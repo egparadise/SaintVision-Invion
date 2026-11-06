@@ -1,0 +1,191 @@
+"""Independent Claude reviewer attacks on Rev9 (3daf1a0d) symbolic model.
+
+Usage: python -B reviewer_rev9_m1_l3_attacks.py <rev9-evidence-dir> <out.json>
+Imports the immutable Rev9 owner model only; no DB/network/crypto/clock/IO.
+Each case records the OBSERVED model behaviour and the reviewer EXPECTATION
+derived from actual 72028 terminal.py _current / build_execution / Root scope.
+"""
+import json, sys
+from copy import deepcopy
+sys.path.insert(0, sys.argv[1])
+from model import World, binding, scope, sk, VER, OP, RUN, SAFE
+from io_contract import fixture_footprint
+
+R = []
+def rec(case, observed, expected, note=''):
+    R.append({'case': case, 'observed': observed, 'expected': expected, 'match': observed == expected, 'note': note})
+
+def send(w, h):
+    if h is None: return False
+    b = w.obligations[w.handles[h.handle_hash]['key']]['binding']
+    return w.invoke(h, b['bodySHA'], b['method'], b['rawPath'])
+
+def row(w, h): return w.obligations[w.handles[h.handle_hash]['key']]
+
+def setup(profile='B', kind='EXECUTE', run='run-1', resource='resource-1'):
+    w = World(); s = scope(); n = w.nodes[sk(s)]; n['profile'] = profile; c = w.connect(VER)
+    p = w.register(c, binding(w, op='parent', kind=kind, run=run, resource=resource)); assert p and send(w, p)
+    return w, s, n, c, p
+
+def frame(w, c, p, op='frame', s=None, run='run-1', resource='resource-1'):
+    return w.register(c, binding(w, s=s, op=op, kind='TERMINAL_FRAME', parent=p.handle_hash, run=run, resource=resource))
+
+def snap(w, n): return deepcopy((n['facts'], n['authorityVersion'], n['lineageVersion'], n.get('claimVersions'), sorted(n['activeClaims']), n.get('claimRights')))
+
+for profile in ('PLAIN', 'B'):
+    P = profile + ':'
+    # ---- M1 / TERMINAL_FRAME ----
+    # M1-R1 Node liveness offline (product mark_offline sets status offline;
+    # actual terminal._current requires node status in {online,draining}).
+    w, s, n, c, p = setup(profile); n['liveness'] = 'offline'
+    h = frame(w, c, p)
+    rec(P + 'M1-offline-node-frame-register', h is not None, False, 'terminal.py _current node status online/draining')
+    rec(P + 'M1-offline-node-frame-invoke', bool(h and send(w, h)), False)
+    rec(P + 'M1-offline-node-R12-eligible-query', w.eligible('R12', s, None, h) if h else None, False if h else None)
+    # live frame prepared, then Node goes offline before invoke
+    w, s, n, c, p = setup(profile); h = frame(w, c, p); n['liveness'] = 'offline'
+    rec(P + 'M1-prepared-then-offline-invoke', send(w, h), False)
+    # M1-R2 two claims: release A, B frame unaffected, B rights intact
+    w, s, n, c, p = setup(profile)
+    q = w.register(c, binding(w, op='parent-b', kind='EXECUTE', run='run-2', resource='resource-2')); assert q and send(w, q)
+    qb = row(w, q)['binding']; before_b = deepcopy(n['claimRights'][qb['claimBindingSHA']]); vb = n['claimVersions'][qb['claimBindingSHA']]
+    assert w.confirm(c, p, w.outcome(p, 'TERMINAL_CLEAN'))
+    rec(P + 'M1-release-A-other-claim-B-rights-unchanged', n['claimRights'][qb['claimBindingSHA']] == before_b and n['claimVersions'][qb['claimBindingSHA']] == vb and qb['claimBindingSHA'] in n['activeClaims'], True)
+    hb = frame(w, c, q, op='frame-b', run='run-2', resource='resource-2')  # reviewer fixture fix: first run used default run-1 (recorded)
+    rec(P + 'M1-release-A-frame-B-still-positive', bool(hb and send(w, hb)), True)
+    rec(P + 'M1-release-A-frame-A-refused-with-other-active', frame(w, c, p, op='frame-a') is None, True)
+    # M1-R3 CANCEL release then original EXECUTE TERMINAL_CLEAN: no double version bump
+    w, s, n, c, p = setup(profile); claim = row(w, p)['binding']['claimBindingSHA']; v0 = n['claimVersions'][claim]
+    k = w.register(c, binding(w, op='cancel', kind='CANCEL', parent=p.handle_hash)); assert send(w, k)
+    assert w.confirm(c, k, w.outcome(k, 'TERMINAL_CLEAN'))
+    ok2 = w.confirm(c, p, w.outcome(p, 'TERMINAL_CLEAN'))
+    rec(P + 'M1-cancel-then-original-receipt-no-double-release', (n['claimVersions'][claim], ok2), (v0 + 1, True))
+    # M1-R4 re-admission of the SAME claim key: old frame/parent refused, new parent positive
+    w, s, n, c, p = setup(profile); claim = row(w, p)['binding']['claimBindingSHA']
+    k = w.register(c, binding(w, op='cancel', kind='CANCEL', parent=p.handle_hash)); assert send(w, k); assert w.confirm(c, k, w.outcome(k, 'TERMINAL_CLEAN'))
+    assert w.confirm(c, p, w.outcome(p, 'TERMINAL_CLEAN'))
+    p2 = w.register(c, binding(w, op='parent-2', kind='EXECUTE')); assert p2 and send(w, p2)
+    rec(P + 'M1-readmitted-claim-old-parent-frame-refused', frame(w, c, p, op='old') is None, True)
+    h2 = frame(w, c, p2, op='new')
+    rec(P + 'M1-readmitted-claim-new-parent-frame-positive', bool(h2 and send(w, h2)), True)
+    # M1-R4b registered re-admission blocked while CANCEL-released parent stays PENDING_IO overlapping
+    w, s, n, c, p = setup(profile)
+    k = w.register(c, binding(w, op='cancel', kind='CANCEL', parent=p.handle_hash)); assert send(w, k); assert w.confirm(c, k, w.outcome(k, 'TERMINAL_CLEAN'))
+    bx = binding(w, op='parent-x', kind='EXECUTE')  # NOTE fixture binding() seeds admission state itself
+    rec(P + 'M1-readmit-register-blocked-while-old-parent-pending', w.register(c, bx) is None, True, 'unresolved overlap invariant')
+    # M1-R4c FIXTURE-ONLY: tombstone is keyed by claim, not (claim,admittedClaimVersion/attempt).
+    # binding() above already re-seeded RUNNING rights v+2 for the same claim key; a late
+    # ORIGINAL receipt (old version) then tombstones the newer seeded rights.
+    claim = row(w, p)['binding']['claimBindingSHA']; seeded_v = n['claimRights'][claim]['version']
+    okold = w.confirm(c, p, w.outcome(p, 'TERMINAL_CLEAN'))
+    rec(P + 'M1-INFO-stale-version-receipt-tombstones-newer-seeded-rights', (okold, n['claimRights'][claim]['workloadState'], row(w, p)['binding']['admittedClaimVersion'] != seeded_v), (True, 'TERMINAL_TOMBSTONED', True), 'only reachable by fixture seeding; real admission gated by unresolved overlap; defence-in-depth CAS recommended')
+    # M1-R5 per-lease expiry between register and invoke (rights-level expiry still live)
+    w, s, n, c, p = setup(profile); b = row(w, p)['binding']; rights = n['claimRights'][b['claimBindingSHA']]
+    h = frame(w, c, p); rights['leases'][0]['expiresAt'] = w.now
+    rec(P + 'M1-matched-lease-expired-after-prepare-invoke', send(w, h), False)
+    # M1-R6 clock advance past deadline-5 between prepare and invoke
+    w, s, n, c, p = setup(profile); h = frame(w, c, p); w.now += 296
+    rec(P + 'M1-deadline-now+5-reached-after-prepare-invoke', send(w, h), False)
+    # M1-R7 rights.version stale while claimVersions current
+    w, s, n, c, p = setup(profile); b = row(w, p)['binding']; n['claimRights'][b['claimBindingSHA']]['version'] -= 1
+    rec(P + 'M1-rights-version-mismatch', frame(w, c, p) is None, True)
+    # M1-R8 non-EXECUTE parent (CANCEL / BUILD_DISPATCH) refused
+    w, s, n, c, p = setup(profile, kind='BUILD_DISPATCH')
+    rec(P + 'M1-build-parent-frame-refused', frame(w, c, p) is None, True)
+    # M1-R9 verifier restart (parent cap LOST_INCARNATION)
+    w, s, n, c, p = setup(profile); w.restart_verifier(); c2 = w.connect(VER)
+    rec(P + 'M1-after-restart-frame-refused', frame(w, c2, p) is None, True)
+    # M1-R10 cross-node frame scope
+    w, s, n, c, p = setup(profile); s2 = scope(n='node-2')
+    try: hx = frame(w, c, p, s=s2)
+    except Exception as e: hx = None
+    rec(P + 'M1-cross-node-frame-refused', hx is None, True)
+    # M1-R11 Node-wide booleans true but matched claim released: refused
+    w, s, n, c, p = setup(profile); assert w.confirm(c, p, w.outcome(p, 'TERMINAL_CLEAN')); n['leaseActive'] = n['workloadActive'] = True; n['activeClaims'].add('claim-other')
+    rec(P + 'M1-node-bools-never-substitute', frame(w, c, p) is None, True)
+    # M1-R12 ACK/recovery observation never releases (reconcile_safety on CANCEL)
+    w, s, n, c, p = setup(profile); claim = row(w, p)['binding']['claimBindingSHA']; v0 = n['claimVersions'][claim]
+    k = w.register(c, binding(w, op='cancel', kind='CANCEL', parent=p.handle_hash)); assert send(w, k); w.failure(k)
+    rcv = w.connect('sv_b_recovery_observation_verifier'); okr = w.reconcile_safety(rcv, k, w.recovery_ack(k))
+    rec(P + 'M1-recovery-ack-closes-cancel-without-release', (okr, claim in n['activeClaims'], n['claimVersions'][claim]), (True, True, v0))
+    # M1-R13 CANCEL after tombstone: durable identity still resolvable (safety lane not broken)
+    w, s, n, c, p = setup(profile); w.failure(p)
+    k = w.register(c, binding(w, op='cancel', kind='CANCEL', parent=p.handle_hash)); assert send(w, k); assert w.confirm(c, k, w.outcome(k, 'TERMINAL_CLEAN'))
+    k2 = w.register(c, binding(w, op='cancel-2', kind='CANCEL', parent=p.handle_hash))
+    rec(P + 'M1-cancel-lane-after-tombstone-identity-lookup', k2 is not None, True, 'safety stop of possibly running UNKNOWN parent stays available; no TERMINAL access')
+    rec(P + 'M1-terminal-after-tombstone-UNKNOWN-parent-refused', frame(w, c, p) is None, True)
+
+    # ---- BUILD_CLEANUP_READ ----
+    def cleanup_setup():
+        w, s, n, c, p = setup(profile, kind='BUILD_DISPATCH'); w.seed_protected_cleanup_fixture(p); return w, s, n, c, p
+    def cleanup(w, c, p, op='cleanup', s=None):
+        return w.register(c, binding(w, s=s, op=op, kind='BUILD_CLEANUP_READ', parent=p.handle_hash))
+    for field, value in [('channelEnabled', False), ('keyLive', False), ('certNotAfter', 0), ('observeGrantLive', False), ('observeGrantUntil', 0), ('fenced', True), ('C', 9), ('DER', '0' * 64), ('generation', 'g-other')]:
+        w, s, n, c, p = cleanup_setup(); n[field] = value
+        rec(P + 'CR-current-auth-' + field, cleanup(w, c, p) is None, True)
+    w, s, n, c, p = cleanup_setup(); w.protected_cleanup_parents[p.handle_hash]['readGrantLive'] = False
+    rec(P + 'CR-read-grant-revoked', cleanup(w, c, p) is None, True)
+    w, s, n, c, p = cleanup_setup(); h = cleanup(w, c, p); w.protected_cleanup_parents[p.handle_hash]['readGrantUntil'] = w.now
+    rec(P + 'CR-read-grant-expired-after-prepare-invoke', send(w, h), False)
+    w, s, n, c, p = cleanup_setup(); w.protected_cleanup_parents[p.handle_hash]['pathPurpose'] = 'GENERIC_FILE_READ'; w.admitted_build_descriptors[p.handle_hash]['pathPurpose'] = 'GENERIC_FILE_READ'
+    rec(P + 'CR-wrong-purpose-even-if-both-views-agree', cleanup(w, c, p) is None, True)
+    # parent EXECUTE (not BUILD_DISPATCH) with a hand-crafted record
+    w, s, n, c, p = setup(profile)
+    try: w.seed_protected_cleanup_fixture(p); seeded = True
+    except ValueError: seeded = False
+    rec(P + 'CR-execute-parent-fixture-refused', seeded, False)
+    # cleanup read confirm under QUARANTINE fact (read-only evidence) and effects
+    w, s, n, c, p = cleanup_setup(); w.set_fact(w.connect(OP), s, 'QUARANTINE'); before = snap(w, n)
+    h = cleanup(w, c, p); okq = bool(h and send(w, h) and w.confirm(c, h, w.outcome(h, 'OBSERVED')))
+    rec(P + 'CR-read-under-quarantine-no-effect', (okq, snap(w, n) == before), (True, True), 'read-only evidence lane; facts/claims/versions unchanged')
+    # cleanup read never settles UNKNOWN parent / never revives cap
+    w, s, n, c, p = cleanup_setup(); w.failure(p); before = (snap(w, n), deepcopy(row(w, p)), deepcopy(w.private_caps[p.handle_hash]))
+    h = cleanup(w, c, p); assert send(w, h); okr = w.confirm(c, h, w.outcome(h, 'OBSERVED'))
+    rec(P + 'CR-UNKNOWN-parent-read-no-settlement', (okr, (snap(w, n), row(w, p), w.private_caps[p.handle_hash]) == before), (True, True))
+    # TERMINAL_CLEAN label on read with live build claim: refused, claim unchanged, read row poisoned (fail-closed)
+    w, s, n, c, p = cleanup_setup(); claim = row(w, p)['binding']['claimBindingSHA']; v0 = n['claimVersions'][claim]
+    h = cleanup(w, c, p); assert send(w, h); okt = w.confirm(c, h, w.outcome(h, 'TERMINAL_CLEAN'))
+    rec(P + 'CR-terminal-clean-label-refused-live-claim', (okt, claim in n['activeClaims'], n['claimVersions'][claim]), (False, True, v0))
+    # cross-node cleanup refused
+    w, s, n, c, p = cleanup_setup()
+    try: hx = cleanup(w, c, p, s=scope(n='node-2'))
+    except Exception: hx = None
+    rec(P + 'CR-cross-node-refused', hx is None, True)
+    # duplicate op id refused; distinct op allowed (read-only)
+    w, s, n, c, p = cleanup_setup(); h1 = cleanup(w, c, p)
+    try: hdup = cleanup(w, c, p)
+    except Exception: hdup = None
+    rec(P + 'CR-duplicate-op-refused', (h1 is not None, hdup is None), (True, True))
+    # B lineage tombstone: business chain revoked, read-only protected evidence still current-auth gated
+    if profile == 'B':
+        w, s, n, c, p = cleanup_setup(); w.tombstones[(sk(s), 'A1')] = True
+        h = cleanup(w, c, p)
+        rec(P + 'CR-lineage-tombstone-not-channel-revoke', h is not None, True, 'catalog: lineage tombstone alone is not observe/channel revocation')
+
+    # ---- L3 hints ----
+    def hint_setup():
+        w, s, n, c, p = setup(profile); n['dbCandidates'] = {'A': fixture_footprint(), 'B': fixture_footprint('resource-2', 'run-2')}; return w, s, n, c, p
+    for field, value in [('liveness', 'offline'), ('grantLive', False), ('expiresAt', 0), ('certNotAfter', 0)]:
+        w, s, n, c, p = hint_setup(); before = snap(w, n); n[field] = value
+        st = w.candidate_hint(c, s, 'B')['status']
+        rec(P + 'L3-hint-' + field, (st, snap(w, n) == before), ('AUTHORITY_DENIED', True))
+    w, s, n, c, p = hint_setup(); c2 = w.connect(VER, scopes=[scope(n='node-2')])
+    rec(P + 'L3-hint-cross-node-connection', w.candidate_hint(c2, s, 'B')['status'], 'AUTHORITY_DENIED')
+    w, s, n, c, p = hint_setup(); w.restart_verifier(); c3 = w.connect(VER)
+    rec(P + 'L3-hint-after-restart-own-node-UNKNOWN-hold', w.candidate_hint(c3, s, 'B')['status'], 'UNKNOWN_PARENT_HOLD', 'LIVE parent cap -> LOST_INCARNATION')
+    w, s, n, c, p = hint_setup(); w.failure(p)
+    rec(P + 'L3-hint-UNKNOWN-other-node-not-held', w.candidate_hint(c, scope(n='node-2'), 'B')['status'] if w.nodes[sk(scope(n='node-2'))].get('dbCandidates') else 'NO_CANDIDATES', 'NO_CANDIDATES')
+    w.nodes[sk(scope(n='node-2'))]['dbCandidates'] = {'B': fixture_footprint('resource-2', 'run-2')}
+    rec(P + 'L3-hint-UNKNOWN-other-node-available', w.candidate_hint(c, scope(n='node-2'), 'B')['status'], 'HINT_AVAILABLE')
+    w, s, n, c, p = hint_setup(); n['dbCandidates']['M'] = {'known': False, 'rows': []}; before = snap(w, n)
+    rec(P + 'L3-hint-missing-scope-no-mutation', (w.candidate_hint(c, s, 'M')['status'], snap(w, n) == before), ('MISSING_RESOURCE_SCOPE', True))
+    w, s, n, c, p = hint_setup(); n['dbCandidates']['B'] = fixture_footprint('resource-2', 'run-2')
+    rec(P + 'L3-hint-forged-disjoint-caller-footprint-for-A-ignored', w.candidate_hint(c, s, 'A', 'R05', fixture_footprint('resource-9', 'run-9'))['status'], 'HINT_OVERLAP')
+    if profile == 'B':
+        w, s, n, c, p = hint_setup(); w.tombstones[(sk(s), 'A1')] = True
+        rec(P + 'L3-hint-lineage-tombstone-business-denied', w.candidate_hint(c, s, 'B')['status'], 'AUTHORITY_DENIED')
+
+out = {'reviewer': 'Claude independent', 'target': '3daf1a0d24c220586474a4b376609e62960b8ca6', 'scope': 'SYMBOLIC model attacks only; not B runtime',
+       'cases': R, 'total': len(R), 'mismatches': [r['case'] for r in R if not r['match']]}
+open(sys.argv[2], 'w', encoding='utf-8', newline='\n').write(json.dumps(out, indent=1) + '\n')
+print(json.dumps({'total': len(R), 'mismatches': out['mismatches']}))

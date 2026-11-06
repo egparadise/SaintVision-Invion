@@ -1,0 +1,31 @@
+{"case": "actual-source-positive", "observed": "ACCEPT", "reason": null}
+{"case": "L1-hidden-replacement-state", "observed": "REFUSE", "reason": "UNRESOLVED:CONSTRUCTOR_ROOT_REMOVED_OR_HIDDEN"}
+{"case": "L1-hidden-replacement-runtime", "observed": "REFUSE", "reason": "UNRESOLVED:CONSTRUCTOR_ROOT_REMOVED_OR_HIDDEN"}
+{"case": "L1-removed-root", "observed": "REFUSE", "reason": "UNRESOLVED:CONSTRUCTOR_ROOT_REMOVED_OR_HIDDEN"}
+{"case": "L1-six-plus-hidden-operator", "observed": "REFUSE", "reason": "UNRESOLVED:RELEVANT_REFLECTION_USE_NOT_ALLOWLISTED:REFLECTION_NAMESPACE:sys.modules"}
+{"case": "L1-six-plus-hidden-inspect", "observed": "REFUSE", "reason": "UNRESOLVED:RELEVANT_REFLECTION_USE_NOT_ALLOWLISTED:REFLECTION_NAMESPACE:inspect.getattr_static"}
+{"case": "L1-inspect-members", "observed": "REFUSE", "reason": "UNRESOLVED:RELEVANT_REFLECTION_USE_NOT_ALLOWLISTED:REFLECTION_NAMESPACE:inspect.getmembers"}
+{"case": "L1-importlib-module", "observed": "REFUSE", "reason": "UNRESOLVED:RELEVANT_REFLECTION_USE_NOT_ALLOWLISTED:REFLECTION_NAMESPACE:importlib.import_module"}
+{"case": "L1-sys-module", "observed": "REFUSE", "reason": "UNRESOLVED:RELEVANT_REFLECTION_USE_NOT_ALLOWLISTED:REFLECTION_NAMESPACE:sys.modules"}
+{"case": "L1-methodcaller", "observed": "REFUSE", "reason": "UNRESOLVED:RELEVANT_REFLECTION_USE_NOT_ALLOWLISTED:REFLECTION_NAMESPACE:operator.methodcaller"}
+{"case": "L1-operator-module-alias", "observed": "REFUSE", "reason": "UNRESOLVED:RELEVANT_REFLECTION_USE_NOT_ALLOWLISTED:REFLECTION_NAMESPACE:operator.attrgetter"}
+{"case": "L1-benign-unused-import-and-nonreflective-string", "observed": "ACCEPT", "reason": null}
+{"case": "L1-benign-current-constructor-module-alias", "observed": "ACCEPT", "reason": null}
+{"case": "L2-reviewer-business-handoff-alias-omitted", "observed": "REFUSE", "reason": "UNCATALOGUED_PRODUCTION_SOURCE:services/control-plane/src/inv/business_handoff.py"}
+{"case": "L2-reexport-alias-omitted", "observed": "REFUSE", "reason": "UNCATALOGUED_PRODUCTION_SOURCE:services/control-plane/src/inv/b9c_reexport_fixture.py,services/control-plane/src/inv/business_handoff.py"}
+{"case": "L2-module-reexport-omitted", "observed": "REFUSE", "reason": "UNCATALOGUED_PRODUCTION_SOURCE:services/control-plane/src/inv/b9c_reexport_fixture.py,services/control-plane/src/inv/business_handoff.py"}
+{"case": "L2-forwarding-fixed-point-omitted", "observed": "REFUSE", "reason": "UNCATALOGUED_PRODUCTION_SOURCE:services/control-plane/src/inv/business_handoff.py,services/control-plane/src/inv/business_surface.py"}
+{"case": "L2-harness-is-separated", "observed": "ACCEPT", "reason": null}
+{"case": "L2-benign-current-import-alias", "observed": "ACCEPT", "reason": null}
+{"case": "L2-benign-current-module-alias", "observed": "ACCEPT", "reason": null}
+{"case": "L3-five-runtime-runtime", "observed": "REFUSE", "reason": "DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:INSTANCE:runtime"}
+{"case": "L3-five-runtime-runtime.db", "observed": "REFUSE", "reason": "DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:INSTANCE:runtime"}
+{"case": "L3-five-runtime-runtime.db.transaction", "observed": "REFUSE", "reason": "DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:INSTANCE:runtime"}
+{"case": "L3-five-workspace-workspace", "observed": "REFUSE", "reason": "DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:INSTANCE:workspace"}
+{"case": "L3-five-workspace-workspace.runtime.db", "observed": "REFUSE", "reason": "DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:INSTANCE:workspace"}
+{"case": "L3-with-target", "observed": "REFUSE", "reason": "DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:INSTANCE:held_runtime"}
+{"case": "L3-comprehension-target", "observed": "REFUSE", "reason": "DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:INSTANCE:aliases"}
+{"case": "L3-attribute-subscript", "observed": "REFUSE", "reason": "DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:INSTANCE:runtime_alias"}
+{"case": "L3-benign-unrelated-containers", "observed": "ACCEPT", "reason": null}
+{"cases": 29, "newAPI": true}
+{"ownerResourceMeasurement": {"target": "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105\\docs\\vault\\30_Development\\Evidence\\fleet5-b-rev9c-20261106-codex\\rev9c_probe_driver.py", "peakWorkingSetBytes": 128983040, "elapsedSeconds": 125.366, "OSMemoryLimitEnforced": false, "serial": true}}

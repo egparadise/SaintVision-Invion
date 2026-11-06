@@ -1,0 +1,602 @@
+{
+ "reviewer": "Claude independent",
+ "target": "3daf1a0d24c220586474a4b376609e62960b8ca6",
+ "source": "72028cbac903c4415d9979f980a6e0f9948e914f",
+ "scope": "BOUNDED STATIC mutation probes of owner predicates; mutants parsed only, never imported/executed",
+ "cases": [
+  {
+   "case": "A1c-escape[mark_offline.conn] foreign(c=conn)",
+   "acceptedByOwnerPredicate": false,
+   "reviewerExpectsRefusal": true,
+   "soundGap": false,
+   "reason": "DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:INSTANCE:conn",
+   "producerSanity": true,
+   "mutatedSourceSHA256": "f6315ef55fc5307fe5fb0dd24fe07b2d12807a75985013332c3d2d78da5601ac"
+  },
+  {
+   "case": "A1c-escape[mark_offline.conn] foreign([conn])",
+   "acceptedByOwnerPredicate": false,
+   "reviewerExpectsRefusal": true,
+   "soundGap": false,
+   "reason": "DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:INSTANCE:conn",
+   "producerSanity": true,
+   "mutatedSourceSHA256": "e5db9686fafd565ee030d0f14e7a439f80e4d3f1fccda1d8edf727bdbe49de85"
+  },
+  {
+   "case": "A1c-escape[mark_offline.conn] foreign(*[conn])",
+   "acceptedByOwnerPredicate": false,
+   "reviewerExpectsRefusal": true,
+   "soundGap": false,
+   "reason": "DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:INSTANCE:conn",
+   "producerSanity": true,
+   "mutatedSourceSHA256": "023777aad30dbf6d871d9776755b6a42c3a213846b6ad00abdb4bcbd116c8da7"
+  },
+  {
+   "case": "A1c-escape[mark_offline.conn] foreign(hook)",
+   "acceptedByOwnerPredicate": false,
+   "reviewerExpectsRefusal": true,
+   "soundGap": false,
+   "reason": "DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:INSTANCE:conn",
+   "producerSanity": true,
+   "mutatedSourceSHA256": "4da7c1953238d1856ecd1b6c4a81e35f56bf3af239eff09d4ed297e213e52898"
+  },
+  {
+   "case": "A1c-escape[mark_offline.conn] foreign(box)",
+   "acceptedByOwnerPredicate": false,
+   "reviewerExpectsRefusal": true,
+   "soundGap": false,
+   "reason": "DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:INSTANCE:box",
+   "producerSanity": true,
+   "mutatedSourceSHA256": "4ea43e6443da46e667b58ce9fc171bcd4998cdd133bb8675cb51ef5e83ccbc5c"
+  },
+  {
+   "case": "A1c-escape[mark_offline.conn] foreign.attach(conn=conn)",
+   "acceptedByOwnerPredicate": false,
+   "reviewerExpectsRefusal": true,
+   "soundGap": false,
+   "reason": "DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:INSTANCE:conn",
+   "producerSanity": true,
+   "mutatedSourceSHA256": "a184a0b4662325611f625176d01de4f4ed074746f99d76190beeb4ab4ba5bfe5"
+  },
+  {
+   "case": "A1c-escape[mark_offline.conn] foreign(conn.execute)",
+   "acceptedByOwnerPredicate": false,
+   "reviewerExpectsRefusal": true,
+   "soundGap": false,
+   "reason": "DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:INSTANCE:conn",
+   "producerSanity": true,
+   "mutatedSourceSHA256": "8be8ad6b30b58598606558a1bab89a4bb2a254aadaeda80c07c63a34e1f55237"
+  },
+  {
+   "case": "A1c-escape[mark_offline.conn] conn.__class__.execute = foreign",
+   "acceptedByOwnerPredicate": false,
+   "reviewerExpectsRefusal": true,
+   "soundGap": false,
+   "reason": "DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:WRITE_USE:conn.__class__.execute",
+   "producerSanity": true,
+   "mutatedSourceSHA256": "8575fb41c8badced9f2c528674ebc34f397a7b62fe05fc5dc69be4772452b60f"
+  },
+  {
+   "case": "A1c-escape[mark_offline.conn] foreign(conn)",
+   "acceptedByOwnerPredicate": false,
+   "reviewerExpectsRefusal": true,
+   "soundGap": false,
+   "reason": "DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:INSTANCE:conn",
+   "producerSanity": true,
+   "mutatedSourceSHA256": "45ef73125ef2f834f0d22cb12f5fdc179d76750d96f39f6a9198e3630ce86a12"
+  },
+  {
+   "case": "A1c-escape[transaction.conn] foreign(c=conn)",
+   "acceptedByOwnerPredicate": false,
+   "reviewerExpectsRefusal": true,
+   "soundGap": false,
+   "reason": "DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:INSTANCE:conn",
+   "producerSanity": true,
+   "mutatedSourceSHA256": "641ef9f6f9b2a3613d8e7459911a61ad5d449e863a0fb808fd1280fa955f67c6"
+  },
+  {
+   "case": "A1c-escape[transaction.conn] foreign([conn])",
+   "acceptedByOwnerPredicate": false,
+   "reviewerExpectsRefusal": true,
+   "soundGap": false,
+   "reason": "DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:INSTANCE:conn",
+   "producerSanity": true,
+   "mutatedSourceSHA256": "3c1d123fa8ecb0576fdf3138be5649a13bc08502a79cedbc246c1612465ca1c4"
+  },
+  {
+   "case": "A1c-escape[transaction.conn] foreign(*[conn])",
+   "acceptedByOwnerPredicate": false,
+   "reviewerExpectsRefusal": true,
+   "soundGap": false,
+   "reason": "DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:INSTANCE:conn",
+   "producerSanity": true,
+   "mutatedSourceSHA256": "926ff0a58d854ac0d70dd3a06ec5075bf4512ef6e0a91a919b87490149976615"
+  },
+  {
+   "case": "A1c-escape[transaction.conn] foreign(hook)",
+   "acceptedByOwnerPredicate": false,
+   "reviewerExpectsRefusal": true,
+   "soundGap": false,
+   "reason": "DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:INSTANCE:conn",
+   "producerSanity": true,
+   "mutatedSourceSHA256": "3521997e03bad5e376730d44a90157dc1e1e4ef8213d0d5e9d54fdaa028b16b8"
+  },
+  {
+   "case": "A1c-escape[transaction.conn] foreign(box)",
+   "acceptedByOwnerPredicate": false,
+   "reviewerExpectsRefusal": true,
+   "soundGap": false,
+   "reason": "DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:INSTANCE:box",
+   "producerSanity": true,
+   "mutatedSourceSHA256": "46fb6366fbc4c49582497247c1bfcfcc1fc7ad3e80f3d5e843a40110eb61ed23"
+  },
+  {
+   "case": "A1c-escape[transaction.conn] foreign.attach(conn=conn)",
+   "acceptedByOwnerPredicate": false,
+   "reviewerExpectsRefusal": true,
+   "soundGap": false,
+   "reason": "DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:INSTANCE:conn",
+   "producerSanity": true,
+   "mutatedSourceSHA256": "2d590b7438bb27f88baf66d661b24b6c972f49aa9791a81521741d8280163692"
+  },
+  {
+   "case": "A1c-escape[transaction.conn] foreign(conn.execute)",
+   "acceptedByOwnerPredicate": false,
+   "reviewerExpectsRefusal": true,
+   "soundGap": false,
+   "reason": "DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:INSTANCE:conn",
+   "producerSanity": true,
+   "mutatedSourceSHA256": "f7e55637e467c3f2de47876a6c212f45fa29f2b9910385b65454394b097d163d"
+  },
+  {
+   "case": "A1c-escape[transaction.conn] conn.__class__.execute = foreign",
+   "acceptedByOwnerPredicate": false,
+   "reviewerExpectsRefusal": true,
+   "soundGap": false,
+   "reason": "DYNAMIC_BLOCK:DB_CLASS_MUTATION",
+   "producerSanity": true,
+   "mutatedSourceSHA256": "69c7ac59ff18fac5680822d809eab1dd6c2d1e8196293c38e32161f911d2501d"
+  },
+  {
+   "case": "A1c-escape[transaction.conn] foreign(conn)",
+   "acceptedByOwnerPredicate": false,
+   "reviewerExpectsRefusal": true,
+   "soundGap": false,
+   "reason": "DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:INSTANCE:conn",
+   "producerSanity": true,
+   "mutatedSourceSHA256": "fbe6bcff4243dc247b08f521ca0be19ee34759cb8ede05dcb8d499affcead08e"
+  },
+  {
+   "case": "A1c-escape[transaction.observed_conn] foreign(c=observed_conn)",
+   "acceptedByOwnerPredicate": false,
+   "reviewerExpectsRefusal": true,
+   "soundGap": false,
+   "reason": "DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:INSTANCE:observed_conn",
+   "producerSanity": true,
+   "mutatedSourceSHA256": "d866686bcae4d72aaea473c6fdf1a9a412b6f07fef07ef92bb0d847bde454cf4"
+  },
+  {
+   "case": "A1c-escape[transaction.observed_conn] foreign([observed_conn])",
+   "acceptedByOwnerPredicate": false,
+   "reviewerExpectsRefusal": true,
+   "soundGap": false,
+   "reason": "DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:INSTANCE:observed_conn",
+   "producerSanity": true,
+   "mutatedSourceSHA256": "591d33bd857535584e7dfeedb314a6eecd05ca4c12f181596f5a3f702b502dcc"
+  },
+  {
+   "case": "A1c-escape[transaction.observed_conn] foreign(*[observed_conn])",
+   "acceptedByOwnerPredicate": false,
+   "reviewerExpectsRefusal": true,
+   "soundGap": false,
+   "reason": "DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:INSTANCE:observed_conn",
+   "producerSanity": true,
+   "mutatedSourceSHA256": "918fbfc7973104e3607d6ec2feb1aebdd54693d9326c8f102af58a02568eced9"
+  },
+  {
+   "case": "A1c-escape[transaction.observed_conn] foreign(hook)",
+   "acceptedByOwnerPredicate": false,
+   "reviewerExpectsRefusal": true,
+   "soundGap": false,
+   "reason": "DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:INSTANCE:observed_conn",
+   "producerSanity": true,
+   "mutatedSourceSHA256": "cc16eeca5043f527831980184956dd5661d55c7e8aa4638a2df7e8be06146547"
+  },
+  {
+   "case": "A1c-escape[transaction.observed_conn] foreign(box)",
+   "acceptedByOwnerPredicate": false,
+   "reviewerExpectsRefusal": true,
+   "soundGap": false,
+   "reason": "DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:INSTANCE:box",
+   "producerSanity": true,
+   "mutatedSourceSHA256": "7d464cd8570bc739f4da2fa9ba72f2d10737ce2527e028fdc39376db9f643275"
+  },
+  {
+   "case": "A1c-escape[transaction.observed_conn] foreign.attach(conn=observed_conn)",
+   "acceptedByOwnerPredicate": false,
+   "reviewerExpectsRefusal": true,
+   "soundGap": false,
+   "reason": "DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:INSTANCE:observed_conn",
+   "producerSanity": true,
+   "mutatedSourceSHA256": "b3ca4dc4395cf1231a1d67f4aab6bb8fbd70c97470a88f3511f20cdbd7d663ba"
+  },
+  {
+   "case": "A1c-escape[transaction.observed_conn] foreign(observed_conn.execute)",
+   "acceptedByOwnerPredicate": false,
+   "reviewerExpectsRefusal": true,
+   "soundGap": false,
+   "reason": "DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:INSTANCE:observed_conn",
+   "producerSanity": true,
+   "mutatedSourceSHA256": "235f8c85e6a58f28d2d0cefa827f5881b42de2be9482d940865d61995b2b7678"
+  },
+  {
+   "case": "A1c-escape[transaction.observed_conn] observed_conn.__class__.execute = foreign",
+   "acceptedByOwnerPredicate": false,
+   "reviewerExpectsRefusal": true,
+   "soundGap": false,
+   "reason": "DYNAMIC_BLOCK:DB_CLASS_MUTATION",
+   "producerSanity": true,
+   "mutatedSourceSHA256": "5709dff528a7f7c4994bc710ae4431abe85ca1d0a6a097bb295c8135024756e6"
+  },
+  {
+   "case": "A1c-escape[transaction.observed_conn] foreign(observed_conn)",
+   "acceptedByOwnerPredicate": false,
+   "reviewerExpectsRefusal": true,
+   "soundGap": false,
+   "reason": "DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:INSTANCE:observed_conn",
+   "producerSanity": true,
+   "mutatedSourceSHA256": "e3ae594692862d26982a7620a181fcbf90306051aae177b483bb7921d09f0e04"
+  },
+  {
+   "case": "A1c/A8-owner-patch mark_offline-start self.db.transaction = foreign",
+   "acceptedByOwnerPredicate": false,
+   "reviewerExpectsRefusal": true,
+   "soundGap": false,
+   "reason": "DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:WRITE_USE:self.db.transaction",
+   "producerSanity": true,
+   "mutatedSourceSHA256": "816cbd81e254932452f2416e0be1b30c510d97fcfeefe56652a8c55e440f136a"
+  },
+  {
+   "case": "A1c/A8-owner-patch mark_offline-start self.db.__class__ = foreign",
+   "acceptedByOwnerPredicate": false,
+   "reviewerExpectsRefusal": true,
+   "soundGap": false,
+   "reason": "DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:WRITE_USE:self.db.__class__",
+   "producerSanity": true,
+   "mutatedSourceSHA256": "82f932fbd969e846718cf40c7cfe3fb8beb8d84b614520c033ba6a02e3df54d9"
+  },
+  {
+   "case": "A1c/A8-owner-patch mark_offline-start vars(self.db).update(transaction=foreign)",
+   "acceptedByOwnerPredicate": false,
+   "reviewerExpectsRefusal": true,
+   "soundGap": false,
+   "reason": "DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:SYMBOL:builtins.vars",
+   "producerSanity": true,
+   "mutatedSourceSHA256": "bb74775a11af2e56e492ab285bed0f3dd9deb3e43028a75d7c8bab0e941c5fc4"
+  },
+  {
+   "case": "A1c/A8-owner-patch __init__-end self.db.transaction = foreign",
+   "acceptedByOwnerPredicate": false,
+   "reviewerExpectsRefusal": true,
+   "soundGap": false,
+   "reason": "DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:WRITE_USE:self.db.transaction",
+   "producerSanity": true,
+   "mutatedSourceSHA256": "de6a00a912a3b1ecf9ba3332cd53476da200f7329990d1edf4d65c17b093385d"
+  },
+  {
+   "case": "A1c/A8-owner-patch module-end from .db import Database as _D; _D.transaction = foreign",
+   "acceptedByOwnerPredicate": false,
+   "reviewerExpectsRefusal": true,
+   "soundGap": false,
+   "reason": "DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:WRITE_USE:inv.db.Database.transaction",
+   "producerSanity": true,
+   "mutatedSourceSHA256": "602ecb76b0c1ec4d78053cc9da0e433102dc3654b1a48f76f84e3c6ddc415fa2"
+  },
+  {
+   "case": "A1c/A8-owner-patch module-end Database.transaction = foreign (control)",
+   "acceptedByOwnerPredicate": false,
+   "reviewerExpectsRefusal": true,
+   "soundGap": false,
+   "reason": "DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:WRITE_USE:Database.transaction",
+   "producerSanity": true,
+   "mutatedSourceSHA256": "de4b46de61f765a3092ab7ed653639ce3fe286ee77dca0703508ba3c811db57b"
+  },
+  {
+   "case": "A8-root-instance-patch observer_worker.main db.transaction = foreign",
+   "acceptedByOwnerPredicate": false,
+   "reviewerExpectsRefusal": true,
+   "soundGap": false,
+   "reason": "DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:WRITE_USE:db.transaction",
+   "producerSanity": true,
+   "mutatedSourceSHA256": "de1b73dc5bd16429106a3910de7ea93e2b70421473847981fa80bd8ea41dc066"
+  },
+  {
+   "case": "A8-root-instance-patch observer_worker.main db.statement_observer = foreign_socket_send",
+   "acceptedByOwnerPredicate": false,
+   "reviewerExpectsRefusal": true,
+   "soundGap": false,
+   "reason": "DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:WRITE_USE:db.statement_observer",
+   "producerSanity": true,
+   "mutatedSourceSHA256": "6907eb745a0d3e6b11d2a2368238991e13686ea2ba26e42565112b1142a1bd17"
+  },
+  {
+   "case": "A8-root-instance-patch observer_worker.main db.placement_metric_sink = foreign_subprocess_run",
+   "acceptedByOwnerPredicate": false,
+   "reviewerExpectsRefusal": true,
+   "soundGap": false,
+   "reason": "DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:WRITE_USE:db.placement_metric_sink",
+   "producerSanity": true,
+   "mutatedSourceSHA256": "b0ae890567ce723c6411dc57e28f22daf036ccd8f4c9921d2bcd0c83a51cabb7"
+  },
+  {
+   "case": "A8-lan_pilot-root ObservationWorker(runtime(state)) -> ObservationWorker(foreign_database)",
+   "acceptedByOwnerPredicate": false,
+   "reviewerExpectsRefusal": true,
+   "soundGap": false,
+   "reason": "UNRESOLVED:CONSTRUCTOR_ROOT_REMOVED_OR_HIDDEN",
+   "producerSanity": true,
+   "mutatedSourceSHA256": "7aad03da3bb2edcb1c45f92b55934c7691b555f37cb19aa9194e975af5c7c3bd"
+  },
+  {
+   "case": "A8-lan_pilot-root ObservationWorker(runtime(state)) -> ObservationWorker(BoundDatabase_like(...))",
+   "acceptedByOwnerPredicate": false,
+   "reviewerExpectsRefusal": true,
+   "soundGap": false,
+   "reason": "UNRESOLVED:CONSTRUCTOR_ROOT_REMOVED_OR_HIDDEN",
+   "producerSanity": true,
+   "mutatedSourceSHA256": "afb0d10a03fdc6af8bd3271052983eabf3e37b143da4ad46d79c892ddd458ee2"
+  },
+  {
+   "case": "A8-lan_pilot-root module-end runtime = foreign_runtime",
+   "acceptedByOwnerPredicate": false,
+   "reviewerExpectsRefusal": true,
+   "soundGap": false,
+   "reason": "RECEIVER_UNION_UNPROVEN:CONSTRUCTOR_INPUT:inv.observation.NodeObservation",
+   "producerSanity": true,
+   "mutatedSourceSHA256": "526c5caf6a15764a199df872cdae8426fbe25639bdd23a9595ff019a9d8201cf"
+  },
+  {
+   "case": "A1c-db-module[transaction.conn] import psycopg as _pg; _pg.Connection.execute = foreign",
+   "acceptedByOwnerPredicate": false,
+   "reviewerExpectsRefusal": true,
+   "soundGap": false,
+   "reason": "DYNAMIC_BLOCK:DB_CLASS_MUTATION",
+   "producerSanity": true,
+   "mutatedSourceSHA256": "b6f01fcbacd2270c3d73a690dab6b62f88df9fc9c4888b6350f92666885a84c2"
+  },
+  {
+   "case": "A1c-db-module[transaction.observed_conn] import psycopg as _pg; _pg.Connection.execute = foreign",
+   "acceptedByOwnerPredicate": false,
+   "reviewerExpectsRefusal": true,
+   "soundGap": false,
+   "reason": "DYNAMIC_BLOCK:DB_CLASS_MUTATION",
+   "producerSanity": true,
+   "mutatedSourceSHA256": "b6f01fcbacd2270c3d73a690dab6b62f88df9fc9c4888b6350f92666885a84c2"
+  },
+  {
+   "case": "INFO union-only import psycopg as _pg; _pg.Connection.execute = foreign",
+   "acceptedByOwnerPredicate": false,
+   "reviewerExpectsRefusal": null,
+   "soundGap": false,
+   "reason": "DYNAMIC_BLOCK:DB_CLASS_MUTATION",
+   "note": "observed_union alone; pipeline row above is the verdict"
+  },
+  {
+   "case": "A1c-db-module[transaction.conn] from psycopg import Connection as _PC; _PC.execute = foreign",
+   "acceptedByOwnerPredicate": false,
+   "reviewerExpectsRefusal": true,
+   "soundGap": false,
+   "reason": "DYNAMIC_BLOCK:DB_CLASS_MUTATION",
+   "producerSanity": true,
+   "mutatedSourceSHA256": "d692018f190ab1f0b34331156f9f94d860853f26377df193c03f85f2e853d12c"
+  },
+  {
+   "case": "A1c-db-module[transaction.observed_conn] from psycopg import Connection as _PC; _PC.execute = foreign",
+   "acceptedByOwnerPredicate": false,
+   "reviewerExpectsRefusal": true,
+   "soundGap": false,
+   "reason": "DYNAMIC_BLOCK:DB_CLASS_MUTATION",
+   "producerSanity": true,
+   "mutatedSourceSHA256": "d692018f190ab1f0b34331156f9f94d860853f26377df193c03f85f2e853d12c"
+  },
+  {
+   "case": "INFO union-only from psycopg import Connection as _PC; _PC.execute = foreign",
+   "acceptedByOwnerPredicate": false,
+   "reviewerExpectsRefusal": null,
+   "soundGap": false,
+   "reason": "DYNAMIC_BLOCK:DB_CLASS_MUTATION",
+   "note": "observed_union alone; pipeline row above is the verdict"
+  },
+  {
+   "case": "A1c-db-module[transaction.conn] import builtins; builtins.setattr(_ObservedConnection, execute)",
+   "acceptedByOwnerPredicate": false,
+   "reviewerExpectsRefusal": true,
+   "soundGap": false,
+   "reason": "DYNAMIC_BLOCK:DB_CLASS_MUTATION",
+   "producerSanity": true,
+   "mutatedSourceSHA256": "96ed29d4045dc03eae0226af98489988ed2090ca0811831d5e3cfbac908f7c13"
+  },
+  {
+   "case": "A1c-db-module[transaction.observed_conn] import builtins; builtins.setattr(_ObservedConnection, execute)",
+   "acceptedByOwnerPredicate": false,
+   "reviewerExpectsRefusal": true,
+   "soundGap": false,
+   "reason": "DYNAMIC_BLOCK:DB_CLASS_MUTATION",
+   "producerSanity": true,
+   "mutatedSourceSHA256": "96ed29d4045dc03eae0226af98489988ed2090ca0811831d5e3cfbac908f7c13"
+  },
+  {
+   "case": "INFO union-only import builtins; builtins.setattr(_ObservedConnection, execute)",
+   "acceptedByOwnerPredicate": false,
+   "reviewerExpectsRefusal": null,
+   "soundGap": false,
+   "reason": "DYNAMIC_BLOCK:DB_CLASS_MUTATION",
+   "note": "observed_union alone; pipeline row above is the verdict"
+  },
+  {
+   "case": "A1c-db-module[transaction.conn] type.__setattr__(_ObservedConnection, execute)",
+   "acceptedByOwnerPredicate": false,
+   "reviewerExpectsRefusal": true,
+   "soundGap": false,
+   "reason": "DYNAMIC_BLOCK:DB_CLASS_MUTATION",
+   "producerSanity": true,
+   "mutatedSourceSHA256": "069d2429954d1218afca6eb8f41d3b089fa60fe5f0a8914355440ef4b2300c27"
+  },
+  {
+   "case": "A1c-db-module[transaction.observed_conn] type.__setattr__(_ObservedConnection, execute)",
+   "acceptedByOwnerPredicate": false,
+   "reviewerExpectsRefusal": true,
+   "soundGap": false,
+   "reason": "DYNAMIC_BLOCK:DB_CLASS_MUTATION",
+   "producerSanity": true,
+   "mutatedSourceSHA256": "069d2429954d1218afca6eb8f41d3b089fa60fe5f0a8914355440ef4b2300c27"
+  },
+  {
+   "case": "INFO union-only type.__setattr__(_ObservedConnection, execute)",
+   "acceptedByOwnerPredicate": false,
+   "reviewerExpectsRefusal": null,
+   "soundGap": false,
+   "reason": "DYNAMIC_BLOCK:DB_CLASS_MUTATION",
+   "note": "observed_union alone; pipeline row above is the verdict"
+  },
+  {
+   "case": "A1c-db-module[transaction.conn] globals()['_ObservedConnection'].execute = foreign",
+   "acceptedByOwnerPredicate": false,
+   "reviewerExpectsRefusal": true,
+   "soundGap": false,
+   "reason": "DYNAMIC_BLOCK:DB_CLASS_MUTATION",
+   "producerSanity": true,
+   "mutatedSourceSHA256": "f0606143cf975854a012f2953b80c2a275d88ce1f82816209da095d077e692d3"
+  },
+  {
+   "case": "A1c-db-module[transaction.observed_conn] globals()['_ObservedConnection'].execute = foreign",
+   "acceptedByOwnerPredicate": false,
+   "reviewerExpectsRefusal": true,
+   "soundGap": false,
+   "reason": "DYNAMIC_BLOCK:DB_CLASS_MUTATION",
+   "producerSanity": true,
+   "mutatedSourceSHA256": "f0606143cf975854a012f2953b80c2a275d88ce1f82816209da095d077e692d3"
+  },
+  {
+   "case": "INFO union-only globals()['_ObservedConnection'].execute = foreign",
+   "acceptedByOwnerPredicate": false,
+   "reviewerExpectsRefusal": null,
+   "soundGap": false,
+   "reason": "DYNAMIC_BLOCK:DB_CLASS_MUTATION",
+   "note": "observed_union alone; pipeline row above is the verdict"
+  },
+  {
+   "case": "A1c-db-module[transaction.conn] psycopg.Connection.execute = foreign (control)",
+   "acceptedByOwnerPredicate": false,
+   "reviewerExpectsRefusal": true,
+   "soundGap": false,
+   "reason": "DYNAMIC_BLOCK:DB_CLASS_MUTATION",
+   "producerSanity": true,
+   "mutatedSourceSHA256": "3b4f3f348b35b3f881b1b5e092afb0ec17279f9304c42221f3453ffc435a9042"
+  },
+  {
+   "case": "A1c-db-module[transaction.observed_conn] psycopg.Connection.execute = foreign (control)",
+   "acceptedByOwnerPredicate": false,
+   "reviewerExpectsRefusal": true,
+   "soundGap": false,
+   "reason": "DYNAMIC_BLOCK:DB_CLASS_MUTATION",
+   "producerSanity": true,
+   "mutatedSourceSHA256": "3b4f3f348b35b3f881b1b5e092afb0ec17279f9304c42221f3453ffc435a9042"
+  },
+  {
+   "case": "INFO union-only psycopg.Connection.execute = foreign (control)",
+   "acceptedByOwnerPredicate": false,
+   "reviewerExpectsRefusal": null,
+   "soundGap": false,
+   "reason": "DYNAMIC_BLOCK:DB_CLASS_MUTATION",
+   "note": "observed_union alone; pipeline row above is the verdict"
+  },
+  {
+   "case": "A2-error_initializer errors.py head import builtins; builtins.Exception = foreign",
+   "acceptedByOwnerPredicate": false,
+   "reviewerExpectsRefusal": true,
+   "soundGap": false
+  },
+  {
+   "case": "A2-error_initializer errors.py end type.__setattr__(DomainError, __init__)",
+   "acceptedByOwnerPredicate": false,
+   "reviewerExpectsRefusal": true,
+   "soundGap": false
+  },
+  {
+   "case": "A2-error_initializer errors.py end import builtins; builtins.setattr(DomainError, __init__)",
+   "acceptedByOwnerPredicate": false,
+   "reviewerExpectsRefusal": true,
+   "soundGap": false
+  },
+  {
+   "case": "A2-error_initializer errors.py end globals()['DomainError'].__init__ = foreign",
+   "acceptedByOwnerPredicate": false,
+   "reviewerExpectsRefusal": true,
+   "soundGap": false
+  },
+  {
+   "case": "A2-error_initializer errors.py end DomainError.__init__ = foreign (control)",
+   "acceptedByOwnerPredicate": false,
+   "reviewerExpectsRefusal": true,
+   "soundGap": false
+  },
+  {
+   "case": "A2-constructor_binding db.py end from . import errors as _e; _e.DomainError.__init__ = foreign",
+   "acceptedByOwnerPredicate": false,
+   "reviewerExpectsRefusal": true,
+   "soundGap": false
+  },
+  {
+   "case": "A2-constructor_binding db.py end type.__setattr__(DomainError, __init__)",
+   "acceptedByOwnerPredicate": false,
+   "reviewerExpectsRefusal": true,
+   "soundGap": false
+  },
+  {
+   "case": "A2-constructor_binding db.py end DomainError.__init__ = foreign (control)",
+   "acceptedByOwnerPredicate": false,
+   "reviewerExpectsRefusal": true,
+   "soundGap": false
+  },
+  {
+   "case": "POSITIVE actual A1c[mark_offline.conn]",
+   "acceptedByOwnerPredicate": true,
+   "reviewerExpectsRefusal": false,
+   "soundGap": false,
+   "reason": null,
+   "producerSanity": true
+  },
+  {
+   "case": "POSITIVE actual A1c[transaction.conn]",
+   "acceptedByOwnerPredicate": true,
+   "reviewerExpectsRefusal": false,
+   "soundGap": false,
+   "reason": null,
+   "producerSanity": true
+  },
+  {
+   "case": "POSITIVE actual A1c[transaction.observed_conn]",
+   "acceptedByOwnerPredicate": true,
+   "reviewerExpectsRefusal": false,
+   "soundGap": false,
+   "reason": null,
+   "producerSanity": true
+  },
+  {
+   "case": "POSITIVE actual A2 error_initializer",
+   "acceptedByOwnerPredicate": true,
+   "reviewerExpectsRefusal": false,
+   "soundGap": false
+  },
+  {
+   "case": "POSITIVE actual A2 constructor_binding",
+   "acceptedByOwnerPredicate": true,
+   "reviewerExpectsRefusal": false,
+   "soundGap": false
+  }
+ ],
+ "total": 70,
+ "soundGaps": [],
+ "positiveFailures": []
+}

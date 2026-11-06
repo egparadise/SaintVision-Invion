@@ -1,0 +1,26 @@
+{
+  "retainedImmutableFilesVerified": 31,
+  "T1AnalysisEdges": 16,
+  "T1PendingRuntimeEdges": 3,
+  "outsideCensusRuntimeObligations": 1,
+  "derivedProductionConstructorCalls": 6,
+  "harnessConstructorCalls": 20,
+  "completeSourceSurfaceCount": 21,
+  "forwardingProductionFiles": [
+    "services/control-plane/src/inv/app.py",
+    "services/control-plane/src/inv/workspace_config.py"
+  ],
+  "modelLifecycleFrozen": {
+    "model.py": "f7384016f72b5f6b9d369925a3a6d864012f286351db38d97993a5f95be78acf",
+    "lifecycle.py": "710c6aafa1829d9aecc25b8e591c4f2a8ec01b0927a45cf6e7ba7b13b75977b0"
+  },
+  "targetedUnknownRefs": 25,
+  "nonTargetUnchanged": 573,
+  "remainingUnreviewedFallbackRows": 218,
+  "orderedFinalContractSHA256": "68dbd6e6c75feebe8a79ed5fbfeb52fc2d890854ca648b66fc8d483f54c89f12",
+  "productDiffPaths": 0,
+  "actualRuntimeB": 0,
+  "realBindings": null,
+  "independentRev9cReview": "PENDING via Root",
+  "partialFreeze": false
+}

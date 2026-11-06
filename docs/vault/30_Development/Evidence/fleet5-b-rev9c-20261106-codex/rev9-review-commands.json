@@ -1,0 +1,29 @@
+{
+  "environment": "Windows 11, Git Bash, D:/Project/SaintVisionI-Invion/.venv Python 3.14.7 with -B, PYTHONUTF8=1, cwd = worktree root fleet5-bootstrap-v3-review-20261106 on branch agent/claude/fleet5-b-rev9-3daf-review-20261106 created from 3daf1a0d. Times KST.",
+  "provenance": [
+    {"argv": "git fetch origin agent/codex/fleet5-b-rev9-t1-20261106 && git rev-parse FETCH_HEAD", "result": "3daf1a0d24c220586474a4b376609e62960b8ca6"},
+    {"argv": "git ls-remote origin agent/codex/fleet5-b-rev9-t1-20261106", "result": "3daf1a0d24c220586474a4b376609e62960b8ca6 exact"},
+    {"argv": "git diff --name-status 6a656658 3daf1a0d", "result": "86 A (85 Evidence/fleet5-b-rev9-t1-20261106-codex incl .gitattributes + 1 History), 0 M/D"},
+    {"argv": "git diff --name-only 72028cba 3daf1a0d -- . ':!docs'", "result": "0 paths"},
+    {"argv": "gh run view 42191613681 --json headSha,headBranch,event,status,conclusion,workflowName,attempt,displayTitle,jobs; gh api .../actions/runs/42191613681 --jq .path,.run_attempt", "result": "3daf head/branch, workflow_dispatch, success, attempt 1, .github/workflows/docs.yml, job 127804769842 docs 19/19 success, title fleet5-rev9-t1-task_a8fd2969f0b3-3daf..."}
+  ],
+  "ownerReruns": "owner-reruns.tsv.txt (python -B <E>/measured_run.py <target> [args], one at a time, serial)",
+  "reviewerMistakes": [
+    {"what": "owner rows 12-14 first run passed bare directory names as argv to terminal_claim_regression.py; the reviewer-authored probe then imported the Rev9 model from the script directory and labelled it rev7/rev8 -> exit 0/0/0", "fix": "rows 12a-14a with absolute directory paths -> 1/1/0 and raw defect true/true/false, matching owner proof-checks-12..14", "kst": "2026-11-06T18:28:27..18:29:02+09:00"},
+    {"what": "reviewer_rev9_m1_l3_attacks first run: frame for second claim used default run-1/resource-1 (fixture bug) -> spurious mismatch 'release-A-frame-B-still-positive'", "fix": "frame helper takes run/resource; rerun -> only the six offline-Node mismatches remain", "retained": "reviewer-rev9-m1-l3-attacks-run1-fixturebug-result.json"},
+    {"what": "first draft of M1-R4 re-admission used a binding() call whose fixture side effect re-seeds claim rights even when register refuses", "fix": "kept as explicit FIXTURE-ONLY info probe M1-INFO-stale-version-receipt (B9-I1); positive re-admission path uses full original release first"}
+  ],
+  "reviewerProbes": [
+    {"argv": "python -B reviewer_rev9_m1_l3_attacks.py.txt docs/vault/30_Development/Evidence/fleet5-b-rev9-t1-20261106-codex <out>", "exit": 0, "result": "102 cases, 6 mismatches (offline Node TERMINAL_FRAME register/invoke/prepared-invoke in PLAIN and B)", "out": "reviewer-rev9-m1-l3-attacks-result.json"},
+    {"argv": "python -B reviewer_offline_frame_probe.py.txt <abs Evidence/{rev7,rev8,rev9}>", "exit": "0 each", "result": "register+invoke true, R12 eligible false on all three models", "out": "reviewer-offline-frame-probe-result.jsonl.txt"},
+    {"argv": "python -B reviewer_rev9_l1_t1_mutations.py.txt docs/vault/30_Development/Evidence/fleet5-b-rev9-t1-20261106-codex <out>", "exit": 0, "result": "70 rows, 48 accepted forms that should refuse, 0 positive failures; mutants parsed only", "out": "reviewer-rev9-l1-t1-mutations-result.json"},
+    {"argv": "python -B reviewer_l2_six_corrections.py.txt <targeted-category-delta.json> <out>", "exit": 0, "result": "6 refs/14 rows, all hashes match 72028, all blocksGrant", "out": "reviewer-l2-six-corrections-result.json"},
+    {"argv": "python -B reviewer_inflight_frame_wedge.py.txt <abs rev9 evidence>", "exit": 0, "result": "late confirm false, row UNCERTAIN, cap POISONED, same-Node disjoint admission held, other Node ok", "out": "reviewer-inflight-frame-wedge-result.json.txt"}
+  ],
+  "inlineChecks": [
+    "git grep NodeObservation / RestrictedWorkspaceRuntime / Database( / ObservationWorker / NodeChannels( / NodeDelivery( / client method callers at 72028 (results summarized in review.json)",
+    "python recount of Rev8 critical-edge-categories.json vs targeted-category-delta.json: 598/25/573, fallback 227->218",
+    "python recompute of proof-producer-hashes.json entries vs git show 3daf blobs: 33/33",
+    "grep of 10 actual input sources for type.__setattr__/builtins/globals()[/post-construction stores: only lan_pilot.py:4258 globals() command dispatch and Database/BoundDatabase own __init__ stores"
+  ]
+}

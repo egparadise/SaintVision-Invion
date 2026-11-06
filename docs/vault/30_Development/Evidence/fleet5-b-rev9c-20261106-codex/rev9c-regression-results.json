@@ -1,0 +1,107 @@
+{
+  "executionOwner": "Codex OWNER, not independent review",
+  "commands": [
+    {
+      "command": [
+        "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+        "-B",
+        "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105\\docs\\vault\\30_Development\\Evidence\\fleet5-b-rev9c-20261106-codex\\measured_run.py",
+        "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105\\docs\\vault\\30_Development\\Evidence\\fleet5-b-rev9c-20261106-codex\\rev9c_probe_driver.py",
+        "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105\\docs\\vault\\30_Development\\Evidence\\fleet5-b-rev9b-20261106-codex",
+        "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105\\docs\\vault\\30_Development\\Evidence\\fleet5-b-rev9c-20261106-codex\\old-bound-contrast-results.json"
+      ],
+      "actualExit": 0,
+      "log": "old-bound-contrast.log",
+      "logSHA256": "f4bb599069427eeecc63358a1605df8b1d33922f93940eba2eccbcd5291267bb",
+      "kst": "2026-11-06T23:23:58.415160+09:00"
+    },
+    {
+      "command": [
+        "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+        "-B",
+        "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105\\docs\\vault\\30_Development\\Evidence\\fleet5-b-rev9c-20261106-codex\\measured_run.py",
+        "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105\\docs\\vault\\30_Development\\Evidence\\fleet5-b-rev9c-20261106-codex\\rev9c_probe_driver.py",
+        "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105\\docs\\vault\\30_Development\\Evidence\\fleet5-b-rev9c-20261106-codex",
+        "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105\\docs\\vault\\30_Development\\Evidence\\fleet5-b-rev9c-20261106-codex\\new-bound-contrast-results.json"
+      ],
+      "actualExit": 0,
+      "log": "new-bound-contrast.log",
+      "logSHA256": "a9ad91f6e751a1810298099f5ce763fd6d83ccee4f3d82dfb5a98e22a7e58338",
+      "kst": "2026-11-06T23:26:04.337648+09:00"
+    }
+  ],
+  "cases": 29,
+  "oldAcceptedNewRefused": [
+    "L1-hidden-replacement-state",
+    "L1-hidden-replacement-runtime",
+    "L1-removed-root",
+    "L1-six-plus-hidden-operator",
+    "L1-six-plus-hidden-inspect",
+    "L1-inspect-members",
+    "L1-importlib-module",
+    "L1-sys-module",
+    "L1-methodcaller",
+    "L1-operator-module-alias",
+    "L2-reviewer-business-handoff-alias-omitted",
+    "L2-reexport-alias-omitted",
+    "L2-module-reexport-omitted",
+    "L2-forwarding-fixed-point-omitted",
+    "L3-five-runtime-runtime",
+    "L3-five-runtime-runtime.db",
+    "L3-five-runtime-runtime.db.transaction",
+    "L3-five-workspace-workspace",
+    "L3-five-workspace-workspace.runtime.db",
+    "L3-comprehension-target"
+  ],
+  "controls": [
+    {
+      "case": "actual-source-positive",
+      "old": "ACCEPT",
+      "new": "ACCEPT"
+    },
+    {
+      "case": "L1-benign-unused-import-and-nonreflective-string",
+      "old": "ACCEPT",
+      "new": "ACCEPT"
+    },
+    {
+      "case": "L1-benign-current-constructor-module-alias",
+      "old": "REFUSE",
+      "new": "ACCEPT"
+    },
+    {
+      "case": "L2-harness-is-separated",
+      "old": "ACCEPT",
+      "new": "ACCEPT"
+    },
+    {
+      "case": "L2-benign-current-import-alias",
+      "old": "ACCEPT",
+      "new": "ACCEPT"
+    },
+    {
+      "case": "L2-benign-current-module-alias",
+      "old": "REFUSE",
+      "new": "ACCEPT"
+    },
+    {
+      "case": "L3-with-target",
+      "old": "REFUSE",
+      "new": "REFUSE"
+    },
+    {
+      "case": "L3-attribute-subscript",
+      "old": "REFUSE",
+      "new": "REFUSE"
+    },
+    {
+      "case": "L3-benign-unrelated-containers",
+      "old": "ACCEPT",
+      "new": "ACCEPT"
+    }
+  ],
+  "oldWorldOverlayNote": "Old pipeline has no complete source-view discovery API; outside overlay is omitted from its manually selected inputs. New pipeline receives the explicit fixture source view and discovers/refuses omitted relevant production files.",
+  "effectfulMutantsImportedOrExecuted": false,
+  "actualRuntimeB": 0,
+  "realBindings": null
+}

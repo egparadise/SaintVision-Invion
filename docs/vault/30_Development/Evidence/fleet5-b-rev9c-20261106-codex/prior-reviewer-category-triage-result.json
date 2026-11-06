@@ -1,0 +1,73 @@
+{
+ "categoryCounts": {
+  "ANALYSIS_RULE:A1": 76,
+  "ANALYSIS_RULE:A2": 170,
+  "ANALYSIS_RULE:A3": 4,
+  "ANALYSIS_RULE:A4": 54,
+  "ANALYSIS_RULE:A6": 6,
+  "ANALYSIS_RULE:A8": 2,
+  "DYNAMIC_BLOCK": 227,
+  "NAMED_PORT:P-API-DI": 6,
+  "NAMED_PORT:P-DBFUNC": 2,
+  "NAMED_PORT:P-DBROLE": 1,
+  "NAMED_PORT:P-GETATTR": 16,
+  "NAMED_PORT:P-INJECT-BUILD": 10,
+  "NAMED_PORT:P-SQLSCOPE": 1,
+  "NAMED_PORT:T2": 11,
+  "NAMED_PORT:T3": 12
+ },
+ "dynamicBlock": 227,
+ "dynamicBlockByShape": {
+  "BUILTIN_OR_VALUE_METHOD": 164,
+  "CRYPTO_PUBLIC_OR_PACKAGE_RESOURCE": 8,
+  "LOGGER": 4,
+  "OTHER": 23,
+  "SQLALCHEMY_BUILDER": 22,
+  "TYPE_JOIN_UNRESOLVED": 6
+ },
+ "edges": 598,
+ "edgesWithIOCatalogLinkCategory": 0,
+ "flaggedMiscategorized": [
+  {
+   "callRef": "0c55b8d56234e5a548d5eec022a9d6965ff20f80d91f130d83c5dcb23aff1d60",
+   "expression": "ErrorCategory",
+   "function": "saintvision.errors.category_of",
+   "why": "covered by the stated A2 InvError contract"
+  },
+  {
+   "callRef": "12fc7b7611336899d3e12cf34f87113ced7398cf2eec4f44fea1f3be9d9fcde7",
+   "expression": "certificate_key(certificate_der, challenge.channel, now).verify",
+   "function": "inv.storage_sampling.verify_sample",
+   "why": "signature VERIFY: authority-bearing crypto check, needs its own named contract"
+  },
+  {
+   "callRef": "2694f1602e6f243a7e23931c0fa37e9d915490fe0cf6b5dbbcbd415201bdc5bb",
+   "expression": "files('inv').joinpath('generated/core.schema.json').read_text",
+   "function": "inv.contracts.catalog",
+   "why": "covered by the stated A4 files('inv') readonly resource contract"
+  },
+  {
+   "callRef": "2805a1b950907c9dd052f9d5a1cf2242522334a2f2721eadcfea4ed6236b8c52",
+   "expression": "files('inv').joinpath",
+   "function": "inv.contracts.catalog",
+   "why": "covered by the stated A4 files('inv') readonly resource contract"
+  },
+  {
+   "callRef": "6f527581d8b2eed4619b5265fc998693453e6e0ea11695fd2cfda50c6e7688ff",
+   "expression": "Exception.__init__",
+   "function": "saintvision.errors.InvError.__post_init__",
+   "why": "covered by the stated A2 InvError contract"
+  },
+  {
+   "callRef": "bc24f7b2291988a25339d1b50cf267a6396a4cbf0753d2b33657adaf45996fe1",
+   "expression": "super().connect",
+   "function": "inv.node_transport.OneConnection.connect",
+   "why": "TLS socket connect = existing network IO (T2), not dynamic dispatch"
+  }
+ ],
+ "nonPilotEdgesNotBlockingGrant": [],
+ "pilotEdgesClosed": 3,
+ "reviewer": "Claude independent",
+ "scope": "TRIAGE ONLY; categories remain proof obligations",
+ "separateExistingCallerIOCatalogLinks": 21
+}

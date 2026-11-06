@@ -1,0 +1,24 @@
+{
+  "scope": "OWN Rev9c preparation/static checks only",
+  "events": [
+    {
+      "check": "Initial preparation",
+      "actualExit": 1,
+      "reason": "git diff-tree output decoded through Windows cp949 and failed on a Korean History filename",
+      "fix": "Read Git output as explicit UTF-8 with NUL-separated paths; own partial producer copies unchanged before retry"
+    },
+    {
+      "check": "Initial old-contrast fixture witness validation",
+      "actualExit": 1,
+      "log": "development-old-contrast.log",
+      "reason": "The accepted prior closure also contains two Database-constructor witnesses outside the ten selected core bodies; fixture indexed that selected dictionary directly",
+      "fix": "Validate those unchanged witness files by frozen git72028 source, with source-hash keyed metadata-only sanity cache; no product source changes"
+    },
+    {
+      "check": "Finalizer newline-literal inspection",
+      "actualExit": 1,
+      "finding": "Tool JSON escaping was mistaken for two literal backslashes; correction guard refused before any write",
+      "resolution": "AST constant inspection confirms the source already contains the correct newline; actual follow-up exit0; file unchanged"
+    }
+  ]
+}

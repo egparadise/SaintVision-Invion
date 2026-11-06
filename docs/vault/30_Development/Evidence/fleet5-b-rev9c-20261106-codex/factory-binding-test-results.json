@@ -1,0 +1,39 @@
+{
+  "executionOwner": "Codex",
+  "cases": [
+    {
+      "case": "unshadowed-builtin-positive",
+      "accepted": true,
+      "expectedAccepted": true,
+      "pass": true,
+      "sourceSHA256": "0294296cbeed201d2a35ab7b377c17c6122981ff452d7eb08099e14210d56201",
+      "parsedOnly": true
+    },
+    {
+      "case": "factory-rebound",
+      "accepted": false,
+      "expectedAccepted": false,
+      "pass": true,
+      "sourceSHA256": "45593a668258da1eece5165bb5a6ba2927edf3b360f89e0315b61f0243fdef2d",
+      "parsedOnly": true
+    },
+    {
+      "case": "factory-import-alias",
+      "accepted": false,
+      "expectedAccepted": false,
+      "pass": true,
+      "sourceSHA256": "332b8a4d09cde21d9ec1bcf4b9ead33ffe3fd7618b121fc41b079b80891b2057",
+      "parsedOnly": true
+    },
+    {
+      "case": "factory-class-rebind",
+      "accepted": false,
+      "expectedAccepted": false,
+      "pass": true,
+      "sourceSHA256": "b0fa3ede28f96fa9d74d431792a5786a07e1dc2cda1f8693575bde5e715dcf25",
+      "parsedOnly": true
+    }
+  ],
+  "effectfulMutantsImportedOrExecuted": false,
+  "actualRuntimeB": 0
+}

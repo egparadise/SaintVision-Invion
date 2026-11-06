@@ -1,0 +1,33 @@
+{"case": "actual-source-positive", "observed": "ACCEPT", "reason": null}
+{"case": "L1-hidden-replacement-state", "observed": "ACCEPT", "reason": null}
+{"case": "L1-hidden-replacement-runtime", "observed": "ACCEPT", "reason": null}
+{"case": "L1-removed-root", "observed": "ACCEPT", "reason": null}
+{"case": "L1-six-plus-hidden-operator", "observed": "ACCEPT", "reason": null}
+{"case": "L1-six-plus-hidden-inspect", "observed": "ACCEPT", "reason": null}
+{"case": "L1-inspect-members", "observed": "ACCEPT", "reason": null}
+{"case": "L1-importlib-module", "observed": "ACCEPT", "reason": null}
+{"case": "L1-sys-module", "observed": "ACCEPT", "reason": null}
+{"case": "L1-methodcaller", "observed": "ACCEPT", "reason": null}
+{"case": "L1-operator-module-alias", "observed": "ACCEPT", "reason": null}
+{"case": "L1-benign-unused-import-and-nonreflective-string", "observed": "ACCEPT", "reason": null}
+{"case": "L1-benign-current-constructor-module-alias", "observed": "REFUSE", "reason": "DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:INSTANCE:observer"}
+{"case": "L2-reviewer-business-handoff-alias-omitted", "observed": "ACCEPT", "reason": null}
+fatal: path 'services/control-plane/src/inv/b9c_reexport_fixture.py' does not exist in '72028cbac903c4415d9979f980a6e0f9948e914f'
+{"case": "L2-reexport-alias-omitted", "observed": "ACCEPT", "reason": null}
+fatal: path 'services/control-plane/src/inv/b9c_reexport_fixture.py' does not exist in '72028cbac903c4415d9979f980a6e0f9948e914f'
+{"case": "L2-module-reexport-omitted", "observed": "ACCEPT", "reason": null}
+{"case": "L2-forwarding-fixed-point-omitted", "observed": "ACCEPT", "reason": null}
+{"case": "L2-harness-is-separated", "observed": "ACCEPT", "reason": null}
+{"case": "L2-benign-current-import-alias", "observed": "ACCEPT", "reason": null}
+{"case": "L2-benign-current-module-alias", "observed": "REFUSE", "reason": "DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:INSTANCE:database"}
+{"case": "L3-five-runtime-runtime", "observed": "ACCEPT", "reason": null}
+{"case": "L3-five-runtime-runtime.db", "observed": "ACCEPT", "reason": null}
+{"case": "L3-five-runtime-runtime.db.transaction", "observed": "ACCEPT", "reason": null}
+{"case": "L3-five-workspace-workspace", "observed": "ACCEPT", "reason": null}
+{"case": "L3-five-workspace-workspace.runtime.db", "observed": "ACCEPT", "reason": null}
+{"case": "L3-with-target", "observed": "REFUSE", "reason": "DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:INSTANCE:result"}
+{"case": "L3-comprehension-target", "observed": "ACCEPT", "reason": null}
+{"case": "L3-attribute-subscript", "observed": "REFUSE", "reason": "DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:INSTANCE:result"}
+{"case": "L3-benign-unrelated-containers", "observed": "ACCEPT", "reason": null}
+{"cases": 29, "newAPI": false}
+{"ownerResourceMeasurement": {"target": "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105\\docs\\vault\\30_Development\\Evidence\\fleet5-b-rev9c-20261106-codex\\rev9c_probe_driver.py", "peakWorkingSetBytes": 114049024, "elapsedSeconds": 50.89, "OSMemoryLimitEnforced": false, "serial": true}}

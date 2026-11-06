@@ -1,0 +1,23 @@
+"""Reviewer serial local publication gates + canonical sync CHECK (no apply/state write)."""
+import datetime, hashlib, subprocess, sys
+from pathlib import Path
+ROOT = Path(r'D:\Project\SaintVisionI-Invion\fleet5-bootstrap-v3-review-20261106'); S = Path(__file__).resolve().parent
+ST = Path('D:/Project/SaintVision-Invion/SaintVisionI-Invion/.git/obsidian-sync-state.json'); BASE = sys.argv[1]; OUT = Path(sys.argv[2])
+def kst(): return datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=9))).strftime('%H:%M:%S')
+def sha(b): return hashlib.sha256(b).hexdigest()
+gates = [['tools/check_docs.py'], ['tools/check_ontology.py'],
+         ['tools/sync_obsidian.py', '--check', '--state', str(ST).replace('\\', '/'), '--conflicts-out', str(S / 'sync-check-after.json')],
+         ['tools/check_contract_bindings.py'], ['tools/check_frontend_integrity.py'], ['tools/check_doc_single_source.py', '--ratchet'],
+         ['tools/check_response_freshness.py'], ['tools/check_doc_path_citations.py', '--ratchet', '--base-ref', BASE]]
+lines = ['Local publication gates, 2026-11-06 KST, Windows, D:/Project/SaintVisionI-Invion/.venv Python 3.14.7, PYTHONUTF8=1, cwd=worktree root, tree = ' + BASE[:8] + ' + this review\'s own History/Evidence only.',
+         'sync_obsidian ran CHECK only with the canonical Root state; --conflicts-out written to reviewer scratch. No apply/adopt/resolve/state write.',
+         'stateBefore ' + sha(ST.read_bytes())]
+worst = 0
+for g in gates:
+    a = kst(); r = subprocess.run([sys.executable, '-B', *g], cwd=ROOT, stdout=subprocess.PIPE, stderr=subprocess.STDOUT); b = kst(); worst = max(worst, r.returncode)
+    shown = ' '.join('<scratch>/sync-check-after.json' if x.startswith(str(S)) else x for x in g)
+    lines.append(f'{a}..{b} exit={r.returncode} logsha={sha(r.stdout)} :: python -B {shown}')
+    tail = r.stdout.decode('utf-8', 'replace').strip().splitlines()[-2:]
+    lines += ['    ' + t[:300] for t in tail]
+lines.append('stateAfter ' + sha(ST.read_bytes()))
+OUT.write_text('\n'.join(lines) + '\n', encoding='utf-8', newline='\n'); print('\n'.join(lines)); raise SystemExit(worst)

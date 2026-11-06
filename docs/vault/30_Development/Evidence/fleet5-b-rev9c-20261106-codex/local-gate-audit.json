@@ -1,0 +1,17 @@
+{
+  "mode": "READ_ONLY_SOURCE_AUDIT",
+  "tools": [
+    "check_docs.py",
+    "check_ontology.py",
+    "sync_obsidian.py --check --state canonical --conflicts-out own",
+    "check_contract_bindings.py",
+    "check_frontend_integrity.py",
+    "check_doc_single_source.py --ratchet",
+    "check_response_freshness.py",
+    "check_doc_path_citations.py --ratchet --base-ref 870486f9"
+  ],
+  "protectedPathDestructiveCommandsAttempted": [],
+  "omittedUnsafeCommand": null,
+  "unsafeCommandExit": "NOT_RUN_NONE_ENCOUNTERED",
+  "notes": "Explicit argv lists; ontology remove calls alter RDF graphs, not files. No shell removal, shared sync mutation or broad Core retry. Normal Docs ontology generation occurs on CI temporary runner only."
+}

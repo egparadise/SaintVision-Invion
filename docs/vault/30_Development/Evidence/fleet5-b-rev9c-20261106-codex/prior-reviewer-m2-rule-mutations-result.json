@@ -1,0 +1,145 @@
+{
+ "cases": [
+  {
+   "actual": "PROOF",
+   "claim": "actual recorded fetchone results close",
+   "defect": false,
+   "expected": "PROOF",
+   "id": "A1-baseline-actual",
+   "note": ""
+  },
+  {
+   "actual": "HASH_MISMATCH",
+   "claim": "owner A1-cursor-rebinding-BLOCK passes for its own predicate, not an expression-hash/span mismatch",
+   "defect": true,
+   "expected": "PREDICATE",
+   "id": "owner-rebinding-test-is-span-vacuous",
+   "note": "owner passes original-text node spans against mutated text; the segment at the old span is no longer the recorded execute"
+  },
+  {
+   "actual": "NONE",
+   "claim": "A1 must refuse receiver laundering/monkeypatch after the recorded cursor factory",
+   "defect": false,
+   "expected": "NONE",
+   "id": "A1-shifted-name-rebind",
+   "note": ""
+  },
+  {
+   "actual": "PROOF",
+   "claim": "A1 must refuse receiver laundering/monkeypatch after the recorded cursor factory",
+   "defect": true,
+   "expected": "NONE",
+   "id": "A1-shifted-attribute-monkeypatch",
+   "note": ""
+  },
+  {
+   "actual": "PROOF",
+   "claim": "A1 must refuse receiver laundering/monkeypatch after the recorded cursor factory",
+   "defect": true,
+   "expected": "NONE",
+   "id": "A1-shifted-setattr-monkeypatch",
+   "note": ""
+  },
+  {
+   "actual": "NONE",
+   "claim": "A1 must refuse receiver laundering/monkeypatch after the recorded cursor factory",
+   "defect": false,
+   "expected": "NONE",
+   "id": "A1-shifted-walrus-rebind",
+   "note": ""
+  },
+  {
+   "actual": "PROOF",
+   "claim": "control: statement that cannot change the already-created cursor keeps proof",
+   "defect": false,
+   "expected": "PROOF",
+   "id": "A1-shifted-benign-conn-rebind-after-cursor",
+   "note": ""
+  },
+  {
+   "actual": "PROOF",
+   "claim": "control: statement that cannot change the already-created cursor keeps proof",
+   "defect": false,
+   "expected": "PROOF",
+   "id": "A1-shifted-control-pass",
+   "note": ""
+  },
+  {
+   "actual": true,
+   "claim": "actual DomainError closes",
+   "defect": false,
+   "expected": true,
+   "id": "A2-baseline",
+   "note": ""
+  },
+  {
+   "actual": true,
+   "claim": "A2 must refuse constructor-time code injection",
+   "defect": true,
+   "expected": false,
+   "id": "A2-metaclass-keyword",
+   "note": ""
+  },
+  {
+   "actual": true,
+   "claim": "A2 must refuse constructor-time code injection",
+   "defect": true,
+   "expected": false,
+   "id": "A2-reimport-dataclass-shadow",
+   "note": ""
+  },
+  {
+   "actual": true,
+   "claim": "A2 must refuse constructor-time code injection",
+   "defect": true,
+   "expected": false,
+   "id": "A2-import-Exception-shadow",
+   "note": ""
+  },
+  {
+   "actual": true,
+   "claim": "control: cannot affect DomainError construction",
+   "defect": false,
+   "expected": true,
+   "id": "A2-module-getattr-hook",
+   "note": ""
+  },
+  {
+   "actual": false,
+   "claim": "A2 must refuse constructor-time code injection",
+   "defect": false,
+   "expected": false,
+   "id": "A2-init_subclass-on-base",
+   "note": ""
+  },
+  {
+   "actual": true,
+   "claim": "control: cannot affect DomainError construction",
+   "defect": false,
+   "expected": true,
+   "id": "A2-str-field-default-factory-call",
+   "note": ""
+  },
+  {
+   "actual": "UNCHECKED",
+   "claim": "A2 call-site proof must reject a later module rebinding of DomainError",
+   "defect": true,
+   "expected": "CHECKED",
+   "id": "A2-caller-name-rebinding-checked",
+   "note": "bounded_analysis.main asserts only ImportFrom presence and trusts immutable inferredTarget; no Store-of-DomainError scan"
+  }
+ ],
+ "defects": [
+  "owner-rebinding-test-is-span-vacuous",
+  "A1-shifted-attribute-monkeypatch",
+  "A1-shifted-setattr-monkeypatch",
+  "A2-metaclass-keyword",
+  "A2-reimport-dataclass-shadow",
+  "A2-import-Exception-shadow",
+  "A2-caller-name-rebinding-checked"
+ ],
+ "reviewer": "Claude independent",
+ "scope": "static AST mutations of owner A1/A2 rule functions only",
+ "sourceBytes": 9131,
+ "sourceFiles": 2
+}
