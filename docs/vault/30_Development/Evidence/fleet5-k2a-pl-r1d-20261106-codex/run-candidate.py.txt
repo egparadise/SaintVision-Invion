@@ -1,0 +1,57 @@
+"""Actual immutable b47 compile-valid red proof, before changing the gate."""
+from pathlib import Path
+import datetime
+import hashlib
+import io
+import json
+import os
+import subprocess
+import tarfile
+
+root = Path.cwd()
+out = root / 'docs/vault/30_Development/Evidence/fleet5-k2a-pl-r1d-20261106-codex'
+work = root / '.work/pl-r1d-static-proof'
+work.mkdir(parents=True, exist_ok=True)
+BASE = 'b47d5dd6cd23873c62602e02e85a8f82c9843dc5'
+gitdir = subprocess.check_output(['git', 'rev-parse', '--absolute-git-dir']).decode().strip()
+archive = subprocess.check_output(['git', 'archive', BASE, 'services/node-agent', 'packages/contracts-go', 'tests/proofs'])
+env = dict(os.environ, GOTOOLCHAIN='local', GOWORK='off', GOPROXY='off', GOSUMDB='off', GOMAXPROCS='1', PYTHONDONTWRITEBYTECODE='1')
+report = dict(classification='PUBLIC_SOURCE_STATIC_MUTANTS_NOT_LIVE_TRUST_OR_BODY_EXECUTION', base=BASE,
+              fixture='Complete public Git archive plus read-only GIT_DIR/GIT_WORK_TREE index/object view; no raw worktree/index write/private source/cleanup', runs=[])
+
+report=json.loads((out/'proof-results.json').read_text())
+
+def stamp():
+    return datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=9))).isoformat()
+
+def run(name, argv, cwd, e, expected, count=None, reason=None):
+    start = stamp()
+    print(json.dumps(dict(starting=name, argv=argv, kst=start)), flush=True)
+    p = subprocess.run(argv, cwd=cwd, env=e, capture_output=True)
+    raw = p.stdout + p.stderr
+    (out/(name+'.log')).write_bytes(raw)
+    item = dict(name=name, argv=argv, cwd=str(cwd), exit=p.returncode, expectedExit=expected,
+                startedKST=start, endedKST=stamp(), log=name+'.log',
+                actualMutantBuildExit0=raw.count(b'actual go build -p=1 ./internal/migrationcontext exit0;'),
+                intendedReason=reason, reasonPresent=None if reason is None else reason.encode() in raw)
+    report['runs'].append(item)
+    (out/'proof-results.json').write_text(json.dumps(report, indent=2)+'\n')
+    print(json.dumps(item), flush=True)
+    if p.returncode != expected or count is not None and item['actualMutantBuildExit0'] != count or reason is not None and not item['reasonPresent']:
+        print(raw.decode(errors='replace')[-9000:], flush=True)
+        raise SystemExit('Unexpected actual result; preserve and stop, no blind retry')
+    return raw
+
+def fixture(name):
+    d = work/name
+    d.mkdir()
+    with tarfile.open(fileobj=io.BytesIO(archive)) as t:
+        t.extractall(d, filter='data')
+    return d, dict(env, GIT_DIR=gitdir, GIT_WORK_TREE=str(d))
+
+run('candidate-full-package',['go','test','-p','1','-count=1','-v','./internal/migrationcontext'],root/'services/node-agent',env,0,count=99)
+run('candidate-vet',['go','vet','-p','1','./internal/migrationcontext','./migrationverify'],root/'services/node-agent',env,0)
+d=work/'real-G1';e=dict(env,GIT_DIR=gitdir,GIT_WORK_TREE=str(d))
+for name in ('effect_gate_test.go','pl_r1a_test.go'):
+ (d/'services/node-agent/internal/migrationcontext'/name).write_bytes((root/'services/node-agent/internal/migrationcontext'/name).read_bytes())
+run('real-G1-corrected-full-refusal',['go','test','-p','1','-count=1','-v','./internal/migrationcontext'],d/'services/node-agent',e,1,reason='pointee-changing pointer conversion forbidden:')

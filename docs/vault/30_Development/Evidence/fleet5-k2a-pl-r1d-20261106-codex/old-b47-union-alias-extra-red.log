@@ -1,0 +1,17 @@
+=== RUN   TestPLR1DCompiledTargetPointerTermsAndControls
+=== RUN   TestPLR1DCompiledTargetPointerTermsAndControls/G5-union-second-pointer-term
+    pl_r1a_test.go:516: actual go build -p=1 ./internal/migrationcontext exit0; mutant body NOT executed
+    pl_r1a_test.go:526: OWNER_PLR1D_PROBE case=G5-union-second-pointer-term kind=CONVERSION_NEGATIVE build=0 typecheck=0 refused=false reason=<nil>
+    pl_r1a_test.go:527: REASON case=G5-union-second-pointer-term build=0 typecheck=0 refused=false reason=<nil>
+    pl_r1a_test.go:527: want intended refusal prefixes=["pointee-changing pointer conversion forbidden:"], got=<nil>
+=== RUN   TestPLR1DCompiledTargetPointerTermsAndControls/G6-embedded-alias-pointer-term
+    pl_r1a_test.go:516: actual go build -p=1 ./internal/migrationcontext exit0; mutant body NOT executed
+    pl_r1a_test.go:526: OWNER_PLR1D_PROBE case=G6-embedded-alias-pointer-term kind=CONVERSION_NEGATIVE build=0 typecheck=0 refused=false reason=<nil>
+    pl_r1a_test.go:527: REASON case=G6-embedded-alias-pointer-term build=0 typecheck=0 refused=false reason=<nil>
+    pl_r1a_test.go:527: want intended refusal prefixes=["pointee-changing pointer conversion forbidden:"], got=<nil>
+--- FAIL: TestPLR1DCompiledTargetPointerTermsAndControls (4.46s)
+    --- FAIL: TestPLR1DCompiledTargetPointerTermsAndControls/G5-union-second-pointer-term (1.58s)
+    --- FAIL: TestPLR1DCompiledTargetPointerTermsAndControls/G6-embedded-alias-pointer-term (1.56s)
+FAIL
+FAIL	github.com/egparadise/SaintVision-Invion/services/node-agent/internal/migrationcontext	5.374s
+FAIL

@@ -1,0 +1,156 @@
+{
+  "classification": "PUBLIC_SOURCE_STATIC_MUTANTS_NOT_LIVE_TRUST_OR_BODY_EXECUTION",
+  "base": "b47d5dd6cd23873c62602e02e85a8f82c9843dc5",
+  "fixture": "Complete public Git archive plus read-only GIT_DIR/GIT_WORK_TREE index/object view; no raw worktree/index write/private source/cleanup",
+  "runs": [
+    {
+      "name": "old-b47-pointer-term-cases-red",
+      "argv": [
+        "go",
+        "test",
+        "-p",
+        "1",
+        "-count=1",
+        "-run",
+        "TestPLR1DCompiledTargetPointerTermsAndControls",
+        "-v",
+        "./internal/migrationcontext"
+      ],
+      "cwd": "D:\\Project\\SaintVisionI-Invion\\fleet5-k2a-pl-r1d-20261106\\.work\\pl-r1d-static-proof\\old-b47-new-22-cases\\services\\node-agent",
+      "exit": 1,
+      "expectedExit": 1,
+      "startedKST": "2026-11-06T20:19:41.345415+09:00",
+      "endedKST": "2026-11-06T20:20:30.070131+09:00",
+      "log": "old-b47-pointer-term-cases-red.log",
+      "actualMutantBuildExit0": 22,
+      "intendedReason": "want intended refusal",
+      "reasonPresent": true
+    },
+    {
+      "name": "real-G1-old-actual-build",
+      "argv": [
+        "go",
+        "build",
+        "-p",
+        "1",
+        "-buildvcs=false",
+        "./..."
+      ],
+      "cwd": "D:\\Project\\SaintVisionI-Invion\\fleet5-k2a-pl-r1d-20261106\\.work\\pl-r1d-static-proof\\real-G1\\services\\node-agent",
+      "exit": 0,
+      "expectedExit": 0,
+      "startedKST": "2026-11-06T20:20:30.415065+09:00",
+      "endedKST": "2026-11-06T20:20:40.808660+09:00",
+      "log": "real-G1-old-actual-build.log",
+      "actualMutantBuildExit0": 0,
+      "intendedReason": null,
+      "reasonPresent": null
+    },
+    {
+      "name": "real-G1-old-full-escape",
+      "argv": [
+        "go",
+        "test",
+        "-p",
+        "1",
+        "-count=1",
+        "-v",
+        "./internal/migrationcontext"
+      ],
+      "cwd": "D:\\Project\\SaintVisionI-Invion\\fleet5-k2a-pl-r1d-20261106\\.work\\pl-r1d-static-proof\\real-G1\\services\\node-agent",
+      "exit": 0,
+      "expectedExit": 0,
+      "startedKST": "2026-11-06T20:20:40.809406+09:00",
+      "endedKST": "2026-11-06T20:23:45.090220+09:00",
+      "log": "real-G1-old-full-escape.log",
+      "actualMutantBuildExit0": 75,
+      "intendedReason": null,
+      "reasonPresent": null
+    },
+    {
+      "name": "old-b47-union-alias-extra-red",
+      "argv": [
+        "go",
+        "test",
+        "-p",
+        "1",
+        "-count=1",
+        "-run",
+        "TestPLR1DCompiledTargetPointerTermsAndControls/G[56]-",
+        "-v",
+        "./internal/migrationcontext"
+      ],
+      "cwd": "D:\\Project\\SaintVisionI-Invion\\fleet5-k2a-pl-r1d-20261106\\.work\\pl-r1d-static-proof\\old-b47-union-alias-extra\\services\\node-agent",
+      "exit": 1,
+      "expectedExit": 1,
+      "startedKST": "2026-11-06T20:24:25.225919+09:00",
+      "endedKST": "2026-11-06T20:24:40.358945+09:00",
+      "log": "old-b47-union-alias-extra-red.log",
+      "actualMutantBuildExit0": 2,
+      "intendedReason": "want intended refusal",
+      "reasonPresent": true
+    },
+    {
+      "name": "candidate-full-package",
+      "argv": [
+        "go",
+        "test",
+        "-p",
+        "1",
+        "-count=1",
+        "-v",
+        "./internal/migrationcontext"
+      ],
+      "cwd": "D:\\Project\\SaintVisionI-Invion\\fleet5-k2a-pl-r1d-20261106\\services\\node-agent",
+      "exit": 0,
+      "expectedExit": 0,
+      "startedKST": "2026-11-06T20:26:30.388419+09:00",
+      "endedKST": "2026-11-06T20:29:24.975259+09:00",
+      "log": "candidate-full-package.log",
+      "actualMutantBuildExit0": 99,
+      "intendedReason": null,
+      "reasonPresent": null
+    },
+    {
+      "name": "candidate-vet",
+      "argv": [
+        "go",
+        "vet",
+        "-p",
+        "1",
+        "./internal/migrationcontext",
+        "./migrationverify"
+      ],
+      "cwd": "D:\\Project\\SaintVisionI-Invion\\fleet5-k2a-pl-r1d-20261106\\services\\node-agent",
+      "exit": 0,
+      "expectedExit": 0,
+      "startedKST": "2026-11-06T20:29:24.976045+09:00",
+      "endedKST": "2026-11-06T20:29:29.958124+09:00",
+      "log": "candidate-vet.log",
+      "actualMutantBuildExit0": 0,
+      "intendedReason": null,
+      "reasonPresent": null
+    },
+    {
+      "name": "real-G1-corrected-full-refusal",
+      "argv": [
+        "go",
+        "test",
+        "-p",
+        "1",
+        "-count=1",
+        "-v",
+        "./internal/migrationcontext"
+      ],
+      "cwd": "D:\\Project\\SaintVisionI-Invion\\fleet5-k2a-pl-r1d-20261106\\.work\\pl-r1d-static-proof\\real-G1\\services\\node-agent",
+      "exit": 1,
+      "expectedExit": 1,
+      "startedKST": "2026-11-06T20:29:30.006497+09:00",
+      "endedKST": "2026-11-06T20:29:49.116531+09:00",
+      "log": "real-G1-corrected-full-refusal.log",
+      "actualMutantBuildExit0": 0,
+      "intendedReason": "pointee-changing pointer conversion forbidden:",
+      "reasonPresent": true
+    }
+  ]
+}

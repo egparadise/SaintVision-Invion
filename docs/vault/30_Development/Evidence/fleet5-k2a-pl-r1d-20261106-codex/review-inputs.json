@@ -1,0 +1,8 @@
+{
+  "actualReviewSHA": "cfec7b81094b487ed068eac08a228cb99dd7509a",
+  "probePath": "docs/vault/30_Development/Evidence/fleet5-k2a-pl-r1c-b47-review-20261106-claude/reviewer_plr1c_probe_test.go.txt",
+  "probeSHA256": "234d78a990ee441d0632280f9ddd41b09722c7bb1442b4ea2652c04140e9cdb5",
+  "sketchPath": "docs/vault/30_Development/Evidence/fleet5-k2a-pl-r1c-b47-review-20261106-claude/reviewer_plr1c_fix_sketch.py.txt",
+  "sketchSHA256": "3f986c09857f7ed3d3dd3f56000189acba3b200111feb7890bcc8bf3351aa129",
+  "scope": "Actual immutable reviewer input read first; owner adaptation, not acceptance/counts of this new candidate"
+}

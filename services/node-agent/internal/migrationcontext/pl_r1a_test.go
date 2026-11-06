@@ -395,3 +395,136 @@ func probe(){_=n(1)}`, ""},
 		})
 	}
 }
+
+// New owner-run PL-R1d cases; actual narrow review is pending.
+func TestPLR1DCompiledTargetPointerTermsAndControls(t *testing.T) {
+	root := repository(t)
+	original := ownProductionSources(t, root)
+	paths := exports(t, root)
+	control, e := checkSourcePackage(ownImport, original, paths, nil)
+	if e != nil {
+		t.Fatal(e)
+	}
+	if e = sourceEffects(original, control); e != nil {
+		t.Fatal("actual pure source must pass", e)
+	}
+	const conv = "pointee-changing pointer conversion forbidden:"
+	// Owner adaptation of actual cfec probes; G1-G4 require the intended
+	// conversion refusal, and empty want denotes an accepted control.
+	cases := []struct{ name, kind, code, want string }{
+		// Type-parameter conversion targets: underlying is the constraint
+		// interface, not a pointer, so pointerElement(target) is false.
+		{"G1-typeparam-target-generic-launder-return", "CONVERSION_NEGATIVE", `import clock "time"
+type L clock.Location
+func launder[P interface{*L}](x *clock.Location) P { return P(x) }
+func probe(){*launder[*L](clock.UTC)=L{}}`, conv},
+		{"G2-typeparam-tilde-target-write-in-body", "CONVERSION_NEGATIVE", `import clock "time"
+type L clock.Location
+func set[P ~*L](x *clock.Location){*P(x)=L{}}
+func probe(){set[*L](clock.UTC)}`, conv},
+		{"G3-typeparam-target-foreign-field", "CONVERSION_NEGATIVE", `import "crypto/x509"
+type C x509.Certificate
+func bump[P ~*C](c *x509.Certificate){(*P(c)).Version++}
+func probe(c *x509.Certificate){bump[*C](c)}`, conv},
+		{"G4-typeparam-target-slice-to-own-array", "CONVERSION_NEGATIVE", `import ed "crypto/ed25519"
+type a [64]byte
+func bump[P ~*a](k ed.PrivateKey){(*P(k))[0]++}
+func probe(k ed.PrivateKey){bump[*a](k)}`, conv},
+		{"G5-union-second-pointer-term", "CONVERSION_NEGATIVE", `import clock "time"
+type L clock.Location
+func launder[P interface{*clock.Location|*L}](x *clock.Location)P{return P(x)}
+func probe(){*launder[*L](clock.UTC)=L{}}`, conv},
+		{"G6-embedded-alias-pointer-term", "CONVERSION_NEGATIVE", `import clock "time"
+type L clock.Location
+type base interface{~*L}
+type Alias=base
+type embedded interface{Alias}
+func launder[P embedded](x *clock.Location)P{return P(x)}
+func probe(){*launder[*L](clock.UTC)=L{}}`, conv},
+		// Bounded rule controls the b47 gate must keep.
+		{"C1-chained-identity-then-launder", "REFUSE", `import clock "time"
+type L clock.Location
+func probe(){_=(*L)((*clock.Location)(clock.UTC))}`, conv},
+		{"C2-own-to-foreign-reverse", "REFUSE", `import clock "time"
+type L clock.Location
+func probe(p *L){_=(*clock.Location)(p)}`, conv},
+		{"C3-typeparam-operand-to-own", "REFUSE", `import clock "time"
+type L clock.Location
+func f[Q ~*clock.Location](q Q){_=(*L)(q)}
+func probe(){f(clock.UTC)}`, conv},
+		{"C4-uncalled-closure-conversion", "REFUSE", `import clock "time"
+type L clock.Location
+func probe(){f:=func(){_=(*L)(clock.UTC)};_=f}`, conv},
+		{"C5-local-named-in-helper-method", "REFUSE", `import "crypto/x509"
+type h struct{}
+func (h) m(c *x509.Certificate){type C x509.Certificate;(*C)(c).Version=3}
+func probe(c *x509.Certificate){h{}.m(c)}`, conv},
+		{"C6-foreign-named-pointer-identity-then-write", "REFUSE", `import clock "time"
+type FP *clock.Location
+func probe(){*FP(clock.UTC)=clock.Location{}}`, "foreign pointee write forbidden: time.Location"},
+		{"C7-package-level-var-initializer", "REFUSE", `import clock "time"
+type L clock.Location
+var v = (*L)(clock.UTC)
+func probe(){_=v}`, conv},
+		{"C8-alias-to-foreign-target", "REFUSE", `import clock "time"
+type L clock.Location
+type AL=*L
+func probe(){_=AL(clock.UTC)}`, conv},
+		// Positive controls.
+		{"P7-alias-to-foreign-pointer-identity", "POSITIVE", `import clock "time"
+type A=*clock.Location
+func probe(){_=A(clock.UTC)}`, ""},
+		{"P8-alias-element-identity", "POSITIVE", `type o struct{N int}
+type O2=o
+func probe(p *o){(*O2)(p).N++}`, ""},
+		{"P9-foreign-value-conversion-copy", "POSITIVE", `import clock "time"
+type L clock.Location
+func probe(){l:=L(*clock.UTC);_=l}`, ""},
+		{"P10-typed-nil-own-pointer", "POSITIVE", `type o struct{N int}
+func probe(){var p *o;_=(*o)(p)}`, ""},
+		{"Q1-embedded-pointer-constraint", "POSITIVE", `type o struct{N int}
+type base interface{~*o}
+type extended interface{base}
+func id[P extended](p *o)P{return P(p)}
+func probe(p *o){_=id[*o](p)}`, ""},
+		{"Q2-union-named-pointers-same-element", "POSITIVE", `type o struct{N int}
+type p *o
+type q *o
+func id[T interface{p|q}](v *o)T{return T(v)}
+func probe(v *o){_=id[p](v)}`, ""},
+		{"Q3-alias-pointer-constraint", "POSITIVE", `type o struct{N int}
+type constraint interface{~*o}
+type Alias=constraint
+func id[P Alias](p *o)P{return P(p)}
+func probe(p *o){_=id[*o](p)}`, ""},
+		{"Q4-named-pointer-term", "POSITIVE", `type o struct{N int}
+type pointer *o
+type constraint interface{pointer}
+func id[P constraint](p *o)P{return P(p)}
+func probe(p *o){_=id[pointer](p)}`, ""},
+		{"Q5-core-pointer-term", "POSITIVE", `type o struct{N int}
+func id[P ~*o](p *o)P{return P(p)}
+func probe(p *o){_=id[*o](p)}`, ""},
+		{"Q6-nil-pointer-term", "POSITIVE", `type o struct{N int}
+func zero[P ~*o]()P{return P(nil)}
+func probe(){_=zero[*o]()}`, ""},
+	}
+	for _, m := range cases {
+		t.Run(m.name, func(t *testing.T) {
+			src := copyMap(original)
+			src["pl_review_probe.go"] = []byte("package migrationcontext\n" + m.code)
+			buildPLMutation(t, root, src)
+			checked, e := checkSourcePackage(ownImport, src, paths, nil)
+			if e != nil {
+				t.Fatal("actual built source must typecheck", e)
+			}
+			e = sourceEffects(src, checked)
+			reason := "<nil>"
+			if e != nil {
+				reason = e.Error()
+			}
+			t.Logf("OWNER_PLR1D_PROBE case=%s kind=%s build=0 typecheck=0 refused=%t reason=%s", m.name, m.kind, e != nil, reason)
+			assertPLReason(t, m.name, m.want != "", []string{m.want}, e)
+		})
+	}
+}

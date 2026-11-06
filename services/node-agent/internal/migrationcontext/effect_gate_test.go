@@ -242,6 +242,34 @@ func pointerElement(t types.Type) (types.Type, bool) {
 	return nil, false
 }
 
+// conversionPointerElements returns every pointer element a conversion target
+// can denote: the target itself, or each pointer term of a type parameter's
+// constraint type set (recursively through embedded interfaces and unions).
+func conversionPointerElements(t types.Type, out []types.Type) []types.Type {
+	if t == nil {
+		return out
+	}
+	switch x := types.Unalias(t).(type) {
+	case *types.TypeParam:
+		return conversionPointerElements(x.Constraint(), out)
+	case *types.Union:
+		for i := 0; i < x.Len(); i++ {
+			out = conversionPointerElements(x.Term(i).Type(), out)
+		}
+		return out
+	}
+	if iface, ok := types.Unalias(t).Underlying().(*types.Interface); ok {
+		for i := 0; i < iface.NumEmbeddeds(); i++ {
+			out = conversionPointerElements(iface.EmbeddedType(i), out)
+		}
+		return out
+	}
+	if e, ok := pointerElement(t); ok {
+		out = append(out, e)
+	}
+	return out
+}
+
 func writeTargetBoundary(expr ast.Expr, info *types.Info) error {
 	if expr == nil {
 		return nil
@@ -372,7 +400,7 @@ func sourceEffects(src map[string][]byte, checked checkedSource) error {
 					// Pointer conversions must preserve element identity. An own
 					// defined pointee name cannot confer ownership of a foreign
 					// address, nor can a slice become an own array pointer here.
-					if dst, ok := pointerElement(tv.Type); ok {
+					for _, dst := range conversionPointerElements(tv.Type, nil) {
 						var operand types.Type
 						if len(call.Args) == 1 {
 							operand = checked.info.TypeOf(call.Args[0])
