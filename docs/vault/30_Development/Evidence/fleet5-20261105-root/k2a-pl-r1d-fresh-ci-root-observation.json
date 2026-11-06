@@ -1,0 +1,43 @@
+{
+  "atKST": "2026-11-06T21:56:54+09:00",
+  "source": "ea276c97ece2906dc1f29b44b65aa887379ea78f",
+  "branch": "agent/codex/fleet5-k2a-pl-r1d-20261106",
+  "CI": {
+    "Core": {
+      "run": 42220638304,
+      "status": "in_progress",
+      "conclusion": null,
+      "exactHeadRefEventPathAttemptExpectedUniqueCorrelation": true,
+      "jobs": [
+        {
+          "id": 127901520588,
+          "name": "s01-storage-roundtrip",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "id": 127901520917,
+          "name": "core",
+          "status": "in_progress",
+          "conclusion": null
+        }
+      ],
+      "all19StepsSuccess": false
+    },
+    "SourceDocs": {
+      "run": 42220644407,
+      "status": "completed",
+      "conclusion": "success",
+      "exactHeadRefEventPathAttemptExpectedUniqueCorrelation": true,
+      "jobs": [
+        {
+          "id": 127901541202,
+          "name": "docs",
+          "status": "completed",
+          "conclusion": "success"
+        }
+      ],
+      "all19StepsSuccess": true
+    }
+  }
+}

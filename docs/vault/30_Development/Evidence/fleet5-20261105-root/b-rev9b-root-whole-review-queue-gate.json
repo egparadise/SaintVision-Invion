@@ -5,12 +5,16 @@
   "branch": "agent/codex/fleet5-b-rev9b-20261106",
   "rootVerification": "b-rev9b-source-root-verification.json",
   "reviewTask": "task_a67e24d81ef8",
-  "status": "pending",
+  "status": "actualreviewactive",
   "dependsOn": "task_41987ea5739d",
-  "actualReviewStarted": false,
+  "actualReviewStarted": true,
   "scope": "WHOLEboundedRev9bdocs/model/staticdelta",
   "ownerQuestionPending": "msg_8cebdb075c59",
   "actualVerdict": null,
   "nextCut": "OnlyRootconcretechoiceafteractualreview; snapshotA7notgrantednow; deliverdeferred",
-  "BProductOrPortGrant": false
+  "BProductOrPortGrant": false,
+  "reviewDispatch": "ctx_99a4e28b6c25",
+  "reviewTerminal": "term_3f256f99-b615-417a-ba6e-d42d141c280d",
+  "workerStartReceipt": "ready",
+  "predecessor": "PL419/ctxfb actualsucceeded/settled; guardedreleasealready_released then freshactualexited/released verified"
 }

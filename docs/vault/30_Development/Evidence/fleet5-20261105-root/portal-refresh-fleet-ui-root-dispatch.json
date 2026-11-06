@@ -1,5 +1,5 @@
 {
-  "atKST": "2026-11-06T21:18:54+09:00",
+  "atKST": "2026-11-06T22:08:52+09:00",
   "taskId": "task_9d814a8270e1",
   "dispatchId": "ctx_d855f1849f6b",
   "terminal": "term_8b773c12-fcd0-495e-946c-d2a67bd2b029",
@@ -17,11 +17,32 @@
   "fivePCEnrolled": false,
   "ownerReport": "854a8eab0b6e236b62878f49ee941c700e458af0",
   "RootContractReview": "portal-refresh-3a-root-contract-findings.json",
-  "next": "sameownerR2fixfrom854/freshCI/actualnarrowreview beforedeployment; stage854notdeployable",
-  "actualSourceCI": "portal-refresh-854-source-root-verification.json",
-  "queuedActualReview": null,
+  "next": "actualnarrowUIR2reviewafterB; no854deploy; source22cnotyetaccepted",
+  "actualSourceCI": "portal-polling-r2-source-root-verification.json",
+  "queuedActualReview": {
+    "atKST": "2026-11-06T22:08:52+09:00",
+    "source": "22c20a838fe0ab82a772641163ef553494c5bea3",
+    "final": "9c25f3c9cab162f424744d79f9a4e21729c40404",
+    "branch": "agent/gemini/portal-refresh-polling-r2-20261106",
+    "rootVerification": "portal-polling-r2-source-root-verification.json",
+    "reviewTask": "task_855e5f3977e0",
+    "status": "pending",
+    "dependsOn": "task_a67e24d81ef8",
+    "actualReviewStarted": false,
+    "scope": "NARROWM1+L1L4polling/timeout/header/manualcallback/actualApptests",
+    "actualVerdict": null,
+    "deployment": "NOT_RUN_PENDING_ACTUAL_REVIEW",
+    "authorPacketActualWorkerDone": "msg_170d7bc04c59",
+    "authorTaskOutcome": "succeeded_DELIVERY_ONLY",
+    "officialRegistryOrProductDone": false
+  },
   "actualReview": "ab7f768db22c0b6f2f4ac812f63a1b605cd26d19",
   "actualReviewDocs": 42215440314,
   "actualVerdict": "REVISION_REQUIRED Mediumslowpoll+4Low",
-  "currentRootScope": "portal-refresh-polling-r2-root-scope.json"
+  "currentRootScope": "portal-refresh-polling-r2-root-scope.json",
+  "currentSource": "22c20a838fe0ab82a772641163ef553494c5bea3",
+  "currentReport": "9c25f3c9cab162f424744d79f9a4e21729c40404",
+  "currentBranch": "agent/gemini/portal-refresh-polling-r2-20261106",
+  "authorTaskActualWorkerDone": "msg_170d7bc04c59",
+  "authorTaskDeliveryOnlyComplete": true
 }

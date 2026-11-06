@@ -1,11 +1,11 @@
 ---
 doc_id: "GOV-FLEET5-BOOTSTRAP-V5-FREEZE-CODE-SCOPE-20261106"
 title: "FLEET5 전환 v5 계약 동결과 구현 범위"
-version: "1.0.15"
+version: "1.0.16"
 status: "active"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-11-06T20:17:42+09:00"
+updated: "2026-11-06T22:08:52+09:00"
 source_of_truth: "Git"
 ---
 
@@ -171,3 +171,8 @@ Root는 전체 Core 전에 이 시험 보강을 하는 선택을 확정했다. �
 ## PL-R1c 실제 검토와 한정 PL-R1d 후속
 
 cfec7b81094b487ed068eac08a228cb99dd7509a/Docs42208154603은 기존 N1–N6·non-generic conversion·75owner 사례와 storage 한계를 수락했으나 type parameter constraint의 pointer term은 기존 pointerElement에서 빠지는 새 PL-R1d LOW를 남겼다. 실제 production7파일에는 해당 conversion이 없고 이전 reviewer 명세도 불완전했음을 기록한다. Root는 msg_049b87bd98ba로 b47 기반 새 branch의 동일3test/README만 보강하고 실제 좁은 검토 뒤 한 번의 Core를 결정한다. production/K1/pin/모든 실행 binding은 바꾸지 않으며 현재 Core grant는0이다. 정확한 지시는 k2a-pl-r1d-root-scope.json이다.
+
+
+## PL-R1d 실제 코드 축 수락과 단일 fresh Core 범위
+
+0c5bfc1a2e3738877f25e6370a600c445fe75a17/Docs42219022532의 실제 좁은 검토가 G1–G6·pointer-term 변환 경계를 한정 수락했다. finding0/INFO4이며 intersection 과잉거부·typeparam operand 보수거부·reviewer sketch와 helper 동일(새13probe/oldcontrast로 완화)·주석을 추적한다. Root는 msg_9cb645b95305로 정확한ea276/branchagent-codex-fleet5-k2a-pl-r1d-20261106의 normal전체Core1회+SourceDocs1회를 승인했다. actualCore42220638304는실행중/SourceDocs42220644407는19단계성공이다. 선택proofflags는false이고새S08/native2cycle/40runtime/5대인수가아니다. 실패시재시도나source/pin/role/설치변경은새Root결정전없다. 구체권한과unique correlation은k2a-pl-r1d-one-fresh-core-root-scope.json이다.

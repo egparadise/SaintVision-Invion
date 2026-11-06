@@ -1,0 +1,50 @@
+{
+  "atKST": "2026-11-06T21:56:56+09:00",
+  "base": "854a8eab0b6e236b62878f49ee941c700e458af0",
+  "source": "22c20a838fe0ab82a772641163ef553494c5bea3",
+  "final": "9c25f3c9cab162f424744d79f9a4e21729c40404",
+  "branch": "agent/gemini/portal-refresh-polling-r2-20261106",
+  "remoteExact": true,
+  "originalReportedFinal": "9c25f3c95e1e7a02c918ef8392110c4d445585b3",
+  "originalReportedFinalWasInvalid": true,
+  "finalResolvedFromActualRemoteAndGit": true,
+  "productChanges": [
+    "apps/web/src/app/App.tsx",
+    "apps/web/src/features/desktop/ResourceExplorer.tsx",
+    "apps/web/src/shared/api/projectObservation.ts",
+    "apps/web/src/shared/api/runApprovalObservation.ts",
+    "apps/web/src/shared/ui/Header.tsx",
+    "apps/web/tests/portal-refresh-fleet-ui.test.tsx"
+  ],
+  "ownDocsDelta": [
+    "docs/vault/30_Development/Evidence/portal-refresh-fleet-ui-20261106-gemini/verification.json",
+    "docs/vault/30_Development/History/2026-11-06_21-45-00_KST_PORTAL_REFRESH_POLLING_R2_Gemini.md"
+  ],
+  "finalNonDocsEqualSource": true,
+  "Frontend": {
+    "run": 42219574051,
+    "head": "22c20a838fe0ab82a772641163ef553494c5bea3",
+    "exactHeadRefEventPathAttemptAllJobsStepsSuccess": true,
+    "actualTitle": "Frontend Build & Test",
+    "jobIds": [
+      127897973932,
+      127897974300
+    ]
+  },
+  "oldDocs": {
+    "run": 42220264732,
+    "actualHead": "5f3c9b74462dd4c5f2bb449ca6813d68badf6f31",
+    "notFinal9c": true
+  },
+  "actualClaudeReview": null,
+  "deployment": "NOTRUN",
+  "Docs": {
+    "run": 42221567010,
+    "head": "9c25f3c9cab162f424744d79f9a4e21729c40404",
+    "job": 127904637893,
+    "correlation": "Root-UIR2-FINAL-DOCS-9c25f3c9-0f0b790b829d4e76b706ede3c486afec",
+    "exactHeadRefEventPathAttemptAll19StepsSuccess": true,
+    "validatedBy": "Root operator after correcting ownerpublicationmetadata",
+    "atKST": "2026-11-06T21:59:44+09:00"
+  }
+}

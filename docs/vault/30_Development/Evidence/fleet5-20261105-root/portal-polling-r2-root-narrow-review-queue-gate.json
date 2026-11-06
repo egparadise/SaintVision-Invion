@@ -1,0 +1,17 @@
+{
+  "atKST": "2026-11-06T22:08:52+09:00",
+  "source": "22c20a838fe0ab82a772641163ef553494c5bea3",
+  "final": "9c25f3c9cab162f424744d79f9a4e21729c40404",
+  "branch": "agent/gemini/portal-refresh-polling-r2-20261106",
+  "rootVerification": "portal-polling-r2-source-root-verification.json",
+  "reviewTask": "task_855e5f3977e0",
+  "status": "pending",
+  "dependsOn": "task_a67e24d81ef8",
+  "actualReviewStarted": false,
+  "scope": "NARROWM1+L1L4polling/timeout/header/manualcallback/actualApptests",
+  "actualVerdict": null,
+  "deployment": "NOT_RUN_PENDING_ACTUAL_REVIEW",
+  "authorPacketActualWorkerDone": "msg_170d7bc04c59",
+  "authorTaskOutcome": "succeeded_DELIVERY_ONLY",
+  "officialRegistryOrProductDone": false
+}
