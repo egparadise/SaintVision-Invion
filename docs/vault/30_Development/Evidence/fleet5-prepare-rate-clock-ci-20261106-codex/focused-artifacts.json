@@ -1,0 +1,25 @@
+{
+  "total_count": 1,
+  "artifacts": [
+    {
+      "id": 13466003560,
+      "node_id": "MDg6QXJ0aWZhY3QxMzQ2NjAwMzU2MA==",
+      "name": "preparation-rate-clock-real-pg-eb32b211ab3704935b9431747089ab0715582a74",
+      "size_in_bytes": 13493,
+      "url": "https://api.github.com/repos/egparadise/SaintVision-Invion/actions/artifacts/13466003560",
+      "archive_download_url": "https://api.github.com/repos/egparadise/SaintVision-Invion/actions/artifacts/13466003560/zip",
+      "expired": false,
+      "digest": "sha256:cb6ac1002ff5fe785a12186d26b891a4895ba105ea9c4c4fb67f0fc726925a62",
+      "created_at": "2026-11-06T00:30:16Z",
+      "updated_at": "2026-11-06T00:30:16Z",
+      "expires_at": "2026-12-06T00:30:15Z",
+      "workflow_run": {
+        "id": 42137053588,
+        "repository_id": 1362259805,
+        "head_repository_id": 1362259805,
+        "head_branch": "agent/codex/fleet5-prepare-rate-clock-test-20261106",
+        "head_sha": "eb32b211ab3704935b9431747089ab0715582a74"
+      }
+    }
+  ]
+}

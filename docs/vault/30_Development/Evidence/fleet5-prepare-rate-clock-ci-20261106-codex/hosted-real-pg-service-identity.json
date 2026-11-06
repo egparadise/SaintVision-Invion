@@ -1,0 +1,11 @@
+{
+  "identity": {
+    "database": "invdev",
+    "role": "invowner",
+    "version": "160015"
+  },
+  "host": "127.0.0.1",
+  "port": 5432,
+  "dedicatedWorkflowService": true,
+  "productionDSN": false
+}

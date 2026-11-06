@@ -1,0 +1,113 @@
+{
+  "sourceSHA": "eb32b211ab3704935b9431747089ab0715582a74",
+  "run": 42137053588,
+  "artifactID": 13466003560,
+  "bytes": 13493,
+  "archiveSHA256": "cb6ac1002ff5fe785a12186d26b891a4895ba105ea9c4c4fb67f0fc726925a62",
+  "remoteDigest": "sha256:cb6ac1002ff5fe785a12186d26b891a4895ba105ea9c4c4fb67f0fc726925a62",
+  "digestMatches": true,
+  "atKST": "2026-11-06T09:32:26.748132+09:00",
+  "rawArchiveIgnored": ".work\\focused-rate-clock-13466003560.zip",
+  "rawJUnitLogExported": false,
+  "entries": [
+    {
+      "name": "full-affected-file.json",
+      "bytes": 12377
+    },
+    {
+      "name": "full-affected-file.log",
+      "bytes": 7260
+    },
+    {
+      "name": "full-affected-file.xml",
+      "bytes": 5302
+    },
+    {
+      "name": "original-controls.json",
+      "bytes": 5778
+    },
+    {
+      "name": "original-forced-rollover.json",
+      "bytes": 2688
+    },
+    {
+      "name": "original-forced-rollover.log",
+      "bytes": 4425
+    },
+    {
+      "name": "original-forced-rollover.py.txt",
+      "bytes": 1615
+    },
+    {
+      "name": "original-forced-rollover.xml",
+      "bytes": 2690
+    },
+    {
+      "name": "original-same-window.json",
+      "bytes": 2018
+    },
+    {
+      "name": "original-same-window.log",
+      "bytes": 1417
+    },
+    {
+      "name": "original-same-window.py.txt",
+      "bytes": 1608
+    },
+    {
+      "name": "original-same-window.xml",
+      "bytes": 419
+    },
+    {
+      "name": "provenance-end.json",
+      "bytes": 832
+    },
+    {
+      "name": "provenance-start.json",
+      "bytes": 702
+    },
+    {
+      "name": "real-pg-service-identity.json",
+      "bytes": 198
+    }
+  ],
+  "parsed": {
+    "original-controls.json": {
+      "rawSHA256": "cf7c1304a0c7b63ab813b2ade0f4bc34ebfdde61b7f601be3c43656f23780cdd",
+      "rawBytes": 5778
+    },
+    "full-affected-file.json": {
+      "rawSHA256": "cdfeb084229fc3ddae2d0c16abb4f5c1dd65b93eb1ba14358ccbaa9c288a3e4a",
+      "rawBytes": 12377
+    },
+    "real-pg-service-identity.json": {
+      "rawSHA256": "a012a1a6ff2c5d0c6aa1eb48e14d7a3c520fbc735f681c260432c28f24dc4ca8",
+      "rawBytes": 198
+    },
+    "provenance-end.json": {
+      "rawSHA256": "b1ff0f44e79d66ace9bfd58becda198b2e0590deee6ccd905a80b88819902da7",
+      "rawBytes": 832
+    },
+    "original-same-window.xml": {
+      "cases": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "rawSHA256": "4df75b576c364d35e00dc6646096c7af47cd4fe878a438032b04d5060210a9ec"
+    },
+    "original-forced-rollover.xml": {
+      "cases": 1,
+      "failures": 1,
+      "errors": 0,
+      "skipped": 0,
+      "rawSHA256": "045a0317d39a547d9fbc5f0d438793fd76c62061b6f12ed318a00c76820bdc92"
+    },
+    "full-affected-file.xml": {
+      "cases": 30,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "rawSHA256": "8976c7bd39be85fc04692f3b9d0b3bc08ae36009bb680f17a0b12c1a0690907f"
+    }
+  }
+}

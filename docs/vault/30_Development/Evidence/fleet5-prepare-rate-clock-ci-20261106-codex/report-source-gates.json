@@ -1,0 +1,127 @@
+{
+  "runs": [
+    {
+      "argv": [
+        "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+        "-B",
+        "tools/check_docs.py"
+      ],
+      "exit": 0,
+      "startedKST": "2026-11-06T09:36:42.836951+09:00",
+      "endedKST": "2026-11-06T09:37:01.961832+09:00",
+      "log": "report-gate-01-check_docs.log"
+    },
+    {
+      "argv": [
+        "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+        "-B",
+        "tools/check_ontology_generation.py"
+      ],
+      "exit": 0,
+      "startedKST": "2026-11-06T09:37:01.962538+09:00",
+      "endedKST": "2026-11-06T09:37:04.005613+09:00",
+      "log": "report-gate-02-check_ontology_generation.log"
+    },
+    {
+      "argv": [
+        "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+        "-B",
+        "tools/check_ontology.py"
+      ],
+      "exit": 0,
+      "startedKST": "2026-11-06T09:37:04.006010+09:00",
+      "endedKST": "2026-11-06T09:37:05.902313+09:00",
+      "log": "report-gate-03-check_ontology.log"
+    },
+    {
+      "argv": [
+        "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+        "-B",
+        "tools/check_contract_bindings.py"
+      ],
+      "exit": 0,
+      "startedKST": "2026-11-06T09:37:05.902695+09:00",
+      "endedKST": "2026-11-06T09:37:18.083949+09:00",
+      "log": "report-gate-04-check_contract_bindings.log"
+    },
+    {
+      "argv": [
+        "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+        "-B",
+        "tools/check_frontend_integrity.py"
+      ],
+      "exit": 0,
+      "startedKST": "2026-11-06T09:37:18.084282+09:00",
+      "endedKST": "2026-11-06T09:37:19.529996+09:00",
+      "log": "report-gate-05-check_frontend_integrity.log"
+    },
+    {
+      "argv": [
+        "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+        "-B",
+        "tools/check_doc_path_citations.py",
+        "--ratchet",
+        "--base-ref",
+        "eb32b211ab3704935b9431747089ab0715582a74"
+      ],
+      "exit": 0,
+      "startedKST": "2026-11-06T09:37:19.530334+09:00",
+      "endedKST": "2026-11-06T09:37:23.767316+09:00",
+      "log": "report-gate-06-check_doc_path_citations.log"
+    },
+    {
+      "argv": [
+        "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+        "-B",
+        "tools/check_doc_single_source.py",
+        "--ratchet"
+      ],
+      "exit": 0,
+      "startedKST": "2026-11-06T09:37:23.767687+09:00",
+      "endedKST": "2026-11-06T09:37:24.168340+09:00",
+      "log": "report-gate-07-check_doc_single_source.log"
+    },
+    {
+      "argv": [
+        "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+        "-B",
+        "tools/test_sync.py"
+      ],
+      "exit": 0,
+      "startedKST": "2026-11-06T09:37:24.168700+09:00",
+      "endedKST": "2026-11-06T09:37:28.946358+09:00",
+      "log": "report-gate-08-test_sync.log"
+    },
+    {
+      "argv": [
+        "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+        "-B",
+        "tools/build_docs.py"
+      ],
+      "exit": 0,
+      "startedKST": "2026-11-06T09:37:28.946818+09:00",
+      "endedKST": "2026-11-06T09:37:36.525157+09:00",
+      "log": "report-gate-09-build_docs.log"
+    },
+    {
+      "argv": [
+        "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+        "-B",
+        "tools/sync_obsidian.py",
+        "--check",
+        "--state",
+        "D:\\Project\\SaintVision-Invion\\SaintVisionI-Invion\\.git\\obsidian-sync-state.json"
+      ],
+      "exit": 0,
+      "startedKST": "2026-11-06T09:37:36.537909+09:00",
+      "endedKST": "2026-11-06T09:37:43.152309+09:00",
+      "log": "report-gate-10-sync_obsidian.log",
+      "canonicalStateSHA256Before": "1a4bf31dd6f03e8ce2c41f97548d27836950329d744f58a3b6d11a2bafe4d64c",
+      "canonicalStateSHA256After": "1a4bf31dd6f03e8ce2c41f97548d27836950329d744f58a3b6d11a2bafe4d64c",
+      "unchanged": true,
+      "authority": "msg_2f135030b23c",
+      "noApplyAdoptResolve": true
+    }
+  ],
+  "noObsidianApply": true
+}

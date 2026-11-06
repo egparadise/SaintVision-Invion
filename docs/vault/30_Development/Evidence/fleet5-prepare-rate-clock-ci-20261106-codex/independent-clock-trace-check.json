@@ -1,0 +1,69 @@
+{
+  "sourceSHA": "eb32b211ab3704935b9431747089ab0715582a74",
+  "atKST": "2026-11-06T09:34:52.162482+09:00",
+  "controls": [
+    {
+      "label": "original-same-window",
+      "buckets": {
+        "2026-11-06T00:29:00+00:00": 5
+      },
+      "actualObservedClockCalls": 6,
+      "intendedOutcome": true
+    },
+    {
+      "label": "original-forced-rollover",
+      "buckets": {
+        "2026-11-06T00:29:00+00:00": 5,
+        "2026-11-06T00:30:00+00:00": 1
+      },
+      "actualObservedClockCalls": 6,
+      "intendedOutcome": true
+    }
+  ],
+  "positiveTraces": [
+    {
+      "observedClockCalls": 5,
+      "buckets": {
+        "2026-11-06T00:30:00+00:00": 5
+      }
+    },
+    {
+      "observedClockCalls": 6,
+      "buckets": {
+        "2026-11-06T00:30:00+00:00": 5
+      }
+    },
+    {
+      "observedClockCalls": 5,
+      "buckets": {
+        "2026-11-06T00:30:00+00:00": 5
+      }
+    },
+    {
+      "observedClockCalls": 6,
+      "buckets": {
+        "2026-11-06T00:30:00+00:00": 5,
+        "2026-11-06T00:31:00+00:00": 1
+      }
+    },
+    {
+      "observedClockCalls": 10,
+      "buckets": {
+        "2026-11-06T00:30:00+00:00": 5,
+        "2026-11-06T00:31:00+00:00": 5
+      }
+    },
+    {
+      "observedClockCalls": 11,
+      "buckets": {
+        "2026-11-06T00:30:00+00:00": 5,
+        "2026-11-06T00:31:00+00:00": 5
+      }
+    }
+  ],
+  "strictPositiveCases": 30,
+  "skips": 0,
+  "assertionsPASS": true,
+  "historicalCICauseProven": false,
+  "wholeCore": false
+}

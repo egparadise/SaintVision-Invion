@@ -1,0 +1,24 @@
+{
+  "sourceSHA": "eb32b211ab3704935b9431747089ab0715582a74",
+  "base": "56651cba697f2ab6fcd7166ca4e6ea11eac28113",
+  "event": "push",
+  "ref": "refs/heads/agent/codex/fleet5-prepare-rate-clock-test-20261106",
+  "run": "42137053588",
+  "runAttempt": "1",
+  "atUTC": "2026-11-06T00:30:14.865109+00:00",
+  "python": "3.12.16 (main, Oct 26 2026, 02:48:44) [GCC 15.2.0]",
+  "platform": "linux",
+  "go": {
+    "argv": [
+      "go",
+      "version"
+    ],
+    "exit": 0,
+    "version": "go version go1.27.1 linux/amd64"
+  },
+  "nodeBinarySHA256": "2aa70e1f42992790700a53b0989dfa1800785227021de9f7b0e13436be33fb8a",
+  "syntheticImageID": "sha256:d35ac3850aaab0396441ac40a94a4d0a96c1b13d48eb4435be4c62e29fe756cb",
+  "scope": "fixed hosted test-owned PG and synthetic Node fixtures only",
+  "wholeCore": false,
+  "physicalAcceptance": false
+}

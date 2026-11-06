@@ -1,0 +1,167 @@
+[
+  {
+    "label": "original-same-window",
+    "argv": [
+      "/opt/hostedtoolcache/Python/3.12.16/x64/bin/python",
+      "-B",
+      "-m",
+      "pytest",
+      "/home/runner/work/SaintVision-Invion/SaintVision-Invion/tests/integration/test_fleet5_preparation_rate_original_probe.py",
+      "-q",
+      "-s",
+      "--junitxml=/home/runner/work/SaintVision-Invion/SaintVision-Invion/.work/preparation-rate-clock/original-same-window.xml"
+    ],
+    "exit": 0,
+    "testcases": 1,
+    "names": [
+      "test_prepare_rate_limit_is_enforced_before_repeated_failed_work"
+    ],
+    "failures": 0,
+    "errors": 0,
+    "skips": 0,
+    "deselected": false,
+    "realWindowTraces": [
+      {
+        "anchor": "2026-11-06T00:29:00+00:00",
+        "identity": {
+          "database": "inv_test_29e20e195fe9419584ab99049aee7c35",
+          "role": "inv_app_64e021191f5d4e898fb0",
+          "version": "160015"
+        },
+        "observed": [
+          "2026-11-06T00:29:01+00:00",
+          "2026-11-06T00:29:05+00:00",
+          "2026-11-06T00:29:10+00:00",
+          "2026-11-06T00:29:15+00:00",
+          "2026-11-06T00:29:20+00:00",
+          "2026-11-06T00:29:50+00:00"
+        ],
+        "rows": [
+          {
+            "count": 5,
+            "operation": "combined",
+            "scope": "project",
+            "subject_id": "*",
+            "window_started_at": "2026-11-06T00:29:00+00:00"
+          },
+          {
+            "count": 5,
+            "operation": "prepare",
+            "scope": "subject",
+            "subject_id": "oidc:eea0c3d996e5cd7390f0bf8b3384621d02ffcc6f90b929406f42e468d6e4b326",
+            "window_started_at": "2026-11-06T00:29:00+00:00"
+          },
+          {
+            "count": 5,
+            "operation": "combined",
+            "scope": "tenant-project",
+            "subject_id": "*",
+            "window_started_at": "2026-11-06T00:29:00+00:00"
+          }
+        ]
+      }
+    ],
+    "rawLogSHA256": "d2b0b9c03ddbef9c518894a92c33e7da7aab2449f32a25be70e4b33b90bb3a5b",
+    "rawJUnitSHA256": "4df75b576c364d35e00dc6646096c7af47cd4fe878a438032b04d5060210a9ec",
+    "rawLogJUnitForOpaqueArtifactOnly": true,
+    "expectedExit": 0,
+    "originalFunctionSHA256": "4452bf5b87fcecbc037e8adbab48b5882d348f34427f25f814117ed666ae1e97",
+    "baseSourceRawSHA256": "709581f43e0a67435bda6079e577240022cf1bba9f3d020d8cc8800fe8213a30",
+    "probeRawSHA256": "e596948598cc89b4fe58e7e37f5ac03ade31c8ccfaadeb30e36bdb308b8d7f47",
+    "historicalCICauseProven": false,
+    "intendedControlOutcome": true
+  },
+  {
+    "label": "original-forced-rollover",
+    "argv": [
+      "/opt/hostedtoolcache/Python/3.12.16/x64/bin/python",
+      "-B",
+      "-m",
+      "pytest",
+      "/home/runner/work/SaintVision-Invion/SaintVision-Invion/tests/integration/test_fleet5_preparation_rate_original_probe.py",
+      "-q",
+      "-s",
+      "--junitxml=/home/runner/work/SaintVision-Invion/SaintVision-Invion/.work/preparation-rate-clock/original-forced-rollover.xml"
+    ],
+    "exit": 1,
+    "testcases": 1,
+    "names": [
+      "test_prepare_rate_limit_is_enforced_before_repeated_failed_work"
+    ],
+    "failures": 1,
+    "errors": 0,
+    "skips": 0,
+    "deselected": false,
+    "realWindowTraces": [
+      {
+        "anchor": "2026-11-06T00:29:00+00:00",
+        "identity": {
+          "database": "inv_test_92bad3f9ac554b29a3577e2d418a56ef",
+          "role": "inv_app_06e46d9f41bc4c48b29c",
+          "version": "160015"
+        },
+        "observed": [
+          "2026-11-06T00:29:01+00:00",
+          "2026-11-06T00:29:05+00:00",
+          "2026-11-06T00:29:10+00:00",
+          "2026-11-06T00:29:15+00:00",
+          "2026-11-06T00:29:20+00:00",
+          "2026-11-06T00:30:00+00:00"
+        ],
+        "rows": [
+          {
+            "count": 5,
+            "operation": "combined",
+            "scope": "project",
+            "subject_id": "*",
+            "window_started_at": "2026-11-06T00:29:00+00:00"
+          },
+          {
+            "count": 5,
+            "operation": "prepare",
+            "scope": "subject",
+            "subject_id": "oidc:eea0c3d996e5cd7390f0bf8b3384621d02ffcc6f90b929406f42e468d6e4b326",
+            "window_started_at": "2026-11-06T00:29:00+00:00"
+          },
+          {
+            "count": 5,
+            "operation": "combined",
+            "scope": "tenant-project",
+            "subject_id": "*",
+            "window_started_at": "2026-11-06T00:29:00+00:00"
+          },
+          {
+            "count": 1,
+            "operation": "combined",
+            "scope": "project",
+            "subject_id": "*",
+            "window_started_at": "2026-11-06T00:30:00+00:00"
+          },
+          {
+            "count": 1,
+            "operation": "prepare",
+            "scope": "subject",
+            "subject_id": "oidc:eea0c3d996e5cd7390f0bf8b3384621d02ffcc6f90b929406f42e468d6e4b326",
+            "window_started_at": "2026-11-06T00:30:00+00:00"
+          },
+          {
+            "count": 1,
+            "operation": "combined",
+            "scope": "tenant-project",
+            "subject_id": "*",
+            "window_started_at": "2026-11-06T00:30:00+00:00"
+          }
+        ]
+      }
+    ],
+    "rawLogSHA256": "ba4bdc5453d133aa0ef880ff2be5144e5a8f8437174ea7908dae565496ca06af",
+    "rawJUnitSHA256": "045a0317d39a547d9fbc5f0d438793fd76c62061b6f12ed318a00c76820bdc92",
+    "rawLogJUnitForOpaqueArtifactOnly": true,
+    "expectedExit": 1,
+    "originalFunctionSHA256": "4452bf5b87fcecbc037e8adbab48b5882d348f34427f25f814117ed666ae1e97",
+    "baseSourceRawSHA256": "709581f43e0a67435bda6079e577240022cf1bba9f3d020d8cc8800fe8213a30",
+    "probeRawSHA256": "d64ac7fb0f0fbbe50c04a92dc6054c88b367de3f425378dca15c3c6fd83d2461",
+    "historicalCICauseProven": false,
+    "intendedControlOutcome": true
+  }
+]

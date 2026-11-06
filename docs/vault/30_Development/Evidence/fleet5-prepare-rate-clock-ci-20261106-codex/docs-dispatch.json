@@ -1,0 +1,23 @@
+{
+  "sourceSHA": "eb32b211ab3704935b9431747089ab0715582a74",
+  "branch": "agent/codex/fleet5-prepare-rate-clock-test-20261106",
+  "argv": [
+    "gh",
+    "workflow",
+    "run",
+    "docs.yml",
+    "--ref",
+    "agent/codex/fleet5-prepare-rate-clock-test-20261106",
+    "-f",
+    "correlation_id=FLEET5-prepare-rate-clock-Docs-eb32b211ab37-20261106T093017KST"
+  ],
+  "exit": 0,
+  "correlation": "FLEET5-prepare-rate-clock-Docs-eb32b211ab37-20261106T093017KST",
+  "stdout": "https://github.com/egparadise/SaintVision-Invion/actions/runs/42137296076\n",
+  "stderr": "",
+  "focusedPGRun": 42137053588,
+  "focusedPGEvent": "push",
+  "wholeCoreDispatched": false,
+  "priorMetadataPreflightExit": 1,
+  "priorMetadataPreflightReason": "REST name uses dynamic run-name; fixed validation uses exact workflow path/title/head/ref/event; no earlier Docs dispatch or PG rerun"
+}
