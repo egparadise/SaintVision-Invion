@@ -1,11 +1,11 @@
 ---
 doc_id: "HISTORY-FLEET5-20261106-K2A-STAGE2-COMBINED-CODEX"
 title: "FLEET5 K2A Low PL-R1a Stage2 combined source candidate"
-version: "1.0.0"
+version: "1.0.1"
 status: "review"
 author: "Codex"
 reviewer: "Claude through Root; actual combined review pending"
-updated: "2026-11-06T16:42:00+09:00"
+updated: "2026-11-06T16:47:48.702814+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 base_sha: "21059451c23cebe8c038f76e437c390120205998"
@@ -107,3 +107,22 @@ unchanged before/after; no apply/adopt/resolve/global state write. Exact command
 times and exits local-required-gates.json. Source/CI/review/runtime axes remain
 separate: local source PASS, own hosted Docs pending, combined Claude pending,
 fresh combined Core NOT_RUN/not granted, operational/FIVE incomplete.
+
+Actual source/evidence checkpoint6005ffccb40844bb604c248e304d868bb5783d14
+is docs-only after66d4cd51, product diff empty. Own exact Docs42183063052,
+job127776899753, workflow_dispatch/attempt1, exact combined head/ref/correlation,
+ALL1job/19stepsSUCCESS independently read from GitHub run AND jobs API by Codex.
+Full public metadata plus source-docs-verification.json preserved. This qualifies
+Docs only, not final review/Core/runtime. This qualification report is docs-only;
+its own exact Docs will be observed separately and handed to Root with frozen
+report SHA; no self-referential invented future CI binding.
+
+Qualification-only changed documentation16:47:49-16:48:45 KST revalidated
+ALL10required gates exit0, exact210594 ratchet and fresh canonical state same
+26c355f5 before/after. Evidence qualification/local-required-gates.json preserves
+its separate observations. No product test repeat needed: no product bytes changed
+after66d4cd51. First next Root action after exact final report Docs: independently
+verify immutable lineage/hash/CI bindings, then dispatch ONE actual Claude final
+combined delta review after B8 release. Review scope includes PL-R1a18compiled
+cases, union/pin/local regressions and informational boundaries; reviewer decides
+closure, not author. Fresh fullCore+Docs remains Root next decision only.
