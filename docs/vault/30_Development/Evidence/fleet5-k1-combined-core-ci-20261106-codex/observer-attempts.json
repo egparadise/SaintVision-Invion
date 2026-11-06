@@ -1,0 +1,19 @@
+{
+  "firstCollectorExit": 1,
+  "firstCollectorReason": "Compared parameterized JUnit names directly to function declarations; no source or CI failure",
+  "diagnosis": {
+    "actualCases": 30,
+    "baseFunctions": 13,
+    "allActualAffectedCasesPassed": true
+  },
+  "correctedCollectorExit": 0,
+  "correctedCollectorSHA256": "68e643f814eb46856e68d77096489243897c362a3fc99c0a7a283f0929e16a41",
+  "sameOriginalArtifactUsed": 13467404761,
+  "mainArchiveNotRedownloadedAfterCorrection": true,
+  "CIReexecuted": false,
+  "rootTerminalHandback": "msg_62c30bf98178",
+  "currentTask": "task_38393b5d1865",
+  "currentDispatch": "ctx_ceecb3824e33",
+  "rootReviewPublicationSHAPending": true,
+  "atKST": "2026-11-06T10:13:50.961407+09:00"
+}

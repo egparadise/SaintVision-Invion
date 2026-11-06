@@ -1,0 +1,30 @@
+{
+  "sourceSHA": "eb32b211ab3704935b9431747089ab0715582a74",
+  "branch": "agent/codex/fleet5-prepare-rate-clock-test-20261106",
+  "correlation": "FLEET5-K1-reviewed-combined-Core-eb32b211ab37-20261106T094204KST",
+  "argv": [
+    "gh",
+    "workflow",
+    "run",
+    "core.yml",
+    "--repo",
+    "egparadise/SaintVision-Invion",
+    "--ref",
+    "agent/codex/fleet5-prepare-rate-clock-test-20261106",
+    "-f",
+    "correlation_id=FLEET5-K1-reviewed-combined-Core-eb32b211ab37-20261106T094204KST",
+    "-f",
+    "run_s08_acceptance=false",
+    "-f",
+    "run_fleet5_peer_phase_proof=false",
+    "-f",
+    "run_fleet5_peer_phase_fixed_proof=false"
+  ],
+  "exit": 0,
+  "stdout": "https://github.com/egparadise/SaintVision-Invion/actions/runs/42138733821\n",
+  "stderr": "",
+  "rootAuthorization": "msg_4f741ef0872c",
+  "sourceDocsReuse": 42137296076,
+  "optionalProofs": false,
+  "priorFailurePreserved": 42126222201
+}

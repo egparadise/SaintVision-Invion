@@ -1,0 +1,95 @@
+{
+  "passEvents": 343,
+  "topLevelPassed": 109,
+  "k1PassEvents": 165,
+  "k1TopLevelPassed": 42,
+  "failedEvents": [],
+  "skippedTests": [
+    {
+      "package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+      "test": "TestDockerLiveCompatibility"
+    }
+  ],
+  "packageResults": [
+    {
+      "Time": "2026-11-06T00:44:12.513382652Z",
+      "Action": "skip",
+      "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/cmd/inv-discover",
+      "Elapsed": 0
+    },
+    {
+      "Time": "2026-11-06T00:44:14.323821862Z",
+      "Action": "pass",
+      "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/cmd/inv-node",
+      "Elapsed": 1.034
+    },
+    {
+      "Time": "2026-11-06T00:44:14.33401811Z",
+      "Action": "pass",
+      "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/cmd/inv-supervisor",
+      "Elapsed": 1.038
+    },
+    {
+      "Time": "2026-11-06T00:44:14.360402245Z",
+      "Action": "pass",
+      "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/discovery",
+      "Elapsed": 1.023
+    },
+    {
+      "Time": "2026-11-06T00:44:14.619713351Z",
+      "Action": "pass",
+      "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/internal/wire",
+      "Elapsed": 1.12
+    },
+    {
+      "Time": "2026-11-06T00:44:15.661182109Z",
+      "Action": "pass",
+      "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/storage",
+      "Elapsed": 1.041
+    },
+    {
+      "Time": "2026-11-06T00:44:15.662441329Z",
+      "Action": "skip",
+      "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/tests/probe",
+      "Elapsed": 0
+    },
+    {
+      "Time": "2026-11-06T00:44:15.662450613Z",
+      "Action": "skip",
+      "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/transfer",
+      "Elapsed": 0
+    },
+    {
+      "Time": "2026-11-06T00:44:15.785234749Z",
+      "Action": "pass",
+      "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/telemetry",
+      "Elapsed": 1.164
+    },
+    {
+      "Time": "2026-11-06T00:44:16.977719931Z",
+      "Action": "pass",
+      "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/workspace",
+      "Elapsed": 1.192
+    },
+    {
+      "Time": "2026-11-06T00:44:17.298217678Z",
+      "Action": "pass",
+      "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/transport",
+      "Elapsed": 1.6360000000000001
+    },
+    {
+      "Time": "2026-11-06T00:44:19.147430555Z",
+      "Action": "pass",
+      "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+      "Elapsed": 4.527
+    },
+    {
+      "Time": "2026-11-06T00:47:50.037836376Z",
+      "Action": "pass",
+      "Package": "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify",
+      "Elapsed": 215.713
+    }
+  ],
+  "rawSHA256": "bb4a2af166e7ac2194ebfd41412f7506585cbeb061b74ac242c52de6b818d711",
+  "raceStepStatus": "success"
+}

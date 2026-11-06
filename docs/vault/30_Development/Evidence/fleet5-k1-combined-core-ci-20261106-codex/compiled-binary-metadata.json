@@ -1,0 +1,14 @@
+{
+  "inv-node": {
+    "rawSHA256": "2aa70e1f42992790700a53b0989dfa1800785227021de9f7b0e13436be33fb8a",
+    "bytes": 13387338,
+    "readOnlyGoVersionM": ".work\\combined-core-42138733821-inv-node: go1.27.1\n\tpath\tgithub.com/egparadise/SaintVision-Invion/services/node-agent/cmd/inv-node\n\tmod\tgithub.com/egparadise/SaintVision-Invion/services/node-agent\t(devel)\t\n\tdep\tgithub.com/egparadise/SaintVision-Invion/packages/contracts-go\tv0.0.0\n\t=>\t../../packages/contracts-go\t(devel)\t\n\t\n\tdep\tgithub.com/santhosh-tekuri/jsonschema/v6\tv6.0.2\th1:KRzFb2m7YtdldCEkzs6KqmJw4nqEVZGK7IN2kJkjTuQ=\n\tdep\tgolang.org/x/text\tv0.14.0\th1:ScX5w1eTa3QqT8oi6+ziP7dTV1S2+ALU0bI+0zXKWiQ=\n\tbuild\t-buildmode=exe\n\tbuild\t-compiler=gc\n\tbuild\t-trimpath=true\n\tbuild\tDefaultGODEBUG=containermaxprocs=0,cryptocustomrand=1,decoratemappings=0,gotestjsonbuildtext=1,httpcookiemaxnum=0,multipathtcp=0,randseednop=0,rsa1024min=0,tlsmlkem=0,tlssecpmlkem=0,tlssha1=1,tracebacklabels=0,updatemaxprocs=0,urlmaxqueryparams=0,urlstrictcolons=0,x509rsacrt=0,x509sha256skid=0,x509sslcertoverrideplatform=0,x509usepolicies=0\n\tbuild\tCGO_ENABLED=0\n\tbuild\tGOARCH=amd64\n\tbuild\tGOOS=linux\n\tbuild\tGOAMD64=v1\n\tbuild\tvcs=git\n\tbuild\tvcs.revision=eb32b211ab3704935b9431747089ab0715582a74\n\tbuild\tvcs.time=2026-11-06T00:28:14Z\n\tbuild\tvcs.modified=false\n",
+    "executed": false
+  },
+  "inv-discover": {
+    "rawSHA256": "3cb5aac62936feb00460b20e38698673539008734fb1d2d40ab140c3161bf6bd",
+    "bytes": 10212675,
+    "readOnlyGoVersionM": ".work\\combined-core-42138733821-inv-discover: go1.27.1\n\tpath\tgithub.com/egparadise/SaintVision-Invion/services/node-agent/cmd/inv-discover\n\tmod\tgithub.com/egparadise/SaintVision-Invion/services/node-agent\t(devel)\t\n\tbuild\t-buildmode=exe\n\tbuild\t-compiler=gc\n\tbuild\t-trimpath=true\n\tbuild\tDefaultGODEBUG=containermaxprocs=0,cryptocustomrand=1,decoratemappings=0,gotestjsonbuildtext=1,httpcookiemaxnum=0,multipathtcp=0,randseednop=0,rsa1024min=0,tlsmlkem=0,tlssecpmlkem=0,tlssha1=1,tracebacklabels=0,updatemaxprocs=0,urlmaxqueryparams=0,urlstrictcolons=0,x509rsacrt=0,x509sha256skid=0,x509sslcertoverrideplatform=0,x509usepolicies=0\n\tbuild\tCGO_ENABLED=0\n\tbuild\tGOARCH=amd64\n\tbuild\tGOOS=linux\n\tbuild\tGOAMD64=v1\n\tbuild\tvcs=git\n\tbuild\tvcs.revision=eb32b211ab3704935b9431747089ab0715582a74\n\tbuild\tvcs.time=2026-11-06T00:28:14Z\n\tbuild\tvcs.modified=false\n",
+    "executed": false
+  }
+}

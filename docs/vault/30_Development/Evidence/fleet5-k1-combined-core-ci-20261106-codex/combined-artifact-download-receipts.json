@@ -1,0 +1,224 @@
+[
+  {
+    "artifactID": 13467404761,
+    "artifactName": "saintvision-core-evidence",
+    "archiveBytes": 13987414,
+    "rawSHA256": "4773e870d5e23c775ee1a1532fd563f4140f2039c159fd9e2fabd1d071b8561d",
+    "remoteDigest": "sha256:4773e870d5e23c775ee1a1532fd563f4140f2039c159fd9e2fabd1d071b8561d",
+    "digestMatches": true,
+    "rawKeptIgnored": ".work/combined-core-42138733821-artifact-13467404761.zip",
+    "members": [
+      {
+        "name": "build-product-runtime-real-pg.xml",
+        "bytes": 2368,
+        "rawSHA256": "60a48d07eb589c8b30f02fb7f7f1b597c1ecf7be8e8ea87b3d8881f22e0853f9"
+      },
+      {
+        "name": "api-unconfigured.log",
+        "bytes": 2745,
+        "rawSHA256": "520accb1659fbc24dc24217fdd46646918776f64e439d02133110eba8bd038cc"
+      },
+      {
+        "name": "business-handoff-tests.xml",
+        "bytes": 2778,
+        "rawSHA256": "7844c7a8de2b16a88e8d70a5bb2b8e86282762372642dbf25524b8eab2d1286d"
+      },
+      {
+        "name": "containment-tests.xml",
+        "bytes": 4363,
+        "rawSHA256": "ac37c989adee54a0c97d672d331148ccc5de0a9659f1c85f70832bf35241cb59"
+      },
+      {
+        "name": "core-tests.xml",
+        "bytes": 1418595,
+        "rawSHA256": "d29b146cb62c0c3e1953a0fc3d50c31ca80ffc3bb07c4556235471883b8132b4"
+      },
+      {
+        "name": "cx01-recovery-tests.xml",
+        "bytes": 3535,
+        "rawSHA256": "33f5aaedb9f935182d210a65c40f76843f633a000b1c0100a1f74c27f234dd1e"
+      },
+      {
+        "name": "developer-5454f63f-f9ef-4418-bfde-d256d2ad6a90.json",
+        "bytes": 541,
+        "rawSHA256": "5f4067295bde735368e871020aa3fedf720a9c53b6b94d78be1b918aceb28286"
+      },
+      {
+        "name": "developer-7c44d764-c603-4a90-b50e-961b71efe4fc.json",
+        "bytes": 1747,
+        "rawSHA256": "2576529b658ae47898dd69e2713c151c362a914bc842be27d85feb86bdd57e83"
+      },
+      {
+        "name": "developer-7e147d7d-9582-4001-9bd3-a344a9facff5.json",
+        "bytes": 1731,
+        "rawSHA256": "56821019dfd1268dafb0c5e99354d6936dc44c450a34a43ef455fa12010b6613"
+      },
+      {
+        "name": "developer-b86ee166-0ccc-49ba-9de0-29f4b4377487.json",
+        "bytes": 1002,
+        "rawSHA256": "e864f0e831ea222cafe5ec365edc8a875c1c693d9e51663f539388d3bc8c30f7"
+      },
+      {
+        "name": "docker-compatibility.log",
+        "bytes": 1176,
+        "rawSHA256": "b23e0ade891083b5e92655b1c3786e87dc8a47b10718365f0c5c8e72e751d5f5"
+      },
+      {
+        "name": "docker-host-tests.xml",
+        "bytes": 539,
+        "rawSHA256": "12a84a40d81a5364566c7222a70e15be2fdf6a35dfd370772c66c9f4cb93ccd8"
+      },
+      {
+        "name": "first-4b990b4e-cbca-4ff5-b2dc-4f379be6ddf2.json",
+        "bytes": 1476,
+        "rawSHA256": "dd7bd2980ec299fd4eab06e9558c6ca11f2721031cab9c9b22f0d51af7abeab7"
+      },
+      {
+        "name": "first-c20f84ba-1a82-4217-a036-f66ad32d35ec.json",
+        "bytes": 1489,
+        "rawSHA256": "9f16998ba1face31ab411fac6f59145d013875f5e68d5a1b5fb15aeb5992a1e4"
+      },
+      {
+        "name": "first-c6daaa10-b6bf-429c-94c0-1a09cb7139f0.json",
+        "bytes": 829,
+        "rawSHA256": "c8991fcbef9111212b3de016b2f9ee8c1a2cf514f2a3eea0d1c1292546aa3a22"
+      },
+      {
+        "name": "first-edda36e2-b1fb-4683-977e-15eb0f84f3a9.json",
+        "bytes": 598,
+        "rawSHA256": "ac1029bc73db00344b0b0558e7515506afdbc5fda13c9e1bd3dbb44de9435f05"
+      },
+      {
+        "name": "inv-discover",
+        "bytes": 10212675,
+        "rawSHA256": "3cb5aac62936feb00460b20e38698673539008734fb1d2d40ab140c3161bf6bd"
+      },
+      {
+        "name": "inv-node",
+        "bytes": 13387338,
+        "rawSHA256": "2aa70e1f42992790700a53b0989dfa1800785227021de9f7b0e13436be33fb8a"
+      },
+      {
+        "name": "lan-database-readiness-phases.json",
+        "bytes": 775,
+        "rawSHA256": "74ef82eb5dc7f18f290df38b33c7b0d30b2c259d397e27df6eae182114b59afb"
+      },
+      {
+        "name": "lan-installer-tests.xml",
+        "bytes": 2914,
+        "rawSHA256": "9747097e70bb742b0185c9e968bdf168d7bbae178adf081ce60cdbf20ef70458"
+      },
+      {
+        "name": "model-cancel.json",
+        "bytes": 1429,
+        "rawSHA256": "facfc25b3578fa9166d7ba359ef1675b040d6aa1cdd5ac8298ae47f14c9ef61b"
+      },
+      {
+        "name": "lan-pilot-database-real-pg.xml",
+        "bytes": 563,
+        "rawSHA256": "6db9f145825ac616cc98208812ca6b317ec62a545a7e5ffb365937183a23e7b7"
+      },
+      {
+        "name": "model-node-loss.json",
+        "bytes": 1429,
+        "rawSHA256": "40bd7d375bcc18998d37413535f894d81590947eced68a4edb3b5c06453ddbee"
+      },
+      {
+        "name": "model-output-recovery.json",
+        "bytes": 1493,
+        "rawSHA256": "d84040326f7ab5a92d80e37337d051584691101c9b5188e7719a3dd3fb67e889"
+      },
+      {
+        "name": "model-replacement-node.json",
+        "bytes": 1971,
+        "rawSHA256": "3cf8a40183957deed87f6c7c28fe09aaabd27b45cfd992b1199696a4dfc97683"
+      },
+      {
+        "name": "model-single.json",
+        "bytes": 1484,
+        "rawSHA256": "0b80320c332f9a5fcec90f7a3327e8f2e90f6189539342214877f43b01503515"
+      },
+      {
+        "name": "model-stale.json",
+        "bytes": 1425,
+        "rawSHA256": "1c2e7aa7a7a55295c8dc1f764db0d929bab50bccb9c681d2f2009706f9bb5e02"
+      },
+      {
+        "name": "node-unit.jsonl",
+        "bytes": 539199,
+        "rawSHA256": "bb4a2af166e7ac2194ebfd41412f7506585cbeb061b74ac242c52de6b818d711"
+      },
+      {
+        "name": "p0-owned-docker-floor.json",
+        "bytes": 4022,
+        "rawSHA256": "f276bdac794debb992b5ef119ebbe740393520a38843e4af95ae9124b82f9aad"
+      },
+      {
+        "name": "p0-real-stopped-reentry-settled.json",
+        "bytes": 3347,
+        "rawSHA256": "35eaacbc68b4d2293062ecbe26338b2627878fb06e09c37cede774c8c1650c78"
+      },
+      {
+        "name": "saintvision_control_plane-0.1.0-py3-none-any.whl",
+        "bytes": 335443,
+        "rawSHA256": "e0eb7ddc8b06ac74dd78b48423b31fd356dae82f0020bac6829d8c0232ecddfc"
+      },
+      {
+        "name": "saintvision_control_plane-0.1.0.tar.gz",
+        "bytes": 266243,
+        "rawSHA256": "b95cbb233913a1aff79cb2c481eec8c8553ab521d15d8aa1c76104b047a4122b"
+      },
+      {
+        "name": "shard-recovery-tests.xml",
+        "bytes": 3353,
+        "rawSHA256": "d79e1bce5e30f1a5380da5e48217d360a6d8e4f83a2af59cb722925761b45cfb"
+      },
+      {
+        "name": "subject-boundary.json",
+        "bytes": 2219,
+        "rawSHA256": "a72538bbb98b364c907912aa3ee141e867a9c56e2de0e24f9acf3042219e26af"
+      },
+      {
+        "name": "workspace-tests.xml",
+        "bytes": 3642,
+        "rawSHA256": "65e3c0e383c7bd79c24d8dc51a7c1f4f8803e565594e63873ab723f3175c2928"
+      }
+    ]
+  },
+  {
+    "artifactID": 13465564407,
+    "artifactName": "saintvision-s01-storage-evidence-42138733821",
+    "archiveBytes": 1766,
+    "rawSHA256": "d96dff3949cb0e633172cd69011394c838458fb21a68f3157a28b71128864197",
+    "remoteDigest": "sha256:d96dff3949cb0e633172cd69011394c838458fb21a68f3157a28b71128864197",
+    "digestMatches": true,
+    "rawKeptIgnored": ".work/combined-core-42138733821-artifact-13465564407.zip",
+    "members": [
+      {
+        "name": "s01-minio-image.txt",
+        "bytes": 89,
+        "rawSHA256": "7a8a0240ecec797856d7955f7959f7c2f863ea45683d709bd2b4e7ff313d429b"
+      },
+      {
+        "name": "s01-storage-roundtrip.json",
+        "bytes": 315,
+        "rawSHA256": "2c3d0ee58b86c31a908be47e358b950dcfc2767f7917a4c18068c19ae17ff2f6"
+      },
+      {
+        "name": "s01-storage-roundtrip.xml",
+        "bytes": 205,
+        "rawSHA256": "c434df9453d3bff005bf22a3df5c4697bf83c92cecd7822b3a37fe513d294cc1"
+      },
+      {
+        "name": "s3-product-object-store.xml",
+        "bytes": 512,
+        "rawSHA256": "51087e51eb809a376ddfc10effe16be13816c1ac715eee605511e63e23454b25"
+      },
+      {
+        "name": "s3-product-postgres.xml",
+        "bytes": 736,
+        "rawSHA256": "aa6f879d903ad75c986e8cfbc2487d42a58a541bb189549cd12196120f36e2d1"
+      }
+    ]
+  }
+]

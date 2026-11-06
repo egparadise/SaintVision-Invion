@@ -1,0 +1,20 @@
+{
+  "sourceSHA": "909b2ef7b2c12b18e86ed66b12a12a3cdc3f573f",
+  "branch": "agent/codex/fleet5-prepare-rate-clock-report-20261106",
+  "correlation": "FLEET5-rate-clock-CI-report-Docs-909b2ef7b2c1-20261106T094208KST",
+  "argv": [
+    "gh",
+    "workflow",
+    "run",
+    "docs.yml",
+    "--repo",
+    "egparadise/SaintVision-Invion",
+    "--ref",
+    "agent/codex/fleet5-prepare-rate-clock-report-20261106",
+    "-f",
+    "correlation_id=FLEET5-rate-clock-CI-report-Docs-909b2ef7b2c1-20261106T094208KST"
+  ],
+  "exit": 0,
+  "stdout": "https://github.com/egparadise/SaintVision-Invion/actions/runs/42138741441\n",
+  "stderr": ""
+}

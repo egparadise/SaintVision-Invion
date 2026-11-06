@@ -1,0 +1,15 @@
+{
+  "pythonVersionTokens": [
+    "Python 3.12.15"
+  ],
+  "goVersionTokens": [
+    "go1.27.1 linux/amd64"
+  ],
+  "postgresVersionTokens": [
+    "PostgreSQL 16.15"
+  ],
+  "rawLogSHA256": "26972563154b82a52a96bd50f24384127f578aecb09d0e0a05aeeefb4f748089",
+  "rawLogBytes": 1337821,
+  "rawLogExported": false,
+  "binaryMetadataNotRuntimeBinaryExecution": true
+}

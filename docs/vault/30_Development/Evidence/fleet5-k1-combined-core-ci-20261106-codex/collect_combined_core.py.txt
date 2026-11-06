@@ -1,0 +1,173 @@
+"""Read-only collection for the ONE Root-authorized immutable combined run.
+
+Raw downloaded artifacts/logs never enter owner Evidence. This is local report
+scratch, not a product helper, runner or retry mechanism.
+"""
+import ast
+from collections import Counter
+import datetime
+import hashlib
+import io
+import json
+from pathlib import Path
+import re
+import subprocess
+import xml.etree.ElementTree as ET
+import zipfile
+
+REPO = 'egparadise/SaintVision-Invion'
+RUN = 42138733821
+SHA = 'eb32b211ab3704935b9431747089ab0715582a74'
+BRANCH = 'agent/codex/fleet5-prepare-rate-clock-test-20261106'
+CORRELATION = 'FLEET5-K1-reviewed-combined-Core-eb32b211ab37-20261106T094204KST'
+EVIDENCE = Path('docs/vault/30_Development/Evidence/fleet5-k1-combined-core-ci-20261106-codex')
+SCRATCH = Path('.work')
+EVIDENCE.mkdir(parents=True, exist_ok=True)
+
+def command(args):
+    p = subprocess.run(args, capture_output=True)
+    if p.returncode:
+        raise RuntimeError(f'command failed exit={p.returncode}: {args[:3]}')
+    return p.stdout
+
+def api(path):
+    return json.loads(command(['gh', 'api', f'repos/{REPO}/{path}']))
+
+def sha256(raw):
+    return hashlib.sha256(raw).hexdigest()
+
+def write(name, value):
+    EVIDENCE.joinpath(name).write_text(json.dumps(value, indent=2, ensure_ascii=False)+'\n', encoding='utf-8')
+
+run = api(f'actions/runs/{RUN}')
+assert (run['id'], run['head_sha'], run['head_branch'], run['event'], run['path'], run['display_title'], run['run_attempt']) == (
+    RUN, SHA, BRANCH, 'workflow_dispatch', '.github/workflows/core.yml', CORRELATION, 1)
+assert run['status'] == 'completed', 'Still running: no premature collection or new dispatch'
+jobs = api(f'actions/runs/{RUN}/jobs?per_page=100')['jobs']
+assert {j['name'] for j in jobs} == {'core', 's01-storage-roundtrip'}
+write('combined-source-ci-final.json', {'run': run, 'jobs': jobs,
+    'sourceDocsReused': 42137296076, 'rootAuthorization': 'msg_4f741ef0872c',
+    'historicalCoreFailurePreserved': 42126222201, 'noRerunCancelOrSourceMove': True})
+artifacts = api(f'actions/runs/{RUN}/artifacts?per_page=100')
+write('combined-artifact-list.json', artifacts)
+receipts = []
+counts = {}
+archives = {}
+for artifact in artifacts['artifacts']:
+    artifact_id = artifact['id']
+    local = SCRATCH / f'combined-core-{RUN}-artifact-{artifact_id}.zip'
+    if local.exists():
+        raw = local.read_bytes()
+    else:
+        raw = command(['gh', 'api', f'repos/{REPO}/actions/artifacts/{artifact_id}/zip'])
+        local.write_bytes(raw)
+    assert len(raw) == artifact['size_in_bytes']
+    digest = sha256(raw)
+    assert artifact['digest'] == 'sha256:'+digest
+    archive = zipfile.ZipFile(io.BytesIO(raw))
+    archives[artifact['name']] = archive
+    receipts.append({'artifactID': artifact_id, 'artifactName': artifact['name'],
+        'archiveBytes': len(raw), 'rawSHA256': digest, 'remoteDigest': artifact['digest'],
+        'digestMatches': True, 'rawKeptIgnored': local.as_posix(),
+        'members': [{'name': i.filename, 'bytes': i.file_size, 'rawSHA256': sha256(archive.read(i))}
+                    for i in archive.infolist() if not i.is_dir()]})
+    for name in archive.namelist():
+        if not name.endswith('.xml'):
+            continue
+        raw_xml = archive.read(name)
+        tree = ET.fromstring(raw_xml)
+        cases = tree.findall('.//testcase')
+        failures = sum(c.find('failure') is not None for c in cases)
+        errors = sum(c.find('error') is not None for c in cases)
+        skips = [c.find('skipped') for c in cases if c.find('skipped') is not None]
+        counts[f'{artifact["name"]}/{name}'] = {
+            'testcases': len(cases), 'passed': len(cases)-failures-errors-len(skips),
+            'failures': failures, 'errors': errors, 'skipped': len(skips),
+            'skipReasons': dict(Counter((s.get('message') or '').strip() for s in skips)),
+            'rawSHA256': sha256(raw_xml), 'rawExported': False,
+            'privateKeyMarkerLocations': {
+                'attributes': sum('PRIVATE KEY-----' in str(v) for e in tree.iter() for v in e.attrib.values()),
+                'textElements': sum('PRIVATE KEY-----' in (e.text or '') for e in tree.iter())}}
+        if name == 'core-tests.xml':
+            affected = [c for c in cases if c.get('classname') == 'tests.integration.test_build_preparations_real_pg']
+            source = Path('tests/integration/test_build_preparations_real_pg.py').read_text(encoding='utf-8')
+            declared = {n.name for n in ast.parse(source).body if isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef)) and n.name.startswith('test_')}
+            actual = {c.get('name') for c in affected}
+            actual_functions = {n.split('[', 1)[0] for n in actual}
+            assert actual_functions == declared and len(actual) == 30 and len(affected) == 30
+            assert all(c.find(t) is None for c in affected for t in ('failure', 'error', 'skipped'))
+            original = 'test_prepare_rate_limit_is_enforced_before_repeated_failed_work'
+            boundary = 'test_prepare_rate_limit_uses_exact_minute_boundaries'
+            assert original in actual and boundary in actual
+            boundary_names = [n for n in actual if 'minute' in n or 'boundary' in n]
+            write('affected-preparation-test-execution.json', {'count': len(affected), 'allDeclaredNamesExecuted': True,
+                'passed': len(affected), 'failures': 0, 'errors': 0, 'skipped': 0,
+                'testNames': sorted(actual), 'declaredFunctionCount': len(declared),
+                'parameterizedNamesComparedByFunction': True,
+                'originalCase': original, 'boundaryCases': boundary_names,
+                'sourceSHA': SHA, 'run': RUN, 'rawXMLSHA256': sha256(raw_xml)})
+            workflow = Path('.github/workflows/core.yml').read_text(encoding='utf-8')
+            fragment = workflow.split('expected_skips = Counter(', 1)[1].split('})', 1)[0]+'}'
+            expected = ast.literal_eval(fragment.strip())
+            actual_skips = dict(Counter((s.get('message') or '').strip() for s in skips))
+            write('core-declared-skip-ratchet.json', {'expected': expected, 'actual': actual_skips, 'matches': expected == actual_skips})
+            assert expected == actual_skips
+        assert failures == 0 and errors == 0, f'Actual test failure recorded in {name}: diagnose original run; never retry'
+
+write('combined-artifact-download-receipts.json', receipts)
+write('combined-junit-counts.json', counts)
+main = archives['saintvision-core-evidence']
+go_raw = main.read('node-unit.jsonl')
+events = [json.loads(line) for line in go_raw.splitlines() if line.strip()]
+passes = [e for e in events if e['Action'] == 'pass' and e.get('Test')]
+fails = [e for e in events if e['Action'] == 'fail']
+skips = [e for e in events if e['Action'] == 'skip' and e.get('Test')]
+k1 = [e for e in passes if e['Package'].endswith('/migrationverify')]
+go_counts = {'passEvents': len(passes), 'topLevelPassed': sum('/' not in e['Test'] for e in passes),
+    'k1PassEvents': len(k1), 'k1TopLevelPassed': sum('/' not in e['Test'] for e in k1),
+    'failedEvents': [{'package': e['Package'], 'test': e.get('Test')} for e in fails],
+    'skippedTests': [{'package': e['Package'], 'test': e['Test']} for e in skips],
+    'packageResults': [{k: v for k, v in e.items() if k != 'Output'} for e in events
+                       if e['Action'] in ('pass', 'fail', 'skip') and not e.get('Test')],
+    'rawSHA256': sha256(go_raw), 'raceStepStatus': next(s['conclusion'] for j in jobs if j['name']=='core'
+                   for s in j['steps'] if s['name']=='Test Linux Node concurrency and crash boundaries')}
+write('compiled-go-test-counts.json', go_counts)
+assert not fails and not [e for e in skips if e['Package'].endswith('/migrationverify')]
+assert go_counts['raceStepStatus'] == 'success'
+
+tool_metadata = {}
+for name in ('inv-node', 'inv-supervisor', 'inv-discover'):
+    if name not in main.namelist():
+        continue
+    binary = main.read(name)
+    local_binary = SCRATCH / f'combined-core-{RUN}-{name}'
+    if local_binary.exists():
+        assert local_binary.read_bytes() == binary
+    else:
+        local_binary.write_bytes(binary)
+    # Read executable build metadata only; never execute artifact code.
+    metadata = command(['go', 'version', '-m', str(local_binary)]).decode('utf-8')
+    tool_metadata[name] = {'rawSHA256': sha256(binary), 'bytes': len(binary),
+                           'readOnlyGoVersionM': metadata, 'executed': False}
+write('compiled-binary-metadata.json', tool_metadata)
+
+log_file = SCRATCH / f'combined-core-{RUN}-all-jobs.log'
+if not log_file.exists():
+    log_file.write_bytes(command(['gh', 'run', 'view', str(RUN), '--repo', REPO, '--log']))
+log_raw = log_file.read_bytes()
+log_text = log_raw.decode('utf-8', errors='replace')
+write('compiled-tool-version-observations.json', {
+    'pythonVersionTokens': sorted(set(re.findall(r'Python 3\.12\.\d+', log_text))),
+    'goVersionTokens': sorted(set(re.findall(r'go1\.27\.\d+\s+linux/amd64', log_text))),
+    'postgresVersionTokens': sorted(set(re.findall(r'PostgreSQL 16\.\d+', log_text))),
+    'rawLogSHA256': sha256(log_raw), 'rawLogBytes': len(log_raw), 'rawLogExported': False,
+    'binaryMetadataNotRuntimeBinaryExecution': True})
+
+assert run['conclusion'] == 'success' and all(j['conclusion']=='success' for j in jobs)
+write('collection-verdict.json', {'sourceSHA': SHA, 'run': RUN, 'correlation': CORRELATION,
+    'atKST': datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=9))).isoformat(),
+    'exactRunMetadata': True, 'allJobsSuccess': True, 'allParsedJUnitNoFailureError': True,
+    'affected30NoSkip': True, 'declaredSkipRatchetExact': True, 'allArtifactDigestsMatch': True,
+    'GoRaceActualSuccess': True, 'rawPayloadExport': False, 'historicalFailureUnchanged': True,
+    'K2Runtime40PhysicalFivePC': 'NOT_RUN', 'workerDoneAuthorized': False})
+print(json.dumps({'source': SHA, 'run': RUN, 'junit': counts, 'go': go_counts}, indent=2))

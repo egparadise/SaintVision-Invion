@@ -1,0 +1,16 @@
+{
+  "atKST": "2026-11-06T09:46:34.230207+09:00",
+  "sourceSHA": "eb32b211ab3704935b9431747089ab0715582a74",
+  "rootActualReviewMessage": "msg_4f741ef0872c",
+  "rootVerdict": "ACCEPT TEST+README+fixed focused CI delta",
+  "claudeActualReviewSHA": "191b6f843a643ee4989ce28c9ebf1816963ffe28",
+  "claudeExactDocs": 42132923864,
+  "claudeVerdict": "ACCEPT IMPLEMENTATION delta56651",
+  "rootSelectedCombinedSource": true,
+  "sourceGoTestdataSchemaPinsProductChangedAfter56651": false,
+  "readmeR1ClosedDocumentationOnly": true,
+  "sourceDocsReuse": 42137296076,
+  "sourceDocsRedispatched": false,
+  "finalBoundedRootHandoffPending": true,
+  "wholeFivePCAccepted": false
+}

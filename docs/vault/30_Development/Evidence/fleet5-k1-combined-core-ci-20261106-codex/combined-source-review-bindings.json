@@ -1,0 +1,18 @@
+{
+  "atKST": "2026-11-06T10:15:01.052066+09:00",
+  "acceptedImplementationBase": "56651cba697f2ab6fcd7166ca4e6ea11eac28113",
+  "combinedSource": "eb32b211ab3704935b9431747089ab0715582a74",
+  "combinedSourceRemoteUnmoved": "eb32b211ab3704935b9431747089ab0715582a74",
+  "changedNonDocs": [
+    ".github/workflows/preparation-rate-clock.yml",
+    "services/node-agent/migrationverify/README.md",
+    "tests/integration/test_build_preparations_real_pg.py",
+    "tests/proofs/run_preparation_rate_clock.py"
+  ],
+  "onlyK1PackageChange": "README.md",
+  "K1GoTestdataSchemaPinDiff": 0,
+  "existingCoreBackendWorkflowChanged": false,
+  "codeReview": "191b6f843a643ee4989ce28c9ebf1816963ffe28",
+  "codeReviewDocs": 42132923864,
+  "rootTestReadmeWorkflowActualReviewMessage": "msg_4f741ef0872c"
+}

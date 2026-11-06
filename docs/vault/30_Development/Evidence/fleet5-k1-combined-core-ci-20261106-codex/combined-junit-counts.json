@@ -1,0 +1,199 @@
+{
+  "saintvision-core-evidence/build-product-runtime-real-pg.xml": {
+    "testcases": 13,
+    "passed": 13,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "skipReasons": {},
+    "rawSHA256": "60a48d07eb589c8b30f02fb7f7f1b597c1ecf7be8e8ea87b3d8881f22e0853f9",
+    "rawExported": false,
+    "privateKeyMarkerLocations": {
+      "attributes": 0,
+      "textElements": 0
+    }
+  },
+  "saintvision-core-evidence/business-handoff-tests.xml": {
+    "testcases": 17,
+    "passed": 17,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "skipReasons": {},
+    "rawSHA256": "7844c7a8de2b16a88e8d70a5bb2b8e86282762372642dbf25524b8eab2d1286d",
+    "rawExported": false,
+    "privateKeyMarkerLocations": {
+      "attributes": 0,
+      "textElements": 0
+    }
+  },
+  "saintvision-core-evidence/containment-tests.xml": {
+    "testcases": 28,
+    "passed": 28,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "skipReasons": {},
+    "rawSHA256": "ac37c989adee54a0c97d672d331148ccc5de0a9659f1c85f70832bf35241cb59",
+    "rawExported": false,
+    "privateKeyMarkerLocations": {
+      "attributes": 0,
+      "textElements": 0
+    }
+  },
+  "saintvision-core-evidence/core-tests.xml": {
+    "testcases": 9262,
+    "passed": 9216,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 46,
+    "skipReasons": {
+      "PowerShell and csc.exe shim require Windows": 13,
+      "PowerShell parser requires Windows": 2,
+      "PowerShell required": 9,
+      "Actual Windows PowerShell launcher": 10,
+      "Explicit browser smoke integration lane required (INV_BROWSER_SMOKE_INTEGRATION=1)": 1,
+      "Set INV_MLFLOW_LIVE_URI (the run-mlflow lane starts the server)": 3,
+      "run only through tools/placement_benchmark.py": 1,
+      "run only through tools/placement_lock_wait_diagnostic.py": 1,
+      "run only through S11 Storage Failure Hosted Reference opt-in lane": 1,
+      "claude is not installed on this machine": 1,
+      "codex is not installed on this machine": 1,
+      "gemini is not installed on this machine": 1,
+      "antigravity is not installed on this machine": 1,
+      "Intranet CA NSS DB live browser test requires Linux, certutil (libnss3-tools), and Playwright": 1
+    },
+    "rawSHA256": "d29b146cb62c0c3e1953a0fc3d50c31ca80ffc3bb07c4556235471883b8132b4",
+    "rawExported": false,
+    "privateKeyMarkerLocations": {
+      "attributes": 6,
+      "textElements": 0
+    }
+  },
+  "saintvision-core-evidence/cx01-recovery-tests.xml": {
+    "testcases": 20,
+    "passed": 20,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "skipReasons": {},
+    "rawSHA256": "33f5aaedb9f935182d210a65c40f76843f633a000b1c0100a1f74c27f234dd1e",
+    "rawExported": false,
+    "privateKeyMarkerLocations": {
+      "attributes": 0,
+      "textElements": 0
+    }
+  },
+  "saintvision-core-evidence/docker-host-tests.xml": {
+    "testcases": 2,
+    "passed": 2,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "skipReasons": {},
+    "rawSHA256": "12a84a40d81a5364566c7222a70e15be2fdf6a35dfd370772c66c9f4cb93ccd8",
+    "rawExported": false,
+    "privateKeyMarkerLocations": {
+      "attributes": 0,
+      "textElements": 0
+    }
+  },
+  "saintvision-core-evidence/lan-installer-tests.xml": {
+    "testcases": 17,
+    "passed": 17,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "skipReasons": {},
+    "rawSHA256": "9747097e70bb742b0185c9e968bdf168d7bbae178adf081ce60cdbf20ef70458",
+    "rawExported": false,
+    "privateKeyMarkerLocations": {
+      "attributes": 0,
+      "textElements": 0
+    }
+  },
+  "saintvision-core-evidence/lan-pilot-database-real-pg.xml": {
+    "testcases": 2,
+    "passed": 2,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "skipReasons": {},
+    "rawSHA256": "6db9f145825ac616cc98208812ca6b317ec62a545a7e5ffb365937183a23e7b7",
+    "rawExported": false,
+    "privateKeyMarkerLocations": {
+      "attributes": 0,
+      "textElements": 0
+    }
+  },
+  "saintvision-core-evidence/shard-recovery-tests.xml": {
+    "testcases": 21,
+    "passed": 21,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "skipReasons": {},
+    "rawSHA256": "d79e1bce5e30f1a5380da5e48217d360a6d8e4f83a2af59cb722925761b45cfb",
+    "rawExported": false,
+    "privateKeyMarkerLocations": {
+      "attributes": 0,
+      "textElements": 0
+    }
+  },
+  "saintvision-core-evidence/workspace-tests.xml": {
+    "testcases": 23,
+    "passed": 23,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "skipReasons": {},
+    "rawSHA256": "65e3c0e383c7bd79c24d8dc51a7c1f4f8803e565594e63873ab723f3175c2928",
+    "rawExported": false,
+    "privateKeyMarkerLocations": {
+      "attributes": 0,
+      "textElements": 0
+    }
+  },
+  "saintvision-s01-storage-evidence-42138733821/s01-storage-roundtrip.xml": {
+    "testcases": 1,
+    "passed": 1,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "skipReasons": {},
+    "rawSHA256": "c434df9453d3bff005bf22a3df5c4697bf83c92cecd7822b3a37fe513d294cc1",
+    "rawExported": false,
+    "privateKeyMarkerLocations": {
+      "attributes": 0,
+      "textElements": 0
+    }
+  },
+  "saintvision-s01-storage-evidence-42138733821/s3-product-object-store.xml": {
+    "testcases": 2,
+    "passed": 2,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "skipReasons": {},
+    "rawSHA256": "51087e51eb809a376ddfc10effe16be13816c1ac715eee605511e63e23454b25",
+    "rawExported": false,
+    "privateKeyMarkerLocations": {
+      "attributes": 0,
+      "textElements": 0
+    }
+  },
+  "saintvision-s01-storage-evidence-42138733821/s3-product-postgres.xml": {
+    "testcases": 3,
+    "passed": 3,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "skipReasons": {},
+    "rawSHA256": "aa6f879d903ad75c986e8cfbc2487d42a58a541bb189549cd12196120f36e2d1",
+    "rawExported": false,
+    "privateKeyMarkerLocations": {
+      "attributes": 0,
+      "textElements": 0
+    }
+  }
+}

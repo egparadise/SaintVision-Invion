@@ -1,0 +1,17 @@
+{
+  "sourceSHA": "eb32b211ab3704935b9431747089ab0715582a74",
+  "run": 42138733821,
+  "correlation": "FLEET5-K1-reviewed-combined-Core-eb32b211ab37-20261106T094204KST",
+  "atKST": "2026-11-06T10:12:50.913076+09:00",
+  "exactRunMetadata": true,
+  "allJobsSuccess": true,
+  "allParsedJUnitNoFailureError": true,
+  "affected30NoSkip": true,
+  "declaredSkipRatchetExact": true,
+  "allArtifactDigestsMatch": true,
+  "GoRaceActualSuccess": true,
+  "rawPayloadExport": false,
+  "historicalFailureUnchanged": true,
+  "K2Runtime40PhysicalFivePC": "NOT_RUN",
+  "workerDoneAuthorized": false
+}
