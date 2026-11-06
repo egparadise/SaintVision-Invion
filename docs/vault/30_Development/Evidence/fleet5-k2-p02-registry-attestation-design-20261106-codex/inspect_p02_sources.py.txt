@@ -1,0 +1,57 @@
+from pathlib import Path
+import ast, datetime, hashlib, json, re, subprocess
+
+base = 'c76d0d66895503adde39288544929ff35cd6c281'
+root = Path.cwd()
+e = root/'docs/vault/30_Development/Evidence/fleet5-k2-p02-registry-attestation-design-20261106-codex'
+assert e.exists() and not any(e.iterdir()), 'No overwrite of prior source evidence'
+def raw(ref, path):
+    return subprocess.check_output(['git', 'show', ref+':'+path])
+def pin(ref, path):
+    b = raw(ref, path)
+    return dict(source=ref, path=path, bytes=len(b), SHA256=hashlib.sha256(b).hexdigest(),
+                blob=subprocess.check_output(['git','rev-parse',ref+':'+path]).decode().strip())
+def save(name, obj):
+    (e/name).write_bytes((json.dumps(obj, indent=2, ensure_ascii=True)+'\n').encode())
+paths = subprocess.check_output(['git','ls-tree','-r','--name-only',base]).decode().splitlines()
+launcher = 'deploy/lan/leaf_rotation_standalone_runtime.py'
+tree = ast.parse(raw(base, launcher))
+modules = next(ast.literal_eval(n.value) for n in tree.body if isinstance(n, ast.Assign)
+               and any(isinstance(t, ast.Name) and t.id == 'WORKER_MODULES' for t in n.targets))
+for name, digest in modules.items():
+    assert hashlib.sha256(raw(base, 'deploy/lan/'+name)).hexdigest() == digest
+closure = [launcher, 'deploy/lan/leaf-rotation-runtime-lock.json'] + ['deploy/lan/'+n for n in modules]
+selected = [p for p in paths if p.startswith('services/node-agent/internal/migrationcontext/')
+            or (p.startswith('services/node-agent/migrationverify/') and (p.endswith('.go') or '/resources/' in p))
+            or p.endswith('go.mod') or p in closure]
+rows = [pin(base,p) for p in selected]
+idx = json.loads(raw(base,'services/node-agent/migrationverify/resources/proposed-contracts/index.json'))
+contracts = []
+for c in idx['contracts']:
+    path='services/node-agent/migrationverify/resources/proposed-contracts/'+c['file']
+    d=json.loads(raw(base,path))
+    assert hashlib.sha256(raw(base,path)).hexdigest()==c['rawSHA256']
+    contracts.append({k:d.get(k) for k in ['contractId','signatureDomainASCII','producerRole','signerRole','requiredVerifier','freshness','codec']})
+assert len(contracts)==28 and all(x['signerRole']!='installed-policy-registry' for x in contracts)
+prior='4ce63e8ee78d957aa91e813f6ee226cc21abb52a'
+prefix='docs/vault/30_Development/Evidence/fleet5-k2-trusted-producer-contract-20261106-codex/'
+priorrows=[pin(prior,prefix+p) for p in ['rev2/contract.md','rev2/producer-matrix.json','rev2/installed-bindings-HOLD.json','existing-proof-contract-catalog.json','rev2/authority-and-effect-gates.json']]
+reviews=[]
+for ref,needle in [('fe7e1ea03c2862fce305fb617a4d5782fe9c0d48','fleet5-k2-rev2-4ce-review'),('7d979761e6ee91bba254ea04074a6855429320ab','fleet5-k2a-combined-ac74-review'),('0c5bfc1a2e3738877f25e6370a600c445fe75a17','fleet5-k2a-pl-r1d-ea276-review')]:
+    p=next(x for x in subprocess.check_output(['git','ls-tree','-r','--name-only',ref,'docs/vault/30_Development/Evidence']).decode().splitlines() if needle in x and x.endswith('/review.json'))
+    d=json.loads(raw(ref,p)); row=pin(ref,p)
+    row.update(verdict=d.get('verdict'),scope=d.get('axis',d.get('verdictScope')),findings=d.get('findings'),info=d.get('infos',d.get('info')))
+    reviews.append(row)
+canonical=Path('D:/Project/SaintVisionI-Invion/fleet-five-orchestration-20261105')
+gov=next((canonical/'docs/vault/40_Governance').glob('FLEET5*v5*'))
+b=gov.read_bytes()
+govrow=dict(path=str(gov),SHA256=hashlib.sha256(b).hexdigest(),version=re.search(r'version: "([^"]+)"',b.decode('utf-8')).group(1),observedWorkingDocument=True)
+observations=[]
+for name in ['plr1d-full-core-root-verified.json','plr1d-qualified-report-root-accepted.json']:
+    b=(canonical/'.work'/name).read_bytes(); d=json.loads(b)
+    observations.append(dict(path=str(canonical/'.work'/name),SHA256=hashlib.sha256(b).hexdigest(),source=d.get('source'),qualifiedReport=d.get('qualifiedReport'),run=d.get('run',d.get('Docs')),classification='ROOT_READ_ONLY_SOURCE_OBSERVATION_NOT_REGISTRY_AUTHORITY'))
+now=datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=9))).isoformat()
+record=dict(classification='PUBLIC_SOURCE_INSPECTION_ONLY_NOT_PROVISIONING',base=base,grant='msg_f68dc38baa0f',task='task_a95ef3d8ccce',dispatch='ctx_ed23b4a777d0',branch='agent/codex/fleet5-k2-p02-registry-design-20261106',worktreeIdentity='wt2:local:bf8e63b6-3570-44c1-bc4f-96064af9b865',canonicalRootHead=subprocess.check_output(['git','-C',str(canonical),'rev-parse','HEAD']).decode().strip(),canonicalGov=govrow,rootSourceObservations=observations,sourceFiles=rows,priorDesignInputs=priorrows,actualReviews=reviews,contractCount=28,contracts=contracts,goModules=[p for p in paths if p.endswith('go.mod')],firstPartyGoFileCount=sum(p.endswith('.go') for p in paths if not p.startswith('docs/')),runtimeSevenFiles=[pin(base,p) for p in closure],runtimeModules=modules,rawSevenRegistration='UNREGISTERED',policyBytesEqualDe71=raw(base,'services/node-agent/internal/migrationcontext/policy.go')==raw('de71c07c2b827eea50e2ca660f80d042334472c7','services/node-agent/internal/migrationcontext/policy.go'),observedKST=now)
+save('source-inspection.json',record)
+save('authoring-attempts.json',dict(classification='SOURCE_INSPECTION_NOT_TEST_OR_CI',attempts=[dict(action='Orca create with abbreviated identity',result='LINEAGE_PARENT_NOT_FOUND; no checkout created; exact show-discovered repo::path then succeeded'),dict(action='Public Governance print',result='cp949 UnicodeEncodeError; repeated read UTF-8 output, no file change'),dict(action='Prior catalog assumed rev2 path',exit=128,result='No such Git path; exact Git tree resolved inherited parent-level catalog; corrected source pin')]))
+print(json.dumps(dict(sourceFiles=len(rows),contracts=28,firstPartyGoFiles=record['firstPartyGoFileCount'],goModules=record['goModules'],govVersion=govrow['version'],policyBytesEqualDe71=record['policyBytesEqualDe71'],KST=now)))

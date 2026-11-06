@@ -1,0 +1,77 @@
+{
+  "classification": "PRIVATE_CANDIDATE_REASONS_NOT_NEW_PUBLIC_ABI",
+  "publicProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH",
+  "rows": [
+    {
+      "id": "ANCHOR",
+      "predicate": "missing/unregistered/wrong-purpose independent capsule or bootstrap authority",
+      "result": "REFUSE_NO_OPAQUE_RESULT_NO_EFFECT"
+    },
+    {
+      "id": "ARTIFACT",
+      "predicate": "recomputed artifact digest/size or sealed payload bytes inconsistent (independent metadata mismatches already refuse PROVENANCE)",
+      "result": "REFUSE_NO_OPAQUE_RESULT_NO_EFFECT"
+    },
+    {
+      "id": "CI",
+      "predicate": "wrong run identity, omitted/extra job/step, required skip/non-success, policy mismatch",
+      "result": "REFUSE_NO_OPAQUE_RESULT_NO_EFFECT"
+    },
+    {
+      "id": "FORMAT",
+      "predicate": "size/type/UTF8/canonical/closed-schema/duplicate/unknown/invalid number violation",
+      "result": "REFUSE_NO_OPAQUE_RESULT_NO_EFFECT"
+    },
+    {
+      "id": "INSTALLATION",
+      "predicate": "actual running/receipt/source/runtime-lock/linked closure mismatch",
+      "result": "REFUSE_NO_OPAQUE_RESULT_NO_EFFECT"
+    },
+    {
+      "id": "OWNERSHIP",
+      "predicate": "borrowed mutable/custom input or nonimmutable bound synthetic snapshot",
+      "result": "REFUSE_NO_OPAQUE_RESULT_NO_EFFECT"
+    },
+    {
+      "id": "PROVENANCE",
+      "predicate": "any manifest fact differs from independent acquisition, or source/review/VCS consistency fails",
+      "result": "REFUSE_NO_OPAQUE_RESULT_NO_EFFECT"
+    },
+    {
+      "id": "READBACK",
+      "predicate": "missing/changed V0/V1 token; no silent retry",
+      "result": "REFUSE_NO_OPAQUE_RESULT_NO_EFFECT"
+    },
+    {
+      "id": "REPLAY",
+      "predicate": "record copied into another private acquisition ticket",
+      "result": "REFUSE_NO_OPAQUE_RESULT_NO_EFFECT"
+    },
+    {
+      "id": "SCOPE",
+      "predicate": "wrong selector/cohort scope/anchor generation or version",
+      "result": "REFUSE_NO_OPAQUE_RESULT_NO_EFFECT"
+    },
+    {
+      "id": "SIGNATURE",
+      "predicate": "wrong trusted SPKI or unbound projection/signature; no self-issued key acceptance",
+      "result": "REFUSE_NO_OPAQUE_RESULT_NO_EFFECT"
+    },
+    {
+      "id": "STATUS",
+      "predicate": "unknown/revoked/retired current registry/key/publication/receipt status",
+      "result": "REFUSE_NO_OPAQUE_RESULT_NO_EFFECT"
+    },
+    {
+      "id": "TIME",
+      "predicate": "untrusted/inverted/too-wide/stale/expired/future/key-interval clock bounds",
+      "result": "REFUSE_NO_OPAQUE_RESULT_NO_EFFECT"
+    },
+    {
+      "id": "VERSION",
+      "predicate": "record not exact independently authenticated current version/digest or below floor",
+      "result": "REFUSE_NO_OPAQUE_RESULT_NO_EFFECT"
+    }
+  ],
+  "positive": "SYNTHETIC_ALREADY_BOUND_MODEL_ONLY; production projection STILL refuses"
+}

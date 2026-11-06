@@ -1,0 +1,229 @@
+{
+  "classification": "CLOSED_PRIVATE_PROVISIONING_DESCRIPTOR_CANDIDATE_NOT_A_REGISTERED_WIRE",
+  "descriptorMaxBytes": 65536,
+  "additionalParametersForbidden": true,
+  "parameters": [
+    {
+      "name": "selector",
+      "required": true,
+      "typeAndMeaning": "ASCII existing selector alphabet,1..128bytes",
+      "actual": null,
+      "actualState": "NULL_HOLD",
+      "decisionOwner": "Root"
+    },
+    {
+      "name": "cohortScopeSHA256",
+      "required": true,
+      "typeAndMeaning": "exact independently installed ordered legacy-two scope digest",
+      "actual": null,
+      "actualState": "NULL_HOLD",
+      "decisionOwner": "Root"
+    },
+    {
+      "name": "provisioningGeneration",
+      "required": true,
+      "typeAndMeaning": "ASCII opaque immutable installation generation,1..128bytes; never reset by reply",
+      "actual": null,
+      "actualState": "NULL_HOLD",
+      "decisionOwner": "Root"
+    },
+    {
+      "name": "anchorVersion",
+      "required": true,
+      "typeAndMeaning": "monotone positive integer <=2^53-1 inside protected generation",
+      "actual": null,
+      "actualState": "NULL_HOLD",
+      "decisionOwner": "Root"
+    },
+    {
+      "name": "registrySPKIDER",
+      "required": true,
+      "typeAndMeaning": "exact canonical Ed25519 public SPKI DER <=64KiB, independently provisioned",
+      "actual": null,
+      "actualState": "NULL_HOLD",
+      "decisionOwner": "Root"
+    },
+    {
+      "name": "registrySPKISHA256",
+      "required": true,
+      "typeAndMeaning": "SHA256(exact DER), compared to computed bytes; not a self-issued key identifier",
+      "actual": null,
+      "actualState": "NULL_HOLD",
+      "decisionOwner": "Root"
+    },
+    {
+      "name": "registryKeyInterval",
+      "required": true,
+      "typeAndMeaning": "original UTC signing interval, both issue and whole current read interval inside",
+      "actual": null,
+      "actualState": "NULL_HOLD",
+      "decisionOwner": "Root"
+    },
+    {
+      "name": "purpose",
+      "required": true,
+      "typeAndMeaning": "exact installed-policy-registry READ-SNAPSHOT only, no release/head/floor mutation",
+      "actual": null,
+      "actualState": "NULL_HOLD",
+      "decisionOwner": "Root"
+    },
+    {
+      "name": "formatID",
+      "required": true,
+      "typeAndMeaning": "fixed candidate ID, registration absent",
+      "actual": null,
+      "actualState": "NULL_HOLD",
+      "decisionOwner": "Root"
+    },
+    {
+      "name": "formatSchemaSHA256",
+      "required": true,
+      "typeAndMeaning": "independent immutable candidate-envelope schema bytes",
+      "actual": null,
+      "actualState": "NULL_HOLD",
+      "decisionOwner": "Root"
+    },
+    {
+      "name": "payloadSchemaSHA256",
+      "required": true,
+      "typeAndMeaning": "independent immutable source-specific policy payload schema bytes",
+      "actual": null,
+      "actualState": "NULL_HOLD",
+      "decisionOwner": "Root"
+    },
+    {
+      "name": "projectionDomainAndDefinition",
+      "required": true,
+      "typeAndMeaning": "exact fixed candidate domain,NUL,projection and stable-record identity definition",
+      "actual": null,
+      "actualState": "NULL_HOLD",
+      "decisionOwner": "Root"
+    },
+    {
+      "name": "algorithm",
+      "required": true,
+      "typeAndMeaning": "Ed25519 fixed externally, no payload algorithm selection",
+      "actual": null,
+      "actualState": "NULL_HOLD",
+      "decisionOwner": "Root"
+    },
+    {
+      "name": "bootstrapVerifierSourceSHA",
+      "required": true,
+      "typeAndMeaning": "independently reviewed/installed source pin, actual NULL",
+      "actual": null,
+      "actualState": "NULL_HOLD",
+      "decisionOwner": "Root"
+    },
+    {
+      "name": "bootstrapVerifierBinarySHA256",
+      "required": true,
+      "typeAndMeaning": "independently installed running bootstrap verifier artifact, actual NULL",
+      "actual": null,
+      "actualState": "NULL_HOLD",
+      "decisionOwner": "Root"
+    },
+    {
+      "name": "bootstrapVerifierClosureSHA256",
+      "required": true,
+      "typeAndMeaning": "source/dependency/link/stdlib/ABI closure, actual NULL",
+      "actual": null,
+      "actualState": "NULL_HOLD",
+      "decisionOwner": "Root"
+    },
+    {
+      "name": "rootSourceChoiceAuthority",
+      "required": true,
+      "typeAndMeaning": "separately authenticated Root decision/publication identity and exact release/scope/coverage",
+      "actual": null,
+      "actualState": "NULL_HOLD",
+      "decisionOwner": "Root"
+    },
+    {
+      "name": "providerAuthorization",
+      "required": true,
+      "typeAndMeaning": "fixed repository,GitHub/origin,workflow/provider identity and bounded artifact acquisition policy",
+      "actual": null,
+      "actualState": "NULL_HOLD",
+      "decisionOwner": "Root"
+    },
+    {
+      "name": "reviewerAuthorization",
+      "required": true,
+      "typeAndMeaning": "independent exact review identity/key/purpose/scope and actual verdict/target/coverage rules",
+      "actual": null,
+      "actualState": "NULL_HOLD",
+      "decisionOwner": "Root"
+    },
+    {
+      "name": "currentRegistryHeadAuthority",
+      "required": true,
+      "typeAndMeaning": "separate authenticated publication/head authority; snapshot signer cannot choose head",
+      "actual": null,
+      "actualState": "NULL_HOLD",
+      "decisionOwner": "Root"
+    },
+    {
+      "name": "lifecycleAuthority",
+      "required": true,
+      "typeAndMeaning": "current unrevoked record/key/source/provider/reviewer/receipt status with stable record digest and version",
+      "actual": null,
+      "actualState": "NULL_HOLD",
+      "decisionOwner": "Root"
+    },
+    {
+      "name": "clockAuthority",
+      "required": true,
+      "typeAndMeaning": "independent real UTC/monotonic mechanism and <=1second uncertainty bounds",
+      "actual": null,
+      "actualState": "NULL_HOLD",
+      "decisionOwner": "Root"
+    },
+    {
+      "name": "readTicketAuthority",
+      "required": true,
+      "typeAndMeaning": "separate authenticated purpose/selector/scope/currentVersion request-binding issuer; K2A allocates none",
+      "actual": null,
+      "actualState": "NULL_HOLD",
+      "decisionOwner": "Root"
+    },
+    {
+      "name": "runningInstallationAuthority",
+      "required": true,
+      "typeAndMeaning": "separate receipt and actual held process/executable measurement mechanism plus V1 recheck",
+      "actual": null,
+      "actualState": "NULL_HOLD",
+      "decisionOwner": "Root"
+    },
+    {
+      "name": "antirollbackAuthority",
+      "required": true,
+      "typeAndMeaning": "protected generation/key/record floors and independently reviewed advancement/recovery ownership",
+      "actual": null,
+      "actualState": "NULL_HOLD",
+      "decisionOwner": "Root"
+    },
+    {
+      "name": "requiredCIPolicy",
+      "required": true,
+      "typeAndMeaning": "exact disjoint required and optional step/run/job sets, never learned from provider green labels",
+      "actual": null,
+      "actualState": "NULL_HOLD",
+      "decisionOwner": "Root"
+    },
+    {
+      "name": "byteAndOwnershipBounds",
+      "required": true,
+      "typeAndMeaning": "capsule64KiB,envelope2MiB,policy16MiB,artifact256MiB streaming,expanded closure1GiB; private immutable snapshots",
+      "actual": null,
+      "actualState": "NULL_HOLD",
+      "decisionOwner": "Root"
+    }
+  ],
+  "provisioningCommands": null,
+  "storagePath": null,
+  "physicalBindings": null,
+  "providerMaySupplyAuthority": false,
+  "registryCanUpdateDescriptor": false,
+  "rawDescriptorSHA256": "DERIVED_FROM_EXTERNALLY_AUTHENTICATED_SEALED_BYTES_NOT_A_SELF_HASH_FIELD"
+}

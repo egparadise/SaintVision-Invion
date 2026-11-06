@@ -1,0 +1,715 @@
+{
+  "classification": "EXECUTED_SYMBOLIC_CANDIDATE_CONTRACT_TESTS_ONLY",
+  "cases": 100,
+  "syntheticControls": 4,
+  "negativeRefusals": 96,
+  "failures": 0,
+  "results": [
+    {
+      "id": "C01-synthetic-already-bound-control",
+      "label": "SYNTHETIC_ALREADY_BOUND",
+      "internalReason": "",
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH",
+      "cryptographicOrRuntimeAuthentication": false
+    },
+    {
+      "id": "C02-idempotent-same-ticket-read",
+      "label": "SYNTHETIC_ALREADY_BOUND",
+      "internalReason": "",
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH",
+      "cryptographicOrRuntimeAuthentication": false
+    },
+    {
+      "id": "C03-exact-upper-key-status-bound-control",
+      "label": "SYNTHETIC_ALREADY_BOUND",
+      "internalReason": "",
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH",
+      "cryptographicOrRuntimeAuthentication": false
+    },
+    {
+      "id": "N01-missing-anchor",
+      "label": "REFUSE",
+      "internalReason": "ANCHOR",
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH",
+      "cryptographicOrRuntimeAuthentication": false
+    },
+    {
+      "id": "N02-wrong-anchor-purpose",
+      "label": "REFUSE",
+      "internalReason": "ANCHOR",
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH",
+      "cryptographicOrRuntimeAuthentication": false
+    },
+    {
+      "id": "N03-provider-self-key",
+      "label": "REFUSE",
+      "internalReason": "SIGNATURE",
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH",
+      "cryptographicOrRuntimeAuthentication": false
+    },
+    {
+      "id": "N04-plan-purpose",
+      "label": "REFUSE",
+      "internalReason": "FORMAT",
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH",
+      "cryptographicOrRuntimeAuthentication": false
+    },
+    {
+      "id": "N05-foreign-scope",
+      "label": "REFUSE",
+      "internalReason": "SCOPE",
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH",
+      "cryptographicOrRuntimeAuthentication": false
+    },
+    {
+      "id": "N06-foreign-selector",
+      "label": "REFUSE",
+      "internalReason": "SCOPE",
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH",
+      "cryptographicOrRuntimeAuthentication": false
+    },
+    {
+      "id": "N07-anchor-version",
+      "label": "REFUSE",
+      "internalReason": "SCOPE",
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH",
+      "cryptographicOrRuntimeAuthentication": false
+    },
+    {
+      "id": "N08-record-rollback",
+      "label": "REFUSE",
+      "internalReason": "VERSION",
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH",
+      "cryptographicOrRuntimeAuthentication": false
+    },
+    {
+      "id": "N09-future-unpublished-version",
+      "label": "REFUSE",
+      "internalReason": "VERSION",
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH",
+      "cryptographicOrRuntimeAuthentication": false
+    },
+    {
+      "id": "N10-replayed-ticket",
+      "label": "REFUSE",
+      "internalReason": "REPLAY",
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH",
+      "cryptographicOrRuntimeAuthentication": false
+    },
+    {
+      "id": "N11-future-issued",
+      "label": "REFUSE",
+      "internalReason": "TIME",
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH",
+      "cryptographicOrRuntimeAuthentication": false
+    },
+    {
+      "id": "N12-expired-record",
+      "label": "REFUSE",
+      "internalReason": "TIME",
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH",
+      "cryptographicOrRuntimeAuthentication": false
+    },
+    {
+      "id": "N13-stale-backdated-issue",
+      "label": "REFUSE",
+      "internalReason": "TIME",
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH",
+      "cryptographicOrRuntimeAuthentication": false
+    },
+    {
+      "id": "N14-wrong-format",
+      "label": "REFUSE",
+      "internalReason": "FORMAT",
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH",
+      "cryptographicOrRuntimeAuthentication": false
+    },
+    {
+      "id": "N15-required-skip",
+      "label": "REFUSE",
+      "internalReason": "CI",
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH",
+      "cryptographicOrRuntimeAuthentication": false
+    },
+    {
+      "id": "N16-tampered-projection-no-resign",
+      "label": "REFUSE",
+      "internalReason": "SIGNATURE",
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH",
+      "cryptographicOrRuntimeAuthentication": false
+    },
+    {
+      "id": "N17-independently-mismatched-sourceSHA",
+      "label": "REFUSE",
+      "internalReason": "PROVENANCE",
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH",
+      "cryptographicOrRuntimeAuthentication": false
+    },
+    {
+      "id": "N18-independently-mismatched-reviewSHA",
+      "label": "REFUSE",
+      "internalReason": "PROVENANCE",
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH",
+      "cryptographicOrRuntimeAuthentication": false
+    },
+    {
+      "id": "N19-independently-mismatched-reviewTargetSHA",
+      "label": "REFUSE",
+      "internalReason": "PROVENANCE",
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH",
+      "cryptographicOrRuntimeAuthentication": false
+    },
+    {
+      "id": "N20-independently-mismatched-reviewScope",
+      "label": "REFUSE",
+      "internalReason": "PROVENANCE",
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH",
+      "cryptographicOrRuntimeAuthentication": false
+    },
+    {
+      "id": "N21-independently-mismatched-reviewVerdict",
+      "label": "REFUSE",
+      "internalReason": "PROVENANCE",
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH",
+      "cryptographicOrRuntimeAuthentication": false
+    },
+    {
+      "id": "N22-independently-mismatched-reviewCoverageSHA256",
+      "label": "REFUSE",
+      "internalReason": "PROVENANCE",
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH",
+      "cryptographicOrRuntimeAuthentication": false
+    },
+    {
+      "id": "N23-independently-mismatched-rootChoiceSHA256",
+      "label": "REFUSE",
+      "internalReason": "PROVENANCE",
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH",
+      "cryptographicOrRuntimeAuthentication": false
+    },
+    {
+      "id": "N24-independently-mismatched-sourceEquivalenceSHA256",
+      "label": "REFUSE",
+      "internalReason": "PROVENANCE",
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH",
+      "cryptographicOrRuntimeAuthentication": false
+    },
+    {
+      "id": "N25-independently-mismatched-graphSHA256",
+      "label": "REFUSE",
+      "internalReason": "PROVENANCE",
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH",
+      "cryptographicOrRuntimeAuthentication": false
+    },
+    {
+      "id": "N26-independently-mismatched-contractSetSHA256",
+      "label": "REFUSE",
+      "internalReason": "PROVENANCE",
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH",
+      "cryptographicOrRuntimeAuthentication": false
+    },
+    {
+      "id": "N27-independently-mismatched-semanticPinsSHA256",
+      "label": "REFUSE",
+      "internalReason": "PROVENANCE",
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH",
+      "cryptographicOrRuntimeAuthentication": false
+    },
+    {
+      "id": "N28-independently-mismatched-artifactId",
+      "label": "REFUSE",
+      "internalReason": "PROVENANCE",
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH",
+      "cryptographicOrRuntimeAuthentication": false
+    },
+    {
+      "id": "N29-independently-mismatched-artifactZipSHA256",
+      "label": "REFUSE",
+      "internalReason": "PROVENANCE",
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH",
+      "cryptographicOrRuntimeAuthentication": false
+    },
+    {
+      "id": "N30-independently-mismatched-artifactZipBytes",
+      "label": "REFUSE",
+      "internalReason": "PROVENANCE",
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH",
+      "cryptographicOrRuntimeAuthentication": false
+    },
+    {
+      "id": "N31-independently-mismatched-binaryVCSRevision",
+      "label": "REFUSE",
+      "internalReason": "PROVENANCE",
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH",
+      "cryptographicOrRuntimeAuthentication": false
+    },
+    {
+      "id": "N32-independently-mismatched-binaryVCSModified",
+      "label": "REFUSE",
+      "internalReason": "PROVENANCE",
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH",
+      "cryptographicOrRuntimeAuthentication": false
+    },
+    {
+      "id": "N33-independently-mismatched-toolchain",
+      "label": "REFUSE",
+      "internalReason": "PROVENANCE",
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH",
+      "cryptographicOrRuntimeAuthentication": false
+    },
+    {
+      "id": "N34-independently-mismatched-moduleClosureSHA256",
+      "label": "REFUSE",
+      "internalReason": "PROVENANCE",
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH",
+      "cryptographicOrRuntimeAuthentication": false
+    },
+    {
+      "id": "N35-independently-mismatched-helperClosureSHA256",
+      "label": "REFUSE",
+      "internalReason": "PROVENANCE",
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH",
+      "cryptographicOrRuntimeAuthentication": false
+    },
+    {
+      "id": "N36-independently-mismatched-runtimeLockSHA256",
+      "label": "REFUSE",
+      "internalReason": "PROVENANCE",
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH",
+      "cryptographicOrRuntimeAuthentication": false
+    },
+    {
+      "id": "N37-independently-mismatched-linkedClosureSHA256",
+      "label": "REFUSE",
+      "internalReason": "PROVENANCE",
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH",
+      "cryptographicOrRuntimeAuthentication": false
+    },
+    {
+      "id": "N38-independently-mismatched-installationReceiptSHA256",
+      "label": "REFUSE",
+      "internalReason": "PROVENANCE",
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH",
+      "cryptographicOrRuntimeAuthentication": false
+    },
+    {
+      "id": "N39-independently-mismatched-runningMeasurementSHA256",
+      "label": "REFUSE",
+      "internalReason": "PROVENANCE",
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH",
+      "cryptographicOrRuntimeAuthentication": false
+    },
+    {
+      "id": "N40-independently-mismatched-sourcePublicationAnchorSHA256",
+      "label": "REFUSE",
+      "internalReason": "PROVENANCE",
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH",
+      "cryptographicOrRuntimeAuthentication": false
+    },
+    {
+      "id": "N41-independently-mismatched-sourceAcquisitionSHA256",
+      "label": "REFUSE",
+      "internalReason": "PROVENANCE",
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH",
+      "cryptographicOrRuntimeAuthentication": false
+    },
+    {
+      "id": "N42-ci-correlation",
+      "label": "REFUSE",
+      "internalReason": "CI",
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH",
+      "cryptographicOrRuntimeAuthentication": false
+    },
+    {
+      "id": "N43-ci-ref",
+      "label": "REFUSE",
+      "internalReason": "CI",
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH",
+      "cryptographicOrRuntimeAuthentication": false
+    },
+    {
+      "id": "N44-ci-event",
+      "label": "REFUSE",
+      "internalReason": "CI",
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH",
+      "cryptographicOrRuntimeAuthentication": false
+    },
+    {
+      "id": "N45-ci-attempt",
+      "label": "REFUSE",
+      "internalReason": "CI",
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH",
+      "cryptographicOrRuntimeAuthentication": false
+    },
+    {
+      "id": "N46-ci-workflow",
+      "label": "REFUSE",
+      "internalReason": "CI",
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH",
+      "cryptographicOrRuntimeAuthentication": false
+    },
+    {
+      "id": "N47-ci-headSHA",
+      "label": "REFUSE",
+      "internalReason": "CI",
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH",
+      "cryptographicOrRuntimeAuthentication": false
+    },
+    {
+      "id": "N48-authenticated-CI-omits-required-step",
+      "label": "REFUSE",
+      "internalReason": "CI",
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH",
+      "cryptographicOrRuntimeAuthentication": false
+    },
+    {
+      "id": "N49-authenticated-CI-omits-required-docs-job",
+      "label": "REFUSE",
+      "internalReason": "CI",
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH",
+      "cryptographicOrRuntimeAuthentication": false
+    },
+    {
+      "id": "N50-optional-failure-not-a-skip",
+      "label": "REFUSE",
+      "internalReason": "CI",
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH",
+      "cryptographicOrRuntimeAuthentication": false
+    },
+    {
+      "id": "N51-wrong-artifact-bytes",
+      "label": "REFUSE",
+      "internalReason": "ARTIFACT",
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH",
+      "cryptographicOrRuntimeAuthentication": false
+    },
+    {
+      "id": "N52-wrong-sealed-policy-bytes",
+      "label": "REFUSE",
+      "internalReason": "ARTIFACT",
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH",
+      "cryptographicOrRuntimeAuthentication": false
+    },
+    {
+      "id": "N53-authentic-inconsistent-installationSourceSHA",
+      "label": "REFUSE",
+      "internalReason": "INSTALLATION",
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH",
+      "cryptographicOrRuntimeAuthentication": false
+    },
+    {
+      "id": "N54-authentic-inconsistent-installationBinarySHA256",
+      "label": "REFUSE",
+      "internalReason": "INSTALLATION",
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH",
+      "cryptographicOrRuntimeAuthentication": false
+    },
+    {
+      "id": "N55-authentic-inconsistent-runningBinarySHA256",
+      "label": "REFUSE",
+      "internalReason": "INSTALLATION",
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH",
+      "cryptographicOrRuntimeAuthentication": false
+    },
+    {
+      "id": "N56-authentic-inconsistent-runningReceiptSHA256",
+      "label": "REFUSE",
+      "internalReason": "INSTALLATION",
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH",
+      "cryptographicOrRuntimeAuthentication": false
+    },
+    {
+      "id": "N57-authentic-inconsistent-runningRuntimeLockSHA256",
+      "label": "REFUSE",
+      "internalReason": "INSTALLATION",
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH",
+      "cryptographicOrRuntimeAuthentication": false
+    },
+    {
+      "id": "N58-authentic-inconsistent-runningLinkedClosureSHA256",
+      "label": "REFUSE",
+      "internalReason": "INSTALLATION",
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH",
+      "cryptographicOrRuntimeAuthentication": false
+    },
+    {
+      "id": "N59-authentic-inconsistent-runningSourceSHA",
+      "label": "REFUSE",
+      "internalReason": "INSTALLATION",
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH",
+      "cryptographicOrRuntimeAuthentication": false
+    },
+    {
+      "id": "N60-revoked",
+      "label": "REFUSE",
+      "internalReason": "STATUS",
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH",
+      "cryptographicOrRuntimeAuthentication": false
+    },
+    {
+      "id": "N61-unknown-status",
+      "label": "REFUSE",
+      "internalReason": "STATUS",
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH",
+      "cryptographicOrRuntimeAuthentication": false
+    },
+    {
+      "id": "N62-stale-status",
+      "label": "REFUSE",
+      "internalReason": "TIME",
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH",
+      "cryptographicOrRuntimeAuthentication": false
+    },
+    {
+      "id": "N63-expired-status",
+      "label": "REFUSE",
+      "internalReason": "TIME",
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH",
+      "cryptographicOrRuntimeAuthentication": false
+    },
+    {
+      "id": "N64-wide-clock",
+      "label": "REFUSE",
+      "internalReason": "TIME",
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH",
+      "cryptographicOrRuntimeAuthentication": false
+    },
+    {
+      "id": "N65-inverted-clock",
+      "label": "REFUSE",
+      "internalReason": "TIME",
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH",
+      "cryptographicOrRuntimeAuthentication": false
+    },
+    {
+      "id": "N66-original-key-not-yet-authorized",
+      "label": "REFUSE",
+      "internalReason": "TIME",
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH",
+      "cryptographicOrRuntimeAuthentication": false
+    },
+    {
+      "id": "N67-original-key-expired",
+      "label": "REFUSE",
+      "internalReason": "TIME",
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH",
+      "cryptographicOrRuntimeAuthentication": false
+    },
+    {
+      "id": "N68-independent-floor-ahead",
+      "label": "REFUSE",
+      "internalReason": "VERSION",
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH",
+      "cryptographicOrRuntimeAuthentication": false
+    },
+    {
+      "id": "N69-independent-current-digest-changed",
+      "label": "REFUSE",
+      "internalReason": "VERSION",
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH",
+      "cryptographicOrRuntimeAuthentication": false
+    },
+    {
+      "id": "N70-final-readback-changed",
+      "label": "REFUSE",
+      "internalReason": "READBACK",
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH",
+      "cryptographicOrRuntimeAuthentication": false
+    },
+    {
+      "id": "N71-final-readback-unknown",
+      "label": "REFUSE",
+      "internalReason": "READBACK",
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH",
+      "cryptographicOrRuntimeAuthentication": false
+    },
+    {
+      "id": "N72-mutable-bound-step-policy",
+      "label": "REFUSE",
+      "internalReason": "OWNERSHIP",
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH",
+      "cryptographicOrRuntimeAuthentication": false
+    },
+    {
+      "id": "N73-mutable-untrusted-policy",
+      "label": "REFUSE",
+      "internalReason": "OWNERSHIP",
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH",
+      "cryptographicOrRuntimeAuthentication": false
+    },
+    {
+      "id": "N74-mutable-untrusted-envelope",
+      "label": "REFUSE",
+      "internalReason": "OWNERSHIP",
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH",
+      "cryptographicOrRuntimeAuthentication": false
+    },
+    {
+      "id": "N75-duplicate-key",
+      "label": "REFUSE",
+      "internalReason": "FORMAT",
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH",
+      "cryptographicOrRuntimeAuthentication": false
+    },
+    {
+      "id": "N76-trailing-data",
+      "label": "REFUSE",
+      "internalReason": "FORMAT",
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH",
+      "cryptographicOrRuntimeAuthentication": false
+    },
+    {
+      "id": "N77-BOM",
+      "label": "REFUSE",
+      "internalReason": "FORMAT",
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH",
+      "cryptographicOrRuntimeAuthentication": false
+    },
+    {
+      "id": "N78-whitespace-alias",
+      "label": "REFUSE",
+      "internalReason": "FORMAT",
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH",
+      "cryptographicOrRuntimeAuthentication": false
+    },
+    {
+      "id": "N79-float-version",
+      "label": "REFUSE",
+      "internalReason": "FORMAT",
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH",
+      "cryptographicOrRuntimeAuthentication": false
+    },
+    {
+      "id": "N80-invalid-UTF8",
+      "label": "REFUSE",
+      "internalReason": "FORMAT",
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH",
+      "cryptographicOrRuntimeAuthentication": false
+    },
+    {
+      "id": "N81-envelope-size",
+      "label": "REFUSE",
+      "internalReason": "FORMAT",
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH",
+      "cryptographicOrRuntimeAuthentication": false
+    },
+    {
+      "id": "N82-deep-tree",
+      "label": "REFUSE",
+      "internalReason": "FORMAT",
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH",
+      "cryptographicOrRuntimeAuthentication": false
+    },
+    {
+      "id": "N83-boolean-version",
+      "label": "REFUSE",
+      "internalReason": "FORMAT",
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH",
+      "cryptographicOrRuntimeAuthentication": false
+    },
+    {
+      "id": "N84-payload-trust-key-injection",
+      "label": "REFUSE",
+      "internalReason": "FORMAT",
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH",
+      "cryptographicOrRuntimeAuthentication": false
+    },
+    {
+      "id": "N85-duplicate-step-number",
+      "label": "REFUSE",
+      "internalReason": "FORMAT",
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH",
+      "cryptographicOrRuntimeAuthentication": false
+    },
+    {
+      "id": "N86-authenticated-unknown-step-policy",
+      "label": "REFUSE",
+      "internalReason": "CI",
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH",
+      "cryptographicOrRuntimeAuthentication": false
+    },
+    {
+      "id": "N87-current-registry-key-expired-after-issue",
+      "label": "REFUSE",
+      "internalReason": "TIME",
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH",
+      "cryptographicOrRuntimeAuthentication": false
+    },
+    {
+      "id": "N88-clock-numeric-type-mismatch",
+      "label": "REFUSE",
+      "internalReason": "TIME",
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH",
+      "cryptographicOrRuntimeAuthentication": false
+    },
+    {
+      "id": "N89-self-current-publication-without-independent-anchor",
+      "label": "REFUSE",
+      "internalReason": "ANCHOR",
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH",
+      "cryptographicOrRuntimeAuthentication": false
+    },
+    {
+      "id": "N90-negative-zero-alias",
+      "label": "REFUSE",
+      "internalReason": "FORMAT",
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH",
+      "cryptographicOrRuntimeAuthentication": false
+    },
+    {
+      "id": "N91-NaN",
+      "label": "REFUSE",
+      "internalReason": "FORMAT",
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH",
+      "cryptographicOrRuntimeAuthentication": false
+    },
+    {
+      "id": "N92-response-before-ticket-issue",
+      "label": "REFUSE",
+      "internalReason": "TIME",
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH",
+      "cryptographicOrRuntimeAuthentication": false
+    },
+    {
+      "id": "N93-ticket-expired",
+      "label": "REFUSE",
+      "internalReason": "TIME",
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH",
+      "cryptographicOrRuntimeAuthentication": false
+    },
+    {
+      "id": "N94-authentic-scope-join-inconsistent",
+      "label": "REFUSE",
+      "internalReason": "PROVENANCE",
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH",
+      "cryptographicOrRuntimeAuthentication": false
+    },
+    {
+      "id": "N95-foreign-capsule-digest",
+      "label": "REFUSE",
+      "internalReason": "SCOPE",
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH",
+      "cryptographicOrRuntimeAuthentication": false
+    },
+    {
+      "id": "N96-replayed-installation-generation",
+      "label": "REFUSE",
+      "internalReason": "SCOPE",
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH",
+      "cryptographicOrRuntimeAuthentication": false
+    },
+    {
+      "id": "C04-new-ticket-same-stable-record",
+      "label": "SYNTHETIC_ALREADY_BOUND",
+      "internalReason": "",
+      "productionProjection": "TRUST_UNKNOWN_OR_PIN_MISMATCH",
+      "cryptographicOrRuntimeAuthentication": false
+    }
+  ],
+  "schemaValidation": "2 candidate schemas valid; envelope and policy shape controls pass; 3 envelope and 5 policy schema mutants refused; no DER/crypto/graph validation claimed",
+  "signatureMechanism": "SYMBOLIC_ALREADY_BOUND_TABLE_NO_ED25519_AUTHENTICATION",
+  "productionProjectionAlwaysRefuses": true,
+  "actualRuntime40": "NOT_RUN",
+  "realBindings": "NULL_HOLD",
+  "completedKST": "2026-11-06T23:25:30.636697+09:00"
+}

@@ -1,0 +1,80 @@
+from pathlib import Path
+import datetime, hashlib, importlib.util, json, subprocess, sys
+
+e=Path('docs/vault/30_Development/Evidence/fleet5-k2-p02-registry-attestation-design-20261106-codex')
+spec=importlib.util.spec_from_file_location('p02_model',e/'candidate_model.py')
+m=importlib.util.module_from_spec(spec);sys.modules[spec.name]=m;spec.loader.exec_module(m)
+def write(name,value): (e/name).write_bytes((json.dumps(value,indent=2,ensure_ascii=True)+'\n').encode())
+def obj(props): return dict(type='object',additionalProperties=False,properties=props,required=list(props))
+def text(n=256): return dict(type='string',minLength=1,maxLength=n,pattern='^[ -~]+$')
+def integer(): return dict(type='integer',minimum=1,maximum=9007199254740991)
+def digest(n): return dict(type='string',pattern='^[0-9a-f]{'+str(n)+'}$',**{'not':{'pattern':'^0+$'}})
+facts={k:digest(40 if k in m.HASH40 else 64) for k in sorted(m.HASH40|m.HASH64)}
+facts.update({k:text() for k in m.TEXT});facts.update({k:integer() for k in m.NUMBERS});facts['binaryVCSModified']={'type':'boolean'}
+step=obj(dict(number=integer(),name=text(),conclusion=text()))
+job=obj(dict(id=integer(),name=text(128),conclusion=text(),steps=dict(type='array',minItems=1,maxItems=128,items=step)))
+run=obj(dict(runId=integer(),repository=text(),headSHA=digest(40),ref=text(),event=text(),workflow=text(),correlation=text(),attempt=integer(),conclusion=text(),jobs=dict(type='array',minItems=1,maxItems=8,items=job)))
+body=obj(dict(format={'const':m.FORMAT},purpose={'const':m.PURPOSE},selector=dict(type='string',pattern='^[A-Za-z0-9_-]{1,128}$'),scopeSHA256=digest(64),capsuleSHA256=digest(64),provisioningGeneration=dict(type='string',pattern='^[A-Za-z0-9_-]{1,128}$'),anchorVersion=integer(),recordVersion=integer(),requestBindingSHA256=digest(64),issuedAt=integer(),validUntil=integer(),facts=obj(facts),ciRuns=dict(type='array',minItems=1,maxItems=8,items=run)))
+schema=obj(dict(body=body,signer=obj(dict(keySPKISHA256=digest(64))),signatureHex=digest(128)))
+schema.update({'$schema':'https://json-schema.org/draft/2020-12/schema','$id':'https://fleet5-candidate.invalid/p02/registry-envelope-candidate-1','title':'UNREGISTERED P02 candidate envelope; schema validation is not authentication'})
+write('candidate-envelope.schema.json',schema)
+source=json.loads((e/'source-inspection.json').read_text())
+ids=[c['contractId'] for c in source['contracts']]
+index=json.loads(subprocess.check_output(['git','show',source['base']+':services/node-agent/migrationverify/resources/proposed-contracts/index.json']))
+pin_by_id={}
+for item in index['contracts']:
+ descriptor=next(c for c in source['contracts'] if c['contractId']==item['contractId'])
+ pin_by_id[item['contractId']]=obj(dict(contractSHA256={'const':item['rawSHA256']},schemaSHA256={'const':item['schemaSHA256']},codec={'const':descriptor['codec']},requiredVerifier={'const':descriptor['requiredVerifier']}))
+scope=obj(dict(tenantId=text(128),nodeId=text(128),recoveryEpoch=text(128)))
+hexblob=lambda n: dict(type='string',minLength=2,maxLength=n,pattern='^(?:[0-9a-f]{2})+$')
+member=obj(dict(slot={'enum':['PC2','PC4']},scope=scope,certificateDERHex=hexblob(131072),caRootDERHex=hexblob(131072)))
+grant=obj(dict(role=text(128),authorityScopeC2Hex=hexblob(131072),publicKeyHex=digest(64),notBefore=dict(type='integer',minimum=0,maximum=9007199254740991),notAfter=integer()))
+payload=obj(dict(selector=dict(type='string',pattern='^[A-Za-z0-9_-]{1,128}$'),version=text(128),verifier=obj(dict(id={'const':'saintvision-migrationverify-k1:1'},sourceSHA=digest(40),artifactSHA256=digest(64),reviewSHA=digest(40),ciRunIDs=dict(type='array',minItems=1,maxItems=8,uniqueItems=True,items=integer()))),contractPins=obj(pin_by_id),grants=dict(type='array',minItems=1,maxItems=512,items=grant),cohortId=text(128),members=dict(type='array',minItems=2,maxItems=2,prefixItems=[{**member,'properties':{**member['properties'],'slot':{'const':'PC2'}}},{**member,'properties':{**member['properties'],'slot':{'const':'PC4'}}}],items=False),graphHex=hexblob(12582912),nodeKinds=dict(type='object',minProperties=1,maxProperties=4096,propertyNames=text(256),additionalProperties=text(128))))
+payload.update({'$schema':'https://json-schema.org/draft/2020-12/schema','$id':'https://fleet5-candidate.invalid/p02/policy-payload-candidate-1','title':'UNREGISTERED sealed policy payload, no status or RegistrySHA256 self claim'})
+write('policy-payload.schema.json',payload)
+
+groups=[
+ ('registry',m.HASH64 & {'policyPayloadSHA256','registryProofSlotsSHA256','designRegistrationSHA256','graphSHA256','contractSetSHA256','semanticPinsSHA256','cohortScopeSHA256','keyGrantsSHA256'},'Root-provisioned policy publisher plus independently authenticated capsule/source registration','Registry issuer signature, exact externally pinned payload/graph/contract/scope; grant current state comes from independent status','Root provisioning; Codex later reader','policyData/contractPin/grant/member; current consistency only'),
+ ('review',{'reviewSHA','reviewTargetSHA','reviewScope','reviewVerdict','reviewCoverageSHA256','rootChoiceSHA256','sourceEquivalenceSHA256'},'Independently registered reviewer, original review publication and Root exact source-choice/coverage decision','Actual issuer identity, verdict and exact target/scope/byte-equivalence coverage; never arbitrary review JSON','Root decision/identity provisioning; Codex later authenticated acquirer','provenance.ReviewTargetSHA/ReviewScope/ApprovedReviewScope; verdict and coverage producer absent'),
+ ('artifact',{'artifactId','artifactZipSHA256','artifactZipBytes'},'Configured authenticated immutable CI artifact service and independently authorized acquirer','Artifact id/run/head/digest/size joined to streamed exact downloaded bytes; archive hash not binary hash','Root provider authorization; Codex later artifact acquirer','provenance.ArtifactDigest syntax only; artifact ID/size/bytes authentication absent'),
+ ('source_binary',{'sourceSHA','sourceTreeSHA256','binarySHA256','binaryVCSRevision','binaryVCSModified','toolchain','moduleClosureSHA256','helperClosureSHA256','runtimeLockSHA256','linkedClosureSHA256'},'Original authenticated source/build evidence and Root release selection','Exact source/blob/dependency/platform/toolchain/link closure; binary VCS is consistency metadata only','Root release choice; Codex later provenance adapter','publication.SourceSHA/ArtifactSHA256, provenance.BinaryVCS/RuntimeLockSHA256/LinkedClosureSHA256; full closure producer absent'),
+ ('installation',{'installationReceiptSHA256','installationSourceSHA','installationBinarySHA256','runningBinarySHA256','runningReceiptSHA256','runningRuntimeLockSHA256','runningLinkedClosureSHA256','runningSourceSHA','runningMeasurementSHA256'},'Independent installation authority and separately registered running-code measurement producer','Receipt signature/identity plus actual held executable/process/generation/root/namespace readback; never record self-measurement','Root mechanism/provisioning; separate future running owner grant','runningData and provenance receipt/executable strings exist; authenticateRunning always refuses'),
+ ('source_anchors',{'sourcePublicationAnchorSHA256','sourceAcquisitionSHA256'},'Independently authenticated ORIGINAL source publication/time-anchor ledger and provenance acquirer, preceding this registry record','Original source-event/acquisition bytes and identity; NOT a future registry head or current self-authentication; fresh status remains a separate input','Root source/provider authorization; Codex future acquirer','Original publication authentication absent; StatusPort/ClockPort also default-refuse for separate current checks'),
+]
+rows=[];seen=set()
+for group,fields,origin,verification,owner,existing in groups:
+ for field in sorted(fields):
+  assert field not in seen;seen.add(field)
+  rows.append(dict(field='body.facts.'+field,group=group,origin=origin,authentication=verification,authorityCannotComeFrom='provider/caller/plan/record self-claim',existingSource=dict(source=source['base'],path='services/node-agent/internal/migrationcontext/'+('ports.go' if group=='status' else 'policy.go'),symbols=existing),actualAuthenticator='ABSENT_NULL_HOLD',proposedOwner=owner,failure='Opaque TRUST_UNKNOWN_OR_PIN_MISMATCH; initial independent-facts mismatch PROVENANCE, then computed-byte/installation joins ARTIFACT/INSTALLATION; first failed gate wins'))
+assert seen==m.FACT_KEYS,(seen^m.FACT_KEYS)
+rows.extend([
+ dict(field='body.ciRuns[*]',group='ci',origin='Independently authenticated GitHub provider/acquirer; repository and workflow identity fixed outside record',authentication='Exact head/ref/event/path/correlation/attempt/run/job/step bytes and every independently required conclusion; required+optional policy from Root capsule',actualAuthenticator='ABSENT_NULL_HOLD',proposedOwner='Root policy/identity; Codex future acquirer',failure='CI'),
+ dict(field='signer/body purpose/format/selector/scope/capsuleSHA256/provisioningGeneration/anchorVersion',group='bootstrap',origin='Independently installed Root-authorized capsule and purpose-specific issuer authorization',authentication='Exact externally provisioned SPKI DER, format/schema/projection/verifier hash, purpose/scope and protected capsule generation; no self-registration',actualAuthenticator='ABSENT_NULL_HOLD',proposedOwner='Root custody/provisioning; future bootstrap verifier owner',failure='ANCHOR/SCOPE/SIGNATURE'),
+ dict(field='recordVersion/requestBindingSHA256/issuedAt/validUntil/V0/V1',group='freshness',origin='Separate authenticated lifecycle, read-ticket, real clock and running measurement snapshots',authentication='Exact generation/floor/current version/digest/ticket; full real interval and final version/process readback; no silent retry',actualAuthenticator='ABSENT_NULL_HOLD',proposedOwner='Root separate purposes; future adapter owners by grant',failure='STATUS/VERSION/REPLAY/TIME/READBACK'),
+])
+write('authority-matrix.json',dict(classification='UNREGISTERED_CONTRACT_CANDIDATE_NOT_PRODUCTION_TRUST',source=source['base'],factCount=len(m.FACT_KEYS),allFactsCoveredOnce=True,rows=rows))
+reasons={
+ 'ANCHOR':'missing/unregistered/wrong-purpose independent capsule or bootstrap authority',
+ 'FORMAT':'size/type/UTF8/canonical/closed-schema/duplicate/unknown/invalid number violation',
+ 'OWNERSHIP':'borrowed mutable/custom input or nonimmutable bound synthetic snapshot',
+ 'SCOPE':'wrong selector/cohort scope/anchor generation or version',
+ 'SIGNATURE':'wrong trusted SPKI or unbound projection/signature; no self-issued key acceptance',
+ 'TIME':'untrusted/inverted/too-wide/stale/expired/future/key-interval clock bounds',
+ 'STATUS':'unknown/revoked/retired current registry/key/publication/receipt status',
+ 'VERSION':'record not exact independently authenticated current version/digest or below floor',
+ 'REPLAY':'record copied into another private acquisition ticket',
+ 'PROVENANCE':'any manifest fact differs from independent acquisition, or source/review/VCS consistency fails',
+ 'CI':'wrong run identity, omitted/extra job/step, required skip/non-success, policy mismatch',
+ 'ARTIFACT':'recomputed artifact digest/size or sealed payload bytes inconsistent (independent metadata mismatches already refuse PROVENANCE)',
+ 'INSTALLATION':'actual running/receipt/source/runtime-lock/linked closure mismatch',
+ 'READBACK':'missing/changed V0/V1 token; no silent retry',
+}
+assert set(reasons)==m.REASONS
+write('refusal-matrix.json',dict(classification='PRIVATE_CANDIDATE_REASONS_NOT_NEW_PUBLIC_ABI',publicProjection=m.PUBLIC_REFUSAL,rows=[dict(id=k,predicate=v,result='REFUSE_NO_OPAQUE_RESULT_NO_EFFECT') for k,v in sorted(reasons.items())],positive='SYNTHETIC_ALREADY_BOUND_MODEL_ONLY; production projection STILL refuses'))
+write('real-bindings-HOLD.json',dict(classification='ACTUAL_NULL_HOLD_NOT_SYNTHETIC_CONTROL',bootstrapLoader=None,operatorCustody=None,registrySPKIDER=None,registrySignerAuthorization=None,capsule=None,reviewerProviderAuthorization=None,sourceChoiceRelease=None,ciAcquirer=None,artifactAcquirer=None,clock=None,lifecycleStatus=None,readTicketIssuer=None,rollbackFloor=None,installationReceipt=None,runningMeasurement=None,linkedK2Entrypoint=None,registeredCandidateFormat=False,registeredRawSeven=False,runtimeCasesA01A40='NOT_RUN',wholeK2OrFleet='INCOMPLETE',smallestNextSeam='After actual review and Root grant: pure internal bounded codec/projection/strict signature verifier on private already-authenticated types; default-refusal composition only, no port/factory/install'))
+now=datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=9))).isoformat()
+history=Path('docs/vault/30_Development/History/2026-11-06_FLEET5_K2_P02_registry_attestation_design_Codex.md')
+text_history=history.read_text(encoding='utf-8')
+text_history=__import__('re').sub(r'updated: "[^"]+"','updated: "'+now+'"',text_history,count=1)
+history.write_bytes(text_history.encode())
+print(json.dumps(dict(schemaFiles=2,facts=len(m.FACT_KEYS),matrixRows=len(rows),refusalReasons=len(reasons),allRealBindings='NULL_HOLD',KST=now)))

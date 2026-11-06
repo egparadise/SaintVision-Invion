@@ -1,0 +1,620 @@
+{
+  "classification": "UNREGISTERED_CONTRACT_CANDIDATE_NOT_PRODUCTION_TRUST",
+  "source": "c76d0d66895503adde39288544929ff35cd6c281",
+  "factCount": 39,
+  "allFactsCoveredOnce": true,
+  "rows": [
+    {
+      "field": "body.facts.cohortScopeSHA256",
+      "group": "registry",
+      "origin": "Root-provisioned policy publisher plus independently authenticated capsule/source registration",
+      "authentication": "Registry issuer signature, exact externally pinned payload/graph/contract/scope; grant current state comes from independent status",
+      "authorityCannotComeFrom": "provider/caller/plan/record self-claim",
+      "existingSource": {
+        "source": "c76d0d66895503adde39288544929ff35cd6c281",
+        "path": "services/node-agent/internal/migrationcontext/policy.go",
+        "symbols": "policyData/contractPin/grant/member; current consistency only"
+      },
+      "actualAuthenticator": "ABSENT_NULL_HOLD",
+      "proposedOwner": "Root provisioning; Codex later reader",
+      "failure": "Opaque TRUST_UNKNOWN_OR_PIN_MISMATCH; initial independent-facts mismatch PROVENANCE, then computed-byte/installation joins ARTIFACT/INSTALLATION; first failed gate wins"
+    },
+    {
+      "field": "body.facts.contractSetSHA256",
+      "group": "registry",
+      "origin": "Root-provisioned policy publisher plus independently authenticated capsule/source registration",
+      "authentication": "Registry issuer signature, exact externally pinned payload/graph/contract/scope; grant current state comes from independent status",
+      "authorityCannotComeFrom": "provider/caller/plan/record self-claim",
+      "existingSource": {
+        "source": "c76d0d66895503adde39288544929ff35cd6c281",
+        "path": "services/node-agent/internal/migrationcontext/policy.go",
+        "symbols": "policyData/contractPin/grant/member; current consistency only"
+      },
+      "actualAuthenticator": "ABSENT_NULL_HOLD",
+      "proposedOwner": "Root provisioning; Codex later reader",
+      "failure": "Opaque TRUST_UNKNOWN_OR_PIN_MISMATCH; initial independent-facts mismatch PROVENANCE, then computed-byte/installation joins ARTIFACT/INSTALLATION; first failed gate wins"
+    },
+    {
+      "field": "body.facts.designRegistrationSHA256",
+      "group": "registry",
+      "origin": "Root-provisioned policy publisher plus independently authenticated capsule/source registration",
+      "authentication": "Registry issuer signature, exact externally pinned payload/graph/contract/scope; grant current state comes from independent status",
+      "authorityCannotComeFrom": "provider/caller/plan/record self-claim",
+      "existingSource": {
+        "source": "c76d0d66895503adde39288544929ff35cd6c281",
+        "path": "services/node-agent/internal/migrationcontext/policy.go",
+        "symbols": "policyData/contractPin/grant/member; current consistency only"
+      },
+      "actualAuthenticator": "ABSENT_NULL_HOLD",
+      "proposedOwner": "Root provisioning; Codex later reader",
+      "failure": "Opaque TRUST_UNKNOWN_OR_PIN_MISMATCH; initial independent-facts mismatch PROVENANCE, then computed-byte/installation joins ARTIFACT/INSTALLATION; first failed gate wins"
+    },
+    {
+      "field": "body.facts.graphSHA256",
+      "group": "registry",
+      "origin": "Root-provisioned policy publisher plus independently authenticated capsule/source registration",
+      "authentication": "Registry issuer signature, exact externally pinned payload/graph/contract/scope; grant current state comes from independent status",
+      "authorityCannotComeFrom": "provider/caller/plan/record self-claim",
+      "existingSource": {
+        "source": "c76d0d66895503adde39288544929ff35cd6c281",
+        "path": "services/node-agent/internal/migrationcontext/policy.go",
+        "symbols": "policyData/contractPin/grant/member; current consistency only"
+      },
+      "actualAuthenticator": "ABSENT_NULL_HOLD",
+      "proposedOwner": "Root provisioning; Codex later reader",
+      "failure": "Opaque TRUST_UNKNOWN_OR_PIN_MISMATCH; initial independent-facts mismatch PROVENANCE, then computed-byte/installation joins ARTIFACT/INSTALLATION; first failed gate wins"
+    },
+    {
+      "field": "body.facts.keyGrantsSHA256",
+      "group": "registry",
+      "origin": "Root-provisioned policy publisher plus independently authenticated capsule/source registration",
+      "authentication": "Registry issuer signature, exact externally pinned payload/graph/contract/scope; grant current state comes from independent status",
+      "authorityCannotComeFrom": "provider/caller/plan/record self-claim",
+      "existingSource": {
+        "source": "c76d0d66895503adde39288544929ff35cd6c281",
+        "path": "services/node-agent/internal/migrationcontext/policy.go",
+        "symbols": "policyData/contractPin/grant/member; current consistency only"
+      },
+      "actualAuthenticator": "ABSENT_NULL_HOLD",
+      "proposedOwner": "Root provisioning; Codex later reader",
+      "failure": "Opaque TRUST_UNKNOWN_OR_PIN_MISMATCH; initial independent-facts mismatch PROVENANCE, then computed-byte/installation joins ARTIFACT/INSTALLATION; first failed gate wins"
+    },
+    {
+      "field": "body.facts.policyPayloadSHA256",
+      "group": "registry",
+      "origin": "Root-provisioned policy publisher plus independently authenticated capsule/source registration",
+      "authentication": "Registry issuer signature, exact externally pinned payload/graph/contract/scope; grant current state comes from independent status",
+      "authorityCannotComeFrom": "provider/caller/plan/record self-claim",
+      "existingSource": {
+        "source": "c76d0d66895503adde39288544929ff35cd6c281",
+        "path": "services/node-agent/internal/migrationcontext/policy.go",
+        "symbols": "policyData/contractPin/grant/member; current consistency only"
+      },
+      "actualAuthenticator": "ABSENT_NULL_HOLD",
+      "proposedOwner": "Root provisioning; Codex later reader",
+      "failure": "Opaque TRUST_UNKNOWN_OR_PIN_MISMATCH; initial independent-facts mismatch PROVENANCE, then computed-byte/installation joins ARTIFACT/INSTALLATION; first failed gate wins"
+    },
+    {
+      "field": "body.facts.registryProofSlotsSHA256",
+      "group": "registry",
+      "origin": "Root-provisioned policy publisher plus independently authenticated capsule/source registration",
+      "authentication": "Registry issuer signature, exact externally pinned payload/graph/contract/scope; grant current state comes from independent status",
+      "authorityCannotComeFrom": "provider/caller/plan/record self-claim",
+      "existingSource": {
+        "source": "c76d0d66895503adde39288544929ff35cd6c281",
+        "path": "services/node-agent/internal/migrationcontext/policy.go",
+        "symbols": "policyData/contractPin/grant/member; current consistency only"
+      },
+      "actualAuthenticator": "ABSENT_NULL_HOLD",
+      "proposedOwner": "Root provisioning; Codex later reader",
+      "failure": "Opaque TRUST_UNKNOWN_OR_PIN_MISMATCH; initial independent-facts mismatch PROVENANCE, then computed-byte/installation joins ARTIFACT/INSTALLATION; first failed gate wins"
+    },
+    {
+      "field": "body.facts.semanticPinsSHA256",
+      "group": "registry",
+      "origin": "Root-provisioned policy publisher plus independently authenticated capsule/source registration",
+      "authentication": "Registry issuer signature, exact externally pinned payload/graph/contract/scope; grant current state comes from independent status",
+      "authorityCannotComeFrom": "provider/caller/plan/record self-claim",
+      "existingSource": {
+        "source": "c76d0d66895503adde39288544929ff35cd6c281",
+        "path": "services/node-agent/internal/migrationcontext/policy.go",
+        "symbols": "policyData/contractPin/grant/member; current consistency only"
+      },
+      "actualAuthenticator": "ABSENT_NULL_HOLD",
+      "proposedOwner": "Root provisioning; Codex later reader",
+      "failure": "Opaque TRUST_UNKNOWN_OR_PIN_MISMATCH; initial independent-facts mismatch PROVENANCE, then computed-byte/installation joins ARTIFACT/INSTALLATION; first failed gate wins"
+    },
+    {
+      "field": "body.facts.reviewCoverageSHA256",
+      "group": "review",
+      "origin": "Independently registered reviewer, original review publication and Root exact source-choice/coverage decision",
+      "authentication": "Actual issuer identity, verdict and exact target/scope/byte-equivalence coverage; never arbitrary review JSON",
+      "authorityCannotComeFrom": "provider/caller/plan/record self-claim",
+      "existingSource": {
+        "source": "c76d0d66895503adde39288544929ff35cd6c281",
+        "path": "services/node-agent/internal/migrationcontext/policy.go",
+        "symbols": "provenance.ReviewTargetSHA/ReviewScope/ApprovedReviewScope; verdict and coverage producer absent"
+      },
+      "actualAuthenticator": "ABSENT_NULL_HOLD",
+      "proposedOwner": "Root decision/identity provisioning; Codex later authenticated acquirer",
+      "failure": "Opaque TRUST_UNKNOWN_OR_PIN_MISMATCH; initial independent-facts mismatch PROVENANCE, then computed-byte/installation joins ARTIFACT/INSTALLATION; first failed gate wins"
+    },
+    {
+      "field": "body.facts.reviewSHA",
+      "group": "review",
+      "origin": "Independently registered reviewer, original review publication and Root exact source-choice/coverage decision",
+      "authentication": "Actual issuer identity, verdict and exact target/scope/byte-equivalence coverage; never arbitrary review JSON",
+      "authorityCannotComeFrom": "provider/caller/plan/record self-claim",
+      "existingSource": {
+        "source": "c76d0d66895503adde39288544929ff35cd6c281",
+        "path": "services/node-agent/internal/migrationcontext/policy.go",
+        "symbols": "provenance.ReviewTargetSHA/ReviewScope/ApprovedReviewScope; verdict and coverage producer absent"
+      },
+      "actualAuthenticator": "ABSENT_NULL_HOLD",
+      "proposedOwner": "Root decision/identity provisioning; Codex later authenticated acquirer",
+      "failure": "Opaque TRUST_UNKNOWN_OR_PIN_MISMATCH; initial independent-facts mismatch PROVENANCE, then computed-byte/installation joins ARTIFACT/INSTALLATION; first failed gate wins"
+    },
+    {
+      "field": "body.facts.reviewScope",
+      "group": "review",
+      "origin": "Independently registered reviewer, original review publication and Root exact source-choice/coverage decision",
+      "authentication": "Actual issuer identity, verdict and exact target/scope/byte-equivalence coverage; never arbitrary review JSON",
+      "authorityCannotComeFrom": "provider/caller/plan/record self-claim",
+      "existingSource": {
+        "source": "c76d0d66895503adde39288544929ff35cd6c281",
+        "path": "services/node-agent/internal/migrationcontext/policy.go",
+        "symbols": "provenance.ReviewTargetSHA/ReviewScope/ApprovedReviewScope; verdict and coverage producer absent"
+      },
+      "actualAuthenticator": "ABSENT_NULL_HOLD",
+      "proposedOwner": "Root decision/identity provisioning; Codex later authenticated acquirer",
+      "failure": "Opaque TRUST_UNKNOWN_OR_PIN_MISMATCH; initial independent-facts mismatch PROVENANCE, then computed-byte/installation joins ARTIFACT/INSTALLATION; first failed gate wins"
+    },
+    {
+      "field": "body.facts.reviewTargetSHA",
+      "group": "review",
+      "origin": "Independently registered reviewer, original review publication and Root exact source-choice/coverage decision",
+      "authentication": "Actual issuer identity, verdict and exact target/scope/byte-equivalence coverage; never arbitrary review JSON",
+      "authorityCannotComeFrom": "provider/caller/plan/record self-claim",
+      "existingSource": {
+        "source": "c76d0d66895503adde39288544929ff35cd6c281",
+        "path": "services/node-agent/internal/migrationcontext/policy.go",
+        "symbols": "provenance.ReviewTargetSHA/ReviewScope/ApprovedReviewScope; verdict and coverage producer absent"
+      },
+      "actualAuthenticator": "ABSENT_NULL_HOLD",
+      "proposedOwner": "Root decision/identity provisioning; Codex later authenticated acquirer",
+      "failure": "Opaque TRUST_UNKNOWN_OR_PIN_MISMATCH; initial independent-facts mismatch PROVENANCE, then computed-byte/installation joins ARTIFACT/INSTALLATION; first failed gate wins"
+    },
+    {
+      "field": "body.facts.reviewVerdict",
+      "group": "review",
+      "origin": "Independently registered reviewer, original review publication and Root exact source-choice/coverage decision",
+      "authentication": "Actual issuer identity, verdict and exact target/scope/byte-equivalence coverage; never arbitrary review JSON",
+      "authorityCannotComeFrom": "provider/caller/plan/record self-claim",
+      "existingSource": {
+        "source": "c76d0d66895503adde39288544929ff35cd6c281",
+        "path": "services/node-agent/internal/migrationcontext/policy.go",
+        "symbols": "provenance.ReviewTargetSHA/ReviewScope/ApprovedReviewScope; verdict and coverage producer absent"
+      },
+      "actualAuthenticator": "ABSENT_NULL_HOLD",
+      "proposedOwner": "Root decision/identity provisioning; Codex later authenticated acquirer",
+      "failure": "Opaque TRUST_UNKNOWN_OR_PIN_MISMATCH; initial independent-facts mismatch PROVENANCE, then computed-byte/installation joins ARTIFACT/INSTALLATION; first failed gate wins"
+    },
+    {
+      "field": "body.facts.rootChoiceSHA256",
+      "group": "review",
+      "origin": "Independently registered reviewer, original review publication and Root exact source-choice/coverage decision",
+      "authentication": "Actual issuer identity, verdict and exact target/scope/byte-equivalence coverage; never arbitrary review JSON",
+      "authorityCannotComeFrom": "provider/caller/plan/record self-claim",
+      "existingSource": {
+        "source": "c76d0d66895503adde39288544929ff35cd6c281",
+        "path": "services/node-agent/internal/migrationcontext/policy.go",
+        "symbols": "provenance.ReviewTargetSHA/ReviewScope/ApprovedReviewScope; verdict and coverage producer absent"
+      },
+      "actualAuthenticator": "ABSENT_NULL_HOLD",
+      "proposedOwner": "Root decision/identity provisioning; Codex later authenticated acquirer",
+      "failure": "Opaque TRUST_UNKNOWN_OR_PIN_MISMATCH; initial independent-facts mismatch PROVENANCE, then computed-byte/installation joins ARTIFACT/INSTALLATION; first failed gate wins"
+    },
+    {
+      "field": "body.facts.sourceEquivalenceSHA256",
+      "group": "review",
+      "origin": "Independently registered reviewer, original review publication and Root exact source-choice/coverage decision",
+      "authentication": "Actual issuer identity, verdict and exact target/scope/byte-equivalence coverage; never arbitrary review JSON",
+      "authorityCannotComeFrom": "provider/caller/plan/record self-claim",
+      "existingSource": {
+        "source": "c76d0d66895503adde39288544929ff35cd6c281",
+        "path": "services/node-agent/internal/migrationcontext/policy.go",
+        "symbols": "provenance.ReviewTargetSHA/ReviewScope/ApprovedReviewScope; verdict and coverage producer absent"
+      },
+      "actualAuthenticator": "ABSENT_NULL_HOLD",
+      "proposedOwner": "Root decision/identity provisioning; Codex later authenticated acquirer",
+      "failure": "Opaque TRUST_UNKNOWN_OR_PIN_MISMATCH; initial independent-facts mismatch PROVENANCE, then computed-byte/installation joins ARTIFACT/INSTALLATION; first failed gate wins"
+    },
+    {
+      "field": "body.facts.artifactId",
+      "group": "artifact",
+      "origin": "Configured authenticated immutable CI artifact service and independently authorized acquirer",
+      "authentication": "Artifact id/run/head/digest/size joined to streamed exact downloaded bytes; archive hash not binary hash",
+      "authorityCannotComeFrom": "provider/caller/plan/record self-claim",
+      "existingSource": {
+        "source": "c76d0d66895503adde39288544929ff35cd6c281",
+        "path": "services/node-agent/internal/migrationcontext/policy.go",
+        "symbols": "provenance.ArtifactDigest syntax only; artifact ID/size/bytes authentication absent"
+      },
+      "actualAuthenticator": "ABSENT_NULL_HOLD",
+      "proposedOwner": "Root provider authorization; Codex later artifact acquirer",
+      "failure": "Opaque TRUST_UNKNOWN_OR_PIN_MISMATCH; initial independent-facts mismatch PROVENANCE, then computed-byte/installation joins ARTIFACT/INSTALLATION; first failed gate wins"
+    },
+    {
+      "field": "body.facts.artifactZipBytes",
+      "group": "artifact",
+      "origin": "Configured authenticated immutable CI artifact service and independently authorized acquirer",
+      "authentication": "Artifact id/run/head/digest/size joined to streamed exact downloaded bytes; archive hash not binary hash",
+      "authorityCannotComeFrom": "provider/caller/plan/record self-claim",
+      "existingSource": {
+        "source": "c76d0d66895503adde39288544929ff35cd6c281",
+        "path": "services/node-agent/internal/migrationcontext/policy.go",
+        "symbols": "provenance.ArtifactDigest syntax only; artifact ID/size/bytes authentication absent"
+      },
+      "actualAuthenticator": "ABSENT_NULL_HOLD",
+      "proposedOwner": "Root provider authorization; Codex later artifact acquirer",
+      "failure": "Opaque TRUST_UNKNOWN_OR_PIN_MISMATCH; initial independent-facts mismatch PROVENANCE, then computed-byte/installation joins ARTIFACT/INSTALLATION; first failed gate wins"
+    },
+    {
+      "field": "body.facts.artifactZipSHA256",
+      "group": "artifact",
+      "origin": "Configured authenticated immutable CI artifact service and independently authorized acquirer",
+      "authentication": "Artifact id/run/head/digest/size joined to streamed exact downloaded bytes; archive hash not binary hash",
+      "authorityCannotComeFrom": "provider/caller/plan/record self-claim",
+      "existingSource": {
+        "source": "c76d0d66895503adde39288544929ff35cd6c281",
+        "path": "services/node-agent/internal/migrationcontext/policy.go",
+        "symbols": "provenance.ArtifactDigest syntax only; artifact ID/size/bytes authentication absent"
+      },
+      "actualAuthenticator": "ABSENT_NULL_HOLD",
+      "proposedOwner": "Root provider authorization; Codex later artifact acquirer",
+      "failure": "Opaque TRUST_UNKNOWN_OR_PIN_MISMATCH; initial independent-facts mismatch PROVENANCE, then computed-byte/installation joins ARTIFACT/INSTALLATION; first failed gate wins"
+    },
+    {
+      "field": "body.facts.binarySHA256",
+      "group": "source_binary",
+      "origin": "Original authenticated source/build evidence and Root release selection",
+      "authentication": "Exact source/blob/dependency/platform/toolchain/link closure; binary VCS is consistency metadata only",
+      "authorityCannotComeFrom": "provider/caller/plan/record self-claim",
+      "existingSource": {
+        "source": "c76d0d66895503adde39288544929ff35cd6c281",
+        "path": "services/node-agent/internal/migrationcontext/policy.go",
+        "symbols": "publication.SourceSHA/ArtifactSHA256, provenance.BinaryVCS/RuntimeLockSHA256/LinkedClosureSHA256; full closure producer absent"
+      },
+      "actualAuthenticator": "ABSENT_NULL_HOLD",
+      "proposedOwner": "Root release choice; Codex later provenance adapter",
+      "failure": "Opaque TRUST_UNKNOWN_OR_PIN_MISMATCH; initial independent-facts mismatch PROVENANCE, then computed-byte/installation joins ARTIFACT/INSTALLATION; first failed gate wins"
+    },
+    {
+      "field": "body.facts.binaryVCSModified",
+      "group": "source_binary",
+      "origin": "Original authenticated source/build evidence and Root release selection",
+      "authentication": "Exact source/blob/dependency/platform/toolchain/link closure; binary VCS is consistency metadata only",
+      "authorityCannotComeFrom": "provider/caller/plan/record self-claim",
+      "existingSource": {
+        "source": "c76d0d66895503adde39288544929ff35cd6c281",
+        "path": "services/node-agent/internal/migrationcontext/policy.go",
+        "symbols": "publication.SourceSHA/ArtifactSHA256, provenance.BinaryVCS/RuntimeLockSHA256/LinkedClosureSHA256; full closure producer absent"
+      },
+      "actualAuthenticator": "ABSENT_NULL_HOLD",
+      "proposedOwner": "Root release choice; Codex later provenance adapter",
+      "failure": "Opaque TRUST_UNKNOWN_OR_PIN_MISMATCH; initial independent-facts mismatch PROVENANCE, then computed-byte/installation joins ARTIFACT/INSTALLATION; first failed gate wins"
+    },
+    {
+      "field": "body.facts.binaryVCSRevision",
+      "group": "source_binary",
+      "origin": "Original authenticated source/build evidence and Root release selection",
+      "authentication": "Exact source/blob/dependency/platform/toolchain/link closure; binary VCS is consistency metadata only",
+      "authorityCannotComeFrom": "provider/caller/plan/record self-claim",
+      "existingSource": {
+        "source": "c76d0d66895503adde39288544929ff35cd6c281",
+        "path": "services/node-agent/internal/migrationcontext/policy.go",
+        "symbols": "publication.SourceSHA/ArtifactSHA256, provenance.BinaryVCS/RuntimeLockSHA256/LinkedClosureSHA256; full closure producer absent"
+      },
+      "actualAuthenticator": "ABSENT_NULL_HOLD",
+      "proposedOwner": "Root release choice; Codex later provenance adapter",
+      "failure": "Opaque TRUST_UNKNOWN_OR_PIN_MISMATCH; initial independent-facts mismatch PROVENANCE, then computed-byte/installation joins ARTIFACT/INSTALLATION; first failed gate wins"
+    },
+    {
+      "field": "body.facts.helperClosureSHA256",
+      "group": "source_binary",
+      "origin": "Original authenticated source/build evidence and Root release selection",
+      "authentication": "Exact source/blob/dependency/platform/toolchain/link closure; binary VCS is consistency metadata only",
+      "authorityCannotComeFrom": "provider/caller/plan/record self-claim",
+      "existingSource": {
+        "source": "c76d0d66895503adde39288544929ff35cd6c281",
+        "path": "services/node-agent/internal/migrationcontext/policy.go",
+        "symbols": "publication.SourceSHA/ArtifactSHA256, provenance.BinaryVCS/RuntimeLockSHA256/LinkedClosureSHA256; full closure producer absent"
+      },
+      "actualAuthenticator": "ABSENT_NULL_HOLD",
+      "proposedOwner": "Root release choice; Codex later provenance adapter",
+      "failure": "Opaque TRUST_UNKNOWN_OR_PIN_MISMATCH; initial independent-facts mismatch PROVENANCE, then computed-byte/installation joins ARTIFACT/INSTALLATION; first failed gate wins"
+    },
+    {
+      "field": "body.facts.linkedClosureSHA256",
+      "group": "source_binary",
+      "origin": "Original authenticated source/build evidence and Root release selection",
+      "authentication": "Exact source/blob/dependency/platform/toolchain/link closure; binary VCS is consistency metadata only",
+      "authorityCannotComeFrom": "provider/caller/plan/record self-claim",
+      "existingSource": {
+        "source": "c76d0d66895503adde39288544929ff35cd6c281",
+        "path": "services/node-agent/internal/migrationcontext/policy.go",
+        "symbols": "publication.SourceSHA/ArtifactSHA256, provenance.BinaryVCS/RuntimeLockSHA256/LinkedClosureSHA256; full closure producer absent"
+      },
+      "actualAuthenticator": "ABSENT_NULL_HOLD",
+      "proposedOwner": "Root release choice; Codex later provenance adapter",
+      "failure": "Opaque TRUST_UNKNOWN_OR_PIN_MISMATCH; initial independent-facts mismatch PROVENANCE, then computed-byte/installation joins ARTIFACT/INSTALLATION; first failed gate wins"
+    },
+    {
+      "field": "body.facts.moduleClosureSHA256",
+      "group": "source_binary",
+      "origin": "Original authenticated source/build evidence and Root release selection",
+      "authentication": "Exact source/blob/dependency/platform/toolchain/link closure; binary VCS is consistency metadata only",
+      "authorityCannotComeFrom": "provider/caller/plan/record self-claim",
+      "existingSource": {
+        "source": "c76d0d66895503adde39288544929ff35cd6c281",
+        "path": "services/node-agent/internal/migrationcontext/policy.go",
+        "symbols": "publication.SourceSHA/ArtifactSHA256, provenance.BinaryVCS/RuntimeLockSHA256/LinkedClosureSHA256; full closure producer absent"
+      },
+      "actualAuthenticator": "ABSENT_NULL_HOLD",
+      "proposedOwner": "Root release choice; Codex later provenance adapter",
+      "failure": "Opaque TRUST_UNKNOWN_OR_PIN_MISMATCH; initial independent-facts mismatch PROVENANCE, then computed-byte/installation joins ARTIFACT/INSTALLATION; first failed gate wins"
+    },
+    {
+      "field": "body.facts.runtimeLockSHA256",
+      "group": "source_binary",
+      "origin": "Original authenticated source/build evidence and Root release selection",
+      "authentication": "Exact source/blob/dependency/platform/toolchain/link closure; binary VCS is consistency metadata only",
+      "authorityCannotComeFrom": "provider/caller/plan/record self-claim",
+      "existingSource": {
+        "source": "c76d0d66895503adde39288544929ff35cd6c281",
+        "path": "services/node-agent/internal/migrationcontext/policy.go",
+        "symbols": "publication.SourceSHA/ArtifactSHA256, provenance.BinaryVCS/RuntimeLockSHA256/LinkedClosureSHA256; full closure producer absent"
+      },
+      "actualAuthenticator": "ABSENT_NULL_HOLD",
+      "proposedOwner": "Root release choice; Codex later provenance adapter",
+      "failure": "Opaque TRUST_UNKNOWN_OR_PIN_MISMATCH; initial independent-facts mismatch PROVENANCE, then computed-byte/installation joins ARTIFACT/INSTALLATION; first failed gate wins"
+    },
+    {
+      "field": "body.facts.sourceSHA",
+      "group": "source_binary",
+      "origin": "Original authenticated source/build evidence and Root release selection",
+      "authentication": "Exact source/blob/dependency/platform/toolchain/link closure; binary VCS is consistency metadata only",
+      "authorityCannotComeFrom": "provider/caller/plan/record self-claim",
+      "existingSource": {
+        "source": "c76d0d66895503adde39288544929ff35cd6c281",
+        "path": "services/node-agent/internal/migrationcontext/policy.go",
+        "symbols": "publication.SourceSHA/ArtifactSHA256, provenance.BinaryVCS/RuntimeLockSHA256/LinkedClosureSHA256; full closure producer absent"
+      },
+      "actualAuthenticator": "ABSENT_NULL_HOLD",
+      "proposedOwner": "Root release choice; Codex later provenance adapter",
+      "failure": "Opaque TRUST_UNKNOWN_OR_PIN_MISMATCH; initial independent-facts mismatch PROVENANCE, then computed-byte/installation joins ARTIFACT/INSTALLATION; first failed gate wins"
+    },
+    {
+      "field": "body.facts.sourceTreeSHA256",
+      "group": "source_binary",
+      "origin": "Original authenticated source/build evidence and Root release selection",
+      "authentication": "Exact source/blob/dependency/platform/toolchain/link closure; binary VCS is consistency metadata only",
+      "authorityCannotComeFrom": "provider/caller/plan/record self-claim",
+      "existingSource": {
+        "source": "c76d0d66895503adde39288544929ff35cd6c281",
+        "path": "services/node-agent/internal/migrationcontext/policy.go",
+        "symbols": "publication.SourceSHA/ArtifactSHA256, provenance.BinaryVCS/RuntimeLockSHA256/LinkedClosureSHA256; full closure producer absent"
+      },
+      "actualAuthenticator": "ABSENT_NULL_HOLD",
+      "proposedOwner": "Root release choice; Codex later provenance adapter",
+      "failure": "Opaque TRUST_UNKNOWN_OR_PIN_MISMATCH; initial independent-facts mismatch PROVENANCE, then computed-byte/installation joins ARTIFACT/INSTALLATION; first failed gate wins"
+    },
+    {
+      "field": "body.facts.toolchain",
+      "group": "source_binary",
+      "origin": "Original authenticated source/build evidence and Root release selection",
+      "authentication": "Exact source/blob/dependency/platform/toolchain/link closure; binary VCS is consistency metadata only",
+      "authorityCannotComeFrom": "provider/caller/plan/record self-claim",
+      "existingSource": {
+        "source": "c76d0d66895503adde39288544929ff35cd6c281",
+        "path": "services/node-agent/internal/migrationcontext/policy.go",
+        "symbols": "publication.SourceSHA/ArtifactSHA256, provenance.BinaryVCS/RuntimeLockSHA256/LinkedClosureSHA256; full closure producer absent"
+      },
+      "actualAuthenticator": "ABSENT_NULL_HOLD",
+      "proposedOwner": "Root release choice; Codex later provenance adapter",
+      "failure": "Opaque TRUST_UNKNOWN_OR_PIN_MISMATCH; initial independent-facts mismatch PROVENANCE, then computed-byte/installation joins ARTIFACT/INSTALLATION; first failed gate wins"
+    },
+    {
+      "field": "body.facts.installationBinarySHA256",
+      "group": "installation",
+      "origin": "Independent installation authority and separately registered running-code measurement producer",
+      "authentication": "Receipt signature/identity plus actual held executable/process/generation/root/namespace readback; never record self-measurement",
+      "authorityCannotComeFrom": "provider/caller/plan/record self-claim",
+      "existingSource": {
+        "source": "c76d0d66895503adde39288544929ff35cd6c281",
+        "path": "services/node-agent/internal/migrationcontext/policy.go",
+        "symbols": "runningData and provenance receipt/executable strings exist; authenticateRunning always refuses"
+      },
+      "actualAuthenticator": "ABSENT_NULL_HOLD",
+      "proposedOwner": "Root mechanism/provisioning; separate future running owner grant",
+      "failure": "Opaque TRUST_UNKNOWN_OR_PIN_MISMATCH; initial independent-facts mismatch PROVENANCE, then computed-byte/installation joins ARTIFACT/INSTALLATION; first failed gate wins"
+    },
+    {
+      "field": "body.facts.installationReceiptSHA256",
+      "group": "installation",
+      "origin": "Independent installation authority and separately registered running-code measurement producer",
+      "authentication": "Receipt signature/identity plus actual held executable/process/generation/root/namespace readback; never record self-measurement",
+      "authorityCannotComeFrom": "provider/caller/plan/record self-claim",
+      "existingSource": {
+        "source": "c76d0d66895503adde39288544929ff35cd6c281",
+        "path": "services/node-agent/internal/migrationcontext/policy.go",
+        "symbols": "runningData and provenance receipt/executable strings exist; authenticateRunning always refuses"
+      },
+      "actualAuthenticator": "ABSENT_NULL_HOLD",
+      "proposedOwner": "Root mechanism/provisioning; separate future running owner grant",
+      "failure": "Opaque TRUST_UNKNOWN_OR_PIN_MISMATCH; initial independent-facts mismatch PROVENANCE, then computed-byte/installation joins ARTIFACT/INSTALLATION; first failed gate wins"
+    },
+    {
+      "field": "body.facts.installationSourceSHA",
+      "group": "installation",
+      "origin": "Independent installation authority and separately registered running-code measurement producer",
+      "authentication": "Receipt signature/identity plus actual held executable/process/generation/root/namespace readback; never record self-measurement",
+      "authorityCannotComeFrom": "provider/caller/plan/record self-claim",
+      "existingSource": {
+        "source": "c76d0d66895503adde39288544929ff35cd6c281",
+        "path": "services/node-agent/internal/migrationcontext/policy.go",
+        "symbols": "runningData and provenance receipt/executable strings exist; authenticateRunning always refuses"
+      },
+      "actualAuthenticator": "ABSENT_NULL_HOLD",
+      "proposedOwner": "Root mechanism/provisioning; separate future running owner grant",
+      "failure": "Opaque TRUST_UNKNOWN_OR_PIN_MISMATCH; initial independent-facts mismatch PROVENANCE, then computed-byte/installation joins ARTIFACT/INSTALLATION; first failed gate wins"
+    },
+    {
+      "field": "body.facts.runningBinarySHA256",
+      "group": "installation",
+      "origin": "Independent installation authority and separately registered running-code measurement producer",
+      "authentication": "Receipt signature/identity plus actual held executable/process/generation/root/namespace readback; never record self-measurement",
+      "authorityCannotComeFrom": "provider/caller/plan/record self-claim",
+      "existingSource": {
+        "source": "c76d0d66895503adde39288544929ff35cd6c281",
+        "path": "services/node-agent/internal/migrationcontext/policy.go",
+        "symbols": "runningData and provenance receipt/executable strings exist; authenticateRunning always refuses"
+      },
+      "actualAuthenticator": "ABSENT_NULL_HOLD",
+      "proposedOwner": "Root mechanism/provisioning; separate future running owner grant",
+      "failure": "Opaque TRUST_UNKNOWN_OR_PIN_MISMATCH; initial independent-facts mismatch PROVENANCE, then computed-byte/installation joins ARTIFACT/INSTALLATION; first failed gate wins"
+    },
+    {
+      "field": "body.facts.runningLinkedClosureSHA256",
+      "group": "installation",
+      "origin": "Independent installation authority and separately registered running-code measurement producer",
+      "authentication": "Receipt signature/identity plus actual held executable/process/generation/root/namespace readback; never record self-measurement",
+      "authorityCannotComeFrom": "provider/caller/plan/record self-claim",
+      "existingSource": {
+        "source": "c76d0d66895503adde39288544929ff35cd6c281",
+        "path": "services/node-agent/internal/migrationcontext/policy.go",
+        "symbols": "runningData and provenance receipt/executable strings exist; authenticateRunning always refuses"
+      },
+      "actualAuthenticator": "ABSENT_NULL_HOLD",
+      "proposedOwner": "Root mechanism/provisioning; separate future running owner grant",
+      "failure": "Opaque TRUST_UNKNOWN_OR_PIN_MISMATCH; initial independent-facts mismatch PROVENANCE, then computed-byte/installation joins ARTIFACT/INSTALLATION; first failed gate wins"
+    },
+    {
+      "field": "body.facts.runningMeasurementSHA256",
+      "group": "installation",
+      "origin": "Independent installation authority and separately registered running-code measurement producer",
+      "authentication": "Receipt signature/identity plus actual held executable/process/generation/root/namespace readback; never record self-measurement",
+      "authorityCannotComeFrom": "provider/caller/plan/record self-claim",
+      "existingSource": {
+        "source": "c76d0d66895503adde39288544929ff35cd6c281",
+        "path": "services/node-agent/internal/migrationcontext/policy.go",
+        "symbols": "runningData and provenance receipt/executable strings exist; authenticateRunning always refuses"
+      },
+      "actualAuthenticator": "ABSENT_NULL_HOLD",
+      "proposedOwner": "Root mechanism/provisioning; separate future running owner grant",
+      "failure": "Opaque TRUST_UNKNOWN_OR_PIN_MISMATCH; initial independent-facts mismatch PROVENANCE, then computed-byte/installation joins ARTIFACT/INSTALLATION; first failed gate wins"
+    },
+    {
+      "field": "body.facts.runningReceiptSHA256",
+      "group": "installation",
+      "origin": "Independent installation authority and separately registered running-code measurement producer",
+      "authentication": "Receipt signature/identity plus actual held executable/process/generation/root/namespace readback; never record self-measurement",
+      "authorityCannotComeFrom": "provider/caller/plan/record self-claim",
+      "existingSource": {
+        "source": "c76d0d66895503adde39288544929ff35cd6c281",
+        "path": "services/node-agent/internal/migrationcontext/policy.go",
+        "symbols": "runningData and provenance receipt/executable strings exist; authenticateRunning always refuses"
+      },
+      "actualAuthenticator": "ABSENT_NULL_HOLD",
+      "proposedOwner": "Root mechanism/provisioning; separate future running owner grant",
+      "failure": "Opaque TRUST_UNKNOWN_OR_PIN_MISMATCH; initial independent-facts mismatch PROVENANCE, then computed-byte/installation joins ARTIFACT/INSTALLATION; first failed gate wins"
+    },
+    {
+      "field": "body.facts.runningRuntimeLockSHA256",
+      "group": "installation",
+      "origin": "Independent installation authority and separately registered running-code measurement producer",
+      "authentication": "Receipt signature/identity plus actual held executable/process/generation/root/namespace readback; never record self-measurement",
+      "authorityCannotComeFrom": "provider/caller/plan/record self-claim",
+      "existingSource": {
+        "source": "c76d0d66895503adde39288544929ff35cd6c281",
+        "path": "services/node-agent/internal/migrationcontext/policy.go",
+        "symbols": "runningData and provenance receipt/executable strings exist; authenticateRunning always refuses"
+      },
+      "actualAuthenticator": "ABSENT_NULL_HOLD",
+      "proposedOwner": "Root mechanism/provisioning; separate future running owner grant",
+      "failure": "Opaque TRUST_UNKNOWN_OR_PIN_MISMATCH; initial independent-facts mismatch PROVENANCE, then computed-byte/installation joins ARTIFACT/INSTALLATION; first failed gate wins"
+    },
+    {
+      "field": "body.facts.runningSourceSHA",
+      "group": "installation",
+      "origin": "Independent installation authority and separately registered running-code measurement producer",
+      "authentication": "Receipt signature/identity plus actual held executable/process/generation/root/namespace readback; never record self-measurement",
+      "authorityCannotComeFrom": "provider/caller/plan/record self-claim",
+      "existingSource": {
+        "source": "c76d0d66895503adde39288544929ff35cd6c281",
+        "path": "services/node-agent/internal/migrationcontext/policy.go",
+        "symbols": "runningData and provenance receipt/executable strings exist; authenticateRunning always refuses"
+      },
+      "actualAuthenticator": "ABSENT_NULL_HOLD",
+      "proposedOwner": "Root mechanism/provisioning; separate future running owner grant",
+      "failure": "Opaque TRUST_UNKNOWN_OR_PIN_MISMATCH; initial independent-facts mismatch PROVENANCE, then computed-byte/installation joins ARTIFACT/INSTALLATION; first failed gate wins"
+    },
+    {
+      "field": "body.facts.sourceAcquisitionSHA256",
+      "group": "source_anchors",
+      "origin": "Independently authenticated ORIGINAL source publication/time-anchor ledger and provenance acquirer, preceding this registry record",
+      "authentication": "Original source-event/acquisition bytes and identity; NOT a future registry head or current self-authentication; fresh status remains a separate input",
+      "authorityCannotComeFrom": "provider/caller/plan/record self-claim",
+      "existingSource": {
+        "source": "c76d0d66895503adde39288544929ff35cd6c281",
+        "path": "services/node-agent/internal/migrationcontext/policy.go",
+        "symbols": "Original publication authentication absent; StatusPort/ClockPort also default-refuse for separate current checks"
+      },
+      "actualAuthenticator": "ABSENT_NULL_HOLD",
+      "proposedOwner": "Root source/provider authorization; Codex future acquirer",
+      "failure": "Opaque TRUST_UNKNOWN_OR_PIN_MISMATCH; initial independent-facts mismatch PROVENANCE, then computed-byte/installation joins ARTIFACT/INSTALLATION; first failed gate wins"
+    },
+    {
+      "field": "body.facts.sourcePublicationAnchorSHA256",
+      "group": "source_anchors",
+      "origin": "Independently authenticated ORIGINAL source publication/time-anchor ledger and provenance acquirer, preceding this registry record",
+      "authentication": "Original source-event/acquisition bytes and identity; NOT a future registry head or current self-authentication; fresh status remains a separate input",
+      "authorityCannotComeFrom": "provider/caller/plan/record self-claim",
+      "existingSource": {
+        "source": "c76d0d66895503adde39288544929ff35cd6c281",
+        "path": "services/node-agent/internal/migrationcontext/policy.go",
+        "symbols": "Original publication authentication absent; StatusPort/ClockPort also default-refuse for separate current checks"
+      },
+      "actualAuthenticator": "ABSENT_NULL_HOLD",
+      "proposedOwner": "Root source/provider authorization; Codex future acquirer",
+      "failure": "Opaque TRUST_UNKNOWN_OR_PIN_MISMATCH; initial independent-facts mismatch PROVENANCE, then computed-byte/installation joins ARTIFACT/INSTALLATION; first failed gate wins"
+    },
+    {
+      "field": "body.ciRuns[*]",
+      "group": "ci",
+      "origin": "Independently authenticated GitHub provider/acquirer; repository and workflow identity fixed outside record",
+      "authentication": "Exact head/ref/event/path/correlation/attempt/run/job/step bytes and every independently required conclusion; required+optional policy from Root capsule",
+      "actualAuthenticator": "ABSENT_NULL_HOLD",
+      "proposedOwner": "Root policy/identity; Codex future acquirer",
+      "failure": "CI"
+    },
+    {
+      "field": "signer/body purpose/format/selector/scope/capsuleSHA256/provisioningGeneration/anchorVersion",
+      "group": "bootstrap",
+      "origin": "Independently installed Root-authorized capsule and purpose-specific issuer authorization",
+      "authentication": "Exact externally provisioned SPKI DER, format/schema/projection/verifier hash, purpose/scope and protected capsule generation; no self-registration",
+      "actualAuthenticator": "ABSENT_NULL_HOLD",
+      "proposedOwner": "Root custody/provisioning; future bootstrap verifier owner",
+      "failure": "ANCHOR/SCOPE/SIGNATURE"
+    },
+    {
+      "field": "recordVersion/requestBindingSHA256/issuedAt/validUntil/V0/V1",
+      "group": "freshness",
+      "origin": "Separate authenticated lifecycle, read-ticket, real clock and running measurement snapshots",
+      "authentication": "Exact generation/floor/current version/digest/ticket; full real interval and final version/process readback; no silent retry",
+      "actualAuthenticator": "ABSENT_NULL_HOLD",
+      "proposedOwner": "Root separate purposes; future adapter owners by grant",
+      "failure": "STATUS/VERSION/REPLAY/TIME/READBACK"
+    }
+  ]
+}

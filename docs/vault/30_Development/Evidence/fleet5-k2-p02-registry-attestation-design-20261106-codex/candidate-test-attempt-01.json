@@ -1,0 +1,17 @@
+{
+  "classification": "FAILED_SYNTHETIC_HARNESS_ATTEMPT_PRESERVED",
+  "argv": [
+    "existing .venv Python3.14.7",
+    "-I",
+    "-B",
+    "docs\\vault\\30_Development\\Evidence\\fleet5-k2-p02-registry-attestation-design-20261106-codex\\test_candidate.py"
+  ],
+  "exit": 1,
+  "failedCase": "N46-ci-workflow",
+  "expectedReason": "CI",
+  "actualReason": "FORMAT",
+  "cause": "The deliberately wrong workflow value also changed canonical CI-run order, so the earlier format gate correctly refused it",
+  "correction": "Use a different workflow that preserves ordering, then exercise intended CI identity refusal; no production or registry authority changed",
+  "partialCasesNotCountedAsFinalEvidence": true,
+  "recordedKST": "2026-11-06T23:14:20.005166+09:00"
+}

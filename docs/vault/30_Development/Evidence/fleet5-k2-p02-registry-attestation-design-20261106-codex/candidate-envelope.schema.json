@@ -1,0 +1,565 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "body": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "format": {
+          "const": "fleet5-p02-registry-candidate:1"
+        },
+        "purpose": {
+          "const": "installed-policy-registry"
+        },
+        "selector": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_-]{1,128}$"
+        },
+        "scopeSHA256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$",
+          "not": {
+            "pattern": "^0+$"
+          }
+        },
+        "capsuleSHA256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$",
+          "not": {
+            "pattern": "^0+$"
+          }
+        },
+        "provisioningGeneration": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_-]{1,128}$"
+        },
+        "anchorVersion": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "recordVersion": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "requestBindingSHA256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$",
+          "not": {
+            "pattern": "^0+$"
+          }
+        },
+        "issuedAt": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "validUntil": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "facts": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "artifactZipSHA256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$",
+              "not": {
+                "pattern": "^0+$"
+              }
+            },
+            "binarySHA256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$",
+              "not": {
+                "pattern": "^0+$"
+              }
+            },
+            "binaryVCSRevision": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{40}$",
+              "not": {
+                "pattern": "^0+$"
+              }
+            },
+            "cohortScopeSHA256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$",
+              "not": {
+                "pattern": "^0+$"
+              }
+            },
+            "contractSetSHA256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$",
+              "not": {
+                "pattern": "^0+$"
+              }
+            },
+            "designRegistrationSHA256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$",
+              "not": {
+                "pattern": "^0+$"
+              }
+            },
+            "graphSHA256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$",
+              "not": {
+                "pattern": "^0+$"
+              }
+            },
+            "helperClosureSHA256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$",
+              "not": {
+                "pattern": "^0+$"
+              }
+            },
+            "installationBinarySHA256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$",
+              "not": {
+                "pattern": "^0+$"
+              }
+            },
+            "installationReceiptSHA256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$",
+              "not": {
+                "pattern": "^0+$"
+              }
+            },
+            "installationSourceSHA": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{40}$",
+              "not": {
+                "pattern": "^0+$"
+              }
+            },
+            "keyGrantsSHA256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$",
+              "not": {
+                "pattern": "^0+$"
+              }
+            },
+            "linkedClosureSHA256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$",
+              "not": {
+                "pattern": "^0+$"
+              }
+            },
+            "moduleClosureSHA256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$",
+              "not": {
+                "pattern": "^0+$"
+              }
+            },
+            "policyPayloadSHA256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$",
+              "not": {
+                "pattern": "^0+$"
+              }
+            },
+            "registryProofSlotsSHA256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$",
+              "not": {
+                "pattern": "^0+$"
+              }
+            },
+            "reviewCoverageSHA256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$",
+              "not": {
+                "pattern": "^0+$"
+              }
+            },
+            "reviewSHA": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{40}$",
+              "not": {
+                "pattern": "^0+$"
+              }
+            },
+            "reviewTargetSHA": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{40}$",
+              "not": {
+                "pattern": "^0+$"
+              }
+            },
+            "rootChoiceSHA256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$",
+              "not": {
+                "pattern": "^0+$"
+              }
+            },
+            "runningBinarySHA256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$",
+              "not": {
+                "pattern": "^0+$"
+              }
+            },
+            "runningLinkedClosureSHA256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$",
+              "not": {
+                "pattern": "^0+$"
+              }
+            },
+            "runningMeasurementSHA256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$",
+              "not": {
+                "pattern": "^0+$"
+              }
+            },
+            "runningReceiptSHA256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$",
+              "not": {
+                "pattern": "^0+$"
+              }
+            },
+            "runningRuntimeLockSHA256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$",
+              "not": {
+                "pattern": "^0+$"
+              }
+            },
+            "runningSourceSHA": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{40}$",
+              "not": {
+                "pattern": "^0+$"
+              }
+            },
+            "runtimeLockSHA256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$",
+              "not": {
+                "pattern": "^0+$"
+              }
+            },
+            "semanticPinsSHA256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$",
+              "not": {
+                "pattern": "^0+$"
+              }
+            },
+            "sourceAcquisitionSHA256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$",
+              "not": {
+                "pattern": "^0+$"
+              }
+            },
+            "sourceEquivalenceSHA256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$",
+              "not": {
+                "pattern": "^0+$"
+              }
+            },
+            "sourcePublicationAnchorSHA256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$",
+              "not": {
+                "pattern": "^0+$"
+              }
+            },
+            "sourceSHA": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{40}$",
+              "not": {
+                "pattern": "^0+$"
+              }
+            },
+            "sourceTreeSHA256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$",
+              "not": {
+                "pattern": "^0+$"
+              }
+            },
+            "toolchain": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 256,
+              "pattern": "^[ -~]+$"
+            },
+            "reviewVerdict": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 256,
+              "pattern": "^[ -~]+$"
+            },
+            "reviewScope": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 256,
+              "pattern": "^[ -~]+$"
+            },
+            "artifactId": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 9007199254740991
+            },
+            "artifactZipBytes": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 9007199254740991
+            },
+            "binaryVCSModified": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "artifactZipSHA256",
+            "binarySHA256",
+            "binaryVCSRevision",
+            "cohortScopeSHA256",
+            "contractSetSHA256",
+            "designRegistrationSHA256",
+            "graphSHA256",
+            "helperClosureSHA256",
+            "installationBinarySHA256",
+            "installationReceiptSHA256",
+            "installationSourceSHA",
+            "keyGrantsSHA256",
+            "linkedClosureSHA256",
+            "moduleClosureSHA256",
+            "policyPayloadSHA256",
+            "registryProofSlotsSHA256",
+            "reviewCoverageSHA256",
+            "reviewSHA",
+            "reviewTargetSHA",
+            "rootChoiceSHA256",
+            "runningBinarySHA256",
+            "runningLinkedClosureSHA256",
+            "runningMeasurementSHA256",
+            "runningReceiptSHA256",
+            "runningRuntimeLockSHA256",
+            "runningSourceSHA",
+            "runtimeLockSHA256",
+            "semanticPinsSHA256",
+            "sourceAcquisitionSHA256",
+            "sourceEquivalenceSHA256",
+            "sourcePublicationAnchorSHA256",
+            "sourceSHA",
+            "sourceTreeSHA256",
+            "toolchain",
+            "reviewVerdict",
+            "reviewScope",
+            "artifactId",
+            "artifactZipBytes",
+            "binaryVCSModified"
+          ]
+        },
+        "ciRuns": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 8,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "runId": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 9007199254740991
+              },
+              "repository": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 256,
+                "pattern": "^[ -~]+$"
+              },
+              "headSHA": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{40}$",
+                "not": {
+                  "pattern": "^0+$"
+                }
+              },
+              "ref": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 256,
+                "pattern": "^[ -~]+$"
+              },
+              "event": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 256,
+                "pattern": "^[ -~]+$"
+              },
+              "workflow": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 256,
+                "pattern": "^[ -~]+$"
+              },
+              "correlation": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 256,
+                "pattern": "^[ -~]+$"
+              },
+              "attempt": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 9007199254740991
+              },
+              "conclusion": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 256,
+                "pattern": "^[ -~]+$"
+              },
+              "jobs": {
+                "type": "array",
+                "minItems": 1,
+                "maxItems": 8,
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "id": {
+                      "type": "integer",
+                      "minimum": 1,
+                      "maximum": 9007199254740991
+                    },
+                    "name": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 128,
+                      "pattern": "^[ -~]+$"
+                    },
+                    "conclusion": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 256,
+                      "pattern": "^[ -~]+$"
+                    },
+                    "steps": {
+                      "type": "array",
+                      "minItems": 1,
+                      "maxItems": 128,
+                      "items": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "properties": {
+                          "number": {
+                            "type": "integer",
+                            "minimum": 1,
+                            "maximum": 9007199254740991
+                          },
+                          "name": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 256,
+                            "pattern": "^[ -~]+$"
+                          },
+                          "conclusion": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 256,
+                            "pattern": "^[ -~]+$"
+                          }
+                        },
+                        "required": [
+                          "number",
+                          "name",
+                          "conclusion"
+                        ]
+                      }
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "name",
+                    "conclusion",
+                    "steps"
+                  ]
+                }
+              }
+            },
+            "required": [
+              "runId",
+              "repository",
+              "headSHA",
+              "ref",
+              "event",
+              "workflow",
+              "correlation",
+              "attempt",
+              "conclusion",
+              "jobs"
+            ]
+          }
+        }
+      },
+      "required": [
+        "format",
+        "purpose",
+        "selector",
+        "scopeSHA256",
+        "capsuleSHA256",
+        "provisioningGeneration",
+        "anchorVersion",
+        "recordVersion",
+        "requestBindingSHA256",
+        "issuedAt",
+        "validUntil",
+        "facts",
+        "ciRuns"
+      ]
+    },
+    "signer": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "keySPKISHA256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$",
+          "not": {
+            "pattern": "^0+$"
+          }
+        }
+      },
+      "required": [
+        "keySPKISHA256"
+      ]
+    },
+    "signatureHex": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{128}$",
+      "not": {
+        "pattern": "^0+$"
+      }
+    }
+  },
+  "required": [
+    "body",
+    "signer",
+    "signatureHex"
+  ],
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://fleet5-candidate.invalid/p02/registry-envelope-candidate-1",
+  "title": "UNREGISTERED P02 candidate envelope; schema validation is not authentication"
+}

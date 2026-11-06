@@ -1,0 +1,982 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "selector": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9_-]{1,128}$"
+    },
+    "version": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^[ -~]+$"
+    },
+    "verifier": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "const": "saintvision-migrationverify-k1:1"
+        },
+        "sourceSHA": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$",
+          "not": {
+            "pattern": "^0+$"
+          }
+        },
+        "artifactSHA256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$",
+          "not": {
+            "pattern": "^0+$"
+          }
+        },
+        "reviewSHA": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$",
+          "not": {
+            "pattern": "^0+$"
+          }
+        },
+        "ciRunIDs": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 8,
+          "uniqueItems": true,
+          "items": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9007199254740991
+          }
+        }
+      },
+      "required": [
+        "id",
+        "sourceSHA",
+        "artifactSHA256",
+        "reviewSHA",
+        "ciRunIDs"
+      ]
+    },
+    "contractPins": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "saintvision-proof-build-provenance:1": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "contractSHA256": {
+              "const": "57169c1e179332aeb41fd9c50ba9abaa01cc816564eb134eec6aeeb59a146793"
+            },
+            "schemaSHA256": {
+              "const": "ec75c0fa90cf6ee3d5f32f591aca3042e67a5e10989f5968b106517d8e70cba4"
+            },
+            "codec": {
+              "const": "normalized-proof-v1"
+            },
+            "requiredVerifier": {
+              "const": "pretrusted:build-provenance:1"
+            }
+          },
+          "required": [
+            "contractSHA256",
+            "schemaSHA256",
+            "codec",
+            "requiredVerifier"
+          ]
+        },
+        "saintvision-proof-ci-attestation:1": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "contractSHA256": {
+              "const": "6b1058699c5b2f9e57c69e4a53372dac19ca3fee6b407f9ee58f08de3f80a0bc"
+            },
+            "schemaSHA256": {
+              "const": "9ef78efbf72c62356c3cd254c1e6fba5dbf63e3bad2bc77578365d934a09ebf1"
+            },
+            "codec": {
+              "const": "normalized-proof-v1"
+            },
+            "requiredVerifier": {
+              "const": "pretrusted:ci-attestation:1"
+            }
+          },
+          "required": [
+            "contractSHA256",
+            "schemaSHA256",
+            "codec",
+            "requiredVerifier"
+          ]
+        },
+        "saintvision-proof-descendant-quiescence:1": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "contractSHA256": {
+              "const": "08bdfb17d2adc7189bacf5964a27fd71e423ab3782d92a6eafd3e53b6e90c1cc"
+            },
+            "schemaSHA256": {
+              "const": "d662dc3e3381a787f28714423dc975b21ad8a90907b137dfd8439e9467f88413"
+            },
+            "codec": {
+              "const": "normalized-proof-v1"
+            },
+            "requiredVerifier": {
+              "const": "pretrusted:descendant-quiescence:1"
+            }
+          },
+          "required": [
+            "contractSHA256",
+            "schemaSHA256",
+            "codec",
+            "requiredVerifier"
+          ]
+        },
+        "saintvision-proof-g2-planning-policy:1": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "contractSHA256": {
+              "const": "6c3007fe677038fc878ee1180337c72a09f99961702b7b0cb934972999c560cd"
+            },
+            "schemaSHA256": {
+              "const": "650e913892cb3b501e387fd0461cd4db51a8711c34c799babc025b9cc6123d8b"
+            },
+            "codec": {
+              "const": "normalized-proof-v1"
+            },
+            "requiredVerifier": {
+              "const": "pretrusted:g2-planning-policy:1"
+            }
+          },
+          "required": [
+            "contractSHA256",
+            "schemaSHA256",
+            "codec",
+            "requiredVerifier"
+          ]
+        },
+        "saintvision-proof-image-distribution:1": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "contractSHA256": {
+              "const": "39c1a706ccf54187e9182eea0f19cead9b3959902442e8d73443ed4d5dd6d974"
+            },
+            "schemaSHA256": {
+              "const": "f59b10102399f8b3c5f91d1d61f84fb5e4372920811dbe6da3cda9cc275215c8"
+            },
+            "codec": {
+              "const": "normalized-proof-v1"
+            },
+            "requiredVerifier": {
+              "const": "pretrusted:image-distribution:1"
+            }
+          },
+          "required": [
+            "contractSHA256",
+            "schemaSHA256",
+            "codec",
+            "requiredVerifier"
+          ]
+        },
+        "saintvision-proof-independent-code-review:1": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "contractSHA256": {
+              "const": "ad81f205d924cfb93aa2f95a8f698818878adc44ce869421335b720b8861136c"
+            },
+            "schemaSHA256": {
+              "const": "54394f4b3b8ceee9fcffb3111eb565a9ad452d19e01c4eac9e5a30f6a8847a89"
+            },
+            "codec": {
+              "const": "normalized-proof-v1"
+            },
+            "requiredVerifier": {
+              "const": "pretrusted:independent-code-review:1"
+            }
+          },
+          "required": [
+            "contractSHA256",
+            "schemaSHA256",
+            "codec",
+            "requiredVerifier"
+          ]
+        },
+        "saintvision-proof-independent-plan-review:1": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "contractSHA256": {
+              "const": "c4a2ccd10b8e7e4f8aad7e18803d7d1049cbffdfcaa56ea33c711799fdd605ba"
+            },
+            "schemaSHA256": {
+              "const": "f3bffb3e70b853236dd973550af2ff38aa5acff2593d1bb757ad3eb92c705f4f"
+            },
+            "codec": {
+              "const": "normalized-proof-v1"
+            },
+            "requiredVerifier": {
+              "const": "pretrusted:independent-plan-review:1"
+            }
+          },
+          "required": [
+            "contractSHA256",
+            "schemaSHA256",
+            "codec",
+            "requiredVerifier"
+          ]
+        },
+        "saintvision-proof-inventory-head-readback:1": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "contractSHA256": {
+              "const": "d31962924a87403f6117cadbd1ff29569c7181b8c63f12965c88f6d17337af79"
+            },
+            "schemaSHA256": {
+              "const": "01e115e8f9b7268ca412cfd8a33fdf93d29c9255ff761ac81e5b6bcd87066614"
+            },
+            "codec": {
+              "const": "normalized-proof-v1"
+            },
+            "requiredVerifier": {
+              "const": "pretrusted:inventory-head-readback:1"
+            }
+          },
+          "required": [
+            "contractSHA256",
+            "schemaSHA256",
+            "codec",
+            "requiredVerifier"
+          ]
+        },
+        "saintvision-proof-launch-surface-inventory:1": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "contractSHA256": {
+              "const": "e5fadf62766737cddc44ba463ad0f4935eaee752e55beaa9d4bae77e7c089117"
+            },
+            "schemaSHA256": {
+              "const": "7adedccf531968117bc985819a0d621ea5ea286a7cabbe04f6233c1a4aabb8e0"
+            },
+            "codec": {
+              "const": "normalized-proof-v1"
+            },
+            "requiredVerifier": {
+              "const": "pretrusted:launch-surface-inventory:1"
+            }
+          },
+          "required": [
+            "contractSHA256",
+            "schemaSHA256",
+            "codec",
+            "requiredVerifier"
+          ]
+        },
+        "saintvision-proof-m2-capability:1": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "contractSHA256": {
+              "const": "9ae795c1f5962c54eeafd0feb8beabdba8d6362921d994aee66489919d7ba748"
+            },
+            "schemaSHA256": {
+              "const": "57c5db5e2533244c3ad8dd5e47c639626616b50e48ffbd32513f2c9a6d4fcfbd"
+            },
+            "codec": {
+              "const": "normalized-proof-v1"
+            },
+            "requiredVerifier": {
+              "const": "pretrusted:m2-capability:1"
+            }
+          },
+          "required": [
+            "contractSHA256",
+            "schemaSHA256",
+            "codec",
+            "requiredVerifier"
+          ]
+        },
+        "saintvision-proof-member-progress-evidence:1": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "contractSHA256": {
+              "const": "f801a27df679b2c78c22d5135cb951c28ba3f82f1ab7e3e02fbd02a4042e154d"
+            },
+            "schemaSHA256": {
+              "const": "8170de0758758dc5fe5be046ff923dbb72023b58a5b5f0bf59a381c33efba29d"
+            },
+            "codec": {
+              "const": "normalized-proof-v1"
+            },
+            "requiredVerifier": {
+              "const": "pretrusted:member-progress-evidence:1"
+            }
+          },
+          "required": [
+            "contractSHA256",
+            "schemaSHA256",
+            "codec",
+            "requiredVerifier"
+          ]
+        },
+        "saintvision-proof-migration-effect-readback:1": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "contractSHA256": {
+              "const": "c6dcd04184732881856f2e5e2bf8e32770b3419395fef08d04f350e9c5462e86"
+            },
+            "schemaSHA256": {
+              "const": "d5d08bd89b26749fd8d07a099a6ba7f7daa31f9a3c057c4b39a1ed90c98eee16"
+            },
+            "codec": {
+              "const": "normalized-proof-v1"
+            },
+            "requiredVerifier": {
+              "const": "pretrusted:migration-effect-readback:1"
+            }
+          },
+          "required": [
+            "contractSHA256",
+            "schemaSHA256",
+            "codec",
+            "requiredVerifier"
+          ]
+        },
+        "saintvision-proof-migration-event-evidence:1": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "contractSHA256": {
+              "const": "7ad54c7fc2380880ca62e9a8ba3b745dc64daecca71ca2b6ed29ff5d145f5615"
+            },
+            "schemaSHA256": {
+              "const": "345256de3a239204fb61b4b9381bb1b30b16d99f0346e3c59481e66c4e2fb9bc"
+            },
+            "codec": {
+              "const": "normalized-proof-v1"
+            },
+            "requiredVerifier": {
+              "const": "pretrusted:migration-event-evidence:1"
+            }
+          },
+          "required": [
+            "contractSHA256",
+            "schemaSHA256",
+            "codec",
+            "requiredVerifier"
+          ]
+        },
+        "saintvision-proof-native-two-cycle:1": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "contractSHA256": {
+              "const": "10ecd7182b813d5e2f64e91c585b0507091b6efe8c3acf2465e87e13d3d1eb3d"
+            },
+            "schemaSHA256": {
+              "const": "e46e56d2fee968e83940b106e5a211f4f705e875258668c4af52927182143c7c"
+            },
+            "codec": {
+              "const": "normalized-proof-v1"
+            },
+            "requiredVerifier": {
+              "const": "pretrusted:native-two-cycle:1"
+            }
+          },
+          "required": [
+            "contractSHA256",
+            "schemaSHA256",
+            "codec",
+            "requiredVerifier"
+          ]
+        },
+        "saintvision-proof-no-overlap:1": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "contractSHA256": {
+              "const": "09a5bdcb43d5d23bca789aeb10a400f6902efb72cf0ecbc10fb61f8b7d4ac68e"
+            },
+            "schemaSHA256": {
+              "const": "3153c18ab404681bbfb218e72d0dbdfe671f5d30fdf9fea0f611c176f628db1d"
+            },
+            "codec": {
+              "const": "normalized-proof-v1"
+            },
+            "requiredVerifier": {
+              "const": "pretrusted:no-overlap:1"
+            }
+          },
+          "required": [
+            "contractSHA256",
+            "schemaSHA256",
+            "codec",
+            "requiredVerifier"
+          ]
+        },
+        "saintvision-proof-node-floor-v2:1": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "contractSHA256": {
+              "const": "ef03e4c2a035672a829d81d43c0d09be0483c196dda4b3664451ecd3b607e4fa"
+            },
+            "schemaSHA256": {
+              "const": "14f09f682837e8abfd84cfafc6acde88734e0d6480fec4098c0c4a60230fbf01"
+            },
+            "codec": {
+              "const": "native-m2-v2"
+            },
+            "requiredVerifier": {
+              "const": "pretrusted:node-floor-v2:1"
+            }
+          },
+          "required": [
+            "contractSHA256",
+            "schemaSHA256",
+            "codec",
+            "requiredVerifier"
+          ]
+        },
+        "saintvision-proof-old-new-no-write:1": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "contractSHA256": {
+              "const": "9719c303f4c31c7e0683e46a97d5405ec5d99c413351c8c3e85db3e2cc026c73"
+            },
+            "schemaSHA256": {
+              "const": "37b7d1ca5893e70b863eac650074358df3d1151871afe487ec84a87ded902aa6"
+            },
+            "codec": {
+              "const": "normalized-proof-v1"
+            },
+            "requiredVerifier": {
+              "const": "pretrusted:old-new-no-write:1"
+            }
+          },
+          "required": [
+            "contractSHA256",
+            "schemaSHA256",
+            "codec",
+            "requiredVerifier"
+          ]
+        },
+        "saintvision-proof-owned-engine-exec:1": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "contractSHA256": {
+              "const": "b234a4dadeb31df06540e04d0af353a92ba05d43c42cbbafd04ed5812c3679b4"
+            },
+            "schemaSHA256": {
+              "const": "4b521aaee09f39b4daf74448c696f24768003d9262e653fbc338561ea5a84119"
+            },
+            "codec": {
+              "const": "normalized-proof-v1"
+            },
+            "requiredVerifier": {
+              "const": "pretrusted:owned-engine-exec:1"
+            }
+          },
+          "required": [
+            "contractSHA256",
+            "schemaSHA256",
+            "codec",
+            "requiredVerifier"
+          ]
+        },
+        "saintvision-proof-process-quiescence:1": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "contractSHA256": {
+              "const": "2267728118b38c039d9dc21fe85adf8346ac38508feda76f079f59ce36126776"
+            },
+            "schemaSHA256": {
+              "const": "6be629f142a908f8a92e68a571fe2eab72a2134ccfb1c7a23a5e92d2fe6a173a"
+            },
+            "codec": {
+              "const": "normalized-proof-v1"
+            },
+            "requiredVerifier": {
+              "const": "pretrusted:process-quiescence:1"
+            }
+          },
+          "required": [
+            "contractSHA256",
+            "schemaSHA256",
+            "codec",
+            "requiredVerifier"
+          ]
+        },
+        "saintvision-proof-protected-tree-equality:1": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "contractSHA256": {
+              "const": "405a06f1e7d3b3855a7920f1c5f2a14c88121854d64f4d70fd035e1221f4d9f3"
+            },
+            "schemaSHA256": {
+              "const": "87f30c0d14e5dd738cc6c55f6108cdfbf0af56ee178f85d3a99887f32567914a"
+            },
+            "codec": {
+              "const": "normalized-proof-v1"
+            },
+            "requiredVerifier": {
+              "const": "pretrusted:protected-tree-equality:1"
+            }
+          },
+          "required": [
+            "contractSHA256",
+            "schemaSHA256",
+            "codec",
+            "requiredVerifier"
+          ]
+        },
+        "saintvision-proof-root-execution-decision:1": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "contractSHA256": {
+              "const": "4e88dfd58f1e564beb6c0459d43641ec2fe903772e259c3541b546cfd9b0fb25"
+            },
+            "schemaSHA256": {
+              "const": "1e48a65750575b9013bf6c1f4a2c7a755d02a89ec80abe2ed895b00b878c6423"
+            },
+            "codec": {
+              "const": "normalized-proof-v1"
+            },
+            "requiredVerifier": {
+              "const": "pretrusted:root-execution-decision:1"
+            }
+          },
+          "required": [
+            "contractSHA256",
+            "schemaSHA256",
+            "codec",
+            "requiredVerifier"
+          ]
+        },
+        "saintvision-proof-root-publication-intent:1": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "contractSHA256": {
+              "const": "3716b51a60a37beef9939bba50e9c398cdb008f50aee41e48799d675b7054d68"
+            },
+            "schemaSHA256": {
+              "const": "09c7a38c987ed058d7738349eac50d07b8e47c16f8dc5e68adf75633ee542ef7"
+            },
+            "codec": {
+              "const": "normalized-proof-v1"
+            },
+            "requiredVerifier": {
+              "const": "pretrusted:root-publication-intent:1"
+            }
+          },
+          "required": [
+            "contractSHA256",
+            "schemaSHA256",
+            "codec",
+            "requiredVerifier"
+          ]
+        },
+        "saintvision-proof-root-restart-restore:1": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "contractSHA256": {
+              "const": "a55312190de97c423055b80e61c104ffb73b91cd0dd50fb3865bf5b67c274626"
+            },
+            "schemaSHA256": {
+              "const": "87d1e23248113b03453cfccfdd91495d1e5090ac913202f908c88b0b0851e3ed"
+            },
+            "codec": {
+              "const": "normalized-proof-v1"
+            },
+            "requiredVerifier": {
+              "const": "pretrusted:root-restart-restore:1"
+            }
+          },
+          "required": [
+            "contractSHA256",
+            "schemaSHA256",
+            "codec",
+            "requiredVerifier"
+          ]
+        },
+        "saintvision-proof-root-seal-decision:1": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "contractSHA256": {
+              "const": "a70bb825aaed6301f730f33261e3c648b94d51975d6ac5a499fab9b9175f0bef"
+            },
+            "schemaSHA256": {
+              "const": "2d277069f0d6ef238d496b03c15b5b2ab8a37c16dbad15a00a2afcffa9466acf"
+            },
+            "codec": {
+              "const": "normalized-proof-v1"
+            },
+            "requiredVerifier": {
+              "const": "pretrusted:root-seal-decision:1"
+            }
+          },
+          "required": [
+            "contractSHA256",
+            "schemaSHA256",
+            "codec",
+            "requiredVerifier"
+          ]
+        },
+        "saintvision-proof-runtime-inspection-after:1": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "contractSHA256": {
+              "const": "d9b8b80b0e660e6925bb1ab2ddb1b3fcf9eeb537fca381a7074cefdd199cbfa6"
+            },
+            "schemaSHA256": {
+              "const": "560bf6179890ebef3e02aa1220c8115cc7eadeba8f9d1e2600bd020d96655e2a"
+            },
+            "codec": {
+              "const": "normalized-proof-v1"
+            },
+            "requiredVerifier": {
+              "const": "pretrusted:runtime-inspection-after:1"
+            }
+          },
+          "required": [
+            "contractSHA256",
+            "schemaSHA256",
+            "codec",
+            "requiredVerifier"
+          ]
+        },
+        "saintvision-proof-runtime-inspection-before:1": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "contractSHA256": {
+              "const": "4f43ed65324d3aff28e21e1b1a9c15b0799596e8ff6fda0728ae26f108f6c6e7"
+            },
+            "schemaSHA256": {
+              "const": "d8be7a9531caef138086db9e85a5d8733e0fa3e9d56b4ae4c69ccfafc13bf90d"
+            },
+            "codec": {
+              "const": "normalized-proof-v1"
+            },
+            "requiredVerifier": {
+              "const": "pretrusted:runtime-inspection-before:1"
+            }
+          },
+          "required": [
+            "contractSHA256",
+            "schemaSHA256",
+            "codec",
+            "requiredVerifier"
+          ]
+        },
+        "saintvision-proof-schedule-disabled-readback:1": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "contractSHA256": {
+              "const": "39c6b61caa9ecb86b1c5792cb0c63c2f492b6e04606e70803025ebb6d8cc7994"
+            },
+            "schemaSHA256": {
+              "const": "8d4c081260c8c715f5ff48ca35e2aba7436fdaac090d3d8624fe418134d846d0"
+            },
+            "codec": {
+              "const": "normalized-proof-v1"
+            },
+            "requiredVerifier": {
+              "const": "pretrusted:schedule-disabled-readback:1"
+            }
+          },
+          "required": [
+            "contractSHA256",
+            "schemaSHA256",
+            "codec",
+            "requiredVerifier"
+          ]
+        },
+        "saintvision-proof-unchanged-mtls:1": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "contractSHA256": {
+              "const": "1f26d116a9e1b6baa3730f6c0bcdf8cec19ee9cec6d0c834b58b558c1f967dec"
+            },
+            "schemaSHA256": {
+              "const": "48df9c31a686880e3e268046cd5248f45c202231da9c88cc9d3f10de2af6365f"
+            },
+            "codec": {
+              "const": "normalized-proof-v1"
+            },
+            "requiredVerifier": {
+              "const": "pretrusted:unchanged-mtls:1"
+            }
+          },
+          "required": [
+            "contractSHA256",
+            "schemaSHA256",
+            "codec",
+            "requiredVerifier"
+          ]
+        }
+      },
+      "required": [
+        "saintvision-proof-build-provenance:1",
+        "saintvision-proof-ci-attestation:1",
+        "saintvision-proof-descendant-quiescence:1",
+        "saintvision-proof-g2-planning-policy:1",
+        "saintvision-proof-image-distribution:1",
+        "saintvision-proof-independent-code-review:1",
+        "saintvision-proof-independent-plan-review:1",
+        "saintvision-proof-inventory-head-readback:1",
+        "saintvision-proof-launch-surface-inventory:1",
+        "saintvision-proof-m2-capability:1",
+        "saintvision-proof-member-progress-evidence:1",
+        "saintvision-proof-migration-effect-readback:1",
+        "saintvision-proof-migration-event-evidence:1",
+        "saintvision-proof-native-two-cycle:1",
+        "saintvision-proof-no-overlap:1",
+        "saintvision-proof-node-floor-v2:1",
+        "saintvision-proof-old-new-no-write:1",
+        "saintvision-proof-owned-engine-exec:1",
+        "saintvision-proof-process-quiescence:1",
+        "saintvision-proof-protected-tree-equality:1",
+        "saintvision-proof-root-execution-decision:1",
+        "saintvision-proof-root-publication-intent:1",
+        "saintvision-proof-root-restart-restore:1",
+        "saintvision-proof-root-seal-decision:1",
+        "saintvision-proof-runtime-inspection-after:1",
+        "saintvision-proof-runtime-inspection-before:1",
+        "saintvision-proof-schedule-disabled-readback:1",
+        "saintvision-proof-unchanged-mtls:1"
+      ]
+    },
+    "grants": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 512,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "role": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^[ -~]+$"
+          },
+          "authorityScopeC2Hex": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 131072,
+            "pattern": "^(?:[0-9a-f]{2})+$"
+          },
+          "publicKeyHex": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$",
+            "not": {
+              "pattern": "^0+$"
+            }
+          },
+          "notBefore": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "notAfter": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9007199254740991
+          }
+        },
+        "required": [
+          "role",
+          "authorityScopeC2Hex",
+          "publicKeyHex",
+          "notBefore",
+          "notAfter"
+        ]
+      }
+    },
+    "cohortId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^[ -~]+$"
+    },
+    "members": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "prefixItems": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "slot": {
+              "const": "PC2"
+            },
+            "scope": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "tenantId": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 128,
+                  "pattern": "^[ -~]+$"
+                },
+                "nodeId": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 128,
+                  "pattern": "^[ -~]+$"
+                },
+                "recoveryEpoch": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 128,
+                  "pattern": "^[ -~]+$"
+                }
+              },
+              "required": [
+                "tenantId",
+                "nodeId",
+                "recoveryEpoch"
+              ]
+            },
+            "certificateDERHex": {
+              "type": "string",
+              "minLength": 2,
+              "maxLength": 131072,
+              "pattern": "^(?:[0-9a-f]{2})+$"
+            },
+            "caRootDERHex": {
+              "type": "string",
+              "minLength": 2,
+              "maxLength": 131072,
+              "pattern": "^(?:[0-9a-f]{2})+$"
+            }
+          },
+          "required": [
+            "slot",
+            "scope",
+            "certificateDERHex",
+            "caRootDERHex"
+          ]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "slot": {
+              "const": "PC4"
+            },
+            "scope": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "tenantId": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 128,
+                  "pattern": "^[ -~]+$"
+                },
+                "nodeId": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 128,
+                  "pattern": "^[ -~]+$"
+                },
+                "recoveryEpoch": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 128,
+                  "pattern": "^[ -~]+$"
+                }
+              },
+              "required": [
+                "tenantId",
+                "nodeId",
+                "recoveryEpoch"
+              ]
+            },
+            "certificateDERHex": {
+              "type": "string",
+              "minLength": 2,
+              "maxLength": 131072,
+              "pattern": "^(?:[0-9a-f]{2})+$"
+            },
+            "caRootDERHex": {
+              "type": "string",
+              "minLength": 2,
+              "maxLength": 131072,
+              "pattern": "^(?:[0-9a-f]{2})+$"
+            }
+          },
+          "required": [
+            "slot",
+            "scope",
+            "certificateDERHex",
+            "caRootDERHex"
+          ]
+        }
+      ],
+      "items": false
+    },
+    "graphHex": {
+      "type": "string",
+      "minLength": 2,
+      "maxLength": 12582912,
+      "pattern": "^(?:[0-9a-f]{2})+$"
+    },
+    "nodeKinds": {
+      "type": "object",
+      "minProperties": 1,
+      "maxProperties": 4096,
+      "propertyNames": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 256,
+        "pattern": "^[ -~]+$"
+      },
+      "additionalProperties": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 128,
+        "pattern": "^[ -~]+$"
+      }
+    }
+  },
+  "required": [
+    "selector",
+    "version",
+    "verifier",
+    "contractPins",
+    "grants",
+    "cohortId",
+    "members",
+    "graphHex",
+    "nodeKinds"
+  ],
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://fleet5-candidate.invalid/p02/policy-payload-candidate-1",
+  "title": "UNREGISTERED sealed policy payload, no status or RegistrySHA256 self claim"
+}

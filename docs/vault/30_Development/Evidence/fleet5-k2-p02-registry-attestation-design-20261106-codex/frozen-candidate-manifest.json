@@ -1,0 +1,175 @@
+{
+  "classification": "IMMUTABLE_CANDIDATE_INPUT_DIGESTS_NOT_AUTHORIZATION",
+  "base": "c76d0d66895503adde39288544929ff35cd6c281",
+  "files": [
+    {
+      "file": "authoring-attempts.json",
+      "bytes": 601,
+      "SHA256": "b569a184fe03886559ed90829a9fbe524afa91b4f8ea3c712122dc913be4c195"
+    },
+    {
+      "file": "authority-matrix.json",
+      "bytes": 42168,
+      "SHA256": "4f6e40a3e5b49487304fa227507da8fcf751328a94523916638e880a3509b57c"
+    },
+    {
+      "file": "candidate-envelope.schema.json",
+      "bytes": 16211,
+      "SHA256": "6681ed2028e5606cf1dd1bd034c53ca5d179fff7b42a16dca4bd2b4a6112a4cb"
+    },
+    {
+      "file": "candidate-generation-attempt-02.json",
+      "bytes": 363,
+      "SHA256": "f1109b07cd67186a7e00ff0231a27b3d331e7b80b38fb2b99b0543cd02d4b655"
+    },
+    {
+      "file": "candidate-test-attempt-01.json",
+      "bytes": 760,
+      "SHA256": "84b949e2a1043c26bf380ca3fbd3097f8fdd93a725288a4bee5034a816a0a94b"
+    },
+    {
+      "file": "candidate-test-before-capsule-closure.json",
+      "bytes": 23800,
+      "SHA256": "81b089f384ba357b6a085480f3387b9e36721fee03c5224bbdfbb194b903b789"
+    },
+    {
+      "file": "candidate-test-before-record-identity-closure.json",
+      "bytes": 22925,
+      "SHA256": "738135e381e634643b259927561d4bee78a2975c4d915cf10f720872c53dd240"
+    },
+    {
+      "file": "candidate-test-results.json",
+      "bytes": 24152,
+      "SHA256": "fde727a5893d0d54886baf638190fba535980d7ba6b613a8a3a561786e2a2c5f"
+    },
+    {
+      "file": "candidate_model.py",
+      "bytes": 12813,
+      "SHA256": "533cc4a7229c67701c26bc8609e2bf3624fd7310a692da108fdca951b47acb67"
+    },
+    {
+      "file": "contract.md",
+      "bytes": 26602,
+      "SHA256": "4a3d4a0e17a0585343b25b7628da3bdf2acfd72e181eba18676d7a46ceeb1682"
+    },
+    {
+      "file": "gate-01-check_docs.log",
+      "bytes": 126,
+      "SHA256": "fe6709ab10790f4f41452ae1fcba11883fcbd0d1403b4ee85d0b08ed40691c30"
+    },
+    {
+      "file": "gate-02-check_ontology_generation.log",
+      "bytes": 70,
+      "SHA256": "9d8298b5f2bd5db7b4548a54f9a88ff16463feb7d786c45e502c0900fb1a89e7"
+    },
+    {
+      "file": "gate-03-check_ontology.log",
+      "bytes": 162,
+      "SHA256": "e7d3aaf1eda371ff7035720c656da1e87c472c90cdc26d7a7e7161fdd4a0246f"
+    },
+    {
+      "file": "gate-04-check_contract_bindings.log",
+      "bytes": 1637,
+      "SHA256": "d20a071705a3f6c9c651eadefe41d48f3e045b209a7d547f9adafcaaa9657b2c"
+    },
+    {
+      "file": "gate-05-check_frontend_integrity.log",
+      "bytes": 148,
+      "SHA256": "5fcd00e09a33916acc1fbe04d132a92fc9315337073ec61fe392deb7ac613353"
+    },
+    {
+      "file": "gate-06-check_doc_path_citations.log",
+      "bytes": 111,
+      "SHA256": "a560a6b6ab2fd27754fb4b97f5997ebeb9968b3b6d95491420d6a6744eab5a6b"
+    },
+    {
+      "file": "gate-07-check_doc_single_source.log",
+      "bytes": 79,
+      "SHA256": "ef5067403172ab7be30011face3cf89221e099c773e0517cce6158a79345807a"
+    },
+    {
+      "file": "gate-08-test_sync.log",
+      "bytes": 2108,
+      "SHA256": "286800df3f196bddfb48aa20241ee65b2748d42788931ba146172b70fec16dea"
+    },
+    {
+      "file": "gate-09-build_docs.log",
+      "bytes": 71,
+      "SHA256": "b7ab5135f765d32bf936b3ddd258a4fdb67fffd42a2656994c55761fb7953a57"
+    },
+    {
+      "file": "gate-10-sync_obsidian.log",
+      "bytes": 73,
+      "SHA256": "60cdba7201990ad933301f757cef9d33fd3a69df32a8f6fbb48056240a42d9f0"
+    },
+    {
+      "file": "generate_p02_tables.py.txt",
+      "bytes": 13098,
+      "SHA256": "493b4de50ff768a5bbdc2c82730f61628184c8431f1ef66e320a696b5b3433ee"
+    },
+    {
+      "file": "inspect_p02_sources.py.txt",
+      "bytes": 5946,
+      "SHA256": "eddac4cbbca270ec17919f377c5d56d158c65b7a442984a8402bfd2a55e83aa3"
+    },
+    {
+      "file": "local-execution-and-pins.json",
+      "bytes": 4101,
+      "SHA256": "671cebce1191f6c384c46cf4517136668a0fcf5af855dcd7ee96358b46cef570"
+    },
+    {
+      "file": "local-required-gates.json",
+      "bytes": 6048,
+      "SHA256": "30a4e999cb3c6a7c131f01d574a08436918bfba1a8f95851c208354cd00a2b46"
+    },
+    {
+      "file": "policy-payload.schema.json",
+      "bytes": 30338,
+      "SHA256": "dbca16700404039a886d218c49f53689cff73b0af1871b76fa6f785516e0f414"
+    },
+    {
+      "file": "provisioning-parameters.json",
+      "bytes": 7616,
+      "SHA256": "934325049d751f5c1239a62fa89c8b5f7b0ef952e705257a3025a2b35b91fc53"
+    },
+    {
+      "file": "real-bindings-HOLD.json",
+      "bytes": 876,
+      "SHA256": "406082e62a218e64cc9a12a5396d77618ba3fdadf21563e440905351ca44045a"
+    },
+    {
+      "file": "refusal-matrix.json",
+      "bytes": 2848,
+      "SHA256": "7fb300ef8ee55d4216405fe5e6f39d4a572f9facaf39d009bbad25c54dbc1c11"
+    },
+    {
+      "file": "run_required_gates.py.txt",
+      "bytes": 2571,
+      "SHA256": "64a066f77c9f2a37d3eec7615bd43d2db28de2c923e821bfd9d5d74db20a8ba8"
+    },
+    {
+      "file": "source-inspection.json",
+      "bytes": 76142,
+      "SHA256": "3b3af3f07bf061b086a0410d01804736be76ead294af0d16f8aefc7fc61c7c6f"
+    },
+    {
+      "file": "synthetic-control.json",
+      "bytes": 6596,
+      "SHA256": "925ea504bd2fe02112e1fa2a563aa9e820209d19ee3aedb1802f686ee06b9cfc"
+    },
+    {
+      "file": "synthetic-policy-shape.json",
+      "bytes": 11853,
+      "SHA256": "1625d1052174f115879e104e07d4c195711f1a1fd5becb008536a2813882978a"
+    },
+    {
+      "file": "test_candidate.py",
+      "bytes": 15853,
+      "SHA256": "d25233b3179c6ca426d6805a427f9fa4fa7d7c6c0780f437ec0879c66a00dfe1"
+    }
+  ],
+  "manifestSelfExcluded": true,
+  "actualProducerSHA256": null,
+  "actualBindings": "NULL_HOLD",
+  "preparedKST": "2026-11-06T23:32:02.223491+09:00"
+}

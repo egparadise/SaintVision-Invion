@@ -1,0 +1,129 @@
+{
+  "classification": "SYNTHETIC_ALREADY_BOUND_NO_CRYPTO_OR_PRODUCER_RUNTIME_ACCEPTANCE",
+  "envelope": {
+    "body": {
+      "format": "fleet5-p02-registry-candidate:1",
+      "purpose": "installed-policy-registry",
+      "selector": "synthetic_legacy_two",
+      "scopeSHA256": "9191919191919191919191919191919191919191919191919191919191919191",
+      "capsuleSHA256": "9595959595959595959595959595959595959595959595959595959595959595",
+      "provisioningGeneration": "synthetic-install-1",
+      "anchorVersion": 1,
+      "recordVersion": 7,
+      "requestBindingSHA256": "9292929292929292929292929292929292929292929292929292929292929292",
+      "issuedAt": 990,
+      "validUntil": 1100,
+      "facts": {
+        "reviewSHA": "a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1",
+        "semanticPinsSHA256": "a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1",
+        "cohortScopeSHA256": "9191919191919191919191919191919191919191919191919191919191919191",
+        "runningRuntimeLockSHA256": "d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4",
+        "contractSetSHA256": "a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1",
+        "installationReceiptSHA256": "c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3",
+        "runningLinkedClosureSHA256": "e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5",
+        "registryProofSlotsSHA256": "a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1",
+        "sourceEquivalenceSHA256": "a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1",
+        "runningMeasurementSHA256": "a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1",
+        "binaryVCSRevision": "a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1",
+        "graphSHA256": "a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1",
+        "policyPayloadSHA256": "b5a016ea249ecbad8b8bfe7cd930c47fb32e23a25b7163337cf38af8aafdc2e4",
+        "sourceTreeSHA256": "a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1",
+        "helperClosureSHA256": "a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1",
+        "runtimeLockSHA256": "d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4",
+        "installationBinarySHA256": "b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2",
+        "keyGrantsSHA256": "a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1",
+        "binarySHA256": "b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2",
+        "runningReceiptSHA256": "c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3",
+        "runningSourceSHA": "a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1",
+        "designRegistrationSHA256": "a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1",
+        "runningBinarySHA256": "b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2",
+        "sourceAcquisitionSHA256": "a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1",
+        "moduleClosureSHA256": "a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1",
+        "sourcePublicationAnchorSHA256": "a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1",
+        "reviewTargetSHA": "a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1",
+        "sourceSHA": "a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1",
+        "installationSourceSHA": "a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1",
+        "reviewCoverageSHA256": "a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1",
+        "linkedClosureSHA256": "e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5",
+        "artifactZipSHA256": "0425b3b3cd7975e1e3347b02772663aa85ca6d129f58df1ca34de4712344e28e",
+        "rootChoiceSHA256": "a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1",
+        "reviewScope": "synthetic-exact-scope",
+        "reviewVerdict": "SYNTHETIC_SCOPED_ACCEPT",
+        "toolchain": "synthetic-toolchain",
+        "artifactId": 303,
+        "artifactZipBytes": 51,
+        "binaryVCSModified": false
+      },
+      "ciRuns": [
+        {
+          "runId": 101,
+          "repository": "synthetic/repo",
+          "headSHA": "a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1",
+          "ref": "synthetic/ref",
+          "event": "workflow_dispatch",
+          "workflow": ".github/workflows/core.yml",
+          "correlation": "synthetic-one",
+          "attempt": 1,
+          "conclusion": "success",
+          "jobs": [
+            {
+              "id": 201,
+              "name": "core",
+              "conclusion": "success",
+              "steps": [
+                {
+                  "number": 1,
+                  "name": "actual-required-build",
+                  "conclusion": "success"
+                },
+                {
+                  "number": 2,
+                  "name": "actual-required-test",
+                  "conclusion": "success"
+                },
+                {
+                  "number": 3,
+                  "name": "explicit-optional-proof",
+                  "conclusion": "skipped"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "runId": 102,
+          "repository": "synthetic/repo",
+          "headSHA": "a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1",
+          "ref": "synthetic/ref",
+          "event": "workflow_dispatch",
+          "workflow": ".github/workflows/docs.yml",
+          "correlation": "synthetic-two",
+          "attempt": 1,
+          "conclusion": "success",
+          "jobs": [
+            {
+              "id": 202,
+              "name": "docs",
+              "conclusion": "success",
+              "steps": [
+                {
+                  "number": 1,
+                  "name": "actual-required-docs",
+                  "conclusion": "success"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "signer": {
+      "keySPKISHA256": "9393939393939393939393939393939393939393939393939393939393939393"
+    },
+    "signatureHex": "94949494949494949494949494949494949494949494949494949494949494949494949494949494949494949494949494949494949494949494949494949494"
+  },
+  "policyBytesHex": "53594e5448455449435f414c52454144595f424f554e445f504f4c4943595f42595445535f4e4f545f415f43455254494649434154455f4f525f52554e54494d455f50524f4f46",
+  "artifactBytesHex": "53594e5448455449435f414c52454144595f424f554e445f41525449464143545f42595445535f4e4f545f415f42494e415259",
+  "authorityOrigin": "In-memory static fixture ONLY; no key generation or signature verification",
+  "realAuthorities": "NULL_HOLD"
+}

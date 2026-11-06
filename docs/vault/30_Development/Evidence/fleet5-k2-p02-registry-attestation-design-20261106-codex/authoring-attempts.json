@@ -1,0 +1,18 @@
+{
+  "classification": "SOURCE_INSPECTION_NOT_TEST_OR_CI",
+  "attempts": [
+    {
+      "action": "Orca create with abbreviated identity",
+      "result": "LINEAGE_PARENT_NOT_FOUND; no checkout created; exact show-discovered repo::path then succeeded"
+    },
+    {
+      "action": "Public Governance print",
+      "result": "cp949 UnicodeEncodeError; repeated read UTF-8 output, no file change"
+    },
+    {
+      "action": "Prior catalog assumed rev2 path",
+      "exit": 128,
+      "result": "No such Git path; exact Git tree resolved inherited parent-level catalog; corrected source pin"
+    }
+  ]
+}

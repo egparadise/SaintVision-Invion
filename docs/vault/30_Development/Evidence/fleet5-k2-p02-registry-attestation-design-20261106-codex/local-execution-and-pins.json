@@ -1,0 +1,121 @@
+{
+  "classification": "DESIGN_CANDIDATE_STATIC_MODEL_ONLY_NO_PRODUCTION_AUTHENTICATOR",
+  "card": "FLEET5-K2-P02-INDEPENDENT-REGISTRY-ATTESTATION-DESIGN-20261106",
+  "task": "task_a95ef3d8ccce",
+  "dispatch": "ctx_ed23b4a777d0",
+  "grant": "msg_f68dc38baa0f",
+  "base": "c76d0d66895503adde39288544929ff35cd6c281",
+  "branch": "agent/codex/fleet5-k2-p02-registry-design-20261106",
+  "owner": "Codex",
+  "reviewer": "Actual independent Claude through Root pending",
+  "promptContextVersion": "Exact Root grant msg_f68dc38baa0f on same task/dispatch",
+  "agentVersion": "Codex; exact model runtime ID not exposed/not asserted",
+  "skills": {
+    "agentDelivery": "1.1.0",
+    "coreReliability": "1.0.0",
+    "orca": "1.4.248"
+  },
+  "harness": [
+    {
+      "file": "candidate_model.py",
+      "bytes": 12813,
+      "SHA256": "533cc4a7229c67701c26bc8609e2bf3624fd7310a692da108fdca951b47acb67"
+    },
+    {
+      "file": "test_candidate.py",
+      "bytes": 15853,
+      "SHA256": "d25233b3179c6ca426d6805a427f9fa4fa7d7c6c0780f437ec0879c66a00dfe1"
+    }
+  ],
+  "ROOF": "No new accepted ruleset; inherited source and separate candidate policy",
+  "environment": {
+    "python": "3.14.7 (tags/v3.14.7:823f032, Aug  5 2026, 10:51:32) [MSC v.1944 64 bit (AMD64)]",
+    "pythonExecutable": "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+    "jsonschema": "4.26.0",
+    "newDependenciesInstalled": false
+  },
+  "runs": [
+    {
+      "argv": [
+        "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+        "-I",
+        "-B",
+        ".work/generate_p02_tables.py"
+      ],
+      "exit": 0
+    },
+    {
+      "argv": [
+        "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+        "-I",
+        "-B",
+        "docs\\vault\\30_Development\\Evidence\\fleet5-k2-p02-registry-attestation-design-20261106-codex\\test_candidate.py"
+      ],
+      "exit": 0,
+      "completedKST": "2026-11-06T23:25:30.636697+09:00"
+    }
+  ],
+  "testCases": 100,
+  "syntheticAlreadyBoundControls": 4,
+  "negativeRefusals": 96,
+  "cryptographicSignatureVerification": "NOT_PERFORMED_SYMBOLIC_TABLE_ONLY",
+  "producerSHA256": null,
+  "realProducer": "ABSENT_NULL_HOLD",
+  "actualRuntimeA01A40": "NOT_RUN",
+  "currentAndEffects": "ABSENT_NOT_GRANTED",
+  "schemaAndCandidatePins": [
+    {
+      "file": "candidate_model.py",
+      "bytes": 12813,
+      "SHA256": "533cc4a7229c67701c26bc8609e2bf3624fd7310a692da108fdca951b47acb67"
+    },
+    {
+      "file": "test_candidate.py",
+      "bytes": 15853,
+      "SHA256": "d25233b3179c6ca426d6805a427f9fa4fa7d7c6c0780f437ec0879c66a00dfe1"
+    },
+    {
+      "file": "candidate-envelope.schema.json",
+      "bytes": 16211,
+      "SHA256": "6681ed2028e5606cf1dd1bd034c53ca5d179fff7b42a16dca4bd2b4a6112a4cb"
+    },
+    {
+      "file": "policy-payload.schema.json",
+      "bytes": 30338,
+      "SHA256": "dbca16700404039a886d218c49f53689cff73b0af1871b76fa6f785516e0f414"
+    },
+    {
+      "file": "contract.md",
+      "bytes": 26602,
+      "SHA256": "4a3d4a0e17a0585343b25b7628da3bdf2acfd72e181eba18676d7a46ceeb1682"
+    },
+    {
+      "file": "authority-matrix.json",
+      "bytes": 42168,
+      "SHA256": "4f6e40a3e5b49487304fa227507da8fcf751328a94523916638e880a3509b57c"
+    },
+    {
+      "file": "refusal-matrix.json",
+      "bytes": 2848,
+      "SHA256": "7fb300ef8ee55d4216405fe5e6f39d4a572f9facaf39d009bbad25c54dbc1c11"
+    },
+    {
+      "file": "provisioning-parameters.json",
+      "bytes": 7616,
+      "SHA256": "934325049d751f5c1239a62fa89c8b5f7b0ef952e705257a3025a2b35b91fc53"
+    },
+    {
+      "file": "source-inspection.json",
+      "bytes": 76142,
+      "SHA256": "3b3af3f07bf061b086a0410d01804736be76ead294af0d16f8aefc7fc61c7c6f"
+    },
+    {
+      "file": "candidate-test-results.json",
+      "bytes": 24152,
+      "SHA256": "fde727a5893d0d54886baf638190fba535980d7ba6b613a8a3a561786e2a2c5f"
+    }
+  ],
+  "sourceAndFinal": "SAME_FUTURE_IMMUTABLE_DOCS_COMMIT; actual head bound in final API handoff, not invented here",
+  "oneExactDocs": "AUTHORIZED_AFTER_COMMIT_PENDING",
+  "observedKST": "2026-11-06T23:28:23.438760+09:00"
+}
