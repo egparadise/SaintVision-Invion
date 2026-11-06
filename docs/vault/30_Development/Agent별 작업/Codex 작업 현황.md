@@ -1,15 +1,19 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.427"
+version: "1.0.428"
 status: "review"
 author: "Codex"
-updated: "2026-11-07T01:00:33+09:00"
+updated: "2026-11-07T01:06:36+09:00"
 source_of_truth: "Git"
 active_card: "FLEET5 continued supervision with PORTAL-REFRESH-FLEET-20261106"
-active_card_status: "P02actualde4M1L5Rev2FixOnly; UIR3source9cdCIreportpending; BRev9d; noactiveClaude; physicalincomplete"
-active_card_next: "Root verifies exactUIR3CI/report then ONE narrow review; owners finish Rev9d/P02Rev2; PC1actualkeyresult then SSH; noD04A7deploy100claim"
+active_card_status: "UIR3actualLintFailureMinimalFix; P02Rev2/BRev9d; noactiveClaude; TLSdefault18PinnedCA200; physicalincomplete"
+active_card_next: "Gemini fixes unusedcatch then fullLint/newsourceFrontend/finalDocs; Root verifies then ONE review; Codex Rev9d/Rev2; PC1actualkeyresult pending"
 ---
+
+## 2026-11-07T01:06:36+09:00 UI 실제 CI 실패 교정과 TLS 읽기 검증
+
+UI R3의 첫 Frontend42247974625는 사용하지 않는 catch 변수 한 건으로 lint exit1이었다. 컨테이너 job은 성공했지만 이후 프런트 시험·타입·빌드·산출물 단계는 skip이므로 전체 성공이 아니다. 같은 Gemini에 최소 수정과 새 소스 검증을 배정했다. 로컬 IdP는 지정 공개 CA로 HTTPS200이나 Windows 기본 신뢰는 인증서 오류18로 남는다. B Rev9d와 P02 Rev2 보완은 계속하며 실제5대 인수·전체 완료는 아직 아니다. 확인한 명령은 GitHub API/실패 로그 조회·Windows 저장소 및 두 HTTPS 연결의 읽기 전용 검사이며 모두 직접 exit0으로 실행했다. 다음 첫 행동/담당은 Gemini 최소 수정, 두 Codex 보완, Root의 고정 후보 CI와 독립 검토 연결이다.
 
 ## 2026-11-07T01:00:33+09:00 P02 실제 판정 반영과 UI 고정 후보
 

@@ -21,12 +21,14 @@
   "privateKeyMarkersAbsent": true,
   "pushForce": false,
   "RootCIOrIndependentAcceptance": false,
-  "atKST": "2026-11-07T01:00:33+09:00",
+  "atKST": "2026-11-07T01:06:36+09:00",
   "firstFrontendDispatchAuthorizedOnce": "2026-11-07T00:58:17+09:00",
   "sourceCommitAndRemoteVerified": true,
   "localGates": "OWNER_REPORT_PENDING",
-  "exactFrontendCI": "DISPATCHED_RESULTS_PENDING",
+  "exactFrontendCI": "42247974625_FAILED_ESLINT_UNUSED_CATCH",
   "finalDocs": "OWNER_REPORT_PENDING",
   "formalIndependentAcceptance": false,
-  "deployed": false
+  "deployed": false,
+  "failureAndMinimalFix": "portal-polling-r3-first-frontend-failure-root-correction.json",
+  "correctedSource": null
 }

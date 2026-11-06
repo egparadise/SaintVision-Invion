@@ -1,0 +1,39 @@
+{
+  "atKST": "2026-11-07T01:02:35+09:00",
+  "publicCertThumbprint": "5105ED0FA68391A85DAC1DABC3347E2A6ECDCC38",
+  "publicCertSHA256": "bda68b6358fc42c765eb463cd1259a08eb4625578a945a8e2b8c839cc5641f37",
+  "selfSigned": true,
+  "ca": true,
+  "notValidBeforeUTC": "2026-11-05T08:24:16+00:00",
+  "notValidAfterUTC": "2027-11-05T08:24:16+00:00",
+  "stores": [
+    {
+      "name": "ROOT",
+      "matchingCertificates": 0
+    },
+    {
+      "name": "CA",
+      "matchingCertificates": 0
+    },
+    {
+      "name": "MY",
+      "matchingCertificates": 0
+    }
+  ],
+  "HTTPS": [
+    {
+      "trust": "defaultWindows",
+      "error": "URLError",
+      "verifyCode": 18,
+      "verifyMessage": "self-signed certificate"
+    },
+    {
+      "trust": "exactPublicCA",
+      "http": 200,
+      "issuerMatches": true
+    }
+  ],
+  "storesModified": false,
+  "passwordUsed": false,
+  "browserControlled": false
+}
