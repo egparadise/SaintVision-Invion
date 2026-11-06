@@ -1,0 +1,28 @@
+{
+  "host": "Windows 11 Pro 10.0.26300, node v24.10.0, vitest 4.1.11, Python 3.10.11 (-I) for reviewer tools, about 200-530 MB free RAM, serial, maxWorkers=1",
+  "tree": "session scratch git-archive export of 9c25f3c9 (apps/web, contracts, tools, packages; 662/662 blobs hash-verified) + node_modules junction to supervision-integration-20261104 (215/215 installed versions equal lock, 50 optional absent)",
+  "commands": [
+    { "atKST": "2026-11-06T22:33:23+09:00", "cmd": "node node_modules/vitest/vitest.mjs run tests/portal-refresh-fleet-ui.test.tsx --no-file-parallelism --maxWorkers=1", "exit": 0, "result": "35/35 (first own run)" },
+    { "atKST": "2026-11-06T22:37:42+09:00", "cmd": "vitest run tests/reviewer_probe_uir2.test.tsx (scratch only)", "exit": 1, "result": "10 passed, 4 failed = counterexamples R1, R1b, R2, H3 (earlier identical runs 22:36:36 and 22:37:15 before adding the JSON report writer); report probeReportExact9c in reviewer-results.json" },
+    { "atKST": "2026-11-06T22:38:36+09:00", "cmd": "python -I reviewer_mutants.py <export> <scratch> (MA 22:38:42 .. FIX3 22:39:32 per-row vitest json timestamps; each runs author file + probe file, restores bytes)", "exit": 0, "result": "matrix in reviewer-results.json mutantAndFixMatrix; restored blobs App 70bad418 Header fdbe64ad ResourceExplorer 2ee822b6" },
+    { "atKST": "2026-11-06T22:40:39+09:00", "cmd": "vitest run tests/reviewer_probe_uir2_transport.test.tsx (real apiClient, fetch mocked)", "exit": 0, "result": "1/1; signals on /nodes /runs /approvals /workspaces aborted at 10s with REQUEST_TIMEOUT" },
+    { "atKST": "2026-11-06T22:42:41+09:00", "cmd": "vitest run tests/portal-refresh-fleet-ui.test.tsx", "exit": 0, "result": "35/35", "logSha256": "f5c4696a0d7c5719f668b6fe78decac42e8e39359e2654c2dcce15beff42dde7" },
+    { "atKST": "2026-11-06T22:42:48+09:00", "cmd": "vitest run tests/acc09-contrast-tokens.test.tsx", "exit": 0, "result": "46/46", "logSha256": "f955aaade788a3df9c8a74086216eb8e587335eff9d8d4f01f20f1b879b876e4" },
+    { "atKST": "2026-11-06T22:42:56+09:00", "cmd": "vitest run tests/app-node-certificate-freshness.test.tsx", "exit": 0, "result": "9/9", "logSha256": "b51b2d673acf54480c2fcc4b9a2e0cff381685f96921ac472a5f806957353891" },
+    { "atKST": "2026-11-06T22:43:02+09:00", "cmd": "vitest run tests/live-observation.test.tsx", "exit": 0, "result": "27/27", "logSha256": "a0ccc622d1d1853f528fa02e4f85c9a607cb228b9ba4b079e38859dac6cb0817" },
+    { "atKST": "2026-11-06T22:43:04+09:00", "cmd": "vitest run tests/run-approval-observation-contract.test.ts", "exit": 0, "result": "6/6", "logSha256": "6ee2266bf15e53a1f3ffb4eef1b59e0b275e53076966cac026e972c750cc17e6" },
+    { "atKST": "2026-11-06T22:43:05+09:00", "cmd": "vitest run tests/reviewer_probe_uir2.test.tsx", "exit": 1, "result": "10 passed, 4 failed (same counterexamples)", "logSha256": "7f3309e67a6987cfc7d39ae9c548657dd4e26ed1a49527c0364d1eeb9618f830" },
+    { "atKST": "2026-11-06T22:43:09+09:00", "cmd": "vitest run tests/reviewer_probe_uir2_transport.test.tsx", "exit": 0, "result": "1/1", "logSha256": "d2eb50b1a6dcfed674bc2487df60da5d1f17381fbf5e223314fbbefdaafa17dc" },
+    { "atKST": "2026-11-06T22:43:12+09:00", "cmd": "node node_modules/typescript/bin/tsc -b (export lacked packages/contracts-ts)", "exit": 2, "result": "35 errors from missing type-only package ../../../../packages/contracts-ts; environment gap, not a candidate result; wrote gitignored tsbuildinfo through junction (see review.json limits)", "logSha256": "c9adcc0b4fb40c274faa2355a4f8164ad94557834a798eb386cc291464470e0a" },
+    { "atKST": "2026-11-06T22:44:40+09:00", "cmd": "node node_modules/typescript/bin/tsc -p tsconfig.app.json --noEmit (packages added, re-verified 662 blobs)", "exit": 0, "result": "no output", "logSha256": "20e93068f7614527ce01f714318f4e1e5ac4f8609ab1da4abb81523a42ce3df8" },
+    { "atKST": "2026-11-06T22:44:45+09:00", "cmd": "node node_modules/typescript/bin/tsc -p tsconfig.node.json --noEmit", "exit": 0, "result": "no output", "logSha256": "20e93068f7614527ce01f714318f4e1e5ac4f8609ab1da4abb81523a42ce3df8" },
+    { "atKST": "2026-11-06T22:44:46+09:00", "cmd": "node node_modules/eslint/bin/eslint.js --max-warnings 0 <6 changed TS/TSX files>", "exit": 0, "result": "no output", "logSha256": "20e93068f7614527ce01f714318f4e1e5ac4f8609ab1da4abb81523a42ce3df8" },
+    { "atKST": "2026-11-06T22:45:08+09:00", "cmd": "python -I reviewer_mutants.py <export> <scratch> FIXALL_1_2_3", "exit": 0, "result": "49/49 pass; original blobs restored" },
+    { "atKST": "2026-11-06T22:41:30+09:00 (approximate, between transport probe 22:40:43 and fe runner 22:42:41)", "cmd": "gh api repos/{owner}/{repo}/actions/runs/42219574051 and /42221567010 (+/jobs), read-only", "exit": 0, "result": "Frontend head 22c20a83 frontend.yml workflow_dispatch attempt 1, jobs 127897973932 12/12 + 127897974300 14/14 success; Docs head 9c25f3c9 docs.yml attempt 1, job 127904637893 19/19 success" }
+  ],
+  "notRun": [
+    "live 3100/8080/8443/r5, browser, TLS, Docker, PG, PKI, SSH: out of scope by brief",
+    "full Vitest, vite build, backend/Go/old harness: unchanged by delta or covered by exact CI Frontend 42219574051",
+    "owner CI re-dispatch: forbidden by brief; Root verified Frontend 42219574051 and Docs 42221567010"
+  ]
+}

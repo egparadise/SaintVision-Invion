@@ -1,0 +1,47 @@
+import json, os, subprocess, sys
+REPO, COMMIT, ROOT = sys.argv[1], sys.argv[2], sys.argv[3]
+ls = subprocess.run(["git", "-C", REPO, "ls-tree", "-r", COMMIT, "apps/web", "contracts", "tools", "packages"],
+                    capture_output=True, text=True, check=True).stdout.splitlines()
+want = {}
+for line in ls:
+    meta, path = line.split("\t", 1)
+    mode, typ, sha = meta.split()
+    if typ == "blob":
+        want[path] = sha
+paths = list(want)
+mism, missing = [], []
+B = 400
+for i in range(0, len(paths), B):
+    chunk = [p for p in paths[i:i+B] if os.path.exists(os.path.join(ROOT, p))]
+    missing += [p for p in paths[i:i+B] if not os.path.exists(os.path.join(ROOT, p))]
+    if not chunk:
+        continue
+    out = subprocess.run(["git", "hash-object", "--no-filters", "--stdin-paths"],
+                         input="\n".join(os.path.join(ROOT, p) for p in chunk) + "\n",
+                         capture_output=True, text=True, check=True).stdout.split()
+    for p, h in zip(chunk, out):
+        if h != want[p]:
+            mism.append(p)
+web = [p for p in paths if p.startswith("apps/web/")]
+# deps vs lock
+lock = json.load(open(os.path.join(ROOT, "apps/web/package-lock.json"), encoding="utf-8"))
+nm = os.path.join(ROOT, "apps/web")
+dm, dn = [], 0
+for k, v in lock.get("packages", {}).items():
+    if not k.startswith("node_modules/"):
+        continue
+    pj = os.path.join(nm, k, "package.json")
+    if not os.path.exists(pj):
+        dm.append((k, "absent", v.get("version"), "optional" if v.get("optional") else "required"))
+        continue
+    dn += 1
+    got = json.load(open(pj, encoding="utf-8")).get("version")
+    if got != v.get("version"):
+        dm.append((k, got, v.get("version"), bool(v.get("optional"))))
+key = ["apps/web/src/app/App.tsx", "apps/web/src/shared/ui/Header.tsx",
+       "apps/web/src/features/desktop/ResourceExplorer.tsx", "apps/web/src/shared/api/projectObservation.ts",
+       "apps/web/src/shared/api/runApprovalObservation.ts", "apps/web/tests/portal-refresh-fleet-ui.test.tsx",
+       "apps/web/src/shared/api/client.ts", "apps/web/src/shared/api/nodeCertificateObservation.ts"]
+print(json.dumps({"commit": COMMIT, "blobs": len(paths), "appsWebBlobs": len(web), "mismatch": mism,
+                  "missing": missing, "keyBlobs": {k: want[k] for k in key},
+                  "depsCheckedInstalled": dn, "depsMismatchOrAbsent": dm}, indent=1))

@@ -1,0 +1,36 @@
+"""Serial frontend command runner on the scratch export. argv: web_dir out_dir"""
+import json, os, subprocess, sys, datetime, hashlib, re
+WEB, OUT = sys.argv[1], sys.argv[2]
+KST = datetime.timezone(datetime.timedelta(hours=9))
+V = ["node", "node_modules/vitest/vitest.mjs", "run", "--no-file-parallelism", "--maxWorkers=1"]
+CMDS = [
+ ("author-targeted", V + ["tests/portal-refresh-fleet-ui.test.tsx"]),
+ ("acc09", V + ["tests/acc09-contrast-tokens.test.tsx"]),
+ ("cert-freshness", V + ["tests/app-node-certificate-freshness.test.tsx"]),
+ ("live-observation", V + ["tests/live-observation.test.tsx"]),
+ ("run-approval-contract", V + ["tests/run-approval-observation-contract.test.ts"]),
+ ("reviewer-probes", V + ["tests/reviewer_probe_uir2.test.tsx"]),
+ ("reviewer-transport", V + ["tests/reviewer_probe_uir2_transport.test.tsx"]),
+ ("tsc-b", ["node", "node_modules/typescript/bin/tsc", "-b"]),
+ ("tsc-app", ["node", "node_modules/typescript/bin/tsc", "-p", "tsconfig.app.json", "--noEmit"]),
+ ("tsc-node", ["node", "node_modules/typescript/bin/tsc", "-p", "tsconfig.node.json", "--noEmit"]),
+ ("eslint-6", ["node", "node_modules/eslint/bin/eslint.js", "--max-warnings", "0",
+               "src/app/App.tsx", "src/shared/ui/Header.tsx", "src/features/desktop/ResourceExplorer.tsx",
+               "src/shared/api/projectObservation.ts", "src/shared/api/runApprovalObservation.ts", "tests/portal-refresh-fleet-ui.test.tsx"]),
+]
+only = sys.argv[3:]
+res = []
+for name, argv in CMDS:
+    if only and name not in only:
+        continue
+    a = datetime.datetime.now(KST).isoformat(timespec="seconds")
+    env = dict(os.environ, UIR2_REPORT=os.path.join(OUT, f"report-{name}.json"))
+    p = subprocess.run(argv, cwd=WEB, env=env, capture_output=True, text=True, encoding="utf-8", errors="replace")
+    b = datetime.datetime.now(KST).isoformat(timespec="seconds")
+    log = (p.stdout + "\n--stderr--\n" + p.stderr).replace("\r\n", "\n")
+    open(os.path.join(OUT, f"log-{name}.txt"), "w", encoding="utf-8", newline="\n").write(log)
+    summ = [l.strip() for l in log.splitlines() if re.search(r"^\s*(Test Files|Tests)\s", l)]
+    res.append({"name": name, "startKST": a, "endKST": b, "exit": p.returncode, "argv": argv[1:] if argv[0] == "node" else argv,
+                "summary": summ or [l for l in log.splitlines() if l.strip()][-3:], "logSha256": hashlib.sha256(log.encode()).hexdigest()})
+    print(json.dumps(res[-1], ensure_ascii=False), flush=True)
+json.dump(res, open(os.path.join(OUT, "fe-runner.json"), "w", encoding="utf-8"), indent=1, ensure_ascii=False)

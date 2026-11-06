@@ -1,0 +1,56 @@
+"""Reviewer mutant / fix-check runner. Applies byte replacements to the scratch export, runs vitest
+(json reporter) serially, restores original bytes and re-verifies blob hashes. argv: web_dir out_dir"""
+import json, os, subprocess, sys, hashlib
+WEB, OUT = sys.argv[1], sys.argv[2]
+APP, HDR, RE = "src/app/App.tsx", "src/shared/ui/Header.tsx", "src/features/desktop/ResourceExplorer.tsx"
+AUTH, PROBE = "tests/portal-refresh-fleet-ui.test.tsx", "tests/reviewer_probe_uir2.test.tsx"
+
+def blob(b):
+    return hashlib.sha1(b"blob %d\0" % len(b) + b).hexdigest()
+
+M = {
+ # guard-removing mutants (expected killed by author tests)
+ "MA_noAppliedFence": [(APP, "request > nodeAppliedRef.current) {\n        nodeAppliedRef.current = request;\n        setNodes(", "true) {\n        nodeAppliedRef.current = request;\n        setNodes(", 1)],
+ "MB_noNodeTimeout": [(APP, "controller.abort(new Error('REQUEST_TIMEOUT'));\n    }, 10000);\n\n    if (!isBg) {\n      setNodesState", "controller.abort(new Error('REQUEST_TIMEOUT'));\n    }, 10000000);\n\n    if (!isBg) {\n      setNodesState", 1)],
+ "MC_noHeaderSeqFence": [(HDR, "reqId !== reqSeqRef.current", "false", 3)],
+ "MF_degradedCollapsedToOffline": [(HDR, "setGatewayStatus({ kind: 'degraded' });", "setGatewayStatus({ kind: 'offline' });", 2)],
+ "MD_noApprovalsErrorGuard": [(APP, "if (approvalsState === 'error') {", "if (false) {", 2)],
+ "ME_L3EventAsBackground": [(APP, "const fetchNodes = React.useCallback(async (isBackground: boolean | any = false) => {\n    const isBg = isBackground === true;", "const fetchNodes = React.useCallback(async (isBackground: boolean | any = false) => {\n    const isBg = !!isBackground;", 1),
+                            (APP, "onRetryNodes={handleManualRetryNodes}", "onRetryNodes={fetchNodes}", 1),
+                            (RE, "onClick={() => onRetryNodes?.()}", "onClick={onRetryNodes}", 1)],
+ # reviewer minimal-fix checks (expected to turn R1/R1b, R2, H3 green without breaking author tests)
+ "FIX1_certSignal": [(APP, "certObs = await fetchProjectNodeCertificates(targetPrj);", "certObs = await fetchProjectNodeCertificates(targetPrj, controller.signal);", 1)],
+ "FIX2_supersededAbortIgnored": [(APP, "    } catch (err: any) {\n      clearTimeout(timeoutId);\n      if (sessionRef.current === currentSession && scopeRef.current === currentScope && request > nodeAppliedRef.current) {",
+                                  "    } catch (err: any) {\n      clearTimeout(timeoutId);\n      if (controller.signal.aborted && (controller.signal.reason as any)?.message !== 'REQUEST_TIMEOUT') return;\n      if (sessionRef.current === currentSession && scopeRef.current === currentScope && request > nodeAppliedRef.current) {", 1)],
+ "FIX3_headerDeadlineCoversBody": [(HDR, "const res = await fetch('/healthz', { signal: currentController.signal });\n        clearTimeout(timeoutId);", "const res = await fetch('/healthz', { signal: currentController.signal });", 1)],
+}
+M["FIXALL_1_2_3"] = M["FIX1_certSignal"] + M["FIX2_supersededAbortIgnored"] + M["FIX3_headerDeadlineCoversBody"]
+orig = {p: open(os.path.join(WEB, p), "rb").read() for p in (APP, HDR, RE)}
+results = {}
+def run(name):
+    rep = os.path.join(OUT, f"vitest-{name}.json")
+    env = dict(os.environ, UIR2_REPORT=os.path.join(OUT, f"probe-report-{name}.json"))
+    p = subprocess.run(["node", "node_modules/vitest/vitest.mjs", "run", AUTH, PROBE, "--no-file-parallelism", "--maxWorkers=1",
+                        "--reporter=json", f"--outputFile={rep}"], cwd=WEB, env=env, capture_output=True, text=True, encoding="utf-8", errors="replace")
+    d = json.load(open(rep, encoding="utf-8"))
+    tests = {}
+    for f in d["testResults"]:
+        for a in f["assertionResults"]:
+            tests[("AUTH:" if f["name"].endswith("fleet-ui.test.tsx") else "PROBE:") + a["title"][:60]] = a["status"]
+    return p.returncode, d["numPassedTests"], d["numFailedTests"], tests
+only = sys.argv[3:] or list(M)
+for name in only:
+    try:
+        for path, old, new, count in M[name]:
+            src = open(os.path.join(WEB, path), "rb").read().decode("utf-8")
+            n = src.count(old)
+            if n != count:
+                raise SystemExit(f"{name}: pattern count {n} != {count} in {path}")
+            open(os.path.join(WEB, path), "wb").write(src.replace(old, new).encode("utf-8"))
+        rc, ok, bad, tests = run(name)
+        results[name] = {"exit": rc, "passed": ok, "failed": bad, "failedTests": sorted(k for k, v in tests.items() if v != "passed")}
+    finally:
+        for p, b in orig.items():
+            open(os.path.join(WEB, p), "wb").write(b)
+restored = {p: blob(open(os.path.join(WEB, p), "rb").read()) for p in orig}
+print(json.dumps({"results": results, "restoredBlobs": restored}, indent=1, ensure_ascii=False))

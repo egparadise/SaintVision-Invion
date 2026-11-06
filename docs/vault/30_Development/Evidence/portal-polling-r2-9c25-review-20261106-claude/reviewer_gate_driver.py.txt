@@ -1,0 +1,36 @@
+"""Reviewer serial local publication gates + canonical Root sync CHECK before/after (no apply/adopt/resolve/state write).
+argv: base_ref out_file scratch_dir"""
+import datetime, hashlib, subprocess, sys
+from pathlib import Path
+WT = Path(r'D:\Project\SaintVisionI-Invion\fleet5-bootstrap-v3-review-20261106')
+ROOTC = Path(r'D:\Project\SaintVisionI-Invion\fleet-five-orchestration-20261105')
+PY = r'D:\Project\SaintVisionI-Invion\.venv\Scripts\python.exe'
+ST = Path('D:/Project/SaintVision-Invion/SaintVisionI-Invion/.git/obsidian-sync-state.json')
+BASE, OUT, SCR = sys.argv[1], Path(sys.argv[2]), Path(sys.argv[3])
+KST = datetime.timezone(datetime.timedelta(hours=9))
+def kst(): return datetime.datetime.now(KST).isoformat(timespec='seconds')
+def sha(b): return hashlib.sha256(b).hexdigest()
+def git(cwd, *a): return subprocess.run(['git', '-C', str(cwd), *a], capture_output=True, text=True).stdout.strip()
+sync = lambda tag: ['tools/sync_obsidian.py', '--check', '--state', str(ST).replace('\\', '/'), '--conflicts-out', str(SCR / f'sync-conflicts-{tag}.json')]
+plan = [('CanonicalRoot BEFORE', ROOTC, sync('root-before'))] + [('worktree', WT, g) for g in [
+    ['tools/check_docs.py'], ['tools/check_ontology_generation.py'], ['tools/check_ontology.py'],
+    ['tools/check_contract_bindings.py'], ['tools/check_frontend_integrity.py'],
+    ['tools/check_doc_path_citations.py', '--ratchet', '--base-ref', BASE], ['tools/check_doc_single_source.py', '--ratchet'],
+    ['tools/check_response_freshness.py'], ['tools/test_sync.py'], sync('worktree')]] + [('CanonicalRoot AFTER', ROOTC, sync('root-after'))]
+lines = [f'Local publication gates, {kst()} start, Windows, {PY} (venv), PYTHONUTF8=1, serial, argv-list driver (reviewer_gate_driver.py.txt).',
+         f'worktree HEAD={git(WT, "rev-parse", "HEAD")} (= {BASE[:8]}) + this review\'s own uncommitted History/Evidence only.',
+         f'CanonicalRoot = {ROOTC} HEAD={git(ROOTC, "rev-parse", "--short", "HEAD")}. sync_obsidian ran CHECK only with the canonical state; --conflicts-out to reviewer scratch; no apply/adopt/resolve/state write/stale export.']
+worst = 0
+env = dict(__import__('os').environ, PYTHONUTF8='1')
+for tag, cwd, g in plan:
+    before = sha(ST.read_bytes()); a = kst()
+    r = subprocess.run([PY, '-B', *g], cwd=cwd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, env=env)
+    b = kst(); after = sha(ST.read_bytes()); worst = max(worst, r.returncode)
+    shown = ' '.join('<scratch>/' + Path(x).name if x.startswith(str(SCR)) else x for x in g)
+    lines.append(f'[{tag}] {a}..{b} exit={r.returncode} logsha={sha(r.stdout)} :: python -B {shown}')
+    lines += ['    ' + t[:300] for t in r.stdout.decode('utf-8', 'replace').strip().splitlines()[-2:]]
+    if 'sync_obsidian' in g[0]:
+        lines.append(f'    stateBefore={before} stateAfter={after} unchanged={before == after}')
+st = git(WT, 'status', '--short')
+lines.append('git status --short (worktree):'); lines += ['    ' + l for l in st.splitlines()]
+OUT.write_text('\n'.join(lines) + '\n', encoding='utf-8', newline='\n'); print('\n'.join(lines)); raise SystemExit(worst)

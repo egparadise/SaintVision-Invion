@@ -1,0 +1,38 @@
+Local publication gates, 2026-11-06T22:50:05+09:00 start, Windows, D:\Project\SaintVisionI-Invion\.venv\Scripts\python.exe (venv), PYTHONUTF8=1, serial, argv-list driver (reviewer_gate_driver.py.txt).
+worktree HEAD=9c25f3c9cab162f424744d79f9a4e21729c40404 (= 9c25f3c9) + this review's own uncommitted History/Evidence only.
+CanonicalRoot = D:\Project\SaintVisionI-Invion\fleet-five-orchestration-20261105 HEAD=5146f18c. sync_obsidian ran CHECK only with the canonical state; --conflicts-out to reviewer scratch; no apply/adopt/resolve/state write/stale export.
+[CanonicalRoot BEFORE] 2026-11-06T22:50:06+09:00..2026-11-06T22:50:15+09:00 exit=0 logsha=79e652e1307a800a8a9a9bf595d2f41909478edb4f204f334cbce175d94f3a2c :: python -B tools/sync_obsidian.py --check --state D:/Project/SaintVision-Invion/SaintVisionI-Invion/.git/obsidian-sync-state.json --conflicts-out <scratch>/sync-conflicts-root-before.json
+    CHECK: 2860 managed files, 17 pending exports, 0 conflicts. No writes.
+    stateBefore=67a7d5d111ffba0ec8fbd86a18724bbc9f872b5162c58a6daaeff1e4573afd1c stateAfter=67a7d5d111ffba0ec8fbd86a18724bbc9f872b5162c58a6daaeff1e4573afd1c unchanged=True
+[worktree] 2026-11-06T22:50:15+09:00..2026-11-06T22:50:44+09:00 exit=0 logsha=5730b1afd6af3d09ceca9b5fdc7b7bd8a8cde5fdf234e0142b3ae83d0ef85f14 :: python -B tools/check_docs.py
+    PASS: 24 original hashes, 1262 versioned documents, wiki links, 48 tasks, 12 outcomes, owner/reviewer/skills, dependency DAG.
+[worktree] 2026-11-06T22:50:44+09:00..2026-11-06T22:50:46+09:00 exit=0 logsha=451b3d26c538962997f093bbfb8a5ceabffe134e154c1ff412f57590b076e150 :: python -B tools/check_ontology_generation.py
+    PASS: 4 ontology artifacts are graph-equivalent to a fresh generation
+[worktree] 2026-11-06T22:50:46+09:00..2026-11-06T22:50:49+09:00 exit=0 logsha=7cdc12bf64f50ba0964625161638a4c639cf22d786a57f04685bed0718e14042 :: python -B tools/check_ontology.py
+    PASS: RDF parsing, defined terms, TTL/JSON-LD equivalence, 48 task mappings, positive SHACL, 4 rejected invalid fixtures, 4 competency queries, Obsidian mirrors.
+[worktree] 2026-11-06T22:50:49+09:00..2026-11-06T22:51:03+09:00 exit=0 logsha=7d3493f361d1c522254d1dbd2e0a74b4dc3c54ef90bd9bfdec3a57666d7798ed :: python -B tools/check_contract_bindings.py
+      UNIT NOTE: TYPE count <= SITE count. Multi-site types (per-type coverage can mask an untested site): ApprovalView(2 sites: ['approvals']), BusinessBindingView(2 sites: ['business_handoff']), BusinessEditLockReleaseView(2 sites: ['business_handoff']), BusinessEditLockView(2 sites: ['business_handof
+      (Reporting sites is not a regression -- the TYPE number never meant 'sites verified'; this makes the counting unit explicit. EvidenceEnvelope-class multi-site anchors are why.)
+[worktree] 2026-11-06T22:51:03+09:00..2026-11-06T22:51:06+09:00 exit=0 logsha=2a2f0348a4bdc71911a5eac47ef7fd7a1ca4573e71cce914cb6d6dd198392949 :: python -B tools/check_frontend_integrity.py
+    
+    PASS Frontend Integrity Check: all 9 integrity rules satisfied (0 violations).
+[worktree] 2026-11-06T22:51:06+09:00..2026-11-06T22:51:20+09:00 exit=0 logsha=389921b50662776ed834a285f70fc44ab61f7d5bdb4c5249c0a73c98113980de :: python -B tools/check_doc_path_citations.py --ratchet --base-ref 9c25f3c9cab162f424744d79f9a4e21729c40404
+    PASS check_doc_path_citations --ratchet: 290 broken citation(s), all in baseline, none stale, floor unchanged.
+[worktree] 2026-11-06T22:51:20+09:00..2026-11-06T22:51:21+09:00 exit=0 logsha=13b5f5afed05999109839be1baec4ef70ea3c71bcb267353e59eba0f2ae3e448 :: python -B tools/check_doc_single_source.py --ratchet
+    PASS check_doc_single_source --ratchet: 16 pairs, all in baseline, none stale.
+[worktree] 2026-11-06T22:51:21+09:00..2026-11-06T22:51:21+09:00 exit=0 logsha=ba85e5489b5c960d3fdd09acf663a0c157e70028c6d54044d4820a67c99570fc :: python -B tools/check_response_freshness.py
+      ok      saintvision:ReplicaObservationResponse.observedAt
+      (structural floor only. Whether a NEW response is freshness-critical is human judgment -- review this map when responses are added. Staleness behaviour needs a clock-advance test with PG.)
+[worktree] 2026-11-06T22:51:21+09:00..2026-11-06T22:51:27+09:00 exit=0 logsha=75db129e4d29e6960b02b16eed54782f23ba19774410ab15fa569c3ea2ab0187 :: python -B tools/test_sync.py
+    EXPORTED: 1 files; all 1 destination hashes match. Unmanaged files untouched.
+    CHECK: 2 managed files, 0 pending exports, 0 conflicts. No writes.
+[worktree] 2026-11-06T22:51:27+09:00..2026-11-06T22:51:36+09:00 exit=0 logsha=8078ad0fd952fac3a8d262e747702ad7dcb9c4c1832a1d1d7eb0c4836bb0e3c8 :: python -B tools/sync_obsidian.py --check --state D:/Project/SaintVision-Invion/SaintVisionI-Invion/.git/obsidian-sync-state.json --conflicts-out <scratch>/sync-conflicts-worktree.json
+    CHECK: 2841 managed files, 26 pending exports, 0 conflicts. No writes.
+    stateBefore=7e868d1a655c5e77716830fdd9961a892e5ff33c5f09d391933ec9d0c9dd6da7 stateAfter=7e868d1a655c5e77716830fdd9961a892e5ff33c5f09d391933ec9d0c9dd6da7 unchanged=True
+[CanonicalRoot AFTER] 2026-11-06T22:51:36+09:00..2026-11-06T22:51:46+09:00 exit=0 logsha=4cbe79f0c2af6c493eff21394bb96a76510bf455dffce04dbf76dce24a1f10f3 :: python -B tools/sync_obsidian.py --check --state D:/Project/SaintVision-Invion/SaintVisionI-Invion/.git/obsidian-sync-state.json --conflicts-out <scratch>/sync-conflicts-root-after.json
+    CHECK: 2860 managed files, 0 pending exports, 0 conflicts. No writes.
+    stateBefore=7e868d1a655c5e77716830fdd9961a892e5ff33c5f09d391933ec9d0c9dd6da7 stateAfter=7e868d1a655c5e77716830fdd9961a892e5ff33c5f09d391933ec9d0c9dd6da7 unchanged=True
+git status --short (worktree):
+    ?? docs/vault/30_Development/Evidence/portal-polling-r2-9c25-review-20261106-claude/
+    ?? docs/vault/30_Development/History/2026-11-06_22-50-00_KST_PORTAL_POLLING_R2_9C25_독립검토_Claude.md
+Note: canonical state sha256 was 67a7d5d1... at Root BEFORE (22:50:15, 17 pending exports) and 7e868d1a... from the worktree sync check on (22:51:27); the state file mtime is 2026-11-06T22:50:49 KST, inside check_ontology/check_contract_bindings (which do not touch sync state) and before test_sync (22:51:21, temp dirs only). Root canonical HEAD moved to 5146f18c at 22:48:55 and Root AFTER shows 0 pending exports, consistent with an external Root sync apply. Every reviewer sync run was --check and left the state unchanged within its own run.

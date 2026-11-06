@@ -1,0 +1,326 @@
+/** @vitest-environment happy-dom */
+// Claude reviewer probes for UI R2 (9c25f3c9 / source 22c20a83). Not product code.
+import React from 'react';
+import { act } from 'react';
+import { createRoot, Root } from 'react-dom/client';
+import { describe, it, expect, beforeEach, afterEach, afterAll, vi } from 'vitest';
+import { writeFileSync } from 'node:fs';
+import { App } from '@/app/App';
+import { Header } from '@/shared/ui/Header';
+import * as session from '@/features/auth/session';
+import * as client from '@/shared/api/client';
+import * as projects from '@/shared/api/projectObservation';
+import * as runs from '@/shared/api/runApprovalObservation';
+import * as fabric from '@/features/desktop/fabricControlApi';
+import * as storage from '@/shared/api/storageObservation';
+import * as mutations from '@/shared/api/kernelMutations';
+
+(globalThis as any).IS_REACT_ACT_ENVIRONMENT = true;
+const REPORT: Record<string, unknown> = {};
+const report = (k: string, v: unknown) => { REPORT[k] = v; console.log(`UIR2PROBE ${k} ${JSON.stringify(v)}`); };
+afterAll(() => { if (process.env.UIR2_REPORT) writeFileSync(process.env.UIR2_REPORT, JSON.stringify(REPORT, null, 1)); });
+
+const t0 = Date.parse('2026-11-06T11:00:00Z');
+const projectA = 'prj_01ARZ3NDEKTSV4RRFFQ69G5FAV';
+const projectB = 'prj_01ARZ3NDEKTSV4RRFFQ69G5FAW';
+const nodeA = 'nod_01ARZ3NDEKTSV4RRFFQ69G5FAV';
+const approvalId = 'app_01ARZ3NDEKTSV4RRFFQ69G5FAV';
+const ONE = { items: [{ nodeId: nodeA, hostname: 'observed-node', status: 'online', osType: 'linux', cpuCores: 16,
+  memoryTotalBytes: 32 * 1024 ** 3, roles: ['compute'], tags: { zone: 'default' }, heartbeatAt: new Date(t0).toISOString() }], total: 1 };
+
+type Mode = 'empty' | 'one' | 'reject' | 'pending' | 'slow6s';
+type CertMode = 'reject' | 'hang' | 'slow60reject';
+let root: Root; let box: HTMLDivElement;
+let nodeMode: Mode; let certMode: CertMode;
+let nodeCalls: Array<{ path: string; signal?: AbortSignal; t: number }>;
+let certCalls: Array<{ signal?: AbortSignal; t: number }>;
+let pending: Array<{ path: string; signal?: AbortSignal; resolve: (v: any) => void; reject: (e: any) => void }>;
+let inflight = 0; let maxInflight = 0;
+
+function honor<T>(signal: AbortSignal | undefined, body: (res: (v: T) => void, rej: (e: any) => void) => void): Promise<T> {
+  return new Promise<T>((res, rej) => {
+    if (signal) signal.addEventListener('abort', () => rej(signal.reason ?? new DOMException('Aborted', 'AbortError')));
+    body(res, rej);
+  });
+}
+
+beforeEach(() => {
+  vi.useFakeTimers(); vi.setSystemTime(t0); localStorage.clear();
+  box = document.createElement('div'); document.body.appendChild(box); root = createRoot(box);
+  nodeMode = 'empty'; certMode = 'reject'; nodeCalls = []; certCalls = []; pending = []; inflight = 0; maxInflight = 0;
+  vi.spyOn(globalThis, 'fetch').mockImplementation(async () =>
+    new Response(JSON.stringify({ status: 'ok', version: 'probe' }), { status: 200, headers: { 'content-type': 'application/json' } }));
+  vi.spyOn(session, 'hasLoginCallback').mockReturnValue(true);
+  vi.spyOn(session, 'completeLogin').mockImplementation(async () => ({ token: 'probe-token',
+    user: { id: 'oidc:' + 'a'.repeat(64), name: 'Probe User', role: '프로젝트별 권한', tenantId: 'ten_probe' },
+    expiresAt: Math.floor(Date.now() / 1000) + 1800 }) as any);
+  vi.spyOn(session, 'commitSession').mockImplementation(() => {});
+  vi.spyOn(session, 'performLogout').mockImplementation((() => {}) as any);
+  vi.spyOn(client, 'onUnauthorized').mockImplementation(() => {});
+  vi.spyOn(projects, 'fetchProjects').mockResolvedValue([projectA, projectB].map((id) => ({ id, name: id, tenantId: 'ten_probe', createdAt: new Date(t0).toISOString() })) as any);
+  vi.spyOn(projects, 'fetchProjectWorkspaces').mockResolvedValue([]);
+  vi.spyOn(runs, 'fetchObservedRuns').mockResolvedValue([]);
+  vi.spyOn(runs, 'fetchObservedApprovals').mockResolvedValue([{ id: approvalId, projectId: projectA, status: 'pending', target: 'restart-node-nod_01',
+    riskLevel: 'high', requiredApprovals: 2, actionDigest: 'dig_abc123', firstApprovedBy: null, firstApprovedAt: null, secondApprovedBy: null,
+    secondApprovedAt: null, expiresAt: new Date(t0 + 3600000).toISOString(), createdAt: new Date(t0).toISOString() }] as any);
+  vi.spyOn(fabric, 'getDiscoveryCandidates').mockResolvedValue([]);
+  vi.spyOn(fabric, 'getStorageContributions').mockResolvedValue([]);
+  vi.spyOn(fabric, 'getNodeResourceUsage').mockResolvedValue(null as any);
+  vi.spyOn(storage, 'fetchStorageObservation').mockResolvedValue(null as any);
+  vi.spyOn(client, 'apiClient').mockImplementation(async (path: string, options?: any) => {
+    const signal: AbortSignal | undefined = options?.signal;
+    if (path.endsWith('/node-certificates')) {
+      certCalls.push({ signal, t: Date.now() - t0 });
+      if (certMode === 'reject') throw new Error('certificate observation unavailable');
+      if (certMode === 'hang') return honor(signal, () => {});
+      return honor(signal, (_r, rej) => { setTimeout(() => rej(new Error('PROBE-504-gateway-timeout')), 60000); });
+    }
+    if (path.endsWith('/nodes')) {
+      nodeCalls.push({ path, signal, t: Date.now() - t0 });
+      inflight++; maxInflight = Math.max(maxInflight, inflight);
+      const done = <T,>(p: Promise<T>) => p.finally(() => { inflight--; });
+      if (nodeMode === 'empty') return done(Promise.resolve({ items: [], total: 0 }));
+      if (nodeMode === 'one') return done(Promise.resolve(ONE));
+      if (nodeMode === 'reject') return done(Promise.reject(new Error('PROBE-NODES-DOWN')));
+      if (nodeMode === 'slow6s') return done(honor(signal, (res) => { setTimeout(() => res(ONE), 6000); }));
+      return done(honor(signal, (res, rej) => { pending.push({ path, signal, resolve: res, reject: rej }); }));
+    }
+    return {};
+  });
+});
+
+afterEach(() => {
+  try { act(() => { root.unmount(); }); } catch { /* already unmounted */ }
+  box.remove(); vi.restoreAllMocks(); vi.useRealTimers();
+});
+
+async function advance(ms: number) { await act(async () => { await vi.advanceTimersByTimeAsync(ms); }); }
+async function mountApp() { await act(async () => { root.render(<App />); }); await advance(0); }
+async function click(el: Element | null) { expect(el).not.toBeNull(); await act(async () => { (el as HTMLElement).click(); }); }
+const text = () => box.textContent ?? '';
+const q = (id: string) => box.querySelector(`[data-testid="${id}"]`);
+const claimsCurrentZero = () => text().includes('정상 조회 결과: 0대');
+const stale = () => q('cluster-stale-warning') !== null;
+
+describe('UIR2 reviewer probes: App node polling', () => {
+  it('R1 certificate sub-request hang: documented 10s bound does not cover the second leg', async () => {
+    await mountApp();
+    expect(claimsCurrentZero()).toBe(true);
+    nodeMode = 'one'; certMode = 'hang';
+    const snap: Record<string, unknown> = {};
+    for (const at of [15000, 30000, 60000]) {
+      await advance(at - (snap.last as number ?? 0)); snap.last = at;
+      snap[`t${at}`] = { claimsCurrentZero: claimsCurrentZero(), stale: stale(), observedNodeShown: text().includes('observed-node'), timeoutText: text().includes('초과') };
+    }
+    const r = { ...snap, nodeCalls: nodeCalls.length, certCalls: certCalls.length, certCallsWithSignal: certCalls.filter((c) => c.signal).length,
+      nodeSignalsAborted: nodeCalls.filter((c) => c.signal?.aborted).length };
+    report('R1_certHang', r);
+    // Contract (M1): hung leg must become explicit error/stale by the documented bound, never indefinite current 0.
+    expect((r as any).t15000.claimsCurrentZero && !(r as any).t15000.stale).toBe(false);
+  });
+
+  it('R1b certificate sub-request 60s 504 (nginx default /v1 proxy_read_timeout shape)', async () => {
+    await mountApp();
+    nodeMode = 'one'; certMode = 'slow60reject';
+    await advance(30000);
+    const at30 = { claimsCurrentZero: claimsCurrentZero(), stale: stale(), observedNodeShown: text().includes('observed-node') };
+    await advance(40000);
+    const at70 = { claimsCurrentZero: claimsCurrentZero(), stale: stale(), observedNodeShown: text().includes('observed-node') };
+    report('R1b_cert60', { at30, at70, certCallsWithSignal: certCalls.filter((c) => c.signal).length, certCalls: certCalls.length });
+    expect(at30.claimsCurrentZero && !at30.stale).toBe(false);
+  });
+
+  it('R2 manual refresh during an in-flight background poll is labelled a timeout error', async () => {
+    nodeMode = 'one';
+    await mountApp();
+    expect(text()).toContain('observed-node');
+    nodeMode = 'pending';
+    await advance(5000); // background poll in flight
+    expect(pending.length).toBe(1);
+    await click(q('cluster-refresh-btn'));
+    await advance(0);
+    const r = { elapsedSinceBgStartMs: 0, timeoutText: text().includes('응답 시간 초과'), errorBanner: q('cluster-stale-warning') !== null || q('cluster-overview-fetch-error') !== null,
+      bgAborted: pending[0].signal?.aborted ?? null, manualPending: pending.length };
+    report('R2_manualAbortLabel', r);
+    // Contract: no timeout occurred (0ms elapsed); a user-initiated cancel must not surface as a 10s timeout/error.
+    expect(r.timeoutText).toBe(false);
+  });
+
+  it('R3 every response 6s, 120s: applied, no error, bounded concurrency', async () => {
+    await mountApp();
+    nodeMode = 'slow6s';
+    await advance(120000);
+    const r = { observedNodeShown: text().includes('observed-node'), stale: stale(), timeoutText: text().includes('초과'), claimsCurrentZero: claimsCurrentZero(), nodeCalls: nodeCalls.length, maxInflight };
+    report('R3_slow6s', r);
+    expect(r.observedNodeShown).toBe(true); expect(r.stale).toBe(false); expect(r.timeoutText).toBe(false); expect(maxInflight).toBeLessThanOrEqual(3);
+  });
+
+  it('R4 all /nodes hang (signal honoured): stale+timeout by ~15s, persists at 60s, recovery clears', async () => {
+    await mountApp();
+    nodeMode = 'pending';
+    await advance(15500);
+    const at15 = { stale: stale(), timeoutText: text().includes('초과'), claimsCurrentZero: claimsCurrentZero() };
+    await advance(45000);
+    const at60 = { stale: stale(), timeoutText: text().includes('초과'), claimsCurrentZero: claimsCurrentZero(), abortedSignals: nodeCalls.filter((c) => c.signal?.aborted).length, nodeCalls: nodeCalls.length, maxInflight };
+    nodeMode = 'empty';
+    await advance(5000);
+    const recovered = { stale: stale(), claimsCurrentZero: claimsCurrentZero() };
+    report('R4_hang', { at15, at60, recovered });
+    expect(at15.stale && at15.timeoutText && !at15.claimsCurrentZero).toBe(true);
+    expect(at60.stale && !at60.claimsCurrentZero).toBe(true);
+    expect(recovered.stale).toBe(false);
+  });
+
+  it('R5 project switch then old aborted/late completion cannot overwrite the new scope', async () => {
+    nodeMode = 'one';
+    await mountApp();
+    nodeMode = 'pending';
+    await advance(5000);
+    const oldA = pending.splice(0);
+    const sel = box.querySelector<HTMLSelectElement>('[data-testid="project-selector"]')!;
+    await act(async () => { sel.value = projectB; sel.dispatchEvent(new Event('change', { bubbles: true })); });
+    await advance(0);
+    const oldAborted = oldA[0].signal?.aborted ?? null;
+    const bReq = pending.filter((p) => p.path.includes(projectB));
+    bReq.forEach((p) => p.resolve({ items: [], total: 0 }));
+    await advance(0);
+    oldA[0].resolve({ items: [{ nodeId: nodeA, hostname: 'leaked-A-node', status: 'online', osType: 'linux' }], total: 1 });
+    await advance(0);
+    const r = { oldAborted, leaked: text().includes('leaked-A-node'), bApplied: claimsCurrentZero(), stale: stale() };
+    report('R5_projectSwitch', r);
+    expect(r.leaked).toBe(false); expect(r.bApplied).toBe(true); expect(r.stale).toBe(false);
+  });
+
+  it('R6 logout fence: in-flight aborted, late response dropped', async () => {
+    nodeMode = 'one';
+    await mountApp();
+    nodeMode = 'pending';
+    await advance(5000);
+    const inflightReq = pending.splice(0);
+    const logout = Array.from(box.querySelectorAll('button')).find((b) => b.textContent?.includes('로그아웃')) ?? null;
+    await click(logout);
+    await advance(0);
+    inflightReq.forEach((p) => p.resolve({ items: [{ nodeId: nodeA, hostname: 'post-logout-node', status: 'online', osType: 'linux' }], total: 1 }));
+    await advance(0);
+    const r = { aborted: inflightReq.map((p) => p.signal?.aborted ?? null), leaked: text().includes('post-logout-node'), observedStillShown: text().includes('observed-node') };
+    report('R6_logout', r);
+    expect(r.leaked).toBe(false); expect(r.observedStillShown).toBe(false);
+  });
+
+  it('R7 unmount aborts the latest controller; older overlapping requests rely on their own timer', async () => {
+    await mountApp();
+    nodeMode = 'pending';
+    await advance(5000); await advance(5000); // two overlapping background polls
+    const reqs = pending.slice();
+    act(() => { root.unmount(); });
+    const abortedAtUnmount = reqs.map((p) => p.signal?.aborted ?? null);
+    await advance(10000);
+    const abortedAfter10s = reqs.map((p) => p.signal?.aborted ?? null);
+    report('R7_unmount', { abortedAtUnmount, abortedAfter10s });
+    expect(abortedAtUnmount[abortedAtUnmount.length - 1]).toBe(true);
+  });
+
+  it('R8 real reject click: approvalsState=error blocks decideApproval; control success calls it', async () => {
+    const decide = vi.spyOn(mutations, 'decideApproval').mockResolvedValue(undefined as any);
+    await mountApp();
+    await click(q('header-tab-approvals'));
+    await advance(0);
+    const item = q(`approval-item-${approvalId}`);
+    if (item) await click(item);
+    await advance(0);
+    const rejectBtnFound = q('approval-reject-button') !== null;
+    // error state
+    vi.spyOn(runs, 'fetchObservedApprovals').mockRejectedValue(new Error('PROBE-APPROVALS-DOWN'));
+    await advance(5000);
+    const staleShown = q('approval-stale-warning') !== null;
+    const unhandled: unknown[] = [];
+    const onUnh = (e: unknown) => { unhandled.push(String(e)); };
+    process.on('unhandledRejection', onUnh);
+    await click(q('approval-reject-button'));
+    const confirm = Array.from(box.querySelectorAll('button')).find((b) => b.textContent?.includes('반려 확인')) ?? null;
+    await click(confirm);
+    await advance(0);
+    const errorCalls = decide.mock.calls.length;
+    const actionErrorShown = text().includes('승인 반려 실패');
+    report('R8_rejectClick', { rejectBtnFound, staleShown, decideCallsInError: errorCalls, actionErrorShown, unhandled: unhandled.length });
+    expect(errorCalls).toBe(0);
+    process.off('unhandledRejection', onUnh);
+  });
+
+  it('R8c control: same real reject click with approvalsState=success reaches decideApproval', async () => {
+    const decide = vi.spyOn(mutations, 'decideApproval').mockResolvedValue(undefined as any);
+    await mountApp();
+    await click(q('header-tab-approvals'));
+    await advance(0);
+    const item = q(`approval-item-${approvalId}`);
+    if (item) await click(item);
+    await advance(0);
+    await click(q('approval-reject-button'));
+    const confirm = Array.from(box.querySelectorAll('button')).find((b) => b.textContent?.includes('반려 확인')) ?? null;
+    await click(confirm);
+    await advance(0);
+    report('R8c_control', { decideCalls: decide.mock.calls.length });
+    expect(decide.mock.calls.length).toBe(1);
+  });
+
+  it('R9 ResourceExplorer real retry button runs foreground (clears error, shows loading)', async () => {
+    await mountApp();
+    await click(q('header-tab-fabric'));
+    await advance(0);
+    nodeMode = 'reject';
+    await advance(5000);
+    const bannerBefore = q('nodes-fetch-error-banner') !== null;
+    nodeMode = 'pending';
+    await click(q('nodes-retry-btn'));
+    await advance(0);
+    const r = { bannerBefore, bannerAfterClick: q('nodes-fetch-error-banner') !== null, loadingAfterClick: q('nodes-loading-state') !== null, pendingManual: pending.length };
+    report('R9_explorerRetry', r);
+    expect(r.bannerBefore).toBe(true); expect(r.bannerAfterClick).toBe(false); expect(r.loadingAfterClick).toBe(true);
+  });
+});
+
+describe('UIR2 reviewer probes: Header gateway', () => {
+  const renderHeader = async () => { await act(async () => { root.render(<Header currentTheme="light" onToggleTheme={() => {}} activeTab="dashboard" onSelectTab={() => {}} />); }); };
+  const label = () => (box.querySelector('[title*="Gateway"]')?.textContent ?? text()).replace(/\s+/g, ' ');
+
+  it('H3 header JSON body hangs after headers: deadline does not cover res.json()', async () => {
+    let n = 0;
+    vi.spyOn(globalThis, 'fetch').mockImplementation((async (_u: any, init?: RequestInit) => {
+      n++;
+      if (n === 1) return new Response(JSON.stringify({ status: 'ok' }), { status: 200, headers: { 'content-type': 'application/json' } });
+      const sig = init?.signal;
+      return { ok: true, status: 200, headers: new Headers({ 'content-type': 'application/json' }),
+        json: () => new Promise((_r, rej) => { sig?.addEventListener('abort', () => rej(sig.reason ?? new Error('aborted'))); }) } as any;
+    }) as any);
+    await renderHeader(); await advance(0);
+    const first = label();
+    await advance(60000);
+    const after60 = label();
+    report('H3_hungBody', { first, after60, checks: n });
+    expect(/\d+ms/.test(after60)).toBe(false);
+  });
+
+  it('H4 header fetch hangs (signal honoured): 4s deadline -> Offline, never indefinite 확인 중', async () => {
+    vi.spyOn(globalThis, 'fetch').mockImplementation(((_u: any, init?: RequestInit) => honor(init?.signal ?? undefined, () => {})) as any);
+    await renderHeader(); await advance(0);
+    const at0 = label();
+    await advance(4100);
+    const at4 = label();
+    report('H4_timeout', { at0, at4 });
+    expect(at4).toContain('Offline');
+  });
+
+  it('H5 header order: degraded -> healthy -> network, each latest wins', async () => {
+    const seq = [
+      () => new Response(JSON.stringify({ status: 'not_ready' }), { status: 503, headers: { 'content-type': 'application/json' } }),
+      () => new Response(JSON.stringify({ status: 'ok' }), { status: 200, headers: { 'content-type': 'application/json' } }),
+      () => { throw new TypeError('Failed to fetch'); },
+    ];
+    let i = 0;
+    vi.spyOn(globalThis, 'fetch').mockImplementation((async () => seq[Math.min(i++, 2)]()) as any);
+    await renderHeader(); await advance(0);
+    const a = label(); await advance(5000); const b = label(); await advance(5000); const c = label();
+    report('H5_order', { a, b, c });
+    expect(a).toContain('비정상 응답'); expect(b).toMatch(/\d+ms/); expect(c).toContain('Offline');
+  });
+});

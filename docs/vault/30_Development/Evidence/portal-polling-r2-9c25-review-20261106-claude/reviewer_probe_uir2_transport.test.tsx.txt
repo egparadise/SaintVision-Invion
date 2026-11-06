@@ -1,0 +1,52 @@
+/** @vitest-environment happy-dom */
+// Claude reviewer transport probe: real apiClient + real observation wrappers, only global fetch mocked.
+import React from 'react';
+import { act } from 'react';
+import { createRoot, Root } from 'react-dom/client';
+import { it, expect, vi, afterAll } from 'vitest';
+import { writeFileSync } from 'node:fs';
+import { App } from '@/app/App';
+import * as session from '@/features/auth/session';
+import * as client from '@/shared/api/client';
+import * as projects from '@/shared/api/projectObservation';
+import * as fabric from '@/features/desktop/fabricControlApi';
+import * as storage from '@/shared/api/storageObservation';
+
+(globalThis as any).IS_REACT_ACT_ENVIRONMENT = true;
+const projectA = 'prj_01ARZ3NDEKTSV4RRFFQ69G5FAV';
+const OUT: Record<string, unknown> = {};
+afterAll(() => { if (process.env.UIR2_REPORT) writeFileSync(process.env.UIR2_REPORT, JSON.stringify(OUT, null, 1)); });
+
+it('T1 real transport: which polled fetches carry an AbortSignal, and is it aborted by the 10s deadline', async () => {
+  vi.useFakeTimers(); vi.setSystemTime(Date.parse('2026-11-06T11:00:00Z'));
+  const seen: Array<{ url: string; hasSignal: boolean; signal?: AbortSignal }> = [];
+  vi.spyOn(globalThis, 'fetch').mockImplementation(((input: any, init?: RequestInit) => {
+    const url = String(input);
+    seen.push({ url, hasSignal: !!init?.signal, signal: init?.signal ?? undefined });
+    const sig = init?.signal;
+    // every polled control-plane GET hangs until aborted (proxy-hang shape); healthz answers
+    if (url === '/healthz') return Promise.resolve(new Response(JSON.stringify({ status: 'ok' }), { status: 200, headers: { 'content-type': 'application/json' } }));
+    return new Promise((_r, rej) => { sig?.addEventListener('abort', () => rej(sig.reason ?? new DOMException('Aborted', 'AbortError'))); });
+  }) as any);
+  vi.spyOn(session, 'hasLoginCallback').mockReturnValue(true);
+  vi.spyOn(session, 'completeLogin').mockImplementation(async () => ({ token: 't', user: { id: 'oidc:' + 'a'.repeat(64), name: 'P', role: '프로젝트별 권한', tenantId: 'ten_probe' }, expiresAt: Math.floor(Date.now() / 1000) + 1800 }) as any);
+  vi.spyOn(session, 'commitSession').mockImplementation(() => {});
+  vi.spyOn(client, 'onUnauthorized').mockImplementation(() => {});
+  vi.spyOn(projects, 'fetchProjects').mockResolvedValue([{ id: projectA, name: projectA, tenantId: 'ten_probe', createdAt: new Date().toISOString() }] as any);
+  vi.spyOn(fabric, 'getDiscoveryCandidates').mockResolvedValue([]);
+  vi.spyOn(fabric, 'getStorageContributions').mockResolvedValue([]);
+  vi.spyOn(fabric, 'getNodeResourceUsage').mockResolvedValue(null as any);
+  vi.spyOn(storage, 'fetchStorageObservation').mockResolvedValue(null as any);
+  const box = document.createElement('div'); document.body.appendChild(box); const root: Root = createRoot(box);
+  await act(async () => { root.render(<App />); });
+  await act(async () => { await vi.advanceTimersByTimeAsync(10500); });
+  const kinds = ['/nodes', '/runs', '/approvals', '/workspaces'];
+  const first = Object.fromEntries(kinds.map((k) => {
+    const e = seen.find((s) => s.url.startsWith('/v1/projects/') && s.url.endsWith(k));
+    return [k, e ? { hasSignal: e.hasSignal, abortedBy10s: e.signal?.aborted ?? null, reason: e.signal?.aborted ? String((e.signal.reason as any)?.message ?? e.signal.reason) : null } : null];
+  }));
+  const certSeen = seen.filter((s) => s.url.endsWith('/node-certificates'));
+  OUT.T1 = { first, nodeCertificateFetches: certSeen.length, urls: Array.from(new Set(seen.map((s) => s.url))) };
+  act(() => { root.unmount(); }); box.remove(); vi.restoreAllMocks(); vi.useRealTimers();
+  for (const k of kinds) { expect((first as any)[k]?.hasSignal).toBe(true); expect((first as any)[k]?.abortedBy10s).toBe(true); }
+});

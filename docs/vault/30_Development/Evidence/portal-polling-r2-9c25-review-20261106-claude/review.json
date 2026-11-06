@@ -1,0 +1,140 @@
+{
+  "reviewer": "Claude (one actual independent narrow reviewer, no helpers/subagents)",
+  "orca": { "task": "task_855e5f3977e0", "dispatch": "ctx_ed14d0be16a1", "predecessor": "B Rev9b review task_a67e24d81ef8/ctx_99a4e28b6c25 (start owned by Root)" },
+  "author": { "agent": "Gemini", "task": "task_9d814a8270e1", "dispatch": "ctx_d855f1849f6b", "awaitingAsk": "msg_ee333237c962" },
+  "reviewBranch": "agent/claude/portal-polling-r2-9c25-review-20261106",
+  "reviewBranchBase": "9c25f3c9cab162f424744d79f9a4e21729c40404",
+  "candidate": {
+    "final": "9c25f3c9cab162f424744d79f9a4e21729c40404",
+    "source": "22c20a838fe0ab82a772641163ef553494c5bea3",
+    "immutableBase": "854a8eab0b6e236b62878f49ee941c700e458af0",
+    "branch": "agent/gemini/portal-refresh-polling-r2-20261106",
+    "remoteBranchHeadAtReview": "9c25f3c9cab162f424744d79f9a4e21729c40404",
+    "ownerMisreportedFinalNotUsed": "9c25f3c95e1e7a02c918ef8392110c4d445585b3",
+    "nonDocPathsVs854": [
+      "apps/web/src/app/App.tsx", "apps/web/src/features/desktop/ResourceExplorer.tsx",
+      "apps/web/src/shared/api/projectObservation.ts", "apps/web/src/shared/api/runApprovalObservation.ts",
+      "apps/web/src/shared/ui/Header.tsx", "apps/web/tests/portal-refresh-fleet-ui.test.tsx"
+    ],
+    "source22cToFinal9cNonDocPaths": 0,
+    "docsDeltaVs854": [
+      "docs/vault/30_Development/Evidence/portal-refresh-fleet-ui-20261106-gemini/verification.json (modified)",
+      "docs/vault/30_Development/History/2026-11-06_21-45-00_KST_PORTAL_REFRESH_POLLING_R2_Gemini.md (added)"
+    ],
+    "keyBlobs9c": {
+      "apps/web/src/app/App.tsx": "70bad418d0bb8384c3553149920e3e49287a1923",
+      "apps/web/src/shared/ui/Header.tsx": "fdbe64ad6efb7aa8c5c446490a31748bfa9254f0",
+      "apps/web/src/features/desktop/ResourceExplorer.tsx": "2ee822b647708dcae362bb289990b0c88bbc35e8",
+      "apps/web/src/shared/api/projectObservation.ts": "0331832d17e4606bb389cec1330520e4d27574a9",
+      "apps/web/src/shared/api/runApprovalObservation.ts": "6e592d6e9cf4ed611e38ff17187201fa83f8e859",
+      "apps/web/tests/portal-refresh-fleet-ui.test.tsx": "cc5b0a3edf98f857ec5187c21f29a631f31a6e42",
+      "apps/web/src/shared/api/client.ts (unchanged)": "23d40210f6a0b548b5e27fa3866c848ba7ec076b",
+      "apps/web/src/shared/api/nodeCertificateObservation.ts (unchanged)": "52c560211db43b39f5232c0dad8fc93c57c49c5e"
+    },
+    "unchangedAcceptedBytes": "nginx.conf, vite.config.ts, features/auth/session.ts, dashboard/ClusterOverview.tsx and package.json/package-lock.json blobs are identical 854 vs 9c (not in the diff).",
+    "executedTreeProof": "git archive 9c25f3c9 (apps/web, contracts, tools, packages) -> session scratch; git hash-object --no-filters of all 662 blobs equals the 9c tree (0 mismatch, 0 missing; apps/web 281/281). Dependencies: node_modules junction to supervision-integration-20261104/apps/web/node_modules; 215 installed package versions equal the 9c package-lock (0 mismatch), 50 lock entries absent are all optional platform packages. No install, no lock/version/network change. Author worktree src never executed. Reviewer probe files were added only inside the scratch export.",
+    "ci": {
+      "Frontend": "42219574051 head 22c20a83 branch agent/gemini/portal-refresh-polling-r2-20261106 event workflow_dispatch path .github/workflows/frontend.yml attempt 1; jobs 127897973932 frontend 12/12 steps success, 127897974300 Portal Container Build & Hardened Runtime Smoke 14/14 success (read-only gh api re-check by reviewer; Root verified first).",
+      "Docs": "42221567010 head 9c25f3c9 path .github/workflows/docs.yml event workflow_dispatch attempt 1 title Root-UIR2-FINAL-DOCS-9c25f3c9-0f0b790b829d4e76b706ede3c486afec job 127904637893 docs 19/19 success (read-only re-check). Owner Docs 42220264732 validated 5f3c9b74, not final 9c; initial Docs 42220046158 failed on cd452 (path citation) and was fixed by 5f3c9b74. No CI re-dispatched by reviewer."
+    }
+  },
+  "verdict": "REVISION_REQUIRED",
+  "verdictScope": "UI R2 source delta only (narrow). Not deployment, not artifact, not real browser/TLS/fleet SSO, not 5PC/runtime acceptance, not whole-program done.",
+  "priorFindingClosure": {
+    "UI-854-M1": {
+      "status": "PARTIALLY_CLOSED",
+      "closed": [
+        "Starvation: monotone applied fence (request > xAppliedRef) applies an outstanding slower response even when newer ticks were issued; R3 every /nodes answer 6s for 120s -> node shown, no stale/timeout, max 2 concurrent; author P6 also passes.",
+        "Hang on the primary leg: AbortController + 10s timer per request; R4 every /nodes hangs (signal honoured) -> stale banner role=alert with '응답 시간 초과' by 15.5s, still stale at 60s, never '정상 조회 결과: 0대'; recovery clears; max 3 concurrent. Author P7 passes; mutant MB (timer 10s->10000s) is killed by P7 and R4.",
+        "Older/late completion cannot overwrite newer data: P4 passes; mutant MA (remove request > nodeAppliedRef) killed by P4.",
+        "Scope fences: project switch aborts latest controller and drops old late response (R5 oldAborted=true, leaked=false); logout aborts in-flight and drops late response, observed data cleared (R6); unmount aborts latest controller (R7).",
+        "Transport plumbing is real: T1 with real apiClient and real fetchObservedRuns/fetchObservedApprovals/fetchProjectWorkspaces (only global fetch mocked) shows AbortSignal on /nodes, /runs, /approvals, /workspaces fetches, each aborted at 10s with reason REQUEST_TIMEOUT. apiClient spreads options into fetch (client.ts unchanged)."
+      ],
+      "open": "UI-R2-M1: the node poll's second leg fetchProjectNodeCertificates is not given the controller signal, so the documented 10s bound does not hold when /node-certificates hangs."
+    },
+    "UI-854-L1": {
+      "status": "CLOSED",
+      "evidence": "GatewayState unknown/healthy(rtt)/degraded/offline. HTML 200, JSON 404/503, JSON status!=ok -> 'Gateway: 비정상 응답'; fetch rejection and 4s timeout -> 'Offline'; healthy only for res.ok + application/json + body.status==='ok'. Author H1 (5 classes) passes; mutant MF (degraded->offline) killed by 6 author tests and R-H5; reviewer H4 (hang -> Offline at 4.1s) and H5 (503 -> 비정상 응답 -> ok RTT -> network Offline) pass. Canonical /healthz and proxies unchanged."
+    },
+    "UI-854-L2": {
+      "status": "PARTIALLY_CLOSED",
+      "closed": "Sequence fence: older slow success cannot overwrite newer failure (author H2; mutant MC killed by H2). Fetch phase bounded by 4s abort < 5s interval (H4). Mount and current-request guard re-checked after res.json().",
+      "open": "UI-R2-L2: clearTimeout runs before res.json(), so a body that stalls after headers is no longer under the deadline."
+    },
+    "UI-854-L3": {
+      "status": "CLOSED",
+      "evidence": "ResourceExplorer onClick={() => onRetryNodes?.()}; App passes handleManualRetryNodes/Runs/Approvals (fetchX(false)) to WebDesktop, ClusterOverview, ResourceExplorer, AdminSecurityConsole, RunDetail, run list and ApprovalCenter; fetchX uses isBg = isBackground === true. Remaining direct calls fetchNodes() (App.tsx:912), fetchWorkspaces() (994), fetchApprovals()/fetchRuns() after approve/reject/cancel are no-arg foreground. Reviewer R9 clicks the real nodes-retry-btn: error banner cleared, nodes-loading-state shown; mutant ME (restore event-as-background on all three layers) killed by R9."
+    },
+    "UI-854-L4": {
+      "status": "PARTIALLY_CLOSED",
+      "closed": "Section 10 mounts the real App with fake timers and mocked apiClient (P1-P7, P9) and real Header (H1, H2); guard-removing mutants MA, MB, MC, MF are killed by author tests.",
+      "open": "UI-R2-L3: author P8 never clicks approve/reject and P9 does not observe foreground behaviour, so mutants MD and ME stay green on the author suite; no logout, certificate-leg, manual-supersede or hung-body tests."
+    }
+  },
+  "findings": [
+    {
+      "id": "UI-R2-M1",
+      "severity": "Medium",
+      "source": "apps/web/src/app/App.tsx:357 (22c20a83/9c25f3c9) certObs = await fetchProjectNodeCertificates(targetPrj); inside fetchNodes after the /nodes leg, under the 10s timer started at App.tsx:333-335",
+      "claim": "The R2 '10s documented finite timeout ... never indefinite 0 success' holds only for the /nodes leg. fetchProjectNodeCertificates already accepts an AbortSignal (nodeCertificateObservation.ts:56-62) but App does not pass controller.signal, so when /v1/projects/{id}/node-certificates hangs the timer's abort has no listener, the node page that already arrived is never applied, no error/stale is set, and every 5s tick stacks another hung request.",
+      "counterexample": "R1 on exact 9c bytes: observed 0 nodes at t0, then /nodes returns 1 node immediately and /node-certificates hangs. At +15s, +30s and +60s: '정상 조회 결과: 0대' still shown, no cluster-stale-warning, observed-node never shown, 13 node polls and 13 hung certificate calls, 0 of 13 certificate calls carried a signal (10 node signals aborted with no effect). R1b, /node-certificates rejects after 60s (nginx default proxy_read_timeout for /v1/, nginx.conf sets none there): at +30s still current-0 with no stale; the node appears only at about +70s.",
+      "minimalFix": "Pass the same signal: fetchProjectNodeCertificates(targetPrj, controller.signal). Verified in scratch (FIX1): R1 and R1b pass, author 35/35 and all other probes unchanged. Add an App test in the R1 shape.",
+      "regression": "The unsignalled certificate call predates R2 (854), but R2 introduces the 10s bound claim and the M1 closure target; the M1 failure mode (stale snapshot presented as current beyond the documented bound) remains reachable."
+    },
+    {
+      "id": "UI-R2-L1",
+      "severity": "Low",
+      "source": "apps/web/src/app/App.tsx:320-322 (!isBg abort of nodeAbortRef) with 372-382 catch: isTimeout = err?.name === 'AbortError' || err?.message === 'REQUEST_TIMEOUT' (376); same pattern runs 391-393/425, approvals 443-445/477, workspaces 495-497/528",
+      "claim": "Manual retry cancels the in-flight background request with abort() (no reason), and that request's catch is still applied because its id is above the applied fence. The AbortError is classified as a timeout, so the user's own refresh immediately flips the view to error with '클러스터 노드 응답 시간 초과 (10s Timeout)' although no timeout happened; the state then flips again when the manual request completes. For approvals this also briefly sets approvalsState=error.",
+      "counterexample": "R2: observed 1 node; background poll pending since 5s; click cluster-refresh-btn; after 0ms: timeout text shown, stale/error banner shown, background signal aborted, manual request still pending.",
+      "minimalFix": "In each catch, if controller.signal.aborted and the reason is not the REQUEST_TIMEOUT error, return without applying (superseded cancel); classify timeout from signal.reason, not err.name. Verified for nodes in scratch (FIX2): R2 passes, author 35/35 unchanged."
+    },
+    {
+      "id": "UI-R2-L2",
+      "severity": "Low",
+      "source": "apps/web/src/shared/ui/Header.tsx:59 clearTimeout(timeoutId) before Header.tsx:68 await res.json()",
+      "claim": "The 4s gateway deadline is cancelled when headers arrive, so a JSON body that stalls is never aborted. Because only the latest check may write, a run of stalled bodies leaves the last label (for example a healthy RTT) in place for as long as the stall lasts; in production this is bounded only by upstream/proxy timeouts (nginx /healthz location sets no proxy_read_timeout, default 60s).",
+      "counterexample": "H3: first check JSON ok -> 'Gateway: 0ms' (fake clock); every later response has JSON headers and a body that never resolves until aborted. After 60s and 13 checks the label is still 'Gateway: 0ms'.",
+      "minimalFix": "Keep the timer until after res.json() (clear only in finally) so the abort also rejects the body read and maps to Offline/degraded. Verified in scratch (FIX3): H3 passes, author H1/H2 and the rest unchanged."
+    },
+    {
+      "id": "UI-R2-L3",
+      "severity": "Low",
+      "source": "apps/web/tests/portal-refresh-fleet-ui.test.tsx:898-917 (P8), 919-947 (P9)",
+      "claim": "Two of the requested App proofs do not test what they claim. P8 only lets approvals fail and asserts decideApproval was not called; it never clicks approve or reject. P9 asserts that a call happened and '0대' appears, which also holds when the retry runs as a background poll.",
+      "counterexample": "Mutant MD (approvalsState guard removed in handleApprove/handleReject): author suite 35/35 green; reviewer R8 (real reject button + '반려 확인' click while approvals are stale) fails with decideApproval called. Mutant ME (event passed as isBackground at ResourceExplorer, App wiring and isBg): author suite green; reviewer R9 fails (banner stays, no loading).",
+      "minimalFix": "Adopt the R8 (with the R8c success control) and R9 shapes; add R1, R2, H3 and logout (R6) cases."
+    }
+  ],
+  "info": [
+    "UI-R2-I1 Design differs from Root's literal M1 wording (skip a background tick while the same resource is in flight, release only the owning request in finally). The author instead issues every tick and applies any completion newer than the last applied one. Behaviour meets the closure targets in the probes: no starvation (R3), bounded concurrency (2 for 6s responses, 3 for hangs, given a 10s timer and 5s interval), older completions never overwrite newer applied data (P4), no shared in-flight guard that an old scope could release.",
+    "UI-R2-I2 Only the latest controller per resource is kept in xAbortRef. On unmount, logout and project switch, older overlapping requests are not aborted. They end via their own 10s timer (R7) and are dropped by the session/scope/applied fences. No data leak; transport cancellation is not complete.",
+    "UI-R2-I3 The approve/reject guard is real (R8 0 decide calls; R8c control: the same click path with approvals current calls decideApproval once). handleReject rethrows into ApprovalDetail's try/finally without a catch, which leaves one unhandled promise rejection per blocked click (R8 unhandled=1). This predates R2.",
+    "UI-R2-I4 '비정상 응답' covers both contract errors (HTML 200, JSON 404) and a reachable unhealthy endpoint (503, status!=ok), with no HTTP status shown. This is acceptable under the L1 minimal fix; a status suffix would help operators.",
+    "UI-R2-I5 fetchX(isBackground: boolean | any) widens the type to any. Strict === true makes it safe at run time; boolean plus a separate manual callback would keep tsc protection.",
+    "UI-R2-I6 Timeout copy hardcodes '(10s Timeout)'. Under UI-R2-L1 that text also appears for user cancels."
+  ],
+  "accepted": [
+    "Prior accepted parts unchanged in 9c: normal-speed empty-card flash fix (P1), initial pending is not a 0 success (P1/P5), fast failure stale/recovery (P2/P3), scope-bound data and fences, no fabricated 5/5/resources/timestamps, auth display only from server-verified identity, nginx/Vite/auth/ClusterOverview bytes identical to 854.",
+    "Frontend transport change is internal only: optional { signal } forwarded through fetchObservedRuns/fetchObservedApprovals/fetchProjectWorkspaces into apiClient -> fetch. Method, URL, headers and response validation are unchanged."
+  ],
+  "reviewerExecution": {
+    "authorTargeted": "portal-refresh-fleet-ui.test.tsx 35/35 pass, exit 0 (reviewer run on exact bytes; two 'socket hang up' ECONNRESET stderr lines of unidentified origin, no test failure)",
+    "relatedSuites": "acc09-contrast-tokens 46/46, app-node-certificate-freshness 9/9, live-observation 27/27, run-approval-observation-contract 6/6, all exit 0",
+    "reviewerProbes": "reviewer_probe_uir2: 10 pass + 4 counterexamples (R1, R1b, R2, H3); reviewer_probe_uir2_transport T1 1/1",
+    "mutantMatrix": "MA, MB, MC, MF killed by author tests; MD and ME survive the author suite and are killed only by reviewer R8 and R9",
+    "fixChecks": "FIX1, FIX2 and FIX3 each close their probe with no author regression; combined FIX1+2+3: 49/49 pass, exit 0; original blobs restored and re-hashed (App 70bad418, Header fdbe64ad, ResourceExplorer 2ee822b6)",
+    "typecheck": "tsc -p tsconfig.app.json --noEmit exit 0, tsc -p tsconfig.node.json --noEmit exit 0. A first tsc -b on an export without packages/contracts-ts failed (35 errors, all from the missing type-only package) and is not a candidate result.",
+    "eslint": "eslint --max-warnings 0 on the 6 changed TS/TSX files exit 0",
+    "notRun": "full Vitest, vite build, backend/Go/old harness (CI Frontend 42219574051 on exact 22c is the independent build and full-suite proof); no live 3100/8080/8443/r5, browser, TLS or Docker"
+  },
+  "limits": [
+    "Probes run in happy-dom with fake timers, a mocked apiClient (transport T1 mocks only global fetch) and mocked session/projects. This is not a real browser, TLS or fleet SSO. Old Portal Harness 42207878338 is not fresh evidence and was not used.",
+    "Production bounds such as nginx's default 60s read timeout are read from config text; nothing live was probed.",
+    "Owner local results (35/35, acc09 46, certificate freshness 9, tsc/build/route/doc gates) stay owner proof. Only the commands in commands.json were executed by the reviewer.",
+    "Side effect: the first tsc -b (build mode) rewrote the gitignored TypeScript incremental cache supervision-integration-20261104/apps/web/node_modules/.tmp/tsconfig.{app,node}.tsbuildinfo through the dependency junction (22:43:33 KST). No tracked file changed, nothing was deleted, and later runs used non-build -p --noEmit.",
+    "Host had about 200-530 MB free RAM; all runs were serial with one worker. Earlier 854-review limits (parallel crash cause unproven, 6 no-.git fixture failures later 44/44 with GIT_DIR) were the old reviewer's fixture results and are not repeated or cited as author passes."
+  ],
+  "nextAction": "Gemini (same task) fixes UI-R2-M1 (required) and UI-R2-L1..L3 as a new immutable candidate with fresh exact Frontend and Docs CI. Root then requests one narrow Claude re-review of that delta. Root does not stage or deploy 9c25f3c9. Old 854 remains NOT DEPLOYABLE.",
+  "atKST": "2026-11-06T22:50:00+09:00"
+}

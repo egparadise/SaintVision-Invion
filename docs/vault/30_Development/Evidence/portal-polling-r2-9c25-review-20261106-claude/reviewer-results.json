@@ -1,0 +1,608 @@
+{
+ "treeProof": {
+  "commit": "9c25f3c9cab162f424744d79f9a4e21729c40404",
+  "blobs": 662,
+  "appsWebBlobs": 281,
+  "mismatch": [],
+  "missing": [],
+  "keyBlobs": {
+   "apps/web/src/app/App.tsx": "70bad418d0bb8384c3553149920e3e49287a1923",
+   "apps/web/src/shared/ui/Header.tsx": "fdbe64ad6efb7aa8c5c446490a31748bfa9254f0",
+   "apps/web/src/features/desktop/ResourceExplorer.tsx": "2ee822b647708dcae362bb289990b0c88bbc35e8",
+   "apps/web/src/shared/api/projectObservation.ts": "0331832d17e4606bb389cec1330520e4d27574a9",
+   "apps/web/src/shared/api/runApprovalObservation.ts": "6e592d6e9cf4ed611e38ff17187201fa83f8e859",
+   "apps/web/tests/portal-refresh-fleet-ui.test.tsx": "cc5b0a3edf98f857ec5187c21f29a631f31a6e42",
+   "apps/web/src/shared/api/client.ts": "23d40210f6a0b548b5e27fa3866c848ba7ec076b",
+   "apps/web/src/shared/api/nodeCertificateObservation.ts": "52c560211db43b39f5232c0dad8fc93c57c49c5e"
+  },
+  "depsCheckedInstalled": 215,
+  "depsMismatchOrAbsent": [
+   [
+    "node_modules/@esbuild/aix-ppc64",
+    "absent",
+    "0.25.12",
+    "optional"
+   ],
+   [
+    "node_modules/@esbuild/android-arm",
+    "absent",
+    "0.25.12",
+    "optional"
+   ],
+   [
+    "node_modules/@esbuild/android-arm64",
+    "absent",
+    "0.25.12",
+    "optional"
+   ],
+   [
+    "node_modules/@esbuild/android-x64",
+    "absent",
+    "0.25.12",
+    "optional"
+   ],
+   [
+    "node_modules/@esbuild/darwin-arm64",
+    "absent",
+    "0.25.12",
+    "optional"
+   ],
+   [
+    "node_modules/@esbuild/darwin-x64",
+    "absent",
+    "0.25.12",
+    "optional"
+   ],
+   [
+    "node_modules/@esbuild/freebsd-arm64",
+    "absent",
+    "0.25.12",
+    "optional"
+   ],
+   [
+    "node_modules/@esbuild/freebsd-x64",
+    "absent",
+    "0.25.12",
+    "optional"
+   ],
+   [
+    "node_modules/@esbuild/linux-arm",
+    "absent",
+    "0.25.12",
+    "optional"
+   ],
+   [
+    "node_modules/@esbuild/linux-arm64",
+    "absent",
+    "0.25.12",
+    "optional"
+   ],
+   [
+    "node_modules/@esbuild/linux-ia32",
+    "absent",
+    "0.25.12",
+    "optional"
+   ],
+   [
+    "node_modules/@esbuild/linux-loong64",
+    "absent",
+    "0.25.12",
+    "optional"
+   ],
+   [
+    "node_modules/@esbuild/linux-mips64el",
+    "absent",
+    "0.25.12",
+    "optional"
+   ],
+   [
+    "node_modules/@esbuild/linux-ppc64",
+    "absent",
+    "0.25.12",
+    "optional"
+   ],
+   [
+    "node_modules/@esbuild/linux-riscv64",
+    "absent",
+    "0.25.12",
+    "optional"
+   ],
+   [
+    "node_modules/@esbuild/linux-s390x",
+    "absent",
+    "0.25.12",
+    "optional"
+   ],
+   [
+    "node_modules/@esbuild/linux-x64",
+    "absent",
+    "0.25.12",
+    "optional"
+   ],
+   [
+    "node_modules/@esbuild/netbsd-arm64",
+    "absent",
+    "0.25.12",
+    "optional"
+   ],
+   [
+    "node_modules/@esbuild/netbsd-x64",
+    "absent",
+    "0.25.12",
+    "optional"
+   ],
+   [
+    "node_modules/@esbuild/openbsd-arm64",
+    "absent",
+    "0.25.12",
+    "optional"
+   ],
+   [
+    "node_modules/@esbuild/openbsd-x64",
+    "absent",
+    "0.25.12",
+    "optional"
+   ],
+   [
+    "node_modules/@esbuild/openharmony-arm64",
+    "absent",
+    "0.25.12",
+    "optional"
+   ],
+   [
+    "node_modules/@esbuild/sunos-x64",
+    "absent",
+    "0.25.12",
+    "optional"
+   ],
+   [
+    "node_modules/@esbuild/win32-arm64",
+    "absent",
+    "0.25.12",
+    "optional"
+   ],
+   [
+    "node_modules/@esbuild/win32-ia32",
+    "absent",
+    "0.25.12",
+    "optional"
+   ],
+   [
+    "node_modules/@napi-rs/lzma-linux-x64-gnu",
+    "absent",
+    "1.5.1",
+    "optional"
+   ],
+   [
+    "node_modules/@rollup/rollup-android-arm-eabi",
+    "absent",
+    "4.63.1",
+    "optional"
+   ],
+   [
+    "node_modules/@rollup/rollup-android-arm64",
+    "absent",
+    "4.63.1",
+    "optional"
+   ],
+   [
+    "node_modules/@rollup/rollup-darwin-arm64",
+    "absent",
+    "4.63.1",
+    "optional"
+   ],
+   [
+    "node_modules/@rollup/rollup-darwin-x64",
+    "absent",
+    "4.63.1",
+    "optional"
+   ],
+   [
+    "node_modules/@rollup/rollup-freebsd-arm64",
+    "absent",
+    "4.63.1",
+    "optional"
+   ],
+   [
+    "node_modules/@rollup/rollup-freebsd-x64",
+    "absent",
+    "4.63.1",
+    "optional"
+   ],
+   [
+    "node_modules/@rollup/rollup-linux-arm-gnueabihf",
+    "absent",
+    "4.63.1",
+    "optional"
+   ],
+   [
+    "node_modules/@rollup/rollup-linux-arm-musleabihf",
+    "absent",
+    "4.63.1",
+    "optional"
+   ],
+   [
+    "node_modules/@rollup/rollup-linux-arm64-gnu",
+    "absent",
+    "4.63.1",
+    "optional"
+   ],
+   [
+    "node_modules/@rollup/rollup-linux-arm64-musl",
+    "absent",
+    "4.63.1",
+    "optional"
+   ],
+   [
+    "node_modules/@rollup/rollup-linux-loong64-gnu",
+    "absent",
+    "4.63.1",
+    "optional"
+   ],
+   [
+    "node_modules/@rollup/rollup-linux-loong64-musl",
+    "absent",
+    "4.63.1",
+    "optional"
+   ],
+   [
+    "node_modules/@rollup/rollup-linux-ppc64-gnu",
+    "absent",
+    "4.63.1",
+    "optional"
+   ],
+   [
+    "node_modules/@rollup/rollup-linux-ppc64-musl",
+    "absent",
+    "4.63.1",
+    "optional"
+   ],
+   [
+    "node_modules/@rollup/rollup-linux-riscv64-gnu",
+    "absent",
+    "4.63.1",
+    "optional"
+   ],
+   [
+    "node_modules/@rollup/rollup-linux-riscv64-musl",
+    "absent",
+    "4.63.1",
+    "optional"
+   ],
+   [
+    "node_modules/@rollup/rollup-linux-s390x-gnu",
+    "absent",
+    "4.63.1",
+    "optional"
+   ],
+   [
+    "node_modules/@rollup/rollup-linux-x64-gnu",
+    "absent",
+    "4.63.1",
+    "optional"
+   ],
+   [
+    "node_modules/@rollup/rollup-linux-x64-musl",
+    "absent",
+    "4.63.1",
+    "optional"
+   ],
+   [
+    "node_modules/@rollup/rollup-openbsd-x64",
+    "absent",
+    "4.63.1",
+    "optional"
+   ],
+   [
+    "node_modules/@rollup/rollup-openharmony-arm64",
+    "absent",
+    "4.63.1",
+    "optional"
+   ],
+   [
+    "node_modules/@rollup/rollup-win32-arm64-msvc",
+    "absent",
+    "4.63.1",
+    "optional"
+   ],
+   [
+    "node_modules/@rollup/rollup-win32-ia32-msvc",
+    "absent",
+    "4.63.1",
+    "optional"
+   ],
+   [
+    "node_modules/fsevents",
+    "absent",
+    "2.3.3",
+    "optional"
+   ]
+  ]
+ },
+ "probeReportExact9c": {
+  "R1_certHang": {
+   "last": 60000,
+   "t15000": {
+    "claimsCurrentZero": true,
+    "stale": false,
+    "observedNodeShown": false,
+    "timeoutText": false
+   },
+   "t30000": {
+    "claimsCurrentZero": true,
+    "stale": false,
+    "observedNodeShown": false,
+    "timeoutText": false
+   },
+   "t60000": {
+    "claimsCurrentZero": true,
+    "stale": false,
+    "observedNodeShown": false,
+    "timeoutText": false
+   },
+   "nodeCalls": 13,
+   "certCalls": 13,
+   "certCallsWithSignal": 0,
+   "nodeSignalsAborted": 10
+  },
+  "R1b_cert60": {
+   "at30": {
+    "claimsCurrentZero": true,
+    "stale": false,
+    "observedNodeShown": false
+   },
+   "at70": {
+    "claimsCurrentZero": false,
+    "stale": false,
+    "observedNodeShown": true
+   },
+   "certCallsWithSignal": 0,
+   "certCalls": 15
+  },
+  "R2_manualAbortLabel": {
+   "elapsedSinceBgStartMs": 0,
+   "timeoutText": true,
+   "errorBanner": true,
+   "bgAborted": true,
+   "manualPending": 2
+  },
+  "R3_slow6s": {
+   "observedNodeShown": true,
+   "stale": false,
+   "timeoutText": false,
+   "claimsCurrentZero": false,
+   "nodeCalls": 25,
+   "maxInflight": 2
+  },
+  "R4_hang": {
+   "at15": {
+    "stale": true,
+    "timeoutText": true,
+    "claimsCurrentZero": false
+   },
+   "at60": {
+    "stale": true,
+    "timeoutText": true,
+    "claimsCurrentZero": false,
+    "abortedSignals": 10,
+    "nodeCalls": 13,
+    "maxInflight": 3
+   },
+   "recovered": {
+    "stale": false,
+    "claimsCurrentZero": true
+   }
+  },
+  "R5_projectSwitch": {
+   "oldAborted": true,
+   "leaked": false,
+   "bApplied": true,
+   "stale": false
+  },
+  "R6_logout": {
+   "aborted": [
+    true
+   ],
+   "leaked": false,
+   "observedStillShown": false
+  },
+  "R7_unmount": {
+   "abortedAtUnmount": [
+    false,
+    true
+   ],
+   "abortedAfter10s": [
+    true,
+    true
+   ]
+  },
+  "R8_rejectClick": {
+   "rejectBtnFound": true,
+   "staleShown": true,
+   "decideCallsInError": 0,
+   "actionErrorShown": true,
+   "unhandled": 1
+  },
+  "R8c_control": {
+   "decideCalls": 1
+  },
+  "R9_explorerRetry": {
+   "bannerBefore": true,
+   "bannerAfterClick": false,
+   "loadingAfterClick": true,
+   "pendingManual": 1
+  },
+  "H3_hungBody": {
+   "first": "Gateway: 0ms",
+   "after60": "Gateway: 0ms",
+   "checks": 13
+  },
+  "H4_timeout": {
+   "at0": "Gateway: 확인 중...",
+   "at4": "Gateway: Offline"
+  },
+  "H5_order": {
+   "a": "Gateway: 비정상 응답",
+   "b": "Gateway: 0ms",
+   "c": "Gateway: Offline"
+  }
+ },
+ "transportReportExact9c": {
+  "T1": {
+   "first": {
+    "/nodes": {
+     "hasSignal": true,
+     "abortedBy10s": true,
+     "reason": "REQUEST_TIMEOUT"
+    },
+    "/runs": {
+     "hasSignal": true,
+     "abortedBy10s": true,
+     "reason": "REQUEST_TIMEOUT"
+    },
+    "/approvals": {
+     "hasSignal": true,
+     "abortedBy10s": true,
+     "reason": "REQUEST_TIMEOUT"
+    },
+    "/workspaces": {
+     "hasSignal": true,
+     "abortedBy10s": true,
+     "reason": "REQUEST_TIMEOUT"
+    }
+   },
+   "nodeCertificateFetches": 0,
+   "urls": [
+    "/healthz",
+    "/v1/projects/prj_01ARZ3NDEKTSV4RRFFQ69G5FAV/nodes",
+    "/v1/projects/prj_01ARZ3NDEKTSV4RRFFQ69G5FAV/runs",
+    "/v1/projects/prj_01ARZ3NDEKTSV4RRFFQ69G5FAV/approvals",
+    "/v1/projects/prj_01ARZ3NDEKTSV4RRFFQ69G5FAV/workspaces"
+   ]
+  }
+ },
+ "mutantAndFixMatrix": {
+  "MA_noAppliedFence": {
+   "exit": 1,
+   "passed": 44,
+   "failed": 5,
+   "failedTests": [
+    "AUTH:P4: late older response is ignored after a newer poll comple",
+    "PROBE:H3 header JSON body hangs after headers: deadline does not c",
+    "PROBE:R1 certificate sub-request hang: documented 10s bound does n",
+    "PROBE:R1b certificate sub-request 60s 504 (nginx default /v1 proxy",
+    "PROBE:R2 manual refresh during an in-flight background poll is lab"
+   ]
+  },
+  "MB_noNodeTimeout": {
+   "exit": 1,
+   "passed": 43,
+   "failed": 6,
+   "failedTests": [
+    "AUTH:P7: hanging request times out at 10s, triggering explicit st",
+    "PROBE:H3 header JSON body hangs after headers: deadline does not c",
+    "PROBE:R1 certificate sub-request hang: documented 10s bound does n",
+    "PROBE:R1b certificate sub-request 60s 504 (nginx default /v1 proxy",
+    "PROBE:R2 manual refresh during an in-flight background poll is lab",
+    "PROBE:R4 all /nodes hang (signal honoured): stale+timeout by ~15s,"
+   ]
+  },
+  "MC_noHeaderSeqFence": {
+   "exit": 1,
+   "passed": 44,
+   "failed": 5,
+   "failedTests": [
+    "AUTH:H2: Header sequence fence prevents older slow success from o",
+    "PROBE:H3 header JSON body hangs after headers: deadline does not c",
+    "PROBE:R1 certificate sub-request hang: documented 10s bound does n",
+    "PROBE:R1b certificate sub-request 60s 504 (nginx default /v1 proxy",
+    "PROBE:R2 manual refresh during an in-flight background poll is lab"
+   ]
+  },
+  "MF_degradedCollapsedToOffline": {
+   "exit": 1,
+   "passed": 38,
+   "failed": 11,
+   "failedTests": [
+    "AUTH:H1: Header failure discrimination for html200 renders () => ",
+    "AUTH:H1: Header failure discrimination for json404 renders () => ",
+    "AUTH:H1: Header failure discrimination for json503 renders () => ",
+    "AUTH:H1: Header failure discrimination for jsonStatusDown renders",
+    "AUTH:rejects HTTP 404, 401, or 503 on /healthz as health success",
+    "AUTH:rejects SPA HTML 200 fallback on /healthz as health success ",
+    "PROBE:H3 header JSON body hangs after headers: deadline does not c",
+    "PROBE:H5 header order: degraded -> healthy -> network, each latest",
+    "PROBE:R1 certificate sub-request hang: documented 10s bound does n",
+    "PROBE:R1b certificate sub-request 60s 504 (nginx default /v1 proxy",
+    "PROBE:R2 manual refresh during an in-flight background poll is lab"
+   ]
+  },
+  "MD_noApprovalsErrorGuard": {
+   "exit": 1,
+   "passed": 44,
+   "failed": 5,
+   "failedTests": [
+    "PROBE:H3 header JSON body hangs after headers: deadline does not c",
+    "PROBE:R1 certificate sub-request hang: documented 10s bound does n",
+    "PROBE:R1b certificate sub-request 60s 504 (nginx default /v1 proxy",
+    "PROBE:R2 manual refresh during an in-flight background poll is lab",
+    "PROBE:R8 real reject click: approvalsState=error blocks decideAppr"
+   ]
+  },
+  "ME_L3EventAsBackground": {
+   "exit": 1,
+   "passed": 44,
+   "failed": 5,
+   "failedTests": [
+    "PROBE:H3 header JSON body hangs after headers: deadline does not c",
+    "PROBE:R1 certificate sub-request hang: documented 10s bound does n",
+    "PROBE:R1b certificate sub-request 60s 504 (nginx default /v1 proxy",
+    "PROBE:R2 manual refresh during an in-flight background poll is lab",
+    "PROBE:R9 ResourceExplorer real retry button runs foreground (clear"
+   ]
+  },
+  "FIX1_certSignal": {
+   "exit": 1,
+   "passed": 47,
+   "failed": 2,
+   "failedTests": [
+    "PROBE:H3 header JSON body hangs after headers: deadline does not c",
+    "PROBE:R2 manual refresh during an in-flight background poll is lab"
+   ]
+  },
+  "FIX2_supersededAbortIgnored": {
+   "exit": 1,
+   "passed": 46,
+   "failed": 3,
+   "failedTests": [
+    "PROBE:H3 header JSON body hangs after headers: deadline does not c",
+    "PROBE:R1 certificate sub-request hang: documented 10s bound does n",
+    "PROBE:R1b certificate sub-request 60s 504 (nginx default /v1 proxy"
+   ]
+  },
+  "FIX3_headerDeadlineCoversBody": {
+   "exit": 1,
+   "passed": 46,
+   "failed": 3,
+   "failedTests": [
+    "PROBE:R1 certificate sub-request hang: documented 10s bound does n",
+    "PROBE:R1b certificate sub-request 60s 504 (nginx default /v1 proxy",
+    "PROBE:R2 manual refresh during an in-flight background poll is lab"
+   ]
+  }
+ },
+ "combinedFix": {
+  "FIXALL_1_2_3": {
+   "exit": 0,
+   "passed": 49,
+   "failed": 0,
+   "failedTests": []
+  }
+ },
+ "restoredBlobsAfterMatrix": {
+  "src/app/App.tsx": "70bad418d0bb8384c3553149920e3e49287a1923",
+  "src/shared/ui/Header.tsx": "fdbe64ad6efb7aa8c5c446490a31748bfa9254f0",
+  "src/features/desktop/ResourceExplorer.tsx": "2ee822b647708dcae362bb289990b0c88bbc35e8"
+ },
+ "baselineNote": "Unmutated 9c: author file 35/35 pass; reviewer probe file 10 pass + 4 fail (R1,R1b,R2,H3 = counterexamples); transport 1/1 pass. In every mutant row those 4 baseline probe failures are present and are not mutant kills."
+}
