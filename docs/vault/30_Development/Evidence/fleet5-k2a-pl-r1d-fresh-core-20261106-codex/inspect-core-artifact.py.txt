@@ -1,0 +1,89 @@
+"""Read-only aggregate inspection of the exact hosted CI artifact; no binary execution."""
+from collections import Counter, defaultdict
+from pathlib import Path
+import hashlib
+import json
+import subprocess
+import zipfile
+import xml.etree.ElementTree as ET
+
+out = Path(__file__).parent
+metadata = json.loads((out/'core-artifact-metadata.json').read_text())
+raw = (out/'core-artifact.zip').read_bytes()
+digest = hashlib.sha256(raw).hexdigest()
+assert metadata['digest'] == 'sha256:'+digest
+assert metadata['size_in_bytes'] == len(raw)
+assert metadata['workflow_run']['head_sha'] == 'ea276c97ece2906dc1f29b44b65aa887379ea78f'
+report = dict(classification='HOSTED_DISPOSABLE_CORE_ONLY_NOT_INSTALLED_PRODUCTION_TRUST',
+              artifactId=metadata['id'], runId=42220638304, artifactZIPBytes=len(raw),
+              artifactZIP_SHA256=digest, githubDigestMatch=True, files=[], junit=[], go=[], binary=[])
+with zipfile.ZipFile(out/'core-artifact.zip') as archive:
+    for member in archive.infolist():
+        if member.is_dir():
+            continue
+        name = member.filename
+        item = dict(name=name, bytes=member.file_size)
+        # No key bodies or unknown PEM files are inspected or copied.
+        if name.lower().endswith(('.key', '.pem', '.p12', '.pfx')):
+            item['contentInspection'] = 'NOT_READ_KEY_OR_PEM'
+            report['files'].append(item)
+            continue
+        data = archive.read(member)
+        item['SHA256'] = hashlib.sha256(data).hexdigest()
+        report['files'].append(item)
+        if name.endswith('.xml'):
+            root = ET.fromstring(data)
+            cases = root.findall('.//testcase')
+            skips = Counter((s.get('message') or '').strip() for c in cases for s in c.findall('skipped'))
+            failures = [dict(classname=c.get('classname'), name=c.get('name'),
+                             failureTypes=[s.get('type') for s in c.findall('failure')],
+                             errorTypes=[s.get('type') for s in c.findall('error')])
+                        for c in cases if c.findall('failure') or c.findall('error')]
+            report['junit'].append(dict(file=name, cases=len(cases),
+                failures=sum(len(c.findall('failure')) for c in cases),
+                errors=sum(len(c.findall('error')) for c in cases),
+                skipped=sum(len(c.findall('skipped')) for c in cases),
+                skipReasons=dict(skips), failedCases=failures))
+        if name.endswith('node-unit.jsonl'):
+            packages = defaultdict(lambda: dict(topPass=0, subPass=0, testSkip=0, testFail=0,
+                                                packagePass=0, packageFail=0))
+            compiled = 0
+            reasons = 0
+            packageSkips = []
+            for line in data.splitlines():
+                event = json.loads(line)
+                pkg = event['Package']
+                row = packages[pkg]
+                action, test = event['Action'], event.get('Test')
+                if test:
+                    if action == 'pass':
+                        row['subPass' if '/' in test else 'topPass'] += 1
+                    elif action == 'skip':
+                        row['testSkip'] += 1
+                    elif action == 'fail':
+                        row['testFail'] += 1
+                elif action == 'pass':
+                    row['packagePass'] += 1
+                elif action == 'fail':
+                    row['packageFail'] += 1
+                elif action == 'skip':
+                    packageSkips.append(pkg)
+                if pkg.endswith('/internal/migrationcontext'):
+                    compiled += event.get('Output', '').count('actual go build -p=1 ./internal/migrationcontext exit0;')
+                    reasons += event.get('Output', '').count('REASON case=')
+            report['go'].append(dict(file=name, packages=dict(packages),
+                packageSkips=packageSkips, migrationcontextCompiledMutants=compiled,
+                migrationcontextReasonLines=reasons))
+        if name in ('inv-node', 'inv-discover'):
+            target = out/('artifact-'+name)
+            assert not target.exists(), 'Preserve prior binary capture; no overwrite'
+            target.write_bytes(data)
+            result = subprocess.run(['go', 'version', '-m', str(target)], capture_output=True)
+            (out/(name+'-go-version-m.txt')).write_bytes(result.stdout+result.stderr)
+            report['binary'].append(dict(file=name, SHA256=item['SHA256'],
+                metadataReadExit=result.returncode, metadata=result.stdout.decode(errors='replace'),
+                executed=False))
+(out/'core-artifact-verification.json').write_text(json.dumps(report, indent=2)+'\n')
+print(json.dumps(dict(artifactId=report['artifactId'], SHA256=digest,
+                     files=len(report['files']), junit=report['junit'],
+                     go=report['go'], binary=report['binary']), indent=2))

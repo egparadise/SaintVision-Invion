@@ -1,0 +1,434 @@
+{
+  "classification": "HOSTED_DISPOSABLE_CORE_ONLY_NOT_INSTALLED_PRODUCTION_TRUST",
+  "artifactId": 13505760008,
+  "runId": 42220638304,
+  "artifactZIPBytes": 14008277,
+  "artifactZIP_SHA256": "c116164469d72acfb7f4b2e173e50eb69f006e6b2d0fc5602cbfdd33cad9fef0",
+  "githubDigestMatch": true,
+  "files": [
+    {
+      "name": "api-unconfigured.log",
+      "bytes": 2745,
+      "SHA256": "520accb1659fbc24dc24217fdd46646918776f64e439d02133110eba8bd038cc"
+    },
+    {
+      "name": "build-product-runtime-real-pg.xml",
+      "bytes": 2368,
+      "SHA256": "d836aae3240d3d69e3a5d79c7cedc0a6b211117575516497edc2adfcca3b65f0"
+    },
+    {
+      "name": "business-handoff-tests.xml",
+      "bytes": 2778,
+      "SHA256": "05ac8fc221af02c1532cac5b96d1b69b8ae6e2d050329a01d8a838d0193e03cf"
+    },
+    {
+      "name": "containment-tests.xml",
+      "bytes": 4363,
+      "SHA256": "c435b06147cf9b214aa5745d919dd13eeb262d62f63344f2831152dd15f18b22"
+    },
+    {
+      "name": "core-tests.xml",
+      "bytes": 1434502,
+      "SHA256": "427cfad481145ed7dbcb94534ff46521ec89ab81f82c7b87132f9e9353e942f3"
+    },
+    {
+      "name": "cx01-recovery-tests.xml",
+      "bytes": 3535,
+      "SHA256": "d2a31168558d41fc1c11ba8afec4fadbd6600e6a1a4fd708e0ec54cc52ffbf1a"
+    },
+    {
+      "name": "developer-3cac621e-c422-429f-983e-53f9b809d702.json",
+      "bytes": 1731,
+      "SHA256": "d71297330fa57ac481380f7435d1b00a096db13bbc637a72ca26f9d54c0e9287"
+    },
+    {
+      "name": "developer-53c62592-0c25-4b60-b86d-5fd0b9c379b0.json",
+      "bytes": 1002,
+      "SHA256": "330399e60ada28fd230f2d67c6850cba7f7560c3c738038be9c1155c598cb9d0"
+    },
+    {
+      "name": "developer-de3512fd-07fb-47ec-ad30-d3533c2e6c84.json",
+      "bytes": 1747,
+      "SHA256": "b3bcbbbb9fd42f7ffc447b9a13a4f87e024508b6e914819b42870b084768aab0"
+    },
+    {
+      "name": "developer-ee2963d4-ea87-47d4-b8c5-f099336ca088.json",
+      "bytes": 541,
+      "SHA256": "4f850e5ff25ce12163cafee8b4b537a68134c88cf4ad6c03cac66e21a9f22277"
+    },
+    {
+      "name": "docker-compatibility.log",
+      "bytes": 1176,
+      "SHA256": "7fde16a684793f8b01bc21f5097bd7695b224881f3e17061ccc455f97ea0cd7e"
+    },
+    {
+      "name": "docker-host-tests.xml",
+      "bytes": 539,
+      "SHA256": "5759a7dbe658e829e32d3c4a028912f97b9be9baa4eb2ef12dc80a010a344034"
+    },
+    {
+      "name": "first-2435b730-2ce4-4d26-a1ec-db92744ae7cd.json",
+      "bytes": 1489,
+      "SHA256": "4f7f4be7a26cf97fee70f06c01880cb9086214288c5af4acc10a3616bff9d44a"
+    },
+    {
+      "name": "first-351d16a1-df5a-4a78-ac71-048b33131cc4.json",
+      "bytes": 829,
+      "SHA256": "bf1271e2daafbdb18114bfa9ff006431bec8e21b7386f1a908500ebbeb404b8e"
+    },
+    {
+      "name": "first-438da24e-c5ce-4df1-8c13-312d0d6bb718.json",
+      "bytes": 1476,
+      "SHA256": "d4106cb844d469e6f0b1b6eb98272703b57300be9a3dd072a2a81bb705303f92"
+    },
+    {
+      "name": "first-c3e377d6-0602-4235-804c-cfade40e6312.json",
+      "bytes": 598,
+      "SHA256": "b663dd1a4136287eca481dbeac8b18bbd339ada05ec4a446fa2182a50e9684d4"
+    },
+    {
+      "name": "inv-discover",
+      "bytes": 10212675,
+      "SHA256": "b92ac9c4a080c39391d17912193e26c181116a891ea6b1d54ce3195f739447c4"
+    },
+    {
+      "name": "lan-database-readiness-phases.json",
+      "bytes": 775,
+      "SHA256": "74ef82eb5dc7f18f290df38b33c7b0d30b2c259d397e27df6eae182114b59afb"
+    },
+    {
+      "name": "inv-node",
+      "bytes": 13387338,
+      "SHA256": "a94667ba6ed3ae9611bf7c1f080e41fe595a273d163bfd6c2c22336254404bad"
+    },
+    {
+      "name": "lan-installer-tests.xml",
+      "bytes": 2914,
+      "SHA256": "61a2c718b27a6bb9c3fb23f0b1bffeede360dd19951c6ef64a46f5c0471e99c0"
+    },
+    {
+      "name": "lan-pilot-database-real-pg.xml",
+      "bytes": 563,
+      "SHA256": "314852509c6e4d8261a7e214537574eceb22c091291530a7b68de6bc89234dd6"
+    },
+    {
+      "name": "model-cancel.json",
+      "bytes": 1429,
+      "SHA256": "71ec52ce2575bc436efd6ea820b1d86b7ef9795ee4e91ae44aeab8816a51bac3"
+    },
+    {
+      "name": "model-node-loss.json",
+      "bytes": 1429,
+      "SHA256": "0a277abd65c02642712dd7ea11ba54e948e1a18e1add3fb0acad184c4b5fe821"
+    },
+    {
+      "name": "model-output-recovery.json",
+      "bytes": 1493,
+      "SHA256": "2487b78e2f57add893e10e4db9e7cb67c728c192c9bd478b60838e0e561b8223"
+    },
+    {
+      "name": "model-replacement-node.json",
+      "bytes": 1971,
+      "SHA256": "2c351acfd59e483cacf997eefc765bac047c4e2789576767bacce32805f06a16"
+    },
+    {
+      "name": "model-single.json",
+      "bytes": 1484,
+      "SHA256": "ac76ba9143aef06ceec7e5678fdd91317ce71306c5e57dc436b76d2d7bf96fdb"
+    },
+    {
+      "name": "model-stale.json",
+      "bytes": 1425,
+      "SHA256": "98f0128de62d943ffddc93c40ac3d063c0e3551cccc0f916c2056cbb21f6f4ca"
+    },
+    {
+      "name": "node-unit.jsonl",
+      "bytes": 861617,
+      "SHA256": "f206bda2443ee51aa9565583caf32c60f37342f3adf792f757ab821128043fa8"
+    },
+    {
+      "name": "p0-owned-docker-floor.json",
+      "bytes": 4022,
+      "SHA256": "30085b90a098e01605c82e746d1d7400a7365e36b1065338f6a49abf39637175"
+    },
+    {
+      "name": "p0-real-stopped-reentry-settled.json",
+      "bytes": 3347,
+      "SHA256": "73fa52cf6d4e75ca3d704f8e3273d049d7863051cc04a22ddfad41462bb21af6"
+    },
+    {
+      "name": "saintvision_control_plane-0.1.0-py3-none-any.whl",
+      "bytes": 335443,
+      "SHA256": "5b7347c16f071017247201117e27abc309f2abb8499386363f7dc5ddcc13acb5"
+    },
+    {
+      "name": "saintvision_control_plane-0.1.0.tar.gz",
+      "bytes": 266292,
+      "SHA256": "bfec2ddf8a334768c6672a6b936325489ffce3d8df0660ef9bec53bb6cb21c2e"
+    },
+    {
+      "name": "shard-recovery-tests.xml",
+      "bytes": 3353,
+      "SHA256": "8876abb987d605c9c1b504f183d91d00a0d960a9c4016fe41d71481d9685332f"
+    },
+    {
+      "name": "subject-boundary.json",
+      "bytes": 2219,
+      "SHA256": "a72538bbb98b364c907912aa3ee141e867a9c56e2de0e24f9acf3042219e26af"
+    },
+    {
+      "name": "workspace-tests.xml",
+      "bytes": 3642,
+      "SHA256": "c1b4db45bec0a9d54906eb0b3139c0ac78774db991cf85f203cabdfaad61a3d3"
+    }
+  ],
+  "junit": [
+    {
+      "file": "build-product-runtime-real-pg.xml",
+      "cases": 13,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "skipReasons": {},
+      "failedCases": []
+    },
+    {
+      "file": "business-handoff-tests.xml",
+      "cases": 17,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "skipReasons": {},
+      "failedCases": []
+    },
+    {
+      "file": "containment-tests.xml",
+      "cases": 28,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "skipReasons": {},
+      "failedCases": []
+    },
+    {
+      "file": "core-tests.xml",
+      "cases": 9358,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 46,
+      "skipReasons": {
+        "PowerShell and csc.exe shim require Windows": 13,
+        "PowerShell parser requires Windows": 2,
+        "PowerShell required": 9,
+        "Actual Windows PowerShell launcher": 10,
+        "Explicit browser smoke integration lane required (INV_BROWSER_SMOKE_INTEGRATION=1)": 1,
+        "Set INV_MLFLOW_LIVE_URI (the run-mlflow lane starts the server)": 3,
+        "run only through tools/placement_benchmark.py": 1,
+        "run only through tools/placement_lock_wait_diagnostic.py": 1,
+        "run only through S11 Storage Failure Hosted Reference opt-in lane": 1,
+        "claude is not installed on this machine": 1,
+        "codex is not installed on this machine": 1,
+        "gemini is not installed on this machine": 1,
+        "antigravity is not installed on this machine": 1,
+        "Intranet CA NSS DB live browser test requires Linux, certutil (libnss3-tools), and Playwright": 1
+      },
+      "failedCases": []
+    },
+    {
+      "file": "cx01-recovery-tests.xml",
+      "cases": 20,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "skipReasons": {},
+      "failedCases": []
+    },
+    {
+      "file": "docker-host-tests.xml",
+      "cases": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "skipReasons": {},
+      "failedCases": []
+    },
+    {
+      "file": "lan-installer-tests.xml",
+      "cases": 17,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "skipReasons": {},
+      "failedCases": []
+    },
+    {
+      "file": "lan-pilot-database-real-pg.xml",
+      "cases": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "skipReasons": {},
+      "failedCases": []
+    },
+    {
+      "file": "shard-recovery-tests.xml",
+      "cases": 21,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "skipReasons": {},
+      "failedCases": []
+    },
+    {
+      "file": "workspace-tests.xml",
+      "cases": 23,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "skipReasons": {},
+      "failedCases": []
+    }
+  ],
+  "go": [
+    {
+      "file": "node-unit.jsonl",
+      "packages": {
+        "github.com/egparadise/SaintVision-Invion/services/node-agent/cmd/inv-discover": {
+          "topPass": 0,
+          "subPass": 0,
+          "testSkip": 0,
+          "testFail": 0,
+          "packagePass": 0,
+          "packageFail": 0
+        },
+        "github.com/egparadise/SaintVision-Invion/services/node-agent/cmd/inv-node": {
+          "topPass": 1,
+          "subPass": 0,
+          "testSkip": 0,
+          "testFail": 0,
+          "packagePass": 1,
+          "packageFail": 0
+        },
+        "github.com/egparadise/SaintVision-Invion/services/node-agent/cmd/inv-supervisor": {
+          "topPass": 4,
+          "subPass": 0,
+          "testSkip": 0,
+          "testFail": 0,
+          "packagePass": 1,
+          "packageFail": 0
+        },
+        "github.com/egparadise/SaintVision-Invion/services/node-agent/discovery": {
+          "topPass": 3,
+          "subPass": 0,
+          "testSkip": 0,
+          "testFail": 0,
+          "packagePass": 1,
+          "packageFail": 0
+        },
+        "github.com/egparadise/SaintVision-Invion/services/node-agent/internal/migrationcontext": {
+          "topPass": 20,
+          "subPass": 171,
+          "testSkip": 0,
+          "testFail": 0,
+          "packagePass": 1,
+          "packageFail": 0
+        },
+        "github.com/egparadise/SaintVision-Invion/services/node-agent/internal/wire": {
+          "topPass": 2,
+          "subPass": 0,
+          "testSkip": 0,
+          "testFail": 0,
+          "packagePass": 1,
+          "packageFail": 0
+        },
+        "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify": {
+          "topPass": 42,
+          "subPass": 123,
+          "testSkip": 0,
+          "testFail": 0,
+          "packagePass": 1,
+          "packageFail": 0
+        },
+        "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime": {
+          "topPass": 36,
+          "subPass": 68,
+          "testSkip": 1,
+          "testFail": 0,
+          "packagePass": 1,
+          "packageFail": 0
+        },
+        "github.com/egparadise/SaintVision-Invion/services/node-agent/storage": {
+          "topPass": 2,
+          "subPass": 7,
+          "testSkip": 0,
+          "testFail": 0,
+          "packagePass": 1,
+          "packageFail": 0
+        },
+        "github.com/egparadise/SaintVision-Invion/services/node-agent/telemetry": {
+          "topPass": 3,
+          "subPass": 0,
+          "testSkip": 0,
+          "testFail": 0,
+          "packagePass": 1,
+          "packageFail": 0
+        },
+        "github.com/egparadise/SaintVision-Invion/services/node-agent/tests/probe": {
+          "topPass": 0,
+          "subPass": 0,
+          "testSkip": 0,
+          "testFail": 0,
+          "packagePass": 0,
+          "packageFail": 0
+        },
+        "github.com/egparadise/SaintVision-Invion/services/node-agent/transfer": {
+          "topPass": 0,
+          "subPass": 0,
+          "testSkip": 0,
+          "testFail": 0,
+          "packagePass": 0,
+          "packageFail": 0
+        },
+        "github.com/egparadise/SaintVision-Invion/services/node-agent/transport": {
+          "topPass": 12,
+          "subPass": 19,
+          "testSkip": 0,
+          "testFail": 0,
+          "packagePass": 1,
+          "packageFail": 0
+        },
+        "github.com/egparadise/SaintVision-Invion/services/node-agent/workspace": {
+          "topPass": 4,
+          "subPass": 17,
+          "testSkip": 0,
+          "testFail": 0,
+          "packagePass": 1,
+          "packageFail": 0
+        }
+      },
+      "packageSkips": [
+        "github.com/egparadise/SaintVision-Invion/services/node-agent/cmd/inv-discover",
+        "github.com/egparadise/SaintVision-Invion/services/node-agent/tests/probe",
+        "github.com/egparadise/SaintVision-Invion/services/node-agent/transfer"
+      ],
+      "migrationcontextCompiledMutants": 99,
+      "migrationcontextReasonLines": 99
+    }
+  ],
+  "binary": [
+    {
+      "file": "inv-discover",
+      "SHA256": "b92ac9c4a080c39391d17912193e26c181116a891ea6b1d54ce3195f739447c4",
+      "metadataReadExit": 0,
+      "metadata": "D:\\Project\\SaintVisionI-Invion\\fleet5-k2a-pl-r1d-20261106\\.work\\fresh-core-ea276-f9d03be4\\artifact-inv-discover: go1.27.1\n\tpath\tgithub.com/egparadise/SaintVision-Invion/services/node-agent/cmd/inv-discover\n\tmod\tgithub.com/egparadise/SaintVision-Invion/services/node-agent\t(devel)\t\n\tbuild\t-buildmode=exe\n\tbuild\t-compiler=gc\n\tbuild\t-trimpath=true\n\tbuild\tDefaultGODEBUG=containermaxprocs=0,cryptocustomrand=1,decoratemappings=0,gotestjsonbuildtext=1,httpcookiemaxnum=0,multipathtcp=0,randseednop=0,rsa1024min=0,tlsmlkem=0,tlssecpmlkem=0,tlssha1=1,tracebacklabels=0,updatemaxprocs=0,urlmaxqueryparams=0,urlstrictcolons=0,x509rsacrt=0,x509sha256skid=0,x509sslcertoverrideplatform=0,x509usepolicies=0\n\tbuild\tCGO_ENABLED=0\n\tbuild\tGOARCH=amd64\n\tbuild\tGOOS=linux\n\tbuild\tGOAMD64=v1\n\tbuild\tvcs=git\n\tbuild\tvcs.revision=ea276c97ece2906dc1f29b44b65aa887379ea78f\n\tbuild\tvcs.time=2026-11-06T11:41:37Z\n\tbuild\tvcs.modified=false\n",
+      "executed": false
+    },
+    {
+      "file": "inv-node",
+      "SHA256": "a94667ba6ed3ae9611bf7c1f080e41fe595a273d163bfd6c2c22336254404bad",
+      "metadataReadExit": 0,
+      "metadata": "D:\\Project\\SaintVisionI-Invion\\fleet5-k2a-pl-r1d-20261106\\.work\\fresh-core-ea276-f9d03be4\\artifact-inv-node: go1.27.1\n\tpath\tgithub.com/egparadise/SaintVision-Invion/services/node-agent/cmd/inv-node\n\tmod\tgithub.com/egparadise/SaintVision-Invion/services/node-agent\t(devel)\t\n\tdep\tgithub.com/egparadise/SaintVision-Invion/packages/contracts-go\tv0.0.0\n\t=>\t../../packages/contracts-go\t(devel)\t\n\t\n\tdep\tgithub.com/santhosh-tekuri/jsonschema/v6\tv6.0.2\th1:KRzFb2m7YtdldCEkzs6KqmJw4nqEVZGK7IN2kJkjTuQ=\n\tdep\tgolang.org/x/text\tv0.14.0\th1:ScX5w1eTa3QqT8oi6+ziP7dTV1S2+ALU0bI+0zXKWiQ=\n\tbuild\t-buildmode=exe\n\tbuild\t-compiler=gc\n\tbuild\t-trimpath=true\n\tbuild\tDefaultGODEBUG=containermaxprocs=0,cryptocustomrand=1,decoratemappings=0,gotestjsonbuildtext=1,httpcookiemaxnum=0,multipathtcp=0,randseednop=0,rsa1024min=0,tlsmlkem=0,tlssecpmlkem=0,tlssha1=1,tracebacklabels=0,updatemaxprocs=0,urlmaxqueryparams=0,urlstrictcolons=0,x509rsacrt=0,x509sha256skid=0,x509sslcertoverrideplatform=0,x509usepolicies=0\n\tbuild\tCGO_ENABLED=0\n\tbuild\tGOARCH=amd64\n\tbuild\tGOOS=linux\n\tbuild\tGOAMD64=v1\n\tbuild\tvcs=git\n\tbuild\tvcs.revision=ea276c97ece2906dc1f29b44b65aa887379ea78f\n\tbuild\tvcs.time=2026-11-06T11:41:37Z\n\tbuild\tvcs.modified=false\n",
+      "executed": false
+    }
+  ]
+}

@@ -1,0 +1,527 @@
+{
+  "classification": "AUTHORIZED_ONE_FRESH_CORE_AND_SOURCE_DOCS_ONLY",
+  "grant": "msg_9cb645b95305",
+  "card": "FLEET5-K2A-PL-R1D-FRESH-CORE-20261106",
+  "task": "task_a95ef3d8ccce",
+  "dispatch": "ctx_ed23b4a777d0",
+  "headSHA": "ea276c97ece2906dc1f29b44b65aa887379ea78f",
+  "branch": "agent/codex/fleet5-k2a-pl-r1d-20261106",
+  "clean": true,
+  "remoteExact": true,
+  "acceptedChangedFilesSHA256": {
+    "effect_gate_test.go": "60418aca7ee005a11983db7fad4ebf9f80eaad6b73ac6b722f3a8461694ea9b0",
+    "pl_r1a_test.go": "9ea789e33204d3f54612223f053602815dd1493d26e1e888a44a679456a3d292",
+    "README.md": "3fe38c538f6a6df2465eef73836584541f10e2b98e7dcbb749bac27047a3f7e1"
+  },
+  "actualReviewRead": "0c5bfc1a2e3738877f25e6370a600c445fe75a17",
+  "canonicalRootRead": "Index457/Codex418",
+  "optionalFlags": {
+    "run_s08_acceptance": false,
+    "run_fleet5_peer_phase_proof": false,
+    "run_fleet5_peer_phase_fixed_proof": false
+  },
+  "workflows": {
+    "core": {
+      "path": ".github/workflows/core.yml",
+      "blob": "a353f78cc7eaf3fec4e21661f0cb80138bf6f432",
+      "SHA256": "466532d8819ae7ec04b3a8da45a5a6338b97ca1cfba5c550372afcb725e888ac",
+      "jobs": {
+        "core": {
+          "condition": "github.event_name != 'pull_request' || contains(github.event.pull_request.labels.*.name, 'run-core')",
+          "timeoutMinutes": 45,
+          "steps": [
+            {
+              "index": 1,
+              "name": null,
+              "uses": "actions/checkout@v4",
+              "runFirstLine": null,
+              "condition": "success()"
+            },
+            {
+              "index": 2,
+              "name": null,
+              "uses": "actions/setup-python@v5",
+              "runFirstLine": null,
+              "condition": "success()"
+            },
+            {
+              "index": 3,
+              "name": null,
+              "uses": "actions/setup-go@v5",
+              "runFirstLine": null,
+              "condition": "success()"
+            },
+            {
+              "index": 4,
+              "name": null,
+              "uses": "actions/setup-node@v4",
+              "runFirstLine": null,
+              "condition": "success()"
+            },
+            {
+              "index": 5,
+              "name": null,
+              "uses": null,
+              "runFirstLine": "python -m pip install -r requirements-test.txt -r requirements-docs.txt",
+              "condition": "success()"
+            },
+            {
+              "index": 6,
+              "name": "FLEET5 early native Go peer-policy lifecycle proof",
+              "uses": null,
+              "runFirstLine": "python -B tests/proofs/run_fleet5_peer_phase_probe.py --output dist/fleet5-peer-phase-proof",
+              "condition": "github.event_name == 'workflow_dispatch' && inputs.run_fleet5_peer_phase_proof"
+            },
+            {
+              "index": 7,
+              "name": "Publish FLEET5 native peer-phase proof (including expected baseline failure)",
+              "uses": "actions/upload-artifact@v4",
+              "runFirstLine": null,
+              "condition": "always() && github.event_name == 'workflow_dispatch' && inputs.run_fleet5_peer_phase_proof"
+            },
+            {
+              "index": 8,
+              "name": "FLEET5 fixed native Go two-cycle proof",
+              "uses": null,
+              "runFirstLine": "python -B tests/proofs/run_fleet5_peer_phase_fixed_probe.py --output dist/fleet5-peer-phase-fixed-proof",
+              "condition": "github.event_name == 'workflow_dispatch' && inputs.run_fleet5_peer_phase_fixed_proof"
+            },
+            {
+              "index": 9,
+              "name": "Publish FLEET5 fixed native proof",
+              "uses": "actions/upload-artifact@v4",
+              "runFirstLine": null,
+              "condition": "always() && github.event_name == 'workflow_dispatch' && inputs.run_fleet5_peer_phase_fixed_proof"
+            },
+            {
+              "index": 10,
+              "name": "Start digest-pinned product ObjectStore service",
+              "uses": null,
+              "runFirstLine": "docker pull --platform linux/amd64 \"$MINIO_IMAGE\"",
+              "condition": "success()"
+            },
+            {
+              "index": 11,
+              "name": "Create disposable CX01 PostgreSQL",
+              "uses": null,
+              "runFirstLine": "mkdir -p .work",
+              "condition": "success()"
+            },
+            {
+              "index": 12,
+              "name": "Regenerate contracts and detect drift",
+              "uses": null,
+              "runFirstLine": "python tools/generate_contracts.py",
+              "condition": "success()"
+            },
+            {
+              "index": 13,
+              "name": "Upgrade each published migration head",
+              "uses": null,
+              "runFirstLine": "python tools/check_migration_upgrade.py",
+              "condition": "success()"
+            },
+            {
+              "index": 14,
+              "name": "Test Linux Node concurrency and crash boundaries",
+              "uses": null,
+              "runFirstLine": "mkdir -p \"$GITHUB_WORKSPACE/dist\"",
+              "condition": "success()"
+            },
+            {
+              "index": 15,
+              "name": "Build Node and isolated synthetic workload image",
+              "uses": null,
+              "runFirstLine": "mkdir -p \"$GITHUB_WORKSPACE/.work/node-image\"",
+              "condition": "success()"
+            },
+            {
+              "index": 16,
+              "name": "Verify Docker API negotiation and actual bounded execution",
+              "uses": null,
+              "runFirstLine": "go test -v -run '^TestDockerLiveCompatibility$' ./runtime > \"$GITHUB_WORKSPACE/dist/docker-compatibility.log\" 2>&1 || { cat \"$GITHUB_WORKSPACE/dist/docker-compatibility.log\"; exit 1; }",
+              "condition": "success()"
+            },
+            {
+              "index": 17,
+              "name": "Build pinned Python workload image for kernel integration",
+              "uses": null,
+              "runFirstLine": "docker pull python:3.12-slim",
+              "condition": "success()"
+            },
+            {
+              "index": 18,
+              "name": "Build owned LAN installer image and provide storage source root",
+              "uses": null,
+              "runFirstLine": "mkdir -p .work/lan-node-image .work/storage-source",
+              "condition": "success()"
+            },
+            {
+              "index": 19,
+              "name": "Build production API image and require explicit configuration",
+              "uses": null,
+              "runFirstLine": "docker build -f deploy/Dockerfile.backend -t \"inv-api-test:$GITHUB_SHA\" .",
+              "condition": "success()"
+            },
+            {
+              "index": 20,
+              "name": "Verify Workspace recovery boundary first",
+              "uses": null,
+              "runFirstLine": "python -m pytest tests/integration/test_workspace_resume.py tests/integration/test_workspace_api.py -x -q --junitxml=dist/workspace-tests.xml -o faulthandler_timeout=45",
+              "condition": "success()"
+            },
+            {
+              "index": 21,
+              "name": "Verify containment controls and physical cleanup",
+              "uses": null,
+              "runFirstLine": "python -m pytest tests/integration/test_containment.py -x -q --junitxml=dist/containment-tests.xml -o faulthandler_timeout=45",
+              "condition": "success()"
+            },
+            {
+              "index": 22,
+              "name": "Verify business handoff against the execution kernel",
+              "uses": null,
+              "runFirstLine": "python -m pytest tests/integration/test_business_handoff.py -x -q --junitxml=dist/business-handoff-tests.xml -o faulthandler_timeout=45",
+              "condition": "success()"
+            },
+            {
+              "index": 23,
+              "name": "Verify bounded shard replacement on two real Nodes",
+              "uses": null,
+              "runFirstLine": "python -m pytest tests/integration/test_shard_recovery.py -x -q --junitxml=dist/shard-recovery-tests.xml -o faulthandler_timeout=45",
+              "condition": "success()"
+            },
+            {
+              "index": 24,
+              "name": "Run provisioned LAN installer acceptance",
+              "uses": null,
+              "runFirstLine": "python -m pytest -q tests/integration/test_workspace_upgrade.py tests/integration/test_lan_storage_install.py --junitxml=dist/lan-installer-tests.xml -o faulthandler_timeout=45",
+              "condition": "success()"
+            },
+            {
+              "index": 25,
+              "name": "Require executed LAN installer evidence",
+              "uses": null,
+              "runFirstLine": "python - <<'PY'",
+              "condition": "success()"
+            },
+            {
+              "index": 26,
+              "name": "Run owned CX01 recovery drill evidence",
+              "uses": null,
+              "runFirstLine": "python -m pytest tests/integration/test_recovery_drill.py -q --junitxml=dist/cx01-recovery-tests.xml -o faulthandler_timeout=45",
+              "condition": "success()"
+            },
+            {
+              "index": 27,
+              "name": "Require executed CX01 recovery evidence",
+              "uses": null,
+              "runFirstLine": "python - <<'PY'",
+              "condition": "success()"
+            },
+            {
+              "index": 28,
+              "name": "Verify build admission queue fairness on PostgreSQL",
+              "uses": null,
+              "runFirstLine": "python -m pytest -q tests/integration/test_build_product_runtime_real_pg.py --junitxml=dist/build-product-runtime-real-pg.xml",
+              "condition": "success()"
+            },
+            {
+              "index": 29,
+              "name": "Require executed build admission queue evidence",
+              "uses": null,
+              "runFirstLine": "python - <<'PY'",
+              "condition": "success()"
+            },
+            {
+              "index": 30,
+              "name": "Verify LAN pilot database scripts with real PostgreSQL",
+              "uses": null,
+              "runFirstLine": "repo_digest=\"$(docker image inspect postgres:16 --format '{{index .RepoDigests 0}}')\"",
+              "condition": "success()"
+            },
+            {
+              "index": 31,
+              "name": "Require executed LAN pilot database evidence",
+              "uses": null,
+              "runFirstLine": "python - <<'PY'",
+              "condition": "success()"
+            },
+            {
+              "index": 32,
+              "name": null,
+              "uses": null,
+              "runFirstLine": "python -m pytest --junitxml=dist/core-tests.xml -o faulthandler_timeout=45 --ignore=tests/integration/test_build_product_runtime_real_pg.py --ignore=tests/integration/test_lan_pilot_database_real_pg.py --ignore=tests/integration/test_desktop_browser.py --ignore=tests/integration/test_approval_browser.py --ignore=tests/integration/test_studio_browser.py --ignore=tests/integration/test_web_container.py --ignore=tests/integration/test_workspace_upgrade.py --ignore=tests/integration/test_lan_storage_install.py --ignore=tests/integration/test_s3_object_store_postgres.py --ignore=tests/integration/test_recovery_drill.py",
+              "condition": "success()"
+            },
+            {
+              "index": 33,
+              "name": "Stop disposable product ObjectStore service",
+              "uses": null,
+              "runFirstLine": "docker rm --force saintvision-product-object-store 2>/dev/null || true",
+              "condition": "always()"
+            },
+            {
+              "index": 34,
+              "name": "Docker host hygiene (explicit lane)",
+              "uses": null,
+              "runFirstLine": "python -m pytest tests/test_check_kernel_docker_hygiene.py -m docker_host --strict-markers --junitxml=dist/docker-host-tests.xml",
+              "condition": "success()"
+            },
+            {
+              "index": 35,
+              "name": "Require executed evidence and declared platform skips",
+              "uses": null,
+              "runFirstLine": "python - <<'PY'",
+              "condition": "success()"
+            },
+            {
+              "index": 36,
+              "name": "Collect fixed-SHA S08 build acceptance observations",
+              "uses": null,
+              "runFirstLine": "test \"$(git rev-parse HEAD)\" = \"$GITHUB_SHA\"",
+              "condition": "github.event_name == 'workflow_dispatch' && inputs.run_s08_acceptance"
+            },
+            {
+              "index": 37,
+              "name": "Recompute S08 build acceptance verdict from raw artifacts",
+              "uses": null,
+              "runFirstLine": "test \"$(git rev-parse HEAD)\" = \"$GITHUB_SHA\"",
+              "condition": "github.event_name == 'workflow_dispatch' && inputs.run_s08_acceptance"
+            },
+            {
+              "index": 38,
+              "name": null,
+              "uses": null,
+              "runFirstLine": "python -m build services/control-plane --outdir dist",
+              "condition": "success()"
+            },
+            {
+              "index": 39,
+              "name": null,
+              "uses": null,
+              "runFirstLine": "go test ./...",
+              "condition": "success()"
+            },
+            {
+              "index": 40,
+              "name": null,
+              "uses": null,
+              "runFirstLine": "npx --yes --package typescript@5.9.3 tsc --noEmit --strict packages/contracts-ts/src/index.ts",
+              "condition": "success()"
+            },
+            {
+              "index": 41,
+              "name": "Cleanup disposable CX01 PostgreSQL",
+              "uses": null,
+              "runFirstLine": "if [ ! -f .work/cx01-container-id ]; then",
+              "condition": "always()"
+            },
+            {
+              "index": 42,
+              "name": null,
+              "uses": "actions/upload-artifact@v4",
+              "runFirstLine": null,
+              "condition": "always()"
+            }
+          ]
+        },
+        "s01-storage-roundtrip": {
+          "condition": "github.event_name != 'pull_request' || contains(github.event.pull_request.labels.*.name, 'run-core')",
+          "timeoutMinutes": 10,
+          "steps": [
+            {
+              "index": 1,
+              "name": null,
+              "uses": "actions/checkout@v4",
+              "runFirstLine": null,
+              "condition": "success()"
+            },
+            {
+              "index": 2,
+              "name": null,
+              "uses": "actions/setup-python@v5",
+              "runFirstLine": null,
+              "condition": "success()"
+            },
+            {
+              "index": 3,
+              "name": "Install pinned product-conformance test dependencies",
+              "uses": null,
+              "runFirstLine": "python -m pip install -r requirements-test.txt",
+              "condition": "success()"
+            },
+            {
+              "index": 4,
+              "name": "Start disposable MinIO candidate",
+              "uses": null,
+              "runFirstLine": "mkdir -p dist",
+              "condition": "success()"
+            },
+            {
+              "index": 5,
+              "name": "Create disposable S01 Storage test bucket",
+              "uses": null,
+              "runFirstLine": "python - <<'PY'",
+              "condition": "success()"
+            },
+            {
+              "index": 6,
+              "name": "Verify product ObjectStore adapter conformance",
+              "uses": null,
+              "runFirstLine": "python -m pytest -q tools/test_s3_object_store_hosted.py --junitxml=dist/s3-product-object-store.xml",
+              "condition": "success()"
+            },
+            {
+              "index": 7,
+              "name": "Verify product S3 persistence and PostgreSQL tenant boundary",
+              "uses": null,
+              "runFirstLine": "python -m pytest -q tests/integration/test_s3_object_store_postgres.py --junitxml=dist/s3-product-postgres.xml",
+              "condition": "success()"
+            },
+            {
+              "index": 8,
+              "name": "Verify S01 Storage candidate SHA-256 roundtrip and cleanup",
+              "uses": null,
+              "runFirstLine": "python tools/verify_storage_roundtrip.py --target-kind ci-candidate --output dist/s01-storage-roundtrip.json --junit dist/s01-storage-roundtrip.xml",
+              "condition": "always()"
+            },
+            {
+              "index": 9,
+              "name": "Stop disposable S01 Storage service",
+              "uses": null,
+              "runFirstLine": "docker rm --force saintvision-s01-minio 2>/dev/null || true",
+              "condition": "always()"
+            },
+            {
+              "index": 10,
+              "name": null,
+              "uses": "actions/upload-artifact@v4",
+              "runFirstLine": null,
+              "condition": "always()"
+            }
+          ]
+        }
+      }
+    },
+    "docs": {
+      "path": ".github/workflows/docs.yml",
+      "blob": "9f8138b7a01410bb661e0ff400a91c8ccf8f8c92",
+      "SHA256": "e550bbcbf547ac36e13d342f0092788961a89647875d102541eb742a6158ac4a",
+      "jobs": {
+        "docs": {
+          "condition": "success()",
+          "timeoutMinutes": null,
+          "steps": [
+            {
+              "index": 1,
+              "name": null,
+              "uses": "actions/checkout@v4",
+              "runFirstLine": null,
+              "condition": "success()"
+            },
+            {
+              "index": 2,
+              "name": null,
+              "uses": "actions/setup-python@v5",
+              "runFirstLine": null,
+              "condition": "success()"
+            },
+            {
+              "index": 3,
+              "name": null,
+              "uses": null,
+              "runFirstLine": "python -m pip install -r requirements-docs.txt",
+              "condition": "success()"
+            },
+            {
+              "index": 4,
+              "name": null,
+              "uses": null,
+              "runFirstLine": "python tools/check_docs.py",
+              "condition": "success()"
+            },
+            {
+              "index": 5,
+              "name": "Repository path citations exist (ratchet; baseline may only shrink)",
+              "uses": null,
+              "runFirstLine": "# The floor is the baseline at the base commit. Each trigger names its",
+              "condition": "success()"
+            },
+            {
+              "index": 6,
+              "name": null,
+              "uses": null,
+              "runFirstLine": "python tools/check_contract_bindings.py",
+              "condition": "success()"
+            },
+            {
+              "index": 7,
+              "name": null,
+              "uses": null,
+              "runFirstLine": "python tools/check_frontend_integrity.py",
+              "condition": "success()"
+            },
+            {
+              "index": 8,
+              "name": "Report fixture producer reachability",
+              "uses": null,
+              "runFirstLine": "python tools/check_fixture_reachability.py | tee fixture-reachability.txt",
+              "condition": "success()"
+            },
+            {
+              "index": 9,
+              "name": "Report client route coverage (report-only; promote per \uac80\uc99d\uac80\uc0ac\ub3c4\uad6c_\ubaa9\ub85d)",
+              "uses": null,
+              "runFirstLine": "set +e",
+              "condition": "success()"
+            },
+            {
+              "index": 10,
+              "name": null,
+              "uses": "actions/upload-artifact@v4",
+              "runFirstLine": null,
+              "condition": "always()"
+            },
+            {
+              "index": 11,
+              "name": null,
+              "uses": null,
+              "runFirstLine": "python tools/test_sync.py",
+              "condition": "success()"
+            },
+            {
+              "index": 12,
+              "name": null,
+              "uses": null,
+              "runFirstLine": "python tools/check_ontology_generation.py",
+              "condition": "success()"
+            },
+            {
+              "index": 13,
+              "name": null,
+              "uses": null,
+              "runFirstLine": "python tools/check_ontology.py",
+              "condition": "success()"
+            },
+            {
+              "index": 14,
+              "name": "Build documentation bundle",
+              "uses": null,
+              "runFirstLine": "python tools/build_docs.py",
+              "condition": "success()"
+            },
+            {
+              "index": 15,
+              "name": null,
+              "uses": "actions/upload-artifact@v4",
+              "runFirstLine": null,
+              "condition": "success()"
+            }
+          ]
+        }
+      }
+    }
+  },
+  "observedKST": "2026-11-06T21:49:37.270828+09:00"
+}

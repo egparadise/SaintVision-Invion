@@ -1,0 +1,28 @@
+{
+  "classification": "ONE_AUTHORIZED_DISPATCH",
+  "argv": [
+    "gh",
+    "workflow",
+    "run",
+    "core.yml",
+    "--repo",
+    "egparadise/SaintVision-Invion",
+    "--ref",
+    "agent/codex/fleet5-k2a-pl-r1d-20261106",
+    "-f",
+    "correlation_id=FLEET5-K2A-PL-R1D-FULL-CORE-ea276c97-f9d03be414344825a2fa5f908f34f985",
+    "-f",
+    "run_s08_acceptance=false",
+    "-f",
+    "run_fleet5_peer_phase_proof=false",
+    "-f",
+    "run_fleet5_peer_phase_fixed_proof=false"
+  ],
+  "exit": 0,
+  "response": "https://github.com/egparadise/SaintVision-Invion/actions/runs/42220638304\n",
+  "runId": 42220638304,
+  "headSHA": "ea276c97ece2906dc1f29b44b65aa887379ea78f",
+  "branch": "agent/codex/fleet5-k2a-pl-r1d-20261106",
+  "correlation": "FLEET5-K2A-PL-R1D-FULL-CORE-ea276c97-f9d03be414344825a2fa5f908f34f985",
+  "kst": "2026-11-06T21:49:40.176175+09:00"
+}

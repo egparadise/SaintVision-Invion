@@ -1,0 +1,17 @@
+{
+  "classification": "DOCS_SOURCE_ONLY_NOT_PRODUCER_RUNTIME_ACCEPTANCE",
+  "runs": [
+    {
+      "argv": [
+        "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+        "-B",
+        "tools/check_docs.py"
+      ],
+      "exit": 1,
+      "startedKST": "2026-11-06T22:25:18.700059+09:00",
+      "endedKST": "2026-11-06T22:25:43.012144+09:00",
+      "log": "gate-01-check_docs.log"
+    }
+  ],
+  "noApplyAdoptResolve": true
+}

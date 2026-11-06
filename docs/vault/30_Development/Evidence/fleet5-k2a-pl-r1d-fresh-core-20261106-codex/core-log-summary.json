@@ -1,0 +1,62 @@
+{
+  "selectedStepLogs": {
+    "core/33_Run python -m pytest --junitxml=dist_core-tests.xml -o faulthandler_timeout=45 --ignore=tests_integration_test_build_product_runtime_real_pg.py --ignore=tests_integration_test_lan_pilot_database_real_pg.py --ignore=tests_integration_test_desktop_browser.py --ignore=tests_integration_test_approval_browser.py --ignore=tests_integration_test_studio_browser.py --ignore=tests_integration_test_web_container.py --ignore=tests_integration_test_workspace_upgrade.py --ignore=tests_integration_test_lan_storage_install.py --ignore=tests_integration_test_s3_object_store_postgres.py --ignore=tests_integration_test_recovery_drill.py.txt": {
+      "SHA256": "ed1b108ed4c390a7fc8a8351495879142dbb4620708c50a87d7af491ec031590",
+      "selectedLines": [
+        "2026-11-06T13:20:13.0534151Z == 9312 passed, 46 skipped, 2 deselected, 2035 warnings in 965.12s (0:16:05) ==="
+      ]
+    },
+    "core/36_Require executed evidence and declared platform skips.txt": {
+      "SHA256": "e0045ac7ae0abe89a76e85583d41bde1ec4ba1d78e7a85f2c04a976f233bcbe7",
+      "selectedLines": [
+        "2026-11-06T13:20:20.6480120Z \u001b[36;1m    f'core skip distribution drifted: expected={expected_skips}, actual={actual_skips}'\u001b[0m"
+      ]
+    },
+    "core/39_Run python -m build services_control-plane --outdir dist.txt": {
+      "SHA256": "b9b219d16f8ade2d02fe5abed2a0e4ba07d25196f05a1f7b621f4d4d34d97ed3",
+      "selectedLines": [
+        "2026-11-06T13:20:23.0024645Z Successfully built saintvision_control_plane-0.1.0.tar.gz and saintvision_control_plane-0.1.0-py3-none-any.whl"
+      ]
+    },
+    "core/40_Run go test ._....txt": {
+      "SHA256": "059eb4d385937ae3fb935039604e5848ae1f966d7d401514913589f8a62264e1",
+      "selectedLines": [
+        "\ufeff2026-11-06T13:20:23.0179417Z ##[group]Run go test ./...",
+        "2026-11-06T13:20:23.0179675Z \u001b[36;1mgo test ./...\u001b[0m"
+      ],
+      "resultLines": [
+        "2026-11-06T13:20:23.0389963Z ?   \tgithub.com/egparadise/SaintVision-Invion/packages/contracts-go\t[no test files]"
+      ]
+    },
+    "core/41_Run npx --yes --package typescript@5.9.3 tsc --noEmit --strict packages_contracts-ts_src_index.ts.txt": {
+      "SHA256": "3a4ab48ea2ef23823c96b70c97d775593ae789a0f483e9462d2a035ee2831cac",
+      "selectedLines": [
+        "\ufeff2026-11-06T13:20:23.0412943Z ##[group]Run npx --yes --package typescript@5.9.3 tsc --noEmit --strict packages/contracts-ts/src/index.ts",
+        "2026-11-06T13:20:23.0413341Z \u001b[36;1mnpx --yes --package typescript@5.9.3 tsc --noEmit --strict packages/contracts-ts/src/index.ts\u001b[0m"
+      ]
+    }
+  },
+  "goRaceAggregate": {
+    "topPass": 129,
+    "subPass": 405,
+    "testFail": 0,
+    "testSkip": 1,
+    "packagePass": 11,
+    "noTestFiles": [
+      "github.com/egparadise/SaintVision-Invion/services/node-agent/cmd/inv-discover",
+      "github.com/egparadise/SaintVision-Invion/services/node-agent/tests/probe",
+      "github.com/egparadise/SaintVision-Invion/services/node-agent/transfer"
+    ]
+  },
+  "goRaceSkippedTests": [
+    {
+      "package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+      "test": "TestDockerLiveCompatibility",
+      "output": [
+        "=== RUN   TestDockerLiveCompatibility",
+        "docker_linux_test.go:20: real Docker opt-in required",
+        "--- SKIP: TestDockerLiveCompatibility (0.00s)"
+      ]
+    }
+  ]
+}

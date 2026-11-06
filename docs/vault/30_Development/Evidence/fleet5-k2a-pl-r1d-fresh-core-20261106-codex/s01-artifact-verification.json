@@ -1,0 +1,70 @@
+{
+  "classification": "HOSTED_DISPOSABLE_S01_ONLY_NOT_WHOLE_CORE_OR_PRODUCTION",
+  "artifactId": 13503885572,
+  "runId": 42220638304,
+  "headSHA": "ea276c97ece2906dc1f29b44b65aa887379ea78f",
+  "artifactZIPBytes": 1769,
+  "artifactZIP_SHA256": "b9163a4f527cdf9309e2bfa0e821fd8a5d343dcca7a7a0340e2fd1ccd9272e9c",
+  "githubDigestMatch": true,
+  "files": [
+    {
+      "name": "s01-minio-image.txt",
+      "bytes": 89,
+      "SHA256": "7a8a0240ecec797856d7955f7959f7c2f863ea45683d709bd2b4e7ff313d429b"
+    },
+    {
+      "name": "s01-storage-roundtrip.json",
+      "bytes": 315,
+      "SHA256": "4ec4ff1f356dce483599cf04fef6a5b4d35a425176ea1ed278e3ed9a9b5c5e84"
+    },
+    {
+      "name": "s01-storage-roundtrip.xml",
+      "bytes": 205,
+      "SHA256": "c434df9453d3bff005bf22a3df5c4697bf83c92cecd7822b3a37fe513d294cc1"
+    },
+    {
+      "name": "s3-product-object-store.xml",
+      "bytes": 512,
+      "SHA256": "fbfd70971878cbc68bff2e9a7c9c47885363872b0dbe76e9e617828ba1dd7fb1"
+    },
+    {
+      "name": "s3-product-postgres.xml",
+      "bytes": 736,
+      "SHA256": "d5e4464bb20c925fadfb6b9ffb548349d56cbecdcc7f98489d7d6f96bfd59706"
+    }
+  ],
+  "junit": [
+    {
+      "file": "s01-storage-roundtrip.xml",
+      "cases": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "file": "s3-product-object-store.xml",
+      "cases": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "file": "s3-product-postgres.xml",
+      "cases": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  ],
+  "jsonStatus": [
+    {
+      "file": "s01-storage-roundtrip.json",
+      "status": "PASS",
+      "schema": "1.1",
+      "targetKind": "ci-candidate",
+      "sourceSHA": "ea276c97ece2906dc1f29b44b65aa887379ea78f"
+    }
+  ],
+  "observedKST": "2026-11-06T21:53:46.712137+09:00",
+  "embeddedSourceField": "codeSha"
+}

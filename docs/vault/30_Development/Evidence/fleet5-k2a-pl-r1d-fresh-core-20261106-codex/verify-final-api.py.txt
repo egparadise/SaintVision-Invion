@@ -1,0 +1,57 @@
+"""Capture final whole-run metadata without replacing any failed outcome."""
+from pathlib import Path
+import datetime
+import json
+import subprocess
+
+out = Path(__file__).parent
+repo = 'egparadise/SaintVision-Invion'
+rid = 42220638304
+dispatch = json.loads((out/'dispatch-core.json').read_text())
+run = json.loads(subprocess.check_output(['gh','api',f'repos/{repo}/actions/runs/{rid}']))
+jobs = json.loads(subprocess.check_output(['gh','api',f'repos/{repo}/actions/runs/{rid}/jobs']))
+artifacts = json.loads(subprocess.check_output(['gh','api',f'repos/{repo}/actions/runs/{rid}/artifacts']))
+assert run['status'] == 'completed', 'Existing run still active; do not redispatch'
+assert run['head_sha'] == dispatch['headSHA']
+assert run['head_branch'] == dispatch['branch']
+assert run['event'] == 'workflow_dispatch'
+assert run['path'] == '.github/workflows/core.yml'
+assert run['display_title'] == dispatch['correlation']
+assert run['run_attempt'] == 1
+expected_optional_skips = {
+    'FLEET5 early native Go peer-policy lifecycle proof',
+    'Publish FLEET5 native peer-phase proof (including expected baseline failure)',
+    'FLEET5 fixed native Go two-cycle proof',
+    'Publish FLEET5 fixed native proof',
+    'Collect fixed-SHA S08 build acceptance observations',
+    'Recompute S08 build acceptance verdict from raw artifacts',
+}
+assert jobs['total_count'] == len(jobs['jobs']) == 2
+assert {j['name'] for j in jobs['jobs']} == {'core', 's01-storage-roundtrip'}
+rows = []
+for job in jobs['jobs']:
+    optional = expected_optional_skips if job['name'] == 'core' else set()
+    skipped = {s['name'] for s in job['steps'] if s['conclusion'] == 'skipped'}
+    bad = [dict(number=s['number'], name=s['name'], conclusion=s['conclusion'])
+           for s in job['steps'] if s['name'] not in optional and s['conclusion'] != 'success']
+    rows.append(dict(id=job['id'], name=job['name'], status=job['status'],
+                     conclusion=job['conclusion'], steps=len(job['steps']),
+                     expectedOptionalSkipped=sorted(optional), actualSkipped=sorted(skipped),
+                     optionalSkipSetExact=skipped == optional,
+                     requiredStepNonSuccess=bad,
+                     allRequiredStepsSuccess=not bad))
+success = run['conclusion'] == 'success' and all(
+    j['status'] == 'completed' and j['conclusion'] == 'success' and
+    j['allRequiredStepsSuccess'] and j['optionalSkipSetExact'] for j in rows)
+report = dict(classification='WHOLE_CORE_HOSTED_SOURCE_ONLY_NOT_INSTALLED_RUNTIME_TRUST',
+              runId=rid, headSHA=run['head_sha'], branch=run['head_branch'],
+              event=run['event'], workflow=run['path'], correlation=run['display_title'],
+              attempt=run['run_attempt'], status=run['status'], conclusion=run['conclusion'],
+              wholeRequiredCorePassed=success, jobs=rows,
+              optionalS08AndNativeProofs='NOT_RUN_FALSE_FLAGS',
+              runtime40Cases='NOT_RUN', actualFIVE='INCOMPLETE',
+              observedKST=datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=9))).isoformat())
+for name, value in [('core-final-run.json', run), ('core-final-jobs.json', jobs),
+                    ('core-final-artifacts.json', artifacts), ('core-api-verification.json', report)]:
+    (out/name).write_text(json.dumps(value, indent=2)+'\n')
+print(json.dumps(report, indent=2))

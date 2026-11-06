@@ -1,0 +1,57 @@
+{
+  "classification": "WHOLE_CORE_HOSTED_SOURCE_ONLY_NOT_INSTALLED_RUNTIME_TRUST",
+  "runId": 42220638304,
+  "headSHA": "ea276c97ece2906dc1f29b44b65aa887379ea78f",
+  "branch": "agent/codex/fleet5-k2a-pl-r1d-20261106",
+  "event": "workflow_dispatch",
+  "workflow": ".github/workflows/core.yml",
+  "correlation": "FLEET5-K2A-PL-R1D-FULL-CORE-ea276c97-f9d03be414344825a2fa5f908f34f985",
+  "attempt": 1,
+  "status": "completed",
+  "conclusion": "success",
+  "wholeRequiredCorePassed": true,
+  "jobs": [
+    {
+      "id": 127901520588,
+      "name": "s01-storage-roundtrip",
+      "status": "completed",
+      "conclusion": "success",
+      "steps": 16,
+      "expectedOptionalSkipped": [],
+      "actualSkipped": [],
+      "optionalSkipSetExact": true,
+      "requiredStepNonSuccess": [],
+      "allRequiredStepsSuccess": true
+    },
+    {
+      "id": 127901520917,
+      "name": "core",
+      "status": "completed",
+      "conclusion": "success",
+      "steps": 48,
+      "expectedOptionalSkipped": [
+        "Collect fixed-SHA S08 build acceptance observations",
+        "FLEET5 early native Go peer-policy lifecycle proof",
+        "FLEET5 fixed native Go two-cycle proof",
+        "Publish FLEET5 fixed native proof",
+        "Publish FLEET5 native peer-phase proof (including expected baseline failure)",
+        "Recompute S08 build acceptance verdict from raw artifacts"
+      ],
+      "actualSkipped": [
+        "Collect fixed-SHA S08 build acceptance observations",
+        "FLEET5 early native Go peer-policy lifecycle proof",
+        "FLEET5 fixed native Go two-cycle proof",
+        "Publish FLEET5 fixed native proof",
+        "Publish FLEET5 native peer-phase proof (including expected baseline failure)",
+        "Recompute S08 build acceptance verdict from raw artifacts"
+      ],
+      "optionalSkipSetExact": true,
+      "requiredStepNonSuccess": [],
+      "allRequiredStepsSuccess": true
+    }
+  ],
+  "optionalS08AndNativeProofs": "NOT_RUN_FALSE_FLAGS",
+  "runtime40Cases": "NOT_RUN",
+  "actualFIVE": "INCOMPLETE",
+  "observedKST": "2026-11-06T22:21:06.185231+09:00"
+}

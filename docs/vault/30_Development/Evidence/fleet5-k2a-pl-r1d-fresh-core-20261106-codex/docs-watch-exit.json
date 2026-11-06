@@ -1,0 +1,17 @@
+{
+  "argv": [
+    "gh",
+    "run",
+    "watch",
+    "42220644407",
+    "--repo",
+    "egparadise/SaintVision-Invion",
+    "--exit-status",
+    "--interval",
+    "30"
+  ],
+  "exit": 0,
+  "startedKST": "2026-11-06T21:50:57.522507+09:00",
+  "endedKST": "2026-11-06T21:50:58.459995+09:00",
+  "log": "docs-watch.log"
+}

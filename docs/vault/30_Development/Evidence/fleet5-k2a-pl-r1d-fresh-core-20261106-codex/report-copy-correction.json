@@ -1,0 +1,19 @@
+{
+  "kst": "2026-11-06T22:26:31.456359+09:00",
+  "failedGate": "check_docs",
+  "exit": 1,
+  "failedGateEvidence": "qualification-attempt-01",
+  "sourceOrCIChanged": false,
+  "omittedRawCopies": [
+    {
+      "file": "core-workflow.yml.txt",
+      "SHA256": "466532d8819ae7ec04b3a8da45a5a6338b97ca1cfba5c550372afcb725e888ac",
+      "reason": "Raw public workflow omitted from report; immutable Git blob/SHA metadata retained in preflight, unmodified original capture ignored"
+    },
+    {
+      "file": "docs-workflow.yml.txt",
+      "SHA256": "e550bbcbf547ac36e13d342f0092788961a89647875d102541eb742a6158ac4a",
+      "reason": "Raw public workflow omitted from report; immutable Git blob/SHA metadata retained in preflight, unmodified original capture ignored"
+    }
+  ]
+}

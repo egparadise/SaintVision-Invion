@@ -1,0 +1,456 @@
+{
+  "schemaVersion": "fleet5-k2a-pl-r1d-fresh-core-report:1",
+  "classification": "EA276_REQUIRED_SOURCE_CORE_AND_SOURCE_DOCS_PASSED_ROOT_DELIVERY_ACCEPTANCE_PENDING",
+  "card": "FLEET5-K2A-PL-R1D-FRESH-CORE-20261106",
+  "task": "task_a95ef3d8ccce",
+  "dispatch": "ctx_ed23b4a777d0",
+  "owner": "Codex",
+  "grant": "msg_9cb645b95305",
+  "sourceSHA": "ea276c97ece2906dc1f29b44b65aa887379ea78f",
+  "branch": "agent/codex/fleet5-k2a-pl-r1d-20261106",
+  "canonicalRootRead": "Index1.0.457/Codex1.0.418; Root779d0034aacea9ea9d98e4547262b260542a9be2",
+  "review": {
+    "classification": "READ_ONLY_ACTUAL_INDEPENDENT_REVIEW_PUBLICATION_NOT_A_NEW_REVIEW",
+    "reviewSHA": "0c5bfc1a2e3738877f25e6370a600c445fe75a17",
+    "reviewFile": "docs/vault/30_Development/Evidence/fleet5-k2a-pl-r1d-ea276-review-20261106-claude/review.json",
+    "reviewFileSHA256": "8597f60e2c47a0f76979a579baf601dd00cd296b18f01ff092603c53f0fe03c1",
+    "target": {
+      "immutableBase": "b47d5dd6cd23873c62602e02e85a8f82c9843dc5",
+      "source": "3311f4538da4957396fc694d87706e9d5e813ef2",
+      "final": "ea276c97ece2906dc1f29b44b65aa887379ea78f",
+      "branch": "agent/codex/fleet5-k2a-pl-r1d-20261106 (frozen; reviewer branched agent/claude/fleet5-k2a-pl-r1d-ea276-review-20261106 from exact ea276)",
+      "reviewerGitCheck": "origin branch == ea276c97; 3311^ == b47d5dd6; b47->ea276 non-docs = exactly 3 M (README.md, effect_gate_test.go, pl_r1a_test.go); 3311->ea276 non-docs 0 paths. Code diff read in full: effect_gate_test.go adds conversionPointerElements and changes ONE line (if dst,ok := pointerElement -> for _, dst := range conversionPointerElements); pl_r1a_test.go is a pure append after line 397 (old 75-case prefix untouched); README adds the 7-line PL-R1d qualification and R1c->R1d in one sentence. ea276 effect_gate_test.go sha256 60418aca...a9b0 == reviewer's own cfec sketch output. Root .work/plr1d-source-root-verified.json read only (5495 unchanged base rows, 43 own docs, SourceDocs 42211618094 / FinalDocs 42212250558 all19 SUCCESS). Reviewer did not rerun owner CI or the owner 202-byte / 19354-byte checks."
+    },
+    "verdict": "CODE_AXIS_ACCEPT_FOR_BOUNDED_PL_R1D_TEST_DELTA",
+    "findings": [],
+    "retainedInfo": [
+      {
+        "id": "PL-R1d-I1",
+        "severity": "INFO",
+        "text": "conversionPointerElements walks every embedded element/union term syntactically instead of the intersected type set: a superset, so it can only over-refuse. X11 interface{~*L|~*time.Location; ~*time.Location} (real set = identity) is refused on ea276. Acceptable for a defense gate; no change requested."
+      },
+      {
+        "id": "PL-R1d-I2",
+        "severity": "INFO",
+        "text": "a type-parameter OPERAND is never treated as a pointer (C3, X8) so any pointer-term target conversion from it refuses; conservative, unchanged from b47."
+      },
+      {
+        "id": "PL-R1d-I3",
+        "severity": "INFO",
+        "text": "independence caveat: the ea276 helper/loop bytes equal the reviewer's own cfec sketch. Mitigated by 8 new negatives + 4 positives outside the owner table, the old-b47 contrast run and the closure argument above; Root may weigh it."
+      },
+      {
+        "id": "PL-R1c-I1",
+        "severity": "INFO",
+        "text": "dangling comment retained because the old 75-case prefix is byte-frozen; cosmetic, not a blocker."
+      }
+    ],
+    "reviewRunId": 42219022532,
+    "reviewJobId": 127896129328,
+    "event": "workflow_dispatch",
+    "path": ".github/workflows/docs.yml",
+    "attempt": 1,
+    "branch": "agent/claude/fleet5-k2a-pl-r1d-ea276-review-20261106",
+    "correlation": "FLEET5-K2A-PL-R1D-EA276-review-Claude-Docs-0c5bfc1a2e37-20261106T2137KST",
+    "all19StepsSuccess": true,
+    "rootDecision": "msg_9cb645b95305; independently weighed the source review for this one fresh source Core, not product/runtime authority"
+  },
+  "core": {
+    "classification": "WHOLE_CORE_HOSTED_SOURCE_ONLY_NOT_INSTALLED_RUNTIME_TRUST",
+    "runId": 42220638304,
+    "headSHA": "ea276c97ece2906dc1f29b44b65aa887379ea78f",
+    "branch": "agent/codex/fleet5-k2a-pl-r1d-20261106",
+    "event": "workflow_dispatch",
+    "workflow": ".github/workflows/core.yml",
+    "correlation": "FLEET5-K2A-PL-R1D-FULL-CORE-ea276c97-f9d03be414344825a2fa5f908f34f985",
+    "attempt": 1,
+    "status": "completed",
+    "conclusion": "success",
+    "wholeRequiredCorePassed": true,
+    "jobs": [
+      {
+        "id": 127901520588,
+        "name": "s01-storage-roundtrip",
+        "status": "completed",
+        "conclusion": "success",
+        "steps": 16,
+        "expectedOptionalSkipped": [],
+        "actualSkipped": [],
+        "optionalSkipSetExact": true,
+        "requiredStepNonSuccess": [],
+        "allRequiredStepsSuccess": true
+      },
+      {
+        "id": 127901520917,
+        "name": "core",
+        "status": "completed",
+        "conclusion": "success",
+        "steps": 48,
+        "expectedOptionalSkipped": [
+          "Collect fixed-SHA S08 build acceptance observations",
+          "FLEET5 early native Go peer-policy lifecycle proof",
+          "FLEET5 fixed native Go two-cycle proof",
+          "Publish FLEET5 fixed native proof",
+          "Publish FLEET5 native peer-phase proof (including expected baseline failure)",
+          "Recompute S08 build acceptance verdict from raw artifacts"
+        ],
+        "actualSkipped": [
+          "Collect fixed-SHA S08 build acceptance observations",
+          "FLEET5 early native Go peer-policy lifecycle proof",
+          "FLEET5 fixed native Go two-cycle proof",
+          "Publish FLEET5 fixed native proof",
+          "Publish FLEET5 native peer-phase proof (including expected baseline failure)",
+          "Recompute S08 build acceptance verdict from raw artifacts"
+        ],
+        "optionalSkipSetExact": true,
+        "requiredStepNonSuccess": [],
+        "allRequiredStepsSuccess": true
+      }
+    ],
+    "optionalS08AndNativeProofs": "NOT_RUN_FALSE_FLAGS",
+    "runtime40Cases": "NOT_RUN",
+    "actualFIVE": "INCOMPLETE",
+    "observedKST": "2026-11-06T22:21:06.185231+09:00"
+  },
+  "sourceDocs": {
+    "runId": 42220644407,
+    "headSHA": "ea276c97ece2906dc1f29b44b65aa887379ea78f",
+    "branch": "agent/codex/fleet5-k2a-pl-r1d-20261106",
+    "path": ".github/workflows/docs.yml",
+    "event": "workflow_dispatch",
+    "attempt": 1,
+    "correlation": "FLEET5-K2A-PL-R1D-SOURCE-DOCS-ea276c97-f9d03be414344825a2fa5f908f34f985",
+    "conclusion": "success",
+    "jobId": 127901541202,
+    "allJobsAnd19StepsSuccess": true
+  },
+  "artifacts": [
+    {
+      "id": 13505760008,
+      "SHA256": "c116164469d72acfb7f4b2e173e50eb69f006e6b2d0fc5602cbfdd33cad9fef0",
+      "bytes": 14008277
+    },
+    {
+      "id": 13503885572,
+      "SHA256": "b9163a4f527cdf9309e2bfa0e821fd8a5d343dcca7a7a0340e2fd1ccd9272e9c",
+      "bytes": 1769
+    }
+  ],
+  "junit": {
+    "core": [
+      {
+        "file": "build-product-runtime-real-pg.xml",
+        "cases": 13,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "skipReasons": {},
+        "failedCases": []
+      },
+      {
+        "file": "business-handoff-tests.xml",
+        "cases": 17,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "skipReasons": {},
+        "failedCases": []
+      },
+      {
+        "file": "containment-tests.xml",
+        "cases": 28,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "skipReasons": {},
+        "failedCases": []
+      },
+      {
+        "file": "core-tests.xml",
+        "cases": 9358,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 46,
+        "skipReasons": {
+          "PowerShell and csc.exe shim require Windows": 13,
+          "PowerShell parser requires Windows": 2,
+          "PowerShell required": 9,
+          "Actual Windows PowerShell launcher": 10,
+          "Explicit browser smoke integration lane required (INV_BROWSER_SMOKE_INTEGRATION=1)": 1,
+          "Set INV_MLFLOW_LIVE_URI (the run-mlflow lane starts the server)": 3,
+          "run only through tools/placement_benchmark.py": 1,
+          "run only through tools/placement_lock_wait_diagnostic.py": 1,
+          "run only through S11 Storage Failure Hosted Reference opt-in lane": 1,
+          "claude is not installed on this machine": 1,
+          "codex is not installed on this machine": 1,
+          "gemini is not installed on this machine": 1,
+          "antigravity is not installed on this machine": 1,
+          "Intranet CA NSS DB live browser test requires Linux, certutil (libnss3-tools), and Playwright": 1
+        },
+        "failedCases": []
+      },
+      {
+        "file": "cx01-recovery-tests.xml",
+        "cases": 20,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "skipReasons": {},
+        "failedCases": []
+      },
+      {
+        "file": "docker-host-tests.xml",
+        "cases": 2,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "skipReasons": {},
+        "failedCases": []
+      },
+      {
+        "file": "lan-installer-tests.xml",
+        "cases": 17,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "skipReasons": {},
+        "failedCases": []
+      },
+      {
+        "file": "lan-pilot-database-real-pg.xml",
+        "cases": 2,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "skipReasons": {},
+        "failedCases": []
+      },
+      {
+        "file": "shard-recovery-tests.xml",
+        "cases": 21,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "skipReasons": {},
+        "failedCases": []
+      },
+      {
+        "file": "workspace-tests.xml",
+        "cases": 23,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "skipReasons": {},
+        "failedCases": []
+      }
+    ],
+    "s01": [
+      {
+        "file": "s01-storage-roundtrip.xml",
+        "cases": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "file": "s3-product-object-store.xml",
+        "cases": 2,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "file": "s3-product-postgres.xml",
+        "cases": 3,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    ],
+    "countPolicy": "Per-lane case counts; repeated cases across lanes are not distinct acceptance cases"
+  },
+  "goRace": {
+    "topPass": 129,
+    "subPass": 405,
+    "testFail": 0,
+    "testSkip": 1,
+    "packagePass": 11,
+    "noTestFiles": [
+      "github.com/egparadise/SaintVision-Invion/services/node-agent/cmd/inv-discover",
+      "github.com/egparadise/SaintVision-Invion/services/node-agent/tests/probe",
+      "github.com/egparadise/SaintVision-Invion/services/node-agent/transfer"
+    ]
+  },
+  "migrationcontext": {
+    "file": "node-unit.jsonl",
+    "packages": {
+      "github.com/egparadise/SaintVision-Invion/services/node-agent/cmd/inv-discover": {
+        "topPass": 0,
+        "subPass": 0,
+        "testSkip": 0,
+        "testFail": 0,
+        "packagePass": 0,
+        "packageFail": 0
+      },
+      "github.com/egparadise/SaintVision-Invion/services/node-agent/cmd/inv-node": {
+        "topPass": 1,
+        "subPass": 0,
+        "testSkip": 0,
+        "testFail": 0,
+        "packagePass": 1,
+        "packageFail": 0
+      },
+      "github.com/egparadise/SaintVision-Invion/services/node-agent/cmd/inv-supervisor": {
+        "topPass": 4,
+        "subPass": 0,
+        "testSkip": 0,
+        "testFail": 0,
+        "packagePass": 1,
+        "packageFail": 0
+      },
+      "github.com/egparadise/SaintVision-Invion/services/node-agent/discovery": {
+        "topPass": 3,
+        "subPass": 0,
+        "testSkip": 0,
+        "testFail": 0,
+        "packagePass": 1,
+        "packageFail": 0
+      },
+      "github.com/egparadise/SaintVision-Invion/services/node-agent/internal/migrationcontext": {
+        "topPass": 20,
+        "subPass": 171,
+        "testSkip": 0,
+        "testFail": 0,
+        "packagePass": 1,
+        "packageFail": 0
+      },
+      "github.com/egparadise/SaintVision-Invion/services/node-agent/internal/wire": {
+        "topPass": 2,
+        "subPass": 0,
+        "testSkip": 0,
+        "testFail": 0,
+        "packagePass": 1,
+        "packageFail": 0
+      },
+      "github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify": {
+        "topPass": 42,
+        "subPass": 123,
+        "testSkip": 0,
+        "testFail": 0,
+        "packagePass": 1,
+        "packageFail": 0
+      },
+      "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime": {
+        "topPass": 36,
+        "subPass": 68,
+        "testSkip": 1,
+        "testFail": 0,
+        "packagePass": 1,
+        "packageFail": 0
+      },
+      "github.com/egparadise/SaintVision-Invion/services/node-agent/storage": {
+        "topPass": 2,
+        "subPass": 7,
+        "testSkip": 0,
+        "testFail": 0,
+        "packagePass": 1,
+        "packageFail": 0
+      },
+      "github.com/egparadise/SaintVision-Invion/services/node-agent/telemetry": {
+        "topPass": 3,
+        "subPass": 0,
+        "testSkip": 0,
+        "testFail": 0,
+        "packagePass": 1,
+        "packageFail": 0
+      },
+      "github.com/egparadise/SaintVision-Invion/services/node-agent/tests/probe": {
+        "topPass": 0,
+        "subPass": 0,
+        "testSkip": 0,
+        "testFail": 0,
+        "packagePass": 0,
+        "packageFail": 0
+      },
+      "github.com/egparadise/SaintVision-Invion/services/node-agent/transfer": {
+        "topPass": 0,
+        "subPass": 0,
+        "testSkip": 0,
+        "testFail": 0,
+        "packagePass": 0,
+        "packageFail": 0
+      },
+      "github.com/egparadise/SaintVision-Invion/services/node-agent/transport": {
+        "topPass": 12,
+        "subPass": 19,
+        "testSkip": 0,
+        "testFail": 0,
+        "packagePass": 1,
+        "packageFail": 0
+      },
+      "github.com/egparadise/SaintVision-Invion/services/node-agent/workspace": {
+        "topPass": 4,
+        "subPass": 17,
+        "testSkip": 0,
+        "testFail": 0,
+        "packagePass": 1,
+        "packageFail": 0
+      }
+    },
+    "packageSkips": [
+      "github.com/egparadise/SaintVision-Invion/services/node-agent/cmd/inv-discover",
+      "github.com/egparadise/SaintVision-Invion/services/node-agent/tests/probe",
+      "github.com/egparadise/SaintVision-Invion/services/node-agent/transfer"
+    ],
+    "migrationcontextCompiledMutants": 99,
+    "migrationcontextReasonLines": 99
+  },
+  "binaryMetadata": [
+    {
+      "file": "inv-discover",
+      "SHA256": "b92ac9c4a080c39391d17912193e26c181116a891ea6b1d54ce3195f739447c4",
+      "metadataReadExit": 0,
+      "metadata": "D:\\Project\\SaintVisionI-Invion\\fleet5-k2a-pl-r1d-20261106\\.work\\fresh-core-ea276-f9d03be4\\artifact-inv-discover: go1.27.1\n\tpath\tgithub.com/egparadise/SaintVision-Invion/services/node-agent/cmd/inv-discover\n\tmod\tgithub.com/egparadise/SaintVision-Invion/services/node-agent\t(devel)\t\n\tbuild\t-buildmode=exe\n\tbuild\t-compiler=gc\n\tbuild\t-trimpath=true\n\tbuild\tDefaultGODEBUG=containermaxprocs=0,cryptocustomrand=1,decoratemappings=0,gotestjsonbuildtext=1,httpcookiemaxnum=0,multipathtcp=0,randseednop=0,rsa1024min=0,tlsmlkem=0,tlssecpmlkem=0,tlssha1=1,tracebacklabels=0,updatemaxprocs=0,urlmaxqueryparams=0,urlstrictcolons=0,x509rsacrt=0,x509sha256skid=0,x509sslcertoverrideplatform=0,x509usepolicies=0\n\tbuild\tCGO_ENABLED=0\n\tbuild\tGOARCH=amd64\n\tbuild\tGOOS=linux\n\tbuild\tGOAMD64=v1\n\tbuild\tvcs=git\n\tbuild\tvcs.revision=ea276c97ece2906dc1f29b44b65aa887379ea78f\n\tbuild\tvcs.time=2026-11-06T11:41:37Z\n\tbuild\tvcs.modified=false\n",
+      "executed": false
+    },
+    {
+      "file": "inv-node",
+      "SHA256": "a94667ba6ed3ae9611bf7c1f080e41fe595a273d163bfd6c2c22336254404bad",
+      "metadataReadExit": 0,
+      "metadata": "D:\\Project\\SaintVisionI-Invion\\fleet5-k2a-pl-r1d-20261106\\.work\\fresh-core-ea276-f9d03be4\\artifact-inv-node: go1.27.1\n\tpath\tgithub.com/egparadise/SaintVision-Invion/services/node-agent/cmd/inv-node\n\tmod\tgithub.com/egparadise/SaintVision-Invion/services/node-agent\t(devel)\t\n\tdep\tgithub.com/egparadise/SaintVision-Invion/packages/contracts-go\tv0.0.0\n\t=>\t../../packages/contracts-go\t(devel)\t\n\t\n\tdep\tgithub.com/santhosh-tekuri/jsonschema/v6\tv6.0.2\th1:KRzFb2m7YtdldCEkzs6KqmJw4nqEVZGK7IN2kJkjTuQ=\n\tdep\tgolang.org/x/text\tv0.14.0\th1:ScX5w1eTa3QqT8oi6+ziP7dTV1S2+ALU0bI+0zXKWiQ=\n\tbuild\t-buildmode=exe\n\tbuild\t-compiler=gc\n\tbuild\t-trimpath=true\n\tbuild\tDefaultGODEBUG=containermaxprocs=0,cryptocustomrand=1,decoratemappings=0,gotestjsonbuildtext=1,httpcookiemaxnum=0,multipathtcp=0,randseednop=0,rsa1024min=0,tlsmlkem=0,tlssecpmlkem=0,tlssha1=1,tracebacklabels=0,updatemaxprocs=0,urlmaxqueryparams=0,urlstrictcolons=0,x509rsacrt=0,x509sha256skid=0,x509sslcertoverrideplatform=0,x509usepolicies=0\n\tbuild\tCGO_ENABLED=0\n\tbuild\tGOARCH=amd64\n\tbuild\tGOOS=linux\n\tbuild\tGOAMD64=v1\n\tbuild\tvcs=git\n\tbuild\tvcs.revision=ea276c97ece2906dc1f29b44b65aa887379ea78f\n\tbuild\tvcs.time=2026-11-06T11:41:37Z\n\tbuild\tvcs.modified=false\n",
+      "executed": false
+    }
+  ],
+  "optionalFlags": {
+    "run_s08_acceptance": false,
+    "run_fleet5_peer_phase_proof": false,
+    "run_fleet5_peer_phase_fixed_proof": false
+  },
+  "retainedReviewInformation": [
+    "Conservative syntactic intersection over-refusal",
+    "Type-parameter operand conservatively refused",
+    "Helper byte-identical to actual reviewer sketch; Root weighed independent 13 probes, old contrast and closure argument adequate for bounded gate, not a new independent algorithm",
+    "Dangling comment retained with old75case prefix byte-frozen"
+  ],
+  "preservedFailures": {
+    "core42164071724": "FAILURE",
+    "stage142170068364": "FAILURE",
+    "originalDe71DifferingField": "UNKNOWN"
+  },
+  "limits": {
+    "optionalS08": "NOT_RUN",
+    "optionalNativeTwoCycle": "NOT_RUN",
+    "localRace": "NOT_RUN_CGO0",
+    "runtime40": "NOT_RUN",
+    "productionAuthClockCurrentEffectsEntrypointSelfmeasurementInstall": "NULL_HOLD_ABSENT",
+    "actualFIVE": "INCOMPLETE",
+    "rawSevenFileCandidate": "UNREGISTERED"
+  },
+  "genericAliases": "NOT_ATTEMPTED_MODULE_GO_1_23",
+  "reportDocs": "PENDING_ONE_AUTHORIZED_RUN_AFTER_THIS_REPORT_COMMIT_NO_SELF_REFERENTIAL_HEAD_INVENTED",
+  "deliveryAcceptance": "PENDING_ROOT",
+  "nextK2Scope": "PENDING_PRECISE_ROOT_DECISION",
+  "noCIRepeat": true,
+  "noProductionOrLiveChanges": true,
+  "assembledKST": "2026-11-06T22:25:17.274533+09:00"
+}

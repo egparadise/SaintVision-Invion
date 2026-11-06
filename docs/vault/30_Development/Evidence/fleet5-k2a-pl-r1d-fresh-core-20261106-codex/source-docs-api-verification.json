@@ -1,0 +1,12 @@
+{
+  "runId": 42220644407,
+  "headSHA": "ea276c97ece2906dc1f29b44b65aa887379ea78f",
+  "branch": "agent/codex/fleet5-k2a-pl-r1d-20261106",
+  "path": ".github/workflows/docs.yml",
+  "event": "workflow_dispatch",
+  "attempt": 1,
+  "correlation": "FLEET5-K2A-PL-R1D-SOURCE-DOCS-ea276c97-f9d03be414344825a2fa5f908f34f985",
+  "conclusion": "success",
+  "jobId": 127901541202,
+  "allJobsAnd19StepsSuccess": true
+}
