@@ -1,0 +1,30 @@
+{
+  "atKST": "2026-11-06T23:38:08+09:00",
+  "source": "78468d0aec295c712dd1ea33bea1401d1d4939a4",
+  "final": "78468d0aec295c712dd1ea33bea1401d1d4939a4",
+  "base": "c76d0d66895503adde39288544929ff35cd6c281",
+  "branch": "agent/codex/fleet5-k2-p02-registry-design-20261106",
+  "directParent": true,
+  "only35OwnUniqueAddedDocs": true,
+  "basePathsAndNonDocsUnchanged": true,
+  "remoteExact": true,
+  "Docs": 42234905242,
+  "job": 127949897305,
+  "correlation": "FLEET5-K2-P02-REGISTRY-DESIGN-78468d0a-msg_f68dc38baa0f",
+  "rootVerifiedExactHeadRefEventPathAttemptAll19StepsSuccess": true,
+  "actualIndependentReview": null,
+  "productImplementationGranted": false,
+  "wholeK2OrFleetAccepted": false,
+  "RootRecomputedManifestInputHashes": 33,
+  "manifestInputBytes": 358866,
+  "manifestSelfExcluded": true,
+  "actualProducerSHA256": null,
+  "RootCheckedPrimaryContractSchemaModelHashes": {
+    "candidate_model.py": "533cc4a7229c67701c26bc8609e2bf3624fd7310a692da108fdca951b47acb67",
+    "test_candidate.py": "d25233b3179c6ca426d6805a427f9fa4fa7d7c6c0780f437ec0879c66a00dfe1",
+    "candidate-envelope.schema.json": "6681ed2028e5606cf1dd1bd034c53ca5d179fff7b42a16dca4bd2b4a6112a4cb",
+    "policy-payload.schema.json": "dbca16700404039a886d218c49f53689cff73b0af1871b76fa6f785516e0f414",
+    "contract.md": "4a3d4a0e17a0585343b25b7628da3bdf2acfd72e181eba18676d7a46ceeb1682"
+  },
+  "RootReranOwnerTests": false
+}

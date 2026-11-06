@@ -1,15 +1,19 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.423"
+version: "1.0.424"
 status: "review"
 author: "Codex"
-updated: "2026-11-06T23:23:17+09:00"
+updated: "2026-11-06T23:44:24+09:00"
 source_of_truth: "Git"
 active_card: "FLEET5 continued supervision with PORTAL-REFRESH-FLEET-20261106"
-active_card_status: "R3currentagyautoConfirmed/defaultautoSaved; readonlymenusRootanswered; R2actual1M3Lhold; BRev9c/K2P02continue; physicalincomplete"
-active_card_next: "GeminiR3exactsourceCIthenONEnarrowactualreview; BRev9c/K2P02candidateparallel; doNOTdeploy9c854; actualUIreviewerexitedreleased"
+active_card_status: "BRev9cactualClaude5ea/c5dctxe399launched; P02784/da137pending; UIR3edited/regressions; physicalincomplete"
+active_card_next: "ProcessactualBverdict/freshexitrelease; choosefrozenUIR3orP02next; originalasksbccbed/5bf8pending; noA7/D04grant/deploy"
 ---
+
+## 2026-11-06T23:44:24+09:00 두 후보 검증과 실제 독립 검토 연결
+
+Rev9c5ea의139추가문서·48생성기/32참조와 P02후보784의35추가문서·33manifest입력을 Git/API/hash로 검증하고 각각 exactDocs19단계 성공을 대조했다. UI 이전 검토자의 실제 종료·해제 뒤 Claude Rev9c 좁은 검토를 시작하고 P02를 다음에 등록했다. UI R3는 수정·회귀 단계이며 제품 수락·배포·5대 인수는 남는다. 다음 첫 행동/담당은 Claude의 실제 Rev9c 판정, Gemini R3 고정 후보·CI, Root의 실제 판정과 다음 한정 범위 선택이다. UI의 표시상 Ran/background 작업은 명령exit0/무승인실행 증거가 아님을 정정했다.
 
 ## 2026-11-06T23:23:17+09:00 CLI auto 전환과 남은 실제 개발
 
