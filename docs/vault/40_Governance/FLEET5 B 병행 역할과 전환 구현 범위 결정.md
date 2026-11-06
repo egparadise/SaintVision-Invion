@@ -1,17 +1,17 @@
 ---
 doc_id: "GOV-FLEET5-B-BOOTSTRAP-SCOPE-20261106"
 title: "FLEET5 B 병행 역할과 전환 구현 범위 결정"
-version: "1.4.8"
+version: "1.4.9"
 status: "review"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-11-07T02:57:44+09:00"
+updated: "2026-11-07T03:52:04+09:00"
 source_of_truth: "Git"
 ---
 
 # 실제 검토 이후의 범위 결정
 
-통합72028은 실제255cfa37 source/packet ACCEPT와8개CI/12job 성공을 받았다. 배포 전 C-L1 검토시각 정정 문서를 포함한 최종 납품·작은 독립 검토가 필요하며 별도 시험 보완을72028CI로 차용하지 않는다. 제품 전체·운영 인수는 아니다.
+통합72028은 실제255cfa37 source/packet ACCEPT와8개CI/12job 성공을 받았고, 최종C-L1납품97edf991/Docs42084583685에서 검토시각 정정도 닫혔다. 별도 신규 시험을72028CI로 차용하지 않는다. 현재B Rev9e의 실제764c3 검토는 기존6개 반례·I1과 현재positive를 통과시켰지만 import/global 결속의Low2를 남겨 Root가 Rev9f fix-only를 배정했다. A7snapshot은 미착수·미승인이고 제품 전체·운영 인수는 미완료다.
 
 전환5d0753은 실제a81f7330에서 이전 Low/Info를 닫았고 V3-L1~L3의 cohort target·nonproof join·복원 head/epoch 정합성 조건을 남겼다. 기존 Codex를 이후 계약·고난도 구현 owner로 지정하되 현재 작업은 v4 문서/schema/fixture 보완이다. 실제 보완 검토 전 canonical 등록·helper/API/runtime 구현은 허용하지 않는다.
 
@@ -148,3 +148,8 @@ aa3387/Docs42224817650의 실제 검토는 M1·actual72028 T1/A8를 닫았지만
 ## Rev9d 실제 Low 판정과 Rev9e 고정 후보
 
 실제9266f719/Docs42257602765는원래3reflection/5parameter거부를확인했지만enumAPI의비리터럴key와__new__/callee재바인딩Low2를남겼다. Root는msg_533819c42490로54549기반9e의새고유증거수정만배정했다. 현재3ccc/Docs42264002754의174추가only·71script/54copy/20artifact·model/6accounting/stageorder는Root가대조했고task_d1f9b00b0306가실제P02검토뒤대기한다. A7snapshot/제품/port/freeze/runtime는아직미승인이고72028T1/A8기존수락·NULLHOLD는보존한다. 상세는b-rev9e-fix-only-root-scope.json과b-rev9e-source-root-verification.json이다.
+
+
+## Rev9e 실제 판정과 Rev9f 한정 범위
+
+실제764c3/Docs42273461078의Low2만3cccbase에서보완한다. 구체범위·실제5반례·정상control·실행전후hash는b-rev9f-fix-only-root-scope.json에있다. 기존72028T1/A8positive와19edge모델은보존하며A7snapshot/NodeDelivery/runtime부여는실제후속수락과Root별도cut전미승인이다. 검토자의non-ownstale문서syncCHECK3과Root동시apply는별도qualification에그대로남겼고local전체PASS로바꾸지않는다.

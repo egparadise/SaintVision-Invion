@@ -1,15 +1,19 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.435"
+version: "1.0.436"
 status: "review"
 author: "Codex"
-updated: "2026-11-07T03:40:06+09:00"
+updated: "2026-11-07T03:52:04+09:00"
 source_of_truth: "Git"
 active_card: "FLEET5 continued supervision with PORTAL-REFRESH-FLEET-20261106"
-active_card_status: "UIb48previewDEPLOYED13HTTP/healthJSON200/anonymous401/protectedServicesUnchanged; B9eactual523/P02Rev3queued; browserTLS5PCpending"
-active_card_next: "Root actual B9e verdict then release gate and P02Rev3 review; continue physical/auth prerequisites; no fake5PC/global100"
+active_card_status: "B9eactual764Low2/I1closed/Rev9ffix; P02Rev3Claudea658active; UIHTTPdeployed; browserTLS5PCpending"
+active_card_next: "Root actual P02Rev3 verdict and smallest separate cut; B Codex Rev9f five causalcases; next single review after actualrelease; no A7D04authgrant"
 ---
+
+## 2026-11-07T03:52:04+09:00 실제 Low 판정 반영과 다음 단일 검토
+
+B Rev9e의 실제764c3 검토는 기존6개 반례와 현재72028 양성검증·I1 수정을 통과시켰지만, 상대import/package/level과global·starimport 결속의 Low2를 남겼다. 같은 Codex에 한정Rev9f 수정을 배정하고 검토자의 실제 종료·해제 뒤 Claude의 P02Rev3 두 지적 재검토를 시작했다. 검토자의 낡은branch sync충돌과Root의동시동기화는그대로기록했다. 수정 UI 배포의03:40 실제HTTP 증거는 유지하며 전체·5대 인수는 미완료다. 작업한 것·확인한 것·실제 명령/exit/CI·원문hash·범위와 한계는 Root History/Evidence에 남겼다. 다음 첫 행동/담당은 B Codex의 Rev9f 한정 반례 수정, Claude의 실제 P02Rev3 판정, Root의 결과에 따른 구체 다음 범위와 단일 검토 연결이다.
 
 ## 2026-11-07T03:40:06+09:00 수정 화면 배포와 실제 HTTP 확인
 

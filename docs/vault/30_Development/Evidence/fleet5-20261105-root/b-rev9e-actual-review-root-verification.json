@@ -1,0 +1,41 @@
+{
+  "atKST": "2026-11-07T03:48:06+09:00",
+  "target": "3cccfe4d7511180fa8fbb6f5742328c6a43d04bd",
+  "actualReview": "764c3bf3fd9d4046abcaab4b891a1cd1db085a06",
+  "branch": "agent/claude/fleet5-b-rev9e-3ccc-review-20261107",
+  "Docs": 42273461078,
+  "job": 128083686117,
+  "correlation": "claude-b-rev9e-3ccc-review-764c3bf3-ctx_52365790d017",
+  "rootVerifiedExactHeadRefEventPathAttemptAll19StepsSuccess": true,
+  "remoteExact": true,
+  "uniqueAddedReviewDocs": 14,
+  "actualWorkerDone": "msg_349785ddaeaa",
+  "verdict": "REVISION_REQUIRED",
+  "findings": [
+    {
+      "id": "B9e-L1",
+      "severity": "LOW",
+      "source": "reflection_audit.py keys() lines 36-49 and relevant_string() lines 30-34: for importlib.import_module only args[0]/name is inspected; the package argument (args[1] / package=) and builtins.__import__ level (args[4] / level=) are ignored, and a relative name is never composed with its package before the protected-module test",
+      "counterexamples": [
+        "L1-near-import_module-relative-variable-package: _CLAUDE_PKG = 'inv'; importlib.import_module('.workspace_config', _CLAUDE_PKG).configured_workspace(object(), tenant, settings) -> ACCEPT (unprovable module identity inside an enumerated API)",
+        "L1-near-import_module-relative-literal-package: importlib.import_module('.workspace_config', 'inv').configured_workspace(object(), tenant, settings) -> ACCEPT",
+        "L1-near-dunder-import-relative-level1: __import__('workspace_config', globals(), None, (), 1).configured_workspace(object(), tenant, settings) in inv/business_auth.py -> ACCEPT"
+      ],
+      "validity": "business_auth.py overlay only (same file/shape as the four 9266 cases), valid AST, no new unbound names, 15/15 closure witnesses, six frozen roots preserved, full t1_provenance.provenance at final producers; nothing imported or executed",
+      "minimalCorrection": "In keys(): for importlib.import_module also return the package argument (args[1] or keyword package) when present; for builtins.__import__ also return level (args[4] or keyword level). Treat a non-literal package/level as unknown. Treat a relative name (leading '.') or a nonzero level as relevant-unknown unless the composed absolute name is provably unprotected (or simply: relative/levelled enumerated import = unknown, exact frozen match or refuse). Regression: these three refuse; existing controls and the 72028 positive still ACCEPT."
+    },
+    {
+      "id": "B9e-L2",
+      "severity": "LOW",
+      "source": "callee_identity.py rebound() lines 30-45: a global declaration is honoured only for an ast.Name Store/Del; an import, def or class that binds the declared global inside a function, and 'from X import *' in the callee's scope (alias '*' is compared to the name), are not seen as rebinding",
+      "counterexamples": [
+        "L2-near-lan_pilot-global-import-in-function: replacing the two blank lines before the __main__ guard with 'def _claude_install(): global _current_finalized_batch; from foreign_module import _current_finalized_batch' and '_claude_install()' -> ACCEPT; lan_pilot :1872/:1990 then pass conn to the foreign callee (same causal escape as the 9266 wrapper)",
+        "L2-near-lan_pilot-star-import-shadow: replacing them with 'from foreign_module import *' (foreign __all__ may list _current_finalized_batch) -> ACCEPT",
+        "binder-only: global + nested def, global + import, star import -> owned formal still bound, no CALLEE_REBOUND"
+      ],
+      "validity": "tools/lan_pilot.py line-count-preserving replacement as in the actual 9266 case, valid AST, no new unbound names, 15/15 witnesses, six frozen roots preserved, full provenance at final producers; nothing imported or executed",
+      "minimalCorrection": "In rebound(): (a) when name is declared global in a function, any binding of it there (Import/ImportFrom alias, FunctionDef/ClassDef name, MatchAs/MatchStar/MatchMapping rest, ExceptHandler name, Name Store/Del) is a module rebinding; (b) an ImportFrom with '*' in the callee's binding scope is a rebinding unless frozen-identical; optionally (c) the same for nonlocal-declared names of a nested callee. Regression: these two refuse; existing controls and the 72028 positive still ACCEPT."
+    }
+  ],
+  "A7Granted": false
+}

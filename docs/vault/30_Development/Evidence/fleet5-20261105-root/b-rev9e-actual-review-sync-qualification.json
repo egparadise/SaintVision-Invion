@@ -1,0 +1,30 @@
+{
+  "atKST": "2026-11-07T03:52:04+09:00",
+  "actualReview": "764c3bf3fd9d4046abcaab4b891a1cd1db085a06",
+  "commandsGitPath": "docs/vault/30_Development/Evidence/fleet5-b-rev9e-3ccc-review-20261107-claude/commands.json",
+  "commandsGitBlobSHA256": "a9edd22219cf8d4e9a17f8748b1c2fdf8bc64071abd1884393aba30aacaecbca",
+  "actualLocalGateResult": "7_of_8_exit0; canonical_CHECK_exit3",
+  "initialSyncOnlyExit": 3,
+  "finalSyncExit": 3,
+  "sourceOwnerOrReviewerStateWrite": false,
+  "RootAppliedDuringCalls": true,
+  "conflicts": "Initial2non-own / final1non-own stale branch History; exact canonical state changed during calls, no unchanged-state success claimed",
+  "actualCalls": [
+    {
+      "argv": "python -B reviewer_gate_driver.py.txt 3cccfe4d... canonical-sync-check-before.txt <scratch> sync-only",
+      "exit": 3,
+      "kst": "2026-11-07T03:38:23..03:39:13",
+      "stateSHA": "before c3043aee926330d9f40b7a87227006284fdfe8c93022c9dc9c5da314740201bf after e4c2ccd25a996966c485f72f161d24cedd41562c55c1d235b13afb77059ae4ce (changed during the call: Root applied; reviewer wrote nothing)",
+      "conflicts": "2 non-own (both-diverged 30_Development/History/2026-11-05_기존5대_오케스트레이션_착수_Codex.md, destination-edited 40_Governance/오류 및 해결 인덱스.md): this branch's older vault vs newer canonical",
+      "file": "canonical-sync-check-before.txt, canonical-sync-check-before-conflicts.json"
+    },
+    {
+      "argv": "python -B reviewer_gate_driver.py.txt 3cccfe4d... local-doc-gates.txt <scratch>",
+      "exit": 3,
+      "kst": "2026-11-07T03:41:46..03:43:12",
+      "result": "7/8 exit 0 (check_docs, check_ontology, check_contract_bindings, check_frontend_integrity, check_doc_single_source --ratchet, check_response_freshness, check_doc_path_citations --ratchet); sync_obsidian CHECK exit 3, 1 non-own both-diverged conflict (same 2026-11-05 Codex History), state e4c2ccd2... -> 084156b4... during the call (Root apply), no reviewer write",
+      "file": "local-doc-gates.txt, local-doc-gates-sync-conflicts.json"
+    }
+  ],
+  "rootAggregation": "Root preserves this qualification and aggregates only review records into its current canonical docs. No child stale export/adopt/resolve/apply; Root own sync is separately verified."
+}
