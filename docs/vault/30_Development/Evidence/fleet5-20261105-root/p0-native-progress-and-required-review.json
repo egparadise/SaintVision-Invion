@@ -3,8 +3,8 @@
   "recordedAtKST": "2026-11-06T00:46:51+09:00",
   "rootBase": "2b1753ce59c09037b5e130a7ffe64794d1d45fdf",
   "priorRootCheckpoint": {
-    "SHA": "8993b1fcd92ec4dd16c351586e58aa76031a486e",
-    "Docs": 42173842157,
+    "SHA": "6658e44f54176ce1b88795ab82f529b86c024703",
+    "Docs": 42177145944,
     "exactHeadCorrelationAllJobsSuccess": true,
     "remoteMatches": true,
     "syncExits": [
@@ -12,13 +12,13 @@
       0,
       0
     ],
-    "independentlyMatchedNormalizedDestinationHashes": 2802,
+    "independentlyMatchedNormalizedDestinationHashes": 2804,
     "pending": 0,
     "conflicts": 0,
     "trackedAndUntrackedClean": true,
     "rootDocsOnly": true,
     "wholeProgramComplete": false,
-    "verifiedAtKST": "2026-11-06T15:22:56+09:00"
+    "verifiedAtKST": "2026-11-06T15:53:08+09:00"
   },
   "actualPlanLowReview": {
     "source": "803ad270562b1b75e44d26f9e14b965c714ab519",
@@ -2515,7 +2515,7 @@
     "ownerT1T2T3": "msg_620855c76519",
     "normativeRevisionReply": "msg_0392caf64d5d"
   },
-  "latestRecordAtKST": "2026-11-06T15:47:51+09:00",
+  "latestRecordAtKST": "2026-11-06T16:06:19+09:00",
   "optionalLowTokenTestDelta": {
     "source": "f0af307705b4923ebc3e231db5238af4c70aa389",
     "scope": "two otherwise-valid token payload corrections and JSON validity assertions; runtime unchanged",
@@ -3163,5 +3163,13 @@
   "B7ActualWholeReviewRootObservation": "b-rev7-actual-whole-review-root-verification.json",
   "B8ConcreteRevokePilotDecision": "b-rev8-revoke-pilot-root-decision.json",
   "LowStage2ActualSourceCIArtifactRootAudit": "k2a-low-stage2-source-ci-artifact-root-verification.json",
-  "LowStage2ActualPairReviewGate": "k2a-low-stage2-root-actual-pair-review-gate.json"
+  "LowStage2ActualPairReviewGate": "k2a-low-stage2-root-actual-pair-review-gate.json",
+  "BRev8SourceAudit": "b-rev8-final-source-root-verification.json",
+  "BRev8WholeReviewGate": "b-rev8-root-whole-review-queue-gate.json",
+  "queuedActualReview": {
+    "task": "task_ac6f831f2c53",
+    "source": "6a65665819d7479073189c524abf585636c3079d",
+    "dependsOn": "task_de20693ba7c9",
+    "dispatch": null
+  }
 }

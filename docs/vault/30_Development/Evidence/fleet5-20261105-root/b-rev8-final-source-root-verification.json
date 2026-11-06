@@ -1,0 +1,13 @@
+{
+  "atKST": "2026-11-06T15:58:38+09:00",
+  "source": "6a65665819d7479073189c524abf585636c3079d",
+  "branch": "agent/codex/fleet5-b-rev8-revoke-portcut-20261106",
+  "base": "33f7c6b48883cb06d1ea7d645bdb88634eb1bca0",
+  "uniqueAddedDocsOnly": 71,
+  "productDiffVs72028": 0,
+  "remoteExact": true,
+  "Docs": 42177211155,
+  "job": 127758314008,
+  "correlation": "fleet5-rev8-final-task_a8fd2969f0b3-6a65665819d7479073189c524abf585636c3079d",
+  "rootVerifiedExactHeadRefEventWorkflowAttemptAllStepsSuccess": true
+}

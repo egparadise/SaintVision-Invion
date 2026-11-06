@@ -1,15 +1,19 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.406"
+version: "1.0.407"
 status: "review"
 author: "Codex"
-updated: "2026-11-06T15:47:51+09:00"
+updated: "2026-11-06T16:06:19+09:00"
 source_of_truth: "Git"
 active_card: "FLEET5-20261105 five physical node orchestration"
-active_card_status: "Lowdba+Stage201a actualpairReviewctx8aactive/Stage2focused3PASS; LownewraceNOTRUN; closurepinsunregistered/combinedsourcepending; B8pilot/wholephysicalincomplete"
-active_card_next: "Claude per-targetLow+Stage2verdict/exactpinregistrationcut+ownDocs; Root concretecombinedsource/integrationgrant thenfreshCoreDocs; B Codex smallRev8pilot; no borrowedCI"
+active_card_status: "B8final6a65 source/Docs verified; actual review taskac6 pending behind active LowStage2taskde20; no product/portgrant/wholeCore/physical completion"
+active_card_next: "Handle actual LowStage2 verdict and precise integration/pins first; after actual reviewer exit/release start existing B8readytask once; concrete B nextcut after review"
 ---
+
+## 2026-11-06T16:06:19+09:00 B rev8 최종본과 단일 검토 대기열
+
+작업한 것과 확인: B rev8 최종6a656658의 기준33f7 이후 고유 문서71개 추가·제품 변경0·현재 remote 일치와 exact Docs42177211155의19개 단계 성공을 Root가 확인했다. 전체 delta 독립 검토 task_ac6f831f2c53를 현재 K2A 보강·Stage2 검토 task_de20693ba7c9 뒤에 등록했다. 아직 대기 상태이며 새 검토자는 시작하지 않았다. 실제 판정 뒤 다음 분석·계약 범위를 구체적으로 지시한다. 원질문 msg_7adb81131096은 실제 판정과 다음 범위 결정까지 pending이다. 다음 첫 행동/담당은 Claude의 현재 코드 판정, Root의 결합·pin 범위 판단 및 기존 B8 ready Task의 순차 시작이다.
 
 ## 2026-11-06T15:47:51+09:00 K2A 보강·Stage2 실제 delta 검토
 

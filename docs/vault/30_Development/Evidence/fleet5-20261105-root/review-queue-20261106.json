@@ -1,6 +1,6 @@
 {
   "schema": "fleet5-root-review-resource-sequence:1",
-  "atKST": "2026-11-06T15:47:51+09:00",
+  "atKST": "2026-11-06T16:06:19+09:00",
   "completedB": {
     "task": "task_d4c4c809ed4e",
     "review": "ac9182c3e3d606ec027c0be2e90e049ff50d54f1",
@@ -22,16 +22,24 @@
     "scope": "ONEactualLowR1R5+Stage2code-deltareview/per-targetverdict/exactclosurepinseam",
     "state": "ready actualdispatch; verdictpending"
   },
-  "pending": null,
-  "authorParallelWork": "K2ownerawaitsactualpairverdict/Rootcombinedsource+pinregistrationdecision; Bowner narrowRev8pilot perexistingchoice; observationMediumseparatepending",
-  "reason": "bothauthorizedcandidatescleanpublished/allfiveexactCIchecksSUCCESS/actualStage2artifact3PASS; Lownewhostedrace deferredhonestly",
+  "pending": {
+    "task": "task_ac6f831f2c53",
+    "source": "6a65665819d7479073189c524abf585636c3079d",
+    "base": "33f7c6b48883cb06d1ea7d645bdb88634eb1bca0",
+    "dependsOn": "task_de20693ba7c9",
+    "status": "pending",
+    "dispatch": null,
+    "scope": "ONE actual WHOLE Rev8 bounded design/analysis review + concrete next cut"
+  },
+  "authorParallelWork": "K2 author awaits actual Low/Stage2 verdict and Root integration/pin scope; B author awaits actual whole Rev8 review and Root next concrete cut",
+  "reason": "B8 immutable final6a65/71 unique docs/productdiff0/exactDocs42177211155 all19SUCCESS Root verified; serialize one Claude",
   "genericApprovalMissing": false,
   "completedRL1": {
     "task": "task_9cd71aa339ff",
     "review": "0e53fc024ca773b7719182e170e5e126aeaf5b95",
     "verdict": "ACCEPT TEST-ONLY; R-L1 CLOSED; no new findings"
   },
-  "nextActualReviewTrigger": "actualpairverdict orB8immutableDocspreparedafteroneClaudeavailability; no finalCoreuntilRootcombinedsourcechoice",
+  "nextActualReviewTrigger": "on predecessor actual completion and exited/released, start existing ready B8 task once; actual Low/Stage2 verdict handled first without waiting B8",
   "completedIntegration": {
     "task": "task_78064fb4b7ff",
     "dispatch": "ctx_ed7ec73163d6",
