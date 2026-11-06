@@ -3,8 +3,8 @@
   "recordedAtKST": "2026-11-06T00:46:51+09:00",
   "rootBase": "2b1753ce59c09037b5e130a7ffe64794d1d45fdf",
   "priorRootCheckpoint": {
-    "SHA": "37c9c2f5ba1aeacc928dc91c5363f3cf8f890c53",
-    "Docs": 42188781809,
+    "SHA": "29d5828cbd779019a661b30e6f065a77a0df6d2d",
+    "Docs": 42193283179,
     "exactHeadCorrelationAllJobsSuccess": true,
     "remoteMatches": true,
     "syncExits": [
@@ -12,13 +12,13 @@
       0,
       0
     ],
-    "independentlyMatchedNormalizedDestinationHashes": 2814,
+    "independentlyMatchedNormalizedDestinationHashes": 2816,
     "pending": 0,
     "conflicts": 0,
     "trackedAndUntrackedClean": true,
     "rootDocsOnly": true,
     "wholeProgramComplete": false,
-    "verifiedAtKST": "2026-11-06T17:37:05+09:00"
+    "verifiedAtKST": "2026-11-06T18:13:55+09:00"
   },
   "actualPlanLowReview": {
     "source": "803ad270562b1b75e44d26f9e14b965c714ab519",
@@ -2515,7 +2515,7 @@
     "ownerT1T2T3": "msg_620855c76519",
     "normativeRevisionReply": "msg_0392caf64d5d"
   },
-  "latestRecordAtKST": "2026-11-06T18:10:10+09:00",
+  "latestRecordAtKST": "2026-11-06T18:22:06+09:00",
   "optionalLowTokenTestDelta": {
     "source": "f0af307705b4923ebc3e231db5238af4c70aa389",
     "scope": "two otherwise-valid token payload corrections and JSON validity assertions; runtime unchanged",
@@ -3163,7 +3163,12 @@
   "LowStage2ActualPairReviewGate": "k2a-low-stage2-root-actual-pair-review-gate.json",
   "BRev8SourceAudit": "b-rev8-final-source-root-verification.json",
   "BRev8WholeReviewGate": "b-rev8-root-whole-review-queue-gate.json",
-  "queuedActualReview": null,
+  "queuedActualReview": {
+    "task": "task_54959cbb262a",
+    "source": "084bd9471673f7f4f41dc547c76a2411c066109b",
+    "dependsOn": "task_522bf43089d4",
+    "dispatch": null
+  },
   "LowStage2ActualReviewVerification": "k2a-low-stage2-actual-review-root-verification.json",
   "LowStage2ConcreteIntegrationScope": "k2a-low-stage2-combined-root-scope.json",
   "combinedSourceAccepted": false,
@@ -3182,5 +3187,7 @@
   ],
   "newFullCore": "NOTRUN; RootfixbeforeCore",
   "B9FinalSourceProof": "b-rev9-final-source-root-verification.json",
-  "B9ActualWholeReviewGate": "b-rev9-root-whole-review-gate.json"
+  "B9ActualWholeReviewGate": "b-rev9-root-whole-review-gate.json",
+  "PLR1bSourceRootProof": "k2a-pl-r1b-source-root-verification.json",
+  "PLR1bNarrowQueueGate": "k2a-pl-r1b-root-narrow-review-queue-gate.json"
 }

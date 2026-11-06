@@ -1,15 +1,19 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.412"
+version: "1.0.413"
 status: "review"
 author: "Codex"
-updated: "2026-11-06T18:10:10+09:00"
+updated: "2026-11-06T18:22:06+09:00"
 source_of_truth: "Git"
 active_card: "FLEET5-20261105 five physical node orchestration"
-active_card_status: "B9final3daf/86docs/0productdiff/33hashes/exactDocsverified; actualwholeReviewctxde27active; K2PLR1b3filefixcontinues; no fullCore/physicalacceptance"
-active_card_next: "Claude actualwholeB9verdict+exactnextcut; K2Codex immutablePLR1bTESTREADMEcandidate+Docs thenoneactualnarrowreview; Root exactCoredecision onlyafteracceptance"
+active_card_status: "PLR1b084 source/2Docsverified; only3files+5393unchanged; narrowtask549pending behind B9ctxde27active; no sourceclosure/Core/physicalacceptance"
+active_card_next: "Claude actualB9wholeverdict/Rootnextcut; afterprioractualexitrelease start existingPLR1breadytaskonce; actualnarrowverdict thenRoot exactoneCoredecision"
 ---
+
+## 2026-11-06T18:22:06+09:00 PL-R1b 고정 후보와 실제 검토 대기열
+
+작업한 것과 확인: PL-R1b 최종084bd947/source484e9173는 ac7498의 직접 후속으로 시험·README3파일만 바뀌었다. Root는 기존5393개 mode/blob 불변·고유 문서61개·두 remote·source/final Docs 각각19단계 성공을 검증했다. 실제 narrow 검토 task_54959cbb262a를 현재 B Rev9 검토 뒤에 등록했고 아직 시작하지 않았다. 저자54개 compile-valid mutation 시험은 저자 증거이며 독립 closure·새 전체 Core·운영 인수는 아직 아니다. 새 원질문 msg_22a921f5890e는 actual narrow 판정·review SHA/Docs와 Root의 정확한 CI 선택까지 pending이다. 다음 첫 행동/담당은 현재 Claude의 B9 판정과 Root의 다음 범위, 이후 existing ready PL-R1b task의 순차 시작이다.
 
 ## 2026-11-06T18:10:10+09:00 B Rev9 고정 소스와 실제 전체 delta 검토
 

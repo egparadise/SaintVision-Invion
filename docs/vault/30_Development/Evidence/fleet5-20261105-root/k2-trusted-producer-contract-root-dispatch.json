@@ -16,19 +16,19 @@
   "noPrivateKeyOrDBSSHNodeDockerVMAction": true,
   "BRev6Independent": true,
   "wholeProgramComplete": false,
-  "latestObservationAtKST": "2026-11-06T17:34:35+09:00",
+  "latestObservationAtKST": "2026-11-06T18:22:06+09:00",
   "proposalSource": "551d7312bb9c806fd423dcf6074158a9802cbb14",
   "proposalDocs": 42146482617,
   "RootVerifiedProposalExactHeadRefEventAllJobsSuccess": true,
   "actualReviewGate": "k2-551-root-actual-review-gate.json",
-  "ownerQuestionPending": null,
+  "ownerQuestionPending": "msg_22a921f5890e",
   "actualDesignAccepted": true,
   "actualCodeGrant": true,
   "answeredQuestion": "msg_e880984e98ec",
   "actualDirectReply": "msg_6df22674ff19",
   "actualReview": "5623dc00b676ce0b535350897069a3b7f1154eab",
   "actualVerdict": "REVISION_REQUIRED3Major5Low",
-  "currentAuthorization": "PL-R1b onlyeffect_gate_test/pl_r1a_test/README+uniqueDocs fromac7498; no product/deploychanges/Core untilactualnarrowreview+Rootnextdecision",
+  "currentAuthorization": "frozen084 PLR1b narrowreview afteractualB9exit/release; no additionalproduct/test/Coreaction untilverdict/Rootchoice",
   "decision": "k2-rev2-concrete-root-decision.json",
   "latestProposalSource": "4ce63e8ee78d957aa91e813f6ee226cc21abb52a",
   "latestProposalDocs": 42155660700,
@@ -99,5 +99,15 @@
     "PLR1a interfaceConstraintclass(a)"
   ],
   "PLR1bClosed": false,
-  "finalCoreGrantedNow": false
+  "finalCoreGrantedNow": false,
+  "latestPLR1bSource": "484e9173f5e065d4c42a4c5a519678791d7e8473",
+  "latestPLR1bFinal": "084bd9471673f7f4f41dc547c76a2411c066109b",
+  "latestPLR1bSourceProof": "k2a-pl-r1b-source-root-verification.json",
+  "latestPLR1bReviewGate": "k2a-pl-r1b-root-narrow-review-queue-gate.json",
+  "queuedActualNarrowReview": {
+    "task": "task_54959cbb262a",
+    "source": "084bd9471673f7f4f41dc547c76a2411c066109b",
+    "dependsOn": "task_522bf43089d4",
+    "dispatch": null
+  }
 }

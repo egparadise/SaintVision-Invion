@@ -1,0 +1,39 @@
+{
+  "atKST": "2026-11-06T18:18:01+09:00",
+  "base": "ac7498e82a0cf17fc95973fe9187aeb51c99d51e",
+  "source": "484e9173f5e065d4c42a4c5a519678791d7e8473",
+  "final": "084bd9471673f7f4f41dc547c76a2411c066109b",
+  "branch": "agent/codex/fleet5-k2a-pl-r1b-20261106",
+  "bothRemotesExact": true,
+  "sourceDirectChildOfBase": true,
+  "onlyThreeTestReadmeExistingPathsChanged": [
+    "services/node-agent/internal/migrationcontext/README.md",
+    "services/node-agent/internal/migrationcontext/effect_gate_test.go",
+    "services/node-agent/internal/migrationcontext/pl_r1a_test.go"
+  ],
+  "unchangedBaseModesAndBlobs": 5393,
+  "newUniqueOwnDocs": 61,
+  "allNonDocBytesSourceEqualFinal": true,
+  "originalCombinedBranchFrozen": true,
+  "CI": {
+    "SourceDocs": {
+      "source": "484e9173f5e065d4c42a4c5a519678791d7e8473",
+      "run": 42192543960,
+      "job": 127807830202,
+      "correlation": "FLEET5-K2A-PL-R1B-SOURCE-DOCS-484e9173f5e065d4c42a4c5a519678791d7e8473",
+      "exactHeadRefEventPathAttemptAll19StepsSuccess": true
+    },
+    "FinalDocs": {
+      "source": "084bd9471673f7f4f41dc547c76a2411c066109b",
+      "run": 42193308446,
+      "job": 127810327547,
+      "correlation": "FLEET5-K2A-PL-R1B-FINAL-DOCS-084bd9471673f7f4f41dc547c76a2411c066109b",
+      "exactHeadRefEventPathAttemptAll19StepsSuccess": true
+    }
+  },
+  "independentReview": null,
+  "PLR1bClosed": false,
+  "fullCore": "NOTRUN/no grant",
+  "runtimeAcceptance": null,
+  "wholeProgramComplete": false
+}
