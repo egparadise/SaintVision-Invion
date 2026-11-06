@@ -1,11 +1,11 @@
 ---
 doc_id: "HISTORY-FLEET5-20261106-K2A-PL-R1B-CODEX"
 title: "FLEET5 K2A PL-R1b foreign write target source gate revision"
-version: "1.0.0"
+version: "1.0.1"
 status: "review"
 author: "Codex"
 reviewer: "Claude through Root; actual narrow delta review pending"
-updated: "2026-11-06T17:43:55+09:00"
+updated: "2026-11-06T18:08:59.716027+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 base_sha: "ac7498e82a0cf17fc95973fe9187aeb51c99d51e"
@@ -139,3 +139,23 @@ a fabricated collision. Source/CI/review/runtime axes remain separate: local
 source checks PASS, exact hosted Docs pending, actual narrow Claude pending,
 new fullCore NOT_RUN/not granted. First next Root action is verify frozen
 source/Docs/diff, then ONE actual narrow review; no self-closure/wholeK2 claim.
+
+Actual isolated source484e9173f5e065d4c42a4c5a519678791d7e8473 is a direct
+child of exactac7498,49changed paths =3allowed package files plus46unique added
+History/Evidence. All5393remaining base path modes/blobs equalac7498, no historic
+docs modified. Source-publication verification binds final54-case test hashes.
+Own exact Docs42192543960/job127807830202/workflow_dispatch/docs.yml/attempt1,
+exact head/ref/correlation, ALL1job/19stepsSUCCESS read from actual GitHub run
+AND jobs API. Metadata preserved in this unique Evidence. This qualifies Docs
+only; commit title describes a local guard fix, not actual PL-R1b review closure.
+This qualification changes only unique docs; exact final report Docs is observed
+separately for Root handoff, no invented self-referential future CI binding.
+
+Qualification documentation18:09:00-18:10:10 KST ALL10gates exit0,
+exactac7498 ratchet and official canonical state9bfa8c78... before=after. Full
+command/exit/hash provenance qualification/local-required-gates.json. No code
+changed after484e9173; product tests not repeated for documentation. Next Root:
+independently verify frozen report/source/exact final Docs, then ONE actual
+Claude narrow delta review vsac7498 after predecessor actually settles/releases.
+Only actual acceptance plus Root precise choice may grant one fresh fullCore+Docs.
+No PL-R1b/wholeK2 self-closure, no source installation or operational acceptance.
