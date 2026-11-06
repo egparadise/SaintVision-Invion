@@ -1,0 +1,28 @@
+{
+ "schemaVersion": "fleet5-b-rev5-review-commands:1",
+ "environment": {
+  "host": "Windows 11 Pro 10.0.26300 (Git Bash + PowerShell 5.1)",
+  "worktree": "D:/Project/SaintVisionI-Invion/fleet5-bootstrap-v3-review-20261106 (reused released review workspace, new branch)",
+  "branch": "agent/claude/fleet5-b-rev5-228e-review-20261106 created FROM 228e2a2062d8a64bce7f772f668da7df2fd2ac0d at 09:09:22 KST",
+  "python": "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe = Python 3.14.7, SQLAlchemy 2.0.52, jsonschema 4.26.0 (the owner's interpreter per proof-checks.json; read-only use, no installs)",
+  "env": "PYTHONUTF8=1",
+  "noDB_PG_Docker_Node_SSH_PKI_VM_clock_schedule": true
+ },
+ "commands": [
+  {"atKST": "2026-11-06T09:06", "argv": "git fetch origin agent/codex/fleet5-b-contract-rev5-20261106; git ls-remote origin refs/heads/agent/codex/fleet5-b-contract-rev5-20261106", "exit": 0, "result": "FETCH_HEAD and remote ref = 228e2a2062d8a64bce7f772f668da7df2fd2ac0d, parent 2a08284a97fb8cd40c9e6de5c923c7864a7f76af"},
+  {"atKST": "2026-11-06T09:10", "argv": "git diff --name-only 72028cba..228e2a20 -- services src deploy migrations tests tools contracts packages apps .github/workflows | wc -l; git diff --name-status 2a08284a..228e2a20", "exit": 0, "result": "0 product files; 0 files outside History/Evidence; 54 A vs 2a08"},
+  {"atKST": "2026-11-06T09:16:03..09:20:44", "cwd": "worktree root", "argv": "python -B <E>/schema.py | authority.py | fixtures.py | reconcile.py | tests/proofs/fleet5_compute_storage_contract_probe.py | ... --require-coexistence | <E>/source_analysis.py | reconcile.py | source_fixtures.py (stdout+stderr to scratch r1..r9.log)",
+   "exits": [0, 0, 0, 0, 0, 1, 0, 0, 0],
+   "stdoutSha256": ["e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855", "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855", "c8cabf2f0bf6499328963a1f295d5c64e4b33c627b6a358b0cffaeeb112dda1c", "a647e469798426933185c80ced6c32abc2ae28b1bc700b67e7479ad974d71a51", "6853f465cbaf47a3d137a212e1252dc2794fb541f57855e93006c6c88ff831c7", "26901da1c34123066141d82ec7f1ddeb0ba4ee7a5a82854f9f3cee79f3d8745b", "5e426254ecab17655dd01cfc36cccf8b8a75acfe8564b5c06dc9f4a8cce115d9", "a647e469798426933185c80ced6c32abc2ae28b1bc700b67e7479ad974d71a51", "46880b868bf35983881add38f58ddf226632ebb6f54e25a44f8d3549d5919b76"],
+   "comparison": "all 9 equal owner proof-checks/source-checks ledger sha256; source_fixtures took 255 s",
+   "sideEffect": "scripts rewrite their own outputs in the owner folder; git status afterwards showed only source-fixture-results.json modified (24 'seconds' timing fields only), restored with git checkout -- <file>; owner run_checks.py NOT used so no owner .log/.json ledgers were rewritten"},
+  {"atKST": "2026-11-06T09:18..09:22", "argv": "independent git grep -i -E '(insert into|update|delete from|merge into|truncate|copy) (only )?(schema.)?(nodes|tenant_controls|storage_contributions|node_channels|evidence|control_epoch)' 72028 -- . ':!docs' ':!tests'; ORM model/attribute/insert()/pg_insert/setattr/Table() greps; migrations dynamic EXECUTE format greps", "exit": 0, "result": "27 SQL writer sites + 7 ORM writer records = owner 34; sentinel grant 0037 UPDATE(storage_lock_sentinel) is lock-only and covered by allOnlineDirectAuthorityDML.lock_sentinel_UPDATE=false"},
+  {"atKST": "2026-11-06T09:21", "argv": "python (stdlib) re-hash all 46 surface-inventory paths via git show 72028:<path>", "exit": 0, "result": "46 checked, 0 mismatch"},
+  {"atKST": "2026-11-06T09:23:24", "argv": "PYTHONUTF8=1 python -B scratch/reviewer_model_attacks.py <out.json> <E>", "exit": 0, "logLFSha256": "9de42ca9319f21510164efab915ab3210a9a550b26507583abee39b994936253", "scriptSha256": "d85947c8a28a0e7e416a649bc1a6371ad287a484c40f647de35514df5fbf8da2"},
+  {"atKST": "2026-11-06T09:19..09:27:13", "argv": "PYTHONUTF8=1 python -B scratch/reviewer_mutations.py <out.json> <E>", "exit": 0, "cases": 18, "logLFSha256": "5d645682b8591507483b6fc939afaeb12ee9d42db26d4f01e1b25deacce71d0f", "scratchRawCRLFLogSha256": "eb439b390a4ace79295ffb1ad149dc4ea8f1431e6b783b6b0e7780699a08ffe8", "scriptSha256": "8af0d6f0c3de0017f952c7f745b1a38bb625f396db3e1cd4d44d632953283461"},
+  {"atKST": "2026-11-06T09:24", "argv": "gh run view 42132640734 --json headSha,headBranch,event,conclusion,displayTitle,jobs", "exit": 0, "result": "head 228e2a20, workflow_dispatch, success, job 127612804404 success, title fleet5-b-rev5-228e2a2062d8-task_a8fd2969f0b3"},
+  {"atKST": "2026-11-06T09:25", "argv": "read-only: shared canonical vault Root b-rev5-root-decision.json (msg_03544733c9f3), b-rev5-root-review-gate.json, Index 1.0.430 header", "exit": 0}
+ ],
+ "notRun": ["owner run_checks.py (would rewrite owner ledgers)", "any PG/Docker/Node/crypto/crash/equipment command", "Obsidian apply/adopt/resolve"],
+ "publicationGates": "see local-doc-gates.txt"
+}

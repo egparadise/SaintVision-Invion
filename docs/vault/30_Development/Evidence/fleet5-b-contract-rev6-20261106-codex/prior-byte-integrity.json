@@ -1,0 +1,56 @@
+[
+  {
+    "path": "prior-commands.json",
+    "source": "docs/vault/30_Development/Evidence/fleet5-b-rev5-228e-review-20261106-claude/commands.json",
+    "sourceSHA": "8bac0838c08bbdd49cf954a517594c0973b55da6",
+    "sha256": "dded7d173197fcdd2f0fae80dc9ed4a3b771a27cd17e5296ad879770fd4f1476"
+  },
+  {
+    "path": "prior-local-doc-gates.txt",
+    "source": "docs/vault/30_Development/Evidence/fleet5-b-rev5-228e-review-20261106-claude/local-doc-gates.txt",
+    "sourceSHA": "8bac0838c08bbdd49cf954a517594c0973b55da6",
+    "sha256": "546fae64c263e7ec2f9726085ed7b9b1e5a4df90bca50346f27eda0166144d91"
+  },
+  {
+    "path": "prior-review.json",
+    "source": "docs/vault/30_Development/Evidence/fleet5-b-rev5-228e-review-20261106-claude/review.json",
+    "sourceSHA": "8bac0838c08bbdd49cf954a517594c0973b55da6",
+    "sha256": "e1fec7e9aaa406c881e7fd1d512ec597a33ee7cac0f4fe96886d73a750f3ecfc"
+  },
+  {
+    "path": "prior-reviewer-model-attacks-result.json",
+    "source": "docs/vault/30_Development/Evidence/fleet5-b-rev5-228e-review-20261106-claude/reviewer-model-attacks-result.json",
+    "sourceSHA": "8bac0838c08bbdd49cf954a517594c0973b55da6",
+    "sha256": "1f6f461c54a13360dbc7e902ed20a448f1a9623c02cd4c10a830513f67b8d999"
+  },
+  {
+    "path": "prior-reviewer-model-attacks.log.txt",
+    "source": "docs/vault/30_Development/Evidence/fleet5-b-rev5-228e-review-20261106-claude/reviewer-model-attacks.log.txt",
+    "sourceSHA": "8bac0838c08bbdd49cf954a517594c0973b55da6",
+    "sha256": "9de42ca9319f21510164efab915ab3210a9a550b26507583abee39b994936253"
+  },
+  {
+    "path": "prior-reviewer-mutations-result.json",
+    "source": "docs/vault/30_Development/Evidence/fleet5-b-rev5-228e-review-20261106-claude/reviewer-mutations-result.json",
+    "sourceSHA": "8bac0838c08bbdd49cf954a517594c0973b55da6",
+    "sha256": "37a064b90b88b729be9a9567dc601723559fc9e6e85f3ff7052d80f2f29523f3"
+  },
+  {
+    "path": "prior-reviewer-mutations.log.txt",
+    "source": "docs/vault/30_Development/Evidence/fleet5-b-rev5-228e-review-20261106-claude/reviewer-mutations.log.txt",
+    "sourceSHA": "8bac0838c08bbdd49cf954a517594c0973b55da6",
+    "sha256": "5d645682b8591507483b6fc939afaeb12ee9d42db26d4f01e1b25deacce71d0f"
+  },
+  {
+    "path": "prior-reviewer_model_attacks.py.txt",
+    "source": "docs/vault/30_Development/Evidence/fleet5-b-rev5-228e-review-20261106-claude/reviewer_model_attacks.py.txt",
+    "sourceSHA": "8bac0838c08bbdd49cf954a517594c0973b55da6",
+    "sha256": "d85947c8a28a0e7e416a649bc1a6371ad287a484c40f647de35514df5fbf8da2"
+  },
+  {
+    "path": "prior-reviewer_mutations.py.txt",
+    "source": "docs/vault/30_Development/Evidence/fleet5-b-rev5-228e-review-20261106-claude/reviewer_mutations.py.txt",
+    "sourceSHA": "8bac0838c08bbdd49cf954a517594c0973b55da6",
+    "sha256": "8af0d6f0c3de0017f952c7f745b1a38bb625f396db3e1cd4d44d632953283461"
+  }
+]

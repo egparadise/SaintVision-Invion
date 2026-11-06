@@ -1,0 +1,77 @@
+{
+  "actualPriorReview": "8bac0838c08bbdd49cf954a517594c0973b55da6",
+  "rootDecision": "msg_17afe2db8b82",
+  "status": "OWNER_PROPOSED_REMEDIES_ACTUAL_WHOLE_REV6_REVIEW_PENDING",
+  "findings": [
+    {
+      "id": "B5-M1",
+      "proposal": "Scoped committed IO handle/lifecycle, original outcome transaction, poisoned/lost verifier capability, all13 source readers and B callers, orthogonal denial facts; success without OP, error/unknown requires protected proof",
+      "evidence": [
+        "reader-io-catalog.json",
+        "fixture-results.json"
+      ],
+      "status": "OWNER_PROPOSED_NOT_ACCEPTED"
+    },
+    {
+      "id": "B5-M2",
+      "proposal": "Typed per-callsite DB/Mapping/stdlib/transaction provenance, literal/nonliteral getattr, no duplicate DB UNKNOWN, all21 critical plans usable and causal per-entry blockers",
+      "evidence": [
+        "source-analysis.json",
+        "source-fixture-results.json"
+      ],
+      "status": "OWNER_PROPOSED_NOT_ACCEPTED"
+    },
+    {
+      "id": "B5-L1",
+      "proposal": "SET/CASE/WHERE semantics, ORM insert/pg_insert/Table.update/setattr, explicit search_path vs unknown, dynamic identifiers BLOCK, stale RULE/OFFLINE/cardinality and W1-W16 mutations",
+      "evidence": [
+        "writer-reconciliation.json",
+        "source-fixture-results.json"
+      ],
+      "status": "OWNER_PROPOSED_NOT_ACCEPTED"
+    },
+    {
+      "id": "B5-L2",
+      "proposal": "One explicit numeric rank/mode/key catalog for every B table, persistent authority/lineage anchor before children, exact procedure and source-reader/writer lock joins",
+      "evidence": [
+        "authority-matrix.json",
+        "source-procedure-lock-plans.json"
+      ],
+      "status": "OWNER_PROPOSED_NOT_ACCEPTED"
+    },
+    {
+      "id": "B5-L3",
+      "proposal": "Protected signing-service DB pool, installed caller/purpose scope, full authenticated chain/tuple/epoch/fence/expiry read IN SERVICE; HSM private outside tx, versioned conditional publication before exposure and races",
+      "evidence": [
+        "authority-matrix.json",
+        "fixture-results.json"
+      ],
+      "status": "OWNER_PROPOSED_NOT_ACCEPTED"
+    },
+    {
+      "id": "B5-L4",
+      "proposal": "Unsigned authoritative CP tombstones with OP/SAFE principal/causal audit/version; same-tx INVALIDATE outbox, restricted SAFE/dispatcher signing, existing durable Node gate/ACK, no phantom Node tombstone cache/domain",
+      "evidence": [
+        "contract.schema.json",
+        "fixture-results.json"
+      ],
+      "status": "OWNER_PROPOSED_NOT_ACCEPTED"
+    },
+    {
+      "id": "B5-L5",
+      "proposal": "Actual plain owner/not-revoked activation retained; new B-only signed FolderRootObservation producer/consumer/schema, fresh ACTIVE consent, preflight identity distinct from separately required installed RO mount proof",
+      "evidence": [
+        "reader-io-catalog.json",
+        "fixture-results.json"
+      ],
+      "status": "OWNER_PROPOSED_NOT_ACCEPTED"
+    }
+  ],
+  "preservedOld335": "prior-owner-fixture-results.json + prior-owner-source-fixture-results.json, original unchanged parent and9actualreview files",
+  "actualNewGoCryptoPGEngineCrashConcurrencyEquipment": 0,
+  "realBindings": null,
+  "A1_A16": "PENDING",
+  "codeGrant": false,
+  "partialFreeze": false,
+  "nextOwner": "Root dispatch ONE actual Claude whole review of immutable Rev6/exact Docs, then decide precise contract/grant or revisions; Codex future hard owner only after grant"
+}

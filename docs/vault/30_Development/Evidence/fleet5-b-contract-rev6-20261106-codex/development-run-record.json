@@ -1,0 +1,14 @@
+{
+  "status": "HISTORICAL_FAILED_PUBLICATION_GATE_NOT_FINAL_VALIDATION_LEDGER",
+  "originalFailureMetadata": "development-failed-publication-gates.json",
+  "retainedActualFailureStdout": "development-failed-publication-gates-8.log",
+  "originalMetadataLogPathsMayNowContainRegeneratedFinalLogs": true,
+  "completeOriginalRunRawLogRetentionClaim": false,
+  "finalValidation": [
+    "proof-checks.json",
+    "source-command-record.json",
+    "publication-gates.json",
+    "packet-summary.json"
+  ],
+  "explanation": "Retain actual exit1 path-citation failure and correction honestly; do not label the failed attempt PASS. Final exact hashes are only in final ledgers."
+}

@@ -1,0 +1,142 @@
+"""Claude reviewer-owned in-memory Git source mutations against owner Rev5 analyzers.
+
+Read-only: imports owner analyzers from the immutable 228e evidence directory, mutates
+an in-memory copy of 72028 Git sources, and prints semantic projections. Writes only
+to the path given as argv[1]. No application import, DB, Node or network.
+"""
+import json
+import sys
+from pathlib import Path
+
+E = Path(sys.argv[2]).resolve()
+sys.path.insert(0, str(E))
+import source_analysis as sc  # noqa: E402
+import reconcile as rc  # noqa: E402
+from authority import build  # noqa: E402
+
+matrix = build()
+sources = sc.load_sources()
+baseline = sc.analyze(sources)
+base_map = rc.mapping(baseline, matrix)
+base_err = rc.audit(baseline, matrix, base_map)
+PROBE_CP = 'services/control-plane/src/inv/zz_claude_probe.py'
+PROBE_API = 'src/saintvision/services/zz_claude_probe.py'
+
+
+def mutate(path, old, new):
+    out = dict(sources)
+    raw = out[path].decode('utf-8-sig')
+    assert raw.count(old) >= 1, (path, old)
+    out[path] = raw.replace(old, new, 1).encode()
+    return out
+
+
+def add(path, body):
+    out = dict(sources)
+    out[path] = body.encode()
+    return out
+
+
+def project(got, path_filter):
+    m = rc.mapping(got, matrix)
+    errs = rc.audit(got, matrix, m)
+    writers = [dict(path=w['path'], line=w['line'], function=w['function'], table=w['table'], verb=w['verb'],
+                    columns=w['columns'], disposition=w['disposition'], replacement=w['replacementProcedures'],
+                    expression=w['expression'][:160]) for w in m if path_filter(w)]
+    recs = [dict(function=r['function'], line=r['line'], tables=r['tables'], modes=r['modes'],
+                 scope=r.get('scopeDisposition'), unresolved=r.get('unresolvedSQL'))
+            for r in got['records'] if path_filter(r)]
+    edges = [dict(function=e['function'], spelling=e['spelling'], targets=e['targets']) for e in got['edges'] if path_filter(e)]
+    unknown = [dict(function=e['function'], spelling=e['spelling']) for e in got['unknownEdges'] if path_filter(e)]
+    plans = [dict(function=p['function'], locks=p['rankedResourceLocks'], unresolved=len(p['unresolvedDbSites']))
+             for p in got['functionPlans'] if path_filter(p)]
+    return dict(auditErrors=errs, writers=writers, records=recs, edges=edges, unknownEdges=unknown, plans=plans,
+                totalMatrixWriters=len(m))
+
+
+NT = 'services/control-plane/src/inv/node_transport.py'
+BE = 'services/control-plane/src/inv/build_execution.py'
+OB = 'services/control-plane/src/inv/observation.py'
+ST = 'src/saintvision/services/storage.py'
+CASES = [
+    # --- B4-M1 semantic writer causality ---
+    ('W1-deny-only-writer-reversed-to-clear', mutate(NT, "UPDATE inv.nodes SET status='quarantined' WHERE node_id=%s",
+                                                     "UPDATE inv.nodes SET status='online' WHERE node_id=%s"),
+     lambda r: r['path'] == NT),
+    ('W2-observation-writer-clears-quarantine', mutate(OB, "status=CASE WHEN status='offline' THEN 'online' ELSE status END",
+                                                       "status='online'"),
+     lambda r: r['path'] == OB),
+    ('W3-ORM-core-insert-public-nodes', add(PROBE_API,
+        'from sqlalchemy import insert\nfrom saintvision.db.models import Node\n\n'
+        'def sneaky(session):\n    session.execute(insert(Node).values(node_id="n", tenant_id="t", status="active"))\n'),
+     lambda r: r['path'] == PROBE_API),
+    ('W4-fstring-dynamic-table-DML', add(PROBE_CP,
+        'def sneaky(conn, t, n):\n    conn.execute(f"UPDATE inv.{t} SET status=\'online\' WHERE node_id=%s", (n,))\n'),
+     lambda r: r['path'] == PROBE_CP),
+    ('W5-unqualified-public-nodes-text', add(PROBE_API,
+        'from sqlalchemy import text\n\ndef sneaky(session, n):\n'
+        '    session.execute(text("UPDATE nodes SET status=\'active\' WHERE node_id=:n"), {"n": n})\n'),
+     lambda r: r['path'] == PROBE_API),
+    ('W6-setattr-ORM-status', add(PROBE_API,
+        'from saintvision.db.models import Node\n\ndef sneaky(session, n):\n'
+        '    node = session.get(Node, n)\n    setattr(node, "status", "active")\n'),
+     lambda r: r['path'] == PROBE_API),
+    ('W7-positive-ORM-attribute-status', add(PROBE_API,
+        'from saintvision.db.models import Node\n\ndef sneaky(session, n):\n'
+        '    node = session.get(Node, n)\n    node.status = "active"\n'),
+     lambda r: r['path'] == PROBE_API),
+    ('W8-positive-new-SQL-writer-public-contribution', add(PROBE_API,
+        'from sqlalchemy import text\n\ndef sneaky(session, c):\n'
+        '    session.execute(text("UPDATE public.storage_contributions SET status=\'active\' WHERE contribution_id=:c"), {"c": c})\n'),
+     lambda r: r['path'] == PROBE_API),
+    ('W9-rename-mapped-function', mutate(BE, 'def _mark_node_quarantined(', 'def _mark_node_q('),
+     lambda r: r['path'] == BE and 'inv.nodes' in json.dumps(r)),
+    ('W10-delete-real-deny-only-writer', mutate(NT, """            conn.execute(
+                "UPDATE inv.nodes SET status='quarantined' WHERE node_id=%s",
+                (node.node_id,),
+            )
+""", ''),
+     lambda r: r['path'] == NT),
+    ('W11-second-writer-same-mapped-function-new-column', mutate(ST, 'contribution.status = "active"',
+        'contribution.status = "active"\n    contribution.registered_by_user_id = actor_user_id'),
+     lambda r: r['path'] == ST),
+    # --- B4-M2 independent closure/lock attacks (reviewer variants, not S4/S5/S6 copies) ---
+    ('L1-dotted-import-as-alias', add(PROBE_CP,
+        'import inv.leases as L\n\ndef sneaky(conn, run_id, project_id):\n    return L.lock_run(conn, run_id, project_id)\n'),
+     lambda r: r['path'] == PROBE_CP),
+    ('L2-self-attribute-instance', add(PROBE_CP,
+        'from .leases import LeaseStore\n\nclass Sneaky:\n    def __init__(self, db):\n        self.store = LeaseStore(db)\n\n'
+        '    def go(self, conn, project, run_id):\n        return self.store._admit_locked(conn, project, run_id)\n'),
+     lambda r: r['path'] == PROBE_CP),
+    ('L3-imported-SQL-constant-other-module', dict(add(PROBE_CP,
+        'from .zz_claude_const import Q\n\ndef sneaky(conn, n):\n    return conn.execute(Q, (n,)).fetchone()\n'),
+        **{'services/control-plane/src/inv/zz_claude_const.py': b'Q = "SELECT status FROM inv.nodes WHERE node_id=%s FOR NO KEY UPDATE"\n'}),
+     lambda r: r['path'] == PROBE_CP),
+    ('L4-class-attribute-SQL-constant', add(PROBE_CP,
+        'class Sneaky:\n    _SQL = "SELECT 1 FROM inv.tenant_controls WHERE tenant_id=%s FOR UPDATE"\n\n'
+        '    def go(self, conn, t):\n        return conn.execute(self._SQL, (t,))\n'),
+     lambda r: r['path'] == PROBE_CP),
+    ('L5-getattr-dynamic-helper', add(PROBE_CP,
+        'from . import leases\n\ndef sneaky(conn, run_id, project_id):\n    return getattr(leases, "lock_run")(conn, run_id, project_id)\n'),
+     lambda r: r['path'] == PROBE_CP),
+    ('L6-advisory-session-lock-online', add(PROBE_CP,
+        'def sneaky(conn, k):\n    conn.execute("SELECT pg_advisory_lock(%s)", (k,))\n'),
+     lambda r: r['path'] == PROBE_CP),
+    ('L7-inverted-order-runs-then-nodes', add(PROBE_CP,
+        'def sneaky(conn, r, n):\n    conn.execute("SELECT 1 FROM inv.runs WHERE run_id=%s FOR UPDATE", (r,))\n'
+        '    conn.execute("SELECT 1 FROM inv.nodes WHERE node_id=%s FOR UPDATE", (n,))\n'),
+     lambda r: r['path'] == PROBE_CP),
+]
+
+out = dict(baselineAuditErrors=base_err, baselineMatrixWriters=len(base_map), cases=[])
+for name, src, flt in CASES:
+    got = sc.analyze(src)
+    proj = project(got, flt)
+    out['cases'].append(dict(case=name, **proj))
+    print(json.dumps(dict(case=name, auditErrors=proj['auditErrors'], matrixWriters=proj['totalMatrixWriters'],
+                          probeWriters=[(w['table'], w['verb'], w['columns'], w['disposition']) for w in proj['writers']][:6],
+                          probeRecords=[(x['tables'], x['modes'], x['scope']) for x in proj['records']][:6],
+                          probeEdges=[(e['spelling'], e['targets']) for e in proj['edges']][:4],
+                          probeUnknown=[e['spelling'] for e in proj['unknownEdges']][:4],
+                          probePlans=[[(l['table'], l['mode'], l['rank']) for l in p['locks']] for p in proj['plans']][:3])), flush=True)
+Path(sys.argv[1]).write_text(json.dumps(out, indent=1, default=str) + '\n', encoding='utf-8')

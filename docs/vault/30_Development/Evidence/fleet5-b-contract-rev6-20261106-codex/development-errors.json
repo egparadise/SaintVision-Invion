@@ -1,0 +1,31 @@
+{
+  "level": "DEVELOPMENT_DISCOVERY_AND_FIXTURE_DIAGNOSTICS_NOT_ACCEPTANCE",
+  "events": [
+    {
+      "event": "read-only path discovery",
+      "actualNonzero": true,
+      "detail": "Several guessed receipt/contract/app paths did not exist; resolved actual NodeReceiptStore in node_execution.py and generated/core.schema.json via imports/rg. No mutation or protected read."
+    },
+    {
+      "event": "apply_patch verification",
+      "actualNonzero": true,
+      "detail": "Three draft patch contexts/empty hunk did not apply; corrected exact own Evidence contexts. No product path was changed."
+    },
+    {
+      "event": "first typed census diagnostic",
+      "actualExit": 0,
+      "detail": "21 critical entries found; conn.cursor and Session.flush initially unresolved in4 plans; typed cursor/UOW provenance added, not a bare-name allowlist."
+    },
+    {
+      "event": "source analysis profiling",
+      "status": "read-only own evidence profile to identify expensive static analysis; no application import/DB/Node operation"
+    },
+    {
+      "event": "publication path citation gate",
+      "actualExit": 1,
+      "rawLog": "development-failed-publication-gates-8.log",
+      "detail": "History used shorthand services/storage.activate_contribution, which checker treated as nonexistent path; corrected to real src/saintvision/services/storage.py plus separate symbol, no baseline raise."
+    }
+  ],
+  "priorFailures": "Every earlier actual review/probe/error remains immutable in parent;9actual Rev5 review files copied byte-for-byte here. Old335cases retained as prior-owner snapshots, never new runtime PASS."
+}

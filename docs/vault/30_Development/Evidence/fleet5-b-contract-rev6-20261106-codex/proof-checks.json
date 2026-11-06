@@ -1,0 +1,85 @@
+{
+  "recordedAtKST": "2026-11-06T11:17:20.438763+09:00",
+  "checks": [
+    {
+      "command": [
+        "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+        "-B",
+        "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105\\docs\\vault\\30_Development\\Evidence\\fleet5-b-contract-rev6-20261106-codex\\schema.py"
+      ],
+      "expectedExit": 0,
+      "actualExit": 0,
+      "log": "docs/vault/30_Development/Evidence/fleet5-b-contract-rev6-20261106-codex/proof-checks-1.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": [
+        "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+        "-B",
+        "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105\\docs\\vault\\30_Development\\Evidence\\fleet5-b-contract-rev6-20261106-codex\\authority.py"
+      ],
+      "expectedExit": 0,
+      "actualExit": 0,
+      "log": "docs/vault/30_Development/Evidence/fleet5-b-contract-rev6-20261106-codex/proof-checks-2.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": [
+        "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+        "-B",
+        "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105\\docs\\vault\\30_Development\\Evidence\\fleet5-b-contract-rev6-20261106-codex\\fixtures.py"
+      ],
+      "expectedExit": 0,
+      "actualExit": 0,
+      "log": "docs/vault/30_Development/Evidence/fleet5-b-contract-rev6-20261106-codex/proof-checks-3.log",
+      "sha256": "0b2c5837fbf06c49bfa2ab05b64daed9eebdf14b48d9eef7aa3396a30e7ca4ea"
+    },
+    {
+      "command": [
+        "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+        "-B",
+        "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105\\docs\\vault\\30_Development\\Evidence\\fleet5-b-contract-rev6-20261106-codex\\reconcile.py"
+      ],
+      "expectedExit": 0,
+      "actualExit": 0,
+      "log": "docs/vault/30_Development/Evidence/fleet5-b-contract-rev6-20261106-codex/proof-checks-4.log",
+      "sha256": "a647e469798426933185c80ced6c32abc2ae28b1bc700b67e7479ad974d71a51"
+    },
+    {
+      "command": [
+        "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+        "-B",
+        "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105\\docs\\vault\\30_Development\\Evidence\\fleet5-b-contract-rev6-20261106-codex\\link_plans.py"
+      ],
+      "expectedExit": 0,
+      "actualExit": 0,
+      "log": "docs/vault/30_Development/Evidence/fleet5-b-contract-rev6-20261106-codex/proof-checks-5.log",
+      "sha256": "b9d26b3d1629604a94a99ef74addf2dc93590ac73fa1aea97d9dd95bb1a42fae"
+    },
+    {
+      "command": [
+        "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+        "-B",
+        "tests/proofs/fleet5_compute_storage_contract_probe.py"
+      ],
+      "expectedExit": 0,
+      "actualExit": 0,
+      "log": "docs/vault/30_Development/Evidence/fleet5-b-contract-rev6-20261106-codex/proof-checks-6.log",
+      "sha256": "6853f465cbaf47a3d137a212e1252dc2794fb541f57855e93006c6c88ff831c7"
+    },
+    {
+      "command": [
+        "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+        "-B",
+        "tests/proofs/fleet5_compute_storage_contract_probe.py",
+        "--require-coexistence"
+      ],
+      "expectedExit": 1,
+      "actualExit": 1,
+      "log": "docs/vault/30_Development/Evidence/fleet5-b-contract-rev6-20261106-codex/proof-checks-7.log",
+      "sha256": "26901da1c34123066141d82ec7f1ddeb0ba4ee7a5a82854f9f3cee79f3d8745b"
+    }
+  ],
+  "obsidianApply": false,
+  "productionChanges": false
+}

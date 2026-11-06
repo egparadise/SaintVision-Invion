@@ -1,0 +1,53 @@
+{
+  "level": "ACTUAL_COMPLETED_TOOL_COMMANDS_WITH_RESULT_ARTIFACTS_NOT_RAW_STDOUT_LEDGER",
+  "recordedAtKST": "2026-11-06T11:11:54.754793+09:00",
+  "toolSession": 33555,
+  "actualShellExit": 0,
+  "commands": [
+    {
+      "argv": [
+        "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+        "-B",
+        "docs/vault/30_Development/Evidence/fleet5-b-contract-rev6-20261106-codex/source_analysis.py"
+      ],
+      "actualExit": 0,
+      "gate": "PowerShell LASTEXITCODE captured immediately, nonzero would stop"
+    },
+    {
+      "argv": [
+        "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+        "-B",
+        "docs/vault/30_Development/Evidence/fleet5-b-contract-rev6-20261106-codex/reconcile.py"
+      ],
+      "actualExit": 0,
+      "gate": "PowerShell LASTEXITCODE captured immediately, nonzero would stop"
+    },
+    {
+      "argv": [
+        "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+        "-B",
+        "docs/vault/30_Development/Evidence/fleet5-b-contract-rev6-20261106-codex/source_fixtures.py"
+      ],
+      "actualExit": 0,
+      "gate": "PowerShell LASTEXITCODE captured immediately, nonzero would stop"
+    }
+  ],
+  "resultArtifacts": [
+    {
+      "path": "source-analysis.json",
+      "sha256": "19944f326147bf0d83784534231de8434eab5268355fb796f3239772f8d6ae9d"
+    },
+    {
+      "path": "writer-reconciliation.json",
+      "sha256": "ba08d706af4a0eaf54750e1e82c2c22d40e2e680b04591b8c2e512c4b3299c12"
+    },
+    {
+      "path": "source-fixture-results.json",
+      "sha256": "db00ecd3a9c36db14f53e468dbfa5b4ccfd7f855474d802857eb5a9dad4bfef1"
+    }
+  ],
+  "stdoutProvenance": "functions.exec/write_stdin captured actual output; no claim of retained raw stdout file or fabricated raw log hash",
+  "sourceMutationCount": 26,
+  "passed": 1358,
+  "actualPGEngineCrypto": 0
+}

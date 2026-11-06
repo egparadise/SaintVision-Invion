@@ -1,0 +1,3391 @@
+{
+  "level": "SCHEMA_STATEFUL_SYMBOLIC_ONLY",
+  "passed": 547,
+  "failed": 0,
+  "cases": [
+    {
+      "case": "PLAIN-registration-committed",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "PLAIN-R01-unresolved-denial",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "PLAIN-R02-unresolved-denial",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "PLAIN-R03-unresolved-denial",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "PLAIN-R04-unresolved-denial",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "PLAIN-R05-unresolved-denial",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "PLAIN-R06-unresolved-denial",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "PLAIN-R07-unresolved-denial",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "PLAIN-R08-unresolved-denial",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "PLAIN-R09-unresolved-denial",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "PLAIN-R10-unresolved-denial",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "PLAIN-R11-unresolved-denial",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "PLAIN-R12-unresolved-denial",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "PLAIN-R13-unresolved-denial",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "PLAIN-exact-own-first-IO",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "PLAIN-new-admission-not-opid-bypass",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "PLAIN-observe-lane-remains-available",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "PLAIN-ordinary-ACTIVE-confirm",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "PLAIN-ACTIVE-retains-claims",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "PLAIN-R01-confirmed-no-ambiguity",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "PLAIN-R02-confirmed-no-ambiguity",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "PLAIN-R03-confirmed-no-ambiguity",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "PLAIN-R04-confirmed-no-ambiguity",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "PLAIN-R05-confirmed-no-ambiguity",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "PLAIN-R06-confirmed-no-ambiguity",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "PLAIN-R07-confirmed-no-ambiguity",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "PLAIN-R08-confirmed-no-ambiguity",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "PLAIN-R09-confirmed-no-ambiguity",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "PLAIN-R10-confirmed-no-ambiguity",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "PLAIN-R11-confirmed-no-ambiguity",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "PLAIN-R12-confirmed-no-ambiguity",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "PLAIN-R13-confirmed-no-ambiguity",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "B-registration-committed",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "B-R01-unresolved-denial",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "B-R02-unresolved-denial",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "B-R03-unresolved-denial",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "B-R04-unresolved-denial",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "B-R05-unresolved-denial",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "B-R06-unresolved-denial",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "B-R07-unresolved-denial",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "B-R08-unresolved-denial",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "B-R09-unresolved-denial",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "B-R10-unresolved-denial",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "B-R11-unresolved-denial",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "B-R12-unresolved-denial",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "B-R13-unresolved-denial",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "B-exact-own-first-IO",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "B-new-admission-not-opid-bypass",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "B-observe-lane-remains-available",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "B-ordinary-ACTIVE-confirm",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "B-ACTIVE-retains-claims",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "B-R01-confirmed-no-ambiguity",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "B-R02-confirmed-no-ambiguity",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "B-R03-confirmed-no-ambiguity",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "B-R04-confirmed-no-ambiguity",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "B-R05-confirmed-no-ambiguity",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "B-R06-confirmed-no-ambiguity",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "B-R07-confirmed-no-ambiguity",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "B-R08-confirmed-no-ambiguity",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "B-R09-confirmed-no-ambiguity",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "B-R10-confirmed-no-ambiguity",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "B-R11-confirmed-no-ambiguity",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "B-R12-confirmed-no-ambiguity",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "B-R13-confirmed-no-ambiguity",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "terminal-receipt-transaction-failure-no-close",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "terminal-failure-retains-claims",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "terminal-independent-exact-receipt",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "terminal-original-kernel-path-releases-only-validated",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "observation-cannot-stand-in-for-terminal-receipt",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "wrong-outcome-kind-retains-lease",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "registration-original-binding-deny-bodySHA",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "registration-original-binding-deny-method",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "registration-original-binding-deny-rawPath",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "registration-original-binding-deny-nonce",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "registration-original-binding-deny-runId",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "registration-original-binding-deny-generation",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "registration-original-binding-deny-claimBindingSHA",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "registration-original-binding-deny-existingPermitOrApprovalSHA",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "no-IO-without-proven-COMMIT",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "fake-handle-same-hash-no-capability",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "request-substitution-refused",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "duplicate-send-refused-after-exact-own-send",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "duplicate-send-not-new-operation",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "failure-state-(True, True)",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "EXECUTE-loss-(True, True)-R01",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "EXECUTE-loss-(True, True)-R02",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "EXECUTE-loss-(True, True)-R03",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "EXECUTE-loss-(True, True)-R04",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "EXECUTE-loss-(True, True)-R05",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "EXECUTE-loss-(True, True)-R06",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "EXECUTE-loss-(True, True)-R07",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "EXECUTE-loss-(True, True)-R08",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "EXECUTE-loss-(True, True)-R09",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "EXECUTE-loss-(True, True)-R10",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "EXECUTE-loss-(True, True)-R11",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "EXECUTE-loss-(True, True)-R12",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "EXECUTE-loss-(True, True)-R13",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "swallowed-fence-cannot-fallthrough-confirm-(True, True)",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "RUN-no-uncertain-settle-(True, True)",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "OP-no-proof-settle-(True, True)",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "protected-exact-recovery-(True, True)",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "protected-settle-not-physical-stop",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "failure-state-(False, True)",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "EXECUTE-loss-(False, True)-R01",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "EXECUTE-loss-(False, True)-R02",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "EXECUTE-loss-(False, True)-R03",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "EXECUTE-loss-(False, True)-R04",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "EXECUTE-loss-(False, True)-R05",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "EXECUTE-loss-(False, True)-R06",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "EXECUTE-loss-(False, True)-R07",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "EXECUTE-loss-(False, True)-R08",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "EXECUTE-loss-(False, True)-R09",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "EXECUTE-loss-(False, True)-R10",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "EXECUTE-loss-(False, True)-R11",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "EXECUTE-loss-(False, True)-R12",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "EXECUTE-loss-(False, True)-R13",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "swallowed-fence-cannot-fallthrough-confirm-(False, True)",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "RUN-no-uncertain-settle-(False, True)",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "OP-no-proof-settle-(False, True)",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "protected-exact-recovery-(False, True)",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "protected-settle-not-physical-stop",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "failure-state-(False, False)",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "EXECUTE-loss-(False, False)-R01",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "EXECUTE-loss-(False, False)-R02",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "EXECUTE-loss-(False, False)-R03",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "EXECUTE-loss-(False, False)-R04",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "EXECUTE-loss-(False, False)-R05",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "EXECUTE-loss-(False, False)-R06",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "EXECUTE-loss-(False, False)-R07",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "EXECUTE-loss-(False, False)-R08",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "EXECUTE-loss-(False, False)-R09",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "EXECUTE-loss-(False, False)-R10",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "EXECUTE-loss-(False, False)-R11",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "EXECUTE-loss-(False, False)-R12",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "EXECUTE-loss-(False, False)-R13",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "swallowed-fence-cannot-fallthrough-confirm-(False, False)",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "RUN-no-uncertain-settle-(False, False)",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "OP-no-proof-settle-(False, False)",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "protected-exact-recovery-(False, False)",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "protected-settle-not-physical-stop",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "restart-no-reconstructed-completion-capability",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "old-verifier-incarnation-refused",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "mismatched-receipt-denied",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "healthy-capability-mismatched-receipt-poisons",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "mismatch-cannot-fallthrough-later-good-receipt",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "wrong-scope-('tenant-1', 'node-2', 'epoch-1')-R01",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "wrong-scope-('tenant-1', 'node-2', 'epoch-1')-R02",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "wrong-scope-('tenant-1', 'node-2', 'epoch-1')-R03",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "wrong-scope-('tenant-1', 'node-2', 'epoch-1')-R04",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "wrong-scope-('tenant-1', 'node-2', 'epoch-1')-R05",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "wrong-scope-('tenant-1', 'node-2', 'epoch-1')-R06",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "wrong-scope-('tenant-1', 'node-2', 'epoch-1')-R07",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "wrong-scope-('tenant-1', 'node-2', 'epoch-1')-R08",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "wrong-scope-('tenant-1', 'node-2', 'epoch-1')-R09",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "wrong-scope-('tenant-1', 'node-2', 'epoch-1')-R10",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "wrong-scope-('tenant-1', 'node-2', 'epoch-1')-R11",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "wrong-scope-('tenant-1', 'node-2', 'epoch-1')-R12",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "wrong-scope-('tenant-1', 'node-2', 'epoch-1')-R13",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "wrong-scope-('tenant-other', 'node-1', 'epoch-1')-R01",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "wrong-scope-('tenant-other', 'node-1', 'epoch-1')-R02",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "wrong-scope-('tenant-other', 'node-1', 'epoch-1')-R03",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "wrong-scope-('tenant-other', 'node-1', 'epoch-1')-R04",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "wrong-scope-('tenant-other', 'node-1', 'epoch-1')-R05",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "wrong-scope-('tenant-other', 'node-1', 'epoch-1')-R06",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "wrong-scope-('tenant-other', 'node-1', 'epoch-1')-R07",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "wrong-scope-('tenant-other', 'node-1', 'epoch-1')-R08",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "wrong-scope-('tenant-other', 'node-1', 'epoch-1')-R09",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "wrong-scope-('tenant-other', 'node-1', 'epoch-1')-R10",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "wrong-scope-('tenant-other', 'node-1', 'epoch-1')-R11",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "wrong-scope-('tenant-other', 'node-1', 'epoch-1')-R12",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "wrong-scope-('tenant-other', 'node-1', 'epoch-1')-R13",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "wrong-scope-('tenant-1', 'node-1', 'epoch-old')-R01",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "wrong-scope-('tenant-1', 'node-1', 'epoch-old')-R02",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "wrong-scope-('tenant-1', 'node-1', 'epoch-old')-R03",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "wrong-scope-('tenant-1', 'node-1', 'epoch-old')-R04",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "wrong-scope-('tenant-1', 'node-1', 'epoch-old')-R05",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "wrong-scope-('tenant-1', 'node-1', 'epoch-old')-R06",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "wrong-scope-('tenant-1', 'node-1', 'epoch-old')-R07",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "wrong-scope-('tenant-1', 'node-1', 'epoch-old')-R08",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "wrong-scope-('tenant-1', 'node-1', 'epoch-old')-R09",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "wrong-scope-('tenant-1', 'node-1', 'epoch-old')-R10",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "wrong-scope-('tenant-1', 'node-1', 'epoch-old')-R11",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "wrong-scope-('tenant-1', 'node-1', 'epoch-old')-R12",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "wrong-scope-('tenant-1', 'node-1', 'epoch-old')-R13",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "stale-current-epoch-denied",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "projection-quarantine-retains-drain",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "clear-quarantine-with-exact-proof",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "clear-reveals-preserved-drain",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "observation-never-clears-drain",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "clear-own-cause-only",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "runtime-cannot-clear-fact",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "service-positive-GATE_CONTROL",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "MA3b-direct-service-revoked-deny-GATE_CONTROL",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "MA3c-no-Node-ARM-after-denied-signature",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "service-positive-RELEASE",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "MA3b-direct-service-revoked-deny-RELEASE",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "service-positive-DELEGATION",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "MA3b-direct-service-revoked-deny-DELEGATION",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "service-positive-DELIVERY_CHALLENGE",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "MA3b-direct-service-revoked-deny-DELIVERY_CHALLENGE",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "service-positive-KEY_DELIVERY_RECEIPT",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "MA3b-direct-service-revoked-deny-KEY_DELIVERY_RECEIPT",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "HSM-not-exposed-before-publication-revoke",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "race-before-publication-revoke",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "HSM-not-exposed-before-publication-fence",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "race-before-publication-fence",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "HSM-not-exposed-before-publication-tuple",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "race-before-publication-tuple",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "HSM-not-exposed-before-publication-expiry",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "race-before-publication-expiry",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "HSM-not-exposed-before-publication-missing-ancestor",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "race-before-publication-missing-ancestor",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "caller-role-label-not-authenticated",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "installed-purpose-no-ARM-sv_b_runtime",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "installed-purpose-no-ARM-sv_b_verifier",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "installed-purpose-no-ARM-sv_b_use_issuer",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "installed-purpose-no-ARM-sv_b_safety",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "installed-purpose-no-ARM-sv_b_revocation_dispatcher",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "installed-purpose-no-ARM-sv_b_budget_approver",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "installed-purpose-no-ARM-sv_b_delivery_controller",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "caller-boolean-not-authority",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "bool-not-channel-integer",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "ancestor-time-expiry-still-current-descendant",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "same-config-renew-service-preserved",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "expired-current-protected-reapprove-preserved",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "SAFE-cannot-borrow-ordinary-switch-intent",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "planned-switch-confirm-ACK",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "planned-switch-no-lineage-tombstone",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "planned-invalidated-gate-business-denied",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "planned-new-ARM-confirm-ACK",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "new-ARM-not-current-delivered-chain-yet",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "old-gate-release-terminal-history",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "post-issuance-revoke-honest-Node-bound",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "CP-current-immediate-revoke-denial",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "schema-positive-cpTombstoneRecord",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "schema-extra-cpTombstoneRecord",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "schema-missing-cpTombstoneRecord-scope",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "schema-type-cpTombstoneRecord-scope",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "schema-missing-cpTombstoneRecord-rootLineageID",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "schema-type-cpTombstoneRecord-rootLineageID",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "schema-missing-cpTombstoneRecord-revokedAncestorHash",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "schema-type-cpTombstoneRecord-revokedAncestorHash",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "schema-missing-cpTombstoneRecord-authenticatedPrincipal",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "schema-type-cpTombstoneRecord-authenticatedPrincipal",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "schema-missing-cpTombstoneRecord-causalEvidenceHash",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "schema-type-cpTombstoneRecord-causalEvidenceHash",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "schema-missing-cpTombstoneRecord-auditRef",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "schema-type-cpTombstoneRecord-auditRef",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "schema-missing-cpTombstoneRecord-anchorVersion",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "schema-type-cpTombstoneRecord-anchorVersion",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "schema-missing-cpTombstoneRecord-recordedAt",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "schema-type-cpTombstoneRecord-recordedAt",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "schema-positive-revocationOutbox",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "schema-extra-revocationOutbox",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "schema-missing-revocationOutbox-outboxId",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "schema-type-revocationOutbox-outboxId",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "schema-missing-revocationOutbox-scope",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "schema-type-revocationOutbox-scope",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "schema-missing-revocationOutbox-rootLineageID",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "schema-type-revocationOutbox-rootLineageID",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "schema-missing-revocationOutbox-ancestorHash",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "schema-type-revocationOutbox-ancestorHash",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "schema-missing-revocationOutbox-anchorVersion",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "schema-type-revocationOutbox-anchorVersion",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "schema-missing-revocationOutbox-targetGateId",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "schema-type-revocationOutbox-targetGateId",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "schema-missing-revocationOutbox-targetReleaseHash",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "schema-type-revocationOutbox-targetReleaseHash",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "schema-missing-revocationOutbox-state",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "schema-type-revocationOutbox-state",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "schema-missing-revocationOutbox-commandHash",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "schema-type-revocationOutbox-commandHash",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "schema-missing-revocationOutbox-ackHash",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "schema-type-revocationOutbox-ackHash",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "schema-missing-revocationOutbox-causalEvidenceHash",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "schema-type-revocationOutbox-causalEvidenceHash",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "unsigned-CP-tombstone-no-signature",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "no-fictitious-Node-tombstone-domain",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "outbox-prepared",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "outbox-private-signature-stage",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "outbox-publication-ready",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "dispatch-exact-committed-safety-handle",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "existing-ACK-wire-shape",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "Node-invalidation-terminal",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "gate-ACK-and-IO-atomic-failure",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "failed-ACK-commit-retains-pending",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "gate-ACK-and-IO-atomic-success",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "outbox-ACK-recorded",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "duplicate-original-ACK-no-new-time",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "schema-positive-gateObservation",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "schema-extra-gateObservation",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "schema-missing-gateObservation-status",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "schema-type-gateObservation-status",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "schema-missing-gateObservation-businessAuthority",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "schema-type-gateObservation-businessAuthority",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "schema-missing-gateObservation-method",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "schema-type-gateObservation-method",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "schema-missing-gateObservation-path",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "schema-type-gateObservation-path",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "schema-missing-gateObservation-nodeId",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "schema-type-gateObservation-nodeId",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "schema-missing-gateObservation-epoch",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "schema-type-gateObservation-epoch",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "schema-missing-gateObservation-generation",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "schema-type-gateObservation-generation",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "schema-missing-gateObservation-nonce",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "schema-type-gateObservation-nonce",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "schema-missing-gateObservation-observedAt",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "schema-type-gateObservation-observedAt",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "schema-missing-gateObservation-expiresAt",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "schema-type-gateObservation-expiresAt",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "schema-missing-gateObservation-recordId",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "schema-type-gateObservation-recordId",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "schema-missing-gateObservation-record",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "schema-type-gateObservation-record",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "schema-missing-gateObservation-sequence",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "schema-type-gateObservation-sequence",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "schema-missing-gateObservation-retiredGateIDs",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "schema-type-gateObservation-retiredGateIDs",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "schema-missing-gateObservation-retiredReleaseHashes",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "schema-type-gateObservation-retiredReleaseHashes",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "schema-missing-gateObservation-originalAckHash",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "schema-type-gateObservation-originalAckHash",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "schema-missing-gateObservation-originalAckExpiresAt",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "schema-type-gateObservation-originalAckExpiresAt",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "lost-ACK-stale-HOLD",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "schema-positive-gateObservation",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "schema-extra-gateObservation",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "schema-missing-gateObservation-status",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "schema-type-gateObservation-status",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "schema-missing-gateObservation-businessAuthority",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "schema-type-gateObservation-businessAuthority",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "schema-missing-gateObservation-nodeId",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "schema-type-gateObservation-nodeId",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "schema-missing-gateObservation-nonce",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "schema-type-gateObservation-nonce",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "schema-missing-gateObservation-observedAt",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "schema-type-gateObservation-observedAt",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "schema-missing-gateObservation-reason",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "schema-type-gateObservation-reason",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "schema-missing-gateObservation-recovery",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "schema-type-gateObservation-recovery",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "no-old-ACK-renew-time",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "unknown-gate-propagation-HOLD",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "unknown-gate-no-invalidation-signature",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "plain-owner-no-new-confirmation",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "schema-positive-folderRootObservation",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "schema-extra-folderRootObservation",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "schema-missing-folderRootObservation-kind",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "schema-type-folderRootObservation-kind",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "schema-missing-folderRootObservation-stage",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "schema-type-folderRootObservation-stage",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "schema-missing-folderRootObservation-purpose",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "schema-type-folderRootObservation-purpose",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "schema-missing-folderRootObservation-businessAuthority",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "schema-type-folderRootObservation-businessAuthority",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "schema-missing-folderRootObservation-scope",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "schema-type-folderRootObservation-scope",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "schema-missing-folderRootObservation-contributionId",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "schema-type-folderRootObservation-contributionId",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "schema-missing-folderRootObservation-normalizedPath",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "schema-type-folderRootObservation-normalizedPath",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "schema-missing-folderRootObservation-heldRoot",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "schema-type-folderRootObservation-heldRoot",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "schema-missing-folderRootObservation-generation",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "schema-type-folderRootObservation-generation",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "schema-missing-folderRootObservation-channelVersion",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "schema-type-folderRootObservation-channelVersion",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "schema-missing-folderRootObservation-nodeDER",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "schema-type-folderRootObservation-nodeDER",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "schema-missing-folderRootObservation-policyR",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "schema-type-folderRootObservation-policyR",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "schema-missing-folderRootObservation-policyHash",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "schema-type-folderRootObservation-policyHash",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "schema-missing-folderRootObservation-ownerConsentVersion",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "schema-type-folderRootObservation-ownerConsentVersion",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "schema-missing-folderRootObservation-observePermitHash",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "schema-type-folderRootObservation-observePermitHash",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "schema-missing-folderRootObservation-challenge",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "schema-type-folderRootObservation-challenge",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "schema-missing-folderRootObservation-observedAt",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "schema-type-folderRootObservation-observedAt",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "schema-missing-folderRootObservation-expiresAt",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "schema-type-folderRootObservation-expiresAt",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "B-folder-positive-current-root",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "preflight-not-installed-RO-mount",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "preflight-alone-never-business-admission",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "preflight-alone-no-ARM-signature",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "folder-operator-cannot-impersonate-other-scope",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "B-folder-binding-deny-normalizedPath",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "B-folder-binding-deny-heldRoot",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "B-folder-binding-deny-generation",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "B-folder-binding-deny-channelVersion",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "B-folder-binding-deny-nodeDER",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "B-folder-binding-deny-policyR",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "B-folder-binding-deny-policyHash",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "B-folder-binding-deny-ownerConsentVersion",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "B-folder-binding-deny-challenge",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "B-folder-binding-deny-contributionId",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "B-folder-stale-deny",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "B-folder-current-change-revoked",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "B-folder-current-change-withdraw-version",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "B-folder-current-change-new-DER",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "B-folder-current-change-mount-substitution",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "schema-positive-folderRootResponse",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "schema-extra-folderRootResponse",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "schema-missing-folderRootResponse-status",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "schema-type-folderRootResponse-status",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "schema-missing-folderRootResponse-observation",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "schema-type-folderRootResponse-observation",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "schema-positive-folderRootResponse",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "schema-extra-folderRootResponse",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "schema-missing-folderRootResponse-status",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "schema-type-folderRootResponse-status",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "schema-missing-folderRootResponse-businessAuthority",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "schema-type-folderRootResponse-businessAuthority",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "schema-missing-folderRootResponse-scope",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "schema-type-folderRootResponse-scope",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "schema-missing-folderRootResponse-challenge",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "schema-type-folderRootResponse-challenge",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "schema-missing-folderRootResponse-observedAt",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "schema-type-folderRootResponse-observedAt",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "schema-missing-folderRootResponse-reason",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "schema-type-folderRootResponse-reason",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "folder-refusal-no-eligible-root",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "folder-preflight-no-future-RO-field",
+      "passed": true,
+      "actual": false,
+      "expected": false
+    },
+    {
+      "case": "authority-semantic-invariants",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "ALL-table-ranks-and-procedure-locklists",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "explicit-rank-inv.node_role_approvals",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "explicit-rank-inv.node_role_operations",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "explicit-rank-inv.node_role_current",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "explicit-rank-inv.node_role_routing",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "explicit-rank-inv.node_role_cohorts",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "explicit-rank-inv.node_role_candidates",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "explicit-rank-inv.node_role_gate_acks",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "explicit-rank-inv.node_role_safety_obligations",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "explicit-rank-inv.node_role_authority_anchors",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "explicit-rank-inv.node_channels",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "explicit-rank-inv.node_role_member_cas",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "explicit-rank-inv.node_role_releases",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "explicit-rank-inv.node_role_delegations",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "explicit-rank-inv.node_role_admissions",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "explicit-rank-inv.node_role_leases",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "explicit-rank-inv.node_role_activation_ledger",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "explicit-rank-inv.node_role_delivery_challenges",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "explicit-rank-inv.node_role_key_possessions",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "explicit-rank-inv.node_role_delivery_consumptions",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "explicit-rank-inv.node_role_key_deliveries",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "explicit-rank-inv.node_role_request_issuance",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "explicit-rank-inv.node_role_request_commits",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "explicit-rank-inv.node_role_reconcile_evidence",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "explicit-rank-inv.node_role_safety_requests",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "explicit-rank-inv.node_role_service_bindings",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "explicit-rank-inv.nodes",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "explicit-rank-inv.node_role_denial_facts",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "explicit-rank-inv.tenant_controls",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "explicit-rank-public.nodes",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "explicit-rank-public.storage_contributions",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "explicit-rank-inv.node_role_storage_bindings",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "explicit-rank-inv.node_role_folder_root_observations",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "explicit-rank-inv.evidence",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "explicit-rank-inv.node_role_lineage_tombstones",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "explicit-rank-inv.node_role_lineage_anchors",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "explicit-rank-inv.node_role_revocation_outbox",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "explicit-rank-inv.node_role_signing_intents",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "explicit-rank-inv.control_epoch",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "exact-numeric-lock-order-b_append_approval",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "exact-numeric-lock-order-b_begin_node_switch",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "exact-numeric-lock-order-b_plan_fresh",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "exact-numeric-lock-order-b_fence_cohort",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "exact-numeric-lock-order-b_append_candidate",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "exact-numeric-lock-order-b_record_gate_ack",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "exact-numeric-lock-order-b_member_cas",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "exact-numeric-lock-order-b_commit_node_activation",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "exact-numeric-lock-order-b_commit_fresh_cohort",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "exact-numeric-lock-order-b_refresh_same_generation",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "exact-numeric-lock-order-b_prepare_key_delivery",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "exact-numeric-lock-order-b_append_key_possession",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "exact-numeric-lock-order-b_consume_key_challenge",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "exact-numeric-lock-order-b_record_key_delivery",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "exact-numeric-lock-order-b_record_request_issuance",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "exact-numeric-lock-order-b_commit_business_nonce_evidence",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "exact-numeric-lock-order-b_commit_reconcile_receipt",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "exact-numeric-lock-order-b_record_safety_request",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "exact-numeric-lock-order-b_update_service_bindings",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "exact-numeric-lock-order-b_raise_node_quarantine",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "exact-numeric-lock-order-b_commit_node_observation",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "exact-numeric-lock-order-b_set_node_containment",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "exact-numeric-lock-order-b_clear_node_containment",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "exact-numeric-lock-order-b_set_tenant_containment",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "exact-numeric-lock-order-b_clear_tenant_containment",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "exact-numeric-lock-order-b_seed_new_tenant_control",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "exact-numeric-lock-order-b_provision_node_channel",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "exact-numeric-lock-order-b_revoke_node_channel",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "exact-numeric-lock-order-b_bootstrap_plain_node",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "exact-numeric-lock-order-b_bind_public_node_certificate",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "exact-numeric-lock-order-b_public_node_heartbeat",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "exact-numeric-lock-order-b_public_node_lost",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "exact-numeric-lock-order-b_retire_public_node",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "exact-numeric-lock-order-b_register_owner_contribution",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "exact-numeric-lock-order-b_activate_owner_contribution",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "exact-numeric-lock-order-b_revoke_owner_contribution",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "exact-numeric-lock-order-b_approve_readonly_contribution_root",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "exact-numeric-lock-order-b_append_build_cleanup_evidence",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "exact-numeric-lock-order-b_append_result_completion_evidence",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "exact-numeric-lock-order-b_append_run_completion_evidence",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "exact-numeric-lock-order-b_append_shard_completion_evidence",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "exact-numeric-lock-order-b_append_storage_sample_evidence",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "exact-numeric-lock-order-b_revoke_approval_lineage",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "exact-numeric-lock-order-b_register_io_obligation",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "exact-numeric-lock-order-b_mark_io_uncertain",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "exact-numeric-lock-order-b_confirm_execution_stop_io",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "exact-numeric-lock-order-b_confirm_build_dispatch_io",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "exact-numeric-lock-order-b_confirm_build_cleanup_read_io",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "exact-numeric-lock-order-b_confirm_observation_io",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "exact-numeric-lock-order-b_confirm_active_observation_io",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "exact-numeric-lock-order-b_confirm_storage_sample_io",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "exact-numeric-lock-order-b_confirm_object_read_io",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "exact-numeric-lock-order-b_confirm_terminal_frame_io",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "exact-numeric-lock-order-b_confirm_safety_observation_io",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "exact-numeric-lock-order-b_settle_uncertain_io",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "exact-numeric-lock-order-b_prepare_signature",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "exact-numeric-lock-order-b_publish_signature",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "exact-numeric-lock-order-b_append_folder_root_observation",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "exact-numeric-lock-order-b_read_placement_candidates",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "exact-numeric-lock-order-b_read_speculative_candidates",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "exact-numeric-lock-order-b_lock_execution_dispatch",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "exact-numeric-lock-order-b_lock_lease_node_admission",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "exact-numeric-lock-order-b_read_project_capacity",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "exact-numeric-lock-order-b_read_scheduler_candidate_snapshot",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "exact-numeric-lock-order-b_lock_build_dispatch_authority",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "exact-numeric-lock-order-b_lock_gpu_allocation_authority",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "exact-numeric-lock-order-b_lock_model_commit_nodes",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "exact-numeric-lock-order-b_lock_model_locality_nodes",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "exact-numeric-lock-order-b_lock_tool_claim_node",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "exact-numeric-lock-order-b_lock_terminal_exact_claim",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "exact-numeric-lock-order-b_read_delivery_channel",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "exact-numeric-lock-order-b_lock_activation_current",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "exact-numeric-lock-order-b_lock_refresh_current",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "exact-numeric-lock-order-b_lock_use_issuance",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "exact-numeric-lock-order-b_lock_use_commit",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "exact-numeric-lock-order-b_read_signing_authority",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "exact-numeric-lock-order-b_lock_signature_publication",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "exact-numeric-lock-order-b_lock_folder_approval",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "exact-numeric-lock-order-b_read_observe_reconcile_scope",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "exact-numeric-lock-order-b_bootstrap_authority_anchors",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "case": "exact-numeric-lock-order-b_record_reconcile_observation",
+      "passed": true,
+      "actual": true,
+      "expected": true
+    }
+  ],
+  "advancingTimeTraces": [
+    [
+      {
+        "label": "before-registration",
+        "now": 2000000000,
+        "obligations": [],
+        "authority": {
+          "serviceId": "sv_b_verifier",
+          "incarnation": "verifier-1",
+          "state": "ACTIVE",
+          "durableSequence": 0,
+          "lastErrorHash": null
+        }
+      },
+      {
+        "label": "registered",
+        "now": 2000000001,
+        "obligations": [
+          {
+            "bindingHash": "440362a990fb7ff0ce0722d208cb2bda1dd536f6022e1ab5274d7e32b624cdab",
+            "state": "PENDING_IO"
+          }
+        ],
+        "authority": {
+          "serviceId": "sv_b_verifier",
+          "incarnation": "verifier-1",
+          "state": "ACTIVE",
+          "durableSequence": 0,
+          "lastErrorHash": null
+        }
+      },
+      {
+        "label": "confirmed-outcome-no-OP",
+        "now": 2000000003,
+        "obligations": [
+          {
+            "bindingHash": "440362a990fb7ff0ce0722d208cb2bda1dd536f6022e1ab5274d7e32b624cdab",
+            "state": "CONFIRMED_OUTCOME"
+          }
+        ],
+        "authority": {
+          "serviceId": "sv_b_verifier",
+          "incarnation": "verifier-1",
+          "state": "ACTIVE",
+          "durableSequence": 0,
+          "lastErrorHash": null
+        }
+      }
+    ],
+    [
+      {
+        "label": "before-registration",
+        "now": 2000000000,
+        "obligations": [],
+        "authority": {
+          "serviceId": "sv_b_verifier",
+          "incarnation": "verifier-1",
+          "state": "ACTIVE",
+          "durableSequence": 0,
+          "lastErrorHash": null
+        }
+      },
+      {
+        "label": "registered",
+        "now": 2000000001,
+        "obligations": [
+          {
+            "bindingHash": "440362a990fb7ff0ce0722d208cb2bda1dd536f6022e1ab5274d7e32b624cdab",
+            "state": "PENDING_IO"
+          }
+        ],
+        "authority": {
+          "serviceId": "sv_b_verifier",
+          "incarnation": "verifier-1",
+          "state": "ACTIVE",
+          "durableSequence": 0,
+          "lastErrorHash": null
+        }
+      },
+      {
+        "label": "confirmed-outcome-no-OP",
+        "now": 2000000003,
+        "obligations": [
+          {
+            "bindingHash": "440362a990fb7ff0ce0722d208cb2bda1dd536f6022e1ab5274d7e32b624cdab",
+            "state": "CONFIRMED_OUTCOME"
+          }
+        ],
+        "authority": {
+          "serviceId": "sv_b_verifier",
+          "incarnation": "verifier-1",
+          "state": "ACTIVE",
+          "durableSequence": 0,
+          "lastErrorHash": null
+        }
+      }
+    ]
+  ],
+  "prior335": "immutable Rev5 cases and actual reviewer reproduction preserved; NOT relabelled as new runtime evidence",
+  "actualNewGoCryptoPGEngineCrashConcurrencyEquipment": 0,
+  "A1_A16": "PENDING",
+  "realBindings": null
+}

@@ -1,0 +1,31 @@
+{
+  "version": "fleet5-b-rev5-record:1",
+  "owner": "Codex architecture/reliability",
+  "reviewer": "Actual independent Claude whole-contract delta review via Root PENDING",
+  "task": "FLEET5-COMPUTE-STORAGE-CONTRACT-20261105",
+  "orcaTask": "task_a8fd2969f0b3",
+  "dispatch": "ctx_6f0f8253b8a7",
+  "branch": "agent/codex/fleet5-b-contract-rev5-20261106",
+  "proposalBaseDocsSHA": "2a08284a97fb8cd40c9e6de5c923c7864a7f76af",
+  "sourceAnchor": "72028cbac903c4415d9979f980a6e0f9948e914f",
+  "actualPriorReview": "14c7c936e056c685e85ee8f34f6185aa27ed9a2c",
+  "priorReviewExactDocs": 42124324426,
+  "priorVerdict": "REVISION REQUIRED B4-M1/M2 L1-L4; no partial freeze or code grant",
+  "rootDecision": "msg_03544733c9f3: ONE narrow Rev5 DOCS/schema/static/source-analysis delta ONLY; reconcile EVERY actual shared writer, complete canonical-locker closure, lineage-inherited revocation, durable monotonic gate history/lost ACK observe readback, purpose-restricted existing operator signing SERVICE, semantic and temporal fixtures",
+  "recordedAtKST": "2026-11-06T08:25:20+09:00",
+  "firstReadRootBoards": [
+    {"doc_id": "INDEX-PROGRESS-001", "version": "1.0.426", "updated": "2026-11-06T07:34:16+09:00", "sha256": "b3b7399eaaa0568683b9666194a00d8aab69c9b9cee49e1b1ece02828ffd274e"},
+    {"doc_id": "WORKBOARD-CODEX-001", "version": "1.0.387", "updated": "2026-11-06T07:34:16+09:00", "sha256": "4f9760f2763f65884aa1a3508974a37d10b12f9f65a6273ddba7dd0563a5a53a"}
+  ],
+  "refreshedRootBoards": [
+    {"doc_id": "INDEX-PROGRESS-001", "version": "1.0.427", "updated": "2026-11-06T08:06:43+09:00", "sha256": "b99008440e04656422bf531d97550fc1a323f23e3a34423d3a92b45e29aa392a"},
+    {"doc_id": "WORKBOARD-CODEX-001", "version": "1.0.388", "updated": "2026-11-06T08:06:43+09:00", "sha256": "1493fb542f912986b7476fe9fcecd1bbe597e83e6f15b4b473c88752f70303c6"}
+  ],
+  "canonicalFirstReads": "Immutable fleet5-b-contract-rev2-20261106-codex/initial-first-read-source-inventory.json contains exact first-read doc IDs/versions/hashes; agent-delivery1.1.0/core-reliability1.0.0 apply; current Root boards, not stale shared-board export, govern",
+  "scope": "Unique own History/Evidence additions only. No production, PG, Node, keys, VM, physical, remote, private config, PKI, Docker/WSL/trust/UAC/clock/schedule/cleanup, protected oldpilot/state, source originals, ADR, registry, shared boards or Obsidian apply. No helper workers.",
+  "allRealBindings": null,
+  "actualNewGoCryptoPGDockerCrashConcurrencyEquipment": 0,
+  "A1_A16": "PENDING",
+  "otherProgramWork": "72028 accepted product and e50 test/report deltas remain separate; this derivative is NOT integrated, no acceptance borrowed; existing48/VFCL statuses unchanged",
+  "implementationOwnerAfterActualWholeReviewAndRootGrant": "Codex"
+}

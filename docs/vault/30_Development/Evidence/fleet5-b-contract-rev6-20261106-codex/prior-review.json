@@ -1,0 +1,147 @@
+{
+ "schemaVersion": "fleet5-b-rev5-actual-review:1",
+ "reviewer": "Claude (independent; no helper agents)",
+ "orcaTask": "task_b176020315c8",
+ "dispatch": "ctx_391e15f3a280",
+ "run": "run_e57ecd84a7bc",
+ "owner": "Codex task_a8fd2969f0b3 / ctx_6f0f8253b8a7",
+ "target": {
+  "commit": "228e2a2062d8a64bce7f772f668da7df2fd2ac0d",
+  "branch": "agent/codex/fleet5-b-contract-rev5-20261106",
+  "parent": "2a08284a97fb8cd40c9e6de5c923c7864a7f76af",
+  "remoteRefVerified": "git ls-remote origin refs/heads/agent/codex/fleet5-b-contract-rev5-20261106 == 228e2a20 (09:06 KST)",
+  "deltaVs2a08": "54 added files, all owner History/Evidence; 0 modified/deleted",
+  "productDiffVs72028": "0 files under services/src/deploy/migrations/tests/tools/contracts/packages/apps/.github/workflows; 0 files outside History/Evidence",
+  "ownerDocs": {"run": 42132640734, "job": 127612804404, "event": "workflow_dispatch", "headSha": "228e2a2062d8a64bce7f772f668da7df2fd2ac0d", "displayTitle": "fleet5-b-rev5-228e2a2062d8-task_a8fd2969f0b3", "conclusion": "success", "jobs": "1/1 success", "readBy": "gh run view (read-only)"}
+ },
+ "verdict": "REVISION_REQUIRED",
+ "verdictScope": "whole coupled B Rev5 design contract (DESIGN axis). No implementation, PG, crypto, Docker, crash or equipment evidence exists or is claimed; that evidence remains future and is not itself counted as a design gap.",
+ "blockingFindings": ["B5-M1", "B5-M2"],
+ "nonBlockingButRequiredBeforeGrant": ["B5-L1", "B5-L2", "B5-L3", "B5-L4", "B5-L5"],
+ "info": ["B5-I1", "B5-I2"],
+ "findings": [
+  {
+   "id": "B5-M1",
+   "severity": "MEDIUM (blocks design acceptance)",
+   "area": "B4-M1 PRE_IO durable safety obligation lifecycle",
+   "statement": "The proposed PRE_IO obligation is a register-and-protected-settle pair, not a closed lifecycle. (a) No ordinary verified-success disposition exists: b_settle_node_safety_obligation is sv_b_operator-only and requires 'independent authenticated physical cleanup proof + protected clear/restore record'; an obligation registered before an ordinary successful GPU exchange or build dispatch therefore keeps the Node ineligible until an operator settles it, or an unspecified ordinary settle path exists, which would contradict 'cannot become implicit release/clear/success'. (b) The actual IO call sites the obligation must precede are not named and nothing binds the obligation to the IO, so precedence is not checkable. (c) 'Every eligibility query checks unresolved obligation independently of nodes.status' is a blanket label: none of the actual plain eligibility readers are enumerated or mapped to an obligation-aware read, and the actual source swallows quarantine-fence failure. (d) The symbolic model checks obligations globally and only for B, and has no settle transition.",
+   "callsites": {
+    "ioThatMustBePrecededSource72028": ["services/control-plane/src/inv/node_transport.py:289 self.client.exchange (GPU allocations; failure -> _quarantine_gpu_node:319)", "services/control-plane/src/inv/build_execution.py:787 self._adapter.execute (build dispatch; post-dispatch quarantine :823/:864)", "services/control-plane/src/inv/build_execution.py:835 collect_cleanup_receipt"],
+    "quarantineFailureSwallowed": ["services/control-plane/src/inv/build_execution.py:414 and :429 LOGGER.exception after node-agent marker and _mark_node_quarantined failures"],
+    "unmappedPlainEligibilityReaders": ["inv/placement.py:239", "inv/placement.py:538", "inv/dispatch.py:79", "inv/leases.py:253", "inv/capacity.py:23", "inv/scheduler.py:106", "inv/build_adapter.py:138", "inv/gpu.py:97", "inv/model_commit.py:57", "inv/model_locality.py:27", "inv/tooling.py:203", "inv/terminal.py:78", "inv/node_channels.py:137"],
+    "contract": ["authority.py:37-48 b_raise_node_quarantine, b_register/b_settle_node_safety_obligation", "model.py:279-292 cp_eligible/pre_io_obligation/raise_quarantine", "plan_specs.py quarantine spec 'physical cleanup already occurred outside'"]
+   },
+   "counterexamples": [
+    "MA2b: released_state -> pre_io_obligation('gpu-delivery-op') with no failure -> cp_eligible == False permanently (no settle transition in model; matrix settle only sv_b_operator).",
+    "MA1: an obligation for another tenant/Node/epoch denies THIS Node (cp_eligible False), so fixture quarantine-EXECUTE-loss-still-denied passes without testing scoping.",
+    "Source: build_execution.py:419-431 _mark_node_quarantined fails -> logged and swallowed -> status stays 'online' -> dispatch.py:79 / placement.py:239 still select the Node. The contract wants the obligation to keep it denied, but no plain reader is mapped to check it."
+   ],
+   "requiredFix": [
+    "Define the obligation key (tenant_id,node_id,epoch,operation_id) and a closed state machine, e.g. PENDING_IO -> {VERIFIED_CLEAN | UNCERTAIN} -> SETTLED_PROTECTED, with typed procedures and principals per edge.",
+    "Ordinary success: sv_b_runtime/verifier may settle PENDING_IO -> VERIFIED_CLEAN only in the same transaction as the exact typed receipt/cleanup evidence (e.g. b_append_build_cleanup_evidence, NodeReceiptStore.record) bound to operation_id, and never from UNCERTAIN.",
+    "Any exception or unknown outcome moves the obligation to UNCERTAIN (or leaves it PENDING), and only the protected OP settle with physical proof can reduce it.",
+    "Name each registration call site and its committed transaction BEFORE node_transport.py:289 and build_execution.py:787.",
+    "Bind the obligation_id/hash into the signed permit / dispatch body / receipt so the Node, adapter or receipt verifier refuses IO, or refuses to accept its outcome, without a committed obligation.",
+    "Enumerate every plain and B eligibility reader (at least the 13 sites above) and replace each with one fixed read/lock procedure: status AND no unresolved obligation for that tenant/node/epoch AND containment AND B current-chain conditions where B applies.",
+    "Define the denial lattice over inv.nodes {online, offline, draining, quarantined} so 'retain stronger denial / never clear draining' is decidable. Actual source overwrites draining with quarantined.",
+    "Model scoped obligations and add settle positive/negative and time-advancing fixtures (success settle, failure->UNCERTAIN, RUN cannot settle UNCERTAIN, OP settle without proof refused, wrong-node obligation does not deny other Nodes, EXECUTE loss still denies the plain readers)."
+   ]
+  },
+  {
+   "id": "B5-M2",
+   "severity": "MEDIUM (blocks design acceptance)",
+   "area": "B4-M2 closure: UNKNOWN/BLOCK classification",
+   "statement": "unknownEdges are chosen by bare method-name collision with any reached function name, and every one gets disposition BLOCK_THIS_ENTRY_UNTIL_STATIC_RESOLUTION_OR_ACTUAL_TRACE. The result is 5426 BLOCK edges. That is an effective global boilerplate block, which Root forbade ('required known path must have a concrete supported plan, not global B denial'). Every critical entry that has a concrete plan also carries BLOCK edges in its own transitive closure, so the artifacts contradict themselves, and the real residual unknowns are buried. Plans never reference unknownEdges.",
+   "measured": {
+    "unknownEdgesTotal": 5426,
+    "sameCallSiteAsAnAlreadyRecordedDBRecord": 1459,
+    "dotGetCalls": 3283,
+    "remaining": 684,
+    "remainingTopSpellings": "subprocess.run 199, self.db.transaction 76, run 42, session.begin 34, record 17, conn.transaction 15, URL.create 13, self.control.grant 10, ... runtime(state).transaction 6, env.db.transaction 5",
+    "criticalPlansWithBlockEdgesInClosure": "_commit_consequences 14, _mark_node_quarantined 12, BuildExecutionService.execute 42, enqueue 12, _terminalize 17, capture_locations 3, capture_channels 3, provision_channel 6, revoke_channel 5, _quarantine_gpu_node 12, NodeDelivery.deliver 28, NodeObservation.accept 9, mark_offline 3, ResultStore.complete 19, RunStore.complete 15, ShardCompletion.once 15, apply_sample 5, set_resource_offer 5/3, _owned_for_update 1; only NodePrincipal.lock_current has 0",
+    "source": "computed from owner source-analysis.json (byte-identical regeneration verified)"
+   },
+   "counterexamples": [
+    "W1 probeUnknown for node_transport includes 'timer.cancel' and 'conn.execute' as BLOCK although conn.execute is the recorded SQL site and timer.cancel is threading.Timer.",
+    "L5: getattr(leases,'lock_run')(...) produces no edge, no unknown and no record (silently dropped), while the boilerplate list stays BLOCK-heavy."
+   ],
+   "requiredFix": [
+    "Do not emit unknownEdges for call sites already captured as DB records, or for builtin/Mapping .get, json/subprocess/stdlib receivers.",
+    "Explicitly resolve DB transaction-owner receivers (self.db.transaction, conn.transaction, session.begin, runtime(state).transaction) to Database/BoundDatabase/Session, because they define the outer transaction.",
+    "Attach each remaining unknown to the plans whose closure contains it, with a per-entry disposition (resolved, irrelevant-with-reason, or BLOCK).",
+    "Treat getattr/dynamic dispatch on modules that contain reached functions as explicit UNKNOWN.",
+    "Add a source fixture asserting that every concrete critical plan (the 13 Root-named entries plus the business/result/sample set) has zero unjustified BLOCK edges."
+   ]
+  },
+  {
+   "id": "B5-L1",
+   "severity": "LOW (required before implementation grant; current 72028 census is complete)",
+   "area": "B4-M1 semantic census<->matrix audit as a future regression gate",
+   "statement": "Root required that a new or unmapped writer, or a removed mapping, fail a semantic audit, with an explicit column plus from/to predicate. The audit maps writers by (function, table, verb, columns) only. Several real writer shapes are silently missed or accepted.",
+   "reviewerSourceMutations": {
+    "W1 node_transport deny-only quarantine UPDATE reversed to status='online'": "auditErrors [] (still mapped to b_raise_node_quarantine)",
+    "W2 observation.accept CASE replaced by status='online' (would clear quarantine)": "auditErrors []",
+    "W3 session.execute(insert(Node).values(...))": "no writer, auditErrors []",
+    "W4 conn.execute(f\"UPDATE inv.{t} SET status='online' ...\")": "no writer; record scopeDisposition STATIC_NAMED_SCOPE (not UNKNOWN/BLOCK)",
+    "W5 text(\"UPDATE nodes SET status='active' ...\") (unqualified, default search_path -> public.nodes)": "no writer, auditErrors []",
+    "W6 setattr(node,'status','active')": "no writer, auditErrors []",
+    "W10 delete the real node_transport quarantine UPDATE": "auditErrors [] (stale RULE, deny-only safety writer vanished silently)",
+    "positiveControls": "W7 ORM attribute, W8 new SQL writer, W9 rename mapped function -> UNMAPPED_WRITER; W11 owner-impersonation column -> WRITER_COLUMN_UNCOVERED"
+   },
+   "independentCensus": "Independent git grep over all 72028 non-docs/non-test files (any language, optional schema qualifier) finds exactly the 27 SQL writer sites in writer-reconciliation, and no ORM insert()/setattr/dynamic-table/unqualified DML on matrix tables. The 7 ORM writer records (enroll, heartbeat, lost, register, activate, revoke x2) also match; 27+7=34. The status/kill_switch/enabled transitions of the mapped writers were checked by hand against source SET/CASE values: consistent.",
+   "requiredFix": [
+    "Extract SET literals, CASE targets and WHERE status guards for status/kill_switch/enabled columns, and assert them against procedure statusTransitions/denyOnly.",
+    "Detect sqlalchemy insert()/pg_insert()/Table.update(), setattr on model instances, unqualified table names resolved through the effective search_path, and f-string/format table names (the latter as UNKNOWN/BLOCK).",
+    "Fail on a RULES/OFFLINE entry that matches no current writer, especially deny-only safety writers."
+   ]
+  },
+  {
+   "id": "B5-L2",
+   "severity": "LOW",
+   "area": "B4-M2 explicit rank of proposed B tables",
+   "statement": "RANK_GROUPS ranks all observed source tables but none of the 21 proposed B tables written by B procedures. These include inv.node_role_safety_obligations, lineage_tombstones, gate_acks, releases, delegations, admissions, leases, delivery_challenges, key_possessions, key_deliveries, request_issuance, request_commits, member_cas, storage_bindings and service_bindings. lockOnlyProcedures.canonicalOrder only names coarse 'role/current' and 'nonce/evidence/ledger' stages, so within-stage order and the position of obligations and tombstones relative to inv.nodes and runs are undecided.",
+   "requiredFix": "Give every new B table an explicit rank and mode in the same RANK list used for plans, plus per-procedure ranked lock lists (e.g. b_raise_node_quarantine: obligations vs inv.nodes vs outbox)."
+  },
+  {
+   "id": "B5-L3",
+   "severity": "LOW",
+   "area": "B4-L3 signing-service scope for operator purposes",
+   "statement": "The History and a model comment say the protected signing service refuses ARM of a revoked or unknown descendant. In model.service_sign the operator policy is kind plus shape only. The lineage check lives in the caller's command(). The Node has no tombstone knowledge, so it ARMs the revoked descendant. The CP CAS still refuses, so the impact is availability/HOLD only.",
+   "counterexamples": ["MA3b service_sign(OP,'GATE_CONTROL', ARM body of revoked lineage) -> signed", "MA3c Node node_command -> ARMED", "MA3d CP commit_activation -> refused"],
+   "requiredFix": "Either make GATE_CONTROL ARM / RELEASE / DELEGATION scope validation inside the signing service (current lineage, no tombstone, exact approved tuple) with negatives, or correct the claim so the guarantee is CP-CAS-only."
+  },
+  {
+   "id": "B5-L4",
+   "severity": "LOW",
+   "area": "B4-L1 tombstone authenticity and Node propagation",
+   "statement": "b_revoke_approval_lineage is executable by sv_b_operator and sv_b_safety. The signing policy grants LINEAGE_TOMBSTONE to the operator only, so a safety-initiated tombstone cannot be signed. The LINEAGE_TOMBSTONE domain has no consumer: Node knownLineageRevocations is never populated.",
+   "counterexamples": ["MA4 revoke_lineage(role=SAFE) True", "MA4b service_sign(SAFE,'LINEAGE_TOMBSTONE') None", "MA4c Node tombstones empty"],
+   "requiredFix": "State that CP tombstone authenticity is the DB principal plus causal evidence (unsigned) and remove the domain, or define the signer for SAFE-initiated tombstones and a Node-side consumer/ACK. Keep the Node bound as gate invalidation or expiry."
+  },
+  {
+   "id": "B5-L5",
+   "severity": "LOW (fact for Root)",
+   "area": "card250 owner activation semantics",
+   "statement": "The contract (Root (e) wording) says activation requires the original Node folder confirmation. The actual 72028 activate_contribution (src/saintvision/services/storage.py:94-112) and API (src/saintvision/api/v1/storage.py:184-195) check only the registered owner and not-revoked. No confirmation artifact is read; the docstring states intent only. A plain wrapper requiring confirmation would change current plain behaviour.",
+   "requiredFix": "Either name the confirmation artifact (signed Node folder observation bound to contribution_id/normalized_path/channel) and record it as an explicit plain behaviour change, or keep plain activation owner-only and place folder confirmation in the B-only b_approve_readonly_contribution_root prerequisite."
+  }
+ ],
+ "infoFindings": [
+  {"id": "B5-I1", "statement": "Time-advancing counterexample MA6: an ACK resolved 1s before expiry, then CAS 2s later, is refused. switchPending stays True while the Node gate is ARMED and the CP current is unchanged. This is the honest B-RECOVERY1 HOLD Root chose; availability, not safety. After a CAS, a delivery more than 60s after the ARM ACK likewise HOLDs (owner fixture ACK-expiry-after-CAS-denies-delivery)."},
+  {"id": "B5-I2", "statement": "Session advisory locks are labelled SESSION_ADVISORY_OFFLINE_ONLY by regex regardless of location (L6 online CP probe), and ranked at the transaction-advisory rank. Actual 72028 has 0 session-advisory sites (5 transaction-advisory sites), so this is a tooling caveat only."}
+ ],
+ "verifiedAndAcceptedDesignAspects": [
+  "Owner tools reproduced byte-exact with the owner venv (Python 3.14.7, SQLAlchemy 2.0.52, jsonschema 4.26.0): schema/authority/fixtures/reconcile/probe exit 0/0/0/0/0, probe --require-coexistence expected exit 1, source_analysis/reconcile/source_fixtures exit 0/0/0. All 9 raw stdout sha256 equal the owner ledgers. Regenerated contract.schema/authority-matrix/fixture-results/source-analysis/writer-reconciliation are byte-identical; source-fixture-results differs only in 24 'seconds' timing fields (restored via git checkout).",
+  "222 symbolic + 113 source/compile cases pass; 7 PostgreSQL compilations with pinned SQLAlchemy 2.0.52; 24 previously dropped CP receiver edges and 17 mode sites asserted (owner fixtures, re-executed).",
+  "Reviewer M2 variants resolve: L1 'import inv.leases as L', L2 self.store=LeaseStore(db) instance, L3 SQL constant imported from another module (FOR NO KEY UPDATE), L4 class-attribute SQL -> explicit UNKNOWN_SQL_SCOPE_BLOCK; L7 inverted runs->nodes is re-ranked nodes(4)->runs(14).",
+  "46 inherited surfaces: sha256 of every path re-verified against Git 72028 (0 mismatch); worker_workspace.py:73-75 R4 refusal present; --require-coexistence exit 1 remains the honest current-gap proof, not B implementation.",
+  "L1 lineage: append/ARM/activation/delivery/refresh/current gates deny after ancestor revocation; missing ancestor denies; ancestor time expiry alone does not; CP immediate vs Node acknowledged invalidation is honest; CP 300s lease not claimed as a Node bound.",
+  "L2 history: retired gate/release terminal, generation/predecessor/sequence CAS, duplicate returns only the original ACK without mutation, stale ACK >60s and missing ACK HOLD; the gateObservation schema is closed (MA7: refusal with businessAuthority true / extra recordId / AVAILABLE without originalAckHash all rejected).",
+  "L3 caller policy: runtime/verifier/use_issuer/safety/budget/controller cannot obtain APPROVAL (MA5); controller limited to DELIVERY_CHALLENGE/KEY_DELIVERY_RECEIPT with exact postcommit ledger/ARM/key/challenge scope; separate budget key; custody NULL.",
+  "Evidence append is typed and cannot mint approval/success; owner consent is additional to B RO/root approval; observation cannot clear quarantine/draining/retired (authority.invariants plus semantic mutants re-executed).",
+  "Earlier closed aspects preserved unchanged: per-Node 24h same-config renew/reapprove, strict JSON/C2/safe ints, isolated Linux VM/separate kernel, CP-colocated excluded from S05/S07, four independent Linux workers, role identity/DER/C/epoch/R/root preservation with leaf C+1/P+1/P+2, no workload host state/socket/contribution access."
+ ],
+ "rolloutPrerequisitesIfRevisedAndAccepted": "Not issued: design is REVISION_REQUIRED. After B5-M1/M2 and L1-L5 are closed, the accepted-interface list for Root's bounded grant should include: the obligation state machine/procedures/readers, the cleaned closure artifact with per-plan unknown dispositions, explicit B-table ranks, and the signing-service scope and tombstone decisions, in addition to the owner's implementation-interface.json modules.",
+ "notClaimed": ["no partial freeze", "no code grant", "no runtime acceptance", "no actual crypto, PG grants/locks, Docker, crash or equipment evidence", "A1-A16 PENDING", "all real bindings NULL/HOLD", "whole 100% and 5PC acceptance incomplete"],
+ "productDiffOfThisReview": 0
+}

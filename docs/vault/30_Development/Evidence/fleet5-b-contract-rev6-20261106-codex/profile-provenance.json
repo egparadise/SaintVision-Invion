@@ -1,0 +1,8 @@
+{
+  "level": "LOCAL_STATIC_ANALYZER_DIAGNOSTIC_NOT_NODE_PERFORMANCE",
+  "originalRawSHA256": "9497ce46f4abccf477b16b674b0b23c720a4d6451b7707377ad41adb69225d93",
+  "publishedRedaction": "local interpreter directory/account replaced with <PYTHON314_LIB>; timing/call counts retained",
+  "publishedSHA256": "51753e5f19aa9e36611d8b43990e2e8a374a8c8eee2c32648087a9fd27ecbf74",
+  "newRuntimeEvidence": 0,
+  "changeDecision": "no performance refactor after successful source checks; retain stable tested implementation"
+}

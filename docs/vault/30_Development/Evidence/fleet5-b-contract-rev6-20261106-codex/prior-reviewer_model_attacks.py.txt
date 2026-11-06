@@ -1,0 +1,109 @@
+"""Claude reviewer symbolic attacks on owner Rev5 model (no keys/crypto/DB/Node IO).
+
+Imports the immutable owner model; prints observed outcomes. Writes only argv[1].
+"""
+import json
+import sys
+from copy import deepcopy
+from pathlib import Path
+
+E = Path(sys.argv[2]).resolve()
+sys.path.insert(0, str(E))
+import model as m  # noqa: E402
+from authority import OP, DEL, SAFE, RUN, VER, ISS, BUD, build  # noqa: E402
+
+R = []
+
+
+def rec(name, observed, note):
+    R.append(dict(case=name, observed=observed, note=note))
+    print(json.dumps(R[-1], default=str), flush=True)
+
+
+# MA1 obligation scoping: an obligation registered for ANOTHER Node/operation.
+s = m.released_state()
+s['safetyObligations']['other-tenant-other-node-op'] = {'state': 'PENDING_PROOF', 'nodeId': 'some-other-node', 'epoch': 'other-epoch'}
+rec('MA1-foreign-node-obligation-denies-this-node', m.cp_eligible(s, s['current'], m.role_use(s)),
+    'model cp_eligible ignores obligation tenant/Node/epoch scope; fixture quarantine-EXECUTE-loss-still-denied is scope-vacuous')
+
+# MA2 settle path exists in model?
+rec('MA2-model-has-settle-transition', any(hasattr(m, n) for n in ('settle_obligation', 'settle_safety_obligation', 'settle')),
+    'only pre_io_obligation and raise_quarantine are modelled; no success/settle/clear transition or negative')
+s = m.released_state()
+m.pre_io_obligation(s, 'gpu-delivery-op')
+rec('MA2b-normal-success-after-PRE_IO-still-denied', m.cp_eligible(s, s['current'], m.role_use(s)),
+    'an obligation registered before ordinary successful IO keeps the Node ineligible; only OP-protected settle exists in matrix')
+
+# MA3 operator signing service signs ARM for revoked lineage when caller skips command() guard.
+s = m.released_state()
+anc = m.digest(s['current']['approval'])
+s['now'] += 2
+a = m.append_approval(s, 'APPROVAL_RENEW_SAME_CONFIG', s['now'] + 1200)
+mat = m.material(s, a, 'new')
+mat['approvalChain'] = deepcopy(m.chain(s, a))
+# invalidate current gate so ARM is structurally possible
+old = {k: s['current'][k] for k in ('approval', 'release', 'delegation')}
+old['approvalChain'] = deepcopy(m.chain(s, old['approval']))
+s['switchPending'] = True
+inv = m.node_command(s, old, m.command(s, old, 'INVALIDATE_EXACT_GATE'))
+assert inv and m.record_ack(s, inv)
+s['now'] += 1
+assert m.revoke_lineage(s, anc)
+guarded = m.command(s, mat, 'ARM_EXACT_RELEASE')
+r = mat['release']['body']
+prior_gate = s['node']['gate']['gateId']
+body = {'action': 'ARM_EXACT_RELEASE', 'method': 'POST', 'path': '/v1/roles/gate', 'staticHash': m.digest(s['static']),
+        'nodeId': s['static']['nodeId'], 'epoch': s['static']['epoch'], 'generation': s['node']['generation'],
+        'gateId': r['gateId'], 'expectedPriorGateId': prior_gate, 'releaseHash': m.digest(mat['release']),
+        'delegationHash': m.digest(mat['delegation']), 'useKeyHash': r['useKeyHash'],
+        'nonce': m.digest({'action': 'ARM_EXACT_RELEASE', 'gate': r['gateId'], 'record': s['node']['recordId']}),
+        'issuedAt': s['now'], 'expiresAt': min(s['now'] + 120, m.trust_end(s)),
+        'expectedPriorRecordHash': s['node']['recordId'], 'expectedPriorSequence': s['node']['sequence']}
+direct = m.service_sign(s, OP, 'GATE_CONTROL', body)
+node_ack = m.node_command(s, mat, direct) if direct else None
+rec('MA3-guarded-command-refuses-revoked-ARM', guarded is None, 'CP planner command() refuses')
+rec('MA3b-signing-service-signs-revoked-descendant-ARM', direct is not None,
+    'service_sign OP policy is kind+shape only; model comment claims signing service refuses ARM of revoked descendant')
+rec('MA3c-Node-ARMs-revoked-descendant', bool(node_ack),
+    'Node has no tombstone knowledge (knownLineageRevocations never populated); CP CAS still refuses below')
+if node_ack:
+    m.record_ack(s, node_ack)
+    rec('MA3d-CP-CAS-still-refuses', m.commit_activation(s, mat, node_ack), 'CP lineage gate holds; impact availability/HOLD only')
+
+# MA4 safety-revoked lineage authenticity.
+s = m.released_state()
+rec('MA4-SAFE-can-revoke-lineage', m.revoke_lineage(s, m.digest(s['current']['approval']), role=SAFE), 'matrix EXECUTE [OP,SAFE]')
+tomb = list(s['lineageTombstones'].values())[0]
+rec('MA4b-SAFE-cannot-sign-LINEAGE_TOMBSTONE', m.service_sign(s, SAFE, 'LINEAGE_TOMBSTONE', tomb) is None,
+    'signing policy grants LINEAGE_TOMBSTONE only to OP; signed tombstone domain has no Node consumer in model')
+rec('MA4c-Node-learns-tombstone', bool(s['node']['knownLineageRevocations']), 'no model path populates Node tombstones')
+
+# MA5 delivery controller impersonation / extra purposes.
+s = m.released_state()
+for caller in (RUN, VER, ISS, SAFE, BUD, 'sv_b_delivery_controller '):
+    rec('MA5-caller-' + caller.strip() + '-APPROVAL', m.service_sign(s, caller, 'APPROVAL', deepcopy(s['current']['approval']['body'])) is None,
+        'policy keyed on installed caller id string')
+
+# MA6 ACK expiring between resolve and CAS (time-advancing counterexample).
+s = m.released_state(); s['now'] += 5
+a = m.append_approval(s, 'APPROVAL_RENEW_SAME_CONFIG', s['now'] + 1200); mat = m.material(s, a, 'new')
+mat['approvalChain'] = deepcopy(m.chain(s, a))
+old = {k: s['current'][k] for k in ('approval', 'release', 'delegation')}; old['approvalChain'] = deepcopy(m.chain(s, old['approval']))
+s['switchPending'] = True; inv = m.node_command(s, old, m.command(s, old, 'INVALIDATE_EXACT_GATE')); assert inv and m.record_ack(s, inv)
+cmd = m.command(s, mat, 'ARM_EXACT_RELEASE'); ack = m.node_command(s, mat, cmd); assert ack
+s['now'] = ack['body']['expiresAt'] - 1
+rb = m.gate_observe(s)
+rec('MA6-resolve-1s-before-ACK-expiry', m.resolve_lost_ack(s, rb, cmd, ack), 'allowed while original ACK valid')
+s['now'] += 2
+rec('MA6b-CAS-after-ACK-expiry', m.commit_activation(s, mat, ack), 'CAS refuses; switch remains fenced')
+rec('MA6c-switch-fenced-and-node-armed', [s['switchPending'], s['node']['gate']['state']], 'B-RECOVERY1 HOLD with Node ARMED; no recovery path modelled')
+rec('MA6d-fresh-renewal-blocked', m.append_approval(s, 'APPROVAL_RENEW_SAME_CONFIG', s['now'] + 1200) is None, 'no ordinary renewal escape')
+
+# MA7 gateObservation refusal branch carrying businessAuthority true / extra payload.
+s = m.released_state()
+ref = m.gate_observe(s, authenticated=False)['body']
+rec('MA7-refusal-businessAuthority-true-rejected', m.shape('gateObservation', {**ref, 'businessAuthority': True}), 'expect False')
+rec('MA7b-refusal-with-record-rejected', m.shape('gateObservation', {**ref, 'recordId': 'f' * 64}), 'expect False')
+rec('MA7c-AVAILABLE-without-originalAck-rejected', m.shape('gateObservation', {k: v for k, v in m.gate_observe(s)['body'].items() if k != 'originalAckHash'}), 'expect False')
+
+Path(sys.argv[1]).write_text(json.dumps(R, indent=1, default=str) + '\n', encoding='utf-8')

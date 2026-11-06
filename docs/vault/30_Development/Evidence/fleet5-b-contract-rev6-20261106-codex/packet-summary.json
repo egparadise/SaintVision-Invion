@@ -1,0 +1,201 @@
+{
+  "level": "SCHEMA_STATIC_SYMBOLIC_BYTE_PROVENANCE_ONLY",
+  "source": "72028cbac903c4415d9979f980a6e0f9948e914f",
+  "sourceFiles": 523,
+  "sourceRecords": 1669,
+  "matrixWriters": 34,
+  "knownWriterComposition": "27 SQL +7 ORM, exact72028; independently accepted Rev5 census retained",
+  "statefulSchemaCases": 547,
+  "sourceCases": 1358,
+  "newTotal": 1905,
+  "sourceMutationCount": 26,
+  "criticalPlans": 21,
+  "criticalUnjustifiedBlocks": 0,
+  "remainingScopedCallgraphUnknowns": 28,
+  "remainingScopedSQLIssues": 63,
+  "sourcePlans": 632,
+  "plainEligibilityReaders": 13,
+  "ioKinds": 16,
+  "explicitProposedBTables": 31,
+  "priorActualReviewByteExactFiles": 9,
+  "old335": "preserved prior snapshots, not new/runtime evidence",
+  "rawProofPublicationLogs": [
+    {
+      "command": [
+        "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+        "-B",
+        "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105\\docs\\vault\\30_Development\\Evidence\\fleet5-b-contract-rev6-20261106-codex\\schema.py"
+      ],
+      "expectedExit": 0,
+      "actualExit": 0,
+      "log": "docs/vault/30_Development/Evidence/fleet5-b-contract-rev6-20261106-codex/proof-checks-1.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": [
+        "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+        "-B",
+        "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105\\docs\\vault\\30_Development\\Evidence\\fleet5-b-contract-rev6-20261106-codex\\authority.py"
+      ],
+      "expectedExit": 0,
+      "actualExit": 0,
+      "log": "docs/vault/30_Development/Evidence/fleet5-b-contract-rev6-20261106-codex/proof-checks-2.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": [
+        "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+        "-B",
+        "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105\\docs\\vault\\30_Development\\Evidence\\fleet5-b-contract-rev6-20261106-codex\\fixtures.py"
+      ],
+      "expectedExit": 0,
+      "actualExit": 0,
+      "log": "docs/vault/30_Development/Evidence/fleet5-b-contract-rev6-20261106-codex/proof-checks-3.log",
+      "sha256": "0b2c5837fbf06c49bfa2ab05b64daed9eebdf14b48d9eef7aa3396a30e7ca4ea"
+    },
+    {
+      "command": [
+        "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+        "-B",
+        "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105\\docs\\vault\\30_Development\\Evidence\\fleet5-b-contract-rev6-20261106-codex\\reconcile.py"
+      ],
+      "expectedExit": 0,
+      "actualExit": 0,
+      "log": "docs/vault/30_Development/Evidence/fleet5-b-contract-rev6-20261106-codex/proof-checks-4.log",
+      "sha256": "a647e469798426933185c80ced6c32abc2ae28b1bc700b67e7479ad974d71a51"
+    },
+    {
+      "command": [
+        "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+        "-B",
+        "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105\\docs\\vault\\30_Development\\Evidence\\fleet5-b-contract-rev6-20261106-codex\\link_plans.py"
+      ],
+      "expectedExit": 0,
+      "actualExit": 0,
+      "log": "docs/vault/30_Development/Evidence/fleet5-b-contract-rev6-20261106-codex/proof-checks-5.log",
+      "sha256": "b9d26b3d1629604a94a99ef74addf2dc93590ac73fa1aea97d9dd95bb1a42fae"
+    },
+    {
+      "command": [
+        "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+        "-B",
+        "tests/proofs/fleet5_compute_storage_contract_probe.py"
+      ],
+      "expectedExit": 0,
+      "actualExit": 0,
+      "log": "docs/vault/30_Development/Evidence/fleet5-b-contract-rev6-20261106-codex/proof-checks-6.log",
+      "sha256": "6853f465cbaf47a3d137a212e1252dc2794fb541f57855e93006c6c88ff831c7"
+    },
+    {
+      "command": [
+        "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+        "-B",
+        "tests/proofs/fleet5_compute_storage_contract_probe.py",
+        "--require-coexistence"
+      ],
+      "expectedExit": 1,
+      "actualExit": 1,
+      "log": "docs/vault/30_Development/Evidence/fleet5-b-contract-rev6-20261106-codex/proof-checks-7.log",
+      "sha256": "26901da1c34123066141d82ec7f1ddeb0ba4ee7a5a82854f9f3cee79f3d8745b"
+    },
+    {
+      "command": [
+        "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+        "-B",
+        "tools/check_docs.py"
+      ],
+      "expectedExit": 0,
+      "actualExit": 0,
+      "log": "docs/vault/30_Development/Evidence/fleet5-b-contract-rev6-20261106-codex/publication-gates-1.log",
+      "sha256": "95b7ad5a9d6ce969f0b0ebc06e831ba432b0979dd892b5be766333314cb528e1"
+    },
+    {
+      "command": [
+        "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+        "-B",
+        "tools/check_ontology.py"
+      ],
+      "expectedExit": 0,
+      "actualExit": 0,
+      "log": "docs/vault/30_Development/Evidence/fleet5-b-contract-rev6-20261106-codex/publication-gates-2.log",
+      "sha256": "7cdc12bf64f50ba0964625161638a4c639cf22d786a57f04685bed0718e14042"
+    },
+    {
+      "command": [
+        "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+        "-B",
+        "tools/sync_obsidian.py",
+        "--check"
+      ],
+      "expectedExit": 0,
+      "actualExit": 0,
+      "log": "docs/vault/30_Development/Evidence/fleet5-b-contract-rev6-20261106-codex/publication-gates-3.log",
+      "sha256": "6d959ce66552daa3b144514a2c5f7509ad08e7f1dee024bab58623222eb07bc7"
+    },
+    {
+      "command": [
+        "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+        "-B",
+        "tools/check_contract_bindings.py"
+      ],
+      "expectedExit": 0,
+      "actualExit": 0,
+      "log": "docs/vault/30_Development/Evidence/fleet5-b-contract-rev6-20261106-codex/publication-gates-4.log",
+      "sha256": "7d3493f361d1c522254d1dbd2e0a74b4dc3c54ef90bd9bfdec3a57666d7798ed"
+    },
+    {
+      "command": [
+        "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+        "-B",
+        "tools/check_frontend_integrity.py"
+      ],
+      "expectedExit": 0,
+      "actualExit": 0,
+      "log": "docs/vault/30_Development/Evidence/fleet5-b-contract-rev6-20261106-codex/publication-gates-5.log",
+      "sha256": "2a2f0348a4bdc71911a5eac47ef7fd7a1ca4573e71cce914cb6d6dd198392949"
+    },
+    {
+      "command": [
+        "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+        "-B",
+        "tools/check_doc_single_source.py",
+        "--ratchet"
+      ],
+      "expectedExit": 0,
+      "actualExit": 0,
+      "log": "docs/vault/30_Development/Evidence/fleet5-b-contract-rev6-20261106-codex/publication-gates-6.log",
+      "sha256": "13b5f5afed05999109839be1baec4ef70ea3c71bcb267353e59eba0f2ae3e448"
+    },
+    {
+      "command": [
+        "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+        "-B",
+        "tools/check_response_freshness.py"
+      ],
+      "expectedExit": 0,
+      "actualExit": 0,
+      "log": "docs/vault/30_Development/Evidence/fleet5-b-contract-rev6-20261106-codex/publication-gates-7.log",
+      "sha256": "ba85e5489b5c960d3fdd09acf663a0c157e70028c6d54044d4820a67c99570fc"
+    },
+    {
+      "command": [
+        "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+        "-B",
+        "tools/check_doc_path_citations.py",
+        "--ratchet",
+        "--base-ref",
+        "228e2a2062d8a64bce7f772f668da7df2fd2ac0d"
+      ],
+      "expectedExit": 0,
+      "actualExit": 0,
+      "log": "docs/vault/30_Development/Evidence/fleet5-b-contract-rev6-20261106-codex/publication-gates-8.log",
+      "sha256": "389921b50662776ed834a285f70fc44ab61f7d5bdb4c5249c0a73c98113980de"
+    }
+  ],
+  "sourceCommandEvidence": "source-command-record.json actual exit0 + content-hashed result artifacts, no raw stdout retention claim",
+  "actualNewGoCryptoPGEngineCrashConcurrencyEquipment": 0,
+  "allRealBindings": null,
+  "A1_A16": "PENDING",
+  "independentWholeReview": "PENDING via Root",
+  "obsidianApply": false
+}

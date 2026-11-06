@@ -1,0 +1,39 @@
+{
+  "version": "fleet5-b-contract-rev6-record:1",
+  "owner": "Codex architecture/reliability",
+  "reviewer": "Actual independent Claude whole Rev6 review via Root PENDING",
+  "task": "FLEET5-COMPUTE-STORAGE-CONTRACT-20261105",
+  "orcaTask": "task_a8fd2969f0b3",
+  "dispatch": "ctx_6f0f8253b8a7",
+  "branch": "agent/codex/fleet5-b-contract-rev6-20261106",
+  "baseDocsSHA": "228e2a2062d8a64bce7f772f668da7df2fd2ac0d",
+  "sourceSHA": "72028cbac903c4415d9979f980a6e0f9948e914f",
+  "actualPriorReview": "8bac0838c08bbdd49cf954a517594c0973b55da6",
+  "priorReviewExactDocs": 42137554199,
+  "priorVerdict": "REVISION_REQUIRED B5-M1/M2 L1-L5; current27SQL+7ORM and46surfaces/335oldtoolcases independently verified accepted aspects, NOT future regression completeness",
+  "rootDecision": "msg_17afe2db8b82: ONE narrow Rev6 DOCS/schema/static/source-analysis delta; scoped IO lifecycle, orthogonal denial facts, typed closure, semantic transition regression, numeric ranks/anchors, actual signing-service publication fence, UNSIGNED CP tombstones/INVALIDATE outbox, B-only root observation; NO product/DB/permission/Node/key/VM changes",
+  "firstReadAtKST": "2026-11-06T09:48:12+09:00",
+  "recordedAtKST": "2026-11-06T10:54:25.975619+09:00",
+  "guidance": [
+    {
+      "doc_id": "INDEX-PROGRESS-001",
+      "version": "1.0.430",
+      "updated": "2026-11-06T09:17:48+09:00",
+      "sha256": "1a038eefd19f1aed22e8b181ef62eae7df3e77b4eaf568e4d14bd27d2f39d655"
+    },
+    {
+      "doc_id": "WORKBOARD-CODEX-001",
+      "version": "1.0.391",
+      "updated": "2026-11-06T09:17:48+09:00",
+      "sha256": "7890aa7018c42c1d2979c8eb09b49e439b74d153a1d92d8109288a5b99bab637"
+    }
+  ],
+  "canonicalFirstReads": "Immutable Rev2 initial-first-read-source-inventory.json retains exact canonical doc IDs/versions/hashes; current Root boards govern; agent-delivery1.1.0/core-reliability1.0.0 applied",
+  "scope": "Unique own History/Evidence only; no source originals, ADR, registry, shared boards, Obsidian apply, remote/private/PKI/Node/PG/Docker/WSL/VM/UAC/trust/clock/schedule/protected oldpilot/state/cleanup/helper action",
+  "actualNewGoCryptoPGEngineCrashConcurrencyEquipment": 0,
+  "allRealBindings": null,
+  "A1_A16": "PENDING",
+  "existing48AndVFCL": "unchanged",
+  "otherRootWork": "separate K1/Test+PG/Core program work is NOT B evidence; no independent review or operational success borrowed",
+  "implementationOwnerOnlyAfterActualWholeReviewAndConcreteRootGrant": "Codex"
+}
