@@ -1,0 +1,46 @@
+=== RUN   TestReviewR5AllBridgeObjectsAndMethodSets
+    review_census_test.go:21: actual resolved bridge objects: [github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify.CanonicalJSON github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify.CertificateStatus github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify.ContractPin github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify.HistoricalContext github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify.InstalledTrust github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify.KeyGrant github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify.MemberIdentity github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify.NativeChallenge github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify.NewVerifier github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify.OperationBinding github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify.Packet github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify.PublicationStatus github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify.Report github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify.TrustedContext github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify.Verifier github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify.Verifier.Verify github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify.VerifierPublication]
+=== RUN   TestReviewR5AllBridgeObjectsAndMethodSets/Packet-named-map
+=== RUN   TestReviewR5AllBridgeObjectsAndMethodSets/Report-named-slice
+=== RUN   TestReviewR5AllBridgeObjectsAndMethodSets/CanonicalJSON-variadic
+=== RUN   TestReviewR5AllBridgeObjectsAndMethodSets/MarshalJSON-InstalledTrust
+=== RUN   TestReviewR5AllBridgeObjectsAndMethodSets/MarshalJSON-*InstalledTrust
+=== RUN   TestReviewR5AllBridgeObjectsAndMethodSets/method-declaration-order-control
+--- PASS: TestReviewR5AllBridgeObjectsAndMethodSets (3.99s)
+    --- PASS: TestReviewR5AllBridgeObjectsAndMethodSets/Packet-named-map (0.34s)
+    --- PASS: TestReviewR5AllBridgeObjectsAndMethodSets/Report-named-slice (0.34s)
+    --- PASS: TestReviewR5AllBridgeObjectsAndMethodSets/CanonicalJSON-variadic (0.17s)
+    --- PASS: TestReviewR5AllBridgeObjectsAndMethodSets/MarshalJSON-InstalledTrust (0.18s)
+    --- PASS: TestReviewR5AllBridgeObjectsAndMethodSets/MarshalJSON-*InstalledTrust (0.18s)
+    --- PASS: TestReviewR5AllBridgeObjectsAndMethodSets/method-declaration-order-control (0.38s)
+=== RUN   TestWholePackageFullUnderlyingCensus
+    source_gate_test.go:453: actual full package: 12 files, input types=13 fields=73 embedded=0 canonicalSHA256=7eee6ccb07b55399adecdd1dc3bb704aeaebc655d5f3739f29a8e5a7aaa4bfdc; same-toolchain immutable baseline
+--- PASS: TestWholePackageFullUnderlyingCensus (1.35s)
+=== RUN   TestCensusMutantsAfterSimulatedRawRepin
+=== RUN   TestCensusMutantsAfterSimulatedRawRepin/G01
+=== RUN   TestCensusMutantsAfterSimulatedRawRepin/G02
+=== RUN   TestCensusMutantsAfterSimulatedRawRepin/G03
+=== RUN   TestCensusMutantsAfterSimulatedRawRepin/G04
+=== RUN   TestCensusMutantsAfterSimulatedRawRepin/G05
+=== RUN   TestCensusMutantsAfterSimulatedRawRepin/G06
+=== RUN   TestCensusMutantsAfterSimulatedRawRepin/G07
+=== RUN   TestCensusMutantsAfterSimulatedRawRepin/G08
+=== RUN   TestCensusMutantsAfterSimulatedRawRepin/R01
+=== RUN   TestCensusMutantsAfterSimulatedRawRepin/R02
+=== RUN   TestCensusMutantsAfterSimulatedRawRepin/R03
+=== RUN   TestCensusMutantsAfterSimulatedRawRepin/cross-file-generic
+--- PASS: TestCensusMutantsAfterSimulatedRawRepin (3.89s)
+    --- PASS: TestCensusMutantsAfterSimulatedRawRepin/G01 (0.19s)
+    --- PASS: TestCensusMutantsAfterSimulatedRawRepin/G02 (0.18s)
+    --- PASS: TestCensusMutantsAfterSimulatedRawRepin/G03 (0.01s)
+    --- PASS: TestCensusMutantsAfterSimulatedRawRepin/G04 (0.18s)
+    --- PASS: TestCensusMutantsAfterSimulatedRawRepin/G05 (0.20s)
+    --- PASS: TestCensusMutantsAfterSimulatedRawRepin/G06 (0.21s)
+    --- PASS: TestCensusMutantsAfterSimulatedRawRepin/G07 (0.01s)
+    --- PASS: TestCensusMutantsAfterSimulatedRawRepin/G08 (0.19s)
+    --- PASS: TestCensusMutantsAfterSimulatedRawRepin/R01 (0.45s)
+    --- PASS: TestCensusMutantsAfterSimulatedRawRepin/R02 (0.46s)
+    --- PASS: TestCensusMutantsAfterSimulatedRawRepin/R03 (0.39s)
+    --- PASS: TestCensusMutantsAfterSimulatedRawRepin/cross-file-generic (0.33s)
+PASS
+ok  	github.com/egparadise/SaintVision-Invion/services/node-agent/internal/migrationcontext	10.697s

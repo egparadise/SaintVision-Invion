@@ -1,0 +1,17 @@
+{
+  "classification": "PRESERVED_AUTHORING_FAILURES",
+  "entries": [
+    {
+      "command": "R1-R3 initial focused go test",
+      "exit": 1,
+      "reason": "Exact pure allowlist initially omitted existing transitively used net/url.URL.String; actual pure control failed. Mutant pass labels from that initial attempt are NOT used as conclusive negatives.",
+      "fix": "Added ONLY the existing pure URL.String object and required baseline control before mutants."
+    },
+    {
+      "command": "R1-R3 second focused go test",
+      "exit": 1,
+      "reason": "Additional foreign-global write guard mistakenly treated writes to local constructed K1 DTO fields as package-global writes.",
+      "fix": "Distinguish types.Info.Selections field selectors from package-qualified globals; actual pure control and mutants then passed."
+    }
+  ]
+}

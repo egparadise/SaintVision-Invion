@@ -1,0 +1,40 @@
+=== RUN   TestResolvedObjectEffectBoundary
+    effect_gate_test.go:228: foreign state write forbidden
+--- FAIL: TestResolvedObjectEffectBoundary (0.89s)
+=== RUN   TestReviewR1CompileValidEffectAndAliasMutants
+    effect_gate_test.go:251: actual pure control must pass before mutants foreign state write forbidden
+--- FAIL: TestReviewR1CompileValidEffectAndAliasMutants (0.01s)
+=== RUN   TestReviewR2DistinctMemberBindings
+=== RUN   TestReviewR2DistinctMemberBindings/duplicate-scope-and-DER
+=== RUN   TestReviewR2DistinctMemberBindings/duplicate-canonical-scope
+=== RUN   TestReviewR2DistinctMemberBindings/duplicate-leaf-DER
+=== RUN   TestReviewR2DistinctMemberBindings/distinct-scope-DER-same-SPKI
+--- PASS: TestReviewR2DistinctMemberBindings (0.01s)
+    --- PASS: TestReviewR2DistinctMemberBindings/duplicate-scope-and-DER (0.00s)
+    --- PASS: TestReviewR2DistinctMemberBindings/duplicate-canonical-scope (0.00s)
+    --- PASS: TestReviewR2DistinctMemberBindings/duplicate-leaf-DER (0.00s)
+    --- PASS: TestReviewR2DistinctMemberBindings/distinct-scope-DER-same-SPKI (0.00s)
+=== RUN   TestReviewR3EveryOriginalOperationAndLease
+=== RUN   TestReviewR3EveryOriginalOperationAndLease/three-way-current-original-kept
+=== RUN   TestReviewR3EveryOriginalOperationAndLease/extra-operation-reuses-original-HELD
+=== RUN   TestReviewR3EveryOriginalOperationAndLease/extra-key-ID-mismatch
+=== RUN   TestReviewR3EveryOriginalOperationAndLease/extra-missing-migration
+=== RUN   TestReviewR3EveryOriginalOperationAndLease/extra-zero-fence
+=== RUN   TestReviewR3EveryOriginalOperationAndLease/extra-bad-hash
+=== RUN   TestReviewR3EveryOriginalOperationAndLease/extra-non-UTC
+=== RUN   TestReviewR3EveryOriginalOperationAndLease/extra-reversed-interval
+--- PASS: TestReviewR3EveryOriginalOperationAndLease (0.05s)
+    --- PASS: TestReviewR3EveryOriginalOperationAndLease/three-way-current-original-kept (0.00s)
+    --- PASS: TestReviewR3EveryOriginalOperationAndLease/extra-operation-reuses-original-HELD (0.00s)
+    --- PASS: TestReviewR3EveryOriginalOperationAndLease/extra-key-ID-mismatch (0.00s)
+    --- PASS: TestReviewR3EveryOriginalOperationAndLease/extra-missing-migration (0.00s)
+    --- PASS: TestReviewR3EveryOriginalOperationAndLease/extra-zero-fence (0.00s)
+    --- PASS: TestReviewR3EveryOriginalOperationAndLease/extra-bad-hash (0.00s)
+    --- PASS: TestReviewR3EveryOriginalOperationAndLease/extra-non-UTC (0.01s)
+    --- PASS: TestReviewR3EveryOriginalOperationAndLease/extra-reversed-interval (0.00s)
+=== RUN   TestRepositoryBoundaryAndZeroEffects
+    source_gate_test.go:379: foreign state write forbidden
+--- FAIL: TestRepositoryBoundaryAndZeroEffects (0.01s)
+FAIL
+FAIL	github.com/egparadise/SaintVision-Invion/services/node-agent/internal/migrationcontext	2.496s
+FAIL

@@ -166,6 +166,13 @@ func checkOriginalHistory(p policyData, h historyData) error {
 	if !ok || facts["migrationOperationId"] != q.OriginalOperationID {
 		return refuse(OriginalOperationMismatch)
 	}
+	leases := map[string]bool{}
+	for id, op := range h.Operations {
+		if id == "" || id != op.OperationID || op.MigrationID == "" || op.FenceEpoch < 1 || !validHash(op.LeaseEnvelopeSHA256, 32) || !utc(op.AcquiredAt) || !utc(op.ExpiresAt) || !op.AcquiredAt.Before(op.ExpiresAt) || leases[op.LeaseEnvelopeSHA256] {
+			return refuse(OriginalOperationMismatch)
+		}
+		leases[op.LeaseEnvelopeSHA256] = true
+	}
 	op, ok := h.Operations[q.OriginalOperationID]
 	if !ok || q.OriginalOperationID == "" || q.OriginalMigrationID == "" || op.OperationID != q.OriginalOperationID || op.MigrationID != q.OriginalMigrationID || op.FenceEpoch != q.FenceEpoch || op.FenceEpoch < 1 || op.LeaseEnvelopeSHA256 != q.OriginalLeaseSHA256 || !validHash(q.OriginalLeaseSHA256, 32) || hashBytes(h.OriginalLease) != q.OriginalLeaseSHA256 || !utc(op.AcquiredAt) || !utc(op.ExpiresAt) || !op.AcquiredAt.Before(op.ExpiresAt) {
 		return refuse(OriginalOperationMismatch)

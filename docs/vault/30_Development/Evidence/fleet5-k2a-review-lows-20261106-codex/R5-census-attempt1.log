@@ -1,0 +1,5 @@
+=== RUN   TestWholePackageFullUnderlyingCensus
+    source_gate_test.go:453: actual full package: 12 files, input types=13 fields=73 embedded=0 canonicalSHA256=7eee6ccb07b55399adecdd1dc3bb704aeaebc655d5f3739f29a8e5a7aaa4bfdc; same-toolchain immutable baseline
+--- PASS: TestWholePackageFullUnderlyingCensus (2.86s)
+PASS
+ok  	github.com/egparadise/SaintVision-Invion/services/node-agent/internal/migrationcontext	4.357s
