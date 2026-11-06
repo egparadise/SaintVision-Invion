@@ -1,0 +1,1316 @@
+{
+ "reviewer": "Claude independent",
+ "target": "fleet5-b-rev9c-20261106-codex",
+ "frozenRootKeys": 6,
+ "cases": [
+  {
+   "case": "actual-72028-positive",
+   "observed": "ACCEPT",
+   "reason": null,
+   "expected": "ACCEPT",
+   "matchesExpectation": true,
+   "mode": "t1_provenance.provenance (graph + use sites)",
+   "astValid": true,
+   "newUnboundNames": [],
+   "witnessesChecked": 15,
+   "intentionalRootRewrites": [],
+   "mutatedSHA256": {},
+   "visibleProductionRoots": 6,
+   "discoveryError": null,
+   "discoveredProductionFiles": [
+    "services/control-plane/src/inv/app.py",
+    "services/control-plane/src/inv/workspace_config.py"
+   ],
+   "discoveredHarnessFiles": [],
+   "trackedForwarders": [
+    "inv.workspace_config.configured_workspace"
+   ],
+   "note": null
+  },
+  {
+   "case": "L1-aa3387-repro-state",
+   "observed": "REFUSE",
+   "reason": "UNRESOLVED:CONSTRUCTOR_ROOT_REMOVED_OR_HIDDEN",
+   "expected": "REFUSE:UNRESOLVED:CONSTRUCTOR_ROOT_REMOVED_OR_HIDDEN",
+   "matchesExpectation": true,
+   "mode": "t1_provenance.provenance (graph + use sites)",
+   "astValid": true,
+   "newUnboundNames": [],
+   "witnessesChecked": 14,
+   "intentionalRootRewrites": [
+    [
+     "tools/lan_pilot.py",
+     [
+      3945,
+      15,
+      3945,
+      82
+     ]
+    ]
+   ],
+   "mutatedSHA256": {
+    "tools/lan_pilot.py": "86cfd13a73bdeca681fe306405b16f9a9d262f27a65bbe7befa1f34d66921bab"
+   },
+   "visibleProductionRoots": 5,
+   "discoveryError": null,
+   "discoveredProductionFiles": [
+    "services/control-plane/src/inv/app.py",
+    "services/control-plane/src/inv/workspace_config.py"
+   ],
+   "discoveredHarnessFiles": [],
+   "trackedForwarders": [
+    "inv.workspace_config.configured_workspace"
+   ],
+   "note": null
+  },
+  {
+   "case": "L1-aa3387-repro-runtime-state",
+   "observed": "REFUSE",
+   "reason": "UNRESOLVED:CONSTRUCTOR_ROOT_REMOVED_OR_HIDDEN",
+   "expected": "REFUSE:UNRESOLVED:CONSTRUCTOR_ROOT_REMOVED_OR_HIDDEN",
+   "matchesExpectation": true,
+   "mode": "t1_provenance.provenance (graph + use sites)",
+   "astValid": true,
+   "newUnboundNames": [],
+   "witnessesChecked": 14,
+   "intentionalRootRewrites": [
+    [
+     "tools/lan_pilot.py",
+     [
+      3945,
+      15,
+      3945,
+      82
+     ]
+    ]
+   ],
+   "mutatedSHA256": {
+    "tools/lan_pilot.py": "1999f26005eea4b0bfc1d4f3990a43d1165165078c99cf8958eefc136ef120e0"
+   },
+   "visibleProductionRoots": 5,
+   "discoveryError": null,
+   "discoveredProductionFiles": [
+    "services/control-plane/src/inv/app.py",
+    "services/control-plane/src/inv/workspace_config.py"
+   ],
+   "discoveredHarnessFiles": [],
+   "trackedForwarders": [
+    "inv.workspace_config.configured_workspace"
+   ],
+   "note": null
+  },
+  {
+   "case": "L1-root-argument-changed",
+   "observed": "REFUSE",
+   "reason": "UNRESOLVED:CONSTRUCTOR_ROOT_REMOVED_OR_HIDDEN",
+   "expected": "REFUSE:UNRESOLVED:CONSTRUCTOR_ROOT_REMOVED_OR_HIDDEN",
+   "matchesExpectation": true,
+   "mode": "t1_provenance.provenance (graph + use sites)",
+   "astValid": true,
+   "newUnboundNames": [],
+   "witnessesChecked": 14,
+   "intentionalRootRewrites": [
+    [
+     "tools/lan_pilot.py",
+     [
+      3945,
+      15,
+      3945,
+      82
+     ]
+    ]
+   ],
+   "mutatedSHA256": {
+    "tools/lan_pilot.py": "64d07a62f1a9a1c16d8fd5ebaa1c98068357439923d03c300ee0184c4e841350"
+   },
+   "visibleProductionRoots": 6,
+   "discoveryError": null,
+   "discoveredProductionFiles": [
+    "services/control-plane/src/inv/app.py",
+    "services/control-plane/src/inv/workspace_config.py"
+   ],
+   "discoveredHarnessFiles": [],
+   "trackedForwarders": [
+    "inv.workspace_config.configured_workspace"
+   ],
+   "note": null
+  },
+  {
+   "case": "L1-root-moved-to-helper",
+   "observed": "REFUSE",
+   "reason": "UNRESOLVED:CONSTRUCTOR_ROOT_REMOVED_OR_HIDDEN",
+   "expected": "REFUSE:UNRESOLVED:CONSTRUCTOR_ROOT_REMOVED_OR_HIDDEN",
+   "matchesExpectation": true,
+   "mode": "t1_provenance.provenance (graph + use sites)",
+   "astValid": true,
+   "newUnboundNames": [],
+   "witnessesChecked": 14,
+   "intentionalRootRewrites": [
+    [
+     "tools/lan_pilot.py",
+     [
+      3945,
+      15,
+      3945,
+      82
+     ]
+    ]
+   ],
+   "mutatedSHA256": {
+    "tools/lan_pilot.py": "6ff7e745064a7fcb14e5b5f03a46d13fb52c51068e4f7e684519500129d40564"
+   },
+   "visibleProductionRoots": 6,
+   "discoveryError": null,
+   "discoveredProductionFiles": [
+    "services/control-plane/src/inv/app.py",
+    "services/control-plane/src/inv/workspace_config.py"
+   ],
+   "discoveredHarnessFiles": [],
+   "trackedForwarders": [
+    "inv.workspace_config.configured_workspace"
+   ],
+   "note": null
+  },
+  {
+   "case": "L1-six-plus-hidden-importlib-attr",
+   "observed": "REFUSE",
+   "reason": "RECEIVER_UNION_UNPROVEN:CONSTRUCTOR_BINDING",
+   "expected": "REFUSE",
+   "matchesExpectation": true,
+   "mode": "t1_provenance.provenance (graph + use sites)",
+   "astValid": true,
+   "newUnboundNames": [],
+   "witnessesChecked": 15,
+   "intentionalRootRewrites": [],
+   "mutatedSHA256": {
+    "tools/lan_pilot.py": "8e205bf0ddfcb7e7e91b75f75d890428dcdd6eb46200aa8e023208951a41189f"
+   },
+   "visibleProductionRoots": 7,
+   "discoveryError": null,
+   "discoveredProductionFiles": [
+    "services/control-plane/src/inv/app.py",
+    "services/control-plane/src/inv/workspace_config.py"
+   ],
+   "discoveredHarnessFiles": [],
+   "trackedForwarders": [
+    "inv.workspace_config.configured_workspace"
+   ],
+   "note": null
+  },
+  {
+   "case": "L1-six-plus-hidden-operator-module-alias",
+   "observed": "REFUSE",
+   "reason": "UNRESOLVED:RELEVANT_REFLECTION_USE_NOT_ALLOWLISTED:REFLECTION_NAMESPACE:sys.modules",
+   "expected": "REFUSE",
+   "matchesExpectation": true,
+   "mode": "t1_provenance.provenance (graph + use sites)",
+   "astValid": true,
+   "newUnboundNames": [],
+   "witnessesChecked": 15,
+   "intentionalRootRewrites": [],
+   "mutatedSHA256": {
+    "tools/lan_pilot.py": "7c80552b2cf5c3930f2fc2d56787fca07d1ba0151fe447da01abe5898b043845"
+   },
+   "visibleProductionRoots": 6,
+   "discoveryError": null,
+   "discoveredProductionFiles": [
+    "services/control-plane/src/inv/app.py",
+    "services/control-plane/src/inv/workspace_config.py"
+   ],
+   "discoveredHarnessFiles": [],
+   "trackedForwarders": [
+    "inv.workspace_config.configured_workspace"
+   ],
+   "note": null
+  },
+  {
+   "case": "L1-six-plus-hidden-sys-modules-get",
+   "observed": "REFUSE",
+   "reason": "RECEIVER_UNION_UNPROVEN:CONSTRUCTOR_BINDING",
+   "expected": "REFUSE",
+   "matchesExpectation": true,
+   "mode": "t1_provenance.provenance (graph + use sites)",
+   "astValid": true,
+   "newUnboundNames": [],
+   "witnessesChecked": 15,
+   "intentionalRootRewrites": [],
+   "mutatedSHA256": {
+    "tools/lan_pilot.py": "2f377611dd9567e2b6a9bfa25e20077f9981b21123f9ce92ec09c44df5a2c854"
+   },
+   "visibleProductionRoots": 7,
+   "discoveryError": null,
+   "discoveredProductionFiles": [
+    "services/control-plane/src/inv/app.py",
+    "services/control-plane/src/inv/workspace_config.py"
+   ],
+   "discoveredHarnessFiles": [],
+   "trackedForwarders": [
+    "inv.workspace_config.configured_workspace"
+   ],
+   "note": null
+  },
+  {
+   "case": "L1-six-plus-hidden-methodcaller-transaction",
+   "observed": "REFUSE",
+   "reason": "UNRESOLVED:RELEVANT_REFLECTION_USE_NOT_ALLOWLISTED:REFLECTION_NAMESPACE:operator.methodcaller",
+   "expected": "REFUSE",
+   "matchesExpectation": true,
+   "mode": "t1_provenance.provenance (graph + use sites)",
+   "astValid": true,
+   "newUnboundNames": [],
+   "witnessesChecked": 15,
+   "intentionalRootRewrites": [],
+   "mutatedSHA256": {
+    "tools/lan_pilot.py": "dbfa8907cb0e9aaac04bc25df0b13f26c869a2c3e9c9139a63c5f735359a19d3"
+   },
+   "visibleProductionRoots": 6,
+   "discoveryError": null,
+   "discoveredProductionFiles": [
+    "services/control-plane/src/inv/app.py",
+    "services/control-plane/src/inv/workspace_config.py"
+   ],
+   "discoveredHarnessFiles": [],
+   "trackedForwarders": [
+    "inv.workspace_config.configured_workspace"
+   ],
+   "note": null
+  },
+  {
+   "case": "L1-six-plus-hidden-from-operator-alias",
+   "observed": "REFUSE",
+   "reason": "UNRESOLVED:RELEVANT_REFLECTION_USE_NOT_ALLOWLISTED:REFLECTION_NAMESPACE:sys.modules",
+   "expected": "REFUSE",
+   "matchesExpectation": true,
+   "mode": "t1_provenance.provenance (graph + use sites)",
+   "astValid": true,
+   "newUnboundNames": [],
+   "witnessesChecked": 15,
+   "intentionalRootRewrites": [],
+   "mutatedSHA256": {
+    "tools/lan_pilot.py": "98e943ec1002d2a9087dc261c5935ac3b8316750e78fd745e885e0e45867bc50"
+   },
+   "visibleProductionRoots": 6,
+   "discoveryError": null,
+   "discoveredProductionFiles": [
+    "services/control-plane/src/inv/app.py",
+    "services/control-plane/src/inv/workspace_config.py"
+   ],
+   "discoveredHarnessFiles": [],
+   "trackedForwarders": [
+    "inv.workspace_config.configured_workspace"
+   ],
+   "note": null
+  },
+  {
+   "case": "L1-six-plus-hidden-from-sys-modules-alias",
+   "observed": "REFUSE",
+   "reason": "RECEIVER_UNION_UNPROVEN:CONSTRUCTOR_BINDING",
+   "expected": "REFUSE",
+   "matchesExpectation": true,
+   "mode": "t1_provenance.provenance (graph + use sites)",
+   "astValid": true,
+   "newUnboundNames": [],
+   "witnessesChecked": 15,
+   "intentionalRootRewrites": [],
+   "mutatedSHA256": {
+    "tools/lan_pilot.py": "d0f135acd7bdc549c31e1f080d2785cf3163c20c55e87044838db6996d5265ce"
+   },
+   "visibleProductionRoots": 7,
+   "discoveryError": null,
+   "discoveredProductionFiles": [
+    "services/control-plane/src/inv/app.py",
+    "services/control-plane/src/inv/workspace_config.py"
+   ],
+   "discoveredHarnessFiles": [],
+   "trackedForwarders": [
+    "inv.workspace_config.configured_workspace"
+   ],
+   "note": null
+  },
+  {
+   "case": "L1-six-plus-hidden-from-inspect-alias",
+   "observed": "REFUSE",
+   "reason": "UNRESOLVED:RELEVANT_REFLECTION_USE_NOT_ALLOWLISTED:REFLECTION_NAMESPACE:inspect.getattr_static",
+   "expected": "REFUSE",
+   "matchesExpectation": true,
+   "mode": "t1_provenance.provenance (graph + use sites)",
+   "astValid": true,
+   "newUnboundNames": [],
+   "witnessesChecked": 15,
+   "intentionalRootRewrites": [],
+   "mutatedSHA256": {
+    "tools/lan_pilot.py": "750a27a672d2265dda370c4f7c15a5501c94163910620a3e564a6b67024a4241"
+   },
+   "visibleProductionRoots": 6,
+   "discoveryError": null,
+   "discoveredProductionFiles": [
+    "services/control-plane/src/inv/app.py",
+    "services/control-plane/src/inv/workspace_config.py"
+   ],
+   "discoveredHarnessFiles": [],
+   "trackedForwarders": [
+    "inv.workspace_config.configured_workspace"
+   ],
+   "note": null
+  },
+  {
+   "case": "L1-bound-pkgutil-resolve-name",
+   "observed": "ACCEPT",
+   "reason": null,
+   "expected": null,
+   "matchesExpectation": true,
+   "mode": "t1_provenance.provenance (graph + use sites)",
+   "astValid": true,
+   "newUnboundNames": [],
+   "witnessesChecked": 15,
+   "intentionalRootRewrites": [],
+   "mutatedSHA256": {
+    "tools/lan_pilot.py": "3bf7e66ea3ea4f221789eff6dc013319074885ee950f0b441ed43d8b501b0d80"
+   },
+   "visibleProductionRoots": 6,
+   "discoveryError": null,
+   "discoveredProductionFiles": [
+    "services/control-plane/src/inv/app.py",
+    "services/control-plane/src/inv/workspace_config.py"
+   ],
+   "discoveredHarnessFiles": [],
+   "trackedForwarders": [
+    "inv.workspace_config.configured_workspace"
+   ],
+   "note": "pkgutil is outside the enumerated sys/importlib/operator/inspect surfaces; recorded as a declared-bound observation"
+  },
+  {
+   "case": "L1-outside-file-hidden-root-operator-sys",
+   "observed": "ACCEPT",
+   "reason": null,
+   "expected": "REFUSE",
+   "matchesExpectation": false,
+   "mode": "t1_provenance.provenance (graph + use sites)",
+   "astValid": true,
+   "newUnboundNames": [],
+   "witnessesChecked": 15,
+   "intentionalRootRewrites": [],
+   "mutatedSHA256": {
+    "services/control-plane/src/inv/business_auth.py": "b6fdaa11768967a0f75bba0d7fcc9ae387d0b23614c97cf69ac886f1e5362989"
+   },
+   "visibleProductionRoots": 6,
+   "discoveryError": null,
+   "discoveredProductionFiles": [
+    "services/control-plane/src/inv/app.py",
+    "services/control-plane/src/inv/workspace_config.py"
+   ],
+   "discoveredHarnessFiles": [],
+   "trackedForwarders": [
+    "inv.workspace_config.configured_workspace"
+   ],
+   "note": "six genuine roots retained; extra reflective root in production file business_auth.py outside the 12 proof inputs"
+  },
+  {
+   "case": "L1-outside-file-hidden-root-importlib",
+   "observed": "REFUSE",
+   "reason": "UNCATALOGUED_PRODUCTION_SOURCE:services/control-plane/src/inv/business_auth.py",
+   "expected": "REFUSE",
+   "matchesExpectation": true,
+   "mode": "t1_provenance.provenance (graph + use sites)",
+   "astValid": true,
+   "newUnboundNames": [],
+   "witnessesChecked": 15,
+   "intentionalRootRewrites": [],
+   "mutatedSHA256": {
+    "services/control-plane/src/inv/business_auth.py": "5b10a4e2fc6e69eb9d550e7f3a2eb424ab952c749e935484a3b47c441fac27bd"
+   },
+   "visibleProductionRoots": 7,
+   "discoveryError": null,
+   "discoveredProductionFiles": [
+    "services/control-plane/src/inv/app.py",
+    "services/control-plane/src/inv/workspace_config.py"
+   ],
+   "discoveredHarnessFiles": [],
+   "trackedForwarders": [
+    "inv.workspace_config.configured_workspace"
+   ],
+   "note": "six genuine roots retained; extra reflective root in production file business_auth.py outside the 12 proof inputs"
+  },
+  {
+   "case": "L1-control-unused-imports-and-log-string",
+   "observed": "ACCEPT",
+   "reason": null,
+   "expected": "ACCEPT",
+   "matchesExpectation": true,
+   "mode": "t1_provenance.provenance (graph + use sites)",
+   "astValid": true,
+   "newUnboundNames": [],
+   "witnessesChecked": 15,
+   "intentionalRootRewrites": [],
+   "mutatedSHA256": {
+    "tools/lan_pilot.py": "e080783d73d932559db81807bb25c3358b7e8395bbc9ce592208dd48529936cc"
+   },
+   "visibleProductionRoots": 6,
+   "discoveryError": null,
+   "discoveredProductionFiles": [
+    "services/control-plane/src/inv/app.py",
+    "services/control-plane/src/inv/workspace_config.py"
+   ],
+   "discoveredHarnessFiles": [],
+   "trackedForwarders": [
+    "inv.workspace_config.configured_workspace"
+   ],
+   "note": null
+  },
+  {
+   "case": "L1-control-class-alias-root",
+   "observed": "ACCEPT",
+   "reason": null,
+   "expected": "ACCEPT",
+   "matchesExpectation": true,
+   "mode": "t1_provenance.provenance (graph + use sites)",
+   "astValid": true,
+   "newUnboundNames": [],
+   "witnessesChecked": 14,
+   "intentionalRootRewrites": [
+    [
+     "tools/lan_pilot.py",
+     [
+      3945,
+      15,
+      3945,
+      82
+     ]
+    ]
+   ],
+   "mutatedSHA256": {
+    "tools/lan_pilot.py": "c6a276c8346d39b6266f2a78aa7ebba25d651c3ca1455e6fb341c5669eb0d6e1"
+   },
+   "visibleProductionRoots": 6,
+   "discoveryError": null,
+   "discoveredProductionFiles": [
+    "services/control-plane/src/inv/app.py",
+    "services/control-plane/src/inv/workspace_config.py"
+   ],
+   "discoveredHarnessFiles": [],
+   "trackedForwarders": [
+    "inv.workspace_config.configured_workspace"
+   ],
+   "note": null
+  },
+  {
+   "case": "L1-control-from-package-module-alias-root",
+   "observed": "ACCEPT",
+   "reason": null,
+   "expected": "ACCEPT",
+   "matchesExpectation": true,
+   "mode": "t1_provenance.provenance (graph + use sites)",
+   "astValid": true,
+   "newUnboundNames": [],
+   "witnessesChecked": 14,
+   "intentionalRootRewrites": [
+    [
+     "tools/lan_pilot.py",
+     [
+      3945,
+      15,
+      3945,
+      82
+     ]
+    ]
+   ],
+   "mutatedSHA256": {
+    "tools/lan_pilot.py": "5a4eedbfc982eebb94ad279068b5874f743cfa8d0b58b18305e9d1c5600ef521"
+   },
+   "visibleProductionRoots": 6,
+   "discoveryError": null,
+   "discoveredProductionFiles": [
+    "services/control-plane/src/inv/app.py",
+    "services/control-plane/src/inv/workspace_config.py"
+   ],
+   "discoveredHarnessFiles": [],
+   "trackedForwarders": [
+    "inv.workspace_config.configured_workspace"
+   ],
+   "note": null
+  },
+  {
+   "case": "L2-aa3387-repro-business-handoff-alias",
+   "observed": "REFUSE",
+   "reason": "UNCATALOGUED_PRODUCTION_SOURCE:services/control-plane/src/inv/business_handoff.py",
+   "expected": "REFUSE:UNCATALOGUED_PRODUCTION_SOURCE:",
+   "matchesExpectation": true,
+   "mode": "t1_provenance.provenance (graph + use sites)",
+   "astValid": true,
+   "newUnboundNames": [],
+   "witnessesChecked": 15,
+   "intentionalRootRewrites": [],
+   "mutatedSHA256": {
+    "services/control-plane/src/inv/business_handoff.py": "e4269bbc7e567decdf3280be83426ea26f9e87bac552074c52cabf7542868fbc"
+   },
+   "visibleProductionRoots": 6,
+   "discoveryError": null,
+   "discoveredProductionFiles": [
+    "services/control-plane/src/inv/app.py",
+    "services/control-plane/src/inv/business_handoff.py",
+    "services/control-plane/src/inv/workspace_config.py"
+   ],
+   "discoveredHarnessFiles": [],
+   "trackedForwarders": [
+    "inv.workspace_config.configured_workspace"
+   ],
+   "note": null
+  },
+  {
+   "case": "L2-three-hop-fixed-point",
+   "observed": "REFUSE",
+   "reason": "UNCATALOGUED_PRODUCTION_SOURCE:services/control-plane/src/inv/business_auth.py,services/control-plane/src/inv/business_handoff.py,services/control-plane/src/inv/business_surface.py",
+   "expected": "REFUSE:UNCATALOGUED_PRODUCTION_SOURCE:",
+   "matchesExpectation": true,
+   "mode": "t1_provenance.provenance (graph + use sites)",
+   "astValid": true,
+   "newUnboundNames": [],
+   "witnessesChecked": 15,
+   "intentionalRootRewrites": [],
+   "mutatedSHA256": {
+    "services/control-plane/src/inv/business_auth.py": "57df2d7a36b44c40b6a3a7eaf35aac3a6bc13109024bb9a79fe081176d74cf1f",
+    "services/control-plane/src/inv/business_handoff.py": "309cd921e6a15f2ca0bf3fa884b70877576556dbdfd9e24ca738e19973513c22",
+    "services/control-plane/src/inv/business_surface.py": "bef786c9b28a91e5222ece589c270abf9df566e3a11f53ef01baa49d9f107a28"
+   },
+   "visibleProductionRoots": 6,
+   "discoveryError": null,
+   "discoveredProductionFiles": [
+    "services/control-plane/src/inv/app.py",
+    "services/control-plane/src/inv/business_auth.py",
+    "services/control-plane/src/inv/business_handoff.py",
+    "services/control-plane/src/inv/business_surface.py",
+    "services/control-plane/src/inv/workspace_config.py"
+   ],
+   "discoveredHarnessFiles": [],
+   "trackedForwarders": [
+    "inv.business_handoff._claude_f1",
+    "inv.business_surface._claude_f2",
+    "inv.workspace_config.configured_workspace"
+   ],
+   "note": null
+  },
+  {
+   "case": "L2-keyword-only-call-outside",
+   "observed": "REFUSE",
+   "reason": "UNCATALOGUED_PRODUCTION_SOURCE:services/control-plane/src/inv/business_handoff.py",
+   "expected": "REFUSE:UNCATALOGUED_PRODUCTION_SOURCE:",
+   "matchesExpectation": true,
+   "mode": "t1_provenance.provenance (graph + use sites)",
+   "astValid": true,
+   "newUnboundNames": [],
+   "witnessesChecked": 15,
+   "intentionalRootRewrites": [],
+   "mutatedSHA256": {
+    "services/control-plane/src/inv/business_handoff.py": "a6a9e950aa69ff0400fcdca6be6b46af29e0d7bdd8630ff5ba99670b741f3ac2"
+   },
+   "visibleProductionRoots": 6,
+   "discoveryError": null,
+   "discoveredProductionFiles": [
+    "services/control-plane/src/inv/app.py",
+    "services/control-plane/src/inv/business_handoff.py",
+    "services/control-plane/src/inv/workspace_config.py"
+   ],
+   "discoveredHarnessFiles": [],
+   "trackedForwarders": [
+    "inv.workspace_config.configured_workspace"
+   ],
+   "note": null
+  },
+  {
+   "case": "L2-keyword-forwarder-higher-hop-inventory",
+   "observed": "REFUSE",
+   "reason": "UNCATALOGUED_PRODUCTION_SOURCE:services/control-plane/src/inv/business_handoff.py",
+   "expected": "REFUSE:UNCATALOGUED_PRODUCTION_SOURCE:",
+   "matchesExpectation": true,
+   "mode": "t1_provenance.provenance (graph + use sites)",
+   "astValid": true,
+   "newUnboundNames": [],
+   "witnessesChecked": 15,
+   "intentionalRootRewrites": [],
+   "mutatedSHA256": {
+    "services/control-plane/src/inv/business_auth.py": "5c2e7e8f865d7efe2e16c084207cf71063c16d0f592415e4e9af3f0aef082f45",
+    "services/control-plane/src/inv/business_handoff.py": "55841f6d0332a46430b07b5aea76ac1d104ae6cfc3e26c1b197fc1c18a8fe2f8"
+   },
+   "visibleProductionRoots": 6,
+   "discoveryError": null,
+   "discoveredProductionFiles": [
+    "services/control-plane/src/inv/app.py",
+    "services/control-plane/src/inv/business_handoff.py",
+    "services/control-plane/src/inv/workspace_config.py"
+   ],
+   "discoveredHarnessFiles": [],
+   "trackedForwarders": [
+    "inv.workspace_config.configured_workspace"
+   ],
+   "note": "fails closed on BH; records whether the higher hop BA is inventoried",
+   "higherHopInventoried": false
+  },
+  {
+   "case": "L2-outside-reflective-forwarder-call-importlib",
+   "observed": "ACCEPT",
+   "reason": null,
+   "expected": "REFUSE",
+   "matchesExpectation": false,
+   "mode": "t1_provenance.provenance (graph + use sites)",
+   "astValid": true,
+   "newUnboundNames": [],
+   "witnessesChecked": 15,
+   "intentionalRootRewrites": [],
+   "mutatedSHA256": {
+    "services/control-plane/src/inv/business_auth.py": "1ecf935a31aa3c9fd81b1471aece3815250956839ed785e92a9bba1e298ad86a"
+   },
+   "visibleProductionRoots": 6,
+   "discoveryError": null,
+   "discoveredProductionFiles": [
+    "services/control-plane/src/inv/app.py",
+    "services/control-plane/src/inv/workspace_config.py"
+   ],
+   "discoveredHarnessFiles": [],
+   "trackedForwarders": [
+    "inv.workspace_config.configured_workspace"
+   ],
+   "note": "grep token workspace_config hits the file; the reflective call is parsed but not resolved"
+  },
+  {
+   "case": "L2-outside-reflective-forwarder-call-sys-modules",
+   "observed": "ACCEPT",
+   "reason": null,
+   "expected": "REFUSE",
+   "matchesExpectation": false,
+   "mode": "t1_provenance.provenance (graph + use sites)",
+   "astValid": true,
+   "newUnboundNames": [],
+   "witnessesChecked": 15,
+   "intentionalRootRewrites": [],
+   "mutatedSHA256": {
+    "services/control-plane/src/inv/business_auth.py": "337dad7b14b9a7e5770b26699beb00e02d3b60ad46df5a8c2466619232dfe5f6"
+   },
+   "visibleProductionRoots": 6,
+   "discoveryError": null,
+   "discoveredProductionFiles": [
+    "services/control-plane/src/inv/app.py",
+    "services/control-plane/src/inv/workspace_config.py"
+   ],
+   "discoveredHarnessFiles": [],
+   "trackedForwarders": [
+    "inv.workspace_config.configured_workspace"
+   ],
+   "note": "grep token workspace_config hits the file; the reflective call is parsed but not resolved"
+  },
+  {
+   "case": "L2-control-module-import-getattr",
+   "observed": "REFUSE",
+   "reason": "UNCATALOGUED_PRODUCTION_SOURCE:services/control-plane/src/inv/business_auth.py",
+   "expected": "REFUSE:UNCATALOGUED_PRODUCTION_SOURCE:",
+   "matchesExpectation": true,
+   "mode": "t1_provenance.provenance (graph + use sites)",
+   "astValid": true,
+   "newUnboundNames": [],
+   "witnessesChecked": 15,
+   "intentionalRootRewrites": [],
+   "mutatedSHA256": {
+    "services/control-plane/src/inv/business_auth.py": "ad044caefcccc65d0a93a16c852db2c1e68138ccb206d705ee9f9b0e716eab1b"
+   },
+   "visibleProductionRoots": 6,
+   "discoveryError": null,
+   "discoveredProductionFiles": [
+    "services/control-plane/src/inv/app.py",
+    "services/control-plane/src/inv/business_auth.py",
+    "services/control-plane/src/inv/workspace_config.py"
+   ],
+   "discoveredHarnessFiles": [],
+   "trackedForwarders": [
+    "inv.workspace_config.configured_workspace"
+   ],
+   "note": null
+  },
+  {
+   "case": "L2-control-function-scope-import-call",
+   "observed": "REFUSE",
+   "reason": "UNCATALOGUED_PRODUCTION_SOURCE:services/control-plane/src/inv/business_auth.py",
+   "expected": "REFUSE:UNCATALOGUED_PRODUCTION_SOURCE:",
+   "matchesExpectation": true,
+   "mode": "t1_provenance.provenance (graph + use sites)",
+   "astValid": true,
+   "newUnboundNames": [],
+   "witnessesChecked": 15,
+   "intentionalRootRewrites": [],
+   "mutatedSHA256": {
+    "services/control-plane/src/inv/business_auth.py": "5b380dd954600af772ba79d69a877c88e99fdae2b1ff7c6034138cdec22f3ffe"
+   },
+   "visibleProductionRoots": 6,
+   "discoveryError": null,
+   "discoveredProductionFiles": [
+    "services/control-plane/src/inv/app.py",
+    "services/control-plane/src/inv/business_auth.py",
+    "services/control-plane/src/inv/workspace_config.py"
+   ],
+   "discoveredHarnessFiles": [],
+   "trackedForwarders": [
+    "inv.workspace_config.configured_workspace"
+   ],
+   "note": null
+  },
+  {
+   "case": "L2-control-benign-local-database-helper",
+   "observed": "ACCEPT",
+   "reason": null,
+   "expected": "ACCEPT",
+   "matchesExpectation": true,
+   "mode": "t1_provenance.provenance (graph + use sites)",
+   "astValid": true,
+   "newUnboundNames": [],
+   "witnessesChecked": 15,
+   "intentionalRootRewrites": [],
+   "mutatedSHA256": {
+    "services/control-plane/src/inv/business_auth.py": "85d17fdc376c1c463aa78cac207140eaaef46f0b93507b815db61641df5c49af"
+   },
+   "visibleProductionRoots": 6,
+   "discoveryError": null,
+   "discoveredProductionFiles": [
+    "services/control-plane/src/inv/app.py",
+    "services/control-plane/src/inv/workspace_config.py"
+   ],
+   "discoveredHarnessFiles": [],
+   "trackedForwarders": [
+    "inv.workspace_config.configured_workspace"
+   ],
+   "note": null
+  },
+  {
+   "case": "L2-control-harness-two-hop-separated",
+   "observed": "ACCEPT",
+   "reason": null,
+   "expected": "ACCEPT",
+   "matchesExpectation": true,
+   "mode": "t1_provenance.provenance (graph + use sites)",
+   "astValid": true,
+   "newUnboundNames": [],
+   "witnessesChecked": 15,
+   "intentionalRootRewrites": [],
+   "mutatedSHA256": {
+    "tests/integration/test_node_extensions.py": "967e4e153b9ec422b42230cd7b168e85c3bab49a176500cd50d2a0b6e64183db",
+    "tests/integration/test_workspace_api.py": "382c41067539a66ecdd62360b2bb35353e8df80726b86680c1e3561f3459a49e"
+   },
+   "visibleProductionRoots": 6,
+   "discoveryError": null,
+   "discoveredProductionFiles": [
+    "services/control-plane/src/inv/app.py",
+    "services/control-plane/src/inv/workspace_config.py"
+   ],
+   "discoveredHarnessFiles": [
+    "tests/integration/test_node_extensions.py"
+   ],
+   "trackedForwarders": [
+    "inv.workspace_config.configured_workspace"
+   ],
+   "note": null
+  },
+  {
+   "case": "L2-keyword-only-in-source-graph-only",
+   "observed": "ACCEPT",
+   "reason": null,
+   "expected": null,
+   "matchesExpectation": true,
+   "mode": "cg.prove graph only",
+   "astValid": true,
+   "newUnboundNames": [],
+   "witnessesChecked": 15,
+   "intentionalRootRewrites": [],
+   "mutatedSHA256": {
+    "services/control-plane/src/inv/app.py": "f9b37a4ac65963401540a5c85de60f14b977cad891cc6ee62790d1c9041f5023"
+   },
+   "visibleProductionRoots": 6,
+   "discoveryError": null,
+   "discoveredProductionFiles": [
+    "services/control-plane/src/inv/app.py",
+    "services/control-plane/src/inv/workspace_config.py"
+   ],
+   "discoveredHarnessFiles": [],
+   "trackedForwarders": [
+    "inv.workspace_config.configured_workspace"
+   ],
+   "note": "graph skips keyword-only tracked calls (not c.args)"
+  },
+  {
+   "case": "L2-keyword-only-in-source-full",
+   "observed": "REFUSE",
+   "reason": "DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:INSTANCE:_claude_extra",
+   "expected": "REFUSE:DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:",
+   "matchesExpectation": true,
+   "mode": "t1_provenance.provenance (graph + use sites)",
+   "astValid": true,
+   "newUnboundNames": [],
+   "witnessesChecked": 15,
+   "intentionalRootRewrites": [],
+   "mutatedSHA256": {
+    "services/control-plane/src/inv/app.py": "f9b37a4ac65963401540a5c85de60f14b977cad891cc6ee62790d1c9041f5023"
+   },
+   "visibleProductionRoots": 6,
+   "discoveryError": null,
+   "discoveredProductionFiles": [
+    "services/control-plane/src/inv/app.py",
+    "services/control-plane/src/inv/workspace_config.py"
+   ],
+   "discoveredHarnessFiles": [],
+   "trackedForwarders": [
+    "inv.workspace_config.configured_workspace"
+   ],
+   "note": null
+  },
+  {
+   "case": "L3-aa3387-repro-runtime-runtime",
+   "observed": "REFUSE",
+   "reason": "DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:INSTANCE:runtime",
+   "expected": "REFUSE:DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:",
+   "matchesExpectation": true,
+   "mode": "t1_provenance.provenance (graph + use sites)",
+   "astValid": true,
+   "newUnboundNames": [],
+   "witnessesChecked": 15,
+   "intentionalRootRewrites": [],
+   "mutatedSHA256": {
+    "services/control-plane/src/inv/workspace_config.py": "8d71c935714fb9c094412fb7080ef8166ec48169a78d68379706df4d003331ec"
+   },
+   "visibleProductionRoots": 6,
+   "discoveryError": null,
+   "discoveredProductionFiles": [
+    "services/control-plane/src/inv/app.py",
+    "services/control-plane/src/inv/workspace_config.py"
+   ],
+   "discoveredHarnessFiles": [],
+   "trackedForwarders": [
+    "inv.workspace_config.configured_workspace"
+   ],
+   "note": null
+  },
+  {
+   "case": "L3-aa3387-repro-runtime-runtime.db",
+   "observed": "REFUSE",
+   "reason": "DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:INSTANCE:runtime",
+   "expected": "REFUSE:DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:",
+   "matchesExpectation": true,
+   "mode": "t1_provenance.provenance (graph + use sites)",
+   "astValid": true,
+   "newUnboundNames": [],
+   "witnessesChecked": 15,
+   "intentionalRootRewrites": [],
+   "mutatedSHA256": {
+    "services/control-plane/src/inv/workspace_config.py": "5ebbf56bd8c018b1497f4603ada95799d0594a5915a416cc189060598f0e0364"
+   },
+   "visibleProductionRoots": 6,
+   "discoveryError": null,
+   "discoveredProductionFiles": [
+    "services/control-plane/src/inv/app.py",
+    "services/control-plane/src/inv/workspace_config.py"
+   ],
+   "discoveredHarnessFiles": [],
+   "trackedForwarders": [
+    "inv.workspace_config.configured_workspace"
+   ],
+   "note": null
+  },
+  {
+   "case": "L3-aa3387-repro-runtime-runtime.db.transaction",
+   "observed": "REFUSE",
+   "reason": "DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:INSTANCE:runtime",
+   "expected": "REFUSE:DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:",
+   "matchesExpectation": true,
+   "mode": "t1_provenance.provenance (graph + use sites)",
+   "astValid": true,
+   "newUnboundNames": [],
+   "witnessesChecked": 15,
+   "intentionalRootRewrites": [],
+   "mutatedSHA256": {
+    "services/control-plane/src/inv/workspace_config.py": "4310f832ad15e17ae095a6e89086b372575e5af095cc3a8d60e31ff2413695a7"
+   },
+   "visibleProductionRoots": 6,
+   "discoveryError": null,
+   "discoveredProductionFiles": [
+    "services/control-plane/src/inv/app.py",
+    "services/control-plane/src/inv/workspace_config.py"
+   ],
+   "discoveredHarnessFiles": [],
+   "trackedForwarders": [
+    "inv.workspace_config.configured_workspace"
+   ],
+   "note": null
+  },
+  {
+   "case": "L3-aa3387-repro-workspace-workspace",
+   "observed": "REFUSE",
+   "reason": "DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:INSTANCE:workspace",
+   "expected": "REFUSE:DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:",
+   "matchesExpectation": true,
+   "mode": "t1_provenance.provenance (graph + use sites)",
+   "astValid": true,
+   "newUnboundNames": [],
+   "witnessesChecked": 15,
+   "intentionalRootRewrites": [],
+   "mutatedSHA256": {
+    "services/control-plane/src/inv/app.py": "78fb47b07f99f3e274d516385e351b1226b12ad420792e6b1b3bd249726932e2"
+   },
+   "visibleProductionRoots": 6,
+   "discoveryError": null,
+   "discoveredProductionFiles": [
+    "services/control-plane/src/inv/app.py",
+    "services/control-plane/src/inv/workspace_config.py"
+   ],
+   "discoveredHarnessFiles": [],
+   "trackedForwarders": [
+    "inv.workspace_config.configured_workspace"
+   ],
+   "note": null
+  },
+  {
+   "case": "L3-aa3387-repro-workspace-workspace.runtime.db",
+   "observed": "REFUSE",
+   "reason": "DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:INSTANCE:workspace",
+   "expected": "REFUSE:DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:",
+   "matchesExpectation": true,
+   "mode": "t1_provenance.provenance (graph + use sites)",
+   "astValid": true,
+   "newUnboundNames": [],
+   "witnessesChecked": 15,
+   "intentionalRootRewrites": [],
+   "mutatedSHA256": {
+    "services/control-plane/src/inv/app.py": "db5978363ad71e62a51a50921bb68e0786cc999bfcca360a98c0e8b3e4145d99"
+   },
+   "visibleProductionRoots": 6,
+   "discoveryError": null,
+   "discoveredProductionFiles": [
+    "services/control-plane/src/inv/app.py",
+    "services/control-plane/src/inv/workspace_config.py"
+   ],
+   "discoveredHarnessFiles": [],
+   "trackedForwarders": [
+    "inv.workspace_config.configured_workspace"
+   ],
+   "note": null
+  },
+  {
+   "case": "L3-variant-tuple-unpack-items",
+   "observed": "REFUSE",
+   "reason": "DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:INSTANCE:_node_id",
+   "expected": "REFUSE:DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:",
+   "matchesExpectation": true,
+   "mode": "t1_provenance.provenance (graph + use sites)",
+   "astValid": true,
+   "newUnboundNames": [],
+   "witnessesChecked": 15,
+   "intentionalRootRewrites": [],
+   "mutatedSHA256": {
+    "services/control-plane/src/inv/workspace_config.py": "9337af63bd72bb5802b60d5eae6741993a992747e5c720769a5b5d108b69f899"
+   },
+   "visibleProductionRoots": 6,
+   "discoveryError": null,
+   "discoveredProductionFiles": [
+    "services/control-plane/src/inv/app.py",
+    "services/control-plane/src/inv/workspace_config.py"
+   ],
+   "discoveredHarnessFiles": [],
+   "trackedForwarders": [
+    "inv.workspace_config.configured_workspace"
+   ],
+   "note": null
+  },
+  {
+   "case": "L3-variant-walrus-filter",
+   "observed": "REFUSE",
+   "reason": "DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:INSTANCE:picked",
+   "expected": "REFUSE:DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:",
+   "matchesExpectation": true,
+   "mode": "t1_provenance.provenance (graph + use sites)",
+   "astValid": true,
+   "newUnboundNames": [],
+   "witnessesChecked": 15,
+   "intentionalRootRewrites": [],
+   "mutatedSHA256": {
+    "services/control-plane/src/inv/workspace_config.py": "94a74224e981af6d6746aa60b79d389384959ac3014dc64eab9667cfe7506450"
+   },
+   "visibleProductionRoots": 6,
+   "discoveryError": null,
+   "discoveredProductionFiles": [
+    "services/control-plane/src/inv/app.py",
+    "services/control-plane/src/inv/workspace_config.py"
+   ],
+   "discoveredHarnessFiles": [],
+   "trackedForwarders": [
+    "inv.workspace_config.configured_workspace"
+   ],
+   "note": null
+  },
+  {
+   "case": "L3-variant-dict-comprehension-value",
+   "observed": "REFUSE",
+   "reason": "DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:INSTANCE:mirror",
+   "expected": "REFUSE:DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:",
+   "matchesExpectation": true,
+   "mode": "t1_provenance.provenance (graph + use sites)",
+   "astValid": true,
+   "newUnboundNames": [],
+   "witnessesChecked": 15,
+   "intentionalRootRewrites": [],
+   "mutatedSHA256": {
+    "services/control-plane/src/inv/workspace_config.py": "696e99ddf8cc1c6c0dae79edf6e00aca282008543aa5d83967f921563ff752ac"
+   },
+   "visibleProductionRoots": 6,
+   "discoveryError": null,
+   "discoveredProductionFiles": [
+    "services/control-plane/src/inv/app.py",
+    "services/control-plane/src/inv/workspace_config.py"
+   ],
+   "discoveredHarnessFiles": [],
+   "trackedForwarders": [
+    "inv.workspace_config.configured_workspace"
+   ],
+   "note": null
+  },
+  {
+   "case": "L3-variant-container-append-then-loop",
+   "observed": "REFUSE",
+   "reason": "DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:INSTANCE:result",
+   "expected": "REFUSE:DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:",
+   "matchesExpectation": true,
+   "mode": "t1_provenance.provenance (graph + use sites)",
+   "astValid": true,
+   "newUnboundNames": [],
+   "witnessesChecked": 15,
+   "intentionalRootRewrites": [],
+   "mutatedSHA256": {
+    "services/control-plane/src/inv/workspace_config.py": "c6451b8b566eda4b9c6d193ccd97862eaf4fd1f6cc7eefd5cd7172cafbd4a7cb"
+   },
+   "visibleProductionRoots": 6,
+   "discoveryError": null,
+   "discoveredProductionFiles": [
+    "services/control-plane/src/inv/app.py",
+    "services/control-plane/src/inv/workspace_config.py"
+   ],
+   "discoveredHarnessFiles": [],
+   "trackedForwarders": [
+    "inv.workspace_config.configured_workspace"
+   ],
+   "note": null
+  },
+  {
+   "case": "L3-variant-lambda-closure",
+   "observed": "REFUSE",
+   "reason": "DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:INSTANCE:result",
+   "expected": "REFUSE:DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:",
+   "matchesExpectation": true,
+   "mode": "t1_provenance.provenance (graph + use sites)",
+   "astValid": true,
+   "newUnboundNames": [],
+   "witnessesChecked": 15,
+   "intentionalRootRewrites": [],
+   "mutatedSHA256": {
+    "services/control-plane/src/inv/workspace_config.py": "ccc3870a4c2d2e7ceb34dd45887d39171a95c8e5e007222fa70f94cfe7cf77ca"
+   },
+   "visibleProductionRoots": 6,
+   "discoveryError": null,
+   "discoveredProductionFiles": [
+    "services/control-plane/src/inv/app.py",
+    "services/control-plane/src/inv/workspace_config.py"
+   ],
+   "discoveredHarnessFiles": [],
+   "trackedForwarders": [
+    "inv.workspace_config.configured_workspace"
+   ],
+   "note": null
+  },
+  {
+   "case": "L3-param-WorkspaceAPI-init-runtime",
+   "observed": "ACCEPT",
+   "reason": null,
+   "expected": "REFUSE",
+   "matchesExpectation": false,
+   "mode": "t1_provenance.provenance (graph + use sites)",
+   "astValid": true,
+   "newUnboundNames": [],
+   "witnessesChecked": 15,
+   "intentionalRootRewrites": [],
+   "mutatedSHA256": {
+    "services/control-plane/src/inv/workspace_api.py": "90129123a8500a77b909775c20dc8be3f8952fef695f4d27aca8e2f69f12302d"
+   },
+   "visibleProductionRoots": 6,
+   "discoveryError": null,
+   "discoveredProductionFiles": [
+    "services/control-plane/src/inv/app.py",
+    "services/control-plane/src/inv/workspace_config.py"
+   ],
+   "discoveredHarnessFiles": [],
+   "trackedForwarders": [
+    "inv.workspace_config.configured_workspace"
+   ],
+   "note": "runtime parameter receives the RestrictedWorkspaceRuntime from workspace_config:44-56"
+  },
+  {
+   "case": "L3-param-WorkspaceAPI-init-runtime.db",
+   "observed": "ACCEPT",
+   "reason": null,
+   "expected": "REFUSE",
+   "matchesExpectation": false,
+   "mode": "t1_provenance.provenance (graph + use sites)",
+   "astValid": true,
+   "newUnboundNames": [],
+   "witnessesChecked": 15,
+   "intentionalRootRewrites": [],
+   "mutatedSHA256": {
+    "services/control-plane/src/inv/workspace_api.py": "d0964a7cdb6c98223cb4ab2f7eaccac37bed3ccb0b07f48e1f96d43d0bc19c28"
+   },
+   "visibleProductionRoots": 6,
+   "discoveryError": null,
+   "discoveredProductionFiles": [
+    "services/control-plane/src/inv/app.py",
+    "services/control-plane/src/inv/workspace_config.py"
+   ],
+   "discoveredHarnessFiles": [],
+   "trackedForwarders": [
+    "inv.workspace_config.configured_workspace"
+   ],
+   "note": "runtime parameter receives the RestrictedWorkspaceRuntime from workspace_config:44-56"
+  },
+  {
+   "case": "L3-param-WorkspaceAPI-init-runtime.db.transaction",
+   "observed": "ACCEPT",
+   "reason": null,
+   "expected": "REFUSE",
+   "matchesExpectation": false,
+   "mode": "t1_provenance.provenance (graph + use sites)",
+   "astValid": true,
+   "newUnboundNames": [],
+   "witnessesChecked": 15,
+   "intentionalRootRewrites": [],
+   "mutatedSHA256": {
+    "services/control-plane/src/inv/workspace_api.py": "30cce2a131e88680747e986a06f2d049efc4e37f11443e4c7e91b8a1b626fcb4"
+   },
+   "visibleProductionRoots": 6,
+   "discoveryError": null,
+   "discoveredProductionFiles": [
+    "services/control-plane/src/inv/app.py",
+    "services/control-plane/src/inv/workspace_config.py"
+   ],
+   "discoveredHarnessFiles": [],
+   "trackedForwarders": [
+    "inv.workspace_config.configured_workspace"
+   ],
+   "note": "runtime parameter receives the RestrictedWorkspaceRuntime from workspace_config:44-56"
+  },
+  {
+   "case": "L3-param-create_app-workspace_service-workspace",
+   "observed": "ACCEPT",
+   "reason": null,
+   "expected": "REFUSE",
+   "matchesExpectation": false,
+   "mode": "t1_provenance.provenance (graph + use sites)",
+   "astValid": true,
+   "newUnboundNames": [],
+   "witnessesChecked": 15,
+   "intentionalRootRewrites": [],
+   "mutatedSHA256": {
+    "services/control-plane/src/inv/app.py": "5dcc3e5f1dfbfd507830627d9e0aeb362c00ea31beece1413cdcc8e5134a5c90"
+   },
+   "visibleProductionRoots": 6,
+   "discoveryError": null,
+   "discoveredProductionFiles": [
+    "services/control-plane/src/inv/app.py",
+    "services/control-plane/src/inv/workspace_config.py"
+   ],
+   "discoveredHarnessFiles": [],
+   "trackedForwarders": [
+    "inv.workspace_config.configured_workspace"
+   ],
+   "note": "create_app workspace parameter receives configured_workspace result via app.py:1405 workspace=workspace"
+  },
+  {
+   "case": "L3-param-create_app-workspace_service-workspace.runtime.db",
+   "observed": "ACCEPT",
+   "reason": null,
+   "expected": "REFUSE",
+   "matchesExpectation": false,
+   "mode": "t1_provenance.provenance (graph + use sites)",
+   "astValid": true,
+   "newUnboundNames": [],
+   "witnessesChecked": 15,
+   "intentionalRootRewrites": [],
+   "mutatedSHA256": {
+    "services/control-plane/src/inv/app.py": "a97599dcf153bc2e0f58495ff849ce177525fa353dccb1777ed0a9b85e37c174"
+   },
+   "visibleProductionRoots": 6,
+   "discoveryError": null,
+   "discoveredProductionFiles": [
+    "services/control-plane/src/inv/app.py",
+    "services/control-plane/src/inv/workspace_config.py"
+   ],
+   "discoveredHarnessFiles": [],
+   "trackedForwarders": [
+    "inv.workspace_config.configured_workspace"
+   ],
+   "note": "create_app workspace parameter receives configured_workspace result via app.py:1405 workspace=workspace"
+  },
+  {
+   "case": "L3-control-unowned-loop-and-call",
+   "observed": "ACCEPT",
+   "reason": null,
+   "expected": "ACCEPT",
+   "matchesExpectation": true,
+   "mode": "t1_provenance.provenance (graph + use sites)",
+   "astValid": true,
+   "newUnboundNames": [],
+   "witnessesChecked": 15,
+   "intentionalRootRewrites": [],
+   "mutatedSHA256": {
+    "services/control-plane/src/inv/workspace_config.py": "83277748b7e041998883c9e41c1913781e5e560da48ef4c410b2d4b1ba418b71"
+   },
+   "visibleProductionRoots": 6,
+   "discoveryError": null,
+   "discoveredProductionFiles": [
+    "services/control-plane/src/inv/app.py",
+    "services/control-plane/src/inv/workspace_config.py"
+   ],
+   "discoveredHarnessFiles": [],
+   "trackedForwarders": [
+    "inv.workspace_config.configured_workspace"
+   ],
+   "note": null
+  },
+  {
+   "case": "L3-control-unowned-settings-read",
+   "observed": "ACCEPT",
+   "reason": null,
+   "expected": null,
+   "matchesExpectation": true,
+   "mode": "t1_provenance.provenance (graph + use sites)",
+   "astValid": true,
+   "newUnboundNames": [],
+   "witnessesChecked": 15,
+   "intentionalRootRewrites": [],
+   "mutatedSHA256": {
+    "services/control-plane/src/inv/workspace_config.py": "4b733bda03f34d0424a2f1e0b11b06c93603e70cd2fc4cf6a31d8a06bf228531"
+   },
+   "visibleProductionRoots": 6,
+   "discoveryError": null,
+   "discoveredProductionFiles": [
+    "services/control-plane/src/inv/app.py",
+    "services/control-plane/src/inv/workspace_config.py"
+   ],
+   "discoveredHarnessFiles": [],
+   "trackedForwarders": [
+    "inv.workspace_config.configured_workspace"
+   ],
+   "note": "builtins.len is a protected-prefix symbol; records how conservative a benign builtin use is"
+  }
+ ],
+ "mismatches": [
+  "L1-outside-file-hidden-root-operator-sys",
+  "L2-outside-reflective-forwarder-call-importlib",
+  "L2-outside-reflective-forwarder-call-sys-modules",
+  "L3-param-WorkspaceAPI-init-runtime",
+  "L3-param-WorkspaceAPI-init-runtime.db",
+  "L3-param-WorkspaceAPI-init-runtime.db.transaction",
+  "L3-param-create_app-workspace_service-workspace",
+  "L3-param-create_app-workspace_service-workspace.runtime.db"
+ ],
+ "effectfulMutantsImportedOrExecuted": false,
+ "productFilesWritten": 0
+}
