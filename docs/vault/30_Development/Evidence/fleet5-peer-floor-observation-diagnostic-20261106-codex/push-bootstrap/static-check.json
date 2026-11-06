@@ -1,0 +1,18 @@
+{
+  "classification": "LOCAL_STATIC_BOOTSTRAP_FILTER_GUARD_CHECK_NOT_HOSTED_PROOF",
+  "RootGrant": "msg_37da39cf72b3",
+  "base": "34e7e73c84882c75809ef61b71d01cebcd672bd2",
+  "exactBranch": "agent/codex/fleet5-peer-floor-observation-diagnostic-20261106",
+  "exactSinglePath": ".github/workflows/peer-floor-observation-diagnostic.yml",
+  "events": [
+    "push",
+    "workflow_dispatch"
+  ],
+  "unchangedJobStepsAndEnv": true,
+  "inlineCompile": "PASS",
+  "artifactFilterControlAndNegativeChecks": "PASS",
+  "sourceHelper": "UNCHANGED_0dfd",
+  "oldManual404": "PRESERVED_NO_RETRY",
+  "expectedNewPushRun": "PENDING_ACTUAL_COMMIT_PUSH",
+  "stage2": "NOT_GRANTED"
+}

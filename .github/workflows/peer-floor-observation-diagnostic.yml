@@ -1,6 +1,11 @@
 name: Peer floor observation stage1 diagnostic
-run-name: ${{ inputs.correlation_id || github.workflow }}
+run-name: ${{ github.event_name == 'push' && format('FLEET5-peer-floor-stage1-{0}', github.sha) || inputs.correlation_id || github.workflow }}
 on:
+  push:
+    branches:
+      - agent/codex/fleet5-peer-floor-observation-diagnostic-20261106
+    paths:
+      - .github/workflows/peer-floor-observation-diagnostic.yml
   workflow_dispatch:
     inputs:
       correlation_id:
@@ -10,7 +15,7 @@ permissions:
   contents: read
 jobs:
   diagnose:
-    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/agent/codex/fleet5-peer-floor-observation-diagnostic-20261106'
+    if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/agent/codex/fleet5-peer-floor-observation-diagnostic-20261106'
     runs-on: ubuntu-latest
     timeout-minutes: 20
     env:

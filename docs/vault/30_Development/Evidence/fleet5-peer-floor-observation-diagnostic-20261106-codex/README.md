@@ -17,7 +17,7 @@ workspace upgrade unit tests remain unchanged. Initial malformed-state test
 expectation failed because the original code raises AttributeError; that original
 refusal was preserved and the corrected scoped test run passed65/exit0.
 
-The optional manual workflow is restricted to this exact diagnostic branch and
+The workflow is restricted to this exact diagnostic branch and
 one hosted Linux job with20-minute timeout. It reuses Core Python3.12/Go1.27.1,
 requirements files, Node/probe/supervisor builds, Python workload Dockerfile and
 scratch LAN Node Dockerfile. Core's Python base selection resolves the existing
@@ -48,3 +48,5 @@ The old de71 Core failure/differing field remains preserved/UNKNOWN. Stage2
 normalization/field exclusion/behavior repair is NOT GRANTED. Root decides a
 separate next scope from actual evidence; independent K2 code review alone cannot
 complete overall Core, K2 or five-PC acceptance.
+
+Root msg_37da39cf72b3 subsequently grants PUSH bootstrap only for this exact branch AND the sole workflow YAML path. The job allows push/manual only on that branch; PUSH run-name binds full github.sha. Original manual404 remains preserved; no manual duplicate/empty commit/default publication or existing workflow change is permitted.

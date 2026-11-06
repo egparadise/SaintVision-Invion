@@ -97,3 +97,22 @@ manual workflow cannot supply hosted evidence while unregistered. Stage1 source/
 unit evidence remains valid, original de71 field UNKNOWN and stage2 NOT_GRANTED.
 
 The registration-gap report has all10 required documentation gates exit0 at14:26:34-14:27:11 KST. Fresh records are separate dispatch-gap-gates, preserving original source checks. Canonical state before/after remains49fba01268a37b0c85ed9075a5221dcf4e2ca111433b4b7e67d8818d2c544b0a, unchanged. Source/helper/test/workflow bytes remain exactly0dfd; only this unique report changes. Next Root action is the specific default-branch workflow registration or separately named existing-lane grant; no generic approval/behavior fix is requested.
+
+
+Root msg_37da39cf72b3 grants ONE new-workflow-only branch/path PUSH bootstrap on
+this current branch from34e. No existing/default workflow/settings may change.
+Source actual Root441/Codex402 checkpoint04fdc5e8 read; actual Claude review49d0f904
+after immutable public fetch was read: CODE_AXIS_ACCEPT_FOR_BOUNDED_A_REFUSAL_SLICE,
+0High/Medium and5nonblockingLows. This is de71 code-axis only; old Core FAILURE,
+no final acceptance. Root permits separate K2A Low branch after this push.
+
+Amended only the new workflow header: PUSH exact branch AND sole workflow path,
+job permits only push/manual on that exact branch, push run-name fixed prefix plus
+full github.sha. Manual correlation remains. All job steps/env/toolchains/images/
+permissions/timeouts/three samples/privacy filtering remain exact34e. Local YAML,
+inline compile and artifact-filter positive/negative checks passed; focused actual
+observe+existing workspace units65passed/exit0. Original404/no samples remains
+historical, stage2 NOT_GRANTED. Next is this ONE real workflow-changing commit/
+push, observe its actual push run; no manual duplicate/empty commit/old Core run.
+
+Bootstrap required10docs gates all exit0 at14:39:22-14:41:19 KST. Canonical sync before/after6385dee13cfa9d89410bdfca6c181a103d311ab9e6c8d68c401cbdaaa21f32b8 unchanged, no apply/adopt/resolve. Workflow header is the only source delta from34e; helper/tests/K2/Go/old workflows remain byte-identical. Push exactly once to create the new push event; no manual duplicate run.

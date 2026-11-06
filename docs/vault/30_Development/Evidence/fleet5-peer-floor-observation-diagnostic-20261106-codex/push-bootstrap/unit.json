@@ -1,0 +1,13 @@
+{
+  "argv": [
+    "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+    "-B",
+    "-m",
+    "pytest",
+    "tests/core/test_worker_peer_floor_observation_diagnostics.py",
+    "tests/core/test_lan_workspace_upgrade.py",
+    "-q"
+  ],
+  "exit": 0,
+  "observedKST": "2026-11-06T14:39:21.504376+09:00"
+}
