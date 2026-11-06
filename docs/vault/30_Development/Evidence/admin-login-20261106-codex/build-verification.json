@@ -1,0 +1,38 @@
+{
+  "source": "b2b64a4b7bc9c70852da99c75effe5ae2c3a27d1",
+  "CI": {
+    "docs": {
+      "run": 42198460090,
+      "jobIds": [
+        127827531376
+      ],
+      "exactHeadRefWorkflowEventCorrelationAttemptAllJobsSuccess": true
+    },
+    "frontend": {
+      "run": 42198464199,
+      "jobIds": [
+        127827544145,
+        127827544343
+      ],
+      "exactHeadRefWorkflowEventCorrelationAttemptAllJobsSuccess": true
+    }
+  },
+  "webArtifact": {
+    "source": "b2b64a4b7bc9c70852da99c75effe5ae2c3a27d1",
+    "FrontendRun": 42198464199,
+    "artifactId": 13492269040,
+    "artifactBytes": 1114732,
+    "artifactSHA256": "9f8765598305530e873838a91281198111569ef220f32be4d50b2fcabc43a12d",
+    "GitHubDigestMatched": true,
+    "builtFileCount": 13,
+    "runtimePublicAuthConfigSHA256": "e041468a55ca5aa4e68f069f8b86d7b35c421be58f1e1232cd65e1c4134e83fa",
+    "credentialValuesIncluded": false,
+    "applicationSourceChanged": false
+  },
+  "productionFrontendDeployment": "NEXT_AFTER_OBSIDIAN_REPORT",
+  "browserUITest": "NOT_RUN_tool_permission_denied",
+  "defaultWindowsCertificateTrust": "NOT_VERIFIED_import_waited_certutil_timeout",
+  "privateKeyImported": false,
+  "TLSValidation": "verified for SSO using exact existing local CA; no insecure TLS option",
+  "credentialValuesRecorded": false
+}
