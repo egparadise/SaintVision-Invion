@@ -1,0 +1,312 @@
+{
+  "acceptedBaselineDischarges": 0,
+  "actualRuntimeB": 0,
+  "baselineObligationListSHA256": "9d722dac0cb90502f5cde655bd7a99fd5664242180798cc85d6f24326045a8d2",
+  "candidate": {
+    "acceptedDischarge": false,
+    "edges": [
+      {
+        "acquire": {
+          "argumentAST": "arguments(args=[arg(arg='self'), arg(arg='tenant_id')], kwonlyargs=[arg(arg='command_id'), arg(arg='control_only')], kw_defaults=[Constant(value=None), Constant(value=False)])",
+          "source": {
+            "expressionSHA256": "cadf3dfe3fff388d4d648a61fc6087028353cdd642d8bb036a3da163c790883d",
+            "fileSHA256": "4a33428502279b88e510b5447382814bb115ddf2bff4f88f5bfcbb93f3c1a404",
+            "function": "inv.dispatch.DeliveryQueue.acquire",
+            "path": "services/control-plane/src/inv/dispatch.py",
+            "span": [
+              129,
+              4,
+              251,
+              13
+            ]
+          }
+        },
+        "deliver": {
+          "argumentAST": "arguments(args=[arg(arg='self'), arg(arg='node'), arg(arg='permit')], kwonlyargs=[arg(arg='observation_only'), arg(arg='cancel_only')], kw_defaults=[Constant(value=False), Constant(value=False)])",
+          "cancel_onlyDefault": false,
+          "observation_onlyDefault": false,
+          "runtimeExactBoolValidation": false,
+          "source": {
+            "expressionSHA256": "e1ae7f9bce0c238d82ef69ac3c136f7c5f32e3863c8738530ec575817844937e",
+            "fileSHA256": "3559bbcdf9568f8930654d860b0edd980eca71c835cde3fe7380a69dd56e18f4",
+            "function": "inv.node_transport.NodeDelivery.deliver",
+            "path": "services/control-plane/src/inv/node_transport.py",
+            "span": [
+              264,
+              4,
+              320,
+              17
+            ]
+          }
+        },
+        "kind": "SIGNATURES_AND_DEFAULTS",
+        "once": {
+          "argumentAST": "arguments(args=[arg(arg='self'), arg(arg='tenant_id')], kwonlyargs=[arg(arg='command_id'), arg(arg='control_only')], kw_defaults=[Constant(value=None), Constant(value=False)])",
+          "source": {
+            "expressionSHA256": "c64c37870612c2a49eeebe6f450a7577eeb7e678b15808437ebb2a9e0bd5f227",
+            "fileSHA256": "4a33428502279b88e510b5447382814bb115ddf2bff4f88f5bfcbb93f3c1a404",
+            "function": "inv.dispatch.DeliveryWorker.once",
+            "path": "services/control-plane/src/inv/dispatch.py",
+            "span": [
+              323,
+              4,
+              349,
+              22
+            ]
+          }
+        }
+      },
+      {
+        "kind": "CONDITIONAL_RECEIVER_FIELD_STORES",
+        "premise": "genuine unchanged DeliveryWorker and DeliveryQueue instances; field ownership is not proved by spelling",
+        "source": {
+          "expressionSHA256": "9af1bc14fbd566a352127c3cf1cba68bd87273beeb1b460eda7f06c0f5f09106",
+          "fileSHA256": "4a33428502279b88e510b5447382814bb115ddf2bff4f88f5bfcbb93f3c1a404",
+          "function": "inv.dispatch.DeliveryWorker.__init__",
+          "path": "services/control-plane/src/inv/dispatch.py",
+          "span": [
+            315,
+            8,
+            315,
+            69
+          ]
+        }
+      },
+      {
+        "actual": {
+          "cancel_only": "attempt.operation == 'cancel'",
+          "observation_only": "attempt.operation == 'observe'"
+        },
+        "kind": "MODE_FORWARD_ARGUMENT_BINDING",
+        "receiverPremise": "self.delivery is the NodeDelivery constructor result, not an arbitrary duck adapter",
+        "source": {
+          "expressionSHA256": "d69c6f33b2cb6380cc5d24417398a504e58e82708a188f86a3ee537ce15569da",
+          "fileSHA256": "4a33428502279b88e510b5447382814bb115ddf2bff4f88f5bfcbb93f3c1a404",
+          "function": "inv.dispatch.DeliveryWorker.once",
+          "path": "services/control-plane/src/inv/dispatch.py",
+          "span": [
+            336,
+            12,
+            341,
+            13
+          ]
+        }
+      },
+      {
+        "expression": "observation_only or cancel_only",
+        "kind": "SNAPSHOT_OR_OPERAND_FORWARD",
+        "semantics": "truth-test left; return left if truthy, else return right unchanged; no bool coercion/type validation is added",
+        "source": {
+          "expressionSHA256": "2a0a4bcf0e3ac2713a8bfc1fe2f15dc290ad3f19ecc33818ce46f579b186459c",
+          "fileSHA256": "3559bbcdf9568f8930654d860b0edd980eca71c835cde3fe7380a69dd56e18f4",
+          "function": "inv.node_transport.NodeDelivery.deliver",
+          "path": "services/control-plane/src/inv/node_transport.py",
+          "span": [
+            280,
+            22,
+            280,
+            100
+          ]
+        }
+      },
+      {
+        "assignments": [
+          {
+            "branchAncestors": [],
+            "literalValues": [
+              "cancel",
+              "observe"
+            ],
+            "source": {
+              "expressionSHA256": "57f3cba08df75f6b0d149b92bf0359ad046cca0578e969034cd9aec96e878535",
+              "fileSHA256": "4a33428502279b88e510b5447382814bb115ddf2bff4f88f5bfcbb93f3c1a404",
+              "function": "inv.dispatch.DeliveryQueue.acquire",
+              "path": "services/control-plane/src/inv/dispatch.py",
+              "span": [
+                170,
+                12,
+                174,
+                13
+              ]
+            },
+            "valueAST": "'cancel' if run['state'] in {'cancelled', 'failed'} or row['operation'] == 'cancel' else 'observe'"
+          },
+          {
+            "branchAncestors": [
+              {
+                "expressionSHA256": "9a3b6574d0fab2b89c41280c76e6cd47c020f9d015d2f56b2a4796f2065b7d12",
+                "fileSHA256": "4a33428502279b88e510b5447382814bb115ddf2bff4f88f5bfcbb93f3c1a404",
+                "function": "inv.dispatch.DeliveryQueue.acquire",
+                "path": "services/control-plane/src/inv/dispatch.py",
+                "span": [
+                  180,
+                  12,
+                  193,
+                  21
+                ]
+              }
+            ],
+            "literalValues": [
+              "cancel"
+            ],
+            "source": {
+              "expressionSHA256": "9b0a7a7506af8ea40ac2294799ffad1bca0445ad8f1e3600dce597c0cd15080a",
+              "fileSHA256": "4a33428502279b88e510b5447382814bb115ddf2bff4f88f5bfcbb93f3c1a404",
+              "function": "inv.dispatch.DeliveryQueue.acquire",
+              "path": "services/control-plane/src/inv/dispatch.py",
+              "span": [
+                184,
+                16,
+                184,
+                36
+              ]
+            },
+            "valueAST": "'cancel'"
+          },
+          {
+            "branchAncestors": [
+              {
+                "expressionSHA256": "88af5c13d241f792ee4b2412e5f0770036bb4abe915a5083566749ceb8d999e1",
+                "fileSHA256": "4a33428502279b88e510b5447382814bb115ddf2bff4f88f5bfcbb93f3c1a404",
+                "function": "inv.dispatch.DeliveryQueue.acquire",
+                "path": "services/control-plane/src/inv/dispatch.py",
+                "span": [
+                  194,
+                  12,
+                  228,
+                  17
+                ]
+              }
+            ],
+            "literalValues": [
+              "execute"
+            ],
+            "source": {
+              "expressionSHA256": "6952d90566427193eea302c9ba0337cbf36f99cd10cabe0913abf9a9a09d328e",
+              "fileSHA256": "4a33428502279b88e510b5447382814bb115ddf2bff4f88f5bfcbb93f3c1a404",
+              "function": "inv.dispatch.DeliveryQueue.acquire",
+              "path": "services/control-plane/src/inv/dispatch.py",
+              "span": [
+                203,
+                16,
+                203,
+                37
+              ]
+            },
+            "valueAST": "'execute'"
+          }
+        ],
+        "kind": "LITERAL_OPERATION_ASSIGNMENTS",
+        "literalUnion": [
+          "cancel",
+          "execute",
+          "observe"
+        ],
+        "notProven": "which branch is permitted, SQL/DB/clock effects and rich condition comparisons are outside this value-origin proof"
+      },
+      {
+        "classDeclaration": {
+          "expressionSHA256": "9db5984cfb93ac531f303bbda35d2a8e6c393434b5e21ce4ada810955be9d08d",
+          "fileSHA256": "4a33428502279b88e510b5447382814bb115ddf2bff4f88f5bfcbb93f3c1a404",
+          "function": "inv.dispatch.",
+          "path": "services/control-plane/src/inv/dispatch.py",
+          "span": [
+            45,
+            0,
+            52,
+            18
+          ]
+        },
+        "fieldOrder": [
+          "node",
+          "project_id",
+          "run_id",
+          "command_id",
+          "token",
+          "operation",
+          "envelope"
+        ],
+        "kind": "CONDITIONAL_DATACLASS_ARGUMENT_TO_FIELD",
+        "premise": "genuine dataclasses decorator/generated initializer, genuine returned object and faithful unchanged plain operation field; annotation str is not proof of runtime type",
+        "source": {
+          "expressionSHA256": "cdca168cf4fe539a9a1d47828e485f1f68bd3a405140f13338596fb0f622a4bf",
+          "fileSHA256": "4a33428502279b88e510b5447382814bb115ddf2bff4f88f5bfcbb93f3c1a404",
+          "function": "inv.dispatch.DeliveryQueue.acquire",
+          "path": "services/control-plane/src/inv/dispatch.py",
+          "span": [
+            243,
+            19,
+            251,
+            13
+          ]
+        }
+      }
+    ],
+    "missingRuntimePredicate": "Worker does not capture/validate the genuine builtin-string operation before its two equality expressions. Foreign adapter/attempt/field values may have custom __eq__/__bool__; a comparison AST or str annotation alone does not close it.",
+    "operationMatrix": [
+      {
+        "cancel_only": true,
+        "observation_only": false,
+        "operation": "cancel",
+        "snapshotMode": "OBSERVATION"
+      },
+      {
+        "cancel_only": false,
+        "observation_only": false,
+        "operation": "execute",
+        "snapshotMode": "NORMAL"
+      },
+      {
+        "cancel_only": false,
+        "observation_only": true,
+        "operation": "observe",
+        "snapshotMode": "OBSERVATION"
+      }
+    ],
+    "premises": [
+      "genuine bound NodeDelivery / DeliveryWorker / DeliveryQueue methods and source constructors; no unmodelled heap/callback/frame mutation",
+      "DeliveryQueue.acquire returns the original genuine DeliveryAttempt, with standard generated initialization and unchanged plain operation field",
+      "attempt.operation reads preserve those builtin string literals; only then does builtin string equality yield builtin bool",
+      "scoped aliases and reflection are bounded source evidence, not universal dynamic caller/heap completeness"
+    ],
+    "reason": null,
+    "status": "CONDITIONAL_LITERAL_MODE_ORIGIN_CANDIDATE"
+  },
+  "independentReview": "PENDING",
+  "minimalFutureCodeProposal": {
+    "contract": "Capture once; require genuine builtin str from the declared domain before either equality. Keep NodeDelivery truthiness/or API unchanged. Builtin type/str bindings and genuine receiver remain separate premises. No mode permission/authentication is granted.",
+    "failureBehavior": "Inside existing try, ValueError maps to existing SYS-0001/not_sent=False handling; no NodeDelivery call for rejected input. Existing queue finish/uncertainty semantics require future tests, not runtime acceptance here.",
+    "function": "DeliveryWorker.once",
+    "futureCode": "operation = attempt.operation\nif type(operation) is not str or operation not in (\"execute\", \"observe\", \"cancel\"):\n    raise ValueError(\"Unsupported delivery operation origin\")\n# In the existing deliver call, use these two keyword expressions:\n# observation_only=(operation == \"observe\"), cancel_only=(operation == \"cancel\")",
+    "location": "inside existing try, immediately before self.delivery.deliver",
+    "path": "services/control-plane/src/inv/dispatch.py",
+    "productDeltaThisCard": 0
+  },
+  "originalBaseline19Unchanged": true,
+  "realBindings": null,
+  "scopedGuardsClean": true,
+  "status": "CONDITIONAL_SOURCE_CANDIDATE_RUNTIME_AND_OWNER_PREMISES_PENDING",
+  "target": {
+    "blocksGrant": true,
+    "code": "A7_PURPOSE_PROVENANCE",
+    "detail": {
+      "blocksGrant": true,
+      "expression": "observation_only or cancel_only",
+      "reason": "foreign/dynamic truthiness requires complete caller and value provenance",
+      "state": "UNRESOLVED"
+    },
+    "source": {
+      "expressionSHA256": "2a0a4bcf0e3ac2713a8bfc1fe2f15dc290ad3f19ecc33818ce46f579b186459c",
+      "fileSHA256": "3559bbcdf9568f8930654d860b0edd980eca71c835cde3fe7380a69dd56e18f4",
+      "function": "inv.node_transport.NodeDelivery.deliver",
+      "path": "services/control-plane/src/inv/node_transport.py",
+      "span": [
+        280,
+        22,
+        280,
+        100
+      ]
+    },
+    "state": "UNRESOLVED"
+  }
+}

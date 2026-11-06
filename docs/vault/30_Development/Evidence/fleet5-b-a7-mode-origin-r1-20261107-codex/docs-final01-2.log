@@ -1,0 +1,2 @@
+PASS: RDF parsing, defined terms, TTL/JSON-LD equivalence, 48 task mappings, positive SHACL, 4 rejected invalid fixtures, 4 competency queries, Obsidian mirrors.
+{"ownerResourceMeasurement": {"target": "tools/check_ontology.py", "peakWorkingSetBytes": 67637248, "elapsedSeconds": 2.936, "OSMemoryLimitEnforced": false, "serial": true}}

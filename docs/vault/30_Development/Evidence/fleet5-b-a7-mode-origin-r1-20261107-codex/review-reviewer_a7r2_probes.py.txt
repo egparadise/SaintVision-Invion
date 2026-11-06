@@ -1,0 +1,172 @@
+"""Reviewer A7 R2 9690 narrow delta probes: AST/source-only, serial, one process.
+
+Usage: python -B -I reviewer_a7r2_probes.py <R2 evidence dir abs> <out.json>
+Calls the owner's FINAL R2 a7_inventory.census/prove and a7_body.prove, and the
+UNCHANGED R1 inventory (red-a7_inventory.py.txt, byte-checked against the 1550
+Git blob) on the same in-memory inputs. Nothing from the product or a mutant is
+imported or executed; every mutant is only compile()d for syntax. Nothing is
+written into the evidence directory.
+"""
+import ast, hashlib, json, subprocess, sys, time, types
+from collections import Counter
+from pathlib import Path
+
+E = Path(sys.argv[1]).resolve(); OUT = Path(sys.argv[2])
+assert E.is_dir() and (E / 'a7_inventory.py').exists(), E
+sys.path.insert(0, str(E))
+REPO = next(p for p in E.parents if (p / 'AGENTS.md').exists())
+H = lambda b: hashlib.sha256(b).hexdigest()
+def git(*a): return subprocess.check_output(['git', *a], cwd=REPO, stderr=subprocess.PIPE)
+
+rows = []
+def log(row):
+    rows.append(row); print(json.dumps(row, sort_keys=True)[:1800], flush=True)
+
+# ---------- P0 preconditions at committed bytes (before importing owner modules) ----------
+mraw = (E / 'proof-producer-hashes.json').read_bytes(); m = json.loads(mraw)
+fmis = [r['file'] for r in m['files'] if H((E / r['file']).read_bytes()) != r['sha256'] or (E / r['file']).stat().st_size != r['bytes']]
+pmis = [k for k, v in m['producers'].items() if H(((E.parent / k[3:]) if k.startswith('../') else (E / k)).read_bytes()) != v]
+hist = REPO / m['history']['path']
+listed = {r['file'] for r in m['files']}; ondisk = {p.name for p in E.iterdir() if p.is_file()} - {'proof-producer-hashes.json'}
+receipts = []
+for rc in m['commandReceipts']:
+    d = json.loads((E / rc['file']).read_bytes()); ok = H((E / rc['file']).read_bytes()) == rc['sha256']
+    for c in d['commands']:
+        ok = ok and c['exit'] == c.get('expectedExit', 0) and c['producerHashesBefore'] == c['producerHashesAfter'] == m['producers'] and H((E / c['rawLog']).read_bytes()) == c['rawSHA256']
+        if c.get('canonicalStateBefore') is not None: ok = ok and c['canonicalStateBefore'] == c['canonicalStateAfter']
+    receipts.append({'file': rc['file'], 'commands': len(d['commands']), 'allExpectedExits': d.get('allExpectedExits'), 'allChecksOk': ok,
+                     'argv': [c.get('argv') for c in d['commands']], 'exits': [c['exit'] for c in d['commands']]})
+pub = json.loads((E / 'publication-docs-check.json').read_bytes())
+R1E = 'docs/vault/30_Development/Evidence/fleet5-b-a7-snapshot-r1-20261107-codex/'
+r1inv = git('show', '1550453d1f072a87fd9a7baa53d4fe4ce8a98d5d:' + R1E + 'a7_inventory.py')
+red_txt = (E / 'red-a7_inventory.py.txt').read_bytes(); green_inv = (E / 'a7_inventory.py').read_bytes()
+# All same-named files in R1 vs R2 evidence dirs (Git blobs at 1550 vs working bytes at 9690)
+r1names = [x.split('/')[-1] for x in git('ls-tree', '--name-only', '1550453d1f072a87fd9a7baa53d4fe4ce8a98d5d', R1E).decode().split()]
+common = sorted(set(r1names) & ondisk); differ = [n for n in common if git('show', '1550453d1f072a87fd9a7baa53d4fe4ce8a98d5d:' + R1E + n) != (E / n).read_bytes()]
+# Ten actual review originals vs 7a80 blobs
+RV = 'docs/vault/30_Development/Evidence/fleet5-b-a7-snapshot-1550-review-20261107-claude/'
+RH = 'docs/vault/30_Development/History/2026-11-07_FLEET5_B_A7_Snapshot_R1_1550_독립검토_Claude.md'
+pairs = {'actual-review-canonical-sync-check-before.txt': RV + 'canonical-sync-check-before.txt', 'actual-review-commands.json': RV + 'commands.json',
+         'actual-review-local-doc-gates.txt': RV + 'local-doc-gates.txt', 'actual-review-original-gitattributes.txt': RV + '.gitattributes',
+         'actual-review-original-history.md.txt': RH, 'actual-review-review.json': RV + 'review.json',
+         'actual-review-reviewer_a7_probes.py.txt': RV + 'reviewer_a7_probes.py.txt', 'actual-review-reviewer_gate_driver.py.txt': RV + 'reviewer_gate_driver.py.txt',
+         'actual-review-reviewer-a7-probes.log.txt': RV + 'reviewer-a7-probes.log.txt', 'actual-review-reviewer-a7-probes-result.json': RV + 'reviewer-a7-probes-result.json'}
+origs = {k: git('show', '7a8012f47de5aa94a4264366df6722c1f6755a9c:' + v) == (E / k).read_bytes() for k, v in pairs.items()}
+pre = {'manifestSHA256': H(mraw), 'manifestFiles': len(m['files']), 'fileMismatches': fmis, 'unlistedOnDisk': sorted(ondisk - listed), 'listedMissing': sorted(listed - ondisk),
+       'producersAndInherited': len(m['producers']), 'producerMismatches': pmis, 'historySHA256Match': H(hist.read_bytes()) == m['history']['sha256'],
+       'commandReceipts': receipts, 'publicationDocsCheck': {'argv': pub['argv'], 'exit': pub['exit'], 'expectedExit': pub['expectedExit'],
+       'rawLogHashOk': H((E / pub['rawLog']).read_bytes()) == pub['rawSHA256'], 'producersEqualManifest': pub['producerHashesBefore'] == pub['producerHashesAfter'] == m['producers']},
+       'r1InventoryBlobSHA256': H(r1inv), 'redInventoryEqualsR1Blob': red_txt == r1inv, 'greenInventorySHA256': H(green_inv),
+       'commonFilesR1vsR2': len(common), 'commonFilesDiffering': differ, 'actualReviewOriginalsByteEqual7a80': origs}
+assert pre['manifestSHA256'] == 'a69dc82098438eb83b74cce31d2dd7f334b44da14237fc519e22ad2b062a5488' and not fmis and not pmis and pre['historySHA256Match'], pre
+assert pre['redInventoryEqualsR1Blob'] and H(r1inv).startswith('6910ddfd') and H(green_inv).startswith('05976037') and all(origs.values()), pre
+log({'layer': 'PRECONDITION', 'case': 'manifest-receipts-origins', **pre})
+
+import a7_body as body, a7_inventory as green, use_sites as u, reflection_audit as ra
+from a7_common import NC, CT, DB, ER, PROTECTED, frozen_source, sha, grep
+from source_bindings import Facts
+red = types.ModuleType('a7_inventory_red_r1'); red.__file__ = str(E / 'a7_inventory.py')
+exec(compile(red_txt.decode('utf-8'), str(E / 'red-a7_inventory.py.txt'), 'exec', dont_inherit=True), red.__dict__)
+ERROR = 'DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:WRITE_USE:inv.node_channels.NodeChannels.snapshot'
+NR = 'services/control-plane/src/inv/node_certificates.py'; OBS = 'services/control-plane/src/inv/observation.py'
+
+def okey(o):  # reviewer's own complete key: code, source path, source span, full detail JSON (no replay)
+    s = o.get('source'); d = json.dumps(o.get('detail'), sort_keys=True, default=str)
+    if isinstance(s, dict): return (o['code'], s.get('path'), tuple(s.get('span', [])), d)
+    return (o['code'], s, (), d)
+def ser(cnt): return [list(map(str, k[:2])) + [list(k[2]), k[3][:220], n] for k, n in sorted(cnt.items())]
+
+def census(mod, world):
+    with body.target_scope(): return mod.census(world or None)
+
+# ---------- A: independent parsed==audited at actual bytes ----------
+t0 = time.monotonic()
+paths, q = grep(r'NodeChannels|node_channels|\.snapshot[[:space:]]*\(')
+indep = {p: H(git('show', '72028cbac903c4415d9979f980a6e0f9948e914f:' + p)) for p in paths}
+indep_str = {p: sha(frozen_source(p)) for p in paths}
+g0 = census(green, {}); r0 = census(red, {})
+parsed = {x['path']: x['sha256'] for x in g0['sourceFiles']}
+aud_field = {x['path']: x['sourceSHA256'] for x in g0['guards']}
+aud_refl = {x['path']: x['reflection'].get('sourceSHA256') for x in g0['guards']}
+aud_use = {x['path']: (x['useSites'] or {}).get('sourceSHA256') for x in g0['guards']}
+nonret = sorted(x['path'] for x in g0['sourceFiles'] if not x['retainedForCallClosure'])
+sidecar = json.loads((E / 'a7-snapshot-sidecar.json').read_bytes())['callers']['census']
+same = lambda k: json.dumps(g0[k], sort_keys=True, default=str) == json.dumps(r0[k], sort_keys=True, default=str)
+A = {'layer': 'COVERAGE', 'case': 'baseline-actual-72028-independent', 'gitGrepPy': len(paths), 'grepExit': q['exit'],
+     'blobSHA256EqualsDecodedSHA256': indep == indep_str, 'parsedEqualsIndependentGitBlobs': parsed == indep,
+     'auditedFieldEqualsIndependent': aud_field == indep, 'auditedReflectionSHAEqualsIndependent': aud_refl == indep, 'auditedUseSiteSHAEqualsIndependent': aud_use == indep,
+     'guardRows': len(g0['guards']), 'distinctGuardPaths': len(aud_field), 'nonRetained': len(nonret),
+     'nonRetainedClean': all(not x['reflection']['newRelevantHits'] and x['error'] is None for x in g0['guards'] if not x['retainedForCallClosure']),
+     'redGuardPaths': len(r0['guards']), 'redUncovered': sorted(set(parsed) - {x['path'] for x in r0['guards']}) == nonret,
+     'sidecarCoverageEqualsIndependent': sidecar['guardCoverage']['parsedPathSHA256'] == indep == sidecar['guardCoverage']['auditedPathSHA256'],
+     'greenEqualsRedFrozen': {k: same(k) for k in ('sourceFiles', 'constructorSites', 'snapshotSites', 'otherSnapshotReceivers', 'carrierClasses', 'obligations')},
+     'counts': [len(g0['sourceFiles']), len(g0['constructorSites']), len(g0['snapshotSites']), len(g0['obligations'])], 'seconds': round(time.monotonic() - t0, 1)}
+assert A['parsedEqualsIndependentGitBlobs'] and A['auditedFieldEqualsIndependent'] and A['auditedReflectionSHAEqualsIndependent'], A
+log(A)
+BG = Counter(okey(o) for o in g0['obligations']); BR = Counter(okey(o) for o in r0['obligations'])
+with body.target_scope():
+    gp0 = green.prove(None); rp0 = red.prove(None)
+PG = Counter(okey(o) for o in gp0['obligations']); PR = Counter(okey(o) for o in rp0['obligations'])
+log({'layer': 'PROVE', 'case': 'baseline-full-obligations', 'green': len(gp0['obligations']), 'red': len(rp0['obligations']), 'greenEqualsRedKeys': PG == PR,
+     'greenEqualsRedJSON': json.dumps(gp0['obligations'], sort_keys=True, default=str) == json.dumps(rp0['obligations'], sort_keys=True, default=str),
+     'allBlocksGrant': all(o['blocksGrant'] for o in gp0['obligations']), 'callerClosureAccepted': gp0['callerClosureAccepted'],
+     'forwardingEqual': json.dumps(gp0['forwarding'], sort_keys=True, default=str) == json.dumps(rp0['forwarding'], sort_keys=True, default=str)})
+
+def guard_location(path, source, error):  # diagnostic only: first refused node, same args as census
+    f = Facts(path, source); allowed = u.baseline_sites(path, True, (), ()).copy()
+    for n, tag in u.audited_nodes(f, True, (), {}, (), ()):
+        if u.class_field_factory_allowed(f, n): continue
+        k = u.key_for(f, n, tag)
+        if allowed[k] <= 0: return {'tag': tag, 'span': [n.lineno, n.col_offset, n.end_lineno, n.end_col_offset]}
+        allowed[k] -= 1
+    return None
+
+def frozen_sha_or_missing(p):  # attempt-1 harness bug fix: a new path has no frozen blob
+    try: return sha(frozen_source(p))
+    except subprocess.CalledProcessError: return 'MISSING_AT_72028'
+
+def case(name, world, path, note, full=False):
+    for p, s in world.items(): compile(s, p, 'exec', dont_inherit=True)
+    t0 = time.monotonic(); row = {'layer': 'CENSUS_RED_GREEN', 'case': name, 'path': path, 'note': note, 'inputSHA256': {p: sha(s) for p, s in world.items()},
+                                  'frozenSHA256': {p: frozen_sha_or_missing(p) for p in world}}
+    out = {}
+    for label, mod, base in (('green', green, BG), ('red', red, BR)):
+        try:
+            c = census(mod, world)
+        except Exception as e:
+            out[label] = {'exception': type(e).__name__ + ':' + str(e)[:200]}; continue
+        cur = Counter(okey(o) for o in c['obligations']); gr = [x for x in c['guards'] if x['path'] == path]
+        out[label] = {'added': ser(cur - base), 'removed': ser(base - cur), 'guardRowsForPath': len(gr),
+                      'guardError': gr[0]['error'] if gr else None, 'reflectionHits': len(gr[0]['reflection']['newRelevantHits']) if gr else None,
+                      'retained': next((x['retainedForCallClosure'] for x in c['sourceFiles'] if x['path'] == path), None),
+                      'parsedEqualsAudited': {x['path']: x['sha256'] for x in c['sourceFiles']} == {x['path']: x.get('sourceSHA256', x['reflection'].get('sourceSHA256')) for x in c['guards']},
+                      'counts': [len(c['sourceFiles']), len(c['constructorSites']), len(c['snapshotSites'])]}
+    row.update(out)
+    if path in world and 'guardError' in out.get('green', {}) and out['green']['guardError']:
+        row['diagnosticFirstRefusedNode'] = guard_location(path, world[path], out['green']['guardError'])
+    if full:
+        with body.target_scope():
+            b = body.prove(world); gp = green.prove(world); rp = red.prove(world)
+        row['bodyAccepted'] = b['bodyAccepted']; row['fullAddedGreen'] = ser(Counter(okey(o) for o in gp['obligations']) - PG); row['fullRemovedGreen'] = ser(PG - Counter(okey(o) for o in gp['obligations']))
+        row['fullAddedRed'] = ser(Counter(okey(o) for o in rp['obligations']) - PR); row['callerClosureAcceptedGreen'] = gp['callerClosureAccepted']
+    row['seconds'] = round(time.monotonic() - t0, 1); log(row); return row
+
+drv = ast.parse((E / 'actual-review-reviewer_a7_probes.py.txt').read_bytes())
+PATCH = next(n.value.value for n in drv.body if isinstance(n, ast.Assign) and any(isinstance(x, ast.Name) and x.id == 'PATCH' for x in n.targets))
+assert nonret and NR in nonret
+other = next(p for p in nonret if p != NR and p.startswith('services/control-plane/src/inv/'))
+wx = {NR: frozen_source(NR) + PATCH}; assert sha(wx[NR]) == '19c2e14eb3e586f5ed22e1fb0549fe51961a079557fba2bb07ca1b8410686191'
+fx = Facts(NR, wx[NR]); store = next(n for n in ast.walk(fx.tree) if isinstance(n, ast.Attribute) and isinstance(n.ctx, ast.Store) and ast.unparse(n) == '_ReviewerA7NC.snapshot')
+log({'layer': 'SPAN', 'case': 'exact-store-node', 'span': [store.lineno, store.col_offset, store.end_lineno, store.end_col_offset]})
+
+case('exact-actual-review-nonretained-monkeypatch', wx, NR, 'exact R1 reviewer input 19c2e14e', full=True)
+case('same-patch-other-nonretained', {other: frozen_source(other) + PATCH}, other, 'same PATCH, a different non-retained candidate: coverage is not special-cased to node_certificates')
+case('nonretained-reflection-import-module', {NR: frozen_source(NR) + "\nimport importlib\n_reviewer_m = importlib.import_module('inv.node_channels')\n"}, NR, 'exercises the reflection guard (A7_RELEVANT_REFLECTION) on a non-retained file')
+case('nonretained-module-attribute-store', {NR: frozen_source(NR) + '\nfrom . import node_channels as _ReviewerA7M\n_ReviewerA7M.assert_channel = lambda conn, expected: None\n'}, NR, 'R1 informational case, now guarded or not: record only')
+case('nonretained-benign-other-comment', {other: frozen_source(other) + '\n# reviewer benign comment\n'}, other, 'benign non-retained control on a different candidate')
+case('retained-observation-same-patch', {OBS: frozen_source(OBS) + PATCH}, OBS, 'retained control: red already guarded retained files, so red and green must both add')
+case('INFOI3-purpose-foreign', {OBS: frozen_source(OBS).replace('observation_only=True', 'observation_only=foreign', 1)}, OBS, 'purpose predicate unchanged: red and green should both add the same observation.py purpose key')
+case('new-production-file-patch', {'services/control-plane/src/inv/a7_reviewer_new_file.py': PATCH.lstrip()}, 'services/control-plane/src/inv/a7_reviewer_new_file.py', 'missing frozen path precondition: expected fail-closed exception, not success')
+
+OUT.write_text(json.dumps({'preconditions': pre, 'rows': rows}, indent=1, sort_keys=True, default=str) + '\n', encoding='utf-8', newline='\n')
+print(json.dumps({'rows': len(rows)}))

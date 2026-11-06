@@ -1,0 +1,2 @@
+{"parsed": 25, "audited": 25, "constructors": 9, "deliverReferences": 1, "rule": "CONDITIONAL_LITERAL_MODE_ORIGIN_CANDIDATE", "guardClean": true, "baselineDischarges": 0}
+{"ownerResourceMeasurement": {"target": "docs/vault/30_Development/Evidence/fleet5-b-a7-mode-origin-r1-20261107-codex/mode.py", "peakWorkingSetBytes": 95965184, "elapsedSeconds": 10.196, "OSMemoryLimitEnforced": false, "serial": true}}

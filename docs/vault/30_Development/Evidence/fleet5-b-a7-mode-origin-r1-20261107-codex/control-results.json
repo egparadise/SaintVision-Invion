@@ -1,0 +1,343 @@
+{
+  "actualRuntimeB": 0,
+  "allExpected": true,
+  "baselineDischarges": 0,
+  "count": 6,
+  "productOrMutantsExecuted": false,
+  "rows": [
+    {
+      "acceptedSnapshotMatrix": "Referenced immutable R1/R2 proof at product72028; no snapshot body/matrix rerun or mutation",
+      "currentSpansRecomputedAndVerified": true,
+      "currentWitnesses": [
+        {
+          "expressionSHA256": "9af1bc14fbd566a352127c3cf1cba68bd87273beeb1b460eda7f06c0f5f09106",
+          "fileSHA256": "4a33428502279b88e510b5447382814bb115ddf2bff4f88f5bfcbb93f3c1a404",
+          "function": "inv.dispatch.DeliveryWorker.__init__",
+          "path": "services/control-plane/src/inv/dispatch.py",
+          "span": [
+            315,
+            8,
+            315,
+            69
+          ]
+        },
+        {
+          "expressionSHA256": "d69c6f33b2cb6380cc5d24417398a504e58e82708a188f86a3ee537ce15569da",
+          "fileSHA256": "4a33428502279b88e510b5447382814bb115ddf2bff4f88f5bfcbb93f3c1a404",
+          "function": "inv.dispatch.DeliveryWorker.once",
+          "path": "services/control-plane/src/inv/dispatch.py",
+          "span": [
+            336,
+            12,
+            341,
+            13
+          ]
+        },
+        {
+          "expressionSHA256": "2a0a4bcf0e3ac2713a8bfc1fe2f15dc290ad3f19ecc33818ce46f579b186459c",
+          "fileSHA256": "3559bbcdf9568f8930654d860b0edd980eca71c835cde3fe7380a69dd56e18f4",
+          "function": "inv.node_transport.NodeDelivery.deliver",
+          "path": "services/control-plane/src/inv/node_transport.py",
+          "span": [
+            280,
+            22,
+            280,
+            100
+          ]
+        },
+        {
+          "expressionSHA256": "cdca168cf4fe539a9a1d47828e485f1f68bd3a405140f13338596fb0f622a4bf",
+          "fileSHA256": "4a33428502279b88e510b5447382814bb115ddf2bff4f88f5bfcbb93f3c1a404",
+          "function": "inv.dispatch.DeliveryQueue.acquire",
+          "path": "services/control-plane/src/inv/dispatch.py",
+          "span": [
+            243,
+            19,
+            251,
+            13
+          ]
+        }
+      ],
+      "expectationMet": true,
+      "expectedReason": null,
+      "expectedStatus": "CONDITIONAL_LITERAL_MODE_ORIGIN_CANDIDATE",
+      "inputSHA256": {},
+      "kind": "DIRECT_MODE_RULE",
+      "name": "actual-source",
+      "qualification": "AST/DATA conditional source rule only; old full-use-site/context refusals are not counted as causal mode-rule proof; no runtime/DB/caller discharge",
+      "reason": null,
+      "status": "CONDITIONAL_LITERAL_MODE_ORIGIN_CANDIDATE",
+      "syntaxValid": true,
+      "unchangedOtherInputs": {
+        "services/control-plane/src/inv/dispatch.py": "4a33428502279b88e510b5447382814bb115ddf2bff4f88f5bfcbb93f3c1a404",
+        "services/control-plane/src/inv/node_transport.py": "3559bbcdf9568f8930654d860b0edd980eca71c835cde3fe7380a69dd56e18f4",
+        "services/control-plane/src/inv/worker.py": "3010b2409bb285de960eb322792b1062ed066275307c9bea53a2cc767b65d4e3",
+        "tools/remote_workspace_entry.py": "e69fa8ff6c51bd3880f5ec388fe97288a4256169377e17d9d6aa5b7ec2f32c27"
+      }
+    },
+    {
+      "acceptedSnapshotMatrix": "Referenced immutable R1/R2 proof at product72028; no snapshot body/matrix rerun or mutation",
+      "currentSpansRecomputedAndVerified": true,
+      "currentWitnesses": [
+        {
+          "expressionSHA256": "9af1bc14fbd566a352127c3cf1cba68bd87273beeb1b460eda7f06c0f5f09106",
+          "fileSHA256": "74b7cab804e6f4b77a3dddb7ed3f83c4b63beac83faa33698e17c980c09ddbbd",
+          "function": "inv.dispatch.DeliveryWorker.__init__",
+          "path": "services/control-plane/src/inv/dispatch.py",
+          "span": [
+            316,
+            8,
+            316,
+            69
+          ]
+        },
+        {
+          "expressionSHA256": "d69c6f33b2cb6380cc5d24417398a504e58e82708a188f86a3ee537ce15569da",
+          "fileSHA256": "74b7cab804e6f4b77a3dddb7ed3f83c4b63beac83faa33698e17c980c09ddbbd",
+          "function": "inv.dispatch.DeliveryWorker.once",
+          "path": "services/control-plane/src/inv/dispatch.py",
+          "span": [
+            337,
+            12,
+            342,
+            13
+          ]
+        },
+        {
+          "expressionSHA256": "2a0a4bcf0e3ac2713a8bfc1fe2f15dc290ad3f19ecc33818ce46f579b186459c",
+          "fileSHA256": "3559bbcdf9568f8930654d860b0edd980eca71c835cde3fe7380a69dd56e18f4",
+          "function": "inv.node_transport.NodeDelivery.deliver",
+          "path": "services/control-plane/src/inv/node_transport.py",
+          "span": [
+            280,
+            22,
+            280,
+            100
+          ]
+        },
+        {
+          "expressionSHA256": "cdca168cf4fe539a9a1d47828e485f1f68bd3a405140f13338596fb0f622a4bf",
+          "fileSHA256": "74b7cab804e6f4b77a3dddb7ed3f83c4b63beac83faa33698e17c980c09ddbbd",
+          "function": "inv.dispatch.DeliveryQueue.acquire",
+          "path": "services/control-plane/src/inv/dispatch.py",
+          "span": [
+            244,
+            19,
+            252,
+            13
+          ]
+        }
+      ],
+      "expectationMet": true,
+      "expectedReason": null,
+      "expectedStatus": "CONDITIONAL_LITERAL_MODE_ORIGIN_CANDIDATE",
+      "inputSHA256": {
+        "services/control-plane/src/inv/dispatch.py": "74b7cab804e6f4b77a3dddb7ed3f83c4b63beac83faa33698e17c980c09ddbbd"
+      },
+      "kind": "DIRECT_MODE_RULE",
+      "name": "benign-leading-comment",
+      "qualification": "AST/DATA conditional source rule only; old full-use-site/context refusals are not counted as causal mode-rule proof; no runtime/DB/caller discharge",
+      "reason": null,
+      "status": "CONDITIONAL_LITERAL_MODE_ORIGIN_CANDIDATE",
+      "syntaxValid": true,
+      "unchangedOtherInputs": {
+        "services/control-plane/src/inv/node_transport.py": "3559bbcdf9568f8930654d860b0edd980eca71c835cde3fe7380a69dd56e18f4",
+        "services/control-plane/src/inv/worker.py": "3010b2409bb285de960eb322792b1062ed066275307c9bea53a2cc767b65d4e3",
+        "tools/remote_workspace_entry.py": "e69fa8ff6c51bd3880f5ec388fe97288a4256169377e17d9d6aa5b7ec2f32c27"
+      }
+    },
+    {
+      "acceptedSnapshotMatrix": "Referenced immutable R1/R2 proof at product72028; no snapshot body/matrix rerun or mutation",
+      "currentSpansRecomputedAndVerified": true,
+      "currentWitnesses": [
+        {
+          "expressionSHA256": "9af1bc14fbd566a352127c3cf1cba68bd87273beeb1b460eda7f06c0f5f09106",
+          "fileSHA256": "91eadaae052886b89b933c2dd0ed58fe3f4520b2e20cb8c02196fe09ea01bee8",
+          "function": "inv.dispatch.DeliveryWorker.__init__",
+          "path": "services/control-plane/src/inv/dispatch.py",
+          "span": [
+            315,
+            8,
+            315,
+            69
+          ]
+        },
+        {
+          "expressionSHA256": "45c9ced3565ba9c13d9b67f9f6509ccbae2e003223d7cd94c9b0c05b79c62790",
+          "fileSHA256": "91eadaae052886b89b933c2dd0ed58fe3f4520b2e20cb8c02196fe09ea01bee8",
+          "function": "inv.dispatch.DeliveryWorker.once",
+          "path": "services/control-plane/src/inv/dispatch.py",
+          "span": [
+            336,
+            12,
+            341,
+            13
+          ]
+        }
+      ],
+      "expectationMet": true,
+      "expectedReason": "MODE_FORWARDING_CHANGED",
+      "expectedStatus": "UNRESOLVED",
+      "inputSHA256": {
+        "services/control-plane/src/inv/dispatch.py": "91eadaae052886b89b933c2dd0ed58fe3f4520b2e20cb8c02196fe09ea01bee8"
+      },
+      "kind": "DIRECT_MODE_RULE",
+      "name": "causal-forwarded-mode-change",
+      "qualification": "AST/DATA conditional source rule only; old full-use-site/context refusals are not counted as causal mode-rule proof; no runtime/DB/caller discharge",
+      "reason": "MODE_FORWARDING_CHANGED",
+      "status": "UNRESOLVED",
+      "syntaxValid": true,
+      "unchangedOtherInputs": {
+        "services/control-plane/src/inv/node_transport.py": "3559bbcdf9568f8930654d860b0edd980eca71c835cde3fe7380a69dd56e18f4",
+        "services/control-plane/src/inv/worker.py": "3010b2409bb285de960eb322792b1062ed066275307c9bea53a2cc767b65d4e3",
+        "tools/remote_workspace_entry.py": "e69fa8ff6c51bd3880f5ec388fe97288a4256169377e17d9d6aa5b7ec2f32c27"
+      }
+    },
+    {
+      "acceptedSnapshotMatrix": "Referenced immutable R1/R2 proof at product72028; no snapshot body/matrix rerun or mutation",
+      "currentSpansRecomputedAndVerified": true,
+      "currentWitnesses": [
+        {
+          "expressionSHA256": "9af1bc14fbd566a352127c3cf1cba68bd87273beeb1b460eda7f06c0f5f09106",
+          "fileSHA256": "fded3753ebb4a1f39d1f4a9d0d1afe7de446bb066a377ef276aed51097d83463",
+          "function": "inv.dispatch.DeliveryWorker.__init__",
+          "path": "services/control-plane/src/inv/dispatch.py",
+          "span": [
+            315,
+            8,
+            315,
+            69
+          ]
+        },
+        {
+          "expressionSHA256": "d69c6f33b2cb6380cc5d24417398a504e58e82708a188f86a3ee537ce15569da",
+          "fileSHA256": "fded3753ebb4a1f39d1f4a9d0d1afe7de446bb066a377ef276aed51097d83463",
+          "function": "inv.dispatch.DeliveryWorker.once",
+          "path": "services/control-plane/src/inv/dispatch.py",
+          "span": [
+            336,
+            12,
+            341,
+            13
+          ]
+        },
+        {
+          "expressionSHA256": "2a0a4bcf0e3ac2713a8bfc1fe2f15dc290ad3f19ecc33818ce46f579b186459c",
+          "fileSHA256": "3559bbcdf9568f8930654d860b0edd980eca71c835cde3fe7380a69dd56e18f4",
+          "function": "inv.node_transport.NodeDelivery.deliver",
+          "path": "services/control-plane/src/inv/node_transport.py",
+          "span": [
+            280,
+            22,
+            280,
+            100
+          ]
+        }
+      ],
+      "expectationMet": true,
+      "expectedReason": "UNRESOLVED_DYNAMIC_OPERATION_ORIGIN",
+      "expectedStatus": "UNRESOLVED",
+      "inputSHA256": {
+        "services/control-plane/src/inv/dispatch.py": "fded3753ebb4a1f39d1f4a9d0d1afe7de446bb066a377ef276aed51097d83463"
+      },
+      "kind": "DIRECT_MODE_RULE",
+      "name": "dynamic-operation-origin",
+      "qualification": "AST/DATA conditional source rule only; old full-use-site/context refusals are not counted as causal mode-rule proof; no runtime/DB/caller discharge",
+      "reason": "UNRESOLVED_DYNAMIC_OPERATION_ORIGIN",
+      "status": "UNRESOLVED",
+      "syntaxValid": true,
+      "unchangedOtherInputs": {
+        "services/control-plane/src/inv/node_transport.py": "3559bbcdf9568f8930654d860b0edd980eca71c835cde3fe7380a69dd56e18f4",
+        "services/control-plane/src/inv/worker.py": "3010b2409bb285de960eb322792b1062ed066275307c9bea53a2cc767b65d4e3",
+        "tools/remote_workspace_entry.py": "e69fa8ff6c51bd3880f5ec388fe97288a4256169377e17d9d6aa5b7ec2f32c27"
+      }
+    },
+    {
+      "acceptedSnapshotMatrix": "Referenced immutable R1/R2 proof at product72028; no snapshot body/matrix rerun or mutation",
+      "currentSpansRecomputedAndVerified": true,
+      "currentWitnesses": [],
+      "expectationMet": true,
+      "expectedReason": "EARLIER_CALLEE_BINDING",
+      "expectedStatus": "UNRESOLVED",
+      "inputSHA256": {
+        "services/control-plane/src/inv/dispatch.py": "c7445593187c3d10188a1399a9c2096e7deb592d18de17042ba24005f8712f74"
+      },
+      "kind": "EARLIER_BINDING_PRECONDITION",
+      "name": "foreign-rebound-attempt-callee",
+      "qualification": "AST/DATA conditional source rule only; old full-use-site/context refusals are not counted as causal mode-rule proof; no runtime/DB/caller discharge",
+      "reason": "EARLIER_CALLEE_BINDING",
+      "status": "UNRESOLVED",
+      "syntaxValid": true,
+      "unchangedOtherInputs": {
+        "services/control-plane/src/inv/node_transport.py": "3559bbcdf9568f8930654d860b0edd980eca71c835cde3fe7380a69dd56e18f4",
+        "services/control-plane/src/inv/worker.py": "3010b2409bb285de960eb322792b1062ed066275307c9bea53a2cc767b65d4e3",
+        "tools/remote_workspace_entry.py": "e69fa8ff6c51bd3880f5ec388fe97288a4256169377e17d9d6aa5b7ec2f32c27"
+      }
+    },
+    {
+      "expectationMet": true,
+      "foreignTypePremise": "UNKNOWN; rich __eq__/__bool__ not evaluated, not certified builtin bool/string from annotation/comparison AST",
+      "kind": "LITERAL_DATA_WITH_UNKNOWN_TYPE_PREMISE",
+      "matrix": [
+        {
+          "left": false,
+          "result": false,
+          "resultType": "bool",
+          "returnedOperand": "right",
+          "right": false,
+          "snapshotTruthiness": false
+        },
+        {
+          "left": false,
+          "result": true,
+          "resultType": "bool",
+          "returnedOperand": "right",
+          "right": true,
+          "snapshotTruthiness": true
+        },
+        {
+          "left": true,
+          "result": true,
+          "resultType": "bool",
+          "returnedOperand": "left",
+          "right": false,
+          "snapshotTruthiness": true
+        },
+        {
+          "left": true,
+          "result": true,
+          "resultType": "bool",
+          "returnedOperand": "left",
+          "right": true,
+          "snapshotTruthiness": true
+        },
+        {
+          "left": "tag",
+          "result": "tag",
+          "resultType": "str",
+          "returnedOperand": "left",
+          "right": false,
+          "snapshotTruthiness": true
+        },
+        {
+          "left": false,
+          "result": "cancel-tag",
+          "resultType": "str",
+          "returnedOperand": "right",
+          "right": "cancel-tag",
+          "snapshotTruthiness": true
+        },
+        {
+          "left": null,
+          "result": "tag",
+          "resultType": "str",
+          "returnedOperand": "right",
+          "right": "tag",
+          "snapshotTruthiness": true
+        }
+      ],
+      "name": "truthiness-and-or-operand-data",
+      "noExactBoolRuntimeCheckInvented": true
+    }
+  ]
+}

@@ -1,0 +1,2 @@
+PASS check_doc_path_citations --ratchet: 290 broken citation(s), all in baseline, none stale, floor unchanged.
+{"ownerResourceMeasurement": {"target": "tools/check_doc_path_citations.py", "peakWorkingSetBytes": 29376512, "elapsedSeconds": 5.299, "OSMemoryLimitEnforced": false, "serial": true}}

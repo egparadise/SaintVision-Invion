@@ -1,0 +1,49 @@
+{
+  "argv": [
+    "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+    "-B",
+    "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105\\docs\\vault\\30_Development\\Evidence\\fleet5-b-a7-snapshot-r2-20261107-codex\\measured_run.py",
+    "tools/check_contract_bindings.py"
+  ],
+  "cwd": "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105",
+  "python": "3.14.7 (tags/v3.14.7:823f032, Aug  5 2026, 10:51:32) [MSC v.1944 64 bit (AMD64)]",
+  "kst": "2026-11-07T08:29:07.344386+09:00",
+  "exit": 0,
+  "log": "docs-final01-4.log",
+  "logSHA256": "3bd25bac372f9bcf48613530835559e55c89a344e39b4882acd7854bceb898db",
+  "producerHashesBefore": {
+    "docs/vault/30_Development/Evidence/fleet5-b-a7-mode-origin-r1-20261107-codex/controls.py": "517ba1da45a9b887ab439819546b46fd3851a510d40b7c2dbf43f2f417302b55",
+    "docs/vault/30_Development/Evidence/fleet5-b-a7-mode-origin-r1-20261107-codex/mode.py": "0f17230b6b1aa2c8345cb2e138fbc684a1e76eb2694b089d79dc6bc21d3755d7",
+    "docs/vault/30_Development/Evidence/fleet5-b-a7-mode-origin-r1-20261107-codex/prepare.py": "ad90f95d91d7a24ff14d45330b4dac98543c52c01ec91a44ce7a01e959baedb6",
+    "docs/vault/30_Development/Evidence/fleet5-b-a7-mode-origin-r1-20261107-codex/run.py": "7732a523f977968da77ab2f4e436fb76c30af04e2713e2535d62838e139e264c",
+    "docs/vault/30_Development/Evidence/fleet5-b-a7-mode-origin-r1-20261107-codex/review-reviewer_a7r2_probes.py.txt": "b91e601347f2cd7cb1a2def84ea80d1d29fd5aaeb107ad9b9baf7aa67ddcbc27",
+    "docs/vault/30_Development/Evidence/fleet5-b-a7-mode-origin-r1-20261107-codex/review-reviewer_gate_driver.py.txt": "b3dd3ed21c8fd8f323be0ffecf6abeba58a6b13efb64b0fd9b41cf1a345795c4",
+    "docs/vault/30_Development/Evidence/fleet5-b-a7-snapshot-r2-20261107-codex/source_bindings.py": "29dd7070de00fabd1cd4c5824227db0689104910922a0ae28634f12a62efe7e9",
+    "docs/vault/30_Development/Evidence/fleet5-b-a7-snapshot-r2-20261107-codex/call_binding.py": "d1bd5ff2e8212555b95c09a4c24669245341897e42e84a732cbcda25bf058f8b",
+    "docs/vault/30_Development/Evidence/fleet5-b-a7-snapshot-r2-20261107-codex/callee_identity.py": "8e119d5ff4c3916ac41b2147cc09ccbaf6597ab7ef24df4d56cc169611ca37aa",
+    "docs/vault/30_Development/Evidence/fleet5-b-a7-snapshot-r2-20261107-codex/lexical_bindings.py": "6f678154e856c67554b7a569ae54c74fe46d35bf7d197a149272d968f9978edc",
+    "docs/vault/30_Development/Evidence/fleet5-b-a7-snapshot-r2-20261107-codex/reflection_audit.py": "bd63d00f0e82703ab31c566b3596003a651b285e032649035007f5fc74afa95c",
+    "docs/vault/30_Development/Evidence/fleet5-b-a7-snapshot-r2-20261107-codex/use_sites.py": "4a1fbb3f42180bf3d43698121a863fdb1ed2f723394f2a85864a2afc54b647dc",
+    "docs/vault/30_Development/Evidence/fleet5-b-a7-snapshot-r2-20261107-codex/owner_transfer.py": "68623be32888be9cd25023dd0096aefeedffe00dd905784e3de59525b5d84ff7",
+    "docs/vault/30_Development/Evidence/fleet5-b-a7-snapshot-r2-20261107-codex/measured_run.py": "61f7dcfdb00a873c2423e463b5beee5fa623bbf04c392e7ae9e30cdb297ed62e"
+  },
+  "producerHashesAfter": {
+    "docs/vault/30_Development/Evidence/fleet5-b-a7-mode-origin-r1-20261107-codex/controls.py": "517ba1da45a9b887ab439819546b46fd3851a510d40b7c2dbf43f2f417302b55",
+    "docs/vault/30_Development/Evidence/fleet5-b-a7-mode-origin-r1-20261107-codex/mode.py": "0f17230b6b1aa2c8345cb2e138fbc684a1e76eb2694b089d79dc6bc21d3755d7",
+    "docs/vault/30_Development/Evidence/fleet5-b-a7-mode-origin-r1-20261107-codex/prepare.py": "ad90f95d91d7a24ff14d45330b4dac98543c52c01ec91a44ce7a01e959baedb6",
+    "docs/vault/30_Development/Evidence/fleet5-b-a7-mode-origin-r1-20261107-codex/run.py": "7732a523f977968da77ab2f4e436fb76c30af04e2713e2535d62838e139e264c",
+    "docs/vault/30_Development/Evidence/fleet5-b-a7-mode-origin-r1-20261107-codex/review-reviewer_a7r2_probes.py.txt": "b91e601347f2cd7cb1a2def84ea80d1d29fd5aaeb107ad9b9baf7aa67ddcbc27",
+    "docs/vault/30_Development/Evidence/fleet5-b-a7-mode-origin-r1-20261107-codex/review-reviewer_gate_driver.py.txt": "b3dd3ed21c8fd8f323be0ffecf6abeba58a6b13efb64b0fd9b41cf1a345795c4",
+    "docs/vault/30_Development/Evidence/fleet5-b-a7-snapshot-r2-20261107-codex/source_bindings.py": "29dd7070de00fabd1cd4c5824227db0689104910922a0ae28634f12a62efe7e9",
+    "docs/vault/30_Development/Evidence/fleet5-b-a7-snapshot-r2-20261107-codex/call_binding.py": "d1bd5ff2e8212555b95c09a4c24669245341897e42e84a732cbcda25bf058f8b",
+    "docs/vault/30_Development/Evidence/fleet5-b-a7-snapshot-r2-20261107-codex/callee_identity.py": "8e119d5ff4c3916ac41b2147cc09ccbaf6597ab7ef24df4d56cc169611ca37aa",
+    "docs/vault/30_Development/Evidence/fleet5-b-a7-snapshot-r2-20261107-codex/lexical_bindings.py": "6f678154e856c67554b7a569ae54c74fe46d35bf7d197a149272d968f9978edc",
+    "docs/vault/30_Development/Evidence/fleet5-b-a7-snapshot-r2-20261107-codex/reflection_audit.py": "bd63d00f0e82703ab31c566b3596003a651b285e032649035007f5fc74afa95c",
+    "docs/vault/30_Development/Evidence/fleet5-b-a7-snapshot-r2-20261107-codex/use_sites.py": "4a1fbb3f42180bf3d43698121a863fdb1ed2f723394f2a85864a2afc54b647dc",
+    "docs/vault/30_Development/Evidence/fleet5-b-a7-snapshot-r2-20261107-codex/owner_transfer.py": "68623be32888be9cd25023dd0096aefeedffe00dd905784e3de59525b5d84ff7",
+    "docs/vault/30_Development/Evidence/fleet5-b-a7-snapshot-r2-20261107-codex/measured_run.py": "61f7dcfdb00a873c2423e463b5beee5fa623bbf04c392e7ae9e30cdb297ed62e"
+  },
+  "stateBefore": null,
+  "stateAfter": null,
+  "measurementScope": "child process only, serial; no aggregate/quota/OS enforcement"
+}

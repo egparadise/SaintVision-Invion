@@ -1,0 +1,2 @@
+CHECK: 4866 managed files, 2442 pending exports, 0 conflicts. No writes.
+{"ownerResourceMeasurement": {"target": "tools/sync_obsidian.py", "peakWorkingSetBytes": 110456832, "elapsedSeconds": 23.222, "OSMemoryLimitEnforced": false, "serial": true}}
