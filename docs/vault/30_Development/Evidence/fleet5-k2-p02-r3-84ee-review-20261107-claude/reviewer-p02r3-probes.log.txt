@@ -1,0 +1,44 @@
+W01 ok | "SYNTHETIC_ALREADY_BOUND" | 
+W02 ok | [["cap['expectedEffectiveVerdict']"], true, false, false, true] | None
+W03 ok | ["PROVENANCE", "05_REVIEWS"] | independently-approved-effective-verdict
+W04 ok | ["PROVENANCE", "05_REVIEWS"] | effective-publication-distinct-from-every-original-and-part
+W05 ok | ["PROVENANCE", "05_REVIEWS"] | effective-publication-distinct-from-every-original-and-part
+W06 ok | "SYNTHETIC_ALREADY_BOUND" | 
+W07 ok | ["PROVENANCE", "05_REVIEWS"] | independently-approved-effective-verdict
+W08 ok | ["PROVENANCE", "05_REVIEWS"] | independently-approved-effective-verdict
+W09 ok | ["PROVENANCE", "05_REVIEWS"] | independently-approved-effective-verdict
+W10 ok | ["PROVENANCE", "05_REVIEWS"] | independently-approved-effective-verdict
+W11 ok | ["PROVENANCE", "05_REVIEWS"] | independently-approved-effective-verdict
+W12 ok | ["PROVENANCE", "05_REVIEWS"] | closed-independent-effective-verdict-expectation
+W13 ok | ["PROVENANCE", "05_REVIEWS"] | closed-independent-effective-verdict-expectation
+W14 ok | ["PROVENANCE", "05_REVIEWS"] | closed-independent-effective-verdict-expectation
+W15 ok | ["PROVENANCE", "05_REVIEWS"] | closed-independent-effective-verdict-expectation
+W16 ok | ["PROVENANCE", "05_REVIEWS"] | closed-independent-effective-verdict-expectation
+W17 ok | ["PROVENANCE", "05_REVIEWS"] | closed-independent-effective-verdict-expectation
+W18 ok | "SYNTHETIC_ALREADY_BOUND" | 
+W19 ok | ["PROVENANCE", "05_REVIEWS"] | closed-independent-effective-verdict-expectation
+W20 ok | ["ANCHOR", "01_ANCHOR"] | capsule-unavailable
+W21 ok | ["ANCHOR", "01_ANCHOR"] | capsule-unavailable
+W22 ok | ["ANCHOR", "01_ANCHOR"] | closed-capsule-descriptor
+W23 ok | ["PROVENANCE", "05_REVIEWS"] | effective-publication-distinct-from-every-original-and-part
+W24 ok | ["STATUS", "06_STATUS"] | current-review-registration
+W25 ok | ["PROVENANCE", "05_REVIEWS"] | independent-review-outcome-set
+W26 ok | ["PROVENANCE", "05_REVIEWS"] | preserved-original-review-target
+W27 ok | ["PROVENANCE", "05_REVIEWS"] | effective-publicationSHA
+W28 ok | "SYNTHETIC_ALREADY_BOUND" | 
+X01 ok | [{"InstallationReceiptSHA256": "H3", "RuntimeLockSHA256": "H3", "LinkedClosureSHA256": "H3", "RunningExecutableSHA256": "H5", "Verifier.ArtifactSHA256": "H3", "Verifier.SourceSHA": "H3"}, {"ExecutableSHA256": "H5", "Inst | None
+X02 ok | [6, true, 1, 4] | None
+X03 ok | [8, 0, 6, true] | None
+X04 ok | ["INSTALLATION", "05_RUNNING"] | independent-H5-receiptSHA256
+X05 ok | ["INSTALLATION", "05_RUNNING"] | independent-H5-receiptSHA256
+X06 ok | ["INSTALLATION", "05_RUNNING"] | independent-H5-runtimeLockSHA256
+X07 ok | ["INSTALLATION", "05_RUNNING"] | independent-H5-runtimeLockSHA256
+X08 ok | ["INSTALLATION", "05_RUNNING"] | independent-H5-linkedClosureSHA256
+X09 ok | ["INSTALLATION", "05_RUNNING"] | independent-H5-linkedClosureSHA256
+X10 ok | ["INSTALLATION", "05_RUNNING"] | independent-H5-executableSHA256
+X11 ok | ["INSTALLATION", "05_RUNNING"] | independent-H5-sourceSHA
+Y01 ok | [10, 10, true] | None
+Y02 ok | ["7f10d87844321c6f4a63bb98d4ad03588477f9021eb3fd7c64c56665d69c4fff", true, 1, true, "6da1c0276943ad6b091214570e9db92580ced0e8389d74c7a32c2ed136064473", true, [2, 15, 15, 1, 14, 0, 8], [1, 15, 15, 1, 14, 0, 8]] | None
+Y03 ok | [true, true] | None
+Y04 ok | [5, true, true, true] | None
+findings []

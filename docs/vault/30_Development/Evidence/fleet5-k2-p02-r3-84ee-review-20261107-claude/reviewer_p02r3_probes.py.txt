@@ -1,0 +1,307 @@
+"""Reviewer (Claude) independent NARROW delta probes of P02 Rev3 candidate 84ee9b1b (P02R2-M1, P02R2-L1 only). Symbolic only.
+
+Imports byte-verified scratch COPIES of the exact target blobs: Rev3 candidate_model.py / fixture_data.py, the
+retained Rev2 schema_defs.py and (for the deliberately regressed same-source mutant only) the actual Rev2
+candidate_model.py. Owner test_rev3.py is NOT executed (it writes owner test-runs/test-results); it is hashed only.
+Every row that claims an already-bound precondition re-checks it with the reviewer's OWN code: retained-format
+envelope valid against the committed candidate-envelope.schema.json FILE, payload valid against the committed
+policy-payload.schema.json FILE, exact canonical envelope bytes, payload digest bound, signature tuple bound
+(reviewer-own domain projection), and the observed passed-stage list equal to the exact STAGES prefix.
+K1 comparisons are transliterated from the immutable policy.go TEXT (line containing the measured comparisons);
+policy.go is read and hashed, never compiled or executed. No crypto, provider, clock, OS, network, key or service.
+Usage: python -I -B reviewer_p02r3_probes.py <worktree> <scratch-model-dir> <out.json>
+A row whose observed result differs from contractExpects is a FINDING, not a harness failure.
+"""
+import ast, copy, datetime, hashlib, importlib.util, json, re, subprocess, sys
+from dataclasses import replace
+from pathlib import Path
+
+WT = Path(sys.argv[1]); SCR = Path(sys.argv[2]); OUT = Path(sys.argv[3])
+TARGET = '84ee9b1b43b8921ed1d0ef8bde6f3546013c1095'
+EV3 = 'docs/vault/30_Development/Evidence/fleet5-k2-p02-registry-attestation-rev3-20261107-codex'
+EV2 = 'docs/vault/30_Development/Evidence/fleet5-k2-p02-registry-attestation-rev2-20261107-codex'
+POLICY_GO = 'services/node-agent/internal/migrationcontext/policy.go'
+REV2_REVIEW = '973b6f8cca4c4a2f3dee698d52b93230ae2e8e4a'
+def git(*args): return subprocess.run(['git', '-C', str(WT), *args], capture_output=True, check=True).stdout
+def blob(path, rev=TARGET): return git('show', rev + ':' + path)
+def sha(b): return hashlib.sha256(b).hexdigest()
+
+PINNED = {EV3 + '/candidate_model.py': '62ed38d3cd90d6e8105d7e613d25371ff866572647ab03641ba2aedae5430c18',
+          EV3 + '/fixture_data.py': 'b3619dcd3e801691d3fe320f9c1f3a4db66475016b07b1be169e852a08cc8134',
+          EV3 + '/test_rev3.py': '6da1c0276943ad6b091214570e9db92580ced0e8389d74c7a32c2ed136064473',
+          EV3 + '/contract.md': 'de290b978fe3d7fbea45488e5971492abace60f8b4235a513466c0cb738fbf99',
+          EV3 + '/payload-contract.json': '7d3d7ed48989afb559a4ff4404669543d0f046937e998787581bb17ba1df25e4',
+          EV2 + '/candidate_model.py': 'e816e1f53803904d717df1fe247d75198e8ee6c2f94cf531cba238b48d868d9e',
+          EV2 + '/schema_defs.py': '114000ff9ef276525ca303e91621fd5ef5efd8f30e59e39dd01d6000daeec6c4',
+          EV2 + '/candidate-envelope.schema.json': '60d6c825d26e3c72f4c367e92200e0bc14c83642764c0dc27ec4d7c74a43d74c',
+          EV2 + '/policy-payload.schema.json': '02d0b30fdd79b0263cdbafc42bd2bc0531c3e0ecbd8d55cbe72e6c91dfc320a1',
+          EV2 + '/authority-scope.schema.json': 'ccae13986377c1a670323983c0c24c1d2e05cc8cdeb6b9119d4560c65c15bf21',
+          POLICY_GO: 'ce6f1b9b1a1835276b248c3dbdb8fa42b68fa79fb5684748ea78694d104bbdd2'}
+for f, h in PINNED.items(): assert sha(blob(f)) == h, f
+assert git('rev-parse', TARGET + '^').decode().strip() == '58d7eb077efbcff5327ac298a39984fe1e39fdf1'
+for name, path in [('p02_rev2_schema', EV2 + '/schema_defs.py'), ('p02_rev3_model', EV3 + '/candidate_model.py'),
+                   ('p02_rev3_fixtures', EV3 + '/fixture_data.py'), ('p02_rev2_model', EV2 + '/candidate_model.py')]:
+    file = SCR / (name + '.py'); file.write_bytes(blob(path))
+    spec = importlib.util.spec_from_file_location(name, file)
+    mod = importlib.util.module_from_spec(spec); sys.modules[name] = mod; spec.loader.exec_module(mod)
+m = sys.modules['p02_rev3_model']; fx = sys.modules['p02_rev3_fixtures']; sd = sys.modules['p02_rev2_schema']; m2 = sys.modules['p02_rev2_model']
+import jsonschema
+FILE_SCHEMA = {k: json.loads(blob(EV2 + '/' + f)) for k, f in [('envelope', 'candidate-envelope.schema.json'), ('payload', 'policy-payload.schema.json'), ('authorityScope', 'authority-scope.schema.json')]}
+assert all(FILE_SCHEMA[k] == sd.schema(k) for k in FILE_SCHEMA), 'schema_defs differs from committed schema files'
+V = {k: jsonschema.Draft202012Validator(s) for k, s in FILE_SCHEMA.items()}
+STAGE_NAMES = [s for s, _ in m.STAGES]
+assert m.STAGES == m2.STAGES and m.REASONS == m2.REASONS and m.PUBLIC_REFUSAL == m2.PUBLIC_REFUSAL
+MY_DOMAIN = b'fleet5/p02/installed-policy-registry/candidate/v2'
+
+rows = []
+def my_pre(inp):
+    raw, p, z, a = inp; out = {}
+    try:
+        e = json.loads(raw); cap = json.loads(a.capsule)
+        out['envelopeSchemaValid'] = not list(V['envelope'].iter_errors(e))
+        out['payloadSchemaValid'] = not list(V['payload'].iter_errors(json.loads(p)))
+        out['retainedFormat'] = e['body']['format'] == 'fleet5-p02-registry-candidate:2'
+        out['exactCanonicalEnvelope'] = json.dumps(e, sort_keys=True, separators=(',', ':'), ensure_ascii=False).encode() == raw
+        out['payloadDigestBound'] = sha(p) == e['body']['facts']['policyPayloadSHA256']
+        out['capsuleDigestBound'] = sha(a.capsule) == e['body']['capsuleSHA256']
+        out['signatureTupleBound'] = (sha(MY_DOMAIN + b'\0' + json.dumps({'body': e['body'], 'signer': e['signer']}, sort_keys=True, separators=(',', ':'), ensure_ascii=False).encode()), e['signatureHex'], cap['keySPKI']) in a.signatures
+    except Exception as x: out['preError'] = type(x).__name__
+    return out
+PRE_KEYS = ('envelopeSchemaValid', 'payloadSchemaValid', 'retainedFormat', 'exactCanonicalEnvelope', 'payloadDigestBound', 'capsuleDigestBound', 'signatureTupleBound')
+def run(inp):
+    r = m.evaluate(*inp); assert m.production_projection(r) == m.PUBLIC_REFUSAL; return r
+def probe(pid, area, expects, inp=None, *, observed=None, detail_expect=None, bound=True, note='', extra=None):
+    pre = my_pre(inp) if inp is not None else {}
+    detail = None; prefix_ok = None
+    if inp is not None:
+        r = run(inp)
+        observed = r.label if r.label != 'REFUSE' else [r.reason, r.failed_stage]
+        prefix = STAGE_NAMES if r.label != 'REFUSE' else STAGE_NAMES[:STAGE_NAMES.index(r.failed_stage)]
+        prefix_ok = list(r.passed_stages) == prefix; detail = r.detail
+    pre_ok = all(pre.get(k) for k in PRE_KEYS) if inp is not None else None
+    match = expects == observed and (detail_expect is None or detail_expect == detail)
+    finding = (not match) or (bound and inp is not None and not pre_ok) or (prefix_ok is False)
+    row = dict(id=pid, area=area, contractExpects=expects, expectedDetail=detail_expect, observed=observed, detail=detail,
+               alreadyBoundPreconditions=pre if inp is not None else None, preconditionsOK=pre_ok, earlierStagesExactPrefix=prefix_ok,
+               inputSHA256=sha(inp[0] + b'\0' + inp[1] + b'\0' + inp[3].capsule + inp[3].source_facts + inp[3].coverage + inp[3].reviews + inp[3].h5 + inp[3].lifecycle + inp[3].ticket) if inp is not None else None,
+               finding=finding, note=note)
+    if extra: row.update(extra)
+    rows.append(row); return observed
+
+def base(): return fx.fixture()
+def capmod(e, a, fn):
+    cap = json.loads(a.capsule); fn(cap); a = replace(a, capsule=m.canonical(cap)); e['body']['capsuleSHA256'] = sha(a.capsule); return a
+def covmod(a, fn):
+    cov = json.loads(a.coverage); fn(cov); return replace(a, coverage=m.canonical(cov))
+def eff_verdict_case(e, a, verdict):
+    a = covmod(a, lambda cov: cov['statement']['effective'].update(verdict=verdict)); e['body']['facts']['effectiveReviewVerdict'] = verdict; return a
+INDEP = fx.EXPECTED_EFFECTIVE_VERDICT
+PROV05 = ['PROVENANCE', '05_REVIEWS']
+D_VERDICT = 'independently-approved-effective-verdict'; D_EXPECT = 'closed-independent-effective-verdict-expectation'; D_DISTINCT = 'effective-publication-distinct-from-every-original-and-part'
+
+# ================= M1 =================
+e, p, z, a = base(); ctl = (m.canonical(e), m.canonical(p), z, a)
+probe('W01', 'M1-control', 'SYNTHETIC_ALREADY_BOUND', ctl, note='benign C01-equivalent on reviewer copy: all 20 STAGES pass; production projection still refuses')
+
+# W02 static: the expectation is read only from the capsule, never from coverage; fixture constant is an independent literal; seal never rebinds it.
+msrc = blob(EV3 + '/candidate_model.py').decode(); fsrc = blob(EV3 + '/fixture_data.py').decode()
+tree = ast.parse(msrc); rv = next(n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name == '_reviews')
+assigns = [ast.unparse(n.value) for n in ast.walk(rv) if isinstance(n, ast.Assign) and any(isinstance(t, ast.Name) and t.id == 'expected' for t in n.targets)]
+ftree = ast.parse(fsrc)
+const = [n for n in ftree.body if isinstance(n, ast.Assign) and any(isinstance(t, ast.Name) and t.id == 'EXPECTED_EFFECTIVE_VERDICT' for t in n.targets)]
+seal_fn = next(n for n in ftree.body if isinstance(n, ast.FunctionDef) and n.name == 'seal')
+probe('W02', 'M1-origin-static', [["cap['expectedEffectiveVerdict']"], True, False, False, True],
+      observed=[assigns, len(const) == 1 and isinstance(const[0].value, ast.Constant), 'expectedEffectiveVerdict' in ast.unparse(seal_fn), 'EFFECTIVE' in ast.unparse(const[0].value) if const else None,
+                json.loads(a.capsule)['expectedEffectiveVerdict'] == INDEP],
+      note='AST: _reviews assigns expected ONLY from capsule; fixture EXPECTED_EFFECTIVE_VERDICT is a literal Constant (not EFFECTIVE[...]); seal() never names/rebinds expectedEffectiveVerdict; benign capsule carries that literal')
+
+# W03-W05 actual V19/V20/V20b equivalents rebased on valid retained schema/canonical bytes, new digests/signature/current identity.
+e, p, z, a = base(); a = eff_verdict_case(e, a, 'SYNTHETIC_REVISION_REQUIRED_NOT_APPROVED')
+probe('W03', 'M1-V19-equivalent', PROV05, fx.seal(e, p, z, a, bind_coverage=True, source_fields=('effectiveReviewVerdict',), new_head=True, new_request=True), detail_expect=D_VERDICT,
+      note='V19 rebased: authenticated H3-EA statement publishes a NON-approval; facts/H3 source/coverage digests/current head/ticket/request/signature rebound consistently; capsule expectation untouched')
+for pid, idx, label in (('W04', 1, 'V20 rebased: effective publication relabelled as ORIGINAL DIRECT review 2'), ('W05', 0, 'V20b rebased: effective publication relabelled as ORIGINAL INHERITED review 1 (target a1.. != current b1..)')):
+    e, p, z, a = base(); orig = fx.REVIEWS[idx]['reviewSHA']
+    a = covmod(a, lambda cov: cov['statement']['effective'].update(publicationSHA=orig)); p['verifier']['reviewSHA'] = orig; e['body']['facts']['effectiveReviewSHA'] = orig
+    probe(pid, 'M1-' + label[:3] + '-equivalent', PROV05, fx.seal(e, p, z, a, bind_payload=True, bind_coverage=True, source_fields=('effectiveReviewSHA',), new_head=True, new_request=True), detail_expect=D_DISTINCT,
+          note=label + '; payload.verifier.reviewSHA, facts and H3 source rebound; original rows/targets/verdicts/parts unchanged')
+
+# W06 the predicate is an exact join to an INDEPENDENT value, not a hard-coded string: Root re-provisions a different literal and coverage carries it.
+e, p, z, a = base(); alt = 'SYNTHETIC_ROOT_REPROVISIONED_OUTCOME'
+a = capmod(e, a, lambda cap: cap.update(expectedEffectiveVerdict=alt)); a = eff_verdict_case(e, a, alt)
+probe('W06', 'M1-exact-join-control', 'SYNTHETIC_ALREADY_BOUND', fx.seal(e, p, z, a, bind_coverage=True, source_fields=('effectiveReviewVerdict',), new_head=True, new_request=True),
+      note='CONTROL: independent capsule expectation and H3-EA verdict both = another literal -> accepted; acceptance follows the independently provisioned value, no name/suffix heuristic')
+e, p, z, a = base(); a = capmod(e, a, lambda cap: cap.update(expectedEffectiveVerdict=alt))
+probe('W07', 'M1-not-learned', PROV05, fx.seal(e, p, z, a, new_head=True, new_request=True), detail_expect=D_VERDICT,
+      note='independent expectation re-provisioned but coverage still says the old (approval-looking) literal -> refuses; value is not learned from coverage')
+# W08-W11 near-variant effective verdicts (envelope accepts them: printable ASCII <=256), capsule unchanged.
+for pid, v, why in (('W08', INDEP + ' ', 'trailing space'), ('W09', INDEP.lower(), 'case fold'), ('W10', INDEP[:-1], 'truncated prefix'), ('W11', INDEP + '_NOT', 'superstring/suffix')):
+    e, p, z, a = base(); a = eff_verdict_case(e, a, v)
+    probe(pid, 'M1-near-verdict', PROV05, fx.seal(e, p, z, a, bind_coverage=True, source_fields=('effectiveReviewVerdict',), new_head=True, new_request=True), detail_expect=D_VERDICT, note='effective verdict ' + why + ' of the independent literal')
+# W12-W19 malformed / boundary expectation in the CLOSED capsule (coverage unchanged unless stated).
+for pid, val, why in (('W12', '', 'empty'), ('W13', 7, 'integer'), ('W14', None, 'null'), ('W15', [INDEP], 'list holding the literal'), ('W16', {'v': INDEP}, 'object'), ('W17', True, 'bool')):
+    e, p, z, a = base(); a = capmod(e, a, lambda cap: cap.update(expectedEffectiveVerdict=val))
+    probe(pid, 'M1-malformed-expectation', PROV05, fx.seal(e, p, z, a, new_head=True, new_request=True), detail_expect=D_EXPECT, note='capsule expectation ' + why)
+for pid, n, expects, dexp in (('W18', 128, 'SYNTHETIC_ALREADY_BOUND', None), ('W19', 129, PROV05, D_EXPECT)):
+    e, p, z, a = base(); v = ('A' * n)
+    a = capmod(e, a, lambda cap: cap.update(expectedEffectiveVerdict=v)); a = eff_verdict_case(e, a, v)
+    probe(pid, 'M1-length-boundary', expects, fx.seal(e, p, z, a, bind_coverage=True, source_fields=('effectiveReviewVerdict',), new_head=True, new_request=True), detail_expect=dexp,
+          note=f'expectation == effective verdict == {n} printable ASCII bytes (envelope allows <=256, so only the 05 predicate decides)')
+for pid, val, why in (('W20', INDEP[:-1] + 'É', 'non-ASCII'), ('W21', INDEP + '\t', 'control character')):
+    e, p, z, a = base(); a = capmod(e, a, lambda cap: cap.update(expectedEffectiveVerdict=val))
+    a = replace(a, signatures=frozenset(((m.sha(m.projection(e)), e['signatureHex'], json.loads(a.capsule)['keySPKI']),)))
+    probe(pid, 'M1-nonprintable-expectation', ['ANCHOR', '01_ANCHOR'], (m.canonical(e), m.canonical(p), z, a), detail_expect='capsule-unavailable',
+          note='capsule expectation ' + why + ': refused EARLIER by the closed capsule lexical codec (strict_json ascii 32..126), not by the 05 predicate; contract.md text says PROVENANCE 05 for any present malformed value (INFO precision only, fail-closed)')
+e, p, z, a = base(); a = capmod(e, a, lambda cap: cap.pop('expectedEffectiveVerdict'))
+probe('W22', 'M1-missing-expectation', ['ANCHOR', '01_ANCHOR'], fx.seal(e, p, z, a, new_head=True, new_request=True), detail_expect='closed-capsule-descriptor', note='capsule field absent')
+
+# W23 unused ORIGINAL alias, reviewer-own construction: review 3 authenticated (response + H3 reviews + capsule outcome + coverage set), referenced by no part.
+e, p, z, a = base(); third = fx._review(3, 'c3' * 20, 'c4' * 20, 'SYNTHETIC_UNUSED_ORIGINAL_ACCEPT', 'Reviewer unused original scope', 'synthetic-reviewer-R')
+e['body']['reviews'].append(third)
+a = capmod(e, a, lambda cap: cap['approvedReviewOutcomes'].update({third['reviewSHA']: third['verdict']}))
+a = covmod(a, lambda cov: cov['statement'].update(reviewSetSHA256=m.sha(m.c2(e['body']['reviews']))))
+a = covmod(a, lambda cov: cov['statement']['effective'].update(publicationSHA=third['reviewSHA']))
+p['verifier']['reviewSHA'] = third['reviewSHA']; e['body']['facts']['effectiveReviewSHA'] = third['reviewSHA']
+probe('W23', 'M1-unused-original', PROV05, fx.seal(e, p, z, a, bind_payload=True, bind_reviews=True, bind_coverage=True, source_fields=('effectiveReviewSHA',), new_head=True, new_request=True), detail_expect=D_DISTINCT,
+      note='independently bound original review 3 used by NO part; alias still in the deny set')
+# W24 control for W23: the same 3-review world with a DISTINCT effective publication passes 05_REVIEWS (refusal, if any, is later) -> the deny set, not the extra row, causes W23.
+e, p, z, a = base(); e['body']['reviews'].append(copy.deepcopy(third))
+a = capmod(e, a, lambda cap: cap['approvedReviewOutcomes'].update({third['reviewSHA']: third['verdict']}))
+a = covmod(a, lambda cov: cov['statement'].update(reviewSetSHA256=m.sha(m.c2(e['body']['reviews']))))
+inp24 = fx.seal(e, p, z, a, bind_reviews=True, bind_coverage=True, new_head=True, new_request=True)
+probe('W24', 'M1-unused-original-control', ['STATUS', '06_STATUS'], inp24, detail_expect='current-review-registration',
+      note='CAUSAL CONTROL for W23: identical 3-review world, distinct publication e2.. -> passes 05_REVIEWS..05_RUNNING and stops only at 06_STATUS because H4 lifecycle never registered review 3')
+# W25 the response cannot shrink the deny set: drop original review 1 from response AND H3 review rows, rebind coverage set; capsule still names it.
+e, p, z, a = base(); r1 = fx.REVIEWS[0]['reviewSHA']
+e['body']['reviews'] = [dict(fx.REVIEWS[1], ordinal=1)]
+a = covmod(a, lambda cov: cov['statement'].update(reviewSetSHA256=m.sha(m.c2(e['body']['reviews']))))
+a = covmod(a, lambda cov: cov['statement']['effective'].update(publicationSHA=r1)); p['verifier']['reviewSHA'] = r1; e['body']['facts']['effectiveReviewSHA'] = r1
+probe('W25', 'M1-deny-set-not-shrinkable', PROV05, fx.seal(e, p, z, a, bind_payload=True, bind_reviews=True, bind_coverage=True, source_fields=('effectiveReviewSHA',), new_head=True, new_request=True),
+      detail_expect='independent-review-outcome-set', note='original review 1 removed from every response-side and H3 review row; capsule.approvedReviewOutcomes still names it -> refused before the alias check')
+# W26 a part cannot point at the effective publication (parts subset of originals is joined earlier).
+e, p, z, a = base()
+a = covmod(a, lambda cov: cov['statement']['parts'][1].update(reviewSHA=fx.EFFECTIVE['publicationSHA']))
+probe('W26', 'M1-part-to-effective', PROV05, fx.seal(e, p, z, a, bind_coverage=True, new_head=True, new_request=True), detail_expect='preserved-original-review-target',
+      note='coverage part adapter claims the effective publication as its reviewer; refused by the earlier original-review join, so parts[] is always a subset of the original identities')
+# W27 lexical alias of an original (uppercase) only in coverage: passes the set test, refused by the effective join.
+e, p, z, a = base(); up = fx.REVIEWS[1]['reviewSHA'].upper()
+a = covmod(a, lambda cov: cov['statement']['effective'].update(publicationSHA=up))
+probe('W27', 'M1-lexical-alias', PROV05, fx.seal(e, p, z, a, bind_coverage=True, new_head=True, new_request=True), detail_expect='effective-publicationSHA',
+      note='coverage publicationSHA = UPPERCASE of original review 2; facts/payload keep e2.. (they cannot carry uppercase: closed envelope/payload hex patterns) -> effective join refuses at 05_REVIEWS')
+# W28 observation (not a contract requirement): publication equal to the current source commit SHA.
+e, p, z, a = base(); src_sha = fx.SOURCE
+a = covmod(a, lambda cov: cov['statement']['effective'].update(publicationSHA=src_sha)); p['verifier']['reviewSHA'] = src_sha; e['body']['facts']['effectiveReviewSHA'] = src_sha
+probe('W28', 'M1-observation-not-required', 'SYNTHETIC_ALREADY_BOUND', fx.seal(e, p, z, a, bind_payload=True, bind_coverage=True, source_fields=('effectiveReviewSHA',), new_head=True, new_request=True),
+      note='OBSERVATION ONLY: contract requires distinctness from original/part REVIEW identities, not from the source commit; the real H3-EA must authenticate the publication identity itself. Not a finding.')
+
+# ================= L1 =================
+def context(inp):
+    raw, pol, art, a = inp; c = dict(raw=raw, policy=pol, artifact=art, a=a)
+    for check in m._CHECKS[:-1]: check(c)
+    return c
+H3TAG = {'installationReceiptSHA256': 'a3' * 32, 'runtimeLockSHA256': 'b3' * 32, 'linkedClosureSHA256': 'c3' * 32, 'binarySHA256': 'd3' * 32}
+H5TAG = {'receiptSHA256': 'a5' * 32, 'runtimeLockSHA256': 'b5' * 32, 'linkedClosureSHA256': 'c5' * 32, 'executableSHA256': 'd5' * 32, 'sourceSHA': 'e5' * 20}
+def tag_source(v):
+    return 'H3' if v in H3TAG.values() or v == fx.SOURCE else 'H5' if v in H5TAG.values() else 'other'
+def tainted(model):
+    c = context(ctl); c = dict(c); c['source_facts'] = dict(c['source_facts'], **H3TAG); c['h5'] = dict(c['h5'], **H5TAG)
+    model._project(c); return json.loads(c['projection']), c
+proj3, c3 = tainted(m); proj2, _ = tainted(m2)
+rd = m.running_data_projection(c3['h5'])
+attr3 = {k: tag_source(proj3['Provenance'][k]) for k in ('InstallationReceiptSHA256', 'RuntimeLockSHA256', 'LinkedClosureSHA256', 'RunningExecutableSHA256')}
+attr3.update({'Verifier.ArtifactSHA256': tag_source(proj3['Verifier']['ArtifactSHA256']), 'Verifier.SourceSHA': tag_source(proj3['Verifier']['SourceSHA'])})
+attr2 = {k: tag_source(proj2['Provenance'][k]) for k in ('InstallationReceiptSHA256', 'RuntimeLockSHA256', 'LinkedClosureSHA256', 'RunningExecutableSHA256')}
+probe('X01', 'L1-projection-origin', [{'InstallationReceiptSHA256': 'H3', 'RuntimeLockSHA256': 'H3', 'LinkedClosureSHA256': 'H3', 'RunningExecutableSHA256': 'H5', 'Verifier.ArtifactSHA256': 'H3', 'Verifier.SourceSHA': 'H3'},
+      {k: 'H5' for k in rd}, sorted(rd) == sorted(['ExecutableSHA256', 'InstallationReceiptSHA256', 'SourceSHA', 'RuntimeLockSHA256', 'LinkedClosureSHA256'])],
+      observed=[attr3, {k: tag_source(v) for k, v in rd.items()}, sorted(rd) == sorted(['ExecutableSHA256', 'InstallationReceiptSHA256', 'SourceSHA', 'RuntimeLockSHA256', 'LinkedClosureSHA256'])],
+      extra=dict(regressedRev2Attribution=attr2),
+      note='TAINT attribution: real Rev3 _project on a context that passed stages 01..06 of C01, then H3 and H5 values given distinct tags (isolated, not accepted policy). Rev2 _project on the same context: ' + json.dumps(attr2))
+
+# X02 transliterate the immutable K1 comparison line from policy.go TEXT and classify every operand by origin.
+pg = blob(POLICY_GO).decode('utf-8').splitlines()
+ln = next(i for i, t in enumerate(pg, 1) if 'measured.ExecutableSHA256 != v.ArtifactSHA256' in t)
+cond = re.search(r'if (.*) \{', pg[ln - 1]).group(1)
+pairs = [tuple(x.strip() for x in term.split('!=')) for term in cond.split('||')]
+def operand(expr, proj, measured):
+    obj, field = expr.split('.')
+    return {'v': proj['Verifier'], 'pr': proj['Provenance'], 'measured': measured}[obj][field]
+def k1_last(proj, measured): return all(operand(x, proj, measured) == operand(y, proj, measured) for x, y in pairs)
+cls3 = [(x, y, tag_source(operand(x, proj3, rd)), tag_source(operand(y, proj3, rd))) for x, y in pairs]
+cls2 = [(x, y, tag_source(operand(x, proj2, rd)), tag_source(operand(y, proj2, rd))) for x, y in pairs]
+measured_fields = sorted(rd); covered = {f: any(('measured.' + f) in (x, y) and 'H3' in (sx, sy) for x, y, sx, sy in cls3) for f in measured_fields}
+probe('X02', 'L1-K1-two-sided', [6, True, 1, 4], observed=[len(pairs), all(covered.values()), sum(sx == sy for _, _, sx, sy in cls3), sum(sx == sy for _, _, sx, sy in cls2)],
+      extra=dict(policyGoLine=ln, comparisons=[f'{x} != {y}' for x, y in pairs], rev3Origins=[f'{sx}<->{sy}' for _, _, sx, sy in cls3], rev2RegressedOrigins=[f'{sx}<->{sy}' for _, _, sx, sy in cls2], measuredFieldHasH3Counterpart=covered),
+      note=f'policy.go:{ln} (blob ce6f1b9b, TEXT only). Rev3: every one of the 5 measured fields has an H3 counterpart; the single same-source pair is pr.RunningExecutableSHA256 vs measured.ExecutableSHA256 (Root-specified H5; its H3 counterpart is v.ArtifactSHA256). Rev2 regressed: 4 same-source pairs (receipt/lock/link + running executable).')
+
+# X03 eight ISOLATED last-comparison checks on the tainted-free real values: one side regressed per check.
+def iso(model, s_over=None, h_over=None):
+    c = context(ctl); c = dict(c); c['source_facts'] = dict(c['source_facts'], **(s_over or {})); c['h5'] = dict(c['h5'], **(h_over or {}))
+    model._project(c); pj = json.loads(c['projection']); return k1_last(pj, m.running_data_projection(c['h5']))
+iso_rows = []
+for lab, h3k, h5k in (('receipt', 'installationReceiptSHA256', 'receiptSHA256'), ('lock', 'runtimeLockSHA256', 'runtimeLockSHA256'), ('link', 'linkedClosureSHA256', 'linkedClosureSHA256')):
+    iso_rows.append(dict(id='H3-' + lab, rev3K1Last=iso(m, s_over={h3k: 'af' * 32}), rev2RegressedK1Last=iso(m2, s_over={h3k: 'af' * 32})))
+    iso_rows.append(dict(id='H5-' + lab, rev3K1Last=iso(m, h_over={h5k: 'bf' * 32}), rev2RegressedK1Last=iso(m2, h_over={h5k: 'bf' * 32})))
+iso_rows.append(dict(id='H5-executable', rev3K1Last=iso(m, h_over={'executableSHA256': 'bf' * 32}), rev2RegressedK1Last=iso(m2, h_over={'executableSHA256': 'bf' * 32})))
+iso_rows.append(dict(id='H5-source', rev3K1Last=iso(m, h_over={'sourceSHA': 'bf' * 20}), rev2RegressedK1Last=iso(m2, h_over={'sourceSHA': 'bf' * 20})))
+probe('X03', 'L1-isolated-vacuity', [8, 0, 6, True], observed=[len(iso_rows), sum(r['rev3K1Last'] for r in iso_rows), sum(r['rev2RegressedK1Last'] for r in iso_rows), iso(m) and iso(m2)],
+      extra=dict(isolatedChecks=iso_rows, classification='ISOLATED_MISMATCHED_DTO_NOT_ACCEPTED_POLICY_NOT_K1_EXECUTION'),
+      note='each check perturbs ONE side after stages 01..06 passed; Rev3 projection makes the transliterated K1 last comparison fail in all 8; the actual Rev2 _project (H5-to-both-sides) passes it in the 6 receipt/lock/link cases (vacuous) and fails only executable/source, which always had H3 counterparts. Unperturbed both pass.')
+
+# X04-X11 full evaluator: tamper ONE independent source, everything else validly rebound -> INSTALLATION 05_RUNNING, exact prefix.
+xi = 4
+for lab, h3k, h5k in (('receipt', 'installationReceiptSHA256', 'receiptSHA256'), ('lock', 'runtimeLockSHA256', 'runtimeLockSHA256'), ('link', 'linkedClosureSHA256', 'linkedClosureSHA256')):
+    e, p, z, a = base(); e['body']['facts'][h3k] = 'ab' * 32
+    probe(f'X{xi:02d}', 'L1-full-H3-mismatch', ['INSTALLATION', '05_RUNNING'], fx.seal(e, p, z, a, source_fields=(h3k,), new_head=True, new_request=True), detail_expect='independent-H5-' + h5k,
+          note='approved H3 ' + h3k + ' changed in record AND H3 source (05_SOURCE passes); H5 unchanged'); xi += 1
+    e, p, z, a = base(); h = json.loads(a.h5); h[h5k] = 'cd' * 32; a = replace(a, h5=m.canonical(h))
+    probe(f'X{xi:02d}', 'L1-full-H5-mismatch', ['INSTALLATION', '05_RUNNING'], fx.seal(e, p, z, a, new_request=True), detail_expect='independent-H5-' + h5k,
+          note='measured H5 ' + h5k + ' changed; request binding/echo/signature rebound to the new H5 bytes'); xi += 1
+for key, val in (('executableSHA256', 'cd' * 32), ('sourceSHA', 'cd' * 20)):
+    e, p, z, a = base(); h = json.loads(a.h5); h[key] = val; a = replace(a, h5=m.canonical(h))
+    probe(f'X{xi:02d}', 'L1-full-H5-mismatch-extra', ['INSTALLATION', '05_RUNNING'], fx.seal(e, p, z, a, new_request=True), detail_expect='independent-H5-' + key, note='extra: measured H5 ' + key + ' changed'); xi += 1
+
+# ================= retained-fact checks (read, not rerun) =================
+def lstree_z(*args): return [l.split('\t', 1) for l in git('ls-tree', '-z', *args).decode('utf-8').split('\0') if l]
+orig = [r for r in lstree_z('-r', REV2_REVIEW, '--', 'docs/vault/30_Development/Evidence/fleet5-k2-p02-r2-58d-review-20261107-claude', 'docs/vault/30_Development/History')
+        if 'fleet5-k2-p02-r2-58d-review-20261107-claude' in r[1] or 'K2_P02_Rev2_58d' in r[1]]
+raws = lstree_z(TARGET, EV3 + '/review-originals/')
+probe('Y01', 'retained-originals', [10, 10, True], observed=[len(raws), len(orig), sorted(sha(git('cat-file', 'blob', x.split()[2])) for x, _ in raws) == sorted(sha(git('cat-file', 'blob', x.split()[2])) for x, _ in orig)],
+      note='review-originals/*.raw SHA256 multiset == actual 973b6f8c review blobs (ls-tree -z object IDs + cat-file)')
+drv = blob(EV3 + '/test-runs/attempt-01-driver.raw'); fin = blob(EV3 + '/test_rev3.py')
+tr = json.loads(blob(EV3 + '/test-results.json')); a1 = json.loads(blob(EV3 + '/test-runs/attempt-01.json'))
+probe('Y02', 'owner-attempts', ['7f10d87844321c6f4a63bb98d4ad03588477f9021eb3fd7c64c56665d69c4fff', True, 1, True, '6da1c0276943ad6b091214570e9db92580ced0e8389d74c7a32c2ed136064473', True, [2, 15, 15, 1, 14, 0, 8], [1, 15, 15, 1, 14, 0, 8]],
+      observed=[sha(drv), drv.startswith(b'\xef\xbb\xbf'), drv.count(b'\r\n'), drv[3:].replace(b'\r\n', b'\n') == fin, a1['sourceHashes']['test_rev3.py'] == sha(drv) and sha(fin), blob(EV3 + '/test-results.json') == blob(EV3 + '/test-runs/attempt-02.json'),
+                [tr[k] if k != 'projectionIsolationChecks' else len(tr[k]) for k in ('attempt', 'executedRows', 'distinctCompleteInputTuples', 'symbolicControls', 'refusals', 'failures', 'projectionIsolationChecks')],
+                [a1[k] if k != 'projectionIsolationChecks' else len(a1[k]) for k in ('attempt', 'executedRows', 'distinctCompleteInputTuples', 'symbolicControls', 'refusals', 'failures', 'projectionIsolationChecks')]],
+      note='owner driver original raw (BOM + 1 CRLF) vs final LF bytes; attempt-01 bound the raw hash, final report == attempt-02 bound the final hash; both 15/15/1/14/0/8 (OWNER static symbolic evidence, not summed, not reviewer proof)')
+d2 = blob(EV2 + '/candidate_model.py').decode().splitlines(); d3 = msrc.splitlines()
+import difflib
+fn_of = {}
+for n in ast.parse(msrc).body:
+    if isinstance(n, ast.FunctionDef): fn_of.update({i: n.name for i in range(n.lineno, n.end_lineno + 1)})
+ALLOWED = {'<docstring>', '<between>', '_anchor', '_reviews', '_project', 'installation_provenance_projection', 'running_data_projection'}
+hunk_fns = set(); changed = 0
+for op, i1, i2, j1, j2 in difflib.SequenceMatcher(None, d2, d3, autojunk=False).get_opcodes():
+    if op == 'equal': continue
+    changed += (i2 - i1) + (j2 - j1)
+    for j in (range(j1 + 1, j2 + 1) if j2 > j1 else [j1 + 1]):
+        hunk_fns.add(fn_of.get(j, '<docstring>' if j <= 4 else '<between>'))
+probe('Y03', 'retained-model', [True, True], observed=[m.STAGES == m2.STAGES and m.REASONS == m2.REASONS and [f.__name__ for f in m._CHECKS] == [f.__name__ for f in m2._CHECKS], hunk_fns <= ALLOWED],
+      extra=dict(changedLines=changed, changedRegions=sorted(hunk_fns)), note='Rev2->Rev3 model: STAGES/14 reasons/check order identical; every changed line lies in the docstring, _anchor capsule key set, _reviews predicates, the 2 new helpers (or blank separators) or _project')
+
+pcj = json.loads(blob(EV3 + '/payload-contract.json'))
+rdrows = pcj['runningDataProjection']
+partner = {}
+for x, y in pairs:
+    for a_, b_ in ((x, y), (y, x)):
+        if a_.startswith('measured.'): partner.setdefault(a_.split('.')[1], set()).add(b_.replace('v.', 'Verifier.').replace('pr.', 'Provenance.'))
+probe('Y04', 'L1-table-vs-K1-text', [5, True, True, True], observed=[len(rdrows), sorted(r['field'] for r in rdrows) == sorted(rd),
+      all(r['unchangedK1Counterpart'] in partner.get(r['field'], set()) for r in rdrows), all(r['independentOrigin'].startswith('private authenticated H5.') and r['counterpartIndependentOrigin'].startswith('H3 ') for r in rdrows)],
+      extra=dict(k1PartnersFromPolicyGo={k: sorted(v) for k, v in partner.items()}), note='payload-contract.json runningDataProjection: 5 rows == helper keys; each declared unchanged K1 counterpart is a real partner of measured.<field> in the parsed policy.go comparison line; every measured origin H5, every counterpart H3')
+
+finds = [r['id'] for r in rows if r['finding']]
+out = dict(classification='REVIEWER_SYMBOLIC_NARROW_DELTA_PROBES_M1_L1_NO_CRYPTO_NO_PROVIDER_NO_RUNTIME', target=TARGET, pinnedInputs=PINNED, probes=len(rows),
+           findingsWhereObservedDiffers=finds, rows=rows,
+           completedKST=datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=9))).strftime('%Y-%m-%dT%H:%M:%S+09:00'))
+OUT.write_text(json.dumps(out, indent=2, ensure_ascii=False) + '\n', encoding='utf-8', newline='\n')
+for r in rows: print(r['id'], 'FINDING' if r['finding'] else 'ok', '|', json.dumps(r['observed'], ensure_ascii=False)[:220], '|', r.get('detail'))
+print('findings', finds)
