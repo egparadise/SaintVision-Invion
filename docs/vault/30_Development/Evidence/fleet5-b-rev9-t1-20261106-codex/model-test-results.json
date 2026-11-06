@@ -1,0 +1,736 @@
+{
+  "ownerOnly": true,
+  "scope": "SYMBOLIC_PROPOSAL_ONLY",
+  "cases": [
+    {
+      "case": "PLAIN-original-False-live-prepared",
+      "pass": true
+    },
+    {
+      "case": "PLAIN-original-False-kernel-release",
+      "pass": true
+    },
+    {
+      "case": "PLAIN-original-False-exact-tombstone",
+      "pass": true
+    },
+    {
+      "case": "PLAIN-original-False-identity-retained",
+      "pass": true
+    },
+    {
+      "case": "PLAIN-original-False-new-frame-refused",
+      "pass": true
+    },
+    {
+      "case": "PLAIN-original-False-prepared-invoke-refused",
+      "pass": true
+    },
+    {
+      "case": "PLAIN-original-False-prepared-confirm-refused",
+      "pass": true
+    },
+    {
+      "case": "PLAIN-original-True-live-prepared",
+      "pass": true
+    },
+    {
+      "case": "PLAIN-original-True-kernel-release",
+      "pass": true
+    },
+    {
+      "case": "PLAIN-original-True-exact-tombstone",
+      "pass": true
+    },
+    {
+      "case": "PLAIN-original-True-identity-retained",
+      "pass": true
+    },
+    {
+      "case": "PLAIN-original-True-new-frame-refused",
+      "pass": true
+    },
+    {
+      "case": "PLAIN-original-True-prepared-invoke-refused",
+      "pass": true
+    },
+    {
+      "case": "PLAIN-original-True-prepared-confirm-refused",
+      "pass": true
+    },
+    {
+      "case": "PLAIN-cancel-False-live-prepared",
+      "pass": true
+    },
+    {
+      "case": "PLAIN-cancel-False-kernel-release",
+      "pass": true
+    },
+    {
+      "case": "PLAIN-cancel-False-exact-tombstone",
+      "pass": true
+    },
+    {
+      "case": "PLAIN-cancel-False-identity-retained",
+      "pass": true
+    },
+    {
+      "case": "PLAIN-cancel-False-new-frame-refused",
+      "pass": true
+    },
+    {
+      "case": "PLAIN-cancel-False-prepared-invoke-refused",
+      "pass": true
+    },
+    {
+      "case": "PLAIN-cancel-False-prepared-confirm-refused",
+      "pass": true
+    },
+    {
+      "case": "PLAIN-False-parent-stays-PENDING",
+      "pass": true
+    },
+    {
+      "case": "PLAIN-cancel-True-live-prepared",
+      "pass": true
+    },
+    {
+      "case": "PLAIN-cancel-True-kernel-release",
+      "pass": true
+    },
+    {
+      "case": "PLAIN-cancel-True-exact-tombstone",
+      "pass": true
+    },
+    {
+      "case": "PLAIN-cancel-True-identity-retained",
+      "pass": true
+    },
+    {
+      "case": "PLAIN-cancel-True-new-frame-refused",
+      "pass": true
+    },
+    {
+      "case": "PLAIN-cancel-True-prepared-invoke-refused",
+      "pass": true
+    },
+    {
+      "case": "PLAIN-cancel-True-prepared-confirm-refused",
+      "pass": true
+    },
+    {
+      "case": "PLAIN-True-parent-stays-PENDING",
+      "pass": true
+    },
+    {
+      "case": "PLAIN-terminal-DRAIN",
+      "pass": true
+    },
+    {
+      "case": "PLAIN-terminal-QUARANTINE",
+      "pass": true
+    },
+    {
+      "case": "PLAIN-terminal-RETIRE",
+      "pass": true
+    },
+    {
+      "case": "PLAIN-matched-guard-missing-rights",
+      "pass": true
+    },
+    {
+      "case": "PLAIN-matched-guard-released-matched",
+      "pass": true
+    },
+    {
+      "case": "PLAIN-matched-guard-version",
+      "pass": true
+    },
+    {
+      "case": "PLAIN-matched-guard-attempt",
+      "pass": true
+    },
+    {
+      "case": "PLAIN-matched-guard-workload",
+      "pass": true
+    },
+    {
+      "case": "PLAIN-matched-guard-missing-workload",
+      "pass": true
+    },
+    {
+      "case": "PLAIN-matched-guard-unknown-leases",
+      "pass": true
+    },
+    {
+      "case": "PLAIN-matched-guard-no-leases",
+      "pass": true
+    },
+    {
+      "case": "PLAIN-matched-guard-one-expired-lease",
+      "pass": true
+    },
+    {
+      "case": "PLAIN-matched-guard-one-released-lease",
+      "pass": true
+    },
+    {
+      "case": "PLAIN-matched-guard-lease-epoch",
+      "pass": true
+    },
+    {
+      "case": "PLAIN-matched-guard-deadline",
+      "pass": true
+    },
+    {
+      "case": "PLAIN-matched-guard-lease-expiry",
+      "pass": true
+    },
+    {
+      "case": "PLAIN-matched-guard-owner",
+      "pass": true
+    },
+    {
+      "case": "PLAIN-matched-guard-project-member",
+      "pass": true
+    },
+    {
+      "case": "PLAIN-matched-guard-parent-UNKNOWN",
+      "pass": true
+    },
+    {
+      "case": "PLAIN-matched-guard-parent-deadcap",
+      "pass": true
+    },
+    {
+      "case": "PLAIN-inflight-frame-confirm-after-release-refused",
+      "pass": true
+    },
+    {
+      "case": "PLAIN-release-never-clears-parentUNKNOWN-or-otherfact",
+      "pass": true
+    },
+    {
+      "case": "PLAIN-cleanup-released-read-after-stop",
+      "pass": true
+    },
+    {
+      "case": "PLAIN-cleanup-released-no-business-effects",
+      "pass": true
+    },
+    {
+      "case": "PLAIN-cleanup-UNKNOWN-read-after-stop",
+      "pass": true
+    },
+    {
+      "case": "PLAIN-cleanup-UNKNOWN-no-business-effects",
+      "pass": true
+    },
+    {
+      "case": "PLAIN-cleanup-live-expired-deadline-read-after-stop",
+      "pass": true
+    },
+    {
+      "case": "PLAIN-cleanup-live-expired-deadline-no-business-effects",
+      "pass": true
+    },
+    {
+      "case": "PLAIN-cleanup-forged-buildSessionId",
+      "pass": true
+    },
+    {
+      "case": "PLAIN-cleanup-forged-heldOwnedRootSHA",
+      "pass": true
+    },
+    {
+      "case": "PLAIN-cleanup-forged-protectedDescriptorSHA",
+      "pass": true
+    },
+    {
+      "case": "PLAIN-cleanup-forged-daemonIdentitySHA",
+      "pass": true
+    },
+    {
+      "case": "PLAIN-cleanup-forged-fencingDescriptorSHA",
+      "pass": true
+    },
+    {
+      "case": "PLAIN-cleanup-forged-leaseId",
+      "pass": true
+    },
+    {
+      "case": "PLAIN-cleanup-forged-resourceId",
+      "pass": true
+    },
+    {
+      "case": "PLAIN-cleanup-unknown-T3-binding-HOLD",
+      "pass": true
+    },
+    {
+      "case": "PLAIN-cleanup-read-label-cannot-release",
+      "pass": true
+    },
+    {
+      "case": "PLAINR01-auth-channelEnabled",
+      "pass": true
+    },
+    {
+      "case": "PLAINR01-auth-keyLive",
+      "pass": true
+    },
+    {
+      "case": "PLAINR01-auth-certNotAfter",
+      "pass": true
+    },
+    {
+      "case": "PLAINR01-auth-epoch",
+      "pass": true
+    },
+    {
+      "case": "PLAINR01-auth-generation",
+      "pass": true
+    },
+    {
+      "case": "PLAINR01-auth-C",
+      "pass": true
+    },
+    {
+      "case": "PLAINR01-auth-DER",
+      "pass": true
+    },
+    {
+      "case": "PLAINR01-auth-observeGrantLive",
+      "pass": true
+    },
+    {
+      "case": "PLAINR01-auth-observeGrantUntil",
+      "pass": true
+    },
+    {
+      "case": "PLAINR01-auth-fenced",
+      "pass": true
+    },
+    {
+      "case": "PLAINR01-disjoint-positive",
+      "pass": true
+    },
+    {
+      "case": "PLAINR01-forged-footprint-ignored",
+      "pass": true
+    },
+    {
+      "case": "PLAINR05-auth-channelEnabled",
+      "pass": true
+    },
+    {
+      "case": "PLAINR05-auth-keyLive",
+      "pass": true
+    },
+    {
+      "case": "PLAINR05-auth-certNotAfter",
+      "pass": true
+    },
+    {
+      "case": "PLAINR05-auth-epoch",
+      "pass": true
+    },
+    {
+      "case": "PLAINR05-auth-generation",
+      "pass": true
+    },
+    {
+      "case": "PLAINR05-auth-C",
+      "pass": true
+    },
+    {
+      "case": "PLAINR05-auth-DER",
+      "pass": true
+    },
+    {
+      "case": "PLAINR05-auth-observeGrantLive",
+      "pass": true
+    },
+    {
+      "case": "PLAINR05-auth-observeGrantUntil",
+      "pass": true
+    },
+    {
+      "case": "PLAINR05-auth-fenced",
+      "pass": true
+    },
+    {
+      "case": "PLAINR05-disjoint-positive",
+      "pass": true
+    },
+    {
+      "case": "PLAINR05-forged-footprint-ignored",
+      "pass": true
+    },
+    {
+      "case": "B-original-False-live-prepared",
+      "pass": true
+    },
+    {
+      "case": "B-original-False-kernel-release",
+      "pass": true
+    },
+    {
+      "case": "B-original-False-exact-tombstone",
+      "pass": true
+    },
+    {
+      "case": "B-original-False-identity-retained",
+      "pass": true
+    },
+    {
+      "case": "B-original-False-new-frame-refused",
+      "pass": true
+    },
+    {
+      "case": "B-original-False-prepared-invoke-refused",
+      "pass": true
+    },
+    {
+      "case": "B-original-False-prepared-confirm-refused",
+      "pass": true
+    },
+    {
+      "case": "B-original-True-live-prepared",
+      "pass": true
+    },
+    {
+      "case": "B-original-True-kernel-release",
+      "pass": true
+    },
+    {
+      "case": "B-original-True-exact-tombstone",
+      "pass": true
+    },
+    {
+      "case": "B-original-True-identity-retained",
+      "pass": true
+    },
+    {
+      "case": "B-original-True-new-frame-refused",
+      "pass": true
+    },
+    {
+      "case": "B-original-True-prepared-invoke-refused",
+      "pass": true
+    },
+    {
+      "case": "B-original-True-prepared-confirm-refused",
+      "pass": true
+    },
+    {
+      "case": "B-cancel-False-live-prepared",
+      "pass": true
+    },
+    {
+      "case": "B-cancel-False-kernel-release",
+      "pass": true
+    },
+    {
+      "case": "B-cancel-False-exact-tombstone",
+      "pass": true
+    },
+    {
+      "case": "B-cancel-False-identity-retained",
+      "pass": true
+    },
+    {
+      "case": "B-cancel-False-new-frame-refused",
+      "pass": true
+    },
+    {
+      "case": "B-cancel-False-prepared-invoke-refused",
+      "pass": true
+    },
+    {
+      "case": "B-cancel-False-prepared-confirm-refused",
+      "pass": true
+    },
+    {
+      "case": "B-False-parent-stays-PENDING",
+      "pass": true
+    },
+    {
+      "case": "B-cancel-True-live-prepared",
+      "pass": true
+    },
+    {
+      "case": "B-cancel-True-kernel-release",
+      "pass": true
+    },
+    {
+      "case": "B-cancel-True-exact-tombstone",
+      "pass": true
+    },
+    {
+      "case": "B-cancel-True-identity-retained",
+      "pass": true
+    },
+    {
+      "case": "B-cancel-True-new-frame-refused",
+      "pass": true
+    },
+    {
+      "case": "B-cancel-True-prepared-invoke-refused",
+      "pass": true
+    },
+    {
+      "case": "B-cancel-True-prepared-confirm-refused",
+      "pass": true
+    },
+    {
+      "case": "B-True-parent-stays-PENDING",
+      "pass": true
+    },
+    {
+      "case": "B-terminal-DRAIN",
+      "pass": true
+    },
+    {
+      "case": "B-terminal-QUARANTINE",
+      "pass": true
+    },
+    {
+      "case": "B-terminal-RETIRE",
+      "pass": true
+    },
+    {
+      "case": "B-matched-guard-missing-rights",
+      "pass": true
+    },
+    {
+      "case": "B-matched-guard-released-matched",
+      "pass": true
+    },
+    {
+      "case": "B-matched-guard-version",
+      "pass": true
+    },
+    {
+      "case": "B-matched-guard-attempt",
+      "pass": true
+    },
+    {
+      "case": "B-matched-guard-workload",
+      "pass": true
+    },
+    {
+      "case": "B-matched-guard-missing-workload",
+      "pass": true
+    },
+    {
+      "case": "B-matched-guard-unknown-leases",
+      "pass": true
+    },
+    {
+      "case": "B-matched-guard-no-leases",
+      "pass": true
+    },
+    {
+      "case": "B-matched-guard-one-expired-lease",
+      "pass": true
+    },
+    {
+      "case": "B-matched-guard-one-released-lease",
+      "pass": true
+    },
+    {
+      "case": "B-matched-guard-lease-epoch",
+      "pass": true
+    },
+    {
+      "case": "B-matched-guard-deadline",
+      "pass": true
+    },
+    {
+      "case": "B-matched-guard-lease-expiry",
+      "pass": true
+    },
+    {
+      "case": "B-matched-guard-owner",
+      "pass": true
+    },
+    {
+      "case": "B-matched-guard-project-member",
+      "pass": true
+    },
+    {
+      "case": "B-matched-guard-parent-UNKNOWN",
+      "pass": true
+    },
+    {
+      "case": "B-matched-guard-parent-deadcap",
+      "pass": true
+    },
+    {
+      "case": "B-inflight-frame-confirm-after-release-refused",
+      "pass": true
+    },
+    {
+      "case": "B-release-never-clears-parentUNKNOWN-or-otherfact",
+      "pass": true
+    },
+    {
+      "case": "B-cleanup-released-read-after-stop",
+      "pass": true
+    },
+    {
+      "case": "B-cleanup-released-no-business-effects",
+      "pass": true
+    },
+    {
+      "case": "B-cleanup-UNKNOWN-read-after-stop",
+      "pass": true
+    },
+    {
+      "case": "B-cleanup-UNKNOWN-no-business-effects",
+      "pass": true
+    },
+    {
+      "case": "B-cleanup-live-expired-deadline-read-after-stop",
+      "pass": true
+    },
+    {
+      "case": "B-cleanup-live-expired-deadline-no-business-effects",
+      "pass": true
+    },
+    {
+      "case": "B-cleanup-forged-buildSessionId",
+      "pass": true
+    },
+    {
+      "case": "B-cleanup-forged-heldOwnedRootSHA",
+      "pass": true
+    },
+    {
+      "case": "B-cleanup-forged-protectedDescriptorSHA",
+      "pass": true
+    },
+    {
+      "case": "B-cleanup-forged-daemonIdentitySHA",
+      "pass": true
+    },
+    {
+      "case": "B-cleanup-forged-fencingDescriptorSHA",
+      "pass": true
+    },
+    {
+      "case": "B-cleanup-forged-leaseId",
+      "pass": true
+    },
+    {
+      "case": "B-cleanup-forged-resourceId",
+      "pass": true
+    },
+    {
+      "case": "B-cleanup-unknown-T3-binding-HOLD",
+      "pass": true
+    },
+    {
+      "case": "B-cleanup-read-label-cannot-release",
+      "pass": true
+    },
+    {
+      "case": "BR01-auth-channelEnabled",
+      "pass": true
+    },
+    {
+      "case": "BR01-auth-keyLive",
+      "pass": true
+    },
+    {
+      "case": "BR01-auth-certNotAfter",
+      "pass": true
+    },
+    {
+      "case": "BR01-auth-epoch",
+      "pass": true
+    },
+    {
+      "case": "BR01-auth-generation",
+      "pass": true
+    },
+    {
+      "case": "BR01-auth-C",
+      "pass": true
+    },
+    {
+      "case": "BR01-auth-DER",
+      "pass": true
+    },
+    {
+      "case": "BR01-auth-observeGrantLive",
+      "pass": true
+    },
+    {
+      "case": "BR01-auth-observeGrantUntil",
+      "pass": true
+    },
+    {
+      "case": "BR01-auth-fenced",
+      "pass": true
+    },
+    {
+      "case": "BR01-disjoint-positive",
+      "pass": true
+    },
+    {
+      "case": "BR01-forged-footprint-ignored",
+      "pass": true
+    },
+    {
+      "case": "BR05-auth-channelEnabled",
+      "pass": true
+    },
+    {
+      "case": "BR05-auth-keyLive",
+      "pass": true
+    },
+    {
+      "case": "BR05-auth-certNotAfter",
+      "pass": true
+    },
+    {
+      "case": "BR05-auth-epoch",
+      "pass": true
+    },
+    {
+      "case": "BR05-auth-generation",
+      "pass": true
+    },
+    {
+      "case": "BR05-auth-C",
+      "pass": true
+    },
+    {
+      "case": "BR05-auth-DER",
+      "pass": true
+    },
+    {
+      "case": "BR05-auth-observeGrantLive",
+      "pass": true
+    },
+    {
+      "case": "BR05-auth-observeGrantUntil",
+      "pass": true
+    },
+    {
+      "case": "BR05-auth-fenced",
+      "pass": true
+    },
+    {
+      "case": "BR05-disjoint-positive",
+      "pass": true
+    },
+    {
+      "case": "BR05-forged-footprint-ignored",
+      "pass": true
+    }
+  ],
+  "actualRuntimeB": 0,
+  "realBindings": null
+}

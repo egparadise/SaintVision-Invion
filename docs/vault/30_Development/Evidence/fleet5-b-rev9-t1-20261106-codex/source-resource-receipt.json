@@ -1,0 +1,34 @@
+{
+  "selectedFiles": [
+    {
+      "path": "services/control-plane/src/inv/node_channels.py",
+      "bytes": 8898,
+      "sha256": "3fad0bb24beb096522ea3335e3bf45f4e65f2d0d906177ef7e310aca1128502b"
+    },
+    {
+      "path": "services/control-plane/src/inv/errors.py",
+      "bytes": 233,
+      "sha256": "833eea9d797496c44ef3b3003cf728cfa88d12128dddf60106632609ead3a7bc"
+    },
+    {
+      "path": "src/saintvision/services/pools.py",
+      "bytes": 19889,
+      "sha256": "7739b70e716cef0a4c55fba8282dc783d8f37a0932e26706d500b7acd3948f87"
+    },
+    {
+      "path": "src/saintvision/services/settings.py",
+      "bytes": 25071,
+      "sha256": "3759240a2a962be1515b89cb44f83501e06ba4960eec7026cc25321c7b288632"
+    }
+  ],
+  "sourceBytes": 54091,
+  "fileBudget": 12,
+  "byteBudget": 2097152,
+  "serial": true,
+  "budgetOSenforced": false,
+  "fullAssembler": "NOT_RUN",
+  "sourceFilesCensusRetained": 523,
+  "callsRetained": 47608,
+  "oldBacklogRetained": 29573,
+  "oldTransactionDenominatorRetained": 107
+}

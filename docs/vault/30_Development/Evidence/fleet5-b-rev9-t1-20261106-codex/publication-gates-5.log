@@ -1,0 +1,4 @@
+Scanning 94 frontend production source files under apps/web/src ...
+
+PASS Frontend Integrity Check: all 9 integrity rules satisfied (0 violations).
+{"ownerResourceMeasurement": {"target": "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105\\tools\\check_frontend_integrity.py", "peakWorkingSetBytes": 24481792, "elapsedSeconds": 1.23, "OSMemoryLimitEnforced": false, "serial": true}}

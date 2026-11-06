@@ -1,0 +1,203 @@
+"""Independent Claude reviewer attacks on Rev8 M1 per-kind recovery and L2 hints.
+
+Symbolic model only: owner model.py/lifecycle.py imported read-only from argv[1].
+No DB/Node/crypto/network. Not runtime evidence.
+"""
+import sys, json
+from copy import deepcopy
+
+sys.dont_write_bytecode = True
+sys.path.insert(0, sys.argv[1])
+import model as M  # noqa: E402
+from io_contract import fixture_footprint, RECOVERY  # noqa: E402
+
+World, binding, scope, sk = M.World, M.binding, M.scope, M.sk
+VER, OP = M.VER, M.OP
+results = []
+
+
+def case(cid, claim, expected, actual, note=''):
+    results.append({'id': cid, 'claim': claim, 'expected': expected, 'actual': actual,
+                    'defect': expected != actual, 'note': note})
+
+
+def send(w, h):
+    if h is None:
+        return False
+    b = w.obligations[w.handles[h.handle_hash]['key']]['binding']
+    return w.invoke(h, b['bodySHA'], b['method'], b['rawPath'])
+
+
+def row(w, h):
+    return w.obligations[w.handles[h.handle_hash]['key']]
+
+
+def setup(profile='PLAIN', op='parent', resource='resource-1', run='run-1', w=None):
+    w = w or World()
+    s = scope()
+    w.nodes[sk(s)]['profile'] = profile
+    c = w.connect(VER)
+    p = w.register(c, binding(w, op=op, resource=resource, run=run))
+    assert p and send(w, p), op
+    return w, s, c, p
+
+
+for profile in ('PLAIN', 'B'):
+    P = profile + ':'
+    # 1. Released matched claim vs TERMINAL_FRAME continuation (other claim keeps Node booleans true).
+    w, s, c, p = setup(profile); n = w.nodes[sk(s)]
+    h = w.register(c, binding(w, op='cancel', kind='CANCEL', parent=p.handle_hash)); send(w, h)
+    matched = row(w, p)['binding']['claimBindingSHA']
+    ok = w.confirm(c, h, w.outcome(h, 'TERMINAL_CLEAN'))
+    released = ok and matched not in n['activeClaims']
+    t = w.register(c, binding(w, op='frame-after-release', kind='TERMINAL_FRAME', parent=p.handle_hash))
+    case(P + 'TF-after-cancel-release',
+         'TERMINAL_FRAME needs its matched claim live; a released claim cannot keep terminal continuation',
+         'REFUSE', 'ALLOW' if (released and t is not None and send(w, t)) else 'REFUSE',
+         f'matchedReleased={released} otherActiveClaims={len(n["activeClaims"])} leaseActive={n["leaseActive"]} '
+         f'workloadActive={n["workloadActive"]} claimRightsRetained={matched in n.get("claimRights", {})} parentState={row(w, p)["state"]}')
+    w, s, c, p = setup(profile); n = w.nodes[sk(s)]
+    ok = w.confirm(c, p, w.outcome(p, 'TERMINAL_CLEAN'))
+    t = w.register(c, binding(w, op='frame-after-terminal', kind='TERMINAL_FRAME', parent=p.handle_hash))
+    case(P + 'TF-after-parent-terminal-clean', 'TERMINAL_FRAME after the original EXECUTE is CONFIRMED TERMINAL_CLEAN must refuse',
+         'REFUSE', 'ALLOW' if (ok and t is not None and send(w, t)) else 'REFUSE',
+         f'parentState={row(w, p)["state"]} leaseActive={n["leaseActive"]} (seed claim-1 keeps Node booleans true)')
+    w, s, c, p = setup(profile); n = w.nodes[sk(s)]; n['activeClaims'].discard('claim-1')
+    w.confirm(c, p, w.outcome(p, 'TERMINAL_CLEAN'))
+    t = w.register(c, binding(w, op='frame-control', kind='TERMINAL_FRAME', parent=p.handle_hash))
+    case(P + 'TF-control-no-other-claim', 'control: with no other claim the Node-wide booleans refuse', 'REFUSE',
+         'ALLOW' if t is not None else 'REFUSE')
+    # 2. RECEIPT_OBSERVE after the claim was already released by the cancel path.
+    w, s, c, p = setup(profile); n = w.nodes[sk(s)]
+    h = w.register(c, binding(w, op='cancel', kind='CANCEL', parent=p.handle_hash)); send(w, h)
+    w.confirm(c, h, w.outcome(h, 'TERMINAL_CLEAN'))
+    v = dict(n.get('claimVersions', {}))
+    r = w.register(c, binding(w, op='observe-after-release', kind='RECEIPT_OBSERVE', parent=p.handle_hash))
+    sent = send(w, r); conf = sent and w.confirm(c, r, w.outcome(r, 'TERMINAL_CLEAN'))
+    case(P + 'RO-after-release-no-double-version', 'second terminal receipt for released claim changes no claim version',
+         'NO_CHANGE', 'NO_CHANGE' if n.get('claimVersions', {}) == v else 'CHANGED', f'register={r is not None} confirm={conf}')
+    # 3. Parent kind / chain / settled.
+    w, s, c, p = setup(profile)
+    tf = w.register(c, binding(w, op='frame', kind='TERMINAL_FRAME', parent=p.handle_hash)); send(w, tf)
+    x = w.register(c, binding(w, op='cancel-of-frame', kind='CANCEL', parent=tf.handle_hash))
+    case(P + 'CANCEL-parent-not-EXECUTE', 'CANCEL parent must be original EXECUTE', 'REFUSE', 'ALLOW' if x is not None else 'REFUSE')
+    w, s, c, p = setup(profile)
+    h = w.register(c, binding(w, op='cancel', kind='CANCEL', parent=p.handle_hash)); send(w, h)
+    x = w.register(c, binding(w, op='cancel-of-cancel', kind='CANCEL', parent=h.handle_hash))
+    case(P + 'CANCEL-chain', 'CANCEL cannot chain from a CANCEL handle', 'REFUSE', 'ALLOW' if x is not None else 'REFUSE')
+    w, s, c, p = setup(profile); w.failure(p)
+    proof = M.seal('PROTECTED_PHYSICAL_RECOVERY', {'bindingHash': p.handle_hash, 'recovery': 'EXACT_PHYSICAL_RECONCILIATION'},
+                   'SYMBOLIC_OPERATOR_INDEPENDENT_PHYSICAL_VERIFIER')
+    st = w.settle(w.connect(OP), p, proof)
+    x = w.register(c, binding(w, op='cancel-settled', kind='CANCEL', parent=p.handle_hash))
+    case(P + 'CANCEL-after-protected-settle', 'no recovery lane against a protected-settled parent', 'REFUSE',
+         'ALLOW' if (st and x is not None) else 'REFUSE', f'settled={st}')
+    # 4. Business RETIRE vs actual channel/observe/key revocation.
+    for field, value in (('channelEnabled', False), ('observeGrantLive', False), ('keyLive', False)):
+        w, s, c, p = setup(profile); w.set_fact(w.connect(OP), s, 'RETIRE'); w.nodes[sk(s)][field] = value
+        x = w.register(c, binding(w, op='cancel-retire', kind='CANCEL', parent=p.handle_hash))
+        case(P + 'RETIRE+' + field, 'RETIRE that revokes channel/observe/key refuses ordinary recovery', 'REFUSE',
+             'ALLOW' if x is not None else 'REFUSE')
+    w, s, c, p = setup(profile); w.set_fact(w.connect(OP), s, 'RETIRE')
+    x = w.register(c, binding(w, op='cancel-retire-only', kind='CANCEL', parent=p.handle_hash)); ok = x is not None and send(w, x)
+    case(P + 'RETIRE-business-only', 'business RETIRE alone keeps the exact recovery lane and keeps the fact',
+         'ALLOW_FACT_KEPT', 'ALLOW_FACT_KEPT' if ok and w.nodes[sk(s)]['facts'][('RETIRE', 'original-operation')] else 'OTHER')
+    # 5. Cross-node parent.
+    w, s, c, p = setup(profile)
+    b = binding(w, s=scope(n='node-2'), op='x-node', kind='CANCEL', parent=p.handle_hash)
+    case(P + 'CANCEL-cross-node-parent', 'node-1 parent cannot be cancelled through node-2 scope', 'REFUSE',
+         'ALLOW' if w.register(c, b) is not None else 'REFUSE')
+    # 6. Process loss.
+    w, s, c, p = setup(profile); w.restart_verifier(); c2 = w.connect(VER)
+    ro = w.register(c2, binding(w, op='ro-restart', kind='RECEIPT_OBSERVE', parent=p.handle_hash))
+    ca = w.register(c2, binding(w, op='ca-restart', kind='CANCEL', parent=p.handle_hash))
+    case(P + 'restart-RO', 'after process loss ordinary RECEIPT_OBSERVE refuses (parent cap LOST)', 'REFUSE', 'ALLOW' if ro is not None else 'REFUSE')
+    case(P + 'restart-CANCEL', 'after process loss safety CANCEL still allowed under current auth', 'ALLOW',
+         'ALLOW' if ca is not None and send(w, ca) else 'REFUSE')
+    case(P + 'restart-no-revival', 'original completion cap stays dead', 'DEAD',
+         'DEAD' if w.private_caps[p.handle_hash]['state'] == 'LOST_INCARNATION' and not w.confirm(c2, p, w.outcome(p, 'TERMINAL_CLEAN')) else 'REVIVED')
+    # 7. Multiple claims and foreign receipt.
+    w, s, c, p = setup(profile); _, _, _, q = setup(profile, op='parent-2', resource='resource-2', run='run-2', w=w)
+    n = w.nodes[sk(s)]; before = set(n['activeClaims'])
+    mq = row(w, q)['binding']['claimBindingSHA']; mp = row(w, p)['binding']['claimBindingSHA']
+    h = w.register(c, binding(w, op='cancel-p', kind='CANCEL', parent=p.handle_hash)); send(w, h)
+    w.confirm(c, h, w.outcome(h, 'TERMINAL_CLEAN'))
+    case(P + 'multi-claim-only-matched', 'cancel terminal receipt releases only matched claim', 'ONLY_MATCHED',
+         'ONLY_MATCHED' if n['activeClaims'] == before - {mp} and mq in n['activeClaims'] else 'OTHER')
+    w, s, c, p = setup(profile); _, _, _, q = setup(profile, op='parent-2', resource='resource-2', run='run-2', w=w)
+    n = w.nodes[sk(s)]
+    h = w.register(c, binding(w, op='cancel-p', kind='CANCEL', parent=p.handle_hash)); send(w, h)
+    o = w.outcome(h, 'TERMINAL_CLEAN'); o['body']['kernelReceipt'] = w.kernel_receipt(row(w, q)['binding'])
+    o = M.seal(o['kind'], o['body'], o['signer']); before = set(n['activeClaims'])
+    case(P + 'foreign-kernel-receipt', 'another original command receipt cannot release through this cancel', 'REFUSE',
+         'ALLOW' if w.confirm(c, h, o) else 'REFUSE', f'claimsUnchanged={n["activeClaims"] == before}')
+    # 8. Replay.
+    w, s, c, p = setup(profile)
+    h = w.register(c, binding(w, op='cancel', kind='CANCEL', parent=p.handle_hash)); send(w, h)
+    first = w.confirm(c, h, w.outcome(h, 'OBSERVED')); second = w.confirm(c, h, w.outcome(h, 'OBSERVED'))
+    dup = w.register(c, binding(w, op='cancel', kind='CANCEL', parent=p.handle_hash))
+    case(P + 'replay', 'confirm once; same operation id cannot re-register', 'ONCE',
+         'ONCE' if first and not second and dup is None else 'REPLAYED')
+    # 9. Receipt ACK without terminal fact.
+    w, s, c, p = setup(profile)
+    r = w.register(c, binding(w, op='ro', kind='RECEIPT_OBSERVE', parent=p.handle_hash)); send(w, r)
+    case(P + 'RO-ack-without-terminal', 'RECEIPT_OBSERVE needs exact TERMINAL_CLEAN kernel receipt', 'REFUSE',
+         'ALLOW' if w.confirm(c, r, w.outcome(r, 'OBSERVED')) else 'REFUSE', f'rowNow={row(w, r)["state"]}')
+    # 10. Safety ACK via recovery verifier on UNKNOWN parent.
+    w, s, c, p = setup(profile); w.failure(p)
+    h = w.register(c, binding(w, op='cu', kind='CANCEL', parent=p.handle_hash)); send(w, h); w.failure(h)
+    claims = set(w.nodes[sk(s)]['activeClaims'])
+    ok = w.reconcile_safety(w.connect(RECOVERY), h, w.recovery_ack(h))
+    case(P + 'safety-ACK-own-only', 'recovery ACK closes cancel obligation only; parent UNCERTAIN; claims kept', 'OWN_ONLY',
+         'OWN_ONLY' if ok and row(w, p)['state'] == 'UNCERTAIN' and w.nodes[sk(s)]['activeClaims'] == claims else 'OTHER')
+    case(P + 'UNKNOWN-still-holds', 'UNKNOWN parent keeps Node-wide hold for fresh admission', 'HOLD',
+         'HOLD' if w.register(c, binding(w, op='fresh', resource='resource-9', run='run-9')) is None else 'ADMITTED')
+    # 11. No caller flag / no EXECUTE through recovery lane.
+    w, s, c, p = setup(profile)
+    b = binding(w, op='exec2', resource='resource-3', run='run-3'); b['observation_only'] = True
+    w.original_requests[(sk(s), 'exec2')] = deepcopy(b)
+    case(P + 'observation_only-flag', 'no public flag selects the recovery lane', 'REFUSE', 'ALLOW' if w.register(c, b) is not None else 'REFUSE')
+    w, s, c, p = setup(profile); w.set_fact(w.connect(OP), s, 'QUARANTINE')
+    case(P + 'EXECUTE-under-quarantine', 'fresh EXECUTE still refused under QUARANTINE', 'REFUSE',
+         'ALLOW' if w.register(c, binding(w, op='e3', resource='resource-3', run='run-3')) is not None else 'REFUSE')
+    if profile == 'B':
+        w, s, c, p = setup(profile); w.revoke(w.connect(OP), s, 'A0', causal='c' * 64)
+        x = w.register(c, binding(w, op='cancel-after-lineage-revoke', kind='CANCEL', parent=p.handle_hash))
+        case(P + 'CANCEL-after-B-lineage-revoke',
+             'observation: B approval-lineage revocation is not channel auth; safety CANCEL continues', 'ALLOW',
+             'ALLOW' if x is not None else 'REFUSE', 'design observation for Root; not stated in catalog')
+    # 12. L2 per-candidate hints.
+    for reader in ('R01', 'R05'):
+        w, s, c, p = setup(profile); n = w.nodes[sk(s)]; v = n['authorityVersion']; facts = deepcopy(n['facts'])
+        fpA = fixture_footprint()
+        share = fixture_footprint('resource-6', 'run-6'); share['rows'] = [x for x in share['rows'] if x['mode'] == 'SHARE']
+        n['dbCandidates'] = {'A': fpA, 'A-alias': fpA, 'B': fixture_footprint('resource-2', 'run-2'),
+                             'U': fixture_footprint('resource-5', 'run-5', known=False), 'S': share}
+        got = {k: w.candidate_hint(c, s, k, reader)['status'] for k in ('A', 'A-alias', 'B', 'U', 'S', 'missing')}
+        case(P + reader + '-mixed', 'mixed: A/alias overlap, B disjoint, unknown/missing explicit, SHARE-only disjoint',
+             {'A': 'HINT_OVERLAP', 'A-alias': 'HINT_OVERLAP', 'B': 'HINT_AVAILABLE', 'U': 'MISSING_RESOURCE_SCOPE',
+              'S': 'HINT_AVAILABLE', 'missing': 'MISSING_RESOURCE_SCOPE'}, got)
+        case(P + reader + '-no-mutation', 'hint queries never mutate authority version/facts', 'UNCHANGED',
+             'UNCHANGED' if n['authorityVersion'] == v and n['facts'] == facts else 'MUTATED')
+        case(P + reader + '-forged-footprint-ignored', 'caller footprint cannot turn disjoint B into overlap', 'HINT_AVAILABLE',
+             w.candidate_hint(c, s, 'B', reader, caller_footprint=fixture_footprint())['status'])
+        n['dbCandidates']['B'] = fixture_footprint()
+        case(P + reader + '-later-scope-change', 're-query reflects current DB scope', 'HINT_OVERLAP', w.candidate_hint(c, s, 'B', reader)['status'])
+        try:
+            w.eligible(reader, s); r = 'RETURNED'
+        except ValueError:
+            r = 'RAISES'
+        case(P + reader + '-boolean-path-closed', 'R01/R05 cannot be used as boolean eligibility', 'RAISES', r)
+        case(P + reader + '-wrong-scope-conn', 'connection scoped to another Node is AUTHORITY_DENIED', 'AUTHORITY_DENIED',
+             w.candidate_hint(w.connect(VER, [scope(n='node-2')]), s, 'B', reader)['status'])
+        w2, s2, c2, p2 = setup(profile); w2.nodes[sk(scope(n='node-2'))]['dbCandidates']['B'] = fixture_footprint('resource-2', 'run-2'); w2.failure(p2)
+        case(P + reader + '-unknown-other-node', 'UNKNOWN on node-1 does not hold node-2 hint', 'HINT_AVAILABLE',
+             w2.candidate_hint(c2, scope(n='node-2'), 'B', reader)['status'])
+        w3, s3, c3, p3 = setup(profile); w3.nodes[sk(s3)]['dbCandidates']['B'] = fixture_footprint('resource-2', 'run-2'); w3.failure(p3)
+        case(P + reader + '-unknown-precedes-missing', 'observation: missing scope is reported before UNKNOWN hold',
+             'MISSING_RESOURCE_SCOPE', w3.candidate_hint(c3, s3, 'missing', reader)['status'], 'non-authorizing either way')
+
+out = {'reviewer': 'Claude independent', 'scope': 'SYMBOLIC Rev8 model attacks only; no runtime/Node/PG/crypto evidence',
+       'model': sys.argv[1].replace('\\', '/').split('/Evidence/')[-1], 'cases': results,
+       'defects': [r['id'] for r in results if r['defect']]}
+print(json.dumps(out, indent=1, sort_keys=True))

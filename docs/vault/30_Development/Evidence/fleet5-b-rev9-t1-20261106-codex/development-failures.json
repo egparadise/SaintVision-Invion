@@ -1,0 +1,25 @@
+{
+  "scope": "OWNER fixture development only; no production source/runtime changes",
+  "events": [
+    {
+      "command": "main .venv Python3.14.7 -B t1_tests.py",
+      "actualExit": 1,
+      "failure": "SyntaxError line1318 of generated app mutant: concatenating a keyword after an existing trailing comma produced an invalid fixture",
+      "fix": "Deep-copy the current parsed Database Call, append an ast.keyword and unparse the Call before insertion; every resulting mutant must pass ast.parse before the intended provenance test",
+      "resolution": "Final exact check command, exit, source hashes and resource receipt recorded separately"
+    },
+    {
+      "scope": "Initial narrow A8 proof development",
+      "result": "Rule initially reported DB_CONSTRUCTOR_MUTATION for actual app's unrelated route-local literal __import__('re')",
+      "fix": "Retain all Database import/store/class/alias/global-mutation checks and limit the non-target import exception to exact builtin __import__('re') with no local/global import rebinding; no purity or type grant for that route"
+    },
+    {
+      "command": "run_checks.py proof command8 t1_tests.py",
+      "actualExit": 1,
+      "log": "failed-proof-checks-t1-8.log",
+      "failure": "New unknown observer-db mutation was not rejected because the original constructor input for the same file silently overwrote the mutated core input",
+      "fix": "Reject inconsistent overlapping source inputs, and mutate both core and constructor views consistently in the negative fixture so refusal comes from the intended construction-chain rule",
+      "resourceObservation": "Initial T1 source peak55,599,104B and mutation suite64,839,680B; unused duplicate legacy manifest is released before bounded proofs to reduce memory, no OS limit changed"
+    }
+  ]
+}

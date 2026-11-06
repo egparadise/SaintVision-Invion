@@ -1,0 +1,175 @@
+{
+  "base": "6a65665819d7479073189c524abf585636c3079d",
+  "productSource": "72028cbac903c4415d9979f980a6e0f9948e914f",
+  "scope": "Exact final OWNER proposal/proof producers and generated contract artifacts; final commit/CI pins delivered in Root structured ask",
+  "kst": "2026-11-06T17:58:29.356832+09:00",
+  "files": [
+    {
+      "file": "analysis_rule_tests.py",
+      "bytes": 6315,
+      "sha256": "8fd361caddb552e0d93b815a372fcae6a1ff22c6ec1732b2fca689231782ce6a"
+    },
+    {
+      "file": "analysis_rules.py",
+      "bytes": 12869,
+      "sha256": "84c175efd08f3c124e9b30f4d3cf04e4bb6f6bb473f362b22e58151e184a2b47"
+    },
+    {
+      "file": "authority-matrix.json",
+      "bytes": 779941,
+      "sha256": "59fe2a3eaa4f44d825c103c87402288b7f025e8838c0ef9623958ca666a83050"
+    },
+    {
+      "file": "authority.py",
+      "bytes": 25339,
+      "sha256": "0941f705002db011b0c762b45730162f89e46f5f16efb1cfb533403eb49297ab"
+    },
+    {
+      "file": "bounded_analysis.py",
+      "bytes": 14751,
+      "sha256": "03d53a9431c326b297ad786e03852edb88e43323e2dc4791761c36e7072730ca"
+    },
+    {
+      "file": "catalog.py",
+      "bytes": 19855,
+      "sha256": "e581bfce8a3107c1b9752513b2b2b517f4205289355f943fa6f2f679ebeb1383"
+    },
+    {
+      "file": "contract.schema.json",
+      "bytes": 119384,
+      "sha256": "dce3e45df7b66e31f6521c96c0879029d103406bebe69887c8d8bc797d8d1ae9"
+    },
+    {
+      "file": "edge_categories.py",
+      "bytes": 7578,
+      "sha256": "d16ae559ca4b12c36d52a61d183fb2b1d3bdf38e6e8a54d511e4414e72cd18dd"
+    },
+    {
+      "file": "io_contract.py",
+      "bytes": 3567,
+      "sha256": "f8870b3dc0ad9963b9dea04e5371aa456169bb4967fd95e5cbca6d392a6ae6d8"
+    },
+    {
+      "file": "lifecycle.py",
+      "bytes": 31757,
+      "sha256": "895ad5dcd10bc45920e87a4b0253685d5aed77ca0b6a2ebc6ff7a71470a5e974"
+    },
+    {
+      "file": "measured_run.py",
+      "bytes": 1615,
+      "sha256": "61f7dcfdb00a873c2423e463b5beee5fa623bbf04c392e7ae9e30cdb297ed62e"
+    },
+    {
+      "file": "model.py",
+      "bytes": 38483,
+      "sha256": "e047bdc0579f0b078b489f9d3aad32d3b264e0028cb7adf1247f365ab5515b5f"
+    },
+    {
+      "file": "model_tests.py",
+      "bytes": 8263,
+      "sha256": "275544fc465d9bccfa659efb2f8a451984945a9e37aaa843b218130885067f6d"
+    },
+    {
+      "file": "mutation_fixture.py",
+      "bytes": 1719,
+      "sha256": "2ed03fa1780fd216c528a49a28911f1427197503c8358a6b94bbd285a583dea6"
+    },
+    {
+      "file": "packet_checks.py",
+      "bytes": 4009,
+      "sha256": "6f2547ee3a800a85fdcbbd6ea03a3b16f9ff0b91acf7ff5c83309d48c13c9919"
+    },
+    {
+      "file": "pending-interface-contracts.json",
+      "bytes": 96580,
+      "sha256": "79a03d49424b508470bf29cb724f4b6591b5cdfc7a370b557c0f8dd1674fe393"
+    },
+    {
+      "file": "pending-interface-contracts.stage1.json",
+      "bytes": 60118,
+      "sha256": "61daff8ae95825631dff25d4fc334f2b89153524fc110e727636f0af0cba078b"
+    },
+    {
+      "file": "pending_contracts.py",
+      "bytes": 4062,
+      "sha256": "e0dd1ee5d468096704a38b1b28c39f6e55bc3aa1e24bd1f5d3895a5f51db9e16"
+    },
+    {
+      "file": "pilot-closure.json",
+      "bytes": 28278,
+      "sha256": "0f08c7e961cf6db1e61f415a430d75ce67a1d819f18167692b4bd25a5f06347d"
+    },
+    {
+      "file": "prepare.py",
+      "bytes": 4141,
+      "sha256": "dcb8476ba531f809513963a54c4c5b01e85434ff80566defaf91388023574451"
+    },
+    {
+      "file": "producer-order.json",
+      "bytes": 764,
+      "sha256": "aed91124a6142da6e5e04028e986a2ef89d5fc8f8ac2dffe751cd4dcce90bd8d"
+    },
+    {
+      "file": "rank_contract.py",
+      "bytes": 7212,
+      "sha256": "c95f906069c7d8ce3221e523584aa16c89bd3ae1165bd5d8d76b6abbb58cc310"
+    },
+    {
+      "file": "reader-io-catalog.json",
+      "bytes": 50751,
+      "sha256": "4bcc0cde704465e9387a1664883e374a620a2d279dfa323b91098c71fc7f1f72"
+    },
+    {
+      "file": "retained_probes.py",
+      "bytes": 2094,
+      "sha256": "c1616b3b359c35737a9526fea0d48d046a06762eca74eb1ac49f314ea977338a"
+    },
+    {
+      "file": "run_checks.py",
+      "bytes": 3416,
+      "sha256": "782bc32e1353cfa6e2da7a2b5b6b8b2d428c15941ac9086021fdfb9f6854d31c"
+    },
+    {
+      "file": "schema.py",
+      "bytes": 7616,
+      "sha256": "8f726fd30ab6ada4280eb632fbecad1cc28aae3200c8b0379dca23df9fb7657f"
+    },
+    {
+      "file": "t1-mark-offline-closure.json",
+      "bytes": 94365,
+      "sha256": "8f7952335800c48ba2068b3ac36e32c22f2f77a74bc3fe3ca6af92177265a0ad"
+    },
+    {
+      "file": "t1_build.py",
+      "bytes": 8732,
+      "sha256": "2f1a0b64f05b1b81ba72524a9225306423e78c9183d511dc364ed50446cb84c2"
+    },
+    {
+      "file": "t1_provenance.py",
+      "bytes": 14962,
+      "sha256": "210be9a6b90296d25a5e9f260904e0ce01ecd5ee7e51ab73469480cba18c29ed"
+    },
+    {
+      "file": "t1_tests.py",
+      "bytes": 8370,
+      "sha256": "4fbe26dee3390e9c356f777f3d2148aef8fe0bf8dbb6e20dbb7829b5f67897ed"
+    },
+    {
+      "file": "targeted-category-delta.json",
+      "bytes": 88263,
+      "sha256": "bb46b0c48dd9b926095d59db4eb47e88eab7c01b184b734c1b7480cb259bee26"
+    },
+    {
+      "file": "terminal_claim_regression.py",
+      "bytes": 500,
+      "sha256": "fad4e25e286a8472f7c996743c47a9867642b78c2e2f4e9b033697e109cb5282"
+    },
+    {
+      "file": "writer-census-delta.json",
+      "bytes": 1633,
+      "sha256": "40494695825789c24758cec36505016e6db0667335c6d46f91ab3e6f95659d6e"
+    }
+  ],
+  "actualRuntimeB": 0,
+  "independentReview": "Rev9 PENDING via Root"
+}

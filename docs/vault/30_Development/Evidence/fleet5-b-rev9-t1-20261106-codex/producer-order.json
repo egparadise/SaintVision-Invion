@@ -1,0 +1,20 @@
+{
+  "requiredOrder": [
+    "pending_contracts.py",
+    "edge_categories.py"
+  ],
+  "stage1": {
+    "artifact": "pending-interface-contracts.stage1.json",
+    "sha256": "61daff8ae95825631dff25d4fc334f2b89153524fc110e727636f0af0cba078b",
+    "producerSHA256": "e0dd1ee5d468096704a38b1b28c39f6e55bc3aa1e24bd1f5d3895a5f51db9e16",
+    "acceptedFinalProof": false
+  },
+  "final": {
+    "artifact": "pending-interface-contracts.json",
+    "sha256": "79a03d49424b508470bf29cb724f4b6591b5cdfc7a370b557c0f8dd1674fe393",
+    "producerSHA256": "d16ae559ca4b12c36d52a61d183fb2b1d3bdf38e6e8a54d511e4414e72cd18dd",
+    "acceptedFinalProof": "ORDERED_STATIC_ARTIFACT_ONLY_NOT_REVIEW_OR_RUNTIME_ACCEPTANCE"
+  },
+  "kst": "2026-11-06T17:51:09.317344+09:00",
+  "actualRuntimeB": 0
+}

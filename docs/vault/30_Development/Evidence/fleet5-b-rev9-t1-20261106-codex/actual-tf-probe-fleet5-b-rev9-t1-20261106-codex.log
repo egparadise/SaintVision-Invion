@@ -1,0 +1,1 @@
+{"defect": false, "matchedClaimReleased": true, "model": "fleet5-b-rev9-t1-20261106-codex", "nodeLeaseActive": true, "otherClaimsOnNode": ["claim-1"], "parentConfirmedTerminalClean": true, "releasedClaimRightsRetained": true, "terminalFrameInvoked": false, "terminalFrameRegistered": false}

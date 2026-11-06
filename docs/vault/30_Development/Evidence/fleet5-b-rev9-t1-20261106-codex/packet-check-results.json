@@ -1,0 +1,14 @@
+{
+  "retainedImmutableFilesVerified": 20,
+  "T1AnalysisEdges": 16,
+  "T1PendingRuntimeEdges": 3,
+  "targetedUnknownRefs": 25,
+  "nonTargetUnchanged": 573,
+  "remainingUnreviewedFallbackRows": 218,
+  "orderedFinalContractSHA256": "79a03d49424b508470bf29cb724f4b6591b5cdfc7a370b557c0f8dd1674fe393",
+  "productDiffPaths": 0,
+  "actualRuntimeB": 0,
+  "realBindings": null,
+  "independentRev9Review": "PENDING via Root",
+  "partialFreeze": false
+}

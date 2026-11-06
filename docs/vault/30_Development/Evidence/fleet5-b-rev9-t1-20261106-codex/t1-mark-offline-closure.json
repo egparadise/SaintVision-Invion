@@ -1,0 +1,2536 @@
+{
+  "source": "72028cbac903c4415d9979f980a6e0f9948e914f",
+  "entry": "inv.observation.NodeObservation.mark_offline",
+  "status": "SOURCE_STATIC_CLOSED_RUNTIME_PENDING",
+  "notGrantable": true,
+  "oldPlanReference": {
+    "ledger": {
+      "file": "functionPlans.jsonl",
+      "rows": 3485,
+      "bytes": 8115807,
+      "sha256": "7d650fbe47e83f9714c922ffcfe1d93cef3d7a9319873bc9898ebf644f28409a"
+    },
+    "entry": "inv.observation.NodeObservation.mark_offline",
+    "unknownIDs": [
+      "36b34ca14e0e952c029ae29fe5ec90e768917041531013ca63bc30e07b206c38",
+      "6367eafee00b16fe77ed6475dd98ba37d2873a3a59b82c821babc1472afe10f3",
+      "d28ac491b9c444d4429e2ad217422e73adb3510fd539669ca1c4340d5147ce7c",
+      "f0e94cd518fa2948438931ba2c2239fc5946dd122699d4a46f7a0bd2c8e4e6c0",
+      "2fee33b1d7a35c5ab73aef228b1d1cbbd152e923df8a405e0a21191fe593e418",
+      "0900fcf3ee00e5dfa59f724aad9769d340acf7e022f312c13e832dc5937039a8",
+      "7250f09561b724047872700cc2e7b7bda964e8e6c354a0abec8509986ccd2f4f",
+      "bf871086558da68fae6f99087dba0157d4aa22b183720c72f02a1c13406fd16e",
+      "038957a7d84e801a61796e6171a28b3920d2945ee7fce99bc70d426595dd53cc",
+      "21156e69b339fe380ba83f3bbeea6207d913f91d59e80b0dc1e1283016efcd31",
+      "402f16a79c13a366b175b95856b432e32f5763ac9600e73ed06a8fa596142e37",
+      "ac52192a6b9a7bc1a10ad58dfdb27af0981524c9ad77e5044701b6bba2b413a6",
+      "de9d9e265fa02411fc2f7e72011c1b6d5abf963c21e674514e8dd21317590726",
+      "850d6ff6bb0db9ec30186d2ff111bab72e669641ad7371552ae67ea3d276d259",
+      "f6d5fe58f1bc552f51c5bddb0574bc1014bb94921cc5322c7daa90039dad46c3",
+      "52fb59f4058e2cf847a8bccaf323f92cf840ef29462513cccd0a51ac67cc9152",
+      "c5dbe16644b32611e8c1aea3f764e591675c6562eefd42aca34c06134b1dd24c",
+      "4bfa4566940ef66d68e5403956db9904e48913b65fad2739c43e4984e19e4c02",
+      "5e4959377b92699d426be7c92b2aa26ea37eda82cb70dc67707986e125f9c98c"
+    ]
+  },
+  "edges": [
+    {
+      "callRef": "de9d9e265fa02411fc2f7e72011c1b6d5abf963c21e674514e8dd21317590726",
+      "rule": "A8_T1_ATTRIBUTE",
+      "source": {
+        "path": "services/control-plane/src/inv/db.py",
+        "span": [
+          36,
+          11,
+          36,
+          59
+        ],
+        "sourceFileSHA256": "38e0d679b442433fd0b775e98411d78dfff2b7d114bbc3c2a52d3a886726022d",
+        "expressionSHA256": "9175d9cac23fec81fdc554b6bf16e9850b56e366e6e2ab2f428f1790d305748a",
+        "function": "inv.db.record_placement_metric"
+      },
+      "receiver": {
+        "expression": "getattr",
+        "oldInferredType": null,
+        "provenUnion": [
+          "inv.db.Database"
+        ]
+      },
+      "producerRecord": null,
+      "proof": {
+        "receiver": "Database self from transaction -> record_placement_metric(self,metric)",
+        "constructorFieldProvenance": [
+          {
+            "path": "services/control-plane/src/inv/app.py",
+            "span": [
+              1313,
+              19,
+              1318,
+              9
+            ],
+            "sourceFileSHA256": "237f97915ea7476a9c3f3ef487e1f714488cb55bd687ae960e262e4963258433",
+            "expressionSHA256": "13018cbdcbfbea2e34c9f731c9ad7b42977b455aa11c3f5b3010785c7b6bf780",
+            "constructor": "inv.db.Database",
+            "statement_observer": "None default or exact None",
+            "placement_metric_sink": "None default or exact None",
+            "authority": "SOURCE_PROVENANCE_ONLY_RUNTIME_BINDING_NULL"
+          },
+          {
+            "path": "services/control-plane/src/inv/observer_worker.py",
+            "span": [
+              54,
+              13,
+              57,
+              9
+            ],
+            "sourceFileSHA256": "6bbdf815554fe1f0157247732ddc4dc3069686685c291ef83add55c8f3e92003",
+            "expressionSHA256": "e0f11d03418cd4634318a282ed40685772a3bd5bfdad26650ebeaf570e5a6f6f",
+            "constructor": "inv.db.Database",
+            "statement_observer": "None default or exact None",
+            "placement_metric_sink": "None default or exact None",
+            "authority": "SOURCE_PROVENANCE_ONLY_RUNTIME_BINDING_NULL"
+          },
+          {
+            "path": "services/control-plane/src/inv/worker.py",
+            "span": [
+              118,
+              13,
+              121,
+              9
+            ],
+            "sourceFileSHA256": "3010b2409bb285de960eb322792b1062ed066275307c9bea53a2cc767b65d4e3",
+            "expressionSHA256": "e0f11d03418cd4634318a282ed40685772a3bd5bfdad26650ebeaf570e5a6f6f",
+            "constructor": "inv.db.Database",
+            "statement_observer": "None default or exact None",
+            "placement_metric_sink": "None default or exact None",
+            "authority": "SOURCE_PROVENANCE_ONLY_RUNTIME_BINDING_NULL"
+          },
+          {
+            "path": "tools/lan_pilot.py",
+            "span": [
+              903,
+              11,
+              903,
+              71
+            ],
+            "sourceFileSHA256": "2c626540f495499423b707b063a6cab6a53e1be3af8c324f46af88a94ac8f652",
+            "expressionSHA256": "18db108f9bb7e1dc844010d966482bd7a4cb1fc3b398ae0bbb2a2e37a11b9f3e",
+            "constructor": "inv.db.Database",
+            "statement_observer": "None default or exact None",
+            "placement_metric_sink": "None default or exact None",
+            "authority": "SOURCE_PROVENANCE_ONLY_RUNTIME_BINDING_NULL"
+          },
+          {
+            "path": "tools/remote_workspace_entry.py",
+            "span": [
+              63,
+              11,
+              63,
+              72
+            ],
+            "sourceFileSHA256": "e69fa8ff6c51bd3880f5ec388fe97288a4256169377e17d9d6aa5b7ec2f32c27",
+            "expressionSHA256": "3a98777830ce0fbbe68af67d58850dac8ff6e24113104bb2b40647027bc18b87",
+            "constructor": "inv.db.Database",
+            "statement_observer": "None default or exact None",
+            "placement_metric_sink": "None default or exact None",
+            "authority": "SOURCE_PROVENANCE_ONLY_RUNTIME_BINDING_NULL"
+          },
+          {
+            "path": "tools/run_s04_fe_matrix.py",
+            "span": [
+              613,
+              13,
+              613,
+              65
+            ],
+            "sourceFileSHA256": "456850d76284749e6e8b3125876699336004695c51203f25afe52539e47eebfe",
+            "expressionSHA256": "8930d5cf88c27d4bccc919ca9c12486c60b165c327e7119c1e9d14b44feb5683",
+            "constructor": "inv.db.Database",
+            "statement_observer": "None default or exact None",
+            "placement_metric_sink": "None default or exact None",
+            "authority": "SOURCE_PROVENANCE_ONLY_RUNTIME_BINDING_NULL"
+          },
+          {
+            "path": "tools/rehearse_independent_restore.py",
+            "span": [
+              204,
+              13,
+              204,
+              72
+            ],
+            "sourceFileSHA256": "2c6ca111e24dccd40b657b53af2df06377f629ec4ce415569e75d1e7c538be70",
+            "expressionSHA256": "0b2eb458615238ca3708a8480b81d5de1eacabe790bd0cba4dbb0e4033ea757f",
+            "constructor": "inv.db.Database",
+            "statement_observer": "None default or exact None",
+            "placement_metric_sink": "None default or exact None",
+            "authority": "SOURCE_PROVENANCE_ONLY_RUNTIME_BINDING_NULL"
+          }
+        ],
+        "attribute": "placement_metric_sink",
+        "scope": "Exact optional known field; not a generic getattr exemption",
+        "value": "placement_metric_sink source default None; placement_short_commit typed bool, current setting/log handlers runtime pending"
+      },
+      "pendingRuntimeContract": null,
+      "blocksGrant": false,
+      "sharedOwner": "inv.db.Database.transaction",
+      "closedOnlyForEntry": null,
+      "closureScope": "SOURCE_ANALYSIS_ONLY_NO_RUNTIME_GRANT"
+    },
+    {
+      "callRef": "850d6ff6bb0db9ec30186d2ff111bab72e669641ad7371552ae67ea3d276d259",
+      "rule": "NAMED_PORT:T1-OBSERVABILITY",
+      "source": {
+        "path": "services/control-plane/src/inv/db.py",
+        "span": [
+          37,
+          12,
+          37,
+          50
+        ],
+        "sourceFileSHA256": "38e0d679b442433fd0b775e98411d78dfff2b7d114bbc3c2a52d3a886726022d",
+        "expressionSHA256": "1fffd5063c89e73591fa3edc4ea7001d55cd054045c5a98af01af07ed813ebbf",
+        "function": "inv.db.record_placement_metric"
+      },
+      "receiver": {
+        "expression": "database.placement_metric_sink",
+        "oldInferredType": "TYPE_JOIN:d742656e07d4ac1ce85a",
+        "provenUnion": [
+          "exact named runtime interface; installed binding unproven"
+        ]
+      },
+      "producerRecord": null,
+      "proof": null,
+      "pendingRuntimeContract": "Exact existing optional sink/logging implementation. In-process/nonblocking/no-network/exception-contained/no-authority required; installed logging handlers/config NOT_PROVEN",
+      "blocksGrant": true,
+      "sharedOwner": "inv.db.Database.transaction",
+      "closedOnlyForEntry": null,
+      "closureScope": "SOURCE_ANALYSIS_ONLY_NO_RUNTIME_GRANT"
+    },
+    {
+      "callRef": "f6d5fe58f1bc552f51c5bddb0574bc1014bb94921cc5322c7daa90039dad46c3",
+      "rule": "A8_T1_ATTRIBUTE",
+      "source": {
+        "path": "services/control-plane/src/inv/db.py",
+        "span": [
+          38,
+          13,
+          38,
+          63
+        ],
+        "sourceFileSHA256": "38e0d679b442433fd0b775e98411d78dfff2b7d114bbc3c2a52d3a886726022d",
+        "expressionSHA256": "560a770ca6e26a50420476a102f28d5a7d6c311f8ae04f1d2bfc195f0de6efad",
+        "function": "inv.db.record_placement_metric"
+      },
+      "receiver": {
+        "expression": "getattr",
+        "oldInferredType": null,
+        "provenUnion": [
+          "inv.db.Database"
+        ]
+      },
+      "producerRecord": null,
+      "proof": {
+        "receiver": "Database self from transaction -> record_placement_metric(self,metric)",
+        "constructorFieldProvenance": [
+          {
+            "path": "services/control-plane/src/inv/app.py",
+            "span": [
+              1313,
+              19,
+              1318,
+              9
+            ],
+            "sourceFileSHA256": "237f97915ea7476a9c3f3ef487e1f714488cb55bd687ae960e262e4963258433",
+            "expressionSHA256": "13018cbdcbfbea2e34c9f731c9ad7b42977b455aa11c3f5b3010785c7b6bf780",
+            "constructor": "inv.db.Database",
+            "statement_observer": "None default or exact None",
+            "placement_metric_sink": "None default or exact None",
+            "authority": "SOURCE_PROVENANCE_ONLY_RUNTIME_BINDING_NULL"
+          },
+          {
+            "path": "services/control-plane/src/inv/observer_worker.py",
+            "span": [
+              54,
+              13,
+              57,
+              9
+            ],
+            "sourceFileSHA256": "6bbdf815554fe1f0157247732ddc4dc3069686685c291ef83add55c8f3e92003",
+            "expressionSHA256": "e0f11d03418cd4634318a282ed40685772a3bd5bfdad26650ebeaf570e5a6f6f",
+            "constructor": "inv.db.Database",
+            "statement_observer": "None default or exact None",
+            "placement_metric_sink": "None default or exact None",
+            "authority": "SOURCE_PROVENANCE_ONLY_RUNTIME_BINDING_NULL"
+          },
+          {
+            "path": "services/control-plane/src/inv/worker.py",
+            "span": [
+              118,
+              13,
+              121,
+              9
+            ],
+            "sourceFileSHA256": "3010b2409bb285de960eb322792b1062ed066275307c9bea53a2cc767b65d4e3",
+            "expressionSHA256": "e0f11d03418cd4634318a282ed40685772a3bd5bfdad26650ebeaf570e5a6f6f",
+            "constructor": "inv.db.Database",
+            "statement_observer": "None default or exact None",
+            "placement_metric_sink": "None default or exact None",
+            "authority": "SOURCE_PROVENANCE_ONLY_RUNTIME_BINDING_NULL"
+          },
+          {
+            "path": "tools/lan_pilot.py",
+            "span": [
+              903,
+              11,
+              903,
+              71
+            ],
+            "sourceFileSHA256": "2c626540f495499423b707b063a6cab6a53e1be3af8c324f46af88a94ac8f652",
+            "expressionSHA256": "18db108f9bb7e1dc844010d966482bd7a4cb1fc3b398ae0bbb2a2e37a11b9f3e",
+            "constructor": "inv.db.Database",
+            "statement_observer": "None default or exact None",
+            "placement_metric_sink": "None default or exact None",
+            "authority": "SOURCE_PROVENANCE_ONLY_RUNTIME_BINDING_NULL"
+          },
+          {
+            "path": "tools/remote_workspace_entry.py",
+            "span": [
+              63,
+              11,
+              63,
+              72
+            ],
+            "sourceFileSHA256": "e69fa8ff6c51bd3880f5ec388fe97288a4256169377e17d9d6aa5b7ec2f32c27",
+            "expressionSHA256": "3a98777830ce0fbbe68af67d58850dac8ff6e24113104bb2b40647027bc18b87",
+            "constructor": "inv.db.Database",
+            "statement_observer": "None default or exact None",
+            "placement_metric_sink": "None default or exact None",
+            "authority": "SOURCE_PROVENANCE_ONLY_RUNTIME_BINDING_NULL"
+          },
+          {
+            "path": "tools/run_s04_fe_matrix.py",
+            "span": [
+              613,
+              13,
+              613,
+              65
+            ],
+            "sourceFileSHA256": "456850d76284749e6e8b3125876699336004695c51203f25afe52539e47eebfe",
+            "expressionSHA256": "8930d5cf88c27d4bccc919ca9c12486c60b165c327e7119c1e9d14b44feb5683",
+            "constructor": "inv.db.Database",
+            "statement_observer": "None default or exact None",
+            "placement_metric_sink": "None default or exact None",
+            "authority": "SOURCE_PROVENANCE_ONLY_RUNTIME_BINDING_NULL"
+          },
+          {
+            "path": "tools/rehearse_independent_restore.py",
+            "span": [
+              204,
+              13,
+              204,
+              72
+            ],
+            "sourceFileSHA256": "2c6ca111e24dccd40b657b53af2df06377f629ec4ce415569e75d1e7c538be70",
+            "expressionSHA256": "0b2eb458615238ca3708a8480b81d5de1eacabe790bd0cba4dbb0e4033ea757f",
+            "constructor": "inv.db.Database",
+            "statement_observer": "None default or exact None",
+            "placement_metric_sink": "None default or exact None",
+            "authority": "SOURCE_PROVENANCE_ONLY_RUNTIME_BINDING_NULL"
+          }
+        ],
+        "attribute": "placement_short_commit",
+        "scope": "Exact optional known field; not a generic getattr exemption",
+        "value": "placement_metric_sink source default None; placement_short_commit typed bool, current setting/log handlers runtime pending"
+      },
+      "pendingRuntimeContract": null,
+      "blocksGrant": false,
+      "sharedOwner": "inv.db.Database.transaction",
+      "closedOnlyForEntry": null,
+      "closureScope": "SOURCE_ANALYSIS_ONLY_NO_RUNTIME_GRANT"
+    },
+    {
+      "callRef": "52fb59f4058e2cf847a8bccaf323f92cf840ef29462513cccd0a51ac67cc9152",
+      "rule": "NAMED_PORT:T1-OBSERVABILITY",
+      "source": {
+        "path": "services/control-plane/src/inv/db.py",
+        "span": [
+          39,
+          12,
+          42,
+          13
+        ],
+        "sourceFileSHA256": "38e0d679b442433fd0b775e98411d78dfff2b7d114bbc3c2a52d3a886726022d",
+        "expressionSHA256": "10bf24c2bd023a80c823c444dbb1cae24327ec00d6ce172456c8ee0650158cb6",
+        "function": "inv.db.record_placement_metric"
+      },
+      "receiver": {
+        "expression": "_placement_logger.info",
+        "oldInferredType": "inv.db._placement_logger",
+        "provenUnion": [
+          "exact named runtime interface; installed binding unproven"
+        ]
+      },
+      "producerRecord": null,
+      "proof": null,
+      "pendingRuntimeContract": "Exact existing optional sink/logging implementation. In-process/nonblocking/no-network/exception-contained/no-authority required; installed logging handlers/config NOT_PROVEN",
+      "blocksGrant": true,
+      "sharedOwner": "inv.db.Database.transaction",
+      "closedOnlyForEntry": null,
+      "closureScope": "SOURCE_ANALYSIS_ONLY_NO_RUNTIME_GRANT"
+    },
+    {
+      "callRef": "36b34ca14e0e952c029ae29fe5ec90e768917041531013ca63bc30e07b206c38",
+      "rule": "A3",
+      "source": {
+        "path": "services/control-plane/src/inv/db.py",
+        "span": [
+          177,
+          22,
+          177,
+          76
+        ],
+        "sourceFileSHA256": "38e0d679b442433fd0b775e98411d78dfff2b7d114bbc3c2a52d3a886726022d",
+        "expressionSHA256": "da2ed64f3f1f9978906fbe8fa51c0c4de158b51c3e1fa9c1994ebbd7a49d5b99",
+        "function": "inv.db.Database.transaction"
+      },
+      "receiver": {
+        "expression": "_statement_phase.set",
+        "oldInferredType": "inv.db._statement_phase",
+        "provenUnion": [
+          "contextvars.ContextVar phase/token; metric dict"
+        ]
+      },
+      "producerRecord": null,
+      "proof": {
+        "moduleFactory": {
+          "path": "services/control-plane/src/inv/db.py",
+          "span": [
+            15,
+            0,
+            15,
+            83
+          ],
+          "sourceFileSHA256": "38e0d679b442433fd0b775e98411d78dfff2b7d114bbc3c2a52d3a886726022d",
+          "expressionSHA256": "00366941ac17ab814e260e8f73dce7bbca152a43f7ec2ff6679e568ab009446b"
+        },
+        "tokenSet": {
+          "path": "services/control-plane/src/inv/db.py",
+          "span": [
+            177,
+            8,
+            177,
+            76
+          ],
+          "sourceFileSHA256": "38e0d679b442433fd0b775e98411d78dfff2b7d114bbc3c2a52d3a886726022d",
+          "expressionSHA256": "9004844ad3617f498ac4ce598f352b412ab8eeb2b3c3812e2c869ea403ce53aa"
+        },
+        "finallyReset": {
+          "path": "services/control-plane/src/inv/db.py",
+          "span": [
+            234,
+            12,
+            234,
+            47
+          ],
+          "sourceFileSHA256": "38e0d679b442433fd0b775e98411d78dfff2b7d114bbc3c2a52d3a886726022d",
+          "expressionSHA256": "8960eba1e3a4046e29187a4514a6fc78e06aea540be6d6fc6723e502b5933c3c"
+        },
+        "metricsOnly": {
+          "path": "services/control-plane/src/inv/db.py",
+          "span": [
+            235,
+            12,
+            245,
+            53
+          ],
+          "sourceFileSHA256": "38e0d679b442433fd0b775e98411d78dfff2b7d114bbc3c2a52d3a886726022d",
+          "expressionSHA256": "56347532aae87b0d1edc79891164aaeba25c7e8aacdad4ac9a67172fd1639d37"
+        },
+        "clock": "perf_counter_ns actual clock source retained, not pure conversion"
+      },
+      "pendingRuntimeContract": null,
+      "blocksGrant": false,
+      "sharedOwner": "inv.db.Database.transaction",
+      "closedOnlyForEntry": null,
+      "closureScope": "SOURCE_ANALYSIS_ONLY_NO_RUNTIME_GRANT"
+    },
+    {
+      "callRef": "6367eafee00b16fe77ed6475dd98ba37d2873a3a59b82c821babc1472afe10f3",
+      "rule": "NAMED_PORT:P-DBROLE",
+      "source": {
+        "path": "services/control-plane/src/inv/db.py",
+        "span": [
+          180,
+          17,
+          180,
+          65
+        ],
+        "sourceFileSHA256": "38e0d679b442433fd0b775e98411d78dfff2b7d114bbc3c2a52d3a886726022d",
+        "expressionSHA256": "88b9868cb88c97c53243d1302545ae00404226314c5019e51fc15fa89c4af76e",
+        "function": "inv.db.Database.transaction"
+      },
+      "receiver": {
+        "expression": "psycopg.connect",
+        "oldInferredType": "psycopg",
+        "provenUnion": [
+          "exact named runtime interface; installed binding unproven"
+        ]
+      },
+      "producerRecord": null,
+      "proof": null,
+      "pendingRuntimeContract": "Actual credential/installed non-superuser/non-owner/no-RLS-bypass role/PG transaction proof NOT_RUN",
+      "blocksGrant": true,
+      "sharedOwner": "inv.db.Database.transaction",
+      "closedOnlyForEntry": null,
+      "closureScope": "SOURCE_ANALYSIS_ONLY_NO_RUNTIME_GRANT"
+    },
+    {
+      "callRef": "d28ac491b9c444d4429e2ad217422e73adb3510fd539669ca1c4340d5147ce7c",
+      "rule": "A1c",
+      "source": {
+        "path": "services/control-plane/src/inv/db.py",
+        "span": [
+          183,
+          23,
+          186,
+          65
+        ],
+        "sourceFileSHA256": "38e0d679b442433fd0b775e98411d78dfff2b7d114bbc3c2a52d3a886726022d",
+        "expressionSHA256": "21f4573990f9ee272507c3bf95ef26e30d52caa2d739a7faa7570c7f3e5f7ee5",
+        "function": "inv.db.Database.transaction"
+      },
+      "receiver": {
+        "expression": "conn.execute(\"SELECT r.rolsuper, r.rolbypassrls,\\n                    r.oid = n.nspowner AS owns_schema\\n                    FROM pg_roles r JOIN pg_namespace n ON n.nspname='inv'\\n                    WHERE r.rolname = current_user\").fetchone",
+        "oldInferredType": "DB:Cursor",
+        "provenUnion": [
+          "psycopg.Connection",
+          "inv.db._ObservedConnection"
+        ]
+      },
+      "producerRecord": {
+        "source": "72028cbac903c4415d9979f980a6e0f9948e914f",
+        "path": "services/control-plane/src/inv/db.py",
+        "function": "inv.db.Database.transaction",
+        "line": 183,
+        "column": 23,
+        "endLine": 186,
+        "endColumn": 54,
+        "expression": "conn.execute(\"\"\"SELECT r.rolsuper, r.rolbypassrls,\n                    r.oid = n.nspowner AS owns_schema\n                    FROM pg_roles r JOIN pg_namespace n ON n.nspname='inv'\n                    WHERE r.rolname = current_user\"\"\")",
+        "expressionSHA256": "01eb716530bf157c9da52b64b32cd11c3377efef31d2a5213e1b79ccef31cf4b",
+        "kind": "SQL",
+        "tables": [],
+        "modes": [],
+        "resolvedSQL": "SELECT r.rolsuper, r.rolbypassrls,\n                    r.oid = n.nspowner AS owns_schema\n                    FROM pg_roles r JOIN pg_namespace n ON n.nspname='inv'\n                    WHERE r.rolname = current_user",
+        "unresolvedSQL": false,
+        "scopeDisposition": "CLOSED_LITERAL_SET_ALL_VARIANTS_ANALYZED",
+        "closedLiteralVariants": [
+          "SELECT r.rolsuper, r.rolbypassrls,\n                    r.oid = n.nspowner AS owns_schema\n                    FROM pg_roles r JOIN pg_namespace n ON n.nspname='inv'\n                    WHERE r.rolname = current_user"
+        ]
+      },
+      "proof": {
+        "classification": "RESOLVED_DB_CURSOR_RESULT",
+        "rule": "A1c_CONNECTION_UNION",
+        "producerSanity": {
+          "parse": true,
+          "currentCallSpan": [
+            183,
+            23,
+            186,
+            65
+          ],
+          "sourceSHA256": "38e0d679b442433fd0b775e98411d78dfff2b7d114bbc3c2a52d3a886726022d",
+          "producerExpressionSHA256": "01eb716530bf157c9da52b64b32cd11c3377efef31d2a5213e1b79ccef31cf4b",
+          "producerRecord": {
+            "source": "72028cbac903c4415d9979f980a6e0f9948e914f",
+            "path": "services/control-plane/src/inv/db.py",
+            "function": "inv.db.Database.transaction",
+            "line": 183,
+            "column": 23,
+            "endLine": 186,
+            "endColumn": 54,
+            "expression": "conn.execute(\"\"\"SELECT r.rolsuper, r.rolbypassrls,\n                    r.oid = n.nspowner AS owns_schema\n                    FROM pg_roles r JOIN pg_namespace n ON n.nspname='inv'\n                    WHERE r.rolname = current_user\"\"\")",
+            "expressionSHA256": "01eb716530bf157c9da52b64b32cd11c3377efef31d2a5213e1b79ccef31cf4b",
+            "kind": "SQL",
+            "tables": [],
+            "modes": [],
+            "resolvedSQL": "SELECT r.rolsuper, r.rolbypassrls,\n                    r.oid = n.nspowner AS owns_schema\n                    FROM pg_roles r JOIN pg_namespace n ON n.nspname='inv'\n                    WHERE r.rolname = current_user",
+            "unresolvedSQL": false,
+            "scopeDisposition": "CLOSED_LITERAL_SET_ALL_VARIANTS_ANALYZED",
+            "closedLiteralVariants": [
+              "SELECT r.rolsuper, r.rolbypassrls,\n                    r.oid = n.nspowner AS owns_schema\n                    FROM pg_roles r JOIN pg_namespace n ON n.nspname='inv'\n                    WHERE r.rolname = current_user"
+            ]
+          },
+          "producerCallRef": "be11ca3a6bfa93bcccadbd82bba49cd055fce18e653904cf77b2ac40e07ff081"
+        },
+        "receiver": "conn",
+        "receiverUnionProof": {
+          "receiverUnion": [
+            "psycopg.Connection",
+            "inv.db._ObservedConnection"
+          ],
+          "yieldSelection": {
+            "path": "services/control-plane/src/inv/db.py",
+            "span": [
+              196,
+              16,
+              200,
+              17
+            ],
+            "sourceFileSHA256": "38e0d679b442433fd0b775e98411d78dfff2b7d114bbc3c2a52d3a886726022d",
+            "expressionSHA256": "cd14a3c76cce93589ef8aa50b98ef857dffe2bb506ce5c4db62d3619f7b59878"
+          },
+          "executeForward": {
+            "path": "services/control-plane/src/inv/db.py",
+            "span": [
+              65,
+              12,
+              65,
+              64
+            ],
+            "sourceFileSHA256": "38e0d679b442433fd0b775e98411d78dfff2b7d114bbc3c2a52d3a886726022d",
+            "expressionSHA256": "35472b7afdf80ae4fba7488d6e395cac62396a7d37b56a998cf67d39780c4a8f"
+          },
+          "returnUnchanged": {
+            "path": "services/control-plane/src/inv/db.py",
+            "span": [
+              106,
+              8,
+              106,
+              21
+            ],
+            "sourceFileSHA256": "38e0d679b442433fd0b775e98411d78dfff2b7d114bbc3c2a52d3a886726022d",
+            "expressionSHA256": "bffa478fd43608c06d50aa5022c6b4a8407fc234526250dfaa512d5200d252ac"
+          },
+          "delegate": {
+            "path": "services/control-plane/src/inv/db.py",
+            "span": [
+              108,
+              4,
+              109,
+              40
+            ],
+            "sourceFileSHA256": "38e0d679b442433fd0b775e98411d78dfff2b7d114bbc3c2a52d3a886726022d",
+            "expressionSHA256": "0e1073426cf31db3494b2a53df993b1ba91289271a4b876cd4557eb3c3422294"
+          },
+          "observerEffect": "Named T1 observability; current source constructors default None, runtime handler/config proof pending"
+        },
+        "transactionOwner": {
+          "span": [
+            180,
+            17,
+            180,
+            65
+          ],
+          "genuineCredentialPort": "P-DBROLE_RUNTIME_PENDING"
+        },
+        "retainsDatabaseReadWriteAndControlFlow": true,
+        "tables": [],
+        "lockModes": [],
+        "runtimeBinding": null
+      },
+      "pendingRuntimeContract": null,
+      "blocksGrant": false,
+      "sharedOwner": "inv.db.Database.transaction",
+      "closedOnlyForEntry": null,
+      "closureScope": "SOURCE_ANALYSIS_ONLY_NO_RUNTIME_GRANT"
+    },
+    {
+      "callRef": "f0e94cd518fa2948438931ba2c2239fc5946dd122699d4a46f7a0bd2c8e4e6c0",
+      "rule": "A2_HARDENED",
+      "source": {
+        "path": "services/control-plane/src/inv/db.py",
+        "span": [
+          188,
+          26,
+          192,
+          21
+        ],
+        "sourceFileSHA256": "38e0d679b442433fd0b775e98411d78dfff2b7d114bbc3c2a52d3a886726022d",
+        "expressionSHA256": "46fbdffca44cb16a54923f431464b7231ec472096f64b870e63214cc78db69d5",
+        "function": "inv.db.Database.transaction"
+      },
+      "receiver": {
+        "expression": "DomainError",
+        "oldInferredType": null,
+        "provenUnion": [
+          "inv.errors.DomainError"
+        ]
+      },
+      "producerRecord": null,
+      "proof": {
+        "constructor": "inv.errors.DomainError",
+        "constructorFileSHA256": "833eea9d797496c44ef3b3003cf728cfa88d12128dddf60106632609ead3a7bc",
+        "callerBinding": "exact .errors import, all Store/import/alias/class mutations refused",
+        "bodyContract": "exact dataclass/Exception binding; no custom keywords/init/post_init/field effect"
+      },
+      "pendingRuntimeContract": null,
+      "blocksGrant": false,
+      "sharedOwner": "inv.db.Database.transaction",
+      "closedOnlyForEntry": null,
+      "closureScope": "SOURCE_ANALYSIS_ONLY_NO_RUNTIME_GRANT"
+    },
+    {
+      "callRef": "2fee33b1d7a35c5ab73aef228b1d1cbbd152e923df8a405e0a21191fe593e418",
+      "rule": "A1c",
+      "source": {
+        "path": "services/control-plane/src/inv/db.py",
+        "span": [
+          201,
+          24,
+          203,
+          28
+        ],
+        "sourceFileSHA256": "38e0d679b442433fd0b775e98411d78dfff2b7d114bbc3c2a52d3a886726022d",
+        "expressionSHA256": "504f947c88a50ecfae8b500afc4914083e7fa5f433868301123c808204c74a50",
+        "function": "inv.db.Database.transaction"
+      },
+      "receiver": {
+        "expression": "observed_conn.execute('SELECT epoch FROM inv.control_epoch WHERE singleton FOR SHARE').fetchone",
+        "oldInferredType": "UNRESOLVED_CALL_RETURN:inv.db:observed_conn.execute",
+        "provenUnion": [
+          "psycopg.Connection",
+          "inv.db._ObservedConnection"
+        ]
+      },
+      "producerRecord": {
+        "source": "72028cbac903c4415d9979f980a6e0f9948e914f",
+        "path": "services/control-plane/src/inv/db.py",
+        "function": "inv.db.Database.transaction",
+        "line": 201,
+        "column": 24,
+        "endLine": 203,
+        "endColumn": 17,
+        "expression": "observed_conn.execute(\n                    \"SELECT epoch FROM inv.control_epoch WHERE singleton FOR SHARE\"\n                )",
+        "expressionSHA256": "1700d1f2a73f083e888134523eaa054548e1fd47c1227d11e01ac3156cd35015",
+        "kind": "SQL",
+        "tables": [
+          "inv.control_epoch"
+        ],
+        "modes": [
+          "FOR SHARE"
+        ],
+        "resolvedSQL": "SELECT epoch FROM inv.control_epoch WHERE singleton FOR SHARE",
+        "unresolvedSQL": false,
+        "scopeDisposition": "CLOSED_LITERAL_SET_ALL_VARIANTS_ANALYZED",
+        "closedLiteralVariants": [
+          "SELECT epoch FROM inv.control_epoch WHERE singleton FOR SHARE"
+        ]
+      },
+      "proof": {
+        "classification": "RESOLVED_DB_CURSOR_RESULT",
+        "rule": "A1c_CONNECTION_UNION",
+        "producerSanity": {
+          "parse": true,
+          "currentCallSpan": [
+            201,
+            24,
+            203,
+            28
+          ],
+          "sourceSHA256": "38e0d679b442433fd0b775e98411d78dfff2b7d114bbc3c2a52d3a886726022d",
+          "producerExpressionSHA256": "1700d1f2a73f083e888134523eaa054548e1fd47c1227d11e01ac3156cd35015",
+          "producerRecord": {
+            "source": "72028cbac903c4415d9979f980a6e0f9948e914f",
+            "path": "services/control-plane/src/inv/db.py",
+            "function": "inv.db.Database.transaction",
+            "line": 201,
+            "column": 24,
+            "endLine": 203,
+            "endColumn": 17,
+            "expression": "observed_conn.execute(\n                    \"SELECT epoch FROM inv.control_epoch WHERE singleton FOR SHARE\"\n                )",
+            "expressionSHA256": "1700d1f2a73f083e888134523eaa054548e1fd47c1227d11e01ac3156cd35015",
+            "kind": "SQL",
+            "tables": [
+              "inv.control_epoch"
+            ],
+            "modes": [
+              "FOR SHARE"
+            ],
+            "resolvedSQL": "SELECT epoch FROM inv.control_epoch WHERE singleton FOR SHARE",
+            "unresolvedSQL": false,
+            "scopeDisposition": "CLOSED_LITERAL_SET_ALL_VARIANTS_ANALYZED",
+            "closedLiteralVariants": [
+              "SELECT epoch FROM inv.control_epoch WHERE singleton FOR SHARE"
+            ]
+          },
+          "producerCallRef": "24e95f7b87eef162381bbde560ae3f97f20d64e2021101eb04bf581eed3cd4ee"
+        },
+        "receiver": "observed_conn",
+        "receiverUnionProof": {
+          "receiverUnion": [
+            "psycopg.Connection",
+            "inv.db._ObservedConnection"
+          ],
+          "yieldSelection": {
+            "path": "services/control-plane/src/inv/db.py",
+            "span": [
+              196,
+              16,
+              200,
+              17
+            ],
+            "sourceFileSHA256": "38e0d679b442433fd0b775e98411d78dfff2b7d114bbc3c2a52d3a886726022d",
+            "expressionSHA256": "cd14a3c76cce93589ef8aa50b98ef857dffe2bb506ce5c4db62d3619f7b59878"
+          },
+          "executeForward": {
+            "path": "services/control-plane/src/inv/db.py",
+            "span": [
+              65,
+              12,
+              65,
+              64
+            ],
+            "sourceFileSHA256": "38e0d679b442433fd0b775e98411d78dfff2b7d114bbc3c2a52d3a886726022d",
+            "expressionSHA256": "35472b7afdf80ae4fba7488d6e395cac62396a7d37b56a998cf67d39780c4a8f"
+          },
+          "returnUnchanged": {
+            "path": "services/control-plane/src/inv/db.py",
+            "span": [
+              106,
+              8,
+              106,
+              21
+            ],
+            "sourceFileSHA256": "38e0d679b442433fd0b775e98411d78dfff2b7d114bbc3c2a52d3a886726022d",
+            "expressionSHA256": "bffa478fd43608c06d50aa5022c6b4a8407fc234526250dfaa512d5200d252ac"
+          },
+          "delegate": {
+            "path": "services/control-plane/src/inv/db.py",
+            "span": [
+              108,
+              4,
+              109,
+              40
+            ],
+            "sourceFileSHA256": "38e0d679b442433fd0b775e98411d78dfff2b7d114bbc3c2a52d3a886726022d",
+            "expressionSHA256": "0e1073426cf31db3494b2a53df993b1ba91289271a4b876cd4557eb3c3422294"
+          },
+          "observerEffect": "Named T1 observability; current source constructors default None, runtime handler/config proof pending"
+        },
+        "transactionOwner": {
+          "span": [
+            180,
+            17,
+            180,
+            65
+          ],
+          "genuineCredentialPort": "P-DBROLE_RUNTIME_PENDING"
+        },
+        "retainsDatabaseReadWriteAndControlFlow": true,
+        "tables": [
+          "inv.control_epoch"
+        ],
+        "lockModes": [
+          "FOR SHARE"
+        ],
+        "runtimeBinding": null
+      },
+      "pendingRuntimeContract": null,
+      "blocksGrant": false,
+      "sharedOwner": "inv.db.Database.transaction",
+      "closedOnlyForEntry": null,
+      "closureScope": "SOURCE_ANALYSIS_ONLY_NO_RUNTIME_GRANT"
+    },
+    {
+      "callRef": "0900fcf3ee00e5dfa59f724aad9769d340acf7e022f312c13e832dc5937039a8",
+      "rule": "A2_HARDENED",
+      "source": {
+        "path": "services/control-plane/src/inv/db.py",
+        "span": [
+          205,
+          26,
+          207,
+          21
+        ],
+        "sourceFileSHA256": "38e0d679b442433fd0b775e98411d78dfff2b7d114bbc3c2a52d3a886726022d",
+        "expressionSHA256": "4be3069c99af9f1a5ea16c81bf57c640f267d4767ae0305e387c7ef2b67b960d",
+        "function": "inv.db.Database.transaction"
+      },
+      "receiver": {
+        "expression": "DomainError",
+        "oldInferredType": null,
+        "provenUnion": [
+          "inv.errors.DomainError"
+        ]
+      },
+      "producerRecord": null,
+      "proof": {
+        "constructor": "inv.errors.DomainError",
+        "constructorFileSHA256": "833eea9d797496c44ef3b3003cf728cfa88d12128dddf60106632609ead3a7bc",
+        "callerBinding": "exact .errors import, all Store/import/alias/class mutations refused",
+        "bodyContract": "exact dataclass/Exception binding; no custom keywords/init/post_init/field effect"
+      },
+      "pendingRuntimeContract": null,
+      "blocksGrant": false,
+      "sharedOwner": "inv.db.Database.transaction",
+      "closedOnlyForEntry": null,
+      "closureScope": "SOURCE_ANALYSIS_ONLY_NO_RUNTIME_GRANT"
+    },
+    {
+      "callRef": "7250f09561b724047872700cc2e7b7bda964e8e6c354a0abec8509986ccd2f4f",
+      "rule": "A1c",
+      "source": {
+        "path": "services/control-plane/src/inv/db.py",
+        "span": [
+          212,
+          27,
+          216,
+          32
+        ],
+        "sourceFileSHA256": "38e0d679b442433fd0b775e98411d78dfff2b7d114bbc3c2a52d3a886726022d",
+        "expressionSHA256": "7a3a838a4ecca56ca871c0d0f542494bc6a3841e445a639d68ec2b04415978f4",
+        "function": "inv.db.Database.transaction"
+      },
+      "receiver": {
+        "expression": "observed_conn.execute('SELECT tenant_id FROM inv.tenant_controls WHERE tenant_id=%s FOR ' + ('UPDATE' if containment_write else 'SHARE'), (tenant,)).fetchone",
+        "oldInferredType": "UNRESOLVED_CALL_RETURN:inv.db:observed_conn.execute",
+        "provenUnion": [
+          "psycopg.Connection",
+          "inv.db._ObservedConnection"
+        ]
+      },
+      "producerRecord": {
+        "source": "72028cbac903c4415d9979f980a6e0f9948e914f",
+        "path": "services/control-plane/src/inv/db.py",
+        "function": "inv.db.Database.transaction",
+        "line": 212,
+        "column": 27,
+        "endLine": 216,
+        "endColumn": 21,
+        "expression": "observed_conn.execute(\n                        \"SELECT tenant_id FROM inv.tenant_controls WHERE tenant_id=%s FOR \"\n                        + (\"UPDATE\" if containment_write else \"SHARE\"),\n                        (tenant,),\n                    )",
+        "expressionSHA256": "fc41c8218273abf7ff67561e2bdeba477812f2c630f1909b8ec8bcb66ca18d1b",
+        "kind": "SQL",
+        "tables": [
+          "inv.tenant_controls"
+        ],
+        "modes": [],
+        "resolvedSQL": "SELECT tenant_id FROM inv.tenant_controls WHERE tenant_id=%s FOR <dynamic>",
+        "unresolvedSQL": false,
+        "scopeDisposition": "CLOSED_LITERAL_SET_ALL_VARIANTS_ANALYZED",
+        "closedLiteralVariants": [
+          "SELECT tenant_id FROM inv.tenant_controls WHERE tenant_id=%s FOR SHARE",
+          "SELECT tenant_id FROM inv.tenant_controls WHERE tenant_id=%s FOR UPDATE"
+        ]
+      },
+      "proof": {
+        "classification": "RESOLVED_DB_CURSOR_RESULT",
+        "rule": "A1c_CONNECTION_UNION",
+        "producerSanity": {
+          "parse": true,
+          "currentCallSpan": [
+            212,
+            27,
+            216,
+            32
+          ],
+          "sourceSHA256": "38e0d679b442433fd0b775e98411d78dfff2b7d114bbc3c2a52d3a886726022d",
+          "producerExpressionSHA256": "fc41c8218273abf7ff67561e2bdeba477812f2c630f1909b8ec8bcb66ca18d1b",
+          "producerRecord": {
+            "source": "72028cbac903c4415d9979f980a6e0f9948e914f",
+            "path": "services/control-plane/src/inv/db.py",
+            "function": "inv.db.Database.transaction",
+            "line": 212,
+            "column": 27,
+            "endLine": 216,
+            "endColumn": 21,
+            "expression": "observed_conn.execute(\n                        \"SELECT tenant_id FROM inv.tenant_controls WHERE tenant_id=%s FOR \"\n                        + (\"UPDATE\" if containment_write else \"SHARE\"),\n                        (tenant,),\n                    )",
+            "expressionSHA256": "fc41c8218273abf7ff67561e2bdeba477812f2c630f1909b8ec8bcb66ca18d1b",
+            "kind": "SQL",
+            "tables": [
+              "inv.tenant_controls"
+            ],
+            "modes": [],
+            "resolvedSQL": "SELECT tenant_id FROM inv.tenant_controls WHERE tenant_id=%s FOR <dynamic>",
+            "unresolvedSQL": false,
+            "scopeDisposition": "CLOSED_LITERAL_SET_ALL_VARIANTS_ANALYZED",
+            "closedLiteralVariants": [
+              "SELECT tenant_id FROM inv.tenant_controls WHERE tenant_id=%s FOR SHARE",
+              "SELECT tenant_id FROM inv.tenant_controls WHERE tenant_id=%s FOR UPDATE"
+            ]
+          },
+          "producerCallRef": "49a05d86f0e1466943cb786adc2de8ba3c3e3dc1273b7dc02d4ea1e87b26938e"
+        },
+        "receiver": "observed_conn",
+        "receiverUnionProof": {
+          "receiverUnion": [
+            "psycopg.Connection",
+            "inv.db._ObservedConnection"
+          ],
+          "yieldSelection": {
+            "path": "services/control-plane/src/inv/db.py",
+            "span": [
+              196,
+              16,
+              200,
+              17
+            ],
+            "sourceFileSHA256": "38e0d679b442433fd0b775e98411d78dfff2b7d114bbc3c2a52d3a886726022d",
+            "expressionSHA256": "cd14a3c76cce93589ef8aa50b98ef857dffe2bb506ce5c4db62d3619f7b59878"
+          },
+          "executeForward": {
+            "path": "services/control-plane/src/inv/db.py",
+            "span": [
+              65,
+              12,
+              65,
+              64
+            ],
+            "sourceFileSHA256": "38e0d679b442433fd0b775e98411d78dfff2b7d114bbc3c2a52d3a886726022d",
+            "expressionSHA256": "35472b7afdf80ae4fba7488d6e395cac62396a7d37b56a998cf67d39780c4a8f"
+          },
+          "returnUnchanged": {
+            "path": "services/control-plane/src/inv/db.py",
+            "span": [
+              106,
+              8,
+              106,
+              21
+            ],
+            "sourceFileSHA256": "38e0d679b442433fd0b775e98411d78dfff2b7d114bbc3c2a52d3a886726022d",
+            "expressionSHA256": "bffa478fd43608c06d50aa5022c6b4a8407fc234526250dfaa512d5200d252ac"
+          },
+          "delegate": {
+            "path": "services/control-plane/src/inv/db.py",
+            "span": [
+              108,
+              4,
+              109,
+              40
+            ],
+            "sourceFileSHA256": "38e0d679b442433fd0b775e98411d78dfff2b7d114bbc3c2a52d3a886726022d",
+            "expressionSHA256": "0e1073426cf31db3494b2a53df993b1ba91289271a4b876cd4557eb3c3422294"
+          },
+          "observerEffect": "Named T1 observability; current source constructors default None, runtime handler/config proof pending"
+        },
+        "transactionOwner": {
+          "span": [
+            180,
+            17,
+            180,
+            65
+          ],
+          "genuineCredentialPort": "P-DBROLE_RUNTIME_PENDING"
+        },
+        "retainsDatabaseReadWriteAndControlFlow": true,
+        "tables": [
+          "inv.tenant_controls"
+        ],
+        "lockModes": [],
+        "runtimeBinding": null
+      },
+      "pendingRuntimeContract": null,
+      "blocksGrant": false,
+      "sharedOwner": "inv.db.Database.transaction",
+      "closedOnlyForEntry": null,
+      "closureScope": "SOURCE_ANALYSIS_ONLY_NO_RUNTIME_GRANT"
+    },
+    {
+      "callRef": "bf871086558da68fae6f99087dba0157d4aa22b183720c72f02a1c13406fd16e",
+      "rule": "A2_HARDENED",
+      "source": {
+        "path": "services/control-plane/src/inv/db.py",
+        "span": [
+          218,
+          30,
+          218,
+          101
+        ],
+        "sourceFileSHA256": "38e0d679b442433fd0b775e98411d78dfff2b7d114bbc3c2a52d3a886726022d",
+        "expressionSHA256": "e18704530ab9e3a2bd8bcacffe79cc69a04daf8046fd2a62d7435009f48ccaa1",
+        "function": "inv.db.Database.transaction"
+      },
+      "receiver": {
+        "expression": "DomainError",
+        "oldInferredType": null,
+        "provenUnion": [
+          "inv.errors.DomainError"
+        ]
+      },
+      "producerRecord": null,
+      "proof": {
+        "constructor": "inv.errors.DomainError",
+        "constructorFileSHA256": "833eea9d797496c44ef3b3003cf728cfa88d12128dddf60106632609ead3a7bc",
+        "callerBinding": "exact .errors import, all Store/import/alias/class mutations refused",
+        "bodyContract": "exact dataclass/Exception binding; no custom keywords/init/post_init/field effect"
+      },
+      "pendingRuntimeContract": null,
+      "blocksGrant": false,
+      "sharedOwner": "inv.db.Database.transaction",
+      "closedOnlyForEntry": null,
+      "closureScope": "SOURCE_ANALYSIS_ONLY_NO_RUNTIME_GRANT"
+    },
+    {
+      "callRef": "038957a7d84e801a61796e6171a28b3920d2945ee7fce99bc70d426595dd53cc",
+      "rule": "A2_HARDENED",
+      "source": {
+        "path": "services/control-plane/src/inv/db.py",
+        "span": [
+          225,
+          26,
+          230,
+          21
+        ],
+        "sourceFileSHA256": "38e0d679b442433fd0b775e98411d78dfff2b7d114bbc3c2a52d3a886726022d",
+        "expressionSHA256": "aba1c93c12085995d6ff982164fe3f1c0a67204c6b91feedc5ed9c1251f15fb1",
+        "function": "inv.db.Database.transaction"
+      },
+      "receiver": {
+        "expression": "DomainError",
+        "oldInferredType": null,
+        "provenUnion": [
+          "inv.errors.DomainError"
+        ]
+      },
+      "producerRecord": null,
+      "proof": {
+        "constructor": "inv.errors.DomainError",
+        "constructorFileSHA256": "833eea9d797496c44ef3b3003cf728cfa88d12128dddf60106632609ead3a7bc",
+        "callerBinding": "exact .errors import, all Store/import/alias/class mutations refused",
+        "bodyContract": "exact dataclass/Exception binding; no custom keywords/init/post_init/field effect"
+      },
+      "pendingRuntimeContract": null,
+      "blocksGrant": false,
+      "sharedOwner": "inv.db.Database.transaction",
+      "closedOnlyForEntry": null,
+      "closureScope": "SOURCE_ANALYSIS_ONLY_NO_RUNTIME_GRANT"
+    },
+    {
+      "callRef": "21156e69b339fe380ba83f3bbeea6207d913f91d59e80b0dc1e1283016efcd31",
+      "rule": "A3",
+      "source": {
+        "path": "services/control-plane/src/inv/db.py",
+        "span": [
+          233,
+          20,
+          233,
+          42
+        ],
+        "sourceFileSHA256": "38e0d679b442433fd0b775e98411d78dfff2b7d114bbc3c2a52d3a886726022d",
+        "expressionSHA256": "d885317b1780d7d1da93dad1934c1c5e33650880d47799bbb802c1f2d61669d1",
+        "function": "inv.db.Database.transaction"
+      },
+      "receiver": {
+        "expression": "_statement_phase.get",
+        "oldInferredType": "inv.db._statement_phase",
+        "provenUnion": [
+          "contextvars.ContextVar phase/token; metric dict"
+        ]
+      },
+      "producerRecord": null,
+      "proof": {
+        "moduleFactory": {
+          "path": "services/control-plane/src/inv/db.py",
+          "span": [
+            15,
+            0,
+            15,
+            83
+          ],
+          "sourceFileSHA256": "38e0d679b442433fd0b775e98411d78dfff2b7d114bbc3c2a52d3a886726022d",
+          "expressionSHA256": "00366941ac17ab814e260e8f73dce7bbca152a43f7ec2ff6679e568ab009446b"
+        },
+        "tokenSet": {
+          "path": "services/control-plane/src/inv/db.py",
+          "span": [
+            177,
+            8,
+            177,
+            76
+          ],
+          "sourceFileSHA256": "38e0d679b442433fd0b775e98411d78dfff2b7d114bbc3c2a52d3a886726022d",
+          "expressionSHA256": "9004844ad3617f498ac4ce598f352b412ab8eeb2b3c3812e2c869ea403ce53aa"
+        },
+        "finallyReset": {
+          "path": "services/control-plane/src/inv/db.py",
+          "span": [
+            234,
+            12,
+            234,
+            47
+          ],
+          "sourceFileSHA256": "38e0d679b442433fd0b775e98411d78dfff2b7d114bbc3c2a52d3a886726022d",
+          "expressionSHA256": "8960eba1e3a4046e29187a4514a6fc78e06aea540be6d6fc6723e502b5933c3c"
+        },
+        "metricsOnly": {
+          "path": "services/control-plane/src/inv/db.py",
+          "span": [
+            235,
+            12,
+            245,
+            53
+          ],
+          "sourceFileSHA256": "38e0d679b442433fd0b775e98411d78dfff2b7d114bbc3c2a52d3a886726022d",
+          "expressionSHA256": "56347532aae87b0d1edc79891164aaeba25c7e8aacdad4ac9a67172fd1639d37"
+        },
+        "clock": "perf_counter_ns actual clock source retained, not pure conversion"
+      },
+      "pendingRuntimeContract": null,
+      "blocksGrant": false,
+      "sharedOwner": "inv.db.Database.transaction",
+      "closedOnlyForEntry": null,
+      "closureScope": "SOURCE_ANALYSIS_ONLY_NO_RUNTIME_GRANT"
+    },
+    {
+      "callRef": "402f16a79c13a366b175b95856b432e32f5763ac9600e73ed06a8fa596142e37",
+      "rule": "A3",
+      "source": {
+        "path": "services/control-plane/src/inv/db.py",
+        "span": [
+          234,
+          12,
+          234,
+          47
+        ],
+        "sourceFileSHA256": "38e0d679b442433fd0b775e98411d78dfff2b7d114bbc3c2a52d3a886726022d",
+        "expressionSHA256": "8960eba1e3a4046e29187a4514a6fc78e06aea540be6d6fc6723e502b5933c3c",
+        "function": "inv.db.Database.transaction"
+      },
+      "receiver": {
+        "expression": "_statement_phase.reset",
+        "oldInferredType": "inv.db._statement_phase",
+        "provenUnion": [
+          "contextvars.ContextVar phase/token; metric dict"
+        ]
+      },
+      "producerRecord": null,
+      "proof": {
+        "moduleFactory": {
+          "path": "services/control-plane/src/inv/db.py",
+          "span": [
+            15,
+            0,
+            15,
+            83
+          ],
+          "sourceFileSHA256": "38e0d679b442433fd0b775e98411d78dfff2b7d114bbc3c2a52d3a886726022d",
+          "expressionSHA256": "00366941ac17ab814e260e8f73dce7bbca152a43f7ec2ff6679e568ab009446b"
+        },
+        "tokenSet": {
+          "path": "services/control-plane/src/inv/db.py",
+          "span": [
+            177,
+            8,
+            177,
+            76
+          ],
+          "sourceFileSHA256": "38e0d679b442433fd0b775e98411d78dfff2b7d114bbc3c2a52d3a886726022d",
+          "expressionSHA256": "9004844ad3617f498ac4ce598f352b412ab8eeb2b3c3812e2c869ea403ce53aa"
+        },
+        "finallyReset": {
+          "path": "services/control-plane/src/inv/db.py",
+          "span": [
+            234,
+            12,
+            234,
+            47
+          ],
+          "sourceFileSHA256": "38e0d679b442433fd0b775e98411d78dfff2b7d114bbc3c2a52d3a886726022d",
+          "expressionSHA256": "8960eba1e3a4046e29187a4514a6fc78e06aea540be6d6fc6723e502b5933c3c"
+        },
+        "metricsOnly": {
+          "path": "services/control-plane/src/inv/db.py",
+          "span": [
+            235,
+            12,
+            245,
+            53
+          ],
+          "sourceFileSHA256": "38e0d679b442433fd0b775e98411d78dfff2b7d114bbc3c2a52d3a886726022d",
+          "expressionSHA256": "56347532aae87b0d1edc79891164aaeba25c7e8aacdad4ac9a67172fd1639d37"
+        },
+        "clock": "perf_counter_ns actual clock source retained, not pure conversion"
+      },
+      "pendingRuntimeContract": null,
+      "blocksGrant": false,
+      "sharedOwner": "inv.db.Database.transaction",
+      "closedOnlyForEntry": null,
+      "closureScope": "SOURCE_ANALYSIS_ONLY_NO_RUNTIME_GRANT"
+    },
+    {
+      "callRef": "ac52192a6b9a7bc1a10ad58dfdb27af0981524c9ad77e5044701b6bba2b413a6",
+      "rule": "A3",
+      "source": {
+        "path": "services/control-plane/src/inv/db.py",
+        "span": [
+          235,
+          43,
+          235,
+          65
+        ],
+        "sourceFileSHA256": "38e0d679b442433fd0b775e98411d78dfff2b7d114bbc3c2a52d3a886726022d",
+        "expressionSHA256": "d61ae8c209d2968de0892e015f2cd5b232aad7a128a5596f1e3bc68f0a6947d2",
+        "function": "inv.db.Database.transaction"
+      },
+      "receiver": {
+        "expression": "phase.get",
+        "oldInferredType": "UNRESOLVED_CALL_RETURN:inv.db:_statement_phase.get",
+        "provenUnion": [
+          "contextvars.ContextVar phase/token; metric dict"
+        ]
+      },
+      "producerRecord": null,
+      "proof": {
+        "moduleFactory": {
+          "path": "services/control-plane/src/inv/db.py",
+          "span": [
+            15,
+            0,
+            15,
+            83
+          ],
+          "sourceFileSHA256": "38e0d679b442433fd0b775e98411d78dfff2b7d114bbc3c2a52d3a886726022d",
+          "expressionSHA256": "00366941ac17ab814e260e8f73dce7bbca152a43f7ec2ff6679e568ab009446b"
+        },
+        "tokenSet": {
+          "path": "services/control-plane/src/inv/db.py",
+          "span": [
+            177,
+            8,
+            177,
+            76
+          ],
+          "sourceFileSHA256": "38e0d679b442433fd0b775e98411d78dfff2b7d114bbc3c2a52d3a886726022d",
+          "expressionSHA256": "9004844ad3617f498ac4ce598f352b412ab8eeb2b3c3812e2c869ea403ce53aa"
+        },
+        "finallyReset": {
+          "path": "services/control-plane/src/inv/db.py",
+          "span": [
+            234,
+            12,
+            234,
+            47
+          ],
+          "sourceFileSHA256": "38e0d679b442433fd0b775e98411d78dfff2b7d114bbc3c2a52d3a886726022d",
+          "expressionSHA256": "8960eba1e3a4046e29187a4514a6fc78e06aea540be6d6fc6723e502b5933c3c"
+        },
+        "metricsOnly": {
+          "path": "services/control-plane/src/inv/db.py",
+          "span": [
+            235,
+            12,
+            245,
+            53
+          ],
+          "sourceFileSHA256": "38e0d679b442433fd0b775e98411d78dfff2b7d114bbc3c2a52d3a886726022d",
+          "expressionSHA256": "56347532aae87b0d1edc79891164aaeba25c7e8aacdad4ac9a67172fd1639d37"
+        },
+        "clock": "perf_counter_ns actual clock source retained, not pure conversion"
+      },
+      "pendingRuntimeContract": null,
+      "blocksGrant": false,
+      "sharedOwner": "inv.db.Database.transaction",
+      "closedOnlyForEntry": null,
+      "closureScope": "SOURCE_ANALYSIS_ONLY_NO_RUNTIME_GRANT"
+    },
+    {
+      "callRef": "c5dbe16644b32611e8c1aea3f764e591675c6562eefd42aca34c06134b1dd24c",
+      "rule": "A1c",
+      "source": {
+        "path": "services/control-plane/src/inv/observation.py",
+        "span": [
+          140,
+          19,
+          142,
+          24
+        ],
+        "sourceFileSHA256": "b515ceda8b066466cf4cdf5fa88d04803220398c436d29ab7c5fd2793bf5748f",
+        "expressionSHA256": "fbc1b60a891f77862dd21549ef4f5acdf62e71fd6fbf96f4db0426333395c632",
+        "function": "inv.observation.NodeObservation.mark_offline"
+      },
+      "receiver": {
+        "expression": "conn.execute(\"SELECT node_id FROM inv.nodes WHERE status='online' ORDER BY node_id FOR UPDATE\").fetchall",
+        "oldInferredType": "DB:Cursor",
+        "provenUnion": [
+          "psycopg.Connection",
+          "inv.db._ObservedConnection"
+        ]
+      },
+      "producerRecord": {
+        "source": "72028cbac903c4415d9979f980a6e0f9948e914f",
+        "path": "services/control-plane/src/inv/observation.py",
+        "function": "inv.observation.NodeObservation.mark_offline",
+        "line": 140,
+        "column": 19,
+        "endLine": 142,
+        "endColumn": 13,
+        "expression": "conn.execute(\n                \"SELECT node_id FROM inv.nodes WHERE status='online' ORDER BY node_id FOR UPDATE\"\n            )",
+        "expressionSHA256": "ac227b429d308a62c5deeee0a85fd254f1b65b15809fa9bea355f31f946d68ea",
+        "kind": "SQL",
+        "tables": [
+          "inv.nodes"
+        ],
+        "modes": [
+          "FOR UPDATE"
+        ],
+        "resolvedSQL": "SELECT node_id FROM inv.nodes WHERE status='online' ORDER BY node_id FOR UPDATE",
+        "unresolvedSQL": false,
+        "scopeDisposition": "CLOSED_LITERAL_SET_ALL_VARIANTS_ANALYZED",
+        "closedLiteralVariants": [
+          "SELECT node_id FROM inv.nodes WHERE status='online' ORDER BY node_id FOR UPDATE"
+        ]
+      },
+      "proof": {
+        "classification": "RESOLVED_DB_CURSOR_RESULT",
+        "rule": "A1c_CONNECTION_UNION",
+        "producerSanity": {
+          "parse": true,
+          "currentCallSpan": [
+            140,
+            19,
+            142,
+            24
+          ],
+          "sourceSHA256": "b515ceda8b066466cf4cdf5fa88d04803220398c436d29ab7c5fd2793bf5748f",
+          "producerExpressionSHA256": "ac227b429d308a62c5deeee0a85fd254f1b65b15809fa9bea355f31f946d68ea",
+          "producerRecord": {
+            "source": "72028cbac903c4415d9979f980a6e0f9948e914f",
+            "path": "services/control-plane/src/inv/observation.py",
+            "function": "inv.observation.NodeObservation.mark_offline",
+            "line": 140,
+            "column": 19,
+            "endLine": 142,
+            "endColumn": 13,
+            "expression": "conn.execute(\n                \"SELECT node_id FROM inv.nodes WHERE status='online' ORDER BY node_id FOR UPDATE\"\n            )",
+            "expressionSHA256": "ac227b429d308a62c5deeee0a85fd254f1b65b15809fa9bea355f31f946d68ea",
+            "kind": "SQL",
+            "tables": [
+              "inv.nodes"
+            ],
+            "modes": [
+              "FOR UPDATE"
+            ],
+            "resolvedSQL": "SELECT node_id FROM inv.nodes WHERE status='online' ORDER BY node_id FOR UPDATE",
+            "unresolvedSQL": false,
+            "scopeDisposition": "CLOSED_LITERAL_SET_ALL_VARIANTS_ANALYZED",
+            "closedLiteralVariants": [
+              "SELECT node_id FROM inv.nodes WHERE status='online' ORDER BY node_id FOR UPDATE"
+            ]
+          },
+          "producerCallRef": "95931d97d25a9ea5d87e0f117347ccd519e8f307fa9dc5348809dce3e0c380a3"
+        },
+        "receiver": "conn",
+        "receiverUnionProof": {
+          "receiverUnion": [
+            "psycopg.Connection",
+            "inv.db._ObservedConnection"
+          ],
+          "yieldSelection": {
+            "path": "services/control-plane/src/inv/db.py",
+            "span": [
+              196,
+              16,
+              200,
+              17
+            ],
+            "sourceFileSHA256": "38e0d679b442433fd0b775e98411d78dfff2b7d114bbc3c2a52d3a886726022d",
+            "expressionSHA256": "cd14a3c76cce93589ef8aa50b98ef857dffe2bb506ce5c4db62d3619f7b59878"
+          },
+          "executeForward": {
+            "path": "services/control-plane/src/inv/db.py",
+            "span": [
+              65,
+              12,
+              65,
+              64
+            ],
+            "sourceFileSHA256": "38e0d679b442433fd0b775e98411d78dfff2b7d114bbc3c2a52d3a886726022d",
+            "expressionSHA256": "35472b7afdf80ae4fba7488d6e395cac62396a7d37b56a998cf67d39780c4a8f"
+          },
+          "returnUnchanged": {
+            "path": "services/control-plane/src/inv/db.py",
+            "span": [
+              106,
+              8,
+              106,
+              21
+            ],
+            "sourceFileSHA256": "38e0d679b442433fd0b775e98411d78dfff2b7d114bbc3c2a52d3a886726022d",
+            "expressionSHA256": "bffa478fd43608c06d50aa5022c6b4a8407fc234526250dfaa512d5200d252ac"
+          },
+          "delegate": {
+            "path": "services/control-plane/src/inv/db.py",
+            "span": [
+              108,
+              4,
+              109,
+              40
+            ],
+            "sourceFileSHA256": "38e0d679b442433fd0b775e98411d78dfff2b7d114bbc3c2a52d3a886726022d",
+            "expressionSHA256": "0e1073426cf31db3494b2a53df993b1ba91289271a4b876cd4557eb3c3422294"
+          },
+          "observerEffect": "Named T1 observability; current source constructors default None, runtime handler/config proof pending"
+        },
+        "transactionOwner": {
+          "span": [
+            139,
+            13,
+            139,
+            43
+          ],
+          "expressionSHA256": "9fdf8fcda3cabb900290a397e20608ce9ae47fb2a9043b438a37b38e2943ac5b"
+        },
+        "retainsDatabaseReadWriteAndControlFlow": true,
+        "tables": [
+          "inv.nodes"
+        ],
+        "lockModes": [
+          "FOR UPDATE"
+        ],
+        "runtimeBinding": null
+      },
+      "pendingRuntimeContract": null,
+      "blocksGrant": false,
+      "sharedOwner": null,
+      "closedOnlyForEntry": "inv.observation.NodeObservation.mark_offline",
+      "closureScope": "SOURCE_ANALYSIS_ONLY_NO_RUNTIME_GRANT"
+    },
+    {
+      "callRef": "4bfa4566940ef66d68e5403956db9904e48913b65fad2739c43e4984e19e4c02",
+      "rule": "A1c",
+      "source": {
+        "path": "services/control-plane/src/inv/observation.py",
+        "span": [
+          145,
+          19,
+          148,
+          28
+        ],
+        "sourceFileSHA256": "b515ceda8b066466cf4cdf5fa88d04803220398c436d29ab7c5fd2793bf5748f",
+        "expressionSHA256": "741b7b381c973e1a034eb89fe6f0a337bde50f72b4c57d056ed0fcf61ec615f8",
+        "function": "inv.observation.NodeObservation.mark_offline"
+      },
+      "receiver": {
+        "expression": "conn.execute(\"UPDATE inv.nodes SET status='offline' WHERE node_id=%s AND heartbeat_at < clock_timestamp()-interval '60 seconds' AND status='online' RETURNING node_id\", (row['node_id'],)).fetchone",
+        "oldInferredType": "DB:Cursor",
+        "provenUnion": [
+          "psycopg.Connection",
+          "inv.db._ObservedConnection"
+        ]
+      },
+      "producerRecord": {
+        "source": "72028cbac903c4415d9979f980a6e0f9948e914f",
+        "path": "services/control-plane/src/inv/observation.py",
+        "function": "inv.observation.NodeObservation.mark_offline",
+        "line": 145,
+        "column": 19,
+        "endLine": 148,
+        "endColumn": 17,
+        "expression": "conn.execute(\n                    \"UPDATE inv.nodes SET status='offline' WHERE node_id=%s AND heartbeat_at < clock_timestamp()-interval '60 seconds' AND status='online' RETURNING node_id\",\n                    (row[\"node_id\"],),\n                )",
+        "expressionSHA256": "6101486d25e3828bb5acc2bc30e822083e2e4e50938fe8b09dc29041a77d395d",
+        "kind": "SQL",
+        "tables": [
+          "inv.nodes"
+        ],
+        "modes": [],
+        "resolvedSQL": "UPDATE inv.nodes SET status='offline' WHERE node_id=%s AND heartbeat_at < clock_timestamp()-interval '60 seconds' AND status='online' RETURNING node_id",
+        "unresolvedSQL": false,
+        "scopeDisposition": "CLOSED_LITERAL_SET_ALL_VARIANTS_ANALYZED",
+        "closedLiteralVariants": [
+          "UPDATE inv.nodes SET status='offline' WHERE node_id=%s AND heartbeat_at < clock_timestamp()-interval '60 seconds' AND status='online' RETURNING node_id"
+        ]
+      },
+      "proof": {
+        "classification": "RESOLVED_DB_CURSOR_RESULT",
+        "rule": "A1c_CONNECTION_UNION",
+        "producerSanity": {
+          "parse": true,
+          "currentCallSpan": [
+            145,
+            19,
+            148,
+            28
+          ],
+          "sourceSHA256": "b515ceda8b066466cf4cdf5fa88d04803220398c436d29ab7c5fd2793bf5748f",
+          "producerExpressionSHA256": "6101486d25e3828bb5acc2bc30e822083e2e4e50938fe8b09dc29041a77d395d",
+          "producerRecord": {
+            "source": "72028cbac903c4415d9979f980a6e0f9948e914f",
+            "path": "services/control-plane/src/inv/observation.py",
+            "function": "inv.observation.NodeObservation.mark_offline",
+            "line": 145,
+            "column": 19,
+            "endLine": 148,
+            "endColumn": 17,
+            "expression": "conn.execute(\n                    \"UPDATE inv.nodes SET status='offline' WHERE node_id=%s AND heartbeat_at < clock_timestamp()-interval '60 seconds' AND status='online' RETURNING node_id\",\n                    (row[\"node_id\"],),\n                )",
+            "expressionSHA256": "6101486d25e3828bb5acc2bc30e822083e2e4e50938fe8b09dc29041a77d395d",
+            "kind": "SQL",
+            "tables": [
+              "inv.nodes"
+            ],
+            "modes": [],
+            "resolvedSQL": "UPDATE inv.nodes SET status='offline' WHERE node_id=%s AND heartbeat_at < clock_timestamp()-interval '60 seconds' AND status='online' RETURNING node_id",
+            "unresolvedSQL": false,
+            "scopeDisposition": "CLOSED_LITERAL_SET_ALL_VARIANTS_ANALYZED",
+            "closedLiteralVariants": [
+              "UPDATE inv.nodes SET status='offline' WHERE node_id=%s AND heartbeat_at < clock_timestamp()-interval '60 seconds' AND status='online' RETURNING node_id"
+            ]
+          },
+          "producerCallRef": "61ffbbf035c35e508be8d7dfcc2f464d196b828b40e33e25c7ed17794c7ba6d0"
+        },
+        "receiver": "conn",
+        "receiverUnionProof": {
+          "receiverUnion": [
+            "psycopg.Connection",
+            "inv.db._ObservedConnection"
+          ],
+          "yieldSelection": {
+            "path": "services/control-plane/src/inv/db.py",
+            "span": [
+              196,
+              16,
+              200,
+              17
+            ],
+            "sourceFileSHA256": "38e0d679b442433fd0b775e98411d78dfff2b7d114bbc3c2a52d3a886726022d",
+            "expressionSHA256": "cd14a3c76cce93589ef8aa50b98ef857dffe2bb506ce5c4db62d3619f7b59878"
+          },
+          "executeForward": {
+            "path": "services/control-plane/src/inv/db.py",
+            "span": [
+              65,
+              12,
+              65,
+              64
+            ],
+            "sourceFileSHA256": "38e0d679b442433fd0b775e98411d78dfff2b7d114bbc3c2a52d3a886726022d",
+            "expressionSHA256": "35472b7afdf80ae4fba7488d6e395cac62396a7d37b56a998cf67d39780c4a8f"
+          },
+          "returnUnchanged": {
+            "path": "services/control-plane/src/inv/db.py",
+            "span": [
+              106,
+              8,
+              106,
+              21
+            ],
+            "sourceFileSHA256": "38e0d679b442433fd0b775e98411d78dfff2b7d114bbc3c2a52d3a886726022d",
+            "expressionSHA256": "bffa478fd43608c06d50aa5022c6b4a8407fc234526250dfaa512d5200d252ac"
+          },
+          "delegate": {
+            "path": "services/control-plane/src/inv/db.py",
+            "span": [
+              108,
+              4,
+              109,
+              40
+            ],
+            "sourceFileSHA256": "38e0d679b442433fd0b775e98411d78dfff2b7d114bbc3c2a52d3a886726022d",
+            "expressionSHA256": "0e1073426cf31db3494b2a53df993b1ba91289271a4b876cd4557eb3c3422294"
+          },
+          "observerEffect": "Named T1 observability; current source constructors default None, runtime handler/config proof pending"
+        },
+        "transactionOwner": {
+          "span": [
+            139,
+            13,
+            139,
+            43
+          ],
+          "expressionSHA256": "9fdf8fcda3cabb900290a397e20608ce9ae47fb2a9043b438a37b38e2943ac5b"
+        },
+        "retainsDatabaseReadWriteAndControlFlow": true,
+        "tables": [
+          "inv.nodes"
+        ],
+        "lockModes": [],
+        "runtimeBinding": null
+      },
+      "pendingRuntimeContract": null,
+      "blocksGrant": false,
+      "sharedOwner": null,
+      "closedOnlyForEntry": "inv.observation.NodeObservation.mark_offline",
+      "closureScope": "SOURCE_ANALYSIS_ONLY_NO_RUNTIME_GRANT"
+    },
+    {
+      "callRef": "5e4959377b92699d426be7c92b2aa26ea37eda82cb70dc67707986e125f9c98c",
+      "rule": "A5_LOCAL",
+      "source": {
+        "path": "services/control-plane/src/inv/observation.py",
+        "span": [
+          149,
+          20,
+          149,
+          50
+        ],
+        "sourceFileSHA256": "b515ceda8b066466cf4cdf5fa88d04803220398c436d29ab7c5fd2793bf5748f",
+        "expressionSHA256": "a39c0a4a6c07aebdd38766a2baaaa3a631ff6bddc415985fe40236df00c361e7",
+        "function": "inv.observation.NodeObservation.mark_offline"
+      },
+      "receiver": {
+        "expression": "changed.append",
+        "oldInferredType": "PY:collection",
+        "provenUnion": [
+          "builtin list"
+        ]
+      },
+      "producerRecord": null,
+      "proof": {
+        "literalListAssignment": [
+          143,
+          12,
+          143,
+          24
+        ],
+        "receiver": "function-local list",
+        "noRebindAliasOrEscapeBeforeCall": true,
+        "returnsListAfterLoop": true
+      },
+      "pendingRuntimeContract": null,
+      "blocksGrant": false,
+      "sharedOwner": null,
+      "closedOnlyForEntry": "inv.observation.NodeObservation.mark_offline",
+      "closureScope": "SOURCE_ANALYSIS_ONLY_NO_RUNTIME_GRANT"
+    }
+  ],
+  "analysisEdgesClosed": 16,
+  "namedRuntimeEdgesPending": 3,
+  "sharedOwnerReferencedCriticalEntries": [
+    "inv.build_execution.BuildExecutionService._commit_consequences",
+    "inv.build_execution.BuildExecutionService._mark_node_quarantined",
+    "inv.build_execution.BuildExecutionService.execute",
+    "inv.build_execution_worker.BuildExecutionIntentQueue.enqueue",
+    "inv.build_preparations.BuildPreparationService._terminalize",
+    "inv.node_transport.NodeDelivery._quarantine_gpu_node",
+    "inv.node_transport.NodeDelivery.deliver",
+    "inv.observation.NodeObservation.accept",
+    "inv.observation.NodeObservation.mark_offline",
+    "inv.results.ResultStore.complete",
+    "inv.runs.RunStore.complete",
+    "inv.shard_completion.ShardCompletion.once"
+  ],
+  "entryStatusUpgrades": 0,
+  "narrowA8Proof": {
+    "status": "SOURCE_PROVEN_RUNTIME_PENDING",
+    "dbSourceSHA256": "38e0d679b442433fd0b775e98411d78dfff2b7d114bbc3c2a52d3a886726022d",
+    "receiverUnion": {
+      "receiverUnion": [
+        "psycopg.Connection",
+        "inv.db._ObservedConnection"
+      ],
+      "yieldSelection": {
+        "path": "services/control-plane/src/inv/db.py",
+        "span": [
+          196,
+          16,
+          200,
+          17
+        ],
+        "sourceFileSHA256": "38e0d679b442433fd0b775e98411d78dfff2b7d114bbc3c2a52d3a886726022d",
+        "expressionSHA256": "cd14a3c76cce93589ef8aa50b98ef857dffe2bb506ce5c4db62d3619f7b59878"
+      },
+      "executeForward": {
+        "path": "services/control-plane/src/inv/db.py",
+        "span": [
+          65,
+          12,
+          65,
+          64
+        ],
+        "sourceFileSHA256": "38e0d679b442433fd0b775e98411d78dfff2b7d114bbc3c2a52d3a886726022d",
+        "expressionSHA256": "35472b7afdf80ae4fba7488d6e395cac62396a7d37b56a998cf67d39780c4a8f"
+      },
+      "returnUnchanged": {
+        "path": "services/control-plane/src/inv/db.py",
+        "span": [
+          106,
+          8,
+          106,
+          21
+        ],
+        "sourceFileSHA256": "38e0d679b442433fd0b775e98411d78dfff2b7d114bbc3c2a52d3a886726022d",
+        "expressionSHA256": "bffa478fd43608c06d50aa5022c6b4a8407fc234526250dfaa512d5200d252ac"
+      },
+      "delegate": {
+        "path": "services/control-plane/src/inv/db.py",
+        "span": [
+          108,
+          4,
+          109,
+          40
+        ],
+        "sourceFileSHA256": "38e0d679b442433fd0b775e98411d78dfff2b7d114bbc3c2a52d3a886726022d",
+        "expressionSHA256": "0e1073426cf31db3494b2a53df993b1ba91289271a4b876cd4557eb3c3422294"
+      },
+      "observerEffect": "Named T1 observability; current source constructors default None, runtime handler/config proof pending"
+    },
+    "productionDatabaseConstructors": [
+      {
+        "path": "services/control-plane/src/inv/app.py",
+        "span": [
+          1313,
+          19,
+          1318,
+          9
+        ],
+        "sourceFileSHA256": "237f97915ea7476a9c3f3ef487e1f714488cb55bd687ae960e262e4963258433",
+        "expressionSHA256": "13018cbdcbfbea2e34c9f731c9ad7b42977b455aa11c3f5b3010785c7b6bf780",
+        "constructor": "inv.db.Database",
+        "statement_observer": "None default or exact None",
+        "placement_metric_sink": "None default or exact None",
+        "authority": "SOURCE_PROVENANCE_ONLY_RUNTIME_BINDING_NULL"
+      },
+      {
+        "path": "services/control-plane/src/inv/observer_worker.py",
+        "span": [
+          54,
+          13,
+          57,
+          9
+        ],
+        "sourceFileSHA256": "6bbdf815554fe1f0157247732ddc4dc3069686685c291ef83add55c8f3e92003",
+        "expressionSHA256": "e0f11d03418cd4634318a282ed40685772a3bd5bfdad26650ebeaf570e5a6f6f",
+        "constructor": "inv.db.Database",
+        "statement_observer": "None default or exact None",
+        "placement_metric_sink": "None default or exact None",
+        "authority": "SOURCE_PROVENANCE_ONLY_RUNTIME_BINDING_NULL"
+      },
+      {
+        "path": "services/control-plane/src/inv/worker.py",
+        "span": [
+          118,
+          13,
+          121,
+          9
+        ],
+        "sourceFileSHA256": "3010b2409bb285de960eb322792b1062ed066275307c9bea53a2cc767b65d4e3",
+        "expressionSHA256": "e0f11d03418cd4634318a282ed40685772a3bd5bfdad26650ebeaf570e5a6f6f",
+        "constructor": "inv.db.Database",
+        "statement_observer": "None default or exact None",
+        "placement_metric_sink": "None default or exact None",
+        "authority": "SOURCE_PROVENANCE_ONLY_RUNTIME_BINDING_NULL"
+      },
+      {
+        "path": "tools/lan_pilot.py",
+        "span": [
+          903,
+          11,
+          903,
+          71
+        ],
+        "sourceFileSHA256": "2c626540f495499423b707b063a6cab6a53e1be3af8c324f46af88a94ac8f652",
+        "expressionSHA256": "18db108f9bb7e1dc844010d966482bd7a4cb1fc3b398ae0bbb2a2e37a11b9f3e",
+        "constructor": "inv.db.Database",
+        "statement_observer": "None default or exact None",
+        "placement_metric_sink": "None default or exact None",
+        "authority": "SOURCE_PROVENANCE_ONLY_RUNTIME_BINDING_NULL"
+      },
+      {
+        "path": "tools/remote_workspace_entry.py",
+        "span": [
+          63,
+          11,
+          63,
+          72
+        ],
+        "sourceFileSHA256": "e69fa8ff6c51bd3880f5ec388fe97288a4256169377e17d9d6aa5b7ec2f32c27",
+        "expressionSHA256": "3a98777830ce0fbbe68af67d58850dac8ff6e24113104bb2b40647027bc18b87",
+        "constructor": "inv.db.Database",
+        "statement_observer": "None default or exact None",
+        "placement_metric_sink": "None default or exact None",
+        "authority": "SOURCE_PROVENANCE_ONLY_RUNTIME_BINDING_NULL"
+      },
+      {
+        "path": "tools/run_s04_fe_matrix.py",
+        "span": [
+          613,
+          13,
+          613,
+          65
+        ],
+        "sourceFileSHA256": "456850d76284749e6e8b3125876699336004695c51203f25afe52539e47eebfe",
+        "expressionSHA256": "8930d5cf88c27d4bccc919ca9c12486c60b165c327e7119c1e9d14b44feb5683",
+        "constructor": "inv.db.Database",
+        "statement_observer": "None default or exact None",
+        "placement_metric_sink": "None default or exact None",
+        "authority": "SOURCE_PROVENANCE_ONLY_RUNTIME_BINDING_NULL"
+      },
+      {
+        "path": "tools/rehearse_independent_restore.py",
+        "span": [
+          204,
+          13,
+          204,
+          72
+        ],
+        "sourceFileSHA256": "2c6ca111e24dccd40b657b53af2df06377f629ec4ce415569e75d1e7c538be70",
+        "expressionSHA256": "0b2eb458615238ca3708a8480b81d5de1eacabe790bd0cba4dbb0e4033ea757f",
+        "constructor": "inv.db.Database",
+        "statement_observer": "None default or exact None",
+        "placement_metric_sink": "None default or exact None",
+        "authority": "SOURCE_PROVENANCE_ONLY_RUNTIME_BINDING_NULL"
+      }
+    ],
+    "NodeObservationDbUnion": [
+      "inv.db.Database"
+    ],
+    "constructionChains": [
+      {
+        "path": "services/control-plane/src/inv/observer_worker.py",
+        "span": [
+          18,
+          43,
+          18,
+          76
+        ],
+        "sourceFileSHA256": "6bbdf815554fe1f0157247732ddc4dc3069686685c291ef83add55c8f3e92003",
+        "expressionSHA256": "bc15aeb3860906059841369dfbe400f1f8ac0f189e7f17ca9dceafd5437db1a5",
+        "argument": "database",
+        "provenType": "inv.db.Database"
+      },
+      {
+        "path": "services/control-plane/src/inv/workspace_api.py",
+        "span": [
+          98,
+          30,
+          98,
+          67
+        ],
+        "sourceFileSHA256": "c0e67146d6a3152426876f86fafa35363ec49c48fedf66e9e6bce4c1394050e2",
+        "expressionSHA256": "d105363fa11f1e19401e946972335cf494ddcd9b2775f759bbaf19b9885ec643",
+        "argument": "self.db",
+        "provenType": "inv.db.Database"
+      },
+      {
+        "path": "services/control-plane/src/inv/workspace_config.py",
+        "span": [
+          47,
+          8,
+          55,
+          9
+        ],
+        "sourceFileSHA256": "7b77a716b4fb56e951fce110d347ac41f16d1d80d4722ba9d1410a1869b351cb",
+        "expressionSHA256": "a8fc1b6c36f5734933ac37be2706e9402522fc7756522b4731f77235e3474bc2",
+        "argument": "database",
+        "provenType": "inv.db.Database"
+      },
+      {
+        "path": "tools/remote_workspace_entry.py",
+        "span": [
+          111,
+          16,
+          112,
+          120
+        ],
+        "sourceFileSHA256": "e69fa8ff6c51bd3880f5ec388fe97288a4256169377e17d9d6aa5b7ec2f32c27",
+        "expressionSHA256": "72df0ec402b7978b57f89d5159a06753cb6ac46e5a1bd844e1ab5f170f7f33a7",
+        "argument": "db",
+        "provenType": "inv.db.Database"
+      }
+    ],
+    "productionObservabilityBindings": "SOURCE defaults None; installed runtime/config handlers NOT_PROVEN",
+    "BoundDatabase": "Existing exact-tenant borrowing owner; all non-target constructor census references retained, no other entry upgraded",
+    "runtimeBinding": null
+  },
+  "productionConstructorCensus": [
+    {
+      "callRef": "abfba77053e6b684694ed38ecff9e6a0872fd31fea8704db1d3eca567eeb2363",
+      "source": {
+        "path": "services/control-plane/src/inv/app.py",
+        "function": "inv.app.create_configured_app",
+        "span": [
+          1313,
+          19,
+          1318,
+          9
+        ]
+      },
+      "resolvedTargets": [
+        "inv.db.Database.__init__"
+      ],
+      "classification": "RESOLVED_SOURCE_TARGET",
+      "scope": "PRODUCTION_SOURCE_CENSUS_NOT_A_GRANT"
+    },
+    {
+      "callRef": "28ea8bf577b76dcb562c867a1f91b44c18d5bd2b432e2a150c688e043dbfcfdf",
+      "source": {
+        "path": "services/control-plane/src/inv/build_preparations.py",
+        "function": "inv.build_preparations.BuildPreparationService._reserve",
+        "span": [
+          379,
+          26,
+          379,
+          75
+        ]
+      },
+      "resolvedTargets": [
+        "inv.db.BoundDatabase.__init__"
+      ],
+      "classification": "RESOLVED_SOURCE_TARGET",
+      "scope": "PRODUCTION_SOURCE_CENSUS_NOT_A_GRANT"
+    },
+    {
+      "callRef": "47fa7ed9b9b417fdd98e09150168da251a73bd36d94fc2834c48c13f3a627134",
+      "source": {
+        "path": "services/control-plane/src/inv/build_preparations.py",
+        "function": "inv.build_preparations.BuildPreparationService.prepare",
+        "span": [
+          446,
+          38,
+          446,
+          87
+        ]
+      },
+      "resolvedTargets": [
+        "inv.db.BoundDatabase.__init__"
+      ],
+      "classification": "RESOLVED_SOURCE_TARGET",
+      "scope": "PRODUCTION_SOURCE_CENSUS_NOT_A_GRANT"
+    },
+    {
+      "callRef": "f0cd29be8e603ca995f83c6602619ad04633be78d7b9a1fa1618a34e99db2328",
+      "source": {
+        "path": "services/control-plane/src/inv/build_preparations.py",
+        "function": "inv.build_preparations.BuildPreparationService.prepare",
+        "span": [
+          570,
+          20,
+          570,
+          69
+        ]
+      },
+      "resolvedTargets": [
+        "inv.db.BoundDatabase.__init__"
+      ],
+      "classification": "RESOLVED_SOURCE_TARGET",
+      "scope": "PRODUCTION_SOURCE_CENSUS_NOT_A_GRANT"
+    },
+    {
+      "callRef": "3526025483b7673987ab9b9107a585df72c9c263743056235d909c774c4b883f",
+      "source": {
+        "path": "services/control-plane/src/inv/build_preparations.py",
+        "function": "inv.build_preparations.BuildPreparationService._terminalize",
+        "span": [
+          752,
+          29,
+          752,
+          78
+        ]
+      },
+      "resolvedTargets": [
+        "inv.db.BoundDatabase.__init__"
+      ],
+      "classification": "RESOLVED_SOURCE_TARGET",
+      "scope": "PRODUCTION_SOURCE_CENSUS_NOT_A_GRANT"
+    },
+    {
+      "callRef": "692ee89932c0fccab163b482d7033c21e0bc4df3c485821a520bbeefab324c97",
+      "source": {
+        "path": "services/control-plane/src/inv/build_preparations.py",
+        "function": "inv.build_preparations.BuildPreparationService._terminalize",
+        "span": [
+          756,
+          30,
+          756,
+          79
+        ]
+      },
+      "resolvedTargets": [
+        "inv.db.BoundDatabase.__init__"
+      ],
+      "classification": "RESOLVED_SOURCE_TARGET",
+      "scope": "PRODUCTION_SOURCE_CENSUS_NOT_A_GRANT"
+    },
+    {
+      "callRef": "bcdee5ba76ccdf22f0923250b01085f6a3921909553b8b9570a4f431655d5465",
+      "source": {
+        "path": "services/control-plane/src/inv/business_handoff.py",
+        "function": "inv.business_handoff.BusinessHandoff.prepare",
+        "span": [
+          319,
+          20,
+          319,
+          69
+        ]
+      },
+      "resolvedTargets": [
+        "inv.db.BoundDatabase.__init__"
+      ],
+      "classification": "RESOLVED_SOURCE_TARGET",
+      "scope": "PRODUCTION_SOURCE_CENSUS_NOT_A_GRANT"
+    },
+    {
+      "callRef": "171ce7ee3b8a26cb20ae6fc564acc42a4963a13c0c3fe287d4ca55663ffa1a71",
+      "source": {
+        "path": "services/control-plane/src/inv/db.py",
+        "function": "inv.db.Database.transaction",
+        "span": [
+          197,
+          20,
+          197,
+          70
+        ]
+      },
+      "resolvedTargets": [
+        "inv.db._ObservedConnection.__init__"
+      ],
+      "classification": "RESOLVED_SOURCE_TARGET",
+      "scope": "PRODUCTION_SOURCE_CENSUS_NOT_A_GRANT"
+    },
+    {
+      "callRef": "8a17052116304e452b91ffbc60c9a78d27d6257ea9f491b7b74f76cb2b992f4a",
+      "source": {
+        "path": "services/control-plane/src/inv/model_retry.py",
+        "function": "inv.model_retry.ModelRetryStore.prepare",
+        "span": [
+          114,
+          20,
+          114,
+          69
+        ]
+      },
+      "resolvedTargets": [
+        "inv.db.BoundDatabase.__init__"
+      ],
+      "classification": "RESOLVED_SOURCE_TARGET",
+      "scope": "PRODUCTION_SOURCE_CENSUS_NOT_A_GRANT"
+    },
+    {
+      "callRef": "01a7e3aeac7294700f8d425fa24f5ee3f361d40003af9f47ef52bc35fd60ef58",
+      "source": {
+        "path": "services/control-plane/src/inv/observer_worker.py",
+        "function": "inv.observer_worker.ObservationWorker.__init__",
+        "span": [
+          18,
+          43,
+          18,
+          76
+        ]
+      },
+      "resolvedTargets": [
+        "inv.observation.NodeObservation.__init__"
+      ],
+      "classification": "RESOLVED_SOURCE_TARGET",
+      "scope": "PRODUCTION_SOURCE_CENSUS_NOT_A_GRANT"
+    },
+    {
+      "callRef": "4454b9e139d5b0b516fb25b17caa2098b005b7050ab4c9515ac25f393cc60e97",
+      "source": {
+        "path": "services/control-plane/src/inv/observer_worker.py",
+        "function": "inv.observer_worker.main",
+        "span": [
+          54,
+          13,
+          57,
+          9
+        ]
+      },
+      "resolvedTargets": [
+        "inv.db.Database.__init__"
+      ],
+      "classification": "RESOLVED_SOURCE_TARGET",
+      "scope": "PRODUCTION_SOURCE_CENSUS_NOT_A_GRANT"
+    },
+    {
+      "callRef": "bc9d1157c849f55bd0d2650ebce108d87b1301b513006a9ae6b04b91fce456fe",
+      "source": {
+        "path": "services/control-plane/src/inv/shard_recovery.py",
+        "function": "inv.shard_recovery.ShardRecovery.prepare",
+        "span": [
+          178,
+          20,
+          178,
+          69
+        ]
+      },
+      "resolvedTargets": [
+        "inv.db.BoundDatabase.__init__"
+      ],
+      "classification": "RESOLVED_SOURCE_TARGET",
+      "scope": "PRODUCTION_SOURCE_CENSUS_NOT_A_GRANT"
+    },
+    {
+      "callRef": "aa3cb4dd3c928d42bcd51a99ae631cdc82beecb7607a81420f2e3d31c2c5e96f",
+      "source": {
+        "path": "services/control-plane/src/inv/shard_recovery.py",
+        "function": "inv.shard_recovery.ShardRecovery.enqueue",
+        "span": [
+          309,
+          20,
+          309,
+          69
+        ]
+      },
+      "resolvedTargets": [
+        "inv.db.BoundDatabase.__init__"
+      ],
+      "classification": "RESOLVED_SOURCE_TARGET",
+      "scope": "PRODUCTION_SOURCE_CENSUS_NOT_A_GRANT"
+    },
+    {
+      "callRef": "a1e6cede080161b87c0b248ac759fe35fbab982531a192d16c2e9e4b55962cbb",
+      "source": {
+        "path": "services/control-plane/src/inv/shards.py",
+        "function": "inv.shards.ShardRuntime.enqueue",
+        "span": [
+          208,
+          34,
+          208,
+          70
+        ]
+      },
+      "resolvedTargets": [
+        "inv.db.BoundDatabase.__init__"
+      ],
+      "classification": "RESOLVED_SOURCE_TARGET",
+      "scope": "PRODUCTION_SOURCE_CENSUS_NOT_A_GRANT"
+    },
+    {
+      "callRef": "f6893ac45ad2e2c3ff4e1318aa2787fde1061a0bafaf34f422ebe90fade72a1f",
+      "source": {
+        "path": "services/control-plane/src/inv/worker.py",
+        "function": "inv.worker.main",
+        "span": [
+          118,
+          13,
+          121,
+          9
+        ]
+      },
+      "resolvedTargets": [
+        "inv.db.Database.__init__"
+      ],
+      "classification": "RESOLVED_SOURCE_TARGET",
+      "scope": "PRODUCTION_SOURCE_CENSUS_NOT_A_GRANT"
+    },
+    {
+      "callRef": "30c0a402e82262e8bb8f110e554a686d098e51c6f32585322b836a6a9feba3d8",
+      "source": {
+        "path": "services/control-plane/src/inv/workspace_api.py",
+        "function": "inv.workspace_api.RestrictedWorkspaceRuntime.observe",
+        "span": [
+          98,
+          30,
+          98,
+          67
+        ]
+      },
+      "resolvedTargets": [
+        "inv.observation.NodeObservation.__init__"
+      ],
+      "classification": "RESOLVED_SOURCE_TARGET",
+      "scope": "PRODUCTION_SOURCE_CENSUS_NOT_A_GRANT"
+    },
+    {
+      "callRef": "ec9440dc88f12f7a792edcf09b7414a6266a4be9f457a27864e1bfe0d5cd9746",
+      "source": {
+        "path": "services/control-plane/src/inv/workspace_api.py",
+        "function": "inv.workspace_api.WorkspaceAPI.prepare",
+        "span": [
+          174,
+          20,
+          174,
+          69
+        ]
+      },
+      "resolvedTargets": [
+        "inv.db.BoundDatabase.__init__"
+      ],
+      "classification": "RESOLVED_SOURCE_TARGET",
+      "scope": "PRODUCTION_SOURCE_CENSUS_NOT_A_GRANT"
+    },
+    {
+      "callRef": "f7bb295b69ac21fc1ab0a4e19984ab4693437f0b4b4b7751cc582f14733cc6e7",
+      "source": {
+        "path": "services/control-plane/src/inv/workspace_api.py",
+        "function": "inv.workspace_api.WorkspaceAPI.enqueue",
+        "span": [
+          305,
+          20,
+          305,
+          69
+        ]
+      },
+      "resolvedTargets": [
+        "inv.db.BoundDatabase.__init__"
+      ],
+      "classification": "RESOLVED_SOURCE_TARGET",
+      "scope": "PRODUCTION_SOURCE_CENSUS_NOT_A_GRANT"
+    },
+    {
+      "callRef": "636342dc1e7bd93a7325c3c8bca7c89cbfe4fcadb173afea8790edfb571bd83c",
+      "source": {
+        "path": "services/control-plane/src/inv/workspace_config.py",
+        "function": "inv.workspace_config.configured_workspace",
+        "span": [
+          47,
+          8,
+          55,
+          9
+        ]
+      },
+      "resolvedTargets": [
+        "inv.workspace_api.RestrictedWorkspaceRuntime.__init__"
+      ],
+      "classification": "RESOLVED_SOURCE_TARGET",
+      "scope": "PRODUCTION_SOURCE_CENSUS_NOT_A_GRANT"
+    },
+    {
+      "callRef": "94d47cea28ce198d3b25381fe4faf66c2ae0f940a0196a0008d377f3e0cb2005",
+      "source": {
+        "path": "services/control-plane/src/inv/workspace_resume.py",
+        "function": "inv.workspace_resume.WorkspaceResume.enqueue",
+        "span": [
+          271,
+          20,
+          271,
+          64
+        ]
+      },
+      "resolvedTargets": [
+        "inv.db.BoundDatabase.__init__"
+      ],
+      "classification": "RESOLVED_SOURCE_TARGET",
+      "scope": "PRODUCTION_SOURCE_CENSUS_NOT_A_GRANT"
+    },
+    {
+      "callRef": "a83a7d7f7c1d8aeaed1ff36e3a6b63a5343da13167b2b62ebf023f26d8896386",
+      "source": {
+        "path": "services/control-plane/src/inv/workspace_start.py",
+        "function": "inv.workspace_start.WorkspaceStart.prepare",
+        "span": [
+          192,
+          20,
+          192,
+          69
+        ]
+      },
+      "resolvedTargets": [
+        "inv.db.BoundDatabase.__init__"
+      ],
+      "classification": "RESOLVED_SOURCE_TARGET",
+      "scope": "PRODUCTION_SOURCE_CENSUS_NOT_A_GRANT"
+    },
+    {
+      "callRef": "3088ada4c73d5bdb943ee17958c32785451c8c4a8c15a5093436c8f79d99d173",
+      "source": {
+        "path": "services/control-plane/src/inv/workspace_start.py",
+        "function": "inv.workspace_start.WorkspaceStart.enqueue",
+        "span": [
+          300,
+          20,
+          300,
+          69
+        ]
+      },
+      "resolvedTargets": [
+        "inv.db.BoundDatabase.__init__"
+      ],
+      "classification": "RESOLVED_SOURCE_TARGET",
+      "scope": "PRODUCTION_SOURCE_CENSUS_NOT_A_GRANT"
+    },
+    {
+      "callRef": "5494e5219c43832eea619984f4012ac7d9076fff746dc6550a006e1840074017",
+      "source": {
+        "path": "tools/lan_pilot.py",
+        "function": "tools.lan_pilot.runtime",
+        "span": [
+          903,
+          11,
+          903,
+          71
+        ]
+      },
+      "resolvedTargets": [
+        "inv.db.Database.__init__"
+      ],
+      "classification": "RESOLVED_SOURCE_TARGET",
+      "scope": "PRODUCTION_SOURCE_CENSUS_NOT_A_GRANT"
+    },
+    {
+      "callRef": "3c164edf26d5e14704a706f56fa7cda2699b49afca2e558983001edda00d6f41",
+      "source": {
+        "path": "tools/rehearse_independent_restore.py",
+        "function": "tools.rehearse_independent_restore.rehearse",
+        "span": [
+          204,
+          13,
+          204,
+          72
+        ]
+      },
+      "resolvedTargets": [
+        "inv.db.Database.__init__"
+      ],
+      "classification": "RESOLVED_SOURCE_TARGET",
+      "scope": "PRODUCTION_SOURCE_CENSUS_NOT_A_GRANT"
+    },
+    {
+      "callRef": "9535ad457972fdc616f29fd29a42eb4fc2ffca4df7b5f9d257791651de1a3720",
+      "source": {
+        "path": "tools/remote_workspace_entry.py",
+        "function": "tools.remote_workspace_entry.database",
+        "span": [
+          63,
+          11,
+          63,
+          72
+        ]
+      },
+      "resolvedTargets": [
+        "inv.db.Database.__init__"
+      ],
+      "classification": "RESOLVED_SOURCE_TARGET",
+      "scope": "PRODUCTION_SOURCE_CENSUS_NOT_A_GRANT"
+    },
+    {
+      "callRef": "68e6914a97f94bc177c6bd33e6e6bdbd4506053c40add32b78e1dcc06644c593",
+      "source": {
+        "path": "tools/remote_workspace_entry.py",
+        "function": "tools.remote_workspace_entry.setup",
+        "span": [
+          111,
+          16,
+          112,
+          120
+        ]
+      },
+      "resolvedTargets": [
+        "inv.workspace_api.RestrictedWorkspaceRuntime.__init__"
+      ],
+      "classification": "RESOLVED_SOURCE_TARGET",
+      "scope": "PRODUCTION_SOURCE_CENSUS_NOT_A_GRANT"
+    },
+    {
+      "callRef": "02ebcb63efbb85bf4914b65a49ef1189cc88d62b640efb77f11ceb442fdfd324",
+      "source": {
+        "path": "tools/run_s04_fe_matrix.py",
+        "function": "tools.run_s04_fe_matrix.run_acceptance",
+        "span": [
+          613,
+          13,
+          613,
+          65
+        ]
+      },
+      "resolvedTargets": [
+        "inv.db.Database.__init__"
+      ],
+      "classification": "RESOLVED_SOURCE_TARGET",
+      "scope": "PRODUCTION_SOURCE_CENSUS_NOT_A_GRANT"
+    }
+  ],
+  "nonProductionHarness": {
+    "scope": "HARNESS_ONLY_PROVENANCE; retained, never runtime type evidence",
+    "command": [
+      "git",
+      "grep",
+      "-n",
+      "-E",
+      "(_GetDatabase\\(_Database\\)|RestrictedWorkspaceRuntime\\(object\\(\\))",
+      "72028cbac903c4415d9979f980a6e0f9948e914f",
+      "--",
+      "tests"
+    ],
+    "exit": 0,
+    "exactSourceReferences": [
+      "72028cbac903c4415d9979f980a6e0f9948e914f:tests/core/test_run_approval_observation_contract.py:155:    class _GetDatabase(_Database):",
+      "72028cbac903c4415d9979f980a6e0f9948e914f:tests/core/test_s08_be_kill_switch_execution_gate.py:275:    return RestrictedWorkspaceRuntime(object(), **arguments)"
+    ]
+  },
+  "noProductionSubclass": {
+    "command": [
+      "git",
+      "grep",
+      "-n",
+      "-E",
+      "^class .*\\((.*\\.)?(Database|BoundDatabase|_ObservedConnection)[,)]",
+      "72028cbac903c4415d9979f980a6e0f9948e914f",
+      "--",
+      "services/control-plane/src",
+      "tools"
+    ],
+    "exit": 1,
+    "outputSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "sourceSubsets": [
+    {
+      "subset": "T1_CORE_AND_ROOT_CONSTRUCTORS",
+      "files": [
+        {
+          "path": "services/control-plane/src/inv/observation.py",
+          "bytes": 6736,
+          "sha256": "b515ceda8b066466cf4cdf5fa88d04803220398c436d29ab7c5fd2793bf5748f"
+        },
+        {
+          "path": "services/control-plane/src/inv/db.py",
+          "bytes": 10068,
+          "sha256": "38e0d679b442433fd0b775e98411d78dfff2b7d114bbc3c2a52d3a886726022d"
+        },
+        {
+          "path": "services/control-plane/src/inv/errors.py",
+          "bytes": 233,
+          "sha256": "833eea9d797496c44ef3b3003cf728cfa88d12128dddf60106632609ead3a7bc"
+        },
+        {
+          "path": "services/control-plane/src/inv/observer_worker.py",
+          "bytes": 2821,
+          "sha256": "6bbdf815554fe1f0157247732ddc4dc3069686685c291ef83add55c8f3e92003"
+        },
+        {
+          "path": "services/control-plane/src/inv/workspace_api.py",
+          "bytes": 14943,
+          "sha256": "c0e67146d6a3152426876f86fafa35363ec49c48fedf66e9e6bce4c1394050e2"
+        },
+        {
+          "path": "services/control-plane/src/inv/workspace_config.py",
+          "bytes": 4125,
+          "sha256": "7b77a716b4fb56e951fce110d347ac41f16d1d80d4722ba9d1410a1869b351cb"
+        },
+        {
+          "path": "services/control-plane/src/inv/app.py",
+          "bytes": 58011,
+          "sha256": "237f97915ea7476a9c3f3ef487e1f714488cb55bd687ae960e262e4963258433"
+        },
+        {
+          "path": "tools/remote_workspace_entry.py",
+          "bytes": 14741,
+          "sha256": "e69fa8ff6c51bd3880f5ec388fe97288a4256169377e17d9d6aa5b7ec2f32c27"
+        },
+        {
+          "path": "services/control-plane/src/inv/worker.py",
+          "bytes": 7594,
+          "sha256": "3010b2409bb285de960eb322792b1062ed066275307c9bea53a2cc767b65d4e3"
+        },
+        {
+          "path": "tools/lan_pilot.py",
+          "bytes": 198894,
+          "sha256": "2c626540f495499423b707b063a6cab6a53e1be3af8c324f46af88a94ac8f652"
+        }
+      ],
+      "fileCount": 10,
+      "sourceBytes": 318166
+    },
+    {
+      "subset": "REMAINING_SOURCE_CONSTRUCTOR_CENSUS_ONLY",
+      "files": [
+        {
+          "path": "tools/run_s04_fe_matrix.py",
+          "bytes": 84028,
+          "sha256": "456850d76284749e6e8b3125876699336004695c51203f25afe52539e47eebfe"
+        },
+        {
+          "path": "tools/rehearse_independent_restore.py",
+          "bytes": 13944,
+          "sha256": "2c6ca111e24dccd40b657b53af2df06377f629ec4ce415569e75d1e7c538be70"
+        }
+      ],
+      "fileCount": 2,
+      "sourceBytes": 97972
+    }
+  ],
+  "maximumSimultaneousSelectedFiles": 10,
+  "sourceBudgetBytes": 2097152,
+  "OSMemoryLimitEnforced": false,
+  "runtimePending": [
+    "P-DBROLE installed roles/credentials/RLS/no schema owner/no superuser/no bypass",
+    "READ COMMITTED/tenant SET LOCAL/timeouts actual PG",
+    "two-session Node FOR UPDATE vs heartbeat lock traces",
+    "clock_timestamp heartbeat cutoff semantics",
+    "logging handlers/observability configuration",
+    "B purpose roles/current auth/cutover"
+  ],
+  "A7": "DEFERRED_NOT_NEEDED_ON_THIS_GRAPH",
+  "actualRuntimeB": 0,
+  "realBindings": null,
+  "A1_A16": "PENDING",
+  "fullAssembler": "NOT_RUN"
+}

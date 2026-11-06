@@ -1,0 +1,14 @@
+REPORT check_response_freshness (advisory): 11/11 curated freshness-field checks are present.
+  ok      kernel:ModelCommitObservation.committedAt
+  ok      kernel:ModelExecutionManifestObservation.observedAt
+  ok      kernel:ProjectNodeCertificateObservationResponse.observedAt
+  ok      kernel:RunArtifactList.completedAt
+  ok      kernel:RunLogView.completedAt
+  ok      kernel:RunResultView.completedAt
+  ok      kernel:RunResultView.stateUpdatedAt
+  ok      kernel:ShardObservation.stateAsOf
+  ok      kernel:StorageObservationView.createdAt
+  ok      saintvision:NodeResponse.lastHeartbeatAt
+  ok      saintvision:ReplicaObservationResponse.observedAt
+  (structural floor only. Whether a NEW response is freshness-critical is human judgment -- review this map when responses are added. Staleness behaviour needs a clock-advance test with PG.)
+{"ownerResourceMeasurement": {"target": "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105\\tools\\check_response_freshness.py", "peakWorkingSetBytes": 18923520, "elapsedSeconds": 0.036, "OSMemoryLimitEnforced": false, "serial": true}}

@@ -1,0 +1,246 @@
+{
+  "executionOwner": "Codex",
+  "independentReview": false,
+  "cases": [
+    {
+      "case": "A1-shifted-pass",
+      "pass": true,
+      "reason": null,
+      "producerSanityPassed": true,
+      "sourceSHA256": "4d63929895d05fe8a872a287c41d04601ded6b1367b612450783c7ef6046fda5",
+      "recordExpressionSHA256": "47f66d428eefb5b4d18eef52ac6c3e73c5c72f14bbff2311e3a290f877a8c2a4"
+    },
+    {
+      "case": "A1-shifted-conn = foreign_conn",
+      "pass": true,
+      "reason": null,
+      "producerSanityPassed": true,
+      "sourceSHA256": "f934a1463351742e44e701dd3bb5375792ac9d5d7c0ec9b1f1f4186b03630182",
+      "recordExpressionSHA256": "47f66d428eefb5b4d18eef52ac6c3e73c5c72f14bbff2311e3a290f877a8c2a4"
+    },
+    {
+      "case": "A1-shifted-cursor = foreign_cursor",
+      "pass": true,
+      "reason": "DYNAMIC_BLOCK:RECEIVER_NAME_STORE_OR_DELETE",
+      "producerSanityPassed": true,
+      "sourceSHA256": "374040dc7591ff9ba65befd44392d53619a7656509eeba664f649cbc099880ff",
+      "recordExpressionSHA256": "47f66d428eefb5b4d18eef52ac6c3e73c5c72f14bbff2311e3a290f877a8c2a4"
+    },
+    {
+      "case": "A1-shifted-(cursor := foreign_cursor)",
+      "pass": true,
+      "reason": "DYNAMIC_BLOCK:RECEIVER_NAME_STORE_OR_DELETE",
+      "producerSanityPassed": true,
+      "sourceSHA256": "d8868c03f6ba644102328848e896ef032fcc643950a76d833a8d6b1eb46bb32a",
+      "recordExpressionSHA256": "47f66d428eefb5b4d18eef52ac6c3e73c5c72f14bbff2311e3a290f877a8c2a4"
+    },
+    {
+      "case": "A1-shifted-cursor.execute = foreign_execute",
+      "pass": true,
+      "reason": "DYNAMIC_BLOCK:RECEIVER_ATTRIBUTE_STORE_OR_DELETE",
+      "producerSanityPassed": true,
+      "sourceSHA256": "21ee9db67fae06203316b0230a0aeeb8057985c50e7e870abab9d645b336a32d",
+      "recordExpressionSHA256": "47f66d428eefb5b4d18eef52ac6c3e73c5c72f14bbff2311e3a290f877a8c2a4"
+    },
+    {
+      "case": "A1-shifted-setattr(cursor, 'execute', foreign_execute)",
+      "pass": true,
+      "reason": "DYNAMIC_BLOCK:DYNAMIC_ATTRIBUTE_MUTATION",
+      "producerSanityPassed": true,
+      "sourceSHA256": "bbe8906b78b40badd0fb2766cd4bdf9f8dbcb09c7da35ce8052a4bfa63018a2f",
+      "recordExpressionSHA256": "47f66d428eefb5b4d18eef52ac6c3e73c5c72f14bbff2311e3a290f877a8c2a4"
+    },
+    {
+      "case": "A1-shifted-delattr(cursor, 'fetchone')",
+      "pass": true,
+      "reason": "DYNAMIC_BLOCK:DYNAMIC_ATTRIBUTE_MUTATION",
+      "producerSanityPassed": true,
+      "sourceSHA256": "66023887d30b36a38edf4020cb50de36f65ac824e90e929746c11d158c05c49a",
+      "recordExpressionSHA256": "47f66d428eefb5b4d18eef52ac6c3e73c5c72f14bbff2311e3a290f877a8c2a4"
+    },
+    {
+      "case": "A1-shifted-del cursor.execute",
+      "pass": true,
+      "reason": "DYNAMIC_BLOCK:RECEIVER_ATTRIBUTE_STORE_OR_DELETE",
+      "producerSanityPassed": true,
+      "sourceSHA256": "fc76dd80634725281085ac2e267ac76d231b74f8186eb702082a60b82cbdbbdd",
+      "recordExpressionSHA256": "47f66d428eefb5b4d18eef52ac6c3e73c5c72f14bbff2311e3a290f877a8c2a4"
+    },
+    {
+      "case": "A1-shifted-alias = cursor",
+      "pass": true,
+      "reason": "DYNAMIC_BLOCK:RECEIVER_ALIAS_ESCAPE",
+      "producerSanityPassed": true,
+      "sourceSHA256": "9a355ea191aca79a595550a76c6a414f33a1afdeaf43adf80bc5075c9e6d8fca",
+      "recordExpressionSHA256": "47f66d428eefb5b4d18eef52ac6c3e73c5c72f14bbff2311e3a290f877a8c2a4"
+    },
+    {
+      "case": "A1-shifted-cls = type(cursor)",
+      "pass": true,
+      "reason": "DYNAMIC_BLOCK:RECEIVER_CLASS_ALIAS",
+      "producerSanityPassed": true,
+      "sourceSHA256": "2f8b7f75810273ba05b3ceca4c1ded1821867d7d1a389f9c54b420a4d86acd6a",
+      "recordExpressionSHA256": "47f66d428eefb5b4d18eef52ac6c3e73c5c72f14bbff2311e3a290f877a8c2a4"
+    },
+    {
+      "case": "A1-shifted-for cursor in foreign_cursors:",
+      "pass": true,
+      "reason": "DYNAMIC_BLOCK:RECEIVER_NAME_STORE_OR_DELETE",
+      "producerSanityPassed": true,
+      "sourceSHA256": "df6fcd79d316217e74e570d5e1a9b679179ba1c64cccdd04cef3889e70115265",
+      "recordExpressionSHA256": "47f66d428eefb5b4d18eef52ac6c3e73c5c72f14bbff2311e3a290f877a8c2a4"
+    },
+    {
+      "case": "A1-shifted-with foreign_factory() as cursor:",
+      "pass": true,
+      "reason": "DYNAMIC_BLOCK:RECEIVER_NAME_STORE_OR_DELETE",
+      "producerSanityPassed": true,
+      "sourceSHA256": "e7aeff6866b286bfc5d26bea4475f5b785970ffa1622ce3d80bf122f2a9910b7",
+      "recordExpressionSHA256": "47f66d428eefb5b4d18eef52ac6c3e73c5c72f14bbff2311e3a290f877a8c2a4"
+    },
+    {
+      "case": "A2-DomainError-positive",
+      "pass": true
+    },
+    {
+      "case": "A2-InvError-positive",
+      "pass": true
+    },
+    {
+      "case": "A2-metaclass",
+      "pass": true,
+      "parsePassed": true,
+      "reason": "DYNAMIC_BINDING_OR_CONSTRUCTOR_EFFECT_UNPROVEN",
+      "sourceSHA256": "300d2e3482c4a259730839d34415ff26cd4630f0be3086d1f496ebd252495cb4"
+    },
+    {
+      "case": "A2-later-dataclass-import",
+      "pass": true,
+      "parsePassed": true,
+      "reason": "DYNAMIC_BINDING_OR_CONSTRUCTOR_EFFECT_UNPROVEN",
+      "sourceSHA256": "b19030ae7775e7fb2115b5e21529244374d31638fb9bc222f543a94183bb3711"
+    },
+    {
+      "case": "A2-later-Exception-import",
+      "pass": true,
+      "parsePassed": true,
+      "reason": "DYNAMIC_BINDING_OR_CONSTRUCTOR_EFFECT_UNPROVEN",
+      "sourceSHA256": "716e2e4395600cee2be49da50de9102cf30e5609d64baa56362aba35d6a4722c"
+    },
+    {
+      "case": "A2-later-field-import",
+      "pass": true,
+      "parsePassed": true,
+      "reason": "DYNAMIC_BINDING_OR_CONSTRUCTOR_EFFECT_UNPROVEN",
+      "sourceSHA256": "794fe6b95daa9c268f025d085889a6ac1ed1ee9c90afa60eb9a7a230f8147541"
+    },
+    {
+      "case": "A2-class-alias-mutation",
+      "pass": true,
+      "parsePassed": true,
+      "reason": "DYNAMIC_BINDING_OR_CONSTRUCTOR_EFFECT_UNPROVEN",
+      "sourceSHA256": "3eb9ab2c625f67bb487b004660f8ff53cd6f87f48ba13e11e9d8212d944300fd"
+    },
+    {
+      "case": "A2-class-setattr",
+      "pass": true,
+      "parsePassed": true,
+      "reason": "DYNAMIC_BINDING_OR_CONSTRUCTOR_EFFECT_UNPROVEN",
+      "sourceSHA256": "64c9ff14c5087b7f0b363eb0202b97dabbf6cf4e48b0eabecfd0c86bd9bff7f5"
+    },
+    {
+      "case": "A2-constructor-db",
+      "pass": true,
+      "parsePassed": true,
+      "reason": "DYNAMIC_BINDING_OR_CONSTRUCTOR_EFFECT_UNPROVEN",
+      "sourceSHA256": "d75f8d35e757b171352775a78ed3f9e0bcd96a96e3fc2883a3deacdabe379b3a"
+    },
+    {
+      "case": "A2-postinit-io",
+      "pass": true,
+      "parsePassed": true,
+      "reason": "DYNAMIC_BINDING_OR_CONSTRUCTOR_EFFECT_UNPROVEN",
+      "sourceSHA256": "71d204a4d12b4d10ade8836ae97192e73a10605b3ec8c369b5d2bc34c3d0032f"
+    },
+    {
+      "case": "A2-unbound-field-control-is-not-proven",
+      "pass": true,
+      "parsePassed": true,
+      "reason": "DYNAMIC_BINDING_OR_CONSTRUCTOR_EFFECT_UNPROVEN",
+      "sourceSHA256": "311bf86b84c13b2ef3b233ce4b930bba3777a70a42136f0ed1387886dad3f09a"
+    },
+    {
+      "case": "A2-proper-imported-field-positive",
+      "pass": true,
+      "parsePassed": true,
+      "reason": "PROVEN",
+      "sourceSHA256": "d53d5d01692831ddc8077d41e85eb6e40c22a38a5ea6d346e8a2daf9dcd5541b"
+    },
+    {
+      "case": "A2-module-getattr-benign-control",
+      "pass": true,
+      "parsePassed": true,
+      "reason": "PROVEN",
+      "sourceSHA256": "aeb1a4f1f934976c86074eb0015d2e0617c96b57ca6afbfaa1a0f8a1c3094c97"
+    },
+    {
+      "case": "A2-caller-DomainError = foreign_factory",
+      "pass": true,
+      "parsePassed": true,
+      "sourceSHA256": "fad3ec1332eeec79961e0fcc1052d4107b4749553757ff20159565bbe1c87442"
+    },
+    {
+      "case": "A2-caller-Alias = DomainError",
+      "pass": true,
+      "parsePassed": true,
+      "sourceSHA256": "3c2c53d592cb63a676849c76e918aafc58e0332dbe9ad0a3b353baa4eb419986"
+    },
+    {
+      "case": "A2-caller-setattr(DomainError, '__new__', foreign)",
+      "pass": true,
+      "parsePassed": true,
+      "sourceSHA256": "cb2f11dbb1c2ebcb054ae7419060c683efe0d1555078f7cbe6c0cb87239858d5"
+    },
+    {
+      "case": "A2-caller-from evil import DomainError",
+      "pass": true,
+      "parsePassed": true,
+      "sourceSHA256": "25da152344e207612c371c263ca5dd27e7dc0e44d677d7bf7062470ca298148b"
+    },
+    {
+      "case": "A2-caller-actual-binding-positive",
+      "pass": true
+    },
+    {
+      "case": "original-script-seven-rule-defects-accounted",
+      "pass": true,
+      "originalReportedDefects": [
+        "owner-rebinding-test-is-span-vacuous",
+        "A2-str-field-default-factory-call",
+        "A2-caller-name-rebinding-checked"
+      ],
+      "explanation": "Unmodified script inspects old mutation construction and hardcodes the old caller import-presence assertion. Unbound field control now refuses per Root exact-import rule; properly imported field positive above passes. No expected output altered."
+    }
+  ],
+  "sourceMutationPolicy": "Fresh parse + recomputed producer record spans/expression/source hashes for every cursor mutant; no effectful mutant imported/executed",
+  "priorActualReviewOriginalDefects": [
+    "owner-rebinding-test-is-span-vacuous",
+    "A1-shifted-attribute-monkeypatch",
+    "A1-shifted-setattr-monkeypatch",
+    "A2-metaclass-keyword",
+    "A2-reimport-dataclass-shadow",
+    "A2-import-Exception-shadow",
+    "A2-caller-name-rebinding-checked"
+  ],
+  "original16CaseScriptUnmodified": {
+    "script": "prior-reviewer_m2_rule_mutations.py.txt",
+    "actualExit": 0,
+    "output": "original-reviewer-rule16-owner-rerun.log",
+    "reportedDefects": [
+      "owner-rebinding-test-is-span-vacuous",
+      "A2-str-field-default-factory-call",
+      "A2-caller-name-rebinding-checked"
+    ]
+  },
+  "actualRuntimeB": 0
+}

@@ -1,0 +1,2 @@
+{"passed": 31, "originalReviewerCases": 16, "originalRemainingMetaControlReports": ["owner-rebinding-test-is-span-vacuous", "A2-str-field-default-factory-call", "A2-caller-name-rebinding-checked"]}
+{"ownerResourceMeasurement": {"target": "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105\\docs\\vault\\30_Development\\Evidence\\fleet5-b-rev9-t1-20261106-codex\\analysis_rule_tests.py", "peakWorkingSetBytes": 31232000, "elapsedSeconds": 1.669, "OSMemoryLimitEnforced": false, "serial": true}}

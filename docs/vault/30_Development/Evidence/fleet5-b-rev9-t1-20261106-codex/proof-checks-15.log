@@ -1,0 +1,18 @@
+{
+  "scope": "synthetic-source-validator-only",
+  "policyBytesPreserved": true,
+  "plainStateOnlyAccepted": true,
+  "plainDefaultSocketAccepted": true,
+  "storageOnlyAccepted": true,
+  "workspaceStorageRejected": "Workspace upgrade does not support storage contribution; preserve this Node and use a separate plain Node for workspace acceptance",
+  "storageWithWorkspaceSocketRejected": "Storage installation scope, path, bytes or receipt differs",
+  "aliasesRejected": 3,
+  "activeStorageAssessed": false,
+  "linuxMountEnforcementAssessed": false,
+  "sourceSHA256": {
+    "worker_workspace.py": "056737f897295e1662b5067a49a4e3f0945ab64536b576ae5cdd972aceef83a1",
+    "worker_storage.py": "ec6bb6d34e57d4024c2879826eef82ffc3e3e6ad39e09dc37b3fe62ff6da1294",
+    "worker_config.py": "909d1c25deb61c5c4795af49dab18f5a9722e5cbc1c034a18472b6a4427c192c"
+  }
+}
+{"ownerResourceMeasurement": {"target": "tests/proofs/fleet5_compute_storage_contract_probe.py", "peakWorkingSetBytes": 25792512, "elapsedSeconds": 0.167, "OSMemoryLimitEnforced": false, "serial": true}}
