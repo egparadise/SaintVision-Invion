@@ -1,0 +1,73 @@
+{
+  "atKST": "2026-11-07T06:33:57+09:00",
+  "sourceBase": "08e0f56eabe7d46518e17b8c3d6d7e296df880ac",
+  "sourceContentSHA256": "090a8c6e16a5d74c76c28f1fc117bdff21aaaed4bab0cbf3419d5654b7ec76b2",
+  "packetSHA256": "6e2aba8a1afdbd480ca74a9a0636ac24a2366ed6a1fc3ff8158a9127c712213f",
+  "allFourPhasesGreen": true,
+  "topLevelPass": 25,
+  "subtestPass": 230,
+  "failed": 0,
+  "skipped": 0,
+  "caseRows": 92,
+  "distinctCompleteInputFingerprints": 90,
+  "originalProbeObservations": [
+    {
+      "tuples": 16,
+      "reason": "",
+      "stage": "",
+      "detail": "",
+      "passed": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE",
+        "03_PAYLOAD",
+        "03_C2",
+        "04_SIGNATURE",
+        "04_KEY_INTERVAL",
+        "05_PAYLOAD_JOINS",
+        "05_COMPONENTS",
+        "05_REVIEWS",
+        "05_SOURCE",
+        "05_CI",
+        "05_ARTIFACT",
+        "05_RUNNING",
+        "06_STATUS",
+        "06_VERSION",
+        "06_REPLAY",
+        "06_TIME",
+        "06_READBACK",
+        "07_PROJECTION"
+      ]
+    },
+    {
+      "tuples": 17,
+      "reason": "OWNERSHIP",
+      "stage": "01_ANCHOR",
+      "detail": "immutable-signature-table",
+      "passed": []
+    }
+  ],
+  "originalProbeNotCountedAsAdditionalDistinctFingerprints": true,
+  "allocationLog": [
+    "p02_signature_table_bound_test.go:71: P02_L1_COPY_BUDGET allocations=0 repeatedEvaluations=2 uniqueAdditionalInputs=0 beforeSHA256=69533191420d778fe609e5739fb8344ffce326adfd75cfe879a90e4bfdbcaf54 afterSHA256=69533191420d778fe609e5739fb8344ffce326adfd75cfe879a90e4bfdbcaf54 actualAuth=false"
+  ],
+  "sourceBeforeAfterEqualAllPhases": true,
+  "sourceSnapshotEntries": 370,
+  "phasePeakMemoryBytes": [
+    395309056,
+    79990784,
+    166576128,
+    678498304
+  ],
+  "phaseElapsedSeconds": [
+    28.318,
+    0.504,
+    1.306,
+    119.875
+  ],
+  "knownHostsUnchanged": true,
+  "independentDeltaReview": "PENDING",
+  "newSourceDocsCore": "NOT_RUN",
+  "factoryProducerPortRuntimeGranted": false,
+  "wholeProgramComplete": false
+}

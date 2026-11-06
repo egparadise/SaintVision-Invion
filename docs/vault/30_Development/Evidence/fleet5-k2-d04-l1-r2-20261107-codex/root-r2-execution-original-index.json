@@ -1,0 +1,640 @@
+{
+  "classification": "EXACT_ACTUAL_ROOT_R2_EXECUTION_ORIGINAL_COPIES",
+  "authority": "Root msg_010aeec31cf3; execution performed by Root, not author/reviewer",
+  "files": [
+    {
+      "name": "job.json",
+      "bytes": 720,
+      "SHA256": "b6308e95e36e10172c86952730fd339568d23d3c5027e2908dd5a947e36475c0",
+      "source": "Root .work/d04-l1-r2-actual-go-originals/job.json",
+      "copiedAs": "root-r2-execution-originals/job.json.raw",
+      "kind": "ACTUAL_ROOT_RAW_NOT_WORKER_RERUN"
+    },
+    {
+      "name": "r2-base-files.json",
+      "bytes": 67749,
+      "SHA256": "b8c4345544a5e23f1cf5088923656f66b1683ca8a5a040714dad47f9ef171015",
+      "source": "Root .work/d04-l1-r2-actual-go-originals/r2-base-files.json",
+      "copiedAs": "root-r2-execution-originals/r2-base-files.json.raw",
+      "kind": "ACTUAL_ROOT_RAW_NOT_WORKER_RERUN"
+    },
+    {
+      "name": "r2-execution-receipt.json",
+      "bytes": 24087,
+      "SHA256": "6a64097fc920247c98774bcfd4510e3721b07529a9909219520ef7bdada91950",
+      "source": "Root .work/d04-l1-r2-actual-go-originals/r2-execution-receipt.json",
+      "copiedAs": "root-r2-execution-originals/r2-execution-receipt.json.raw",
+      "kind": "ACTUAL_ROOT_RAW_NOT_WORKER_RERUN"
+    },
+    {
+      "name": "r2-phase1-after-files.json",
+      "bytes": 68150,
+      "SHA256": "933e45f707da0b84a731d695d0c53b5531df6cc88cf1b779726a64ea2f861068",
+      "source": "Root .work/d04-l1-r2-actual-go-originals/r2-phase1-after-files.json",
+      "copiedAs": "root-r2-execution-originals/r2-phase1-after-files.json.raw",
+      "kind": "ACTUAL_ROOT_RAW_NOT_WORKER_RERUN"
+    },
+    {
+      "name": "r2-phase1-container.log",
+      "bytes": 0,
+      "SHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "source": "Root .work/d04-l1-r2-actual-go-originals/r2-phase1-container.log",
+      "copiedAs": "root-r2-execution-originals/r2-phase1-container.log.raw",
+      "kind": "ACTUAL_ROOT_RAW_NOT_WORKER_RERUN"
+    },
+    {
+      "name": "r2-phase1-final.json",
+      "bytes": 7377,
+      "SHA256": "2fb4101dda527f1b4df7ebd129f07383e13fe96ee104abae0eae7f9496f3f2e3",
+      "source": "Root .work/d04-l1-r2-actual-go-originals/r2-phase1-final.json",
+      "copiedAs": "root-r2-execution-originals/r2-phase1-final.json.raw",
+      "kind": "ACTUAL_ROOT_RAW_NOT_WORKER_RERUN"
+    },
+    {
+      "name": "r2-phase1-initial.json",
+      "bytes": 6816,
+      "SHA256": "dee95ddbb132a59c13d3621643b14918fa7595c2588e24180cead03236f740eb",
+      "source": "Root .work/d04-l1-r2-actual-go-originals/r2-phase1-initial.json",
+      "copiedAs": "root-r2-execution-originals/r2-phase1-initial.json.raw",
+      "kind": "ACTUAL_ROOT_RAW_NOT_WORKER_RERUN"
+    },
+    {
+      "name": "r2-phase1-memory-peak.bytes",
+      "bytes": 10,
+      "SHA256": "1256ec011ee883bfb34e9b99f13a366763387d4b70fe0680969b558f4025421e",
+      "source": "Root .work/d04-l1-r2-actual-go-originals/r2-phase1-memory-peak.bytes",
+      "copiedAs": "root-r2-execution-originals/r2-phase1-memory-peak.bytes.raw",
+      "kind": "ACTUAL_ROOT_RAW_NOT_WORKER_RERUN"
+    },
+    {
+      "name": "r2-phase1-receipt.json",
+      "bytes": 951,
+      "SHA256": "2e2c1fe92c6922626a0ea1d58f0cfb88872575fc2984f5e3c14ec74cb658339b",
+      "source": "Root .work/d04-l1-r2-actual-go-originals/r2-phase1-receipt.json",
+      "copiedAs": "root-r2-execution-originals/r2-phase1-receipt.json.raw",
+      "kind": "ACTUAL_ROOT_RAW_NOT_WORKER_RERUN"
+    },
+    {
+      "name": "r2-phase1.stderr",
+      "bytes": 0,
+      "SHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "source": "Root .work/d04-l1-r2-actual-go-originals/r2-phase1.stderr",
+      "copiedAs": "root-r2-execution-originals/r2-phase1.stderr.raw",
+      "kind": "ACTUAL_ROOT_RAW_NOT_WORKER_RERUN"
+    },
+    {
+      "name": "r2-phase1.stdout",
+      "bytes": 5283,
+      "SHA256": "1c8e33057e727db96ca18167243e0d2322711b5881ac881f705ee57ca7f1410a",
+      "source": "Root .work/d04-l1-r2-actual-go-originals/r2-phase1.stdout",
+      "copiedAs": "root-r2-execution-originals/r2-phase1.stdout.raw",
+      "kind": "ACTUAL_ROOT_RAW_NOT_WORKER_RERUN"
+    },
+    {
+      "name": "r2-phase2-after-files.json",
+      "bytes": 68150,
+      "SHA256": "933e45f707da0b84a731d695d0c53b5531df6cc88cf1b779726a64ea2f861068",
+      "source": "Root .work/d04-l1-r2-actual-go-originals/r2-phase2-after-files.json",
+      "copiedAs": "root-r2-execution-originals/r2-phase2-after-files.json.raw",
+      "kind": "ACTUAL_ROOT_RAW_NOT_WORKER_RERUN"
+    },
+    {
+      "name": "r2-phase2-container.log",
+      "bytes": 0,
+      "SHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "source": "Root .work/d04-l1-r2-actual-go-originals/r2-phase2-container.log",
+      "copiedAs": "root-r2-execution-originals/r2-phase2-container.log.raw",
+      "kind": "ACTUAL_ROOT_RAW_NOT_WORKER_RERUN"
+    },
+    {
+      "name": "r2-phase2-final.json",
+      "bytes": 7377,
+      "SHA256": "ca83857eafdf9e231507edd1164a2edde6751ed60fd0a61cfd330774dc4dedb2",
+      "source": "Root .work/d04-l1-r2-actual-go-originals/r2-phase2-final.json",
+      "copiedAs": "root-r2-execution-originals/r2-phase2-final.json.raw",
+      "kind": "ACTUAL_ROOT_RAW_NOT_WORKER_RERUN"
+    },
+    {
+      "name": "r2-phase2-initial.json",
+      "bytes": 6816,
+      "SHA256": "47a120b4447c491687c8ef6fefd3342ce1cee6c505de1857b979682a2d32d6f1",
+      "source": "Root .work/d04-l1-r2-actual-go-originals/r2-phase2-initial.json",
+      "copiedAs": "root-r2-execution-originals/r2-phase2-initial.json.raw",
+      "kind": "ACTUAL_ROOT_RAW_NOT_WORKER_RERUN"
+    },
+    {
+      "name": "r2-phase2-memory-peak.bytes",
+      "bytes": 9,
+      "SHA256": "2b296988925dca0f3391de50c274e9d3f44c2e8e59db976049be0b10d973ac79",
+      "source": "Root .work/d04-l1-r2-actual-go-originals/r2-phase2-memory-peak.bytes",
+      "copiedAs": "root-r2-execution-originals/r2-phase2-memory-peak.bytes.raw",
+      "kind": "ACTUAL_ROOT_RAW_NOT_WORKER_RERUN"
+    },
+    {
+      "name": "r2-phase2-receipt.json",
+      "bytes": 1605,
+      "SHA256": "9b5e709de09c840417333d806d5b2e889ec71bf3f9e32d2f247db52e0f79c10f",
+      "source": "Root .work/d04-l1-r2-actual-go-originals/r2-phase2-receipt.json",
+      "copiedAs": "root-r2-execution-originals/r2-phase2-receipt.json.raw",
+      "kind": "ACTUAL_ROOT_RAW_NOT_WORKER_RERUN"
+    },
+    {
+      "name": "r2-phase2.stderr",
+      "bytes": 0,
+      "SHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "source": "Root .work/d04-l1-r2-actual-go-originals/r2-phase2.stderr",
+      "copiedAs": "root-r2-execution-originals/r2-phase2.stderr.raw",
+      "kind": "ACTUAL_ROOT_RAW_NOT_WORKER_RERUN"
+    },
+    {
+      "name": "r2-phase2.stdout",
+      "bytes": 685,
+      "SHA256": "d46d00552e7ae9e5f89c99f74f44d4614aca9baf119374c0af2ba401d3405be0",
+      "source": "Root .work/d04-l1-r2-actual-go-originals/r2-phase2.stdout",
+      "copiedAs": "root-r2-execution-originals/r2-phase2.stdout.raw",
+      "kind": "ACTUAL_ROOT_RAW_NOT_WORKER_RERUN"
+    },
+    {
+      "name": "r2-phase3-after-files.json",
+      "bytes": 68150,
+      "SHA256": "933e45f707da0b84a731d695d0c53b5531df6cc88cf1b779726a64ea2f861068",
+      "source": "Root .work/d04-l1-r2-actual-go-originals/r2-phase3-after-files.json",
+      "copiedAs": "root-r2-execution-originals/r2-phase3-after-files.json.raw",
+      "kind": "ACTUAL_ROOT_RAW_NOT_WORKER_RERUN"
+    },
+    {
+      "name": "r2-phase3-container.log",
+      "bytes": 0,
+      "SHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "source": "Root .work/d04-l1-r2-actual-go-originals/r2-phase3-container.log",
+      "copiedAs": "root-r2-execution-originals/r2-phase3-container.log.raw",
+      "kind": "ACTUAL_ROOT_RAW_NOT_WORKER_RERUN"
+    },
+    {
+      "name": "r2-phase3-final.json",
+      "bytes": 7377,
+      "SHA256": "db53de0897487833cbe0f3ccb28c8463fcdd36be6efc9a7a9361f0abccb0db71",
+      "source": "Root .work/d04-l1-r2-actual-go-originals/r2-phase3-final.json",
+      "copiedAs": "root-r2-execution-originals/r2-phase3-final.json.raw",
+      "kind": "ACTUAL_ROOT_RAW_NOT_WORKER_RERUN"
+    },
+    {
+      "name": "r2-phase3-initial.json",
+      "bytes": 6816,
+      "SHA256": "e0df2ab669fa90e11e0d2024a8f0be5aeb71bf2dbd15387673df92747eea5b1b",
+      "source": "Root .work/d04-l1-r2-actual-go-originals/r2-phase3-initial.json",
+      "copiedAs": "root-r2-execution-originals/r2-phase3-initial.json.raw",
+      "kind": "ACTUAL_ROOT_RAW_NOT_WORKER_RERUN"
+    },
+    {
+      "name": "r2-phase3-memory-peak.bytes",
+      "bytes": 10,
+      "SHA256": "b7477049c206a825c6e5d98d6637afec57acb281df0547d23354bde9fdc4a0bd",
+      "source": "Root .work/d04-l1-r2-actual-go-originals/r2-phase3-memory-peak.bytes",
+      "copiedAs": "root-r2-execution-originals/r2-phase3-memory-peak.bytes.raw",
+      "kind": "ACTUAL_ROOT_RAW_NOT_WORKER_RERUN"
+    },
+    {
+      "name": "r2-phase3-receipt.json",
+      "bytes": 7474,
+      "SHA256": "ae239ae9ff58af04ff9041578d0bad5f0eeb6d6aec5679206e0131a314fc3a08",
+      "source": "Root .work/d04-l1-r2-actual-go-originals/r2-phase3-receipt.json",
+      "copiedAs": "root-r2-execution-originals/r2-phase3-receipt.json.raw",
+      "kind": "ACTUAL_ROOT_RAW_NOT_WORKER_RERUN"
+    },
+    {
+      "name": "r2-phase3.stderr",
+      "bytes": 0,
+      "SHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "source": "Root .work/d04-l1-r2-actual-go-originals/r2-phase3.stderr",
+      "copiedAs": "root-r2-execution-originals/r2-phase3.stderr.raw",
+      "kind": "ACTUAL_ROOT_RAW_NOT_WORKER_RERUN"
+    },
+    {
+      "name": "r2-phase3.stdout",
+      "bytes": 166944,
+      "SHA256": "4391bd94d1a86a92850672260e23574b5262c826b43c91d1824cc9ea5cc50554",
+      "source": "Root .work/d04-l1-r2-actual-go-originals/r2-phase3.stdout",
+      "copiedAs": "root-r2-execution-originals/r2-phase3.stdout.raw",
+      "kind": "ACTUAL_ROOT_RAW_NOT_WORKER_RERUN"
+    },
+    {
+      "name": "r2-phase4-after-files.json",
+      "bytes": 68150,
+      "SHA256": "933e45f707da0b84a731d695d0c53b5531df6cc88cf1b779726a64ea2f861068",
+      "source": "Root .work/d04-l1-r2-actual-go-originals/r2-phase4-after-files.json",
+      "copiedAs": "root-r2-execution-originals/r2-phase4-after-files.json.raw",
+      "kind": "ACTUAL_ROOT_RAW_NOT_WORKER_RERUN"
+    },
+    {
+      "name": "r2-phase4-container.log",
+      "bytes": 0,
+      "SHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "source": "Root .work/d04-l1-r2-actual-go-originals/r2-phase4-container.log",
+      "copiedAs": "root-r2-execution-originals/r2-phase4-container.log.raw",
+      "kind": "ACTUAL_ROOT_RAW_NOT_WORKER_RERUN"
+    },
+    {
+      "name": "r2-phase4-final.json",
+      "bytes": 7377,
+      "SHA256": "79f93ac6b1e4117175f2b76d00207a4a57e0c2990d0f52819e32e778aa06f016",
+      "source": "Root .work/d04-l1-r2-actual-go-originals/r2-phase4-final.json",
+      "copiedAs": "root-r2-execution-originals/r2-phase4-final.json.raw",
+      "kind": "ACTUAL_ROOT_RAW_NOT_WORKER_RERUN"
+    },
+    {
+      "name": "r2-phase4-initial.json",
+      "bytes": 6816,
+      "SHA256": "72ce179a10a7f551eac9e6103e38fb8744ee25feb7a6d5f22636133987f354cb",
+      "source": "Root .work/d04-l1-r2-actual-go-originals/r2-phase4-initial.json",
+      "copiedAs": "root-r2-execution-originals/r2-phase4-initial.json.raw",
+      "kind": "ACTUAL_ROOT_RAW_NOT_WORKER_RERUN"
+    },
+    {
+      "name": "r2-phase4-memory-peak.bytes",
+      "bytes": 10,
+      "SHA256": "cec8106641e7e5f9022b750347da81c0fd1f51152f62ef3b70e247febd7a20c1",
+      "source": "Root .work/d04-l1-r2-actual-go-originals/r2-phase4-memory-peak.bytes",
+      "copiedAs": "root-r2-execution-originals/r2-phase4-memory-peak.bytes.raw",
+      "kind": "ACTUAL_ROOT_RAW_NOT_WORKER_RERUN"
+    },
+    {
+      "name": "r2-phase4-receipt.json",
+      "bytes": 11586,
+      "SHA256": "f4a2e173a71eb32d179d71bbb447792fa9dc0a5b90d43ee189b555eff21ec550",
+      "source": "Root .work/d04-l1-r2-actual-go-originals/r2-phase4-receipt.json",
+      "copiedAs": "root-r2-execution-originals/r2-phase4-receipt.json.raw",
+      "kind": "ACTUAL_ROOT_RAW_NOT_WORKER_RERUN"
+    },
+    {
+      "name": "r2-phase4.stderr",
+      "bytes": 0,
+      "SHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "source": "Root .work/d04-l1-r2-actual-go-originals/r2-phase4.stderr",
+      "copiedAs": "root-r2-execution-originals/r2-phase4.stderr.raw",
+      "kind": "ACTUAL_ROOT_RAW_NOT_WORKER_RERUN"
+    },
+    {
+      "name": "r2-phase4.stdout",
+      "bytes": 263066,
+      "SHA256": "34ee020d7e1a631d9bde74168993062eaa701906b81811dc26e5c890e3877903",
+      "source": "Root .work/d04-l1-r2-actual-go-originals/r2-phase4.stdout",
+      "copiedAs": "root-r2-execution-originals/r2-phase4.stdout.raw",
+      "kind": "ACTUAL_ROOT_RAW_NOT_WORKER_RERUN"
+    },
+    {
+      "name": "r2-run-started.json",
+      "bytes": 186,
+      "SHA256": "6015e026c26c19e81ba7afc3f4abe73c74ed90fc4010b2ddc4784c81a6d79884",
+      "source": "Root .work/d04-l1-r2-actual-go-originals/r2-run-started.json",
+      "copiedAs": "root-r2-execution-originals/r2-run-started.json.raw",
+      "kind": "ACTUAL_ROOT_RAW_NOT_WORKER_RERUN"
+    },
+    {
+      "name": "r2-source-before-files.json",
+      "bytes": 68150,
+      "SHA256": "933e45f707da0b84a731d695d0c53b5531df6cc88cf1b779726a64ea2f861068",
+      "source": "Root .work/d04-l1-r2-actual-go-originals/r2-source-before-files.json",
+      "copiedAs": "root-r2-execution-originals/r2-source-before-files.json.raw",
+      "kind": "ACTUAL_ROOT_RAW_NOT_WORKER_RERUN"
+    },
+    {
+      "name": "r2-source-manifest.json",
+      "bytes": 2835,
+      "SHA256": "5afa70f35b09cfceff23f2b9d9a0b93b11e14485a9cca1bdd56b13b2024977e1",
+      "source": "Root .work/d04-l1-r2-actual-go-originals/r2-source-manifest.json",
+      "copiedAs": "root-r2-execution-originals/r2-source-manifest.json.raw",
+      "kind": "ACTUAL_ROOT_RAW_NOT_WORKER_RERUN"
+    },
+    {
+      "name": "root-image-reference.json",
+      "bytes": 95,
+      "SHA256": "bb81686b55400ddfe26ac32aca381aa3bbaeba820369c4a123f7698940a66ea6",
+      "source": "Root .work/d04-l1-r2-actual-go-originals/root-image-reference.json",
+      "copiedAs": "root-r2-execution-originals/root-image-reference.json.raw",
+      "kind": "ACTUAL_ROOT_RAW_NOT_WORKER_RERUN"
+    },
+    {
+      "name": "source-setup-checkout-base.log",
+      "bytes": 80,
+      "SHA256": "82471865b84b601b2692f686d32a46cbbafdf336b165dd912952bdeed4cf05bd",
+      "source": "Root .work/d04-l1-r2-actual-go-originals/source-setup-checkout-base.log",
+      "copiedAs": "root-r2-execution-originals/source-setup-checkout-base.log.raw",
+      "kind": "ACTUAL_ROOT_RAW_NOT_WORKER_RERUN"
+    },
+    {
+      "name": "source-setup-clean.log",
+      "bytes": 0,
+      "SHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "source": "Root .work/d04-l1-r2-actual-go-originals/source-setup-clean.log",
+      "copiedAs": "root-r2-execution-originals/source-setup-clean.log.raw",
+      "kind": "ACTUAL_ROOT_RAW_NOT_WORKER_RERUN"
+    },
+    {
+      "name": "source-setup-commands.tsv",
+      "bytes": 2390,
+      "SHA256": "e93f1fc6d256e32d6e1107c23cffdd2a92d0c409e302b877c3ebc158d003d29b",
+      "source": "Root .work/d04-l1-r2-actual-go-originals/source-setup-commands.tsv",
+      "copiedAs": "root-r2-execution-originals/source-setup-commands.tsv.raw",
+      "kind": "ACTUAL_ROOT_RAW_NOT_WORKER_RERUN"
+    },
+    {
+      "name": "source-setup-container-final.json",
+      "bytes": 7360,
+      "SHA256": "a561355881aa887a5a19b482101fd86a6a77874c409cb61d96f6cde9ca0b79d4",
+      "source": "Root .work/d04-l1-r2-actual-go-originals/source-setup-container-final.json",
+      "copiedAs": "root-r2-execution-originals/source-setup-container-final.json.raw",
+      "kind": "ACTUAL_ROOT_RAW_NOT_WORKER_RERUN"
+    },
+    {
+      "name": "source-setup-container-initial.json",
+      "bytes": 6799,
+      "SHA256": "6920f1ef3d1a25fb52efa359d8f9d3225e5ca0432ec732d19eb93e0d3753685b",
+      "source": "Root .work/d04-l1-r2-actual-go-originals/source-setup-container-initial.json",
+      "copiedAs": "root-r2-execution-originals/source-setup-container-initial.json.raw",
+      "kind": "ACTUAL_ROOT_RAW_NOT_WORKER_RERUN"
+    },
+    {
+      "name": "source-setup-create.log",
+      "bytes": 65,
+      "SHA256": "b994fafbfc24551801f0f8e37f71855acf4cee31d8cb764b9437e35c3a548af1",
+      "source": "Root .work/d04-l1-r2-actual-go-originals/source-setup-create.log",
+      "copiedAs": "root-r2-execution-originals/source-setup-create.log.raw",
+      "kind": "ACTUAL_ROOT_RAW_NOT_WORKER_RERUN"
+    },
+    {
+      "name": "source-setup-exits.tsv",
+      "bytes": 350,
+      "SHA256": "208b86321c28802cdee31dab839a5b51cc5298dbf37019bc473ad3d19475c787",
+      "source": "Root .work/d04-l1-r2-actual-go-originals/source-setup-exits.tsv",
+      "copiedAs": "root-r2-execution-originals/source-setup-exits.tsv.raw",
+      "kind": "ACTUAL_ROOT_RAW_NOT_WORKER_RERUN"
+    },
+    {
+      "name": "source-setup-fetch-base.log",
+      "bytes": 130,
+      "SHA256": "c599c3fe2a3447cd4e85607b5b68fc4cc525e40084a194d8859b8dbce302c334",
+      "source": "Root .work/d04-l1-r2-actual-go-originals/source-setup-fetch-base.log",
+      "copiedAs": "root-r2-execution-originals/source-setup-fetch-base.log.raw",
+      "kind": "ACTUAL_ROOT_RAW_NOT_WORKER_RERUN"
+    },
+    {
+      "name": "source-setup-fetch-k1.log",
+      "bytes": 130,
+      "SHA256": "ebde9045a488c8f241af20dd0c5f62c90fd74d4e25cffeca8cfe916531503d9b",
+      "source": "Root .work/d04-l1-r2-actual-go-originals/source-setup-fetch-k1.log",
+      "copiedAs": "root-r2-execution-originals/source-setup-fetch-k1.log.raw",
+      "kind": "ACTUAL_ROOT_RAW_NOT_WORKER_RERUN"
+    },
+    {
+      "name": "source-setup-go-list-files.log",
+      "bytes": 5676,
+      "SHA256": "8a36c4b603114498d0f6070b65790db90dc40b2c2e1205c2a7f469e9f23a49bb",
+      "source": "Root .work/d04-l1-r2-actual-go-originals/source-setup-go-list-files.log",
+      "copiedAs": "root-r2-execution-originals/source-setup-go-list-files.log.raw",
+      "kind": "ACTUAL_ROOT_RAW_NOT_WORKER_RERUN"
+    },
+    {
+      "name": "source-setup-go-version.log",
+      "bytes": 32,
+      "SHA256": "f554cfdb85411c2bb1d503df3f53dfbad1f753eb8271938833166a5d26a7547c",
+      "source": "Root .work/d04-l1-r2-actual-go-originals/source-setup-go-version.log",
+      "copiedAs": "root-r2-execution-originals/source-setup-go-version.log.raw",
+      "kind": "ACTUAL_ROOT_RAW_NOT_WORKER_RERUN"
+    },
+    {
+      "name": "source-setup-head.log",
+      "bytes": 41,
+      "SHA256": "cfc71f1236bc0644e7a083ec1cde6dab83afb2d5294e1a382e906aa7323220f8",
+      "source": "Root .work/d04-l1-r2-actual-go-originals/source-setup-head.log",
+      "copiedAs": "root-r2-execution-originals/source-setup-head.log.raw",
+      "kind": "ACTUAL_ROOT_RAW_NOT_WORKER_RERUN"
+    },
+    {
+      "name": "source-setup-init.log",
+      "bytes": 0,
+      "SHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "source": "Root .work/d04-l1-r2-actual-go-originals/source-setup-init.log",
+      "copiedAs": "root-r2-execution-originals/source-setup-init.log.raw",
+      "kind": "ACTUAL_ROOT_RAW_NOT_WORKER_RERUN"
+    },
+    {
+      "name": "source-setup-k1-contracts.go.log",
+      "bytes": 4980,
+      "SHA256": "017102092eebf5cdde81616d07b64e4501781c2f4fa956d5895592198bb06967",
+      "source": "Root .work/d04-l1-r2-actual-go-originals/source-setup-k1-contracts.go.log",
+      "copiedAs": "root-r2-execution-originals/source-setup-k1-contracts.go.log.raw",
+      "kind": "ACTUAL_ROOT_RAW_NOT_WORKER_RERUN"
+    },
+    {
+      "name": "source-setup-k1-current.go.log",
+      "bytes": 5324,
+      "SHA256": "b8061a064d4578305cea31af3638ea35af2de0228abc9862107262aa44da385b",
+      "source": "Root .work/d04-l1-r2-actual-go-originals/source-setup-k1-current.go.log",
+      "copiedAs": "root-r2-execution-originals/source-setup-k1-current.go.log.raw",
+      "kind": "ACTUAL_ROOT_RAW_NOT_WORKER_RERUN"
+    },
+    {
+      "name": "source-setup-k1-ed25519.go.log",
+      "bytes": 4118,
+      "SHA256": "d557da3806cb65f6c4a73120ea1430751a9354336787cffb5777f62c148f1fc5",
+      "source": "Root .work/d04-l1-r2-actual-go-originals/source-setup-k1-ed25519.go.log",
+      "copiedAs": "root-r2-execution-originals/source-setup-k1-ed25519.go.log.raw",
+      "kind": "ACTUAL_ROOT_RAW_NOT_WORKER_RERUN"
+    },
+    {
+      "name": "source-setup-k1-graph.go.log",
+      "bytes": 9880,
+      "SHA256": "81fbd517f0ba5bb4062a2a14cd2972f9ddae89c2d4e4f979cc7d1d2058da238c",
+      "source": "Root .work/d04-l1-r2-actual-go-originals/source-setup-k1-graph.go.log",
+      "copiedAs": "root-r2-execution-originals/source-setup-k1-graph.go.log.raw",
+      "kind": "ACTUAL_ROOT_RAW_NOT_WORKER_RERUN"
+    },
+    {
+      "name": "source-setup-k1-json.go.log",
+      "bytes": 5504,
+      "SHA256": "c7b4428a71d051848e1c9df302f2f6fbed3f16c0685e9264e37343ed21c683e6",
+      "source": "Root .work/d04-l1-r2-actual-go-originals/source-setup-k1-json.go.log",
+      "copiedAs": "root-r2-execution-originals/source-setup-k1-json.go.log.raw",
+      "kind": "ACTUAL_ROOT_RAW_NOT_WORKER_RERUN"
+    },
+    {
+      "name": "source-setup-k1-list.log",
+      "bytes": 9205,
+      "SHA256": "e349c32a5420a9a2a3727c247d39c731ef538245bc0e98fe582a53045d9e6bda",
+      "source": "Root .work/d04-l1-r2-actual-go-originals/source-setup-k1-list.log",
+      "copiedAs": "root-r2-execution-originals/source-setup-k1-list.log.raw",
+      "kind": "ACTUAL_ROOT_RAW_NOT_WORKER_RERUN"
+    },
+    {
+      "name": "source-setup-k1-native.go.log",
+      "bytes": 5331,
+      "SHA256": "8f08b4ed8f7c4108374e3197cee678841885cc1ed86214c10a2d97a7b9f4e2b0",
+      "source": "Root .work/d04-l1-r2-actual-go-originals/source-setup-k1-native.go.log",
+      "copiedAs": "root-r2-execution-originals/source-setup-k1-native.go.log.raw",
+      "kind": "ACTUAL_ROOT_RAW_NOT_WORKER_RERUN"
+    },
+    {
+      "name": "source-setup-k1-proofs.go.log",
+      "bytes": 10397,
+      "SHA256": "b6c6efcb7052a1b7091e0a4c460296d83ba890d57f5ceb3436b98738b6a4e4dd",
+      "source": "Root .work/d04-l1-r2-actual-go-originals/source-setup-k1-proofs.go.log",
+      "copiedAs": "root-r2-execution-originals/source-setup-k1-proofs.go.log.raw",
+      "kind": "ACTUAL_ROOT_RAW_NOT_WORKER_RERUN"
+    },
+    {
+      "name": "source-setup-k1-recipes.go.log",
+      "bytes": 10359,
+      "SHA256": "37338bfdb939a107aa4748c1cc62e6eb810d0e5335e75173a1f82878719d8df8",
+      "source": "Root .work/d04-l1-r2-actual-go-originals/source-setup-k1-recipes.go.log",
+      "copiedAs": "root-r2-execution-originals/source-setup-k1-recipes.go.log.raw",
+      "kind": "ACTUAL_ROOT_RAW_NOT_WORKER_RERUN"
+    },
+    {
+      "name": "source-setup-k1-schemas.go.log",
+      "bytes": 5064,
+      "SHA256": "37228c2401e4ea1730446347547a246e5de258d033b2e2714334d4c19958a9ec",
+      "source": "Root .work/d04-l1-r2-actual-go-originals/source-setup-k1-schemas.go.log",
+      "copiedAs": "root-r2-execution-originals/source-setup-k1-schemas.go.log.raw",
+      "kind": "ACTUAL_ROOT_RAW_NOT_WORKER_RERUN"
+    },
+    {
+      "name": "source-setup-k1-temporal.go.log",
+      "bytes": 4076,
+      "SHA256": "759519f626e8454e79219f6368d4befe2b3e734dca1ac80bf1585d60bcbc3eb7",
+      "source": "Root .work/d04-l1-r2-actual-go-originals/source-setup-k1-temporal.go.log",
+      "copiedAs": "root-r2-execution-originals/source-setup-k1-temporal.go.log.raw",
+      "kind": "ACTUAL_ROOT_RAW_NOT_WORKER_RERUN"
+    },
+    {
+      "name": "source-setup-k1-trust.go.log",
+      "bytes": 10336,
+      "SHA256": "d0e72b6f4d1ab08fe2bece5465c932b084983068a3049d73b69dd28922d07dd7",
+      "source": "Root .work/d04-l1-r2-actual-go-originals/source-setup-k1-trust.go.log",
+      "copiedAs": "root-r2-execution-originals/source-setup-k1-trust.go.log.raw",
+      "kind": "ACTUAL_ROOT_RAW_NOT_WORKER_RERUN"
+    },
+    {
+      "name": "source-setup-k1-verify.go.log",
+      "bytes": 14338,
+      "SHA256": "3834b97335c7af45b1c6ac2ab9eebbca196149e84faaf44dfbbb227a3f113743",
+      "source": "Root .work/d04-l1-r2-actual-go-originals/source-setup-k1-verify.go.log",
+      "copiedAs": "root-r2-execution-originals/source-setup-k1-verify.go.log.raw",
+      "kind": "ACTUAL_ROOT_RAW_NOT_WORKER_RERUN"
+    },
+    {
+      "name": "source-setup-memory-peak.bytes",
+      "bytes": 9,
+      "SHA256": "94cba30f2b85f859731eaa55e8e5ca7bad8c7db67b76760069625df7b95c7d44",
+      "source": "Root .work/d04-l1-r2-actual-go-originals/source-setup-memory-peak.bytes",
+      "copiedAs": "root-r2-execution-originals/source-setup-memory-peak.bytes.raw",
+      "kind": "ACTUAL_ROOT_RAW_NOT_WORKER_RERUN"
+    },
+    {
+      "name": "source-setup-mod-download.log",
+      "bytes": 0,
+      "SHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "source": "Root .work/d04-l1-r2-actual-go-originals/source-setup-mod-download.log",
+      "copiedAs": "root-r2-execution-originals/source-setup-mod-download.log.raw",
+      "kind": "ACTUAL_ROOT_RAW_NOT_WORKER_RERUN"
+    },
+    {
+      "name": "source-setup-mod-verify.log",
+      "bytes": 21,
+      "SHA256": "b4537ed75f533f993f371954de47e42a793b8e5b0587577de7e27fb3e50696bd",
+      "source": "Root .work/d04-l1-r2-actual-go-originals/source-setup-mod-verify.log",
+      "copiedAs": "root-r2-execution-originals/source-setup-mod-verify.log.raw",
+      "kind": "ACTUAL_ROOT_RAW_NOT_WORKER_RERUN"
+    },
+    {
+      "name": "source-setup-receipt.json",
+      "bytes": 2658,
+      "SHA256": "75b6b6ced93e740206c596f721e1ab2040ca4cbdaea41172364cd9a6035615fc",
+      "source": "Root .work/d04-l1-r2-actual-go-originals/source-setup-receipt.json",
+      "copiedAs": "root-r2-execution-originals/source-setup-receipt.json.raw",
+      "kind": "ACTUAL_ROOT_RAW_NOT_WORKER_RERUN"
+    },
+    {
+      "name": "source-setup-remote.log",
+      "bytes": 0,
+      "SHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "source": "Root .work/d04-l1-r2-actual-go-originals/source-setup-remote.log",
+      "copiedAs": "root-r2-execution-originals/source-setup-remote.log.raw",
+      "kind": "ACTUAL_ROOT_RAW_NOT_WORKER_RERUN"
+    },
+    {
+      "name": "source-setup-sparse-init.log",
+      "bytes": 0,
+      "SHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "source": "Root .work/d04-l1-r2-actual-go-originals/source-setup-sparse-init.log",
+      "copiedAs": "root-r2-execution-originals/source-setup-sparse-init.log.raw",
+      "kind": "ACTUAL_ROOT_RAW_NOT_WORKER_RERUN"
+    },
+    {
+      "name": "source-setup-sparse-set.log",
+      "bytes": 0,
+      "SHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "source": "Root .work/d04-l1-r2-actual-go-originals/source-setup-sparse-set.log",
+      "copiedAs": "root-r2-execution-originals/source-setup-sparse-set.log.raw",
+      "kind": "ACTUAL_ROOT_RAW_NOT_WORKER_RERUN"
+    },
+    {
+      "name": "source-setup-started.json",
+      "bytes": 200,
+      "SHA256": "f7c86cfa031b282166051cd05f297cf65c67c7c9e3a5b03e818655e8c50530c1",
+      "source": "Root .work/d04-l1-r2-actual-go-originals/source-setup-started.json",
+      "copiedAs": "root-r2-execution-originals/source-setup-started.json.raw",
+      "kind": "ACTUAL_ROOT_RAW_NOT_WORKER_RERUN"
+    },
+    {
+      "name": "source-setup.log",
+      "bytes": 632,
+      "SHA256": "5eed4d8d8b3c458f6abfd926f6a5ee444cd42713389a4f3e549387229a5fd0fa",
+      "source": "Root .work/d04-l1-r2-actual-go-originals/source-setup.log",
+      "copiedAs": "root-r2-execution-originals/source-setup.log.raw",
+      "kind": "ACTUAL_ROOT_RAW_NOT_WORKER_RERUN"
+    },
+    {
+      "name": "d04-l1-r2-actual-go-summary.json",
+      "bytes": 2090,
+      "SHA256": "f8cc6490263bc409e2b2a4b84eef14fcfcb4cbcbab42b4bbd9a0816fb82fd2f4",
+      "source": "Root .work/d04-l1-r2-actual-go-summary.json",
+      "copiedAs": "root-r2-execution-originals/d04-l1-r2-actual-go-summary.json.raw",
+      "kind": "ACTUAL_ROOT_SUMMARY_INDEX_NOT_WORKER_RERUN"
+    },
+    {
+      "name": "d04-l1-r2-actual-go-root-proof.json",
+      "bytes": 24526,
+      "SHA256": "b35c6868c3019d20782ee47c9dabb70c290613910298c40fdb2754c704c1c73f",
+      "source": "Root .work/d04-l1-r2-actual-go-root-proof.json",
+      "copiedAs": "root-r2-execution-originals/d04-l1-r2-actual-go-root-proof.json.raw",
+      "kind": "ACTUAL_ROOT_SUMMARY_INDEX_NOT_WORKER_RERUN"
+    },
+    {
+      "name": "d04-l1-r2-actual-case-rows.json",
+      "bytes": 34015,
+      "SHA256": "e67e96573b5e6c587b3b9a4afdb5d1f9572231e4349fe1d536c2afd77def18c6",
+      "source": "Root .work/d04-l1-r2-actual-case-rows.json",
+      "copiedAs": "root-r2-execution-originals/d04-l1-r2-actual-case-rows.json.raw",
+      "kind": "ACTUAL_ROOT_SUMMARY_INDEX_NOT_WORKER_RERUN"
+    },
+    {
+      "name": "d04-l1-r2-actual-go-original-index.json",
+      "bytes": 11347,
+      "SHA256": "9853b320fae1aac5e9047aa538ef9ae375927f42f4415815d751180029176b27",
+      "source": "Root .work/d04-l1-r2-actual-go-original-index.json",
+      "copiedAs": "root-r2-execution-originals/d04-l1-r2-actual-go-original-index.json.raw",
+      "kind": "ACTUAL_ROOT_SUMMARY_INDEX_NOT_WORKER_RERUN"
+    },
+    {
+      "name": "d04-l1-r2-tested-go-code-hashes.json",
+      "bytes": 850,
+      "SHA256": "18ecc15063c4f27c7b974d91f8e6463b5c0364f4028a9f95ba71ea46082af8bd",
+      "source": "Root .work/d04-l1-r2-tested-go-code-hashes.json",
+      "copiedAs": "root-r2-execution-originals/d04-l1-r2-tested-go-code-hashes.json.raw",
+      "kind": "ACTUAL_ROOT_SUMMARY_INDEX_NOT_WORKER_RERUN"
+    }
+  ],
+  "rawOriginalCount": 74,
+  "summaryIndexCount": 5
+}

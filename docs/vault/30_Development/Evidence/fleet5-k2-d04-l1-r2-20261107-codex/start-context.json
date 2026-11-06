@@ -1,0 +1,50 @@
+{
+  "docID": "EVIDENCE-FLEET5-K2-D04-L1-R2-20261107-CODEX",
+  "version": "1.0.0",
+  "startedKST": "2026-11-07T06:25:01.002820+09:00",
+  "task": "task_a95ef3d8ccce",
+  "dispatch": "ctx_ed23b4a777d0",
+  "grant": "msg_d42e405d8bd0",
+  "card": "FLEET5-K2-D04-L1-R2-20261107",
+  "owner": "Codex",
+  "reviewer": "Future actual independent Claude delta CODE review via Root, NOT_RUN",
+  "branch": "agent/codex/fleet5-k2-d04-l1-r2-20261107",
+  "baseSHA": "08e0f56eabe7d46518e17b8c3d6d7e296df880ac",
+  "worktree": "D:\\Project\\SaintVisionI-Invion\\fleet5-k2-d04-l1-r2-20261107",
+  "managedWorktreeIdentity": "wt2:local:4504c3e7-8775-4475-a422-86443e5f0af8",
+  "canonicalRootHEAD": "da4f07ebfdc1ba12f7d998b3611d1c6a3d292477",
+  "canonicalBoards": [
+    {
+      "path": "docs/vault/00_Index/\uc804\uccb4 \uac1c\ubc1c \uc9c4\ud589 \ud604\ud669.md",
+      "SHA256": "ee57ad8956d17a7731b3a3243f6aff3f9fd6f488e58df03a3726d4c12e307a56",
+      "frontmatter": "doc_id: \"INDEX-PROGRESS-001\"\r\ntitle: \"\uc804\uccb4 \uac1c\ubc1c \uc9c4\ud589 \ud604\ud669\"\r\nversion: \"1.0.482\"\r\nstatus: \"review\"\r\nauthor: \"Codex\"\r\nupdated: \"2026-11-07T05:51:57+09:00\"\r\nsource_of_truth: \"Git\"\r\nlatest_codex_card: \"B9gactual90ccACCEPT/A7snapshotSTATICcut; D04actualCODEreview1ddcfactive/Core42287980945pendingFinalEvidence; 5PCincomplete\""
+    },
+    {
+      "path": "docs/vault/30_Development/Agent\ubcc4 \uc791\uc5c5/Codex \uc791\uc5c5 \ud604\ud669.md",
+      "SHA256": "40c1f3708ed09e2bb24ac3370f18719842496dc094943d4ff7aae8a56d924509",
+      "frontmatter": "doc_id: \"WORKBOARD-CODEX-001\"\r\ntitle: \"Codex \uc791\uc5c5 \ud604\ud669\"\r\nversion: \"1.0.443\"\r\nstatus: \"review\"\r\nauthor: \"Codex\"\r\nupdated: \"2026-11-07T05:51:57+09:00\"\r\nsource_of_truth: \"Git\"\r\nactive_card: \"FLEET5 continued supervision with PORTAL-REFRESH-FLEET-20261106\"\r\nactive_card_status: \"B9gactual90ccACCEPT/LOW2CLOSED/INFOonly; A7STATICsnapshotnewcut; D04actualCODEreview1ddcfactive/Corefinalevidencepending; fleetincomplete\"\r\nactive_card_next: \"B Codex A7snapshot-only static closure/candidate; Claude D04actualCODEverdict; Root exact Core final/artifacts/failures then concrete next cuts, no runtime or positive factory grant\""
+    }
+  ],
+  "skills": {
+    "agent-delivery": "1.1.0",
+    "core-reliability": "1.0.0",
+    "Orca": "1.4.248"
+  },
+  "requiredDocs": "AGENTS and required plans/role/governance/task registry read in preceding continuation; skills/AGENTS and current canonical boards reread here",
+  "PromptContext": "Actual same-task Root msg_d42e405d8bd0, no widened grant",
+  "Harness": "One new private Go regression; unchanged original reviewer probe for Root isolated execution",
+  "ROOFGraphContractPins": "UNCHANGED",
+  "AgentRuntimeModel": "Not exposed; not invented",
+  "allowedProductFiles": [
+    "p02_evaluate_internal.go",
+    "p02_signature_table_bound_test.go",
+    "README.md"
+  ],
+  "noOtherProductChanges": true,
+  "mainGoCompileTest": "NOT_RUN_PROHIBITED_MAIN_HOST",
+  "R2Go": "NOT_RUN",
+  "R2DocsCore": "NOT_RUN",
+  "publication": "NOT_GRANTED_BEFORE_ACTUAL_GO_VERIFICATION",
+  "A01A40": "NOT_RUN",
+  "wholeFleet": "INCOMPLETE"
+}

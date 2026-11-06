@@ -1,0 +1,26 @@
+[
+  {
+    "file": "inv-node",
+    "bytes": 13387338,
+    "SHA256": "3682c2ac1dfe46f2041d27b3724cb0da3258de0267561ea9e1f235595a5371b4",
+    "GoVersion": "D:\\Project\\SaintVisionI-Invion\\fleet-five-orchestration-20261105\\.work\\d04-core-artifacts\\inv-node: go1.27.1",
+    "vcsRevisionExact": true,
+    "vcsModifiedFalse": true,
+    "GOOSLinux": true,
+    "GOARCHAMD64": true,
+    "metadataReadOnly": true,
+    "binaryExecuted": false
+  },
+  {
+    "file": "inv-discover",
+    "bytes": 10212675,
+    "SHA256": "1e3fc08e6af03ade094c097612bf9022042e02506d47ae5c25ef25d27e2a6896",
+    "GoVersion": "D:\\Project\\SaintVisionI-Invion\\fleet-five-orchestration-20261105\\.work\\d04-core-artifacts\\inv-discover: go1.27.1",
+    "vcsRevisionExact": true,
+    "vcsModifiedFalse": true,
+    "GOOSLinux": true,
+    "GOARCHAMD64": true,
+    "metadataReadOnly": true,
+    "binaryExecuted": false
+  }
+]

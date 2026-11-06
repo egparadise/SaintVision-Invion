@@ -1,0 +1,29 @@
+// INERT DATA, NOT_RUN, NOT COMPILED BY THE REVIEWER. Optional Root-only probe for
+// D04-L1 (see review.json). The finding is a static control-flow fact at frozen
+// source 08e0f56eabe7d46518e17b8c3d6d7e296df880ac (p02_inputs_internal.go:1067,
+// p02_evaluate_internal.go:104-118 and :263); the verdict does not depend on running it.
+// If Root wants actual execution: copy to services/node-agent/internal/migrationcontext/
+// p02_reviewer_probe_test.go on an isolated 08e0 checkout only, then
+//   go test -p=1 -count=1 -run '^TestP02ReviewerProbeSignatureTableBound$' -v ./internal/migrationcontext
+// Expected by the ACCEPTED design (candidate_model.py:173): 17 tuples refuse
+// OWNERSHIP at 01_ANCHOR (immutable-signature-table), passed=[].
+// Static prediction for 08e0: 17 tuples refuse SIGNATURE at 04_SIGNATURE
+// (bounded-signature-tuple-table) after passing 01_ANCHOR..03_C2. Control: 16 tuples
+// (same benign fixture) pass all 20 stages. A compile or setup failure is NOT evidence.
+package migrationcontext
+
+import "testing"
+
+func TestP02ReviewerProbeSignatureTableBound(t *testing.T) {
+	for _, n := range []int{16, 17} {
+		tc := p02BenignFixture()
+		valid := tc.in.signatures[0]
+		for len(tc.in.signatures) < n {
+			extra := p02FreezeSignatureTuple(valid)
+			extra.signature[len(extra.signature)-1] ^= byte(len(tc.in.signatures))
+			tc.in.signatures = append(tc.in.signatures, extra)
+		}
+		r := p02Evaluate(tc.raw, tc.payload, tc.artifact, tc.in)
+		t.Logf("P02_REVIEWER_PROBE tuples=%d reason=%q stage=%q detail=%q passed=%v", n, r.reason, r.stage, r.detail, r.passed)
+	}
+}

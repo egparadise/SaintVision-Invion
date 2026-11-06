@@ -1,0 +1,121 @@
+{
+  "classification": "ACTUAL_08E0_CODE_REVIEW_ORIGINALS_NOT_RERUN",
+  "review": "879aea64e6896d6014f1b10d4ab63fda0de6073c",
+  "target": "08e0f56eabe7d46518e17b8c3d6d7e296df880ac",
+  "verdict": "INTERNAL_CODE_ACCEPT_NARROW_WITH_NONBLOCKING_LOW_L1",
+  "reviewer": "Actual Claude through Root",
+  "Docs": 42293776865,
+  "DocsJob": 128153632966,
+  "RootVerifiedAll19Success": true,
+  "reviewerCorePending": "HISTORICAL_TEMPORAL_OBSERVATION_UNCHANGED",
+  "files": [
+    {
+      "source": "879aea64e6896d6014f1b10d4ab63fda0de6073c",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-d04-08e0-code-review-20261107-claude/.gitattributes",
+      "objectID": "bb2789ad98e51258a73e184a7a912ab02c6a83c0",
+      "copiedAs": "review-originals/00-.gitattributes.raw",
+      "bytes": 21,
+      "SHA256": "96a83569c84cfe3f57b7efe3dc61c249548d0fca4fed0e538b3587cdc97c95c1",
+      "executedByOwner": false
+    },
+    {
+      "source": "879aea64e6896d6014f1b10d4ab63fda0de6073c",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-d04-08e0-code-review-20261107-claude/canonical-sync-check-before.txt",
+      "objectID": "9ce702e02b692f25f60b1289fba74535be63426d",
+      "copiedAs": "review-originals/01-canonical-sync-check-before.txt.raw",
+      "bytes": 895,
+      "SHA256": "4f3572e35b67c444cdc077db0e05856eab41732dcc7a6b4d1a2643159a40d9ff",
+      "executedByOwner": false
+    },
+    {
+      "source": "879aea64e6896d6014f1b10d4ab63fda0de6073c",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-d04-08e0-code-review-20261107-claude/commands.json",
+      "objectID": "befec9cb03da6b902ceb535c1f8695adfd0d91ed",
+      "copiedAs": "review-originals/02-commands.json.raw",
+      "bytes": 5587,
+      "SHA256": "85507ad26d35c4f73766216bbcd36b212133d96de6bd3b7a1dec6bf42bb17fb6",
+      "executedByOwner": false
+    },
+    {
+      "source": "879aea64e6896d6014f1b10d4ab63fda0de6073c",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-d04-08e0-code-review-20261107-claude/local-doc-gates.txt",
+      "objectID": "e66cc06f2ab2de40ca73f1c9f05b641bc34a0a0d",
+      "copiedAs": "review-originals/03-local-doc-gates.txt.raw",
+      "bytes": 3765,
+      "SHA256": "8e3bdc530b4b7c5e9437c9188f73008e8620c75b10f83b2f73b323723d82f4aa",
+      "executedByOwner": false
+    },
+    {
+      "source": "879aea64e6896d6014f1b10d4ab63fda0de6073c",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-d04-08e0-code-review-20261107-claude/optional_probe_signature_table_bound_test.go.txt",
+      "objectID": "c34ecad77c7852d7ee64dc7cb91587ec239d5259",
+      "copiedAs": "review-originals/04-optional_probe_signature_table_bound_test.go.txt.raw",
+      "bytes": 1588,
+      "SHA256": "412fd1ed587a0e4786275ac8a56aca32d20ea853bfb59f6835b228cdb0da0beb",
+      "executedByOwner": false
+    },
+    {
+      "source": "879aea64e6896d6014f1b10d4ab63fda0de6073c",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-d04-08e0-code-review-20261107-claude/review.json",
+      "objectID": "f0cc046cdc4b6f621e5ae8cf60d8b8de6f6e2304",
+      "copiedAs": "review-originals/05-review.json.raw",
+      "bytes": 15738,
+      "SHA256": "2f855caacdf0da3b1550780d20baed58781b01e205dd497d6d5beccf81dafa6d",
+      "executedByOwner": false
+    },
+    {
+      "source": "879aea64e6896d6014f1b10d4ab63fda0de6073c",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-d04-08e0-code-review-20261107-claude/reviewer-schema-compare-result.json",
+      "objectID": "a52b6b371bbec016e932a7956eba3df97fc92c7d",
+      "copiedAs": "review-originals/06-reviewer-schema-compare-result.json.raw",
+      "bytes": 993,
+      "SHA256": "babc30d872b60bf4331d4325612fc859b37127f203b6bd28aede0874fc35891c",
+      "executedByOwner": false
+    },
+    {
+      "source": "879aea64e6896d6014f1b10d4ab63fda0de6073c",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-d04-08e0-code-review-20261107-claude/reviewer-stage-reasons-result.json",
+      "objectID": "a71f4d6a726ab749474a65cee4f485b4bf61a557",
+      "copiedAs": "review-originals/07-reviewer-stage-reasons-result.json.raw",
+      "bytes": 2948,
+      "SHA256": "b7bb724b649ca2a5f366af4b51e444145b6baa19e10341c6456e2982fdd1846b",
+      "executedByOwner": false
+    },
+    {
+      "source": "879aea64e6896d6014f1b10d4ab63fda0de6073c",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-d04-08e0-code-review-20261107-claude/reviewer_gate_driver.py.txt",
+      "objectID": "b8d4828740073b7ab6ca45e1db83aa33db0dca9f",
+      "copiedAs": "review-originals/08-reviewer_gate_driver.py.txt.raw",
+      "bytes": 2464,
+      "SHA256": "f7221fa64434cc2a4a7cedc23641733a9b471455db18e05fee0bd70fc208c19f",
+      "executedByOwner": false
+    },
+    {
+      "source": "879aea64e6896d6014f1b10d4ab63fda0de6073c",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-d04-08e0-code-review-20261107-claude/reviewer_schema_compare.py.txt",
+      "objectID": "83c5c5123f0dbf41a6087b5b33ce1a2bb16cfbe1",
+      "copiedAs": "review-originals/09-reviewer_schema_compare.py.txt.raw",
+      "bytes": 7691,
+      "SHA256": "bc6b54f34fe62c6caf9d21a3de11aad14b3e9ce20dcaf1bd1c6b745890a2d8d1",
+      "executedByOwner": false
+    },
+    {
+      "source": "879aea64e6896d6014f1b10d4ab63fda0de6073c",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-d04-08e0-code-review-20261107-claude/reviewer_stage_reasons.py.txt",
+      "objectID": "830c3e15f466f4680d9d36002d85a12fde77d2ac",
+      "copiedAs": "review-originals/10-reviewer_stage_reasons.py.txt.raw",
+      "bytes": 2098,
+      "SHA256": "85edbcfc710b9254cea7b5feca31d038a65341c5ea0b34e67267bbd0ee88d428",
+      "executedByOwner": false
+    },
+    {
+      "source": "879aea64e6896d6014f1b10d4ab63fda0de6073c",
+      "path": "docs/vault/30_Development/History/2026-11-07_06-05-00_KST_FLEET5_K2_D04_08e0_\ucf54\ub4dc\ub3c5\ub9bd\uac80\ud1a0_Claude.md",
+      "objectID": "91db796796169fa93cac605b99a576c14765e7e4",
+      "copiedAs": "review-originals/11-2026-11-07_06-05-00_KST_FLEET5_K2_D04_08e0_\ucf54\ub4dc\ub3c5\ub9bd\uac80\ud1a0_Claude.md.raw",
+      "bytes": 9420,
+      "SHA256": "5ec616fc2dfb62d3a32f9ad4d02da1a29d585342a5efb1e5c2253ddadf9c7feb",
+      "executedByOwner": false
+    }
+  ]
+}

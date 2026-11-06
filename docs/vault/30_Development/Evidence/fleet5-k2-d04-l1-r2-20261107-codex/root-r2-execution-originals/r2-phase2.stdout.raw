@@ -1,0 +1,6 @@
+=== RUN   TestP02ReviewerProbeSignatureTableBound
+    p02_reviewer_probe_test.go:27: P02_REVIEWER_PROBE tuples=16 reason="" stage="" detail="" passed=[01_ANCHOR 02_SOURCES 03_ENVELOPE 03_PAYLOAD 03_C2 04_SIGNATURE 04_KEY_INTERVAL 05_PAYLOAD_JOINS 05_COMPONENTS 05_REVIEWS 05_SOURCE 05_CI 05_ARTIFACT 05_RUNNING 06_STATUS 06_VERSION 06_REPLAY 06_TIME 06_READBACK 07_PROJECTION]
+    p02_reviewer_probe_test.go:27: P02_REVIEWER_PROBE tuples=17 reason="OWNERSHIP" stage="01_ANCHOR" detail="immutable-signature-table" passed=[]
+--- PASS: TestP02ReviewerProbeSignatureTableBound (0.00s)
+PASS
+ok  	github.com/egparadise/SaintVision-Invion/services/node-agent/internal/migrationcontext	0.008s

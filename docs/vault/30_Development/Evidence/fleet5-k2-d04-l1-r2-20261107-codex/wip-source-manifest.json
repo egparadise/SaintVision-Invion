@@ -1,0 +1,71 @@
+{
+  "classification": "IMMUTABLE_UNCOMMITTED_R2_WIP_NOT_COMPILED_TESTED_PUBLISHED_OR_DONE",
+  "atKST": "2026-11-07T06:26:43.768133+09:00",
+  "baseSHA": "08e0f56eabe7d46518e17b8c3d6d7e296df880ac",
+  "branch": "agent/codex/fleet5-k2-d04-l1-r2-20261107",
+  "codeCommit": null,
+  "task": "task_a95ef3d8ccce",
+  "dispatch": "ctx_ed23b4a777d0",
+  "grant": "msg_d42e405d8bd0",
+  "files": [
+    {
+      "path": "services/node-agent/internal/migrationcontext/README.md",
+      "change": "M",
+      "mode": "100644",
+      "bytes": 18421,
+      "SHA256": "a7199f4396a0d65c40b3c4484a75e3e6fec67ef91e641787735fce44d77eca33",
+      "base": {
+        "mode": "100644",
+        "blobOID": "192d103662513b94cfba2f7e68ce8c6f12a64e09",
+        "SHA256": "ad26172075ab9200ef45502b5728bc79dc5cd9efb583269c0db18df7a65b1ec9",
+        "bytes": 16154
+      },
+      "regularFile": true,
+      "symlink": false,
+      "frozenCopy": "source-frozen/README.md"
+    },
+    {
+      "path": "services/node-agent/internal/migrationcontext/p02_evaluate_internal.go",
+      "change": "M",
+      "mode": "100644",
+      "bytes": 25679,
+      "SHA256": "2f29f521ffe358411baaa3d365f80f757c2be6df14043abdae787802a275b5c9",
+      "base": {
+        "mode": "100644",
+        "blobOID": "5502c42096491fda55c29a7efe9b13d77d5a3a42",
+        "SHA256": "35de87be6a8fba9a34cc71d4ea77f231f312bd3d6d6ef5ac8f72e4a1e36fa398",
+        "bytes": 25538
+      },
+      "regularFile": true,
+      "symlink": false,
+      "frozenCopy": "source-frozen/p02_evaluate_internal.go"
+    },
+    {
+      "path": "services/node-agent/internal/migrationcontext/p02_signature_table_bound_test.go",
+      "change": "A",
+      "mode": "100644",
+      "bytes": 2921,
+      "SHA256": "97d0c59b2978f2d086a310257b93057ef6d65def990d0f6f4a47bcaabd4c49bd",
+      "base": null,
+      "regularFile": true,
+      "symlink": false,
+      "frozenCopy": "source-frozen/p02_signature_table_bound_test.go"
+    }
+  ],
+  "sourceContentSHA256": "090a8c6e16a5d74c76c28f1fc117bdff21aaaed4bab0cbf3419d5654b7ec76b2",
+  "sourceContentAlgorithm": "SHA256 of UTF8 JSON array in shown file order; fields path/mode/SHA256; json.dumps(sort_keys=True,separators=(comma,colon))",
+  "completeSourcePatchSHA256": "23d029e48e67eca52fd224ed76bac3231c6db96d9d6d83b495a4f3932e99e790",
+  "originalProbeSHA256": "412fd1ed587a0e4786275ac8a56aca32d20ea853bfb59f6835b228cdb0da0beb",
+  "originalProbeModified": false,
+  "RootOnlyCommandProposalSHA256": "560565f49d2b34b2199dd1e692a399f6ceafc4d5ba493f0c6deda8acf9bd267c",
+  "GoCompile": "NOT_RUN",
+  "GoTests": "NOT_RUN",
+  "sourceEffectCensus": "NOT_RUN",
+  "DocsCore": "NOT_RUN",
+  "independentDeltaCODE": "NOT_RUN",
+  "actualProducer": null,
+  "actualBindings": "NULL_HOLD",
+  "A01A40": "NOT_RUN",
+  "wholeFleet": "INCOMPLETE",
+  "publicationAllowedBeforeActualNecessaryGoVerification": false
+}

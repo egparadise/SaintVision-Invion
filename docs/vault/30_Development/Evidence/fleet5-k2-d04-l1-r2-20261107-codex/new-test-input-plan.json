@@ -1,0 +1,43 @@
+{
+  "classification": "STATIC_TEST_INPUT_CONSTRUCTION_NOT_EXECUTION",
+  "fixtureSourceSHA256": "458c9ef1bd606ad1afcf081da554f7cc57179ac0af9490dbb53e9f97f8e5f42b",
+  "fixtureSourceGit": "08e0f56eabe7d46518e17b8c3d6d7e296df880ac",
+  "fixture": "p02BenignFixture: fake DER/signatures; no actual crypto/producer",
+  "changedTestSHA256": "97d0c59b2978f2d086a310257b93057ef6d65def990d0f6f4a47bcaabd4c49bd",
+  "cases": [
+    {
+      "id": "L1-tuples-16",
+      "tuples": 16,
+      "matchingTuple": "LAST full-message/key/domain/capsule/scope/version/request binding unchanged",
+      "otherTuples": "15 deep-copied signatures, final byte XOR distinct1..15",
+      "expected": "20stage private consistency only, public TrustUnknown"
+    },
+    {
+      "id": "L1-tuples-17",
+      "tuples": 17,
+      "matchingTuple": "LAST full-message/key/domain/capsule/scope/version/request binding unchanged",
+      "otherTuples": "16 deep-copied signatures, final byte XOR distinct1..16",
+      "expected": {
+        "reason": "OWNERSHIP",
+        "stage": "01_ANCHOR",
+        "detail": "immutable-signature-table",
+        "passed": []
+      },
+      "allocationExpectation": 0,
+      "allocationRepeats": 2,
+      "additionalUniqueInputsFromAllocationRepeats": 0
+    }
+  ],
+  "preconditions": [
+    "strict canonical envelope/payload plus schemas",
+    "bound payload digest",
+    "matching tuple equals p02TestTuple over exact message/signature",
+    "all earlier tuples mismatch",
+    "single preserved tuple passes existing independent capsule/key/domain check"
+  ],
+  "fingerprints": "Existing p02TestHash full closed input bytes/typed records, pointer addresses excluded; before/after",
+  "mutationPurpose": "Removing the new guard restores the actually observed R1 late SIGNATURE outcome and fails the exact new assertion; no mutant executed here",
+  "actualGoResult": null,
+  "actualUniqueInputHashes": null,
+  "actualAuthentication": false
+}

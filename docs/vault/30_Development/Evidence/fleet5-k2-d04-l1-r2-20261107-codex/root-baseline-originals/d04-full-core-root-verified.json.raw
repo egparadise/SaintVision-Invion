@@ -1,0 +1,79 @@
+{
+  "atKST": "2026-11-07T06:10:23+09:00",
+  "source": "08e0f56eabe7d46518e17b8c3d6d7e296df880ac",
+  "branch": "agent/codex/fleet5-k2-d04-internal-codec-r1-20261107",
+  "Core": 42287980945,
+  "correlation": "fleet5-d04-core-979bfa0f2a554833b5134ec37eaceddd",
+  "exactHeadRefEventPathAttemptSuccess": true,
+  "jobs": [
+    {
+      "id": 128133671917,
+      "name": "s01-storage-roundtrip",
+      "steps": 16,
+      "conclusion": "success"
+    },
+    {
+      "id": 128133672409,
+      "name": "core",
+      "steps": 48,
+      "conclusion": "success"
+    }
+  ],
+  "allRequiredStepsSuccess": true,
+  "intentionalOptionalSkippedSteps": [
+    "FLEET5 early native Go peer-policy lifecycle proof",
+    "Publish FLEET5 native peer-phase proof (including expected baseline failure)",
+    "FLEET5 fixed native Go two-cycle proof",
+    "Publish FLEET5 fixed native proof",
+    "Collect fixed-SHA S08 build acceptance observations",
+    "Recompute S08 build acceptance verdict from raw artifacts"
+  ],
+  "JUnit": [
+    {
+      "name": "pytest",
+      "tests": 9358,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 46
+    }
+  ],
+  "Go": [
+    {
+      "path": "node-unit.jsonl",
+      "topLevelPass": 141,
+      "subtestPass": 504,
+      "skips": [
+        "github.com/egparadise/SaintVision-Invion/services/node-agent/cmd/inv-discover",
+        "TestDockerLiveCompatibility",
+        "github.com/egparadise/SaintVision-Invion/services/node-agent/tests/probe",
+        "github.com/egparadise/SaintVision-Invion/services/node-agent/transfer"
+      ],
+      "P02TopLevelPass": 12,
+      "P02SubtestPass": 99,
+      "SHA256": "a29524fd5595e62a187719f4685ed28363b680dd2d55e18251ff6ab6e56a922e"
+    }
+  ],
+  "artifacts": [
+    {
+      "id": 13540867798,
+      "name": "saintvision-core-evidence",
+      "zipBytes": 14024255,
+      "zipSHA256": "sha256:149032bc78c13d590b1e73878cdb332a18b8466f8b090e18a3665423cd7e4735",
+      "files": 35,
+      "uncompressedBytes": 26721034,
+      "verifiedExactSourceRun": true
+    },
+    {
+      "id": 13537144624,
+      "name": "saintvision-s01-storage-evidence-42287980945",
+      "zipBytes": 1771,
+      "zipSHA256": "sha256:86c80a449b68201cf72548e7f9a427c9036e57fcc5e3be1da5554e32936eef7a",
+      "files": 5,
+      "uncompressedBytes": 1857,
+      "verifiedExactSourceRun": true
+    }
+  ],
+  "actualFullCoreSourceAxis": "SUCCESS_WITH_EXPLICIT_DECLARED_SKIPS",
+  "codeReviewOrRuntimeAcceptanceInferred": false,
+  "wholeProgramComplete": false
+}

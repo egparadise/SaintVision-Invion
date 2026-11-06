@@ -1,0 +1,205 @@
+{
+  "classification": "EXACT_WIP_INPUT_BYTES_NO_RUNTIME_AUTHORITY",
+  "baseSHA": "08e0f56eabe7d46518e17b8c3d6d7e296df880ac",
+  "files": [
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-d04-l1-r2-20261107-codex/.gitattributes",
+      "mode": "100644",
+      "bytes": 166,
+      "SHA256": "6f53d0ef5edad5ee5e7b93e1013750051a6b150ef9921d14ce0fa0f96c7e6527"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-d04-l1-r2-20261107-codex/complete-source.patch",
+      "mode": "100644",
+      "bytes": 8931,
+      "SHA256": "23d029e48e67eca52fd224ed76bac3231c6db96d9d6d83b495a4f3932e99e790"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-d04-l1-r2-20261107-codex/new-test-input-plan.json",
+      "mode": "100644",
+      "bytes": 1933,
+      "SHA256": "4a2349cc3c7f1136aa854a355b769bffeaac202e955f3cd41a7ea43e7cde8cd8"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-d04-l1-r2-20261107-codex/review-original-index.json",
+      "mode": "100644",
+      "bytes": 6180,
+      "SHA256": "6b8fddb8a06e052722622c761d63c450e15179c2b2cf247da5fd9481d7d85505"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-d04-l1-r2-20261107-codex/review-originals/00-.gitattributes.raw",
+      "mode": "100644",
+      "bytes": 21,
+      "SHA256": "96a83569c84cfe3f57b7efe3dc61c249548d0fca4fed0e538b3587cdc97c95c1"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-d04-l1-r2-20261107-codex/review-originals/01-canonical-sync-check-before.txt.raw",
+      "mode": "100644",
+      "bytes": 895,
+      "SHA256": "4f3572e35b67c444cdc077db0e05856eab41732dcc7a6b4d1a2643159a40d9ff"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-d04-l1-r2-20261107-codex/review-originals/02-commands.json.raw",
+      "mode": "100644",
+      "bytes": 5587,
+      "SHA256": "85507ad26d35c4f73766216bbcd36b212133d96de6bd3b7a1dec6bf42bb17fb6"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-d04-l1-r2-20261107-codex/review-originals/03-local-doc-gates.txt.raw",
+      "mode": "100644",
+      "bytes": 3765,
+      "SHA256": "8e3bdc530b4b7c5e9437c9188f73008e8620c75b10f83b2f73b323723d82f4aa"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-d04-l1-r2-20261107-codex/review-originals/04-optional_probe_signature_table_bound_test.go.txt.raw",
+      "mode": "100644",
+      "bytes": 1588,
+      "SHA256": "412fd1ed587a0e4786275ac8a56aca32d20ea853bfb59f6835b228cdb0da0beb"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-d04-l1-r2-20261107-codex/review-originals/05-review.json.raw",
+      "mode": "100644",
+      "bytes": 15738,
+      "SHA256": "2f855caacdf0da3b1550780d20baed58781b01e205dd497d6d5beccf81dafa6d"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-d04-l1-r2-20261107-codex/review-originals/06-reviewer-schema-compare-result.json.raw",
+      "mode": "100644",
+      "bytes": 993,
+      "SHA256": "babc30d872b60bf4331d4325612fc859b37127f203b6bd28aede0874fc35891c"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-d04-l1-r2-20261107-codex/review-originals/07-reviewer-stage-reasons-result.json.raw",
+      "mode": "100644",
+      "bytes": 2948,
+      "SHA256": "b7bb724b649ca2a5f366af4b51e444145b6baa19e10341c6456e2982fdd1846b"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-d04-l1-r2-20261107-codex/review-originals/08-reviewer_gate_driver.py.txt.raw",
+      "mode": "100644",
+      "bytes": 2464,
+      "SHA256": "f7221fa64434cc2a4a7cedc23641733a9b471455db18e05fee0bd70fc208c19f"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-d04-l1-r2-20261107-codex/review-originals/09-reviewer_schema_compare.py.txt.raw",
+      "mode": "100644",
+      "bytes": 7691,
+      "SHA256": "bc6b54f34fe62c6caf9d21a3de11aad14b3e9ce20dcaf1bd1c6b745890a2d8d1"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-d04-l1-r2-20261107-codex/review-originals/10-reviewer_stage_reasons.py.txt.raw",
+      "mode": "100644",
+      "bytes": 2098,
+      "SHA256": "85edbcfc710b9254cea7b5feca31d038a65341c5ea0b34e67267bbd0ee88d428"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-d04-l1-r2-20261107-codex/review-originals/11-2026-11-07_06-05-00_KST_FLEET5_K2_D04_08e0_\ucf54\ub4dc\ub3c5\ub9bd\uac80\ud1a0_Claude.md.raw",
+      "mode": "100644",
+      "bytes": 9420,
+      "SHA256": "5ec616fc2dfb62d3a32f9ad4d02da1a29d585342a5efb1e5c2253ddadf9c7feb"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-d04-l1-r2-20261107-codex/root-baseline-original-index.json",
+      "mode": "100644",
+      "bytes": 1934,
+      "SHA256": "a909cac6f9c11984e07d3788c4af74268f4131c84210e9990f7530f710ea59d9"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-d04-l1-r2-20261107-codex/root-baseline-originals/d04-bound-probe-root-proof.json.raw",
+      "mode": "100644",
+      "bytes": 2937,
+      "SHA256": "d4759efb4336400e4241a85b1865f0ee212acb66d692de76ac21321379a641e1"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-d04-l1-r2-20261107-codex/root-baseline-originals/d04-core-built-binaries-root-verified.json.raw",
+      "mode": "100644",
+      "bytes": 915,
+      "SHA256": "d782c0d4b631915cd947d95803c533c31d9867c315626b75e02d917714453e78"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-d04-l1-r2-20261107-codex/root-baseline-originals/d04-full-core-root-verified.json.raw",
+      "mode": "100644",
+      "bytes": 2551,
+      "SHA256": "e07e9acdad2a5b8ad1bad03f692c3d78d1a07383af5249796120391aa15432ce"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-d04-l1-r2-20261107-codex/root-isolated-command-proposal.json",
+      "mode": "100644",
+      "bytes": 4598,
+      "SHA256": "560565f49d2b34b2199dd1e692a399f6ceafc4d5ba493f0c6deda8acf9bd267c"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-d04-l1-r2-20261107-codex/source-frozen/README.md",
+      "mode": "100644",
+      "bytes": 18421,
+      "SHA256": "a7199f4396a0d65c40b3c4484a75e3e6fec67ef91e641787735fce44d77eca33"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-d04-l1-r2-20261107-codex/source-frozen/p02_evaluate_internal.go",
+      "mode": "100644",
+      "bytes": 25679,
+      "SHA256": "2f29f521ffe358411baaa3d365f80f757c2be6df14043abdae787802a275b5c9"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-d04-l1-r2-20261107-codex/source-frozen/p02_signature_table_bound_test.go",
+      "mode": "100644",
+      "bytes": 2921,
+      "SHA256": "97d0c59b2978f2d086a310257b93057ef6d65def990d0f6f4a47bcaabd4c49bd"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-d04-l1-r2-20261107-codex/source-preimages/README.md.raw",
+      "mode": "100644",
+      "bytes": 16154,
+      "SHA256": "ad26172075ab9200ef45502b5728bc79dc5cd9efb583269c0db18df7a65b1ec9"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-d04-l1-r2-20261107-codex/source-preimages/p02_evaluate_internal.go.raw",
+      "mode": "100644",
+      "bytes": 25538,
+      "SHA256": "35de87be6a8fba9a34cc71d4ea77f231f312bd3d6d6ef5ac8f72e4a1e36fa398"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-d04-l1-r2-20261107-codex/start-context.json",
+      "mode": "100644",
+      "bytes": 3155,
+      "SHA256": "fd72175f53ac617a5b108eac321da205d37349f5b7beef5ad1b40e2938b398ee"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-d04-l1-r2-20261107-codex/wip-source-manifest.json",
+      "mode": "100644",
+      "bytes": 2835,
+      "SHA256": "5afa70f35b09cfceff23f2b9d9a0b93b11e14485a9cca1bdd56b13b2024977e1"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-d04-l1-r2-20261107-codex/wip-static-inspection.json",
+      "mode": "100644",
+      "bytes": 1393,
+      "SHA256": "60cc7185bd081d5adbab832e8205c31e5afaebdf5fccf188aa33ec27684232d9"
+    },
+    {
+      "path": "docs/vault/30_Development/History/2026-11-07_FLEET5_K2_D04_L1_R2_Codex.md",
+      "mode": "100644",
+      "bytes": 6801,
+      "SHA256": "939c4c993169ac164c0162a61a3a96a510acabae948a329b08d00c23be623676"
+    },
+    {
+      "path": "services/node-agent/internal/migrationcontext/README.md",
+      "mode": "100644",
+      "bytes": 18421,
+      "SHA256": "a7199f4396a0d65c40b3c4484a75e3e6fec67ef91e641787735fce44d77eca33"
+    },
+    {
+      "path": "services/node-agent/internal/migrationcontext/p02_evaluate_internal.go",
+      "mode": "100644",
+      "bytes": 25679,
+      "SHA256": "2f29f521ffe358411baaa3d365f80f757c2be6df14043abdae787802a275b5c9"
+    },
+    {
+      "path": "services/node-agent/internal/migrationcontext/p02_signature_table_bound_test.go",
+      "mode": "100644",
+      "bytes": 2921,
+      "SHA256": "97d0c59b2978f2d086a310257b93057ef6d65def990d0f6f4a47bcaabd4c49bd"
+    }
+  ],
+  "excludedSelf": true
+}

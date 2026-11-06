@@ -1,0 +1,8 @@
+review-originals/** -text -diff
+root-baseline-originals/** -text -diff
+source-frozen/** -text -diff
+source-preimages/** -text -diff
+complete-source.patch -text -diff
+root-r2-execution-originals/** -text -diff
+gate-raw/** -text -diff
+post-test-readme-status-only.diff -text -diff

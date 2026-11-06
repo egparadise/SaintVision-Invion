@@ -1,0 +1,18 @@
+--- tested-WIP-README-a7199f43
++++ publication-README-status-only
+@@ -190,8 +190,13 @@
+ refusal at `04_SIGNATURE`; that probe's command PASS was not contract PASS.
+ The new16/17boundary regression preserves the matching tuple and fingerprints;
+ its17tuple allocation check measures repeated evaluation of the same input.
+-R2 Go tests, R2 source gates, R2 Docs/Core and independent delta CODE review are
+-NOT_RUN at this WIP checkpoint. R1 results do not validate changed R2 bytes.
++Root's actual R2 receipt at2026-11-07T06:33:57+09:00 records25top-level/
++230subtests,0fail/0skip,92P02_CASE rows/90distinct complete input fingerprints;
++17tuples refuse at the exact first stage with an empty prefix and0allocations.
++Both Go files are byte-exact to that tested source; this README evidence-status
++update follows the tests. The immutable WIP snapshot retains its earlier NOT_RUN
++status. R2 Docs/Core and independent delta CODE review remain PENDING until
++actually observed. See the unique R2 root-r2-execution-original-index.json receipt.
+ Gofmt parsing is not compilation, type-checking, a passing source gate or tests.
+ 
+ It adds a bounded lexical JSON codec with exact round-trip, fixed generated

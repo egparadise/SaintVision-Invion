@@ -1,0 +1,162 @@
+---
+doc_id: "HISTORY-FLEET5-20261107-K2-D04-08E0-CODE-REVIEW-CLAUDE"
+title: "2026-11-07 FLEET5 K2 D04 08e0 내부 코드 독립 검토"
+version: "1.0.0"
+status: "review"
+author: "Claude"
+reviewer: "Codex"
+audience: "agent"
+updated: "2026-11-07T06:05:00+09:00"
+timezone: "Asia/Seoul"
+source_of_truth: "Git"
+base_sha: "08e0f56eabe7d46518e17b8c3d6d7e296df880ac"
+task_ids: ["FLEET5-K2-D04-INTERNAL-CODEC-R1-20261107"]
+tags: ["fleet5", "independent-review", "k2", "d04", "code-review", "claude"]
+---
+
+# K2 D04 08e0 내부 코드 독립 검토
+
+Orca `task_6d952cac2c9f` / dispatch `ctx_1ddcf22e6a4c`에서 한 실제 독립 CODE 검토 1건이다. 대상은 pure INTERNAL D04 구현이다.
+
+- 작성자: Codex `task_a95ef3d8ccce / ctx_ed23b4a777d0`
+- Root 구현 grant: `msg_ccd8401cb2c5`
+- Root 게시 grant: `msg_3cf791b73706`
+
+## 시작 조건과 대상
+
+- **시작 조건**: 앞선 B9g 검토(`task_6e4ff78a4444 / ctx_b48554022c90`)는 `90cccfb3`에서 ACCEPT였다. 시작 시점에 succeeded / settled / exited / released였다.
+  - 근거: Root `.work/b9g-reviewer-before-d04-start.json`
+  - Root 보드 481(`b112b324`)과 482(`da4f07eb`)를 읽었다.
+- **작업 공간**: 같은 managed worktree를 재사용했다. branch는 정확한 `08e0`에서 새로 만들었다.
+- **대상**: `08e0f56e`. 직접 base는 `84ee9b1b`다.
+  - 변경 14개: production 7개 추가, test 5개 추가, `README.md`와 `effect_gate_test.go` 수정
+  - 14개 blob의 SHA256이 Root 목록과 같은지 검토자가 직접 확인했다.
+- **기준**: 설계 기준은 승인된 P02 Rev3 `84ee`와 실제 설계 검토 `6fa4`다. `6fa4`는 DESIGN만 승인했다. 이번이 첫 CODE 검토다.
+
+## Root 증거(재실행하지 않음)
+
+- PC3 실제 Go 실행: 23 top-level / 228 subtest, exit 0
+  - 90 P02_CASE / 88 distinct input
+  - source hash before = after
+- 게시 manifest와 Docs `42287667048`
+- 이것들은 Root의 귀속 증거다. 검토자가 다시 돌리지 않았다.
+
+## Core 상태: PENDING
+
+- Core는 `42287980945`다. Root raw 관측 시각은 05:51:58 KST다.
+  - S01은 success다.
+  - core job은 in_progress다. pytest 실행 중이고 `go test ./...`는 pending이다.
+- step 7~10 optional proof는 skipped다. optional 입력을 false로 둔 Root 설계에 따른 것이며 통과로 세지 않는다.
+- 이 판정은 Core 결과에 기대지 않는다.
+
+**판정: INTERNAL_CODE_ACCEPT (좁은 범위).**
+
+- LOW 1건(D04-L1)은 비차단이다. 다음 code cut에서 고친다.
+- INFO 4건이 있다. HIGH/MEDIUM은 없다.
+- 검토자가 찾은 차이는 모두 양쪽(설계·코드) 다 거부하는 경우다. 수용 경로가 설계와 다른 곳은 없다.
+- 상세: `docs/vault/30_Development/Evidence/fleet5-k2-d04-08e0-code-review-20261107-claude/review.json`
+
+## 발견 사항
+
+### D04-L1 (LOW, 비차단): signature tuple table 크기 거부의 단계·원인 위치
+
+이 발견은 control flow를 정적으로 읽어 얻은 것이다. 실행하지 않았다.
+
+- **코드 위치**
+  - `p02_evaluate_internal.go:263`은 `len(signatures) <= 16`을 04_SIGNATURE 안에서 검사한다(`SIGNATURE / bounded-signature-tuple-table`).
+  - 사전 budget(`p02_inputs_internal.go:1067`)은 4096개 초과만 거부한다.
+- **승인된 설계**: `candidate_model.py:173`은 이 검사를 `_anchor`에 둔다. 결과는 `OWNERSHIP / 01_ANCHOR / immutable-signature-table`이고 통과 prefix는 비어 있다.
+  - Root grant는 "정확한 STAGES/first-reason 순서"를 요구했다.
+- **재현 사례**: benign C01에 tuple 16개를 더한다(총 17개).
+  - 설계: 01에서 거부된다.
+  - `08e0`: 01_ANCHOR~03_C2를 통과한 뒤 04_SIGNATURE에서 거부된다.
+  - 17~4096개는 모두 같다.
+- **영향**: 양쪽 다 fail-closed다. public refusal은 같은 상수다. 다른 것은 private 원인/단계와 앞선 prefix뿐이다. 17개 이상을 다루는 test가 없어서 놓쳤다.
+- **최소 수정**:
+  - 동결(freeze) 전에 `> 16`을 `OWNERSHIP / 01_ANCHOR / immutable-signature-table`로 거부한다.
+  - 17개 test(빈 prefix)와 16개 control을 추가한다.
+- **선택 probe**: `optional_probe_signature_table_bound_test.go.txt`
+  - inert DATA이고 NOT_RUN이다. 판정에는 필요 없다.
+
+### INFO
+
+- **D04-I1**: 02_SOURCES에서 source가 여러 개 빠졌을 때 거부 순서가 설계와 다르다.
+  - ticket이 있고 clock과 H5가 모두 없으면, Go는 TIME이고 설계는 INSTALLATION이다.
+  - budget(OWNERSHIP)이 nil-capsule(ANCHOR)보다 먼저 거부한다. 둘 다 01이다.
+  - 하나만 빠진 경우는 같다.
+- **D04-I2**: Go가 설계보다 엄격한 곳들이다. 모두 fail-closed다.
+  - lifecycle floor > 0
+  - 각 시각의 epoch domain
+  - ticket id, raw evidence, artifact가 비어 있지 않아야 한다.
+  - readback은 결합된 구조화 token이다.
+  - raw H3-EA digest를 byte에서 직접 계산한다.
+  - C2는 ASCII만 허용한다. schema 후에는 설계와 같다.
+  - floor 0처럼 설계가 받는 입력을 거부할 수 있다. 다음 contract delta에 명시해야 한다.
+- **D04-I3**: `README.md:175-176`에 "Go tests NOT_RUN"(WIP 시점) 문장이 남아 있다.
+  - Root는 이미 23/228을 실제로 실행했다.
+  - 게시 cut이 14개 byte를 동결해서 못 고쳤다. 다음 code cut에서 갱신한다.
+- **D04-I4**: P02R3-I1의 정밀화다.
+  - typed capsule의 expectation 'a'/'o'는 내용을 담지 않는다.
+  - 그래서 비어 있지 않은 배열/객체 기대값은 raw와 typed 불일치가 되어 01에서 거부된다.
+  - 빈 `[]`/`{}`, int/bool/null, 빈 문자열, 129 byte는 05에서 거부된다.
+
+## 확인한 것(발견 없음)
+
+- **codec**
+  - budget은 parser 할당과 copy보다 먼저 검사한다.
+  - depth 32, node 100000(key 포함)이다.
+  - printable ASCII만 허용한다. 따라서 BOM, 제어문자, non-ASCII, invalid UTF-8, surrogate는 거부된다.
+  - escape와 key alias는 정확한 round-trip에서 거부된다.
+  - key는 엄격히 증가해야 한다. 따라서 중복과 비정렬은 거부된다.
+  - safe integer 범위이고 `-0`, 선행 0, 소수, 지수는 거부된다. bool과 int는 구별된다.
+  - C2는 `& < >`를 소문자 `\u00XX`로 escape한다.
+  - `encoding/json`, callback, interface, 새 의존성은 없다.
+- **schema**: 검토자 비교기(`reviewer_schema_compare.py.txt`)로 확인했다.
+  - generated validator 168개를 Rev2 schema 3개와 구조 비교했다. 296 node에서 차이는 0이다.
+  - seeded mutant 2개를 검출해서 비교기가 공허하지 않음을 보였다.
+  - 50개 object 모두 required == properties이다.
+  - pattern id 0은 `validSelector`이고 regex와 같다.
+- **stage-reason**: 20개 stage method의 reason이 모두 설계 STAGES 허용 집합 안에 있다. reason ID는 14개다.
+- **join**: `_anchor`~`_readback`을 하나씩 대조했다. D04-L1/I1/I2를 빼면 같다.
+  - exact tuple: domain + NUL + body/signer, signature, key, context, version, request binding. body-only와 digest-only는 거부된다.
+  - 독립 ORIGINAL review set과 bijection outcome
+  - 완전한 순서 partition
+  - publication은 outcome ∪ original ∪ part 어디에도 없어야 한다. source SHA와 같은 것은 허용된다(I2).
+  - CI: H3 record와 같아야 한다(ref/event/workflow/correlation/attempt 결합). required/optional은 겹치지 않고 실제 step과 정확히 bijection이다.
+  - H3 receipt/lock/link와 H5 running을 서로 대체하지 않는다.
+- **projection**
+  - policyData 41 leaf가 모두 채워진다.
+  - Provenance receipt/lock/link는 H3, RunningExecutable과 runningData 5개는 H5에서 온다.
+  - Verifier artifact는 executable이고, ArtifactDigest는 zip이다.
+  - 시각은 `time.Unix(n,0).UTC()`이다.
+  - 반환값은 소유된 copy다.
+- **경계**
+  - non-test caller가 없다.
+  - InstalledPolicy, History, binding을 만들지 않는다.
+  - effect whitelist에는 `time.Unix`와 `time.Time.UTC` 두 개만 추가됐다. alias와 거부 회귀 test가 있다.
+  - K1 파일은 바뀌지 않았다.
+
+## 유지되는 HOLD
+
+- 실제 H1~H7, H3-EA, expected verdict custody는 NULL/HOLD다. tuple table은 DATA일 뿐이다.
+- RD registration은 Root HOLD다.
+- raw7은 UNREGISTERED, A01~A40은 NOT_RUN이다. K2, fleet, global100은 INCOMPLETE다.
+- 다음은 하나도 부여하지 않았다: factory, producer, issuer, port, loader, current view, clock, installer, effect, Engine, K1 변경, public Service hook.
+
+## 다음 첫 행동 / 담당
+
+- **Root**
+  - 이 검토 commit과 exact Docs를 확인한다.
+  - Core `42287980945`의 최종 job/step/skip을 관측해서 보존한다.
+- **작성자**: Root가 승인하는 다음 code cut에서 D04-L1을 고친다. I1/I3는 선택이다. 그 delta에는 새 실제 실행과 검토가 필요하다.
+- **검토자**: 스스로 승인하지 않는다.
+
+## 증거 귀속과 한계
+
+- 검토자는 다음 두 가지만 했다.
+  - 정적 코드 읽기
+  - bounded offline Python: 구조 비교와 stage-reason 표. byte를 확인한 `08e0` blob scratch 사본을 썼다.
+- Go compile/test, Core, Node, browser, remote, host, SSH, Docker, PG, PKI, clock, process 작업은 하지 않았다.
+- D04-L1/I1은 정적 관찰이다.
+- Root PC3 결과는 Root 증거다. owner test와 generator는 실행하지 않았다.
+- 범위는 INTERNAL_CODE뿐이다. full CI, 통합, runtime, 인증, fleet 수용과는 별개다.

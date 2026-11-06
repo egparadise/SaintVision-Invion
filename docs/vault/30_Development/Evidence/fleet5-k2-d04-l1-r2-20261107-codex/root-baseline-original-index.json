@@ -1,0 +1,43 @@
+{
+  "classification": "ATTRIBUTED_ACTUAL_R1_ROOT_PROOFS_NOT_RERUN",
+  "source": "08e0f56eabe7d46518e17b8c3d6d7e296df880ac",
+  "observedAtKST": "2026-11-07T06:25:01.002820+09:00",
+  "files": [
+    {
+      "source": "D:\\Project\\SaintVisionI-Invion\\fleet-five-orchestration-20261105\\.work\\d04-bound-probe-root-proof.json",
+      "copiedAs": "root-baseline-originals/d04-bound-probe-root-proof.json.raw",
+      "bytes": 2937,
+      "SHA256": "d4759efb4336400e4241a85b1865f0ee212acb66d692de76ac21321379a641e1",
+      "actualExecutor": "Root, not Codex worker",
+      "R2Validation": false
+    },
+    {
+      "source": "D:\\Project\\SaintVisionI-Invion\\fleet-five-orchestration-20261105\\.work\\d04-full-core-root-verified.json",
+      "copiedAs": "root-baseline-originals/d04-full-core-root-verified.json.raw",
+      "bytes": 2551,
+      "SHA256": "e07e9acdad2a5b8ad1bad03f692c3d78d1a07383af5249796120391aa15432ce",
+      "actualExecutor": "Root, not Codex worker",
+      "R2Validation": false
+    },
+    {
+      "source": "D:\\Project\\SaintVisionI-Invion\\fleet-five-orchestration-20261105\\.work\\d04-core-built-binaries-root-verified.json",
+      "copiedAs": "root-baseline-originals/d04-core-built-binaries-root-verified.json.raw",
+      "bytes": 915,
+      "SHA256": "d782c0d4b631915cd947d95803c533c31d9867c315626b75e02d917714453e78",
+      "actualExecutor": "Root, not Codex worker",
+      "R2Validation": false
+    },
+    {
+      "source": "D:\\Project\\SaintVisionI-Invion\\fleet-five-orchestration-20261105\\.work\\d04-bound-probe-source-setup-root-proof.json",
+      "copiedAs": null,
+      "bytes": 2751,
+      "SHA256": "6bb1f228ed07d8685f7df0c0bc7e0b87f87f65ca52389f031da133f74c2d8190",
+      "referenceOnly": true,
+      "reason": "Setup-only original read; no setup or remote command executed by worker"
+    }
+  ],
+  "R2Go": "NOT_RUN",
+  "R2CI": "NOT_RUN",
+  "actualProducer": null,
+  "actualBindings": "NULL_HOLD"
+}

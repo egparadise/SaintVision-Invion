@@ -172,9 +172,31 @@ with the future archive. No new producer, wire, current view or effect grant.
 
 The NEW private `p02_*_internal.go` seam implements the bounded P02 Rev3
 consistency contract accepted in review `6fa4c644` of design `84ee9b1b`.
-This candidate code has not yet received independent CODE review. At this WIP
-checkpoint its Go tests are NOT_RUN: the main host had only268004KiB free memory;
-Root's already-authorized isolated CPU execution phase is the next dependency.
+The published R1 source is `08e0f56eabe7d46518e17b8c3d6d7e296df880ac`.
+Root's actual isolated Go1.27.1 run passed23top-level/228subtests, with0fail/0skip
+and unchanged source before/after. Its exact Docs42287667048 and hosted
+Core42287980945 succeeded. Core's required jobs/steps succeeded; its declared
+optional skips remain explicit in the attributed Root receipt. Actual independent
+Claude CODE review `879aea64e6896d6014f1b10d4ab63fda0de6073c` returned narrow
+`INTERNAL_CODE_ACCEPT`, with nonblocking Low D04-L1 and INFO I1-I4. That review's
+earlier Core-pending observation and the earlier WIP NOT_RUN checkpoint remain
+unchanged historical facts in their original Git/Evidence.
+
+The separate R2 change (Root `msg_d42e405d8bd0`) rejects more than16signature
+tuples BEFORE the general snapshot budget and deep freeze: exact private
+`OWNERSHIP` / `01_ANCHOR` / `immutable-signature-table`, with an empty passed
+prefix. The later exact tuple/context check and independent general budgets stay
+unchanged. Root's unchanged observational probe actually reproduced R1's17tuple
+refusal at `04_SIGNATURE`; that probe's command PASS was not contract PASS.
+The new16/17boundary regression preserves the matching tuple and fingerprints;
+its17tuple allocation check measures repeated evaluation of the same input.
+Root's actual R2 receipt at2026-11-07T06:33:57+09:00 records25top-level/
+230subtests,0fail/0skip,92P02_CASE rows/90distinct complete input fingerprints;
+17tuples refuse at the exact first stage with an empty prefix and0allocations.
+Both Go files are byte-exact to that tested source; this README evidence-status
+update follows the tests. The immutable WIP snapshot retains its earlier NOT_RUN
+status. R2 Docs/Core and independent delta CODE review remain PENDING until
+actually observed. See the unique R2 root-r2-execution-original-index.json receipt.
 Gofmt parsing is not compilation, type-checking, a passing source gate or tests.
 
 It adds a bounded lexical JSON codec with exact round-trip, fixed generated
@@ -197,11 +219,25 @@ All actual producers/anchors/custody/H1-H7/H3-EA remain NULL/HOLD.
 
 Effective verdict is checked against the private capsule exact expected literal
 at05_REVIEWS; no accepted literal is defaulted. The printable-ASCII capsule codec
-is at01_ANCHOR (actual Rev3 INFO I1), so present control/non-ASCII values refuse
-there. Printable type/empty/128byte bounds and mismatches are checked at05.
+is at01_ANCHOR (design-review INFO I1), so present control/non-ASCII values refuse
+there. Empty array/object expectations and integer/bool/null/empty-string/129byte
+expectations can reach05; nonempty array/object contents cannot be represented
+by the private expectation and fail the raw/typed capsule equality at01 (CODE
+review INFO I4). Printable bounds and literal mismatches are checked at05.
 Effective publication differs from every independently bound original/part review
 identity, including unused originals; equality with the SOURCE SHA is not itself
-a refusal (actual INFO I2). Original targets/scopes/verdicts are preserved.
+a refusal (design-review INFO I2). Original targets/scopes/verdicts are preserved.
+
+CODE-review INFO I1 remains: when both H5 and clock are missing with a present
+ticket, Go reports TIME before the design's INSTALLATION. The general snapshot
+budget also precedes a missing-capsule refusal. R2 changes neither multi-missing
+source order nor that independent general budget. CODE-review INFO I2 records
+additional Go-only fail-closed predicates: positive floor; clock/lifecycle/ticket/
+H5 integer domains; nonempty ticket ID, H5/coverage evidence and artifact; full
+subject-bound readback tokens; Root-choice digest over actual supplied bytes;
+and the C2 printable-ASCII check after schema validation. These are explicit
+precision limits, not a claim of complete design/Go diagnostic equivalence.
+R2 updates the current README (CODE-review INFO I3) without rewriting old reports.
 
 Eight component hashes derive from the exact checked payload/C2/raw component
 bytes. Exact CI run metadata and independently required/optional steps, review

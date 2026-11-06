@@ -1,0 +1,31 @@
+{
+  "classification": "STATIC_SYNTAX_SCOPE_ONLY_NOT_GO_TEST_EVIDENCE",
+  "atKST": "2026-11-07T06:26:43.768133+09:00",
+  "gofmtWriteExit": 0,
+  "gofmtListExit": 0,
+  "gofmtListOutputEmpty": true,
+  "trackedWhitespaceExit": 0,
+  "patchNumstatExit": 0,
+  "patchNumstat": "37\t6\tservices/node-agent/internal/migrationcontext/README.md\n3\t0\tservices/node-agent/internal/migrationcontext/p02_evaluate_internal.go\n74\t0\tservices/node-agent/internal/migrationcontext/p02_signature_table_bound_test.go\n",
+  "trackedModified": [
+    "services/node-agent/internal/migrationcontext/README.md",
+    "services/node-agent/internal/migrationcontext/p02_evaluate_internal.go"
+  ],
+  "newSourceOnly": "services/node-agent/internal/migrationcontext/p02_signature_table_bound_test.go",
+  "onlyHistoryEvidenceUntrackedOtherwise": true,
+  "parentR1Ref": "08e0f56eabe7d46518e17b8c3d6d7e296df880ac",
+  "parentHistoryEvidenceUntouched": true,
+  "changedProductionLines": 3,
+  "newTestTopLevel": 1,
+  "newTestSubtestsPlanned": 2,
+  "newTypesProduction": 0,
+  "generalBudgetAndFreezeAndLaterSignatureCheck": "UNCHANGED",
+  "p02InputsFile": "UNCHANGED",
+  "READMEInfoI1I2I4": "PRECISE_LIMITS_NOT_FIXED",
+  "READMEInfoI3": "CURRENT_BASELINE_PRECISION_UPDATED",
+  "GoCompile": "NOT_RUN",
+  "GoTests": "NOT_RUN",
+  "sourceEffectCensus": "NOT_RUN",
+  "DocsCore": "NOT_RUN",
+  "publication": "NOT_RUN_NOT_GRANTED_YET"
+}

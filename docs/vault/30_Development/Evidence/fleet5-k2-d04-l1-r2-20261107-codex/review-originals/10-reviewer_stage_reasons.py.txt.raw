@@ -1,0 +1,24 @@
+"""Static: each Go stage method's refusal reasons vs design STAGES allowed reasons. argv: evaluate.go projection.go out.json"""
+import re, sys, json, hashlib
+ev = open(sys.argv[1], encoding='utf-8').read(); pj = open(sys.argv[2], encoding='utf-8').read()
+allowed = {'01_ANCHOR': {'ANCHOR', 'OWNERSHIP'}, '02_SOURCES': {'PROVENANCE', 'CI', 'STATUS', 'TIME', 'INSTALLATION', 'OWNERSHIP'},
+           '03_ENVELOPE': {'FORMAT'}, '03_PAYLOAD': {'FORMAT'}, '03_C2': {'FORMAT'}, '04_SIGNATURE': {'SCOPE', 'SIGNATURE'},
+           '04_KEY_INTERVAL': {'TIME'}, '05_PAYLOAD_JOINS': {'PROVENANCE'}, '05_COMPONENTS': {'PROVENANCE'}, '05_REVIEWS': {'PROVENANCE'},
+           '05_SOURCE': {'PROVENANCE'}, '05_CI': {'CI'}, '05_ARTIFACT': {'ARTIFACT'}, '05_RUNNING': {'INSTALLATION'}, '06_STATUS': {'STATUS'},
+           '06_VERSION': {'VERSION'}, '06_REPLAY': {'REPLAY'}, '06_TIME': {'TIME'}, '06_READBACK': {'READBACK'}, '07_PROJECTION': {'PROVENANCE', 'CI', 'INSTALLATION'}}
+stages = re.search(r'return \[\]string\{([^}]*)\}', ev).group(1).replace('"', '').replace(' ', '').split(',')
+order = re.findall(r'case (\d+):\n\t\t\tok = c\.(\w+)\(\)', ev)
+src = ev + pj
+out = {'evaluateSHA256': hashlib.sha256(open(sys.argv[1], 'rb').read()).hexdigest(), 'projectionSHA256': hashlib.sha256(open(sys.argv[2], 'rb').read()).hexdigest(), 'stages': [], 'violations': []}
+assert stages == list(allowed), stages
+for idx, meth in order:
+    body = re.search(r'func \(c \*p02Context\) ' + meth + r'\(\) bool \{\n(.*?)\n\}\n', src, re.S).group(1)
+    reasons = sorted(set(re.findall(r'"([A-Z]+)", "[^"]+"\)', body)))
+    st = stages[int(idx)]
+    bad = [r for r in reasons if r not in allowed[st]]
+    out['stages'].append({'stage': st, 'method': meth, 'reasons': reasons, 'outsideAllowed': bad})
+    if bad: out['violations'].append([st, meth, bad])
+pre = re.search(r'return p02Result\{reason: "([A-Z]+)", stage: "([0-9A-Z_]+)"', ev)
+out['preStageBudget'] = [pre.group(1), pre.group(2), pre.group(1) in allowed[pre.group(2)]]
+json.dump(out, open(sys.argv[3], 'w', encoding='utf-8'), indent=1)
+print(json.dumps(out, indent=1))

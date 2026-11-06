@@ -1,0 +1,36 @@
+from pathlib import Path
+import datetime,hashlib,json,os,subprocess,sys
+root=Path.cwd()
+e=root/'docs/vault/30_Development/Evidence/fleet5-k2-d04-l1-r2-20261107-codex'
+rawdir=e/'gate-raw'
+rawdir.mkdir(exist_ok=True)
+state=Path('D:/Project/SaintVision-Invion/SaintVisionI-Invion/.git/obsidian-sync-state.json')
+commands=[['tools/check_docs.py'],['tools/check_ontology_generation.py'],['tools/check_ontology.py'],['tools/check_contract_bindings.py'],['tools/check_frontend_integrity.py'],['tools/check_doc_path_citations.py','--ratchet','--base-ref','08e0f56eabe7d46518e17b8c3d6d7e296df880ac'],['tools/check_doc_single_source.py','--ratchet'],['tools/check_response_freshness.py'],['tools/test_sync.py'],['tools/build_docs.py'],['tools/sync_obsidian.py','--check','--state',str(state),'--conflicts-out',str(root/'.work/d04-l1-r2-sync-conflicts.json')]]
+report=dict(classification='REQUIRED_DOC_GATES_R2_EXACT_TESTED_GO_PLUS_DOC_ONLY_STATUS_UPDATE',runs=[],allPassed=False,noApplyAdoptResolve=True)
+sha=lambda b:hashlib.sha256(b).hexdigest()
+kst=lambda:datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=9))).isoformat()
+env=os.environ.copy();env['PYTHONUTF8']='1'
+for index,args in enumerate(commands,1):
+ before=sha(state.read_bytes()) if args[0].endswith('sync_obsidian.py') else None
+ argv=[sys.executable,'-B',*args]
+ start=kst();print(json.dumps(dict(starting=argv,kst=start)),flush=True)
+ p=subprocess.run(argv,capture_output=True,env=env)
+ after=sha(state.read_bytes()) if before is not None else None
+ raw=p.stdout+p.stderr
+ name=f'gate-{index:02d}-{Path(args[0]).stem}.log'
+ assert not (rawdir/name).exists(),'Preserve actual prior gate attempt; no overwrite'
+ (rawdir/name).write_bytes(raw)
+ (e/name).write_bytes(raw.replace(b'\r\n',b'\n'))
+ row=dict(argv=argv,exit=p.returncode,startedKST=start,endedKST=kst(),log=name,rawLogSHA256=sha(raw),publishedLF_LogSHA256=sha(raw.replace(b'\r\n',b'\n')))
+ if before is not None:
+  row.update(canonicalStatePath=str(state),canonicalStateSHA256Before=before,canonicalStateSHA256After=after,unchanged=before==after,authority='Root msg_010aeec31cf3, official --check --state only; no apply/adopt/resolve/statewrite',conflictsOut='.work/d04-l1-r2-sync-conflicts.json')
+ report['runs'].append(row)
+ (e/'local-required-gates.json').write_text(json.dumps(report,indent=2)+'\n',encoding='utf-8',newline='\n')
+ print(json.dumps(row),flush=True)
+ if p.returncode:
+  print(raw.decode('utf-8',errors='replace')[-5000:],flush=True)
+  raise SystemExit(p.returncode)
+ if before is not None and before!=after:
+  raise RuntimeError('Canonical state changed during official CHECK; preserve and ask Root actual scope')
+report['allPassed']=True
+(e/'local-required-gates.json').write_text(json.dumps(report,indent=2)+'\n',encoding='utf-8',newline='\n')

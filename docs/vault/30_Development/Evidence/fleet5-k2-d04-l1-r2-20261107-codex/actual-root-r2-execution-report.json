@@ -1,0 +1,160 @@
+{
+  "classification": "ATTRIBUTED_ACTUAL_ROOT_R2_GO_EXECUTION_NOT_AUTHOR_RERUN",
+  "source": "Root msg_010aeec31cf3",
+  "actualAtKST": "2026-11-07T06:33:57+09:00",
+  "sourceBase": "08e0f56eabe7d46518e17b8c3d6d7e296df880ac",
+  "testedContentSHA256": "090a8c6e16a5d74c76c28f1fc117bdff21aaaed4bab0cbf3419d5654b7ec76b2",
+  "actualPhases": [
+    {
+      "phase": 1,
+      "id": "new-l1-regression",
+      "startedKST": "2026-11-07T06:31:27+09:00",
+      "endedKST": "2026-11-07T06:31:55+09:00",
+      "command": [
+        "go",
+        "test",
+        "-p=1",
+        "-count=1",
+        "-json",
+        "-run",
+        "^TestP02InternalSignatureTableBound$",
+        "./internal/migrationcontext"
+      ],
+      "exit": 0,
+      "elapsedSeconds": 28.318,
+      "cgroupMemoryPeakBytes": 395309056,
+      "OOMKilled": false,
+      "sourceBeforeAfterEqual": true,
+      "topLevelPass": 1,
+      "subtestPass": 2
+    },
+    {
+      "phase": 2,
+      "id": "unchanged-original-observational-probe",
+      "startedKST": "2026-11-07T06:31:55+09:00",
+      "endedKST": "2026-11-07T06:31:55+09:00",
+      "command": [
+        "go",
+        "test",
+        "-p=1",
+        "-count=1",
+        "-run",
+        "^TestP02ReviewerProbeSignatureTableBound$",
+        "-v",
+        "./internal/migrationcontext"
+      ],
+      "exit": 0,
+      "elapsedSeconds": 0.504,
+      "cgroupMemoryPeakBytes": 79990784,
+      "OOMKilled": false,
+      "sourceBeforeAfterEqual": true,
+      "topLevelPass": 1,
+      "subtestPass": 0
+    },
+    {
+      "phase": 3,
+      "id": "exact-original-twelve-p02-regression-tests",
+      "startedKST": "2026-11-07T06:31:56+09:00",
+      "endedKST": "2026-11-07T06:31:57+09:00",
+      "command": [
+        "go",
+        "test",
+        "-p=1",
+        "-count=1",
+        "-json",
+        "-run",
+        "^(TestP02InternalOriginalSetAndPartition|TestP02InternalExactVerifiedTupleTable|TestP02InternalH3H5BindingsAndSnapshots|TestP02InternalProjectionEveryFieldAndOwnership|TestP02InternalTwoSourceProjectionMutants|TestP02InternalCauseOrderAndNullRefusal|TestP02InternalStrictLexicalCodec|TestP02InternalC2AndEpochDomains|TestP02InternalEightComponentsAndArtifact|TestP02InternalApprovalContract|TestP02InternalOriginalScopeRawUTF8|TestP02InternalPureEpochExactObjectBoundary)$",
+        "./internal/migrationcontext"
+      ],
+      "exit": 0,
+      "elapsedSeconds": 1.306,
+      "cgroupMemoryPeakBytes": 166576128,
+      "OOMKilled": false,
+      "sourceBeforeAfterEqual": true,
+      "topLevelPass": 12,
+      "subtestPass": 99
+    },
+    {
+      "phase": 4,
+      "id": "original-eleven-public-effect-source-census-plr-gates",
+      "startedKST": "2026-11-07T06:31:57+09:00",
+      "endedKST": "2026-11-07T06:33:57+09:00",
+      "command": [
+        "go",
+        "test",
+        "-p=1",
+        "-count=1",
+        "-json",
+        "-run",
+        "^(TestNullPortsAndOpaqueBoundary|TestWellFormedUnregisteredProvidersNeverAuthenticate|TestCopyRejectsCallbacksAndBoundsBeforeEncoding|TestResolvedObjectEffectBoundary|TestRepositoryBoundaryAndZeroEffects|TestWholePackageFullUnderlyingCensus|TestReviewR1CompileValidEffectAndAliasMutants|TestPLR1AActualBuildsThenBoundaryRefuses|TestPLR1BCompiledWriteTargetsAndReasons|TestPLR1CCompiledPointerConversionsAndControls|TestPLR1DCompiledTargetPointerTermsAndControls)$",
+        "./internal/migrationcontext"
+      ],
+      "exit": 0,
+      "elapsedSeconds": 119.875,
+      "cgroupMemoryPeakBytes": 678498304,
+      "OOMKilled": false,
+      "sourceBeforeAfterEqual": true,
+      "topLevelPass": 11,
+      "subtestPass": 129
+    }
+  ],
+  "actualTotals": {
+    "topLevel": 25,
+    "subtests": 230,
+    "fail": 0,
+    "skip": 0,
+    "caseRows": 92,
+    "distinctCompleteInputFingerprints": 90
+  },
+  "probe": [
+    {
+      "tuples": 16,
+      "reason": "",
+      "stage": "",
+      "detail": "",
+      "passed": [
+        "01_ANCHOR",
+        "02_SOURCES",
+        "03_ENVELOPE",
+        "03_PAYLOAD",
+        "03_C2",
+        "04_SIGNATURE",
+        "04_KEY_INTERVAL",
+        "05_PAYLOAD_JOINS",
+        "05_COMPONENTS",
+        "05_REVIEWS",
+        "05_SOURCE",
+        "05_CI",
+        "05_ARTIFACT",
+        "05_RUNNING",
+        "06_STATUS",
+        "06_VERSION",
+        "06_REPLAY",
+        "06_TIME",
+        "06_READBACK",
+        "07_PROJECTION"
+      ]
+    },
+    {
+      "tuples": 17,
+      "reason": "OWNERSHIP",
+      "stage": "01_ANCHOR",
+      "detail": "immutable-signature-table",
+      "passed": []
+    }
+  ],
+  "allocation": [
+    "p02_signature_table_bound_test.go:71: P02_L1_COPY_BUDGET allocations=0 repeatedEvaluations=2 uniqueAdditionalInputs=0 beforeSHA256=69533191420d778fe609e5739fb8344ffce326adfd75cfe879a90e4bfdbcaf54 afterSHA256=69533191420d778fe609e5739fb8344ffce326adfd75cfe879a90e4bfdbcaf54 actualAuth=false"
+  ],
+  "workerStaticReceiptVerification": true,
+  "all370SourceBytesEqual": true,
+  "GoOnlyContentSHA256": "9361e40fd8390684cd263f4ddbbcd1c0d1d3da0b1e7d37b12db216971ff1aa7c",
+  "Docs": "PENDING",
+  "Core": "PENDING",
+  "independentDeltaCODE": "PENDING",
+  "actualProducer": null,
+  "actualBindings": "NULL_HOLD",
+  "rawSeven": "UNREGISTERED",
+  "A01A40": "NOT_RUN",
+  "wholeFleet": "INCOMPLETE"
+}

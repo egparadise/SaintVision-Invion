@@ -1,0 +1,111 @@
+{
+  "classification": "ROOT_ONLY_ISOLATED_EXECUTION_PROPOSAL_NOT_EXECUTED",
+  "baseSHA": "08e0f56eabe7d46518e17b8c3d6d7e296df880ac",
+  "cwd": "services/node-agent",
+  "actualExecution": null,
+  "sourceSetup": "Root fresh own isolated source/caches from exact08e0 plus real eb32 Git object and both modules; no old job/cache reuse or worker remote action",
+  "image": "golang@sha256:8d48e12ec56735e9358640898b9d9b9fcca110612ed8a5567438c0a1baa24e66",
+  "Go": "1.27.1 linux/amd64",
+  "resources": {
+    "CPU": 2,
+    "memoryBytes": 2147483648,
+    "memoryPlusSwapTotalBytes": 2147483648,
+    "additionalSwap": 0,
+    "pids": 128,
+    "networkTests": "none",
+    "user": "1000:1000",
+    "rootFS": "readonly",
+    "capabilities": "ALL dropped",
+    "noNewPrivileges": true
+  },
+  "environment": {
+    "GOTOOLCHAIN": "local",
+    "GOWORK": "off",
+    "GOPROXY": "off",
+    "GOSUMDB": "off",
+    "GOMAXPROCS": "1",
+    "GOCACHE": "ROOT_NEW_OWNED_ISOLATED_CACHE"
+  },
+  "probe": {
+    "review": "879aea64e6896d6014f1b10d4ab63fda0de6073c",
+    "dataPath": "review-originals/04-optional_probe_signature_table_bound_test.go.txt.raw",
+    "SHA256": "412fd1ed587a0e4786275ac8a56aca32d20ea853bfb59f6835b228cdb0da0beb",
+    "scratchOnlyTestPath": "services/node-agent/internal/migrationcontext/p02_reviewer_probe_test.go",
+    "modificationAllowed": false,
+    "commandPassIsNotContractPass": true
+  },
+  "phases": [
+    {
+      "id": "new-l1-regression",
+      "command": [
+        "go",
+        "test",
+        "-p=1",
+        "-count=1",
+        "-json",
+        "-run",
+        "^TestP02InternalSignatureTableBound$",
+        "./internal/migrationcontext"
+      ]
+    },
+    {
+      "id": "unchanged-original-observational-probe",
+      "command": [
+        "go",
+        "test",
+        "-p=1",
+        "-count=1",
+        "-run",
+        "^TestP02ReviewerProbeSignatureTableBound$",
+        "-v",
+        "./internal/migrationcontext"
+      ]
+    },
+    {
+      "id": "exact-original-twelve-p02-regression-tests",
+      "command": [
+        "go",
+        "test",
+        "-p=1",
+        "-count=1",
+        "-json",
+        "-run",
+        "^(TestP02InternalOriginalSetAndPartition|TestP02InternalExactVerifiedTupleTable|TestP02InternalH3H5BindingsAndSnapshots|TestP02InternalProjectionEveryFieldAndOwnership|TestP02InternalTwoSourceProjectionMutants|TestP02InternalCauseOrderAndNullRefusal|TestP02InternalStrictLexicalCodec|TestP02InternalC2AndEpochDomains|TestP02InternalEightComponentsAndArtifact|TestP02InternalApprovalContract|TestP02InternalOriginalScopeRawUTF8|TestP02InternalPureEpochExactObjectBoundary)$",
+        "./internal/migrationcontext"
+      ],
+      "baselineReferenceOnly": "Actual R1 12top/99sub; R2 counts/results must be measured"
+    },
+    {
+      "id": "original-eleven-public-effect-source-census-plr-gates",
+      "command": [
+        "go",
+        "test",
+        "-p=1",
+        "-count=1",
+        "-json",
+        "-run",
+        "^(TestNullPortsAndOpaqueBoundary|TestWellFormedUnregisteredProvidersNeverAuthenticate|TestCopyRejectsCallbacksAndBoundsBeforeEncoding|TestResolvedObjectEffectBoundary|TestRepositoryBoundaryAndZeroEffects|TestWholePackageFullUnderlyingCensus|TestReviewR1CompileValidEffectAndAliasMutants|TestPLR1AActualBuildsThenBoundaryRefuses|TestPLR1BCompiledWriteTargetsAndReasons|TestPLR1CCompiledPointerConversionsAndControls|TestPLR1DCompiledTargetPointerTermsAndControls)$",
+        "./internal/migrationcontext"
+      ],
+      "baselineReferenceOnly": "Actual R1 11top/129sub; R2 counts/results must be measured"
+    }
+  ],
+  "stopOnFirstFailure": true,
+  "record": [
+    "Exact Go/image/source and unchanged per-file hashes before/after",
+    "Raw stdout/stderr/exit/time/peak/OOM and actual top/sub/skips",
+    "16 control all20pass;17 exact OWNERSHIP/01_ANCHOR/immutable-signature-table/empty prefix",
+    "Original observational probe logs independently checked against exact required fields",
+    "Complete input fingerprints; matching tuple preserved; before=after",
+    "Zero measured allocations at17; one warmup + one measured repeat of SAME input, not additional unique cases",
+    "Actual census13/73/0 and unchanged refusal/effect boundaries; fail closed on setup/compile/parser/test failures"
+  ],
+  "scopeCountsAreNotResults": true,
+  "notGranted": [
+    "Worker main Go compile/test",
+    "worker remote/SSH/Docker/Node operations",
+    "product/source publication before necessary actual Go verification",
+    "Core dispatch by worker",
+    "live crypto/keys/issuer/DB/Engine/effects/current view/producer/ports/opaque issuance"
+  ]
+}

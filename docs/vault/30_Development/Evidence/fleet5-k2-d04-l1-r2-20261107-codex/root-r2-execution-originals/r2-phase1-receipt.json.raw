@@ -1,0 +1,35 @@
+{
+  "phase": 1,
+  "id": "new-l1-regression",
+  "startedKST": "2026-11-07T06:31:27+09:00",
+  "endedKST": "2026-11-07T06:31:55+09:00",
+  "command": [
+    "go",
+    "test",
+    "-p=1",
+    "-count=1",
+    "-json",
+    "-run",
+    "^TestP02InternalSignatureTableBound$",
+    "./internal/migrationcontext"
+  ],
+  "exit": 0,
+  "elapsedSeconds": 28.318,
+  "cgroupMemoryPeakBytes": 395309056,
+  "OOMKilled": false,
+  "sourceBeforeAfterEqual": true,
+  "topLevelPass": 1,
+  "subtestPass": 2,
+  "passTests": [
+    "TestP02InternalSignatureTableBound/16",
+    "TestP02InternalSignatureTableBound/17",
+    "TestP02InternalSignatureTableBound"
+  ],
+  "failTests": [],
+  "skips": [],
+  "observedOriginalProbe": [],
+  "originalProbeContractMatches": null,
+  "stdoutSHA256": "1c8e33057e727db96ca18167243e0d2322711b5881ac881f705ee57ca7f1410a",
+  "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "ownStoppedContainerRemoved": true
+}

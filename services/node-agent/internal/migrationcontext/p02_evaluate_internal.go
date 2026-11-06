@@ -43,6 +43,9 @@ func (c *p02Context) need(ok bool, reason, detail string) bool {
 func p02Evaluate(raw, payload, artifact []byte, prerequisites p02Inputs) p02Result {
 	// Exclusive ownership is required throughout the budget pass and freeze. This
 	// is not malicious same-process or concurrent-mutation isolation.
+	if len(prerequisites.signatures) > 16 {
+		return p02Result{reason: "OWNERSHIP", stage: "01_ANCHOR", detail: "immutable-signature-table"}
+	}
 	budget := p02Budget{bytes: 32 << 20, nodes: 100000}
 	if !p02BudgetInputs(prerequisites, &budget) {
 		return p02Result{reason: "OWNERSHIP", stage: "01_ANCHOR", detail: "bounded-private-snapshots"}

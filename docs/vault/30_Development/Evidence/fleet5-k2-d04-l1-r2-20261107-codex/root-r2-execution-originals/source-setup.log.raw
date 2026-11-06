@@ -1,0 +1,27 @@
+STEP go-version exit=0
+STEP init exit=0
+STEP remote exit=0
+STEP sparse-init exit=0
+STEP sparse-set exit=0
+STEP fetch-base exit=0
+STEP checkout-base exit=0
+STEP fetch-k1 exit=0
+STEP k1-list exit=0
+STEP k1-contracts.go exit=0
+STEP k1-current.go exit=0
+STEP k1-ed25519.go exit=0
+STEP k1-graph.go exit=0
+STEP k1-json.go exit=0
+STEP k1-native.go exit=0
+STEP k1-proofs.go exit=0
+STEP k1-recipes.go exit=0
+STEP k1-schemas.go exit=0
+STEP k1-temporal.go exit=0
+STEP k1-trust.go exit=0
+STEP k1-verify.go exit=0
+STEP go-list-files exit=0
+STEP head exit=0
+STEP clean exit=0
+STEP mod-download exit=0
+STEP mod-verify exit=0
+SOURCE_SETUP_COMPLETE

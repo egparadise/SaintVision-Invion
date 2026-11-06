@@ -1,0 +1,157 @@
+diff --git a/services/node-agent/internal/migrationcontext/README.md b/services/node-agent/internal/migrationcontext/README.md
+index 192d1036..68904242 100644
+--- a/services/node-agent/internal/migrationcontext/README.md
++++ b/services/node-agent/internal/migrationcontext/README.md
+@@ -172,9 +172,26 @@ with the future archive. No new producer, wire, current view or effect grant.
+ 
+ The NEW private `p02_*_internal.go` seam implements the bounded P02 Rev3
+ consistency contract accepted in review `6fa4c644` of design `84ee9b1b`.
+-This candidate code has not yet received independent CODE review. At this WIP
+-checkpoint its Go tests are NOT_RUN: the main host had only268004KiB free memory;
+-Root's already-authorized isolated CPU execution phase is the next dependency.
++The published R1 source is `08e0f56eabe7d46518e17b8c3d6d7e296df880ac`.
++Root's actual isolated Go1.27.1 run passed23top-level/228subtests, with0fail/0skip
++and unchanged source before/after. Its exact Docs42287667048 and hosted
++Core42287980945 succeeded. Core's required jobs/steps succeeded; its declared
++optional skips remain explicit in the attributed Root receipt. Actual independent
++Claude CODE review `879aea64e6896d6014f1b10d4ab63fda0de6073c` returned narrow
++`INTERNAL_CODE_ACCEPT`, with nonblocking Low D04-L1 and INFO I1-I4. That review's
++earlier Core-pending observation and the earlier WIP NOT_RUN checkpoint remain
++unchanged historical facts in their original Git/Evidence.
++
++The separate R2 change (Root `msg_d42e405d8bd0`) rejects more than16signature
++tuples BEFORE the general snapshot budget and deep freeze: exact private
++`OWNERSHIP` / `01_ANCHOR` / `immutable-signature-table`, with an empty passed
++prefix. The later exact tuple/context check and independent general budgets stay
++unchanged. Root's unchanged observational probe actually reproduced R1's17tuple
++refusal at `04_SIGNATURE`; that probe's command PASS was not contract PASS.
++The new16/17boundary regression preserves the matching tuple and fingerprints;
++its17tuple allocation check measures repeated evaluation of the same input.
++R2 Go tests, R2 source gates, R2 Docs/Core and independent delta CODE review are
++NOT_RUN at this WIP checkpoint. R1 results do not validate changed R2 bytes.
+ Gofmt parsing is not compilation, type-checking, a passing source gate or tests.
+ 
+ It adds a bounded lexical JSON codec with exact round-trip, fixed generated
+@@ -197,11 +214,25 @@ All actual producers/anchors/custody/H1-H7/H3-EA remain NULL/HOLD.
+ 
+ Effective verdict is checked against the private capsule exact expected literal
+ at05_REVIEWS; no accepted literal is defaulted. The printable-ASCII capsule codec
+-is at01_ANCHOR (actual Rev3 INFO I1), so present control/non-ASCII values refuse
+-there. Printable type/empty/128byte bounds and mismatches are checked at05.
++is at01_ANCHOR (design-review INFO I1), so present control/non-ASCII values refuse
++there. Empty array/object expectations and integer/bool/null/empty-string/129byte
++expectations can reach05; nonempty array/object contents cannot be represented
++by the private expectation and fail the raw/typed capsule equality at01 (CODE
++review INFO I4). Printable bounds and literal mismatches are checked at05.
+ Effective publication differs from every independently bound original/part review
+ identity, including unused originals; equality with the SOURCE SHA is not itself
+-a refusal (actual INFO I2). Original targets/scopes/verdicts are preserved.
++a refusal (design-review INFO I2). Original targets/scopes/verdicts are preserved.
++
++CODE-review INFO I1 remains: when both H5 and clock are missing with a present
++ticket, Go reports TIME before the design's INSTALLATION. The general snapshot
++budget also precedes a missing-capsule refusal. R2 changes neither multi-missing
++source order nor that independent general budget. CODE-review INFO I2 records
++additional Go-only fail-closed predicates: positive floor; clock/lifecycle/ticket/
++H5 integer domains; nonempty ticket ID, H5/coverage evidence and artifact; full
++subject-bound readback tokens; Root-choice digest over actual supplied bytes;
++and the C2 printable-ASCII check after schema validation. These are explicit
++precision limits, not a claim of complete design/Go diagnostic equivalence.
++R2 updates the current README (CODE-review INFO I3) without rewriting old reports.
+ 
+ Eight component hashes derive from the exact checked payload/C2/raw component
+ bytes. Exact CI run metadata and independently required/optional steps, review
+diff --git a/services/node-agent/internal/migrationcontext/p02_evaluate_internal.go b/services/node-agent/internal/migrationcontext/p02_evaluate_internal.go
+index 5502c420..b7606dd6 100644
+--- a/services/node-agent/internal/migrationcontext/p02_evaluate_internal.go
++++ b/services/node-agent/internal/migrationcontext/p02_evaluate_internal.go
+@@ -43,6 +43,9 @@ func (c *p02Context) need(ok bool, reason, detail string) bool {
+ func p02Evaluate(raw, payload, artifact []byte, prerequisites p02Inputs) p02Result {
+ 	// Exclusive ownership is required throughout the budget pass and freeze. This
+ 	// is not malicious same-process or concurrent-mutation isolation.
++	if len(prerequisites.signatures) > 16 {
++		return p02Result{reason: "OWNERSHIP", stage: "01_ANCHOR", detail: "immutable-signature-table"}
++	}
+ 	budget := p02Budget{bytes: 32 << 20, nodes: 100000}
+ 	if !p02BudgetInputs(prerequisites, &budget) {
+ 		return p02Result{reason: "OWNERSHIP", stage: "01_ANCHOR", detail: "bounded-private-snapshots"}
+diff --git a/services/node-agent/internal/migrationcontext/p02_signature_table_bound_test.go b/services/node-agent/internal/migrationcontext/p02_signature_table_bound_test.go
+new file mode 100644
+index 0000000000000000000000000000000000000000..b2e67acc3bf16475c561ba5b537f0cf906f36660
+--- /dev/null
++++ b/services/node-agent/internal/migrationcontext/p02_signature_table_bound_test.go
+@@ -0,0 +1,74 @@
++package migrationcontext
++
++import (
++	"reflect"
++	"strconv"
++	"testing"
++)
++
++func TestP02InternalSignatureTableBound(t *testing.T) {
++	for _, n := range []int{16, 17} {
++		t.Run(strconv.Itoa(n), func(t *testing.T) {
++			tc := p02BenignFixture()
++			valid := p02FreezeSignatureTuple(tc.in.signatures[0])
++			tc.in.signatures = make([]p02SignatureTuple, 0, n)
++			for i := 1; i < n; i++ {
++				extra := p02FreezeSignatureTuple(valid)
++				extra.signature[len(extra.signature)-1] ^= byte(i)
++				tc.in.signatures = append(tc.in.signatures, extra)
++			}
++			tc.in.signatures = append(tc.in.signatures, valid)
++
++			// Prove the exact matching synthetic tuple remains LAST, independently
++			// of signature()'s table-size guard. No real authentication is claimed.
++			ev, ok := p02Decode(tc.raw, p02EnvelopeLimit, false)
++			if !ok || !p02EnvelopeSchema(ev) {
++				t.Fatal("invalid canonical envelope precondition")
++			}
++			pv, ok := p02Decode(tc.payload, p02PayloadLimit, false)
++			if !ok || !p02PayloadSchema(pv) {
++				t.Fatal("invalid canonical payload precondition")
++			}
++			e := p02ReadEnvelope(ev)
++			if hashBytes(tc.payload) != e.body.facts.policyPayloadSHA256 {
++				t.Fatal("unbound payload precondition")
++			}
++			c := p02Context{in: tc.in, envelope: e, envelopeValue: ev}
++			sig, ok := p02Unhex(e.signatureHex)
++			want := p02TestTuple(e, c.signingInput(), sig)
++			if !ok || len(tc.in.signatures) != n || !reflect.DeepEqual(tc.in.signatures[n-1], want) {
++				t.Fatal("matching full-message/context tuple missing")
++			}
++			for _, extra := range tc.in.signatures[:n-1] {
++				if reflect.DeepEqual(extra, want) {
++					t.Fatal("unexpected earlier matching tuple")
++				}
++			}
++			c.in.signatures = []p02SignatureTuple{valid}
++			if !c.signature() {
++				t.Fatal("matching tuple lacks independent capsule/key/domain binding", c.result)
++			}
++
++			id := "L1-tuples-" + strconv.Itoa(n)
++			if n == 16 {
++				p02TestBound(t, id, tc, "", "", "")
++				return
++			}
++			before := p02TestHash(tc)
++			p02TestCheck(t, id, tc, "OWNERSHIP", "01_ANCHOR", "immutable-signature-table", false)
++			var measured p02Result
++			allocations := testing.AllocsPerRun(1, func() {
++				measured = p02Evaluate(tc.raw, tc.payload, tc.artifact, tc.in)
++			})
++			if allocations != 0 || measured.reason != "OWNERSHIP" || measured.stage != "01_ANCHOR" || measured.detail != "immutable-signature-table" || len(measured.passed) != 0 {
++				t.Fatalf("oversized table copied/advanced: allocations=%g result=%+v", allocations, measured)
++			}
++			if after := p02TestHash(tc); before != after {
++				t.Fatal("allocation probe mutated input", before, after)
++			}
++			// One warm-up plus one measured evaluation of the SAME input. These
++			// are not additional unique cases and emit no additional P02_CASE rows.
++			t.Logf("P02_L1_COPY_BUDGET allocations=%g repeatedEvaluations=2 uniqueAdditionalInputs=0 beforeSHA256=%s afterSHA256=%s actualAuth=false", allocations, before, p02TestHash(tc))
++		})
++	}
++}
