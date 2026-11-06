@@ -1,0 +1,401 @@
+{
+  "task": "FLEET5-B-A7-SNAPSHOT-R1-20261107",
+  "orcaTask": "task_a8fd2969f0b3",
+  "dispatch": "ctx_6f0f8253b8a7",
+  "owner": "Codex",
+  "reviewer": "Independent A7 static review through Root PENDING after D04 reviewer exit/release",
+  "rootMessage": "msg_35937c8787d1",
+  "base": "0e66b5ab2b5fbc131dd6e98f5d5e8930ac045148",
+  "branch": "agent/codex/fleet5-b-a7-snapshot-r1-20261107",
+  "productSource": "72028cbac903c4415d9979f980a6e0f9948e914f",
+  "rootHeadAtRead": "b112b32450a378cd12bddbc711a98cb8cb8816dd",
+  "kst": "2026-11-07T05:51:30.578744+09:00",
+  "docs": [
+    {
+      "path": "ROOT_READ_ONLY/docs/vault/00_Index/\uc804\uccb4 \uac1c\ubc1c \uc9c4\ud589 \ud604\ud669.md",
+      "sha256": "e36f34239c2f3fba122cdd14957e8587ded9e37a739926757fbcf3a168ad7165",
+      "frontmatter": "doc_id: \"INDEX-PROGRESS-001\"\ntitle: \"\uc804\uccb4 \uac1c\ubc1c \uc9c4\ud589 \ud604\ud669\"\nversion: \"1.0.481\"\nstatus: \"review\"\nauthor: \"Codex\"\nupdated: \"2026-11-07T05:31:06+09:00\"\nsource_of_truth: \"Git\"\nlatest_codex_card: \"D04exact08e0published/Docs19PASS/Core42287980945pending/CODEreview6d952queued; B9gactualReviewPending; 5PCincomplete\""
+    },
+    {
+      "path": "ROOT_READ_ONLY/docs/vault/30_Development/Agent\ubcc4 \uc791\uc5c5/Codex \uc791\uc5c5 \ud604\ud669.md",
+      "sha256": "54639328f321179336c7baf51a63289cd686bae4184d5283b0bf620d107a5098",
+      "frontmatter": "doc_id: \"WORKBOARD-CODEX-001\"\ntitle: \"Codex \uc791\uc5c5 \ud604\ud669\"\nversion: \"1.0.442\"\nstatus: \"review\"\nauthor: \"Codex\"\nupdated: \"2026-11-07T05:31:06+09:00\"\nsource_of_truth: \"Git\"\nactive_card: \"FLEET5 continued supervision with PORTAL-REFRESH-FLEET-20261106\"\nactive_card_status: \"D04exact08e0published/Docs19SUCCESS/Core42287980945pending/CODEreview6d952dependsB9g; actual23top228subGoPASS; fleetincomplete\"\nactive_card_next: \"Root verifies actual Core final jobs/steps/artifacts, handles B9g actual verdict then proven reviewer release and starts D04CODEreview6d952; owner questions74e711 and2fb349 pending\""
+    },
+    {
+      "path": "ROOT_READ_ONLY/docs/vault/00_Index/2026-09-15 \ub2e8\uc77c \uac00\uc0c1 \ucef4\ud4e8\ud130 \ubcf4\uac15 \uc124\uacc4 \uc778\ub371\uc2a4.md",
+      "sha256": "35f2cca047fdb57ff2e2ad28e3847e9a7c0a19d6ace6fb36aa941042e872e9be",
+      "frontmatter": "doc_id: \"INDEX-VIRTUAL-COMPUTER-001\"\ntitle: \"2026-09-15 \ub2e8\uc77c \uac00\uc0c1 \ucef4\ud4e8\ud130 \ubcf4\uac15 \uc124\uacc4 \uc778\ub371\uc2a4\"\nversion: \"1.0.0\"\nstatus: \"accepted\"\nauthor: \"Codex\"\nupdated: \"2026-09-15T11:20:06+09:00\"\nsource_of_truth: \"Git and Obsidian paired update\"\ntags: [\"saintvision\", \"inv\", \"web-desktop\", \"distributed-model\", \"roadmap\"]"
+    },
+    {
+      "path": "ROOT_READ_ONLY/docs/vault/30_Development/57.81\ud37c\uc13c\ud2b8 \uc774\ud6c4 \ub2e8\uc77c \uac00\uc0c1 \ucef4\ud4e8\ud130 \ubcf4\uac15 \ub85c\ub4dc\ub9f5.md",
+      "sha256": "3a4527ffe53ebea114063692dd3bba826da8c279a93a9800919fff394df1a018",
+      "frontmatter": "doc_id: \"ROADMAP-VIRTUAL-COMPUTER-001\"\ntitle: \"57.81\ud37c\uc13c\ud2b8 \uc774\ud6c4 \ub2e8\uc77c \uac00\uc0c1 \ucef4\ud4e8\ud130 \ubcf4\uac15 \ub85c\ub4dc\ub9f5\"\nversion: \"1.0.0\"\nstatus: \"accepted\"\nauthor: \"Codex\"\nupdated: \"2026-09-15T11:20:06+09:00\"\nsource_of_truth: \"Git and Obsidian paired update\"\ntags: [\"saintvision\", \"roadmap\", \"web-desktop\", \"storage-fabric\", \"agents\"]"
+    },
+    {
+      "path": "ROOT_READ_ONLY/docs/vault/40_Governance/Agent \uc5f0\uc18d \uc2e4\ud589\uacfc \ucd5c\uc885 \ubcf4\uace0 \uc815\ucc45.md",
+      "sha256": "60c6a8d3130491bd4cab730cccc0e236fb038d1c7c816efa333acdc34a30cd8f",
+      "frontmatter": "doc_id: \"GOV-CONTINUOUS-001\"\ntitle: \"Agent \uc5f0\uc18d \uc2e4\ud589\uacfc \ucd5c\uc885 \ubcf4\uace0 \uc815\ucc45\"\nversion: \"1.1.0\"\nstatus: \"accepted\"\nauthor: \"Codex\"\nupdated: \"2026-09-21T14:33:00+09:00\"\nsource_of_truth: \"Git and Obsidian paired update\"\ntags: [\"saintvision\", \"agents\", \"autonomy\", \"governance\"]"
+    },
+    {
+      "path": "ROOT_READ_ONLY/docs/vault/00_Index/\ucd5c\uc885 \uac1c\ubc1c \uacc4\ud68d - \ubaa8\ub4e0 \uac1c\ubc1c\uc758 \uc9c0\uce68.md",
+      "sha256": "59223c5dff4b4bb6252c8061aebe975665e6eadf92db3659a3f89951b2cb149f",
+      "frontmatter": "doc_id: \"GUIDE-001\"\ntitle: \"\ucd5c\uc885 \uac1c\ubc1c \uacc4\ud68d - \ubaa8\ub4e0 \uac1c\ubc1c\uc758 \uc9c0\uce68\"\nversion: \"1.1.0\"\nstatus: \"baseline\"\nauthor: \"Codex\"\nupdated: \"2026-09-11T17:15:06+09:00\"\ntimezone: \"Asia/Seoul\"\nsource_of_truth: \"Git\"\ntags: [\"saintvision\", \"final-plan\"]\naliases: [\"\ucd5c\uc885 \uacc4\ubc1c \uacc4\ud68c - \ubaa8\ub4e0 \uac1c\ubc1c\uc758 \uc9c0\uce68\", \"\ucd5c\uc885 \uac1c\ubc1c \uc9c0\uce68\"]"
+    },
+    {
+      "path": "ROOT_READ_ONLY/docs/vault/40_Governance/\uc124\uacc4 \ucda9\ub3cc \uc815\uc815 \ubc0f ADR.md",
+      "sha256": "771f7714a63af52d7c8aea2424db0b33a2fe96c759c51c81c23144daf7aeaf77",
+      "frontmatter": "doc_id: \"ADR-INDEX-001\"\ntitle: \"\uc124\uacc4 \ucda9\ub3cc \uc815\uc815 \ubc0f ADR\"\nversion: \"1.37.0\"\nstatus: \"baseline\"\nauthor: \"Codex\"\nupdated: \"2026-09-23T03:10:00+09:00\"\ntimezone: \"Asia/Seoul\"\nsource_of_truth: \"Git\"\ntags: [\"saintvision\", \"final-plan\"]"
+    },
+    {
+      "path": "ROOT_READ_ONLY/docs/vault/40_Governance/Agent \uc5ed\ud560\uacfc \uc778\uacc4 \uacc4\uc57d.md",
+      "sha256": "128c054e72f9e001b3b32f914cce544bce5432eddccdbe1212d27180c3200823",
+      "frontmatter": "doc_id: \"GOV-AGENT-001\"\ntitle: \"Agent \uc5ed\ud560\uacfc \uc778\uacc4 \uacc4\uc57d\"\nversion: \"1.1.3\"\nstatus: \"baseline\"\nauthor: \"Codex\"\nupdated: \"2026-09-21T18:47:00+09:00\"\ntimezone: \"Asia/Seoul\"\nsource_of_truth: \"Git\"\ntags: [\"saintvision\", \"final-plan\"]"
+    },
+    {
+      "path": "ROOT_READ_ONLY/docs/vault/40_Governance/Git Build Obsidian \uc6b4\uc601 \uc808\ucc28.md",
+      "sha256": "fe5e8adc44a14c081ac767265a16434b72e4b3ebfb7719081fa166ad459e59e9",
+      "frontmatter": "doc_id: \"GOV-GIT-001\"\ntitle: \"Git Build Obsidian \uc6b4\uc601 \uc808\ucc28\"\nversion: \"1.1.4\"\nstatus: \"baseline\"\nauthor: \"Codex\"\nupdated: \"2026-09-22T19:25:00+09:00\"\ntimezone: \"Asia/Seoul\"\nsource_of_truth: \"Git\"\ntags: [\"saintvision\", \"final-plan\"]"
+    },
+    {
+      "path": "ROOT_READ_ONLY/docs/vault/40_Governance/Agent \uc9c0\uc18d \uac1c\ubc1c \uc6b4\uc601 \uaddc\uce59.md",
+      "sha256": "63839c440ead6dc07300a0e18d5024fb9aadbddf546707156c39af7ee9495c84",
+      "frontmatter": "doc_id: \"GOV-CONTINUITY-001\"\ntitle: \"Agent \uc9c0\uc18d \uac1c\ubc1c \uc6b4\uc601 \uaddc\uce59\"\nversion: \"1.0.0\"\nstatus: \"review\"\nauthor: \"Codex\"\nupdated: \"2026-09-21T14:05:43+09:00\"\nsource_of_truth: \"Git\""
+    },
+    {
+      "path": "AGENTS.md",
+      "sha256": "c12a50a38f81c12a647f9b6f4592a205cd899e76d29190202a6ae73b12c04b27",
+      "frontmatter": null
+    },
+    {
+      "path": "skills/agent-delivery/SKILL.md",
+      "sha256": "9596c1d4a132c3de90fd99ed2095b8271da7a31532e8487aa6d7d93151ac3830",
+      "frontmatter": "name: agent-delivery\ndescription: Every SaintVision task delivery\nversion: 1.1.0"
+    },
+    {
+      "path": "skills/core-reliability/SKILL.md",
+      "sha256": "4650a371befb5a59cd9f3ce87c2e2dab732aa7e9b89e57885cb67f0e64f0ef76",
+      "frontmatter": "name: core-reliability\ndescription: Codex high difficulty reliability work\nversion: 1.0.0"
+    },
+    {
+      "path": "docs/task-registry.json",
+      "sha256": "7c6b339c7487aae652cc5c5e04f6e933249c83930019e798ec24006794b07644",
+      "frontmatter": null
+    }
+  ],
+  "actualAcceptedReview": [
+    {
+      "commit": "90cccfb34718a8bb375bd7c1b7e06beb49670823",
+      "objectID": "bb2789ad98e51258a73e184a7a912ab02c6a83c0",
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-rev9g-0e66-review-20261107-claude/.gitattributes",
+      "copy": "accepted-review-original-gitattributes.txt",
+      "sha256": "96a83569c84cfe3f57b7efe3dc61c249548d0fca4fed0e538b3587cdc97c95c1",
+      "bytes": 21
+    },
+    {
+      "commit": "90cccfb34718a8bb375bd7c1b7e06beb49670823",
+      "objectID": "9bec71187bcabf4875807fa163e13a1bd582176c",
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-rev9g-0e66-review-20261107-claude/canonical-sync-check-before.txt",
+      "copy": "accepted-review-canonical-sync-check-before.txt",
+      "sha256": "0b904575b4b82aaaf23bce5c937ca43c5c57e426ff9e0e7e57121a82148acc4f",
+      "bytes": 880
+    },
+    {
+      "commit": "90cccfb34718a8bb375bd7c1b7e06beb49670823",
+      "objectID": "6e4574495d495a3dbaed676b87d886a4e52bcd33",
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-rev9g-0e66-review-20261107-claude/commands.json",
+      "copy": "accepted-review-commands.json",
+      "sha256": "3e6b27da4a5d36e30e9ae92bde1b6cdd72bae598e6e0b4f2aba0df2b4d3bce16",
+      "bytes": 3601
+    },
+    {
+      "commit": "90cccfb34718a8bb375bd7c1b7e06beb49670823",
+      "objectID": "f4d425573c64394c3860570d06ff1de64e9e419f",
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-rev9g-0e66-review-20261107-claude/local-doc-gates.txt",
+      "copy": "accepted-review-local-doc-gates.txt",
+      "sha256": "7b039dda316a8b8609ed9a6d06087e5375a6e79dfeab3c868446a7158d449e47",
+      "bytes": 3496
+    },
+    {
+      "commit": "90cccfb34718a8bb375bd7c1b7e06beb49670823",
+      "objectID": "cc4016c743b461b92ea5a73fcb71e804669de6fe",
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-rev9g-0e66-review-20261107-claude/review.json",
+      "copy": "accepted-review-review.json",
+      "sha256": "07ee8c0b23efdb109e64dd66337bf86430b607e2c1b277c97b4735885dee2878",
+      "bytes": 12205
+    },
+    {
+      "commit": "90cccfb34718a8bb375bd7c1b7e06beb49670823",
+      "objectID": "95db9852a66d7a01d95bdccd2ffb416b103fd0d3",
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-rev9g-0e66-review-20261107-claude/reviewer-local-shadow-at-0e66.json.txt",
+      "copy": "accepted-review-reviewer-local-shadow-at-0e66.json.txt",
+      "sha256": "ab1e5affa3898ec0346042567627a2e20b39e61589202eec428e1333f2c3c05a",
+      "bytes": 1595
+    },
+    {
+      "commit": "90cccfb34718a8bb375bd7c1b7e06beb49670823",
+      "objectID": "6a22bdeecc0f05e24a90d057a89b21e69445f761",
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-rev9g-0e66-review-20261107-claude/reviewer-local-shadow-at-9cea.json.txt",
+      "copy": "accepted-review-reviewer-local-shadow-at-9cea.json.txt",
+      "sha256": "21806dfeebe6557e8d1effa9beeb36ff79233d0c99c80f41403baa13881b9372",
+      "bytes": 1704
+    },
+    {
+      "commit": "90cccfb34718a8bb375bd7c1b7e06beb49670823",
+      "objectID": "689857a0efa6320ac3228620afec9cba5fdb0adc",
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-rev9g-0e66-review-20261107-claude/reviewer-rev9g-delta-probes-result.json",
+      "copy": "accepted-review-reviewer-rev9g-delta-probes-result.json",
+      "sha256": "d5849f579edccf48d6a5305af7a4c0c59881c5ae5496851d88b2b2bf1724b0ad",
+      "bytes": 47026
+    },
+    {
+      "commit": "90cccfb34718a8bb375bd7c1b7e06beb49670823",
+      "objectID": "ff4547d069c168452415b3728bd4c8c0d3ef3644",
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-rev9g-0e66-review-20261107-claude/reviewer-rev9g-delta-probes.log.txt",
+      "copy": "accepted-review-reviewer-rev9g-delta-probes.log.txt",
+      "sha256": "f9c607de54be8be8547ac11b6b41277e24f34df3d8d35cdad0375182648a5952",
+      "bytes": 15405
+    },
+    {
+      "commit": "90cccfb34718a8bb375bd7c1b7e06beb49670823",
+      "objectID": "5bf18d0110cfcd518bacdaff09d1cc41b8e3de86",
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-rev9g-0e66-review-20261107-claude/reviewer-rev9g-l2-guard-attribution-result.json",
+      "copy": "accepted-review-reviewer-rev9g-l2-guard-attribution-result.json",
+      "sha256": "19df3b1acbba942432d4d22b113781a47e76b216542c98e0549fd67892ac2ef0",
+      "bytes": 17850
+    },
+    {
+      "commit": "90cccfb34718a8bb375bd7c1b7e06beb49670823",
+      "objectID": "f2bcc73c694f4f0986a34d4d737dca216b41be15",
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-rev9g-0e66-review-20261107-claude/reviewer-rev9g-l2-guard-attribution.log.txt",
+      "copy": "accepted-review-reviewer-rev9g-l2-guard-attribution.log.txt",
+      "sha256": "bf8cbe328e849d9f66da84e01be14aa376692bcc4abfde3c680ed9d5a5d5a6d2",
+      "bytes": 4636
+    },
+    {
+      "commit": "90cccfb34718a8bb375bd7c1b7e06beb49670823",
+      "objectID": "d8758587458ed85aed0909703044966ffee7acd2",
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-rev9g-0e66-review-20261107-claude/reviewer-rev9g-newfile-reach-result.json",
+      "copy": "accepted-review-reviewer-rev9g-newfile-reach-result.json",
+      "sha256": "57043c6bcd5d928c7afde1425f99b8d8fd26a94e1ace50f46e42aabf9ca6fd59",
+      "bytes": 596
+    },
+    {
+      "commit": "90cccfb34718a8bb375bd7c1b7e06beb49670823",
+      "objectID": "ac4a7cb332b305aca00155059bdc9ee7cdd50ba4",
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-rev9g-0e66-review-20261107-claude/reviewer_gate_driver.py.txt",
+      "copy": "accepted-review-reviewer_gate_driver.py.txt",
+      "sha256": "b3dd3ed21c8fd8f323be0ffecf6abeba58a6b13efb64b0fd9b41cf1a345795c4",
+      "bytes": 2355
+    },
+    {
+      "commit": "90cccfb34718a8bb375bd7c1b7e06beb49670823",
+      "objectID": "ec68684348d40c23578f15ef4ecd12c7d88dc48f",
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-rev9g-0e66-review-20261107-claude/reviewer_rev9g_delta_probes.py.txt",
+      "copy": "accepted-review-reviewer_rev9g_delta_probes.py.txt",
+      "sha256": "249fd0df9a186685b38ab116950d066354e5867c3d3ed509734fcc10d053d612",
+      "bytes": 26870
+    },
+    {
+      "commit": "90cccfb34718a8bb375bd7c1b7e06beb49670823",
+      "objectID": "20df8540fe6e650fce62590debc4696945d251d9",
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-rev9g-0e66-review-20261107-claude/reviewer_rev9g_l2_guard_attribution.py.txt",
+      "copy": "accepted-review-reviewer_rev9g_l2_guard_attribution.py.txt",
+      "sha256": "dd9ec9f7c86fad2d4dda8b35a6b10a66920869fab29333268dda17cfa44f7009",
+      "bytes": 10213
+    },
+    {
+      "commit": "90cccfb34718a8bb375bd7c1b7e06beb49670823",
+      "objectID": "c3237723acbe033006aa92a34d8528755ff90b36",
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-rev9g-0e66-review-20261107-claude/reviewer_rev9g_local_shadow_check.py.txt",
+      "copy": "accepted-review-reviewer_rev9g_local_shadow_check.py.txt",
+      "sha256": "0267a4b7cd9eb105d0da3567454b4e6a0346e96108ef21aa040226fcf83687c3",
+      "bytes": 2615
+    },
+    {
+      "commit": "90cccfb34718a8bb375bd7c1b7e06beb49670823",
+      "objectID": "fa5045c8601080afdfd31abdbc371a46528df9a4",
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-rev9g-0e66-review-20261107-claude/reviewer_rev9g_newfile_reach.py.txt",
+      "copy": "accepted-review-reviewer_rev9g_newfile_reach.py.txt",
+      "sha256": "50f40d8704666aea0817dc7c78e1a43241b8abe424edb38056a58d16dc9e9478",
+      "bytes": 3331
+    },
+    {
+      "commit": "90cccfb34718a8bb375bd7c1b7e06beb49670823",
+      "objectID": "19c580f91ebdb1101440b88847e89770c4048a29",
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-rev9g-0e66-review-20261107-claude/reviewer_stage_evidence.py.txt",
+      "copy": "accepted-review-reviewer_stage_evidence.py.txt",
+      "sha256": "e9ef568688eac61bad54bbe5af97bb475586ebc7d31988e72e73115aeed57e2f",
+      "bytes": 1954
+    },
+    {
+      "commit": "90cccfb34718a8bb375bd7c1b7e06beb49670823",
+      "objectID": "b24661426c37e86e874b95ba121c9cda33a69b97",
+      "path": "docs/vault/30_Development/History/2026-11-07_FLEET5_B_rev9g_0e66_\uc881\uc740\ub378\ud0c0_\ub3c5\ub9bd\uac80\ud1a0_Claude.md",
+      "copy": "accepted-review-original-history.md.txt",
+      "sha256": "78c98bba365f49259232abeb91c7d09cfd88be1c4d9f9dc2fe29c84cfe2758a9",
+      "bytes": 9753
+    }
+  ],
+  "copiedProducerClosure": [
+    "analysis_rules",
+    "bounded_analysis",
+    "call_binding",
+    "callee_identity",
+    "constructor_graph",
+    "edge_categories",
+    "forwarding_discovery",
+    "lexical_bindings",
+    "measured_run",
+    "owner_transfer",
+    "parameter_flow",
+    "pending_contracts",
+    "reflection_audit",
+    "source_bindings",
+    "t1_provenance",
+    "use_sites"
+  ],
+  "immutableRetained": [
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-rev9g-20261107-codex/targeted-category-delta.json",
+      "copy": "targeted-category-delta.json",
+      "sha256": "bb46b0c48dd9b926095d59db4eb47e88eab7c01b184b734c1b7480cb259bee26",
+      "bytes": 88263
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-rev9g-20261107-codex/writer-census-delta.json",
+      "copy": "writer-census-delta.json",
+      "sha256": "40494695825789c24758cec36505016e6db0667335c6d46f91ab3e6f95659d6e",
+      "bytes": 1633
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-rev9g-20261107-codex/reader-io-catalog.json",
+      "copy": "reader-io-catalog.json",
+      "sha256": "00097f9c407773d40090c028cdbb8bf6a123bb38eb83ba6af745e0f2c2acf4d6",
+      "bytes": 51150
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-rev9g-20261107-codex/authority-matrix.json",
+      "copy": "authority-matrix.json",
+      "sha256": "b3fe96e61b5e1c06fb4a7181cc2d9bcb6bb11bfe85e287cee49c36b2a80c9ac5",
+      "bytes": 781274
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-rev9g-20261107-codex/contract.schema.json",
+      "copy": "contract.schema.json",
+      "sha256": "0433656ff505ff01ad1cf740c7013fb481547e33b9004329bbd0fef7096038ad",
+      "bytes": 119517
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-rev9g-20261107-codex/pilot-closure.json",
+      "copy": "pilot-closure.json",
+      "sha256": "0f08c7e961cf6db1e61f415a430d75ce67a1d819f18167692b4bd25a5f06347d",
+      "bytes": 28278
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-rev9g-20261107-codex/model.py",
+      "copy": "model.py",
+      "sha256": "f7384016f72b5f6b9d369925a3a6d864012f286351db38d97993a5f95be78acf",
+      "bytes": 38619
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-rev9g-20261107-codex/lifecycle.py",
+      "copy": "lifecycle.py",
+      "sha256": "710c6aafa1829d9aecc25b8e591c4f2a8ec01b0927a45cf6e7ba7b13b75977b0",
+      "bytes": 32017
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-rev9g-20261107-codex/pending-interface-contracts.stage1.json",
+      "copy": "pending-interface-contracts.stage1.json",
+      "sha256": "071859158d57207bc393065f5383911d19216e7d3c229e1490cfc294afde8181",
+      "bytes": 65644
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-rev9g-20261107-codex/pending-interface-contracts.json",
+      "copy": "pending-interface-contracts.json",
+      "sha256": "c40b5e1e3b471660693070b568e2ad647ba7a829362a44b5bfc4ab2939871d10",
+      "bytes": 102106
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-rev9g-20261107-codex/producer-order.json",
+      "copy": "producer-order.json",
+      "sha256": "250843b8d4c971a11e75e0e8be32abc6f5190cb04d3018c3291fc5e201769b81",
+      "bytes": 764
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-rev9g-20261107-codex/proof-producer-hashes.json",
+      "sha256": "3e8775f88ed976870af2db04a848eeb1f015ae1576b3d94fdbbdf5f25d1f9432",
+      "bytes": 43502
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-rev9g-20261107-codex/t1-mark-offline-closure.json",
+      "sha256": "40bfbd553ee01160a9ff3c5bc04a3d6885f9b99af1d32587c153c59d424aeed3",
+      "bytes": 1140313
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-rev9g-20261107-codex/proof-final01.json",
+      "sha256": "324d93055352b5480bd5c2df3d77f0c21a7efbed157073f86697725e028108c6",
+      "bytes": 191667
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-rev9g-20261107-codex/docs-final01.json",
+      "sha256": "360a4743b20cf170e2fd37830d74532bc31e88f274d6a44203f546a60f3c2ccc",
+      "bytes": 170438
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-rev9g-20261107-codex/rev9g-current-verification.json",
+      "sha256": "7b0dfa3b0ba3430287ecc79fd3e5f87d627d9eff9fc1d19cb4a6f5af1d6d8cdc",
+      "bytes": 2429
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-rev9g-20261107-codex/input-receipts.json",
+      "sha256": "4660c18df38797cab9fea0848c468dd3e6567c0542a22646371b7ae2be75139e",
+      "bytes": 38514
+    }
+  ],
+  "accountingFrozen": [
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-rev9g-20261107-codex/targeted-category-delta.json",
+      "copy": "targeted-category-delta.json",
+      "sha256": "bb46b0c48dd9b926095d59db4eb47e88eab7c01b184b734c1b7480cb259bee26",
+      "bytes": 88263
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-rev9g-20261107-codex/writer-census-delta.json",
+      "copy": "writer-census-delta.json",
+      "sha256": "40494695825789c24758cec36505016e6db0667335c6d46f91ab3e6f95659d6e",
+      "bytes": 1633
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-rev9g-20261107-codex/reader-io-catalog.json",
+      "copy": "reader-io-catalog.json",
+      "sha256": "00097f9c407773d40090c028cdbb8bf6a123bb38eb83ba6af745e0f2c2acf4d6",
+      "bytes": 51150
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-rev9g-20261107-codex/authority-matrix.json",
+      "copy": "authority-matrix.json",
+      "sha256": "b3fe96e61b5e1c06fb4a7181cc2d9bcb6bb11bfe85e287cee49c36b2a80c9ac5",
+      "bytes": 781274
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-rev9g-20261107-codex/contract.schema.json",
+      "copy": "contract.schema.json",
+      "sha256": "0433656ff505ff01ad1cf740c7013fb481547e33b9004329bbd0fef7096038ad",
+      "bytes": 119517
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-rev9g-20261107-codex/pilot-closure.json",
+      "copy": "pilot-closure.json",
+      "sha256": "0f08c7e961cf6db1e61f415a430d75ce67a1d819f18167692b4bd25a5f06347d",
+      "bytes": 28278
+    }
+  ],
+  "modelLifecycleFrozen": {
+    "model.py": "f7384016f72b5f6b9d369925a3a6d864012f286351db38d97993a5f95be78acf",
+    "lifecycle.py": "710c6aafa1829d9aecc25b8e591c4f2a8ec01b0927a45cf6e7ba7b13b75977b0"
+  },
+  "scope": "NodeChannels.snapshot ONLY, necessary containment/proof/assert_channel/import/caller/DB ownership closure; sidecar only, explicit unresolved obligations when closure is not proven; no product/runtime/port/NodeDelivery.deliver grant",
+  "actualRuntimeB": 0,
+  "realBindings": null,
+  "A1_A16": "PENDING"
+}

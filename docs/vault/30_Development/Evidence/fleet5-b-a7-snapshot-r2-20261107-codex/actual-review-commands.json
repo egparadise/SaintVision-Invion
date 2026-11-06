@@ -1,0 +1,21 @@
+{
+  "environment": "Windows 11, PowerShell + Git Bash, D:/Project/SaintVisionI-Invion/.venv Python 3.14.7 -B (-I for probes), PYTHONUTF8=1, PYTHONHASHSEED=0 and PYTHONDONTWRITEBYTECODE=1 for probes, cwd = worktree root fleet5-bootstrap-v3-review-20261106 on branch agent/claude/fleet5-b-a7-snapshot-1550-review-20261107 created from exact 1550453d. Times KST. Serial only; no installs and no OS/pagefile/process/service changes. Available memory 101 MB at 06:32 and 577 MB at 06:35 KST.",
+  "provenance": [
+    {"argv": "git fetch origin ; git switch -c agent/claude/fleet5-b-a7-snapshot-1550-review-20261107 1550453d1f072a87fd9a7baa53d4fe4ce8a98d5d ; git rev-parse 1550453d^", "result": "HEAD 1550453d, parent 0e66b5ab2b5fbc131dd6e98f5d5e8930ac045148, contained in origin/agent/codex/fleet5-b-a7-snapshot-r1-20261107"},
+    {"argv": "git diff --name-status 0e66b5ab 1550453d", "result": "109 A, 0 M/D, all under docs/vault"},
+    {"argv": "git show 90cccfb3:<History, review.json, commands.json, reviewer_gate_driver.py.txt, reviewer-rev9g-delta-probes.log.txt>", "result": "read first"},
+    {"argv": "read-only fleet-five-orchestration-20261105: HEAD da4f07eb, Index 1.0.482, Claude board 1.2.130, .work/b-a7-snapshot-r1-root-cut.txt, a7r1-source-root-verified.json, a7r1-narrow-review-spec.txt, a7r1-narrow-review-dispatch.json, a7r1-ready-before-start.json", "result": "read only"},
+    {"argv": "python -B -I - (manifest check in Evidence/fleet5-b-a7-snapshot-r1-20261107-codex)", "result": "manifest sha 2a75a22f...; 107 files, 36 producers, History: 0 mismatches; proof-final02 3/3 and docs-final02 8/8 exit 0, raw log hashes match"},
+    {"argv": "git grep -l -E 'NodeChannels|node_channels|\\.snapshot[[:space:]]*\\(' 72028cba -- services/control-plane/src src tools", "result": "34 files = 30 .py + 4 non-py"}
+  ],
+  "reviewerRuns": [
+    {"argv": "python -B -I <A7 evidence abs>/measured_run.py <scratch>/reviewer_a7_probes.py <A7 evidence abs> <scratch>/reviewer-a7-probes-result.json", "exit": 0, "kstWindow": "2026-11-07T06:35:05..06:36:12",
+     "log": "reviewer-a7-probes.log.txt (UTF-8 BOM and CR removed before commit; raw scratch sha256 87ddc53a78ba0e79d2ae3c2ce9b63fb22aa39298066084a1d2bc26689e0d68af)",
+     "result": "reviewer-a7-probes-result.json sha256 00214954438eb6804ad795990a8f24cf8b37eecf858613b406f6d7cdd12eb665", "driver": "reviewer_a7_probes.py.txt sha256 ca25e1abba204a241095d44377efdb684e99c2e208193600d06a870b73ac0750",
+     "rows": "49 = 1 baseline + 19 body + 8 census + 20 guard-only + 1 span", "peakWorkingSetBytes": 105259008, "elapsedSeconds": 65.3, "run": "single run, retained as final; expectation mismatch 1 (control-comment-inside-snapshot, INFO I1)"},
+    {"argv": "python -B <scratch>/reviewer_gate_driver.py 1550453d1f072a87fd9a7baa53d4fe4ce8a98d5d <scratch>/canonical-sync-check-before.txt <scratch>/gates sync-only", "exit": 0, "kst": "2026-11-07T06:38:12..06:38:38",
+     "stateSHA": "before d308e7d81eb434636970c564350d99f33f5c56712622b9f63cd530ba136aabc1 after d308e7d81eb434636970c564350d99f33f5c56712622b9f63cd530ba136aabc1", "result": "CHECK 4690 managed, 2266 pending exports, 0 conflicts, no writes", "file": "canonical-sync-check-before.txt"}
+  ],
+  "localGates": "see local-doc-gates.txt (8 gates after authoring, own History/Evidence only)",
+  "notRun": "owner proof/docs/seal commands, generators, model/terminal/recovery suites, full assembler; no Obsidian apply/adopt/resolve/state write"
+}

@@ -1,0 +1,34 @@
+diff --git "a/docs\\vault\\30_Development\\Evidence\\fleet5-b-a7-snapshot-r1-20261107-codex\\a7_inventory.py" "b/docs\\vault\\30_Development\\Evidence\\fleet5-b-a7-snapshot-r2-20261107-codex\\a7_inventory.py"
+index 06a5a4b9..4fda37ca 100644
+--- "a/docs\\vault\\30_Development\\Evidence\\fleet5-b-a7-snapshot-r1-20261107-codex\\a7_inventory.py"
++++ "b/docs\\vault\\30_Development\\Evidence\\fleet5-b-a7-snapshot-r2-20261107-codex\\a7_inventory.py"
+@@ -32,13 +32,15 @@ def census(world=None):
+         # necessary call/import owners, not every SQL node_channels reference.
+         relevant=any(isinstance(n,ast.Call) and (f.resolve(n.func)==TARGET or isinstance(n.func,ast.Attribute) and n.func.attr=='snapshot') for n in ast.walk(f.tree)) or path in (NC,CT,DB,ER)
+         files.append({'path':path,'sha256':sha(source),'bytes':len(source.encode()),'parsed':True,'retainedForCallClosure':relevant})
+-        if not relevant:continue
+-        selected[path]=source
++        # EVERY parsed lexical candidate receives the unchanged existing
++        # guards. Call retention is a separate downstream classification.
+         audit=ra.audit(f,PROTECTED)
+         if audit['newRelevantHits']:failures.append(obligation('A7_RELEVANT_REFLECTION',audit['newRelevantHits'],path))
+         uses,error=u.module_uses(source,path,instances=True,factories=(),parameter_context={})
+-        guards.append({'path':path,'reflection':audit,'useSites':uses,'error':error,'meaning':'frozen no-new-use compatibility, not callable purity/type proof'})
++        guards.append({'path':path,'sourceSHA256':sha(source),'retainedForCallClosure':relevant,'reflection':audit,'useSites':uses,'error':error,'meaning':'frozen no-new-use compatibility, not callable purity/type proof'})
+         if error:failures.append(obligation('A7_FULL_MODULE_USE_SITE_GUARD',error,path))
++        if not relevant:continue
++        selected[path]=source
+         fields={}
+         for qname,fn in f.functions.items():
+             if not qname.endswith('.__init__'):continue
+@@ -79,7 +81,9 @@ def census(world=None):
+         for owner in sorted({f.enclosing(c).rsplit('.',1)[0] for c in ast.walk(f.tree) if isinstance(c,ast.Call) and f.resolve(c.func)==TARGET and f.enclosing(c).endswith('.__init__')}):
+             carrier_rows.append({'symbol':f.module+'.'+owner,'path':path,'init':witness(f,f.functions[owner+'.__init__'])})
+     if sorted({tuple(x['key']) for x in constructors})!=sorted({tuple(x) for x in frozen_keys}):failures.append(obligation('A7_CONSTRUCTOR_CENSUS_CHANGED','frozen source constructor keys must be preserved'))
+-    return {'source':SOURCE,'queries':queries,'sourceFiles':files,'constructorSites':sorted(constructors,key=lambda x:x['key']),'snapshotSites':sorted(snapshots,key=lambda x:x['key']),'otherSnapshotReceivers':other,'carrierClasses':carrier_rows,'guards':guards,'obligations':failures,'selectedSources':selected,'scope':'finite textual/import-aware source census; dynamic aliases/heap roots not declared complete'}
++    parsed={row['path']:row['sha256'] for row in files};audited={row['path']:row['sourceSHA256'] for row in guards}
++    assert len(parsed)==len(files) and len(audited)==len(guards) and parsed==audited,'parsed path/current-SHA set must equal audited path/current-SHA set'
++    return {'source':SOURCE,'queries':queries,'sourceFiles':files,'constructorSites':sorted(constructors,key=lambda x:x['key']),'snapshotSites':sorted(snapshots,key=lambda x:x['key']),'otherSnapshotReceivers':other,'carrierClasses':carrier_rows,'guards':guards,'guardCoverage':{'parsedPathSHA256':parsed,'auditedPathSHA256':audited,'parsedEqualsAudited':True},'obligations':failures,'selectedSources':selected,'scope':'finite textual/import-aware source census; dynamic aliases/heap roots not declared complete'}
+ 
+ def reverse_forwarding(c,world=None):
+     """Derive source call sites of database-forwarding carriers, not their types.

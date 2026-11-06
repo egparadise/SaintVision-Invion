@@ -1,0 +1,27 @@
+{
+  "events": [
+    {
+      "label": "dev02-tests",
+      "exit": 1,
+      "kind": "FIXTURE_LITERAL_MISMATCH_NOT_A_SEMANTIC_PRODUCT_RESULT",
+      "failure": "online/heartbeat condition is multiline in actual frozen source",
+      "raw": "dev02-tests.log",
+      "partialResults": "dev02-a7-test-results.json",
+      "partialInputs": "dev02-a7-test-inputs.json",
+      "resolution": "match the actual multiline source literals and rerun fresh"
+    },
+    {
+      "label": "dev03-tests",
+      "exit": 1,
+      "kind": "EXPECTATION_LAYER_MISMATCH_NOT_FALSE_ACCEPT",
+      "case": "class-monkeypatch",
+      "actual": [
+        [
+          false,
+          "DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:WRITE_USE:inv.node_channels.NodeChannels.snapshot"
+        ]
+      ],
+      "resolution": "retain actual older use-site refusal attribution; do not claim new callee-binder causality"
+    }
+  ]
+}

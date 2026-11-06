@@ -1,0 +1,2 @@
+{"verified": true, "parsed": 30, "audited": 30, "newlyAudited18Clean": true, "baselineObligations": 19, "cases": 5, "sidecarSHA256": "88bcafbc6d76ec8ce1848be5be0c22858bdb4c463afea290a65c323db0ba5c79", "actualRuntimeB": 0}
+{"ownerResourceMeasurement": {"target": "docs/vault/30_Development/Evidence/fleet5-b-a7-snapshot-r2-20261107-codex/r2_verify.py", "peakWorkingSetBytes": 126263296, "elapsedSeconds": 25.575, "OSMemoryLimitEnforced": false, "serial": true}}

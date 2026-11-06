@@ -1,0 +1,19 @@
+{"name": "actual-review-exact-nonretained-monkeypatch", "layer": "CENSUS_AND_EXISTING_GUARDS_NOT_BODY_REFUSAL", "inputSHA256": {"services/control-plane/src/inv/node_certificates.py": "19c2e14eb3e586f5ed22e1fb0549fe51961a079557fba2bb07ca1b8410686191"}, "syntaxValid": true, "selectedBodiesUnchanged": {"services/control-plane/src/inv/node_channels.py": "3fad0bb24beb096522ea3335e3bf45f4e65f2d0d906177ef7e310aca1128502b", "services/control-plane/src/inv/containment.py": "a0d7055d5f3e5485d82ea3876f9885bb6f0c2e8d5d0e7fd11a846ec86edf425e", "services/control-plane/src/inv/db.py": "38e0d679b442433fd0b775e98411d78dfff2b7d114bbc3c2a52d3a886726022d", "services/control-plane/src/inv/errors.py": "833eea9d797496c44ef3b3003cf728cfa88d12128dddf60106632609ead3a7bc"}, "bodyAccepted": true, "callerClosureAccepted": false, "completeAddedVsBaseline": [], "completeRemovedVsBaseline": [], "censusAddedVsBaseline": [], "censusRemovedVsBaseline": [], "retainedForCallClosure": false, "injectedStatements": [{"source": {"path": "services/control-plane/src/inv/node_certificates.py", "function": "inv.node_certificates.", "span": [75, 0, 75, 56], "fileSHA256": "19c2e14eb3e586f5ed22e1fb0549fe51961a079557fba2bb07ca1b8410686191", "expressionSHA256": "f8dfca23544920e6ffddf4b83fb5ebe3a9e98fc379fbf3f2f138636892b19712"}, "text": "from .node_channels import NodeChannels as _ReviewerA7NC"}, {"source": {"path": "services/control-plane/src/inv/node_certificates.py", "function": "inv.node_certificates.", "span": [76, 0, 76, 54], "fileSHA256": "19c2e14eb3e586f5ed22e1fb0549fe51961a079557fba2bb07ca1b8410686191", "expressionSHA256": "77cf095086b436fdb259fe146f4815fef27dfd3162921b5b3779fa3352e137c4"}, "text": "_ReviewerA7NC.snapshot = lambda self, node, **kw: None"}], "actualUnresolvedObligations": 19}
+{"ownerResourceMeasurement": {"target": "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105\\docs\\vault\\30_Development\\Evidence\\fleet5-b-a7-snapshot-r2-20261107-codex\\r2_tests.py", "peakWorkingSetBytes": 141099008, "elapsedSeconds": 73.516, "OSMemoryLimitEnforced": false, "serial": true}}
+Traceback (most recent call last):
+  File "D:\Project\SaintVisionI-Invion\fleet5-compute-storage-contract-20261105\docs\vault\30_Development\Evidence\fleet5-b-a7-snapshot-r2-20261107-codex\measured_run.py", line 20, in <module>
+    if __name__=='__main__':main()
+                            ~~~~^^
+  File "D:\Project\SaintVisionI-Invion\fleet5-compute-storage-contract-20261105\docs\vault\30_Development\Evidence\fleet5-b-a7-snapshot-r2-20261107-codex\measured_run.py", line 9, in main
+    try:runpy.run_path(target,run_name='__main__')
+        ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen runpy>", line 294, in run_path
+  File "<frozen runpy>", line 98, in _run_module_code
+  File "<frozen runpy>", line 88, in _run_code
+  File "D:\Project\SaintVisionI-Invion\fleet5-compute-storage-contract-20261105\docs\vault\30_Development\Evidence\fleet5-b-a7-snapshot-r2-20261107-codex\r2_tests.py", line 79, in <module>
+    if __name__=='__main__':main()
+                            ~~~~^^
+  File "D:\Project\SaintVisionI-Invion\fleet5-compute-storage-contract-20261105\docs\vault\30_Development\Evidence\fleet5-b-a7-snapshot-r2-20261107-codex\r2_tests.py", line 64, in main
+    assert ca==Counter({expected_key:1}),('MISSING_OR_INEXACT_NEW_CENSUS_DELTA',name,serialized(ca),list(expected_key))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: ('MISSING_OR_INEXACT_NEW_CENSUS_DELTA', 'actual-review-exact-nonretained-monkeypatch', [], ['A7_FULL_MODULE_USE_SITE_GUARD', 'services/control-plane/src/inv/node_certificates.py', (76, 0, 76, 22), 'DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:WRITE_USE:inv.node_channels.NodeChannels.snapshot'])

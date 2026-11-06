@@ -1,0 +1,18 @@
+{"ownerResourceMeasurement": {"target": "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105\\docs\\vault\\30_Development\\Evidence\\fleet5-b-a7-snapshot-r2-20261107-codex\\r2_verify.py", "peakWorkingSetBytes": 126844928, "elapsedSeconds": 20.699, "OSMemoryLimitEnforced": false, "serial": true}}
+Traceback (most recent call last):
+  File "D:\Project\SaintVisionI-Invion\fleet5-compute-storage-contract-20261105\docs\vault\30_Development\Evidence\fleet5-b-a7-snapshot-r2-20261107-codex\measured_run.py", line 20, in <module>
+    if __name__=='__main__':main()
+                            ~~~~^^
+  File "D:\Project\SaintVisionI-Invion\fleet5-compute-storage-contract-20261105\docs\vault\30_Development\Evidence\fleet5-b-a7-snapshot-r2-20261107-codex\measured_run.py", line 9, in main
+    try:runpy.run_path(target,run_name='__main__')
+        ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen runpy>", line 294, in run_path
+  File "<frozen runpy>", line 98, in _run_module_code
+  File "<frozen runpy>", line 88, in _run_code
+  File "D:\Project\SaintVisionI-Invion\fleet5-compute-storage-contract-20261105\docs\vault\30_Development\Evidence\fleet5-b-a7-snapshot-r2-20261107-codex\r2_verify.py", line 29, in <module>
+    if __name__=='__main__':main()
+                            ~~~~^^
+  File "D:\Project\SaintVisionI-Invion\fleet5-compute-storage-contract-20261105\docs\vault\30_Development\Evidence\fleet5-b-a7-snapshot-r2-20261107-codex\r2_verify.py", line 8, in main
+    old=json.loads((E/'r1-a7-snapshot-sidecar.json').read_bytes());assert current['body']==old['body'];assert current['callers']['obligations']==old['callers']['obligations'] and len(current['callers']['obligations'])==19
+                                                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError

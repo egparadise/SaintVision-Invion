@@ -1,0 +1,447 @@
+{
+  "actualRuntimeB": 0,
+  "baseline": {
+    "bodyAccepted": true,
+    "callerClosureAccepted": false,
+    "censusObligations": [
+      {
+        "code": "A7_PURPOSE_PROVENANCE",
+        "multiplicity": 1,
+        "path": "services/control-plane/src/inv/node_transport.py",
+        "span": [
+          280,
+          22,
+          280,
+          100
+        ],
+        "subject": "observation_only or cancel_only"
+      }
+    ],
+    "coverage": {
+      "audited": {
+        "services/control-plane/src/inv/build_product_runtime.py": "7483d65fcb1032aeb05b4d2dd56e09e714cff8ca676de0f80fc3a2f5e447e9af",
+        "services/control-plane/src/inv/containment.py": "a0d7055d5f3e5485d82ea3876f9885bb6f0c2e8d5d0e7fd11a846ec86edf425e",
+        "services/control-plane/src/inv/node_channels.py": "3fad0bb24beb096522ea3335e3bf45f4e65f2d0d906177ef7e310aca1128502b",
+        "services/control-plane/src/inv/node_transfer.py": "3b5315201357c8d5b82643cde8f685ed39dc542255d8bc31fb63d894065dac2e",
+        "services/control-plane/src/inv/node_transport.py": "3559bbcdf9568f8930654d860b0edd980eca71c835cde3fe7380a69dd56e18f4",
+        "services/control-plane/src/inv/observation.py": "b515ceda8b066466cf4cdf5fa88d04803220398c436d29ab7c5fd2793bf5748f",
+        "services/control-plane/src/inv/remote_git.py": "5efd1057f9208cdb29670073bd8ea5e96f98cfbd5a8173f4daa764d3db5db52e",
+        "services/control-plane/src/inv/terminal.py": "fe294d648b34d617df94449974fc82fed904639b80b8a5da2c9d34f32606bf8e",
+        "services/control-plane/src/inv/workspace_git.py": "9148060a66ce41df01d764b4584c3c890d61ff9ed87cfb9e49df348e4d891e7a",
+        "tools/check_remote_workspace.py": "3550db9c20fb7e2118f66f0337ed787dd22a166a6ff8cf1c6e9490f9ae9df6e3",
+        "tools/lan_execution.py": "cd4be84de9a60c03c32daa8e831a527ed9014169e151c7a436383772a5d4ddc0",
+        "tools/remote_workspace_entry.py": "e69fa8ff6c51bd3880f5ec388fe97288a4256169377e17d9d6aa5b7ec2f32c27"
+      },
+      "equal": false,
+      "parsed": {
+        "services/control-plane/src/inv/build_product_runtime.py": "7483d65fcb1032aeb05b4d2dd56e09e714cff8ca676de0f80fc3a2f5e447e9af",
+        "services/control-plane/src/inv/capacity.py": "70cf93fcc99d5f23a946445889d5f6b3ab7bd86a30e7923b74e4df82fc85578d",
+        "services/control-plane/src/inv/containment.py": "a0d7055d5f3e5485d82ea3876f9885bb6f0c2e8d5d0e7fd11a846ec86edf425e",
+        "services/control-plane/src/inv/gpu.py": "2a229e710fcdd10cac948d0660c75a04b0405851a76cac5b9df44924ed02c03f",
+        "services/control-plane/src/inv/model_remote.py": "796f61fe8404c2c3a8a4be08eca75d98e3c442a30c04077c66b278e7d60c6737",
+        "services/control-plane/src/inv/model_runtime.py": "f7f89911af4987bd7218c8ca6e3e8654c4c4dabc4994b30b547987f17c88e128",
+        "services/control-plane/src/inv/model_source.py": "9b7adaa666c9031e61dc201c3daf15b08e014aa3b6e329dc1c01277dfea0c8ee",
+        "services/control-plane/src/inv/node_certificates.py": "6e2bfb2d0cfa972eaf6f7d4ca3a1928cde7a2b3d0c21b80d03fbb4ff7ccf4901",
+        "services/control-plane/src/inv/node_channels.py": "3fad0bb24beb096522ea3335e3bf45f4e65f2d0d906177ef7e310aca1128502b",
+        "services/control-plane/src/inv/node_execution.py": "0b70dbfd048e4985dcf11faeecedf39975c21c37af27c4c1d6f0d0c1d82494a3",
+        "services/control-plane/src/inv/node_resource_usage.py": "95dd48c34601e52b696e9da0115102816ccdb7e4e332c28b5a4013ba28fa5b37",
+        "services/control-plane/src/inv/node_transfer.py": "3b5315201357c8d5b82643cde8f685ed39dc542255d8bc31fb63d894065dac2e",
+        "services/control-plane/src/inv/node_transport.py": "3559bbcdf9568f8930654d860b0edd980eca71c835cde3fe7380a69dd56e18f4",
+        "services/control-plane/src/inv/observation.py": "b515ceda8b066466cf4cdf5fa88d04803220398c436d29ab7c5fd2793bf5748f",
+        "services/control-plane/src/inv/observer_worker.py": "6bbdf815554fe1f0157247732ddc4dc3069686685c291ef83add55c8f3e92003",
+        "services/control-plane/src/inv/placement.py": "d6f1baea8fedb0e8cf471d8b6880444c3c1ac13fc5c2d767eac6a7983c386224",
+        "services/control-plane/src/inv/remote_git.py": "5efd1057f9208cdb29670073bd8ea5e96f98cfbd5a8173f4daa764d3db5db52e",
+        "services/control-plane/src/inv/storage_commit.py": "41522f6ef98b315c4dff75b06d10507ad7bc45a6523983b3de9767cd61ff496c",
+        "services/control-plane/src/inv/storage_sampling.py": "4e43aa43e8dc9b8ab78af0fde78f9e83b83d7bfdc77b7362ad565741f6f94e8a",
+        "services/control-plane/src/inv/terminal.py": "fe294d648b34d617df94449974fc82fed904639b80b8a5da2c9d34f32606bf8e",
+        "services/control-plane/src/inv/workspace_git.py": "9148060a66ce41df01d764b4584c3c890d61ff9ed87cfb9e49df348e4d891e7a",
+        "src/saintvision/identity/node_auth.py": "9b670227f01011ac1947b411c6459692bacaaeff49f7918f83eec89f1bdc026d",
+        "tools/check_lan_storage_readiness.py": "b2ccdc3933549eae7c2d1414e438314ea1019d269e84471064b6d2a5063a7339",
+        "tools/check_remote_workspace.py": "3550db9c20fb7e2118f66f0337ed787dd22a166a6ff8cf1c6e9490f9ae9df6e3",
+        "tools/five_node_lab_preflight.py": "13b455a80aecd095ceb02ade0fbda40f2f56408c227d8461e9eff60ef6327943",
+        "tools/lan_console.py": "3e037403bd47e2a4cc6c1bca1e6e32c2eeefaf9da3dee9ad56d7379692845317",
+        "tools/lan_execution.py": "cd4be84de9a60c03c32daa8e831a527ed9014169e151c7a436383772a5d4ddc0",
+        "tools/lan_pilot.py": "2c626540f495499423b707b063a6cab6a53e1be3af8c324f46af88a94ac8f652",
+        "tools/remote_workspace_entry.py": "e69fa8ff6c51bd3880f5ec388fe97288a4256169377e17d9d6aa5b7ec2f32c27",
+        "tools/s01_readiness_preflight.py": "cf563c0e0491b7d8b87aea8e151beb7fa8914fdae3a100705d42e6b00cb5d2de"
+      },
+      "uncoveredPaths": [
+        "services/control-plane/src/inv/capacity.py",
+        "services/control-plane/src/inv/gpu.py",
+        "services/control-plane/src/inv/model_remote.py",
+        "services/control-plane/src/inv/model_runtime.py",
+        "services/control-plane/src/inv/model_source.py",
+        "services/control-plane/src/inv/node_certificates.py",
+        "services/control-plane/src/inv/node_execution.py",
+        "services/control-plane/src/inv/node_resource_usage.py",
+        "services/control-plane/src/inv/observer_worker.py",
+        "services/control-plane/src/inv/placement.py",
+        "services/control-plane/src/inv/storage_commit.py",
+        "services/control-plane/src/inv/storage_sampling.py",
+        "src/saintvision/identity/node_auth.py",
+        "tools/check_lan_storage_readiness.py",
+        "tools/five_node_lab_preflight.py",
+        "tools/lan_console.py",
+        "tools/lan_pilot.py",
+        "tools/s01_readiness_preflight.py"
+      ]
+    },
+    "obligations": [
+      {
+        "code": "A7_DATABASE_OWNER_CLOSURE",
+        "multiplicity": 1,
+        "path": "services/control-plane/src/inv/build_product_runtime.py",
+        "span": [
+          532,
+          14,
+          532,
+          36
+        ],
+        "subject": "database"
+      },
+      {
+        "code": "A7_DATABASE_OWNER_CLOSURE",
+        "multiplicity": 1,
+        "path": "services/control-plane/src/inv/node_transfer.py",
+        "span": [
+          18,
+          24,
+          18,
+          46
+        ],
+        "subject": "database"
+      },
+      {
+        "code": "A7_DATABASE_OWNER_CLOSURE",
+        "multiplicity": 1,
+        "path": "services/control-plane/src/inv/node_transport.py",
+        "span": [
+          231,
+          24,
+          231,
+          46
+        ],
+        "subject": "database"
+      },
+      {
+        "code": "A7_DATABASE_OWNER_CLOSURE",
+        "multiplicity": 1,
+        "path": "services/control-plane/src/inv/observation.py",
+        "span": [
+          14,
+          24,
+          14,
+          46
+        ],
+        "subject": "database"
+      },
+      {
+        "code": "A7_DATABASE_OWNER_CLOSURE",
+        "multiplicity": 1,
+        "path": "services/control-plane/src/inv/terminal.py",
+        "span": [
+          275,
+          18,
+          275,
+          39
+        ],
+        "subject": "self.db"
+      },
+      {
+        "code": "A7_DATABASE_OWNER_CLOSURE",
+        "multiplicity": 1,
+        "path": "tools/check_remote_workspace.py",
+        "span": [
+          116,
+          16,
+          116,
+          44
+        ],
+        "subject": "runtime(state)"
+      },
+      {
+        "code": "A7_DATABASE_OWNER_CLOSURE",
+        "multiplicity": 1,
+        "path": "tools/lan_execution.py",
+        "span": [
+          83,
+          12,
+          83,
+          40
+        ],
+        "subject": "runtime(state)"
+      },
+      {
+        "code": "A7_DATABASE_OWNER_CLOSURE",
+        "multiplicity": 1,
+        "path": "tools/lan_execution.py",
+        "span": [
+          137,
+          16,
+          137,
+          44
+        ],
+        "subject": "runtime(state)"
+      },
+      {
+        "code": "A7_DATABASE_OWNER_CLOSURE",
+        "multiplicity": 1,
+        "path": "tools/lan_execution.py",
+        "span": [
+          172,
+          12,
+          172,
+          40
+        ],
+        "subject": "runtime(state)"
+      },
+      {
+        "code": "A7_DATABASE_OWNER_CLOSURE",
+        "multiplicity": 1,
+        "path": "tools/remote_workspace_entry.py",
+        "span": [
+          205,
+          38,
+          205,
+          58
+        ],
+        "subject": "a.e.db"
+      },
+      {
+        "code": "A7_FORWARD_ROOT_TYPE_UNPROVEN",
+        "multiplicity": 1,
+        "path": "services/control-plane/src/inv/app.py",
+        "span": [
+          1323,
+          24,
+          1323,
+          97
+        ],
+        "subject": "database"
+      },
+      {
+        "code": "A7_FORWARD_ROOT_TYPE_UNPROVEN",
+        "multiplicity": 1,
+        "path": "services/control-plane/src/inv/observer_worker.py",
+        "span": [
+          58,
+          17,
+          58,
+          60
+        ],
+        "subject": "db"
+      },
+      {
+        "code": "A7_FORWARD_ROOT_TYPE_UNPROVEN",
+        "multiplicity": 1,
+        "path": "services/control-plane/src/inv/worker.py",
+        "span": [
+          122,
+          19,
+          122,
+          67
+        ],
+        "subject": "db"
+      },
+      {
+        "code": "A7_FORWARD_ROOT_TYPE_UNPROVEN",
+        "multiplicity": 1,
+        "path": "services/control-plane/src/inv/worker.py",
+        "span": [
+          133,
+          28,
+          139,
+          13
+        ],
+        "subject": "db"
+      },
+      {
+        "code": "A7_FORWARD_ROOT_TYPE_UNPROVEN",
+        "multiplicity": 1,
+        "path": "tools/lan_pilot.py",
+        "span": [
+          3945,
+          15,
+          3945,
+          82
+        ],
+        "subject": "runtime(state)"
+      },
+      {
+        "code": "A7_FORWARD_ROOT_TYPE_UNPROVEN",
+        "multiplicity": 1,
+        "path": "tools/remote_workspace_entry.py",
+        "span": [
+          107,
+          17,
+          107,
+          42
+        ],
+        "subject": "db"
+      },
+      {
+        "code": "A7_FORWARD_ROOT_TYPE_UNPROVEN",
+        "multiplicity": 1,
+        "path": "tools/remote_workspace_entry.py",
+        "span": [
+          111,
+          16,
+          112,
+          120
+        ],
+        "subject": "db"
+      },
+      {
+        "code": "A7_FORWARD_ROOT_TYPE_UNPROVEN",
+        "multiplicity": 1,
+        "path": "tools/remote_workspace_entry.py",
+        "span": [
+          145,
+          33,
+          145,
+          58
+        ],
+        "subject": "db"
+      },
+      {
+        "code": "A7_PURPOSE_PROVENANCE",
+        "multiplicity": 1,
+        "path": "services/control-plane/src/inv/node_transport.py",
+        "span": [
+          280,
+          22,
+          280,
+          100
+        ],
+        "subject": "observation_only or cancel_only"
+      }
+    ]
+  },
+  "cases": [
+    {
+      "actualUnresolvedObligations": 19,
+      "bodyAccepted": true,
+      "callerClosureAccepted": false,
+      "censusAddedVsBaseline": [],
+      "censusRemovedVsBaseline": [],
+      "completeAddedVsBaseline": [],
+      "completeRemovedVsBaseline": [],
+      "coverage": {
+        "audited": {
+          "services/control-plane/src/inv/build_product_runtime.py": "7483d65fcb1032aeb05b4d2dd56e09e714cff8ca676de0f80fc3a2f5e447e9af",
+          "services/control-plane/src/inv/containment.py": "a0d7055d5f3e5485d82ea3876f9885bb6f0c2e8d5d0e7fd11a846ec86edf425e",
+          "services/control-plane/src/inv/node_channels.py": "3fad0bb24beb096522ea3335e3bf45f4e65f2d0d906177ef7e310aca1128502b",
+          "services/control-plane/src/inv/node_transfer.py": "3b5315201357c8d5b82643cde8f685ed39dc542255d8bc31fb63d894065dac2e",
+          "services/control-plane/src/inv/node_transport.py": "3559bbcdf9568f8930654d860b0edd980eca71c835cde3fe7380a69dd56e18f4",
+          "services/control-plane/src/inv/observation.py": "b515ceda8b066466cf4cdf5fa88d04803220398c436d29ab7c5fd2793bf5748f",
+          "services/control-plane/src/inv/remote_git.py": "5efd1057f9208cdb29670073bd8ea5e96f98cfbd5a8173f4daa764d3db5db52e",
+          "services/control-plane/src/inv/terminal.py": "fe294d648b34d617df94449974fc82fed904639b80b8a5da2c9d34f32606bf8e",
+          "services/control-plane/src/inv/workspace_git.py": "9148060a66ce41df01d764b4584c3c890d61ff9ed87cfb9e49df348e4d891e7a",
+          "tools/check_remote_workspace.py": "3550db9c20fb7e2118f66f0337ed787dd22a166a6ff8cf1c6e9490f9ae9df6e3",
+          "tools/lan_execution.py": "cd4be84de9a60c03c32daa8e831a527ed9014169e151c7a436383772a5d4ddc0",
+          "tools/remote_workspace_entry.py": "e69fa8ff6c51bd3880f5ec388fe97288a4256169377e17d9d6aa5b7ec2f32c27"
+        },
+        "equal": false,
+        "parsed": {
+          "services/control-plane/src/inv/build_product_runtime.py": "7483d65fcb1032aeb05b4d2dd56e09e714cff8ca676de0f80fc3a2f5e447e9af",
+          "services/control-plane/src/inv/capacity.py": "70cf93fcc99d5f23a946445889d5f6b3ab7bd86a30e7923b74e4df82fc85578d",
+          "services/control-plane/src/inv/containment.py": "a0d7055d5f3e5485d82ea3876f9885bb6f0c2e8d5d0e7fd11a846ec86edf425e",
+          "services/control-plane/src/inv/gpu.py": "2a229e710fcdd10cac948d0660c75a04b0405851a76cac5b9df44924ed02c03f",
+          "services/control-plane/src/inv/model_remote.py": "796f61fe8404c2c3a8a4be08eca75d98e3c442a30c04077c66b278e7d60c6737",
+          "services/control-plane/src/inv/model_runtime.py": "f7f89911af4987bd7218c8ca6e3e8654c4c4dabc4994b30b547987f17c88e128",
+          "services/control-plane/src/inv/model_source.py": "9b7adaa666c9031e61dc201c3daf15b08e014aa3b6e329dc1c01277dfea0c8ee",
+          "services/control-plane/src/inv/node_certificates.py": "19c2e14eb3e586f5ed22e1fb0549fe51961a079557fba2bb07ca1b8410686191",
+          "services/control-plane/src/inv/node_channels.py": "3fad0bb24beb096522ea3335e3bf45f4e65f2d0d906177ef7e310aca1128502b",
+          "services/control-plane/src/inv/node_execution.py": "0b70dbfd048e4985dcf11faeecedf39975c21c37af27c4c1d6f0d0c1d82494a3",
+          "services/control-plane/src/inv/node_resource_usage.py": "95dd48c34601e52b696e9da0115102816ccdb7e4e332c28b5a4013ba28fa5b37",
+          "services/control-plane/src/inv/node_transfer.py": "3b5315201357c8d5b82643cde8f685ed39dc542255d8bc31fb63d894065dac2e",
+          "services/control-plane/src/inv/node_transport.py": "3559bbcdf9568f8930654d860b0edd980eca71c835cde3fe7380a69dd56e18f4",
+          "services/control-plane/src/inv/observation.py": "b515ceda8b066466cf4cdf5fa88d04803220398c436d29ab7c5fd2793bf5748f",
+          "services/control-plane/src/inv/observer_worker.py": "6bbdf815554fe1f0157247732ddc4dc3069686685c291ef83add55c8f3e92003",
+          "services/control-plane/src/inv/placement.py": "d6f1baea8fedb0e8cf471d8b6880444c3c1ac13fc5c2d767eac6a7983c386224",
+          "services/control-plane/src/inv/remote_git.py": "5efd1057f9208cdb29670073bd8ea5e96f98cfbd5a8173f4daa764d3db5db52e",
+          "services/control-plane/src/inv/storage_commit.py": "41522f6ef98b315c4dff75b06d10507ad7bc45a6523983b3de9767cd61ff496c",
+          "services/control-plane/src/inv/storage_sampling.py": "4e43aa43e8dc9b8ab78af0fde78f9e83b83d7bfdc77b7362ad565741f6f94e8a",
+          "services/control-plane/src/inv/terminal.py": "fe294d648b34d617df94449974fc82fed904639b80b8a5da2c9d34f32606bf8e",
+          "services/control-plane/src/inv/workspace_git.py": "9148060a66ce41df01d764b4584c3c890d61ff9ed87cfb9e49df348e4d891e7a",
+          "src/saintvision/identity/node_auth.py": "9b670227f01011ac1947b411c6459692bacaaeff49f7918f83eec89f1bdc026d",
+          "tools/check_lan_storage_readiness.py": "b2ccdc3933549eae7c2d1414e438314ea1019d269e84471064b6d2a5063a7339",
+          "tools/check_remote_workspace.py": "3550db9c20fb7e2118f66f0337ed787dd22a166a6ff8cf1c6e9490f9ae9df6e3",
+          "tools/five_node_lab_preflight.py": "13b455a80aecd095ceb02ade0fbda40f2f56408c227d8461e9eff60ef6327943",
+          "tools/lan_console.py": "3e037403bd47e2a4cc6c1bca1e6e32c2eeefaf9da3dee9ad56d7379692845317",
+          "tools/lan_execution.py": "cd4be84de9a60c03c32daa8e831a527ed9014169e151c7a436383772a5d4ddc0",
+          "tools/lan_pilot.py": "2c626540f495499423b707b063a6cab6a53e1be3af8c324f46af88a94ac8f652",
+          "tools/remote_workspace_entry.py": "e69fa8ff6c51bd3880f5ec388fe97288a4256169377e17d9d6aa5b7ec2f32c27",
+          "tools/s01_readiness_preflight.py": "cf563c0e0491b7d8b87aea8e151beb7fa8914fdae3a100705d42e6b00cb5d2de"
+        },
+        "uncoveredPaths": [
+          "services/control-plane/src/inv/capacity.py",
+          "services/control-plane/src/inv/gpu.py",
+          "services/control-plane/src/inv/model_remote.py",
+          "services/control-plane/src/inv/model_runtime.py",
+          "services/control-plane/src/inv/model_source.py",
+          "services/control-plane/src/inv/node_certificates.py",
+          "services/control-plane/src/inv/node_execution.py",
+          "services/control-plane/src/inv/node_resource_usage.py",
+          "services/control-plane/src/inv/observer_worker.py",
+          "services/control-plane/src/inv/placement.py",
+          "services/control-plane/src/inv/storage_commit.py",
+          "services/control-plane/src/inv/storage_sampling.py",
+          "src/saintvision/identity/node_auth.py",
+          "tools/check_lan_storage_readiness.py",
+          "tools/five_node_lab_preflight.py",
+          "tools/lan_console.py",
+          "tools/lan_pilot.py",
+          "tools/s01_readiness_preflight.py"
+        ]
+      },
+      "injectedStatements": [
+        {
+          "source": {
+            "expressionSHA256": "f8dfca23544920e6ffddf4b83fb5ebe3a9e98fc379fbf3f2f138636892b19712",
+            "fileSHA256": "19c2e14eb3e586f5ed22e1fb0549fe51961a079557fba2bb07ca1b8410686191",
+            "function": "inv.node_certificates.",
+            "path": "services/control-plane/src/inv/node_certificates.py",
+            "span": [
+              75,
+              0,
+              75,
+              56
+            ]
+          },
+          "text": "from .node_channels import NodeChannels as _ReviewerA7NC"
+        },
+        {
+          "source": {
+            "expressionSHA256": "77cf095086b436fdb259fe146f4815fef27dfd3162921b5b3779fa3352e137c4",
+            "fileSHA256": "19c2e14eb3e586f5ed22e1fb0549fe51961a079557fba2bb07ca1b8410686191",
+            "function": "inv.node_certificates.",
+            "path": "services/control-plane/src/inv/node_certificates.py",
+            "span": [
+              76,
+              0,
+              76,
+              54
+            ]
+          },
+          "text": "_ReviewerA7NC.snapshot = lambda self, node, **kw: None"
+        }
+      ],
+      "inputSHA256": {
+        "services/control-plane/src/inv/node_certificates.py": "19c2e14eb3e586f5ed22e1fb0549fe51961a079557fba2bb07ca1b8410686191"
+      },
+      "layer": "CENSUS_AND_EXISTING_GUARDS_NOT_BODY_REFUSAL",
+      "name": "actual-review-exact-nonretained-monkeypatch",
+      "retainedForCallClosure": false,
+      "selectedBodiesUnchanged": {
+        "services/control-plane/src/inv/containment.py": "a0d7055d5f3e5485d82ea3876f9885bb6f0c2e8d5d0e7fd11a846ec86edf425e",
+        "services/control-plane/src/inv/db.py": "38e0d679b442433fd0b775e98411d78dfff2b7d114bbc3c2a52d3a886726022d",
+        "services/control-plane/src/inv/errors.py": "833eea9d797496c44ef3b3003cf728cfa88d12128dddf60106632609ead3a7bc",
+        "services/control-plane/src/inv/node_channels.py": "3fad0bb24beb096522ea3335e3bf45f4e65f2d0d906177ef7e310aca1128502b"
+      },
+      "syntaxValid": true
+    }
+  ],
+  "productImportedOrExecuted": false,
+  "reviewInputOrigin": "actual7a8012f47de5aa94a4264366df6722c1f6755a9c, four distinct SPAN/BODY/CENSUS/GUARD_ONLY rows; not three"
+}

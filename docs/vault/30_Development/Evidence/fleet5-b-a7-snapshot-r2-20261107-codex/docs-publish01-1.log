@@ -1,0 +1,2 @@
+PASS: 24 original hashes, 1264 versioned documents, wiki links, 48 tasks, 12 outcomes, owner/reviewer/skills, dependency DAG.
+{"ownerResourceMeasurement": {"target": "tools/check_docs.py", "peakWorkingSetBytes": 181047296, "elapsedSeconds": 15.573, "OSMemoryLimitEnforced": false, "serial": true}}

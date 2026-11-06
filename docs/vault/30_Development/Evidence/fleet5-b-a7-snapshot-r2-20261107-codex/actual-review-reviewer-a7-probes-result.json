@@ -1,0 +1,1418 @@
+{
+ "preconditions": {
+  "fileMismatches": [],
+  "manifestFiles": 107,
+  "manifestSHA256": "2a75a22f883f9ab9eba13e8b618c213710f7880f5df39769f10d8ab6bcf4ee43",
+  "producerMismatches": [],
+  "producers": 36
+ },
+ "rows": [
+  {
+   "case": "baseline-actual-72028",
+   "censusObligations": 1,
+   "constructors": 10,
+   "layer": "CENSUS",
+   "other": 2,
+   "parsed": 30,
+   "pre": {
+    "fileMismatches": [],
+    "manifestFiles": 107,
+    "manifestSHA256": "2a75a22f883f9ab9eba13e8b618c213710f7880f5df39769f10d8ab6bcf4ee43",
+    "producerMismatches": [],
+    "producers": 36
+   },
+   "retained": 12,
+   "snapshots": 10
+  },
+  {
+   "accepted": true,
+   "case": "control-actual",
+   "detail": null,
+   "expected": "ACCEPT",
+   "frozenSHA256": {},
+   "gatesBeforeRefusal": [
+    "NODECHANNELS_DATABASE_FIELD",
+    "NORMAL_CONTAINMENT_IMPORT_AND_CALL",
+    "NODE_LOCK_AND_DB_CLOCK",
+    "NODE_EPOCH_ALWAYS",
+    "NORMAL_ONLINE_HEARTBEAT_0_15",
+    "CHANNEL_READ_SAME_CONNECTION",
+    "CHANNEL_EPOCH_ALWAYS",
+    "CHANNEL_PROOF_DATA",
+    "ASSERT_CURRENT_CHANNEL_ALWAYS",
+    "RETURN_PROOF_DATA",
+    "PROOF_DATA",
+    "CURRENT_CHANNEL_CERTIFICATE_PROOF",
+    "EXECUTION_CONTAINMENT",
+    "DATABASE_DEPENDENCY_BODY_AND_SIGNATURE",
+    "DATABASE_DEPENDENCY_BODY_AND_SIGNATURE",
+    "DATABASE_DEPENDENCY_BODY_AND_SIGNATURE",
+    "DATABASE_DEPENDENCY_BODY_AND_SIGNATURE",
+    "DATABASE_DEPENDENCY_BODY_AND_SIGNATURE",
+    "NECESSARY_LEXICAL_LOAD_BINDINGS",
+    "FROZEN_USE_SITE_SCOPE",
+    "FROZEN_USE_SITE_SCOPE",
+    "FROZEN_USE_SITE_SCOPE",
+    "FROZEN_USE_SITE_SCOPE"
+   ],
+   "inputSHA256": {},
+   "layer": "BODY",
+   "matches": true,
+   "note": "",
+   "reason": null,
+   "seconds": 10.0,
+   "unchangedSelected": {
+    "services/control-plane/src/inv/containment.py": "a0d7055d5f3e5485d82ea3876f9885bb6f0c2e8d5d0e7fd11a846ec86edf425e",
+    "services/control-plane/src/inv/db.py": "38e0d679b442433fd0b775e98411d78dfff2b7d114bbc3c2a52d3a886726022d",
+    "services/control-plane/src/inv/errors.py": "833eea9d797496c44ef3b3003cf728cfa88d12128dddf60106632609ead3a7bc",
+    "services/control-plane/src/inv/node_channels.py": "3fad0bb24beb096522ea3335e3bf45f4e65f2d0d906177ef7e310aca1128502b"
+   }
+  },
+  {
+   "accepted": true,
+   "case": "control-leading-comment-shifts-all-nc-spans",
+   "detail": null,
+   "expected": "ACCEPT",
+   "frozenSHA256": {
+    "services/control-plane/src/inv/node_channels.py": "3fad0bb24beb096522ea3335e3bf45f4e65f2d0d906177ef7e310aca1128502b"
+   },
+   "gatesBeforeRefusal": [
+    "NODECHANNELS_DATABASE_FIELD",
+    "NORMAL_CONTAINMENT_IMPORT_AND_CALL",
+    "NODE_LOCK_AND_DB_CLOCK",
+    "NODE_EPOCH_ALWAYS",
+    "NORMAL_ONLINE_HEARTBEAT_0_15",
+    "CHANNEL_READ_SAME_CONNECTION",
+    "CHANNEL_EPOCH_ALWAYS",
+    "CHANNEL_PROOF_DATA",
+    "ASSERT_CURRENT_CHANNEL_ALWAYS",
+    "RETURN_PROOF_DATA",
+    "PROOF_DATA",
+    "CURRENT_CHANNEL_CERTIFICATE_PROOF",
+    "EXECUTION_CONTAINMENT",
+    "DATABASE_DEPENDENCY_BODY_AND_SIGNATURE",
+    "DATABASE_DEPENDENCY_BODY_AND_SIGNATURE",
+    "DATABASE_DEPENDENCY_BODY_AND_SIGNATURE",
+    "DATABASE_DEPENDENCY_BODY_AND_SIGNATURE",
+    "DATABASE_DEPENDENCY_BODY_AND_SIGNATURE",
+    "NECESSARY_LEXICAL_LOAD_BINDINGS",
+    "FROZEN_USE_SITE_SCOPE",
+    "FROZEN_USE_SITE_SCOPE",
+    "FROZEN_USE_SITE_SCOPE",
+    "FROZEN_USE_SITE_SCOPE"
+   ],
+   "inputSHA256": {
+    "services/control-plane/src/inv/node_channels.py": "cbebe7724f715700a5de3b846907e562f993652565be8ab1ca2af54d7889c790"
+   },
+   "layer": "BODY",
+   "matches": true,
+   "note": "",
+   "reason": null,
+   "seconds": 0.6,
+   "unchangedSelected": {
+    "services/control-plane/src/inv/containment.py": "a0d7055d5f3e5485d82ea3876f9885bb6f0c2e8d5d0e7fd11a846ec86edf425e",
+    "services/control-plane/src/inv/db.py": "38e0d679b442433fd0b775e98411d78dfff2b7d114bbc3c2a52d3a886726022d",
+    "services/control-plane/src/inv/errors.py": "833eea9d797496c44ef3b3003cf728cfa88d12128dddf60106632609ead3a7bc"
+   }
+  },
+  {
+   "accepted": false,
+   "case": "control-comment-inside-snapshot",
+   "detail": "services/control-plane/src/inv/node_channels.py:NodeChannels.snapshot:conn",
+   "expected": "ACCEPT",
+   "frozenSHA256": {
+    "services/control-plane/src/inv/node_channels.py": "3fad0bb24beb096522ea3335e3bf45f4e65f2d0d906177ef7e310aca1128502b"
+   },
+   "gatesBeforeRefusal": [
+    "NODECHANNELS_DATABASE_FIELD",
+    "NORMAL_CONTAINMENT_IMPORT_AND_CALL",
+    "NODE_LOCK_AND_DB_CLOCK",
+    "NODE_EPOCH_ALWAYS",
+    "NORMAL_ONLINE_HEARTBEAT_0_15",
+    "CHANNEL_READ_SAME_CONNECTION",
+    "CHANNEL_EPOCH_ALWAYS",
+    "CHANNEL_PROOF_DATA",
+    "ASSERT_CURRENT_CHANNEL_ALWAYS",
+    "RETURN_PROOF_DATA",
+    "PROOF_DATA",
+    "CURRENT_CHANNEL_CERTIFICATE_PROOF",
+    "EXECUTION_CONTAINMENT",
+    "DATABASE_DEPENDENCY_BODY_AND_SIGNATURE",
+    "DATABASE_DEPENDENCY_BODY_AND_SIGNATURE",
+    "DATABASE_DEPENDENCY_BODY_AND_SIGNATURE",
+    "DATABASE_DEPENDENCY_BODY_AND_SIGNATURE",
+    "DATABASE_DEPENDENCY_BODY_AND_SIGNATURE"
+   ],
+   "inputSHA256": {
+    "services/control-plane/src/inv/node_channels.py": "6130676acf50fdb463d5336efb4390ed3781aa53eec500f82716f0ce74458afb"
+   },
+   "layer": "BODY",
+   "matches": false,
+   "note": "",
+   "reason": "UNRESOLVED:A7_NECESSARY_LEXICAL_BINDING",
+   "seconds": 0.2,
+   "unchangedSelected": {
+    "services/control-plane/src/inv/containment.py": "a0d7055d5f3e5485d82ea3876f9885bb6f0c2e8d5d0e7fd11a846ec86edf425e",
+    "services/control-plane/src/inv/db.py": "38e0d679b442433fd0b775e98411d78dfff2b7d114bbc3c2a52d3a886726022d",
+    "services/control-plane/src/inv/errors.py": "833eea9d797496c44ef3b3003cf728cfa88d12128dddf60106632609ead3a7bc"
+   }
+  },
+  {
+   "accepted": true,
+   "case": "control-containment-trailing-comment",
+   "detail": null,
+   "expected": "ACCEPT",
+   "frozenSHA256": {
+    "services/control-plane/src/inv/containment.py": "a0d7055d5f3e5485d82ea3876f9885bb6f0c2e8d5d0e7fd11a846ec86edf425e"
+   },
+   "gatesBeforeRefusal": [
+    "NODECHANNELS_DATABASE_FIELD",
+    "NORMAL_CONTAINMENT_IMPORT_AND_CALL",
+    "NODE_LOCK_AND_DB_CLOCK",
+    "NODE_EPOCH_ALWAYS",
+    "NORMAL_ONLINE_HEARTBEAT_0_15",
+    "CHANNEL_READ_SAME_CONNECTION",
+    "CHANNEL_EPOCH_ALWAYS",
+    "CHANNEL_PROOF_DATA",
+    "ASSERT_CURRENT_CHANNEL_ALWAYS",
+    "RETURN_PROOF_DATA",
+    "PROOF_DATA",
+    "CURRENT_CHANNEL_CERTIFICATE_PROOF",
+    "EXECUTION_CONTAINMENT",
+    "DATABASE_DEPENDENCY_BODY_AND_SIGNATURE",
+    "DATABASE_DEPENDENCY_BODY_AND_SIGNATURE",
+    "DATABASE_DEPENDENCY_BODY_AND_SIGNATURE",
+    "DATABASE_DEPENDENCY_BODY_AND_SIGNATURE",
+    "DATABASE_DEPENDENCY_BODY_AND_SIGNATURE",
+    "NECESSARY_LEXICAL_LOAD_BINDINGS",
+    "FROZEN_USE_SITE_SCOPE",
+    "FROZEN_USE_SITE_SCOPE",
+    "FROZEN_USE_SITE_SCOPE",
+    "FROZEN_USE_SITE_SCOPE"
+   ],
+   "inputSHA256": {
+    "services/control-plane/src/inv/containment.py": "8fb6c6701dce1f14e81ef02b2021684506a49ce7948252b5c70de2151a018adc"
+   },
+   "layer": "BODY",
+   "matches": true,
+   "note": "",
+   "reason": null,
+   "seconds": 0.5,
+   "unchangedSelected": {
+    "services/control-plane/src/inv/db.py": "38e0d679b442433fd0b775e98411d78dfff2b7d114bbc3c2a52d3a886726022d",
+    "services/control-plane/src/inv/errors.py": "833eea9d797496c44ef3b3003cf728cfa88d12128dddf60106632609ead3a7bc",
+    "services/control-plane/src/inv/node_channels.py": "3fad0bb24beb096522ea3335e3bf45f4e65f2d0d906177ef7e310aca1128502b"
+   }
+  },
+  {
+   "accepted": true,
+   "case": "control-db-trailing-comment",
+   "detail": null,
+   "expected": "ACCEPT",
+   "frozenSHA256": {
+    "services/control-plane/src/inv/db.py": "38e0d679b442433fd0b775e98411d78dfff2b7d114bbc3c2a52d3a886726022d"
+   },
+   "gatesBeforeRefusal": [
+    "NODECHANNELS_DATABASE_FIELD",
+    "NORMAL_CONTAINMENT_IMPORT_AND_CALL",
+    "NODE_LOCK_AND_DB_CLOCK",
+    "NODE_EPOCH_ALWAYS",
+    "NORMAL_ONLINE_HEARTBEAT_0_15",
+    "CHANNEL_READ_SAME_CONNECTION",
+    "CHANNEL_EPOCH_ALWAYS",
+    "CHANNEL_PROOF_DATA",
+    "ASSERT_CURRENT_CHANNEL_ALWAYS",
+    "RETURN_PROOF_DATA",
+    "PROOF_DATA",
+    "CURRENT_CHANNEL_CERTIFICATE_PROOF",
+    "EXECUTION_CONTAINMENT",
+    "DATABASE_DEPENDENCY_BODY_AND_SIGNATURE",
+    "DATABASE_DEPENDENCY_BODY_AND_SIGNATURE",
+    "DATABASE_DEPENDENCY_BODY_AND_SIGNATURE",
+    "DATABASE_DEPENDENCY_BODY_AND_SIGNATURE",
+    "DATABASE_DEPENDENCY_BODY_AND_SIGNATURE",
+    "NECESSARY_LEXICAL_LOAD_BINDINGS",
+    "FROZEN_USE_SITE_SCOPE",
+    "FROZEN_USE_SITE_SCOPE",
+    "FROZEN_USE_SITE_SCOPE",
+    "FROZEN_USE_SITE_SCOPE"
+   ],
+   "inputSHA256": {
+    "services/control-plane/src/inv/db.py": "840dd96050e6320682652e1b656d8738961a6a1407700a6fc2676d27a1d4156d"
+   },
+   "layer": "BODY",
+   "matches": true,
+   "note": "",
+   "reason": null,
+   "seconds": 0.7,
+   "unchangedSelected": {
+    "services/control-plane/src/inv/containment.py": "a0d7055d5f3e5485d82ea3876f9885bb6f0c2e8d5d0e7fd11a846ec86edf425e",
+    "services/control-plane/src/inv/errors.py": "833eea9d797496c44ef3b3003cf728cfa88d12128dddf60106632609ead3a7bc",
+    "services/control-plane/src/inv/node_channels.py": "3fad0bb24beb096522ea3335e3bf45f4e65f2d0d906177ef7e310aca1128502b"
+   }
+  },
+  {
+   "accepted": true,
+   "case": "control-errors-trailing-comment",
+   "detail": null,
+   "expected": "ACCEPT",
+   "frozenSHA256": {
+    "services/control-plane/src/inv/errors.py": "833eea9d797496c44ef3b3003cf728cfa88d12128dddf60106632609ead3a7bc"
+   },
+   "gatesBeforeRefusal": [
+    "NODECHANNELS_DATABASE_FIELD",
+    "NORMAL_CONTAINMENT_IMPORT_AND_CALL",
+    "NODE_LOCK_AND_DB_CLOCK",
+    "NODE_EPOCH_ALWAYS",
+    "NORMAL_ONLINE_HEARTBEAT_0_15",
+    "CHANNEL_READ_SAME_CONNECTION",
+    "CHANNEL_EPOCH_ALWAYS",
+    "CHANNEL_PROOF_DATA",
+    "ASSERT_CURRENT_CHANNEL_ALWAYS",
+    "RETURN_PROOF_DATA",
+    "PROOF_DATA",
+    "CURRENT_CHANNEL_CERTIFICATE_PROOF",
+    "EXECUTION_CONTAINMENT",
+    "DATABASE_DEPENDENCY_BODY_AND_SIGNATURE",
+    "DATABASE_DEPENDENCY_BODY_AND_SIGNATURE",
+    "DATABASE_DEPENDENCY_BODY_AND_SIGNATURE",
+    "DATABASE_DEPENDENCY_BODY_AND_SIGNATURE",
+    "DATABASE_DEPENDENCY_BODY_AND_SIGNATURE",
+    "NECESSARY_LEXICAL_LOAD_BINDINGS",
+    "FROZEN_USE_SITE_SCOPE",
+    "FROZEN_USE_SITE_SCOPE",
+    "FROZEN_USE_SITE_SCOPE",
+    "FROZEN_USE_SITE_SCOPE"
+   ],
+   "inputSHA256": {
+    "services/control-plane/src/inv/errors.py": "96119886f0926a389f9a2fe699c294f2fc965d62d10d8d7451094c7002de03e7"
+   },
+   "layer": "BODY",
+   "matches": true,
+   "note": "",
+   "reason": null,
+   "seconds": 0.7,
+   "unchangedSelected": {
+    "services/control-plane/src/inv/containment.py": "a0d7055d5f3e5485d82ea3876f9885bb6f0c2e8d5d0e7fd11a846ec86edf425e",
+    "services/control-plane/src/inv/db.py": "38e0d679b442433fd0b775e98411d78dfff2b7d114bbc3c2a52d3a886726022d",
+    "services/control-plane/src/inv/node_channels.py": "3fad0bb24beb096522ea3335e3bf45f4e65f2d0d906177ef7e310aca1128502b"
+   }
+  },
+  {
+   "accepted": false,
+   "case": "ct-module-rebinding-after-def",
+   "detail": "authenticated helper/caller binding",
+   "expected": "REFUSE",
+   "frozenSHA256": {
+    "services/control-plane/src/inv/containment.py": "a0d7055d5f3e5485d82ea3876f9885bb6f0c2e8d5d0e7fd11a846ec86edf425e"
+   },
+   "gatesBeforeRefusal": [
+    "NODECHANNELS_DATABASE_FIELD"
+   ],
+   "inputSHA256": {
+    "services/control-plane/src/inv/containment.py": "c918c3e3db087513a6e5a83664b0b8fdf022919a988c5f6efe95d4ed9b19b5e9"
+   },
+   "layer": "BODY",
+   "matches": true,
+   "note": "",
+   "reason": "UNRESOLVED:CALLEE_REBOUND",
+   "seconds": 0.0,
+   "unchangedSelected": {
+    "services/control-plane/src/inv/db.py": "38e0d679b442433fd0b775e98411d78dfff2b7d114bbc3c2a52d3a886726022d",
+    "services/control-plane/src/inv/errors.py": "833eea9d797496c44ef3b3003cf728cfa88d12128dddf60106632609ead3a7bc",
+    "services/control-plane/src/inv/node_channels.py": "3fad0bb24beb096522ea3335e3bf45f4e65f2d0d906177ef7e310aca1128502b"
+   }
+  },
+  {
+   "accepted": false,
+   "case": "ct-duplicate-noop-def-after",
+   "detail": "authenticated helper/caller binding",
+   "expected": "REFUSE",
+   "frozenSHA256": {
+    "services/control-plane/src/inv/containment.py": "a0d7055d5f3e5485d82ea3876f9885bb6f0c2e8d5d0e7fd11a846ec86edf425e"
+   },
+   "gatesBeforeRefusal": [
+    "NODECHANNELS_DATABASE_FIELD"
+   ],
+   "inputSHA256": {
+    "services/control-plane/src/inv/containment.py": "7e97b2d483fe080e8f509a10d8aeb58de297c7a52a43bb7a332d4483e9f6ebac"
+   },
+   "layer": "BODY",
+   "matches": true,
+   "note": "",
+   "reason": "UNRESOLVED:CALLEE_REBOUND",
+   "seconds": 0.0,
+   "unchangedSelected": {
+    "services/control-plane/src/inv/db.py": "38e0d679b442433fd0b775e98411d78dfff2b7d114bbc3c2a52d3a886726022d",
+    "services/control-plane/src/inv/errors.py": "833eea9d797496c44ef3b3003cf728cfa88d12128dddf60106632609ead3a7bc",
+    "services/control-plane/src/inv/node_channels.py": "3fad0bb24beb096522ea3335e3bf45f4e65f2d0d906177ef7e310aca1128502b"
+   }
+  },
+  {
+   "accepted": false,
+   "case": "ct-duplicate-noop-def-before",
+   "detail": "authenticated helper/caller binding",
+   "expected": "REFUSE",
+   "frozenSHA256": {
+    "services/control-plane/src/inv/containment.py": "a0d7055d5f3e5485d82ea3876f9885bb6f0c2e8d5d0e7fd11a846ec86edf425e"
+   },
+   "gatesBeforeRefusal": [
+    "NODECHANNELS_DATABASE_FIELD"
+   ],
+   "inputSHA256": {
+    "services/control-plane/src/inv/containment.py": "9bfcbdd76b713e44837b1744783106caacc46fd60868ec887273db1c90856872"
+   },
+   "layer": "BODY",
+   "matches": true,
+   "note": "",
+   "reason": "UNRESOLVED:CALLEE_REBOUND",
+   "seconds": 0.0,
+   "unchangedSelected": {
+    "services/control-plane/src/inv/db.py": "38e0d679b442433fd0b775e98411d78dfff2b7d114bbc3c2a52d3a886726022d",
+    "services/control-plane/src/inv/errors.py": "833eea9d797496c44ef3b3003cf728cfa88d12128dddf60106632609ead3a7bc",
+    "services/control-plane/src/inv/node_channels.py": "3fad0bb24beb096522ea3335e3bf45f4e65f2d0d906177ef7e310aca1128502b"
+   }
+  },
+  {
+   "accepted": false,
+   "case": "ct-del-after-def",
+   "detail": "authenticated helper/caller binding",
+   "expected": "REFUSE",
+   "frozenSHA256": {
+    "services/control-plane/src/inv/containment.py": "a0d7055d5f3e5485d82ea3876f9885bb6f0c2e8d5d0e7fd11a846ec86edf425e"
+   },
+   "gatesBeforeRefusal": [
+    "NODECHANNELS_DATABASE_FIELD"
+   ],
+   "inputSHA256": {
+    "services/control-plane/src/inv/containment.py": "bcee92d7283db68ac26dfab14d8538195c0b40563daeb0da6fae37b2a8cd42ab"
+   },
+   "layer": "BODY",
+   "matches": true,
+   "note": "",
+   "reason": "UNRESOLVED:CALLEE_REBOUND",
+   "seconds": 0.0,
+   "unchangedSelected": {
+    "services/control-plane/src/inv/db.py": "38e0d679b442433fd0b775e98411d78dfff2b7d114bbc3c2a52d3a886726022d",
+    "services/control-plane/src/inv/errors.py": "833eea9d797496c44ef3b3003cf728cfa88d12128dddf60106632609ead3a7bc",
+    "services/control-plane/src/inv/node_channels.py": "3fad0bb24beb096522ea3335e3bf45f4e65f2d0d906177ef7e310aca1128502b"
+   }
+  },
+  {
+   "accepted": false,
+   "case": "ct-domainerror-rebound",
+   "detail": "services/control-plane/src/inv/containment.py:require_execution:DomainError",
+   "expected": "REFUSE",
+   "frozenSHA256": {
+    "services/control-plane/src/inv/containment.py": "a0d7055d5f3e5485d82ea3876f9885bb6f0c2e8d5d0e7fd11a846ec86edf425e"
+   },
+   "gatesBeforeRefusal": [
+    "NODECHANNELS_DATABASE_FIELD",
+    "NORMAL_CONTAINMENT_IMPORT_AND_CALL",
+    "NODE_LOCK_AND_DB_CLOCK",
+    "NODE_EPOCH_ALWAYS",
+    "NORMAL_ONLINE_HEARTBEAT_0_15",
+    "CHANNEL_READ_SAME_CONNECTION",
+    "CHANNEL_EPOCH_ALWAYS",
+    "CHANNEL_PROOF_DATA",
+    "ASSERT_CURRENT_CHANNEL_ALWAYS",
+    "RETURN_PROOF_DATA",
+    "PROOF_DATA",
+    "CURRENT_CHANNEL_CERTIFICATE_PROOF",
+    "EXECUTION_CONTAINMENT",
+    "DATABASE_DEPENDENCY_BODY_AND_SIGNATURE",
+    "DATABASE_DEPENDENCY_BODY_AND_SIGNATURE",
+    "DATABASE_DEPENDENCY_BODY_AND_SIGNATURE",
+    "DATABASE_DEPENDENCY_BODY_AND_SIGNATURE",
+    "DATABASE_DEPENDENCY_BODY_AND_SIGNATURE"
+   ],
+   "inputSHA256": {
+    "services/control-plane/src/inv/containment.py": "7eb7b5f99578932cd0a9cf15a9769b2fc43c734ae1f1d1c1d64ee518a40a3bd2"
+   },
+   "layer": "BODY",
+   "matches": true,
+   "note": "",
+   "reason": "UNRESOLVED:A7_NECESSARY_LEXICAL_BINDING",
+   "seconds": 0.2,
+   "unchangedSelected": {
+    "services/control-plane/src/inv/db.py": "38e0d679b442433fd0b775e98411d78dfff2b7d114bbc3c2a52d3a886726022d",
+    "services/control-plane/src/inv/errors.py": "833eea9d797496c44ef3b3003cf728cfa88d12128dddf60106632609ead3a7bc",
+    "services/control-plane/src/inv/node_channels.py": "3fad0bb24beb096522ea3335e3bf45f4e65f2d0d906177ef7e310aca1128502b"
+   }
+  },
+  {
+   "accepted": false,
+   "case": "nc-assert-channel-module-rebinding",
+   "detail": "authenticated helper/caller binding",
+   "expected": "REFUSE",
+   "frozenSHA256": {
+    "services/control-plane/src/inv/node_channels.py": "3fad0bb24beb096522ea3335e3bf45f4e65f2d0d906177ef7e310aca1128502b"
+   },
+   "gatesBeforeRefusal": [
+    "NODECHANNELS_DATABASE_FIELD"
+   ],
+   "inputSHA256": {
+    "services/control-plane/src/inv/node_channels.py": "323ec227d5e1b44623c3885400be58cb2b0c5e5b4d10bf0d44206251c2f15a27"
+   },
+   "layer": "BODY",
+   "matches": true,
+   "note": "",
+   "reason": "UNRESOLVED:CALLEE_REBOUND",
+   "seconds": 0.0,
+   "unchangedSelected": {
+    "services/control-plane/src/inv/containment.py": "a0d7055d5f3e5485d82ea3876f9885bb6f0c2e8d5d0e7fd11a846ec86edf425e",
+    "services/control-plane/src/inv/db.py": "38e0d679b442433fd0b775e98411d78dfff2b7d114bbc3c2a52d3a886726022d",
+    "services/control-plane/src/inv/errors.py": "833eea9d797496c44ef3b3003cf728cfa88d12128dddf60106632609ead3a7bc"
+   }
+  },
+  {
+   "accepted": false,
+   "case": "nc-channelproof-eq-patch",
+   "detail": "retained full-module use-site guard: services/control-plane/src/inv/node_channels.py",
+   "expected": "REFUSE",
+   "frozenSHA256": {
+    "services/control-plane/src/inv/node_channels.py": "3fad0bb24beb096522ea3335e3bf45f4e65f2d0d906177ef7e310aca1128502b"
+   },
+   "gatesBeforeRefusal": [
+    "NODECHANNELS_DATABASE_FIELD",
+    "NORMAL_CONTAINMENT_IMPORT_AND_CALL",
+    "NODE_LOCK_AND_DB_CLOCK",
+    "NODE_EPOCH_ALWAYS",
+    "NORMAL_ONLINE_HEARTBEAT_0_15",
+    "CHANNEL_READ_SAME_CONNECTION",
+    "CHANNEL_EPOCH_ALWAYS",
+    "CHANNEL_PROOF_DATA",
+    "ASSERT_CURRENT_CHANNEL_ALWAYS",
+    "RETURN_PROOF_DATA",
+    "PROOF_DATA",
+    "CURRENT_CHANNEL_CERTIFICATE_PROOF",
+    "EXECUTION_CONTAINMENT",
+    "DATABASE_DEPENDENCY_BODY_AND_SIGNATURE",
+    "DATABASE_DEPENDENCY_BODY_AND_SIGNATURE",
+    "DATABASE_DEPENDENCY_BODY_AND_SIGNATURE",
+    "DATABASE_DEPENDENCY_BODY_AND_SIGNATURE",
+    "DATABASE_DEPENDENCY_BODY_AND_SIGNATURE",
+    "NECESSARY_LEXICAL_LOAD_BINDINGS"
+   ],
+   "inputSHA256": {
+    "services/control-plane/src/inv/node_channels.py": "edfaf4853227e9f83f663ed70dd1d04f2c80696d757e4930fcb64c196985b843"
+   },
+   "layer": "BODY",
+   "matches": true,
+   "note": "",
+   "reason": "DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:WRITE_USE:inv.node_channels.ChannelProof.__eq__",
+   "seconds": 0.4,
+   "unchangedSelected": {
+    "services/control-plane/src/inv/containment.py": "a0d7055d5f3e5485d82ea3876f9885bb6f0c2e8d5d0e7fd11a846ec86edf425e",
+    "services/control-plane/src/inv/db.py": "38e0d679b442433fd0b775e98411d78dfff2b7d114bbc3c2a52d3a886726022d",
+    "services/control-plane/src/inv/errors.py": "833eea9d797496c44ef3b3003cf728cfa88d12128dddf60106632609ead3a7bc"
+   }
+  },
+  {
+   "accepted": false,
+   "case": "nc-domainerror-rebound",
+   "detail": "services/control-plane/src/inv/node_channels.py:NodeChannels.snapshot:DomainError",
+   "expected": "REFUSE",
+   "frozenSHA256": {
+    "services/control-plane/src/inv/node_channels.py": "3fad0bb24beb096522ea3335e3bf45f4e65f2d0d906177ef7e310aca1128502b"
+   },
+   "gatesBeforeRefusal": [
+    "NODECHANNELS_DATABASE_FIELD",
+    "NORMAL_CONTAINMENT_IMPORT_AND_CALL",
+    "NODE_LOCK_AND_DB_CLOCK",
+    "NODE_EPOCH_ALWAYS",
+    "NORMAL_ONLINE_HEARTBEAT_0_15",
+    "CHANNEL_READ_SAME_CONNECTION",
+    "CHANNEL_EPOCH_ALWAYS",
+    "CHANNEL_PROOF_DATA",
+    "ASSERT_CURRENT_CHANNEL_ALWAYS",
+    "RETURN_PROOF_DATA",
+    "PROOF_DATA",
+    "CURRENT_CHANNEL_CERTIFICATE_PROOF",
+    "EXECUTION_CONTAINMENT",
+    "DATABASE_DEPENDENCY_BODY_AND_SIGNATURE",
+    "DATABASE_DEPENDENCY_BODY_AND_SIGNATURE",
+    "DATABASE_DEPENDENCY_BODY_AND_SIGNATURE",
+    "DATABASE_DEPENDENCY_BODY_AND_SIGNATURE",
+    "DATABASE_DEPENDENCY_BODY_AND_SIGNATURE"
+   ],
+   "inputSHA256": {
+    "services/control-plane/src/inv/node_channels.py": "d3fbfc86cd1712caad2c6f2d424d052cdbd595036759645e956ef60e6224dd98"
+   },
+   "layer": "BODY",
+   "matches": true,
+   "note": "",
+   "reason": "UNRESOLVED:A7_NECESSARY_LEXICAL_BINDING",
+   "seconds": 0.2,
+   "unchangedSelected": {
+    "services/control-plane/src/inv/containment.py": "a0d7055d5f3e5485d82ea3876f9885bb6f0c2e8d5d0e7fd11a846ec86edf425e",
+    "services/control-plane/src/inv/db.py": "38e0d679b442433fd0b775e98411d78dfff2b7d114bbc3c2a52d3a886726022d",
+    "services/control-plane/src/inv/errors.py": "833eea9d797496c44ef3b3003cf728cfa88d12128dddf60106632609ead3a7bc"
+   }
+  },
+  {
+   "accepted": false,
+   "case": "nc-heartbeat-lower-bound-weakened",
+   "detail": "semantic AST/control-flow/SQL/receiver statement contract, not a source-digest gate",
+   "expected": "NORMAL_ONLINE",
+   "frozenSHA256": {
+    "services/control-plane/src/inv/node_channels.py": "3fad0bb24beb096522ea3335e3bf45f4e65f2d0d906177ef7e310aca1128502b"
+   },
+   "gatesBeforeRefusal": [
+    "NODECHANNELS_DATABASE_FIELD",
+    "NORMAL_CONTAINMENT_IMPORT_AND_CALL",
+    "NODE_LOCK_AND_DB_CLOCK",
+    "NODE_EPOCH_ALWAYS"
+   ],
+   "inputSHA256": {
+    "services/control-plane/src/inv/node_channels.py": "67a52821227214b6c1e036104bf2fd2d3b765bec7e7926af95f07f890cb20f66"
+   },
+   "layer": "BODY",
+   "matches": true,
+   "note": "",
+   "reason": "UNRESOLVED:A7_NORMAL_ONLINE_HEARTBEAT_0_15",
+   "seconds": 0.0,
+   "unchangedSelected": {
+    "services/control-plane/src/inv/containment.py": "a0d7055d5f3e5485d82ea3876f9885bb6f0c2e8d5d0e7fd11a846ec86edf425e",
+    "services/control-plane/src/inv/db.py": "38e0d679b442433fd0b775e98411d78dfff2b7d114bbc3c2a52d3a886726022d",
+    "services/control-plane/src/inv/errors.py": "833eea9d797496c44ef3b3003cf728cfa88d12128dddf60106632609ead3a7bc"
+   }
+  },
+  {
+   "accepted": false,
+   "case": "nc-online-check-forced-into-observation",
+   "detail": "semantic AST/control-flow/SQL/receiver statement contract, not a source-digest gate",
+   "expected": "NORMAL_ONLINE",
+   "frozenSHA256": {
+    "services/control-plane/src/inv/node_channels.py": "3fad0bb24beb096522ea3335e3bf45f4e65f2d0d906177ef7e310aca1128502b"
+   },
+   "gatesBeforeRefusal": [
+    "NODECHANNELS_DATABASE_FIELD",
+    "NORMAL_CONTAINMENT_IMPORT_AND_CALL",
+    "NODE_LOCK_AND_DB_CLOCK",
+    "NODE_EPOCH_ALWAYS"
+   ],
+   "inputSHA256": {
+    "services/control-plane/src/inv/node_channels.py": "9c57a38aac98d8f2cd5804833cf3465ab8f53a1f3fbaebbd4ef37ee415578341"
+   },
+   "layer": "BODY",
+   "matches": true,
+   "note": "",
+   "reason": "UNRESOLVED:A7_NORMAL_ONLINE_HEARTBEAT_0_15",
+   "seconds": 0.0,
+   "unchangedSelected": {
+    "services/control-plane/src/inv/containment.py": "a0d7055d5f3e5485d82ea3876f9885bb6f0c2e8d5d0e7fd11a846ec86edf425e",
+    "services/control-plane/src/inv/db.py": "38e0d679b442433fd0b775e98411d78dfff2b7d114bbc3c2a52d3a886726022d",
+    "services/control-plane/src/inv/errors.py": "833eea9d797496c44ef3b3003cf728cfa88d12128dddf60106632609ead3a7bc"
+   }
+  },
+  {
+   "accepted": false,
+   "case": "nc-assert-channel-host-clock",
+   "detail": "helper semantic body/signature lock",
+   "expected": "CURRENT_CHANNEL_CERTIFICATE",
+   "frozenSHA256": {
+    "services/control-plane/src/inv/node_channels.py": "3fad0bb24beb096522ea3335e3bf45f4e65f2d0d906177ef7e310aca1128502b"
+   },
+   "gatesBeforeRefusal": [
+    "NODECHANNELS_DATABASE_FIELD",
+    "NORMAL_CONTAINMENT_IMPORT_AND_CALL",
+    "NODE_LOCK_AND_DB_CLOCK",
+    "NODE_EPOCH_ALWAYS",
+    "NORMAL_ONLINE_HEARTBEAT_0_15",
+    "CHANNEL_READ_SAME_CONNECTION",
+    "CHANNEL_EPOCH_ALWAYS",
+    "CHANNEL_PROOF_DATA",
+    "ASSERT_CURRENT_CHANNEL_ALWAYS",
+    "RETURN_PROOF_DATA",
+    "PROOF_DATA"
+   ],
+   "inputSHA256": {
+    "services/control-plane/src/inv/node_channels.py": "59b768774ef30ce891ef81448326536be17e3bb6276cf04d7979c539e62f86fb"
+   },
+   "layer": "BODY",
+   "matches": true,
+   "note": "",
+   "reason": "UNRESOLVED:A7_CURRENT_CHANNEL_CERTIFICATE_PROOF",
+   "seconds": 0.0,
+   "unchangedSelected": {
+    "services/control-plane/src/inv/containment.py": "a0d7055d5f3e5485d82ea3876f9885bb6f0c2e8d5d0e7fd11a846ec86edf425e",
+    "services/control-plane/src/inv/db.py": "38e0d679b442433fd0b775e98411d78dfff2b7d114bbc3c2a52d3a886726022d",
+    "services/control-plane/src/inv/errors.py": "833eea9d797496c44ef3b3003cf728cfa88d12128dddf60106632609ead3a7bc"
+   }
+  },
+  {
+   "accepted": false,
+   "case": "nc-snapshot-default-true",
+   "detail": "",
+   "expected": "SIGNATURE",
+   "frozenSHA256": {
+    "services/control-plane/src/inv/node_channels.py": "3fad0bb24beb096522ea3335e3bf45f4e65f2d0d906177ef7e310aca1128502b"
+   },
+   "gatesBeforeRefusal": [
+    "NODECHANNELS_DATABASE_FIELD"
+   ],
+   "inputSHA256": {
+    "services/control-plane/src/inv/node_channels.py": "c0e60639427ce148d1e4c9a1213cb3460ff5a51ff4de74a8fd191e35a7c131d8"
+   },
+   "layer": "BODY",
+   "matches": true,
+   "note": "",
+   "reason": "UNRESOLVED:A7_SNAPSHOT_SIGNATURE",
+   "seconds": 0.0,
+   "unchangedSelected": {
+    "services/control-plane/src/inv/containment.py": "a0d7055d5f3e5485d82ea3876f9885bb6f0c2e8d5d0e7fd11a846ec86edf425e",
+    "services/control-plane/src/inv/db.py": "38e0d679b442433fd0b775e98411d78dfff2b7d114bbc3c2a52d3a886726022d",
+    "services/control-plane/src/inv/errors.py": "833eea9d797496c44ef3b3003cf728cfa88d12128dddf60106632609ead3a7bc"
+   }
+  },
+  {
+   "case": "nonretained-candidate-class-monkeypatch",
+   "injected": [
+    {
+     "span": [
+      75,
+      0,
+      75,
+      56
+     ],
+     "text": "from .node_channels import NodeChannels as _ReviewerA7NC"
+    },
+    {
+     "span": [
+      76,
+      0,
+      76,
+      54
+     ],
+     "text": "_ReviewerA7NC.snapshot = lambda self, node, **kw: None"
+    }
+   ],
+   "layer": "SPAN",
+   "path": "services/control-plane/src/inv/node_certificates.py"
+  },
+  {
+   "accepted": true,
+   "case": "nonretained-candidate-class-monkeypatch",
+   "detail": null,
+   "expected": "ACCEPT",
+   "frozenSHA256": {
+    "services/control-plane/src/inv/node_certificates.py": "6e2bfb2d0cfa972eaf6f7d4ca3a1928cde7a2b3d0c21b80d03fbb4ff7ccf4901"
+   },
+   "gatesBeforeRefusal": [
+    "NODECHANNELS_DATABASE_FIELD",
+    "NORMAL_CONTAINMENT_IMPORT_AND_CALL",
+    "NODE_LOCK_AND_DB_CLOCK",
+    "NODE_EPOCH_ALWAYS",
+    "NORMAL_ONLINE_HEARTBEAT_0_15",
+    "CHANNEL_READ_SAME_CONNECTION",
+    "CHANNEL_EPOCH_ALWAYS",
+    "CHANNEL_PROOF_DATA",
+    "ASSERT_CURRENT_CHANNEL_ALWAYS",
+    "RETURN_PROOF_DATA",
+    "PROOF_DATA",
+    "CURRENT_CHANNEL_CERTIFICATE_PROOF",
+    "EXECUTION_CONTAINMENT",
+    "DATABASE_DEPENDENCY_BODY_AND_SIGNATURE",
+    "DATABASE_DEPENDENCY_BODY_AND_SIGNATURE",
+    "DATABASE_DEPENDENCY_BODY_AND_SIGNATURE",
+    "DATABASE_DEPENDENCY_BODY_AND_SIGNATURE",
+    "DATABASE_DEPENDENCY_BODY_AND_SIGNATURE",
+    "NECESSARY_LEXICAL_LOAD_BINDINGS",
+    "FROZEN_USE_SITE_SCOPE",
+    "FROZEN_USE_SITE_SCOPE",
+    "FROZEN_USE_SITE_SCOPE",
+    "FROZEN_USE_SITE_SCOPE"
+   ],
+   "inputSHA256": {
+    "services/control-plane/src/inv/node_certificates.py": "19c2e14eb3e586f5ed22e1fb0549fe51961a079557fba2bb07ca1b8410686191"
+   },
+   "layer": "BODY",
+   "matches": true,
+   "note": "body layer reads only node_channels/containment/db/errors; ACCEPT here is expected at this layer",
+   "reason": null,
+   "seconds": 0.9,
+   "unchangedSelected": {
+    "services/control-plane/src/inv/containment.py": "a0d7055d5f3e5485d82ea3876f9885bb6f0c2e8d5d0e7fd11a846ec86edf425e",
+    "services/control-plane/src/inv/db.py": "38e0d679b442433fd0b775e98411d78dfff2b7d114bbc3c2a52d3a886726022d",
+    "services/control-plane/src/inv/errors.py": "833eea9d797496c44ef3b3003cf728cfa88d12128dddf60106632609ead3a7bc",
+    "services/control-plane/src/inv/node_channels.py": "3fad0bb24beb096522ea3335e3bf45f4e65f2d0d906177ef7e310aca1128502b"
+   }
+  },
+  {
+   "addedVsBaseline": [],
+   "case": "nonretained-candidate-class-monkeypatch",
+   "constructors": 10,
+   "frozenSHA256": {
+    "services/control-plane/src/inv/node_certificates.py": "6e2bfb2d0cfa972eaf6f7d4ca3a1928cde7a2b3d0c21b80d03fbb4ff7ccf4901"
+   },
+   "inputSHA256": {
+    "services/control-plane/src/inv/node_certificates.py": "19c2e14eb3e586f5ed22e1fb0549fe51961a079557fba2bb07ca1b8410686191"
+   },
+   "layer": "CENSUS",
+   "note": "parsed lexical candidate with no NodeChannels call and no .snapshot call",
+   "obligations": 1,
+   "otherReceivers": [
+    {
+     "path": "services/control-plane/src/inv/remote_git.py",
+     "purpose": {
+      "origin": "snapshot default False; no runtime type check",
+      "purpose": "NORMAL",
+      "state": "SOURCE_LITERAL",
+      "value": false
+     },
+     "receiver": "self",
+     "span": [
+      285,
+      20,
+      285,
+      58
+     ]
+    },
+    {
+     "path": "services/control-plane/src/inv/workspace_git.py",
+     "purpose": {
+      "origin": "snapshot default False; no runtime type check",
+      "purpose": "NORMAL",
+      "state": "SOURCE_LITERAL",
+      "value": false
+     },
+     "receiver": "repo",
+     "span": [
+      167,
+      18,
+      167,
+      73
+     ]
+    }
+   ],
+   "removedVsBaseline": [],
+   "retainedForCallClosure": {
+    "services/control-plane/src/inv/node_certificates.py": false
+   },
+   "seconds": 4.6,
+   "snapshots": 10,
+   "unchangedSelected": {
+    "services/control-plane/src/inv/containment.py": "a0d7055d5f3e5485d82ea3876f9885bb6f0c2e8d5d0e7fd11a846ec86edf425e",
+    "services/control-plane/src/inv/db.py": "38e0d679b442433fd0b775e98411d78dfff2b7d114bbc3c2a52d3a886726022d",
+    "services/control-plane/src/inv/errors.py": "833eea9d797496c44ef3b3003cf728cfa88d12128dddf60106632609ead3a7bc",
+    "services/control-plane/src/inv/node_channels.py": "3fad0bb24beb096522ea3335e3bf45f4e65f2d0d906177ef7e310aca1128502b"
+   }
+  },
+  {
+   "case": "nonretained-candidate-class-monkeypatch",
+   "inputSHA256": "19c2e14eb3e586f5ed22e1fb0549fe51961a079557fba2bb07ca1b8410686191",
+   "layer": "GUARD_ONLY",
+   "path": "services/control-plane/src/inv/node_certificates.py",
+   "reflectionNewRelevantHits": [],
+   "useSiteError": "DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:WRITE_USE:inv.node_channels.NodeChannels.snapshot"
+  },
+  {
+   "addedVsBaseline": [
+    [
+     "A7_FULL_MODULE_USE_SITE_GUARD",
+     "services/control-plane/src/inv/observation.py",
+     "()",
+     1
+    ]
+   ],
+   "case": "retained-candidate-class-monkeypatch",
+   "constructors": 10,
+   "frozenSHA256": {
+    "services/control-plane/src/inv/observation.py": "b515ceda8b066466cf4cdf5fa88d04803220398c436d29ab7c5fd2793bf5748f"
+   },
+   "inputSHA256": {
+    "services/control-plane/src/inv/observation.py": "0e4734a5dd2e5c58fa61694237dba0108d89ea5c6256c49efce64751f5226595"
+   },
+   "layer": "CENSUS",
+   "note": "same patch in a retained candidate",
+   "obligations": 2,
+   "otherReceivers": [
+    {
+     "path": "services/control-plane/src/inv/remote_git.py",
+     "purpose": {
+      "origin": "snapshot default False; no runtime type check",
+      "purpose": "NORMAL",
+      "state": "SOURCE_LITERAL",
+      "value": false
+     },
+     "receiver": "self",
+     "span": [
+      285,
+      20,
+      285,
+      58
+     ]
+    },
+    {
+     "path": "services/control-plane/src/inv/workspace_git.py",
+     "purpose": {
+      "origin": "snapshot default False; no runtime type check",
+      "purpose": "NORMAL",
+      "state": "SOURCE_LITERAL",
+      "value": false
+     },
+     "receiver": "repo",
+     "span": [
+      167,
+      18,
+      167,
+      73
+     ]
+    }
+   ],
+   "removedVsBaseline": [],
+   "retainedForCallClosure": {
+    "services/control-plane/src/inv/observation.py": true
+   },
+   "seconds": 4.6,
+   "snapshots": 10,
+   "unchangedSelected": {
+    "services/control-plane/src/inv/containment.py": "a0d7055d5f3e5485d82ea3876f9885bb6f0c2e8d5d0e7fd11a846ec86edf425e",
+    "services/control-plane/src/inv/db.py": "38e0d679b442433fd0b775e98411d78dfff2b7d114bbc3c2a52d3a886726022d",
+    "services/control-plane/src/inv/errors.py": "833eea9d797496c44ef3b3003cf728cfa88d12128dddf60106632609ead3a7bc",
+    "services/control-plane/src/inv/node_channels.py": "3fad0bb24beb096522ea3335e3bf45f4e65f2d0d906177ef7e310aca1128502b"
+   }
+  },
+  {
+   "addedVsBaseline": [],
+   "case": "nonretained-candidate-module-attribute-store",
+   "constructors": 10,
+   "frozenSHA256": {
+    "services/control-plane/src/inv/node_certificates.py": "6e2bfb2d0cfa972eaf6f7d4ca3a1928cde7a2b3d0c21b80d03fbb4ff7ccf4901"
+   },
+   "inputSHA256": {
+    "services/control-plane/src/inv/node_certificates.py": "ddd03c5c3b94f89c688dd66d048ecbee737c6665f376139453e22b89c4cf7ccc"
+   },
+   "layer": "CENSUS",
+   "note": "module attribute store: outside the declared categories (B9g INFO novel family); informational only",
+   "obligations": 1,
+   "otherReceivers": [
+    {
+     "path": "services/control-plane/src/inv/remote_git.py",
+     "purpose": {
+      "origin": "snapshot default False; no runtime type check",
+      "purpose": "NORMAL",
+      "state": "SOURCE_LITERAL",
+      "value": false
+     },
+     "receiver": "self",
+     "span": [
+      285,
+      20,
+      285,
+      58
+     ]
+    },
+    {
+     "path": "services/control-plane/src/inv/workspace_git.py",
+     "purpose": {
+      "origin": "snapshot default False; no runtime type check",
+      "purpose": "NORMAL",
+      "state": "SOURCE_LITERAL",
+      "value": false
+     },
+     "receiver": "repo",
+     "span": [
+      167,
+      18,
+      167,
+      73
+     ]
+    }
+   ],
+   "removedVsBaseline": [],
+   "retainedForCallClosure": {
+    "services/control-plane/src/inv/node_certificates.py": false
+   },
+   "seconds": 4.5,
+   "snapshots": 10,
+   "unchangedSelected": {
+    "services/control-plane/src/inv/containment.py": "a0d7055d5f3e5485d82ea3876f9885bb6f0c2e8d5d0e7fd11a846ec86edf425e",
+    "services/control-plane/src/inv/db.py": "38e0d679b442433fd0b775e98411d78dfff2b7d114bbc3c2a52d3a886726022d",
+    "services/control-plane/src/inv/errors.py": "833eea9d797496c44ef3b3003cf728cfa88d12128dddf60106632609ead3a7bc",
+    "services/control-plane/src/inv/node_channels.py": "3fad0bb24beb096522ea3335e3bf45f4e65f2d0d906177ef7e310aca1128502b"
+   }
+  },
+  {
+   "case": "nonretained-candidate-module-attribute-store",
+   "inputSHA256": "ddd03c5c3b94f89c688dd66d048ecbee737c6665f376139453e22b89c4cf7ccc",
+   "layer": "GUARD_ONLY",
+   "path": "services/control-plane/src/inv/node_certificates.py",
+   "reflectionNewRelevantHits": [],
+   "useSiteError": "DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:WRITE_USE:inv.node_channels.assert_channel"
+  },
+  {
+   "case": "new-production-file-class-monkeypatch",
+   "exception": "CalledProcessError:Command '['git', 'show', '72028cbac903c4415d9979f980a6e0f9948e914f:services/control-plane/src/inv/a7_reviewer_new_file.py']' returned non-zero exit status 128.",
+   "frozenSHA256": {},
+   "inputSHA256": {
+    "services/control-plane/src/inv/a7_reviewer_new_file.py": "c1a298881ecca8f0297f5dc65bcc7faa8a9188402917dc10be0baefa39e793a4"
+   },
+   "layer": "CENSUS",
+   "note": "new file inside the declared production universe",
+   "unchangedSelected": {
+    "services/control-plane/src/inv/containment.py": "a0d7055d5f3e5485d82ea3876f9885bb6f0c2e8d5d0e7fd11a846ec86edf425e",
+    "services/control-plane/src/inv/db.py": "38e0d679b442433fd0b775e98411d78dfff2b7d114bbc3c2a52d3a886726022d",
+    "services/control-plane/src/inv/errors.py": "833eea9d797496c44ef3b3003cf728cfa88d12128dddf60106632609ead3a7bc",
+    "services/control-plane/src/inv/node_channels.py": "3fad0bb24beb096522ea3335e3bf45f4e65f2d0d906177ef7e310aca1128502b"
+   }
+  },
+  {
+   "case": "frozen-nonretained-guard",
+   "inputSHA256": "70cf93fcc99d5f23a946445889d5f6b3ab7bd86a30e7923b74e4df82fc85578d",
+   "layer": "GUARD_ONLY",
+   "path": "services/control-plane/src/inv/capacity.py",
+   "reflectionNewRelevantHits": [],
+   "useSiteError": null
+  },
+  {
+   "case": "frozen-nonretained-guard",
+   "inputSHA256": "2a229e710fcdd10cac948d0660c75a04b0405851a76cac5b9df44924ed02c03f",
+   "layer": "GUARD_ONLY",
+   "path": "services/control-plane/src/inv/gpu.py",
+   "reflectionNewRelevantHits": [],
+   "useSiteError": null
+  },
+  {
+   "case": "frozen-nonretained-guard",
+   "inputSHA256": "796f61fe8404c2c3a8a4be08eca75d98e3c442a30c04077c66b278e7d60c6737",
+   "layer": "GUARD_ONLY",
+   "path": "services/control-plane/src/inv/model_remote.py",
+   "reflectionNewRelevantHits": [],
+   "useSiteError": null
+  },
+  {
+   "case": "frozen-nonretained-guard",
+   "inputSHA256": "f7f89911af4987bd7218c8ca6e3e8654c4c4dabc4994b30b547987f17c88e128",
+   "layer": "GUARD_ONLY",
+   "path": "services/control-plane/src/inv/model_runtime.py",
+   "reflectionNewRelevantHits": [],
+   "useSiteError": null
+  },
+  {
+   "case": "frozen-nonretained-guard",
+   "inputSHA256": "9b7adaa666c9031e61dc201c3daf15b08e014aa3b6e329dc1c01277dfea0c8ee",
+   "layer": "GUARD_ONLY",
+   "path": "services/control-plane/src/inv/model_source.py",
+   "reflectionNewRelevantHits": [],
+   "useSiteError": null
+  },
+  {
+   "case": "frozen-nonretained-guard",
+   "inputSHA256": "6e2bfb2d0cfa972eaf6f7d4ca3a1928cde7a2b3d0c21b80d03fbb4ff7ccf4901",
+   "layer": "GUARD_ONLY",
+   "path": "services/control-plane/src/inv/node_certificates.py",
+   "reflectionNewRelevantHits": [],
+   "useSiteError": null
+  },
+  {
+   "case": "frozen-nonretained-guard",
+   "inputSHA256": "0b70dbfd048e4985dcf11faeecedf39975c21c37af27c4c1d6f0d0c1d82494a3",
+   "layer": "GUARD_ONLY",
+   "path": "services/control-plane/src/inv/node_execution.py",
+   "reflectionNewRelevantHits": [],
+   "useSiteError": null
+  },
+  {
+   "case": "frozen-nonretained-guard",
+   "inputSHA256": "95dd48c34601e52b696e9da0115102816ccdb7e4e332c28b5a4013ba28fa5b37",
+   "layer": "GUARD_ONLY",
+   "path": "services/control-plane/src/inv/node_resource_usage.py",
+   "reflectionNewRelevantHits": [],
+   "useSiteError": null
+  },
+  {
+   "case": "frozen-nonretained-guard",
+   "inputSHA256": "6bbdf815554fe1f0157247732ddc4dc3069686685c291ef83add55c8f3e92003",
+   "layer": "GUARD_ONLY",
+   "path": "services/control-plane/src/inv/observer_worker.py",
+   "reflectionNewRelevantHits": [],
+   "useSiteError": null
+  },
+  {
+   "case": "frozen-nonretained-guard",
+   "inputSHA256": "d6f1baea8fedb0e8cf471d8b6880444c3c1ac13fc5c2d767eac6a7983c386224",
+   "layer": "GUARD_ONLY",
+   "path": "services/control-plane/src/inv/placement.py",
+   "reflectionNewRelevantHits": [],
+   "useSiteError": null
+  },
+  {
+   "case": "frozen-nonretained-guard",
+   "inputSHA256": "41522f6ef98b315c4dff75b06d10507ad7bc45a6523983b3de9767cd61ff496c",
+   "layer": "GUARD_ONLY",
+   "path": "services/control-plane/src/inv/storage_commit.py",
+   "reflectionNewRelevantHits": [],
+   "useSiteError": null
+  },
+  {
+   "case": "frozen-nonretained-guard",
+   "inputSHA256": "4e43aa43e8dc9b8ab78af0fde78f9e83b83d7bfdc77b7362ad565741f6f94e8a",
+   "layer": "GUARD_ONLY",
+   "path": "services/control-plane/src/inv/storage_sampling.py",
+   "reflectionNewRelevantHits": [],
+   "useSiteError": null
+  },
+  {
+   "case": "frozen-nonretained-guard",
+   "inputSHA256": "9b670227f01011ac1947b411c6459692bacaaeff49f7918f83eec89f1bdc026d",
+   "layer": "GUARD_ONLY",
+   "path": "src/saintvision/identity/node_auth.py",
+   "reflectionNewRelevantHits": [],
+   "useSiteError": null
+  },
+  {
+   "case": "frozen-nonretained-guard",
+   "inputSHA256": "b2ccdc3933549eae7c2d1414e438314ea1019d269e84471064b6d2a5063a7339",
+   "layer": "GUARD_ONLY",
+   "path": "tools/check_lan_storage_readiness.py",
+   "reflectionNewRelevantHits": [],
+   "useSiteError": null
+  },
+  {
+   "case": "frozen-nonretained-guard",
+   "inputSHA256": "13b455a80aecd095ceb02ade0fbda40f2f56408c227d8461e9eff60ef6327943",
+   "layer": "GUARD_ONLY",
+   "path": "tools/five_node_lab_preflight.py",
+   "reflectionNewRelevantHits": [],
+   "useSiteError": null
+  },
+  {
+   "case": "frozen-nonretained-guard",
+   "inputSHA256": "3e037403bd47e2a4cc6c1bca1e6e32c2eeefaf9da3dee9ad56d7379692845317",
+   "layer": "GUARD_ONLY",
+   "path": "tools/lan_console.py",
+   "reflectionNewRelevantHits": [],
+   "useSiteError": null
+  },
+  {
+   "case": "frozen-nonretained-guard",
+   "inputSHA256": "2c626540f495499423b707b063a6cab6a53e1be3af8c324f46af88a94ac8f652",
+   "layer": "GUARD_ONLY",
+   "path": "tools/lan_pilot.py",
+   "reflectionNewRelevantHits": [],
+   "useSiteError": null
+  },
+  {
+   "case": "frozen-nonretained-guard",
+   "inputSHA256": "cf563c0e0491b7d8b87aea8e151beb7fa8914fdae3a100705d42e6b00cb5d2de",
+   "layer": "GUARD_ONLY",
+   "path": "tools/s01_readiness_preflight.py",
+   "reflectionNewRelevantHits": [],
+   "useSiteError": null
+  },
+  {
+   "addedVsBaseline": [
+    [
+     "A7_FULL_MODULE_USE_SITE_GUARD",
+     "services/control-plane/src/inv/node_transfer.py",
+     "()",
+     1
+    ]
+   ],
+   "case": "local-alias-receiver-dynamic-mode",
+   "constructors": 10,
+   "frozenSHA256": {
+    "services/control-plane/src/inv/node_transfer.py": "3b5315201357c8d5b82643cde8f685ed39dc542255d8bc31fb63d894065dac2e"
+   },
+   "inputSHA256": {
+    "services/control-plane/src/inv/node_transfer.py": "38da29dfe9147d9a1de1744263b80b7e1df171c40781ef9dcf97431261228855"
+   },
+   "layer": "CENSUS",
+   "note": "NodeChannels instance reached through a local alias, dynamic mode",
+   "obligations": 2,
+   "otherReceivers": [
+    {
+     "path": "services/control-plane/src/inv/node_transfer.py",
+     "purpose": {
+      "blocksGrant": true,
+      "expression": "bool(size)",
+      "reason": "foreign/dynamic truthiness requires complete caller and value provenance",
+      "state": "UNRESOLVED"
+     },
+     "receiver": "channels",
+     "span": [
+      28,
+      18,
+      28,
+      70
+     ]
+    },
+    {
+     "path": "services/control-plane/src/inv/remote_git.py",
+     "purpose": {
+      "origin": "snapshot default False; no runtime type check",
+      "purpose": "NORMAL",
+      "state": "SOURCE_LITERAL",
+      "value": false
+     },
+     "receiver": "self",
+     "span": [
+      285,
+      20,
+      285,
+      58
+     ]
+    },
+    {
+     "path": "services/control-plane/src/inv/workspace_git.py",
+     "purpose": {
+      "origin": "snapshot default False; no runtime type check",
+      "purpose": "NORMAL",
+      "state": "SOURCE_LITERAL",
+      "value": false
+     },
+     "receiver": "repo",
+     "span": [
+      167,
+      18,
+      167,
+      73
+     ]
+    }
+   ],
+   "removedVsBaseline": [],
+   "retainedForCallClosure": {
+    "services/control-plane/src/inv/node_transfer.py": true
+   },
+   "seconds": 4.6,
+   "snapshots": 9,
+   "unchangedSelected": {
+    "services/control-plane/src/inv/containment.py": "a0d7055d5f3e5485d82ea3876f9885bb6f0c2e8d5d0e7fd11a846ec86edf425e",
+    "services/control-plane/src/inv/db.py": "38e0d679b442433fd0b775e98411d78dfff2b7d114bbc3c2a52d3a886726022d",
+    "services/control-plane/src/inv/errors.py": "833eea9d797496c44ef3b3003cf728cfa88d12128dddf60106632609ead3a7bc",
+    "services/control-plane/src/inv/node_channels.py": "3fad0bb24beb096522ea3335e3bf45f4e65f2d0d906177ef7e310aca1128502b"
+   }
+  },
+  {
+   "addedVsBaseline": [
+    [
+     "A7_FULL_MODULE_USE_SITE_GUARD",
+     "services/control-plane/src/inv/node_transfer.py",
+     "()",
+     1
+    ]
+   ],
+   "case": "local-alias-receiver-literal-normal",
+   "constructors": 10,
+   "frozenSHA256": {
+    "services/control-plane/src/inv/node_transfer.py": "3b5315201357c8d5b82643cde8f685ed39dc542255d8bc31fb63d894065dac2e"
+   },
+   "inputSHA256": {
+    "services/control-plane/src/inv/node_transfer.py": "ebb004feeffc8a40d0ade5ada89b27c0c39654de368e8218502737d34523b183"
+   },
+   "layer": "CENSUS",
+   "note": "near control: same alias, literal default mode",
+   "obligations": 2,
+   "otherReceivers": [
+    {
+     "path": "services/control-plane/src/inv/node_transfer.py",
+     "purpose": {
+      "origin": "snapshot default False; no runtime type check",
+      "purpose": "NORMAL",
+      "state": "SOURCE_LITERAL",
+      "value": false
+     },
+     "receiver": "channels",
+     "span": [
+      28,
+      18,
+      28,
+      41
+     ]
+    },
+    {
+     "path": "services/control-plane/src/inv/remote_git.py",
+     "purpose": {
+      "origin": "snapshot default False; no runtime type check",
+      "purpose": "NORMAL",
+      "state": "SOURCE_LITERAL",
+      "value": false
+     },
+     "receiver": "self",
+     "span": [
+      285,
+      20,
+      285,
+      58
+     ]
+    },
+    {
+     "path": "services/control-plane/src/inv/workspace_git.py",
+     "purpose": {
+      "origin": "snapshot default False; no runtime type check",
+      "purpose": "NORMAL",
+      "state": "SOURCE_LITERAL",
+      "value": false
+     },
+     "receiver": "repo",
+     "span": [
+      167,
+      18,
+      167,
+      73
+     ]
+    }
+   ],
+   "removedVsBaseline": [],
+   "retainedForCallClosure": {
+    "services/control-plane/src/inv/node_transfer.py": true
+   },
+   "seconds": 4.7,
+   "snapshots": 9,
+   "unchangedSelected": {
+    "services/control-plane/src/inv/containment.py": "a0d7055d5f3e5485d82ea3876f9885bb6f0c2e8d5d0e7fd11a846ec86edf425e",
+    "services/control-plane/src/inv/db.py": "38e0d679b442433fd0b775e98411d78dfff2b7d114bbc3c2a52d3a886726022d",
+    "services/control-plane/src/inv/errors.py": "833eea9d797496c44ef3b3003cf728cfa88d12128dddf60106632609ead3a7bc",
+    "services/control-plane/src/inv/node_channels.py": "3fad0bb24beb096522ea3335e3bf45f4e65f2d0d906177ef7e310aca1128502b"
+   }
+  },
+  {
+   "addedVsBaseline": [
+    [
+     "A7_FULL_MODULE_USE_SITE_GUARD",
+     "services/control-plane/src/inv/node_transfer.py",
+     "()",
+     1
+    ],
+    [
+     "A7_PURPOSE_PROVENANCE",
+     "services/control-plane/src/inv/node_transfer.py",
+     "(27, 18, 27, 75)",
+     1
+    ]
+   ],
+   "case": "control-inline-dynamic-mode",
+   "constructors": 10,
+   "frozenSHA256": {
+    "services/control-plane/src/inv/node_transfer.py": "3b5315201357c8d5b82643cde8f685ed39dc542255d8bc31fb63d894065dac2e"
+   },
+   "inputSHA256": {
+    "services/control-plane/src/inv/node_transfer.py": "b0ca13e425af53fd2ddf0b891e38699f5acc3c6d87446dbf6910f7e31a3750c0"
+   },
+   "layer": "CENSUS",
+   "note": "control: self.channels receiver with dynamic mode is counted",
+   "obligations": 3,
+   "otherReceivers": [
+    {
+     "path": "services/control-plane/src/inv/remote_git.py",
+     "purpose": {
+      "origin": "snapshot default False; no runtime type check",
+      "purpose": "NORMAL",
+      "state": "SOURCE_LITERAL",
+      "value": false
+     },
+     "receiver": "self",
+     "span": [
+      285,
+      20,
+      285,
+      58
+     ]
+    },
+    {
+     "path": "services/control-plane/src/inv/workspace_git.py",
+     "purpose": {
+      "origin": "snapshot default False; no runtime type check",
+      "purpose": "NORMAL",
+      "state": "SOURCE_LITERAL",
+      "value": false
+     },
+     "receiver": "repo",
+     "span": [
+      167,
+      18,
+      167,
+      73
+     ]
+    }
+   ],
+   "removedVsBaseline": [],
+   "retainedForCallClosure": {
+    "services/control-plane/src/inv/node_transfer.py": true
+   },
+   "seconds": 4.6,
+   "snapshots": 10,
+   "unchangedSelected": {
+    "services/control-plane/src/inv/containment.py": "a0d7055d5f3e5485d82ea3876f9885bb6f0c2e8d5d0e7fd11a846ec86edf425e",
+    "services/control-plane/src/inv/db.py": "38e0d679b442433fd0b775e98411d78dfff2b7d114bbc3c2a52d3a886726022d",
+    "services/control-plane/src/inv/errors.py": "833eea9d797496c44ef3b3003cf728cfa88d12128dddf60106632609ead3a7bc",
+    "services/control-plane/src/inv/node_channels.py": "3fad0bb24beb096522ea3335e3bf45f4e65f2d0d906177ef7e310aca1128502b"
+   }
+  },
+  {
+   "addedVsBaseline": [
+    [
+     "A7_FULL_MODULE_USE_SITE_GUARD",
+     "services/control-plane/src/inv/observation.py",
+     "()",
+     1
+    ],
+    [
+     "A7_PURPOSE_PROVENANCE",
+     "services/control-plane/src/inv/observation.py",
+     "(17, 16, 17, 70)",
+     1
+    ]
+   ],
+   "case": "owner-caller-dynamic-purpose-recomputed",
+   "constructors": 10,
+   "frozenSHA256": {
+    "services/control-plane/src/inv/observation.py": "b515ceda8b066466cf4cdf5fa88d04803220398c436d29ab7c5fd2793bf5748f"
+   },
+   "inputSHA256": {
+    "services/control-plane/src/inv/observation.py": "d4c0587ff1c525ea05945f9be813e7654833d90fdc56e2b649c8d2dd5d6c79e8"
+   },
+   "layer": "CENSUS",
+   "note": "owner case; added-vs-baseline shows whether the purpose obligation is new",
+   "obligations": 3,
+   "otherReceivers": [
+    {
+     "path": "services/control-plane/src/inv/remote_git.py",
+     "purpose": {
+      "origin": "snapshot default False; no runtime type check",
+      "purpose": "NORMAL",
+      "state": "SOURCE_LITERAL",
+      "value": false
+     },
+     "receiver": "self",
+     "span": [
+      285,
+      20,
+      285,
+      58
+     ]
+    },
+    {
+     "path": "services/control-plane/src/inv/workspace_git.py",
+     "purpose": {
+      "origin": "snapshot default False; no runtime type check",
+      "purpose": "NORMAL",
+      "state": "SOURCE_LITERAL",
+      "value": false
+     },
+     "receiver": "repo",
+     "span": [
+      167,
+      18,
+      167,
+      73
+     ]
+    }
+   ],
+   "removedVsBaseline": [],
+   "retainedForCallClosure": {
+    "services/control-plane/src/inv/observation.py": true
+   },
+   "seconds": 4.6,
+   "snapshots": 10,
+   "unchangedSelected": {
+    "services/control-plane/src/inv/containment.py": "a0d7055d5f3e5485d82ea3876f9885bb6f0c2e8d5d0e7fd11a846ec86edf425e",
+    "services/control-plane/src/inv/db.py": "38e0d679b442433fd0b775e98411d78dfff2b7d114bbc3c2a52d3a886726022d",
+    "services/control-plane/src/inv/errors.py": "833eea9d797496c44ef3b3003cf728cfa88d12128dddf60106632609ead3a7bc",
+    "services/control-plane/src/inv/node_channels.py": "3fad0bb24beb096522ea3335e3bf45f4e65f2d0d906177ef7e310aca1128502b"
+   }
+  }
+ ]
+}

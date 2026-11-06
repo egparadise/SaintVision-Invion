@@ -1,0 +1,332 @@
+{
+  "A1_A16": "PENDING",
+  "actualReviewOriginals": [
+    {
+      "bytes": 21,
+      "commit": "7a8012f47de5aa94a4264366df6722c1f6755a9c",
+      "copy": "actual-review-original-gitattributes.txt",
+      "objectID": "bb2789ad98e51258a73e184a7a912ab02c6a83c0",
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-snapshot-1550-review-20261107-claude/.gitattributes",
+      "sha256": "96a83569c84cfe3f57b7efe3dc61c249548d0fca4fed0e538b3587cdc97c95c1"
+    },
+    {
+      "bytes": 880,
+      "commit": "7a8012f47de5aa94a4264366df6722c1f6755a9c",
+      "copy": "actual-review-canonical-sync-check-before.txt",
+      "objectID": "924a64ef4d9ab61894a189c929c821d625ac6e61",
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-snapshot-1550-review-20261107-claude/canonical-sync-check-before.txt",
+      "sha256": "56454ab6ed055d839cd0970081a3013392635a3a07e641f73f3bb690a1f1fd43"
+    },
+    {
+      "bytes": 3458,
+      "commit": "7a8012f47de5aa94a4264366df6722c1f6755a9c",
+      "copy": "actual-review-commands.json",
+      "objectID": "3b2a83d6cbf67ed33f8fc508c963b8185bddf465",
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-snapshot-1550-review-20261107-claude/commands.json",
+      "sha256": "3cdfe0314c4a0b7255cdb591ff187b6cb89b7504e6b56b539179abf2236116e6"
+    },
+    {
+      "bytes": 3496,
+      "commit": "7a8012f47de5aa94a4264366df6722c1f6755a9c",
+      "copy": "actual-review-local-doc-gates.txt",
+      "objectID": "602586f7f73723eaabe40d6f5afb0b11135d871f",
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-snapshot-1550-review-20261107-claude/local-doc-gates.txt",
+      "sha256": "868c2a73acf70f03fe3ff21e4a96612db0119d0dc017a6d634ed49bfd946e001"
+    },
+    {
+      "bytes": 12673,
+      "commit": "7a8012f47de5aa94a4264366df6722c1f6755a9c",
+      "copy": "actual-review-review.json",
+      "objectID": "6ad666e89593688e82b412dffbebde2b194cb6c0",
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-snapshot-1550-review-20261107-claude/review.json",
+      "sha256": "ac7dc00fa88902c4ede18b7500951ac31e7f528064099fe1ffa6980097142b45"
+    },
+    {
+      "bytes": 49583,
+      "commit": "7a8012f47de5aa94a4264366df6722c1f6755a9c",
+      "copy": "actual-review-reviewer-a7-probes-result.json",
+      "objectID": "a822e5bbf2ffc5d86455fd67a9c89c900f495399",
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-snapshot-1550-review-20261107-claude/reviewer-a7-probes-result.json",
+      "sha256": "00214954438eb6804ad795990a8f24cf8b37eecf858613b406f6d7cdd12eb665"
+    },
+    {
+      "bytes": 41462,
+      "commit": "7a8012f47de5aa94a4264366df6722c1f6755a9c",
+      "copy": "actual-review-reviewer-a7-probes.log.txt",
+      "objectID": "10c1c7f4a537345377e955c870c44e7bb5afdc75",
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-snapshot-1550-review-20261107-claude/reviewer-a7-probes.log.txt",
+      "sha256": "906e28e82cd1b9224790015a8be2f449ccf57842be00fa33b6738e5dfb2f1f06"
+    },
+    {
+      "bytes": 11302,
+      "commit": "7a8012f47de5aa94a4264366df6722c1f6755a9c",
+      "copy": "actual-review-reviewer_a7_probes.py.txt",
+      "objectID": "306884c43b730e9dbe6530c8e9b9a4127b58f37b",
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-snapshot-1550-review-20261107-claude/reviewer_a7_probes.py.txt",
+      "sha256": "ca25e1abba204a241095d44377efdb684e99c2e208193600d06a870b73ac0750"
+    },
+    {
+      "bytes": 2355,
+      "commit": "7a8012f47de5aa94a4264366df6722c1f6755a9c",
+      "copy": "actual-review-reviewer_gate_driver.py.txt",
+      "objectID": "ac4a7cb332b305aca00155059bdc9ee7cdd50ba4",
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-snapshot-1550-review-20261107-claude/reviewer_gate_driver.py.txt",
+      "sha256": "b3dd3ed21c8fd8f323be0ffecf6abeba58a6b13efb64b0fd9b41cf1a345795c4"
+    },
+    {
+      "bytes": 10617,
+      "commit": "7a8012f47de5aa94a4264366df6722c1f6755a9c",
+      "copy": "actual-review-original-history.md.txt",
+      "objectID": "7fbd71b4a1952c9ac794c1007e1f2f6ef5475536",
+      "path": "docs/vault/30_Development/History/2026-11-07_FLEET5_B_A7_Snapshot_R1_1550_\ub3c5\ub9bd\uac80\ud1a0_Claude.md",
+      "sha256": "b7859d7ba8d75b2d4ce7a0dd32eaff3e6e67ebf354d3921d953bb06936232083"
+    }
+  ],
+  "actualRuntimeB": 0,
+  "deterministicSidecarSHA256": "88bcafbc6d76ec8ce1848be5be0c22858bdb4c463afea290a65c323db0ba5c79",
+  "finalProducerHashes": {
+    "../fleet5-b-contract-rev7-20261106-codex/source-manifest.json": "0901aabf4d4187351b72292941957a80191cbbe7b3e07260ff87d30fa2139434",
+    "../fleet5-b-rev8-revoke-portcut-20261106-codex/bounded_analysis.py": "bd1d708fb75d64bb481190247b46db658d7ae4aa70fd152b0fb654b3636cff88",
+    "a7_body.py": "d884cd4dacb3d4ed21db135342969507196f40f30df6ce65cf271d70d976e665",
+    "a7_build.py": "3a89d59473cb7036dbfa3147ca067b8895525fdec576d522eedcc8a499913114",
+    "a7_common.py": "decb55caf99d02582debe7de23779622a3352779a095fa2ea58cc9715186431b",
+    "a7_inventory.py": "059760377971e433afab3ba207807eedfd5632c1887ef6ba399c1ce39d359787",
+    "a7_record.py": "1732947b66d21d67f5bc02e3b26552148fd4912b5e4dd2ff2aaf0af536c310a6",
+    "actual-review-reviewer_a7_probes.py.txt": "ca25e1abba204a241095d44377efdb684e99c2e208193600d06a870b73ac0750",
+    "actual-review-reviewer_gate_driver.py.txt": "b3dd3ed21c8fd8f323be0ffecf6abeba58a6b13efb64b0fd9b41cf1a345795c4",
+    "analysis_rules.py": "c3ceff61cde7c0adc8267590a13ebcec1b56e56e06624058cc8fbd283c8a4244",
+    "bounded_analysis.py": "03d53a9431c326b297ad786e03852edb88e43323e2dc4791761c36e7072730ca",
+    "call_binding.py": "d1bd5ff2e8212555b95c09a4c24669245341897e42e84a732cbcda25bf058f8b",
+    "callee_identity.py": "8e119d5ff4c3916ac41b2147cc09ccbaf6597ab7ef24df4d56cc169611ca37aa",
+    "constructor_graph.py": "1ec99021b4d1160bcee15c43032cbe21554625e345b46b19112c2697e670dfa3",
+    "edge_categories.py": "d16ae559ca4b12c36d52a61d183fb2b1d3bdf38e6e8a54d511e4414e72cd18dd",
+    "forwarding_discovery.py": "05512ea4a76ff4e8814eab8f192f01c0995a8cf91c203c3ca816d9c36d6a1c85",
+    "lexical_bindings.py": "6f678154e856c67554b7a569ae54c74fe46d35bf7d197a149272d968f9978edc",
+    "lifecycle.py": "710c6aafa1829d9aecc25b8e591c4f2a8ec01b0927a45cf6e7ba7b13b75977b0",
+    "measured_run.py": "61f7dcfdb00a873c2423e463b5beee5fa623bbf04c392e7ae9e30cdb297ed62e",
+    "model.py": "f7384016f72b5f6b9d369925a3a6d864012f286351db38d97993a5f95be78acf",
+    "owner_transfer.py": "68623be32888be9cd25023dd0096aefeedffe00dd905784e3de59525b5d84ff7",
+    "parameter_flow.py": "b72a4e160dbc0f94b82f53ff150098a54b5fd871debcd4e59295fb437c6fa606",
+    "pending_contracts.py": "9617fbe48b25d23774cd91e83a42572d6b3e8437397e15b4b9f1c38c16804a4f",
+    "prepare_r2.py": "74c706c4ec33b9f0a9b14d814e5d9f00c71cc02135855e65c321016654826165",
+    "r1-a7_tests.py.txt": "85db4171b15138cbf06d0618410a1107560a4085049b521376f15866ff6b2472",
+    "r2_final.py": "9c2d63cb105e6f6633b7e2dd82ac09a211902d29e80994d59f1868df5cd9df89",
+    "r2_seal.py": "0d47b3e2c14a68d1b0250ff706666dca8546b2ab58ffd349de125a17fc531fb3",
+    "r2_tests.py": "a51b71d51bcc0c509135351b13e1dedd6ec81e51f63e7736c0703e8e07807bf5",
+    "r2_verify.py": "b75b531650a79d233f8919b7e13e4261ce11341f3e5d99eaf0458e59d0a9517b",
+    "red-a7_inventory.py.txt": "6910ddfd6ae1f3cd2d037f439ccd194cd4ebd5faf953cb6761d997465693c4e9",
+    "reflection_audit.py": "bd63d00f0e82703ab31c566b3596003a651b285e032649035007f5fc74afa95c",
+    "source_bindings.py": "29dd7070de00fabd1cd4c5824227db0689104910922a0ae28634f12a62efe7e9",
+    "t1_provenance.py": "b8fd9df42e64c3227e0713bba448e20c1125e0c2e6a5bd524c53410c5194d948",
+    "use_sites.py": "4a1fbb3f42180bf3d43698121a863fdb1ed2f723394f2a85864a2afc54b647dc"
+  },
+  "independentR2Review": "PENDING through Root",
+  "newRegressionAndControls": 5,
+  "newlyAudited18Clean": [
+    {
+      "newRelevantHits": [],
+      "path": "services/control-plane/src/inv/capacity.py",
+      "sha256": "70cf93fcc99d5f23a946445889d5f6b3ab7bd86a30e7923b74e4df82fc85578d",
+      "useSiteError": null
+    },
+    {
+      "newRelevantHits": [],
+      "path": "services/control-plane/src/inv/gpu.py",
+      "sha256": "2a229e710fcdd10cac948d0660c75a04b0405851a76cac5b9df44924ed02c03f",
+      "useSiteError": null
+    },
+    {
+      "newRelevantHits": [],
+      "path": "services/control-plane/src/inv/model_remote.py",
+      "sha256": "796f61fe8404c2c3a8a4be08eca75d98e3c442a30c04077c66b278e7d60c6737",
+      "useSiteError": null
+    },
+    {
+      "newRelevantHits": [],
+      "path": "services/control-plane/src/inv/model_runtime.py",
+      "sha256": "f7f89911af4987bd7218c8ca6e3e8654c4c4dabc4994b30b547987f17c88e128",
+      "useSiteError": null
+    },
+    {
+      "newRelevantHits": [],
+      "path": "services/control-plane/src/inv/model_source.py",
+      "sha256": "9b7adaa666c9031e61dc201c3daf15b08e014aa3b6e329dc1c01277dfea0c8ee",
+      "useSiteError": null
+    },
+    {
+      "newRelevantHits": [],
+      "path": "services/control-plane/src/inv/node_certificates.py",
+      "sha256": "6e2bfb2d0cfa972eaf6f7d4ca3a1928cde7a2b3d0c21b80d03fbb4ff7ccf4901",
+      "useSiteError": null
+    },
+    {
+      "newRelevantHits": [],
+      "path": "services/control-plane/src/inv/node_execution.py",
+      "sha256": "0b70dbfd048e4985dcf11faeecedf39975c21c37af27c4c1d6f0d0c1d82494a3",
+      "useSiteError": null
+    },
+    {
+      "newRelevantHits": [],
+      "path": "services/control-plane/src/inv/node_resource_usage.py",
+      "sha256": "95dd48c34601e52b696e9da0115102816ccdb7e4e332c28b5a4013ba28fa5b37",
+      "useSiteError": null
+    },
+    {
+      "newRelevantHits": [],
+      "path": "services/control-plane/src/inv/observer_worker.py",
+      "sha256": "6bbdf815554fe1f0157247732ddc4dc3069686685c291ef83add55c8f3e92003",
+      "useSiteError": null
+    },
+    {
+      "newRelevantHits": [],
+      "path": "services/control-plane/src/inv/placement.py",
+      "sha256": "d6f1baea8fedb0e8cf471d8b6880444c3c1ac13fc5c2d767eac6a7983c386224",
+      "useSiteError": null
+    },
+    {
+      "newRelevantHits": [],
+      "path": "services/control-plane/src/inv/storage_commit.py",
+      "sha256": "41522f6ef98b315c4dff75b06d10507ad7bc45a6523983b3de9767cd61ff496c",
+      "useSiteError": null
+    },
+    {
+      "newRelevantHits": [],
+      "path": "services/control-plane/src/inv/storage_sampling.py",
+      "sha256": "4e43aa43e8dc9b8ab78af0fde78f9e83b83d7bfdc77b7362ad565741f6f94e8a",
+      "useSiteError": null
+    },
+    {
+      "newRelevantHits": [],
+      "path": "src/saintvision/identity/node_auth.py",
+      "sha256": "9b670227f01011ac1947b411c6459692bacaaeff49f7918f83eec89f1bdc026d",
+      "useSiteError": null
+    },
+    {
+      "newRelevantHits": [],
+      "path": "tools/check_lan_storage_readiness.py",
+      "sha256": "b2ccdc3933549eae7c2d1414e438314ea1019d269e84471064b6d2a5063a7339",
+      "useSiteError": null
+    },
+    {
+      "newRelevantHits": [],
+      "path": "tools/five_node_lab_preflight.py",
+      "sha256": "13b455a80aecd095ceb02ade0fbda40f2f56408c227d8461e9eff60ef6327943",
+      "useSiteError": null
+    },
+    {
+      "newRelevantHits": [],
+      "path": "tools/lan_console.py",
+      "sha256": "3e037403bd47e2a4cc6c1bca1e6e32c2eeefaf9da3dee9ad56d7379692845317",
+      "useSiteError": null
+    },
+    {
+      "newRelevantHits": [],
+      "path": "tools/lan_pilot.py",
+      "sha256": "2c626540f495499423b707b063a6cab6a53e1be3af8c324f46af88a94ac8f652",
+      "useSiteError": null
+    },
+    {
+      "newRelevantHits": [],
+      "path": "tools/s01_readiness_preflight.py",
+      "sha256": "cf563c0e0491b7d8b87aea8e151beb7fa8914fdae3a100705d42e6b00cb5d2de",
+      "useSiteError": null
+    }
+  ],
+  "parsedEqualsAudited": {
+    "auditedPathSHA256": {
+      "services/control-plane/src/inv/build_product_runtime.py": "7483d65fcb1032aeb05b4d2dd56e09e714cff8ca676de0f80fc3a2f5e447e9af",
+      "services/control-plane/src/inv/capacity.py": "70cf93fcc99d5f23a946445889d5f6b3ab7bd86a30e7923b74e4df82fc85578d",
+      "services/control-plane/src/inv/containment.py": "a0d7055d5f3e5485d82ea3876f9885bb6f0c2e8d5d0e7fd11a846ec86edf425e",
+      "services/control-plane/src/inv/gpu.py": "2a229e710fcdd10cac948d0660c75a04b0405851a76cac5b9df44924ed02c03f",
+      "services/control-plane/src/inv/model_remote.py": "796f61fe8404c2c3a8a4be08eca75d98e3c442a30c04077c66b278e7d60c6737",
+      "services/control-plane/src/inv/model_runtime.py": "f7f89911af4987bd7218c8ca6e3e8654c4c4dabc4994b30b547987f17c88e128",
+      "services/control-plane/src/inv/model_source.py": "9b7adaa666c9031e61dc201c3daf15b08e014aa3b6e329dc1c01277dfea0c8ee",
+      "services/control-plane/src/inv/node_certificates.py": "6e2bfb2d0cfa972eaf6f7d4ca3a1928cde7a2b3d0c21b80d03fbb4ff7ccf4901",
+      "services/control-plane/src/inv/node_channels.py": "3fad0bb24beb096522ea3335e3bf45f4e65f2d0d906177ef7e310aca1128502b",
+      "services/control-plane/src/inv/node_execution.py": "0b70dbfd048e4985dcf11faeecedf39975c21c37af27c4c1d6f0d0c1d82494a3",
+      "services/control-plane/src/inv/node_resource_usage.py": "95dd48c34601e52b696e9da0115102816ccdb7e4e332c28b5a4013ba28fa5b37",
+      "services/control-plane/src/inv/node_transfer.py": "3b5315201357c8d5b82643cde8f685ed39dc542255d8bc31fb63d894065dac2e",
+      "services/control-plane/src/inv/node_transport.py": "3559bbcdf9568f8930654d860b0edd980eca71c835cde3fe7380a69dd56e18f4",
+      "services/control-plane/src/inv/observation.py": "b515ceda8b066466cf4cdf5fa88d04803220398c436d29ab7c5fd2793bf5748f",
+      "services/control-plane/src/inv/observer_worker.py": "6bbdf815554fe1f0157247732ddc4dc3069686685c291ef83add55c8f3e92003",
+      "services/control-plane/src/inv/placement.py": "d6f1baea8fedb0e8cf471d8b6880444c3c1ac13fc5c2d767eac6a7983c386224",
+      "services/control-plane/src/inv/remote_git.py": "5efd1057f9208cdb29670073bd8ea5e96f98cfbd5a8173f4daa764d3db5db52e",
+      "services/control-plane/src/inv/storage_commit.py": "41522f6ef98b315c4dff75b06d10507ad7bc45a6523983b3de9767cd61ff496c",
+      "services/control-plane/src/inv/storage_sampling.py": "4e43aa43e8dc9b8ab78af0fde78f9e83b83d7bfdc77b7362ad565741f6f94e8a",
+      "services/control-plane/src/inv/terminal.py": "fe294d648b34d617df94449974fc82fed904639b80b8a5da2c9d34f32606bf8e",
+      "services/control-plane/src/inv/workspace_git.py": "9148060a66ce41df01d764b4584c3c890d61ff9ed87cfb9e49df348e4d891e7a",
+      "src/saintvision/identity/node_auth.py": "9b670227f01011ac1947b411c6459692bacaaeff49f7918f83eec89f1bdc026d",
+      "tools/check_lan_storage_readiness.py": "b2ccdc3933549eae7c2d1414e438314ea1019d269e84471064b6d2a5063a7339",
+      "tools/check_remote_workspace.py": "3550db9c20fb7e2118f66f0337ed787dd22a166a6ff8cf1c6e9490f9ae9df6e3",
+      "tools/five_node_lab_preflight.py": "13b455a80aecd095ceb02ade0fbda40f2f56408c227d8461e9eff60ef6327943",
+      "tools/lan_console.py": "3e037403bd47e2a4cc6c1bca1e6e32c2eeefaf9da3dee9ad56d7379692845317",
+      "tools/lan_execution.py": "cd4be84de9a60c03c32daa8e831a527ed9014169e151c7a436383772a5d4ddc0",
+      "tools/lan_pilot.py": "2c626540f495499423b707b063a6cab6a53e1be3af8c324f46af88a94ac8f652",
+      "tools/remote_workspace_entry.py": "e69fa8ff6c51bd3880f5ec388fe97288a4256169377e17d9d6aa5b7ec2f32c27",
+      "tools/s01_readiness_preflight.py": "cf563c0e0491b7d8b87aea8e151beb7fa8914fdae3a100705d42e6b00cb5d2de"
+    },
+    "parsedEqualsAudited": true,
+    "parsedPathSHA256": {
+      "services/control-plane/src/inv/build_product_runtime.py": "7483d65fcb1032aeb05b4d2dd56e09e714cff8ca676de0f80fc3a2f5e447e9af",
+      "services/control-plane/src/inv/capacity.py": "70cf93fcc99d5f23a946445889d5f6b3ab7bd86a30e7923b74e4df82fc85578d",
+      "services/control-plane/src/inv/containment.py": "a0d7055d5f3e5485d82ea3876f9885bb6f0c2e8d5d0e7fd11a846ec86edf425e",
+      "services/control-plane/src/inv/gpu.py": "2a229e710fcdd10cac948d0660c75a04b0405851a76cac5b9df44924ed02c03f",
+      "services/control-plane/src/inv/model_remote.py": "796f61fe8404c2c3a8a4be08eca75d98e3c442a30c04077c66b278e7d60c6737",
+      "services/control-plane/src/inv/model_runtime.py": "f7f89911af4987bd7218c8ca6e3e8654c4c4dabc4994b30b547987f17c88e128",
+      "services/control-plane/src/inv/model_source.py": "9b7adaa666c9031e61dc201c3daf15b08e014aa3b6e329dc1c01277dfea0c8ee",
+      "services/control-plane/src/inv/node_certificates.py": "6e2bfb2d0cfa972eaf6f7d4ca3a1928cde7a2b3d0c21b80d03fbb4ff7ccf4901",
+      "services/control-plane/src/inv/node_channels.py": "3fad0bb24beb096522ea3335e3bf45f4e65f2d0d906177ef7e310aca1128502b",
+      "services/control-plane/src/inv/node_execution.py": "0b70dbfd048e4985dcf11faeecedf39975c21c37af27c4c1d6f0d0c1d82494a3",
+      "services/control-plane/src/inv/node_resource_usage.py": "95dd48c34601e52b696e9da0115102816ccdb7e4e332c28b5a4013ba28fa5b37",
+      "services/control-plane/src/inv/node_transfer.py": "3b5315201357c8d5b82643cde8f685ed39dc542255d8bc31fb63d894065dac2e",
+      "services/control-plane/src/inv/node_transport.py": "3559bbcdf9568f8930654d860b0edd980eca71c835cde3fe7380a69dd56e18f4",
+      "services/control-plane/src/inv/observation.py": "b515ceda8b066466cf4cdf5fa88d04803220398c436d29ab7c5fd2793bf5748f",
+      "services/control-plane/src/inv/observer_worker.py": "6bbdf815554fe1f0157247732ddc4dc3069686685c291ef83add55c8f3e92003",
+      "services/control-plane/src/inv/placement.py": "d6f1baea8fedb0e8cf471d8b6880444c3c1ac13fc5c2d767eac6a7983c386224",
+      "services/control-plane/src/inv/remote_git.py": "5efd1057f9208cdb29670073bd8ea5e96f98cfbd5a8173f4daa764d3db5db52e",
+      "services/control-plane/src/inv/storage_commit.py": "41522f6ef98b315c4dff75b06d10507ad7bc45a6523983b3de9767cd61ff496c",
+      "services/control-plane/src/inv/storage_sampling.py": "4e43aa43e8dc9b8ab78af0fde78f9e83b83d7bfdc77b7362ad565741f6f94e8a",
+      "services/control-plane/src/inv/terminal.py": "fe294d648b34d617df94449974fc82fed904639b80b8a5da2c9d34f32606bf8e",
+      "services/control-plane/src/inv/workspace_git.py": "9148060a66ce41df01d764b4584c3c890d61ff9ed87cfb9e49df348e4d891e7a",
+      "src/saintvision/identity/node_auth.py": "9b670227f01011ac1947b411c6459692bacaaeff49f7918f83eec89f1bdc026d",
+      "tools/check_lan_storage_readiness.py": "b2ccdc3933549eae7c2d1414e438314ea1019d269e84471064b6d2a5063a7339",
+      "tools/check_remote_workspace.py": "3550db9c20fb7e2118f66f0337ed787dd22a166a6ff8cf1c6e9490f9ae9df6e3",
+      "tools/five_node_lab_preflight.py": "13b455a80aecd095ceb02ade0fbda40f2f56408c227d8461e9eff60ef6327943",
+      "tools/lan_console.py": "3e037403bd47e2a4cc6c1bca1e6e32c2eeefaf9da3dee9ad56d7379692845317",
+      "tools/lan_execution.py": "cd4be84de9a60c03c32daa8e831a527ed9014169e151c7a436383772a5d4ddc0",
+      "tools/lan_pilot.py": "2c626540f495499423b707b063a6cab6a53e1be3af8c324f46af88a94ac8f652",
+      "tools/remote_workspace_entry.py": "e69fa8ff6c51bd3880f5ec388fe97288a4256169377e17d9d6aa5b7ec2f32c27",
+      "tools/s01_readiness_preflight.py": "cf563c0e0491b7d8b87aea8e151beb7fa8914fdae3a100705d42e6b00cb5d2de"
+    }
+  },
+  "realBindings": null,
+  "redActualExit": 1,
+  "status": "SOURCE_STATIC_UNRESOLVED_RUNTIME_PENDING",
+  "unchangedCopiedProducers": [
+    "a7_body.py",
+    "a7_build.py",
+    "a7_common.py",
+    "a7_record.py",
+    "analysis_rules.py",
+    "bounded_analysis.py",
+    "call_binding.py",
+    "callee_identity.py",
+    "constructor_graph.py",
+    "edge_categories.py",
+    "forwarding_discovery.py",
+    "lexical_bindings.py",
+    "lifecycle.py",
+    "measured_run.py",
+    "model.py",
+    "owner_transfer.py",
+    "parameter_flow.py",
+    "pending_contracts.py",
+    "reflection_audit.py",
+    "source_bindings.py",
+    "t1_provenance.py",
+    "use_sites.py"
+  ],
+  "unchangedOriginal19Obligations": true,
+  "unchangedSelectedBodyProof": true,
+  "verified": true
+}

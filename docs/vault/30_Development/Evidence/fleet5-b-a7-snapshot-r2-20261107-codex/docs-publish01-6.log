@@ -1,0 +1,2 @@
+PASS check_doc_single_source --ratchet: 16 pairs, all in baseline, none stale.
+{"ownerResourceMeasurement": {"target": "tools/check_doc_single_source.py", "peakWorkingSetBytes": 32657408, "elapsedSeconds": 0.465, "OSMemoryLimitEnforced": false, "serial": true}}

@@ -1,0 +1,18 @@
+{"ownerResourceMeasurement": {"target": "tools/check_docs.py", "peakWorkingSetBytes": 180838400, "elapsedSeconds": 2.497, "OSMemoryLimitEnforced": false, "serial": true}}
+Traceback (most recent call last):
+  File "D:\Project\SaintVisionI-Invion\fleet5-compute-storage-contract-20261105\docs\vault\30_Development\Evidence\fleet5-b-a7-snapshot-r2-20261107-codex\measured_run.py", line 20, in <module>
+    if __name__=='__main__':main()
+                            ~~~~^^
+  File "D:\Project\SaintVisionI-Invion\fleet5-compute-storage-contract-20261105\docs\vault\30_Development\Evidence\fleet5-b-a7-snapshot-r2-20261107-codex\measured_run.py", line 9, in main
+    try:runpy.run_path(target,run_name='__main__')
+        ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen runpy>", line 294, in run_path
+  File "<frozen runpy>", line 98, in _run_module_code
+  File "<frozen runpy>", line 88, in _run_code
+  File "tools/check_docs.py", line 157, in <module>
+    validate()
+    ~~~~~~~~^^
+  File "tools/check_docs.py", line 152, in validate
+    raise ValueError('\n'.join(errors))
+ValueError: Unreadable UTF-8 document/config: 30_Development\Evidence\fleet5-b-a7-snapshot-r2-20261107-codex\prepare-attempt02.log
+Unreadable UTF-8 document/config: 30_Development\Evidence\fleet5-b-a7-snapshot-r2-20261107-codex\prepare-attempt03.log

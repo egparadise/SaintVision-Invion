@@ -1,0 +1,40 @@
+{
+  "events": [
+    {
+      "stage": "preparation",
+      "firstCommandExit": 1,
+      "firstToolChunk": "ecdccb",
+      "cause": "LookupError unknown encoding utf8-sig before any module copies or source proofs",
+      "unchangedRecordedReproduction": "prepare-attempt02.log",
+      "reproductionExit": 1,
+      "correction": "canonical codec spelling utf-8-sig; fresh preparation after correction",
+      "qualification": "harness preparation failure, not a product semantic refusal"
+    },
+    {
+      "stage": "proof-final01-3",
+      "exit": 1,
+      "rawLog": "proof-final01-3.log",
+      "cause": "over-strong verification compares serialized body proof to R1 across independent processes; inspect differences before changing validation",
+      "bodyDifference": [],
+      "note": "first five regression/control cases and build exited0; this verification failure remains recorded, not all-pass",
+      "resolution": "canonicalize fresh in-memory proof to its exact JSON representation before comparing against serialized R1; tuples vs JSON arrays, zero serialized body differences; no guard/predicate changes"
+    },
+    {
+      "stage": "proof-final02-3",
+      "exit": 1,
+      "rawLog": "proof-final02-3.log",
+      "cause": "red-original01.json is a phase summary with the complete command record nested under commands[0], not a top-level exit field",
+      "resolution": "read the original nested command receipt; no source guard or proof predicate change",
+      "qualification": "verification receipt parsing failure after unchanged body/19-obligation/artifact checks passed"
+    },
+    {
+      "stage": "docs-final03-1",
+      "exit": 1,
+      "rawLog": "docs-final03-1.log",
+      "cause": "two own preparation logs used PowerShell UTF-16, repository text gate requires UTF-8",
+      "resolution": "preserve original bytes and SHA256 in lossless base64 archive, publish decoded UTF-8 logs; no gate changes or bypass",
+      "encodingReceipt": "raw-preparation-transcripts.json"
+    }
+  ],
+  "priorFailuresPreserved": "r1-development-failures.json and raw dev02/dev03 logs; original review INFO/invalid preconditions retained separately"
+}
