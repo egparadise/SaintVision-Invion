@@ -1,0 +1,11 @@
+=== RUN   TestDurableTwoEpochHistoryAndCurrent
+    temporal_fixture_test.go:144: TEST timeline: epoch1 HELD 0..300, release68; epoch2 HELD600..1200, events610/620, Now630; original Node proofs32/52; separate current proofs630
+--- PASS: TestDurableTwoEpochHistoryAndCurrent (1.45s)
+=== RUN   TestK2ReviewMigrationOperationIDSemantics
+    zz_k2review_test.go:10: historical MigrationOperationID="fixture-operation-migration" current OperationID="fixture-operation-restore" currentOpsHasHist=false
+    zz_k2review_test.go:21: RESULT control Verify=<nil> Current=<nil>
+    zz_k2review_test.go:21: RESULT P12-as-written-current-op Verify=plan/body/expectedInventoryHead/readbackProof: proof signed for different current operation Current=plan/body/expectedInventoryHead/readbackProof: proof signed for different current operation
+    zz_k2review_test.go:21: RESULT facts-migrationOperationId-differs Verify=plan/body/noOverlap: proof subject differs from containing authenticated sources Current=plan/body/noOverlap: proof subject differs from containing authenticated sources
+--- PASS: TestK2ReviewMigrationOperationIDSemantics (3.37s)
+PASS
+ok  	github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify	6.187s

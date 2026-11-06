@@ -1,0 +1,117 @@
+"""Claude reviewer in-memory mutations of the OWNER static validator inputs.
+The owner file is read, never modified; Git source and owner documents are
+overridden only in this process's memory. STATIC: measures what the owner
+validator can detect, not crypto/runtime/producer behaviour.
+argv: <owner validator .py.txt> <out.json>
+"""
+import contextlib, copy, io, json, subprocess, sys
+from pathlib import Path
+
+SRC, OUT = Path(sys.argv[1]), Path(sys.argv[2])
+code = SRC.read_text(encoding='utf-8')
+OLD_RAW = "def raw(source,path): return subprocess.check_output(['git','show',source+':'+path])"
+OLD_READ = "def read(name): return json.loads((ROOT/name).read_text(encoding='utf-8'))"
+assert OLD_RAW in code and OLD_READ in code
+code = code.replace(OLD_RAW, "def raw(source,path):\n    k=source+':'+path\n    return RAW_OVERRIDE[k] if k in RAW_OVERRIDE else subprocess.check_output(['git','show',k])")
+code = code.replace(OLD_READ, "def read(name):\n    return copy.deepcopy(DOC_OVERRIDE[name]) if name in DOC_OVERRIDE else json.loads((ROOT/name).read_text(encoding='utf-8'))")
+BASE = 'eb32b211ab3704935b9431747089ab0715582a74'
+TRUST = BASE + ':services/node-agent/migrationverify/trust.go'
+trust = subprocess.check_output(['git', 'show', TRUST]).decode('utf-8')
+E = SRC.parent
+
+
+def doc(n):
+    return json.loads((E / n).read_text(encoding='utf-8'))
+
+
+def run(raw_over=None, doc_over=None):
+    g = {'__file__': str(SRC), '__name__': '__k2review__', 'RAW_OVERRIDE': raw_over or {}, 'DOC_OVERRIDE': doc_over or {}, 'copy': copy}
+    buf = io.StringIO()
+    try:
+        with contextlib.redirect_stdout(buf):
+            exec(compile(code, str(SRC), 'exec'), g)
+        return 'PASS'
+    except AssertionError as e:
+        return 'ASSERT_FAIL ' + (str(e)[:80] if str(e) else '')
+    except Exception as e:  # noqa: BLE001 - record any other failure class
+        return 'ERROR ' + type(e).__name__ + ': ' + str(e)[:120]
+
+
+def trust_with(old, new):
+    assert old in trust
+    return {TRUST: trust.replace(old, new, 1).encode('utf-8')}
+
+
+def census_only(raw_over):
+    """Also re-pin the mutated trust.go hash so ONLY the regex field census decides."""
+    import hashlib
+    si = doc('source-inspection.json')
+    for f in si['files']:
+        if f['path'] == 'services/node-agent/migrationverify/trust.go':
+            f['rawSHA256'] = hashlib.sha256(raw_over[TRUST]).hexdigest()
+    return run(raw_over, {'source-inspection.json': si})
+
+
+cases = []
+
+
+def case(cid, purpose, expect, result):
+    cases.append({'id': cid, 'purpose': purpose, 'expectedIfValidatorIsSemantic': expect, 'actual': result,
+                  'ownerValidatorDetects': not result.startswith('PASS')})
+
+
+case('V00-control', 'unmodified inputs', 'PASS', run())
+# Go surface attacks the regex-based field census cannot see (AST would).
+case('V01-embedded-exported-field', 'add embedded exported struct field to TrustedContext (a 74th caller input path)', 'FAIL',
+     run(trust_with('\tCurrent              *CurrentProjectionContext\n}', '\tCurrent              *CurrentProjectionContext\n\tCurrentNativeWitness\n}')))
+case('V02-embedded-pointer-field', 'add embedded *KeyGrant to InstalledTrust', 'FAIL',
+     run(trust_with('\tNodeKinds      map[string]string\n}', '\tNodeKinds      map[string]string\n\t*KeyGrant\n}')))
+case('V03-field-type-weakened', 'change TrustedContext.Now from time.Time to any (caller-shaped clock)', 'FAIL',
+     run(trust_with('\tNow                  time.Time\n', '\tNow                  any\n')))
+case('V04-new-named-field-detected', 'control: add named field Override bool to TrustedContext', 'FAIL',
+     run(trust_with('\tCurrent              *CurrentProjectionContext\n}', '\tCurrent              *CurrentProjectionContext\n\tOverride bool\n}')))
+case('V05-new-input-type-not-in-inventory', 'add a 14th struct type reachable from NewVerifier via new field typed by an uninventoried struct', 'FAIL',
+     run(trust_with('\tCurrent              *CurrentProjectionContext\n}', '\tCurrent              *CurrentProjectionContext\n\tPolicyX              PolicyOverride\n}\ntype PolicyOverride struct{ AllowPrepublication bool')))
+for cid, purpose, old, new in [
+        ('V01c-embedded-exported-field', 'census only: embedded exported CurrentNativeWitness in TrustedContext', '\tCurrent              *CurrentProjectionContext\n}', '\tCurrent              *CurrentProjectionContext\n\tCurrentNativeWitness\n}'),
+        ('V02c-embedded-pointer-field', 'census only: embedded *KeyGrant in InstalledTrust', '\tNodeKinds      map[string]string\n}', '\tNodeKinds      map[string]string\n\t*KeyGrant\n}'),
+        ('V03c-field-type-weakened', 'census only: TrustedContext.Now time.Time -> any', '\tNow                  time.Time\n', '\tNow                  any\n'),
+        ('V04c-new-named-field', 'census only: named Override bool in TrustedContext', '\tCurrent              *CurrentProjectionContext\n}', '\tCurrent              *CurrentProjectionContext\n\tOverride bool\n}'),
+        ('V05c-new-reachable-type', 'census only: 14th reachable struct type via new field', '\tCurrent              *CurrentProjectionContext\n}', '\tCurrent              *CurrentProjectionContext\n\tPolicyX              PolicyOverride\n}\ntype PolicyOverride struct{ AllowPrepublication bool')]:
+    case(cid, purpose, 'FAIL', census_only(trust_with(old, new)))
+# Semantic placement / label attacks (static-by-design limits).
+m = doc('producer-matrix.json')
+for r in m['rows']:
+    if 'TrustedContext.MigrationOperationID' in r['inputs']:
+        r['inputs'].remove('TrustedContext.MigrationOperationID')
+next(r for r in m['rows'] if r['id'] == 'P06')['inputs'].append('TrustedContext.MigrationOperationID')
+case('V06-field-moved-to-clock-row', 'move MigrationOperationID under the clock producer row P06', 'FAIL', run(doc_over={'producer-matrix.json': m}))
+f = doc('failure-examples.json')
+next(x for x in f['examples'] if x['id'] == 'K2-HEAD_ABSENT')['expectedRefusal'] = 'STALE_SNAPSHOT'
+case('V07-wrong-but-cataloged-refusal', 'K2-HEAD_ABSENT expects STALE_SNAPSHOT instead of NO_CURRENT_HEAD', 'FAIL', run(doc_over={'failure-examples.json': f}))
+a = doc('authority-and-effect-gates.json')
+a['K2AForbiddenEffects'] = []
+case('V08-forbidden-effects-emptied', 'empty K2AForbiddenEffects list', 'FAIL', run(doc_over={'authority-and-effect-gates.json': a}))
+a = doc('authority-and-effect-gates.json')
+a['RootDecisions'][0]['choice'] = 'Allow prepublication effects with a generic boolean'
+case('V09-root-decision-text-inverted', 'D-PREPUBLICATION choice text inverted while status stays HOLD', 'FAIL', run(doc_over={'authority-and-effect-gates.json': a}))
+# Controls the validator should catch.
+f = doc('future-runtime-A01-A40.json')
+f['cases'][5]['red'] = f['cases'][5]['red'] + ' (edited)'
+case('V10-original-red-text-edited', 'edit A06 original red text', 'FAIL', run(doc_over={'future-runtime-A01-A40.json': f}))
+b = doc('installed-bindings-HOLD.json')
+b['actual']['authenticatedClockSource'] = 'os-utc'
+case('V11-binding-filled', 'fill authenticatedClockSource binding', 'FAIL', run(doc_over={'installed-bindings-HOLD.json': b}))
+f = doc('future-runtime-A01-A40.json')
+f['cases'][0]['executionEvidence'] = {'exit': 0}
+case('V12-execution-evidence-invented', 'invent A01 execution evidence', 'FAIL', run(doc_over={'future-runtime-A01-A40.json': f}))
+m = doc('producer-matrix.json')
+m['rows'][0]['untrustedCallerMaySupplyAuthority'] = True
+case('V13-caller-authority-flag', 'set P01 untrustedCallerMaySupplyAuthority true', 'FAIL', run(doc_over={'producer-matrix.json': m}))
+summary = {'cases': len(cases), 'detected': [c['id'] for c in cases if c['ownerValidatorDetects']],
+           'undetected': [c['id'] for c in cases if not c['ownerValidatorDetects']]}
+OUT.write_text(json.dumps({'classification': 'REVIEWER_IN_MEMORY_MUTATIONS_OF_OWNER_STATIC_VALIDATOR', 'summary': summary, 'cases': cases},
+                          indent=1, ensure_ascii=False) + '\n', encoding='utf-8', newline='\n')
+for c in cases:
+    print(c['id'], '->', c['actual'])
+print(json.dumps(summary))

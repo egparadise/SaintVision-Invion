@@ -1,0 +1,164 @@
+// Reviewer-owned Go AST/types inspection of the K1 NewVerifier input surface.
+// Reads a source directory given as argv[1]; performs no network/runtime I/O.
+package main
+
+import (
+	"encoding/json"
+	"fmt"
+	"go/ast"
+	"go/importer"
+	"go/parser"
+	"go/token"
+	"go/types"
+	"os"
+	"path/filepath"
+	"sort"
+	"strings"
+)
+
+type fieldUse struct {
+	File, Func string
+	Line       int
+}
+type fieldOut struct {
+	Type, Field, GoType string
+	Opaque              bool
+	Uses                []fieldUse
+	UseFuncs            []string
+}
+
+func main() {
+	dir := os.Args[1]
+	fset := token.NewFileSet()
+	matches, _ := filepath.Glob(filepath.Join(dir, "*.go"))
+	var files []*ast.File
+	for _, m := range matches {
+		if strings.HasSuffix(m, "_test.go") {
+			continue
+		}
+		f, e := parser.ParseFile(fset, m, nil, 0)
+		if e != nil {
+			panic(e)
+		}
+		files = append(files, f)
+	}
+	info := &types.Info{Uses: map[*ast.Ident]types.Object{}, Defs: map[*ast.Ident]types.Object{}, Selections: map[*ast.SelectorExpr]*types.Selection{}}
+	var typeErrs []string
+	std := importer.ForCompiler(fset, "source", nil)
+	conf := types.Config{Importer: importerFunc(func(path string) (*types.Package, error) {
+		if strings.Contains(path, ".") { // third-party: opaque stub, errors recorded
+			return types.NewPackage(path, filepath.Base(path)), nil
+		}
+		return std.Import(path)
+	}), Error: func(err error) { typeErrs = append(typeErrs, err.Error()) }}
+	pkg, _ := conf.Check("migrationverify", fset, files, info)
+	nv := pkg.Scope().Lookup("NewVerifier").(*types.Func)
+	sig := nv.Type().(*types.Signature)
+	seen := map[string]*types.Named{}
+	var order []string
+	var walk func(t types.Type)
+	walk = func(t types.Type) {
+		switch x := t.(type) {
+		case *types.Pointer:
+			walk(x.Elem())
+		case *types.Slice:
+			walk(x.Elem())
+		case *types.Map:
+			walk(x.Key()); walk(x.Elem())
+		case *types.Named:
+			if x.Obj().Pkg() != pkg {
+				return
+			}
+			if _, ok := seen[x.Obj().Name()]; ok {
+				return
+			}
+			st, ok := x.Underlying().(*types.Struct)
+			if !ok {
+				return
+			}
+			seen[x.Obj().Name()] = x
+			order = append(order, x.Obj().Name())
+			for i := 0; i < st.NumFields(); i++ {
+				walk(st.Field(i).Type())
+			}
+		}
+	}
+	for i := 0; i < sig.Params().Len(); i++ {
+		walk(sig.Params().At(i).Type())
+	}
+	// map field var -> out
+	byVar := map[*types.Var]*fieldOut{}
+	var outs []*fieldOut
+	embedded := 0
+	for _, n := range order {
+		st := seen[n].Underlying().(*types.Struct)
+		for i := 0; i < st.NumFields(); i++ {
+			f := st.Field(i)
+			if f.Embedded() {
+				embedded++
+			}
+			o := &fieldOut{Type: n, Field: f.Name(), GoType: types.TypeString(f.Type(), types.RelativeTo(pkg))}
+			_, o.Opaque = f.Type().Underlying().(*types.Interface)
+			byVar[f] = o
+			outs = append(outs, o)
+		}
+	}
+	// enclosing function lookup
+	for _, file := range files {
+		fname := filepath.Base(fset.Position(file.Pos()).Filename)
+		for _, d := range file.Decls {
+			fd, ok := d.(*ast.FuncDecl)
+			if !ok {
+				continue
+			}
+			name := fd.Name.Name
+			if fd.Recv != nil {
+				name = "(Verifier)." + name
+			}
+			ast.Inspect(fd, func(n ast.Node) bool {
+				se, ok := n.(*ast.SelectorExpr)
+				if ok {
+					if sel, ok := info.Selections[se]; ok && sel.Kind() == types.FieldVal {
+						if v, ok := sel.Obj().(*types.Var); ok {
+							if o := byVar[v]; o != nil {
+								o.Uses = append(o.Uses, fieldUse{fname, name, fset.Position(se.Pos()).Line})
+							}
+						}
+					}
+				}
+				// composite-literal keyed fields
+				if kv, ok := n.(*ast.KeyValueExpr); ok {
+					if id, ok := kv.Key.(*ast.Ident); ok {
+						if v, ok := info.Uses[id].(*types.Var); ok {
+							if o := byVar[v]; o != nil {
+								o.Uses = append(o.Uses, fieldUse{fname, name + "#literal", fset.Position(id.Pos()).Line})
+							}
+						}
+					}
+				}
+				return true
+			})
+		}
+	}
+	for _, o := range outs {
+		fs := map[string]bool{}
+		for _, u := range o.Uses {
+			fs[u.File+":"+u.Func] = true
+		}
+		for k := range fs {
+			o.UseFuncs = append(o.UseFuncs, k)
+		}
+		sort.Strings(o.UseFuncs)
+	}
+	params := []string{}
+	for i := 0; i < sig.Params().Len(); i++ {
+		params = append(params, types.TypeString(sig.Params().At(i).Type(), types.RelativeTo(pkg)))
+	}
+	res := map[string]any{"NewVerifierParams": params, "reachableStructTypes": order, "typeCount": len(order), "fieldCount": len(outs), "embeddedFields": embedded, "fields": outs, "position": fset.Position(nv.Pos()).String(), "typeErrorsFromStubbedThirdParty": typeErrs}
+	b, _ := json.MarshalIndent(res, "", " ")
+	fmt.Println(string(b))
+}
+
+type importerFunc func(string) (*types.Package, error)
+
+func (f importerFunc) Import(p string) (*types.Package, error) { return f(p) }

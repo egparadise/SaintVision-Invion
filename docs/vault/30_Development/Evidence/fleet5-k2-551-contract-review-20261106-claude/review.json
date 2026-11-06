@@ -1,0 +1,112 @@
+{
+ "schemaVersion": "fleet5-k2-551-contract-review:1",
+ "reviewer": "Claude (actual independent review; owner Codex not consulted for findings)",
+ "orca": {"task": "task_ac1819feb2d7", "dispatch": "ctx_5613e3659b52", "ownerTask": "task_a95ef3d8ccce", "ownerDispatch": "ctx_ed23b4a777d0", "rootQuestionPending": "msg_3adfd8134a89"},
+ "target": {
+  "proposal": "551d7312bb9c806fd423dcf6074158a9802cbb14",
+  "branch": "agent/codex/fleet5-k2-trusted-producer-contract-20261106",
+  "remoteRefVerified": true,
+  "parent": "eb32b211ab3704935b9431747089ab0715582a74",
+  "proposalDiffVsParent": "31 added files, all owner History/Evidence; 0 product/test/schema/workflow/dependency/registry changes",
+  "ownerDocs": {"run": 42146482617, "job": 127659082272, "head": "551d7312bb9c", "event": "workflow_dispatch", "attempt": 1, "title": "FLEET5-K2-trusted-producer-contract-Docs-551d7312bb9c-20261106T105034KST", "conclusion": "success"}
+ },
+ "axis": "BOUNDED_DESIGN_CONTRACT_AND_READINESS_FOR_A_SMALL_READ_ONLY_CODE_GRANT; NOT effect/operational readiness",
+ "verdict": "REVISION_REQUIRED",
+ "blocking": ["K2-M1", "K2-M2", "K2-M3"],
+ "fixBeforeAnyCodeGrant": ["K2-L1", "K2-L2", "K2-L3", "K2-L4", "K2-L5"],
+ "info": ["K2-I1", "K2-I2", "K2-I3", "K2-I4", "K2-I5", "K2-I6"],
+ "codeGrant": false,
+ "effectOrOperationalReadiness": "NOT_READY_AND_NOT_ASSESSED_AS_READY; all actual bindings remain NULL/HOLD",
+ "findings": [
+  {
+   "id": "K2-M1", "severity": "MAJOR_BLOCKING",
+   "title": "Fresh-witness acquisition liveness/circularity for a PRESENT head is neither closed nor named HOLD",
+   "statement": "K1 current derivation needs two fresh ordered native M2 witnesses against a live TrustedContext.Challenges entry under the current HELD operation (current.go currentNativeWitnesses; proofs.go verifyNativeAt live branch; evidence age <=min(plan,120s)). Producing them requires challenge issuance and observer Engine ExecCreate/Start, which the proposal correctly assigns to K2B. But K2B admission says only 're-verify K1 current where available' (contract section 6) and names a replacement authority solely for ABSENT head (D-PREPUBLICATION/BootstrapPhaseAuthorization). For PRESENT head with expired or missing witnesses there is no named admission authority: either observation is admitted without any defined predicate (hidden missing authority) or it is blocked, in which case no CurrentView can ever be re-obtained once the first 120 s pass (liveness deadlock).",
+   "counterexample": "Steady state after bootstrap: head PRESENT, readback and HELD lease valid, last M2 observed 121 s ago. DeriveCurrent -> CURRENT_NATIVE_WITNESS_UNKNOWN_MISMATCH_OR_EXPIRED. AuthorizeEffect(observe) -> 'K1 current where available' is unavailable; D-PREPUBLICATION does not apply (head is PRESENT). No rule in contract.md, authority-and-effect-gates.json or the 18 failure examples decides this request.",
+   "sourceEvidence": [
+    "design 8874 acceptance-matrix A36 green (preserved verbatim in future-runtime-A01-A40.json): 'immutable terminal seal plus a fresh common normal:3 operation lease admits later observation/rotation' - an authority the K2B section never carries forward or HOLDs",
+    "eb32 trust.go: Challenges map keyed operationId+NUL+C2(scope) => exactly one live challenge per (operation, Node); after an EFFECT_OUTCOME_UNKNOWN observation the retry path (replace challenge vs new operation/fence) is unspecified",
+    "authority-and-effect-gates.json RootDecisions has 4 entries; none covers PRESENT-head observation admission"
+   ],
+   "missingAuthority": "Closed, method-scoped observation/witness-refresh admission (challenge issuance + owned ExecCreate/Start) that is not CurrentView, plus retry/supersession semantics under K1's single challenge slot",
+   "requiredRevision": "Name the authority (e.g. adopt or reject the 8874 A36 'terminal seal + fresh common normal:3 lease' rule explicitly) or add a fifth Root HOLD decision; state that until decided every effect that needs a CurrentView on a real system is BLOCKED; specify the retry semantics; add red/green failure examples for PRESENT-head-expired-witness and for retry-after-UNKNOWN."
+  },
+  {
+   "id": "K2-M2", "severity": "MAJOR_BLOCKING",
+   "title": "TrustedContext.MigrationOperationID is classified as a current-operation field but K1 uses it as a historical plan-level operation selector",
+   "statement": "producer-matrix P12 places MigrationOperationID under 'ReadCurrent active common-cohort operation registry' with validation 'MigrationOperationID exact current authority-selected ID'. In eb32 it is read only in recipes.go recipeSources as the alias operationId fallback for records whose body has no operationId (successor-plan proofs); proofs.go proofOperationAt then resolves it in History.Operations for historical use and in Operations for live use. K1's own durable two-epoch fixture sets it to the expired epoch-1 operation that is absent from current Operations.",
+   "reviewerReproduction": "Scratch-only Go test on a git-archive copy of eb32 (never in product): control Verify/Current pass; MigrationOperationID := Current.OperationID (P12 as written) -> Verify and VerifyCurrentProjectionSet both refuse 'proof signed for different current operation' (first failing plan proof path varies with Go map order: scheduleDisabledReadback / expectedInventoryHead/readbackProof / allLaunchSurfaces); facts.migrationOperationId changed alone -> 'plan/body/noOverlap: proof subject differs'. See reviewer-go-scratch-test.log.txt.",
+   "impact": "A K2A implemented from P12 refuses every valid multi-epoch history (fail-closed but unusable) and would version this field in the current-registry SnapshotToken instead of binding it to the authenticated plan/history archive. It also leaves unstated that TrustedContext.MigrationOperationID and SemanticInputs.facts.migrationOperationId must be the same authenticated plan-level HELD operation (K1 cross-checks them only indirectly via the signed noOverlap subject).",
+   "requiredRevision": "Move MigrationOperationID to the history/plan producer (P08/P18 family), define it as the plan's original migration operation, require equality with facts.migrationOperationId and existence in HistoricalContext.Operations, and add a failure example."
+  },
+  {
+   "id": "K2-M3", "severity": "MAJOR_BLOCKING_FOR_GRANT_SCOPING",
+   "title": "A01-A40 requiredTask partition assigns effect-requiring original greens to read-only K2A tasks",
+   "statement": "future-runtime-A01-A40.json maps A05, A15, A29, A33, A36 to K2A-CURRENT and A32 to K2A-TRUST, but their unchanged original greens require effects or new producers: A05 'signed same-executable ... M2' (fresh M2 production), A15 'both entries atomically published' (inventory publish), A29 'Real post-bootstrap M2 then later normal:3 TWO completed cycles succeed', A33 'observer Engine ExecID recorded before start', A36 'admits bootstrap observation ... admits later observation/rotation', A32 'actual compiled v2 signs separate servingExecutableSHA256' (Node signer change). The contract forbids K2A signers, nonce allocation, publication and Engine exec.",
+   "impact": "A read-only K2A grant scoped by this table either cannot green its assigned cases or silently grows into effect/producer scope; the next small read-only grant cannot be scoped from this artifact.",
+   "requiredRevision": "Re-partition: split each mixed case into its read-only refusal/consumption part (K2A) and its effect/producer green (K2B-PHASE/K2B-EFFECTS or a separate Node-signer task), keeping the original IDs and red/green text byte-identical."
+  },
+  {
+   "id": "K2-L1", "severity": "LOW_FIX_BEFORE_GRANT",
+   "title": "Interval-conservative clock use is required but its mechanism against K1's single Now is unspecified",
+   "statement": "Contract section 4 requires validating the whole uncertainty interval against every bound and then passing the actual UTC observation to K1. K1 evaluates its many internal time predicates (recordUse at<=Now, status <=120s, challenge/lease windows, proof freshness, key intervals) at one Now; K2 cannot validate them over an interval without duplicating K1 logic. The contract must name a sound mechanism (one feasible option: evaluate K1 at both interval endpoints and require both to pass with identical outputs, which is sound only if every K1 time predicate is convex in Now; the reviewer found each inspected eb32 predicate to be a half-line or half-open interval). The bound value and clock source stay Root's D-CLOCK choice; the reviewer chooses neither."
+  },
+  {
+   "id": "K2-L2", "severity": "LOW_FIX_BEFORE_GRANT",
+   "title": "Normative refusal names in contract.md are outside the closed errorCatalog",
+   "statement": "contract.md uses REPLAY_OR_SCOPE_MISMATCH (section 4), NO_CURRENT_HEAD and TRUST_UNKNOWN (section 5); the catalog has LIVE_/HISTORICAL_CHALLENGE_UNKNOWN_OR_REPLAY, NO_CURRENT_HEAD_OR_STALE_CURRENT_SET and TRUST_UNKNOWN_OR_PIN_MISMATCH. The owner validator checks only rows and examples against the catalog."
+  },
+  {
+   "id": "K2-L3", "severity": "LOW_FIX_BEFORE_GRANT",
+   "title": "Owner field census is regex-based; future code gates need a go/types census",
+   "statement": "With the trust.go raw hash re-pinned (as any future K2 change will do), the owner regex census passes an embedded exported field, an embedded *KeyGrant and a Now time.Time->any type change (V01c-V03c PASS); named fields and new named types are caught. At eb32 the exact raw-hash pin makes the census correct, and the reviewer go/types census independently confirms 13 types / 73 fields / 0 embedded. Semantic placement (V06), wrong-but-cataloged refusals (V07), emptied forbidden-effect list (V08) and inverted Root-decision text (V09) also pass: expected static limits, so they must be covered by review and executed tests, not labels."
+  },
+  {
+   "id": "K2-L4", "severity": "LOW_FIX_BEFORE_GRANT",
+   "title": "DTO non-forgeability has no named Go enforcement",
+   "statement": "migrationverify.NewVerifier is exported, takes plain exported structs and is not under internal/; any package can call it with hand-built inputs. Contract section 5 says constructors stay behind K2A but names no mechanism. Require unexported-field authenticated DTOs, an import-boundary test (only the reviewed K2A package imports migrationverify and constructs InstalledTrust/TrustedContext), and that K2B never accepts a K1 Report, derived digest or caller-supplied SnapshotToken as authority (it re-acquires)."
+  },
+  {
+   "id": "K2-L5", "severity": "LOW_FIX_BEFORE_GRANT",
+   "title": "VerifierPublication is not required to equal the measured running verifier",
+   "statement": "AST: all five VerifierPublication fields are read only in NewVerifier for format (ID constant, hash shape, non-empty CIRunIDs). P02 authenticates a publication but never requires ArtifactSHA256 to equal the digest of the executable actually running K1/K2 (via the installation receipt and a reviewed self-measurement path), so an authentic publication of artifact X could accompany running binary Y. Combined with K2-I1 (inv-node does not link K1), the future integration entrypoint must be the measured executable."
+  }
+ ],
+ "infos": [
+  {"id": "K2-I1", "statement": "Go-only claim verified and strengthened: whole eb32 tree has 34 NewVerifier occurrences in .go files, exactly one non-test (trust.go:136 definition); no .go file imports .../node-agent/migrationverify; `go list -deps ./cmd/inv-node` (GOOS=linux, offline) lists 229 packages and 0 migrationverify, so the CI inv-node hash 2aa70e1f... cannot contain K1 at all and its eb32 VCS revision is not a K1/K2 integration."},
+  {"id": "K2-I2", "statement": "Reproduced: owner validator exit 0, LF-normalized stdout sha256 8af5fde3b3bde5e6edd96c2f1b1b893fe537f6366a5033fac15f6fd9de1ca644 = owner gate-01/final log; its 4 malformed failure-example negatives are schema-level STATIC rejections only. Independent: 28 descriptors raw+schema pins match index.json, LF-only, 28 distinct domains, 1 native-m2-v2 + 27 normalized-proof-v1, 77 slots join catalog domain/role/producer with 0 mismatches; 28 source-inspection files rehash 0 mismatch; 5 worker modules + launcher + lock = 7-file closure, all literal pins match; A01-A40 original raw sha256 e671501c... from design 8874 equals owner pin, 0 key/value diffs, all NOT_RUN/null; 56651->eb32 migrationverify delta is README.md only; design 8874/review 6b12/registration a0a05427 appear as pins in eb32 source-pins.json."},
+  {"id": "K2-I3", "statement": "Go AST/types census: NewVerifier(InstalledTrust, TrustedContext) reaches exactly the 13 inventoried struct types and 73 fields, 0 embedded; 4 fields are opaque `any` (KeyGrant.AuthorityScope, MemberIdentity.Scope, TrustedContext.SemanticInputs, CurrentProjectionContext.InventoryHead) whose nested shape is only partly constrained by K1 (scopeIdentity, validateSemanticInputs, readback subject join). Fields read only inside NewVerifier (format/consistency): all VerifierPublication and ContractPin fields, Grants, GraphBytes/GraphSHA256 and all KeyGrant fields."},
+  {"id": "K2-I4", "statement": "K1 history validation is not clock- or status-free: certificate nonrevocation (native.go) and publication status (proofs.go freshnessAt) are checked at TrustedContext.Now for historical use too, so even a read-only ValidateHistory needs D-CLOCK and current status sources for real use; fixtures suffice only for tests."},
+  {"id": "K2-I5", "statement": "Verified with the proposal: native effective end = min(observed+min(plan,120s), certificate NotAfter, plan expiry, HELD expiry); live challenge requires IssuedAt<=Now<ExpiresAt; readback/status age <=120s; 30 s proof skew separate; latestCurrent compares only within one migration/plan (R2 residual correctly assigned to D-COHORT-FENCE); ABSENT head cannot yield CurrentView. Engine API 1.45 vs 1.41, VM RESOURCE_UNAVAILABLE 97%/482MiB snapshot and old two-identity scopes are retained as historical context without new measurement. Citation nit: P08 cites v3/operation-lease.schema.json for HELD/RELEASED, which are defined in v2 (v3 only overlays cohortId)."},
+  {"id": "K2-I6", "statement": "IDEMPOTENCY_COLLISION and PERMISSION_OR_CAPABILITY_UNKNOWN are cataloged with no row or failure example (K2B scope; acceptable now, needed before K2B review). All CI identities cited by the proposal were re-read with gh (not rerun): Docs 42146482617, Core 42138733821 (jobs 127633370756/127633370998 success), Docs 42137296076, 42142783600, 42132923864 success; old Core 42126222201 remains failure (job 127591007221)."}
+ ],
+ "attacksClosedOrCorrectlyHeld": {
+  "circularAuthoritySelfRegistration": "Closed by design text: registry authenticated out of band via custody (D-TRUST-INSTALL HOLD); plan canonicalContractSHA256 must equal installed RegistrySHA256 (verify.go) but never selects it; grants acquired before signer acceptance.",
+  "statusKeyScope": "Publications keyed by referent raw hash with SubjectSHA256 join, Certificates by leaf DER hash, Challenges by operation+scope hash: matches eb32; single-slot challenge consequence folded into K2-M1.",
+  "partialReadback": "P14 refuses partial member/readback; K1 requires both ordered members and exact readback subject join.",
+  "fixturePromotion": "installed-bindings all null; failure examples forbid fixture nonce/key promotion; validator rejects filled bindings and invented execution evidence (V11/V12).",
+  "doubleReadWithUnmediatedWriters": "Correctly not claimed safe; requires mandatory fence for every mutator (D-COHORT-FENCE HOLD).",
+  "prepublication": "BootstrapPhaseAuthorization is named, method-specific, not CurrentView, no K1 schema weakening; correctly HOLD.",
+  "effectStateMachine": "REFUSED_NO_EFFECT only before first authority/journal/external write; INTENT_COMMITTED after; UNKNOWN forward-only; no exactly-once claim; PC2 then PC4 order; no locked DB over SSH/Engine/issuer/filesystem I/O.",
+  "generations": "Binary bootstrap preserves P/H/C/R/keys/CA/profile; normal-v2 P+1/P+2, C+1, R unchanged; SF1/RS1 not bypasses."
+ },
+ "rootDecisionsNecessary": [
+  {"id": "D-TRUST-INSTALL", "need": "actual public anchors/custody/CA/offline policy, registry selector authentication, reviewer-identity grant registration for P02, exact K2 package/runtime-lock/manifest and installation receipt"},
+  {"id": "D-COHORT-FENCE", "need": "single authoritative cross-migration cohort registry (ordered tenant/Node/recoveryEpoch vector, active migration, max fenceEpoch, qualified sequence, currentVersion) and proof that every permitted mutator is mediated"},
+  {"id": "D-CLOCK", "need": "authenticated clock source and maximum uncertainty (proposal 1 s, not 30 s skew) plus the K2-L1 evaluation mechanism"},
+  {"id": "D-PREPUBLICATION", "need": "closed BootstrapPhaseAuthorization for named ABSENT-head bootstrap methods, initial expected state/counter/set and phase-transition evidence"},
+  {"id": "D-OBSERVATION (new, from K2-M1)", "need": "closed PRESENT-head witness-refresh admission (challenge issuance + owned observer ExecCreate/Start) and its retry/supersession rule, or explicit HOLD blocking every CurrentView-dependent effect"}
+ ],
+ "notChosenByReviewer": "No trust key, protocol, registry, clock source/budget, fence design or code grant was chosen by the reviewer.",
+ "nextScope": {
+  "first": "Codex rev2 docs/static-only delta closing K2-M1..M3 and K2-L1..L5 on top of 551d (no code), then one actual Claude delta review.",
+  "smallestReadOnlyCodeGrantAfterRevisionAndRootChoice": "K2A-TRUST/HISTORY slice: unexported-field authenticated DTOs, LoadInstalledPolicy/ReadHistory/ValidateHistory interfaces that return typed refusals while bindings are null, MigrationOperationID from the authenticated plan/history (K2-M2), import-boundary and go/types census gates, tests only with separately granted synthetic fixtures; DeriveCurrent limited to typed refusal; no signer, nonce, lock/journal/temp file, OpenJournal/pin or Engine API.",
+  "remainsUnusable": "Any CurrentView on a real system (needs D-OBSERVATION + K2B + installation), every K2B effect, installation, operations, physical five-PC acceptance; real use of even ValidateHistory needs D-CLOCK and current status sources (K2-I4)."
+ },
+ "limits": [
+  "STATIC/source and scratch fixture analysis only: no crypto vector generation, no live producer, no PG/Docker/SSH/VM/Node/PKI/clock/schedule access, no installation.",
+  "The scratch Go test ran on a git-archive copy of eb32 with K1's own ephemeral test fixtures; it shows K1 semantics, not K2 behaviour, and was never added to product.",
+  "Owner validator mutations ran in memory; owner files unchanged.",
+  "Original A01-A40 remain NOT_RUN; no completed K1 CI/proof/archive was rerun."
+ ]
+}

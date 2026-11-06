@@ -1,0 +1,30 @@
+{
+ "schemaVersion": "fleet5-k2-551-review-commands:1",
+ "environment": {
+  "host": "Windows 11 Pro 10.0.26300 (Git Bash + PowerShell 5.1)",
+  "worktree": "D:/Project/SaintVisionI-Invion/fleet5-bootstrap-v3-review-20261106 (reused released B5 review workspace, new branch)",
+  "branch": "agent/claude/fleet5-k2-551-contract-review-20261106 created FROM 551d7312bb9c806fd423dcf6074158a9802cbb14 at ~10:58 KST",
+  "python": "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe = Python 3.14.7, jsonschema 4.26.0 (owner interpreter per local-contract-gates.json; read-only use, no installs); stdlib-only reviewer scripts also ran under system Python 3.10",
+  "go": "go1.27.0 windows/amd64, GOTOOLCHAIN=local, GOPROXY=off, GOFLAGS=-mod=mod (module cache only, no download)",
+  "env": "PYTHONUTF8=1",
+  "scratch": "session scratchpad outside the repo; eb32 trees extracted with `git archive eb32b211 services/node-agent packages/contracts-go`",
+  "noDB_PG_Docker_Node_SSH_PKI_VM_clock_schedule_privateKey": true
+ },
+ "timeNote": "Only 11:12:02 (owner validator), 11:18:06 (second scratch Go test) and the gate ledger times were captured from the clock (PowerShell Get-Date); other atKST values are approximate session-order times.",
+ "commands": [
+  {"atKST": "2026-11-06T10:57", "argv": "git fetch origin agent/codex/fleet5-k2-trusted-producer-contract-20261106; git ls-remote origin refs/heads/agent/codex/fleet5-k2-trusted-producer-contract-20261106", "exit": 0, "result": "FETCH_HEAD = remote ref = 551d7312bb9c806fd423dcf6074158a9802cbb14, parent eb32b211ab3704935b9431747089ab0715582a74"},
+  {"atKST": "2026-11-06T10:58", "argv": "git checkout -b agent/claude/fleet5-k2-551-contract-review-20261106 551d7312", "exit": 0},
+  {"atKST": "2026-11-06T11:00..11:05", "argv": "go run ./astcheck <scratch eb32 migrationverify>  (reviewer_astcheck.go.txt; scratch CRLF copy sha256 ccff24fe7163fd9632c6529965d6441619272e8c6a5a97e2e65a25f454358bee, committed LF copy differs only by line endings)", "exit": 0, "result": "13 reachable struct types, 73 fields, 0 embedded; 9 type errors only from the stubbed third-party jsonschema import", "output": "reviewer-ast-result.json"},
+  {"atKST": "2026-11-06T11:05", "argv": "go test ./migrationverify/ -run TestDurableTwoEpochHistoryAndCurrent -count=1 (unmodified scratch eb32)", "exit": 0},
+  {"atKST": "2026-11-06T11:06 and 11:18:06", "argv": "go test ./migrationverify/ -run 'TestK2ReviewMigrationOperationIDSemantics|TestDurableTwoEpochHistoryAndCurrent' -count=1 -v  (scratch-only reviewer test file reviewer_scratch_k2review_test.go.txt sha256 e7905a3fd1e91e333d86cb601d1ba330daf04ce06af7d6fbabc91e8cb7476d27 placed in the scratch copy; never in product)", "exit": 0, "result": "control pass; MigrationOperationID:=Current.OperationID refuses 'proof signed for different current operation' in both Verify and Current (first failing plan proof path varied between runs with Go map order); facts.migrationOperationId change refuses noOverlap subject", "output": "reviewer-go-scratch-test.log.txt (second run)"},
+  {"atKST": "2026-11-06T11:08..11:10", "argv": "python -B reviewer_static.py <out> <owner Evidence dir>", "exit": 0, "note": "first attempt mis-parsed single-quoted WORKER_MODULES (0 pins); regex fixed, rerun exit 0 with 5/5 module pins", "output": "reviewer-static-result.json"},
+  {"atKST": "2026-11-06T11:12:02", "argv": "PYTHONUTF8=1 <owner python> -B docs/vault/30_Development/Evidence/fleet5-k2-trusted-producer-contract-20261106-codex/validate_static_contract.py.txt", "exit": 0, "stdoutLFSha256": "8af5fde3b3bde5e6edd96c2f1b1b893fe537f6366a5033fac15f6fd9de1ca644", "comparison": "equals owner gate-01 and final-static_contract.log; stderr empty; git status unchanged", "output": "owner-validator-reproduction.stdout.txt"},
+  {"atKST": "2026-11-06T11:13..11:15", "argv": "PYTHONUTF8=1 <owner python> -B reviewer_validator_mutations.py <owner validator .py.txt> <out>", "exit": 0, "result": "19 in-memory cases: control PASS; hash-pinned trust.go edits all caught by raw pin; census-only V01c-V03c PASS (undetected), V04c/V05c caught; semantic V06-V09 PASS (static limits); V10-V13 caught", "output": "reviewer-validator-mutations-result.json, reviewer-validator-mutations.log.txt"},
+  {"atKST": "2026-11-06T11:15", "argv": "gh run view <id> --json headSha,headBranch,event,conclusion,displayTitle,attempt,workflowName,jobs for 42146482617 42138733821 42137296076 42142783600 42132923864 42126222201", "exit": 0, "result": "551d Docs success job 127659082272; eb32 Core success jobs 127633370756/127633370998; Docs 42137296076/42142783600/42132923864 success; 56651 Core 42126222201 failure (job 127591007221). Read only, nothing rerun."},
+  {"atKST": "2026-11-06T11:16", "argv": "GOOS=linux go list -deps ./cmd/inv-node (scratch eb32 + packages/contracts-go)", "exit": 0, "result": "229 packages, 0 contain migrationverify (first attempt exit 1 only because packages/contracts-go was not yet extracted)"},
+  {"atKST": "2026-11-06T11:17", "argv": "read-only: shared canonical vault fleet-five-orchestration-20261105 Index header (1.0.433, efaa6708) and Claude 작업 현황 header (1.2.130)", "exit": 0},
+  {"atKST": "2026-11-06T11:21:48..", "argv": "10 doc gates one by one, stop on first nonzero, sync --check --state canonical only", "exit": 0, "output": "local-doc-gates.txt"}
+ ],
+ "notRun": ["any PG/Docker/Node/SSH/VM/crypto-vector/clock/schedule/equipment command", "owner gate runner (owner ledgers not rewritten)", "Obsidian apply/adopt/resolve/state write", "rerun of any completed K1 CI/proof/archive"],
+ "reviewerArtifactsLFSha256": "see History; recomputed after commit in worker_done"
+}

@@ -1,0 +1,202 @@
+{
+ "classification": "REVIEWER_STATIC_SOURCE_CHECKS_NOT_CRYPTO_NOT_RUNTIME",
+ "checks": {
+  "descriptors28": {
+   "count": 28,
+   "catalogCount": 28,
+   "allRawAndSchemaPinsMatch": true,
+   "allLFOnlyNoCR": true,
+   "catalogFieldMismatches": [],
+   "slots": 77,
+   "slotDomainRoleProducerMismatches": [],
+   "codecs": [
+    "native-m2-v2",
+    "normalized-proof-v1"
+   ],
+   "nativeCount": 1,
+   "distinctDomains": 28
+  },
+  "helperClosure7": {
+   "moduleLiteralPins": 5,
+   "moduleRawMatches": {
+    "worker_config.py": true,
+    "worker_leaf_rotation.py": true,
+    "peer_policy_phase.py": true,
+    "worker_peer_floor.py": true,
+    "worker_plain_rotation.py": true
+   },
+   "lockRawMatchesLiteral": true,
+   "launcherRawMatchesOwnerInspection": true,
+   "closureFiles": [
+    "leaf-rotation-runtime-lock.json",
+    "leaf_rotation_standalone_runtime.py",
+    "peer_policy_phase.py",
+    "worker_config.py",
+    "worker_leaf_rotation.py",
+    "worker_peer_floor.py",
+    "worker_plain_rotation.py"
+   ],
+   "ownerList": [
+    "leaf-rotation-runtime-lock.json",
+    "leaf_rotation_standalone_runtime.py",
+    "peer_policy_phase.py",
+    "worker_config.py",
+    "worker_leaf_rotation.py",
+    "worker_peer_floor.py",
+    "worker_plain_rotation.py"
+   ]
+  },
+  "ownerInspectionRehash": {
+   "count": 28,
+   "mismatches": []
+  },
+  "A01_A40": {
+   "originalSource": "8874b2dfe0dda9a019bd5f334636668290702e13",
+   "originalSourceIsDesign8874": true,
+   "originalPath": "docs/vault/30_Development/Evidence/fleet5-legacy-capability-bootstrap-plan-20261105/acceptance-matrix.json",
+   "originalRawSHA256": "e671501c9e901b117bafeef1de89ef6e1b0c3dccecc18eff29ba2e76c2071026",
+   "ownerPinnedSHA": "e671501c9e901b117bafeef1de89ef6e1b0c3dccecc18eff29ba2e76c2071026",
+   "idsExact": true,
+   "countOrig": 40,
+   "countNew": 40,
+   "originalKeyValueDiffs": [],
+   "originalKeys": [
+    "findings",
+    "gates",
+    "green",
+    "id",
+    "red"
+   ],
+   "allNotRunNullEvidence": true,
+   "addedKeys": [
+    "executionEvidence",
+    "futurePermission",
+    "implementationOwner",
+    "mutantPurpose",
+    "requiredTask",
+    "status"
+   ]
+  },
+  "NewVerifier": {
+   "allGoOccurrences": 34,
+   "nonTest": [
+    "eb32b211ab3704935b9431747089ab0715582a74:services/node-agent/migrationverify/trust.go:136:func NewVerifier(installed InstalledTrust, context TrustedContext) (*Verifier, error) {"
+   ],
+   "goFilesImportingMigrationverify": [],
+   "grepExit": 1
+  },
+  "delta56651toEb32": {
+   "all": [
+    "A\t.github/workflows/preparation-rate-clock.yml",
+    "A\tdocs/vault/30_Development/Evidence/fleet5-prepare-rate-clock-test-20261106-codex/counterexample-prerequisite.json",
+    "A\tdocs/vault/30_Development/Evidence/fleet5-prepare-rate-clock-test-20261106-codex/final-source-scope.json",
+    "A\tdocs/vault/30_Development/Evidence/fleet5-prepare-rate-clock-test-20261106-codex/focused-lane-static.json",
+    "A\tdocs/vault/30_Development/Evidence/fleet5-prepare-rate-clock-test-20261106-codex/gate-01-check_docs.log",
+    "A\tdocs/vault/30_Development/Evidence/fleet5-prepare-rate-clock-test-20261106-codex/gate-02-check_ontology_generation.log",
+    "A\tdocs/vault/30_Development/Evidence/fleet5-prepare-rate-clock-test-20261106-codex/gate-03-check_ontology.log",
+    "A\tdocs/vault/30_Development/Evidence/fleet5-prepare-rate-clock-test-20261106-codex/gate-04-check_contract_bindings.log",
+    "A\tdocs/vault/30_Development/Evidence/fleet5-prepare-rate-clock-test-20261106-codex/gate-05-check_frontend_integrity.log",
+    "A\tdocs/vault/30_Development/Evidence/fleet5-prepare-rate-clock-test-20261106-codex/gate-06-check_doc_path_citations.log",
+    "A\tdocs/vault/30_Development/Evidence/fleet5-prepare-rate-clock-test-20261106-codex/gate-07-check_doc_single_source.log",
+    "A\tdocs/vault/30_Development/Evidence/fleet5-prepare-rate-clock-test-20261106-codex/gate-08-test_sync.log",
+    "A\tdocs/vault/30_Development/Evidence/fleet5-prepare-rate-clock-test-20261106-codex/gate-09-build_docs.log",
+    "A\tdocs/vault/30_Development/Evidence/fleet5-prepare-rate-clock-test-20261106-codex/gate-10-sync_obsidian.log",
+    "A\tdocs/vault/30_Development/Evidence/fleet5-prepare-rate-clock-test-20261106-codex/init.json",
+    "A\tdocs/vault/30_Development/Evidence/fleet5-prepare-rate-clock-test-20261106-codex/local-prerequisite-checks.json",
+    "A\tdocs/vault/30_Development/Evidence/fleet5-prepare-rate-clock-test-20261106-codex/local-source-gates.json",
+    "A\tdocs/vault/30_Development/Evidence/fleet5-prepare-rate-clock-test-20261106-codex/original-rate-test.py.txt",
+    "A\tdocs/vault/30_Development/Evidence/fleet5-prepare-rate-clock-test-20261106-codex/prepublication-test-source.json",
+    "A\tdocs/vault/30_Development/Evidence/fleet5-prepare-rate-clock-test-20261106-codex/run_original_counterexample.py.txt",
+    "A\tdocs/vault/30_Development/Evidence/fleet5-prepare-rate-clock-test-20261106-codex/source-inspection.json",
+    "A\tdocs/vault/30_Development/History/2026-11-06_FLEET5_prepare_rate_clock_test_Codex.md",
+    "M\tservices/node-agent/migrationverify/README.md",
+    "M\ttests/integration/test_build_preparations_real_pg.py",
+    "A\ttests/proofs/run_preparation_rate_clock.py"
+   ],
+   "migrationverifyOnly": [
+    "M\tservices/node-agent/migrationverify/README.md"
+   ]
+  },
+  "proposal551dVsEb32": {
+   "count": 31,
+   "nonAdd": [],
+   "outsideOwnerHistoryEvidence": []
+  },
+  "matrixSymbolCitations": {
+   "rows": 19,
+   "tokensNotFoundInCitedFile": [
+    {
+     "row": "P04",
+     "path": "services/control-plane/src/inv/node_channels.py",
+     "token": "NodeChannels.snapshot"
+    },
+    {
+     "row": "P08",
+     "path": "services/node-agent/migrationverify/resources/schemas/v3/operation-lease.schema.json",
+     "token": "HELD"
+    },
+    {
+     "row": "P08",
+     "path": "services/node-agent/migrationverify/resources/schemas/v3/operation-lease.schema.json",
+     "token": "RELEASED"
+    },
+    {
+     "row": "P13",
+     "path": "services/node-agent/migrationverify/trust.go",
+     "token": "TrustedContext.Challenges"
+    },
+    {
+     "row": "P17",
+     "path": "services/node-agent/runtime/permit.go",
+     "token": "Config.Image"
+    }
+   ]
+  },
+  "fieldPlacement": {
+   "multiRow": {},
+   "MigrationOperationID": [
+    "P12"
+   ],
+   "P12producer": "ReadCurrent active common-cohort operation registry (new producer)",
+   "P12validation": "Only actual live operation bindings, exact HELD lease raw hash/window/fence/migration, no RELEASED or expired lease; MigrationOperationID exact current authority-selected ID; history map remains separate"
+  },
+  "contractUpperSnakeTokensOutsideErrorAndStateCatalogs": [
+   "AUTHENTICATED_ORIGINAL_NATIVE_HISTORY_NOT_FRESH_PROOF",
+   "DESIGN_PROPOSAL_REVIEW_REQUIRED",
+   "NEW_CODE_CONTRACT_NOT_IMPLEMENTED_OR_ACCEPTED",
+   "NOT_RUN",
+   "NO_CURRENT_HEAD",
+   "REPLAY_OR_SCOPE_MISMATCH",
+   "RESOURCE_UNAVAILABLE",
+   "TRUST_UNKNOWN"
+  ],
+  "failureExamples": {
+   "count": 18,
+   "ids": [
+    "K2-UNKNOWN_TRUST",
+    "K2-REVOKED_KEY",
+    "K2-EXPIRED_KEY",
+    "K2-REVOKED_CERT",
+    "K2-EXPIRED_CURRENT_STATUS",
+    "K2-BACKDATED_PUBLICATION",
+    "K2-REPLAYED_NONCE",
+    "K2-WRONG_ARTIFACT",
+    "K2-REVIEW_SCOPE",
+    "K2-CROSS_MIGRATION",
+    "K2-HEAD_ABSENT",
+    "K2-CURRENT_WITNESS",
+    "K2-UNTRUSTED_CLOCK",
+    "K2-TOCTOU",
+    "K2-READONLY_EFFECT",
+    "K2-PREPUBLICATION",
+    "K2-AMBIGUOUS_EFFECT",
+    "K2-FLOOR_RESET"
+   ],
+   "refusalsNotInCatalog": []
+  },
+  "catalogCodesUnusedByAnyRowOrExample": [
+   "IDEMPOTENCY_COLLISION",
+   "PERMISSION_OR_CAPABILITY_UNKNOWN"
+  ]
+ }
+}

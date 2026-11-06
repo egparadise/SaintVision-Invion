@@ -1,0 +1,164 @@
+{
+ "classification": "REVIEWER_IN_MEMORY_MUTATIONS_OF_OWNER_STATIC_VALIDATOR",
+ "summary": {
+  "cases": 19,
+  "detected": [
+   "V01-embedded-exported-field",
+   "V02-embedded-pointer-field",
+   "V03-field-type-weakened",
+   "V04-new-named-field-detected",
+   "V05-new-input-type-not-in-inventory",
+   "V04c-new-named-field",
+   "V05c-new-reachable-type",
+   "V10-original-red-text-edited",
+   "V11-binding-filled",
+   "V12-execution-evidence-invented",
+   "V13-caller-authority-flag"
+  ],
+  "undetected": [
+   "V00-control",
+   "V01c-embedded-exported-field",
+   "V02c-embedded-pointer-field",
+   "V03c-field-type-weakened",
+   "V06-field-moved-to-clock-row",
+   "V07-wrong-but-cataloged-refusal",
+   "V08-forbidden-effects-emptied",
+   "V09-root-decision-text-inverted"
+  ]
+ },
+ "cases": [
+  {
+   "id": "V00-control",
+   "purpose": "unmodified inputs",
+   "expectedIfValidatorIsSemantic": "PASS",
+   "actual": "PASS",
+   "ownerValidatorDetects": false
+  },
+  {
+   "id": "V01-embedded-exported-field",
+   "purpose": "add embedded exported struct field to TrustedContext (a 74th caller input path)",
+   "expectedIfValidatorIsSemantic": "FAIL",
+   "actual": "ASSERT_FAIL ",
+   "ownerValidatorDetects": true
+  },
+  {
+   "id": "V02-embedded-pointer-field",
+   "purpose": "add embedded *KeyGrant to InstalledTrust",
+   "expectedIfValidatorIsSemantic": "FAIL",
+   "actual": "ASSERT_FAIL ",
+   "ownerValidatorDetects": true
+  },
+  {
+   "id": "V03-field-type-weakened",
+   "purpose": "change TrustedContext.Now from time.Time to any (caller-shaped clock)",
+   "expectedIfValidatorIsSemantic": "FAIL",
+   "actual": "ASSERT_FAIL ",
+   "ownerValidatorDetects": true
+  },
+  {
+   "id": "V04-new-named-field-detected",
+   "purpose": "control: add named field Override bool to TrustedContext",
+   "expectedIfValidatorIsSemantic": "FAIL",
+   "actual": "ASSERT_FAIL ",
+   "ownerValidatorDetects": true
+  },
+  {
+   "id": "V05-new-input-type-not-in-inventory",
+   "purpose": "add a 14th struct type reachable from NewVerifier via new field typed by an uninventoried struct",
+   "expectedIfValidatorIsSemantic": "FAIL",
+   "actual": "ASSERT_FAIL ",
+   "ownerValidatorDetects": true
+  },
+  {
+   "id": "V01c-embedded-exported-field",
+   "purpose": "census only: embedded exported CurrentNativeWitness in TrustedContext",
+   "expectedIfValidatorIsSemantic": "FAIL",
+   "actual": "PASS",
+   "ownerValidatorDetects": false
+  },
+  {
+   "id": "V02c-embedded-pointer-field",
+   "purpose": "census only: embedded *KeyGrant in InstalledTrust",
+   "expectedIfValidatorIsSemantic": "FAIL",
+   "actual": "PASS",
+   "ownerValidatorDetects": false
+  },
+  {
+   "id": "V03c-field-type-weakened",
+   "purpose": "census only: TrustedContext.Now time.Time -> any",
+   "expectedIfValidatorIsSemantic": "FAIL",
+   "actual": "PASS",
+   "ownerValidatorDetects": false
+  },
+  {
+   "id": "V04c-new-named-field",
+   "purpose": "census only: named Override bool in TrustedContext",
+   "expectedIfValidatorIsSemantic": "FAIL",
+   "actual": "ASSERT_FAIL ",
+   "ownerValidatorDetects": true
+  },
+  {
+   "id": "V05c-new-reachable-type",
+   "purpose": "census only: 14th reachable struct type via new field",
+   "expectedIfValidatorIsSemantic": "FAIL",
+   "actual": "ASSERT_FAIL ",
+   "ownerValidatorDetects": true
+  },
+  {
+   "id": "V06-field-moved-to-clock-row",
+   "purpose": "move MigrationOperationID under the clock producer row P06",
+   "expectedIfValidatorIsSemantic": "FAIL",
+   "actual": "PASS",
+   "ownerValidatorDetects": false
+  },
+  {
+   "id": "V07-wrong-but-cataloged-refusal",
+   "purpose": "K2-HEAD_ABSENT expects STALE_SNAPSHOT instead of NO_CURRENT_HEAD",
+   "expectedIfValidatorIsSemantic": "FAIL",
+   "actual": "PASS",
+   "ownerValidatorDetects": false
+  },
+  {
+   "id": "V08-forbidden-effects-emptied",
+   "purpose": "empty K2AForbiddenEffects list",
+   "expectedIfValidatorIsSemantic": "FAIL",
+   "actual": "PASS",
+   "ownerValidatorDetects": false
+  },
+  {
+   "id": "V09-root-decision-text-inverted",
+   "purpose": "D-PREPUBLICATION choice text inverted while status stays HOLD",
+   "expectedIfValidatorIsSemantic": "FAIL",
+   "actual": "PASS",
+   "ownerValidatorDetects": false
+  },
+  {
+   "id": "V10-original-red-text-edited",
+   "purpose": "edit A06 original red text",
+   "expectedIfValidatorIsSemantic": "FAIL",
+   "actual": "ASSERT_FAIL A06",
+   "ownerValidatorDetects": true
+  },
+  {
+   "id": "V11-binding-filled",
+   "purpose": "fill authenticatedClockSource binding",
+   "expectedIfValidatorIsSemantic": "FAIL",
+   "actual": "ASSERT_FAIL ",
+   "ownerValidatorDetects": true
+  },
+  {
+   "id": "V12-execution-evidence-invented",
+   "purpose": "invent A01 execution evidence",
+   "expectedIfValidatorIsSemantic": "FAIL",
+   "actual": "ASSERT_FAIL ",
+   "ownerValidatorDetects": true
+  },
+  {
+   "id": "V13-caller-authority-flag",
+   "purpose": "set P01 untrustedCallerMaySupplyAuthority true",
+   "expectedIfValidatorIsSemantic": "FAIL",
+   "actual": "ASSERT_FAIL ",
+   "ownerValidatorDetects": true
+  }
+ ]
+}

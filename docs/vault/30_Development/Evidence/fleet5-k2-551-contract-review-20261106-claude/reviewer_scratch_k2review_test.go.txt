@@ -1,0 +1,29 @@
+package migrationverify
+
+// REVIEWER SCRATCH ONLY (Claude K2 551d review). Never committed to product.
+import "testing"
+
+func TestK2ReviewMigrationOperationIDSemantics(t *testing.T) {
+	base := newCryptoFixtureMutated(t, nil, cryptoFixtureOptions{DurableHistory: true})
+	cur := base.context.Current.OperationID
+	hist := base.context.MigrationOperationID
+	t.Logf("historical MigrationOperationID=%q current OperationID=%q currentOpsHasHist=%v", hist, cur, base.context.Operations[hist].OperationID != "")
+	run := func(name string, mutate func(f *cryptoFixture)) {
+		f := newCryptoFixtureMutated(t, nil, cryptoFixtureOptions{DurableHistory: true})
+		mutate(f)
+		v, e := NewVerifier(f.installed, f.context)
+		if e != nil {
+			t.Logf("RESULT %s NewVerifier=%v", name, e)
+			return
+		}
+		_, ev := v.Verify(f.packet)
+		_, ec := v.VerifyCurrentProjectionSet(f.packet, "cohort-36")
+		t.Logf("RESULT %s Verify=%v Current=%v", name, ev, ec)
+	}
+	run("control", func(f *cryptoFixture) {})
+	run("P12-as-written-current-op", func(f *cryptoFixture) { f.context.MigrationOperationID = f.context.Current.OperationID })
+	run("facts-migrationOperationId-differs", func(f *cryptoFixture) {
+		facts := f.context.SemanticInputs.(map[string]any)["facts"].(map[string]any)
+		facts["migrationOperationId"] = "k2-review-other-operation"
+	})
+}

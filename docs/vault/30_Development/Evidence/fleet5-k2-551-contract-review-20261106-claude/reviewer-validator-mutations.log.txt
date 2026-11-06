@@ -1,0 +1,20 @@
+V00-control -> PASS
+V01-embedded-exported-field -> ASSERT_FAIL 
+V02-embedded-pointer-field -> ASSERT_FAIL 
+V03-field-type-weakened -> ASSERT_FAIL 
+V04-new-named-field-detected -> ASSERT_FAIL 
+V05-new-input-type-not-in-inventory -> ASSERT_FAIL 
+V01c-embedded-exported-field -> PASS
+V02c-embedded-pointer-field -> PASS
+V03c-field-type-weakened -> PASS
+V04c-new-named-field -> ASSERT_FAIL 
+V05c-new-reachable-type -> ASSERT_FAIL 
+V06-field-moved-to-clock-row -> PASS
+V07-wrong-but-cataloged-refusal -> PASS
+V08-forbidden-effects-emptied -> PASS
+V09-root-decision-text-inverted -> PASS
+V10-original-red-text-edited -> ASSERT_FAIL A06
+V11-binding-filled -> ASSERT_FAIL 
+V12-execution-evidence-invented -> ASSERT_FAIL 
+V13-caller-authority-flag -> ASSERT_FAIL 
+{"cases": 19, "detected": ["V01-embedded-exported-field", "V02-embedded-pointer-field", "V03-field-type-weakened", "V04-new-named-field-detected", "V05-new-input-type-not-in-inventory", "V04c-new-named-field", "V05c-new-reachable-type", "V10-original-red-text-edited", "V11-binding-filled", "V12-execution-evidence-invented", "V13-caller-authority-flag"], "undetected": ["V00-control", "V01c-embedded-exported-field", "V02c-embedded-pointer-field", "V03c-field-type-weakened", "V06-field-moved-to-clock-row", "V07-wrong-but-cataloged-refusal", "V08-forbidden-effects-emptied", "V09-root-decision-text-inverted"]}

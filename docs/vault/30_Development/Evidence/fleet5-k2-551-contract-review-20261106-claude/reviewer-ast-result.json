@@ -1,0 +1,2270 @@
+{
+ "NewVerifierParams": [
+  "InstalledTrust",
+  "TrustedContext"
+ ],
+ "embeddedFields": 0,
+ "fieldCount": 73,
+ "fields": [
+  {
+   "Type": "InstalledTrust",
+   "Field": "RegistrySHA256",
+   "GoType": "string",
+   "Opaque": false,
+   "Uses": [
+    {
+     "File": "trust.go",
+     "Func": "NewVerifier",
+     "Line": 137
+    },
+    {
+     "File": "verify.go",
+     "Func": "(Verifier).verify",
+     "Line": 135
+    }
+   ],
+   "UseFuncs": [
+    "trust.go:NewVerifier",
+    "verify.go:(Verifier).verify"
+   ]
+  },
+  {
+   "Type": "InstalledTrust",
+   "Field": "Verifier",
+   "GoType": "VerifierPublication",
+   "Opaque": false,
+   "Uses": [
+    {
+     "File": "trust.go",
+     "Func": "NewVerifier",
+     "Line": 137
+    },
+    {
+     "File": "trust.go",
+     "Func": "NewVerifier",
+     "Line": 137
+    },
+    {
+     "File": "trust.go",
+     "Func": "NewVerifier",
+     "Line": 137
+    },
+    {
+     "File": "trust.go",
+     "Func": "NewVerifier",
+     "Line": 137
+    },
+    {
+     "File": "trust.go",
+     "Func": "NewVerifier",
+     "Line": 137
+    }
+   ],
+   "UseFuncs": [
+    "trust.go:NewVerifier"
+   ]
+  },
+  {
+   "Type": "InstalledTrust",
+   "Field": "ContractPins",
+   "GoType": "map[string]ContractPin",
+   "Opaque": false,
+   "Uses": [
+    {
+     "File": "trust.go",
+     "Func": "NewVerifier",
+     "Line": 197
+    },
+    {
+     "File": "trust.go",
+     "Func": "NewVerifier",
+     "Line": 201
+    }
+   ],
+   "UseFuncs": [
+    "trust.go:NewVerifier"
+   ]
+  },
+  {
+   "Type": "InstalledTrust",
+   "Field": "Grants",
+   "GoType": "[]KeyGrant",
+   "Opaque": false,
+   "Uses": [
+    {
+     "File": "trust.go",
+     "Func": "NewVerifier",
+     "Line": 214
+    },
+    {
+     "File": "trust.go",
+     "Func": "NewVerifier",
+     "Line": 218
+    }
+   ],
+   "UseFuncs": [
+    "trust.go:NewVerifier"
+   ]
+  },
+  {
+   "Type": "InstalledTrust",
+   "Field": "CohortID",
+   "GoType": "string",
+   "Opaque": false,
+   "Uses": [
+    {
+     "File": "trust.go",
+     "Func": "NewVerifier",
+     "Line": 140
+    },
+    {
+     "File": "trust.go",
+     "Func": "(Verifier).cohortAuthority",
+     "Line": 291
+    },
+    {
+     "File": "verify.go",
+     "Func": "(Verifier).checkRegisteredMembers",
+     "Line": 253
+    },
+    {
+     "File": "verify.go",
+     "Func": "(Verifier).VerifyCurrentProjectionSet",
+     "Line": 323
+    }
+   ],
+   "UseFuncs": [
+    "trust.go:(Verifier).cohortAuthority",
+    "trust.go:NewVerifier",
+    "verify.go:(Verifier).VerifyCurrentProjectionSet",
+    "verify.go:(Verifier).checkRegisteredMembers"
+   ]
+  },
+  {
+   "Type": "InstalledTrust",
+   "Field": "Members",
+   "GoType": "[]MemberIdentity",
+   "Opaque": false,
+   "Uses": [
+    {
+     "File": "current.go",
+     "Func": "(Verifier).leaseScopesMatch",
+     "Line": 10
+    },
+    {
+     "File": "current.go",
+     "Func": "(Verifier).leaseScopesMatch",
+     "Line": 13
+    },
+    {
+     "File": "current.go",
+     "Func": "(Verifier).currentNativeWitnesses",
+     "Line": 71
+    },
+    {
+     "File": "current.go",
+     "Func": "(Verifier).currentNativeWitnesses",
+     "Line": 86
+    },
+    {
+     "File": "proofs.go",
+     "Func": "(Verifier).verifyNativeAt",
+     "Line": 264
+    },
+    {
+     "File": "recipes.go",
+     "Func": "(Verifier).recipeSources",
+     "Line": 216
+    },
+    {
+     "File": "recipes.go",
+     "Func": "(Verifier).proofAuthority",
+     "Line": 382
+    },
+    {
+     "File": "trust.go",
+     "Func": "NewVerifier",
+     "Line": 140
+    },
+    {
+     "File": "trust.go",
+     "Func": "NewVerifier",
+     "Line": 140
+    },
+    {
+     "File": "trust.go",
+     "Func": "NewVerifier",
+     "Line": 140
+    },
+    {
+     "File": "trust.go",
+     "Func": "NewVerifier",
+     "Line": 156
+    },
+    {
+     "File": "trust.go",
+     "Func": "NewVerifier",
+     "Line": 157
+    },
+    {
+     "File": "trust.go",
+     "Func": "NewVerifier",
+     "Line": 157
+    },
+    {
+     "File": "trust.go",
+     "Func": "NewVerifier",
+     "Line": 161
+    },
+    {
+     "File": "trust.go",
+     "Func": "NewVerifier",
+     "Line": 165
+    },
+    {
+     "File": "trust.go",
+     "Func": "NewVerifier",
+     "Line": 165
+    },
+    {
+     "File": "trust.go",
+     "Func": "(Verifier).member",
+     "Line": 279
+    },
+    {
+     "File": "trust.go",
+     "Func": "(Verifier).cohortAuthority",
+     "Line": 288
+    },
+    {
+     "File": "verify.go",
+     "Func": "(Verifier).checkRegisteredMembers",
+     "Line": 240
+    },
+    {
+     "File": "verify.go",
+     "Func": "(Verifier).checkRegisteredMembers",
+     "Line": 243
+    },
+    {
+     "File": "verify.go",
+     "Func": "(Verifier).outerAuthority",
+     "Line": 262
+    },
+    {
+     "File": "verify.go",
+     "Func": "(Verifier).VerifyCurrentProjectionSet",
+     "Line": 408
+    }
+   ],
+   "UseFuncs": [
+    "current.go:(Verifier).currentNativeWitnesses",
+    "current.go:(Verifier).leaseScopesMatch",
+    "proofs.go:(Verifier).verifyNativeAt",
+    "recipes.go:(Verifier).proofAuthority",
+    "recipes.go:(Verifier).recipeSources",
+    "trust.go:(Verifier).cohortAuthority",
+    "trust.go:(Verifier).member",
+    "trust.go:NewVerifier",
+    "verify.go:(Verifier).VerifyCurrentProjectionSet",
+    "verify.go:(Verifier).checkRegisteredMembers",
+    "verify.go:(Verifier).outerAuthority"
+   ]
+  },
+  {
+   "Type": "InstalledTrust",
+   "Field": "GraphBytes",
+   "GoType": "[]byte",
+   "Opaque": false,
+   "Uses": [
+    {
+     "File": "trust.go",
+     "Func": "NewVerifier",
+     "Line": 206
+    },
+    {
+     "File": "trust.go",
+     "Func": "NewVerifier",
+     "Line": 209
+    }
+   ],
+   "UseFuncs": [
+    "trust.go:NewVerifier"
+   ]
+  },
+  {
+   "Type": "InstalledTrust",
+   "Field": "GraphSHA256",
+   "GoType": "string",
+   "Opaque": false,
+   "Uses": [
+    {
+     "File": "trust.go",
+     "Func": "NewVerifier",
+     "Line": 206
+    },
+    {
+     "File": "trust.go",
+     "Func": "NewVerifier",
+     "Line": 206
+    }
+   ],
+   "UseFuncs": [
+    "trust.go:NewVerifier"
+   ]
+  },
+  {
+   "Type": "InstalledTrust",
+   "Field": "NodeKinds",
+   "GoType": "map[string]string",
+   "Opaque": false,
+   "Uses": [
+    {
+     "File": "current.go",
+     "Func": "(Verifier).latestCurrent",
+     "Line": 25
+    },
+    {
+     "File": "current.go",
+     "Func": "(Verifier).currentNativeWitnesses",
+     "Line": 96
+    },
+    {
+     "File": "current.go",
+     "Func": "(Verifier).currentReadback",
+     "Line": 168
+    },
+    {
+     "File": "recipes.go",
+     "Func": "(Verifier).recipeSources",
+     "Line": 332
+    },
+    {
+     "File": "temporal.go",
+     "Func": "(Verifier).recordUse",
+     "Line": 52
+    },
+    {
+     "File": "temporal.go",
+     "Func": "(Verifier).recordUse",
+     "Line": 75
+    },
+    {
+     "File": "trust.go",
+     "Func": "NewVerifier",
+     "Line": 209
+    },
+    {
+     "File": "verify.go",
+     "Func": "(Verifier).verify",
+     "Line": 80
+    },
+    {
+     "File": "verify.go",
+     "Func": "(Verifier).verify",
+     "Line": 90
+    },
+    {
+     "File": "verify.go",
+     "Func": "(Verifier).verify",
+     "Line": 118
+    },
+    {
+     "File": "verify.go",
+     "Func": "(Verifier).verify",
+     "Line": 121
+    },
+    {
+     "File": "verify.go",
+     "Func": "(Verifier).verify",
+     "Line": 144
+    },
+    {
+     "File": "verify.go",
+     "Func": "(Verifier).verify",
+     "Line": 188
+    },
+    {
+     "File": "verify.go",
+     "Func": "(Verifier).verify",
+     "Line": 204
+    },
+    {
+     "File": "verify.go",
+     "Func": "(Verifier).verify",
+     "Line": 227
+    },
+    {
+     "File": "verify.go",
+     "Func": "(Verifier).VerifyCurrentProjectionSet",
+     "Line": 316
+    },
+    {
+     "File": "verify.go",
+     "Func": "(Verifier).VerifyCurrentProjectionSet",
+     "Line": 334
+    }
+   ],
+   "UseFuncs": [
+    "current.go:(Verifier).currentNativeWitnesses",
+    "current.go:(Verifier).currentReadback",
+    "current.go:(Verifier).latestCurrent",
+    "recipes.go:(Verifier).recipeSources",
+    "temporal.go:(Verifier).recordUse",
+    "trust.go:NewVerifier",
+    "verify.go:(Verifier).VerifyCurrentProjectionSet",
+    "verify.go:(Verifier).verify"
+   ]
+  },
+  {
+   "Type": "VerifierPublication",
+   "Field": "ID",
+   "GoType": "string",
+   "Opaque": false,
+   "Uses": [
+    {
+     "File": "trust.go",
+     "Func": "NewVerifier",
+     "Line": 137
+    }
+   ],
+   "UseFuncs": [
+    "trust.go:NewVerifier"
+   ]
+  },
+  {
+   "Type": "VerifierPublication",
+   "Field": "SourceSHA",
+   "GoType": "string",
+   "Opaque": false,
+   "Uses": [
+    {
+     "File": "trust.go",
+     "Func": "NewVerifier",
+     "Line": 137
+    }
+   ],
+   "UseFuncs": [
+    "trust.go:NewVerifier"
+   ]
+  },
+  {
+   "Type": "VerifierPublication",
+   "Field": "ArtifactSHA256",
+   "GoType": "string",
+   "Opaque": false,
+   "Uses": [
+    {
+     "File": "trust.go",
+     "Func": "NewVerifier",
+     "Line": 137
+    }
+   ],
+   "UseFuncs": [
+    "trust.go:NewVerifier"
+   ]
+  },
+  {
+   "Type": "VerifierPublication",
+   "Field": "ReviewSHA",
+   "GoType": "string",
+   "Opaque": false,
+   "Uses": [
+    {
+     "File": "trust.go",
+     "Func": "NewVerifier",
+     "Line": 137
+    }
+   ],
+   "UseFuncs": [
+    "trust.go:NewVerifier"
+   ]
+  },
+  {
+   "Type": "VerifierPublication",
+   "Field": "CIRunIDs",
+   "GoType": "[]string",
+   "Opaque": false,
+   "Uses": [
+    {
+     "File": "trust.go",
+     "Func": "NewVerifier",
+     "Line": 137
+    }
+   ],
+   "UseFuncs": [
+    "trust.go:NewVerifier"
+   ]
+  },
+  {
+   "Type": "ContractPin",
+   "Field": "ContractSHA256",
+   "GoType": "string",
+   "Opaque": false,
+   "Uses": [
+    {
+     "File": "trust.go",
+     "Func": "NewVerifier",
+     "Line": 202
+    }
+   ],
+   "UseFuncs": [
+    "trust.go:NewVerifier"
+   ]
+  },
+  {
+   "Type": "ContractPin",
+   "Field": "SchemaSHA256",
+   "GoType": "string",
+   "Opaque": false,
+   "Uses": [
+    {
+     "File": "trust.go",
+     "Func": "NewVerifier",
+     "Line": 202
+    }
+   ],
+   "UseFuncs": [
+    "trust.go:NewVerifier"
+   ]
+  },
+  {
+   "Type": "ContractPin",
+   "Field": "Codec",
+   "GoType": "string",
+   "Opaque": false,
+   "Uses": [
+    {
+     "File": "trust.go",
+     "Func": "NewVerifier",
+     "Line": 202
+    }
+   ],
+   "UseFuncs": [
+    "trust.go:NewVerifier"
+   ]
+  },
+  {
+   "Type": "ContractPin",
+   "Field": "RequiredVerifier",
+   "GoType": "string",
+   "Opaque": false,
+   "Uses": [
+    {
+     "File": "trust.go",
+     "Func": "NewVerifier",
+     "Line": 202
+    }
+   ],
+   "UseFuncs": [
+    "trust.go:NewVerifier"
+   ]
+  },
+  {
+   "Type": "KeyGrant",
+   "Field": "Role",
+   "GoType": "string",
+   "Opaque": false,
+   "Uses": [
+    {
+     "File": "trust.go",
+     "Func": "NewVerifier",
+     "Line": 237
+    }
+   ],
+   "UseFuncs": [
+    "trust.go:NewVerifier"
+   ]
+  },
+  {
+   "Type": "KeyGrant",
+   "Field": "AuthorityScope",
+   "GoType": "any",
+   "Opaque": true,
+   "Uses": [
+    {
+     "File": "trust.go",
+     "Func": "NewVerifier",
+     "Line": 218
+    },
+    {
+     "File": "trust.go",
+     "Func": "NewVerifier",
+     "Line": 218
+    },
+    {
+     "File": "trust.go",
+     "Func": "NewVerifier",
+     "Line": 233
+    }
+   ],
+   "UseFuncs": [
+    "trust.go:NewVerifier"
+   ]
+  },
+  {
+   "Type": "KeyGrant",
+   "Field": "PublicKeyHex",
+   "GoType": "string",
+   "Opaque": false,
+   "Uses": [
+    {
+     "File": "trust.go",
+     "Func": "NewVerifier",
+     "Line": 222
+    }
+   ],
+   "UseFuncs": [
+    "trust.go:NewVerifier"
+   ]
+  },
+  {
+   "Type": "KeyGrant",
+   "Field": "NotBefore",
+   "GoType": "time.Time",
+   "Opaque": false,
+   "Uses": [
+    {
+     "File": "trust.go",
+     "Func": "NewVerifier",
+     "Line": 215
+    },
+    {
+     "File": "trust.go",
+     "Func": "NewVerifier",
+     "Line": 215
+    },
+    {
+     "File": "trust.go",
+     "Func": "NewVerifier",
+     "Line": 241
+    }
+   ],
+   "UseFuncs": [
+    "trust.go:NewVerifier"
+   ]
+  },
+  {
+   "Type": "KeyGrant",
+   "Field": "NotAfter",
+   "GoType": "time.Time",
+   "Opaque": false,
+   "Uses": [
+    {
+     "File": "trust.go",
+     "Func": "NewVerifier",
+     "Line": 215
+    },
+    {
+     "File": "trust.go",
+     "Func": "NewVerifier",
+     "Line": 241
+    }
+   ],
+   "UseFuncs": [
+    "trust.go:NewVerifier"
+   ]
+  },
+  {
+   "Type": "KeyGrant",
+   "Field": "Status",
+   "GoType": "string",
+   "Opaque": false,
+   "Uses": [
+    {
+     "File": "trust.go",
+     "Func": "NewVerifier",
+     "Line": 215
+    }
+   ],
+   "UseFuncs": [
+    "trust.go:NewVerifier"
+   ]
+  },
+  {
+   "Type": "MemberIdentity",
+   "Field": "Slot",
+   "GoType": "string",
+   "Opaque": false,
+   "Uses": [
+    {
+     "File": "current.go",
+     "Func": "(Verifier).currentNativeWitnesses",
+     "Line": 88
+    },
+    {
+     "File": "proofs.go",
+     "Func": "(Verifier).verifyNativeAt",
+     "Line": 266
+    },
+    {
+     "File": "trust.go",
+     "Func": "NewVerifier",
+     "Line": 140
+    },
+    {
+     "File": "trust.go",
+     "Func": "NewVerifier",
+     "Line": 140
+    },
+    {
+     "File": "trust.go",
+     "Func": "(Verifier).member",
+     "Line": 280
+    },
+    {
+     "File": "verify.go",
+     "Func": "(Verifier).checkRegisteredMembers",
+     "Line": 248
+    },
+    {
+     "File": "verify.go",
+     "Func": "(Verifier).VerifyCurrentProjectionSet",
+     "Line": 410
+    }
+   ],
+   "UseFuncs": [
+    "current.go:(Verifier).currentNativeWitnesses",
+    "proofs.go:(Verifier).verifyNativeAt",
+    "trust.go:(Verifier).member",
+    "trust.go:NewVerifier",
+    "verify.go:(Verifier).VerifyCurrentProjectionSet",
+    "verify.go:(Verifier).checkRegisteredMembers"
+   ]
+  },
+  {
+   "Type": "MemberIdentity",
+   "Field": "Scope",
+   "GoType": "any",
+   "Opaque": true,
+   "Uses": [
+    {
+     "File": "current.go",
+     "Func": "(Verifier).leaseScopesMatch",
+     "Line": 15
+    },
+    {
+     "File": "current.go",
+     "Func": "(Verifier).currentNativeWitnesses",
+     "Line": 111
+    },
+    {
+     "File": "current.go",
+     "Func": "(Verifier).currentNativeWitnesses",
+     "Line": 126
+    },
+    {
+     "File": "native.go",
+     "Func": "(Verifier).authenticateNativeOriginal",
+     "Line": 68
+    },
+    {
+     "File": "proofs.go",
+     "Func": "(Verifier).verifyNativeAt",
+     "Line": 265
+    },
+    {
+     "File": "recipes.go",
+     "Func": "(Verifier).recipeSources",
+     "Line": 217
+    },
+    {
+     "File": "recipes.go",
+     "Func": "(Verifier).recipeSources",
+     "Line": 313
+    },
+    {
+     "File": "recipes.go",
+     "Func": "(Verifier).recipeSources",
+     "Line": 343
+    },
+    {
+     "File": "recipes.go",
+     "Func": "(Verifier).proofAuthority",
+     "Line": 383
+    },
+    {
+     "File": "recipes.go",
+     "Func": "(Verifier).proofAuthority",
+     "Line": 384
+    },
+    {
+     "File": "recipes.go",
+     "Func": "(Verifier).proofAuthority",
+     "Line": 397
+    },
+    {
+     "File": "recipes.go",
+     "Func": "(Verifier).proofAuthority",
+     "Line": 409
+    },
+    {
+     "File": "trust.go",
+     "Func": "NewVerifier",
+     "Line": 157
+    },
+    {
+     "File": "trust.go",
+     "Func": "NewVerifier",
+     "Line": 157
+    },
+    {
+     "File": "trust.go",
+     "Func": "NewVerifier",
+     "Line": 161
+    },
+    {
+     "File": "trust.go",
+     "Func": "NewVerifier",
+     "Line": 165
+    },
+    {
+     "File": "trust.go",
+     "Func": "NewVerifier",
+     "Line": 165
+    },
+    {
+     "File": "trust.go",
+     "Func": "(Verifier).cohortAuthority",
+     "Line": 289
+    },
+    {
+     "File": "verify.go",
+     "Func": "(Verifier).checkRegisteredMembers",
+     "Line": 248
+    },
+    {
+     "File": "verify.go",
+     "Func": "(Verifier).outerAuthority",
+     "Line": 263
+    },
+    {
+     "File": "verify.go",
+     "Func": "(Verifier).outerAuthority",
+     "Line": 264
+    },
+    {
+     "File": "verify.go",
+     "Func": "(Verifier).outerAuthority",
+     "Line": 275
+    },
+    {
+     "File": "verify.go",
+     "Func": "(Verifier).VerifyCurrentProjectionSet",
+     "Line": 410
+    },
+    {
+     "File": "verify.go",
+     "Func": "(Verifier).VerifyCurrentProjectionSet",
+     "Line": 418
+    }
+   ],
+   "UseFuncs": [
+    "current.go:(Verifier).currentNativeWitnesses",
+    "current.go:(Verifier).leaseScopesMatch",
+    "native.go:(Verifier).authenticateNativeOriginal",
+    "proofs.go:(Verifier).verifyNativeAt",
+    "recipes.go:(Verifier).proofAuthority",
+    "recipes.go:(Verifier).recipeSources",
+    "trust.go:(Verifier).cohortAuthority",
+    "trust.go:NewVerifier",
+    "verify.go:(Verifier).VerifyCurrentProjectionSet",
+    "verify.go:(Verifier).checkRegisteredMembers",
+    "verify.go:(Verifier).outerAuthority"
+   ]
+  },
+  {
+   "Type": "MemberIdentity",
+   "Field": "CertificateDER",
+   "GoType": "[]byte",
+   "Opaque": false,
+   "Uses": [
+    {
+     "File": "native.go",
+     "Func": "(Verifier).authenticateNativeOriginal",
+     "Line": 72
+    },
+    {
+     "File": "native.go",
+     "Func": "(Verifier).authenticateNativeOriginal",
+     "Line": 75
+    },
+    {
+     "File": "native.go",
+     "Func": "(Verifier).authenticateNativeOriginal",
+     "Line": 83
+    }
+   ],
+   "UseFuncs": [
+    "native.go:(Verifier).authenticateNativeOriginal"
+   ]
+  },
+  {
+   "Type": "MemberIdentity",
+   "Field": "CARootDER",
+   "GoType": "[]byte",
+   "Opaque": false,
+   "Uses": [
+    {
+     "File": "native.go",
+     "Func": "(Verifier).authenticateNativeOriginal",
+     "Line": 72
+    },
+    {
+     "File": "native.go",
+     "Func": "(Verifier).authenticateNativeOriginal",
+     "Line": 79
+    },
+    {
+     "File": "native.go",
+     "Func": "(Verifier).authenticateNativeOriginal",
+     "Line": 83
+    }
+   ],
+   "UseFuncs": [
+    "native.go:(Verifier).authenticateNativeOriginal"
+   ]
+  },
+  {
+   "Type": "TrustedContext",
+   "Field": "Now",
+   "GoType": "time.Time",
+   "Opaque": false,
+   "Uses": [
+    {
+     "File": "current.go",
+     "Func": "(Verifier).currentNativeWitnesses",
+     "Line": 135
+    },
+    {
+     "File": "current.go",
+     "Func": "(Verifier).currentNativeWitnesses",
+     "Line": 158
+    },
+    {
+     "File": "current.go",
+     "Func": "(Verifier).currentReadback",
+     "Line": 172
+    },
+    {
+     "File": "native.go",
+     "Func": "(Verifier).authenticateNativeOriginal",
+     "Line": 97
+    },
+    {
+     "File": "proofs.go",
+     "Func": "(Verifier).freshnessAt",
+     "Line": 219
+    },
+    {
+     "File": "temporal.go",
+     "Func": "(Verifier).recordUse",
+     "Line": 115
+    },
+    {
+     "File": "trust.go",
+     "Func": "NewVerifier",
+     "Line": 143
+    },
+    {
+     "File": "trust.go",
+     "Func": "NewVerifier",
+     "Line": 143
+    },
+    {
+     "File": "trust.go",
+     "Func": "(Verifier).key",
+     "Line": 250
+    },
+    {
+     "File": "verify.go",
+     "Func": "(Verifier).VerifyCurrentProjectionSet",
+     "Line": 359
+    },
+    {
+     "File": "verify.go",
+     "Func": "(Verifier).VerifyCurrentProjectionSet",
+     "Line": 359
+    },
+    {
+     "File": "verify.go",
+     "Func": "(Verifier).VerifyCurrentProjectionSet",
+     "Line": 372
+    },
+    {
+     "File": "verify.go",
+     "Func": "(Verifier).VerifyCurrentProjectionSet",
+     "Line": 377
+    },
+    {
+     "File": "verify.go",
+     "Func": "(Verifier).VerifyCurrentProjectionSet",
+     "Line": 377
+    },
+    {
+     "File": "verify.go",
+     "Func": "(Verifier).VerifyCurrentProjectionSet",
+     "Line": 377
+    }
+   ],
+   "UseFuncs": [
+    "current.go:(Verifier).currentNativeWitnesses",
+    "current.go:(Verifier).currentReadback",
+    "native.go:(Verifier).authenticateNativeOriginal",
+    "proofs.go:(Verifier).freshnessAt",
+    "temporal.go:(Verifier).recordUse",
+    "trust.go:(Verifier).key",
+    "trust.go:NewVerifier",
+    "verify.go:(Verifier).VerifyCurrentProjectionSet"
+   ]
+  },
+  {
+   "Type": "TrustedContext",
+   "Field": "SemanticInputs",
+   "GoType": "any",
+   "Opaque": true,
+   "Uses": [
+    {
+     "File": "current.go",
+     "Func": "(Verifier).currentNativeWitnesses",
+     "Line": 139
+    },
+    {
+     "File": "proofs.go",
+     "Func": "(Verifier).verifyNativeAt",
+     "Line": 290
+    },
+    {
+     "File": "recipes.go",
+     "Func": "(Verifier).recipeSources",
+     "Line": 206
+    },
+    {
+     "File": "recipes.go",
+     "Func": "(Verifier).proofAuthority",
+     "Line": 400
+    },
+    {
+     "File": "trust.go",
+     "Func": "NewVerifier",
+     "Line": 176
+    },
+    {
+     "File": "trust.go",
+     "Func": "NewVerifier",
+     "Line": 176
+    },
+    {
+     "File": "trust.go",
+     "Func": "NewVerifier",
+     "Line": 180
+    },
+    {
+     "File": "verify.go",
+     "Func": "(Verifier).verify",
+     "Line": 227
+    },
+    {
+     "File": "verify.go",
+     "Func": "(Verifier).checkRegisteredMembers",
+     "Line": 252
+    }
+   ],
+   "UseFuncs": [
+    "current.go:(Verifier).currentNativeWitnesses",
+    "proofs.go:(Verifier).verifyNativeAt",
+    "recipes.go:(Verifier).proofAuthority",
+    "recipes.go:(Verifier).recipeSources",
+    "trust.go:NewVerifier",
+    "verify.go:(Verifier).checkRegisteredMembers",
+    "verify.go:(Verifier).verify"
+   ]
+  },
+  {
+   "Type": "TrustedContext",
+   "Field": "Operations",
+   "GoType": "map[string]OperationBinding",
+   "Opaque": false,
+   "Uses": [
+    {
+     "File": "trust.go",
+     "Func": "(Verifier).operation",
+     "Line": 299
+    }
+   ],
+   "UseFuncs": [
+    "trust.go:(Verifier).operation"
+   ]
+  },
+  {
+   "Type": "TrustedContext",
+   "Field": "History",
+   "GoType": "HistoricalContext",
+   "Opaque": false,
+   "Uses": [
+    {
+     "File": "proofs.go",
+     "Func": "(Verifier).verifyNativeAt",
+     "Line": 282
+    },
+    {
+     "File": "trust.go",
+     "Func": "(Verifier).historicalOperation",
+     "Line": 302
+    },
+    {
+     "File": "verify.go",
+     "Func": "(Verifier).verify",
+     "Line": 185
+    }
+   ],
+   "UseFuncs": [
+    "proofs.go:(Verifier).verifyNativeAt",
+    "trust.go:(Verifier).historicalOperation",
+    "verify.go:(Verifier).verify"
+   ]
+  },
+  {
+   "Type": "TrustedContext",
+   "Field": "MigrationOperationID",
+   "GoType": "string",
+   "Opaque": false,
+   "Uses": [
+    {
+     "File": "recipes.go",
+     "Func": "(Verifier).recipeSources",
+     "Line": 225
+    }
+   ],
+   "UseFuncs": [
+    "recipes.go:(Verifier).recipeSources"
+   ]
+  },
+  {
+   "Type": "TrustedContext",
+   "Field": "Challenges",
+   "GoType": "map[string]NativeChallenge",
+   "Opaque": false,
+   "Uses": [
+    {
+     "File": "current.go",
+     "Func": "(Verifier).currentNativeWitnesses",
+     "Line": 130
+    },
+    {
+     "File": "proofs.go",
+     "Func": "(Verifier).verifyNativeAt",
+     "Line": 284
+    }
+   ],
+   "UseFuncs": [
+    "current.go:(Verifier).currentNativeWitnesses",
+    "proofs.go:(Verifier).verifyNativeAt"
+   ]
+  },
+  {
+   "Type": "TrustedContext",
+   "Field": "Publications",
+   "GoType": "map[string]PublicationStatus",
+   "Opaque": false,
+   "Uses": [
+    {
+     "File": "proofs.go",
+     "Func": "(Verifier).freshnessAt",
+     "Line": 237
+    }
+   ],
+   "UseFuncs": [
+    "proofs.go:(Verifier).freshnessAt"
+   ]
+  },
+  {
+   "Type": "TrustedContext",
+   "Field": "Certificates",
+   "GoType": "map[string]CertificateStatus",
+   "Opaque": false,
+   "Uses": [
+    {
+     "File": "native.go",
+     "Func": "(Verifier).authenticateNativeOriginal",
+     "Line": 96
+    }
+   ],
+   "UseFuncs": [
+    "native.go:(Verifier).authenticateNativeOriginal"
+   ]
+  },
+  {
+   "Type": "TrustedContext",
+   "Field": "Current",
+   "GoType": "*CurrentProjectionContext",
+   "Opaque": false,
+   "Uses": [
+    {
+     "File": "trust.go",
+     "Func": "NewVerifier",
+     "Line": 183
+    },
+    {
+     "File": "trust.go",
+     "Func": "NewVerifier",
+     "Line": 184
+    },
+    {
+     "File": "trust.go",
+     "Func": "NewVerifier",
+     "Line": 184
+    },
+    {
+     "File": "verify.go",
+     "Func": "(Verifier).VerifyCurrentProjectionSet",
+     "Line": 315
+    }
+   ],
+   "UseFuncs": [
+    "trust.go:NewVerifier",
+    "verify.go:(Verifier).VerifyCurrentProjectionSet"
+   ]
+  },
+  {
+   "Type": "OperationBinding",
+   "Field": "MigrationID",
+   "GoType": "string",
+   "Opaque": false,
+   "Uses": [
+    {
+     "File": "proofs.go",
+     "Func": "(Verifier).verifyProofAt",
+     "Line": 161
+    },
+    {
+     "File": "proofs.go",
+     "Func": "(Verifier).verifyProofAt",
+     "Line": 167
+    },
+    {
+     "File": "proofs.go",
+     "Func": "(Verifier).freshnessAt",
+     "Line": 232
+    },
+    {
+     "File": "proofs.go",
+     "Func": "(Verifier).verifyNativeAt",
+     "Line": 287
+    },
+    {
+     "File": "proofs.go",
+     "Func": "(Verifier).verifyNativeAt",
+     "Line": 315
+    },
+    {
+     "File": "trust.go",
+     "Func": "checkedOperation",
+     "Line": 306
+    },
+    {
+     "File": "verify.go",
+     "Func": "(Verifier).verify",
+     "Line": 193
+    },
+    {
+     "File": "verify.go",
+     "Func": "(Verifier).VerifyCurrentProjectionSet",
+     "Line": 359
+    }
+   ],
+   "UseFuncs": [
+    "proofs.go:(Verifier).freshnessAt",
+    "proofs.go:(Verifier).verifyNativeAt",
+    "proofs.go:(Verifier).verifyProofAt",
+    "trust.go:checkedOperation",
+    "verify.go:(Verifier).VerifyCurrentProjectionSet",
+    "verify.go:(Verifier).verify"
+   ]
+  },
+  {
+   "Type": "OperationBinding",
+   "Field": "OperationID",
+   "GoType": "string",
+   "Opaque": false,
+   "Uses": [
+    {
+     "File": "current.go",
+     "Func": "(Verifier).currentNativeWitnesses",
+     "Line": 130
+    },
+    {
+     "File": "proofs.go",
+     "Func": "(Verifier).verifyProofAt",
+     "Line": 161
+    },
+    {
+     "File": "proofs.go",
+     "Func": "(Verifier).verifyProofAt",
+     "Line": 167
+    },
+    {
+     "File": "proofs.go",
+     "Func": "(Verifier).verifyNativeAt",
+     "Line": 286
+    },
+    {
+     "File": "proofs.go",
+     "Func": "(Verifier).verifyNativeAt",
+     "Line": 287
+    },
+    {
+     "File": "proofs.go",
+     "Func": "(Verifier).verifyNativeAt",
+     "Line": 315
+    },
+    {
+     "File": "trust.go",
+     "Func": "checkedOperation",
+     "Line": 306
+    },
+    {
+     "File": "verify.go",
+     "Func": "(Verifier).verify",
+     "Line": 193
+    }
+   ],
+   "UseFuncs": [
+    "current.go:(Verifier).currentNativeWitnesses",
+    "proofs.go:(Verifier).verifyNativeAt",
+    "proofs.go:(Verifier).verifyProofAt",
+    "trust.go:checkedOperation",
+    "verify.go:(Verifier).verify"
+   ]
+  },
+  {
+   "Type": "OperationBinding",
+   "Field": "LeaseEnvelopeSHA256",
+   "GoType": "string",
+   "Opaque": false,
+   "Uses": [
+    {
+     "File": "trust.go",
+     "Func": "checkedOperation",
+     "Line": 306
+    },
+    {
+     "File": "verify.go",
+     "Func": "(Verifier).verify",
+     "Line": 188
+    },
+    {
+     "File": "verify.go",
+     "Func": "(Verifier).VerifyCurrentProjectionSet",
+     "Line": 362
+    }
+   ],
+   "UseFuncs": [
+    "trust.go:checkedOperation",
+    "verify.go:(Verifier).VerifyCurrentProjectionSet",
+    "verify.go:(Verifier).verify"
+   ]
+  },
+  {
+   "Type": "OperationBinding",
+   "Field": "FenceEpoch",
+   "GoType": "int64",
+   "Opaque": false,
+   "Uses": [
+    {
+     "File": "proofs.go",
+     "Func": "(Verifier).verifyNativeAt",
+     "Line": 287
+    },
+    {
+     "File": "trust.go",
+     "Func": "checkedOperation",
+     "Line": 306
+    },
+    {
+     "File": "verify.go",
+     "Func": "(Verifier).verify",
+     "Line": 193
+    },
+    {
+     "File": "verify.go",
+     "Func": "(Verifier).VerifyCurrentProjectionSet",
+     "Line": 359
+    }
+   ],
+   "UseFuncs": [
+    "proofs.go:(Verifier).verifyNativeAt",
+    "trust.go:checkedOperation",
+    "verify.go:(Verifier).VerifyCurrentProjectionSet",
+    "verify.go:(Verifier).verify"
+   ]
+  },
+  {
+   "Type": "OperationBinding",
+   "Field": "AcquiredAt",
+   "GoType": "time.Time",
+   "Opaque": false,
+   "Uses": [
+    {
+     "File": "proofs.go",
+     "Func": "(Verifier).freshnessAt",
+     "Line": 229
+    },
+    {
+     "File": "proofs.go",
+     "Func": "(Verifier).freshnessAt",
+     "Line": 229
+    },
+    {
+     "File": "trust.go",
+     "Func": "checkedOperation",
+     "Line": 306
+    },
+    {
+     "File": "trust.go",
+     "Func": "checkedOperation",
+     "Line": 306
+    },
+    {
+     "File": "verify.go",
+     "Func": "(Verifier).verify",
+     "Line": 193
+    },
+    {
+     "File": "verify.go",
+     "Func": "(Verifier).VerifyCurrentProjectionSet",
+     "Line": 359
+    },
+    {
+     "File": "verify.go",
+     "Func": "(Verifier).VerifyCurrentProjectionSet",
+     "Line": 365
+    }
+   ],
+   "UseFuncs": [
+    "proofs.go:(Verifier).freshnessAt",
+    "trust.go:checkedOperation",
+    "verify.go:(Verifier).VerifyCurrentProjectionSet",
+    "verify.go:(Verifier).verify"
+   ]
+  },
+  {
+   "Type": "OperationBinding",
+   "Field": "ExpiresAt",
+   "GoType": "time.Time",
+   "Opaque": false,
+   "Uses": [
+    {
+     "File": "current.go",
+     "Func": "(Verifier).currentNativeWitnesses",
+     "Line": 152
+    },
+    {
+     "File": "proofs.go",
+     "Func": "(Verifier).freshnessAt",
+     "Line": 229
+    },
+    {
+     "File": "proofs.go",
+     "Func": "(Verifier).freshnessAt",
+     "Line": 229
+    },
+    {
+     "File": "proofs.go",
+     "Func": "(Verifier).verifyNativeAt",
+     "Line": 303
+    },
+    {
+     "File": "trust.go",
+     "Func": "checkedOperation",
+     "Line": 306
+    },
+    {
+     "File": "verify.go",
+     "Func": "(Verifier).verify",
+     "Line": 193
+    },
+    {
+     "File": "verify.go",
+     "Func": "(Verifier).VerifyCurrentProjectionSet",
+     "Line": 359
+    },
+    {
+     "File": "verify.go",
+     "Func": "(Verifier).VerifyCurrentProjectionSet",
+     "Line": 365
+    }
+   ],
+   "UseFuncs": [
+    "current.go:(Verifier).currentNativeWitnesses",
+    "proofs.go:(Verifier).freshnessAt",
+    "proofs.go:(Verifier).verifyNativeAt",
+    "trust.go:checkedOperation",
+    "verify.go:(Verifier).VerifyCurrentProjectionSet",
+    "verify.go:(Verifier).verify"
+   ]
+  },
+  {
+   "Type": "HistoricalContext",
+   "Field": "Operations",
+   "GoType": "map[string]OperationBinding",
+   "Opaque": false,
+   "Uses": [
+    {
+     "File": "trust.go",
+     "Func": "(Verifier).historicalOperation",
+     "Line": 302
+    },
+    {
+     "File": "verify.go",
+     "Func": "(Verifier).verify",
+     "Line": 185
+    }
+   ],
+   "UseFuncs": [
+    "trust.go:(Verifier).historicalOperation",
+    "verify.go:(Verifier).verify"
+   ]
+  },
+  {
+   "Type": "HistoricalContext",
+   "Field": "Challenges",
+   "GoType": "map[string]NativeChallenge",
+   "Opaque": false,
+   "Uses": [
+    {
+     "File": "proofs.go",
+     "Func": "(Verifier).verifyNativeAt",
+     "Line": 282
+    }
+   ],
+   "UseFuncs": [
+    "proofs.go:(Verifier).verifyNativeAt"
+   ]
+  },
+  {
+   "Type": "NativeChallenge",
+   "Field": "Nonce",
+   "GoType": "string",
+   "Opaque": false,
+   "Uses": [
+    {
+     "File": "current.go",
+     "Func": "(Verifier).currentNativeWitnesses",
+     "Line": 134
+    },
+    {
+     "File": "proofs.go",
+     "Func": "(Verifier).verifyNativeAt",
+     "Line": 287
+    }
+   ],
+   "UseFuncs": [
+    "current.go:(Verifier).currentNativeWitnesses",
+    "proofs.go:(Verifier).verifyNativeAt"
+   ]
+  },
+  {
+   "Type": "NativeChallenge",
+   "Field": "MigrationID",
+   "GoType": "string",
+   "Opaque": false,
+   "Uses": [
+    {
+     "File": "proofs.go",
+     "Func": "(Verifier).verifyNativeAt",
+     "Line": 287
+    }
+   ],
+   "UseFuncs": [
+    "proofs.go:(Verifier).verifyNativeAt"
+   ]
+  },
+  {
+   "Type": "NativeChallenge",
+   "Field": "OperationID",
+   "GoType": "string",
+   "Opaque": false,
+   "Uses": [
+    {
+     "File": "proofs.go",
+     "Func": "(Verifier).verifyNativeAt",
+     "Line": 287
+    }
+   ],
+   "UseFuncs": [
+    "proofs.go:(Verifier).verifyNativeAt"
+   ]
+  },
+  {
+   "Type": "NativeChallenge",
+   "Field": "ScopeSHA256",
+   "GoType": "string",
+   "Opaque": false,
+   "Uses": [
+    {
+     "File": "proofs.go",
+     "Func": "(Verifier).verifyNativeAt",
+     "Line": 287
+    }
+   ],
+   "UseFuncs": [
+    "proofs.go:(Verifier).verifyNativeAt"
+   ]
+  },
+  {
+   "Type": "NativeChallenge",
+   "Field": "FenceEpoch",
+   "GoType": "int64",
+   "Opaque": false,
+   "Uses": [
+    {
+     "File": "proofs.go",
+     "Func": "(Verifier).verifyNativeAt",
+     "Line": 287
+    }
+   ],
+   "UseFuncs": [
+    "proofs.go:(Verifier).verifyNativeAt"
+   ]
+  },
+  {
+   "Type": "NativeChallenge",
+   "Field": "IssuedAt",
+   "GoType": "time.Time",
+   "Opaque": false,
+   "Uses": [
+    {
+     "File": "proofs.go",
+     "Func": "(Verifier).verifyNativeAt",
+     "Line": 287
+    },
+    {
+     "File": "proofs.go",
+     "Func": "(Verifier).verifyNativeAt",
+     "Line": 287
+    },
+    {
+     "File": "proofs.go",
+     "Func": "(Verifier).verifyNativeAt",
+     "Line": 287
+    }
+   ],
+   "UseFuncs": [
+    "proofs.go:(Verifier).verifyNativeAt"
+   ]
+  },
+  {
+   "Type": "NativeChallenge",
+   "Field": "ExpiresAt",
+   "GoType": "time.Time",
+   "Opaque": false,
+   "Uses": [
+    {
+     "File": "proofs.go",
+     "Func": "(Verifier).verifyNativeAt",
+     "Line": 287
+    },
+    {
+     "File": "proofs.go",
+     "Func": "(Verifier).verifyNativeAt",
+     "Line": 287
+    }
+   ],
+   "UseFuncs": [
+    "proofs.go:(Verifier).verifyNativeAt"
+   ]
+  },
+  {
+   "Type": "PublicationStatus",
+   "Field": "Status",
+   "GoType": "string",
+   "Opaque": false,
+   "Uses": [
+    {
+     "File": "proofs.go",
+     "Func": "(Verifier).freshnessAt",
+     "Line": 238
+    }
+   ],
+   "UseFuncs": [
+    "proofs.go:(Verifier).freshnessAt"
+   ]
+  },
+  {
+   "Type": "PublicationStatus",
+   "Field": "SubjectSHA256",
+   "GoType": "string",
+   "Opaque": false,
+   "Uses": [
+    {
+     "File": "proofs.go",
+     "Func": "(Verifier).freshnessAt",
+     "Line": 238
+    }
+   ],
+   "UseFuncs": [
+    "proofs.go:(Verifier).freshnessAt"
+   ]
+  },
+  {
+   "Type": "PublicationStatus",
+   "Field": "PublishedAt",
+   "GoType": "time.Time",
+   "Opaque": false,
+   "Uses": [
+    {
+     "File": "proofs.go",
+     "Func": "(Verifier).freshnessAt",
+     "Line": 238
+    },
+    {
+     "File": "proofs.go",
+     "Func": "(Verifier).freshnessAt",
+     "Line": 238
+    },
+    {
+     "File": "proofs.go",
+     "Func": "(Verifier).freshnessAt",
+     "Line": 242
+    },
+    {
+     "File": "proofs.go",
+     "Func": "(Verifier).freshnessAt",
+     "Line": 242
+    },
+    {
+     "File": "proofs.go",
+     "Func": "(Verifier).freshnessAt",
+     "Line": 242
+    },
+    {
+     "File": "proofs.go",
+     "Func": "(Verifier).freshnessAt",
+     "Line": 248
+    }
+   ],
+   "UseFuncs": [
+    "proofs.go:(Verifier).freshnessAt"
+   ]
+  },
+  {
+   "Type": "PublicationStatus",
+   "Field": "CheckedAt",
+   "GoType": "time.Time",
+   "Opaque": false,
+   "Uses": [
+    {
+     "File": "proofs.go",
+     "Func": "(Verifier).freshnessAt",
+     "Line": 238
+    },
+    {
+     "File": "proofs.go",
+     "Func": "(Verifier).freshnessAt",
+     "Line": 238
+    }
+   ],
+   "UseFuncs": [
+    "proofs.go:(Verifier).freshnessAt"
+   ]
+  },
+  {
+   "Type": "PublicationStatus",
+   "Field": "ExpiresAt",
+   "GoType": "time.Time",
+   "Opaque": false,
+   "Uses": [
+    {
+     "File": "proofs.go",
+     "Func": "(Verifier).freshnessAt",
+     "Line": 238
+    }
+   ],
+   "UseFuncs": [
+    "proofs.go:(Verifier).freshnessAt"
+   ]
+  },
+  {
+   "Type": "CertificateStatus",
+   "Field": "Status",
+   "GoType": "string",
+   "Opaque": false,
+   "Uses": [
+    {
+     "File": "native.go",
+     "Func": "(Verifier).authenticateNativeOriginal",
+     "Line": 98
+    }
+   ],
+   "UseFuncs": [
+    "native.go:(Verifier).authenticateNativeOriginal"
+   ]
+  },
+  {
+   "Type": "CertificateStatus",
+   "Field": "CheckedAt",
+   "GoType": "time.Time",
+   "Opaque": false,
+   "Uses": [
+    {
+     "File": "native.go",
+     "Func": "(Verifier).authenticateNativeOriginal",
+     "Line": 98
+    },
+    {
+     "File": "native.go",
+     "Func": "(Verifier).authenticateNativeOriginal",
+     "Line": 98
+    }
+   ],
+   "UseFuncs": [
+    "native.go:(Verifier).authenticateNativeOriginal"
+   ]
+  },
+  {
+   "Type": "CertificateStatus",
+   "Field": "ExpiresAt",
+   "GoType": "time.Time",
+   "Opaque": false,
+   "Uses": [
+    {
+     "File": "native.go",
+     "Func": "(Verifier).authenticateNativeOriginal",
+     "Line": 98
+    }
+   ],
+   "UseFuncs": [
+    "native.go:(Verifier).authenticateNativeOriginal"
+   ]
+  },
+  {
+   "Type": "CurrentProjectionContext",
+   "Field": "SetID",
+   "GoType": "string",
+   "Opaque": false,
+   "Uses": [
+    {
+     "File": "verify.go",
+     "Func": "(Verifier).VerifyCurrentProjectionSet",
+     "Line": 316
+    }
+   ],
+   "UseFuncs": [
+    "verify.go:(Verifier).VerifyCurrentProjectionSet"
+   ]
+  },
+  {
+   "Type": "CurrentProjectionContext",
+   "Field": "MigrationID",
+   "GoType": "string",
+   "Opaque": false,
+   "Uses": [
+    {
+     "File": "current.go",
+     "Func": "(Verifier).latestCurrent",
+     "Line": 37
+    },
+    {
+     "File": "current.go",
+     "Func": "(Verifier).currentReadback",
+     "Line": 173
+    },
+    {
+     "File": "verify.go",
+     "Func": "(Verifier).VerifyCurrentProjectionSet",
+     "Line": 323
+    },
+    {
+     "File": "verify.go",
+     "Func": "(Verifier).VerifyCurrentProjectionSet",
+     "Line": 359
+    },
+    {
+     "File": "verify.go",
+     "Func": "(Verifier).VerifyCurrentProjectionSet",
+     "Line": 368
+    },
+    {
+     "File": "verify.go",
+     "Func": "(Verifier).VerifyCurrentProjectionSet",
+     "Line": 377
+    }
+   ],
+   "UseFuncs": [
+    "current.go:(Verifier).currentReadback",
+    "current.go:(Verifier).latestCurrent",
+    "verify.go:(Verifier).VerifyCurrentProjectionSet"
+   ]
+  },
+  {
+   "Type": "CurrentProjectionContext",
+   "Field": "OperationID",
+   "GoType": "string",
+   "Opaque": false,
+   "Uses": [
+    {
+     "File": "current.go",
+     "Func": "(Verifier).latestCurrent",
+     "Line": 48
+    },
+    {
+     "File": "current.go",
+     "Func": "(Verifier).latestCurrent",
+     "Line": 54
+    },
+    {
+     "File": "current.go",
+     "Func": "(Verifier).currentNativeWitnesses",
+     "Line": 74
+    },
+    {
+     "File": "current.go",
+     "Func": "(Verifier).currentReadback",
+     "Line": 173
+    },
+    {
+     "File": "verify.go",
+     "Func": "(Verifier).VerifyCurrentProjectionSet",
+     "Line": 323
+    },
+    {
+     "File": "verify.go",
+     "Func": "(Verifier).VerifyCurrentProjectionSet",
+     "Line": 355
+    },
+    {
+     "File": "verify.go",
+     "Func": "(Verifier).VerifyCurrentProjectionSet",
+     "Line": 368
+    },
+    {
+     "File": "verify.go",
+     "Func": "(Verifier).VerifyCurrentProjectionSet",
+     "Line": 377
+    }
+   ],
+   "UseFuncs": [
+    "current.go:(Verifier).currentNativeWitnesses",
+    "current.go:(Verifier).currentReadback",
+    "current.go:(Verifier).latestCurrent",
+    "verify.go:(Verifier).VerifyCurrentProjectionSet"
+   ]
+  },
+  {
+   "Type": "CurrentProjectionContext",
+   "Field": "PlanEnvelopeSHA256",
+   "GoType": "string",
+   "Opaque": false,
+   "Uses": [
+    {
+     "File": "current.go",
+     "Func": "(Verifier).latestCurrent",
+     "Line": 37
+    },
+    {
+     "File": "verify.go",
+     "Func": "(Verifier).VerifyCurrentProjectionSet",
+     "Line": 323
+    },
+    {
+     "File": "verify.go",
+     "Func": "(Verifier).VerifyCurrentProjectionSet",
+     "Line": 328
+    },
+    {
+     "File": "verify.go",
+     "Func": "(Verifier).VerifyCurrentProjectionSet",
+     "Line": 418
+    }
+   ],
+   "UseFuncs": [
+    "current.go:(Verifier).latestCurrent",
+    "verify.go:(Verifier).VerifyCurrentProjectionSet"
+   ]
+  },
+  {
+   "Type": "CurrentProjectionContext",
+   "Field": "LeaseEnvelopeSHA256",
+   "GoType": "string",
+   "Opaque": false,
+   "Uses": [
+    {
+     "File": "verify.go",
+     "Func": "(Verifier).VerifyCurrentProjectionSet",
+     "Line": 323
+    },
+    {
+     "File": "verify.go",
+     "Func": "(Verifier).VerifyCurrentProjectionSet",
+     "Line": 344
+    },
+    {
+     "File": "verify.go",
+     "Func": "(Verifier).VerifyCurrentProjectionSet",
+     "Line": 362
+    },
+    {
+     "File": "verify.go",
+     "Func": "(Verifier).VerifyCurrentProjectionSet",
+     "Line": 418
+    }
+   ],
+   "UseFuncs": [
+    "verify.go:(Verifier).VerifyCurrentProjectionSet"
+   ]
+  },
+  {
+   "Type": "CurrentProjectionContext",
+   "Field": "FenceEpoch",
+   "GoType": "int64",
+   "Opaque": false,
+   "Uses": [
+    {
+     "File": "current.go",
+     "Func": "(Verifier).latestCurrent",
+     "Line": 48
+    },
+    {
+     "File": "current.go",
+     "Func": "(Verifier).latestCurrent",
+     "Line": 51
+    },
+    {
+     "File": "current.go",
+     "Func": "(Verifier).latestCurrent",
+     "Line": 54
+    },
+    {
+     "File": "verify.go",
+     "Func": "(Verifier).VerifyCurrentProjectionSet",
+     "Line": 323
+    },
+    {
+     "File": "verify.go",
+     "Func": "(Verifier).VerifyCurrentProjectionSet",
+     "Line": 359
+    },
+    {
+     "File": "verify.go",
+     "Func": "(Verifier).VerifyCurrentProjectionSet",
+     "Line": 368
+    }
+   ],
+   "UseFuncs": [
+    "current.go:(Verifier).latestCurrent",
+    "verify.go:(Verifier).VerifyCurrentProjectionSet"
+   ]
+  },
+  {
+   "Type": "CurrentProjectionContext",
+   "Field": "Sequence",
+   "GoType": "int64",
+   "Opaque": false,
+   "Uses": [
+    {
+     "File": "current.go",
+     "Func": "(Verifier).latestCurrent",
+     "Line": 64
+    },
+    {
+     "File": "verify.go",
+     "Func": "(Verifier).VerifyCurrentProjectionSet",
+     "Line": 323
+    }
+   ],
+   "UseFuncs": [
+    "current.go:(Verifier).latestCurrent",
+    "verify.go:(Verifier).VerifyCurrentProjectionSet"
+   ]
+  },
+  {
+   "Type": "CurrentProjectionContext",
+   "Field": "InventoryHead",
+   "GoType": "any",
+   "Opaque": true,
+   "Uses": [
+    {
+     "File": "current.go",
+     "Func": "(Verifier).currentNativeWitnesses",
+     "Line": 79
+    },
+    {
+     "File": "trust.go",
+     "Func": "NewVerifier",
+     "Line": 184
+    },
+    {
+     "File": "trust.go",
+     "Func": "NewVerifier",
+     "Line": 184
+    },
+    {
+     "File": "verify.go",
+     "Func": "(Verifier).VerifyCurrentProjectionSet",
+     "Line": 323
+    },
+    {
+     "File": "verify.go",
+     "Func": "(Verifier).VerifyCurrentProjectionSet",
+     "Line": 379
+    },
+    {
+     "File": "verify.go",
+     "Func": "(Verifier).VerifyCurrentProjectionSet",
+     "Line": 391
+    }
+   ],
+   "UseFuncs": [
+    "current.go:(Verifier).currentNativeWitnesses",
+    "trust.go:NewVerifier",
+    "verify.go:(Verifier).VerifyCurrentProjectionSet"
+   ]
+  },
+  {
+   "Type": "CurrentProjectionContext",
+   "Field": "InventoryReadbackSHA256",
+   "GoType": "string",
+   "Opaque": false,
+   "Uses": [
+    {
+     "File": "current.go",
+     "Func": "(Verifier).currentReadback",
+     "Line": 169
+    },
+    {
+     "File": "verify.go",
+     "Func": "(Verifier).VerifyCurrentProjectionSet",
+     "Line": 323
+    },
+    {
+     "File": "verify.go",
+     "Func": "(Verifier).VerifyCurrentProjectionSet",
+     "Line": 376
+    }
+   ],
+   "UseFuncs": [
+    "current.go:(Verifier).currentReadback",
+    "verify.go:(Verifier).VerifyCurrentProjectionSet"
+   ]
+  },
+  {
+   "Type": "CurrentProjectionContext",
+   "Field": "MemberProjectionSHA256",
+   "GoType": "[]string",
+   "Opaque": false,
+   "Uses": [
+    {
+     "File": "verify.go",
+     "Func": "(Verifier).VerifyCurrentProjectionSet",
+     "Line": 328
+    },
+    {
+     "File": "verify.go",
+     "Func": "(Verifier).VerifyCurrentProjectionSet",
+     "Line": 410
+    },
+    {
+     "File": "verify.go",
+     "Func": "(Verifier).VerifyCurrentProjectionSet",
+     "Line": 413
+    }
+   ],
+   "UseFuncs": [
+    "verify.go:(Verifier).VerifyCurrentProjectionSet"
+   ]
+  },
+  {
+   "Type": "CurrentProjectionContext",
+   "Field": "NativeWitnesses",
+   "GoType": "[]CurrentNativeWitness",
+   "Opaque": false,
+   "Uses": [
+    {
+     "File": "current.go",
+     "Func": "(Verifier).currentNativeWitnesses",
+     "Line": 71
+    },
+    {
+     "File": "current.go",
+     "Func": "(Verifier).currentNativeWitnesses",
+     "Line": 87
+    }
+   ],
+   "UseFuncs": [
+    "current.go:(Verifier).currentNativeWitnesses"
+   ]
+  },
+  {
+   "Type": "CurrentNativeWitness",
+   "Field": "Slot",
+   "GoType": "string",
+   "Opaque": false,
+   "Uses": [
+    {
+     "File": "current.go",
+     "Func": "(Verifier).currentNativeWitnesses",
+     "Line": 88
+    },
+    {
+     "File": "current.go",
+     "Func": "(Verifier).currentNativeWitnesses",
+     "Line": 135
+    }
+   ],
+   "UseFuncs": [
+    "current.go:(Verifier).currentNativeWitnesses"
+   ]
+  },
+  {
+   "Type": "CurrentNativeWitness",
+   "Field": "Raw",
+   "GoType": "[]byte",
+   "Opaque": false,
+   "Uses": [
+    {
+     "File": "current.go",
+     "Func": "(Verifier).currentNativeWitnesses",
+     "Line": 135
+    },
+    {
+     "File": "current.go",
+     "Func": "(Verifier).currentNativeWitnesses",
+     "Line": 158
+    }
+   ],
+   "UseFuncs": [
+    "current.go:(Verifier).currentNativeWitnesses"
+   ]
+  }
+ ],
+ "position": "<scratch-git-archive-eb32>/services/node-agent/migrationverify/trust.go:136:6",
+ "reachableStructTypes": [
+  "InstalledTrust",
+  "VerifierPublication",
+  "ContractPin",
+  "KeyGrant",
+  "MemberIdentity",
+  "TrustedContext",
+  "OperationBinding",
+  "HistoricalContext",
+  "NativeChallenge",
+  "PublicationStatus",
+  "CertificateStatus",
+  "CurrentProjectionContext",
+  "CurrentNativeWitness"
+ ],
+ "typeCount": 13,
+ "typeErrorsFromStubbedThirdParty": [
+  "<scratch-git-archive-eb32>/services/node-agent/migrationverify/contracts.go:27:77: undefined: jsonschema",
+  "<scratch-git-archive-eb32>/services/node-agent/migrationverify/contracts.go:28:77: undefined: jsonschema",
+  "<scratch-git-archive-eb32>/services/node-agent/migrationverify/schemas.go:36:40: undefined: jsonschema",
+  "<scratch-git-archive-eb32>/services/node-agent/migrationverify/schemas.go:154:36: undefined: jsonschema",
+  "<scratch-git-archive-eb32>/services/node-agent/migrationverify/contracts.go:139:15: undefined: jsonschema",
+  "<scratch-git-archive-eb32>/services/node-agent/migrationverify/contracts.go:140:25: undefined: jsonschema",
+  "<scratch-git-archive-eb32>/services/node-agent/migrationverify/schemas.go:56:7: undefined: jsonschema",
+  "<scratch-git-archive-eb32>/services/node-agent/migrationverify/schemas.go:57:17: undefined: jsonschema",
+  "<scratch-git-archive-eb32>/services/node-agent/migrationverify/schemas.go:93:35: undefined: jsonschema"
+ ],
+ "note": "Reviewer go/types census of eb32 migrationverify non-test files; the third-party jsonschema import is stubbed (its 9 type errors are listed) which does not affect selector resolution of package-local fields."
+}
