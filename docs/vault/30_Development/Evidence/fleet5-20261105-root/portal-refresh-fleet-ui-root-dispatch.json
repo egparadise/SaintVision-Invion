@@ -1,5 +1,5 @@
 {
-  "atKST": "2026-11-06T20:52:52+09:00",
+  "atKST": "2026-11-06T21:18:54+09:00",
   "taskId": "task_9d814a8270e1",
   "dispatchId": "ctx_d855f1849f6b",
   "terminal": "term_8b773c12-fcd0-495e-946c-d2a67bd2b029",
@@ -17,24 +17,11 @@
   "fivePCEnrolled": false,
   "ownerReport": "854a8eab0b6e236b62878f49ee941c700e458af0",
   "RootContractReview": "portal-refresh-3a-root-contract-findings.json",
-  "next": "Rootactualverdictthenreviewedartifactdeploymentafterpredeployreport; source3aRootfindingsareearlierhistory",
+  "next": "sameownerR2fixfrom854/freshCI/actualnarrowreview beforedeployment; stage854notdeployable",
   "actualSourceCI": "portal-refresh-854-source-root-verification.json",
-  "queuedActualReview": {
-    "atKST": "2026-11-06T20:52:52+09:00",
-    "source": "2d87d7aa3af1e35e5980ab340d132df56ce52c66",
-    "final": "854a8eab0b6e236b62878f49ee941c700e458af0",
-    "branch": "agent/gemini/portal-refresh-fleet-ui-20261106",
-    "rootVerification": "portal-refresh-854-source-root-verification.json",
-    "artifactStaging": "portal-refresh-854-build-artifact-staging.json",
-    "reviewTask": "task_599e55626b4a",
-    "reviewDispatch": "ctx_15e621fbe050",
-    "reviewTerminal": "term_6c10ee03-939f-4312-9d89-9b9bd2157b64",
-    "receipt": "ready",
-    "scope": "WHOLEbounded8frontendpaths inclauthdisplay/proxy/poll/timeouttest",
-    "ownerQuestionPending": "msg_31779385396e",
-    "actualVerdict": null,
-    "actualReviewSHA": null,
-    "deployment": "NOT_RUN_PENDING_ACTUAL_REVIEW",
-    "independentBrowserOrFleetSSOAccepted": false
-  }
+  "queuedActualReview": null,
+  "actualReview": "ab7f768db22c0b6f2f4ac812f63a1b605cd26d19",
+  "actualReviewDocs": 42215440314,
+  "actualVerdict": "REVISION_REQUIRED Mediumslowpoll+4Low",
+  "currentRootScope": "portal-refresh-polling-r2-root-scope.json"
 }

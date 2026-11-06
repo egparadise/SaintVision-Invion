@@ -1,0 +1,12 @@
+{
+  "atKST": "2026-11-06T21:13:02+09:00",
+  "target": "854a8eab0b6e236b62878f49ee941c700e458af0",
+  "actualReview": "ab7f768db22c0b6f2f4ac812f63a1b605cd26d19",
+  "branch": "agent/claude/portal-refresh-854-review-20261106",
+  "Docs": 42215440314,
+  "job": 127884163105,
+  "correlation": "claude-ui854-review-ab7f768d-1793966930",
+  "rootVerifiedExactHeadRefEventPathAttemptAll19StepsSuccess": true,
+  "remoteExact": true,
+  "uniqueAddedReviewDocs": 7
+}

@@ -1,6 +1,6 @@
 {
   "schema": "fleet5-root-review-resource-sequence:1",
-  "atKST": "2026-11-06T20:52:52+09:00",
+  "atKST": "2026-11-06T21:18:54+09:00",
   "completedB": {
     "task": "task_d4c4c809ed4e",
     "review": "ac9182c3e3d606ec027c0be2e90e049ff50d54f1",
@@ -14,38 +14,24 @@
   },
   "active": {
     "atKST": "2026-11-06T20:52:52+09:00",
-    "source": "2d87d7aa3af1e35e5980ab340d132df56ce52c66",
-    "final": "854a8eab0b6e236b62878f49ee941c700e458af0",
-    "branch": "agent/gemini/portal-refresh-fleet-ui-20261106",
-    "rootVerification": "portal-refresh-854-source-root-verification.json",
-    "artifactStaging": "portal-refresh-854-build-artifact-staging.json",
-    "reviewTask": "task_599e55626b4a",
-    "reviewDispatch": "ctx_15e621fbe050",
-    "reviewTerminal": "term_6c10ee03-939f-4312-9d89-9b9bd2157b64",
-    "receipt": "ready",
-    "scope": "WHOLEbounded8frontendpaths inclauthdisplay/proxy/poll/timeouttest",
-    "ownerQuestionPending": "msg_31779385396e",
+    "source": "3311f4538da4957396fc694d87706e9d5e813ef2",
+    "final": "ea276c97ece2906dc1f29b44b65aa887379ea78f",
+    "branch": "agent/codex/fleet5-k2a-pl-r1d-20261106",
+    "rootVerification": "k2a-pl-r1d-source-root-verification.json",
+    "reviewTask": "task_41987ea5739d",
+    "status": "actualreviewactive",
+    "dependsOn": "task_599e55626b4a",
+    "actualReviewStarted": true,
+    "scope": "VERY_NARROWpointertermconversion TEST_ONLYdelta",
+    "ownerQuestionPending": "msg_4b416731f99d",
     "actualVerdict": null,
-    "actualReviewSHA": null,
-    "deployment": "NOT_RUN_PENDING_ACTUAL_REVIEW",
-    "independentBrowserOrFleetSSOAccepted": false
+    "fullCoreGrantedNow": false,
+    "reviewDispatch": "ctx_fb6fdb3cd301",
+    "reviewTerminal": "term_0d6d21eb-cad9-48d2-b3aa-d58994cf0e92",
+    "workerStartReceipt": "ready",
+    "predecessor": "UI599/ctx15 actualsucceeded/settled/exited/released verifiedbeforestart"
   },
   "pending": [
-    {
-      "atKST": "2026-11-06T20:52:52+09:00",
-      "source": "3311f4538da4957396fc694d87706e9d5e813ef2",
-      "final": "ea276c97ece2906dc1f29b44b65aa887379ea78f",
-      "branch": "agent/codex/fleet5-k2a-pl-r1d-20261106",
-      "rootVerification": "k2a-pl-r1d-source-root-verification.json",
-      "reviewTask": "task_41987ea5739d",
-      "status": "pending",
-      "dependsOn": "task_599e55626b4a",
-      "actualReviewStarted": false,
-      "scope": "VERY_NARROWpointertermconversion TEST_ONLYdelta",
-      "ownerQuestionPending": "msg_4b416731f99d",
-      "actualVerdict": null,
-      "fullCoreGrantedNow": false
-    },
     {
       "atKST": "2026-11-06T20:52:52+09:00",
       "source": "870486f98ba8fdc6d82f24c2610352a426f23a16",
@@ -63,7 +49,7 @@
       "BProductOrPortGrant": false
     }
   ],
-  "authorParallelWork": "All3frozencandidatesawaitactualverdict/Rootprecisecuts; sourceholdersnotselfclosed",
+  "authorParallelWork": "GeminiR2boundedpollingfix; K2awaitsactualPLverdict; BawaitsactualRev9breview",
   "reason": "actuala7e9 and5a3c reviews+CI verified andprecisefixscopesdelivered; do notselfclose source/runtime",
   "genericApprovalMissing": false,
   "completedRL1": {
@@ -71,7 +57,7 @@
     "review": "0e53fc024ca773b7719182e170e5e126aeaf5b95",
     "verdict": "ACCEPT TEST-ONLY; R-L1 CLOSED; no new findings"
   },
-  "nextActualReviewTrigger": "Onactualworker_done startreadyPLthenB ONLYafterfreshpredecessorsucceeded/settled/exited/released",
+  "nextActualReviewTrigger": "PLactualverdict->readyBafterfreshpredecessorexitrelease; newfrozenUIR2candidategetsactualnarrowreviewwhenONEClaudeslotfree",
   "completedIntegration": {
     "task": "task_78064fb4b7ff",
     "dispatch": "ctx_ed7ec73163d6",
@@ -335,37 +321,38 @@
     "rootReply": "msg_a58269f30929"
   },
   "frontendAuthor": {
-    "atKST": "2026-11-06T20:17:42+09:00",
-    "task": "task_9d814a8270e1",
-    "dispatch": "ctx_d855f1849f6b",
-    "ownerQuestion": "msg_1b0e167f43e9",
-    "source": "3a83707688f43570a7eaf9008989794979b3eb9f",
-    "ownerReport": "ebcaf0ba9df15bbd5c5890b0eefab5d263a23a3d",
-    "ownerReportedCI": [
-      42207931409,
-      42207943051,
-      42208412613,
-      42207878338,
-      42208396777
-    ],
-    "CIStatus": "OWNER_REPORTED_SUCCESS_NOT_ROOT_API_VERIFIED; source alreadyrequiresfix",
-    "reviewer": "Codex Root actual source/contract review; independentClaudeNOTRUN",
-    "RootVerdict": "FIX_REQUIRED_BEFORE_ACTUAL_CLAUDE_REVIEW",
-    "findings": {
-      "R-UI-M1": "v1health404/401/HTML200 treatedashealthy instead of canonicalhealthzJSONstatusok+actualproxy; default5/5 remains",
-      "R-UI-M2": "unconditional0nodes empty-successview hides initialpending and previouslyobservedemptyrefreshfailure/staleness"
+    "atKST": "2026-11-06T21:18:54+09:00",
+    "card": "PORTAL-REFRESH-POLLING-R2-20261106",
+    "actualReview": {
+      "atKST": "2026-11-06T21:13:02+09:00",
+      "target": "854a8eab0b6e236b62878f49ee941c700e458af0",
+      "actualReview": "ab7f768db22c0b6f2f4ac812f63a1b605cd26d19",
+      "branch": "agent/claude/portal-refresh-854-review-20261106",
+      "Docs": 42215440314,
+      "job": 127884163105,
+      "correlation": "claude-ui854-review-ab7f768d-1793966930",
+      "rootVerifiedExactHeadRefEventPathAttemptAll19StepsSuccess": true,
+      "remoteExact": true,
+      "uniqueAddedReviewDocs": 7
     },
+    "actualVerdict": "REVISION_REQUIRED",
+    "actualWorkerDone": "msg_1fb21ba424cc",
+    "accepted": "ordinaryemptyflash/canonicalhealthJSON/proxies/unknowncounts/authdisplay/fastfailurestale/scopefences",
+    "remaining": "Mediumslow/hungpollstarvation + LowHTTP/networklabel,Headerorderingtimeout,MouseEventbackgroundarg,missingrealApptests",
+    "ownerQuestionAnswered": "msg_31779385396e",
     "rootReply": {
       "ok": true,
       "result": {
-        "messageId": "msg_53f39f9a6bf2",
+        "messageId": "msg_a98ff72039c6",
         "next": "Finish the rest of your mail."
       }
     },
-    "body": "Root read exact3a83707688f43570a7eaf9008989794979b3eb9f code delta. Your ask msg_1b0e167f43e9 received; source3a/reportebcaf0ba and CI runs are owner-reported at this point, not yet Root API verified. Before ONE actualClaude review, correct these concrete Root contract findings in SAMEtask_9d814a8270e1/currentctx_d855f1849f6b. Preserve initial3a/report/CI history, newcorrectedsource andfreshCIrequired.\n\nR-UI-M1: Header still GET/v1/health (actualproduction404) and accepts ANY2xx/401/404 as online. This does not implement actual requested health observation and accepts SPAHTML200. Consume queuedRoot messages msg_f7e4f80d268c/msg_c82730a0ba86/msg_5405d42122cf/msg_1323916ab85b. Existing canonical services/control-plane/src/inv/app.py347 GET/healthz returns JSONstatusok/version, anon200. Implement canonicalHeaderhealthz, validateJSON+statusok, distinguish unknown/networkerror from reachableHTTPhealthcontracterror/unhealthy. Neither404/401 norHTML200 is healthy. Add corresponding Vite DEV/PREVIEW proxy and exactHTTPSnginx upstreamhealthroute. ExistingHTTP80nginx localplaintexthealthz mustremain forcontainerliveness. Rootownsprivateexistinglivepreviewconfig and willupdatehealthzproxy at actualrevieweddeployment. No newbackend route, no authbypass, no live restart. Headerdefaults5online/5total mustbe truthfulunknown/0 (App passes actual values); no fabricatedRTT.\n\nR-UI-M2: ClusterOverview changed to unconditional nodes.length===0 empty-successcard; when a previously observed0-node query refreshfails, nodesStateerror with lastFetchedAt now renders the same 'normal0nodes' section without explicit stale/error marker (confirm fullview). Lastgoodemptydata mayremain stable duringrefresh/failure but failedrefresh must be visiblyfailed/stale, notpresentedascurrentsuccess. Initialidle/loading/error mustnotbe0registered-success. Test repeatedemptyrefresh, staleempty/error, nonemptyretention/error, recoveries, realprojectswitch/logout scope reset and oldresponseignored. Do not keep authorizedactions enabled fromstalepermissions. No syntheticregistration/resources.\n\nSourceApp request/scope fences must stay, auth/session preferredname changes displayONLY afterverifiedserversession; tenant/subject/permissions authority preserved, no privilegesfromJWTdisplayclaims. Keep sourcebounded within relevantfrontend/healthproxy/tests. Use onlyownedheadless/CI; originalChrome denied andmustnotbeaccessedbyalternateGUI/CDP/profile. No dependencyupgrades, secrets, OS/Node/PKI.\n\nRoot K2actualClaude reviewcfec7b81/Docs42208154603 justfinishedwithONEnewLOWtypeparamconversion; authorgetsboundedfixfirst. ONEClaude reviewerconstraint remains, verifyactualexit/release before your lateractualreview. Do not selfclose task or reportwholeprogram/5PCdone. Correctedimmutablecandidate+normalpush+exactFrontend/Docs+meaningfulcontracttests+ownuniqueHistoryEvidence thenaskRootagain foractualreview. Localruntime/proxyinspection availabledirectly; stopcostlyhistoryscrapes/recurringmanualCIpolls. Officialfreshreadonlysync canonicalstateonly, Root454/2834hash0conflictsislatestverified. No sharedboards orObsidianapply.\n",
-    "actualClaudeverdict": null,
-    "deployment": "NOT_RUN_KNOWN_CONTRACT_FINDINGS",
-    "fivePCEnrolled": false
+    "newBase": "854a8eab0b6e236b62878f49ee941c700e458af0",
+    "newBranch": "agent/gemini/portal-refresh-polling-r2-20261106",
+    "body": "Root actually read ab7f768db22c0b6f2f4ac812f63a1b605cd26d19/review.json all rootFindingClosure/findings/info/accepted/limits/nextAction. RootGit/API verified7uniqueaddedreviewdocs/remote/Docs42215440314/job127884163105/head/ref/workflow_dispatch/docs.yml/attempt1/unique correlationclaude-ui854-review-ab7f768d-1793966930/all19SUCCESS. Actualworker_done msg_1fb21ba424cc. Verdict REVISION_REQUIRED: MediumUI-854-M1 +LowL1L2L3L4; bothRootM1M2PARTIALLY_CLOSED. CanonicalhealthJSON/proxies/unknowncounts/authdisplay/no-fabrication/fastfailurestale/scopefences and ordinary5sflash fix accepted. Slow/hungpolls still claimcurrent0 indefinitely. NO deploy854; its hashedartifact remains archived/STAGED_NOT_ACCEPTED.\n\nCONCRETE ANSWER msg_31779385396e / SAMEtask_9d814a8270e1 ctx_d855f1849f6b: implement bounded UI polling R2 beforedeployment. Card PORTAL-REFRESH-POLLING-R2-20261106, NEW branch agent/gemini/portal-refresh-polling-r2-20261106 FROM immutable854a8eab0b6e236b62878f49ee941c700e458af0; preserveoldbranchremote854. Sameownedworktree/newOrcachildwithoutnewagent ifneeded; nohelpers. Relevant App/Header/ResourceExplorer/realApp+Headertests and minimal optionalAbortSignal frontendtransport plumbing ifneeded, preservewire/API/auth contracts andacceptedproxy/config/displaybytes whereverunchanged. No dependency/lock/globalCI/backend/schema/role/OS/Node/PKI/sourceoriginal changes.\n\nM1: Per-resource in-flight guard for nodes/runs/approvals/workspaces. Do not increment latest-request fence for skipped backgroundticks. Clearonlythecorrespondingrequest in finally so an oldscopecompletion cannotclearnewrequest. One outstanding slow success within a documented finitebound mustapply (reviewerP6 6s response >5sinterval); hanging/504 mustbecomeexpliciterror/stale by a documentedtimeout (e.g. bounded8-10s, chooseanddocument), neverindefinitecurrent0success. Preserveactual Abort/cancellation onscope/logout/unmount wherepossible and request/session/project fences; iftransportadaptersneedoptionalAbortSignal it isinternalfrontendtransportonly, preservemethod/wirecontracts. A timedout/lateoldrequest mustnot overwrite newerdata or releaseanotherrequest'sinflight guard. Staleage policy maycomplementtimeout but mustnotmanufactureobservations. No arbitrarilyrapidretryloop, no oldsuccessful0labelwithoutvisible stale/error beyondbound.\n\nL1: Headerdiscriminatedobservation states: unknown, healthyJSONstatusok withrealRTT, receivedHTTPbuthealth/contracterror (HTML200,JSON404/503,statusdown/malformedJSON), networkfailure/timeout. Distincttruthfullabels, receivedbadhealth isNOThealthy and notthe sameunreachablelabel. No rawuntrustederrortext/tokenprinting.\nL2: Header singleinflight/sequencefence +finite timeout/cleanup. Older slowJSONsuccess cannotoverwrite newererror; no hangingforeverchecking/oldhealthy, no setState afterawaitbodywithoutcurrentrequest/mountguard. Preservecanonicalhealthz/proxyacceptedparts.\nL3: Separate no-arg manualretry callback from internal backgroundflag atallcallers, especiallyResourceExplorer onClick. MouseEventmustnotbeinterpretedasisBackground. Actualmanualretrytestmustclickthe realbutton andreach Appcallback, notpassmanualpropsstandin. Reviewwhethercoalesce orcancelpriorrequest onmanualretry, documentclearboundedbehaviorwithoutlosingscopefences.\nL4: TestsMUSTmountactualApp with fake timers/mock apiClient, notjustClusterOverview handprops or locallydefinedstand-inhandlers. Readimmutable reviewer App P1-P7/probes andHeader H1H2 fixtures first, adapt/executeactualtestsownsource. Addslow6spositive/hung/late504/timeout/recovery, repeatempty/nonemptyretention, realprojectswitch/logout reset +oldresponseignored, actualapprove/reject clicks whenapprovalsStateerror assertnodecisionAPIcall, Headeroverlap/errorclasses and manualResourceExplorerretry. Preserveall previouslypassingcontrols. A codechange removingactual App guardmustkillthemeaningfulprobe, notremain green.\n\nReviewerfullVitest1232/1238 +6noGitexportfailures later44/44 withGIT_DIRpinned854 and firstparallelnodecrash/OOM were actualreviewerfixture/resourceissues, NOTproductfailures or your newpasscounts. Actual281appswebblob/265lockdepsverified. Your own tests/CI mustuseactualcandidatebytes. Don't borrowreviewerexecutionasownerproof. Fixtureproblemcode20stesttimeoutInfoacceptednonweakening; recordactualreason/firstfailureifrecoverable, otherwiseexplicitNOT_RECORDED(noinventedlog), orrevertifunneeded. InfoauthJWKSsignatureoptionalpre-existing/displayonly istracked, don'tredesignauth.\n\nNormal serialrelevanttest/lint/tsc/build/contracts/route/fullfrontendwhereappropriate + ownuniqueHistoryEvidence/normalcommit/push/freshEXACTsourceFrontend2jobs/container-smoke andDocs(finalreportexact). Useunique correlationwhenworkflow supports; preserveactualIDs/head/ref/event/path/attempt/allrequiredsteps. Do notciteoldPortalHarness42207878338 asfreshrealbrowserSSO. TestsUIhappy-dom/mocks are NOTactualbrowser/fleetSSO. No hostChromeGUI/CDP/profilepermissionbypass, TLSbypass, passwordborrowing, or live3100/8080/8443/r5restart. RootdeploysonlyafteractualnarrowClaudeacceptanceandpredeployreport.\n\nFrozennewsource/finalreport+allactualCI thenONEstructuredask for narrowactualR2delta review. No selfclosure/global100%/5PCacceptance. RootstartedreadyPLR1d task41987ea5739d/ctx_fb6fdb3cd301 onlyafteryouractualreviewerexited/released; Btaska67 remainspending. ONEClaudeconstraint, nextreviewwillbesequenced. Coregrant0now. CanonicalRootc93d481f4ec8de72e6247a69d7ff254361122d77/Index456/Codex417/Docs42213674062/sync2847hash0pending0conflicts/cleanGit20:55:36KST. Freshreadonlycanonicalsync --check --state D:/Project/SaintVision-Invion/SaintVisionI-Invion/.git/obsidian-sync-state.json beforeafterhash, noapply/adopt/resolve/statewrite/staleexport. Continueauthorizedsameownerwithoutgenericuserapproval.\n",
+    "limitClarification": "Reviewer firstparallelNodecrash -1073740791 co-observed with ~200MBfreeRAM; exactcause/OOM notproven. SixlaternoGitfixturefailures passed44/44 withGitDIRpinned854. TheseareNOTnewauthorresults.",
+    "deployment854": "PROHIBITED_ACTUAL_MEDIUM_FINDING",
+    "wholeProgramComplete": false
   },
   "completedPLR1c": {
     "task": "task_26dd9ebd51dd",
@@ -378,5 +365,16 @@
     "resource": "actualsucceeded/settled/exited/released",
     "RootConcreteReply": "msg_049b87bd98ba"
   },
-  "priority": "User-visibleUIreview/deployfirst; thennarrowPLreviewenablesONEfuturehostedCorewhileBreviewcancontinue; ONEactualClaude"
+  "priority": "User-visibleUIreview/deployfirst; thennarrowPLreviewenablesONEfuturehostedCorewhileBreviewcancontinue; ONEactualClaude",
+  "completedUI854": {
+    "task": "task_599e55626b4a",
+    "dispatch": "ctx_15e621fbe050",
+    "source": "854a8eab0b6e236b62878f49ee941c700e458af0",
+    "actualReview": "ab7f768db22c0b6f2f4ac812f63a1b605cd26d19",
+    "Docs": 42215440314,
+    "verdict": "REVISION_REQUIRED M1+L1L2L3L4",
+    "actualWorkerDone": "msg_1fb21ba424cc",
+    "resource": "actualsucceeded/settled/exited/released",
+    "RootConcreteReply": "msg_a98ff72039c6"
+  }
 }

@@ -5,11 +5,15 @@
   "branch": "agent/codex/fleet5-k2a-pl-r1d-20261106",
   "rootVerification": "k2a-pl-r1d-source-root-verification.json",
   "reviewTask": "task_41987ea5739d",
-  "status": "pending",
+  "status": "actualreviewactive",
   "dependsOn": "task_599e55626b4a",
-  "actualReviewStarted": false,
+  "actualReviewStarted": true,
   "scope": "VERY_NARROWpointertermconversion TEST_ONLYdelta",
   "ownerQuestionPending": "msg_4b416731f99d",
   "actualVerdict": null,
-  "fullCoreGrantedNow": false
+  "fullCoreGrantedNow": false,
+  "reviewDispatch": "ctx_fb6fdb3cd301",
+  "reviewTerminal": "term_0d6d21eb-cad9-48d2-b3aa-d58994cf0e92",
+  "workerStartReceipt": "ready",
+  "predecessor": "UI599/ctx15 actualsucceeded/settled/exited/released verifiedbeforestart"
 }

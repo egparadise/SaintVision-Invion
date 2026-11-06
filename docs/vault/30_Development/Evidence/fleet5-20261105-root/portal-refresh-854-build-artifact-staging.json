@@ -27,6 +27,10 @@
   "credentialValuesIncluded": false,
   "originalAuthConfigChanged": false,
   "liveServiceChanged": false,
-  "actualClaudeReview": "PENDING ctx_15e621fbe050",
-  "deployment": "NOT_RUN_SOURCE_REVIEW_PENDING"
+  "actualClaudeReview": {
+    "SHA": "ab7f768db22c0b6f2f4ac812f63a1b605cd26d19",
+    "Docs": 42215440314,
+    "verdict": "REVISION_REQUIRED"
+  },
+  "deployment": "NOT_DEPLOYABLE_ACTUAL_REVIEW_REFUSED"
 }

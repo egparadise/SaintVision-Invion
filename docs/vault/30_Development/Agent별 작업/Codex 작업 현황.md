@@ -1,15 +1,19 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.417"
+version: "1.0.418"
 status: "review"
 author: "Codex"
-updated: "2026-11-06T20:52:52+09:00"
+updated: "2026-11-06T21:18:54+09:00"
 source_of_truth: "Git"
 active_card: "FLEET5 continued supervision with PORTAL-REFRESH-FLEET-20261106"
-active_card_status: "UI854source2d87exactFrontend2jobs/Docsverified; actualClaude599active; hashedartifact13filesstagedNOTDEPLOYED; PLR1dea276/B9b870sourceverifiedpending419/a67; physicalPC1SSH-PC5APIremain"
-active_card_next: "RoothandlesactualUIverdictthenqualifiedfrontenddeployment; startreadyPL419thenBa67onlyafteractualpredecessorexitrelease; ONEfreshCoreonlyafteractualPLacceptance/Rootchoice; noNodeorPKIshortcut"
+active_card_status: "ActualUIab7REVISION_REQUIRED M1+L1L4; source854stagedNOTDEPLOYABLE; GeminiR2from854fix; actualPLR1dClaude419ctxfbactive; B9ba67pending; physicalPC1SSH-PC5APIremain"
+active_card_next: "RootactualPLverdictthenpreciseONECorechoice/startreadyBafteractualexitrelease; sameGeminiR2pollingfix/freshCI/actualnarrowreview beforefrontenddeployment; no854deploy/noNodefabrication"
 ---
+
+## 2026-11-06T21:18:54+09:00 실제 화면 검토의 느린 조회 결함과 PL 검토 시작
+
+실제 UI854 검토 ab7/Docs42215440314가 보통 속도의 깜빡임·health JSON·proxy·scope 보강은 수락했지만, 5초보다 느리거나 멈춘 조회가 영구히 버려져 예전0대를 최신 성공처럼 보이는 Medium과4Low를 남겼다. Root는854 배포를 보류하고 같은 Gemini에게 요청 중복·기한·상태 구분·실제 App 시험을 한정 수정하도록 답했다. 이전 검토자의 실제 종료·해제를 확인한 뒤 대기 중인 PL-R1d Claude 검토419를 시작했다. 확인은 실제reviewer코드/유효한counterexample/자체CI/RootGitAPI 증거로 구분했다. 다음 첫 행동/담당은 Gemini의 R2 수정, Claude의 PL 실제 판정, Root의 후속 검토·정확한 CI 선택이다.
 
 ## 2026-11-06T20:52:52+09:00 수정 화면의 실제 검토와 배포 산출물 준비
 

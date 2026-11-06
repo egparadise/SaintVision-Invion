@@ -10,9 +10,13 @@
   "reviewTerminal": "term_6c10ee03-939f-4312-9d89-9b9bd2157b64",
   "receipt": "ready",
   "scope": "WHOLEbounded8frontendpaths inclauthdisplay/proxy/poll/timeouttest",
-  "ownerQuestionPending": "msg_31779385396e",
-  "actualVerdict": null,
-  "actualReviewSHA": null,
-  "deployment": "NOT_RUN_PENDING_ACTUAL_REVIEW",
-  "independentBrowserOrFleetSSOAccepted": false
+  "ownerQuestionPending": null,
+  "actualVerdict": "REVISION_REQUIRED",
+  "actualReviewSHA": "ab7f768db22c0b6f2f4ac812f63a1b605cd26d19",
+  "deployment": "NOT_DEPLOYABLE_ACTUAL_MEDIUM_FINDING",
+  "independentBrowserOrFleetSSOAccepted": false,
+  "actualReviewDocs": 42215440314,
+  "actualWorkerDone": "msg_1fb21ba424cc",
+  "rootReply": "msg_a98ff72039c6",
+  "nextRootScope": "portal-refresh-polling-r2-root-scope.json"
 }

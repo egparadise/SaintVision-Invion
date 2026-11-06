@@ -3,8 +3,8 @@
   "recordedAtKST": "2026-11-06T00:46:51+09:00",
   "rootBase": "2b1753ce59c09037b5e130a7ffe64794d1d45fdf",
   "priorRootCheckpoint": {
-    "SHA": "cd308f44277743322afd90b4c8a98c1704d63f61",
-    "Docs": 42209469408,
+    "SHA": "c93d481f4ec8de72e6247a69d7ff254361122d77",
+    "Docs": 42213674062,
     "exactHeadCorrelationAllJobsSuccess": true,
     "remoteMatches": true,
     "syncExits": [
@@ -12,13 +12,13 @@
       0,
       0
     ],
-    "independentlyMatchedNormalizedDestinationHashes": 2840,
+    "independentlyMatchedNormalizedDestinationHashes": 2847,
     "pending": 0,
     "conflicts": 0,
     "trackedAndUntrackedClean": true,
     "rootDocsOnly": true,
     "wholeProgramComplete": false,
-    "verifiedAtKST": "2026-11-06T20:22:09+09:00"
+    "verifiedAtKST": "2026-11-06T20:55:36+09:00"
   },
   "actualPlanLowReview": {
     "source": "803ad270562b1b75e44d26f9e14b965c714ab519",
@@ -2515,7 +2515,7 @@
     "ownerT1T2T3": "msg_620855c76519",
     "normativeRevisionReply": "msg_0392caf64d5d"
   },
-  "latestRecordAtKST": "2026-11-06T20:52:52+09:00",
+  "latestRecordAtKST": "2026-11-06T21:18:54+09:00",
   "optionalLowTokenTestDelta": {
     "source": "f0af307705b4923ebc3e231db5238af4c70aa389",
     "scope": "two otherwise-valid token payload corrections and JSON validity assertions; runtime unchanged",
@@ -3110,21 +3110,22 @@
   "BRev7RootDecision": "b-rev7-concrete-root-decision.json",
   "activeActualReview": {
     "atKST": "2026-11-06T20:52:52+09:00",
-    "source": "2d87d7aa3af1e35e5980ab340d132df56ce52c66",
-    "final": "854a8eab0b6e236b62878f49ee941c700e458af0",
-    "branch": "agent/gemini/portal-refresh-fleet-ui-20261106",
-    "rootVerification": "portal-refresh-854-source-root-verification.json",
-    "artifactStaging": "portal-refresh-854-build-artifact-staging.json",
-    "reviewTask": "task_599e55626b4a",
-    "reviewDispatch": "ctx_15e621fbe050",
-    "reviewTerminal": "term_6c10ee03-939f-4312-9d89-9b9bd2157b64",
-    "receipt": "ready",
-    "scope": "WHOLEbounded8frontendpaths inclauthdisplay/proxy/poll/timeouttest",
-    "ownerQuestionPending": "msg_31779385396e",
+    "source": "3311f4538da4957396fc694d87706e9d5e813ef2",
+    "final": "ea276c97ece2906dc1f29b44b65aa887379ea78f",
+    "branch": "agent/codex/fleet5-k2a-pl-r1d-20261106",
+    "rootVerification": "k2a-pl-r1d-source-root-verification.json",
+    "reviewTask": "task_41987ea5739d",
+    "status": "actualreviewactive",
+    "dependsOn": "task_599e55626b4a",
+    "actualReviewStarted": true,
+    "scope": "VERY_NARROWpointertermconversion TEST_ONLYdelta",
+    "ownerQuestionPending": "msg_4b416731f99d",
     "actualVerdict": null,
-    "actualReviewSHA": null,
-    "deployment": "NOT_RUN_PENDING_ACTUAL_REVIEW",
-    "independentBrowserOrFleetSSOAccepted": false
+    "fullCoreGrantedNow": false,
+    "reviewDispatch": "ctx_fb6fdb3cd301",
+    "reviewTerminal": "term_0d6d21eb-cad9-48d2-b3aa-d58994cf0e92",
+    "workerStartReceipt": "ready",
+    "predecessor": "UI599/ctx15 actualsucceeded/settled/exited/released verifiedbeforestart"
   },
   "nextReviewRequires": "newimmutableK2Low/Stage2 orB8 pilot/evidence; oneClaudeafteractualrelease",
   "K2LatestImmutableProposalRootObservation": "k2-rev2-root-actual-contract-review-gate.json",
@@ -3178,21 +3179,6 @@
   "queuedActualReview": [
     {
       "atKST": "2026-11-06T20:52:52+09:00",
-      "source": "3311f4538da4957396fc694d87706e9d5e813ef2",
-      "final": "ea276c97ece2906dc1f29b44b65aa887379ea78f",
-      "branch": "agent/codex/fleet5-k2a-pl-r1d-20261106",
-      "rootVerification": "k2a-pl-r1d-source-root-verification.json",
-      "reviewTask": "task_41987ea5739d",
-      "status": "pending",
-      "dependsOn": "task_599e55626b4a",
-      "actualReviewStarted": false,
-      "scope": "VERY_NARROWpointertermconversion TEST_ONLYdelta",
-      "ownerQuestionPending": "msg_4b416731f99d",
-      "actualVerdict": null,
-      "fullCoreGrantedNow": false
-    },
-    {
-      "atKST": "2026-11-06T20:52:52+09:00",
       "source": "870486f98ba8fdc6d82f24c2610352a426f23a16",
       "base": "3daf1a0d24c220586474a4b376609e62960b8ca6",
       "branch": "agent/codex/fleet5-b-rev9b-20261106",
@@ -3241,5 +3227,7 @@
   "UI854Source": "portal-refresh-854-source-root-verification.json",
   "UI854Artifact": "portal-refresh-854-build-artifact-staging.json",
   "PLR1dSource": "k2a-pl-r1d-source-root-verification.json",
-  "B9bSource": "b-rev9b-source-root-verification.json"
+  "B9bSource": "b-rev9b-source-root-verification.json",
+  "UI854ActualReview": "portal-refresh-854-actual-review-root-verification.json",
+  "UIR2Scope": "portal-refresh-polling-r2-root-scope.json"
 }
