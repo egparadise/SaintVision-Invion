@@ -1,0 +1,153 @@
+"""Reviewer (Claude) independent merge/pin/hash verification for K2A combined ac7498.
+Usage: python -I -B rv_merge_pin.py <repo>   (reads git objects only; writes JSON to stdout)."""
+import ast, hashlib, json, subprocess, sys
+
+REPO = sys.argv[1]
+BASE, LEFT, RIGHT, LOWBASE = 'ff3169d360a707415d9b03484cf0cf3031f3912c', '21059451c23cebe8c038f76e437c390120205998', 'cc82fb80e5913a739c9d2ef59bc4df2c503b7d92', 'dba1804b1d180eda2bf0439952e9706782109fd6'
+MERGE, PIN, SRC, FINAL = 'a78bce7dd2ae020f084a6434ef4b77956bbe9e10', '66d4cd5175cbe28c19541cbfcbf3cb20b006370a', '6005ffccb40844bb604c248e304d868bb5783d14', 'ac7498e82a0cf17fc95973fe9187aeb51c99d51e'
+STAGE2 = '01a4bebf55d23f11f85258746662d8b8a5cd0311'
+DE71 = None
+
+def git(*a, raw=False):
+    out = subprocess.run(['git', '-C', REPO, *a], capture_output=True, check=True).stdout
+    return out if raw else out.decode('utf-8', 'surrogateescape')
+
+def tree(c):
+    d = {}
+    for line in git('ls-tree', '-r', '-z', '--full-tree', c).split('\0'):
+        if not line:
+            continue
+        meta, path = line.split('\t', 1)
+        mode, kind, oid = meta.split()
+        d[path] = (mode, kind, oid)
+    return d
+
+def blob(c, p):
+    return git('show', f'{c}:{p}', raw=True)
+
+def sha(b):
+    return hashlib.sha256(b).hexdigest()
+
+r = {}
+tb, tl, tr, tm = tree(BASE), tree(LEFT), tree(RIGHT), tree(MERGE)
+changed_l = {p for p in set(tb) | set(tl) if tb.get(p) != tl.get(p)}
+changed_r = {p for p in set(tb) | set(tr) if tb.get(p) != tr.get(p)}
+r['leftChanged'] = len(changed_l)
+r['rightChanged'] = len(changed_r)
+r['overlap'] = sorted(changed_l & changed_r)
+bad = []
+counts = {'left': 0, 'right': 0, 'unchangedBase': 0}
+allpaths = set(tb) | set(tl) | set(tr) | set(tm)
+for p in sorted(allpaths):
+    if p in changed_l:
+        exp, side = tl.get(p), 'left'
+    elif p in changed_r:
+        exp, side = tr.get(p), 'right'
+    else:
+        exp, side = tb.get(p), 'unchangedBase'
+    if tm.get(p) != exp:
+        bad.append((p, side, exp, tm.get(p)))
+    elif exp is not None:
+        counts[side] += 1
+r['mergeTreeEntries'] = len(tm)
+r['mergeCounts'] = counts
+r['mergeMismatches'] = bad
+# deletions?
+r['deletedInLeft'] = sorted(p for p in changed_l if p not in tl)
+r['deletedInRight'] = sorted(p for p in changed_r if p not in tr)
+# product (non-docs/vault) classification
+def nondocs(s):
+    return sorted(p for p in s if not p.startswith('docs/vault/'))
+r['leftNonDocs'] = nondocs(changed_l)
+r['rightNonDocs'] = nondocs(changed_r)
+# right == dba lineage: right changed vs LOWBASE
+tlow = tree(LOWBASE)
+r['rightVsDbaChanged'] = sorted(p for p in set(tlow) | set(tr) if tlow.get(p) != tr.get(p) and not p.startswith('docs/vault/30_Development/Evidence/'))
+# left product == 01a product
+t01 = tree(STAGE2)
+r['leftVs01aNonDocs'] = sorted(p for p in set(t01) | set(tl) if t01.get(p) != tl.get(p) and not p.startswith('docs/'))
+
+# pin commit
+tp = tree(PIN)
+pd = sorted(p for p in set(tm) | set(tp) if tm.get(p) != tp.get(p))
+r['pinChangedPaths'] = pd
+L = 'deploy/lan/leaf_rotation_standalone_runtime.py'
+a, b = blob(MERGE, L), blob(PIN, L)
+old, new = b'c73c81adaedb2a7b3b8513cd874b093a71f7b5c147e2e08ea86f71a54c8d2fec', b'7665735eb5735be9fcb24f783f83ffe087c0d176e464a97df3022a4bd9f35799'
+r['pinOldCountBefore'] = a.count(old)
+r['pinNewCountBefore'] = a.count(new)
+r['pinRawReplaceExact'] = b == a.replace(old, new, 1)
+r['pinModeSame'] = tm[L][0] == tp[L][0]
+la, lb = a.split(b'\n'), b.split(b'\n')
+r['pinLinesChanged'] = [i + 1 for i, (x, y) in enumerate(zip(la, lb)) if x != y] if len(la) == len(lb) else 'LINECOUNT_DIFF'
+r['launcherSHA256'] = {'merge': sha(a), 'pin': sha(b), 'ff31': sha(blob(BASE, L))}
+# after pin
+tf = tree(FINAL)
+after = sorted(p for p in set(tp) | set(tf) if tp.get(p) != tf.get(p))
+r['afterPinChanged'] = len(after)
+r['afterPinNonDocs'] = [p for p in after if not p.startswith('docs/vault/')]
+r['afterPinNonOwnEvidence'] = [p for p in after if 'fleet5-k2a-stage2-combined-20261106-codex' not in p]
+
+# module map: AST literal
+mod = ast.parse(b.decode('utf-8'))
+consts = {}
+for node in mod.body:
+    if isinstance(node, ast.Assign) and len(node.targets) == 1 and isinstance(node.targets[0], ast.Name):
+        try:
+            consts[node.targets[0].id] = ast.literal_eval(node.value)
+        except Exception:
+            pass
+WM = consts['WORKER_MODULES']
+r['WORKER_MODULES'] = WM
+r['otherConsts'] = {k: v for k, v in consts.items() if isinstance(v, str) and len(v) == 64 or k in ('WORKER_ENTRY', 'BUNDLE_SCHEMA', 'INSTALL_SCHEMA', 'LOCK_FILE')}
+# rehash each worker module from PIN tree
+actual = {}
+for name in WM:
+    p = 'deploy/lan/' + name
+    actual[name] = sha(blob(PIN, p))
+r['actualModuleSHA'] = actual
+r['allModulesMatch'] = all(actual[n] == WM[n] for n in WM)
+for k in ('WORKER_ENTRY',):
+    if k in consts:
+        r['workerEntryActualSHA'] = sha(blob(PIN, 'deploy/lan/' + consts[k]))
+canon = json.dumps(WM, sort_keys=True, separators=(',', ':')).encode() + b'\n'
+r['canonicalWorkerModulesSHA256_compactSorted_nl'] = sha(canon)
+r['canonicalWorkerModulesSHA256_compactSorted'] = sha(json.dumps(WM, sort_keys=True, separators=(',', ':')).encode())
+r['helperSHA'] = {'pin': sha(blob(PIN, 'deploy/lan/worker_peer_floor.py')), '01a': sha(blob(STAGE2, 'deploy/lan/worker_peer_floor.py')), 'ff31': sha(blob(BASE, 'deploy/lan/worker_peer_floor.py'))}
+lockp = 'deploy/lan/leaf-rotation-runtime-lock.json'
+try:
+    r['lockSHA'] = {'pin': sha(blob(PIN, lockp)), 'ff31': sha(blob(BASE, lockp))}
+except subprocess.CalledProcessError:
+    r['lockSHA'] = 'path?'
+# ff31 consts diff
+mod0 = ast.parse(blob(BASE, L).decode('utf-8'))
+c0 = {}
+for node in mod0.body:
+    if isinstance(node, ast.Assign) and len(node.targets) == 1 and isinstance(node.targets[0], ast.Name):
+        try:
+            c0[node.targets[0].id] = ast.literal_eval(node.value)
+        except Exception:
+            pass
+r['constsChangedVsFf31'] = sorted(k for k in set(c0) | set(consts) if c0.get(k) != consts.get(k))
+r['wmChangedKeysVsFf31'] = sorted(k for k in set(c0['WORKER_MODULES']) | set(WM) if c0['WORKER_MODULES'].get(k) != WM.get(k))
+# whole-module AST equality except the one constant
+def strip(m):
+    return ast.dump(m, include_attributes=False)
+m0 = ast.parse(blob(BASE, L).decode()); m1 = ast.parse(b.decode())
+for m in (m0, m1):
+    for node in m.body:
+        if isinstance(node, ast.Assign) and getattr(node.targets[0], 'id', None) == 'WORKER_MODULES':
+            node.value = ast.Constant(None)
+r['launcherASTEqualExceptWorkerModulesVsFf31'] = strip(m0) == strip(m1)
+# K1 and go module files unchanged base..final
+tF = tf
+k1 = sorted(p for p in set(tb) | set(tF) if (p.startswith('services/node-agent/migrationverify/') or p.endswith('go.mod') or p.endswith('go.sum') or p.endswith('go.work') or p.endswith('go.work.sum')) and tb.get(p) != tF.get(p))
+r['k1OrGoModChangedBaseToFinal'] = k1
+r['servicesChangedBaseToFinal'] = sorted(p for p in set(tb) | set(tF) if p.startswith('services/') and tb.get(p) != tF.get(p))
+r['workflowsChangedBaseToFinal'] = sorted(p for p in set(tb) | set(tF) if p.startswith('.github/') and tb.get(p) != tF.get(p))
+wf = '.github/workflows/peer-floor-observation-diagnostic.yml'
+r['diagWorkflow'] = {'final': sha(blob(FINAL, wf)), '2105': sha(blob(LEFT, wf)), '01a': sha(blob(STAGE2, wf)), 'equal': blob(FINAL, wf) == blob(LEFT, wf), 'bytes': len(blob(FINAL, wf))}
+r['nonDocsChangedBaseToFinal'] = sorted(p for p in set(tb) | set(tF) if not p.startswith('docs/') and tb.get(p) != tF.get(p))
+# docs changed outside own evidence/history between base and final
+r['docsNonEvidenceHistoryChangedBaseToFinal'] = sorted(p for p in set(tb) | set(tF) if p.startswith('docs/') and tb.get(p) != tF.get(p) and not (p.startswith('docs/vault/30_Development/Evidence/') or p.startswith('docs/vault/30_Development/History/')))
+print(json.dumps(r, indent=1, ensure_ascii=False))

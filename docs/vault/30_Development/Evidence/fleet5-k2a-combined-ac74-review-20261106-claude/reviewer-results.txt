@@ -1,0 +1,94 @@
+# Reviewer-derived result lines (Claude, ONE reviewer, no helper). Condensed from scratch logs; raw go/pytest logs stay in scratch only (sha256 listed in commands.json).
+# Scratch = detached git worktree at ac7498e82a0cf17fc95973fe9187aeb51c99d51e; env GOTOOLCHAIN=local GOWORK=off GOPROXY=off GOSUMDB=off GOMAXPROCS=1; go1.27.0 windows/amd64 CGO_ENABLED=0; Python 3.14.7.
+
+## 1. Owner combined Go suite reproduced (go test -p 1 -count=1 -v ./internal/migrationcontext), exit 0
+top-level PASS=17 subtest PASS=90 FAIL-lines=0 actual-mutant-build-exit0=18
+ok  	github.com/egparadise/SaintVision-Invion/services/node-agent/internal/migrationcontext	42.986s
+go vet -p 1 ./internal/migrationcontext ./migrationverify exit 0 (empty output)
+
+## 2. OLD dba effect_gate_test.go swapped in (scratch only), owner TestPLR1AActualBuildsThenBoundaryRefuses, exit 1 = expected RED
+--- FAIL: TestPLR1AActualBuildsThenBoundaryRefuses/own-interface-Certificate-Verify
+--- FAIL: TestPLR1AActualBuildsThenBoundaryRefuses/generic-constraint-Certificate-Verify
+--- FAIL: TestPLR1AActualBuildsThenBoundaryRefuses/instantiated-generic-interface
+--- FAIL: TestPLR1AActualBuildsThenBoundaryRefuses/own-interface-Time-Local
+--- FAIL: TestPLR1AActualBuildsThenBoundaryRefuses/pointer-write-foreign-Local
+--- FAIL: TestPLR1AActualBuildsThenBoundaryRefuses/pointer-address-allowed-read-UTC
+--- FAIL: TestPLR1AActualBuildsThenBoundaryRefuses/dot-import-foreign-Local-read
+--- FAIL: TestPLR1AActualBuildsThenBoundaryRefuses/dot-import-UTC-write
+--- PASS: TestPLR1AActualBuildsThenBoundaryRefuses/selector-UTC-write-control
+--- FAIL: TestPLR1AActualBuildsThenBoundaryRefuses/foreign-interface-alias-transitive-embed
+--- PASS: TestPLR1AActualBuildsThenBoundaryRefuses/interface-method-value-control
+--- PASS: TestPLR1AActualBuildsThenBoundaryRefuses/embedded-concrete-promotion-control
+--- PASS: TestPLR1AActualBuildsThenBoundaryRefuses/dot-import-clock-control
+--- PASS: TestPLR1AActualBuildsThenBoundaryRefuses/package-function-value-control
+--- PASS: TestPLR1AActualBuildsThenBoundaryRefuses/defer-clock-control
+--- PASS: TestPLR1AActualBuildsThenBoundaryRefuses/closure-value-control
+--- PASS: TestPLR1AActualBuildsThenBoundaryRefuses/unexported-own-interface-UTC-positive
+--- PASS: TestPLR1AActualBuildsThenBoundaryRefuses/unexported-generic-constraint-positive
+
+## 3. Reviewer TestRVClaudePLR1aCombined (reviewer_plr1a_combined_claude_test.go.txt), 42 cases, each actual go build exit 0 then re-typecheck + CURRENT sourceEffects; exit 1 = 7 recorded GATE_MISMATCH escapes
+RESULT owner/own-interface-Certificate-Verify build=0 refused=true reason=interface/constraint method must be unexported own object: <own>.Probe.Verify
+RESULT owner/generic-constraint-Certificate-Verify build=0 refused=true reason=interface/constraint method must be unexported own object: <own>.Verify
+RESULT owner/instantiated-generic-interface build=0 refused=true reason=interface/constraint method must be unexported own object: <own>.Probe.Verify
+RESULT owner/own-interface-Time-Local build=0 refused=true reason=interface/constraint method must be unexported own object: <own>.Probe.Local
+RESULT owner/pointer-write-foreign-Local build=0 refused=true reason=foreign package variable read forbidden: time.Local
+RESULT owner/pointer-address-allowed-read-UTC build=0 refused=true reason=foreign package variable address forbidden: time.UTC
+RESULT owner/dot-import-foreign-Local-read build=0 refused=true reason=foreign package variable read forbidden: time.Local
+RESULT owner/dot-import-UTC-write build=0 refused=true reason=foreign state write forbidden: time.UTC
+RESULT owner/selector-UTC-write-control build=0 refused=true reason=foreign state write forbidden: time.UTC
+RESULT owner/foreign-interface-alias-transitive-embed build=0 refused=true reason=interface/constraint method must be unexported own object: io.Reader.Read
+RESULT owner/interface-method-value-control build=0 refused=true reason=interface/constraint method must be unexported own object: <own>.Probe.Verify
+RESULT owner/embedded-concrete-promotion-control build=0 refused=true reason=unreviewed function/method object: crypto/x509.Certificate.Verify
+RESULT owner/dot-import-clock-control build=0 refused=true reason=unreviewed function/method object: time.Now
+RESULT owner/package-function-value-control build=0 refused=true reason=unreviewed function/method object: time.Now
+RESULT owner/defer-clock-control build=0 refused=true reason=unreviewed function/method object: time.Since
+RESULT owner/closure-value-control build=0 refused=true reason=unresolved/function-value/callback call forbidden
+RESULT owner/unexported-own-interface-UTC-positive build=0 refused=false reason=<nil>
+RESULT owner/unexported-generic-constraint-positive build=0 refused=false reason=<nil>
+RESULT rv/range-assign-direct-write-time.UTC build=0 refused=false reason=<nil>
+RESULT rv/range-assign-dot-import-write-UTC build=0 refused=false reason=<nil>
+RESULT rv/deref-write-through-allowed-UTC-read build=0 refused=false reason=<nil>
+RESULT rv/deref-write-through-local-copy-of-UTC build=0 refused=false reason=<nil>
+RESULT rv/deref-write-through-allowlisted-Time.Location-no-var-ref build=0 refused=false reason=<nil>
+RESULT rv/deref-write-via-own-helper-param build=0 refused=false reason=<nil>
+RESULT rv/range-assign-deref-write-UTC build=0 refused=false reason=<nil>
+RESULT rv/select-case-assign-UTC-control build=0 refused=true reason=foreign state write forbidden: time.UTC
+RESULT rv/paren-address-Local-control build=0 refused=true reason=foreign package variable read forbidden: time.Local
+RESULT rv/dot-import-address-UTC-control build=0 refused=true reason=foreign package variable address forbidden: time.UTC
+RESULT rv/tuple-assign-UTC-control build=0 refused=true reason=foreign state write forbidden: time.UTC
+RESULT rv/universe-error-embedded-in-own-interface build=0 refused=true reason=interface/constraint method must be unexported own object: .error.Error
+RESULT rv/struct-embedded-universe-error-call build=0 refused=true reason=unreviewed call: .error.Error
+RESULT rv/alias-foreign-interface-as-constraint build=0 refused=true reason=foreign embedded interface forbidden: encoding/json/v2.Marshaler
+RESULT rv/function-local-interface-type build=0 refused=true reason=interface/constraint method must be unexported own object: <own>.I.Verify
+RESULT rv/type-assertion-interface-literal build=0 refused=true reason=interface/constraint method must be unexported own object: <own>.Verify
+RESULT rv/method-expression-own-exported-interface build=0 refused=true reason=interface/constraint method must be unexported own object: <own>.I.Verify
+RESULT rv/struct-embedded-foreign-interface-call build=0 refused=true reason=unreviewed function/method object: encoding/json/v2.Marshaler.MarshalJSON
+RESULT rv/transitive-alias-constraint-chain build=0 refused=true reason=foreign embedded interface forbidden: encoding/json/v2.Marshaler
+RESULT rv/generic-own-interface-exported-method-unused build=0 refused=true reason=interface/constraint method must be unexported own object: <own>.G.M
+RESULT rv/instantiated-own-unexported-generic-interface-positive build=0 refused=false reason=<nil>
+RESULT rv/nested-instantiated-constraint-positive build=0 refused=false reason=<nil>
+RESULT rv/range-assign-own-var-positive build=0 refused=false reason=<nil>
+RESULT rv/UTC-pure-compare-positive build=0 refused=false reason=<nil>
+SUMMARY cases=42 mismatches=7
+builds exit0 in this run: 42
+
+## 4. End-to-end: escape added as a REAL non-test file (git add -N in scratch worktree, removed after), go build -p 1 ./... then FULL owner package suite
+E1-range-write-UTC :: ok   github.com/egparadise/SaintVision-Invion/services/node-agent/internal/migrationcontext 41.856s
+E2-deref-UTC :: ok   github.com/egparadise/SaintVision-Invion/services/node-agent/internal/migrationcontext 42.922s
+E3-deref-Location-method :: ok   github.com/egparadise/SaintVision-Invion/services/node-agent/internal/migrationcontext 41.287s
+E1 body: func rvProbe() { for _, clock.UTC = range []*clock.Location{nil} {} }   build=0 fullpkg_exit=0
+E2 body: func rvProbe() { *clock.UTC = clock.Location{} }                       build=0 fullpkg_exit=0
+E3 body: func rvProbe() { *clock.Time{}.Location() = clock.Location{} }         build=0 fullpkg_exit=0
+(mutant bodies never executed; effect follows from the Go spec: E1 assigns the package var time.UTC, E2/E3 overwrite the process-global utcLoc that time.UTC and Time{}.Location() point to)
+
+## 5. Standalone pin seam, UNEDITED tests/test_lan_leaf_rotation_standalone_runtime.py (blob dad400be90c1071d30a1b7505e26d669db2e031f at ff31/a78b/ac74)
+a78bce7d (merge, helper 7665735e, launcher 76be4088 still pins c73c81ad): exit 1: 13 failed, 24 passed, 6 skipped in 1.89s
+  failed set == the 13 recorded at 01a in 9c37 reviewer-results.txt: SAME_13
+ac7498e8 (after one-line pin, launcher 8a509dc2): exit 0: 37 passed, 6 skipped in 2.53s
+SKIPPED [1] tests\test_lan_leaf_rotation_standalone_runtime.py:647: Windows runner cannot create the reviewed symlinks
+SKIPPED [1] tests\test_lan_leaf_rotation_standalone_runtime.py:661: Windows runner cannot create the reviewed symlinks
+SKIPPED [2] tests\test_lan_leaf_rotation_standalone_runtime.py:674: Windows runner cannot create the reviewed symlinks
+SKIPPED [2] tests\test_lan_leaf_rotation_standalone_runtime.py:690: Windows runner cannot create the reviewed symlinks
+
+## 6. Stage2 controlled (owner 3 files) at ac7498e8: exit 0: 129 passed in 1.40s
+## 7. Helper consumers tests/test_fleet5_plain_reentry.py + tests/test_fleet5_reentry_guard_negatives.py at ac7498e8: exit 0: 32 passed in 8.16s

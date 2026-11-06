@@ -1,0 +1,164 @@
+package migrationcontext
+
+// Reviewer (Claude) scratch-only test for the K2A combined ac7498 PL-R1a delta.
+// Copied into a detached scratch worktree only; never committed as product/test.
+// Every mutant is first compiled with the owner's buildPLMutation (go build exit 0),
+// then re-type-checked from the mutated source and passed to the CURRENT sourceEffects.
+// The mutant body is never executed.
+
+import (
+	"strings"
+	"testing"
+)
+
+func TestRVClaudePLR1aCombined(t *testing.T) {
+	root := repository(t)
+	original := ownProductionSources(t, root)
+	paths := exports(t, root)
+	control, e := checkSourcePackage(ownImport, original, paths, nil)
+	if e != nil {
+		t.Fatal(e)
+	}
+	if e = sourceEffects(original, control); e != nil {
+		t.Fatal("actual production source must pass", e)
+	}
+	type tc struct {
+		name, code string
+		wantRefuse bool
+		wantReason string // substring the refusal must contain (proves the intended rule fired)
+	}
+	cases := []tc{
+		// --- owner's 18 cases re-run with the refusal REASON checked ---
+		{"owner/own-interface-Certificate-Verify", `import "crypto/x509"
+type Probe interface{ Verify(x509.VerifyOptions) ([][]*x509.Certificate,error) }
+func probe(c *x509.Certificate){var v Probe=c;_,_=v.Verify(x509.VerifyOptions{})}`, true, "interface/constraint method must be unexported own object"},
+		{"owner/generic-constraint-Certificate-Verify", `import "crypto/x509"
+func probe[T interface{Verify(x509.VerifyOptions)([][]*x509.Certificate,error)}](c T){_,_=c.Verify(x509.VerifyOptions{})}
+func use(c *x509.Certificate){probe(c)}`, true, "interface/constraint method must be unexported own object"},
+		{"owner/instantiated-generic-interface", `import "crypto/x509"
+type Probe[T any] interface{Verify(T)([][]*x509.Certificate,error)}
+func probe(c *x509.Certificate){var v Probe[x509.VerifyOptions]=c;_,_=v.Verify(x509.VerifyOptions{})}`, true, "interface/constraint method must be unexported own object"},
+		{"owner/own-interface-Time-Local", `import clock "time"
+type Probe interface{Local()clock.Time}
+func probe(){var v Probe=clock.Time{};_=v.Local()}`, true, "interface/constraint method must be unexported own object"},
+		{"owner/pointer-write-foreign-Local", `import clock "time"
+func probe(){p:=&clock.Local;*p=clock.UTC}`, true, "time.Local"},
+		{"owner/pointer-address-allowed-read-UTC", `import clock "time"
+func probe(){p:=&clock.UTC;*p=clock.UTC}`, true, "foreign package variable address forbidden: time.UTC"},
+		{"owner/dot-import-foreign-Local-read", `import . "time"
+func probe(){_=Local}`, true, "foreign package variable read forbidden: time.Local"},
+		{"owner/dot-import-UTC-write", `import . "time"
+func probe(){UTC=nil}`, true, "foreign state write forbidden: time.UTC"},
+		{"owner/selector-UTC-write-control", `import clock "time"
+func probe(){clock.UTC=nil}`, true, "foreign state write forbidden"},
+		{"owner/foreign-interface-alias-transitive-embed", `import "io"
+type Alias=io.Reader
+type Level interface{Alias}
+type Probe interface{Level;read()string}`, true, "io.Reader"},
+		{"owner/interface-method-value-control", `import "crypto/x509"
+type Probe interface{Verify(x509.VerifyOptions)([][]*x509.Certificate,error)}
+func probe(c *x509.Certificate){var v Probe=c;f:=v.Verify;_,_=f(x509.VerifyOptions{})}`, true, ""},
+		{"owner/embedded-concrete-promotion-control", `import "crypto/x509"
+type Probe struct{*x509.Certificate}
+func probe(c *x509.Certificate){_,_=Probe{c}.Verify(x509.VerifyOptions{})}`, true, "crypto/x509.Certificate.Verify"},
+		{"owner/dot-import-clock-control", `import . "time"
+func probe(){_=Now()}`, true, "time.Now"},
+		{"owner/package-function-value-control", `import "time"
+var probe=time.Now`, true, "time.Now"},
+		{"owner/defer-clock-control", `import "time"
+func probe(){defer time.Since(time.Time{})}`, true, "time.Since"},
+		{"owner/closure-value-control", `func probe(){f:=func(){};f()}`, true, "unresolved/function-value/callback call forbidden"},
+		{"owner/unexported-own-interface-UTC-positive", `import clock "time"
+type Probe interface{read()string}
+func probe(p Probe)string{_=clock.UTC;return p.read()}`, false, ""},
+		{"owner/unexported-generic-constraint-positive", `type Probe interface{read()string}
+type Value struct{}
+func(Value)read()string{return "pure"}
+func probe[T Probe](p T)string{return p.read()}
+func use(){_=probe(Value{})}`, false, ""},
+
+		// --- reviewer attacks on the foreign-state-write class (b) ---
+		{"rv/range-assign-direct-write-time.UTC", `import clock "time"
+func probe(){for _, clock.UTC = range []*clock.Location{nil} {}}`, true, "time.UTC"},
+		{"rv/range-assign-dot-import-write-UTC", `import . "time"
+func probe(){for _, UTC = range []*Location{nil} {}}`, true, "time.UTC"},
+		{"rv/deref-write-through-allowed-UTC-read", `import clock "time"
+func probe(){*clock.UTC = clock.Location{}}`, true, "time"},
+		{"rv/deref-write-through-local-copy-of-UTC", `import clock "time"
+func probe(){p := clock.UTC; *p = clock.Location{}}`, true, "time"},
+		{"rv/deref-write-through-allowlisted-Time.Location-no-var-ref", `import clock "time"
+func probe(){*clock.Time{}.Location() = clock.Location{}}`, true, "time"},
+		{"rv/deref-write-via-own-helper-param", `import clock "time"
+func set(l *clock.Location){*l = clock.Location{}}
+func probe(){set(clock.Time{}.Location())}`, true, "time"},
+		{"rv/range-assign-deref-write-UTC", `import clock "time"
+func probe(){for _, *clock.UTC = range []clock.Location{{}} {}}`, true, "time"},
+		{"rv/select-case-assign-UTC-control", `import clock "time"
+func probe(ch chan *clock.Location){select{case clock.UTC = <-ch:}}`, true, "foreign state write forbidden: time.UTC"},
+		{"rv/paren-address-Local-control", `import clock "time"
+func probe(){p:=&(clock.Local);_=p}`, true, "time.Local"},
+		{"rv/dot-import-address-UTC-control", `import . "time"
+func probe(){p:=&UTC;_=p}`, true, "foreign package variable address forbidden: time.UTC"},
+		{"rv/tuple-assign-UTC-control", `import clock "time"
+func probe(){var x int; clock.UTC, x = nil, 1; _ = x}`, true, "foreign state write forbidden: time.UTC"},
+
+		// --- reviewer attacks on the interface/constraint class (a) ---
+		{"rv/universe-error-embedded-in-own-interface", `type Probe interface{ error; read() string }`, true, "Error"},
+		{"rv/struct-embedded-universe-error-call", `type S struct{ error }
+func probe(s S) string { return s.Error() }`, true, "unreviewed call"},
+		{"rv/alias-foreign-interface-as-constraint", `import "encoding/json"
+type A = json.Marshaler
+func probe[T A](t T){_,_ = t.MarshalJSON()}`, true, "foreign embedded interface forbidden: encoding/json/v2.Marshaler"},
+		{"rv/function-local-interface-type", `import "crypto/x509"
+func probe(c *x509.Certificate){type I interface{Verify(x509.VerifyOptions)([][]*x509.Certificate,error)}; var v I = c; _,_ = v.Verify(x509.VerifyOptions{})}`, true, "interface/constraint method must be unexported own object"},
+		{"rv/type-assertion-interface-literal", `import "crypto/x509"
+func probe(x any){ if v, ok := x.(interface{Verify(x509.VerifyOptions)([][]*x509.Certificate,error)}); ok {_,_ = v.Verify(x509.VerifyOptions{})}}`, true, "interface/constraint method must be unexported own object"},
+		{"rv/method-expression-own-exported-interface", `import "crypto/x509"
+type I interface{Verify(x509.VerifyOptions)([][]*x509.Certificate,error)}
+func probe(c *x509.Certificate){_,_ = I.Verify(c, x509.VerifyOptions{})}`, true, "interface/constraint method must be unexported own object"},
+		{"rv/struct-embedded-foreign-interface-call", `import "encoding/json"
+type S struct{ json.Marshaler }
+func probe(s S){_,_ = s.MarshalJSON()}`, true, "encoding/json/v2.Marshaler.MarshalJSON"},
+		{"rv/transitive-alias-constraint-chain", `import "encoding/json"
+type A = json.Marshaler
+type L interface{A}
+func probe[T interface{L; read()}](t T){t.read()}`, true, "foreign embedded interface forbidden: encoding/json/v2.Marshaler"},
+		{"rv/generic-own-interface-exported-method-unused", `type G[T any] interface{ M(T) }`, true, "interface/constraint method must be unexported own object"},
+		{"rv/instantiated-own-unexported-generic-interface-positive", `type G[T any] interface{ read(T) string }
+type V struct{}
+func (V) read(int) string { return "pure" }
+func probe() string { var g G[int] = V{}; return g.read(1) }`, false, ""},
+		{"rv/nested-instantiated-constraint-positive", `type G[T any] interface{ read(T) string }
+type V struct{}
+func (V) read(int) string { return "pure" }
+func inner[T G[int]](t T) string { return t.read(2) }
+func probe() string { return inner(V{}) }`, false, ""},
+		{"rv/range-assign-own-var-positive", `var own int
+func probe(){for _, own = range []int{1} {}}`, false, ""},
+		{"rv/UTC-pure-compare-positive", `import clock "time"
+func probe() bool { return clock.Time{}.Location() == clock.UTC }`, false, ""},
+	}
+	mismatches := 0
+	for _, m := range cases {
+		t.Run(m.name, func(t *testing.T) {
+			src := copyMap(original)
+			src["rv_probe.go"] = []byte("package migrationcontext\n" + m.code)
+			buildPLMutation(t, root, src)
+			checked, e := checkSourcePackage(ownImport, src, paths, nil)
+			if e != nil {
+				t.Fatal("built source must typecheck", e)
+			}
+			e = sourceEffects(src, checked)
+			reason := "<nil>"
+			if e != nil {
+				reason = e.Error()
+			}
+			t.Logf("RESULT %s build=0 refused=%t reason=%s", m.name, e != nil, reason)
+			if (e != nil) != m.wantRefuse || (e != nil && m.wantReason != "" && !strings.Contains(reason, m.wantReason)) {
+				mismatches++
+				t.Errorf("GATE_MISMATCH %s: wantRefuse=%t wantReason=%q got=%s", m.name, m.wantRefuse, m.wantReason, reason)
+			}
+		})
+	}
+	t.Logf("SUMMARY cases=%d mismatches=%d", len(cases), mismatches)
+}

@@ -1,0 +1,44 @@
+Local publication gates, 2026-11-06 KST, Windows, D:/Project/SaintVisionI-Invion/.venv Python 3.14.7, PYTHONUTF8=1, serial; times KST.
+tree = ac7498e82a0cf17fc95973fe9187aeb51c99d51e + this review's own uncommitted History/Evidence only (git status below).
+sync_obsidian ran CHECK only (worktree default state, canonical state, and Canonical Root official check). No apply/adopt/resolve/state write.
+stateBefore 39ba0c012f7ef90d46be042ab06d97c2bc3c6b26db2129b23dd2c38ff99b5b13 436179 mtime=2026-11-06T17:07:34+09:00
+17:24:21..17:24:29 exit=0 logsha=5730b1afd6af3d09ceca9b5fdc7b7bd8a8cde5fdf234e0142b3ae83d0ef85f14 :: [worktree] python -B tools/check_docs.py
+    PASS: 24 original hashes, 1262 versioned documents, wiki links, 48 tasks, 12 outcomes, owner/reviewer/skills, dependency DAG.
+17:24:29..17:24:32 exit=0 logsha=7cdc12bf64f50ba0964625161638a4c639cf22d786a57f04685bed0718e14042 :: [worktree] python -B tools/check_ontology.py
+    PASS: RDF parsing, defined terms, TTL/JSON-LD equivalence, 48 task mappings, positive SHACL, 4 rejected invalid fixtures, 4 competency queries, Obsidian mirrors.
+17:24:32..17:24:43 exit=0 logsha=d502d08497e117d012c305168db80f80df9785e27e95f835adec1b0a32c588e4 :: [worktree] python -B tools/sync_obsidian.py --check
+    CHECK: 3602 managed files, 1150 pending exports, 0 conflicts. No writes.
+17:24:43..17:24:53 exit=0 logsha=d502d08497e117d012c305168db80f80df9785e27e95f835adec1b0a32c588e4 :: [worktree] python -B tools/sync_obsidian.py --check --state D:/Project/SaintVision-Invion/SaintVisionI-Invion/.git/obsidian-sync-state.json
+    CHECK: 3602 managed files, 1150 pending exports, 0 conflicts. No writes.
+  stateAfterWorktreeChecks 39ba0c012f7ef90d46be042ab06d97c2bc3c6b26db2129b23dd2c38ff99b5b13 436179 mtime=2026-11-06T17:07:34+09:00
+17:24:53..17:25:03 exit=0 logsha=363807f265b58fd9798f9d2e3f47d3fc11a7657105a1f37a17046265f059ed52 :: [CanonicalRoot] python -B tools/sync_obsidian.py --check --state D:/Project/SaintVision-Invion/SaintVisionI-Invion/.git/obsidian-sync-state.json
+    CHECK: 2812 managed files, 0 pending exports, 0 conflicts. No writes.
+  stateAfterCanonicalRootCheck 39ba0c012f7ef90d46be042ab06d97c2bc3c6b26db2129b23dd2c38ff99b5b13 436179 mtime=2026-11-06T17:07:34+09:00
+17:25:03..17:25:11 exit=0 logsha=7d3493f361d1c522254d1dbd2e0a74b4dc3c54ef90bd9bfdec3a57666d7798ed :: [worktree] python -B tools/check_contract_bindings.py
+    PASS check_contract_bindings: 57 fixtures each referenced by a test; 21 bound kernel response TYPES each have >=1 serving-anchor test (counted PER TYPE, not per anchor SITE: those types occupy 27 anchor sites; a multi-site type counts covered even if only 
+17:25:11..17:25:12 exit=0 logsha=2a2f0348a4bdc71911a5eac47ef7fd7a1ca4573e71cce914cb6d6dd198392949 :: [worktree] python -B tools/check_frontend_integrity.py
+    PASS Frontend Integrity Check: all 9 integrity rules satisfied (0 violations).
+17:25:13..17:25:14 exit=0 logsha=13b5f5afed05999109839be1baec4ef70ea3c71bcb267353e59eba0f2ae3e448 :: [worktree] python -B tools/check_doc_single_source.py --ratchet
+    PASS check_doc_single_source --ratchet: 16 pairs, all in baseline, none stale.
+17:25:14..17:25:14 exit=0 logsha=ba85e5489b5c960d3fdd09acf663a0c157e70028c6d54044d4820a67c99570fc :: [worktree] python -B tools/check_response_freshness.py
+17:25:15..17:25:19 exit=0 logsha=389921b50662776ed834a285f70fc44ab61f7d5bdb4c5249c0a73c98113980de :: [worktree] python -B tools/check_doc_path_citations.py --ratchet --base-ref ac7498e82a0cf17fc95973fe9187aeb51c99d51e
+    PASS check_doc_path_citations --ratchet: 290 broken citation(s), all in baseline, none stale, floor unchanged.
+stateAfter 39ba0c012f7ef90d46be042ab06d97c2bc3c6b26db2129b23dd2c38ff99b5b13 436179 mtime=2026-11-06T17:07:34+09:00
+git status --short (worktree):
+    ?? docs/vault/30_Development/Evidence/fleet5-k2a-combined-ac74-review-20261106-claude/.gitattributes
+    ?? docs/vault/30_Development/Evidence/fleet5-k2a-combined-ac74-review-20261106-claude/commands.json
+    ?? docs/vault/30_Development/Evidence/fleet5-k2a-combined-ac74-review-20261106-claude/review.json
+    ?? docs/vault/30_Development/Evidence/fleet5-k2a-combined-ac74-review-20261106-claude/reviewer-merge-pin-result.json
+    ?? docs/vault/30_Development/Evidence/fleet5-k2a-combined-ac74-review-20261106-claude/reviewer-results.txt
+    ?? docs/vault/30_Development/Evidence/fleet5-k2a-combined-ac74-review-20261106-claude/reviewer_merge_pin.py.txt
+    ?? docs/vault/30_Development/Evidence/fleet5-k2a-combined-ac74-review-20261106-claude/reviewer_plr1a_combined_claude_test.go.txt
+    ?? docs/vault/30_Development/History/2026-11-06_17-20-00_KST_FLEET5_K2A_결합소스_ac74_독립검토_Claude.md
+evidence hashes (sha256, bytes as committed):
+    003208a5f03533a9942c8f8e910d1f2d4d7e6025b47d20ff14013efbd72ae018 review.json
+    4b651cae79f29558f8b1901d551b7ce11f4495355f44e892a160bba27199951e commands.json
+    879c1e168e9936487b68387944627f53c0bfcc2dcad41e2d24a713cec1798f39 reviewer-results.txt
+    70d6969d6d1ca4f3c8865bd2256953ba51912b22cdc0343d73f409828b4447fb reviewer_plr1a_combined_claude_test.go.txt
+    0b4504df660fd8a318d6ae4f45c69ce65003c2bf3a7174bd0e2e6ba39524c890 reviewer_merge_pin.py.txt
+    5bf8e37f3321babdba0a9466160ff1b2f279c41f1f3231f96c2371a1ca9091fc reviewer-merge-pin-result.json
+    96a83569c84cfe3f57b7efe3dc61c249548d0fca4fed0e538b3587cdc97c95c1 .gitattributes
+overall gate failure flag: 0

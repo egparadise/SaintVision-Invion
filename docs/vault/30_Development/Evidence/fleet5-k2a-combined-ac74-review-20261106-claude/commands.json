@@ -1,0 +1,153 @@
+{
+ "schemaVersion": "fleet5-k2a-combined-review-commands:1",
+ "environment": "Windows 11, Git Bash + PowerShell 5.1; Go go1.27.0 windows/amd64 CGO_ENABLED=0 (not changed); D:/Project/SaintVisionI-Invion/.venv Python 3.14.7; PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1; Go env GOTOOLCHAIN=local GOWORK=off GOPROXY=off GOSUMDB=off GOMAXPROCS=1 (same as owner run_combined.py). All runs serial. Scratch = detached git worktree at ac7498e8 under the session scratchpad, removed at the end; raw logs stay in scratch, only sha256 published here.",
+ "commands": [
+  {
+   "atKST": "2026-11-06T16:56",
+   "argv": "orca orchestration dispatch-show --task task_ac6f831f2c53 --json",
+   "exit": 0,
+   "result": "ctx_a3cf08fa935b status completed, capability_revoked_at 07:50:53Z"
+  },
+  {
+   "atKST": "2026-11-06T16:57",
+   "argv": "git fetch origin agent/codex/fleet5-k2a-stage2-combined-20261106; git ls-remote origin <combined>, <pl-r1a>; git switch -c agent/claude/fleet5-k2a-combined-ac74-review-20261106 ac7498e8",
+   "exit": 0,
+   "result": "remote combined == ac7498e8, remote pl-r1a == cc82fb80"
+  },
+  {
+   "atKST": "2026-11-06T16:58",
+   "argv": "sha256sum D:/Project/SaintVision-Invion/SaintVisionI-Invion/.git/obsidian-sync-state.json; git -C <CanonicalRoot> log -1",
+   "exit": 0,
+   "result": "state 26c355f564b4...abc4 435531 B mtime 16:20:38 (== owner-time); Root head ed2f088f"
+  },
+  {
+   "atKST": "2026-11-06T16:59",
+   "argv": "python -I -B reviewer_merge_pin.py.txt <repo> > reviewer-merge-pin-result.json",
+   "exit": 0,
+   "result": "91/64/0 overlap; 5353 entries 0 mismatches (91+64+5198); pin one path, line 35, raw replace exact; all module hashes match; workerModules 7a2840ba...; K1/go.mod unchanged"
+  },
+  {
+   "atKST": "2026-11-06T17:00",
+   "argv": "python -I -B -c <raw-7 = sha256(_canonical({file: sha256})) over 7 files at 66d4>",
+   "exit": 0,
+   "result": "dfda9b355abc...0baa (== owner); git grep in non-docs: 0 references"
+  },
+  {
+   "atKST": "2026-11-06T17:05:51-17:06:42",
+   "argv": "go test -p 1 -count=1 -v ./internal/migrationcontext (scratch ac74)",
+   "exit": 0,
+   "logSha256": "bd488c6a3b121a94ef3b1f696a9aeff3ab18157c494893ff715b261d8634acad",
+   "result": "17 top / 90 sub PASS; 18 mutant builds exit 0"
+  },
+  {
+   "atKST": "2026-11-06T17:06:42",
+   "argv": "go vet -p 1 ./internal/migrationcontext ./migrationverify",
+   "exit": 0,
+   "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "atKST": "2026-11-06T17:07",
+   "argv": "git show dba1804b:<effect_gate_test.go> > <scratch file>; go test -p 1 -count=1 -v -run TestPLR1AActualBuildsThenBoundaryRefuses; git checkout -- <file>",
+   "exit": 1,
+   "logSha256": "317361c21f74921c79dcb9db613132f3f4ad7f429f865b4c1a7463ca7b1277c2",
+   "result": "expected RED: 9 negatives FAIL (old gate accepts), 7 controls + 2 positives PASS; scratch file restored"
+  },
+  {
+   "atKST": "2026-11-06T17:08",
+   "argv": "reviewer TestRVClaudePLR1aCombined first run",
+   "exit": 1,
+   "result": "11 mismatches: 7 real escapes + 4 reviewer expected-REASON strings that were wrong (go1.27 resolves encoding/json.Marshaler to encoding/json/v2.Marshaler; the alias-embed case refuses on the method rule io.Reader.Read first). Refusals in those 4 were correct; reason strings fixed in the reviewer file only."
+  },
+  {
+   "atKST": "2026-11-06T17:10-17:11",
+   "argv": "go test -p 1 -count=1 -v -run TestRVClaudePLR1aCombined ./internal/migrationcontext (reviewer_plr1a_combined_claude_test.go.txt copied in, removed after)",
+   "exit": 1,
+   "logSha256": "7e97853b3e9bc8ad35c00e08d78406e16054e3e58794a2c845229bd57faabb2b",
+   "result": "42 cases, 42 builds exit 0, 7 GATE_MISMATCH = PL-R1b escapes; all other cases match"
+  },
+  {
+   "atKST": "2026-11-06T17:11-17:14",
+   "argv": "for E1..E3: write non-test rv_e2e_probe.go; git add -N; go build -p 1 ./...; go test -p 1 -count=1 ./internal/migrationcontext; git rm --cached; rm",
+   "exits": {
+    "E1": [
+     0,
+     0
+    ],
+    "E2": [
+     0,
+     0
+    ],
+    "E3": [
+     0,
+     0
+    ]
+   },
+   "logSha256": {
+    "E1": "446fd20e7ddbaa328de5904ffa1f62f3e4629dda0080b833e17b4ea884fa4b2c",
+    "E2": "8ef2afb5ef4365c092b79df701e74d7cfe1a17ce4b3e6211e026f4a039e6ea89",
+    "E3": "21bde692914d4ec47dde9fcb358ebac9dba0d748eb8e11a95a333d13508c5bec"
+   },
+   "result": "full owner package PASSES with each escape present; scratch tree clean after"
+  },
+  {
+   "atKST": "2026-11-06T17:14",
+   "argv": "git checkout --detach a78bce7d; python -B -m pytest -p no:cacheprovider -q -ra tests/test_lan_leaf_rotation_standalone_runtime.py",
+   "exit": 1,
+   "logSha256": "3b9ab0d4901db9a78d76956823c89c1ca8e1946c7fd8795046ea412d408011b3",
+   "result": "13 failed, 24 passed, 6 skipped; failed set == 9c37 01a list"
+  },
+  {
+   "atKST": "2026-11-06T17:14",
+   "argv": "git checkout --detach ac7498e8; same pytest",
+   "exit": 0,
+   "logSha256": "2f3757dfa396ac5b96d1f4d821d9bcd96104265a2a176c5e269361345449fc3a",
+   "result": "37 passed, 6 skipped (Windows symlink)"
+  },
+  {
+   "atKST": "2026-11-06T17:14",
+   "argv": "python -B -m pytest -p no:cacheprovider -q -ra tests/core/test_worker_peer_floor_observation_diagnostics.py tests/core/test_worker_peer_floor_mount_order_stage2.py tests/core/test_lan_workspace_upgrade.py",
+   "exit": 0,
+   "logSha256": "a2f0f2c059a53c572702cba15f78acef03edf840a5b087d9dae54cb59d666fad",
+   "result": "129 passed"
+  },
+  {
+   "atKST": "2026-11-06T17:17",
+   "argv": "python -B -m pytest -p no:cacheprovider -q -ra tests/test_fleet5_plain_reentry.py tests/test_fleet5_reentry_guard_negatives.py",
+   "exit": 0,
+   "logSha256": "c0166cf4b9d396a1e9c860439b24d1487ef98f5fa8e1333e3f69a5388f9e185e",
+   "result": "32 passed"
+  },
+  {
+   "atKST": "2026-11-06T17:15-17:17",
+   "argv": "python -I -B -c <ast top-level compare of worker_peer_floor.py at ff31/0dfd/52f/01a/ac74; observe unwrap check>",
+   "exit": 0,
+   "result": "0dfd==52f; 52f->01a only observe + _ordered_plain_mounts; observe(01a) unwrapped == observe(52f); 01a==final; ff31->0dfd observe equal modulo raise message"
+  },
+  {
+   "atKST": "2026-11-06T17:18",
+   "argv": "gh api repos/egparadise/SaintVision-Invion/actions/runs/{42183063052,42183480798}[/jobs]; gh api .../runs?branch=<combined>; gh repo view --json visibility",
+   "exit": 0,
+   "result": "both: exact head, branch, workflow_dispatch, docs.yml, attempt 1, success, 1 job, 19 steps, 0 non-success; no diagnostic-workflow run on the combined ref; repository PUBLIC"
+  },
+  {
+   "atKST": "2026-11-06T17:22:34-17:23:46",
+   "argv": "bash run_gates.sh (reviewer serial runner): check_docs, check_ontology, sync_obsidian --check (default + canonical --state) in worktree, Canonical Root sync_obsidian --check --state, check_contract_bindings, check_frontend_integrity, check_doc_single_source --ratchet, check_response_freshness, check_doc_path_citations --ratchet --base-ref ac7498e8",
+   "exit": 0,
+   "result": "all 10 exit 0; see local-doc-gates.txt"
+  }
+ ],
+ "reviewerFiles": {
+  "reviewer_plr1a_combined_claude_test.go.txt": "70d6969d6d1ca4f3c8865bd2256953ba51912b22cdc0343d73f409828b4447fb",
+  "reviewer_merge_pin.py.txt": "0b4504df660fd8a318d6ae4f45c69ce65003c2bf3a7174bd0e2e6ba39524c890",
+  "reviewer-merge-pin-result.json": "5bf8e37f3321babdba0a9466160ff1b2f279c41f1f3231f96c2371a1ca9091fc"
+ },
+ "notRun": [
+  "owner run_combined.py / verify_source.py / run_gates.py wrappers (they rewrite owner Evidence)",
+  "go test -race (CGO_ENABLED=0; not changed)",
+  "provisioned LAN installer / Docker / PG / SSH / PKI / private keys / VM / clock / runtime / live installer / bundle publication",
+  "full Core dispatch or owner CI redispatch",
+  "all8/e50 packet ceremony",
+  "Obsidian apply/adopt/resolve/state write"
+ ],
+ "canonicalStateProvenance": "Canonical state read 26c355f564b4...abc4 (mtime 16:20:38) at 16:58 == owner-time. It was 39ba0c012f7e...5b13 (436179 B, mtime 17:07:34) at gate start because Root advanced (Root commits 62f35432 17:03 and 13a4ba7a 17:06 after ed2f088f). The reviewer never wrote it: before/after every reviewer check it is 39ba0c01 (0 change). This is provenance only, not a conflict."
+}
