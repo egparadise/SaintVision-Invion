@@ -1,0 +1,42 @@
+{
+  "atKST": "2026-11-07T08:12:39+09:00",
+  "candidate": "382fe3d86c14283dcb549f935205081db8b4eee4",
+  "base": "1f073c03eb6673ac60806e8fbe008d391bc45864",
+  "branch": "agent/codex/fleet5-k2-h1-h2-authority-design-20261107",
+  "localCleanAndFrozen": true,
+  "onlyOwnAddedDocs": 9,
+  "productDelta": 0,
+  "exactRemoteRef": null,
+  "checks": [
+    {
+      "check": "repository",
+      "exit": 0,
+      "result": {
+        "archived": false,
+        "disabled": false,
+        "APIcredentialReportsPushPermission": true
+      }
+    },
+    {
+      "check": "effectiveBranchRules",
+      "exit": 0,
+      "result": {
+        "count": 0,
+        "rules": []
+      }
+    },
+    {
+      "check": "repositoryRulesets",
+      "exit": 0,
+      "result": {
+        "count": 0,
+        "rulesets": []
+      }
+    }
+  ],
+  "firstObservedFailure": "REMOTE_COMMIT_REFS_RULES_EXIT1",
+  "failureCauseProven": false,
+  "credentialIdentityEquivalenceAssumed": false,
+  "permissionOrRulesetModified": false,
+  "pushOrRetryPerformedByThisCheck": false
+}

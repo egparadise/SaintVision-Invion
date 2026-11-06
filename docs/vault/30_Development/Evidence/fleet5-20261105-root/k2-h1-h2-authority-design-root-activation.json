@@ -9,7 +9,7 @@
   "productBaseline": "f2c1afb78b589b4b2cbcf3dcd4dc4f3c3f3bc856",
   "proposalSHA256": "85d52cb6313bda9b6d97ce6c1cb3d4c3c6bebf8ef487775fb6c8bc7581ec9479",
   "newBranch": "agent/codex/fleet5-k2-h1-h2-authority-design-20261107",
-  "status": "ACTIVATED_FINITE_DESIGN_ONLY_CANDIDATE_PENDING",
+  "status": "LOCAL_CANDIDATE_FIRST_REMOTE_PUSH_FAILED_ONE_NORMAL_RETRY_AUTHORIZED_RESULT_PENDING",
   "scopeFile": "k2-h1-h2-authority-design-root-scope.txt",
   "selectedLogicalPolicies": [
     "independent control-plane/project trust-provisioning boundary, separately authenticated installation/readback",
@@ -31,5 +31,16 @@
   "positiveFactoryOrProductChangeGranted": false,
   "independentContractReview": "PENDING_FROZEN_CANDIDATE_AND_ACTUAL_REVIEWER_RELEASE",
   "actualA7ReviewUnchanged": "ctx_36ec44cc8ca0",
-  "wholeProgramComplete": false
+  "wholeProgramComplete": false,
+  "latestRecordAtKST": "2026-11-07T08:14:42+09:00",
+  "localCandidate": "382fe3d86c14283dcb549f935205081db8b4eee4",
+  "localParent": "1f073c03eb6673ac60806e8fbe008d391bc45864",
+  "localOwnAddedDocs": 9,
+  "firstPush": "EXIT1_REMOTE_COMMIT_REFS_RULES",
+  "firstPushDocs": "NOT_RUN",
+  "rootRecoveryReply": "msg_a48c8c8a2b37",
+  "normalRetryLimit": 1,
+  "normalRetryResult": "PENDING",
+  "actualRemoteRefAtRootCheck": null,
+  "reviewReadiness": false
 }
