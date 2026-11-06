@@ -34,7 +34,7 @@
     "pytestRouteCoverage": "exit 0 (41/41 passed in 1.43s)",
     "checkDocs": "exit 0 (24 original hashes, 1262 versioned documents)",
     "syncObsidianCheck": "exit 0 (python tools/sync_obsidian.py --check --state 'D:/Project/SaintVision-Invion/SaintVisionI-Invion/.git/obsidian-sync-state.json'; 2829 managed files, 0 conflicts; state hash verified identical 6367D282E9029B1BFC531D4145A4FB4890A010481E48EEE0E66ED2B7540FFEDD before and after)",
-    "localLint": "NOT_RUN_ENVIRONMENT_missing_shared_eslint (apps/web/node_modules/eslint/bin/eslint.js absent in junction, exit 1 MODULE_NOT_FOUND recorded honestly; full lint verified in hosted CI)"
+    "localLint": "NOT_RUN_ENVIRONMENT_missing_shared_eslint (local ESLint CLI binary absent in local shared junction, exit 1 MODULE_NOT_FOUND recorded honestly; not a tracked repository path; full lint verified in hosted CI)"
   },
   "guardMutantExecutionProof": {
     "executor": "ROOT OPERATOR (ad-hoc isolated execution on physical PC3; not an enforced host quota or node enrollment/5PC acceptance)",
@@ -67,7 +67,7 @@
       }
     },
     "inputClosure": "281 apps/web + 165 contracts from Git b48; all 446 input hashes verified restored afterward; author real product/index never mutated",
-    "unexecutedDraft": "tools/run_uir3_mutants.py draft remained unexecuted and safely moved to ignored .work/run_uir3_mutants.py.draft"
+    "unexecutedDraft": "retired private draft remained unexecuted under ignored work directory .work/run_uir3_mutants.py.draft; no tracked tools/ path created or executed"
   },
   "initialSourceCI": {
     "sha": "9cd017abf26a145d15a5c1b0d915662c3c71a724",

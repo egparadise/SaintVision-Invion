@@ -82,7 +82,7 @@ source_of_truth: "Git"
      - 실패 시험: **R9** (포그라운드 재시도 시 loading 상태 진입 실패로 단언 실패).
      - 대조군: R8c 정상 클릭 단언은 양호하게 통과하여 인과적 탐지 확인.
 - **입력 폐포 무결성**: 281개 apps/web + 165개 contracts 파일의 복원 후 해시 전수 일치 확인 (저장소 원본 변형 0건).
-- **미실행 초안 보존**: 작성자가 최초 작성한 `tools/run_uir3_mutants.py` 초안은 미실행 상태로 안전하게 `.work/run_uir3_mutants.py.draft`로 격리 보존함.
+- **미실행 초안 보존**: 작성자의 초기 가드 변이 실행기 초안은 저장소 추적 경로가 아닌 무시된 로컬 작업 디렉터리(`.work/run_uir3_mutants.py.draft`)로 격리 보존(미실행)되었으며 저장소 추적 도구 경로를 생성하거나 실행하지 않음.
 
 ---
 
@@ -105,7 +105,7 @@ source_of_truth: "Git"
   - `python tools/check_docs.py`: PASS (24 original hashes, 1262 versioned documents, exit 0)
   - `python tools/sync_obsidian.py --check --state "D:/Project/SaintVision-Invion/SaintVisionI-Invion/.git/obsidian-sync-state.json"`: CHECK (2829 managed files, 0 conflicts, 상태 해시 `6367D282E9029B1BFC531D4145A4FB4890A010481E48EEE0E66ED2B7540FFEDD` 전후 불변 실측, exit 0)
 - **로컬 린트 환경 상태**:
-  - `apps/web/node_modules/eslint/bin/eslint.js`가 공유 정션에 존재하지 않아 로컬 린트는 `NOT_RUN_ENVIRONMENT_missing_shared_eslint`로 기록함 (exit 1, `MODULE_NOT_FOUND`). 정식 린트는 호스팅 CI 환경에서 완벽히 통과함.
+  - 로컬 환경(공유 정션)에 ESLint CLI 바이너리가 부재하여(저장소 추적 경로가 아닌 로컬 환경 부재) 로컬 린트는 `NOT_RUN_ENVIRONMENT_missing_shared_eslint`로 기록함 (exit 1, `MODULE_NOT_FOUND`). 정식 린트는 호스팅 CI 환경에서 완벽히 통과함.
 
 ### 2) 원격 CI 검증 (Root Operator 대행 실행)
 - **1차 소스 `9cd017ab`**:
