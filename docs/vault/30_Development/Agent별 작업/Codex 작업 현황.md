@@ -1,15 +1,19 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.399"
+version: "1.0.400"
 status: "review"
 author: "Codex"
-updated: "2026-11-06T13:08:37+09:00"
+updated: "2026-11-06T13:48:38+09:00"
 source_of_truth: "Git"
 active_card: "FLEET5-20261105 five physical node orchestration"
-active_card_status: "K2A readonlyboundary/refusal slice underRootA; positiveproductionauth/newproofABI notgranted; B targetedrev7; observationMediumOPEN; K1boundedcomplete/wholephysicalincomplete"
-active_card_next: "Codex implementnull/refusal+purelogic/boundary+census/newCoreDocs/actualreview; explicitinternaltestauthbypasslabels; actualproviderpurposeformat remainsfuturedependency; B rev7continues"
+active_card_status: "K2A de71candidate DocsSUCCESS/Corein_progress; localrace CGOdisabledNOTRUN; finiteCIcallbackactive thenactualClaude; B rev7/observationMediumOPEN/wholephysicalincomplete"
+active_card_next: "FixedCIterminal callback existingownerquestion thenRoot ONEactualimmutablede71codereview; failurepreserve/fixno blindrerun; no borrowedCI/productionauth; B rev7continues"
 ---
+
+## 2026-11-06T13:48:38+09:00 K2A 실제 후보와 새 CI 종료 감시
+
+작업한 것과 확인: K2A 구현 후보 de71c07c는4ce parent·허용된 신규 package/시험/문서 추가만임을 Root가 확인했다. 새 Docs42164075078와 S01 job은 성공했고 Core42164071724는 아직 진행 중이다. 고정된 두 CI의 종료를90분 제한의 단발 감시로 연결했으며 실제 성공 뒤 단일 Claude 코드·권한 경계·Go census 검토를 배정한다. 코드 수락과 운영 인증은 아직 아니다. 원질문 msg_4ee970a431ec는 고정 CI 종료 callback의 대상이다. 실제 검토는 아직 시작하지 않았으며 local race는 CGO disabled로 실행 전 거부된 NOTRUN이다. 다음 첫 행동/담당은 CI 종료 결과에 따른 Root/동일 Codex의 실제 검토 또는 원인 수정이다.
 
 ## 2026-11-06T13:08:37+09:00 K2A 인증 형식 공백의 A 선택
 

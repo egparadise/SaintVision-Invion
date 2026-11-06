@@ -1,0 +1,529 @@
+{
+  "schemaVersion": "fleet5-k2a-de71-root-source-ci-review-gate:1",
+  "atKST": "2026-11-06T13:48:38+09:00",
+  "source": "de71c07c2b827eea50e2ca660f80d042334472c7",
+  "branch": "agent/codex/fleet5-k2a-trust-history-20261106",
+  "parent": "4ce63e8ee78d957aa91e813f6ee226cc21abb52a",
+  "rootVerifiedExactRemoteAndAllowedAddedOnlyScope": true,
+  "totalAddedPaths": 42,
+  "newPackagePaths": [
+    "services/node-agent/internal/migrationcontext/README.md",
+    "services/node-agent/internal/migrationcontext/boundary_test.go",
+    "services/node-agent/internal/migrationcontext/clock.go",
+    "services/node-agent/internal/migrationcontext/crypto_history_test.go",
+    "services/node-agent/internal/migrationcontext/doc.go",
+    "services/node-agent/internal/migrationcontext/errors.go",
+    "services/node-agent/internal/migrationcontext/history.go",
+    "services/node-agent/internal/migrationcontext/k1_bridge.go",
+    "services/node-agent/internal/migrationcontext/policy.go",
+    "services/node-agent/internal/migrationcontext/ports.go",
+    "services/node-agent/internal/migrationcontext/source_gate_test.go",
+    "services/node-agent/internal/migrationcontext/testdata/synthetic-public-history.json"
+  ],
+  "oldK1WorkflowSchemaDependencySharedBoardsUntouched": true,
+  "RootReadHandoffAndPackageREADME": true,
+  "actualCISnapshot": {
+    "Core": {
+      "run": 42164071724,
+      "head": "de71c07c2b827eea50e2ca660f80d042334472c7",
+      "ref": "agent/codex/fleet5-k2a-trust-history-20261106",
+      "event": "workflow_dispatch",
+      "correlation": "FLEET5-K2A-Core-de71c07c2b82-20261106T1342KST",
+      "attempt": 1,
+      "path": ".github/workflows/core.yml",
+      "status": "in_progress",
+      "conclusion": null,
+      "jobs": [
+        {
+          "id": 127716312164,
+          "name": "s01-storage-roundtrip",
+          "head": "de71c07c2b827eea50e2ca660f80d042334472c7",
+          "status": "completed",
+          "conclusion": "success",
+          "steps": [
+            {
+              "name": "Set up job",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "name": "Initialize containers",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "name": "Run actions/checkout@v4",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "name": "Run actions/setup-python@v5",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "name": "Install pinned product-conformance test dependencies",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "name": "Start disposable MinIO candidate",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "name": "Create disposable S01 Storage test bucket",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "name": "Verify product ObjectStore adapter conformance",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "name": "Verify product S3 persistence and PostgreSQL tenant boundary",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "name": "Verify S01 Storage candidate SHA-256 roundtrip and cleanup",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "name": "Stop disposable S01 Storage service",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "name": "Run actions/upload-artifact@v4",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "name": "Post Run actions/setup-python@v5",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "name": "Post Run actions/checkout@v4",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "name": "Stop containers",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "name": "Complete job",
+              "status": "completed",
+              "conclusion": "success"
+            }
+          ]
+        },
+        {
+          "id": 127716312318,
+          "name": "core",
+          "head": "de71c07c2b827eea50e2ca660f80d042334472c7",
+          "status": "in_progress",
+          "conclusion": null,
+          "steps": [
+            {
+              "name": "Set up job",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "name": "Run actions/checkout@v4",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "name": "Run actions/setup-python@v5",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "name": "Run actions/setup-go@v5",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "name": "Run actions/setup-node@v4",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "name": "Run python -m pip install -r requirements-test.txt -r requirements-docs.txt",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "name": "FLEET5 early native Go peer-policy lifecycle proof",
+              "status": "completed",
+              "conclusion": "skipped"
+            },
+            {
+              "name": "Publish FLEET5 native peer-phase proof (including expected baseline failure)",
+              "status": "completed",
+              "conclusion": "skipped"
+            },
+            {
+              "name": "FLEET5 fixed native Go two-cycle proof",
+              "status": "completed",
+              "conclusion": "skipped"
+            },
+            {
+              "name": "Publish FLEET5 fixed native proof",
+              "status": "completed",
+              "conclusion": "skipped"
+            },
+            {
+              "name": "Start digest-pinned product ObjectStore service",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "name": "Create disposable CX01 PostgreSQL",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "name": "Regenerate contracts and detect drift",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "name": "Upgrade each published migration head",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "name": "Test Linux Node concurrency and crash boundaries",
+              "status": "in_progress",
+              "conclusion": null
+            },
+            {
+              "name": "Build Node and isolated synthetic workload image",
+              "status": "pending",
+              "conclusion": null
+            },
+            {
+              "name": "Verify Docker API negotiation and actual bounded execution",
+              "status": "pending",
+              "conclusion": null
+            },
+            {
+              "name": "Build pinned Python workload image for kernel integration",
+              "status": "pending",
+              "conclusion": null
+            },
+            {
+              "name": "Build owned LAN installer image and provide storage source root",
+              "status": "pending",
+              "conclusion": null
+            },
+            {
+              "name": "Build production API image and require explicit configuration",
+              "status": "pending",
+              "conclusion": null
+            },
+            {
+              "name": "Verify Workspace recovery boundary first",
+              "status": "pending",
+              "conclusion": null
+            },
+            {
+              "name": "Verify containment controls and physical cleanup",
+              "status": "pending",
+              "conclusion": null
+            },
+            {
+              "name": "Verify business handoff against the execution kernel",
+              "status": "pending",
+              "conclusion": null
+            },
+            {
+              "name": "Verify bounded shard replacement on two real Nodes",
+              "status": "pending",
+              "conclusion": null
+            },
+            {
+              "name": "Run provisioned LAN installer acceptance",
+              "status": "pending",
+              "conclusion": null
+            },
+            {
+              "name": "Require executed LAN installer evidence",
+              "status": "pending",
+              "conclusion": null
+            },
+            {
+              "name": "Run owned CX01 recovery drill evidence",
+              "status": "pending",
+              "conclusion": null
+            },
+            {
+              "name": "Require executed CX01 recovery evidence",
+              "status": "pending",
+              "conclusion": null
+            },
+            {
+              "name": "Verify build admission queue fairness on PostgreSQL",
+              "status": "pending",
+              "conclusion": null
+            },
+            {
+              "name": "Require executed build admission queue evidence",
+              "status": "pending",
+              "conclusion": null
+            },
+            {
+              "name": "Verify LAN pilot database scripts with real PostgreSQL",
+              "status": "pending",
+              "conclusion": null
+            },
+            {
+              "name": "Require executed LAN pilot database evidence",
+              "status": "pending",
+              "conclusion": null
+            },
+            {
+              "name": "Run python -m pytest --junitxml=dist/core-tests.xml -o faulthandler_timeout=45 --ignore=tests/integration/test_build_product_runtime_real_pg.py --ignore=tests/integration/test_lan_pilot_database_real_pg.py --ignore=tests/integration/test_desktop_browser.py --ignore=tests/integration/test_approval_browser.py --ignore=tests/integration/test_studio_browser.py --ignore=tests/integration/test_web_container.py --ignore=tests/integration/test_workspace_upgrade.py --ignore=tests/integration/test_lan_storage_install.py --ignore=tests/integration/test_s3_object_store_postgres.py --ignore=tests/integration/test_recovery_drill.py",
+              "status": "pending",
+              "conclusion": null
+            },
+            {
+              "name": "Stop disposable product ObjectStore service",
+              "status": "pending",
+              "conclusion": null
+            },
+            {
+              "name": "Docker host hygiene (explicit lane)",
+              "status": "pending",
+              "conclusion": null
+            },
+            {
+              "name": "Require executed evidence and declared platform skips",
+              "status": "pending",
+              "conclusion": null
+            },
+            {
+              "name": "Collect fixed-SHA S08 build acceptance observations",
+              "status": "pending",
+              "conclusion": null
+            },
+            {
+              "name": "Recompute S08 build acceptance verdict from raw artifacts",
+              "status": "pending",
+              "conclusion": null
+            },
+            {
+              "name": "Run python -m build services/control-plane --outdir dist",
+              "status": "pending",
+              "conclusion": null
+            },
+            {
+              "name": "Run go test ./...",
+              "status": "pending",
+              "conclusion": null
+            },
+            {
+              "name": "Run npx --yes --package typescript@5.9.3 tsc --noEmit --strict packages/contracts-ts/src/index.ts",
+              "status": "pending",
+              "conclusion": null
+            },
+            {
+              "name": "Cleanup disposable CX01 PostgreSQL",
+              "status": "pending",
+              "conclusion": null
+            },
+            {
+              "name": "Run actions/upload-artifact@v4",
+              "status": "pending",
+              "conclusion": null
+            },
+            {
+              "name": "Post Run actions/setup-node@v4",
+              "status": "pending",
+              "conclusion": null
+            },
+            {
+              "name": "Post Run actions/setup-go@v5",
+              "status": "pending",
+              "conclusion": null
+            },
+            {
+              "name": "Post Run actions/setup-python@v5",
+              "status": "pending",
+              "conclusion": null
+            },
+            {
+              "name": "Post Run actions/checkout@v4",
+              "status": "pending",
+              "conclusion": null
+            }
+          ]
+        }
+      ]
+    },
+    "Docs": {
+      "run": 42164075078,
+      "head": "de71c07c2b827eea50e2ca660f80d042334472c7",
+      "ref": "agent/codex/fleet5-k2a-trust-history-20261106",
+      "event": "workflow_dispatch",
+      "correlation": "FLEET5-K2A-Docs-de71c07c2b82-20261106T1342KST",
+      "attempt": 1,
+      "path": ".github/workflows/docs.yml",
+      "status": "completed",
+      "conclusion": "success",
+      "jobs": [
+        {
+          "id": 127716312780,
+          "name": "docs",
+          "head": "de71c07c2b827eea50e2ca660f80d042334472c7",
+          "status": "completed",
+          "conclusion": "success",
+          "steps": [
+            {
+              "name": "Set up job",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "name": "Run actions/checkout@v4",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "name": "Run actions/setup-python@v5",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "name": "Run python -m pip install -r requirements-docs.txt",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "name": "Run python tools/check_docs.py",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "name": "Repository path citations exist (ratchet; baseline may only shrink)",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "name": "Run python tools/check_contract_bindings.py",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "name": "Run python tools/check_frontend_integrity.py",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "name": "Report fixture producer reachability",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "name": "Report client route coverage (report-only; promote per 검증검사도구_목록)",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "name": "Run actions/upload-artifact@v4",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "name": "Run python tools/test_sync.py",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "name": "Run python tools/check_ontology_generation.py",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "name": "Run python tools/check_ontology.py",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "name": "Build documentation bundle",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "name": "Run actions/upload-artifact@v4",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "name": "Post Run actions/setup-python@v5",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "name": "Post Run actions/checkout@v4",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "name": "Complete job",
+              "status": "completed",
+              "conclusion": "success"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "state": "CODE_CANDIDATE_NOT_ACCEPTED_WAITING_FRESH_CORE_THEN_ACTUAL_REVIEW",
+  "ownerTask": "task_a95ef3d8ccce",
+  "ownerDispatch": "ctx_ed23b4a777d0",
+  "ownerQuestion": "msg_4ee970a431ec",
+  "ownerReportedLocalEvidence": {
+    "newPlusExistingK1": "52top/147subtests/vet exit0 ownerreport",
+    "finalNewPackage": "11tests/24subtests/vet0 ownerreport",
+    "race": "exit2 BEFOREEXECUTION CGOdisabled NOTRUN; noenvironmentchange/retry",
+    "docGates": "10required0+finaldocs0 ownerreport",
+    "census": "whole12K1files/no stubs/13types73fields0embedded/G01G08R01R03+crossfilegeneric",
+    "boundary": "2modules/93Go files solebridge ownerreport"
+  },
+  "ownerEvidenceMeaning": "RootNOTindependentlyrerunlocalGo/census; actualClaude/newCIrequired",
+  "syntheticPositiveMeaning": "*_test.go alreadyboundpublicephemeralfixture deliberatelybypassesmissingexternalauth; notproductionauth/liveproducer",
+  "actualBindings": null,
+  "A01_A40": "NOTRUN/null",
+  "actualIndependentCodeReview": null,
+  "codeAccepted": false,
+  "runtimeOrPhysicalAcceptance": false,
+  "finiteCIMonitor": {
+    "atKST": "2026-11-06T13:46:40+09:00",
+    "source": "de71c07c2b827eea50e2ca660f80d042334472c7",
+    "branch": "agent/codex/fleet5-k2a-trust-history-20261106",
+    "runs": {
+      "Core": 42164071724,
+      "Docs": 42164075078
+    },
+    "ownerQuestion": "msg_4ee970a431ec",
+    "ownerTask": "task_a95ef3d8ccce",
+    "ownerDispatch": "ctx_ed23b4a777d0",
+    "intervalSeconds": 30,
+    "finiteLimitMinutes": 90,
+    "onlyGitHubRunAPIsPolled": true,
+    "OrcaInboxRead": false,
+    "reviewStartedOrAccepted": false
+  },
+  "monitorLifecycle": "one fixedCore+Docs for90m; terminal exactsuccess/failure/contradiction/timeout directlyreplyexistingauthorquestion; success authorasksRootactualreview; no inboxpoll/no newOrcaautomation",
+  "nextAction": "actualCoreterminal then ONEactualClaude code/boundary/fullcensus review onimmutablede71; actualreviewSHA/Docs/verdict thenRootboundeddecision/authorreport",
+  "wholeProgramComplete": false
+}
