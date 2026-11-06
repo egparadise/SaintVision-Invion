@@ -1,0 +1,45 @@
+{
+  "classification": "PUBLIC_METADATA_DISPLAY_NEWLINE_FREEZE_RAW_ORIGINALS_PRESERVED",
+  "cause": "Git text filter warned of CRLF->LF on four own generator metadata copies; canonical Git-byte manifest requires explicit display bytes",
+  "files": [
+    {
+      "display": "p02-fixture-seed.json",
+      "original": "generation-originals/p02-fixture-seed.json.raw",
+      "originalBytes": 489,
+      "originalSHA256": "c926d98603a9d932621ba8d0b01f4cedb42dd51d7c34b9e267cc7b58f477cd64",
+      "displaySHA256": "5429a89b244e283e388bb28426edb14fd0fbb2b558bd61682fbcac4dc78704bc",
+      "CRLFtoLF": 10,
+      "semanticChange": false
+    },
+    {
+      "display": "p02-generation-attempt01-failure.json",
+      "original": "generation-originals/p02-generation-attempt01-failure.json.raw",
+      "originalBytes": 214,
+      "originalSHA256": "69470a1386c792ebd66e61b501d8782d49d7ed21f9d80b080c496232f569970d",
+      "displaySHA256": "e9995d5bdc1aac23017df786ddbd9ee35f71a3a3a4279177c8dbed1bbbe6bfba",
+      "CRLFtoLF": 1,
+      "semanticChange": false
+    },
+    {
+      "display": "p02-schema-generation.json",
+      "original": "generation-originals/p02-schema-generation.json.raw",
+      "originalBytes": 846,
+      "originalSHA256": "2f41457354984b7c1a94720554428ca5f684a4b19c4f4e044bf7bf620c50e5d4",
+      "displaySHA256": "55537268564d0330728dbecd023cab9e1dd1b450fd9b6b09f71d92f0a62b3ad9",
+      "CRLFtoLF": 31,
+      "semanticChange": false
+    },
+    {
+      "display": "private-type-generation-inputs.json",
+      "original": "generation-originals/private-type-generation-inputs.json.raw",
+      "originalBytes": 8656,
+      "originalSHA256": "24faae31d2af6d993edc375762bc249b91e6d33a032c5cf79243fde8eed520e9",
+      "displaySHA256": "7ed477d9ad9fb68d35cd3ecbcea84c50666a0ac172169ca5f1db34725d6ec917",
+      "CRLFtoLF": 642,
+      "semanticChange": false
+    }
+  ],
+  "tested14ProductTestBytesChanged": false,
+  "actualGoOrCIRerun": false,
+  "KST": "2026-11-07T05:20:03.270291+09:00"
+}

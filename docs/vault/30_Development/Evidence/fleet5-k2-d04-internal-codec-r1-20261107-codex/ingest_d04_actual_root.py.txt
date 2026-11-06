@@ -1,0 +1,116 @@
+from pathlib import Path
+import json,hashlib,re,collections,datetime,subprocess
+R=Path('D:/Project/SaintVisionI-Invion/fleet-five-orchestration-20261105/.work');E=Path('docs/vault/30_Development/Evidence/fleet5-k2-d04-internal-codec-r1-20261107-codex');O=R/'d04-pc3-actual-go-originals'
+def sha(b):return hashlib.sha256(b).hexdigest()
+m=json.loads((E/'wip-source-manifest.json').read_bytes())
+for row in m['files']:
+ b=Path(row['path']).read_bytes();assert len(b)==row['bytes'] and sha(b)==row['SHA256'],row['path']
+content=sha(''.join(r['path']+'\0'+str(r['bytes'])+'\0'+r['SHA256']+'\n' for r in m['files']).encode());assert content==m['codeAndTestContentSHA256']=='bc0b5e0b464f2c58315be6445289ae41b0cc7c3a4fe5181a77371482505243c9'
+idxraw=(R/'d04-pc3-actual-go-original-index.json').read_bytes();idx=json.loads(idxraw);assert len(idx)==71
+summary=json.loads((R/'d04-pc3-actual-go-summary.json').read_bytes());assert sha(idxraw)==summary['originalIndexSHA256']
+archive=E/'root-execution-originals';archive.mkdir();rows=[]
+for i,r in enumerate(idx):
+ assert Path(r['name']).name==r['name'];b=(O/r['name']).read_bytes();assert len(b)==r['bytes'] and sha(b)==r['sha256'],r
+ dest=f'{i:02d}-'+r['name']+'.raw';(archive/dest).write_bytes(b);rows.append(dict(sourceRelative='d04-pc3-actual-go-originals/'+r['name'],copiedAs='root-execution-originals/'+dest,bytes=len(b),SHA256=sha(b),originalIndexAttribution=True,executedBy='Root Codex isolated CPU',reexecutedByOwner=False))
+for name in ('d04-pc3-actual-go-summary.json','d04-pc3-actual-causal-case-rows.json','d04-pc3-actual-go-original-index.json','d04-pc3-frozen-run-root-proof.json'):
+ b=(R/name).read_bytes();dest='root-execution-originals/'+name+'.raw';(E/dest).write_bytes(b);rows.append(dict(sourceRelative=name,copiedAs=dest,bytes=len(b),SHA256=sha(b),originalIndexAttribution=False,executedBy='Root Codex isolated CPU',reexecutedByOwner=False))
+a=E/'.gitattributes';a.write_text(a.read_text(encoding='utf-8')+'root-execution-originals/** -text -diff\n',encoding='utf-8',newline='\n')
+(E/'root-execution-original-index.json').write_text(json.dumps(dict(classification='EXACT_ROOT_EXECUTION_ORIGINALS_NOT_OWNER_RERUN',rootGrant='msg_3cf791b73706',rootOriginalIndexSHA256=sha(idxraw),indexedOriginals=71,additionalRootSummaryAndIndexOriginals=4,totalCopies=75,exactBytes=True,rawPaths='Original allowed-share absolute job paths retained in immutable raw originals; only derived public displays sanitized',files=rows),indent=2)+'\n',encoding='utf-8',newline='\n')
+before=json.loads((O/'source-frozen-before.json').read_bytes());one=json.loads((O/'phase1-source-after.json').read_bytes());two=json.loads((O/'phase2-source-after.json').read_bytes());assert before==one==two and len(before)==368
+snap={r['path']:r for r in before}
+for r in m['files']:assert snap[r['path']]['SHA256']==r['SHA256'] and snap[r['path']]['bytes']==r['bytes']
+counts=[];cases=[];isolated=[]
+pattern=re.compile(r'P02_CASE id=(\S+) beforeSHA256=([0-9a-f]{64}) afterSHA256=([0-9a-f]{64}) stage=(\S*) reason=(\S*) prior=(\d+) actualAuth=false')
+for phase in ('phase1','phase2'):
+ data=[json.loads(x) for x in (O/(phase+'-go-test.jsonl')).read_text(encoding='utf-8').splitlines() if x];top=[];sub=[]
+ for d in data:
+  assert d['Action'] not in ('fail','skip'),(phase,d)
+  if d['Action']=='pass' and 'Test' in d:(sub if '/' in d['Test'] else top).append(d['Test'])
+  if d['Action']=='output':
+   out=d.get('Output','');found=pattern.search(out)
+   if found:
+    id,b,a,stage,reason,prior=found.groups();assert b==a;cases.append(dict(phase=phase,test=d.get('Test'),id=id,beforeSHA256=b,afterSHA256=a,stage=stage,reason=reason,prior=int(prior),actualAuth=False))
+   if 'P02_ISOLATED ' in out:isolated.append(dict(phase=phase,test=d.get('Test'),output=out.strip()))
+ counts.append(dict(phase=phase,topLevel=len(top),subtests=len(sub),fail=0,skip=0))
+assert counts==[dict(phase='phase1',topLevel=12,subtests=99,fail=0,skip=0),dict(phase='phase2',topLevel=11,subtests=129,fail=0,skip=0)]
+assert len(cases)==90 and len({r['beforeSHA256'] for r in cases})==88 and len(isolated)==8
+rootcases=json.loads((R/'d04-pc3-actual-causal-case-rows.json').read_bytes());assert len(rootcases)==len(cases)
+for r,p in zip(rootcases,cases):assert all(r[k]==p[k] for k in ('phase','test','id','beforeSHA256','afterSHA256','prior','actualAuth'))
+(E/'actual-causal-case-rows.json').write_text(json.dumps(dict(classification='READ_FROM_ACTUAL_ROOT_GO_JSONL_NOT_RERUN',caseLogRows=90,distinctCompleteInputs=88,duplicateControlRows=2,allBeforeAfterEqual=True,rows=cases,isolatedProjectionRows=isolated,isolatedRowsNotAddedToCaseCount=True,actualAuth=False,A01A40='NOT_RUN'),indent=2)+'\n',encoding='utf-8',newline='\n')
+proof=json.loads((R/'d04-pc3-frozen-run-root-proof.json').read_bytes())
+phases=[]
+for phase in proof['actualPhases']:
+ assert phase['exit']==0 and not phase['OOMKilled'] and phase['sourceBeforeAfterEqual'] and phase['network']=='none'
+ keep={k:phase[k] for k in ('phase','startedKST','endedKST','elapsedSeconds','command','environment','image','exit','OOMKilled','cgroupMemoryPeakBytes','network','containerMemoryBytes','containerMemoryPlusSwapTotalBytes','containerNanoCPUs','nonRootUser','readOnlyRootFS','sourceBeforeAfterEqual','sourceFileCount','logs')};phases.append(keep)
+view=dict(classification='ACTUAL_ROOT_OPERATED_GO_TESTS_AND_AFFECTED_GATES_NOT_CODE_REVIEW_OR_FLEET_ACCEPTANCE',authorTask='task_a95ef3d8ccce',dispatch='ctx_ed23b4a777d0',publicationGrant='msg_3cf791b73706',operator='Root Codex',ownerReceiptProcessing='Codex read/copied/hashed only; no SSH/Docker/test rerun',base=m['baseSHA'],testedCodeAndTestContentSHA256=content,testedPacketSHA256=summary['packetSHA256'],testedSourceManifestSHA256=summary['manifestSHA256'],codeCommitAtExecution=None,sourceOverlay14Exact=True,all368BeforeAfterSourceHashesEqual=True,all14CurrentSourceTestBytesEqual=True,phases=phases,counts=counts,topLevel23=23,subtests228=228,caseLogRows=90,distinctCompleteInputHashes=88,allCaseBeforeAfterEqual=True,isolatedProjectionRows=8,rawOriginals=71,originalIndexSHA256=sha(idxraw),sourceSetup=dict(publicGitAndDepsOnly=True,bridgeNetworkDuringSourceSetupOnly=True,modDownloadVerifyExit=0,testsNetworkNone=True,real84eeAndEb32Objects=True),K1Census='ACTUAL_PASS_13TYPES_73FIELDS_0EMBEDDED',newPrivateProductionDeclarations=44,independentCODEReview='NOT_RUN',hostedProductCI='NOT_RUN_ROOT_NEXT_CONDITIONAL_CUT',actualProducer=None,actualH1H7='NULL_HOLD',H3_EA='ABSENT_UNREGISTERED_HOLD',RD_registration='HOLD_FACT_ONLY_NOT_ORIGIN_AUTHENTICATION',rawSeven='UNREGISTERED',A01A40='NOT_RUN',wholeK2Fleet='INCOMPLETE',rawAttribution='root-execution-original-index.json',KST=datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=9))).isoformat())
+(E/'actual-root-execution-report.json').write_text(json.dumps(view,indent=2)+'\n',encoding='utf-8',newline='\n')
+# Preserve the original WIP timeline and append actual execution without touching14 tested files.
+h=Path('docs/vault/30_Development/History/2026-11-07_FLEET5_K2_D04_internal_codec_R1_Codex.md');s=h.read_text(encoding='utf-8');s=s.replace('version: "1.0.0"','version: "1.0.1"',1);s=re.sub(r'^updated: ".*"$', 'updated: "'+view['KST']+'"',s,count=1,flags=re.M)
+s+='''
+
+## Actual Root execution and source-identical publication checkpoint
+
+Root msg_3cf791b73706 authorizes PUBLICATION ONLY after actual isolated Go
+execution. All14product/test bytes remain EXACT WIP content bc0b5e0b...
+and manifest12c47c1b..., packet31902e35...; no semantic/test/guard/module/
+K1/schema/pin mutation. Earlier WIP NOT_RUN statements, including frozen README,
+are historically true time points and are not rewritten as past success.
+
+Actual operator Root Codex, not author-local execution: official pinned
+image golang@sha256:8d48e12ec56735e9358640898b9d9b9fcca110612ed8a5567438c0a1baa24e66,
+Go1.27.1 linux/amd64, nonroot1000:1000/readOnlyRootFS/cap-dropALL/noNewPrivileges,
+2CPU/2GiB memory+swap TOTAL2GiB (extra swap0), pids128, own allowed share/caches.
+Public Git/dependency source setup used bridge with real84ee/eb32 Git objects;
+both TEST containers networknone, GOTOOLCHAINlocal/GOWORKoff/GOPROXYoff/
+GOSUMDBoff/GOMAXPROCS1, mod download/verify exit0. No fake Git metadata or stubs.
+Worker copied/hashes exact provided receipts, no own SSH/Docker/PC action.
+
+Phase1 exact proposed go test -p=1 -count=1 -json -run ^TestP02Internal:
+exit0,12top/99subtests,0fail0skip,29.215seconds, memory.peak420581376B/OOMfalse.
+Phase2 exact11affected public-null/unregistered/copy/effect/source/K1census/
+PL-R1A/B/C/D gates: exit0,11top/129subtests,0fail0skip,119.407seconds,
+peak667811840B/OOMfalse. Totals23top/228sub, not fleet/runtime acceptance.
+Actual same-toolchain immutable K1 census13types/73fields/0embedded passed.
+Go/source/effect results are now actual PASS for these exact affected commands;
+no unaffected fullCore/census-mutant/old model/proof rerun by this worker.
+
+All368materialized source rows before/after BOTH phases match; current14overlay
+file hashes match the frozen tested manifest. Actual JSONL re-parsed read-only:
+90P02_CASE log rows,88DISTINCT complete input hashes, before==after all90,
+8isolated projection logs counted separately. Repeated controls are not90unique
+inputs; raw48/43symbolic reviewer rows are not added as Go tests. Exact actual
+source/test/receipt/log/code/per-case hashes and attribution are in
+actual-root-execution-report.json, actual-causal-case-rows.json and the75-copy
+root-execution-original-index.json (71indexed originals plus4Root summary/index
+originals). Immutable .raw copies preserve every byte/SHA and allowed-share job
+paths; derived public reports omit those absolute bindings. No keys/passwords.
+
+Latest canonical Root read Index1.0.478/Codex1.0.439; their NOT_RUN entry is an
+older true management checkpoint, not silently rewritten or exported by this
+worker. Root alone maintains shared boards/registry. Authoring failures remain
+in unique Evidence, including the inventory locale/counter/generator failures;
+no actual Go failure occurred in these two phases and no failure was re-labelled.
+
+Next authorized path: serial local required docs/ontology/bindings/frontend/
+path-ratchet/single-source/test-sync/build-docs plus canonical sync CHECK and
+staged diff gates; every exit saved, no apply/adopt/resolve/state write. EACH
+canonical check gets immediate before/after full state hash; a real changed hash
+or conflict is preserved for Root, not auto-resolved. Then one normal code+
+evidence commit/push on the existing own branch and ONE exact Docs; actual
+head/ref/event/path/attempt/correlation/all19 proof bound externally after commit.
+No recursive report/source change and no source byte change from tested packet.
+
+Hosted product CI is NOT_RUN: Root will first verify committed14source bytes
+and exact Docs, then operate ONE existing Core Build at that exact SHA/ref with
+unique correlation, peer proof/S08acceptance false. Author does not run Core,
+edit workflow or retry a failed hosted run. Root queues ONE actual independent
+CODE delta reviewer after the active B9g reviewer exits/releases. Source/unit/
+package gates/hosted CI/report/CODE review/integration/runtime are separate axes.
+Actual H1-H7/H3EA/expected-verdict custody/RD origin authentication NULL_HOLD;
+raw7 UNREGISTERED, A01-A40 NOT_RUN, wholeK2/FIVE/global100 INCOMPLETE.
+First next action/owner: Codex completes exact publication; Root verifies and
+runs concrete hosted Core cut, preserves any first failure/skips, and assigns
+one actual CODE review. No whole-K2 worker_done or generic user approval.
+'''
+h.write_text(s,encoding='utf-8',newline='\n')
+print(json.dumps(dict(rootIndexedOriginals=71,additionalOriginals=4,rawTotalCopies=75,originalBytes=sum(x['bytes'] for x in idx),allSource14Exact=True,all368SnapshotsEqual=True,topLevel=23,subtests=228,rows=90,distinct=88,isolated=8,GoRerun=False)))

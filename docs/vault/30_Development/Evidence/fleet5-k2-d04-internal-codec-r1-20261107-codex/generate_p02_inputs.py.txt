@@ -1,0 +1,69 @@
+from pathlib import Path
+import json
+D=Path('services/node-agent/internal/migrationcontext')
+# All boundary fields are concrete private types. No callback/interface/any.
+types={
+'Expectation':[('present','bool'),('kind','byte'),('literal','string'),('integer','int64'),('boolean','bool')],
+'SourceConstants':[(x,'string') for x in ('k1SourcePinSetSHA256','recipeDefinitionsSHA256','derivedDigestContractSHA256','proofSlotRegistrySHA256','graphSHA256','nodeKindsSHA256','designRegistrationSHA256')],
+'MemberBinding':[('slot','string'),('scope','p02NodeScope')]+[(x,'string') for x in ('certificateSHA256','caSHA256','sPKISHA256','publicKeyHex')],
+'StepKey':[('runID','int64'),('jobName','string'),('number','int64'),('name','string')],
+'PrimaryCI':[('runID','int64'),('jobID','int64'),('jobName','string')],
+'Capsule':[(x,'string') for x in ('format','purpose','selector','scopeSHA256','generation','keySPKI','approvedReviewScope','rootApprovalIdentity','rootApprovalPurpose','componentSHA256','expectedRootSHA256')]+[(x,'int64') for x in ('anchorVersion','keyNotBefore','keyNotAfter','expectedUID','minimumRecordVersion')]+[('primaryCI','p02PrimaryCI'),('sourceConstants','p02SourceConstants'),('memberBindings','[]p02MemberBinding'),('sourceParts','map[string]string'),('reviewedParts','map[string]map[string]string'),('requiredParts','[]string'),('requiredSteps','[]p02StepKey'),('optionalSteps','[]p02StepKey'),('approvedReviewOutcomes','map[string]string'),('expectedEffectiveVerdict','p02Expectation')],
+'CoveragePart':[(x,'string') for x in ('partId','reviewSHA','reviewTargetSHA','reviewedBlobSHA256','currentBlobSHA256','relation')],
+'Effective':[(x,'string') for x in ('publicationSHA','targetSourceSHA','scopeId','verdict')],
+'CoverageStatement':[('sourceSHA','string'),('sourceTreeSHA256','string'),('reviewSetSHA256','string'),('effective','p02Effective'),('parts','[]p02CoveragePart')],
+'Coverage':[('purpose','string'),('authorityId','string'),('rawEvidence','[]byte'),('statement','p02CoverageStatement')],
+'SourceRecord':[('facts','p02SourceFacts')],
+'CIRecord':[('runs','[]p02Run')],
+'ReviewRecord':[('reviews','[]p02Review')],
+'Lifecycle':[(x,'string') for x in ('status','keyStatus','sourceStatus','coverageStatus','receiptStatus','currentRecordIdentity','generation','capsuleSHA256')]+[(x,'int64') for x in ('currentVersion','floor','checkedAt','expiresAt')]+[(x,'map[string]string') for x in ('reviews','grants','certificates')],
+'Ticket':[(x,'string') for x in ('purpose','id','selector','scopeSHA256','capsuleSHA256','generation','currentRecordIdentity')]+[(x,'int64') for x in ('issuedAt','expiresAt','currentVersion')],
+'Measurement':[(x,'string') for x in ('purpose','componentSHA256','executableSHA256','sourceSHA','receiptSHA256','runtimeLockSHA256','linkedClosureSHA256','startGeneration','rootIdentitySHA256','proofNonce')]+[(x,'int64') for x in ('pid','uid','observedAt','expiresAt')]+[('rawEvidence','[]byte')],
+'Clock':[('lower','int64'),('upper','int64')],
+'SignatureTuple':[(x,'string') for x in ('format','purpose','domain','keySPKI','capsuleSHA256','generation','selector','scopeSHA256','requestBindingSHA256')]+[(x,'int64') for x in ('anchorVersion','recordVersion')]+[('signingInput','[]byte'),('signature','[]byte')],
+'SnapshotToken':[(x,'string') for x in ('revision','capsuleSHA256','generation','selector','scopeSHA256','recordIdentity','ticketID','measurementSHA256')]+[('recordVersion','int64')],
+'Inputs':[('capsule','*p02Capsule'),('capsuleRaw','[]byte'),('source','*p02SourceRecord'),('ci','*p02CIRecord'),('reviews','*p02ReviewRecord'),('coverage','*p02Coverage'),('lifecycle','*p02Lifecycle'),('ticket','*p02Ticket'),('measurement','*p02Measurement'),('clock','*p02Clock'),('signatures','[]p02SignatureTuple'),('before','p02SnapshotToken'),('after','p02SnapshotToken')]
+}
+s=['package migrationcontext','', '// Already-authenticated prerequisites are hypotheses at this private seam, NOT', '// authentication tokens. No port/loader/opaque issuer consumes or creates them.', '// Future independently authorized producers must bind exact raw evidence to', '// decoded records. Their actual authority and every installation remain HOLD.']
+for n,fields in types.items():s+=['type p02'+n+' struct {']+[f'{k} {v}' for k,v in fields]+['}']
+s+=['type p02Budget struct { bytes int64; nodes int64 }','func (b *p02Budget) take(n int64) bool {if n<0||n>b.bytes||b.nodes<=0 {return false};b.bytes-=n;b.nodes--;return true}', 'func p02BudgetString(s string,b *p02Budget) bool {return len(s)<=65536&&b.take(int64(len(s)))}']
+s+=['func p02BudgetInt64(_ int64,b *p02Budget) bool {return b.take(8)}','func p02BudgetBool(_ bool,b *p02Budget) bool {return b.take(1)}','func p02BudgetByte(_ byte,b *p02Budget) bool {return b.take(1)}']
+# Include generated wire types when emitting safe budget/freeze routines.
+wire=(D/'p02_wire_internal.go').read_text()
+import re
+alltypes=dict(types)
+for n,body in re.findall(r'type p02(\w+) struct \{([^}]+)\}',wire):
+ fields=[]
+ for line in body.strip().splitlines():
+  k,v=line.split();fields.append((k,v))
+ alltypes[n]=fields
+
+def clone_expr(v,t):
+ if t in ('string','int64','bool','byte'):return v
+ if t.startswith('p02'):return f'p02Freeze{t[3:]}({v})'
+ raise AssertionError(t)
+def budget_expr(v,t):
+ if t=='string':return f'p02BudgetString({v},b)'
+ if t in ('int64','bool','byte'):return f'p02Budget{t.title()}({v},b)'
+ if t.startswith('p02'):return f'p02Budget{t[3:]}({v},b)'
+ raise AssertionError(t)
+for n,fields in alltypes.items():
+ f=[f'func p02Freeze{n}(v p02{n}) p02{n} {{out:=v'];budget=[f'func p02Budget{n}(v p02{n},b *p02Budget) bool {{']
+ for k,t in fields:
+  v='v.'+k;o='out.'+k
+  if t=='[]byte':f+=[f'{o}=copyBytes({v})'];budget+=[f'if len({v})>p02PayloadLimit||!b.take(int64(len({v}))) {{return false}}']
+  elif t.startswith('[]'):
+   item=t[2:];f+=[f'{o}=make({t},len({v}));for i,x:=range {v} {{{o}[i]={clone_expr("x",item)}}}'];budget+=[f'if len({v})>4096 {{return false}};for _,x:=range {v} {{if !{budget_expr("x",item)} {{return false}}}}']
+  elif t=='map[string]string':
+   f+=[f'{o}=copyMap({v})'];budget+=[f'if len({v})>4096 {{return false}};for k,x:=range {v} {{if !p02BudgetString(k,b)||!p02BudgetString(x,b) {{return false}}}}']
+  elif t=='map[string]map[string]string':
+   f+=[f'{o}=make({t},len({v}));for k,x:=range {v} {{{o}[k]=copyMap(x)}}'];budget+=[f'if len({v})>4096 {{return false}};for k,x:=range {v} {{if !p02BudgetString(k,b)||len(x)>4096 {{return false}};for a,z:=range x {{if !p02BudgetString(a,b)||!p02BudgetString(z,b) {{return false}}}}}}']
+  elif t=='map[string]p02Pin':
+   f+=[f'{o}=copyMap({v})'];budget+=[f'if len({v})>4096 {{return false}};for k,x:=range {v} {{if !p02BudgetString(k,b)||!p02BudgetPin(x,b) {{return false}}}}']
+  elif t.startswith('*p02'):
+   sub=t[4:];f+=[f'if {v}!=nil {{x:=p02Freeze{sub}(*{v});{o}=&x}}'];budget+=[f'if {v}!=nil&&!p02Budget{sub}(*{v},b) {{return false}}']
+  else:f+=[f'{o}={clone_expr(v,t)}'];budget+=[f'if !{budget_expr(v,t)} {{return false}}']
+ f+=['return out}'];budget+=['return true}'];s+=f+budget
+(D/'p02_inputs_internal.go').write_text('\n'.join(s)+'\n',encoding='utf-8',newline='\n')
+Path('.work/p02-private-types.json').write_text(json.dumps(types,indent=2)+'\n')
+print('Concrete prerequisite types',len(types),'plus closed wire types',len(alltypes)-len(types))

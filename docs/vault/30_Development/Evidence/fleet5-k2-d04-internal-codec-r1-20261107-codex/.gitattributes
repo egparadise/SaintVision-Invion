@@ -1,0 +1,3 @@
+review-originals/** -text -diff
+root-execution-originals/** -text -diff
+generation-originals/** -text -diff

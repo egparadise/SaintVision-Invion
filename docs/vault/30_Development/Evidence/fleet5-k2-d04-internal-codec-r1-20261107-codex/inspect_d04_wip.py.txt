@@ -1,0 +1,123 @@
+from pathlib import Path
+import json,subprocess,hashlib,re,datetime
+D=Path('services/node-agent/internal/migrationcontext');E=Path('docs/vault/30_Development/Evidence/fleet5-k2-d04-internal-codec-r1-20261107-codex')
+prod=sorted(D.glob('p02_*_internal.go'));tests=sorted(D.glob('p02_*_test.go'));assert len(prod)==7 and len(tests)==5
+report=dict(classification='BOUNDED_STATIC_NOT_TYPECHECK_OR_TESTS',gofmtParseExit=0,trackedWhitespaceExit=0,newProductionFiles=7,newTestFiles=5,newPrivateProductionTypes=[],newTests=[],actualGoCompile='NOT_RUN',actualSourceEffectsGate='NOT_RUN',actualK1Census='NOT_RUN_BASELINE_STILL13_73',actualCryptoOrProducer=False,actualRuntimeA01A40='NOT_RUN',actualCI='NOT_DISPATCHED_NO_EXECUTION_PHASE_YET',newAllowlistObjects=['time.Unix','time.Time.UTC'])
+for p in prod:
+ s=p.read_text(encoding='utf-8');report['newPrivateProductionTypes']+=re.findall(r'^type (p02\w+) ',s,re.M)
+ assert not re.search(r'(?m)^func (?:\([^\n]*\) )?[A-Z]',s),p
+ assert not re.search(r'(?m)^type [A-Z]',s),p
+ assert not any(x in s for x in ('json.Unmarshal(','json.NewDecoder(','time.Now(','InstalledPolicy{','History{','policyBinding{','historyBinding{')),p
+for p in tests:
+ s=p.read_text(encoding='utf-8');assert 't.Skip(' not in s and 't.Parallel(' not in s,p;report['newTests']+=re.findall(r'^func (Test\w+)\(',s,re.M)
+old=subprocess.check_output(['git','show','84ee9b1b43b8921ed1d0ef8bde6f3546013c1095:'+str(D/'effect_gate_test.go').replace('\\','/')]).decode('utf-8')
+expected=old.replace('"time.Time.Sub": true,','"time.Time.Sub": true,\n\t// D04 grant msg_ccd8401cb2c5: deterministic epoch projection only.\n\t"time.Unix": true, "time.Time.UTC": true,');assert expected==(D/'effect_gate_test.go').read_text(encoding='utf-8')
+report.update(effectGateExactBoundedDiff=True,newPrivateProductionTypeCount=len(report['newPrivateProductionTypes']),newTestFunctionCount=len(report['newTests']),rawScopeUTF8='Valid UTF8 in exact hex-decoded original review scope; no normalization; outer JSON/authority strings ASCII')
+(E/'wip-static-inspection.json').write_text(json.dumps(report,indent=2)+'\n',encoding='utf-8',newline='\n')
+(E/'static-preflight-attempt01-failure.json').write_text(json.dumps(dict(exit=1,cause='Author inventory assumed6 new test files; actual5 includes fixture and four test files',correction='Derived exact lists and asserted7prod/5test; no Go test failure or predicate skipped',actualGoTests='NOT_RUN'),indent=2)+'\n',encoding='utf-8',newline='\n')
+focus=['TestNullPortsAndOpaqueBoundary','TestWellFormedUnregisteredProvidersNeverAuthenticate','TestCopyRejectsCallbacksAndBoundsBeforeEncoding','TestResolvedObjectEffectBoundary','TestRepositoryBoundaryAndZeroEffects','TestWholePackageFullUnderlyingCensus','TestReviewR1CompileValidEffectAndAliasMutants','TestPLR1AActualBuildsThenBoundaryRefuses','TestPLR1BCompiledWriteTargetsAndReasons','TestPLR1CCompiledPointerConversionsAndControls','TestPLR1DCompiledTargetPointerTermsAndControls']
+commands=dict(classification='ROOT_OPERATED_ISOLATED_CPU_PROPOSAL_NOT_EXECUTED',base='84ee9b1b43b8921ed1d0ef8bde6f3546013c1095',cwd='services/node-agent',environment={'GOTOOLCHAIN':'local','GOWORK':'off','GOPROXY':'off','GOSUMDB':'off','GOMAXPROCS':'1','GOCACHE':'ROOT_NEW_OWNED_ISOLATED_CACHE'},requiredGitObject='eb32b211ab3704935b9431747089ab0715582a74 and real Git metadata required by unchanged census',phase1=['go','test','-p=1','-count=1','-json','-run','^TestP02Internal','./internal/migrationcontext'],phase2=['go','test','-p=1','-count=1','-json','-run','^('+'|'.join(focus)+')$','./internal/migrationcontext'],stopOnNonzero=True,record=['actual toolchain/image/source and before/after file hashes','stdout/stderr/exit/peak memory/time; no false Go pass','each complete input beforeSHA256/afterSHA256/cause/prefix','executed rows AND distinct complete inputs; repeated controls not summed','isolated mutants separately; compile/parser failure never semantic kill'],resources='Root fixed image2CPU/2GiB/new owned share/cache; no prior job reuse',notGranted=['fullCore','Node/browser','keys/issuer/DB/Engine/live effects','remote commands by worker','productCI until Root concrete phase'],actualExecution=None)
+(E/'root-isolated-command-proposal.json').write_text(json.dumps(commands,indent=2)+'\n',encoding='utf-8',newline='\n')
+now=datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=9))).isoformat()
+h=Path('docs/vault/30_Development/History/2026-11-07_FLEET5_K2_D04_internal_codec_R1_Codex.md')
+s=f'''---
+doc_id: "HISTORY-FLEET5-20261107-K2-D04-INTERNAL-CODEC-R1-CODEX"
+title: "FLEET5 K2 D04 pure internal codec R1 implementation WIP"
+version: "1.0.0"
+status: "review"
+author: "Codex"
+reviewer: "Actual independent CODE review through Root pending"
+updated: "{now}"
+timezone: "Asia/Seoul"
+source_of_truth: "Git"
+base_sha: "84ee9b1b43b8921ed1d0ef8bde6f3546013c1095"
+task_ids: ["FLEET5-K2-D04-INTERNAL-CODEC-R1-20261107"]
+tags: ["fleet5", "codex", "d04", "internal", "wip", "not-tested"]
+---
+
+SAME Task task_a95ef3d8ccce / Dispatch ctx_ed23b4a777d0, actual separate code
+grant msg_ccd8401cb2c5. Codex owner; future actual Claude CODE reviewer via Root.
+Bounded DESIGN ACCEPT6fa4c644a769b768d9212e5fa4a9083e5bf2947a/43actual rows/
+0differences, Root-verified Docs42276591734/job128094369710/all19SUCCESS, is not
+CODE/auth/runtime acceptance. All10 original review docs archived exact, not rerun.
+
+Read canonical Root Index1.0.476/Codex1.0.437; AGENTS/required plans and
+agent-delivery1.1.0/core-reliability1.0.0/Orca1.4.248 apply. Prompt/Context=actual
+grant, Harness=NEW p02 Go tests, ROOF/graph/contract28/schema/K1 pins unchanged.
+Runtime exact model ID is not exposed/invented. Orca-managed workspace identity
+wt2:local:6426b8d4-55ce-44d5-a784-3a4cfa0ecab2, branch
+agent/codex/fleet5-k2-d04-internal-codec-r1-20261107 from exact84ee9b1b;
+setup skipped, no helper, raw worktree, reinitialization, reset or force.
+
+Goal -> evidence -> contracts -> task -> owner: implement accepted pure P02
+codec/joins/projection, then prove actual Go controls and exact causal negatives,
+unchanged package gates and code review. Codex wrote seven NEW implementation
+and five NEW test Go files (including fixture), precise README, and ONLY two
+needed pure time objects time.Unix/time.Time.UTC in effect_gate_test.go.
+All other old code/test/guard/module/K1/schema/pin files stay byte-frozen.
+
+Implemented bounded lexical canonical JSON/C2 (no json.Unmarshal/NewDecoder,
+callback/custom marshaler or dependency);168author-time generated FIXED schema
+functions, no runtime schema loader. Closed concrete signed-width private
+prerequisites, bounded freeze and exact full-message/domain/key/signature/context
+DATA tuple membership.20actual candidate stages preserve order and independent
+expectations; all8component digests/joins precede41policy/5running projection.
+Approved receipt/lock/link H3, measured H5; exact UTC epochs, original intervals,
+canonical CI IDs, separate artifact ZIP/executable, current/floor/ticket/clock/
+zero-weight echo/replay/final readback. No public hook, opaque issuer, loader,
+provider, acquisition, current or effect. Existing K1 bridge remains sole importer.
+
+Actual Rev3 INFO I1 capsule ASCII at01 and I2 publication may equal SOURCE SHA
+are explicit. Exact hex-decoded original review scope preserves valid UTF8 raw
+bytes (accepted contract), no normalization; outer JSON/authority strings ASCII.
+Private prerequisites are hypotheses only. Raw H3-EA digest is computed from exact
+already-authenticated evidence bytes; binding/authentication of raw bytes and
+typed statement, source tree partition origin and subject-keyed H4 status remain
+producer obligations, not supplied by this seam. H1-H7/H3-EA/custody all NULL/HOLD.
+
+Actual bounded static work: gofmt parse12new Go files exit0; tracked git diff
+--check exit0; own policy inspection confirms only2allowed pure time objects,
+no public API/opaque constructor. New private production types={report['newPrivateProductionTypeCount']} by STATIC
+inventory, separately from immutable K1 input13types/73fields (NOT_RERUN here).
+New test functions={report['newTestFunctionCount']} (NOT_RUN). Gofmt is not Go compile/typecheck/tests/
+source-effect gate/census/CI. No actual Go or crypto/runtime success is claimed.
+
+Tests log complete deterministic typed input hashes before/after, exact cause/
+earlier prefix; W03-W05/V19/V20/V20b, empty/missing/type/ASCII/128/129, unused
+original/partition shrinking, exact tuple/context replay, strict codec/budgets,
+H3/H5 X04-X11 semantics, every41+5field, post-return original-input mutation,
+separate isolated regressed H5-to-both-sides mutants, alias-safe time/effect cases.
+No unrelated FORMAT/compiler failure is credited as semantic closure, no skip or
+parallel test launch. Repeated controls must be counted separately from distinct
+complete inputs; old symbolic/test/review counts are not summed.
+
+Main preflight:268004KiB then851864KiB free of16538864KiB; volatile scarce RAM,
+no adequate reserved2GiB local runner assumed. go version ONLY actual
+Go1.27.0 windows/amd64 with child GOTOOLCHAIN=local; no local compile/cache/
+dependency install, guessed peaks, OS/pagefile/process/container change.
+Exact WIP packet/base/preimages/per-file SHA and serial command proposal go to
+Root's already-authorized isolated fixed-image2CPU/2GiB CPU phase, operated by
+Root only with owned share/cache, no prior job reuse. Worker does no remote
+SSH/Docker/host action. WIP is not done: actual Go/package gates, final source
+matching, normal commit/push/exact Docs/relevant product CI and CODE review remain.
+
+Authoring failures preserved: inspector Counter mapping-vs-keys, generator's
+initial unsupported not.const zero-hash rule (corrected without dropping it),
+and own static inventory initially assumed6tests vs actual5. None was a Go/CI
+run. Old source/review/test/gate failures remain frozen. No broad old-suite/
+Core/census-mutant/proof/archive repeat beyond proposed affected package gates.
+
+No private config/PKI/key/state/schedule/clock/permissions/operator/hardware,
+shared boards/registry or Obsidian apply. Official sync later is canonical CHECK
+with immediate before/after full-state hash, never apply/adopt/resolve/stale
+export. Actual A01-A40 NOT_RUN, raw7 UNREGISTERED, RD original-byte origin auth
+HOLD, whole K2/FIVE/global100 INCOMPLETE.
+
+First next action/owner: Root verifies frozen WIP base/packet/preimages/hashes and
+operates the isolated serial Go phase, preserving real failures/exits/peaks;
+Codex fixes proven failures only, then finishes required gates/publication and
+requests ONE actual independent CODE delta review plus concrete product CI cut.
+No generic user approval, restart or whole-K2 worker_done at this dependency wait.
+'''
+h.write_text(s,encoding='utf-8',newline='\n')
+print(json.dumps(dict(staticOnly=True,newFiles=12,newProductionTypes=report['newPrivateProductionTypeCount'],testFunctions=report['newTestFunctionCount'],GoTests='NOT_RUN',next='Root isolated CPU phase')))

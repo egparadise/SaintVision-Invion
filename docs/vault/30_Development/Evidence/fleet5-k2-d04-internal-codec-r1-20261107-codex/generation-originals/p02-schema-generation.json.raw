@@ -1,0 +1,31 @@
+{
+  "schemaFunctions": 168,
+  "patterns": [
+    "^[A-Za-z0-9_-]{1,128}(?![\\s\\S])",
+    "^[0-9a-f]{64}(?![\\s\\S])",
+    "^[0-9a-f]{40}(?![\\s\\S])",
+    "^[ -~]+(?![\\s\\S])",
+    "^(?:[0-9a-f]{2})+(?![\\s\\S])",
+    "^[0-9a-f]{128}(?![\\s\\S])",
+    "^[1-9][0-9]{0,15}(?![\\s\\S])"
+  ],
+  "roots": [
+    "p02Schema0",
+    "p02Schema25",
+    "p02Schema160"
+  ],
+  "sourceSchemas": [
+    {
+      "file": "candidate-envelope.schema.json",
+      "SHA256": "60d6c825d26e3c72f4c367e92200e0bc14c83642764c0dc27ec4d7c74a43d74c"
+    },
+    {
+      "file": "policy-payload.schema.json",
+      "SHA256": "02d0b30fdd79b0263cdbafc42bd2bc0531c3e0ecbd8d55cbe72e6c91dfc320a1"
+    },
+    {
+      "file": "authority-scope.schema.json",
+      "SHA256": "ccae13986377c1a670323983c0c24c1d2e05cc8cdeb6b9119d4560c65c15bf21"
+    }
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "argv": [
+    "go",
+    "version"
+  ],
+  "exit": 0,
+  "stdout": "go version go1.27.0 windows/amd64",
+  "stderr": "",
+  "GOTOOLCHAIN": "local child only; no global environment/cache change",
+  "compileTests": "NOT_RUN_RESOURCE_UNAVAILABLE",
+  "KST": "2026-11-07T04:42:34.910770+09:00"
+}

@@ -1,0 +1,10 @@
+{
+  "classification": "PUBLIC_SYNTHETIC_HYPOTHESIS_SEED_NOT_GO_OR_CRYPTO_PROOF",
+  "source": "84ee9b1b43b8921ed1d0ef8bde6f3546013c1095",
+  "modelEvaluated": false,
+  "testSuitesExecuted": false,
+  "inputsSHA256": "23a4da835046e42af68ec6026d2ac82b851cf3b191e0b4163cd9cf6b8d0b43cb",
+  "payloadSHA256": "1af43bdca66eecf83741879a50a2bb0e083effc760660820b2009d55769ca87b",
+  "capsuleRawSHA256": "6ebc3c578ce1e7d27e1acda7279a487a3e41417c3ce969dbdc29a1c5d2324160",
+  "producer": null
+}

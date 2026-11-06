@@ -1,0 +1,6 @@
+{
+  "exit": 1,
+  "cause": "Author inventory assumed6 new test files; actual5 includes fixture and four test files",
+  "correction": "Derived exact lists and asserted7prod/5test; no Go test failure or predicate skipped",
+  "actualGoTests": "NOT_RUN"
+}

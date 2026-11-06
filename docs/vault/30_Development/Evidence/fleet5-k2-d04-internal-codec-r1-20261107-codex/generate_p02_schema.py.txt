@@ -1,0 +1,109 @@
+from pathlib import Path
+import json,hashlib
+P=Path('docs/vault/30_Development/Evidence/fleet5-k2-p02-registry-attestation-rev2-20261107-codex');D=Path('services/node-agent/internal/migrationcontext')
+env=json.loads((P/'candidate-envelope.schema.json').read_bytes());pay=json.loads((P/'policy-payload.schema.json').read_bytes());scope=json.loads((P/'authority-scope.schema.json').read_bytes())
+functions=[];memo={};patterns=[]
+def q(s):return json.dumps(s,ensure_ascii=True)
+def gen(s):
+ key=json.dumps(s,sort_keys=True)
+ if key in memo:return memo[key]
+ name='p02Schema'+str(len(memo));memo[key]=name;lines=[]
+ if 'oneOf' in s:
+  kids=[gen(k) for k in s['oneOf']];lines=['matches:=0']+[f'if {k}(v) {{matches++}}' for k in kids]+['return matches==1']
+ else:
+  typ=s.get('type')
+  if 'const' in s:
+   v=s['const'];assert isinstance(v,str);lines+=[f'if v.kind!=\'s\'||v.text!={q(v)} {{return false}}']
+  if 'enum' in s:
+   assert all(isinstance(x,str) for x in s['enum']);lines+=["if v.kind!='s' {return false}", 'if '+ '&&'.join('v.text!='+q(x) for x in s['enum'])+' {return false}']
+  if typ:
+   kinds={'string':'s','integer':'i','boolean':'b','object':'o','array':'a'};assert typ in kinds,typ
+   lines+=[f"if v.kind!='{kinds[typ]}' {{return false}}"]
+  for a,op,expr in [('minLength','<','len(v.text)'),('maxLength','>','len(v.text)'),('minimum','<','v.integer'),('maximum','>','v.integer'),('minItems','<','len(v.array)'),('maxItems','>','len(v.array)'),('minProperties','<','len(v.object)'),('maxProperties','>','len(v.object)')]:
+   if a in s:lines+=[f'if {expr}{op}{s[a]} {{return false}}']
+  if 'pattern' in s:
+   pattern=s['pattern']
+   if pattern not in patterns:patterns.append(pattern)
+   lines+=[f'if !p02Pattern({patterns.index(pattern)},v.text) {{return false}}']
+  if 'not' in s:
+   if 'const' in s['not']:
+    lines+=[f'if v.text=={q(s["not"]["const"])} {{return false}}']
+   else:
+    assert s['not']=={'pattern':'^0+(?![\\s\\S])'}
+    lines+=["nonzero:=false;for i:=0;i<len(v.text);i++ {if v.text[i]!='0' {nonzero=true}};if !nonzero {return false}"]
+  if typ=='object':
+   props=s.get('properties',{});required=s.get('required',[])
+   if s.get('additionalProperties') is False and len(required)==len(props):lines+=[f'if len(v.object)!={len(props)} {{return false}}']
+   for field in required:lines+=[f'if p02Get(v,{q(field)}).kind==0 {{return false}}']
+   lines+=['for _,field:=range v.object {']
+   if 'propertyNames' in s:lines+=[f'if !{gen(s["propertyNames"])}(p02String(field.key)) {{return false}}']
+   if props:
+    lines+=['switch field.key {']
+    for k,v in props.items():lines+=[f'case {q(k)}: if !{gen(v)}(field.value) {{return false}}']
+    if s.get('additionalProperties') is False:lines+=['default:return false']
+    elif isinstance(s.get('additionalProperties'),dict):lines+=[f'default:if !{gen(s["additionalProperties"])}(field.value) {{return false}}']
+    else:raise AssertionError(s)
+    lines+=['}']
+   elif isinstance(s.get('additionalProperties'),dict):lines+=[f'if !{gen(s["additionalProperties"])}(field.value) {{return false}}']
+   else:assert False,s
+   lines+=['}']
+  if typ=='array':
+   lines+=['for i,child:=range v.array {','_ = i']
+   if s.get('prefixItems'):
+    lines+=['switch i {']
+    for i,x in enumerate(s['prefixItems']):lines+=[f'case {i}:if !{gen(x)}(child) {{return false}}']
+    assert s.get('items') is False;lines+=['default:return false','}']
+   elif isinstance(s.get('items'),dict):lines+=[f'if !{gen(s["items"])}(child) {{return false}}']
+   else:raise AssertionError(s)
+   lines+=['}']
+   if s.get('uniqueItems'):lines+=['for i:=range v.array {for j:=0;j<i;j++ {if p02Same(v.array[i],v.array[j]) {return false}}}']
+  lines+=['return true']
+ functions.append('func '+name+'(v p02Value) bool {\n'+'\n'.join(lines)+'\n}\n');return name
+roots=[gen(x) for x in (env,pay,scope)]
+patfunc=['func p02Pattern(id int,s string) bool {switch id {']
+for i,p in enumerate(patterns):
+ if p.startswith('^[0-9a-f]{'):
+  n=int(p.split('{')[1].split('}')[0]);expr=f'p02Hex(s,{n},false)'
+ elif p.startswith('^(?:[0-9a-f]{2})+'):expr='p02Hex(s,0,false)'
+ elif p.startswith('^[ -~]+'):expr='len(s)>0&&p02ASCII(s)'
+ elif p.startswith('^[A-Za-z0-9_-]'):expr='validSelector(s)'
+ elif p.startswith('^[1-9][0-9]'):
+  patfunc+=[f'case {i}:if len(s)<1||len(s)>16||s[0]<\'1\'||s[0]>\'9\' {{return false}};for j:=1;j<len(s);j++ {{if p02Digit(s[j])<0 {{return false}}}};return true'];continue
+ else:raise AssertionError(p)
+ patfunc+=[f'case {i}:return {expr}']
+patfunc+=['};return false}']
+s='package migrationcontext\n\n// Generated ONLY from the three immutable accepted Rev2 schemas at84ee base.\n// Fixed functions, not a runtime schema loader, regex engine or callback dispatch.\n'+'\n'.join(patfunc)+'\n'+'\n'.join(functions)+f'\nfunc p02EnvelopeSchema(v p02Value) bool {{return {roots[0]}(v)}}\nfunc p02PayloadSchema(v p02Value) bool {{return {roots[1]}(v)}}\nfunc p02AuthoritySchema(v p02Value) bool {{return {roots[2]}(v)}}\n'
+(D/'p02_schema_internal.go').write_text(s,encoding='utf-8',newline='\n')
+body=env['properties']['body'];run=body['properties']['ciRuns']['items'];job=run['properties']['jobs']['items']
+schemas={'Envelope':env,'Body':body,'Signer':env['properties']['signer'],'Facts':body['properties']['facts'],'Run':run,'Job':job,'Step':job['properties']['steps']['items'],'Review':body['properties']['reviews']['items'],'Payload':pay,'Verifier':pay['properties']['verifier'],'Pin':next(iter(pay['properties']['contractPins']['properties'].values())),'WireGrant':pay['properties']['grants']['items'],'Member':pay['properties']['members']['prefixItems'][0],'NodeScope':pay['properties']['members']['prefixItems'][0]['properties']['scope'],'SemanticPins':pay['properties']['semanticPins']}
+objects={'body':'Body','signer':'Signer','facts':'Facts','verifier':'Verifier','scope':'NodeScope','semanticPins':'SemanticPins'}
+arrays={'ciRuns':'Run','jobs':'Job','steps':'Step','reviews':'Review','grants':'WireGrant','members':'Member'}
+wire=[]
+for name,sc in schemas.items():
+ props=sc['properties'];decl=['type p02'+name+' struct {'];reads=['func p02Read'+name+'(v p02Value) p02'+name+' {out:=p02'+name+'{}'];writes=['func p02Value'+name+'(v p02'+name+') p02Value {out:=p02Object()']
+ for key,typ in props.items():
+  t=typ.get('type','string');g='p02Get(v,'+q(key)+')';val='v.'+key
+  if key=='contractPins':
+   gotype='map[string]p02Pin';read=f'out.{key}=make({gotype});for _,f:=range {g}.object {{out.{key}[f.key]=p02ReadPin(f.value)}}';write=f'x{key}:=p02Object();for k,x:=range {val} {{x{key}.object=append(x{key}.object,p02Field{{k,p02ValuePin(x)}})}}';node='x'+key
+  elif key=='nodeKinds':
+   gotype='map[string]string';read=f'out.{key}=make({gotype});for _,f:=range {g}.object {{out.{key}[f.key]=f.value.text}}';write=f'x{key}:=p02Object();for k,x:=range {val} {{x{key}.object=append(x{key}.object,p02Field{{k,p02String(x)}})}}';node='x'+key
+  elif t in ('string','integer','boolean'):
+   gotype={'string':'string','integer':'int64','boolean':'bool'}[t];member={'string':'text','integer':'integer','boolean':'boolean'}[t];ctor={'string':'String','integer':'Integer','boolean':'Boolean'}[t]
+   read=f'out.{key}={g}.{member}';write='';node=f'p02{ctor}({val})'
+  elif t=='object':
+   sub=objects[key];gotype='p02'+sub;read=f'out.{key}=p02Read{sub}({g})';write='';node=f'p02Value{sub}({val})'
+  elif t=='array':
+   if key=='ciRunIDs':sub='int64';decode='child.integer';encode='p02Integer(child)'
+   else:sub='p02'+arrays[key];decode='p02Read'+arrays[key]+'(child)';encode='p02Value'+arrays[key]+'(child)'
+   gotype='[]'+sub;read=f'for _,child:=range {g}.array {{out.{key}=append(out.{key},{decode})}}';write=f'x{key}:=p02Array(nil);for _,child:=range {val} {{x{key}.array=append(x{key}.array,{encode})}}';node='x'+key
+  else:raise AssertionError((key,t))
+  decl+=[key+' '+gotype];reads+=[read];writes+=[write,f'out.object=append(out.object,p02Field{{{q(key)},{node}}})']
+ decl+=['}'];reads+=['return out}'];writes+=['return out}'];wire+=decl+reads+writes
+# H3 has no measurement echo field and is a different closed typed record.
+facts=schemas['Facts']['properties'];wire+=['type p02SourceFacts struct {']
+for k,sc in facts.items():
+ if k!='runningMeasurementSHA256':wire+=[k+' '+{'string':'string','integer':'int64','boolean':'bool'}[sc['type']]]
+wire+=['}','func p02SourceMatches(f p02Facts,s p02SourceFacts) bool {return '+'&&'.join('f.'+k+'==s.'+k for k in facts if k!='runningMeasurementSHA256')+'}']
+(D/'p02_wire_internal.go').write_text('package migrationcontext\n\n// Closed typed records; decoding is called only after canonical/schema checks.\n'+'\n'.join(wire)+'\n',encoding='utf-8',newline='\n')
+Path('.work/p02-schema-generation.json').write_text(json.dumps(dict(schemaFunctions=len(functions),patterns=patterns,roots=roots,sourceSchemas=[dict(file=f,SHA256=hashlib.sha256((P/f).read_bytes()).hexdigest()) for f in ('candidate-envelope.schema.json','policy-payload.schema.json','authority-scope.schema.json')]),indent=2)+'\n')
+print('Generated fixed validators',len(functions),'and closed wire types',len(schemas)+1)

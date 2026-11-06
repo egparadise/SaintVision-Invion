@@ -1,0 +1,57 @@
+from pathlib import Path
+import json,importlib.util,sys,re,hashlib
+D=Path('services/node-agent/internal/migrationcontext');V=Path('docs/vault/30_Development/Evidence');P=V/'fleet5-k2-p02-registry-attestation-rev3-20261107-codex';P2=V/'fleet5-k2-p02-registry-attestation-rev2-20261107-codex'
+for name,path in [('p02_rev2_schema',P2/'schema_defs.py'),('p02_rev3_model',P/'candidate_model.py'),('p02_rev3_fixtures',P/'fixture_data.py')]:
+ spec=importlib.util.spec_from_file_location(name,path);m=importlib.util.module_from_spec(spec);sys.modules[name]=m;spec.loader.exec_module(m)
+m=sys.modules['p02_rev3_model'];fx=sys.modules['p02_rev3_fixtures'];e,p,z,a=fx.fixture()
+# Seed construction ONLY; the model/evaluator/test suites are not executed.
+def load(x):return json.loads(x)
+cap=load(a.capsule);src=load(a.source_facts);cov=load(a.coverage);h5=load(a.h5)
+raw_approval=b'SYNTHETIC AUTHENTICATED ROOT APPROVAL ENVELOPE';assert m.sha(raw_approval)==cov['evidenceRawSHA256']
+types=json.loads(Path('.work/p02-private-types.json').read_text());wire=(D/'p02_wire_internal.go').read_text()
+for name,body in re.findall(r'type p02(\w+) struct \{([^}]+)\}',wire):
+ types[name]=[line.strip().split() for line in body.strip().splitlines()]
+def quote(s):return json.dumps(s,ensure_ascii=True)
+def lit(t,v):
+ if t=='string':return quote(v)
+ if t in ('int64','byte'):return str(v)
+ if t=='bool':return 'true' if v else 'false'
+ if t=='[]byte':return '[]byte('+quote(v.decode('ascii'))+')'
+ if t.startswith('[]'):return t+'{'+','.join(lit(t[2:],x) for x in v)+'}'
+ if t.startswith('map[string]'):
+  child=t[len('map[string]'):];return t+'{'+','.join(quote(k)+':'+lit(child,x) for k,x in sorted(v.items()))+'}'
+ if t.startswith('*p02'):return '&'+lit(t[1:],v)
+ assert t.startswith('p02'),t
+ name=t[3:]
+ if name=='StepKey':v=dict(runID=v[0],jobName=v[1],number=v[2],name=v[3])
+ fields=[]
+ for key,typ in types[name]:
+  alias={'sPKISHA256':'SPKISHA256','runID':'runId','jobID':'jobId'}.get(key,key)
+  if key in v:x=v[key]
+  elif alias in v:x=v[alias]
+  else:continue
+  fields.append(key+':'+lit(typ,x))
+ return t+'{'+','.join(fields)+'}'
+cap['expectedEffectiveVerdict']=dict(present=True,kind=ord('s'),literal=cap['expectedEffectiveVerdict'],integer=0,boolean=False)
+cov=dict(purpose=cov['purpose'],authorityId=cov['authorityId'],rawEvidence=raw_approval,statement=cov['statement']);h5['rawEvidence']=a.h5
+before=dict(revision='SYNTHETIC_READBACK_VERSION_1',capsuleSHA256=m.sha(a.capsule),generation=cap['generation'],selector=cap['selector'],scopeSHA256=cap['scopeSHA256'],recordIdentity=load(a.lifecycle)['currentRecordIdentity'],ticketID=load(a.ticket)['id'],measurementSHA256=m.sha(a.h5),recordVersion=e['body']['recordVersion'])
+b=e['body'];tuple_=dict(format=b['format'],purpose=b['purpose'],domain=m.DOMAIN.decode(),keySPKI=cap['keySPKI'],capsuleSHA256=b['capsuleSHA256'],generation=cap['generation'],selector=cap['selector'],scopeSHA256=cap['scopeSHA256'],requestBindingSHA256=b['requestBindingSHA256'],anchorVersion=b['anchorVersion'],recordVersion=b['recordVersion'],signingInput=m.projection(e),signature=bytes.fromhex(e['signatureHex']))
+# Binary signature is deliberately a fake already-verified-table hypothesis, no key/signature computation.
+def byteslit(b):return '[]byte{'+','.join(str(x) for x in b)+'}'
+origlit=lit
+def lit(t,v):
+ if t=='[]byte':return byteslit(v)
+ return origlit(t,v)
+inputs=dict(capsule=cap,capsuleRaw=a.capsule,source=dict(facts=src),ci=dict(runs=load(a.ci)),reviews=dict(reviews=load(a.reviews)),coverage=cov,lifecycle=load(a.lifecycle),ticket=load(a.ticket),measurement=h5,clock=load(a.clock),signatures=[tuple_],before=before,after=before)
+code='''package migrationcontext
+
+// PRIVATE SYNTHETIC already-authenticated hypotheses ONLY. No cryptographic
+// authentication: fake DER/signature, no key generation, signing or producer.
+// Seeded from immutable accepted Rev3 fixture bytes; old model was NOT evaluated.
+type p02TestInput struct {raw,payload,artifact []byte; in p02Inputs}
+func p02BenignFixture() p02TestInput {return p02TestInput{
+'''
+code+='raw:[]byte('+quote(m.canonical(e).decode())+'),\npayload:[]byte('+quote(m.canonical(p).decode())+'),\nartifact:[]byte('+quote(z.decode())+'),\nin:'+lit('p02Inputs',inputs)+',\n}}\n'
+(D/'p02_fixture_test.go').write_text(code,encoding='utf-8',newline='\n')
+Path('.work/p02-fixture-seed.json').write_text(json.dumps(dict(classification='PUBLIC_SYNTHETIC_HYPOTHESIS_SEED_NOT_GO_OR_CRYPTO_PROOF',source='84ee9b1b43b8921ed1d0ef8bde6f3546013c1095',modelEvaluated=False,testSuitesExecuted=False,inputsSHA256=m.sha(m.canonical(e)),payloadSHA256=m.sha(m.canonical(p)),capsuleRawSHA256=m.sha(a.capsule),producer=None),indent=2)+'\n')
+print('Generated private synthetic Go seed; no model/Go/crypto execution')

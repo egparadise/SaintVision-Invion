@@ -1,0 +1,1 @@
+{"exit":1,"cause":"Inspector default locale read_text(cp949) changed interpretation of unchanged UTF8 middle-dot assembly fixture in original effect gate; actual git diff is exactly2added lines","correction":"Explicit UTF8 reads in own inspector; no guard/source/predicate change or actual Go test","GoTests":"NOT_RUN"}

@@ -93,7 +93,7 @@ and ports, and a future explicit implementation grant. No actual binding, clock
 mechanism, installation, D-COHORT, D-OBSERVATION, prepublication/current authority,
 K2B effect execution, or five-PC acceptance is completed here.
 
-The P02 provenance checks are a **partial necessary consistency subset**. Missing
+The pre-existing public-path P02 provenance checks remain a **partial necessary consistency subset**. Missing
 joins remain explicit HOLD obligations for the future independently provisioned
 and reviewed attestation contract: actual review VERDICT and exact target/scope;
 CI event, correlation, run attempt, required jobs and every required step's
@@ -166,3 +166,67 @@ remain accepted, and PL-R1d/foreign-write class (b) closure remains subject to
 actual independent narrow review. PL-I1 future factory
 must call checkPolicyBindings before K1; PL-I2 operation-set authentication stays
 with the future archive. No new producer, wire, current view or effect grant.
+
+
+## D04 internal consistency candidate (Root msg_ccd8401cb2c5)
+
+The NEW private `p02_*_internal.go` seam implements the bounded P02 Rev3
+consistency contract accepted in review `6fa4c644` of design `84ee9b1b`.
+This candidate code has not yet received independent CODE review. At this WIP
+checkpoint its Go tests are NOT_RUN: the main host had only268004KiB free memory;
+Root's already-authorized isolated CPU execution phase is the next dependency.
+Gofmt parsing is not compilation, type-checking, a passing source gate or tests.
+
+It adds a bounded lexical JSON codec with exact round-trip, fixed generated
+validators from the three immutable Rev2 schemas, closed signed-width private
+records, and a20stage pure evaluator. No json.Unmarshal/NewDecoder, runtime
+schema loader, arbitrary marshaler, interface/function callback, dependency,
+K1 import/callsite or source/schema pin is added. Intermediate codec nodes are
+private; concrete prerequisites contain no `any` truth assertions. The final
+legacy `policyData` scope algebra is populated only from checked closed scopes.
+
+Inputs are exclusively owned for a bounded sizing pass and deep freeze. No
+concurrent-input mutation, hostile same-process isolation or general heap effect
+proof is claimed. The evaluator accepts only already-authenticated PRIVATE
+prerequisite hypotheses. It does not establish who authenticated them. Exact
+verified signature tuple DATA must match the independent key, full domain+NUL+
+canonical body/signer bytes, signature bytes, purpose/format, capsule, generation,
+scope/selector, versions and request binding. No hash-only or role-label substitute
+is accepted and no signature verification/signing/key operation is performed.
+All actual producers/anchors/custody/H1-H7/H3-EA remain NULL/HOLD.
+
+Effective verdict is checked against the private capsule exact expected literal
+at05_REVIEWS; no accepted literal is defaulted. The printable-ASCII capsule codec
+is at01_ANCHOR (actual Rev3 INFO I1), so present control/non-ASCII values refuse
+there. Printable type/empty/128byte bounds and mismatches are checked at05.
+Effective publication differs from every independently bound original/part review
+identity, including unused originals; equality with the SOURCE SHA is not itself
+a refusal (actual INFO I2). Original targets/scopes/verdicts are preserved.
+
+Eight component hashes derive from the exact checked payload/C2/raw component
+bytes. Exact CI run metadata and independently required/optional steps, review
+coverage, archive versus executable, lifecycle/head/floor/ticket/expiry/H5,
+zero-weight H5 echo/request and final readback joins precede projection. Raw
+H3-EA evidence digests are computed over the supplied exact already-authenticated
+bytes; authentication of those bytes and their binding to the typed statement is
+still the missing producer's obligation, not supplied by this evaluator. Source
+tree-to-partition origin and fully subject-keyed H4 status remain producer
+obligations; typed consistency checks are not those authentications.
+
+The result contains ONLY existing private policyData41leaf and separate
+runningData5fields. Approved receipt/runtimeLock/link Provenance comes from H3;
+RunningExecutable plus all five measured fields comes from H5. The H3-approved
+Verifier source/executable remain expected counterparts. Deterministic epoch
+projection uses ONLY the newly allowed exact `time.Unix` and `time.Time.UTC`
+objects; no ambient clock/timer API or time wildcard is granted. Alias-aware
+regressions and all existing effect/source/public-refusal/opacity/K1 baseline
+gates remain required on the final code. The unchanged checkPolicyBindings is
+still a future consumer before K1; this seam performs no X509/Ed25519 check.
+
+No public service method calls this seam. It issues no InstalledPolicy, History,
+policyBinding or historyBinding; all public null/unregistered paths keep refusing.
+No producer, port, loader, acquisition/current view, real clock, installer,
+lock/journal/effect, hardware or five-PC acceptance is added. RD registration
+byte equality is fact-only and HOLD for actual delivery/origin authentication.
+Raw7 remains UNREGISTERED; A01-A40 remain NOT_RUN. New private implementation types
+are reported separately and do not change K1's immutable13types/73field baseline.

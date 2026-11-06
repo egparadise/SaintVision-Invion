@@ -132,6 +132,8 @@ var pureExternalObjects = map[string]bool{
 	"net/url.URL.String":       true,
 	"unicode/utf8.ValidString": true, "strings.ToLower": true, "strings.Trim": true,
 	"time.Time.IsZero": true, "time.Time.Location": true, "time.Time.Before": true, "time.Time.After": true, "time.Time.Sub": true,
+	// D04 grant msg_ccd8401cb2c5: deterministic epoch projection only.
+	"time.Unix": true, "time.Time.UTC": true,
 	k1Import + ".CanonicalJSON": true, k1Import + ".NewVerifier": true, k1Import + ".Verifier.Verify": true,
 }
 

@@ -1,0 +1,51 @@
+{
+  "classification": "ROOT_OPERATED_ISOLATED_CPU_PROPOSAL_NOT_EXECUTED",
+  "base": "84ee9b1b43b8921ed1d0ef8bde6f3546013c1095",
+  "cwd": "services/node-agent",
+  "environment": {
+    "GOTOOLCHAIN": "local",
+    "GOWORK": "off",
+    "GOPROXY": "off",
+    "GOSUMDB": "off",
+    "GOMAXPROCS": "1",
+    "GOCACHE": "ROOT_NEW_OWNED_ISOLATED_CACHE"
+  },
+  "requiredGitObject": "eb32b211ab3704935b9431747089ab0715582a74 and real Git metadata required by unchanged census",
+  "phase1": [
+    "go",
+    "test",
+    "-p=1",
+    "-count=1",
+    "-json",
+    "-run",
+    "^TestP02Internal",
+    "./internal/migrationcontext"
+  ],
+  "phase2": [
+    "go",
+    "test",
+    "-p=1",
+    "-count=1",
+    "-json",
+    "-run",
+    "^(TestNullPortsAndOpaqueBoundary|TestWellFormedUnregisteredProvidersNeverAuthenticate|TestCopyRejectsCallbacksAndBoundsBeforeEncoding|TestResolvedObjectEffectBoundary|TestRepositoryBoundaryAndZeroEffects|TestWholePackageFullUnderlyingCensus|TestReviewR1CompileValidEffectAndAliasMutants|TestPLR1AActualBuildsThenBoundaryRefuses|TestPLR1BCompiledWriteTargetsAndReasons|TestPLR1CCompiledPointerConversionsAndControls|TestPLR1DCompiledTargetPointerTermsAndControls)$",
+    "./internal/migrationcontext"
+  ],
+  "stopOnNonzero": true,
+  "record": [
+    "actual toolchain/image/source and before/after file hashes",
+    "stdout/stderr/exit/peak memory/time; no false Go pass",
+    "each complete input beforeSHA256/afterSHA256/cause/prefix",
+    "executed rows AND distinct complete inputs; repeated controls not summed",
+    "isolated mutants separately; compile/parser failure never semantic kill"
+  ],
+  "resources": "Root fixed image2CPU/2GiB/new owned share/cache; no prior job reuse",
+  "notGranted": [
+    "fullCore",
+    "Node/browser",
+    "keys/issuer/DB/Engine/live effects",
+    "remote commands by worker",
+    "productCI until Root concrete phase"
+  ],
+  "actualExecution": null
+}

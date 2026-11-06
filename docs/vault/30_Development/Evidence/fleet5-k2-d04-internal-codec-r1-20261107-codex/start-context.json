@@ -1,0 +1,36 @@
+{
+  "task": "task_a95ef3d8ccce",
+  "dispatch": "ctx_ed23b4a777d0",
+  "card": "FLEET5-K2-D04-INTERNAL-CODEC-R1-20261107",
+  "grant": "msg_ccd8401cb2c5",
+  "owner": "Codex",
+  "reviewer": "Actual future Claude code delta through Root pending",
+  "base": "84ee9b1b43b8921ed1d0ef8bde6f3546013c1095",
+  "branch": "agent/codex/fleet5-k2-d04-internal-codec-r1-20261107",
+  "worktree": "wt2:local:6426b8d4-55ce-44d5-a784-3a4cfa0ecab2",
+  "Index": "1.0.476",
+  "Codex": "1.0.437",
+  "skills": {
+    "agentDelivery": "1.1.0",
+    "coreReliability": "1.0.0",
+    "orca": "1.4.248"
+  },
+  "scope": "NEW p02_*_internal.go / p02_*_test.go, precise README, optionally two actually needed time pure objects, unique History/Evidence; no production positive factory or acquisition",
+  "acceptedDesignReview": "6fa4c644a769b768d9212e5fa4a9083e5bf2947a",
+  "acceptedReviewDocs": 42276591734,
+  "actualAuthentication": "NULL_HOLD",
+  "rawSeven": "UNREGISTERED",
+  "A01A40": "NOT_RUN",
+  "wholeFleet": "INCOMPLETE",
+  "preflight": {
+    "totalVisibleKiB": 16538864,
+    "freePhysicalKiB": 268004,
+    "localCompile": "NOT_RUN_RESOURCE_UNAVAILABLE; Root isolated PC3 CPU handoff after code/static"
+  },
+  "sourceInspectorAuthoringFailure": {
+    "exit": 1,
+    "cause": "Counter.update(dict) treated schema dict values as counts; changed only inspector to update(keys)",
+    "gateOrTest": false
+  },
+  "KST": "2026-11-07T04:19:32.127237+09:00"
+}

@@ -1,0 +1,687 @@
+{
+  "classification": "EXACT_ROOT_EXECUTION_ORIGINALS_NOT_OWNER_RERUN",
+  "rootGrant": "msg_3cf791b73706",
+  "rootOriginalIndexSHA256": "57bc720ae2ebf1ac07b5cf6c83c10c0d157f368e9dce6c176015080371738f3e",
+  "indexedOriginals": 71,
+  "additionalRootSummaryAndIndexOriginals": 4,
+  "totalCopies": 75,
+  "exactBytes": true,
+  "rawPaths": "Original allowed-share absolute job paths retained in immutable raw originals; only derived public displays sanitized",
+  "files": [
+    {
+      "sourceRelative": "d04-pc3-actual-go-originals/frozen-manifest.json",
+      "copiedAs": "root-execution-originals/00-frozen-manifest.json.raw",
+      "bytes": 5040,
+      "SHA256": "12c47c1b0eb88fd3781d808a865dc433e28685a2f11fa33207ec12055e370fb2",
+      "originalIndexAttribution": true,
+      "executedBy": "Root Codex isolated CPU",
+      "reexecutedByOwner": false
+    },
+    {
+      "sourceRelative": "d04-pc3-actual-go-originals/frozen-run-receipt.json",
+      "copiedAs": "root-execution-originals/01-frozen-run-receipt.json.raw",
+      "bytes": 37662,
+      "SHA256": "41b1b7018fae75a8f2e165c92fc12ada7da8c9c46a3732e3cd921e4afc808f8b",
+      "originalIndexAttribution": true,
+      "executedBy": "Root Codex isolated CPU",
+      "reexecutedByOwner": false
+    },
+    {
+      "sourceRelative": "d04-pc3-actual-go-originals/frozen-run-started.json",
+      "copiedAs": "root-execution-originals/02-frozen-run-started.json.raw",
+      "bytes": 270,
+      "SHA256": "3f143e6d5e9f13c6920c115d6b7eb75756e0f270398da86cc447e64e4d5b1cfb",
+      "originalIndexAttribution": true,
+      "executedBy": "Root Codex isolated CPU",
+      "reexecutedByOwner": false
+    },
+    {
+      "sourceRelative": "d04-pc3-actual-go-originals/go-image-inspect.log",
+      "copiedAs": "root-execution-originals/03-go-image-inspect.log.raw",
+      "bytes": 2080,
+      "SHA256": "1f7bf497401a5074368dd219d2f317030dacf397c0828846a976e75d57e62956",
+      "originalIndexAttribution": true,
+      "executedBy": "Root Codex isolated CPU",
+      "reexecutedByOwner": false
+    },
+    {
+      "sourceRelative": "d04-pc3-actual-go-originals/go-image-pull.log",
+      "copiedAs": "root-execution-originals/04-go-image-pull.log.raw",
+      "bytes": 925,
+      "SHA256": "5f3840be69eacda202439b1297fb657d8c4a6749d930182c44f818641c345bc3",
+      "originalIndexAttribution": true,
+      "executedBy": "Root Codex isolated CPU",
+      "reexecutedByOwner": false
+    },
+    {
+      "sourceRelative": "d04-pc3-actual-go-originals/go-probe-create.log",
+      "copiedAs": "root-execution-originals/05-go-probe-create.log.raw",
+      "bytes": 65,
+      "SHA256": "befe4cbac3cf404276137f6aabc38be4f614754e55c5facc9dbd36db34521f66",
+      "originalIndexAttribution": true,
+      "executedBy": "Root Codex isolated CPU",
+      "reexecutedByOwner": false
+    },
+    {
+      "sourceRelative": "d04-pc3-actual-go-originals/go-probe-final.json",
+      "copiedAs": "root-execution-originals/06-go-probe-final.json.raw",
+      "bytes": 7114,
+      "SHA256": "83a5b9635fde825072b003a1f30431cd186e3beda0306878ab95ed834ec7a1d2",
+      "originalIndexAttribution": true,
+      "executedBy": "Root Codex isolated CPU",
+      "reexecutedByOwner": false
+    },
+    {
+      "sourceRelative": "d04-pc3-actual-go-originals/go-probe-initial.json",
+      "copiedAs": "root-execution-originals/07-go-probe-initial.json.raw",
+      "bytes": 6553,
+      "SHA256": "43f59acc53a07a4ea6d1327ace7af09a6c895a96aca49b850c115f78e3ba784a",
+      "originalIndexAttribution": true,
+      "executedBy": "Root Codex isolated CPU",
+      "reexecutedByOwner": false
+    },
+    {
+      "sourceRelative": "d04-pc3-actual-go-originals/go-probe-inspect.log",
+      "copiedAs": "root-execution-originals/08-go-probe-inspect.log.raw",
+      "bytes": 9214,
+      "SHA256": "2aadcf4f02d1617fa2085ace35742ea6c5ebe400f7410c738d2d6e1dfb48409a",
+      "originalIndexAttribution": true,
+      "executedBy": "Root Codex isolated CPU",
+      "reexecutedByOwner": false
+    },
+    {
+      "sourceRelative": "d04-pc3-actual-go-originals/go-probe-remove.log",
+      "copiedAs": "root-execution-originals/09-go-probe-remove.log.raw",
+      "bytes": 65,
+      "SHA256": "befe4cbac3cf404276137f6aabc38be4f614754e55c5facc9dbd36db34521f66",
+      "originalIndexAttribution": true,
+      "executedBy": "Root Codex isolated CPU",
+      "reexecutedByOwner": false
+    },
+    {
+      "sourceRelative": "d04-pc3-actual-go-originals/go-version-probe.log",
+      "copiedAs": "root-execution-originals/10-go-version-probe.log.raw",
+      "bytes": 32,
+      "SHA256": "f554cfdb85411c2bb1d503df3f53dfbad1f753eb8271938833166a5d26a7547c",
+      "originalIndexAttribution": true,
+      "executedBy": "Root Codex isolated CPU",
+      "reexecutedByOwner": false
+    },
+    {
+      "sourceRelative": "d04-pc3-actual-go-originals/job.json",
+      "copiedAs": "root-execution-originals/11-job.json.raw",
+      "bytes": 776,
+      "SHA256": "1f989a08c82266f2a0f277c6dad801d1c54891d5842632aa3886518b8e50848a",
+      "originalIndexAttribution": true,
+      "executedBy": "Root Codex isolated CPU",
+      "reexecutedByOwner": false
+    },
+    {
+      "sourceRelative": "d04-pc3-actual-go-originals/phase1-container-final.json",
+      "copiedAs": "root-execution-originals/12-phase1-container-final.json.raw",
+      "bytes": 7425,
+      "SHA256": "67b371a67b875667d68e151f7e00e9422ce41bd39c615489e0f93dca922a43cd",
+      "originalIndexAttribution": true,
+      "executedBy": "Root Codex isolated CPU",
+      "reexecutedByOwner": false
+    },
+    {
+      "sourceRelative": "d04-pc3-actual-go-originals/phase1-container-initial.json",
+      "copiedAs": "root-execution-originals/13-phase1-container-initial.json.raw",
+      "bytes": 6865,
+      "SHA256": "9d79a8ce0912ee0dcc98b428896e2404024313120c67e690ddec7ca0f811d720",
+      "originalIndexAttribution": true,
+      "executedBy": "Root Codex isolated CPU",
+      "reexecutedByOwner": false
+    },
+    {
+      "sourceRelative": "d04-pc3-actual-go-originals/phase1-container.log",
+      "copiedAs": "root-execution-originals/14-phase1-container.log.raw",
+      "bytes": 0,
+      "SHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "originalIndexAttribution": true,
+      "executedBy": "Root Codex isolated CPU",
+      "reexecutedByOwner": false
+    },
+    {
+      "sourceRelative": "d04-pc3-actual-go-originals/phase1-exit.txt",
+      "copiedAs": "root-execution-originals/15-phase1-exit.txt.raw",
+      "bytes": 2,
+      "SHA256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "originalIndexAttribution": true,
+      "executedBy": "Root Codex isolated CPU",
+      "reexecutedByOwner": false
+    },
+    {
+      "sourceRelative": "d04-pc3-actual-go-originals/phase1-go-test.jsonl",
+      "copiedAs": "root-execution-originals/16-phase1-go-test.jsonl.raw",
+      "bytes": 166957,
+      "SHA256": "4b7eff6bbfd11fffcc50aebe427aad0fa7dadeac42d384e2a9c8180725cd0c79",
+      "originalIndexAttribution": true,
+      "executedBy": "Root Codex isolated CPU",
+      "reexecutedByOwner": false
+    },
+    {
+      "sourceRelative": "d04-pc3-actual-go-originals/phase1-go-test.stderr",
+      "copiedAs": "root-execution-originals/17-phase1-go-test.stderr.raw",
+      "bytes": 0,
+      "SHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "originalIndexAttribution": true,
+      "executedBy": "Root Codex isolated CPU",
+      "reexecutedByOwner": false
+    },
+    {
+      "sourceRelative": "d04-pc3-actual-go-originals/phase1-memory-peak.bytes",
+      "copiedAs": "root-execution-originals/18-phase1-memory-peak.bytes.raw",
+      "bytes": 10,
+      "SHA256": "d778e3932268c4d582926e20aea9dde5e96d11250248be9d45e730f71bbc3263",
+      "originalIndexAttribution": true,
+      "executedBy": "Root Codex isolated CPU",
+      "reexecutedByOwner": false
+    },
+    {
+      "sourceRelative": "d04-pc3-actual-go-originals/phase1-receipt.json",
+      "copiedAs": "root-execution-originals/19-phase1-receipt.json.raw",
+      "bytes": 15443,
+      "SHA256": "0f8e176fd231ade1cce6d1b2149e964abb29574995e8c978c0e4417c7920045d",
+      "originalIndexAttribution": true,
+      "executedBy": "Root Codex isolated CPU",
+      "reexecutedByOwner": false
+    },
+    {
+      "sourceRelative": "d04-pc3-actual-go-originals/phase1-source-after.json",
+      "copiedAs": "root-execution-originals/20-phase1-source-after.json.raw",
+      "bytes": 67749,
+      "SHA256": "b8c4345544a5e23f1cf5088923656f66b1683ca8a5a040714dad47f9ef171015",
+      "originalIndexAttribution": true,
+      "executedBy": "Root Codex isolated CPU",
+      "reexecutedByOwner": false
+    },
+    {
+      "sourceRelative": "d04-pc3-actual-go-originals/phase1.sh",
+      "copiedAs": "root-execution-originals/21-phase1.sh.raw",
+      "bytes": 280,
+      "SHA256": "606bf192767281d3f7c8d22ee39e8081e18f3af64c854396a34317957f60eac5",
+      "originalIndexAttribution": true,
+      "executedBy": "Root Codex isolated CPU",
+      "reexecutedByOwner": false
+    },
+    {
+      "sourceRelative": "d04-pc3-actual-go-originals/phase2-container-final.json",
+      "copiedAs": "root-execution-originals/22-phase2-container-final.json.raw",
+      "bytes": 7426,
+      "SHA256": "658c82ca5f54a60b94264462c8051cdc98402c0bafa983d52981c0a10688b36b",
+      "originalIndexAttribution": true,
+      "executedBy": "Root Codex isolated CPU",
+      "reexecutedByOwner": false
+    },
+    {
+      "sourceRelative": "d04-pc3-actual-go-originals/phase2-container-initial.json",
+      "copiedAs": "root-execution-originals/23-phase2-container-initial.json.raw",
+      "bytes": 6865,
+      "SHA256": "7057833678b4c36355b0bdcdc7c59b2907fe99bc3ffc3a8e6a70b636ae567bea",
+      "originalIndexAttribution": true,
+      "executedBy": "Root Codex isolated CPU",
+      "reexecutedByOwner": false
+    },
+    {
+      "sourceRelative": "d04-pc3-actual-go-originals/phase2-container.log",
+      "copiedAs": "root-execution-originals/24-phase2-container.log.raw",
+      "bytes": 0,
+      "SHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "originalIndexAttribution": true,
+      "executedBy": "Root Codex isolated CPU",
+      "reexecutedByOwner": false
+    },
+    {
+      "sourceRelative": "d04-pc3-actual-go-originals/phase2-exit.txt",
+      "copiedAs": "root-execution-originals/25-phase2-exit.txt.raw",
+      "bytes": 2,
+      "SHA256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "originalIndexAttribution": true,
+      "executedBy": "Root Codex isolated CPU",
+      "reexecutedByOwner": false
+    },
+    {
+      "sourceRelative": "d04-pc3-actual-go-originals/phase2-go-test.jsonl",
+      "copiedAs": "root-execution-originals/26-phase2-go-test.jsonl.raw",
+      "bytes": 263076,
+      "SHA256": "d330df75841fb7267add3de0d4a29a60e41c679a6808f7a40e9e5816734a02e5",
+      "originalIndexAttribution": true,
+      "executedBy": "Root Codex isolated CPU",
+      "reexecutedByOwner": false
+    },
+    {
+      "sourceRelative": "d04-pc3-actual-go-originals/phase2-go-test.stderr",
+      "copiedAs": "root-execution-originals/27-phase2-go-test.stderr.raw",
+      "bytes": 0,
+      "SHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "originalIndexAttribution": true,
+      "executedBy": "Root Codex isolated CPU",
+      "reexecutedByOwner": false
+    },
+    {
+      "sourceRelative": "d04-pc3-actual-go-originals/phase2-memory-peak.bytes",
+      "copiedAs": "root-execution-originals/28-phase2-memory-peak.bytes.raw",
+      "bytes": 10,
+      "SHA256": "6b761dfe244dfd33f1c58b8e253f9f089548b01c4c5cf3b61715a6032739afcf",
+      "originalIndexAttribution": true,
+      "executedBy": "Root Codex isolated CPU",
+      "reexecutedByOwner": false
+    },
+    {
+      "sourceRelative": "d04-pc3-actual-go-originals/phase2-receipt.json",
+      "copiedAs": "root-execution-originals/29-phase2-receipt.json.raw",
+      "bytes": 19942,
+      "SHA256": "0a5f0949e65d9dc1c92b48a40ad5d80f297619ef6ecec7d1a952b1c393b08941",
+      "originalIndexAttribution": true,
+      "executedBy": "Root Codex isolated CPU",
+      "reexecutedByOwner": false
+    },
+    {
+      "sourceRelative": "d04-pc3-actual-go-originals/phase2-source-after.json",
+      "copiedAs": "root-execution-originals/30-phase2-source-after.json.raw",
+      "bytes": 67749,
+      "SHA256": "b8c4345544a5e23f1cf5088923656f66b1683ca8a5a040714dad47f9ef171015",
+      "originalIndexAttribution": true,
+      "executedBy": "Root Codex isolated CPU",
+      "reexecutedByOwner": false
+    },
+    {
+      "sourceRelative": "d04-pc3-actual-go-originals/phase2.sh",
+      "copiedAs": "root-execution-originals/31-phase2.sh.raw",
+      "bytes": 727,
+      "SHA256": "2e07f6dae9eef7299741002cf8a0aa7899eb7499db07d2046da774c947c50a6e",
+      "originalIndexAttribution": true,
+      "executedBy": "Root Codex isolated CPU",
+      "reexecutedByOwner": false
+    },
+    {
+      "sourceRelative": "d04-pc3-actual-go-originals/prepare-receipt.json",
+      "copiedAs": "root-execution-originals/32-prepare-receipt.json.raw",
+      "bytes": 3742,
+      "SHA256": "4c121d3579bbb4413e9b2eda466844a99de63c21044a4625491562ae50127325",
+      "originalIndexAttribution": true,
+      "executedBy": "Root Codex isolated CPU",
+      "reexecutedByOwner": false
+    },
+    {
+      "sourceRelative": "d04-pc3-actual-go-originals/prepare-started.json",
+      "copiedAs": "root-execution-originals/33-prepare-started.json.raw",
+      "bytes": 124,
+      "SHA256": "d1b1082bbdb91cc30511c4a32634a58461d16062435f1efbd221060a1fc8dff7",
+      "originalIndexAttribution": true,
+      "executedBy": "Root Codex isolated CPU",
+      "reexecutedByOwner": false
+    },
+    {
+      "sourceRelative": "d04-pc3-actual-go-originals/source-base-files.json",
+      "copiedAs": "root-execution-originals/34-source-base-files.json.raw",
+      "bytes": 65435,
+      "SHA256": "baf9dac4605a1c165421c0e756f265aff39cf95b53824a384e02cc2a6f627756",
+      "originalIndexAttribution": true,
+      "executedBy": "Root Codex isolated CPU",
+      "reexecutedByOwner": false
+    },
+    {
+      "sourceRelative": "d04-pc3-actual-go-originals/source-frozen-before.json",
+      "copiedAs": "root-execution-originals/35-source-frozen-before.json.raw",
+      "bytes": 67749,
+      "SHA256": "b8c4345544a5e23f1cf5088923656f66b1683ca8a5a040714dad47f9ef171015",
+      "originalIndexAttribution": true,
+      "executedBy": "Root Codex isolated CPU",
+      "reexecutedByOwner": false
+    },
+    {
+      "sourceRelative": "d04-pc3-actual-go-originals/source-setup-checkout-base.log",
+      "copiedAs": "root-execution-originals/36-source-setup-checkout-base.log.raw",
+      "bytes": 91,
+      "SHA256": "e8335245084d67ac9966b1de49a080dd72fe12d3eb4d26abebe605d3002f889c",
+      "originalIndexAttribution": true,
+      "executedBy": "Root Codex isolated CPU",
+      "reexecutedByOwner": false
+    },
+    {
+      "sourceRelative": "d04-pc3-actual-go-originals/source-setup-clean.log",
+      "copiedAs": "root-execution-originals/37-source-setup-clean.log.raw",
+      "bytes": 0,
+      "SHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "originalIndexAttribution": true,
+      "executedBy": "Root Codex isolated CPU",
+      "reexecutedByOwner": false
+    },
+    {
+      "sourceRelative": "d04-pc3-actual-go-originals/source-setup-commands.tsv",
+      "copiedAs": "root-execution-originals/38-source-setup-commands.tsv.raw",
+      "bytes": 2367,
+      "SHA256": "d9337805a41d9ad09d4159e5b989541f7ca0f1731bda98247c72adad41f23c71",
+      "originalIndexAttribution": true,
+      "executedBy": "Root Codex isolated CPU",
+      "reexecutedByOwner": false
+    },
+    {
+      "sourceRelative": "d04-pc3-actual-go-originals/source-setup-container-final.json",
+      "copiedAs": "root-execution-originals/39-source-setup-container-final.json.raw",
+      "bytes": 7354,
+      "SHA256": "2a68f56487f9199d42e66228cf93ae52f99ca9df19d74025b0ba198b8b530f9b",
+      "originalIndexAttribution": true,
+      "executedBy": "Root Codex isolated CPU",
+      "reexecutedByOwner": false
+    },
+    {
+      "sourceRelative": "d04-pc3-actual-go-originals/source-setup-container-initial.json",
+      "copiedAs": "root-execution-originals/40-source-setup-container-initial.json.raw",
+      "bytes": 6793,
+      "SHA256": "647fd097d08ed88ebbdc6f511c31a1c21547a6f970e4df65baef7277755662c2",
+      "originalIndexAttribution": true,
+      "executedBy": "Root Codex isolated CPU",
+      "reexecutedByOwner": false
+    },
+    {
+      "sourceRelative": "d04-pc3-actual-go-originals/source-setup-create.log",
+      "copiedAs": "root-execution-originals/41-source-setup-create.log.raw",
+      "bytes": 65,
+      "SHA256": "4b6491c52eeaedeaec9c382c8739fb61dd01872e745ffe51478a72f835f654df",
+      "originalIndexAttribution": true,
+      "executedBy": "Root Codex isolated CPU",
+      "reexecutedByOwner": false
+    },
+    {
+      "sourceRelative": "d04-pc3-actual-go-originals/source-setup-exits.tsv",
+      "copiedAs": "root-execution-originals/42-source-setup-exits.tsv.raw",
+      "bytes": 337,
+      "SHA256": "2cbc7c3db601f7d43a9620a939636d4959ae954b9822c313f52b5c5fbf450d9b",
+      "originalIndexAttribution": true,
+      "executedBy": "Root Codex isolated CPU",
+      "reexecutedByOwner": false
+    },
+    {
+      "sourceRelative": "d04-pc3-actual-go-originals/source-setup-fetch-base.log",
+      "copiedAs": "root-execution-originals/43-source-setup-fetch-base.log.raw",
+      "bytes": 130,
+      "SHA256": "69eb4ba881358fcb5728b38e6986a4ce5e5748a8924a4ec0b32fa02176193976",
+      "originalIndexAttribution": true,
+      "executedBy": "Root Codex isolated CPU",
+      "reexecutedByOwner": false
+    },
+    {
+      "sourceRelative": "d04-pc3-actual-go-originals/source-setup-fetch-k1.log",
+      "copiedAs": "root-execution-originals/44-source-setup-fetch-k1.log.raw",
+      "bytes": 130,
+      "SHA256": "ebde9045a488c8f241af20dd0c5f62c90fd74d4e25cffeca8cfe916531503d9b",
+      "originalIndexAttribution": true,
+      "executedBy": "Root Codex isolated CPU",
+      "reexecutedByOwner": false
+    },
+    {
+      "sourceRelative": "d04-pc3-actual-go-originals/source-setup-go-list-files.log",
+      "copiedAs": "root-execution-originals/45-source-setup-go-list-files.log.raw",
+      "bytes": 4858,
+      "SHA256": "de66f1d77319bcc8ad19456819174aceee754a9fe600f4ec74db9f3869ec3f7d",
+      "originalIndexAttribution": true,
+      "executedBy": "Root Codex isolated CPU",
+      "reexecutedByOwner": false
+    },
+    {
+      "sourceRelative": "d04-pc3-actual-go-originals/source-setup-head.log",
+      "copiedAs": "root-execution-originals/46-source-setup-head.log.raw",
+      "bytes": 41,
+      "SHA256": "9fe1bd544a324fca638e9f6f2f4076ea82f1d4d04778fd284e3f6fac359a57c3",
+      "originalIndexAttribution": true,
+      "executedBy": "Root Codex isolated CPU",
+      "reexecutedByOwner": false
+    },
+    {
+      "sourceRelative": "d04-pc3-actual-go-originals/source-setup-init.log",
+      "copiedAs": "root-execution-originals/47-source-setup-init.log.raw",
+      "bytes": 0,
+      "SHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "originalIndexAttribution": true,
+      "executedBy": "Root Codex isolated CPU",
+      "reexecutedByOwner": false
+    },
+    {
+      "sourceRelative": "d04-pc3-actual-go-originals/source-setup-k1-contracts.go.log",
+      "copiedAs": "root-execution-originals/48-source-setup-k1-contracts.go.log.raw",
+      "bytes": 4980,
+      "SHA256": "017102092eebf5cdde81616d07b64e4501781c2f4fa956d5895592198bb06967",
+      "originalIndexAttribution": true,
+      "executedBy": "Root Codex isolated CPU",
+      "reexecutedByOwner": false
+    },
+    {
+      "sourceRelative": "d04-pc3-actual-go-originals/source-setup-k1-current.go.log",
+      "copiedAs": "root-execution-originals/49-source-setup-k1-current.go.log.raw",
+      "bytes": 5324,
+      "SHA256": "b8061a064d4578305cea31af3638ea35af2de0228abc9862107262aa44da385b",
+      "originalIndexAttribution": true,
+      "executedBy": "Root Codex isolated CPU",
+      "reexecutedByOwner": false
+    },
+    {
+      "sourceRelative": "d04-pc3-actual-go-originals/source-setup-k1-ed25519.go.log",
+      "copiedAs": "root-execution-originals/50-source-setup-k1-ed25519.go.log.raw",
+      "bytes": 4118,
+      "SHA256": "d557da3806cb65f6c4a73120ea1430751a9354336787cffb5777f62c148f1fc5",
+      "originalIndexAttribution": true,
+      "executedBy": "Root Codex isolated CPU",
+      "reexecutedByOwner": false
+    },
+    {
+      "sourceRelative": "d04-pc3-actual-go-originals/source-setup-k1-graph.go.log",
+      "copiedAs": "root-execution-originals/51-source-setup-k1-graph.go.log.raw",
+      "bytes": 9880,
+      "SHA256": "81fbd517f0ba5bb4062a2a14cd2972f9ddae89c2d4e4f979cc7d1d2058da238c",
+      "originalIndexAttribution": true,
+      "executedBy": "Root Codex isolated CPU",
+      "reexecutedByOwner": false
+    },
+    {
+      "sourceRelative": "d04-pc3-actual-go-originals/source-setup-k1-json.go.log",
+      "copiedAs": "root-execution-originals/52-source-setup-k1-json.go.log.raw",
+      "bytes": 5504,
+      "SHA256": "c7b4428a71d051848e1c9df302f2f6fbed3f16c0685e9264e37343ed21c683e6",
+      "originalIndexAttribution": true,
+      "executedBy": "Root Codex isolated CPU",
+      "reexecutedByOwner": false
+    },
+    {
+      "sourceRelative": "d04-pc3-actual-go-originals/source-setup-k1-list.log",
+      "copiedAs": "root-execution-originals/53-source-setup-k1-list.log.raw",
+      "bytes": 9205,
+      "SHA256": "e349c32a5420a9a2a3727c247d39c731ef538245bc0e98fe582a53045d9e6bda",
+      "originalIndexAttribution": true,
+      "executedBy": "Root Codex isolated CPU",
+      "reexecutedByOwner": false
+    },
+    {
+      "sourceRelative": "d04-pc3-actual-go-originals/source-setup-k1-native.go.log",
+      "copiedAs": "root-execution-originals/54-source-setup-k1-native.go.log.raw",
+      "bytes": 5331,
+      "SHA256": "8f08b4ed8f7c4108374e3197cee678841885cc1ed86214c10a2d97a7b9f4e2b0",
+      "originalIndexAttribution": true,
+      "executedBy": "Root Codex isolated CPU",
+      "reexecutedByOwner": false
+    },
+    {
+      "sourceRelative": "d04-pc3-actual-go-originals/source-setup-k1-proofs.go.log",
+      "copiedAs": "root-execution-originals/55-source-setup-k1-proofs.go.log.raw",
+      "bytes": 10397,
+      "SHA256": "b6c6efcb7052a1b7091e0a4c460296d83ba890d57f5ceb3436b98738b6a4e4dd",
+      "originalIndexAttribution": true,
+      "executedBy": "Root Codex isolated CPU",
+      "reexecutedByOwner": false
+    },
+    {
+      "sourceRelative": "d04-pc3-actual-go-originals/source-setup-k1-recipes.go.log",
+      "copiedAs": "root-execution-originals/56-source-setup-k1-recipes.go.log.raw",
+      "bytes": 10359,
+      "SHA256": "37338bfdb939a107aa4748c1cc62e6eb810d0e5335e75173a1f82878719d8df8",
+      "originalIndexAttribution": true,
+      "executedBy": "Root Codex isolated CPU",
+      "reexecutedByOwner": false
+    },
+    {
+      "sourceRelative": "d04-pc3-actual-go-originals/source-setup-k1-schemas.go.log",
+      "copiedAs": "root-execution-originals/57-source-setup-k1-schemas.go.log.raw",
+      "bytes": 5064,
+      "SHA256": "37228c2401e4ea1730446347547a246e5de258d033b2e2714334d4c19958a9ec",
+      "originalIndexAttribution": true,
+      "executedBy": "Root Codex isolated CPU",
+      "reexecutedByOwner": false
+    },
+    {
+      "sourceRelative": "d04-pc3-actual-go-originals/source-setup-k1-temporal.go.log",
+      "copiedAs": "root-execution-originals/58-source-setup-k1-temporal.go.log.raw",
+      "bytes": 4076,
+      "SHA256": "759519f626e8454e79219f6368d4befe2b3e734dca1ac80bf1585d60bcbc3eb7",
+      "originalIndexAttribution": true,
+      "executedBy": "Root Codex isolated CPU",
+      "reexecutedByOwner": false
+    },
+    {
+      "sourceRelative": "d04-pc3-actual-go-originals/source-setup-k1-trust.go.log",
+      "copiedAs": "root-execution-originals/59-source-setup-k1-trust.go.log.raw",
+      "bytes": 10336,
+      "SHA256": "d0e72b6f4d1ab08fe2bece5465c932b084983068a3049d73b69dd28922d07dd7",
+      "originalIndexAttribution": true,
+      "executedBy": "Root Codex isolated CPU",
+      "reexecutedByOwner": false
+    },
+    {
+      "sourceRelative": "d04-pc3-actual-go-originals/source-setup-k1-verify.go.log",
+      "copiedAs": "root-execution-originals/60-source-setup-k1-verify.go.log.raw",
+      "bytes": 14338,
+      "SHA256": "3834b97335c7af45b1c6ac2ab9eebbca196149e84faaf44dfbbb227a3f113743",
+      "originalIndexAttribution": true,
+      "executedBy": "Root Codex isolated CPU",
+      "reexecutedByOwner": false
+    },
+    {
+      "sourceRelative": "d04-pc3-actual-go-originals/source-setup-memory-peak.bytes",
+      "copiedAs": "root-execution-originals/61-source-setup-memory-peak.bytes.raw",
+      "bytes": 9,
+      "SHA256": "3164d03feaa76ed58d2d70c6008d559f25fad4fa943a665fea3995082326c0a6",
+      "originalIndexAttribution": true,
+      "executedBy": "Root Codex isolated CPU",
+      "reexecutedByOwner": false
+    },
+    {
+      "sourceRelative": "d04-pc3-actual-go-originals/source-setup-mod-download.log",
+      "copiedAs": "root-execution-originals/62-source-setup-mod-download.log.raw",
+      "bytes": 0,
+      "SHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "originalIndexAttribution": true,
+      "executedBy": "Root Codex isolated CPU",
+      "reexecutedByOwner": false
+    },
+    {
+      "sourceRelative": "d04-pc3-actual-go-originals/source-setup-mod-verify.log",
+      "copiedAs": "root-execution-originals/63-source-setup-mod-verify.log.raw",
+      "bytes": 21,
+      "SHA256": "b4537ed75f533f993f371954de47e42a793b8e5b0587577de7e27fb3e50696bd",
+      "originalIndexAttribution": true,
+      "executedBy": "Root Codex isolated CPU",
+      "reexecutedByOwner": false
+    },
+    {
+      "sourceRelative": "d04-pc3-actual-go-originals/source-setup-receipt.json",
+      "copiedAs": "root-execution-originals/64-source-setup-receipt.json.raw",
+      "bytes": 2640,
+      "SHA256": "5cc2c90ad638c41a0efe5f3fe96cadd35b8abf5000af62653f2c4aa100de88e6",
+      "originalIndexAttribution": true,
+      "executedBy": "Root Codex isolated CPU",
+      "reexecutedByOwner": false
+    },
+    {
+      "sourceRelative": "d04-pc3-actual-go-originals/source-setup-remote.log",
+      "copiedAs": "root-execution-originals/65-source-setup-remote.log.raw",
+      "bytes": 0,
+      "SHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "originalIndexAttribution": true,
+      "executedBy": "Root Codex isolated CPU",
+      "reexecutedByOwner": false
+    },
+    {
+      "sourceRelative": "d04-pc3-actual-go-originals/source-setup-sparse-init.log",
+      "copiedAs": "root-execution-originals/66-source-setup-sparse-init.log.raw",
+      "bytes": 0,
+      "SHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "originalIndexAttribution": true,
+      "executedBy": "Root Codex isolated CPU",
+      "reexecutedByOwner": false
+    },
+    {
+      "sourceRelative": "d04-pc3-actual-go-originals/source-setup-sparse-set.log",
+      "copiedAs": "root-execution-originals/67-source-setup-sparse-set.log.raw",
+      "bytes": 0,
+      "SHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "originalIndexAttribution": true,
+      "executedBy": "Root Codex isolated CPU",
+      "reexecutedByOwner": false
+    },
+    {
+      "sourceRelative": "d04-pc3-actual-go-originals/source-setup-started.json",
+      "copiedAs": "root-execution-originals/68-source-setup-started.json.raw",
+      "bytes": 200,
+      "SHA256": "6e93d14d4e53846ebadd60d21990f97fa0c6597525e6524333d8873f3c859059",
+      "originalIndexAttribution": true,
+      "executedBy": "Root Codex isolated CPU",
+      "reexecutedByOwner": false
+    },
+    {
+      "sourceRelative": "d04-pc3-actual-go-originals/source-setup.log",
+      "copiedAs": "root-execution-originals/69-source-setup.log.raw",
+      "bytes": 609,
+      "SHA256": "c0b40d53bc85dcc5b97b6191aaf67e7c821dd2a375c0904aed606705d5f41ac0",
+      "originalIndexAttribution": true,
+      "executedBy": "Root Codex isolated CPU",
+      "reexecutedByOwner": false
+    },
+    {
+      "sourceRelative": "d04-pc3-actual-go-originals/source-setup.sh",
+      "copiedAs": "root-execution-originals/70-source-setup.sh.raw",
+      "bytes": 2016,
+      "SHA256": "c1762df26b22650ed34de91297c06b3c380cf6bf171e991d88284f53aabfed50",
+      "originalIndexAttribution": true,
+      "executedBy": "Root Codex isolated CPU",
+      "reexecutedByOwner": false
+    },
+    {
+      "sourceRelative": "d04-pc3-actual-go-summary.json",
+      "copiedAs": "root-execution-originals/d04-pc3-actual-go-summary.json.raw",
+      "bytes": 2319,
+      "SHA256": "b4af61353d09d38073220150fbeeed0a27847e000a4a446c2c7c6a284e5e9383",
+      "originalIndexAttribution": false,
+      "executedBy": "Root Codex isolated CPU",
+      "reexecutedByOwner": false
+    },
+    {
+      "sourceRelative": "d04-pc3-actual-causal-case-rows.json",
+      "copiedAs": "root-execution-originals/d04-pc3-actual-causal-case-rows.json.raw",
+      "bytes": 36288,
+      "SHA256": "c739085fbceb79c44d9b814e85af35b979833f5b684d4c8c1e259429df3e4eef",
+      "originalIndexAttribution": false,
+      "executedBy": "Root Codex isolated CPU",
+      "reexecutedByOwner": false
+    },
+    {
+      "sourceRelative": "d04-pc3-actual-go-original-index.json",
+      "copiedAs": "root-execution-originals/d04-pc3-actual-go-original-index.json.raw",
+      "bytes": 10850,
+      "SHA256": "57bc720ae2ebf1ac07b5cf6c83c10c0d157f368e9dce6c176015080371738f3e",
+      "originalIndexAttribution": false,
+      "executedBy": "Root Codex isolated CPU",
+      "reexecutedByOwner": false
+    },
+    {
+      "sourceRelative": "d04-pc3-frozen-run-root-proof.json",
+      "copiedAs": "root-execution-originals/d04-pc3-frozen-run-root-proof.json.raw",
+      "bytes": 38061,
+      "SHA256": "be3312b8409a4a7fce23662b6517a726a7f91456b9f380ffc536e2923381583d",
+      "originalIndexAttribution": false,
+      "executedBy": "Root Codex isolated CPU",
+      "reexecutedByOwner": false
+    }
+  ]
+}

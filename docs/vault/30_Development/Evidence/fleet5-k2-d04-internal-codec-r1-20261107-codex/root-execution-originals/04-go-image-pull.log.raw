@@ -1,0 +1,27 @@
+1.27.1-bookworm: Pulling from library/golang
+8cb71386cfcf: Pulling fs layer
+4f4fb700ef54: Pulling fs layer
+ef1dbfdbb5d5: Pulling fs layer
+e965c67be351: Pulling fs layer
+a4edf9c328e8: Pulling fs layer
+d2adcb2707c5: Pulling fs layer
+c6c71fff0869: Pulling fs layer
+4f4fb700ef54: Download complete
+c6c71fff0869: Download complete
+a4edf9c328e8: Download complete
+8cb71386cfcf: Download complete
+d2adcb2707c5: Download complete
+ef1dbfdbb5d5: Download complete
+8cb71386cfcf: Pull complete
+a4edf9c328e8: Pull complete
+db5c65e434d8: Download complete
+c6c71fff0869: Pull complete
+3551fb8b8fa8: Download complete
+e965c67be351: Download complete
+e965c67be351: Pull complete
+4f4fb700ef54: Pull complete
+d2adcb2707c5: Pull complete
+ef1dbfdbb5d5: Pull complete
+Digest: sha256:8d48e12ec56735e9358640898b9d9b9fcca110612ed8a5567438c0a1baa24e66
+Status: Downloaded newer image for golang:1.27.1-bookworm
+docker.io/library/golang:1.27.1-bookworm

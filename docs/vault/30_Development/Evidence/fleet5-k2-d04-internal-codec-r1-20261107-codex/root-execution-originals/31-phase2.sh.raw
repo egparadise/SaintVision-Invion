@@ -1,0 +1,7 @@
+#!/bin/bash
+set +e
+go test -p=1 -count=1 -json -run '^(TestNullPortsAndOpaqueBoundary|TestWellFormedUnregisteredProvidersNeverAuthenticate|TestCopyRejectsCallbacksAndBoundsBeforeEncoding|TestResolvedObjectEffectBoundary|TestRepositoryBoundaryAndZeroEffects|TestWholePackageFullUnderlyingCensus|TestReviewR1CompileValidEffectAndAliasMutants|TestPLR1AActualBuildsThenBoundaryRefuses|TestPLR1BCompiledWriteTargetsAndReasons|TestPLR1CCompiledPointerConversionsAndControls|TestPLR1DCompiledTargetPointerTermsAndControls)$' ./internal/migrationcontext > /job/phase2-go-test.jsonl 2> /job/phase2-go-test.stderr
+rc=$?
+cat /sys/fs/cgroup/memory.peak > /job/phase2-memory-peak.bytes
+printf "%s\n" "$rc" > /job/phase2-exit.txt
+exit "$rc"

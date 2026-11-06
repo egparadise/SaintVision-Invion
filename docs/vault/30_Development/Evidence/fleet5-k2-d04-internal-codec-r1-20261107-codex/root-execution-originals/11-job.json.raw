@@ -1,0 +1,22 @@
+{
+  "nonce": "bae75bd85e4c",
+  "base": "84ee9b1b43b8921ed1d0ef8bde6f3546013c1095",
+  "remoteJob": "/home/saintvision-invion3/saintvision-share/.work/root-d04-go-bae75bd85e4c",
+  "requestedImage": "golang:1.27.1-bookworm",
+  "expectedGoVersion": "go1.27.1",
+  "imageChoiceSource": "Exact base84ee .github/workflows/core.yml setup-go1.27.1; node module go1.23 minimum",
+  "preparedAtKST": "2026-11-07T04:48:16+09:00",
+  "preflight": {
+    "uid": 1000,
+    "dockerVersion": "29.9.3",
+    "dockerAPI": "1.56",
+    "memoryAvailableBytes": 11479072768,
+    "diskFreeBytes": 212623785984,
+    "existingRunningContainerIDs": [],
+    "readOnly": true
+  },
+  "physicalPC": 3,
+  "GoCodeTestsExecuted": false,
+  "nodeEnrollmentOrOfferProof": false,
+  "hostPackageOrDaemonChange": false
+}

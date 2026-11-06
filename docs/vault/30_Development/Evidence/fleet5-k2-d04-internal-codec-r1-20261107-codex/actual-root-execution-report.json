@@ -1,0 +1,178 @@
+{
+  "classification": "ACTUAL_ROOT_OPERATED_GO_TESTS_AND_AFFECTED_GATES_NOT_CODE_REVIEW_OR_FLEET_ACCEPTANCE",
+  "authorTask": "task_a95ef3d8ccce",
+  "dispatch": "ctx_ed23b4a777d0",
+  "publicationGrant": "msg_3cf791b73706",
+  "operator": "Root Codex",
+  "ownerReceiptProcessing": "Codex read/copied/hashed only; no SSH/Docker/test rerun",
+  "base": "84ee9b1b43b8921ed1d0ef8bde6f3546013c1095",
+  "testedCodeAndTestContentSHA256": "bc0b5e0b464f2c58315be6445289ae41b0cc7c3a4fe5181a77371482505243c9",
+  "testedPacketSHA256": "31902e3558fff96f34ca548829c762afeec59b5402413ac0be2090b69c9d8551",
+  "testedSourceManifestSHA256": "12c47c1b0eb88fd3781d808a865dc433e28685a2f11fa33207ec12055e370fb2",
+  "codeCommitAtExecution": null,
+  "sourceOverlay14Exact": true,
+  "all368BeforeAfterSourceHashesEqual": true,
+  "all14CurrentSourceTestBytesEqual": true,
+  "phases": [
+    {
+      "phase": "phase1",
+      "startedKST": "2026-11-07T05:03:48+09:00",
+      "endedKST": "2026-11-07T05:04:17+09:00",
+      "elapsedSeconds": 29.215,
+      "command": [
+        "go",
+        "test",
+        "-p=1",
+        "-count=1",
+        "-json",
+        "-run",
+        "^TestP02Internal",
+        "./internal/migrationcontext"
+      ],
+      "environment": {
+        "HOME": "/job/home",
+        "GOTOOLCHAIN": "local",
+        "GOWORK": "off",
+        "GOMAXPROCS": "1",
+        "GOMEMLIMIT": "1GiB",
+        "GOPATH": "/job/gopath",
+        "GOMODCACHE": "/job/cache/gomod",
+        "GOCACHE": "/job/cache/gobuild",
+        "GOTMPDIR": "/job/tmp",
+        "GOPROXY": "off",
+        "GOSUMDB": "off",
+        "GOFLAGS": "-p=1 -mod=readonly",
+        "GIT_TERMINAL_PROMPT": "0",
+        "GIT_CONFIG_NOSYSTEM": "1"
+      },
+      "image": "golang@sha256:8d48e12ec56735e9358640898b9d9b9fcca110612ed8a5567438c0a1baa24e66",
+      "exit": 0,
+      "OOMKilled": false,
+      "cgroupMemoryPeakBytes": 420581376,
+      "network": "none",
+      "containerMemoryBytes": 2147483648,
+      "containerMemoryPlusSwapTotalBytes": 2147483648,
+      "containerNanoCPUs": 2000000000,
+      "nonRootUser": "1000:1000",
+      "readOnlyRootFS": true,
+      "sourceBeforeAfterEqual": true,
+      "sourceFileCount": 368,
+      "logs": {
+        "phase1-go-test.jsonl": {
+          "bytes": 166957,
+          "SHA256": "4b7eff6bbfd11fffcc50aebe427aad0fa7dadeac42d384e2a9c8180725cd0c79"
+        },
+        "phase1-go-test.stderr": {
+          "bytes": 0,
+          "SHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "phase1-container.log": {
+          "bytes": 0,
+          "SHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      }
+    },
+    {
+      "phase": "phase2",
+      "startedKST": "2026-11-07T05:04:17+09:00",
+      "endedKST": "2026-11-07T05:06:16+09:00",
+      "elapsedSeconds": 119.407,
+      "command": [
+        "go",
+        "test",
+        "-p=1",
+        "-count=1",
+        "-json",
+        "-run",
+        "^(TestNullPortsAndOpaqueBoundary|TestWellFormedUnregisteredProvidersNeverAuthenticate|TestCopyRejectsCallbacksAndBoundsBeforeEncoding|TestResolvedObjectEffectBoundary|TestRepositoryBoundaryAndZeroEffects|TestWholePackageFullUnderlyingCensus|TestReviewR1CompileValidEffectAndAliasMutants|TestPLR1AActualBuildsThenBoundaryRefuses|TestPLR1BCompiledWriteTargetsAndReasons|TestPLR1CCompiledPointerConversionsAndControls|TestPLR1DCompiledTargetPointerTermsAndControls)$",
+        "./internal/migrationcontext"
+      ],
+      "environment": {
+        "HOME": "/job/home",
+        "GOTOOLCHAIN": "local",
+        "GOWORK": "off",
+        "GOMAXPROCS": "1",
+        "GOMEMLIMIT": "1GiB",
+        "GOPATH": "/job/gopath",
+        "GOMODCACHE": "/job/cache/gomod",
+        "GOCACHE": "/job/cache/gobuild",
+        "GOTMPDIR": "/job/tmp",
+        "GOPROXY": "off",
+        "GOSUMDB": "off",
+        "GOFLAGS": "-p=1 -mod=readonly",
+        "GIT_TERMINAL_PROMPT": "0",
+        "GIT_CONFIG_NOSYSTEM": "1"
+      },
+      "image": "golang@sha256:8d48e12ec56735e9358640898b9d9b9fcca110612ed8a5567438c0a1baa24e66",
+      "exit": 0,
+      "OOMKilled": false,
+      "cgroupMemoryPeakBytes": 667811840,
+      "network": "none",
+      "containerMemoryBytes": 2147483648,
+      "containerMemoryPlusSwapTotalBytes": 2147483648,
+      "containerNanoCPUs": 2000000000,
+      "nonRootUser": "1000:1000",
+      "readOnlyRootFS": true,
+      "sourceBeforeAfterEqual": true,
+      "sourceFileCount": 368,
+      "logs": {
+        "phase2-go-test.jsonl": {
+          "bytes": 263076,
+          "SHA256": "d330df75841fb7267add3de0d4a29a60e41c679a6808f7a40e9e5816734a02e5"
+        },
+        "phase2-go-test.stderr": {
+          "bytes": 0,
+          "SHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "phase2-container.log": {
+          "bytes": 0,
+          "SHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      }
+    }
+  ],
+  "counts": [
+    {
+      "phase": "phase1",
+      "topLevel": 12,
+      "subtests": 99,
+      "fail": 0,
+      "skip": 0
+    },
+    {
+      "phase": "phase2",
+      "topLevel": 11,
+      "subtests": 129,
+      "fail": 0,
+      "skip": 0
+    }
+  ],
+  "topLevel23": 23,
+  "subtests228": 228,
+  "caseLogRows": 90,
+  "distinctCompleteInputHashes": 88,
+  "allCaseBeforeAfterEqual": true,
+  "isolatedProjectionRows": 8,
+  "rawOriginals": 71,
+  "originalIndexSHA256": "57bc720ae2ebf1ac07b5cf6c83c10c0d157f368e9dce6c176015080371738f3e",
+  "sourceSetup": {
+    "publicGitAndDepsOnly": true,
+    "bridgeNetworkDuringSourceSetupOnly": true,
+    "modDownloadVerifyExit": 0,
+    "testsNetworkNone": true,
+    "real84eeAndEb32Objects": true
+  },
+  "K1Census": "ACTUAL_PASS_13TYPES_73FIELDS_0EMBEDDED",
+  "newPrivateProductionDeclarations": 44,
+  "independentCODEReview": "NOT_RUN",
+  "hostedProductCI": "NOT_RUN_ROOT_NEXT_CONDITIONAL_CUT",
+  "actualProducer": null,
+  "actualH1H7": "NULL_HOLD",
+  "H3_EA": "ABSENT_UNREGISTERED_HOLD",
+  "RD_registration": "HOLD_FACT_ONLY_NOT_ORIGIN_AUTHENTICATION",
+  "rawSeven": "UNREGISTERED",
+  "A01A40": "NOT_RUN",
+  "wholeK2Fleet": "INCOMPLETE",
+  "rawAttribution": "root-execution-original-index.json",
+  "KST": "2026-11-07T05:13:01.882065+09:00"
+}

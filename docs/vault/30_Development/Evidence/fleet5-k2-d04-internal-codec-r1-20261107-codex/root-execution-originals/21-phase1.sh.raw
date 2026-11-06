@@ -1,0 +1,7 @@
+#!/bin/bash
+set +e
+go test -p=1 -count=1 -json -run '^TestP02Internal' ./internal/migrationcontext > /job/phase1-go-test.jsonl 2> /job/phase1-go-test.stderr
+rc=$?
+cat /sys/fs/cgroup/memory.peak > /job/phase1-memory-peak.bytes
+printf "%s\n" "$rc" > /job/phase1-exit.txt
+exit "$rc"

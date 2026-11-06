@@ -1,0 +1,1343 @@
+{
+  "classification": "REVIEWER_SYMBOLIC_NARROW_DELTA_PROBES_M1_L1_NO_CRYPTO_NO_PROVIDER_NO_RUNTIME",
+  "target": "84ee9b1b43b8921ed1d0ef8bde6f3546013c1095",
+  "pinnedInputs": {
+    "docs/vault/30_Development/Evidence/fleet5-k2-p02-registry-attestation-rev3-20261107-codex/candidate_model.py": "62ed38d3cd90d6e8105d7e613d25371ff866572647ab03641ba2aedae5430c18",
+    "docs/vault/30_Development/Evidence/fleet5-k2-p02-registry-attestation-rev3-20261107-codex/fixture_data.py": "b3619dcd3e801691d3fe320f9c1f3a4db66475016b07b1be169e852a08cc8134",
+    "docs/vault/30_Development/Evidence/fleet5-k2-p02-registry-attestation-rev3-20261107-codex/test_rev3.py": "6da1c0276943ad6b091214570e9db92580ced0e8389d74c7a32c2ed136064473",
+    "docs/vault/30_Development/Evidence/fleet5-k2-p02-registry-attestation-rev3-20261107-codex/contract.md": "de290b978fe3d7fbea45488e5971492abace60f8b4235a513466c0cb738fbf99",
+    "docs/vault/30_Development/Evidence/fleet5-k2-p02-registry-attestation-rev3-20261107-codex/payload-contract.json": "7d3d7ed48989afb559a4ff4404669543d0f046937e998787581bb17ba1df25e4",
+    "docs/vault/30_Development/Evidence/fleet5-k2-p02-registry-attestation-rev2-20261107-codex/candidate_model.py": "e816e1f53803904d717df1fe247d75198e8ee6c2f94cf531cba238b48d868d9e",
+    "docs/vault/30_Development/Evidence/fleet5-k2-p02-registry-attestation-rev2-20261107-codex/schema_defs.py": "114000ff9ef276525ca303e91621fd5ef5efd8f30e59e39dd01d6000daeec6c4",
+    "docs/vault/30_Development/Evidence/fleet5-k2-p02-registry-attestation-rev2-20261107-codex/candidate-envelope.schema.json": "60d6c825d26e3c72f4c367e92200e0bc14c83642764c0dc27ec4d7c74a43d74c",
+    "docs/vault/30_Development/Evidence/fleet5-k2-p02-registry-attestation-rev2-20261107-codex/policy-payload.schema.json": "02d0b30fdd79b0263cdbafc42bd2bc0531c3e0ecbd8d55cbe72e6c91dfc320a1",
+    "docs/vault/30_Development/Evidence/fleet5-k2-p02-registry-attestation-rev2-20261107-codex/authority-scope.schema.json": "ccae13986377c1a670323983c0c24c1d2e05cc8cdeb6b9119d4560c65c15bf21",
+    "services/node-agent/internal/migrationcontext/policy.go": "ce6f1b9b1a1835276b248c3dbdb8fa42b68fa79fb5684748ea78694d104bbdd2"
+  },
+  "probes": 43,
+  "findingsWhereObservedDiffers": [],
+  "rows": [
+    {
+      "id": "W01",
+      "area": "M1-control",
+      "contractExpects": "SYNTHETIC_ALREADY_BOUND",
+      "expectedDetail": null,
+      "observed": "SYNTHETIC_ALREADY_BOUND",
+      "detail": "",
+      "alreadyBoundPreconditions": {
+        "envelopeSchemaValid": true,
+        "payloadSchemaValid": true,
+        "retainedFormat": true,
+        "exactCanonicalEnvelope": true,
+        "payloadDigestBound": true,
+        "capsuleDigestBound": true,
+        "signatureTupleBound": true
+      },
+      "preconditionsOK": true,
+      "earlierStagesExactPrefix": true,
+      "inputSHA256": "1c3ab9cfc3e553023fe7b46455a3f91f5fe043bb35049f71d0343efb1fea20b2",
+      "finding": false,
+      "note": "benign C01-equivalent on reviewer copy: all 20 STAGES pass; production projection still refuses"
+    },
+    {
+      "id": "W02",
+      "area": "M1-origin-static",
+      "contractExpects": [
+        [
+          "cap['expectedEffectiveVerdict']"
+        ],
+        true,
+        false,
+        false,
+        true
+      ],
+      "expectedDetail": null,
+      "observed": [
+        [
+          "cap['expectedEffectiveVerdict']"
+        ],
+        true,
+        false,
+        false,
+        true
+      ],
+      "detail": null,
+      "alreadyBoundPreconditions": null,
+      "preconditionsOK": null,
+      "earlierStagesExactPrefix": null,
+      "inputSHA256": null,
+      "finding": false,
+      "note": "AST: _reviews assigns expected ONLY from capsule; fixture EXPECTED_EFFECTIVE_VERDICT is a literal Constant (not EFFECTIVE[...]); seal() never names/rebinds expectedEffectiveVerdict; benign capsule carries that literal"
+    },
+    {
+      "id": "W03",
+      "area": "M1-V19-equivalent",
+      "contractExpects": [
+        "PROVENANCE",
+        "05_REVIEWS"
+      ],
+      "expectedDetail": "independently-approved-effective-verdict",
+      "observed": [
+        "PROVENANCE",
+        "05_REVIEWS"
+      ],
+      "detail": "independently-approved-effective-verdict",
+      "alreadyBoundPreconditions": {
+        "envelopeSchemaValid": true,
+        "payloadSchemaValid": true,
+        "retainedFormat": true,
+        "exactCanonicalEnvelope": true,
+        "payloadDigestBound": true,
+        "capsuleDigestBound": true,
+        "signatureTupleBound": true
+      },
+      "preconditionsOK": true,
+      "earlierStagesExactPrefix": true,
+      "inputSHA256": "a717d9ccada82c9838480fd3132e841a7a233b056c70670cbb09b2456093f52b",
+      "finding": false,
+      "note": "V19 rebased: authenticated H3-EA statement publishes a NON-approval; facts/H3 source/coverage digests/current head/ticket/request/signature rebound consistently; capsule expectation untouched"
+    },
+    {
+      "id": "W04",
+      "area": "M1-V20-equivalent",
+      "contractExpects": [
+        "PROVENANCE",
+        "05_REVIEWS"
+      ],
+      "expectedDetail": "effective-publication-distinct-from-every-original-and-part",
+      "observed": [
+        "PROVENANCE",
+        "05_REVIEWS"
+      ],
+      "detail": "effective-publication-distinct-from-every-original-and-part",
+      "alreadyBoundPreconditions": {
+        "envelopeSchemaValid": true,
+        "payloadSchemaValid": true,
+        "retainedFormat": true,
+        "exactCanonicalEnvelope": true,
+        "payloadDigestBound": true,
+        "capsuleDigestBound": true,
+        "signatureTupleBound": true
+      },
+      "preconditionsOK": true,
+      "earlierStagesExactPrefix": true,
+      "inputSHA256": "b1fb4ee0484d733e571038685052ab61d94bdc5db102a1381d1abae82f32e7bb",
+      "finding": false,
+      "note": "V20 rebased: effective publication relabelled as ORIGINAL DIRECT review 2; payload.verifier.reviewSHA, facts and H3 source rebound; original rows/targets/verdicts/parts unchanged"
+    },
+    {
+      "id": "W05",
+      "area": "M1-V20-equivalent",
+      "contractExpects": [
+        "PROVENANCE",
+        "05_REVIEWS"
+      ],
+      "expectedDetail": "effective-publication-distinct-from-every-original-and-part",
+      "observed": [
+        "PROVENANCE",
+        "05_REVIEWS"
+      ],
+      "detail": "effective-publication-distinct-from-every-original-and-part",
+      "alreadyBoundPreconditions": {
+        "envelopeSchemaValid": true,
+        "payloadSchemaValid": true,
+        "retainedFormat": true,
+        "exactCanonicalEnvelope": true,
+        "payloadDigestBound": true,
+        "capsuleDigestBound": true,
+        "signatureTupleBound": true
+      },
+      "preconditionsOK": true,
+      "earlierStagesExactPrefix": true,
+      "inputSHA256": "ab258ed20ac508505d6b740ccb32b349735c84517411e187ea5aaae6da4bb89a",
+      "finding": false,
+      "note": "V20b rebased: effective publication relabelled as ORIGINAL INHERITED review 1 (target a1.. != current b1..); payload.verifier.reviewSHA, facts and H3 source rebound; original rows/targets/verdicts/parts unchanged"
+    },
+    {
+      "id": "W06",
+      "area": "M1-exact-join-control",
+      "contractExpects": "SYNTHETIC_ALREADY_BOUND",
+      "expectedDetail": null,
+      "observed": "SYNTHETIC_ALREADY_BOUND",
+      "detail": "",
+      "alreadyBoundPreconditions": {
+        "envelopeSchemaValid": true,
+        "payloadSchemaValid": true,
+        "retainedFormat": true,
+        "exactCanonicalEnvelope": true,
+        "payloadDigestBound": true,
+        "capsuleDigestBound": true,
+        "signatureTupleBound": true
+      },
+      "preconditionsOK": true,
+      "earlierStagesExactPrefix": true,
+      "inputSHA256": "493e1b24355c77d1f7330fec1faa174d72bf8a359fa54dda98dda5bd5b19afab",
+      "finding": false,
+      "note": "CONTROL: independent capsule expectation and H3-EA verdict both = another literal -> accepted; acceptance follows the independently provisioned value, no name/suffix heuristic"
+    },
+    {
+      "id": "W07",
+      "area": "M1-not-learned",
+      "contractExpects": [
+        "PROVENANCE",
+        "05_REVIEWS"
+      ],
+      "expectedDetail": "independently-approved-effective-verdict",
+      "observed": [
+        "PROVENANCE",
+        "05_REVIEWS"
+      ],
+      "detail": "independently-approved-effective-verdict",
+      "alreadyBoundPreconditions": {
+        "envelopeSchemaValid": true,
+        "payloadSchemaValid": true,
+        "retainedFormat": true,
+        "exactCanonicalEnvelope": true,
+        "payloadDigestBound": true,
+        "capsuleDigestBound": true,
+        "signatureTupleBound": true
+      },
+      "preconditionsOK": true,
+      "earlierStagesExactPrefix": true,
+      "inputSHA256": "7eb2074ef5762ed25b56348a77e8fd07707893ca428a8e478d96995b5f1c34f9",
+      "finding": false,
+      "note": "independent expectation re-provisioned but coverage still says the old (approval-looking) literal -> refuses; value is not learned from coverage"
+    },
+    {
+      "id": "W08",
+      "area": "M1-near-verdict",
+      "contractExpects": [
+        "PROVENANCE",
+        "05_REVIEWS"
+      ],
+      "expectedDetail": "independently-approved-effective-verdict",
+      "observed": [
+        "PROVENANCE",
+        "05_REVIEWS"
+      ],
+      "detail": "independently-approved-effective-verdict",
+      "alreadyBoundPreconditions": {
+        "envelopeSchemaValid": true,
+        "payloadSchemaValid": true,
+        "retainedFormat": true,
+        "exactCanonicalEnvelope": true,
+        "payloadDigestBound": true,
+        "capsuleDigestBound": true,
+        "signatureTupleBound": true
+      },
+      "preconditionsOK": true,
+      "earlierStagesExactPrefix": true,
+      "inputSHA256": "63468e524f62486c1d428e6f99d8ed9db4545d2edbc70841067f37766c640901",
+      "finding": false,
+      "note": "effective verdict trailing space of the independent literal"
+    },
+    {
+      "id": "W09",
+      "area": "M1-near-verdict",
+      "contractExpects": [
+        "PROVENANCE",
+        "05_REVIEWS"
+      ],
+      "expectedDetail": "independently-approved-effective-verdict",
+      "observed": [
+        "PROVENANCE",
+        "05_REVIEWS"
+      ],
+      "detail": "independently-approved-effective-verdict",
+      "alreadyBoundPreconditions": {
+        "envelopeSchemaValid": true,
+        "payloadSchemaValid": true,
+        "retainedFormat": true,
+        "exactCanonicalEnvelope": true,
+        "payloadDigestBound": true,
+        "capsuleDigestBound": true,
+        "signatureTupleBound": true
+      },
+      "preconditionsOK": true,
+      "earlierStagesExactPrefix": true,
+      "inputSHA256": "5b97caf0c2029ac1f9b9e9516ac9c5aefca93f5a0efa02dd2fd54a1a772c103b",
+      "finding": false,
+      "note": "effective verdict case fold of the independent literal"
+    },
+    {
+      "id": "W10",
+      "area": "M1-near-verdict",
+      "contractExpects": [
+        "PROVENANCE",
+        "05_REVIEWS"
+      ],
+      "expectedDetail": "independently-approved-effective-verdict",
+      "observed": [
+        "PROVENANCE",
+        "05_REVIEWS"
+      ],
+      "detail": "independently-approved-effective-verdict",
+      "alreadyBoundPreconditions": {
+        "envelopeSchemaValid": true,
+        "payloadSchemaValid": true,
+        "retainedFormat": true,
+        "exactCanonicalEnvelope": true,
+        "payloadDigestBound": true,
+        "capsuleDigestBound": true,
+        "signatureTupleBound": true
+      },
+      "preconditionsOK": true,
+      "earlierStagesExactPrefix": true,
+      "inputSHA256": "785c7ec07063ebd015bafaa76a0371216125b30e07e3d5c880df7bb4727db7bd",
+      "finding": false,
+      "note": "effective verdict truncated prefix of the independent literal"
+    },
+    {
+      "id": "W11",
+      "area": "M1-near-verdict",
+      "contractExpects": [
+        "PROVENANCE",
+        "05_REVIEWS"
+      ],
+      "expectedDetail": "independently-approved-effective-verdict",
+      "observed": [
+        "PROVENANCE",
+        "05_REVIEWS"
+      ],
+      "detail": "independently-approved-effective-verdict",
+      "alreadyBoundPreconditions": {
+        "envelopeSchemaValid": true,
+        "payloadSchemaValid": true,
+        "retainedFormat": true,
+        "exactCanonicalEnvelope": true,
+        "payloadDigestBound": true,
+        "capsuleDigestBound": true,
+        "signatureTupleBound": true
+      },
+      "preconditionsOK": true,
+      "earlierStagesExactPrefix": true,
+      "inputSHA256": "435662685b4f5bfe36c02a9336cf3c78f88f1e88c7b986a964c6dbc6eeac182d",
+      "finding": false,
+      "note": "effective verdict superstring/suffix of the independent literal"
+    },
+    {
+      "id": "W12",
+      "area": "M1-malformed-expectation",
+      "contractExpects": [
+        "PROVENANCE",
+        "05_REVIEWS"
+      ],
+      "expectedDetail": "closed-independent-effective-verdict-expectation",
+      "observed": [
+        "PROVENANCE",
+        "05_REVIEWS"
+      ],
+      "detail": "closed-independent-effective-verdict-expectation",
+      "alreadyBoundPreconditions": {
+        "envelopeSchemaValid": true,
+        "payloadSchemaValid": true,
+        "retainedFormat": true,
+        "exactCanonicalEnvelope": true,
+        "payloadDigestBound": true,
+        "capsuleDigestBound": true,
+        "signatureTupleBound": true
+      },
+      "preconditionsOK": true,
+      "earlierStagesExactPrefix": true,
+      "inputSHA256": "77de62b6805cf040db33b922cdfdca0e73ee384830ef0e565cf0c7f8da281eea",
+      "finding": false,
+      "note": "capsule expectation empty"
+    },
+    {
+      "id": "W13",
+      "area": "M1-malformed-expectation",
+      "contractExpects": [
+        "PROVENANCE",
+        "05_REVIEWS"
+      ],
+      "expectedDetail": "closed-independent-effective-verdict-expectation",
+      "observed": [
+        "PROVENANCE",
+        "05_REVIEWS"
+      ],
+      "detail": "closed-independent-effective-verdict-expectation",
+      "alreadyBoundPreconditions": {
+        "envelopeSchemaValid": true,
+        "payloadSchemaValid": true,
+        "retainedFormat": true,
+        "exactCanonicalEnvelope": true,
+        "payloadDigestBound": true,
+        "capsuleDigestBound": true,
+        "signatureTupleBound": true
+      },
+      "preconditionsOK": true,
+      "earlierStagesExactPrefix": true,
+      "inputSHA256": "cf485f28352d7fc03ceb4fd4791fbfa81d408bc65e131b5a3a3c58a6ba2d7ff7",
+      "finding": false,
+      "note": "capsule expectation integer"
+    },
+    {
+      "id": "W14",
+      "area": "M1-malformed-expectation",
+      "contractExpects": [
+        "PROVENANCE",
+        "05_REVIEWS"
+      ],
+      "expectedDetail": "closed-independent-effective-verdict-expectation",
+      "observed": [
+        "PROVENANCE",
+        "05_REVIEWS"
+      ],
+      "detail": "closed-independent-effective-verdict-expectation",
+      "alreadyBoundPreconditions": {
+        "envelopeSchemaValid": true,
+        "payloadSchemaValid": true,
+        "retainedFormat": true,
+        "exactCanonicalEnvelope": true,
+        "payloadDigestBound": true,
+        "capsuleDigestBound": true,
+        "signatureTupleBound": true
+      },
+      "preconditionsOK": true,
+      "earlierStagesExactPrefix": true,
+      "inputSHA256": "66effd3ea07bab8f6c7a657dfce2464afa88eb7e71c30b0a16a15c6436201081",
+      "finding": false,
+      "note": "capsule expectation null"
+    },
+    {
+      "id": "W15",
+      "area": "M1-malformed-expectation",
+      "contractExpects": [
+        "PROVENANCE",
+        "05_REVIEWS"
+      ],
+      "expectedDetail": "closed-independent-effective-verdict-expectation",
+      "observed": [
+        "PROVENANCE",
+        "05_REVIEWS"
+      ],
+      "detail": "closed-independent-effective-verdict-expectation",
+      "alreadyBoundPreconditions": {
+        "envelopeSchemaValid": true,
+        "payloadSchemaValid": true,
+        "retainedFormat": true,
+        "exactCanonicalEnvelope": true,
+        "payloadDigestBound": true,
+        "capsuleDigestBound": true,
+        "signatureTupleBound": true
+      },
+      "preconditionsOK": true,
+      "earlierStagesExactPrefix": true,
+      "inputSHA256": "c675899436ef2bcf200b761a11c7f51cecdf79cac109b905f33335fef8388884",
+      "finding": false,
+      "note": "capsule expectation list holding the literal"
+    },
+    {
+      "id": "W16",
+      "area": "M1-malformed-expectation",
+      "contractExpects": [
+        "PROVENANCE",
+        "05_REVIEWS"
+      ],
+      "expectedDetail": "closed-independent-effective-verdict-expectation",
+      "observed": [
+        "PROVENANCE",
+        "05_REVIEWS"
+      ],
+      "detail": "closed-independent-effective-verdict-expectation",
+      "alreadyBoundPreconditions": {
+        "envelopeSchemaValid": true,
+        "payloadSchemaValid": true,
+        "retainedFormat": true,
+        "exactCanonicalEnvelope": true,
+        "payloadDigestBound": true,
+        "capsuleDigestBound": true,
+        "signatureTupleBound": true
+      },
+      "preconditionsOK": true,
+      "earlierStagesExactPrefix": true,
+      "inputSHA256": "1cbe0dde1375a4711218dc022f2c70986479fc41780c23ee2e9179a943d0d8c3",
+      "finding": false,
+      "note": "capsule expectation object"
+    },
+    {
+      "id": "W17",
+      "area": "M1-malformed-expectation",
+      "contractExpects": [
+        "PROVENANCE",
+        "05_REVIEWS"
+      ],
+      "expectedDetail": "closed-independent-effective-verdict-expectation",
+      "observed": [
+        "PROVENANCE",
+        "05_REVIEWS"
+      ],
+      "detail": "closed-independent-effective-verdict-expectation",
+      "alreadyBoundPreconditions": {
+        "envelopeSchemaValid": true,
+        "payloadSchemaValid": true,
+        "retainedFormat": true,
+        "exactCanonicalEnvelope": true,
+        "payloadDigestBound": true,
+        "capsuleDigestBound": true,
+        "signatureTupleBound": true
+      },
+      "preconditionsOK": true,
+      "earlierStagesExactPrefix": true,
+      "inputSHA256": "ab33bfc904c4d9911abb03f1fb050fd41b0395e4791fe71e383953d66040ae2b",
+      "finding": false,
+      "note": "capsule expectation bool"
+    },
+    {
+      "id": "W18",
+      "area": "M1-length-boundary",
+      "contractExpects": "SYNTHETIC_ALREADY_BOUND",
+      "expectedDetail": null,
+      "observed": "SYNTHETIC_ALREADY_BOUND",
+      "detail": "",
+      "alreadyBoundPreconditions": {
+        "envelopeSchemaValid": true,
+        "payloadSchemaValid": true,
+        "retainedFormat": true,
+        "exactCanonicalEnvelope": true,
+        "payloadDigestBound": true,
+        "capsuleDigestBound": true,
+        "signatureTupleBound": true
+      },
+      "preconditionsOK": true,
+      "earlierStagesExactPrefix": true,
+      "inputSHA256": "15a499de477c484e5605de69442ea7a7fa7c17c19e8c2ce03a2480ecea8c251f",
+      "finding": false,
+      "note": "expectation == effective verdict == 128 printable ASCII bytes (envelope allows <=256, so only the 05 predicate decides)"
+    },
+    {
+      "id": "W19",
+      "area": "M1-length-boundary",
+      "contractExpects": [
+        "PROVENANCE",
+        "05_REVIEWS"
+      ],
+      "expectedDetail": "closed-independent-effective-verdict-expectation",
+      "observed": [
+        "PROVENANCE",
+        "05_REVIEWS"
+      ],
+      "detail": "closed-independent-effective-verdict-expectation",
+      "alreadyBoundPreconditions": {
+        "envelopeSchemaValid": true,
+        "payloadSchemaValid": true,
+        "retainedFormat": true,
+        "exactCanonicalEnvelope": true,
+        "payloadDigestBound": true,
+        "capsuleDigestBound": true,
+        "signatureTupleBound": true
+      },
+      "preconditionsOK": true,
+      "earlierStagesExactPrefix": true,
+      "inputSHA256": "c262d72e0b7680817bfbb202cda952eb207c113994a7d907372cb0cb837d34b9",
+      "finding": false,
+      "note": "expectation == effective verdict == 129 printable ASCII bytes (envelope allows <=256, so only the 05 predicate decides)"
+    },
+    {
+      "id": "W20",
+      "area": "M1-nonprintable-expectation",
+      "contractExpects": [
+        "ANCHOR",
+        "01_ANCHOR"
+      ],
+      "expectedDetail": "capsule-unavailable",
+      "observed": [
+        "ANCHOR",
+        "01_ANCHOR"
+      ],
+      "detail": "capsule-unavailable",
+      "alreadyBoundPreconditions": {
+        "envelopeSchemaValid": true,
+        "payloadSchemaValid": true,
+        "retainedFormat": true,
+        "exactCanonicalEnvelope": true,
+        "payloadDigestBound": true,
+        "capsuleDigestBound": true,
+        "signatureTupleBound": true
+      },
+      "preconditionsOK": true,
+      "earlierStagesExactPrefix": true,
+      "inputSHA256": "ddc0e110d77c86be747fcf534f0d8e5332d2c8cad846fd783153655b0243a3ed",
+      "finding": false,
+      "note": "capsule expectation non-ASCII: refused EARLIER by the closed capsule lexical codec (strict_json ascii 32..126), not by the 05 predicate; contract.md text says PROVENANCE 05 for any present malformed value (INFO precision only, fail-closed)"
+    },
+    {
+      "id": "W21",
+      "area": "M1-nonprintable-expectation",
+      "contractExpects": [
+        "ANCHOR",
+        "01_ANCHOR"
+      ],
+      "expectedDetail": "capsule-unavailable",
+      "observed": [
+        "ANCHOR",
+        "01_ANCHOR"
+      ],
+      "detail": "capsule-unavailable",
+      "alreadyBoundPreconditions": {
+        "envelopeSchemaValid": true,
+        "payloadSchemaValid": true,
+        "retainedFormat": true,
+        "exactCanonicalEnvelope": true,
+        "payloadDigestBound": true,
+        "capsuleDigestBound": true,
+        "signatureTupleBound": true
+      },
+      "preconditionsOK": true,
+      "earlierStagesExactPrefix": true,
+      "inputSHA256": "c1fd376f983cc83044a24e2ec8c66752e1d77825597cbdcd06b7cbc296170f32",
+      "finding": false,
+      "note": "capsule expectation control character: refused EARLIER by the closed capsule lexical codec (strict_json ascii 32..126), not by the 05 predicate; contract.md text says PROVENANCE 05 for any present malformed value (INFO precision only, fail-closed)"
+    },
+    {
+      "id": "W22",
+      "area": "M1-missing-expectation",
+      "contractExpects": [
+        "ANCHOR",
+        "01_ANCHOR"
+      ],
+      "expectedDetail": "closed-capsule-descriptor",
+      "observed": [
+        "ANCHOR",
+        "01_ANCHOR"
+      ],
+      "detail": "closed-capsule-descriptor",
+      "alreadyBoundPreconditions": {
+        "envelopeSchemaValid": true,
+        "payloadSchemaValid": true,
+        "retainedFormat": true,
+        "exactCanonicalEnvelope": true,
+        "payloadDigestBound": true,
+        "capsuleDigestBound": true,
+        "signatureTupleBound": true
+      },
+      "preconditionsOK": true,
+      "earlierStagesExactPrefix": true,
+      "inputSHA256": "7b8737deb7e51c4c180ca91fb5aab00bb4ea7e62d25576f81a5088058f72c2dc",
+      "finding": false,
+      "note": "capsule field absent"
+    },
+    {
+      "id": "W23",
+      "area": "M1-unused-original",
+      "contractExpects": [
+        "PROVENANCE",
+        "05_REVIEWS"
+      ],
+      "expectedDetail": "effective-publication-distinct-from-every-original-and-part",
+      "observed": [
+        "PROVENANCE",
+        "05_REVIEWS"
+      ],
+      "detail": "effective-publication-distinct-from-every-original-and-part",
+      "alreadyBoundPreconditions": {
+        "envelopeSchemaValid": true,
+        "payloadSchemaValid": true,
+        "retainedFormat": true,
+        "exactCanonicalEnvelope": true,
+        "payloadDigestBound": true,
+        "capsuleDigestBound": true,
+        "signatureTupleBound": true
+      },
+      "preconditionsOK": true,
+      "earlierStagesExactPrefix": true,
+      "inputSHA256": "2869a9b87d76fcf8c409cd8d591e65c963e0264e9d8a2ad2eb77b0968cc9fdd8",
+      "finding": false,
+      "note": "independently bound original review 3 used by NO part; alias still in the deny set"
+    },
+    {
+      "id": "W24",
+      "area": "M1-unused-original-control",
+      "contractExpects": [
+        "STATUS",
+        "06_STATUS"
+      ],
+      "expectedDetail": "current-review-registration",
+      "observed": [
+        "STATUS",
+        "06_STATUS"
+      ],
+      "detail": "current-review-registration",
+      "alreadyBoundPreconditions": {
+        "envelopeSchemaValid": true,
+        "payloadSchemaValid": true,
+        "retainedFormat": true,
+        "exactCanonicalEnvelope": true,
+        "payloadDigestBound": true,
+        "capsuleDigestBound": true,
+        "signatureTupleBound": true
+      },
+      "preconditionsOK": true,
+      "earlierStagesExactPrefix": true,
+      "inputSHA256": "0ac09422b25ca86aaa7a7f963c5b026ea03f30f72db3351b153b085120fef294",
+      "finding": false,
+      "note": "CAUSAL CONTROL for W23: identical 3-review world, distinct publication e2.. -> passes 05_REVIEWS..05_RUNNING and stops only at 06_STATUS because H4 lifecycle never registered review 3"
+    },
+    {
+      "id": "W25",
+      "area": "M1-deny-set-not-shrinkable",
+      "contractExpects": [
+        "PROVENANCE",
+        "05_REVIEWS"
+      ],
+      "expectedDetail": "independent-review-outcome-set",
+      "observed": [
+        "PROVENANCE",
+        "05_REVIEWS"
+      ],
+      "detail": "independent-review-outcome-set",
+      "alreadyBoundPreconditions": {
+        "envelopeSchemaValid": true,
+        "payloadSchemaValid": true,
+        "retainedFormat": true,
+        "exactCanonicalEnvelope": true,
+        "payloadDigestBound": true,
+        "capsuleDigestBound": true,
+        "signatureTupleBound": true
+      },
+      "preconditionsOK": true,
+      "earlierStagesExactPrefix": true,
+      "inputSHA256": "a64f104ead49bbac8ff267db4d1671d5fabc95ce8a42a097578594e1d8e761af",
+      "finding": false,
+      "note": "original review 1 removed from every response-side and H3 review row; capsule.approvedReviewOutcomes still names it -> refused before the alias check"
+    },
+    {
+      "id": "W26",
+      "area": "M1-part-to-effective",
+      "contractExpects": [
+        "PROVENANCE",
+        "05_REVIEWS"
+      ],
+      "expectedDetail": "preserved-original-review-target",
+      "observed": [
+        "PROVENANCE",
+        "05_REVIEWS"
+      ],
+      "detail": "preserved-original-review-target",
+      "alreadyBoundPreconditions": {
+        "envelopeSchemaValid": true,
+        "payloadSchemaValid": true,
+        "retainedFormat": true,
+        "exactCanonicalEnvelope": true,
+        "payloadDigestBound": true,
+        "capsuleDigestBound": true,
+        "signatureTupleBound": true
+      },
+      "preconditionsOK": true,
+      "earlierStagesExactPrefix": true,
+      "inputSHA256": "06bbfe5ae110873fe09ae72d025df8a683f3bbb0e615fb49e55d6695a6d90649",
+      "finding": false,
+      "note": "coverage part adapter claims the effective publication as its reviewer; refused by the earlier original-review join, so parts[] is always a subset of the original identities"
+    },
+    {
+      "id": "W27",
+      "area": "M1-lexical-alias",
+      "contractExpects": [
+        "PROVENANCE",
+        "05_REVIEWS"
+      ],
+      "expectedDetail": "effective-publicationSHA",
+      "observed": [
+        "PROVENANCE",
+        "05_REVIEWS"
+      ],
+      "detail": "effective-publicationSHA",
+      "alreadyBoundPreconditions": {
+        "envelopeSchemaValid": true,
+        "payloadSchemaValid": true,
+        "retainedFormat": true,
+        "exactCanonicalEnvelope": true,
+        "payloadDigestBound": true,
+        "capsuleDigestBound": true,
+        "signatureTupleBound": true
+      },
+      "preconditionsOK": true,
+      "earlierStagesExactPrefix": true,
+      "inputSHA256": "23503949c73205842fffea4650be696f5e3e153278c10bcd03b128466d423a1d",
+      "finding": false,
+      "note": "coverage publicationSHA = UPPERCASE of original review 2; facts/payload keep e2.. (they cannot carry uppercase: closed envelope/payload hex patterns) -> effective join refuses at 05_REVIEWS"
+    },
+    {
+      "id": "W28",
+      "area": "M1-observation-not-required",
+      "contractExpects": "SYNTHETIC_ALREADY_BOUND",
+      "expectedDetail": null,
+      "observed": "SYNTHETIC_ALREADY_BOUND",
+      "detail": "",
+      "alreadyBoundPreconditions": {
+        "envelopeSchemaValid": true,
+        "payloadSchemaValid": true,
+        "retainedFormat": true,
+        "exactCanonicalEnvelope": true,
+        "payloadDigestBound": true,
+        "capsuleDigestBound": true,
+        "signatureTupleBound": true
+      },
+      "preconditionsOK": true,
+      "earlierStagesExactPrefix": true,
+      "inputSHA256": "9d56e5d3e82a7d74dfa04a12cf045418bc02f0ca075dc7e35e01794b76cd8361",
+      "finding": false,
+      "note": "OBSERVATION ONLY: contract requires distinctness from original/part REVIEW identities, not from the source commit; the real H3-EA must authenticate the publication identity itself. Not a finding."
+    },
+    {
+      "id": "X01",
+      "area": "L1-projection-origin",
+      "contractExpects": [
+        {
+          "InstallationReceiptSHA256": "H3",
+          "RuntimeLockSHA256": "H3",
+          "LinkedClosureSHA256": "H3",
+          "RunningExecutableSHA256": "H5",
+          "Verifier.ArtifactSHA256": "H3",
+          "Verifier.SourceSHA": "H3"
+        },
+        {
+          "ExecutableSHA256": "H5",
+          "InstallationReceiptSHA256": "H5",
+          "SourceSHA": "H5",
+          "RuntimeLockSHA256": "H5",
+          "LinkedClosureSHA256": "H5"
+        },
+        true
+      ],
+      "expectedDetail": null,
+      "observed": [
+        {
+          "InstallationReceiptSHA256": "H3",
+          "RuntimeLockSHA256": "H3",
+          "LinkedClosureSHA256": "H3",
+          "RunningExecutableSHA256": "H5",
+          "Verifier.ArtifactSHA256": "H3",
+          "Verifier.SourceSHA": "H3"
+        },
+        {
+          "ExecutableSHA256": "H5",
+          "InstallationReceiptSHA256": "H5",
+          "SourceSHA": "H5",
+          "RuntimeLockSHA256": "H5",
+          "LinkedClosureSHA256": "H5"
+        },
+        true
+      ],
+      "detail": null,
+      "alreadyBoundPreconditions": null,
+      "preconditionsOK": null,
+      "earlierStagesExactPrefix": null,
+      "inputSHA256": null,
+      "finding": false,
+      "note": "TAINT attribution: real Rev3 _project on a context that passed stages 01..06 of C01, then H3 and H5 values given distinct tags (isolated, not accepted policy). Rev2 _project on the same context: {\"InstallationReceiptSHA256\": \"H5\", \"RuntimeLockSHA256\": \"H5\", \"LinkedClosureSHA256\": \"H5\", \"RunningExecutableSHA256\": \"H5\"}",
+      "regressedRev2Attribution": {
+        "InstallationReceiptSHA256": "H5",
+        "RuntimeLockSHA256": "H5",
+        "LinkedClosureSHA256": "H5",
+        "RunningExecutableSHA256": "H5"
+      }
+    },
+    {
+      "id": "X02",
+      "area": "L1-K1-two-sided",
+      "contractExpects": [
+        6,
+        true,
+        1,
+        4
+      ],
+      "expectedDetail": null,
+      "observed": [
+        6,
+        true,
+        1,
+        4
+      ],
+      "detail": null,
+      "alreadyBoundPreconditions": null,
+      "preconditionsOK": null,
+      "earlierStagesExactPrefix": null,
+      "inputSHA256": null,
+      "finding": false,
+      "note": "policy.go:275 (blob ce6f1b9b, TEXT only). Rev3: every one of the 5 measured fields has an H3 counterpart; the single same-source pair is pr.RunningExecutableSHA256 vs measured.ExecutableSHA256 (Root-specified H5; its H3 counterpart is v.ArtifactSHA256). Rev2 regressed: 4 same-source pairs (receipt/lock/link + running executable).",
+      "policyGoLine": 275,
+      "comparisons": [
+        "measured.ExecutableSHA256 != v.ArtifactSHA256",
+        "pr.RunningExecutableSHA256 != measured.ExecutableSHA256",
+        "measured.SourceSHA != v.SourceSHA",
+        "measured.InstallationReceiptSHA256 != pr.InstallationReceiptSHA256",
+        "measured.RuntimeLockSHA256 != pr.RuntimeLockSHA256",
+        "measured.LinkedClosureSHA256 != pr.LinkedClosureSHA256"
+      ],
+      "rev3Origins": [
+        "H5<->H3",
+        "H5<->H5",
+        "H5<->H3",
+        "H5<->H3",
+        "H5<->H3",
+        "H5<->H3"
+      ],
+      "rev2RegressedOrigins": [
+        "H5<->H3",
+        "H5<->H5",
+        "H5<->H3",
+        "H5<->H5",
+        "H5<->H5",
+        "H5<->H5"
+      ],
+      "measuredFieldHasH3Counterpart": {
+        "ExecutableSHA256": true,
+        "InstallationReceiptSHA256": true,
+        "LinkedClosureSHA256": true,
+        "RuntimeLockSHA256": true,
+        "SourceSHA": true
+      }
+    },
+    {
+      "id": "X03",
+      "area": "L1-isolated-vacuity",
+      "contractExpects": [
+        8,
+        0,
+        6,
+        true
+      ],
+      "expectedDetail": null,
+      "observed": [
+        8,
+        0,
+        6,
+        true
+      ],
+      "detail": null,
+      "alreadyBoundPreconditions": null,
+      "preconditionsOK": null,
+      "earlierStagesExactPrefix": null,
+      "inputSHA256": null,
+      "finding": false,
+      "note": "each check perturbs ONE side after stages 01..06 passed; Rev3 projection makes the transliterated K1 last comparison fail in all 8; the actual Rev2 _project (H5-to-both-sides) passes it in the 6 receipt/lock/link cases (vacuous) and fails only executable/source, which always had H3 counterparts. Unperturbed both pass.",
+      "isolatedChecks": [
+        {
+          "id": "H3-receipt",
+          "rev3K1Last": false,
+          "rev2RegressedK1Last": true
+        },
+        {
+          "id": "H5-receipt",
+          "rev3K1Last": false,
+          "rev2RegressedK1Last": true
+        },
+        {
+          "id": "H3-lock",
+          "rev3K1Last": false,
+          "rev2RegressedK1Last": true
+        },
+        {
+          "id": "H5-lock",
+          "rev3K1Last": false,
+          "rev2RegressedK1Last": true
+        },
+        {
+          "id": "H3-link",
+          "rev3K1Last": false,
+          "rev2RegressedK1Last": true
+        },
+        {
+          "id": "H5-link",
+          "rev3K1Last": false,
+          "rev2RegressedK1Last": true
+        },
+        {
+          "id": "H5-executable",
+          "rev3K1Last": false,
+          "rev2RegressedK1Last": false
+        },
+        {
+          "id": "H5-source",
+          "rev3K1Last": false,
+          "rev2RegressedK1Last": false
+        }
+      ],
+      "classification": "ISOLATED_MISMATCHED_DTO_NOT_ACCEPTED_POLICY_NOT_K1_EXECUTION"
+    },
+    {
+      "id": "X04",
+      "area": "L1-full-H3-mismatch",
+      "contractExpects": [
+        "INSTALLATION",
+        "05_RUNNING"
+      ],
+      "expectedDetail": "independent-H5-receiptSHA256",
+      "observed": [
+        "INSTALLATION",
+        "05_RUNNING"
+      ],
+      "detail": "independent-H5-receiptSHA256",
+      "alreadyBoundPreconditions": {
+        "envelopeSchemaValid": true,
+        "payloadSchemaValid": true,
+        "retainedFormat": true,
+        "exactCanonicalEnvelope": true,
+        "payloadDigestBound": true,
+        "capsuleDigestBound": true,
+        "signatureTupleBound": true
+      },
+      "preconditionsOK": true,
+      "earlierStagesExactPrefix": true,
+      "inputSHA256": "68b886f66b143de7c9e6eb6974bb8599b4856b91b40756e6c5a33df8b68746dd",
+      "finding": false,
+      "note": "approved H3 installationReceiptSHA256 changed in record AND H3 source (05_SOURCE passes); H5 unchanged"
+    },
+    {
+      "id": "X05",
+      "area": "L1-full-H5-mismatch",
+      "contractExpects": [
+        "INSTALLATION",
+        "05_RUNNING"
+      ],
+      "expectedDetail": "independent-H5-receiptSHA256",
+      "observed": [
+        "INSTALLATION",
+        "05_RUNNING"
+      ],
+      "detail": "independent-H5-receiptSHA256",
+      "alreadyBoundPreconditions": {
+        "envelopeSchemaValid": true,
+        "payloadSchemaValid": true,
+        "retainedFormat": true,
+        "exactCanonicalEnvelope": true,
+        "payloadDigestBound": true,
+        "capsuleDigestBound": true,
+        "signatureTupleBound": true
+      },
+      "preconditionsOK": true,
+      "earlierStagesExactPrefix": true,
+      "inputSHA256": "3d1b45df4db0f8302cb51c26a031f530dc32604742d83811d97ec3d86d1b06b5",
+      "finding": false,
+      "note": "measured H5 receiptSHA256 changed; request binding/echo/signature rebound to the new H5 bytes"
+    },
+    {
+      "id": "X06",
+      "area": "L1-full-H3-mismatch",
+      "contractExpects": [
+        "INSTALLATION",
+        "05_RUNNING"
+      ],
+      "expectedDetail": "independent-H5-runtimeLockSHA256",
+      "observed": [
+        "INSTALLATION",
+        "05_RUNNING"
+      ],
+      "detail": "independent-H5-runtimeLockSHA256",
+      "alreadyBoundPreconditions": {
+        "envelopeSchemaValid": true,
+        "payloadSchemaValid": true,
+        "retainedFormat": true,
+        "exactCanonicalEnvelope": true,
+        "payloadDigestBound": true,
+        "capsuleDigestBound": true,
+        "signatureTupleBound": true
+      },
+      "preconditionsOK": true,
+      "earlierStagesExactPrefix": true,
+      "inputSHA256": "732d49c4da6391e5c9d8a85697a170fd53e46c882ffb135e8da416e52fabb173",
+      "finding": false,
+      "note": "approved H3 runtimeLockSHA256 changed in record AND H3 source (05_SOURCE passes); H5 unchanged"
+    },
+    {
+      "id": "X07",
+      "area": "L1-full-H5-mismatch",
+      "contractExpects": [
+        "INSTALLATION",
+        "05_RUNNING"
+      ],
+      "expectedDetail": "independent-H5-runtimeLockSHA256",
+      "observed": [
+        "INSTALLATION",
+        "05_RUNNING"
+      ],
+      "detail": "independent-H5-runtimeLockSHA256",
+      "alreadyBoundPreconditions": {
+        "envelopeSchemaValid": true,
+        "payloadSchemaValid": true,
+        "retainedFormat": true,
+        "exactCanonicalEnvelope": true,
+        "payloadDigestBound": true,
+        "capsuleDigestBound": true,
+        "signatureTupleBound": true
+      },
+      "preconditionsOK": true,
+      "earlierStagesExactPrefix": true,
+      "inputSHA256": "70ef48ac6538c8657181cd65b5ec3c1d0da87676b1540199b6c0f06b114a6582",
+      "finding": false,
+      "note": "measured H5 runtimeLockSHA256 changed; request binding/echo/signature rebound to the new H5 bytes"
+    },
+    {
+      "id": "X08",
+      "area": "L1-full-H3-mismatch",
+      "contractExpects": [
+        "INSTALLATION",
+        "05_RUNNING"
+      ],
+      "expectedDetail": "independent-H5-linkedClosureSHA256",
+      "observed": [
+        "INSTALLATION",
+        "05_RUNNING"
+      ],
+      "detail": "independent-H5-linkedClosureSHA256",
+      "alreadyBoundPreconditions": {
+        "envelopeSchemaValid": true,
+        "payloadSchemaValid": true,
+        "retainedFormat": true,
+        "exactCanonicalEnvelope": true,
+        "payloadDigestBound": true,
+        "capsuleDigestBound": true,
+        "signatureTupleBound": true
+      },
+      "preconditionsOK": true,
+      "earlierStagesExactPrefix": true,
+      "inputSHA256": "12d83c231676af6cf1e09d7aa7f227eb999d8b9854bf250d8f2290b48b2f7cc0",
+      "finding": false,
+      "note": "approved H3 linkedClosureSHA256 changed in record AND H3 source (05_SOURCE passes); H5 unchanged"
+    },
+    {
+      "id": "X09",
+      "area": "L1-full-H5-mismatch",
+      "contractExpects": [
+        "INSTALLATION",
+        "05_RUNNING"
+      ],
+      "expectedDetail": "independent-H5-linkedClosureSHA256",
+      "observed": [
+        "INSTALLATION",
+        "05_RUNNING"
+      ],
+      "detail": "independent-H5-linkedClosureSHA256",
+      "alreadyBoundPreconditions": {
+        "envelopeSchemaValid": true,
+        "payloadSchemaValid": true,
+        "retainedFormat": true,
+        "exactCanonicalEnvelope": true,
+        "payloadDigestBound": true,
+        "capsuleDigestBound": true,
+        "signatureTupleBound": true
+      },
+      "preconditionsOK": true,
+      "earlierStagesExactPrefix": true,
+      "inputSHA256": "87d431b8958e84089f59996e70340a9940e0aa144070f808919f7e4e3edf60d3",
+      "finding": false,
+      "note": "measured H5 linkedClosureSHA256 changed; request binding/echo/signature rebound to the new H5 bytes"
+    },
+    {
+      "id": "X10",
+      "area": "L1-full-H5-mismatch-extra",
+      "contractExpects": [
+        "INSTALLATION",
+        "05_RUNNING"
+      ],
+      "expectedDetail": "independent-H5-executableSHA256",
+      "observed": [
+        "INSTALLATION",
+        "05_RUNNING"
+      ],
+      "detail": "independent-H5-executableSHA256",
+      "alreadyBoundPreconditions": {
+        "envelopeSchemaValid": true,
+        "payloadSchemaValid": true,
+        "retainedFormat": true,
+        "exactCanonicalEnvelope": true,
+        "payloadDigestBound": true,
+        "capsuleDigestBound": true,
+        "signatureTupleBound": true
+      },
+      "preconditionsOK": true,
+      "earlierStagesExactPrefix": true,
+      "inputSHA256": "e8d0fd7742e771f46b84fd706c264df8b8394e215df7b96f186e56ca2a3ce3ba",
+      "finding": false,
+      "note": "extra: measured H5 executableSHA256 changed"
+    },
+    {
+      "id": "X11",
+      "area": "L1-full-H5-mismatch-extra",
+      "contractExpects": [
+        "INSTALLATION",
+        "05_RUNNING"
+      ],
+      "expectedDetail": "independent-H5-sourceSHA",
+      "observed": [
+        "INSTALLATION",
+        "05_RUNNING"
+      ],
+      "detail": "independent-H5-sourceSHA",
+      "alreadyBoundPreconditions": {
+        "envelopeSchemaValid": true,
+        "payloadSchemaValid": true,
+        "retainedFormat": true,
+        "exactCanonicalEnvelope": true,
+        "payloadDigestBound": true,
+        "capsuleDigestBound": true,
+        "signatureTupleBound": true
+      },
+      "preconditionsOK": true,
+      "earlierStagesExactPrefix": true,
+      "inputSHA256": "b5d8e00b1b771d051f298f6dd8a9bf7672296530cc853c781822a3853fbf6c96",
+      "finding": false,
+      "note": "extra: measured H5 sourceSHA changed"
+    },
+    {
+      "id": "Y01",
+      "area": "retained-originals",
+      "contractExpects": [
+        10,
+        10,
+        true
+      ],
+      "expectedDetail": null,
+      "observed": [
+        10,
+        10,
+        true
+      ],
+      "detail": null,
+      "alreadyBoundPreconditions": null,
+      "preconditionsOK": null,
+      "earlierStagesExactPrefix": null,
+      "inputSHA256": null,
+      "finding": false,
+      "note": "review-originals/*.raw SHA256 multiset == actual 973b6f8c review blobs (ls-tree -z object IDs + cat-file)"
+    },
+    {
+      "id": "Y02",
+      "area": "owner-attempts",
+      "contractExpects": [
+        "7f10d87844321c6f4a63bb98d4ad03588477f9021eb3fd7c64c56665d69c4fff",
+        true,
+        1,
+        true,
+        "6da1c0276943ad6b091214570e9db92580ced0e8389d74c7a32c2ed136064473",
+        true,
+        [
+          2,
+          15,
+          15,
+          1,
+          14,
+          0,
+          8
+        ],
+        [
+          1,
+          15,
+          15,
+          1,
+          14,
+          0,
+          8
+        ]
+      ],
+      "expectedDetail": null,
+      "observed": [
+        "7f10d87844321c6f4a63bb98d4ad03588477f9021eb3fd7c64c56665d69c4fff",
+        true,
+        1,
+        true,
+        "6da1c0276943ad6b091214570e9db92580ced0e8389d74c7a32c2ed136064473",
+        true,
+        [
+          2,
+          15,
+          15,
+          1,
+          14,
+          0,
+          8
+        ],
+        [
+          1,
+          15,
+          15,
+          1,
+          14,
+          0,
+          8
+        ]
+      ],
+      "detail": null,
+      "alreadyBoundPreconditions": null,
+      "preconditionsOK": null,
+      "earlierStagesExactPrefix": null,
+      "inputSHA256": null,
+      "finding": false,
+      "note": "owner driver original raw (BOM + 1 CRLF) vs final LF bytes; attempt-01 bound the raw hash, final report == attempt-02 bound the final hash; both 15/15/1/14/0/8 (OWNER static symbolic evidence, not summed, not reviewer proof)"
+    },
+    {
+      "id": "Y03",
+      "area": "retained-model",
+      "contractExpects": [
+        true,
+        true
+      ],
+      "expectedDetail": null,
+      "observed": [
+        true,
+        true
+      ],
+      "detail": null,
+      "alreadyBoundPreconditions": null,
+      "preconditionsOK": null,
+      "earlierStagesExactPrefix": null,
+      "inputSHA256": null,
+      "finding": false,
+      "note": "Rev2->Rev3 model: STAGES/14 reasons/check order identical; every changed line lies in the docstring, _anchor capsule key set, _reviews predicates, the 2 new helpers (or blank separators) or _project",
+      "changedLines": 29,
+      "changedRegions": [
+        "<between>",
+        "<docstring>",
+        "_anchor",
+        "_project",
+        "_reviews",
+        "installation_provenance_projection",
+        "running_data_projection"
+      ]
+    },
+    {
+      "id": "Y04",
+      "area": "L1-table-vs-K1-text",
+      "contractExpects": [
+        5,
+        true,
+        true,
+        true
+      ],
+      "expectedDetail": null,
+      "observed": [
+        5,
+        true,
+        true,
+        true
+      ],
+      "detail": null,
+      "alreadyBoundPreconditions": null,
+      "preconditionsOK": null,
+      "earlierStagesExactPrefix": null,
+      "inputSHA256": null,
+      "finding": false,
+      "note": "payload-contract.json runningDataProjection: 5 rows == helper keys; each declared unchanged K1 counterpart is a real partner of measured.<field> in the parsed policy.go comparison line; every measured origin H5, every counterpart H3",
+      "k1PartnersFromPolicyGo": {
+        "ExecutableSHA256": [
+          "Provenance.RunningExecutableSHA256",
+          "Verifier.ArtifactSHA256"
+        ],
+        "SourceSHA": [
+          "Verifier.SourceSHA"
+        ],
+        "InstallationReceiptSHA256": [
+          "Provenance.InstallationReceiptSHA256"
+        ],
+        "RuntimeLockSHA256": [
+          "Provenance.RuntimeLockSHA256"
+        ],
+        "LinkedClosureSHA256": [
+          "Provenance.LinkedClosureSHA256"
+        ]
+      }
+    }
+  ],
+  "completedKST": "2026-11-07T03:58:50+09:00"
+}
