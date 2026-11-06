@@ -612,8 +612,10 @@ describe('PORTAL-REFRESH-FLEET-20261106: Stable Polling, Honest Gateway & Identi
     let pRoot: Root;
     let pContainer: HTMLDivElement;
     let nodeMode: 'empty' | 'one' | 'reject' | 'pending' | 'slow6s';
+    let certMode: 'reject' | 'hang' | 'slow60reject';
     let nodeCalls: string[];
-    let pendingRequests: Array<{ path: string; resolve: (v: any) => void; reject: (e: any) => void }>;
+    let certCalls: Array<{ signal?: AbortSignal; t: number }>;
+    let pendingRequests: Array<{ path: string; signal?: AbortSignal; resolve: (v: any) => void; reject: (e: any) => void }>;
 
     const t0 = Date.parse('2026-11-06T11:00:00Z');
     const projectA = 'prj_01ARZ3NDEKTSV4RRFFQ69G5FAV';
@@ -628,7 +630,9 @@ describe('PORTAL-REFRESH-FLEET-20261106: Stable Polling, Honest Gateway & Identi
       document.body.appendChild(pContainer);
       pRoot = createRoot(pContainer);
       nodeMode = 'empty';
+      certMode = 'reject';
       nodeCalls = [];
+      certCalls = [];
       pendingRequests = [];
 
       vi.spyOn(globalThis, 'fetch').mockImplementation(async () =>
@@ -644,6 +648,7 @@ describe('PORTAL-REFRESH-FLEET-20261106: Stable Polling, Honest Gateway & Identi
         expiresAt: Math.floor(Date.now() / 1000) + 1800,
       }));
       vi.spyOn(session, 'commitSession').mockImplementation(() => {});
+      vi.spyOn(session, 'performLogout').mockImplementation((() => {}) as any);
       vi.spyOn(client, 'onUnauthorized').mockImplementation(() => {});
       vi.spyOn(projects, 'fetchProjects').mockResolvedValue(
         [projectA, projectB].map((id) => ({
@@ -678,7 +683,27 @@ describe('PORTAL-REFRESH-FLEET-20261106: Stable Polling, Honest Gateway & Identi
       vi.spyOn(storage, 'fetchStorageObservation').mockResolvedValue(null);
 
       vi.spyOn(client, 'apiClient').mockImplementation(async (path: string, options?: any) => {
-        if (path.endsWith('/node-certificates')) throw new Error('certificate observation unavailable');
+        const signal: AbortSignal | undefined = options?.signal;
+        if (path.endsWith('/node-certificates')) {
+          certCalls.push({ signal, t: Date.now() - t0 });
+          if (certMode === 'reject') throw new Error('certificate observation unavailable');
+          if (certMode === 'hang') {
+            return new Promise((_res, rej) => {
+              if (signal) signal.addEventListener('abort', () => rej(signal.reason ?? new DOMException('Aborted', 'AbortError')));
+            });
+          }
+          if (certMode === 'slow60reject') {
+            return new Promise((_res, rej) => {
+              const timer = setTimeout(() => rej(new Error('504 Gateway Timeout')), 60000);
+              if (signal) {
+                signal.addEventListener('abort', () => {
+                  clearTimeout(timer);
+                  rej(signal.reason ?? new DOMException('Aborted', 'AbortError'));
+                });
+              }
+            });
+          }
+        }
         if (path.endsWith('/nodes')) {
           nodeCalls.push(path);
           const one = {
@@ -712,7 +737,7 @@ describe('PORTAL-REFRESH-FLEET-20261106: Stable Polling, Honest Gateway & Identi
             });
           }
           return new Promise((resolve, reject) => {
-            const entry = { path, resolve, reject };
+            const entry = { path, signal: options?.signal, resolve, reject };
             pendingRequests.push(entry);
             if (options?.signal) {
               options.signal.addEventListener('abort', () => {
@@ -895,7 +920,108 @@ describe('PORTAL-REFRESH-FLEET-20261106: Stable Polling, Honest Gateway & Identi
       expect(appText()).not.toContain('정상 조회 결과: 0대');
     });
 
-    it('P8: when approvalsState === error, actions throw and do not call decideApproval API', async () => {
+    it('R1: certificate sub-request hangs while /nodes returns 1 node immediately', async () => {
+      await mountApp();
+      expect(appText()).toContain('정상 조회 결과: 0대');
+
+      nodeMode = 'one';
+      certMode = 'hang';
+      await advance(15000); // 10s timeout expires
+
+      expect(staleWarning()).not.toBeNull();
+      expect(staleWarning()!.getAttribute('role')).toBe('alert');
+      expect(appText()).toContain('초과');
+      expect(appText()).not.toContain('정상 조회 결과: 0대');
+      expect(certCalls.some((c) => c.signal?.aborted)).toBe(true);
+    });
+
+    it('R1b: certificate sub-request 60s 504 (nginx default /v1 proxy_read_timeout shape)', async () => {
+      await mountApp();
+      nodeMode = 'one';
+      certMode = 'slow60reject';
+
+      await advance(30000);
+      expect(staleWarning()).not.toBeNull();
+      expect(appText()).not.toContain('정상 조회 결과: 0대');
+
+      await advance(40000);
+      expect(staleWarning()).not.toBeNull();
+      expect(appText()).not.toContain('정상 조회 결과: 0대');
+    });
+
+    it('R2: manual refresh during an in-flight background poll is not labelled a timeout error', async () => {
+      nodeMode = 'one';
+      await mountApp();
+      expect(appText()).toContain('observed-node');
+
+      nodeMode = 'pending';
+      await advance(5000); // background poll in flight
+      expect(pendingRequests.length).toBe(1);
+
+      const refreshBtn = pContainer.querySelector<HTMLButtonElement>('[data-testid="cluster-refresh-btn"]');
+      expect(refreshBtn).not.toBeNull();
+      await act(async () => {
+        refreshBtn!.click();
+      });
+      await advance(0);
+
+      expect(appText()).not.toContain('응답 시간 초과');
+      expect(staleWarning()).toBeNull();
+      expect(pContainer.querySelector('[data-testid="cluster-overview-fetch-error"]')).toBeNull();
+    });
+
+    it('R2b: manual supersede with ordinary abort reason and late Error(REQUEST_TIMEOUT) rejection does not set timeout error', async () => {
+      nodeMode = 'one';
+      await mountApp();
+      expect(appText()).toContain('observed-node');
+
+      nodeMode = 'pending';
+      await advance(5000);
+      expect(pendingRequests.length).toBe(1);
+      const bgReq = pendingRequests[0];
+
+      // User manually refreshes, aborting bgReq with ordinary supersede AbortError
+      const refreshBtn = pContainer.querySelector<HTMLButtonElement>('[data-testid="cluster-refresh-btn"]');
+      expect(refreshBtn).not.toBeNull();
+      await act(async () => {
+        refreshBtn!.click();
+      });
+      await advance(0);
+
+      // Even if the aborted background request rejects with late Error('REQUEST_TIMEOUT')
+      bgReq.reject(new Error('REQUEST_TIMEOUT'));
+      await advance(0);
+
+      // Owned signal.reason is AbortError, so it must not apply false timeout error
+      expect(appText()).not.toContain('응답 시간 초과');
+      expect(staleWarning()).toBeNull();
+    });
+
+    it('R6: logout fence: in-flight aborted, late response dropped and does not leak into logged-out view', async () => {
+      nodeMode = 'one';
+      await mountApp();
+      nodeMode = 'pending';
+      await advance(5000);
+      const inflightReq = pendingRequests.splice(0);
+      expect(inflightReq.length).toBe(1);
+
+      const logoutBtn = Array.from(pContainer.querySelectorAll('button')).find((b) => b.textContent?.includes('로그아웃')) ?? null;
+      expect(logoutBtn).not.toBeNull();
+      await act(async () => {
+        logoutBtn!.click();
+      });
+      await advance(0);
+
+      inflightReq[0].resolve({
+        items: [{ nodeId: nodeA, hostname: 'leaked-post-logout-node', status: 'online', osType: 'linux' }],
+        total: 1,
+      });
+      await advance(0);
+
+      expect(appText()).not.toContain('leaked-post-logout-node');
+    });
+
+    it('R8: when approvalsState === error, real reject button and modal click throws without calling decideApproval', async () => {
       const decideSpy = vi.spyOn(mutations, 'decideApproval');
       await mountApp();
 
@@ -908,18 +1034,83 @@ describe('PORTAL-REFRESH-FLEET-20261106: Stable Polling, Honest Gateway & Identi
         await advance(0);
       }
 
+      const item = pContainer.querySelector<HTMLElement>('[data-testid="approval-item-app_01ARZ3NDEKTSV4RRFFQ69G5FAV"]');
+      if (item) {
+        await act(async () => {
+          item.click();
+        });
+        await advance(0);
+      }
+
       // Cause approvals to fail on next tick
       vi.spyOn(runs, 'fetchObservedApprovals').mockRejectedValue(new Error('PROBE-APPROVALS-DOWN'));
       await advance(5000);
 
       expect(pContainer.querySelector('[data-testid="approval-stale-warning"]')).not.toBeNull();
-      expect(decideSpy).not.toHaveBeenCalled();
+
+      const unhandled: unknown[] = [];
+      const onUnh = (e: unknown) => { unhandled.push(String(e)); };
+      process.on('unhandledRejection', onUnh);
+
+      const rejectBtn = pContainer.querySelector<HTMLButtonElement>('[data-testid="approval-reject-button"]');
+      expect(rejectBtn).not.toBeNull();
+      await act(async () => {
+        rejectBtn!.click();
+      });
+      await advance(0);
+
+      const confirmBtn = Array.from(pContainer.querySelectorAll('button')).find((b) => b.textContent?.includes('반려 확인')) ?? null;
+      expect(confirmBtn).not.toBeNull();
+      await act(async () => {
+        confirmBtn!.click();
+      });
+      await advance(0);
+
+      expect(decideSpy).toHaveBeenCalledTimes(0);
+      expect(appText()).toContain('승인 반려 실패');
+      process.off('unhandledRejection', onUnh);
     });
 
-    it('P9: clicking nodes-retry-btn in ResourceExplorer triggers manual retry with isBackground=false', async () => {
+    it('R8c: control - same real reject click with approvalsState === success reaches decideApproval', async () => {
+      const decideSpy = vi.spyOn(mutations, 'decideApproval').mockResolvedValue(undefined as any);
       await mountApp();
 
-      // Switch to fabric tab where ResourceExplorer is rendered
+      const approvalsTab = pContainer.querySelector<HTMLButtonElement>('[data-testid="header-tab-approvals"]');
+      if (approvalsTab) {
+        await act(async () => {
+          approvalsTab.click();
+        });
+        await advance(0);
+      }
+
+      const item = pContainer.querySelector<HTMLElement>('[data-testid="approval-item-app_01ARZ3NDEKTSV4RRFFQ69G5FAV"]');
+      if (item) {
+        await act(async () => {
+          item.click();
+        });
+        await advance(0);
+      }
+
+      const rejectBtn = pContainer.querySelector<HTMLButtonElement>('[data-testid="approval-reject-button"]');
+      expect(rejectBtn).not.toBeNull();
+      await act(async () => {
+        rejectBtn!.click();
+      });
+      await advance(0);
+
+      const confirmBtn = Array.from(pContainer.querySelectorAll('button')).find((b) => b.textContent?.includes('반려 확인')) ?? null;
+      expect(confirmBtn).not.toBeNull();
+      await act(async () => {
+        confirmBtn!.click();
+      });
+      await advance(0);
+
+      expect(decideSpy).toHaveBeenCalledTimes(1);
+    });
+
+    it('R9: clicking nodes-retry-btn in ResourceExplorer clears error banner and shows loading state while manual request is pending', async () => {
+      await mountApp();
+
       const fabricTab = pContainer.querySelector<HTMLButtonElement>('[data-testid="header-tab-fabric"]');
       expect(fabricTab).not.toBeNull();
       await act(async () => {
@@ -927,23 +1118,20 @@ describe('PORTAL-REFRESH-FLEET-20261106: Stable Polling, Honest Gateway & Identi
       });
       await advance(0);
 
-      // Fail background poll
       nodeMode = 'reject';
       await advance(5000);
+      expect(pContainer.querySelector('[data-testid="nodes-fetch-error-banner"]')).not.toBeNull();
 
+      nodeMode = 'pending';
       const retryBtn = pContainer.querySelector<HTMLButtonElement>('[data-testid="nodes-retry-btn"]');
       expect(retryBtn).not.toBeNull();
-
-      // Next call recovers
-      nodeMode = 'empty';
-      const callsBefore = nodeCalls.length;
       await act(async () => {
         retryBtn!.click();
       });
       await advance(0);
 
-      expect(nodeCalls.length).toBeGreaterThan(callsBefore);
-      expect(pContainer.textContent).toContain('0대');
+      expect(pContainer.querySelector('[data-testid="nodes-fetch-error-banner"]')).toBeNull();
+      expect(pContainer.querySelector('[data-testid="nodes-loading-state"]')).not.toBeNull();
     });
 
     it.each([
@@ -989,6 +1177,135 @@ describe('PORTAL-REFRESH-FLEET-20261106: Stable Polling, Honest Gateway & Identi
       // Sequence fence ensures newer Offline is not overwritten by older slow call
       expect(pContainer.textContent).toContain('Gateway: Offline');
       expect(pContainer.textContent).not.toMatch(/Gateway:\s*\d+ms/);
+    });
+
+    it('H3: header JSON body hangs after headers: 4s deadline covers res.json() and transitions to offline', async () => {
+      let n = 0;
+      vi.spyOn(globalThis, 'fetch').mockImplementation((async (_u: any, init?: RequestInit) => {
+        n++;
+        if (n === 1) return new Response(JSON.stringify({ status: 'ok' }), { status: 200, headers: { 'content-type': 'application/json' } });
+        const sig = init?.signal;
+        return {
+          ok: true,
+          status: 200,
+          headers: new Headers({ 'content-type': 'application/json' }),
+          json: () => new Promise((_r, rej) => {
+            sig?.addEventListener('abort', () => rej(sig.reason ?? new Error('aborted')));
+          }),
+        } as any;
+      }) as any);
+
+      await act(async () => {
+        pRoot.render(<Header currentTheme="light" onToggleTheme={() => {}} activeTab="dashboard" onSelectTab={() => {}} />);
+      });
+      await advance(0);
+      expect(pContainer.textContent).toMatch(/Gateway:\s*\d+ms/);
+
+      await advance(60000);
+      expect(pContainer.textContent).not.toMatch(/Gateway:\s*\d+ms/);
+      expect(pContainer.textContent).toContain('Gateway: Offline');
+    });
+
+    it('H3b: header response with malformed JSON body renders degraded (비정상 응답) and recovery works', async () => {
+      let call = 0;
+      vi.spyOn(globalThis, 'fetch').mockImplementation((async () => {
+        call++;
+        if (call === 1) {
+          return new Response('invalid-json{{{', { status: 200, headers: { 'content-type': 'application/json' } });
+        }
+        return new Response(JSON.stringify({ status: 'ok' }), { status: 200, headers: { 'content-type': 'application/json' } });
+      }) as any);
+
+      await act(async () => {
+        pRoot.render(<Header currentTheme="light" onToggleTheme={() => {}} activeTab="dashboard" onSelectTab={() => {}} />);
+      });
+      await advance(0);
+      expect(pContainer.textContent).toContain('비정상 응답');
+      expect(pContainer.textContent).not.toContain('Gateway: Offline');
+
+      // Next poll recovers to healthy
+      await advance(5000);
+      expect(pContainer.textContent).toMatch(/Gateway:\s*\d+ms/);
+      expect(pContainer.textContent).not.toContain('비정상 응답');
+    });
+
+    it('H4: header fetch hangs (signal honoured): 4s deadline -> Offline, never indefinite 확인 중', async () => {
+      vi.spyOn(globalThis, 'fetch').mockImplementation(((_u: any, init?: RequestInit) => {
+        const sig = init?.signal;
+        return new Promise((_res, rej) => {
+          if (sig) sig.addEventListener('abort', () => rej(sig.reason ?? new DOMException('Aborted', 'AbortError')));
+        });
+      }) as any);
+
+      await act(async () => {
+        pRoot.render(<Header currentTheme="light" onToggleTheme={() => {}} activeTab="dashboard" onSelectTab={() => {}} />);
+      });
+      await advance(0);
+      expect(pContainer.textContent).toContain('확인 중');
+
+      await advance(4100);
+      expect(pContainer.textContent).toContain('Gateway: Offline');
+    });
+
+    it('H5: header order: degraded -> healthy -> network, each latest wins', async () => {
+      const seq = [
+        () => new Response(JSON.stringify({ status: 'not_ready' }), { status: 503, headers: { 'content-type': 'application/json' } }),
+        () => new Response(JSON.stringify({ status: 'ok' }), { status: 200, headers: { 'content-type': 'application/json' } }),
+        () => { throw new TypeError('Failed to fetch'); },
+      ];
+      let i = 0;
+      vi.spyOn(globalThis, 'fetch').mockImplementation((async () => seq[Math.min(i++, 2)]()) as any);
+
+      await act(async () => {
+        pRoot.render(<Header currentTheme="light" onToggleTheme={() => {}} activeTab="dashboard" onSelectTab={() => {}} />);
+      });
+      await advance(0);
+      expect(pContainer.textContent).toContain('비정상 응답');
+
+      await advance(5000);
+      expect(pContainer.textContent).toMatch(/Gateway:\s*\d+ms/);
+
+      await advance(5000);
+      expect(pContainer.textContent).toContain('Gateway: Offline');
+    });
+
+    it('T1: real transport: polled endpoints carry AbortSignal and are aborted by 10s deadline', async () => {
+      vi.mocked(runs.fetchObservedRuns).mockRestore();
+      vi.mocked(runs.fetchObservedApprovals).mockRestore();
+      vi.mocked(projects.fetchProjectWorkspaces).mockRestore();
+      vi.mocked(client.apiClient).mockRestore();
+
+      const seen: Array<{ url: string; hasSignal: boolean; signal?: AbortSignal }> = [];
+      vi.spyOn(globalThis, 'fetch').mockImplementation(((input: any, init?: RequestInit) => {
+        const url = String(input);
+        seen.push({ url, hasSignal: !!init?.signal, signal: init?.signal ?? undefined });
+        const sig = init?.signal;
+        if (url === '/healthz') {
+          return Promise.resolve(new Response(JSON.stringify({ status: 'ok' }), { status: 200, headers: { 'content-type': 'application/json' } }));
+        }
+        if (url.endsWith('/nodes')) {
+          return Promise.resolve(new Response(JSON.stringify({ items: [], total: 0 }), { status: 200, headers: { 'content-type': 'application/json' } }));
+        }
+        return new Promise((_r, rej) => {
+          sig?.addEventListener('abort', () => rej(sig.reason ?? new DOMException('Aborted', 'AbortError')));
+        });
+      }) as any);
+
+      await mountApp();
+      await advance(10500);
+
+      const certEntry = seen.find((s) => s.url.endsWith('/node-certificates'));
+      expect(certEntry).toBeDefined();
+      expect(certEntry?.hasSignal).toBe(true);
+      expect(certEntry?.signal?.aborted).toBe(true);
+
+      const kinds = ['/runs', '/approvals', '/workspaces'];
+      for (const k of kinds) {
+        const entry = seen.find((s) => s.url.startsWith('/v1/projects/') && s.url.endsWith(k));
+        expect(entry).toBeDefined();
+        expect(entry?.hasSignal).toBe(true);
+        expect(entry?.signal?.aborted).toBe(true);
+      }
     });
   });
 });

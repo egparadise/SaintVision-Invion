@@ -354,8 +354,11 @@ export const App: React.FC = () => {
 
       let certObs: ProjectNodeCertificateObservationResponse | null = null;
       try {
-        certObs = await fetchProjectNodeCertificates(targetPrj);
-      } catch {
+        certObs = await fetchProjectNodeCertificates(targetPrj, controller.signal);
+      } catch (err: any) {
+        if (controller.signal.aborted) {
+          throw err;
+        }
         certObs = null;
       }
 
@@ -370,10 +373,16 @@ export const App: React.FC = () => {
       }
     } catch (err: any) {
       clearTimeout(timeoutId);
+      const isTimeout = controller.signal.aborted && (
+        controller.signal.reason?.message === 'REQUEST_TIMEOUT' ||
+        controller.signal.reason === 'REQUEST_TIMEOUT'
+      );
+      if (controller.signal.aborted && !isTimeout) {
+        return;
+      }
       if (sessionRef.current === currentSession && scopeRef.current === currentScope && request > nodeAppliedRef.current) {
         nodeAppliedRef.current = request;
         setNodesState('error');
-        const isTimeout = err?.name === 'AbortError' || err?.message === 'REQUEST_TIMEOUT';
         const msg = isTimeout
           ? '클러스터 노드 응답 시간 초과 (10s Timeout)'
           : (err?.message || '노드 목록을 확인하지 못했습니다.');
@@ -419,10 +428,16 @@ export const App: React.FC = () => {
       }
     } catch (err: any) {
       clearTimeout(timeoutId);
+      const isTimeout = controller.signal.aborted && (
+        controller.signal.reason?.message === 'REQUEST_TIMEOUT' ||
+        controller.signal.reason === 'REQUEST_TIMEOUT'
+      );
+      if (controller.signal.aborted && !isTimeout) {
+        return;
+      }
       if (sessionRef.current === currentSession && scopeRef.current === scope && request > runAppliedRef.current) {
         runAppliedRef.current = request;
         setRunsState('error');
-        const isTimeout = err?.name === 'AbortError' || err?.message === 'REQUEST_TIMEOUT';
         const prob = err?.problem;
         const msg = isTimeout
           ? 'Run 목록 응답 시간 초과 (10s Timeout)'
@@ -471,10 +486,16 @@ export const App: React.FC = () => {
       }
     } catch (err: any) {
       clearTimeout(timeoutId);
+      const isTimeout = controller.signal.aborted && (
+        controller.signal.reason?.message === 'REQUEST_TIMEOUT' ||
+        controller.signal.reason === 'REQUEST_TIMEOUT'
+      );
+      if (controller.signal.aborted && !isTimeout) {
+        return;
+      }
       if (sessionRef.current === currentSession && scopeRef.current === scope && request > approvalAppliedRef.current) {
         approvalAppliedRef.current = request;
         setApprovalsState('error');
-        const isTimeout = err?.name === 'AbortError' || err?.message === 'REQUEST_TIMEOUT';
         const msg = isTimeout
           ? '승인 목록 응답 시간 초과 (10s Timeout)'
           : '승인 목록을 확인하지 못했습니다.';
@@ -522,10 +543,16 @@ export const App: React.FC = () => {
       }
     } catch (err: any) {
       clearTimeout(timeoutId);
+      const isTimeout = controller.signal.aborted && (
+        controller.signal.reason?.message === 'REQUEST_TIMEOUT' ||
+        controller.signal.reason === 'REQUEST_TIMEOUT'
+      );
+      if (controller.signal.aborted && !isTimeout) {
+        return;
+      }
       if (sessionRef.current === currentSession && scopeRef.current === scope && request > workspaceAppliedRef.current) {
         workspaceAppliedRef.current = request;
         setWorkspacesState('error');
-        const isTimeout = err?.name === 'AbortError' || err?.message === 'REQUEST_TIMEOUT';
         const msg = isTimeout
           ? 'Workspace 목록 응답 시간 초과 (10s Timeout)'
           : (err?.message || 'Workspace 목록을 확인하지 못했습니다.');

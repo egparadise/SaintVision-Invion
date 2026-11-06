@@ -56,8 +56,6 @@ export const Header: React.FC<HeaderProps> = ({
       const start = performance.now();
       try {
         const res = await fetch('/healthz', { signal: currentController.signal });
-        clearTimeout(timeoutId);
-        const rtt = Math.round(performance.now() - start);
         const contentType = res.headers.get('content-type') || '';
 
         if (!isMounted || reqId !== reqSeqRef.current) return;
@@ -65,7 +63,16 @@ export const Header: React.FC<HeaderProps> = ({
         // Canonical /healthz returns 200 with JSON { status: 'ok', version: ... }
         // HTML fallback (200 text/html) or 401/404/500/503 is not health success
         if (res.ok && contentType.includes('application/json')) {
-          const data = await res.json().catch(() => null);
+          let data: any = null;
+          try {
+            data = await res.json();
+          } catch (jsonErr: any) {
+            if (currentController.signal.aborted) {
+              throw jsonErr;
+            }
+            data = null;
+          }
+          const rtt = Math.round(performance.now() - start);
           if (!isMounted || reqId !== reqSeqRef.current) return;
           if (data && data.status === 'ok') {
             setGatewayStatus({ kind: 'healthy', rttMs: rtt });
@@ -76,7 +83,6 @@ export const Header: React.FC<HeaderProps> = ({
           setGatewayStatus({ kind: 'degraded' });
         }
       } catch {
-        clearTimeout(timeoutId);
         if (!isMounted || reqId !== reqSeqRef.current) return;
         setGatewayStatus({ kind: 'offline' });
       } finally {
