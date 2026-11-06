@@ -1,0 +1,135 @@
+{
+  "atKST": "2026-11-07T05:23:41+09:00",
+  "source": "08e0f56eabe7d46518e17b8c3d6d7e296df880ac",
+  "base": "84ee9b1b43b8921ed1d0ef8bde6f3546013c1095",
+  "branch": "agent/codex/fleet5-k2-d04-internal-codec-r1-20261107",
+  "source14BytesExactlyMatchActuallyGoTestedWIP": true,
+  "contentSHA256": "bc0b5e0b464f2c58315be6445289ae41b0cc7c3a4fe5181a77371482505243c9",
+  "source14": [
+    {
+      "path": "services/node-agent/internal/migrationcontext/README.md",
+      "change": "M",
+      "bytes": 16154,
+      "SHA256": "ad26172075ab9200ef45502b5728bc79dc5cd9efb583269c0db18df7a65b1ec9",
+      "baseSHA256": "3fe38c538f6a6df2465eef73836584541f10e2b98e7dcbb749bac27047a3f7e1",
+      "mode": "100644"
+    },
+    {
+      "path": "services/node-agent/internal/migrationcontext/effect_gate_test.go",
+      "change": "M",
+      "bytes": 19751,
+      "SHA256": "871e1b1ca26e6bcdcc4ea7af2e8a290dc7a9b615f201c46aa7bf1102e0af7c04",
+      "baseSHA256": "60418aca7ee005a11983db7fad4ebf9f80eaad6b73ac6b722f3a8461694ea9b0",
+      "mode": "100644"
+    },
+    {
+      "path": "services/node-agent/internal/migrationcontext/p02_bindings_test.go",
+      "change": "A",
+      "bytes": 15280,
+      "SHA256": "fe196d73657c17f8e734ca834b45b81b4060366adb0228da51803b9817517e9a",
+      "baseSHA256": null,
+      "mode": "100644"
+    },
+    {
+      "path": "services/node-agent/internal/migrationcontext/p02_canonical_internal.go",
+      "change": "A",
+      "bytes": 10147,
+      "SHA256": "88fc45ec259d3a9ea38ea8095044c9fc3d5feba45832a45a2d7bf0cf0c3b5bf4",
+      "baseSHA256": null,
+      "mode": "100644"
+    },
+    {
+      "path": "services/node-agent/internal/migrationcontext/p02_codec_internal.go",
+      "change": "A",
+      "bytes": 8414,
+      "SHA256": "10b1a4b6ed8c1bbcf08029cd137195597476e9b8078e56dd2bf67bfa4e43d9db",
+      "baseSHA256": null,
+      "mode": "100644"
+    },
+    {
+      "path": "services/node-agent/internal/migrationcontext/p02_codec_test.go",
+      "change": "A",
+      "bytes": 5972,
+      "SHA256": "df82222b4de173a99e2a9ad1b55d282334c316d35b773020cc801d0a653c0be6",
+      "baseSHA256": null,
+      "mode": "100644"
+    },
+    {
+      "path": "services/node-agent/internal/migrationcontext/p02_contract_test.go",
+      "change": "A",
+      "bytes": 11492,
+      "SHA256": "cd6f427a4555854a0fff3386a20e1308fe51c9cb5e8c6812e24f3901a07eedea",
+      "baseSHA256": null,
+      "mode": "100644"
+    },
+    {
+      "path": "services/node-agent/internal/migrationcontext/p02_effect_test.go",
+      "change": "A",
+      "bytes": 1992,
+      "SHA256": "a003084e7559df2c19a5a7f395a9653ab5227b63e7359fe2a05667c16ad790bc",
+      "baseSHA256": null,
+      "mode": "100644"
+    },
+    {
+      "path": "services/node-agent/internal/migrationcontext/p02_evaluate_internal.go",
+      "change": "A",
+      "bytes": 25538,
+      "SHA256": "35de87be6a8fba9a34cc71d4ea77f231f312bd3d6d6ef5ac8f72e4a1e36fa398",
+      "baseSHA256": null,
+      "mode": "100644"
+    },
+    {
+      "path": "services/node-agent/internal/migrationcontext/p02_fixture_test.go",
+      "change": "A",
+      "bytes": 75572,
+      "SHA256": "458c9ef1bd606ad1afcf081da554f7cc57179ac0af9490dbb53e9f97f8e5f42b",
+      "baseSHA256": null,
+      "mode": "100644"
+    },
+    {
+      "path": "services/node-agent/internal/migrationcontext/p02_inputs_internal.go",
+      "change": "A",
+      "bytes": 46398,
+      "SHA256": "d1dbd3bf0ab261cffcc4112750142784f877a3b6499f95381d85f90281b0b07d",
+      "baseSHA256": null,
+      "mode": "100644"
+    },
+    {
+      "path": "services/node-agent/internal/migrationcontext/p02_projection_internal.go",
+      "change": "A",
+      "bytes": 6336,
+      "SHA256": "c25699cc905635aca87da4e17e993d981ea58a0965a970be4c2a29cb16e152ed",
+      "baseSHA256": null,
+      "mode": "100644"
+    },
+    {
+      "path": "services/node-agent/internal/migrationcontext/p02_schema_internal.go",
+      "change": "A",
+      "bytes": 71787,
+      "SHA256": "1a346e5072586355ddaf797fdf42fe4bd99c079c392701882e63b9f77b3499e2",
+      "baseSHA256": null,
+      "mode": "100644"
+    },
+    {
+      "path": "services/node-agent/internal/migrationcontext/p02_wire_internal.go",
+      "change": "A",
+      "bytes": 29353,
+      "SHA256": "6472966beab52792d2e9955680afee13dea81be944323aa440bf0d560eb35748",
+      "baseSHA256": null,
+      "mode": "100644"
+    }
+  ],
+  "onlyAdditionalOwnUniqueDocs": 125,
+  "allOtherBaseModesAndBlobIDsUnchanged": true,
+  "remoteExact": true,
+  "Docs": 42287667048,
+  "job": 128132594536,
+  "correlation": "FLEET5-K2-D04-INTERNAL-R1-08e0f56e-msg_3cf791b73706",
+  "rootVerifiedExactHeadRefEventPathAttemptAll19StepsSuccess": true,
+  "actualRootGoTopLevel": 23,
+  "actualRootGoSubtests": 228,
+  "actualCodeReview": "PENDING",
+  "productCore": "NOT_RUN",
+  "producerOrPortGrant": false,
+  "wholeProgramComplete": false
+}

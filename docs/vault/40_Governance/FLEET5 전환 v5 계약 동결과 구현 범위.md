@@ -1,11 +1,11 @@
 ---
 doc_id: "GOV-FLEET5-BOOTSTRAP-V5-FREEZE-CODE-SCOPE-20261106"
 title: "FLEET5 전환 v5 계약 동결과 구현 범위"
-version: "1.0.25"
+version: "1.0.26"
 status: "active"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-11-07T05:14:32+09:00"
+updated: "2026-11-07T05:31:06+09:00"
 source_of_truth: "Git"
 ---
 
@@ -221,3 +221,8 @@ Codex는허용된privateGo20stage/41policy+5running projection과인과시험을
 ## D04 동결 Go 실제 검증과 정확한 게시 cut
 
 Root가정확한14WIP파일을실제Git84ee/eb32원본의3번PC격리Go1.27.1networknone컨테이너에서시험했다.23최상위/228하위·실패0/skip0·90case88고유입력·368소스전후불변을확인했고msg_3cf791b73706으로동일바이트게시/Docs와조건부RootONEhostedCore/후속단일CODE검토를구체허용했다. 근거와실행조건은k2-d04-actual-go-publication-and-hosted-ci-root-cut.json이다. 새factory/port/producer/auth/current/효과와실장비인수는여전히보류다.
+
+
+## 실제 D04 내부 코드 게시와 제품 CI·CODE 검토 대기
+
+Root가실제시험14파일그대로의08e0/139변경과exactDocs42287667048/all19·138manifest입력/75원문copy를대조했다. 구체허용에따라동일source로Core42287980945를한번시작했고최종CI판정은대기다. B9g실제판정·검토자종료해제뒤단일D04CODE검토task_6d952cac2c9f를시작하는의존작업을등록했으며설계수락6fa4를코드수락으로빌리지않는다. 실제코드/게시/CI/검토/producer/auth/runtime인수는분리하고새factory/port/효과권한은없다.

@@ -1,0 +1,17 @@
+{
+  "atKST": "2026-11-07T05:27:11+09:00",
+  "source": "08e0f56eabe7d46518e17b8c3d6d7e296df880ac",
+  "RootRecomputedAllPublicationInputHashes": 138,
+  "manifestSHA256": "1faa1f921933606ff019118b6f34825b0c6cc55e9998f66669a2e0f04e69adb1",
+  "exactChangedPathsIncludingSelf": 139,
+  "RootByteCompared75OriginalCopiesAgainstRootActualPrivateReceipts": true,
+  "actualRootIndexedOriginals": 71,
+  "RootSummaryAndIndexOriginals": 4,
+  "reportSHA256": "f33e84c98fa67bbb233b0349c76e8a27834e9037caa2bb0dedd22772bf39a28f",
+  "archiveIndexSHA256": "af22a83c9bcc546d90393f2e9c6ba0de9146c2282cc21a5a392c4455b9c6d7e7",
+  "RootActualPhaseMeasurementsAndCommandsMatchAuthorDisplay": true,
+  "fourMetadataCRLFOnlySemanticEqual": true,
+  "source14TestedBytesUnchanged": true,
+  "CodeReviewAcceptance": false,
+  "wholeProgramComplete": false
+}
