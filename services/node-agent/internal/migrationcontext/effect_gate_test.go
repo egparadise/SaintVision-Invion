@@ -144,6 +144,81 @@ func rejectNativeSources(src map[string][]byte) error {
 	}
 	return nil
 }
+
+func interfaceReceiver(t types.Type) bool {
+	t = types.Unalias(t)
+	if p, ok := t.(*types.Pointer); ok {
+		t = types.Unalias(p.Elem())
+	}
+	if _, ok := t.(*types.TypeParam); ok {
+		return true
+	}
+	_, ok := t.Underlying().(*types.Interface)
+	return ok
+}
+
+func closedOwnInterface(t types.Type, seen map[types.Type]bool) error {
+	if t == nil || seen[t] {
+		return nil
+	}
+	seen[t] = true
+	if p, ok := types.Unalias(t).(*types.TypeParam); ok {
+		return closedOwnInterface(p.Constraint(), seen)
+	}
+	u := types.Unalias(t)
+	iface, ok := u.Underlying().(*types.Interface)
+	if !ok {
+		return nil
+	}
+	if n, ok := u.(*types.Named); ok && n.Obj().Pkg() != nil && n.Obj().Pkg().Path() != ownImport {
+		return fmt.Errorf("foreign embedded interface forbidden: %s", objectID(n.Obj()))
+	}
+	iface.Complete()
+	for i := 0; i < iface.NumMethods(); i++ {
+		m := iface.Method(i)
+		if m.Exported() || m.Pkg() == nil || m.Pkg().Path() != ownImport {
+			return fmt.Errorf("interface/constraint method must be unexported own object: %s", objectID(m))
+		}
+	}
+	for i := 0; i < iface.NumEmbeddeds(); i++ {
+		if e := closedOwnInterface(iface.EmbeddedType(i), seen); e != nil {
+			return e
+		}
+	}
+	return nil
+}
+
+func foreignPackageVar(obj types.Object) *types.Var {
+	v, ok := obj.(*types.Var)
+	if !ok || v.IsField() || v.Pkg() == nil || v.Pkg().Path() == ownImport {
+		return nil
+	}
+	if v.Pkg().Scope().Lookup(v.Name()) != v {
+		return nil
+	}
+	return v
+}
+
+func usedObject(expr ast.Expr, info *types.Info) types.Object {
+	for {
+		if p, ok := expr.(*ast.ParenExpr); ok {
+			expr = p.X
+			continue
+		}
+		break
+	}
+	switch x := expr.(type) {
+	case *ast.Ident:
+		return info.Uses[x]
+	case *ast.SelectorExpr:
+		if s := info.Selections[x]; s != nil {
+			return s.Obj()
+		}
+		return info.Uses[x.Sel]
+	}
+	return nil
+}
+
 func sourceEffects(src map[string][]byte, checked checkedSource) error {
 	if e := rejectNativeSources(src); e != nil {
 		return e
@@ -164,7 +239,31 @@ func sourceEffects(src map[string][]byte, checked checkedSource) error {
 			}
 		}
 	}
+	seenInterfaces := map[types.Type]bool{}
+	for _, obj := range checked.info.Defs {
+		if n, ok := obj.(*types.TypeName); ok && n.Pkg() != nil && n.Pkg().Path() == ownImport {
+			if e := closedOwnInterface(n.Type(), seenInterfaces); e != nil {
+				return e
+			}
+		}
+	}
+	for expr, tv := range checked.info.Types {
+		if _, ok := expr.(*ast.InterfaceType); ok {
+			if e := closedOwnInterface(tv.Type, seenInterfaces); e != nil {
+				return e
+			}
+		}
+	}
 	for _, obj := range checked.info.Uses {
+		if v := foreignPackageVar(obj); v != nil && objectID(v) != "time.UTC" {
+			return fmt.Errorf("foreign package variable read forbidden: %s", objectID(v))
+		}
+		if f, ok := obj.(*types.Func); ok && f.Pkg() != nil && f.Pkg().Path() == ownImport {
+			sig := f.Type().(*types.Signature)
+			if sig.Recv() != nil && interfaceReceiver(sig.Recv().Type()) && f.Exported() {
+				return fmt.Errorf("exported own interface/constraint dispatch forbidden: %s", objectID(f))
+			}
+		}
 		if f, ok := obj.(*types.Func); ok && f.Pkg() != nil && f.Pkg().Path() != ownImport && !pureExternalObjects[objectID(f)] {
 			return fmt.Errorf("unreviewed function/method object: %s", objectID(f))
 		}
@@ -174,6 +273,12 @@ func sourceEffects(src map[string][]byte, checked checkedSource) error {
 		ast.Inspect(f, func(n ast.Node) bool {
 			if failure != nil {
 				return false
+			}
+			if u, ok := n.(*ast.UnaryExpr); ok && u.Op == token.AND {
+				if v := foreignPackageVar(usedObject(u.X, checked.info)); v != nil {
+					failure = fmt.Errorf("foreign package variable address forbidden: %s", objectID(v))
+					return false
+				}
 			}
 			switch n.(type) {
 			case *ast.GoStmt, *ast.SendStmt:
@@ -225,10 +330,8 @@ func sourceEffects(src map[string][]byte, checked checkedSource) error {
 			}
 			if a, ok := n.(*ast.AssignStmt); ok {
 				for _, lhs := range a.Lhs {
-					if s, ok := lhs.(*ast.SelectorExpr); ok {
-						if v, ok := checked.info.Uses[s.Sel].(*types.Var); ok && checked.info.Selections[s] == nil && v.Pkg() != nil && v.Pkg().Path() != ownImport {
-							failure = fmt.Errorf("foreign state write forbidden")
-						}
+					if v := foreignPackageVar(usedObject(lhs, checked.info)); v != nil {
+						failure = fmt.Errorf("foreign state write forbidden: %s", objectID(v))
 					}
 				}
 			}

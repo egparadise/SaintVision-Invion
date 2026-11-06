@@ -1,0 +1,32 @@
+{
+  "classification": "PL_R1A_CANDIDATE_LOCAL_ONLY_NOT_REVIEW_CLOSED",
+  "runs": [
+    {
+      "argv": [
+        "go",
+        "test",
+        "-p",
+        "1",
+        "-count=1",
+        "-v",
+        "./internal/migrationcontext"
+      ],
+      "exit": 0,
+      "startedKST": "2026-11-06T16:28:59.521507+09:00",
+      "endedKST": "2026-11-06T16:29:41.944742+09:00"
+    },
+    {
+      "argv": [
+        "go",
+        "vet",
+        "-p",
+        "1",
+        "./internal/migrationcontext",
+        "./migrationverify"
+      ],
+      "exit": 0,
+      "startedKST": "2026-11-06T16:29:41.945385+09:00",
+      "endedKST": "2026-11-06T16:29:45.655158+09:00"
+    }
+  ]
+}

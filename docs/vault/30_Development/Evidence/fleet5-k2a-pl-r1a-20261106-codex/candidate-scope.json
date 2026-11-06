@@ -1,0 +1,95 @@
+{
+  "classification": "TEST_ONLY_CANDIDATE_PENDING_INDEPENDENT_PL_R1A_CLOSURE",
+  "task": "task_a95ef3d8ccce",
+  "dispatch": "ctx_ed23b4a777d0",
+  "base": "dba1804b1d180eda2bf0439952e9706782109fd6",
+  "owner": "Codex",
+  "reviewer": "Claude through Root pending",
+  "kst": "2026-11-06T16:35:00.568398+09:00",
+  "changedProductPaths": [
+    "services/node-agent/internal/migrationcontext/effect_gate_test.go",
+    "services/node-agent/internal/migrationcontext/pl_r1a_test.go",
+    "services/node-agent/internal/migrationcontext/README.md"
+  ],
+  "unchangedOwnSources": [
+    {
+      "path": "services/node-agent/internal/migrationcontext/boundary_test.go",
+      "gitBlob": "bb8ce9c86c919aca27d611fdcc45f7d55b9b8bd9",
+      "sha256": "dc7d53fab00f0d5653a0ac2f446cf3e48f4f98c0e1d3910bb576361e09216199"
+    },
+    {
+      "path": "services/node-agent/internal/migrationcontext/clock.go",
+      "gitBlob": "af9efbf8af29e19e2633d7ef4fd3a312d77b42ba",
+      "sha256": "fe4e7c75f474d06aee63bd9d343ef7e0414342d3cbe6c75e5aca92c699c496c7"
+    },
+    {
+      "path": "services/node-agent/internal/migrationcontext/crypto_history_test.go",
+      "gitBlob": "554e1364eb6366c390958054b2bb62d736b772e2",
+      "sha256": "034f40de23c7be2a11f2a4483d022822c41fa4454b462b68ccfa291764b4c854"
+    },
+    {
+      "path": "services/node-agent/internal/migrationcontext/doc.go",
+      "gitBlob": "5df7c4aa9ac4fc672270762914daed5accf123ef",
+      "sha256": "5ff529bc776a7ef507061712744122dfa1e851ff3d5929b441ba2f5f1e0e68ee"
+    },
+    {
+      "path": "services/node-agent/internal/migrationcontext/errors.go",
+      "gitBlob": "f69658086ee839d7d266bad87781c89f27a39469",
+      "sha256": "78abff5a56d3bd9d9114514166464ed05efb81d523ee8146c7b66a5f1f1b1eb6"
+    },
+    {
+      "path": "services/node-agent/internal/migrationcontext/history.go",
+      "gitBlob": "22d93b5bfce10f25ce8676c884b055816d2da973",
+      "sha256": "6a0bbd8ba8d3ba0b9ddaa79cf6239f247b14b47bd96063982e100dac5c94c951"
+    },
+    {
+      "path": "services/node-agent/internal/migrationcontext/k1_bridge.go",
+      "gitBlob": "178b1f2d28b5587612e34e909e7a0adc6706d804",
+      "sha256": "6fe4729694636c54e231aad80cd12de27383174d1a6cd21840df172112c2ee72"
+    },
+    {
+      "path": "services/node-agent/internal/migrationcontext/policy.go",
+      "gitBlob": "eb906a24e4aa8fc54e7014d9a04668d84854871e",
+      "sha256": "ce6f1b9b1a1835276b248c3dbdb8fa42b68fa79fb5684748ea78694d104bbdd2"
+    },
+    {
+      "path": "services/node-agent/internal/migrationcontext/ports.go",
+      "gitBlob": "a8cc4b7e4492e4a0401f7f9ace7fd55fcf9ec4cb",
+      "sha256": "db7c7e877afc6ee8bbf8ca2e2b6afad3b973a63a624d4bcd6ee2ad5ce649fb95"
+    },
+    {
+      "path": "services/node-agent/internal/migrationcontext/review_census_test.go",
+      "gitBlob": "1d81c8c69d7c9a26d7b8c4870622f9f0fb812a7e",
+      "sha256": "62e262d58be3efac1a6eecb478b0d752069156a932ded372c4840cde874e584c"
+    },
+    {
+      "path": "services/node-agent/internal/migrationcontext/review_lows_test.go",
+      "gitBlob": "c07a0300d3671bb320b2430992e2e82af11955ee",
+      "sha256": "2df822e71c6a71611f7720d39113268668d56c81c8bcb8960681999f72187b81"
+    },
+    {
+      "path": "services/node-agent/internal/migrationcontext/source_gate_test.go",
+      "gitBlob": "a395e5ff9824ddc01c27004f1627dfda2bb56b09",
+      "sha256": "10c0229040b40d2dd0653979b4761da4e35baab5d519b8d52dbe368928c0c780"
+    },
+    {
+      "path": "services/node-agent/internal/migrationcontext/testdata/synthetic-public-history.json",
+      "gitBlob": "2a4d3834ed3123cb650f1360006f0e1fa350f940",
+      "sha256": "76f237ceaeb88d3cbc5a5cc9f74369b15c3c56cd28dbb4dcde803c2540ea3eec"
+    }
+  ],
+  "nonTestGoChanged": false,
+  "dependenciesChanged": false,
+  "localFullTop": 17,
+  "localFullSub": 90,
+  "mutantBuildsExit0": 18,
+  "negativeRefusals": 16,
+  "positiveControls": 2,
+  "race": "NOT_RUN_CGO0",
+  "runtimeOrTrustAcceptance": false,
+  "finalRunEvidence": [
+    "baseline-red-final.json",
+    "full-unit-final.json",
+    "vet-final.json"
+  ]
+}

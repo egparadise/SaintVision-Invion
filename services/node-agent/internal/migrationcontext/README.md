@@ -108,7 +108,8 @@ public unregistered authentication paths still refuse and issue no opaque input.
 
 The reviewed Low revision strengthens the source gate with actual package
 Go/types resolution: exact current pure function/method objects are allowed,
-independent of import alias, and every function reference and call is checked.
+independent of import alias. Resolved references/calls are checked against that
+closed policy, including own interface and instantiated constraint dispatch.
 There is no strings/time wildcard. Ambient clock/timer functions, signing/key
 creation, certificate Verify/system roots, unresolved function-value callbacks,
 native linker sources, bodyless functions and linker directives are refused.
@@ -123,3 +124,15 @@ it does not describe the size of the larger complete object graph. New type-corr
 Packet/Report map/slice, CanonicalJSON variadic and value/pointer MarshalJSON
 mutations are detected after simulated raw repins; declaration-order controls
 stay equal. Existing raw K1 source pins remain frozen, with no automatic repin.
+
+
+The PL-R1a candidate limits own interface/constraint dispatch to unexported OWN
+method objects, and refuses exported methods or foreign interface embeddings,
+including aliased/transitive embeddings. Concrete own methods are a separate
+reviewed class. Foreign package-level variable reads permit only the resolved
+current time.UTC binding; taking a foreign package variable address is refused.
+Direct foreign variable writes resolve the same object, including dot imports.
+These are precise source-defense rules for the reviewed closure and tested attack
+classes, not arbitrary trusted-process isolation or a whole-program effect proof.
+They do not install an authority, provider or positive authentication path. Closure
+of the review finding remains subject to the actual final combined review.
