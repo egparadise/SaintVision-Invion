@@ -1,0 +1,17 @@
+{
+ "case": "L2-owned-database-to-new-file-local-shadow",
+ "mutatedSHA256": {
+  "services/control-plane/src/inv/workspace_config.py": "041a05061c10d65eedb03cb27c174d055099c20b7245d82ea8a350f2a421a3ac",
+  "services/control-plane/src/inv/claude_new_caller.py": "3ecf783f7f79d45475def4384570d63a0a36e74a30b11958ae37eba39675ba01"
+ },
+ "witnessesChecked": 15,
+ "sixFrozenRootsPreserved": true,
+ "final": {
+  "observed": "REFUSE",
+  "reason": "UNRESOLVED:CALLEE_REBOUND"
+ },
+ "caller_error-reverted": {
+  "observed": "REFUSE",
+  "reason": "DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:INSTANCE:database"
+ }
+}

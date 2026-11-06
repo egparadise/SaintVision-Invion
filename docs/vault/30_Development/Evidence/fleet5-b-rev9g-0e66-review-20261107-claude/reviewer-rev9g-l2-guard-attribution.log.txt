@@ -1,0 +1,24 @@
+{"overlay": "frozen-72028", "44:WorkspaceAPI": null, "47:RestrictedWorkspaceRuntime": null, "64:SnapshotStore": null}
+{"overlay": "L2-near-imported-callee-global-import-workspace_config (exact ce713)", "44:WorkspaceAPI": "UNRESOLVED:CALLEE_REBOUND", "47:RestrictedWorkspaceRuntime": null, "64:SnapshotStore": null}
+{"overlay": "L2-installer-RestrictedWorkspaceRuntime", "44:WorkspaceAPI": null, "47:RestrictedWorkspaceRuntime": "UNRESOLVED:CALLEE_REBOUND", "64:SnapshotStore": null}
+{"overlay": "L2-plain-module-reassignment", "44:WorkspaceAPI": "UNRESOLVED:CALLEE_REBOUND", "47:RestrictedWorkspaceRuntime": null, "64:SnapshotStore": null}
+{"overlay": "L2-same-line-second-import", "44:WorkspaceAPI": "UNRESOLVED:CALLEE_REBOUND", "47:RestrictedWorkspaceRuntime": null, "64:SnapshotStore": null}
+{"overlay": "L2-equal-count-replaced-import (invalid full input: roots)", "44:WorkspaceAPI": "UNRESOLVED:CALLEE_REBOUND", "47:RestrictedWorkspaceRuntime": "UNRESOLVED:CALLEE_REBOUND", "64:SnapshotStore": null}
+{"overlay": "L2-module-walrus-in-comprehension", "44:WorkspaceAPI": "UNRESOLVED:CALLEE_REBOUND", "47:RestrictedWorkspaceRuntime": null, "64:SnapshotStore": null}
+{"overlay": "L2-global-del-in-function", "44:WorkspaceAPI": "UNRESOLVED:CALLEE_REBOUND", "47:RestrictedWorkspaceRuntime": null, "64:SnapshotStore": null}
+{"overlay": "L2-class-body-global-import", "44:WorkspaceAPI": "UNRESOLVED:CALLEE_REBOUND", "47:RestrictedWorkspaceRuntime": null, "64:SnapshotStore": null}
+{"overlay": "L2-function-scope-import-blank-line", "44:WorkspaceAPI": null, "47:RestrictedWorkspaceRuntime": null, "64:SnapshotStore": "UNRESOLVED:CALLEE_REBOUND"}
+{"overlay": "L2-function-scope-equal-count-replaced-import", "44:WorkspaceAPI": null, "47:RestrictedWorkspaceRuntime": null, "64:SnapshotStore": "UNRESOLVED:CALLEE_REBOUND"}
+{"overlay": "L2-module-star-import-workspace_config", "44:WorkspaceAPI": "UNRESOLVED:CALLEE_REBOUND", "47:RestrictedWorkspaceRuntime": "UNRESOLVED:CALLEE_REBOUND", "64:SnapshotStore": null}
+{"overlay": "L2-control-global-declaration-alone", "44:WorkspaceAPI": null, "47:RestrictedWorkspaceRuntime": null, "64:SnapshotStore": null}
+{"overlay": "L2-control-nested-local-same-name", "44:WorkspaceAPI": null, "47:RestrictedWorkspaceRuntime": null, "64:SnapshotStore": null}
+{"overlay": "L2-control-class-body-same-name", "44:WorkspaceAPI": null, "47:RestrictedWorkspaceRuntime": null, "64:SnapshotStore": null}
+{"overlay": "L2-control-comprehension-iteration-same-name", "44:WorkspaceAPI": null, "47:RestrictedWorkspaceRuntime": null, "64:SnapshotStore": null}
+{"overlay": "L2-control-lambda-arg-same-name", "44:WorkspaceAPI": null, "47:RestrictedWorkspaceRuntime": null, "64:SnapshotStore": null}
+{"overlay": "L2-control-unrelated-alias", "44:WorkspaceAPI": null, "47:RestrictedWorkspaceRuntime": null, "64:SnapshotStore": null}
+{"overlay": "L2-control-module-shadow-of-function-scope-import", "44:WorkspaceAPI": null, "47:RestrictedWorkspaceRuntime": null, "64:SnapshotStore": null}
+{"overlay": "L2-local-shadow-in-frozen-function-same-line", "44:WorkspaceAPI": "UNRESOLVED:CALLEE_REBOUND", "47:RestrictedWorkspaceRuntime": null, "64:SnapshotStore": null}
+{"overlay": "L2-local-shadow-in-new-function", "44:WorkspaceAPI": null, "47:RestrictedWorkspaceRuntime": null, "64:SnapshotStore": null, "100:WorkspaceAPI": "UNRESOLVED:CALLEE_REBOUND"}
+{"case": "L2-function-scope-equal-count-replaced-import", "sourceSHA256": "ce707d7475e2c870fc02da07e230b4fff4e3c955a803003e10dfe1c91edab6a7", "witnessesChecked": 15, "sixFrozenRootsPreserved": true, "newUnboundNames": [], "final": {"observed": "REFUSE", "reason": "UNRESOLVED:CALLEE_REBOUND"}, "caller_error-reverted": {"observed": "REFUSE", "reason": "DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:WRITE_USE:result.recovery"}}
+{"case": "L2-control-global-declaration-alone", "sourceSHA256": "c323d56712e1961c687916499e0cbcc62497b5a3da2f323f33eab49a1a8f8ce7", "witnessesChecked": 15, "sixFrozenRootsPreserved": true, "newUnboundNames": [], "final": {"observed": "REFUSE", "reason": "DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:SYMBOL:inv.workspace_api.WorkspaceAPI"}, "caller_error-reverted": {"observed": "REFUSE", "reason": "DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:SYMBOL:inv.workspace_api.WorkspaceAPI"}}
+{"case": "L2-new-production-file-local-shadow (world overlay)", "path": "services/control-plane/src/inv/claude_new_caller.py", "sourceSHA256": "3ecf783f7f79d45475def4384570d63a0a36e74a30b11958ae37eba39675ba01", "frozenBaselineExists": false, "callerErrorAtNewCall": null, "final": {"observed": "ACCEPT", "reason": null}, "caller_error-reverted": {"observed": "ACCEPT", "reason": null}}

@@ -1,0 +1,22 @@
+"""Copy reviewer scratch outputs into own Evidence as UTF-8/LF bytes and print SHA256 (Rev9g review)."""
+import hashlib, sys
+from pathlib import Path
+SP = Path(sys.argv[1]); D = Path(sys.argv[2]); D.mkdir(parents=True, exist_ok=True)
+def text(p):
+    b = p.read_bytes()
+    if b[:2] in (b'\xff\xfe', b'\xfe\xff'): s = b.decode('utf-16')
+    else: s = b.decode('utf-8-sig')
+    return s.replace('\r\n', '\n').encode('utf-8')
+pairs = [('reviewer_rev9g_delta_probes.py', 'reviewer_rev9g_delta_probes.py.txt'), ('reviewer-rev9g-delta-probes.log', 'reviewer-rev9g-delta-probes.log.txt'),
+         ('reviewer-rev9g-delta-probes-result.json', 'reviewer-rev9g-delta-probes-result.json'),
+         ('reviewer_rev9g_l2_guard_attribution.py', 'reviewer_rev9g_l2_guard_attribution.py.txt'), ('reviewer-rev9g-l2-guard-attribution.log', 'reviewer-rev9g-l2-guard-attribution.log.txt'),
+         ('reviewer-rev9g-l2-guard-attribution-result.json', 'reviewer-rev9g-l2-guard-attribution-result.json'),
+         ('reviewer_rev9g_local_shadow_check.py', 'reviewer_rev9g_local_shadow_check.py.txt'),
+         ('local-shadow-fleet5-b-rev9g-20261107-codex.txt', 'reviewer-local-shadow-at-0e66.json.txt'), ('local-shadow-fleet5-b-rev9f-20261107-codex.txt', 'reviewer-local-shadow-at-9cea.json.txt'),
+         ('reviewer_rev9g_newfile_reach.py', 'reviewer_rev9g_newfile_reach.py.txt'), ('reviewer-rev9g-newfile-reach-result.json', 'reviewer-rev9g-newfile-reach-result.json'),
+         ('canonical-sync-check-before.txt', 'canonical-sync-check-before.txt'), ('reviewer_gate_driver.py', 'reviewer_gate_driver.py.txt'),
+         ('stage_evidence_rev9g.py', 'reviewer_stage_evidence.py.txt')]
+if len(sys.argv) > 3: pairs.append(('local-doc-gates.txt', 'local-doc-gates.txt'))
+for a, b in pairs:
+    (D / b).write_bytes(text(SP / a)); print(hashlib.sha256((D / b).read_bytes()).hexdigest(), len((D / b).read_bytes()), b)
+(D / '.gitattributes').write_bytes(b'* -text\n*.txt binary\n')
