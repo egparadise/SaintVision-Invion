@@ -1,0 +1,14 @@
+{
+  "atKST": "2026-11-07T00:13:48+09:00",
+  "target": "5ea87937f1b542f8cbe32c08dc224526965a8e2d",
+  "actualReview": "4288a1c403bc15ac1174c49e512ab8c7314d522f",
+  "branch": "agent/claude/fleet5-b-rev9c-5ea-review-20261106",
+  "Docs": 42240632854,
+  "job": 127969682356,
+  "correlation": "claude-b-rev9c-5ea-review-4288a1c4-ctx_e399e8dd4f9d",
+  "rootVerifiedExactHeadRefEventPathAttemptAll19StepsSuccess": true,
+  "remoteExact": true,
+  "uniqueAddedReviewDocs": 12,
+  "actualWorkerDone": "msg_d96df9301ff2",
+  "verdict": "REVISION_REQUIRED (narrow, LOW-only; no MEDIUM; actual-source T1/A8 closure on 72028 bytes stands; A7 NodeChannels.snapshot NOT yet grantable)"
+}

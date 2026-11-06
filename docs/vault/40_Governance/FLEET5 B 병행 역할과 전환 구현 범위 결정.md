@@ -1,11 +1,11 @@
 ---
 doc_id: "GOV-FLEET5-B-BOOTSTRAP-SCOPE-20261106"
 title: "FLEET5 B 병행 역할과 전환 구현 범위 결정"
-version: "1.4.6"
+version: "1.4.7"
 status: "review"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-11-06T23:44:24+09:00"
+updated: "2026-11-07T00:31:11+09:00"
 source_of_truth: "Git"
 ---
 
@@ -138,3 +138,8 @@ aa3387/Docs42224817650의 실제 검토는 M1·actual72028 T1/A8를 닫았지만
 ## Rev9c 고정 후보와 실제 좁은 검토
 
 5ea87937/Docs42234721725의139고유문서·48생성기/32참조hash·frozenmodel/lifecycle와orderedartifact를Root가확인하고task_c5d0e8ae0837/ctx_e399e8dd4f9d의L1L2L3+정렬delta검토를시작했다. 이전실제UI검토자의exit/release를새로확인했고별도Claude는시작하지않았다. 실제verdictNULL이며A7snapshot/제품/port/runtime/freezegrant는아직없다. msg_bccbed800e8b는실제판정과다음cut까지pending이다. 상세는b-rev9c-root-narrow-review-queue-gate.json이다.
+
+
+## Rev9c 실제 Low2 판정과 Rev9d 좁은 후속
+
+4288a1c4/Docs42240632854 실제검토는현재72028T1A8closure와정렬I1을보존했으나proofsource밖reflection과ownerparameter전달을놓치는Low2를남겼다. Root는msg_1a4f33b7e3e6로exact5ea기반Rev9d의새고유문서·bounded분석·targeted회귀만허용했다. 생산universe전체열거된reflection과current/frozenparameter고정점수정후한번실제좁은검토로연결하며A7snapshot/제품/port/runtime/freezegrant는아직0이다. model/lifecycle와집계·NULLHOLD는보존한다. 상세는b-rev9d-fix-only-root-scope.json이다.

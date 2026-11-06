@@ -1,0 +1,39 @@
+{
+  "atKST": "2026-11-07T00:31:11+09:00",
+  "PC1": {
+    "observedAtKST": "2026-11-07T00:00:19+09:00",
+    "additionalExistingIdentitiesAttempted": 2,
+    "authExitCodes": [
+      255,
+      255
+    ],
+    "refusal": "PUBLIC_KEY_DENIED",
+    "knownHostsUnchanged": true,
+    "passwordAttempted": false,
+    "privateKeyBodiesReadByAgent": false,
+    "remoteConfigChanged": false,
+    "manualPublicKeyRegistrationResult": "PENDING_USER_RESULT",
+    "asyncQuestionAccepted": true
+  },
+  "alternativeConnectionDiscovery": {
+    "savedOrcaSSHEntries": 5,
+    "connected": 0,
+    "fleetBindingsVerified": false,
+    "otherHostsConnectedOrGuessed": false,
+    "visibleNativeRemoteControlWindowIdentified": false,
+    "GUIOrBrowserControlUsed": false
+  },
+  "PC5": {
+    "atKST": "2026-11-07T00:22:53+09:00",
+    "dockerExit": 0,
+    "dockerVersion": "20.10.22",
+    "dockerAPI": "1.41",
+    "dockerMinAPI": "1.12",
+    "daemonOS": "linux",
+    "mutation": false
+  },
+  "PC5DockerAPIFloor": "1.45",
+  "PC5RuntimeObservationIsRegistrationProof": false,
+  "nodeOrOfferAcceptanceFromTheseChecks": false,
+  "fivePCAccepted": false
+}

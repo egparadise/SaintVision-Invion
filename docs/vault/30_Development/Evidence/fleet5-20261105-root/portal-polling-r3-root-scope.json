@@ -60,5 +60,10 @@
   "sharedTypecheckCacheDecision": "portal-polling-r3-shared-typecheck-cache-root-decision.json",
   "pendingTscBuildApproved": false,
   "concreteLocalTypechecks": "two separate node typescript/bin/tsc -p tsconfig.app.json/node.json --noEmit; after exit0 own Vite build",
-  "scopeExpanded": false
+  "scopeExpanded": false,
+  "atPreFreezeCorrectionKST": "2026-11-07T00:31:11+09:00",
+  "preFreezeScopePreservation": "portal-polling-r3-pre-freeze-source-preservation-root-scope.json",
+  "fixedCandidateSource": null,
+  "freshExactCI": null,
+  "formalIndependentAcceptance": false
 }

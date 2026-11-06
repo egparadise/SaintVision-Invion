@@ -1,0 +1,21 @@
+{
+  "atKST": "2026-11-07T00:09:46+09:00",
+  "escalation": "msg_stop_06d862ad89fa73f569f4ee6d",
+  "task": "task_8dfd2a5d01a2",
+  "dispatch": "ctx_c8a99a3645b0",
+  "pendingGate": "python tools/check_docs.py",
+  "gateStillRequiredAndAuthorized": true,
+  "reasonForCurrentToolTurnCancel": "deliver concrete pre-freeze static scope-preservation corrections before source/CI",
+  "guidanceMessage": "msg_33a002e885c3",
+  "staticFindings": [
+    "malformed health JSON must remain degraded; abort body still bounded",
+    "four-resource timeout must derive solely from owned abort reason"
+  ],
+  "RootExecutedCounterexamples": false,
+  "workerOrTaskRestarted": false,
+  "productAcceptedOrDeployed": false,
+  "recordedAtKST": "2026-11-07T00:31:11+09:00",
+  "structuredGuidance": "Root PRELIMINARY STATIC read of the current uncommitted R3 App/Header diff (not formal immutable-source acceptance; no claim of executing these counterexamples) found two small violations of the existing R3 scope. Please correct BEFORE source freeze/CI, in the same allowed files. Root will cancel only the presently blocked check_docs tool/turn so this structured note can be consumed; check_docs itself remains required/authorized and must be rerun normally. Preserve your edits/tests and actual failure receipts, same task8df/ctxc8, no process/worker/Task restart.\n\n1. Preserve CLOSED UI854-L1 for malformed JSON. Current Header diff changes res.json().catch(()=>null) to plain await res.json(), and outer catch always maps to offline. A received 200/application-json whose json() rejects SyntaxError now becomes Offline; old9c mapped it to degraded/비정상 응답. This is a deterministic code-path observation, not a network test. Keeping the body under the4s deadline is correct, but a non-abort parse/contract error must remain degraded, while the owned timeout/network abort maps truthfully to failure. Minimal shape: catch only non-abort JSON errors to null (or set degraded), RE-THROW when currentController.signal.aborted, keep timer clearing in finally and req/mount guards. Add malformed-body + recovery test, preserve H1/H2/H3 and real body-timeout behavior. No auth/network/API redesign.\n\n2. Owned abort REASON must be authoritative for supersede vs timeout in ALL FOUR resource catches. Current new isTimeout contains controller.signal.aborted && (...reason.message==='REQUEST_TIMEOUT' || reason==='REQUEST_TIMEOUT' || err.message==='REQUEST_TIMEOUT'). The err.message fallback permits a cancelled old request (signal.reason is ordinary user/supersede AbortError) whose late rejection happens to carry REQUEST_TIMEOUT to apply a false timeout/stale because its id is still > applied. The original actual71f L1 and Root scope explicitly require ignoring aborted requests whose OWN reason is not REQUEST_TIMEOUT. Remove the arbitrary rejection-message fallback when classifying an aborted request; trust only the owned signal.reason. Add a manual-supersede with ordinary abort reason + late Error('REQUEST_TIMEOUT') negative and real owned timer positive. Apply consistently to nodes/runs/approvals/workspaces, retain session/scope/applied fences and finally cleanup.\n\nThese are pre-freeze scope-preservation corrections, not new product authority or an accepted independent review. If either has already been fixed, cite actual current bytes/test result rather than undoing your newer work. Your previous local build/test results remain results of their actual earlier bytes. After correction use meaningful serial targeted tests and the two safe non-build typechecks + own Vite build, required gates, frozen exact-source Frontend2jobs+Docs and finalreport exactDocs. Do not borrow Root static reasoning as an executed test/closure. Keep full required author evidence and limits; actual narrow Claude review remains pending. Current B actual review and queued P02 are unchanged. No generic user approval needed.\n",
+  "status": "AUTHOR_FIX_AND_REGRESSION_PENDING_FROZEN_CI",
+  "formalIndependentAcceptance": false
+}
