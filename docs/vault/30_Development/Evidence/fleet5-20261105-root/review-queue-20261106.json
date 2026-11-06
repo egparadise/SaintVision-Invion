@@ -1,6 +1,6 @@
 {
   "schema": "fleet5-root-review-resource-sequence:1",
-  "atKST": "2026-11-06T16:06:19+09:00",
+  "atKST": "2026-11-06T16:18:44+09:00",
   "completedB": {
     "task": "task_d4c4c809ed4e",
     "review": "ac9182c3e3d606ec027c0be2e90e049ff50d54f1",
@@ -13,33 +13,22 @@
     "source": "8874b2dfe0dda9a019bd5f334636668290702e13"
   },
   "active": {
-    "task": "task_de20693ba7c9",
-    "dispatch": "ctx_8a1710587147",
-    "sources": [
-      "dba1804b1d180eda2bf0439952e9706782109fd6",
-      "01a4bebf55d23f11f85258746662d8b8a5cd0311"
-    ],
-    "scope": "ONEactualLowR1R5+Stage2code-deltareview/per-targetverdict/exactclosurepinseam",
-    "state": "ready actualdispatch; verdictpending"
-  },
-  "pending": {
     "task": "task_ac6f831f2c53",
+    "dispatch": "ctx_a3cf08fa935b",
     "source": "6a65665819d7479073189c524abf585636c3079d",
-    "base": "33f7c6b48883cb06d1ea7d645bdb88634eb1bca0",
-    "dependsOn": "task_de20693ba7c9",
-    "status": "pending",
-    "dispatch": null,
-    "scope": "ONE actual WHOLE Rev8 bounded design/analysis review + concrete next cut"
+    "scope": "ONE actual WHOLE Rev8 bounded design/analysis delta and concrete next cut",
+    "state": "ready actualdispatch/verdictpending"
   },
-  "authorParallelWork": "K2 author awaits actual Low/Stage2 verdict and Root integration/pin scope; B author awaits actual whole Rev8 review and Root next concrete cut",
-  "reason": "B8 immutable final6a65/71 unique docs/productdiff0/exactDocs42177211155 all19SUCCESS Root verified; serialize one Claude",
+  "pending": null,
+  "authorParallelWork": "K2 sameCodex authorized new PLR1a TEST/README, actual disjoint2parentmerge210594+Low and exact one-line sourcepin candidate; B owner awaits actualwholeRev8 verdict",
+  "reason": "actual9c37 separatecodeacceptances/Rootconcretescope delivered; B8 priorreadytask startedonce afteractualpriorrelease",
   "genericApprovalMissing": false,
   "completedRL1": {
     "task": "task_9cd71aa339ff",
     "review": "0e53fc024ca773b7719182e170e5e126aeaf5b95",
     "verdict": "ACCEPT TEST-ONLY; R-L1 CLOSED; no new findings"
   },
-  "nextActualReviewTrigger": "on predecessor actual completion and exited/released, start existing ready B8 task once; actual Low/Stage2 verdict handled first without waiting B8",
+  "nextActualReviewTrigger": "B8 actualverdict first; after exact combined candidate/Docs exists and reviewer exited/released, one actualcombinedreview inclPLR1a/merge/pin/diagnostics",
   "completedIntegration": {
     "task": "task_78064fb4b7ff",
     "dispatch": "ctx_ed7ec73163d6",
@@ -50,7 +39,7 @@
     "scope": "bounded source/packet/report only",
     "taskOutcome": "succeeded"
   },
-  "sourceIntegratorActive": false,
+  "sourceIntegratorActive": true,
   "completedB3": {
     "task": "task_deba0c63a626",
     "dispatch": "ctx_ba55264f86fb",
@@ -212,5 +201,34 @@
     "verdict": "REVISION_REQUIRED B7-M1/M2+L1/L2",
     "workerDone": "msg_be4d8850d250",
     "RootDirectReply": "msg_aca0d787de3d"
-  }
+  },
+  "completedLowStage2Pair": {
+    "task": "task_de20693ba7c9",
+    "dispatch": "ctx_8a1710587147",
+    "sources": [
+      "dba1804b1d180eda2bf0439952e9706782109fd6",
+      "01a4bebf55d23f11f85258746662d8b8a5cd0311"
+    ],
+    "actualReview": "9c37e6a11151c4ae6cd5d935b89304ab96223bf0",
+    "Docs": 42179189534,
+    "verdicts": {
+      "Low": "CODE_AXIS_ACCEPT_FOR_BOUNDED_LOW_REVISION (with ONE new non-blocking Low PL-R1a)",
+      "Stage2": "CODE_AXIS_ACCEPT_FOR_BOUNDED_STAGE2_FIXED_CASE_CANDIDATE"
+    },
+    "actualWorkerDone": "msg_5821b50453b2",
+    "resource": {
+      "dispatchId": "ctx_8a1710587147",
+      "taskId": "task_de20693ba7c9",
+      "runId": "run_e57ecd84a7bc",
+      "state": "succeeded",
+      "stage": "settled",
+      "liveness": "exited",
+      "terminal": "term_98156187-a0b8-4d56-a9e8-4f849b633434",
+      "terminalState": "released",
+      "workspace": "d98dc9d3-fe61-4cb2-9776-dff349347a61::D:/Project/SaintVisionI-Invion/fleet5-bootstrap-v3-review-20261106",
+      "waitingOnHuman": "unknown"
+    },
+    "RootConcreteReply": "msg_256747ff9f44"
+  },
+  "sourceIntegratorState": "same K2 owner scope reply delivered; actual final source notyetpublished"
 }

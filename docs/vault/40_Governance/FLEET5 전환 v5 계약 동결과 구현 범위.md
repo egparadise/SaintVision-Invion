@@ -1,11 +1,11 @@
 ---
 doc_id: "GOV-FLEET5-BOOTSTRAP-V5-FREEZE-CODE-SCOPE-20261106"
 title: "FLEET5 전환 v5 계약 동결과 구현 범위"
-version: "1.0.11"
+version: "1.0.12"
 status: "active"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-11-06T15:02:33+09:00"
+updated: "2026-11-06T16:18:44+09:00"
 source_of_truth: "Git"
 ---
 
@@ -137,3 +137,16 @@ Root는 실제 push run42170068364/job127735558839/attempt1/source52f935ac와 ar
 이 근거로 같은 Codex에게 Stage2 후보 구현만 허용했다. 현재 Low 수정의 clean checkpoint 뒤 정확한52f를 base로 별도 stage2 branch를 만든다. typed list/dict·고유하고 알려진 두 destination·원래 plain mount type과 writable 사실을 검사하며 전체 mount dictionary의 모든 알려진/알려지지 않은 key·값을 유지한다. hash나 일부 필드 projection으로 비교하지 않는다. Id/Image/Config/StartedAt/RestartCount/full volume의 CreatedAt/consumers·nonce/DER/signature/owner·기존 target 호출은 그대로다. 중복·겹침·알 수 없는 mount topology는 거부한다. storage/profile/권한을 확장하지 않는다.
 
 새 branch의 own 진단 workflow만 정확한 stage2 branch/path/run label과 새 unit 목록으로 한 번 실행할 수 있다. 원래 Stage1 branch·52f failure·기존 unrelated workflow/default branch는 보존한다. 새 helper/7-file closure는 unregistered 후보이며 제품/실장비에는 적용하지 않는다. 새 구현의 local negative·정확한 focused CI/Docs와 실제 독립 코드 검토 이후에만 Root가 최종 결합 소스를 선택하고 새 전체 Core/Docs를 요구한다. 상세53개 실행과 source 제한은 stage2-mount-order-independent-root-proposal-review.json·실행 원문 txt·stage2-mount-order-root-candidate-grant.json에 있다.
+
+
+## 실제 두 코드 판정과 한정된 결합·source pin 후보 범위
+
+Root는 실제 Claude9c37e6a11151c4ae6cd5d935b89304ab96223bf0 원문과 Docs42179189534/job127764583055의 exact source/ref/event/path/attempt1/correlation/전체19단계 성공을 확인했다. Low dba1804b는 한정 코드 축 수락이며 R2–R5와 R1 정적 selector 범위가 닫혔다. 새 PL-R1a는 현재 제품에서 도달하지 않는 nonblocking Low다. Stage2 01a4bebf도 한정 fixed-case 코드 축 수락이다. 이는 별개 두 소스 판정이며 결합 소스·전체 Core·운영 수락은 아니다. 실제 reviewer의16상위72하위/vet0, Stage2129+독립22통과와 local race NOTRUN/cgo exit2를 구분한다.
+
+Root는 msg_256747ff9f44로 같은 Codex에게 PL-R1a 시험 코드·README 수정을 먼저 지시했다. 실제 types.Object 기반의 자체 interface/constraint exported method 경유 외부 효과와 foreign package variable 주소 취득을 막고 기존 unexported port·UTC read 정상 사례는 보존한다. 비시험 Go 제품 코드는 바꾸지 않는다. 새 Low를 저자가 자체 완료 처리하지 않고 필수 결합 검토에 함께 포함한다.
+
+결합은 Stage2 보고21059451c23cebe8c038f76e437c390120205998에서 시작해 새 PL-R1a Low branch를 정상 두 부모 merge한다. 실제 경로 무중첩과 각 source blob의 side 일치를 증명하고 충돌을 임의 해결하지 않는다. branch 제한 진단 workflow는210594 바이트 그대로 운반하며 결합 ref에서 비활성이다. 그 다음 별도 commit에서 standalone launcher의 WORKER_MODULES 중 worker_peer_floor.py 값 한 줄만 c73c81ad에서 실제 검토한 helper7665735e로 바꾸는 source 후보를 허용한다. Root는210594 helper 원본 hash와 기존 pin·lock을 독립 재계산했다. 전체 새 digest와 정확한 범위는 k2a-low-stage2-combined-root-scope.json에 고정한다.
+
+leaf-rotation-runtime-lock.json/LOCK06710d85, 다른 module/entry pin, bundle·install :2 schema, K1의28 schema/verifier/resource pin·v5 graph·원본 이력과13/73/0 기준·go.mod는 그대로다. raw7 closure와 launcher hash는 실제 변경 바이트에서 새로 측정하며 source 후보 UNREGISTERED로 기록한다. 이 한 줄은 live trust·설치·배포·PKI 등록이 아니다. 이전 Stage1 helper17378b80은 등록하지 않는다.
+
+Codex는 의미 있는 순차 시험·기존 standalone 시험 불변·실제 문서 gate/commit/push/exact Docs 뒤 새 고정 후보를 제출한다. Root는 먼저 진행 중인 B rev8 실제 검토를 받고, 검토자 exit/release와 후보 준비를 확인한 뒤 PL-R1a/merge/pin/진단을 포함한 단일 실제 결합 검토를 배정한다. 그 판정 후 Root의 다음 정확한 결정으로만 고정 최종 소스의 새 전체 Core·Docs를 한 번 실행한다. 현재 full Core 실행은 아직 부여하지 않았다. 실제 clock/current/authentication/effects·K2 usable·40runtime·5대 인수는 여전히 NULL/HOLD/미실행이다. 기존 de71 Core42164071724와 Stage1 push42170068364 실패·원래 차이 UNKNOWN도 보존한다.

@@ -1,15 +1,19 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.407"
+version: "1.0.408"
 status: "review"
 author: "Codex"
-updated: "2026-11-06T16:06:19+09:00"
+updated: "2026-11-06T16:18:44+09:00"
 source_of_truth: "Git"
 active_card: "FLEET5-20261105 five physical node orchestration"
-active_card_status: "B8final6a65 source/Docs verified; actual review taskac6 pending behind active LowStage2taskde20; no product/portgrant/wholeCore/physical completion"
-active_card_next: "Handle actual LowStage2 verdict and precise integration/pins first; after actual reviewer exit/release start existing B8readytask once; concrete B nextcut after review"
+active_card_status: "ActualLowStage2codeaccept/PLR1a nonblocking; sameCodex granted TEST+merge+exactpin candidate; B8ctxa3 actualreviewactive; wholeCore/physical incomplete"
+active_card_next: "Codex PLR1a+2parentmerge+onepin candidate with exactDocs; Claude wholeB8 review; Root nextscope and one combinedreview after candidate ready/reviewer exit; then decidefreshCore"
 ---
+
+## 2026-11-06T16:18:44+09:00 실제 두 코드 축 판정과 결합 후보 지시
+
+작업한 것과 확인: 실제 Claude9c37e6a1/Docs42179189534는 Low dba와 Stage2 01a를 각각 한정 코드 축에서 수락했다. Root는 현재 제품에 도달하지 않는 PL-R1a Low의 시험·README 보강, 두 부모 merge, 검토된 helper의 단일 source pin 후보 변경을 같은 Codex에게 지시했다. B rev8 task_ac6f831f2c53/ctx_a3cf08fa935b도 이전 검토자의 실제 exit/release 뒤 한 번 시작했다. 결합 소스의 실제 검토·새 전체 Core와5대 운영 인수는 아직 남는다. 원질문 msg_6823df024379에는 msg_256747ff9f44로 실제 판정과 구체 다음 범위를 답했다. 다음 첫 행동/담당은 Codex의 제한된 새 결합 후보, Claude의 B8 실제 판정, Root의 고정 결합 후보 검토 배정이다.
 
 ## 2026-11-06T16:06:19+09:00 B rev8 최종본과 단일 검토 대기열
 

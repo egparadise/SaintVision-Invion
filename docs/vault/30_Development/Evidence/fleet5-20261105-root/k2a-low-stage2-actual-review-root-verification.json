@@ -1,0 +1,13 @@
+{
+  "atKST": "2026-11-06T16:13:52+09:00",
+  "Low": "dba1804b1d180eda2bf0439952e9706782109fd6",
+  "Stage2": "01a4bebf55d23f11f85258746662d8b8a5cd0311",
+  "actualReview": "9c37e6a11151c4ae6cd5d935b89304ab96223bf0",
+  "branch": "agent/claude/fleet5-k2a-low-stage2-pair-review-20261106",
+  "Docs": 42179189534,
+  "job": 127764583055,
+  "correlation": "FLEET5-K2A-Low-Stage2-pair-review-Claude-Docs-9c37e6a11151-20261106T1612KST",
+  "rootVerifiedExactHeadRefEventWorkflowAttemptAllStepsSuccess": true,
+  "remoteExact": true,
+  "reviewOnlyPaths": 9
+}
