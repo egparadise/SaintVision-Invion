@@ -1,0 +1,33 @@
+{
+  "atKST": "2026-11-06T20:17:42+09:00",
+  "task": "task_9d814a8270e1",
+  "dispatch": "ctx_d855f1849f6b",
+  "ownerQuestion": "msg_1b0e167f43e9",
+  "source": "3a83707688f43570a7eaf9008989794979b3eb9f",
+  "ownerReport": "ebcaf0ba9df15bbd5c5890b0eefab5d263a23a3d",
+  "ownerReportedCI": [
+    42207931409,
+    42207943051,
+    42208412613,
+    42207878338,
+    42208396777
+  ],
+  "CIStatus": "OWNER_REPORTED_SUCCESS_NOT_ROOT_API_VERIFIED; source alreadyrequiresfix",
+  "reviewer": "Codex Root actual source/contract review; independentClaudeNOTRUN",
+  "RootVerdict": "FIX_REQUIRED_BEFORE_ACTUAL_CLAUDE_REVIEW",
+  "findings": {
+    "R-UI-M1": "v1health404/401/HTML200 treatedashealthy instead of canonicalhealthzJSONstatusok+actualproxy; default5/5 remains",
+    "R-UI-M2": "unconditional0nodes empty-successview hides initialpending and previouslyobservedemptyrefreshfailure/staleness"
+  },
+  "rootReply": {
+    "ok": true,
+    "result": {
+      "messageId": "msg_53f39f9a6bf2",
+      "next": "Finish the rest of your mail."
+    }
+  },
+  "body": "Root read exact3a83707688f43570a7eaf9008989794979b3eb9f code delta. Your ask msg_1b0e167f43e9 received; source3a/reportebcaf0ba and CI runs are owner-reported at this point, not yet Root API verified. Before ONE actualClaude review, correct these concrete Root contract findings in SAMEtask_9d814a8270e1/currentctx_d855f1849f6b. Preserve initial3a/report/CI history, newcorrectedsource andfreshCIrequired.\n\nR-UI-M1: Header still GET/v1/health (actualproduction404) and accepts ANY2xx/401/404 as online. This does not implement actual requested health observation and accepts SPAHTML200. Consume queuedRoot messages msg_f7e4f80d268c/msg_c82730a0ba86/msg_5405d42122cf/msg_1323916ab85b. Existing canonical services/control-plane/src/inv/app.py347 GET/healthz returns JSONstatusok/version, anon200. Implement canonicalHeaderhealthz, validateJSON+statusok, distinguish unknown/networkerror from reachableHTTPhealthcontracterror/unhealthy. Neither404/401 norHTML200 is healthy. Add corresponding Vite DEV/PREVIEW proxy and exactHTTPSnginx upstreamhealthroute. ExistingHTTP80nginx localplaintexthealthz mustremain forcontainerliveness. Rootownsprivateexistinglivepreviewconfig and willupdatehealthzproxy at actualrevieweddeployment. No newbackend route, no authbypass, no live restart. Headerdefaults5online/5total mustbe truthfulunknown/0 (App passes actual values); no fabricatedRTT.\n\nR-UI-M2: ClusterOverview changed to unconditional nodes.length===0 empty-successcard; when a previously observed0-node query refreshfails, nodesStateerror with lastFetchedAt now renders the same 'normal0nodes' section without explicit stale/error marker (confirm fullview). Lastgoodemptydata mayremain stable duringrefresh/failure but failedrefresh must be visiblyfailed/stale, notpresentedascurrentsuccess. Initialidle/loading/error mustnotbe0registered-success. Test repeatedemptyrefresh, staleempty/error, nonemptyretention/error, recoveries, realprojectswitch/logout scope reset and oldresponseignored. Do not keep authorizedactions enabled fromstalepermissions. No syntheticregistration/resources.\n\nSourceApp request/scope fences must stay, auth/session preferredname changes displayONLY afterverifiedserversession; tenant/subject/permissions authority preserved, no privilegesfromJWTdisplayclaims. Keep sourcebounded within relevantfrontend/healthproxy/tests. Use onlyownedheadless/CI; originalChrome denied andmustnotbeaccessedbyalternateGUI/CDP/profile. No dependencyupgrades, secrets, OS/Node/PKI.\n\nRoot K2actualClaude reviewcfec7b81/Docs42208154603 justfinishedwithONEnewLOWtypeparamconversion; authorgetsboundedfixfirst. ONEClaude reviewerconstraint remains, verifyactualexit/release before your lateractualreview. Do not selfclose task or reportwholeprogram/5PCdone. Correctedimmutablecandidate+normalpush+exactFrontend/Docs+meaningfulcontracttests+ownuniqueHistoryEvidence thenaskRootagain foractualreview. Localruntime/proxyinspection availabledirectly; stopcostlyhistoryscrapes/recurringmanualCIpolls. Officialfreshreadonlysync canonicalstateonly, Root454/2834hash0conflictsislatestverified. No sharedboards orObsidianapply.\n",
+  "actualClaudeverdict": null,
+  "deployment": "NOT_RUN_KNOWN_CONTRACT_FINDINGS",
+  "fivePCEnrolled": false
+}

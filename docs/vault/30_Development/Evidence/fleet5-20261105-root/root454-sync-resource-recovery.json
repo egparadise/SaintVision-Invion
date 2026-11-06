@@ -1,0 +1,44 @@
+{
+  "SHA": "fba7a8a393d4b4684d670d0c9ae4697f37d60bbd",
+  "Docs": 42205869046,
+  "exactHeadCorrelationAllJobsSuccess": true,
+  "remoteMatches": true,
+  "syncExits": [
+    0,
+    0,
+    0
+  ],
+  "independentlyMatchedNormalizedDestinationHashes": 2834,
+  "pending": 0,
+  "conflicts": 0,
+  "trackedAndUntrackedClean": true,
+  "rootDocsOnly": true,
+  "wholeProgramComplete": false,
+  "verifiedAtKST": "2026-11-06T20:01:39+09:00",
+  "initialPrecheckFailure": "Windows1450 preserved in root454-sync-precheck.log; no apply then; one retry after measuredresourcechange",
+  "recoveryAttempt": {
+    "atKST": "2026-11-06T20:00:04+09:00",
+    "priorFailurePreserved": true,
+    "reasonForOneRetry": "actualfreevirtualmemoryincreased2453960to3441312KiB; boundedworkersserialized; noOSchanges",
+    "commands": [
+      {
+        "action": "--check",
+        "exit": 0,
+        "logSHA256": "41a0f1d1793e4124842163f424078bf47527bfdc503c235eafda566dcc02af90",
+        "endedAtKST": "2026-11-06T20:00:22+09:00"
+      },
+      {
+        "action": "--apply",
+        "exit": 0,
+        "logSHA256": "7a21a44a4e3e3f9f93a88a803dca0432ca379a435352bf34a24322f3f2ab5ccb",
+        "endedAtKST": "2026-11-06T20:01:08+09:00"
+      },
+      {
+        "action": "--check",
+        "exit": 0,
+        "logSHA256": "a8b841461fab8331cf059057771fe090ed814e0ca6bb8fa6807a51da5a83d2ef",
+        "endedAtKST": "2026-11-06T20:01:27+09:00"
+      }
+    ]
+  }
+}

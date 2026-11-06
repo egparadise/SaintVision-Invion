@@ -3,8 +3,8 @@
   "recordedAtKST": "2026-11-06T00:46:51+09:00",
   "rootBase": "2b1753ce59c09037b5e130a7ffe64794d1d45fdf",
   "priorRootCheckpoint": {
-    "SHA": "53683020e3cfaf79ec4662f9a79b8b4dae28a628",
-    "Docs": 42201651730,
+    "SHA": "fba7a8a393d4b4684d670d0c9ae4697f37d60bbd",
+    "Docs": 42205869046,
     "exactHeadCorrelationAllJobsSuccess": true,
     "remoteMatches": true,
     "syncExits": [
@@ -12,13 +12,39 @@
       0,
       0
     ],
-    "independentlyMatchedNormalizedDestinationHashes": 2826,
+    "independentlyMatchedNormalizedDestinationHashes": 2834,
     "pending": 0,
     "conflicts": 0,
     "trackedAndUntrackedClean": true,
     "rootDocsOnly": true,
     "wholeProgramComplete": false,
-    "verifiedAtKST": "2026-11-06T19:20:01+09:00"
+    "verifiedAtKST": "2026-11-06T20:01:39+09:00",
+    "initialPrecheckFailure": "Windows1450 preserved in root454-sync-precheck.log; no apply then; one retry after measuredresourcechange",
+    "recoveryAttempt": {
+      "atKST": "2026-11-06T20:00:04+09:00",
+      "priorFailurePreserved": true,
+      "reasonForOneRetry": "actualfreevirtualmemoryincreased2453960to3441312KiB; boundedworkersserialized; noOSchanges",
+      "commands": [
+        {
+          "action": "--check",
+          "exit": 0,
+          "logSHA256": "41a0f1d1793e4124842163f424078bf47527bfdc503c235eafda566dcc02af90",
+          "endedAtKST": "2026-11-06T20:00:22+09:00"
+        },
+        {
+          "action": "--apply",
+          "exit": 0,
+          "logSHA256": "7a21a44a4e3e3f9f93a88a803dca0432ca379a435352bf34a24322f3f2ab5ccb",
+          "endedAtKST": "2026-11-06T20:01:08+09:00"
+        },
+        {
+          "action": "--check",
+          "exit": 0,
+          "logSHA256": "a8b841461fab8331cf059057771fe090ed814e0ca6bb8fa6807a51da5a83d2ef",
+          "endedAtKST": "2026-11-06T20:01:27+09:00"
+        }
+      ]
+    }
   },
   "actualPlanLowReview": {
     "source": "803ad270562b1b75e44d26f9e14b965c714ab519",
@@ -2515,7 +2541,7 @@
     "ownerT1T2T3": "msg_620855c76519",
     "normativeRevisionReply": "msg_0392caf64d5d"
   },
-  "latestRecordAtKST": "2026-11-06T19:48:35+09:00",
+  "latestRecordAtKST": "2026-11-06T20:17:42+09:00",
   "optionalLowTokenTestDelta": {
     "source": "f0af307705b4923ebc3e231db5238af4c70aa389",
     "scope": "two otherwise-valid token payload corrections and JSON validity assertions; runtime unchanged",
@@ -2584,7 +2610,7 @@
     "onlyFourDraftToolPointerFieldsDiffered": true,
     "rootProductChanged": false
   },
-  "physicalRefresh": "physical-readiness-refresh-20261106-1933.json",
+  "physicalRefresh": "physical-readiness-refresh-20261106-pc3-docker-ready.json",
   "sourceDocCitationAdaptations": [
     {
       "source": "100f6f132132199d1204a76190f04712dd82de00",
@@ -2631,7 +2657,7 @@
   },
   "implementationScopeDecision": "implementation-scope-decision-root.json",
   "previousPhysicalRefreshPreserved": "physical-readiness-refresh-20261106.json",
-  "pendingUserInput": "PC1authorizedpublickeyandPC3dockergroupOSresults; concretebootstrapprovided, no genericapproval",
+  "pendingUserInput": "PC1publickeyregistration remains actualaccess prerequisite; PC3Docker nowobservedOK; no repeatedOSorapprovalquestion",
   "bootstrapV4ActualReview": {
     "reviewSHA": "d2fab4a2bfc6c9c1f3f6136735cb1591e20aada4",
     "reviewDocs": 42088999346,
@@ -3108,16 +3134,7 @@
     "reviewOnlyPaths": 18
   },
   "BRev7RootDecision": "b-rev7-concrete-root-decision.json",
-  "activeActualReview": {
-    "taskId": "task_26dd9ebd51dd",
-    "dispatchId": "ctx_63ce6b6612b7",
-    "terminal": "term_b1366203-1a64-45bf-b3b8-b577d89fc9ae",
-    "receipt": "ready",
-    "source": "b47d5dd6cd23873c62602e02e85a8f82c9843dc5",
-    "scope": "ONEactualClaudeNARROWpointeeconversiontestdelta",
-    "predecessor": "ctx_94f4cd146419 succeeded/settled/exited/released actualverified",
-    "verdict": null
-  },
+  "activeActualReview": null,
   "nextReviewRequires": "newimmutableK2Low/Stage2 orB8 pilot/evidence; oneClaudeafteractualrelease",
   "K2LatestImmutableProposalRootObservation": "k2-rev2-root-actual-contract-review-gate.json",
   "K2LatestActualReviewDispatch": {
@@ -3194,6 +3211,8 @@
   "PLR1bActualReview": "k2a-pl-r1b-actual-review-root-verification.json",
   "PLR1cScope": "k2a-pl-r1c-root-scope.json",
   "administratorLogin": "administrator-login-root-handoff.json",
-  "frontendRefresh": "portal-refresh-fleet-ui-root-dispatch.json",
-  "physicalShareFollowup": "pc3-user-share-setup-20261106.json"
+  "frontendRefresh": "portal-refresh-3a-root-contract-findings.json",
+  "physicalShareFollowup": "pc3-user-share-setup-20261106.json",
+  "PLR1cActualReview": "k2a-pl-r1c-actual-review-root-verification.json",
+  "PLR1dScope": "k2a-pl-r1d-root-scope.json"
 }

@@ -50,5 +50,21 @@
     "verdict": null
   },
   "fullCoreGranted": false,
-  "wholeProgramComplete": false
+  "wholeProgramComplete": false,
+  "actualReview": {
+    "atKST": "2026-11-06T20:12:24+09:00",
+    "target": "b47d5dd6cd23873c62602e02e85a8f82c9843dc5",
+    "actualReview": "cfec7b81094b487ed068eac08a228cb99dd7509a",
+    "branch": "agent/claude/fleet5-k2a-pl-r1c-b47-review-20261106",
+    "Docs": 42208154603,
+    "job": 127859873292,
+    "correlation": "FLEET5-K2A-PL-R1C-B47-review-Claude-Docs-cfec7b81094b-20261106T2011KST",
+    "rootVerifiedExactHeadRefEventPathAttemptAll19StepsSuccess": true,
+    "remoteExact": true,
+    "uniqueAddedReviewDocs": 9
+  },
+  "actualVerdict": "REVISION_REQUIRED PL-R1dLOW",
+  "actualWorkerDone": "msg_959aed1e687c",
+  "nextRootScope": "k2a-pl-r1d-root-scope.json",
+  "rootReply": "msg_049b87bd98ba"
 }

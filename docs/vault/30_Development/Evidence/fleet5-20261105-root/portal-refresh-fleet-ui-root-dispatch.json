@@ -1,5 +1,5 @@
 {
-  "atKST": "2026-11-06T19:48:35+09:00",
+  "atKST": "2026-11-06T20:17:42+09:00",
   "taskId": "task_9d814a8270e1",
   "dispatchId": "ctx_d855f1849f6b",
   "terminal": "term_8b773c12-fcd0-495e-946c-d2a67bd2b029",
@@ -10,9 +10,12 @@
   "scope": "stablebackgroundrefresh/realhealthcontract+proxy/tests; no fabricatedNodes/auth/runtime",
   "RootGatewayEvidence": "portal-health-route-mismatch-20261106.json",
   "scopeClarification": "msg_f7e4f80d268c",
-  "source": null,
+  "source": "3a83707688f43570a7eaf9008989794979b3eb9f",
   "review": null,
   "deployment": null,
   "hostChromePermissionBypass": false,
-  "fivePCEnrolled": false
+  "fivePCEnrolled": false,
+  "ownerReport": "ebcaf0ba9df15bbd5c5890b0eefab5d263a23a3d",
+  "RootContractReview": "portal-refresh-3a-root-contract-findings.json",
+  "next": "sameowneractualhealthJSONproxy/staleemptyfix thenfreshCI+actualindependentreview; no deploy"
 }

@@ -1,15 +1,19 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.415"
+version: "1.0.416"
 status: "review"
 author: "Codex"
-updated: "2026-11-06T19:48:35+09:00"
+updated: "2026-11-06T20:17:42+09:00"
 source_of_truth: "Git"
 active_card: "FLEET5 continued supervision with PORTAL-REFRESH-FLEET-20261106"
-active_card_status: "Adminactualartifactdeployed13hash/SSO200; GeminiUIrefresh+healthfixactive; PLR1cb47oneClaudeactive; B9bcontinues; realfleetprerequisitespending"
-active_card_next: "RootprocessactualPLverdictthenpreciseoneCorechoice; frozenUIcandidateactualreviewthenbuildartifactdeploy; PC1publickeyandPC3groupOSresultsawaitfreshSSH; PC5APIneedsverifiedruntimepath"
+active_card_status: "PC3Docker29.9.3API1.56/share/GPUqueryready; actualPLR1cN1N6closed/newR1dLOWfix; UI3ahealth/staleemptycontractfix; B9bcontinues; Root454sync2834recovered"
+active_card_next: "SameownersPLR1dtestonly/UIhealthproxyandstaleempty/B9bfix; RootnewfrozencandidateactualreviewthenpreciseCoreorfrontenddeploy; PC1access/PC5runtimeprerequisitesremain"
 ---
+
+## 2026-11-06T20:17:42+09:00 PC3 실제 준비 진전과 새 후보 보완
+
+PC3의 Docker29.9.3/API1.56·GPU 조회·공유 폴더 접근을 새 SSH에서 확인해 PC2·3·4의 host 준비 조건이 진전됐다. PC1 SSH와 PC5 API 보강·실제 Node 등록은 남는다. UI3a는 실제 health 경로와 빈 화면 오류 표시의 계약 문제를 Root가 찾아 같은 Gemini에게 보완 지시했다. K2 실제 cfec 검토는 N1–N6를 닫고 generic target의 새 Low만 남겨 같은 Codex에게3파일 보강을 지시했다. Root454의 리소스 오류는 보존했고 재측정 뒤 동기화0/0/0·2834hash를 확인했다. 다음 첫 행동/담당은 각 owner의 한정 수정·실제 CI 고정, Root의 순차 독립 검토와 검토된 source만 배포하는 것이다. 사용자에게 PC3 Docker 작업을 다시 요구하지 않는다.
 
 ## 2026-11-06T19:48:35+09:00 실제 배포 사후 검증·화면 수정과 장비 연결 계속
 

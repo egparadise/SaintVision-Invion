@@ -1,11 +1,11 @@
 ---
 doc_id: "GOV-FLEET5-BOOTSTRAP-V5-FREEZE-CODE-SCOPE-20261106"
 title: "FLEET5 전환 v5 계약 동결과 구현 범위"
-version: "1.0.14"
+version: "1.0.15"
 status: "active"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-11-06T19:17:15+09:00"
+updated: "2026-11-06T20:17:42+09:00"
 source_of_truth: "Git"
 ---
 
@@ -166,3 +166,8 @@ Root는 전체 Core 전에 이 시험 보강을 하는 선택을 확정했다. �
 ## 실제 후속 검토와 제한된 다음 수정
 
 실제5a3c77f6/Docs42200327874는 PL-R1b의 원래7우회·write form·reason과 positive를 수락했지만 pointer conversion으로 같은 주소의 pointee 이름만 바꾸는 PL-R1c Low를 남겼다. Root는 msg_a58269f30929로 같은 Codex에게084 기반 새 test-only branch의3파일 보강만 지시했다. pointer target conversion은 untyped nil 또는 element가 types.Identical인 pointer operand만 허용하며 N1–N6/P1과 README 한계를 보강한다. 기존54사례와 acceptedmerge/pin/diagnostics·production bytes는 유지한다. 실제 새 delta 수락 뒤 한 번의 fresh Core를 선택하며 현재 Core grant는 없다. 정확한 범위는 k2a-pl-r1c-root-scope.json이다.
+
+
+## PL-R1c 실제 검토와 한정 PL-R1d 후속
+
+cfec7b81094b487ed068eac08a228cb99dd7509a/Docs42208154603은 기존 N1–N6·non-generic conversion·75owner 사례와 storage 한계를 수락했으나 type parameter constraint의 pointer term은 기존 pointerElement에서 빠지는 새 PL-R1d LOW를 남겼다. 실제 production7파일에는 해당 conversion이 없고 이전 reviewer 명세도 불완전했음을 기록한다. Root는 msg_049b87bd98ba로 b47 기반 새 branch의 동일3test/README만 보강하고 실제 좁은 검토 뒤 한 번의 Core를 결정한다. production/K1/pin/모든 실행 binding은 바꾸지 않으며 현재 Core grant는0이다. 정확한 지시는 k2a-pl-r1d-root-scope.json이다.
