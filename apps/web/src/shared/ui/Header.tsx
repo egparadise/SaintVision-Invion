@@ -13,6 +13,13 @@ export interface HeaderProps {
   onSwitchToDesktop?: () => void;
 }
 
+function formatUserDisplayName(name: string): string {
+  if (typeof name === 'string' && name.startsWith('oidc:') && name.length > 16) {
+    return `사용자 (${name.slice(5, 13)}…)`;
+  }
+  return name;
+}
+
 export const Header: React.FC<HeaderProps> = ({
   currentTheme,
   onToggleTheme,
@@ -24,9 +31,9 @@ export const Header: React.FC<HeaderProps> = ({
   onLogout,
   onSwitchToDesktop,
 }) => {
-  const [gatewayStatus, setGatewayStatus] = useState<{ online: boolean; rttMs: number | null }>({
-    online: true,
-    rttMs: 8,
+  const [gatewayStatus, setGatewayStatus] = useState<{ online: boolean | null; rttMs: number | null }>({
+    online: null,
+    rttMs: null,
   });
 
   useEffect(() => {
@@ -37,7 +44,8 @@ export const Header: React.FC<HeaderProps> = ({
         const res = await fetch('/v1/health');
         const rtt = Math.round(performance.now() - start);
         if (isMounted) {
-          if (res.ok) {
+          // HTTP 2xx, 401, or 404 confirms the gateway transport is online and responsive
+          if (res.ok || res.status === 401 || res.status === 404) {
             setGatewayStatus({ online: true, rttMs: rtt });
           } else {
             setGatewayStatus({ online: false, rttMs: null });
@@ -182,12 +190,24 @@ export const Header: React.FC<HeaderProps> = ({
               width: '8px',
               height: '8px',
               borderRadius: '50%',
-              backgroundColor: gatewayStatus.online ? 'var(--color-status-online)' : 'var(--color-status-offline)',
+              backgroundColor:
+                gatewayStatus.online === null
+                  ? 'var(--color-status-unknown)'
+                  : gatewayStatus.online
+                    ? 'var(--color-status-online)'
+                    : 'var(--color-status-offline)',
               display: 'inline-block',
             }}
           />
           <span style={{ color: 'var(--color-text-secondary)' }}>
-            Gateway: {gatewayStatus.online ? <strong>{gatewayStatus.rttMs ?? 0}ms</strong> : <strong style={{ color: 'var(--color-status-offline)' }}>Offline</strong>}
+            Gateway:{' '}
+            {gatewayStatus.online === null ? (
+              <strong>확인 중...</strong>
+            ) : gatewayStatus.online ? (
+              <strong>{gatewayStatus.rttMs ?? 0}ms</strong>
+            ) : (
+              <strong style={{ color: 'var(--color-status-offline)' }}>Offline</strong>
+            )}
           </span>
         </div>
 
@@ -205,7 +225,7 @@ export const Header: React.FC<HeaderProps> = ({
             }}
           >
             <span style={{ fontWeight: 600, color: 'var(--color-brand-primary)' }}>
-              👤 {currentUser.name}
+              👤 {formatUserDisplayName(currentUser.name)}
             </span>
             <span
               style={{

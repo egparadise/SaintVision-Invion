@@ -73,8 +73,8 @@ export const ClusterOverview: React.FC<ClusterOverviewProps> = ({
   lastFetchedAt = null,
   onRefresh,
 }) => {
-  // 1. 에러 상태이면서 노드가 0대인 경우: 정상 0대 빈 상태로 둔갑하지 않고 즉시 에러 표출
-  if (nodesState === 'error' && nodes.length === 0) {
+  // 1. 에러 상태이면서 노드가 0대인 경우: 정상 0대 빈 상태로 둔갑하지 않고 즉시 에러 표출 (이전 관측 성공이 없는 경우)
+  if (nodesState === 'error' && nodes.length === 0 && !lastFetchedAt) {
     return (
       <section
         role="alert"
@@ -117,8 +117,8 @@ export const ClusterOverview: React.FC<ClusterOverviewProps> = ({
     );
   }
 
-  // 2. 정상 조회 결과 노드가 0대인 경우 (정상 빈 클러스터)
-  if (nodes.length === 0 && (nodesState === 'success' || nodesState === 'idle')) {
+  // 2. 정상 조회 결과 노드가 0대인 경우 (정상 빈 클러스터) 또는 관측된 노드가 0대인 상태
+  if (nodes.length === 0) {
     return (
       <section
         role="status"

@@ -706,6 +706,7 @@ export async function completeLogin(): Promise<{
     }
 
     const nowSec = Math.floor(Date.now() / 1000);
+    let idClaims: JwtClaims | null = null;
 
     // OIDC ID token validation (when nonce was sent or id_token is provided)
     if (tx.nonce || result.id_token) {
@@ -715,7 +716,7 @@ export async function completeLogin(): Promise<{
       if (config.jwks?.keys) {
         await verifyIdTokenSignature(result.id_token, config);
       }
-      const idClaims = parseJwtPayload(result.id_token);
+      idClaims = parseJwtPayload(result.id_token);
       if (!idClaims) {
         throw new Error('ID 토큰 페이로드가 올바르지 않습니다.');
       }
@@ -778,11 +779,22 @@ export async function completeLogin(): Promise<{
       throw new Error('서버 사용자 세션 유효 기간이 계약 허용치(최대 3600초)를 초과합니다.');
     }
 
+    const preferredName =
+      (typeof idClaims?.preferred_username === 'string' && idClaims.preferred_username.trim()) ||
+      (typeof idClaims?.name === 'string' && idClaims.name.trim()) ||
+      (typeof idClaims?.email === 'string' && idClaims.email.trim());
+
+    const displayName =
+      preferredName ||
+      (identity.subjectId.startsWith('oidc:')
+        ? `사용자 (${identity.subjectId.slice(5, 13)}…)`
+        : identity.subjectId);
+
     return {
       token: result.access_token,
       user: {
         id: identity.subjectId,
-        name: identity.subjectId,
+        name: displayName,
         tenantId: identity.tenantId,
         role: '프로젝트별 권한',
       },
@@ -950,11 +962,22 @@ export async function completeStepUp(): Promise<{
       throw new Error('서버 사용자 세션 유효 기간이 계약 허용치(최대 3600초)를 초과합니다.');
     }
 
+    const preferredName =
+      (typeof idClaims?.preferred_username === 'string' && idClaims.preferred_username.trim()) ||
+      (typeof idClaims?.name === 'string' && idClaims.name.trim()) ||
+      (typeof idClaims?.email === 'string' && idClaims.email.trim());
+
+    const displayName =
+      preferredName ||
+      (identity.subjectId.startsWith('oidc:')
+        ? `사용자 (${identity.subjectId.slice(5, 13)}…)`
+        : identity.subjectId);
+
     return {
       token: result.access_token,
       user: {
         id: identity.subjectId,
-        name: identity.subjectId,
+        name: displayName,
         tenantId: identity.tenantId,
         role: '프로젝트별 권한',
       },

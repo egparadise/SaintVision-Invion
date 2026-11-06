@@ -278,7 +278,7 @@ export const App: React.FC = () => {
     setActiveTab('studio');
   };
 
-  const fetchNodes = React.useCallback(async () => {
+  const fetchNodes = React.useCallback(async (isBackground = false) => {
     if (!currentUser) {
       setNodesState('idle');
       return;
@@ -291,8 +291,10 @@ export const App: React.FC = () => {
     const currentSession = sessionRef.current;
     const currentScope = scopeRef.current;
     const request = ++nodeRequest.current;
-    setNodesState('loading');
-    setNodeError(null);
+    if (!isBackground) {
+      setNodesState('loading');
+      setNodeError(null);
+    }
     try {
       let page: NodePageResponse;
       try {
@@ -321,20 +323,20 @@ export const App: React.FC = () => {
       }
     } catch (err: any) {
       if (sessionRef.current === currentSession && scopeRef.current === currentScope && request === nodeRequest.current) {
-        setNodes([]);
-        setCertificateObservation(null);
         setNodesState('error');
         setNodeError(err?.message || '노드 목록을 확인하지 못했습니다.');
       }
     }
   }, [currentUser, projectId]);
 
-  const fetchRuns = React.useCallback(async () => {
+  const fetchRuns = React.useCallback(async (isBackground = false) => {
     if (!currentUser || !projectId || activeProject.current !== projectId) return;
     const currentSession = sessionRef.current;
     const scope = scopeRef.current;
     const request = ++runRequest.current;
-    setRunsState('loading');
+    if (!isBackground) {
+      setRunsState('loading');
+    }
     try {
       const items = await fetchObservedRuns(projectId);
       if (sessionRef.current === currentSession && scopeRef.current === scope && request === runRequest.current) {
@@ -345,7 +347,6 @@ export const App: React.FC = () => {
       }
     } catch (err: any) {
       if (sessionRef.current === currentSession && scopeRef.current === scope && request === runRequest.current) {
-        setRuns([]);
         setRunsState('error');
         const prob = err?.problem;
         const msg = prob?.code
@@ -356,12 +357,14 @@ export const App: React.FC = () => {
     }
   }, [currentUser, projectId]);
 
-  const fetchApprovals = React.useCallback(async () => {
+  const fetchApprovals = React.useCallback(async (isBackground = false) => {
     if (!currentUser || !projectId || activeProject.current !== projectId) return;
     const currentSession = sessionRef.current;
     const scope = scopeRef.current;
     const request = ++approvalRequest.current;
-    setApprovalsState('loading');
+    if (!isBackground) {
+      setApprovalsState('loading');
+    }
     try {
       const items = await fetchObservedApprovals(projectId);
       if (sessionRef.current === currentSession && scopeRef.current === scope && request === approvalRequest.current) {
@@ -372,14 +375,13 @@ export const App: React.FC = () => {
       }
     } catch {
       if (sessionRef.current === currentSession && scopeRef.current === scope && request === approvalRequest.current) {
-        setApprovals([]);
         setApprovalsState('error');
         setApprovalError('승인 목록을 확인하지 못했습니다.');
       }
     }
   }, [currentUser, projectId]);
 
-  const fetchWorkspaces = React.useCallback(async () => {
+  const fetchWorkspaces = React.useCallback(async (isBackground = false) => {
     if (!currentUser || !projectId || activeProject.current !== projectId) {
       setWorkspacesState('idle');
       return;
@@ -387,8 +389,10 @@ export const App: React.FC = () => {
     const currentSession = sessionRef.current;
     const scope = scopeRef.current;
     const request = ++workspaceRequest.current;
-    setWorkspacesState('loading');
-    setWorkspaceError(null);
+    if (!isBackground) {
+      setWorkspacesState('loading');
+      setWorkspaceError(null);
+    }
     try {
       const items = await fetchProjectWorkspaces(projectId);
       if (sessionRef.current === currentSession && scopeRef.current === scope && request === workspaceRequest.current) {
@@ -398,7 +402,6 @@ export const App: React.FC = () => {
       }
     } catch (err: any) {
       if (sessionRef.current === currentSession && scopeRef.current === scope && request === workspaceRequest.current) {
-        setWorkspaces([]);
         setWorkspacesState('error');
         setWorkspaceError(err?.message || 'Workspace 목록을 확인하지 못했습니다.');
       }
@@ -411,19 +414,19 @@ export const App: React.FC = () => {
 
   // Initial load from live backend endpoints
   useEffect(() => {
-    fetchNodes();
-    fetchRuns();
-    fetchApprovals();
-    fetchWorkspaces();
+    fetchNodes(false);
+    fetchRuns(false);
+    fetchApprovals(false);
+    fetchWorkspaces(false);
   }, [fetchNodes, fetchRuns, fetchApprovals, fetchWorkspaces]);
 
   // Periodic Telemetry Sync (Genuine Server Polling, Zero Synthetic Fluctuations)
   useEffect(() => {
     const interval = setInterval(() => {
-      fetchNodes();
-      fetchRuns();
-      fetchApprovals();
-      fetchWorkspaces();
+      fetchNodes(true);
+      fetchRuns(true);
+      fetchApprovals(true);
+      fetchWorkspaces(true);
     }, 5000);
     return () => clearInterval(interval);
   }, [fetchNodes, fetchRuns, fetchApprovals, fetchWorkspaces]);
