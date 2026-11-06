@@ -1,0 +1,17 @@
+{
+  "scope": "Rev9d own preparation/static checks only",
+  "events": [
+    {
+      "check": "Initial baseline parameter proof",
+      "command": [
+        "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+        "-B",
+        "-"
+      ],
+      "actualExit": 1,
+      "resourcePeak": "UNMEASURED",
+      "reason": "UNRESOLVED:UNKNOWN_ARGUMENT_BINDING in the static signature model for tools.lan_pilot.run named kwargs; no pilot operation was executed",
+      "resolution": "Bind explicit extra named keywords to the declared kwargs dictionary, citing original member expression spans/hashes; retain refusal of ambiguous owned spreads. Baseline proof and 11 binder controls then exit0."
+    }
+  ]
+}

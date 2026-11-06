@@ -1,0 +1,34 @@
+{
+  "executionOwner": "Codex",
+  "cases": [
+    {
+      "case": "unchanged-positive",
+      "accepted": true,
+      "expectedAccepted": true,
+      "pass": true,
+      "sourceSHA256": "65efcda7f8325408d596878280fb599d6532b688977e5304ede5183cf6d7c4ab",
+      "reason": null,
+      "parsedOnly": true
+    },
+    {
+      "case": "argument-shadow",
+      "accepted": false,
+      "expectedAccepted": false,
+      "pass": true,
+      "sourceSHA256": "99f1a3a50fbd2ddda80d754d3cfc562b1920a0efea2821cefd9eb75318259c1b",
+      "reason": "DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:OWNER_READ:self.db.transaction",
+      "parsedOnly": true
+    },
+    {
+      "case": "decorator",
+      "accepted": false,
+      "expectedAccepted": false,
+      "pass": true,
+      "sourceSHA256": "d9704001d0aa1c0579b5fdb28a9c0f5b19219b1979ab58c3520ab37ea8e3120b",
+      "reason": "DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:OWNER_READ:self.db.transaction",
+      "parsedOnly": true
+    }
+  ],
+  "effectfulMutantsImportedOrExecuted": false,
+  "actualRuntimeB": 0
+}

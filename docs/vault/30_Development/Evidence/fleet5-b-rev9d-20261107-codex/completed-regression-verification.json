@@ -1,0 +1,7 @@
+{
+  "verified": true,
+  "reuse": "Completed exact old/new12 and original47 execution receipts, not a second execution",
+  "sealTiming": "POST_RUN_SOURCE_SEAL: owner records no analysed-producer edits after these runs began; this is not an instrumented execution-time hash",
+  "sourceFilesVerified": 15,
+  "actualRuntimeB": 0
+}

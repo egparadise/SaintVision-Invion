@@ -1,0 +1,42 @@
+{
+  "mode": "Native argv-only source-audited local gates",
+  "gateSourceHashes": [
+    {
+      "path": "tools/check_docs.py",
+      "sha256": "bea5d2c807b1bf9a92b4892b510599aefa22f5c5bd8ceedf515648cb3f0a289d"
+    },
+    {
+      "path": "tools/check_ontology.py",
+      "sha256": "7a3ceec081889b9507a13ca99c7a016091914a0c9b991cdac91882ec3cb0e721"
+    },
+    {
+      "path": "tools/sync_obsidian.py",
+      "sha256": "6ceb8c41d72799956aa48fdd2e7d9589041cb2650deb424e3ad02da4b52919ad"
+    },
+    {
+      "path": "tools/check_contract_bindings.py",
+      "sha256": "9b8760bf1cb323b9c7b0d70b486d5def91816da1c3434c55aa28970c169939d6"
+    },
+    {
+      "path": "tools/check_frontend_integrity.py",
+      "sha256": "548139df4fb619158e4eecc5ce1b7752d4af9dce662430f7f8a69cf86135a736"
+    },
+    {
+      "path": "tools/check_doc_single_source.py",
+      "sha256": "56dcc084669f2c81807e0bb86a0c42c85d4a6558639daa8c91c22b30f3b2b050"
+    },
+    {
+      "path": "tools/check_response_freshness.py",
+      "sha256": "6932c2cc0172b4587a5ca4e4e4dec40f0e78c589fb32d40eaaf8365208e74a54"
+    },
+    {
+      "path": "tools/check_doc_path_citations.py",
+      "sha256": "83b9cfdeb104879077de7b4a16ced4a4e08922ba11f87958c4c3e140aa661211"
+    }
+  ],
+  "unsafeProtectedPathRecursiveRemovalAttempted": false,
+  "omittedUnsafeCommand": null,
+  "omittedCommandExit": "NOT_RUN_NONE_ENCOUNTERED",
+  "sync": "Only --check --state canonical --conflicts-out own, hash immediately before/after each call; no shared mutation",
+  "wholeCoreRetry": false
+}

@@ -1,0 +1,676 @@
+{
+  "source": "72028cbac903c4415d9979f980a6e0f9948e914f",
+  "entry": "inv.node_channels.revoke_channel",
+  "original": {
+    "function": "inv.node_channels.revoke_channel",
+    "supportStatus": "UNSUPPORTED_NAMED_PORTS_PENDING",
+    "unknownIDs": [
+      "c92597ca3a705637568a47fb88722c628921714a77092cca3ec29864068b5bb1",
+      "8c22987d25a5253530dc5b7fe3f2dbddd9bd01c23beb423f76b4455df60afe49",
+      "0b9bda6aaea4fa76e087d1c9b4d6c9786e102372d9e7a9eb1036227cf7ac2db7"
+    ],
+    "missingPorts": [
+      "inv.node_channels.revoke_channel:DomainError",
+      "inv.node_channels.revoke_channel:cursor.execute('SELECT node_id FROM inv.nodes WHERE tenant_id=%s AND node_id=%s FOR UPDATE', (node.tenant_id, node.node_id)).fetchone",
+      "inv.node_channels.revoke_channel:cursor.execute('SELECT version,certificate_sha256 FROM inv.node_channels WHERE tenant_id=%s AND node_id=%s FOR UPDATE', (node.tenant_id, node.node_id)).fetchone"
+    ]
+  },
+  "closedAnalysisEdges": [
+    {
+      "callRef": "c92597ca3a705637568a47fb88722c628921714a77092cca3ec29864068b5bb1",
+      "category": "ANALYSIS_RULE:A1",
+      "source": {
+        "path": "services/control-plane/src/inv/node_channels.py",
+        "span": [
+          207,
+          8,
+          210,
+          20
+        ],
+        "expressionSHA256": "6ee142af0b232881137e0c3ad36fdaf5afedae601d2d4e75e03fb038e3e90e67",
+        "fileSHA256": "3fad0bb24beb096522ea3335e3bf45f4e65f2d0d906177ef7e310aca1128502b"
+      },
+      "type": "UNRESOLVED_CALL_RETURN:inv.node_channels:cursor.execute",
+      "receiver": "cursor.execute('SELECT node_id FROM inv.nodes WHERE tenant_id=%s AND node_id=%s FOR UPDATE', (node.tenant_id, node.node_id)).fetchone",
+      "binding": {
+        "DBResult": {
+          "classification": "RESOLVED_DB_CURSOR_RESULT",
+          "retainsDatabaseRead": true,
+          "recordSHA256": "47f66d428eefb5b4d18eef52ac6c3e73c5c72f14bbff2311e3a290f877a8c2a4",
+          "recordSpan": [
+            207,
+            8,
+            210,
+            9
+          ],
+          "cursorFactoryCallRef": "2c3943b10514f48afc12612f1f3de752ac707336d7e7784453102269a55c0cf3",
+          "controlFlow": "Original result use/None guard/version comparison retained byte-exact; no pure-value exemption",
+          "rule": "A1_CURSOR_HARDENED",
+          "producerSanity": {
+            "parse": true,
+            "currentCallSpan": [
+              207,
+              8,
+              210,
+              20
+            ],
+            "sourceSHA256": "3fad0bb24beb096522ea3335e3bf45f4e65f2d0d906177ef7e310aca1128502b",
+            "producerExpressionSHA256": "47f66d428eefb5b4d18eef52ac6c3e73c5c72f14bbff2311e3a290f877a8c2a4",
+            "producerRecord": {
+              "source": "72028cbac903c4415d9979f980a6e0f9948e914f",
+              "path": "services/control-plane/src/inv/node_channels.py",
+              "function": "inv.node_channels.revoke_channel",
+              "line": 207,
+              "column": 8,
+              "endLine": 210,
+              "endColumn": 9,
+              "expression": "cursor.execute(\n            \"SELECT node_id FROM inv.nodes WHERE tenant_id=%s AND node_id=%s FOR UPDATE\",\n            (node.tenant_id, node.node_id),\n        )",
+              "expressionSHA256": "47f66d428eefb5b4d18eef52ac6c3e73c5c72f14bbff2311e3a290f877a8c2a4",
+              "kind": "SQL",
+              "tables": [
+                "inv.nodes"
+              ],
+              "modes": [
+                "FOR UPDATE"
+              ],
+              "resolvedSQL": "SELECT node_id FROM inv.nodes WHERE tenant_id=%s AND node_id=%s FOR UPDATE",
+              "unresolvedSQL": false,
+              "scopeDisposition": "CLOSED_LITERAL_SET_ALL_VARIANTS_ANALYZED",
+              "closedLiteralVariants": [
+                "SELECT node_id FROM inv.nodes WHERE tenant_id=%s AND node_id=%s FOR UPDATE"
+              ]
+            },
+            "producerCallRef": "be5a50a27836af1776b64fa291483e6be89f73b8570b63684e15f05a43caacc0"
+          },
+          "mutationScan": "name/attribute/delete/setattr/delattr/class/alias/escape checked"
+        }
+      },
+      "proof": "Exact source AST span + recorded producer/proven import and constructor closure",
+      "futureWork": "Real operator-role/PG transaction and denial-preservation trace before any code inclusion",
+      "blocksGrant": false,
+      "proofScope": "ANALYSIS_ONLY_NO_GRANT"
+    },
+    {
+      "callRef": "8c22987d25a5253530dc5b7fe3f2dbddd9bd01c23beb423f76b4455df60afe49",
+      "category": "ANALYSIS_RULE:A1",
+      "source": {
+        "path": "services/control-plane/src/inv/node_channels.py",
+        "span": [
+          211,
+          14,
+          214,
+          20
+        ],
+        "expressionSHA256": "e5ed92666dfe02b2c63a510ab09d14c9c514f4c44bc35b2bd35b4098eb744ffb",
+        "fileSHA256": "3fad0bb24beb096522ea3335e3bf45f4e65f2d0d906177ef7e310aca1128502b"
+      },
+      "type": "UNRESOLVED_CALL_RETURN:inv.node_channels:cursor.execute",
+      "receiver": "cursor.execute('SELECT version,certificate_sha256 FROM inv.node_channels WHERE tenant_id=%s AND node_id=%s FOR UPDATE', (node.tenant_id, node.node_id)).fetchone",
+      "binding": {
+        "DBResult": {
+          "classification": "RESOLVED_DB_CURSOR_RESULT",
+          "retainsDatabaseRead": true,
+          "recordSHA256": "9f4501cb265aa5fad9c891cbe482c6b96b338be7b13e087d810da51c96f416eb",
+          "recordSpan": [
+            211,
+            14,
+            214,
+            9
+          ],
+          "cursorFactoryCallRef": "2c3943b10514f48afc12612f1f3de752ac707336d7e7784453102269a55c0cf3",
+          "controlFlow": "Original result use/None guard/version comparison retained byte-exact; no pure-value exemption",
+          "rule": "A1_CURSOR_HARDENED",
+          "producerSanity": {
+            "parse": true,
+            "currentCallSpan": [
+              211,
+              14,
+              214,
+              20
+            ],
+            "sourceSHA256": "3fad0bb24beb096522ea3335e3bf45f4e65f2d0d906177ef7e310aca1128502b",
+            "producerExpressionSHA256": "9f4501cb265aa5fad9c891cbe482c6b96b338be7b13e087d810da51c96f416eb",
+            "producerRecord": {
+              "source": "72028cbac903c4415d9979f980a6e0f9948e914f",
+              "path": "services/control-plane/src/inv/node_channels.py",
+              "function": "inv.node_channels.revoke_channel",
+              "line": 211,
+              "column": 14,
+              "endLine": 214,
+              "endColumn": 9,
+              "expression": "cursor.execute(\n            \"SELECT version,certificate_sha256 FROM inv.node_channels WHERE tenant_id=%s AND node_id=%s FOR UPDATE\",\n            (node.tenant_id, node.node_id),\n        )",
+              "expressionSHA256": "9f4501cb265aa5fad9c891cbe482c6b96b338be7b13e087d810da51c96f416eb",
+              "kind": "SQL",
+              "tables": [
+                "inv.node_channels"
+              ],
+              "modes": [
+                "FOR UPDATE"
+              ],
+              "resolvedSQL": "SELECT version,certificate_sha256 FROM inv.node_channels WHERE tenant_id=%s AND node_id=%s FOR UPDATE",
+              "unresolvedSQL": false,
+              "scopeDisposition": "CLOSED_LITERAL_SET_ALL_VARIANTS_ANALYZED",
+              "closedLiteralVariants": [
+                "SELECT version,certificate_sha256 FROM inv.node_channels WHERE tenant_id=%s AND node_id=%s FOR UPDATE"
+              ]
+            },
+            "producerCallRef": "e477070758c9d1cb59dfd597b803381642887f44e1e357c805e0cd8409b0c75b"
+          },
+          "mutationScan": "name/attribute/delete/setattr/delattr/class/alias/escape checked"
+        }
+      },
+      "proof": "Exact source AST span + recorded producer/proven import and constructor closure",
+      "futureWork": "Real operator-role/PG transaction and denial-preservation trace before any code inclusion",
+      "blocksGrant": false,
+      "proofScope": "ANALYSIS_ONLY_NO_GRANT"
+    },
+    {
+      "callRef": "0b9bda6aaea4fa76e087d1c9b4d6c9786e102372d9e7a9eb1036227cf7ac2db7",
+      "category": "ANALYSIS_RULE:A2",
+      "source": {
+        "path": "services/control-plane/src/inv/node_channels.py",
+        "span": [
+          216,
+          18,
+          216,
+          75
+        ],
+        "expressionSHA256": "85015f3a7cf0d15aa1d3f69a29488a5f01bf2fc6a49b567a729cba25849924df",
+        "fileSHA256": "3fad0bb24beb096522ea3335e3bf45f4e65f2d0d906177ef7e310aca1128502b"
+      },
+      "type": "inv.errors.DomainError",
+      "receiver": "DomainError",
+      "binding": {
+        "constructor": "inv.errors.DomainError",
+        "base": "builtin Exception",
+        "decorator": "dataclasses.dataclass",
+        "fileSHA256": "833eea9d797496c44ef3b3003cf728cfa88d12128dddf60106632609ead3a7bc",
+        "init": "generated field assignment; no explicit init/post_init; __str__ not executed by construction"
+      },
+      "proof": "Exact source AST span + recorded producer/proven import and constructor closure",
+      "futureWork": "Real operator-role/PG transaction and denial-preservation trace before any code inclusion",
+      "blocksGrant": false,
+      "proofScope": "ANALYSIS_ONLY_NO_GRANT"
+    }
+  ],
+  "sourceCalls": 10,
+  "unchangedDBReadRecords": 4,
+  "status": "SOURCE_TO_PROPOSED_PROCEDURE_STATIC_CLOSED_RUNTIME_PENDING",
+  "notGrantable": true,
+  "procedureJoin": {
+    "entry": "inv.node_channels.revoke_channel",
+    "sourcePlanRef": "inv.node_channels.revoke_channel",
+    "sourceClosureRefs": [
+      "inv.node_channels.revoke_channel"
+    ],
+    "procedureRefs": [
+      "b_revoke_node_channel"
+    ],
+    "mergedPreacquiredLocks": [
+      {
+        "table": "inv.control_epoch",
+        "rank": 0,
+        "rowKeySet": "UNION of complete DB-discovered primary keys from all procedure/source/transitive requirements; tenant_id then complete primary-key canonical bytes; full discovered scope sorted",
+        "mode": "FOR SHARE",
+        "requirements": [
+          {
+            "origin": "procedure:b_revoke_node_channel",
+            "mode": "FOR SHARE"
+          }
+        ],
+        "acquire": "ONCE BEFORE ANY BODY EFFECT, canonical(rank,qualifiedTable,canonicalPKBytes)",
+        "wrappedBody": "REWRITE original locks to assert-held/no reacquisition; no SHARE->UPDATE upgrade after prefix"
+      },
+      {
+        "table": "inv.tenant_controls",
+        "rank": 100,
+        "rowKeySet": "UNION of complete DB-discovered primary keys from all procedure/source/transitive requirements; tenant_id then complete primary-key canonical bytes; full discovered scope sorted",
+        "mode": "FOR SHARE",
+        "requirements": [
+          {
+            "origin": "procedure:b_revoke_node_channel",
+            "mode": "FOR SHARE"
+          }
+        ],
+        "acquire": "ONCE BEFORE ANY BODY EFFECT, canonical(rank,qualifiedTable,canonicalPKBytes)",
+        "wrappedBody": "REWRITE original locks to assert-held/no reacquisition; no SHARE->UPDATE upgrade after prefix"
+      },
+      {
+        "table": "inv.node_role_routing",
+        "rank": 200,
+        "rowKeySet": "UNION of complete DB-discovered primary keys from all procedure/source/transitive requirements; tenant_id,node_id sorted canonical bytes over complete discovered set",
+        "mode": "FOR SHARE",
+        "requirements": [
+          {
+            "origin": "procedure:b_revoke_node_channel",
+            "mode": "FOR SHARE"
+          }
+        ],
+        "acquire": "ONCE BEFORE ANY BODY EFFECT, canonical(rank,qualifiedTable,canonicalPKBytes)",
+        "wrappedBody": "REWRITE original locks to assert-held/no reacquisition; no SHARE->UPDATE upgrade after prefix"
+      },
+      {
+        "table": "inv.node_role_cohorts",
+        "rank": 210,
+        "rowKeySet": "UNION of complete DB-discovered primary keys from all procedure/source/transitive requirements; tenant_id,cohort_id sorted canonical bytes over complete discovered set",
+        "mode": "FOR SHARE",
+        "requirements": [
+          {
+            "origin": "procedure:b_revoke_node_channel",
+            "mode": "FOR SHARE"
+          }
+        ],
+        "acquire": "ONCE BEFORE ANY BODY EFFECT, canonical(rank,qualifiedTable,canonicalPKBytes)",
+        "wrappedBody": "REWRITE original locks to assert-held/no reacquisition; no SHARE->UPDATE upgrade after prefix"
+      },
+      {
+        "table": "@transaction_advisory",
+        "rank": 300,
+        "rowKeySet": "UNION of complete DB-discovered primary keys from all procedure/source/transitive requirements; sorted complete transaction advisory keys",
+        "mode": "TRANSACTION_ADVISORY",
+        "requirements": [
+          {
+            "origin": "procedure:b_revoke_node_channel",
+            "mode": "TRANSACTION_ADVISORY"
+          }
+        ],
+        "acquire": "ONCE BEFORE ANY BODY EFFECT, canonical(rank,qualifiedTable,canonicalPKBytes)",
+        "wrappedBody": "REWRITE original locks to assert-held/no reacquisition; no SHARE->UPDATE upgrade after prefix"
+      },
+      {
+        "table": "inv.nodes",
+        "rank": 400,
+        "rowKeySet": "UNION of complete DB-discovered primary keys from all procedure/source/transitive requirements; tenant_id then complete primary-key canonical bytes; full discovered scope sorted",
+        "mode": "FOR UPDATE",
+        "requirements": [
+          {
+            "origin": "procedure:b_revoke_node_channel",
+            "mode": "FOR SHARE"
+          },
+          {
+            "origin": "source:explicit/transitive",
+            "mode": "FOR UPDATE"
+          }
+        ],
+        "acquire": "ONCE BEFORE ANY BODY EFFECT, canonical(rank,qualifiedTable,canonicalPKBytes)",
+        "wrappedBody": "REWRITE original locks to assert-held/no reacquisition; no SHARE->UPDATE upgrade after prefix"
+      },
+      {
+        "table": "public.nodes",
+        "rank": 500,
+        "rowKeySet": "UNION of complete DB-discovered primary keys from all procedure/source/transitive requirements; tenant_id then complete primary-key canonical bytes; full discovered scope sorted",
+        "mode": "FOR SHARE",
+        "requirements": [
+          {
+            "origin": "procedure:b_revoke_node_channel",
+            "mode": "FOR SHARE"
+          }
+        ],
+        "acquire": "ONCE BEFORE ANY BODY EFFECT, canonical(rank,qualifiedTable,canonicalPKBytes)",
+        "wrappedBody": "REWRITE original locks to assert-held/no reacquisition; no SHARE->UPDATE upgrade after prefix"
+      },
+      {
+        "table": "public.storage_contributions",
+        "rank": 600,
+        "rowKeySet": "UNION of complete DB-discovered primary keys from all procedure/source/transitive requirements; tenant_id then complete primary-key canonical bytes; full discovered scope sorted",
+        "mode": "FOR SHARE",
+        "requirements": [
+          {
+            "origin": "procedure:b_revoke_node_channel",
+            "mode": "FOR SHARE"
+          }
+        ],
+        "acquire": "ONCE BEFORE ANY BODY EFFECT, canonical(rank,qualifiedTable,canonicalPKBytes)",
+        "wrappedBody": "REWRITE original locks to assert-held/no reacquisition; no SHARE->UPDATE upgrade after prefix"
+      },
+      {
+        "table": "inv.node_channels",
+        "rank": 700,
+        "rowKeySet": "UNION of complete DB-discovered primary keys from all procedure/source/transitive requirements; tenant_id then complete primary-key canonical bytes; full discovered scope sorted",
+        "mode": "FOR UPDATE",
+        "requirements": [
+          {
+            "origin": "procedure:b_revoke_node_channel",
+            "mode": "FOR UPDATE"
+          },
+          {
+            "origin": "source:explicit/transitive",
+            "mode": "FOR UPDATE"
+          },
+          {
+            "origin": "source:DML",
+            "mode": "FOR UPDATE"
+          }
+        ],
+        "acquire": "ONCE BEFORE ANY BODY EFFECT, canonical(rank,qualifiedTable,canonicalPKBytes)",
+        "wrappedBody": "REWRITE original locks to assert-held/no reacquisition; no SHARE->UPDATE upgrade after prefix"
+      },
+      {
+        "table": "inv.node_role_service_bindings",
+        "rank": 800,
+        "rowKeySet": "UNION of complete DB-discovered primary keys from all procedure/source/transitive requirements; login_oid,service_id,tenant_id sorted canonical bytes over complete discovered set",
+        "mode": "FOR SHARE",
+        "requirements": [
+          {
+            "origin": "procedure:b_revoke_node_channel",
+            "mode": "FOR SHARE"
+          }
+        ],
+        "acquire": "ONCE BEFORE ANY BODY EFFECT, canonical(rank,qualifiedTable,canonicalPKBytes)",
+        "wrappedBody": "REWRITE original locks to assert-held/no reacquisition; no SHARE->UPDATE upgrade after prefix"
+      },
+      {
+        "table": "inv.node_role_authority_anchors",
+        "rank": 810,
+        "rowKeySet": "UNION of complete DB-discovered primary keys from all procedure/source/transitive requirements; tenant_id,node_id,epoch sorted canonical bytes over complete discovered set",
+        "mode": "FOR UPDATE",
+        "requirements": [
+          {
+            "origin": "procedure:b_revoke_node_channel",
+            "mode": "FOR UPDATE"
+          }
+        ],
+        "acquire": "ONCE BEFORE ANY BODY EFFECT, canonical(rank,qualifiedTable,canonicalPKBytes)",
+        "wrappedBody": "REWRITE original locks to assert-held/no reacquisition; no SHARE->UPDATE upgrade after prefix"
+      },
+      {
+        "table": "inv.node_role_lineage_anchors",
+        "rank": 820,
+        "rowKeySet": "UNION of complete DB-discovered primary keys from all procedure/source/transitive requirements; tenant_id,node_id,epoch,root_lineage_id sorted canonical bytes over complete discovered set",
+        "mode": "FOR UPDATE",
+        "requirements": [
+          {
+            "origin": "procedure:b_revoke_node_channel",
+            "mode": "FOR UPDATE"
+          }
+        ],
+        "acquire": "ONCE BEFORE ANY BODY EFFECT, canonical(rank,qualifiedTable,canonicalPKBytes)",
+        "wrappedBody": "REWRITE original locks to assert-held/no reacquisition; no SHARE->UPDATE upgrade after prefix"
+      },
+      {
+        "table": "inv.node_role_current",
+        "rank": 830,
+        "rowKeySet": "UNION of complete DB-discovered primary keys from all procedure/source/transitive requirements; tenant_id,node_id,epoch sorted canonical bytes over complete discovered set",
+        "mode": "FOR SHARE",
+        "requirements": [
+          {
+            "origin": "procedure:b_revoke_node_channel",
+            "mode": "FOR SHARE"
+          }
+        ],
+        "acquire": "ONCE BEFORE ANY BODY EFFECT, canonical(rank,qualifiedTable,canonicalPKBytes)",
+        "wrappedBody": "REWRITE original locks to assert-held/no reacquisition; no SHARE->UPDATE upgrade after prefix"
+      },
+      {
+        "table": "inv.node_role_denial_facts",
+        "rank": 840,
+        "rowKeySet": "UNION of complete DB-discovered primary keys from all procedure/source/transitive requirements; tenant_id,node_id,epoch,fact_kind,cause_operation_id sorted canonical bytes over complete discovered set",
+        "mode": "FOR SHARE",
+        "requirements": [
+          {
+            "origin": "procedure:b_revoke_node_channel",
+            "mode": "FOR SHARE"
+          }
+        ],
+        "acquire": "ONCE BEFORE ANY BODY EFFECT, canonical(rank,qualifiedTable,canonicalPKBytes)",
+        "wrappedBody": "REWRITE original locks to assert-held/no reacquisition; no SHARE->UPDATE upgrade after prefix"
+      },
+      {
+        "table": "inv.node_role_safety_obligations",
+        "rank": 850,
+        "rowKeySet": "UNION of complete DB-discovered primary keys from all procedure/source/transitive requirements; tenant_id,node_id,epoch,operation_id sorted canonical bytes over complete discovered set",
+        "mode": "FOR SHARE",
+        "requirements": [
+          {
+            "origin": "procedure:b_revoke_node_channel",
+            "mode": "FOR SHARE"
+          }
+        ],
+        "acquire": "ONCE BEFORE ANY BODY EFFECT, canonical(rank,qualifiedTable,canonicalPKBytes)",
+        "wrappedBody": "REWRITE original locks to assert-held/no reacquisition; no SHARE->UPDATE upgrade after prefix"
+      },
+      {
+        "table": "inv.node_channel_audit",
+        "rank": 2306,
+        "rowKeySet": "UNION of complete DB-discovered primary keys from all procedure/source/transitive requirements; tenant_id then complete immutable operation/receipt primary key sorted canonical bytes",
+        "mode": "FOR UPDATE",
+        "requirements": [
+          {
+            "origin": "source:DML",
+            "mode": "FOR UPDATE"
+          }
+        ],
+        "acquire": "ONCE BEFORE ANY BODY EFFECT, canonical(rank,qualifiedTable,canonicalPKBytes)",
+        "wrappedBody": "REWRITE original locks to assert-held/no reacquisition; no SHARE->UPDATE upgrade after prefix"
+      }
+    ],
+    "lockPorts": [],
+    "sourceUnknownRefs": [
+      "c92597ca3a705637568a47fb88722c628921714a77092cca3ec29864068b5bb1",
+      "8c22987d25a5253530dc5b7fe3f2dbddd9bd01c23beb423f76b4455df60afe49",
+      "0b9bda6aaea4fa76e087d1c9b4d6c9786e102372d9e7a9eb1036227cf7ac2db7"
+    ],
+    "status": "UNSUPPORTED_NAMED_PORTS_PENDING",
+    "rewriteRequired": true,
+    "originalBodyMayRunUnchanged": false,
+    "actualPGTwoSessionTrace": "NOT_RUN"
+  },
+  "procedure": {
+    "owner": "sv_b_proc_owner",
+    "execute": [
+      "sv_b_operator"
+    ],
+    "effects": {
+      "inv.node_channels": {
+        "verb": "UPDATE",
+        "columns": [
+          "enabled",
+          "version"
+        ]
+      },
+      "inv.node_role_authority_anchors": {
+        "verb": "UPDATE",
+        "columns": [
+          "scoped_versions"
+        ]
+      }
+    },
+    "searchPath": "pg_catalog",
+    "rowSecurity": "on/FORCE where applicable",
+    "arbitrarySqlOrTableParameter": false,
+    "protected": true,
+    "transitionPredicate": "exact tenant+Node+expected shared C; enabled=false,C+1,audit; cannot re-enable/reset/replace certificate, no separate storage C",
+    "denyOnly": true,
+    "mayReduceDenial": false,
+    "relatedAtomicEffects": [
+      "inv.node_channel_audit action revoke same C and DER; affected B eligibility denied"
+    ],
+    "lockList": [
+      {
+        "table": "inv.control_epoch",
+        "rank": 0,
+        "key": "tenant_id then complete primary-key canonical bytes; full discovered scope sorted",
+        "allowedModes": [
+          "FOR SHARE",
+          "FOR KEY SHARE",
+          "FOR UPDATE",
+          "FOR NO KEY UPDATE"
+        ],
+        "source": "explicit inherited observed-source class",
+        "mode": "FOR SHARE"
+      },
+      {
+        "table": "inv.tenant_controls",
+        "rank": 100,
+        "key": "tenant_id then complete primary-key canonical bytes; full discovered scope sorted",
+        "allowedModes": [
+          "FOR SHARE",
+          "FOR KEY SHARE",
+          "FOR UPDATE",
+          "FOR NO KEY UPDATE"
+        ],
+        "source": "explicit inherited observed-source class",
+        "mode": "FOR SHARE"
+      },
+      {
+        "table": "inv.node_role_routing",
+        "rank": 200,
+        "key": "tenant_id,node_id sorted canonical bytes over complete discovered set",
+        "allowedModes": [
+          "FOR SHARE",
+          "FOR UPDATE"
+        ],
+        "source": "explicit Rev6 proposed contract",
+        "mode": "FOR SHARE"
+      },
+      {
+        "table": "inv.node_role_cohorts",
+        "rank": 210,
+        "key": "tenant_id,cohort_id sorted canonical bytes over complete discovered set",
+        "allowedModes": [
+          "FOR SHARE",
+          "FOR UPDATE"
+        ],
+        "source": "explicit Rev6 proposed contract",
+        "mode": "FOR SHARE"
+      },
+      {
+        "table": "@transaction_advisory",
+        "rank": 300,
+        "key": "sorted complete transaction advisory keys",
+        "allowedModes": [
+          "TRANSACTION_ADVISORY"
+        ],
+        "source": "transaction only; online SESSION advisory rejected",
+        "mode": "TRANSACTION_ADVISORY"
+      },
+      {
+        "table": "inv.nodes",
+        "rank": 400,
+        "key": "tenant_id then complete primary-key canonical bytes; full discovered scope sorted",
+        "allowedModes": [
+          "FOR SHARE",
+          "FOR KEY SHARE",
+          "FOR UPDATE",
+          "FOR NO KEY UPDATE"
+        ],
+        "source": "explicit inherited observed-source class",
+        "mode": "FOR SHARE"
+      },
+      {
+        "table": "public.nodes",
+        "rank": 500,
+        "key": "tenant_id then complete primary-key canonical bytes; full discovered scope sorted",
+        "allowedModes": [
+          "FOR SHARE",
+          "FOR KEY SHARE",
+          "FOR UPDATE",
+          "FOR NO KEY UPDATE"
+        ],
+        "source": "explicit inherited observed-source class",
+        "mode": "FOR SHARE"
+      },
+      {
+        "table": "public.storage_contributions",
+        "rank": 600,
+        "key": "tenant_id then complete primary-key canonical bytes; full discovered scope sorted",
+        "allowedModes": [
+          "FOR SHARE",
+          "FOR KEY SHARE",
+          "FOR UPDATE",
+          "FOR NO KEY UPDATE"
+        ],
+        "source": "explicit inherited observed-source class",
+        "mode": "FOR SHARE"
+      },
+      {
+        "table": "inv.node_channels",
+        "rank": 700,
+        "key": "tenant_id then complete primary-key canonical bytes; full discovered scope sorted",
+        "allowedModes": [
+          "FOR SHARE",
+          "FOR KEY SHARE",
+          "FOR UPDATE",
+          "FOR NO KEY UPDATE"
+        ],
+        "source": "explicit inherited observed-source class",
+        "mode": "FOR UPDATE"
+      },
+      {
+        "table": "inv.node_role_service_bindings",
+        "rank": 800,
+        "key": "login_oid,service_id,tenant_id sorted canonical bytes over complete discovered set",
+        "allowedModes": [
+          "FOR SHARE",
+          "FOR UPDATE"
+        ],
+        "source": "explicit Rev6 proposed contract",
+        "mode": "FOR SHARE"
+      },
+      {
+        "table": "inv.node_role_authority_anchors",
+        "rank": 810,
+        "key": "tenant_id,node_id,epoch sorted canonical bytes over complete discovered set",
+        "allowedModes": [
+          "FOR SHARE",
+          "FOR UPDATE"
+        ],
+        "source": "explicit Rev6 proposed contract",
+        "mode": "FOR UPDATE"
+      },
+      {
+        "table": "inv.node_role_lineage_anchors",
+        "rank": 820,
+        "key": "tenant_id,node_id,epoch,root_lineage_id sorted canonical bytes over complete discovered set",
+        "allowedModes": [
+          "FOR SHARE",
+          "FOR UPDATE"
+        ],
+        "source": "explicit Rev6 proposed contract",
+        "mode": "FOR UPDATE"
+      },
+      {
+        "table": "inv.node_role_current",
+        "rank": 830,
+        "key": "tenant_id,node_id,epoch sorted canonical bytes over complete discovered set",
+        "allowedModes": [
+          "FOR SHARE",
+          "FOR UPDATE"
+        ],
+        "source": "explicit Rev6 proposed contract",
+        "mode": "FOR SHARE"
+      },
+      {
+        "table": "inv.node_role_denial_facts",
+        "rank": 840,
+        "key": "tenant_id,node_id,epoch,fact_kind,cause_operation_id sorted canonical bytes over complete discovered set",
+        "allowedModes": [
+          "FOR SHARE",
+          "FOR UPDATE"
+        ],
+        "source": "explicit Rev6 proposed contract",
+        "mode": "FOR SHARE"
+      },
+      {
+        "table": "inv.node_role_safety_obligations",
+        "rank": 850,
+        "key": "tenant_id,node_id,epoch,operation_id sorted canonical bytes over complete discovered set",
+        "allowedModes": [
+          "FOR SHARE",
+          "FOR UPDATE"
+        ],
+        "source": "explicit Rev6 proposed contract",
+        "mode": "FOR SHARE"
+      }
+    ],
+    "lockScopeDiscovery": "complete persisted tenant/Node/epoch/lineage/operation/resource set BEFORE locks; late earlier-rank abort/replan without effects; no DB locks across HSM/network IO",
+    "versionMapKeysDerivedByFixedProcedure": true,
+    "securityVersionEffects": "fixed relevant entries in anchor.scoped_versions only when actual authority changes, atomic original effects; no generic runtime flag/JSON map accepted"
+  },
+  "nonPilotEntryStatusChanges": 0,
+  "remainingNamedPilotPorts": [],
+  "actualRuntimeB": 0,
+  "PG": "NOT_RUN",
+  "crypto": "NOT_RUN",
+  "portGrant": false
+}

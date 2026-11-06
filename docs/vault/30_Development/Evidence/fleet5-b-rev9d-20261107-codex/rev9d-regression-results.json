@@ -1,0 +1,69 @@
+{
+  "executionOwner": "Codex OWNER; original reviewer metadata/script retained byte-exact, not new independent review",
+  "commands": [
+    {
+      "command": [
+        "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+        "-B",
+        "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105\\docs\\vault\\30_Development\\Evidence\\fleet5-b-rev9d-20261107-codex\\measured_run.py",
+        "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105\\docs\\vault\\30_Development\\Evidence\\fleet5-b-rev9d-20261107-codex\\rev9d_gap_driver.py",
+        "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105\\docs\\vault\\30_Development\\Evidence\\fleet5-b-rev9c-20261106-codex",
+        "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105\\docs\\vault\\30_Development\\Evidence\\fleet5-b-rev9d-20261107-codex\\old-gap-results.json"
+      ],
+      "actualExit": 0,
+      "log": "old-gap-contrast.log",
+      "logSHA256": "4e186cefeff63d0cd8c934be3ac8242a5ae2e5176466bb1c0ab18f88ffe2b8cd",
+      "kst": "2026-11-07T00:53:20.234578+09:00"
+    },
+    {
+      "command": [
+        "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+        "-B",
+        "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105\\docs\\vault\\30_Development\\Evidence\\fleet5-b-rev9d-20261107-codex\\measured_run.py",
+        "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105\\docs\\vault\\30_Development\\Evidence\\fleet5-b-rev9d-20261107-codex\\rev9d_gap_driver.py",
+        "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105\\docs\\vault\\30_Development\\Evidence\\fleet5-b-rev9d-20261107-codex",
+        "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105\\docs\\vault\\30_Development\\Evidence\\fleet5-b-rev9d-20261107-codex\\new-gap-results.json"
+      ],
+      "actualExit": 0,
+      "log": "new-gap-contrast.log",
+      "logSHA256": "457458feb5557be5e1d5a69e0c1b2bcc62693badc89bd72962b6d62d8a002b37",
+      "kst": "2026-11-07T00:54:38.467915+09:00"
+    },
+    {
+      "command": [
+        "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+        "-B",
+        "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105\\docs\\vault\\30_Development\\Evidence\\fleet5-b-rev9d-20261107-codex\\measured_run.py",
+        "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105\\docs\\vault\\30_Development\\Evidence\\fleet5-b-rev9d-20261107-codex\\rev9c-review-reviewer_rev9c_delta_probes.py.txt",
+        "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105\\docs\\vault\\30_Development\\Evidence\\fleet5-b-rev9d-20261107-codex",
+        "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105\\docs\\vault\\30_Development\\Evidence\\fleet5-b-rev9d-20261107-codex\\owner-original47-results.json"
+      ],
+      "actualExit": 0,
+      "log": "owner-original47-replay.log",
+      "logSHA256": "9dadf56cde1a98ddae41cfc470dbbe76b6d4cd61e301390d4cf26f1fccbe1792",
+      "kst": "2026-11-07T01:01:18.593837+09:00"
+    }
+  ],
+  "actualGapContrasts": [
+    "outside-operator-sys",
+    "outside-importlib-forwarder",
+    "outside-sys-forwarder",
+    "parameter-WorkspaceAPI-runtime",
+    "parameter-WorkspaceAPI-runtime.db",
+    "parameter-WorkspaceAPI-runtime.db.transaction",
+    "parameter-create_app-workspace",
+    "parameter-create_app-workspace.runtime.db"
+  ],
+  "oldNewCasesEach": 12,
+  "original47Cases": 47,
+  "rawOriginal47MismatchLabels": [
+    "L2-keyword-only-in-source-full"
+  ],
+  "explainedStrengthenedKeywordRefusal": [
+    "L2-keyword-only-in-source-full"
+  ],
+  "unexpectedSemanticResults": [],
+  "actualRuntimeB": 0,
+  "realBindings": null,
+  "fixtureBugs": "Original reviewer run1/run3 line-shift failures retained separately; no product negative inferred from them"
+}

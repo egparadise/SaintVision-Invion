@@ -1,0 +1,186 @@
+{
+  "executionOwner": "Codex OWNER, not independent review",
+  "targetEvidence": "fleet5-b-rev9c-20261106-codex",
+  "cases": [
+    {
+      "case": "actual-source-positive",
+      "gapAt5ea": false,
+      "expectedNew": "ACCEPT",
+      "observed": "ACCEPT",
+      "reason": null,
+      "astValid": true,
+      "newUnboundNames": [],
+      "witnessesChecked": 15,
+      "visibleProductionRoots": 6,
+      "mutatedSHA256": {},
+      "effectfulMutantsImportedOrExecuted": false
+    },
+    {
+      "case": "outside-operator-sys",
+      "gapAt5ea": true,
+      "expectedNew": "REFUSE",
+      "observed": "ACCEPT",
+      "reason": null,
+      "astValid": true,
+      "newUnboundNames": [],
+      "witnessesChecked": 15,
+      "visibleProductionRoots": 6,
+      "mutatedSHA256": {
+        "services/control-plane/src/inv/business_auth.py": "435ac6e716a3760b33cff30028be14331c2a78ad5822e14b5edc2dbeebf54b0f"
+      },
+      "effectfulMutantsImportedOrExecuted": false
+    },
+    {
+      "case": "outside-importlib-forwarder",
+      "gapAt5ea": true,
+      "expectedNew": "REFUSE",
+      "observed": "ACCEPT",
+      "reason": null,
+      "astValid": true,
+      "newUnboundNames": [],
+      "witnessesChecked": 15,
+      "visibleProductionRoots": 6,
+      "mutatedSHA256": {
+        "services/control-plane/src/inv/business_auth.py": "fa122f04823bb3f95d6b08cf2a7f538859c5bc7068c6812a6384f3e209c5e44e"
+      },
+      "effectfulMutantsImportedOrExecuted": false
+    },
+    {
+      "case": "outside-sys-forwarder",
+      "gapAt5ea": true,
+      "expectedNew": "REFUSE",
+      "observed": "ACCEPT",
+      "reason": null,
+      "astValid": true,
+      "newUnboundNames": [],
+      "witnessesChecked": 15,
+      "visibleProductionRoots": 6,
+      "mutatedSHA256": {
+        "services/control-plane/src/inv/business_auth.py": "caa94b333856376d7142f2428b62940240d18cc692b92acbe0878da241395591"
+      },
+      "effectfulMutantsImportedOrExecuted": false
+    },
+    {
+      "case": "parameter-WorkspaceAPI-runtime",
+      "gapAt5ea": true,
+      "expectedNew": "REFUSE",
+      "observed": "ACCEPT",
+      "reason": null,
+      "astValid": true,
+      "newUnboundNames": [],
+      "witnessesChecked": 15,
+      "visibleProductionRoots": 6,
+      "mutatedSHA256": {
+        "services/control-plane/src/inv/workspace_api.py": "90129123a8500a77b909775c20dc8be3f8952fef695f4d27aca8e2f69f12302d"
+      },
+      "effectfulMutantsImportedOrExecuted": false
+    },
+    {
+      "case": "parameter-WorkspaceAPI-runtime.db",
+      "gapAt5ea": true,
+      "expectedNew": "REFUSE",
+      "observed": "ACCEPT",
+      "reason": null,
+      "astValid": true,
+      "newUnboundNames": [],
+      "witnessesChecked": 15,
+      "visibleProductionRoots": 6,
+      "mutatedSHA256": {
+        "services/control-plane/src/inv/workspace_api.py": "d0964a7cdb6c98223cb4ab2f7eaccac37bed3ccb0b07f48e1f96d43d0bc19c28"
+      },
+      "effectfulMutantsImportedOrExecuted": false
+    },
+    {
+      "case": "parameter-WorkspaceAPI-runtime.db.transaction",
+      "gapAt5ea": true,
+      "expectedNew": "REFUSE",
+      "observed": "ACCEPT",
+      "reason": null,
+      "astValid": true,
+      "newUnboundNames": [],
+      "witnessesChecked": 15,
+      "visibleProductionRoots": 6,
+      "mutatedSHA256": {
+        "services/control-plane/src/inv/workspace_api.py": "30cce2a131e88680747e986a06f2d049efc4e37f11443e4c7e91b8a1b626fcb4"
+      },
+      "effectfulMutantsImportedOrExecuted": false
+    },
+    {
+      "case": "parameter-create_app-workspace",
+      "gapAt5ea": true,
+      "expectedNew": "REFUSE",
+      "observed": "ACCEPT",
+      "reason": null,
+      "astValid": true,
+      "newUnboundNames": [],
+      "witnessesChecked": 15,
+      "visibleProductionRoots": 6,
+      "mutatedSHA256": {
+        "services/control-plane/src/inv/app.py": "5dcc3e5f1dfbfd507830627d9e0aeb362c00ea31beece1413cdcc8e5134a5c90"
+      },
+      "effectfulMutantsImportedOrExecuted": false
+    },
+    {
+      "case": "parameter-create_app-workspace.runtime.db",
+      "gapAt5ea": true,
+      "expectedNew": "REFUSE",
+      "observed": "ACCEPT",
+      "reason": null,
+      "astValid": true,
+      "newUnboundNames": [],
+      "witnessesChecked": 15,
+      "visibleProductionRoots": 6,
+      "mutatedSHA256": {
+        "services/control-plane/src/inv/app.py": "a97599dcf153bc2e0f58495ff849ce177525fa353dccb1777ed0a9b85e37c174"
+      },
+      "effectfulMutantsImportedOrExecuted": false
+    },
+    {
+      "case": "outside-importlib-attribute-retained",
+      "gapAt5ea": false,
+      "expectedNew": "REFUSE",
+      "observed": "REFUSE",
+      "reason": "UNCATALOGUED_PRODUCTION_SOURCE:services/control-plane/src/inv/business_auth.py",
+      "astValid": true,
+      "newUnboundNames": [],
+      "witnessesChecked": 15,
+      "visibleProductionRoots": 7,
+      "mutatedSHA256": {
+        "services/control-plane/src/inv/business_auth.py": "d1a3d201ed1762dc00db8bdae4169940f27311f1a174763a388623ad99a057d0"
+      },
+      "effectfulMutantsImportedOrExecuted": false
+    },
+    {
+      "case": "outside-module-getattr-retained",
+      "gapAt5ea": false,
+      "expectedNew": "REFUSE",
+      "observed": "REFUSE",
+      "reason": "UNCATALOGUED_PRODUCTION_SOURCE:services/control-plane/src/inv/business_auth.py",
+      "astValid": true,
+      "newUnboundNames": [],
+      "witnessesChecked": 15,
+      "visibleProductionRoots": 6,
+      "mutatedSHA256": {
+        "services/control-plane/src/inv/business_auth.py": "c788f22e0e6fac2c06556659328dd147ee7a118bfde202dacfebef5cda1d6d55"
+      },
+      "effectfulMutantsImportedOrExecuted": false
+    },
+    {
+      "case": "outside-benign-database-helper",
+      "gapAt5ea": false,
+      "expectedNew": "ACCEPT",
+      "observed": "ACCEPT",
+      "reason": null,
+      "astValid": true,
+      "newUnboundNames": [],
+      "witnessesChecked": 15,
+      "visibleProductionRoots": 6,
+      "mutatedSHA256": {
+        "services/control-plane/src/inv/business_auth.py": "0103413a767377e2cae3ba3b726bb1382cfdfae8a98285245b6cc5d023d7ee53"
+      },
+      "effectfulMutantsImportedOrExecuted": false
+    }
+  ],
+  "actualRuntimeB": 0,
+  "productFilesWritten": 0
+}

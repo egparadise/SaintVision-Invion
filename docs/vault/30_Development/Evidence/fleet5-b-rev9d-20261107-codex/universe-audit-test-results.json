@@ -1,0 +1,67 @@
+{
+  "executionOwner": "Codex",
+  "cases": [
+    {
+      "case": "operator-hidden",
+      "pass": true,
+      "astValid": true,
+      "sourceSHA256": "a695ac5f6906f91f1117fead7a8bb94bf7a1d4843910509eb6e5951c7eb565ca",
+      "newRelevantHits": 2,
+      "fileRetainedAsRelevant": true,
+      "censusAuditedFiles": 21,
+      "forwarderAuditedFiles": 4
+    },
+    {
+      "case": "reflective-importlib-forwarder",
+      "pass": true,
+      "astValid": true,
+      "sourceSHA256": "7072eaae5334ddf50ddf8588511f9e30888c4aa648bb69fe84f3f93315611e92",
+      "newRelevantHits": 1,
+      "fileRetainedAsRelevant": true,
+      "censusAuditedFiles": 21,
+      "forwarderAuditedFiles": 4
+    },
+    {
+      "case": "reflective-sys-forwarder",
+      "pass": true,
+      "astValid": true,
+      "sourceSHA256": "0a892c613df67a5b03582f30ae298814b8c65d37dbe0031a25c0e45819975231",
+      "newRelevantHits": 1,
+      "fileRetainedAsRelevant": true,
+      "censusAuditedFiles": 21,
+      "forwarderAuditedFiles": 4
+    },
+    {
+      "case": "bounded-dotted-resolver",
+      "pass": true,
+      "astValid": true,
+      "sourceSHA256": "aa5548e98e0d9269101e76fee1a93ae4b92ecadc2b006085e2d2470d06f6e541",
+      "newRelevantHits": 1,
+      "fileRetainedAsRelevant": true,
+      "censusAuditedFiles": 21,
+      "forwarderAuditedFiles": 4
+    },
+    {
+      "case": "benign-unused-import-string",
+      "pass": true,
+      "astValid": true,
+      "sourceSHA256": "bd0df79e1aff5b73489ba14a9fe8acdd1d651b77e9eba67ec8d636ab164ba93d",
+      "newRelevantHits": 0,
+      "fileRetainedAsRelevant": false,
+      "censusAuditedFiles": 21,
+      "forwarderAuditedFiles": 4
+    },
+    {
+      "case": "benign-database-helper",
+      "pass": true,
+      "astValid": true,
+      "sourceSHA256": "59075b2e3004f7b3f160925657f6d7f4198591ca5b1a71ef057b3567d70901f7",
+      "newRelevantHits": 0,
+      "fileRetainedAsRelevant": false,
+      "censusAuditedFiles": 21,
+      "forwarderAuditedFiles": 4
+    }
+  ],
+  "effectfulMutantsImportedOrExecuted": false,
+  "actualRuntimeB": 0
+}

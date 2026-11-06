@@ -1,0 +1,195 @@
+"""Claude independent Rev9c delta probes (L1/L2/L3). Parse-only fixtures.
+
+Usage: python -B reviewer_rev9c_delta_probes.py.txt <rev9c evidence dir> <out.json>
+Imports the OWNER analysis producers from <evidence dir> (static AST code) and
+feeds them in-memory source overlays over frozen git 72028. No product file is
+written, and no mutant source is imported or executed (ast.parse only).
+Every mutant is checked before its verdict: AST-valid, no new unbound names
+versus the frozen file, and every recorded closure witness span/hash resolves
+(except an explicitly listed intentional root rewrite).
+"""
+import ast, builtins, json, sys
+from pathlib import Path
+E = Path(sys.argv[1]).resolve(strict=True); OUT = Path(sys.argv[2]); sys.path.insert(0, str(E))
+import t1_provenance as t, constructor_graph as cg, source_bindings as sb
+import forwarding_discovery as fd
+from owner_transfer import derive
+assert Path(t.__file__).resolve().parent == E and Path(cg.__file__).resolve().parent == E
+CP = t.CP; LP = 'tools/lan_pilot.py'; WC = CP + 'workspace_config.py'; AP = CP + 'app.py'; WA = CP + 'workspace_api.py'
+BH = CP + 'business_handoff.py'; BS = CP + 'business_surface.py'; BA = CP + 'business_auth.py'
+core = t.read_batch([CP + n for n in t.CORE] + ['tools/remote_workspace_entry.py']); ctors = t.read_batch(t.MAIN_CTOR_PATHS)
+S = {**core, **ctors}
+closure = json.loads((E / 't1-mark-offline-closure.json').read_bytes())['narrowA8Proof']
+g = closure['completeConstructorGraph']
+W = [r['source'] for r in g['productionConstructorProofs']] + [r['source'] for r in g['localHelperProofs']] + \
+    [{'path': r['path'], 'span': r['span'], 'expressionSHA256': r['expressionSHA256']} for r in closure['productionDatabaseConstructors']]
+FROZEN_ROOTS = cg.frozen_root_keys()
+assert sum(FROZEN_ROOTS.values()) == 6 and len(FROZEN_ROOTS) == 6, FROZEN_ROOTS
+R = []
+
+def unbound(source):
+    tr = ast.parse(source); bound = set(dir(builtins))
+    for n in ast.walk(tr):
+        if isinstance(n, (ast.Import, ast.ImportFrom)): bound.update((a.asname or a.name).split('.')[0] for a in n.names)
+        elif isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)): bound.add(n.name)
+        elif isinstance(n, ast.arg): bound.add(n.arg)
+        elif isinstance(n, ast.Name) and isinstance(n.ctx, (ast.Store, ast.Del)): bound.add(n.id)
+        elif isinstance(n, ast.ExceptHandler) and n.name: bound.add(n.name)
+    return {n.id for n in ast.walk(tr) if isinstance(n, ast.Name) and isinstance(n.ctx, ast.Load) and n.id not in bound}
+
+def witnesses(sources, skip):
+    checked = 0
+    for w in W:
+        if (w['path'], tuple(w['span'])) in skip: continue
+        src = sources.get(w['path']) or sb.frozen_source(w['path']); tree = ast.parse(src)
+        node = next((n for n in ast.walk(tree) if hasattr(n, 'lineno') and [n.lineno, n.col_offset, n.end_lineno, n.end_col_offset] == w['span']), None)
+        assert node is not None and sb.sha(ast.get_source_segment(src, node)) == w['expressionSHA256'], ('WITNESS', w)
+        checked += 1
+    return checked
+
+def must_replace(src, old, new):
+    assert src.count(old) == 1, ('ANCHOR', old[:80], src.count(old)); return src.replace(old, new, 1)
+
+def run(name, changes=None, world=None, expect=None, skip=(), extra_core=None, note=None, graph_only=False):
+    changes = changes or {}; world = world or {}
+    changed = {**S, **changes}
+    for p, s in {**changes, **world, **(extra_core or {})}.items():
+        ast.parse(s)
+        try: base = sb.frozen_source(p)
+        except Exception: base = ''
+        nb = sorted(unbound(s) - unbound(base)); assert not nb, (name, nb)
+    checked = witnesses({**world, **changed}, skip)
+    c2 = {p: changed[p] for p in core}; c2.update(extra_core or {}); k2 = {p: changed[p] for p in ctors}
+    if graph_only:
+        out, err = cg.prove({**c2, **k2}, world or None)
+    else:
+        out, err = t.provenance(c2, k2, universe_overrides=world or None)
+    universe = {**world, **changed, **(extra_core or {})}
+    census = cg.current_census(universe)
+    disc, derr = fd.discover(census['production'], universe)
+    observed = 'ACCEPT' if err is None else 'REFUSE'
+    row = {'case': name, 'observed': observed, 'reason': err, 'expected': expect, 'matchesExpectation': expect is None or observed == expect.split(':', 1)[0] and (':' not in expect or (err or '').startswith(expect.split(':', 1)[1])),
+           'mode': 'cg.prove graph only' if graph_only else 't1_provenance.provenance (graph + use sites)',
+           'astValid': True, 'newUnboundNames': [], 'witnessesChecked': checked, 'intentionalRootRewrites': sorted(map(list, skip)),
+           'mutatedSHA256': {p: sb.sha(s) for p, s in sorted({**changes, **world, **(extra_core or {})}.items())},
+           'visibleProductionRoots': len(census['production']), 'discoveryError': derr,
+           'discoveredProductionFiles': disc['productionFiles'] if disc else None, 'discoveredHarnessFiles': disc['harnessFiles'] if disc else None,
+           'trackedForwarders': disc['trackedForwarders'] if disc else None, 'note': note}
+    R.append(row); print(json.dumps({'case': name, 'observed': observed, 'reason': err, 'expected': expect}), flush=True)
+    return row
+
+IMPORT = '\nimport argparse\n'
+def lp_import(src, mod): return must_replace(src, IMPORT, '\nimport argparse, ' + mod + '\n')
+ROOT_CALL = 'observer = ObservationWorker(runtime(state), NodeTLSClient(**tls(args.state)))'
+ROOT_SKIP = {(LP, (3945, 15, 3945, 82))}
+TAIL = '\n\ndef _claude_rev9c_probe(state):\n    return '
+
+# ---------------- actual positive
+run('actual-72028-positive', expect='ACCEPT')
+
+# ---------------- L1 reproductions of aa3387 bound counterexamples
+for label, arg in [('state', 'state'), ('runtime-state', 'runtime(state)')]:
+    src = must_replace(lp_import(S[LP], 'operator'), ROOT_CALL, "observer = operator.attrgetter('ObservationWorker')(sys.modules['inv.observer_worker'])(" + arg + ', NodeTLSClient(**tls(args.state)))')
+    run('L1-aa3387-repro-' + label, {LP: src}, expect='REFUSE:UNRESOLVED:CONSTRUCTOR_ROOT_REMOVED_OR_HIDDEN', skip=ROOT_SKIP)
+# independent: changed-argument root (same function/constructor, different AST)
+run('L1-root-argument-changed', {LP: must_replace(S[LP], ROOT_CALL, 'observer = ObservationWorker(runtime(state), None)')}, expect='REFUSE:UNRESOLVED:CONSTRUCTOR_ROOT_REMOVED_OR_HIDDEN', skip=ROOT_SKIP)
+# independent: root moved into a new helper with byte-identical call text
+moved = must_replace(S[LP], ROOT_CALL, 'observer = _claude_make_observer(state, args)')
+moved += '\n\ndef _claude_make_observer(state, args):\n    return ObservationWorker(runtime(state), NodeTLSClient(**tls(args.state)))\n'
+run('L1-root-moved-to-helper', {LP: moved}, expect='REFUSE:UNRESOLVED:CONSTRUCTOR_ROOT_REMOVED_OR_HIDDEN', skip=ROOT_SKIP)
+# six genuine roots + EXTRA hidden reflective roots, independent spellings
+for label, mod, expr in [
+    ('importlib-attr', 'importlib', "importlib.import_module('inv.observer_worker').ObservationWorker(state, None)"),
+    ('operator-module-alias', 'operator as _claude_op', "_claude_op.attrgetter('ObservationWorker')(sys.modules['inv.observer_worker'])(state, None)"),
+    ('sys-modules-get', 'operator', "sys.modules.get('inv.observer_worker').ObservationWorker(state, None)"),
+    ('methodcaller-transaction', 'operator', "operator.methodcaller('transaction')(runtime(state))"),
+]:
+    run('L1-six-plus-hidden-' + label, {LP: lp_import(S[LP], mod) + TAIL + expr + '\n'}, expect='REFUSE')
+for label, imp, expr in [
+    ('from-operator-alias', 'from operator import attrgetter as _claude_ag', "_claude_ag('ObservationWorker')(sys.modules['inv.observer_worker'])(state, None)"),
+    ('from-sys-modules-alias', 'from sys import modules as _claude_mods', "_claude_mods['inv.observer_worker'].ObservationWorker(state, None)"),
+    ('from-inspect-alias', 'from inspect import getattr_static as _claude_gs', "_claude_gs(sys.modules['inv.observer_worker'], 'ObservationWorker')(state, None)"),
+]:
+    # same-line import keeps every recorded witness span (run1 fixture bug: an added line shifted lan_pilot:3945)
+    run('L1-six-plus-hidden-' + label, {LP: must_replace(S[LP], IMPORT, '\nimport argparse; ' + imp + '\n') + TAIL + expr + '\n'}, expect='REFUSE')
+# extra hidden root through a resolver OUTSIDE the enumerated namespaces (bound check, not a demand)
+run('L1-bound-pkgutil-resolve-name', {LP: lp_import(S[LP], 'pkgutil') + TAIL + "pkgutil.resolve_name('inv.observer_worker:ObservationWorker')(state, None)\n"},
+    note='pkgutil is outside the enumerated sys/importlib/operator/inspect surfaces; recorded as a declared-bound observation')
+# EXTRA hidden reflective root in an OUTSIDE production file, enumerated surfaces only
+for label, body in [
+    ('operator-sys', "import operator\nimport sys\n\n\ndef _claude_hidden_root():\n    return operator.attrgetter('ObservationWorker')(sys.modules['inv.observer_worker'])(object(), None)\n"),
+    ('importlib', "import importlib\n\n\ndef _claude_hidden_root():\n    return importlib.import_module('inv.observer_worker').ObservationWorker(object(), None)\n"),
+]:
+    run('L1-outside-file-hidden-root-' + label, world={BA: sb.frozen_source(BA) + '\n' + body}, expect='REFUSE',
+        note='six genuine roots retained; extra reflective root in production file business_auth.py outside the 12 proof inputs')
+# benign controls
+run('L1-control-unused-imports-and-log-string', {LP: lp_import(S[LP], 'operator, inspect, importlib') + TAIL + "'NodeObservation runtime db note'\n"}, expect='ACCEPT')
+run('L1-control-class-alias-root', {LP: must_replace(must_replace(S[LP], 'from inv.observer_worker import ObservationWorker', 'from inv.observer_worker import ObservationWorker as _ClaudeOW'), ROOT_CALL, 'observer = _ClaudeOW(runtime(state), NodeTLSClient(**tls(args.state)))')}, expect='ACCEPT', skip=ROOT_SKIP)
+run('L1-control-from-package-module-alias-root', {LP: must_replace(must_replace(S[LP], 'from inv.observer_worker import ObservationWorker', 'from inv import observer_worker as _claude_ow'), ROOT_CALL, 'observer = _claude_ow.ObservationWorker(runtime(state), NodeTLSClient(**tls(args.state)))')}, expect='ACCEPT', skip=ROOT_SKIP)
+
+# ---------------- L2
+cw = '\nfrom .workspace_config import configured_workspace as _cw\n'
+run('L2-aa3387-repro-business-handoff-alias', world={BH: sb.frozen_source(BH) + cw + '\n\ndef _extra_root(tenant, settings):\n    return _cw(object(), tenant, settings)\n'}, expect='REFUSE:UNCATALOGUED_PRODUCTION_SOURCE:')
+three = {BH: sb.frozen_source(BH) + cw + '\n\ndef _claude_f1(database, tenant, settings):\n    return _cw(database, tenant, settings)\n',
+         BS: sb.frozen_source(BS) + '\nfrom .business_handoff import _claude_f1\n\n\ndef _claude_f2(db, tenant, settings):\n    return _claude_f1(db, tenant, settings)\n',
+         BA: sb.frozen_source(BA) + '\nfrom .business_surface import _claude_f2 as _hop\n\n\ndef _claude_root(tenant, settings):\n    return _hop(object(), tenant, settings)\n'}
+r = run('L2-three-hop-fixed-point', world=three, expect='REFUSE:UNCATALOGUED_PRODUCTION_SOURCE:')
+assert {BH, BS, BA} <= set(r['discoveredProductionFiles']), r['discoveredProductionFiles']
+run('L2-keyword-only-call-outside', world={BH: sb.frozen_source(BH) + cw + '\n\ndef _claude_kw(tenant, settings):\n    return _cw(database=object(), tenant=tenant, settings=settings)\n'}, expect='REFUSE:UNCATALOGUED_PRODUCTION_SOURCE:')
+kwf = {BH: sb.frozen_source(BH) + cw + '\n\ndef _claude_kwf(database, tenant, settings):\n    return _cw(database=database, tenant=tenant, settings=settings)\n',
+       BA: sb.frozen_source(BA) + '\nfrom .business_handoff import _claude_kwf\n\n\ndef _claude_root(tenant, settings):\n    return _claude_kwf(object(), tenant, settings)\n'}
+r = run('L2-keyword-forwarder-higher-hop-inventory', world=kwf, expect='REFUSE:UNCATALOGUED_PRODUCTION_SOURCE:', note='fails closed on BH; records whether the higher hop BA is inventoried')
+r['higherHopInventoried'] = BA in (r['discoveredProductionFiles'] or [])
+for label, body in [
+    ('importlib', "import importlib\n\n\ndef _claude_root(tenant, settings):\n    return importlib.import_module('inv.workspace_config').configured_workspace(object(), tenant, settings)\n"),
+    ('sys-modules', "import sys\n\n\ndef _claude_root(tenant, settings):\n    return sys.modules['inv.workspace_config'].configured_workspace(object(), tenant, settings)\n"),
+]:
+    run('L2-outside-reflective-forwarder-call-' + label, world={BA: sb.frozen_source(BA) + '\n' + body}, expect='REFUSE',
+        note='grep token workspace_config hits the file; the reflective call is parsed but not resolved')
+run('L2-control-module-import-getattr', world={BA: sb.frozen_source(BA) + "\nfrom . import workspace_config as _claude_wc\n\n\ndef _claude_root(tenant, settings):\n    return getattr(_claude_wc, 'configured_workspace')(object(), tenant, settings)\n"}, expect='REFUSE:UNCATALOGUED_PRODUCTION_SOURCE:')
+run('L2-control-function-scope-import-call', world={BA: sb.frozen_source(BA) + "\n\ndef _claude_root(tenant, settings):\n    from .workspace_config import configured_workspace as _local_cw\n    return _local_cw(object(), tenant, settings)\n"}, expect='REFUSE:UNCATALOGUED_PRODUCTION_SOURCE:')
+run('L2-control-benign-local-database-helper', world={BA: sb.frozen_source(BA) + "\nfrom .db import Database\n\n\ndef _claude_db(dsn):\n    return Database(dsn)\n"}, expect='ACCEPT')
+hp1 = 'tests/integration/test_node_extensions.py'; hp2 = 'tests/integration/test_workspace_api.py'
+r = run('L2-control-harness-two-hop-separated', world={hp1: sb.frozen_source(hp1) + '\nfrom inv.workspace_config import configured_workspace as _h_cw\n\n\ndef _claude_h1(database, tenant, settings):\n    return _h_cw(database, tenant, settings)\n',
+                                                     hp2: sb.frozen_source(hp2) + '\nfrom tests.integration.test_node_extensions import _claude_h1\n\n\ndef _claude_h2(tenant, settings):\n    return _claude_h1(object(), tenant, settings)\n'}, expect='ACCEPT')
+assert hp1 in r['discoveredHarnessFiles'] and not any(p.startswith('tests/') for p in r['discoveredProductionFiles'])
+# keyword-only forwarding inside a supplied source: graph alone vs full provenance (I2 interaction)
+kw_app = must_replace(S[AP], '            workspace = configured_workspace(database, identity.tenant_id, settings["workspace"])\n',
+                      '            workspace = configured_workspace(database, identity.tenant_id, settings["workspace"])\n            _claude_extra = configured_workspace(database=object(), tenant=identity.tenant_id, settings=settings["workspace"])\n')
+run('L2-keyword-only-in-source-graph-only', {AP: kw_app}, graph_only=True, note='graph skips keyword-only tracked calls (not c.args)')
+run('L2-keyword-only-in-source-full', {AP: kw_app}, expect='REFUSE:DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:')
+
+# ---------------- L3
+loop = '    for runtime in pool.values():\n        runtime.destinations = pool\n'
+for expr in ('runtime', 'runtime.db', 'runtime.db.transaction'):
+    run('L3-aa3387-repro-runtime-' + expr, {WC: must_replace(S[WC], loop, loop + '        import foreign_module\n        foreign_module.register_runtime(' + expr + ')\n')}, expect='REFUSE:DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:')
+ws = '            workspace = configured_workspace(database, identity.tenant_id, settings["workspace"])\n'
+for expr in ('workspace', 'workspace.runtime.db'):
+    run('L3-aa3387-repro-workspace-' + expr, {AP: must_replace(S[AP], ws, ws + '            import foreign_module\n            foreign_module.register_workspace(' + expr + ')\n')}, expect='REFUSE:DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:')
+ret = '    return result\n'
+for label, stmt in [
+    ('tuple-unpack-items', '    import foreign_module\n    for _node_id, held in pool.items():\n        foreign_module.register_runtime(held.db)\n'),
+    ('walrus-filter', '    import foreign_module\n    if (picked := next(iter(pool.values()))) is not None:\n        foreign_module.register_runtime(picked)\n'),
+    ('dict-comprehension-value', '    import foreign_module\n    mirror = {k: v.db for k, v in pool.items()}\n    foreign_module.register_runtime(mirror)\n'),
+    ('container-append-then-loop', '    import foreign_module\n    bucket = []\n    bucket.append(result)\n    foreign_module.register_runtime(bucket)\n'),
+    ('lambda-closure', '    import foreign_module\n    foreign_module.register_runtime(lambda: result.runtime)\n'),
+]:
+    run('L3-variant-' + label, {WC: must_replace(S[WC], ret, stmt + ret)}, expect='REFUSE:DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:')
+# parameter-bound owner objects inside the analysed proof bodies
+init = '        self.db, self.working, self.runtime = database, working, runtime\n'
+for expr in ('runtime', 'runtime.db', 'runtime.db.transaction'):
+    run('L3-param-WorkspaceAPI-init-' + expr, {WA: must_replace(S[WA], init, init + '        import foreign_module\n        foreign_module.register_runtime(' + expr + ')\n')}, expect='REFUSE',
+        note='runtime parameter receives the RestrictedWorkspaceRuntime from workspace_config:44-56')
+# same-line statements keep the later app.py witnesses (run3 fixture bug: inserted lines shifted app.py:1313)
+svc = '            raise DomainError("SYS-0001", "Workspace admission is not configured", 503)\n        return workspace\n'
+for expr in ('workspace', 'workspace.runtime.db'):
+    run('L3-param-create_app-workspace_service-' + expr, {AP: must_replace(S[AP], svc, '            raise DomainError("SYS-0001", "Workspace admission is not configured", 503)\n        import foreign_module; foreign_module.register_workspace(' + expr + '); return workspace\n')}, expect='REFUSE',
+        note='create_app workspace parameter receives configured_workspace result via app.py:1405 workspace=workspace')
+# legitimate controls
+run('L3-control-unowned-loop-and-call', {WC: must_replace(S[WC], ret, '    import foreign_module\n    for note in ("alpha", "beta"):\n        foreign_module.register_runtime(note)\n    foreign_module.register_runtime(tenant)\n' + ret)}, expect='ACCEPT')
+run('L3-control-unowned-settings-read', {WC: must_replace(S[WC], ret, '    import foreign_module\n    foreign_module.audit_note(len(git_repositories))\n' + ret)}, note='builtins.len is a protected-prefix symbol; records how conservative a benign builtin use is')
+
+d = json.loads(json.dumps({'reviewer': 'Claude independent', 'target': E.name, 'frozenRootKeys': len(FROZEN_ROOTS), 'cases': R,
+                           'mismatches': [x['case'] for x in R if not x['matchesExpectation']],
+                           'effectfulMutantsImportedOrExecuted': False, 'productFilesWritten': 0}))
+OUT.write_bytes((json.dumps(d, indent=1) + '\n').encode()); print(json.dumps({'cases': len(R), 'mismatches': d['mismatches']}))

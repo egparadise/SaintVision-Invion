@@ -1,0 +1,21 @@
+{
+  "environment": "Windows 11, Git Bash, D:/Project/SaintVisionI-Invion/.venv Python 3.14.7 with -B, PYTHONUTF8=1, cwd = worktree root fleet5-bootstrap-v3-review-20261106 on branch agent/claude/fleet5-b-rev9c-5ea-review-20261106 created from exact 5ea87937. Times KST. Serial only; no installs, no OS/pagefile/process/service changes.",
+  "provenance": [
+    {"argv": "git fetch origin agent/codex/fleet5-b-rev9c-20261106 ; git rev-parse FETCH_HEAD", "result": "5ea87937f1b542f8cbe32c08dc224526965a8e2d"},
+    {"argv": "git ls-remote origin refs/heads/agent/codex/fleet5-b-rev9c-20261106", "result": "5ea87937f1b542f8cbe32c08dc224526965a8e2d exact"},
+    {"argv": "git log --oneline 870486f9..5ea87937 ; git diff --name-status 870486f9 5ea87937", "result": "1 commit; 139 A (138 Evidence/fleet5-b-rev9c-20261106-codex + 1 History), 0 M/D"},
+    {"argv": "git switch -c agent/claude/fleet5-b-rev9c-5ea-review-20261106 5ea87937f1b542f8cbe32c08dc224526965a8e2d", "result": "HEAD 5ea87937"}
+  ],
+  "staticReads": [
+    "diff Rev9b vs Rev9c copies of every *.py producer (12 SAME-class unchanged, 9 changed, 5 new)",
+    "git grep at 72028 over all *.py: reflective forms naming protected/forwarder modules = 0; relevant *.py outside discovery SCOPE = 0; configured_workspace/workspace_config references = app.py:1321/1323, workspace_config.py:13/87, tests/core/test_object_store_provider_binding.py:500/514"
+  ],
+  "reviewerProbes": [
+    {"argv": "python -B <rev9c>/measured_run.py reviewer_rev9c_delta_probes.py.txt <rev9c dir> <scratch>/run1.json", "exit": 1, "log": "reviewer-probes-run1-fixturebug.log.txt", "why": "reviewer fixture bug: added import line shifted lan_pilot:3945; witness guard stopped before any verdict on that case"},
+    {"argv": "same (run2)", "exit": 1, "why": "the fixture edit did not apply (anchor escaping), so the run repeated run1 unchanged; log not retained; fixed with an exact editor replacement"},
+    {"argv": "same (run3)", "exit": 1, "log": "reviewer-probes-run3-fixturebug.log.txt", "why": "reviewer fixture bug: inserted lines shifted app.py:1313; witness guard stopped; its 43 rows equal the final run"},
+    {"argv": "PYTHONHASHSEED=0 python -B <rev9c>/measured_run.py reviewer_rev9c_delta_probes.py.txt <rev9c dir> reviewer-rev9c-delta-probes-result.json", "exit": 0, "log": "reviewer-rev9c-delta-probes.log.txt", "cases": 47, "mismatchesAreFindings": 8}
+  ],
+  "hashChecks": ["48 producersAndRetainedScripts vs 5ea87937 blobs: 48 match, 398363 B", "32 originalReviewCopies: match; 17 rev9b-review-* equal aa3387 blobs", "model.py/lifecycle.py equal 870 blobs", "stage1 ab5ecd59..., final 68dbd6e6..., closure 7a925bee... equal committed blobs", "6 accounting artifacts byte-identical to Rev9b copies"],
+  "syncCheck": "reviewer_gate_driver.py.txt runs tools/sync_obsidian.py --check with the canonical state D:/Project/SaintVision-Invion/SaintVisionI-Invion/.git/obsidian-sync-state.json; state SHA recorded immediately before/after each check (canonical-sync-check-before.txt, local-doc-gates.txt); no apply/adopt/resolve/state write"
+}

@@ -1,0 +1,20 @@
+id	expectedExit	actualExit	endKST	command(measured_run.py <target> ...)	peakWorkingSetBytes
+1	0	0	2026-11-06T18:27:47+09:00	schema.py	21245952
+2	0	0	2026-11-06T18:27:49+09:00	authority.py	50589696
+3	0	0	2026-11-06T18:27:51+09:00	model_tests.py	62332928
+4	0	0	2026-11-06T18:27:55+09:00	retained_probes.py	20672512
+5	0	0	2026-11-06T18:27:57+09:00	bounded_analysis.py	37384192
+6	0	0	2026-11-06T18:27:59+09:00	analysis_rule_tests.py	31789056
+7	0	0	2026-11-06T18:28:07+09:00	t1_build.py	53395456
+8	0	0	2026-11-06T18:28:22+09:00	t1_tests.py	62840832
+9	0	0	2026-11-06T18:28:22+09:00	pending_contracts.py	20193280
+10	0	0	2026-11-06T18:28:24+09:00	edge_categories.py	30969856
+11	0	0	2026-11-06T18:28:26+09:00	packet_checks.py	62107648
+12	1	0	2026-11-06T18:28:27+09:00	terminal_claim_regression.py fleet5-b-contract-rev7-20261106-codex	18522112
+13	1	0	2026-11-06T18:28:28+09:00	terminal_claim_regression.py fleet5-b-rev8-revoke-portcut-20261106-codex	18653184
+14	0	0	2026-11-06T18:28:29+09:00	terminal_claim_regression.py fleet5-b-rev9-t1-20261106-codex	18608128
+15	0	0	2026-11-06T18:28:30+09:00	tests/proofs/fleet5_compute_storage_contract_probe.py	25530368
+16	1	1	2026-11-06T18:28:31+09:00	tests/proofs/fleet5_compute_storage_contract_probe.py --require-coexistence	24907776
+12a	1	1	2026-11-06T18:28:59+09:00	terminal_claim_regression.py <abs>/fleet5-b-contract-rev7-20261106-codex	18415616
+13a	1	1	2026-11-06T18:29:01+09:00	terminal_claim_regression.py <abs>/fleet5-b-rev8-revoke-portcut-20261106-codex	18575360
+14a	0	0	2026-11-06T18:29:02+09:00	terminal_claim_regression.py <abs>/fleet5-b-rev9-t1-20261106-codex	18583552

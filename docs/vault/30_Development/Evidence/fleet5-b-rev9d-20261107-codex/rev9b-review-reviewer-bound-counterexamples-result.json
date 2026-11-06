@@ -1,0 +1,94 @@
+{
+ "reviewer": "Claude",
+ "cases": [
+  {
+   "case": "B9b-L1a lan_pilot string-reflective root, bound dict state as db",
+   "ownerPipeline": "ACCEPT",
+   "ownerPipelineError": null,
+   "graphError": null,
+   "censusProductionRows": 5,
+   "newUnboundNames": [],
+   "producerSanity": true,
+   "witnessesChecked": 2,
+   "sourceSHA256": "86cfd13a73bdeca681fe306405b16f9a9d262f27a65bbe7befa1f34d66921bab"
+  },
+  {
+   "case": "B9b-L1a lan_pilot string-reflective root, benign runtime(state) (root silently leaves census)",
+   "ownerPipeline": "ACCEPT",
+   "ownerPipelineError": null,
+   "graphError": null,
+   "censusProductionRows": 5,
+   "newUnboundNames": [],
+   "producerSanity": true,
+   "witnessesChecked": 2,
+   "sourceSHA256": "1999f26005eea4b0bfc1d4f3990a43d1165165078c99cf8958eefc136ef120e0"
+  },
+  {
+   "case": "B9b-L2 uncatalogued production caller of configured_workspace (object())",
+   "ownerPipeline": "ACCEPT",
+   "ownerPipelineError": null,
+   "ifHandAddedToSources": "RECEIVER_UNION_UNPROVEN:CONSTRUCTOR_INPUT:inv.observation.NodeObservation",
+   "censusProductionRows": 6,
+   "newUnboundNames": [],
+   "producerSanity": true,
+   "sourceSHA256": "a208b08216e92841e7d9e3b4ca524f64691bda54d7606767ba872b37475c22d9"
+  },
+  {
+   "case": "B9b-L3 workspace_config for-target owner escape",
+   "ownerPipeline": "ACCEPT",
+   "ownerPipelineError": null,
+   "graphError": null,
+   "censusProductionRows": 6,
+   "newUnboundNames": [],
+   "producerSanity": true,
+   "witnessesChecked": 1,
+   "sourceSHA256": "caefbf8911dfff33a4ac07796c82dfb4d2ccbf8a485a67104dee557dd889bc53"
+  },
+  {
+   "case": "B9b-L3 workspace_config for-target root db escape",
+   "ownerPipeline": "ACCEPT",
+   "ownerPipelineError": null,
+   "graphError": null,
+   "censusProductionRows": 6,
+   "newUnboundNames": [],
+   "producerSanity": true,
+   "witnessesChecked": 1,
+   "sourceSHA256": "25a319a33f1851121d2ab36f64ca1d2b9e894aadea1995627eccfe54fa6031ee"
+  },
+  {
+   "case": "B9b-L3 workspace_config for-target db.transaction method escape",
+   "ownerPipeline": "ACCEPT",
+   "ownerPipelineError": null,
+   "graphError": null,
+   "censusProductionRows": 6,
+   "newUnboundNames": [],
+   "producerSanity": true,
+   "witnessesChecked": 1,
+   "sourceSHA256": "e74d907db5af0297ec16b6d891cb8858aa81d7ec190c0114e097f4eb085860bd"
+  },
+  {
+   "case": "B9b-L3 app.py factory-result owner escape",
+   "ownerPipeline": "ACCEPT",
+   "ownerPipelineError": null,
+   "graphError": null,
+   "censusProductionRows": 6,
+   "newUnboundNames": [],
+   "producerSanity": true,
+   "witnessesChecked": 1,
+   "sourceSHA256": "5ed7c55f79a8c59d0d974f2810480028a023a8947db6e55790955b11ed4144e8"
+  },
+  {
+   "case": "B9b-L3 app.py factory-result root db escape",
+   "ownerPipeline": "ACCEPT",
+   "ownerPipelineError": null,
+   "graphError": null,
+   "censusProductionRows": 6,
+   "newUnboundNames": [],
+   "producerSanity": true,
+   "witnessesChecked": 1,
+   "sourceSHA256": "5df41923057c5a2298bb3ad6065623c7fe1cbf47d49064718ca483d6a329b8a9"
+  }
+ ],
+ "effectfulMutantsImportedOrExecuted": false,
+ "actualRuntimeB": 0
+}

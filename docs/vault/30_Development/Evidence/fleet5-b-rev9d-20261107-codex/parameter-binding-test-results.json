@@ -1,0 +1,424 @@
+{
+  "executionOwner": "Codex",
+  "cases": [
+    {
+      "case": "same-function-unowned-positive",
+      "pass": true,
+      "ownedParameter": false,
+      "expectedOwned": false,
+      "reason": null,
+      "sourceSHA256": "9f1e716a2134639347e8df0c0376bd26202b7bab640a559299b499da60d8f652",
+      "bindings": [],
+      "astValid": true,
+      "effectfulFixtureExecuted": false
+    },
+    {
+      "case": "same-function-owned-positional",
+      "pass": true,
+      "ownedParameter": true,
+      "expectedOwned": true,
+      "reason": null,
+      "sourceSHA256": "2b3bfc49b10bf443e81264f847383630c7bfabbe035b0615de0d569950e18ea5",
+      "bindings": [
+        {
+          "source": {
+            "path": "fixtures/b9d_parameter_fixture.py",
+            "function": "fixtures.b9d_parameter_fixture.",
+            "span": [
+              6,
+              0,
+              6,
+              12
+            ],
+            "fileSHA256": "2b3bfc49b10bf443e81264f847383630c7bfabbe035b0615de0d569950e18ea5",
+            "expressionSHA256": "6c07db265f5b9c31f92d25b396a00894414fca69b85f81ac6c2d574b99570c8f"
+          },
+          "target": "fixtures.b9d_parameter_fixture.accept",
+          "targetPath": "fixtures/b9d_parameter_fixture.py",
+          "formal": "runtime",
+          "boundReceiverSkipped": false,
+          "argument": "held",
+          "argumentEvidence": [
+            {
+              "span": [
+                6,
+                7,
+                6,
+                11
+              ],
+              "sourceExpressionSHA256": "c20dea4d876b5b8fb0a1814b43017030cea6d4ac30b2d9ae71b404d2faba49b5"
+            }
+          ],
+          "argumentForm": "ORIGINAL_SOURCE_EXPRESSION",
+          "binding": "ACTUAL_POSITION_OR_KEYWORD_NAME; packs cite their original expression members, never a synthetic source span"
+        }
+      ],
+      "astValid": true,
+      "effectfulFixtureExecuted": false
+    },
+    {
+      "case": "owned-alias-keyword",
+      "pass": true,
+      "ownedParameter": true,
+      "expectedOwned": true,
+      "reason": null,
+      "sourceSHA256": "681724002474ed8bdb6999665ea3cb96bbcee753e5fc66614de1cdef0274a481",
+      "bindings": [
+        {
+          "source": {
+            "path": "fixtures/b9d_parameter_fixture.py",
+            "function": "fixtures.b9d_parameter_fixture.",
+            "span": [
+              7,
+              0,
+              7,
+              20
+            ],
+            "fileSHA256": "681724002474ed8bdb6999665ea3cb96bbcee753e5fc66614de1cdef0274a481",
+            "expressionSHA256": "9a803daafadb75c90f786100ee15bdcf490d828c1896a5a45bb355e3e53ac493"
+          },
+          "target": "fixtures.b9d_parameter_fixture.accept",
+          "targetPath": "fixtures/b9d_parameter_fixture.py",
+          "formal": "runtime",
+          "boundReceiverSkipped": false,
+          "argument": "held",
+          "argumentEvidence": [
+            {
+              "span": [
+                7,
+                15,
+                7,
+                19
+              ],
+              "sourceExpressionSHA256": "c20dea4d876b5b8fb0a1814b43017030cea6d4ac30b2d9ae71b404d2faba49b5"
+            }
+          ],
+          "argumentForm": "ORIGINAL_SOURCE_EXPRESSION",
+          "binding": "ACTUAL_POSITION_OR_KEYWORD_NAME; packs cite their original expression members, never a synthetic source span"
+        }
+      ],
+      "astValid": true,
+      "effectfulFixtureExecuted": false
+    },
+    {
+      "case": "owned-literal-keyword-spread",
+      "pass": true,
+      "ownedParameter": true,
+      "expectedOwned": true,
+      "reason": null,
+      "sourceSHA256": "d94d0ba25d08ac296a014ce7041b2ab6401f91b13cdc3981ff9caa17aa45c750",
+      "bindings": [
+        {
+          "source": {
+            "path": "fixtures/b9d_parameter_fixture.py",
+            "function": "fixtures.b9d_parameter_fixture.",
+            "span": [
+              6,
+              0,
+              6,
+              27
+            ],
+            "fileSHA256": "d94d0ba25d08ac296a014ce7041b2ab6401f91b13cdc3981ff9caa17aa45c750",
+            "expressionSHA256": "d2adaf1ed3d27ef76737a14554fc10c86fa74d5552b602029f0d7c258611c635"
+          },
+          "target": "fixtures.b9d_parameter_fixture.accept",
+          "targetPath": "fixtures/b9d_parameter_fixture.py",
+          "formal": "runtime",
+          "boundReceiverSkipped": false,
+          "argument": "held",
+          "argumentEvidence": [
+            {
+              "span": [
+                6,
+                21,
+                6,
+                25
+              ],
+              "sourceExpressionSHA256": "c20dea4d876b5b8fb0a1814b43017030cea6d4ac30b2d9ae71b404d2faba49b5"
+            }
+          ],
+          "argumentForm": "ORIGINAL_SOURCE_EXPRESSION",
+          "binding": "ACTUAL_POSITION_OR_KEYWORD_NAME; packs cite their original expression members, never a synthetic source span"
+        }
+      ],
+      "astValid": true,
+      "effectfulFixtureExecuted": false
+    },
+    {
+      "case": "owned-unknown-keyword-spread",
+      "pass": true,
+      "ownedParameter": false,
+      "expectedOwned": false,
+      "reason": "UNRESOLVED:OWNED_ARGUMENT_KEYWORD_SPREAD_BINDING",
+      "sourceSHA256": "23beac23e92116cdbd3ce69bea3f614e0fbb01f5e91cf94d5107d15903904b7d",
+      "bindings": [],
+      "astValid": true,
+      "effectfulFixtureExecuted": false
+    },
+    {
+      "case": "arbitrary-formal-name",
+      "pass": true,
+      "ownedParameter": true,
+      "expectedOwned": true,
+      "reason": null,
+      "sourceSHA256": "3791a113a6dac276598699320c5970d58682dee1e4a1db4ed659a7b6f4a38406",
+      "bindings": [
+        {
+          "source": {
+            "path": "fixtures/b9d_parameter_fixture.py",
+            "function": "fixtures.b9d_parameter_fixture.",
+            "span": [
+              6,
+              0,
+              6,
+              12
+            ],
+            "fileSHA256": "3791a113a6dac276598699320c5970d58682dee1e4a1db4ed659a7b6f4a38406",
+            "expressionSHA256": "6c07db265f5b9c31f92d25b396a00894414fca69b85f81ac6c2d574b99570c8f"
+          },
+          "target": "fixtures.b9d_parameter_fixture.accept",
+          "targetPath": "fixtures/b9d_parameter_fixture.py",
+          "formal": "recipient",
+          "boundReceiverSkipped": false,
+          "argument": "held",
+          "argumentEvidence": [
+            {
+              "span": [
+                6,
+                7,
+                6,
+                11
+              ],
+              "sourceExpressionSHA256": "c20dea4d876b5b8fb0a1814b43017030cea6d4ac30b2d9ae71b404d2faba49b5"
+            }
+          ],
+          "argumentForm": "ORIGINAL_SOURCE_EXPRESSION",
+          "binding": "ACTUAL_POSITION_OR_KEYWORD_NAME; packs cite their original expression members, never a synthetic source span"
+        }
+      ],
+      "astValid": true,
+      "effectfulFixtureExecuted": false
+    },
+    {
+      "case": "constructor-skips-receiver",
+      "pass": true,
+      "ownedParameter": true,
+      "expectedOwned": true,
+      "reason": null,
+      "sourceSHA256": "dad2f0da5fe7efc22b54b2be89461b561e99a5db3d1f4cd7015c84cc6ed7740c",
+      "bindings": [
+        {
+          "source": {
+            "path": "fixtures/b9d_parameter_fixture.py",
+            "function": "fixtures.b9d_parameter_fixture.",
+            "span": [
+              7,
+              0,
+              7,
+              9
+            ],
+            "fileSHA256": "dad2f0da5fe7efc22b54b2be89461b561e99a5db3d1f4cd7015c84cc6ed7740c",
+            "expressionSHA256": "dca20354f8e495967d0923598971b3c1f2229e08742633f1d67db08a3b58059f"
+          },
+          "target": "fixtures.b9d_parameter_fixture.Box.__init__",
+          "targetPath": "fixtures/b9d_parameter_fixture.py",
+          "formal": "slot",
+          "boundReceiverSkipped": true,
+          "argument": "held",
+          "argumentEvidence": [
+            {
+              "span": [
+                7,
+                4,
+                7,
+                8
+              ],
+              "sourceExpressionSHA256": "c20dea4d876b5b8fb0a1814b43017030cea6d4ac30b2d9ae71b404d2faba49b5"
+            }
+          ],
+          "argumentForm": "ORIGINAL_SOURCE_EXPRESSION",
+          "binding": "ACTUAL_POSITION_OR_KEYWORD_NAME; packs cite their original expression members, never a synthetic source span"
+        }
+      ],
+      "astValid": true,
+      "effectfulFixtureExecuted": false
+    },
+    {
+      "case": "constructor-keyword-alias",
+      "pass": true,
+      "ownedParameter": true,
+      "expectedOwned": true,
+      "reason": null,
+      "sourceSHA256": "c8bb81cd9d448395d6bcff6555b1635c46637506e6e09d31e21cdd2814524a5d",
+      "bindings": [
+        {
+          "source": {
+            "path": "fixtures/b9d_parameter_fixture.py",
+            "function": "fixtures.b9d_parameter_fixture.",
+            "span": [
+              8,
+              0,
+              8,
+              16
+            ],
+            "fileSHA256": "c8bb81cd9d448395d6bcff6555b1635c46637506e6e09d31e21cdd2814524a5d",
+            "expressionSHA256": "59cc6c4e4fe6f893961c8e9a554c34d58da60ea4c7429e0ea406b3ec480cbbe3"
+          },
+          "target": "fixtures.b9d_parameter_fixture.Box.__init__",
+          "targetPath": "fixtures/b9d_parameter_fixture.py",
+          "formal": "slot",
+          "boundReceiverSkipped": true,
+          "argument": "held",
+          "argumentEvidence": [
+            {
+              "span": [
+                8,
+                11,
+                8,
+                15
+              ],
+              "sourceExpressionSHA256": "c20dea4d876b5b8fb0a1814b43017030cea6d4ac30b2d9ae71b404d2faba49b5"
+            }
+          ],
+          "argumentForm": "ORIGINAL_SOURCE_EXPRESSION",
+          "binding": "ACTUAL_POSITION_OR_KEYWORD_NAME; packs cite their original expression members, never a synthetic source span"
+        }
+      ],
+      "astValid": true,
+      "effectfulFixtureExecuted": false
+    },
+    {
+      "case": "bound-method-skips-receiver",
+      "pass": true,
+      "ownedParameter": true,
+      "expectedOwned": true,
+      "reason": null,
+      "sourceSHA256": "d637b887cac4dd10f1d7868c17078db7bda65579019375deb330d7145bf3a7a6",
+      "bindings": [
+        {
+          "source": {
+            "path": "fixtures/b9d_parameter_fixture.py",
+            "function": "fixtures.b9d_parameter_fixture.Box.start",
+            "span": [
+              8,
+              8,
+              8,
+              28
+            ],
+            "fileSHA256": "d637b887cac4dd10f1d7868c17078db7bda65579019375deb330d7145bf3a7a6",
+            "expressionSHA256": "dea4701016dba0d49dc8e77a1101c6a6ce7f37d8dc0f3cd327822cab3e5e1178"
+          },
+          "target": "fixtures.b9d_parameter_fixture.Box.accept",
+          "targetPath": "fixtures/b9d_parameter_fixture.py",
+          "formal": "slot",
+          "boundReceiverSkipped": true,
+          "argument": "payload",
+          "argumentEvidence": [
+            {
+              "span": [
+                8,
+                20,
+                8,
+                27
+              ],
+              "sourceExpressionSHA256": "239f59ed55e737c77147cf55ad0c1b030b6d7ee748a7426952f9b852d5a935e5"
+            }
+          ],
+          "argumentForm": "ORIGINAL_SOURCE_EXPRESSION",
+          "binding": "ACTUAL_POSITION_OR_KEYWORD_NAME; packs cite their original expression members, never a synthetic source span"
+        },
+        {
+          "source": {
+            "path": "fixtures/b9d_parameter_fixture.py",
+            "function": "fixtures.b9d_parameter_fixture.",
+            "span": [
+              9,
+              0,
+              9,
+              22
+            ],
+            "fileSHA256": "d637b887cac4dd10f1d7868c17078db7bda65579019375deb330d7145bf3a7a6",
+            "expressionSHA256": "6b5eb419fa5663e5e05943f610ea27188cd38a5c7f727de9549cd3790dfdfcc8"
+          },
+          "target": "fixtures.b9d_parameter_fixture.Box.start",
+          "targetPath": "fixtures/b9d_parameter_fixture.py",
+          "formal": "payload",
+          "boundReceiverSkipped": false,
+          "argument": "held",
+          "argumentEvidence": [
+            {
+              "span": [
+                9,
+                17,
+                9,
+                21
+              ],
+              "sourceExpressionSHA256": "c20dea4d876b5b8fb0a1814b43017030cea6d4ac30b2d9ae71b404d2faba49b5"
+            }
+          ],
+          "argumentForm": "ORIGINAL_SOURCE_EXPRESSION",
+          "binding": "ACTUAL_POSITION_OR_KEYWORD_NAME; packs cite their original expression members, never a synthetic source span"
+        }
+      ],
+      "astValid": true,
+      "effectfulFixtureExecuted": false
+    },
+    {
+      "case": "nested-enclosing-parameter",
+      "pass": true,
+      "ownedParameter": true,
+      "expectedOwned": true,
+      "reason": null,
+      "sourceSHA256": "1edcf2e376e8fa4f603f0a760ba8e706cb4262f54e087bd9408b89e807503146",
+      "bindings": [
+        {
+          "source": {
+            "path": "fixtures/b9d_parameter_fixture.py",
+            "function": "fixtures.b9d_parameter_fixture.",
+            "span": [
+              8,
+              0,
+              8,
+              12
+            ],
+            "fileSHA256": "1edcf2e376e8fa4f603f0a760ba8e706cb4262f54e087bd9408b89e807503146",
+            "expressionSHA256": "6c07db265f5b9c31f92d25b396a00894414fca69b85f81ac6c2d574b99570c8f"
+          },
+          "target": "fixtures.b9d_parameter_fixture.accept",
+          "targetPath": "fixtures/b9d_parameter_fixture.py",
+          "formal": "recipient",
+          "boundReceiverSkipped": false,
+          "argument": "held",
+          "argumentEvidence": [
+            {
+              "span": [
+                8,
+                7,
+                8,
+                11
+              ],
+              "sourceExpressionSHA256": "c20dea4d876b5b8fb0a1814b43017030cea6d4ac30b2d9ae71b404d2faba49b5"
+            }
+          ],
+          "argumentForm": "ORIGINAL_SOURCE_EXPRESSION",
+          "binding": "ACTUAL_POSITION_OR_KEYWORD_NAME; packs cite their original expression members, never a synthetic source span"
+        }
+      ],
+      "astValid": true,
+      "effectfulFixtureExecuted": false
+    },
+    {
+      "case": "duplicate-owned-binding",
+      "pass": true,
+      "ownedParameter": false,
+      "expectedOwned": false,
+      "reason": "UNRESOLVED:DUPLICATE_ARGUMENT_BINDING",
+      "sourceSHA256": "c204d686c8dd5297cd43231c172c9d24150360a21a6795553563fbff1b2c9bc6",
+      "bindings": [],
+      "astValid": true,
+      "effectfulFixtureExecuted": false
+    }
+  ],
+  "scope": "Lexical binder unit fixtures only; no standalone provenance/runtime grant",
+  "actualRuntimeB": 0
+}

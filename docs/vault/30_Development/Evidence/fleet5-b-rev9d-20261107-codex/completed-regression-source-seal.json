@@ -1,0 +1,97 @@
+{
+  "timing": "POST_RUN_SOURCE_SEAL: owner records no analysed-producer edits after these runs began; this is not an instrumented execution-time hash",
+  "kst": "2026-11-07T01:04:05.439661+09:00",
+  "sourceFiles": [
+    {
+      "file": "analysis_rules.py",
+      "sha256": "c3ceff61cde7c0adc8267590a13ebcec1b56e56e06624058cc8fbd283c8a4244"
+    },
+    {
+      "file": "bounded_analysis.py",
+      "sha256": "03d53a9431c326b297ad786e03852edb88e43323e2dc4791761c36e7072730ca"
+    },
+    {
+      "file": "call_binding.py",
+      "sha256": "94a359d1567e31467ecb94da9473a982f3e978c932a7d3b6018b6571369ecd30"
+    },
+    {
+      "file": "constructor_graph.py",
+      "sha256": "1ec99021b4d1160bcee15c43032cbe21554625e345b46b19112c2697e670dfa3"
+    },
+    {
+      "file": "forwarding_discovery.py",
+      "sha256": "05512ea4a76ff4e8814eab8f192f01c0995a8cf91c203c3ca816d9c36d6a1c85"
+    },
+    {
+      "file": "mutation_fixture.py",
+      "sha256": "2ed03fa1780fd216c528a49a28911f1427197503c8358a6b94bbd285a583dea6"
+    },
+    {
+      "file": "owner_transfer.py",
+      "sha256": "68623be32888be9cd25023dd0096aefeedffe00dd905784e3de59525b5d84ff7"
+    },
+    {
+      "file": "parameter_flow.py",
+      "sha256": "346377c467f593a7c1dfdb339d3b302cf5ac13f7d6194e5c10dedcee46819adf"
+    },
+    {
+      "file": "reflection_audit.py",
+      "sha256": "aac30f09aa81738591bfefb56008755793ea898becf8a61458752d9a64d1337e"
+    },
+    {
+      "file": "source_bindings.py",
+      "sha256": "29dd7070de00fabd1cd4c5824227db0689104910922a0ae28634f12a62efe7e9"
+    },
+    {
+      "file": "t1_provenance.py",
+      "sha256": "b8fd9df42e64c3227e0713bba448e20c1125e0c2e6a5bd524c53410c5194d948"
+    },
+    {
+      "file": "use_sites.py",
+      "sha256": "4a1fbb3f42180bf3d43698121a863fdb1ed2f723394f2a85864a2afc54b647dc"
+    },
+    {
+      "file": "rev9d_gap_driver.py",
+      "sha256": "4cbda6fa84b56e6ae09c6c83f17c10697e06b0ce546332f5c40de127dfbd8d63"
+    },
+    {
+      "file": "rev9d_regressions.py",
+      "sha256": "ab0432d222d9cb04a242fd49ff35991665addeea77375e8e38b3a94643dabfa3"
+    },
+    {
+      "file": "rev9c-review-reviewer_rev9c_delta_probes.py.txt",
+      "sha256": "7240434d8b174c2d233c0d9e0199d722baee5487ca73fbf6b98bd1acc974abc5"
+    }
+  ],
+  "artifacts": [
+    {
+      "file": "rev9d-regression-results.json",
+      "sha256": "e442403aa979bebc0822f7db18bc5ed2b80e3d1d33815b9314d687896cb28077"
+    },
+    {
+      "file": "old-gap-results.json",
+      "sha256": "461b530bf263e44671cc59d076583f6a3e222b10740db0982c331a942dd8fe57"
+    },
+    {
+      "file": "new-gap-results.json",
+      "sha256": "7f28e20d77678313171dc1cadeb13ff1a7291862cb3c08976ecd797c25237bb6"
+    },
+    {
+      "file": "owner-original47-results.json",
+      "sha256": "70f650570c3119ea771614fbd3cc1177918f3ff3cc483582742154b7df4f4f2c"
+    },
+    {
+      "file": "old-gap-contrast.log",
+      "sha256": "4e186cefeff63d0cd8c934be3ac8242a5ae2e5176466bb1c0ab18f88ffe2b8cd"
+    },
+    {
+      "file": "new-gap-contrast.log",
+      "sha256": "457458feb5557be5e1d5a69e0c1b2bcc62693badc89bd72962b6d62d8a002b37"
+    },
+    {
+      "file": "owner-original47-replay.log",
+      "sha256": "9dadf56cde1a98ddae41cfc470dbbe76b6d4cd61e301390d4cf26f1fccbe1792"
+    }
+  ],
+  "purpose": "Avoid unnecessary rerun of successful 8-gap old/new contrast and exact original47; invalidate reuse if any bound input changes."
+}

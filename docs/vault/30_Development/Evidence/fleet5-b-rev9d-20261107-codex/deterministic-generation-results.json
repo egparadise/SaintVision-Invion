@@ -1,0 +1,39 @@
+{
+  "executionOwner": "Codex",
+  "commands": [
+    {
+      "command": [
+        "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+        "-B",
+        "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105\\docs\\vault\\30_Development\\Evidence\\fleet5-b-rev9d-20261107-codex\\measured_run.py",
+        "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105\\docs\\vault\\30_Development\\Evidence\\fleet5-b-rev9d-20261107-codex\\t1_build.py"
+      ],
+      "PYTHONHASHSEED": "11",
+      "actualExit": 0,
+      "kst": "2026-11-07T01:22:43.196262+09:00",
+      "log": "determinism-11.log",
+      "logSHA256": "f58bd4fe28a81ab75df36052f73a7f7362dd680f7b36de9c903a7168ab86903b",
+      "closureSHA256": "0b25575952ecb7a390c87393e783c9c777eec237f67a4dfded9216fb1a399694"
+    },
+    {
+      "command": [
+        "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+        "-B",
+        "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105\\docs\\vault\\30_Development\\Evidence\\fleet5-b-rev9d-20261107-codex\\measured_run.py",
+        "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105\\docs\\vault\\30_Development\\Evidence\\fleet5-b-rev9d-20261107-codex\\t1_build.py"
+      ],
+      "PYTHONHASHSEED": "29",
+      "actualExit": 0,
+      "kst": "2026-11-07T01:23:11.976065+09:00",
+      "log": "determinism-29.log",
+      "logSHA256": "9262b4b06ca8e01ad109b86ba004f50ce7cd1270ab4b8385ae3540a89287996a",
+      "closureSHA256": "0b25575952ecb7a390c87393e783c9c777eec237f67a4dfded9216fb1a399694"
+    }
+  ],
+  "byteIdentical": true,
+  "producerOrderNext": [
+    "pending_contracts.py",
+    "edge_categories.py"
+  ],
+  "actualRuntimeB": 0
+}

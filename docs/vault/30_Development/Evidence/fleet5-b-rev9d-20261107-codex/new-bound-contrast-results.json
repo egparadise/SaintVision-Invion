@@ -1,0 +1,1890 @@
+{
+  "executionOwner": "Codex OWNER counterexample reproduction",
+  "targetEvidence": "fleet5-b-rev9d-20261107-codex",
+  "cases": [
+    {
+      "case": "actual-source-positive",
+      "expectedNew": "ACCEPT",
+      "observed": "ACCEPT",
+      "reason": null,
+      "expectedReasonPrefix": null,
+      "oldGapExpected": false,
+      "producerSanity": true,
+      "originalWitnessesChecked": 15,
+      "intentionalRootRewrites": 0,
+      "mutatedSourceSHA256": {},
+      "sourceUniverseOverlay": false,
+      "newUnboundNames": [],
+      "currentVisibleProductionRoots": 6,
+      "discoveredProductionFiles": [
+        "services/control-plane/src/inv/app.py",
+        "services/control-plane/src/inv/workspace_config.py"
+      ],
+      "discoveredHarnessFiles": [],
+      "trackedForwarders": [
+        "inv.workspace_config.configured_workspace"
+      ],
+      "exportAliases": {},
+      "ownerTargets": null
+    },
+    {
+      "case": "L1-hidden-replacement-state",
+      "expectedNew": "REFUSE",
+      "observed": "REFUSE",
+      "reason": "UNRESOLVED:CONSTRUCTOR_ROOT_REMOVED_OR_HIDDEN",
+      "expectedReasonPrefix": "UNRESOLVED:CONSTRUCTOR_ROOT_REMOVED_OR_HIDDEN",
+      "oldGapExpected": true,
+      "producerSanity": true,
+      "originalWitnessesChecked": 14,
+      "intentionalRootRewrites": 1,
+      "mutatedSourceSHA256": {
+        "tools/lan_pilot.py": "86cfd13a73bdeca681fe306405b16f9a9d262f27a65bbe7befa1f34d66921bab"
+      },
+      "sourceUniverseOverlay": false,
+      "newUnboundNames": [],
+      "currentVisibleProductionRoots": 5,
+      "discoveredProductionFiles": [
+        "services/control-plane/src/inv/app.py",
+        "services/control-plane/src/inv/workspace_config.py",
+        "tools/lan_pilot.py"
+      ],
+      "discoveredHarnessFiles": [],
+      "trackedForwarders": [
+        "inv.workspace_config.configured_workspace"
+      ],
+      "exportAliases": {},
+      "ownerTargets": null
+    },
+    {
+      "case": "L1-hidden-replacement-runtime",
+      "expectedNew": "REFUSE",
+      "observed": "REFUSE",
+      "reason": "UNRESOLVED:CONSTRUCTOR_ROOT_REMOVED_OR_HIDDEN",
+      "expectedReasonPrefix": "UNRESOLVED:CONSTRUCTOR_ROOT_REMOVED_OR_HIDDEN",
+      "oldGapExpected": true,
+      "producerSanity": true,
+      "originalWitnessesChecked": 14,
+      "intentionalRootRewrites": 1,
+      "mutatedSourceSHA256": {
+        "tools/lan_pilot.py": "1999f26005eea4b0bfc1d4f3990a43d1165165078c99cf8958eefc136ef120e0"
+      },
+      "sourceUniverseOverlay": false,
+      "newUnboundNames": [],
+      "currentVisibleProductionRoots": 5,
+      "discoveredProductionFiles": [
+        "services/control-plane/src/inv/app.py",
+        "services/control-plane/src/inv/workspace_config.py",
+        "tools/lan_pilot.py"
+      ],
+      "discoveredHarnessFiles": [],
+      "trackedForwarders": [
+        "inv.workspace_config.configured_workspace"
+      ],
+      "exportAliases": {},
+      "ownerTargets": null
+    },
+    {
+      "case": "L1-removed-root",
+      "expectedNew": "REFUSE",
+      "observed": "REFUSE",
+      "reason": "UNRESOLVED:CONSTRUCTOR_ROOT_REMOVED_OR_HIDDEN",
+      "expectedReasonPrefix": "UNRESOLVED:CONSTRUCTOR_ROOT_REMOVED_OR_HIDDEN",
+      "oldGapExpected": true,
+      "producerSanity": true,
+      "originalWitnessesChecked": 14,
+      "intentionalRootRewrites": 1,
+      "mutatedSourceSHA256": {
+        "tools/lan_pilot.py": "37e135863280c5101bd58f447c0e935a82246679f0fcb310592f9f0d589067c4"
+      },
+      "sourceUniverseOverlay": false,
+      "newUnboundNames": [],
+      "currentVisibleProductionRoots": 5,
+      "discoveredProductionFiles": [
+        "services/control-plane/src/inv/app.py",
+        "services/control-plane/src/inv/workspace_config.py"
+      ],
+      "discoveredHarnessFiles": [],
+      "trackedForwarders": [
+        "inv.workspace_config.configured_workspace"
+      ],
+      "exportAliases": {},
+      "ownerTargets": null
+    },
+    {
+      "case": "L1-six-plus-hidden-operator",
+      "expectedNew": "REFUSE",
+      "observed": "REFUSE",
+      "reason": "UNRESOLVED:RELEVANT_REFLECTION_USE_NOT_ALLOWLISTED:tools/lan_pilot.py",
+      "expectedReasonPrefix": "UNRESOLVED:RELEVANT_REFLECTION_USE_NOT_ALLOWLISTED",
+      "oldGapExpected": true,
+      "producerSanity": true,
+      "originalWitnessesChecked": 15,
+      "intentionalRootRewrites": 0,
+      "mutatedSourceSHA256": {
+        "tools/lan_pilot.py": "eb0deb3ce5a41fc4f98ebdf3450156346368bd1b0e085749cbaf8b108a69807d"
+      },
+      "sourceUniverseOverlay": false,
+      "newUnboundNames": [],
+      "currentVisibleProductionRoots": 6,
+      "discoveredProductionFiles": [
+        "services/control-plane/src/inv/app.py",
+        "services/control-plane/src/inv/workspace_config.py",
+        "tools/lan_pilot.py"
+      ],
+      "discoveredHarnessFiles": [],
+      "trackedForwarders": [
+        "inv.workspace_config.configured_workspace"
+      ],
+      "exportAliases": {},
+      "ownerTargets": null
+    },
+    {
+      "case": "L1-six-plus-hidden-inspect",
+      "expectedNew": "REFUSE",
+      "observed": "REFUSE",
+      "reason": "UNRESOLVED:RELEVANT_REFLECTION_USE_NOT_ALLOWLISTED:tools/lan_pilot.py",
+      "expectedReasonPrefix": "UNRESOLVED:RELEVANT_REFLECTION_USE_NOT_ALLOWLISTED",
+      "oldGapExpected": true,
+      "producerSanity": true,
+      "originalWitnessesChecked": 15,
+      "intentionalRootRewrites": 0,
+      "mutatedSourceSHA256": {
+        "tools/lan_pilot.py": "6cc4ffa2677c7777dbccb85b112696edce94355fcd2f4b3000b358392418ea25"
+      },
+      "sourceUniverseOverlay": false,
+      "newUnboundNames": [],
+      "currentVisibleProductionRoots": 6,
+      "discoveredProductionFiles": [
+        "services/control-plane/src/inv/app.py",
+        "services/control-plane/src/inv/workspace_config.py",
+        "tools/lan_pilot.py"
+      ],
+      "discoveredHarnessFiles": [],
+      "trackedForwarders": [
+        "inv.workspace_config.configured_workspace"
+      ],
+      "exportAliases": {},
+      "ownerTargets": null
+    },
+    {
+      "case": "L1-inspect-members",
+      "expectedNew": "REFUSE",
+      "observed": "REFUSE",
+      "reason": "UNRESOLVED:RELEVANT_REFLECTION_USE_NOT_ALLOWLISTED:tools/lan_pilot.py",
+      "expectedReasonPrefix": "UNRESOLVED:RELEVANT_REFLECTION_USE_NOT_ALLOWLISTED",
+      "oldGapExpected": true,
+      "producerSanity": true,
+      "originalWitnessesChecked": 15,
+      "intentionalRootRewrites": 0,
+      "mutatedSourceSHA256": {
+        "tools/lan_pilot.py": "a1cf12c9d25bd373b37f026c5404a48b66e7e788984774a07662dd14682a103f"
+      },
+      "sourceUniverseOverlay": false,
+      "newUnboundNames": [],
+      "currentVisibleProductionRoots": 6,
+      "discoveredProductionFiles": [
+        "services/control-plane/src/inv/app.py",
+        "services/control-plane/src/inv/workspace_config.py",
+        "tools/lan_pilot.py"
+      ],
+      "discoveredHarnessFiles": [],
+      "trackedForwarders": [
+        "inv.workspace_config.configured_workspace"
+      ],
+      "exportAliases": {},
+      "ownerTargets": null
+    },
+    {
+      "case": "L1-importlib-module",
+      "expectedNew": "REFUSE",
+      "observed": "REFUSE",
+      "reason": "UNRESOLVED:RELEVANT_REFLECTION_USE_NOT_ALLOWLISTED:tools/lan_pilot.py",
+      "expectedReasonPrefix": "UNRESOLVED:RELEVANT_REFLECTION_USE_NOT_ALLOWLISTED",
+      "oldGapExpected": true,
+      "producerSanity": true,
+      "originalWitnessesChecked": 15,
+      "intentionalRootRewrites": 0,
+      "mutatedSourceSHA256": {
+        "tools/lan_pilot.py": "adf9ad9a515c6da68d7793af80dcd5f3611c8cd2ea3dbf176250731385996cc2"
+      },
+      "sourceUniverseOverlay": false,
+      "newUnboundNames": [],
+      "currentVisibleProductionRoots": 6,
+      "discoveredProductionFiles": [
+        "services/control-plane/src/inv/app.py",
+        "services/control-plane/src/inv/workspace_config.py",
+        "tools/lan_pilot.py"
+      ],
+      "discoveredHarnessFiles": [],
+      "trackedForwarders": [
+        "inv.workspace_config.configured_workspace"
+      ],
+      "exportAliases": {},
+      "ownerTargets": null
+    },
+    {
+      "case": "L1-sys-module",
+      "expectedNew": "REFUSE",
+      "observed": "REFUSE",
+      "reason": "UNRESOLVED:RELEVANT_REFLECTION_USE_NOT_ALLOWLISTED:tools/lan_pilot.py",
+      "expectedReasonPrefix": "UNRESOLVED:RELEVANT_REFLECTION_USE_NOT_ALLOWLISTED",
+      "oldGapExpected": true,
+      "producerSanity": true,
+      "originalWitnessesChecked": 15,
+      "intentionalRootRewrites": 0,
+      "mutatedSourceSHA256": {
+        "tools/lan_pilot.py": "a6cc29f237f98a50e10040a0d49205858ac6177cef3da5de312716b2d4aba0fe"
+      },
+      "sourceUniverseOverlay": false,
+      "newUnboundNames": [],
+      "currentVisibleProductionRoots": 6,
+      "discoveredProductionFiles": [
+        "services/control-plane/src/inv/app.py",
+        "services/control-plane/src/inv/workspace_config.py",
+        "tools/lan_pilot.py"
+      ],
+      "discoveredHarnessFiles": [],
+      "trackedForwarders": [
+        "inv.workspace_config.configured_workspace"
+      ],
+      "exportAliases": {},
+      "ownerTargets": null
+    },
+    {
+      "case": "L1-methodcaller",
+      "expectedNew": "REFUSE",
+      "observed": "REFUSE",
+      "reason": "UNRESOLVED:RELEVANT_REFLECTION_USE_NOT_ALLOWLISTED:REFLECTION_NAMESPACE:operator.methodcaller",
+      "expectedReasonPrefix": "UNRESOLVED:RELEVANT_REFLECTION_USE_NOT_ALLOWLISTED",
+      "oldGapExpected": true,
+      "producerSanity": true,
+      "originalWitnessesChecked": 15,
+      "intentionalRootRewrites": 0,
+      "mutatedSourceSHA256": {
+        "tools/lan_pilot.py": "f31d3c649791b804cb5f5aa381028e108dcca32b0fbfcc3b7e304063bcaac53a"
+      },
+      "sourceUniverseOverlay": false,
+      "newUnboundNames": [],
+      "currentVisibleProductionRoots": 6,
+      "discoveredProductionFiles": [
+        "services/control-plane/src/inv/app.py",
+        "services/control-plane/src/inv/workspace_config.py"
+      ],
+      "discoveredHarnessFiles": [],
+      "trackedForwarders": [
+        "inv.workspace_config.configured_workspace"
+      ],
+      "exportAliases": {},
+      "ownerTargets": null
+    },
+    {
+      "case": "L1-operator-module-alias",
+      "expectedNew": "REFUSE",
+      "observed": "REFUSE",
+      "reason": "UNRESOLVED:RELEVANT_REFLECTION_USE_NOT_ALLOWLISTED:REFLECTION_NAMESPACE:operator.attrgetter",
+      "expectedReasonPrefix": "UNRESOLVED:RELEVANT_REFLECTION_USE_NOT_ALLOWLISTED",
+      "oldGapExpected": true,
+      "producerSanity": true,
+      "originalWitnessesChecked": 15,
+      "intentionalRootRewrites": 0,
+      "mutatedSourceSHA256": {
+        "tools/lan_pilot.py": "5dc6ef79cef6aa9096a6c0d2ad2f2268faa605d14a99191b648799173a2efda6"
+      },
+      "sourceUniverseOverlay": false,
+      "newUnboundNames": [],
+      "currentVisibleProductionRoots": 6,
+      "discoveredProductionFiles": [
+        "services/control-plane/src/inv/app.py",
+        "services/control-plane/src/inv/workspace_config.py"
+      ],
+      "discoveredHarnessFiles": [],
+      "trackedForwarders": [
+        "inv.workspace_config.configured_workspace"
+      ],
+      "exportAliases": {},
+      "ownerTargets": null
+    },
+    {
+      "case": "L1-benign-unused-import-and-nonreflective-string",
+      "expectedNew": "ACCEPT",
+      "observed": "ACCEPT",
+      "reason": null,
+      "expectedReasonPrefix": null,
+      "oldGapExpected": false,
+      "producerSanity": true,
+      "originalWitnessesChecked": 15,
+      "intentionalRootRewrites": 0,
+      "mutatedSourceSHA256": {
+        "tools/lan_pilot.py": "f682f3f55a092449394a13b31ddfca6eef8faec64712c9ad09bc5b800001451b"
+      },
+      "sourceUniverseOverlay": false,
+      "newUnboundNames": [],
+      "currentVisibleProductionRoots": 6,
+      "discoveredProductionFiles": [
+        "services/control-plane/src/inv/app.py",
+        "services/control-plane/src/inv/workspace_config.py"
+      ],
+      "discoveredHarnessFiles": [],
+      "trackedForwarders": [
+        "inv.workspace_config.configured_workspace"
+      ],
+      "exportAliases": {},
+      "ownerTargets": null
+    },
+    {
+      "case": "L1-benign-current-constructor-module-alias",
+      "expectedNew": "ACCEPT",
+      "observed": "ACCEPT",
+      "reason": null,
+      "expectedReasonPrefix": null,
+      "oldGapExpected": false,
+      "producerSanity": true,
+      "originalWitnessesChecked": 14,
+      "intentionalRootRewrites": 1,
+      "mutatedSourceSHA256": {
+        "tools/lan_pilot.py": "f4d7efd7b7be855f0317bc0290076b2bf41048d89d6b8563cc1bd5a92b91028a"
+      },
+      "sourceUniverseOverlay": false,
+      "newUnboundNames": [],
+      "currentVisibleProductionRoots": 6,
+      "discoveredProductionFiles": [
+        "services/control-plane/src/inv/app.py",
+        "services/control-plane/src/inv/workspace_config.py"
+      ],
+      "discoveredHarnessFiles": [],
+      "trackedForwarders": [
+        "inv.workspace_config.configured_workspace"
+      ],
+      "exportAliases": {},
+      "ownerTargets": null
+    },
+    {
+      "case": "L2-reviewer-business-handoff-alias-omitted",
+      "expectedNew": "REFUSE",
+      "observed": "REFUSE",
+      "reason": "UNCATALOGUED_PRODUCTION_SOURCE:services/control-plane/src/inv/business_handoff.py",
+      "expectedReasonPrefix": "UNCATALOGUED_PRODUCTION_SOURCE:",
+      "oldGapExpected": true,
+      "producerSanity": true,
+      "originalWitnessesChecked": 15,
+      "intentionalRootRewrites": 0,
+      "mutatedSourceSHA256": {
+        "services/control-plane/src/inv/business_handoff.py": "a208b08216e92841e7d9e3b4ca524f64691bda54d7606767ba872b37475c22d9"
+      },
+      "sourceUniverseOverlay": true,
+      "newUnboundNames": [],
+      "currentVisibleProductionRoots": 6,
+      "discoveredProductionFiles": [
+        "services/control-plane/src/inv/app.py",
+        "services/control-plane/src/inv/business_handoff.py",
+        "services/control-plane/src/inv/workspace_config.py"
+      ],
+      "discoveredHarnessFiles": [],
+      "trackedForwarders": [
+        "inv.workspace_config.configured_workspace"
+      ],
+      "exportAliases": {
+        "inv.business_handoff._cw": "inv.workspace_config.configured_workspace"
+      },
+      "ownerTargets": null
+    },
+    {
+      "case": "L2-reexport-alias-omitted",
+      "expectedNew": "REFUSE",
+      "observed": "REFUSE",
+      "reason": "UNCATALOGUED_PRODUCTION_SOURCE:services/control-plane/src/inv/b9c_reexport_fixture.py,services/control-plane/src/inv/business_handoff.py",
+      "expectedReasonPrefix": "UNCATALOGUED_PRODUCTION_SOURCE:",
+      "oldGapExpected": true,
+      "producerSanity": true,
+      "originalWitnessesChecked": 15,
+      "intentionalRootRewrites": 0,
+      "mutatedSourceSHA256": {
+        "services/control-plane/src/inv/b9c_reexport_fixture.py": "df98209207cd50d1e2b4ea126bfbba21938135f709b9d3ecc649c6337608fa3b",
+        "services/control-plane/src/inv/business_handoff.py": "b972413a8657c2aadab73f3deb6d6e4c2eea1571c98cc5c81c696c495bc20bc2"
+      },
+      "sourceUniverseOverlay": true,
+      "newUnboundNames": [],
+      "currentVisibleProductionRoots": 6,
+      "discoveredProductionFiles": [
+        "services/control-plane/src/inv/app.py",
+        "services/control-plane/src/inv/b9c_reexport_fixture.py",
+        "services/control-plane/src/inv/business_handoff.py",
+        "services/control-plane/src/inv/workspace_config.py"
+      ],
+      "discoveredHarnessFiles": [],
+      "trackedForwarders": [
+        "inv.workspace_config.configured_workspace"
+      ],
+      "exportAliases": {
+        "inv.b9c_reexport_fixture.exported_factory": "inv.workspace_config.configured_workspace",
+        "inv.business_handoff.factory_alias": "inv.workspace_config.configured_workspace"
+      },
+      "ownerTargets": null
+    },
+    {
+      "case": "L2-module-reexport-omitted",
+      "expectedNew": "REFUSE",
+      "observed": "REFUSE",
+      "reason": "UNCATALOGUED_PRODUCTION_SOURCE:services/control-plane/src/inv/b9c_reexport_fixture.py,services/control-plane/src/inv/business_handoff.py",
+      "expectedReasonPrefix": "UNCATALOGUED_PRODUCTION_SOURCE:",
+      "oldGapExpected": true,
+      "producerSanity": true,
+      "originalWitnessesChecked": 15,
+      "intentionalRootRewrites": 0,
+      "mutatedSourceSHA256": {
+        "services/control-plane/src/inv/b9c_reexport_fixture.py": "d706e9310b21c43fcb7b716b044f06d1b86f4dc56391a923365bceec02ecef3f",
+        "services/control-plane/src/inv/business_handoff.py": "4540ba6873af3a19daddbb2e56d7af229c3a46121b5e1a1434c5aad32d93cdb9"
+      },
+      "sourceUniverseOverlay": true,
+      "newUnboundNames": [],
+      "currentVisibleProductionRoots": 6,
+      "discoveredProductionFiles": [
+        "services/control-plane/src/inv/app.py",
+        "services/control-plane/src/inv/b9c_reexport_fixture.py",
+        "services/control-plane/src/inv/business_handoff.py",
+        "services/control-plane/src/inv/workspace_config.py"
+      ],
+      "discoveredHarnessFiles": [],
+      "trackedForwarders": [
+        "inv.workspace_config.configured_workspace"
+      ],
+      "exportAliases": {
+        "inv.b9c_reexport_fixture.exported_module": "inv.workspace_config",
+        "inv.business_handoff.module_alias": "inv.workspace_config"
+      },
+      "ownerTargets": null
+    },
+    {
+      "case": "L2-forwarding-fixed-point-omitted",
+      "expectedNew": "REFUSE",
+      "observed": "REFUSE",
+      "reason": "UNCATALOGUED_PRODUCTION_SOURCE:services/control-plane/src/inv/business_handoff.py,services/control-plane/src/inv/business_surface.py",
+      "expectedReasonPrefix": "UNCATALOGUED_PRODUCTION_SOURCE:",
+      "oldGapExpected": true,
+      "producerSanity": true,
+      "originalWitnessesChecked": 15,
+      "intentionalRootRewrites": 0,
+      "mutatedSourceSHA256": {
+        "services/control-plane/src/inv/business_handoff.py": "90902067cc1a06044118c07b5146f48d569571a24cccf12f5638ad695fbff660",
+        "services/control-plane/src/inv/business_surface.py": "ab7178ea7d645920386ef4c953b7551abcb2d33f5831335e4210b9af846c6a86"
+      },
+      "sourceUniverseOverlay": true,
+      "newUnboundNames": [],
+      "currentVisibleProductionRoots": 6,
+      "discoveredProductionFiles": [
+        "services/control-plane/src/inv/app.py",
+        "services/control-plane/src/inv/business_handoff.py",
+        "services/control-plane/src/inv/business_surface.py",
+        "services/control-plane/src/inv/workspace_config.py"
+      ],
+      "discoveredHarnessFiles": [],
+      "trackedForwarders": [
+        "inv.business_handoff._b9c_forward",
+        "inv.workspace_config.configured_workspace"
+      ],
+      "exportAliases": {
+        "inv.business_handoff._cw": "inv.workspace_config.configured_workspace",
+        "inv.business_surface._higher": "inv.business_handoff._b9c_forward"
+      },
+      "ownerTargets": null
+    },
+    {
+      "case": "L2-harness-is-separated",
+      "expectedNew": "ACCEPT",
+      "observed": "ACCEPT",
+      "reason": null,
+      "expectedReasonPrefix": null,
+      "oldGapExpected": false,
+      "producerSanity": true,
+      "originalWitnessesChecked": 15,
+      "intentionalRootRewrites": 0,
+      "mutatedSourceSHA256": {
+        "tests/integration/test_node_extensions.py": "a5693331f9a5d378fa57020a3bb512106295c923f7b64a6f243494f47956aba2"
+      },
+      "sourceUniverseOverlay": true,
+      "newUnboundNames": [],
+      "currentVisibleProductionRoots": 6,
+      "discoveredProductionFiles": [
+        "services/control-plane/src/inv/app.py",
+        "services/control-plane/src/inv/workspace_config.py"
+      ],
+      "discoveredHarnessFiles": [
+        "tests/integration/test_node_extensions.py"
+      ],
+      "trackedForwarders": [
+        "inv.workspace_config.configured_workspace"
+      ],
+      "exportAliases": {
+        "tests.integration.test_node_extensions.harness_factory": "inv.workspace_config.configured_workspace"
+      },
+      "ownerTargets": null
+    },
+    {
+      "case": "L2-benign-current-import-alias",
+      "expectedNew": "ACCEPT",
+      "observed": "ACCEPT",
+      "reason": null,
+      "expectedReasonPrefix": null,
+      "oldGapExpected": false,
+      "producerSanity": true,
+      "originalWitnessesChecked": 15,
+      "intentionalRootRewrites": 0,
+      "mutatedSourceSHA256": {
+        "services/control-plane/src/inv/app.py": "02c5063e329bf2f9aaf16ab3c6c520d64a14fb7a90ff1866db4c22c4ff3050b0"
+      },
+      "sourceUniverseOverlay": false,
+      "newUnboundNames": [],
+      "currentVisibleProductionRoots": 6,
+      "discoveredProductionFiles": [
+        "services/control-plane/src/inv/app.py",
+        "services/control-plane/src/inv/workspace_config.py"
+      ],
+      "discoveredHarnessFiles": [],
+      "trackedForwarders": [
+        "inv.workspace_config.configured_workspace"
+      ],
+      "exportAliases": {},
+      "ownerTargets": null
+    },
+    {
+      "case": "L2-benign-current-module-alias",
+      "expectedNew": "ACCEPT",
+      "observed": "ACCEPT",
+      "reason": null,
+      "expectedReasonPrefix": null,
+      "oldGapExpected": false,
+      "producerSanity": true,
+      "originalWitnessesChecked": 15,
+      "intentionalRootRewrites": 0,
+      "mutatedSourceSHA256": {
+        "services/control-plane/src/inv/app.py": "aaa3e2ae291fa745ab9b3c2c0c47d213230f40fa22034cfa73ad091f12e8ccb7"
+      },
+      "sourceUniverseOverlay": false,
+      "newUnboundNames": [],
+      "currentVisibleProductionRoots": 6,
+      "discoveredProductionFiles": [
+        "services/control-plane/src/inv/app.py",
+        "services/control-plane/src/inv/workspace_config.py"
+      ],
+      "discoveredHarnessFiles": [],
+      "trackedForwarders": [
+        "inv.workspace_config.configured_workspace"
+      ],
+      "exportAliases": {},
+      "ownerTargets": null
+    },
+    {
+      "case": "L3-five-runtime-runtime",
+      "expectedNew": "REFUSE",
+      "observed": "REFUSE",
+      "reason": "DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:INSTANCE:runtime",
+      "expectedReasonPrefix": "DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:",
+      "oldGapExpected": true,
+      "producerSanity": true,
+      "originalWitnessesChecked": 15,
+      "intentionalRootRewrites": 0,
+      "mutatedSourceSHA256": {
+        "services/control-plane/src/inv/workspace_config.py": "caefbf8911dfff33a4ac07796c82dfb4d2ccbf8a485a67104dee557dd889bc53"
+      },
+      "sourceUniverseOverlay": false,
+      "newUnboundNames": [],
+      "currentVisibleProductionRoots": 6,
+      "discoveredProductionFiles": [
+        "services/control-plane/src/inv/app.py",
+        "services/control-plane/src/inv/workspace_config.py"
+      ],
+      "discoveredHarnessFiles": [],
+      "trackedForwarders": [
+        "inv.workspace_config.configured_workspace"
+      ],
+      "exportAliases": {},
+      "ownerTargets": {
+        "services/control-plane/src/inv/workspace_config.py": {
+          "": [],
+          "configured_workspace": [
+            "configured",
+            "pool",
+            "result",
+            "runtime"
+          ]
+        },
+        "services/control-plane/src/inv/app.py": {
+          "": [],
+          "Boundary": [],
+          "Boundary.__call__": [],
+          "Boundary.__call__.traced_send": [],
+          "Boundary.__init__": [],
+          "Boundary.handle": [
+            "error"
+          ],
+          "Boundary.handle.read_body": [],
+          "Boundary.handle.replay": [],
+          "_configured_object_stores": [
+            "local",
+            "recovery",
+            "snapshots"
+          ],
+          "_utc_now": [],
+          "artifact_content_response": [],
+          "create_app": [
+            "control",
+            "model_execution_view",
+            "model_uri_resolver",
+            "model_view",
+            "result_view",
+            "storage_view"
+          ],
+          "create_app.apply_git": [],
+          "create_app.approval": [],
+          "create_app.approval_review": [],
+          "create_app.approvals": [],
+          "create_app.authenticated": [
+            "header",
+            "identity",
+            "request"
+          ],
+          "create_app.build_preparation_service": [],
+          "create_app.business_binding": [],
+          "create_app.business_permission": [
+            "conn",
+            "effective",
+            "value"
+          ],
+          "create_app.business_service": [],
+          "create_app.capacity": [],
+          "create_app.checkout_files": [],
+          "create_app.collect_storage_sample": [],
+          "create_app.configuration_readiness": [
+            "conn"
+          ],
+          "create_app.containment_approval": [],
+          "create_app.domain_error": [],
+          "create_app.events": [],
+          "create_app.events.stream": [
+            "current",
+            "deadline"
+          ],
+          "create_app.first_workspace_service": [],
+          "create_app.first_workspace_status": [],
+          "create_app.get_git": [],
+          "create_app.health": [],
+          "create_app.http_error": [],
+          "create_app.invalid": [],
+          "create_app.key": [],
+          "create_app.kill_status": [],
+          "create_app.model_commitment": [],
+          "create_app.model_execution_manifest": [],
+          "create_app.node_certificates": [],
+          "create_app.node_control": [],
+          "create_app.node_resource_usage": [],
+          "create_app.nodes": [],
+          "create_app.prepare_model_retry": [],
+          "create_app.projects": [],
+          "create_app.ready": [
+            "conn"
+          ],
+          "create_app.reconcile_git": [],
+          "create_app.resolve_model_uri": [],
+          "create_app.run": [],
+          "create_app.run_artifacts": [],
+          "create_app.run_attempts": [],
+          "create_app.run_file": [
+            "download"
+          ],
+          "create_app.run_logs": [],
+          "create_app.run_result": [],
+          "create_app.runs": [],
+          "create_app.session": [],
+          "create_app.shards": [],
+          "create_app.storage_observation": [],
+          "create_app.terminal_socket": [],
+          "create_app.workspace_recovery_service": [
+            "recovery"
+          ],
+          "create_app.workspace_service": [],
+          "create_app.workspace_status": [],
+          "create_configured_app": [
+            "build_preparations",
+            "business",
+            "database",
+            "denial_engine",
+            "model_retry",
+            "object_stores",
+            "plan_authority",
+            "storage_sample_collector",
+            "workspace"
+          ],
+          "problem": []
+        }
+      }
+    },
+    {
+      "case": "L3-five-runtime-runtime.db",
+      "expectedNew": "REFUSE",
+      "observed": "REFUSE",
+      "reason": "DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:INSTANCE:runtime",
+      "expectedReasonPrefix": "DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:",
+      "oldGapExpected": true,
+      "producerSanity": true,
+      "originalWitnessesChecked": 15,
+      "intentionalRootRewrites": 0,
+      "mutatedSourceSHA256": {
+        "services/control-plane/src/inv/workspace_config.py": "25a319a33f1851121d2ab36f64ca1d2b9e894aadea1995627eccfe54fa6031ee"
+      },
+      "sourceUniverseOverlay": false,
+      "newUnboundNames": [],
+      "currentVisibleProductionRoots": 6,
+      "discoveredProductionFiles": [
+        "services/control-plane/src/inv/app.py",
+        "services/control-plane/src/inv/workspace_config.py"
+      ],
+      "discoveredHarnessFiles": [],
+      "trackedForwarders": [
+        "inv.workspace_config.configured_workspace"
+      ],
+      "exportAliases": {},
+      "ownerTargets": {
+        "services/control-plane/src/inv/workspace_config.py": {
+          "": [],
+          "configured_workspace": [
+            "configured",
+            "pool",
+            "result",
+            "runtime"
+          ]
+        },
+        "services/control-plane/src/inv/app.py": {
+          "": [],
+          "Boundary": [],
+          "Boundary.__call__": [],
+          "Boundary.__call__.traced_send": [],
+          "Boundary.__init__": [],
+          "Boundary.handle": [
+            "error"
+          ],
+          "Boundary.handle.read_body": [],
+          "Boundary.handle.replay": [],
+          "_configured_object_stores": [
+            "local",
+            "recovery",
+            "snapshots"
+          ],
+          "_utc_now": [],
+          "artifact_content_response": [],
+          "create_app": [
+            "control",
+            "model_execution_view",
+            "model_uri_resolver",
+            "model_view",
+            "result_view",
+            "storage_view"
+          ],
+          "create_app.apply_git": [],
+          "create_app.approval": [],
+          "create_app.approval_review": [],
+          "create_app.approvals": [],
+          "create_app.authenticated": [
+            "header",
+            "identity",
+            "request"
+          ],
+          "create_app.build_preparation_service": [],
+          "create_app.business_binding": [],
+          "create_app.business_permission": [
+            "conn",
+            "effective",
+            "value"
+          ],
+          "create_app.business_service": [],
+          "create_app.capacity": [],
+          "create_app.checkout_files": [],
+          "create_app.collect_storage_sample": [],
+          "create_app.configuration_readiness": [
+            "conn"
+          ],
+          "create_app.containment_approval": [],
+          "create_app.domain_error": [],
+          "create_app.events": [],
+          "create_app.events.stream": [
+            "current",
+            "deadline"
+          ],
+          "create_app.first_workspace_service": [],
+          "create_app.first_workspace_status": [],
+          "create_app.get_git": [],
+          "create_app.health": [],
+          "create_app.http_error": [],
+          "create_app.invalid": [],
+          "create_app.key": [],
+          "create_app.kill_status": [],
+          "create_app.model_commitment": [],
+          "create_app.model_execution_manifest": [],
+          "create_app.node_certificates": [],
+          "create_app.node_control": [],
+          "create_app.node_resource_usage": [],
+          "create_app.nodes": [],
+          "create_app.prepare_model_retry": [],
+          "create_app.projects": [],
+          "create_app.ready": [
+            "conn"
+          ],
+          "create_app.reconcile_git": [],
+          "create_app.resolve_model_uri": [],
+          "create_app.run": [],
+          "create_app.run_artifacts": [],
+          "create_app.run_attempts": [],
+          "create_app.run_file": [
+            "download"
+          ],
+          "create_app.run_logs": [],
+          "create_app.run_result": [],
+          "create_app.runs": [],
+          "create_app.session": [],
+          "create_app.shards": [],
+          "create_app.storage_observation": [],
+          "create_app.terminal_socket": [],
+          "create_app.workspace_recovery_service": [
+            "recovery"
+          ],
+          "create_app.workspace_service": [],
+          "create_app.workspace_status": [],
+          "create_configured_app": [
+            "build_preparations",
+            "business",
+            "database",
+            "denial_engine",
+            "model_retry",
+            "object_stores",
+            "plan_authority",
+            "storage_sample_collector",
+            "workspace"
+          ],
+          "problem": []
+        }
+      }
+    },
+    {
+      "case": "L3-five-runtime-runtime.db.transaction",
+      "expectedNew": "REFUSE",
+      "observed": "REFUSE",
+      "reason": "DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:INSTANCE:runtime",
+      "expectedReasonPrefix": "DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:",
+      "oldGapExpected": true,
+      "producerSanity": true,
+      "originalWitnessesChecked": 15,
+      "intentionalRootRewrites": 0,
+      "mutatedSourceSHA256": {
+        "services/control-plane/src/inv/workspace_config.py": "e74d907db5af0297ec16b6d891cb8858aa81d7ec190c0114e097f4eb085860bd"
+      },
+      "sourceUniverseOverlay": false,
+      "newUnboundNames": [],
+      "currentVisibleProductionRoots": 6,
+      "discoveredProductionFiles": [
+        "services/control-plane/src/inv/app.py",
+        "services/control-plane/src/inv/workspace_config.py"
+      ],
+      "discoveredHarnessFiles": [],
+      "trackedForwarders": [
+        "inv.workspace_config.configured_workspace"
+      ],
+      "exportAliases": {},
+      "ownerTargets": {
+        "services/control-plane/src/inv/workspace_config.py": {
+          "": [],
+          "configured_workspace": [
+            "configured",
+            "pool",
+            "result",
+            "runtime"
+          ]
+        },
+        "services/control-plane/src/inv/app.py": {
+          "": [],
+          "Boundary": [],
+          "Boundary.__call__": [],
+          "Boundary.__call__.traced_send": [],
+          "Boundary.__init__": [],
+          "Boundary.handle": [
+            "error"
+          ],
+          "Boundary.handle.read_body": [],
+          "Boundary.handle.replay": [],
+          "_configured_object_stores": [
+            "local",
+            "recovery",
+            "snapshots"
+          ],
+          "_utc_now": [],
+          "artifact_content_response": [],
+          "create_app": [
+            "control",
+            "model_execution_view",
+            "model_uri_resolver",
+            "model_view",
+            "result_view",
+            "storage_view"
+          ],
+          "create_app.apply_git": [],
+          "create_app.approval": [],
+          "create_app.approval_review": [],
+          "create_app.approvals": [],
+          "create_app.authenticated": [
+            "header",
+            "identity",
+            "request"
+          ],
+          "create_app.build_preparation_service": [],
+          "create_app.business_binding": [],
+          "create_app.business_permission": [
+            "conn",
+            "effective",
+            "value"
+          ],
+          "create_app.business_service": [],
+          "create_app.capacity": [],
+          "create_app.checkout_files": [],
+          "create_app.collect_storage_sample": [],
+          "create_app.configuration_readiness": [
+            "conn"
+          ],
+          "create_app.containment_approval": [],
+          "create_app.domain_error": [],
+          "create_app.events": [],
+          "create_app.events.stream": [
+            "current",
+            "deadline"
+          ],
+          "create_app.first_workspace_service": [],
+          "create_app.first_workspace_status": [],
+          "create_app.get_git": [],
+          "create_app.health": [],
+          "create_app.http_error": [],
+          "create_app.invalid": [],
+          "create_app.key": [],
+          "create_app.kill_status": [],
+          "create_app.model_commitment": [],
+          "create_app.model_execution_manifest": [],
+          "create_app.node_certificates": [],
+          "create_app.node_control": [],
+          "create_app.node_resource_usage": [],
+          "create_app.nodes": [],
+          "create_app.prepare_model_retry": [],
+          "create_app.projects": [],
+          "create_app.ready": [
+            "conn"
+          ],
+          "create_app.reconcile_git": [],
+          "create_app.resolve_model_uri": [],
+          "create_app.run": [],
+          "create_app.run_artifacts": [],
+          "create_app.run_attempts": [],
+          "create_app.run_file": [
+            "download"
+          ],
+          "create_app.run_logs": [],
+          "create_app.run_result": [],
+          "create_app.runs": [],
+          "create_app.session": [],
+          "create_app.shards": [],
+          "create_app.storage_observation": [],
+          "create_app.terminal_socket": [],
+          "create_app.workspace_recovery_service": [
+            "recovery"
+          ],
+          "create_app.workspace_service": [],
+          "create_app.workspace_status": [],
+          "create_configured_app": [
+            "build_preparations",
+            "business",
+            "database",
+            "denial_engine",
+            "model_retry",
+            "object_stores",
+            "plan_authority",
+            "storage_sample_collector",
+            "workspace"
+          ],
+          "problem": []
+        }
+      }
+    },
+    {
+      "case": "L3-five-workspace-workspace",
+      "expectedNew": "REFUSE",
+      "observed": "REFUSE",
+      "reason": "DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:INSTANCE:workspace",
+      "expectedReasonPrefix": "DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:",
+      "oldGapExpected": true,
+      "producerSanity": true,
+      "originalWitnessesChecked": 15,
+      "intentionalRootRewrites": 0,
+      "mutatedSourceSHA256": {
+        "services/control-plane/src/inv/app.py": "5ed7c55f79a8c59d0d974f2810480028a023a8947db6e55790955b11ed4144e8"
+      },
+      "sourceUniverseOverlay": false,
+      "newUnboundNames": [],
+      "currentVisibleProductionRoots": 6,
+      "discoveredProductionFiles": [
+        "services/control-plane/src/inv/app.py",
+        "services/control-plane/src/inv/workspace_config.py"
+      ],
+      "discoveredHarnessFiles": [],
+      "trackedForwarders": [
+        "inv.workspace_config.configured_workspace"
+      ],
+      "exportAliases": {},
+      "ownerTargets": {
+        "services/control-plane/src/inv/workspace_config.py": {
+          "": [],
+          "configured_workspace": [
+            "configured",
+            "pool",
+            "result",
+            "runtime"
+          ]
+        },
+        "services/control-plane/src/inv/app.py": {
+          "": [],
+          "Boundary": [],
+          "Boundary.__call__": [],
+          "Boundary.__call__.traced_send": [],
+          "Boundary.__init__": [],
+          "Boundary.handle": [
+            "error"
+          ],
+          "Boundary.handle.read_body": [],
+          "Boundary.handle.replay": [],
+          "_configured_object_stores": [
+            "local",
+            "recovery",
+            "snapshots"
+          ],
+          "_utc_now": [],
+          "artifact_content_response": [],
+          "create_app": [
+            "control",
+            "model_execution_view",
+            "model_uri_resolver",
+            "model_view",
+            "result_view",
+            "storage_view"
+          ],
+          "create_app.apply_git": [],
+          "create_app.approval": [],
+          "create_app.approval_review": [],
+          "create_app.approvals": [],
+          "create_app.authenticated": [
+            "header",
+            "identity",
+            "request"
+          ],
+          "create_app.build_preparation_service": [],
+          "create_app.business_binding": [],
+          "create_app.business_permission": [
+            "conn",
+            "effective",
+            "value"
+          ],
+          "create_app.business_service": [],
+          "create_app.capacity": [],
+          "create_app.checkout_files": [],
+          "create_app.collect_storage_sample": [],
+          "create_app.configuration_readiness": [
+            "conn"
+          ],
+          "create_app.containment_approval": [],
+          "create_app.domain_error": [],
+          "create_app.events": [],
+          "create_app.events.stream": [
+            "current",
+            "deadline"
+          ],
+          "create_app.first_workspace_service": [],
+          "create_app.first_workspace_status": [],
+          "create_app.get_git": [],
+          "create_app.health": [],
+          "create_app.http_error": [],
+          "create_app.invalid": [],
+          "create_app.key": [],
+          "create_app.kill_status": [],
+          "create_app.model_commitment": [],
+          "create_app.model_execution_manifest": [],
+          "create_app.node_certificates": [],
+          "create_app.node_control": [],
+          "create_app.node_resource_usage": [],
+          "create_app.nodes": [],
+          "create_app.prepare_model_retry": [],
+          "create_app.projects": [],
+          "create_app.ready": [
+            "conn"
+          ],
+          "create_app.reconcile_git": [],
+          "create_app.resolve_model_uri": [],
+          "create_app.run": [],
+          "create_app.run_artifacts": [],
+          "create_app.run_attempts": [],
+          "create_app.run_file": [
+            "download"
+          ],
+          "create_app.run_logs": [],
+          "create_app.run_result": [],
+          "create_app.runs": [],
+          "create_app.session": [],
+          "create_app.shards": [],
+          "create_app.storage_observation": [],
+          "create_app.terminal_socket": [],
+          "create_app.workspace_recovery_service": [
+            "recovery"
+          ],
+          "create_app.workspace_service": [],
+          "create_app.workspace_status": [],
+          "create_configured_app": [
+            "build_preparations",
+            "business",
+            "database",
+            "denial_engine",
+            "model_retry",
+            "object_stores",
+            "plan_authority",
+            "storage_sample_collector",
+            "workspace"
+          ],
+          "problem": []
+        }
+      }
+    },
+    {
+      "case": "L3-five-workspace-workspace.runtime.db",
+      "expectedNew": "REFUSE",
+      "observed": "REFUSE",
+      "reason": "DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:INSTANCE:workspace",
+      "expectedReasonPrefix": "DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:",
+      "oldGapExpected": true,
+      "producerSanity": true,
+      "originalWitnessesChecked": 15,
+      "intentionalRootRewrites": 0,
+      "mutatedSourceSHA256": {
+        "services/control-plane/src/inv/app.py": "5df41923057c5a2298bb3ad6065623c7fe1cbf47d49064718ca483d6a329b8a9"
+      },
+      "sourceUniverseOverlay": false,
+      "newUnboundNames": [],
+      "currentVisibleProductionRoots": 6,
+      "discoveredProductionFiles": [
+        "services/control-plane/src/inv/app.py",
+        "services/control-plane/src/inv/workspace_config.py"
+      ],
+      "discoveredHarnessFiles": [],
+      "trackedForwarders": [
+        "inv.workspace_config.configured_workspace"
+      ],
+      "exportAliases": {},
+      "ownerTargets": {
+        "services/control-plane/src/inv/workspace_config.py": {
+          "": [],
+          "configured_workspace": [
+            "configured",
+            "pool",
+            "result",
+            "runtime"
+          ]
+        },
+        "services/control-plane/src/inv/app.py": {
+          "": [],
+          "Boundary": [],
+          "Boundary.__call__": [],
+          "Boundary.__call__.traced_send": [],
+          "Boundary.__init__": [],
+          "Boundary.handle": [
+            "error"
+          ],
+          "Boundary.handle.read_body": [],
+          "Boundary.handle.replay": [],
+          "_configured_object_stores": [
+            "local",
+            "recovery",
+            "snapshots"
+          ],
+          "_utc_now": [],
+          "artifact_content_response": [],
+          "create_app": [
+            "control",
+            "model_execution_view",
+            "model_uri_resolver",
+            "model_view",
+            "result_view",
+            "storage_view"
+          ],
+          "create_app.apply_git": [],
+          "create_app.approval": [],
+          "create_app.approval_review": [],
+          "create_app.approvals": [],
+          "create_app.authenticated": [
+            "header",
+            "identity",
+            "request"
+          ],
+          "create_app.build_preparation_service": [],
+          "create_app.business_binding": [],
+          "create_app.business_permission": [
+            "conn",
+            "effective",
+            "value"
+          ],
+          "create_app.business_service": [],
+          "create_app.capacity": [],
+          "create_app.checkout_files": [],
+          "create_app.collect_storage_sample": [],
+          "create_app.configuration_readiness": [
+            "conn"
+          ],
+          "create_app.containment_approval": [],
+          "create_app.domain_error": [],
+          "create_app.events": [],
+          "create_app.events.stream": [
+            "current",
+            "deadline"
+          ],
+          "create_app.first_workspace_service": [],
+          "create_app.first_workspace_status": [],
+          "create_app.get_git": [],
+          "create_app.health": [],
+          "create_app.http_error": [],
+          "create_app.invalid": [],
+          "create_app.key": [],
+          "create_app.kill_status": [],
+          "create_app.model_commitment": [],
+          "create_app.model_execution_manifest": [],
+          "create_app.node_certificates": [],
+          "create_app.node_control": [],
+          "create_app.node_resource_usage": [],
+          "create_app.nodes": [],
+          "create_app.prepare_model_retry": [],
+          "create_app.projects": [],
+          "create_app.ready": [
+            "conn"
+          ],
+          "create_app.reconcile_git": [],
+          "create_app.resolve_model_uri": [],
+          "create_app.run": [],
+          "create_app.run_artifacts": [],
+          "create_app.run_attempts": [],
+          "create_app.run_file": [
+            "download"
+          ],
+          "create_app.run_logs": [],
+          "create_app.run_result": [],
+          "create_app.runs": [],
+          "create_app.session": [],
+          "create_app.shards": [],
+          "create_app.storage_observation": [],
+          "create_app.terminal_socket": [],
+          "create_app.workspace_recovery_service": [
+            "recovery"
+          ],
+          "create_app.workspace_service": [],
+          "create_app.workspace_status": [],
+          "create_configured_app": [
+            "build_preparations",
+            "business",
+            "database",
+            "denial_engine",
+            "model_retry",
+            "object_stores",
+            "plan_authority",
+            "storage_sample_collector",
+            "workspace"
+          ],
+          "problem": []
+        }
+      }
+    },
+    {
+      "case": "L3-with-target",
+      "expectedNew": "REFUSE",
+      "observed": "REFUSE",
+      "reason": "DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:INSTANCE:held_runtime",
+      "expectedReasonPrefix": "DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:",
+      "oldGapExpected": false,
+      "producerSanity": true,
+      "originalWitnessesChecked": 15,
+      "intentionalRootRewrites": 0,
+      "mutatedSourceSHA256": {
+        "services/control-plane/src/inv/workspace_config.py": "e0a8dafe87109ddf5a086a398c49dc4e0840057d0aac94ca056186fae96877f0"
+      },
+      "sourceUniverseOverlay": false,
+      "newUnboundNames": [],
+      "currentVisibleProductionRoots": 6,
+      "discoveredProductionFiles": [
+        "services/control-plane/src/inv/app.py",
+        "services/control-plane/src/inv/workspace_config.py"
+      ],
+      "discoveredHarnessFiles": [],
+      "trackedForwarders": [
+        "inv.workspace_config.configured_workspace"
+      ],
+      "exportAliases": {},
+      "ownerTargets": {
+        "services/control-plane/src/inv/workspace_config.py": {
+          "": [],
+          "configured_workspace": [
+            "configured",
+            "held_runtime",
+            "pool",
+            "result",
+            "runtime"
+          ]
+        },
+        "services/control-plane/src/inv/app.py": {
+          "": [],
+          "Boundary": [],
+          "Boundary.__call__": [],
+          "Boundary.__call__.traced_send": [],
+          "Boundary.__init__": [],
+          "Boundary.handle": [
+            "error"
+          ],
+          "Boundary.handle.read_body": [],
+          "Boundary.handle.replay": [],
+          "_configured_object_stores": [
+            "local",
+            "recovery",
+            "snapshots"
+          ],
+          "_utc_now": [],
+          "artifact_content_response": [],
+          "create_app": [
+            "control",
+            "model_execution_view",
+            "model_uri_resolver",
+            "model_view",
+            "result_view",
+            "storage_view"
+          ],
+          "create_app.apply_git": [],
+          "create_app.approval": [],
+          "create_app.approval_review": [],
+          "create_app.approvals": [],
+          "create_app.authenticated": [
+            "header",
+            "identity",
+            "request"
+          ],
+          "create_app.build_preparation_service": [],
+          "create_app.business_binding": [],
+          "create_app.business_permission": [
+            "conn",
+            "effective",
+            "value"
+          ],
+          "create_app.business_service": [],
+          "create_app.capacity": [],
+          "create_app.checkout_files": [],
+          "create_app.collect_storage_sample": [],
+          "create_app.configuration_readiness": [
+            "conn"
+          ],
+          "create_app.containment_approval": [],
+          "create_app.domain_error": [],
+          "create_app.events": [],
+          "create_app.events.stream": [
+            "current",
+            "deadline"
+          ],
+          "create_app.first_workspace_service": [],
+          "create_app.first_workspace_status": [],
+          "create_app.get_git": [],
+          "create_app.health": [],
+          "create_app.http_error": [],
+          "create_app.invalid": [],
+          "create_app.key": [],
+          "create_app.kill_status": [],
+          "create_app.model_commitment": [],
+          "create_app.model_execution_manifest": [],
+          "create_app.node_certificates": [],
+          "create_app.node_control": [],
+          "create_app.node_resource_usage": [],
+          "create_app.nodes": [],
+          "create_app.prepare_model_retry": [],
+          "create_app.projects": [],
+          "create_app.ready": [
+            "conn"
+          ],
+          "create_app.reconcile_git": [],
+          "create_app.resolve_model_uri": [],
+          "create_app.run": [],
+          "create_app.run_artifacts": [],
+          "create_app.run_attempts": [],
+          "create_app.run_file": [
+            "download"
+          ],
+          "create_app.run_logs": [],
+          "create_app.run_result": [],
+          "create_app.runs": [],
+          "create_app.session": [],
+          "create_app.shards": [],
+          "create_app.storage_observation": [],
+          "create_app.terminal_socket": [],
+          "create_app.workspace_recovery_service": [
+            "recovery"
+          ],
+          "create_app.workspace_service": [],
+          "create_app.workspace_status": [],
+          "create_configured_app": [
+            "build_preparations",
+            "business",
+            "database",
+            "denial_engine",
+            "model_retry",
+            "object_stores",
+            "plan_authority",
+            "storage_sample_collector",
+            "workspace"
+          ],
+          "problem": []
+        }
+      }
+    },
+    {
+      "case": "L3-comprehension-target",
+      "expectedNew": "REFUSE",
+      "observed": "REFUSE",
+      "reason": "DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:INSTANCE:aliases",
+      "expectedReasonPrefix": "DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:",
+      "oldGapExpected": true,
+      "producerSanity": true,
+      "originalWitnessesChecked": 15,
+      "intentionalRootRewrites": 0,
+      "mutatedSourceSHA256": {
+        "services/control-plane/src/inv/workspace_config.py": "0e6cb891c3ae67bfb1506b0ebe242caa4be7b7d9b91b7ca5423d8ab635f1db6d"
+      },
+      "sourceUniverseOverlay": false,
+      "newUnboundNames": [],
+      "currentVisibleProductionRoots": 6,
+      "discoveredProductionFiles": [
+        "services/control-plane/src/inv/app.py",
+        "services/control-plane/src/inv/workspace_config.py"
+      ],
+      "discoveredHarnessFiles": [],
+      "trackedForwarders": [
+        "inv.workspace_config.configured_workspace"
+      ],
+      "exportAliases": {},
+      "ownerTargets": {
+        "services/control-plane/src/inv/workspace_config.py": {
+          "": [],
+          "configured_workspace": [
+            "aliases",
+            "configured",
+            "entry",
+            "pool",
+            "result",
+            "runtime"
+          ]
+        },
+        "services/control-plane/src/inv/app.py": {
+          "": [],
+          "Boundary": [],
+          "Boundary.__call__": [],
+          "Boundary.__call__.traced_send": [],
+          "Boundary.__init__": [],
+          "Boundary.handle": [
+            "error"
+          ],
+          "Boundary.handle.read_body": [],
+          "Boundary.handle.replay": [],
+          "_configured_object_stores": [
+            "local",
+            "recovery",
+            "snapshots"
+          ],
+          "_utc_now": [],
+          "artifact_content_response": [],
+          "create_app": [
+            "control",
+            "model_execution_view",
+            "model_uri_resolver",
+            "model_view",
+            "result_view",
+            "storage_view"
+          ],
+          "create_app.apply_git": [],
+          "create_app.approval": [],
+          "create_app.approval_review": [],
+          "create_app.approvals": [],
+          "create_app.authenticated": [
+            "header",
+            "identity",
+            "request"
+          ],
+          "create_app.build_preparation_service": [],
+          "create_app.business_binding": [],
+          "create_app.business_permission": [
+            "conn",
+            "effective",
+            "value"
+          ],
+          "create_app.business_service": [],
+          "create_app.capacity": [],
+          "create_app.checkout_files": [],
+          "create_app.collect_storage_sample": [],
+          "create_app.configuration_readiness": [
+            "conn"
+          ],
+          "create_app.containment_approval": [],
+          "create_app.domain_error": [],
+          "create_app.events": [],
+          "create_app.events.stream": [
+            "current",
+            "deadline"
+          ],
+          "create_app.first_workspace_service": [],
+          "create_app.first_workspace_status": [],
+          "create_app.get_git": [],
+          "create_app.health": [],
+          "create_app.http_error": [],
+          "create_app.invalid": [],
+          "create_app.key": [],
+          "create_app.kill_status": [],
+          "create_app.model_commitment": [],
+          "create_app.model_execution_manifest": [],
+          "create_app.node_certificates": [],
+          "create_app.node_control": [],
+          "create_app.node_resource_usage": [],
+          "create_app.nodes": [],
+          "create_app.prepare_model_retry": [],
+          "create_app.projects": [],
+          "create_app.ready": [
+            "conn"
+          ],
+          "create_app.reconcile_git": [],
+          "create_app.resolve_model_uri": [],
+          "create_app.run": [],
+          "create_app.run_artifacts": [],
+          "create_app.run_attempts": [],
+          "create_app.run_file": [
+            "download"
+          ],
+          "create_app.run_logs": [],
+          "create_app.run_result": [],
+          "create_app.runs": [],
+          "create_app.session": [],
+          "create_app.shards": [],
+          "create_app.storage_observation": [],
+          "create_app.terminal_socket": [],
+          "create_app.workspace_recovery_service": [
+            "recovery"
+          ],
+          "create_app.workspace_service": [],
+          "create_app.workspace_status": [],
+          "create_configured_app": [
+            "build_preparations",
+            "business",
+            "database",
+            "denial_engine",
+            "model_retry",
+            "object_stores",
+            "plan_authority",
+            "storage_sample_collector",
+            "workspace"
+          ],
+          "problem": []
+        }
+      }
+    },
+    {
+      "case": "L3-attribute-subscript",
+      "expectedNew": "REFUSE",
+      "observed": "REFUSE",
+      "reason": "DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:INSTANCE:runtime_alias",
+      "expectedReasonPrefix": "DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:",
+      "oldGapExpected": false,
+      "producerSanity": true,
+      "originalWitnessesChecked": 15,
+      "intentionalRootRewrites": 0,
+      "mutatedSourceSHA256": {
+        "services/control-plane/src/inv/workspace_config.py": "bfab332a71a963b710db5c055cee9bcf678ebd3493022e4832665c4781f66f87"
+      },
+      "sourceUniverseOverlay": false,
+      "newUnboundNames": [],
+      "currentVisibleProductionRoots": 6,
+      "discoveredProductionFiles": [
+        "services/control-plane/src/inv/app.py",
+        "services/control-plane/src/inv/workspace_config.py"
+      ],
+      "discoveredHarnessFiles": [],
+      "trackedForwarders": [
+        "inv.workspace_config.configured_workspace"
+      ],
+      "exportAliases": {},
+      "ownerTargets": {
+        "services/control-plane/src/inv/workspace_config.py": {
+          "": [],
+          "configured_workspace": [
+            "configured",
+            "pool",
+            "result",
+            "runtime",
+            "runtime_alias"
+          ]
+        },
+        "services/control-plane/src/inv/app.py": {
+          "": [],
+          "Boundary": [],
+          "Boundary.__call__": [],
+          "Boundary.__call__.traced_send": [],
+          "Boundary.__init__": [],
+          "Boundary.handle": [
+            "error"
+          ],
+          "Boundary.handle.read_body": [],
+          "Boundary.handle.replay": [],
+          "_configured_object_stores": [
+            "local",
+            "recovery",
+            "snapshots"
+          ],
+          "_utc_now": [],
+          "artifact_content_response": [],
+          "create_app": [
+            "control",
+            "model_execution_view",
+            "model_uri_resolver",
+            "model_view",
+            "result_view",
+            "storage_view"
+          ],
+          "create_app.apply_git": [],
+          "create_app.approval": [],
+          "create_app.approval_review": [],
+          "create_app.approvals": [],
+          "create_app.authenticated": [
+            "header",
+            "identity",
+            "request"
+          ],
+          "create_app.build_preparation_service": [],
+          "create_app.business_binding": [],
+          "create_app.business_permission": [
+            "conn",
+            "effective",
+            "value"
+          ],
+          "create_app.business_service": [],
+          "create_app.capacity": [],
+          "create_app.checkout_files": [],
+          "create_app.collect_storage_sample": [],
+          "create_app.configuration_readiness": [
+            "conn"
+          ],
+          "create_app.containment_approval": [],
+          "create_app.domain_error": [],
+          "create_app.events": [],
+          "create_app.events.stream": [
+            "current",
+            "deadline"
+          ],
+          "create_app.first_workspace_service": [],
+          "create_app.first_workspace_status": [],
+          "create_app.get_git": [],
+          "create_app.health": [],
+          "create_app.http_error": [],
+          "create_app.invalid": [],
+          "create_app.key": [],
+          "create_app.kill_status": [],
+          "create_app.model_commitment": [],
+          "create_app.model_execution_manifest": [],
+          "create_app.node_certificates": [],
+          "create_app.node_control": [],
+          "create_app.node_resource_usage": [],
+          "create_app.nodes": [],
+          "create_app.prepare_model_retry": [],
+          "create_app.projects": [],
+          "create_app.ready": [
+            "conn"
+          ],
+          "create_app.reconcile_git": [],
+          "create_app.resolve_model_uri": [],
+          "create_app.run": [],
+          "create_app.run_artifacts": [],
+          "create_app.run_attempts": [],
+          "create_app.run_file": [
+            "download"
+          ],
+          "create_app.run_logs": [],
+          "create_app.run_result": [],
+          "create_app.runs": [],
+          "create_app.session": [],
+          "create_app.shards": [],
+          "create_app.storage_observation": [],
+          "create_app.terminal_socket": [],
+          "create_app.workspace_recovery_service": [
+            "recovery"
+          ],
+          "create_app.workspace_service": [],
+          "create_app.workspace_status": [],
+          "create_configured_app": [
+            "build_preparations",
+            "business",
+            "database",
+            "denial_engine",
+            "model_retry",
+            "object_stores",
+            "plan_authority",
+            "storage_sample_collector",
+            "workspace"
+          ],
+          "problem": []
+        }
+      }
+    },
+    {
+      "case": "L3-benign-unrelated-containers",
+      "expectedNew": "ACCEPT",
+      "observed": "ACCEPT",
+      "reason": null,
+      "expectedReasonPrefix": null,
+      "oldGapExpected": false,
+      "producerSanity": true,
+      "originalWitnessesChecked": 15,
+      "intentionalRootRewrites": 0,
+      "mutatedSourceSHA256": {
+        "services/control-plane/src/inv/workspace_config.py": "c9b90e58877530af082823bc767b45b070943bc75f2516392a08f086aaca72d4"
+      },
+      "sourceUniverseOverlay": false,
+      "newUnboundNames": [],
+      "currentVisibleProductionRoots": 6,
+      "discoveredProductionFiles": [
+        "services/control-plane/src/inv/app.py",
+        "services/control-plane/src/inv/workspace_config.py"
+      ],
+      "discoveredHarnessFiles": [],
+      "trackedForwarders": [
+        "inv.workspace_config.configured_workspace"
+      ],
+      "exportAliases": {},
+      "ownerTargets": {
+        "services/control-plane/src/inv/workspace_config.py": {
+          "": [],
+          "configured_workspace": [
+            "configured",
+            "pool",
+            "result",
+            "runtime"
+          ]
+        },
+        "services/control-plane/src/inv/app.py": {
+          "": [],
+          "Boundary": [],
+          "Boundary.__call__": [],
+          "Boundary.__call__.traced_send": [],
+          "Boundary.__init__": [],
+          "Boundary.handle": [
+            "error"
+          ],
+          "Boundary.handle.read_body": [],
+          "Boundary.handle.replay": [],
+          "_configured_object_stores": [
+            "local",
+            "recovery",
+            "snapshots"
+          ],
+          "_utc_now": [],
+          "artifact_content_response": [],
+          "create_app": [
+            "control",
+            "model_execution_view",
+            "model_uri_resolver",
+            "model_view",
+            "result_view",
+            "storage_view"
+          ],
+          "create_app.apply_git": [],
+          "create_app.approval": [],
+          "create_app.approval_review": [],
+          "create_app.approvals": [],
+          "create_app.authenticated": [
+            "header",
+            "identity",
+            "request"
+          ],
+          "create_app.build_preparation_service": [],
+          "create_app.business_binding": [],
+          "create_app.business_permission": [
+            "conn",
+            "effective",
+            "value"
+          ],
+          "create_app.business_service": [],
+          "create_app.capacity": [],
+          "create_app.checkout_files": [],
+          "create_app.collect_storage_sample": [],
+          "create_app.configuration_readiness": [
+            "conn"
+          ],
+          "create_app.containment_approval": [],
+          "create_app.domain_error": [],
+          "create_app.events": [],
+          "create_app.events.stream": [
+            "current",
+            "deadline"
+          ],
+          "create_app.first_workspace_service": [],
+          "create_app.first_workspace_status": [],
+          "create_app.get_git": [],
+          "create_app.health": [],
+          "create_app.http_error": [],
+          "create_app.invalid": [],
+          "create_app.key": [],
+          "create_app.kill_status": [],
+          "create_app.model_commitment": [],
+          "create_app.model_execution_manifest": [],
+          "create_app.node_certificates": [],
+          "create_app.node_control": [],
+          "create_app.node_resource_usage": [],
+          "create_app.nodes": [],
+          "create_app.prepare_model_retry": [],
+          "create_app.projects": [],
+          "create_app.ready": [
+            "conn"
+          ],
+          "create_app.reconcile_git": [],
+          "create_app.resolve_model_uri": [],
+          "create_app.run": [],
+          "create_app.run_artifacts": [],
+          "create_app.run_attempts": [],
+          "create_app.run_file": [
+            "download"
+          ],
+          "create_app.run_logs": [],
+          "create_app.run_result": [],
+          "create_app.runs": [],
+          "create_app.session": [],
+          "create_app.shards": [],
+          "create_app.storage_observation": [],
+          "create_app.terminal_socket": [],
+          "create_app.workspace_recovery_service": [
+            "recovery"
+          ],
+          "create_app.workspace_service": [],
+          "create_app.workspace_status": [],
+          "create_configured_app": [
+            "build_preparations",
+            "business",
+            "database",
+            "denial_engine",
+            "model_retry",
+            "object_stores",
+            "plan_authority",
+            "storage_sample_collector",
+            "workspace"
+          ],
+          "problem": []
+        }
+      }
+    }
+  ],
+  "effectfulMutantsImportedOrExecuted": false,
+  "fixtureSourceUniverse": "Frozen git72028 plus explicit in-memory overlay; no product/source files modified",
+  "arbitraryPythonReflectionOrHeapCompleteness": false,
+  "actualRuntimeB": 0
+}
