@@ -1,11 +1,11 @@
 ---
 doc_id: "GOV-FLEET5-B-BOOTSTRAP-SCOPE-20261106"
 title: "FLEET5 B 병행 역할과 전환 구현 범위 결정"
-version: "1.4.10"
+version: "1.4.11"
 status: "review"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-11-07T04:21:28+09:00"
+updated: "2026-11-07T04:54:19+09:00"
 source_of_truth: "Git"
 ---
 
@@ -158,3 +158,8 @@ aa3387/Docs42224817650의 실제 검토는 M1·actual72028 T1/A8를 닫았지만
 ## B Rev9f 고정 후보와 실제 좁은 검토
 
 9cea의175고유추가문서·82script/68rawcopy/17실행전후hash·모든기존source동결·exactDocs42276852254를Root가검증했고,P02실제reviewer종료·해제뒤task_12e7a699ad90/ctx_7fb26ffb3970의단일Claude검토를시작했다. 5개의실제764반례와해당Low2수정만다룬다. A7snapshot·NodeDelivery·runtime/port는실제수락과Root의별도구체cut전미승인이다.
+
+
+## Rev9f 실제 Low 판정과 Rev9g 한정 보완
+
+실제ce713/Docs42281468269는기존5반례/정상currentpositive를통과했지만새3full-provenance인과변형의Low2를남겼다. Root msg_6a4d15e35b3e의9cea기반fix-only범위는b-rev9g-fix-only-root-scope.json에있다. 정확한후속source/실제검토수락과Root별도cut전A7snapshot/NodeDelivery/runtime/port는미승인이다.

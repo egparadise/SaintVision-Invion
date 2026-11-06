@@ -1,0 +1,16 @@
+{
+  "atKST": "2026-11-07T04:54:19+09:00",
+  "card": "FLEET5-K2-D04-ROOT-PC3-EXECUTION-PREPARATION-20261107",
+  "base": "84ee9b1b43b8921ed1d0ef8bde6f3546013c1095",
+  "operator": "Root Codex",
+  "authorTask": "task_a95ef3d8ccce",
+  "authorDispatch": "ctx_ed23b4a777d0",
+  "scopeGrant": "k2-d04-internal-codec-r1-root-scope.json",
+  "toolchainPreparation": "k2-d04-pc3-go-runner-preparation-root-verification.json",
+  "status": "TOOLCHAIN_READY_WAIT_FROZEN_AUTHOR_WIP_AND_TEST_COMMANDS",
+  "GoCodeTestsExecuted": false,
+  "plannedNext": "Owner freezes exact WIP base/patch/per-file hash and focused Go tests; Root executes only that packet in own PC3 job; actual failures preserved and corrected before final delivery/review",
+  "authorObservation": "Owner actually writes Go20-stage evaluator/41policy+5running projection and causal test sources, reports gofmt parse0 and Go tests NOT_RUN; Root did not execute or accept that code",
+  "nodeEnrollmentOrOfferProof": false,
+  "positiveFactoryOrH1H7AuthenticationGranted": false
+}

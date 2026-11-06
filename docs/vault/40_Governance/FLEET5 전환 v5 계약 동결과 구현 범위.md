@@ -1,11 +1,11 @@
 ---
 doc_id: "GOV-FLEET5-BOOTSTRAP-V5-FREEZE-CODE-SCOPE-20261106"
 title: "FLEET5 전환 v5 계약 동결과 구현 범위"
-version: "1.0.23"
+version: "1.0.24"
 status: "active"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-11-07T04:21:28+09:00"
+updated: "2026-11-07T04:54:19+09:00"
 source_of_truth: "Git"
 ---
 
@@ -211,3 +211,8 @@ source58d7eb07/Docs42259157167은51고유추가문서·50입력hash·10de4원문
 ## P02 Rev3 실제 좁은 검토 시작
 
 Root는84ee고정후보의45own추가문서/44manifest/10actual973b6원문copy/8pin·exactDocs42270611272를확인했고,실제B9e검토자종료·해제뒤 task_01cdc5e54543/ctx_a6589fe0c3df의단일Claude M1/L1재검토를시작했다. 실제결과와Root의별도cut전D04코드/producer/factory/설치·효과는미승인이다. H1-H7/H3EA NULLHOLD,raw7 UNREGISTERED,RD bytes사실만/인증HOLD,40실행미수행은유지한다.
+
+
+## D04 실제 Go 구현과 PC3 도구 준비
+
+Codex는허용된privateGo20stage/41policy+5running projection과인과시험을작성중이며Go실행은NOT_RUN이다. Root는별도PC3ownjob의2CPU/2GiB nonroot networknone컨테이너에서CI와동일Go1.27.1 version명령0을확인해도구만준비했다. 실제동결WIP/Hash/시험명령의운영gate는k2-d04-root-pc3-execution-preparation-gate.json이다. 새factory/producer/port/실제H1-H7auth/current/effects·장비수락을허용하거나성공으로표시하지않는다.

@@ -1,0 +1,41 @@
+{
+  "atKST": "2026-11-07T04:42:05+09:00",
+  "target": "9cea33e8a087981fdedcddb71c4381bdc25c1507",
+  "actualReview": "ce713a85fc428198468ea078c2fef035ac704ba8",
+  "branch": "agent/claude/fleet5-b-rev9f-9cea-review-20261107",
+  "Docs": 42281468269,
+  "job": 128111249050,
+  "correlation": "claude-b-rev9f-9cea-review-ce713a85-ctx_7fb26ffb3970",
+  "rootVerifiedExactHeadRefEventPathAttemptAll19StepsSuccess": true,
+  "remoteExact": true,
+  "uniqueAddedReviewDocs": 13,
+  "actualWorkerDone": "msg_4ad9aebd0c09",
+  "verdict": "REVISION_REQUIRED",
+  "findings": [
+    {
+      "id": "B9f-L1",
+      "severity": "LOW",
+      "source": "reflection_audit.py supplied() lines 54-58 and relative_import_unknown() lines 60-66: supplied() looks only at args[index], the keyword and a ** spread, so a positional *spread that ends before slot 4 hides the level; relative_import_unknown() and keys() handle only builtins.__import__, although importlib.__import__ is inside the existing importlib.* enumeration (api()) with the same (name, globals, locals, fromlist, level) signature",
+      "counterexamples": [
+        "L1-near-dunder-import-level-hidden-by-starred-args: __import__('workspace_config', *(globals(), None, (), 1)).configured_workspace(object(), tenant, settings) in inv/business_auth.py -> ACCEPT (Python imports inv.workspace_config, the same causal import as the actual level-1 case)",
+        "L1-near-importlib-dunder-import-level1: importlib.__import__('workspace_config', globals(), None, (), 1).configured_workspace(object(), tenant, settings) -> ACCEPT"
+      ],
+      "validity": "business_auth.py append overlay of the same shape as the 764 cases; compiles, no new unbound names, 15/15 witnesses, six frozen roots preserved, full t1_provenance.provenance at final 9cea producers; nothing imported or executed",
+      "minimalCorrection": "supplied(): if any ast.Starred appears in call.args at a position <= index, return [None]. Treat importlib.__import__ exactly like builtins.__import__ in keys() and relative_import_unknown(). Regressions: these two refuse; the level-0 literal and existing controls and the 72028 positive still ACCEPT. No general import resolver is needed."
+    },
+    {
+      "id": "B9f-L2",
+      "severity": "LOW",
+      "source": "callee_identity.py error() lines 72-77 and rebound() lines 29-34: the new lexical index is consulted only for the callee's DEFINING file (receiver) and, for a Name call, only when the name is a def in the caller (f.defs['']). When the call-site name is an import alias in the caller (from .workspace_api import WorkspaceAPI), a global-declared import or star import in the caller's binding scope of that name is recorded by lexical_bindings but never applied",
+      "counterexamples": [
+        "L2-near-imported-callee-global-import-workspace_config: append 'def _claude_install():\\n    global WorkspaceAPI\\n    from foreign_module import WorkspaceAPI' and '_claude_install()' to inv/workspace_config.py -> ACCEPT; configured_workspace :44 then passes the owned database to the foreign callable (the exact 764 installer shape on an imported callee name)",
+        "binder-only: near-cross-module-imported-callee-star-shadow and near-cross-module-imported-callee-global-import keep the owned formal with no CALLEE_REBOUND"
+      ],
+      "validity": "append-only overlay (no line shift, witnesses 15/15), compiles, no new unbound names, six frozen roots preserved, full provenance at final producers. The installer runs at module import, before configured_workspace can be called. Nothing imported or executed",
+      "starNote": "No full-provenance star escape was shown: every 72028 production file that imports a relevant callee also defines its own relevant callee, so a module star import there already refuses through that file. The star part is binder-only evidence here.",
+      "minimalCorrection": "For a Name call, also check the CALLER file: find the scope that binds the call-site name, and refuse CALLEE_REBOUND when that scope has a binding event of the name (from the lexical index, global-redirected) or a star import beyond the exact-frozen multiset for that file. This needs counts, not the current writes set, so the frozen import binding itself is allowed. Regressions: this case and the two binder fixtures refuse; the plain cross-module import control, existing controls and the 72028 positive still ACCEPT.",
+      "notExercised": "a plain caller-side reassignment of an imported callee name (WorkspaceAPI = wrap(WorkspaceAPI)) was not run; the correction above would cover it"
+    }
+  ],
+  "A7Granted": false
+}

@@ -3,8 +3,8 @@
   "recordedAtKST": "2026-11-06T00:46:51+09:00",
   "rootBase": "2b1753ce59c09037b5e130a7ffe64794d1d45fdf",
   "priorRootCheckpoint": {
-    "SHA": "1a0ac751bd67d17c1df1a42a2696346fb1ffa836",
-    "Docs": 42275937831,
+    "SHA": "fc02b4aed6cb46212ff4168e3b9fe4746abe8a5e",
+    "Docs": 42279100669,
     "exactHeadCorrelationAllJobsSuccess": true,
     "remoteMatches": true,
     "syncExits": [
@@ -12,13 +12,13 @@
       0,
       0
     ],
-    "independentlyMatchedNormalizedDestinationHashes": 2925,
+    "independentlyMatchedNormalizedDestinationHashes": 2930,
     "pending": 0,
     "conflicts": 0,
     "trackedAndUntrackedClean": true,
     "rootDocsOnly": true,
     "wholeProgramComplete": false,
-    "verifiedAtKST": "2026-11-07T04:03:11+09:00"
+    "verifiedAtKST": "2026-11-07T04:24:12+09:00"
   },
   "actualPlanLowReview": {
     "source": "803ad270562b1b75e44d26f9e14b965c714ab519",
@@ -2515,7 +2515,7 @@
     "ownerT1T2T3": "msg_620855c76519",
     "normativeRevisionReply": "msg_0392caf64d5d"
   },
-  "latestRecordAtKST": "2026-11-07T04:21:28+09:00",
+  "latestRecordAtKST": "2026-11-07T04:54:19+09:00",
   "optionalLowTokenTestDelta": {
     "source": "f0af307705b4923ebc3e231db5238af4c70aa389",
     "scope": "two otherwise-valid token payload corrections and JSON validity assertions; runtime unchanged",
@@ -3108,24 +3108,7 @@
     "reviewOnlyPaths": 18
   },
   "BRev7RootDecision": "b-rev7-concrete-root-decision.json",
-  "activeActualReview": {
-    "atKST": "2026-11-07T04:21:28+09:00",
-    "source": "9cea33e8a087981fdedcddb71c4381bdc25c1507",
-    "base": "3cccfe4d7511180fa8fbb6f5742328c6a43d04bd",
-    "branch": "agent/codex/fleet5-b-rev9f-20261107",
-    "rootVerification": "b-rev9f-source-root-verification.json",
-    "reviewTask": "task_12e7a699ad90",
-    "reviewDispatch": "ctx_7fb26ffb3970",
-    "reviewTerminal": "term_12178418-a623-4f2a-92c9-982589aca8ac",
-    "workerStartReceipt": "ready",
-    "status": "actual_narrow_review_launched",
-    "actualReviewStarted": true,
-    "actualVerdict": null,
-    "ownerQuestionPending": "msg_453ac2a3ea95",
-    "predecessor": "P02Rev3 actual6fa4c succeeded/settled/exited/released freshly verified; workspace clean exact6fa4c; no stop/retry/manual release",
-    "A7OrProductOrPortGranted": false,
-    "spec": "ONE actual independent Claude NARROW Rev9f delta review, AFTER actual P02Rev3 task_01cdc5e54543/ctx_a6589fe0c3df verdict and fresh succeeded/settled/exited/released. Root owns start; one Claude/nohelpers. Source9cea33e8a087981fdedcddb71c4381bdc25c1507 direct immutable base3cccfe4d7511180fa8fbb6f5742328c6a43d04bd, branchagent/codex/fleet5-b-rev9f-20261107; product72028cbac903c4415d9979f980a6e0f9948e914f unchanged. SAME author task_a8fd2969f0b3/ctx_6f0f8253b8a7, original pending askmsg_453ac2a3ea95, Rootgrantmsg_ca131b500e12. Read FULL actual764c3bf3fd9d4046abcaab4b891a1cd1db085a06 review/driver/results/commands first. Its LOW-only B9e-L1/L2 are THIS scope; prior6 actual cases/current72028positive and I1 closed remain accepted. No general Python resolver/heap/effect/whole-program discovery expansion, no reopening K1/K2/UI/model/recovery/native/other-provider audits.\n\nRoot .work/b9f-source-root-verified.json in fleet-five-orchestration-20261105: independently verified175onlyAownHistoryEvidence/allbasemodesOIDunchanged/product0/remoteexact/parentrefpreserved;82producer-retained595499B,68rawcopy hashes and additional14 actual764review blobs byte-compared viaGitOIDs/multisets;12artifacthashes,17freshcommand source-before/after maps equal all82 FINAL committed scripts plus every rawloghash; model/lifecycle/6accounting byteequal; ordered pending_contracts THEN edge_categories/stage hashes. Manifest07e708426fc3a8ad0a1ac6c70644336bbfb12aaf1cdb477bc62288c6dd5790bf; stage1071859158d57207bc393065f5383911d19216e7d3c229e1490cfc294afde8181; finalc40b5e1e3b471660693070b568e2ad647ba7a829362a44b5bfc4ab2939871d10; closurea8e65f80f69d5faf4386d030a86c55edd2bc34aca4ff6b11d8bb805eb829e4cb. Exact Docs42276852254/job128095264239/head/ref/workflow_dispatch/docs.yml/attempt1/correlationfleet5-rev9f-task_a8fd2969f0b3-9cea33e8a087981fdedcddb71c4381bdc25c1507/all19SUCCESS. Root DID NOT run owner proof commands or accept semantics. Source bracketing is NOT continuous instrumentation; retained history is NOT new coverage.\n\nRead unique History2026-11-07_FLEET5_B_Rev9f_FixOnly_Codex.md, Evidencefleet5-b-rev9f-20261107-codex: reflection_audit.py keys/supplied/relative_import_unknown/hits, callee_identity.rebound, NEW lexical_bindings.py, relevant integration in callee/parameter/use-site/provenance/discovery and bounded tests, actual764 raw originals and actual final receipts/proof manifests. Owner evidence: five EXACT actual764 input-SHA overlays now semantically refuse,55smallAST/binderfixtures and7fullprovenancecontrols/currentpositive;9freshproof+8freshdocscmds at final bytes, no guard changes afterward; prior70/19/31/83/29/model/recovery remain history, not rerun. Owner no new failed attempts here; earlier failures/oldreview conflicts preserved. 180383744B maximum individual observed peak, NOT aggregate/hardquota.\n\nL1 EXACT required cases: business_auth overlays import_module('.workspace_config',variable_inv_pkg), import_module('.workspace_config','inv'), __import__('workspace_config',globals(),None,(),1) -> semantic UNCATALOGUED_PRODUCTION_SOURCE, valid syntax-only compile, no effectful imports/execution, no new unbound names,15witnesses/sixroots intact. Package positional/package= and level positional5th/level= supplied identity retained. Conservative policy: relative leading-dot or nonzero/unprovable level, unprovable supplied package -> relevantUNKNOWN, exact frozen match or refuse; literal int0 is control. No general import resolver needed. Preserve <=512/depth4 literal boundary and exact frozen allowances. Examine only necessary near variants of these declared categories, not arbitrary reflective APIs beyond the existing enumeration.\n\nL2 EXACT required cases: line-count-preserving lan_pilot global-import-installer and module star import (actual conn calls1872/1990) -> semantic CALLEE_REBOUND or justified stronger causal semantic refusal at full final t1_provenance; no stale-hash/parser precondition counted. lexical_bindings redirects global Import/ImportFrom alias, FunctionDef/AsyncFunctionDef/ClassDef, MatchAs/MatchStar/MatchMapping rest, ExceptHandler name, Name Store/Del in the SAME actual lexical scope; distinguish nested function/class/lambda/comprehension locals and outer-scope walrus. Star import in binding scope shadows unless exact frozen. Meaningful small binder checks for the affected non-Name and scope/control rules; nonlocal explicitly INFO/outside this cut, I-a class-body/attribute-store cases are already refused by FULL use-site guards and binder-alone insufficiency remains honest. Prior inconclusive match probe is not evidence; any new causal case needs valid earlier preconditions. No new whole-program closure requirement.\n\nExercise the FIVE actual764 full-provenance counterexamples at FINAL producers yourself with correct witnesses/preconditions and benign controls/current72028 positive, plus only small necessary scope/keyword/level0 near variants; avoid replaying all giant inherited suites by default. Currentpositive should remain25parsed=audited/11production/576bindings;19edges16analysis3runtime/12entries and6accounting598/757/1071/21/573outside218backlog remain Root-verified history unless you actually derive them. No full523assembler/3485plans/giantledger/model/recovery/wholeCore. Sourcefreeze/provenance alone is not authentication, graph/binder alone not full effect closure. actualruntimeB0/allrealbindingsNULLHOLD/A1A16PENDING; observerlockoutside19/storageR4expected0/1/model f7384016.../lifecycle710c6aaf... unchanged.\n\nDELIVER actual narrow ACCEPT or precise REVISION_REQUIRED with severity/source/valid causalcase/minimal correction, L1/L2 statuses and evidence attribution/limits. Only actual acceptance permits Root to consider a SEPARATE concrete A7NodeChannels.snapshot-alone grant; no selfgrant, NodeDelivery/fullA8/source inclusion/fleet100. Root has separately granted the other Codex a pure Go D04 INTERNAL implementation; it is NOT this review scope and no permission to inspect/modify their working code.\n\nReuse managed fleet5-bootstrap-v3-review-20261106 after actual P02release, NEW own branchagent/claude/fleet5-b-rev9f-9cea-review-20261107 FROM EXACT9cea. Unique own reviewHistoryEvidence only; no author/product/schema/test/workflow/board/registry/ADR/pin/sourceoriginal edits. Mainmemoryscarce: own serial bounded pureAST scratch; no Node/browser/Go/OS/pagefile/processkill/host/SSH/Docker/PG/PKI/permission/current/effects/automation actions. Official canonical sync CHECK ONLY full immediate statehash before/after EACH call. Root may apply during/between calls: preserve actual non-own conflicts/changed hashes, no apply/adopt/resolve/staleexport/statewrite, never relabel failed checks as pass. Read fresh Root boards (476 or newer). Actual commands/exits/KST/hash/peak; normal owncommit/push/ONE exactDocs/uniquecorrelation/head/ref/manual/docs.yml/attempt1/all19; worker_done actualreviewSHA/branch/Docs/target/verdict/next. No routine user approval or duplicate agent.\n"
-  },
+  "activeActualReview": null,
   "nextReviewRequires": "newimmutableK2Low/Stage2 orB8 pilot/evidence; oneClaudeafteractualrelease",
   "K2LatestImmutableProposalRootObservation": "k2-rev2-root-actual-contract-review-gate.json",
   "K2LatestActualReviewDispatch": {
@@ -3255,5 +3238,8 @@
   "BRev9f": "b-rev9f-source-root-verification.json",
   "IdPTrust": "idp-existing-public-ca-trust-boundary-root-decision.json",
   "P02Rev3Actual": "k2-p02-rev3-actual-review-root-verification.json",
-  "D04InternalCode": "k2-d04-internal-codec-r1-root-scope.json"
+  "D04InternalCode": "k2-d04-internal-codec-r1-root-scope.json",
+  "BRev9fActual": "b-rev9f-actual-review-root-verification.json",
+  "BRev9g": "b-rev9g-fix-only-root-scope.json",
+  "D04PC3Preparation": "k2-d04-root-pc3-execution-preparation-gate.json"
 }
