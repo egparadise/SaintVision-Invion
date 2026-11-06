@@ -1,15 +1,19 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.404"
+version: "1.0.405"
 status: "review"
 author: "Codex"
-updated: "2026-11-06T15:02:33+09:00"
+updated: "2026-11-06T15:18:50+09:00"
 source_of_truth: "Git"
 active_card: "FLEET5-20261105 five physical node orchestration"
-active_card_status: "52factual3sampleFAILURE/order-onlynewcaseverified; Root53caseproposalreviewdone/Stage2candidatescopegranted; CodexLowcheckpointthenStage2; B7actualreviewactive/wholeCorestillFAILED"
-active_card_next: "Codex Lowcleancheckpoint/minimalStage2implementation+guardnegatives/singleexactfocusedCI/Docs; actualcode-deltareviewthenRootcombinedfreshCoreDocs; ClaudeB7verdict/portcut pending"
+active_card_status: "B7actual97bb2M2L/rootnarrowRev8revoke_channelpilotdelivered; K2Low+Stage2candidate; noactiveClaudeuntilnewcandidate; noBcode/wholephysicalincomplete"
+active_card_next: "B Codex Rev8perkindrecovery/hints/typedanalysispilot+exactDocs; K2Codex LowcheckpointthenStage2actualCI; Root nextimmutable ONEactualreview andcombinedCoreDocs decision"
 ---
+
+## 2026-11-06T15:18:50+09:00 B rev7 실제 보완 판정과 작은 rev8 지시
+
+작업한 것과 확인: 실제 B rev7 검토97bb2f67/Docs42172425569는 안전 복구 조건과 구체 port 분리의2Medium·2Low를 남겼다. Root는 취소/영수증 관측의 원래 안전 복구 경로를 보존하고, revoke_channel을 시범으로 작은 rev8 분석·계약 수정을 지시했다. 거대한 그래프 재생성이나 B 코드 grant는 없다. 실제 다음 후보의 독립 검토를 기다린다. 원질문 msg_426d7dd551c8에 msg_aca0d787de3d로 정확한 다음 범위를 답했다. 다음 첫 행동/담당은 B Codex의 작은 시범 delta, K2 Codex의 Low/Stage2 후보, Root의 준비된 불변 소스 실제 검토 배정이다.
 
 ## 2026-11-06T15:02:33+09:00 실제 Stage1 순서 차이와 독립 비교 경계 검토
 

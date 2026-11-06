@@ -1,11 +1,11 @@
 ---
 doc_id: "GOV-FLEET5-B-BOOTSTRAP-SCOPE-20261106"
 title: "FLEET5 B 병행 역할과 전환 구현 범위 결정"
-version: "1.4.1"
+version: "1.4.2"
 status: "review"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-11-06T12:11:22+09:00"
+updated: "2026-11-06T15:18:50+09:00"
 source_of_truth: "Git"
 ---
 
@@ -95,3 +95,16 @@ completion fuse의 한 operation 실패를 다른 Node의 정상 capability까�
 미해결 호출의 기본 분류는 UNRESOLVED이며 영향받는 entry에 인과적으로 연결한다. NONAUTHORITY는 실제 타입·import·source provenance가 있어야 한다. tuple/injected database/runtime transaction·dynamic dispatch를 닫고, 모든 미해결 항목의 scope/binding/futureWork/blocksGrant를 기록한다. 각 entry의 procedure와 감싼 원본 body lock을 합쳐 같은 row의 가장 강한 mode를 한 번에 전체 순서로 획득하며 SHARE→UPDATE 승격을 금지한다. 632개는 source plan 집계이고 실제 procedure join은39개라는 차이를 보존한다. 상세 반례·선택·합격 조건은 Root Evidence b-rev7-concrete-root-decision.json에 고정했다.
 
 실제 검토 재현은547 schema/authority·R4와 bounded stream·작은 source subset까지다. 메모리 부족으로 full source-analysis/reconcile/source-fixtures/link-plans는 재실행하지 않았다. 이를 전체1905 독립 재현으로 쓰지 않는다. 원래74MB ledger는 불변 Git에 보존하며 관리/공유 vault에 복제하지 않는다. 실제 B runtime·A1–A16·장비 인수는 미완료다.
+
+
+## rev7 실제 검토 후 rev8의 안전 복구 조건과 작은 분석 경로
+
+실제 Claude97bb2f67/Docs42172425569는 B7-M1/M2 및 L1/L2를 남겼다. 기존 merged lock·실제 caller/Go anchor·plain owner-only 문구는 정적 축에서 닫혔고, sound default UNRESOLVED도 확인됐다. 다만 CANCEL/RECEIPT_OBSERVE가 TERMINAL_FRAME의 현재 실행 lease·containment 조건을 상속해 정상 복구를 막고, 분석상 미해결757개 참조를 구체 runtime port와 구분하지 못했다. B 코드·port·부분 동결은 허용하지 않는다.
+
+Root는 msg_aca0d787de3d로 같은 담당자에게 좁은 rev8을 지시했다. CANCEL과 실제 reconcile 부작용이 있는 RECEIPT_OBSERVE는 정확한 원래 parent/claim/run/command와 유효한 현재 identity/epoch/generation/channel C/DER·관측 인증을 검사한다. 실행 lease/activation lease 만료·quarantine·offline heartbeat만으로 이 복구 경로를 막지 않는다. 실제 인증 channel/키/cert의 만료·폐기·epoch 변경은 계속 거부한다. TERMINAL_FRAME은 기존 live lease와 목적 조건을 유지한다.
+
+불확실한 EXECUTE는 안전 취소 ACK만으로 일반 정리하지 않는다. 정확한 NodeStopReceipt는 보호된 quiescence 재조정의 입력이며 다른 claim·denial·UNKNOWN을 지우지 않는다. 현재 인증이 남은 원래 작업의 복구와 실제 인증 폐기를 구분하고, 사업상 RETIRE 사실이 새 권한을 만들어 주지 않게 한다. R01/R05 hint는 DB가 찾은 후보 footprint별로 계산하며 scope 없는 입력을 전체 Node 사업상 거부로 바꾸지 않는다.
+
+시범 경로는 inv.node_channels.revoke_channel이다. 기존3개 미해결은 DomainError와 이미 기록된 DB call의 cursor 결과라 분석 근거를 닫는 대상이다. A1–A8의 타입·import·body provenance 규칙과 변형 반례를 작은 sidecar로 증명하고 다른 경로의 byte/reference를 유지한다. 전체644MB급 assembler를 반복 실행하지 않는다. T1 DB transaction/자격증명 역할·T2 기존 IO catalog 연결·T3 보호된 로컬 읽기는 기존 인터페이스의 설계 계약으로 묶되 실제 연결은 미제공이다. P-INJECT-BUILD/P-DBFUNC/P-API-DI/P-GETATTR/P-LOCKRANK/P-SQLSCOPE는 구체 미래 계약으로 이름만 정하며 구현·등록하지 않는다.
+
+ORM session.delete/merge writer 누락과 ServeHTTP/rawPath anchor·선택 hook 부재·39 source lock plan 중33 procedure join이라는 차이도 바로잡는다. Runtime crypto/PG/role/race·실장비 증거는 아직0이고 A1–A16은 PENDING이다. 실제 rev8 독립 판정 뒤에만 Root가 다음 한정 계약·구현 범위를 결정한다. 상세 조건은 Root Evidence b-rev8-revoke-pilot-root-decision.json에 있다.

@@ -1,0 +1,83 @@
+{
+  "atKST": "2026-11-06T15:09:50+09:00",
+  "source": "33f7c6b48883cb06d1ea7d645bdb88634eb1bca0",
+  "actualReview": "97bb2f6734ee328fe86031053bb7490ab011a523",
+  "branch": "agent/claude/fleet5-b-rev7-33f7-review-20261106",
+  "Docs": 42172425569,
+  "job": 127743102797,
+  "correlation": "fleet5-b-rev7-33f7-claude-review-task_c1e820194621-97bb2f6734ee328fe86031053bb7490ab011a523",
+  "rootVerifiedExactHeadRefEventWorkflowAttemptAllStepsSuccess": true,
+  "remoteExact": true,
+  "reviewOnlyPaths": 15,
+  "actualWorkerDone": "msg_be4d8850d250",
+  "verdict": "REVISION_REQUIRED",
+  "actualBlocking": [
+    "B7-M1",
+    "B7-M2"
+  ],
+  "beforeAnyImplementationGrant": [
+    "B7-L1",
+    "B7-L2"
+  ],
+  "actualPriorClosure": {
+    "B6-M1": "PARTIALLY CLOSED. Closed and independently checked: closed per-handler effectClass with caller downgrade refused (incl. reviewer C10 receipts-rawPath under a READ_ONLY kind); RECEIPT_OBSERVE=SIDE_EFFECT verified in actual Go (runner.go Observe:343-370 calls reconcile:366; reconcile Stop:267 and finish Remove:331/Save:334 run on context.Background so CP abandonment cannot stop them); Cancel writes journal.Reject/stop receipt and Quarantine RecordQuarantine durably and idempotently by command hash (IDEMPOTENT_SAFETY consistent); storage Sample is read+sign only (READ_ONLY consistent); READ_ONLY failure -> NO_EFFECT_ABANDONED without OP, no security-version bump, late response refused (C9); prepared ARM survives read registration but not revoke; disjoint executions allowed, same claim denied; SIDE_EFFECT UNCERTAIN Node-scoped, other Node unaffected (C8/C8b); scoped fuse failure; restart loses all LIVE caps; rollback cannot resurrect capability death (C11); fresh exact safety verifier; atomic never-invoked vs ambiguous timeout. Prior A1-A9 attack script re-run against Rev7: remaining 'defects' are API drift only (literal-string expectation, continuation readers need a handle, shared default footprint, confirm-before-invoke). Residual: B7-M1 (continuation policy for CANCEL/RECEIPT_OBSERVE) and B7-L2 (hint footprint).",
+    "B6-M2": "SOUNDNESS CLOSED; NAMED-BOUNDARY NOT YET CONCRETE. Closed: no NONAUTHORITY_UNRESOLVED class (owner packet check rerun exit 0), 47608 calls / 29573 old backlog / 107 old transactions accounted with 0 waivers; ShardRecovery.prepare :179/:186 reaches RunStore.transition; observation:52/:139, results:164, shard_completion:46 resolve to inv.db.Database; dict dispatch / untyped inject / inner factory / eval / builtin shadow BLOCK; post_init-authority negative; Session status positive (owner 41 bounded source cases rerun, log hash identical). Residual: B7-M2.",
+    "B6-L1": "MOSTLY CLOSED. W1-W22 + closed-literal-set positive reproduced (source_fixtures rerun 41/41, log sha256 aa660f18 identical); 21 RULE keys with SQL seed insert and DDL defaults kill_switch=false/version=0; reviewer independent counterexample: actual psycopg sql.SQL(...).format(sql.Identifier) in tools (CREATE DATABASE/CREATE ROLE/GRANT inv_app) fails closed NONCONSTANT_SQL_COMPOSITION_BLOCK. Residual: B7-L1 (ORM unit-of-work session.delete).",
+    "B6-L2": "CLOSED (static). 39 merged plans: reviewer recheck 0 order inversions, 0 late upgrades, advisory locks a separate @transaction_advisory class (never merged into a row lock), prior 12 hazards recorded RED. Actual PG two-session trace NOT RUN. Info B7-I3.",
+    "B6-L3": "CLOSED with info. All 19 caller rows byte-exact vs 72028 (file sha256, exactLine, call text, enclosing qualified function); reviewer whole-tree AST scan (all non-test .py, not only inv/ and tools/) finds no additional Node transport caller (3 extra hits are non-Node adapter probe() in src/saintvision); 9 Go handler anchors lie in the correct rawPath branch of ServeHTTP with unique needles; the RECEIPT_OBSERVE counterexample chain is method-range exact. Info B7-I1, B7-I2.",
+    "B6-L4": "CLOSED. Only negated 'no Node confirmation' text in plan_specs/authority/transition contracts; requiresNodeConfirmation=false; 72028 storage.py activate_contribution is owner + not revoked (its docstring's 'once the node has confirmed' is stale prose; Rev7 correctly follows code).",
+    "B6-I1": "CLOSED: stable (rank, qualified table, canonical key) comparator, ties retained and documented.",
+    "B6-I2": "CLOSED: 3485 source-plan census separate from 39 joins (see B7-I3 wording note).",
+    "B5-L3/L4/L5": "Retained closed design; not re-litigated. Owner prior_closed.py rerun exit 0, log hash b975f890 identical."
+  },
+  "actualReproduction": {
+    "ownerChecks": "schema.py 0 (e3b0c442), authority.py 0 (e3b0c442), fixtures.py 0 (4b57bce7), prior_closed.py 0 (b975f890), R4 probe 0 (6853f465), R4 --require-coexistence 1 expected (26901da1), transport_inventory.py 0 (1086e784), packet_checks.py 0 (3bbee656; 78360-assertion streaming packet check), source_fixtures.py 0 (aa660f18; 41 cases). All stdout sha256 equal owner proof-checks/source-checks. The only regenerated-file diff was source-fixture-results.json self-measured memory (reviewer peak 50,851,840 B vs owner 50,352,128 B); restored to owner bytes. git status clean afterwards.",
+    "displayRedaction": "21/21 masked writer rows: expressionSHA256 equals sha256 of the raw 72028 source segment; masked fields are derived display values only (allTransitionGuards assignment values; 1 classifiedCalls exactLine). Masked display is not replacement source; no DSN text copied into this report.",
+    "transportAndGo": "reviewer-l3-transport-result.json",
+    "goSourceRead": "server.go ServeHTTP 55-316; runner.go Cancel 133-174, reconcile 224-286, finish 287-342, Observe 343-370; quarantine.go 15-40; storage.go Sample 72-90; storage/sample.go Collect 111-175 (git show 72028cba, read-only)"
+  },
+  "actualNotRun": [
+    "source_analysis.py full assembler (owner peak 643,637,248 B; reviewer host free RAM 218-228 MB): 1905 owner cases and the full graph are NOT independently reproduced",
+    "reconcile.py / link_plans.py / baseline_accounting.py / sanitize_display.py reruns (they rewrite owner ledgers; consumers verified via packet_checks rerun and streaming probes)",
+    "any PG/Docker/Node/crypto/crash/concurrency/equipment/VM/clock action; actual new B runtime evidence = 0; A1-A16 PENDING; all real bindings NULL/HOLD",
+    "Obsidian apply/adopt/resolve or state write"
+  ],
+  "concreteNextCut": {
+    "decisionNeeded": "Root chooses whether to commission ONE narrow Rev8 delta (recommended) covering B7-M1 + B7-M2 Cut-1 categories + B7-L1/L2, then one actual Claude delta review. No B code, port, freeze or runtime grant follows from this review.",
+    "pilotEntry": {
+      "entry": "inv.node_channels.revoke_channel",
+      "why": "3 missing ports, all analysis-only (DomainError + 2 cursor fetchone on recorded FOR UPDATE calls), 1 procedure join, lockPorts [], RULE key (revoke_channel, inv.node_channels) present",
+      "expectedAfterCut1": "source-to-procedure closed with only runtime evidence pending (crypto/PG/role NOT RUN)",
+      "second": "inv.observation.NodeObservation.mark_offline (15 = 11 analysis + 4 Database.transaction shared-owner items); proves Cut-2"
+    },
+    "cut1_PURE_ANALYSIS_no_new_authority": [
+      "A1 psycopg Cursor result methods (fetchone/fetchall/scalar*) on the return of an already RESOLVED_DB_RECORD execute -> RESOLVED_DB_CURSOR_RESULT, no new effect (132 refs)",
+      "A2 non-frozen @dataclass Exception subclasses inv.errors.DomainError and saintvision.errors.InvError (incl. __post_init__ -> category_of/ErrorCategory/_STATUS/_RETRYABLE/Exception.__init__) as value initializers after body/base/property checks (~153)",
+      "A3 module-level ContextVar get/set/reset (inv.db._statement_phase) as stdlib with provenance (48)",
+      "A4 library typing with import provenance: psycopg Jsonb, jsonschema Draft202012Validator/FormatChecker, importlib.resources files('inv').joinpath(...).read_text (package-internal read-only resource), cryptography x509/hashes, ipaddress, urllib.parse, hashlib, unicodedata, PurePosixPath, nullcontext, deepcopy (146)",
+      "A5 builtin str/list/set/dict/datetime methods only where the receiver's builtin type is proven (121)",
+      "A6 SQLAlchemy select/where/with_for_update/execution_options/order_by/in_/is_, insert().values, session.scalars/execute(...).one*, session.query().filter on a typed Session -> typed ORM read/write with extracted lock mode (46)",
+      "A7 resolve `from lan_pilot import runtime` under the tools sys.path convention -> tools.lan_pilot.runtime returns inv.db.Database (4 sites; unblocks NodeChannels.snapshot:125)",
+      "A8 interprocedural argument-type propagation for constructor-injected self.db (union only resolved types; non-production harness doubles reported separately, never silently dropped) (92 sites)",
+      "Mutation negatives: authority write inserted into DomainError/InvError init -> BLOCK; fetchone on an unrecorded mystery().execute -> BLOCK; runtime() body replaced by object() -> BLOCK; a Database subclass overriding transaction -> BLOCK; every non-pilot entry unchanged"
+    ],
+    "cut2_SHARED_EXISTING_INTERFACE_contracts": [
+      "T1 inv.db.Database.transaction / BoundDatabase.transaction typed owner contract: psycopg.connect under DB-role credential port P-DBROLE (existing non-owner/no-RLS-bypass check; B private-service role per retained B5 design), READ COMMITTED, tenant set_config, timeouts, control_epoch SHARE, tenant_controls closed literal SHARE|UPDATE; statement_observer/placement_metric_sink/_placement_logger typed as non-authority observability ports with constructor-site proof (affects 13 entries)",
+      "T2 IO_CATALOG_LINK: NodeTLSClient._request internals (OneConnection/request/getresponse/sock/timer) link to the 19 existing caller boundaries/IO kinds; no new port (deliver, _quarantine_gpu_node, RunStore.complete paths)",
+      "T3 protected local file read contract: buildkit_transport._protected_json (os.open/fstat/fdopen/lstat/S_ISREG) and inv.storage.verify_content path.open/read -> BUILD_HEALTH_READ/BUILD_CLEANUP_READ / object verification local read, owner/mode/path rules"
+    ],
+    "cut3_GENUINE_NAMED_PORTS_needing_Codex_contract_and_Root_choice": [
+      "P-INJECT-BUILD: BuildExecutionService/NodeAgentReceipts/RootlessBuildkitTransport injected self._clock, self._now, self._request_id_factory, self._runner.run (buildctl subprocess = BUILD_DISPATCH side effect); production wiring build_product_runtime.py:537",
+      "P-DBFUNC: public.apply_capability_offer (migration 0030 SECURITY DEFINER plpgsql) and public.business_admin_allowed: SQL function body writer/permission contract for set_resource_offer",
+      "P-API-DI: FastAPI Depends/Header/router.put for saintvision.api.v1.settings.set_resource_offer bound to the existing principal/auth dependency functions",
+      "P-GETATTR: 22 getattr sites (BoundDatabase.__init__, record_placement_metric, object_store.provider_id/session, build_execution._database_now/_require_reconciliation_channel, lock_wait_problem, settings._audit): resolve receivers; any truly dynamic one stays DYNAMIC_BLOCK",
+      "P-LOCKRANK: ranks for the 11 unranked DML tables (B7-I3)",
+      "P-SQLSCOPE: saintvision.api.lock_wait.bound_lock_wait SQL scope"
+    ],
+    "separation": "Cut-1 is analysis only and creates no authority. Cut-2 types existing source interfaces. Cut-3 needs explicit Codex contracts and Root choice. The shared plain/B cutover (writers/readers/procedures together) stays a later implementation step after an explicit grant.",
+    "wholeBStatus": "REVISION_REQUIRED (bounded). After Rev8 closes B7-M1/M2/L1/L2, the bounded design can plausibly be accepted with the named pending contracts T1-T3 and P-*. That is a later review's decision, not this one. All 21 critical entries remain UNSUPPORTED now; no readiness or zero-blocker claim."
+  },
+  "RootExecutedOwnerProbes": false,
+  "codeGrant": false,
+  "wholeProgramComplete": false
+}
