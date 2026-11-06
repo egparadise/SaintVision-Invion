@@ -3,8 +3,8 @@
   "recordedAtKST": "2026-11-06T00:46:51+09:00",
   "rootBase": "2b1753ce59c09037b5e130a7ffe64794d1d45fdf",
   "priorRootCheckpoint": {
-    "SHA": "138534a667d344dec579e816a3e13bc190852a11",
-    "Docs": 42266559221,
+    "SHA": "42e50f8ce5980d941d5e573a8f0aa421db9bb697",
+    "Docs": 42272405299,
     "exactHeadCorrelationAllJobsSuccess": true,
     "remoteMatches": true,
     "syncExits": [
@@ -12,13 +12,13 @@
       0,
       0
     ],
-    "independentlyMatchedNormalizedDestinationHashes": 2902,
+    "independentlyMatchedNormalizedDestinationHashes": 2915,
     "pending": 0,
     "conflicts": 0,
     "trackedAndUntrackedClean": true,
     "rootDocsOnly": true,
     "wholeProgramComplete": false,
-    "verifiedAtKST": "2026-11-07T03:00:48+09:00"
+    "verifiedAtKST": "2026-11-07T03:39:24+09:00"
   },
   "actualPlanLowReview": {
     "source": "803ad270562b1b75e44d26f9e14b965c714ab519",
@@ -2515,7 +2515,7 @@
     "ownerT1T2T3": "msg_620855c76519",
     "normativeRevisionReply": "msg_0392caf64d5d"
   },
-  "latestRecordAtKST": "2026-11-07T03:34:11+09:00",
+  "latestRecordAtKST": "2026-11-07T03:40:06+09:00",
   "optionalLowTokenTestDelta": {
     "source": "f0af307705b4923ebc3e231db5238af4c70aa389",
     "scope": "two otherwise-valid token payload corrections and JSON validity assertions; runtime unchanged",
@@ -3265,5 +3265,7 @@
   "P02Rev2Actual": "k2-p02-rev2-actual-review-root-verification.json",
   "P02Rev3": "k2-p02-rev3-source-root-verification.json",
   "UIR3FinalReport": "portal-polling-r3-final-qualified-report-root-verification.json",
-  "UIR3Predeploy": "portal-polling-r3-root-predeploy-decision.json"
+  "UIR3Predeploy": "portal-polling-r3-root-predeploy-decision.json",
+  "UIR3Deployment": "portal-polling-r3-live-deployment-root-verification.json",
+  "UIR3PostHelperExit": "portal-polling-r3-post-helper-exit-root-verification.json"
 }

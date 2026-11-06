@@ -1,0 +1,18 @@
+{
+  "atKST": "2026-11-07T03:40:06+09:00",
+  "operator": "Root Codex",
+  "source": "b48c2c4492f8aea4b55c33161733a9a6fb9eed8c",
+  "final": "f81768b61a92bc01f40c39bb662e36bfb7967424",
+  "sameNewPreviewPIDAfterDeploymentHelperExit": 62240,
+  "sameProcessIdentity": true,
+  "HTTPFilesMatched": 13,
+  "healthProxyStatus": 200,
+  "anonymousNodesAPIPath": "/v1/projects/lan-pilot/nodes",
+  "anonymousNodesAPIStatus": 401,
+  "protectedListenerIdentitiesUnchanged": true,
+  "scope": "Second read after the deployment helper exited; no long-term uptime, terminal-reopen, browser, TLS/SSO or five-PC acceptance inferred",
+  "browserVisualVerification": "NOT_RUN",
+  "defaultWindowsTLSAndSSO": "NOT_VERIFIED",
+  "actualFiveNodeResourceAcceptance": false,
+  "wholeProgramComplete": false
+}

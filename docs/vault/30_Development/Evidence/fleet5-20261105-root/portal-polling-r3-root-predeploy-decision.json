@@ -1,6 +1,6 @@
 {
-  "atKST": "2026-11-07T03:34:11+09:00",
-  "decision": "ELIGIBLE_AFTER_THIS_ROOT_CHECKPOINT_CI_SYNC_AND_FRESH_PROCESS_PREFLIGHT",
+  "atKST": "2026-11-07T03:40:06+09:00",
+  "decision": "EXECUTED_AFTER_EXACT_ROOT473_CI_SYNC",
   "source": "b48c2c4492f8aea4b55c33161733a9a6fb9eed8c",
   "qualifiedFinal": "f81768b61a92bc01f40c39bb662e36bfb7967424",
   "qualifiedFinalDocs": 42270929179,
@@ -14,7 +14,27 @@
   "rollbackBuildBytesVerified": true,
   "replacementScope": "Only the owned loopback3100 preview; proxy both /v1 and /healthz to existing8080; no-store. Preserve backend/DB/IdP, original public runtime config, all business containers.",
   "nextVerification": "13 HTTP file hashes, health JSON200, anonymous real API401, protected listener identities, post-launch lifetime; browser/TLS/SSO remain separate.",
-  "deployed": false,
+  "deployed": true,
   "actualFiveNodeAcceptance": false,
-  "wholeProgramComplete": false
+  "wholeProgramComplete": false,
+  "root473": {
+    "SHA": "42e50f8ce5980d941d5e573a8f0aa421db9bb697",
+    "Docs": 42272405299,
+    "exactHeadCorrelationAllJobsSuccess": true,
+    "remoteMatches": true,
+    "syncExits": [
+      0,
+      0,
+      0
+    ],
+    "independentlyMatchedNormalizedDestinationHashes": 2915,
+    "pending": 0,
+    "conflicts": 0,
+    "trackedAndUntrackedClean": true,
+    "rootDocsOnly": true,
+    "wholeProgramComplete": false,
+    "verifiedAtKST": "2026-11-07T03:39:24+09:00"
+  },
+  "newOwnedPreviewPID": 62240,
+  "deploymentEvidence": "portal-polling-r3-live-deployment-root-verification.json"
 }

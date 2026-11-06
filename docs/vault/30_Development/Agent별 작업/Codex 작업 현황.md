@@ -1,15 +1,19 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.434"
+version: "1.0.435"
 status: "review"
 author: "Codex"
-updated: "2026-11-07T03:34:11+09:00"
+updated: "2026-11-07T03:40:06+09:00"
 source_of_truth: "Git"
 active_card: "FLEET5 continued supervision with PORTAL-REFRESH-FLEET-20261106"
-active_card_status: "UIb48accepted626/finalReportDocsPASS/deployPending; P02actual973Rev3fix; B9eactual523active; 5PCincomplete"
-active_card_next: "Root deploy exact b48 artifact after checkpoint then HTTP/lifetime verify/report; Claude B9e verdict; Codex P02Rev3fix; no A7D04authgrant"
+active_card_status: "UIb48previewDEPLOYED13HTTP/healthJSON200/anonymous401/protectedServicesUnchanged; B9eactual523/P02Rev3queued; browserTLS5PCpending"
+active_card_next: "Root actual B9e verdict then release gate and P02Rev3 review; continue physical/auth prerequisites; no fake5PC/global100"
 ---
+
+## 2026-11-07T03:40:06+09:00 수정 화면 배포와 실제 HTTP 확인
+
+검토받은 UI b48의 실제 CI 산출물13파일로 owned3100 화면을 교체했다. Root가 모든 HTTP파일 해시·no-store, health JSON200, 익명 프로젝트NodeAPI401, backend/DB/IdP listener불변과 배포 helper종료뒤 같은PID/HTTP를 직접 확인했다. 실제 브라우저 시각검사·기본TLS/SSO·5대 자원 인수는 별도 미완료다. B9e 실제검토와 그뒤 P02Rev3 좁은검토를 계속한다. 작업한 것·확인한 것·명령·실제exit·정확한source/CI/해시/PID는 Root History/Evidence에 보존했다. 다음 첫 행동/담당은 Root가 B9e 실제 판정과 검토자 종료·해제 뒤 P02Rev3를 연결하고 장비별 실권한·실제 인수 준비를 이어가는 것이다.
 
 ## 2026-11-07T03:34:11+09:00 최종 화면 납품 검증과 배포 준비
 

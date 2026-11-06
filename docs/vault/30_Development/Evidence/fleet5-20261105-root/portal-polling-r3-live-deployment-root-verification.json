@@ -1,0 +1,144 @@
+{
+  "atKST": "2026-11-07T03:39:38+09:00",
+  "operator": "Root Codex",
+  "source": "b48c2c4492f8aea4b55c33161733a9a6fb9eed8c",
+  "final": "f81768b61a92bc01f40c39bb662e36bfb7967424",
+  "finalDocs": 42270929179,
+  "sourceReview": "626ab0eda10c22e8539546db8d9639092d88f7e7",
+  "predeployRootCheckpoint": {
+    "SHA": "42e50f8ce5980d941d5e573a8f0aa421db9bb697",
+    "Docs": 42272405299,
+    "exactHeadCorrelationAllJobsSuccess": true,
+    "remoteMatches": true,
+    "syncExits": [
+      0,
+      0,
+      0
+    ],
+    "independentlyMatchedNormalizedDestinationHashes": 2915,
+    "pending": 0,
+    "conflicts": 0,
+    "trackedAndUntrackedClean": true,
+    "rootDocsOnly": true,
+    "wholeProgramComplete": false,
+    "verifiedAtKST": "2026-11-07T03:39:24+09:00"
+  },
+  "artifact": {
+    "id": 13520599988,
+    "sha256": "7212b4870e3a142b8c44dc2629d5e6643401ae9e1d187d6234ecdf4059fd671d",
+    "bytes": 1119300
+  },
+  "oldPreviewPID": 62056,
+  "status": "DEPLOYED_HTTP_VERIFIED",
+  "detachedNodeVersionCapabilityExit": 0,
+  "deploymentAccepted": true,
+  "wholeProgramComplete": false,
+  "stoppedAtKST": "2026-11-07T03:39:39+09:00",
+  "newPID": 62240,
+  "newArgv": [
+    "C:\\Program Files\\nodejs\\node.exe",
+    "D:\\Project\\SaintVisionI-Invion\\https-github.com-egparadise-SaintVision-Invion.git\\apps\\web\\node_modules\\vite\\bin\\vite.js",
+    "preview",
+    "--config",
+    "D:\\Project\\SaintVisionI-Invion\\fleet-five-orchestration-20261105\\.work\\uir3-b48-preview.config.mjs",
+    "--configLoader",
+    "native",
+    "--host",
+    "127.0.0.1",
+    "--port",
+    "3100",
+    "--strictPort"
+  ],
+  "launchedAtKST": "2026-11-07T03:39:39+09:00",
+  "verifiedAtKST": "2026-11-07T03:39:44+09:00",
+  "newPreview": {
+    "port": 3100,
+    "address": "127.0.0.1",
+    "pid": 62240,
+    "name": "node.exe",
+    "exe": "C:\\Program Files\\nodejs\\node.exe",
+    "command": "\"C:\\Program Files\\nodejs\\node.exe\" D:\\Project\\SaintVisionI-Invion\\https-github.com-egparadise-SaintVision-Invion.git\\apps\\web\\node_modules\\vite\\bin\\vite.js preview --config D:\\Project\\SaintVisionI-Invion\\fleet-five-orchestration-20261105\\.work\\uir3-b48-preview.config.mjs --configLoader native --host 127.0.0.1 --port 3100 --strictPort",
+    "created": "2026-11-06T18:39:39.6856200Z"
+  },
+  "HTTPFiles": {
+    "assets/icons-DVYUNEhE.js": {
+      "status": 200,
+      "sha256": "94f3f917fa843a4e312937688a83f400ea3d5617d1f1e1f36d6bc643f78ffa9e",
+      "cacheControl": "no-store"
+    },
+    "assets/icons-DVYUNEhE.js.map": {
+      "status": 200,
+      "sha256": "bdc634b37b1574e46b91990a227c6ecf862e6364ec9219a524c88741ee294ea3",
+      "cacheControl": "no-store"
+    },
+    "assets/index-D7aM6F7D.js": {
+      "status": 200,
+      "sha256": "7bd30aa3486125dd4ac5ac36ba08611b0c0ffc2a4fcd9b2a03117c91c947c4ac",
+      "cacheControl": "no-store"
+    },
+    "assets/index-D7aM6F7D.js.map": {
+      "status": 200,
+      "sha256": "2d32f3694f8f09325efc3be371ab97708d88f7f3b6ce1723748edb4d6145aff3",
+      "cacheControl": "no-store"
+    },
+    "assets/index-kKrfL4r3.css": {
+      "status": 200,
+      "sha256": "66d8552241923e10b189e3b9372f85205bccbf083a5dc19872d001fd91ad0d26",
+      "cacheControl": "no-store"
+    },
+    "assets/query-DtERyQJL.js": {
+      "status": 200,
+      "sha256": "3a24ebe459ff24b83ef333288347529de609b65f1c25d5c5b74f2f8b20e2904d",
+      "cacheControl": "no-store"
+    },
+    "assets/query-DtERyQJL.js.map": {
+      "status": 200,
+      "sha256": "d584967ed9a938c701324896050b1db23187d2a79840fe5fac55791a2eafc500",
+      "cacheControl": "no-store"
+    },
+    "assets/vendor-CYSfZuHu.js": {
+      "status": 200,
+      "sha256": "d967cddbe86b7822415ceafb696d97dea5a491621955cb4127e0f3f96e5497eb",
+      "cacheControl": "no-store"
+    },
+    "assets/vendor-CYSfZuHu.js.map": {
+      "status": 200,
+      "sha256": "037070c1858eff839f466f2431a724493a80f81c8f47484c4c6c21698885d15e",
+      "cacheControl": "no-store"
+    },
+    "auth-config.js": {
+      "status": 200,
+      "sha256": "e041468a55ca5aa4e68f069f8b86d7b35c421be58f1e1232cd65e1c4134e83fa",
+      "cacheControl": "no-store"
+    },
+    "index.html": {
+      "status": 200,
+      "sha256": "c43986e7a726c5161e32d7a9de8546172eee28f840a836aab186901506d822e6",
+      "cacheControl": "no-store"
+    },
+    "manifest.json": {
+      "status": 200,
+      "sha256": "d4c3c0897d7be95321a37babc97bd922618cf8142dd9103faef1efe700fd343a",
+      "cacheControl": "no-store"
+    },
+    "sw.js": {
+      "status": 200,
+      "sha256": "5befc07c048a6a49d7f7ec492fe1c04ae8b40283dcc8387ef4e6b2b92c516dcd",
+      "cacheControl": "no-store"
+    }
+  },
+  "healthProxy": {
+    "status": 200,
+    "response": {
+      "status": "ok",
+      "version": "0.1.0"
+    }
+  },
+  "anonymousNodesAPIPath": "/v1/projects/lan-pilot/nodes",
+  "anonymousNodesAPIStatus": 401,
+  "protectedListenerIdentitiesUnchanged": true,
+  "originalRuntimeAuthConfigUnchanged": true,
+  "browserVisualVerification": "NOT_RUN",
+  "defaultWindowsTLSAndSSO": "NOT_VERIFIED",
+  "actualFiveNodeResourceAcceptance": false
+}
