@@ -1,0 +1,179 @@
+{
+  "schemaVersion": "fleet5-b-rev7-final-root-source-and-review-queue-gate:1",
+  "atKST": "2026-11-06T14:25:15+09:00",
+  "source": "33f7c6b48883cb06d1ea7d645bdb88634eb1bca0",
+  "branch": "agent/codex/fleet5-b-contract-rev7-20261106",
+  "base": "ee97c27a5d135a4059256124290731cd2b791193",
+  "commitCountVsRev6": 2,
+  "allAddedUniqueDocsOnly": true,
+  "newDocsPaths": 131,
+  "productDiffVs72028": 0,
+  "remoteExact": true,
+  "Docs": 42167885479,
+  "job": 127728519281,
+  "correlation": "fleet5-rev7-final-task_a8fd2969f0b3-33f7c6b48883cb06d1ea7d645bdb88634eb1bca0",
+  "rootVerifiedExactHeadRefEventWorkflowAttemptAllJobsSuccess": true,
+  "earlierSupersededHead": "0c547bf4 historical/Docs42166130621 notfinalreviewtarget",
+  "ownerTask": "task_a8fd2969f0b3",
+  "ownerDispatch": "ctx_6f0f8253b8a7",
+  "ownerQuestionPending": "msg_426d7dd551c8",
+  "actualPriorReview": "ecbdaa3beca33e4cb4efc943f6bd9c4b02620291",
+  "rootConcreteChoice": "msg_8b52dd815cae",
+  "RootReadScope": "review-resolution/packet-summary/revision-record; source-manifest parsed with selected dictionary; criticalEntries21status/count + selectedrows",
+  "ownerReportedStaticCounts": {
+    "symbolicCases": 335,
+    "boundedSourceCases": 41,
+    "ownerPriorClosedRerunCases": 8,
+    "packetAssertions": 78360,
+    "allCalls": 47608,
+    "sourcePlanCensus": 3485,
+    "actualProcedureJoins": 39,
+    "authorityWriters": 34,
+    "streamedLedgerBytes": 43994760
+  },
+  "countsMeaning": "OWNER_STATIC_SYMBOLIC_NOT_ROOT_OR_ACTUAL_REVIEWER_REPRODUCTION",
+  "criticalStatus": "ALL21_UNSUPPORTED_NAMED_PORTS_PENDING",
+  "criticalEntrySummary": [
+    {
+      "function": "inv.build_execution.BuildExecutionService._mark_node_quarantined",
+      "status": "UNSUPPORTED_NAMED_PORTS_PENDING",
+      "unknownIDs": 21,
+      "missingPortLabels": 17
+    },
+    {
+      "function": "inv.build_execution.BuildExecutionService._commit_consequences",
+      "status": "UNSUPPORTED_NAMED_PORTS_PENDING",
+      "unknownIDs": 75,
+      "missingPortLabels": 37
+    },
+    {
+      "function": "inv.build_execution.BuildExecutionService.execute",
+      "status": "UNSUPPORTED_NAMED_PORTS_PENDING",
+      "unknownIDs": 329,
+      "missingPortLabels": 186
+    },
+    {
+      "function": "inv.build_execution_worker.BuildExecutionIntentQueue.enqueue",
+      "status": "UNSUPPORTED_NAMED_PORTS_PENDING",
+      "unknownIDs": 44,
+      "missingPortLabels": 30
+    },
+    {
+      "function": "inv.build_preparations.BuildPreparationService._terminalize",
+      "status": "UNSUPPORTED_NAMED_PORTS_PENDING",
+      "unknownIDs": 38,
+      "missingPortLabels": 25
+    },
+    {
+      "function": "inv.model_commit.capture_locations",
+      "status": "UNSUPPORTED_NAMED_PORTS_PENDING",
+      "unknownIDs": 5,
+      "missingPortLabels": 5
+    },
+    {
+      "function": "inv.model_source.capture_channels",
+      "status": "UNSUPPORTED_NAMED_PORTS_PENDING",
+      "unknownIDs": 6,
+      "missingPortLabels": 6
+    },
+    {
+      "function": "inv.node_channels.provision_channel",
+      "status": "UNSUPPORTED_NAMED_PORTS_PENDING",
+      "unknownIDs": 20,
+      "missingPortLabels": 16
+    },
+    {
+      "function": "inv.node_channels.revoke_channel",
+      "status": "UNSUPPORTED_NAMED_PORTS_PENDING",
+      "unknownIDs": 3,
+      "missingPortLabels": 3
+    },
+    {
+      "function": "inv.node_transport.NodeDelivery._quarantine_gpu_node",
+      "status": "UNSUPPORTED_NAMED_PORTS_PENDING",
+      "unknownIDs": 19,
+      "missingPortLabels": 15
+    },
+    {
+      "function": "inv.node_transport.NodeDelivery.deliver",
+      "status": "UNSUPPORTED_NAMED_PORTS_PENDING",
+      "unknownIDs": 98,
+      "missingPortLabels": 75
+    },
+    {
+      "function": "inv.observation.NodeObservation.accept",
+      "status": "UNSUPPORTED_NAMED_PORTS_PENDING",
+      "unknownIDs": 47,
+      "missingPortLabels": 36
+    },
+    {
+      "function": "inv.observation.NodeObservation.mark_offline",
+      "status": "UNSUPPORTED_NAMED_PORTS_PENDING",
+      "unknownIDs": 19,
+      "missingPortLabels": 15
+    },
+    {
+      "function": "inv.results.ResultStore.complete",
+      "status": "UNSUPPORTED_NAMED_PORTS_PENDING",
+      "unknownIDs": 94,
+      "missingPortLabels": 71
+    },
+    {
+      "function": "inv.runs.RunStore.complete",
+      "status": "UNSUPPORTED_NAMED_PORTS_PENDING",
+      "unknownIDs": 56,
+      "missingPortLabels": 44
+    },
+    {
+      "function": "inv.shard_completion.ShardCompletion.once",
+      "status": "UNSUPPORTED_NAMED_PORTS_PENDING",
+      "unknownIDs": 56,
+      "missingPortLabels": 46
+    },
+    {
+      "function": "inv.storage_commit.StorageSampleStore.apply_sample",
+      "status": "UNSUPPORTED_NAMED_PORTS_PENDING",
+      "unknownIDs": 44,
+      "missingPortLabels": 39
+    },
+    {
+      "function": "saintvision.api.v1.settings.set_resource_offer",
+      "status": "UNSUPPORTED_NAMED_PORTS_PENDING",
+      "unknownIDs": 56,
+      "missingPortLabels": 51
+    },
+    {
+      "function": "saintvision.identity.node_auth.NodePrincipal.lock_current",
+      "status": "UNSUPPORTED_NAMED_PORTS_PENDING",
+      "unknownIDs": 7,
+      "missingPortLabels": 7
+    },
+    {
+      "function": "saintvision.services.settings.set_resource_offer",
+      "status": "UNSUPPORTED_NAMED_PORTS_PENDING",
+      "unknownIDs": 28,
+      "missingPortLabels": 27
+    },
+    {
+      "function": "saintvision.services.storage._owned_for_update",
+      "status": "UNSUPPORTED_NAMED_PORTS_PENDING",
+      "unknownIDs": 6,
+      "missingPortLabels": 6
+    }
+  ],
+  "nextBoundaryDecision": "actualreview mustseparateanalysis/type/libraryunknownfromgenuinemissingauthority/IO/DBports, identify concreteboundedsource/contractcut; no wholeBreadyfromHOLDlabels",
+  "reviewTask": "task_c1e820194621",
+  "reviewDependencyTask": "task_c067a20c86ed",
+  "reviewDependencyReason": "singleClaude resource; currentlyactualK2Acodeaxisreviewactive",
+  "actualReviewStarted": false,
+  "actualReview": null,
+  "state": "ACTUAL_REVIEW_TASK_REGISTERED_PENDING_PREDECESSOR_NOT_YET_STARTED",
+  "largeLedgerCopiedToRootOrSharedVault": false,
+  "actualBGoCryptoPGEngineCrashConcurrencyEquipment": 0,
+  "A1_A16": "PENDING",
+  "realBindings": null,
+  "codeGrant": false,
+  "partialFreeze": false,
+  "wholeProgramComplete": false,
+  "nextAction": "Root processes de71actualverdict/task-listready, provenreviewerexit thenstarttask_c1e820194621 once; actualB7verdict+Rootconcreteportdecision thenreplyownerquestion"
+}
