@@ -1,6 +1,6 @@
 {
   "schema": "fleet5-root-review-resource-sequence:1",
-  "atKST": "2026-11-06T22:47:40+09:00",
+  "atKST": "2026-11-06T22:58:50+09:00",
   "completedB": {
     "task": "task_d4c4c809ed4e",
     "review": "ac9182c3e3d606ec027c0be2e90e049ff50d54f1",
@@ -12,29 +12,9 @@
     "verdict": "ACCEPT auxiliary delta at design/proposal level, no remaining blocker",
     "source": "8874b2dfe0dda9a019bd5f334636668290702e13"
   },
-  "active": {
-    "atKST": "2026-11-06T22:47:40+09:00",
-    "source": "22c20a838fe0ab82a772641163ef553494c5bea3",
-    "final": "9c25f3c9cab162f424744d79f9a4e21729c40404",
-    "branch": "agent/gemini/portal-refresh-polling-r2-20261106",
-    "rootVerification": "portal-polling-r2-source-root-verification.json",
-    "reviewTask": "task_855e5f3977e0",
-    "status": "actual_narrow_review_active",
-    "dependsOn": "task_a67e24d81ef8",
-    "actualReviewStarted": true,
-    "scope": "NARROWM1+L1L4polling/timeout/header/manualcallback/actualApptests",
-    "actualVerdict": null,
-    "deployment": "NOT_RUN_PENDING_ACTUAL_REVIEW",
-    "authorPacketActualWorkerDone": "msg_170d7bc04c59",
-    "authorTaskOutcome": "succeeded_DELIVERY_ONLY",
-    "officialRegistryOrProductDone": false,
-    "reviewDispatch": "ctx_ed14d0be16a1",
-    "reviewTerminal": "term_2a4365d1-ee04-4161-a728-66e15efbb148",
-    "workerStartReceipt": "ready",
-    "predecessor": "B9b actual succeeded/settled/exited/released independently verified before start"
-  },
+  "active": null,
   "pending": [],
-  "authorParallelWork": "B Rev9c fix-only; K2 P02 registry attestation candidate design; current UI actual reviewer only",
+  "authorParallelWork": "UI R3 reopened Gemini Task8df/ctxc8 ready; B Rev9c fix-only authorized; K2 P02 registry design authorized",
   "reason": "actuala7e9 and5a3c reviews+CI verified andprecisefixscopesdelivered; do notselfclose source/runtime",
   "genericApprovalMissing": false,
   "completedRL1": {
@@ -42,7 +22,7 @@
     "review": "0e53fc024ca773b7719182e170e5e126aeaf5b95",
     "verdict": "ACCEPT TEST-ONLY; R-L1 CLOSED; no new findings"
   },
-  "nextActualReviewTrigger": "Process UI actual worker_done; only then fresh actual exit/release, next frozen ready candidate",
+  "nextActualReviewTrigger": "Frozen new candidate with exact own CI; actual prior UI reviewer already exited/released; Root chooses ONE narrow actual review",
   "completedIntegration": {
     "task": "task_78064fb4b7ff",
     "dispatch": "ctx_ed7ec73163d6",
@@ -353,5 +333,31 @@
     "verdict": "REVISION_REQUIRED (narrow, LOW-only; no MEDIUM; M1 CLOSED; actual-source T1/A8 closure on 72028 bytes stands)",
     "resource": "actual_succeeded_settled_exited_released",
     "RootFixScope": "b-rev9c-fix-only-root-scope.json"
+  },
+  "completedUIR2": {
+    "atKST": "2026-11-06T22:58:50+09:00",
+    "source": "22c20a838fe0ab82a772641163ef553494c5bea3",
+    "final": "9c25f3c9cab162f424744d79f9a4e21729c40404",
+    "branch": "agent/gemini/portal-refresh-polling-r2-20261106",
+    "rootVerification": "portal-polling-r2-source-root-verification.json",
+    "reviewTask": "task_855e5f3977e0",
+    "status": "actual_review_completed_REVISION_REQUIRED",
+    "dependsOn": "task_a67e24d81ef8",
+    "actualReviewStarted": true,
+    "scope": "NARROWM1+L1L4polling/timeout/header/manualcallback/actualApptests",
+    "actualVerdict": "REVISION_REQUIRED",
+    "deployment": "NOT_DEPLOYABLE_ACTUAL_MEDIUM_FINDING",
+    "authorPacketActualWorkerDone": "msg_170d7bc04c59",
+    "authorTaskOutcome": "succeeded_DELIVERY_ONLY",
+    "officialRegistryOrProductDone": false,
+    "reviewDispatch": "ctx_ed14d0be16a1",
+    "reviewTerminal": "term_2a4365d1-ee04-4161-a728-66e15efbb148",
+    "workerStartReceipt": "ready",
+    "predecessor": "B9b actual succeeded/settled/exited/released independently verified before start",
+    "actualReview": "71f26dbfc648a8140ac688df3fa89d6952d81d0d",
+    "Docs": 42229163844,
+    "actualWorkerDone": "msg_fb763e641314",
+    "reviewerActualFinalState": "succeeded_settled_exited_released",
+    "next": "portal-polling-r3-root-scope.json"
   }
 }

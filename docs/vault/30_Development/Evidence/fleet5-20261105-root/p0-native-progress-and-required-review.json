@@ -3,8 +3,8 @@
   "recordedAtKST": "2026-11-06T00:46:51+09:00",
   "rootBase": "2b1753ce59c09037b5e130a7ffe64794d1d45fdf",
   "priorRootCheckpoint": {
-    "SHA": "2cdd189e76430bbbbaf29938ac95d1ccd47940c1",
-    "Docs": 42223348286,
+    "SHA": "5146f18cb1730abb635cd7574bca032d26311268",
+    "Docs": 42228576430,
     "exactHeadCorrelationAllJobsSuccess": true,
     "remoteMatches": true,
     "syncExits": [
@@ -12,13 +12,13 @@
       0,
       0
     ],
-    "independentlyMatchedNormalizedDestinationHashes": 2855,
+    "independentlyMatchedNormalizedDestinationHashes": 2860,
     "pending": 0,
     "conflicts": 0,
     "trackedAndUntrackedClean": true,
     "rootDocsOnly": true,
     "wholeProgramComplete": false,
-    "verifiedAtKST": "2026-11-06T22:11:57+09:00"
+    "verifiedAtKST": "2026-11-06T22:51:17+09:00"
   },
   "actualPlanLowReview": {
     "source": "803ad270562b1b75e44d26f9e14b965c714ab519",
@@ -2515,7 +2515,7 @@
     "ownerT1T2T3": "msg_620855c76519",
     "normativeRevisionReply": "msg_0392caf64d5d"
   },
-  "latestRecordAtKST": "2026-11-06T22:47:40+09:00",
+  "latestRecordAtKST": "2026-11-06T22:58:50+09:00",
   "optionalLowTokenTestDelta": {
     "source": "f0af307705b4923ebc3e231db5238af4c70aa389",
     "scope": "two otherwise-valid token payload corrections and JSON validity assertions; runtime unchanged",
@@ -3108,27 +3108,7 @@
     "reviewOnlyPaths": 18
   },
   "BRev7RootDecision": "b-rev7-concrete-root-decision.json",
-  "activeActualReview": {
-    "atKST": "2026-11-06T22:47:40+09:00",
-    "source": "22c20a838fe0ab82a772641163ef553494c5bea3",
-    "final": "9c25f3c9cab162f424744d79f9a4e21729c40404",
-    "branch": "agent/gemini/portal-refresh-polling-r2-20261106",
-    "rootVerification": "portal-polling-r2-source-root-verification.json",
-    "reviewTask": "task_855e5f3977e0",
-    "status": "actual_narrow_review_active",
-    "dependsOn": "task_a67e24d81ef8",
-    "actualReviewStarted": true,
-    "scope": "NARROWM1+L1L4polling/timeout/header/manualcallback/actualApptests",
-    "actualVerdict": null,
-    "deployment": "NOT_RUN_PENDING_ACTUAL_REVIEW",
-    "authorPacketActualWorkerDone": "msg_170d7bc04c59",
-    "authorTaskOutcome": "succeeded_DELIVERY_ONLY",
-    "officialRegistryOrProductDone": false,
-    "reviewDispatch": "ctx_ed14d0be16a1",
-    "reviewTerminal": "term_2a4365d1-ee04-4161-a728-66e15efbb148",
-    "workerStartReceipt": "ready",
-    "predecessor": "B9b actual succeeded/settled/exited/released independently verified before start"
-  },
+  "activeActualReview": null,
   "nextReviewRequires": "newimmutableK2Low/Stage2 orB8 pilot/evidence; oneClaudeafteractualrelease",
   "K2LatestImmutableProposalRootObservation": "k2-rev2-root-actual-contract-review-gate.json",
   "K2LatestActualReviewDispatch": {
@@ -3223,5 +3203,9 @@
   "PLR1dFullCore": "k2a-pl-r1d-full-core-root-verification.json",
   "PLR1dBoundedDelivery": "k2a-pl-r1d-qualified-delivery-root-acceptance.json",
   "K2Next": "k2-p02-registry-attestation-design-root-scope.json",
-  "BNext": "b-rev9c-fix-only-root-scope.json"
+  "BNext": "b-rev9c-fix-only-root-scope.json",
+  "UIR2ActualVerdict": "REVISION_REQUIRED",
+  "UIR2ActualReview": "portal-polling-r2-actual-review-root-verification.json",
+  "UIR3": "portal-polling-r3-root-scope.json",
+  "currentPhysical": "physical-readiness-refresh-20261106-2249.json"
 }

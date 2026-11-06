@@ -1,0 +1,81 @@
+{
+  "atKST": "2026-11-06T22:49:40+09:00",
+  "targets": [
+    {
+      "pc": "PC1",
+      "sshExit": 255,
+      "observed": false,
+      "refusal": "SSH_PUBLIC_KEY_DENIED"
+    },
+    {
+      "pc": "PC2",
+      "sshExit": 0,
+      "observed": true,
+      "cpuLogical": 12,
+      "memoryBytes": 15938523136,
+      "share": {
+        "exists": true,
+        "read": true,
+        "write": true
+      },
+      "dockerExit": 0,
+      "dockerDenied": false,
+      "dockerMissing": false,
+      "dockerVersion": "29.1.3",
+      "dockerAPI": "1.52",
+      "dockerMinAPI": "1.44",
+      "gpuObserved": true
+    },
+    {
+      "pc": "PC3",
+      "sshExit": 0,
+      "observed": true,
+      "cpuLogical": 12,
+      "memoryBytes": 15938240512,
+      "share": {
+        "exists": true,
+        "read": true,
+        "write": true
+      },
+      "dockerExit": 0,
+      "dockerDenied": false,
+      "dockerMissing": false,
+      "dockerVersion": "29.9.3",
+      "dockerAPI": "1.56",
+      "dockerMinAPI": "1.40",
+      "gpuObserved": true
+    },
+    {
+      "pc": "PC4",
+      "sshExit": 0,
+      "observed": true,
+      "cpuLogical": 12,
+      "memoryBytes": 16480641024,
+      "share": {
+        "exists": true,
+        "read": true,
+        "write": true
+      },
+      "dockerExit": 0,
+      "dockerDenied": false,
+      "dockerMissing": false,
+      "dockerVersion": "29.8.1",
+      "dockerAPI": "1.56",
+      "dockerMinAPI": "1.40",
+      "gpuObserved": true
+    },
+    {
+      "pc": "PC5",
+      "dockerExit": 0,
+      "registered": false,
+      "dockerVersion": "20.10.22",
+      "dockerAPI": "1.41",
+      "dockerMinAPI": "1.12",
+      "daemonOS": "linux"
+    }
+  ],
+  "knownHostsUnchanged": true,
+  "remoteMutation": false,
+  "fiveNodesRegistered": false,
+  "fiveResourceOffersVerified": false
+}

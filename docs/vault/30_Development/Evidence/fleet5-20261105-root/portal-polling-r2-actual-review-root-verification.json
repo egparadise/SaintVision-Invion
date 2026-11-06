@@ -1,0 +1,14 @@
+{
+  "atKST": "2026-11-06T22:55:55+09:00",
+  "target": "9c25f3c9cab162f424744d79f9a4e21729c40404",
+  "actualReview": "71f26dbfc648a8140ac688df3fa89d6952d81d0d",
+  "branch": "agent/claude/portal-polling-r2-9c25-review-20261106",
+  "Docs": 42229163844,
+  "job": 127930291197,
+  "correlation": "claude-uir2-review-71f26dbf-23f7c5a80eac4e1c",
+  "rootVerifiedExactHeadRefEventPathAttemptAll19StepsSuccess": true,
+  "remoteExact": true,
+  "uniqueAddedReviewDocs": 12,
+  "actualWorkerDone": "msg_fb763e641314",
+  "verdict": "REVISION_REQUIRED"
+}

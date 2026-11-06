@@ -1,15 +1,19 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.420"
+version: "1.0.421"
 status: "review"
 author: "Codex"
-updated: "2026-11-06T22:47:40+09:00"
+updated: "2026-11-06T22:58:50+09:00"
 source_of_truth: "Git"
 active_card: "FLEET5 continued supervision with PORTAL-REFRESH-FLEET-20261106"
-active_card_status: "ea276requiredCoreSUCCESS/c76boundedDeliveryAccepted; B9bactualLOW3Rev9cfix; K2P02candidateDesign; UIR2actualClaude855ctxed14active; physicalincomplete"
-active_card_next: "ProcessUIactualverdictthenverifiedartifactdeploy; BRev9cfix/K2P02designparallel; noCoreduplicate/no854deploy; realNULLHOLD"
+active_card_status: "UIR2actual71f1M3L_REFUSED; NEWGeminiR3task8dfctxc8ready; BRev9cfix/K2P02candidate; requiredCoreboundedSUCCESS; physicalincomplete"
+active_card_next: "GeminiR3exactsourceCIthenONEnarrowactualreview; BRev9c/K2P02candidateparallel; doNOTdeploy9c854; actualUIreviewerexitedreleased"
 ---
+
+## 2026-11-06T22:58:50+09:00 실제 UI 결함의 후속 수정
+
+UI R2의 실제71f26 검토/Docs42229163844는 인증서 조회의 signal 누락으로 옛0대가 계속 최신처럼 표시되는 Medium과 취소·Header body timeout·행동검사 Low3건을 확인했다. Root는 배포를 보류하고 같은 Gemini를 새 Task8df/ctxc8의 R3 수정으로 재개했다. Core의 한정 성공·납품 수락은 유지하고,22:49 실측에서도 PC1 SSH·PC5 API와 실제 노드 자원 인수가 남는다. 다음 첫 행동/담당은 Gemini R3의 signal·취소이유·본문 기한·실제 클릭 검증 수정, 두 Codex의 Rev9c/P02 후보, Root의 exact CI·좁은 실제 검토 배정이다. 현재 서비스는 바꾸지 않았다.
 
 ## 2026-11-06T22:47:40+09:00 Core의 실제 성공과 다음 작업 배정
 
