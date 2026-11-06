@@ -1,0 +1,232 @@
+"""Claude independent Rev9e delta probes (B9d-L1/L2 + I1). Parse-only fixtures.
+
+Usage: python -B reviewer_rev9e_delta_probes.py.txt <rev9e evidence dir (absolute)> <out.json>
+Imports the FINAL Rev9e OWNER analysis producers from <evidence dir> (static AST code only) and
+feeds in-memory source overlays over frozen git 72028. No product file is written, and no
+mutant source is imported or executed (ast.parse only).
+Every full-provenance mutant is checked before its verdict: AST-valid, no new unbound names
+versus the frozen file, and every recorded closure witness span/hash (15) resolves in the
+mutated sources. Expected values are reviewer expectations, not owner claims.
+"""
+import ast, builtins, json, sys
+from collections import Counter
+from pathlib import Path
+E = Path(sys.argv[1]).resolve(strict=True); OUT = Path(sys.argv[2]); sys.path.insert(0, str(E))
+import t1_provenance as t, constructor_graph as cg, source_bindings as sb
+import forwarding_discovery as fd, parameter_flow as pf, use_sites as u, call_binding as cb, reflection_audit as ra, callee_identity as ci
+for m in (t, cg, sb, fd, pf, u, cb, ra, ci):
+    assert Path(m.__file__).resolve().parent == E, m.__file__
+CP = t.CP; LP = 'tools/lan_pilot.py'; WC = CP + 'workspace_config.py'; AP = CP + 'app.py'; WA = CP + 'workspace_api.py'
+BH = CP + 'business_handoff.py'; BA = CP + 'business_auth.py'
+core = t.read_batch([CP + n for n in t.CORE] + ['tools/remote_workspace_entry.py']); ctors = t.read_batch(t.MAIN_CTOR_PATHS)
+S = {**core, **ctors}
+closure = json.loads((E / 't1-mark-offline-closure.json').read_bytes())
+A8 = closure['narrowA8Proof']; g = A8['completeConstructorGraph']
+W = [r['source'] for r in g['productionConstructorProofs']] + [r['source'] for r in g['localHelperProofs']] + \
+    [{'path': r['path'], 'span': r['span'], 'expressionSHA256': r['expressionSHA256']} for r in A8['productionDatabaseConstructors']]
+FROZEN_ROOTS = cg.frozen_root_keys()
+assert sum(FROZEN_ROOTS.values()) == 6 and len(FROZEN_ROOTS) == 6, FROZEN_ROOTS
+R = []; INFO = {}
+
+def unbound(source):
+    tr = ast.parse(source); bound = set(dir(builtins))
+    for n in ast.walk(tr):
+        if isinstance(n, (ast.Import, ast.ImportFrom)): bound.update((a.asname or a.name).split('.')[0] for a in n.names)
+        elif isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)): bound.add(n.name)
+        elif isinstance(n, ast.arg): bound.add(n.arg)
+        elif isinstance(n, ast.Name) and isinstance(n.ctx, (ast.Store, ast.Del)): bound.add(n.id)
+        elif isinstance(n, ast.ExceptHandler) and n.name: bound.add(n.name)
+        elif isinstance(n, (ast.MatchAs, ast.MatchStar)) and n.name: bound.add(n.name)
+    return {n.id for n in ast.walk(tr) if isinstance(n, ast.Name) and isinstance(n.ctx, ast.Load) and n.id not in bound}
+
+def witnesses(sources):
+    checked = 0
+    for w in W:
+        src = sources.get(w['path']) or sb.frozen_source(w['path']); tree = ast.parse(src)
+        node = next((n for n in ast.walk(tree) if hasattr(n, 'lineno') and [n.lineno, n.col_offset, n.end_lineno, n.end_col_offset] == w['span']), None)
+        assert node is not None and sb.sha(ast.get_source_segment(src, node)) == w['expressionSHA256'], ('WITNESS', w)
+        checked += 1
+    return checked
+
+def must_replace(src, old, new):
+    assert src.count(old) == 1, ('ANCHOR', old[:80], src.count(old)); return src.replace(old, new, 1)
+
+def roots_preserved(universe):
+    census = cg.current_census(universe); facts = {p: sb.Facts(p, s) for p, s in universe.items() if p in S}
+    keys = Counter(cg.root_key(r, facts[r['source']['path']]) for r in census['production'] if r['source']['path'] in facts)
+    return census, not (FROZEN_ROOTS - keys)
+
+def run(name, changes=None, world=None, expect=None, note=None, graph_only=False, finding=None):
+    changes = changes or {}; world = world or {}
+    changed = {**S, **changes}
+    for p, s in {**changes, **world}.items():
+        ast.parse(s)
+        assert s.count('\n') >= sb.frozen_source(p).count('\n') or p in world, (name, 'LINE_LOSS', p)
+        nb = sorted(unbound(s) - unbound(sb.frozen_source(p))); assert not nb, (name, nb)
+    checked = witnesses({**world, **changed})
+    c2 = {p: changed[p] for p in core}; k2 = {p: changed[p] for p in ctors}
+    if graph_only: out, err = cg.prove({**c2, **k2}, world or None)
+    else: out, err = t.provenance(c2, k2, universe_overrides=world or None)
+    universe = {**world, **changed}
+    census, preserved = roots_preserved(universe)
+    disc, derr = fd.discover(census['production'], universe)
+    audits = {a['path']: [h['kind'] for h in a['newRelevantHits']] for a in census['reflectionAudits'] + (disc['reflectionAudits'] if disc else [])}
+    observed = 'ACCEPT' if err is None else 'REFUSE'
+    row = {'case': name, 'observed': observed, 'reason': err, 'expected': expect,
+           'matchesExpectation': expect is None or observed == expect.split(':', 1)[0] and (':' not in expect or (err or '').startswith(expect.split(':', 1)[1])),
+           'finding': finding, 'mode': 'cg.prove graph only' if graph_only else 't1_provenance.provenance (full)',
+           'astValid': True, 'newUnboundNames': [], 'witnessesChecked': checked,
+           'mutatedSHA256': {p: sb.sha(s) for p, s in sorted({**changes, **world}.items())},
+           'visibleProductionRoots': len(census['production']), 'sixFrozenRootsPreserved': preserved, 'discoveryError': derr,
+           'newRelevantReflectionHitsByPath': {p: k for p, k in sorted(audits.items()) if k}, 'note': note}
+    R.append(row); print(json.dumps({'case': name, 'observed': observed, 'reason': err, 'expected': expect}), flush=True)
+    return row, out
+
+TAILF = '\n\n\ndef _claude_root(tenant, settings):\n    return '
+# ---------------- 0. actual positive at FINAL producers and parsed-universe inventory
+r0, out0 = run('actual-72028-positive', expect='ACCEPT')
+census0 = cg.current_census(S); disc0, _ = fd.discover(census0['production'], S)
+parsed = sorted({x['path'] for x in census0['sourceFiles']} | {x['path'] for x in disc0['sourceFiles']})
+audited = sorted({x['path'] for x in census0['reflectionAudits']} | {x['path'] for x in disc0['reflectionAudits']})
+frozen_hits = {a['path']: Counter(h['kind'] for h in a['hits']) for a in census0['reflectionAudits'] + disc0['reflectionAudits'] if a['hits']}
+pd = pf.default_frozen()
+cur, cur_err = pf.prove(S, pd['ownerFactorySymbols'])
+INFO['positive'] = {'censusFiles': len(census0['sourceFiles']), 'discoveryFiles': len(disc0['sourceFiles']), 'unionParsed': len(parsed),
+                    'unionAudited': len(audited), 'parsedEqualsAudited': parsed == audited,
+                    'productionParsed': sorted(p for p in parsed if not p.startswith('tests/')),
+                    'frozenHitKindsByPath': {p: dict(c) for p, c in sorted(frozen_hits.items())},
+                    'frozenBindingCount': len(pd['bindings']), 'frozenIterations': pd['iterations'], 'frozenIterationBound': pd.get('iterationBound'),
+                    'frozenUnresolved': pd['unresolved'],
+                    'provenanceTopKeys': sorted(out0.keys()) if isinstance(out0, dict) else None}
+
+# ---------------- 1. L1: the four actual 9266 non-literal-key counterexamples (six genuine roots retained)
+for label, body in [
+    ('sys-modules-string-variable-forwarder', "import sys\n_CLAUDE_MOD = 'inv.workspace_config'\n" + TAILF + "sys.modules[_CLAUDE_MOD].configured_workspace(object(), tenant, settings)\n"),
+    ('sys-modules-fstring-forwarder', "import sys\n" + TAILF + "sys.modules[f\"inv.{'workspace_config'}\"].configured_workspace(object(), tenant, settings)\n"),
+    ('importlib-join-forwarder', "import importlib\n" + TAILF + "importlib.import_module('.'.join(('inv', 'workspace_config'))).configured_workspace(object(), tenant, settings)\n"),
+    ('getattr-importlib-variable-constructor-root', "import importlib\n_CLAUDE_MOD = 'inv.observer_worker'\n_CLAUDE_NAME = 'ObservationWorker'\n\n\ndef _claude_hidden_root():\n    return getattr(importlib.import_module(_CLAUDE_MOD), _CLAUDE_NAME)(object(), None)\n"),
+]:
+    run('L1-9266-actual-' + label, world={BA: sb.frozen_source(BA) + '\n' + body}, expect='REFUSE:UNCATALOGUED_PRODUCTION_SOURCE:' + BA,
+        note='actual 9266 B9d-L1 counterexample at final producers')
+# retained 4288 literal refusals and earlier controls
+for label, body in [
+    ('attrgetter-sys-modules-root', "import operator\nimport sys\n\n\ndef _claude_hidden_root():\n    return operator.attrgetter('ObservationWorker')(sys.modules['inv.observer_worker'])(object(), None)\n"),
+    ('importlib-configured_workspace', "import importlib\n" + TAILF + "importlib.import_module('inv.workspace_config').configured_workspace(object(), tenant, settings)\n"),
+    ('sys-modules-configured_workspace', "import sys\n" + TAILF + "sys.modules['inv.workspace_config'].configured_workspace(object(), tenant, settings)\n"),
+]:
+    run('L1-retained-4288-' + label, world={BA: sb.frozen_source(BA) + '\n' + body}, expect='REFUSE')
+run('L1-control-outside-benign-database-helper', world={BA: sb.frozen_source(BA) + "\nfrom .db import Database\n\n\ndef _claude_db(dsn):\n    return Database(dsn)\n"}, expect='ACCEPT')
+run('L1-control-outside-assigned-string-unused-import', world={BA: sb.frozen_source(BA) + "\nimport operator\n_CLAUDE_NOTE = 'inv.workspace_config.configured_workspace'\n"}, expect='ACCEPT')
+run('L1-control-bounded-literal-unrelated-sys-modules', world={BA: sb.frozen_source(BA) + "\nimport sys\n\n\ndef _claude_json():\n    return sys.modules['js' + 'on']\n"}, expect='ACCEPT')
+run('L1-conservative-nonliteral-unrelated-key', world={BA: sb.frozen_source(BA) + "\nimport sys\n_CLAUDE_KEY = 'json'\n\n\ndef _claude_json():\n    return sys.modules[_CLAUDE_KEY]\n"}, expect='REFUSE',
+    note='unrelated but unprovable key: conservative refusal is the declared L1 behaviour')
+# near variants inside the SAME enumerated API: importlib.import_module(name, package) -- package is part of the module identity
+run('L1-near-import_module-relative-variable-package', world={BA: sb.frozen_source(BA) + "\nimport importlib\n_CLAUDE_PKG = 'inv'\n" + TAILF + "importlib.import_module('.workspace_config', _CLAUDE_PKG).configured_workspace(object(), tenant, settings)\n"},
+    expect='REFUSE', finding='B9e-L1 candidate if ACCEPT',
+    note='importlib.import_module(name, package): an unprovable package argument makes the resolved module unprovable; keys() inspects only args[0]')
+run('L1-near-import_module-relative-literal-package', world={BA: sb.frozen_source(BA) + "\nimport importlib\n" + TAILF + "importlib.import_module('.workspace_config', 'inv').configured_workspace(object(), tenant, settings)\n"},
+    expect='REFUSE', finding='B9e-L1 candidate if ACCEPT',
+    note="both arguments literal, but relevant_string never composes package+relative name, so 'inv'+'.workspace_config' is not seen as a protected module")
+run('L1-near-dunder-import-relative-level1', world={BA: sb.frozen_source(BA) + "\n" + TAILF + "__import__('workspace_config', globals(), None, (), 1).configured_workspace(object(), tenant, settings)\n"},
+    expect='REFUSE', finding='B9e-L1 candidate if ACCEPT',
+    note='builtins.__import__ level=1 from package inv returns inv.workspace_config; literal relative name never composed with the importing package')
+
+# ---------------- 2. L2: the two actual 9266 escapes, retained 4288 escapes and controls
+blank_new = '        self.control, self.ledger = Control(database), ApprovalStore(database)\n\n    def _scope('
+run('L2-9266-actual-WorkspaceAPI-__new__-receives-runtime', {WA: must_replace(S[WA], blank_new,
+    '        self.control, self.ledger = Control(database), ApprovalStore(database)\n'
+    '    def __new__(cls, *args, **kwargs): import foreign_module; foreign_module.register_runtime(args[2]); return super().__new__(cls)\n'
+    '    def _scope(')}, expect='REFUSE:UNRESOLVED:CLASS_CONSTRUCTION_BINDING')
+guard = '\n\n\nif __name__ == "__main__":\n'
+run('L2-9266-actual-lan_pilot-callee-rebinding-conn', {LP: must_replace(S[LP], guard,
+    '\ndef _claude_wrap(fn): import foreign_module; return lambda *a, **k: (foreign_module.register_conn(a[4]), fn(*a, **k))[1]\n'
+    '_current_finalized_batch = _claude_wrap(_current_finalized_batch)\nif __name__ == "__main__":\n')}, expect='REFUSE:UNRESOLVED:CALLEE_REBOUND')
+run('L2-control-app-factory-rebinding', {AP: S[AP] + '\n\ndef _claude_wrap(fn):\n    return fn\n\n\ncreate_app = _claude_wrap(create_app)\n'}, expect='REFUSE')
+init = '        self.db, self.working, self.runtime = database, working, runtime\n'
+for expr in ('runtime', 'runtime.db', 'runtime.db.transaction'):
+    run('L2-retained-4288-WorkspaceAPI-init-' + expr, {WA: must_replace(S[WA], init, init + '        import foreign_module\n        foreign_module.register_runtime(' + expr + ')\n')}, expect='REFUSE:DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:INSTANCE:runtime')
+svc = '            raise DomainError("SYS-0001", "Workspace admission is not configured", 503)\n        return workspace\n'
+for expr in ('workspace', 'workspace.runtime.db'):
+    run('L2-retained-4288-create_app-workspace_service-' + expr, {AP: must_replace(S[AP], svc, '            raise DomainError("SYS-0001", "Workspace admission is not configured", 503)\n        import foreign_module; foreign_module.register_workspace(' + expr + '); return workspace\n')}, expect='REFUSE:DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:INSTANCE:workspace')
+run('L2-control-WorkspaceAPI-init-unowned-working', {WA: must_replace(S[WA], init, init + '        import foreign_module\n        foreign_module.register_note(working)\n')}, expect='ACCEPT')
+run('L2-control-lan_pilot-unrelated-module-helper', {LP: must_replace(S[LP], guard,
+    '\ndef _claude_note(text): return text\n_CLAUDE_NOTE = _claude_note("ok")\nif __name__ == "__main__":\n')}, expect='ACCEPT', note='new unrelated module-level def/assignment before the guard, no relevant callee changed')
+# near variants: same categories (newly unproven __new__ / module assignment / import shadow / global rebinding)
+run('L2-near-WorkspaceAPI-class-body-__new__-assignment', {WA: must_replace(S[WA], blank_new,
+    '        self.control, self.ledger = Control(database), ApprovalStore(database)\n'
+    '    __new__ = lambda cls, *args, **kwargs: (__import__("foreign_module").register_runtime(args[2]), object.__new__(cls))[1]\n'
+    '    def _scope(')}, expect='REFUSE', finding='B9e-L2 candidate if ACCEPT',
+    note='type() wraps a plain-function __new__ class attribute as staticmethod; construction() only checks FunctionDef __new__/__call__')
+run('L2-near-WorkspaceAPI-__init__-module-attribute-rebind', {WA: S[WA] + '\n\ndef _claude_wrap(fn):\n    def inner(self, database, working, runtime):\n        import foreign_module\n        foreign_module.register_runtime(runtime)\n        return fn(self, database, working, runtime)\n    return inner\n\n\nWorkspaceAPI.__init__ = _claude_wrap(WorkspaceAPI.__init__)\n'},
+    expect='REFUSE', finding='B9e-L2 candidate if ACCEPT',
+    note='module-level attribute assignment replaces the bound initializer the binder trusts; rebound() only inspects Name Store/Del')
+run('L2-near-WorkspaceAPI-__new__-module-attribute-assign', {WA: S[WA] + '\n\ndef _claude_new(cls, *args, **kwargs):\n    import foreign_module\n    foreign_module.register_runtime(args[2])\n    return object.__new__(cls)\n\n\nWorkspaceAPI.__new__ = _claude_new\n'},
+    expect='REFUSE', finding='B9e-L2 candidate if ACCEPT', note='post-class __new__ attribute assignment (same file)')
+run('L2-near-lan_pilot-global-import-in-function', {LP: must_replace(S[LP], guard,
+    '\ndef _claude_install(): global _current_finalized_batch; from foreign_module import _current_finalized_batch\n'
+    '_claude_install()\nif __name__ == "__main__":\n')}, expect='REFUSE', finding='B9e-L2 candidate if ACCEPT',
+    note='global declaration + import inside a function rebinds the module callee; rebound() treats global only for Name Store')
+run('L2-near-lan_pilot-star-import-shadow', {LP: must_replace(S[LP], guard, '\nfrom foreign_module import *\n\nif __name__ == "__main__":\n')},
+    expect='REFUSE', finding='B9e-L2 candidate if ACCEPT', note="star import may rebind _current_finalized_batch (foreign __all__); rebound() compares alias '*' to the name")
+run('L2-near-lan_pilot-match-capture-rebind', {LP: must_replace(S[LP], guard,
+    '\nmatch __import__("foreign_module").wrap(_current_finalized_batch):\n    case _current_finalized_batch: pass\nif __name__ == "__main__":\n')},
+    expect='REFUSE', finding='B9e-L2 candidate if ACCEPT', note='irrefutable capture pattern is a module-level Store that is not an ast.Name')
+run('L2-bound-lan_pilot-globals-dict-store', {LP: must_replace(S[LP], guard,
+    '\nglobals()["_current_finalized_batch"] = __import__("foreign_module").wrap(_current_finalized_batch)\n\nif __name__ == "__main__":\n')},
+    note='bound observation only: globals() is not an enumerated reflection API; not a demand')
+# frozen serve.Server inherited initializer exception (tools/lan_pilot.py:4049)
+sv_blank = '        request_queue_size = 8\n\n        def process_request(self, request, address):\n'
+run('L2-server-control-new-in-server-class', {LP: must_replace(S[LP], sv_blank, '        request_queue_size = 8\n        def __new__(cls, *args, **kwargs): return super().__new__(cls)\n        def process_request(self, request, address):\n')},
+    expect='REFUSE:UNRESOLVED:CLASS_CONSTRUCTION_BINDING', note='changed class: frozen exception must not apply')
+run('L2-server-control-metaclass-header', {LP: must_replace(S[LP], '    class Server(ThreadingHTTPServer):\n', '    class Server(ThreadingHTTPServer, metaclass=type):\n')},
+    expect='REFUSE:UNRESOLVED:CLASS_CONSTRUCTION_BINDING', note='changed class header')
+run('L2-server-control-changed-call', {LP: must_replace(S[LP], '    server = Server((state["serverIP"], state["downloadPort"]), Handler)\n', '    server = Server((state["serverIP"], state["downloadPort"]), Handler, True)\n')},
+    expect='REFUSE', note='changed call expression: exact-frozen call match must fail')
+
+# ---------------- 3. AST-only binder fixtures (lexical binder output, not provenance)
+P = 'fixtures/claude_b9e_binder.py'
+PRE = 'from inv.workspace_api import WorkspaceAPI as Owner\nfrom foreign_module import receive\nheld = Owner(None, None, None)\n'
+B = []
+for name, body, q, formal, want_reason, want_owned in [
+    ('I1-explicit-kw-into-kwargs', 'def accept(**extra):\n    return receive(extra)\naccept(slot=held)\n', 'accept', 'extra', None, True),
+    ('I1-two-explicit-kw-into-kwargs', 'def accept(note, **extra):\n    return receive(extra)\naccept("plain", a=held, b=held)\n', 'accept', 'extra', None, True),
+    ('I1-dict-literal-spread-into-kwargs', 'def accept(**extra):\n    return receive(extra)\naccept(**{"slot": held})\n', 'accept', 'extra', None, True),
+    ('I1-unknown-spread-refuses', 'def accept(**extra):\n    return receive(extra)\nbag = {"slot": held}\naccept(**bag)\n', 'accept', 'extra', 'UNRESOLVED:OWNED_ARGUMENT_KEYWORD_SPREAD_BINDING', None),
+    ('I1-kwargs-forward-chain', 'def inner(**more):\n    return receive(more)\ndef accept(**extra):\n    return inner(**extra)\naccept(slot=held)\n', 'accept', 'extra', 'UNRESOLVED:OWNED_ARGUMENT_KEYWORD_SPREAD_BINDING', True),
+    ('I1-vararg-refuses', 'def accept(*rest):\n    return receive(rest)\naccept(held)\n', 'accept', 'rest', 'UNRESOLVED:OWNED_ARGUMENT_VARIADIC_BINDING', None),
+    ('I1-factory-chain-converges', 'def make():\n    return held\ndef make2():\n    return make()\ndef make3():\n    return make2()\ndef accept(slot):\n    return receive(slot)\naccept(make3())\n', 'accept', 'slot', None, True),
+    ('alias-before-computed-rebind', 'def accept(slot):\n    return None\ndef wrap(fn):\n    return lambda *a: receive(a)\n_orig = accept\naccept = wrap(_orig)\naccept(held)\n', 'accept', 'slot', 'UNRESOLVED:CALLEE_REBOUND', None),
+    ('alias-call-of-original-after-rebind', 'def accept(slot):\n    return None\ndef wrap(fn):\n    return lambda *a: receive(a)\n_orig = accept\naccept = wrap(_orig)\n_orig(held)\n', 'accept', 'slot', None, None),
+    ('lexical-unrelated-local-same-name', 'def accept(slot):\n    return None\ndef other():\n    accept = receive\n    return accept\naccept(held)\n', 'accept', 'slot', None, True),
+    ('lexical-unrelated-class-attr-same-name', 'def accept(slot):\n    return None\nclass Box:\n    accept = receive\naccept(held)\n', 'accept', 'slot', None, True),
+    ('near-global-def-in-function', 'def accept(slot):\n    return None\ndef alter():\n    global accept\n    def accept(slot):\n        return receive(slot)\nalter()\naccept(held)\n', 'accept', 'slot', 'UNRESOLVED:CALLEE_REBOUND', None),
+    ('near-global-import-in-function', 'def accept(slot):\n    return None\ndef alter():\n    global accept\n    from foreign_module import accept\nalter()\naccept(held)\n', 'accept', 'slot', 'UNRESOLVED:CALLEE_REBOUND', None),
+    ('near-nonlocal-rebind-nested-callee', 'def outer():\n    def accept(slot):\n        return None\n    def alter():\n        nonlocal accept\n        accept = receive\n    alter()\n    return accept(held)\n', 'outer.accept', 'slot', 'UNRESOLVED:CALLEE_REBOUND', None),
+    ('near-star-import-shadow', 'def accept(slot):\n    return None\nfrom foreign_module import *\naccept(held)\n', 'accept', 'slot', 'UNRESOLVED:CALLEE_REBOUND', None),
+    ('near-class-body-__new__-assign', 'class Box:\n    __new__ = lambda cls, *args: (receive(args), object.__new__(cls))[1]\n    def __init__(self, slot):\n        self.slot = None\nBox(held)\n', 'Box.__init__', 'slot', 'UNRESOLVED:CLASS_CONSTRUCTION_BINDING', None),
+    ('near-module-attr-init-rebind', 'class Box:\n    def __init__(self, slot):\n        self.slot = None\nBox.__init__ = lambda self, slot: receive(slot)\nBox(held)\n', 'Box.__init__', 'slot', 'UNRESOLVED:CALLEE_REBOUND', None),
+    ('control-ordinary-init', 'class Box:\n    def __init__(self, slot):\n        self.slot = None\nBox(held)\n', 'Box.__init__', 'slot', None, True),
+    ('control-frozen-style-staticmethod', 'class Box:\n    @staticmethod\n    def accept(slot):\n        return None\nBox.accept(held)\n', 'Box.accept', 'slot', None, True),
+]:
+    src = PRE + body; ast.parse(src); data, error = pf.solve({P: src})
+    owned = sorted(data['parameters'].get(P, {}).get(q, [])) if data else None
+    reasons = [x['reason'] for x in (data or {}).get('unresolved', [])]
+    ok_reason = (want_reason in reasons) if want_reason else (error is None and not reasons)
+    ok_owned = want_owned is None or (formal in (owned or [])) is want_owned
+    row = {'case': name, 'sourceSHA256': sb.sha(src), 'error': error, 'unresolved': reasons, 'ownedFormalsAt': {q: owned},
+           'iterations': (data or {}).get('iterations'), 'iterationBound': (data or {}).get('iterationBound'),
+           'bindings': [{'target': x['target'], 'formal': x['formal'], 'form': x['argumentForm'], 'evidence': x['argumentEvidence']} for x in (data or {}).get('bindings', [])],
+           'expectedReason': want_reason, 'expectedFormalOwned': want_owned, 'matchesExpectation': ok_reason and ok_owned}
+    if name.startswith('I1-') and data:
+        tree = ast.parse(src); spans = set()
+        for b in data['bindings']:
+            for ev in b['argumentEvidence']:
+                node = next((n for n in ast.walk(tree) if hasattr(n, 'lineno') and [n.lineno, n.col_offset, n.end_lineno, n.end_col_offset] == ev['span']), None)
+                spans.add(node is not None and sb.sha(ast.get_source_segment(src, node)) == ev['sourceExpressionSHA256'])
+        row['allEvidenceSpansResolveToOriginalSource'] = spans == {True} if spans else None
+    B.append(row); print(json.dumps({k: row[k] for k in ('case', 'error', 'unresolved', 'ownedFormalsAt', 'matchesExpectation')}), flush=True)
+
+d = {'reviewer': 'Claude independent', 'target': E.name, 'frozenRootKeys': len(FROZEN_ROOTS), 'info': INFO, 'cases': R, 'binderFixtures': B,
+     'mismatches': [x['case'] for x in R if not x['matchesExpectation']] + [x['case'] for x in B if not x['matchesExpectation']],
+     'effectfulMutantsImportedOrExecuted': False, 'productFilesWritten': 0}
+OUT.write_bytes((json.dumps(d, indent=1, default=str) + '\n').encode()); print(json.dumps({'cases': len(R), 'binder': len(B), 'mismatches': d['mismatches']}))
