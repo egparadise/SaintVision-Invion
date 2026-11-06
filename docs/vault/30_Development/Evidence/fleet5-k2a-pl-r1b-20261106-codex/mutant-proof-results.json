@@ -1,0 +1,490 @@
+{
+  "classification": "PUBLIC_SOURCE_STATIC_MUTANT_PROOFS_NOT_LIVE_TRUST_OR_EFFECT_EXECUTION",
+  "base": "ac7498e82a0cf17fc95973fe9187aeb51c99d51e",
+  "scratch": "ignored .work/pl-r1b-redgreen public Git archives; preserved, no cleanup",
+  "gitObjectIndexView": "GIT_DIR own registered worktree readonly; GIT_WORK_TREE scratch; no raw Git worktree registration or index writes",
+  "goBuildVCS": "-buildvcs=false only on scratch whole-source compile, no artifact trust claim",
+  "runs": [
+    {
+      "name": "baseline-new-cases-red",
+      "argv": [
+        "go",
+        "test",
+        "-p",
+        "1",
+        "-count=1",
+        "-run",
+        "TestPLR1BCompiledWriteTargetsAndReasons",
+        "-v",
+        "./internal/migrationcontext"
+      ],
+      "cwd": "D:\\Project\\SaintVisionI-Invion\\fleet5-k2a-pl-r1b-20261106\\.work\\pl-r1b-redgreen\\baseline-new-cases\\services\\node-agent",
+      "exit": 1,
+      "expectedExit": 1,
+      "startedKST": "2026-11-06T17:43:55.192965+09:00",
+      "endedKST": "2026-11-06T17:44:57.963281+09:00",
+      "log": "baseline-new-cases-red.log",
+      "actualBuildExit0Count": 34,
+      "intendedReason": "want intended refusal",
+      "reasonPresent": true
+    },
+    {
+      "name": "candidate-full-package",
+      "argv": [
+        "go",
+        "test",
+        "-p",
+        "1",
+        "-count=1",
+        "-v",
+        "./internal/migrationcontext"
+      ],
+      "cwd": "D:\\Project\\SaintVisionI-Invion\\fleet5-k2a-pl-r1b-20261106\\services\\node-agent",
+      "exit": 1,
+      "expectedExit": 0,
+      "startedKST": "2026-11-06T17:44:57.963950+09:00",
+      "endedKST": "2026-11-06T17:46:33.503938+09:00",
+      "log": "candidate-full-package.log",
+      "actualBuildExit0Count": 52,
+      "intendedReason": null,
+      "reasonPresent": null
+    },
+    {
+      "name": "candidate-full-package-final",
+      "argv": [
+        "go",
+        "test",
+        "-p",
+        "1",
+        "-count=1",
+        "-v",
+        "./internal/migrationcontext"
+      ],
+      "cwd": "D:\\Project\\SaintVisionI-Invion\\fleet5-k2a-pl-r1b-20261106\\services\\node-agent",
+      "exit": 0,
+      "expectedExit": 0,
+      "startedKST": "2026-11-06T17:48:18.532171+09:00",
+      "endedKST": "2026-11-06T17:49:53.865306+09:00",
+      "log": "candidate-full-package-final.log",
+      "actualBuildExit0Count": 52,
+      "intendedReason": null,
+      "reasonPresent": null
+    },
+    {
+      "name": "candidate-vet",
+      "argv": [
+        "go",
+        "vet",
+        "-p",
+        "1",
+        "./internal/migrationcontext",
+        "./migrationverify"
+      ],
+      "cwd": "D:\\Project\\SaintVisionI-Invion\\fleet5-k2a-pl-r1b-20261106\\services\\node-agent",
+      "exit": 0,
+      "expectedExit": 0,
+      "startedKST": "2026-11-06T17:49:53.865958+09:00",
+      "endedKST": "2026-11-06T17:49:57.751635+09:00",
+      "log": "candidate-vet.log",
+      "actualBuildExit0Count": 0,
+      "intendedReason": null,
+      "reasonPresent": null
+    },
+    {
+      "name": "E1-range-actual-build",
+      "argv": [
+        "go",
+        "build",
+        "-p",
+        "1",
+        "-buildvcs=false",
+        "./..."
+      ],
+      "cwd": "D:\\Project\\SaintVisionI-Invion\\fleet5-k2a-pl-r1b-20261106\\.work\\pl-r1b-redgreen\\E1-range\\services\\node-agent",
+      "exit": 0,
+      "expectedExit": 0,
+      "startedKST": "2026-11-06T17:49:58.000132+09:00",
+      "endedKST": "2026-11-06T17:50:07.520286+09:00",
+      "log": "E1-range-actual-build.log",
+      "actualBuildExit0Count": 0,
+      "intendedReason": null,
+      "reasonPresent": null
+    },
+    {
+      "name": "E1-range-old-full-escape",
+      "argv": [
+        "go",
+        "test",
+        "-p",
+        "1",
+        "-count=1",
+        "-v",
+        "./internal/migrationcontext"
+      ],
+      "cwd": "D:\\Project\\SaintVisionI-Invion\\fleet5-k2a-pl-r1b-20261106\\.work\\pl-r1b-redgreen\\E1-range\\services\\node-agent",
+      "exit": 1,
+      "expectedExit": 0,
+      "startedKST": "2026-11-06T17:50:07.520869+09:00",
+      "endedKST": "2026-11-06T17:50:54.260255+09:00",
+      "log": "E1-range-old-full-escape.log",
+      "actualBuildExit0Count": 18,
+      "intendedReason": null,
+      "reasonPresent": null
+    },
+    {
+      "name": "E1-range-actual-build-final",
+      "argv": [
+        "go",
+        "build",
+        "-p",
+        "1",
+        "-buildvcs=false",
+        "./..."
+      ],
+      "cwd": "D:\\Project\\SaintVisionI-Invion\\fleet5-k2a-pl-r1b-20261106\\.work\\pl-r1b-redgreen\\E1-range-complete-public-Go\\services\\node-agent",
+      "exit": 0,
+      "expectedExit": 0,
+      "startedKST": "2026-11-06T17:52:28.763600+09:00",
+      "endedKST": "2026-11-06T17:52:35.770607+09:00",
+      "log": "E1-range-actual-build-final.log",
+      "actualBuildExit0Count": 0,
+      "intendedReason": null,
+      "reasonPresent": null
+    },
+    {
+      "name": "E1-range-old-full-escape-final",
+      "argv": [
+        "go",
+        "test",
+        "-p",
+        "1",
+        "-count=1",
+        "-v",
+        "./internal/migrationcontext"
+      ],
+      "cwd": "D:\\Project\\SaintVisionI-Invion\\fleet5-k2a-pl-r1b-20261106\\.work\\pl-r1b-redgreen\\E1-range-complete-public-Go\\services\\node-agent",
+      "exit": 0,
+      "expectedExit": 0,
+      "startedKST": "2026-11-06T17:52:35.771225+09:00",
+      "endedKST": "2026-11-06T17:53:23.178762+09:00",
+      "log": "E1-range-old-full-escape-final.log",
+      "actualBuildExit0Count": 18,
+      "intendedReason": null,
+      "reasonPresent": null
+    },
+    {
+      "name": "E1-range-corrected-full-refusal-final",
+      "argv": [
+        "go",
+        "test",
+        "-p",
+        "1",
+        "-count=1",
+        "-v",
+        "./internal/migrationcontext"
+      ],
+      "cwd": "D:\\Project\\SaintVisionI-Invion\\fleet5-k2a-pl-r1b-20261106\\.work\\pl-r1b-redgreen\\E1-range-complete-public-Go\\services\\node-agent",
+      "exit": 1,
+      "expectedExit": 1,
+      "startedKST": "2026-11-06T17:53:23.191093+09:00",
+      "endedKST": "2026-11-06T17:53:41.800662+09:00",
+      "log": "E1-range-corrected-full-refusal-final.log",
+      "actualBuildExit0Count": 0,
+      "intendedReason": "foreign state write forbidden: time.UTC",
+      "reasonPresent": true
+    },
+    {
+      "name": "E2-deref-UTC-actual-build-final",
+      "argv": [
+        "go",
+        "build",
+        "-p",
+        "1",
+        "-buildvcs=false",
+        "./..."
+      ],
+      "cwd": "D:\\Project\\SaintVisionI-Invion\\fleet5-k2a-pl-r1b-20261106\\.work\\pl-r1b-redgreen\\E2-deref-UTC-complete-public-Go\\services\\node-agent",
+      "exit": 0,
+      "expectedExit": 0,
+      "startedKST": "2026-11-06T17:53:41.997937+09:00",
+      "endedKST": "2026-11-06T17:53:47.637945+09:00",
+      "log": "E2-deref-UTC-actual-build-final.log",
+      "actualBuildExit0Count": 0,
+      "intendedReason": null,
+      "reasonPresent": null
+    },
+    {
+      "name": "E2-deref-UTC-old-full-escape-final",
+      "argv": [
+        "go",
+        "test",
+        "-p",
+        "1",
+        "-count=1",
+        "-v",
+        "./internal/migrationcontext"
+      ],
+      "cwd": "D:\\Project\\SaintVisionI-Invion\\fleet5-k2a-pl-r1b-20261106\\.work\\pl-r1b-redgreen\\E2-deref-UTC-complete-public-Go\\services\\node-agent",
+      "exit": 0,
+      "expectedExit": 0,
+      "startedKST": "2026-11-06T17:53:47.638413+09:00",
+      "endedKST": "2026-11-06T17:54:32.682891+09:00",
+      "log": "E2-deref-UTC-old-full-escape-final.log",
+      "actualBuildExit0Count": 18,
+      "intendedReason": null,
+      "reasonPresent": null
+    },
+    {
+      "name": "E2-deref-UTC-corrected-full-refusal-final",
+      "argv": [
+        "go",
+        "test",
+        "-p",
+        "1",
+        "-count=1",
+        "-v",
+        "./internal/migrationcontext"
+      ],
+      "cwd": "D:\\Project\\SaintVisionI-Invion\\fleet5-k2a-pl-r1b-20261106\\.work\\pl-r1b-redgreen\\E2-deref-UTC-complete-public-Go\\services\\node-agent",
+      "exit": 1,
+      "expectedExit": 1,
+      "startedKST": "2026-11-06T17:54:32.684476+09:00",
+      "endedKST": "2026-11-06T17:54:51.835219+09:00",
+      "log": "E2-deref-UTC-corrected-full-refusal-final.log",
+      "actualBuildExit0Count": 0,
+      "intendedReason": "foreign pointee write forbidden: time.Location",
+      "reasonPresent": true
+    },
+    {
+      "name": "E3-deref-Location-actual-build-final",
+      "argv": [
+        "go",
+        "build",
+        "-p",
+        "1",
+        "-buildvcs=false",
+        "./..."
+      ],
+      "cwd": "D:\\Project\\SaintVisionI-Invion\\fleet5-k2a-pl-r1b-20261106\\.work\\pl-r1b-redgreen\\E3-deref-Location-complete-public-Go\\services\\node-agent",
+      "exit": 0,
+      "expectedExit": 0,
+      "startedKST": "2026-11-06T17:54:52.039232+09:00",
+      "endedKST": "2026-11-06T17:54:57.950712+09:00",
+      "log": "E3-deref-Location-actual-build-final.log",
+      "actualBuildExit0Count": 0,
+      "intendedReason": null,
+      "reasonPresent": null
+    },
+    {
+      "name": "E3-deref-Location-old-full-escape-final",
+      "argv": [
+        "go",
+        "test",
+        "-p",
+        "1",
+        "-count=1",
+        "-v",
+        "./internal/migrationcontext"
+      ],
+      "cwd": "D:\\Project\\SaintVisionI-Invion\\fleet5-k2a-pl-r1b-20261106\\.work\\pl-r1b-redgreen\\E3-deref-Location-complete-public-Go\\services\\node-agent",
+      "exit": 0,
+      "expectedExit": 0,
+      "startedKST": "2026-11-06T17:54:57.951191+09:00",
+      "endedKST": "2026-11-06T17:55:46.963418+09:00",
+      "log": "E3-deref-Location-old-full-escape-final.log",
+      "actualBuildExit0Count": 18,
+      "intendedReason": null,
+      "reasonPresent": null
+    },
+    {
+      "name": "E3-deref-Location-corrected-full-refusal-final",
+      "argv": [
+        "go",
+        "test",
+        "-p",
+        "1",
+        "-count=1",
+        "-v",
+        "./internal/migrationcontext"
+      ],
+      "cwd": "D:\\Project\\SaintVisionI-Invion\\fleet5-k2a-pl-r1b-20261106\\.work\\pl-r1b-redgreen\\E3-deref-Location-complete-public-Go\\services\\node-agent",
+      "exit": 1,
+      "expectedExit": 1,
+      "startedKST": "2026-11-06T17:55:46.976589+09:00",
+      "endedKST": "2026-11-06T17:56:11.859130+09:00",
+      "log": "E3-deref-Location-corrected-full-refusal-final.log",
+      "actualBuildExit0Count": 0,
+      "intendedReason": "foreign pointee write forbidden: time.Location",
+      "reasonPresent": true
+    },
+    {
+      "name": "slice-root-before-traversal-red",
+      "argv": [
+        "go",
+        "test",
+        "-p",
+        "1",
+        "-count=1",
+        "-run",
+        "TestPLR1BCompiledWriteTargetsAndReasons/slice-root",
+        "-v",
+        "./internal/migrationcontext"
+      ],
+      "cwd": "D:\\Project\\SaintVisionI-Invion\\fleet5-k2a-pl-r1b-20261106\\.work\\pl-r1b-redgreen\\slice-root-before-final-traversal\\services\\node-agent",
+      "exit": 1,
+      "expectedExit": 1,
+      "startedKST": "2026-11-06T17:56:40.987423+09:00",
+      "endedKST": "2026-11-06T17:56:50.139499+09:00",
+      "log": "slice-root-before-traversal-red.log",
+      "actualBuildExit0Count": 2,
+      "intendedReason": "want intended refusal",
+      "reasonPresent": true
+    },
+    {
+      "name": "candidate-frozen-full-package",
+      "argv": [
+        "go",
+        "test",
+        "-p",
+        "1",
+        "-count=1",
+        "-v",
+        "./internal/migrationcontext"
+      ],
+      "cwd": "D:\\Project\\SaintVisionI-Invion\\fleet5-k2a-pl-r1b-20261106\\services\\node-agent",
+      "exit": 0,
+      "expectedExit": 0,
+      "startedKST": "2026-11-06T17:57:43.188829+09:00",
+      "endedKST": "2026-11-06T17:59:26.209290+09:00",
+      "log": "candidate-frozen-full-package.log",
+      "actualBuildExit0Count": 54,
+      "intendedReason": null,
+      "reasonPresent": null
+    },
+    {
+      "name": "candidate-frozen-vet",
+      "argv": [
+        "go",
+        "vet",
+        "-p",
+        "1",
+        "./internal/migrationcontext",
+        "./migrationverify"
+      ],
+      "cwd": "D:\\Project\\SaintVisionI-Invion\\fleet5-k2a-pl-r1b-20261106\\services\\node-agent",
+      "exit": 0,
+      "expectedExit": 0,
+      "startedKST": "2026-11-06T17:59:26.211467+09:00",
+      "endedKST": "2026-11-06T17:59:27.464593+09:00",
+      "log": "candidate-frozen-vet.log",
+      "actualBuildExit0Count": 0,
+      "intendedReason": null,
+      "reasonPresent": null
+    },
+    {
+      "name": "E1-range-frozen-corrected-full-refusal",
+      "argv": [
+        "go",
+        "test",
+        "-p",
+        "1",
+        "-count=1",
+        "-v",
+        "./internal/migrationcontext"
+      ],
+      "cwd": "D:\\Project\\SaintVisionI-Invion\\fleet5-k2a-pl-r1b-20261106\\.work\\pl-r1b-redgreen\\E1-range-complete-public-Go\\services\\node-agent",
+      "exit": 1,
+      "expectedExit": 1,
+      "startedKST": "2026-11-06T17:59:27.481380+09:00",
+      "endedKST": "2026-11-06T17:59:45.819607+09:00",
+      "log": "E1-range-frozen-corrected-full-refusal.log",
+      "actualBuildExit0Count": 0,
+      "intendedReason": "foreign state write forbidden: time.UTC",
+      "reasonPresent": true
+    },
+    {
+      "name": "E2-deref-UTC-frozen-corrected-full-refusal",
+      "argv": [
+        "go",
+        "test",
+        "-p",
+        "1",
+        "-count=1",
+        "-v",
+        "./internal/migrationcontext"
+      ],
+      "cwd": "D:\\Project\\SaintVisionI-Invion\\fleet5-k2a-pl-r1b-20261106\\.work\\pl-r1b-redgreen\\E2-deref-UTC-complete-public-Go\\services\\node-agent",
+      "exit": 1,
+      "expectedExit": 1,
+      "startedKST": "2026-11-06T17:59:45.848255+09:00",
+      "endedKST": "2026-11-06T18:00:02.856333+09:00",
+      "log": "E2-deref-UTC-frozen-corrected-full-refusal.log",
+      "actualBuildExit0Count": 0,
+      "intendedReason": "foreign pointee write forbidden: time.Location",
+      "reasonPresent": true
+    },
+    {
+      "name": "E3-deref-Location-frozen-corrected-full-refusal",
+      "argv": [
+        "go",
+        "test",
+        "-p",
+        "1",
+        "-count=1",
+        "-v",
+        "./internal/migrationcontext"
+      ],
+      "cwd": "D:\\Project\\SaintVisionI-Invion\\fleet5-k2a-pl-r1b-20261106\\.work\\pl-r1b-redgreen\\E3-deref-Location-complete-public-Go\\services\\node-agent",
+      "exit": 1,
+      "expectedExit": 1,
+      "startedKST": "2026-11-06T18:00:02.858038+09:00",
+      "endedKST": "2026-11-06T18:00:20.640939+09:00",
+      "log": "E3-deref-Location-frozen-corrected-full-refusal.log",
+      "actualBuildExit0Count": 0,
+      "intendedReason": "foreign pointee write forbidden: time.Location",
+      "reasonPresent": true
+    },
+    {
+      "name": "UTC-incdec-UNAVAILABLE-NOT-boundary-proof",
+      "argv": [
+        "go",
+        "build",
+        "-p",
+        "1",
+        "./internal/migrationcontext"
+      ],
+      "cwd": "D:\\Project\\SaintVisionI-Invion\\fleet5-k2a-pl-r1b-20261106\\.work\\pl-r1b-redgreen\\invalid-UTC-incdec-availability-only\\services\\node-agent",
+      "exit": 1,
+      "expectedExit": 1,
+      "startedKST": "2026-11-06T18:00:20.916012+09:00",
+      "endedKST": "2026-11-06T18:00:22.204906+09:00",
+      "log": "UTC-incdec-UNAVAILABLE-NOT-boundary-proof.log",
+      "actualBuildExit0Count": 0,
+      "intendedReason": "non-numeric type",
+      "reasonPresent": true
+    },
+    {
+      "name": "slice-root-ac7498-baseline-red",
+      "argv": [
+        "go",
+        "test",
+        "-p",
+        "1",
+        "-count=1",
+        "-run",
+        "TestPLR1BCompiledWriteTargetsAndReasons/slice-root",
+        "-v",
+        "./internal/migrationcontext"
+      ],
+      "cwd": "D:\\Project\\SaintVisionI-Invion\\fleet5-k2a-pl-r1b-20261106\\.work\\pl-r1b-redgreen\\slice-root-base-ac7498\\services\\node-agent",
+      "exit": 1,
+      "expectedExit": 1,
+      "startedKST": "2026-11-06T18:01:26.316343+09:00",
+      "endedKST": "2026-11-06T18:01:35.487619+09:00",
+      "log": "slice-root-ac7498-baseline-red.log",
+      "actualBuildExit0Count": 2,
+      "intendedReason": "want intended refusal",
+      "reasonPresent": true
+    }
+  ]
+}

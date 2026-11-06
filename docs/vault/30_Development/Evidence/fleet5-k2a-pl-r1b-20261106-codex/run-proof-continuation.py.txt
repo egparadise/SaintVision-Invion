@@ -1,0 +1,34 @@
+from pathlib import Path
+import datetime,subprocess,json,os,io,tarfile,uuid
+root=Path.cwd();out=root/'docs/vault/30_Development/Evidence/fleet5-k2a-pl-r1b-20261106-codex';out.mkdir(parents=True,exist_ok=True)
+work=root/'.work/pl-r1b-redgreen';work.mkdir(parents=True,exist_ok=True)
+base='ac7498e82a0cf17fc95973fe9187aeb51c99d51e';gitdir=subprocess.check_output(['git','rev-parse','--absolute-git-dir']).decode().strip()
+raw=subprocess.check_output(['git','archive',base,'services/node-agent','packages/contracts-go'])
+baseenv=dict(os.environ,GOTOOLCHAIN='local',GOWORK='off',GOPROXY='off',GOSUMDB='off',GOMAXPROCS='1',PYTHONDONTWRITEBYTECODE='1')
+report={'classification':'PUBLIC_SOURCE_STATIC_MUTANT_PROOFS_NOT_LIVE_TRUST_OR_EFFECT_EXECUTION','base':base,'scratch':'ignored .work/pl-r1b-redgreen public Git archives; preserved, no cleanup','gitObjectIndexView':'GIT_DIR own registered worktree readonly; GIT_WORK_TREE scratch; no raw Git worktree registration or index writes','goBuildVCS':'-buildvcs=false only on scratch whole-source compile, no artifact trust claim','runs':[]}
+report=json.loads((out/'mutant-proof-results.json').read_text())
+def stamp():return datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=9))).isoformat()
+def run(name,argv,cwd,env,expected,reason=None,count=None):
+ print(json.dumps({'starting':name,'argv':argv,'kst':stamp()}),flush=True);start=stamp();p=subprocess.run(argv,cwd=cwd,env=env,capture_output=True);log=p.stdout+p.stderr;(out/(name+'.log')).write_bytes(log)
+ item={'name':name,'argv':argv,'cwd':str(cwd),'exit':p.returncode,'expectedExit':expected,'startedKST':start,'endedKST':stamp(),'log':name+'.log','actualBuildExit0Count':log.count(b'actual go build -p=1 ./internal/migrationcontext exit0;'),'intendedReason':reason,'reasonPresent':None if reason is None else reason.encode() in log}
+ report['runs'].append(item);(out/'mutant-proof-results.json').write_text(json.dumps(report,indent=2)+'\n');print(json.dumps(item),flush=True)
+ if p.returncode!=expected or reason is not None and reason.encode() not in log or count is not None and item['actualBuildExit0Count']!=count:
+  print(log.decode(errors='replace')[-10000:],flush=True);raise SystemExit('unexpected actual result; preserve and stop, no blind retry')
+ return log
+def fixture(name):
+ d=work/name;d.mkdir()
+ with tarfile.open(fileobj=io.BytesIO(raw)) as tar:tar.extractall(d,filter='data')
+ e=dict(baseenv,GIT_DIR=gitdir,GIT_WORK_TREE=str(d));return d,e
+# Full corrected package and vet, including all old/new cases and public refusals.
+run('candidate-full-package-final',['go','test','-p','1','-count=1','-v','./internal/migrationcontext'],root/'services/node-agent',baseenv,0,count=52)
+run('candidate-vet',['go','vet','-p','1','./internal/migrationcontext','./migrationverify'],root/'services/node-agent',baseenv,0)
+# Three REAL non-test source escapes: compile0 + old FULL suite0, corrected FULL
+# gate rejects for the intended write reason. Bodies have no call site/initializer.
+real=[('E1-range','import clock "time"\nfunc plr1bRealProbe(){for _,clock.UTC=range []*clock.Location{nil} {}}','foreign state write forbidden: time.UTC'),('E2-deref-UTC','import clock "time"\nfunc plr1bRealProbe(){*clock.UTC=clock.Location{}}','foreign pointee write forbidden: time.Location'),('E3-deref-Location','import clock "time"\nfunc plr1bRealProbe(){*clock.Time{}.Location()=clock.Location{}}','foreign pointee write forbidden: time.Location')]
+for name,body,reason in real:
+ d,e=fixture(name);(d/'services/node-agent/internal/migrationcontext/plr1b_real_probe.go').write_text('package migrationcontext\n'+body+'\n')
+ run(name+'-actual-build',['go','build','-p','1','-buildvcs=false','./...'],d/'services/node-agent',e,0)
+ run(name+'-old-full-escape',['go','test','-p','1','-count=1','-v','./internal/migrationcontext'],d/'services/node-agent',e,0,count=18)
+ for f in ['effect_gate_test.go','pl_r1a_test.go']:(d/'services/node-agent/internal/migrationcontext'/f).write_bytes((root/'services/node-agent/internal/migrationcontext'/f).read_bytes())
+ run(name+'-corrected-full-refusal',['go','test','-p','1','-count=1','-v','./internal/migrationcontext'],d/'services/node-agent',e,1,reason)
+print('All expected static mutant results observed; no mutant body executed.',flush=True)

@@ -1,0 +1,131 @@
+=== RUN   TestNullPortsAndOpaqueBoundary
+--- PASS: TestNullPortsAndOpaqueBoundary (0.00s)
+=== RUN   TestWellFormedUnregisteredProvidersNeverAuthenticate
+--- PASS: TestWellFormedUnregisteredProvidersNeverAuthenticate (0.00s)
+=== RUN   TestAlreadyBoundSyntheticOriginalSelectorAndFreeze
+--- PASS: TestAlreadyBoundSyntheticOriginalSelectorAndFreeze (0.00s)
+=== RUN   TestCopyRejectsCallbacksAndBoundsBeforeEncoding
+--- PASS: TestCopyRejectsCallbacksAndBoundsBeforeEncoding (0.00s)
+=== RUN   TestAlreadyBoundCurrentStatusAgeAndRefusalIsolation
+--- PASS: TestAlreadyBoundCurrentStatusAgeAndRefusalIsolation (0.00s)
+=== RUN   TestSyntheticClockEnvelopeAndCompleteOutput
+--- PASS: TestSyntheticClockEnvelopeAndCompleteOutput (0.00s)
+=== RUN   TestAlreadyBoundSyntheticCryptoHistoryEndpoints
+    crypto_history_test.go:93: SYNTHETIC auth bypass only: L/U/t0 full-report equal, records=195 proofs=112 signatures=227
+=== RUN   TestAlreadyBoundSyntheticCryptoHistoryEndpoints/current-selector
+=== RUN   TestAlreadyBoundSyntheticCryptoHistoryEndpoints/publication-revoked
+=== RUN   TestAlreadyBoundSyntheticCryptoHistoryEndpoints/certificate-revoked
+=== RUN   TestAlreadyBoundSyntheticCryptoHistoryEndpoints/upper-endpoint-expiry
+=== RUN   TestAlreadyBoundSyntheticCryptoHistoryEndpoints/raw-proof-corruption
+--- PASS: TestAlreadyBoundSyntheticCryptoHistoryEndpoints (4.72s)
+    --- PASS: TestAlreadyBoundSyntheticCryptoHistoryEndpoints/current-selector (0.01s)
+    --- PASS: TestAlreadyBoundSyntheticCryptoHistoryEndpoints/publication-revoked (0.01s)
+    --- PASS: TestAlreadyBoundSyntheticCryptoHistoryEndpoints/certificate-revoked (0.01s)
+    --- PASS: TestAlreadyBoundSyntheticCryptoHistoryEndpoints/upper-endpoint-expiry (1.01s)
+    --- PASS: TestAlreadyBoundSyntheticCryptoHistoryEndpoints/raw-proof-corruption (0.61s)
+=== RUN   TestAlreadyBoundPolicyJoinsDoNotAuthenticate
+=== RUN   TestAlreadyBoundPolicyJoinsDoNotAuthenticate/wrong-executable
+=== RUN   TestAlreadyBoundPolicyJoinsDoNotAuthenticate/archive-is-not-executable
+=== RUN   TestAlreadyBoundPolicyJoinsDoNotAuthenticate/review-scope
+=== RUN   TestAlreadyBoundPolicyJoinsDoNotAuthenticate/review-target
+=== RUN   TestAlreadyBoundPolicyJoinsDoNotAuthenticate/ci-run
+=== RUN   TestAlreadyBoundPolicyJoinsDoNotAuthenticate/wrong-node-DER
+=== RUN   TestAlreadyBoundPolicyJoinsDoNotAuthenticate/wrong-node-grant
+--- PASS: TestAlreadyBoundPolicyJoinsDoNotAuthenticate (0.02s)
+    --- PASS: TestAlreadyBoundPolicyJoinsDoNotAuthenticate/wrong-executable (0.00s)
+    --- PASS: TestAlreadyBoundPolicyJoinsDoNotAuthenticate/archive-is-not-executable (0.00s)
+    --- PASS: TestAlreadyBoundPolicyJoinsDoNotAuthenticate/review-scope (0.00s)
+    --- PASS: TestAlreadyBoundPolicyJoinsDoNotAuthenticate/review-target (0.00s)
+    --- PASS: TestAlreadyBoundPolicyJoinsDoNotAuthenticate/ci-run (0.00s)
+    --- PASS: TestAlreadyBoundPolicyJoinsDoNotAuthenticate/wrong-node-DER (0.00s)
+    --- PASS: TestAlreadyBoundPolicyJoinsDoNotAuthenticate/wrong-node-grant (0.00s)
+=== RUN   TestResolvedObjectEffectBoundary
+    effect_gate_test.go:428: foreign pointee write forbidden: time.Location
+--- FAIL: TestResolvedObjectEffectBoundary (1.17s)
+=== RUN   TestReviewR1CompileValidEffectAndAliasMutants
+    effect_gate_test.go:474: actual pure control must pass before mutants foreign pointee write forbidden: time.Location
+--- FAIL: TestReviewR1CompileValidEffectAndAliasMutants (0.01s)
+=== RUN   TestPLR1AActualBuildsThenBoundaryRefuses
+    pl_r1a_test.go:128: actual pure source must pass foreign pointee write forbidden: time.Location
+--- FAIL: TestPLR1AActualBuildsThenBoundaryRefuses (0.01s)
+=== RUN   TestPLR1BCompiledWriteTargetsAndReasons
+    pl_r1a_test.go:206: actual pure source must pass foreign pointee write forbidden: time.Location
+--- FAIL: TestPLR1BCompiledWriteTargetsAndReasons (0.01s)
+=== RUN   TestReviewR5AllBridgeObjectsAndMethodSets
+    review_census_test.go:21: actual resolved bridge objects: [github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify.CanonicalJSON github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify.CertificateStatus github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify.ContractPin github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify.HistoricalContext github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify.InstalledTrust github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify.KeyGrant github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify.MemberIdentity github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify.NativeChallenge github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify.NewVerifier github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify.OperationBinding github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify.Packet github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify.PublicationStatus github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify.Report github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify.TrustedContext github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify.Verifier github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify.Verifier.Verify github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify.VerifierPublication]
+=== RUN   TestReviewR5AllBridgeObjectsAndMethodSets/Packet-named-map
+=== RUN   TestReviewR5AllBridgeObjectsAndMethodSets/Report-named-slice
+=== RUN   TestReviewR5AllBridgeObjectsAndMethodSets/CanonicalJSON-variadic
+=== RUN   TestReviewR5AllBridgeObjectsAndMethodSets/MarshalJSON-InstalledTrust
+=== RUN   TestReviewR5AllBridgeObjectsAndMethodSets/MarshalJSON-*InstalledTrust
+=== RUN   TestReviewR5AllBridgeObjectsAndMethodSets/method-declaration-order-control
+--- PASS: TestReviewR5AllBridgeObjectsAndMethodSets (2.94s)
+    --- PASS: TestReviewR5AllBridgeObjectsAndMethodSets/Packet-named-map (0.35s)
+    --- PASS: TestReviewR5AllBridgeObjectsAndMethodSets/Report-named-slice (0.33s)
+    --- PASS: TestReviewR5AllBridgeObjectsAndMethodSets/CanonicalJSON-variadic (0.17s)
+    --- PASS: TestReviewR5AllBridgeObjectsAndMethodSets/MarshalJSON-InstalledTrust (0.20s)
+    --- PASS: TestReviewR5AllBridgeObjectsAndMethodSets/MarshalJSON-*InstalledTrust (0.19s)
+    --- PASS: TestReviewR5AllBridgeObjectsAndMethodSets/method-declaration-order-control (0.39s)
+=== RUN   TestReviewR2DistinctMemberBindings
+=== RUN   TestReviewR2DistinctMemberBindings/duplicate-scope-and-DER
+=== RUN   TestReviewR2DistinctMemberBindings/duplicate-canonical-scope
+=== RUN   TestReviewR2DistinctMemberBindings/duplicate-leaf-DER
+=== RUN   TestReviewR2DistinctMemberBindings/distinct-scope-DER-same-SPKI
+--- PASS: TestReviewR2DistinctMemberBindings (0.01s)
+    --- PASS: TestReviewR2DistinctMemberBindings/duplicate-scope-and-DER (0.00s)
+    --- PASS: TestReviewR2DistinctMemberBindings/duplicate-canonical-scope (0.00s)
+    --- PASS: TestReviewR2DistinctMemberBindings/duplicate-leaf-DER (0.00s)
+    --- PASS: TestReviewR2DistinctMemberBindings/distinct-scope-DER-same-SPKI (0.00s)
+=== RUN   TestReviewR3EveryOriginalOperationAndLease
+=== RUN   TestReviewR3EveryOriginalOperationAndLease/three-way-current-original-kept
+=== RUN   TestReviewR3EveryOriginalOperationAndLease/extra-operation-reuses-original-HELD
+=== RUN   TestReviewR3EveryOriginalOperationAndLease/extra-key-ID-mismatch
+=== RUN   TestReviewR3EveryOriginalOperationAndLease/extra-missing-migration
+=== RUN   TestReviewR3EveryOriginalOperationAndLease/extra-zero-fence
+=== RUN   TestReviewR3EveryOriginalOperationAndLease/extra-bad-hash
+=== RUN   TestReviewR3EveryOriginalOperationAndLease/extra-non-UTC
+=== RUN   TestReviewR3EveryOriginalOperationAndLease/extra-reversed-interval
+--- PASS: TestReviewR3EveryOriginalOperationAndLease (0.13s)
+    --- PASS: TestReviewR3EveryOriginalOperationAndLease/three-way-current-original-kept (0.02s)
+    --- PASS: TestReviewR3EveryOriginalOperationAndLease/extra-operation-reuses-original-HELD (0.02s)
+    --- PASS: TestReviewR3EveryOriginalOperationAndLease/extra-key-ID-mismatch (0.01s)
+    --- PASS: TestReviewR3EveryOriginalOperationAndLease/extra-missing-migration (0.02s)
+    --- PASS: TestReviewR3EveryOriginalOperationAndLease/extra-zero-fence (0.02s)
+    --- PASS: TestReviewR3EveryOriginalOperationAndLease/extra-bad-hash (0.01s)
+    --- PASS: TestReviewR3EveryOriginalOperationAndLease/extra-non-UTC (0.02s)
+    --- PASS: TestReviewR3EveryOriginalOperationAndLease/extra-reversed-interval (0.02s)
+=== RUN   TestWholePackageFullUnderlyingCensus
+    source_gate_test.go:457: actual full package: 12 files, input types=13 fields=73 embedded=0 canonicalSHA256=7eee6ccb07b55399adecdd1dc3bb704aeaebc655d5f3739f29a8e5a7aaa4bfdc; same-toolchain immutable baseline
+--- PASS: TestWholePackageFullUnderlyingCensus (1.32s)
+=== RUN   TestCensusMutantsAfterSimulatedRawRepin
+=== RUN   TestCensusMutantsAfterSimulatedRawRepin/G01
+=== RUN   TestCensusMutantsAfterSimulatedRawRepin/G02
+=== RUN   TestCensusMutantsAfterSimulatedRawRepin/G03
+=== RUN   TestCensusMutantsAfterSimulatedRawRepin/G04
+=== RUN   TestCensusMutantsAfterSimulatedRawRepin/G05
+=== RUN   TestCensusMutantsAfterSimulatedRawRepin/G06
+=== RUN   TestCensusMutantsAfterSimulatedRawRepin/G07
+=== RUN   TestCensusMutantsAfterSimulatedRawRepin/G08
+=== RUN   TestCensusMutantsAfterSimulatedRawRepin/R01
+=== RUN   TestCensusMutantsAfterSimulatedRawRepin/R02
+=== RUN   TestCensusMutantsAfterSimulatedRawRepin/R03
+=== RUN   TestCensusMutantsAfterSimulatedRawRepin/cross-file-generic
+--- PASS: TestCensusMutantsAfterSimulatedRawRepin (4.08s)
+    --- PASS: TestCensusMutantsAfterSimulatedRawRepin/G01 (0.20s)
+    --- PASS: TestCensusMutantsAfterSimulatedRawRepin/G02 (0.19s)
+    --- PASS: TestCensusMutantsAfterSimulatedRawRepin/G03 (0.01s)
+    --- PASS: TestCensusMutantsAfterSimulatedRawRepin/G04 (0.18s)
+    --- PASS: TestCensusMutantsAfterSimulatedRawRepin/G05 (0.19s)
+    --- PASS: TestCensusMutantsAfterSimulatedRawRepin/G06 (0.19s)
+    --- PASS: TestCensusMutantsAfterSimulatedRawRepin/G07 (0.02s)
+    --- PASS: TestCensusMutantsAfterSimulatedRawRepin/G08 (0.20s)
+    --- PASS: TestCensusMutantsAfterSimulatedRawRepin/R01 (0.44s)
+    --- PASS: TestCensusMutantsAfterSimulatedRawRepin/R02 (0.48s)
+    --- PASS: TestCensusMutantsAfterSimulatedRawRepin/R03 (0.46s)
+    --- PASS: TestCensusMutantsAfterSimulatedRawRepin/cross-file-generic (0.42s)
+=== RUN   TestRepositoryBoundaryAndZeroEffects
+    source_gate_test.go:537: foreign pointee write forbidden: time.Location
+--- FAIL: TestRepositoryBoundaryAndZeroEffects (0.01s)
+FAIL
+FAIL	github.com/egparadise/SaintVision-Invion/services/node-agent/internal/migrationcontext	16.368s
+FAIL

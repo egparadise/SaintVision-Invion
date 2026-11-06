@@ -1,0 +1,431 @@
+{
+  "classification": "FINAL_LOCAL_TEST_ONLY_CANDIDATE_INDEPENDENT_REVIEW_PENDING",
+  "task": "task_a95ef3d8ccce",
+  "dispatch": "ctx_ed23b4a777d0",
+  "card": "FLEET5-K2A-PL-R1B-20261106",
+  "base": "ac7498e82a0cf17fc95973fe9187aeb51c99d51e",
+  "owner": "Codex",
+  "reviewer": "Claude through Root pending",
+  "rootGrant": "msg_6f62615d78a9",
+  "actualReviewRead": "7d979761e6ee91bba254ea04074a6855429320ab",
+  "goVersion": "go version go1.27.0 windows/amd64",
+  "cgo": "0",
+  "topLevelPass": 18,
+  "subtestPass": 126,
+  "mutantBuildExit0": 54,
+  "intendedNegativeRefusals": 42,
+  "positiveControls": 12,
+  "changedFilesSHA256": {
+    "effect_gate_test.go": "243f68ed28a05959f94f40fb8923b338472f56d3ed6804fc74d2233e1040bf29",
+    "pl_r1a_test.go": "e2552048ea774e6747f5d313e25e9a431e3d8aa570ec53b3ff3240714b9de5d5",
+    "README.md": "010b6f91959cb8d16839ec7367c35a8312e83cd5085d546466605b6ae81102b4"
+  },
+  "finalRequiredProofNames": [
+    "baseline-new-cases-red",
+    "candidate-frozen-full-package",
+    "candidate-frozen-vet",
+    "slice-root-ac7498-baseline-red",
+    "UTC-incdec-UNAVAILABLE-NOT-boundary-proof",
+    "E1-range-actual-build-final",
+    "E1-range-old-full-escape-final",
+    "E1-range-frozen-corrected-full-refusal",
+    "E2-deref-UTC-actual-build-final",
+    "E2-deref-UTC-old-full-escape-final",
+    "E2-deref-UTC-frozen-corrected-full-refusal",
+    "E3-deref-Location-actual-build-final",
+    "E3-deref-Location-old-full-escape-final",
+    "E3-deref-Location-frozen-corrected-full-refusal"
+  ],
+  "allFinalExpectedResultsObserved": true,
+  "initialUnexpectedAttemptsPreserved": [
+    "candidate-full-package: alias diagnostic reason mismatch; 52builds0,2reason assertion fails",
+    "E1-range-old-full-escape: incomplete public archive missing tests/proofs, NOT boundary refusal"
+  ],
+  "actualReasonTable": [
+    {
+      "case": "own-interface-Certificate-Verify",
+      "buildExit": 0,
+      "typecheckExit": 0,
+      "refused": true,
+      "reason": "interface/constraint method must be unexported own object: github.com/egparadise/SaintVision-Invion/services/node-agent/internal/migrationcontext.Probe.Verify"
+    },
+    {
+      "case": "generic-constraint-Certificate-Verify",
+      "buildExit": 0,
+      "typecheckExit": 0,
+      "refused": true,
+      "reason": "interface/constraint method must be unexported own object: github.com/egparadise/SaintVision-Invion/services/node-agent/internal/migrationcontext.Verify"
+    },
+    {
+      "case": "instantiated-generic-interface",
+      "buildExit": 0,
+      "typecheckExit": 0,
+      "refused": true,
+      "reason": "interface/constraint method must be unexported own object: github.com/egparadise/SaintVision-Invion/services/node-agent/internal/migrationcontext.Probe.Verify"
+    },
+    {
+      "case": "own-interface-Time-Local",
+      "buildExit": 0,
+      "typecheckExit": 0,
+      "refused": true,
+      "reason": "interface/constraint method must be unexported own object: github.com/egparadise/SaintVision-Invion/services/node-agent/internal/migrationcontext.Probe.Local"
+    },
+    {
+      "case": "pointer-write-foreign-Local",
+      "buildExit": 0,
+      "typecheckExit": 0,
+      "refused": true,
+      "reason": "foreign package variable read forbidden: time.Local"
+    },
+    {
+      "case": "pointer-address-allowed-read-UTC",
+      "buildExit": 0,
+      "typecheckExit": 0,
+      "refused": true,
+      "reason": "foreign package variable address forbidden: time.UTC"
+    },
+    {
+      "case": "dot-import-foreign-Local-read",
+      "buildExit": 0,
+      "typecheckExit": 0,
+      "refused": true,
+      "reason": "foreign package variable read forbidden: time.Local"
+    },
+    {
+      "case": "dot-import-UTC-write",
+      "buildExit": 0,
+      "typecheckExit": 0,
+      "refused": true,
+      "reason": "foreign state write forbidden: time.UTC"
+    },
+    {
+      "case": "selector-UTC-write-control",
+      "buildExit": 0,
+      "typecheckExit": 0,
+      "refused": true,
+      "reason": "foreign state write forbidden: time.UTC"
+    },
+    {
+      "case": "foreign-interface-alias-transitive-embed",
+      "buildExit": 0,
+      "typecheckExit": 0,
+      "refused": true,
+      "reason": "interface/constraint method must be unexported own object: io.Reader.Read"
+    },
+    {
+      "case": "interface-method-value-control",
+      "buildExit": 0,
+      "typecheckExit": 0,
+      "refused": true,
+      "reason": "interface/constraint method must be unexported own object: github.com/egparadise/SaintVision-Invion/services/node-agent/internal/migrationcontext.Probe.Verify"
+    },
+    {
+      "case": "embedded-concrete-promotion-control",
+      "buildExit": 0,
+      "typecheckExit": 0,
+      "refused": true,
+      "reason": "unreviewed function/method object: crypto/x509.Certificate.Verify"
+    },
+    {
+      "case": "dot-import-clock-control",
+      "buildExit": 0,
+      "typecheckExit": 0,
+      "refused": true,
+      "reason": "unreviewed function/method object: time.Now"
+    },
+    {
+      "case": "package-function-value-control",
+      "buildExit": 0,
+      "typecheckExit": 0,
+      "refused": true,
+      "reason": "unreviewed function/method object: time.Now"
+    },
+    {
+      "case": "defer-clock-control",
+      "buildExit": 0,
+      "typecheckExit": 0,
+      "refused": true,
+      "reason": "unreviewed function/method object: time.Since"
+    },
+    {
+      "case": "closure-value-control",
+      "buildExit": 0,
+      "typecheckExit": 0,
+      "refused": true,
+      "reason": "unresolved/function-value/callback call forbidden"
+    },
+    {
+      "case": "unexported-own-interface-UTC-positive",
+      "buildExit": 0,
+      "typecheckExit": 0,
+      "refused": false,
+      "reason": "<nil>"
+    },
+    {
+      "case": "unexported-generic-constraint-positive",
+      "buildExit": 0,
+      "typecheckExit": 0,
+      "refused": false,
+      "reason": "<nil>"
+    },
+    {
+      "case": "E1-range-UTC",
+      "buildExit": 0,
+      "typecheckExit": 0,
+      "refused": true,
+      "reason": "foreign state write forbidden: time.UTC"
+    },
+    {
+      "case": "range-dot-UTC",
+      "buildExit": 0,
+      "typecheckExit": 0,
+      "refused": true,
+      "reason": "foreign state write forbidden: time.UTC"
+    },
+    {
+      "case": "E2-deref-UTC",
+      "buildExit": 0,
+      "typecheckExit": 0,
+      "refused": true,
+      "reason": "foreign pointee write forbidden: time.Location"
+    },
+    {
+      "case": "deref-local-pointer-copy",
+      "buildExit": 0,
+      "typecheckExit": 0,
+      "refused": true,
+      "reason": "foreign pointee write forbidden: time.Location"
+    },
+    {
+      "case": "E3-deref-pure-Location",
+      "buildExit": 0,
+      "typecheckExit": 0,
+      "refused": true,
+      "reason": "foreign pointee write forbidden: time.Location"
+    },
+    {
+      "case": "deref-helper-parameter",
+      "buildExit": 0,
+      "typecheckExit": 0,
+      "refused": true,
+      "reason": "foreign pointee write forbidden: time.Location"
+    },
+    {
+      "case": "range-deref-UTC",
+      "buildExit": 0,
+      "typecheckExit": 0,
+      "refused": true,
+      "reason": "foreign pointee write forbidden: time.Location"
+    },
+    {
+      "case": "paren-direct-UTC",
+      "buildExit": 0,
+      "typecheckExit": 0,
+      "refused": true,
+      "reason": "foreign state write forbidden: time.UTC"
+    },
+    {
+      "case": "tuple-direct-UTC",
+      "buildExit": 0,
+      "typecheckExit": 0,
+      "refused": true,
+      "reason": "foreign state write forbidden: time.UTC"
+    },
+    {
+      "case": "select-direct-UTC",
+      "buildExit": 0,
+      "typecheckExit": 0,
+      "refused": true,
+      "reason": "foreign state write forbidden: time.UTC"
+    },
+    {
+      "case": "foreign-pointee-alias",
+      "buildExit": 0,
+      "typecheckExit": 0,
+      "refused": true,
+      "reason": "foreign pointee write forbidden: time.Location"
+    },
+    {
+      "case": "defined-pointer-to-foreign-pointee",
+      "buildExit": 0,
+      "typecheckExit": 0,
+      "refused": true,
+      "reason": "foreign pointee write forbidden: time.Location"
+    },
+    {
+      "case": "index-local-pointer-container",
+      "buildExit": 0,
+      "typecheckExit": 0,
+      "refused": true,
+      "reason": "foreign pointee write forbidden: time.Location"
+    },
+    {
+      "case": "paren-deref-UTC",
+      "buildExit": 0,
+      "typecheckExit": 0,
+      "refused": true,
+      "reason": "foreign pointee write forbidden: time.Location"
+    },
+    {
+      "case": "tuple-deref-UTC",
+      "buildExit": 0,
+      "typecheckExit": 0,
+      "refused": true,
+      "reason": "foreign pointee write forbidden: time.Location"
+    },
+    {
+      "case": "select-deref-UTC",
+      "buildExit": 0,
+      "typecheckExit": 0,
+      "refused": true,
+      "reason": "foreign pointee write forbidden: time.Location"
+    },
+    {
+      "case": "implicit-selector-foreign-pointer",
+      "buildExit": 0,
+      "typecheckExit": 0,
+      "refused": true,
+      "reason": "foreign pointee write forbidden: crypto/x509.Certificate"
+    },
+    {
+      "case": "explicit-selector-foreign-pointer",
+      "buildExit": 0,
+      "typecheckExit": 0,
+      "refused": true,
+      "reason": "foreign pointee write forbidden: crypto/x509.Certificate"
+    },
+    {
+      "case": "own-root-foreign-pointer-field",
+      "buildExit": 0,
+      "typecheckExit": 0,
+      "refused": true,
+      "reason": "foreign pointee write forbidden: crypto/x509.Certificate"
+    },
+    {
+      "case": "promoted-foreign-pointer-field",
+      "buildExit": 0,
+      "typecheckExit": 0,
+      "refused": true,
+      "reason": "foreign pointee write forbidden: crypto/x509.Certificate"
+    },
+    {
+      "case": "compound-foreign-selector",
+      "buildExit": 0,
+      "typecheckExit": 0,
+      "refused": true,
+      "reason": "foreign pointee write forbidden: crypto/x509.Certificate"
+    },
+    {
+      "case": "incdec-foreign-selector",
+      "buildExit": 0,
+      "typecheckExit": 0,
+      "refused": true,
+      "reason": "foreign pointee write forbidden: crypto/x509.Certificate"
+    },
+    {
+      "case": "range-key-foreign-selector",
+      "buildExit": 0,
+      "typecheckExit": 0,
+      "refused": true,
+      "reason": "foreign pointee write forbidden: crypto/x509.Certificate"
+    },
+    {
+      "case": "index-base-foreign-pointer",
+      "buildExit": 0,
+      "typecheckExit": 0,
+      "refused": true,
+      "reason": "foreign pointee write forbidden: crypto/x509.Certificate"
+    },
+    {
+      "case": "unnamed-array-pointer-conservative",
+      "buildExit": 0,
+      "typecheckExit": 0,
+      "refused": true,
+      "reason": "foreign pointee write forbidden: [1]int"
+    },
+    {
+      "case": "slice-root-foreign-pointee",
+      "buildExit": 0,
+      "typecheckExit": 0,
+      "refused": true,
+      "reason": "foreign pointee write forbidden: crypto/ed25519.PrivateKey"
+    },
+    {
+      "case": "UTC-pure-compare",
+      "buildExit": 0,
+      "typecheckExit": 0,
+      "refused": false,
+      "reason": "<nil>"
+    },
+    {
+      "case": "own-var-range-assignment",
+      "buildExit": 0,
+      "typecheckExit": 0,
+      "refused": false,
+      "reason": "<nil>"
+    },
+    {
+      "case": "local-var-range-assignment",
+      "buildExit": 0,
+      "typecheckExit": 0,
+      "refused": false,
+      "reason": "<nil>"
+    },
+    {
+      "case": "local-range-definition",
+      "buildExit": 0,
+      "typecheckExit": 0,
+      "refused": false,
+      "reason": "<nil>"
+    },
+    {
+      "case": "own-pointer-local-mutation",
+      "buildExit": 0,
+      "typecheckExit": 0,
+      "refused": false,
+      "reason": "<nil>"
+    },
+    {
+      "case": "own-array-pointer-index",
+      "buildExit": 0,
+      "typecheckExit": 0,
+      "refused": false,
+      "reason": "<nil>"
+    },
+    {
+      "case": "own-scalar-pointer-incdec",
+      "buildExit": 0,
+      "typecheckExit": 0,
+      "refused": false,
+      "reason": "<nil>"
+    },
+    {
+      "case": "own-alias-pointer",
+      "buildExit": 0,
+      "typecheckExit": 0,
+      "refused": false,
+      "reason": "<nil>"
+    },
+    {
+      "case": "local-foreign-value-copy",
+      "buildExit": 0,
+      "typecheckExit": 0,
+      "refused": false,
+      "reason": "<nil>"
+    },
+    {
+      "case": "slice-root-local-value",
+      "buildExit": 0,
+      "typecheckExit": 0,
+      "refused": false,
+      "reason": "<nil>"
+    }
+  ],
+  "localRace": "NOT_RUN_CGO0",
+  "provisionedLAN": "NOT_RUN_NO_DOCKER",
+  "stage2Standalone": "NOT_RERUN_UNCHANGED_BYTES_PROVED",
+  "runtime40Cases": "NOT_RUN",
+  "authClockCurrentEffectsInstall": "NULL_HOLD_ABSENT",
+  "wholeFIVE": "INCOMPLETE",
+  "observedKST": "2026-11-06T18:02:29.500240+09:00"
+}

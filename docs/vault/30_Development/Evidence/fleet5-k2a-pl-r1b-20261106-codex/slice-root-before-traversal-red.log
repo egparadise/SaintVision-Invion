@@ -1,0 +1,14 @@
+=== RUN   TestPLR1BCompiledWriteTargetsAndReasons
+=== RUN   TestPLR1BCompiledWriteTargetsAndReasons/slice-root-foreign-pointee
+    pl_r1a_test.go:292: actual go build -p=1 ./internal/migrationcontext exit0; mutant body NOT executed
+    pl_r1a_test.go:298: REASON case=slice-root-foreign-pointee build=0 typecheck=0 refused=false reason=<nil>
+    pl_r1a_test.go:298: want intended refusal prefixes=["foreign pointee write forbidden: crypto/ed25519.PrivateKey"], got=<nil>
+=== RUN   TestPLR1BCompiledWriteTargetsAndReasons/slice-root-local-value
+    pl_r1a_test.go:292: actual go build -p=1 ./internal/migrationcontext exit0; mutant body NOT executed
+    pl_r1a_test.go:298: REASON case=slice-root-local-value build=0 typecheck=0 refused=false reason=<nil>
+--- FAIL: TestPLR1BCompiledWriteTargetsAndReasons (3.74s)
+    --- FAIL: TestPLR1BCompiledWriteTargetsAndReasons/slice-root-foreign-pointee (1.50s)
+    --- PASS: TestPLR1BCompiledWriteTargetsAndReasons/slice-root-local-value (1.42s)
+FAIL
+FAIL	github.com/egparadise/SaintVision-Invion/services/node-agent/internal/migrationcontext	5.016s
+FAIL

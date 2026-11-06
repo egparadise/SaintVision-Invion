@@ -1,0 +1,256 @@
+=== RUN   TestNullPortsAndOpaqueBoundary
+--- PASS: TestNullPortsAndOpaqueBoundary (0.00s)
+=== RUN   TestWellFormedUnregisteredProvidersNeverAuthenticate
+--- PASS: TestWellFormedUnregisteredProvidersNeverAuthenticate (0.00s)
+=== RUN   TestAlreadyBoundSyntheticOriginalSelectorAndFreeze
+--- PASS: TestAlreadyBoundSyntheticOriginalSelectorAndFreeze (0.00s)
+=== RUN   TestCopyRejectsCallbacksAndBoundsBeforeEncoding
+--- PASS: TestCopyRejectsCallbacksAndBoundsBeforeEncoding (0.00s)
+=== RUN   TestAlreadyBoundCurrentStatusAgeAndRefusalIsolation
+--- PASS: TestAlreadyBoundCurrentStatusAgeAndRefusalIsolation (0.00s)
+=== RUN   TestSyntheticClockEnvelopeAndCompleteOutput
+--- PASS: TestSyntheticClockEnvelopeAndCompleteOutput (0.00s)
+=== RUN   TestAlreadyBoundSyntheticCryptoHistoryEndpoints
+    crypto_history_test.go:93: SYNTHETIC auth bypass only: L/U/t0 full-report equal, records=195 proofs=112 signatures=227
+=== RUN   TestAlreadyBoundSyntheticCryptoHistoryEndpoints/current-selector
+=== RUN   TestAlreadyBoundSyntheticCryptoHistoryEndpoints/publication-revoked
+=== RUN   TestAlreadyBoundSyntheticCryptoHistoryEndpoints/certificate-revoked
+=== RUN   TestAlreadyBoundSyntheticCryptoHistoryEndpoints/upper-endpoint-expiry
+=== RUN   TestAlreadyBoundSyntheticCryptoHistoryEndpoints/raw-proof-corruption
+--- PASS: TestAlreadyBoundSyntheticCryptoHistoryEndpoints (4.83s)
+    --- PASS: TestAlreadyBoundSyntheticCryptoHistoryEndpoints/current-selector (0.01s)
+    --- PASS: TestAlreadyBoundSyntheticCryptoHistoryEndpoints/publication-revoked (0.01s)
+    --- PASS: TestAlreadyBoundSyntheticCryptoHistoryEndpoints/certificate-revoked (0.01s)
+    --- PASS: TestAlreadyBoundSyntheticCryptoHistoryEndpoints/upper-endpoint-expiry (1.03s)
+    --- PASS: TestAlreadyBoundSyntheticCryptoHistoryEndpoints/raw-proof-corruption (0.69s)
+=== RUN   TestAlreadyBoundPolicyJoinsDoNotAuthenticate
+=== RUN   TestAlreadyBoundPolicyJoinsDoNotAuthenticate/wrong-executable
+=== RUN   TestAlreadyBoundPolicyJoinsDoNotAuthenticate/archive-is-not-executable
+=== RUN   TestAlreadyBoundPolicyJoinsDoNotAuthenticate/review-scope
+=== RUN   TestAlreadyBoundPolicyJoinsDoNotAuthenticate/review-target
+=== RUN   TestAlreadyBoundPolicyJoinsDoNotAuthenticate/ci-run
+=== RUN   TestAlreadyBoundPolicyJoinsDoNotAuthenticate/wrong-node-DER
+=== RUN   TestAlreadyBoundPolicyJoinsDoNotAuthenticate/wrong-node-grant
+--- PASS: TestAlreadyBoundPolicyJoinsDoNotAuthenticate (0.02s)
+    --- PASS: TestAlreadyBoundPolicyJoinsDoNotAuthenticate/wrong-executable (0.00s)
+    --- PASS: TestAlreadyBoundPolicyJoinsDoNotAuthenticate/archive-is-not-executable (0.00s)
+    --- PASS: TestAlreadyBoundPolicyJoinsDoNotAuthenticate/review-scope (0.00s)
+    --- PASS: TestAlreadyBoundPolicyJoinsDoNotAuthenticate/review-target (0.00s)
+    --- PASS: TestAlreadyBoundPolicyJoinsDoNotAuthenticate/ci-run (0.00s)
+    --- PASS: TestAlreadyBoundPolicyJoinsDoNotAuthenticate/wrong-node-DER (0.00s)
+    --- PASS: TestAlreadyBoundPolicyJoinsDoNotAuthenticate/wrong-node-grant (0.00s)
+=== RUN   TestResolvedObjectEffectBoundary
+--- PASS: TestResolvedObjectEffectBoundary (2.46s)
+=== RUN   TestReviewR1CompileValidEffectAndAliasMutants
+=== RUN   TestReviewR1CompileValidEffectAndAliasMutants/aliased-time-Since
+=== RUN   TestReviewR1CompileValidEffectAndAliasMutants/aliased-time-Now
+=== RUN   TestReviewR1CompileValidEffectAndAliasMutants/aliased-time-Until
+=== RUN   TestReviewR1CompileValidEffectAndAliasMutants/function-alias-clock
+=== RUN   TestReviewR1CompileValidEffectAndAliasMutants/time-After
+=== RUN   TestReviewR1CompileValidEffectAndAliasMutants/time-AfterFunc
+=== RUN   TestReviewR1CompileValidEffectAndAliasMutants/time-NewTimer
+=== RUN   TestReviewR1CompileValidEffectAndAliasMutants/time-NewTicker
+=== RUN   TestReviewR1CompileValidEffectAndAliasMutants/time-Tick
+=== RUN   TestReviewR1CompileValidEffectAndAliasMutants/aliased-seed
+=== RUN   TestReviewR1CompileValidEffectAndAliasMutants/aliased-generate
+=== RUN   TestReviewR1CompileValidEffectAndAliasMutants/aliased-sign
+=== RUN   TestReviewR1CompileValidEffectAndAliasMutants/create-certificate
+=== RUN   TestReviewR1CompileValidEffectAndAliasMutants/certificate-ambient-Verify
+=== RUN   TestReviewR1CompileValidEffectAndAliasMutants/certificate-method-expression
+=== RUN   TestReviewR1CompileValidEffectAndAliasMutants/system-roots
+=== RUN   TestReviewR1CompileValidEffectAndAliasMutants/unreviewed-pure-strings
+=== RUN   TestReviewR1CompileValidEffectAndAliasMutants/bodyless
+=== RUN   TestReviewR1CompileValidEffectAndAliasMutants/builtin-output
+=== RUN   TestReviewR1CompileValidEffectAndAliasMutants/asynchronous-execution
+=== RUN   TestReviewR1CompileValidEffectAndAliasMutants/linkname
+=== RUN   TestReviewR1CompileValidEffectAndAliasMutants/pure-alias-control
+=== RUN   TestReviewR1CompileValidEffectAndAliasMutants/native.s
+=== RUN   TestReviewR1CompileValidEffectAndAliasMutants/native.S
+=== RUN   TestReviewR1CompileValidEffectAndAliasMutants/native.syso
+=== RUN   TestReviewR1CompileValidEffectAndAliasMutants/native.c
+=== RUN   TestReviewR1CompileValidEffectAndAliasMutants/native.h
+=== RUN   TestReviewR1CompileValidEffectAndAliasMutants/native.cc
+=== RUN   TestReviewR1CompileValidEffectAndAliasMutants/native.o
+=== RUN   TestReviewR1CompileValidEffectAndAliasMutants/assembly-compiles-but-refuses
+--- PASS: TestReviewR1CompileValidEffectAndAliasMutants (0.62s)
+    --- PASS: TestReviewR1CompileValidEffectAndAliasMutants/aliased-time-Since (0.01s)
+    --- PASS: TestReviewR1CompileValidEffectAndAliasMutants/aliased-time-Now (0.01s)
+    --- PASS: TestReviewR1CompileValidEffectAndAliasMutants/aliased-time-Until (0.01s)
+    --- PASS: TestReviewR1CompileValidEffectAndAliasMutants/function-alias-clock (0.01s)
+    --- PASS: TestReviewR1CompileValidEffectAndAliasMutants/time-After (0.01s)
+    --- PASS: TestReviewR1CompileValidEffectAndAliasMutants/time-AfterFunc (0.01s)
+    --- PASS: TestReviewR1CompileValidEffectAndAliasMutants/time-NewTimer (0.01s)
+    --- PASS: TestReviewR1CompileValidEffectAndAliasMutants/time-NewTicker (0.01s)
+    --- PASS: TestReviewR1CompileValidEffectAndAliasMutants/time-Tick (0.01s)
+    --- PASS: TestReviewR1CompileValidEffectAndAliasMutants/aliased-seed (0.01s)
+    --- PASS: TestReviewR1CompileValidEffectAndAliasMutants/aliased-generate (0.01s)
+    --- PASS: TestReviewR1CompileValidEffectAndAliasMutants/aliased-sign (0.01s)
+    --- PASS: TestReviewR1CompileValidEffectAndAliasMutants/create-certificate (0.01s)
+    --- PASS: TestReviewR1CompileValidEffectAndAliasMutants/certificate-ambient-Verify (0.01s)
+    --- PASS: TestReviewR1CompileValidEffectAndAliasMutants/certificate-method-expression (0.01s)
+    --- PASS: TestReviewR1CompileValidEffectAndAliasMutants/system-roots (0.01s)
+    --- PASS: TestReviewR1CompileValidEffectAndAliasMutants/unreviewed-pure-strings (0.01s)
+    --- PASS: TestReviewR1CompileValidEffectAndAliasMutants/bodyless (0.01s)
+    --- PASS: TestReviewR1CompileValidEffectAndAliasMutants/builtin-output (0.01s)
+    --- PASS: TestReviewR1CompileValidEffectAndAliasMutants/asynchronous-execution (0.01s)
+    --- PASS: TestReviewR1CompileValidEffectAndAliasMutants/linkname (0.01s)
+    --- PASS: TestReviewR1CompileValidEffectAndAliasMutants/pure-alias-control (0.01s)
+    --- PASS: TestReviewR1CompileValidEffectAndAliasMutants/native.s (0.01s)
+    --- PASS: TestReviewR1CompileValidEffectAndAliasMutants/native.S (0.01s)
+    --- PASS: TestReviewR1CompileValidEffectAndAliasMutants/native.syso (0.01s)
+    --- PASS: TestReviewR1CompileValidEffectAndAliasMutants/native.c (0.01s)
+    --- PASS: TestReviewR1CompileValidEffectAndAliasMutants/native.h (0.01s)
+    --- PASS: TestReviewR1CompileValidEffectAndAliasMutants/native.cc (0.01s)
+    --- PASS: TestReviewR1CompileValidEffectAndAliasMutants/native.o (0.01s)
+    --- PASS: TestReviewR1CompileValidEffectAndAliasMutants/assembly-compiles-but-refuses (0.29s)
+=== RUN   TestPLR1AActualBuildsThenBoundaryRefuses
+=== RUN   TestPLR1AActualBuildsThenBoundaryRefuses/own-interface-Certificate-Verify
+    pl_r1a_test.go:140: actual go build -p=1 ./internal/migrationcontext exit0; mutant body NOT executed
+    pl_r1a_test.go:149: resolved gate refused=true after actual build exit0
+=== RUN   TestPLR1AActualBuildsThenBoundaryRefuses/generic-constraint-Certificate-Verify
+    pl_r1a_test.go:140: actual go build -p=1 ./internal/migrationcontext exit0; mutant body NOT executed
+    pl_r1a_test.go:149: resolved gate refused=true after actual build exit0
+=== RUN   TestPLR1AActualBuildsThenBoundaryRefuses/instantiated-generic-interface
+    pl_r1a_test.go:140: actual go build -p=1 ./internal/migrationcontext exit0; mutant body NOT executed
+    pl_r1a_test.go:149: resolved gate refused=true after actual build exit0
+=== RUN   TestPLR1AActualBuildsThenBoundaryRefuses/own-interface-Time-Local
+    pl_r1a_test.go:140: actual go build -p=1 ./internal/migrationcontext exit0; mutant body NOT executed
+    pl_r1a_test.go:149: resolved gate refused=true after actual build exit0
+=== RUN   TestPLR1AActualBuildsThenBoundaryRefuses/pointer-write-foreign-Local
+    pl_r1a_test.go:140: actual go build -p=1 ./internal/migrationcontext exit0; mutant body NOT executed
+    pl_r1a_test.go:149: resolved gate refused=true after actual build exit0
+=== RUN   TestPLR1AActualBuildsThenBoundaryRefuses/pointer-address-allowed-read-UTC
+    pl_r1a_test.go:140: actual go build -p=1 ./internal/migrationcontext exit0; mutant body NOT executed
+    pl_r1a_test.go:149: resolved gate refused=true after actual build exit0
+=== RUN   TestPLR1AActualBuildsThenBoundaryRefuses/dot-import-foreign-Local-read
+    pl_r1a_test.go:140: actual go build -p=1 ./internal/migrationcontext exit0; mutant body NOT executed
+    pl_r1a_test.go:149: resolved gate refused=true after actual build exit0
+=== RUN   TestPLR1AActualBuildsThenBoundaryRefuses/dot-import-UTC-write
+    pl_r1a_test.go:140: actual go build -p=1 ./internal/migrationcontext exit0; mutant body NOT executed
+    pl_r1a_test.go:149: resolved gate refused=true after actual build exit0
+=== RUN   TestPLR1AActualBuildsThenBoundaryRefuses/selector-UTC-write-control
+    pl_r1a_test.go:140: actual go build -p=1 ./internal/migrationcontext exit0; mutant body NOT executed
+    pl_r1a_test.go:149: resolved gate refused=true after actual build exit0
+=== RUN   TestPLR1AActualBuildsThenBoundaryRefuses/foreign-interface-alias-transitive-embed
+    pl_r1a_test.go:140: actual go build -p=1 ./internal/migrationcontext exit0; mutant body NOT executed
+    pl_r1a_test.go:149: resolved gate refused=true after actual build exit0
+=== RUN   TestPLR1AActualBuildsThenBoundaryRefuses/interface-method-value-control
+    pl_r1a_test.go:140: actual go build -p=1 ./internal/migrationcontext exit0; mutant body NOT executed
+    pl_r1a_test.go:149: resolved gate refused=true after actual build exit0
+=== RUN   TestPLR1AActualBuildsThenBoundaryRefuses/embedded-concrete-promotion-control
+    pl_r1a_test.go:140: actual go build -p=1 ./internal/migrationcontext exit0; mutant body NOT executed
+    pl_r1a_test.go:149: resolved gate refused=true after actual build exit0
+=== RUN   TestPLR1AActualBuildsThenBoundaryRefuses/dot-import-clock-control
+    pl_r1a_test.go:140: actual go build -p=1 ./internal/migrationcontext exit0; mutant body NOT executed
+    pl_r1a_test.go:149: resolved gate refused=true after actual build exit0
+=== RUN   TestPLR1AActualBuildsThenBoundaryRefuses/package-function-value-control
+    pl_r1a_test.go:140: actual go build -p=1 ./internal/migrationcontext exit0; mutant body NOT executed
+    pl_r1a_test.go:149: resolved gate refused=true after actual build exit0
+=== RUN   TestPLR1AActualBuildsThenBoundaryRefuses/defer-clock-control
+    pl_r1a_test.go:140: actual go build -p=1 ./internal/migrationcontext exit0; mutant body NOT executed
+    pl_r1a_test.go:149: resolved gate refused=true after actual build exit0
+=== RUN   TestPLR1AActualBuildsThenBoundaryRefuses/closure-value-control
+    pl_r1a_test.go:140: actual go build -p=1 ./internal/migrationcontext exit0; mutant body NOT executed
+    pl_r1a_test.go:149: resolved gate refused=true after actual build exit0
+=== RUN   TestPLR1AActualBuildsThenBoundaryRefuses/unexported-own-interface-UTC-positive
+    pl_r1a_test.go:140: actual go build -p=1 ./internal/migrationcontext exit0; mutant body NOT executed
+    pl_r1a_test.go:149: resolved gate refused=false after actual build exit0
+=== RUN   TestPLR1AActualBuildsThenBoundaryRefuses/unexported-generic-constraint-positive
+    pl_r1a_test.go:140: actual go build -p=1 ./internal/migrationcontext exit0; mutant body NOT executed
+    pl_r1a_test.go:149: resolved gate refused=false after actual build exit0
+--- PASS: TestPLR1AActualBuildsThenBoundaryRefuses (25.92s)
+    --- PASS: TestPLR1AActualBuildsThenBoundaryRefuses/own-interface-Certificate-Verify (1.53s)
+    --- PASS: TestPLR1AActualBuildsThenBoundaryRefuses/generic-constraint-Certificate-Verify (1.50s)
+    --- PASS: TestPLR1AActualBuildsThenBoundaryRefuses/instantiated-generic-interface (1.44s)
+    --- PASS: TestPLR1AActualBuildsThenBoundaryRefuses/own-interface-Time-Local (1.44s)
+    --- PASS: TestPLR1AActualBuildsThenBoundaryRefuses/pointer-write-foreign-Local (1.47s)
+    --- PASS: TestPLR1AActualBuildsThenBoundaryRefuses/pointer-address-allowed-read-UTC (1.39s)
+    --- PASS: TestPLR1AActualBuildsThenBoundaryRefuses/dot-import-foreign-Local-read (1.40s)
+    --- PASS: TestPLR1AActualBuildsThenBoundaryRefuses/dot-import-UTC-write (1.51s)
+    --- PASS: TestPLR1AActualBuildsThenBoundaryRefuses/selector-UTC-write-control (1.39s)
+    --- PASS: TestPLR1AActualBuildsThenBoundaryRefuses/foreign-interface-alias-transitive-embed (1.41s)
+    --- PASS: TestPLR1AActualBuildsThenBoundaryRefuses/interface-method-value-control (1.47s)
+    --- PASS: TestPLR1AActualBuildsThenBoundaryRefuses/embedded-concrete-promotion-control (1.43s)
+    --- PASS: TestPLR1AActualBuildsThenBoundaryRefuses/dot-import-clock-control (1.39s)
+    --- PASS: TestPLR1AActualBuildsThenBoundaryRefuses/package-function-value-control (1.41s)
+    --- PASS: TestPLR1AActualBuildsThenBoundaryRefuses/defer-clock-control (1.46s)
+    --- PASS: TestPLR1AActualBuildsThenBoundaryRefuses/closure-value-control (1.46s)
+    --- PASS: TestPLR1AActualBuildsThenBoundaryRefuses/unexported-own-interface-UTC-positive (1.39s)
+    --- PASS: TestPLR1AActualBuildsThenBoundaryRefuses/unexported-generic-constraint-positive (1.42s)
+=== RUN   TestReviewR5AllBridgeObjectsAndMethodSets
+    review_census_test.go:21: actual resolved bridge objects: [github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify.CanonicalJSON github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify.CertificateStatus github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify.ContractPin github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify.HistoricalContext github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify.InstalledTrust github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify.KeyGrant github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify.MemberIdentity github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify.NativeChallenge github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify.NewVerifier github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify.OperationBinding github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify.Packet github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify.PublicationStatus github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify.Report github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify.TrustedContext github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify.Verifier github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify.Verifier.Verify github.com/egparadise/SaintVision-Invion/services/node-agent/migrationverify.VerifierPublication]
+=== RUN   TestReviewR5AllBridgeObjectsAndMethodSets/Packet-named-map
+=== RUN   TestReviewR5AllBridgeObjectsAndMethodSets/Report-named-slice
+=== RUN   TestReviewR5AllBridgeObjectsAndMethodSets/CanonicalJSON-variadic
+=== RUN   TestReviewR5AllBridgeObjectsAndMethodSets/MarshalJSON-InstalledTrust
+=== RUN   TestReviewR5AllBridgeObjectsAndMethodSets/MarshalJSON-*InstalledTrust
+=== RUN   TestReviewR5AllBridgeObjectsAndMethodSets/method-declaration-order-control
+--- PASS: TestReviewR5AllBridgeObjectsAndMethodSets (3.07s)
+    --- PASS: TestReviewR5AllBridgeObjectsAndMethodSets/Packet-named-map (0.39s)
+    --- PASS: TestReviewR5AllBridgeObjectsAndMethodSets/Report-named-slice (0.34s)
+    --- PASS: TestReviewR5AllBridgeObjectsAndMethodSets/CanonicalJSON-variadic (0.17s)
+    --- PASS: TestReviewR5AllBridgeObjectsAndMethodSets/MarshalJSON-InstalledTrust (0.18s)
+    --- PASS: TestReviewR5AllBridgeObjectsAndMethodSets/MarshalJSON-*InstalledTrust (0.18s)
+    --- PASS: TestReviewR5AllBridgeObjectsAndMethodSets/method-declaration-order-control (0.38s)
+=== RUN   TestReviewR2DistinctMemberBindings
+=== RUN   TestReviewR2DistinctMemberBindings/duplicate-scope-and-DER
+=== RUN   TestReviewR2DistinctMemberBindings/duplicate-canonical-scope
+=== RUN   TestReviewR2DistinctMemberBindings/duplicate-leaf-DER
+=== RUN   TestReviewR2DistinctMemberBindings/distinct-scope-DER-same-SPKI
+--- PASS: TestReviewR2DistinctMemberBindings (0.01s)
+    --- PASS: TestReviewR2DistinctMemberBindings/duplicate-scope-and-DER (0.00s)
+    --- PASS: TestReviewR2DistinctMemberBindings/duplicate-canonical-scope (0.00s)
+    --- PASS: TestReviewR2DistinctMemberBindings/duplicate-leaf-DER (0.00s)
+    --- PASS: TestReviewR2DistinctMemberBindings/distinct-scope-DER-same-SPKI (0.00s)
+=== RUN   TestReviewR3EveryOriginalOperationAndLease
+=== RUN   TestReviewR3EveryOriginalOperationAndLease/three-way-current-original-kept
+=== RUN   TestReviewR3EveryOriginalOperationAndLease/extra-operation-reuses-original-HELD
+=== RUN   TestReviewR3EveryOriginalOperationAndLease/extra-key-ID-mismatch
+=== RUN   TestReviewR3EveryOriginalOperationAndLease/extra-missing-migration
+=== RUN   TestReviewR3EveryOriginalOperationAndLease/extra-zero-fence
+=== RUN   TestReviewR3EveryOriginalOperationAndLease/extra-bad-hash
+=== RUN   TestReviewR3EveryOriginalOperationAndLease/extra-non-UTC
+=== RUN   TestReviewR3EveryOriginalOperationAndLease/extra-reversed-interval
+--- PASS: TestReviewR3EveryOriginalOperationAndLease (0.13s)
+    --- PASS: TestReviewR3EveryOriginalOperationAndLease/three-way-current-original-kept (0.02s)
+    --- PASS: TestReviewR3EveryOriginalOperationAndLease/extra-operation-reuses-original-HELD (0.01s)
+    --- PASS: TestReviewR3EveryOriginalOperationAndLease/extra-key-ID-mismatch (0.01s)
+    --- PASS: TestReviewR3EveryOriginalOperationAndLease/extra-missing-migration (0.01s)
+    --- PASS: TestReviewR3EveryOriginalOperationAndLease/extra-zero-fence (0.02s)
+    --- PASS: TestReviewR3EveryOriginalOperationAndLease/extra-bad-hash (0.02s)
+    --- PASS: TestReviewR3EveryOriginalOperationAndLease/extra-non-UTC (0.02s)
+    --- PASS: TestReviewR3EveryOriginalOperationAndLease/extra-reversed-interval (0.01s)
+=== RUN   TestWholePackageFullUnderlyingCensus
+    source_gate_test.go:457: actual full package: 12 files, input types=13 fields=73 embedded=0 canonicalSHA256=7eee6ccb07b55399adecdd1dc3bb704aeaebc655d5f3739f29a8e5a7aaa4bfdc; same-toolchain immutable baseline
+--- PASS: TestWholePackageFullUnderlyingCensus (1.36s)
+=== RUN   TestCensusMutantsAfterSimulatedRawRepin
+=== RUN   TestCensusMutantsAfterSimulatedRawRepin/G01
+=== RUN   TestCensusMutantsAfterSimulatedRawRepin/G02
+=== RUN   TestCensusMutantsAfterSimulatedRawRepin/G03
+=== RUN   TestCensusMutantsAfterSimulatedRawRepin/G04
+=== RUN   TestCensusMutantsAfterSimulatedRawRepin/G05
+=== RUN   TestCensusMutantsAfterSimulatedRawRepin/G06
+=== RUN   TestCensusMutantsAfterSimulatedRawRepin/G07
+=== RUN   TestCensusMutantsAfterSimulatedRawRepin/G08
+=== RUN   TestCensusMutantsAfterSimulatedRawRepin/R01
+=== RUN   TestCensusMutantsAfterSimulatedRawRepin/R02
+=== RUN   TestCensusMutantsAfterSimulatedRawRepin/R03
+=== RUN   TestCensusMutantsAfterSimulatedRawRepin/cross-file-generic
+--- PASS: TestCensusMutantsAfterSimulatedRawRepin (3.93s)
+    --- PASS: TestCensusMutantsAfterSimulatedRawRepin/G01 (0.20s)
+    --- PASS: TestCensusMutantsAfterSimulatedRawRepin/G02 (0.18s)
+    --- PASS: TestCensusMutantsAfterSimulatedRawRepin/G03 (0.01s)
+    --- PASS: TestCensusMutantsAfterSimulatedRawRepin/G04 (0.18s)
+    --- PASS: TestCensusMutantsAfterSimulatedRawRepin/G05 (0.17s)
+    --- PASS: TestCensusMutantsAfterSimulatedRawRepin/G06 (0.19s)
+    --- PASS: TestCensusMutantsAfterSimulatedRawRepin/G07 (0.01s)
+    --- PASS: TestCensusMutantsAfterSimulatedRawRepin/G08 (0.18s)
+    --- PASS: TestCensusMutantsAfterSimulatedRawRepin/R01 (0.41s)
+    --- PASS: TestCensusMutantsAfterSimulatedRawRepin/R02 (0.42s)
+    --- PASS: TestCensusMutantsAfterSimulatedRawRepin/R03 (0.41s)
+    --- PASS: TestCensusMutantsAfterSimulatedRawRepin/cross-file-generic (0.46s)
+=== RUN   TestRepositoryBoundaryAndZeroEffects
+    source_gate_test.go:725: repo modules=[packages/contracts-go/go.mod services/node-agent/go.mod]; Go files=98; production imports=[services/node-agent/internal/migrationcontext/k1_bridge.go:k1]; test imports=[]; immutable K1 definitions=[services/node-agent/migrationverify/trust.go:NewVerifier services/node-agent/migrationverify/verify.go:Verify services/node-agent/migrationverify/verify.go:VerifyCurrentProjectionSet]; sole bridge sites=[services/node-agent/internal/migrationcontext/k1_bridge.go:InstalledTrust services/node-agent/internal/migrationcontext/k1_bridge.go:TrustedContext services/node-agent/internal/migrationcontext/k1_bridge.go:NewVerifier]
+--- PASS: TestRepositoryBoundaryAndZeroEffects (0.28s)
+PASS
+ok  	github.com/egparadise/SaintVision-Invion/services/node-agent/internal/migrationcontext	44.174s

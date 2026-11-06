@@ -131,8 +131,22 @@ method objects, and refuses exported methods or foreign interface embeddings,
 including aliased/transitive embeddings. Concrete own methods are a separate
 reviewed class. Foreign package-level variable reads permit only the resolved
 current time.UTC binding; taking a foreign package variable address is refused.
-Direct foreign variable writes resolve the same object, including dot imports.
+The PL-R1b candidate checks write targets in assignments (tuple/select-case
+included), range clauses with `=` (not definitions with `:=`), and increment or
+decrement. Direct foreign package variables resolve by object identity, including
+parentheses and dot imports. Targets walk selector/index/slice/parenthesis roots and
+explicit or implicit pointer dereferences, including promoted field paths.
+Pointee writes require an unaliased named type declared in this package; foreign,
+builtin, unnamed or unresolved pointees are conservatively refused even through
+a local pointer, helper parameter or an allowed pure call. Own named pointee
+types and local value/range mutations remain allowed. This type restriction is
+not proof of storage ownership or whole-program pointer/alias provenance.
 These are precise source-defense rules for the reviewed closure and tested attack
 classes, not arbitrary trusted-process isolation or a whole-program effect proof.
-They do not install an authority, provider or positive authentication path. Closure
-of the review finding remains subject to the actual final combined review.
+Implicit argument dispatch through allowed `json.Marshal` (MarshalJSON/MarshalText)
+and argument ownership remain limits (PL-I4), not a general effect/isolation proof.
+They do not install an authority, provider or positive authentication path. The
+actual combined review closed interface class (a); PL-R1b/foreign-write class (b)
+closure remains subject to actual independent narrow review. PL-I1 future factory
+must call checkPolicyBindings before K1; PL-I2 operation-set authentication stays
+with the future archive. No new producer, wire, current view or effect grant.

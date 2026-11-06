@@ -1,0 +1,1633 @@
+{
+  "classification": "PUBLIC_SOURCE_BYTE_EQUALITY_NOT_RUNTIME_INSTALLED_TRUST",
+  "base": "ac7498e82a0cf17fc95973fe9187aeb51c99d51e",
+  "observedKST": "2026-11-06T17:49:40.512699+09:00",
+  "changedNonDocsPaths": [
+    "services/node-agent/internal/migrationcontext/README.md",
+    "services/node-agent/internal/migrationcontext/effect_gate_test.go",
+    "services/node-agent/internal/migrationcontext/pl_r1a_test.go"
+  ],
+  "allRowsEqual": true,
+  "immutableRows": [
+    {
+      "path": "deploy/CONFIGURED-SERVER.md",
+      "mode": "100644",
+      "blob": "52affaff275a6c569715a23758e4218177605dd8",
+      "gitSHA256": "9522e326ab465776605884673a9ad596c0d67d8f53a3abf9b959a4e4ff864232",
+      "workingSHA256": "9522e326ab465776605884673a9ad596c0d67d8f53a3abf9b959a4e4ff864232",
+      "byteEqual": true
+    },
+    {
+      "path": "deploy/Dockerfile.backend",
+      "mode": "100644",
+      "blob": "b3f9d710aa5d26280cff5532b95734efdb0ccfb2",
+      "gitSHA256": "19d588a5b2e4856bc0d89ee0af12973908fcfa8647f9720abd2bcdc8ef25ea1d",
+      "workingSHA256": "19d588a5b2e4856bc0d89ee0af12973908fcfa8647f9720abd2bcdc8ef25ea1d",
+      "byteEqual": true
+    },
+    {
+      "path": "deploy/init-db.sql",
+      "mode": "100644",
+      "blob": "4f8fe2baf39000d82b61bee1ca925d2e9854f5c3",
+      "gitSHA256": "602709b1e4b5a5adeab5d3781db3a63296be5027a4d41953e3c5871909cacf85",
+      "workingSHA256": "602709b1e4b5a5adeab5d3781db3a63296be5027a4d41953e3c5871909cacf85",
+      "byteEqual": true
+    },
+    {
+      "path": "deploy/intranet/README.md",
+      "mode": "100644",
+      "blob": "810290f3a6c93280772c069d50248640224d084d",
+      "gitSHA256": "5cc36215863d4391c0cfacd53edd8ad1203e151d485c4f8110e1e07f47dcfb98",
+      "workingSHA256": "5cc36215863d4391c0cfacd53edd8ad1203e151d485c4f8110e1e07f47dcfb98",
+      "byteEqual": true
+    },
+    {
+      "path": "deploy/intranet/idp-realm.sh",
+      "mode": "100644",
+      "blob": "427ef205cbba1cfec832ce5061d4273b21875086",
+      "gitSHA256": "95d48cb7505a1ba4da37b44db7c303ec12441f112b67ac3138a004e674c26980",
+      "workingSHA256": "95d48cb7505a1ba4da37b44db7c303ec12441f112b67ac3138a004e674c26980",
+      "byteEqual": true
+    },
+    {
+      "path": "deploy/intranet/idp-up.sh",
+      "mode": "100644",
+      "blob": "4e90b56599ce03142c33e09c410838873fb97d30",
+      "gitSHA256": "22ca22a0036290cf43f5de93814c1a5d28a93c07d5422b6297dfe5ceac9d2c3c",
+      "workingSHA256": "22ca22a0036290cf43f5de93814c1a5d28a93c07d5422b6297dfe5ceac9d2c3c",
+      "byteEqual": true
+    },
+    {
+      "path": "deploy/intranet/inventory.example.json",
+      "mode": "100644",
+      "blob": "ee3081d569832b8f01c7076b7d1affc879f40be7",
+      "gitSHA256": "983576a4f87284465bcb79604c8d766f452bafbb1babd7c3534f3184bef10b21",
+      "workingSHA256": "983576a4f87284465bcb79604c8d766f452bafbb1babd7c3534f3184bef10b21",
+      "byteEqual": true
+    },
+    {
+      "path": "deploy/intranet/portal/Dockerfile",
+      "mode": "100644",
+      "blob": "3e067d96bb25c24ddb953c21f1c490cd2092d648",
+      "gitSHA256": "d920d1054ef87d3fa054c08caafb4acfbb6846da23365d1146fced913e25c16e",
+      "workingSHA256": "d920d1054ef87d3fa054c08caafb4acfbb6846da23365d1146fced913e25c16e",
+      "byteEqual": true
+    },
+    {
+      "path": "deploy/intranet/portal/Dockerfile.dockerignore",
+      "mode": "100644",
+      "blob": "f1925f2d5d91a2b7d1e8f992f57f89b53866f1ff",
+      "gitSHA256": "b8b0319ca75fc360fb7a3198d402f8fd05c5912e70ec73ce9546b508ee150ff6",
+      "workingSHA256": "b8b0319ca75fc360fb7a3198d402f8fd05c5912e70ec73ce9546b508ee150ff6",
+      "byteEqual": true
+    },
+    {
+      "path": "deploy/intranet/portal/README.md",
+      "mode": "100644",
+      "blob": "924c39d08be460e455354bd73b90e4d6b7eda1ba",
+      "gitSHA256": "8a4f5cab27d899a59ff62f1da4e59ae24fb592bc97d3fd16e5be553daff94a53",
+      "workingSHA256": "8a4f5cab27d899a59ff62f1da4e59ae24fb592bc97d3fd16e5be553daff94a53",
+      "byteEqual": true
+    },
+    {
+      "path": "deploy/intranet/portal/auth-config.js",
+      "mode": "100644",
+      "blob": "62a396a8294b7556cf6aaa575c6d5d9b8a425a6d",
+      "gitSHA256": "535736a3218a789ab8a4ba1b60694c06e0f32f0acb60f4bbcf010264dc9d88d7",
+      "workingSHA256": "535736a3218a789ab8a4ba1b60694c06e0f32f0acb60f4bbcf010264dc9d88d7",
+      "byteEqual": true
+    },
+    {
+      "path": "deploy/intranet/portal/conf.d/upstream.conf",
+      "mode": "100644",
+      "blob": "118267b25f6c8b0043963e8440ba93687254c814",
+      "gitSHA256": "508bf353bd46e1f3d4b0f2f6089ef4d6995fe444a2ca2111d5feedd9303e3f28",
+      "workingSHA256": "508bf353bd46e1f3d4b0f2f6089ef4d6995fe444a2ca2111d5feedd9303e3f28",
+      "byteEqual": true
+    },
+    {
+      "path": "deploy/intranet/portal/generate-dev-certs.sh",
+      "mode": "100644",
+      "blob": "f59892ebc134122922f86431a6c4a5ee2c2f06c0",
+      "gitSHA256": "2efc479d1ad71e14905df3ad7c0a45b36bffe90d02f8fd700a270ea151a26e45",
+      "workingSHA256": "2efc479d1ad71e14905df3ad7c0a45b36bffe90d02f8fd700a270ea151a26e45",
+      "byteEqual": true
+    },
+    {
+      "path": "deploy/intranet/portal/nginx.conf",
+      "mode": "100644",
+      "blob": "fdd8d6119f6a480d3b7a2106e6b270ec33db3f24",
+      "gitSHA256": "4cb3f8e20312a25d70a64008804025f065df106252c93f4c33ebd4cfa302a2c6",
+      "workingSHA256": "4cb3f8e20312a25d70a64008804025f065df106252c93f4c33ebd4cfa302a2c6",
+      "byteEqual": true
+    },
+    {
+      "path": "deploy/intranet/portal/portal-down.sh",
+      "mode": "100644",
+      "blob": "1808961f3b9d0971c4dd0582ec2183629380da17",
+      "gitSHA256": "ecf8492bb97e88e70b15e3df42514f5315a3d7e4c0ecf3b9632b32dc22d7cf19",
+      "workingSHA256": "ecf8492bb97e88e70b15e3df42514f5315a3d7e4c0ecf3b9632b32dc22d7cf19",
+      "byteEqual": true
+    },
+    {
+      "path": "deploy/intranet/portal/portal-load-release.sh",
+      "mode": "100644",
+      "blob": "6815e102baf9feb733161ac25b1dac19e0bbed05",
+      "gitSHA256": "9f10520623ba7fe710f66e6ba4311eb050df127788bea83502138db04c646292",
+      "workingSHA256": "9f10520623ba7fe710f66e6ba4311eb050df127788bea83502138db04c646292",
+      "byteEqual": true
+    },
+    {
+      "path": "deploy/intranet/portal/portal-release-evidence.schema.json",
+      "mode": "100644",
+      "blob": "87e4bed4ee1b30fc445187211539fd29c1f7e562",
+      "gitSHA256": "63d0269b15c265586ec164f70f1d1add2684f5424ec6ca4fbf4dad05ae00b5d1",
+      "workingSHA256": "63d0269b15c265586ec164f70f1d1add2684f5424ec6ca4fbf4dad05ae00b5d1",
+      "byteEqual": true
+    },
+    {
+      "path": "deploy/intranet/portal/portal-smoke-up.sh",
+      "mode": "100644",
+      "blob": "4b8d09c0dc49d305e6cb1aa4cd77ddda5fe9302f",
+      "gitSHA256": "37df00b18198d22f4bcdbde909ffbd51cbad178af248b44b74087c38b951ec48",
+      "workingSHA256": "37df00b18198d22f4bcdbde909ffbd51cbad178af248b44b74087c38b951ec48",
+      "byteEqual": true
+    },
+    {
+      "path": "deploy/intranet/portal/portal-up.sh",
+      "mode": "100644",
+      "blob": "9e0f2e709c148c33f8ec724249ac95bfa33fa825",
+      "gitSHA256": "39f1144866084485db5bc93f4b017ad520b4d8e0fc296493a7ba92a0b03b4893",
+      "workingSHA256": "39f1144866084485db5bc93f4b017ad520b4d8e0fc296493a7ba92a0b03b4893",
+      "byteEqual": true
+    },
+    {
+      "path": "deploy/intranet/portal/security-headers.conf",
+      "mode": "100644",
+      "blob": "229689ac1bccb4d6c2260774155c9f1a6c22fd61",
+      "gitSHA256": "1365881a4f7a50e65c41d4083735fc547d8e6103439abe3759227b37a87bc731",
+      "workingSHA256": "1365881a4f7a50e65c41d4083735fc547d8e6103439abe3759227b37a87bc731",
+      "byteEqual": true
+    },
+    {
+      "path": "deploy/intranet/reissue-oidc-trust-bundle.sh",
+      "mode": "100644",
+      "blob": "213be3d1d5ce0abebad63466b281e3435b3567fd",
+      "gitSHA256": "77008f92300cf4e3e4c57a6d94604122a5f0dfc53a56912ea9aa594ff87d6686",
+      "workingSHA256": "77008f92300cf4e3e4c57a6d94604122a5f0dfc53a56912ea9aa594ff87d6686",
+      "byteEqual": true
+    },
+    {
+      "path": "deploy/intranet/storage/pitr-policy.json",
+      "mode": "100644",
+      "blob": "6b077472e9a4c9250778bbe0b327e5d47b406e27",
+      "gitSHA256": "efbb68ad79665fece57c59a0b55a77c6489cb077ef598b2d267411c7ce80db4c",
+      "workingSHA256": "efbb68ad79665fece57c59a0b55a77c6489cb077ef598b2d267411c7ce80db4c",
+      "byteEqual": true
+    },
+    {
+      "path": "deploy/intranet/storage/product-policy.json",
+      "mode": "100644",
+      "blob": "ebea51246bf4299695111d851ff1535456204ff6",
+      "gitSHA256": "3d6785e95f3f6db76f741e53d81b7d1913e8c6bd27cfb9633940bb6cec87bada",
+      "workingSHA256": "3d6785e95f3f6db76f741e53d81b7d1913e8c6bd27cfb9633940bb6cec87bada",
+      "byteEqual": true
+    },
+    {
+      "path": "deploy/intranet/storage/provision-minio.sh",
+      "mode": "100644",
+      "blob": "0bc26275947a7a5f22fae1f2ea4ce8a162f76a73",
+      "gitSHA256": "e73d1b37d22fc200162f86b4e8013160c0d0f021cf46f2a9664cc7e7c4d764cd",
+      "workingSHA256": "e73d1b37d22fc200162f86b4e8013160c0d0f021cf46f2a9664cc7e7c4d764cd",
+      "byteEqual": true
+    },
+    {
+      "path": "deploy/intranet/storage/rehearse-pilot-pitr.sh",
+      "mode": "100644",
+      "blob": "32440de20e7b7621c5f89ae2877a8fd04d91adcb",
+      "gitSHA256": "01e1f0bc038eb9a47310c41816f29d8d1f13526e5611e57e91c182421e0125a3",
+      "workingSHA256": "01e1f0bc038eb9a47310c41816f29d8d1f13526e5611e57e91c182421e0125a3",
+      "byteEqual": true
+    },
+    {
+      "path": "deploy/intranet/sv-oidc-trust-bundle.service",
+      "mode": "100644",
+      "blob": "96802f28909233d2e320d892f7dbcf626d7c6872",
+      "gitSHA256": "4edf513a521c7c58a669d47bc4e2cffb063f57779b843a759027cba2fcb99eef",
+      "workingSHA256": "4edf513a521c7c58a669d47bc4e2cffb063f57779b843a759027cba2fcb99eef",
+      "byteEqual": true
+    },
+    {
+      "path": "deploy/intranet/sv-oidc-trust-bundle.timer",
+      "mode": "100644",
+      "blob": "fc0d8af78b56392d9369d73518f7a4a9d6402ce9",
+      "gitSHA256": "16ceaed2807b67398434000773a92bfee3ef6aedf132426bd2316b2d5439393c",
+      "workingSHA256": "16ceaed2807b67398434000773a92bfee3ef6aedf132426bd2316b2d5439393c",
+      "byteEqual": true
+    },
+    {
+      "path": "deploy/lan/Dockerfile.node",
+      "mode": "100644",
+      "blob": "76ffdf54d80485c082de647680711392f5b9bba3",
+      "gitSHA256": "6f750372a41047188260bea2e7f7789d0fd76eddd7525d176fec0b0f2203ff9d",
+      "workingSHA256": "6f750372a41047188260bea2e7f7789d0fd76eddd7525d176fec0b0f2203ff9d",
+      "byteEqual": true
+    },
+    {
+      "path": "deploy/lan/Dockerfile.node.remote",
+      "mode": "100644",
+      "blob": "9139956d1102abe35422b81642c68b6ecd308216",
+      "gitSHA256": "38e3b6ea2d4dcdef6c85108124324bfafd012fcd5119912bf0f61eca9999b1ae",
+      "workingSHA256": "38e3b6ea2d4dcdef6c85108124324bfafd012fcd5119912bf0f61eca9999b1ae",
+      "byteEqual": true
+    },
+    {
+      "path": "deploy/lan/Dockerfile.probe",
+      "mode": "100644",
+      "blob": "85a9f2a19e5243a61a79e23ef73da1da61a80735",
+      "gitSHA256": "6d8606b3c33aa9228477b8111a3caacbb219cd3abafd6a1d0e4da20c75750dbd",
+      "workingSHA256": "6d8606b3c33aa9228477b8111a3caacbb219cd3abafd6a1d0e4da20c75750dbd",
+      "byteEqual": true
+    },
+    {
+      "path": "deploy/lan/Enable-ExecutionTests.ps1",
+      "mode": "100644",
+      "blob": "521ee55573e5740d0bd4de6d1e7b07e26c345ec9",
+      "gitSHA256": "485067ad443ed85a1178aa90d6407db4445f4987d4d1f2712b75d868a4954aa6",
+      "workingSHA256": "485067ad443ed85a1178aa90d6407db4445f4987d4d1f2712b75d868a4954aa6",
+      "byteEqual": true
+    },
+    {
+      "path": "deploy/lan/Enable-Workspace.ps1",
+      "mode": "100644",
+      "blob": "7138f2f20dbfa2b08ea1bd89527ba9a14ae2dabd",
+      "gitSHA256": "3a6c4ea138c2ac9633abfd05ebbed2145ba34dda06b080ea255fbaa24b960673",
+      "workingSHA256": "3a6c4ea138c2ac9633abfd05ebbed2145ba34dda06b080ea255fbaa24b960673",
+      "byteEqual": true
+    },
+    {
+      "path": "deploy/lan/Invoke-ScheduledLeafRenewal.ps1",
+      "mode": "100644",
+      "blob": "46c7efc917451dfa2dfceb3ec39a8f6f9b1bd89a",
+      "gitSHA256": "2f62dec8be50898fa2c628943d5c7d6d12bfdfa0079da16d711dfe1e65dd3717",
+      "workingSHA256": "2f62dec8be50898fa2c628943d5c7d6d12bfdfa0079da16d711dfe1e65dd3717",
+      "byteEqual": true
+    },
+    {
+      "path": "deploy/lan/Prepare-Worker.ps1",
+      "mode": "100644",
+      "blob": "2920add40038deba631ad67eba46513cc67067f2",
+      "gitSHA256": "95361cd51a2b92c28bee9effa092e49666bb3ee9351bb705e83cf43ccd448ea0",
+      "workingSHA256": "95361cd51a2b92c28bee9effa092e49666bb3ee9351bb705e83cf43ccd448ea0",
+      "byteEqual": true
+    },
+    {
+      "path": "deploy/lan/README.md",
+      "mode": "100644",
+      "blob": "e45fb689e5cffb2e7cadbebcc22ab23f07bc498e",
+      "gitSHA256": "3ee37ad59a30f0b93415f47bc821080f5c37d770bfeba058a1cc7d5a0529a093",
+      "workingSHA256": "3ee37ad59a30f0b93415f47bc821080f5c37d770bfeba058a1cc7d5a0529a093",
+      "byteEqual": true
+    },
+    {
+      "path": "deploy/lan/Register-DesktopShortcut.ps1",
+      "mode": "100644",
+      "blob": "9f5d8d7dd3432c4021589a19a325220e432c88c9",
+      "gitSHA256": "fd3b96c855ab67e400c9e676561eb50e0f0800514504f84144c6ada294ce1e2a",
+      "workingSHA256": "fd3b96c855ab67e400c9e676561eb50e0f0800514504f84144c6ada294ce1e2a",
+      "byteEqual": true
+    },
+    {
+      "path": "deploy/lan/Register-LeafRenewalTask.ps1",
+      "mode": "100644",
+      "blob": "60332d50bc8ab0d34c19c9e4d1f22653a20c7a76",
+      "gitSHA256": "013e2a79c86779181cdffeb4e98127b76fd8437d62cce39dcf0a34969d00c7a4",
+      "workingSHA256": "013e2a79c86779181cdffeb4e98127b76fd8437d62cce39dcf0a34969d00c7a4",
+      "byteEqual": true
+    },
+    {
+      "path": "deploy/lan/Repair-Worker.ps1",
+      "mode": "100644",
+      "blob": "38fb4125cba078f798bc1504552f27e324d85609",
+      "gitSHA256": "cdfe372cec46e2a28ef1776837dfc61b0e1d67ce8aa001542c7e706512cbb6dd",
+      "workingSHA256": "cdfe372cec46e2a28ef1776837dfc61b0e1d67ce8aa001542c7e706512cbb6dd",
+      "byteEqual": true
+    },
+    {
+      "path": "deploy/lan/Replace-Storage.ps1",
+      "mode": "100644",
+      "blob": "8cee84bd431f5c8f4359759983f41e49e386d6b6",
+      "gitSHA256": "cbb07e36a3d42caa750170891c05d1a4686608984606acf684bce4cc59343fae",
+      "workingSHA256": "cbb07e36a3d42caa750170891c05d1a4686608984606acf684bce4cc59343fae",
+      "byteEqual": true
+    },
+    {
+      "path": "deploy/lan/Start-LiveConsole.ps1",
+      "mode": "100644",
+      "blob": "0c8ec99a503ac91a0f810b77f7686f6142a7e5e4",
+      "gitSHA256": "89e12c71d4c0a9f496df43ac620f3ab625b9bc62a8ee39fa146aa86a16f5e6ce",
+      "workingSHA256": "89e12c71d4c0a9f496df43ac620f3ab625b9bc62a8ee39fa146aa86a16f5e6ce",
+      "byteEqual": true
+    },
+    {
+      "path": "deploy/lan/Start-Worker.ps1",
+      "mode": "100644",
+      "blob": "90f7a1c1a78c2f8b5ec230e0e6721b5c733d9a21",
+      "gitSHA256": "635a45184c82ce32d2dcf0ce95e8f9e32453e1ac48c5f5604cc771e10ace163e",
+      "workingSHA256": "635a45184c82ce32d2dcf0ce95e8f9e32453e1ac48c5f5604cc771e10ace163e",
+      "byteEqual": true
+    },
+    {
+      "path": "deploy/lan/SvLauncherInput.ps1",
+      "mode": "100644",
+      "blob": "f44244df9c5d5af18e91d5d3947a270740caab18",
+      "gitSHA256": "616ba0e59a294b032be5535b738784402027aeb5103745d89b2a032062a47cb0",
+      "workingSHA256": "616ba0e59a294b032be5535b738784402027aeb5103745d89b2a032062a47cb0",
+      "byteEqual": true
+    },
+    {
+      "path": "deploy/lan/finish-worker.sh",
+      "mode": "100644",
+      "blob": "dc876ed250d8b3c45b9f12527007a67792fde8cd",
+      "gitSHA256": "505ca5e91aba1707cbb3277e3be6ea957694d5b3654e01e5d918617761f1ec92",
+      "workingSHA256": "505ca5e91aba1707cbb3277e3be6ea957694d5b3654e01e5d918617761f1ec92",
+      "byteEqual": true
+    },
+    {
+      "path": "deploy/lan/leaf-rotation-runtime-lock.json",
+      "mode": "100644",
+      "blob": "8c4233eec428bf85712b97ced407f1932ed310d2",
+      "gitSHA256": "06710d854ff52578949249065dd009de6561bc779c4b21c5355262e59a527a8c",
+      "workingSHA256": "06710d854ff52578949249065dd009de6561bc779c4b21c5355262e59a527a8c",
+      "byteEqual": true
+    },
+    {
+      "path": "deploy/lan/leaf_rotation_standalone_runtime.py",
+      "mode": "100644",
+      "blob": "e11a5e50edf7fba1a4df9ec38091cea358ab6f5b",
+      "gitSHA256": "8a509dc2ee25aff9c355d3dadde6da0d245f55a17098cf2b43f4079e6a1e36d8",
+      "workingSHA256": "8a509dc2ee25aff9c355d3dadde6da0d245f55a17098cf2b43f4079e6a1e36d8",
+      "byteEqual": true
+    },
+    {
+      "path": "deploy/lan/peer_policy_phase.py",
+      "mode": "100644",
+      "blob": "052b4a7e156e75a69bc4acf9656c12d25fd5a9d8",
+      "gitSHA256": "8aac0c65fb2a242b08287ba4206e6c7213fc18795903584b5b28abf3a10c17f8",
+      "workingSHA256": "8aac0c65fb2a242b08287ba4206e6c7213fc18795903584b5b28abf3a10c17f8",
+      "byteEqual": true
+    },
+    {
+      "path": "deploy/lan/plain-peer-phase-v3.schema.json",
+      "mode": "100644",
+      "blob": "7758bd18c35a23b10ec6322aa926d0d772ea41bc",
+      "gitSHA256": "dae2246b71e32df4ec3d1eb62f9c3fe01bc0175c0f44aff559fc40881b7f1cde",
+      "workingSHA256": "dae2246b71e32df4ec3d1eb62f9c3fe01bc0175c0f44aff559fc40881b7f1cde",
+      "byteEqual": true
+    },
+    {
+      "path": "deploy/lan/prepare-leaf-rotation-runtime.sh",
+      "mode": "100755",
+      "blob": "94194121aab7e1642f600a9be50f3ec07e361e1e",
+      "gitSHA256": "36c8496c425d9074ca4fdeca1254c2fd69a813c0cf5227c1fc4118aacd7fc77b",
+      "workingSHA256": "36c8496c425d9074ca4fdeca1254c2fd69a813c0cf5227c1fc4118aacd7fc77b",
+      "byteEqual": true
+    },
+    {
+      "path": "deploy/lan/prepare-pilot-database.sh",
+      "mode": "100755",
+      "blob": "a5695cab0a955d0aeeedf40f6459458ccef6210a",
+      "gitSHA256": "60bebe1164e60242b56578b6afda468ca0ff3565662fce644a86472e41cd2266",
+      "workingSHA256": "60bebe1164e60242b56578b6afda468ca0ff3565662fce644a86472e41cd2266",
+      "byteEqual": true
+    },
+    {
+      "path": "deploy/lan/prepare-worker.sh",
+      "mode": "100644",
+      "blob": "eff077df50f7bfbdeef937d7b404d9cba3eea8d0",
+      "gitSHA256": "f82767d7c5db5b24937e2b3084692d55cdc0182ed9c92b1f3c5430b4c6372dcd",
+      "workingSHA256": "f82767d7c5db5b24937e2b3084692d55cdc0182ed9c92b1f3c5430b4c6372dcd",
+      "byteEqual": true
+    },
+    {
+      "path": "deploy/lan/repair-node.sh",
+      "mode": "100644",
+      "blob": "8598cc8db2e6c80e23d8d46f708654c4b220d4f6",
+      "gitSHA256": "3538d6a20c92cc83736b3cb8413a01aa237d2df7a8d411dce68b3b912010b19b",
+      "workingSHA256": "3538d6a20c92cc83736b3cb8413a01aa237d2df7a8d411dce68b3b912010b19b",
+      "byteEqual": true
+    },
+    {
+      "path": "deploy/lan/start-node.sh",
+      "mode": "100644",
+      "blob": "bd67b7910152a67ea01cf78fc83faf2628efaaa2",
+      "gitSHA256": "4b4acb641510a7b2e283f61ffd11cbd16bacb6e40aff8fe486a9c1af11ebeeb0",
+      "workingSHA256": "4b4acb641510a7b2e283f61ffd11cbd16bacb6e40aff8fe486a9c1af11ebeeb0",
+      "byteEqual": true
+    },
+    {
+      "path": "deploy/lan/verify-pilot-database.sh",
+      "mode": "100644",
+      "blob": "8af8372f312256b453e8908da43b277119dab316",
+      "gitSHA256": "f67e40b3c691427417c48bffab07f0c632c699db275f8b0992225ddd6821bfba",
+      "workingSHA256": "f67e40b3c691427417c48bffab07f0c632c699db275f8b0992225ddd6821bfba",
+      "byteEqual": true
+    },
+    {
+      "path": "deploy/lan/worker_config.py",
+      "mode": "100644",
+      "blob": "e42f017ea011780ee2724866c3b11cdc087d7af6",
+      "gitSHA256": "909d1c25deb61c5c4795af49dab18f5a9722e5cbc1c034a18472b6a4427c192c",
+      "workingSHA256": "909d1c25deb61c5c4795af49dab18f5a9722e5cbc1c034a18472b6a4427c192c",
+      "byteEqual": true
+    },
+    {
+      "path": "deploy/lan/worker_execution.py",
+      "mode": "100644",
+      "blob": "9407f6ad974b8f19daeb75d95fcb1fcbc5465693",
+      "gitSHA256": "be7a72654f34aadda1919e6c3e5e2969db753e4cd0254f0096eaa6b1f8a3934f",
+      "workingSHA256": "be7a72654f34aadda1919e6c3e5e2969db753e4cd0254f0096eaa6b1f8a3934f",
+      "byteEqual": true
+    },
+    {
+      "path": "deploy/lan/worker_leaf_rotation.py",
+      "mode": "100644",
+      "blob": "2a03a3dd9445a51ffc1954a8878498ea51beab0b",
+      "gitSHA256": "4e29685241a3e625e59aa64bcff07bdd69d4b0381c67687706a09fa960f75998",
+      "workingSHA256": "4e29685241a3e625e59aa64bcff07bdd69d4b0381c67687706a09fa960f75998",
+      "byteEqual": true
+    },
+    {
+      "path": "deploy/lan/worker_peer_floor.py",
+      "mode": "100644",
+      "blob": "56fd9fc3c45df97d7c8f2c48ba1cd3efe223fd97",
+      "gitSHA256": "7665735eb5735be9fcb24f783f83ffe087c0d176e464a97df3022a4bd9f35799",
+      "workingSHA256": "7665735eb5735be9fcb24f783f83ffe087c0d176e464a97df3022a4bd9f35799",
+      "byteEqual": true
+    },
+    {
+      "path": "deploy/lan/worker_plain_rotation.py",
+      "mode": "100644",
+      "blob": "b0d01a5f1b12da9f2c9fa0cc562a16a64a497ec4",
+      "gitSHA256": "bf3754a27f748b1dd58a7fc65a1f1831dddae6133f11ae17d0f7bf3ea59c46e5",
+      "workingSHA256": "bf3754a27f748b1dd58a7fc65a1f1831dddae6133f11ae17d0f7bf3ea59c46e5",
+      "byteEqual": true
+    },
+    {
+      "path": "deploy/lan/worker_replace.py",
+      "mode": "100644",
+      "blob": "ac9d55aa27081224a8beb8c761ff04ecffd8134a",
+      "gitSHA256": "c11206224052edec8a05e8b8fc77e2df0320d37b7681afebee67a75aa5439244",
+      "workingSHA256": "c11206224052edec8a05e8b8fc77e2df0320d37b7681afebee67a75aa5439244",
+      "byteEqual": true
+    },
+    {
+      "path": "deploy/lan/worker_replacement.py",
+      "mode": "100644",
+      "blob": "cc08219e81099610a52cd36f225550e76698b227",
+      "gitSHA256": "aed3e41951c4481de3ccc94e3f5d755c11631bb8e0e09f949782288a1b932f67",
+      "workingSHA256": "aed3e41951c4481de3ccc94e3f5d755c11631bb8e0e09f949782288a1b932f67",
+      "byteEqual": true
+    },
+    {
+      "path": "deploy/lan/worker_storage.py",
+      "mode": "100644",
+      "blob": "a7cddd5e783287d9e5d090bf748c3c39b35888d6",
+      "gitSHA256": "ec6bb6d34e57d4024c2879826eef82ffc3e3e6ad39e09dc37b3fe62ff6da1294",
+      "workingSHA256": "ec6bb6d34e57d4024c2879826eef82ffc3e3e6ad39e09dc37b3fe62ff6da1294",
+      "byteEqual": true
+    },
+    {
+      "path": "deploy/lan/worker_storage_bridge.py",
+      "mode": "100644",
+      "blob": "db062b4fcb6f35de4dfdd77fa46276d77a77469b",
+      "gitSHA256": "cbb5c63be37e5bcb932c4d3c3d31f9818cd6c1794e077f2ca02460e148bab95d",
+      "workingSHA256": "cbb5c63be37e5bcb932c4d3c3d31f9818cd6c1794e077f2ca02460e148bab95d",
+      "byteEqual": true
+    },
+    {
+      "path": "deploy/lan/worker_workspace.py",
+      "mode": "100644",
+      "blob": "33fbf2ef8aaa42b5e1384e6c2aa69f867e80cf63",
+      "gitSHA256": "056737f897295e1662b5067a49a4e3f0945ab64536b576ae5cdd972aceef83a1",
+      "workingSHA256": "056737f897295e1662b5067a49a4e3f0945ab64536b576ae5cdd972aceef83a1",
+      "byteEqual": true
+    },
+    {
+      "path": "deploy/remediate-shared-app-role.sql",
+      "mode": "100644",
+      "blob": "338c0c8cd3eeac52bc5337186b7cfdc2151f1615",
+      "gitSHA256": "b3f0e99b48b7776fa3f53ec03856fa50eeaa12782a5b4b77977d2d31042facf8",
+      "workingSHA256": "b3f0e99b48b7776fa3f53ec03856fa50eeaa12782a5b4b77977d2d31042facf8",
+      "byteEqual": true
+    },
+    {
+      "path": "deploy/studio/Agent-Shell.ps1",
+      "mode": "100644",
+      "blob": "9df8a7c7292703fc1b0de3d6c868d910579ab124",
+      "gitSHA256": "fc602df8879a1f72b97fcc6a7375bdc0e172a978e5bfe654918b2dbf987ec053",
+      "workingSHA256": "fc602df8879a1f72b97fcc6a7375bdc0e172a978e5bfe654918b2dbf987ec053",
+      "byteEqual": true
+    },
+    {
+      "path": "deploy/studio/Dockerfile",
+      "mode": "100644",
+      "blob": "13a94f9f2aa0a4065aae67e3e82bbe30784bb140",
+      "gitSHA256": "214ce1e0cb447f996d1b5b05653081b9a54b8dedc7d91e846c4b625133b063f7",
+      "workingSHA256": "214ce1e0cb447f996d1b5b05653081b9a54b8dedc7d91e846c4b625133b063f7",
+      "byteEqual": true
+    },
+    {
+      "path": "deploy/studio/Open-Tool.ps1",
+      "mode": "100644",
+      "blob": "0a215d511c5891e5e312eb6bae5fa3d37769c7a9",
+      "gitSHA256": "cc88c76aeb2398da87b0c3b06bb9a60ecc2778e6b3fb6b554b09975e7a07b594",
+      "workingSHA256": "cc88c76aeb2398da87b0c3b06bb9a60ecc2778e6b3fb6b554b09975e7a07b594",
+      "byteEqual": true
+    },
+    {
+      "path": "deploy/studio/Register-EnvironmentStartup.ps1",
+      "mode": "100644",
+      "blob": "9c871c8d5f89ac5d87106c7ffc888168b4f2639a",
+      "gitSHA256": "df547428122e52631a2c3d11ab52a60c5b21e6dec557cc5c53007b1c2062c9f9",
+      "workingSHA256": "df547428122e52631a2c3d11ab52a60c5b21e6dec557cc5c53007b1c2062c9f9",
+      "byteEqual": true
+    },
+    {
+      "path": "deploy/studio/Setup-DevStudio.ps1",
+      "mode": "100644",
+      "blob": "382faf31428125224aa52900a64770dd9041135d",
+      "gitSHA256": "cb6a100de8eed74304f27d215d96bade637ef605e35e7d28ba49b8e6ca86676d",
+      "workingSHA256": "cb6a100de8eed74304f27d215d96bade637ef605e35e7d28ba49b8e6ca86676d",
+      "byteEqual": true
+    },
+    {
+      "path": "deploy/studio/Start-DevStudio.ps1",
+      "mode": "100644",
+      "blob": "e8ebb7e5ce290f95fbc227375c8210706693e241",
+      "gitSHA256": "fa4438c4ff56a7676936227cfc6966abf7f957ed8411047e9155573c870385ea",
+      "workingSHA256": "fa4438c4ff56a7676936227cfc6966abf7f957ed8411047e9155573c870385ea",
+      "byteEqual": true
+    },
+    {
+      "path": "deploy/studio/Start-Environment.ps1",
+      "mode": "100644",
+      "blob": "13ab60c1e8e20733763b1375e9f8c6eb7ca70abd",
+      "gitSHA256": "e5f42cae38768fb5ca827455a8eac64cc7fe5598d424cc61cca0e09ffff5a707",
+      "workingSHA256": "e5f42cae38768fb5ca827455a8eac64cc7fe5598d424cc61cca0e09ffff5a707",
+      "byteEqual": true
+    },
+    {
+      "path": "deploy/studio/container_worker.py",
+      "mode": "100644",
+      "blob": "6254f2707e7edc787e32a90819102b7826043c82",
+      "gitSHA256": "9f886fe99f23d49e9919d69f568a9cc96ce57fdf29a4cb00a45d8f31ce7b1a4e",
+      "workingSHA256": "9f886fe99f23d49e9919d69f568a9cc96ce57fdf29a4cb00a45d8f31ce7b1a4e",
+      "byteEqual": true
+    },
+    {
+      "path": "deploy/testing/Dockerfile.kernel",
+      "mode": "100644",
+      "blob": "daa6657660cbd01808da7e2669f7a8be66a60c29",
+      "gitSHA256": "4117775e05c304317c42d0d3d79b76ab120a07493ba35ea5a5724383310ff691",
+      "workingSHA256": "4117775e05c304317c42d0d3d79b76ab120a07493ba35ea5a5724383310ff691",
+      "byteEqual": true
+    },
+    {
+      "path": "deploy/testing/Dockerfile.python-node",
+      "mode": "100644",
+      "blob": "6d836d63384a63d5a607c8efd181496e05cf1888",
+      "gitSHA256": "9d2a2590e4dd1821cb3752dbbdd4537c02969c25ceb7425580b1df93a15191f0",
+      "workingSHA256": "9d2a2590e4dd1821cb3752dbbdd4537c02969c25ceb7425580b1df93a15191f0",
+      "byteEqual": true
+    },
+    {
+      "path": "packages/contracts-go/go.mod",
+      "mode": "100644",
+      "blob": "a660fe692511853f41147f7dcf05ba6c7570d983",
+      "gitSHA256": "bb5f6271d1e4cf852c090adc57abaa235afe1c2e7fbfc28240a8fcc12a8804c3",
+      "workingSHA256": "bb5f6271d1e4cf852c090adc57abaa235afe1c2e7fbfc28240a8fcc12a8804c3",
+      "byteEqual": true
+    },
+    {
+      "path": "services/node-agent/go.mod",
+      "mode": "100644",
+      "blob": "3d2eb34ae4b23800f71712e7b4c6e4cdae7c01c8",
+      "gitSHA256": "cea129ad106765ca9942a68241fc8734ed2dfd8efd4dd1ac829328c25ebda990",
+      "workingSHA256": "cea129ad106765ca9942a68241fc8734ed2dfd8efd4dd1ac829328c25ebda990",
+      "byteEqual": true
+    },
+    {
+      "path": "services/node-agent/go.sum",
+      "mode": "100644",
+      "blob": "8fee20f8df677b4a94cb6cfdc7ed2e658daacd84",
+      "gitSHA256": "63c93a009db9ad922511c645e7216a59837b8c33aec5f77a8fab84ba01d0a13d",
+      "workingSHA256": "63c93a009db9ad922511c645e7216a59837b8c33aec5f77a8fab84ba01d0a13d",
+      "byteEqual": true
+    },
+    {
+      "path": "services/node-agent/internal/migrationcontext/boundary_test.go",
+      "mode": "100644",
+      "blob": "bb8ce9c86c919aca27d611fdcc45f7d55b9b8bd9",
+      "gitSHA256": "dc7d53fab00f0d5653a0ac2f446cf3e48f4f98c0e1d3910bb576361e09216199",
+      "workingSHA256": "dc7d53fab00f0d5653a0ac2f446cf3e48f4f98c0e1d3910bb576361e09216199",
+      "byteEqual": true
+    },
+    {
+      "path": "services/node-agent/internal/migrationcontext/clock.go",
+      "mode": "100644",
+      "blob": "af9efbf8af29e19e2633d7ef4fd3a312d77b42ba",
+      "gitSHA256": "fe4e7c75f474d06aee63bd9d343ef7e0414342d3cbe6c75e5aca92c699c496c7",
+      "workingSHA256": "fe4e7c75f474d06aee63bd9d343ef7e0414342d3cbe6c75e5aca92c699c496c7",
+      "byteEqual": true
+    },
+    {
+      "path": "services/node-agent/internal/migrationcontext/crypto_history_test.go",
+      "mode": "100644",
+      "blob": "554e1364eb6366c390958054b2bb62d736b772e2",
+      "gitSHA256": "034f40de23c7be2a11f2a4483d022822c41fa4454b462b68ccfa291764b4c854",
+      "workingSHA256": "034f40de23c7be2a11f2a4483d022822c41fa4454b462b68ccfa291764b4c854",
+      "byteEqual": true
+    },
+    {
+      "path": "services/node-agent/internal/migrationcontext/doc.go",
+      "mode": "100644",
+      "blob": "5df7c4aa9ac4fc672270762914daed5accf123ef",
+      "gitSHA256": "5ff529bc776a7ef507061712744122dfa1e851ff3d5929b441ba2f5f1e0e68ee",
+      "workingSHA256": "5ff529bc776a7ef507061712744122dfa1e851ff3d5929b441ba2f5f1e0e68ee",
+      "byteEqual": true
+    },
+    {
+      "path": "services/node-agent/internal/migrationcontext/errors.go",
+      "mode": "100644",
+      "blob": "f69658086ee839d7d266bad87781c89f27a39469",
+      "gitSHA256": "78abff5a56d3bd9d9114514166464ed05efb81d523ee8146c7b66a5f1f1b1eb6",
+      "workingSHA256": "78abff5a56d3bd9d9114514166464ed05efb81d523ee8146c7b66a5f1f1b1eb6",
+      "byteEqual": true
+    },
+    {
+      "path": "services/node-agent/internal/migrationcontext/history.go",
+      "mode": "100644",
+      "blob": "22d93b5bfce10f25ce8676c884b055816d2da973",
+      "gitSHA256": "6a0bbd8ba8d3ba0b9ddaa79cf6239f247b14b47bd96063982e100dac5c94c951",
+      "workingSHA256": "6a0bbd8ba8d3ba0b9ddaa79cf6239f247b14b47bd96063982e100dac5c94c951",
+      "byteEqual": true
+    },
+    {
+      "path": "services/node-agent/internal/migrationcontext/k1_bridge.go",
+      "mode": "100644",
+      "blob": "178b1f2d28b5587612e34e909e7a0adc6706d804",
+      "gitSHA256": "6fe4729694636c54e231aad80cd12de27383174d1a6cd21840df172112c2ee72",
+      "workingSHA256": "6fe4729694636c54e231aad80cd12de27383174d1a6cd21840df172112c2ee72",
+      "byteEqual": true
+    },
+    {
+      "path": "services/node-agent/internal/migrationcontext/policy.go",
+      "mode": "100644",
+      "blob": "eb906a24e4aa8fc54e7014d9a04668d84854871e",
+      "gitSHA256": "ce6f1b9b1a1835276b248c3dbdb8fa42b68fa79fb5684748ea78694d104bbdd2",
+      "workingSHA256": "ce6f1b9b1a1835276b248c3dbdb8fa42b68fa79fb5684748ea78694d104bbdd2",
+      "byteEqual": true
+    },
+    {
+      "path": "services/node-agent/internal/migrationcontext/ports.go",
+      "mode": "100644",
+      "blob": "a8cc4b7e4492e4a0401f7f9ace7fd55fcf9ec4cb",
+      "gitSHA256": "db7c7e877afc6ee8bbf8ca2e2b6afad3b973a63a624d4bcd6ee2ad5ce649fb95",
+      "workingSHA256": "db7c7e877afc6ee8bbf8ca2e2b6afad3b973a63a624d4bcd6ee2ad5ce649fb95",
+      "byteEqual": true
+    },
+    {
+      "path": "services/node-agent/internal/migrationcontext/review_census_test.go",
+      "mode": "100644",
+      "blob": "1d81c8c69d7c9a26d7b8c4870622f9f0fb812a7e",
+      "gitSHA256": "62e262d58be3efac1a6eecb478b0d752069156a932ded372c4840cde874e584c",
+      "workingSHA256": "62e262d58be3efac1a6eecb478b0d752069156a932ded372c4840cde874e584c",
+      "byteEqual": true
+    },
+    {
+      "path": "services/node-agent/internal/migrationcontext/review_lows_test.go",
+      "mode": "100644",
+      "blob": "c07a0300d3671bb320b2430992e2e82af11955ee",
+      "gitSHA256": "2df822e71c6a71611f7720d39113268668d56c81c8bcb8960681999f72187b81",
+      "workingSHA256": "2df822e71c6a71611f7720d39113268668d56c81c8bcb8960681999f72187b81",
+      "byteEqual": true
+    },
+    {
+      "path": "services/node-agent/internal/migrationcontext/source_gate_test.go",
+      "mode": "100644",
+      "blob": "a395e5ff9824ddc01c27004f1627dfda2bb56b09",
+      "gitSHA256": "10c0229040b40d2dd0653979b4761da4e35baab5d519b8d52dbe368928c0c780",
+      "workingSHA256": "10c0229040b40d2dd0653979b4761da4e35baab5d519b8d52dbe368928c0c780",
+      "byteEqual": true
+    },
+    {
+      "path": "services/node-agent/internal/migrationcontext/testdata/synthetic-public-history.json",
+      "mode": "100644",
+      "blob": "2a4d3834ed3123cb650f1360006f0e1fa350f940",
+      "gitSHA256": "76f237ceaeb88d3cbc5a5cc9f74369b15c3c56cd28dbb4dcde803c2540ea3eec",
+      "workingSHA256": "76f237ceaeb88d3cbc5a5cc9f74369b15c3c56cd28dbb4dcde803c2540ea3eec",
+      "byteEqual": true
+    },
+    {
+      "path": "services/node-agent/migrationverify/README.md",
+      "mode": "100644",
+      "blob": "87247a217273764e5826c093279ea20d7a702fa9",
+      "gitSHA256": "65912af40f579bf17b307da1ab59becfaf59b910fae48732d8e2a11d7116eb1d",
+      "workingSHA256": "65912af40f579bf17b307da1ab59becfaf59b910fae48732d8e2a11d7116eb1d",
+      "byteEqual": true
+    },
+    {
+      "path": "services/node-agent/migrationverify/api_test.go",
+      "mode": "100644",
+      "blob": "05bc299286b3f621cb54e82cf944e7377271c47b",
+      "gitSHA256": "debaa030495e9702a2a563abb34f71708cc3aa30d4f41104117b25835882b7c6",
+      "workingSHA256": "debaa030495e9702a2a563abb34f71708cc3aa30d4f41104117b25835882b7c6",
+      "byteEqual": true
+    },
+    {
+      "path": "services/node-agent/migrationverify/contracts.go",
+      "mode": "100644",
+      "blob": "0d9b213157281fd068a9adc09839e00871f608d6",
+      "gitSHA256": "017102092eebf5cdde81616d07b64e4501781c2f4fa956d5895592198bb06967",
+      "workingSHA256": "017102092eebf5cdde81616d07b64e4501781c2f4fa956d5895592198bb06967",
+      "byteEqual": true
+    },
+    {
+      "path": "services/node-agent/migrationverify/crypto_fixture_test.go",
+      "mode": "100644",
+      "blob": "fc68da58785a715130f4a0473ba73c83c9c32e4b",
+      "gitSHA256": "5ebefce69fb738da477d3a5b1a52bb9b818e18eed7e6303607916af01b23e7eb",
+      "workingSHA256": "5ebefce69fb738da477d3a5b1a52bb9b818e18eed7e6303607916af01b23e7eb",
+      "byteEqual": true
+    },
+    {
+      "path": "services/node-agent/migrationverify/current.go",
+      "mode": "100644",
+      "blob": "2e87b0927767d83b486a6d21d0959be623552f4f",
+      "gitSHA256": "b8061a064d4578305cea31af3638ea35af2de0228abc9862107262aa44da385b",
+      "workingSHA256": "b8061a064d4578305cea31af3638ea35af2de0228abc9862107262aa44da385b",
+      "byteEqual": true
+    },
+    {
+      "path": "services/node-agent/migrationverify/ed25519.go",
+      "mode": "100644",
+      "blob": "3b1c83c7a19a905ef46d87f3edd95fe6db0d6247",
+      "gitSHA256": "d557da3806cb65f6c4a73120ea1430751a9354336787cffb5777f62c148f1fc5",
+      "workingSHA256": "d557da3806cb65f6c4a73120ea1430751a9354336787cffb5777f62c148f1fc5",
+      "byteEqual": true
+    },
+    {
+      "path": "services/node-agent/migrationverify/ed25519_test.go",
+      "mode": "100644",
+      "blob": "166677c2c7570bbfa0973fba53ccfaeb684d393c",
+      "gitSHA256": "e991cd089153d7fa80be575bbec765d6dc6344916e53e1233078d095e2a090bc",
+      "workingSHA256": "e991cd089153d7fa80be575bbec765d6dc6344916e53e1233078d095e2a090bc",
+      "byteEqual": true
+    },
+    {
+      "path": "services/node-agent/migrationverify/graph.go",
+      "mode": "100644",
+      "blob": "f0e73328228433537ee5e301f9ead2cf7c8ea066",
+      "gitSHA256": "81fbd517f0ba5bb4062a2a14cd2972f9ddae89c2d4e4f979cc7d1d2058da238c",
+      "workingSHA256": "81fbd517f0ba5bb4062a2a14cd2972f9ddae89c2d4e4f979cc7d1d2058da238c",
+      "byteEqual": true
+    },
+    {
+      "path": "services/node-agent/migrationverify/graph_test.go",
+      "mode": "100644",
+      "blob": "24d203a5d4a7054cc2f29c135fbe80af12106bfb",
+      "gitSHA256": "c6312b5f68075ee7889e0cfcdaacbe3d709b6c292d96d188810f4ce9e7e5d8a6",
+      "workingSHA256": "c6312b5f68075ee7889e0cfcdaacbe3d709b6c292d96d188810f4ce9e7e5d8a6",
+      "byteEqual": true
+    },
+    {
+      "path": "services/node-agent/migrationverify/json.go",
+      "mode": "100644",
+      "blob": "f469c414adca15f40a0b1671f5a12fa620ac1f06",
+      "gitSHA256": "c7b4428a71d051848e1c9df302f2f6fbed3f16c0685e9264e37343ed21c683e6",
+      "workingSHA256": "c7b4428a71d051848e1c9df302f2f6fbed3f16c0685e9264e37343ed21c683e6",
+      "byteEqual": true
+    },
+    {
+      "path": "services/node-agent/migrationverify/json_test.go",
+      "mode": "100644",
+      "blob": "ca03af84ade6fbdb8fdade77d193b98e03996793",
+      "gitSHA256": "7f379a11a5c4132d1d309ce36a02d35b1e5d72b9fcf77d3233dc6ba647199bbb",
+      "workingSHA256": "7f379a11a5c4132d1d309ce36a02d35b1e5d72b9fcf77d3233dc6ba647199bbb",
+      "byteEqual": true
+    },
+    {
+      "path": "services/node-agent/migrationverify/native.go",
+      "mode": "100644",
+      "blob": "df95d10c6e0cc8a9ccece1fd89902ea56082750f",
+      "gitSHA256": "8f08b4ed8f7c4108374e3197cee678841885cc1ed86214c10a2d97a7b9f4e2b0",
+      "workingSHA256": "8f08b4ed8f7c4108374e3197cee678841885cc1ed86214c10a2d97a7b9f4e2b0",
+      "byteEqual": true
+    },
+    {
+      "path": "services/node-agent/migrationverify/native_history_test.go",
+      "mode": "100644",
+      "blob": "1204a6126bb8802b665efe614898d94f0dc10f95",
+      "gitSHA256": "c195e665f9eec5f15e2e7a517af5876b94f1ee8768803b9bcadfc6b17398c3a0",
+      "workingSHA256": "c195e665f9eec5f15e2e7a517af5876b94f1ee8768803b9bcadfc6b17398c3a0",
+      "byteEqual": true
+    },
+    {
+      "path": "services/node-agent/migrationverify/proofs.go",
+      "mode": "100644",
+      "blob": "88e836695e43dbc762f3301988ab7566dc443362",
+      "gitSHA256": "b6c6efcb7052a1b7091e0a4c460296d83ba890d57f5ceb3436b98738b6a4e4dd",
+      "workingSHA256": "b6c6efcb7052a1b7091e0a4c460296d83ba890d57f5ceb3436b98738b6a4e4dd",
+      "byteEqual": true
+    },
+    {
+      "path": "services/node-agent/migrationverify/recipes.go",
+      "mode": "100644",
+      "blob": "009762055645da0f836ad013faf257ba042abe4b",
+      "gitSHA256": "37338bfdb939a107aa4748c1cc62e6eb810d0e5335e75173a1f82878719d8df8",
+      "workingSHA256": "37338bfdb939a107aa4748c1cc62e6eb810d0e5335e75173a1f82878719d8df8",
+      "byteEqual": true
+    },
+    {
+      "path": "services/node-agent/migrationverify/recipes_test.go",
+      "mode": "100644",
+      "blob": "4c3873a5c9b258e1737b7433108a799c2eec54b1",
+      "gitSHA256": "12c5c33563d730c1748e29850b25842e8b140d1c5847bd447d297f04d3fd8c4b",
+      "workingSHA256": "12c5c33563d730c1748e29850b25842e8b140d1c5847bd447d297f04d3fd8c4b",
+      "byteEqual": true
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/derived-digest-contract.json",
+      "mode": "100644",
+      "blob": "b3714fc76351c9d1e8bccbc6ed1a5d21056e6302",
+      "gitSHA256": "707ada226f0fc6b62372ae176b94deb424adead002f462387f0a8bc8be95956b",
+      "workingSHA256": "707ada226f0fc6b62372ae176b94deb424adead002f462387f0a8bc8be95956b",
+      "byteEqual": true
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proof-slot-registry.json",
+      "mode": "100644",
+      "blob": "f98b5e853103333bc257c732b1e2da819e5c93ce",
+      "gitSHA256": "3571fc0a775a5c8b50f0b49fad8fbc1c43db60dfba3a8df097aa4eb4cdf73758",
+      "workingSHA256": "3571fc0a775a5c8b50f0b49fad8fbc1c43db60dfba3a8df097aa4eb4cdf73758",
+      "byteEqual": true
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/build-provenance.contract.json",
+      "mode": "100644",
+      "blob": "207deca482522f9c3d0b83f80e6fc3413a8e4840",
+      "gitSHA256": "57169c1e179332aeb41fd9c50ba9abaa01cc816564eb134eec6aeeb59a146793",
+      "workingSHA256": "57169c1e179332aeb41fd9c50ba9abaa01cc816564eb134eec6aeeb59a146793",
+      "byteEqual": true
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/build-provenance.schema.json",
+      "mode": "100644",
+      "blob": "bb9eab754242e4297ecefc3560fdae3bd8866fd2",
+      "gitSHA256": "ec75c0fa90cf6ee3d5f32f591aca3042e67a5e10989f5968b106517d8e70cba4",
+      "workingSHA256": "ec75c0fa90cf6ee3d5f32f591aca3042e67a5e10989f5968b106517d8e70cba4",
+      "byteEqual": true
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/ci-attestation.contract.json",
+      "mode": "100644",
+      "blob": "4ac1adee9f36b2de4f3d51095c5dd6d1ac422b46",
+      "gitSHA256": "6b1058699c5b2f9e57c69e4a53372dac19ca3fee6b407f9ee58f08de3f80a0bc",
+      "workingSHA256": "6b1058699c5b2f9e57c69e4a53372dac19ca3fee6b407f9ee58f08de3f80a0bc",
+      "byteEqual": true
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/ci-attestation.schema.json",
+      "mode": "100644",
+      "blob": "3c0bcefa7da9a94f1a3b0ce7154d10d11c018bae",
+      "gitSHA256": "9ef78efbf72c62356c3cd254c1e6fba5dbf63e3bad2bc77578365d934a09ebf1",
+      "workingSHA256": "9ef78efbf72c62356c3cd254c1e6fba5dbf63e3bad2bc77578365d934a09ebf1",
+      "byteEqual": true
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/descendant-quiescence.contract.json",
+      "mode": "100644",
+      "blob": "1d26c1ef764c7df68243c7dd8549ac864d9cfd62",
+      "gitSHA256": "08bdfb17d2adc7189bacf5964a27fd71e423ab3782d92a6eafd3e53b6e90c1cc",
+      "workingSHA256": "08bdfb17d2adc7189bacf5964a27fd71e423ab3782d92a6eafd3e53b6e90c1cc",
+      "byteEqual": true
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/descendant-quiescence.schema.json",
+      "mode": "100644",
+      "blob": "d6f87e6e2139fa3622868892d7bac165cce97d3e",
+      "gitSHA256": "d662dc3e3381a787f28714423dc975b21ad8a90907b137dfd8439e9467f88413",
+      "workingSHA256": "d662dc3e3381a787f28714423dc975b21ad8a90907b137dfd8439e9467f88413",
+      "byteEqual": true
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/g2-planning-policy.contract.json",
+      "mode": "100644",
+      "blob": "890779650452b21e61d6bc77638497e37dcc4fa5",
+      "gitSHA256": "6c3007fe677038fc878ee1180337c72a09f99961702b7b0cb934972999c560cd",
+      "workingSHA256": "6c3007fe677038fc878ee1180337c72a09f99961702b7b0cb934972999c560cd",
+      "byteEqual": true
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/g2-planning-policy.schema.json",
+      "mode": "100644",
+      "blob": "3a140c4cc49487b14d97ffb0ee68371655e29216",
+      "gitSHA256": "650e913892cb3b501e387fd0461cd4db51a8711c34c799babc025b9cc6123d8b",
+      "workingSHA256": "650e913892cb3b501e387fd0461cd4db51a8711c34c799babc025b9cc6123d8b",
+      "byteEqual": true
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/image-distribution.contract.json",
+      "mode": "100644",
+      "blob": "1038c21fd9ae294afb6e293e0950b91e90909149",
+      "gitSHA256": "39c1a706ccf54187e9182eea0f19cead9b3959902442e8d73443ed4d5dd6d974",
+      "workingSHA256": "39c1a706ccf54187e9182eea0f19cead9b3959902442e8d73443ed4d5dd6d974",
+      "byteEqual": true
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/image-distribution.schema.json",
+      "mode": "100644",
+      "blob": "207e53eeba7d9cc88b505da602dc4c505f045767",
+      "gitSHA256": "f59b10102399f8b3c5f91d1d61f84fb5e4372920811dbe6da3cda9cc275215c8",
+      "workingSHA256": "f59b10102399f8b3c5f91d1d61f84fb5e4372920811dbe6da3cda9cc275215c8",
+      "byteEqual": true
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/independent-code-review.contract.json",
+      "mode": "100644",
+      "blob": "00e0cdb61d4cbcfda786e074e722e2b1fb2ff1ed",
+      "gitSHA256": "ad81f205d924cfb93aa2f95a8f698818878adc44ce869421335b720b8861136c",
+      "workingSHA256": "ad81f205d924cfb93aa2f95a8f698818878adc44ce869421335b720b8861136c",
+      "byteEqual": true
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/independent-code-review.schema.json",
+      "mode": "100644",
+      "blob": "5e5abe6aaf81bf052be2b7ec10ae911052c27129",
+      "gitSHA256": "54394f4b3b8ceee9fcffb3111eb565a9ad452d19e01c4eac9e5a30f6a8847a89",
+      "workingSHA256": "54394f4b3b8ceee9fcffb3111eb565a9ad452d19e01c4eac9e5a30f6a8847a89",
+      "byteEqual": true
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/independent-plan-review.contract.json",
+      "mode": "100644",
+      "blob": "f51f66b9f88cdbacc5e752e1934e7a95629b25a6",
+      "gitSHA256": "c4a2ccd10b8e7e4f8aad7e18803d7d1049cbffdfcaa56ea33c711799fdd605ba",
+      "workingSHA256": "c4a2ccd10b8e7e4f8aad7e18803d7d1049cbffdfcaa56ea33c711799fdd605ba",
+      "byteEqual": true
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/independent-plan-review.schema.json",
+      "mode": "100644",
+      "blob": "b2687b316940b1d0fed6334e05888b38678c2ade",
+      "gitSHA256": "f3bffb3e70b853236dd973550af2ff38aa5acff2593d1bb757ad3eb92c705f4f",
+      "workingSHA256": "f3bffb3e70b853236dd973550af2ff38aa5acff2593d1bb757ad3eb92c705f4f",
+      "byteEqual": true
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/index.json",
+      "mode": "100644",
+      "blob": "cd8e89c4e505fad1f2e941768db313ffc4f82701",
+      "gitSHA256": "733b918383bc0c45abdd0c266bac4baf51c11eeeaaf6f44cd4e4ea2464d90582",
+      "workingSHA256": "733b918383bc0c45abdd0c266bac4baf51c11eeeaaf6f44cd4e4ea2464d90582",
+      "byteEqual": true
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/inventory-head-readback.contract.json",
+      "mode": "100644",
+      "blob": "2a3d3d3de935f8fade300f73c63a9c5741b3650c",
+      "gitSHA256": "d31962924a87403f6117cadbd1ff29569c7181b8c63f12965c88f6d17337af79",
+      "workingSHA256": "d31962924a87403f6117cadbd1ff29569c7181b8c63f12965c88f6d17337af79",
+      "byteEqual": true
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/inventory-head-readback.schema.json",
+      "mode": "100644",
+      "blob": "8275717b5b21e841e88aeca553db7ac8642d31f7",
+      "gitSHA256": "01e115e8f9b7268ca412cfd8a33fdf93d29c9255ff761ac81e5b6bcd87066614",
+      "workingSHA256": "01e115e8f9b7268ca412cfd8a33fdf93d29c9255ff761ac81e5b6bcd87066614",
+      "byteEqual": true
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/launch-surface-inventory.contract.json",
+      "mode": "100644",
+      "blob": "73ceb35497ba7f64d8ca5de219d34081ef842cb6",
+      "gitSHA256": "e5fadf62766737cddc44ba463ad0f4935eaee752e55beaa9d4bae77e7c089117",
+      "workingSHA256": "e5fadf62766737cddc44ba463ad0f4935eaee752e55beaa9d4bae77e7c089117",
+      "byteEqual": true
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/launch-surface-inventory.schema.json",
+      "mode": "100644",
+      "blob": "4d6c786c0785cd58f72b07ed9c4e0d600fd594ad",
+      "gitSHA256": "7adedccf531968117bc985819a0d621ea5ea286a7cabbe04f6233c1a4aabb8e0",
+      "workingSHA256": "7adedccf531968117bc985819a0d621ea5ea286a7cabbe04f6233c1a4aabb8e0",
+      "byteEqual": true
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/m2-capability.contract.json",
+      "mode": "100644",
+      "blob": "806a4fca798432d80a85ebe484c862087e23b2c3",
+      "gitSHA256": "9ae795c1f5962c54eeafd0feb8beabdba8d6362921d994aee66489919d7ba748",
+      "workingSHA256": "9ae795c1f5962c54eeafd0feb8beabdba8d6362921d994aee66489919d7ba748",
+      "byteEqual": true
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/m2-capability.schema.json",
+      "mode": "100644",
+      "blob": "6bca2c283e752158ccb0c8cc07b7937b63757c61",
+      "gitSHA256": "57c5db5e2533244c3ad8dd5e47c639626616b50e48ffbd32513f2c9a6d4fcfbd",
+      "workingSHA256": "57c5db5e2533244c3ad8dd5e47c639626616b50e48ffbd32513f2c9a6d4fcfbd",
+      "byteEqual": true
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/member-progress-evidence.contract.json",
+      "mode": "100644",
+      "blob": "eb05c154ea7f1651780be78ae747aad07e452aac",
+      "gitSHA256": "f801a27df679b2c78c22d5135cb951c28ba3f82f1ab7e3e02fbd02a4042e154d",
+      "workingSHA256": "f801a27df679b2c78c22d5135cb951c28ba3f82f1ab7e3e02fbd02a4042e154d",
+      "byteEqual": true
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/member-progress-evidence.schema.json",
+      "mode": "100644",
+      "blob": "76c123bf08630bd1f9f51a435bbb078d74a77bdf",
+      "gitSHA256": "8170de0758758dc5fe5be046ff923dbb72023b58a5b5f0bf59a381c33efba29d",
+      "workingSHA256": "8170de0758758dc5fe5be046ff923dbb72023b58a5b5f0bf59a381c33efba29d",
+      "byteEqual": true
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/migration-effect-readback.contract.json",
+      "mode": "100644",
+      "blob": "420c022e7404a19cbf7c2e5978b2e6ed12f0b7ca",
+      "gitSHA256": "c6dcd04184732881856f2e5e2bf8e32770b3419395fef08d04f350e9c5462e86",
+      "workingSHA256": "c6dcd04184732881856f2e5e2bf8e32770b3419395fef08d04f350e9c5462e86",
+      "byteEqual": true
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/migration-effect-readback.schema.json",
+      "mode": "100644",
+      "blob": "5c3477fce00ccf418a066b6c3c9142042bd048c5",
+      "gitSHA256": "d5d08bd89b26749fd8d07a099a6ba7f7daa31f9a3c057c4b39a1ed90c98eee16",
+      "workingSHA256": "d5d08bd89b26749fd8d07a099a6ba7f7daa31f9a3c057c4b39a1ed90c98eee16",
+      "byteEqual": true
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/migration-event-evidence.contract.json",
+      "mode": "100644",
+      "blob": "9b79b275e05cf8d26c64433dd7e5c04d9b61e626",
+      "gitSHA256": "7ad54c7fc2380880ca62e9a8ba3b745dc64daecca71ca2b6ed29ff5d145f5615",
+      "workingSHA256": "7ad54c7fc2380880ca62e9a8ba3b745dc64daecca71ca2b6ed29ff5d145f5615",
+      "byteEqual": true
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/migration-event-evidence.schema.json",
+      "mode": "100644",
+      "blob": "cdd7344bfd36267cf0d9afdbb837d3cbaaa5b8f2",
+      "gitSHA256": "345256de3a239204fb61b4b9381bb1b30b16d99f0346e3c59481e66c4e2fb9bc",
+      "workingSHA256": "345256de3a239204fb61b4b9381bb1b30b16d99f0346e3c59481e66c4e2fb9bc",
+      "byteEqual": true
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/native-two-cycle.contract.json",
+      "mode": "100644",
+      "blob": "73146bd026c9762c4a5a34aa0e67e9142276c566",
+      "gitSHA256": "10ecd7182b813d5e2f64e91c585b0507091b6efe8c3acf2465e87e13d3d1eb3d",
+      "workingSHA256": "10ecd7182b813d5e2f64e91c585b0507091b6efe8c3acf2465e87e13d3d1eb3d",
+      "byteEqual": true
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/native-two-cycle.schema.json",
+      "mode": "100644",
+      "blob": "fb1ac8056f6fd43304e942a9e64a2242624a2e5c",
+      "gitSHA256": "e46e56d2fee968e83940b106e5a211f4f705e875258668c4af52927182143c7c",
+      "workingSHA256": "e46e56d2fee968e83940b106e5a211f4f705e875258668c4af52927182143c7c",
+      "byteEqual": true
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/no-overlap.contract.json",
+      "mode": "100644",
+      "blob": "38f0891f67d2f50b37a3802a63e4118877053c61",
+      "gitSHA256": "09a5bdcb43d5d23bca789aeb10a400f6902efb72cf0ecbc10fb61f8b7d4ac68e",
+      "workingSHA256": "09a5bdcb43d5d23bca789aeb10a400f6902efb72cf0ecbc10fb61f8b7d4ac68e",
+      "byteEqual": true
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/no-overlap.schema.json",
+      "mode": "100644",
+      "blob": "8b5fc46916e32c468c5728a219f083044238c94b",
+      "gitSHA256": "3153c18ab404681bbfb218e72d0dbdfe671f5d30fdf9fea0f611c176f628db1d",
+      "workingSHA256": "3153c18ab404681bbfb218e72d0dbdfe671f5d30fdf9fea0f611c176f628db1d",
+      "byteEqual": true
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/node-floor-v2.contract.json",
+      "mode": "100644",
+      "blob": "43d66f23767bd54269760df91f022367b4e71b02",
+      "gitSHA256": "ef03e4c2a035672a829d81d43c0d09be0483c196dda4b3664451ecd3b607e4fa",
+      "workingSHA256": "ef03e4c2a035672a829d81d43c0d09be0483c196dda4b3664451ecd3b607e4fa",
+      "byteEqual": true
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/node-floor-v2.schema.json",
+      "mode": "100644",
+      "blob": "9d44b35cca6fa04574a51284b343e839f37421bc",
+      "gitSHA256": "14f09f682837e8abfd84cfafc6acde88734e0d6480fec4098c0c4a60230fbf01",
+      "workingSHA256": "14f09f682837e8abfd84cfafc6acde88734e0d6480fec4098c0c4a60230fbf01",
+      "byteEqual": true
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/old-new-no-write.contract.json",
+      "mode": "100644",
+      "blob": "fb80b2b8a67b5fb5b1d8431435979b1f6cfa4636",
+      "gitSHA256": "9719c303f4c31c7e0683e46a97d5405ec5d99c413351c8c3e85db3e2cc026c73",
+      "workingSHA256": "9719c303f4c31c7e0683e46a97d5405ec5d99c413351c8c3e85db3e2cc026c73",
+      "byteEqual": true
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/old-new-no-write.schema.json",
+      "mode": "100644",
+      "blob": "2f235d4fea4c18cfa8dca8c5814ddfdf84243172",
+      "gitSHA256": "37b7d1ca5893e70b863eac650074358df3d1151871afe487ec84a87ded902aa6",
+      "workingSHA256": "37b7d1ca5893e70b863eac650074358df3d1151871afe487ec84a87ded902aa6",
+      "byteEqual": true
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/owned-engine-exec.contract.json",
+      "mode": "100644",
+      "blob": "c54d70c8ed16e340f44574f352cc7d7e53f9bbeb",
+      "gitSHA256": "b234a4dadeb31df06540e04d0af353a92ba05d43c42cbbafd04ed5812c3679b4",
+      "workingSHA256": "b234a4dadeb31df06540e04d0af353a92ba05d43c42cbbafd04ed5812c3679b4",
+      "byteEqual": true
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/owned-engine-exec.schema.json",
+      "mode": "100644",
+      "blob": "5e72cf63906d18518c88cab6ffd3e5b2e6d04a1c",
+      "gitSHA256": "4b521aaee09f39b4daf74448c696f24768003d9262e653fbc338561ea5a84119",
+      "workingSHA256": "4b521aaee09f39b4daf74448c696f24768003d9262e653fbc338561ea5a84119",
+      "byteEqual": true
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/process-quiescence.contract.json",
+      "mode": "100644",
+      "blob": "e5fe44288650a5e7dcfaf7b7cb2ec5defa1a937d",
+      "gitSHA256": "2267728118b38c039d9dc21fe85adf8346ac38508feda76f079f59ce36126776",
+      "workingSHA256": "2267728118b38c039d9dc21fe85adf8346ac38508feda76f079f59ce36126776",
+      "byteEqual": true
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/process-quiescence.schema.json",
+      "mode": "100644",
+      "blob": "cdc3c3f040f9ac73d3b527cb6776cea8e433c733",
+      "gitSHA256": "6be629f142a908f8a92e68a571fe2eab72a2134ccfb1c7a23a5e92d2fe6a173a",
+      "workingSHA256": "6be629f142a908f8a92e68a571fe2eab72a2134ccfb1c7a23a5e92d2fe6a173a",
+      "byteEqual": true
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/protected-tree-equality.contract.json",
+      "mode": "100644",
+      "blob": "86b651ded8cac42619c3c535caece0506705945a",
+      "gitSHA256": "405a06f1e7d3b3855a7920f1c5f2a14c88121854d64f4d70fd035e1221f4d9f3",
+      "workingSHA256": "405a06f1e7d3b3855a7920f1c5f2a14c88121854d64f4d70fd035e1221f4d9f3",
+      "byteEqual": true
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/protected-tree-equality.schema.json",
+      "mode": "100644",
+      "blob": "a5866beed2f29e1bcf0c9e210b28122bb243d5bf",
+      "gitSHA256": "87f30c0d14e5dd738cc6c55f6108cdfbf0af56ee178f85d3a99887f32567914a",
+      "workingSHA256": "87f30c0d14e5dd738cc6c55f6108cdfbf0af56ee178f85d3a99887f32567914a",
+      "byteEqual": true
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/root-execution-decision.contract.json",
+      "mode": "100644",
+      "blob": "70463be983afadf1389e36e2e543492fa5f91962",
+      "gitSHA256": "4e88dfd58f1e564beb6c0459d43641ec2fe903772e259c3541b546cfd9b0fb25",
+      "workingSHA256": "4e88dfd58f1e564beb6c0459d43641ec2fe903772e259c3541b546cfd9b0fb25",
+      "byteEqual": true
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/root-execution-decision.schema.json",
+      "mode": "100644",
+      "blob": "007370ba6154a80b92fd1de4eda96768f62cae85",
+      "gitSHA256": "1e48a65750575b9013bf6c1f4a2c7a755d02a89ec80abe2ed895b00b878c6423",
+      "workingSHA256": "1e48a65750575b9013bf6c1f4a2c7a755d02a89ec80abe2ed895b00b878c6423",
+      "byteEqual": true
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/root-publication-intent.contract.json",
+      "mode": "100644",
+      "blob": "69e82874739be5236161d7fca0e657067fee0ae3",
+      "gitSHA256": "3716b51a60a37beef9939bba50e9c398cdb008f50aee41e48799d675b7054d68",
+      "workingSHA256": "3716b51a60a37beef9939bba50e9c398cdb008f50aee41e48799d675b7054d68",
+      "byteEqual": true
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/root-publication-intent.schema.json",
+      "mode": "100644",
+      "blob": "178c284a1139d066b37ae6afaad9fa32d10d9938",
+      "gitSHA256": "09c7a38c987ed058d7738349eac50d07b8e47c16f8dc5e68adf75633ee542ef7",
+      "workingSHA256": "09c7a38c987ed058d7738349eac50d07b8e47c16f8dc5e68adf75633ee542ef7",
+      "byteEqual": true
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/root-restart-restore.contract.json",
+      "mode": "100644",
+      "blob": "30977b13f2529790462956bf60a214e47add6053",
+      "gitSHA256": "a55312190de97c423055b80e61c104ffb73b91cd0dd50fb3865bf5b67c274626",
+      "workingSHA256": "a55312190de97c423055b80e61c104ffb73b91cd0dd50fb3865bf5b67c274626",
+      "byteEqual": true
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/root-restart-restore.schema.json",
+      "mode": "100644",
+      "blob": "a6f622feaa7fae87147310afb00b0e6f8590f682",
+      "gitSHA256": "87d1e23248113b03453cfccfdd91495d1e5090ac913202f908c88b0b0851e3ed",
+      "workingSHA256": "87d1e23248113b03453cfccfdd91495d1e5090ac913202f908c88b0b0851e3ed",
+      "byteEqual": true
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/root-seal-decision.contract.json",
+      "mode": "100644",
+      "blob": "204e9af804ec5431019ec862af18fdb96ec21dc2",
+      "gitSHA256": "a70bb825aaed6301f730f33261e3c648b94d51975d6ac5a499fab9b9175f0bef",
+      "workingSHA256": "a70bb825aaed6301f730f33261e3c648b94d51975d6ac5a499fab9b9175f0bef",
+      "byteEqual": true
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/root-seal-decision.schema.json",
+      "mode": "100644",
+      "blob": "e683cb7aaeddd9da2759160588bd6788344c109e",
+      "gitSHA256": "2d277069f0d6ef238d496b03c15b5b2ab8a37c16dbad15a00a2afcffa9466acf",
+      "workingSHA256": "2d277069f0d6ef238d496b03c15b5b2ab8a37c16dbad15a00a2afcffa9466acf",
+      "byteEqual": true
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/runtime-inspection-after.contract.json",
+      "mode": "100644",
+      "blob": "151acfec9548f2658494d2a935064b8a308de6e9",
+      "gitSHA256": "d9b8b80b0e660e6925bb1ab2ddb1b3fcf9eeb537fca381a7074cefdd199cbfa6",
+      "workingSHA256": "d9b8b80b0e660e6925bb1ab2ddb1b3fcf9eeb537fca381a7074cefdd199cbfa6",
+      "byteEqual": true
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/runtime-inspection-after.schema.json",
+      "mode": "100644",
+      "blob": "b44338c2acb0b8ce225814e8164611a9d8d1895d",
+      "gitSHA256": "560bf6179890ebef3e02aa1220c8115cc7eadeba8f9d1e2600bd020d96655e2a",
+      "workingSHA256": "560bf6179890ebef3e02aa1220c8115cc7eadeba8f9d1e2600bd020d96655e2a",
+      "byteEqual": true
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/runtime-inspection-before.contract.json",
+      "mode": "100644",
+      "blob": "552821b7928c0749fa0e123f9bb7138f23c0147d",
+      "gitSHA256": "4f43ed65324d3aff28e21e1b1a9c15b0799596e8ff6fda0728ae26f108f6c6e7",
+      "workingSHA256": "4f43ed65324d3aff28e21e1b1a9c15b0799596e8ff6fda0728ae26f108f6c6e7",
+      "byteEqual": true
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/runtime-inspection-before.schema.json",
+      "mode": "100644",
+      "blob": "46fa97c9f74d2a8a28703f01f633972959f30eaf",
+      "gitSHA256": "d8be7a9531caef138086db9e85a5d8733e0fa3e9d56b4ae4c69ccfafc13bf90d",
+      "workingSHA256": "d8be7a9531caef138086db9e85a5d8733e0fa3e9d56b4ae4c69ccfafc13bf90d",
+      "byteEqual": true
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/schedule-disabled-readback.contract.json",
+      "mode": "100644",
+      "blob": "32db3d24b2325bb324a85bb63bafccc9a8d967d6",
+      "gitSHA256": "39c6b61caa9ecb86b1c5792cb0c63c2f492b6e04606e70803025ebb6d8cc7994",
+      "workingSHA256": "39c6b61caa9ecb86b1c5792cb0c63c2f492b6e04606e70803025ebb6d8cc7994",
+      "byteEqual": true
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/schedule-disabled-readback.schema.json",
+      "mode": "100644",
+      "blob": "16bb1a14e2ecae7325a1d20c65758868d172aae5",
+      "gitSHA256": "8d4c081260c8c715f5ff48ca35e2aba7436fdaac090d3d8624fe418134d846d0",
+      "workingSHA256": "8d4c081260c8c715f5ff48ca35e2aba7436fdaac090d3d8624fe418134d846d0",
+      "byteEqual": true
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/unchanged-mtls.contract.json",
+      "mode": "100644",
+      "blob": "c8ed9f3b5d14c01e669fa331d8f97601cb153110",
+      "gitSHA256": "1f26d116a9e1b6baa3730f6c0bcdf8cec19ee9cec6d0c834b58b558c1f967dec",
+      "workingSHA256": "1f26d116a9e1b6baa3730f6c0bcdf8cec19ee9cec6d0c834b58b558c1f967dec",
+      "byteEqual": true
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/unchanged-mtls.schema.json",
+      "mode": "100644",
+      "blob": "5d6e4201a03b37bf06c50ab1db352bf644a1ed78",
+      "gitSHA256": "48df9c31a686880e3e268046cd5248f45c202231da9c88cc9d3f10de2af6365f",
+      "workingSHA256": "48df9c31a686880e3e268046cd5248f45c202231da9c88cc9d3f10de2af6365f",
+      "byteEqual": true
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/recipe-definitions.json",
+      "mode": "100644",
+      "blob": "2d336d7feec9b588b7d77b6e73fe9dd015d2ed6f",
+      "gitSHA256": "b2db6df614fccb2c4918080101b78f7340733c5c04309bc6fd56895c6aeead58",
+      "workingSHA256": "b2db6df614fccb2c4918080101b78f7340733c5c04309bc6fd56895c6aeead58",
+      "byteEqual": true
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/schemas/v2/common.schema.json",
+      "mode": "100644",
+      "blob": "8591921f20871af07c8606ffae8d7bb1a7e69666",
+      "gitSHA256": "d056b1b1b6bbc76f562cc1123036703ceea085bbd269bf86b86367b382ae6db4",
+      "workingSHA256": "d056b1b1b6bbc76f562cc1123036703ceea085bbd269bf86b86367b382ae6db4",
+      "byteEqual": true
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/schemas/v2/migration-event.schema.json",
+      "mode": "100644",
+      "blob": "60a464a595420f0615db4643019dd16ce52c02a4",
+      "gitSHA256": "9e9a9e47ea1300799a219c9f6634bec73f40ef4a2a63deb2cab228305601456d",
+      "workingSHA256": "9e9a9e47ea1300799a219c9f6634bec73f40ef4a2a63deb2cab228305601456d",
+      "byteEqual": true
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/schemas/v2/migration-journal.schema.json",
+      "mode": "100644",
+      "blob": "0bf9f36adc1e7d70b77d2c45af3f531d6b18bb72",
+      "gitSHA256": "d2aff35f7090b1753964c67f8f0c184c2becce207b67e40c96058c3c7e8d36b3",
+      "workingSHA256": "d2aff35f7090b1753964c67f8f0c184c2becce207b67e40c96058c3c7e8d36b3",
+      "byteEqual": true
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/schemas/v2/operation-lease.schema.json",
+      "mode": "100644",
+      "blob": "37588253f2804baebeedf36852201e0f30f49c9a",
+      "gitSHA256": "f84910b33336507a243414687ca2ca48e2867880cdba652c170f17e3f2017c3a",
+      "workingSHA256": "f84910b33336507a243414687ca2ca48e2867880cdba652c170f17e3f2017c3a",
+      "byteEqual": true
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/schemas/v2/runtime-inventory.schema.json",
+      "mode": "100644",
+      "blob": "33ca256119a20b3fd6368780c1cffd6a8a082f25",
+      "gitSHA256": "b6088bb3c8dc1255b97a5770307f442deaabba032b88cfecdc4d94f56ac5f2bd",
+      "workingSHA256": "b6088bb3c8dc1255b97a5770307f442deaabba032b88cfecdc4d94f56ac5f2bd",
+      "byteEqual": true
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/schemas/v2/successor-plan.schema.json",
+      "mode": "100644",
+      "blob": "46720f977116ecae6d7e8ac9172742434a7fcca5",
+      "gitSHA256": "7cdde62b82e5af7d9162313575c814ee1135e5b1ce12a66bd86f2536bd548161",
+      "workingSHA256": "7cdde62b82e5af7d9162313575c814ee1135e5b1ce12a66bd86f2536bd548161",
+      "byteEqual": true
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/schemas/v2/terminal-seal.schema.json",
+      "mode": "100644",
+      "blob": "48811c8e5bdc9d54e80ed6b9b9d1e3be12ead860",
+      "gitSHA256": "f8f9840cf8128d234acf2cb6b11e85a825c5737891fa1dc6db173fda5c9adab1",
+      "workingSHA256": "f8f9840cf8128d234acf2cb6b11e85a825c5737891fa1dc6db173fda5c9adab1",
+      "byteEqual": true
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/schemas/v3/migration-event.schema.json",
+      "mode": "100644",
+      "blob": "0e1f8f19f38103e700d200c7d784e4ce15584ea5",
+      "gitSHA256": "7b07902f5adbe541b1b8bc2830a752e395f8778c89ca9cf925adfdb2508e0875",
+      "workingSHA256": "7b07902f5adbe541b1b8bc2830a752e395f8778c89ca9cf925adfdb2508e0875",
+      "byteEqual": true
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/schemas/v3/migration-journal.schema.json",
+      "mode": "100644",
+      "blob": "8340131f635a9306363853f113c2bfffe1375031",
+      "gitSHA256": "05c786a0e2674aaff909b00e3eb032e031399941b0616d2a08a6ad6e95bd5ee6",
+      "workingSHA256": "05c786a0e2674aaff909b00e3eb032e031399941b0616d2a08a6ad6e95bd5ee6",
+      "byteEqual": true
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/schemas/v3/operation-lease.schema.json",
+      "mode": "100644",
+      "blob": "7c67b2929f88cb18f0935dab5b9f2b0c94631ed2",
+      "gitSHA256": "6c1155b2357b9e9ca76a581e97132d2fb115418b2f46a91f17480a3283e11578",
+      "workingSHA256": "6c1155b2357b9e9ca76a581e97132d2fb115418b2f46a91f17480a3283e11578",
+      "byteEqual": true
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/schemas/v3/runtime-inventory.schema.json",
+      "mode": "100644",
+      "blob": "248704b3864f69f1542f1e4bab5001d825511eb5",
+      "gitSHA256": "d68d4f72d4b3aa9ccd516dad0beba3201a6c0623fe4767c2cf5e4fde9cdf7020",
+      "workingSHA256": "d68d4f72d4b3aa9ccd516dad0beba3201a6c0623fe4767c2cf5e4fde9cdf7020",
+      "byteEqual": true
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/schemas/v3/successor-plan.schema.json",
+      "mode": "100644",
+      "blob": "f70d250ac12895f78736ab95ac6985d2784ab998",
+      "gitSHA256": "e7fbe90d31f4355f01bff5c1f845c4e637339db5e81d168edefd79520e3622c4",
+      "workingSHA256": "e7fbe90d31f4355f01bff5c1f845c4e637339db5e81d168edefd79520e3622c4",
+      "byteEqual": true
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/schemas/v3/terminal-seal.schema.json",
+      "mode": "100644",
+      "blob": "68fa5fe7ccc2575af52229d5fc3a901440f4428b",
+      "gitSHA256": "a845f49943f3f0f18311c3126940da74ab778664b1b9bc39ae32c78c4c3dd8f3",
+      "workingSHA256": "a845f49943f3f0f18311c3126940da74ab778664b1b9bc39ae32c78c4c3dd8f3",
+      "byteEqual": true
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/schemas/v4/migration-event.schema.json",
+      "mode": "100644",
+      "blob": "e3c1cf91814431354549e1cb0401884f3369afb8",
+      "gitSHA256": "b5fddd5a9b55e7f8f278c45c960e92bed3644ab5f3ee685e639d94a911b0df35",
+      "workingSHA256": "b5fddd5a9b55e7f8f278c45c960e92bed3644ab5f3ee685e639d94a911b0df35",
+      "byteEqual": true
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/schemas/v5/api-request.schema.json",
+      "mode": "100644",
+      "blob": "0a17e1d9573051ac4ab6153297211e99faf691ba",
+      "gitSHA256": "eaf004cad8357d8956da90a0891a0d3a612bf079ed5d452ba93fbc61f8135f8d",
+      "workingSHA256": "eaf004cad8357d8956da90a0891a0d3a612bf079ed5d452ba93fbc61f8135f8d",
+      "byteEqual": true
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/schemas/v5/api-response.schema.json",
+      "mode": "100644",
+      "blob": "6fdf1c7ef6dbd03b4ddd583f16964a1dbb90318a",
+      "gitSHA256": "b37764080b656dc4481cf1bfca47dec96e90194a864c13d802a07770b8e7f3aa",
+      "workingSHA256": "b37764080b656dc4481cf1bfca47dec96e90194a864c13d802a07770b8e7f3aa",
+      "byteEqual": true
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/schemas/v5/cohort-projection-set.schema.json",
+      "mode": "100644",
+      "blob": "ca0570f784df5661a21f4f4a2d9ba7390f226b6d",
+      "gitSHA256": "35e8a2b87216a62b75399313e0bb38856cba015820797286caee66712ff1a645",
+      "workingSHA256": "35e8a2b87216a62b75399313e0bb38856cba015820797286caee66712ff1a645",
+      "byteEqual": true
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/source-pins.json",
+      "mode": "100644",
+      "blob": "82f163823349e4917c8b2c1f20446ade18766eee",
+      "gitSHA256": "6c02c2e51f373ee74c823204e046ddc5381d3e52923f4479ece8c2ed70d56b99",
+      "workingSHA256": "6c02c2e51f373ee74c823204e046ddc5381d3e52923f4479ece8c2ed70d56b99",
+      "byteEqual": true
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/trust-bootstrap-contract.json",
+      "mode": "100644",
+      "blob": "b36c97241d5d5619e819d001a9717e25df8cc23f",
+      "gitSHA256": "f42166c4545480a30112d1c6f92f374376941b129607d0c14168e8df373a5869",
+      "workingSHA256": "f42166c4545480a30112d1c6f92f374376941b129607d0c14168e8df373a5869",
+      "byteEqual": true
+    },
+    {
+      "path": "services/node-agent/migrationverify/schemas.go",
+      "mode": "100644",
+      "blob": "697d7f643a1a263fce1c7110d46fba3c835e3e53",
+      "gitSHA256": "37228c2401e4ea1730446347547a246e5de258d033b2e2714334d4c19958a9ec",
+      "workingSHA256": "37228c2401e4ea1730446347547a246e5de258d033b2e2714334d4c19958a9ec",
+      "byteEqual": true
+    },
+    {
+      "path": "services/node-agent/migrationverify/schemas_test.go",
+      "mode": "100644",
+      "blob": "0303033945169a381b90616b593b606e7fde92c6",
+      "gitSHA256": "25c85ccb1e2fe2fd94c6d042f9bcd873ca0ce44cf7226def1cc3eabdc4f2a4cb",
+      "workingSHA256": "25c85ccb1e2fe2fd94c6d042f9bcd873ca0ce44cf7226def1cc3eabdc4f2a4cb",
+      "byteEqual": true
+    },
+    {
+      "path": "services/node-agent/migrationverify/security_test.go",
+      "mode": "100644",
+      "blob": "b52b8e7cbc8a54f14a1402b80894422a57ae2369",
+      "gitSHA256": "46e16a1a16bafe60f6dea5b1a21bd12ed1a4f5175d1741e9ebef9f0c04f9174a",
+      "workingSHA256": "46e16a1a16bafe60f6dea5b1a21bd12ed1a4f5175d1741e9ebef9f0c04f9174a",
+      "byteEqual": true
+    },
+    {
+      "path": "services/node-agent/migrationverify/temporal.go",
+      "mode": "100644",
+      "blob": "8820b8f11a8e18922fc11140cfa83af84bf17b63",
+      "gitSHA256": "759519f626e8454e79219f6368d4befe2b3e734dca1ac80bf1585d60bcbc3eb7",
+      "workingSHA256": "759519f626e8454e79219f6368d4befe2b3e734dca1ac80bf1585d60bcbc3eb7",
+      "byteEqual": true
+    },
+    {
+      "path": "services/node-agent/migrationverify/temporal_fixture_test.go",
+      "mode": "100644",
+      "blob": "648f73ddab07e916b87caa212fdf440e913f3fc2",
+      "gitSHA256": "c501b4c80e71e2aa8642488e050442d614d0a2502729040c9f48c535da04facf",
+      "workingSHA256": "c501b4c80e71e2aa8642488e050442d614d0a2502729040c9f48c535da04facf",
+      "byteEqual": true
+    },
+    {
+      "path": "services/node-agent/migrationverify/temporal_security_test.go",
+      "mode": "100644",
+      "blob": "d97a85977d61350b37bc37fc5794ad31a4b4028e",
+      "gitSHA256": "16055ed51820a9118bc30c4be678f28ce0169852bac33d398e43b9e533896428",
+      "workingSHA256": "16055ed51820a9118bc30c4be678f28ce0169852bac33d398e43b9e533896428",
+      "byteEqual": true
+    },
+    {
+      "path": "services/node-agent/migrationverify/temporal_test.go",
+      "mode": "100644",
+      "blob": "dbd2d8953bce6bcdfa992819dce6441643990324",
+      "gitSHA256": "790d0c78031492086868569054c6cb22fc7217c7851078e3e7475860a676b1c9",
+      "workingSHA256": "790d0c78031492086868569054c6cb22fc7217c7851078e3e7475860a676b1c9",
+      "byteEqual": true
+    },
+    {
+      "path": "services/node-agent/migrationverify/testdata/actual-bindings-HOLD.json",
+      "mode": "100644",
+      "blob": "363572a4c45de8f8dc35f8a82e1b256a8f36ff66",
+      "gitSHA256": "bd5aaf27d8ca9a2307f31ce9474e20801821622bab299d78ee318406a9d86902",
+      "workingSHA256": "bd5aaf27d8ca9a2307f31ce9474e20801821622bab299d78ee318406a9d86902",
+      "byteEqual": true
+    },
+    {
+      "path": "services/node-agent/migrationverify/testdata/artifact-reference-graph.json",
+      "mode": "100644",
+      "blob": "fce498a8e3e65c9bf1222a053394695fa9312dcf",
+      "gitSHA256": "7a87bcd81e3abcc27ab0d6ec7afafc93414749b42b139491b04840a8ed980fc9",
+      "workingSHA256": "7a87bcd81e3abcc27ab0d6ec7afafc93414749b42b139491b04840a8ed980fc9",
+      "byteEqual": true
+    },
+    {
+      "path": "services/node-agent/migrationverify/testdata/derived-byte-ordering-vectors.json",
+      "mode": "100644",
+      "blob": "fce11f4e1377d3c5fd2399a27aee198eeac341fe",
+      "gitSHA256": "f6d79189bc45dd3d30d7b2b78590c272cb95bfb08181518555fc341164dc4b1b",
+      "workingSHA256": "f6d79189bc45dd3d30d7b2b78590c272cb95bfb08181518555fc341164dc4b1b",
+      "byteEqual": true
+    },
+    {
+      "path": "services/node-agent/migrationverify/testdata/dummy-signer-policy.json",
+      "mode": "100644",
+      "blob": "10ebc7ff8e0e6b0a82827458f95a37ff6b578214",
+      "gitSHA256": "e897f5a150a069ae05b1d2f9ff8fdc84aab5921c0c58c248b0e38b39bc7c2c90",
+      "workingSHA256": "e897f5a150a069ae05b1d2f9ff8fdc84aab5921c0c58c248b0e38b39bc7c2c90",
+      "byteEqual": true
+    },
+    {
+      "path": "services/node-agent/migrationverify/testdata/reference-graph-coverage.json",
+      "mode": "100644",
+      "blob": "89e13e15e6f84c79e626f40d0e1c097d32125de7",
+      "gitSHA256": "cdd9266060b1e84f0dbf00c90cfdbde71c2730c78d7c2230354a8859b60f2e09",
+      "workingSHA256": "cdd9266060b1e84f0dbf00c90cfdbde71c2730c78d7c2230354a8859b60f2e09",
+      "byteEqual": true
+    },
+    {
+      "path": "services/node-agent/migrationverify/testdata/scenario-inputs.json",
+      "mode": "100644",
+      "blob": "8b954a0fd8c6c9575697c8aaee42170aaacafdd1",
+      "gitSHA256": "a4f4a40765f8815f70b130ee2db139c244ba9da5a209890285ed76380341346a",
+      "workingSHA256": "a4f4a40765f8815f70b130ee2db139c244ba9da5a209890285ed76380341346a",
+      "byteEqual": true
+    },
+    {
+      "path": "services/node-agent/migrationverify/testdata/scenario-objects.json",
+      "mode": "100644",
+      "blob": "8b7c8868c0d5abce1cc74e8d4643750b3d362500",
+      "gitSHA256": "d695fb715b0965e51052933ed948afdedf5888ed489c09b829f081a5ba10b841",
+      "workingSHA256": "d695fb715b0965e51052933ed948afdedf5888ed489c09b829f081a5ba10b841",
+      "byteEqual": true
+    },
+    {
+      "path": "services/node-agent/migrationverify/trust.go",
+      "mode": "100644",
+      "blob": "0554cd16384573044045fb1ffd1ab81b03790b44",
+      "gitSHA256": "d0e72b6f4d1ab08fe2bece5465c932b084983068a3049d73b69dd28922d07dd7",
+      "workingSHA256": "d0e72b6f4d1ab08fe2bece5465c932b084983068a3049d73b69dd28922d07dd7",
+      "byteEqual": true
+    },
+    {
+      "path": "services/node-agent/migrationverify/vectors_test.go",
+      "mode": "100644",
+      "blob": "1123601790d6893bcf44612bd7b209afc0d16c7a",
+      "gitSHA256": "e546e2ee5ad8bf8e56028016e479fa4ce5b3e598123914f31be4d6f395383cfd",
+      "workingSHA256": "e546e2ee5ad8bf8e56028016e479fa4ce5b3e598123914f31be4d6f395383cfd",
+      "byteEqual": true
+    },
+    {
+      "path": "services/node-agent/migrationverify/verify.go",
+      "mode": "100644",
+      "blob": "fa01d55c43637721525e7f2d7b1b691362f8abf2",
+      "gitSHA256": "3834b97335c7af45b1c6ac2ab9eebbca196149e84faaf44dfbbb227a3f113743",
+      "workingSHA256": "3834b97335c7af45b1c6ac2ab9eebbca196149e84faaf44dfbbb227a3f113743",
+      "byteEqual": true
+    }
+  ],
+  "tableSHA256": "95096425eb98c743e4afc4c3c688e9fe38e7084cdfd68ccb9ae404cfab8ee1f5",
+  "unchangedStage2AndStandaloneTestsNotRerun": true,
+  "unchangedAuthClockCurrentEffectsInstall": true,
+  "originalCombinedBranchPreserved": "ac7498e82a0cf17fc95973fe9187aeb51c99d51e"
+}

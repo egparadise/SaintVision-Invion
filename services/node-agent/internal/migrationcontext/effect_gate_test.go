@@ -219,6 +219,88 @@ func usedObject(expr ast.Expr, info *types.Info) types.Object {
 	return nil
 }
 
+// A declared own pointee is a conservative TYPE boundary, not proof of memory
+// provenance. In particular, a local name/parameter or a pure call returning a
+// pointer does not establish ownership. No whole-program alias analysis here.
+func ownPointeeWrite(t types.Type) error {
+	if t != nil {
+		t = types.Unalias(t)
+		if n, ok := t.(*types.Named); ok && n.Obj().Pkg() != nil && n.Obj().Pkg().Path() == ownImport {
+			return nil
+		}
+		return fmt.Errorf("foreign pointee write forbidden: %s", types.TypeString(t, nil))
+	}
+	return fmt.Errorf("foreign pointee write forbidden: unresolved type")
+}
+
+func pointerElement(t types.Type) (types.Type, bool) {
+	if t != nil {
+		if p, ok := types.Unalias(t).Underlying().(*types.Pointer); ok {
+			return p.Elem(), true
+		}
+	}
+	return nil, false
+}
+
+func writeTargetBoundary(expr ast.Expr, info *types.Info) error {
+	if expr == nil {
+		return nil
+	}
+	if v := foreignPackageVar(usedObject(expr, info)); v != nil {
+		return fmt.Errorf("foreign state write forbidden: %s", objectID(v))
+	}
+	switch x := expr.(type) {
+	case *ast.ParenExpr:
+		return writeTargetBoundary(x.X, info)
+	case *ast.StarExpr:
+		if e := ownPointeeWrite(info.TypeOf(x)); e != nil {
+			return e
+		}
+		return writeTargetBoundary(x.X, info)
+	case *ast.IndexExpr:
+		// Go also implicitly dereferences pointers to arrays in index writes.
+		if elem, ok := pointerElement(info.TypeOf(x.X)); ok {
+			if e := ownPointeeWrite(elem); e != nil {
+				return e
+			}
+		}
+		return writeTargetBoundary(x.X, info)
+	case *ast.SliceExpr:
+		// An index target may be rooted in a slice expression, e.g. (*p)[:][i].
+		// Continue to the pointer root rather than treating the slice as local.
+		if elem, ok := pointerElement(info.TypeOf(x.X)); ok {
+			if e := ownPointeeWrite(elem); e != nil {
+				return e
+			}
+		}
+		return writeTargetBoundary(x.X, info)
+	case *ast.SelectorExpr:
+		// Resolve the complete field path: a promoted field can implicitly
+		// dereference an embedded foreign pointer even when x.X is an own value.
+		if sel := info.Selections[x]; sel != nil && sel.Kind() == types.FieldVal {
+			t := info.TypeOf(x.X)
+			for _, index := range sel.Index() {
+				if elem, ok := pointerElement(t); ok {
+					if e := ownPointeeWrite(elem); e != nil {
+						return e
+					}
+					t = elem
+				}
+				if t == nil {
+					return fmt.Errorf("foreign pointee write forbidden: unresolved field path")
+				}
+				s, ok := types.Unalias(t).Underlying().(*types.Struct)
+				if !ok || index >= s.NumFields() {
+					return fmt.Errorf("foreign pointee write forbidden: unresolved field path")
+				}
+				t = s.Field(index).Type()
+			}
+		}
+		return writeTargetBoundary(x.X, info)
+	}
+	return nil
+}
+
 func sourceEffects(src map[string][]byte, checked checkedSource) error {
 	if e := rejectNativeSources(src); e != nil {
 		return e
@@ -328,11 +410,21 @@ func sourceEffects(src map[string][]byte, checked checkedSource) error {
 					failure = fmt.Errorf("unresolved/function-value/callback call forbidden")
 				}
 			}
-			if a, ok := n.(*ast.AssignStmt); ok {
-				for _, lhs := range a.Lhs {
-					if v := foreignPackageVar(usedObject(lhs, checked.info)); v != nil {
-						failure = fmt.Errorf("foreign state write forbidden: %s", objectID(v))
-					}
+			var targets []ast.Expr
+			switch x := n.(type) {
+			case *ast.AssignStmt:
+				targets = x.Lhs
+			case *ast.RangeStmt:
+				if x.Tok == token.ASSIGN {
+					targets = []ast.Expr{x.Key, x.Value}
+				}
+			case *ast.IncDecStmt:
+				targets = []ast.Expr{x.X}
+			}
+			for _, target := range targets {
+				if e := writeTargetBoundary(target, checked.info); e != nil {
+					failure = e
+					break
 				}
 			}
 			return failure == nil

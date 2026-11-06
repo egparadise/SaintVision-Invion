@@ -1,0 +1,2 @@
+# github.com/egparadise/SaintVision-Invion/services/node-agent/internal/migrationcontext
+internal\migrationcontext\plr1b_invalid_incdec.go:3:20: invalid operation: clock.UTC++ (non-numeric type *"time".Location)

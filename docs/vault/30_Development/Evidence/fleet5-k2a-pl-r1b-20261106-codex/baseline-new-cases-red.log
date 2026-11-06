@@ -1,0 +1,163 @@
+=== RUN   TestPLR1BCompiledWriteTargetsAndReasons
+=== RUN   TestPLR1BCompiledWriteTargetsAndReasons/E1-range-UTC
+    pl_r1a_test.go:289: actual go build -p=1 ./internal/migrationcontext exit0; mutant body NOT executed
+    pl_r1a_test.go:295: REASON case=E1-range-UTC build=0 typecheck=0 refused=false reason=<nil>
+    pl_r1a_test.go:295: want intended refusal prefixes=["foreign state write forbidden: time.UTC"], got=<nil>
+=== RUN   TestPLR1BCompiledWriteTargetsAndReasons/range-dot-UTC
+    pl_r1a_test.go:289: actual go build -p=1 ./internal/migrationcontext exit0; mutant body NOT executed
+    pl_r1a_test.go:295: REASON case=range-dot-UTC build=0 typecheck=0 refused=false reason=<nil>
+    pl_r1a_test.go:295: want intended refusal prefixes=["foreign state write forbidden: time.UTC"], got=<nil>
+=== RUN   TestPLR1BCompiledWriteTargetsAndReasons/E2-deref-UTC
+    pl_r1a_test.go:289: actual go build -p=1 ./internal/migrationcontext exit0; mutant body NOT executed
+    pl_r1a_test.go:295: REASON case=E2-deref-UTC build=0 typecheck=0 refused=false reason=<nil>
+    pl_r1a_test.go:295: want intended refusal prefixes=["foreign pointee write forbidden: time.Location"], got=<nil>
+=== RUN   TestPLR1BCompiledWriteTargetsAndReasons/deref-local-pointer-copy
+    pl_r1a_test.go:289: actual go build -p=1 ./internal/migrationcontext exit0; mutant body NOT executed
+    pl_r1a_test.go:295: REASON case=deref-local-pointer-copy build=0 typecheck=0 refused=false reason=<nil>
+    pl_r1a_test.go:295: want intended refusal prefixes=["foreign pointee write forbidden: time.Location"], got=<nil>
+=== RUN   TestPLR1BCompiledWriteTargetsAndReasons/E3-deref-pure-Location
+    pl_r1a_test.go:289: actual go build -p=1 ./internal/migrationcontext exit0; mutant body NOT executed
+    pl_r1a_test.go:295: REASON case=E3-deref-pure-Location build=0 typecheck=0 refused=false reason=<nil>
+    pl_r1a_test.go:295: want intended refusal prefixes=["foreign pointee write forbidden: time.Location"], got=<nil>
+=== RUN   TestPLR1BCompiledWriteTargetsAndReasons/deref-helper-parameter
+    pl_r1a_test.go:289: actual go build -p=1 ./internal/migrationcontext exit0; mutant body NOT executed
+    pl_r1a_test.go:295: REASON case=deref-helper-parameter build=0 typecheck=0 refused=false reason=<nil>
+    pl_r1a_test.go:295: want intended refusal prefixes=["foreign pointee write forbidden: time.Location"], got=<nil>
+=== RUN   TestPLR1BCompiledWriteTargetsAndReasons/range-deref-UTC
+    pl_r1a_test.go:289: actual go build -p=1 ./internal/migrationcontext exit0; mutant body NOT executed
+    pl_r1a_test.go:295: REASON case=range-deref-UTC build=0 typecheck=0 refused=false reason=<nil>
+    pl_r1a_test.go:295: want intended refusal prefixes=["foreign pointee write forbidden: time.Location"], got=<nil>
+=== RUN   TestPLR1BCompiledWriteTargetsAndReasons/paren-direct-UTC
+    pl_r1a_test.go:289: actual go build -p=1 ./internal/migrationcontext exit0; mutant body NOT executed
+    pl_r1a_test.go:295: REASON case=paren-direct-UTC build=0 typecheck=0 refused=true reason=foreign state write forbidden: time.UTC
+=== RUN   TestPLR1BCompiledWriteTargetsAndReasons/tuple-direct-UTC
+    pl_r1a_test.go:289: actual go build -p=1 ./internal/migrationcontext exit0; mutant body NOT executed
+    pl_r1a_test.go:295: REASON case=tuple-direct-UTC build=0 typecheck=0 refused=true reason=foreign state write forbidden: time.UTC
+=== RUN   TestPLR1BCompiledWriteTargetsAndReasons/select-direct-UTC
+    pl_r1a_test.go:289: actual go build -p=1 ./internal/migrationcontext exit0; mutant body NOT executed
+    pl_r1a_test.go:295: REASON case=select-direct-UTC build=0 typecheck=0 refused=true reason=foreign state write forbidden: time.UTC
+=== RUN   TestPLR1BCompiledWriteTargetsAndReasons/foreign-pointee-alias
+    pl_r1a_test.go:289: actual go build -p=1 ./internal/migrationcontext exit0; mutant body NOT executed
+    pl_r1a_test.go:295: REASON case=foreign-pointee-alias build=0 typecheck=0 refused=false reason=<nil>
+    pl_r1a_test.go:295: want intended refusal prefixes=["foreign pointee write forbidden: time.Location"], got=<nil>
+=== RUN   TestPLR1BCompiledWriteTargetsAndReasons/defined-pointer-to-foreign-pointee
+    pl_r1a_test.go:289: actual go build -p=1 ./internal/migrationcontext exit0; mutant body NOT executed
+    pl_r1a_test.go:295: REASON case=defined-pointer-to-foreign-pointee build=0 typecheck=0 refused=false reason=<nil>
+    pl_r1a_test.go:295: want intended refusal prefixes=["foreign pointee write forbidden: time.Location"], got=<nil>
+=== RUN   TestPLR1BCompiledWriteTargetsAndReasons/index-local-pointer-container
+    pl_r1a_test.go:289: actual go build -p=1 ./internal/migrationcontext exit0; mutant body NOT executed
+    pl_r1a_test.go:295: REASON case=index-local-pointer-container build=0 typecheck=0 refused=false reason=<nil>
+    pl_r1a_test.go:295: want intended refusal prefixes=["foreign pointee write forbidden: time.Location"], got=<nil>
+=== RUN   TestPLR1BCompiledWriteTargetsAndReasons/paren-deref-UTC
+    pl_r1a_test.go:289: actual go build -p=1 ./internal/migrationcontext exit0; mutant body NOT executed
+    pl_r1a_test.go:295: REASON case=paren-deref-UTC build=0 typecheck=0 refused=false reason=<nil>
+    pl_r1a_test.go:295: want intended refusal prefixes=["foreign pointee write forbidden: time.Location"], got=<nil>
+=== RUN   TestPLR1BCompiledWriteTargetsAndReasons/tuple-deref-UTC
+    pl_r1a_test.go:289: actual go build -p=1 ./internal/migrationcontext exit0; mutant body NOT executed
+    pl_r1a_test.go:295: REASON case=tuple-deref-UTC build=0 typecheck=0 refused=false reason=<nil>
+    pl_r1a_test.go:295: want intended refusal prefixes=["foreign pointee write forbidden: time.Location"], got=<nil>
+=== RUN   TestPLR1BCompiledWriteTargetsAndReasons/select-deref-UTC
+    pl_r1a_test.go:289: actual go build -p=1 ./internal/migrationcontext exit0; mutant body NOT executed
+    pl_r1a_test.go:295: REASON case=select-deref-UTC build=0 typecheck=0 refused=false reason=<nil>
+    pl_r1a_test.go:295: want intended refusal prefixes=["foreign pointee write forbidden: time.Location"], got=<nil>
+=== RUN   TestPLR1BCompiledWriteTargetsAndReasons/implicit-selector-foreign-pointer
+    pl_r1a_test.go:289: actual go build -p=1 ./internal/migrationcontext exit0; mutant body NOT executed
+    pl_r1a_test.go:295: REASON case=implicit-selector-foreign-pointer build=0 typecheck=0 refused=false reason=<nil>
+    pl_r1a_test.go:295: want intended refusal prefixes=["foreign pointee write forbidden: crypto/x509.Certificate"], got=<nil>
+=== RUN   TestPLR1BCompiledWriteTargetsAndReasons/explicit-selector-foreign-pointer
+    pl_r1a_test.go:289: actual go build -p=1 ./internal/migrationcontext exit0; mutant body NOT executed
+    pl_r1a_test.go:295: REASON case=explicit-selector-foreign-pointer build=0 typecheck=0 refused=false reason=<nil>
+    pl_r1a_test.go:295: want intended refusal prefixes=["foreign pointee write forbidden: crypto/x509.Certificate"], got=<nil>
+=== RUN   TestPLR1BCompiledWriteTargetsAndReasons/own-root-foreign-pointer-field
+    pl_r1a_test.go:289: actual go build -p=1 ./internal/migrationcontext exit0; mutant body NOT executed
+    pl_r1a_test.go:295: REASON case=own-root-foreign-pointer-field build=0 typecheck=0 refused=false reason=<nil>
+    pl_r1a_test.go:295: want intended refusal prefixes=["foreign pointee write forbidden: crypto/x509.Certificate"], got=<nil>
+=== RUN   TestPLR1BCompiledWriteTargetsAndReasons/promoted-foreign-pointer-field
+    pl_r1a_test.go:289: actual go build -p=1 ./internal/migrationcontext exit0; mutant body NOT executed
+    pl_r1a_test.go:295: REASON case=promoted-foreign-pointer-field build=0 typecheck=0 refused=false reason=<nil>
+    pl_r1a_test.go:295: want intended refusal prefixes=["foreign pointee write forbidden: crypto/x509.Certificate"], got=<nil>
+=== RUN   TestPLR1BCompiledWriteTargetsAndReasons/compound-foreign-selector
+    pl_r1a_test.go:289: actual go build -p=1 ./internal/migrationcontext exit0; mutant body NOT executed
+    pl_r1a_test.go:295: REASON case=compound-foreign-selector build=0 typecheck=0 refused=false reason=<nil>
+    pl_r1a_test.go:295: want intended refusal prefixes=["foreign pointee write forbidden: crypto/x509.Certificate"], got=<nil>
+=== RUN   TestPLR1BCompiledWriteTargetsAndReasons/incdec-foreign-selector
+    pl_r1a_test.go:289: actual go build -p=1 ./internal/migrationcontext exit0; mutant body NOT executed
+    pl_r1a_test.go:295: REASON case=incdec-foreign-selector build=0 typecheck=0 refused=false reason=<nil>
+    pl_r1a_test.go:295: want intended refusal prefixes=["foreign pointee write forbidden: crypto/x509.Certificate"], got=<nil>
+=== RUN   TestPLR1BCompiledWriteTargetsAndReasons/range-key-foreign-selector
+    pl_r1a_test.go:289: actual go build -p=1 ./internal/migrationcontext exit0; mutant body NOT executed
+    pl_r1a_test.go:295: REASON case=range-key-foreign-selector build=0 typecheck=0 refused=false reason=<nil>
+    pl_r1a_test.go:295: want intended refusal prefixes=["foreign pointee write forbidden: crypto/x509.Certificate"], got=<nil>
+=== RUN   TestPLR1BCompiledWriteTargetsAndReasons/index-base-foreign-pointer
+    pl_r1a_test.go:289: actual go build -p=1 ./internal/migrationcontext exit0; mutant body NOT executed
+    pl_r1a_test.go:295: REASON case=index-base-foreign-pointer build=0 typecheck=0 refused=false reason=<nil>
+    pl_r1a_test.go:295: want intended refusal prefixes=["foreign pointee write forbidden: crypto/x509.Certificate"], got=<nil>
+=== RUN   TestPLR1BCompiledWriteTargetsAndReasons/unnamed-array-pointer-conservative
+    pl_r1a_test.go:289: actual go build -p=1 ./internal/migrationcontext exit0; mutant body NOT executed
+    pl_r1a_test.go:295: REASON case=unnamed-array-pointer-conservative build=0 typecheck=0 refused=false reason=<nil>
+    pl_r1a_test.go:295: want intended refusal prefixes=["foreign pointee write forbidden: [1]int"], got=<nil>
+=== RUN   TestPLR1BCompiledWriteTargetsAndReasons/UTC-pure-compare
+    pl_r1a_test.go:289: actual go build -p=1 ./internal/migrationcontext exit0; mutant body NOT executed
+    pl_r1a_test.go:295: REASON case=UTC-pure-compare build=0 typecheck=0 refused=false reason=<nil>
+=== RUN   TestPLR1BCompiledWriteTargetsAndReasons/own-var-range-assignment
+    pl_r1a_test.go:289: actual go build -p=1 ./internal/migrationcontext exit0; mutant body NOT executed
+    pl_r1a_test.go:295: REASON case=own-var-range-assignment build=0 typecheck=0 refused=false reason=<nil>
+=== RUN   TestPLR1BCompiledWriteTargetsAndReasons/local-var-range-assignment
+    pl_r1a_test.go:289: actual go build -p=1 ./internal/migrationcontext exit0; mutant body NOT executed
+    pl_r1a_test.go:295: REASON case=local-var-range-assignment build=0 typecheck=0 refused=false reason=<nil>
+=== RUN   TestPLR1BCompiledWriteTargetsAndReasons/local-range-definition
+    pl_r1a_test.go:289: actual go build -p=1 ./internal/migrationcontext exit0; mutant body NOT executed
+    pl_r1a_test.go:295: REASON case=local-range-definition build=0 typecheck=0 refused=false reason=<nil>
+=== RUN   TestPLR1BCompiledWriteTargetsAndReasons/own-pointer-local-mutation
+    pl_r1a_test.go:289: actual go build -p=1 ./internal/migrationcontext exit0; mutant body NOT executed
+    pl_r1a_test.go:295: REASON case=own-pointer-local-mutation build=0 typecheck=0 refused=false reason=<nil>
+=== RUN   TestPLR1BCompiledWriteTargetsAndReasons/own-array-pointer-index
+    pl_r1a_test.go:289: actual go build -p=1 ./internal/migrationcontext exit0; mutant body NOT executed
+    pl_r1a_test.go:295: REASON case=own-array-pointer-index build=0 typecheck=0 refused=false reason=<nil>
+=== RUN   TestPLR1BCompiledWriteTargetsAndReasons/own-scalar-pointer-incdec
+    pl_r1a_test.go:289: actual go build -p=1 ./internal/migrationcontext exit0; mutant body NOT executed
+    pl_r1a_test.go:295: REASON case=own-scalar-pointer-incdec build=0 typecheck=0 refused=false reason=<nil>
+=== RUN   TestPLR1BCompiledWriteTargetsAndReasons/own-alias-pointer
+    pl_r1a_test.go:289: actual go build -p=1 ./internal/migrationcontext exit0; mutant body NOT executed
+    pl_r1a_test.go:295: REASON case=own-alias-pointer build=0 typecheck=0 refused=false reason=<nil>
+=== RUN   TestPLR1BCompiledWriteTargetsAndReasons/local-foreign-value-copy
+    pl_r1a_test.go:289: actual go build -p=1 ./internal/migrationcontext exit0; mutant body NOT executed
+    pl_r1a_test.go:295: REASON case=local-foreign-value-copy build=0 typecheck=0 refused=false reason=<nil>
+--- FAIL: TestPLR1BCompiledWriteTargetsAndReasons (54.91s)
+    --- FAIL: TestPLR1BCompiledWriteTargetsAndReasons/E1-range-UTC (1.52s)
+    --- FAIL: TestPLR1BCompiledWriteTargetsAndReasons/range-dot-UTC (1.48s)
+    --- FAIL: TestPLR1BCompiledWriteTargetsAndReasons/E2-deref-UTC (1.46s)
+    --- FAIL: TestPLR1BCompiledWriteTargetsAndReasons/deref-local-pointer-copy (1.46s)
+    --- FAIL: TestPLR1BCompiledWriteTargetsAndReasons/E3-deref-pure-Location (1.51s)
+    --- FAIL: TestPLR1BCompiledWriteTargetsAndReasons/deref-helper-parameter (1.44s)
+    --- FAIL: TestPLR1BCompiledWriteTargetsAndReasons/range-deref-UTC (1.53s)
+    --- PASS: TestPLR1BCompiledWriteTargetsAndReasons/paren-direct-UTC (2.33s)
+    --- PASS: TestPLR1BCompiledWriteTargetsAndReasons/tuple-direct-UTC (2.92s)
+    --- PASS: TestPLR1BCompiledWriteTargetsAndReasons/select-direct-UTC (3.01s)
+    --- FAIL: TestPLR1BCompiledWriteTargetsAndReasons/foreign-pointee-alias (1.53s)
+    --- FAIL: TestPLR1BCompiledWriteTargetsAndReasons/defined-pointer-to-foreign-pointee (1.42s)
+    --- FAIL: TestPLR1BCompiledWriteTargetsAndReasons/index-local-pointer-container (1.43s)
+    --- FAIL: TestPLR1BCompiledWriteTargetsAndReasons/paren-deref-UTC (1.48s)
+    --- FAIL: TestPLR1BCompiledWriteTargetsAndReasons/tuple-deref-UTC (1.42s)
+    --- FAIL: TestPLR1BCompiledWriteTargetsAndReasons/select-deref-UTC (1.46s)
+    --- FAIL: TestPLR1BCompiledWriteTargetsAndReasons/implicit-selector-foreign-pointer (1.41s)
+    --- FAIL: TestPLR1BCompiledWriteTargetsAndReasons/explicit-selector-foreign-pointer (1.45s)
+    --- FAIL: TestPLR1BCompiledWriteTargetsAndReasons/own-root-foreign-pointer-field (1.53s)
+    --- FAIL: TestPLR1BCompiledWriteTargetsAndReasons/promoted-foreign-pointer-field (1.42s)
+    --- FAIL: TestPLR1BCompiledWriteTargetsAndReasons/compound-foreign-selector (1.42s)
+    --- FAIL: TestPLR1BCompiledWriteTargetsAndReasons/incdec-foreign-selector (1.43s)
+    --- FAIL: TestPLR1BCompiledWriteTargetsAndReasons/range-key-foreign-selector (1.39s)
+    --- FAIL: TestPLR1BCompiledWriteTargetsAndReasons/index-base-foreign-pointer (1.41s)
+    --- FAIL: TestPLR1BCompiledWriteTargetsAndReasons/unnamed-array-pointer-conservative (1.47s)
+    --- PASS: TestPLR1BCompiledWriteTargetsAndReasons/UTC-pure-compare (1.39s)
+    --- PASS: TestPLR1BCompiledWriteTargetsAndReasons/own-var-range-assignment (1.40s)
+    --- PASS: TestPLR1BCompiledWriteTargetsAndReasons/local-var-range-assignment (1.46s)
+    --- PASS: TestPLR1BCompiledWriteTargetsAndReasons/local-range-definition (1.43s)
+    --- PASS: TestPLR1BCompiledWriteTargetsAndReasons/own-pointer-local-mutation (1.43s)
+    --- PASS: TestPLR1BCompiledWriteTargetsAndReasons/own-array-pointer-index (1.41s)
+    --- PASS: TestPLR1BCompiledWriteTargetsAndReasons/own-scalar-pointer-incdec (1.41s)
+    --- PASS: TestPLR1BCompiledWriteTargetsAndReasons/own-alias-pointer (1.52s)
+    --- PASS: TestPLR1BCompiledWriteTargetsAndReasons/local-foreign-value-copy (1.44s)
+FAIL
+FAIL	github.com/egparadise/SaintVision-Invion/services/node-agent/internal/migrationcontext	56.065s
+FAIL
