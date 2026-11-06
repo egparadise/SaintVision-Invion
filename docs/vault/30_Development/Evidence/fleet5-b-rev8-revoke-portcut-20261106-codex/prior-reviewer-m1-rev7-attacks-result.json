@@ -1,0 +1,110 @@
+{
+ "cases": [
+  {
+   "case": "C1-cancel-under-QUARANTINE-registers",
+   "observed": false,
+   "expected72028OrRoot": true,
+   "matches": false,
+   "basis": "72028 node_channels.py:126 observation_only skips require_execution; dispatch.py:177-184 cancel to obtain Node tombstone, leases kept until receipt"
+  },
+  {
+   "case": "C2-cancel-after-lease-expiry-registers",
+   "observed": false,
+   "expected72028OrRoot": true,
+   "matches": false,
+   "basis": "72028 dispatch.acquire selects cancel without assert_fences/lease freshness; start_authority_lost -> cancel_and_await_receipt"
+  },
+  {
+   "case": "C3-receipt-observe-under-QUARANTINE-registers",
+   "observed": false,
+   "expected72028OrRoot": true,
+   "matches": false,
+   "basis": "72028 dispatch.py:339 observation_only via snapshot(observation_only=True) without containment check"
+  },
+  {
+   "case": "C4-receipt-observe-after-lease-expiry-registers",
+   "observed": false,
+   "expected72028OrRoot": true,
+   "matches": false,
+   "basis": "72028 observe path has no resource-lease freshness requirement"
+  },
+  {
+   "case": "C5-cancel-node-offline-registers",
+   "observed": true,
+   "expected72028OrRoot": true,
+   "matches": true,
+   "basis": "72028 observation_only skips status/heartbeat freshness"
+  },
+  {
+   "case": "C6-cancel-after-parent-UNCERTAIN-registers",
+   "observed": true,
+   "expected72028OrRoot": true,
+   "matches": true,
+   "basis": "Root msg_8b52dd815cae: CANCEL IDEMPOTENT_SAFETY; 72028 cancel is the tombstone path for ambiguous execute"
+  },
+  {
+   "case": "C7-R01-hint-no-footprint-while-other-execute-pending",
+   "observed": false,
+   "expected72028OrRoot": true,
+   "matches": false,
+   "basis": "Rev7 History: deny only intersecting footprint; hints are not new admission"
+  },
+  {
+   "case": "C7b-R05-capacity-hint-no-footprint",
+   "observed": false,
+   "expected72028OrRoot": true,
+   "matches": false,
+   "basis": "same"
+  },
+  {
+   "case": "C7c-R03-disjoint-footprint",
+   "observed": true,
+   "expected72028OrRoot": true,
+   "matches": true,
+   "basis": "owner fixture parity"
+  },
+  {
+   "case": "C8-uncertain-A-blocks-unrelated-R03-on-same-node",
+   "observed": false,
+   "expected72028OrRoot": false,
+   "matches": true,
+   "basis": "Root: SIDE_EFFECT UNCERTAIN Node-scoped deny"
+  },
+  {
+   "case": "C8b-uncertain-A-does-not-block-node2",
+   "observed": true,
+   "expected72028OrRoot": true,
+   "matches": true,
+   "basis": "Root: no cross-Node deny"
+  },
+  {
+   "case": "C9-late-read-response-after-abandon-refused",
+   "observed": false,
+   "expected72028OrRoot": false,
+   "matches": true,
+   "basis": "Root: late/duplicate cannot reopen"
+  },
+  {
+   "case": "C10-receipts-path-under-read-kind-refused",
+   "observed": true,
+   "expected72028OrRoot": true,
+   "matches": true,
+   "basis": "Go runner.go:366 Observe->reconcile mutates"
+  },
+  {
+   "case": "C11-rollback-keeps-capability-death",
+   "observed": true,
+   "expected72028OrRoot": true,
+   "matches": true,
+   "basis": "Root completion fence"
+  }
+ ],
+ "mismatches": [
+  "C1-cancel-under-QUARANTINE-registers",
+  "C2-cancel-after-lease-expiry-registers",
+  "C3-receipt-observe-under-QUARANTINE-registers",
+  "C4-receipt-observe-after-lease-expiry-registers",
+  "C7-R01-hint-no-footprint-while-other-execute-pending",
+  "C7b-R05-capacity-hint-no-footprint"
+ ]
+}

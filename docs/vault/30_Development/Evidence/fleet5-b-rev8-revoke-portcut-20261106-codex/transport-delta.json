@@ -1,0 +1,252 @@
+{
+  "source": "72028cbac903c4415d9979f980a6e0f9948e914f",
+  "parentTransportInventorySHA256": "04f592f337e8de61dc34e2c3c16c74dfd78d4b9a16b6a797b9996e2b1f392826",
+  "unchangedCallerBoundaries": 19,
+  "handlerFile": {
+    "path": "services/node-agent/transport/server.go",
+    "sha256": "c9c98084798eeda52a8f38bebc6a13f5e531deaf3c0016e4295ade19a500b8a2"
+  },
+  "handlerAnchors": {
+    "HEARTBEAT_OBSERVE": {
+      "rawPath": "/v1/heartbeats",
+      "method": "POST",
+      "enclosingFunction": {
+        "name": "func (h *handler) ServeHTTP(",
+        "startLine": 55,
+        "endLine": 303,
+        "sha256": "6cd012c71dedaca9410051ca27e8a7ed903e540bf7a080c2c7d3ec6ec8745d4b"
+      },
+      "branch": {
+        "condition": "if probe || snapshot {",
+        "startLine": 218,
+        "endLine": 249,
+        "sha256": "fe9e673bf4b2019079fba0cc105b9cd5c09b1459abb066d85b7d66753101324a"
+      },
+      "selector": {
+        "expression": "probe := r.URL.Path == \"/v1/heartbeats\"",
+        "line": 60
+      },
+      "line": 223,
+      "exactLine": "\t\tconfig := h.authority.config",
+      "rawPathGuard": "r.URL.RawQuery != \"\" || r.URL.RawPath != \"\"",
+      "effectivePathProof": "Validated closed URL.Path set; earlier distinct path handlers return. Default execute branch excludes cancelling and receipts; probe/snapshot branch uses exact selector. No first-substring/whole-file anchor."
+    },
+    "GPU_ACTIVE_OBSERVE": {
+      "rawPath": "/v1/snapshots",
+      "method": "POST",
+      "enclosingFunction": {
+        "name": "func (h *handler) ServeHTTP(",
+        "startLine": 55,
+        "endLine": 303,
+        "sha256": "6cd012c71dedaca9410051ca27e8a7ed903e540bf7a080c2c7d3ec6ec8745d4b"
+      },
+      "branch": {
+        "condition": "if snapshot {",
+        "startLine": 226,
+        "endLine": 236,
+        "sha256": "d4b2c0a5d40c8b504894a9c94bb8644f7d83313a0e37520f59b5ce3d96cb04de"
+      },
+      "selector": {
+        "expression": "snapshot := r.URL.Path == \"/v1/snapshots\"",
+        "line": 61
+      },
+      "line": 230,
+      "exactLine": "\t\t\tresult, err = telemetry.Sample(ctx)",
+      "rawPathGuard": "r.URL.RawQuery != \"\" || r.URL.RawPath != \"\"",
+      "effectivePathProof": "Validated closed URL.Path set; earlier distinct path handlers return. Default execute branch excludes cancelling and receipts; probe/snapshot branch uses exact selector. No first-substring/whole-file anchor."
+    },
+    "STORAGE_SAMPLE": {
+      "rawPath": "/v1/storage/sample",
+      "method": "POST",
+      "enclosingFunction": {
+        "name": "func (h *handler) ServeHTTP(",
+        "startLine": 55,
+        "endLine": 303,
+        "sha256": "6cd012c71dedaca9410051ca27e8a7ed903e540bf7a080c2c7d3ec6ec8745d4b"
+      },
+      "branch": {
+        "condition": "if storageSample {",
+        "startLine": 126,
+        "endLine": 143,
+        "sha256": "d2be2dcda42b37eda010253f14320a3bc19eb708bc5acb300876175c48e9808c"
+      },
+      "selector": {
+        "expression": "storageSample := r.URL.Path == \"/v1/storage/sample\"",
+        "line": 66
+      },
+      "line": 129,
+      "exactLine": "\t\tresult, err := h.storage.Sample(ctx, raw)",
+      "rawPathGuard": "r.URL.RawQuery != \"\" || r.URL.RawPath != \"\"",
+      "effectivePathProof": "Validated closed URL.Path set; earlier distinct path handlers return. Default execute branch excludes cancelling and receipts; probe/snapshot branch uses exact selector. No first-substring/whole-file anchor."
+    },
+    "OBJECT_READ": {
+      "rawPath": "/v1/objects/read",
+      "method": "POST",
+      "enclosingFunction": {
+        "name": "func (h *handler) ServeHTTP(",
+        "startLine": 55,
+        "endLine": 303,
+        "sha256": "6cd012c71dedaca9410051ca27e8a7ed903e540bf7a080c2c7d3ec6ec8745d4b"
+      },
+      "branch": {
+        "condition": "if chunk {",
+        "startLine": 198,
+        "endLine": 217,
+        "sha256": "7ef86166490a88a1ad9f7ffb7705affe4e8a446dfacfb6d20a439d0870e90c29"
+      },
+      "selector": {
+        "expression": "chunk := r.URL.Path == \"/v1/objects/read\"",
+        "line": 62
+      },
+      "line": 203,
+      "exactLine": "\t\tresult, err := h.objects.Read(ctx, input)",
+      "rawPathGuard": "r.URL.RawQuery != \"\" || r.URL.RawPath != \"\"",
+      "effectivePathProof": "Validated closed URL.Path set; earlier distinct path handlers return. Default execute branch excludes cancelling and receipts; probe/snapshot branch uses exact selector. No first-substring/whole-file anchor."
+    },
+    "TERMINAL_FRAME": {
+      "rawPath": "/v1/terminals/frame",
+      "method": "POST",
+      "enclosingFunction": {
+        "name": "func (h *handler) ServeHTTP(",
+        "startLine": 55,
+        "endLine": 303,
+        "sha256": "6cd012c71dedaca9410051ca27e8a7ed903e540bf7a080c2c7d3ec6ec8745d4b"
+      },
+      "branch": {
+        "condition": "if terminal {",
+        "startLine": 173,
+        "endLine": 197,
+        "sha256": "4e0d904e86ce7eb82cea0a1bd2bf86acc3c249fdecd0b5f429cc0110c630f756"
+      },
+      "selector": {
+        "expression": "terminal := r.URL.Path == \"/v1/terminals/frame\"",
+        "line": 63
+      },
+      "line": 183,
+      "exactLine": "\t\tresult, err := engine.Terminal(ctx, raw)",
+      "rawPathGuard": "r.URL.RawQuery != \"\" || r.URL.RawPath != \"\"",
+      "effectivePathProof": "Validated closed URL.Path set; earlier distinct path handlers return. Default execute branch excludes cancelling and receipts; probe/snapshot branch uses exact selector. No first-substring/whole-file anchor."
+    },
+    "QUARANTINE_RECONCILE": {
+      "rawPath": "/v1/builds/quarantine",
+      "method": "POST",
+      "enclosingFunction": {
+        "name": "func (h *handler) ServeHTTP(",
+        "startLine": 55,
+        "endLine": 303,
+        "sha256": "6cd012c71dedaca9410051ca27e8a7ed903e540bf7a080c2c7d3ec6ec8745d4b"
+      },
+      "branch": {
+        "condition": "if quarantine {",
+        "startLine": 144,
+        "endLine": 172,
+        "sha256": "0c26d6d430c99d992c72c502cd41bae2338ff6a6285930b29f9e6d4ac23ad077"
+      },
+      "selector": {
+        "expression": "quarantine := r.URL.Path == \"/v1/builds/quarantine\"",
+        "line": 65
+      },
+      "line": 154,
+      "exactLine": "\t\tresult, err := recorder.Quarantine(ctx, raw)",
+      "rawPathGuard": "r.URL.RawQuery != \"\" || r.URL.RawPath != \"\"",
+      "effectivePathProof": "Validated closed URL.Path set; earlier distinct path handlers return. Default execute branch excludes cancelling and receipts; probe/snapshot branch uses exact selector. No first-substring/whole-file anchor."
+    },
+    "CANCEL": {
+      "rawPath": "/v1/executions/cancel",
+      "method": "POST",
+      "enclosingFunction": {
+        "name": "func (h *handler) ServeHTTP(",
+        "startLine": 55,
+        "endLine": 303,
+        "sha256": "6cd012c71dedaca9410051ca27e8a7ed903e540bf7a080c2c7d3ec6ec8745d4b"
+      },
+      "branch": {
+        "condition": "if cancelling {",
+        "startLine": 272,
+        "endLine": 281,
+        "sha256": "3db4bb2eb3744f2107fcdc7919eeda6ce57326798be7ace440228ec80016f859"
+      },
+      "selector": {
+        "expression": "cancelling := r.URL.Path == \"/v1/executions/cancel\"",
+        "line": 64
+      },
+      "line": 280,
+      "exactLine": "\t\tresult, err = stopper.Cancel(ctx, raw)",
+      "rawPathGuard": "r.URL.RawQuery != \"\" || r.URL.RawPath != \"\"",
+      "effectivePathProof": "Validated closed URL.Path set; earlier distinct path handlers return. Default execute branch excludes cancelling and receipts; probe/snapshot branch uses exact selector. No first-substring/whole-file anchor."
+    },
+    "RECEIPT_OBSERVE": {
+      "rawPath": "/v1/executions/receipts",
+      "method": "POST",
+      "enclosingFunction": {
+        "name": "func (h *handler) ServeHTTP(",
+        "startLine": 55,
+        "endLine": 303,
+        "sha256": "6cd012c71dedaca9410051ca27e8a7ed903e540bf7a080c2c7d3ec6ec8745d4b"
+      },
+      "branch": {
+        "condition": "else if r.URL.Path == \"/v1/executions/receipts\" {",
+        "startLine": 281,
+        "endLine": 283,
+        "sha256": "42ba0a57c52c73cdc9e4ba8392741c196b8f03ebbe577afb00bea2a18ed7d786"
+      },
+      "selector": {
+        "expression": "r.URL.Path == \"/v1/executions/receipts\"",
+        "line": 281
+      },
+      "line": 282,
+      "exactLine": "\t\tresult, err = h.runner.Observe(ctx, raw)",
+      "rawPathGuard": "r.URL.RawQuery != \"\" || r.URL.RawPath != \"\"",
+      "effectivePathProof": "Validated closed URL.Path set; earlier distinct path handlers return. Default execute branch excludes cancelling and receipts; probe/snapshot branch uses exact selector. No first-substring/whole-file anchor."
+    },
+    "EXECUTE": {
+      "rawPath": "/v1/executions",
+      "method": "POST",
+      "enclosingFunction": {
+        "name": "func (h *handler) ServeHTTP(",
+        "startLine": 55,
+        "endLine": 303,
+        "sha256": "6cd012c71dedaca9410051ca27e8a7ed903e540bf7a080c2c7d3ec6ec8745d4b"
+      },
+      "branch": {
+        "condition": "else {",
+        "startLine": 283,
+        "endLine": 285,
+        "sha256": "844ab93cd1f931a882aba226f7f61f0bd5c95bf136e617cbfac3d9dc81bed455"
+      },
+      "selector": {
+        "expression": "r.URL.Path != \"/v1/executions\"",
+        "line": 67
+      },
+      "line": 284,
+      "exactLine": "\t\tresult, err = h.runner.Execute(ctx, raw)",
+      "rawPathGuard": "r.URL.RawQuery != \"\" || r.URL.RawPath != \"\"",
+      "effectivePathProof": "Validated closed URL.Path set; earlier distinct path handlers return. Default execute branch excludes cancelling and receipts; probe/snapshot branch uses exact selector. No first-substring/whole-file anchor."
+    }
+  },
+  "I1MutationBranchSubstitutionRefused": true,
+  "optionalHook": {
+    "path": "services/control-plane/src/inv/build_execution.py",
+    "line": 885,
+    "expression": "getattr(self._transport, \"materialize_source_capsule\", None)",
+    "fileSHA256": "afc4cabc20bd1d4f4adf3f1542ed5eb49d9f16631b5dbdb3ebc5d06d1bc9d11f",
+    "disposition": "ABSENT_IN72028_ALWAYS_RES0006",
+    "scope": "Exact optional literal getattr only",
+    "scanCommand": [
+      "git",
+      "grep",
+      "-n",
+      "-E",
+      "def materialize_source_capsule|materialize_source_capsule[[:space:]]*=",
+      "72028cbac903c4415d9979f980a6e0f9948e914f",
+      "--",
+      "services/control-plane/src",
+      "src",
+      "deploy"
+    ],
+    "scanExit": 1,
+    "scanOutputSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "futureImplementation": "NEW IO kind/method/effect/owner registration plus independent review; never silently inherit BUILD_DISPATCH or a generic filesystem port"
+  },
+  "actualRuntimeB": 0
+}

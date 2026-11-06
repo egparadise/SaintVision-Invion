@@ -1,0 +1,2 @@
+PASS: RDF parsing, defined terms, TTL/JSON-LD equivalence, 48 task mappings, positive SHACL, 4 rejected invalid fixtures, 4 competency queries, Obsidian mirrors.
+{"ownerResourceMeasurement": {"target": "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105\\tools\\check_ontology.py", "peakWorkingSetBytes": 67436544, "elapsedSeconds": 2.599, "OSMemoryLimitEnforced": false, "serial": true}}

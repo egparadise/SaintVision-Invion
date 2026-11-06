@@ -1,0 +1,12 @@
+{
+  "scope": "OWNER development checks; not runtime evidence",
+  "failures": [
+    {
+      "command": ["D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe", "-B", "docs/vault/30_Development/Evidence/fleet5-b-rev8-revoke-portcut-20261106-codex/transport_delta.py"],
+      "actualExit": 1,
+      "failure": "AssertionError at assert refused: initial two-step source replacement canceled itself and produced the original source",
+      "fix": "Swap Observe/Execute with a unique placeholder so the mutation actually substitutes the two handler branches; anchor generator must reject it",
+      "resolution": "See subsequent exact proof-check log/exit; no product source changed"
+    }
+  ]
+}

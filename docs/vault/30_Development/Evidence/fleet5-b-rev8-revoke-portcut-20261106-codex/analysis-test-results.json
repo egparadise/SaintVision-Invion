@@ -1,0 +1,102 @@
+{
+  "ownerOnly": true,
+  "scope": "BOUNDED_AST_PROOFS_ONLY",
+  "cases": [
+    {
+      "case": "A2-DomainError-actual-nonfrozen-constructor",
+      "pass": true
+    },
+    {
+      "case": "A2-InvError-actual-postinit-category-map-base",
+      "pass": true
+    },
+    {
+      "case": "DomainError-ctor-DB-BLOCK",
+      "pass": true
+    },
+    {
+      "case": "DomainError-postinit-IO-BLOCK",
+      "pass": true
+    },
+    {
+      "case": "InvError-ctor-DB-BLOCK",
+      "pass": true
+    },
+    {
+      "case": "InvError-postinit-IO-BLOCK",
+      "pass": true
+    },
+    {
+      "case": "A1-actual-recorded-result-0",
+      "pass": true
+    },
+    {
+      "case": "A1-actual-recorded-result-1",
+      "pass": true
+    },
+    {
+      "case": "A1-mystery().execute(\"SELECT 1\").fetchone()-BLOCK",
+      "pass": true
+    },
+    {
+      "case": "A1-foreign_cursor.execute(\"SELECT 1\").fetchone()-BLOCK",
+      "pass": true
+    },
+    {
+      "case": "A1-cursor-rebinding-BLOCK",
+      "pass": true
+    },
+    {
+      "case": "W23-loaded-B-model-writer",
+      "pass": true
+    },
+    {
+      "case": "W23-new-unmapped-B-writer-fails-census",
+      "pass": true
+    },
+    {
+      "case": "W23-unknown-instance-DYNAMIC_BLOCK",
+      "pass": true
+    },
+    {
+      "case": "W23-foreign-session-DYNAMIC_BLOCK",
+      "pass": true
+    },
+    {
+      "case": "W23b-loaded-B-model-writer",
+      "pass": true
+    },
+    {
+      "case": "W23b-new-unmapped-B-writer-fails-census",
+      "pass": true
+    },
+    {
+      "case": "W23b-unknown-instance-DYNAMIC_BLOCK",
+      "pass": true
+    },
+    {
+      "case": "W23b-foreign-session-DYNAMIC_BLOCK",
+      "pass": true
+    },
+    {
+      "case": "A6-actual-src/saintvision/services/pools.py",
+      "pass": true
+    },
+    {
+      "case": "A6-actual-src/saintvision/services/settings.py",
+      "pass": true
+    }
+  ],
+  "resource": {
+    "sourceFiles": 5,
+    "bytes": 59770
+  },
+  "notImplementedRules": [
+    "A3",
+    "A4",
+    "A5",
+    "A7",
+    "A8"
+  ],
+  "actualRuntimeB": 0
+}

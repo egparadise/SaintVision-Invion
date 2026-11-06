@@ -1,0 +1,309 @@
+{
+  "phase": "proof-checks",
+  "commands": [
+    {
+      "command": [
+        "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+        "-B",
+        "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105\\docs\\vault\\30_Development\\Evidence\\fleet5-b-rev8-revoke-portcut-20261106-codex\\measured_run.py",
+        "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105\\docs\\vault\\30_Development\\Evidence\\fleet5-b-rev8-revoke-portcut-20261106-codex\\schema.py"
+      ],
+      "expectedExit": 0,
+      "actualExit": 0,
+      "seconds": 0.415,
+      "kst": "2026-11-06T15:37:48.557915+09:00",
+      "log": "proof-checks-1.log",
+      "sha256": "67d7f0e5e9affef400f531db830984f4c4ec4efe304238b9e9da6fc9d52548ec",
+      "resource": {
+        "target": "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105\\docs\\vault\\30_Development\\Evidence\\fleet5-b-rev8-revoke-portcut-20261106-codex\\schema.py",
+        "peakWorkingSetBytes": 21585920,
+        "elapsedSeconds": 0.05,
+        "OSMemoryLimitEnforced": false,
+        "serial": true
+      }
+    },
+    {
+      "command": [
+        "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+        "-B",
+        "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105\\docs\\vault\\30_Development\\Evidence\\fleet5-b-rev8-revoke-portcut-20261106-codex\\measured_run.py",
+        "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105\\docs\\vault\\30_Development\\Evidence\\fleet5-b-rev8-revoke-portcut-20261106-codex\\authority.py"
+      ],
+      "expectedExit": 0,
+      "actualExit": 0,
+      "seconds": 1.745,
+      "kst": "2026-11-06T15:37:50.321210+09:00",
+      "log": "proof-checks-2.log",
+      "sha256": "485ed776ecb1bef2337153cb957af544243fd9c57ce3ebf959793df023bb0ed7",
+      "resource": {
+        "target": "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105\\docs\\vault\\30_Development\\Evidence\\fleet5-b-rev8-revoke-portcut-20261106-codex\\authority.py",
+        "peakWorkingSetBytes": 50024448,
+        "elapsedSeconds": 1.63,
+        "OSMemoryLimitEnforced": false,
+        "serial": true
+      }
+    },
+    {
+      "command": [
+        "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+        "-B",
+        "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105\\docs\\vault\\30_Development\\Evidence\\fleet5-b-rev8-revoke-portcut-20261106-codex\\measured_run.py",
+        "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105\\docs\\vault\\30_Development\\Evidence\\fleet5-b-rev8-revoke-portcut-20261106-codex\\regression_red_green.py",
+        "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105\\docs\\vault\\30_Development\\Evidence\\fleet5-b-contract-rev7-20261106-codex"
+      ],
+      "expectedExit": 1,
+      "actualExit": 1,
+      "seconds": 1.221,
+      "kst": "2026-11-06T15:37:51.543033+09:00",
+      "log": "proof-checks-3.log",
+      "sha256": "db2edb3ed06d46f7c5802d2edf85ec2ce9b230ba7f2ec27a089a173e9bdf4a64",
+      "resource": {
+        "target": "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105\\docs\\vault\\30_Development\\Evidence\\fleet5-b-rev8-revoke-portcut-20261106-codex\\regression_red_green.py",
+        "peakWorkingSetBytes": 62308352,
+        "elapsedSeconds": 0.761,
+        "OSMemoryLimitEnforced": false,
+        "serial": true
+      }
+    },
+    {
+      "command": [
+        "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+        "-B",
+        "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105\\docs\\vault\\30_Development\\Evidence\\fleet5-b-rev8-revoke-portcut-20261106-codex\\measured_run.py",
+        "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105\\docs\\vault\\30_Development\\Evidence\\fleet5-b-rev8-revoke-portcut-20261106-codex\\regression_red_green.py",
+        "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105\\docs\\vault\\30_Development\\Evidence\\fleet5-b-rev8-revoke-portcut-20261106-codex"
+      ],
+      "expectedExit": 0,
+      "actualExit": 0,
+      "seconds": 0.458,
+      "kst": "2026-11-06T15:37:52.001113+09:00",
+      "log": "proof-checks-4.log",
+      "sha256": "57cf88185c0325c573c31e835d29a88003d8e0f89299d29588b96281114cfd9d",
+      "resource": {
+        "target": "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105\\docs\\vault\\30_Development\\Evidence\\fleet5-b-rev8-revoke-portcut-20261106-codex\\regression_red_green.py",
+        "peakWorkingSetBytes": 62328832,
+        "elapsedSeconds": 0.346,
+        "OSMemoryLimitEnforced": false,
+        "serial": true
+      }
+    },
+    {
+      "command": [
+        "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+        "-B",
+        "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105\\docs\\vault\\30_Development\\Evidence\\fleet5-b-rev8-revoke-portcut-20261106-codex\\measured_run.py",
+        "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105\\docs\\vault\\30_Development\\Evidence\\fleet5-b-rev8-revoke-portcut-20261106-codex\\proof_tests.py"
+      ],
+      "expectedExit": 0,
+      "actualExit": 0,
+      "seconds": 1.065,
+      "kst": "2026-11-06T15:37:53.066613+09:00",
+      "log": "proof-checks-5.log",
+      "sha256": "f4c367c1af9d584a96c05cc36c224c5f4860d26a99742a62aadeca77e447ab79",
+      "resource": {
+        "target": "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105\\docs\\vault\\30_Development\\Evidence\\fleet5-b-rev8-revoke-portcut-20261106-codex\\proof_tests.py",
+        "peakWorkingSetBytes": 62320640,
+        "elapsedSeconds": 0.944,
+        "OSMemoryLimitEnforced": false,
+        "serial": true
+      }
+    },
+    {
+      "command": [
+        "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+        "-B",
+        "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105\\docs\\vault\\30_Development\\Evidence\\fleet5-b-rev8-revoke-portcut-20261106-codex\\measured_run.py",
+        "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105\\docs\\vault\\30_Development\\Evidence\\fleet5-b-rev8-revoke-portcut-20261106-codex\\bounded_analysis.py"
+      ],
+      "expectedExit": 0,
+      "actualExit": 0,
+      "seconds": 0.961,
+      "kst": "2026-11-06T15:37:54.028423+09:00",
+      "log": "proof-checks-6.log",
+      "sha256": "c50ca7a0e31f33e6475b083d7e9375272cbd44e78ce7a57fa4d87e1734856176",
+      "resource": {
+        "target": "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105\\docs\\vault\\30_Development\\Evidence\\fleet5-b-rev8-revoke-portcut-20261106-codex\\bounded_analysis.py",
+        "peakWorkingSetBytes": 36990976,
+        "elapsedSeconds": 0.859,
+        "OSMemoryLimitEnforced": false,
+        "serial": true
+      }
+    },
+    {
+      "command": [
+        "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+        "-B",
+        "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105\\docs\\vault\\30_Development\\Evidence\\fleet5-b-rev8-revoke-portcut-20261106-codex\\measured_run.py",
+        "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105\\docs\\vault\\30_Development\\Evidence\\fleet5-b-rev8-revoke-portcut-20261106-codex\\analysis_tests.py"
+      ],
+      "expectedExit": 0,
+      "actualExit": 0,
+      "seconds": 0.658,
+      "kst": "2026-11-06T15:37:54.687427+09:00",
+      "log": "proof-checks-7.log",
+      "sha256": "a244c917fa5991537c327782b96a98d1e09815abb05a64dffa84eca098a7b337",
+      "resource": {
+        "target": "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105\\docs\\vault\\30_Development\\Evidence\\fleet5-b-rev8-revoke-portcut-20261106-codex\\analysis_tests.py",
+        "peakWorkingSetBytes": 26431488,
+        "elapsedSeconds": 0.55,
+        "OSMemoryLimitEnforced": false,
+        "serial": true
+      }
+    },
+    {
+      "command": [
+        "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+        "-B",
+        "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105\\docs\\vault\\30_Development\\Evidence\\fleet5-b-rev8-revoke-portcut-20261106-codex\\measured_run.py",
+        "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105\\docs\\vault\\30_Development\\Evidence\\fleet5-b-rev8-revoke-portcut-20261106-codex\\pending_contracts.py"
+      ],
+      "expectedExit": 0,
+      "actualExit": 0,
+      "seconds": 1.343,
+      "kst": "2026-11-06T15:37:56.031333+09:00",
+      "log": "proof-checks-8.log",
+      "sha256": "c445a928b86511bdfb46c9744f06d45386b2571f18eca00b9a2230bed1a36408",
+      "resource": {
+        "target": "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105\\docs\\vault\\30_Development\\Evidence\\fleet5-b-rev8-revoke-portcut-20261106-codex\\pending_contracts.py",
+        "peakWorkingSetBytes": 25378816,
+        "elapsedSeconds": 1.235,
+        "OSMemoryLimitEnforced": false,
+        "serial": true
+      }
+    },
+    {
+      "command": [
+        "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+        "-B",
+        "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105\\docs\\vault\\30_Development\\Evidence\\fleet5-b-rev8-revoke-portcut-20261106-codex\\measured_run.py",
+        "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105\\docs\\vault\\30_Development\\Evidence\\fleet5-b-rev8-revoke-portcut-20261106-codex\\edge_categories.py"
+      ],
+      "expectedExit": 0,
+      "actualExit": 0,
+      "seconds": 0.431,
+      "kst": "2026-11-06T15:37:56.462803+09:00",
+      "log": "proof-checks-9.log",
+      "sha256": "7d3f0b22fc4effe4f65086dee8c80b3b7508ef092cdb52f04b758f043673c40a",
+      "resource": {
+        "target": "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105\\docs\\vault\\30_Development\\Evidence\\fleet5-b-rev8-revoke-portcut-20261106-codex\\edge_categories.py",
+        "peakWorkingSetBytes": 31305728,
+        "elapsedSeconds": 0.319,
+        "OSMemoryLimitEnforced": false,
+        "serial": true
+      }
+    },
+    {
+      "command": [
+        "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+        "-B",
+        "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105\\docs\\vault\\30_Development\\Evidence\\fleet5-b-rev8-revoke-portcut-20261106-codex\\measured_run.py",
+        "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105\\docs\\vault\\30_Development\\Evidence\\fleet5-b-rev8-revoke-portcut-20261106-codex\\transport_delta.py"
+      ],
+      "expectedExit": 0,
+      "actualExit": 0,
+      "seconds": 2.345,
+      "kst": "2026-11-06T15:37:58.808348+09:00",
+      "log": "proof-checks-10.log",
+      "sha256": "2354f7716c1bd1f3c5ad98f0595047d4f84c053025a01f6fe5e85415ec2e74b3",
+      "resource": {
+        "target": "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105\\docs\\vault\\30_Development\\Evidence\\fleet5-b-rev8-revoke-portcut-20261106-codex\\transport_delta.py",
+        "peakWorkingSetBytes": 23187456,
+        "elapsedSeconds": 2.219,
+        "OSMemoryLimitEnforced": false,
+        "serial": true
+      }
+    },
+    {
+      "command": [
+        "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+        "-B",
+        "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105\\docs\\vault\\30_Development\\Evidence\\fleet5-b-rev8-revoke-portcut-20261106-codex\\measured_run.py",
+        "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105\\docs\\vault\\30_Development\\Evidence\\fleet5-b-rev8-revoke-portcut-20261106-codex\\retained_tests.py"
+      ],
+      "expectedExit": 0,
+      "actualExit": 0,
+      "seconds": 1.146,
+      "kst": "2026-11-06T15:37:59.955313+09:00",
+      "log": "proof-checks-11.log",
+      "sha256": "717c38ad99d75b7f82e550c919821ebc01d7cd1df834f74a46d40f81100674ed",
+      "resource": {
+        "target": "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105\\docs\\vault\\30_Development\\Evidence\\fleet5-b-rev8-revoke-portcut-20261106-codex\\retained_tests.py",
+        "peakWorkingSetBytes": 62173184,
+        "elapsedSeconds": 0.994,
+        "OSMemoryLimitEnforced": false,
+        "serial": true
+      }
+    },
+    {
+      "command": [
+        "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+        "-B",
+        "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105\\docs\\vault\\30_Development\\Evidence\\fleet5-b-rev8-revoke-portcut-20261106-codex\\measured_run.py",
+        "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105\\docs\\vault\\30_Development\\Evidence\\fleet5-b-rev8-revoke-portcut-20261106-codex\\packet_checks.py"
+      ],
+      "expectedExit": 0,
+      "actualExit": 0,
+      "seconds": 2.458,
+      "kst": "2026-11-06T15:38:02.414110+09:00",
+      "log": "proof-checks-12.log",
+      "sha256": "bfe6429baf626ffa6046194e9be8fe8fd9de38d4299d05083abb1f8a87807fc8",
+      "resource": {
+        "target": "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105\\docs\\vault\\30_Development\\Evidence\\fleet5-b-rev8-revoke-portcut-20261106-codex\\packet_checks.py",
+        "peakWorkingSetBytes": 62144512,
+        "elapsedSeconds": 2.332,
+        "OSMemoryLimitEnforced": false,
+        "serial": true
+      }
+    },
+    {
+      "command": [
+        "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+        "-B",
+        "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105\\docs\\vault\\30_Development\\Evidence\\fleet5-b-rev8-revoke-portcut-20261106-codex\\measured_run.py",
+        "tests/proofs/fleet5_compute_storage_contract_probe.py"
+      ],
+      "expectedExit": 0,
+      "actualExit": 0,
+      "seconds": 0.276,
+      "kst": "2026-11-06T15:38:02.690851+09:00",
+      "log": "proof-checks-13.log",
+      "sha256": "fc0c80ec21ad1d21e90a8e956b67517169e1eb8aea98483a1fab13f7867ec88b",
+      "resource": {
+        "target": "tests/proofs/fleet5_compute_storage_contract_probe.py",
+        "peakWorkingSetBytes": 25808896,
+        "elapsedSeconds": 0.17,
+        "OSMemoryLimitEnforced": false,
+        "serial": true
+      }
+    },
+    {
+      "command": [
+        "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+        "-B",
+        "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105\\docs\\vault\\30_Development\\Evidence\\fleet5-b-rev8-revoke-portcut-20261106-codex\\measured_run.py",
+        "tests/proofs/fleet5_compute_storage_contract_probe.py",
+        "--require-coexistence"
+      ],
+      "expectedExit": 1,
+      "actualExit": 1,
+      "seconds": 0.179,
+      "kst": "2026-11-06T15:38:02.870242+09:00",
+      "log": "proof-checks-14.log",
+      "sha256": "fefea51ed8a7ab85c6a8fef062395f469d78ee988cb6d874af3d866d027432fa",
+      "resource": {
+        "target": "tests/proofs/fleet5_compute_storage_contract_probe.py",
+        "peakWorkingSetBytes": 25767936,
+        "elapsedSeconds": 0.072,
+        "OSMemoryLimitEnforced": false,
+        "serial": true
+      }
+    }
+  ],
+  "canonicalSyncStateBeforeSHA256": null,
+  "canonicalSyncStateAfterSHA256": null,
+  "obsidianApply": false,
+  "actualRuntimeB": 0,
+  "fullAssembler": "NOT_RUN",
+  "source": "72028cbac903c4415d9979f980a6e0f9948e914f",
+  "independentReview": "PENDING through Root"
+}

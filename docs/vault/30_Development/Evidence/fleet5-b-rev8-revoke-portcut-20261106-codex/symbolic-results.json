@@ -1,0 +1,839 @@
+{
+  "ownerOnly": true,
+  "scope": "SYMBOLIC_PROPOSAL_ONLY",
+  "cases": [
+    {
+      "case": "PLAINCANCELQUARANTINE-register",
+      "pass": true
+    },
+    {
+      "case": "PLAINCANCELQUARANTINE-invoke",
+      "pass": true
+    },
+    {
+      "case": "PLAINCANCELQUARANTINE-retains-claims",
+      "pass": true
+    },
+    {
+      "case": "PLAINCANCELDRAIN-register",
+      "pass": true
+    },
+    {
+      "case": "PLAINCANCELDRAIN-invoke",
+      "pass": true
+    },
+    {
+      "case": "PLAINCANCELDRAIN-retains-claims",
+      "pass": true
+    },
+    {
+      "case": "PLAINCANCELRETIRE_BUSINESS_ONLY-register",
+      "pass": true
+    },
+    {
+      "case": "PLAINCANCELRETIRE_BUSINESS_ONLY-invoke",
+      "pass": true
+    },
+    {
+      "case": "PLAINCANCELRETIRE_BUSINESS_ONLY-retains-claims",
+      "pass": true
+    },
+    {
+      "case": "PLAINCANCELEXECUTION_LEASE-register",
+      "pass": true
+    },
+    {
+      "case": "PLAINCANCELEXECUTION_LEASE-invoke",
+      "pass": true
+    },
+    {
+      "case": "PLAINCANCELEXECUTION_LEASE-retains-claims",
+      "pass": true
+    },
+    {
+      "case": "PLAINCANCELACTIVATION_LEASE-register",
+      "pass": true
+    },
+    {
+      "case": "PLAINCANCELACTIVATION_LEASE-invoke",
+      "pass": true
+    },
+    {
+      "case": "PLAINCANCELACTIVATION_LEASE-retains-claims",
+      "pass": true
+    },
+    {
+      "case": "PLAINCANCELOFFLINE-register",
+      "pass": true
+    },
+    {
+      "case": "PLAINCANCELOFFLINE-invoke",
+      "pass": true
+    },
+    {
+      "case": "PLAINCANCELOFFLINE-retains-claims",
+      "pass": true
+    },
+    {
+      "case": "PLAINCANCELEXECUTION_GRANT-register",
+      "pass": true
+    },
+    {
+      "case": "PLAINCANCELEXECUTION_GRANT-invoke",
+      "pass": true
+    },
+    {
+      "case": "PLAINCANCELEXECUTION_GRANT-retains-claims",
+      "pass": true
+    },
+    {
+      "case": "PLAINRECEIPT_OBSERVEQUARANTINE-register",
+      "pass": true
+    },
+    {
+      "case": "PLAINRECEIPT_OBSERVEQUARANTINE-invoke",
+      "pass": true
+    },
+    {
+      "case": "PLAINRECEIPT_OBSERVEQUARANTINE-retains-claims",
+      "pass": true
+    },
+    {
+      "case": "PLAINRECEIPT_OBSERVEDRAIN-register",
+      "pass": true
+    },
+    {
+      "case": "PLAINRECEIPT_OBSERVEDRAIN-invoke",
+      "pass": true
+    },
+    {
+      "case": "PLAINRECEIPT_OBSERVEDRAIN-retains-claims",
+      "pass": true
+    },
+    {
+      "case": "PLAINRECEIPT_OBSERVERETIRE_BUSINESS_ONLY-register",
+      "pass": true
+    },
+    {
+      "case": "PLAINRECEIPT_OBSERVERETIRE_BUSINESS_ONLY-invoke",
+      "pass": true
+    },
+    {
+      "case": "PLAINRECEIPT_OBSERVERETIRE_BUSINESS_ONLY-retains-claims",
+      "pass": true
+    },
+    {
+      "case": "PLAINRECEIPT_OBSERVEEXECUTION_LEASE-register",
+      "pass": true
+    },
+    {
+      "case": "PLAINRECEIPT_OBSERVEEXECUTION_LEASE-invoke",
+      "pass": true
+    },
+    {
+      "case": "PLAINRECEIPT_OBSERVEEXECUTION_LEASE-retains-claims",
+      "pass": true
+    },
+    {
+      "case": "PLAINRECEIPT_OBSERVEACTIVATION_LEASE-register",
+      "pass": true
+    },
+    {
+      "case": "PLAINRECEIPT_OBSERVEACTIVATION_LEASE-invoke",
+      "pass": true
+    },
+    {
+      "case": "PLAINRECEIPT_OBSERVEACTIVATION_LEASE-retains-claims",
+      "pass": true
+    },
+    {
+      "case": "PLAINRECEIPT_OBSERVEOFFLINE-register",
+      "pass": true
+    },
+    {
+      "case": "PLAINRECEIPT_OBSERVEOFFLINE-invoke",
+      "pass": true
+    },
+    {
+      "case": "PLAINRECEIPT_OBSERVEOFFLINE-retains-claims",
+      "pass": true
+    },
+    {
+      "case": "PLAINRECEIPT_OBSERVEEXECUTION_GRANT-register",
+      "pass": true
+    },
+    {
+      "case": "PLAINRECEIPT_OBSERVEEXECUTION_GRANT-invoke",
+      "pass": true
+    },
+    {
+      "case": "PLAINRECEIPT_OBSERVEEXECUTION_GRANT-retains-claims",
+      "pass": true
+    },
+    {
+      "case": "PLAIN-wrong-parentHandleHash",
+      "pass": true
+    },
+    {
+      "case": "PLAIN-wrong-parentCommandSHA",
+      "pass": true
+    },
+    {
+      "case": "PLAIN-wrong-runId",
+      "pass": true
+    },
+    {
+      "case": "PLAIN-wrong-claimBindingSHA",
+      "pass": true
+    },
+    {
+      "case": "PLAIN-wrong-ownerBindingSHA",
+      "pass": true
+    },
+    {
+      "case": "PLAIN-wrong-existingPermitOrApprovalSHA",
+      "pass": true
+    },
+    {
+      "case": "PLAIN-wrong-channelVersion",
+      "pass": true
+    },
+    {
+      "case": "PLAIN-wrong-nodeDER",
+      "pass": true
+    },
+    {
+      "case": "PLAIN-wrong-generation",
+      "pass": true
+    },
+    {
+      "case": "PLAINregister-auth-channelEnabled",
+      "pass": true
+    },
+    {
+      "case": "PLAINinvoke-auth-channelEnabled",
+      "pass": true
+    },
+    {
+      "case": "PLAINregister-auth-keyLive",
+      "pass": true
+    },
+    {
+      "case": "PLAINinvoke-auth-keyLive",
+      "pass": true
+    },
+    {
+      "case": "PLAINregister-auth-certNotAfter",
+      "pass": true
+    },
+    {
+      "case": "PLAINinvoke-auth-certNotAfter",
+      "pass": true
+    },
+    {
+      "case": "PLAINregister-auth-observeGrantLive",
+      "pass": true
+    },
+    {
+      "case": "PLAINinvoke-auth-observeGrantLive",
+      "pass": true
+    },
+    {
+      "case": "PLAINregister-auth-observeGrantUntil",
+      "pass": true
+    },
+    {
+      "case": "PLAINinvoke-auth-observeGrantUntil",
+      "pass": true
+    },
+    {
+      "case": "PLAINregister-auth-epoch",
+      "pass": true
+    },
+    {
+      "case": "PLAINinvoke-auth-epoch",
+      "pass": true
+    },
+    {
+      "case": "PLAINregister-auth-fenced",
+      "pass": true
+    },
+    {
+      "case": "PLAINinvoke-auth-fenced",
+      "pass": true
+    },
+    {
+      "case": "PLAIN-unauthenticated-connection",
+      "pass": true
+    },
+    {
+      "case": "PLAIN-wrong-authenticated-scope",
+      "pass": true
+    },
+    {
+      "case": "PLAIN-wrong-control-epoch",
+      "pass": true
+    },
+    {
+      "case": "PLAIN-UNKNOWN-parent-cancel",
+      "pass": true
+    },
+    {
+      "case": "PLAIN-UNKNOWN-parent-receipt-protected-only",
+      "pass": true
+    },
+    {
+      "case": "PLAIN-cancel-ACK-own-only",
+      "pass": true
+    },
+    {
+      "case": "PLAIN-UNKNOWN-ordinary-late-confirm-refused",
+      "pass": true
+    },
+    {
+      "case": "PLAIN-exact-original-receipt-frees-matched-only",
+      "pass": true
+    },
+    {
+      "case": "PLAIN-physical-receipt-does-not-settle-UNKNOWN",
+      "pass": true
+    },
+    {
+      "case": "PLAIN-other-denials-retained",
+      "pass": true
+    },
+    {
+      "case": "PLAIN-kernel-negative-schemaValid",
+      "pass": true
+    },
+    {
+      "case": "PLAIN-kernel-negative-stopped",
+      "pass": true
+    },
+    {
+      "case": "PLAIN-kernel-negative-cleanupPending",
+      "pass": true
+    },
+    {
+      "case": "PLAIN-kernel-negative-projectClaimPlanExact",
+      "pass": true
+    },
+    {
+      "case": "PLAIN-kernel-negative-exactUnreleasedAllocationSet",
+      "pass": true
+    },
+    {
+      "case": "PLAIN-kernel-negative-uniqueAllocationIds",
+      "pass": true
+    },
+    {
+      "case": "PLAIN-kernel-negative-resourceNodeKindAmountFenceExact",
+      "pass": true
+    },
+    {
+      "case": "PLAIN-kernel-negative-receiptIdContentImmutable",
+      "pass": true
+    },
+    {
+      "case": "PLAIN-kernel-negative-sameTransactionRecordAndRelease",
+      "pass": true
+    },
+    {
+      "case": "PLAIN-kernel-negative-commandSHA",
+      "pass": true
+    },
+    {
+      "case": "PLAIN-kernel-negative-generation",
+      "pass": true
+    },
+    {
+      "case": "PLAIN-ACK-label-not-original-receipt",
+      "pass": true
+    },
+    {
+      "case": "PLAIN-terminal-DRAIN",
+      "pass": true
+    },
+    {
+      "case": "PLAIN-terminal-QUARANTINE",
+      "pass": true
+    },
+    {
+      "case": "PLAIN-terminal-RETIRE",
+      "pass": true
+    },
+    {
+      "case": "PLAIN-terminal-expired-refused",
+      "pass": true
+    },
+    {
+      "case": "PLAIN-parent-dies-before-confirm-no-revival",
+      "pass": true
+    },
+    {
+      "case": "PLAINR01-overlap-A",
+      "pass": true
+    },
+    {
+      "case": "PLAINR01-disjoint-B",
+      "pass": true
+    },
+    {
+      "case": "PLAINR01-missing-explicit",
+      "pass": true
+    },
+    {
+      "case": "PLAINR01-forged-caller-footprint-ignored",
+      "pass": true
+    },
+    {
+      "case": "PLAINR01-selected-admission-rechecks",
+      "pass": true
+    },
+    {
+      "case": "PLAINR01-unknown-parent-nodewide",
+      "pass": true
+    },
+    {
+      "case": "PLAINR05-overlap-A",
+      "pass": true
+    },
+    {
+      "case": "PLAINR05-disjoint-B",
+      "pass": true
+    },
+    {
+      "case": "PLAINR05-missing-explicit",
+      "pass": true
+    },
+    {
+      "case": "PLAINR05-forged-caller-footprint-ignored",
+      "pass": true
+    },
+    {
+      "case": "PLAINR05-selected-admission-rechecks",
+      "pass": true
+    },
+    {
+      "case": "PLAINR05-unknown-parent-nodewide",
+      "pass": true
+    },
+    {
+      "case": "BCANCELQUARANTINE-register",
+      "pass": true
+    },
+    {
+      "case": "BCANCELQUARANTINE-invoke",
+      "pass": true
+    },
+    {
+      "case": "BCANCELQUARANTINE-retains-claims",
+      "pass": true
+    },
+    {
+      "case": "BCANCELDRAIN-register",
+      "pass": true
+    },
+    {
+      "case": "BCANCELDRAIN-invoke",
+      "pass": true
+    },
+    {
+      "case": "BCANCELDRAIN-retains-claims",
+      "pass": true
+    },
+    {
+      "case": "BCANCELRETIRE_BUSINESS_ONLY-register",
+      "pass": true
+    },
+    {
+      "case": "BCANCELRETIRE_BUSINESS_ONLY-invoke",
+      "pass": true
+    },
+    {
+      "case": "BCANCELRETIRE_BUSINESS_ONLY-retains-claims",
+      "pass": true
+    },
+    {
+      "case": "BCANCELEXECUTION_LEASE-register",
+      "pass": true
+    },
+    {
+      "case": "BCANCELEXECUTION_LEASE-invoke",
+      "pass": true
+    },
+    {
+      "case": "BCANCELEXECUTION_LEASE-retains-claims",
+      "pass": true
+    },
+    {
+      "case": "BCANCELACTIVATION_LEASE-register",
+      "pass": true
+    },
+    {
+      "case": "BCANCELACTIVATION_LEASE-invoke",
+      "pass": true
+    },
+    {
+      "case": "BCANCELACTIVATION_LEASE-retains-claims",
+      "pass": true
+    },
+    {
+      "case": "BCANCELOFFLINE-register",
+      "pass": true
+    },
+    {
+      "case": "BCANCELOFFLINE-invoke",
+      "pass": true
+    },
+    {
+      "case": "BCANCELOFFLINE-retains-claims",
+      "pass": true
+    },
+    {
+      "case": "BCANCELEXECUTION_GRANT-register",
+      "pass": true
+    },
+    {
+      "case": "BCANCELEXECUTION_GRANT-invoke",
+      "pass": true
+    },
+    {
+      "case": "BCANCELEXECUTION_GRANT-retains-claims",
+      "pass": true
+    },
+    {
+      "case": "BRECEIPT_OBSERVEQUARANTINE-register",
+      "pass": true
+    },
+    {
+      "case": "BRECEIPT_OBSERVEQUARANTINE-invoke",
+      "pass": true
+    },
+    {
+      "case": "BRECEIPT_OBSERVEQUARANTINE-retains-claims",
+      "pass": true
+    },
+    {
+      "case": "BRECEIPT_OBSERVEDRAIN-register",
+      "pass": true
+    },
+    {
+      "case": "BRECEIPT_OBSERVEDRAIN-invoke",
+      "pass": true
+    },
+    {
+      "case": "BRECEIPT_OBSERVEDRAIN-retains-claims",
+      "pass": true
+    },
+    {
+      "case": "BRECEIPT_OBSERVERETIRE_BUSINESS_ONLY-register",
+      "pass": true
+    },
+    {
+      "case": "BRECEIPT_OBSERVERETIRE_BUSINESS_ONLY-invoke",
+      "pass": true
+    },
+    {
+      "case": "BRECEIPT_OBSERVERETIRE_BUSINESS_ONLY-retains-claims",
+      "pass": true
+    },
+    {
+      "case": "BRECEIPT_OBSERVEEXECUTION_LEASE-register",
+      "pass": true
+    },
+    {
+      "case": "BRECEIPT_OBSERVEEXECUTION_LEASE-invoke",
+      "pass": true
+    },
+    {
+      "case": "BRECEIPT_OBSERVEEXECUTION_LEASE-retains-claims",
+      "pass": true
+    },
+    {
+      "case": "BRECEIPT_OBSERVEACTIVATION_LEASE-register",
+      "pass": true
+    },
+    {
+      "case": "BRECEIPT_OBSERVEACTIVATION_LEASE-invoke",
+      "pass": true
+    },
+    {
+      "case": "BRECEIPT_OBSERVEACTIVATION_LEASE-retains-claims",
+      "pass": true
+    },
+    {
+      "case": "BRECEIPT_OBSERVEOFFLINE-register",
+      "pass": true
+    },
+    {
+      "case": "BRECEIPT_OBSERVEOFFLINE-invoke",
+      "pass": true
+    },
+    {
+      "case": "BRECEIPT_OBSERVEOFFLINE-retains-claims",
+      "pass": true
+    },
+    {
+      "case": "BRECEIPT_OBSERVEEXECUTION_GRANT-register",
+      "pass": true
+    },
+    {
+      "case": "BRECEIPT_OBSERVEEXECUTION_GRANT-invoke",
+      "pass": true
+    },
+    {
+      "case": "BRECEIPT_OBSERVEEXECUTION_GRANT-retains-claims",
+      "pass": true
+    },
+    {
+      "case": "B-wrong-parentHandleHash",
+      "pass": true
+    },
+    {
+      "case": "B-wrong-parentCommandSHA",
+      "pass": true
+    },
+    {
+      "case": "B-wrong-runId",
+      "pass": true
+    },
+    {
+      "case": "B-wrong-claimBindingSHA",
+      "pass": true
+    },
+    {
+      "case": "B-wrong-ownerBindingSHA",
+      "pass": true
+    },
+    {
+      "case": "B-wrong-existingPermitOrApprovalSHA",
+      "pass": true
+    },
+    {
+      "case": "B-wrong-channelVersion",
+      "pass": true
+    },
+    {
+      "case": "B-wrong-nodeDER",
+      "pass": true
+    },
+    {
+      "case": "B-wrong-generation",
+      "pass": true
+    },
+    {
+      "case": "Bregister-auth-channelEnabled",
+      "pass": true
+    },
+    {
+      "case": "Binvoke-auth-channelEnabled",
+      "pass": true
+    },
+    {
+      "case": "Bregister-auth-keyLive",
+      "pass": true
+    },
+    {
+      "case": "Binvoke-auth-keyLive",
+      "pass": true
+    },
+    {
+      "case": "Bregister-auth-certNotAfter",
+      "pass": true
+    },
+    {
+      "case": "Binvoke-auth-certNotAfter",
+      "pass": true
+    },
+    {
+      "case": "Bregister-auth-observeGrantLive",
+      "pass": true
+    },
+    {
+      "case": "Binvoke-auth-observeGrantLive",
+      "pass": true
+    },
+    {
+      "case": "Bregister-auth-observeGrantUntil",
+      "pass": true
+    },
+    {
+      "case": "Binvoke-auth-observeGrantUntil",
+      "pass": true
+    },
+    {
+      "case": "Bregister-auth-epoch",
+      "pass": true
+    },
+    {
+      "case": "Binvoke-auth-epoch",
+      "pass": true
+    },
+    {
+      "case": "Bregister-auth-fenced",
+      "pass": true
+    },
+    {
+      "case": "Binvoke-auth-fenced",
+      "pass": true
+    },
+    {
+      "case": "B-unauthenticated-connection",
+      "pass": true
+    },
+    {
+      "case": "B-wrong-authenticated-scope",
+      "pass": true
+    },
+    {
+      "case": "B-wrong-control-epoch",
+      "pass": true
+    },
+    {
+      "case": "B-UNKNOWN-parent-cancel",
+      "pass": true
+    },
+    {
+      "case": "B-UNKNOWN-parent-receipt-protected-only",
+      "pass": true
+    },
+    {
+      "case": "B-cancel-ACK-own-only",
+      "pass": true
+    },
+    {
+      "case": "B-UNKNOWN-ordinary-late-confirm-refused",
+      "pass": true
+    },
+    {
+      "case": "B-exact-original-receipt-frees-matched-only",
+      "pass": true
+    },
+    {
+      "case": "B-physical-receipt-does-not-settle-UNKNOWN",
+      "pass": true
+    },
+    {
+      "case": "B-other-denials-retained",
+      "pass": true
+    },
+    {
+      "case": "B-kernel-negative-schemaValid",
+      "pass": true
+    },
+    {
+      "case": "B-kernel-negative-stopped",
+      "pass": true
+    },
+    {
+      "case": "B-kernel-negative-cleanupPending",
+      "pass": true
+    },
+    {
+      "case": "B-kernel-negative-projectClaimPlanExact",
+      "pass": true
+    },
+    {
+      "case": "B-kernel-negative-exactUnreleasedAllocationSet",
+      "pass": true
+    },
+    {
+      "case": "B-kernel-negative-uniqueAllocationIds",
+      "pass": true
+    },
+    {
+      "case": "B-kernel-negative-resourceNodeKindAmountFenceExact",
+      "pass": true
+    },
+    {
+      "case": "B-kernel-negative-receiptIdContentImmutable",
+      "pass": true
+    },
+    {
+      "case": "B-kernel-negative-sameTransactionRecordAndRelease",
+      "pass": true
+    },
+    {
+      "case": "B-kernel-negative-commandSHA",
+      "pass": true
+    },
+    {
+      "case": "B-kernel-negative-generation",
+      "pass": true
+    },
+    {
+      "case": "B-ACK-label-not-original-receipt",
+      "pass": true
+    },
+    {
+      "case": "B-terminal-DRAIN",
+      "pass": true
+    },
+    {
+      "case": "B-terminal-QUARANTINE",
+      "pass": true
+    },
+    {
+      "case": "B-terminal-RETIRE",
+      "pass": true
+    },
+    {
+      "case": "B-terminal-expired-refused",
+      "pass": true
+    },
+    {
+      "case": "B-parent-dies-before-confirm-no-revival",
+      "pass": true
+    },
+    {
+      "case": "BR01-overlap-A",
+      "pass": true
+    },
+    {
+      "case": "BR01-disjoint-B",
+      "pass": true
+    },
+    {
+      "case": "BR01-missing-explicit",
+      "pass": true
+    },
+    {
+      "case": "BR01-forged-caller-footprint-ignored",
+      "pass": true
+    },
+    {
+      "case": "BR01-selected-admission-rechecks",
+      "pass": true
+    },
+    {
+      "case": "BR01-unknown-parent-nodewide",
+      "pass": true
+    },
+    {
+      "case": "BR05-overlap-A",
+      "pass": true
+    },
+    {
+      "case": "BR05-disjoint-B",
+      "pass": true
+    },
+    {
+      "case": "BR05-missing-explicit",
+      "pass": true
+    },
+    {
+      "case": "BR05-forged-caller-footprint-ignored",
+      "pass": true
+    },
+    {
+      "case": "BR05-selected-admission-rechecks",
+      "pass": true
+    },
+    {
+      "case": "BR05-unknown-parent-nodewide",
+      "pass": true
+    }
+  ],
+  "actualRuntimeB": 0
+}

@@ -1,0 +1,211 @@
+{
+  "task": "FLEET5-B-REV8-REVOKE-PORTCUT-20261106",
+  "orcaTask": "task_a8fd2969f0b3",
+  "dispatch": "ctx_6f0f8253b8a7",
+  "owner": "Codex",
+  "reviewer": "Claude independent via Root; Rev8 PENDING",
+  "rootMessage": "msg_aca0d787de3d",
+  "base": "33f7c6b48883cb06d1ea7d645bdb88634eb1bca0",
+  "productSource": "72028cbac903c4415d9979f980a6e0f9948e914f",
+  "rootHead": "eb3d0ec35c4e6546d3534de93d7d6c311049266e",
+  "rootExpectedAtDecision": "443eb3d0ec35c4e6546d3534de93d7d6c311049266e; Index443/Codex404",
+  "kst": "2026-11-06T15:20:11.253388+09:00",
+  "docs": [
+    {
+      "path": "ROOT_READ_ONLY/docs/vault/00_Index/\uc804\uccb4 \uac1c\ubc1c \uc9c4\ud589 \ud604\ud669.md",
+      "sha256": "b72bf0932a5a92c18c270b736ad3ca6869fda8fc1a026bf97fc9ba2cba7b234e",
+      "frontmatter": "doc_id: \"INDEX-PROGRESS-001\"\r\ntitle: \"\uc804\uccb4 \uac1c\ubc1c \uc9c4\ud589 \ud604\ud669\"\r\nversion: \"1.0.444\"\r\nstatus: \"review\"\r\nauthor: \"Codex\"\r\nupdated: \"2026-11-06T15:18:50+09:00\"\r\nsource_of_truth: \"Git\"\r\nlatest_codex_card: \"B7actual97bb REVISION_REQUIRED2M2L/RootnarrowB8revoke_channelpilot+perkindrecoverychosen; K2Low+Stage2candidatecontinues; noBcodegrant/wholeCoreFAILURE/physicalincomplete\""
+    },
+    {
+      "path": "ROOT_READ_ONLY/docs/vault/30_Development/Agent\ubcc4 \uc791\uc5c5/Codex \uc791\uc5c5 \ud604\ud669.md",
+      "sha256": "a14bedbdd6d6d82bf061245aae5ea47c5933388fb7f2eade492a53bfaea6298f",
+      "frontmatter": "doc_id: \"WORKBOARD-CODEX-001\"\r\ntitle: \"Codex \uc791\uc5c5 \ud604\ud669\"\r\nversion: \"1.0.405\"\r\nstatus: \"review\"\r\nauthor: \"Codex\"\r\nupdated: \"2026-11-06T15:18:50+09:00\"\r\nsource_of_truth: \"Git\"\r\nactive_card: \"FLEET5-20261105 five physical node orchestration\"\r\nactive_card_status: \"B7actual97bb2M2L/rootnarrowRev8revoke_channelpilotdelivered; K2Low+Stage2candidate; noactiveClaudeuntilnewcandidate; noBcode/wholephysicalincomplete\"\r\nactive_card_next: \"B Codex Rev8perkindrecovery/hints/typedanalysispilot+exactDocs; K2Codex LowcheckpointthenStage2actualCI; Root nextimmutable ONEactualreview andcombinedCoreDocs decision\""
+    },
+    {
+      "path": "ROOT_READ_ONLY/docs/vault/00_Index/2026-09-15 \ub2e8\uc77c \uac00\uc0c1 \ucef4\ud4e8\ud130 \ubcf4\uac15 \uc124\uacc4 \uc778\ub371\uc2a4.md",
+      "sha256": "35f2cca047fdb57ff2e2ad28e3847e9a7c0a19d6ace6fb36aa941042e872e9be",
+      "frontmatter": "doc_id: \"INDEX-VIRTUAL-COMPUTER-001\"\ntitle: \"2026-09-15 \ub2e8\uc77c \uac00\uc0c1 \ucef4\ud4e8\ud130 \ubcf4\uac15 \uc124\uacc4 \uc778\ub371\uc2a4\"\nversion: \"1.0.0\"\nstatus: \"accepted\"\nauthor: \"Codex\"\nupdated: \"2026-09-15T11:20:06+09:00\"\nsource_of_truth: \"Git and Obsidian paired update\"\ntags: [\"saintvision\", \"inv\", \"web-desktop\", \"distributed-model\", \"roadmap\"]"
+    },
+    {
+      "path": "ROOT_READ_ONLY/docs/vault/30_Development/57.81\ud37c\uc13c\ud2b8 \uc774\ud6c4 \ub2e8\uc77c \uac00\uc0c1 \ucef4\ud4e8\ud130 \ubcf4\uac15 \ub85c\ub4dc\ub9f5.md",
+      "sha256": "3a4527ffe53ebea114063692dd3bba826da8c279a93a9800919fff394df1a018",
+      "frontmatter": "doc_id: \"ROADMAP-VIRTUAL-COMPUTER-001\"\ntitle: \"57.81\ud37c\uc13c\ud2b8 \uc774\ud6c4 \ub2e8\uc77c \uac00\uc0c1 \ucef4\ud4e8\ud130 \ubcf4\uac15 \ub85c\ub4dc\ub9f5\"\nversion: \"1.0.0\"\nstatus: \"accepted\"\nauthor: \"Codex\"\nupdated: \"2026-09-15T11:20:06+09:00\"\nsource_of_truth: \"Git and Obsidian paired update\"\ntags: [\"saintvision\", \"roadmap\", \"web-desktop\", \"storage-fabric\", \"agents\"]"
+    },
+    {
+      "path": "ROOT_READ_ONLY/docs/vault/40_Governance/Agent \uc5f0\uc18d \uc2e4\ud589\uacfc \ucd5c\uc885 \ubcf4\uace0 \uc815\ucc45.md",
+      "sha256": "60c6a8d3130491bd4cab730cccc0e236fb038d1c7c816efa333acdc34a30cd8f",
+      "frontmatter": "doc_id: \"GOV-CONTINUOUS-001\"\ntitle: \"Agent \uc5f0\uc18d \uc2e4\ud589\uacfc \ucd5c\uc885 \ubcf4\uace0 \uc815\ucc45\"\nversion: \"1.1.0\"\nstatus: \"accepted\"\nauthor: \"Codex\"\nupdated: \"2026-09-21T14:33:00+09:00\"\nsource_of_truth: \"Git and Obsidian paired update\"\ntags: [\"saintvision\", \"agents\", \"autonomy\", \"governance\"]"
+    },
+    {
+      "path": "ROOT_READ_ONLY/docs/vault/00_Index/\ucd5c\uc885 \uac1c\ubc1c \uacc4\ud68d - \ubaa8\ub4e0 \uac1c\ubc1c\uc758 \uc9c0\uce68.md",
+      "sha256": "59223c5dff4b4bb6252c8061aebe975665e6eadf92db3659a3f89951b2cb149f",
+      "frontmatter": "doc_id: \"GUIDE-001\"\ntitle: \"\ucd5c\uc885 \uac1c\ubc1c \uacc4\ud68d - \ubaa8\ub4e0 \uac1c\ubc1c\uc758 \uc9c0\uce68\"\nversion: \"1.1.0\"\nstatus: \"baseline\"\nauthor: \"Codex\"\nupdated: \"2026-09-11T17:15:06+09:00\"\ntimezone: \"Asia/Seoul\"\nsource_of_truth: \"Git\"\ntags: [\"saintvision\", \"final-plan\"]\naliases: [\"\ucd5c\uc885 \uacc4\ubc1c \uacc4\ud68c - \ubaa8\ub4e0 \uac1c\ubc1c\uc758 \uc9c0\uce68\", \"\ucd5c\uc885 \uac1c\ubc1c \uc9c0\uce68\"]"
+    },
+    {
+      "path": "ROOT_READ_ONLY/docs/vault/40_Governance/\uc124\uacc4 \ucda9\ub3cc \uc815\uc815 \ubc0f ADR.md",
+      "sha256": "771f7714a63af52d7c8aea2424db0b33a2fe96c759c51c81c23144daf7aeaf77",
+      "frontmatter": "doc_id: \"ADR-INDEX-001\"\ntitle: \"\uc124\uacc4 \ucda9\ub3cc \uc815\uc815 \ubc0f ADR\"\nversion: \"1.37.0\"\nstatus: \"baseline\"\nauthor: \"Codex\"\nupdated: \"2026-09-23T03:10:00+09:00\"\ntimezone: \"Asia/Seoul\"\nsource_of_truth: \"Git\"\ntags: [\"saintvision\", \"final-plan\"]"
+    },
+    {
+      "path": "ROOT_READ_ONLY/docs/vault/40_Governance/Agent \uc5ed\ud560\uacfc \uc778\uacc4 \uacc4\uc57d.md",
+      "sha256": "128c054e72f9e001b3b32f914cce544bce5432eddccdbe1212d27180c3200823",
+      "frontmatter": "doc_id: \"GOV-AGENT-001\"\ntitle: \"Agent \uc5ed\ud560\uacfc \uc778\uacc4 \uacc4\uc57d\"\nversion: \"1.1.3\"\nstatus: \"baseline\"\nauthor: \"Codex\"\nupdated: \"2026-09-21T18:47:00+09:00\"\ntimezone: \"Asia/Seoul\"\nsource_of_truth: \"Git\"\ntags: [\"saintvision\", \"final-plan\"]"
+    },
+    {
+      "path": "ROOT_READ_ONLY/docs/vault/40_Governance/Git Build Obsidian \uc6b4\uc601 \uc808\ucc28.md",
+      "sha256": "fe5e8adc44a14c081ac767265a16434b72e4b3ebfb7719081fa166ad459e59e9",
+      "frontmatter": "doc_id: \"GOV-GIT-001\"\ntitle: \"Git Build Obsidian \uc6b4\uc601 \uc808\ucc28\"\nversion: \"1.1.4\"\nstatus: \"baseline\"\nauthor: \"Codex\"\nupdated: \"2026-09-22T19:25:00+09:00\"\ntimezone: \"Asia/Seoul\"\nsource_of_truth: \"Git\"\ntags: [\"saintvision\", \"final-plan\"]"
+    },
+    {
+      "path": "ROOT_READ_ONLY/docs/vault/40_Governance/Agent \uc9c0\uc18d \uac1c\ubc1c \uc6b4\uc601 \uaddc\uce59.md",
+      "sha256": "63839c440ead6dc07300a0e18d5024fb9aadbddf546707156c39af7ee9495c84",
+      "frontmatter": "doc_id: \"GOV-CONTINUITY-001\"\ntitle: \"Agent \uc9c0\uc18d \uac1c\ubc1c \uc6b4\uc601 \uaddc\uce59\"\nversion: \"1.0.0\"\nstatus: \"review\"\nauthor: \"Codex\"\nupdated: \"2026-09-21T14:05:43+09:00\"\nsource_of_truth: \"Git\""
+    },
+    {
+      "path": "AGENTS.md",
+      "sha256": "c12a50a38f81c12a647f9b6f4592a205cd899e76d29190202a6ae73b12c04b27",
+      "bytes": 7086
+    },
+    {
+      "path": "skills/agent-delivery/SKILL.md",
+      "sha256": "9596c1d4a132c3de90fd99ed2095b8271da7a31532e8487aa6d7d93151ac3830",
+      "bytes": 1276
+    },
+    {
+      "path": "skills/core-reliability/SKILL.md",
+      "sha256": "4650a371befb5a59cd9f3ce87c2e2dab732aa7e9b89e57885cb67f0e64f0ef76",
+      "bytes": 619
+    },
+    {
+      "path": "docs/task-registry.json",
+      "sha256": "7c6b339c7487aae652cc5c5e04f6e933249c83930019e798ec24006794b07644",
+      "bytes": 42011
+    }
+  ],
+  "actualIndependentPriorReview": [
+    {
+      "commit": "97bb2f6734ee328fe86031053bb7490ab011a523",
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-rev7-33f7-review-20261106-claude/review.json",
+      "sha256": "90c903a55ded8227fc9bc4bddc8a8c3f0df63cfd4882037faf7bb92f7790b81d",
+      "bytes": 24627
+    },
+    {
+      "commit": "97bb2f6734ee328fe86031053bb7490ab011a523",
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-rev7-33f7-review-20261106-claude/reviewer_m1_rev7_attacks.py.txt",
+      "sha256": "b78abead5b00069f3598a10a1501701cbc5b3c8e425b979bfc03b11dd56e4823",
+      "bytes": 5750
+    },
+    {
+      "commit": "97bb2f6734ee328fe86031053bb7490ab011a523",
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-rev7-33f7-review-20261106-claude/reviewer-m1-rev7-attacks-result.json",
+      "sha256": "a23a2647ed106e12d1ef63cc0077c4b6c688e851853b529eff733a00edc0aaf3",
+      "bytes": 3432
+    },
+    {
+      "commit": "97bb2f6734ee328fe86031053bb7490ab011a523",
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-rev7-33f7-review-20261106-claude/reviewer-m2-port-taxonomy-result.json",
+      "sha256": "ada47180917da44388ac55170d4e2bae1a44d1e0dadccffb1e170f6d817e7ad1",
+      "bytes": 17887
+    }
+  ],
+  "immutableRetained": [
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-contract-rev7-20261106-codex/classifiedCalls.jsonl",
+      "sha256": "4d61a286b6201567bf0724136fb4c4393251e20e9b870879d76cf77db7f5812e",
+      "bytes": 24948352
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-contract-rev7-20261106-codex/criticalEntries.jsonl",
+      "sha256": "18eb25cbcf70fbee42b42f12cf85f158adc03d859d63b728c23b533512fba32a",
+      "bytes": 139930
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-contract-rev7-20261106-codex/entry-lock-plans.json",
+      "sha256": "accf56f215c243e20b0536a67986685e27e3dfb3bb558c5c482e5acbf80938a9",
+      "bytes": 738397
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-contract-rev7-20261106-codex/functionPlans.jsonl",
+      "sha256": "7d650fbe47e83f9714c922ffcfe1d93cef3d7a9319873bc9898ebf644f28409a",
+      "bytes": 8115807
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-contract-rev7-20261106-codex/records.jsonl",
+      "sha256": "2638625a21b476d7493c563619e117381c82afe30a0f06056e5d44fe14bd9079",
+      "bytes": 1646605
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-contract-rev7-20261106-codex/retained-surface-carry-forward.json",
+      "sha256": "daacd402dfa8df0ac8515d06b6c8cf6d5cde984f4c843fbc999ff68e03aa4f0c",
+      "bytes": 540
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-contract-rev7-20261106-codex/source-manifest.json",
+      "sha256": "0901aabf4d4187351b72292941957a80191cbbe7b3e07260ff87d30fa2139434",
+      "bytes": 1305127
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-contract-rev7-20261106-codex/sourceFiles.jsonl",
+      "sha256": "c64f664c78250d4510db8bca539c94ad76a947ea661ae3f9ce93b936b7c52303",
+      "bytes": 66624
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-contract-rev7-20261106-codex/sqlScopeIssues.jsonl",
+      "sha256": "ed78ce2d35bf8d7513c115bf22bc09db12335bab6af7d485d5187a3386df4229",
+      "bytes": 278711
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-contract-rev7-20261106-codex/transactionBoundaries.jsonl",
+      "sha256": "1e77eca3bfefe15ed15d85257a8879cf71a399a8ce7c9d84ce74f3198b7448f8",
+      "bytes": 99342
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-contract-rev7-20261106-codex/transport-inventory.json",
+      "sha256": "04f592f337e8de61dc34e2c3c16c74dfd78d4b9a16b6a797b9996e2b1f392826",
+      "bytes": 89605
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-contract-rev7-20261106-codex/unknownEdges.jsonl",
+      "sha256": "91c925d3864753e893c710de7b4dcccca3502c7e2652c7737535fe65b3e0526f",
+      "bytes": 6012094
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-contract-rev7-20261106-codex/unknownSqlWriters.jsonl",
+      "sha256": "5424915a272de18ed4a56b3b83bd0b0323549be684094f7f25a85b9c4f2c3ad5",
+      "bytes": 161230
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-contract-rev7-20261106-codex/valueConstructorProofs.jsonl",
+      "sha256": "8dd4c4335a2fe4bab11fcc16e159d3c407fdf2e99feb49eddec4bc6c86ce3747",
+      "bytes": 182173
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-contract-rev7-20261106-codex/writers.jsonl",
+      "sha256": "e1be3bbb8cdc35bcb2ed998a8f5b15f1ab572fcc57c74d71eeb225fd466f750b",
+      "bytes": 2343892
+    }
+  ],
+  "scope": "DOCS/schema/static/symbolic; revoke_channel pilot only; no production implementation or grant",
+  "actualRuntimeB": 0,
+  "realBindings": null,
+  "A1_A16": "PENDING",
+  "partialFreeze": false,
+  "obsidianApply": false,
+  "rootDecisionRead": {
+    "path": "ROOT_READ_ONLY/docs/vault/30_Development/Evidence/fleet5-20261105-root/b-rev8-revoke-pilot-root-decision.json",
+    "sha256": "2b24b0fdd6e74f181ec77fb34f8fc2d5ff1a843b994a85af454158b0a8cd347b",
+    "atKST": "2026-11-06T15:15:16+09:00",
+    "rootMessage": "msg_aca0d787de3d",
+    "scope": "ONEdocs/schema/static/closedperkindrecovery/pilotanalysisdelta only"
+  },
+  "executionEnvironment": {
+    "python": "3.14.7 (tags/v3.14.7:823f032, Aug  5 2026, 10:51:32) [MSC v.1944 64 bit (AMD64)]",
+    "executable": "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+    "bytecodeDisabled": true,
+    "jsonschema": "4.26.0",
+    "SQLAlchemy": "2.0.52",
+    "packageInstalls": false,
+    "OSMemoryLimitsChanged": false,
+    "sourceOfRuntimeEvidence": "NONE; local source/schema/symbolic only"
+  }
+}

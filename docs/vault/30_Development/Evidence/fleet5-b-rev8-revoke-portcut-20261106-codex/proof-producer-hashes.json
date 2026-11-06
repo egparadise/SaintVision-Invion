@@ -1,0 +1,144 @@
+{
+  "base": "33f7c6b48883cb06d1ea7d645bdb88634eb1bca0",
+  "productSource": "72028cbac903c4415d9979f980a6e0f9948e914f",
+  "scope": "Exact owner proposal/proof producers and derived contract artifacts, final Git SHA supplied to Root after commit",
+  "kst": "2026-11-06T15:43:25.702960+09:00",
+  "files": [
+    {
+      "file": "analysis_tests.py",
+      "bytes": 4256,
+      "sha256": "196456f30354193afb3289801b8425e74e7a8669c465568e36e42c1131ff3598"
+    },
+    {
+      "file": "authority-matrix.json",
+      "bytes": 776833,
+      "sha256": "fa849cc61189daca898a7622a3ffda6b5d2e84f4799131fa3f4e25e93395091a"
+    },
+    {
+      "file": "authority.py",
+      "bytes": 24218,
+      "sha256": "d0f82441eb46be1014a03ae0d1b76c1f2afca5362ca97969028db926e11cbb6d"
+    },
+    {
+      "file": "bootstrap.py",
+      "bytes": 4112,
+      "sha256": "a5139d6dee6df44f116cc5ece6bcd4172fcabaf63a99ec303e17c461c83214bf"
+    },
+    {
+      "file": "bounded_analysis.py",
+      "bytes": 14621,
+      "sha256": "bd1d708fb75d64bb481190247b46db658d7ae4aa70fd152b0fb654b3636cff88"
+    },
+    {
+      "file": "catalog.py",
+      "bytes": 18748,
+      "sha256": "c5d4222a9b1a2659ccd59327c3b60ead296f5450797fe4f280fd6accda037fc9"
+    },
+    {
+      "file": "contract.schema.json",
+      "bytes": 116597,
+      "sha256": "348dd345f86daf8592c17d75b4fb635f828bd3162ced12f83020b9b4445bc119"
+    },
+    {
+      "file": "critical-edge-categories.json",
+      "bytes": 1349099,
+      "sha256": "1106be2a3d5af86fbc9b34b024849237f97c85f1f6799e3cfcb37ea3453b0e94"
+    },
+    {
+      "file": "edge_categories.py",
+      "bytes": 10366,
+      "sha256": "e0768f5519666e4f6596dad384636775322d890cb4d76e46637a5a36e973084d"
+    },
+    {
+      "file": "io_contract.py",
+      "bytes": 2975,
+      "sha256": "38f22ce4538f6a4c8c9a10fdcfbee596572e5220a6870075faae89314a0241c3"
+    },
+    {
+      "file": "lifecycle.py",
+      "bytes": 26494,
+      "sha256": "59abfebf1185d03a2b69a3ea846d3548472bdababd937d629fc80b698c9c31d4"
+    },
+    {
+      "file": "measured_run.py",
+      "bytes": 1615,
+      "sha256": "61f7dcfdb00a873c2423e463b5beee5fa623bbf04c392e7ae9e30cdb297ed62e"
+    },
+    {
+      "file": "model.py",
+      "bytes": 37372,
+      "sha256": "20ca3e91588bf9dfa48a5907562cadf5599f5643ff1a52ae1da974fcd95b7c7d"
+    },
+    {
+      "file": "packet_checks.py",
+      "bytes": 2987,
+      "sha256": "7861a4c2007cc6491c8f21d7ef1f0b5dbbc2cd12fbf43d854240c0267db3c028"
+    },
+    {
+      "file": "pending-interface-contracts.json",
+      "bytes": 54320,
+      "sha256": "a69f551579d9e6aab3000470c93409f8a0167cfc6fadc81799200e1624ce1ca0"
+    },
+    {
+      "file": "pending_contracts.py",
+      "bytes": 17369,
+      "sha256": "a5f994463af041ef510c17e77ce4f348ae014fffd6c8f09a6a755a48b4ce0716"
+    },
+    {
+      "file": "pilot-closure.json",
+      "bytes": 24523,
+      "sha256": "9e9f7155bba7ff3e657a7f9b9fc9380c4051cb9380f85b5f84a24d82482966f1"
+    },
+    {
+      "file": "proof_tests.py",
+      "bytes": 8382,
+      "sha256": "17e69e07fdf860ec37ea8676788fc4d8b3a802e3cfc9511eb24173d9d85ee8bd"
+    },
+    {
+      "file": "rank_contract.py",
+      "bytes": 7212,
+      "sha256": "c95f906069c7d8ce3221e523584aa16c89bd3ae1165bd5d8d76b6abbb58cc310"
+    },
+    {
+      "file": "reader-io-catalog.json",
+      "bytes": 48525,
+      "sha256": "f8a65808ce659331ae12722e4112cc70e19740b92d3c9657004fc4d110516fd3"
+    },
+    {
+      "file": "regression_red_green.py",
+      "bytes": 976,
+      "sha256": "1c33d4e204ae2da5bd4ba0ebadea63f19e225b19efc6fd58c3cc7a37e0e4c840"
+    },
+    {
+      "file": "retained_tests.py",
+      "bytes": 1165,
+      "sha256": "a2a211d8c77a20949de111f50e5c07a576fcfd371075bfddc3e48193c3342a7b"
+    },
+    {
+      "file": "run_checks.py",
+      "bytes": 3398,
+      "sha256": "7482186ff437797ad45268dd0c90daf2d588b8ac1bf9db1662392b824db6f5ab"
+    },
+    {
+      "file": "schema.py",
+      "bytes": 7047,
+      "sha256": "5872c251b6f087db50478ec44c637b406ecf37419ed2b4279dacbe916a0eab31"
+    },
+    {
+      "file": "transport-delta.json",
+      "bytes": 10700,
+      "sha256": "9394b7b01a95c26177d04f5be1ad3a0f77984a31feae69d84a945456aa6e20d1"
+    },
+    {
+      "file": "transport_delta.py",
+      "bytes": 6061,
+      "sha256": "245971b54d64718c8276010208454249f0e1bf6ee7cc3254c7e3e3ba2da4759a"
+    },
+    {
+      "file": "writer-census-delta.json",
+      "bytes": 1633,
+      "sha256": "40494695825789c24758cec36505016e6db0667335c6d46f91ab3e6f95659d6e"
+    }
+  ],
+  "actualRuntimeB": 0
+}

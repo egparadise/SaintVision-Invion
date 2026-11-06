@@ -1,0 +1,3 @@
+{"symbolicDeltaCases": 335, "failed": 0}
+{"retainedPriorClosedCases": 8, "actualIndependentRev8Review": "PENDING"}
+{"ownerResourceMeasurement": {"target": "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105\\docs\\vault\\30_Development\\Evidence\\fleet5-b-rev8-revoke-portcut-20261106-codex\\retained_tests.py", "peakWorkingSetBytes": 62173184, "elapsedSeconds": 0.994, "OSMemoryLimitEnforced": false, "serial": true}}

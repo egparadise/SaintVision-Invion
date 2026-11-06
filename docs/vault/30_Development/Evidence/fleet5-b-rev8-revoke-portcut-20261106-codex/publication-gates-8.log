@@ -1,0 +1,2 @@
+PASS check_doc_path_citations --ratchet: 290 broken citation(s), all in baseline, none stale, floor unchanged.
+{"ownerResourceMeasurement": {"target": "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105\\tools\\check_doc_path_citations.py", "peakWorkingSetBytes": 29286400, "elapsedSeconds": 4.824, "OSMemoryLimitEnforced": false, "serial": true}}
