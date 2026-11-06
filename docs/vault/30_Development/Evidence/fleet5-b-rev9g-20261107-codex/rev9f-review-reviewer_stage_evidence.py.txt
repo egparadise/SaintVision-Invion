@@ -1,0 +1,16 @@
+"""Copy reviewer scratch outputs into own Evidence as UTF-8/LF bytes and print SHA256."""
+import hashlib, shutil, sys
+from pathlib import Path
+SP = Path(sys.argv[1]); D = Path(sys.argv[2]); D.mkdir(parents=True, exist_ok=True)
+def text(p):
+    b = p.read_bytes()
+    if b[:2] in (b'\xff\xfe', b'\xfe\xff'): s = b.decode('utf-16')
+    else: s = b.decode('utf-8-sig')
+    return s.replace('\r\n', '\n').encode('utf-8')
+pairs = [('reviewer_rev9f_delta_probes.py', 'reviewer_rev9f_delta_probes.py.txt'), ('reviewer-rev9f-delta-probes.log', 'reviewer-rev9f-delta-probes.log.txt'),
+         ('reviewer-rev9f-delta-probes-result.json', 'reviewer-rev9f-delta-probes-result.json'), ('reviewer_scan_72028_b9f_forms.py', 'reviewer_scan_72028_b9f_forms.py.txt'),
+         ('reviewer-scan-72028-b9f-forms.txt', 'reviewer-scan-72028-b9f-forms.txt'), ('reviewer_gate_driver.py', 'reviewer_gate_driver.py.txt'),
+         ('stage_evidence.py', 'reviewer_stage_evidence.py.txt')]
+for a, b in pairs:
+    (D / b).write_bytes(text(SP / a)); print(hashlib.sha256((D / b).read_bytes()).hexdigest(), len((D / b).read_bytes()), b)
+(D / '.gitattributes').write_bytes(b'* -text\n*.txt binary\n')

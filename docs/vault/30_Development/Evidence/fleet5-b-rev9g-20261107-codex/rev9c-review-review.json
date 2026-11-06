@@ -1,0 +1,93 @@
+{
+  "schemaVersion": "fleet5-b-rev9c-5ea-review-claude:1",
+  "reviewer": "Claude (actual independent narrow delta review, one worker, no helpers/subagents)",
+  "orca": {"task": "task_c5d0e8ae0837", "dispatch": "ctx_e399e8dd4f9d", "coordinator": "Root"},
+  "owner": {"agent": "Codex", "task": "task_a8fd2969f0b3", "dispatch": "ctx_6f0f8253b8a7", "pendingQuestion": "msg_bccbed800e8b"},
+  "target": {
+    "final": "5ea87937f1b542f8cbe32c08dc224526965a8e2d",
+    "base": "870486f98ba8fdc6d82f24c2610352a426f23a16",
+    "branch": "agent/codex/fleet5-b-rev9c-20261106",
+    "remoteExact": true,
+    "addedPaths": 139, "modifiedOrDeletedPaths": 0,
+    "productSource": "72028cbac903c4415d9979f980a6e0f9948e914f",
+    "ownerDocs": {"run": 42234721725, "job": 127949272081, "acceptedFromRoot": ".work/b9c-source-root-verified.json (Root-verified exact head/ref/workflow_dispatch/docs.yml/attempt1/correlation/all19 SUCCESS); not re-queried by this reviewer"}
+  },
+  "inputsRead": [
+    "owner History 2026-11-06_FLEET5_B_Rev9c_FixOnly_Codex.md 1.0.0",
+    "own prior actual review aa3387b8 (History + review.json); Root msg_8f20f55b48dc scope = canonical Evidence fleet5-20261105-root/b-rev9c-fix-only-root-scope.json; Root .work/b9c-source-root-verified.json",
+    "changed producers vs 870 Rev9b copies: constructor_graph.py (root_key/frozen_root_keys/prove), use_sites.py (reflection + owner relevance), t1_provenance.py, t1_build.py, pending_contracts.py, source_bindings.py; new forwarding_discovery.py, owner_transfer.py, rev9c_probe_driver.py, rev9c_regressions.py, deterministic_generation.py",
+    "artifacts: t1-mark-offline-closure.json, rev9c-regression-results.json, new/old-bound-contrast-results.json, development-failures.json, deterministic-generation-results.json, proof-producer-hashes.json, producer-order.json, targeted-category-delta.json",
+    "actual 72028: workspace_config.py 1-93, app.py 225-260/841-844/1300-1340/1405, workspace_api.py 120-135, lan_pilot.py 1-30/895-906/3935-3950, business_handoff.py and business_surface.py heads",
+    "Root vault fleet-five-orchestration-20261105 read-only: head f748a970 (2026-11-06 23:49:41 KST), Index 1.0.464 (23:49:06), Claude board 1.2.130"
+  ],
+  "verdict": "REVISION_REQUIRED (narrow, LOW-only; no MEDIUM; actual-source T1/A8 closure on 72028 bytes stands; A7 NodeChannels.snapshot NOT yet grantable)",
+  "itemStatus": {
+    "B9b-L1": "PARTIAL. CLOSED for the proof sources: frozen production root multiset (path, function, resolved constructor, normalized call AST) is enforced. aa3387 state and runtime(state) substitutions, a changed-argument root and a byte-identical root moved into a helper refuse UNRESOLVED:CONSTRUCTOR_ROOT_REMOVED_OR_HIDDEN. Six genuine roots plus an extra hidden root in lan_pilot.py refuse for importlib, module-aliased operator, sys.modules.get, methodcaller, from-operator/from-sys/from-inspect aliases. Some refuse through RECEIVER_UNION_UNPROVEN:CONSTRUCTOR_BINDING, the census short-name path, rather than the reflection reason. Controls pass: unused reflective imports with a protected log string, a class alias root, and a from-package module alias root. NOT closed outside the twelve proof sources: B9c-L1.",
+    "B9b-L2": "PARTIAL. CLOSED for lexical forms: aa3387 business_handoff alias refuses UNCATALOGUED_PRODUCTION_SOURCE. A reviewer three-hop chain (business_handoff -> business_surface -> business_auth) is discovered to a fixed point and refuses, listing all three files. Keyword-only, module-import+getattr and function-scope import callers refuse. A benign local Database helper and a two-hop harness chain ACCEPT (harness separated, no tests/ path in production files). Combined surface 21 = census sourceFiles 20 + app.py; constructor census 6 production / 20 harness / 0 unresolved; reviewer git grep finds configured_workspace callers only at app.py:1323 and recursion workspace_config:87. NOT closed: reflective forwarder calls in an outside production file (B9c-L1, same root cause).",
+    "B9b-L3": "PARTIAL. CLOSED: the five aa3387 escapes (runtime, runtime.db, runtime.db.transaction, workspace, workspace.runtime.db) refuse with reviewer spelling (import foreign_module; foreign_module.register_*). Independent tuple-unpack items(), walrus, dict-comprehension value, container append and lambda-closure variants refuse. Unowned loop/call controls ACCEPT. NOT closed: owner objects received as function/constructor parameters inside the analysed proof bodies (B9c-L2).",
+    "B9b-I1": "CLOSED. Set-derived keys are sorted (incoming/TARGETS, helpers, exports, callers, sourceFiles, owners, factories). Owner two-seed closure SHA 7a925bee... equals the committed blob. No reproduction was needed.",
+    "B9b-I2": "RETAINED and exercised. requiresFullProvenanceUseSiteChecks=true. A keyword-only configured_workspace(database=object(), ...) call in app.py: cg.prove alone ACCEPTS (graph skips tracked calls with no positional args), full provenance REFUSES DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:INSTANCE:_claude_extra.",
+    "B9b-I3": "RECORDED in owner History prose only, without changing model bytes. Carry it as a machine-readable obligation in the next cut.",
+    "B9b-I4": "RETAINED. module_uses allowlists every frozen-72028 use, so it shows no new protected use, not that existing uses are benign."
+  },
+  "findings": [
+    {
+      "id": "B9c-L1", "severity": "LOW",
+      "title": "The enumerated reflection audit covers only the 12 proof sources. Census/discovery universe files are parsed but not audited, so an extra hidden root or a reflective forwarder call in an outside production file is accepted",
+      "source": "use_sites.audited_nodes/module_uses run only over {**core,**ctors} (t1_provenance.provenance:99-102). constructor_graph.current_census admits a call as a root only if its callee resolves to TARGETS or its spelling ends in a target class name. forwarding_discovery.discover records a caller only when canonical(f.resolve(call.func)) is tracked, or an import alias targets a tracked symbol. Reflective spellings in the same parsed file are dropped without an UNRESOLVED row.",
+      "counterexamples": [
+        "L1-outside-file-hidden-root-operator-sys: services/control-plane/src/inv/business_auth.py (production, outside the proof sources) + 'import operator' + 'import sys' + def _claude_hidden_root(): return operator.attrgetter('ObservationWorker')(sys.modules['inv.observer_worker'])(object(), None). Full provenance ACCEPTS: six genuine roots preserved, visible roots 6, discovered production files [app.py, workspace_config.py].",
+        "L2-outside-reflective-forwarder-call-importlib: business_auth.py + 'import importlib' + def _claude_root(tenant, settings): return importlib.import_module('inv.workspace_config').configured_workspace(object(), tenant, settings). ACCEPTS. The grep token workspace_config hits the file and it is parsed.",
+        "L2-outside-reflective-forwarder-call-sys-modules: the same with sys.modules['inv.workspace_config'].configured_workspace(object(), tenant, settings). ACCEPTS."
+      ],
+      "validity": "Each mutant is ast.parse-valid, adds no unbound names versus frozen business_auth.py, and passes 15/15 recorded closure witness spans/hashes. Contrast: importlib.import_module('inv.observer_worker').ObservationWorker(object(), None) in the same file refuses UNCATALOGUED_PRODUCTION_SOURCE (census short-name), and a module-import getattr caller refuses. So the gap is the reflective spelling only.",
+      "impact": "Same class as B9b-L1/L2, moved one file outside the proof inputs. The derived census and forwarding inventory can drop a relevant production root/caller without refusal. Actual 72028 is unaffected: reviewer git grep over every *.py finds zero import_module/sys.modules/attrgetter/methodcaller/getattr_static/getmembers/resolve_name/__import__ uses naming the protected or forwarder modules/classes, and no relevant *.py outside the discovery SCOPE. In the real run the outside universe is frozen 72028 bytes. It matters when A7/A8 reuse the tool on new commits or overlays.",
+      "minimalFix": "During census and forwarding discovery, run the existing enumerated reflection scan on every production-scope file read (grep hit or overlay). Scan: REFLECT_NAMESPACES symbols, builtins __import__/getattr, and protected or tracked module/name strings including inv.workspace_config, configured_workspace and every export alias. Refuse any hit not byte-identical to an allowlisted frozen-72028 hit (there are none today) with UNRESOLVED:RELEVANT_REFLECTION_OUTSIDE_PROOF_SOURCES (or UNCATALOGUED_PRODUCTION_SOURCE). Add the three counterexamples as negatives, and keep the importlib-attribute and module-getattr refusals plus a benign outside Database helper as controls."
+    },
+    {
+      "id": "B9c-L2", "severity": "LOW",
+      "title": "Owner objects received as function or constructor parameters in the analysed proof bodies are not relevant, so they escape to foreign callables",
+      "source": "owner_transfer.derive binds owners only through Assign/AnnAssign/NamedExpr, For/comprehension and With targets, and tracked forwarding-factory results. Parameters are owners only when they are spelled as a SEEDS name (conn, observed_conn, cursor, db, database, self). use_sites.audited_nodes therefore yields no INSTANCE node for loads of those parameters.",
+      "counterexamples": [
+        "L3-param-WorkspaceAPI-init-runtime / -runtime.db / -runtime.db.transaction: workspace_api.py WorkspaceAPI.__init__ after line 128 'self.db, self.working, self.runtime = database, working, runtime': '        import foreign_module' + '        foreign_module.register_runtime(<expr>)'. All three ACCEPT. The runtime parameter is exactly the RestrictedWorkspaceRuntime root constructed inline at workspace_config.py:47 as WorkspaceAPI's third argument (:44-56). Its self.db feeds NodeObservation(self.db, ...) at workspace_api.py:98.",
+        "L3-param-create_app-workspace_service-workspace / -workspace.runtime.db: app.py create_app.workspace_service (line 844, same-line statements, no line shift) 'import foreign_module; foreign_module.register_workspace(<expr>); return workspace'. Both ACCEPT. The create_app workspace parameter receives the configured_workspace result via app.py:1405 workspace=workspace."
+      ],
+      "validity": "AST-valid, no new unbound names, 15/15 recorded witnesses resolve (two earlier fixture runs that shifted app.py:1313 and lan_pilot:3945 were caught by the witness guard and are kept as run1/run3 fixture-bug logs, not used as verdicts). The same expressions reached through the derived names (for runtime in pool.values(), workspace = configured_workspace(...)) refuse, so the parameter binding is the cause.",
+      "impact": "Foreign code receiving the runtime/workspace can rebind runtime.db or install an observer after construction, which is the B9-L1/B9b-L3 concern. 'Unknown relevant escape must fail closed' does not hold for this binding form, and it was not named in aa3387's minimal fix (reviewer's own earlier gap). Actual 72028 contains none of these statements. create_app's existing hand-offs of workspace_service() to WorkspaceGit/TerminalService/BusinessHandoff/WorkspaceEditor/WorkspaceStart/WorkspaceRecoveryService remain pre-existing uses covered only by B9b-I4 (aa3387 found no external .db/.observer/statement_observer/placement_metric_sink writes repo-wide). NodeChannels A8 reuse has many more parameter hand-offs.",
+      "minimalFix": "Propagate ownership to parameters to a fixed point over the supplied sources, current and frozen unioned. For every call whose resolved target is a function, or a class (map to __init__ and skip self), defined in the proof sources, mark the matching parameter (by positional index or keyword name) owned when the argument is owned. Nested functions keep reading enclosing owned names via the existing scope-prefix rule. Add the five negatives and a control that passes an unowned argument to the same parameterised function."
+    }
+  ],
+  "infoItems": [
+    {"id": "B9c-I1", "text": "Declared bound, no demand: a resolver outside the enumerated surfaces, pkgutil.resolve_name('inv.observer_worker:ObservationWorker')(state, None), in lan_pilot.py ACCEPTS (L1-bound-pkgutil-resolve-name). The owner claims no arbitrary-reflection completeness. Cheap tightening if wanted: treat a new protected dotted-path string passed to any call as relevant."},
+    {"id": "B9c-I2", "text": "Keyword-only tracked calls: constructor_graph.prove skips them ('if target not in tracked or not c.args: continue'), and discovery promotes a forwarder only via positional arg0 Name. In L2-keyword-forwarder-higher-hop-inventory, business_handoff refuses UNCATALOGUED, but the higher-hop caller business_auth is not inventoried (higherHopInventoried=false). Fail-closed today only through UNCATALOGUED and the use-site factory/instance audit (B9b-I2). Map keyword arguments before reuse."},
+    {"id": "B9c-I3", "text": "Harness inventory: tests/core/test_object_store_provider_binding.py:500/514 binds inv.workspace_config at function scope and monkeypatches configured_workspace, but discovery reads only module-scope aliases, so harnessFiles=[]. Harness-only; no production effect."}
+  ],
+  "ownerEvidenceChecked": {
+    "producerHashes": "48/48 producersAndRetainedScripts equal 5ea87937 blobs (sha256+bytes), total 398363 B. 32/32 originalReviewCopies equal. All 17 rev9b-review-* copies equal the aa3387 blobs. model.py f7384016... and lifecycle.py 710c6aaf... are byte-equal to 870. The 2 command receipts equal.",
+    "orderedStages": "producer-order.json pending_contracts.py THEN edge_categories.py; stage1 ab5ecd59... and final 68dbd6e6... equal the committed blobs; closure 7a925bee... equals the committed blob.",
+    "accounting": "targeted-category-delta, writer-census-delta, reader-io-catalog, authority-matrix, contract.schema and pilot-closure are byte-identical to the Rev9b copies. Accepted counts retained: 19 T1 edges (16 analysis/3 runtime), 12 entries, 598/757/1071/21, 573 outside, 218 backlog, no status upgrades.",
+    "ownerRegressions": "Read, not rerun: rev9c-regression-results.json lists 29 cases = 20 old-ACCEPT-now-REFUSE + 9 controls. 2 controls changed old REFUSE -> new ACCEPT (constructor module alias, current module alias), consistent with normalized keys and confirmed by reviewer controls. 2 controls were REFUSE in both pipelines (with-target, attribute-subscript), labelled honestly. The 3 development failures (cp949 decode, extra-witness fixture, newline guard) were read and match the code.",
+    "notRerun": "Owner 16 proof commands, 8 publication gates, original70/inherited19 and model182/terminal47/recovery79+8 were not rerun: unchanged model bytes, retained by hash per scope. R4 expected exits 0/1 are taken as recorded."
+  },
+  "reviewerProbes": {
+    "driver": "reviewer_rev9c_delta_probes.py.txt",
+    "result": "reviewer-rev9c-delta-probes-result.json (47 cases, exit 0, PYTHONHASHSEED=0) + reviewer-rev9c-delta-probes.log.txt",
+    "mismatches": ["L1-outside-file-hidden-root-operator-sys", "L2-outside-reflective-forwarder-call-importlib", "L2-outside-reflective-forwarder-call-sys-modules", "L3-param-WorkspaceAPI-init-runtime", "L3-param-WorkspaceAPI-init-runtime.db", "L3-param-WorkspaceAPI-init-runtime.db.transaction", "L3-param-create_app-workspace_service-workspace", "L3-param-create_app-workspace_service-workspace.runtime.db"],
+    "fixtureBugsKept": ["reviewer-probes-run1-fixturebug.log.txt (added import line shifted lan_pilot:3945; witness guard stopped)", "reviewer-probes-run3-fixturebug.log.txt (inserted lines shifted app.py:1313; witness guard stopped; earlier rows equal the final run)"],
+    "safety": "Owner static producers imported from the Evidence directory; all mutants are in-memory strings parsed with ast.parse only; nothing imported or executed; no product file written.",
+    "resources": "Final probe process peak working set 136806400 B, 261.6 s (measured_run.py observation, not an OS quota)."
+  },
+  "nextCutForRoot": {
+    "recommendation": "Rev9d fix-only, then ONE Claude narrow delta review. NodeChannels.snapshot-only A7 is deferred until Rev9d is actually accepted.",
+    "rev9d": {
+      "owner": "Codex task_a8fd2969f0b3 (same)", "base": "5ea87937f1b542f8cbe32c08dc224526965a8e2d",
+      "scope": "docs/schema/static/symbolic only; unique own History/Evidence; no product/runtime/model change",
+      "items": ["B9c-L1 enumerated reflection scan over every production universe file read by census/discovery, plus 3 negatives", "B9c-L2 parameter ownership fixed point over the proof sources, plus 5 negatives and an unowned-argument control", "optional B9c-I2 keyword argument mapping in graph and discovery", "optional machine-readable B9b-I3 obligation"],
+      "unchanged": "model/lifecycle bytes, 19-edge set, 12 entries, 598/757/1071/21, 573 outside, 218 backlog, all real bindings NULL/HOLD"
+    },
+    "afterRev9dAccepted": "inv.node_channels.NodeChannels.snapshot ALONE (A7 cut as described in aa3387), never NodeDelivery.deliver, full A8 or all ports.",
+    "notGranted": "No B product/code/port/freeze/DB/Engine/SSH/issuer/installation/current/effect/physical/whole-Core grant; no self-registration."
+  },
+  "bState": {"newActualBEvidence": 0, "runtimeB": 0, "A1_A16": "PENDING", "realBindings": "NULL/HOLD", "observerLockSafety": "named runtime pending outside the 19 edges", "fixedStorageGap": "still expected red"},
+  "notRun": "full 523-file assembler / 3485 plans / giant ledgers; PG/Docker/SSH/Node/Engine/PKI/clock; Obsidian apply/adopt/resolve/state write; mutant import or execution."
+}

@@ -1,0 +1,22 @@
+Reviewer local gates, Windows, D:/Project/SaintVisionI-Invion/.venv Python 3.14.7 -B, PYTHONUTF8=1, cwd=worktree root, tree = 9cea33e8 + own review History/Evidence only.
+sync_obsidian is CHECK only with the canonical Root state; --conflicts-out goes to reviewer scratch. No apply/adopt/resolve/state write.
+2026-11-07T04:36:55+09:00..2026-11-07T04:37:09+09:00 exit=0 logsha=5730b1afd6af3d09ceca9b5fdc7b7bd8a8cde5fdf234e0142b3ae83d0ef85f14 :: python -B tools/check_docs.py
+    PASS: 24 original hashes, 1262 versioned documents, wiki links, 48 tasks, 12 outcomes, owner/reviewer/skills, dependency DAG.
+2026-11-07T04:37:09+09:00..2026-11-07T04:37:12+09:00 exit=0 logsha=7cdc12bf64f50ba0964625161638a4c639cf22d786a57f04685bed0718e14042 :: python -B tools/check_ontology.py
+    PASS: RDF parsing, defined terms, TTL/JSON-LD equivalence, 48 task mappings, positive SHACL, 4 rejected invalid fixtures, 4 competency queries, Obsidian mirrors.
+2026-11-07T04:37:12+09:00..2026-11-07T04:37:34+09:00 exit=0 logsha=d050aa6b01f2e0486f3d0c8e365bbba505cfdbce9bdf1abd939fbbc2fd17d432 :: python -B tools/sync_obsidian.py --check --state D:/Project/SaintVision-Invion/SaintVisionI-Invion/.git/obsidian-sync-state.json --conflicts-out <scratch>/sync-conflicts-local-doc-gates.json
+    stateBefore 3dda9efc3d4d20746358b0dd19bdbf8fdbf46ce93c2392612d01ff889260279f stateAfter 3dda9efc3d4d20746358b0dd19bdbf8fdbf46ce93c2392612d01ff889260279f
+    CHECK: 4403 managed files, 1979 pending exports, 0 conflicts. No writes.
+2026-11-07T04:37:34+09:00..2026-11-07T04:37:44+09:00 exit=0 logsha=7d3493f361d1c522254d1dbd2e0a74b4dc3c54ef90bd9bfdec3a57666d7798ed :: python -B tools/check_contract_bindings.py
+      UNIT NOTE: TYPE count <= SITE count. Multi-site types (per-type coverage can mask an untested site): ApprovalView(2 sites: ['approvals']), BusinessBindingView(2 sites: ['business_handoff']), BusinessEditLockReleaseView(2 sites: ['business_handoff']), BusinessEditLockView(2 sites: ['business_handof
+      (Reporting sites is not a regression -- the TYPE number never meant 'sites verified'; this makes the counting unit explicit. EvidenceEnvelope-class multi-site anchors are why.)
+2026-11-07T04:37:44+09:00..2026-11-07T04:37:47+09:00 exit=0 logsha=2a2f0348a4bdc71911a5eac47ef7fd7a1ca4573e71cce914cb6d6dd198392949 :: python -B tools/check_frontend_integrity.py
+    
+    PASS Frontend Integrity Check: all 9 integrity rules satisfied (0 violations).
+2026-11-07T04:37:47+09:00..2026-11-07T04:37:49+09:00 exit=0 logsha=13b5f5afed05999109839be1baec4ef70ea3c71bcb267353e59eba0f2ae3e448 :: python -B tools/check_doc_single_source.py --ratchet
+    PASS check_doc_single_source --ratchet: 16 pairs, all in baseline, none stale.
+2026-11-07T04:37:49+09:00..2026-11-07T04:37:49+09:00 exit=0 logsha=ba85e5489b5c960d3fdd09acf663a0c157e70028c6d54044d4820a67c99570fc :: python -B tools/check_response_freshness.py
+      ok      saintvision:ReplicaObservationResponse.observedAt
+      (structural floor only. Whether a NEW response is freshness-critical is human judgment -- review this map when responses are added. Staleness behaviour needs a clock-advance test with PG.)
+2026-11-07T04:37:49+09:00..2026-11-07T04:37:54+09:00 exit=0 logsha=389921b50662776ed834a285f70fc44ab61f7d5bdb4c5249c0a73c98113980de :: python -B tools/check_doc_path_citations.py --ratchet --base-ref 9cea33e8a087981fdedcddb71c4381bdc25c1507
+    PASS check_doc_path_citations --ratchet: 290 broken citation(s), all in baseline, none stale, floor unchanged.

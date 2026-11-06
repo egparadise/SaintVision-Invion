@@ -1,0 +1,81 @@
+{
+  "review": "Actual independent Claude NARROW Rev9f delta review",
+  "orca": {"task": "task_12e7a699ad90", "dispatch": "ctx_7fb26ffb3970", "reviewerBranch": "agent/claude/fleet5-b-rev9f-9cea-review-20261107", "reviewerBase": "9cea33e8a087981fdedcddb71c4381bdc25c1507",
+           "precondition": "P02Rev3 task_01cdc5e54543 / ctx_a6589fe0c3df worker-show: succeeded / settled / exited / released (read before start)"},
+  "owner": {"agent": "Codex", "task": "task_a8fd2969f0b3", "dispatch": "ctx_6f0f8253b8a7", "pendingQuestion": "askmsg_453ac2a3ea95", "rootFixGrant": "msg_ca131b500e12"},
+  "target": "9cea33e8a087981fdedcddb71c4381bdc25c1507",
+  "base": "3cccfe4d7511180fa8fbb6f5742328c6a43d04bd",
+  "productSource": "72028cbac903c4415d9979f980a6e0f9948e914f",
+  "priorActualReview": {"commit": "764c3bf3fd9d4046abcaab4b891a1cd1db085a06", "verdict": "LOW-only REVISION_REQUIRED (B9e-L1/L2); I1 closed", "readFirst": "History, review.json, reviewer_rev9e_delta_probes driver, result json, commands.json (764 result copy in the Rev9f Evidence has the same git blob 3e840fab as the 764 original)"},
+  "rootSourceReceiptAccepted": {"path": "fleet-five-orchestration-20261105/.work/b9f-source-root-verified.json", "sha256": "bbb1cf646fc9a4121c4cc328ad810fbd2574c00330cb17702a355a9c8a5ca878", "docs": 42276852254, "job": 128095264239, "rerunByReviewer": false,
+                                "note": "Root CI/raw-hash/bracket receipt taken as Root evidence, not semantic review; reviewer did not re-query that run"},
+  "rootBoardsRead": {"head": "fc02b4aed6cb46212ff4168e3b9fe4746abe8a5e", "index": "1.0.477", "codexBoard": "1.0.438", "claudeBoard": "1.2.130", "mode": "read-only"},
+  "readStatic": ["owner History 2026-11-07_FLEET5_B_Rev9f_FixOnly_Codex.md", "diffs vs rev9e copies: reflection_audit.py, callee_identity.py, pending_contracts.py, pending_obligations.py", "full new lexical_bindings.py, callee_identity.py, reflection_audit.py, source_bindings.py, call_binding.py, parameter_flow.py", "rev9f_gap_driver.py, rev9f_units.py, measured_run.py, proof-final01.json (command 1 head and last-command producerHashesAfter map), docs-final01.json sync argv"],
+  "verdict": "REVISION_REQUIRED",
+  "severity": "LOW only; no MEDIUM. The five actual 764 counterexamples refuse at the final 9cea producers with input SHA bound to the 764 ACCEPT rows, the benign controls and the actual 72028 positive ACCEPT. Three new near variants inside the declared B9e-L1/L2 categories still ACCEPT at full provenance. Frozen 72028 has 0 of these forms.",
+  "finalBytes": {"ownerLastProofCommandBracketedFiles": 82, "mismatches": 0, "reflection_audit.py": "7934ab1837c2056ae4f38e99a844fcace0322674b536dfbc01d95235065c57f3", "callee_identity.py": "3ff62c8e30c8bba0a09c976e7376331fcf59cd6850a7dee450d4b7bb67aca39c", "lexical_bindings.py": "8d85415adf78fd4b0f3a27fe0d4671f718963d20c2e352d5f2c79d785eebf8a5"},
+  "items": {
+    "B9e-L1": {
+      "status": "PARTIAL -> B9f-L1 (LOW)",
+      "closed": [
+        "the three exact actual 764 business_auth overlays (import_module('.workspace_config', _CLAUDE_PKG), import_module('.workspace_config', 'inv'), __import__('workspace_config', globals(), None, (), 1)) refuse UNCATALOGUED_PRODUCTION_SOURCE:inv/business_auth.py; mutated SHA equals the 764 ACCEPT rows",
+        "keyword forms refuse the same way: __import__(..., level=1) and import_module('.workspace_config', package='inv')",
+        "literal integer 0 controls ACCEPT: __import__('json', globals(), None, (), 0) and __import__('json', level=0)",
+        "existing controls ACCEPT (outside Database helper, assigned protected string with unused import, bounded literal sys.modules['js'+'on'])",
+        "a starred tail after slot 4 (__import__(..., (), *(1,))) is UNKNOWN; a starred package for an absolute name is UNKNOWN (conservative; reviewer expected ACCEPT, not a gap)"
+      ],
+      "open": {
+        "id": "B9f-L1",
+        "severity": "LOW",
+        "source": "reflection_audit.py supplied() lines 54-58 and relative_import_unknown() lines 60-66: supplied() looks only at args[index], the keyword and a ** spread, so a positional *spread that ends before slot 4 hides the level; relative_import_unknown() and keys() handle only builtins.__import__, although importlib.__import__ is inside the existing importlib.* enumeration (api()) with the same (name, globals, locals, fromlist, level) signature",
+        "counterexamples": [
+          "L1-near-dunder-import-level-hidden-by-starred-args: __import__('workspace_config', *(globals(), None, (), 1)).configured_workspace(object(), tenant, settings) in inv/business_auth.py -> ACCEPT (Python imports inv.workspace_config, the same causal import as the actual level-1 case)",
+          "L1-near-importlib-dunder-import-level1: importlib.__import__('workspace_config', globals(), None, (), 1).configured_workspace(object(), tenant, settings) -> ACCEPT"
+        ],
+        "validity": "business_auth.py append overlay of the same shape as the 764 cases; compiles, no new unbound names, 15/15 witnesses, six frozen roots preserved, full t1_provenance.provenance at final 9cea producers; nothing imported or executed",
+        "minimalCorrection": "supplied(): if any ast.Starred appears in call.args at a position <= index, return [None]. Treat importlib.__import__ exactly like builtins.__import__ in keys() and relative_import_unknown(). Regressions: these two refuse; the level-0 literal and existing controls and the 72028 positive still ACCEPT. No general import resolver is needed."
+      }
+    },
+    "B9e-L2": {
+      "status": "PARTIAL -> B9f-L2 (LOW)",
+      "closed": [
+        "the two exact actual 764 lan_pilot overlays (global-import installer, module star import) refuse UNRESOLVED:CALLEE_REBOUND; mutated SHA equals the 764 ACCEPT rows",
+        "outer-scope walrus through a comprehension under global refuses CALLEE_REBOUND at full provenance; a comprehension iteration variable of the same spelling under a global-declaring function ACCEPTs",
+        "binder: class-body global store, module walrus in comprehension, global for-target, global with-target, module type alias, global declared in the nested function itself -> CALLEE_REBOUND; controls (other global name, lambda arg, class method of the same spelling, plain cross-module import) keep the owned formal",
+        "a module-level star import in inv/workspace_api.py refuses CALLEE_REBOUND at full provenance (through the file's own WorkspaceAPI/RestrictedWorkspaceRuntime callees)"
+      ],
+      "open": {
+        "id": "B9f-L2",
+        "severity": "LOW",
+        "source": "callee_identity.py error() lines 72-77 and rebound() lines 29-34: the new lexical index is consulted only for the callee's DEFINING file (receiver) and, for a Name call, only when the name is a def in the caller (f.defs['']). When the call-site name is an import alias in the caller (from .workspace_api import WorkspaceAPI), a global-declared import or star import in the caller's binding scope of that name is recorded by lexical_bindings but never applied",
+        "counterexamples": [
+          "L2-near-imported-callee-global-import-workspace_config: append 'def _claude_install():\\n    global WorkspaceAPI\\n    from foreign_module import WorkspaceAPI' and '_claude_install()' to inv/workspace_config.py -> ACCEPT; configured_workspace :44 then passes the owned database to the foreign callable (the exact 764 installer shape on an imported callee name)",
+          "binder-only: near-cross-module-imported-callee-star-shadow and near-cross-module-imported-callee-global-import keep the owned formal with no CALLEE_REBOUND"
+        ],
+        "validity": "append-only overlay (no line shift, witnesses 15/15), compiles, no new unbound names, six frozen roots preserved, full provenance at final producers. The installer runs at module import, before configured_workspace can be called. Nothing imported or executed",
+        "starNote": "No full-provenance star escape was shown: every 72028 production file that imports a relevant callee also defines its own relevant callee, so a module star import there already refuses through that file. The star part is binder-only evidence here.",
+        "minimalCorrection": "For a Name call, also check the CALLER file: find the scope that binds the call-site name, and refuse CALLEE_REBOUND when that scope has a binding event of the name (from the lexical index, global-redirected) or a star import beyond the exact-frozen multiset for that file. This needs counts, not the current writes set, so the frozen import binding itself is allowed. Regressions: this case and the two binder fixtures refuse; the plain cross-module import control, existing controls and the 72028 positive still ACCEPT.",
+        "notExercised": "a plain caller-side reassignment of an imported callee name (WorkspaceAPI = wrap(WorkspaceAPI)) was not run; the correction above would cover it"
+      },
+      "info": [
+        "nonlocal stays INFO / outside this cut (binder fixture still keeps the owned formal, as declared); frozen 72028 has 3 nonlocal statements",
+        "I-a class-body __new__ assignment and post-class dunder attribute stores remain covered only by the full use-site guards; binder alone stays insufficient (not re-run here, owner bound unchanged)",
+        "the prior inconclusive match-capture probe is not used as evidence"
+      ]
+    }
+  },
+  "currentPositive": {"finalProducerRun": "actual-72028-positive ACCEPT via t1_provenance.provenance at final 9cea producers", "parsedAudited": 25, "production": 11, "parsedEqualsAudited": true, "frozenBindings": 576, "currentBindings": 576, "unresolved": 0,
+                      "notRecomputedByReviewer": "19 edges (16/3), 12 entries, the 6 accounting artifacts 598/757/1071/21/573/218 and model/lifecycle byte equality are Root-verified history (b9f receipt), not re-derived"},
+  "ownerReceiptAssessment": "proof-final01 command brackets list 82 files; the reviewer recomputed all 82 at the committed bytes and they equal the last command's after-map, so the reviewer probes ran on the same final bytes. Bracketing is not continuous instrumentation; retained history is not new coverage.",
+  "reviewerRun": {"cases": 22, "binderFixtures": 13, "reflectionUnits": 5, "mismatches": 8,
+                  "findings": ["L1-near-dunder-import-level-hidden-by-starred-args", "L1-near-importlib-dunder-import-level1", "L2-near-imported-callee-global-import-workspace_config"],
+                  "binderOrUnitOnly": ["near-cross-module-imported-callee-star-shadow", "near-cross-module-imported-callee-global-import", "starred-level", "importlib-dunder-level1"],
+                  "reviewerExpectationWrongConservative": ["import_module-starred-package-absolute"]},
+  "frozen72028Scan": "reviewer_scan_72028_b9f_forms over 11 production paths: 0 starred-argument import calls, 0 __import__ attribute uses, 0 global statements, 0 star imports; 3 nonlocal statements",
+  "resources": {"peakWorkingSetBytes": 153198592, "elapsedSeconds": 227, "scope": "observed peak of the single reviewer probe process only; no aggregate or hard quota"},
+  "notRun": ["owner run_checks/proof/docs commands", "model/terminal/recovery suites", "owner 70/19/31/83/29 replays", "full 523 assembler / 3485 plans / giant ledger / whole Core", "mutant import or execution", "Obsidian apply/adopt/resolve/state write"],
+  "unchanged": "actualRuntimeB 0; all real bindings NULL/HOLD; A1-A16 PENDING; observer lock outside 19; storage R4 0/1 expected; model f7384016.../lifecycle 710c6aaf... untouched",
+  "A7": "UNSTARTED / NOT GRANTED; this verdict does not allow an A7 NodeChannels.snapshot grant",
+  "nextCut": "Rev9g fix-only from exact 9cea33e8: B9f-L1 (starred spread before the level slot is UNKNOWN; importlib.__import__ treated as builtins.__import__) and B9f-L2 (apply the lexical index to the caller-side binding scope of an imported call-site name, with frozen multiset counts) with these 3 full-provenance cases and 2 binder fixtures as regressions and existing controls; then one narrow Claude delta review. A7 only after actual acceptance and a separate Root grant.",
+  "nextFirstAction": {"owner": "Root", "action": "relay this verdict to askmsg_453ac2a3ea95 and decide Rev9g"}
+}

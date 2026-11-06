@@ -1,0 +1,2223 @@
+{
+  "source": "72028cbac903c4415d9979f980a6e0f9948e914f",
+  "contracts": [
+    {
+      "id": "T1",
+      "status": "DESIGN_ONLY_PENDING_IMPLEMENTATION_AND_ROOT_CHOICE",
+      "actualBinding": null,
+      "codeGrant": false,
+      "portGrant": false,
+      "wiring": [
+        {
+          "source": "72028cbac903c4415d9979f980a6e0f9948e914f",
+          "path": "services/control-plane/src/inv/db.py",
+          "function": "Database.transaction",
+          "functionRange": [
+            175,
+            245
+          ],
+          "line": 190,
+          "fileSHA256": "38e0d679b442433fd0b775e98411d78dfff2b7d114bbc3c2a52d3a886726022d",
+          "functionSHA256": "d4255ebf919f91471d3597391c026e9bc8fcaf343e4e1016506649ba9fe39700",
+          "needle": "Runtime must use a non-owner role without RLS bypass"
+        },
+        {
+          "source": "72028cbac903c4415d9979f980a6e0f9948e914f",
+          "path": "services/control-plane/src/inv/db.py",
+          "function": "BoundDatabase.transaction",
+          "functionRange": [
+            130,
+            133
+          ],
+          "line": 130,
+          "fileSHA256": "38e0d679b442433fd0b775e98411d78dfff2b7d114bbc3c2a52d3a886726022d",
+          "functionSHA256": "d29f34f2ae8539db1b77aa2c0d0112cccb46b4f7974cf5c988be2f0fa461bdaf",
+          "needle": null
+        },
+        {
+          "source": "72028cbac903c4415d9979f980a6e0f9948e914f",
+          "path": "services/control-plane/src/inv/db.py",
+          "function": "Database.__init__",
+          "functionRange": [
+            137,
+            172
+          ],
+          "line": 137,
+          "fileSHA256": "38e0d679b442433fd0b775e98411d78dfff2b7d114bbc3c2a52d3a886726022d",
+          "functionSHA256": "1bf0f779f88161395d3a63372ccc847868af5dc3749ca655066a1a9e5c92a59b",
+          "needle": null
+        },
+        {
+          "source": "72028cbac903c4415d9979f980a6e0f9948e914f",
+          "path": "services/control-plane/src/inv/observation.py",
+          "function": "NodeObservation.mark_offline",
+          "functionRange": [
+            138,
+            151
+          ],
+          "line": 138,
+          "fileSHA256": "b515ceda8b066466cf4cdf5fa88d04803220398c436d29ab7c5fd2793bf5748f",
+          "functionSHA256": "535679e3ff8ff5c778f83e3e58a12215ab68269238789c467dbbae826ae37266",
+          "needle": null
+        }
+      ],
+      "authentication": "ONE shared P-DBROLE credential contract. Installed non-superuser, non-schema-owner, no RLS-bypass role; tenant/current epoch from trusted principal. Future B purpose-specific roles require actual grant/RLS proof. Not 13 new ports.",
+      "input": "Validated tenant UUID and fixed containment_write boolean chosen by trusted caller; immutable recovery epoch; exact DSN held by private installed owner, never evidence or request input. BoundDatabase tenant must equal outer tenant.",
+      "output": "ObservedConnection/psycopg connection scoped to transaction; BoundDatabase yields same existing connection, no new transaction credential.",
+      "error": "AUTH-0020 on role check; LEASE-0004 epoch mismatch; AUTH-0060 missing tenant barrier; RES-0007 retry same key on lock timeout/query cancellation/deadlock; AUTH-0011 nested tenant mismatch; unknown commit never success.",
+      "ownership": "Database owns connection; BoundDatabase borrows. statement_observer/placement_metric_sink/logger are pending typed observability only after all production constructor sites/type/effect constraints are proven. Callback exception must not hide commit ambiguity or confer authority.",
+      "transaction": "READ COMMITTED; SET LOCAL tenant via set_config; 500ms lock_timeout/2s statement_timeout; control_epoch FOR SHARE; tenant_controls fixed SHARE or UPDATE before body; no network IO in transaction. ContextVar phase get/set/reset stays related to yield/commit/rollback/lock timing.",
+      "effect": "DB credential connect + reads/writes of caller body; clock/perf_counter remain real clock sources. Observability output may append metrics/logs only and must not mutate authority, dispatch or credentials.",
+      "verificationDependencies": [
+        "A3 context phase provenance",
+        "A7 exact tools import/return proof across four runtime import sites",
+        "A8 all production constructor argument propagation; subclass override BLOCK; harness doubles retained separately",
+        "purpose role PG/RLS/grants and two-session trace NOT_RUN",
+        "mark_offline SECOND demonstrator only; no critical entry upgrade from this contract",
+        "Exact12 critical-entry set named, no count13",
+        "Only five listed A1c Connection results close; no general76-edge closure",
+        "Six derived production and twenty separately catalogued harness constructor calls; three class database-input unions; local lan_pilot.runtime and remote_workspace_entry.database single-return proofs",
+        "A7 cross-module deferred; local runtime helper is within this fix-only proof",
+        "Actual roles/current auth/credentials/cutover/PG/two-session/clock semantics/log handlers NOT_RUN",
+        "Rev9c frozen production root multiset preservation plus enumerated reflection audit; added hidden roots cannot be closed by a count check",
+        "Derived current-T1 database-parameter forwarding caller/re-export fixed point; relevant omitted production sources refuse UNCATALOGUED_PRODUCTION_SOURCE",
+        "Bounded owner/container relevance through For/With/comprehensions/attributes/subscripts/factory results; graph alone is not a complete provenance proof",
+        "No-new-protected-use relative to frozen72028 only; no arbitrary Python reflection/heap completeness claim",
+        "Rev9d reflection audit covers every production census/discovery grep-hit and overlay read, with exact frozen hit comparison and truthful relevant-file inventory",
+        "Owned argument to formal-parameter fixed point over supplied current/frozen sources; positional/keyword binding and bound receiver handling, nested reads inherit enclosing ownership; ambiguous relevant bindings refuse",
+        "pending-obligations.json carries future tenant-epoch gate obligation without a model writer and records harness function-scope alias limitation",
+        "Rev9e enumerated reflection module/name/key outside the declared literal bound is relevant UNKNOWN in every parsed production file; exact frozen match or refuse",
+        "Relevant owned-argument binding requires conservative callable/class construction identity: custom __new__/in-proof base/metaclass, callee assignment/deletion/import shadow/global rebinding and new unproven decorators refuse",
+        "Fixed-point bound includes vararg/kwarg slots and the finite called-factory universe; original kwargs-member witnesses are retained; no arbitrary Python reflection/callable completeness grant",
+        "Rev9f relative import names, unprovable supplied import_module package, and nonzero/unprovable supplied __import__ level are relevant UNKNOWN; exact frozen allowance or refuse, no general import resolver",
+        "Declared-global import/def/class/pattern/except/Name bindings redirect only within the same lexical scope; nested function/class/comprehension boundaries preserved; new star import in a callee binding scope refuses",
+        "Final causal5/control executions are bracketed by per-file producer/harness hashes before and after each command; no post-run-only seal is presented as execution provenance"
+      ],
+      "sharedOwnerReferencedCriticalEntries": [
+        "inv.build_execution.BuildExecutionService._commit_consequences",
+        "inv.build_execution.BuildExecutionService._mark_node_quarantined",
+        "inv.build_execution.BuildExecutionService.execute",
+        "inv.build_execution_worker.BuildExecutionIntentQueue.enqueue",
+        "inv.build_preparations.BuildPreparationService._terminalize",
+        "inv.node_transport.NodeDelivery._quarantine_gpu_node",
+        "inv.node_transport.NodeDelivery.deliver",
+        "inv.observation.NodeObservation.accept",
+        "inv.observation.NodeObservation.mark_offline",
+        "inv.results.ResultStore.complete",
+        "inv.runs.RunStore.complete",
+        "inv.shard_completion.ShardCompletion.once"
+      ],
+      "sourceClosureReference": "t1-mark-offline-closure.json",
+      "observability": {
+        "productionSourceBindings": "All seven actual Database constructors omit observer/sink or exact None; Database defaults and BoundDatabase copying remain source-grounded; bounded post-construction load/store contexts checked",
+        "statementObserver": "P-T1-OBSERVER-LOCK-SAFETY NAMED_RUNTIME_PENDING outside fixed 19-edge census; inside held locks: in-process, nonblocking, no network/subprocess, exception-contained, no authority. None source default is not runtime handler proof",
+        "placementMetricSink": "After connection context closes; same restricted effects",
+        "logger": "Existing logging.getLogger(inv.placement); handler/configuration runtime PENDING, never assumed pure",
+        "actualBinding": null
+      },
+      "targetedWiring": [
+        {
+          "callRef": "de9d9e265fa02411fc2f7e72011c1b6d5abf963c21e674514e8dd21317590726",
+          "category": "ANALYSIS_RULE:A8_T1_ATTRIBUTE",
+          "source": {
+            "path": "services/control-plane/src/inv/db.py",
+            "span": [
+              36,
+              11,
+              36,
+              59
+            ],
+            "sourceFileSHA256": "38e0d679b442433fd0b775e98411d78dfff2b7d114bbc3c2a52d3a886726022d",
+            "expressionSHA256": "9175d9cac23fec81fdc554b6bf16e9850b56e366e6e2ab2f428f1790d305748a",
+            "function": "inv.db.record_placement_metric"
+          },
+          "receiver": {
+            "expression": "getattr",
+            "oldInferredType": null,
+            "provenUnion": [
+              "inv.db.Database"
+            ]
+          },
+          "blocksGrant": false
+        },
+        {
+          "callRef": "850d6ff6bb0db9ec30186d2ff111bab72e669641ad7371552ae67ea3d276d259",
+          "category": "NAMED_PORT:T1-OBSERVABILITY",
+          "source": {
+            "path": "services/control-plane/src/inv/db.py",
+            "span": [
+              37,
+              12,
+              37,
+              50
+            ],
+            "sourceFileSHA256": "38e0d679b442433fd0b775e98411d78dfff2b7d114bbc3c2a52d3a886726022d",
+            "expressionSHA256": "1fffd5063c89e73591fa3edc4ea7001d55cd054045c5a98af01af07ed813ebbf",
+            "function": "inv.db.record_placement_metric"
+          },
+          "receiver": {
+            "expression": "database.placement_metric_sink",
+            "oldInferredType": "TYPE_JOIN:d742656e07d4ac1ce85a",
+            "provenUnion": [
+              "exact named runtime interface; installed binding unproven"
+            ]
+          },
+          "blocksGrant": true
+        },
+        {
+          "callRef": "f6d5fe58f1bc552f51c5bddb0574bc1014bb94921cc5322c7daa90039dad46c3",
+          "category": "ANALYSIS_RULE:A8_T1_ATTRIBUTE",
+          "source": {
+            "path": "services/control-plane/src/inv/db.py",
+            "span": [
+              38,
+              13,
+              38,
+              63
+            ],
+            "sourceFileSHA256": "38e0d679b442433fd0b775e98411d78dfff2b7d114bbc3c2a52d3a886726022d",
+            "expressionSHA256": "560a770ca6e26a50420476a102f28d5a7d6c311f8ae04f1d2bfc195f0de6efad",
+            "function": "inv.db.record_placement_metric"
+          },
+          "receiver": {
+            "expression": "getattr",
+            "oldInferredType": null,
+            "provenUnion": [
+              "inv.db.Database"
+            ]
+          },
+          "blocksGrant": false
+        },
+        {
+          "callRef": "52fb59f4058e2cf847a8bccaf323f92cf840ef29462513cccd0a51ac67cc9152",
+          "category": "NAMED_PORT:T1-OBSERVABILITY",
+          "source": {
+            "path": "services/control-plane/src/inv/db.py",
+            "span": [
+              39,
+              12,
+              42,
+              13
+            ],
+            "sourceFileSHA256": "38e0d679b442433fd0b775e98411d78dfff2b7d114bbc3c2a52d3a886726022d",
+            "expressionSHA256": "10bf24c2bd023a80c823c444dbb1cae24327ec00d6ce172456c8ee0650158cb6",
+            "function": "inv.db.record_placement_metric"
+          },
+          "receiver": {
+            "expression": "_placement_logger.info",
+            "oldInferredType": "inv.db._placement_logger",
+            "provenUnion": [
+              "exact named runtime interface; installed binding unproven"
+            ]
+          },
+          "blocksGrant": true
+        },
+        {
+          "callRef": "36b34ca14e0e952c029ae29fe5ec90e768917041531013ca63bc30e07b206c38",
+          "category": "ANALYSIS_RULE:A3",
+          "source": {
+            "path": "services/control-plane/src/inv/db.py",
+            "span": [
+              177,
+              22,
+              177,
+              76
+            ],
+            "sourceFileSHA256": "38e0d679b442433fd0b775e98411d78dfff2b7d114bbc3c2a52d3a886726022d",
+            "expressionSHA256": "da2ed64f3f1f9978906fbe8fa51c0c4de158b51c3e1fa9c1994ebbd7a49d5b99",
+            "function": "inv.db.Database.transaction"
+          },
+          "receiver": {
+            "expression": "_statement_phase.set",
+            "oldInferredType": "inv.db._statement_phase",
+            "provenUnion": [
+              "contextvars.ContextVar phase/token; metric dict"
+            ]
+          },
+          "blocksGrant": false
+        },
+        {
+          "callRef": "6367eafee00b16fe77ed6475dd98ba37d2873a3a59b82c821babc1472afe10f3",
+          "category": "NAMED_PORT:P-DBROLE",
+          "source": {
+            "path": "services/control-plane/src/inv/db.py",
+            "span": [
+              180,
+              17,
+              180,
+              65
+            ],
+            "sourceFileSHA256": "38e0d679b442433fd0b775e98411d78dfff2b7d114bbc3c2a52d3a886726022d",
+            "expressionSHA256": "88b9868cb88c97c53243d1302545ae00404226314c5019e51fc15fa89c4af76e",
+            "function": "inv.db.Database.transaction"
+          },
+          "receiver": {
+            "expression": "psycopg.connect",
+            "oldInferredType": "psycopg",
+            "provenUnion": [
+              "exact named runtime interface; installed binding unproven"
+            ]
+          },
+          "blocksGrant": true
+        },
+        {
+          "callRef": "d28ac491b9c444d4429e2ad217422e73adb3510fd539669ca1c4340d5147ce7c",
+          "category": "ANALYSIS_RULE:A1c",
+          "source": {
+            "path": "services/control-plane/src/inv/db.py",
+            "span": [
+              183,
+              23,
+              186,
+              65
+            ],
+            "sourceFileSHA256": "38e0d679b442433fd0b775e98411d78dfff2b7d114bbc3c2a52d3a886726022d",
+            "expressionSHA256": "21f4573990f9ee272507c3bf95ef26e30d52caa2d739a7faa7570c7f3e5f7ee5",
+            "function": "inv.db.Database.transaction"
+          },
+          "receiver": {
+            "expression": "conn.execute(\"SELECT r.rolsuper, r.rolbypassrls,\\n                    r.oid = n.nspowner AS owns_schema\\n                    FROM pg_roles r JOIN pg_namespace n ON n.nspname='inv'\\n                    WHERE r.rolname = current_user\").fetchone",
+            "oldInferredType": "DB:Cursor",
+            "provenUnion": [
+              "psycopg.Connection",
+              "inv.db._ObservedConnection"
+            ]
+          },
+          "blocksGrant": false
+        },
+        {
+          "callRef": "f0e94cd518fa2948438931ba2c2239fc5946dd122699d4a46f7a0bd2c8e4e6c0",
+          "category": "ANALYSIS_RULE:A2_HARDENED",
+          "source": {
+            "path": "services/control-plane/src/inv/db.py",
+            "span": [
+              188,
+              26,
+              192,
+              21
+            ],
+            "sourceFileSHA256": "38e0d679b442433fd0b775e98411d78dfff2b7d114bbc3c2a52d3a886726022d",
+            "expressionSHA256": "46fbdffca44cb16a54923f431464b7231ec472096f64b870e63214cc78db69d5",
+            "function": "inv.db.Database.transaction"
+          },
+          "receiver": {
+            "expression": "DomainError",
+            "oldInferredType": null,
+            "provenUnion": [
+              "inv.errors.DomainError"
+            ]
+          },
+          "blocksGrant": false
+        },
+        {
+          "callRef": "2fee33b1d7a35c5ab73aef228b1d1cbbd152e923df8a405e0a21191fe593e418",
+          "category": "ANALYSIS_RULE:A1c",
+          "source": {
+            "path": "services/control-plane/src/inv/db.py",
+            "span": [
+              201,
+              24,
+              203,
+              28
+            ],
+            "sourceFileSHA256": "38e0d679b442433fd0b775e98411d78dfff2b7d114bbc3c2a52d3a886726022d",
+            "expressionSHA256": "504f947c88a50ecfae8b500afc4914083e7fa5f433868301123c808204c74a50",
+            "function": "inv.db.Database.transaction"
+          },
+          "receiver": {
+            "expression": "observed_conn.execute('SELECT epoch FROM inv.control_epoch WHERE singleton FOR SHARE').fetchone",
+            "oldInferredType": "UNRESOLVED_CALL_RETURN:inv.db:observed_conn.execute",
+            "provenUnion": [
+              "psycopg.Connection",
+              "inv.db._ObservedConnection"
+            ]
+          },
+          "blocksGrant": false
+        },
+        {
+          "callRef": "0900fcf3ee00e5dfa59f724aad9769d340acf7e022f312c13e832dc5937039a8",
+          "category": "ANALYSIS_RULE:A2_HARDENED",
+          "source": {
+            "path": "services/control-plane/src/inv/db.py",
+            "span": [
+              205,
+              26,
+              207,
+              21
+            ],
+            "sourceFileSHA256": "38e0d679b442433fd0b775e98411d78dfff2b7d114bbc3c2a52d3a886726022d",
+            "expressionSHA256": "4be3069c99af9f1a5ea16c81bf57c640f267d4767ae0305e387c7ef2b67b960d",
+            "function": "inv.db.Database.transaction"
+          },
+          "receiver": {
+            "expression": "DomainError",
+            "oldInferredType": null,
+            "provenUnion": [
+              "inv.errors.DomainError"
+            ]
+          },
+          "blocksGrant": false
+        },
+        {
+          "callRef": "7250f09561b724047872700cc2e7b7bda964e8e6c354a0abec8509986ccd2f4f",
+          "category": "ANALYSIS_RULE:A1c",
+          "source": {
+            "path": "services/control-plane/src/inv/db.py",
+            "span": [
+              212,
+              27,
+              216,
+              32
+            ],
+            "sourceFileSHA256": "38e0d679b442433fd0b775e98411d78dfff2b7d114bbc3c2a52d3a886726022d",
+            "expressionSHA256": "7a3a838a4ecca56ca871c0d0f542494bc6a3841e445a639d68ec2b04415978f4",
+            "function": "inv.db.Database.transaction"
+          },
+          "receiver": {
+            "expression": "observed_conn.execute('SELECT tenant_id FROM inv.tenant_controls WHERE tenant_id=%s FOR ' + ('UPDATE' if containment_write else 'SHARE'), (tenant,)).fetchone",
+            "oldInferredType": "UNRESOLVED_CALL_RETURN:inv.db:observed_conn.execute",
+            "provenUnion": [
+              "psycopg.Connection",
+              "inv.db._ObservedConnection"
+            ]
+          },
+          "blocksGrant": false
+        },
+        {
+          "callRef": "bf871086558da68fae6f99087dba0157d4aa22b183720c72f02a1c13406fd16e",
+          "category": "ANALYSIS_RULE:A2_HARDENED",
+          "source": {
+            "path": "services/control-plane/src/inv/db.py",
+            "span": [
+              218,
+              30,
+              218,
+              101
+            ],
+            "sourceFileSHA256": "38e0d679b442433fd0b775e98411d78dfff2b7d114bbc3c2a52d3a886726022d",
+            "expressionSHA256": "e18704530ab9e3a2bd8bcacffe79cc69a04daf8046fd2a62d7435009f48ccaa1",
+            "function": "inv.db.Database.transaction"
+          },
+          "receiver": {
+            "expression": "DomainError",
+            "oldInferredType": null,
+            "provenUnion": [
+              "inv.errors.DomainError"
+            ]
+          },
+          "blocksGrant": false
+        },
+        {
+          "callRef": "038957a7d84e801a61796e6171a28b3920d2945ee7fce99bc70d426595dd53cc",
+          "category": "ANALYSIS_RULE:A2_HARDENED",
+          "source": {
+            "path": "services/control-plane/src/inv/db.py",
+            "span": [
+              225,
+              26,
+              230,
+              21
+            ],
+            "sourceFileSHA256": "38e0d679b442433fd0b775e98411d78dfff2b7d114bbc3c2a52d3a886726022d",
+            "expressionSHA256": "aba1c93c12085995d6ff982164fe3f1c0a67204c6b91feedc5ed9c1251f15fb1",
+            "function": "inv.db.Database.transaction"
+          },
+          "receiver": {
+            "expression": "DomainError",
+            "oldInferredType": null,
+            "provenUnion": [
+              "inv.errors.DomainError"
+            ]
+          },
+          "blocksGrant": false
+        },
+        {
+          "callRef": "21156e69b339fe380ba83f3bbeea6207d913f91d59e80b0dc1e1283016efcd31",
+          "category": "ANALYSIS_RULE:A3",
+          "source": {
+            "path": "services/control-plane/src/inv/db.py",
+            "span": [
+              233,
+              20,
+              233,
+              42
+            ],
+            "sourceFileSHA256": "38e0d679b442433fd0b775e98411d78dfff2b7d114bbc3c2a52d3a886726022d",
+            "expressionSHA256": "d885317b1780d7d1da93dad1934c1c5e33650880d47799bbb802c1f2d61669d1",
+            "function": "inv.db.Database.transaction"
+          },
+          "receiver": {
+            "expression": "_statement_phase.get",
+            "oldInferredType": "inv.db._statement_phase",
+            "provenUnion": [
+              "contextvars.ContextVar phase/token; metric dict"
+            ]
+          },
+          "blocksGrant": false
+        },
+        {
+          "callRef": "402f16a79c13a366b175b95856b432e32f5763ac9600e73ed06a8fa596142e37",
+          "category": "ANALYSIS_RULE:A3",
+          "source": {
+            "path": "services/control-plane/src/inv/db.py",
+            "span": [
+              234,
+              12,
+              234,
+              47
+            ],
+            "sourceFileSHA256": "38e0d679b442433fd0b775e98411d78dfff2b7d114bbc3c2a52d3a886726022d",
+            "expressionSHA256": "8960eba1e3a4046e29187a4514a6fc78e06aea540be6d6fc6723e502b5933c3c",
+            "function": "inv.db.Database.transaction"
+          },
+          "receiver": {
+            "expression": "_statement_phase.reset",
+            "oldInferredType": "inv.db._statement_phase",
+            "provenUnion": [
+              "contextvars.ContextVar phase/token; metric dict"
+            ]
+          },
+          "blocksGrant": false
+        },
+        {
+          "callRef": "ac52192a6b9a7bc1a10ad58dfdb27af0981524c9ad77e5044701b6bba2b413a6",
+          "category": "ANALYSIS_RULE:A3",
+          "source": {
+            "path": "services/control-plane/src/inv/db.py",
+            "span": [
+              235,
+              43,
+              235,
+              65
+            ],
+            "sourceFileSHA256": "38e0d679b442433fd0b775e98411d78dfff2b7d114bbc3c2a52d3a886726022d",
+            "expressionSHA256": "d61ae8c209d2968de0892e015f2cd5b232aad7a128a5596f1e3bc68f0a6947d2",
+            "function": "inv.db.Database.transaction"
+          },
+          "receiver": {
+            "expression": "phase.get",
+            "oldInferredType": "UNRESOLVED_CALL_RETURN:inv.db:_statement_phase.get",
+            "provenUnion": [
+              "contextvars.ContextVar phase/token; metric dict"
+            ]
+          },
+          "blocksGrant": false
+        },
+        {
+          "callRef": "c5dbe16644b32611e8c1aea3f764e591675c6562eefd42aca34c06134b1dd24c",
+          "category": "ANALYSIS_RULE:A1c",
+          "source": {
+            "path": "services/control-plane/src/inv/observation.py",
+            "span": [
+              140,
+              19,
+              142,
+              24
+            ],
+            "sourceFileSHA256": "b515ceda8b066466cf4cdf5fa88d04803220398c436d29ab7c5fd2793bf5748f",
+            "expressionSHA256": "fbc1b60a891f77862dd21549ef4f5acdf62e71fd6fbf96f4db0426333395c632",
+            "function": "inv.observation.NodeObservation.mark_offline"
+          },
+          "receiver": {
+            "expression": "conn.execute(\"SELECT node_id FROM inv.nodes WHERE status='online' ORDER BY node_id FOR UPDATE\").fetchall",
+            "oldInferredType": "DB:Cursor",
+            "provenUnion": [
+              "psycopg.Connection",
+              "inv.db._ObservedConnection"
+            ]
+          },
+          "blocksGrant": false
+        },
+        {
+          "callRef": "4bfa4566940ef66d68e5403956db9904e48913b65fad2739c43e4984e19e4c02",
+          "category": "ANALYSIS_RULE:A1c",
+          "source": {
+            "path": "services/control-plane/src/inv/observation.py",
+            "span": [
+              145,
+              19,
+              148,
+              28
+            ],
+            "sourceFileSHA256": "b515ceda8b066466cf4cdf5fa88d04803220398c436d29ab7c5fd2793bf5748f",
+            "expressionSHA256": "741b7b381c973e1a034eb89fe6f0a337bde50f72b4c57d056ed0fcf61ec615f8",
+            "function": "inv.observation.NodeObservation.mark_offline"
+          },
+          "receiver": {
+            "expression": "conn.execute(\"UPDATE inv.nodes SET status='offline' WHERE node_id=%s AND heartbeat_at < clock_timestamp()-interval '60 seconds' AND status='online' RETURNING node_id\", (row['node_id'],)).fetchone",
+            "oldInferredType": "DB:Cursor",
+            "provenUnion": [
+              "psycopg.Connection",
+              "inv.db._ObservedConnection"
+            ]
+          },
+          "blocksGrant": false
+        },
+        {
+          "callRef": "5e4959377b92699d426be7c92b2aa26ea37eda82cb70dc67707986e125f9c98c",
+          "category": "ANALYSIS_RULE:A5_LOCAL",
+          "source": {
+            "path": "services/control-plane/src/inv/observation.py",
+            "span": [
+              149,
+              20,
+              149,
+              50
+            ],
+            "sourceFileSHA256": "b515ceda8b066466cf4cdf5fa88d04803220398c436d29ab7c5fd2793bf5748f",
+            "expressionSHA256": "a39c0a4a6c07aebdd38766a2baaaa3a631ff6bddc415985fe40236df00c361e7",
+            "function": "inv.observation.NodeObservation.mark_offline"
+          },
+          "receiver": {
+            "expression": "changed.append",
+            "oldInferredType": "PY:collection",
+            "provenUnion": [
+              "builtin list"
+            ]
+          },
+          "blocksGrant": false
+        }
+      ]
+    },
+    {
+      "id": "P-DBROLE",
+      "status": "DESIGN_ONLY_PENDING_IMPLEMENTATION_AND_ROOT_CHOICE",
+      "actualBinding": null,
+      "codeGrant": false,
+      "portGrant": false,
+      "wiring": [
+        {
+          "source": "72028cbac903c4415d9979f980a6e0f9948e914f",
+          "path": "services/control-plane/src/inv/db.py",
+          "function": "Database.transaction",
+          "functionRange": [
+            175,
+            245
+          ],
+          "line": 190,
+          "fileSHA256": "38e0d679b442433fd0b775e98411d78dfff2b7d114bbc3c2a52d3a886726022d",
+          "functionSHA256": "d4255ebf919f91471d3597391c026e9bc8fcaf343e4e1016506649ba9fe39700",
+          "needle": "Runtime must use a non-owner role without RLS bypass"
+        },
+        {
+          "source": "72028cbac903c4415d9979f980a6e0f9948e914f",
+          "path": "services/control-plane/src/inv/db.py",
+          "function": "BoundDatabase.transaction",
+          "functionRange": [
+            130,
+            133
+          ],
+          "line": 130,
+          "fileSHA256": "38e0d679b442433fd0b775e98411d78dfff2b7d114bbc3c2a52d3a886726022d",
+          "functionSHA256": "d29f34f2ae8539db1b77aa2c0d0112cccb46b4f7974cf5c988be2f0fa461bdaf",
+          "needle": null
+        },
+        {
+          "source": "72028cbac903c4415d9979f980a6e0f9948e914f",
+          "path": "services/control-plane/src/inv/db.py",
+          "function": "Database.__init__",
+          "functionRange": [
+            137,
+            172
+          ],
+          "line": 137,
+          "fileSHA256": "38e0d679b442433fd0b775e98411d78dfff2b7d114bbc3c2a52d3a886726022d",
+          "functionSHA256": "1bf0f779f88161395d3a63372ccc847868af5dc3749ca655066a1a9e5c92a59b",
+          "needle": null
+        }
+      ],
+      "authentication": "ONE shared P-DBROLE credential contract. Installed non-superuser, non-schema-owner, no RLS-bypass role; tenant/current epoch from trusted principal. Future B purpose-specific roles require actual grant/RLS proof. Not 13 new ports.",
+      "input": "Validated tenant UUID and fixed containment_write boolean chosen by trusted caller; immutable recovery epoch; exact DSN held by private installed owner, never evidence or request input. BoundDatabase tenant must equal outer tenant.",
+      "output": "ObservedConnection/psycopg connection scoped to transaction; BoundDatabase yields same existing connection, no new transaction credential.",
+      "error": "AUTH-0020 on role check; LEASE-0004 epoch mismatch; AUTH-0060 missing tenant barrier; RES-0007 retry same key on lock timeout/query cancellation/deadlock; AUTH-0011 nested tenant mismatch; unknown commit never success.",
+      "ownership": "Database owns connection; BoundDatabase borrows. statement_observer/placement_metric_sink/logger are pending typed observability only after all production constructor sites/type/effect constraints are proven. Callback exception must not hide commit ambiguity or confer authority.",
+      "transaction": "READ COMMITTED; SET LOCAL tenant via set_config; 500ms lock_timeout/2s statement_timeout; control_epoch FOR SHARE; tenant_controls fixed SHARE or UPDATE before body; no network IO in transaction. ContextVar phase get/set/reset stays related to yield/commit/rollback/lock timing.",
+      "effect": "DB credential connect + reads/writes of caller body; clock/perf_counter remain real clock sources. Observability output may append metrics/logs only and must not mutate authority, dispatch or credentials.",
+      "verificationDependencies": [
+        "Alias of shared T1 credential boundary, not another grant",
+        "real DSN/key/role binding NULL",
+        "actual PG NOT_RUN",
+        "Exact12 critical-entry set named, no count13",
+        "Only five listed A1c Connection results close; no general76-edge closure",
+        "Six derived production and twenty separately catalogued harness constructor calls; three class database-input unions; local lan_pilot.runtime and remote_workspace_entry.database single-return proofs",
+        "A7 cross-module deferred; local runtime helper is within this fix-only proof",
+        "Actual roles/current auth/credentials/cutover/PG/two-session/clock semantics/log handlers NOT_RUN",
+        "Rev9c frozen production root multiset preservation plus enumerated reflection audit; added hidden roots cannot be closed by a count check",
+        "Derived current-T1 database-parameter forwarding caller/re-export fixed point; relevant omitted production sources refuse UNCATALOGUED_PRODUCTION_SOURCE",
+        "Bounded owner/container relevance through For/With/comprehensions/attributes/subscripts/factory results; graph alone is not a complete provenance proof",
+        "No-new-protected-use relative to frozen72028 only; no arbitrary Python reflection/heap completeness claim",
+        "Rev9d reflection audit covers every production census/discovery grep-hit and overlay read, with exact frozen hit comparison and truthful relevant-file inventory",
+        "Owned argument to formal-parameter fixed point over supplied current/frozen sources; positional/keyword binding and bound receiver handling, nested reads inherit enclosing ownership; ambiguous relevant bindings refuse",
+        "pending-obligations.json carries future tenant-epoch gate obligation without a model writer and records harness function-scope alias limitation",
+        "Rev9e enumerated reflection module/name/key outside the declared literal bound is relevant UNKNOWN in every parsed production file; exact frozen match or refuse",
+        "Relevant owned-argument binding requires conservative callable/class construction identity: custom __new__/in-proof base/metaclass, callee assignment/deletion/import shadow/global rebinding and new unproven decorators refuse",
+        "Fixed-point bound includes vararg/kwarg slots and the finite called-factory universe; original kwargs-member witnesses are retained; no arbitrary Python reflection/callable completeness grant",
+        "Rev9f relative import names, unprovable supplied import_module package, and nonzero/unprovable supplied __import__ level are relevant UNKNOWN; exact frozen allowance or refuse, no general import resolver",
+        "Declared-global import/def/class/pattern/except/Name bindings redirect only within the same lexical scope; nested function/class/comprehension boundaries preserved; new star import in a callee binding scope refuses",
+        "Final causal5/control executions are bracketed by per-file producer/harness hashes before and after each command; no post-run-only seal is presented as execution provenance"
+      ],
+      "sharedOwnerReferencedCriticalEntries": [
+        "inv.build_execution.BuildExecutionService._commit_consequences",
+        "inv.build_execution.BuildExecutionService._mark_node_quarantined",
+        "inv.build_execution.BuildExecutionService.execute",
+        "inv.build_execution_worker.BuildExecutionIntentQueue.enqueue",
+        "inv.build_preparations.BuildPreparationService._terminalize",
+        "inv.node_transport.NodeDelivery._quarantine_gpu_node",
+        "inv.node_transport.NodeDelivery.deliver",
+        "inv.observation.NodeObservation.accept",
+        "inv.observation.NodeObservation.mark_offline",
+        "inv.results.ResultStore.complete",
+        "inv.runs.RunStore.complete",
+        "inv.shard_completion.ShardCompletion.once"
+      ],
+      "sourceClosureReference": "t1-mark-offline-closure.json",
+      "observability": {
+        "productionSourceBindings": "All seven actual Database constructors omit observer/sink or exact None; Database defaults and BoundDatabase copying remain source-grounded; bounded post-construction load/store contexts checked",
+        "statementObserver": "P-T1-OBSERVER-LOCK-SAFETY NAMED_RUNTIME_PENDING outside fixed 19-edge census; inside held locks: in-process, nonblocking, no network/subprocess, exception-contained, no authority. None source default is not runtime handler proof",
+        "placementMetricSink": "After connection context closes; same restricted effects",
+        "logger": "Existing logging.getLogger(inv.placement); handler/configuration runtime PENDING, never assumed pure",
+        "actualBinding": null
+      },
+      "targetedWiring": [
+        {
+          "callRef": "de9d9e265fa02411fc2f7e72011c1b6d5abf963c21e674514e8dd21317590726",
+          "category": "ANALYSIS_RULE:A8_T1_ATTRIBUTE",
+          "source": {
+            "path": "services/control-plane/src/inv/db.py",
+            "span": [
+              36,
+              11,
+              36,
+              59
+            ],
+            "sourceFileSHA256": "38e0d679b442433fd0b775e98411d78dfff2b7d114bbc3c2a52d3a886726022d",
+            "expressionSHA256": "9175d9cac23fec81fdc554b6bf16e9850b56e366e6e2ab2f428f1790d305748a",
+            "function": "inv.db.record_placement_metric"
+          },
+          "receiver": {
+            "expression": "getattr",
+            "oldInferredType": null,
+            "provenUnion": [
+              "inv.db.Database"
+            ]
+          },
+          "blocksGrant": false
+        },
+        {
+          "callRef": "850d6ff6bb0db9ec30186d2ff111bab72e669641ad7371552ae67ea3d276d259",
+          "category": "NAMED_PORT:T1-OBSERVABILITY",
+          "source": {
+            "path": "services/control-plane/src/inv/db.py",
+            "span": [
+              37,
+              12,
+              37,
+              50
+            ],
+            "sourceFileSHA256": "38e0d679b442433fd0b775e98411d78dfff2b7d114bbc3c2a52d3a886726022d",
+            "expressionSHA256": "1fffd5063c89e73591fa3edc4ea7001d55cd054045c5a98af01af07ed813ebbf",
+            "function": "inv.db.record_placement_metric"
+          },
+          "receiver": {
+            "expression": "database.placement_metric_sink",
+            "oldInferredType": "TYPE_JOIN:d742656e07d4ac1ce85a",
+            "provenUnion": [
+              "exact named runtime interface; installed binding unproven"
+            ]
+          },
+          "blocksGrant": true
+        },
+        {
+          "callRef": "f6d5fe58f1bc552f51c5bddb0574bc1014bb94921cc5322c7daa90039dad46c3",
+          "category": "ANALYSIS_RULE:A8_T1_ATTRIBUTE",
+          "source": {
+            "path": "services/control-plane/src/inv/db.py",
+            "span": [
+              38,
+              13,
+              38,
+              63
+            ],
+            "sourceFileSHA256": "38e0d679b442433fd0b775e98411d78dfff2b7d114bbc3c2a52d3a886726022d",
+            "expressionSHA256": "560a770ca6e26a50420476a102f28d5a7d6c311f8ae04f1d2bfc195f0de6efad",
+            "function": "inv.db.record_placement_metric"
+          },
+          "receiver": {
+            "expression": "getattr",
+            "oldInferredType": null,
+            "provenUnion": [
+              "inv.db.Database"
+            ]
+          },
+          "blocksGrant": false
+        },
+        {
+          "callRef": "52fb59f4058e2cf847a8bccaf323f92cf840ef29462513cccd0a51ac67cc9152",
+          "category": "NAMED_PORT:T1-OBSERVABILITY",
+          "source": {
+            "path": "services/control-plane/src/inv/db.py",
+            "span": [
+              39,
+              12,
+              42,
+              13
+            ],
+            "sourceFileSHA256": "38e0d679b442433fd0b775e98411d78dfff2b7d114bbc3c2a52d3a886726022d",
+            "expressionSHA256": "10bf24c2bd023a80c823c444dbb1cae24327ec00d6ce172456c8ee0650158cb6",
+            "function": "inv.db.record_placement_metric"
+          },
+          "receiver": {
+            "expression": "_placement_logger.info",
+            "oldInferredType": "inv.db._placement_logger",
+            "provenUnion": [
+              "exact named runtime interface; installed binding unproven"
+            ]
+          },
+          "blocksGrant": true
+        },
+        {
+          "callRef": "36b34ca14e0e952c029ae29fe5ec90e768917041531013ca63bc30e07b206c38",
+          "category": "ANALYSIS_RULE:A3",
+          "source": {
+            "path": "services/control-plane/src/inv/db.py",
+            "span": [
+              177,
+              22,
+              177,
+              76
+            ],
+            "sourceFileSHA256": "38e0d679b442433fd0b775e98411d78dfff2b7d114bbc3c2a52d3a886726022d",
+            "expressionSHA256": "da2ed64f3f1f9978906fbe8fa51c0c4de158b51c3e1fa9c1994ebbd7a49d5b99",
+            "function": "inv.db.Database.transaction"
+          },
+          "receiver": {
+            "expression": "_statement_phase.set",
+            "oldInferredType": "inv.db._statement_phase",
+            "provenUnion": [
+              "contextvars.ContextVar phase/token; metric dict"
+            ]
+          },
+          "blocksGrant": false
+        },
+        {
+          "callRef": "6367eafee00b16fe77ed6475dd98ba37d2873a3a59b82c821babc1472afe10f3",
+          "category": "NAMED_PORT:P-DBROLE",
+          "source": {
+            "path": "services/control-plane/src/inv/db.py",
+            "span": [
+              180,
+              17,
+              180,
+              65
+            ],
+            "sourceFileSHA256": "38e0d679b442433fd0b775e98411d78dfff2b7d114bbc3c2a52d3a886726022d",
+            "expressionSHA256": "88b9868cb88c97c53243d1302545ae00404226314c5019e51fc15fa89c4af76e",
+            "function": "inv.db.Database.transaction"
+          },
+          "receiver": {
+            "expression": "psycopg.connect",
+            "oldInferredType": "psycopg",
+            "provenUnion": [
+              "exact named runtime interface; installed binding unproven"
+            ]
+          },
+          "blocksGrant": true
+        },
+        {
+          "callRef": "d28ac491b9c444d4429e2ad217422e73adb3510fd539669ca1c4340d5147ce7c",
+          "category": "ANALYSIS_RULE:A1c",
+          "source": {
+            "path": "services/control-plane/src/inv/db.py",
+            "span": [
+              183,
+              23,
+              186,
+              65
+            ],
+            "sourceFileSHA256": "38e0d679b442433fd0b775e98411d78dfff2b7d114bbc3c2a52d3a886726022d",
+            "expressionSHA256": "21f4573990f9ee272507c3bf95ef26e30d52caa2d739a7faa7570c7f3e5f7ee5",
+            "function": "inv.db.Database.transaction"
+          },
+          "receiver": {
+            "expression": "conn.execute(\"SELECT r.rolsuper, r.rolbypassrls,\\n                    r.oid = n.nspowner AS owns_schema\\n                    FROM pg_roles r JOIN pg_namespace n ON n.nspname='inv'\\n                    WHERE r.rolname = current_user\").fetchone",
+            "oldInferredType": "DB:Cursor",
+            "provenUnion": [
+              "psycopg.Connection",
+              "inv.db._ObservedConnection"
+            ]
+          },
+          "blocksGrant": false
+        },
+        {
+          "callRef": "f0e94cd518fa2948438931ba2c2239fc5946dd122699d4a46f7a0bd2c8e4e6c0",
+          "category": "ANALYSIS_RULE:A2_HARDENED",
+          "source": {
+            "path": "services/control-plane/src/inv/db.py",
+            "span": [
+              188,
+              26,
+              192,
+              21
+            ],
+            "sourceFileSHA256": "38e0d679b442433fd0b775e98411d78dfff2b7d114bbc3c2a52d3a886726022d",
+            "expressionSHA256": "46fbdffca44cb16a54923f431464b7231ec472096f64b870e63214cc78db69d5",
+            "function": "inv.db.Database.transaction"
+          },
+          "receiver": {
+            "expression": "DomainError",
+            "oldInferredType": null,
+            "provenUnion": [
+              "inv.errors.DomainError"
+            ]
+          },
+          "blocksGrant": false
+        },
+        {
+          "callRef": "2fee33b1d7a35c5ab73aef228b1d1cbbd152e923df8a405e0a21191fe593e418",
+          "category": "ANALYSIS_RULE:A1c",
+          "source": {
+            "path": "services/control-plane/src/inv/db.py",
+            "span": [
+              201,
+              24,
+              203,
+              28
+            ],
+            "sourceFileSHA256": "38e0d679b442433fd0b775e98411d78dfff2b7d114bbc3c2a52d3a886726022d",
+            "expressionSHA256": "504f947c88a50ecfae8b500afc4914083e7fa5f433868301123c808204c74a50",
+            "function": "inv.db.Database.transaction"
+          },
+          "receiver": {
+            "expression": "observed_conn.execute('SELECT epoch FROM inv.control_epoch WHERE singleton FOR SHARE').fetchone",
+            "oldInferredType": "UNRESOLVED_CALL_RETURN:inv.db:observed_conn.execute",
+            "provenUnion": [
+              "psycopg.Connection",
+              "inv.db._ObservedConnection"
+            ]
+          },
+          "blocksGrant": false
+        },
+        {
+          "callRef": "0900fcf3ee00e5dfa59f724aad9769d340acf7e022f312c13e832dc5937039a8",
+          "category": "ANALYSIS_RULE:A2_HARDENED",
+          "source": {
+            "path": "services/control-plane/src/inv/db.py",
+            "span": [
+              205,
+              26,
+              207,
+              21
+            ],
+            "sourceFileSHA256": "38e0d679b442433fd0b775e98411d78dfff2b7d114bbc3c2a52d3a886726022d",
+            "expressionSHA256": "4be3069c99af9f1a5ea16c81bf57c640f267d4767ae0305e387c7ef2b67b960d",
+            "function": "inv.db.Database.transaction"
+          },
+          "receiver": {
+            "expression": "DomainError",
+            "oldInferredType": null,
+            "provenUnion": [
+              "inv.errors.DomainError"
+            ]
+          },
+          "blocksGrant": false
+        },
+        {
+          "callRef": "7250f09561b724047872700cc2e7b7bda964e8e6c354a0abec8509986ccd2f4f",
+          "category": "ANALYSIS_RULE:A1c",
+          "source": {
+            "path": "services/control-plane/src/inv/db.py",
+            "span": [
+              212,
+              27,
+              216,
+              32
+            ],
+            "sourceFileSHA256": "38e0d679b442433fd0b775e98411d78dfff2b7d114bbc3c2a52d3a886726022d",
+            "expressionSHA256": "7a3a838a4ecca56ca871c0d0f542494bc6a3841e445a639d68ec2b04415978f4",
+            "function": "inv.db.Database.transaction"
+          },
+          "receiver": {
+            "expression": "observed_conn.execute('SELECT tenant_id FROM inv.tenant_controls WHERE tenant_id=%s FOR ' + ('UPDATE' if containment_write else 'SHARE'), (tenant,)).fetchone",
+            "oldInferredType": "UNRESOLVED_CALL_RETURN:inv.db:observed_conn.execute",
+            "provenUnion": [
+              "psycopg.Connection",
+              "inv.db._ObservedConnection"
+            ]
+          },
+          "blocksGrant": false
+        },
+        {
+          "callRef": "bf871086558da68fae6f99087dba0157d4aa22b183720c72f02a1c13406fd16e",
+          "category": "ANALYSIS_RULE:A2_HARDENED",
+          "source": {
+            "path": "services/control-plane/src/inv/db.py",
+            "span": [
+              218,
+              30,
+              218,
+              101
+            ],
+            "sourceFileSHA256": "38e0d679b442433fd0b775e98411d78dfff2b7d114bbc3c2a52d3a886726022d",
+            "expressionSHA256": "e18704530ab9e3a2bd8bcacffe79cc69a04daf8046fd2a62d7435009f48ccaa1",
+            "function": "inv.db.Database.transaction"
+          },
+          "receiver": {
+            "expression": "DomainError",
+            "oldInferredType": null,
+            "provenUnion": [
+              "inv.errors.DomainError"
+            ]
+          },
+          "blocksGrant": false
+        },
+        {
+          "callRef": "038957a7d84e801a61796e6171a28b3920d2945ee7fce99bc70d426595dd53cc",
+          "category": "ANALYSIS_RULE:A2_HARDENED",
+          "source": {
+            "path": "services/control-plane/src/inv/db.py",
+            "span": [
+              225,
+              26,
+              230,
+              21
+            ],
+            "sourceFileSHA256": "38e0d679b442433fd0b775e98411d78dfff2b7d114bbc3c2a52d3a886726022d",
+            "expressionSHA256": "aba1c93c12085995d6ff982164fe3f1c0a67204c6b91feedc5ed9c1251f15fb1",
+            "function": "inv.db.Database.transaction"
+          },
+          "receiver": {
+            "expression": "DomainError",
+            "oldInferredType": null,
+            "provenUnion": [
+              "inv.errors.DomainError"
+            ]
+          },
+          "blocksGrant": false
+        },
+        {
+          "callRef": "21156e69b339fe380ba83f3bbeea6207d913f91d59e80b0dc1e1283016efcd31",
+          "category": "ANALYSIS_RULE:A3",
+          "source": {
+            "path": "services/control-plane/src/inv/db.py",
+            "span": [
+              233,
+              20,
+              233,
+              42
+            ],
+            "sourceFileSHA256": "38e0d679b442433fd0b775e98411d78dfff2b7d114bbc3c2a52d3a886726022d",
+            "expressionSHA256": "d885317b1780d7d1da93dad1934c1c5e33650880d47799bbb802c1f2d61669d1",
+            "function": "inv.db.Database.transaction"
+          },
+          "receiver": {
+            "expression": "_statement_phase.get",
+            "oldInferredType": "inv.db._statement_phase",
+            "provenUnion": [
+              "contextvars.ContextVar phase/token; metric dict"
+            ]
+          },
+          "blocksGrant": false
+        },
+        {
+          "callRef": "402f16a79c13a366b175b95856b432e32f5763ac9600e73ed06a8fa596142e37",
+          "category": "ANALYSIS_RULE:A3",
+          "source": {
+            "path": "services/control-plane/src/inv/db.py",
+            "span": [
+              234,
+              12,
+              234,
+              47
+            ],
+            "sourceFileSHA256": "38e0d679b442433fd0b775e98411d78dfff2b7d114bbc3c2a52d3a886726022d",
+            "expressionSHA256": "8960eba1e3a4046e29187a4514a6fc78e06aea540be6d6fc6723e502b5933c3c",
+            "function": "inv.db.Database.transaction"
+          },
+          "receiver": {
+            "expression": "_statement_phase.reset",
+            "oldInferredType": "inv.db._statement_phase",
+            "provenUnion": [
+              "contextvars.ContextVar phase/token; metric dict"
+            ]
+          },
+          "blocksGrant": false
+        },
+        {
+          "callRef": "ac52192a6b9a7bc1a10ad58dfdb27af0981524c9ad77e5044701b6bba2b413a6",
+          "category": "ANALYSIS_RULE:A3",
+          "source": {
+            "path": "services/control-plane/src/inv/db.py",
+            "span": [
+              235,
+              43,
+              235,
+              65
+            ],
+            "sourceFileSHA256": "38e0d679b442433fd0b775e98411d78dfff2b7d114bbc3c2a52d3a886726022d",
+            "expressionSHA256": "d61ae8c209d2968de0892e015f2cd5b232aad7a128a5596f1e3bc68f0a6947d2",
+            "function": "inv.db.Database.transaction"
+          },
+          "receiver": {
+            "expression": "phase.get",
+            "oldInferredType": "UNRESOLVED_CALL_RETURN:inv.db:_statement_phase.get",
+            "provenUnion": [
+              "contextvars.ContextVar phase/token; metric dict"
+            ]
+          },
+          "blocksGrant": false
+        },
+        {
+          "callRef": "c5dbe16644b32611e8c1aea3f764e591675c6562eefd42aca34c06134b1dd24c",
+          "category": "ANALYSIS_RULE:A1c",
+          "source": {
+            "path": "services/control-plane/src/inv/observation.py",
+            "span": [
+              140,
+              19,
+              142,
+              24
+            ],
+            "sourceFileSHA256": "b515ceda8b066466cf4cdf5fa88d04803220398c436d29ab7c5fd2793bf5748f",
+            "expressionSHA256": "fbc1b60a891f77862dd21549ef4f5acdf62e71fd6fbf96f4db0426333395c632",
+            "function": "inv.observation.NodeObservation.mark_offline"
+          },
+          "receiver": {
+            "expression": "conn.execute(\"SELECT node_id FROM inv.nodes WHERE status='online' ORDER BY node_id FOR UPDATE\").fetchall",
+            "oldInferredType": "DB:Cursor",
+            "provenUnion": [
+              "psycopg.Connection",
+              "inv.db._ObservedConnection"
+            ]
+          },
+          "blocksGrant": false
+        },
+        {
+          "callRef": "4bfa4566940ef66d68e5403956db9904e48913b65fad2739c43e4984e19e4c02",
+          "category": "ANALYSIS_RULE:A1c",
+          "source": {
+            "path": "services/control-plane/src/inv/observation.py",
+            "span": [
+              145,
+              19,
+              148,
+              28
+            ],
+            "sourceFileSHA256": "b515ceda8b066466cf4cdf5fa88d04803220398c436d29ab7c5fd2793bf5748f",
+            "expressionSHA256": "741b7b381c973e1a034eb89fe6f0a337bde50f72b4c57d056ed0fcf61ec615f8",
+            "function": "inv.observation.NodeObservation.mark_offline"
+          },
+          "receiver": {
+            "expression": "conn.execute(\"UPDATE inv.nodes SET status='offline' WHERE node_id=%s AND heartbeat_at < clock_timestamp()-interval '60 seconds' AND status='online' RETURNING node_id\", (row['node_id'],)).fetchone",
+            "oldInferredType": "DB:Cursor",
+            "provenUnion": [
+              "psycopg.Connection",
+              "inv.db._ObservedConnection"
+            ]
+          },
+          "blocksGrant": false
+        },
+        {
+          "callRef": "5e4959377b92699d426be7c92b2aa26ea37eda82cb70dc67707986e125f9c98c",
+          "category": "ANALYSIS_RULE:A5_LOCAL",
+          "source": {
+            "path": "services/control-plane/src/inv/observation.py",
+            "span": [
+              149,
+              20,
+              149,
+              50
+            ],
+            "sourceFileSHA256": "b515ceda8b066466cf4cdf5fa88d04803220398c436d29ab7c5fd2793bf5748f",
+            "expressionSHA256": "a39c0a4a6c07aebdd38766a2baaaa3a631ff6bddc415985fe40236df00c361e7",
+            "function": "inv.observation.NodeObservation.mark_offline"
+          },
+          "receiver": {
+            "expression": "changed.append",
+            "oldInferredType": "PY:collection",
+            "provenUnion": [
+              "builtin list"
+            ]
+          },
+          "blocksGrant": false
+        }
+      ]
+    },
+    {
+      "id": "T2",
+      "status": "DESIGN_ONLY_PENDING_IMPLEMENTATION_AND_ROOT_CHOICE",
+      "actualBinding": null,
+      "codeGrant": false,
+      "portGrant": false,
+      "wiring": [
+        {
+          "source": "72028cbac903c4415d9979f980a6e0f9948e914f",
+          "path": "services/control-plane/src/inv/node_transport.py",
+          "function": "NodeTLSClient.__init__",
+          "functionRange": [
+            62,
+            77
+          ],
+          "line": 62,
+          "fileSHA256": "3559bbcdf9568f8930654d860b0edd980eca71c835cde3fe7380a69dd56e18f4",
+          "functionSHA256": "c2893f89f1150de350302b92b56318f8e7dd3cb04cfbed92c7eefe83a47201c4",
+          "needle": null
+        },
+        {
+          "source": "72028cbac903c4415d9979f980a6e0f9948e914f",
+          "path": "services/control-plane/src/inv/node_transport.py",
+          "function": "NodeTLSClient._request",
+          "functionRange": [
+            140,
+            224
+          ],
+          "line": 140,
+          "fileSHA256": "3559bbcdf9568f8930654d860b0edd980eca71c835cde3fe7380a69dd56e18f4",
+          "functionSHA256": "cd8d9221d0e909d8e1f77fc96a8940887be27b13fe913ed2920b779477a9be66",
+          "needle": null
+        },
+        {
+          "source": "72028cbac903c4415d9979f980a6e0f9948e914f",
+          "path": "services/control-plane/src/inv/node_transport.py",
+          "function": "NodeDelivery.deliver",
+          "functionRange": [
+            264,
+            320
+          ],
+          "line": 264,
+          "fileSHA256": "3559bbcdf9568f8930654d860b0edd980eca71c835cde3fe7380a69dd56e18f4",
+          "functionSHA256": "e1ae7f9bce0c238d82ef69ac3c136f7c5f32e3863c8738530ec575817844937e",
+          "needle": null
+        }
+      ],
+      "authentication": "Installed CP TLS client and current Node channel C/DER/certificate/tenant/epoch; peer authority rechecked. Handle kind/method/rawPath and original request select effect. User observation_only cannot select fresh execution authority.",
+      "input": "Exact committed opaque IO handle, independently admitted original request bytes, closed rawPath/method, body SHA and current channel; no arbitrary host/URL/method.",
+      "output": "Bounded strict typed response under exact peer/request; ordinary completion one-use LIVE capability or fresh narrow safety recovery where catalog permits.",
+      "error": "TLS/timeout/abort/parse/size/schema/peer/channel errors poison completion before handling; READ_ONLY abandonment, SIDE_EFFECT UNKNOWN/HOLD, exact safety recovery as catalog. Timer/not-sent is never never-invoked proof.",
+      "ownership": "OneConnection/request/getresponse/socket/abort timer are implementation of already catalogued 19 caller boundaries, not independent network permissions.",
+      "transaction": "Original admission/registration COMMIT before external call; no DB lock held across network; typed result appended with original checks in its own transaction.",
+      "effect": "Fixed existing EFFECT per method/rawPath/handler. RECEIPT_OBSERVE SIDE_EFFECT (Go Stop/Remove/Save). CANCEL idempotent safety.",
+      "verificationDependencies": [
+        "transport-delta nine ServeHTTP+path branch anchors",
+        "Rev7 19 byte-exact caller rows retained by hash",
+        "actual Go/TLS/DB/crash CI NOT_RUN",
+        "no new socket/network binding"
+      ]
+    },
+    {
+      "id": "T3",
+      "status": "DESIGN_ONLY_PENDING_IMPLEMENTATION_AND_ROOT_CHOICE",
+      "actualBinding": null,
+      "codeGrant": false,
+      "portGrant": false,
+      "wiring": [
+        {
+          "source": "72028cbac903c4415d9979f980a6e0f9948e914f",
+          "path": "services/control-plane/src/inv/buildkit_transport.py",
+          "function": "_protected_json",
+          "functionRange": [
+            348,
+            376
+          ],
+          "line": 348,
+          "fileSHA256": "70a924987554b389b8c2e377226fac242df1ec0b713c0b4fb9ac240ea8bbcfae",
+          "functionSHA256": "4b7a52b5296ad4a38feab81f0e16a70fd15a60976463de8376746e61f5b84b9e",
+          "needle": null
+        },
+        {
+          "source": "72028cbac903c4415d9979f980a6e0f9948e914f",
+          "path": "services/control-plane/src/inv/storage.py",
+          "function": "verify_content",
+          "functionRange": [
+            82,
+            95
+          ],
+          "line": 82,
+          "fileSHA256": "29ed6b1b65ac17cac99364495d243b8ee9f1c7830c0ad3ea0644ad33b7188555",
+          "functionSHA256": "62db12ddd1a7c5d5908a42c5d6f30bf989ccccb7f91bdb6ce79aa1912759bef8",
+          "needle": null
+        }
+      ],
+      "authentication": "Trusted installed build receipt/source plan ownership; existing BUILD_HEALTH_READ/BUILD_CLEANUP_READ/object verification purpose. No public arbitrary path port.",
+      "input": "Exact configured owned receipt path or trusted Storage resolved immutable object; expected digest/size; held parent/path identity, current owner/mode; reject symlink/substitution/foreign parent.",
+      "output": "Strict bounded protected JSON receipt or verified immutable bytes digest/size; data does not create source writeback or contribution host access.",
+      "error": "Unsafe parent/owner/mode/type, lstat/open/fstat mismatch, symlink/TOCTOU/content/size failure -> refusal/uncertainty under owning IO kind. Existing verify_content Path.open alone is not proof of no-symlink protection.",
+      "ownership": "Owning adapter must hold/check exact path and descriptor identity; proposed hardened owner/mode/parent contract for any missing source enforcement remains pending. No generic filesystem capability.",
+      "transaction": "Read outside authority locks; original trusted verification records only in consumer transaction; immutable digest and descriptor/root identity rechecked before acceptance.",
+      "effect": "Purpose-bound read only; os.open/fstat/fdopen/lstat/S_ISREG are implementation details. No signing, random access, writes or arbitrary filesystem path.",
+      "verificationDependencies": [
+        "actual Linux symlink/TOCTOU/mount substitution/owner-mode tests NOT_RUN",
+        "descriptor/parent enforcement for verify_content pending",
+        "retained contribution read-only/nonrecursive/rprivate boundary unaffected"
+      ],
+      "protectedBuildCleanupRead": "Exact original BUILD_DISPATCH admitted session/request/approval/decision/daemon/lease/resource/fence and held owned protected root/current read purpose; may read after stop/release/deadline. No read-based release/UNKNOWN settle; original typed _commit_consequences/CAS only. No new file/HTTP/auth wire. Actual binding NULL/T3_RUNTIME_PENDING."
+    },
+    {
+      "id": "P-INJECT-BUILD",
+      "status": "DESIGN_ONLY_PENDING_IMPLEMENTATION_AND_ROOT_CHOICE",
+      "actualBinding": null,
+      "codeGrant": false,
+      "portGrant": false,
+      "wiring": [
+        {
+          "source": "72028cbac903c4415d9979f980a6e0f9948e914f",
+          "path": "services/control-plane/src/inv/build_product_runtime.py",
+          "function": "configured_tenant_product_runtime",
+          "functionRange": [
+            503,
+            546
+          ],
+          "line": 503,
+          "fileSHA256": "7483d65fcb1032aeb05b4d2dd56e09e714cff8ca676de0f80fc3a2f5e447e9af",
+          "functionSHA256": "c922b76ffedb15e27aaabe47234b0c80c7272b4a99519791c3bc801bf6d76a23",
+          "needle": null
+        },
+        {
+          "source": "72028cbac903c4415d9979f980a6e0f9948e914f",
+          "path": "services/control-plane/src/inv/build_execution.py",
+          "function": "BuildExecutionService.__init__",
+          "functionRange": [
+            144,
+            150
+          ],
+          "line": 144,
+          "fileSHA256": "afc4cabc20bd1d4f4adf3f1542ed5eb49d9f16631b5dbdb3ebc5d06d1bc9d11f",
+          "functionSHA256": "d31ab9d477d2924a424a01bea49895dacd50a03f36f601f7dfac03fd2756d83e",
+          "needle": null
+        },
+        {
+          "source": "72028cbac903c4415d9979f980a6e0f9948e914f",
+          "path": "services/control-plane/src/inv/buildkit_transport.py",
+          "function": "RootlessBuildkitTransport.__init__",
+          "functionRange": [
+            449,
+            460
+          ],
+          "line": 449,
+          "fileSHA256": "70a924987554b389b8c2e377226fac242df1ec0b713c0b4fb9ac240ea8bbcfae",
+          "functionSHA256": "a918612442040ad934c6d008bb6721dc71421cd7dcd752a6df591ac20f484f86",
+          "needle": null
+        },
+        {
+          "source": "72028cbac903c4415d9979f980a6e0f9948e914f",
+          "path": "services/control-plane/src/inv/buildkit_transport.py",
+          "function": "NodeAgentReceipts.__init__",
+          "functionRange": [
+            812,
+            832
+          ],
+          "line": 812,
+          "fileSHA256": "70a924987554b389b8c2e377226fac242df1ec0b713c0b4fb9ac240ea8bbcfae",
+          "functionSHA256": "5178a3bd7c6e813a7a76bdf81ad711a8baf5ebfc5a20f883a59935f9a2bf0138",
+          "needle": null
+        }
+      ],
+      "authentication": "Composition root supplies trusted database/adapter/receipt owner/environment. Builder identity/profile/recovery epoch/channel still original approved build authority. Caller cannot replace clock/runner.",
+      "input": "Separate injected clock/now, request-id factory and runner contracts. Clock values are observed time, request IDs fresh identity material; runner accepts only exact configured buildctl executable/address/source authority/args.",
+      "output": "Clock sample; request identity; bounded subprocess execution result and existing cleanup/health receipts. No exit-zero-as-application-success.",
+      "error": "Unknown callable/subclass/runner override -> DYNAMIC_BLOCK until typed source wiring. Process timeout/start/cleanup/commit ambiguity follows BUILD_DISPATCH SIDE_EFFECT/HOLD.",
+      "ownership": "Clock provider, ID factory, subprocess runner remain separate purpose/effect boundaries; production defaults/overrides must be enumerated before binding. Optional materialize hook ABSENT_IN72028/RES0006 is not implementation.",
+      "transaction": "Original committed build intent before dispatch; no authority DB locks over buildctl; original receipt/consequence commit remains atomic.",
+      "effect": "Actual datetime/time clock and request randomness are not pure conversions. buildctl run is BUILD_DISPATCH side effect, never generic NONAUTHORITY.",
+      "verificationDependencies": [
+        "all composition roots/source types and overrides",
+        "clock/id/runner mutation negatives",
+        "real Go/Engine/buildctl/crash/PG NOT_RUN",
+        "future source capsule implementation requires NEW IO kind"
+      ]
+    },
+    {
+      "id": "P-DBFUNC",
+      "status": "DESIGN_ONLY_PENDING_IMPLEMENTATION_AND_ROOT_CHOICE",
+      "actualBinding": null,
+      "codeGrant": false,
+      "portGrant": false,
+      "wiring": [
+        {
+          "source": "72028cbac903c4415d9979f980a6e0f9948e914f",
+          "path": "migrations/versions/0031_resource_offer_integrity.py",
+          "function": "upgrade",
+          "functionRange": [
+            14,
+            100
+          ],
+          "line": 17,
+          "fileSHA256": "0d562a32693efc1ab3c3791cff7ce0210fe63b8c44aa8faa2413e05d44019d06",
+          "functionSHA256": "43e9aa717178cfd420aef166b275213d548842dcc3e9b1f68ff391c9eb453dcb",
+          "needle": "CREATE FUNCTION public.apply_capability_offer"
+        },
+        {
+          "source": "72028cbac903c4415d9979f980a6e0f9948e914f",
+          "path": "migrations/versions/0027_business_api_guards.py",
+          "function": "upgrade",
+          "functionRange": [
+            10,
+            55
+          ],
+          "line": 26,
+          "fileSHA256": "bbfa4cff2dafe579b0dc19397e4a551d15b61979178f5aa57edf4c81909e8c3e",
+          "functionSHA256": "8efcd15a72130a69057ab9e63088bb596cac8520a6eab5ed61ebae8d45f6214a",
+          "needle": "CREATE OR REPLACE FUNCTION public.business_admin_allowed"
+        }
+      ],
+      "authentication": "SECURITY DEFINER functions SET search_path=pg_catalog; PUBLIC execute revoked, inv_app EXECUTE granted. Recheck tenant setting/current active public.users and inv.business_admin_grants resources.manage, not caller role string.",
+      "input": "apply_capability_offer tenant/capability/verified actor/offered safe integer within capability; GPU mapping explicitly refused. business_admin_allowed tenant/user/permission fixed existing service binding.",
+      "output": "Typed applied/reason/resource_ids/capacity or false; no claim release. Existing total/unreleased lease sums include expired/old epoch without stop receipt.",
+      "error": "Tenant mismatch/unknown capability/invalid quantity/unit/GPU mapping/resource missing/leased offer refusal; unauthorized admin SQLSTATE42501; lock/commit errors retain original business refusal/rollback.",
+      "ownership": "Definer owns only fixed function body; named reads public.users,node_capabilities,nodes; inv.nodes/resources/resource_leases/business_admin_grants; writes inv.resources.offered. No arbitrary SQL/table parameter.",
+      "transaction": "Lock active principal/grants SHARE, public Node/capability then inv Node and sorted resources UPDATE; re-read capacity/unreleased leases after waiting; update all resource slices in same tenant transaction.",
+      "effect": "Existing SQL-body authority read + offered write. Rev7 SQL unknown body port remains until full function/procedure effect/rank join proof; this design label grants nothing.",
+      "verificationDependencies": [
+        "Correct actual definition in 0031, predecessor 0030 revoked",
+        "PG role/definer/search_path/RLS/offer concurrency NOT_RUN",
+        "exact all function tables/permissions/source->procedure join before code"
+      ]
+    },
+    {
+      "id": "P-API-DI",
+      "status": "DESIGN_ONLY_PENDING_IMPLEMENTATION_AND_ROOT_CHOICE",
+      "actualBinding": null,
+      "codeGrant": false,
+      "portGrant": false,
+      "wiring": [
+        {
+          "source": "72028cbac903c4415d9979f980a6e0f9948e914f",
+          "path": "src/saintvision/api/v1/settings.py",
+          "function": "set_resource_offer",
+          "functionRange": [
+            392,
+            453
+          ],
+          "line": 392,
+          "fileSHA256": "6eca95bc6a39a0796b8403656908cd692541f284c1edd76f1a443a774bfc0917",
+          "functionSHA256": "7a65f4c7c55ca951b17bf1ffa29905819fb317c793d7bb923000cc1c23e853cb",
+          "needle": null
+        },
+        {
+          "source": "72028cbac903c4415d9979f980a6e0f9948e914f",
+          "path": "src/saintvision/api/deps.py",
+          "function": "get_principal",
+          "functionRange": [
+            42,
+            57
+          ],
+          "line": 42,
+          "fileSHA256": "0c5fa90903e9055b74c16106f6f66a95d1589a730f286814bdfe06327a1cb2b8",
+          "functionSHA256": "79403f68cdf1b117dcd7567b6daad478373a88ba70ad50046f1890bfc758249b",
+          "needle": null
+        },
+        {
+          "source": "72028cbac903c4415d9979f980a6e0f9948e914f",
+          "path": "src/saintvision/api/deps.py",
+          "function": "get_session",
+          "functionRange": [
+            60,
+            73
+          ],
+          "line": 60,
+          "fileSHA256": "0c5fa90903e9055b74c16106f6f66a95d1589a730f286814bdfe06327a1cb2b8",
+          "functionSHA256": "2da9059d2e6c86689014b8f9d45b25c7a84760697fc447372d19babf87db97b3",
+          "needle": null
+        }
+      ],
+      "authentication": "FastAPI Depends(get_principal) verifies bearer through installed verifier; get_session derives principal tenant SET LOCAL inside session.begin; set_resource_offer require_global_administrator at current DB scope.",
+      "input": "Existing ResourceOffer request/capability/idempotency headers, actual authenticated Principal; body role/principal string never authentication.",
+      "output": "Existing canonical business offer response/audit and original idempotency result, not B grant or fresh Node execution permit.",
+      "error": "Missing/rejected credential AUTH, permission refusal, schema conflict, idempotency conflict, bounded lock-wait canonical retryable error; unknown commit no success.",
+      "ownership": "App.state credential verifier/engine/clock are pending typed composition dependencies. Header/router.put/Depends declarations are framework wiring, not self-authenticating allowlists.",
+      "transaction": "get_session tenant transaction; original idempotency and bounded lock wait wrap actual write; auth rechecks in SQL definer remain independent.",
+      "effect": "Business auth and offer writer entry point; no caller-selected user role. Framework/DI provenance stays pending; does not waive any static unknown.",
+      "verificationDependencies": [
+        "principal verifier/dependency source closure",
+        "tenant/role/idempotency negatives",
+        "actual API+PG integration NOT_RUN"
+      ]
+    },
+    {
+      "id": "P-GETATTR",
+      "status": "DESIGN_ONLY_PENDING_IMPLEMENTATION_AND_ROOT_CHOICE",
+      "actualBinding": null,
+      "codeGrant": false,
+      "portGrant": false,
+      "wiring": [
+        {
+          "callRef": "0208c6677fd261fe5ef63b83fdae1e8696974aa5a8879ea6bc21cbe2583c2918",
+          "path": "src/saintvision/api/lock_wait.py",
+          "function": "saintvision.api.lock_wait.lock_wait_problem",
+          "span": [
+            87,
+            20,
+            87,
+            48
+          ],
+          "parentLedger": "classifiedCalls",
+          "parentLedgerSHA256": "4d61a286b6201567bf0724136fb4c4393251e20e9b870879d76cf77db7f5812e",
+          "receiver": {
+            "expression": "getattr",
+            "inferredType": null,
+            "possibleTypes": []
+          },
+          "inferredTarget": "saintvision.api.lock_wait.getattr"
+        },
+        {
+          "callRef": "0ec09dcbf3197bcf81bba674b6f08db8a7019c43ef87ec9264fd02f56a5ae0b8",
+          "path": "services/control-plane/src/inv/db.py",
+          "function": "inv.db.BoundDatabase.__init__",
+          "span": [
+            119,
+            39,
+            119,
+            83
+          ],
+          "parentLedger": "classifiedCalls",
+          "parentLedgerSHA256": "4d61a286b6201567bf0724136fb4c4393251e20e9b870879d76cf77db7f5812e",
+          "receiver": {
+            "expression": "getattr",
+            "inferredType": null,
+            "possibleTypes": []
+          },
+          "inferredTarget": "inv.db.getattr"
+        },
+        {
+          "callRef": "115f0fcb69155695e4ef483f9e73c1bc149658a503ccd4480d0c5b4ffecbb160",
+          "path": "services/control-plane/src/inv/db.py",
+          "function": "inv.db.BoundDatabase.__init__",
+          "span": [
+            126,
+            34,
+            126,
+            73
+          ],
+          "parentLedger": "classifiedCalls",
+          "parentLedgerSHA256": "4d61a286b6201567bf0724136fb4c4393251e20e9b870879d76cf77db7f5812e",
+          "receiver": {
+            "expression": "getattr",
+            "inferredType": null,
+            "possibleTypes": []
+          },
+          "inferredTarget": "inv.db.getattr"
+        },
+        {
+          "callRef": "12c0bf9c10c8eb7f4b16bfa35938996c5acef76db6dad1b386b335e653a9c60e",
+          "path": "src/saintvision/api/v1/settings.py",
+          "function": "saintvision.api.v1.settings._audit",
+          "span": [
+            53,
+            17,
+            53,
+            57
+          ],
+          "parentLedger": "classifiedCalls",
+          "parentLedgerSHA256": "4d61a286b6201567bf0724136fb4c4393251e20e9b870879d76cf77db7f5812e",
+          "receiver": {
+            "expression": "getattr",
+            "inferredType": null,
+            "possibleTypes": []
+          },
+          "inferredTarget": "saintvision.api.v1.settings.getattr"
+        },
+        {
+          "callRef": "39b026fe42eaa49dce27b99db21847de019f40f6225052b08c372c097593cc6e",
+          "path": "services/control-plane/src/inv/build_execution.py",
+          "function": "inv.build_execution.BuildExecutionService._require_reconciliation_channel",
+          "span": [
+            162,
+            11,
+            162,
+            65
+          ],
+          "parentLedger": "classifiedCalls",
+          "parentLedgerSHA256": "4d61a286b6201567bf0724136fb4c4393251e20e9b870879d76cf77db7f5812e",
+          "receiver": {
+            "expression": "getattr",
+            "inferredType": null,
+            "possibleTypes": []
+          },
+          "inferredTarget": "inv.build_execution.getattr"
+        },
+        {
+          "callRef": "58d2070c0b171defc3d25e20daea1cbc9067e762bbed06805900b83b4e77bd72",
+          "path": "services/control-plane/src/inv/object_store.py",
+          "function": "inv.object_store.object_store_session",
+          "span": [
+            286,
+            13,
+            286,
+            44
+          ],
+          "parentLedger": "classifiedCalls",
+          "parentLedgerSHA256": "4d61a286b6201567bf0724136fb4c4393251e20e9b870879d76cf77db7f5812e",
+          "receiver": {
+            "expression": "getattr",
+            "inferredType": null,
+            "possibleTypes": []
+          },
+          "inferredTarget": "inv.object_store.getattr"
+        },
+        {
+          "callRef": "704ffab361dec7d187c2cab553c354a99a061b947657c3924043b24b174e1c37",
+          "path": "src/saintvision/api/lock_wait.py",
+          "function": "saintvision.api.lock_wait.lock_wait_problem",
+          "span": [
+            87,
+            12,
+            87,
+            67
+          ],
+          "parentLedger": "classifiedCalls",
+          "parentLedgerSHA256": "4d61a286b6201567bf0724136fb4c4393251e20e9b870879d76cf77db7f5812e",
+          "receiver": {
+            "expression": "getattr",
+            "inferredType": null,
+            "possibleTypes": []
+          },
+          "inferredTarget": "saintvision.api.lock_wait.getattr"
+        },
+        {
+          "callRef": "aebdab057c31166edb919cfaca8b9b306edc299d36ef8635ef2a4e2e7dc30f57",
+          "path": "services/control-plane/src/inv/db.py",
+          "function": "inv.db.BoundDatabase.__init__",
+          "span": [
+            127,
+            37,
+            127,
+            79
+          ],
+          "parentLedger": "classifiedCalls",
+          "parentLedgerSHA256": "4d61a286b6201567bf0724136fb4c4393251e20e9b870879d76cf77db7f5812e",
+          "receiver": {
+            "expression": "getattr",
+            "inferredType": null,
+            "possibleTypes": []
+          },
+          "inferredTarget": "inv.db.getattr"
+        },
+        {
+          "callRef": "aedd9ac03388982f4f6ca2a025918832b2d77b2cb75f8b8d15e60dd0e9ed363d",
+          "path": "services/control-plane/src/inv/build_execution.py",
+          "function": "inv.build_execution.BuildExecutionService._database_now",
+          "span": [
+            177,
+            26,
+            177,
+            54
+          ],
+          "parentLedger": "classifiedCalls",
+          "parentLedgerSHA256": "4d61a286b6201567bf0724136fb4c4393251e20e9b870879d76cf77db7f5812e",
+          "receiver": {
+            "expression": "getattr",
+            "inferredType": null,
+            "possibleTypes": []
+          },
+          "inferredTarget": "inv.build_execution.getattr"
+        },
+        {
+          "callRef": "b99ec33b095c1f708242a546e13b787fcfe849a94ae8304b696e337e85941f76",
+          "path": "services/control-plane/src/inv/db.py",
+          "function": "inv.db.BoundDatabase.__init__",
+          "span": [
+            121,
+            57,
+            125,
+            9
+          ],
+          "parentLedger": "classifiedCalls",
+          "parentLedgerSHA256": "4d61a286b6201567bf0724136fb4c4393251e20e9b870879d76cf77db7f5812e",
+          "receiver": {
+            "expression": "getattr",
+            "inferredType": null,
+            "possibleTypes": []
+          },
+          "inferredTarget": "inv.db.getattr"
+        },
+        {
+          "callRef": "b9e7ec75463430b8da8e2bdf873126eb6b51a8a6914aa0200d3193d47e87f29d",
+          "path": "services/control-plane/src/inv/db.py",
+          "function": "inv.db.BoundDatabase.__init__",
+          "span": [
+            118,
+            32,
+            118,
+            70
+          ],
+          "parentLedger": "classifiedCalls",
+          "parentLedgerSHA256": "4d61a286b6201567bf0724136fb4c4393251e20e9b870879d76cf77db7f5812e",
+          "receiver": {
+            "expression": "getattr",
+            "inferredType": null,
+            "possibleTypes": []
+          },
+          "inferredTarget": "inv.db.getattr"
+        },
+        {
+          "callRef": "c96c02d6accd8bdb44a1d2215726bf09cf3e64561a26b5afc7e96ba8ed3bf2e1",
+          "path": "services/control-plane/src/inv/db.py",
+          "function": "inv.db.BoundDatabase.__init__",
+          "span": [
+            117,
+            40,
+            117,
+            86
+          ],
+          "parentLedger": "classifiedCalls",
+          "parentLedgerSHA256": "4d61a286b6201567bf0724136fb4c4393251e20e9b870879d76cf77db7f5812e",
+          "receiver": {
+            "expression": "getattr",
+            "inferredType": null,
+            "possibleTypes": []
+          },
+          "inferredTarget": "inv.db.getattr"
+        },
+        {
+          "callRef": "cc2b02ed892348780b9780554b6ccce79cd182e37de14df323f9d198b3a993b5",
+          "path": "services/control-plane/src/inv/object_store.py",
+          "function": "inv.object_store.provider_id",
+          "span": [
+            77,
+            11,
+            77,
+            62
+          ],
+          "parentLedger": "classifiedCalls",
+          "parentLedgerSHA256": "4d61a286b6201567bf0724136fb4c4393251e20e9b870879d76cf77db7f5812e",
+          "receiver": {
+            "expression": "getattr",
+            "inferredType": null,
+            "possibleTypes": []
+          },
+          "inferredTarget": "inv.object_store.getattr"
+        },
+        {
+          "callRef": "de9d9e265fa02411fc2f7e72011c1b6d5abf963c21e674514e8dd21317590726",
+          "path": "services/control-plane/src/inv/db.py",
+          "function": "inv.db.record_placement_metric",
+          "span": [
+            36,
+            11,
+            36,
+            59
+          ],
+          "parentLedger": "classifiedCalls",
+          "parentLedgerSHA256": "4d61a286b6201567bf0724136fb4c4393251e20e9b870879d76cf77db7f5812e",
+          "receiver": {
+            "expression": "getattr",
+            "inferredType": null,
+            "possibleTypes": []
+          },
+          "inferredTarget": "inv.db.getattr"
+        },
+        {
+          "callRef": "f6d5fe58f1bc552f51c5bddb0574bc1014bb94921cc5322c7daa90039dad46c3",
+          "path": "services/control-plane/src/inv/db.py",
+          "function": "inv.db.record_placement_metric",
+          "span": [
+            38,
+            13,
+            38,
+            63
+          ],
+          "parentLedger": "classifiedCalls",
+          "parentLedgerSHA256": "4d61a286b6201567bf0724136fb4c4393251e20e9b870879d76cf77db7f5812e",
+          "receiver": {
+            "expression": "getattr",
+            "inferredType": null,
+            "possibleTypes": []
+          },
+          "inferredTarget": "inv.db.getattr"
+        },
+        {
+          "callRef": "fc9679b37748a1ba51c86c9de78b125a71914e97a839b16f9860d004345c39f3",
+          "path": "services/control-plane/src/inv/db.py",
+          "function": "inv.db.BoundDatabase.__init__",
+          "span": [
+            120,
+            38,
+            120,
+            82
+          ],
+          "parentLedger": "classifiedCalls",
+          "parentLedgerSHA256": "4d61a286b6201567bf0724136fb4c4393251e20e9b870879d76cf77db7f5812e",
+          "receiver": {
+            "expression": "getattr",
+            "inferredType": null,
+            "possibleTypes": []
+          },
+          "inferredTarget": "inv.db.getattr"
+        }
+      ],
+      "authentication": "No dynamic receiver gains authority from literal attribute spelling. BoundDatabase fields, metric sink, object_store provider/session, build clock/reconciliation, lock_wait.orig.sqlstate and settings audit require exact receiver and production constructor proof.",
+      "input": "Exact enumerated literal attribute + proven object type/owner; dynamic attribute/unknown receiver remains DYNAMIC_BLOCK.",
+      "output": "Typed optional data/callable only under its specific owning contract; absent optional source capsule closed as RES0006.",
+      "error": "Unknown/override/dynamic fallback refuses affected entry. No generic unknown-property exemption.",
+      "ownership": "Per-edge exact source/type/receiver lives in critical-edge-categories.json; never a global getattr port.",
+      "transaction": "Owning original transaction/IO kind applies; callback effect not assumed safe.",
+      "effect": "Read or injected effect depends on proven target; signing/DB/network/clock retained as actual effects.",
+      "verificationDependencies": [
+        "Per-occurrence constructor/import/type proof",
+        "unknown property/subclass/callback mutations",
+        "real binding NULL"
+      ]
+    },
+    {
+      "id": "P-LOCKRANK",
+      "status": "DESIGN_ONLY_PENDING_IMPLEMENTATION_AND_ROOT_CHOICE",
+      "actualBinding": null,
+      "codeGrant": false,
+      "portGrant": false,
+      "wiring": [
+        {
+          "path": "services/control-plane/src/inv/approvals.py",
+          "function": "inv.approvals.ApprovalStore._audit",
+          "line": 154,
+          "table": "inv.approval_audit",
+          "verb": "INSERT",
+          "expressionSHA256": "1bdaf5e12745cf7f14ec5c2367d82f8524ba2dffcaf304e2ea401016d6143648"
+        },
+        {
+          "path": "services/control-plane/src/inv/approvals.py",
+          "function": "inv.approvals.ApprovalStore.request",
+          "line": 274,
+          "table": "inv.approval_review_snapshots",
+          "verb": "INSERT",
+          "expressionSHA256": "945b5ebb278bd40deefa2be64b29e251bc8ed1010e455f8a837d9fea34402182"
+        },
+        {
+          "path": "services/control-plane/src/inv/containment.py",
+          "function": "inv.containment.Containment.change",
+          "line": 197,
+          "table": "inv.node_controls",
+          "verb": "UPDATE",
+          "expressionSHA256": "13da966a34724cfbc6dc8ad8dfed8c82ddb822a4722522c3ee7e5ad05842baaa"
+        },
+        {
+          "path": "services/control-plane/src/inv/migrations/0022_node_containment.sql",
+          "function": "SQL:services/control-plane/src/inv/migrations/0022_node_containment.sql:<migration>",
+          "line": 35,
+          "table": "inv.node_controls",
+          "verb": "INSERT",
+          "expressionSHA256": "501cd9ac389668f59468beda2e10a56cf92dfc8b3a4bf1a2f4bf3f93cdb3f25b"
+        },
+        {
+          "path": "services/control-plane/src/inv/migrations/0022_node_containment.sql",
+          "function": "SQL:services/control-plane/src/inv/migrations/0022_node_containment.sql:inv.seed_containment_control",
+          "line": 41,
+          "table": "inv.node_controls",
+          "verb": "INSERT",
+          "expressionSHA256": "32cea2ab8b701460c9e5495378e9d8b52f14ce6d1bd1c0aba9e45becb14deeea"
+        },
+        {
+          "path": "services/control-plane/src/inv/model_locality.py",
+          "function": "inv.model_locality.LocalModelObservation.bind",
+          "line": 119,
+          "table": "inv.model_run_inputs",
+          "verb": "INSERT",
+          "expressionSHA256": "8b554c0de6956fdea8b06346557e1317b8c19f6330b5e9b3610da19928d6f18b"
+        },
+        {
+          "path": "services/control-plane/src/inv/observation.py",
+          "function": "inv.observation.NodeObservation.accept",
+          "line": 97,
+          "table": "inv.node_resource_snapshots",
+          "verb": "INSERT",
+          "expressionSHA256": "69ba2fcb52fe3b605aade7c5a77758e4898863fa16b286750b56d7be133945cd"
+        },
+        {
+          "path": "services/control-plane/src/inv/runs.py",
+          "function": "inv.runs.RunStore.checkpoint",
+          "line": 124,
+          "table": "inv.checkpoints",
+          "verb": "INSERT",
+          "expressionSHA256": "6281b3e2f52bc415302c7d6a2464a581abc4b916fa9ea1fb630f18e6ffc09ec1"
+        },
+        {
+          "path": "services/control-plane/src/inv/snapshots.py",
+          "function": "inv.snapshots.attach_checkpoint",
+          "line": 81,
+          "table": "inv.checkpoints",
+          "verb": "INSERT",
+          "expressionSHA256": "7a86c804d3c7f1999225601df9aa0cd40600b216cd37ba944f9125b49954048c"
+        },
+        {
+          "path": "services/control-plane/src/inv/snapshots.py",
+          "function": "inv.snapshots.attach_checkpoint",
+          "line": 88,
+          "table": "inv.checkpoint_objects",
+          "verb": "INSERT",
+          "expressionSHA256": "5f30531438bce4726fbdbcc5228dd3cc3075a82c7dc2aceb4c67806ab68a8e69"
+        },
+        {
+          "path": "src/saintvision/identity/tokens.py",
+          "function": "saintvision.identity.tokens.issue_bootstrap_token",
+          "line": 66,
+          "table": "public.node_bootstrap_tokens",
+          "verb": "INSERT",
+          "expressionSHA256": "b0f125fc4fafc112b7b04e727b764328da902fb5857ab2cbc2bcb70321b695f2"
+        },
+        {
+          "path": "src/saintvision/identity/tokens.py",
+          "function": "saintvision.identity.tokens.consume_bootstrap_token",
+          "line": 93,
+          "table": "public.node_bootstrap_tokens",
+          "verb": "UPDATE",
+          "expressionSHA256": "7d1c2e9c201377d7ef9415c30ae22b4c6202abf80c23493a9c032caf35520a97"
+        },
+        {
+          "path": "src/saintvision/services/pilot.py",
+          "function": "saintvision.services.pilot.record_recovery_drill",
+          "line": 207,
+          "table": "public.recovery_drills",
+          "verb": "INSERT",
+          "expressionSHA256": "8726aebef62780add5649c2fc9ca4df4b33340ef76fe0f9d1c25704a6c480325"
+        },
+        {
+          "path": "tools/check_migration_upgrade.py",
+          "function": "tools.check_migration_upgrade.main",
+          "line": 108,
+          "table": "inv.tenants",
+          "verb": "INSERT",
+          "expressionSHA256": "ea1c424d353c1abcdabb0131135ec5fc76fd0557c5c5ce6b850e8d2723058795"
+        },
+        {
+          "path": "tools/check_migration_upgrade.py",
+          "function": "tools.check_migration_upgrade.main",
+          "line": 124,
+          "table": "inv.tenants",
+          "verb": "INSERT",
+          "expressionSHA256": "7164932c8c25d8c4046e38e0f581ccc6653ae10871af06cc28d0368834b52ca7"
+        },
+        {
+          "path": "tools/check_migration_upgrade.py",
+          "function": "tools.check_migration_upgrade.main",
+          "line": 137,
+          "table": "public.tenants",
+          "verb": "INSERT",
+          "expressionSHA256": "3785f8bd5c2895921605066779458f92e755c295bd07be555a4aa0377978a30b"
+        },
+        {
+          "path": "tools/check_migration_upgrade.py",
+          "function": "tools.check_migration_upgrade.main",
+          "line": 139,
+          "table": "public.recovery_drills",
+          "verb": "INSERT",
+          "expressionSHA256": "0c12e208af3b3b6133f818b27128140ce01a6099f1448ac406a5b63ae6631084"
+        },
+        {
+          "path": "tools/check_migration_upgrade.py",
+          "function": "tools.check_migration_upgrade.main",
+          "line": 144,
+          "table": "public.tenants",
+          "verb": "INSERT",
+          "expressionSHA256": "85f3af40ec6faa1ce149de2053b9e517f7d1cc1c52f81d86e0d0483eb7e157bd"
+        },
+        {
+          "path": "tools/check_migration_upgrade.py",
+          "function": "tools.check_migration_upgrade.main",
+          "line": 181,
+          "table": "public.recovery_drills",
+          "verb": "UPDATE",
+          "expressionSHA256": "c96ac9f05f278afeeddd59265d048b4e37745c0cb4be56903589fc9160c31c41"
+        },
+        {
+          "path": "tools/check_subject_tenant.py",
+          "function": "tools.check_subject_tenant.verify",
+          "line": 94,
+          "table": "public.tenants",
+          "verb": "INSERT",
+          "expressionSHA256": "8a53834dce0c6c49b42e3ae5f402ceee39a1409e66909fba05921b996cf9a707"
+        },
+        {
+          "path": "tools/collect_rls_evidence.py",
+          "function": "tools.collect_rls_evidence.disposable_database._cm",
+          "line": 824,
+          "table": "inv.tenants",
+          "verb": "INSERT",
+          "expressionSHA256": "728db26387ed894e8f664f3ea450a48775626e7af96691fd5c1e897c018060e3"
+        },
+        {
+          "path": "tools/collect_rls_evidence.py",
+          "function": "tools.collect_rls_evidence.disposable_database._cm",
+          "line": 825,
+          "table": "public.tenants",
+          "verb": "INSERT",
+          "expressionSHA256": "8623245690bdbb91b6321adbf79b84bf56f6bad5b0964a6cd0cc54057f5ea80e"
+        },
+        {
+          "path": "tools/lan_pilot.py",
+          "function": "tools.lan_pilot.provision_observation_node",
+          "line": 916,
+          "table": "inv.tenants",
+          "verb": "INSERT",
+          "expressionSHA256": "14bef6ab8800a2dc3b01572c940ea2a2c76cf7022c229878fd23a0d4c09c56be"
+        },
+        {
+          "path": "tools/provision_account.py",
+          "function": "tools.provision_account.apply",
+          "line": 171,
+          "table": "inv.tenants",
+          "verb": "INSERT",
+          "expressionSHA256": "548e8a1f3033da5fd24d291d3fd7c365cfe95ecda9acb9f4aae1fe98e0379275"
+        },
+        {
+          "path": "tools/recovery_drill.py",
+          "function": "tools.recovery_drill._rls_scopes",
+          "line": 392,
+          "table": "public.tenants",
+          "verb": "INSERT",
+          "expressionSHA256": "073d1841e08aa87190f8c69de13dd17a5014501f60a0d7a61b15961a69121bf4"
+        },
+        {
+          "path": "tools/recovery_drill.py",
+          "function": "tools.recovery_drill._rls_scopes",
+          "line": 408,
+          "table": "inv.tenants",
+          "verb": "INSERT",
+          "expressionSHA256": "01beacd406208f40b3253b3c20644624440e9b428a40708738762d0fa9a357cb"
+        },
+        {
+          "path": "tools/remote_workspace_entry.py",
+          "function": "tools.remote_workspace_entry.initialize",
+          "line": 81,
+          "table": "inv.tenants",
+          "verb": "INSERT",
+          "expressionSHA256": "ccbdfa3693606b134850d119c91e01c698408199d7b0af99dc349dbe75f4ab00"
+        },
+        {
+          "path": "tools/run_ac11_migration_rehearsal.py",
+          "function": "tools.run_ac11_migration_rehearsal._negative_fixture_probes",
+          "line": 622,
+          "table": "public.tenants",
+          "verb": "INSERT",
+          "expressionSHA256": "01e4fc9d384de2a38c9c688442cc97ce0f3974a35ac7011c7005aa1a71f55119"
+        },
+        {
+          "path": "tools/run_ac11_migration_rehearsal.py",
+          "function": "tools.run_ac11_migration_rehearsal._seed_sentinel",
+          "line": 680,
+          "table": "public.tenants",
+          "verb": "INSERT",
+          "expressionSHA256": "d5174dc08f047c839008a5f8acb566c35d1f03a03bcb20da6019f8416cf770e4"
+        },
+        {
+          "path": "tools/run_s04_fe_matrix.py",
+          "function": "tools.run_s04_fe_matrix.run_acceptance",
+          "line": 559,
+          "table": "public.tenants",
+          "verb": "INSERT",
+          "expressionSHA256": "61b15e271cceee1a346371762b419346f72f52aa938f111a76a786977ac92957"
+        },
+        {
+          "path": "tools/run_s04_fe_matrix.py",
+          "function": "tools.run_s04_fe_matrix.run_acceptance",
+          "line": 567,
+          "table": "inv.tenants",
+          "verb": "INSERT",
+          "expressionSHA256": "4ef2515b854b768ae5328ee1a90e1e33b6f6d9b5c1ca2a1b073f0ceb86377b88"
+        },
+        {
+          "path": "tools/run_s04_fe_matrix.py",
+          "function": "tools.run_s04_fe_matrix.run_acceptance",
+          "line": 1153,
+          "table": "inv.node_controls",
+          "verb": "DELETE",
+          "expressionSHA256": "cc1475c79b5ef9097f317ae2ee812413ca3fb12b4f923d6dcfee28a0c57efa8a"
+        }
+      ],
+      "authentication": "DB-discovered full tenant/primary-key set; trusted fixed procedures select tables, never caller table/key authority.",
+      "input": [
+        "inv.tenants",
+        "inv.node_controls",
+        "public.tenants",
+        "inv.node_resource_snapshots",
+        "inv.model_run_inputs",
+        "inv.checkpoints",
+        "inv.checkpoint_objects",
+        "public.node_bootstrap_tokens",
+        "public.recovery_drills",
+        "inv.approval_audit",
+        "inv.approval_review_snapshots"
+      ],
+      "output": "Proposed future ranks/comparator proof for exactly 11 currently unranked actual DML tables; NO rank assigned by Rev8.",
+      "error": "Any required unranked table -> affected entry remains blocked; no silent rank0/default omission.",
+      "ownership": "Single shared lock catalog owner; ties use (rank, qualified table, canonical complete PK bytes). Advisory locks remain separate.",
+      "transaction": "Discover full set, preacquire strongest merged lock once before effects; body assert-held; no upgrade after prefix.",
+      "effect": "Existing table DML locks, no new write permission.",
+      "verificationDependencies": [
+        "Root choice of exact ranks in future cut",
+        "two-session PG deadlock/rank traces NOT_RUN",
+        "39 source-lock plans:33 with procedureRefs,6 none; nonpilot plans unchanged"
+      ]
+    },
+    {
+      "id": "P-SQLSCOPE",
+      "status": "DESIGN_ONLY_PENDING_IMPLEMENTATION_AND_ROOT_CHOICE",
+      "actualBinding": null,
+      "codeGrant": false,
+      "portGrant": false,
+      "wiring": [
+        {
+          "source": "72028cbac903c4415d9979f980a6e0f9948e914f",
+          "path": "src/saintvision/api/lock_wait.py",
+          "function": "bound_lock_wait",
+          "functionRange": [
+            75,
+            82
+          ],
+          "line": 75,
+          "fileSHA256": "1dcd88d246915a99ad697964c40028b0409f01d70a495542e356dd47b9c6b30b",
+          "functionSHA256": "4362a3d025d84fb21833332e426f6f1a4d4ce98b1adad9f7674fd40c571e7880",
+          "needle": null
+        },
+        {
+          "source": "72028cbac903c4415d9979f980a6e0f9948e914f",
+          "path": "src/saintvision/api/lock_wait.py",
+          "function": "bounded_lock_wait",
+          "functionRange": [
+            94,
+            110
+          ],
+          "line": 94,
+          "fileSHA256": "1dcd88d246915a99ad697964c40028b0409f01d70a495542e356dd47b9c6b30b",
+          "functionSHA256": "fc60fe5c1d1e441fc1e6e818977e1e5bf86556c5e18b8a384eafd628772c2410",
+          "needle": null
+        },
+        {
+          "source": "72028cbac903c4415d9979f980a6e0f9948e914f",
+          "path": "src/saintvision/api/lock_wait.py",
+          "function": "validate_lock_timeout",
+          "functionRange": [
+            59,
+            72
+          ],
+          "line": 59,
+          "fileSHA256": "1dcd88d246915a99ad697964c40028b0409f01d70a495542e356dd47b9c6b30b",
+          "functionSHA256": "6891cd7201a3f6d37c252d20abfdc01fdd692cd77157a4757791e1454d570a9c",
+          "needle": null
+        }
+      ],
+      "authentication": "Typed existing tenant-scoped Session owned by trusted business write transaction, not user SQL.",
+      "input": "timeout_ms validated exact integer (bool refused) in closed min/max range; only SET LOCAL lock_timeout formatted from validated value.",
+      "output": "Transaction-local bound; no table reads/writes or new credential.",
+      "error": "Invalid range/type ValueError; only known timeout/deadlock OperationalError sqlstates mapped canonical retryable SYS-0001/503; other operational errors reraised.",
+      "ownership": "SQL scope analysis must link validated formatter and original Session; unknown formatting remains DYNAMIC_BLOCK.",
+      "transaction": "Must be inside session.begin and tenant scope; timeout mapping before context exit rolls transaction back.",
+      "effect": "Session configuration effect, not NONAUTHORITY and not a global/session persistent timeout change.",
+      "verificationDependencies": [
+        "bounded SQL formatter proof and invalid bool/string/range mutants",
+        "actual PG SET LOCAL/error rollback NOT_RUN"
+      ]
+    },
+    {
+      "id": "P-PUBLIC-SIGNATURE-VERIFY",
+      "status": "DESIGN_ONLY_PENDING_EXISTING_AUTHORITY_VERIFICATION",
+      "actualBinding": null,
+      "codeGrant": false,
+      "portGrant": false,
+      "wiring": "Exact inv.storage_sampling.verify_sample certificate_key(...).verify edge added by Producer2",
+      "authentication": "Existing storage challenge current Node/tenant/epoch/channel C/DER/certificate identity/validity and Ed25519 public key. No private key/signing/randomness/system-root/network exemption.",
+      "input": "Exact retained storage challenge, bounded canonical signed payload/envelope, certificate DER and current trusted time as required by existing verify_sample; no user signer or hash substitute.",
+      "output": "Existing VerifiedSample input to typed CP append/check/nonce-consumption transaction, no equipment or storage acceptance by signature alone.",
+      "error": "Malformed/base64/size/canonical/challenge/signer/cert/time/signature mismatch rejects. Unknown verification authority remains pending; never pure-value conversion.",
+      "ownership": "Existing public verification only; protected signing key never accessed by this task or interface.",
+      "transaction": "Original sample verification before typed CP sample commit; current channel/root/version/owner authorization rechecked by original consumer.",
+      "effect": "Authority-bearing PUBLIC_SIGNATURE_VERIFY, not signing and not generic crypto purity.",
+      "verificationDependencies": [
+        "Exact current source identity/algorithm/signer/challenge binding proof",
+        "Actual crypto/role/PG/storage acceptance NOT_RUN",
+        "Root future concrete binding/grant decision"
+      ],
+      "sourceScope": "Named existing verification dependency, not a newly registered runtime port",
+      "targetedWiring": [
+        {
+          "callRef": "12fc7b7611336899d3e12cf34f87113ced7398cf2eec4f44fea1f3be9d9fcde7",
+          "category": "NAMED_PORT:P-PUBLIC-SIGNATURE-VERIFY",
+          "source": {
+            "path": "services/control-plane/src/inv/storage_sampling.py",
+            "span": [
+              270,
+              8,
+              272,
+              9
+            ],
+            "sourceFileSHA256": "4e43aa43e8dc9b8ab78af0fde78f9e83b83d7bfdc77b7362ad565741f6f94e8a",
+            "expressionSHA256": "637b1499974c87afd7b0c74f6d8cf791041cb29fc502eb07e3cd884ca556a524",
+            "function": "inv.storage_sampling.verify_sample"
+          },
+          "receiver": {
+            "expression": "certificate_key(certificate_der, challenge.channel, now).verify",
+            "inferredType": "UNRESOLVED_CALL_RETURN:inv.storage_sampling:x509.load_der_x509_certificate(certificate_der).public_key",
+            "exactInferredTarget": "inv.storage_sampling.certificate_key(certificate_der, challenge.channel, now).verify"
+          },
+          "blocksGrant": true
+        }
+      ]
+    }
+  ],
+  "bindingPolicy": "All real bindings NULL/HOLD. Contracts name existing interfaces, do not register/grant them. Cut3 needs future explicit Root choice after actual Rev8 review.",
+  "sourceInputs": [
+    {
+      "path": "services/control-plane/src/inv/db.py",
+      "bytes": 10068,
+      "sha256": "38e0d679b442433fd0b775e98411d78dfff2b7d114bbc3c2a52d3a886726022d"
+    },
+    {
+      "path": "services/control-plane/src/inv/observation.py",
+      "bytes": 6736,
+      "sha256": "b515ceda8b066466cf4cdf5fa88d04803220398c436d29ab7c5fd2793bf5748f"
+    },
+    {
+      "path": "services/control-plane/src/inv/node_transport.py",
+      "bytes": 12319,
+      "sha256": "3559bbcdf9568f8930654d860b0edd980eca71c835cde3fe7380a69dd56e18f4"
+    },
+    {
+      "path": "services/control-plane/src/inv/buildkit_transport.py",
+      "bytes": 41321,
+      "sha256": "70a924987554b389b8c2e377226fac242df1ec0b713c0b4fb9ac240ea8bbcfae"
+    },
+    {
+      "path": "services/control-plane/src/inv/storage.py",
+      "bytes": 4165,
+      "sha256": "29ed6b1b65ac17cac99364495d243b8ee9f1c7830c0ad3ea0644ad33b7188555"
+    },
+    {
+      "path": "services/control-plane/src/inv/build_product_runtime.py",
+      "bytes": 22165,
+      "sha256": "7483d65fcb1032aeb05b4d2dd56e09e714cff8ca676de0f80fc3a2f5e447e9af"
+    },
+    {
+      "path": "services/control-plane/src/inv/build_execution.py",
+      "bytes": 41024,
+      "sha256": "afc4cabc20bd1d4f4adf3f1542ed5eb49d9f16631b5dbdb3ebc5d06d1bc9d11f"
+    },
+    {
+      "path": "migrations/versions/0031_resource_offer_integrity.py",
+      "bytes": 6205,
+      "sha256": "0d562a32693efc1ab3c3791cff7ce0210fe63b8c44aa8faa2413e05d44019d06"
+    },
+    {
+      "path": "migrations/versions/0027_business_api_guards.py",
+      "bytes": 3098,
+      "sha256": "bbfa4cff2dafe579b0dc19397e4a551d15b61979178f5aa57edf4c81909e8c3e"
+    },
+    {
+      "path": "src/saintvision/api/v1/settings.py",
+      "bytes": 15694,
+      "sha256": "6eca95bc6a39a0796b8403656908cd692541f284c1edd76f1a443a774bfc0917"
+    },
+    {
+      "path": "src/saintvision/api/deps.py",
+      "bytes": 10633,
+      "sha256": "0c5fa90903e9055b74c16106f6f66a95d1589a730f286814bdfe06327a1cb2b8"
+    },
+    {
+      "path": "src/saintvision/api/lock_wait.py",
+      "bytes": 5091,
+      "sha256": "1dcd88d246915a99ad697964c40028b0409f01d70a495542e356dd47b9c6b30b"
+    }
+  ],
+  "sourceBytes": 178519,
+  "actualRuntimeB": 0,
+  "actualIndependentRev8Review": "PENDING via Root",
+  "partialFreeze": false,
+  "artifactStage": "PRODUCER2_FINAL_ORDERED_CONTRACT_PROOF",
+  "targetedCategorySHA256": "bb46b0c48dd9b926095d59db4eb47e88eab7c01b184b734c1b7480cb259bee26"
+}

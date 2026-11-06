@@ -1,0 +1,21 @@
+"""Scan frozen 72028 production paths (from the reviewer result) for the B9f near-variant forms. AST only.
+
+Usage: python -B -I reviewer_scan_72028_b9f_forms.py <rev9f evidence dir abs>
+"""
+import ast, json, sys
+from pathlib import Path
+E = Path(sys.argv[1]).resolve(strict=True); sys.path.insert(0, str(E))
+import t1_provenance as t, constructor_graph as cg, forwarding_discovery as fd, source_bindings as sb
+core = t.read_batch([t.CP + n for n in t.CORE] + ['tools/remote_workspace_entry.py']); ctors = t.read_batch(t.MAIN_CTOR_PATHS); S = {**core, **ctors}
+c = cg.current_census(S); d, _ = fd.discover(c['production'], S)
+paths = sorted({x['path'] for x in c['sourceFiles'] + d['sourceFiles'] if not x['path'].startswith('tests/')})
+out = {'productionPaths': len(paths), 'starredArgImportCalls': 0, 'importlibDunderImport': 0, 'globalStatements': 0, 'starImports': 0, 'nonlocalStatements': 0}
+for p in paths:
+    tr = ast.parse(sb.frozen_source(p))
+    for n in ast.walk(tr):
+        if isinstance(n, ast.Call) and ast.unparse(n.func) in ('__import__', 'importlib.__import__', 'builtins.__import__', 'importlib.import_module') and any(isinstance(a, ast.Starred) for a in n.args): out['starredArgImportCalls'] += 1
+        if isinstance(n, ast.Attribute) and n.attr == '__import__': out['importlibDunderImport'] += 1
+        if isinstance(n, ast.Global): out['globalStatements'] += 1
+        if isinstance(n, ast.Nonlocal): out['nonlocalStatements'] += 1
+        if isinstance(n, ast.ImportFrom) and any(a.name == '*' for a in n.names): out['starImports'] += 1
+print(json.dumps(out))

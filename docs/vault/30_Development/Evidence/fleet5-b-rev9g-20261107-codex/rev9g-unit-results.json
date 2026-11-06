@@ -1,0 +1,382 @@
+{
+  "cases": [
+    {
+      "case": "starred-hidden-level",
+      "pass": true,
+      "sourceSHA256": "c615c4866ba5e3e9c7a2a70b62e74facf62b49d944ff556d02ff16fe7cf68ec0",
+      "unknown": true,
+      "scope": "AST_ONLY"
+    },
+    {
+      "case": "starred-tail-level",
+      "pass": true,
+      "sourceSHA256": "14b67196f0be17cf1166e6d5058ecd6d66a8cc63963ab88742bd9a33ac8b9710",
+      "unknown": true,
+      "scope": "AST_ONLY"
+    },
+    {
+      "case": "starred-name",
+      "pass": true,
+      "sourceSHA256": "cda02dc9a2790d3dc3b52fb7c7635ed0c3290c32f8a8efd551317e2ad348ee0e",
+      "unknown": true,
+      "scope": "AST_ONLY"
+    },
+    {
+      "case": "starred-package",
+      "pass": true,
+      "sourceSHA256": "1284ec3ac6183f0a64dd3821bc315eab1167f4cf2f197a621417cc3c29cd588a",
+      "unknown": true,
+      "scope": "AST_ONLY"
+    },
+    {
+      "case": "importlib-dunder-level1",
+      "pass": true,
+      "sourceSHA256": "15a01a5c4be1fb1bc698bd2550c6dd13773c37a1edf802a98b2847abcb16b29a",
+      "unknown": true,
+      "scope": "AST_ONLY"
+    },
+    {
+      "case": "importlib-dunder-keyword",
+      "pass": true,
+      "sourceSHA256": "5475b522c192e1fdbd175108a7e7af0ca23f006d6c1a131ca41d7240d0937e15",
+      "unknown": true,
+      "scope": "AST_ONLY"
+    },
+    {
+      "case": "importlib-dunder-alias",
+      "pass": true,
+      "sourceSHA256": "6cd14db2750340d381c3dbb97f6e4b9e8ffd30afb3ba9d61df4e37865d0a07a3",
+      "unknown": true,
+      "scope": "AST_ONLY"
+    },
+    {
+      "case": "builtin-level0",
+      "pass": true,
+      "sourceSHA256": "d63637d8c9d185186fb92400acab3216ccd6166a995ee726b723cff407a4b6ae",
+      "unknown": false,
+      "scope": "AST_ONLY"
+    },
+    {
+      "case": "importlib-level0",
+      "pass": true,
+      "sourceSHA256": "30e3791b25a5470e880fac3661029cfd33c2a0d5ade078a6150eca83f810c2f3",
+      "unknown": false,
+      "scope": "AST_ONLY"
+    },
+    {
+      "case": "importlib-level0-keyword",
+      "pass": true,
+      "sourceSHA256": "fcd19b35af65f40f0049cfee03ef13fd13951be9c3abd9eb028c1469aefb4fef",
+      "unknown": false,
+      "scope": "AST_ONLY"
+    },
+    {
+      "case": "starred-prefix-even-keyword-zero",
+      "pass": true,
+      "sourceSHA256": "975a100f248a433378f6cc9dbb2c2600e4f8ab5ab0f10487195f48034e599ab5",
+      "unknown": true,
+      "scope": "AST_ONLY"
+    },
+    {
+      "case": "plain-import-module",
+      "pass": true,
+      "sourceSHA256": "0cecf61f6ce6a03b979a245781af6d2854984242d9f3687afd4a5441d93e7b5a",
+      "unknown": false,
+      "scope": "AST_ONLY"
+    },
+    {
+      "case": "control-cross-module-import-plain",
+      "pass": true,
+      "frozenFixtureBaseline": false,
+      "exactCe713BinderInput": true,
+      "sourceSHA256": {
+        "fixtures/claude_b9f_binder.py": "be5fae9a24efa55d6e7f8bf6bbf2da4ab77cc2c6220462bf3a6df26cc81a89b3",
+        "fixtures/claude_b9f_callee.py": "9c9c6c6633fec82fc6195723eaae9952c06d003420fddcfae78fd9d33ef631c0"
+      },
+      "reason": null,
+      "scope": "BINDER_ONLY_NO_FULL_PROVENANCE_OR_RUNTIME_GRANT"
+    },
+    {
+      "case": "control-cross-module-import-plain",
+      "pass": true,
+      "frozenFixtureBaseline": true,
+      "exactCe713BinderInput": true,
+      "sourceSHA256": {
+        "fixtures/claude_b9f_binder.py": "be5fae9a24efa55d6e7f8bf6bbf2da4ab77cc2c6220462bf3a6df26cc81a89b3",
+        "fixtures/claude_b9f_callee.py": "9c9c6c6633fec82fc6195723eaae9952c06d003420fddcfae78fd9d33ef631c0"
+      },
+      "reason": null,
+      "scope": "BINDER_ONLY_NO_FULL_PROVENANCE_OR_RUNTIME_GRANT"
+    },
+    {
+      "case": "near-cross-module-imported-callee-star-shadow",
+      "pass": true,
+      "frozenFixtureBaseline": false,
+      "exactCe713BinderInput": true,
+      "sourceSHA256": {
+        "fixtures/claude_b9f_binder.py": "966e2b0cb2ea3564319da1e13106b26f7626504ead6ef6b16b40283d09178938",
+        "fixtures/claude_b9f_callee.py": "9c9c6c6633fec82fc6195723eaae9952c06d003420fddcfae78fd9d33ef631c0"
+      },
+      "reason": "UNRESOLVED:CALLEE_REBOUND",
+      "scope": "BINDER_ONLY_NO_FULL_PROVENANCE_OR_RUNTIME_GRANT"
+    },
+    {
+      "case": "near-cross-module-imported-callee-star-shadow",
+      "pass": true,
+      "frozenFixtureBaseline": true,
+      "exactCe713BinderInput": true,
+      "sourceSHA256": {
+        "fixtures/claude_b9f_binder.py": "966e2b0cb2ea3564319da1e13106b26f7626504ead6ef6b16b40283d09178938",
+        "fixtures/claude_b9f_callee.py": "9c9c6c6633fec82fc6195723eaae9952c06d003420fddcfae78fd9d33ef631c0"
+      },
+      "reason": "UNRESOLVED:CALLEE_REBOUND",
+      "scope": "BINDER_ONLY_NO_FULL_PROVENANCE_OR_RUNTIME_GRANT"
+    },
+    {
+      "case": "near-cross-module-imported-callee-global-import",
+      "pass": true,
+      "frozenFixtureBaseline": false,
+      "exactCe713BinderInput": true,
+      "sourceSHA256": {
+        "fixtures/claude_b9f_binder.py": "45b6c5d7ac571d0c7a7518b2c809db659b7b95d573b4a0cae8724df5bc8e9755",
+        "fixtures/claude_b9f_callee.py": "9c9c6c6633fec82fc6195723eaae9952c06d003420fddcfae78fd9d33ef631c0"
+      },
+      "reason": "UNRESOLVED:CALLEE_REBOUND",
+      "scope": "BINDER_ONLY_NO_FULL_PROVENANCE_OR_RUNTIME_GRANT"
+    },
+    {
+      "case": "near-cross-module-imported-callee-global-import",
+      "pass": true,
+      "frozenFixtureBaseline": true,
+      "exactCe713BinderInput": true,
+      "sourceSHA256": {
+        "fixtures/claude_b9f_binder.py": "45b6c5d7ac571d0c7a7518b2c809db659b7b95d573b4a0cae8724df5bc8e9755",
+        "fixtures/claude_b9f_callee.py": "9c9c6c6633fec82fc6195723eaae9952c06d003420fddcfae78fd9d33ef631c0"
+      },
+      "reason": "UNRESOLVED:CALLEE_REBOUND",
+      "scope": "BINDER_ONLY_NO_FULL_PROVENANCE_OR_RUNTIME_GRANT"
+    },
+    {
+      "case": "global-declaration-alone",
+      "pass": true,
+      "frozenFixtureBaseline": true,
+      "exactCe713BinderInput": false,
+      "sourceSHA256": {
+        "fixtures/claude_b9f_binder.py": "54f601af64ed104fdbc7a74de528a118da7971f2cfe341de05c2c1af8502e00f",
+        "fixtures/claude_b9f_callee.py": "9c9c6c6633fec82fc6195723eaae9952c06d003420fddcfae78fd9d33ef631c0"
+      },
+      "reason": null,
+      "scope": "BINDER_ONLY_NO_FULL_PROVENANCE_OR_RUNTIME_GRANT"
+    },
+    {
+      "case": "unrelated-local",
+      "pass": true,
+      "frozenFixtureBaseline": true,
+      "exactCe713BinderInput": false,
+      "sourceSHA256": {
+        "fixtures/claude_b9f_binder.py": "7ba5cd15a1f9500227afe068919bb831e770810e018c1641cd87ef1f862d283d",
+        "fixtures/claude_b9f_callee.py": "9c9c6c6633fec82fc6195723eaae9952c06d003420fddcfae78fd9d33ef631c0"
+      },
+      "reason": null,
+      "scope": "BINDER_ONLY_NO_FULL_PROVENANCE_OR_RUNTIME_GRANT"
+    },
+    {
+      "case": "unrelated-unused-alias",
+      "pass": true,
+      "frozenFixtureBaseline": true,
+      "exactCe713BinderInput": false,
+      "sourceSHA256": {
+        "fixtures/claude_b9f_binder.py": "6903ceaa5b09f70562ec03e8fa4bdd348220525ac7ba4fca55c8fb104402bddb",
+        "fixtures/claude_b9f_callee.py": "9c9c6c6633fec82fc6195723eaae9952c06d003420fddcfae78fd9d33ef631c0"
+      },
+      "reason": null,
+      "scope": "BINDER_ONLY_NO_FULL_PROVENANCE_OR_RUNTIME_GRANT"
+    },
+    {
+      "case": "nested-class-scope",
+      "pass": true,
+      "frozenFixtureBaseline": true,
+      "exactCe713BinderInput": false,
+      "sourceSHA256": {
+        "fixtures/claude_b9f_binder.py": "849cdf260356cc2954485983b69af0e476126b9bdee08299451272a1efdd59c5",
+        "fixtures/claude_b9f_callee.py": "9c9c6c6633fec82fc6195723eaae9952c06d003420fddcfae78fd9d33ef631c0"
+      },
+      "reason": null,
+      "scope": "BINDER_ONLY_NO_FULL_PROVENANCE_OR_RUNTIME_GRANT"
+    },
+    {
+      "case": "lambda-scope",
+      "pass": true,
+      "frozenFixtureBaseline": true,
+      "exactCe713BinderInput": false,
+      "sourceSHA256": {
+        "fixtures/claude_b9f_binder.py": "dd82aab73cff589af2b58fe350405c446d93acffe29267790b210f8debfbf0cb",
+        "fixtures/claude_b9f_callee.py": "9c9c6c6633fec82fc6195723eaae9952c06d003420fddcfae78fd9d33ef631c0"
+      },
+      "reason": null,
+      "scope": "BINDER_ONLY_NO_FULL_PROVENANCE_OR_RUNTIME_GRANT"
+    },
+    {
+      "case": "comprehension-scope",
+      "pass": true,
+      "frozenFixtureBaseline": true,
+      "exactCe713BinderInput": false,
+      "sourceSHA256": {
+        "fixtures/claude_b9f_binder.py": "0af08e0f6e719de445ed4cc9cf4e023982ee87f079a65d9eb207a3b392bcfdd8",
+        "fixtures/claude_b9f_callee.py": "9c9c6c6633fec82fc6195723eaae9952c06d003420fddcfae78fd9d33ef631c0"
+      },
+      "reason": null,
+      "scope": "BINDER_ONLY_NO_FULL_PROVENANCE_OR_RUNTIME_GRANT"
+    },
+    {
+      "case": "direct-reassignment",
+      "pass": true,
+      "frozenFixtureBaseline": true,
+      "exactCe713BinderInput": false,
+      "sourceSHA256": {
+        "fixtures/claude_b9f_binder.py": "8864317f25960cbdcb1ab765d749b59d48a32bca0d7d6315e40ef8f0d7bc8188",
+        "fixtures/claude_b9f_callee.py": "9c9c6c6633fec82fc6195723eaae9952c06d003420fddcfae78fd9d33ef631c0"
+      },
+      "reason": "UNRESOLVED:CALLEE_REBOUND",
+      "scope": "BINDER_ONLY_NO_FULL_PROVENANCE_OR_RUNTIME_GRANT"
+    },
+    {
+      "case": "duplicate-import-event",
+      "pass": true,
+      "frozenFixtureBaseline": true,
+      "exactCe713BinderInput": false,
+      "sourceSHA256": {
+        "fixtures/claude_b9f_binder.py": "cc5918831faf4ff9d9ad85f0d01ce0fe7633c4843a805cb827e60d276a49a6b0",
+        "fixtures/claude_b9f_callee.py": "9c9c6c6633fec82fc6195723eaae9952c06d003420fddcfae78fd9d33ef631c0"
+      },
+      "reason": "UNRESOLVED:CALLEE_REBOUND",
+      "scope": "BINDER_ONLY_NO_FULL_PROVENANCE_OR_RUNTIME_GRANT"
+    },
+    {
+      "case": "replaced-import-same-count",
+      "pass": true,
+      "frozenFixtureBaseline": true,
+      "exactCe713BinderInput": false,
+      "sourceSHA256": {
+        "fixtures/claude_b9f_binder.py": "7291aa214a57b3e5bdf0c34a0f7ee7d0599a78896b2b2a9b5aae4a9abb499174",
+        "fixtures/claude_b9f_callee.py": "9c9c6c6633fec82fc6195723eaae9952c06d003420fddcfae78fd9d33ef631c0"
+      },
+      "reason": "UNRESOLVED:CALLEE_REBOUND",
+      "scope": "BINDER_ONLY_NO_FULL_PROVENANCE_OR_RUNTIME_GRANT"
+    },
+    {
+      "case": "exact-event-identity-and-multiplicity",
+      "pass": true,
+      "sameCountDifferentImportRejected": true,
+      "duplicateCount": 2,
+      "records": [
+        {
+          "path": "fixtures/claude_b9f_binder.py",
+          "name": "Owner",
+          "kind": "import",
+          "bindingScope": "",
+          "occurrenceScope": "",
+          "effectiveScope": "",
+          "nodeType": "ImportFrom",
+          "expressionSHA256": "77c88ae76312cb1173707ac9792c65b675e90f5952472682db54e9cd9a5dbb98",
+          "span": [
+            1,
+            0,
+            1,
+            51
+          ],
+          "eventKey": [
+            "",
+            "Owner",
+            "import",
+            "",
+            "",
+            "ImportFrom",
+            "77c88ae76312cb1173707ac9792c65b675e90f5952472682db54e9cd9a5dbb98"
+          ]
+        },
+        {
+          "path": "fixtures/claude_b9f_binder.py",
+          "name": "receive",
+          "kind": "import",
+          "bindingScope": "",
+          "occurrenceScope": "",
+          "effectiveScope": "",
+          "nodeType": "ImportFrom",
+          "expressionSHA256": "61f88707cf9d0a976104639e22de305f15962aa87b6090255cddcf9a9190c149",
+          "span": [
+            2,
+            0,
+            2,
+            34
+          ],
+          "eventKey": [
+            "",
+            "receive",
+            "import",
+            "",
+            "",
+            "ImportFrom",
+            "61f88707cf9d0a976104639e22de305f15962aa87b6090255cddcf9a9190c149"
+          ]
+        },
+        {
+          "path": "fixtures/claude_b9f_binder.py",
+          "name": "held",
+          "kind": "write",
+          "bindingScope": "",
+          "occurrenceScope": "",
+          "effectiveScope": "",
+          "nodeType": "Assign",
+          "expressionSHA256": "d58f729b709a2b200c47fd6bd15e82d8d56384394e2c43e67d3236963ff8b96a",
+          "span": [
+            3,
+            0,
+            3,
+            30
+          ],
+          "eventKey": [
+            "",
+            "held",
+            "write",
+            "",
+            "",
+            "Assign",
+            "d58f729b709a2b200c47fd6bd15e82d8d56384394e2c43e67d3236963ff8b96a"
+          ]
+        },
+        {
+          "path": "fixtures/claude_b9f_binder.py",
+          "name": "accept",
+          "kind": "import",
+          "bindingScope": "",
+          "occurrenceScope": "",
+          "effectiveScope": "",
+          "nodeType": "ImportFrom",
+          "expressionSHA256": "4760733435a850bf86e4bb3166e7ee3ab8220d7d581ad1f6ace3e171c2fb6f41",
+          "span": [
+            4,
+            0,
+            4,
+            45
+          ],
+          "eventKey": [
+            "",
+            "accept",
+            "import",
+            "",
+            "",
+            "ImportFrom",
+            "4760733435a850bf86e4bb3166e7ee3ab8220d7d581ad1f6ace3e171c2fb6f41"
+          ]
+        }
+      ],
+      "scope": "BINDER_ONLY"
+    }
+  ],
+  "count": 28,
+  "nonlocal": "INFO/OUTSIDE_CUT",
+  "binderAlone": "INSUFFICIENT; full source/use-site/provenance required",
+  "effectfulFixturesExecuted": false,
+  "actualRuntimeB": 0
+}

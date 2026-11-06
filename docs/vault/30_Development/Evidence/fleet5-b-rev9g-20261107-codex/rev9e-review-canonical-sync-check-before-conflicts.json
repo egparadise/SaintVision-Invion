@@ -1,0 +1,18 @@
+{
+  "reasonCounts": {
+    "both-diverged": 1,
+    "destination-edited": 1
+  },
+  "conflicts": [
+    {
+      "path": "30_Development/History/2026-11-05_기존5대_오케스트레이션_착수_Codex.md",
+      "reason": "both-diverged"
+    },
+    {
+      "path": "40_Governance/오류 및 해결 인덱스.md",
+      "reason": "destination-edited"
+    }
+  ],
+  "adoptedIdentical": [],
+  "resolvedFromRepository": []
+}

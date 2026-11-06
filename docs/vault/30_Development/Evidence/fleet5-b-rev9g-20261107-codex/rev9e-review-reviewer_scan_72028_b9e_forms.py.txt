@@ -1,0 +1,27 @@
+"""Scan frozen 72028 parsed universe (25 paths from the reviewer run) for the B9e near-variant forms. AST only."""
+import ast, json, subprocess, sys
+SRC = '72028cbac903c4415d9979f980a6e0f9948e914f'
+paths = json.load(open(sys.argv[1], encoding='utf-8'))['info']['positive']
+allp = sorted(set(paths['productionParsed']))
+res = json.load(open(sys.argv[1], encoding='utf-8'))
+out = {}
+for p in allp:
+    s = subprocess.check_output(['git', 'show', SRC + ':' + p]).decode('utf-8-sig'); t = ast.parse(s); c = {}
+    def add(k): c[k] = c.get(k, 0) + 1
+    for n in ast.walk(t):
+        if isinstance(n, ast.ImportFrom) and any(a.name == '*' for a in n.names): add('starImport')
+        if isinstance(n, ast.Global): add('globalStatement')
+        if isinstance(n, ast.Nonlocal): add('nonlocalStatement')
+        if isinstance(n, (ast.MatchAs, ast.MatchStar)) and n.name: add('matchCapture')
+        if isinstance(n, ast.Call):
+            f = ast.unparse(n.func)
+            if f.endswith('import_module') and (len(n.args) > 1 or any(k.arg == 'package' for k in n.keywords)): add('importModuleWithPackage')
+            if f.endswith('import_module') and n.args and isinstance(n.args[0], ast.Constant) and str(n.args[0].value).startswith('.'): add('importModuleRelativeName')
+            if f == '__import__' and (len(n.args) > 4 or any(k.arg == 'level' for k in n.keywords)): add('dunderImportWithLevel')
+        if isinstance(n, ast.Assign) and any(isinstance(x, ast.Name) and x.id == '__new__' for x in n.targets): add('classBodyNewAssign')
+        if isinstance(n, (ast.Assign, ast.AugAssign)):
+            for x in (n.targets if isinstance(n, ast.Assign) else [n.target]):
+                if isinstance(x, ast.Attribute) and x.attr in ('__init__', '__new__', '__call__'): add('dunderAttributeStore')
+    out[p] = c
+print(json.dumps({'source': SRC, 'paths': len(allp), 'scope': 'productionParsed (11) of the reviewer-measured 25 parsed/audited paths', 'formsByPath': out,
+                  'totals': {k: sum(v.get(k, 0) for v in out.values()) for k in sorted({k for v in out.values() for k in v})}}, indent=1))

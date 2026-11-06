@@ -1,0 +1,805 @@
+{
+ "reviewer": "Claude independent",
+ "target": "fleet5-b-rev9f-20261107-codex",
+ "frozenRootKeys": 6,
+ "info": {
+  "finalBytes": {
+   "ownerBracketedFiles": 82,
+   "mismatchedAgainstOwnerAfterMap": [],
+   "calleeIdentitySHA256": "3ff62c8e30c8bba0a09c976e7376331fcf59cd6850a7dee450d4b7bb67aca39c",
+   "lexicalBindingsSHA256": "8d85415adf78fd4b0f3a27fe0d4671f718963d20c2e352d5f2c79d785eebf8a5",
+   "reflectionAuditSHA256": "7934ab1837c2056ae4f38e99a844fcace0322674b536dfbc01d95235065c57f3"
+  },
+  "positive": {
+   "unionParsed": 25,
+   "unionAudited": 25,
+   "parsedEqualsAudited": true,
+   "productionParsed": 11,
+   "frozenBindingCount": 576,
+   "frozenUnresolved": 0,
+   "currentProveError": null,
+   "currentBindingCount": 576
+  },
+  "ownPeakWorkingSetBytes": 153198592,
+  "peakScope": "this single reviewer process only; no aggregate or hard quota"
+ },
+ "cases": [
+  {
+   "case": "actual-72028-positive",
+   "observed": "ACCEPT",
+   "reason": null,
+   "expected": "ACCEPT",
+   "matchesExpectation": true,
+   "finding": null,
+   "mode": "t1_provenance.provenance (full)",
+   "exactActual764Input": false,
+   "actual764Observed": "ACCEPT",
+   "astValidAndCompiledOnly": true,
+   "newUnboundNames": [],
+   "witnessesChecked": 15,
+   "mutatedSHA256": {},
+   "visibleProductionRoots": 6,
+   "sixFrozenRootsPreserved": true,
+   "discoveryError": null,
+   "newRelevantReflectionHitsByPath": {},
+   "note": null
+  },
+  {
+   "case": "L1-near-import_module-relative-variable-package",
+   "observed": "REFUSE",
+   "reason": "UNCATALOGUED_PRODUCTION_SOURCE:services/control-plane/src/inv/business_auth.py",
+   "expected": "REFUSE:UNCATALOGUED_PRODUCTION_SOURCE:services/control-plane/src/inv/business_auth.py",
+   "matchesExpectation": true,
+   "finding": null,
+   "mode": "t1_provenance.provenance (full)",
+   "exactActual764Input": true,
+   "actual764Observed": "ACCEPT",
+   "astValidAndCompiledOnly": true,
+   "newUnboundNames": [],
+   "witnessesChecked": 15,
+   "mutatedSHA256": {
+    "services/control-plane/src/inv/business_auth.py": "36e925c6040b1bbfd6b94e8e94e051690639df0005fd30d828688f7e985c5625"
+   },
+   "visibleProductionRoots": 6,
+   "sixFrozenRootsPreserved": true,
+   "discoveryError": null,
+   "newRelevantReflectionHitsByPath": {
+    "services/control-plane/src/inv/business_auth.py": [
+     "ENUMERATED_REFLECTION_NONLITERAL_KEY"
+    ]
+   },
+   "note": null
+  },
+  {
+   "case": "L1-near-import_module-relative-literal-package",
+   "observed": "REFUSE",
+   "reason": "UNCATALOGUED_PRODUCTION_SOURCE:services/control-plane/src/inv/business_auth.py",
+   "expected": "REFUSE:UNCATALOGUED_PRODUCTION_SOURCE:services/control-plane/src/inv/business_auth.py",
+   "matchesExpectation": true,
+   "finding": null,
+   "mode": "t1_provenance.provenance (full)",
+   "exactActual764Input": true,
+   "actual764Observed": "ACCEPT",
+   "astValidAndCompiledOnly": true,
+   "newUnboundNames": [],
+   "witnessesChecked": 15,
+   "mutatedSHA256": {
+    "services/control-plane/src/inv/business_auth.py": "68697e40e1cc88da4145d5cfbd51979ad13930e55db2c1b91d22679c31df5c14"
+   },
+   "visibleProductionRoots": 6,
+   "sixFrozenRootsPreserved": true,
+   "discoveryError": null,
+   "newRelevantReflectionHitsByPath": {
+    "services/control-plane/src/inv/business_auth.py": [
+     "ENUMERATED_REFLECTION_NONLITERAL_KEY"
+    ]
+   },
+   "note": null
+  },
+  {
+   "case": "L1-near-dunder-import-relative-level1",
+   "observed": "REFUSE",
+   "reason": "UNCATALOGUED_PRODUCTION_SOURCE:services/control-plane/src/inv/business_auth.py",
+   "expected": "REFUSE:UNCATALOGUED_PRODUCTION_SOURCE:services/control-plane/src/inv/business_auth.py",
+   "matchesExpectation": true,
+   "finding": null,
+   "mode": "t1_provenance.provenance (full)",
+   "exactActual764Input": true,
+   "actual764Observed": "ACCEPT",
+   "astValidAndCompiledOnly": true,
+   "newUnboundNames": [],
+   "witnessesChecked": 15,
+   "mutatedSHA256": {
+    "services/control-plane/src/inv/business_auth.py": "3846c753dc9df65d1ddf5ac0e2d6c04276188b5c7ec04bd74f435d88ad907edb"
+   },
+   "visibleProductionRoots": 6,
+   "sixFrozenRootsPreserved": true,
+   "discoveryError": null,
+   "newRelevantReflectionHitsByPath": {
+    "services/control-plane/src/inv/business_auth.py": [
+     "ENUMERATED_REFLECTION_NONLITERAL_KEY"
+    ]
+   },
+   "note": null
+  },
+  {
+   "case": "L2-near-lan_pilot-global-import-in-function",
+   "observed": "REFUSE",
+   "reason": "UNRESOLVED:CALLEE_REBOUND",
+   "expected": "REFUSE:UNRESOLVED:CALLEE_REBOUND",
+   "matchesExpectation": true,
+   "finding": null,
+   "mode": "t1_provenance.provenance (full)",
+   "exactActual764Input": true,
+   "actual764Observed": "ACCEPT",
+   "astValidAndCompiledOnly": true,
+   "newUnboundNames": [],
+   "witnessesChecked": 15,
+   "mutatedSHA256": {
+    "tools/lan_pilot.py": "4f8689bff50ea6fe15066fbe99ce4fa4d598a41d47da3ace7d2ce9cafb713c02"
+   },
+   "visibleProductionRoots": 6,
+   "sixFrozenRootsPreserved": true,
+   "discoveryError": null,
+   "newRelevantReflectionHitsByPath": {},
+   "note": null
+  },
+  {
+   "case": "L2-near-lan_pilot-star-import-shadow",
+   "observed": "REFUSE",
+   "reason": "UNRESOLVED:CALLEE_REBOUND",
+   "expected": "REFUSE:UNRESOLVED:CALLEE_REBOUND",
+   "matchesExpectation": true,
+   "finding": null,
+   "mode": "t1_provenance.provenance (full)",
+   "exactActual764Input": true,
+   "actual764Observed": "ACCEPT",
+   "astValidAndCompiledOnly": true,
+   "newUnboundNames": [],
+   "witnessesChecked": 15,
+   "mutatedSHA256": {
+    "tools/lan_pilot.py": "0c18ea50d478f1a2c4c83016656681db78320fe9c42b4841beb90beda565187e"
+   },
+   "visibleProductionRoots": 6,
+   "sixFrozenRootsPreserved": true,
+   "discoveryError": null,
+   "newRelevantReflectionHitsByPath": {},
+   "note": null
+  },
+  {
+   "case": "control-outside-benign-database-helper",
+   "observed": "ACCEPT",
+   "reason": null,
+   "expected": "ACCEPT",
+   "matchesExpectation": true,
+   "finding": null,
+   "mode": "t1_provenance.provenance (full)",
+   "exactActual764Input": false,
+   "actual764Observed": null,
+   "astValidAndCompiledOnly": true,
+   "newUnboundNames": [],
+   "witnessesChecked": 15,
+   "mutatedSHA256": {
+    "services/control-plane/src/inv/business_auth.py": "85d17fdc376c1c463aa78cac207140eaaef46f0b93507b815db61641df5c49af"
+   },
+   "visibleProductionRoots": 6,
+   "sixFrozenRootsPreserved": true,
+   "discoveryError": null,
+   "newRelevantReflectionHitsByPath": {},
+   "note": null
+  },
+  {
+   "case": "control-outside-assigned-string-unused-import",
+   "observed": "ACCEPT",
+   "reason": null,
+   "expected": "ACCEPT",
+   "matchesExpectation": true,
+   "finding": null,
+   "mode": "t1_provenance.provenance (full)",
+   "exactActual764Input": false,
+   "actual764Observed": null,
+   "astValidAndCompiledOnly": true,
+   "newUnboundNames": [],
+   "witnessesChecked": 15,
+   "mutatedSHA256": {
+    "services/control-plane/src/inv/business_auth.py": "52597349fa92460856212d0240eea975f91dc7d38de4188eb0e2b4067f6dc46d"
+   },
+   "visibleProductionRoots": 6,
+   "sixFrozenRootsPreserved": true,
+   "discoveryError": null,
+   "newRelevantReflectionHitsByPath": {},
+   "note": null
+  },
+  {
+   "case": "control-outside-bounded-literal-json",
+   "observed": "ACCEPT",
+   "reason": null,
+   "expected": "ACCEPT",
+   "matchesExpectation": true,
+   "finding": null,
+   "mode": "t1_provenance.provenance (full)",
+   "exactActual764Input": false,
+   "actual764Observed": null,
+   "astValidAndCompiledOnly": true,
+   "newUnboundNames": [],
+   "witnessesChecked": 15,
+   "mutatedSHA256": {
+    "services/control-plane/src/inv/business_auth.py": "8d6ff0c01e6389d2081780da016a56e69c034f6517425eb6ce03a0bd5807985b"
+   },
+   "visibleProductionRoots": 6,
+   "sixFrozenRootsPreserved": true,
+   "discoveryError": null,
+   "newRelevantReflectionHitsByPath": {},
+   "note": null
+  },
+  {
+   "case": "control-same-function-unowned-working",
+   "observed": "ACCEPT",
+   "reason": null,
+   "expected": "ACCEPT",
+   "matchesExpectation": true,
+   "finding": null,
+   "mode": "t1_provenance.provenance (full)",
+   "exactActual764Input": false,
+   "actual764Observed": null,
+   "astValidAndCompiledOnly": true,
+   "newUnboundNames": [],
+   "witnessesChecked": 15,
+   "mutatedSHA256": {
+    "services/control-plane/src/inv/workspace_api.py": "141c63b1bab2584193046d467ae87d06d26f4434e9a8cf52985a9f2ddbaee79d"
+   },
+   "visibleProductionRoots": 6,
+   "sixFrozenRootsPreserved": true,
+   "discoveryError": null,
+   "newRelevantReflectionHitsByPath": {},
+   "note": null
+  },
+  {
+   "case": "control-unrelated-module-helper",
+   "observed": "ACCEPT",
+   "reason": null,
+   "expected": "ACCEPT",
+   "matchesExpectation": true,
+   "finding": null,
+   "mode": "t1_provenance.provenance (full)",
+   "exactActual764Input": false,
+   "actual764Observed": null,
+   "astValidAndCompiledOnly": true,
+   "newUnboundNames": [],
+   "witnessesChecked": 15,
+   "mutatedSHA256": {
+    "tools/lan_pilot.py": "59aa68e488a948a654a280390c1a55358f62742f1283037915aa6fb7fbac2d56"
+   },
+   "visibleProductionRoots": 6,
+   "sixFrozenRootsPreserved": true,
+   "discoveryError": null,
+   "newRelevantReflectionHitsByPath": {},
+   "note": null
+  },
+  {
+   "case": "control-unrelated-same-spelled-local",
+   "observed": "ACCEPT",
+   "reason": null,
+   "expected": "ACCEPT",
+   "matchesExpectation": true,
+   "finding": null,
+   "mode": "t1_provenance.provenance (full)",
+   "exactActual764Input": false,
+   "actual764Observed": null,
+   "astValidAndCompiledOnly": true,
+   "newUnboundNames": [],
+   "witnessesChecked": 15,
+   "mutatedSHA256": {
+    "tools/lan_pilot.py": "ed7a8b296685b8818b1cdd692aeb4cdb36ed47401986c867ef0a728e3207a11f"
+   },
+   "visibleProductionRoots": 6,
+   "sixFrozenRootsPreserved": true,
+   "discoveryError": null,
+   "newRelevantReflectionHitsByPath": {},
+   "note": null
+  },
+  {
+   "case": "L1-control-level0-positional-literal",
+   "observed": "ACCEPT",
+   "reason": null,
+   "expected": "ACCEPT",
+   "matchesExpectation": true,
+   "finding": null,
+   "mode": "t1_provenance.provenance (full)",
+   "exactActual764Input": false,
+   "actual764Observed": null,
+   "astValidAndCompiledOnly": true,
+   "newUnboundNames": [],
+   "witnessesChecked": 15,
+   "mutatedSHA256": {
+    "services/control-plane/src/inv/business_auth.py": "02875ae5fb56d712bf751ada303e7b1f6285cbb41fc39c2e80eb7870477a0a04"
+   },
+   "visibleProductionRoots": 6,
+   "sixFrozenRootsPreserved": true,
+   "discoveryError": null,
+   "newRelevantReflectionHitsByPath": {},
+   "note": "literal integer 0 is the declared control"
+  },
+  {
+   "case": "L1-control-level0-keyword-literal",
+   "observed": "ACCEPT",
+   "reason": null,
+   "expected": "ACCEPT",
+   "matchesExpectation": true,
+   "finding": null,
+   "mode": "t1_provenance.provenance (full)",
+   "exactActual764Input": false,
+   "actual764Observed": null,
+   "astValidAndCompiledOnly": true,
+   "newUnboundNames": [],
+   "witnessesChecked": 15,
+   "mutatedSHA256": {
+    "services/control-plane/src/inv/business_auth.py": "633e50dbdd16c54795e74b03e933415912dc897dc72fcef067c30af1988370d3"
+   },
+   "visibleProductionRoots": 6,
+   "sixFrozenRootsPreserved": true,
+   "discoveryError": null,
+   "newRelevantReflectionHitsByPath": {},
+   "note": null
+  },
+  {
+   "case": "L1-near-level1-keyword",
+   "observed": "REFUSE",
+   "reason": "UNCATALOGUED_PRODUCTION_SOURCE:services/control-plane/src/inv/business_auth.py",
+   "expected": "REFUSE:UNCATALOGUED_PRODUCTION_SOURCE:services/control-plane/src/inv/business_auth.py",
+   "matchesExpectation": true,
+   "finding": null,
+   "mode": "t1_provenance.provenance (full)",
+   "exactActual764Input": false,
+   "actual764Observed": null,
+   "astValidAndCompiledOnly": true,
+   "newUnboundNames": [],
+   "witnessesChecked": 15,
+   "mutatedSHA256": {
+    "services/control-plane/src/inv/business_auth.py": "7f0f5a64d5b81278a00921976de0f9bba404ecc27d143c1d763be6de995e6c63"
+   },
+   "visibleProductionRoots": 6,
+   "sixFrozenRootsPreserved": true,
+   "discoveryError": null,
+   "newRelevantReflectionHitsByPath": {
+    "services/control-plane/src/inv/business_auth.py": [
+     "ENUMERATED_REFLECTION_NONLITERAL_KEY"
+    ]
+   },
+   "note": "level= keyword form of the declared category"
+  },
+  {
+   "case": "L1-near-package-keyword-literal",
+   "observed": "REFUSE",
+   "reason": "UNCATALOGUED_PRODUCTION_SOURCE:services/control-plane/src/inv/business_auth.py",
+   "expected": "REFUSE:UNCATALOGUED_PRODUCTION_SOURCE:services/control-plane/src/inv/business_auth.py",
+   "matchesExpectation": true,
+   "finding": null,
+   "mode": "t1_provenance.provenance (full)",
+   "exactActual764Input": false,
+   "actual764Observed": null,
+   "astValidAndCompiledOnly": true,
+   "newUnboundNames": [],
+   "witnessesChecked": 15,
+   "mutatedSHA256": {
+    "services/control-plane/src/inv/business_auth.py": "bef9b795181fe3af0beeb02c1d75871c4424902536e6990efd9cf2ca19b598c3"
+   },
+   "visibleProductionRoots": 6,
+   "sixFrozenRootsPreserved": true,
+   "discoveryError": null,
+   "newRelevantReflectionHitsByPath": {
+    "services/control-plane/src/inv/business_auth.py": [
+     "ENUMERATED_REFLECTION_NONLITERAL_KEY"
+    ]
+   },
+   "note": "package= keyword form of the declared category"
+  },
+  {
+   "case": "L1-near-dunder-import-level-hidden-by-starred-args",
+   "observed": "ACCEPT",
+   "reason": null,
+   "expected": "REFUSE",
+   "matchesExpectation": false,
+   "finding": "B9f-L1 candidate if ACCEPT",
+   "mode": "t1_provenance.provenance (full)",
+   "exactActual764Input": false,
+   "actual764Observed": null,
+   "astValidAndCompiledOnly": true,
+   "newUnboundNames": [],
+   "witnessesChecked": 15,
+   "mutatedSHA256": {
+    "services/control-plane/src/inv/business_auth.py": "b27a732d563ba16316d070bf866be00e938469d6e0adcab4c5a2a1c615359a50"
+   },
+   "visibleProductionRoots": 6,
+   "sixFrozenRootsPreserved": true,
+   "discoveryError": null,
+   "newRelevantReflectionHitsByPath": {},
+   "note": "level supplied through a positional *spread before slot 4: supplied() only sees args[4] or level= and the ** spread; same causal import as the actual level1 case"
+  },
+  {
+   "case": "L1-near-importlib-dunder-import-level1",
+   "observed": "ACCEPT",
+   "reason": null,
+   "expected": "REFUSE",
+   "matchesExpectation": false,
+   "finding": "B9f-L1 candidate if ACCEPT",
+   "mode": "t1_provenance.provenance (full)",
+   "exactActual764Input": false,
+   "actual764Observed": null,
+   "astValidAndCompiledOnly": true,
+   "newUnboundNames": [],
+   "witnessesChecked": 15,
+   "mutatedSHA256": {
+    "services/control-plane/src/inv/business_auth.py": "1194ca93cba6c27c33c2adb66106ecf011f2128d3802f5ed020596dcc085cd07"
+   },
+   "visibleProductionRoots": 6,
+   "sixFrozenRootsPreserved": true,
+   "discoveryError": null,
+   "newRelevantReflectionHitsByPath": {},
+   "note": "importlib.__import__ is inside the existing importlib.* enumeration and has the same (name, globals, locals, fromlist, level) signature; relative_import_unknown only checks builtins.__import__"
+  },
+  {
+   "case": "L2-near-imported-callee-star-shadow-workspace_api",
+   "observed": "REFUSE",
+   "reason": "UNRESOLVED:CALLEE_REBOUND",
+   "expected": "REFUSE",
+   "matchesExpectation": true,
+   "finding": "B9f-L2 candidate if ACCEPT",
+   "mode": "t1_provenance.provenance (full)",
+   "exactActual764Input": false,
+   "actual764Observed": null,
+   "astValidAndCompiledOnly": true,
+   "newUnboundNames": [],
+   "witnessesChecked": 15,
+   "mutatedSHA256": {
+    "services/control-plane/src/inv/workspace_api.py": "bc4f364b9126956ed0998c8f54e3ddb8eb8ac6226617892f252548e48d6f43a3"
+   },
+   "visibleProductionRoots": 6,
+   "sixFrozenRootsPreserved": true,
+   "discoveryError": null,
+   "newRelevantReflectionHitsByPath": {},
+   "note": "module-scope star import after \"from .observation import NodeObservation\": at call time (inside WorkspaceAPI methods, e.g. :98) a foreign __all__ may rebind NodeObservation; star is in the binding scope of the call-site name"
+  },
+  {
+   "case": "L2-near-imported-callee-global-import-workspace_config",
+   "observed": "ACCEPT",
+   "reason": null,
+   "expected": "REFUSE",
+   "matchesExpectation": false,
+   "finding": "B9f-L2 candidate if ACCEPT",
+   "mode": "t1_provenance.provenance (full)",
+   "exactActual764Input": false,
+   "actual764Observed": null,
+   "astValidAndCompiledOnly": true,
+   "newUnboundNames": [],
+   "witnessesChecked": 15,
+   "mutatedSHA256": {
+    "services/control-plane/src/inv/workspace_config.py": "7f3fa416ae4dd0a456039a06331c735befe1d06de610769f5e64b92333bcb8f7"
+   },
+   "visibleProductionRoots": 6,
+   "sixFrozenRootsPreserved": true,
+   "discoveryError": null,
+   "newRelevantReflectionHitsByPath": {},
+   "note": "exact 764 global-import installer shape applied to the imported callee name WorkspaceAPI (configured_workspace :44 passes database); installer runs at import, before configured_workspace is called"
+  },
+  {
+   "case": "L2-near-lan_pilot-global-walrus-through-comprehension",
+   "observed": "REFUSE",
+   "reason": "UNRESOLVED:CALLEE_REBOUND",
+   "expected": "REFUSE:UNRESOLVED:CALLEE_REBOUND",
+   "matchesExpectation": true,
+   "finding": null,
+   "mode": "t1_provenance.provenance (full)",
+   "exactActual764Input": false,
+   "actual764Observed": null,
+   "astValidAndCompiledOnly": true,
+   "newUnboundNames": [],
+   "witnessesChecked": 15,
+   "mutatedSHA256": {
+    "tools/lan_pilot.py": "ab64038c769190f29ed6ce6df267f0d267f9855a0ba1e845ea1f78dd93991933"
+   },
+   "visibleProductionRoots": 6,
+   "sixFrozenRootsPreserved": true,
+   "discoveryError": null,
+   "newRelevantReflectionHitsByPath": {},
+   "note": "outer-scope walrus inside a comprehension honours the enclosing global"
+  },
+  {
+   "case": "L2-control-lan_pilot-nested-def-under-global-function",
+   "observed": "ACCEPT",
+   "reason": null,
+   "expected": "ACCEPT",
+   "matchesExpectation": true,
+   "finding": null,
+   "mode": "t1_provenance.provenance (full)",
+   "exactActual764Input": false,
+   "actual764Observed": null,
+   "astValidAndCompiledOnly": true,
+   "newUnboundNames": [],
+   "witnessesChecked": 15,
+   "mutatedSHA256": {
+    "tools/lan_pilot.py": "51d82d2cb3f68684c69bb56ce176b4232df19ae548dfac41275dab557ebb1c2c"
+   },
+   "visibleProductionRoots": 6,
+   "sixFrozenRootsPreserved": true,
+   "discoveryError": null,
+   "newRelevantReflectionHitsByPath": {},
+   "note": "comprehension iteration variable is its own scope even inside a function with a global declaration"
+  }
+ ],
+ "binderFixtures": [
+  {
+   "case": "class-body-global-store",
+   "sourceSHA256": {
+    "fixtures/claude_b9f_binder.py": "4c45bd094dea8ad1acf91fad141c70b6a7b6c77f32126a106a528c141d87463f"
+   },
+   "error": null,
+   "unresolved": [
+    "UNRESOLVED:CALLEE_REBOUND"
+   ],
+   "ownedFormalsAt": {
+    "accept": []
+   },
+   "expectedReason": "UNRESOLVED:CALLEE_REBOUND",
+   "expectedFormalOwned": null,
+   "matchesExpectation": true,
+   "note": null
+  },
+  {
+   "case": "module-walrus-in-comprehension",
+   "sourceSHA256": {
+    "fixtures/claude_b9f_binder.py": "b567bb66f729903a8f046a5b7781a3ca1059f4eeb97d57764d423b6e8979ac24"
+   },
+   "error": null,
+   "unresolved": [
+    "UNRESOLVED:CALLEE_REBOUND"
+   ],
+   "ownedFormalsAt": {
+    "accept": []
+   },
+   "expectedReason": "UNRESOLVED:CALLEE_REBOUND",
+   "expectedFormalOwned": null,
+   "matchesExpectation": true,
+   "note": null
+  },
+  {
+   "case": "global-for-target",
+   "sourceSHA256": {
+    "fixtures/claude_b9f_binder.py": "cd53902ddf4f5405f1be946e60731648b678b80a93ce971bffa1769ad5ed20aa"
+   },
+   "error": null,
+   "unresolved": [
+    "UNRESOLVED:CALLEE_REBOUND"
+   ],
+   "ownedFormalsAt": {
+    "accept": []
+   },
+   "expectedReason": "UNRESOLVED:CALLEE_REBOUND",
+   "expectedFormalOwned": null,
+   "matchesExpectation": true,
+   "note": null
+  },
+  {
+   "case": "global-with-target",
+   "sourceSHA256": {
+    "fixtures/claude_b9f_binder.py": "db25337a0c9fda46a5abb8cbbc8fcd3d52282855dbd90a27dd735acccf23c3c0"
+   },
+   "error": null,
+   "unresolved": [
+    "UNRESOLVED:CALLEE_REBOUND"
+   ],
+   "ownedFormalsAt": {
+    "accept": []
+   },
+   "expectedReason": "UNRESOLVED:CALLEE_REBOUND",
+   "expectedFormalOwned": null,
+   "matchesExpectation": true,
+   "note": null
+  },
+  {
+   "case": "module-type-alias",
+   "sourceSHA256": {
+    "fixtures/claude_b9f_binder.py": "01520e5a7ce5cafbb50164e00eb4fabde4a2278ed7cf5b4b0d0eb19214c8a69a"
+   },
+   "error": null,
+   "unresolved": [
+    "UNRESOLVED:CALLEE_REBOUND"
+   ],
+   "ownedFormalsAt": {
+    "accept": []
+   },
+   "expectedReason": "UNRESOLVED:CALLEE_REBOUND",
+   "expectedFormalOwned": null,
+   "matchesExpectation": true,
+   "note": null
+  },
+  {
+   "case": "global-in-nested-only",
+   "sourceSHA256": {
+    "fixtures/claude_b9f_binder.py": "509f70c986a9aba1af4f9f0ee118d959b93ea03890d29e778fb9384f15d1af10"
+   },
+   "error": null,
+   "unresolved": [
+    "UNRESOLVED:CALLEE_REBOUND"
+   ],
+   "ownedFormalsAt": {
+    "accept": []
+   },
+   "expectedReason": "UNRESOLVED:CALLEE_REBOUND",
+   "expectedFormalOwned": null,
+   "matchesExpectation": true,
+   "note": "global in the nested function itself"
+  },
+  {
+   "case": "control-global-in-sibling-other-name",
+   "sourceSHA256": {
+    "fixtures/claude_b9f_binder.py": "f82459641a670ebb353e91171c5d868a30617a9d70ba07ababd58a8230c8afb6"
+   },
+   "error": null,
+   "unresolved": [],
+   "ownedFormalsAt": {
+    "accept": [
+     "slot"
+    ]
+   },
+   "expectedReason": null,
+   "expectedFormalOwned": true,
+   "matchesExpectation": true,
+   "note": null
+  },
+  {
+   "case": "control-lambda-arg-same-name",
+   "sourceSHA256": {
+    "fixtures/claude_b9f_binder.py": "9c001fc8063b7a1d6de19cde4f535fa3f01d18cc523a9fea33905bff761cd37e"
+   },
+   "error": null,
+   "unresolved": [],
+   "ownedFormalsAt": {
+    "accept": [
+     "slot"
+    ]
+   },
+   "expectedReason": null,
+   "expectedFormalOwned": true,
+   "matchesExpectation": true,
+   "note": null
+  },
+  {
+   "case": "control-class-method-same-name",
+   "sourceSHA256": {
+    "fixtures/claude_b9f_binder.py": "eb420dd59eea846bd75d8030a89ca5224fbd77c843ca2b581f6d0401f4674cb7"
+   },
+   "error": null,
+   "unresolved": [],
+   "ownedFormalsAt": {
+    "accept": [
+     "slot"
+    ]
+   },
+   "expectedReason": null,
+   "expectedFormalOwned": true,
+   "matchesExpectation": true,
+   "note": null
+  },
+  {
+   "case": "control-cross-module-import-plain",
+   "sourceSHA256": {
+    "fixtures/claude_b9f_binder.py": "be5fae9a24efa55d6e7f8bf6bbf2da4ab77cc2c6220462bf3a6df26cc81a89b3",
+    "fixtures/claude_b9f_callee.py": "9c9c6c6633fec82fc6195723eaae9952c06d003420fddcfae78fd9d33ef631c0"
+   },
+   "error": null,
+   "unresolved": [],
+   "ownedFormalsAt": {
+    "accept": [
+     "slot"
+    ]
+   },
+   "expectedReason": null,
+   "expectedFormalOwned": true,
+   "matchesExpectation": true,
+   "note": null
+  },
+  {
+   "case": "near-cross-module-imported-callee-star-shadow",
+   "sourceSHA256": {
+    "fixtures/claude_b9f_binder.py": "966e2b0cb2ea3564319da1e13106b26f7626504ead6ef6b16b40283d09178938",
+    "fixtures/claude_b9f_callee.py": "9c9c6c6633fec82fc6195723eaae9952c06d003420fddcfae78fd9d33ef631c0"
+   },
+   "error": null,
+   "unresolved": [],
+   "ownedFormalsAt": {
+    "accept": [
+     "slot"
+    ]
+   },
+   "expectedReason": "UNRESOLVED:CALLEE_REBOUND",
+   "expectedFormalOwned": null,
+   "matchesExpectation": false,
+   "note": "star import in the CALLER binding scope of an imported callee name"
+  },
+  {
+   "case": "near-cross-module-imported-callee-global-import",
+   "sourceSHA256": {
+    "fixtures/claude_b9f_binder.py": "45b6c5d7ac571d0c7a7518b2c809db659b7b95d573b4a0cae8724df5bc8e9755",
+    "fixtures/claude_b9f_callee.py": "9c9c6c6633fec82fc6195723eaae9952c06d003420fddcfae78fd9d33ef631c0"
+   },
+   "error": null,
+   "unresolved": [],
+   "ownedFormalsAt": {
+    "accept": [
+     "slot"
+    ]
+   },
+   "expectedReason": "UNRESOLVED:CALLEE_REBOUND",
+   "expectedFormalOwned": null,
+   "matchesExpectation": false,
+   "note": "global-declared import in the CALLER rebinding an imported callee name"
+  },
+  {
+   "case": "info-nonlocal-rebind-nested-callee",
+   "sourceSHA256": {
+    "fixtures/claude_b9f_binder.py": "651934c76b9b91d560b73725b4db36926f2e21dcd5965f6866e3beae67d4e5e9"
+   },
+   "error": null,
+   "unresolved": [],
+   "ownedFormalsAt": {
+    "outer.accept": [
+     "slot"
+    ]
+   },
+   "expectedReason": null,
+   "expectedFormalOwned": null,
+   "matchesExpectation": true,
+   "note": "INFO only: nonlocal is outside this cut"
+  }
+ ],
+ "reflectionUnits": [
+  {
+   "case": "starred-level",
+   "expression": "__import__('workspace_config', *(globals(), None, (), 1))",
+   "unknown": false,
+   "reviewerWantsUnknown": true,
+   "matchesExpectation": false
+  },
+  {
+   "case": "starred-tail-after-four",
+   "expression": "__import__('workspace_config', globals(), None, (), *(1,))",
+   "unknown": true,
+   "reviewerWantsUnknown": true,
+   "matchesExpectation": true
+  },
+  {
+   "case": "importlib-dunder-level1",
+   "expression": "importlib.__import__('workspace_config', globals(), None, (), 1)",
+   "unknown": false,
+   "reviewerWantsUnknown": true,
+   "matchesExpectation": false
+  },
+  {
+   "case": "importlib-dunder-level0",
+   "expression": "importlib.__import__('json', globals(), None, (), 0)",
+   "unknown": false,
+   "reviewerWantsUnknown": false,
+   "matchesExpectation": true
+  },
+  {
+   "case": "import_module-starred-package-absolute",
+   "expression": "importlib.import_module('json', *('x',))",
+   "unknown": true,
+   "reviewerWantsUnknown": false,
+   "matchesExpectation": false
+  }
+ ],
+ "mismatches": [
+  "L1-near-dunder-import-level-hidden-by-starred-args",
+  "L1-near-importlib-dunder-import-level1",
+  "L2-near-imported-callee-global-import-workspace_config",
+  "near-cross-module-imported-callee-star-shadow",
+  "near-cross-module-imported-callee-global-import",
+  "starred-level",
+  "importlib-dunder-level1",
+  "import_module-starred-package-absolute"
+ ],
+ "effectfulMutantsImportedOrExecuted": false,
+ "productFilesWritten": 0
+}

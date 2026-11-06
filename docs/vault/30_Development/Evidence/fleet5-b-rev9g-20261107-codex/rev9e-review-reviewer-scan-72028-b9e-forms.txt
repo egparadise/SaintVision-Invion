@@ -1,0 +1,23 @@
+{
+ "source": "72028cbac903c4415d9979f980a6e0f9948e914f",
+ "paths": 11,
+ "scope": "productionParsed (11) of the reviewer-measured 25 parsed/audited paths",
+ "formsByPath": {
+  "services/control-plane/src/inv/app.py": {
+   "nonlocalStatement": 3
+  },
+  "services/control-plane/src/inv/db.py": {},
+  "services/control-plane/src/inv/errors.py": {},
+  "services/control-plane/src/inv/observation.py": {},
+  "services/control-plane/src/inv/observer_worker.py": {},
+  "services/control-plane/src/inv/worker.py": {},
+  "services/control-plane/src/inv/workspace_api.py": {},
+  "services/control-plane/src/inv/workspace_config.py": {},
+  "tools/lan_execution.py": {},
+  "tools/lan_pilot.py": {},
+  "tools/remote_workspace_entry.py": {}
+ },
+ "totals": {
+  "nonlocalStatement": 3
+ }
+}
