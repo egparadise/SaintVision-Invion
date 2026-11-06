@@ -1,0 +1,35 @@
+{
+  "expected": {
+    "Set INV_MLFLOW_LIVE_URI (the run-mlflow lane starts the server)": 3,
+    "PowerShell and csc.exe shim require Windows": 13,
+    "PowerShell parser requires Windows": 2,
+    "PowerShell required": 9,
+    "Actual Windows PowerShell launcher": 10,
+    "Explicit browser smoke integration lane required (INV_BROWSER_SMOKE_INTEGRATION=1)": 1,
+    "run only through tools/placement_lock_wait_diagnostic.py": 1,
+    "run only through S11 Storage Failure Hosted Reference opt-in lane": 1,
+    "claude is not installed on this machine": 1,
+    "codex is not installed on this machine": 1,
+    "gemini is not installed on this machine": 1,
+    "antigravity is not installed on this machine": 1,
+    "run only through tools/placement_benchmark.py": 1,
+    "Intranet CA NSS DB live browser test requires Linux, certutil (libnss3-tools), and Playwright": 1
+  },
+  "actual": {
+    "PowerShell and csc.exe shim require Windows": 13,
+    "PowerShell parser requires Windows": 2,
+    "PowerShell required": 9,
+    "Actual Windows PowerShell launcher": 10,
+    "Explicit browser smoke integration lane required (INV_BROWSER_SMOKE_INTEGRATION=1)": 1,
+    "Set INV_MLFLOW_LIVE_URI (the run-mlflow lane starts the server)": 3,
+    "run only through tools/placement_benchmark.py": 1,
+    "run only through tools/placement_lock_wait_diagnostic.py": 1,
+    "run only through S11 Storage Failure Hosted Reference opt-in lane": 1,
+    "claude is not installed on this machine": 1,
+    "codex is not installed on this machine": 1,
+    "gemini is not installed on this machine": 1,
+    "antigravity is not installed on this machine": 1,
+    "Intranet CA NSS DB live browser test requires Linux, certutil (libnss3-tools), and Playwright": 1
+  },
+  "matches": true
+}

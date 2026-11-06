@@ -1,0 +1,19 @@
+{
+  "schemaVersion": "fleet5-k2-trusted-producer-contract-root-dispatch:1",
+  "atKST": "2026-11-06T10:33:00+09:00",
+  "task": "task_a95ef3d8ccce",
+  "dispatch": "ctx_ed23b4a777d0",
+  "startReceipt": "ready follow_up newTask",
+  "previousTask": "task_38393b5d1865 actualsucceeded/settled beforefollowup",
+  "previousActualWorkerDone": "msg_6987f7ecdcb5",
+  "terminal": "term_7458b407-4902-42ad-9554-eb58ea9b7296",
+  "initialWorkspace": "d98dc9d3-fe61-4cb2-9776-dff349347a61::D:/Project/SaintVisionI-Invion/fleet5-consecutive-leaf-rotation-20261105",
+  "targetOwnWorkspace": "fleet5-k2-trusted-producer-contract-20261106",
+  "sourceBase": "eb32b211ab3704935b9431747089ab0715582a74",
+  "scope": "DESIGN-FIRST trustedproducer/authentication/effectboundary+40futurecasematrix, uniqueDocs/staticonly",
+  "currentActualCodeGrant": false,
+  "futureActualIndependentReviewer": "Claude viaRoot afterimmutableproposal/ownDocs",
+  "noPrivateKeyOrDBSSHNodeDockerVMAction": true,
+  "BRev6Independent": true,
+  "wholeProgramComplete": false
+}

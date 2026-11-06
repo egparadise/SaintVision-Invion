@@ -1,0 +1,208 @@
+{
+  "schemaVersion": "fleet5-eb32-final-bounded-root-verification:1",
+  "atKST": "2026-11-06T10:21:17+09:00",
+  "source": "eb32b211ab3704935b9431747089ab0715582a74",
+  "report": "f28fb41d6e566625d5feb27535d4c3d40fbc9100",
+  "reportScope": "32 unique ownerHistory/Evidence only; productdiff0",
+  "runs": {
+    "Core": {
+      "id": 42138733821,
+      "source": "eb32b211ab3704935b9431747089ab0715582a74",
+      "ref": "agent/codex/fleet5-prepare-rate-clock-test-20261106",
+      "correlation": "FLEET5-K1-reviewed-combined-Core-eb32b211ab37-20261106T094204KST",
+      "runAttempt": 1,
+      "allJobsSuccess": true,
+      "jobs": [
+        {
+          "id": 127633370756,
+          "conclusion": "success",
+          "skippedSteps": []
+        },
+        {
+          "id": 127633370998,
+          "conclusion": "success",
+          "skippedSteps": [
+            "FLEET5 early native Go peer-policy lifecycle proof",
+            "Publish FLEET5 native peer-phase proof (including expected baseline failure)",
+            "FLEET5 fixed native Go two-cycle proof",
+            "Publish FLEET5 fixed native proof",
+            "Collect fixed-SHA S08 build acceptance observations",
+            "Recompute S08 build acceptance verdict from raw artifacts"
+          ]
+        }
+      ]
+    },
+    "reportDocs": {
+      "id": 42142783600,
+      "source": "f28fb41d6e566625d5feb27535d4c3d40fbc9100",
+      "ref": "agent/codex/fleet5-k1-combined-core-report-20261106",
+      "correlation": "FLEET5-K1-combined-Core-report-Docs-f28fb41d6e56-20261106T101702KST",
+      "runAttempt": 1,
+      "allJobsSuccess": true,
+      "jobs": [
+        {
+          "id": 127646928806,
+          "conclusion": "success",
+          "skippedSteps": []
+        }
+      ]
+    }
+  },
+  "actualDownloadedArtifactChecks": [
+    {
+      "id": 13467404761,
+      "bytes": 13987414,
+      "rootDownloadedSHA256": "4773e870d5e23c775ee1a1532fd563f4140f2039c159fd9e2fabd1d071b8561d",
+      "actualRemoteDigestMatches": true
+    },
+    {
+      "id": 13465564407,
+      "bytes": 1766,
+      "rootDownloadedSHA256": "d96dff3949cb0e633172cd69011394c838458fb21a68f3157a28b71128864197",
+      "actualRemoteDigestMatches": true
+    }
+  ],
+  "RootActuallyParsedRawSelectedXMLAndGoJSON": true,
+  "counts": {
+    "main:build-product-runtime-real-pg.xml": {
+      "total": 13,
+      "failure": 0,
+      "error": 0,
+      "skip": 0,
+      "SHA256": "60a48d07eb589c8b30f02fb7f7f1b597c1ecf7be8e8ea87b3d8881f22e0853f9",
+      "pass": 13
+    },
+    "main:business-handoff-tests.xml": {
+      "total": 17,
+      "failure": 0,
+      "error": 0,
+      "skip": 0,
+      "SHA256": "7844c7a8de2b16a88e8d70a5bb2b8e86282762372642dbf25524b8eab2d1286d",
+      "pass": 17
+    },
+    "main:containment-tests.xml": {
+      "total": 28,
+      "failure": 0,
+      "error": 0,
+      "skip": 0,
+      "SHA256": "ac37c989adee54a0c97d672d331148ccc5de0a9659f1c85f70832bf35241cb59",
+      "pass": 28
+    },
+    "main:core-tests.xml": {
+      "total": 9262,
+      "failure": 0,
+      "error": 0,
+      "skip": 46,
+      "SHA256": "d29b146cb62c0c3e1953a0fc3d50c31ca80ffc3bb07c4556235471883b8132b4",
+      "pass": 9216,
+      "affectedFile": {
+        "passed": 30,
+        "functions": 13,
+        "skips": 0,
+        "requiredRateAndBoundaryPassed": true
+      }
+    },
+    "main:cx01-recovery-tests.xml": {
+      "total": 20,
+      "failure": 0,
+      "error": 0,
+      "skip": 0,
+      "SHA256": "33f5aaedb9f935182d210a65c40f76843f633a000b1c0100a1f74c27f234dd1e",
+      "pass": 20
+    },
+    "main:docker-host-tests.xml": {
+      "total": 2,
+      "failure": 0,
+      "error": 0,
+      "skip": 0,
+      "SHA256": "12a84a40d81a5364566c7222a70e15be2fdf6a35dfd370772c66c9f4cb93ccd8",
+      "pass": 2
+    },
+    "main:lan-installer-tests.xml": {
+      "total": 17,
+      "failure": 0,
+      "error": 0,
+      "skip": 0,
+      "SHA256": "9747097e70bb742b0185c9e968bdf168d7bbae178adf081ce60cdbf20ef70458",
+      "pass": 17
+    },
+    "main:lan-pilot-database-real-pg.xml": {
+      "total": 2,
+      "failure": 0,
+      "error": 0,
+      "skip": 0,
+      "SHA256": "6db9f145825ac616cc98208812ca6b317ec62a545a7e5ffb365937183a23e7b7",
+      "pass": 2
+    },
+    "main:shard-recovery-tests.xml": {
+      "total": 21,
+      "failure": 0,
+      "error": 0,
+      "skip": 0,
+      "SHA256": "d79e1bce5e30f1a5380da5e48217d360a6d8e4f83a2af59cb722925761b45cfb",
+      "pass": 21
+    },
+    "main:workspace-tests.xml": {
+      "total": 23,
+      "failure": 0,
+      "error": 0,
+      "skip": 0,
+      "SHA256": "65e3c0e383c7bd79c24d8dc51a7c1f4f8803e565594e63873ab723f3175c2928",
+      "pass": 23
+    },
+    "s01:s01-storage-roundtrip.xml": {
+      "total": 1,
+      "failure": 0,
+      "error": 0,
+      "skip": 0,
+      "SHA256": "c434df9453d3bff005bf22a3df5c4697bf83c92cecd7822b3a37fe513d294cc1",
+      "pass": 1
+    },
+    "s01:s3-product-object-store.xml": {
+      "total": 2,
+      "failure": 0,
+      "error": 0,
+      "skip": 0,
+      "SHA256": "51087e51eb809a376ddfc10effe16be13816c1ac715eee605511e63e23454b25",
+      "pass": 2
+    },
+    "s01:s3-product-postgres.xml": {
+      "total": 3,
+      "failure": 0,
+      "error": 0,
+      "skip": 0,
+      "SHA256": "aa6f879d903ad75c986e8cfbc2487d42a58a541bb189549cd12196120f36e2d1",
+      "pass": 3
+    }
+  },
+  "Go": {
+    "topPass": 109,
+    "passEvents": 343,
+    "skipNames": [
+      "TestDockerLiveCompatibility"
+    ],
+    "failEvents": 0,
+    "K1TopPass": 42,
+    "K1PassEvents": 165,
+    "K1Skips": 0
+  },
+  "compiledBinaryMetadataReadOnly": {
+    "SHA256": "2aa70e1f42992790700a53b0989dfa1800785227021de9f7b0e13436be33fb8a",
+    "vcsRevision": "eb32b211ab3704935b9431747089ab0715582a74",
+    "vcsModified": false,
+    "Go": "1.27.1",
+    "CGO_ENABLED": 0,
+    "ELF": true,
+    "binaryExecuted": false
+  },
+  "priorActualCodeReview": "191b6f843a643ee4989ce28c9ebf1816963ffe28 ACCEPT",
+  "RootTestREADMEWorkflowPGReview": "eb32 actualACCEPT",
+  "oldCore42126222201": "FAILURE preserved/historicalcauseunproven",
+  "rawZIPXMLGoStdoutBinaryNeverGitVaultExported": true,
+  "boundedK1SourceReportDeliveryEligible": true,
+  "K2TrustedProducers40Runtime5PC": "NOTRUN/unaccepted",
+  "wholeProgramComplete": false,
+  "rootReadImmutableAll10ReportGatesExit0": true,
+  "RootActual46SkipNamesMatchPriorC6f": true,
+  "RootActualSkipNameSetSHA256": "2d5bdb2536d97dd37120e067d51b07ca6bc2913b36ba9c1f2959a2f07ff14d2c"
+}

@@ -1,15 +1,19 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.392"
+version: "1.0.393"
 status: "review"
 author: "Codex"
-updated: "2026-11-06T09:52:19+09:00"
+updated: "2026-11-06T10:33:00+09:00"
 source_of_truth: "Git"
 active_card: "FLEET5-20261105 five physical node orchestration"
-active_card_status: "eb32 reviewedcombined/freshCorepending withsameauthorcallback; B5 actualrevision2M5L/rev6; physicalincomplete"
-active_card_next: "exactCoreterminal one-shotreply resumesctx_ceecb3824e33 finalartifact/report; B Codexrev6 immutable/Docs thenoneactualreview; Root finalboundedgate noK2physicalclaim"
+active_card_status: "K1boundedCOMPLETE/CoreallSUCCESS/f28verified; newK2design a95/ctxed23 ready; B rev6; physicalwholeincomplete"
+active_card_next: "K2 Codex newtaska95/ctxed23 close actualtrustedproducer/effectboundaryproposal+Docs; B Codexrev6; Root oneactualreview afterimmutableheads; no oldK1CI reruns"
 ---
+
+## 2026-11-06T10:33:00+09:00 K1 실제 완료와 K2 별도 착수
+
+작업한 것과 확인: K1 eb32/Core42138733821 두job·최종f28/Docs42142783600과 원본artifact/XML/Go/binary metadata를 Root가 검증해 한정 납품을 수락했다. 실제 worker_done msg_6987f7ecdcb5 뒤 별도 K2 설계 task_a95ef3d8ccce/ctx_ed23b4a777d0를 시작했다. B rev6와 K2·40runtime·5대 인수는 별도 진행/미완료다. 다음 첫 행동/담당: 새 K2 Codex는 설치 trust/실제 producer/read-only와 effect 경계의 닫힌 제안·ownDocs, B Codex는 rev6다. Root는 실제 새 불변 제안의 독립 검토와 구체 구현 범위를 정한다. 구형 K1 ctx_ceecb3824e33에 후속을 보내지 않고 새 ctx_ed23b4a777d0를 사용한다.
 
 ## 2026-11-06T09:52:19+09:00 실제 PG 검토와 fullCore handback
 

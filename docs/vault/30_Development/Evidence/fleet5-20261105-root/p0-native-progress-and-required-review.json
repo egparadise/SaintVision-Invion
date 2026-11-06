@@ -3,8 +3,8 @@
   "recordedAtKST": "2026-11-06T00:46:51+09:00",
   "rootBase": "2b1753ce59c09037b5e130a7ffe64794d1d45fdf",
   "priorRootCheckpoint": {
-    "SHA": "b0de0331b1cbdf53451e2ae7e3aeb2c1268aa738",
-    "Docs": 42135996673,
+    "SHA": "f2e7ca8fca42231d99add868511d3db7bb4692b4",
+    "Docs": 42140305962,
     "exactHeadCorrelationAllJobsSuccess": true,
     "remoteMatches": true,
     "syncExits": [
@@ -12,13 +12,13 @@
       0,
       0
     ],
-    "independentlyMatchedNormalizedDestinationHashes": 2763,
+    "independentlyMatchedNormalizedDestinationHashes": 2769,
     "pending": 0,
     "conflicts": 0,
     "trackedAndUntrackedClean": true,
     "rootDocsOnly": true,
     "wholeProgramComplete": false,
-    "verifiedAtKST": "2026-11-06T09:21:12+09:00"
+    "verifiedAtKST": "2026-11-06T09:56:54+09:00"
   },
   "actualPlanLowReview": {
     "source": "803ad270562b1b75e44d26f9e14b965c714ab519",
@@ -1906,6 +1906,31 @@
       "source": "8bac0838c08bbdd49cf954a517594c0973b55da6",
       "path": "docs/vault/30_Development/Evidence/fleet5-b-rev5-228e-review-20261106-claude/review.json",
       "SHA256": "e1fec7e9aaa406c881e7fd1d512ec597a33ee7cac0f4fe96886d73a750f3ecfc"
+    },
+    {
+      "source": "f28fb41d6e566625d5feb27535d4c3d40fbc9100",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k1-combined-core-ci-20261106-codex/combined-source-ci-final.json",
+      "SHA256": "ff5805a8c47357afc267a7431a7e217131068808dd2008b1ae7c15016f480860"
+    },
+    {
+      "source": "f28fb41d6e566625d5feb27535d4c3d40fbc9100",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k1-combined-core-ci-20261106-codex/combined-junit-counts.json",
+      "SHA256": "317ac7ce8b0e3b80fa6e503655deb6d3ca576754d6dadc2b7e7362acc4d05eb6"
+    },
+    {
+      "source": "f28fb41d6e566625d5feb27535d4c3d40fbc9100",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k1-combined-core-ci-20261106-codex/compiled-binary-metadata.json",
+      "SHA256": "bcca947adcdc524537eef5c99fd715fe531e2c5da597e202608c23e5de8654f9"
+    },
+    {
+      "source": "f28fb41d6e566625d5feb27535d4c3d40fbc9100",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k1-combined-core-ci-20261106-codex/core-declared-skip-ratchet.json",
+      "SHA256": "693d930c7ccd02b740114485f99f78e63a01456e73a4fa7646a3a433c33b4186"
+    },
+    {
+      "source": "f28fb41d6e566625d5feb27535d4c3d40fbc9100",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k1-combined-core-ci-20261106-codex/prepublication-scope-audit.json",
+      "SHA256": "11f9d0235ee73701b41d2ea670d7825f410520ad0f473ee3fa834fda966baeb4"
     }
   ],
   "notGatheredRawOrSharedArtifacts": [
@@ -2490,7 +2515,7 @@
     "ownerT1T2T3": "msg_620855c76519",
     "normativeRevisionReply": "msg_0392caf64d5d"
   },
-  "latestRecordAtKST": "2026-11-06T09:52:19+09:00",
+  "latestRecordAtKST": "2026-11-06T10:33:00+09:00",
   "optionalLowTokenTestDelta": {
     "source": "f0af307705b4923ebc3e231db5238af4c70aa389",
     "scope": "two otherwise-valid token payload corrections and JSON validity assertions; runtime unchanged",
@@ -2804,7 +2829,7 @@
     "sourceFullCoreAccepted": true,
     "actualCodeReviewTask": "task_5627222e0f59",
     "actualCodeReviewDispatch": "ctx_0918954c585c",
-    "currentAuthorization": "finishSAMEfreshCore/finalartifact/report afterone-shotreply; no newCore/retry/Nodewrites",
+    "currentAuthorization": "K1finished; separateK2DESIGN-FIRST task_a95ef3d8ccce/ctx_ed23b4a777d0 only",
     "reviewDocs": 42119997927,
     "actualDecisionMessage": "msg_87002d358dbb",
     "actualCodeAccepted": true,
@@ -2824,14 +2849,18 @@
     "acceptanceAxis": "implementation only; fullCorefailed andwholeK1cardnotdone",
     "qualifiedFailedReport": "a413c0c2e9a6d070321480f9c216b8aa07e5fd74",
     "qualifiedFailedReportDocs": 42133327925,
-    "K2AndPhysical": "NOTRUN",
+    "K2AndPhysical": "NOTRUN/unaccepted",
     "reviewedCombinedSource": "eb32b211ab3704935b9431747089ab0715582a74",
     "testREADMEWorkflowDelta": "RootactualACCEPT+rawPGartifactparsed",
     "README_R1": "CLOSED",
     "freshFullCore": 42138733821,
-    "freshFullCoreState": "in_progress",
-    "freshFullCoreAccepted": false,
-    "wholeCardDone": false
+    "freshFullCoreState": "SUCCESS all2jobsactualRootverified",
+    "freshFullCoreAccepted": true,
+    "wholeCardDone": true,
+    "finalReport": "f28fb41d6e566625d5feb27535d4c3d40fbc9100",
+    "finalReportDocs": 42142783600,
+    "scopeOfCompletion": "boundedK1offlineverifier+reviewedTEST/README/CIrepair+qualifiedCI/reportsourceonly",
+    "actualWorkerDone": "msg_6987f7ecdcb5"
   },
   "broadBRevision3ActualReviewGate": "b-rev3-root-review-gate.json",
   "broadBRevision3SourceObservation": "b-rev3-root-source-observation.json",
@@ -3051,5 +3080,10 @@
   "Eb32RootIndependentTestPGReview": "rate-eb32-root-independent-review.json",
   "ReviewedCombinedSourceChoice": "rate-eb32-combined-source-choice-root-decision.json",
   "FreshCoreTerminalMonitor": "eb32-core-terminal-one-shot-monitor-root.json",
-  "QualifiedPGReportRootCheck": "rate-909-qualified-PG-report-root-check.json"
+  "QualifiedPGReportRootCheck": "rate-909-qualified-PG-report-root-check.json",
+  "K1FinalBoundedRootVerification": "eb32-final-bounded-root-verification.json",
+  "K1FinalActualWorkerDone": "msg_6987f7ecdcb5",
+  "K1FinalBoundedHandoff": "k1-final-bounded-root-handoff.json",
+  "K2ActualDesignDispatch": "k2-trusted-producer-contract-root-dispatch.json",
+  "CIoneShotMonitorClosure": "eb32-core-terminal-monitor-root-closure.json"
 }

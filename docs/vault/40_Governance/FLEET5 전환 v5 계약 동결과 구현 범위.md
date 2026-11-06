@@ -1,11 +1,11 @@
 ---
 doc_id: "GOV-FLEET5-BOOTSTRAP-V5-FREEZE-CODE-SCOPE-20261106"
 title: "FLEET5 전환 v5 계약 동결과 구현 범위"
-version: "1.0.4"
+version: "1.0.5"
 status: "active"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-11-06T09:52:19+09:00"
+updated: "2026-11-06T10:33:00+09:00"
 source_of_truth: "Git"
 ---
 
@@ -64,3 +64,10 @@ K1은 서로 다른 시점의 보존 이력을 검증해야 한다. 종료된 ep
 Root는 eb32b211의 TEST/README/고정 CI delta를 직접 읽고 source25개 허용 범위·Go/testdata/schema/pin/기존Core/Backend 불변을 대조해 수락했다. README R1도 닫혔다. 실제 PG16 Focus42137053588과 Docs42137296076은 exact source에서 성공했다. Root가 원본 artifact13466003560의13,493bytes/digest를 비교·다운로드해 XML/JSON을 직접 파싱했다. 원래 함수 같은 분1통과·강제 분 경계1의도된 실패·수정 파일30통과/0오류/0skip와 source의 모든 test 이름,3scope counter·2bucket5→1 및 원래56651 함수 hash를 확인했다. 이 반례는 과거 실패의 실제 시각 원인 확정은 아니다.
 
 msg_4f741ef0872c로 고정 eb32를 검토된 결합 소스로 선택해 새 fullCore42138733821을 한 번 실행하도록 했다. 이미 성공한 동일 SHA Docs를 재사용하고 선택 proof input은 모두 false다. 과거56651/Core42126222201 실패는 유지한다. 현재 fullCore terminal·원본artifact·최종보고/ownDocs·Rootboundedhandoff가 남으며 source/선택PG 검토 수락을 전체 CI 성공으로 바꾸지 않는다. pending question msg_045f69f4caf4에는 고정 run만 확인하는 한정 one-shot monitor가 terminal 때 같은 ctx_ceecb3824e33에 실제 상태를 reply한다. inbox polling·새 Agent·CI 재실행이나 취소는 하지 않는다.
+
+
+## K1 한정 인수 완료와 별도 K2 설계 카드
+
+Root는 실제 eb32/Core42138733821 두 job·f28fb41d 최종 보고/Docs42142783600의 exact source/ref/correlation/runAttempt1/전체 성공을 검증했다. 두 원본artifact의 size/digest를 비교·다운로드하고 XML/Go JSON을 직접 파싱해 main9216pass/46declaredskip/0fail, 영향 file30pass·13함수/0skip, K142상위165PASS이벤트/0skip을 대조했다. 기존c6f와 실제46skip 이름도 동일했고, ELF 바이너리를 실행하지 않고 build info의 eb32/modified=false/Go1.27.1/CGO0와 hash를 읽었다. actual191b 코드 검토와 Root TEST/README/CI 검토, 10개 보고 gate0 및 실제 보고 CI가 모두 충족돼 msg_f96802b15040으로 K1 소스·검증·보고의 한정 납품을 수락했다. actual worker_done msg_6987f7ecdcb5/outcome succeeded를 수신했다.
+
+후속 K2는 별도 task_a95ef3d8ccce/ctx_ed23b4a777d0다. 현재 범위는 trusted producer의 실제 출처·인증·신선도·설치 trust와 read-only acquisition/효과 실행 경계를 닫는 DESIGN-FIRST 문서·정적 사례다. 실제 40 runtime case·설치 trust·Node/PKI/Engine/DB 효과는 미실행이고 새 코드 권한도 아직 없다. 완료한 K1의 ref·보고·artifact·이전 실패를 보존한다. 새 불변 제안/ownDocs 이후 실제 별도 검토와 좁은 구현 grant를 진행하며 B rev6 설계와 병행한다. 새 source 배포 패킷 필요성도 확인해야 하며 이전 e50 패킷을 eb32 설치 증거로 쓰지 않는다. [고정 최종 K1 보고](https://github.com/egparadise/SaintVision-Invion/blob/f28fb41d6e566625d5feb27535d4c3d40fbc9100/docs/vault/30_Development/History/2026-11-06_FLEET5_K1_reviewed_combined_Core_delivery_Codex.md)에 세부 증거를 남겼다.

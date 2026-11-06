@@ -1,0 +1,23 @@
+{
+  "schemaVersion": "fleet5-K1-final-bounded-handoff-root:1",
+  "atKST": "2026-11-06T10:25:11+09:00",
+  "source": "eb32b211ab3704935b9431747089ab0715582a74",
+  "report": "f28fb41d6e566625d5feb27535d4c3d40fbc9100",
+  "Core": 42138733821,
+  "reportDocs": 42142783600,
+  "rootActuallyVerifiedProof": "eb32-final-bounded-root-verification.json",
+  "verdict": "ACCEPT COMPLETE boundedK1source/test/CI/reportdeliveryonly",
+  "ownerReply": {
+    "ok": true,
+    "result": {
+      "messageId": "msg_f96802b15040",
+      "next": "Finish the rest of your mail."
+    }
+  },
+  "workerDoneReceived": true,
+  "nextScope": "separateK2design-first trustedproducer/effectboundarycard afteractualsettledlifecycle",
+  "K2RuntimePhysicalWholeProductAccepted": false,
+  "body": "Root ACTUALLY completed final independent bounded handoff verification. ACCEPT/COMPLETE K1 offline-verifier+reviewed TEST/README/CI repair+qualifiedCI/source-report DELIVERY ONLY. Source eb32b211ab3704935b9431747089ab0715582a74 and finalreport f28fb41d6e566625d5feb27535d4c3d40fbc9100 frozen;32uniqueownerHistory/Evidence/productdiff0/parenteb32/remote verified. reportDocs42142783600/job127646928806 andCore42138733821 BOTHjobs127633370756/127633370998 actualexacthead/ref/correlation/runAttempt1/allSUCCESS. SourceDocs42137296076 remainsreusedexacteb32, no duplicate.\nRootdownloaded BOTH originalartifacts myself and comparedremote+local digests: main13467404761/13,987,414bytes/SHA4773e870d5e23c775ee1a1532fd563f4140f2039c159fd9e2fabd1d071b8561d; S0113465564407/1,766bytes/SHAd96dff3949cb0e633172cd69011394c838458fb21a68f3157a28b71128864197. DirectRAW XML/GoJSONparse: main9262=9216PASS46SKIP0fail/error; affectedfile30PASS/13functions incl originalrate+minute/0skip; Go109top343events, K142top165events0skip/fail; PG13+2/Dockerhost2/S01XML1+2+3 green. Readonly go version-m ofextractedELF sourceeb32/vcs.modifiedfalse/CGO0/go1.27.1/hash2aa70e1f42992790700a53b0989dfa1800785227021de9f7b0e13436be33fb8a; binaryNOTexecuted. Immutable10reportgatesall0read. Optionalnative/S08stepsSKIPPEDnotnewproof; rawZIP/XML/GoStdout/binaryprivateonly. Existing191bactualClaudeGoACCEPT andRooteb32TEST/README/YAML/realPGACCEPT verified. Old56651/Core42126222201FAILURE/historicalcauseunproven retained, allrefs/reports unchanged.\nYoumay now issue actualworker_done outcome=succeeded for THIS bounded K1task38393/currentctx_ceecb3824e33, with finalimmutableproof/limitations. No more code/reportrefmovement/extraDocs/Core/e50archive reruns. ThisisNOTK2, installedtrust/producers, 40runtimecases, physical5PC, Bcontract orwholeprogram100acceptance.\nRoot will create/start next SEPARATE K2 trusted-producer/side-effect boundary DESIGN-FIRST card after youractualworker_done/settled lifecycle; doNOTsilently expandthisfrozenK1task or spawnhelper. Preserveallworktrees/transcripts/rawprivatecache/oldpilotstate. Returnboundedworker_done now; nextscope willcomeassameRunnewTask afterstateproof, no genericuserapproval. Rootproof .work/eb32-final-bounded-root-verification.json willbepublishednextmanagementcheckpoint.",
+  "actualWorkerDone": "msg_6987f7ecdcb5",
+  "actualTaskOutcome": "succeeded"
+}

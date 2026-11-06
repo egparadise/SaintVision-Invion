@@ -1,0 +1,35 @@
+{
+  "schemaVersion": "fleet5-eb32-one-shot-monitor-closure:1",
+  "terminal": {
+    "atKST": "2026-11-06T10:11:45+09:00",
+    "run": 42138733821,
+    "source": "eb32b211ab3704935b9431747089ab0715582a74",
+    "status": "completed",
+    "conclusion": "success",
+    "identityVerified": true,
+    "OrcaInboxChecks": 0,
+    "jobs": [
+      {
+        "id": 127633370756,
+        "conclusion": "success",
+        "failedSteps": []
+      },
+      {
+        "id": 127633370998,
+        "conclusion": "success",
+        "failedSteps": []
+      }
+    ],
+    "allJobsSuccess": true
+  },
+  "actualReply": {
+    "ok": true,
+    "result": {
+      "messageId": "msg_62c30bf98178",
+      "next": "Finish the rest of your mail."
+    }
+  },
+  "originalQuestion": "msg_045f69f4caf4",
+  "sourceSameAuthorResumedThenFinalReport": "f28fb41d6e566625d5feb27535d4c3d40fbc9100",
+  "extraOrcaInboxChecksOrCoreReruns": 0
+}
