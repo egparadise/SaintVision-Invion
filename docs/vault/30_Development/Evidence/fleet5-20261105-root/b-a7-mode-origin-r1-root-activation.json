@@ -1,0 +1,21 @@
+{
+  "atKST": "2026-11-07T08:05:16+09:00",
+  "card": "FLEET5-B-A7-MODE-ORIGIN-R1-20261107",
+  "ownerTask": "task_a8fd2969f0b3",
+  "ownerDispatch": "ctx_6f0f8253b8a7",
+  "answeredQuestion": "msg_649487e8b552",
+  "rootReply": "msg_ec880f3ed724",
+  "base": "969030dbc7716b9cadf75bd314713005306ed34c",
+  "frozenProduct": "72028cbac903c4415d9979f980a6e0f9948e914f",
+  "newBranch": "agent/codex/fleet5-b-a7-mode-origin-r1-20261107",
+  "scopeFile": "b-a7-mode-origin-r1-root-scope.txt",
+  "status": "ACTIVATED_BOUNDED_STATIC_MODE_ORIGIN_CANDIDATE_PENDING",
+  "target": "one existing A7_PURPOSE_PROVENANCE for NodeDelivery snapshot mode",
+  "objective": "finite call/binding/type/operation provenance; conditional one-obligation candidate or exact missing source predicate and minimal code proposal",
+  "maximumNewASTDataControls": 6,
+  "original19BaselineImmutable": true,
+  "globalCountsAndRetainedArtifactsImmutable": true,
+  "productChangesGranted": false,
+  "runtimeOrSourceInclusionGranted": false,
+  "wholeProgramComplete": false
+}

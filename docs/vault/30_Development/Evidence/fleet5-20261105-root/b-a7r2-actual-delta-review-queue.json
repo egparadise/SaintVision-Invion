@@ -1,6 +1,6 @@
 {
-  "atKST": "2026-11-07T07:39:51+09:00",
-  "status": "ACTUAL_NARROW_R2_DELTA_REVIEW_STARTED_VERDICT_PENDING",
+  "atKST": "2026-11-07T08:05:16+09:00",
+  "status": "ACTUAL_PARTIAL_STATIC_EVIDENCE_ACCEPT_L1_CLOSED_KEEP_HOLD",
   "target": "969030dbc7716b9cadf75bd314713005306ed34c",
   "sourceBranch": "agent/codex/fleet5-b-a7-snapshot-r2-20261107",
   "sourceDocs": 42304684547,
@@ -12,8 +12,22 @@
   "dispatch": "ctx_36ec44cc8ca0",
   "actualPredecessor": "ctx_06f0718be774",
   "predecessorFreshLifecycle": "succeeded_settled_exited_released",
-  "independentVerdict": null,
+  "independentVerdict": "PARTIAL_STATIC_EVIDENCE_ACCEPT_L1_CLOSED_KEEP_HOLD",
   "all19ResidualBlocksGrant": true,
   "actualRuntimeB": 0,
-  "wholeProgramComplete": false
+  "wholeProgramComplete": false,
+  "actualReview": "145238898e8c86e1beb091b93efd712c70a6f5ba",
+  "actualDocs": 42308611982,
+  "actualWorkerDone": "msg_7ea27e7b92ea",
+  "i3OracleStatus": "I3_ORACLE_CLOSED",
+  "findings": [],
+  "retainedInfo": [
+    "I1 (retained, fail-closed): necessary lexical binding events are keyed by the source segment of their whole enclosing statement. The same source-segment strictness shows in the I3 input as a generic INSTANCE:proof use-site key at observation.py [17,8,17,13] in red and green alike. Not called text-independent.",
+    "I2 (retained): remote_git.py:285 and workspace_git.py:167 are git snapshot receivers, not closed NodeChannels receivers; no extra NodeChannels paths are invented.",
+    "I4 (retained): BoundDatabase is not authenticated inv.db.Database and stays under the existing unresolved owner/root obligations. No new general resolver is required.",
+    "I5 (new, diagnostic only): census guard obligations carry source = bare path with no span. The [76,0,76,22] span in the R2 oracle comes from replaying u.audited_nodes/key_for/baseline_sites with the census arguments. That replay omits module_uses' builtins.globals NAMESPACE branch; if a future refusal came from that branch, guard_location would raise AssertionError (fail-closed), never pass. The reviewer independently reproduced the span. No correction required.",
+    "I6 (new, bounded): the INFOI3 oracle requires the exact new purpose key, absent from the baseline. It also admits any other added key at observation.py with codes A7_PURPOSE_PROVENANCE/A7_FULL_MODULE_USE_SITE_GUARD/A7_FORWARD_GUARD, rather than one exact complete delta. The actual complete delta is recorded (purpose + INSTANCE:proof guard + its forward guard). Optional tightening only.",
+    "Note (not a defect): the in-code parsed==audited assert is built from the same source in the same loop iteration. It does catch a reintroduced pre-guard skip (path set mismatch). The reviewer's independent equality uses Git blob bytes and the independently computed reflection/useSites SHA fields."
+  ],
+  "reviewerFinalLifecycle": "succeeded_settled_exited_released"
 }

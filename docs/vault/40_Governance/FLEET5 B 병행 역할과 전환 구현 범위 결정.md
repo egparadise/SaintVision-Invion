@@ -1,11 +1,11 @@
 ---
 doc_id: "GOV-FLEET5-B-BOOTSTRAP-SCOPE-20261106"
 title: "FLEET5 B 병행 역할과 전환 구현 범위 결정"
-version: "1.4.15"
+version: "1.4.16"
 status: "review"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-11-07T07:39:51+09:00"
+updated: "2026-11-07T08:05:16+09:00"
 source_of_truth: "Git"
 ---
 
@@ -183,3 +183,8 @@ Root는0e66/parent9cea의190ownA·93script/81원문copy/17최종실행전후hash
 ## A7 R2 고정 증거와 실제 단일 Low 재검토
 
 9690/direct1550의125ownA·manifest123/34producer/최종11commandhashbracket·정확한19c2red/green/new5case·Docs42304684547/all19를Root가대조했다.30parsed=30audited·새18clean·기존조건부body/19blocksGrant/11retainedartifact와allglobals는보존됐으며Root는저자proof를재실행하지않았다. fresh06f검토자exit/release뒤실제Claude ctx_36ec44cc8ca0/task_c2de6e9fd486의좁은delta검토를시작했으나아직판정전이다.19HOLD/actualB0/allrealbindingsNULL_HOLD/A1A16PENDING과SOURCE_STATIC_UNRESOLVED_RUNTIME_PENDING은유지한다.
+
+
+## A7 R2 실제 Low·오라클 닫힘과 모드 출처 한정 후속
+
+실제14523889/Docs42308611982/all19는A7R-L1과I3oracle을닫아PARTIAL_STATIC_EVIDENCE_ACCEPT_L1_CLOSED_KEEP_HOLD로판정했다. Root는12실제행·정확한barecensuskey와진단span·7controls와검토자exit/release를대조했다. INFOI1/I2/I4와새I5/I6는비차단정밀성메모로유지한다. msg_ec880f3ed724는sameB담당자에NodeDelivery동적모드ONE조건의유한source기원/최대6ASTDATAcontrol/최소후속CODE제안만허용한다. 원래19baseline/조건부body/HOLD/runtime0/allrealbindingsNULL_HOLD/globalcounts불변이며제품·DB/crypto/clock/current/effect·새13entry인가가아니다.
