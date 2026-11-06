@@ -1,0 +1,9 @@
+{
+  "command": "python -B -m pytest tests/core/test_worker_peer_floor_observation_diagnostics.py tests/core/test_lan_workspace_upgrade.py -q",
+  "exit": 1,
+  "result": "1 failed,57 passed",
+  "failedCase": "test_existing_security_gate_refusals_remain[malformed-state]",
+  "cause": "Test expected ValueError/KeyError/TypeError but unchanged original observe rejects non-object State with AttributeError. No accepted input or original guard was changed.",
+  "correction": "Test includes the actual original AttributeError refusal. Subsequent scoped run65passed/exit0.",
+  "classification": "PRESERVED_TEST_AUTHORING_EXPECTATION_FAILURE_NOT_BEHAVIOUR_FIX"
+}

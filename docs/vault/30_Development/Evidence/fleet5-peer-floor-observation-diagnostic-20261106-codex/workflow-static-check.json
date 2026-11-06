@@ -1,0 +1,11 @@
+{
+  "classification": "STATIC_WORKFLOW_AND_ARTIFACT_FILTER_CHECK_NOT_HOSTED_PROOF",
+  "yaml": "PASS",
+  "inlinePythonCompile": "PASS",
+  "pureSanitizerAcceptsActualDiagnosticShape": true,
+  "oneJob": true,
+  "jobTimeoutMinutes": 20,
+  "sampleCount": 3,
+  "purpose": "Predeclared independent samples, every outcome executed once; any real failure keeps CI red",
+  "actualFocusedCI": "PENDING"
+}

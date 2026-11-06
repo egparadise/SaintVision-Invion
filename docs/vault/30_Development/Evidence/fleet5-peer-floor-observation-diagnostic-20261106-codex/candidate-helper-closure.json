@@ -1,0 +1,22 @@
+{
+  "classification": "NEW_UNREGISTERED_CANDIDATE_NOT_INSTALLED_OR_ACCEPTED_TRUST",
+  "base": "ff3169d360a707415d9b03484cf0cf3031f3912c",
+  "files": {
+    "worker_config.py": "909d1c25deb61c5c4795af49dab18f5a9722e5cbc1c034a18472b6a4427c192c",
+    "worker_leaf_rotation.py": "4e29685241a3e625e59aa64bcff07bdd69d4b0381c67687706a09fa960f75998",
+    "peer_policy_phase.py": "8aac0c65fb2a242b08287ba4206e6c7213fc18795903584b5b28abf3a10c17f8",
+    "worker_peer_floor.py": "17378b802f42000d74c1dc5d6136bcf5b1454846584b0555b950eb74bd35b406",
+    "worker_plain_rotation.py": "bf3754a27f748b1dd58a7fc65a1f1831dddae6133f11ae17d0f7bf3ea59c46e5",
+    "leaf_rotation_standalone_runtime.py": "76be408878d1105099d3457937fe0a579c09d9eefc6c6d46f0e22679670e5665",
+    "leaf-rotation-runtime-lock.json": "06710d854ff52578949249065dd009de6561bc779c4b21c5355262e59a527a8c"
+  },
+  "candidateWorkerModulesSHA256": "0b2183f4d093c758f7c08e956e1961c14ad3223a58f47471119e675e6e48814c",
+  "candidateRawSevenFileSHA256": "d9ddc67bfe7250d9276f7e2a88c0f994caed8fa9d0972239d3ce33303dfab3fb",
+  "algorithm": "SHA256(sorted compact JSON filename-to-raw-SHA256 map plus LF); module map uses existing standalone canonical convention; seven-file aggregation is diagnostic provenance only",
+  "oldStandalonePins": "UNCHANGED_REFUSE_NEW_HELPER_CANDIDATE",
+  "K1Source28Pins": "UNCHANGED",
+  "stage2BehaviourFix": "NOT_GRANTED",
+  "actualOldFailureField": "UNKNOWN",
+  "actualNewFocusedCI": "PENDING",
+  "sourceReview": "PENDING"
+}

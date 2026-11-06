@@ -188,6 +188,116 @@ def target(worker_root):
     return manifest, name, value, args, volume, sorted(consumers)
 
 
+OBSERVATION_CHANGE_PREFIX = "Owned container/state changed during actual floor observation"
+_CONFIG_DIAGNOSTIC_FIELDS = ("Cmd", "Entrypoint", "Env", "Labels", "Image", "User", "WorkingDir",
+                             "Hostname", "Domainname", "Volumes", "ExposedPorts", "Healthcheck",
+                             "StopSignal", "StopTimeout", "Tty", "OpenStdin", "StdinOnce", "Shell")
+_MOUNT_DIAGNOSTIC_FIELDS = ("Type", "Name", "Source", "Destination", "Driver", "Mode", "RW", "Propagation")
+_VOLUME_DIAGNOSTIC_FIELDS = ("Name", "Driver", "Mountpoint", "CreatedAt", "Scope", "Labels", "Options", "Status")
+
+
+def _diagnostic_hash(value):
+    """A bounded whole-field digest, never repr/str or a secret-value digest list."""
+    budget = [512, 65536]
+
+    def bounded(item, depth):
+        budget[0] -= 1
+        if depth > 8 or budget[0] < 0:
+            return False
+        kind = type(item)
+        if item is None or kind is bool:
+            return True
+        if kind is int:
+            return item.bit_length() <= 64
+        if kind is str:
+            budget[1] -= len(item.encode("utf-8", errors="surrogatepass"))
+            return len(item) <= 16384 and budget[1] >= 0
+        if kind is list:
+            return len(item) <= 64 and all(bounded(v, depth + 1) for v in item)
+        if kind is dict:
+            return (len(item) <= 64 and all(type(k) is str and len(k) <= 128
+                    and bounded(k, depth + 1) and bounded(v, depth + 1) for k, v in item.items()))
+        return False
+
+    if not bounded(value, 0):
+        return None
+    raw = json.dumps(value, ensure_ascii=True, allow_nan=False, sort_keys=True, separators=(",", ":")).encode()
+    return hashlib.sha256(raw).hexdigest() if len(raw) <= 131072 else None
+
+
+def _diagnostic_paths(prefix, before, after, names):
+    """Only predeclared API field names; no arbitrary keys or values escape."""
+    if type(before) is not dict or type(after) is not dict:
+        return [prefix]
+    missing = object()
+    paths = [prefix + "." + name for name in names if before.get(name, missing) != after.get(name, missing)]
+    unknown_before = {k: v for k, v in before.items() if k not in names}
+    unknown_after = {k: v for k, v in after.items() if k not in names}
+    if unknown_before != unknown_after:
+        paths.append(prefix + ".<other>")
+    return paths or [prefix]
+
+
+def _observation_diagnostic(before, after, volume, volume_after, consumers, consumers_after):
+    """DIAGNOSIS ONLY: never participates in, normalizes or relaxes the guard.
+
+    Original values are compared by the unchanged observe predicate below. These
+    bounded paths/categories/hashes contain no Config/argv/env/key/cert/nonce/path
+    values. Even an order-only/CreatedAt-only classification remains a refusal.
+    """
+    pairs = (("container.Id", before["Id"], after["Id"], "CONTAINER_ID_CHANGED"),
+             ("container.Image", before["Image"], after["Image"], "IMAGE_CHANGED"),
+             ("container.Config", before["Config"], after["Config"], "CONFIG_CHANGED"),
+             ("container.Mounts", before["Mounts"], after["Mounts"], "MOUNTS_CHANGED"),
+             ("container.State.StartedAt", before["State"].get("StartedAt"), after["State"].get("StartedAt"), "STARTED_AT_CHANGED"),
+             ("container.RestartCount", before.get("RestartCount"), after.get("RestartCount"), "RESTART_COUNT_CHANGED"),
+             ("volume", volume, volume_after, "VOLUME_CHANGED"),
+             ("volumeConsumers", consumers, consumers_after, "CONSUMERS_CHANGED"))
+    paths, categories, hashes = [], [], {}
+    hash_unavailable = False
+    for path, old, new, category in pairs:
+        if old == new:
+            continue
+        hashes[path] = {"beforeSHA256": _diagnostic_hash(old), "afterSHA256": _diagnostic_hash(new)}
+        hash_unavailable |= any(v is None for v in hashes[path].values())
+        if path == "container.Config":
+            paths.extend(_diagnostic_paths(path, old, new, _CONFIG_DIAGNOSTIC_FIELDS))
+        elif path == "container.Mounts" and type(old) is list and type(new) is list:
+            # Sorting digests classifies a potential representation difference;
+            # the original raw Mounts list STILL refuses below. Preserve counts.
+            old_hashes = [_diagnostic_hash(v) for v in old[:64]]
+            new_hashes = [_diagnostic_hash(v) for v in new[:64]]
+            if (len(old) == len(new) <= 64 and None not in old_hashes + new_hashes
+                    and sorted(old_hashes) == sorted(new_hashes)):
+                category = "MOUNTS_ORDER_ONLY"
+                paths.append(path)
+            else:
+                paths.append(path)
+                for i, (a, b) in enumerate(zip(old[:8], new[:8])):
+                    if a != b:
+                        paths.extend(_diagnostic_paths(path + "[" + str(i) + "]", a, b, _MOUNT_DIAGNOSTIC_FIELDS))
+        elif path == "volume":
+            paths.extend(_diagnostic_paths(path, old, new, _VOLUME_DIAGNOSTIC_FIELDS))
+            if (type(old) is dict and type(new) is dict
+                    and {k: v for k, v in old.items() if k != "CreatedAt"} == {k: v for k, v in new.items() if k != "CreatedAt"}):
+                category = "VOLUME_CREATED_AT_FIELD_ONLY"
+        else:
+            paths.append(path)
+        categories.append(category)
+    # Fixed field names, <=24 paths, depth <=3, <=72 characters per path; eight
+    # whole-field digest pairs maximum. Unknown/unhashable data never yields PASS.
+    paths = list(dict.fromkeys(paths))
+    result = dict(diagnosticVersion=1, classification="REFUSAL_DIAGNOSTIC_ONLY",
+                  changedPaths=paths[:24], categories=categories or ["UNKNOWN_DIFFERENCE"],
+                  hashes=hashes, truncated=len(paths) > 24 or hash_unavailable)
+    raw = json.dumps(result, sort_keys=True, separators=(",", ":"))
+    if len(raw) > 4096:
+        raw = json.dumps(dict(diagnosticVersion=1, classification="REFUSAL_DIAGNOSTIC_ONLY",
+                             changedPaths=list(hashes), categories=["DIAGNOSTIC_BOUND_EXCEEDED"],
+                             hashes={}, truncated=True), sort_keys=True, separators=(",", ":"))
+    return raw
+
+
 def observe(worker_root, rotation, files, *, nonce=None):
     manifest, name, before, args, volume, consumers = target(worker_root)
     if (manifest["nodeId"], manifest["tenantId"], manifest["epoch"]) != (rotation["nodeId"], rotation["tenantId"], rotation["recoveryEpoch"]):
@@ -214,7 +324,8 @@ def observe(worker_root, rotation, files, *, nonce=None):
     if not after["State"].get("Running") or after["State"].get("Restarting"):
         raise ValueError("Actual Node stopped during floor observation")
     if (before["Id"], before["Image"], before["Config"], before["Mounts"], before["State"].get("StartedAt"), before.get("RestartCount"), volume, consumers) != (after["Id"], after["Image"], after["Config"], after["Mounts"], after["State"].get("StartedAt"), after.get("RestartCount"), volume_after, consumers_after):
-        raise ValueError("Owned container/state changed during actual floor observation")
+        raise ValueError(OBSERVATION_CHANGE_PREFIX + "; diagnostic=" +
+                         _observation_diagnostic(before, after, volume, volume_after, consumers, consumers_after))
     return value
 
 
