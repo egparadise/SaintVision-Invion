@@ -1,0 +1,161 @@
+"""Reviewer-owned offline structural comparison: generated Go P02 validators vs
+the immutable Rev2 JSON schemas. Reads files only; executes no Go.
+argv: go_schema_file rev2_dir out_json"""
+import json, re, sys, hashlib
+
+go_path, rev2, out_path = sys.argv[1], sys.argv[2], sys.argv[3]
+src = open(go_path, encoding='utf-8').read()
+
+PAT = {
+    '^[A-Za-z0-9_-]{1,128}(?![\\s\\S])': 0,
+    '^[0-9a-f]{64}(?![\\s\\S])': 1,
+    '^[0-9a-f]{40}(?![\\s\\S])': 2,
+    '^[ -~]+(?![\\s\\S])': 3,
+    '^(?:[0-9a-f]{2})+(?![\\s\\S])': 4,
+    '^[0-9a-f]{128}(?![\\s\\S])': 5,
+    '^[1-9][0-9]{0,15}(?![\\s\\S])': 6,
+}
+
+funcs = {}
+for m in re.finditer(r'func p02Schema(\d+)\(v p02Value\) bool \{\n(.*?)\n\}\n', src, re.S):
+    funcs[int(m.group(1))] = m.group(2)
+
+def go_node(n):
+    b = funcs[n]
+    r = {}
+    if 'matches := 0' in b:
+        r['oneOf'] = [go_node(int(x)) for x in re.findall(r'if p02Schema(\d+)\(v\) \{\n\t\tmatches\+\+', b)]
+        assert 'return matches == 1' in b
+        return r
+    m = re.search(r"v\.kind != '(.)'( \|\| v\.text != \"([^\"]*)\")?", b)
+    r['type'] = {'s': 'string', 'i': 'integer', 'b': 'boolean', 'o': 'object', 'a': 'array'}[m.group(1)]
+    if m.group(2):
+        r['const'] = m.group(3)
+    for k, pat in [('minLength', r'len\(v\.text\) < (\d+)'), ('maxLength', r'len\(v\.text\) > (\d+)'),
+                   ('minimum', r'v\.integer < (-?\d+)'), ('maximum', r'v\.integer > (-?\d+)'),
+                   ('minItems', r'len\(v\.array\) < (\d+)'), ('maxItems', r'len\(v\.array\) > (\d+)'),
+                   ('minProperties', r'len\(v\.object\) < (\d+)'), ('maxProperties', r'len\(v\.object\) > (\d+)')]:
+        x = re.search(pat, b)
+        if x:
+            r[k] = int(x.group(1))
+    x = re.search(r'p02Pattern\((\d+), v\.text\)', b)
+    if x:
+        r['pattern'] = int(x.group(1))
+    if 'nonzero := false' in b:
+        r['not'] = {'pattern0': True}
+    x = re.search(r'if v\.text == "([^"]*)" \{', b)
+    if x:
+        r['not'] = {'const': x.group(1)}
+    if r['type'] == 'object':
+        x = re.search(r'len\(v\.object\) != (\d+)', b)
+        if x:
+            req = re.findall(r'p02Get\(v, "([^"]+)"\)\.kind == 0', b)
+            props = dict((k, go_node(int(s))) for k, s in re.findall(r'case "([^"]+)":\n\t\t\tif !p02Schema(\d+)\(field\.value\)', b))
+            assert 'default:\n\t\t\treturn false' in b
+            r['count'] = int(x.group(1))
+            r['required'] = sorted(req)
+            r['properties'] = props
+            r['additionalProperties'] = False
+        else:
+            pn = re.search(r'p02Schema(\d+)\(p02String\(field\.key\)\)', b)
+            ap = re.search(r'if !p02Schema(\d+)\(field\.value\)', b)
+            r['propertyNames'] = go_node(int(pn.group(1)))
+            r['additionalProperties'] = go_node(int(ap.group(1)))
+    if r['type'] == 'array':
+        if 'switch i {' in b:
+            r['prefixItems'] = [go_node(int(s)) for _, s in re.findall(r'case (\d+):\n\t\t\tif !p02Schema(\d+)\(child\)', b)]
+            r['itemsFalse'] = 'default:\n\t\t\treturn false' in b
+        else:
+            x = re.search(r'if !p02Schema(\d+)\(child\)', b)
+            r['items'] = go_node(int(x.group(1)))
+        if 'p02Same(v.array[i], v.array[j])' in b:
+            r['uniqueItems'] = True
+    return r
+
+IGN = {'$schema', '$id', 'title', 'description'}
+
+def js_node(s):
+    s = {k: v for k, v in s.items() if k not in IGN}
+    r = {}
+    if 'oneOf' in s:
+        assert set(s) == {'oneOf'}, s.keys()
+        return {'oneOf': [js_node(x) for x in s['oneOf']]}
+    if 'type' not in s:
+        assert set(s) == {'const'} and isinstance(s['const'], str), s
+        s = dict(s, type='string')
+    r['type'] = s['type']
+    for k in ('const', 'minLength', 'maxLength', 'minimum', 'maximum', 'minItems', 'maxItems', 'minProperties', 'maxProperties'):
+        if k in s:
+            r[k] = s[k]
+    if 'pattern' in s:
+        r['pattern'] = PAT[s['pattern']]
+    if 'not' in s:
+        n = s['not']
+        if set(n) == {'pattern'} and n['pattern'] == '^0+(?![\\s\\S])':
+            r['not'] = {'pattern0': True}
+        elif set(n) == {'const'}:
+            r['not'] = {'const': n['const']}
+        else:
+            raise SystemExit('unknown not %r' % n)
+    if s['type'] == 'object':
+        if 'properties' in s:
+            assert s.get('additionalProperties') is False, s
+            r['count'] = len(s['properties'])
+            r['required'] = sorted(s['required'])
+            r['properties'] = {k: js_node(v) for k, v in s['properties'].items()}
+            r['additionalProperties'] = False
+        else:
+            r['propertyNames'] = js_node(dict({'type': 'string'}, **s['propertyNames']))
+            r['additionalProperties'] = js_node(s['additionalProperties'])
+    if s['type'] == 'array':
+        if 'prefixItems' in s:
+            r['prefixItems'] = [js_node(x) for x in s['prefixItems']]
+            r['itemsFalse'] = s.get('items') is False
+        else:
+            r['items'] = js_node(s['items'])
+        if s.get('uniqueItems'):
+            r['uniqueItems'] = True
+    unknown = set(s) - {'type', 'const', 'minLength', 'maxLength', 'minimum', 'maximum', 'minItems', 'maxItems', 'minProperties', 'maxProperties', 'pattern', 'not', 'properties', 'required', 'additionalProperties', 'propertyNames', 'items', 'prefixItems', 'uniqueItems'}
+    if unknown:
+        raise SystemExit('unknown keywords %r' % unknown)
+    return r
+
+diffs = []
+def cmp(a, b, path):
+    if isinstance(a, dict) and isinstance(b, dict):
+        for k in sorted(set(a) | set(b)):
+            if k not in a or k not in b:
+                diffs.append((path + '/' + k, a.get(k, '<absent-go>'), b.get(k, '<absent-schema>')))
+            else:
+                cmp(a[k], b[k], path + '/' + k)
+    elif isinstance(a, list) and isinstance(b, list):
+        if len(a) != len(b):
+            diffs.append((path, 'len %d' % len(a), 'len %d' % len(b)))
+        for i, (x, y) in enumerate(zip(a, b)):
+            cmp(x, y, '%s[%d]' % (path, i))
+    elif a != b:
+        diffs.append((path, a, b))
+
+roots = {'envelope': (0, 'candidate-envelope.schema.json'), 'payload': (25, 'policy-payload.schema.json'), 'authorityScope': (160, 'authority-scope.schema.json')}
+assert 'func p02EnvelopeSchema(v p02Value) bool  { return p02Schema0(v) }' in src
+assert 'func p02PayloadSchema(v p02Value) bool   { return p02Schema25(v) }' in src
+assert 'func p02AuthoritySchema(v p02Value) bool { return p02Schema160(v) }' in src
+report = {'goSchemaSHA256': hashlib.sha256(open(go_path, 'rb').read()).hexdigest(), 'goValidatorFunctions': len(funcs), 'roots': {}}
+counts = {}
+for name, (n, f) in roots.items():
+    raw = open(rev2 + '/' + f, 'rb').read()
+    g = go_node(n)
+    j = js_node(json.loads(raw))
+    before = len(diffs)
+    cmp(g, j, name)
+    def count(x):
+        if isinstance(x, dict):
+            return (1 if 'type' in x or 'oneOf' in x else 0) + sum(count(v) for v in x.values())
+        if isinstance(x, list):
+            return sum(count(v) for v in x)
+        return 0
+    report['roots'][name] = {'schemaFile': f, 'schemaSHA256': hashlib.sha256(raw).hexdigest(), 'goRoot': 'p02Schema%d' % n, 'comparedNodes': count(j), 'differences': len(diffs) - before}
+report['differences'] = [list(map(str, d)) for d in diffs]
+report['pattern0ValidSelectorNote'] = 'pattern id 0 maps to existing validSelector; compared separately by reading policy.go'
+json.dump(report, open(out_path, 'w', encoding='utf-8'), indent=1, sort_keys=True)
+print(json.dumps(report, indent=1, sort_keys=True)[:3000])

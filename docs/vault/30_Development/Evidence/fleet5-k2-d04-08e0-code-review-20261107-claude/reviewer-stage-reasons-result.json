@@ -1,0 +1,178 @@
+{
+ "evaluateSHA256": "35de87be6a8fba9a34cc71d4ea77f231f312bd3d6d6ef5ac8f72e4a1e36fa398",
+ "projectionSHA256": "c25699cc905635aca87da4e17e993d981ea58a0965a970be4c2a29cb16e152ed",
+ "stages": [
+  {
+   "stage": "01_ANCHOR",
+   "method": "anchor",
+   "reasons": [
+    "ANCHOR"
+   ],
+   "outsideAllowed": []
+  },
+  {
+   "stage": "02_SOURCES",
+   "method": "sources",
+   "reasons": [
+    "CI",
+    "INSTALLATION",
+    "PROVENANCE",
+    "STATUS",
+    "TIME"
+   ],
+   "outsideAllowed": []
+  },
+  {
+   "stage": "03_ENVELOPE",
+   "method": "decodeEnvelope",
+   "reasons": [
+    "FORMAT"
+   ],
+   "outsideAllowed": []
+  },
+  {
+   "stage": "03_PAYLOAD",
+   "method": "decodePayload",
+   "reasons": [
+    "FORMAT"
+   ],
+   "outsideAllowed": []
+  },
+  {
+   "stage": "03_C2",
+   "method": "decodeC2",
+   "reasons": [
+    "FORMAT"
+   ],
+   "outsideAllowed": []
+  },
+  {
+   "stage": "04_SIGNATURE",
+   "method": "signature",
+   "reasons": [
+    "SCOPE",
+    "SIGNATURE"
+   ],
+   "outsideAllowed": []
+  },
+  {
+   "stage": "04_KEY_INTERVAL",
+   "method": "keyInterval",
+   "reasons": [
+    "TIME"
+   ],
+   "outsideAllowed": []
+  },
+  {
+   "stage": "05_PAYLOAD_JOINS",
+   "method": "payloadJoins",
+   "reasons": [
+    "PROVENANCE"
+   ],
+   "outsideAllowed": []
+  },
+  {
+   "stage": "05_COMPONENTS",
+   "method": "components",
+   "reasons": [
+    "PROVENANCE"
+   ],
+   "outsideAllowed": []
+  },
+  {
+   "stage": "05_REVIEWS",
+   "method": "reviews",
+   "reasons": [
+    "PROVENANCE"
+   ],
+   "outsideAllowed": []
+  },
+  {
+   "stage": "05_SOURCE",
+   "method": "source",
+   "reasons": [
+    "PROVENANCE"
+   ],
+   "outsideAllowed": []
+  },
+  {
+   "stage": "05_CI",
+   "method": "ci",
+   "reasons": [
+    "CI"
+   ],
+   "outsideAllowed": []
+  },
+  {
+   "stage": "05_ARTIFACT",
+   "method": "archive",
+   "reasons": [
+    "ARTIFACT"
+   ],
+   "outsideAllowed": []
+  },
+  {
+   "stage": "05_RUNNING",
+   "method": "running",
+   "reasons": [
+    "INSTALLATION"
+   ],
+   "outsideAllowed": []
+  },
+  {
+   "stage": "06_STATUS",
+   "method": "status",
+   "reasons": [
+    "STATUS"
+   ],
+   "outsideAllowed": []
+  },
+  {
+   "stage": "06_VERSION",
+   "method": "version",
+   "reasons": [
+    "VERSION"
+   ],
+   "outsideAllowed": []
+  },
+  {
+   "stage": "06_REPLAY",
+   "method": "replay",
+   "reasons": [
+    "REPLAY"
+   ],
+   "outsideAllowed": []
+  },
+  {
+   "stage": "06_TIME",
+   "method": "freshness",
+   "reasons": [
+    "TIME"
+   ],
+   "outsideAllowed": []
+  },
+  {
+   "stage": "06_READBACK",
+   "method": "readback",
+   "reasons": [
+    "READBACK"
+   ],
+   "outsideAllowed": []
+  },
+  {
+   "stage": "07_PROJECTION",
+   "method": "project",
+   "reasons": [
+    "CI",
+    "PROVENANCE"
+   ],
+   "outsideAllowed": []
+  }
+ ],
+ "violations": [],
+ "preStageBudget": [
+  "OWNERSHIP",
+  "01_ANCHOR",
+  true
+ ]
+}

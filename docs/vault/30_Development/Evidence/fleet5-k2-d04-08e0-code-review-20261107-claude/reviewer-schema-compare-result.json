@@ -1,0 +1,29 @@
+{
+ "differences": [],
+ "goSchemaSHA256": "1a346e5072586355ddaf797fdf42fe4bd99c079c392701882e63b9f77b3499e2",
+ "goValidatorFunctions": 168,
+ "pattern0ValidSelectorNote": "pattern id 0 maps to existing validSelector; compared separately by reading policy.go",
+ "roots": {
+  "authorityScope": {
+   "comparedNodes": 18,
+   "differences": 0,
+   "goRoot": "p02Schema160",
+   "schemaFile": "authority-scope.schema.json",
+   "schemaSHA256": "ccae13986377c1a670323983c0c24c1d2e05cc8cdeb6b9119d4560c65c15bf21"
+  },
+  "envelope": {
+   "comparedNodes": 89,
+   "differences": 0,
+   "goRoot": "p02Schema0",
+   "schemaFile": "candidate-envelope.schema.json",
+   "schemaSHA256": "60d6c825d26e3c72f4c367e92200e0bc14c83642764c0dc27ec4d7c74a43d74c"
+  },
+  "payload": {
+   "comparedNodes": 189,
+   "differences": 0,
+   "goRoot": "p02Schema25",
+   "schemaFile": "policy-payload.schema.json",
+   "schemaSHA256": "02d0b30fdd79b0263cdbafc42bd2bc0531c3e0ecbd8d55cbe72e6c91dfc320a1"
+  }
+ }
+}
