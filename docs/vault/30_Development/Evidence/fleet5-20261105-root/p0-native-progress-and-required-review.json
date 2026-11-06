@@ -3,8 +3,8 @@
   "recordedAtKST": "2026-11-06T00:46:51+09:00",
   "rootBase": "2b1753ce59c09037b5e130a7ffe64794d1d45fdf",
   "priorRootCheckpoint": {
-    "SHA": "b112b32450a378cd12bddbc711a98cb8cb8816dd",
-    "Docs": 42289185287,
+    "SHA": "da4f07ebfdc1ba12f7d998b3611d1c6a3d292477",
+    "Docs": 42292094499,
     "exactHeadCorrelationAllJobsSuccess": true,
     "remoteMatches": true,
     "syncExits": [
@@ -12,13 +12,13 @@
       0,
       0
     ],
-    "independentlyMatchedNormalizedDestinationHashes": 2953,
+    "independentlyMatchedNormalizedDestinationHashes": 2956,
     "pending": 0,
     "conflicts": 0,
     "trackedAndUntrackedClean": true,
     "rootDocsOnly": true,
     "wholeProgramComplete": false,
-    "verifiedAtKST": "2026-11-07T05:33:28+09:00"
+    "verifiedAtKST": "2026-11-07T05:54:21+09:00"
   },
   "actualPlanLowReview": {
     "source": "803ad270562b1b75e44d26f9e14b965c714ab519",
@@ -2515,7 +2515,7 @@
     "ownerT1T2T3": "msg_620855c76519",
     "normativeRevisionReply": "msg_0392caf64d5d"
   },
-  "latestRecordAtKST": "2026-11-07T05:51:57+09:00",
+  "latestRecordAtKST": "2026-11-07T06:40:38+09:00",
   "optionalLowTokenTestDelta": {
     "source": "f0af307705b4923ebc3e231db5238af4c70aa389",
     "scope": "two otherwise-valid token payload corrections and JSON validity assertions; runtime unchanged",
@@ -3109,32 +3109,19 @@
   },
   "BRev7RootDecision": "b-rev7-concrete-root-decision.json",
   "activeActualReview": {
-    "taskId": "task_6d952cac2c9f",
-    "statusAtCreation": "pending",
-    "dependsOn": "task_6e4ff78a4444",
-    "source": "08e0f56eabe7d46518e17b8c3d6d7e296df880ac",
-    "grantBeforeActualStart": "Root fresh actual B9g verdict and succeeded_settled_exited_released; task-ready alone insufficient",
-    "scope": "ONE actual independent Claude CODE review of pure INTERNAL D04 implementation. Queue only now; Root starts AFTER actual current B9g task_6e4ff78a4444 / ctx_b48554022c90 verdict AND fresh succeeded/settled/exited/released. Do not start from merely task-ready/silence. Reuse managed fleet5-bootstrap-v3-review-20261106, NEW own branchagent/claude/fleet5-k2-d04-08e0-code-review-20261107 FROM EXACT08e0f56eabe7d46518e17b8c3d6d7e296df880ac. ONE Claude/nohelpers; outside B resolver/model audit. Root controls sequence regardless of B verdict. Actual source08e0/directbase84ee9b1b43b8921ed1d0ef8bde6f3546013c1095, branchagent/codex/fleet5-k2-d04-internal-codec-r1-20261107. Author task_a95ef3d8ccce/ctx_ed23b4a777d0, pendingmsg_74e711083e49. Grantsmsg_ccd8401cb2c5 implementation/msg_3cf791b73706 exact publication, latestRootmsg_82159f30f2ca. Need actual CODE verdict; previous6fa4c644a769b768d9212e5fa4a9083e5bf2947a accepted P02Rev3 DESIGN only, not this code.\n\nRoot independently verified14code/test paths exact WIP contentbc0b5e0b464f2c58315be6445289ae41b0cc7c3a4fe5181a77371482505243c9:7NEWpureproduction,5NEWtests,ONLYexistingREADME.md/effect_gate_test.go M;125ownAHistoryEvidence; all otherbase modes/blobIDs immutable. No module/dependency/K1/ports/provider/schema/contracts28/pins changes. Only oldeffectgate addition deterministic time.Unix and time.Time.UTC + grant comment, never time.Now/Since/signing/foreignwrite. ExactDocs42287667048/job128132594536/head/ref/manual/docs.yml/attempt1/correlationFLEET5-K2-D04-INTERNAL-R1-08e0f56e-msg_3cf791b73706/all19SUCCESS. Root .work/d04-published-source-root-verified.json plus d04-publication-evidence-root-verified.json in fleet-five-orchestration-20261105:138publicationinputs/self-excluded=139changedpaths,manifest1faa1f921933606ff019118b6f34825b0c6cc55e9998f66669a2e0f04e69adb1; ALL75 originalcopies bytecompared to Root actual files (71indexed+4summaries),reportf33e84c98fa67bbb233b0349c76e8a27834e9037caa2bb0dedd22772bf39a28f/archiveindexaf22a83c9bcc546d90393f2e9c6ba0de9146c2282cc21a5a392c4455b9c6d7e7; fourgeneratorJSONmetadataCRLF-only normalized display originals+semantics preserved. WIPmanifest12c47c1b0eb88fd3781d808a865dc433e28685a2f11fa33207ec12055e370fb2 / ZIP31902e3558fff96f34ca548829c762afeec59b5402413ac0be2090b69c9d8551.\n\nActual Root-operated tests (NOT author or reviewer rerun): PC3 official golang@sha256:8d48e12ec56735e9358640898b9d9b9fcca110612ed8a5567438c0a1baa24e66/Go1.27.1linuxamd64; nonroot/readonlyroot/capdropALL/noNewPrivileges/networknone/2CPU/2GiBmemory+swapTOTAL2GiB/pids128/only ownsharejob/cache, GOTOOLCHAINlocal/GOWORKoff/GOPROXYoff/GOSUMDBoff/GOMAXPROCS1. Real public84ee/eb32 Git metadata/blobs, actual both-module Go source inventory and contracts, nofake stubs. Phase1 exact ^TestP02Internal:12top/99sub/exit0/0fail0skip/29.215s/peak420581376B. Phase2 exact11affected publicnull/unregistered/copy/resolvedeffects/repositoryzeroeffects/immutableK1census/reviewalias/PL-R1A/B/C/D:11top/129sub/exit0/0fail0skip/119.407s/peak667811840B. Total23top228sub, OOMfalse, all368source before/after hashes equal. Logs phase1 166957B/SHA4b7eff6bbfd11fffcc50aebe427aad0fa7dadeac42d384e2a9c8180725cd0c79 andphase2 263076B/SHAd330df75841fb7267add3de0d4a29a60e41c679a6808f7a40e9e5816734a02e5.90P02_CASE/88DISTINCT completeinput fingerprints (actual bound preconditions/exactcause/earlierprefix/publicTrustUnknown/inputbeforeafter asserted),8isolatedprojectionmutants separate. K1fixedinputcensus13types73fields is NOT44newprivateproductiondeclarations. Root source/effect/repository/alias gates pass does not constitute independent Code review/auth.\n\nRoot dispatches ONE existing hosted Core42287980945 on exact08e0/ref/correlationfleet5-d04-core-979bfa0f2a554833b5134ec37eaceddd, manual/core.yml/attempt1; optionalpeerphase/S08flagsfalse. At task creation actual Core PENDING, S01 job128133671917 all16SUCCESS and main128133672409 migrations in progress; optional proof steps intentionally skipped, main Go/build/Python gates not yet done. Root will provide actual final observation before/while review if available; never infer success or relabel skipped as pass. No reviewer/author extraCore dispatch/rerun or broad local suite. Read latest Root d04-core-ci-* evidence for exact final identity/status, clearly label temporal pending/actual result. Scope acceptance is INTERNAL_CODE only with actual limits, separate from fullCI/integration/runtime; do not claim shipping authority from tests.\n\nREAD accepted P02Rev3 source84ee design/README/closed schema/semanticpins and ACTUAL6fa4 review, Root explicit implementation grant; then14source/test delta. services/node-agent/internal/migrationcontext: p02_canonical_internal.go,codec,evaluate,inputs,projection,schema,wire + five tests; unchanged policy.go/ports/history/k1_bridge/source/effect gates as needed. Newpurecode budget-first strict minimal/C2 parsing,168fixed schema validators/closedwiretypes,20stages/14causes/eightdigest derivations, exact original/effective review/partition/CI/artifact/H3H5/lifecycle/ticket/echo/readback joins,41policy+5running field/ownership projection. No public Service hook or positive InstalledPolicy/History/binding issuer/producer/auth/current/ambientclock/engine/effect path; NewService remains NULL/refusing. Signature-tuple table is DATA only, future producer auth still unavailable; actual H1-H7/H3EA/Root expectedVerdict custody/RD originalregistration NULL_HOLD/raw7UNREGISTERED/A01A40NOT_RUN. Do NOT demand unauthorized positive factories/real device flows; identify real contract mismatch/weak guard or misleading statement precisely.\n\nFocus semantic review on: raw budget BEFORE copy/parser work and nesting/token/string/int bounds; duplicate/escape/unknownkey/invalidUTF8/surrogate/safeint/bool distinction/canonical ASCIIminimal and C2 rules; fixed schemas exactly match immutable design; capsule-controlled expectedVerdict presence/type/1..128 printableASCII and reviewed codeSource equality allowed; independent ORIGINAL review-set and exact coverage partitions/publication distinctness vs each original/part, no shrinkwrap/self-selected verdict; original/effective CI required jobs/steps/IDs/head/ref/attempt/correlation/artifact bytes; H3 approved receipt+lock+linkedclosure vs H5 actualrunning executable+measured5 (no receipt substitution); currentstatus/version/replay/expiration/ticket/readback prefix/cause correctness; EXACT signature tuple domain+NUL/body/signature/key/context/purpose/anchor/version/request membership, no body/digest-only acceptance; alias-safe deep copies41+5 fields/returned ownership; closedprivate types/bounds, no positive opaque auth leakage; time.Unix/UTC exact-resolved pure whitelist stays narrow. Accepted design6fa4 I1 nonprintable expectations fail01_ANCHOR (not05) and I2 effective publication mayequalSourceSHA but not ORIGINAL/partreviewSHA, keep precision. Production JSON NewDecoder/Unmarshal/callback/interfaces/extra dependencies forbidden as Root scope.\n\nMainmemoryscarce: code READ/static review and bounded pure offline scratch only; NO main Go/Node/Vitest/browser/fullCore/OS/pagefile/processkill/host/SSH/Docker/PG/PKI/permission/actions. Existing Rootactual tests are valid attributed evidence; don't redundantly rerun them merely for repetition. If a meaningful NEW concern requires Go execution, write one minimal inert test/probe as DATA under own Evidence, with frozen08e0 inputSHA/expected cause/earlier preconditions/command proposal; ASK Root for isolated PC3 execution, then end awaiting exact result. Do NOT execute remote commands yourself, alter author source, or count compile/parser/precondition failure as semantic mutant kill. Root validates allowed scope and runs precise supplied probe, returns original evidence. No blanket verification expansion or giant corpus replay.\n\nDeliver actual narrow INTERNAL_CODE_ACCEPT or REVISION_REQUIRED, findings severity/exactsource/validcase/minimalcorrection, semantictest gaps distinguished from observed bugs, attribution/limits. Unique own reviewHistoryEvidence only; no author/product/test/source/schema/workflow/pin/sharedboard/registry/ADR changes. Normal required docs gates with immediate exits/KST; canonical sync CHECK ONLY with immediate fullstate hash before/after EACH call; Root may apply during/between calls, preserve genuine conflicts/statechanges, no apply/adopt/resolve/staleexport/statewrite. Ownbranch normalcommit/push/ONE exactDocs/unique correlation/head/ref/manual/docs.yml/attempt1/all19. worker_done actualreviewSHA/ref/Docs/target/verdict/next. No wholeK2/fleet100/factory/port/runtime acceptance or helper/reviewer launch. Read fresh Rootboards481ornewer before beginning.\n",
-    "actualCODEReview": "DISPATCHED_PENDING_ACTUAL_VERDICT",
-    "mainGoNodeBrowserOrRemoteCommandsByReviewerGranted": false,
-    "atKST": "2026-11-07T05:51:57+09:00",
-    "actualDispatch": "ctx_1ddcf22e6a4c",
-    "actualTask": "task_6d952cac2c9f",
-    "freshPredecessorFinalLifecycle": {
-      "dispatchId": "ctx_b48554022c90",
-      "taskId": "task_6e4ff78a4444",
-      "runId": "run_e57ecd84a7bc",
-      "state": "succeeded",
-      "stage": "settled",
-      "liveness": "exited",
-      "terminal": "term_d5dc1189-d5a5-4195-b844-7ed3ce9b4291",
-      "terminalState": "released",
-      "workspace": "d98dc9d3-fe61-4cb2-9776-dff349347a61::D:/Project/SaintVisionI-Invion/fleet5-bootstrap-v3-review-20261106",
-      "waitingOnHuman": "unknown"
-    },
-    "initialStartDeferredOnLiveReleasePending": true,
-    "guardedReleaseReturned": "already_released_processAction_none",
-    "currentActivity": "Root worker-read shows actual source14 hashes and source/accepted-design evidence reading; no verdict inferred"
+    "atKST": "2026-11-07T06:40:38+09:00",
+    "source": "1550453d1f072a87fd9a7baa53d4fe4ce8a98d5d",
+    "base": "0e66b5ab2b5fbc131dd6e98f5d5e8930ac045148",
+    "Docs": 42295460722,
+    "sourceRootVerification": "b-a7-snapshot-r1-source-root-verification.json",
+    "task": "task_8376b6d0ca39",
+    "dispatch": "ctx_d6e29070eb5d",
+    "status": "DISPATCHED_PENDING_ACTUAL_PARTIAL_STATIC_VERDICT",
+    "ownerQuestion": "msg_577bb9090679",
+    "remainingBlocksGrant": 19,
+    "candidateStatus": "SOURCE_STATIC_UNRESOLVED_RUNTIME_PENDING",
+    "productOrPortOrRuntimeGrant": false,
+    "freshPreviousLifecycle": "ctx_1ddcf22e6a4c succeeded_settled_exited_released"
   },
   "nextReviewRequires": "newimmutableK2Low/Stage2 orB8 pilot/evidence; oneClaudeafteractualrelease",
   "K2LatestImmutableProposalRootObservation": "k2-rev2-root-actual-contract-review-gate.json",
@@ -3275,9 +3262,12 @@
   "latestPhysicalReadOnlyObservation": "physical-readiness-refresh-20261107-0516.json",
   "D04PublishedSource": "k2-d04-published-source-root-verification.json",
   "D04ActualCore": "k2-d04-core-ci-root-observation.json",
-  "D04ActualCodeReview": "k2-d04-actual-code-review-pending-task.json",
+  "D04ActualCodeReview": "k2-d04-actual-code-review-root-verification.json",
   "BRev9gActual": "b-rev9g-actual-review-root-verification.json",
   "BA7StaticCut": "b-a7-snapshot-r1-root-cut.json",
   "D04CoreStatus": "in_progress",
-  "D04CoreConclusion": null
+  "D04CoreConclusion": null,
+  "D04FullCore": "k2-d04-full-core-root-verification.json",
+  "D04L1R2": "k2-d04-l1-r2-actual-go-summary.json",
+  "D04L1R2Cut": "k2-d04-l1-r2-publication-root-cut.json"
 }

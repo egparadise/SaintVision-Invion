@@ -1,0 +1,53 @@
+{
+  "atKST": "2026-11-07T06:10:19+09:00",
+  "target": "08e0f56eabe7d46518e17b8c3d6d7e296df880ac",
+  "actualReview": "879aea64e6896d6014f1b10d4ab63fda0de6073c",
+  "branch": "agent/claude/fleet5-k2-d04-08e0-code-review-20261107",
+  "Docs": 42293776865,
+  "job": 128153632966,
+  "correlation": "claude-k2-d04-08e0-code-review-879aea64-ctx_1ddcf22e6a4c",
+  "rootVerifiedExactHeadRefEventPathAttemptAll19StepsSuccess": true,
+  "remoteExact": true,
+  "uniqueAddedReviewDocs": 12,
+  "actualWorkerDone": "msg_1f73812380c4",
+  "verdict": "INTERNAL_CODE_ACCEPT",
+  "scope": "NARROW_INTERNAL_CODE_ONLY",
+  "findings": [
+    {
+      "id": "D04-L1",
+      "severity": "LOW",
+      "blocking": false,
+      "kind": "observed contract mismatch (static control flow, not executed)",
+      "source": "services/node-agent/internal/migrationcontext/p02_evaluate_internal.go:263 checks len(c.in.signatures) <= 16 inside the 04_SIGNATURE stage (SIGNATURE, bounded-signature-tuple-table); p02_inputs_internal.go:1067 only refuses more than 4096 tuples in the pre-stage budget (OWNERSHIP at 01_ANCHOR). anchor() (:104-118) does not check the table size.",
+      "contract": "Accepted design candidate_model.py:173 (Rev2 and Rev3): need(type(a.signatures) is frozenset and len(a.signatures)<=16,'OWNERSHIP','immutable-signature-table') inside _anchor, so the first refusal is OWNERSHIP at 01_ANCHOR with an empty passed prefix. Root grant msg_ccd8401cb2c5: 'Use exact accepted STAGES/first-reason order'.",
+      "validCase": "Benign C01 fixture plus 16 more well-formed tuples (17 total; the matching tuple is still a member). Design: OWNERSHIP / 01_ANCHOR / immutable-signature-table, passed []. 08e0: passes 01_ANCHOR, 02_SOURCES, 03_ENVELOPE, 03_PAYLOAD, 03_C2, then refuses SIGNATURE / 04_SIGNATURE / bounded-signature-tuple-table. Any count 17..4096 behaves the same way; 16 is accepted by both.",
+      "impact": "Fail-closed in both versions; no acceptance difference; public refusal is the same constant. Only the private first cause/stage and the earlier prefix differ, and up to 4096 budget-bounded tuples are frozen before the refusal. No test covers counts 17..4096, which is how this went unnoticed.",
+      "minimalCorrection": "Refuse len(prerequisites.signatures) > 16 as OWNERSHIP / 01_ANCHOR / immutable-signature-table before freezing (p02BudgetInputs or the p02Evaluate pre-check). The 04 check may stay as a redundant guard. Add a 17-tuple test with an exact empty prefix and a 16-tuple control.",
+      "optionalProbe": "optional_probe_signature_table_bound_test.go.txt: inert DATA, NOT_RUN, not needed for this verdict; Root may run it on an isolated 08e0 checkout if execution evidence is wanted."
+    }
+  ],
+  "info": [
+    {
+      "id": "D04-I1",
+      "text": "Order of refusals when several sources are missing in 02_SOURCES (p02_evaluate_internal.go:121-124). Go checks ticket&&clock (TIME) before measurement (INSTALLATION). The design checks h5 (INSTALLATION) before clock (TIME). So ticket present + clock and H5 both missing gives TIME in Go but INSTALLATION in the design. Separately, the pre-stage budget refusal (OWNERSHIP) comes before the nil-capsule check (ANCHOR); both are 01_ANCHOR. With a single missing source the two agree, and the design's targeted cases are single-fault. Fail-closed; optional to align."
+    },
+    {
+      "id": "D04-I2",
+      "text": "Go is stricter than the design in several places, all fail-closed. Lifecycle floor must be > 0 (:549). Clock, lifecycle, ticket and H5 times must be in the epoch domain (:571-580). Ticket id must be non-empty (:562). Raw coverage evidence, H5 evidence and the artifact must be non-empty (:418, :493, :482). Readback uses a structured token bound to capsule/generation/selector/scope/record identity/version/ticket/H5 digest, instead of the design's opaque v0==v1 (:587). rootChoiceSHA256 is computed over the raw H3-EA evidence bytes instead of trusting a claimed field (:418; this moves toward P02R2-I2, but binding those bytes to the typed statement is still the producer's job, as the README says). C2 is ASCII-only, which is equivalent after schema validation because every authority-scope string is printable ASCII. None of these turns a design refusal into acceptance. Some could refuse inputs the design would accept (for example floor 0). A future contract delta should list them explicitly."
+    },
+    {
+      "id": "D04-I3",
+      "text": "README.md:175-176 (frozen published bytes) still says 'At this WIP checkpoint its Go tests are NOT_RUN'. Root actually ran 23 top-level / 228 subtests on these exact bytes before publication. The sentence is time-stamped as a WIP checkpoint and points toward less assurance, not more, but it is stale. The publication cut kept the 14 bytes frozen; update it in the next code cut. Root's original receipts are authoritative."
+    },
+    {
+      "id": "D04-I4",
+      "text": "Precision note for P02R3-I1. p02Expectation kinds 'a'/'o' carry no content (p02_canonical_internal.go:21-24), so a present non-empty array or object expectation cannot be expressed in the typed capsule. It can only appear as a raw-vs-typed mismatch, which refuses ANCHOR at 01. Present empty []/{} and int/bool/null/empty-string/129-byte values reach 05 closed-independent-effective-verdict-expectation, and non-printable values refuse at 01, as P02R3-I1 recorded. Fail-closed."
+    }
+  ],
+  "reviewerExecutedGo": false,
+  "optionalProbeSHA256": "412fd1ed587a0e4786275ac8a56aca32d20ea853bfb59f6835b228cdb0da0beb",
+  "optionalProbeExecutedByRoot": false,
+  "CoreWasTemporalPendingDuringReview": true,
+  "factoryProducerPortRuntimeGranted": false,
+  "wholeProgramComplete": false
+}

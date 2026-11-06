@@ -1,5 +1,5 @@
 {
-  "atKST": "2026-11-07T05:51:57+09:00",
+  "atKST": "2026-11-07T06:40:38+09:00",
   "run": 42287980945,
   "head": "08e0f56eabe7d46518e17b8c3d6d7e296df880ac",
   "branch": "agent/codex/fleet5-k2-d04-internal-codec-r1-20261107",
@@ -7,9 +7,9 @@
   "path": ".github/workflows/core.yml",
   "event": "workflow_dispatch",
   "attempt": 1,
-  "status": "in_progress",
-  "conclusion": null,
-  "artifactVerification": "PENDING",
+  "status": "completed",
+  "conclusion": "success",
+  "artifactVerification": "k2-d04-full-core-root-verification.json",
   "jobs": [
     {
       "id": 128133671917,
@@ -406,5 +406,6 @@
       ]
     }
   ],
-  "wholeProgramComplete": false
+  "wholeProgramComplete": false,
+  "R2SourceMustNotBorrowThisPass": true
 }

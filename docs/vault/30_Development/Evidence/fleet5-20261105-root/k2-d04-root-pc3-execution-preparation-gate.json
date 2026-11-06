@@ -1,5 +1,5 @@
 {
-  "atKST": "2026-11-07T05:31:06+09:00",
+  "atKST": "2026-11-07T06:40:38+09:00",
   "card": "FLEET5-K2-D04-ROOT-PC3-EXECUTION-PREPARATION-20261107",
   "base": "84ee9b1b43b8921ed1d0ef8bde6f3546013c1095",
   "operator": "Root Codex",
@@ -7,7 +7,7 @@
   "authorDispatch": "ctx_ed23b4a777d0",
   "scopeGrant": "k2-d04-internal-codec-r1-root-scope.json",
   "toolchainPreparation": "k2-d04-pc3-go-runner-preparation-root-verification.json",
-  "status": "EXACT_TESTED_CODE_PUBLISHED_DOCS19SUCCESS_CORE_DISPATCHED_CODE_REVIEW_QUEUED",
+  "status": "R1_FULL_CORE_SUCCESS_INTERNAL_CODE_ACCEPT_LOW_REPRODUCED_R2_ACTUAL25TOP230SUBPASS_PUBLICATION",
   "GoCodeTestsExecuted": true,
   "plannedNext": "Owner freezes exact WIP base/patch/per-file hash and focused Go tests; Root executes only that packet in own PC3 job; actual failures preserved and corrected before final delivery/review",
   "authorObservation": "Owner actually writes Go20-stage evaluator/41policy+5running projection and causal test sources, reports gofmt parse0 and Go tests NOT_RUN; Root did not execute or accept that code",
@@ -21,5 +21,10 @@
   "actualCoreStatus": "in_progress",
   "actualCoreConclusion": null,
   "actualCodeReviewTask": "task_6d952cac2c9f",
-  "ownerPendingQuestion": "msg_74e711083e49"
+  "ownerPendingQuestion": null,
+  "R1FullCore": "k2-d04-full-core-root-verification.json",
+  "R1ActualCodeReview": "k2-d04-actual-code-review-root-verification.json",
+  "L1ActualBeforeFix": "k2-d04-l1-before-fix-actual-root-probe.json",
+  "R2ActualGo": "k2-d04-l1-r2-actual-go-summary.json",
+  "R2Publication": "k2-d04-l1-r2-publication-root-cut.json"
 }

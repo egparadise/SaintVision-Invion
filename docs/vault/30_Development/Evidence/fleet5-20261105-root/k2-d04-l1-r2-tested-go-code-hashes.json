@@ -1,0 +1,19 @@
+{
+  "sourceBase": "08e0f56eabe7d46518e17b8c3d6d7e296df880ac",
+  "testedPrePublicationThreeFileContentSHA256": "090a8c6e16a5d74c76c28f1fc117bdff21aaaed4bab0cbf3419d5654b7ec76b2",
+  "testedGoFiles": [
+    {
+      "path": "services/node-agent/internal/migrationcontext/p02_evaluate_internal.go",
+      "mode": "100644",
+      "SHA256": "2f29f521ffe358411baaa3d365f80f757c2be6df14043abdae787802a275b5c9"
+    },
+    {
+      "path": "services/node-agent/internal/migrationcontext/p02_signature_table_bound_test.go",
+      "mode": "100644",
+      "SHA256": "97d0c59b2978f2d086a310257b93057ef6d65def990d0f6f4a47bcaabd4c49bd"
+    }
+  ],
+  "testedGoOnlyContentSHA256": "9361e40fd8390684cd263f4ddbbcd1c0d1d3da0b1e7d37b12db216971ff1aa7c",
+  "READMEOnlyEvidenceRefreshAfterTestsAllowed": true,
+  "GoCodeChangesAfterActualTestsAllowed": false
+}

@@ -1,0 +1,12 @@
+{
+  "source": "08e0f56eabe7d46518e17b8c3d6d7e296df880ac",
+  "originalFiles": 47,
+  "sourceSnapshotEntries": 369,
+  "allSourceBeforeAfterEqual": true,
+  "source14ExactlyEqualsPublished08e0": true,
+  "realGitHead08e0": true,
+  "actualGoVersion": "go1.27.1 linux/amd64",
+  "reviewerProbeSHA256": "412fd1ed587a0e4786275ac8a56aca32d20ea853bfb59f6835b228cdb0da0beb",
+  "observedD04L1Mismatch": true,
+  "sourceOrRuntimeGrant": false
+}

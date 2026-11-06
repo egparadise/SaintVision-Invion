@@ -1,0 +1,15 @@
+{
+  "atKST": "2026-11-07T06:40:38+09:00",
+  "source": "1550453d1f072a87fd9a7baa53d4fe4ce8a98d5d",
+  "base": "0e66b5ab2b5fbc131dd6e98f5d5e8930ac045148",
+  "Docs": 42295460722,
+  "sourceRootVerification": "b-a7-snapshot-r1-source-root-verification.json",
+  "task": "task_8376b6d0ca39",
+  "dispatch": "ctx_d6e29070eb5d",
+  "status": "DISPATCHED_PENDING_ACTUAL_PARTIAL_STATIC_VERDICT",
+  "ownerQuestion": "msg_577bb9090679",
+  "remainingBlocksGrant": 19,
+  "candidateStatus": "SOURCE_STATIC_UNRESOLVED_RUNTIME_PENDING",
+  "productOrPortOrRuntimeGrant": false,
+  "freshPreviousLifecycle": "ctx_1ddcf22e6a4c succeeded_settled_exited_released"
+}
