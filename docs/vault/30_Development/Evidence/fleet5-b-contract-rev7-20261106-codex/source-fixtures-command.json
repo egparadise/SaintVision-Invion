@@ -1,0 +1,13 @@
+{
+  "command": [
+    "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+    "-B",
+    "docs\\vault\\30_Development\\Evidence\\fleet5-b-contract-rev7-20261106-codex\\source_fixtures.py"
+  ],
+  "exit": 1,
+  "seconds": 5.900319600012153,
+  "log": "source-fixtures-run.log",
+  "sha256": "7a108e6bc75a412fe19f7bb004cc21f04712cf434a360a0f4f1ef75586f40468",
+  "kst": "2026-11-06T12:44:44.069092+09:00",
+  "level": "bounded serial selected source mutations only"
+}

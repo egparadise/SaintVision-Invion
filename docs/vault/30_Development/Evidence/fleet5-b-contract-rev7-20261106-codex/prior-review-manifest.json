@@ -1,0 +1,104 @@
+[
+  {
+    "commit": "ecbdaa3beca33e4cb4efc943f6bd9c4b02620291",
+    "path": "docs/vault/30_Development/Evidence/fleet5-b-rev6-ee97-review-20261106-claude/.gitattributes",
+    "sha256": "96a83569c84cfe3f57b7efe3dc61c249548d0fca4fed0e538b3587cdc97c95c1",
+    "bytes": 21
+  },
+  {
+    "commit": "ecbdaa3beca33e4cb4efc943f6bd9c4b02620291",
+    "path": "docs/vault/30_Development/Evidence/fleet5-b-rev6-ee97-review-20261106-claude/commands.json",
+    "sha256": "1b900898125c913882da2f799fbccfa8457b271d7eb49230e1dff0473003d528",
+    "bytes": 5605
+  },
+  {
+    "commit": "ecbdaa3beca33e4cb4efc943f6bd9c4b02620291",
+    "path": "docs/vault/30_Development/Evidence/fleet5-b-rev6-ee97-review-20261106-claude/local-doc-gates.txt",
+    "sha256": "6a419ceeaff0d597212d30dea318276c2c46bfbbe4e68bd18a009e6a48827f82",
+    "bytes": 4670
+  },
+  {
+    "commit": "ecbdaa3beca33e4cb4efc943f6bd9c4b02620291",
+    "path": "docs/vault/30_Development/Evidence/fleet5-b-rev6-ee97-review-20261106-claude/review.json",
+    "sha256": "842951e7a64ed8990dcdf842272549923de35b6a825029c49816168f58697b80",
+    "bytes": 25296
+  },
+  {
+    "commit": "ecbdaa3beca33e4cb4efc943f6bd9c4b02620291",
+    "path": "docs/vault/30_Development/Evidence/fleet5-b-rev6-ee97-review-20261106-claude/reviewer-l3l4-attacks-result.json",
+    "sha256": "828544ca520904eca3dfe043b55d812770b2eaf430e6df633e8f87bfb47fe588",
+    "bytes": 1036
+  },
+  {
+    "commit": "ecbdaa3beca33e4cb4efc943f6bd9c4b02620291",
+    "path": "docs/vault/30_Development/Evidence/fleet5-b-rev6-ee97-review-20261106-claude/reviewer-m1-attacks-result.json",
+    "sha256": "bbb6b0575c339a226f840ae49c21a57933fcdc143f1e98875fdc4485e4887f08",
+    "bytes": 4460
+  },
+  {
+    "commit": "ecbdaa3beca33e4cb4efc943f6bd9c4b02620291",
+    "path": "docs/vault/30_Development/Evidence/fleet5-b-rev6-ee97-review-20261106-claude/reviewer-m2-subset-probes-result.jsonl.txt",
+    "sha256": "78463ae370ab5cb4ea7d129a5afac49fd5725c0c04377281762b549fddb22a83",
+    "bytes": 4492
+  },
+  {
+    "commit": "ecbdaa3beca33e4cb4efc943f6bd9c4b02620291",
+    "path": "docs/vault/30_Development/Evidence/fleet5-b-rev6-ee97-review-20261106-claude/reviewer-stream-backlog-result.json",
+    "sha256": "f504f5a4bba3b33a09b4409169f32943467572cf960bf15590c4dba5dff95d98",
+    "bytes": 7938
+  },
+  {
+    "commit": "ecbdaa3beca33e4cb4efc943f6bd9c4b02620291",
+    "path": "docs/vault/30_Development/Evidence/fleet5-b-rev6-ee97-review-20261106-claude/reviewer-stream-ledger-result.json",
+    "sha256": "d6e5c52886d89f48b350845706935503b5099cbab45a56201f038d2e56a83f3e",
+    "bytes": 15846
+  },
+  {
+    "commit": "ecbdaa3beca33e4cb4efc943f6bd9c4b02620291",
+    "path": "docs/vault/30_Development/Evidence/fleet5-b-rev6-ee97-review-20261106-claude/reviewer-stream-plans-result.json",
+    "sha256": "686ff0ad1904748dbe235dd34f8e044161d6213c1624965d1e616ba27c930f90",
+    "bytes": 7427
+  },
+  {
+    "commit": "ecbdaa3beca33e4cb4efc943f6bd9c4b02620291",
+    "path": "docs/vault/30_Development/Evidence/fleet5-b-rev6-ee97-review-20261106-claude/reviewer_l3l4_attacks.py.txt",
+    "sha256": "776c7708cf8b12f7a01f46e711d3760094e9e643bf57ca52184e78c681ba8365",
+    "bytes": 2470
+  },
+  {
+    "commit": "ecbdaa3beca33e4cb4efc943f6bd9c4b02620291",
+    "path": "docs/vault/30_Development/Evidence/fleet5-b-rev6-ee97-review-20261106-claude/reviewer_m1_attacks.py.txt",
+    "sha256": "b648b24a45bc705bf940751c8c4d4cdb58bdaf6c80e8d200162f8bf4e3dd7c4a",
+    "bytes": 5406
+  },
+  {
+    "commit": "ecbdaa3beca33e4cb4efc943f6bd9c4b02620291",
+    "path": "docs/vault/30_Development/Evidence/fleet5-b-rev6-ee97-review-20261106-claude/reviewer_m2_subset_probes.py.txt",
+    "sha256": "a89771c234435748a24dd58c97e5ff9eff2de0b7685b85f23cfde581b1f0de02",
+    "bytes": 3779
+  },
+  {
+    "commit": "ecbdaa3beca33e4cb4efc943f6bd9c4b02620291",
+    "path": "docs/vault/30_Development/Evidence/fleet5-b-rev6-ee97-review-20261106-claude/reviewer_stream_backlog.py.txt",
+    "sha256": "cc83012607446a6b3aa6d674400bf44775990d7c8b639a3c6e76575a01eb2fa7",
+    "bytes": 1331
+  },
+  {
+    "commit": "ecbdaa3beca33e4cb4efc943f6bd9c4b02620291",
+    "path": "docs/vault/30_Development/Evidence/fleet5-b-rev6-ee97-review-20261106-claude/reviewer_stream_ledger.py.txt",
+    "sha256": "a0168f6d53bbc7ed43db0a61ae2134e31d1c88122839cba587c00122f23882aa",
+    "bytes": 4144
+  },
+  {
+    "commit": "ecbdaa3beca33e4cb4efc943f6bd9c4b02620291",
+    "path": "docs/vault/30_Development/Evidence/fleet5-b-rev6-ee97-review-20261106-claude/reviewer_stream_ledger_lib.py.txt",
+    "sha256": "8aaa02f96648a7c74ddff9e2ac84734e5f14170c1c3fd026eca8351262f54265",
+    "bytes": 1426
+  },
+  {
+    "commit": "ecbdaa3beca33e4cb4efc943f6bd9c4b02620291",
+    "path": "docs/vault/30_Development/Evidence/fleet5-b-rev6-ee97-review-20261106-claude/reviewer_stream_plans.py.txt",
+    "sha256": "a1338ce3e60d01f1edb4ced4734fb3c6a2f06a37ae780f2b421db09d308fc6c4",
+    "bytes": 712
+  }
+]

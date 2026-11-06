@@ -1,0 +1,6 @@
+{
+  "status": "SUPERSEDED_DIAGNOSTIC_ONLY",
+  "finalCommands": "source-checks.json",
+  "priorActualCommand": "development-third-analysis-command.json",
+  "notFinalValidationLedger": true
+}

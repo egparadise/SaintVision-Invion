@@ -1,0 +1,64 @@
+{
+  "scope": "AUTHOR_REPRODUCTION_OF_PRIOR_CLOSED_DESIGN_PROBES_ONLY",
+  "priorProbeSHA256": "776c7708cf8b12f7a01f46e711d3760094e9e643bf57ca52184e78c681ba8365",
+  "cases": [
+    {
+      "case": "A10-ARM-publication-after-concurrent-heartbeat-registration",
+      "actual": true,
+      "expected": true,
+      "defect": false,
+      "note": "any IO registration bumps authorityVersion and discards private signature"
+    },
+    {
+      "case": "L3b-other-node-revoke-no-interference",
+      "actual": true,
+      "expected": true,
+      "defect": false,
+      "note": ""
+    },
+    {
+      "case": "L3c-cross-connection-publication",
+      "actual": true,
+      "expected": true,
+      "defect": false,
+      "note": ""
+    },
+    {
+      "case": "L3d-second-publication-refused",
+      "actual": true,
+      "expected": true,
+      "defect": false,
+      "note": ""
+    },
+    {
+      "case": "L4b-cross-node-outbox-invalidate",
+      "actual": true,
+      "expected": true,
+      "defect": false,
+      "note": ""
+    },
+    {
+      "case": "L4c-dispatcher-ARM-via-outbox",
+      "actual": true,
+      "expected": true,
+      "defect": false,
+      "note": ""
+    },
+    {
+      "case": "L4d-tombstone-requires-causal",
+      "actual": true,
+      "expected": true,
+      "defect": false,
+      "note": ""
+    },
+    {
+      "case": "L4e-RUN-cannot-tombstone",
+      "actual": true,
+      "expected": true,
+      "defect": false,
+      "note": ""
+    }
+  ],
+  "actualIndependentRev7Review": "PENDING via Root",
+  "actualRuntimeB": 0
+}

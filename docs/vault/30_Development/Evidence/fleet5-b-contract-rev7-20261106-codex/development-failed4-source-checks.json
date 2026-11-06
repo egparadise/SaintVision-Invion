@@ -1,0 +1,22 @@
+{
+  "phase": "source-checks",
+  "commands": [
+    {
+      "command": [
+        "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+        "-B",
+        "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105\\docs\\vault\\30_Development\\Evidence\\fleet5-b-contract-rev7-20261106-codex\\source_fixtures.py"
+      ],
+      "expectedExit": 0,
+      "actualExit": 1,
+      "seconds": 12.842,
+      "log": "source-checks-1.log",
+      "sha256": "0971683f77ca061f002509d753a4e7dff8da052d85eee8606c0a88ec0ef50bec",
+      "kst": "2026-11-06T13:30:05.085554+09:00"
+    }
+  ],
+  "canonicalSyncStateBeforeSHA256": null,
+  "canonicalSyncStateAfterSHA256": null,
+  "obsidianApply": false,
+  "actualRuntimeB": 0
+}

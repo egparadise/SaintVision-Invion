@@ -1,0 +1,8 @@
+Traceback (most recent call last):
+  File "D:\Project\SaintVisionI-Invion\fleet5-compute-storage-contract-20261105\tools\check_docs.py", line 157, in <module>
+    validate()
+    ~~~~~~~~^^
+  File "D:\Project\SaintVisionI-Invion\fleet5-compute-storage-contract-20261105\tools\check_docs.py", line 152, in validate
+    raise ValueError('\n'.join(errors))
+ValueError: Password-bearing PostgreSQL DSN must be redacted (1 occurrence(s)): 30_Development\Evidence\fleet5-b-contract-rev7-20261106-codex\classifiedCalls.jsonl
+Password-bearing PostgreSQL DSN must be redacted (42 occurrence(s)): 30_Development\Evidence\fleet5-b-contract-rev7-20261106-codex\writers.jsonl

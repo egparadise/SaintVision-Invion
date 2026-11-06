@@ -1,0 +1,58 @@
+{
+  "level": "SCHEMA_STATIC_SYMBOLIC_ONLY",
+  "source": "72028cbac903c4415d9979f980a6e0f9948e914f",
+  "sourceFiles": 523,
+  "allCalls": 47608,
+  "classes": {
+    "UNRESOLVED": 21453,
+    "NONAUTHORITY_STDLIB": 2910,
+    "NONAUTHORITY_BUILTIN": 9520,
+    "RESOLVED_SOURCE_TARGET": 8738,
+    "NONAUTHORITY_TYPED_MAPPING": 1013,
+    "EXTERNAL_IO_UNMEDIATED": 1939,
+    "RESOLVED_DB_RECORD": 1663,
+    "NONAUTHORITY_VALUE_INITIALIZER": 161,
+    "AUTHORITY_EXTERNAL_IO_CATALOGUE_BOUND": 19,
+    "RESOLVED_TRANSACTION_OWNER": 45,
+    "RESOLVED_DB_CURSOR_FACTORY": 10,
+    "RESOLVED_SOURCE_WRITER": 57,
+    "RESOLVED_TRANSACTION_STATUS": 2,
+    "RESOLVED_TYPED_ORM_UOW": 78
+  },
+  "sourcePlanCensus": 3485,
+  "actualProcedureJoins": 39,
+  "criticalEntries": 21,
+  "criticalStatus": {
+    "UNSUPPORTED_NAMED_PORTS_PENDING": 21
+  },
+  "currentAuthorityWriters": 34,
+  "symbolicCases": 335,
+  "boundedSourceCases": 41,
+  "ownerPriorClosedRerunCases": 8,
+  "packetAssertions": 78358,
+  "streamedSourceLedgerBytes": 43994760,
+  "displayMaskedRows": 22,
+  "displayRawSourceBindingsPreserved": true,
+  "ownerFullAssemblerMemory": {
+    "scope": "this analysis process only",
+    "enforcedRAMLimit": null,
+    "OSChanges": false,
+    "reviewResourceContext": "prior reviewer190-356MiB; stream normalized ledgers and run bounded selected subsets, not a 74MB aggregate parse",
+    "peakWorkingSetBytes": 646504448,
+    "workingSetBytes": 610201600
+  },
+  "boundedSubsetMemory": {
+    "scope": "this process only",
+    "enforcedOSRAMLimit": null,
+    "OSChanges": false,
+    "peakWorkingSetBytes": 50352128,
+    "workingSetBytes": 35266560
+  },
+  "allRealBindings": null,
+  "A1_A16": "PENDING",
+  "actualNewGoCryptoPGEngineCrashConcurrencyEquipment": 0,
+  "independentWholeRev7Review": "PENDING via Root",
+  "implementationGrant": "NONE",
+  "obsidianApply": false,
+  "grantBoundary": "Critical source closures with named unresolved ports are UNSUPPORTED; no whole B readiness/source grant, partial freeze or runtime denial inferred from static counts."
+}

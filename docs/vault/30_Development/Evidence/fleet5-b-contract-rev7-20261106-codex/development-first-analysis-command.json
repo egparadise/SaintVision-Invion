@@ -1,0 +1,13 @@
+{
+  "command": [
+    "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+    "-B",
+    "docs\\vault\\30_Development\\Evidence\\fleet5-b-contract-rev7-20261106-codex\\source_analysis.py"
+  ],
+  "exit": 0,
+  "seconds": 104.18756919994485,
+  "log": "source-analysis-run.log",
+  "sha256": "7370a4e61666af6ac4f95e3afb31b198da72a20c554753cbb878690c983e00a6",
+  "kst": "2026-11-06T12:24:53.956201+09:00",
+  "level": "source AST only; no imports of application/DB/Node"
+}

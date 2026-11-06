@@ -1,0 +1,7 @@
+{
+  "cause": "one actual blank-line trailing space found by retained staged whitespace check",
+  "oldProducerSHA256": "2a308f9ac38fcc050daeb798f7dd35d046dd7da5de3b4c07a361f83e14bb957e",
+  "formattedProducerSHA256": "50a303ea8f9deedd9e0cb311f000790cf1e30aa43b08f690b823a637fe7ae7a3",
+  "ASTIncludingLocationsUnchanged": true,
+  "action": "rerun emitter/postprocessor/consumers to bind exact formatted producer bytes; no production or policy change"
+}

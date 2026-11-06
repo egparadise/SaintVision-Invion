@@ -1,0 +1,599 @@
+{
+  "assertions": 78358,
+  "failed": 0,
+  "namedChecks": [
+    {
+      "case": "matrix-invariants",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "case": "producer-source_analysis.py",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "case": "producer-source_semantics.py",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "case": "producer-graph_policy.py",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "case": "producer-normalized.py",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "case": "producer-rank_contract.py",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "case": "producer-plan_specs.py",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "case": "producer-writer_semantics.py",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "case": "producer-transport_inventory.py",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "case": "producer-catalog.py",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "case": "producer-io_contract.py",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "case": "explicit-display-postprocessor",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "case": "display-raw-input-chain",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "case": "all-523-source-bytes",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "case": "all21-critical-present",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "case": "actual-four-outer-transaction-sites-retained",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "case": "actual-owner-inv.observation.NodeObservation.accept",
+      "pass": true,
+      "detail": {
+        "classification": "RESOLVED_SOURCE_TARGET",
+        "targets": [
+          "inv.db.Database.transaction"
+        ],
+        "types": [
+          "inv.db.Database"
+        ]
+      }
+    },
+    {
+      "case": "actual-owner-inv.observation.NodeObservation.mark_offline",
+      "pass": true,
+      "detail": {
+        "classification": "RESOLVED_SOURCE_TARGET",
+        "targets": [
+          "inv.db.Database.transaction"
+        ],
+        "types": [
+          "inv.db.Database"
+        ]
+      }
+    },
+    {
+      "case": "actual-owner-inv.results.ResultStore.complete",
+      "pass": true,
+      "detail": {
+        "classification": "RESOLVED_SOURCE_TARGET",
+        "targets": [
+          "inv.db.Database.transaction"
+        ],
+        "types": [
+          "inv.db.Database"
+        ]
+      }
+    },
+    {
+      "case": "actual-owner-inv.shard_completion.ShardCompletion.once",
+      "pass": true,
+      "detail": {
+        "classification": "RESOLVED_SOURCE_TARGET",
+        "targets": [
+          "inv.db.Database.transaction"
+        ],
+        "types": [
+          "inv.db.Database"
+        ]
+      }
+    },
+    {
+      "case": "actual-shard-validated-to-planned-writer-reached",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "case": "current34-census-no-errors",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "case": "composition27SQL7ORM",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "case": "SQL-seed-wrong-tenant",
+      "pass": true,
+      "detail": {
+        "mutatedActualGitBytes": true,
+        "expected": "SQL_ROUTINE_INSERT_AUTHORITY_DRIFT"
+      }
+    },
+    {
+      "case": "SQL-seed-default-kill",
+      "pass": true,
+      "detail": {
+        "mutatedActualGitBytes": true,
+        "expected": "SQL_ROUTINE_DEFAULT_AUTHORITY_DRIFT"
+      }
+    },
+    {
+      "case": "separate39-joins-from-source-census",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "case": "prior12-upgrade-hazards-reproduced",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "case": "strongest-preacquired-SQL:services/control-plane/src/inv/migrations/0022_node_containment.sql:<migration>",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "case": "strongest-preacquired-SQL:services/control-plane/src/inv/migrations/0022_node_containment.sql:inv.seed_containment_control",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "case": "strongest-preacquired-inv.build_adapter._lock_live_build_authority",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "case": "strongest-preacquired-inv.build_execution.BuildExecutionService._commit_consequences",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "case": "strongest-preacquired-inv.build_execution.BuildExecutionService._mark_node_quarantined",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "case": "strongest-preacquired-inv.capacity.project_capacity",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "case": "strongest-preacquired-inv.containment.Containment.change",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "case": "strongest-preacquired-inv.dispatch.DeliveryQueue._can_start",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "case": "strongest-preacquired-inv.gpu.current_single_gpu_allocation",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "case": "strongest-preacquired-inv.leases.LeaseStore._reserve_prepared_locked",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "case": "strongest-preacquired-inv.model_commit.ModelManifestStore._capture",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "case": "strongest-preacquired-inv.model_locality._capture",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "case": "strongest-preacquired-inv.node_channels.NodeChannels.snapshot",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "case": "strongest-preacquired-inv.node_channels.provision_channel",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "case": "strongest-preacquired-inv.node_channels.revoke_channel",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "case": "strongest-preacquired-inv.node_transport.NodeDelivery._quarantine_gpu_node",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "case": "strongest-preacquired-inv.observation.NodeObservation.accept",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "case": "strongest-preacquired-inv.observation.NodeObservation.mark_offline",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "case": "strongest-preacquired-inv.placement.PlacementStore._speculate",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "case": "strongest-preacquired-inv.placement.PlacementStore.reserve",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "case": "strongest-preacquired-inv.results.ResultStore.complete",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "case": "strongest-preacquired-inv.runs.RunStore.complete",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "case": "strongest-preacquired-inv.scheduler._place",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "case": "strongest-preacquired-inv.shard_completion.ShardCompletion.once",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "case": "strongest-preacquired-inv.storage_commit.StorageSampleStore.apply_sample",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "case": "strongest-preacquired-inv.terminal.TerminalService._current",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "case": "strongest-preacquired-inv.tooling.ToolGateway.claim",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "case": "strongest-preacquired-saintvision.services.nodes.enroll_node",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "case": "strongest-preacquired-saintvision.services.nodes.mark_lost_nodes",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "case": "strongest-preacquired-saintvision.services.nodes.record_heartbeat",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "case": "strongest-preacquired-saintvision.services.storage.activate_contribution",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "case": "strongest-preacquired-saintvision.services.storage.register_contribution",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "case": "strongest-preacquired-saintvision.services.storage.revoke_contribution",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "case": "strongest-preacquired-tools.check_migration_upgrade.main",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "case": "strongest-preacquired-tools.lan_execution.execute",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "case": "strongest-preacquired-tools.lan_pilot.init",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "case": "strongest-preacquired-tools.lan_pilot.provision_observation_node",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "case": "strongest-preacquired-tools.remote_workspace_entry.initialize",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "case": "strongest-preacquired-tools.run_s04_fe_matrix.run_acceptance",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "case": "same-Node-old-share-then-upgrade-RED",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "case": "same-Node-merged-update-once-GREEN",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "case": "total-key-mode-comparator",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "case": "all19-exact-transport-callers",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "case": "caller-exact-source-services/control-plane/src/inv/build_execution.py:779",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "case": "caller-exact-source-services/control-plane/src/inv/build_execution.py:787",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "case": "caller-exact-source-services/control-plane/src/inv/build_execution.py:835",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "case": "caller-exact-source-services/control-plane/src/inv/buildkit_transport.py:895",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "case": "caller-exact-source-services/control-plane/src/inv/buildkit_transport.py:978",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "case": "caller-exact-source-services/control-plane/src/inv/buildkit_transport.py:855",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "case": "caller-exact-source-services/control-plane/src/inv/model_remote.py:98",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "case": "caller-exact-source-services/control-plane/src/inv/node_transfer.py:43",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "case": "caller-exact-source-services/control-plane/src/inv/node_transport.py:289",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "case": "caller-exact-source-services/control-plane/src/inv/observation.py:119",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "case": "caller-exact-source-services/control-plane/src/inv/observation.py:124",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "case": "caller-exact-source-services/control-plane/src/inv/storage_check_collect.py:309",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "case": "caller-exact-source-services/control-plane/src/inv/storage_commit.py:398",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "case": "caller-exact-source-services/control-plane/src/inv/terminal.py:277",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "case": "caller-exact-source-tools/check_remote_workspace.py:117",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "case": "caller-exact-source-tools/lan_execution.py:174",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "case": "caller-exact-source-tools/lan_execution.py:186",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "case": "caller-exact-source-tools/lan_execution.py:144",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "case": "caller-exact-source-tools/remote_workspace_entry.py:205",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "case": "actual-receipts-side-effect-counterexample",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "case": "13-purpose-specific-reader-predicates",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "case": "plain-owner-activation-no-confirmation",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "case": "plain-confirmation-drift-RED",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "case": "all-plain-folder-assertions-corrected",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "case": "actual-prior-review-byte-ref-.gitattributes",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "case": "actual-prior-review-byte-ref-commands.json",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "case": "actual-prior-review-byte-ref-local-doc-gates.txt",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "case": "actual-prior-review-byte-ref-review.json",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "case": "actual-prior-review-byte-ref-reviewer-l3l4-attacks-result.json",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "case": "actual-prior-review-byte-ref-reviewer-m1-attacks-result.json",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "case": "actual-prior-review-byte-ref-reviewer-m2-subset-probes-result.jsonl.txt",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "case": "actual-prior-review-byte-ref-reviewer-stream-backlog-result.json",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "case": "actual-prior-review-byte-ref-reviewer-stream-ledger-result.json",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "case": "actual-prior-review-byte-ref-reviewer-stream-plans-result.json",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "case": "actual-prior-review-byte-ref-reviewer_l3l4_attacks.py.txt",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "case": "actual-prior-review-byte-ref-reviewer_m1_attacks.py.txt",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "case": "actual-prior-review-byte-ref-reviewer_m2_subset_probes.py.txt",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "case": "actual-prior-review-byte-ref-reviewer_stream_backlog.py.txt",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "case": "actual-prior-review-byte-ref-reviewer_stream_ledger.py.txt",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "case": "actual-prior-review-byte-ref-reviewer_stream_ledger_lib.py.txt",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "case": "actual-prior-review-byte-ref-reviewer_stream_plans.py.txt",
+      "pass": true,
+      "detail": null
+    }
+  ]
+}

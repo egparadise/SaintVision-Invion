@@ -1,0 +1,1370 @@
+{
+  "source": "72028cbac903c4415d9979f980a6e0f9948e914f",
+  "callers": [
+    {
+      "path": "services/control-plane/src/inv/build_execution.py",
+      "line": 779,
+      "function": "BuildExecutionService.execute",
+      "sourceSHA": "72028cbac903c4415d9979f980a6e0f9948e914f",
+      "fileSHA256": "afc4cabc20bd1d4f4adf3f1542ed5eb49d9f16631b5dbdb3ebc5d06d1bc9d11f",
+      "exactLine": "        health = self._transport.collect_product_health()",
+      "implementedSourceOnly": true,
+      "call": "self._transport.collect_product_health()",
+      "methodName": "collect_product_health",
+      "registrationBoundary": true,
+      "disposition": "EXACT_CALL_CLOSED_VARIANTS",
+      "variants": [
+        {
+          "predicate": "exact registered method/path/request/handler",
+          "kind": "BUILD_HEALTH_READ",
+          "effectClass": "READ_ONLY"
+        }
+      ],
+      "callerTransaction": "independent original admitted intent commits before this call; exact outcome appended in original typed consumer transaction. No locks across external call.",
+      "parent": "exact original run/claim/permit or current authorized observation/read/safety scope; cleanup/terminal/object continuation requires exact immutable parent handle and current read rights",
+      "selectorAuthority": "server-approved typed operation chooses exclusive handler variant; untrusted booleans/kind/effectClass cannot authorize or downgrade",
+      "registration": "BEFORE this exact call, after DB-committed opaque handle. Method definition is not a registration boundary."
+    },
+    {
+      "path": "services/control-plane/src/inv/build_execution.py",
+      "line": 787,
+      "function": "BuildExecutionService.execute",
+      "sourceSHA": "72028cbac903c4415d9979f980a6e0f9948e914f",
+      "fileSHA256": "afc4cabc20bd1d4f4adf3f1542ed5eb49d9f16631b5dbdb3ebc5d06d1bc9d11f",
+      "exactLine": "        dispatched = self._adapter.execute(",
+      "implementedSourceOnly": true,
+      "call": "self._adapter.execute(principal, dict(request), dict(plan), dict(decision), policy_version=policy_version, run_id=run_id, evidence_id=evidence_id, actor_id=actor_id, intent_claim_fencing_token=intent_claim_fencing_token)",
+      "methodName": "execute",
+      "registrationBoundary": true,
+      "disposition": "EXACT_CALL_CLOSED_VARIANTS",
+      "variants": [
+        {
+          "predicate": "exact registered method/path/request/handler",
+          "kind": "BUILD_DISPATCH",
+          "effectClass": "SIDE_EFFECT"
+        }
+      ],
+      "callerTransaction": "independent original admitted intent commits before this call; exact outcome appended in original typed consumer transaction. No locks across external call.",
+      "parent": "exact original run/claim/permit or current authorized observation/read/safety scope; cleanup/terminal/object continuation requires exact immutable parent handle and current read rights",
+      "selectorAuthority": "server-approved typed operation chooses exclusive handler variant; untrusted booleans/kind/effectClass cannot authorize or downgrade",
+      "registration": "BEFORE this exact call, after DB-committed opaque handle. Method definition is not a registration boundary."
+    },
+    {
+      "path": "services/control-plane/src/inv/build_execution.py",
+      "line": 835,
+      "function": "BuildExecutionService.execute",
+      "sourceSHA": "72028cbac903c4415d9979f980a6e0f9948e914f",
+      "fileSHA256": "afc4cabc20bd1d4f4adf3f1542ed5eb49d9f16631b5dbdb3ebc5d06d1bc9d11f",
+      "exactLine": "        cleanup_receipt = self._transport.collect_cleanup_receipt(build_session_id)",
+      "implementedSourceOnly": true,
+      "call": "self._transport.collect_cleanup_receipt(build_session_id)",
+      "methodName": "collect_cleanup_receipt",
+      "registrationBoundary": true,
+      "disposition": "EXACT_CALL_CLOSED_VARIANTS",
+      "variants": [
+        {
+          "predicate": "exact registered method/path/request/handler",
+          "kind": "BUILD_CLEANUP_READ",
+          "effectClass": "READ_ONLY"
+        }
+      ],
+      "callerTransaction": "independent original admitted intent commits before this call; exact outcome appended in original typed consumer transaction. No locks across external call.",
+      "parent": "exact original run/claim/permit or current authorized observation/read/safety scope; cleanup/terminal/object continuation requires exact immutable parent handle and current read rights",
+      "selectorAuthority": "server-approved typed operation chooses exclusive handler variant; untrusted booleans/kind/effectClass cannot authorize or downgrade",
+      "registration": "BEFORE this exact call, after DB-committed opaque handle. Method definition is not a registration boundary."
+    },
+    {
+      "path": "services/control-plane/src/inv/buildkit_transport.py",
+      "line": 895,
+      "function": "NodeAgentReceipts.daemon_identity",
+      "sourceSHA": "72028cbac903c4415d9979f980a6e0f9948e914f",
+      "fileSHA256": "70a924987554b389b8c2e377226fac242df1ec0b713c0b4fb9ac240ea8bbcfae",
+      "exactLine": "        receipt = self.collect_product_health()",
+      "implementedSourceOnly": true,
+      "call": "self.collect_product_health()",
+      "methodName": "collect_product_health",
+      "registrationBoundary": true,
+      "disposition": "EXACT_CALL_CLOSED_VARIANTS",
+      "variants": [
+        {
+          "predicate": "exact registered method/path/request/handler",
+          "kind": "BUILD_HEALTH_READ",
+          "effectClass": "READ_ONLY"
+        }
+      ],
+      "callerTransaction": "independent original admitted intent commits before this call; exact outcome appended in original typed consumer transaction. No locks across external call.",
+      "parent": "exact original run/claim/permit or current authorized observation/read/safety scope; cleanup/terminal/object continuation requires exact immutable parent handle and current read rights",
+      "selectorAuthority": "server-approved typed operation chooses exclusive handler variant; untrusted booleans/kind/effectClass cannot authorize or downgrade",
+      "registration": "BEFORE this exact call, after DB-committed opaque handle. Method definition is not a registration boundary."
+    },
+    {
+      "path": "services/control-plane/src/inv/buildkit_transport.py",
+      "line": 978,
+      "function": "NodeAgentReceipts._record_quarantine",
+      "sourceSHA": "72028cbac903c4415d9979f980a6e0f9948e914f",
+      "fileSHA256": "70a924987554b389b8c2e377226fac242df1ec0b713c0b4fb9ac240ea8bbcfae",
+      "exactLine": "        receipt = self._quarantine_client.quarantine(channel, request)",
+      "implementedSourceOnly": true,
+      "call": "self._quarantine_client.quarantine(channel, request)",
+      "methodName": "quarantine",
+      "registrationBoundary": true,
+      "disposition": "EXACT_CALL_CLOSED_VARIANTS",
+      "variants": [
+        {
+          "predicate": "exact registered method/path/request/handler",
+          "kind": "QUARANTINE_RECONCILE",
+          "effectClass": "IDEMPOTENT_SAFETY"
+        }
+      ],
+      "callerTransaction": "independent original admitted intent commits before this call; exact outcome appended in original typed consumer transaction. No locks across external call.",
+      "parent": "exact original run/claim/permit or current authorized observation/read/safety scope; cleanup/terminal/object continuation requires exact immutable parent handle and current read rights",
+      "selectorAuthority": "server-approved typed operation chooses exclusive handler variant; untrusted booleans/kind/effectClass cannot authorize or downgrade",
+      "registration": "BEFORE this exact call, after DB-committed opaque handle. Method definition is not a registration boundary."
+    },
+    {
+      "path": "services/control-plane/src/inv/buildkit_transport.py",
+      "line": 855,
+      "function": "NodeAgentReceipts.preflight_quarantine",
+      "sourceSHA": "72028cbac903c4415d9979f980a6e0f9948e914f",
+      "fileSHA256": "70a924987554b389b8c2e377226fac242df1ec0b713c0b4fb9ac240ea8bbcfae",
+      "exactLine": "            response = self._quarantine_client.probe(channel, request)",
+      "implementedSourceOnly": true,
+      "call": "self._quarantine_client.probe(channel, request)",
+      "methodName": "probe",
+      "registrationBoundary": true,
+      "disposition": "EXACT_CALL_CLOSED_VARIANTS",
+      "variants": [
+        {
+          "predicate": "exact registered method/path/request/handler",
+          "kind": "HEARTBEAT_OBSERVE",
+          "effectClass": "READ_ONLY"
+        }
+      ],
+      "callerTransaction": "independent original admitted intent commits before this call; exact outcome appended in original typed consumer transaction. No locks across external call.",
+      "parent": "exact original run/claim/permit or current authorized observation/read/safety scope; cleanup/terminal/object continuation requires exact immutable parent handle and current read rights",
+      "selectorAuthority": "server-approved typed operation chooses exclusive handler variant; untrusted booleans/kind/effectClass cannot authorize or downgrade",
+      "registration": "BEFORE this exact call, after DB-committed opaque handle. Method definition is not a registration boundary."
+    },
+    {
+      "path": "services/control-plane/src/inv/model_remote.py",
+      "line": 98,
+      "function": "ConfiguredRemoteModelReader.read",
+      "sourceSHA": "72028cbac903c4415d9979f980a6e0f9948e914f",
+      "fileSHA256": "796f61fe8404c2c3a8a4be08eca75d98e3c442a30c04077c66b278e7d60c6737",
+      "exactLine": "            result = self.client.read_chunk(by_node[location.node_id], request)",
+      "implementedSourceOnly": true,
+      "call": "self.client.read_chunk(by_node[location.node_id], request)",
+      "methodName": "read_chunk",
+      "registrationBoundary": true,
+      "disposition": "EXACT_CALL_CLOSED_VARIANTS",
+      "variants": [
+        {
+          "predicate": "exact registered method/path/request/handler",
+          "kind": "OBJECT_READ",
+          "effectClass": "READ_ONLY"
+        }
+      ],
+      "callerTransaction": "independent original admitted intent commits before this call; exact outcome appended in original typed consumer transaction. No locks across external call.",
+      "parent": "exact original run/claim/permit or current authorized observation/read/safety scope; cleanup/terminal/object continuation requires exact immutable parent handle and current read rights",
+      "selectorAuthority": "server-approved typed operation chooses exclusive handler variant; untrusted booleans/kind/effectClass cannot authorize or downgrade",
+      "registration": "BEFORE this exact call, after DB-committed opaque handle. Method definition is not a registration boundary."
+    },
+    {
+      "path": "services/control-plane/src/inv/node_transfer.py",
+      "line": 43,
+      "function": "NodeTransfer.fetch",
+      "sourceSHA": "72028cbac903c4415d9979f980a6e0f9948e914f",
+      "fileSHA256": "3b5315201357c8d5b82643cde8f685ed39dc542255d8bc31fb63d894065dac2e",
+      "exactLine": "                    result = self.client.read_chunk(channel, request)",
+      "implementedSourceOnly": true,
+      "call": "self.client.read_chunk(channel, request)",
+      "methodName": "read_chunk",
+      "registrationBoundary": true,
+      "disposition": "EXACT_CALL_CLOSED_VARIANTS",
+      "variants": [
+        {
+          "predicate": "exact registered method/path/request/handler",
+          "kind": "OBJECT_READ",
+          "effectClass": "READ_ONLY"
+        }
+      ],
+      "callerTransaction": "independent original admitted intent commits before this call; exact outcome appended in original typed consumer transaction. No locks across external call.",
+      "parent": "exact original run/claim/permit or current authorized observation/read/safety scope; cleanup/terminal/object continuation requires exact immutable parent handle and current read rights",
+      "selectorAuthority": "server-approved typed operation chooses exclusive handler variant; untrusted booleans/kind/effectClass cannot authorize or downgrade",
+      "registration": "BEFORE this exact call, after DB-committed opaque handle. Method definition is not a registration boundary."
+    },
+    {
+      "path": "services/control-plane/src/inv/node_transport.py",
+      "line": 289,
+      "function": "NodeDelivery.deliver",
+      "sourceSHA": "72028cbac903c4415d9979f980a6e0f9948e914f",
+      "fileSHA256": "3559bbcdf9568f8930654d860b0edd980eca71c835cde3fe7380a69dd56e18f4",
+      "exactLine": "            result = self.client.exchange(",
+      "implementedSourceOnly": true,
+      "call": "self.client.exchange(channel, permit, observation_only=observation_only, **{'cancel_only': True} if cancel_only else {})",
+      "methodName": "exchange",
+      "registrationBoundary": true,
+      "disposition": "EXACT_CALL_CLOSED_VARIANTS",
+      "variants": [
+        {
+          "predicate": "cancel_only approved exact CANCEL",
+          "kind": "CANCEL",
+          "effectClass": "IDEMPOTENT_SAFETY"
+        },
+        {
+          "predicate": "not cancel_only and observation_only exact original observe permit",
+          "kind": "RECEIPT_OBSERVE",
+          "effectClass": "SIDE_EFFECT"
+        },
+        {
+          "predicate": "neither selector, exact approved original dispatch",
+          "kind": "EXECUTE",
+          "effectClass": "SIDE_EFFECT"
+        }
+      ],
+      "callerTransaction": "independent original admitted intent commits before this call; exact outcome appended in original typed consumer transaction. No locks across external call.",
+      "parent": "exact original run/claim/permit or current authorized observation/read/safety scope; cleanup/terminal/object continuation requires exact immutable parent handle and current read rights",
+      "selectorAuthority": "server-approved typed operation chooses exclusive handler variant; untrusted booleans/kind/effectClass cannot authorize or downgrade",
+      "registration": "BEFORE this exact call, after DB-committed opaque handle. Method definition is not a registration boundary."
+    },
+    {
+      "path": "services/control-plane/src/inv/observation.py",
+      "line": 119,
+      "function": "NodeObservation.poll",
+      "sourceSHA": "72028cbac903c4415d9979f980a6e0f9948e914f",
+      "fileSHA256": "b515ceda8b066466cf4cdf5fa88d04803220398c436d29ab7c5fd2793bf5748f",
+      "exactLine": "        response = self.client.probe(proof, request)",
+      "implementedSourceOnly": true,
+      "call": "self.client.probe(proof, request)",
+      "methodName": "probe",
+      "registrationBoundary": true,
+      "disposition": "EXACT_CALL_CLOSED_VARIANTS",
+      "variants": [
+        {
+          "predicate": "exact registered method/path/request/handler",
+          "kind": "HEARTBEAT_OBSERVE",
+          "effectClass": "READ_ONLY"
+        }
+      ],
+      "callerTransaction": "independent original admitted intent commits before this call; exact outcome appended in original typed consumer transaction. No locks across external call.",
+      "parent": "exact original run/claim/permit or current authorized observation/read/safety scope; cleanup/terminal/object continuation requires exact immutable parent handle and current read rights",
+      "selectorAuthority": "server-approved typed operation chooses exclusive handler variant; untrusted booleans/kind/effectClass cannot authorize or downgrade",
+      "registration": "BEFORE this exact call, after DB-committed opaque handle. Method definition is not a registration boundary."
+    },
+    {
+      "path": "services/control-plane/src/inv/observation.py",
+      "line": 124,
+      "function": "NodeObservation.poll_resources",
+      "sourceSHA": "72028cbac903c4415d9979f980a6e0f9948e914f",
+      "fileSHA256": "b515ceda8b066466cf4cdf5fa88d04803220398c436d29ab7c5fd2793bf5748f",
+      "exactLine": "        snapshot = self.client.resource_snapshot(proof, request)",
+      "implementedSourceOnly": true,
+      "call": "self.client.resource_snapshot(proof, request)",
+      "methodName": "resource_snapshot",
+      "registrationBoundary": true,
+      "disposition": "EXACT_CALL_CLOSED_VARIANTS",
+      "variants": [
+        {
+          "predicate": "exact registered method/path/request/handler",
+          "kind": "GPU_ACTIVE_OBSERVE",
+          "effectClass": "READ_ONLY"
+        }
+      ],
+      "callerTransaction": "independent original admitted intent commits before this call; exact outcome appended in original typed consumer transaction. No locks across external call.",
+      "parent": "exact original run/claim/permit or current authorized observation/read/safety scope; cleanup/terminal/object continuation requires exact immutable parent handle and current read rights",
+      "selectorAuthority": "server-approved typed operation chooses exclusive handler variant; untrusted booleans/kind/effectClass cannot authorize or downgrade",
+      "registration": "BEFORE this exact call, after DB-committed opaque handle. Method definition is not a registration boundary."
+    },
+    {
+      "path": "services/control-plane/src/inv/storage_check_collect.py",
+      "line": 309,
+      "function": "StorageCheckCollector.collect",
+      "sourceSHA": "72028cbac903c4415d9979f980a6e0f9948e914f",
+      "fileSHA256": "bae67c856cc8bdae52c1f06c4b6e36302e17ae0dd53a24fc01557cae19a3e226",
+      "exactLine": "        envelope, certificate = self.client.storage_sample(challenge.channel, challenge)",
+      "implementedSourceOnly": true,
+      "call": "self.client.storage_sample(challenge.channel, challenge)",
+      "methodName": "storage_sample",
+      "registrationBoundary": true,
+      "disposition": "EXACT_CALL_CLOSED_VARIANTS",
+      "variants": [
+        {
+          "predicate": "exact registered method/path/request/handler",
+          "kind": "STORAGE_SAMPLE",
+          "effectClass": "READ_ONLY"
+        }
+      ],
+      "callerTransaction": "independent original admitted intent commits before this call; exact outcome appended in original typed consumer transaction. No locks across external call.",
+      "parent": "exact original run/claim/permit or current authorized observation/read/safety scope; cleanup/terminal/object continuation requires exact immutable parent handle and current read rights",
+      "selectorAuthority": "server-approved typed operation chooses exclusive handler variant; untrusted booleans/kind/effectClass cannot authorize or downgrade",
+      "registration": "BEFORE this exact call, after DB-committed opaque handle. Method definition is not a registration boundary."
+    },
+    {
+      "path": "services/control-plane/src/inv/storage_commit.py",
+      "line": 398,
+      "function": "StorageSampleStore.collect",
+      "sourceSHA": "72028cbac903c4415d9979f980a6e0f9948e914f",
+      "fileSHA256": "41522f6ef98b315c4dff75b06d10507ad7bc45a6523983b3de9767cd61ff496c",
+      "exactLine": "        envelope, certificate = client.storage_sample(challenge.channel, challenge)",
+      "implementedSourceOnly": true,
+      "call": "client.storage_sample(challenge.channel, challenge)",
+      "methodName": "storage_sample",
+      "registrationBoundary": true,
+      "disposition": "EXACT_CALL_CLOSED_VARIANTS",
+      "variants": [
+        {
+          "predicate": "exact registered method/path/request/handler",
+          "kind": "STORAGE_SAMPLE",
+          "effectClass": "READ_ONLY"
+        }
+      ],
+      "callerTransaction": "independent original admitted intent commits before this call; exact outcome appended in original typed consumer transaction. No locks across external call.",
+      "parent": "exact original run/claim/permit or current authorized observation/read/safety scope; cleanup/terminal/object continuation requires exact immutable parent handle and current read rights",
+      "selectorAuthority": "server-approved typed operation chooses exclusive handler variant; untrusted booleans/kind/effectClass cannot authorize or downgrade",
+      "registration": "BEFORE this exact call, after DB-committed opaque handle. Method definition is not a registration boundary."
+    },
+    {
+      "path": "services/control-plane/src/inv/terminal.py",
+      "line": 277,
+      "function": "TerminalService.frame",
+      "sourceSHA": "72028cbac903c4415d9979f980a6e0f9948e914f",
+      "fileSHA256": "fe294d648b34d617df94449974fc82fed904639b80b8a5da2c9d34f32606bf8e",
+      "exactLine": "        result = runtime.client.terminal_frame(channel, {\"permit\": row[\"envelope\"], \"frame\": data})",
+      "implementedSourceOnly": true,
+      "call": "runtime.client.terminal_frame(channel, {'permit': row['envelope'], 'frame': data})",
+      "methodName": "terminal_frame",
+      "registrationBoundary": true,
+      "disposition": "EXACT_CALL_CLOSED_VARIANTS",
+      "variants": [
+        {
+          "predicate": "exact registered method/path/request/handler",
+          "kind": "TERMINAL_FRAME",
+          "effectClass": "SIDE_EFFECT"
+        }
+      ],
+      "callerTransaction": "independent original admitted intent commits before this call; exact outcome appended in original typed consumer transaction. No locks across external call.",
+      "parent": "exact original run/claim/permit or current authorized observation/read/safety scope; cleanup/terminal/object continuation requires exact immutable parent handle and current read rights",
+      "selectorAuthority": "server-approved typed operation chooses exclusive handler variant; untrusted booleans/kind/effectClass cannot authorize or downgrade",
+      "registration": "BEFORE this exact call, after DB-committed opaque handle. Method definition is not a registration boundary."
+    },
+    {
+      "path": "tools/check_remote_workspace.py",
+      "line": 117,
+      "function": "main",
+      "sourceSHA": "72028cbac903c4415d9979f980a6e0f9948e914f",
+      "fileSHA256": "3550db9c20fb7e2118f66f0337ed787dd22a166a6ff8cf1c6e9490f9ae9df6e3",
+      "exactLine": "        probe=NodeTLSClient(**tls(args.state)).resource_snapshot(channel,{'nonce':uuid4().hex+uuid4().hex})",
+      "implementedSourceOnly": true,
+      "call": "NodeTLSClient(**tls(args.state)).resource_snapshot(channel, {'nonce': uuid4().hex + uuid4().hex})",
+      "methodName": "resource_snapshot",
+      "registrationBoundary": true,
+      "disposition": "EXACT_CALL_CLOSED_VARIANTS",
+      "variants": [
+        {
+          "predicate": "exact registered method/path/request/handler",
+          "kind": "GPU_ACTIVE_OBSERVE",
+          "effectClass": "READ_ONLY"
+        }
+      ],
+      "callerTransaction": "independent original admitted intent commits before this call; exact outcome appended in original typed consumer transaction. No locks across external call.",
+      "parent": "exact original run/claim/permit or current authorized observation/read/safety scope; cleanup/terminal/object continuation requires exact immutable parent handle and current read rights",
+      "selectorAuthority": "server-approved typed operation chooses exclusive handler variant; untrusted booleans/kind/effectClass cannot authorize or downgrade",
+      "registration": "BEFORE this exact call, after DB-committed opaque handle. Method definition is not a registration boundary."
+    },
+    {
+      "path": "tools/lan_execution.py",
+      "line": 174,
+      "function": "transmit_fault",
+      "sourceSHA": "72028cbac903c4415d9979f980a6e0f9948e914f",
+      "fileSHA256": "cd4be84de9a60c03c32daa8e831a527ed9014169e151c7a436383772a5d4ddc0",
+      "exactLine": "    result=client.exchange(channel,saved['envelope'])",
+      "implementedSourceOnly": true,
+      "call": "client.exchange(channel, saved['envelope'])",
+      "methodName": "exchange",
+      "registrationBoundary": true,
+      "disposition": "EXACT_CALL_CLOSED_VARIANTS",
+      "variants": [
+        {
+          "predicate": "literal default execution dispatch",
+          "kind": "EXECUTE",
+          "effectClass": "SIDE_EFFECT"
+        }
+      ],
+      "callerTransaction": "independent original admitted intent commits before this call; exact outcome appended in original typed consumer transaction. No locks across external call.",
+      "parent": "exact original run/claim/permit or current authorized observation/read/safety scope; cleanup/terminal/object continuation requires exact immutable parent handle and current read rights",
+      "selectorAuthority": "server-approved typed operation chooses exclusive handler variant; untrusted booleans/kind/effectClass cannot authorize or downgrade",
+      "registration": "BEFORE this exact call, after DB-committed opaque handle. Method definition is not a registration boundary."
+    },
+    {
+      "path": "tools/lan_execution.py",
+      "line": 186,
+      "function": "recover",
+      "sourceSHA": "72028cbac903c4415d9979f980a6e0f9948e914f",
+      "fileSHA256": "cd4be84de9a60c03c32daa8e831a527ed9014169e151c7a436383772a5d4ddc0",
+      "exactLine": "    result=client.exchange(channel,saved['envelope'],observation_only=True)",
+      "implementedSourceOnly": true,
+      "call": "client.exchange(channel, saved['envelope'], observation_only=True)",
+      "methodName": "exchange",
+      "registrationBoundary": true,
+      "disposition": "EXACT_CALL_CLOSED_VARIANTS",
+      "variants": [
+        {
+          "predicate": "literal exact existing observation_only argument",
+          "kind": "RECEIPT_OBSERVE",
+          "effectClass": "SIDE_EFFECT"
+        }
+      ],
+      "callerTransaction": "independent original admitted intent commits before this call; exact outcome appended in original typed consumer transaction. No locks across external call.",
+      "parent": "exact original run/claim/permit or current authorized observation/read/safety scope; cleanup/terminal/object continuation requires exact immutable parent handle and current read rights",
+      "selectorAuthority": "server-approved typed operation chooses exclusive handler variant; untrusted booleans/kind/effectClass cannot authorize or downgrade",
+      "registration": "BEFORE this exact call, after DB-committed opaque handle. Method definition is not a registration boundary."
+    },
+    {
+      "path": "tools/lan_execution.py",
+      "line": 144,
+      "function": "_execute",
+      "sourceSHA": "72028cbac903c4415d9979f980a6e0f9948e914f",
+      "fileSHA256": "cd4be84de9a60c03c32daa8e831a527ed9014169e151c7a436383772a5d4ddc0",
+      "exactLine": "        result=client.exchange(channel,envelope)",
+      "implementedSourceOnly": true,
+      "call": "client.exchange(channel, envelope)",
+      "methodName": "exchange",
+      "registrationBoundary": true,
+      "disposition": "EXACT_CALL_CLOSED_VARIANTS",
+      "variants": [
+        {
+          "predicate": "literal default execution dispatch",
+          "kind": "EXECUTE",
+          "effectClass": "SIDE_EFFECT"
+        }
+      ],
+      "callerTransaction": "independent original admitted intent commits before this call; exact outcome appended in original typed consumer transaction. No locks across external call.",
+      "parent": "exact original run/claim/permit or current authorized observation/read/safety scope; cleanup/terminal/object continuation requires exact immutable parent handle and current read rights",
+      "selectorAuthority": "server-approved typed operation chooses exclusive handler variant; untrusted booleans/kind/effectClass cannot authorize or downgrade",
+      "registration": "BEFORE this exact call, after DB-committed opaque handle. Method definition is not a registration boundary."
+    },
+    {
+      "path": "tools/remote_workspace_entry.py",
+      "line": 205,
+      "function": "execute",
+      "sourceSHA": "72028cbac903c4415d9979f980a6e0f9948e914f",
+      "fileSHA256": "e69fa8ff6c51bd3880f5ec388fe97288a4256169377e17d9d6aa5b7ec2f32c27",
+      "exactLine": "        duplicate = a.client.exchange(NodeChannels(a.e.db).snapshot(a.node,observation_only=True),envelope,observation_only=True)",
+      "implementedSourceOnly": true,
+      "call": "a.client.exchange(NodeChannels(a.e.db).snapshot(a.node, observation_only=True), envelope, observation_only=True)",
+      "methodName": "exchange",
+      "registrationBoundary": true,
+      "disposition": "EXACT_CALL_CLOSED_VARIANTS",
+      "variants": [
+        {
+          "predicate": "literal exact existing observation_only argument",
+          "kind": "RECEIPT_OBSERVE",
+          "effectClass": "SIDE_EFFECT"
+        }
+      ],
+      "callerTransaction": "independent original admitted intent commits before this call; exact outcome appended in original typed consumer transaction. No locks across external call.",
+      "parent": "exact original run/claim/permit or current authorized observation/read/safety scope; cleanup/terminal/object continuation requires exact immutable parent handle and current read rights",
+      "selectorAuthority": "server-approved typed operation chooses exclusive handler variant; untrusted booleans/kind/effectClass cannot authorize or downgrade",
+      "registration": "BEFORE this exact call, after DB-committed opaque handle. Method definition is not a registration boundary."
+    }
+  ],
+  "catalog": {
+    "source": "72028cbac903c4415d9979f980a6e0f9948e914f",
+    "plainReaders": [
+      {
+        "id": "R01",
+        "path": "services/control-plane/src/inv/placement.py",
+        "line": 239,
+        "function": "PlacementStore.reserve",
+        "sourceSHA": "72028cbac903c4415d9979f980a6e0f9948e914f",
+        "fileSHA256": "d6f1baea8fedb0e8cf471d8b6880444c3c1ac13fc5c2d767eac6a7983c386224",
+        "exactLine": "                        \"online\",",
+        "implementedSourceOnly": true,
+        "replacement": "b_read_placement_candidates",
+        "purpose": "candidate eligibility snapshot before normal placement; retains original snapshot freshness/locality/resource-fit checks",
+        "predicate": "DB-current eligible resource footprints; snapshot hint, selected claim admission rechecks intersections",
+        "exception": "only exact already committed own operation through limited authenticated handle; no caller-supplied opid bypass; observe/safety/reconcile use separate scope",
+        "admissionRecheck": "candidate views are hints; actual reservation/dispatch rechecks under same authority anchor FOR UPDATE before new claim",
+        "purposeClass": "CANDIDATE_HINT",
+        "intersectionRule": "same tenant/Node/current epoch; DB-derived complete rank/table/key/mode footprint; SHARE/SHARE coexists, overlapping UPDATE conflicts; unknown footprint is conservative Node-wide for that operation only. SIDE_EFFECT UNCERTAIN same-scope Node-wide; READ_ONLY never denial; safety only exact target/causal denial. Existing facts independent."
+      },
+      {
+        "id": "R02",
+        "path": "services/control-plane/src/inv/placement.py",
+        "line": 538,
+        "function": "PlacementStore._speculate",
+        "sourceSHA": "72028cbac903c4415d9979f980a6e0f9948e914f",
+        "fileSHA256": "d6f1baea8fedb0e8cf471d8b6880444c3c1ac13fc5c2d767eac6a7983c386224",
+        "exactLine": "                        \"online\",",
+        "implementedSourceOnly": true,
+        "replacement": "b_read_speculative_candidates",
+        "purpose": "speculative candidate snapshot; selected guard must recheck anchor/obligation and exact selected resource set",
+        "predicate": "speculative resource candidate footprint only; original project/locality/resource ceiling and fresh final admission",
+        "exception": "only exact already committed own operation through limited authenticated handle; no caller-supplied opid bypass; observe/safety/reconcile use separate scope",
+        "admissionRecheck": "candidate views are hints; actual reservation/dispatch rechecks under same authority anchor FOR UPDATE before new claim",
+        "purposeClass": "SPECULATIVE_HINT",
+        "intersectionRule": "same tenant/Node/current epoch; DB-derived complete rank/table/key/mode footprint; SHARE/SHARE coexists, overlapping UPDATE conflicts; unknown footprint is conservative Node-wide for that operation only. SIDE_EFFECT UNCERTAIN same-scope Node-wide; READ_ONLY never denial; safety only exact target/causal denial. Existing facts independent."
+      },
+      {
+        "id": "R03",
+        "path": "services/control-plane/src/inv/dispatch.py",
+        "line": 79,
+        "function": "DeliveryQueue._can_start",
+        "sourceSHA": "72028cbac903c4415d9979f980a6e0f9948e914f",
+        "fileSHA256": "4a33428502279b88e510b5447382814bb115ddf2bff4f88f5bfcbb93f3c1a404",
+        "exactLine": "                \"\"\"SELECT 1 FROM inv.nodes WHERE node_id=%s AND status='online'",
+        "implementedSourceOnly": true,
+        "replacement": "b_lock_execution_dispatch",
+        "purpose": "execution admission under exact run/claim/lease/fence/current Node; no new dispatch while unresolved",
+        "predicate": "new exact run/claim/resource dispatch; reject overlapping known SIDE_EFFECT pending, any same-scope side-effect uncertainty, current containment",
+        "exception": "only exact already committed own operation through limited authenticated handle; no caller-supplied opid bypass; observe/safety/reconcile use separate scope",
+        "admissionRecheck": "candidate views are hints; actual reservation/dispatch rechecks under same authority anchor FOR UPDATE before new claim",
+        "purposeClass": "EXECUTION_ADMISSION",
+        "intersectionRule": "same tenant/Node/current epoch; DB-derived complete rank/table/key/mode footprint; SHARE/SHARE coexists, overlapping UPDATE conflicts; unknown footprint is conservative Node-wide for that operation only. SIDE_EFFECT UNCERTAIN same-scope Node-wide; READ_ONLY never denial; safety only exact target/causal denial. Existing facts independent."
+      },
+      {
+        "id": "R04",
+        "path": "services/control-plane/src/inv/leases.py",
+        "line": 253,
+        "function": "LeaseStore._reserve_prepared_locked",
+        "sourceSHA": "72028cbac903c4415d9979f980a6e0f9948e914f",
+        "fileSHA256": "e968852cea4fecd011a97e3b665302cc31e3ddec22d505f0f4ce9af2420987b6",
+        "exactLine": "                \"\"\"SELECT status='online' AND heartbeat_at >= clock_timestamp()-interval '15 seconds'",
+        "implementedSourceOnly": true,
+        "replacement": "b_lock_lease_node_admission",
+        "purpose": "lease reservation for full sorted allocation Node set; original per-project/resource ceilings retained",
+        "predicate": "new full sorted allocation set; intersect DB claim/resource footprint, not Node-wide single flight",
+        "exception": "only exact already committed own operation through limited authenticated handle; no caller-supplied opid bypass; observe/safety/reconcile use separate scope",
+        "admissionRecheck": "candidate views are hints; actual reservation/dispatch rechecks under same authority anchor FOR UPDATE before new claim",
+        "purposeClass": "LEASE_ADMISSION",
+        "intersectionRule": "same tenant/Node/current epoch; DB-derived complete rank/table/key/mode footprint; SHARE/SHARE coexists, overlapping UPDATE conflicts; unknown footprint is conservative Node-wide for that operation only. SIDE_EFFECT UNCERTAIN same-scope Node-wide; READ_ONLY never denial; safety only exact target/causal denial. Existing facts independent."
+      },
+      {
+        "id": "R05",
+        "path": "services/control-plane/src/inv/capacity.py",
+        "line": 23,
+        "function": "project_capacity",
+        "sourceSHA": "72028cbac903c4415d9979f980a6e0f9948e914f",
+        "fileSHA256": "70cf93fcc99d5f23a946445889d5f6b3ab7bd86a30e7923b74e4df82fc85578d",
+        "exactLine": "        WHERE p.project_id=%s AND p.enabled AND n.status='online' AND r.kind IN ('cpu','memory')",
+        "implementedSourceOnly": true,
+        "replacement": "b_read_project_capacity",
+        "purpose": "capacity projection over project members; only eligibility hints, not hard quotas or admission",
+        "predicate": "project member availability under original capacity policy; unresolved known footprints remove overlapping capacity only",
+        "exception": "only exact already committed own operation through limited authenticated handle; no caller-supplied opid bypass; observe/safety/reconcile use separate scope",
+        "admissionRecheck": "candidate views are hints; actual reservation/dispatch rechecks under same authority anchor FOR UPDATE before new claim",
+        "purposeClass": "CAPACITY_HINT",
+        "intersectionRule": "same tenant/Node/current epoch; DB-derived complete rank/table/key/mode footprint; SHARE/SHARE coexists, overlapping UPDATE conflicts; unknown footprint is conservative Node-wide for that operation only. SIDE_EFFECT UNCERTAIN same-scope Node-wide; READ_ONLY never denial; safety only exact target/causal denial. Existing facts independent."
+      },
+      {
+        "id": "R06",
+        "path": "services/control-plane/src/inv/scheduler.py",
+        "line": 106,
+        "function": "_place",
+        "sourceSHA": "72028cbac903c4415d9979f980a6e0f9948e914f",
+        "fileSHA256": "69e36fb43d37b0338db065be6e179288f97488f23adcbe8daf9ab9b7765fce0c",
+        "exactLine": "        if c.status != \"online\":",
+        "implementedSourceOnly": true,
+        "replacement": "b_read_scheduler_candidate_snapshot",
+        "purpose": "producer returns opaque typed EligibilitySnapshot; pure _place consumes it, final selected admission rechecks; raw caller Candidate cannot mint eligibility",
+        "predicate": "typed producer snapshot; _place never mints admission; selected allocations recheck DB footprints",
+        "exception": "only exact already committed own operation through limited authenticated handle; no caller-supplied opid bypass; observe/safety/reconcile use separate scope",
+        "admissionRecheck": "candidate views are hints; actual reservation/dispatch rechecks under same authority anchor FOR UPDATE before new claim",
+        "purposeClass": "SCHEDULER_HINT",
+        "intersectionRule": "same tenant/Node/current epoch; DB-derived complete rank/table/key/mode footprint; SHARE/SHARE coexists, overlapping UPDATE conflicts; unknown footprint is conservative Node-wide for that operation only. SIDE_EFFECT UNCERTAIN same-scope Node-wide; READ_ONLY never denial; safety only exact target/causal denial. Existing facts independent."
+      },
+      {
+        "id": "R07",
+        "path": "services/control-plane/src/inv/build_adapter.py",
+        "line": 138,
+        "function": "_lock_live_build_authority",
+        "sourceSHA": "72028cbac903c4415d9979f980a6e0f9948e914f",
+        "fileSHA256": "313acf3d081b940f81be46bbfe689ea2b1a1271359a3bf7f5639f49ace877e72",
+        "exactLine": "    if node[\"status\"] != \"online\":",
+        "implementedSourceOnly": true,
+        "replacement": "b_lock_build_dispatch_authority",
+        "purpose": "build dispatch binding under exact admitted run/resource/approval and unchanged channel/epoch",
+        "predicate": "exact original build admission/intent/decision/claim; conflict with overlapping active obligation, not unrelated Node read",
+        "exception": "only exact already committed own operation through limited authenticated handle; no caller-supplied opid bypass; observe/safety/reconcile use separate scope",
+        "admissionRecheck": "candidate views are hints; actual reservation/dispatch rechecks under same authority anchor FOR UPDATE before new claim",
+        "purposeClass": "BUILD_ADMISSION",
+        "intersectionRule": "same tenant/Node/current epoch; DB-derived complete rank/table/key/mode footprint; SHARE/SHARE coexists, overlapping UPDATE conflicts; unknown footprint is conservative Node-wide for that operation only. SIDE_EFFECT UNCERTAIN same-scope Node-wide; READ_ONLY never denial; safety only exact target/causal denial. Existing facts independent."
+      },
+      {
+        "id": "R08",
+        "path": "services/control-plane/src/inv/gpu.py",
+        "line": 97,
+        "function": "current_single_gpu_allocation",
+        "sourceSHA": "72028cbac903c4415d9979f980a6e0f9948e914f",
+        "fileSHA256": "2a229e710fcdd10cac948d0660c75a04b0405851a76cac5b9df44924ed02c03f",
+        "exactLine": "        or row[\"status\"] != \"online\"",
+        "implementedSourceOnly": true,
+        "replacement": "b_lock_gpu_allocation_authority",
+        "purpose": "exact current GPU device/snapshot/channel/allocation proof; active leases retained",
+        "predicate": "device-specific original allocation and resource snapshot; keep active leases, reject same resource double use",
+        "exception": "only exact already committed own operation through limited authenticated handle; no caller-supplied opid bypass; observe/safety/reconcile use separate scope",
+        "admissionRecheck": "candidate views are hints; actual reservation/dispatch rechecks under same authority anchor FOR UPDATE before new claim",
+        "purposeClass": "GPU_ADMISSION",
+        "intersectionRule": "same tenant/Node/current epoch; DB-derived complete rank/table/key/mode footprint; SHARE/SHARE coexists, overlapping UPDATE conflicts; unknown footprint is conservative Node-wide for that operation only. SIDE_EFFECT UNCERTAIN same-scope Node-wide; READ_ONLY never denial; safety only exact target/causal denial. Existing facts independent."
+      },
+      {
+        "id": "R09",
+        "path": "services/control-plane/src/inv/model_commit.py",
+        "line": 57,
+        "function": "ModelManifestStore._capture",
+        "sourceSHA": "72028cbac903c4415d9979f980a6e0f9948e914f",
+        "fileSHA256": "b4c0ffcb5ae9ccf8325b93f8c642a7b71b1618841cdc5467c54a8530f45eb971",
+        "exactLine": "                \"\"\"SELECT status='online' AND recovery_epoch=%s::uuid",
+        "implementedSourceOnly": true,
+        "replacement": "b_lock_model_commit_nodes",
+        "purpose": "complete model target Node/location set; owner consent and immutable model bindings retained",
+        "predicate": "full manifest target contribution/member/channel read or mutation footprint, frozen exact membership",
+        "exception": "only exact already committed own operation through limited authenticated handle; no caller-supplied opid bypass; observe/safety/reconcile use separate scope",
+        "admissionRecheck": "candidate views are hints; actual reservation/dispatch rechecks under same authority anchor FOR UPDATE before new claim",
+        "purposeClass": "MODEL_COMMIT_ADMISSION",
+        "intersectionRule": "same tenant/Node/current epoch; DB-derived complete rank/table/key/mode footprint; SHARE/SHARE coexists, overlapping UPDATE conflicts; unknown footprint is conservative Node-wide for that operation only. SIDE_EFFECT UNCERTAIN same-scope Node-wide; READ_ONLY never denial; safety only exact target/causal denial. Existing facts independent."
+      },
+      {
+        "id": "R10",
+        "path": "services/control-plane/src/inv/model_locality.py",
+        "line": 27,
+        "function": "_capture",
+        "sourceSHA": "72028cbac903c4415d9979f980a6e0f9948e914f",
+        "fileSHA256": "b621d053a793b57b0ba8f8478038509dbacf03fab30db1f73cf98688073a48ef",
+        "exactLine": "            \"\"\"SELECT status='online' AND recovery_epoch=%s::uuid",
+        "implementedSourceOnly": true,
+        "replacement": "b_lock_model_locality_nodes",
+        "purpose": "complete replica Node set and snapshot/fencing/current channel recheck",
+        "predicate": "replica snapshot only; exact parent/current authorized object read has separate continuation port",
+        "exception": "only exact already committed own operation through limited authenticated handle; no caller-supplied opid bypass; observe/safety/reconcile use separate scope",
+        "admissionRecheck": "candidate views are hints; actual reservation/dispatch rechecks under same authority anchor FOR UPDATE before new claim",
+        "purposeClass": "MODEL_LOCALITY_HINT",
+        "intersectionRule": "same tenant/Node/current epoch; DB-derived complete rank/table/key/mode footprint; SHARE/SHARE coexists, overlapping UPDATE conflicts; unknown footprint is conservative Node-wide for that operation only. SIDE_EFFECT UNCERTAIN same-scope Node-wide; READ_ONLY never denial; safety only exact target/causal denial. Existing facts independent."
+      },
+      {
+        "id": "R11",
+        "path": "services/control-plane/src/inv/tooling.py",
+        "line": 203,
+        "function": "ToolGateway.claim",
+        "sourceSHA": "72028cbac903c4415d9979f980a6e0f9948e914f",
+        "fileSHA256": "de5f6213b196784c6c4280d31a17fba9fe1669eb466edee14197664b37f2ac6c",
+        "exactLine": "                \"\"\"SELECT status='online' AND heartbeat_at>=clock_timestamp()-interval '15 seconds'",
+        "implementedSourceOnly": true,
+        "replacement": "b_lock_tool_claim_node",
+        "purpose": "existing allocation matches Node and run, exact claim/fence and current authority",
+        "predicate": "exact original run/resource claim/fence with DB-known footprint conflict check",
+        "exception": "only exact already committed own operation through limited authenticated handle; no caller-supplied opid bypass; observe/safety/reconcile use separate scope",
+        "admissionRecheck": "candidate views are hints; actual reservation/dispatch rechecks under same authority anchor FOR UPDATE before new claim",
+        "purposeClass": "TOOL_CLAIM_ADMISSION",
+        "intersectionRule": "same tenant/Node/current epoch; DB-derived complete rank/table/key/mode footprint; SHARE/SHARE coexists, overlapping UPDATE conflicts; unknown footprint is conservative Node-wide for that operation only. SIDE_EFFECT UNCERTAIN same-scope Node-wide; READ_ONLY never denial; safety only exact target/causal denial. Existing facts independent."
+      },
+      {
+        "id": "R12",
+        "path": "services/control-plane/src/inv/terminal.py",
+        "line": 78,
+        "function": "TerminalService._current",
+        "sourceSHA": "72028cbac903c4415d9979f980a6e0f9948e914f",
+        "fileSHA256": "fe294d648b34d617df94449974fc82fed904639b80b8a5da2c9d34f32606bf8e",
+        "exactLine": "            or node[\"status\"] not in {\"online\", \"draining\"}",
+        "implementedSourceOnly": true,
+        "replacement": "b_lock_terminal_exact_claim",
+        "purpose": "existing terminal command/claim only; draining may continue only exact bounded CommittedIOHandle, never a fresh attach/admission chosen by request opid",
+        "predicate": "already claimed terminal only; exact parent handle/run/claim/owner/deadline/lease/epoch/generation; DRAIN allowed as actual terminal.py:78, quarantine/retirement denied",
+        "exception": "only exact already committed own operation through limited authenticated handle; no caller-supplied opid bypass; observe/safety/reconcile use separate scope",
+        "admissionRecheck": "candidate views are hints; actual reservation/dispatch rechecks under same authority anchor FOR UPDATE before new claim",
+        "purposeClass": "EXACT_TERMINAL_CONTINUATION",
+        "intersectionRule": "same tenant/Node/current epoch; DB-derived complete rank/table/key/mode footprint; SHARE/SHARE coexists, overlapping UPDATE conflicts; unknown footprint is conservative Node-wide for that operation only. SIDE_EFFECT UNCERTAIN same-scope Node-wide; READ_ONLY never denial; safety only exact target/causal denial. Existing facts independent."
+      },
+      {
+        "id": "R13",
+        "path": "services/control-plane/src/inv/node_channels.py",
+        "line": 137,
+        "function": "NodeChannels.snapshot",
+        "sourceSHA": "72028cbac903c4415d9979f980a6e0f9948e914f",
+        "fileSHA256": "3fad0bb24beb096522ea3335e3bf45f4e65f2d0d906177ef7e310aca1128502b",
+        "exactLine": "                row[\"status\"] != \"online\"",
+        "implementedSourceOnly": true,
+        "replacement": "b_read_delivery_channel",
+        "purpose": "business channel requires admission view OR exact existing committed operation handle; observe/cancel use separate authenticated scope, no client boolean authorization",
+        "predicate": "exact admitted own command or signed observe/safety purpose; original owner/current channel/epoch/fence, not arbitrary opid or fresh selection",
+        "exception": "only exact already committed own operation through limited authenticated handle; no caller-supplied opid bypass; observe/safety/reconcile use separate scope",
+        "admissionRecheck": "candidate views are hints; actual reservation/dispatch rechecks under same authority anchor FOR UPDATE before new claim",
+        "purposeClass": "DELIVERY_FOR_ADMITTED_OPERATION",
+        "intersectionRule": "same tenant/Node/current epoch; DB-derived complete rank/table/key/mode footprint; SHARE/SHARE coexists, overlapping UPDATE conflicts; unknown footprint is conservative Node-wide for that operation only. SIDE_EFFECT UNCERTAIN same-scope Node-wide; READ_ONLY never denial; safety only exact target/causal denial. Existing facts independent."
+      }
+    ],
+    "newBReaders": [
+      {
+        "caller": "b_commit_node_activation",
+        "replacement": "b_lock_activation_current",
+        "purpose": "B current lineage/tuple/gate/CAS before activation",
+        "implemented": false
+      },
+      {
+        "caller": "b_refresh_same_generation",
+        "replacement": "b_lock_refresh_current",
+        "purpose": "same generation current B chain; effect-class and overlapping authority footprint predicate; READ_ONLY bookkeeping never denies",
+        "implemented": false
+      },
+      {
+        "caller": "b_record_request_issuance",
+        "replacement": "b_lock_use_issuance",
+        "purpose": "exact B request release/delegation/delivery/current lineage and original request nonce",
+        "implemented": false
+      },
+      {
+        "caller": "b_commit_business_nonce_evidence",
+        "replacement": "b_lock_use_commit",
+        "purpose": "B current authority and exact request/nonce/verified outcome at commit",
+        "implemented": false
+      },
+      {
+        "caller": "signing_service.prepare",
+        "replacement": "b_read_signing_authority",
+        "purpose": "protected authenticated full current chain/ancestor/tombstone/tuple/epoch/fence view",
+        "implemented": false
+      },
+      {
+        "caller": "signing_service.publish",
+        "replacement": "b_lock_signature_publication",
+        "purpose": "same anchors/versions as prepared intent, recheck BEFORE exposing signature",
+        "implemented": false
+      },
+      {
+        "caller": "b_approve_readonly_contribution_root",
+        "replacement": "b_lock_folder_approval",
+        "purpose": "ACTIVE owner consent + fresh signed B-only folder observation; preflight does not prove installed RO mount",
+        "implemented": false
+      }
+    ],
+    "ioKinds": [
+      {
+        "kind": "EXECUTE",
+        "source": {
+          "path": "services/control-plane/src/inv/node_transport.py",
+          "line": 85,
+          "function": "NodeTLSClient.exchange",
+          "sourceSHA": "72028cbac903c4415d9979f980a6e0f9948e914f",
+          "fileSHA256": "3559bbcdf9568f8930654d860b0edd980eca71c835cde3fe7380a69dd56e18f4",
+          "exactLine": "        return self._request(channel, permit, path, \"NodeExecutionResult\")",
+          "implementedSourceOnly": true
+        },
+        "method": "POST",
+        "rawPath": "/v1/executions",
+        "requestBinding": "NodeExecutionPermit exact existing serialized bytes",
+        "independentlyVerifiedOutcome": "NodeExecutionResult/NodeStopReceipt",
+        "closureProcedure": "b_confirm_execution_stop_io",
+        "closurePrincipal": "sv_b_verifier",
+        "atomicBoundary": "NodeReceiptStore.record original terminal receipt + permitted lease release/event same TX",
+        "registration": "committed before IO, typed opaque CommittedIOHandle consumed by CP adapter/verifier; no new plain Node field or floor2 change",
+        "failure": "uncertain invocation or dead original capability => protected physical/quiescence proof only; atomic proven-never-invoked dispatch abort may NO_EFFECT; no timeout/not-sent boolean proof",
+        "effectClass": "SIDE_EFFECT",
+        "effectSelection": "fixed method/rawPath/handler plus independently admitted exact request; same binding in schema/row/procedure/capability/consumer. Caller cannot downgrade.",
+        "transportMethod": "NodeTLSClient.exchange",
+        "callerBoundaries": [
+          {
+            "path": "services/control-plane/src/inv/node_transport.py",
+            "line": 289,
+            "function": "NodeDelivery.deliver",
+            "fileSHA256": "3559bbcdf9568f8930654d860b0edd980eca71c835cde3fe7380a69dd56e18f4"
+          },
+          {
+            "path": "tools/lan_execution.py",
+            "line": 174,
+            "function": "transmit_fault",
+            "fileSHA256": "cd4be84de9a60c03c32daa8e831a527ed9014169e151c7a436383772a5d4ddc0"
+          },
+          {
+            "path": "tools/lan_execution.py",
+            "line": 144,
+            "function": "_execute",
+            "fileSHA256": "cd4be84de9a60c03c32daa8e831a527ed9014169e151c7a436383772a5d4ddc0"
+          }
+        ]
+      },
+      {
+        "kind": "RECEIPT_OBSERVE",
+        "source": {
+          "path": "services/control-plane/src/inv/node_transport.py",
+          "line": 85,
+          "function": "NodeTLSClient.exchange",
+          "sourceSHA": "72028cbac903c4415d9979f980a6e0f9948e914f",
+          "fileSHA256": "3559bbcdf9568f8930654d860b0edd980eca71c835cde3fe7380a69dd56e18f4",
+          "exactLine": "        return self._request(channel, permit, path, \"NodeExecutionResult\")",
+          "implementedSourceOnly": true
+        },
+        "method": "POST",
+        "rawPath": "/v1/executions/receipts",
+        "requestBinding": "same original permit bytes; existing claimed operation only",
+        "independentlyVerifiedOutcome": "NodeExecutionResult/NodeStopReceipt",
+        "closureProcedure": "b_confirm_execution_stop_io",
+        "closurePrincipal": "sv_b_verifier",
+        "atomicBoundary": "NodeReceiptStore.record duplicate/content/fence rules same TX",
+        "registration": "committed before IO, typed opaque CommittedIOHandle consumed by CP adapter/verifier; no new plain Node field or floor2 change",
+        "failure": "uncertain invocation or dead original capability => protected physical/quiescence proof only; atomic proven-never-invoked dispatch abort may NO_EFFECT; no timeout/not-sent boolean proof",
+        "effectClass": "SIDE_EFFECT",
+        "effectSelection": "fixed method/rawPath/handler plus independently admitted exact request; same binding in schema/row/procedure/capability/consumer. Caller cannot downgrade.",
+        "transportMethod": "NodeTLSClient.exchange",
+        "effectCounterexample": "72028 runtime/runner.go Observe:366 invokes reconcile; reconcile may Stop at :270 and finish Remove at :330 and journal Save. Actual path retained SIDE_EFFECT; no new pure read endpoint invented.",
+        "callerBoundaries": [
+          {
+            "path": "services/control-plane/src/inv/node_transport.py",
+            "line": 289,
+            "function": "NodeDelivery.deliver",
+            "fileSHA256": "3559bbcdf9568f8930654d860b0edd980eca71c835cde3fe7380a69dd56e18f4"
+          },
+          {
+            "path": "tools/lan_execution.py",
+            "line": 186,
+            "function": "recover",
+            "fileSHA256": "cd4be84de9a60c03c32daa8e831a527ed9014169e151c7a436383772a5d4ddc0"
+          },
+          {
+            "path": "tools/remote_workspace_entry.py",
+            "line": 205,
+            "function": "execute",
+            "fileSHA256": "e69fa8ff6c51bd3880f5ec388fe97288a4256169377e17d9d6aa5b7ec2f32c27"
+          }
+        ]
+      },
+      {
+        "kind": "CANCEL",
+        "source": {
+          "path": "services/control-plane/src/inv/node_transport.py",
+          "line": 85,
+          "function": "NodeTLSClient.exchange",
+          "sourceSHA": "72028cbac903c4415d9979f980a6e0f9948e914f",
+          "fileSHA256": "3559bbcdf9568f8930654d860b0edd980eca71c835cde3fe7380a69dd56e18f4",
+          "exactLine": "        return self._request(channel, permit, path, \"NodeExecutionResult\")",
+          "implementedSourceOnly": true
+        },
+        "method": "POST",
+        "rawPath": "/v1/executions/cancel",
+        "requestBinding": "same original signed permit; exact claimed command",
+        "independentlyVerifiedOutcome": "NodeExecutionResult/NodeStopReceipt",
+        "closureProcedure": "b_confirm_execution_stop_io",
+        "closurePrincipal": "sv_b_verifier",
+        "atomicBoundary": "terminal receipt path alone decides release; obligation state never releases independently",
+        "registration": "committed before IO, typed opaque CommittedIOHandle consumed by CP adapter/verifier; no new plain Node field or floor2 change",
+        "failure": "fresh protected RECOVERY_OBSERVATION verifier may close exact command/identity/epoch/generation/target/nonce durable ACK or authenticated causally bound readback; original poisoned cap never reconstructed; no ACK means uncertainty retained",
+        "effectClass": "IDEMPOTENT_SAFETY",
+        "effectSelection": "fixed method/rawPath/handler plus independently admitted exact request; same binding in schema/row/procedure/capability/consumer. Caller cannot downgrade.",
+        "transportMethod": "NodeTLSClient.exchange",
+        "callerBoundaries": [
+          {
+            "path": "services/control-plane/src/inv/node_transport.py",
+            "line": 289,
+            "function": "NodeDelivery.deliver",
+            "fileSHA256": "3559bbcdf9568f8930654d860b0edd980eca71c835cde3fe7380a69dd56e18f4"
+          }
+        ]
+      },
+      {
+        "kind": "BUILD_DISPATCH",
+        "source": {
+          "path": "services/control-plane/src/inv/build_execution.py",
+          "line": 787,
+          "function": "BuildExecutionService.execute",
+          "sourceSHA": "72028cbac903c4415d9979f980a6e0f9948e914f",
+          "fileSHA256": "afc4cabc20bd1d4f4adf3f1542ed5eb49d9f16631b5dbdb3ebc5d06d1bc9d11f",
+          "exactLine": "        dispatched = self._adapter.execute(",
+          "implementedSourceOnly": true
+        },
+        "method": "ADAPTER_EXECUTE",
+        "rawPath": "existing admitted adapter dispatch descriptor; no invented HTTP endpoint",
+        "requestBinding": "exact existing request/plan/decision/intent-fencing-token bytes and approved decision hash",
+        "independentlyVerifiedOutcome": "Build dispatch/evidence plus independently verified physical cleanup",
+        "closureProcedure": "b_confirm_build_dispatch_io",
+        "closurePrincipal": "sv_b_verifier",
+        "atomicBoundary": "same _commit_consequences lease CAS/evidence/outbox transaction, not mere adapter return",
+        "registration": "committed before IO, typed opaque CommittedIOHandle consumed by CP adapter/verifier; no new plain Node field or floor2 change",
+        "failure": "uncertain invocation or dead original capability => protected physical/quiescence proof only; atomic proven-never-invoked dispatch abort may NO_EFFECT; no timeout/not-sent boolean proof",
+        "effectClass": "SIDE_EFFECT",
+        "effectSelection": "fixed method/rawPath/handler plus independently admitted exact request; same binding in schema/row/procedure/capability/consumer. Caller cannot downgrade.",
+        "callerBoundaries": [
+          {
+            "path": "services/control-plane/src/inv/build_execution.py",
+            "line": 787,
+            "function": "BuildExecutionService.execute",
+            "fileSHA256": "afc4cabc20bd1d4f4adf3f1542ed5eb49d9f16631b5dbdb3ebc5d06d1bc9d11f"
+          }
+        ]
+      },
+      {
+        "kind": "BUILD_CLEANUP_READ",
+        "source": {
+          "path": "services/control-plane/src/inv/build_execution.py",
+          "line": 835,
+          "function": "BuildExecutionService.execute",
+          "sourceSHA": "72028cbac903c4415d9979f980a6e0f9948e914f",
+          "fileSHA256": "afc4cabc20bd1d4f4adf3f1542ed5eb49d9f16631b5dbdb3ebc5d06d1bc9d11f",
+          "exactLine": "        cleanup_receipt = self._transport.collect_cleanup_receipt(build_session_id)",
+          "implementedSourceOnly": true
+        },
+        "method": "LOCAL_READ",
+        "rawPath": "existing PRODUCT_CLEANUP_RECEIPT_PREFIX + exact build_session_id + .json under held protected transport directory",
+        "requestBinding": "existing collect_cleanup_receipt argument descriptor, parent BUILD_DISPATCH handle, original request/approval hashes; no claim of a signed local-file wire",
+        "independentlyVerifiedOutcome": "BuildPhysicalCleanupReceipt",
+        "closureProcedure": "b_confirm_build_cleanup_read_io",
+        "closurePrincipal": "sv_b_verifier",
+        "atomicBoundary": "same typed build cleanup append/commit TX as parent, original duplicate physical receipt checks",
+        "registration": "committed before IO, typed opaque CommittedIOHandle consumed by CP adapter/verifier; no new plain Node field or floor2 change",
+        "failure": "ordinary verifier NO_EFFECT_ABANDONED, never business denial/version bump; late reply cannot reopen or refresh. Actual verified liveness/revoke effects remain separate original writers",
+        "effectClass": "READ_ONLY",
+        "effectSelection": "fixed method/rawPath/handler plus independently admitted exact request; same binding in schema/row/procedure/capability/consumer. Caller cannot downgrade.",
+        "callerBoundaries": [
+          {
+            "path": "services/control-plane/src/inv/build_execution.py",
+            "line": 835,
+            "function": "BuildExecutionService.execute",
+            "fileSHA256": "afc4cabc20bd1d4f4adf3f1542ed5eb49d9f16631b5dbdb3ebc5d06d1bc9d11f"
+          }
+        ]
+      },
+      {
+        "kind": "BUILD_HEALTH_READ",
+        "source": {
+          "path": "services/control-plane/src/inv/build_execution.py",
+          "line": 779,
+          "function": "BuildExecutionService.execute",
+          "sourceSHA": "72028cbac903c4415d9979f980a6e0f9948e914f",
+          "fileSHA256": "afc4cabc20bd1d4f4adf3f1542ed5eb49d9f16631b5dbdb3ebc5d06d1bc9d11f",
+          "exactLine": "        health = self._transport.collect_product_health()",
+          "implementedSourceOnly": true
+        },
+        "method": "LOCAL_READ",
+        "rawPath": "existing PRODUCT_HEALTH_RECEIPT under held protected transport directory",
+        "requestBinding": "exact collect_product_health descriptor and original operation binding",
+        "independentlyVerifiedOutcome": "BuildProviderHealthReceipt",
+        "closureProcedure": "b_confirm_observation_io",
+        "closurePrincipal": "sv_b_verifier",
+        "atomicBoundary": "typed observation append, no resource release or success grant",
+        "registration": "committed before IO, typed opaque CommittedIOHandle consumed by CP adapter/verifier; no new plain Node field or floor2 change",
+        "failure": "ordinary verifier NO_EFFECT_ABANDONED, never business denial/version bump; late reply cannot reopen or refresh. Actual verified liveness/revoke effects remain separate original writers",
+        "effectClass": "READ_ONLY",
+        "effectSelection": "fixed method/rawPath/handler plus independently admitted exact request; same binding in schema/row/procedure/capability/consumer. Caller cannot downgrade.",
+        "callerBoundaries": [
+          {
+            "path": "services/control-plane/src/inv/build_execution.py",
+            "line": 779,
+            "function": "BuildExecutionService.execute",
+            "fileSHA256": "afc4cabc20bd1d4f4adf3f1542ed5eb49d9f16631b5dbdb3ebc5d06d1bc9d11f"
+          },
+          {
+            "path": "services/control-plane/src/inv/buildkit_transport.py",
+            "line": 895,
+            "function": "NodeAgentReceipts.daemon_identity",
+            "fileSHA256": "70a924987554b389b8c2e377226fac242df1ec0b713c0b4fb9ac240ea8bbcfae"
+          }
+        ]
+      },
+      {
+        "kind": "GPU_ACTIVE_OBSERVE",
+        "source": {
+          "path": "services/control-plane/src/inv/node_transport.py",
+          "line": 93,
+          "function": "NodeTLSClient.resource_snapshot",
+          "sourceSHA": "72028cbac903c4415d9979f980a6e0f9948e914f",
+          "fileSHA256": "3559bbcdf9568f8930654d860b0edd980eca71c835cde3fe7380a69dd56e18f4",
+          "exactLine": "        return self._request(channel, request, \"/v1/snapshots\", \"NodeResourceSnapshot\")",
+          "implementedSourceOnly": true
+        },
+        "method": "POST",
+        "rawPath": "/v1/snapshots",
+        "requestBinding": "existing NodeProbeInput exact bytes and registered channel",
+        "independentlyVerifiedOutcome": "authenticated existing GPU/resource snapshot classified ACTIVE by verifier; NOT NodeStopReceipt",
+        "closureProcedure": "b_confirm_active_observation_io",
+        "closurePrincipal": "sv_b_verifier",
+        "atomicBoundary": "observation/evidence TX only; workload/claim/lease remain ACTIVE; current NodeExecutionResult is terminal-only",
+        "registration": "committed before IO, typed opaque CommittedIOHandle consumed by CP adapter/verifier; no new plain Node field or floor2 change",
+        "failure": "ordinary verifier NO_EFFECT_ABANDONED, never business denial/version bump; late reply cannot reopen or refresh. Actual verified liveness/revoke effects remain separate original writers",
+        "effectClass": "READ_ONLY",
+        "effectSelection": "fixed method/rawPath/handler plus independently admitted exact request; same binding in schema/row/procedure/capability/consumer. Caller cannot downgrade.",
+        "transportMethod": "NodeTLSClient.resource_snapshot",
+        "callerBoundaries": [
+          {
+            "path": "services/control-plane/src/inv/observation.py",
+            "line": 124,
+            "function": "NodeObservation.poll_resources",
+            "fileSHA256": "b515ceda8b066466cf4cdf5fa88d04803220398c436d29ab7c5fd2793bf5748f"
+          },
+          {
+            "path": "tools/check_remote_workspace.py",
+            "line": 117,
+            "function": "main",
+            "fileSHA256": "3550db9c20fb7e2118f66f0337ed787dd22a166a6ff8cf1c6e9490f9ae9df6e3"
+          }
+        ]
+      },
+      {
+        "kind": "HEARTBEAT_OBSERVE",
+        "source": {
+          "path": "services/control-plane/src/inv/node_transport.py",
+          "line": 89,
+          "function": "NodeTLSClient.probe",
+          "sourceSHA": "72028cbac903c4415d9979f980a6e0f9948e914f",
+          "fileSHA256": "3559bbcdf9568f8930654d860b0edd980eca71c835cde3fe7380a69dd56e18f4",
+          "exactLine": "        return self._request(channel, request, \"/v1/heartbeats\", \"NodeProbeResult\")",
+          "implementedSourceOnly": true
+        },
+        "method": "POST",
+        "rawPath": "/v1/heartbeats",
+        "requestBinding": "existing exact NodeProbeInput",
+        "independentlyVerifiedOutcome": "NodeProbeResult",
+        "closureProcedure": "b_confirm_observation_io",
+        "closurePrincipal": "sv_b_verifier",
+        "atomicBoundary": "original NodeObservation nonce/telemetry transaction",
+        "registration": "committed before IO, typed opaque CommittedIOHandle consumed by CP adapter/verifier; no new plain Node field or floor2 change",
+        "failure": "ordinary verifier NO_EFFECT_ABANDONED, never business denial/version bump; late reply cannot reopen or refresh. Actual verified liveness/revoke effects remain separate original writers",
+        "effectClass": "READ_ONLY",
+        "effectSelection": "fixed method/rawPath/handler plus independently admitted exact request; same binding in schema/row/procedure/capability/consumer. Caller cannot downgrade.",
+        "transportMethod": "NodeTLSClient.probe",
+        "callerBoundaries": [
+          {
+            "path": "services/control-plane/src/inv/buildkit_transport.py",
+            "line": 855,
+            "function": "NodeAgentReceipts.preflight_quarantine",
+            "fileSHA256": "70a924987554b389b8c2e377226fac242df1ec0b713c0b4fb9ac240ea8bbcfae"
+          },
+          {
+            "path": "services/control-plane/src/inv/observation.py",
+            "line": 119,
+            "function": "NodeObservation.poll",
+            "fileSHA256": "b515ceda8b066466cf4cdf5fa88d04803220398c436d29ab7c5fd2793bf5748f"
+          }
+        ]
+      },
+      {
+        "kind": "STORAGE_SAMPLE",
+        "source": {
+          "path": "services/control-plane/src/inv/node_transport.py",
+          "line": 109,
+          "function": "NodeTLSClient.storage_sample",
+          "sourceSHA": "72028cbac903c4415d9979f980a6e0f9948e914f",
+          "fileSHA256": "3559bbcdf9568f8930654d860b0edd980eca71c835cde3fe7380a69dd56e18f4",
+          "exactLine": "        return self._request(",
+          "implementedSourceOnly": true
+        },
+        "method": "POST",
+        "rawPath": "/v1/storage/sample",
+        "requestBinding": "existing exact signed challenge/envelope bytes, policy/channel/root/R",
+        "independentlyVerifiedOutcome": "NodeStorageSignedSample",
+        "closureProcedure": "b_confirm_storage_sample_io",
+        "closurePrincipal": "sv_b_verifier",
+        "atomicBoundary": "StorageSampleStore.apply_sample typed sample nonce/evidence/check/consumption same TX, not equipment acceptance",
+        "registration": "committed before IO, typed opaque CommittedIOHandle consumed by CP adapter/verifier; no new plain Node field or floor2 change",
+        "failure": "ordinary verifier NO_EFFECT_ABANDONED, never business denial/version bump; late reply cannot reopen or refresh. Actual verified liveness/revoke effects remain separate original writers",
+        "effectClass": "READ_ONLY",
+        "effectSelection": "fixed method/rawPath/handler plus independently admitted exact request; same binding in schema/row/procedure/capability/consumer. Caller cannot downgrade.",
+        "transportMethod": "NodeTLSClient.storage_sample",
+        "callerBoundaries": [
+          {
+            "path": "services/control-plane/src/inv/storage_check_collect.py",
+            "line": 309,
+            "function": "StorageCheckCollector.collect",
+            "fileSHA256": "bae67c856cc8bdae52c1f06c4b6e36302e17ae0dd53a24fc01557cae19a3e226"
+          },
+          {
+            "path": "services/control-plane/src/inv/storage_commit.py",
+            "line": 398,
+            "function": "StorageSampleStore.collect",
+            "fileSHA256": "41522f6ef98b315c4dff75b06d10507ad7bc45a6523983b3de9767cd61ff496c"
+          }
+        ]
+      },
+      {
+        "kind": "OBJECT_READ",
+        "source": {
+          "path": "services/control-plane/src/inv/node_transport.py",
+          "line": 120,
+          "function": "NodeTLSClient.read_chunk",
+          "sourceSHA": "72028cbac903c4415d9979f980a6e0f9948e914f",
+          "fileSHA256": "3559bbcdf9568f8930654d860b0edd980eca71c835cde3fe7380a69dd56e18f4",
+          "exactLine": "        return self._request(channel, request, \"/v1/objects/read\", \"NodeChunkResult\")",
+          "implementedSourceOnly": true
+        },
+        "method": "POST",
+        "rawPath": "/v1/objects/read",
+        "requestBinding": "existing exact NodeChunkInput and authorized immutable object",
+        "independentlyVerifiedOutcome": "NodeChunkResult",
+        "closureProcedure": "b_confirm_object_read_io",
+        "closurePrincipal": "sv_b_verifier",
+        "atomicBoundary": "typed digest/size/claim validated append, no source writeback",
+        "registration": "committed before IO, typed opaque CommittedIOHandle consumed by CP adapter/verifier; no new plain Node field or floor2 change",
+        "failure": "ordinary verifier NO_EFFECT_ABANDONED, never business denial/version bump; late reply cannot reopen or refresh. Actual verified liveness/revoke effects remain separate original writers",
+        "effectClass": "READ_ONLY",
+        "effectSelection": "fixed method/rawPath/handler plus independently admitted exact request; same binding in schema/row/procedure/capability/consumer. Caller cannot downgrade.",
+        "transportMethod": "NodeTLSClient.read_chunk",
+        "callerBoundaries": [
+          {
+            "path": "services/control-plane/src/inv/model_remote.py",
+            "line": 98,
+            "function": "ConfiguredRemoteModelReader.read",
+            "fileSHA256": "796f61fe8404c2c3a8a4be08eca75d98e3c442a30c04077c66b278e7d60c6737"
+          },
+          {
+            "path": "services/control-plane/src/inv/node_transfer.py",
+            "line": 43,
+            "function": "NodeTransfer.fetch",
+            "fileSHA256": "3b5315201357c8d5b82643cde8f685ed39dc542255d8bc31fb63d894065dac2e"
+          }
+        ]
+      },
+      {
+        "kind": "TERMINAL_FRAME",
+        "source": {
+          "path": "services/control-plane/src/inv/node_transport.py",
+          "line": 124,
+          "function": "NodeTLSClient.terminal_frame",
+          "sourceSHA": "72028cbac903c4415d9979f980a6e0f9948e914f",
+          "fileSHA256": "3559bbcdf9568f8930654d860b0edd980eca71c835cde3fe7380a69dd56e18f4",
+          "exactLine": "        return self._request(",
+          "implementedSourceOnly": true
+        },
+        "method": "POST",
+        "rawPath": "/v1/terminals/frame",
+        "requestBinding": "existing exact NodeTerminalInput and prior claimed command",
+        "independentlyVerifiedOutcome": "NodeTerminalResult",
+        "closureProcedure": "b_confirm_terminal_frame_io",
+        "closurePrincipal": "sv_b_verifier",
+        "atomicBoundary": "exact sequence/body/expiry transaction; no new authority or lease release",
+        "registration": "committed before IO, typed opaque CommittedIOHandle consumed by CP adapter/verifier; no new plain Node field or floor2 change",
+        "failure": "uncertain invocation or dead original capability => protected physical/quiescence proof only; atomic proven-never-invoked dispatch abort may NO_EFFECT; no timeout/not-sent boolean proof",
+        "effectClass": "SIDE_EFFECT",
+        "effectSelection": "fixed method/rawPath/handler plus independently admitted exact request; same binding in schema/row/procedure/capability/consumer. Caller cannot downgrade.",
+        "transportMethod": "NodeTLSClient.terminal_frame",
+        "callerBoundaries": [
+          {
+            "path": "services/control-plane/src/inv/terminal.py",
+            "line": 277,
+            "function": "TerminalService.frame",
+            "fileSHA256": "fe294d648b34d617df94449974fc82fed904639b80b8a5da2c9d34f32606bf8e"
+          }
+        ]
+      },
+      {
+        "kind": "QUARANTINE_RECONCILE",
+        "source": {
+          "path": "services/control-plane/src/inv/node_transport.py",
+          "line": 132,
+          "function": "NodeTLSClient.quarantine",
+          "sourceSHA": "72028cbac903c4415d9979f980a6e0f9948e914f",
+          "fileSHA256": "3559bbcdf9568f8930654d860b0edd980eca71c835cde3fe7380a69dd56e18f4",
+          "exactLine": "        return self._request(",
+          "implementedSourceOnly": true
+        },
+        "method": "POST",
+        "rawPath": "/v1/builds/quarantine",
+        "requestBinding": "existing exact retained BuildQuarantineRequest",
+        "independentlyVerifiedOutcome": "BuildQuarantineReceipt",
+        "closureProcedure": "b_confirm_safety_observation_io",
+        "closurePrincipal": "sv_b_safety",
+        "atomicBoundary": "durable Node quarantine ACK append; never clears denial",
+        "registration": "committed before IO, typed opaque CommittedIOHandle consumed by CP adapter/verifier; no new plain Node field or floor2 change",
+        "failure": "fresh protected RECOVERY_OBSERVATION verifier may close exact command/identity/epoch/generation/target/nonce durable ACK or authenticated causally bound readback; original poisoned cap never reconstructed; no ACK means uncertainty retained",
+        "effectClass": "IDEMPOTENT_SAFETY",
+        "effectSelection": "fixed method/rawPath/handler plus independently admitted exact request; same binding in schema/row/procedure/capability/consumer. Caller cannot downgrade.",
+        "transportMethod": "NodeTLSClient.quarantine",
+        "callerBoundaries": [
+          {
+            "path": "services/control-plane/src/inv/buildkit_transport.py",
+            "line": 978,
+            "function": "NodeAgentReceipts._record_quarantine",
+            "fileSHA256": "70a924987554b389b8c2e377226fac242df1ec0b713c0b4fb9ac240ea8bbcfae"
+          }
+        ]
+      },
+      {
+        "kind": "B_GATE_ARM",
+        "source": {
+          "path": "PROPOSED_B_ONLY",
+          "line": null,
+          "implemented": false
+        },
+        "method": "POST",
+        "rawPath": "/v1/roles/gate",
+        "requestBinding": "existing proposed exact signed GATE_CONTROL ARM from current protected approved operation",
+        "independentlyVerifiedOutcome": "GATE_ACK",
+        "closureProcedure": "b_record_gate_ack",
+        "closurePrincipal": "sv_b_verifier",
+        "atomicBoundary": "same transaction durable ACK append + exact IO confirmation before activation",
+        "registration": "committed before IO, typed opaque CommittedIOHandle consumed by CP adapter/verifier; no new plain Node field or floor2 change",
+        "failure": "uncertain invocation or dead original capability => protected physical/quiescence proof only; atomic proven-never-invoked dispatch abort may NO_EFFECT; no timeout/not-sent boolean proof",
+        "effectClass": "SIDE_EFFECT",
+        "effectSelection": "fixed method/rawPath/handler plus independently admitted exact request; same binding in schema/row/procedure/capability/consumer. Caller cannot downgrade.",
+        "callerBoundaries": []
+      },
+      {
+        "kind": "B_GATE_INVALIDATE",
+        "source": {
+          "path": "PROPOSED_B_ONLY",
+          "line": null,
+          "implemented": false
+        },
+        "method": "POST",
+        "rawPath": "/v1/roles/gate",
+        "requestBinding": "existing proposed exact signed GATE_CONTROL INVALIDATE from CP tombstone outbox",
+        "independentlyVerifiedOutcome": "GATE_ACK",
+        "closureProcedure": "b_record_gate_ack",
+        "closurePrincipal": "sv_b_verifier",
+        "atomicBoundary": "existing durable Node gate record/retired history ACK + IO confirmation same transaction",
+        "registration": "committed before IO, typed opaque CommittedIOHandle consumed by CP adapter/verifier; no new plain Node field or floor2 change",
+        "failure": "fresh protected RECOVERY_OBSERVATION verifier may close exact command/identity/epoch/generation/target/nonce durable ACK or authenticated causally bound readback; original poisoned cap never reconstructed; no ACK means uncertainty retained",
+        "effectClass": "IDEMPOTENT_SAFETY",
+        "effectSelection": "fixed method/rawPath/handler plus independently admitted exact request; same binding in schema/row/procedure/capability/consumer. Caller cannot downgrade.",
+        "callerBoundaries": []
+      },
+      {
+        "kind": "B_ROLE_OBSERVE",
+        "source": {
+          "path": "PROPOSED_B_ONLY",
+          "line": null,
+          "implemented": false
+        },
+        "method": "POST",
+        "rawPath": "/v1/roles/observe",
+        "requestBinding": "existing proposed closed nonce request on CP observe lane",
+        "independentlyVerifiedOutcome": "GATE_OBSERVATION",
+        "closureProcedure": "b_record_reconcile_observation",
+        "closurePrincipal": "sv_b_verifier",
+        "atomicBoundary": "original still-valid ACK readback rules, otherwise B-RECOVERY1 HOLD",
+        "registration": "committed before IO, typed opaque CommittedIOHandle consumed by CP adapter/verifier; no new plain Node field or floor2 change",
+        "failure": "ordinary verifier NO_EFFECT_ABANDONED, never business denial/version bump; late reply cannot reopen or refresh. Actual verified liveness/revoke effects remain separate original writers",
+        "effectClass": "READ_ONLY",
+        "effectSelection": "fixed method/rawPath/handler plus independently admitted exact request; same binding in schema/row/procedure/capability/consumer. Caller cannot downgrade.",
+        "callerBoundaries": []
+      },
+      {
+        "kind": "B_FOLDER_ROOT_OBSERVE",
+        "source": {
+          "path": "PROPOSED_B_ONLY",
+          "line": null,
+          "implemented": false
+        },
+        "method": "B_PREFLIGHT_OBSERVE",
+        "rawPath": "authorized contributed path only; no physical value bound yet",
+        "requestBinding": "closed B observe permit/challenge and exact contribution/root scope",
+        "independentlyVerifiedOutcome": "FolderRootObservation",
+        "closureProcedure": "b_append_folder_root_observation",
+        "closurePrincipal": "sv_b_verifier",
+        "atomicBoundary": "B-only proof append; no plain activation prerequisite and no installed RO mount proof",
+        "registration": "committed before IO, typed opaque CommittedIOHandle consumed by CP adapter/verifier; no new plain Node field or floor2 change",
+        "failure": "ordinary verifier NO_EFFECT_ABANDONED, never business denial/version bump; late reply cannot reopen or refresh. Actual verified liveness/revoke effects remain separate original writers",
+        "effectClass": "READ_ONLY",
+        "effectSelection": "fixed method/rawPath/handler plus independently admitted exact request; same binding in schema/row/procedure/capability/consumer. Caller cannot downgrade.",
+        "callerBoundaries": []
+      }
+    ],
+    "currentWireFact": "generated core.schema NodeExecutionResult -> NodeStopReceipt with stopped=true/cleanupPending=false; ACTIVE observation cannot be passed to terminal release path",
+    "actualNewIOEnforcement": false
+  },
+  "handlerAnchors": {
+    "HEARTBEAT_OBSERVE": {
+      "sourceSHA": "72028cbac903c4415d9979f980a6e0f9948e914f",
+      "path": "services/node-agent/transport/server.go",
+      "fileSHA256": "c9c98084798eeda52a8f38bebc6a13f5e531deaf3c0016e4295ade19a500b8a2",
+      "line": 101,
+      "exactLine": "\tif probe || snapshot {"
+    },
+    "GPU_ACTIVE_OBSERVE": {
+      "sourceSHA": "72028cbac903c4415d9979f980a6e0f9948e914f",
+      "path": "services/node-agent/transport/server.go",
+      "fileSHA256": "c9c98084798eeda52a8f38bebc6a13f5e531deaf3c0016e4295ade19a500b8a2",
+      "line": 230,
+      "exactLine": "\t\t\tresult, err = telemetry.Sample(ctx)"
+    },
+    "STORAGE_SAMPLE": {
+      "sourceSHA": "72028cbac903c4415d9979f980a6e0f9948e914f",
+      "path": "services/node-agent/transport/server.go",
+      "fileSHA256": "c9c98084798eeda52a8f38bebc6a13f5e531deaf3c0016e4295ade19a500b8a2",
+      "line": 129,
+      "exactLine": "\t\tresult, err := h.storage.Sample(ctx, raw)"
+    },
+    "OBJECT_READ": {
+      "sourceSHA": "72028cbac903c4415d9979f980a6e0f9948e914f",
+      "path": "services/node-agent/transport/server.go",
+      "fileSHA256": "c9c98084798eeda52a8f38bebc6a13f5e531deaf3c0016e4295ade19a500b8a2",
+      "line": 203,
+      "exactLine": "\t\tresult, err := h.objects.Read(ctx, input)"
+    },
+    "TERMINAL_FRAME": {
+      "sourceSHA": "72028cbac903c4415d9979f980a6e0f9948e914f",
+      "path": "services/node-agent/transport/server.go",
+      "fileSHA256": "c9c98084798eeda52a8f38bebc6a13f5e531deaf3c0016e4295ade19a500b8a2",
+      "line": 183,
+      "exactLine": "\t\tresult, err := engine.Terminal(ctx, raw)"
+    },
+    "QUARANTINE_RECONCILE": {
+      "sourceSHA": "72028cbac903c4415d9979f980a6e0f9948e914f",
+      "path": "services/node-agent/transport/server.go",
+      "fileSHA256": "c9c98084798eeda52a8f38bebc6a13f5e531deaf3c0016e4295ade19a500b8a2",
+      "line": 154,
+      "exactLine": "\t\tresult, err := recorder.Quarantine(ctx, raw)"
+    },
+    "EXECUTE": {
+      "sourceSHA": "72028cbac903c4415d9979f980a6e0f9948e914f",
+      "path": "services/node-agent/transport/server.go",
+      "fileSHA256": "c9c98084798eeda52a8f38bebc6a13f5e531deaf3c0016e4295ade19a500b8a2",
+      "line": 284,
+      "exactLine": "\t\tresult, err = h.runner.Execute(ctx, raw)"
+    },
+    "CANCEL": {
+      "sourceSHA": "72028cbac903c4415d9979f980a6e0f9948e914f",
+      "path": "services/node-agent/transport/server.go",
+      "fileSHA256": "c9c98084798eeda52a8f38bebc6a13f5e531deaf3c0016e4295ade19a500b8a2",
+      "line": 280,
+      "exactLine": "\t\tresult, err = stopper.Cancel(ctx, raw)"
+    },
+    "RECEIPT_OBSERVE": {
+      "sourceSHA": "72028cbac903c4415d9979f980a6e0f9948e914f",
+      "path": "services/node-agent/transport/server.go",
+      "fileSHA256": "c9c98084798eeda52a8f38bebc6a13f5e531deaf3c0016e4295ade19a500b8a2",
+      "line": 282,
+      "exactLine": "\t\tresult, err = h.runner.Observe(ctx, raw)"
+    }
+  },
+  "readOnlyException": {
+    "kind": "RECEIPT_OBSERVE",
+    "chosenEffect": "SIDE_EFFECT",
+    "proof": [
+      {
+        "sourceSHA": "72028cbac903c4415d9979f980a6e0f9948e914f",
+        "path": "services/node-agent/runtime/runner.go",
+        "fileSHA256": "ee2ec63fa6a0f28a2f0750be3aba5145fccc88df82819106207ea0c5828f49b9",
+        "line": 343,
+        "exactLine": "func (r *Runner) Observe(ctx context.Context, envelope []byte) (Result, error) {"
+      },
+      {
+        "sourceSHA": "72028cbac903c4415d9979f980a6e0f9948e914f",
+        "path": "services/node-agent/runtime/runner.go",
+        "fileSHA256": "ee2ec63fa6a0f28a2f0750be3aba5145fccc88df82819106207ea0c5828f49b9",
+        "line": 78,
+        "exactLine": "\t\tresult, err := r.reconcile(*prior, \"recovered\")"
+      },
+      {
+        "sourceSHA": "72028cbac903c4415d9979f980a6e0f9948e914f",
+        "path": "services/node-agent/runtime/runner.go",
+        "fileSHA256": "ee2ec63fa6a0f28a2f0750be3aba5145fccc88df82819106207ea0c5828f49b9",
+        "line": 267,
+        "exactLine": "\t\t_ = r.engine.Stop(ctx, state.ID)"
+      },
+      {
+        "sourceSHA": "72028cbac903c4415d9979f980a6e0f9948e914f",
+        "path": "services/node-agent/runtime/runner.go",
+        "fileSHA256": "ee2ec63fa6a0f28a2f0750be3aba5145fccc88df82819106207ea0c5828f49b9",
+        "line": 331,
+        "exactLine": "\tif err := r.engine.Remove(ctx, state.ID, record); err != nil {"
+      },
+      {
+        "sourceSHA": "72028cbac903c4415d9979f980a6e0f9948e914f",
+        "path": "services/node-agent/runtime/runner.go",
+        "fileSHA256": "ee2ec63fa6a0f28a2f0750be3aba5145fccc88df82819106207ea0c5828f49b9",
+        "line": 236,
+        "exactLine": "\t\tif err := r.journal.Save(receipt); err != nil {"
+      }
+    ],
+    "reason": "Observe can Stop/Remove and persist receipt; no pure-read split exists in72028, so actual path stays side effect/HOLD on uncertainty"
+  },
+  "coverageErrors": [],
+  "actualNewRuntimeEnforcement": false
+}

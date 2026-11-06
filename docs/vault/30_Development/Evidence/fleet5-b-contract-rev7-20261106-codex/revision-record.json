@@ -1,0 +1,35 @@
+{
+  "version": "fleet5-b-contract-rev7:1",
+  "task": "FLEET5-COMPUTE-STORAGE-CONTRACT-20261105",
+  "orcaTask": "task_a8fd2969f0b3",
+  "dispatch": "ctx_6f0f8253b8a7",
+  "owner": "Codex",
+  "reviewer": "Actual independent Claude whole Rev7 review via Root PENDING",
+  "branch": "agent/codex/fleet5-b-contract-rev7-20261106",
+  "base": "ee97c27a5d135a4059256124290731cd2b791193",
+  "source": "72028cbac903c4415d9979f980a6e0f9948e914f",
+  "actualPriorReview": "ecbdaa3beca33e4cb4efc943f6bd9c4b02620291",
+  "rootDecision": "msg_8b52dd815cae ONE narrow Rev7 docs/schema/static/source-plan delta; no B code grant",
+  "kst": "2026-11-06T12:11:09.448884+09:00",
+  "guidance": [
+    {
+      "doc_id": "INDEX-PROGRESS-001",
+      "version": "1.0.434",
+      "updated": "2026-11-06T11:44:14+09:00",
+      "path": "D:\\Project\\SaintVisionI-Invion\\fleet-five-orchestration-20261105\\docs\\vault\\00_Index\\\uc804\uccb4 \uac1c\ubc1c \uc9c4\ud589 \ud604\ud669.md",
+      "sha256": "35e6b7f5d97efeb55567dcec234d9110d6e871753a5dad27e19e3a15793056e2"
+    },
+    {
+      "doc_id": "WORKBOARD-CODEX-001",
+      "version": "1.0.395",
+      "updated": "2026-11-06T11:44:14+09:00",
+      "path": "D:\\Project\\SaintVisionI-Invion\\fleet-five-orchestration-20261105\\docs\\vault\\30_Development\\Agent\ubcc4 \uc791\uc5c5\\Codex \uc791\uc5c5 \ud604\ud669.md",
+      "sha256": "15a2fcb1e91452e8ac5538ef5f4e5d451a73d701cfc160c95c38f8e4fa1d0373"
+    }
+  ],
+  "canonicalFirstReads": "Immutable Rev2 initial-first-read-source-inventory.json exact doc IDs/versions/hashes remain; canonical docs and agent-delivery1.1.0/core-reliability1.0.0 read; Root boards govern",
+  "scope": "Only unique own Rev7 Evidence and History; no shared boards/ADR/registry/source originals/Obsidian apply/helpers/protected actions",
+  "actualRuntimeB": 0,
+  "A1_A16": "PENDING",
+  "realBindings": null
+}

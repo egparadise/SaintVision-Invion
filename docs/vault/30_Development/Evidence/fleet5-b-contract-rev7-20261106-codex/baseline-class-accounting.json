@@ -1,0 +1,2057 @@
+{
+  "priorCommit": "ee97c27a5d135a4059256124290731cd2b791193",
+  "priorBytes": 74373915,
+  "priorSHA256": "19944f326147bf0d83784534231de8434eab5268355fb796f3239772f8d6ae9d",
+  "oldCalls": 47608,
+  "newCalls": 47608,
+  "oldUnprovenBacklog": 29573,
+  "oldBacklogCurrentClasses": {
+    "UNRESOLVED": 17764,
+    "NONAUTHORITY_BUILTIN": 9520,
+    "EXTERNAL_IO_UNMEDIATED": 1536,
+    "RESOLVED_SOURCE_TARGET": 511,
+    "NONAUTHORITY_TYPED_MAPPING": 23,
+    "NONAUTHORITY_VALUE_INITIALIZER": 152,
+    "AUTHORITY_EXTERNAL_IO_CATALOGUE_BOUND": 10,
+    "RESOLVED_SOURCE_WRITER": 57
+  },
+  "oldTransactionBacklog": 107,
+  "currentTransactionBacklogInventory": [
+    {
+      "id": "5517f6a0e0a2acfffd8789e8a35c48672e072ffd2848e26b4135a3534135dd55",
+      "path": "services/control-plane/src/inv/app.py",
+      "function": "inv.app.create_app.ready",
+      "line": 362,
+      "column": 13,
+      "spelling": "database.transaction",
+      "receiverType": "inv.app.database",
+      "possibleReceiverTypes": [
+        "inv.app.database"
+      ],
+      "classification": "UNRESOLVED",
+      "targets": [],
+      "blocksGrant": true
+    },
+    {
+      "id": "8723086791fbf31a6fe3d0b763c45d56417c36050007e89b4925e1dbb0a3d675",
+      "path": "services/control-plane/src/inv/app.py",
+      "function": "inv.app.create_app.configuration_readiness",
+      "line": 392,
+      "column": 13,
+      "spelling": "database.transaction",
+      "receiverType": "inv.app.database",
+      "possibleReceiverTypes": [
+        "inv.app.database"
+      ],
+      "classification": "UNRESOLVED",
+      "targets": [],
+      "blocksGrant": true
+    },
+    {
+      "id": "20e11f0f45b18ba3c6cfd784c9c50314adcd504eb87dcb05c869bf9f60df10e4",
+      "path": "services/control-plane/src/inv/app.py",
+      "function": "inv.app.create_app.business_permission",
+      "line": 1057,
+      "column": 13,
+      "spelling": "database.transaction",
+      "receiverType": "inv.app.database",
+      "possibleReceiverTypes": [
+        "inv.app.database"
+      ],
+      "classification": "UNRESOLVED",
+      "targets": [],
+      "blocksGrant": true
+    },
+    {
+      "id": "0f88c8e04a98bb46380c356c67a91dfa9517c2caca52aa0da68169373306adf1",
+      "path": "services/control-plane/src/inv/business_handoff.py",
+      "function": "inv.business_handoff.BusinessHandoff.stop",
+      "line": 194,
+      "column": 12,
+      "spelling": "self.db.transaction",
+      "receiverType": "inv.business_handoff.workspace.db",
+      "possibleReceiverTypes": [
+        "inv.business_handoff.workspace.db"
+      ],
+      "classification": "UNRESOLVED",
+      "targets": [],
+      "blocksGrant": true
+    },
+    {
+      "id": "c246f2c0c039c12c11cbb91c258eac367b582e5f37aeb511239faebf75c7d8ab",
+      "path": "services/control-plane/src/inv/business_handoff.py",
+      "function": "inv.business_handoff.BusinessHandoff.prepare",
+      "line": 283,
+      "column": 12,
+      "spelling": "self.db.transaction",
+      "receiverType": "inv.business_handoff.workspace.db",
+      "possibleReceiverTypes": [
+        "inv.business_handoff.workspace.db"
+      ],
+      "classification": "UNRESOLVED",
+      "targets": [],
+      "blocksGrant": true
+    },
+    {
+      "id": "97f20fd7deab917bc7098b9705a42cef87c206022e6e1d98e42c4c9d6c12e073",
+      "path": "services/control-plane/src/inv/business_handoff.py",
+      "function": "inv.business_handoff.BusinessHandoff.get",
+      "line": 362,
+      "column": 13,
+      "spelling": "self.db.transaction",
+      "receiverType": "inv.business_handoff.workspace.db",
+      "possibleReceiverTypes": [
+        "inv.business_handoff.workspace.db"
+      ],
+      "classification": "UNRESOLVED",
+      "targets": [],
+      "blocksGrant": true
+    },
+    {
+      "id": "b6ce12d140c5d7ff3be2bedc9ad8287f8d8341049714afcd42f829ec1f5e4a3d",
+      "path": "services/control-plane/src/inv/business_handoff.py",
+      "function": "inv.business_handoff.BusinessHandoff.enqueue",
+      "line": 367,
+      "column": 13,
+      "spelling": "self.db.transaction",
+      "receiverType": "inv.business_handoff.workspace.db",
+      "possibleReceiverTypes": [
+        "inv.business_handoff.workspace.db"
+      ],
+      "classification": "UNRESOLVED",
+      "targets": [],
+      "blocksGrant": true
+    },
+    {
+      "id": "e448442ef222a9d02683a1e16df7d6e54b71f287d077849562cfb936d02086b2",
+      "path": "services/control-plane/src/inv/business_handoff.py",
+      "function": "inv.business_handoff.BusinessHandoff.approved",
+      "line": 382,
+      "column": 13,
+      "spelling": "self.db.transaction",
+      "receiverType": "inv.business_handoff.workspace.db",
+      "possibleReceiverTypes": [
+        "inv.business_handoff.workspace.db"
+      ],
+      "classification": "UNRESOLVED",
+      "targets": [],
+      "blocksGrant": true
+    },
+    {
+      "id": "f83bf7eae31fa314b6e69aafa43c5190c628a379e874c9d62792bb5faaad2784",
+      "path": "services/control-plane/src/inv/business_handoff.py",
+      "function": "inv.business_handoff.BusinessHandoff.release",
+      "line": 405,
+      "column": 13,
+      "spelling": "self.db.transaction",
+      "receiverType": "inv.business_handoff.workspace.db",
+      "possibleReceiverTypes": [
+        "inv.business_handoff.workspace.db"
+      ],
+      "classification": "UNRESOLVED",
+      "targets": [],
+      "blocksGrant": true
+    },
+    {
+      "id": "561112b9305321610211eae21890ad862f636d835e467c42689ba86f854b59da",
+      "path": "services/control-plane/src/inv/containment.py",
+      "function": "inv.containment.Containment.get",
+      "line": 86,
+      "column": 13,
+      "spelling": "self.db.transaction",
+      "receiverType": "TYPE_JOIN:35a33e19d29b5a9f7dde",
+      "possibleReceiverTypes": [
+        "inv.app.database",
+        "inv.containment.database"
+      ],
+      "classification": "UNRESOLVED",
+      "targets": [],
+      "blocksGrant": true
+    },
+    {
+      "id": "d8963a1258d984d198c5a01fcde79e2a75e0296bcfeff3adb83d6781b43308cb",
+      "path": "services/control-plane/src/inv/containment.py",
+      "function": "inv.containment.Containment.change",
+      "line": 103,
+      "column": 13,
+      "spelling": "self.db.transaction",
+      "receiverType": "TYPE_JOIN:35a33e19d29b5a9f7dde",
+      "possibleReceiverTypes": [
+        "inv.app.database",
+        "inv.containment.database"
+      ],
+      "classification": "UNRESOLVED",
+      "targets": [],
+      "blocksGrant": true
+    },
+    {
+      "id": "97ddcd942e08401f5a813e3e8e2f8fe880b9d2e5ba626a03d9f965b7bfaf6bbd",
+      "path": "services/control-plane/src/inv/containment.py",
+      "function": "inv.containment.ContainmentReconciler.once",
+      "line": 226,
+      "column": 13,
+      "spelling": "self.db.transaction",
+      "receiverType": "inv.db.Database",
+      "possibleReceiverTypes": [
+        "inv.db.Database"
+      ],
+      "classification": "RESOLVED_SOURCE_TARGET",
+      "targets": [
+        "inv.db.Database.transaction"
+      ],
+      "blocksGrant": false
+    },
+    {
+      "id": "b45655431dec018148f312a09bd9dc20bb8f86e8a292558eb3880dcfd198d0a0",
+      "path": "services/control-plane/src/inv/containment_approvals.py",
+      "function": "inv.containment_approvals.ControlApprovals.propose",
+      "line": 79,
+      "column": 13,
+      "spelling": "self.db.transaction",
+      "receiverType": "TYPE_JOIN:b5265c2fc53aa8031b5c",
+      "possibleReceiverTypes": [
+        "inv.app.database",
+        "inv.containment_approvals.db"
+      ],
+      "classification": "UNRESOLVED",
+      "targets": [],
+      "blocksGrant": true
+    },
+    {
+      "id": "fe5d125f4ee9184e1bbfe7f671daaf08531ba811fa3cedff8beaaf631b7f3544",
+      "path": "services/control-plane/src/inv/containment_approvals.py",
+      "function": "inv.containment_approvals.ControlApprovals.get",
+      "line": 137,
+      "column": 13,
+      "spelling": "self.db.transaction",
+      "receiverType": "TYPE_JOIN:b5265c2fc53aa8031b5c",
+      "possibleReceiverTypes": [
+        "inv.app.database",
+        "inv.containment_approvals.db"
+      ],
+      "classification": "UNRESOLVED",
+      "targets": [],
+      "blocksGrant": true
+    },
+    {
+      "id": "19f2c1be625ff606475ca28394ed5c1d7bda6736e7e0346909692a75457224b6",
+      "path": "services/control-plane/src/inv/containment_approvals.py",
+      "function": "inv.containment_approvals.ControlApprovals.challenge",
+      "line": 142,
+      "column": 13,
+      "spelling": "self.db.transaction",
+      "receiverType": "TYPE_JOIN:b5265c2fc53aa8031b5c",
+      "possibleReceiverTypes": [
+        "inv.app.database",
+        "inv.containment_approvals.db"
+      ],
+      "classification": "UNRESOLVED",
+      "targets": [],
+      "blocksGrant": true
+    },
+    {
+      "id": "1fde508052dade4da9b5f7d9c9e1019c6646262c676aa1f652bb10cbe3e06f74",
+      "path": "services/control-plane/src/inv/containment_approvals.py",
+      "function": "inv.containment_approvals.ControlApprovals.decide",
+      "line": 166,
+      "column": 13,
+      "spelling": "self.db.transaction",
+      "receiverType": "TYPE_JOIN:b5265c2fc53aa8031b5c",
+      "possibleReceiverTypes": [
+        "inv.app.database",
+        "inv.containment_approvals.db"
+      ],
+      "classification": "UNRESOLVED",
+      "targets": [],
+      "blocksGrant": true
+    },
+    {
+      "id": "1f335078dfd0457f5b20c8011fe900d6c11b84e5f57e600c41eee1d58f37dd5c",
+      "path": "services/control-plane/src/inv/credential_registry.py",
+      "function": "inv.credential_registry.PostgresCredentialRegistry.lookup",
+      "line": 17,
+      "column": 13,
+      "spelling": "self.database.transaction",
+      "receiverType": "inv.credential_registry.database",
+      "possibleReceiverTypes": [
+        "inv.credential_registry.database"
+      ],
+      "classification": "UNRESOLVED",
+      "targets": [],
+      "blocksGrant": true
+    },
+    {
+      "id": "4d0c2006ade0b5ba86c777ff4ebb66402539cd8218b20a3d748dce260ac38a2b",
+      "path": "services/control-plane/src/inv/model_commit.py",
+      "function": "inv.model_commit.ModelManifestStore.commit",
+      "line": 77,
+      "column": 13,
+      "spelling": "self.db.transaction",
+      "receiverType": "inv.db.Database",
+      "possibleReceiverTypes": [
+        "inv.db.Database"
+      ],
+      "classification": "RESOLVED_SOURCE_TARGET",
+      "targets": [
+        "inv.db.Database.transaction"
+      ],
+      "blocksGrant": false
+    },
+    {
+      "id": "305ec632cb0fe3dfed204e823a224d435ab4420644a068e3856266a91142e30d",
+      "path": "services/control-plane/src/inv/model_commit.py",
+      "function": "inv.model_commit.ModelManifestStore.commit",
+      "line": 87,
+      "column": 17,
+      "spelling": "self.db.transaction",
+      "receiverType": "inv.db.Database",
+      "possibleReceiverTypes": [
+        "inv.db.Database"
+      ],
+      "classification": "RESOLVED_SOURCE_TARGET",
+      "targets": [
+        "inv.db.Database.transaction"
+      ],
+      "blocksGrant": false
+    },
+    {
+      "id": "e73aa3dab9b80b2e78a1f353734d6d8f86b934679a7e5d79befaacfdb42c1ba9",
+      "path": "services/control-plane/src/inv/model_commit.py",
+      "function": "inv.model_commit.ModelManifestStore.get",
+      "line": 140,
+      "column": 13,
+      "spelling": "self.db.transaction",
+      "receiverType": "inv.db.Database",
+      "possibleReceiverTypes": [
+        "inv.db.Database"
+      ],
+      "classification": "RESOLVED_SOURCE_TARGET",
+      "targets": [
+        "inv.db.Database.transaction"
+      ],
+      "blocksGrant": false
+    },
+    {
+      "id": "ae17b869c20ba0574b710de02f6e76f01614e306a3677940417775deac06d07e",
+      "path": "services/control-plane/src/inv/model_locality.py",
+      "function": "inv.model_locality.ModelLocalityStore.observe",
+      "line": 174,
+      "column": 13,
+      "spelling": "self.db.transaction",
+      "receiverType": "inv.db.Database",
+      "possibleReceiverTypes": [
+        "inv.db.Database"
+      ],
+      "classification": "RESOLVED_SOURCE_TARGET",
+      "targets": [
+        "inv.db.Database.transaction"
+      ],
+      "blocksGrant": false
+    },
+    {
+      "id": "0b09a3f34a2377cc9cbb6d6e18d68409a80668f075f6cfeb61d44a9e337972b6",
+      "path": "services/control-plane/src/inv/model_locality.py",
+      "function": "inv.model_locality.ModelLocalityStore.observe",
+      "line": 186,
+      "column": 21,
+      "spelling": "self.db.transaction",
+      "receiverType": "inv.db.Database",
+      "possibleReceiverTypes": [
+        "inv.db.Database"
+      ],
+      "classification": "RESOLVED_SOURCE_TARGET",
+      "targets": [
+        "inv.db.Database.transaction"
+      ],
+      "blocksGrant": false
+    },
+    {
+      "id": "cbb29fd26f65788aaf5a9202b97918d253cd1e24a6aae6ceaa2ed7716aa03de2",
+      "path": "services/control-plane/src/inv/model_registry_binding.py",
+      "function": "inv.model_registry_binding.ModelRegistryBindingStore.bind",
+      "line": 43,
+      "column": 13,
+      "spelling": "self.db.transaction",
+      "receiverType": "TYPE_JOIN:cc2b268602f1ff79b3e2",
+      "possibleReceiverTypes": [
+        "UNRESOLVED_CALL_RETURN:inv.app:workspace_service.db",
+        "UNRESOLVED_CALL_RETURN:tools.run_real_browser_acceptance:object",
+        "inv.app.database",
+        "inv.build_preparations.database",
+        "inv.build_product_runtime.database",
+        "inv.business_handoff.database",
+        "inv.business_handoff.workspace.db",
+        "inv.control.database",
+        "inv.db.BoundDatabase",
+        "inv.db.Database",
+        "inv.dispatch.database",
+        "inv.model_commit.database",
+        "inv.model_execution_registry.database",
+        "inv.model_locality.database",
+        "inv.model_locality.db",
+        "inv.model_registry_binding.database",
+        "inv.model_retry.database",
+        "inv.model_runtime.database",
+        "inv.model_uri_resolver.database",
+        "inv.model_view.database",
+        "inv.placement.database",
+        "inv.result_view.database",
+        "inv.shard_recovery.database",
+        "inv.shards.database",
+        "inv.storage_check_collect.database",
+        "inv.storage_commit.database",
+        "inv.storage_view.database",
+        "inv.terminal.workspace.db",
+        "inv.workspace_api.database",
+        "inv.workspace_config.database",
+        "inv.workspace_editor.workspace.db",
+        "inv.workspace_git.workspace.db",
+        "inv.workspace_recovery.recovery.db",
+        "inv.workspace_resume.database",
+        "inv.workspace_start.workspace.db"
+      ],
+      "classification": "UNRESOLVED",
+      "targets": [
+        "inv.db.BoundDatabase.transaction",
+        "inv.db.Database.transaction"
+      ],
+      "blocksGrant": true
+    },
+    {
+      "id": "2dab46562359527a1f65b089ed0617c9a387e2527cf66f0c77e3dffe0b99dfc7",
+      "path": "services/control-plane/src/inv/model_runtime.py",
+      "function": "inv.model_runtime.ModelRuntimeStore.prepare",
+      "line": 197,
+      "column": 13,
+      "spelling": "self.db.transaction",
+      "receiverType": "inv.model_runtime.database",
+      "possibleReceiverTypes": [
+        "inv.model_runtime.database"
+      ],
+      "classification": "UNRESOLVED",
+      "targets": [],
+      "blocksGrant": true
+    },
+    {
+      "id": "ba84540c97700e9f7e5703925611790e56656aae17e27f190fbd562df3c4e33d",
+      "path": "services/control-plane/src/inv/model_runtime.py",
+      "function": "inv.model_runtime.ModelRuntimeStore.prepare",
+      "line": 284,
+      "column": 17,
+      "spelling": "self.db.transaction",
+      "receiverType": "inv.model_runtime.database",
+      "possibleReceiverTypes": [
+        "inv.model_runtime.database"
+      ],
+      "classification": "UNRESOLVED",
+      "targets": [],
+      "blocksGrant": true
+    },
+    {
+      "id": "d87c046b349faffe0a16f9a598532734f5f2b8ad2dc32b725fcc8524464293de",
+      "path": "services/control-plane/src/inv/model_uri_resolver.py",
+      "function": "inv.model_uri_resolver.ModelUriResolver.get",
+      "line": 55,
+      "column": 59,
+      "spelling": "session.begin",
+      "receiverType": "UNRESOLVED_CALL_RETURN:inv.model_uri_resolver:Session",
+      "possibleReceiverTypes": [
+        "UNRESOLVED_CALL_RETURN:inv.model_uri_resolver:Session"
+      ],
+      "classification": "UNRESOLVED",
+      "targets": [],
+      "blocksGrant": true
+    },
+    {
+      "id": "7fd7195773afa5d6c755e7fb7ba288d8a58fbafbcc2a092e2eb0c9b05fe2756c",
+      "path": "services/control-plane/src/inv/node_certificates.py",
+      "function": "inv.node_certificates.serve",
+      "line": 43,
+      "column": 9,
+      "spelling": "control.db.transaction",
+      "receiverType": "inv.node_certificates.control.db",
+      "possibleReceiverTypes": [
+        "inv.node_certificates.control.db"
+      ],
+      "classification": "UNRESOLVED",
+      "targets": [],
+      "blocksGrant": true
+    },
+    {
+      "id": "bb11f912ca149c158395479028183babb1df997435baf7a3e6ce7a0940053ac0",
+      "path": "services/control-plane/src/inv/node_resource_usage.py",
+      "function": "inv.node_resource_usage.serve",
+      "line": 52,
+      "column": 9,
+      "spelling": "control.db.transaction",
+      "receiverType": "inv.node_resource_usage.control.db",
+      "possibleReceiverTypes": [
+        "inv.node_resource_usage.control.db"
+      ],
+      "classification": "UNRESOLVED",
+      "targets": [],
+      "blocksGrant": true
+    },
+    {
+      "id": "1d8d36a4e7e27dd4d46ecc76801758fe6c6011ac807ad2f95185d709db4d4133",
+      "path": "services/control-plane/src/inv/node_transfer.py",
+      "function": "inv.node_transfer.NodeTransfer.fetch",
+      "line": 24,
+      "column": 8,
+      "spelling": "self.snapshots.begin",
+      "receiverType": "inv.node_transfer.snapshots",
+      "possibleReceiverTypes": [
+        "inv.node_transfer.snapshots"
+      ],
+      "classification": "UNRESOLVED",
+      "targets": [],
+      "blocksGrant": true
+    },
+    {
+      "id": "8aa6cc969b059046d88b4c2edabea8854d7ce82479b1e4979cfa8eaf8402558c",
+      "path": "services/control-plane/src/inv/node_transfer.py",
+      "function": "inv.node_transfer.NodeTransfer.fetch",
+      "line": 41,
+      "column": 25,
+      "spelling": "self.db.transaction",
+      "receiverType": "inv.node_transfer.database",
+      "possibleReceiverTypes": [
+        "inv.node_transfer.database"
+      ],
+      "classification": "UNRESOLVED",
+      "targets": [],
+      "blocksGrant": true
+    },
+    {
+      "id": "a09f795e74e6fc9577e871f4c772e7e2f2516e3b5911c5a4b6586d35b46297bc",
+      "path": "services/control-plane/src/inv/observation.py",
+      "function": "inv.observation.NodeObservation.begin",
+      "line": 19,
+      "column": 13,
+      "spelling": "self.db.transaction",
+      "receiverType": "inv.db.Database",
+      "possibleReceiverTypes": [
+        "inv.db.Database"
+      ],
+      "classification": "RESOLVED_SOURCE_TARGET",
+      "targets": [
+        "inv.db.Database.transaction"
+      ],
+      "blocksGrant": false
+    },
+    {
+      "id": "524b437b935e143cad1b1d11221cc82ff3d44d15601eb98e7b738567716284b8",
+      "path": "services/control-plane/src/inv/observation.py",
+      "function": "inv.observation.NodeObservation.accept",
+      "line": 52,
+      "column": 13,
+      "spelling": "self.db.transaction",
+      "receiverType": "inv.db.Database",
+      "possibleReceiverTypes": [
+        "inv.db.Database"
+      ],
+      "classification": "RESOLVED_SOURCE_TARGET",
+      "targets": [
+        "inv.db.Database.transaction"
+      ],
+      "blocksGrant": false
+    },
+    {
+      "id": "7560cd6fa07be192dc1de35c49c813047c684f1ac3e624c4482089bcb7c5682c",
+      "path": "services/control-plane/src/inv/observation.py",
+      "function": "inv.observation.NodeObservation.mark_offline",
+      "line": 139,
+      "column": 13,
+      "spelling": "self.db.transaction",
+      "receiverType": "inv.db.Database",
+      "possibleReceiverTypes": [
+        "inv.db.Database"
+      ],
+      "classification": "RESOLVED_SOURCE_TARGET",
+      "targets": [
+        "inv.db.Database.transaction"
+      ],
+      "blocksGrant": false
+    },
+    {
+      "id": "178da5a0d0c85148c4051cf50c1ef2397a101097c99551cd64788a65408fe00f",
+      "path": "services/control-plane/src/inv/observer_worker.py",
+      "function": "inv.observer_worker.ObservationWorker.once",
+      "line": 22,
+      "column": 13,
+      "spelling": "self.db.transaction",
+      "receiverType": "inv.db.Database",
+      "possibleReceiverTypes": [
+        "inv.db.Database"
+      ],
+      "classification": "RESOLVED_SOURCE_TARGET",
+      "targets": [
+        "inv.db.Database.transaction"
+      ],
+      "blocksGrant": false
+    },
+    {
+      "id": "fcbca0d46e829ca1aa4c34c3baab1e48e0e7fef0591b5902c4ed4e61345f832a",
+      "path": "services/control-plane/src/inv/output_ingestion.py",
+      "function": "inv.output_ingestion.OutputIngestion.once",
+      "line": 65,
+      "column": 13,
+      "spelling": "self.db.transaction",
+      "receiverType": "inv.db.Database",
+      "possibleReceiverTypes": [
+        "inv.db.Database"
+      ],
+      "classification": "RESOLVED_SOURCE_TARGET",
+      "targets": [
+        "inv.db.Database.transaction"
+      ],
+      "blocksGrant": false
+    },
+    {
+      "id": "7aa9577884a832da63da4ebd5eb2db2871892296fa6bd48b486452c585c2eb97",
+      "path": "services/control-plane/src/inv/output_ingestion.py",
+      "function": "inv.output_ingestion.OutputIngestion.once",
+      "line": 197,
+      "column": 13,
+      "spelling": "self.db.transaction",
+      "receiverType": "inv.db.Database",
+      "possibleReceiverTypes": [
+        "inv.db.Database"
+      ],
+      "classification": "RESOLVED_SOURCE_TARGET",
+      "targets": [
+        "inv.db.Database.transaction"
+      ],
+      "blocksGrant": false
+    },
+    {
+      "id": "b01e32a5b972f8bd143e8f0eae6b8c0aff1131cd2422ebc7aa1855f9c7d14820",
+      "path": "services/control-plane/src/inv/results.py",
+      "function": "inv.results.ResultStore.prepare",
+      "line": 63,
+      "column": 59,
+      "spelling": "self.db.transaction",
+      "receiverType": "inv.db.Database",
+      "possibleReceiverTypes": [
+        "inv.db.Database"
+      ],
+      "classification": "RESOLVED_SOURCE_TARGET",
+      "targets": [
+        "inv.db.Database.transaction"
+      ],
+      "blocksGrant": false
+    },
+    {
+      "id": "2296332d4db5ad8211c947fb58e870872a176a962102a02a7a3ab679d0b9e354",
+      "path": "services/control-plane/src/inv/results.py",
+      "function": "inv.results.ResultStore.complete",
+      "line": 164,
+      "column": 59,
+      "spelling": "self.db.transaction",
+      "receiverType": "inv.db.Database",
+      "possibleReceiverTypes": [
+        "inv.db.Database"
+      ],
+      "classification": "RESOLVED_SOURCE_TARGET",
+      "targets": [
+        "inv.db.Database.transaction"
+      ],
+      "blocksGrant": false
+    },
+    {
+      "id": "844e13da0764b650fb0db33425758e73774d1c8de4f781dc2e355ab77bb87224",
+      "path": "services/control-plane/src/inv/shard_completion.py",
+      "function": "inv.shard_completion.ShardCompletion.once",
+      "line": 46,
+      "column": 12,
+      "spelling": "self.db.transaction",
+      "receiverType": "inv.db.Database",
+      "possibleReceiverTypes": [
+        "inv.db.Database"
+      ],
+      "classification": "RESOLVED_SOURCE_TARGET",
+      "targets": [
+        "inv.db.Database.transaction"
+      ],
+      "blocksGrant": false
+    },
+    {
+      "id": "42adaa9340756ecfd98e91e2c5cb14a301f281a8fb83c8209f85300c2060dbf9",
+      "path": "services/control-plane/src/inv/shard_recovery.py",
+      "function": "inv.shard_recovery.ShardRecovery.prepare",
+      "line": 145,
+      "column": 13,
+      "spelling": "self.db.transaction",
+      "receiverType": "inv.shard_recovery.database",
+      "possibleReceiverTypes": [
+        "inv.shard_recovery.database"
+      ],
+      "classification": "UNRESOLVED",
+      "targets": [],
+      "blocksGrant": true
+    },
+    {
+      "id": "1ed0ecec59a6378d7bb13b15d7491d919b217e7289c25b04e2cfbdcc596b27d0",
+      "path": "services/control-plane/src/inv/shard_recovery.py",
+      "function": "inv.shard_recovery.ShardRecovery.enqueue",
+      "line": 246,
+      "column": 13,
+      "spelling": "self.db.transaction",
+      "receiverType": "inv.shard_recovery.database",
+      "possibleReceiverTypes": [
+        "inv.shard_recovery.database"
+      ],
+      "classification": "UNRESOLVED",
+      "targets": [],
+      "blocksGrant": true
+    },
+    {
+      "id": "69c6d0ef4e2b89a69296e265ec9fd13d5fc654ed9640a4c70c013988d126a0fa",
+      "path": "services/control-plane/src/inv/shard_recovery.py",
+      "function": "inv.shard_recovery.ShardRecovery.enqueue",
+      "line": 265,
+      "column": 13,
+      "spelling": "self.db.transaction",
+      "receiverType": "inv.shard_recovery.database",
+      "possibleReceiverTypes": [
+        "inv.shard_recovery.database"
+      ],
+      "classification": "UNRESOLVED",
+      "targets": [],
+      "blocksGrant": true
+    },
+    {
+      "id": "e0bf86cfbe30c5a855da21ee3597324e509af37b38f4993d0fdc682b03b8f4b8",
+      "path": "services/control-plane/src/inv/shards.py",
+      "function": "inv.shards.ShardRuntime._admission_transaction",
+      "line": 46,
+      "column": 13,
+      "spelling": "self.db.transaction",
+      "receiverType": "TYPE_JOIN:cc2b268602f1ff79b3e2",
+      "possibleReceiverTypes": [
+        "UNRESOLVED_CALL_RETURN:inv.app:workspace_service.db",
+        "UNRESOLVED_CALL_RETURN:tools.run_real_browser_acceptance:object",
+        "inv.app.database",
+        "inv.build_preparations.database",
+        "inv.build_product_runtime.database",
+        "inv.business_handoff.database",
+        "inv.business_handoff.workspace.db",
+        "inv.control.database",
+        "inv.db.BoundDatabase",
+        "inv.db.Database",
+        "inv.dispatch.database",
+        "inv.model_commit.database",
+        "inv.model_execution_registry.database",
+        "inv.model_locality.database",
+        "inv.model_locality.db",
+        "inv.model_registry_binding.database",
+        "inv.model_retry.database",
+        "inv.model_runtime.database",
+        "inv.model_uri_resolver.database",
+        "inv.model_view.database",
+        "inv.placement.database",
+        "inv.result_view.database",
+        "inv.shard_recovery.database",
+        "inv.shards.database",
+        "inv.storage_check_collect.database",
+        "inv.storage_commit.database",
+        "inv.storage_view.database",
+        "inv.terminal.workspace.db",
+        "inv.workspace_api.database",
+        "inv.workspace_config.database",
+        "inv.workspace_editor.workspace.db",
+        "inv.workspace_git.workspace.db",
+        "inv.workspace_recovery.recovery.db",
+        "inv.workspace_resume.database",
+        "inv.workspace_start.workspace.db"
+      ],
+      "classification": "UNRESOLVED",
+      "targets": [
+        "inv.db.BoundDatabase.transaction",
+        "inv.db.Database.transaction"
+      ],
+      "blocksGrant": true
+    },
+    {
+      "id": "f7e316de19bb84553d99c2a8f086c32dae50ac4088865708630324b769caee71",
+      "path": "services/control-plane/src/inv/shards.py",
+      "function": "inv.shards.ShardRuntime._admission_transaction",
+      "line": 67,
+      "column": 21,
+      "spelling": "conn.transaction",
+      "receiverType": "UNRESOLVED_CALL_RETURN:inv.shards:self.db.transaction",
+      "possibleReceiverTypes": [
+        "UNRESOLVED_CALL_RETURN:inv.shards:self.db.transaction"
+      ],
+      "classification": "UNRESOLVED",
+      "targets": [],
+      "blocksGrant": true
+    },
+    {
+      "id": "41009f82bd05ec719bcbb217c83d5d16dc0fd2c94e283435d517d6becdc596ce",
+      "path": "services/control-plane/src/inv/shards.py",
+      "function": "inv.shards.ShardRuntime.status",
+      "line": 256,
+      "column": 13,
+      "spelling": "self.db.transaction",
+      "receiverType": "TYPE_JOIN:cc2b268602f1ff79b3e2",
+      "possibleReceiverTypes": [
+        "UNRESOLVED_CALL_RETURN:inv.app:workspace_service.db",
+        "UNRESOLVED_CALL_RETURN:tools.run_real_browser_acceptance:object",
+        "inv.app.database",
+        "inv.build_preparations.database",
+        "inv.build_product_runtime.database",
+        "inv.business_handoff.database",
+        "inv.business_handoff.workspace.db",
+        "inv.control.database",
+        "inv.db.BoundDatabase",
+        "inv.db.Database",
+        "inv.dispatch.database",
+        "inv.model_commit.database",
+        "inv.model_execution_registry.database",
+        "inv.model_locality.database",
+        "inv.model_locality.db",
+        "inv.model_registry_binding.database",
+        "inv.model_retry.database",
+        "inv.model_runtime.database",
+        "inv.model_uri_resolver.database",
+        "inv.model_view.database",
+        "inv.placement.database",
+        "inv.result_view.database",
+        "inv.shard_recovery.database",
+        "inv.shards.database",
+        "inv.storage_check_collect.database",
+        "inv.storage_commit.database",
+        "inv.storage_view.database",
+        "inv.terminal.workspace.db",
+        "inv.workspace_api.database",
+        "inv.workspace_config.database",
+        "inv.workspace_editor.workspace.db",
+        "inv.workspace_git.workspace.db",
+        "inv.workspace_recovery.recovery.db",
+        "inv.workspace_resume.database",
+        "inv.workspace_start.workspace.db"
+      ],
+      "classification": "UNRESOLVED",
+      "targets": [
+        "inv.db.BoundDatabase.transaction",
+        "inv.db.Database.transaction"
+      ],
+      "blocksGrant": true
+    },
+    {
+      "id": "9b0abba7eebb1b77dea2c44fb1f7791dd18914028813dfc68ea9a7d74e2911db",
+      "path": "services/control-plane/src/inv/shards.py",
+      "function": "inv.shards.ShardRuntime.cancel",
+      "line": 385,
+      "column": 13,
+      "spelling": "self.db.transaction",
+      "receiverType": "TYPE_JOIN:cc2b268602f1ff79b3e2",
+      "possibleReceiverTypes": [
+        "UNRESOLVED_CALL_RETURN:inv.app:workspace_service.db",
+        "UNRESOLVED_CALL_RETURN:tools.run_real_browser_acceptance:object",
+        "inv.app.database",
+        "inv.build_preparations.database",
+        "inv.build_product_runtime.database",
+        "inv.business_handoff.database",
+        "inv.business_handoff.workspace.db",
+        "inv.control.database",
+        "inv.db.BoundDatabase",
+        "inv.db.Database",
+        "inv.dispatch.database",
+        "inv.model_commit.database",
+        "inv.model_execution_registry.database",
+        "inv.model_locality.database",
+        "inv.model_locality.db",
+        "inv.model_registry_binding.database",
+        "inv.model_retry.database",
+        "inv.model_runtime.database",
+        "inv.model_uri_resolver.database",
+        "inv.model_view.database",
+        "inv.placement.database",
+        "inv.result_view.database",
+        "inv.shard_recovery.database",
+        "inv.shards.database",
+        "inv.storage_check_collect.database",
+        "inv.storage_commit.database",
+        "inv.storage_view.database",
+        "inv.terminal.workspace.db",
+        "inv.workspace_api.database",
+        "inv.workspace_config.database",
+        "inv.workspace_editor.workspace.db",
+        "inv.workspace_git.workspace.db",
+        "inv.workspace_recovery.recovery.db",
+        "inv.workspace_resume.database",
+        "inv.workspace_start.workspace.db"
+      ],
+      "classification": "UNRESOLVED",
+      "targets": [
+        "inv.db.BoundDatabase.transaction",
+        "inv.db.Database.transaction"
+      ],
+      "blocksGrant": true
+    },
+    {
+      "id": "33cac601faf3ea74ed9d271a559b97f40bfdb1ada0667e636332d493ff1239c7",
+      "path": "services/control-plane/src/inv/shards.py",
+      "function": "inv.shards.ShardRuntime.reconcile_failures",
+      "line": 466,
+      "column": 13,
+      "spelling": "self.db.transaction",
+      "receiverType": "TYPE_JOIN:cc2b268602f1ff79b3e2",
+      "possibleReceiverTypes": [
+        "UNRESOLVED_CALL_RETURN:inv.app:workspace_service.db",
+        "UNRESOLVED_CALL_RETURN:tools.run_real_browser_acceptance:object",
+        "inv.app.database",
+        "inv.build_preparations.database",
+        "inv.build_product_runtime.database",
+        "inv.business_handoff.database",
+        "inv.business_handoff.workspace.db",
+        "inv.control.database",
+        "inv.db.BoundDatabase",
+        "inv.db.Database",
+        "inv.dispatch.database",
+        "inv.model_commit.database",
+        "inv.model_execution_registry.database",
+        "inv.model_locality.database",
+        "inv.model_locality.db",
+        "inv.model_registry_binding.database",
+        "inv.model_retry.database",
+        "inv.model_runtime.database",
+        "inv.model_uri_resolver.database",
+        "inv.model_view.database",
+        "inv.placement.database",
+        "inv.result_view.database",
+        "inv.shard_recovery.database",
+        "inv.shards.database",
+        "inv.storage_check_collect.database",
+        "inv.storage_commit.database",
+        "inv.storage_view.database",
+        "inv.terminal.workspace.db",
+        "inv.workspace_api.database",
+        "inv.workspace_config.database",
+        "inv.workspace_editor.workspace.db",
+        "inv.workspace_git.workspace.db",
+        "inv.workspace_recovery.recovery.db",
+        "inv.workspace_resume.database",
+        "inv.workspace_start.workspace.db"
+      ],
+      "classification": "UNRESOLVED",
+      "targets": [
+        "inv.db.BoundDatabase.transaction",
+        "inv.db.Database.transaction"
+      ],
+      "blocksGrant": true
+    },
+    {
+      "id": "76b45fc85b236324b624c61e0c83993a542b962ab0b07181ecfd8e136a7b9e81",
+      "path": "services/control-plane/src/inv/snapshots.py",
+      "function": "inv.snapshots.SnapshotStore.begin",
+      "line": 144,
+      "column": 50,
+      "spelling": "self.db.transaction",
+      "receiverType": "TYPE_JOIN:557a20d6e89fb1bd7605",
+      "possibleReceiverTypes": [
+        "inv.db.Database",
+        "tools.run_s11_storage_failure_hosted.env.db"
+      ],
+      "classification": "UNRESOLVED",
+      "targets": [
+        "inv.db.Database.transaction"
+      ],
+      "blocksGrant": true
+    },
+    {
+      "id": "ee4ee8eef6f905e15d5a196a3b7150e32050086bd9b2534b04101bf85789bd9b",
+      "path": "services/control-plane/src/inv/snapshots.py",
+      "function": "inv.snapshots.SnapshotStore.put_part",
+      "line": 189,
+      "column": 59,
+      "spelling": "self.db.transaction",
+      "receiverType": "TYPE_JOIN:557a20d6e89fb1bd7605",
+      "possibleReceiverTypes": [
+        "inv.db.Database",
+        "tools.run_s11_storage_failure_hosted.env.db"
+      ],
+      "classification": "UNRESOLVED",
+      "targets": [
+        "inv.db.Database.transaction"
+      ],
+      "blocksGrant": true
+    },
+    {
+      "id": "ffadcc118a6dc7e96a1fddb616b55840fdb1def77aad307b87fff701a1909979",
+      "path": "services/control-plane/src/inv/snapshots.py",
+      "function": "inv.snapshots.SnapshotStore.status",
+      "line": 212,
+      "column": 13,
+      "spelling": "self.db.transaction",
+      "receiverType": "TYPE_JOIN:557a20d6e89fb1bd7605",
+      "possibleReceiverTypes": [
+        "inv.db.Database",
+        "tools.run_s11_storage_failure_hosted.env.db"
+      ],
+      "classification": "UNRESOLVED",
+      "targets": [
+        "inv.db.Database.transaction"
+      ],
+      "blocksGrant": true
+    },
+    {
+      "id": "23c5939a8203caf7996178cf3de5605cd21a7bc34b7b50c5cc036d2a4595e016",
+      "path": "services/control-plane/src/inv/snapshots.py",
+      "function": "inv.snapshots.SnapshotStore.finalize",
+      "line": 227,
+      "column": 59,
+      "spelling": "self.db.transaction",
+      "receiverType": "TYPE_JOIN:557a20d6e89fb1bd7605",
+      "possibleReceiverTypes": [
+        "inv.db.Database",
+        "tools.run_s11_storage_failure_hosted.env.db"
+      ],
+      "classification": "UNRESOLVED",
+      "targets": [
+        "inv.db.Database.transaction"
+      ],
+      "blocksGrant": true
+    },
+    {
+      "id": "beb80ca8277ecd200c17fef88d4d663c58ad39f9b3e1f8f4dab930dabb3c21e7",
+      "path": "services/control-plane/src/inv/snapshots.py",
+      "function": "inv.snapshots.SnapshotStore.checkpoint",
+      "line": 265,
+      "column": 59,
+      "spelling": "self.db.transaction",
+      "receiverType": "TYPE_JOIN:557a20d6e89fb1bd7605",
+      "possibleReceiverTypes": [
+        "inv.db.Database",
+        "tools.run_s11_storage_failure_hosted.env.db"
+      ],
+      "classification": "UNRESOLVED",
+      "targets": [
+        "inv.db.Database.transaction"
+      ],
+      "blocksGrant": true
+    },
+    {
+      "id": "b0a76c0d566c509bce2992e5a6062ff6f9739f83ec1adea56025e78f79c71c55",
+      "path": "services/control-plane/src/inv/snapshots.py",
+      "function": "inv.snapshots.SnapshotStore.restore",
+      "line": 298,
+      "column": 13,
+      "spelling": "self.db.transaction",
+      "receiverType": "TYPE_JOIN:557a20d6e89fb1bd7605",
+      "possibleReceiverTypes": [
+        "inv.db.Database",
+        "tools.run_s11_storage_failure_hosted.env.db"
+      ],
+      "classification": "UNRESOLVED",
+      "targets": [
+        "inv.db.Database.transaction"
+      ],
+      "blocksGrant": true
+    },
+    {
+      "id": "b5e0e37c4f9c4b0340f7a4a5552066723cdb24082fd61f9216f78b00542852c4",
+      "path": "services/control-plane/src/inv/snapshots.py",
+      "function": "inv.snapshots.SnapshotStore.restore",
+      "line": 307,
+      "column": 54,
+      "spelling": "self.db.transaction",
+      "receiverType": "TYPE_JOIN:557a20d6e89fb1bd7605",
+      "possibleReceiverTypes": [
+        "inv.db.Database",
+        "tools.run_s11_storage_failure_hosted.env.db"
+      ],
+      "classification": "UNRESOLVED",
+      "targets": [
+        "inv.db.Database.transaction"
+      ],
+      "blocksGrant": true
+    },
+    {
+      "id": "0e5454245fe62b365ee3d1ffe7f852fee9d103e6ec2b235f988b010a3ee8639b",
+      "path": "services/control-plane/src/inv/snapshots.py",
+      "function": "inv.snapshots.SnapshotStore.collect",
+      "line": 316,
+      "column": 17,
+      "spelling": "self.db.transaction",
+      "receiverType": "TYPE_JOIN:557a20d6e89fb1bd7605",
+      "possibleReceiverTypes": [
+        "inv.db.Database",
+        "tools.run_s11_storage_failure_hosted.env.db"
+      ],
+      "classification": "UNRESOLVED",
+      "targets": [
+        "inv.db.Database.transaction"
+      ],
+      "blocksGrant": true
+    },
+    {
+      "id": "24eb288bd432eae47e4f3041aefbdca12a41d621da170b561a9b74d552376f5b",
+      "path": "services/control-plane/src/inv/snapshots.py",
+      "function": "inv.snapshots.SnapshotStore.collect",
+      "line": 345,
+      "column": 17,
+      "spelling": "self.db.transaction",
+      "receiverType": "TYPE_JOIN:557a20d6e89fb1bd7605",
+      "possibleReceiverTypes": [
+        "inv.db.Database",
+        "tools.run_s11_storage_failure_hosted.env.db"
+      ],
+      "classification": "UNRESOLVED",
+      "targets": [
+        "inv.db.Database.transaction"
+      ],
+      "blocksGrant": true
+    },
+    {
+      "id": "85cdc052697c7d8e012e52d91fc7479504cb0d39d9055315896e3fbfbddbe0f5",
+      "path": "services/control-plane/src/inv/storage_check_collect.py",
+      "function": "inv.storage_check_collect.CatalogueProjectReader.contribution_is_wholly_in",
+      "line": 152,
+      "column": 13,
+      "spelling": "self.engine.begin",
+      "receiverType": "inv.app.business.state.denial_engine",
+      "possibleReceiverTypes": [
+        "inv.app.business.state.denial_engine"
+      ],
+      "classification": "UNRESOLVED",
+      "targets": [],
+      "blocksGrant": true
+    },
+    {
+      "id": "e22fadaf1f17766c9c9bca91763f39a5bdc2cb173e95b1cdccf61a98ff3605bf",
+      "path": "services/control-plane/src/inv/terminal.py",
+      "function": "inv.terminal.TerminalService.issue",
+      "line": 110,
+      "column": 13,
+      "spelling": "self.db.transaction",
+      "receiverType": "inv.terminal.workspace.db",
+      "possibleReceiverTypes": [
+        "inv.terminal.workspace.db"
+      ],
+      "classification": "UNRESOLVED",
+      "targets": [],
+      "blocksGrant": true
+    },
+    {
+      "id": "3fa8625193c8147817c65d83076c4c400975a678ff737eb988103416570c0051",
+      "path": "services/control-plane/src/inv/terminal.py",
+      "function": "inv.terminal.TerminalService.redeem",
+      "line": 156,
+      "column": 13,
+      "spelling": "self.db.transaction",
+      "receiverType": "inv.terminal.workspace.db",
+      "possibleReceiverTypes": [
+        "inv.terminal.workspace.db"
+      ],
+      "classification": "UNRESOLVED",
+      "targets": [],
+      "blocksGrant": true
+    },
+    {
+      "id": "fea302c72f565ef6e28fbe3ccdb8cb306099ac6f7637294be93a5290702efb68",
+      "path": "services/control-plane/src/inv/terminal.py",
+      "function": "inv.terminal.TerminalService.frame",
+      "line": 228,
+      "column": 13,
+      "spelling": "self.db.transaction",
+      "receiverType": "inv.terminal.workspace.db",
+      "possibleReceiverTypes": [
+        "inv.terminal.workspace.db"
+      ],
+      "classification": "UNRESOLVED",
+      "targets": [],
+      "blocksGrant": true
+    },
+    {
+      "id": "eed3a859efb3855fad9676c4c5a30c5c4d499b1afae78986acc5873afd49fd9c",
+      "path": "services/control-plane/src/inv/terminal.py",
+      "function": "inv.terminal.TerminalService.frame",
+      "line": 285,
+      "column": 13,
+      "spelling": "self.db.transaction",
+      "receiverType": "inv.terminal.workspace.db",
+      "possibleReceiverTypes": [
+        "inv.terminal.workspace.db"
+      ],
+      "classification": "UNRESOLVED",
+      "targets": [],
+      "blocksGrant": true
+    },
+    {
+      "id": "b304ec6875ecb07979a74eb4e03005340f510edfe8fd9fb5b0a3ac4f9354c4c2",
+      "path": "services/control-plane/src/inv/terminal.py",
+      "function": "inv.terminal.TerminalService.release",
+      "line": 315,
+      "column": 13,
+      "spelling": "self.db.transaction",
+      "receiverType": "inv.terminal.workspace.db",
+      "possibleReceiverTypes": [
+        "inv.terminal.workspace.db"
+      ],
+      "classification": "UNRESOLVED",
+      "targets": [],
+      "blocksGrant": true
+    },
+    {
+      "id": "8e8a3e4798df1dbb2dd78819f41ea3b65f49f9b7ab7e30946bead0bfc6b1eb26",
+      "path": "services/control-plane/src/inv/workspace_api.py",
+      "function": "inv.workspace_api.WorkspaceAPI.prepare",
+      "line": 163,
+      "column": 35,
+      "spelling": "self.db.transaction",
+      "receiverType": "TYPE_JOIN:8bd9ec40f6365c625859",
+      "possibleReceiverTypes": [
+        "inv.db.BoundDatabase",
+        "inv.db.Database"
+      ],
+      "classification": "RESOLVED_SOURCE_TARGET",
+      "targets": [
+        "inv.db.BoundDatabase.transaction",
+        "inv.db.Database.transaction"
+      ],
+      "blocksGrant": false
+    },
+    {
+      "id": "07d736a15448e07b1c7f09f12d810c2046e3602151ae59d482c4e5d7818d96bf",
+      "path": "services/control-plane/src/inv/workspace_api.py",
+      "function": "inv.workspace_api.WorkspaceAPI.get",
+      "line": 227,
+      "column": 13,
+      "spelling": "self.db.transaction",
+      "receiverType": "TYPE_JOIN:8bd9ec40f6365c625859",
+      "possibleReceiverTypes": [
+        "inv.db.BoundDatabase",
+        "inv.db.Database"
+      ],
+      "classification": "RESOLVED_SOURCE_TARGET",
+      "targets": [
+        "inv.db.BoundDatabase.transaction",
+        "inv.db.Database.transaction"
+      ],
+      "blocksGrant": false
+    },
+    {
+      "id": "2504e7e124517a470f1bc66f748487c0264faadcffbc87f7be7c99cec648328c",
+      "path": "services/control-plane/src/inv/workspace_api.py",
+      "function": "inv.workspace_api.WorkspaceAPI.enqueue",
+      "line": 253,
+      "column": 13,
+      "spelling": "self.db.transaction",
+      "receiverType": "TYPE_JOIN:8bd9ec40f6365c625859",
+      "possibleReceiverTypes": [
+        "inv.db.BoundDatabase",
+        "inv.db.Database"
+      ],
+      "classification": "RESOLVED_SOURCE_TARGET",
+      "targets": [
+        "inv.db.BoundDatabase.transaction",
+        "inv.db.Database.transaction"
+      ],
+      "blocksGrant": false
+    },
+    {
+      "id": "dbc96aebfbff90a532e44019ca9fae651223dc9ee8f7180d4723d8c63ae47cbf",
+      "path": "services/control-plane/src/inv/workspace_api.py",
+      "function": "inv.workspace_api.WorkspaceAPI.enqueue",
+      "line": 278,
+      "column": 13,
+      "spelling": "self.db.transaction",
+      "receiverType": "TYPE_JOIN:8bd9ec40f6365c625859",
+      "possibleReceiverTypes": [
+        "inv.db.BoundDatabase",
+        "inv.db.Database"
+      ],
+      "classification": "RESOLVED_SOURCE_TARGET",
+      "targets": [
+        "inv.db.BoundDatabase.transaction",
+        "inv.db.Database.transaction"
+      ],
+      "blocksGrant": false
+    },
+    {
+      "id": "28c3dc6a8c93bd6e2255e0cd08a2b098bf98a5b6351f9b8fc34a68a55bfbebfb",
+      "path": "services/control-plane/src/inv/workspace_editor.py",
+      "function": "inv.workspace_editor.WorkspaceEditor.get",
+      "line": 162,
+      "column": 12,
+      "spelling": "self.db.transaction",
+      "receiverType": "inv.workspace_editor.workspace.db",
+      "possibleReceiverTypes": [
+        "inv.workspace_editor.workspace.db"
+      ],
+      "classification": "UNRESOLVED",
+      "targets": [],
+      "blocksGrant": true
+    },
+    {
+      "id": "e7214aaec837ab370885a192fcb73f4c99ce34145a25ca08891b81073ac9d02d",
+      "path": "services/control-plane/src/inv/workspace_editor.py",
+      "function": "inv.workspace_editor.WorkspaceEditor.edit",
+      "line": 172,
+      "column": 12,
+      "spelling": "self.db.transaction",
+      "receiverType": "inv.workspace_editor.workspace.db",
+      "possibleReceiverTypes": [
+        "inv.workspace_editor.workspace.db"
+      ],
+      "classification": "UNRESOLVED",
+      "targets": [],
+      "blocksGrant": true
+    },
+    {
+      "id": "2cd4737cadd5309401d464194d92929fbe4218ecc6255125dd3615a6ff99f595",
+      "path": "services/control-plane/src/inv/workspace_git.py",
+      "function": "inv.workspace_git.WorkspaceGit.get",
+      "line": 125,
+      "column": 13,
+      "spelling": "self.db.transaction",
+      "receiverType": "inv.workspace_git.workspace.db",
+      "possibleReceiverTypes": [
+        "inv.workspace_git.workspace.db"
+      ],
+      "classification": "UNRESOLVED",
+      "targets": [],
+      "blocksGrant": true
+    },
+    {
+      "id": "539bfea5ce0ee6d25640658260658f53dc94a4180011cecf5ae0baacd63f2cec",
+      "path": "services/control-plane/src/inv/workspace_git.py",
+      "function": "inv.workspace_git.WorkspaceGit.propose",
+      "line": 144,
+      "column": 12,
+      "spelling": "self.db.transaction",
+      "receiverType": "inv.workspace_git.workspace.db",
+      "possibleReceiverTypes": [
+        "inv.workspace_git.workspace.db"
+      ],
+      "classification": "UNRESOLVED",
+      "targets": [],
+      "blocksGrant": true
+    },
+    {
+      "id": "dda4d313b43cf54f9947abc794a56213ac35f411aaba13501e290f7e152b89d8",
+      "path": "services/control-plane/src/inv/workspace_git.py",
+      "function": "inv.workspace_git.WorkspaceGit.propose",
+      "line": 178,
+      "column": 12,
+      "spelling": "self.db.transaction",
+      "receiverType": "inv.workspace_git.workspace.db",
+      "possibleReceiverTypes": [
+        "inv.workspace_git.workspace.db"
+      ],
+      "classification": "UNRESOLVED",
+      "targets": [],
+      "blocksGrant": true
+    },
+    {
+      "id": "75aa41a7e3150a2ac7c584f6cf2f34393ce237260fdd664f2f7fca2dcc0eb031",
+      "path": "services/control-plane/src/inv/workspace_git.py",
+      "function": "inv.workspace_git.WorkspaceGit.vote",
+      "line": 256,
+      "column": 13,
+      "spelling": "self.db.transaction",
+      "receiverType": "inv.workspace_git.workspace.db",
+      "possibleReceiverTypes": [
+        "inv.workspace_git.workspace.db"
+      ],
+      "classification": "UNRESOLVED",
+      "targets": [],
+      "blocksGrant": true
+    },
+    {
+      "id": "eb3720cd03cd591170a1e4ecfb72a8ea3db08ba7944b22e31dada49a0536cc26",
+      "path": "services/control-plane/src/inv/workspace_git.py",
+      "function": "inv.workspace_git.WorkspaceGit.apply",
+      "line": 318,
+      "column": 12,
+      "spelling": "self.db.transaction",
+      "receiverType": "inv.workspace_git.workspace.db",
+      "possibleReceiverTypes": [
+        "inv.workspace_git.workspace.db"
+      ],
+      "classification": "UNRESOLVED",
+      "targets": [],
+      "blocksGrant": true
+    },
+    {
+      "id": "10e03f4b95bf6e658f291cfae8a39a7a267d89901171f04059e651aa37ada02d",
+      "path": "services/control-plane/src/inv/workspace_git.py",
+      "function": "inv.workspace_git.WorkspaceGit.reconcile",
+      "line": 417,
+      "column": 13,
+      "spelling": "self.db.transaction",
+      "receiverType": "inv.workspace_git.workspace.db",
+      "possibleReceiverTypes": [
+        "inv.workspace_git.workspace.db"
+      ],
+      "classification": "UNRESOLVED",
+      "targets": [],
+      "blocksGrant": true
+    },
+    {
+      "id": "9b5c07a3f5ef1bef2c0ad96e4618d7025323d8881af3c5498a5b786d8c08aa92",
+      "path": "services/control-plane/src/inv/workspace_git.py",
+      "function": "inv.workspace_git.WorkspaceGit._observed",
+      "line": 433,
+      "column": 13,
+      "spelling": "self.db.transaction",
+      "receiverType": "inv.workspace_git.workspace.db",
+      "possibleReceiverTypes": [
+        "inv.workspace_git.workspace.db"
+      ],
+      "classification": "UNRESOLVED",
+      "targets": [],
+      "blocksGrant": true
+    },
+    {
+      "id": "ad847ada4c03eb02ea8a7219893ab981228d68c41e6a962b25a3710ee5566c6b",
+      "path": "services/control-plane/src/inv/workspace_recovery.py",
+      "function": "inv.workspace_recovery.WorkspaceRecovery._checkpoint_reader",
+      "line": 82,
+      "column": 13,
+      "spelling": "self.db.transaction",
+      "receiverType": "TYPE_JOIN:557a20d6e89fb1bd7605",
+      "possibleReceiverTypes": [
+        "inv.db.Database",
+        "tools.run_s11_storage_failure_hosted.env.db"
+      ],
+      "classification": "UNRESOLVED",
+      "targets": [
+        "inv.db.Database.transaction"
+      ],
+      "blocksGrant": true
+    },
+    {
+      "id": "903136e16327a616e1e887c9bbc5f3f8242917ab3eca11dc6c6316c1bdaa25cc",
+      "path": "services/control-plane/src/inv/workspace_recovery.py",
+      "function": "inv.workspace_recovery.WorkspaceRecovery._checkout_reader",
+      "line": 111,
+      "column": 13,
+      "spelling": "self.db.transaction",
+      "receiverType": "TYPE_JOIN:557a20d6e89fb1bd7605",
+      "possibleReceiverTypes": [
+        "inv.db.Database",
+        "tools.run_s11_storage_failure_hosted.env.db"
+      ],
+      "classification": "UNRESOLVED",
+      "targets": [
+        "inv.db.Database.transaction"
+      ],
+      "blocksGrant": true
+    },
+    {
+      "id": "c360b5629e2539731f271fda18a04da45b00127db37c1faeb458f33d06d2d277",
+      "path": "services/control-plane/src/inv/workspace_recovery.py",
+      "function": "inv.workspace_recovery.WorkspaceRecovery.checkpoint",
+      "line": 151,
+      "column": 8,
+      "spelling": "self.snapshots.begin",
+      "receiverType": "inv.snapshots.SnapshotStore",
+      "possibleReceiverTypes": [
+        "inv.snapshots.SnapshotStore"
+      ],
+      "classification": "RESOLVED_SOURCE_TARGET",
+      "targets": [
+        "inv.snapshots.SnapshotStore.begin"
+      ],
+      "blocksGrant": false
+    },
+    {
+      "id": "bfb6a9d2eebca2507a4d62a8e70b550c79dd86c809d0d99139f2262eb337a414",
+      "path": "services/control-plane/src/inv/workspace_recovery.py",
+      "function": "inv.workspace_recovery.WorkspaceRecovery.checkpoint",
+      "line": 160,
+      "column": 13,
+      "spelling": "self.db.transaction",
+      "receiverType": "TYPE_JOIN:557a20d6e89fb1bd7605",
+      "possibleReceiverTypes": [
+        "inv.db.Database",
+        "tools.run_s11_storage_failure_hosted.env.db"
+      ],
+      "classification": "UNRESOLVED",
+      "targets": [
+        "inv.db.Database.transaction"
+      ],
+      "blocksGrant": true
+    },
+    {
+      "id": "ef074e4d3f4e235c24543eb12a0fc3f869a5e74f4fdc8f9c09b7c4baa68c4003",
+      "path": "services/control-plane/src/inv/workspace_recovery.py",
+      "function": "inv.workspace_recovery.WorkspaceRecovery.restore",
+      "line": 211,
+      "column": 12,
+      "spelling": "self.db.transaction",
+      "receiverType": "TYPE_JOIN:557a20d6e89fb1bd7605",
+      "possibleReceiverTypes": [
+        "inv.db.Database",
+        "tools.run_s11_storage_failure_hosted.env.db"
+      ],
+      "classification": "UNRESOLVED",
+      "targets": [
+        "inv.db.Database.transaction"
+      ],
+      "blocksGrant": true
+    },
+    {
+      "id": "07a442514e85b6cf3998e25c4e363e45adf54643abb30661eebb68c03ee19bbf",
+      "path": "services/control-plane/src/inv/workspace_recovery.py",
+      "function": "inv.workspace_recovery.WorkspaceRecovery.checkout",
+      "line": 341,
+      "column": 12,
+      "spelling": "self.db.transaction",
+      "receiverType": "TYPE_JOIN:557a20d6e89fb1bd7605",
+      "possibleReceiverTypes": [
+        "inv.db.Database",
+        "tools.run_s11_storage_failure_hosted.env.db"
+      ],
+      "classification": "UNRESOLVED",
+      "targets": [
+        "inv.db.Database.transaction"
+      ],
+      "blocksGrant": true
+    },
+    {
+      "id": "7cce2e87d26103bc99cb9ac833a519b8a7ba8a8d52026951446404071cb8cbe1",
+      "path": "services/control-plane/src/inv/workspace_resume.py",
+      "function": "inv.workspace_resume.WorkspaceResume.prepare",
+      "line": 113,
+      "column": 47,
+      "spelling": "self.db.transaction",
+      "receiverType": "inv.db.BoundDatabase",
+      "possibleReceiverTypes": [
+        "inv.db.BoundDatabase"
+      ],
+      "classification": "RESOLVED_SOURCE_TARGET",
+      "targets": [
+        "inv.db.BoundDatabase.transaction"
+      ],
+      "blocksGrant": false
+    },
+    {
+      "id": "76e6011f35519213d3b5e5cfe4b9a389951265f79afaa6be639261fe86f0a85c",
+      "path": "services/control-plane/src/inv/workspace_resume.py",
+      "function": "inv.workspace_resume.WorkspaceResume.enqueue",
+      "line": 256,
+      "column": 13,
+      "spelling": "self.db.transaction",
+      "receiverType": "inv.db.BoundDatabase",
+      "possibleReceiverTypes": [
+        "inv.db.BoundDatabase"
+      ],
+      "classification": "RESOLVED_SOURCE_TARGET",
+      "targets": [
+        "inv.db.BoundDatabase.transaction"
+      ],
+      "blocksGrant": false
+    },
+    {
+      "id": "5a74040e83127d9aad45a3c756f3b3cea70c92f6bb3dc69c0b161bdf6c11def9",
+      "path": "services/control-plane/src/inv/workspace_start.py",
+      "function": "inv.workspace_start.WorkspaceStart.prepare",
+      "line": 141,
+      "column": 13,
+      "spelling": "self.db.transaction",
+      "receiverType": "inv.workspace_start.workspace.db",
+      "possibleReceiverTypes": [
+        "inv.workspace_start.workspace.db"
+      ],
+      "classification": "UNRESOLVED",
+      "targets": [],
+      "blocksGrant": true
+    },
+    {
+      "id": "447b20f7a8fdbf06fddd0741cf7ee8eae7cc99b3cac16406c5c0d3ea9141df20",
+      "path": "services/control-plane/src/inv/workspace_start.py",
+      "function": "inv.workspace_start.WorkspaceStart.get",
+      "line": 226,
+      "column": 13,
+      "spelling": "self.db.transaction",
+      "receiverType": "inv.workspace_start.workspace.db",
+      "possibleReceiverTypes": [
+        "inv.workspace_start.workspace.db"
+      ],
+      "classification": "UNRESOLVED",
+      "targets": [],
+      "blocksGrant": true
+    },
+    {
+      "id": "eebbfa44939b209f385e0dd92e1e400822516820af2179870b17c82403b200aa",
+      "path": "services/control-plane/src/inv/workspace_start.py",
+      "function": "inv.workspace_start.WorkspaceStart.enqueue",
+      "line": 277,
+      "column": 13,
+      "spelling": "self.db.transaction",
+      "receiverType": "inv.workspace_start.workspace.db",
+      "possibleReceiverTypes": [
+        "inv.workspace_start.workspace.db"
+      ],
+      "classification": "UNRESOLVED",
+      "targets": [],
+      "blocksGrant": true
+    },
+    {
+      "id": "29a0b61a0ef9f5ee6e3a10c5c8a1c662e384948b7fd7807300576bd1f0dbc0d8",
+      "path": "services/control-plane/src/inv/workspace_start.py",
+      "function": "inv.workspace_start.WorkspaceStart.enqueue",
+      "line": 285,
+      "column": 13,
+      "spelling": "self.db.transaction",
+      "receiverType": "inv.workspace_start.workspace.db",
+      "possibleReceiverTypes": [
+        "inv.workspace_start.workspace.db"
+      ],
+      "classification": "UNRESOLVED",
+      "targets": [],
+      "blocksGrant": true
+    },
+    {
+      "id": "d6b02a6509f89b3275cdf5e7944aa0629a253bce89587c8fa06c4046273ff940",
+      "path": "tools/check_remote_workspace.py",
+      "function": "tools.check_remote_workspace.boundary",
+      "line": 46,
+      "column": 9,
+      "spelling": "runtime(state).transaction",
+      "receiverType": "UNRESOLVED_CALL_RETURN:tools.check_remote_workspace:runtime",
+      "possibleReceiverTypes": [
+        "UNRESOLVED_CALL_RETURN:tools.check_remote_workspace:runtime"
+      ],
+      "classification": "UNRESOLVED",
+      "targets": [],
+      "blocksGrant": true
+    },
+    {
+      "id": "8c39cbae8b051577beba5e74f0d366df44d6c6d2c613965140a45b6f994e92db",
+      "path": "tools/discovery_credential.py",
+      "function": "tools.discovery_credential.run",
+      "line": 191,
+      "column": 17,
+      "spelling": "conn.transaction",
+      "receiverType": "tools.discovery_credential.lambda value: psycopg.connect(value, row_factory=dict_row, connect_timeout=5)",
+      "possibleReceiverTypes": [
+        "tools.discovery_credential.lambda value: psycopg.connect(value, row_factory=dict_row, connect_timeout=5)"
+      ],
+      "classification": "UNRESOLVED",
+      "targets": [],
+      "blocksGrant": true
+    },
+    {
+      "id": "fe6e0149bb0d72403749701006a6e93b45e6b03f4c4291c0ca1f0f933c8b0c69",
+      "path": "tools/lan_console.py",
+      "function": "tools.lan_console.snapshot",
+      "line": 84,
+      "column": 9,
+      "spelling": "runtime(state).transaction",
+      "receiverType": "UNRESOLVED_CALL_RETURN:tools.lan_console:runtime",
+      "possibleReceiverTypes": [
+        "UNRESOLVED_CALL_RETURN:tools.lan_console:runtime"
+      ],
+      "classification": "UNRESOLVED",
+      "targets": [],
+      "blocksGrant": true
+    },
+    {
+      "id": "207530595eca005f45c682d890c0c4cdf483c9b8450ad7091c33bdd0a923d415",
+      "path": "tools/lan_execution.py",
+      "function": "tools.lan_execution.execute",
+      "line": 112,
+      "column": 13,
+      "spelling": "runtime(state).transaction",
+      "receiverType": "UNRESOLVED_CALL_RETURN:tools.lan_execution:runtime",
+      "possibleReceiverTypes": [
+        "UNRESOLVED_CALL_RETURN:tools.lan_execution:runtime"
+      ],
+      "classification": "UNRESOLVED",
+      "targets": [],
+      "blocksGrant": true
+    },
+    {
+      "id": "f5087ec5108720ffa04d69474a500c99c0c8c1542f791b508f454f56e57197d7",
+      "path": "tools/lan_execution.py",
+      "function": "tools.lan_execution._execute",
+      "line": 134,
+      "column": 13,
+      "spelling": "runtime(state).transaction",
+      "receiverType": "UNRESOLVED_CALL_RETURN:tools.lan_execution:runtime",
+      "possibleReceiverTypes": [
+        "UNRESOLVED_CALL_RETURN:tools.lan_execution:runtime"
+      ],
+      "classification": "UNRESOLVED",
+      "targets": [],
+      "blocksGrant": true
+    },
+    {
+      "id": "b449b5fbef1784750adba3e87aa6591e759a3143e2645f91299fcfcd1d3e629c",
+      "path": "tools/operational_readiness.py",
+      "function": "tools.operational_readiness._catalog_report",
+      "line": 575,
+      "column": 17,
+      "spelling": "session.begin",
+      "receiverType": "UNRESOLVED_CALL_RETURN:tools.operational_readiness:Session",
+      "possibleReceiverTypes": [
+        "UNRESOLVED_CALL_RETURN:tools.operational_readiness:Session"
+      ],
+      "classification": "UNRESOLVED",
+      "targets": [],
+      "blocksGrant": true
+    },
+    {
+      "id": "fb11459892f8c5a4578d2e20cf90ea680ad094482e62494108a5d9b6b6169481",
+      "path": "tools/operational_readiness.py",
+      "function": "tools.operational_readiness._snapshot_report",
+      "line": 625,
+      "column": 21,
+      "spelling": "session.begin",
+      "receiverType": "UNRESOLVED_CALL_RETURN:tools.operational_readiness:Session",
+      "possibleReceiverTypes": [
+        "UNRESOLVED_CALL_RETURN:tools.operational_readiness:Session"
+      ],
+      "classification": "UNRESOLVED",
+      "targets": [],
+      "blocksGrant": true
+    },
+    {
+      "id": "d044008af6f0d020706ad680edf0d16f4dd6ec63b554b1c3b8eb3c4eea90ca43",
+      "path": "tools/recovery_drill.py",
+      "function": "tools.recovery_drill._service_resumption",
+      "line": 349,
+      "column": 21,
+      "spelling": "conn.transaction",
+      "receiverType": "UNRESOLVED_CALL_RETURN:tools.recovery_drill:_conn",
+      "possibleReceiverTypes": [
+        "UNRESOLVED_CALL_RETURN:tools.recovery_drill:_conn"
+      ],
+      "classification": "UNRESOLVED",
+      "targets": [],
+      "blocksGrant": true
+    },
+    {
+      "id": "b5df40599e984fb31a9799ffe9d692d277142c096b05657195fe818deeafeaac",
+      "path": "tools/recovery_drill.py",
+      "function": "tools.recovery_drill._rls_scopes",
+      "line": 390,
+      "column": 17,
+      "spelling": "conn.transaction",
+      "receiverType": "UNRESOLVED_CALL_RETURN:tools.recovery_drill:_conn",
+      "possibleReceiverTypes": [
+        "UNRESOLVED_CALL_RETURN:tools.recovery_drill:_conn"
+      ],
+      "classification": "UNRESOLVED",
+      "targets": [],
+      "blocksGrant": true
+    },
+    {
+      "id": "4cb52352d299ea0a7f732b74a02e6eb8683276322bb4366ba458916d86cc30be",
+      "path": "tools/recovery_drill.py",
+      "function": "tools.recovery_drill._rls_scopes",
+      "line": 416,
+      "column": 25,
+      "spelling": "conn.transaction",
+      "receiverType": "UNRESOLVED_CALL_RETURN:tools.recovery_drill:_conn",
+      "possibleReceiverTypes": [
+        "UNRESOLVED_CALL_RETURN:tools.recovery_drill:_conn"
+      ],
+      "classification": "UNRESOLVED",
+      "targets": [],
+      "blocksGrant": true
+    },
+    {
+      "id": "3b44d0d6ad51285f47bb3008ef35172b90dd3928a930101f1a791eb219a3132c",
+      "path": "tools/rehearse_lan_upgrade.py",
+      "function": "tools.rehearse_lan_upgrade.rehearse",
+      "line": 236,
+      "column": 13,
+      "spelling": "runtime(copied).transaction",
+      "receiverType": "UNRESOLVED_CALL_RETURN:tools.rehearse_lan_upgrade:runtime",
+      "possibleReceiverTypes": [
+        "UNRESOLVED_CALL_RETURN:tools.rehearse_lan_upgrade:runtime"
+      ],
+      "classification": "UNRESOLVED",
+      "targets": [],
+      "blocksGrant": true
+    },
+    {
+      "id": "598ec1f38ce7f01e9dfa6aac06bb638fec4bb7c0c10d81b70d16a180d09a971d",
+      "path": "tools/remote_workspace_entry.py",
+      "function": "tools.remote_workspace_entry.receipt",
+      "line": 137,
+      "column": 9,
+      "spelling": "a.e.db.transaction",
+      "receiverType": "inv.db.Database",
+      "possibleReceiverTypes": [
+        "inv.db.Database"
+      ],
+      "classification": "RESOLVED_SOURCE_TARGET",
+      "targets": [
+        "inv.db.Database.transaction"
+      ],
+      "blocksGrant": false
+    },
+    {
+      "id": "461fa6f9b381412e943c3151b3c302d216fe9984002d0b74b19a8f2f4675daeb",
+      "path": "tools/remote_workspace_entry.py",
+      "function": "tools.remote_workspace_entry.execute",
+      "line": 201,
+      "column": 13,
+      "spelling": "a.e.db.transaction",
+      "receiverType": "inv.db.Database",
+      "possibleReceiverTypes": [
+        "inv.db.Database"
+      ],
+      "classification": "RESOLVED_SOURCE_TARGET",
+      "targets": [
+        "inv.db.Database.transaction"
+      ],
+      "blocksGrant": false
+    },
+    {
+      "id": "b08edc6dded3cb4a05da2cd75a3c4430778ed9da0f5d5c24701fd397807a148d",
+      "path": "tools/run_s11_storage_failure_hosted.py",
+      "function": "tools.run_s11_storage_failure_hosted._s3_corruption_case",
+      "line": 451,
+      "column": 13,
+      "spelling": "env.db.transaction",
+      "receiverType": "tools.run_s11_storage_failure_hosted.env.db",
+      "possibleReceiverTypes": [
+        "tools.run_s11_storage_failure_hosted.env.db"
+      ],
+      "classification": "UNRESOLVED",
+      "targets": [],
+      "blocksGrant": true
+    },
+    {
+      "id": "6a27289cb3ce838ed0e20141f7a49a0597661996b9fd94478efcfc4060864d49",
+      "path": "tools/run_s11_storage_failure_hosted.py",
+      "function": "tools.run_s11_storage_failure_hosted._count_storage_rows",
+      "line": 491,
+      "column": 9,
+      "spelling": "env.db.transaction",
+      "receiverType": "tools.run_s11_storage_failure_hosted.env.db",
+      "possibleReceiverTypes": [
+        "tools.run_s11_storage_failure_hosted.env.db"
+      ],
+      "classification": "UNRESOLVED",
+      "targets": [],
+      "blocksGrant": true
+    },
+    {
+      "id": "373bbf352d688cd3333b53e35ccb788871a66e834399bac18ff6bd9d1cc9a98d",
+      "path": "tools/run_s11_storage_failure_hosted.py",
+      "function": "tools.run_s11_storage_failure_hosted._quota_case",
+      "line": 545,
+      "column": 9,
+      "spelling": "env.db.transaction",
+      "receiverType": "tools.run_s11_storage_failure_hosted.env.db",
+      "possibleReceiverTypes": [
+        "tools.run_s11_storage_failure_hosted.env.db"
+      ],
+      "classification": "UNRESOLVED",
+      "targets": [],
+      "blocksGrant": true
+    },
+    {
+      "id": "68226be430bf7ea9205cffd3e210338767bcadb94b8eeab6881eb00f62b9df3b",
+      "path": "tools/run_s11_storage_failure_hosted.py",
+      "function": "tools.run_s11_storage_failure_hosted._quota_case.one",
+      "line": 532,
+      "column": 12,
+      "spelling": "store.begin",
+      "receiverType": "tools.run_s11_storage_failure_hosted.store",
+      "possibleReceiverTypes": [
+        "tools.run_s11_storage_failure_hosted.store"
+      ],
+      "classification": "UNRESOLVED",
+      "targets": [],
+      "blocksGrant": true
+    },
+    {
+      "id": "6d31aa2174a0bb84278e8f29201a508a2b9d35e40e1e04f33f1de7ae7a281583",
+      "path": "tools/run_s11_storage_failure_hosted.py",
+      "function": "tools.run_s11_storage_failure_hosted._provider_507_case",
+      "line": 592,
+      "column": 9,
+      "spelling": "env.db.transaction",
+      "receiverType": "tools.run_s11_storage_failure_hosted.env.db",
+      "possibleReceiverTypes": [
+        "tools.run_s11_storage_failure_hosted.env.db"
+      ],
+      "classification": "UNRESOLVED",
+      "targets": [],
+      "blocksGrant": true
+    },
+    {
+      "id": "46c7c0ed5ed0adbbac97a0cc10dee6a4181ad9867d06176a68a6f2303831e202",
+      "path": "tools/run_s11_storage_failure_hosted.py",
+      "function": "tools.run_s11_storage_failure_hosted._provider_507_case",
+      "line": 603,
+      "column": 9,
+      "spelling": "env.db.transaction",
+      "receiverType": "tools.run_s11_storage_failure_hosted.env.db",
+      "possibleReceiverTypes": [
+        "tools.run_s11_storage_failure_hosted.env.db"
+      ],
+      "classification": "UNRESOLVED",
+      "targets": [],
+      "blocksGrant": true
+    },
+    {
+      "id": "6afad963658964c8eddcf3b0c1343a68c1c0ba4f7bc4c4c7653cfcf5b15f67bc",
+      "path": "tools/storage_check.py",
+      "function": "tools.storage_check.run",
+      "line": 59,
+      "column": 41,
+      "spelling": "session.begin",
+      "receiverType": "UNRESOLVED_CALL_RETURN:tools.storage_check:Session",
+      "possibleReceiverTypes": [
+        "UNRESOLVED_CALL_RETURN:tools.storage_check:Session"
+      ],
+      "classification": "UNRESOLVED",
+      "targets": [],
+      "blocksGrant": true
+    }
+  ],
+  "missingOldCalls": 0,
+  "allClassDeltas": [
+    {
+      "old": "BLOCK",
+      "new": "NONAUTHORITY_VALUE_INITIALIZER",
+      "count": 9
+    },
+    {
+      "old": "BLOCK",
+      "new": "RESOLVED_TRANSACTION_STATUS",
+      "count": 2
+    },
+    {
+      "old": "BLOCK",
+      "new": "UNRESOLVED",
+      "count": 17
+    },
+    {
+      "old": "NONAUTHORITY_ATTRIBUTE_FACTORY",
+      "new": "UNRESOLVED",
+      "count": 221
+    },
+    {
+      "old": "NONAUTHORITY_MAPPING",
+      "new": "NONAUTHORITY_TYPED_MAPPING",
+      "count": 990
+    },
+    {
+      "old": "NONAUTHORITY_MAPPING",
+      "new": "UNRESOLVED",
+      "count": 577
+    },
+    {
+      "old": "NONAUTHORITY_STDLIB",
+      "new": "EXTERNAL_IO_UNMEDIATED",
+      "count": 403
+    },
+    {
+      "old": "NONAUTHORITY_STDLIB",
+      "new": "NONAUTHORITY_STDLIB",
+      "count": 2910
+    },
+    {
+      "old": "NONAUTHORITY_STDLIB",
+      "new": "UNRESOLVED",
+      "count": 1971
+    },
+    {
+      "old": "NONAUTHORITY_UNRESOLVED_EXTERNAL_BACKLOG",
+      "new": "AUTHORITY_EXTERNAL_IO_CATALOGUE_BOUND",
+      "count": 10
+    },
+    {
+      "old": "NONAUTHORITY_UNRESOLVED_EXTERNAL_BACKLOG",
+      "new": "EXTERNAL_IO_UNMEDIATED",
+      "count": 1536
+    },
+    {
+      "old": "NONAUTHORITY_UNRESOLVED_EXTERNAL_BACKLOG",
+      "new": "NONAUTHORITY_BUILTIN",
+      "count": 9520
+    },
+    {
+      "old": "NONAUTHORITY_UNRESOLVED_EXTERNAL_BACKLOG",
+      "new": "NONAUTHORITY_TYPED_MAPPING",
+      "count": 23
+    },
+    {
+      "old": "NONAUTHORITY_UNRESOLVED_EXTERNAL_BACKLOG",
+      "new": "NONAUTHORITY_VALUE_INITIALIZER",
+      "count": 152
+    },
+    {
+      "old": "NONAUTHORITY_UNRESOLVED_EXTERNAL_BACKLOG",
+      "new": "RESOLVED_SOURCE_TARGET",
+      "count": 511
+    },
+    {
+      "old": "NONAUTHORITY_UNRESOLVED_EXTERNAL_BACKLOG",
+      "new": "RESOLVED_SOURCE_WRITER",
+      "count": 57
+    },
+    {
+      "old": "NONAUTHORITY_UNRESOLVED_EXTERNAL_BACKLOG",
+      "new": "UNRESOLVED",
+      "count": 17764
+    },
+    {
+      "old": "RESOLVED_DB_CURSOR_FACTORY",
+      "new": "RESOLVED_DB_CURSOR_FACTORY",
+      "count": 10
+    },
+    {
+      "old": "RESOLVED_DB_RECORD",
+      "new": "RESOLVED_DB_RECORD",
+      "count": 1663
+    },
+    {
+      "old": "RESOLVED_DB_RECORD",
+      "new": "UNRESOLVED",
+      "count": 844
+    },
+    {
+      "old": "RESOLVED_SOURCE_TARGET",
+      "new": "AUTHORITY_EXTERNAL_IO_CATALOGUE_BOUND",
+      "count": 9
+    },
+    {
+      "old": "RESOLVED_SOURCE_TARGET",
+      "new": "RESOLVED_SOURCE_TARGET",
+      "count": 8227
+    },
+    {
+      "old": "RESOLVED_SOURCE_TARGET",
+      "new": "UNRESOLVED",
+      "count": 53
+    },
+    {
+      "old": "RESOLVED_TRANSACTION_OWNER",
+      "new": "RESOLVED_TRANSACTION_OWNER",
+      "count": 45
+    },
+    {
+      "old": "RESOLVED_TRANSACTION_OWNER",
+      "new": "UNRESOLVED",
+      "count": 1
+    },
+    {
+      "old": "RESOLVED_TYPED_ORM_UOW",
+      "new": "RESOLVED_TYPED_ORM_UOW",
+      "count": 78
+    },
+    {
+      "old": "RESOLVED_TYPED_ORM_UOW",
+      "new": "UNRESOLVED",
+      "count": 5
+    }
+  ],
+  "waivers": 0,
+  "newCountsAreNotAcceptanceTargets": true,
+  "scope": "Every UNRESOLVED/SQL issue remains HOLD for the causal named grant; no global runtime denial and no unreachability exemption. ALL old107 transaction sites inventoried, including still-unresolved named ports.",
+  "actualRuntimeB": 0
+}

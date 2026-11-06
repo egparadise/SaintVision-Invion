@@ -1,0 +1,46 @@
+W1-runtime-quarantine-reversed-to-online
+W2-CASE-removed-to-unconditional-online
+W3-ORM-insert
+W4-dynamic-fstring-table
+W5-unqualified-unknown-effective-searchpath
+W6-model-setattr
+W7-ORM-attribute-positive-detector
+W8-new-SQL-writer-positive-detector
+W9-renamed-current-writer
+W10-removed-current-safety-writer
+W11-owner-impersonation-new-column
+W12-ORM-pg-insert-alias
+W13-Table-update-alias
+W14-explicit-effective-public-searchpath
+W15-dynamic-format-identifier
+W16-from-state-WHERE-guard-removed
+W17-percent-identifier
+W18-concat-identifier
+W19-format-identifier
+W19b-join-identifier
+W20-query-update
+W20b-query-delete
+W21-bulk-update
+W21b-bulk-insert
+W22-mixed-session-and-xact
+closed-literal-set-positive
+tuple-RunStore-equivalent
+starred-RunStore-equivalent
+chained-RunStore-equivalent
+dict-authority-dispatch-BLOCK
+untyped-injected-admit-BLOCK
+builtin-shadow-is-not-waived
+dynamic-eval-not-NONAUTHORITY
+typed-Session-status-positive
+retained-Timer-cancel-positive
+Traceback (most recent call last):
+  File "D:\Project\SaintVisionI-Invion\fleet5-compute-storage-contract-20261105\docs\vault\30_Development\Evidence\fleet5-b-contract-rev7-20261106-codex\source_fixtures.py", line 98, in <module>
+    if __name__=='__main__':main()
+                            ~~~~^^
+  File "D:\Project\SaintVisionI-Invion\fleet5-compute-storage-contract-20261105\docs\vault\30_Development\Evidence\fleet5-b-contract-rev7-20261106-codex\source_fixtures.py", line 84, in main
+    check(name,ok,{'localClasses':[(c['spelling'],c['classification']) for c in local]});print(name,flush=True);cleanup(g)
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Project\SaintVisionI-Invion\fleet5-compute-storage-contract-20261105\docs\vault\30_Development\Evidence\fleet5-b-contract-rev7-20261106-codex\source_fixtures.py", line 16, in check
+    def check(n,b,detail=None):R.append(dict(case=n,pass_=bool(b),detail=detail));assert b,(n,detail)
+                                                                                         ^
+AssertionError: ('retained-literal-module-getattr-positive', {'localClasses': [("getattr(leases, 'lock_run')", 'RESOLVED_SOURCE_TARGET'), ('getattr', 'UNRESOLVED')]})

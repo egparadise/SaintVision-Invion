@@ -1,0 +1,11 @@
+Traceback (most recent call last):
+  File "D:\Project\SaintVisionI-Invion\fleet5-compute-storage-contract-20261105\docs\vault\30_Development\Evidence\fleet5-b-contract-rev7-20261106-codex\packet_checks.py", line 93, in <module>
+    if __name__=='__main__':main()
+                            ~~~~^^
+  File "D:\Project\SaintVisionI-Invion\fleet5-compute-storage-contract-20261105\docs\vault\30_Development\Evidence\fleet5-b-contract-rev7-20261106-codex\packet_checks.py", line 43, in main
+    check('causal-closure-'+fn,okay)
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Project\SaintVisionI-Invion\fleet5-compute-storage-contract-20261105\docs\vault\30_Development\Evidence\fleet5-b-contract-rev7-20261106-codex\packet_checks.py", line 12, in check
+    def check(name,b,detail=None):R.append({'case':name,'pass':bool(b),'detail':detail});assert b,(name,detail)
+                                                                                                ^
+AssertionError: ('causal-closure-saintvision.api.v1.lineage_query.read_model_lineage', None)

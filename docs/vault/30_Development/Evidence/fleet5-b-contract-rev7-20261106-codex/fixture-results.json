@@ -1,0 +1,1347 @@
+{
+  "level": "SYMBOLIC_ONLY",
+  "cases": [
+    {
+      "case": "PLAINEXECUTE-caller-cannot-downgrade",
+      "pass": true
+    },
+    {
+      "case": "PLAINEXECUTE-register",
+      "pass": true
+    },
+    {
+      "case": "PLAINEXECUTE-forged-opaque-handle",
+      "pass": true
+    },
+    {
+      "case": "PLAINEXECUTE-invoke",
+      "pass": true
+    },
+    {
+      "case": "PLAINEXECUTE-no-resend",
+      "pass": true
+    },
+    {
+      "case": "PLAINEXECUTE-failure-state",
+      "pass": true
+    },
+    {
+      "case": "PLAINEXECUTE-poison-not-ordinary",
+      "pass": true
+    },
+    {
+      "case": "PLAINEXECUTE-side-unknown-protected",
+      "pass": true
+    },
+    {
+      "case": "PLAINBUILD_DISPATCH-caller-cannot-downgrade",
+      "pass": true
+    },
+    {
+      "case": "PLAINBUILD_DISPATCH-register",
+      "pass": true
+    },
+    {
+      "case": "PLAINBUILD_DISPATCH-forged-opaque-handle",
+      "pass": true
+    },
+    {
+      "case": "PLAINBUILD_DISPATCH-invoke",
+      "pass": true
+    },
+    {
+      "case": "PLAINBUILD_DISPATCH-no-resend",
+      "pass": true
+    },
+    {
+      "case": "PLAINBUILD_DISPATCH-failure-state",
+      "pass": true
+    },
+    {
+      "case": "PLAINBUILD_DISPATCH-poison-not-ordinary",
+      "pass": true
+    },
+    {
+      "case": "PLAINBUILD_DISPATCH-side-unknown-protected",
+      "pass": true
+    },
+    {
+      "case": "PLAINTERMINAL_FRAME-caller-cannot-downgrade",
+      "pass": true
+    },
+    {
+      "case": "PLAINTERMINAL_FRAME-register",
+      "pass": true
+    },
+    {
+      "case": "PLAINTERMINAL_FRAME-forged-opaque-handle",
+      "pass": true
+    },
+    {
+      "case": "PLAINTERMINAL_FRAME-invoke",
+      "pass": true
+    },
+    {
+      "case": "PLAINTERMINAL_FRAME-no-resend",
+      "pass": true
+    },
+    {
+      "case": "PLAINTERMINAL_FRAME-failure-state",
+      "pass": true
+    },
+    {
+      "case": "PLAINTERMINAL_FRAME-poison-not-ordinary",
+      "pass": true
+    },
+    {
+      "case": "PLAINTERMINAL_FRAME-side-unknown-protected",
+      "pass": true
+    },
+    {
+      "case": "PLAINB_GATE_ARM-caller-cannot-downgrade",
+      "pass": true
+    },
+    {
+      "case": "PLAINB_GATE_ARM-no-implicit-B-role",
+      "pass": true
+    },
+    {
+      "case": "PLAINRECEIPT_OBSERVE-caller-cannot-downgrade",
+      "pass": true
+    },
+    {
+      "case": "PLAINRECEIPT_OBSERVE-register",
+      "pass": true
+    },
+    {
+      "case": "PLAINRECEIPT_OBSERVE-forged-opaque-handle",
+      "pass": true
+    },
+    {
+      "case": "PLAINRECEIPT_OBSERVE-invoke",
+      "pass": true
+    },
+    {
+      "case": "PLAINRECEIPT_OBSERVE-no-resend",
+      "pass": true
+    },
+    {
+      "case": "PLAINRECEIPT_OBSERVE-failure-state",
+      "pass": true
+    },
+    {
+      "case": "PLAINRECEIPT_OBSERVE-poison-not-ordinary",
+      "pass": true
+    },
+    {
+      "case": "PLAINRECEIPT_OBSERVE-side-unknown-protected",
+      "pass": true
+    },
+    {
+      "case": "PLAINCANCEL-caller-cannot-downgrade",
+      "pass": true
+    },
+    {
+      "case": "PLAINCANCEL-register",
+      "pass": true
+    },
+    {
+      "case": "PLAINCANCEL-forged-opaque-handle",
+      "pass": true
+    },
+    {
+      "case": "PLAINCANCEL-invoke",
+      "pass": true
+    },
+    {
+      "case": "PLAINCANCEL-no-resend",
+      "pass": true
+    },
+    {
+      "case": "PLAINCANCEL-failure-state",
+      "pass": true
+    },
+    {
+      "case": "PLAINCANCEL-poison-not-ordinary",
+      "pass": true
+    },
+    {
+      "case": "PLAINCANCEL-forged-recovery-refused",
+      "pass": true
+    },
+    {
+      "case": "PLAINCANCEL-unrelated-role-refused",
+      "pass": true
+    },
+    {
+      "case": "PLAINCANCEL-wrong-retry-refused",
+      "pass": true
+    },
+    {
+      "case": "PLAINCANCEL-same-command-recovery-send",
+      "pass": true
+    },
+    {
+      "case": "PLAINCANCEL-exact-fresh-recovery",
+      "pass": true
+    },
+    {
+      "case": "PLAINCANCEL-recovery-replay-refused",
+      "pass": true
+    },
+    {
+      "case": "PLAINCANCEL-safety-ACK-retains-workload",
+      "pass": true
+    },
+    {
+      "case": "PLAINQUARANTINE_RECONCILE-caller-cannot-downgrade",
+      "pass": true
+    },
+    {
+      "case": "PLAINQUARANTINE_RECONCILE-register",
+      "pass": true
+    },
+    {
+      "case": "PLAINQUARANTINE_RECONCILE-forged-opaque-handle",
+      "pass": true
+    },
+    {
+      "case": "PLAINQUARANTINE_RECONCILE-invoke",
+      "pass": true
+    },
+    {
+      "case": "PLAINQUARANTINE_RECONCILE-no-resend",
+      "pass": true
+    },
+    {
+      "case": "PLAINQUARANTINE_RECONCILE-failure-state",
+      "pass": true
+    },
+    {
+      "case": "PLAINQUARANTINE_RECONCILE-poison-not-ordinary",
+      "pass": true
+    },
+    {
+      "case": "PLAINQUARANTINE_RECONCILE-forged-recovery-refused",
+      "pass": true
+    },
+    {
+      "case": "PLAINQUARANTINE_RECONCILE-unrelated-role-refused",
+      "pass": true
+    },
+    {
+      "case": "PLAINQUARANTINE_RECONCILE-wrong-retry-refused",
+      "pass": true
+    },
+    {
+      "case": "PLAINQUARANTINE_RECONCILE-same-command-recovery-send",
+      "pass": true
+    },
+    {
+      "case": "PLAINQUARANTINE_RECONCILE-exact-fresh-recovery",
+      "pass": true
+    },
+    {
+      "case": "PLAINQUARANTINE_RECONCILE-recovery-replay-refused",
+      "pass": true
+    },
+    {
+      "case": "PLAINQUARANTINE_RECONCILE-safety-ACK-retains-workload",
+      "pass": true
+    },
+    {
+      "case": "PLAINB_GATE_INVALIDATE-caller-cannot-downgrade",
+      "pass": true
+    },
+    {
+      "case": "PLAINB_GATE_INVALIDATE-no-implicit-B-role",
+      "pass": true
+    },
+    {
+      "case": "PLAINHEARTBEAT_OBSERVE-caller-cannot-downgrade",
+      "pass": true
+    },
+    {
+      "case": "PLAINHEARTBEAT_OBSERVE-register",
+      "pass": true
+    },
+    {
+      "case": "PLAINHEARTBEAT_OBSERVE-forged-opaque-handle",
+      "pass": true
+    },
+    {
+      "case": "PLAINHEARTBEAT_OBSERVE-invoke",
+      "pass": true
+    },
+    {
+      "case": "PLAINHEARTBEAT_OBSERVE-no-resend",
+      "pass": true
+    },
+    {
+      "case": "PLAINHEARTBEAT_OBSERVE-failure-state",
+      "pass": true
+    },
+    {
+      "case": "PLAINHEARTBEAT_OBSERVE-poison-not-ordinary",
+      "pass": true
+    },
+    {
+      "case": "PLAINHEARTBEAT_OBSERVE-read-no-business-denial",
+      "pass": true
+    },
+    {
+      "case": "PLAINHEARTBEAT_OBSERVE-no-OP-needed",
+      "pass": true
+    },
+    {
+      "case": "PLAINGPU_ACTIVE_OBSERVE-caller-cannot-downgrade",
+      "pass": true
+    },
+    {
+      "case": "PLAINGPU_ACTIVE_OBSERVE-register",
+      "pass": true
+    },
+    {
+      "case": "PLAINGPU_ACTIVE_OBSERVE-forged-opaque-handle",
+      "pass": true
+    },
+    {
+      "case": "PLAINGPU_ACTIVE_OBSERVE-invoke",
+      "pass": true
+    },
+    {
+      "case": "PLAINGPU_ACTIVE_OBSERVE-no-resend",
+      "pass": true
+    },
+    {
+      "case": "PLAINGPU_ACTIVE_OBSERVE-failure-state",
+      "pass": true
+    },
+    {
+      "case": "PLAINGPU_ACTIVE_OBSERVE-poison-not-ordinary",
+      "pass": true
+    },
+    {
+      "case": "PLAINGPU_ACTIVE_OBSERVE-read-no-business-denial",
+      "pass": true
+    },
+    {
+      "case": "PLAINGPU_ACTIVE_OBSERVE-no-OP-needed",
+      "pass": true
+    },
+    {
+      "case": "PLAINSTORAGE_SAMPLE-caller-cannot-downgrade",
+      "pass": true
+    },
+    {
+      "case": "PLAINSTORAGE_SAMPLE-register",
+      "pass": true
+    },
+    {
+      "case": "PLAINSTORAGE_SAMPLE-forged-opaque-handle",
+      "pass": true
+    },
+    {
+      "case": "PLAINSTORAGE_SAMPLE-invoke",
+      "pass": true
+    },
+    {
+      "case": "PLAINSTORAGE_SAMPLE-no-resend",
+      "pass": true
+    },
+    {
+      "case": "PLAINSTORAGE_SAMPLE-failure-state",
+      "pass": true
+    },
+    {
+      "case": "PLAINSTORAGE_SAMPLE-poison-not-ordinary",
+      "pass": true
+    },
+    {
+      "case": "PLAINSTORAGE_SAMPLE-read-no-business-denial",
+      "pass": true
+    },
+    {
+      "case": "PLAINSTORAGE_SAMPLE-no-OP-needed",
+      "pass": true
+    },
+    {
+      "case": "PLAINOBJECT_READ-caller-cannot-downgrade",
+      "pass": true
+    },
+    {
+      "case": "PLAINOBJECT_READ-register",
+      "pass": true
+    },
+    {
+      "case": "PLAINOBJECT_READ-forged-opaque-handle",
+      "pass": true
+    },
+    {
+      "case": "PLAINOBJECT_READ-invoke",
+      "pass": true
+    },
+    {
+      "case": "PLAINOBJECT_READ-no-resend",
+      "pass": true
+    },
+    {
+      "case": "PLAINOBJECT_READ-failure-state",
+      "pass": true
+    },
+    {
+      "case": "PLAINOBJECT_READ-poison-not-ordinary",
+      "pass": true
+    },
+    {
+      "case": "PLAINOBJECT_READ-read-no-business-denial",
+      "pass": true
+    },
+    {
+      "case": "PLAINOBJECT_READ-no-OP-needed",
+      "pass": true
+    },
+    {
+      "case": "PLAINBUILD_HEALTH_READ-caller-cannot-downgrade",
+      "pass": true
+    },
+    {
+      "case": "PLAINBUILD_HEALTH_READ-register",
+      "pass": true
+    },
+    {
+      "case": "PLAINBUILD_HEALTH_READ-forged-opaque-handle",
+      "pass": true
+    },
+    {
+      "case": "PLAINBUILD_HEALTH_READ-invoke",
+      "pass": true
+    },
+    {
+      "case": "PLAINBUILD_HEALTH_READ-no-resend",
+      "pass": true
+    },
+    {
+      "case": "PLAINBUILD_HEALTH_READ-failure-state",
+      "pass": true
+    },
+    {
+      "case": "PLAINBUILD_HEALTH_READ-poison-not-ordinary",
+      "pass": true
+    },
+    {
+      "case": "PLAINBUILD_HEALTH_READ-read-no-business-denial",
+      "pass": true
+    },
+    {
+      "case": "PLAINBUILD_HEALTH_READ-no-OP-needed",
+      "pass": true
+    },
+    {
+      "case": "PLAINBUILD_CLEANUP_READ-caller-cannot-downgrade",
+      "pass": true
+    },
+    {
+      "case": "PLAINBUILD_CLEANUP_READ-register",
+      "pass": true
+    },
+    {
+      "case": "PLAINBUILD_CLEANUP_READ-forged-opaque-handle",
+      "pass": true
+    },
+    {
+      "case": "PLAINBUILD_CLEANUP_READ-invoke",
+      "pass": true
+    },
+    {
+      "case": "PLAINBUILD_CLEANUP_READ-no-resend",
+      "pass": true
+    },
+    {
+      "case": "PLAINBUILD_CLEANUP_READ-failure-state",
+      "pass": true
+    },
+    {
+      "case": "PLAINBUILD_CLEANUP_READ-poison-not-ordinary",
+      "pass": true
+    },
+    {
+      "case": "PLAINBUILD_CLEANUP_READ-read-no-business-denial",
+      "pass": true
+    },
+    {
+      "case": "PLAINBUILD_CLEANUP_READ-no-OP-needed",
+      "pass": true
+    },
+    {
+      "case": "PLAINB_ROLE_OBSERVE-caller-cannot-downgrade",
+      "pass": true
+    },
+    {
+      "case": "PLAINB_ROLE_OBSERVE-no-implicit-B-role",
+      "pass": true
+    },
+    {
+      "case": "PLAINB_FOLDER_ROOT_OBSERVE-caller-cannot-downgrade",
+      "pass": true
+    },
+    {
+      "case": "PLAINB_FOLDER_ROOT_OBSERVE-register",
+      "pass": true
+    },
+    {
+      "case": "PLAINB_FOLDER_ROOT_OBSERVE-forged-opaque-handle",
+      "pass": true
+    },
+    {
+      "case": "PLAINB_FOLDER_ROOT_OBSERVE-invoke",
+      "pass": true
+    },
+    {
+      "case": "PLAINB_FOLDER_ROOT_OBSERVE-no-resend",
+      "pass": true
+    },
+    {
+      "case": "PLAINB_FOLDER_ROOT_OBSERVE-failure-state",
+      "pass": true
+    },
+    {
+      "case": "PLAINB_FOLDER_ROOT_OBSERVE-poison-not-ordinary",
+      "pass": true
+    },
+    {
+      "case": "PLAINB_FOLDER_ROOT_OBSERVE-read-no-business-denial",
+      "pass": true
+    },
+    {
+      "case": "PLAINB_FOLDER_ROOT_OBSERVE-no-OP-needed",
+      "pass": true
+    },
+    {
+      "case": "BEXECUTE-caller-cannot-downgrade",
+      "pass": true
+    },
+    {
+      "case": "BEXECUTE-register",
+      "pass": true
+    },
+    {
+      "case": "BEXECUTE-forged-opaque-handle",
+      "pass": true
+    },
+    {
+      "case": "BEXECUTE-invoke",
+      "pass": true
+    },
+    {
+      "case": "BEXECUTE-no-resend",
+      "pass": true
+    },
+    {
+      "case": "BEXECUTE-failure-state",
+      "pass": true
+    },
+    {
+      "case": "BEXECUTE-poison-not-ordinary",
+      "pass": true
+    },
+    {
+      "case": "BEXECUTE-side-unknown-protected",
+      "pass": true
+    },
+    {
+      "case": "BBUILD_DISPATCH-caller-cannot-downgrade",
+      "pass": true
+    },
+    {
+      "case": "BBUILD_DISPATCH-register",
+      "pass": true
+    },
+    {
+      "case": "BBUILD_DISPATCH-forged-opaque-handle",
+      "pass": true
+    },
+    {
+      "case": "BBUILD_DISPATCH-invoke",
+      "pass": true
+    },
+    {
+      "case": "BBUILD_DISPATCH-no-resend",
+      "pass": true
+    },
+    {
+      "case": "BBUILD_DISPATCH-failure-state",
+      "pass": true
+    },
+    {
+      "case": "BBUILD_DISPATCH-poison-not-ordinary",
+      "pass": true
+    },
+    {
+      "case": "BBUILD_DISPATCH-side-unknown-protected",
+      "pass": true
+    },
+    {
+      "case": "BTERMINAL_FRAME-caller-cannot-downgrade",
+      "pass": true
+    },
+    {
+      "case": "BTERMINAL_FRAME-register",
+      "pass": true
+    },
+    {
+      "case": "BTERMINAL_FRAME-forged-opaque-handle",
+      "pass": true
+    },
+    {
+      "case": "BTERMINAL_FRAME-invoke",
+      "pass": true
+    },
+    {
+      "case": "BTERMINAL_FRAME-no-resend",
+      "pass": true
+    },
+    {
+      "case": "BTERMINAL_FRAME-failure-state",
+      "pass": true
+    },
+    {
+      "case": "BTERMINAL_FRAME-poison-not-ordinary",
+      "pass": true
+    },
+    {
+      "case": "BTERMINAL_FRAME-side-unknown-protected",
+      "pass": true
+    },
+    {
+      "case": "BB_GATE_ARM-caller-cannot-downgrade",
+      "pass": true
+    },
+    {
+      "case": "BB_GATE_ARM-register",
+      "pass": true
+    },
+    {
+      "case": "BB_GATE_ARM-forged-opaque-handle",
+      "pass": true
+    },
+    {
+      "case": "BB_GATE_ARM-invoke",
+      "pass": true
+    },
+    {
+      "case": "BB_GATE_ARM-no-resend",
+      "pass": true
+    },
+    {
+      "case": "BB_GATE_ARM-failure-state",
+      "pass": true
+    },
+    {
+      "case": "BB_GATE_ARM-poison-not-ordinary",
+      "pass": true
+    },
+    {
+      "case": "BB_GATE_ARM-side-unknown-protected",
+      "pass": true
+    },
+    {
+      "case": "BRECEIPT_OBSERVE-caller-cannot-downgrade",
+      "pass": true
+    },
+    {
+      "case": "BRECEIPT_OBSERVE-register",
+      "pass": true
+    },
+    {
+      "case": "BRECEIPT_OBSERVE-forged-opaque-handle",
+      "pass": true
+    },
+    {
+      "case": "BRECEIPT_OBSERVE-invoke",
+      "pass": true
+    },
+    {
+      "case": "BRECEIPT_OBSERVE-no-resend",
+      "pass": true
+    },
+    {
+      "case": "BRECEIPT_OBSERVE-failure-state",
+      "pass": true
+    },
+    {
+      "case": "BRECEIPT_OBSERVE-poison-not-ordinary",
+      "pass": true
+    },
+    {
+      "case": "BRECEIPT_OBSERVE-side-unknown-protected",
+      "pass": true
+    },
+    {
+      "case": "BCANCEL-caller-cannot-downgrade",
+      "pass": true
+    },
+    {
+      "case": "BCANCEL-register",
+      "pass": true
+    },
+    {
+      "case": "BCANCEL-forged-opaque-handle",
+      "pass": true
+    },
+    {
+      "case": "BCANCEL-invoke",
+      "pass": true
+    },
+    {
+      "case": "BCANCEL-no-resend",
+      "pass": true
+    },
+    {
+      "case": "BCANCEL-failure-state",
+      "pass": true
+    },
+    {
+      "case": "BCANCEL-poison-not-ordinary",
+      "pass": true
+    },
+    {
+      "case": "BCANCEL-forged-recovery-refused",
+      "pass": true
+    },
+    {
+      "case": "BCANCEL-unrelated-role-refused",
+      "pass": true
+    },
+    {
+      "case": "BCANCEL-wrong-retry-refused",
+      "pass": true
+    },
+    {
+      "case": "BCANCEL-same-command-recovery-send",
+      "pass": true
+    },
+    {
+      "case": "BCANCEL-exact-fresh-recovery",
+      "pass": true
+    },
+    {
+      "case": "BCANCEL-recovery-replay-refused",
+      "pass": true
+    },
+    {
+      "case": "BCANCEL-safety-ACK-retains-workload",
+      "pass": true
+    },
+    {
+      "case": "BQUARANTINE_RECONCILE-caller-cannot-downgrade",
+      "pass": true
+    },
+    {
+      "case": "BQUARANTINE_RECONCILE-register",
+      "pass": true
+    },
+    {
+      "case": "BQUARANTINE_RECONCILE-forged-opaque-handle",
+      "pass": true
+    },
+    {
+      "case": "BQUARANTINE_RECONCILE-invoke",
+      "pass": true
+    },
+    {
+      "case": "BQUARANTINE_RECONCILE-no-resend",
+      "pass": true
+    },
+    {
+      "case": "BQUARANTINE_RECONCILE-failure-state",
+      "pass": true
+    },
+    {
+      "case": "BQUARANTINE_RECONCILE-poison-not-ordinary",
+      "pass": true
+    },
+    {
+      "case": "BQUARANTINE_RECONCILE-forged-recovery-refused",
+      "pass": true
+    },
+    {
+      "case": "BQUARANTINE_RECONCILE-unrelated-role-refused",
+      "pass": true
+    },
+    {
+      "case": "BQUARANTINE_RECONCILE-wrong-retry-refused",
+      "pass": true
+    },
+    {
+      "case": "BQUARANTINE_RECONCILE-same-command-recovery-send",
+      "pass": true
+    },
+    {
+      "case": "BQUARANTINE_RECONCILE-exact-fresh-recovery",
+      "pass": true
+    },
+    {
+      "case": "BQUARANTINE_RECONCILE-recovery-replay-refused",
+      "pass": true
+    },
+    {
+      "case": "BQUARANTINE_RECONCILE-safety-ACK-retains-workload",
+      "pass": true
+    },
+    {
+      "case": "BB_GATE_INVALIDATE-caller-cannot-downgrade",
+      "pass": true
+    },
+    {
+      "case": "BB_GATE_INVALIDATE-register",
+      "pass": true
+    },
+    {
+      "case": "BB_GATE_INVALIDATE-forged-opaque-handle",
+      "pass": true
+    },
+    {
+      "case": "BB_GATE_INVALIDATE-invoke",
+      "pass": true
+    },
+    {
+      "case": "BB_GATE_INVALIDATE-no-resend",
+      "pass": true
+    },
+    {
+      "case": "BB_GATE_INVALIDATE-failure-state",
+      "pass": true
+    },
+    {
+      "case": "BB_GATE_INVALIDATE-poison-not-ordinary",
+      "pass": true
+    },
+    {
+      "case": "BB_GATE_INVALIDATE-forged-recovery-refused",
+      "pass": true
+    },
+    {
+      "case": "BB_GATE_INVALIDATE-unrelated-role-refused",
+      "pass": true
+    },
+    {
+      "case": "BB_GATE_INVALIDATE-wrong-retry-refused",
+      "pass": true
+    },
+    {
+      "case": "BB_GATE_INVALIDATE-same-command-recovery-send",
+      "pass": true
+    },
+    {
+      "case": "BB_GATE_INVALIDATE-generic-gate-ACK-insufficient",
+      "pass": true
+    },
+    {
+      "case": "BHEARTBEAT_OBSERVE-caller-cannot-downgrade",
+      "pass": true
+    },
+    {
+      "case": "BHEARTBEAT_OBSERVE-register",
+      "pass": true
+    },
+    {
+      "case": "BHEARTBEAT_OBSERVE-forged-opaque-handle",
+      "pass": true
+    },
+    {
+      "case": "BHEARTBEAT_OBSERVE-invoke",
+      "pass": true
+    },
+    {
+      "case": "BHEARTBEAT_OBSERVE-no-resend",
+      "pass": true
+    },
+    {
+      "case": "BHEARTBEAT_OBSERVE-failure-state",
+      "pass": true
+    },
+    {
+      "case": "BHEARTBEAT_OBSERVE-poison-not-ordinary",
+      "pass": true
+    },
+    {
+      "case": "BHEARTBEAT_OBSERVE-read-no-business-denial",
+      "pass": true
+    },
+    {
+      "case": "BHEARTBEAT_OBSERVE-no-OP-needed",
+      "pass": true
+    },
+    {
+      "case": "BGPU_ACTIVE_OBSERVE-caller-cannot-downgrade",
+      "pass": true
+    },
+    {
+      "case": "BGPU_ACTIVE_OBSERVE-register",
+      "pass": true
+    },
+    {
+      "case": "BGPU_ACTIVE_OBSERVE-forged-opaque-handle",
+      "pass": true
+    },
+    {
+      "case": "BGPU_ACTIVE_OBSERVE-invoke",
+      "pass": true
+    },
+    {
+      "case": "BGPU_ACTIVE_OBSERVE-no-resend",
+      "pass": true
+    },
+    {
+      "case": "BGPU_ACTIVE_OBSERVE-failure-state",
+      "pass": true
+    },
+    {
+      "case": "BGPU_ACTIVE_OBSERVE-poison-not-ordinary",
+      "pass": true
+    },
+    {
+      "case": "BGPU_ACTIVE_OBSERVE-read-no-business-denial",
+      "pass": true
+    },
+    {
+      "case": "BGPU_ACTIVE_OBSERVE-no-OP-needed",
+      "pass": true
+    },
+    {
+      "case": "BSTORAGE_SAMPLE-caller-cannot-downgrade",
+      "pass": true
+    },
+    {
+      "case": "BSTORAGE_SAMPLE-register",
+      "pass": true
+    },
+    {
+      "case": "BSTORAGE_SAMPLE-forged-opaque-handle",
+      "pass": true
+    },
+    {
+      "case": "BSTORAGE_SAMPLE-invoke",
+      "pass": true
+    },
+    {
+      "case": "BSTORAGE_SAMPLE-no-resend",
+      "pass": true
+    },
+    {
+      "case": "BSTORAGE_SAMPLE-failure-state",
+      "pass": true
+    },
+    {
+      "case": "BSTORAGE_SAMPLE-poison-not-ordinary",
+      "pass": true
+    },
+    {
+      "case": "BSTORAGE_SAMPLE-read-no-business-denial",
+      "pass": true
+    },
+    {
+      "case": "BSTORAGE_SAMPLE-no-OP-needed",
+      "pass": true
+    },
+    {
+      "case": "BOBJECT_READ-caller-cannot-downgrade",
+      "pass": true
+    },
+    {
+      "case": "BOBJECT_READ-register",
+      "pass": true
+    },
+    {
+      "case": "BOBJECT_READ-forged-opaque-handle",
+      "pass": true
+    },
+    {
+      "case": "BOBJECT_READ-invoke",
+      "pass": true
+    },
+    {
+      "case": "BOBJECT_READ-no-resend",
+      "pass": true
+    },
+    {
+      "case": "BOBJECT_READ-failure-state",
+      "pass": true
+    },
+    {
+      "case": "BOBJECT_READ-poison-not-ordinary",
+      "pass": true
+    },
+    {
+      "case": "BOBJECT_READ-read-no-business-denial",
+      "pass": true
+    },
+    {
+      "case": "BOBJECT_READ-no-OP-needed",
+      "pass": true
+    },
+    {
+      "case": "BBUILD_HEALTH_READ-caller-cannot-downgrade",
+      "pass": true
+    },
+    {
+      "case": "BBUILD_HEALTH_READ-register",
+      "pass": true
+    },
+    {
+      "case": "BBUILD_HEALTH_READ-forged-opaque-handle",
+      "pass": true
+    },
+    {
+      "case": "BBUILD_HEALTH_READ-invoke",
+      "pass": true
+    },
+    {
+      "case": "BBUILD_HEALTH_READ-no-resend",
+      "pass": true
+    },
+    {
+      "case": "BBUILD_HEALTH_READ-failure-state",
+      "pass": true
+    },
+    {
+      "case": "BBUILD_HEALTH_READ-poison-not-ordinary",
+      "pass": true
+    },
+    {
+      "case": "BBUILD_HEALTH_READ-read-no-business-denial",
+      "pass": true
+    },
+    {
+      "case": "BBUILD_HEALTH_READ-no-OP-needed",
+      "pass": true
+    },
+    {
+      "case": "BBUILD_CLEANUP_READ-caller-cannot-downgrade",
+      "pass": true
+    },
+    {
+      "case": "BBUILD_CLEANUP_READ-register",
+      "pass": true
+    },
+    {
+      "case": "BBUILD_CLEANUP_READ-forged-opaque-handle",
+      "pass": true
+    },
+    {
+      "case": "BBUILD_CLEANUP_READ-invoke",
+      "pass": true
+    },
+    {
+      "case": "BBUILD_CLEANUP_READ-no-resend",
+      "pass": true
+    },
+    {
+      "case": "BBUILD_CLEANUP_READ-failure-state",
+      "pass": true
+    },
+    {
+      "case": "BBUILD_CLEANUP_READ-poison-not-ordinary",
+      "pass": true
+    },
+    {
+      "case": "BBUILD_CLEANUP_READ-read-no-business-denial",
+      "pass": true
+    },
+    {
+      "case": "BBUILD_CLEANUP_READ-no-OP-needed",
+      "pass": true
+    },
+    {
+      "case": "BB_ROLE_OBSERVE-caller-cannot-downgrade",
+      "pass": true
+    },
+    {
+      "case": "BB_ROLE_OBSERVE-register",
+      "pass": true
+    },
+    {
+      "case": "BB_ROLE_OBSERVE-forged-opaque-handle",
+      "pass": true
+    },
+    {
+      "case": "BB_ROLE_OBSERVE-invoke",
+      "pass": true
+    },
+    {
+      "case": "BB_ROLE_OBSERVE-no-resend",
+      "pass": true
+    },
+    {
+      "case": "BB_ROLE_OBSERVE-failure-state",
+      "pass": true
+    },
+    {
+      "case": "BB_ROLE_OBSERVE-poison-not-ordinary",
+      "pass": true
+    },
+    {
+      "case": "BB_ROLE_OBSERVE-read-no-business-denial",
+      "pass": true
+    },
+    {
+      "case": "BB_ROLE_OBSERVE-no-OP-needed",
+      "pass": true
+    },
+    {
+      "case": "BB_FOLDER_ROOT_OBSERVE-caller-cannot-downgrade",
+      "pass": true
+    },
+    {
+      "case": "BB_FOLDER_ROOT_OBSERVE-register",
+      "pass": true
+    },
+    {
+      "case": "BB_FOLDER_ROOT_OBSERVE-forged-opaque-handle",
+      "pass": true
+    },
+    {
+      "case": "BB_FOLDER_ROOT_OBSERVE-invoke",
+      "pass": true
+    },
+    {
+      "case": "BB_FOLDER_ROOT_OBSERVE-no-resend",
+      "pass": true
+    },
+    {
+      "case": "BB_FOLDER_ROOT_OBSERVE-failure-state",
+      "pass": true
+    },
+    {
+      "case": "BB_FOLDER_ROOT_OBSERVE-poison-not-ordinary",
+      "pass": true
+    },
+    {
+      "case": "BB_FOLDER_ROOT_OBSERVE-read-no-business-denial",
+      "pass": true
+    },
+    {
+      "case": "BB_FOLDER_ROOT_OBSERVE-no-OP-needed",
+      "pass": true
+    },
+    {
+      "case": "pending-read-does-not-deny",
+      "pass": true
+    },
+    {
+      "case": "failed-read-no-security-version-change",
+      "pass": true
+    },
+    {
+      "case": "good-later-heartbeat-original-verifier-success",
+      "pass": true
+    },
+    {
+      "case": "good-later-heartbeat-no-OP",
+      "pass": true
+    },
+    {
+      "case": "good-heartbeat-never-clears-drain",
+      "pass": true
+    },
+    {
+      "case": "prepared-ARM-survives-read-registration",
+      "pass": true
+    },
+    {
+      "case": "prepared-ARM-actual-revoke-invalidates",
+      "pass": true
+    },
+    {
+      "case": "PLAIN-disjoint-executions-allowed",
+      "pass": true
+    },
+    {
+      "case": "PLAIN-same-resource-denied",
+      "pass": true
+    },
+    {
+      "case": "PLAIN-side-unknown-nodewide",
+      "pass": true
+    },
+    {
+      "case": "PLAIN-other-node-unaffected",
+      "pass": true
+    },
+    {
+      "case": "B-disjoint-executions-allowed",
+      "pass": true
+    },
+    {
+      "case": "B-same-resource-denied",
+      "pass": true
+    },
+    {
+      "case": "B-side-unknown-nodewide",
+      "pass": true
+    },
+    {
+      "case": "B-other-node-unaffected",
+      "pass": true
+    },
+    {
+      "case": "row-fuse-failure-retains-PENDING",
+      "pass": true
+    },
+    {
+      "case": "row-fuse-failure-only-own-capability",
+      "pass": true
+    },
+    {
+      "case": "own-capability-death-refuses-reconstruction",
+      "pass": true
+    },
+    {
+      "case": "actual-restart-loses-every-LIVE-capability",
+      "pass": true
+    },
+    {
+      "case": "restart-read-ordinary-abandon",
+      "pass": true
+    },
+    {
+      "case": "restart-side-no-ordinary-rebuild",
+      "pass": true
+    },
+    {
+      "case": "restart-safety-fresh-recovery",
+      "pass": true
+    },
+    {
+      "case": "restart-side-protected-physical",
+      "pass": true
+    },
+    {
+      "case": "exact-terminal-under-DRAIN",
+      "pass": true
+    },
+    {
+      "case": "wrong-terminal-parent-refused",
+      "pass": true
+    },
+    {
+      "case": "expired-terminal-lease-refused",
+      "pass": true
+    },
+    {
+      "case": "atomic-proven-never-invoked-abort",
+      "pass": true
+    },
+    {
+      "case": "ambiguous-timeout-not-never-invoked-proof",
+      "pass": true
+    },
+    {
+      "case": "renewed-leaf-channel-refuses-stale-recovery",
+      "pass": true
+    },
+    {
+      "case": "exact-safety-closes-own-obligation",
+      "pass": true
+    },
+    {
+      "case": "safety-never-clears-another-drain",
+      "pass": true
+    },
+    {
+      "case": "receipt-observe-side-effect-exception",
+      "pass": true
+    },
+    {
+      "case": "kind-name-cannot-downgrade-side-effect-path",
+      "pass": true
+    },
+    {
+      "case": "signed-exact-invalidation-proposed-service",
+      "pass": true
+    },
+    {
+      "case": "timeout-does-not-invent-CP-gate-ACK",
+      "pass": true
+    },
+    {
+      "case": "fresh-gate-recovery-wrong-ACK-refused",
+      "pass": true
+    },
+    {
+      "case": "original-poisoned-gate-capability-stays-dead",
+      "pass": true
+    },
+    {
+      "case": "fresh-exact-durable-gate-ACK-closes-without-OP",
+      "pass": true
+    },
+    {
+      "case": "CP-gate-advances-only-verified-ACK",
+      "pass": true
+    },
+    {
+      "case": "gate-safety-does-not-release-active-claim",
+      "pass": true
+    },
+    {
+      "case": "retired-gate-history-retained",
+      "pass": true
+    },
+    {
+      "case": "compound-mismatch-refused",
+      "pass": true
+    },
+    {
+      "case": "compound-rollback-does-not-revive-poison",
+      "pass": true
+    },
+    {
+      "case": "compound-row-failure-other-Node-capability-live",
+      "pass": true
+    },
+    {
+      "case": "original-terminal-receipt-removes-only-matched-claim",
+      "pass": true
+    },
+    {
+      "case": "role-wide-ARM-invalidated-by-relevant-claim-version",
+      "pass": true
+    },
+    {
+      "case": "same-config-renewal-not-starved-by-unrelated-workload-claim",
+      "pass": true
+    },
+    {
+      "case": "good-heartbeat-applies-original-offline-to-online-rule",
+      "pass": true
+    },
+    {
+      "case": "real-global-trust-fence-not-erased-by-process-restart",
+      "pass": true
+    },
+    {
+      "case": "object-read-parent-no-invented-kernel-Run",
+      "pass": true
+    },
+    {
+      "case": "object-read-failure-abandoned-without-workload",
+      "pass": true
+    },
+    {
+      "case": "object-read-current-read-rights-rechecked",
+      "pass": true
+    },
+    {
+      "case": "R12-exact-current-claimed-terminal-under-DRAIN",
+      "pass": true
+    },
+    {
+      "case": "terminal-wrong-original-owner-refused",
+      "pass": true
+    }
+  ],
+  "count": 335,
+  "actualRuntimeB": 0
+}

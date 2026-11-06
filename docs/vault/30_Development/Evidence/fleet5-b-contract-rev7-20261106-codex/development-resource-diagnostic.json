@@ -1,0 +1,5 @@
+{
+  "initialNormalizedBytes": 515193945,
+  "cause": "nested textual UNION representations grew exponentially; exit0 was not resource acceptance; generated outputs will be replaced, original immutable Rev6 ledger untouched",
+  "fix": "interned finite type-set IDs, stable unknown expression identities and namespace propagation; no OS/pagefile/process/dependency changes"
+}

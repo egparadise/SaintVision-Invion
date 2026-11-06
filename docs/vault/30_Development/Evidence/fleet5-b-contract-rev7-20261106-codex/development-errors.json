@@ -1,0 +1,63 @@
+{
+  "scope": "historical diagnostics, not final ledgers",
+  "errors": [
+    {
+      "kind": "read-only discovery",
+      "actual": "PowerShell rejected Bash brace syntax; three guessed public source paths were absent",
+      "resolution": "used rg --files and actual qualified source paths; no application/private files or actions invoked"
+    },
+    {
+      "kind": "resource diagnostic",
+      "actual": "first owner graph exit0 but nested textual type joins expanded normalized output to515193945bytes",
+      "resolution": "interned finite type sets, source-backed namespaces and compact streaming dictionaries; initial log/metadata retained, no OS/pagefile/dependency/process-control change"
+    },
+    {
+      "kind": "subset setup",
+      "actual": "source_fixtures exit1 W11 because selected fixture omitted StorageContribution model",
+      "evidence": "development-failed1-source-fixtures-run.log",
+      "resolution": "included actual immutable model; W11 detector passes, no production rule weakened"
+    },
+    {
+      "kind": "C2 fixture",
+      "actual": "fixtures exit1 because a nonempty version vector used Python tuples",
+      "toolChunk": "995f13",
+      "rawStdoutRetention": "tool output only, no raw file claim",
+      "resolution": "canonical list-of-lists representation; strict C2 decoder preserved"
+    },
+    {
+      "kind": "authority inventory",
+      "actual": "source-checks reconciliation exit1,31mapped instead of34; final table rebuild omitted control_epoch",
+      "evidence": "development-failed2-source-checks-3.log",
+      "resolution": "restored explicit control_epoch inventory after final rebuild; exact34audit now passes"
+    },
+    {
+      "kind": "causal graph integrity",
+      "actual": "packet_checks exit1 on lineage_query closure; duplicate identical SQL issue had same ID twice",
+      "evidence": "development-failed3-proof-checks-6.log",
+      "resolution": "deduplicate only exact source-binding/reason identity, preserving unknown HOLD; regenerate graph and hashes rather than relax expected closure"
+    },
+    {
+      "kind": "retained typed positive",
+      "actual": "source-checks exit1 on literal module getattr factory; inner/outer calls share start position",
+      "evidence": "development-failed4-source-checks-1.log",
+      "resolution": "use complete AST source spans for DB/writer identity and resolved outer factory proof; add nested unknown-factory counterexample, retain Timer.cancel positive; final source checks pass"
+    },
+    {
+      "kind": "publication DSN display guard",
+      "actual": "check_docs exit1 on DSN-shaped public source-fixture literals in new call/writer display ledgers",
+      "evidence": "development-failed5-publication-gates-1.log",
+      "resolution": "apply unchanged guard pattern to display fields only, retain raw source/field/row/ledger hashes and original Git bindings; separate postprocessing command chain and consumer rerun, no source or guard change"
+    },
+    {
+      "kind": "staged raw line endings",
+      "actual": "git diff --cached --check exit2 because byte-preserving CRLF JSON was treated as trailing CR; tool output truncated, no raw-log retention claim",
+      "resolution": "scoped whitespace attribute permits CR-at-EOL while retaining blank-at-eol/blank-at-eof/space-before-tab; prior TXT/raw logs binary; raw hashes and producer/review bytes unchanged"
+    }
+  ],
+  "finalLedgers": [
+    "source-checks.json",
+    "proof-checks.json",
+    "publication-gates.json"
+  ],
+  "kst": "2026-11-06T13:26:49.964912+09:00"
+}

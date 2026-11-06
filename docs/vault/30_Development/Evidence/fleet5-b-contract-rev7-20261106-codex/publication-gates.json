@@ -1,0 +1,122 @@
+{
+  "phase": "publication-gates",
+  "commands": [
+    {
+      "command": [
+        "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+        "-B",
+        "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105\\tools\\check_docs.py"
+      ],
+      "expectedExit": 0,
+      "actualExit": 0,
+      "seconds": 30.626,
+      "log": "publication-gates-1.log",
+      "sha256": "149edaef15646674894dfd9d60b252cd7109046ea00df34bfb9eed05e1cc86c3",
+      "kst": "2026-11-06T13:59:55.179254+09:00"
+    },
+    {
+      "command": [
+        "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+        "-B",
+        "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105\\tools\\check_ontology.py"
+      ],
+      "expectedExit": 0,
+      "actualExit": 0,
+      "seconds": 2.328,
+      "log": "publication-gates-2.log",
+      "sha256": "7cdc12bf64f50ba0964625161638a4c639cf22d786a57f04685bed0718e14042",
+      "kst": "2026-11-06T13:59:57.526747+09:00"
+    },
+    {
+      "command": [
+        "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+        "-B",
+        "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105\\tools\\sync_obsidian.py",
+        "--check",
+        "--state",
+        "D:/Project/SaintVision-Invion/SaintVisionI-Invion/.git/obsidian-sync-state.json",
+        "--conflicts-out",
+        "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105\\docs\\vault\\30_Development\\Evidence\\fleet5-b-contract-rev7-20261106-codex\\canonical-sync-check-conflicts.json"
+      ],
+      "expectedExit": 0,
+      "actualExit": 0,
+      "seconds": 11.506,
+      "log": "publication-gates-3.log",
+      "sha256": "74da4902865f3a0aaf2a17fac568952332b4dcc413b3c8744088b9acff778962",
+      "kst": "2026-11-06T14:00:09.039024+09:00"
+    },
+    {
+      "command": [
+        "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+        "-B",
+        "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105\\tools\\check_contract_bindings.py"
+      ],
+      "expectedExit": 0,
+      "actualExit": 0,
+      "seconds": 7.677,
+      "log": "publication-gates-4.log",
+      "sha256": "7d3493f361d1c522254d1dbd2e0a74b4dc3c54ef90bd9bfdec3a57666d7798ed",
+      "kst": "2026-11-06T14:00:16.742102+09:00"
+    },
+    {
+      "command": [
+        "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+        "-B",
+        "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105\\tools\\check_frontend_integrity.py"
+      ],
+      "expectedExit": 0,
+      "actualExit": 0,
+      "seconds": 0.655,
+      "log": "publication-gates-5.log",
+      "sha256": "2a2f0348a4bdc71911a5eac47ef7fd7a1ca4573e71cce914cb6d6dd198392949",
+      "kst": "2026-11-06T14:00:17.420384+09:00"
+    },
+    {
+      "command": [
+        "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+        "-B",
+        "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105\\tools\\check_doc_single_source.py",
+        "--ratchet"
+      ],
+      "expectedExit": 0,
+      "actualExit": 0,
+      "seconds": 0.848,
+      "log": "publication-gates-6.log",
+      "sha256": "13b5f5afed05999109839be1baec4ef70ea3c71bcb267353e59eba0f2ae3e448",
+      "kst": "2026-11-06T14:00:18.270535+09:00"
+    },
+    {
+      "command": [
+        "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+        "-B",
+        "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105\\tools\\check_response_freshness.py"
+      ],
+      "expectedExit": 0,
+      "actualExit": 0,
+      "seconds": 0.119,
+      "log": "publication-gates-7.log",
+      "sha256": "ba85e5489b5c960d3fdd09acf663a0c157e70028c6d54044d4820a67c99570fc",
+      "kst": "2026-11-06T14:00:18.391833+09:00"
+    },
+    {
+      "command": [
+        "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+        "-B",
+        "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105\\tools\\check_doc_path_citations.py",
+        "--ratchet",
+        "--base-ref",
+        "ee97c27a5d135a4059256124290731cd2b791193"
+      ],
+      "expectedExit": 0,
+      "actualExit": 0,
+      "seconds": 4.656,
+      "log": "publication-gates-8.log",
+      "sha256": "389921b50662776ed834a285f70fc44ab61f7d5bdb4c5249c0a73c98113980de",
+      "kst": "2026-11-06T14:00:23.049861+09:00"
+    }
+  ],
+  "canonicalSyncStateBeforeSHA256": "2442c54fbc3bf9582a55073aed82082019c6543bf9f46dd62300a72a7330cc53",
+  "canonicalSyncStateAfterSHA256": "2442c54fbc3bf9582a55073aed82082019c6543bf9f46dd62300a72a7330cc53",
+  "obsidianApply": false,
+  "actualRuntimeB": 0
+}

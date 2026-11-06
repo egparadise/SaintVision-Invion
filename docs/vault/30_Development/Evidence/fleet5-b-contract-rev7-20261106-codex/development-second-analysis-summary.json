@@ -1,0 +1,87 @@
+{
+  "memory": {
+    "scope": "this analysis process only",
+    "enforcedRAMLimit": null,
+    "OSChanges": false,
+    "reviewResourceContext": "prior reviewer190-356MiB; stream normalized ledgers and run bounded selected subsets, not a 74MB aggregate parse",
+    "peakWorkingSetBytes": 622448640,
+    "workingSetBytes": 592994304
+  },
+  "ledgers": {
+    "sourceFiles": {
+      "file": "sourceFiles.jsonl",
+      "rows": 523,
+      "bytes": 66624,
+      "sha256": "c64f664c78250d4510db8bca539c94ad76a947ea661ae3f9ce93b936b7c52303"
+    },
+    "records": {
+      "file": "records.jsonl",
+      "rows": 1667,
+      "bytes": 1359468,
+      "sha256": "a6b6f5be763f51e9a23436989751d9fa49c8b20b872e6a9b83e96bd4452ac52a"
+    },
+    "writers": {
+      "file": "writers.jsonl",
+      "rows": 387,
+      "bytes": 597029,
+      "sha256": "ffbe2d1c3710d4df663945beeb6a95dc172aa46150f398f3f8062ec8007855db"
+    },
+    "classifiedCalls": {
+      "file": "classifiedCalls.jsonl",
+      "rows": 47608,
+      "bytes": 55406765,
+      "sha256": "a0bb4f5d8f276e6eb24df35b44fef34875e26906eedbdb8b9f9f7505eb4a928b"
+    },
+    "transactionBoundaries": {
+      "file": "transactionBoundaries.jsonl",
+      "rows": 181,
+      "bytes": 82329,
+      "sha256": "23ae6b04c05c8a62414ba8fb307eef42e77d247444958d5760e9375f05714cb0"
+    },
+    "unknownEdges": {
+      "file": "unknownEdges.jsonl",
+      "rows": 20851,
+      "bytes": 11314405,
+      "sha256": "cf9cb7176f423e05c18d083427817ce8143d74b66dacfd026800dfa0a4ff4764"
+    },
+    "sqlScopeIssues": {
+      "file": "sqlScopeIssues.jsonl",
+      "rows": 277,
+      "bytes": 274881,
+      "sha256": "883ed44ab6535536b7cba89eb3625beb3beabc5285dfe7b82116e0545a9a611b"
+    },
+    "functionPlans": {
+      "file": "functionPlans.jsonl",
+      "rows": 791,
+      "bytes": 4367278,
+      "sha256": "a9cf5417210d5793421b5bcb9279ff477c94f0b83d100fdccdab283f9ec57aa1"
+    },
+    "criticalEntries": {
+      "file": "criticalEntries.jsonl",
+      "rows": 21,
+      "bytes": 94105,
+      "sha256": "bab0c28abe0ec1ecd14aa9c7f80f2a6cccd2fa061616af937bb1493e6e6baf89"
+    },
+    "valueConstructorProofs": {
+      "file": "valueConstructorProofs.jsonl",
+      "rows": 781,
+      "bytes": 182173,
+      "sha256": "8dd4c4335a2fe4bab11fcc16e159d3c407fdf2e99feb49eddec4bc6c86ce3747"
+    }
+  },
+  "classes": {
+    "UNRESOLVED": 20451,
+    "NONAUTHORITY_STDLIB": 2913,
+    "NONAUTHORITY_BUILTIN": 11289,
+    "RESOLVED_SOURCE_TARGET": 8742,
+    "NONAUTHORITY_TYPED_MAPPING": 1013,
+    "EXTERNAL_IO_UNMEDIATED": 400,
+    "RESOLVED_DB_RECORD": 2504,
+    "NONAUTHORITY_VALUE_INITIALIZER": 161,
+    "RESOLVED_TRANSACTION_OWNER": 45,
+    "RESOLVED_DB_CURSOR_FACTORY": 10,
+    "RESOLVED_TRANSACTION_STATUS": 2,
+    "RESOLVED_TYPED_ORM_UOW": 78
+  },
+  "note": "historical diagnostic; current finite dictionary format and corrected recursion regenerate ledgers; no old diagnostic treated as final"
+}

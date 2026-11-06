@@ -1,0 +1,593 @@
+{
+  "memory": {
+    "scope": "this process only",
+    "enforcedOSRAMLimit": null,
+    "OSChanges": false,
+    "peakWorkingSetBytes": 50352128,
+    "workingSetBytes": 35266560
+  },
+  "level": "BOUNDED_SERIAL_SELECTED_GIT_AST_ONLY",
+  "cases": [
+    {
+      "case": "W1-runtime-quarantine-reversed-to-online",
+      "pass_": true,
+      "detail": {
+        "expected": "DENY_ONLY_STATUS_TARGET",
+        "causalErrors": [
+          "DENY_ONLY_STATUS_TARGET:inv.node_transport.NodeDelivery._quarantine_gpu_node"
+        ],
+        "SQLIssues": []
+      }
+    },
+    {
+      "case": "W2-CASE-removed-to-unconditional-online",
+      "pass_": true,
+      "detail": {
+        "expected": "OBSERVATION_CASE_TRANSITION",
+        "causalErrors": [
+          "OBSERVATION_CASE_TRANSITION:inv.observation.NodeObservation.accept"
+        ],
+        "SQLIssues": []
+      }
+    },
+    {
+      "case": "W3-ORM-insert",
+      "pass_": true,
+      "detail": {
+        "expected": "UNMAPPED_WRITER",
+        "causalErrors": [
+          "UNMAPPED_WRITER:saintvision.services.zz_rev7_probe.sneaky"
+        ],
+        "SQLIssues": []
+      }
+    },
+    {
+      "case": "W4-dynamic-fstring-table",
+      "pass_": true,
+      "detail": {
+        "expected": "UNKNOWN_SQL_WRITER_SCOPE",
+        "causalErrors": [
+          "UNKNOWN_SQL_WRITER_SCOPE:inv.zz_rev7_probe.sneaky:2"
+        ],
+        "SQLIssues": [
+          "sql:0c9bc2ed3f5cf10f204f380018e9494e7bd06070ce26f8e8bc91a99e38f95105"
+        ]
+      }
+    },
+    {
+      "case": "W5-unqualified-unknown-effective-searchpath",
+      "pass_": true,
+      "detail": {
+        "expected": "UNKNOWN_SQL_WRITER_SCOPE",
+        "causalErrors": [
+          "UNKNOWN_SQL_WRITER_SCOPE:saintvision.services.zz_rev7_probe.sneaky:3"
+        ],
+        "SQLIssues": [
+          "sql:585c0d0a7abce7c558661cdfd586319da0839db6762aeffe54c0251a53f24b87"
+        ]
+      }
+    },
+    {
+      "case": "W6-model-setattr",
+      "pass_": true,
+      "detail": {
+        "expected": "UNMAPPED_WRITER",
+        "causalErrors": [
+          "UNMAPPED_WRITER:saintvision.services.zz_rev7_probe.sneaky"
+        ],
+        "SQLIssues": []
+      }
+    },
+    {
+      "case": "W7-ORM-attribute-positive-detector",
+      "pass_": true,
+      "detail": {
+        "expected": "UNMAPPED_WRITER",
+        "causalErrors": [
+          "UNMAPPED_WRITER:saintvision.services.zz_rev7_probe.sneaky"
+        ],
+        "SQLIssues": []
+      }
+    },
+    {
+      "case": "W8-new-SQL-writer-positive-detector",
+      "pass_": true,
+      "detail": {
+        "expected": "UNMAPPED_WRITER",
+        "causalErrors": [
+          "UNMAPPED_WRITER:saintvision.services.zz_rev7_probe.sneaky"
+        ],
+        "SQLIssues": []
+      }
+    },
+    {
+      "case": "W9-renamed-current-writer",
+      "pass_": true,
+      "detail": {
+        "expected": "STALE_REQUIRED_RULE",
+        "causalErrors": [
+          "STALE_REQUIRED_RULE:('SQL:services/control-plane/src/inv/migrations/0022_node_containment.sql:<migration>', 'inv.tenant_controls')",
+          "STALE_REQUIRED_RULE:('SQL:services/control-plane/src/inv/migrations/0022_node_containment.sql:inv.seed_containment_control', 'inv.tenant_controls')",
+          "STALE_REQUIRED_RULE:('inv.build_execution.BuildExecutionService._mark_node_quarantined', 'inv.nodes')",
+          "STALE_REQUIRED_RULE:('inv.containment.Containment.change', 'inv.nodes')",
+          "STALE_REQUIRED_RULE:('inv.containment.Containment.change', 'inv.tenant_controls')",
+          "STALE_REQUIRED_RULE:('inv.node_channels.provision_channel', 'inv.node_channels')",
+          "STALE_REQUIRED_RULE:('inv.node_channels.revoke_channel', 'inv.node_channels')",
+          "STALE_REQUIRED_RULE:('inv.node_transport.NodeDelivery._quarantine_gpu_node', 'inv.nodes')",
+          "STALE_REQUIRED_RULE:('inv.observation.NodeObservation.accept', 'inv.nodes')",
+          "STALE_REQUIRED_RULE:('inv.observation.NodeObservation.mark_offline', 'inv.nodes')",
+          "STALE_REQUIRED_RULE:('inv.results.ResultStore.complete', 'inv.evidence')",
+          "STALE_REQUIRED_RULE:('inv.shard_completion.ShardCompletion.once', 'inv.evidence')",
+          "STALE_REQUIRED_RULE:('inv.storage_commit.StorageSampleStore.apply_sample', 'inv.evidence')",
+          "STALE_REQUIRED_RULE:('saintvision.services.nodes.enroll_node', 'public.nodes')",
+          "STALE_REQUIRED_RULE:('saintvision.services.nodes.mark_lost_nodes', 'public.nodes')",
+          "STALE_REQUIRED_RULE:('saintvision.services.nodes.record_heartbeat', 'public.nodes')",
+          "STALE_REQUIRED_RULE:('saintvision.services.storage.activate_contribution', 'public.storage_contributions')",
+          "STALE_REQUIRED_RULE:('saintvision.services.storage.register_contribution', 'public.storage_contributions')",
+          "STALE_REQUIRED_RULE:('saintvision.services.storage.revoke_contribution', 'public.storage_contributions')",
+          "STALE_REQUIRED_RULE:('tools.check_migration_upgrade.main', 'inv.control_epoch')",
+          "STALE_REQUIRED_RULE:('tools.check_migration_upgrade.main', 'inv.nodes')",
+          "STALE_REQUIRED_RULE:('tools.lan_execution.execute', 'inv.tenant_controls')",
+          "STALE_REQUIRED_RULE:('tools.lan_pilot.init', 'inv.control_epoch')",
+          "STALE_REQUIRED_RULE:('tools.lan_pilot.provision_observation_node', 'inv.nodes')",
+          "STALE_REQUIRED_RULE:('tools.lan_pilot.provision_observation_node', 'inv.tenant_controls')",
+          "STALE_REQUIRED_RULE:('tools.remote_workspace_entry.initialize', 'inv.control_epoch')",
+          "STALE_REQUIRED_RULE:('tools.remote_workspace_entry.initialize', 'inv.nodes')",
+          "STALE_REQUIRED_RULE:('tools.run_s04_fe_matrix.run_acceptance', 'inv.nodes')"
+        ],
+        "SQLIssues": []
+      }
+    },
+    {
+      "case": "W10-removed-current-safety-writer",
+      "pass_": true,
+      "detail": {
+        "expected": "STALE_REQUIRED_RULE",
+        "causalErrors": [
+          "STALE_REQUIRED_RULE:('SQL:services/control-plane/src/inv/migrations/0022_node_containment.sql:<migration>', 'inv.tenant_controls')",
+          "STALE_REQUIRED_RULE:('SQL:services/control-plane/src/inv/migrations/0022_node_containment.sql:inv.seed_containment_control', 'inv.tenant_controls')",
+          "STALE_REQUIRED_RULE:('inv.build_execution.BuildExecutionService._commit_consequences', 'inv.evidence')",
+          "STALE_REQUIRED_RULE:('inv.build_execution.BuildExecutionService._mark_node_quarantined', 'inv.nodes')",
+          "STALE_REQUIRED_RULE:('inv.containment.Containment.change', 'inv.nodes')",
+          "STALE_REQUIRED_RULE:('inv.containment.Containment.change', 'inv.tenant_controls')",
+          "STALE_REQUIRED_RULE:('inv.node_channels.provision_channel', 'inv.node_channels')",
+          "STALE_REQUIRED_RULE:('inv.node_channels.revoke_channel', 'inv.node_channels')",
+          "STALE_REQUIRED_RULE:('inv.node_transport.NodeDelivery._quarantine_gpu_node', 'inv.nodes')",
+          "STALE_REQUIRED_RULE:('inv.observation.NodeObservation.accept', 'inv.nodes')",
+          "STALE_REQUIRED_RULE:('inv.observation.NodeObservation.mark_offline', 'inv.nodes')",
+          "STALE_REQUIRED_RULE:('inv.results.ResultStore.complete', 'inv.evidence')",
+          "STALE_REQUIRED_RULE:('inv.shard_completion.ShardCompletion.once', 'inv.evidence')",
+          "STALE_REQUIRED_RULE:('inv.storage_commit.StorageSampleStore.apply_sample', 'inv.evidence')",
+          "STALE_REQUIRED_RULE:('saintvision.services.nodes.enroll_node', 'public.nodes')",
+          "STALE_REQUIRED_RULE:('saintvision.services.nodes.mark_lost_nodes', 'public.nodes')",
+          "STALE_REQUIRED_RULE:('saintvision.services.nodes.record_heartbeat', 'public.nodes')",
+          "STALE_REQUIRED_RULE:('saintvision.services.storage.activate_contribution', 'public.storage_contributions')",
+          "STALE_REQUIRED_RULE:('saintvision.services.storage.register_contribution', 'public.storage_contributions')",
+          "STALE_REQUIRED_RULE:('saintvision.services.storage.revoke_contribution', 'public.storage_contributions')",
+          "STALE_REQUIRED_RULE:('tools.check_migration_upgrade.main', 'inv.control_epoch')",
+          "STALE_REQUIRED_RULE:('tools.check_migration_upgrade.main', 'inv.nodes')",
+          "STALE_REQUIRED_RULE:('tools.lan_execution.execute', 'inv.tenant_controls')",
+          "STALE_REQUIRED_RULE:('tools.lan_pilot.init', 'inv.control_epoch')",
+          "STALE_REQUIRED_RULE:('tools.lan_pilot.provision_observation_node', 'inv.nodes')",
+          "STALE_REQUIRED_RULE:('tools.lan_pilot.provision_observation_node', 'inv.tenant_controls')",
+          "STALE_REQUIRED_RULE:('tools.remote_workspace_entry.initialize', 'inv.control_epoch')",
+          "STALE_REQUIRED_RULE:('tools.remote_workspace_entry.initialize', 'inv.nodes')",
+          "STALE_REQUIRED_RULE:('tools.run_s04_fe_matrix.run_acceptance', 'inv.nodes')"
+        ],
+        "SQLIssues": []
+      }
+    },
+    {
+      "case": "W11-owner-impersonation-new-column",
+      "pass_": true,
+      "detail": {
+        "expected": "WRITER_COLUMN_UNCOVERED",
+        "causalErrors": [
+          "WRITER_COLUMN_UNCOVERED:saintvision.services.storage.activate_contribution"
+        ],
+        "SQLIssues": []
+      }
+    },
+    {
+      "case": "W12-ORM-pg-insert-alias",
+      "pass_": true,
+      "detail": {
+        "expected": "UNMAPPED_WRITER",
+        "causalErrors": [
+          "UNMAPPED_WRITER:saintvision.services.zz_rev7_probe.sneaky"
+        ],
+        "SQLIssues": []
+      }
+    },
+    {
+      "case": "W13-Table-update-alias",
+      "pass_": true,
+      "detail": {
+        "expected": "UNMAPPED_WRITER",
+        "causalErrors": [
+          "UNMAPPED_WRITER:saintvision.services.zz_rev7_probe.sneaky"
+        ],
+        "SQLIssues": [
+          "sql:fc48893849e3014613956f362e58ff13e7585a3dd9000cd76b3d5c5727b3bcec"
+        ]
+      }
+    },
+    {
+      "case": "W14-explicit-effective-public-searchpath",
+      "pass_": true,
+      "detail": {
+        "expected": "UNMAPPED_WRITER",
+        "causalErrors": [
+          "UNMAPPED_WRITER:saintvision.services.zz_rev7_probe.sneaky"
+        ],
+        "SQLIssues": []
+      }
+    },
+    {
+      "case": "W15-dynamic-format-identifier",
+      "pass_": true,
+      "detail": {
+        "expected": "UNKNOWN_SQL_WRITER_SCOPE",
+        "causalErrors": [
+          "UNKNOWN_SQL_WRITER_SCOPE:inv.zz_rev7_probe.sneaky:2"
+        ],
+        "SQLIssues": [
+          "sql:1d8c9ced2a7c793b456f1fc2edb42add8145699b3c4e750827f780e5bfdbda8f"
+        ]
+      }
+    },
+    {
+      "case": "W16-from-state-WHERE-guard-removed",
+      "pass_": true,
+      "detail": {
+        "expected": "OBSERVATION_FROM_GUARD",
+        "causalErrors": [
+          "OBSERVATION_FROM_GUARD:inv.observation.NodeObservation.mark_offline"
+        ],
+        "SQLIssues": []
+      }
+    },
+    {
+      "case": "W17-percent-identifier",
+      "pass_": true,
+      "detail": {
+        "localClasses": [
+          [
+            "conn.execute",
+            "RESOLVED_DB_RECORD"
+          ]
+        ]
+      }
+    },
+    {
+      "case": "W18-concat-identifier",
+      "pass_": true,
+      "detail": {
+        "localClasses": [
+          [
+            "conn.execute",
+            "RESOLVED_DB_RECORD"
+          ]
+        ]
+      }
+    },
+    {
+      "case": "W19-format-identifier",
+      "pass_": true,
+      "detail": {
+        "localClasses": [
+          [
+            "conn.execute",
+            "RESOLVED_DB_RECORD"
+          ],
+          [
+            "\"UPDATE inv.{} SET status='online'\".format",
+            "UNRESOLVED"
+          ]
+        ]
+      }
+    },
+    {
+      "case": "W19b-join-identifier",
+      "pass_": true,
+      "detail": {
+        "localClasses": [
+          [
+            "conn.execute",
+            "RESOLVED_DB_RECORD"
+          ],
+          [
+            "''.join",
+            "UNRESOLVED"
+          ]
+        ]
+      }
+    },
+    {
+      "case": "W20-query-update",
+      "pass_": true,
+      "detail": {
+        "localClasses": [
+          [
+            "session.query(Node).filter(Node.node_id == n).update",
+            "RESOLVED_SOURCE_WRITER"
+          ],
+          [
+            "session.query(Node).filter",
+            "UNRESOLVED"
+          ],
+          [
+            "session.query",
+            "RESOLVED_DB_RECORD"
+          ]
+        ]
+      }
+    },
+    {
+      "case": "W20b-query-delete",
+      "pass_": true,
+      "detail": {
+        "localClasses": [
+          [
+            "session.query(Node).filter(Node.node_id == n).delete",
+            "RESOLVED_DB_RECORD"
+          ],
+          [
+            "session.query(Node).filter",
+            "UNRESOLVED"
+          ],
+          [
+            "session.query",
+            "RESOLVED_DB_RECORD"
+          ]
+        ]
+      }
+    },
+    {
+      "case": "W21-bulk-update",
+      "pass_": true,
+      "detail": {
+        "localClasses": [
+          [
+            "session.bulk_update_mappings",
+            "RESOLVED_DB_RECORD"
+          ]
+        ]
+      }
+    },
+    {
+      "case": "W21b-bulk-insert",
+      "pass_": true,
+      "detail": {
+        "localClasses": [
+          [
+            "session.bulk_insert_mappings",
+            "RESOLVED_DB_RECORD"
+          ]
+        ]
+      }
+    },
+    {
+      "case": "W22-mixed-session-and-xact",
+      "pass_": true,
+      "detail": {
+        "localClasses": [
+          [
+            "conn.execute",
+            "RESOLVED_DB_RECORD"
+          ]
+        ]
+      }
+    },
+    {
+      "case": "closed-literal-set-positive",
+      "pass_": true,
+      "detail": {
+        "localClasses": [
+          [
+            "conn.execute",
+            "RESOLVED_DB_RECORD"
+          ]
+        ]
+      }
+    },
+    {
+      "case": "tuple-RunStore-equivalent",
+      "pass_": true,
+      "detail": {
+        "localClasses": [
+          [
+            "BoundDatabase",
+            "RESOLVED_SOURCE_TARGET"
+          ],
+          [
+            "RunStore",
+            "RESOLVED_SOURCE_TARGET"
+          ],
+          [
+            "runs.transition",
+            "RESOLVED_SOURCE_TARGET"
+          ]
+        ]
+      }
+    },
+    {
+      "case": "starred-RunStore-equivalent",
+      "pass_": true,
+      "detail": {
+        "localClasses": [
+          [
+            "RunStore",
+            "RESOLVED_SOURCE_TARGET"
+          ],
+          [
+            "runs.transition",
+            "RESOLVED_SOURCE_TARGET"
+          ]
+        ]
+      }
+    },
+    {
+      "case": "chained-RunStore-equivalent",
+      "pass_": true,
+      "detail": {
+        "localClasses": [
+          [
+            "RunStore",
+            "RESOLVED_SOURCE_TARGET"
+          ],
+          [
+            "runs.transition",
+            "RESOLVED_SOURCE_TARGET"
+          ]
+        ]
+      }
+    },
+    {
+      "case": "dict-authority-dispatch-BLOCK",
+      "pass_": true,
+      "detail": {
+        "localClasses": [
+          [
+            "{'a': leases.lock_run}[k]",
+            "UNRESOLVED"
+          ]
+        ]
+      }
+    },
+    {
+      "case": "untyped-injected-admit-BLOCK",
+      "pass_": true,
+      "detail": {
+        "localClasses": [
+          [
+            "store._admit_locked",
+            "UNRESOLVED"
+          ]
+        ]
+      }
+    },
+    {
+      "case": "builtin-shadow-is-not-waived",
+      "pass_": true,
+      "detail": {
+        "localClasses": [
+          [
+            "len",
+            "UNRESOLVED"
+          ],
+          [
+            "x.db.execute",
+            "RESOLVED_DB_RECORD"
+          ]
+        ]
+      }
+    },
+    {
+      "case": "inner-factory-not-hidden-by-outer-DB-record",
+      "pass_": true,
+      "detail": {
+        "localClasses": [
+          [
+            "mystery().execute",
+            "RESOLVED_DB_RECORD"
+          ],
+          [
+            "mystery",
+            "UNRESOLVED"
+          ]
+        ]
+      }
+    },
+    {
+      "case": "dynamic-eval-not-NONAUTHORITY",
+      "pass_": true,
+      "detail": {
+        "localClasses": [
+          [
+            "eval",
+            "UNRESOLVED"
+          ]
+        ]
+      }
+    },
+    {
+      "case": "typed-Session-status-positive",
+      "pass_": true,
+      "detail": {
+        "localClasses": [
+          [
+            "session.in_transaction",
+            "RESOLVED_TRANSACTION_STATUS"
+          ]
+        ]
+      }
+    },
+    {
+      "case": "retained-Timer-cancel-positive",
+      "pass_": true,
+      "detail": {
+        "localClasses": [
+          [
+            "Timer",
+            "NONAUTHORITY_STDLIB"
+          ],
+          [
+            "timer.cancel",
+            "NONAUTHORITY_STDLIB"
+          ]
+        ]
+      }
+    },
+    {
+      "case": "retained-literal-module-getattr-positive",
+      "pass_": true,
+      "detail": {
+        "localClasses": [
+          [
+            "getattr(leases, 'lock_run')",
+            "RESOLVED_SOURCE_TARGET"
+          ],
+          [
+            "getattr",
+            "RESOLVED_ATTRIBUTE_FACTORY"
+          ]
+        ]
+      }
+    },
+    {
+      "case": "actual-dataclass-module-alias-positive",
+      "pass_": true,
+      "detail": {
+        "localClasses": [
+          [
+            "ns.ObservationInput",
+            "NONAUTHORITY_VALUE_INITIALIZER"
+          ]
+        ]
+      }
+    },
+    {
+      "case": "real-value-post-init-authority-not-skipped",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "case": "causal-default-unknown-no-false-supported",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "case": "no-global-denial-from-unknown",
+      "pass_": true,
+      "detail": null
+    }
+  ],
+  "passed": 41,
+  "failed": 0,
+  "maxCaseFiles": 12,
+  "maxCaseSourceBytes": 2097152,
+  "enforcedOSRAMLimit": null,
+  "actualRuntimeB": 0,
+  "notClaimed": "No full1905 independent reproduction; these are author delta checks; whole independent Rev7 review pending"
+}

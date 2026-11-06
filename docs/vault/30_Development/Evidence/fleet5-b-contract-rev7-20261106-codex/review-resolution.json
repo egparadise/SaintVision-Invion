@@ -1,0 +1,28 @@
+{
+  "status": "OWNER_PROPOSED_REV7_DELTA_INDEPENDENT_WHOLE_REVIEW_PENDING",
+  "actualPriorReview": "ecbdaa3beca33e4cb4efc943f6bd9c4b02620291",
+  "rootDecision": "msg_8b52dd815cae",
+  "findings": {
+    "B6-M1": "Closed per-handler effect classes, overlap-scoped PENDING, current parent/read rights, ordinary read abandonment, fresh exact safety verifier, scoped capability death/process loss, relevant security versions. Actual receipts handler mutates and remains SIDE_EFFECT.",
+    "B6-M2": "All old47608/29573/107 accounted, UNRESOLVED default and positive provenance; actual tuple/owner/value/status counterexamples tested. Remaining critical and named API source/type/IO ports explicitly UNSUPPORTED: no whole B readiness or code grant requested from counts.",
+    "B6-L1": "Nonconstant SQL compositions, ORM query/bulk, per-occurrence advisory, all21 RULE key Python/SQL/default semantic contracts and actual source mutation tests.",
+    "B6-L2": "One strongest-mode merged plan per39 actual joins, old12 hazards static RED/new merged GREEN; actual2-sessionPG NOT_RUN.",
+    "B6-L3": "19 exact qualified source caller boundaries, separate correct transport method/rawpath/actual handler anchors; no definition-as-registration claim.",
+    "B6-L4": "Plain owner+not-revoked only across normative plans/procedures/prose; B-only root proof separate, semantic drift negative.",
+    "B6-I1": "Intentional rank ties sorted by qualified table/canonical typed full key, one strongest mode per row; identical comparator all participants.",
+    "B6-I2": "Full source graph plan census is separate from39 actual procedure joins; never all632 joined."
+  },
+  "priorClosedDesignOnly": [
+    "B5-L3 service private publication fence",
+    "B5-L4 unsigned CP tombstone + exact invalidation outbox",
+    "B5-L5 authority/model plain activation and B-only root proof"
+  ],
+  "retained": "46 surfaces/R4/C2/C-P-R/leaf/shared storage+execution channel/rights/renew/readmit/readback/VM/clock; all prior actual review bytes referenced; no 1905 full independent reproduction claim",
+  "nextOwner": "Root arranges ONE actual Claude whole Rev7 delta review, then concrete accepted contract/named-port decision. Codex only implements a later explicit bounded grant.",
+  "actualRuntimeB": 0,
+  "realBindings": null,
+  "A1_A16": "PENDING",
+  "partialFreeze": false,
+  "codeGrant": false,
+  "obsidianApply": false
+}

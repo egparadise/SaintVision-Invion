@@ -1,0 +1,22 @@
+{
+  "phase": "publication-gates",
+  "commands": [
+    {
+      "command": [
+        "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+        "-B",
+        "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105\\tools\\check_docs.py"
+      ],
+      "expectedExit": 0,
+      "actualExit": 1,
+      "seconds": 24.569,
+      "log": "publication-gates-1.log",
+      "sha256": "948368385854379edc54341d22c8695286c6fd18a26a155b826cf2d210847f52",
+      "kst": "2026-11-06T13:39:18.210110+09:00"
+    }
+  ],
+  "canonicalSyncStateBeforeSHA256": "d0b82b21910faf1f4c6e08896173138f790a5ae8aad37d5898468715b26cf66a",
+  "canonicalSyncStateAfterSHA256": "d0b82b21910faf1f4c6e08896173138f790a5ae8aad37d5898468715b26cf66a",
+  "obsidianApply": false,
+  "actualRuntimeB": 0
+}

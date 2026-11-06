@@ -1,0 +1,981 @@
+{
+  "source": "72028cbac903c4415d9979f980a6e0f9948e914f",
+  "coveredRuleKeys": [
+    [
+      "SQL:services/control-plane/src/inv/migrations/0022_node_containment.sql:inv.seed_containment_control",
+      "inv.tenant_controls"
+    ],
+    [
+      "inv.build_execution.BuildExecutionService._commit_consequences",
+      "inv.evidence"
+    ],
+    [
+      "inv.build_execution.BuildExecutionService._mark_node_quarantined",
+      "inv.nodes"
+    ],
+    [
+      "inv.containment.Containment.change",
+      "inv.nodes"
+    ],
+    [
+      "inv.containment.Containment.change",
+      "inv.tenant_controls"
+    ],
+    [
+      "inv.node_channels.provision_channel",
+      "inv.node_channels"
+    ],
+    [
+      "inv.node_channels.revoke_channel",
+      "inv.node_channels"
+    ],
+    [
+      "inv.node_transport.NodeDelivery._quarantine_gpu_node",
+      "inv.nodes"
+    ],
+    [
+      "inv.observation.NodeObservation.accept",
+      "inv.nodes"
+    ],
+    [
+      "inv.observation.NodeObservation.mark_offline",
+      "inv.nodes"
+    ],
+    [
+      "inv.results.ResultStore.complete",
+      "inv.evidence"
+    ],
+    [
+      "inv.runs.RunStore.complete",
+      "inv.evidence"
+    ],
+    [
+      "inv.shard_completion.ShardCompletion.once",
+      "inv.evidence"
+    ],
+    [
+      "inv.storage_commit.StorageSampleStore.apply_sample",
+      "inv.evidence"
+    ],
+    [
+      "saintvision.services.nodes.enroll_node",
+      "public.nodes"
+    ],
+    [
+      "saintvision.services.nodes.mark_lost_nodes",
+      "public.nodes"
+    ],
+    [
+      "saintvision.services.nodes.record_heartbeat",
+      "public.nodes"
+    ],
+    [
+      "saintvision.services.storage.activate_contribution",
+      "public.storage_contributions"
+    ],
+    [
+      "saintvision.services.storage.register_contribution",
+      "public.storage_contributions"
+    ],
+    [
+      "saintvision.services.storage.revoke_contribution",
+      "public.storage_contributions"
+    ],
+    [
+      "tools.lan_execution.execute",
+      "inv.tenant_controls"
+    ]
+  ],
+  "functions": {
+    "inv.build_execution.BuildExecutionService._mark_node_quarantined": {
+      "guards": [
+        "not node or _uuid_key(node['recovery_epoch']) != _uuid_key(recovery_epoch)"
+      ],
+      "assignments": [
+        {
+          "targets": [
+            "node"
+          ],
+          "value": "conn.execute('SELECT status,recovery_epoch FROM inv.nodes WHERE node_id=%s FOR UPDATE', (leased_node_id,)).fetchone()"
+        }
+      ],
+      "writeExpressions": [
+        "conn.execute('SELECT status,recovery_epoch FROM inv.nodes WHERE node_id=%s FOR UPDATE', (leased_node_id,))",
+        "conn.execute(\"UPDATE inv.nodes SET status='quarantined' WHERE node_id=%s\", (leased_node_id,))",
+        "conn.execute('INSERT INTO inv.outbox(tenant_id,run_id,event_id,event_type,payload)\\n                VALUES (%s,%s,%s,%s,%s)', (tenant_id, run_id, uuid4(), QUARANTINED_EVENT, Jsonb({'projectId': project_id, 'nodeId': leased_node_id, 'reasonCode': reason_code, 'buildSessionId': identity['build_session_id'], 'leaseId': identity['lease_id'], 'resourceId': identity['resource_id'], 'decisionId': identity['decision_id'], 'bindingDigest': identity['binding_digest']})))"
+      ],
+      "kind": "STRUCTURED_BRANCH_BINDING_CONTRACT",
+      "path": "services/control-plane/src/inv/build_execution.py"
+    },
+    "inv.build_execution.BuildExecutionService._commit_consequences": {
+      "guards": [
+        "intent_claim_fencing_token is not None",
+        "isinstance(intent_claim_fencing_token, bool) or not isinstance(intent_claim_fencing_token, int) or intent_claim_fencing_token < 1",
+        "not claim or claim['status'] != 'claimed' or claim['attempt_count'] != intent_claim_fencing_token",
+        "not lease or str(lease['tenant_id']) != tenant_id or lease['project_id'] != project_id or (str(lease['resource_id']) != resource_id) or (lease['released_at'] is not None) or (_uuid_key(lease['recovery_epoch']) != _uuid_key(self.db.recovery_epoch))",
+        "not released"
+      ],
+      "assignments": [
+        {
+          "targets": [
+            "claim"
+          ],
+          "value": "conn.execute('SELECT status,attempt_count\\n                    FROM inv.build_execution_intents\\n                    WHERE tenant_id=%s AND project_id=%s AND run_id=%s\\n                    FOR UPDATE', (tenant_id, project_id, run_id)).fetchone()"
+        },
+        {
+          "targets": [
+            "lease"
+          ],
+          "value": "conn.execute('SELECT tenant_id,project_id,resource_id,recovery_epoch,released_at\\n                FROM inv.resource_leases\\n                WHERE lease_id=%s AND run_id=%s FOR UPDATE', (lease_id, run_id)).fetchone()"
+        },
+        {
+          "targets": [
+            "verified"
+          ],
+          "value": "self._cleanup_authority(cleanup_receipt, build_session_id=build_session_id, leased_node_id=leased_node_id, resource_id=resource_id, lease_id=lease_id, lease_epoch=str(lease['recovery_epoch']), daemon_before=daemon_before)"
+        },
+        {
+          "targets": [
+            "released"
+          ],
+          "value": "conn.execute('UPDATE inv.resource_leases\\n                SET released_at=clock_timestamp()\\n                WHERE lease_id=%s AND run_id=%s AND released_at IS NULL\\n                RETURNING lease_id', (lease_id, run_id)).fetchone()"
+        },
+        {
+          "targets": [
+            "persisted_cleanup"
+          ],
+          "value": "{**deepcopy(dict(caller_cleanup)), 'physicalReceipt': deepcopy(verified), 'physicalReceiptDigest': canonical_digest(verified), 'leaseReleased': True}"
+        },
+        {
+          "targets": [
+            "envelope"
+          ],
+          "value": "{**deepcopy(dict(evidence)), 'cleanupReceipt': persisted_cleanup}"
+        },
+        {
+          "targets": [
+            "evidence_digest"
+          ],
+          "value": "canonical_digest(envelope)"
+        },
+        {
+          "targets": [
+            "payload"
+          ],
+          "value": "{'decisionId': decision_id, 'bindingDigest': binding_digest, 'resourceId': resource_id, 'leaseId': lease_id, 'evidenceId': evidence_id, 'evidenceDigest': evidence_digest}"
+        }
+      ],
+      "writeExpressions": [
+        "conn.execute('SELECT status,attempt_count\\n                    FROM inv.build_execution_intents\\n                    WHERE tenant_id=%s AND project_id=%s AND run_id=%s\\n                    FOR UPDATE', (tenant_id, project_id, run_id))",
+        "conn.execute('SELECT tenant_id,project_id,resource_id,recovery_epoch,released_at\\n                FROM inv.resource_leases\\n                WHERE lease_id=%s AND run_id=%s FOR UPDATE', (lease_id, run_id))",
+        "conn.execute('UPDATE inv.resource_leases\\n                SET released_at=clock_timestamp()\\n                WHERE lease_id=%s AND run_id=%s AND released_at IS NULL\\n                RETURNING lease_id', (lease_id, run_id))",
+        "conn.execute('INSERT INTO inv.evidence(tenant_id,run_id,evidence_id,envelope) VALUES (%s,%s,%s,%s)', (tenant_id, run_id, evidence_id, Jsonb(envelope)))",
+        "conn.execute('INSERT INTO inv.outbox(tenant_id,run_id,event_id,event_type,payload)\\n                VALUES (%s,%s,%s,%s,%s)', (tenant_id, run_id, uuid4(), COMPLETED_EVENT, Jsonb(payload)))"
+      ],
+      "kind": "STRUCTURED_BRANCH_BINDING_CONTRACT",
+      "path": "services/control-plane/src/inv/build_execution.py"
+    },
+    "inv.containment.Containment.change": {
+      "guards": [
+        "operation not in {'kill', 'clear', 'drain', 'resume'}",
+        "(node_id is None) != (operation in {'kill', 'clear'})",
+        "node_id is not None",
+        "not isinstance(key, str) or not 1 <= len(key) <= 200",
+        "node_id is not None",
+        "not node",
+        "str(node['recovery_epoch']) != self.db.recovery_epoch",
+        "prior['request_hash'] != request_hash",
+        "prior['response'] is not None",
+        "current['version'] != data['expectedVersion']",
+        "operation == 'kill'",
+        "operation == 'clear'",
+        "not current['settled']",
+        "operation == 'drain'",
+        "node['status'] == 'quarantined'",
+        "node['status'] not in {'draining', 'quarantined'} or not current['settled']",
+        "not ready"
+      ],
+      "assignments": [
+        {
+          "targets": [
+            "request_hash"
+          ],
+          "value": "digest({'operation': operation, 'node': node_id, 'actor': principal.subject_id, **data})"
+        },
+        {
+          "targets": [
+            "node"
+          ],
+          "value": "conn.execute('SELECT * FROM inv.nodes WHERE node_id=%s FOR UPDATE', (node_id,)).fetchone()"
+        },
+        {
+          "targets": [
+            "prior"
+          ],
+          "value": "conn.execute('SELECT * FROM inv.containment_requests WHERE operation=%s AND key=%s FOR UPDATE', (operation, key)).fetchone()"
+        },
+        {
+          "targets": [
+            "current"
+          ],
+          "value": "self._view(conn, node_id)"
+        },
+        {
+          "targets": [
+            "target"
+          ],
+          "value": "'draining'"
+        },
+        {
+          "targets": [
+            "ready"
+          ],
+          "value": "conn.execute(\"SELECT 1 FROM inv.nodes n JOIN inv.node_channels c USING(tenant_id,node_id)\\n                        JOIN inv.node_resource_snapshots s USING(tenant_id,node_id)\\n                        WHERE n.node_id=%s AND n.heartbeat_at BETWEEN clock_timestamp()-interval '15 seconds' AND clock_timestamp()\\n                        AND abs(n.clock_skew_seconds)<=5 AND c.enabled AND c.certificate_not_after>clock_timestamp()\\n                        AND c.recovery_epoch=n.recovery_epoch AND s.recovery_epoch=n.recovery_epoch\\n                        AND s.channel_version=c.version AND s.received_at BETWEEN clock_timestamp()-interval '15 seconds' AND clock_timestamp()\", (node_id,)).fetchone()"
+        },
+        {
+          "targets": [
+            "target"
+          ],
+          "value": "'online'"
+        },
+        {
+          "targets": [
+            "result"
+          ],
+          "value": "{'requestId': str(prior['request_id']), 'approvalId': data['approvalId'], 'operation': operation, 'control': self._view(conn, node_id)}"
+        }
+      ],
+      "writeExpressions": [
+        "conn.execute('SELECT * FROM inv.nodes WHERE node_id=%s FOR UPDATE', (node_id,))",
+        "conn.execute('INSERT INTO inv.containment_requests(tenant_id,operation,key,request_id,subject_id,node_id,reason_code,request_hash)\\n                VALUES(%s,%s,%s,%s,%s,%s,%s,%s) ON CONFLICT DO NOTHING', (principal.tenant_id, operation, key, uuid4(), principal.subject_id, node_id, data['reasonCode'], request_hash))",
+        "conn.execute('SELECT * FROM inv.containment_requests WHERE operation=%s AND key=%s FOR UPDATE', (operation, key))",
+        "conn.execute('UPDATE inv.tenant_controls SET kill_switch=true,version=version+1,updated_at=clock_timestamp()')",
+        "conn.execute('UPDATE inv.tenant_controls SET kill_switch=false,version=version+1,updated_at=clock_timestamp()')",
+        "conn.execute(\"SELECT 1 FROM inv.nodes n JOIN inv.node_channels c USING(tenant_id,node_id)\\n                        JOIN inv.node_resource_snapshots s USING(tenant_id,node_id)\\n                        WHERE n.node_id=%s AND n.heartbeat_at BETWEEN clock_timestamp()-interval '15 seconds' AND clock_timestamp()\\n                        AND abs(n.clock_skew_seconds)<=5 AND c.enabled AND c.certificate_not_after>clock_timestamp()\\n                        AND c.recovery_epoch=n.recovery_epoch AND s.recovery_epoch=n.recovery_epoch\\n                        AND s.channel_version=c.version AND s.received_at BETWEEN clock_timestamp()-interval '15 seconds' AND clock_timestamp()\", (node_id,))",
+        "conn.execute('UPDATE inv.nodes SET status=%s WHERE node_id=%s', (target, node_id))",
+        "conn.execute('UPDATE inv.node_controls SET version=version+1,updated_at=clock_timestamp() WHERE node_id=%s', (node_id,))",
+        "conn.execute('UPDATE inv.containment_requests SET response=%s WHERE operation=%s AND key=%s', (Jsonb(result), operation, key))"
+      ],
+      "kind": "STRUCTURED_BRANCH_BINDING_CONTRACT",
+      "path": "services/control-plane/src/inv/containment.py"
+    },
+    "inv.node_channels.provision_channel": {
+      "guards": [
+        "not current_epoch or str(current_epoch[0]) != epoch",
+        "not row or str(row[0]) != epoch",
+        "type(expected_version) is not int or expected_version != (previous[0] if previous else 0)"
+      ],
+      "assignments": [
+        {
+          "targets": [
+            "epoch"
+          ],
+          "value": "str(UUID(epoch))"
+        },
+        {
+          "targets": [
+            "(fingerprint, not_after)"
+          ],
+          "value": "certificate_identity(certificate_der, node, epoch)"
+        },
+        {
+          "targets": [
+            "current_epoch"
+          ],
+          "value": "cursor.execute('SELECT epoch FROM inv.control_epoch WHERE singleton FOR SHARE').fetchone()"
+        },
+        {
+          "targets": [
+            "row"
+          ],
+          "value": "cursor.execute('SELECT recovery_epoch FROM inv.nodes WHERE tenant_id=%s AND node_id=%s FOR UPDATE', (node.tenant_id, node.node_id)).fetchone()"
+        },
+        {
+          "targets": [
+            "previous"
+          ],
+          "value": "cursor.execute('SELECT version FROM inv.node_channels WHERE tenant_id=%s AND node_id=%s FOR UPDATE', (node.tenant_id, node.node_id)).fetchone()"
+        },
+        {
+          "targets": [
+            "version"
+          ],
+          "value": "expected_version + 1"
+        }
+      ],
+      "writeExpressions": [
+        "cursor.execute('SELECT epoch FROM inv.control_epoch WHERE singleton FOR SHARE')",
+        "cursor.execute('SELECT recovery_epoch FROM inv.nodes WHERE tenant_id=%s AND node_id=%s FOR UPDATE', (node.tenant_id, node.node_id))",
+        "cursor.execute('SELECT version FROM inv.node_channels WHERE tenant_id=%s AND node_id=%s FOR UPDATE', (node.tenant_id, node.node_id))",
+        "cursor.execute('INSERT INTO inv.node_channels(tenant_id,node_id,recovery_epoch,version,endpoint,certificate_sha256,certificate_not_after,enabled)\\n            VALUES(%s,%s,%s,%s,%s,%s,%s,true) ON CONFLICT(tenant_id,node_id) DO UPDATE SET\\n            recovery_epoch=excluded.recovery_epoch,version=excluded.version,endpoint=excluded.endpoint,\\n            certificate_sha256=excluded.certificate_sha256,certificate_not_after=excluded.certificate_not_after,enabled=true', (node.tenant_id, node.node_id, epoch, version, endpoint, fingerprint, not_after))",
+        "cursor.execute(\"INSERT INTO inv.node_channel_audit(tenant_id,node_id,version,action,certificate_sha256) VALUES(%s,%s,%s,'provision',%s)\", (node.tenant_id, node.node_id, version, fingerprint))"
+      ],
+      "kind": "STRUCTURED_BRANCH_BINDING_CONTRACT",
+      "path": "services/control-plane/src/inv/node_channels.py"
+    },
+    "inv.node_channels.revoke_channel": {
+      "guards": [
+        "not row or type(expected_version) is not int or row[0] != expected_version"
+      ],
+      "assignments": [
+        {
+          "targets": [
+            "row"
+          ],
+          "value": "cursor.execute('SELECT version,certificate_sha256 FROM inv.node_channels WHERE tenant_id=%s AND node_id=%s FOR UPDATE', (node.tenant_id, node.node_id)).fetchone()"
+        },
+        {
+          "targets": [
+            "version"
+          ],
+          "value": "expected_version + 1"
+        }
+      ],
+      "writeExpressions": [
+        "cursor.execute('SELECT node_id FROM inv.nodes WHERE tenant_id=%s AND node_id=%s FOR UPDATE', (node.tenant_id, node.node_id))",
+        "cursor.execute('SELECT version,certificate_sha256 FROM inv.node_channels WHERE tenant_id=%s AND node_id=%s FOR UPDATE', (node.tenant_id, node.node_id))",
+        "cursor.execute('UPDATE inv.node_channels SET enabled=false,version=%s WHERE tenant_id=%s AND node_id=%s', (version, node.tenant_id, node.node_id))",
+        "cursor.execute(\"INSERT INTO inv.node_channel_audit(tenant_id,node_id,version,action,certificate_sha256) VALUES(%s,%s,%s,'revoke',%s)\", (node.tenant_id, node.node_id, version, row[1]))"
+      ],
+      "kind": "STRUCTURED_BRANCH_BINDING_CONTRACT",
+      "path": "services/control-plane/src/inv/node_channels.py"
+    },
+    "inv.node_transport.NodeDelivery._quarantine_gpu_node": {
+      "guards": [
+        "not current"
+      ],
+      "assignments": [
+        {
+          "targets": [
+            "reason_code"
+          ],
+          "value": "error.code if isinstance(error, DomainError) else 'SYS-0001'"
+        },
+        {
+          "targets": [
+            "current"
+          ],
+          "value": "conn.execute('SELECT status FROM inv.nodes WHERE node_id=%s FOR UPDATE', (node.node_id,)).fetchone()"
+        }
+      ],
+      "writeExpressions": [
+        "conn.execute('SELECT status FROM inv.nodes WHERE node_id=%s FOR UPDATE', (node.node_id,))",
+        "conn.execute(\"UPDATE inv.nodes SET status='quarantined' WHERE node_id=%s\", (node.node_id,))"
+      ],
+      "kind": "STRUCTURED_BRANCH_BINDING_CONTRACT",
+      "path": "services/control-plane/src/inv/node_transport.py"
+    },
+    "inv.observation.NodeObservation.accept": {
+      "guards": [
+        "snapshot is not None",
+        "any((snapshot[k] != v for k, v in response.items())) or snapshot['cpuBusyMillis'] > snapshot['cpuCapacityMillis'] or snapshot['memoryAvailableBytes'] > snapshot['memoryCapacityBytes']",
+        "any((response[k] != v for k, v in {'tenantId': node.tenant_id, 'nodeId': node.node_id, 'recoveryEpoch': self.db.recovery_epoch, 'nonce': request['nonce']}.items())) or proof.tenant_id != node.tenant_id or proof.node_id != node.node_id",
+        "not current or str(current['recovery_epoch']) != self.db.recovery_epoch",
+        "not pending or pending['consumed_at'] or (not 0 <= (now - pending['issued_at']).total_seconds() <= 10)",
+        "current['probe_started_at'] is not None and current['probe_started_at'] >= pending['issued_at']",
+        "abs((observed - now).total_seconds()) > 5 or abs((observed - pending['issued_at']).total_seconds()) > 5",
+        "snapshot is not None"
+      ],
+      "assignments": [
+        {
+          "targets": [
+            "observed"
+          ],
+          "value": "datetime.fromisoformat(response['observedAt'].replace('Z', '+00:00'))"
+        },
+        {
+          "targets": [
+            "current"
+          ],
+          "value": "conn.execute('SELECT * FROM inv.nodes WHERE node_id=%s FOR UPDATE', (node.node_id,)).fetchone()"
+        },
+        {
+          "targets": [
+            "pending"
+          ],
+          "value": "conn.execute('SELECT * FROM inv.node_probes WHERE nonce=%s AND node_id=%s FOR UPDATE', (request['nonce'], node.node_id)).fetchone()"
+        },
+        {
+          "targets": [
+            "now"
+          ],
+          "value": "conn.execute('SELECT clock_timestamp() AS now').fetchone()['now']"
+        },
+        {
+          "targets": [
+            "row"
+          ],
+          "value": "conn.execute(\"UPDATE inv.nodes SET heartbeat_at=%s,probe_started_at=%s,clock_skew_seconds=%s,status=CASE WHEN status='offline' THEN 'online' ELSE status END WHERE node_id=%s RETURNING status\", (now, pending['issued_at'], (observed - now).total_seconds(), node.node_id)).fetchone()"
+        }
+      ],
+      "writeExpressions": [
+        "conn.execute('SELECT * FROM inv.nodes WHERE node_id=%s FOR UPDATE', (node.node_id,))",
+        "conn.execute('SELECT * FROM inv.node_probes WHERE nonce=%s AND node_id=%s FOR UPDATE', (request['nonce'], node.node_id))",
+        "conn.execute('SELECT clock_timestamp() AS now')",
+        "conn.execute('UPDATE inv.node_probes SET consumed_at=%s WHERE nonce=%s', (now, request['nonce']))",
+        "conn.execute(\"UPDATE inv.nodes SET heartbeat_at=%s,probe_started_at=%s,clock_skew_seconds=%s,status=CASE WHEN status='offline' THEN 'online' ELSE status END WHERE node_id=%s RETURNING status\", (now, pending['issued_at'], (observed - now).total_seconds(), node.node_id))",
+        "conn.execute('INSERT INTO inv.node_resource_snapshots(tenant_id,node_id,recovery_epoch,channel_version,received_at,snapshot)\\n                    VALUES(%s,%s,%s,%s,%s,%s) ON CONFLICT(tenant_id,node_id) DO UPDATE SET\\n                    recovery_epoch=excluded.recovery_epoch,channel_version=excluded.channel_version,received_at=excluded.received_at,snapshot=excluded.snapshot', (node.tenant_id, node.node_id, self.db.recovery_epoch, proof.version, now, Jsonb(snapshot)))"
+      ],
+      "kind": "STRUCTURED_BRANCH_BINDING_CONTRACT",
+      "path": "services/control-plane/src/inv/observation.py"
+    },
+    "inv.observation.NodeObservation.mark_offline": {
+      "guards": [
+        "conn.execute(\"UPDATE inv.nodes SET status='offline' WHERE node_id=%s AND heartbeat_at < clock_timestamp()-interval '60 seconds' AND status='online' RETURNING node_id\", (row['node_id'],)).fetchone()"
+      ],
+      "assignments": [
+        {
+          "targets": [
+            "rows"
+          ],
+          "value": "conn.execute(\"SELECT node_id FROM inv.nodes WHERE status='online' ORDER BY node_id FOR UPDATE\").fetchall()"
+        },
+        {
+          "targets": [
+            "changed"
+          ],
+          "value": "[]"
+        }
+      ],
+      "writeExpressions": [
+        "conn.execute(\"SELECT node_id FROM inv.nodes WHERE status='online' ORDER BY node_id FOR UPDATE\")",
+        "conn.execute(\"UPDATE inv.nodes SET status='offline' WHERE node_id=%s AND heartbeat_at < clock_timestamp()-interval '60 seconds' AND status='online' RETURNING node_id\", (row['node_id'],))"
+      ],
+      "kind": "STRUCTURED_BRANCH_BINDING_CONTRACT",
+      "path": "services/control-plane/src/inv/observation.py"
+    },
+    "inv.results.ResultStore.complete": {
+      "guards": [
+        "str(execution['recovery_epoch']) != self.db.recovery_epoch",
+        "conn.execute('SELECT 1 FROM inv.result_completions WHERE command_id=%s', (command_id,)).fetchone()",
+        "run['state'] not in {'running', 'verifying'} or run['version'] != expected_version",
+        "not result or not stop",
+        "not receipt['processStarted'] or receipt['exitCode'] != 0 or receipt['reason'] != 'exited' or ({a['lease']['leaseId']: a['lease']['fencingToken'] for a in receipt['allocations']} != execution['proofs'])",
+        "conn.execute('SELECT 1 FROM inv.resource_leases WHERE run_id=%s AND released_at IS NULL', (run_id,)).fetchone()",
+        "obj['state'] != 'ready'",
+        "run['state'] == 'running'"
+      ],
+      "assignments": [
+        {
+          "targets": [
+            "command_id"
+          ],
+          "value": "str(UUID(command_id))"
+        },
+        {
+          "targets": [
+            "run"
+          ],
+          "value": "lock_run(conn, run_id, project)"
+        },
+        {
+          "targets": [
+            "execution"
+          ],
+          "value": "self._execution(conn, run, command_id)"
+        },
+        {
+          "targets": [
+            "result"
+          ],
+          "value": "conn.execute('SELECT * FROM inv.result_commitments WHERE command_id=%s', (command_id,)).fetchone()"
+        },
+        {
+          "targets": [
+            "stop"
+          ],
+          "value": "conn.execute('SELECT envelope FROM inv.node_stop_receipts WHERE command_id=%s', (command_id,)).fetchone()"
+        },
+        {
+          "targets": [
+            "receipt"
+          ],
+          "value": "stop['envelope']"
+        },
+        {
+          "targets": [
+            "obj"
+          ],
+          "value": "SnapshotStore._row(conn, project, result['object_id'])"
+        },
+        {
+          "targets": [
+            "data"
+          ],
+          "value": "files.get(obj['locator'], obj['content_hash'], obj['size_bytes'])"
+        },
+        {
+          "targets": [
+            "store"
+          ],
+          "value": "RunStore(self.db)"
+        },
+        {
+          "targets": [
+            "run"
+          ],
+          "value": "lock_run(conn, run_id, project)"
+        },
+        {
+          "targets": [
+            "completed"
+          ],
+          "value": "store._transition(conn, tenant, run, 'succeeded', run['version'], evidence_ready=True)"
+        }
+      ],
+      "writeExpressions": [
+        "conn.execute('SELECT 1 FROM inv.result_completions WHERE command_id=%s', (command_id,))",
+        "conn.execute('SELECT * FROM inv.result_commitments WHERE command_id=%s', (command_id,))",
+        "conn.execute('SELECT envelope FROM inv.node_stop_receipts WHERE command_id=%s', (command_id,))",
+        "conn.execute('SELECT 1 FROM inv.resource_leases WHERE run_id=%s AND released_at IS NULL', (run_id,))",
+        "conn.execute('INSERT INTO inv.evidence(tenant_id,run_id,evidence_id,envelope) VALUES(%s,%s,%s,%s)', (tenant, run_id, result['evidence_id'], Jsonb(result['envelope'])))",
+        "conn.execute('INSERT INTO inv.result_completions(tenant_id,run_id,attempt,command_id,evidence_id) VALUES(%s,%s,%s,%s,%s)', (tenant, run_id, run['attempt'], command_id, result['evidence_id']))"
+      ],
+      "kind": "STRUCTURED_BRANCH_BINDING_CONTRACT",
+      "path": "services/control-plane/src/inv/results.py"
+    },
+    "inv.runs.RunStore.complete": {
+      "guards": [
+        "evidence['tenantId'] != tenant_id or evidence['runId'] != run_id or evidence['result'] != 'succeeded'",
+        "row['version'] != expected_version or row['state'] != 'verifying'"
+      ],
+      "assignments": [
+        {
+          "targets": [
+            "row"
+          ],
+          "value": "lock_run(conn, run_id)"
+        }
+      ],
+      "writeExpressions": [
+        "conn.execute('INSERT INTO inv.evidence(tenant_id,run_id,evidence_id,envelope) VALUES (%s,%s,%s,%s)', (tenant_id, run_id, evidence['evidenceId'], Jsonb(evidence)))"
+      ],
+      "kind": "STRUCTURED_BRANCH_BINDING_CONTRACT",
+      "path": "services/control-plane/src/inv/runs.py"
+    },
+    "inv.shard_completion.ShardCompletion.once": {
+      "guards": [
+        "not plan",
+        "parent['state'] == 'succeeded'",
+        "parent['state'] in {'failed', 'cancelled'} or failed",
+        "run['state'] not in TERMINAL",
+        "parent['state'] not in TERMINAL",
+        "files is None or not all((run['state'] == 'succeeded' for _, run in members))",
+        "len(rows) != len(members) or any((r['state'] != 'ready' for r in rows))",
+        "parent['state'] == 'running'"
+      ],
+      "assignments": [
+        {
+          "targets": [
+            "plan"
+          ],
+          "value": "conn.execute(\"SELECT p.* FROM inv.shard_parents p JOIN inv.runs r ON (p.tenant_id,p.run_id)=(r.tenant_id,r.run_id)\\n                WHERE r.state IN ('running','verifying','cancelled','failed') AND p.recovery_epoch=%s\\n                AND (%s::uuid IS NULL OR EXISTS(SELECT 1 FROM inv.shard_commands s WHERE (s.tenant_id,s.project_id,s.plan_id)=(p.tenant_id,p.project_id,p.plan_id) AND s.command_id=%s))\\n                AND EXISTS(SELECT 1 FROM inv.shard_commands s JOIN inv.runs c ON (s.tenant_id,s.run_id)=(c.tenant_id,c.run_id)\\n                    WHERE (s.tenant_id,s.project_id,s.plan_id)=(p.tenant_id,p.project_id,p.plan_id)\\n                    AND ((r.state IN ('cancelled','failed') AND c.state NOT IN ('succeeded','failed','cancelled'))\\n                        OR (r.state IN ('running','verifying') AND c.state IN ('failed','cancelled'))\\n                        OR (r.state IN ('running','verifying') AND NOT EXISTS(SELECT 1 FROM inv.shard_commands z JOIN inv.runs u ON (z.tenant_id,z.run_id)=(u.tenant_id,u.run_id) WHERE (z.tenant_id,z.project_id,z.plan_id)=(p.tenant_id,p.project_id,p.plan_id) AND u.state<>'succeeded'))))\\n                ORDER BY p.plan_id LIMIT 1\", (self.db.recovery_epoch, command_id, command_id)).fetchone()"
+        },
+        {
+          "targets": [
+            "members"
+          ],
+          "value": "ShardRuntime._lock_members(conn, plan['project_id'], plan['plan_id'])"
+        },
+        {
+          "targets": [
+            "parent"
+          ],
+          "value": "lock_run(conn, plan['run_id'], plan['project_id'])"
+        },
+        {
+          "targets": [
+            "failed"
+          ],
+          "value": "any((run['state'] in {'failed', 'cancelled'} for _, run in members))"
+        },
+        {
+          "targets": [
+            "rows"
+          ],
+          "value": "conn.execute('SELECT s.shard_index,s.run_id,s.command_id,c.evidence_id,p.object_id,\\n                o.provider_id,o.locator,o.content_hash,o.size_bytes,o.state\\n                FROM inv.shard_commands s JOIN inv.runs r ON (s.tenant_id,s.run_id)=(r.tenant_id,r.run_id)\\n                JOIN inv.result_completions c ON (s.tenant_id,s.command_id,r.attempt)=(c.tenant_id,c.command_id,c.attempt)\\n                JOIN inv.result_commitments p ON (c.tenant_id,c.command_id)=(p.tenant_id,p.command_id)\\n                JOIN inv.storage_objects o ON (p.tenant_id,p.project_id,p.object_id)=(o.tenant_id,o.project_id,o.object_id)\\n                WHERE s.project_id=%s AND s.plan_id=%s ORDER BY s.shard_index', (plan['project_id'], plan['plan_id'])).fetchall()"
+        },
+        {
+          "targets": [
+            "manifest"
+          ],
+          "value": "[{'index': r['shard_index'], 'runId': r['run_id'], 'commandId': str(r['command_id']), 'evidenceId': r['evidence_id'], 'objectId': str(r['object_id']), 'sha256': r['content_hash'], 'sizeBytes': r['size_bytes']} for r in rows]"
+        },
+        {
+          "targets": [
+            "source"
+          ],
+          "value": "conn.execute('SELECT request_hash FROM inv.shard_plans WHERE project_id=%s AND plan_id=%s', (plan['project_id'], plan['plan_id'])).fetchone()['request_hash']"
+        },
+        {
+          "targets": [
+            "decision"
+          ],
+          "value": "str(uuid4())"
+        },
+        {
+          "targets": [
+            "envelope"
+          ],
+          "value": "{'evidenceId': new_id('evd'), 'tenantId': tenant, 'runId': parent['run_id'], 'traceId': uuid4().hex, 'timestamp': conn.execute('SELECT clock_timestamp() AS now').fetchone()['now'].isoformat(), 'actorId': 'shard-completion:v1', 'action': 'aggregate-verified-shards', 'policyDecisionId': decision, 'inputSha256': source, 'outputSha256': digest(manifest), 'result': 'succeeded'}"
+        },
+        {
+          "targets": [
+            "store"
+          ],
+          "value": "RunStore(self.db)"
+        },
+        {
+          "targets": [
+            "parent"
+          ],
+          "value": "lock_run(conn, parent['run_id'], plan['project_id'])"
+        }
+      ],
+      "writeExpressions": [
+        "conn.execute(\"SELECT p.* FROM inv.shard_parents p JOIN inv.runs r ON (p.tenant_id,p.run_id)=(r.tenant_id,r.run_id)\\n                WHERE r.state IN ('running','verifying','cancelled','failed') AND p.recovery_epoch=%s\\n                AND (%s::uuid IS NULL OR EXISTS(SELECT 1 FROM inv.shard_commands s WHERE (s.tenant_id,s.project_id,s.plan_id)=(p.tenant_id,p.project_id,p.plan_id) AND s.command_id=%s))\\n                AND EXISTS(SELECT 1 FROM inv.shard_commands s JOIN inv.runs c ON (s.tenant_id,s.run_id)=(c.tenant_id,c.run_id)\\n                    WHERE (s.tenant_id,s.project_id,s.plan_id)=(p.tenant_id,p.project_id,p.plan_id)\\n                    AND ((r.state IN ('cancelled','failed') AND c.state NOT IN ('succeeded','failed','cancelled'))\\n                        OR (r.state IN ('running','verifying') AND c.state IN ('failed','cancelled'))\\n                        OR (r.state IN ('running','verifying') AND NOT EXISTS(SELECT 1 FROM inv.shard_commands z JOIN inv.runs u ON (z.tenant_id,z.run_id)=(u.tenant_id,u.run_id) WHERE (z.tenant_id,z.project_id,z.plan_id)=(p.tenant_id,p.project_id,p.plan_id) AND u.state<>'succeeded'))))\\n                ORDER BY p.plan_id LIMIT 1\", (self.db.recovery_epoch, command_id, command_id))",
+        "conn.execute('SELECT s.shard_index,s.run_id,s.command_id,c.evidence_id,p.object_id,\\n                o.provider_id,o.locator,o.content_hash,o.size_bytes,o.state\\n                FROM inv.shard_commands s JOIN inv.runs r ON (s.tenant_id,s.run_id)=(r.tenant_id,r.run_id)\\n                JOIN inv.result_completions c ON (s.tenant_id,s.command_id,r.attempt)=(c.tenant_id,c.command_id,c.attempt)\\n                JOIN inv.result_commitments p ON (c.tenant_id,c.command_id)=(p.tenant_id,p.command_id)\\n                JOIN inv.storage_objects o ON (p.tenant_id,p.project_id,p.object_id)=(o.tenant_id,o.project_id,o.object_id)\\n                WHERE s.project_id=%s AND s.plan_id=%s ORDER BY s.shard_index', (plan['project_id'], plan['plan_id']))",
+        "conn.execute('SELECT request_hash FROM inv.shard_plans WHERE project_id=%s AND plan_id=%s', (plan['project_id'], plan['plan_id']))",
+        "conn.execute('SELECT clock_timestamp() AS now')",
+        "conn.execute('INSERT INTO inv.evidence(tenant_id,run_id,evidence_id,envelope) VALUES(%s,%s,%s,%s)', (tenant, parent['run_id'], envelope['evidenceId'], Jsonb(envelope)))",
+        "conn.execute('INSERT INTO inv.shard_completions(tenant_id,project_id,plan_id,run_id,evidence_id,manifest,manifest_hash,policy_decision_id,policy_version) VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s)', (tenant, plan['project_id'], plan['plan_id'], parent['run_id'], envelope['evidenceId'], Jsonb(manifest), digest(manifest), decision, 'shard-completion:v1'))"
+      ],
+      "kind": "STRUCTURED_BRANCH_BINDING_CONTRACT",
+      "path": "services/control-plane/src/inv/shard_completion.py"
+    },
+    "inv.storage_commit.StorageSampleStore.apply_sample": {
+      "guards": [],
+      "assignments": [
+        {
+          "targets": [
+            "pending"
+          ],
+          "value": "context['pending']"
+        },
+        {
+          "targets": [
+            "challenge"
+          ],
+          "value": "context['challenge']"
+        },
+        {
+          "targets": [
+            "verified"
+          ],
+          "value": "context['verified']"
+        },
+        {
+          "targets": [
+            "envelope"
+          ],
+          "value": "context['envelope']"
+        },
+        {
+          "targets": [
+            "certificate_der"
+          ],
+          "value": "context['certificate_der']"
+        },
+        {
+          "targets": [
+            "request_id"
+          ],
+          "value": "context['request_id']"
+        },
+        {
+          "targets": [
+            "response_hash"
+          ],
+          "value": "context['response_hash']"
+        },
+        {
+          "targets": [
+            "(evidence_id, check_id)"
+          ],
+          "value": "(new_id('evd'), new_id('chk'))"
+        },
+        {
+          "targets": [
+            "observed"
+          ],
+          "value": "datetime.fromtimestamp(verified.observed_at, timezone.utc)"
+        },
+        {
+          "targets": [
+            "evidence"
+          ],
+          "value": "{'evidenceId': evidence_id, 'tenantId': principal.tenant_id, 'runId': run_id, 'traceId': hashlib.sha256(('storage:' + request_id).encode()).hexdigest()[:32], 'timestamp': observed.isoformat(), 'actorId': principal.subject_id, 'action': 'verify-storage-sample', 'policyDecisionId': 'storage-owner-v1:' + request_id, 'inputSha256': challenge.digest(), 'outputSha256': verified.payload_sha256, 'result': 'succeeded' if verified.sample_healthy else 'failed'}"
+        },
+        {
+          "targets": [
+            "detail"
+          ],
+          "value": "{'scope': 'node-storage-sample-v1', 'requestId': request_id, 'evidenceId': evidence_id, 'challenge': pending['challenge'], 'envelope': envelope, 'certificateDer': base64.b64encode(certificate_der).decode(), 'unverifiable': verified.unverifiable, 'examined': verified.examined, 'unsampled': verified.unsampled, 'cataloguedAtIssue': challenge.catalogued, 'operationalAcceptanceAssessed': False}"
+        },
+        {
+          "targets": [
+            "final_now"
+          ],
+          "value": "int(conn.execute('SELECT extract(epoch FROM clock_timestamp()) AS now').fetchone()['now'])"
+        }
+      ],
+      "writeExpressions": [
+        "conn.execute('INSERT INTO inv.evidence(tenant_id,run_id,evidence_id,envelope) VALUES(%s,%s,%s,%s)', (principal.tenant_id, run_id, evidence_id, Jsonb(evidence)))",
+        "conn.execute('INSERT INTO public.storage_checks(check_id,tenant_id,contribution_id,reachable,sampled_count,mismatch_count,healthy,checked_at,detail)\\n          VALUES(%s,%s,%s,true,%s,%s,%s,%s,%s)', (check_id, principal.tenant_id, pending['contribution_id'], verified.sampled, verified.mismatches, verified.sample_healthy, observed, Jsonb(detail)))",
+        "conn.execute('INSERT INTO inv.storage_sample_consumptions(tenant_id,request_id,response_sha256,evidence_id,check_id) VALUES(%s,%s,%s,%s,%s)', (principal.tenant_id, request_id, response_hash, evidence_id, check_id))",
+        "conn.execute('SELECT extract(epoch FROM clock_timestamp()) AS now')"
+      ],
+      "kind": "STRUCTURED_BRANCH_BINDING_CONTRACT",
+      "path": "services/control-plane/src/inv/storage_commit.py"
+    },
+    "saintvision.services.nodes.enroll_node": {
+      "guards": [
+        "os_type not in OS_TYPES",
+        "not hostname or len(hostname) > 253",
+        "capability.offered_quantity is not None"
+      ],
+      "assignments": [
+        {
+          "targets": [
+            "node_id"
+          ],
+          "value": "new_id('node')"
+        },
+        {
+          "targets": [
+            "node"
+          ],
+          "value": "Node(node_id=node_id, tenant_id=tenant_id, hostname=hostname, os_type=os_type, os_version=os_version, agent_version=agent_version, status='active' if certificate_fingerprint else 'enrolling', certificate_fingerprint=certificate_fingerprint, labels=labels or {}, enrolled_at=now, heartbeat_sequence=0)"
+        },
+        {
+          "targets": [
+            "capability_id"
+          ],
+          "value": "new_id('capability')"
+        }
+      ],
+      "writeExpressions": [
+        "session.add(node)",
+        "session.add(NodeCapability(capability_id=capability_id, tenant_id=tenant_id, node_id=node_id, kind=capability.kind, device_index=capability.device_index, vendor=capability.vendor, model=capability.model, total_quantity=capability.canonical_total(), unit=canonical_unit(capability.kind), divisible=capability.divisible, detected_at=now))",
+        "session.add(ResourceOffer(offer_id=new_id('offer'), tenant_id=tenant_id, capability_id=capability_id, offered_quantity=capability.canonical_offered(), effective_from=now))"
+      ],
+      "kind": "STRUCTURED_BRANCH_BINDING_CONTRACT",
+      "path": "src/saintvision/services/nodes.py"
+    },
+    "saintvision.services.nodes.record_heartbeat": {
+      "guards": [
+        "updated is not None",
+        "node is None or node.tenant_id != tenant_id"
+      ],
+      "assignments": [
+        {
+          "targets": [
+            "updated"
+          ],
+          "value": "session.execute(update(Node).where(Node.node_id == node_id, Node.tenant_id == tenant_id, Node.heartbeat_sequence < sequence).values(heartbeat_sequence=sequence, last_heartbeat_at=now, status=case((Node.status == 'lost', 'active'), else_=Node.status)).returning(Node).execution_options(synchronize_session=False, populate_existing=True)).scalar_one_or_none()"
+        },
+        {
+          "targets": [
+            "node"
+          ],
+          "value": "session.get(Node, node_id)"
+        }
+      ],
+      "writeExpressions": [
+        "session.execute(update(Node).where(Node.node_id == node_id, Node.tenant_id == tenant_id, Node.heartbeat_sequence < sequence).values(heartbeat_sequence=sequence, last_heartbeat_at=now, status=case((Node.status == 'lost', 'active'), else_=Node.status)).returning(Node).execution_options(synchronize_session=False, populate_existing=True))",
+        "update(Node)"
+      ],
+      "kind": "STRUCTURED_BRANCH_BINDING_CONTRACT",
+      "path": "src/saintvision/services/nodes.py"
+    },
+    "saintvision.services.nodes.mark_lost_nodes": {
+      "guards": [
+        "last_seen < cutoff",
+        "changed"
+      ],
+      "assignments": [
+        {
+          "targets": [
+            "cutoff"
+          ],
+          "value": "now - dt.timedelta(seconds=timeout_seconds)"
+        },
+        {
+          "targets": [
+            "nodes"
+          ],
+          "value": "session.scalars(select(Node).where(Node.tenant_id == tenant_id, Node.status == 'active')).all()"
+        },
+        {
+          "targets": [
+            "changed"
+          ],
+          "value": "0"
+        },
+        {
+          "targets": [
+            "last_seen"
+          ],
+          "value": "node.last_heartbeat_at or node.enrolled_at"
+        },
+        {
+          "targets": [
+            "node.status"
+          ],
+          "value": "'lost'"
+        },
+        {
+          "targets": [
+            "changed"
+          ],
+          "value": "1"
+        }
+      ],
+      "writeExpressions": [
+        "session.scalars(select(Node).where(Node.tenant_id == tenant_id, Node.status == 'active'))"
+      ],
+      "kind": "STRUCTURED_BRANCH_BINDING_CONTRACT",
+      "path": "src/saintvision/services/nodes.py"
+    },
+    "saintvision.services.storage.register_contribution": {
+      "guards": [
+        "payload.mode not in ('read_only', 'read_write')",
+        "node is None or node.tenant_id != tenant_id"
+      ],
+      "assignments": [
+        {
+          "targets": [
+            "node"
+          ],
+          "value": "session.get(Node, payload.node_id)"
+        },
+        {
+          "targets": [
+            "normalized"
+          ],
+          "value": "normalize_contribution_path(payload.declared_path, node.os_type)"
+        },
+        {
+          "targets": [
+            "contribution"
+          ],
+          "value": "StorageContribution(contribution_id=new_id('storage_contribution'), tenant_id=tenant_id, node_id=payload.node_id, declared_path=payload.declared_path, normalized_path=normalized.normalized, mode=payload.mode, status='pending', capacity_bytes=payload.capacity_bytes, available_bytes=payload.available_bytes, registered_by_user_id=registered_by_user_id, registered_at=now)"
+        }
+      ],
+      "writeExpressions": [
+        "session.add(contribution)"
+      ],
+      "kind": "STRUCTURED_BRANCH_BINDING_CONTRACT",
+      "path": "src/saintvision/services/storage.py"
+    },
+    "saintvision.services.storage.activate_contribution": {
+      "guards": [
+        "contribution.status == 'revoked'"
+      ],
+      "assignments": [
+        {
+          "targets": [
+            "contribution"
+          ],
+          "value": "_owned_for_update(session, tenant_id=tenant_id, contribution_id=contribution_id, owner_user_id=owner_user_id)"
+        },
+        {
+          "targets": [
+            "contribution.status"
+          ],
+          "value": "'active'"
+        }
+      ],
+      "writeExpressions": [],
+      "kind": "STRUCTURED_BRANCH_BINDING_CONTRACT",
+      "path": "src/saintvision/services/storage.py"
+    },
+    "saintvision.services.storage.revoke_contribution": {
+      "guards": [],
+      "assignments": [
+        {
+          "targets": [
+            "contribution"
+          ],
+          "value": "_owned_for_update(session, tenant_id=tenant_id, contribution_id=contribution_id, owner_user_id=owner_user_id)"
+        },
+        {
+          "targets": [
+            "contribution.status"
+          ],
+          "value": "'revoked'"
+        },
+        {
+          "targets": [
+            "contribution.revoked_at"
+          ],
+          "value": "now"
+        }
+      ],
+      "writeExpressions": [],
+      "kind": "STRUCTURED_BRANCH_BINDING_CONTRACT",
+      "path": "src/saintvision/services/storage.py"
+    },
+    "tools.lan_execution.execute": {
+      "guards": [
+        "conn.execute('SELECT count(*) AS n FROM inv.tool_claims').fetchone()['n']",
+        "not row",
+        "opened"
+      ],
+      "assignments": [
+        {
+          "targets": [
+            "state"
+          ],
+          "value": "load(args.state)"
+        },
+        {
+          "targets": [
+            "lock"
+          ],
+          "value": "args.state / 'acceptance.lock'"
+        },
+        {
+          "targets": [
+            "opened"
+          ],
+          "value": "False"
+        },
+        {
+          "targets": [
+            "row"
+          ],
+          "value": "conn.execute('UPDATE inv.tenant_controls SET kill_switch=false,version=version+1 WHERE tenant_id=%s AND kill_switch=true RETURNING version', (state['tenantId'],)).fetchone()"
+        },
+        {
+          "targets": [
+            "opened"
+          ],
+          "value": "True"
+        }
+      ],
+      "writeExpressions": [
+        "conn.execute('SELECT count(*) AS n FROM inv.tool_claims')",
+        "conn.execute('UPDATE inv.tenant_controls SET kill_switch=false,version=version+1 WHERE tenant_id=%s AND kill_switch=true RETURNING version', (state['tenantId'],))",
+        "conn.execute('UPDATE inv.tenant_controls SET kill_switch=true,version=version+1 WHERE tenant_id=%s AND kill_switch=false', (state['tenantId'],))"
+      ],
+      "kind": "STRUCTURED_BRANCH_BINDING_CONTRACT",
+      "path": "tools/lan_execution.py"
+    }
+  },
+  "SQLRoutineInsert": {
+    "table": "inv.tenant_controls",
+    "columns": [
+      "tenant_id"
+    ],
+    "values": [
+      "NEW.tenant_id"
+    ]
+  },
+  "SQLRoutineDDLDefaults": {
+    "kill_switch": "false",
+    "version": 0
+  },
+  "SQLRoutineRule": "actual seed inserts NEW.tenant_id only; source DDL default kill_switch=false/version=0, exclusive no-B traffic; no invented version1 or runtime DB-default proof",
+  "plainActivation": "owner+not-revoked only; no Node confirmation; B-only FolderRootObservation separate"
+}
