@@ -1,11 +1,11 @@
 ---
 doc_id: "HISTORY-FLEET5-20261106-K2A-PL-R1C-CODEX"
 title: "FLEET5 K2A PL-R1c pointer conversion source gate revision"
-version: "1.0.0"
+version: "1.0.1"
 status: "review"
 author: "Codex"
 reviewer: "Claude through Root; actual narrow delta review pending"
-updated: "2026-11-06T19:18:10+09:00"
+updated: "2026-11-06T19:33:15.101998+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 base_sha: "084bd9471673f7f4f41dc547c76a2411c066109b"
@@ -108,3 +108,22 @@ remain historical. Local source PASS; own exact hosted Docs pending, actual
 narrow review pending, fullCore NOT_RUN/not granted, runtime/FIVE incomplete.
 First next Root action after publication is independently verify immutable
 source/report/CI bindings and assign ONE actual narrow delta review vs084.
+
+Actual isolated sourcee93ceb3b4981a7be7ac11755e1afa9d4b6201902 is direct child of
+exact084. 29changed paths =3allowed package files plus26unique added
+History/Evidence. All5454remaining base modes/blobs equal084; no historic
+docs modified. Source-publication verification binds all final75case test hashes.
+Own exact Docs42203278140/job127843577565/workflow_dispatch/docs.yml/attempt1,
+exact head/ref/correlation, ALL1job/19stepsSUCCESS independently read from
+GitHub run AND jobs API; public metadata preserved. This qualifies Docs only,
+not actual PL-R1c closure/Core/runtime. Qualification is unique docs-only; final
+report exact Docs is separately observed for Root handoff without inventing
+a self-referential future CI binding.
+
+Qualification documentation19:33:15-19:35:12 KST ALL10gates exit0; exact084
+ratchet and fresh official canonical state9f4172ff... before=after (full hashes/
+commands/exits in qualification/local-required-gates.json). No code changed
+aftere93ceb3b; no product test repeat for docs. Next Root: verify frozen final
+report/source/exact Docs, then ONE actual Claude narrow delta review vs084
+after predecessor settles/exits/releases. Actual acceptance plus Root precise
+choice alone may grant one fresh fullCore+Docs. No self-closure/wholeK2 claim.
