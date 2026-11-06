@@ -1,6 +1,6 @@
 {
   "schema": "fleet5-root-review-resource-sequence:1",
-  "atKST": "2026-11-06T11:03:03+09:00",
+  "atKST": "2026-11-06T11:44:14+09:00",
   "completedB": {
     "task": "task_d4c4c809ed4e",
     "review": "ac9182c3e3d606ec027c0be2e90e049ff50d54f1",
@@ -13,22 +13,22 @@
     "source": "8874b2dfe0dda9a019bd5f334636668290702e13"
   },
   "active": {
-    "task": "task_ac1819feb2d7",
-    "dispatch": "ctx_5613e3659b52",
-    "source": "551d7312bb9c806fd423dcf6074158a9802cbb14",
-    "scope": "ONE actual K2 trustedproducer/effectboundary DESIGNcontractreview",
+    "task": "task_98d80a7c3d96",
+    "dispatch": "ctx_6b02886ebfc1",
+    "source": "ee97c27a5d135a4059256124290731cd2b791193",
+    "scope": "ONE actual wholeBrev6contractdelta review",
     "state": "ready actualdispatch; verdictpending"
   },
   "pending": null,
-  "authorParallelWork": "K2ownerawaitsactualreview/Rootdecision; B rev6author continues; no newruntimecodegrant",
-  "reason": "one actual Claude reviewer after proven settled/exited/released B4; corrected ownDocs and Linux race passed, fullCore still required",
+  "authorParallelWork": "K2Codex one narrowrev2DOCS/static under explicitRootchoices; Bowner awaits actualwholeRev6review/concreteRootdecision",
+  "reason": "single actualClaude reviewer after proven K2succeeded/settled/exited/released; boundedserialledgerinspection, no hugeledgercopy",
   "genericApprovalMissing": false,
   "completedRL1": {
     "task": "task_9cd71aa339ff",
     "review": "0e53fc024ca773b7719182e170e5e126aeaf5b95",
     "verdict": "ACCEPT TEST-ONLY; R-L1 CLOSED; no new findings"
   },
-  "nextActualReviewTrigger": "actualK2verdict; B6finalimmutable/Docs afteravailableoneClaude resource",
+  "nextActualReviewTrigger": "B6actualverdict; K2rev2immutable/Docs canenterqueuewhenavailable",
   "completedIntegration": {
     "task": "task_78064fb4b7ff",
     "dispatch": "ctx_ed7ec73163d6",
@@ -86,7 +86,7 @@
     "workerDone": "msg_cfce6b990da4",
     "resource": "succeeded/settled/exited/released beforeB5start"
   },
-  "K1CodeAxis": "ACCEPT191b/Docs42132923864; wholeCoreFAILURE remains",
+  "K1CodeAxis": "ACTUAL191b codeACCEPT; correctedeb32fullCore42138733821SUCCESS; historical56651failurepreserved",
   "K1QualifiedFailedReport": "a413c0c2e9a6d070321480f9c216b8aa07e5fd74",
   "completedB5": {
     "task": "task_b176020315c8",
@@ -108,8 +108,8 @@
       "waitingOnHuman": "unknown"
     }
   },
-  "K1CodeAndTestAxes": "actual191b codeACCEPT +Rooteb32TEST/README/CI/actualPGartifactACCEPT; fullCorestillpending",
-  "freshCoreCallback": "one-shot fixedGitHubrun toreplypendingmsg_045f69f4caf4/currentctx_ceecb3824e33, no inboxpoll/newagent",
+  "K1CodeAndTestAxes": "ACTUAL191b+Rooteb32TEST/README/focusedPG/wholeCore+f28report ACCEPT; boundedK1COMPLETE, notK2/physical",
+  "freshCoreCallback": "one-shotterminalSUCCESSreplyalreadydeliveredandclosed; nonepending",
   "completedK1BoundedDelivery": {
     "task": "task_38393b5d1865",
     "dispatch": "ctx_ceecb3824e33",
@@ -122,5 +122,27 @@
     "outcome": "succeeded boundedK1source/CI/reportonly"
   },
   "oldK1DispatchClosed": "DoNOTsendctx_ceecb3824e33 forK2; newcurrentctx_ed23b4a777d0",
-  "oneShotMonitor": "terminalSUCCESS replydeliveredandclosed; nooldpendingCIquestion"
+  "oneShotMonitor": "terminalSUCCESS replydeliveredandclosed; nooldpendingCIquestion",
+  "completedK2FirstContractReview": {
+    "task": "task_ac1819feb2d7",
+    "dispatch": "ctx_5613e3659b52",
+    "proposal": "551d7312bb9c806fd423dcf6074158a9802cbb14",
+    "review": "5623dc00b676ce0b535350897069a3b7f1154eab",
+    "Docs": 42150131952,
+    "verdict": "REVISION_REQUIRED3Major5Low",
+    "actualWorkerDone": "msg_8c306b130312",
+    "rootDirectReply": "msg_6df22674ff19",
+    "resourceState": {
+      "dispatchId": "ctx_5613e3659b52",
+      "taskId": "task_ac1819feb2d7",
+      "runId": "run_e57ecd84a7bc",
+      "state": "succeeded",
+      "stage": "settled",
+      "liveness": "exited",
+      "terminal": "term_083d3ed9-77ac-4358-9954-feb4a25084d4",
+      "terminalState": "released",
+      "workspace": "d98dc9d3-fe61-4cb2-9776-dff349347a61::D:/Project/SaintVisionI-Invion/fleet5-bootstrap-v3-review-20261106",
+      "waitingOnHuman": "unknown"
+    }
+  }
 }

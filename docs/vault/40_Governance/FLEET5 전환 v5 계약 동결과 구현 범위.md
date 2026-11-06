@@ -1,11 +1,11 @@
 ---
 doc_id: "GOV-FLEET5-BOOTSTRAP-V5-FREEZE-CODE-SCOPE-20261106"
 title: "FLEET5 전환 v5 계약 동결과 구현 범위"
-version: "1.0.5"
+version: "1.0.6"
 status: "active"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-11-06T10:33:00+09:00"
+updated: "2026-11-06T11:44:14+09:00"
 source_of_truth: "Git"
 ---
 
@@ -71,3 +71,14 @@ msg_4f741ef0872c로 고정 eb32를 검토된 결합 소스로 선택해 새 full
 Root는 실제 eb32/Core42138733821 두 job·f28fb41d 최종 보고/Docs42142783600의 exact source/ref/correlation/runAttempt1/전체 성공을 검증했다. 두 원본artifact의 size/digest를 비교·다운로드하고 XML/Go JSON을 직접 파싱해 main9216pass/46declaredskip/0fail, 영향 file30pass·13함수/0skip, K142상위165PASS이벤트/0skip을 대조했다. 기존c6f와 실제46skip 이름도 동일했고, ELF 바이너리를 실행하지 않고 build info의 eb32/modified=false/Go1.27.1/CGO0와 hash를 읽었다. actual191b 코드 검토와 Root TEST/README/CI 검토, 10개 보고 gate0 및 실제 보고 CI가 모두 충족돼 msg_f96802b15040으로 K1 소스·검증·보고의 한정 납품을 수락했다. actual worker_done msg_6987f7ecdcb5/outcome succeeded를 수신했다.
 
 후속 K2는 별도 task_a95ef3d8ccce/ctx_ed23b4a777d0다. 현재 범위는 trusted producer의 실제 출처·인증·신선도·설치 trust와 read-only acquisition/효과 실행 경계를 닫는 DESIGN-FIRST 문서·정적 사례다. 실제 40 runtime case·설치 trust·Node/PKI/Engine/DB 효과는 미실행이고 새 코드 권한도 아직 없다. 완료한 K1의 ref·보고·artifact·이전 실패를 보존한다. 새 불변 제안/ownDocs 이후 실제 별도 검토와 좁은 구현 grant를 진행하며 B rev6 설계와 병행한다. 새 source 배포 패킷 필요성도 확인해야 하며 이전 e50 패킷을 eb32 설치 증거로 쓰지 않는다. [고정 최종 K1 보고](https://github.com/egparadise/SaintVision-Invion/blob/f28fb41d6e566625d5feb27535d4c3d40fbc9100/docs/vault/30_Development/History/2026-11-06_FLEET5_K1_reviewed_combined_Core_delivery_Codex.md)에 세부 증거를 남겼다.
+
+
+## K2 첫 계약 검토 후 Root의 rev2 설계 선택
+
+실제 Claude 검토5623dc00/Docs42150131952는551d 제안을 K2-M1/M2/M3와L1–L5의 수정 필요로 판정했다. Root는 msg_6df22674ff19로 기존 K2 담당자에게 한 번의 문서·정적 계약 rev2만 지시했다. 현재 코드나 관측·서명·Engine 효과를 허용한 것은 아니다.
+
+설계 선택은 독립 운영자가 사전 승인한 봉인 공개 registry, 보호된 CP 공통 cohort의 transactional authority, 최대1초 시간 불확실성 정책이다. 실제 registry·custody·모든 mutator 중재·시간 출처는 여전히 미설치/HOLD다. 초기 ABSENT 상태의 효과 보류를 유지하고, PRESENT 상태에서 witness가121초 지난 경우도 명시적인 별도 observation-refresh authority와 retry 계약이 닫히기 전까지 HOLD한다. terminal seal과 fresh common normal:3 lease는 기존 A36의 필요 조건을 보존하며 새로운 K1 current 기능으로 간주하지 않는다. UNKNOWN 관측은 새 challenge/실행/소유자 전환에 앞서 보호된 결과 확인과 quiescence를 요구한다.
+
+TrustedContext.MigrationOperationID는 원래 계획·역사의 migration operation이며 현재 active operation으로 대체하지 않는다. facts와의 동일성 및 역사 HELD lease의 인증을 요구한다. 40개 시험의 원래 문구는 그대로 두고 readonly 소비·거부와 producer·효과의 green 의무를 분리한다. 시간 양 끝점의 동일한 보안 결과와 모든 Now 조건의 convexity 증명, 하나의 오류 catalog, Go types 기반 inventory, internal·opaque DTO 경계, 실제 실행 중 verifier executable의 독립 설치 인증을 rev2에서 닫아야 한다.
+
+상세 선택·반례·보류 조건은 Root Evidence의 k2-rev2-concrete-root-decision.json에 고정했다. 실제 rev2 독립 검토 이후에만 Root가 작은 K2A trust/history 읽기 전용 구현을 검토한다. 40 runtime·현재 view·관측/회전·설치·5PC 인수는 계속 미완료다.

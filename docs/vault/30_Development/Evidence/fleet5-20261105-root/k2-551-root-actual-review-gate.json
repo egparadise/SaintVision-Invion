@@ -13,7 +13,15 @@
   "runAttempt": 1,
   "rootVerifiedExactHeadRefEventAllJobsSuccess": true,
   "ownerQuestionPending": "msg_3adfd8134a89",
-  "actualIndependentReview": null,
+  "actualIndependentReview": {
+    "commit": "5623dc00b676ce0b535350897069a3b7f1154eab",
+    "branch": "agent/claude/fleet5-k2-551-contract-review-20261106",
+    "Docs": 42150131952,
+    "job": 127671084732,
+    "correlation": "FLEET5-K2-551-contract-review-Claude-Docs-5623dc00b676-20261106T112433KST",
+    "rootVerifiedExactHeadRefEventAllJobsSuccess": true,
+    "remoteExact": true
+  },
   "K2CodeOrEffectsAccepted": false,
   "actualIndependentReviewer": "Claude",
   "reviewTask": "task_ac1819feb2d7",
@@ -21,7 +29,7 @@
   "reviewTerminal": "term_083d3ed9-77ac-4358-9954-feb4a25084d4",
   "reviewWorkspace": "d98dc9d3-fe61-4cb2-9776-dff349347a61::D:/Project/SaintVisionI-Invion/fleet5-bootstrap-v3-review-20261106",
   "startReceipt": "ready",
-  "state": "ACTUAL_REVIEW_DISPATCHED_PENDING_VERDICT",
+  "state": "ACTUAL_REVIEW_REVISION_REQUIRED_ROOT_REV2_DECISIONS_DELIVERED",
   "ownerReportedStaticOnly": {
     "declaredInputFields": 73,
     "GoInputTypes": 13,
@@ -34,6 +42,25 @@
     "actualK2RuntimeCasesExecuted": 0
   },
   "RootReadContractAndHistory": true,
-  "rootDecisions": "D-TRUST-INSTALL/D-COHORT-FENCE/D-PREPUBLICATION/D-CLOCK remain HOLD; no implicit selection",
-  "nextAction": "actualverdict/ownDocs thenRoot concrete decisions andnamedcorrections orboundednextgrant"
+  "rootDecisions": "Architecture/policy choices named; actual trust/fence/clock/observation provisioning HOLD",
+  "nextAction": "Codex publishes one narrowrev2 andexactDocs; oneactualClaude delta review after B6 settles; onlythenRoot considers named readonlytrust/history grant",
+  "latestObservationAtKST": "2026-11-06T11:44:14+09:00",
+  "actualVerdict": "REVISION_REQUIRED",
+  "actualBlocking": [
+    "K2-M1",
+    "K2-M2",
+    "K2-M3"
+  ],
+  "actualFixBeforeAnyCodeGrant": [
+    "K2-L1",
+    "K2-L2",
+    "K2-L3",
+    "K2-L4",
+    "K2-L5"
+  ],
+  "actualWorkerDone": "msg_8c306b130312",
+  "actualTaskOutcome": "succeeded reviewdelivery; proposalnotaccepted",
+  "rootDirectReply": "msg_6df22674ff19",
+  "rootDecision": "k2-rev2-concrete-root-decision.json",
+  "currentAuthorization": "ONErev2DOCS/staticonly under existingtask_a95ef3d8ccce/currentctx_ed23b4a777d0"
 }

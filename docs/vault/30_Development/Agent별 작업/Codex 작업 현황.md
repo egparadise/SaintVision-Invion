@@ -1,15 +1,19 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.394"
+version: "1.0.395"
 status: "review"
 author: "Codex"
-updated: "2026-11-06T11:03:03+09:00"
+updated: "2026-11-06T11:44:14+09:00"
 source_of_truth: "Git"
 active_card: "FLEET5-20261105 five physical node orchestration"
-active_card_status: "K2proposal551 actualClaudeac18 reviewactive/RootdecisionsHOLD; K1boundedcomplete; B6authorcontinues; physicalwholeincomplete"
-active_card_next: "Claude actualK2contractverdict/ownDocs; Root exactdecisions/corrections thenboundednextscope; B Codexrev6immutable/Docs; no runtime/installationgrant"
+active_card_status: "K2actual5623 revisionneeded/rootconcreterev2delivered; B6ee97 actualClaude98d8active; K1boundedcomplete; wholephysicalincomplete"
+active_card_next: "K2Codex narrowrev2DOCS/static/exactDocs; Claude actualwholeB6verdict/ownDocs; Root exactgrantorrevisions thenK2deltaqueue; noimplementation/effectgrant"
 ---
+
+## 2026-11-06T11:44:14+09:00 K2 실제 판정의 보완 지시와 B rev6 검토
+
+작업한 것과 확인: 실제 K2 검토5623dc00/Docs42150131952는3Major·5Low 수정 필요로 판정했다. Root는 역사 operation 식별자, fresh 관측 권한과 retry, 시험 단계 배정 및 trust/fence/clock의 구체 선택을 기존 담당자에게 전달했다. 코드·효과는 미허용이며 실제 설치 binding은 HOLD다. B rev6 ee97c27a/Docs42150067167는66개 문서 추가·제품diff0를 확인해 Claude task_98d80a7c3d96/ctx_6b02886ebfc1에 전체 독립 검토를 한 번 배정했다. K2 원질문에는 msg_6df22674ff19로 답했고, B 원질문은 실제 검토와 Root의 결정까지 pending이다. 다음 첫 행동/담당은 K2 Codex의 좁은 rev2 계약, Claude의 B 전체 판정, Root의 그 결과에 따른 명명된 구현 범위 또는 수정 지시다.
 
 ## 2026-11-06T11:03:03+09:00 K2 불변 제안과 실제 검토 배정
 
