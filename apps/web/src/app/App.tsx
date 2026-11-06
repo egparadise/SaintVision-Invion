@@ -484,7 +484,7 @@ export const App: React.FC = () => {
         setLastApprovalsFetchedAt(new Date());
         setApprovalError(null);
       }
-    } catch (err: any) {
+    } catch {
       clearTimeout(timeoutId);
       const isTimeout = controller.signal.aborted && (
         controller.signal.reason?.message === 'REQUEST_TIMEOUT' ||
