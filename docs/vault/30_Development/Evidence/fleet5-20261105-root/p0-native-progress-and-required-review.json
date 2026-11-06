@@ -3,8 +3,8 @@
   "recordedAtKST": "2026-11-06T00:46:51+09:00",
   "rootBase": "2b1753ce59c09037b5e130a7ffe64794d1d45fdf",
   "priorRootCheckpoint": {
-    "SHA": "3c2be24544ff8f1da09bb2a44c73df26532981bf",
-    "Docs": 42132223189,
+    "SHA": "b0de0331b1cbdf53451e2ae7e3aeb2c1268aa738",
+    "Docs": 42135996673,
     "exactHeadCorrelationAllJobsSuccess": true,
     "remoteMatches": true,
     "syncExits": [
@@ -12,13 +12,13 @@
       0,
       0
     ],
-    "independentlyMatchedNormalizedDestinationHashes": 2749,
+    "independentlyMatchedNormalizedDestinationHashes": 2763,
     "pending": 0,
     "conflicts": 0,
     "trackedAndUntrackedClean": true,
     "rootDocsOnly": true,
     "wholeProgramComplete": false,
-    "verifiedAtKST": "2026-11-06T08:49:31+09:00"
+    "verifiedAtKST": "2026-11-06T09:21:12+09:00"
   },
   "actualPlanLowReview": {
     "source": "803ad270562b1b75e44d26f9e14b965c714ab519",
@@ -1901,6 +1901,11 @@
       "source": "a413c0c2e9a6d070321480f9c216b8aa07e5fd74",
       "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-v5-k1-temporal-ci-20261106-codex/report-scope-audit.json",
       "SHA256": "3265b5d43f52dc543f506e5483cd75172687e10cabd03f9404f79aff33bb34eb"
+    },
+    {
+      "source": "8bac0838c08bbdd49cf954a517594c0973b55da6",
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-rev5-228e-review-20261106-claude/review.json",
+      "SHA256": "e1fec7e9aaa406c881e7fd1d512ec597a33ee7cac0f4fe96886d73a750f3ecfc"
     }
   ],
   "notGatheredRawOrSharedArtifacts": [
@@ -2485,7 +2490,7 @@
     "ownerT1T2T3": "msg_620855c76519",
     "normativeRevisionReply": "msg_0392caf64d5d"
   },
-  "latestRecordAtKST": "2026-11-06T09:17:48+09:00",
+  "latestRecordAtKST": "2026-11-06T09:52:19+09:00",
   "optionalLowTokenTestDelta": {
     "source": "f0af307705b4923ebc3e231db5238af4c70aa389",
     "scope": "two otherwise-valid token payload corrections and JSON validity assertions; runtime unchanged",
@@ -2799,7 +2804,7 @@
     "sourceFullCoreAccepted": true,
     "actualCodeReviewTask": "task_5627222e0f59",
     "actualCodeReviewDispatch": "ctx_0918954c585c",
-    "currentAuthorization": "isolatedTESTclock+README-onlyR1+fixedhostedPG16 focusedworkflow; actualRootreview/combinedsourcechoice beforeONEnewwholeCore",
+    "currentAuthorization": "finishSAMEfreshCore/finalartifact/report afterone-shotreply; no newCore/retry/Nodewrites",
     "reviewDocs": 42119997927,
     "actualDecisionMessage": "msg_87002d358dbb",
     "actualCodeAccepted": true,
@@ -2819,7 +2824,14 @@
     "acceptanceAxis": "implementation only; fullCorefailed andwholeK1cardnotdone",
     "qualifiedFailedReport": "a413c0c2e9a6d070321480f9c216b8aa07e5fd74",
     "qualifiedFailedReportDocs": 42133327925,
-    "K2AndPhysical": "NOTRUN"
+    "K2AndPhysical": "NOTRUN",
+    "reviewedCombinedSource": "eb32b211ab3704935b9431747089ab0715582a74",
+    "testREADMEWorkflowDelta": "RootactualACCEPT+rawPGartifactparsed",
+    "README_R1": "CLOSED",
+    "freshFullCore": 42138733821,
+    "freshFullCoreState": "in_progress",
+    "freshFullCoreAccepted": false,
+    "wholeCardDone": false
   },
   "broadBRevision3ActualReviewGate": "b-rev3-root-review-gate.json",
   "broadBRevision3SourceObservation": "b-rev3-root-source-observation.json",
@@ -3033,5 +3045,11 @@
   "K1QualifiedFailedReportRootObservation": "k1-failed-qualified-report-root-observation.json",
   "K1ReportKnownStateDecision": "k1-report-root-known-state-publication-decision.json",
   "BRevision5ActualReviewGate": "b-rev5-root-review-gate.json",
-  "rateClockHostedLaneDecision": "rate-clock-focused-hosted-lane-root-decision.json"
+  "rateClockHostedLaneDecision": "rate-clock-focused-hosted-lane-root-decision.json",
+  "B5ActualReviewRootGate": "b-rev5-root-review-gate.json",
+  "B6ConcreteRootDecision": "b-rev6-concrete-root-decision.json",
+  "Eb32RootIndependentTestPGReview": "rate-eb32-root-independent-review.json",
+  "ReviewedCombinedSourceChoice": "rate-eb32-combined-source-choice-root-decision.json",
+  "FreshCoreTerminalMonitor": "eb32-core-terminal-one-shot-monitor-root.json",
+  "QualifiedPGReportRootCheck": "rate-909-qualified-PG-report-root-check.json"
 }

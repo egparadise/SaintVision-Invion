@@ -11,7 +11,7 @@
   "productDiffVs72028": 0,
   "actualIndependentReviewStarted": true,
   "schemaVersion": "fleet5-b-rev5-root-review-gate:1",
-  "atKST": "2026-11-06T09:17:48+09:00",
+  "atKST": "2026-11-06T09:52:19+09:00",
   "actualReviewer": "Claude",
   "actualReviewTask": "task_b176020315c8",
   "actualReviewDispatch": "ctx_391e15f3a280",
@@ -19,9 +19,9 @@
   "reviewWorkspace": "d98dc9d3-fe61-4cb2-9776-dff349347a61::D:/Project/SaintVisionI-Invion/fleet5-bootstrap-v3-review-20261106",
   "startReceipt": "ready",
   "reviewerPreviousTask": "task_eeb63f89fecd succeeded/settled/exited/released beforestart",
-  "ownerQuestionPending": "msg_f383a9dd44b7",
-  "actualVerdict": null,
-  "state": "ACTUAL_REVIEW_DISPATCHED_PENDING_VERDICT",
+  "ownerQuestionPending": null,
+  "actualVerdict": "REVISION_REQUIRED B5-M1/M2 and L1-L5",
+  "state": "COMPLETED_ACTUAL_REVISION_REQUIRED_REV6_AUTHORIZED",
   "ownerReportedStaticOnly": {
     "schemaModelCases": 222,
     "sourceCompileCases": 113,
@@ -33,7 +33,27 @@
     "sourceMutations": 12,
     "realNewGoCryptoPGDockerCrashConcurrencyEquipment": 0
   },
-  "currentOwnerAuthorization": "DOCS/schema/static only; no partialfreeze/newBcode/registration before actual wholecontractverdict andconcreteRootgrant",
+  "currentOwnerAuthorization": "one narrowREV6 DOCS/schema/static/sourceanalysis only; noBcode orpartialfreeze",
   "realBindings": "NULL/HOLD",
-  "wholeProductAcceptance": false
+  "wholeProductAcceptance": false,
+  "actualIndependentReview": "8bac0838c08bbdd49cf954a517594c0973b55da6",
+  "actualReviewDocs": 42137554199,
+  "rootVerifiedReviewExactHeadRefAllJobsSuccess": true,
+  "actualReviewWorkerDone": "msg_e27e0a6ec3ad",
+  "actualReviewOutcome": "succeeded",
+  "reviewerFinalState": {
+    "dispatchId": "ctx_391e15f3a280",
+    "taskId": "task_b176020315c8",
+    "runId": "run_e57ecd84a7bc",
+    "state": "succeeded",
+    "stage": "settled",
+    "liveness": "exited",
+    "terminal": "term_bd80306e-100d-4ac9-8609-f1da07aac124",
+    "terminalState": "released",
+    "workspace": "d98dc9d3-fe61-4cb2-9776-dff349347a61::D:/Project/SaintVisionI-Invion/fleet5-bootstrap-v3-review-20261106",
+    "waitingOnHuman": "unknown"
+  },
+  "answeredQuestion": "msg_f383a9dd44b7",
+  "currentOwnerReply": "msg_17afe2db8b82",
+  "nextAction": "actualimmutableREV6/Docs thenONEactualwholecontractreview"
 }

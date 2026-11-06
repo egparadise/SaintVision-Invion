@@ -1,15 +1,19 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.391"
+version: "1.0.392"
 status: "review"
 author: "Codex"
-updated: "2026-11-06T09:17:48+09:00"
+updated: "2026-11-06T09:52:19+09:00"
 source_of_truth: "Git"
 active_card: "FLEET5-20261105 five physical node orchestration"
-active_card_status: "K1 codeACCEPT191b butfullCoreFAILURE; separateTESTclock/README/hostedPG16lane; B5 actualClaude b176active; physicalincomplete"
-active_card_next: "Codex isolatedTEST+README+fixedfocusedPG16CI; Root independentdelta+realPGresults thencombinedsource beforeONEfreshCore; Claude B5 actualverdict; B owner awaitconcretegrant"
+active_card_status: "eb32 reviewedcombined/freshCorepending withsameauthorcallback; B5 actualrevision2M5L/rev6; physicalincomplete"
+active_card_next: "exactCoreterminal one-shotreply resumesctx_ceecb3824e33 finalartifact/report; B Codexrev6 immutable/Docs thenoneactualreview; Root finalboundedgate noK2physicalclaim"
 ---
+
+## 2026-11-06T09:52:19+09:00 실제 PG 검토와 fullCore handback
+
+작업한 것과 확인: Root가 eb32의 시험·README·CI와 실제 PG artifact를 직접 검토해 수락하고 새 전체Core42138733821을 한 번 실행하도록 했다. B rev5 실제8bac/Docs42137554199는2Medium·5Low 수정 필요여서 msg_17afe2db8b82로 rev6를 지시했다. 전체Core 종료 후 같은 담당이 최종 증거 보고를 잇도록 one-shot 모니터를 연결했다. 다음 첫 행동/담당은 실제 terminal callback 뒤 K1 Codex의 같은 CI 최종artifact/보고, B Codex의 rev6다. Root가 Root test-source/PG 결과를 검토한 사실과 Claude의 B 판정을 구분하고 K2·실장비를 완료 처리하지 않는다.
 
 ## 2026-11-06T09:17:48+09:00 실제 K1 코드 판정과 다음 B 검토
 

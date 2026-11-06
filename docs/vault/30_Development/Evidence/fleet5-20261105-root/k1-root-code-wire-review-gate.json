@@ -13,7 +13,7 @@
   "reviewTerminal": "term_4de2f264870af2b01e2ba5d447449acb",
   "reviewWorkspace": "d98dc9d3-fe61-4cb2-9776-dff349347a61::D:/Project/SaintVisionI-Invion/fleet5-bootstrap-v3-review-20261106",
   "reviewDispatchState": "ready",
-  "state": "CORRECTED_56651_CODE_DELTA_ACCEPTED_FULLCORE_FAILED_RATE_TEST_REPAIR_ACTIVE",
+  "state": "K1_CODE_AND_EB32_TEST_DELTA_ACCEPTED_FRESH_CORE_PENDING",
   "actualVerdict": "REVISION REQUIRED M1/M2 and L1-L5",
   "fullCoreAccepted": true,
   "reviewScope": [
@@ -72,7 +72,7 @@
   "concreteRootRevision": "k1-c6f-root-revision-decision.json",
   "concreteRootMessage": "msg_87002d358dbb",
   "sourceCodeAccepted": false,
-  "nextAction": "sameauthor isolatedTESTclock+README+focusedCI realPG; Rootactualreview andcombinedsourcechoice beforeONEnewfullCore; no currentworker_done",
+  "nextAction": "one-shot terminalcallback resumes SAMEauthor tocollectactualnewCore/artifact/finalreport/Docs thenRootboundedhandoff; noK2/runtimeclaims",
   "fullCoreAcceptedScope": "CI only for old rejected c6f; no actual M1/M2 or K1 code acceptance",
   "actualFullCoreRun": 42113810160,
   "qualifiedReport": "37fe879ff37f4e673f059cc8e41f1c7c787f45dc",
@@ -81,7 +81,7 @@
   "actualCoreArtifactAudit": "k1-c6f-full-core-root-observation.json",
   "ownerActualQuestion": "msg_2b087b91a050",
   "directVerdictReply": "msg_2a098fb1f4d3",
-  "latestObservationAtKST": "2026-11-06T09:17:48+09:00",
+  "latestObservationAtKST": "2026-11-06T09:52:19+09:00",
   "correctedSource": "56651cba697f2ab6fcd7166ca4e6ea11eac28113",
   "correctedSourceBranch": "agent/codex/fleet5-bootstrap-v5-k1-temporal-fixes-20261106",
   "correctedPackageTree": "d83210590fdc064613d106b5a333b7ff8f3fa2ca",
@@ -108,5 +108,25 @@
   "qualifiedFailedReport": "a413c0c2e9a6d070321480f9c216b8aa07e5fd74",
   "qualifiedFailedReportDocs": 42133327925,
   "rootActualAxisMessage": "msg_b56d7fd0b616",
-  "README_R1": "Low pendingnexttouch; oneREADME-only addition authorized inisolatedTESTcard, noGo/testdata/pinchange"
+  "README_R1": "CLOSED eb32 docs-only exactPRESENT/ABSENT/K2boundary",
+  "reviewedCombinedSource": "eb32b211ab3704935b9431747089ab0715582a74",
+  "RootActualIndependentTestReview": "rate-eb32-root-independent-review.json",
+  "freshFullCore": 42138733821,
+  "freshFullCoreSourceIdentity": {
+    "atKST": "2026-11-06T09:52:34+09:00",
+    "run": 42138733821,
+    "source": "eb32b211ab3704935b9431747089ab0715582a74",
+    "status": "in_progress",
+    "conclusion": null,
+    "identityVerified": true,
+    "OrcaInboxChecks": 0,
+    "oneShotCallbackQuestion": "msg_045f69f4caf4",
+    "callbackCurrentAuthorDispatch": "ctx_ceecb3824e33",
+    "maxSeconds": 5400,
+    "intervalSeconds": 20,
+    "inboxPolling": false
+  },
+  "freshFullCoreAccepted": false,
+  "qualifiedPGReport": "909b2ef7b2c12b18e86ed66b12a12a3cdc3f573f",
+  "qualifiedPGReportDocs": 42138741441
 }

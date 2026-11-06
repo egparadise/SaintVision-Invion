@@ -1,11 +1,11 @@
 ---
 doc_id: "GOV-FLEET5-BOOTSTRAP-V5-FREEZE-CODE-SCOPE-20261106"
 title: "FLEET5 전환 v5 계약 동결과 구현 범위"
-version: "1.0.3"
+version: "1.0.4"
 status: "active"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-11-06T09:17:48+09:00"
+updated: "2026-11-06T09:52:19+09:00"
 source_of_truth: "Git"
 ---
 
@@ -57,3 +57,10 @@ K1은 서로 다른 시점의 보존 이력을 검증해야 한다. 종료된 ep
 다른 migration 사이의 cohort fence, History/current native/challenge/상태·인증서/publication/설치 trust/artifact/CI/review 입력의 실제 독립 생성·인증은 K2 의무다. 서명 시각에 의존하는 offline 역사 검증의 backdating 잔여 한계와 caller-owned 동시성 조건을 보존한다. 이 타입이나 서명 fixture가 실시간 producer 구현을 대신하지 않는다.
 
 실패 보고a413c0c2/Docs42133327925는 사실 보고로만 수락한다. 분 경계는 실제 실패 원인으로 미확정이다. 같은 Codex의 별도 TEST-clock 카드와 README-only 교정·고정 목적 hosted PG16 시험 경로를 허용했다. 기존 Core/Backend workflow·제품·Go는 그대로 두며 선택 시험의 성공은 fullCore가 아니다. Root가 실제 시험/README/CI delta와 실제 PG 결과를 검토하고 결합 SHA를 고른 뒤에만 새 전체Core/Docs를 진행한다. 현재 코드 수락을 근거로 실패 CI를 재실행하거나 K1 최종 worker_done을 하지 않는다. [실제 독립 코드 검토](https://github.com/egparadise/SaintVision-Invion/blob/191b6f843a643ee4989ce28c9ebf1816963ffe28/docs/vault/30_Development/History/2026-11-06_08-50-00_KST_FLEET5_K1_56651cba_temporal_delta_%EB%8F%85%EB%A6%BD%EA%B2%80%ED%86%A0_Claude.md)와 k1-temporal-actual-code-axis-root-decision.json에 근거를 보존했다.
+
+
+## 실제 eb32 시험 교정 검토와 새 전체 CI
+
+Root는 eb32b211의 TEST/README/고정 CI delta를 직접 읽고 source25개 허용 범위·Go/testdata/schema/pin/기존Core/Backend 불변을 대조해 수락했다. README R1도 닫혔다. 실제 PG16 Focus42137053588과 Docs42137296076은 exact source에서 성공했다. Root가 원본 artifact13466003560의13,493bytes/digest를 비교·다운로드해 XML/JSON을 직접 파싱했다. 원래 함수 같은 분1통과·강제 분 경계1의도된 실패·수정 파일30통과/0오류/0skip와 source의 모든 test 이름,3scope counter·2bucket5→1 및 원래56651 함수 hash를 확인했다. 이 반례는 과거 실패의 실제 시각 원인 확정은 아니다.
+
+msg_4f741ef0872c로 고정 eb32를 검토된 결합 소스로 선택해 새 fullCore42138733821을 한 번 실행하도록 했다. 이미 성공한 동일 SHA Docs를 재사용하고 선택 proof input은 모두 false다. 과거56651/Core42126222201 실패는 유지한다. 현재 fullCore terminal·원본artifact·최종보고/ownDocs·Rootboundedhandoff가 남으며 source/선택PG 검토 수락을 전체 CI 성공으로 바꾸지 않는다. pending question msg_045f69f4caf4에는 고정 run만 확인하는 한정 one-shot monitor가 terminal 때 같은 ctx_ceecb3824e33에 실제 상태를 reply한다. inbox polling·새 Agent·CI 재실행이나 취소는 하지 않는다.

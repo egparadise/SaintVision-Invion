@@ -1,0 +1,14 @@
+{
+  "atKST": "2026-11-06T09:52:34+09:00",
+  "run": 42138733821,
+  "source": "eb32b211ab3704935b9431747089ab0715582a74",
+  "status": "in_progress",
+  "conclusion": null,
+  "identityVerified": true,
+  "OrcaInboxChecks": 0,
+  "oneShotCallbackQuestion": "msg_045f69f4caf4",
+  "callbackCurrentAuthorDispatch": "ctx_ceecb3824e33",
+  "maxSeconds": 5400,
+  "intervalSeconds": 20,
+  "inboxPolling": false
+}

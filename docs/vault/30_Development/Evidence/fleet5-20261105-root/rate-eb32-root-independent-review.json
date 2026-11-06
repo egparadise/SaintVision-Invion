@@ -1,0 +1,54 @@
+{
+  "schemaVersion": "fleet5-rate-eb32-root-independent-artifact-review:1",
+  "atKST": "2026-11-06T09:38:37+09:00",
+  "source": "eb32b211ab3704935b9431747089ab0715582a74",
+  "focusedRun": 42137053588,
+  "artifact": 13466003560,
+  "actualRemoteAndDownloadedSHA256": "cb6ac1002ff5fe785a12186d26b891a4895ba105ea9c4c4fb67f0fc726925a62",
+  "downloadedBytes": 13493,
+  "RootActuallyParsedSelectedXMLAndProofJSON": true,
+  "counts": {
+    "original-same-window": {
+      "total": 1,
+      "failures": 0,
+      "errors": 0,
+      "skips": 0,
+      "exit": 0,
+      "rawXMLSHA256": "4df75b576c364d35e00dc6646096c7af47cd4fe878a438032b04d5060210a9ec",
+      "realTraceCount": 1,
+      "declaredSourceTestNamesCovered": false
+    },
+    "original-forced-rollover": {
+      "total": 1,
+      "failures": 1,
+      "errors": 0,
+      "skips": 0,
+      "exit": 1,
+      "rawXMLSHA256": "045a0317d39a547d9fbc5f0d438793fd76c62061b6f12ed318a00c76820bdc92",
+      "realTraceCount": 1,
+      "declaredSourceTestNamesCovered": false
+    },
+    "full-affected-file": {
+      "total": 30,
+      "failures": 0,
+      "errors": 0,
+      "skips": 0,
+      "exit": 0,
+      "rawXMLSHA256": "8976c7bd39be85fc04692f3b9d0b3bc08ae36009bb680f17a0b12c1a0690907f",
+      "realTraceCount": 6,
+      "declaredSourceTestNamesCovered": true
+    }
+  },
+  "originalFunctionSHA256": "4452bf5b87fcecbc037e8adbab48b5882d348f34427f25f814117ed666ae1e97",
+  "allDeclaredAffectedSourceTestNamesActuallyCovered": true,
+  "actualPG16": true,
+  "exactDocs": 42137296076,
+  "DocsJob": 127628586662,
+  "rootVerifiedExactDocsHeadRefAllJobsSuccess": true,
+  "privateRawZIPXMLNotExported": true,
+  "historicalCore42126222201CauseProven": false,
+  "oldCoreConclusion": "FAILURE",
+  "RootSourceReviewVerdict": "ACCEPT TEST+README+fixedCI delta; allproduct/Go/testdata/schema/pins/existingCoreBackendunchanged",
+  "collectorCorrection": "First Root parser looked for control lineage fields in individual JSON saved before augmentation. Read grouped original-controls.json, assert all individual fields equal grouped, then check original raw/function SHA and intended outcome. Same cached ZIP; no source/CI rerun.",
+  "wholeCoreSuccess": false
+}

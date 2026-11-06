@@ -1,0 +1,47 @@
+{
+  "schemaVersion": "fleet5-eb32-reviewed-combined-source-choice:1",
+  "atKST": "2026-11-06T09:39:48+09:00",
+  "source": "eb32b211ab3704935b9431747089ab0715582a74",
+  "RootIndependentTestREADMEWorkflowReview": "ACCEPT",
+  "focusedPGRun": 42137053588,
+  "RootActualArtifactParsed": true,
+  "freshFullCoreDispatchAuthorized": 1,
+  "freshFullCoreID": 42138733821,
+  "existingExactSourceDocsReused": 42137296076,
+  "oldFailedCoreStillFailure": 42126222201,
+  "ownerMessage": {
+    "ok": true,
+    "result": {
+      "messageId": "msg_4f741ef0872c"
+    }
+  },
+  "wholeProgramComplete": false,
+  "body": "CONCRETE Root source-choice gate satisfied. Root independently fetched/read immutable eb32b211ab3704935b9431747089ab0715582a74(parent56651), exactremote/25allowedfiles/4nonDocs, fullTEST+proofhelper+YAML andREADME delta; allGo/testdata/schema/sourcepins/product/existingCoreBackend bytesunchanged. Root actual verdict ACCEPT TEST+README+fixedfocusedCI delta; R1README boundary CLOSED documentation-only. This is Root independent review, not a fabricated extraClaude review. Actual191b/Docs42132923864 codeacceptance covers unchangedGo56651.\nRoot verified actual focused42137053588/job127627763128 eventpush/head/ref/path/SUCCESS and Docs42137296076/job127628586662 exactalljobsSUCCESS. I downloaded originalartifact13466003560 myself13,493bytes/SHAcb6ac1002ff5fe785a12186d26b891a4895ba105ea9c4c4fb67f0fc726925a62 matchingremote andparsed selectedRAW XML+JSON: originalsamewindow1PASS/0error/skip/exit0; originalforcedrollover1INTENDEDfailure/0error/skip/exit1 withexactGraph409vsRes429; FULLaffectedfile30PASS/0fail/error/skip/deselect andALLstaticdeclaredtestnamescovered. Originalfunction4452bf5b87fcecbc037e8adbab48b5882d348f34427f25f814117ed666ae1e97/raw56651source hashes matchgit. Groupedandindividualproof fieldsagree. PG16service/source/run/ref/toolprovenance+actual3scoperows5 andtwoBuckets5->1checked. FirstRootparserlookedforaugmentedfieldsinindividualJSON; correctedtogroupedcontrolswithfieldequality, reusedsameZIP/no source/CIrerun. Historical42126222201 remainsFAILURE/causeunproven, norawXMLexport.\n\nCHOOSE frozen eb32b211ab3704935b9431747089ab0715582a74 on agent/codex/fleet5-prepare-rate-clock-test-20261106 as reviewedCOMBINEDcandidate (acceptedK1Go +reviewedtest+README+focusedCI). AUTHORIZE exactlyONE FRESH full Core workflow_dispatch onTHIShead/ref withUNIQUEcorrelation. Optionalrun_s08_acceptance/run_fleet5_peer_phase_proof/run_fleet5_peer_phase_fixed_proof FALSE/default; no nativeproof/e50archive/all8respin, nooldCorecancel/rerun. This is NEWsourcevalidation, not rerunofoldfailed56651. DoNOTmovethisref; verify actualhead/ref/correlationandalljobs/steps plusactualartifact. SourceDocs42137296076 alreadySUCCESSexacteb32; REUSETHATexactsourceDocsevidence, doNOTdispatchduplicateDocsjustforthechoice.\nContinue yourqualifiedPGreport/ownreportDocs inparallel; keepreportdocsbranchseparateandproductdiff0. FullCore mustexecute normalunchangedLinuxrace/wholePython/PG/requiredpoststeps andincludeoriginalrate+boundarynamesactualpass/0skip; no countguess/skiploosening. Preserveallfirstfailures/skippedoptionalproofsteps andstrictbaselineexpectedskips. Captureactualcompiledtoolversions/source/artifactdigest/parsedXML/Go counts, rawpayloadprivateonly. IfnewCorefails, preserveanddiagnose namedcause, noautomaticblindretry/timeoutincrease. Report actualuniqueCoreid/correlation early andfinishSAMErun/artifact/report.\nK1cardworker_done stillrequiresactualfullCoreallSUCCESS +qualifiedfinalreport/ownDocs +Rootfinalboundedhandoff. K2trustedproducers,40runtimecases,physical5PC remainNOTRUN; no Node/PKI/VM/runtimewrites. ExistingBdesignrev6 isindependent anddoesnotblockthisnewCI; no BclaimfromK1PGproof.\nRootproofprivate .work/rate-eb32-root-independent-review.json willbepublishedinRootnextcheckpoint; sourceoldfailedrun evidencepreserved. Proceed freshfullCore nowwithoutgenericpermissionquestion.",
+  "actualOwnerStatus": "msg_f2dfbea9d29e",
+  "actualSourceIdentityAtObservation": {
+    "atKST": "2026-11-06T09:52:34+09:00",
+    "run": 42138733821,
+    "source": "eb32b211ab3704935b9431747089ab0715582a74",
+    "status": "in_progress",
+    "conclusion": null,
+    "identityVerified": true,
+    "OrcaInboxChecks": 0,
+    "oneShotCallbackQuestion": "msg_045f69f4caf4",
+    "callbackCurrentAuthorDispatch": "ctx_ceecb3824e33",
+    "maxSeconds": 5400,
+    "intervalSeconds": 20,
+    "inboxPolling": false
+  },
+  "sourceDocsReuse": 42137296076,
+  "qualifiedPGReport": {
+    "schemaVersion": "fleet5-909-qualified-PG-report-root-check:1",
+    "atKST": "2026-11-06T09:52:19+09:00",
+    "report": "909b2ef7b2c12b18e86ed66b12a12a3cdc3f573f",
+    "source": "eb32b211ab3704935b9431747089ab0715582a74",
+    "Docs": 42138741441,
+    "job": 127633394611,
+    "rootVerifiedExactHeadRefAllJobsSuccess": true,
+    "productDiff": 0,
+    "actualRawFocusedArtifactRootParsed": "rate-eb32-root-independent-review.json"
+  }
+}

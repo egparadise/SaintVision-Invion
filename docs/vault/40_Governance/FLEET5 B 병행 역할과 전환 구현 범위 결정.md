@@ -1,11 +1,11 @@
 ---
 doc_id: "GOV-FLEET5-B-BOOTSTRAP-SCOPE-20261106"
 title: "FLEET5 B 병행 역할과 전환 구현 범위 결정"
-version: "1.3.0"
+version: "1.4.0"
 status: "review"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-11-06T08:06:43+09:00"
+updated: "2026-11-06T09:52:19+09:00"
 source_of_truth: "Git"
 ---
 
@@ -67,3 +67,16 @@ L1은 승인 계보의 어느 조상이든 명시적으로 revoke되면 모든 �
 L3은 기존 protected operator-release anchor 뒤에 caller/purpose/scope를 강제하는 signing service를 둔다. delivery controller는 raw operator private key를 갖지 않으며 실제 postcommit/ARM/key/recipient/challenge에 결속된 KEY_DELIVERY_PREPARE/RECEIPT만 요청할 수 있다. APPROVAL/RELEASE/DELEGATION/GATE 요청은 서명 전에 거부한다. 별도 budget key와 실제 custody는 NULL이다. L4는 golden manifest 비교와 별도로 실제 writer/소유자/권한 불변식, oneOf branch별 부정 입력, 시간이 흐르는 expiry/revoke/fence/stale/lost ack 전이를 검사한다. 서명은 SYMBOLIC이며 실제 새 B Go/crypto/PG/Docker/crash/장비0, A1–A16 PENDING과 모든 real binding NULL/HOLD를 유지한다.
 
 구체 지시 원문은 b-rev5-root-decision.json이며 실제 판정은 [고정 rev4 독립 검토](https://github.com/egparadise/SaintVision-Invion/blob/14c7c936e056c685e85ee8f34f6185aa27ed9a2c/docs/vault/30_Development/History/2026-11-06_07-45-00_KST_FLEET5_B_contract_rev4_2a08284a_%EB%8F%85%EB%A6%BD%EA%B2%80%ED%86%A0_Claude.md)다. K1의 새 temporal 코드/CI는 별도 카드이고 B 검증을 대신하지 않는다.
+
+
+## 실제 rev5 판정과 rev6의 닫힌 상태·권한 결정
+
+228e2a20은 실제8bac0838/Docs42137554199에서 B5-M1/M2와 L1–L5 수정 필요다. 현재34 writer/46 surface·335검사의 재현된 부분은 보존한다. Root는 원문과 exact head/ref/전체job을 확인하고 reply msg_17afe2db8b82로 좁은 rev6 DOCS/schema/static 범위를 지정했다. 부분 동결·B 코드·운영 등록은 아직 아니다.
+
+PRE_IO obligation은 tenant/Node/epoch/operation별로 닫는다. 등록이 실제 I/O보다 먼저 commit되고 기존 signed body/nonce에 결속된 CP/adapter handle이 이를 증명한다. 보통 성공의 정확한 typed receipt는 원래 evidence/receipt transaction에서 CONFIRMED_OUTCOME으로 닫을 수 있다. ACTIVE receipt는 자원 claim을 유지하고, 이 상태만으로 cleanup·claim 해제·containment 해제를 허가하지 않는다. 오류/불명확은 PENDING 또는 UNCERTAIN으로 거부를 유지하고 UNCERTAIN은 보호된 physical proof 복구만 허용한다. 실제13개 plain reader와 B reader의 목적/동작을 명시하며 observe/safety는 별도 인증 아래 유지한다. 다른 Node의 obligation이 이 Node를 막지 않는다. draining·quarantine 등의 독립 거부 사실을 보존해 상태 projection 변경으로 더 강한 거부가 지워지지 않게 한다.
+
+5426개의 name-collision BLOCK은 호출자의 타입·실제 import·DB 기록·transaction owner를 구분해 정정한다. 남은 unknown을 각 plan에 직접 연결하고 알려진 critical plan이 지원됨과 BLOCK됨을 동시에 주장하지 않는다. getattr·상태 전이 역전·ORM insert/setattr·동적/비정규 table SQL·사라진 stale rule도 인과 source fixture로 검사한다. 모든 새 B table과 anchor/child/tombstone/outbox의 rank/mode·키 순서를 같은 canonical 데이터로 닫는다.
+
+Signing service 자체가 ARM/RELEASE/DELEGATION 등의 현재 승인·계보·tombstone·epoch/fence를 확인한다. 외부 signer가 있으면 준비 intent 뒤 조건부 issuance publication을 검증하며 DB lock을 네트워크 너머 유지하지 않는다. CP tombstone은 권한 있는 DB principal과 causal evidence/audit로 인증하는 unsigned record로 정한다. 존재하지 않는 Node tombstone consumer·별도 domain 주장을 제거하고, authoritative outbox와 기존 signed INVALIDATE/gate ACK/expiry 경계를 명시한다. SAFE caller는 보호된 service에서 정확한 INVALIDATE만 요청하며 ARM을 요청할 수 없다.
+
+Root의 앞선 folder-confirmation 문구를 정정한다. 실제 plain activation은 등록 소유자와 revoked 여부만 확인하므로 그 동작을 보존한다. 새 folder/root 관측은 B-only readonly-root 승인에 추가하며 필요한 closed artifact/producer/rights/서명·검증자를 제안으로 명시한다. 사전 root identity 관측은 설치 후 readonly mount 증거를 대신하지 않는다. 실제72028에 이미 확인 artifact가 있다고 쓰지 않는다. 상세 지시는 b-rev6-concrete-root-decision.json이며 모든 실제 binding NULL/HOLD와 A1–A16 미실행을 유지한다.

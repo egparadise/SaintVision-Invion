@@ -1,0 +1,11 @@
+{
+  "schemaVersion": "fleet5-909-qualified-PG-report-root-check:1",
+  "atKST": "2026-11-06T09:52:19+09:00",
+  "report": "909b2ef7b2c12b18e86ed66b12a12a3cdc3f573f",
+  "source": "eb32b211ab3704935b9431747089ab0715582a74",
+  "Docs": 42138741441,
+  "job": 127633394611,
+  "rootVerifiedExactHeadRefAllJobsSuccess": true,
+  "productDiff": 0,
+  "actualRawFocusedArtifactRootParsed": "rate-eb32-root-independent-review.json"
+}
