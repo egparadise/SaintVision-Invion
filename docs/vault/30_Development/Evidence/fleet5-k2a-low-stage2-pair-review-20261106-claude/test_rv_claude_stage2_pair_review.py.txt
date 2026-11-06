@@ -1,0 +1,90 @@
+"""REVIEWER SCRATCH ONLY (Claude pair review). Never committed to the author tree."""
+import ast
+from copy import deepcopy
+import subprocess
+
+import pytest
+
+from test_worker_peer_floor_observation_diagnostics import observation, run_observe, diagnostic, floor, ROOT
+
+
+def _old_observe():
+    source = subprocess.check_output(["git", "show", "52f935acced837d500af5932c3d26882e091f25a:deploy/lan/worker_peer_floor.py"], cwd=ROOT).decode()
+    old = next(n for n in ast.parse(source).body if isinstance(n, ast.FunctionDef) and n.name == "observe")
+    ns = dict(floor.__dict__)
+    exec(compile(ast.Module(body=[old], type_ignores=[]), "<rv-52f-observe>", "exec"), ns)
+    return ns["observe"]
+
+
+def test_rv_whole_module_ast_except_observe_and_new_validator():
+    old = ast.parse(subprocess.check_output(["git", "show", "52f935acced837d500af5932c3d26882e091f25a:deploy/lan/worker_peer_floor.py"], cwd=ROOT).decode())
+    new = ast.parse((ROOT / "deploy/lan/worker_peer_floor.py").read_text(encoding="utf-8"))
+    def keep(tree):
+        return [ast.dump(n) for n in tree.body if not (isinstance(n, ast.FunctionDef) and n.name in ("observe", "_ordered_plain_mounts"))]
+    assert keep(old) == keep(new)
+    # module node positions: new validator sits immediately before observe only
+    names = [getattr(n, "name", None) for n in new.body]
+    assert names.index("_ordered_plain_mounts") + 1 == names.index("observe")
+
+
+@pytest.mark.parametrize("field", ["Id", "Image", "Config", "StartedAt", "RestartCount", "consumers", "CreatedAt", "volumeName"])
+def test_rv_reordered_mounts_never_mask_other_critical_change(observation, field):
+    a = observation
+    a["after"]["Mounts"].reverse()
+    if field == "Id": a["after"]["Id"] = "c" * 64
+    elif field == "Image": a["after"]["Image"] = "sha256:" + "d" * 64
+    elif field == "Config": a["after"]["Config"]["Env"] = ["PRIVATE_SENTINEL_ENV=changed"]
+    elif field == "StartedAt": a["after"]["State"]["StartedAt"] = "2030-01-01T00:00:01Z"
+    elif field == "RestartCount": a["after"]["RestartCount"] = 1
+    elif field == "consumers": a["after_consumers"].append("e" * 64)
+    elif field == "CreatedAt": a["after_volume"]["CreatedAt"] = "2030-01-01T00:00:01Z"
+    else: a["after_volume"]["Name"] = "other"
+    d = diagnostic(a)  # also asserts no private value leak
+    assert d["classification"] == "REFUSAL_DIAGNOSTIC_ONLY"
+
+
+@pytest.mark.parametrize("fault", ["state-trailing-space", "state-upper", "state-dot-segment", "socket-as-volume", "state-as-bind", "added-socket", "removed-socket", "swap-sources"])
+def test_rv_destination_and_topology_exactness(observation, fault):
+    a = observation; m = a["after"]["Mounts"]
+    if fault == "state-trailing-space": m[0]["Destination"] = "/state "
+    elif fault == "state-upper": m[0]["Destination"] = "/STATE"
+    elif fault == "state-dot-segment": m[0]["Destination"] = "/state/."
+    elif fault == "socket-as-volume": m[1]["Type"] = "volume"
+    elif fault == "state-as-bind": m[0]["Type"] = "bind"
+    elif fault == "added-socket": a["before"]["Mounts"] = a["before"]["Mounts"][:1]
+    elif fault == "removed-socket": a["after"]["Mounts"] = m[:1]
+    else: m[0]["Source"], m[1]["Source"] = m[1]["Source"], m[0]["Source"]
+    with pytest.raises(ValueError):
+        run_observe(a)
+
+
+def test_rv_inputs_not_mutated_by_ordering(observation):
+    a = observation
+    a["after"]["Mounts"].reverse()
+    snapshot_before, snapshot_after = deepcopy(a["before"]["Mounts"]), deepcopy(a["after"]["Mounts"])
+    assert run_observe(a) == a["wire"]
+    assert a["before"]["Mounts"] == snapshot_before and a["after"]["Mounts"] == snapshot_after
+    assert [x["Destination"] for x in a["after"]["Mounts"]] == ["/var/run/docker.sock", "/state"]
+
+
+@pytest.mark.parametrize("old_value,new_value", [(True, 1), (1, 1.0), (False, 0)])
+def test_rv_python_numeric_bool_equality_is_preexisting(observation, old_value, new_value):
+    """Record actual behaviour; NOT asserted as desired. Same in frozen 52f observe."""
+    a = observation
+    a["before"]["Mounts"][0]["FutureField"] = old_value
+    a["after"]["Mounts"][0]["FutureField"] = new_value
+    a["seen"]["targets"] = 0
+    new_passes = run_observe(a) == a["wire"]
+    a["seen"]["targets"] = 0
+    old_passes = _old_observe()("SYNTHETIC", a["rotation"], a["files"], nonce="SYNTHETIC") == a["wire"]
+    print(f"RV-NUMERIC {old_value!r}->{new_value!r} new_passes={new_passes} old52f_passes={old_passes}")
+    assert new_passes == old_passes
+
+
+def test_rv_key_order_inside_mount_record_is_not_a_change(observation):
+    a = observation
+    m = a["after"]["Mounts"][0]
+    a["after"]["Mounts"][0] = dict(reversed(list(m.items())))
+    assert run_observe(a) == a["wire"]
+    a["seen"]["targets"] = 0
+    assert _old_observe()("SYNTHETIC", a["rotation"], a["files"], nonce="SYNTHETIC") == a["wire"]

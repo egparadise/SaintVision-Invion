@@ -1,0 +1,208 @@
+package migrationcontext
+
+// REVIEWER SCRATCH ONLY (Claude, pair review 2026-11-06). Never committed to the
+// author tree. Exercises the actual dba gate functions and pure checks.
+
+import (
+	"bytes"
+	"crypto/ed25519"
+	"crypto/rand"
+	"crypto/x509"
+	"crypto/x509/pkix"
+	"encoding/hex"
+	"math/big"
+	"net/url"
+	"strings"
+	"testing"
+	"time"
+)
+
+// R1: compile-valid mutants; result recorded per mutant (escape or refused).
+func TestRV2_R1ResolvedGateEvasion(t *testing.T) {
+	root := repository(t)
+	original := ownProductionSources(t, root)
+	paths := exports(t, root)
+	cases := []struct {
+		name, code string
+		wantRefuse bool
+	}{
+		{"own-iface-dispatch-Certificate.Verify", `import "crypto/x509"
+type rvVerifier interface{ Verify(x509.VerifyOptions) ([][]*x509.Certificate, error) }
+func rvProbe(c *x509.Certificate) { var v rvVerifier = c; _, _ = v.Verify(x509.VerifyOptions{}) }`, true},
+		{"generic-constraint-dispatch-Certificate.Verify", `import "crypto/x509"
+func rvProbe[T interface{ Verify(x509.VerifyOptions) ([][]*x509.Certificate, error) }](c T) { _, _ = c.Verify(x509.VerifyOptions{}) }
+func rvUse(c *x509.Certificate) { rvProbe(c) }`, true},
+		{"own-iface-dispatch-time.Time.Local", `import "time"
+type rvLocal interface{ Local() time.Time }
+func rvProbe() { var l rvLocal = time.Time{}; _ = l.Local() }`, true},
+		{"foreign-var-pointer-write-time.Local", `import "time"
+func rvProbe() { p := &time.Local; *p = time.UTC }`, true},
+		{"foreign-var-direct-write-time.Local(control)", `import "time"
+func rvProbe() { time.Local = time.UTC }`, true},
+		{"iface-method-value-call(control)", `import "crypto/x509"
+type rvVerifier interface{ Verify(x509.VerifyOptions) ([][]*x509.Certificate, error) }
+func rvProbe(c *x509.Certificate) { var v rvVerifier = c; f := v.Verify; _, _ = f(x509.VerifyOptions{}) }`, true},
+		{"embedded-promotion-Verify(control)", `import "crypto/x509"
+type rvWrap struct{ *x509.Certificate }
+func rvProbe(c *x509.Certificate) { _, _ = rvWrap{c}.Verify(x509.VerifyOptions{}) }`, true},
+		{"dot-import-Now(control)", `import . "time"
+func rvProbe() { _ = Now() }`, true},
+		{"package-level-func-value(control)", `import "time"
+var rvClock = time.Now`, true},
+		{"defer-direct-Since(control)", `import "time"
+func rvProbe() { defer time.Since(time.Time{}) }`, true},
+		{"closure-call(control)", `func rvProbe() { f := func() {}; f() }`, true},
+		{"own-unexported-iface(pure control)", `type rvPort interface{ rvRead() string }
+func rvProbe(p rvPort) string { return p.rvRead() }`, false},
+	}
+	for _, m := range cases {
+		t.Run(m.name, func(t *testing.T) {
+			src := copyMap(original)
+			src["rv_probe.go"] = []byte("package migrationcontext\n" + m.code)
+			checked, e := checkSourcePackage(ownImport, src, paths, nil)
+			if e != nil {
+				t.Fatalf("mutant must typecheck: %v", e)
+			}
+			e = sourceEffects(src, checked)
+			t.Logf("RESULT %s refused=%t err=%v", m.name, e != nil, e)
+			if (e != nil) != m.wantRefuse {
+				t.Errorf("GATE_MISMATCH %s: wantRefuse=%t got err=%v", m.name, m.wantRefuse, e)
+			}
+		})
+	}
+}
+
+// R2: discrimination. Same-SPKI construction with DISTINCT keys must pass, so the
+// owner negative depends on the SPKI rule, not an unrelated construction defect.
+func rvTwoCerts(t *testing.T, f policyData, sameKey bool) policyData {
+	t.Helper()
+	at := time.Date(2030, 1, 1, 0, 0, 0, 0, time.UTC)
+	caPub, caKey, e := ed25519.GenerateKey(rand.Reader)
+	if e != nil {
+		t.Fatal(e)
+	}
+	ca := &x509.Certificate{SerialNumber: big.NewInt(1), Subject: pkix.Name{CommonName: "RV SYNTHETIC"}, NotBefore: at.Add(-time.Hour), NotAfter: at.Add(time.Hour), IsCA: true, BasicConstraintsValid: true, KeyUsage: x509.KeyUsageCertSign}
+	caDER, e := x509.CreateCertificate(rand.Reader, ca, ca, caPub, caKey)
+	if e != nil {
+		t.Fatal(e)
+	}
+	shared, _, _ := ed25519.GenerateKey(rand.Reader)
+	for i := range f.Members {
+		leafPub := shared
+		if !sameKey {
+			leafPub, _, _ = ed25519.GenerateKey(rand.Reader)
+		}
+		sc := f.Members[i].Scope.(map[string]any)
+		uri, _ := url.Parse("spiffe://saintvision.ai/tenant/" + sc["tenantId"].(string) + "/node/" + sc["nodeId"].(string) + "/epoch/" + sc["recoveryEpoch"].(string))
+		cert := &x509.Certificate{SerialNumber: big.NewInt(int64(i + 2)), NotBefore: at.Add(-time.Hour), NotAfter: at.Add(time.Hour), URIs: []*url.URL{uri}, KeyUsage: x509.KeyUsageDigitalSignature, ExtKeyUsage: []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth}}
+		der, e := x509.CreateCertificate(rand.Reader, cert, ca, leafPub, caKey)
+		if e != nil {
+			t.Fatal(e)
+		}
+		f.Members[i].CertificateDER = der
+		f.Members[i].CARootDER = copyBytes(caDER)
+		f.Grants = append(f.Grants, grant{Role: "node-leaf", AuthorityScope: map[string]any{"class": "NODE", "scope": sc}, PublicKeyHex: hex.EncodeToString(leafPub), NotBefore: at.Add(-time.Hour), NotAfter: at.Add(time.Hour), Status: "ACTIVE"})
+	}
+	return f
+}
+
+func TestRV2_R2Discrimination(t *testing.T) {
+	p, _, _, _, _ := syntheticCryptoHistory(t)
+	f, _ := freezePolicy(p)
+	if e := checkPolicyBindings(rvTwoCerts(t, f, false), measuredFor(f)); e != nil {
+		t.Fatalf("distinct-key positive control must pass: %v", e)
+	}
+	f2, _ := freezePolicy(p)
+	wantCode(t, checkPolicyBindings(rvTwoCerts(t, f2, true), measuredFor(f2)), TrustUnknown)
+	// Scope differing only in recoveryEpoch is NOT a duplicate (K1 compares whole scope).
+	f3, _ := freezePolicy(p)
+	sc0 := f3.Members[0].Scope.(map[string]any)
+	sc1 := f3.Members[1].Scope.(map[string]any)
+	t.Logf("fixture scopes distinct: tenant=%t node=%t epoch=%t", sc0["tenantId"] != sc1["tenantId"], sc0["nodeId"] != sc1["nodeId"], sc0["recoveryEpoch"] != sc1["recoveryEpoch"])
+	// Key-order / JSON re-encoding of the same scope is still a duplicate.
+	f4, _ := freezePolicy(p)
+	f4.Members[1].Scope = map[string]any{"recoveryEpoch": sc0["recoveryEpoch"], "nodeId": sc0["nodeId"], "tenantId": sc0["tenantId"]}
+	wantCode(t, checkPolicyBindings(f4, measuredFor(f4)), TrustUnknown)
+}
+
+// R3: discrimination + positive variants.
+func TestRV2_R3Discrimination(t *testing.T) {
+	p, h, st, c, packet := syntheticCryptoHistory(t)
+	if _, e := evaluateBoundHistory(p, h, st, c, packet); e != nil {
+		t.Fatalf("legitimate 2-op positive must pass end-to-end: %v", e)
+	}
+	ids := []string{}
+	for id := range h.Operations {
+		ids = append(ids, id)
+	}
+	t.Logf("fixture operations=%d", len(ids))
+	// An extra fully valid entry with a fresh lease hash and no query reference is
+	// allowed by K2A (and is NOT asked to be refused: do not require one entry).
+	f, _ := freezeHistory(h)
+	old := f.Operations[f.Query.OriginalOperationID]
+	old.OperationID = "rv-extra-valid"
+	old.LeaseEnvelopeSHA256 = hx("b", 64)
+	f.Operations[old.OperationID] = old
+	e := checkOriginalHistory(p, f)
+	t.Logf("extra-valid-fresh-lease pure=%v", e)
+	_, e = evaluateBoundHistory(p, f, st, c, packet)
+	t.Logf("extra-valid-fresh-lease full=%v", e)
+	// Three-way substitution with a fresh lease hash: requires substituting the
+	// OriginalLease bytes too (query hash binds them) => archive-forgery class.
+	g, _ := freezeHistory(h)
+	o := g.Operations[g.Query.OriginalOperationID]
+	o.OperationID = "rv-three-way-fresh"
+	o.LeaseEnvelopeSHA256 = hx("c", 64)
+	g.Operations[o.OperationID] = o
+	g.Query.OriginalOperationID = o.OperationID
+	g.SemanticInputs.(map[string]any)["facts"].(map[string]any)["migrationOperationId"] = o.OperationID
+	wantCode(t, checkOriginalHistory(p, g), OriginalOperationMismatch)
+	// Case-variant duplicate lease hash is caught by validHash lowercase rule.
+	k, _ := freezeHistory(h)
+	o2 := k.Operations[k.Query.OriginalOperationID]
+	o2.OperationID = "rv-upper"
+	o2.LeaseEnvelopeSHA256 = strings.ToUpper(o2.LeaseEnvelopeSHA256)
+	k.Operations[o2.OperationID] = o2
+	wantCode(t, checkOriginalHistory(p, k), OriginalOperationMismatch)
+}
+
+// R5: additional type-correct census mutants beyond the owner set.
+func TestRV2_R5ExtraCensusMutants(t *testing.T) {
+	root := repository(t)
+	paths := exports(t, root)
+	original := sourceSet(t, root, k1Base)
+	base, e := packageCensus(original, paths)
+	if e != nil {
+		t.Fatal(e)
+	}
+	type mut struct{ name, file, old, new, extraFile string }
+	for _, m := range []mut{
+		{"Report-int-to-int64", "verify.go", "Records, ProofReferences, RealSignatures int", "Records, ProofReferences int\n RealSignatures int64", ""},
+		{"Report-field-reorder", "verify.go", "Classification                           string\n\tRecords, ProofReferences, RealSignatures int", "Records, ProofReferences, RealSignatures int\n\tClassification string", ""},
+		{"Packet-tag", "verify.go", "Records   map[string][]byte", "Records   map[string][]byte `json:\"r\"`", ""},
+		{"Verify-value-receiver", "verify.go", "func (v *Verifier) Verify(packet Packet) (Report, error) {", "func (v Verifier) Verify(packet Packet) (Report, error) {", ""},
+		{"Report-unexported-method", "", "", "", "package migrationverify\nfunc (Report) rvProbe() {}\n"},
+		{"Verifier-new-unexported-field", "trust.go", "type Verifier struct {\n\ttrust     InstalledTrust", "type Verifier struct {\n\trvProbe   func()\n\ttrust     InstalledTrust", ""},
+	} {
+		t.Run(m.name, func(t *testing.T) {
+			src := copyMap(original)
+			if m.extraFile != "" {
+				src["rv_extra.go"] = []byte(m.extraFile)
+			} else {
+				if !bytes.Contains(src[m.file], []byte(m.old)) {
+					t.Fatalf("target text absent in %s", m.file)
+				}
+				src[m.file] = bytes.Replace(src[m.file], []byte(m.old), []byte(m.new), 1)
+			}
+			c, e := packageCensus(src, paths)
+			if e != nil {
+				t.Logf("RESULT %s typecheck/census error (refusal): %v", m.name, e)
+				return
+			}
+			t.Logf("RESULT %s detected=%t", m.name, c.shape != base.shape)
+			if c.shape == base.shape {
+				t.Errorf("CENSUS_ESCAPE %s", m.name)
+			}
+		})
+	}
+}

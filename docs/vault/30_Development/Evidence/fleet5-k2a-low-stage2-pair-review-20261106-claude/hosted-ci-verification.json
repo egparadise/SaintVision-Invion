@@ -1,0 +1,38 @@
+{
+  "schemaVersion": "fleet5-k2a-low-stage2-pair-review-hosted-ci:1",
+  "method": "gh api repos/egparadise/SaintVision-Invion/actions/runs/{id} and /jobs (reviewer, 2026-11-06 ~16:00 KST). Fields: head_sha, head_branch, event, status, conclusion, run_attempt, path, every step conclusion.",
+  "runs": [
+    {"id": 42173025277, "role": "Low dba source Docs", "head": "dba1804b1d180eda2bf0439952e9706782109fd6", "branch": "agent/codex/fleet5-k2a-review-lows-20261106", "event": "workflow_dispatch", "path": ".github/workflows/docs.yml", "attempt": 1, "conclusion": "success", "jobs": [{"id": 127745030120, "name": "docs", "conclusion": "success", "steps": 19, "nonSuccessSteps": [], "skipped": 0}], "title": "FLEET5-K2A-review-Lows-Docs-dba1804b1d18-20261106T1513KST"},
+    {"id": 42174324865, "role": "Stage2 ONE push (focused exact-case lane)", "head": "01a4bebf55d23f11f85258746662d8b8a5cd0311", "branch": "agent/codex/fleet5-peer-floor-mount-order-stage2-20261106", "event": "push", "path": ".github/workflows/peer-floor-observation-diagnostic.yml", "attempt": 1, "conclusion": "success", "jobs": [{"id": 127749166146, "name": "diagnose", "conclusion": "success", "steps": 15, "nonSuccessSteps": [], "skipped": 0}], "title": "FLEET5-peer-floor-stage2-01a4bebf55d23f11f85258746662d8b8a5cd0311"},
+    {"id": 42174387586, "role": "Stage2 source Docs", "head": "01a4bebf55d23f11f85258746662d8b8a5cd0311", "event": "workflow_dispatch", "path": ".github/workflows/docs.yml", "attempt": 1, "conclusion": "success", "jobs": [{"id": 127749372289, "name": "docs", "conclusion": "success", "steps": 19, "nonSuccessSteps": [], "skipped": 0}]},
+    {"id": 42175312016, "role": "Stage2 qualified report Docs", "head": "21059451c23cebe8c038f76e437c390120205998", "event": "workflow_dispatch", "path": ".github/workflows/docs.yml", "attempt": 1, "conclusion": "success", "jobs": [{"id": 127752309207, "name": "docs", "conclusion": "success", "steps": 19, "nonSuccessSteps": [], "skipped": 0}]},
+    {"id": 42174947293, "role": "Stage1 qualified report Docs", "head": "a8b6c1bdc15da51df099605cf50a75586577e4de", "branch": "agent/codex/fleet5-peer-floor-observation-diagnostic-20261106", "event": "workflow_dispatch", "path": ".github/workflows/docs.yml", "attempt": 1, "conclusion": "success", "jobs": [{"id": 127751158198, "name": "docs", "conclusion": "success", "steps": 19, "nonSuccessSteps": [], "skipped": 0}]},
+    {"id": 42164071724, "role": "RETAINED FAILURE: de71 Core", "head": "de71c07c2b827eea50e2ca660f80d042334472c7", "event": "workflow_dispatch", "path": ".github/workflows/core.yml", "attempt": 1, "conclusion": "failure", "jobs": [{"id": 127716312164, "name": "s01-storage-roundtrip", "conclusion": "success"}, {"id": 127716312318, "name": "core", "conclusion": "failure", "steps": 48, "nonSuccessSteps": ["Run provisioned LAN installer acceptance"], "skipped": 22}]},
+    {"id": 42170068364, "role": "RETAINED FAILURE: Stage1 52f push", "head": "52f935acced837d500af5932c3d26882e091f25a", "event": "push", "path": ".github/workflows/peer-floor-observation-diagnostic.yml", "attempt": 1, "conclusion": "failure", "jobs": [{"id": 127735558839, "name": "diagnose", "conclusion": "failure", "steps": 15, "nonSuccessSteps": ["Three predeclared diagnostic samples of the exact failed test"], "skipped": 2}]}
+  ],
+  "stage2Artifact": {
+    "id": 13483245465,
+    "name": "peer-floor-observation-stage2-01a4bebf55d23f11f85258746662d8b8a5cd0311",
+    "bytes": 1767,
+    "githubDigest": "sha256:b7e3c2372557d97c27607376a8b5b7886555f1699c330585919beded64b08cdd",
+    "reviewerDownloadSHA256": "b7e3c2372557d97c27607376a8b5b7886555f1699c330585919beded64b08cdd",
+    "expired": false,
+    "workflowRunHead": "01a4bebf55d23f11f85258746662d8b8a5cd0311",
+    "storage": "reviewer session scratch only; raw ZIP NOT exported to the vault",
+    "resultJsonSHA256": "27cd06cd4820b9866c8b8474346ae99a378b3be175a0b00a13d164ef0f4ac3f2",
+    "sourceManifestSHA256": "9e8d05efd97a24c93e3fcd4c932ae043b95082eb645027e52f13eb9231b6c782",
+    "parsed": {
+      "classification": "STAGE2_FIXED_CASE_CANDIDATE_NOT_CORE_OR_OPERATIONAL_ACCEPTANCE",
+      "sourceSHA": "01a4bebf55d23f11f85258746662d8b8a5cd0311", "runId": "42174324865", "attempt": "1",
+      "argvTest": "tests/integration/test_workspace_upgrade.py::test_real_upgrade_preserves_credentials_journal_and_replays (-o faulthandler_timeout=45)",
+      "samples": "OBSERVATION_SAMPLE_1..3 (3 distinct IDs): each exit 0, timedOut false, executedCases 1, failure/error/skipped 0/0/0, NEW_STAGE2_EXACT_CASE_PASS, 0 diagnostics",
+      "allExactCaseExecutionsPassed": true,
+      "originalDe71DifferingField": "UNKNOWN_NOT_RETROACTIVELY_INFERRED",
+      "manifestClassification": "NEW_UNREGISTERED_RAW_SEVEN_FILE_CANDIDATE_NOT_INSTALLED_TRUST",
+      "manifestHelper": "7665735eb5735be9fcb24f783f83ffe087c0d176e464a97df3022a4bd9f35799 (== reviewer git show 01a:deploy/lan/worker_peer_floor.py | sha256sum)",
+      "manifestLauncher": "76be408878d1105099d3457937fe0a579c09d9eefc6c6d46f0e22679670e5665 (still pins worker_peer_floor.py c73c81ad...)",
+      "rawSevenFileCandidateSHA256": "b160f9c7a55e033c86331e1b5adef937f7b064b1e17e9d89663d667f1559d7db (UNREGISTERED)"
+    }
+  },
+  "notClaimed": ["hosted race of the new Low tests (no fresh Core on dba)", "any combined-source CI", "whole Core green", "runtime/installation acceptance"]
+}

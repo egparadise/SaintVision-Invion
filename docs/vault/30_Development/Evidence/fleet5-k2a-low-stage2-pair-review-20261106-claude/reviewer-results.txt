@@ -1,0 +1,90 @@
+# Reviewer-derived result lines (Claude). Condensed from scratch runs; raw go/pytest logs kept in scratch only.
+## Low dba reviewer scratch (go test -count=1 -p 1 -v -run TestRV2_ ./internal/migrationcontext/, exit 1 = 4 recorded GATE_MISMATCH escapes; all other subtests PASS)
+    reviewer_pair_claude_test.go:67: RESULT own-iface-dispatch-Certificate.Verify refused=false err=<nil>
+    reviewer_pair_claude_test.go:69: GATE_MISMATCH own-iface-dispatch-Certificate.Verify: wantRefuse=true got err=<nil>
+    reviewer_pair_claude_test.go:67: RESULT generic-constraint-dispatch-Certificate.Verify refused=false err=<nil>
+    reviewer_pair_claude_test.go:69: GATE_MISMATCH generic-constraint-dispatch-Certificate.Verify: wantRefuse=true got err=<nil>
+    reviewer_pair_claude_test.go:67: RESULT own-iface-dispatch-time.Time.Local refused=false err=<nil>
+    reviewer_pair_claude_test.go:69: GATE_MISMATCH own-iface-dispatch-time.Time.Local: wantRefuse=true got err=<nil>
+    reviewer_pair_claude_test.go:67: RESULT foreign-var-pointer-write-time.Local refused=false err=<nil>
+    reviewer_pair_claude_test.go:69: GATE_MISMATCH foreign-var-pointer-write-time.Local: wantRefuse=true got err=<nil>
+    reviewer_pair_claude_test.go:67: RESULT foreign-var-direct-write-time.Local(control) refused=true err=foreign state write forbidden
+    reviewer_pair_claude_test.go:67: RESULT iface-method-value-call(control) refused=true err=unresolved/function-value/callback call forbidden
+    reviewer_pair_claude_test.go:67: RESULT embedded-promotion-Verify(control) refused=true err=unreviewed function/method object: crypto/x509.Certificate.Verify
+    reviewer_pair_claude_test.go:67: RESULT dot-import-Now(control) refused=true err=unreviewed function/method object: time.Now
+    reviewer_pair_claude_test.go:67: RESULT package-level-func-value(control) refused=true err=unreviewed function/method object: time.Now
+    reviewer_pair_claude_test.go:67: RESULT defer-direct-Since(control) refused=true err=unreviewed function/method object: time.Since
+    reviewer_pair_claude_test.go:67: RESULT closure-call(control) refused=true err=unresolved/function-value/callback call forbidden
+    reviewer_pair_claude_test.go:67: RESULT own-unexported-iface(pure control) refused=false err=<nil>
+--- FAIL: TestRV2_R1ResolvedGateEvasion (1.09s)
+    --- FAIL: TestRV2_R1ResolvedGateEvasion/own-iface-dispatch-Certificate.Verify (0.01s)
+    --- FAIL: TestRV2_R1ResolvedGateEvasion/generic-constraint-dispatch-Certificate.Verify (0.01s)
+    --- FAIL: TestRV2_R1ResolvedGateEvasion/own-iface-dispatch-time.Time.Local (0.01s)
+    --- FAIL: TestRV2_R1ResolvedGateEvasion/foreign-var-pointer-write-time.Local (0.01s)
+    --- PASS: TestRV2_R1ResolvedGateEvasion/foreign-var-direct-write-time.Local(control) (0.01s)
+    --- PASS: TestRV2_R1ResolvedGateEvasion/iface-method-value-call(control) (0.01s)
+    --- PASS: TestRV2_R1ResolvedGateEvasion/embedded-promotion-Verify(control) (0.01s)
+    --- PASS: TestRV2_R1ResolvedGateEvasion/dot-import-Now(control) (0.01s)
+    --- PASS: TestRV2_R1ResolvedGateEvasion/package-level-func-value(control) (0.01s)
+    --- PASS: TestRV2_R1ResolvedGateEvasion/defer-direct-Since(control) (0.01s)
+    --- PASS: TestRV2_R1ResolvedGateEvasion/closure-call(control) (0.01s)
+    --- PASS: TestRV2_R1ResolvedGateEvasion/own-unexported-iface(pure_control) (0.01s)
+    reviewer_pair_claude_test.go:121: fixture scopes distinct: tenant=false node=true epoch=false
+--- PASS: TestRV2_R2Discrimination (0.01s)
+    reviewer_pair_claude_test.go:138: fixture operations=2
+    reviewer_pair_claude_test.go:147: extra-valid-fresh-lease pure=<nil>
+    reviewer_pair_claude_test.go:149: extra-valid-fresh-lease full=K1_VALIDATION_REFUSED
+--- PASS: TestRV2_R3Discrimination (3.79s)
+    reviewer_pair_claude_test.go:202: RESULT Report-int-to-int64 detected=true
+    reviewer_pair_claude_test.go:202: RESULT Report-field-reorder detected=true
+    reviewer_pair_claude_test.go:202: RESULT Packet-tag detected=true
+    reviewer_pair_claude_test.go:202: RESULT Verify-value-receiver detected=true
+    reviewer_pair_claude_test.go:202: RESULT Report-unexported-method detected=true
+    reviewer_pair_claude_test.go:202: RESULT Verifier-new-unexported-field detected=true
+--- PASS: TestRV2_R5ExtraCensusMutants (2.23s)
+    --- PASS: TestRV2_R5ExtraCensusMutants/Report-int-to-int64 (0.19s)
+    --- PASS: TestRV2_R5ExtraCensusMutants/Report-field-reorder (0.19s)
+    --- PASS: TestRV2_R5ExtraCensusMutants/Packet-tag (0.18s)
+    --- PASS: TestRV2_R5ExtraCensusMutants/Verify-value-receiver (0.18s)
+    --- PASS: TestRV2_R5ExtraCensusMutants/Report-unexported-method (0.20s)
+    --- PASS: TestRV2_R5ExtraCensusMutants/Verifier-new-unexported-field (0.20s)
+
+## End-to-end escapes through the OWNER gates (mutant tracked via git add -N in detached scratch worktree, removed after each)
+M1 build=0
+M1 gates exit=0 :: import "crypto/x509" type rvVerifier interface{ Verify(x509.VerifyOptions) ([][]*x509.Certificate, error) } func rvProbe(c *x509.Certificate) { var v rvVerifier = c; _, _ = v.Verify(x509.VerifyOptions{}) } 
+ok  	github.com/egparadise/SaintVision-Invion/services/node-agent/internal/migrationcontext	2.878s
+M2 build=0
+M2 gates exit=0 :: import "time" func rvProbe() { p := &time.Local; *p = time.UTC } 
+ok  	github.com/egparadise/SaintVision-Invion/services/node-agent/internal/migrationcontext	2.739s
+M3 build=0
+M3 gates exit=0 :: import "time" type rvLocal interface{ Local() time.Time } func rvProbe() { var l rvLocal = time.Time{}; _ = l.Local() } 
+ok  	github.com/egparadise/SaintVision-Invion/services/node-agent/internal/migrationcontext	2.407s
+
+## Stage2 reviewer scratch (pytest tests/core/test_rv_claude_stage2_pair_review.py -q -s, exit 0)
+..................RV-NUMERIC True->1 new_passes=True old52f_passes=True
+.RV-NUMERIC 1->1.0 new_passes=True old52f_passes=True
+.RV-NUMERIC False->0 new_passes=True old52f_passes=True
+22 passed in 0.84s
+
+## Owner suites reproduced (serial)
+Low dba: go test -count=1 -p 1 -v ./internal/migrationcontext/ exit 0; top-level PASS=16 FAIL=0; subtest PASS=72 FAIL=0; ok  	github.com/egparadise/SaintVision-Invion/services/node-agent/internal/migrationcontext	17.084s
+Low dba: go vet ./internal/migrationcontext/ ./migrationverify/ exit 0
+Low dba: go test -race exit 2: go: -race requires cgo; enable cgo by setting CGO_ENABLED=1 => NOT_RUN
+Stage2 210594(==01a product): pytest 3 owner unit files exit 0: 129 passed in 1.72s
+
+## Pin seam probe: tests/test_lan_leaf_rotation_standalone_runtime.py (serial, local Windows)
+at 01a/210594: exit 1: 13 failed, 24 passed, 6 skipped in 1.64s
+FAILED tests/test_lan_leaf_rotation_standalone_runtime.py::test_reviewed_lock_is_exactly_two_observed_abis_and_four_pypi_wheels
+FAILED tests/test_lan_leaf_rotation_standalone_runtime.py::test_worker_local_import_closure_is_exact_and_missing_module_fails_before_download
+FAILED tests/test_lan_leaf_rotation_standalone_runtime.py::test_install_is_atomic_idempotent_and_rejects_changed_installed_file
+FAILED tests/test_lan_leaf_rotation_standalone_runtime.py::test_repeated_preflight_install_and_worker_cycle_writes_no_bytecode[original-False]
+FAILED tests/test_lan_leaf_rotation_standalone_runtime.py::test_repeated_preflight_install_and_worker_cycle_writes_no_bytecode[original-True]
+FAILED tests/test_lan_leaf_rotation_standalone_runtime.py::test_repeated_preflight_install_and_worker_cycle_writes_no_bytecode[absent-False]
+FAILED tests/test_lan_leaf_rotation_standalone_runtime.py::test_repeated_preflight_install_and_worker_cycle_writes_no_bytecode[absent-True]
+FAILED tests/test_lan_leaf_rotation_standalone_runtime.py::test_repeated_preflight_install_and_worker_cycle_writes_no_bytecode[blocked-import-False]
+FAILED tests/test_lan_leaf_rotation_standalone_runtime.py::test_repeated_preflight_install_and_worker_cycle_writes_no_bytecode[blocked-import-True]
+FAILED tests/test_lan_leaf_rotation_standalone_runtime.py::test_bytecode_cleanup_is_narrow_verified_and_idempotent
+FAILED tests/test_lan_leaf_rotation_standalone_runtime.py::test_runtime_receipt_must_describe_recomputed_installed_files[fileCount--1]
+FAILED tests/test_lan_leaf_rotation_standalone_runtime.py::test_runtime_receipt_must_describe_recomputed_installed_files[filesSha256-0000000000000000000000000000000000000000000000000000000000000000]
+FAILED tests/test_lan_leaf_rotation_standalone_runtime.py::test_runtime_receipt_must_describe_recomputed_installed_files[workerModulesSha256-0000000000000000000000000000000000000000000000000000000000000000]
+at dba (helper c73c81ad == launcher pin): exit 0: 37 passed, 6 skipped in 2.80s

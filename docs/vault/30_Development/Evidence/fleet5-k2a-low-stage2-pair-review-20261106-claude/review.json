@@ -1,0 +1,114 @@
+{
+  "schemaVersion": "fleet5-k2a-low-stage2-pair-review:1",
+  "reviewer": "Claude (ONE actual independent reviewer; no subagents/helper workers)",
+  "orca": {"task": "task_de20693ba7c9", "dispatch": "ctx_8a1710587147", "coordinator": "Root"},
+  "owner": {"agent": "Codex", "task": "task_a95ef3d8ccce", "dispatch": "ctx_ed23b4a777d0", "pendingQuestion": "msg_6823df024379 (stays pending until this verdict plus a Root concrete action)"},
+  "reviewBranch": "agent/claude/fleet5-k2a-low-stage2-pair-review-20261106 created FROM dba1804b1d180eda2bf0439952e9706782109fd6",
+  "notCombined": "The two targets were reviewed SEPARATELY. No integrated/combined source exists; no combined unit, combined CI, cherry-pick, merge or pin rebinding was performed or is claimed.",
+  "priorReviewRead": "49d0f904ee8b42d3c6d7b770a3514355c21309c9 (Docs 42168779010) review.json K2A-R1..R5 + Root Evidence at 8993b1fc: stage1-push-bootstrap-and-k2a-lows-root-decision.json (msg_37da39cf72b3), stage2-mount-order-root-candidate-grant.json (msg_a29466460f6d), stage2-mount-order-independent-root-proposal-review.json (Root Codex proposal review, NOT Claude)",
+  "targets": {
+    "low": {
+      "head": "dba1804b1d180eda2bf0439952e9706782109fd6",
+      "parent": "ff3169d360a707415d9b03484cf0cf3031f3912c (exact; product bytes == de71c07c)",
+      "branch": "agent/codex/fleet5-k2a-review-lows-20261106",
+      "pathsVerified": "36 paths vs ff31: 7 under services/node-agent/internal/migrationcontext (M README.md, M history.go, M policy.go, M source_gate_test.go, A effect_gate_test.go, A review_census_test.go, A review_lows_test.go), 28 owner Evidence fleet5-k2a-review-lows-20261106-codex/, 1 owner History. 0 other paths; non-test import sets unchanged; no exported identifier added; K1 migrationverify, go.mod, deploy/lan, workflows, boards, registry unchanged."
+    },
+    "stage2": {
+      "helperCommit": "01a4bebf55d23f11f85258746662d8b8a5cd0311 (exact parent 52f935acced837d500af5932c3d26882e091f25a)",
+      "qualifiedReport": "21059451c23cebe8c038f76e437c390120205998 (direct parent 01a; docs-only: git diff 01a 2105 outside docs/vault is empty)",
+      "stage1Report": "a8b6c1bdc15da51df099605cf50a75586577e4de (parent 52f; non-docs bytes == 52f)",
+      "branch": "agent/codex/fleet5-peer-floor-mount-order-stage2-20261106",
+      "pathsVerified": "52f->01a non-docs: M .github/workflows/peer-floor-observation-diagnostic.yml (own branch-restricted lane rename/steps), M deploy/lan/worker_peer_floor.py, A tests/core/test_worker_peer_floor_mount_order_stage2.py, M tests/core/test_worker_peer_floor_observation_diagnostics.py; plus own Evidence/History. worker_config.py, peer_policy_phase.py, launcher, runtime lock, integration tests, services unchanged.",
+      "helperSHA256": {"52f": "17378b802f42000d74c1dc5d6136bcf5b1454846584b0555b950eb74bd35b406", "01a": "7665735eb5735be9fcb24f783f83ffe087c0d176e464a97df3022a4bd9f35799 (21083 bytes; == artifact source-manifest)", "ff31/de71/dba (launcher-pinned)": "c73c81adaedb2a7b3b8513cd874b093a71f7b5c147e2e08ea86f71a54c8d2fec"}
+    },
+    "disjointness": "From common base ff31: Low 36 paths, Stage2 lineage (0dfd,34e7,52f,01a,2105) 91 paths, overlap 0. Low product = services/node-agent/internal/migrationcontext only; Stage2 product = deploy/lan/worker_peer_floor.py + tests/core + own workflow. de71 is an ancestor of 01a."
+  },
+  "verdicts": {
+    "low_dba": {
+      "verdict": "CODE_AXIS_ACCEPT_FOR_BOUNDED_LOW_REVISION (with ONE new non-blocking Low PL-R1a)",
+      "perItem": {
+        "K2A-R1": "CLOSED for the static selector/alias class (owner 21 compile-valid mutants + 7 native + assembly-builds-then-refuses all refuse; reviewer controls: dot import, package-level func value, method value, method expression, embedded promotion, defer, closure call all refuse). RESIDUAL new Low PL-R1a: dynamic dispatch through an own-package interface/generic constraint with an EXPORTED method, and pointer write to a foreign package variable, escape (see findings).",
+        "K2A-R2": "CLOSED. Canonical-scope, leaf DER and leaf SPKI duplicates across ordered PC2/PC4 => TRUST_UNKNOWN_OR_PIN_MISMATCH in checkPolicyBindings/checkMemberBindings. Reviewer discrimination: identical construction with DISTINCT leaf keys passes (so the owner negative depends on the SPKI rule), same key refuses, key-order re-encoded duplicate scope refuses. Correct distinct fixture positive unchanged. K1 duplicate rule is whole-scope equality (trust.go:165), so K2A is not stricter or looser.",
+        "K2A-R3": "CLOSED. Every Operations entry: key==operationId, migrationId, fence>=1, lowercase non-zero 32-byte lease hash, UTC acquired<expires, unique HELD lease hash => ORIGINAL_PLAN_OPERATION_MISMATCH before K1 at checkOriginalHistory, evaluateBoundHistory and public ValidateHistory precedence (owner 8 mutants). Reviewer: legitimate 2-op fixture passes end-to-end; three-way substitution with a fresh lease hash refuses (query hash binds OriginalLease bytes); upper-case duplicate lease refuses. Does not require exactly one entry; no live current lease consulted.",
+        "K2A-R4": "CLOSED as documentation-only HOLD (README lines 96-106): verdict/target/scope, event/correlation/attempt/jobs/required steps, artifact ID/digest/bytes, binary VCS/toolchain/module/helper closure, Root source choice. provenance struct, factory, ABI and wire unchanged; CHOICE A public paths still refuse. Full P02 is NOT implemented and is not claimed.",
+        "K2A-R5": "CLOSED. Census derives explicit AND inferred K1 bridge objects (NewVerifier, Verifier.Verify, Packet, Report, CanonicalJSON, plus reached types) with full transitive underlying types, receivers, variadics and sorted value+pointer method sets; old G01-G08/R01-R03 and 13/73/0 baseline retained separately. Owner mutants + 6 reviewer type-correct mutants detected: Report int->int64, Report field reorder, Packet struct tag, Verify value receiver, unexported Report method, new unexported Verifier field. No source stubs or pin rebinding."
+      },
+      "zeroEffectAndRefusal": "Product delta is pure checks + README. Public auth still always refuses; no Current/effect/provider/entrypoint; bindings NULL/HOLD; the already-bound synthetic positive bypass exists ONLY in _test.go. Actual production source contains no exported-method own interface (ports.go methods are unexported) and its only foreign package-variable use is a time.UTC read, so PL-R1a is not reachable in present code."
+    },
+    "stage2_01a": {
+      "verdict": "CODE_AXIS_ACCEPT_FOR_BOUNDED_STAGE2_FIXED_CASE_CANDIDATE",
+      "counts": "0 Critical/High/Medium/Low; 5 Info",
+      "evidence": [
+        "Exact AST delta: owner test + reviewer whole-MODULE AST (imports, constants, every top-level node) equal 52f except observe and the new _ordered_plain_mounts placed immediately before it; in observe only the two Mounts operands are wrapped; failure raise/diagnostic call unchanged; context() unchanged (no CreatedAt exclusion reuse).",
+        "_ordered_plain_mounts: built-in list of 1..2, built-in dicts with str keys, Destination exactly '/state' or '/var/run/docker.sock' and unique, Type volume/bind exact, RW is True, Name/Source/Driver/Mode/Propagation str when present, /state required; returns the ORIGINAL dict objects sorted by unique Destination. No projection, field drop, path or Unicode normalization, hashing or set semantics; nested lists compared in order. Consistent with actual _plain (socket bind Source/RW/rprivate, refuse contribution/unknown) and repair_target 239-261 (exactly one owned /state volume, RW), which still run on BOTH reads.",
+        "Critical check before+after on Id, Image, Config, sorted full Mounts, StartedAt, RestartCount, FULL volume (incl. CreatedAt), consumers; nonce/DER/signature/servingPID/running/restart/readback calls unchanged (owner test_exact_observation_passes..., guards test).",
+        "Owner: 4 two-mount permutations + state-only pass; every real field mutation, unknown nested/Unicode/new key/missing field, 22 topology faults, full volume metadata incl. CreatedAt refuse; old frozen 52f observe still refuses the order-only case (MOUNTS_ORDER_ONLY). Reproduced 129 passed locally.",
+        "Reviewer (22 PASS): reordered mounts never mask Id/Image/Config/StartedAt/RestartCount/consumers/CreatedAt/volume Name changes (diagnostic leak sentinels hold); '/state ', '/STATE', '/state/.', socket-as-volume, state-as-bind, added/removed socket, swapped Sources refuse; inputs not mutated.",
+        "Diagnostic bounds test change is a legitimate new-domain case: >2 mounts now refuse before comparison (explicit 'too-many' 8-mount negative added); the 24-path truncation is still exercised with supported 2 mounts and many REAL changes; not a guard weakening. Integration test assertions unchanged."
+      ]
+    }
+  },
+  "findings": [
+    {"id": "PL-R1a", "target": "low dba", "severity": "LOW", "blocking": false,
+     "file": "services/node-agent/internal/migrationcontext/effect_gate_test.go:147-239 (sourceEffects); README.md:109-116",
+     "defect": "The resolved-object gate accepts any call whose resolved *types.Func belongs to the own package. A method of an own-package interface (or of a type-parameter constraint) is such an object, so dynamic dispatch to a FOREIGN concrete method is never resolved against the allowlist. Separately, the foreign-state-write rule only inspects assignment LHS selectors, so a write through &pkg.Var is not seen.",
+     "counterexample": "Compile-valid non-test mutants in the tracked package (go build ./... exit 0) leave TestRepositoryBoundaryAndZeroEffects, TestResolvedObjectEffectBoundary and TestReviewR1CompileValidEffectAndAliasMutants exit 0: (M1) type rvVerifier interface{ Verify(x509.VerifyOptions) ([][]*x509.Certificate, error) }; var v rvVerifier = cert; v.Verify(x509.VerifyOptions{}) => ambient time.Now + system roots (SystemCertPool file I/O on Linux); also via a generic constraint; (M3) type rvLocal interface{ Local() time.Time } => TZ/zoneinfo read; (M2) p := &time.Local; *p = time.UTC => process-global state write. Direct x509 Verify, time.Local assignment, method values, promotion and dot import are refused (controls).",
+     "reachability": "Not reachable in present production source (no exported-method own interface; only time.UTC read). Defense-in-depth gate only, not cryptographic trusted-process isolation. README states 'certificate Verify/system roots ... are refused', which is not true for this dispatch class.",
+     "fix": "In sourceEffects: (a) for every used/called *types.Func whose signature receiver is an interface (including type-parameter constraint methods), allow only own-package UNEXPORTED methods (!f.Exported()); refuse own interface or constraint types that declare an exported method or embed a foreign interface (ports.go stays valid); (b) refuse UnaryExpr '&' on any foreign package-level *types.Var and restrict foreign package-level Var uses to an exact read allowlist (today: time.UTC). Add M1/M2/M3 and the generic variant as negatives and an unexported-port call as a pure control. Test-only change plus README wording; no product behaviour change."}
+  ],
+  "info": [
+    {"id": "PL-I1", "target": "low", "note": "checkPolicyBindings (where R2 lives) still has no production caller; evaluateBoundHistory does not call it. 'Before K1' holds only if a future factory calls it before issuing InstalledPolicy. Same structure as de71; record in the future factory contract."},
+    {"id": "PL-I2", "target": "low", "note": "An extra structurally valid Operations entry with a fresh unique lease hash and no query reference passes checkOriginalHistory and K1 refuses (K1_VALIDATION_REFUSED). This matches the agreed fix (do not require exactly one entry); fail-closed; the op set belongs to future archive authentication."},
+    {"id": "S2-I1", "target": "stage2", "note": "Python == treats True==1==1.0 and False==0, so an unknown mount field changing true->1 or 1->1.0 is not detected. Identical in frozen 52f observe (reviewer-verified) and for Config/volume; RW is guarded by 'is True'. Pre-existing, not a Stage2 regression; phase.strict already refuses NaN/Infinity and duplicate keys. A future strict typed comparison would close it."},
+    {"id": "S2-I2", "target": "stage2", "note": "Topology/type errors from _ordered_plain_mounts are raised while the guard tuple is built, so they refuse without the bounded diagnostic. Fail-closed and practically unreachable because target() already validated both reads."},
+    {"id": "S2-I3", "target": "stage2", "note": "Key order inside a mount dict is not compared (dict semantics; also true at 52f). JSON object member order is not semantic, so this is expected."},
+    {"id": "S2-I4", "target": "stage2 lineage (0dfd, outside the 52f->01a delta)", "note": "Diagnostics publish whole-field SHA-256 of Config (which contains Env). This is not a per-secret digest list, but someone who knows every other Config value could confirm a guessed Env value. Root reviewed 0dfd. Claude did not separately review it as code here; the functions are AST-unchanged in 01a."},
+    {"id": "S2-I5", "target": "stage2", "note": "peer-floor-observation-diagnostic.yml is a branch-restricted lane (job if: exact Stage2 ref). It stays inert on a combined ref. Root should decide whether the combined source carries or drops it. It is not acceptance evidence for the combined source."}
+  ],
+  "separatedAxes": {
+    "1_code": "Low dba: ACCEPT bounded (R2-R5 closed, R1 closed for static class, new non-blocking Low PL-R1a). Stage2 01a: ACCEPT bounded fixed-case candidate.",
+    "2_realFocused": "Stage2 hosted push 42174324865 job 127749166146 15/15 steps SUCCESS at 01a with 3 distinct samples NEW_STAGE2_EXACT_CASE_PASS (reviewer re-downloaded artifact 13483245465 1767 bytes sha256 b7e3c237... == GitHub digest; result 27cd06cd..., manifest 9e8d05ef...). Low: NO hosted Go/race run of the new Low tests (only Docs 42173025277); local race NOT_RUN (cgo disabled, exit 2 before execution).",
+    "3_wholeCore": "FAILURE retained: de71 Core 42164071724 (job 127716312318 'Run provisioned LAN installer acceptance'; original differing field UNKNOWN) and Stage1 52f push 42170068364 (three-sample step failure, sample 3 Mounts order-only). No combined Core exists.",
+    "4_independentReview": "This actual Claude review (one reviewer). Root Codex's 53/45 Stage2 proposal review is separate and is not counted as Claude or owner proof.",
+    "5_runtimeAcceptance": "NONE (no install, no five-PC run, no crypto-role installation, no K2 runtime-auth provisioning)."
+  },
+  "pinSeam": {
+    "principle": "The old standalone launcher pins stay byte-frozen and correctly REFUSE the changed helper. This is a refusal, not a bug. The pins have refused since 0dfd1e8b (Stage1 helper 17378b80), so the refusal predates Stage2. Do not rehash until pass. Do not declare a new bundle or installed trust while old pins refuse.",
+    "launcherWorkerSourcePin": {
+      "file": "deploy/lan/leaf_rotation_standalone_runtime.py",
+      "line": 35,
+      "field": "WORKER_MODULES['worker_peer_floor.py']",
+      "old": "c73c81adaedb2a7b3b8513cd874b093a71f7b5c147e2e08ea86f71a54c8d2fec (helper at ff31/de71/dba)",
+      "newCandidate": "7665735eb5735be9fcb24f783f83ffe087c0d176e464a97df3022a4bd9f35799 (byte-exact 01a/210594 helper, accepted here on the code axis)",
+      "neverRegister": "17378b802f42000d74c1dc5d6136bcf5b1454846584b0555b950eb74bd35b406 (superseded Stage1 diagnostic helper)",
+      "consumers": "_worker_sources() (build_bundle), _bundle manifest workerModules, _expected_files(), _installed_worker_modules(), validate_runtime/clean_bytecode_cache/install receipt workerModulesSha256"
+    },
+    "mustStayUnchanged": {
+      "LOCK_SHA256": "06710d854ff52578949249065dd009de6561bc779c4b21c5355262e59a527a8c; leaf-rotation-runtime-lock.json bytes. They pin wheels only and contain no worker-module hash.",
+      "WORKER_ENTRY/WORKER_SHA256": "worker_leaf_rotation.py 4e29685241a3e625e59aa64bcff07bdd69d4b0381c67687706a09fa960f75998",
+      "otherModulePins": "worker_config.py 909d1c25..., peer_policy_phase.py 8aac0c65..., worker_plain_rotation.py bf3754a2...",
+      "schemas": "BUNDLE_SCHEMA saintvision-leaf-rotation-runtime-bundle:2 and INSTALL_SCHEMA ...-install:2. The format is unchanged, so no bump is needed; a bump would be a wire change and needs new Root scope.",
+      "K1": "services/node-agent/migrationverify (the 28 proof schema/verifier/resource pins, registered v5 graph), K2A raw K1 per-file pins + 13/73/0 census baseline in source_gate_test.go, go.mod. Reviewer: services diff ff31..01a empty; migrationverify does not reference deploy/lan. These are a separate pin family. They must NOT move with the launcher pin unless Root issues a separate contract.",
+      "historicalEvidence": "Evidence files citing c73c81ad (10), launcher 76be4088 (10), lock 06710d85 (8) are historical records and must never be rewritten.",
+      "copyListsWithoutHashes": "tools/lan_pilot.py:1248-1266, tools/lan_workspace.py:20-22 INSTALLERS (installerHashes computed at runtime), tests/proofs/fleet5_settled_pinned_fixture.py:17 FILES, diagnostic workflow :139. No edit."
+    },
+    "derivedValuesThatChange": {
+      "workerModulesSha256": "a08ac3a6bfeda1fdeb42e41a29ad1ee9cc7ca0b18bf17760f3e9485f0e129d3c -> 7a2840babd2e337926735f5270a0be33fc51f59bf96be0348c46f98e8db15872 (reviewer-computed sha256 of canonical sorted WORKER_MODULES + newline, assuming only the one value changes; recompute on the actual edit)",
+      "launcherFileSHA256": "76be408878d1105099d3457937fe0a579c09d9eefc6c6d46f0e22679670e5665 -> MEASURE on the actual edited bytes (not predicted here)",
+      "rawSevenFileAggregate": "b160f9c7a55e033c86331e1b5adef937f7b064b1e17e9d89663d667f1559d7db is UNREGISTERED and inconsistent: the launcher pins c73c81ad while the helper is 7665735e, so a bundle build from it refuses at _worker_sources. A new aggregate exists only after the pin commit, and it is still unregistered."
+    },
+    "testThatProvesTheSeam": "tests/test_lan_leaf_rotation_standalone_runtime.py derives its expectations from file bytes. Locally at 01a: 13 failed / 24 passed / 6 skipped. At dba (helper == pin): 37 passed / 6 skipped. It goes green only with the pin commit. No test edit is needed or allowed.",
+    "legitimateRegistrationStep": "A bounded checksum-only third commit, made only after Root records this code acceptance. Owner Codex makes it on top of the combined source. The diff is exactly one line, the WORKER_MODULES['worker_peer_floor.py'] value c73c81ad... -> 7665735e.... The new value must equal an independent recomputation of sha256 of the combined-tree helper bytes. Nothing else changes in the file, the lock, the tests or K1. Then: independent Claude review of that exact commit (byte diff + recomputation + the unit file above), then ONE fresh full Core + Docs. This is NOT installed trust, NOT a K2 runtime-lock/LinkedClosure binding (K2A RuntimeLockSHA256/LinkedClosureSHA256 stay NULL/HOLD) and NOT runtime auth. Any wire/role/trust/delegation/semantic change is new explicit Root scope. The reviewer performed no key, anchor, install, packaging or manifest upload."
+  },
+  "integrationPlanForRoot": [
+    "0. Before integrating, Root decides on PL-R1a. Recommended: the owner adds one small test-only commit on the Low branch (effect_gate_test.go + README wording) and Claude reviews only that delta. Alternative: carry PL-R1a as a tracked non-blocking Low; then the README Verify/system-roots sentence must not be cited as a closed property.",
+    "1. Base: Stage2 report 21059451 (product byte-exact to 01a; includes ff31, 0dfd, 34e7, 52f, 01a).",
+    "2. Add Low dba (or dba plus the PL-R1a commit) with a two-parent merge (21059451, Low head), so both reviewed SHAs stay ancestors. The paths are disjoint (0 overlap), so no conflict resolution is expected. Verify that every path's blob in the merged tree equals its blob in the side that changed it.",
+    "3. ONLY then add the checksum-only pin commit described in pinSeam.legitimateRegistrationStep.",
+    "4. Final source review (Claude) of the merge tree equality + pin commit, then ONE fresh full Core + Docs on that exact final SHA. This must include the Go -race job, provisioned LAN installer acceptance, main pytest (incl. tests/test_lan_leaf_rotation_standalone_runtime.py), build and final go test ./....",
+    "5. Root decides whether the branch-restricted Stage2 diagnostic workflow is carried or dropped (S2-I5).",
+    "6. The source-branch module entrypoint remains the old inv-node without a K1 link. VCS/compiled Node hashes are not K2 runtime auth provisioning."
+  ],
+  "overall": "Bounded per-target code-axis verdicts only. The pair is NOT a final product, source, CI or report completion. A combined source, the pin registration commit, its review and a fresh full Core+Docs are all still required. Original question msg_6823df024379 stays pending until Root takes a concrete action.",
+  "nextOwner": "Root: record both verdicts, decide PL-R1a timing (step 0) and the combined integration + pin registration cut. Codex (same task, only on Root direction): optional PL-R1a test-only commit, the combined merge, the one-line pin commit. Claude: review of those exact commits only when Root assigns them."
+}

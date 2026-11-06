@@ -1,0 +1,39 @@
+{
+  "schemaVersion": "fleet5-k2a-low-stage2-pair-review-commands:1",
+  "environment": {
+    "host": "Windows 11 Pro 10.0.26300 (Git Bash + PowerShell 5.1)",
+    "worktree": "D:/Project/SaintVisionI-Invion/fleet5-bootstrap-v3-review-20261106 (reused released Claude review workspace; was clean on 97bb2f67)",
+    "branch": "agent/claude/fleet5-k2a-low-stage2-pair-review-20261106 created FROM dba1804b1d180eda2bf0439952e9706782109fd6",
+    "scratch": "session scratchpad outside the repo: detached git worktrees wt-dba (dba1804b) and wt-s2 (21059451) holding untracked reviewer test files only; Stage2 artifact download; logs. No owner or Root checkout was mutated.",
+    "go": "go1.27.0 windows/amd64, CGO_ENABLED=0, GOTOOLCHAIN=auto; owner gate subprocesses force GOTOOLCHAIN=local GOWORK=off GOPROXY=off GOSUMDB=off; module cache only",
+    "python": "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe 3.14.7 (cryptography 50.0.1, pytest 9.1.1), PYTHONUTF8=1; -I for parsing scripts",
+    "serial": "one process at a time, go test -p 1 (GOMAXPROCS=1 for suites); pytest single process",
+    "noDB_PG_Docker_Node_SSH_PKI_VM_OSclock_env_schedule_privateKey_ObsidianApply": true
+  },
+  "timeNote": "Clock-captured KST: 15:52:22 (worktrees ready), 15:52:49 (owner Low suite start), 15:54:59 (reviewer Low scratch), 15:56:43 (Stage2 owner units), 16:03:48 (sync state hash). Others are session-order approximations. Doc-gate times are in local-doc-gates.txt.",
+  "commands": [
+    {"atKST": "~15:45", "argv": "git fetch origin; git cat-file -t / git log -1 --format='%P | %s' for dba1804b ff3169d3 01a4bebf 52f935ac 21059451 a8b6c1bd 8993b1fc 49d0f904", "exit": 0, "result": "all commits exist; parents exactly as briefed"},
+    {"atKST": "~15:46", "argv": "git diff --stat/--name-status ff3169d3 dba1804b; 52f935ac 01a4bebf; 01a4bebf 21059451", "exit": 0, "result": "Low 7 package + 28 Evidence + 1 History; Stage2 4 non-docs + own docs; 2105 docs-only"},
+    {"atKST": "~15:48", "argv": "git switch -c agent/claude/fleet5-k2a-low-stage2-pair-review-20261106 dba1804b1d180eda2bf0439952e9706782109fd6", "exit": 0},
+    {"atKST": "15:52:22", "argv": "git worktree add --detach <scratch>/wt-dba dba1804b; git worktree add --detach <scratch>/wt-s2 21059451", "exit": 0},
+    {"atKST": "15:52:49", "argv": "go test -count=1 -p 1 -v ./internal/migrationcontext/ (cwd wt-dba/services/node-agent, GOFLAGS= GOMAXPROCS=1)", "exit": 0, "result": "16 top / 72 sub PASS, 17.1 s"},
+    {"atKST": "~15:53", "argv": "go vet ./internal/migrationcontext/ ./migrationverify/", "exit": 0},
+    {"atKST": "~16:03", "argv": "go test -race -count=1 -p 1 ./internal/migrationcontext/", "exit": 2, "result": "'go: -race requires cgo' before execution => NOT_RUN; no cgo/toolchain/env change, no retry with changed env"},
+    {"atKST": "15:54:59", "argv": "go test -count=1 -p 1 -v -run 'TestRV2_' ./internal/migrationcontext/ (wt-dba + untracked reviewer_pair_claude_test.go)", "exit": 1, "result": "4 recorded GATE_MISMATCH escapes (PL-R1a); R2/R3/R5 reviewer subtests PASS", "output": "reviewer-results.txt"},
+    {"atKST": "~15:56", "argv": "3 mutants, one zz_rv_mutant.go at a time in wt-dba, git add -N (scratch index only), go build ./..., go test -run '^(TestRepositoryBoundaryAndZeroEffects|TestResolvedObjectEffectBoundary|TestReviewR1CompileValidEffectAndAliasMutants)$'; git rm --cached; rm", "exit": "build 0 and gates 0 for each mutant (escape)", "output": "reviewer-results.txt"},
+    {"atKST": "15:56:43", "argv": "python -B -m pytest tests/core/test_worker_peer_floor_observation_diagnostics.py tests/core/test_worker_peer_floor_mount_order_stage2.py tests/core/test_lan_workspace_upgrade.py -q -p no:cacheprovider (cwd wt-s2)", "exit": 0, "result": "129 passed"},
+    {"atKST": "~15:58", "argv": "python -B -m pytest tests/core/test_rv_claude_stage2_pair_review.py -q -s -p no:cacheprovider (wt-s2, untracked reviewer file)", "exit": 0, "result": "22 passed"},
+    {"atKST": "~15:59", "argv": "git show <c>:deploy/lan/worker_peer_floor.py | sha256sum for ff31 de71 dba 34e7 52f 01a; git grep for c73c81ad/17378b80/7665735e/76be4088/06710d85; read launcher _worker_sources/_expected_files/WORKER_MODULES, lock json, tests/test_lan_leaf_rotation_standalone_runtime.py, settled pinned fixture, lan_pilot/lan_workspace lists", "exit": 0},
+    {"atKST": "~16:00", "argv": "python -B -m pytest tests/test_lan_leaf_rotation_standalone_runtime.py -q (wt-s2 then wt-dba)", "exit": "1 at 210594 (13 failed/24 passed/6 skipped); 0 at dba (37 passed/6 skipped)", "result": "pin seam = the single WORKER_MODULES value"},
+    {"atKST": "~16:00", "argv": "git diff --name-only ff3169d3 dba1804b / ff3169d3 21059451; comm -12", "exit": 0, "result": "36 / 91 paths, overlap 0"},
+    {"atKST": "~16:01", "argv": "gh api .../actions/runs/{42173025277,42174324865,42174387586,42175312016,42174947293,42164071724,42170068364} (+/jobs); .../runs/42174324865/artifacts; .../actions/artifacts/13483245465/zip > <scratch>; sha256sum; unzip into a new scratch dir; python -I parse", "exit": 0, "output": "hosted-ci-verification.json"},
+    {"atKST": "~16:02", "argv": "git show 8993b1fc:<Root Evidence fleet5-20261105-root/stage1-push-bootstrap-and-k2a-lows-root-decision.json, stage2-mount-order-root-candidate-grant.json> (read only)", "exit": 0},
+    {"atKST": "16:03:48", "argv": "PowerShell Get-FileHash D:/Project/SaintVision-Invion/SaintVisionI-Invion/.git/obsidian-sync-state.json", "exit": 0, "result": "3418f88ddda881752e898f9fe33d4110b6bb5a59a61756229955a6c246b7f997 (before gates)"},
+    {"atKST": "see local-doc-gates.txt", "argv": "10 doc gates one by one with the owner interpreter, stop on first nonzero; sync_obsidian --check --state <canonical> only", "output": "local-doc-gates.txt"}
+  ],
+  "reviewerFileHashes": {
+    "reviewer_pair_claude_test.go": "fbdc92fc4fd6fcb56e9fad8b1a2f6a6be03fa7fb671d8820fd763280ab6af02a (as run; exported as reviewer_pair_claude_test.go.txt)",
+    "test_rv_claude_stage2_pair_review.py": "b0d4467b3114234a321d61e90dec32449ee13d8dc7b41e4018d1b6a78db65675 (as run; exported as .txt)"
+  },
+  "notRun": ["any PG/Docker/Node/SSH/VM/PKI/OS-clock/env/schedule/equipment command", "owner gate runner in place (owner ledgers not rewritten)", "cherry-pick/merge/integration or pin edit", "combined unit or CI", "Obsidian apply/adopt/resolve/state write/export", "local race (cgo disabled: NOT_RUN)", "any source fix in an author tree", "board/registry/ADR/Card150 edits"]
+}
