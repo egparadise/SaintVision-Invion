@@ -1,0 +1,451 @@
+package migrationcontext
+
+// REVIEWER SCRATCH (Claude, de71 code-axis review). Not product code. Never committed
+// into the author tree. Exercises counterexamples against exact de71 source.
+import (
+	"bytes"
+	"crypto/ed25519"
+	"crypto/rand"
+	"encoding/json"
+	"errors"
+	"go/token"
+	"os"
+	"strings"
+	"testing"
+	"time"
+)
+
+type rvStatus struct {
+	rec   statusRecord
+	err   error
+	calls int
+}
+
+func (f *rvStatus) readStatus(string) (statusRecord, error) { f.calls++; return f.rec, f.err }
+
+type rvClock struct {
+	rec   clockRecord
+	err   error
+	calls int
+}
+
+func (f *rvClock) readClock() (clockRecord, error) { f.calls++; return f.rec, f.err }
+
+type rvRegistryErr struct{ calls int }
+
+func (f *rvRegistryErr) readRegistry(string) (registryRecord, error) {
+	f.calls++
+	return registryRecord{}, errors.New("raw provider diagnostic SHOULD NOT LEAK")
+}
+
+func rvCode(err error) Code {
+	var r *Refusal
+	if errors.As(err, &r) {
+		return r.Code()
+	}
+	if err == nil {
+		return "NIL"
+	}
+	return Code("RAW:" + err.Error())
+}
+
+// Axis1: every public entrypoint on nil/zero/JSON/foreign/copied inputs; forged
+// well-formed self-signed records via every port. No opaque value or report issues.
+func TestRV_A1_PublicNonBypass(t *testing.T) {
+	var nilS *Service
+	var zero Service
+	for name, s := range map[string]*Service{"nil": nilS, "zero": &zero, "new": NewService()} {
+		p, e := s.LoadInstalledPolicy("synthetic-deployment")
+		if p != nil || rvCode(e) != TrustUnknown {
+			t.Fatalf("%s load %v %v", name, p, e)
+		}
+		h, e := s.ReadHistory(nil, HistoryQuery{})
+		if h != nil || rvCode(e) != TrustUnknown {
+			t.Fatalf("%s read %v", name, e)
+		}
+		r, e := s.ValidateHistory(UntrustedPacket{}, nil, nil)
+		if r.Records != 0 || r.Digests != nil || rvCode(e) != TrustUnknown {
+			t.Fatalf("%s validate %v", name, e)
+		}
+	}
+	// Valid synthetic already-bound policy/history copied by value stays bound to
+	// the SAME owner; a foreign or zero service refuses; mutated copy refuses.
+	s, p, h, c, st, r := synthetic(t)
+	cp := *p
+	ch := *h
+	if e := s.checkPolicy(&cp); e != nil {
+		t.Fatal("copied pointer binding is the same object", e)
+	}
+	_, e := (&Service{}).ValidateHistory(UntrustedPacket{}, &cp, &ch)
+	if rvCode(e) != TrustUnknown {
+		t.Fatal("foreign zero service", e)
+	}
+	// JSON round trip of opaque values drops binding.
+	b, _ := json.Marshal(p)
+	if string(b) != "{}" {
+		t.Fatalf("opaque policy JSON exposes %s", b)
+	}
+	var back InstalledPolicy
+	_ = json.Unmarshal(b, &back)
+	if rvCode(s.checkPolicy(&back)) != TrustUnknown {
+		t.Fatal("JSON policy accepted")
+	}
+	// Forged well-formed registry/archive/running/status/clock records with a real
+	// self-issued Ed25519 signature over their own exact JSON bytes.
+	_, key, _ := ed25519.GenerateKey(rand.Reader)
+	raw, _ := json.Marshal(p.binding.data)
+	ev := providerEvidence{purpose: "registry", format: "saintvision-proof-g2-planning-policy:1", version: "ACTIVE", raw: append(raw, ed25519.Sign(key, raw)...)}
+	rg := &fakeRegistry{record: registryRecord{evidence: ev, data: p.binding.data}}
+	s.registry = rg
+	got, e := s.LoadInstalledPolicy("synthetic-deployment")
+	if got != nil || rvCode(e) != TrustUnknown || rg.calls != 1 {
+		t.Fatal("forged registry", e)
+	}
+	re := &rvRegistryErr{}
+	s.registry = re
+	_, e = s.LoadInstalledPolicy("synthetic-deployment")
+	if rvCode(e) != TrustUnknown || strings.Contains(e.Error(), "LEAK") {
+		t.Fatal("raw provider error leaked", e)
+	}
+	ar := &fakeArchive{record: archiveRecord{evidence: ev, data: h.binding.data}}
+	s.archive = ar
+	hh, e := s.ReadHistory(p, h.binding.data.Query)
+	if hh != nil || rvCode(e) != HistoryUnknown || ar.calls != 1 {
+		t.Fatal("forged archive", e)
+	}
+	run := &fakeRunning{record: runningRecord{evidence: ev, data: r}}
+	s.running = run
+	rep, e := s.ValidateHistory(UntrustedPacket{}, p, h)
+	if rvCode(e) != InstallationUnknown || rep.Records != 0 || rep.Digests != nil {
+		t.Fatal("forged running", e)
+	}
+	// running nil with all else valid: exact grant mapping.
+	s.running = nil
+	_, e = s.ValidateHistory(UntrustedPacket{}, p, h)
+	if rvCode(e) != InstallationUnknown {
+		t.Fatal("null running mapping", e)
+	}
+	sp := &rvStatus{rec: statusRecord{evidence: ev, data: st}}
+	s.status = sp
+	if rvCode(s.checkPublicationSource("v")) != PublicationUnknown || rvCode(s.checkCertificateSource("v")) != CertificateUnknown || sp.calls != 2 {
+		t.Fatal("forged status")
+	}
+	sp.err = errors.New("x")
+	if rvCode(s.checkPublicationSource("v")) != PublicationUnknown || rvCode(s.checkCertificateSource("v")) != CertificateUnknown {
+		t.Fatal("status err")
+	}
+	ck := &rvClock{rec: clockRecord{evidence: ev, data: c}}
+	s.clock = ck
+	if rvCode(s.checkClockSource()) != ClockUntrusted || ck.calls != 1 {
+		t.Fatal("forged clock")
+	}
+	t.Log("A1: nil/zero/new/foreign/JSON/forged self-signed records all refuse with grant codes; no opaque value/report issued")
+}
+
+// Axis2 counterexample: duplicate member identity (PC4 == PC2 scope/cert/key)
+// passes checkPolicyBindings; only K1 NewVerifier later refuses.
+func TestRV_A2_DuplicateMemberIdentity(t *testing.T) {
+	p, h, st, c, pkt := syntheticCryptoHistory(t)
+	r := runningData{ExecutableSHA256: p.Verifier.ArtifactSHA256, InstallationReceiptSHA256: p.Provenance.InstallationReceiptSHA256, SourceSHA: p.Verifier.SourceSHA, RuntimeLockSHA256: p.Provenance.RuntimeLockSHA256, LinkedClosureSHA256: p.Provenance.LinkedClosureSHA256}
+	f, _ := freezePolicy(p)
+	f.Members[1] = member{Slot: "PC4", Scope: f.Members[0].Scope, CertificateDER: copyBytes(f.Members[0].CertificateDER), CARootDER: copyBytes(f.Members[0].CARootDER)}
+	got := checkPolicyBindings(f, r)
+	t.Logf("A2 duplicate PC2==PC4 identity checkPolicyBindings => %s", rvCode(got))
+	_, e := verifyK1History(f, h, st, pkt, c.T0)
+	t.Logf("A2 same duplicate at K1 bridge => %s", rvCode(e))
+	if rvCode(e) != K1Refused {
+		t.Fatal("K1 must refuse duplicate scope")
+	}
+}
+
+// Axis2 latent: checkMemberBindings unchecked type assertion if called without
+// checkPolicyBindings' preceding scope validation (unreachable today).
+func TestRV_A2_MemberBindingsLatentPanic(t *testing.T) {
+	p, _, _, _, _ := syntheticCryptoHistory(t)
+	f, _ := freezePolicy(p)
+	f.Members[0].Scope = map[string]any{"nodeId": "x", "recoveryEpoch": "y", "other": "z"}
+	panicked := false
+	func() {
+		defer func() {
+			if recover() != nil {
+				panicked = true
+			}
+		}()
+		_ = checkMemberBindings(f)
+	}()
+	r := runningData{ExecutableSHA256: p.Verifier.ArtifactSHA256, InstallationReceiptSHA256: p.Provenance.InstallationReceiptSHA256, SourceSHA: p.Verifier.SourceSHA, RuntimeLockSHA256: p.Provenance.RuntimeLockSHA256, LinkedClosureSHA256: p.Provenance.LinkedClosureSHA256}
+	t.Logf("A2 direct checkMemberBindings panics=%t; via checkPolicyBindings => %s", panicked, rvCode(checkPolicyBindings(f, r)))
+}
+
+// Axis3: fe7e selectors and consistent three-way current substitution.
+func TestRV_A3_Selectors(t *testing.T) {
+	type mut struct {
+		name string
+		m    func(*historyData)
+	}
+	op := func(h *historyData) operation { return h.Operations[h.Query.OriginalOperationID] }
+	cases := []mut{
+		{"two-current(query+facts)", func(h *historyData) {
+			h.Query.OriginalOperationID = "CURRENT"
+			h.SemanticInputs.(map[string]any)["facts"].(map[string]any)["migrationOperationId"] = "CURRENT"
+		}},
+		{"facts-only", func(h *historyData) {
+			h.SemanticInputs.(map[string]any)["facts"].(map[string]any)["migrationOperationId"] = "CURRENT"
+		}},
+		{"query-lease-hash", func(h *historyData) { h.Query.OriginalLeaseSHA256 = hx("f", 64) }},
+		{"op-lease-hash", func(h *historyData) {
+			o := op(h)
+			o.LeaseEnvelopeSHA256 = hx("f", 64)
+			h.Operations[o.OperationID] = o
+		}},
+		{"op-fence", func(h *historyData) { o := op(h); o.FenceEpoch = 2; h.Operations[o.OperationID] = o }},
+		{"query-fence", func(h *historyData) { h.Query.FenceEpoch = 2 }},
+		{"migration-id", func(h *historyData) { h.Query.OriginalMigrationID = "other" }},
+		{"op-nonUTC", func(h *historyData) { o := op(h); o.AcquiredAt = o.AcquiredAt.In(time.FixedZone("Z", 0)); h.Operations[o.OperationID] = o }},
+		{"facts-missing", func(h *historyData) { delete(h.SemanticInputs.(map[string]any), "facts") }},
+		{"plan-changed", func(h *historyData) {
+			h.SemanticInputs.(map[string]any)["plan"].(map[string]any)["reviewerInjected"] = "x"
+		}},
+		{"three-way-current(query+facts+op entry, original kept)", func(h *historyData) {
+			o := op(h)
+			o.OperationID = "CURRENT"
+			h.Operations["CURRENT"] = o
+			h.Query.OriginalOperationID = "CURRENT"
+			h.SemanticInputs.(map[string]any)["facts"].(map[string]any)["migrationOperationId"] = "CURRENT"
+		}},
+		{"three-way-current(original removed)", func(h *historyData) {
+			o := op(h)
+			delete(h.Operations, o.OperationID)
+			o.OperationID = "CURRENT"
+			h.Operations["CURRENT"] = o
+			h.Query.OriginalOperationID = "CURRENT"
+			h.SemanticInputs.(map[string]any)["facts"].(map[string]any)["migrationOperationId"] = "CURRENT"
+		}},
+		{"extra-unrelated-op", func(h *historyData) {
+			o := op(h)
+			o.OperationID = "EXTRA"
+			h.Operations["EXTRA"] = o
+		}},
+	}
+	for _, m := range cases {
+		p, h, st, c, pkt := syntheticCryptoHistory(t)
+		hf, _ := freezeHistory(h)
+		m.m(&hf)
+		pure := checkOriginalHistory(p, hf)
+		_, full := evaluateBoundHistory(p, hf, st, c, pkt)
+		t.Logf("A3 %-55s pure=%s full=%s", m.name, rvCode(pure), rvCode(full))
+		if rvCode(full) == "NIL" {
+			t.Fatalf("selector mutation accepted: %s", m.name)
+		}
+	}
+}
+
+// Axis3: freeze/alias/typed-alias/JSON algebra.
+func TestRV_A3_FreezeAlgebra(t *testing.T) {
+	s, op, oh, _, _, _ := synthetic(t)
+	// Mutate the policy binding's source after freeze: binding independent.
+	scope := op.binding.data.Grants[0].AuthorityScope.(map[string]any)
+	f, _ := freezePolicy(op.binding.data)
+	f.Grants[0].AuthorityScope.(map[string]any)["class"] = "MUTATED"
+	f.Members[0].Scope.(map[string]any)["nodeId"] = "MUTATED"
+	if scope["class"] != "COHORT" || s.checkPolicy(op) != nil || s.checkHistory(op, oh) != nil {
+		t.Fatal("freeze alias")
+	}
+	type namedMap map[string]any
+	type st struct{ A string }
+	bad := []any{map[string]string{"a": "b"}, namedMap{"a": "b"}, []string{"a"}, st{"a"}, &st{"a"}, float64(1), int(1), json.RawMessage(`{}`), time.Now, make(chan int)}
+	for _, b := range bad {
+		if _, e := cloneJSON(b); rvCode(e) != HistoryUnknown {
+			t.Fatalf("accepted %T", b)
+		}
+	}
+	cyc := map[string]any{}
+	cyc["self"] = cyc
+	if _, e := cloneJSON(cyc); rvCode(e) != HistoryUnknown {
+		t.Fatal("cycle")
+	}
+	// Numbers: cloneJSON permits non-integer/whitespace json.Number; downstream K1
+	// canonicalization (and Marshal) refuses. Fail closed, never authority.
+	for _, n := range []string{"1.5", "1e3", "-0", "1 ", "9007199254740993"} {
+		_, ce := cloneJSON(json.Number(n))
+		_, ke := canonicalValue(json.Number(n))
+		_, me := json.Marshal(json.Number(n))
+		t.Logf("A3 number %-18q clone=%s canonical=%s marshalErr=%t", n, rvCode(ce), rvCode(ke), me != nil)
+	}
+	// Policy freeze with typed scope refuses with the trust code.
+	pd := op.binding.data
+	pd.Grants = append([]grant(nil), pd.Grants...)
+	pd.Grants[0].AuthorityScope = map[string]string{"class": "COHORT"}
+	if _, e := freezePolicy(pd); rvCode(e) != TrustUnknown {
+		t.Fatal("typed grant scope")
+	}
+	hd := oh.binding.data
+	hd.SemanticInputs = st{"x"}
+	if _, e := freezeHistory(hd); rvCode(e) != HistoryUnknown {
+		t.Fatal("struct semantic")
+	}
+	// Packet freeze severs aliases and enforces K1-equal bounds.
+	big := UntrustedPacket{Records: map[string][]byte{}}
+	for i := 0; i < 4097; i++ {
+		big.Records[string(rune(0x4e00+i))] = nil
+	}
+	if _, e := freezePacket(big); rvCode(e) != K1Refused {
+		t.Fatal("packet bound")
+	}
+}
+
+// Axis4: clock envelope edges + endpoint independence.
+func TestRV_A4_ClockEdges(t *testing.T) {
+	_, p, h, c, _, _ := synthetic(t)
+	type cs struct {
+		name string
+		m    func(*clockEnvelope)
+	}
+	for _, x := range []cs{
+		{"zero-width L=U=T0", func(c *clockEnvelope) { c.L = c.T0; c.U = c.T0 }},
+		{"U-L == 1s exact", func(c *clockEnvelope) { c.L = c.T0.Add(-500 * time.Millisecond); c.U = c.T0.Add(500 * time.Millisecond) }},
+		{"U-L > MaxElapsedUncertainty", func(c *clockEnvelope) { c.MaxElapsedUncertainty = 100 * time.Millisecond }},
+		{"negative uncertainty", func(c *clockEnvelope) { c.MaxElapsedUncertainty = -1 }},
+		{"T0 == L", func(c *clockEnvelope) { c.T0 = c.L }},
+		{"T0 < L", func(c *clockEnvelope) { c.T0 = c.L.Add(-1) }},
+		{"T0 nonUTC", func(c *clockEnvelope) { c.T0 = c.T0.In(time.FixedZone("UTC", 0)) }},
+		{"U local", func(c *clockEnvelope) { c.U = c.U.Local() }},
+		{"EvaluationEnd == Deadline", func(c *clockEnvelope) { c.EvaluationEnd = c.Deadline }},
+		{"EvaluationEnd < EvaluationStart", func(c *clockEnvelope) { c.EvaluationEnd = c.EvaluationStart - 1 }},
+		{"Deadline < EvaluationStart", func(c *clockEnvelope) { c.Deadline = c.EvaluationStart - 1 }},
+		{"AcquisitionStart < 0", func(c *clockEnvelope) { c.AcquisitionStart = -1 }},
+		{"EvaluationStart < AcquisitionStart", func(c *clockEnvelope) { c.EvaluationStart = 0 }},
+		{"MappingVersion empty", func(c *clockEnvelope) { c.MappingVersion = "" }},
+		{"MechanismSourceSHA zero", func(c *clockEnvelope) { c.MechanismSourceSHA = hx("0", 40) }},
+		{"RunningClosure mismatch", func(c *clockEnvelope) { c.RunningClosureSHA256 = hx("f", 64) }},
+		{"PolicyVersion stale", func(c *clockEnvelope) { c.PolicyVersion = "old" }},
+	} {
+		f := c
+		x.m(&f)
+		t.Logf("A4 %-36s => %s", x.name, rvCode(checkClock(p.binding.data, h.binding.data, f)))
+	}
+	// Endpoint independence on the crypto fixture: a status valid at T0/U but not
+	// at L, or at L/T0 but not U, refuses (no favorable endpoint).
+	for _, w := range []string{"checked-after-L", "expires-at-T0", "stale-at-U"} {
+		pp, hh, st, cc, pkt := syntheticCryptoHistory(t)
+		for k, v := range st.Publications {
+			switch w {
+			case "checked-after-L":
+				v.CheckedAt = cc.L.Add(time.Nanosecond)
+			case "expires-at-T0":
+				v.ExpiresAt = cc.T0
+			case "stale-at-U":
+				v.CheckedAt = cc.U.Add(-120*time.Second - time.Nanosecond)
+			}
+			st.Publications[k] = v
+			break
+		}
+		_, e := evaluateBoundHistory(pp, hh, st, cc, pkt)
+		t.Logf("A4 endpoint %-16s => %s", w, rvCode(e))
+		if rvCode(e) == "NIL" {
+			t.Fatal("favorable endpoint")
+		}
+	}
+	// Report equality: nil vs empty digests are equal by length; differing values refuse.
+	if !reportsEqual(HistoryReport{}, HistoryReport{Digests: map[string]string{}}) || reportsEqual(HistoryReport{Digests: map[string]string{"a": "1"}}, HistoryReport{Digests: map[string]string{"a": "2"}}) {
+		t.Fatal("report equality")
+	}
+}
+
+// Axis6: census scope. Mutate K1 types NOT reachable from NewVerifier params.
+func TestRV_A6_CensusScope(t *testing.T) {
+	root := repository(t)
+	paths := exports(t, root)
+	orig := sourceSet(t, root, k1Base)
+	ctrl, e := packageCensus(orig, paths)
+	if e != nil {
+		t.Fatal(e)
+	}
+	type m struct{ id, file, old, next, extra string }
+	for _, x := range []m{
+		{"PacketFieldAdded", "verify.go", "Referents map[string][]byte\n}", "Referents map[string][]byte\n\tTrustOverride bool\n}", ""},
+		{"ReportFieldTypeChanged", "verify.go", "Digests                                  map[string]string", "Digests                                  map[string]any", ""},
+		{"VerifyParamPointer", "verify.go", "func (v *Verifier) Verify(packet Packet)", "func (v *Verifier) Verify(packet *Packet)", ""},
+		{"CanonicalJSONSignature", "json.go", "func CanonicalJSON(v any) ([]byte, error)", "func CanonicalJSON(v any, opts ...any) ([]byte, error)", ""},
+		{"MethodAddedToInstalledTrust", "trust.go", "type VerifierPublication struct", "type VerifierPublication struct", "func (InstalledTrust) MarshalJSON() ([]byte, error) { return []byte(`{}`), nil }"},
+		{"ControlAliasChain", "trust.go", "CohortID       string", "CohortID       rvA", "type rvA = rvB\ntype rvB = map[string]any"},
+		{"ControlRecursive", "trust.go", "CohortID       string", "CohortID       rvNode", "type rvNode struct{ Next *rvNode; V any }"},
+		{"ControlGenericConstraint", "trust.go", "CohortID       string", "CohortID       rvG[string]", "type rvG[T any] struct{ X T }"},
+		{"ControlInterfaceMethod", "trust.go", "SemanticInputs       any", "SemanticInputs       interface{ M() }", ""},
+		{"ControlUnresolvedCrossFile", "trust.go", "CohortID       string", "CohortID       rvMissing", ""},
+	} {
+		src := copyMap(orig)
+		s := string(src[x.file])
+		if !strings.Contains(s, x.old) {
+			s = strings.ReplaceAll(s, "\r\n", "\n")
+			if !strings.Contains(s, x.old) {
+				t.Fatalf("%s target missing", x.id)
+			}
+		}
+		src[x.file] = []byte(strings.Replace(s, x.old, x.next, 1) + "\n" + x.extra + "\n")
+		var c census
+		var ce error
+		func() {
+			defer func() {
+				if r := recover(); r != nil {
+					ce = errors.New("PANIC")
+				}
+			}()
+			c, ce = packageCensus(src, paths)
+		}()
+		detected := ce != nil || c.shape != ctrl.shape
+		t.Logf("A6 %-28s detected=%t err=%v", x.id, detected, ce != nil)
+	}
+	// Type-correct before/after pairs (both must typecheck): a probe field of a
+	// named type is inserted, then only that named type's definition changes.
+	run := func(id, file, anchor, field, before, after string) {
+		insert := func(def string) map[string][]byte {
+			src := copyMap(orig)
+			s := strings.ReplaceAll(string(src[file]), "\r\n", "\n")
+			if !strings.Contains(s, anchor) {
+				t.Fatalf("%s anchor missing", id)
+			}
+			src[file] = []byte(strings.Replace(s, anchor, field+"\n\t"+anchor, 1) + "\n" + def + "\n")
+			return src
+		}
+		var a, b census
+		var ea, eb error
+		func() {
+			defer func() {
+				if r := recover(); r != nil {
+					eb = errors.New("PANIC")
+				}
+			}()
+			a, ea = packageCensus(insert(before), paths)
+			b, eb = packageCensus(insert(after), paths)
+		}()
+		t.Logf("A6pair %-34s beforeErr=%v afterErr=%v detected=%t", id, ea, eb, ea == nil && eb == nil && a.shape != b.shape)
+	}
+	run("TC_PacketProbe(not in census)", "verify.go", "Referents map[string][]byte", "Probe rvP", "type rvP map[string]string", "type rvP map[string]any")
+	run("TC_ReportProbe(not in census)", "verify.go", "Records, ProofReferences, RealSignatures int", "Probe rvP", "type rvP []string", "type rvP []any")
+	run("TC_AliasChain", "trust.go", "RegistrySHA256 string", "Probe rvA", "type rvA = rvB\ntype rvB = map[string]string", "type rvA = rvB\ntype rvB = map[string]any")
+	run("TC_SharedRecursive", "trust.go", "RegistrySHA256 string", "Probe *rvNode", "type rvNode struct{ Next *rvNode; Peer *rvNode; V string }", "type rvNode struct{ Next *rvNode; Peer *rvNode; V any }")
+	run("TC_GenericConstraint", "trust.go", "RegistrySHA256 string", "Probe rvG[string]", "type rvG[T comparable] struct{ X T }", "type rvG[T any] struct{ X T }")
+	run("TC_GenericBody", "trust.go", "RegistrySHA256 string", "Probe rvG[string]", "type rvG[T any] struct{ X []T }", "type rvG[T any] struct{ X map[string]T }")
+	run("TC_InterfaceMethod", "trust.go", "RegistrySHA256 string", "Probe rvI", "type rvI interface{ M() }", "type rvI interface{ M(); N() }")
+	run("TC_FuncResult", "trust.go", "RegistrySHA256 string", "Probe rvF", "type rvF func(string) error", "type rvF func(string) any")
+	run("TC_ChanDir", "trust.go", "RegistrySHA256 string", "Probe rvC", "type rvC chan string", "type rvC <-chan string")
+	run("TC_StructTag", "trust.go", "RegistrySHA256 string", "Probe rvT", "type rvT struct{ A string `json:\"a\"` }", "type rvT struct{ A string `json:\"b\"` }")
+	// Cross-file unresolved: must be a type error, never panic or silent stub.
+	src := copyMap(orig)
+	s := strings.ReplaceAll(string(src["trust.go"]), "\r\n", "\n")
+	src["trust.go"] = []byte(strings.Replace(s, "RegistrySHA256 string", "Probe rvMissing\n\tRegistrySHA256 string", 1))
+	var ue error
+	func() {
+		defer func() {
+			if r := recover(); r != nil {
+				ue = errors.New("PANIC")
+			}
+		}()
+		_, ue = packageCensus(src, paths)
+	}()
+	t.Logf("A6 unresolved cross-file type => err=%v", ue)
+	_ = token.NoPos
+	_ = bytes.Equal
+	_ = os.Getenv
+}

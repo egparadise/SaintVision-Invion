@@ -1,0 +1,37 @@
+# Claude K2A de71 code review local doc gates (owner interpreter, each command run separately, stop on first nonzero)
+interpreter: D:\Project\SaintVisionI-Invion\.venv\Scripts\python.exe, env PYTHONUTF8=1, cwd worktree root, branch agent/claude/fleet5-k2a-de71-code-review-20261106 from de71c07c2b827eea50e2ca660f80d042334472c7
+canonical state: D:/Project/SaintVision-Invion/SaintVisionI-Invion/.git/obsidian-sync-state.json
+state sha256 before: 49fba01268a37b0c85ed9075a5221dcf4e2ca111433b4b7e67d8818d2c544b0a
+state sha256 after:  49fba01268a37b0c85ed9075a5221dcf4e2ca111433b4b7e67d8818d2c544b0a  unchanged=True
+
+python -B tools/check_docs.py | exit 0 | 2026-11-06T14:28:14.262017+09:00 .. 2026-11-06T14:28:34.102604+09:00
+    PASS: 24 original hashes, 1257 versioned documents, wiki links, 48 tasks, 12 outcomes, owner/reviewer/skills, dependency DAG.
+python -B tools/check_ontology_generation.py | exit 0 | 2026-11-06T14:28:34.102769+09:00 .. 2026-11-06T14:28:35.909122+09:00
+    PASS: 4 ontology artifacts are graph-equivalent to a fresh generation
+python -B tools/check_ontology.py | exit 0 | 2026-11-06T14:28:35.909142+09:00 .. 2026-11-06T14:28:37.707525+09:00
+    PASS: RDF parsing, defined terms, TTL/JSON-LD equivalence, 48 task mappings, positive SHACL, 4 rejected invalid fixtures, 4 competency queries, Obsidian mirrors.
+python -B tools/check_contract_bindings.py | exit 0 | 2026-11-06T14:28:37.707548+09:00 .. 2026-11-06T14:28:49.972214+09:00
+    PASS check_contract_bindings: 57 fixtures each referenced by a test; 21 bound kernel response TYPES each have >=1 serving-anchor test (counted PER TYPE, not per anchor SITE: those types occupy 27 anchor sites; a multi-site type counts covered even if only one site is tested -- site-level weight is not decidable here, use tools/check_anchor_weight.py + the mutation harness); 14 replay guards presen
+      UNIT NOTE: TYPE count <= SITE count. Multi-site types (per-type coverage can mask an untested site): ApprovalView(2 sites: ['approvals']), BusinessBindingView(2 sites: ['business_handoff']), BusinessEditLockReleaseView(2 sites: ['business_handoff']), BusinessEditLockView(2 sites: ['business_handoff']), ControlRunDetail(3 sites: ['control']), ControlRunView(2 sites: ['control']), EvidenceEnvelope
+      (Reporting sites is not a regression -- the TYPE number never meant 'sites verified'; this makes the counting unit explicit. EvidenceEnvelope-class multi-site anchors are why.)
+python -B tools/check_frontend_integrity.py | exit 0 | 2026-11-06T14:28:49.972240+09:00 .. 2026-11-06T14:28:51.471162+09:00
+    Scanning 94 frontend production source files under apps/web/src ...
+    
+    PASS Frontend Integrity Check: all 9 integrity rules satisfied (0 violations).
+python -B tools/check_doc_path_citations.py --ratchet --base-ref de71c07c2b827eea50e2ca660f80d042334472c7 | exit 0 | 2026-11-06T14:28:51.471180+09:00 .. 2026-11-06T14:28:56.723563+09:00
+    PASS check_doc_path_citations --ratchet: 290 broken citation(s), all in baseline, none stale, floor unchanged.
+python -B tools/check_doc_single_source.py --ratchet | exit 0 | 2026-11-06T14:28:56.723581+09:00 .. 2026-11-06T14:28:57.120103+09:00
+    PASS check_doc_single_source --ratchet: 16 pairs, all in baseline, none stale.
+python -B tools/test_sync.py | exit 0 | 2026-11-06T14:28:57.120120+09:00 .. 2026-11-06T14:29:01.467651+09:00
+    .Sync error (ValueError): Resolution list includes paths that are not current conflicts: one.md, two.md
+    .
+    ----------------------------------------------------------------------
+    Ran 14 tests in 4.075s
+    
+    OK
+python -B tools/build_docs.py | exit 0 | 2026-11-06T14:29:01.467675+09:00 .. 2026-11-06T14:29:07.552420+09:00
+    BUILT: saintvision-guidelines.zip, 42859315 bytes. Documentation only.
+python -B tools/sync_obsidian.py --check --state D:/Project/SaintVision-Invion/SaintVisionI-Invion/.git/obsidian-sync-state.json | exit 0 | 2026-11-06T14:29:07.552439+09:00 .. 2026-11-06T14:29:17.553212+09:00
+    CHECK: 3403 managed files, 951 pending exports, 0 conflicts. No writes.
+
+allExit0=True; sync was --check only (no apply/adopt/resolve/state write).

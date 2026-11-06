@@ -1,0 +1,102 @@
+# Reviewer scratch run 1 (all TestRV_* + owner TestRepositoryBoundaryAndZeroEffects), detached scratch worktree at de71c07c, reviewer files untracked only
+=== RUN   TestRepositoryBoundaryAndZeroEffects
+    source_gate_test.go:566: repo modules=[packages/contracts-go/go.mod services/node-agent/go.mod]; Go files=95; production imports=[services/node-agent/internal/migrationcontext/k1_bridge.go:k1]; test imports=[]; immutable K1 definitions=[services/node-agent/migrationverify/trust.go:NewVerifier services/node-agent/migrationverify/verify.go:Verify services/node-agent/migrationverify/verify.go:VerifyCurrentProjectionSet]; sole bridge sites=[services/node-agent/internal/migrationcontext/k1_bridge.go:InstalledTrust services/node-agent/internal/migrationcontext/k1_bridge.go:TrustedContext services/node-agent/internal/migrationcontext/k1_bridge.go:NewVerifier]
+--- PASS: TestRepositoryBoundaryAndZeroEffects (0.40s)
+=== RUN   TestRV_A1_PublicNonBypass
+    zz_reviewer_claude_test.go:142: A1: nil/zero/new/foreign/JSON/forged self-signed records all refuse with grant codes; no opaque value/report issued
+--- PASS: TestRV_A1_PublicNonBypass (0.00s)
+=== RUN   TestRV_A2_DuplicateMemberIdentity
+    zz_reviewer_claude_test.go:153: A2 duplicate PC2==PC4 identity checkPolicyBindings => NIL
+    zz_reviewer_claude_test.go:155: A2 same duplicate at K1 bridge => K1_VALIDATION_REFUSED
+--- PASS: TestRV_A2_DuplicateMemberIdentity (0.02s)
+=== RUN   TestRV_A2_MemberBindingsLatentPanic
+    zz_reviewer_claude_test.go:177: A2 direct checkMemberBindings panics=true; via checkPolicyBindings => TRUST_UNKNOWN_OR_PIN_MISMATCH
+--- PASS: TestRV_A2_MemberBindingsLatentPanic (0.01s)
+=== RUN   TestRV_A3_Selectors
+    zz_reviewer_claude_test.go:236: A3 two-current(query+facts)                                pure=ORIGINAL_PLAN_OPERATION_MISMATCH full=ORIGINAL_PLAN_OPERATION_MISMATCH
+    zz_reviewer_claude_test.go:236: A3 facts-only                                              pure=ORIGINAL_PLAN_OPERATION_MISMATCH full=ORIGINAL_PLAN_OPERATION_MISMATCH
+    zz_reviewer_claude_test.go:236: A3 query-lease-hash                                        pure=ORIGINAL_PLAN_OPERATION_MISMATCH full=ORIGINAL_PLAN_OPERATION_MISMATCH
+    zz_reviewer_claude_test.go:236: A3 op-lease-hash                                           pure=ORIGINAL_PLAN_OPERATION_MISMATCH full=ORIGINAL_PLAN_OPERATION_MISMATCH
+    zz_reviewer_claude_test.go:236: A3 op-fence                                                pure=ORIGINAL_PLAN_OPERATION_MISMATCH full=ORIGINAL_PLAN_OPERATION_MISMATCH
+    zz_reviewer_claude_test.go:236: A3 query-fence                                             pure=ORIGINAL_PLAN_OPERATION_MISMATCH full=ORIGINAL_PLAN_OPERATION_MISMATCH
+    zz_reviewer_claude_test.go:236: A3 migration-id                                            pure=ORIGINAL_PLAN_OPERATION_MISMATCH full=ORIGINAL_PLAN_OPERATION_MISMATCH
+    zz_reviewer_claude_test.go:236: A3 op-nonUTC                                               pure=ORIGINAL_PLAN_OPERATION_MISMATCH full=ORIGINAL_PLAN_OPERATION_MISMATCH
+    zz_reviewer_claude_test.go:236: A3 facts-missing                                           pure=ORIGINAL_PLAN_OPERATION_MISMATCH full=ORIGINAL_PLAN_OPERATION_MISMATCH
+    zz_reviewer_claude_test.go:236: A3 plan-changed                                            pure=ORIGINAL_PLAN_OPERATION_MISMATCH full=ORIGINAL_PLAN_OPERATION_MISMATCH
+    zz_reviewer_claude_test.go:236: A3 three-way-current(query+facts+op entry, original kept)  pure=NIL full=K1_VALIDATION_REFUSED
+    zz_reviewer_claude_test.go:236: A3 three-way-current(original removed)                     pure=ORIGINAL_PLAN_OPERATION_MISMATCH full=ORIGINAL_PLAN_OPERATION_MISMATCH
+    zz_reviewer_claude_test.go:236: A3 extra-unrelated-op                                      pure=NIL full=K1_VALIDATION_REFUSED
+--- PASS: TestRV_A3_Selectors (1.35s)
+=== RUN   TestRV_A3_FreezeAlgebra
+    zz_reviewer_claude_test.go:273: A3 number "1.5"              clone=NIL canonical=RAW:non-integer number marshalErr=false
+    zz_reviewer_claude_test.go:273: A3 number "1e3"              clone=NIL canonical=RAW:non-integer number marshalErr=false
+    zz_reviewer_claude_test.go:273: A3 number "-0"               clone=NIL canonical=RAW:non-integer number marshalErr=false
+    zz_reviewer_claude_test.go:273: A3 number "1 "               clone=NIL canonical=RAW:non-integer number marshalErr=true
+    zz_reviewer_claude_test.go:273: A3 number "9007199254740993" clone=NIL canonical=RAW:unsafe integer marshalErr=false
+--- PASS: TestRV_A3_FreezeAlgebra (0.00s)
+=== RUN   TestRV_A4_ClockEdges
+    zz_reviewer_claude_test.go:325: A4 zero-width L=U=T0                    => NIL
+    zz_reviewer_claude_test.go:325: A4 U-L == 1s exact                      => NIL
+    zz_reviewer_claude_test.go:325: A4 U-L > MaxElapsedUncertainty          => CLOCK_INTERVAL_INVALID
+    zz_reviewer_claude_test.go:325: A4 negative uncertainty                 => CLOCK_INTERVAL_INVALID
+    zz_reviewer_claude_test.go:325: A4 T0 == L                              => NIL
+    zz_reviewer_claude_test.go:325: A4 T0 < L                               => CLOCK_INTERVAL_INVALID
+    zz_reviewer_claude_test.go:325: A4 T0 nonUTC                            => CLOCK_INTERVAL_INVALID
+    zz_reviewer_claude_test.go:325: A4 U local                              => CLOCK_INTERVAL_INVALID
+    zz_reviewer_claude_test.go:325: A4 EvaluationEnd == Deadline            => NIL
+    zz_reviewer_claude_test.go:325: A4 EvaluationEnd < EvaluationStart      => CLOCK_INTERVAL_INVALID
+    zz_reviewer_claude_test.go:325: A4 Deadline < EvaluationStart           => CLOCK_INTERVAL_INVALID
+    zz_reviewer_claude_test.go:325: A4 AcquisitionStart < 0                 => CLOCK_INTERVAL_INVALID
+    zz_reviewer_claude_test.go:325: A4 EvaluationStart < AcquisitionStart   => CLOCK_INTERVAL_INVALID
+    zz_reviewer_claude_test.go:325: A4 MappingVersion empty                 => CLOCK_MECHANISM_UNPROVEN
+    zz_reviewer_claude_test.go:325: A4 MechanismSourceSHA zero              => CLOCK_MECHANISM_UNPROVEN
+    zz_reviewer_claude_test.go:325: A4 RunningClosure mismatch              => CLOCK_MECHANISM_UNPROVEN
+    zz_reviewer_claude_test.go:325: A4 PolicyVersion stale                  => STALE_SNAPSHOT
+    zz_reviewer_claude_test.go:344: A4 endpoint checked-after-L  => PUBLICATION_UNKNOWN_REVOKED_EXPIRED_OR_BACKDATED
+    zz_reviewer_claude_test.go:344: A4 endpoint expires-at-T0    => PUBLICATION_UNKNOWN_REVOKED_EXPIRED_OR_BACKDATED
+    zz_reviewer_claude_test.go:344: A4 endpoint stale-at-U       => PUBLICATION_UNKNOWN_REVOKED_EXPIRED_OR_BACKDATED
+--- PASS: TestRV_A4_ClockEdges (2.07s)
+=== RUN   TestRV_A6_CensusScope
+    zz_reviewer_claude_test.go:397: A6 PacketFieldAdded             detected=false err=false
+    zz_reviewer_claude_test.go:397: A6 ReportFieldTypeChanged       detected=true err=true
+    zz_reviewer_claude_test.go:397: A6 VerifyParamPointer           detected=true err=true
+    zz_reviewer_claude_test.go:397: A6 CanonicalJSONSignature       detected=false err=false
+    zz_reviewer_claude_test.go:397: A6 MethodAddedToInstalledTrust  detected=false err=false
+    zz_reviewer_claude_test.go:397: A6 ControlAliasChain            detected=true err=true
+    zz_reviewer_claude_test.go:397: A6 ControlRecursive             detected=true err=true
+    zz_reviewer_claude_test.go:397: A6 ControlGenericConstraint     detected=true err=true
+    zz_reviewer_claude_test.go:397: A6 ControlInterfaceMethod       detected=true err=true
+    zz_reviewer_claude_test.go:397: A6 ControlUnresolvedCrossFile   detected=true err=true
+--- PASS: TestRV_A6_CensusScope (2.89s)
+=== RUN   TestRV_External_PublicSurface
+    zz_reviewer_external_claude_test.go:53: external: no exported constructor/option/field installs a port, policy, history or report
+--- PASS: TestRV_External_PublicSurface (0.00s)
+PASS
+ok  	github.com/egparadise/SaintVision-Invion/services/node-agent/internal/migrationcontext	8.858s
+
+# Reviewer scratch run 2 (TestRV_A6 with type-correct before/after pairs added)
+=== RUN   TestRV_A6_CensusScope
+    zz_reviewer_claude_test.go:397: A6 PacketFieldAdded             detected=false err=false
+    zz_reviewer_claude_test.go:397: A6 ReportFieldTypeChanged       detected=true err=true
+    zz_reviewer_claude_test.go:397: A6 VerifyParamPointer           detected=true err=true
+    zz_reviewer_claude_test.go:397: A6 CanonicalJSONSignature       detected=false err=false
+    zz_reviewer_claude_test.go:397: A6 MethodAddedToInstalledTrust  detected=false err=false
+    zz_reviewer_claude_test.go:397: A6 ControlAliasChain            detected=true err=true
+    zz_reviewer_claude_test.go:397: A6 ControlRecursive             detected=true err=true
+    zz_reviewer_claude_test.go:397: A6 ControlGenericConstraint     detected=true err=true
+    zz_reviewer_claude_test.go:397: A6 ControlInterfaceMethod       detected=true err=true
+    zz_reviewer_claude_test.go:397: A6 ControlUnresolvedCrossFile   detected=true err=true
+    zz_reviewer_claude_test.go:422: A6pair TC_PacketProbe(not in census)      beforeErr=<nil> afterErr=<nil> detected=false
+    zz_reviewer_claude_test.go:422: A6pair TC_ReportProbe(not in census)      beforeErr=<nil> afterErr=<nil> detected=false
+    zz_reviewer_claude_test.go:422: A6pair TC_AliasChain                      beforeErr=<nil> afterErr=<nil> detected=true
+    zz_reviewer_claude_test.go:422: A6pair TC_SharedRecursive                 beforeErr=<nil> afterErr=<nil> detected=true
+    zz_reviewer_claude_test.go:422: A6pair TC_GenericConstraint               beforeErr=<nil> afterErr=<nil> detected=true
+    zz_reviewer_claude_test.go:422: A6pair TC_GenericBody                     beforeErr=<nil> afterErr=<nil> detected=true
+    zz_reviewer_claude_test.go:422: A6pair TC_InterfaceMethod                 beforeErr=<nil> afterErr=<nil> detected=true
+    zz_reviewer_claude_test.go:422: A6pair TC_FuncResult                      beforeErr=<nil> afterErr=<nil> detected=true
+    zz_reviewer_claude_test.go:422: A6pair TC_ChanDir                         beforeErr=<nil> afterErr=<nil> detected=true
+    zz_reviewer_claude_test.go:422: A6pair TC_StructTag                       beforeErr=<nil> afterErr=<nil> detected=true
+    zz_reviewer_claude_test.go:447: A6 unresolved cross-file type => err=trust.go:16:8: undefined: rvMissing
+--- PASS: TestRV_A6_CensusScope (2.34s)
+PASS
+ok  	github.com/egparadise/SaintVision-Invion/services/node-agent/internal/migrationcontext	4.183s

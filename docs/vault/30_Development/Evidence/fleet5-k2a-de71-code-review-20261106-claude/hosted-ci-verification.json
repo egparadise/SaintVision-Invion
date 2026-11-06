@@ -1,0 +1,59 @@
+{
+  "schemaVersion": "fleet5-k2a-de71-review-hosted-ci-verification:1",
+  "reviewer": "Claude",
+  "readOnly": true,
+  "method": "gh api (read only) at 2026-11-06 ~14:15 KST; Core artifact downloaded to the session scratchpad only (raw ZIP/jsonl/logs NOT copied into the vault)",
+  "candidate": "de71c07c2b827eea50e2ca660f80d042334472c7",
+  "runs": {
+    "core": {
+      "id": 42164071724,
+      "name": "FLEET5-K2A-Core-de71c07c2b82-20261106T1342KST",
+      "head_sha": "de71c07c2b827eea50e2ca660f80d042334472c7",
+      "head_branch": "agent/codex/fleet5-k2a-trust-history-20261106",
+      "event": "workflow_dispatch",
+      "run_attempt": 1,
+      "conclusion": "failure",
+      "jobs": {
+        "s01-storage-roundtrip": {"id": 127716312164, "conclusion": "success"},
+        "core": {
+          "id": 127716312318,
+          "conclusion": "failure",
+          "steps": {
+            "15 Test Linux Node concurrency and crash boundaries": "success",
+            "25 Run provisioned LAN installer acceptance": "failure",
+            "26-33 (LAN evidence, CX01 recovery, admission queue, LAN DB, main pytest)": "skipped",
+            "39 python -m build control-plane": "skipped",
+            "40 Run go test ./...": "skipped",
+            "41 tsc": "skipped"
+          }
+        }
+      },
+      "step15Command": "go test -race -json ./... > dist/node-unit.jsonl (from the job log, line 1485)",
+      "jobLogSha256": "8167e53085a621b72f581b8d68e6f9047c3ef09b5d58dab8dec76dbe2ca0684e",
+      "artifact": {
+        "id": 13478861491,
+        "name": "saintvision-core-evidence",
+        "bytes": 13211105,
+        "githubDigest": "sha256:9e4152c8c6b0bb981b7fa8e8befcf348d067f685c5a042bff7b38a8ba8d65bd9",
+        "reviewerDownloadSha256": "9e4152c8c6b0bb981b7fa8e8befcf348d067f685c5a042bff7b38a8ba8d65bd9",
+        "nodeUnitJsonlSha256": "deedbc872729c3c3536fa9f74bdec3cd5fcbe414ec68445e5bc6119ecf9d86a3",
+        "nodeUnitParse": {
+          "package": "github.com/egparadise/SaintVision-Invion/services/node-agent/internal/migrationcontext",
+          "packageResult": "pass",
+          "topLevelTests": {"pass": 11, "fail": 0, "skip": 0},
+          "subtests": {"pass": 24, "fail": 0, "skip": 0},
+          "wholeFileFailEvents": 0,
+          "failedPackages": []
+        }
+      }
+    },
+    "sourceDocs": {"id": 42164075078, "name": "FLEET5-K2A-Docs-de71c07c2b82-20261106T1342KST", "head_sha": "de71c07c2b827eea50e2ca660f80d042334472c7", "event": "workflow_dispatch", "run_attempt": 1, "conclusion": "success"},
+    "failureReportDocs": {"id": 42165778183, "name": "FLEET5-K2A-failure-report-Docs-ff3169d360a7-20261106T1400KST", "head_sha": "ff3169d360a707415d9b03484cf0cf3031f3912c", "event": "workflow_dispatch", "run_attempt": 1, "conclusion": "success"}
+  },
+  "reviewerConclusion": {
+    "newPackageHostedRace": "ACTUAL_PASS (independently re-derived from the artifact; matches Root's counts and hashes)",
+    "coreRun": "FAILURE preserved: LAN installer acceptance step failed; main pytest, final build and final go test ./... were SKIPPED, NOT SUCCESS",
+    "wholeCoreGreen": false,
+    "lanFailureDiagnosis": "NOT REVIEWED HERE (separate Codex diagnostic card). The reviewer did not inspect, rerun or judge the LAN helper/test."
+  }
+}

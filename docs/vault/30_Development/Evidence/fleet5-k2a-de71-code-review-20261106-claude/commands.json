@@ -1,0 +1,36 @@
+{
+  "schemaVersion": "fleet5-k2a-de71-code-review-commands:1",
+  "environment": {
+    "host": "Windows 11 Pro 10.0.26300 (Git Bash + PowerShell 5.1)",
+    "worktree": "D:/Project/SaintVisionI-Invion/fleet5-bootstrap-v3-review-20261106 (reused released review workspace, new branch)",
+    "branch": "agent/claude/fleet5-k2a-de71-code-review-20261106 created FROM de71c07c2b827eea50e2ca660f80d042334472c7",
+    "scratch": "session scratchpad outside the repo: detached git worktree at de71 for reviewer tests/mutants (removed after the run), Core artifact/job log download, logs",
+    "go": "go1.27.0 windows/amd64, CGO_ENABLED=0, GOTOOLCHAIN=auto env (owner gate subprocesses force GOTOOLCHAIN=local GOWORK=off GOPROXY=off GOSUMDB=off); module cache only; no install",
+    "python": "system python -I for parsing; owner venv interpreter D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe for doc gates; PYTHONUTF8=1",
+    "serial": "one process at a time, go test -p 1, GOMAXPROCS=1 where set; no RAM measurement taken",
+    "noDB_PG_Docker_Node_SSH_PKI_VM_OSclock_schedule_privateKey_ObsidianApply": true
+  },
+  "timeNote": "Clock-captured KST: 14:13:16 (UTC 05:13:16 at first go test), 14:22:55, 14:26:36 (PowerShell Get-Date). Others are session-order approximations; doc-gate times are in local-doc-gates.txt.",
+  "commands": [
+    {"atKST": "~14:05", "argv": "git fetch origin; git cat-file -t de71c07c / ff3169d3; git log origin/agent/codex/fleet5-k2a-trust-history-20261106", "exit": 0, "result": "remote head ff3169d3, parent de71c07c, grandparent 4ce63e8e"},
+    {"atKST": "~14:05", "argv": "git diff --stat/--name-status 4ce63e8e de71c07c; git diff --name-status de71c07c ff3169d3", "exit": 0, "result": "42 A (12 package, 29 owner Evidence, 1 owner History); ff31 adds 15 docs-only paths + modifies 2 owner docs, 0 services"},
+    {"atKST": "~14:05", "argv": "git switch -c agent/claude/fleet5-k2a-de71-code-review-20261106 de71c07c2b827eea50e2ca660f80d042334472c7", "exit": 0},
+    {"atKST": "~14:08", "argv": "git --git-dir=<Root .git> show eec3dd2c:<Evidence/fleet5-20261105-root/k2a-*.json> (read only)", "exit": 0, "result": "grant + CHOICE A clarification read"},
+    {"atKST": "~14:10", "argv": "git show fe7e1ea0:<prior review evidence> (read only)", "exit": 0},
+    {"atKST": "14:13:16", "argv": "go test -count=1 -p 1 -v ./internal/migrationcontext/ (cwd services/node-agent, GOFLAGS= GOMAXPROCS=1)", "exit": 0, "output": "owner-suite-reproduction.log.txt", "result": "11 top / 24 sub PASS, 12.4 s"},
+    {"atKST": "~14:14", "argv": "go vet ./internal/migrationcontext/ ./migrationverify/", "exit": 0},
+    {"atKST": "~14:14", "argv": "go test -race -count=1 -p 1 ./internal/migrationcontext/", "exit": 2, "result": "'go: -race requires cgo' before execution => NOT_RUN (no cgo enable/toolchain change by scope)"},
+    {"atKST": "~14:15", "argv": "gh api repos/egparadise/SaintVision-Invion/actions/runs/{42164071724,42164075078,42165778183} (+/jobs, jobs/127716312318, runs/42164071724/artifacts)", "exit": 0, "output": "hosted-ci-verification.json"},
+    {"atKST": "~14:15", "argv": "gh api --allow-escape-sequences .../actions/jobs/127716312318/logs > <scratch>/ci/core-job.log", "exit": 0, "result": "305206 bytes sha256 8167e530...; step 15 command go test -race -json ./...; first attempt without the flag exit 1 (escape-sequence refusal), retried with the flag"},
+    {"atKST": "~14:16", "argv": "gh api .../actions/artifacts/13478861491/zip > <scratch>/ci/core-artifact.zip; unzip node-unit.jsonl; python -I <scratch>/ci/parse_unit.py node-unit.jsonl", "exit": 0, "result": "zip 13211105 bytes sha256 9e4152c8... == GitHub digest; jsonl sha256 deedbc87...; migrationcontext pass 11/24, 0 fail; whole-file fail events 0"},
+    {"atKST": "~14:17", "argv": "python -I fixture scans of testdata/synthetic-public-history.json", "exit": 0, "result": "sha256 76f237ce... == owner export record; 37 key-named values all SPKI sha256 of the 35 public grant keys; no private/seed/secret field in JSON or decoded packet bytes; history ops 2, live ops/Current present but not decoded by the test"},
+    {"atKST": "~14:18", "argv": "git diff --stat eb32b211 de71c07c -- services/node-agent/migrationverify; git diff de71c07c ff3169d3 -- services; grep non-test package for time.Since/Until/Now, .Verify(, x509 Create*, NewKeyFromSeed, PrivateKey, unsafe, reflect, current/effect names", "exit": 0, "result": "both diffs empty; only .Verify( is the K1 verifier call in k1_bridge.go; no current/effect symbols; no importer of migrationcontext"},
+    {"atKST": "~14:19", "argv": "git worktree add --detach <scratch>/wt-de71 de71c07c", "exit": 0},
+    {"atKST": "~14:20", "argv": "go test -count=1 -p 1 -v -run 'TestRV_|TestRepositoryBoundaryAndZeroEffects' ./internal/migrationcontext/ (scratch worktree with untracked reviewer_claude_test.go + reviewer_external_claude_test.go)", "exit": 0, "note": "first build attempt exit 1 (reviewer typo: string returned as Code), fixed in the reviewer file only", "output": "reviewer-scratch-test.log.txt"},
+    {"atKST": "~14:21", "argv": "same, -run TestRV_A6 after adding type-correct census pairs", "exit": 0, "output": "reviewer-scratch-test.log.txt (run 2)"},
+    {"atKST": "~14:21", "argv": "9 gate mutants, one zz_mutant.go (+.s for M8) at a time, go test -run '^TestRepositoryBoundaryAndZeroEffects$', file deleted after each", "exit": "per mutant in gate-mutants.txt", "output": "gate-mutants.txt"},
+    {"atKST": "14:22:55", "argv": "PowerShell Get-FileHash canonical obsidian-sync-state.json; git --git-dir=<Root .git> rev-parse origin/agent/codex/fleet-five-orchestration-20261105; show eec3dd2c Claude board (read only)", "exit": "255 (PowerShell native stderr wrapping; values printed)", "result": "state sha256 49fba012...; Root remote 645264e1 (advanced from eec3dd2c, observed only); Claude board 1.2.130"},
+    {"atKST": "see local-doc-gates.txt", "argv": "10 doc gates one by one with the owner interpreter, stop on first nonzero; sync_obsidian --check --state <canonical> only", "output": "local-doc-gates.txt"}
+  ],
+  "notRun": ["any PG/Docker/Node/SSH/VM/PKI/OS-clock/schedule/equipment command", "rerun of old K1 CI, native proofs, or the LAN installer/helper", "owner gate runner in place (owner ledgers not rewritten)", "Obsidian apply/adopt/resolve/state write/export", "local race (cgo disabled: NOT_RUN)", "any source fix in the author tree"]
+}

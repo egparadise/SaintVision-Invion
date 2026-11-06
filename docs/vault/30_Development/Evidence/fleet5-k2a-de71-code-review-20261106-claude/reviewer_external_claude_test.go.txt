@@ -1,0 +1,54 @@
+package migrationcontext_test
+
+// REVIEWER SCRATCH: only the exported API, as an outside caller would see it.
+import (
+	"encoding/json"
+	"errors"
+	"testing"
+
+	mc "github.com/egparadise/SaintVision-Invion/services/node-agent/internal/migrationcontext"
+)
+
+type embedPort struct{ mc.RegistryPort } // satisfies the closed interface only by delegation
+
+func TestRV_External_PublicSurface(t *testing.T) {
+	code := func(e error) mc.Code {
+		var r *mc.Refusal
+		if errors.As(e, &r) {
+			return r.Code()
+		}
+		return "OTHER"
+	}
+	var _ mc.RegistryPort = embedPort{} // compiles; but no exported way to install it
+	s := mc.NewService()
+	var forgedP mc.InstalledPolicy
+	var forgedH mc.History
+	_ = json.Unmarshal([]byte(`{"binding":{"owner":{},"version":"v","digest":"d"}}`), &forgedP)
+	_ = json.Unmarshal([]byte(`{"binding":{"digest":"d"}}`), &forgedH)
+	q := mc.HistoryQuery{CohortID: "c", ScopeSHA256: "11", Version: "v", OriginalMigrationID: "m", OriginalOperationID: "o", FenceEpoch: 1}
+	for _, p := range []*mc.InstalledPolicy{nil, {}, &forgedP} {
+		for _, h := range []*mc.History{nil, {}, &forgedH} {
+			r, e := s.ValidateHistory(mc.UntrustedPacket{Records: map[string][]byte{"x": []byte("{}")}}, p, h)
+			if code(e) != mc.TrustUnknown || r.Records != 0 || r.Digests != nil {
+				t.Fatal("validate", e)
+			}
+		}
+		h, e := s.ReadHistory(p, q)
+		if h != nil || code(e) != mc.TrustUnknown {
+			t.Fatal("read", e)
+		}
+	}
+	for _, sel := range []string{"", "x", "synthetic-deployment", "../x", "a b", string(make([]byte, 129))} {
+		p, e := s.LoadInstalledPolicy(sel)
+		if p != nil || code(e) != mc.TrustUnknown {
+			t.Fatal("load", sel, e)
+		}
+	}
+	// A caller can forge a HistoryReport or an empty Refusal value; neither is
+	// consumed as authority anywhere (no API accepts them).
+	_ = mc.HistoryReport{Classification: "forged", Records: 1}
+	if (&mc.Refusal{}).Code() != "" {
+		t.Fatal("refusal")
+	}
+	t.Log("external: no exported constructor/option/field installs a port, policy, history or report")
+}

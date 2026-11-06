@@ -1,0 +1,33 @@
+# Reviewer zero-effect gate evasion mutants (Claude, de71 code-axis review)
+# Each mutant: one extra NON-TEST file (zz_mutant.go, M8 also zz_rv_amd64.s) written into the
+# migrationcontext package of a DETACHED scratch worktree at de71c07c2b827eea50e2ca660f80d042334472c7,
+# then exactly: GOFLAGS= GOMAXPROCS=1 go test -count=1 -p 1 -run '^TestRepositoryBoundaryAndZeroEffects$' ./internal/migrationcontext/
+# (cwd services/node-agent, go1.27.0 windows/amd64), then the mutant file was deleted before the next one.
+# UNDETECTED_PASS = owner gate exit 0 although the mutant compiles into the non-test package.
+# The actual de71 non-test source contains NONE of these constructs (reviewer grep; package dir holds only .go/README/testdata).
+
+M1_time_Since => UNDETECTED_PASS
+  import "time"; func rvMutant() time.Duration { return time.Since(time.Time{}) }      // physical clock read
+M1b_time_Until => UNDETECTED_PASS
+  import "time"; func rvMutant() time.Duration { return time.Until(time.Time{}) }      // physical clock read
+M2_alias_ed25519_x509_sign => UNDETECTED_PASS
+  import (ed "crypto/ed25519"; "crypto/x509")
+  func rvMutant() ([]byte, error) { k := ed.NewKeyFromSeed(make([]byte, 32)); return x509.CreateCertificate(nil, &x509.Certificate{}, &x509.Certificate{}, k.Public(), k) }
+  // private-key derivation + signing through two allowlisted imports; the ed25519 selector rule keys on the literal identifier "ed25519"
+M2c_control_unaliased_ed25519 => DETECTED(rc=1): source_gate_test.go:534: only public-key type use is granted
+  import "crypto/ed25519"; func rvMutant() []byte { return ed25519.NewKeyFromSeed(make([]byte, 32)) }
+M3_x509_Verify_physical_clock => UNDETECTED_PASS
+  import "crypto/x509"; func rvMutant(c *x509.Certificate) error { _, e := c.Verify(x509.VerifyOptions{}); return e }
+  // zero CurrentTime => stdlib reads time.Now(); nil Roots => system root load
+M4_x509_SystemCertPool_file_read => UNDETECTED_PASS
+  import "crypto/x509"; func rvMutant() error { _, e := x509.SystemCertPool(); return e }   // OS trust-store/file I/O
+M5c_control_time_Now => DETECTED(rc=1): source_gate_test.go:539: effect/unchecked DTO/current selector forbidden in production slice: Now
+  import "time"; func rvMutant() time.Time { return time.Now() }
+M6c_control_os_import => DETECTED(rc=1): source_gate_test.go:430: effect/bypass import forbidden in trusted closure: services/node-agent/internal/migrationcontext/zz_mutant.go os
+  import "os"; func rvMutant() error { return os.Remove("x") }
+M8_assembly_body_less_func => UNDETECTED_PASS
+  zz_mutant.go: func rvAsm()  /  func rvMutant() { rvAsm() }
+  zz_rv_amd64.s: #include "textflag.h" / TEXT ·rvAsm(SB),NOSPLIT,$0-0 / RET
+  // the gate inventories only *.go files; a body-less Go func backed by package assembly needs no forbidden import
+
+Scratch worktree after the run: only the two untracked reviewer *_test.go files; no mutant file left.
