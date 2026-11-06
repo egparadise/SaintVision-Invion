@@ -1,0 +1,71 @@
+Claude PL-R1d ea276 narrow review results (scratch fixtures = git archive of services/node-agent packages/contracts-go tests/proofs at ea276c97 or b47d5dd6; serial; Go go1.27.0 windows/amd64 CGO_ENABLED=0 unchanged; GOTOOLCHAIN=local GOWORK=off GOPROXY=off GOSUMDB=off GOMAXPROCS=1).
+ea276 effect_gate_test.go sha256 60418aca7ee005a11983db7fad4ebf9f80eaad6b73ac6b722f3a8461694ea9b0 == git blob at ea276 == reviewer cfec sketch output (byte-identical); b47 copy e0c969e0e1a5752e312298ca43b37ef7f8dcdefceb4f039b225bb415f49a522e.
+reviewer_plr1d_probe_test.go.txt sha256 281a310f74296ec4c5ee4918acf48b4737045594abd2e0c3318ea7aaea4bbeca (final; attempt-1 file b6d83676... differed only in X10 body and the observe switch).
+
+[A1] reviewer probes vs ea276, attempt 1 (A-probes-ea276.log sha256 234b57cf14edd249b54c14697d0d6acadc2608e5f8b6a0e94c8cd6779fb881ce) exit 1 = REVIEWER PROBE ERROR, not a gate result:
+     X10 as first written ({(*P(k))[0]++} on a two-core union) failed go build: 'pointers of P(k) ... must have identical base types'. Rewritten as a returning view; all other 12 cases matched attempt 2.
+
+[A2] reviewer probes vs ea276 (A2-probes-ea276.log sha256 f94b0aab65d0d5e3dfe5015febd21fc5e1442b860a077220a1c81319717d5152) exit 0, 13/13 build0/typecheck0, assertions on:
+case=X1-instantiated-generic-constraint kind=NEGATIVE build=0 typecheck=0 refused=true reason=pointee-changing pointer conversion forbidden: P
+case=X3-receiver-type-parameter kind=NEGATIVE build=0 typecheck=0 refused=true reason=pointee-changing pointer conversion forbidden: P
+case=X4-union-interface-term kind=NEGATIVE build=0 typecheck=0 refused=true reason=pointee-changing pointer conversion forbidden: P
+case=X5-method-plus-pointer-constraint kind=NEGATIVE build=0 typecheck=0 refused=true reason=pointee-changing pointer conversion forbidden: P
+case=X6-comparable-embedded kind=NEGATIVE build=0 typecheck=0 refused=true reason=pointee-changing pointer conversion forbidden: P
+case=X7-closure-inside-generic-body kind=NEGATIVE build=0 typecheck=0 refused=true reason=pointee-changing pointer conversion forbidden: P
+case=X8-typeparam-operand-to-typeparam-target kind=NEGATIVE build=0 typecheck=0 refused=true reason=pointee-changing pointer conversion forbidden: P
+case=X10-generic-ed25519-slice-union kind=NEGATIVE build=0 typecheck=0 refused=true reason=pointee-changing pointer conversion forbidden: P
+case=X11-intersection-overapprox kind=CONSERVATIVE build=0 typecheck=0 refused=true reason=pointee-changing pointer conversion forbidden: P
+case=Y1-instantiated-generic-constraint-identity kind=POSITIVE build=0 typecheck=0 refused=false reason=<nil>
+case=Y2-receiver-type-parameter-identity kind=POSITIVE build=0 typecheck=0 refused=false reason=<nil>
+case=Y3-union-interface-term-identity kind=POSITIVE build=0 typecheck=0 refused=false reason=<nil>
+case=Y4-non-pointer-typeparam-value-conversion kind=POSITIVE build=0 typecheck=0 refused=false reason=<nil>
+
+[B] same probes vs OLD b47, observe-only CLAUDE_PLR1D_OBSERVE=1 (B-probes-b47-observe.log sha256 20f3564c8a8b9b75e07bc6383068aeee0e9ed084ba5f0e7968851a0e74a98cbb) exit 0, 13/13 build0/typecheck0:
+case=X1-instantiated-generic-constraint kind=NEGATIVE build=0 typecheck=0 refused=false reason=<nil>
+case=X3-receiver-type-parameter kind=NEGATIVE build=0 typecheck=0 refused=false reason=<nil>
+case=X4-union-interface-term kind=NEGATIVE build=0 typecheck=0 refused=false reason=<nil>
+case=X5-method-plus-pointer-constraint kind=NEGATIVE build=0 typecheck=0 refused=false reason=<nil>
+case=X6-comparable-embedded kind=NEGATIVE build=0 typecheck=0 refused=false reason=<nil>
+case=X7-closure-inside-generic-body kind=NEGATIVE build=0 typecheck=0 refused=true reason=unresolved/function-value/callback call forbidden
+case=X8-typeparam-operand-to-typeparam-target kind=NEGATIVE build=0 typecheck=0 refused=false reason=<nil>
+case=X10-generic-ed25519-slice-union kind=NEGATIVE build=0 typecheck=0 refused=false reason=<nil>
+case=X11-intersection-overapprox kind=CONSERVATIVE build=0 typecheck=0 refused=false reason=<nil>
+case=Y1-instantiated-generic-constraint-identity kind=POSITIVE build=0 typecheck=0 refused=false reason=<nil>
+case=Y2-receiver-type-parameter-identity kind=POSITIVE build=0 typecheck=0 refused=false reason=<nil>
+case=Y3-union-interface-term-identity kind=POSITIVE build=0 typecheck=0 refused=false reason=<nil>
+case=Y4-non-pointer-typeparam-value-conversion kind=POSITIVE build=0 typecheck=0 refused=false reason=<nil>
+     => X1 X3 X4 X5 X6 X8 X10 escape on b47 and are refused on ea276 with the conversion reason; X11 (real type set only ~*time.Location, i.e. identity) is correctly accepted on b47 and CONSERVATIVELY refused on ea276 (INFO PL-R1d-I1); X7 is refused on b47 only by the unrelated function-value rule (on ea276 the conversion rule fires first).
+
+[C1] clean ea276 FULL package, attempt 1 (C-clean-full-ea276.log sha256 e4d94d0ddfe4f4d0f652d6ff8fc0d8ce9b6127bef6d7210c5ec50c39f883b89a) exit 1 = SETUP failure, not a gate result:
+     4 top tests (TestReviewR5AllBridgeObjectsAndMethodSets, TestWholePackageFullUnderlyingCensus, TestCensusMutantsAfterSimulatedRawRepin, TestRepositoryBoundaryAndZeroEffects) need git ls-files/ls-tree/show and the archive had no .git (exit 128). 16 top / 153 sub PASS before.
+[C2] clean ea276 FULL package, attempt 2 with owner-documented read-only GIT_DIR=<this worktree absolute git dir, HEAD ea276, clean index> GIT_WORK_TREE=<fixture> (C2-clean-full-ea276.log sha256 fc3fc1d9ea74855fff327156b9c912806109a9b265b989f821c6b0d2f2e59395) exit 0:
+     20 top / 171 sub PASS, 0 FAIL; 99 'actual go build ... exit0; mutant body NOT executed'; 99 REASON lines = 69 refused / 30 accepted; 21 OWNER_PLR1C lines (6 CONVERSION_NEGATIVE, 7 REFUSE, 6 POSITIVE, 2 LIMIT); 24 OWNER_PLR1D lines:
+case=G1-typeparam-target-generic-launder-return kind=CONVERSION_NEGATIVE refused=true reason=pointee-changing pointer conversion forbidden: P
+case=G2-typeparam-tilde-target-write-in-body kind=CONVERSION_NEGATIVE refused=true reason=pointee-changing pointer conversion forbidden: P
+case=G3-typeparam-target-foreign-field kind=CONVERSION_NEGATIVE refused=true reason=pointee-changing pointer conversion forbidden: P
+case=G4-typeparam-target-slice-to-own-array kind=CONVERSION_NEGATIVE refused=true reason=pointee-changing pointer conversion forbidden: P
+case=G5-union-second-pointer-term kind=CONVERSION_NEGATIVE refused=true reason=pointee-changing pointer conversion forbidden: P
+case=G6-embedded-alias-pointer-term kind=CONVERSION_NEGATIVE refused=true reason=pointee-changing pointer conversion forbidden: P
+case=C1-chained-identity-then-launder kind=REFUSE refused=true reason=pointee-changing pointer conversion forbidden: *github.com/egparadise/SaintVision-Invion/services/node-agent/internal/migrationcontext.L
+case=C2-own-to-foreign-reverse kind=REFUSE refused=true reason=pointee-changing pointer conversion forbidden: *time.Location
+case=C3-typeparam-operand-to-own kind=REFUSE refused=true reason=pointee-changing pointer conversion forbidden: *github.com/egparadise/SaintVision-Invion/services/node-agent/internal/migrationcontext.L
+case=C4-uncalled-closure-conversion kind=REFUSE refused=true reason=pointee-changing pointer conversion forbidden: *github.com/egparadise/SaintVision-Invion/services/node-agent/internal/migrationcontext.L
+case=C5-local-named-in-helper-method kind=REFUSE refused=true reason=pointee-changing pointer conversion forbidden: *github.com/egparadise/SaintVision-Invion/services/node-agent/internal/migrationcontext.C
+case=C6-foreign-named-pointer-identity-then-write kind=REFUSE refused=true reason=foreign pointee write forbidden: time.Location
+case=C7-package-level-var-initializer kind=REFUSE refused=true reason=pointee-changing pointer conversion forbidden: *github.com/egparadise/SaintVision-Invion/services/node-agent/internal/migrationcontext.L
+case=C8-alias-to-foreign-target kind=REFUSE refused=true reason=pointee-changing pointer conversion forbidden: github.com/egparadise/SaintVision-Invion/services/node-agent/internal/migrationcontext.AL
+case=P7-alias-to-foreign-pointer-identity kind=POSITIVE refused=false reason=<nil>
+case=P8-alias-element-identity kind=POSITIVE refused=false reason=<nil>
+case=P9-foreign-value-conversion-copy kind=POSITIVE refused=false reason=<nil>
+case=P10-typed-nil-own-pointer kind=POSITIVE refused=false reason=<nil>
+case=Q1-embedded-pointer-constraint kind=POSITIVE refused=false reason=<nil>
+case=Q2-union-named-pointers-same-element kind=POSITIVE refused=false reason=<nil>
+case=Q3-alias-pointer-constraint kind=POSITIVE refused=false reason=<nil>
+case=Q4-named-pointer-term kind=POSITIVE refused=false reason=<nil>
+case=Q5-core-pointer-term kind=POSITIVE refused=false reason=<nil>
+case=Q6-nil-pointer-term kind=POSITIVE refused=false reason=<nil>
+     go vet -p 1 ./internal/migrationcontext ./migrationverify exit 0 (C2-clean-vet-ea276.log sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 = empty). Worktree git status empty before and after.
+
+[D] real NON-TEST G1 (cfec reviewer_real_g1_nontest_probe.go.txt, sha256 2d65b939b0ae95428cc3693b6de0f827521b2180c5e5d48f70b62d7291cd287a, unused func, never executed) in a complete public ea276 archive:
+    go build -p 1 -buildvcs=false ./... exit 0 (log empty e3b0c442...b855); go test -run ^TestResolvedObjectEffectBoundary$ exit 1 (D-realg1-gate.log sha256 c7e23c723f9f2643a6b6b2132501f260cf66d9fcb2972532680a361b913c097e):
+effect_gate_test.go:485: pointee-changing pointer conversion forbidden: P

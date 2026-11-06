@@ -1,0 +1,113 @@
+package migrationcontext
+
+// Claude independent PL-R1d ea276 narrow review probes. Scratch fixture only,
+// never committed into the product package. Each body is compiled (go build)
+// and re-typechecked; no mutant body or initializer is executed.
+// These target constraint forms NOT in the owner table: instantiated generic
+// constraint, generic alias constraint, receiver type parameter, interface-
+// typed union term, method+pointer constraint, comparable embedding, nested
+// closure in generic body, type-param operand into type-param target, and the
+// intersection over-approximation.
+
+import (
+	"os"
+	"testing"
+)
+
+func TestClaudePLR1DReviewProbes(t *testing.T) {
+	root := repository(t)
+	original := ownProductionSources(t, root)
+	paths := exports(t, root)
+	control, e := checkSourcePackage(ownImport, original, paths, nil)
+	if e != nil {
+		t.Fatal(e)
+	}
+	if e = sourceEffects(original, control); e != nil {
+		t.Fatal("actual pure source must pass", e)
+	}
+	const conv = "pointee-changing pointer conversion forbidden:"
+	cases := []struct{ name, kind, code, want string }{
+		{"X1-instantiated-generic-constraint", "NEGATIVE", `import clock "time"
+type L clock.Location
+type C[T any] interface{~*T}
+func launder[P C[L]](x *clock.Location) P { return P(x) }
+func probe(){*launder[*L](clock.UTC)=L{}}`, conv},
+		{"X3-receiver-type-parameter", "NEGATIVE", `import clock "time"
+type L clock.Location
+type g[P ~*L] struct{}
+func (g[P]) launder(x *clock.Location) P { return P(x) }
+func probe(){*g[*L]{}.launder(clock.UTC)=L{}}`, conv},
+		{"X4-union-interface-term", "NEGATIVE", `import clock "time"
+type L clock.Location
+type base interface{~*L}
+func launder[P interface{base|*clock.Location}](x *clock.Location) P { return P(x) }
+func probe(){*launder[*L](clock.UTC)=L{}}`, conv},
+		{"X5-method-plus-pointer-constraint", "NEGATIVE", `import clock "time"
+type L clock.Location
+func (L) m(){}
+type c interface{*L; m()}
+func launder[P c](x *clock.Location) P { return P(x) }
+func probe(){*launder[*L](clock.UTC)=L{}}`, conv},
+		{"X6-comparable-embedded", "NEGATIVE", `import clock "time"
+type L clock.Location
+func launder[P interface{comparable; ~*L}](x *clock.Location) P { return P(x) }
+func probe(){*launder[*L](clock.UTC)=L{}}`, conv},
+		{"X7-closure-inside-generic-body", "NEGATIVE", `import clock "time"
+type L clock.Location
+func mk[P ~*L]() func(*clock.Location) P { return func(x *clock.Location) P { return P(x) } }
+func probe(){*mk[*L]()(clock.UTC)=L{}}`, conv},
+		{"X8-typeparam-operand-to-typeparam-target", "NEGATIVE", `import clock "time"
+type L clock.Location
+func launder[Q ~*clock.Location, P ~*L](q Q) P { return P(q) }
+func probe(){*launder[*clock.Location, *L](clock.UTC)=L{}}`, conv},
+		{"X10-generic-ed25519-slice-union", "NEGATIVE", `import ed "crypto/ed25519"
+type a [64]byte
+type b [64]byte
+func view[P interface{~*a|~*b}](k ed.PrivateKey) P { return P(k) }
+func probe(k ed.PrivateKey){(*view[*a](k))[0]++}`, conv},
+		// Over-approximation: real type set is only ~*clock.Location, but the
+		// syntactic traversal also collects L; conservative refusal is expected.
+		{"X11-intersection-overapprox", "CONSERVATIVE", `import clock "time"
+type L clock.Location
+func id[P interface{~*L|~*clock.Location; ~*clock.Location}](x *clock.Location) P { return P(x) }
+func probe(){_=id[*clock.Location](clock.UTC)}`, conv},
+		// Positive controls for the new forms (identity / nil).
+		{"Y1-instantiated-generic-constraint-identity", "POSITIVE", `type o struct{N int}
+type C[T any] interface{~*T}
+func id[P C[o]](p *o) P { return P(p) }
+func probe(p *o){_=id[*o](p)}`, ""},
+		{"Y2-receiver-type-parameter-identity", "POSITIVE", `type o struct{N int}
+type g[P ~*o] struct{}
+func (g[P]) id(p *o) P { return P(p) }
+func probe(p *o){_=g[*o]{}.id(p)}`, ""},
+		{"Y3-union-interface-term-identity", "POSITIVE", `type o struct{N int}
+type np *o
+type base interface{~*o}
+func id[P interface{base|np}](p *o) P { return P(p) }
+func probe(p *o){_=id[np](p)}`, ""},
+		{"Y4-non-pointer-typeparam-value-conversion", "POSITIVE", `type n int
+func cv[P ~int|~int64](v n) P { return P(v) }
+func probe(){_=cv[int](1)}`, ""},
+	}
+	for _, m := range cases {
+		t.Run(m.name, func(t *testing.T) {
+			src := copyMap(original)
+			src["pl_review_probe.go"] = []byte("package migrationcontext\n" + m.code)
+			buildPLMutation(t, root, src)
+			checked, e := checkSourcePackage(ownImport, src, paths, nil)
+			if e != nil {
+				t.Fatal("actual built source must typecheck", e)
+			}
+			e = sourceEffects(src, checked)
+			reason := "<nil>"
+			if e != nil {
+				reason = e.Error()
+			}
+			t.Logf("CLAUDE_PLR1D_PROBE case=%s kind=%s build=0 typecheck=0 refused=%t reason=%s", m.name, m.kind, e != nil, reason)
+			if m.kind == "OBSERVE" || os.Getenv("CLAUDE_PLR1D_OBSERVE") == "1" {
+				return
+			}
+			assertPLReason(t, m.name, m.want != "", []string{m.want}, e)
+		})
+	}
+}

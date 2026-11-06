@@ -1,0 +1,41 @@
+{
+ "schemaVersion": "fleet5-k2a-pl-r1d-narrow-review:1",
+ "reviewer": "Claude (ONE reviewer, no helper/subagent)",
+ "orca": {"task": "task_41987ea5739d", "dispatch": "ctx_fb6fdb3cd301", "predecessor": "UI854 review task_599e55626b4a / ctx_15e621fbe050 succeeded/settled/exited/released (Root .work/ui854-reviewer-before-plr1d-start.json, read only)"},
+ "owner": {"agent": "Codex", "task": "task_a95ef3d8ccce", "dispatch": "ctx_ed23b4a777d0", "pendingAsk": "msg_4b416731f99d"},
+ "target": {
+  "immutableBase": "b47d5dd6cd23873c62602e02e85a8f82c9843dc5",
+  "source": "3311f4538da4957396fc694d87706e9d5e813ef2",
+  "final": "ea276c97ece2906dc1f29b44b65aa887379ea78f",
+  "branch": "agent/codex/fleet5-k2a-pl-r1d-20261106 (frozen; reviewer branched agent/claude/fleet5-k2a-pl-r1d-ea276-review-20261106 from exact ea276)",
+  "reviewerGitCheck": "origin branch == ea276c97; 3311^ == b47d5dd6; b47->ea276 non-docs = exactly 3 M (README.md, effect_gate_test.go, pl_r1a_test.go); 3311->ea276 non-docs 0 paths. Code diff read in full: effect_gate_test.go adds conversionPointerElements and changes ONE line (if dst,ok := pointerElement -> for _, dst := range conversionPointerElements); pl_r1a_test.go is a pure append after line 397 (old 75-case prefix untouched); README adds the 7-line PL-R1d qualification and R1c->R1d in one sentence. ea276 effect_gate_test.go sha256 60418aca...a9b0 == reviewer's own cfec sketch output. Root .work/plr1d-source-root-verified.json read only (5495 unchanged base rows, 43 own docs, SourceDocs 42211618094 / FinalDocs 42212250558 all19 SUCCESS). Reviewer did not rerun owner CI or the owner 202-byte / 19354-byte checks."
+ },
+ "readInputs": [
+  "own prior review cfec7b81 review.json, reviewer_plr1c_fix_sketch.py.txt, reviewer_plr1c_probe_test.go.txt, reviewer_real_g1_nontest_probe.go.txt",
+  "owner History 2026-11-06_FLEET5_K2A_PL_R1d_Codex.md v1.0.1 and Evidence fleet5-k2a-pl-r1d-20261106-codex (final-local-results, proof-results, review-inputs, unchanged-source-hashes, source-publication-verification, logs, runners)",
+  "Root msg_049b87bd98ba body (.work/plr1d-root-decision.json) and .work/plr1d-source-root-verified.json in canonical fleet-five-orchestration-20261105 (read only)"
+ ],
+ "verdict": "CODE_AXIS_ACCEPT_FOR_BOUNDED_PL_R1D_TEST_DELTA",
+ "verdictScope": "narrow: the PL-R1d type-parameter pointer-term conversion fence and its README qualification. No new blocking finding; 3 INFO. Not full Core, not runtime, not whole K2.",
+ "closure": {
+  "G1G6": "reviewer clean ea276 FULL: G1-G6 each build0/typecheck0 and refused 'pointee-changing pointer conversion forbidden: P'. Old-gate escape for G1-G4 is the reviewer's own cfec observation on e93 (e93->b47 non-docs 0, effect_gate_test.go sha256 e0c969e0...522e == b47 blob); G5/G6 old-b47 red is owner evidence (not rerun).",
+  "conversionClass": "CLOSED within the promised fence. A conversion can change a pointee only when the target denotes a pointer type. For a non-generic target, b47 already checked the underlying pointer. For a *types.TypeParam target, Go conversion validity requires the operand to convert to EVERY type in P's type set; every such type is a term reachable through constraint -> (alias/named) interface -> embedded elements -> union terms -> interface-typed terms (recursion); pointer base types cannot be type parameters, so every collected element is concrete, and named/alias pointer terms resolve via pointerElement's Unalias+Underlying. Each collected element gets the unchanged untyped-nil / types.Identical(src,dst) check; a non-pointer operand (slice) has no element and is refused. Own non-test imports are allowlisted (no unsafe/reflect; source_gate_test.go:568-591), so no other conversion form launders a pointee in the reviewed closure.",
+  "adversarialProbes": "reviewer probes NOT in the owner table, ea276 exit 0, 13/13 build0/typecheck0: X1 instantiated generic constraint C[L]; X3 receiver type parameter of a generic type's method; X4 union with an interface-typed term; X5 method+pointer constraint; X6 comparable embedding; X7 conversion in a closure inside a generic body; X8 type-param operand into type-param target; X10 two-pointer-term union slice->array view: all refused 'pointee-changing pointer conversion forbidden: P'. Same file on OLD b47 (observe only): X1 X3 X4 X5 X6 X8 X10 accepted (escape); X7 refused there only by the function-value rule. Positives Y1 instantiated-constraint identity, Y2 receiver-type-param identity, Y3 interface-term/named-pointer union identity, Y4 non-pointer type-param value conversion: accepted on ea276.",
+  "acceptedControls": "C1-C5, C7, C8 refused with the intended conversion reason, C6 by the write rule; P7-P10 and Q1-Q6 (embedded, union of named pointers, alias constraint, named pointer term, core pointer term, nil pointer term) accepted, all in the reviewer clean ea276 FULL run.",
+  "realNonTestG1": "reviewer: cfec real non-test G1 file (sha256 2d65b939...287a, unused, never executed) in a complete public ea276 archive: go build -p 1 -buildvcs=false ./... exit 0; TestResolvedObjectEffectBoundary exit 1 'effect_gate_test.go:485: pointee-changing pointer conversion forbidden: P'. Owner old-b47 FULL exit 0 not rerun.",
+  "counts": "reviewer clean ea276 FULL go test -p 1 -count=1 -v ./internal/migrationcontext exit 0 (attempt 2): 20 top / 171 sub PASS, 0 FAIL, 99 actual builds exit0 (bodies not executed), 99 REASON lines = 69 refused / 30 accepted, 21 OWNER_PLR1C + 24 OWNER_PLR1D lines == owner claim. go vet -p 1 ./internal/migrationcontext ./migrationverify exit 0.",
+  "readme": "README PL-R1d paragraph states pointer-term qualification (constraint, embedded, alias/named pointer, union terms; EACH element; slice operands still refuse) and that it is a bounded target-term restriction, not a heap/type-set effect proof or generic/storage audit. Unchecked slice/map/backing storage (PL-R1b-I1), Marshal dispatch/argument ownership (PL-I4), factory-before-K1 (PL-I1), archive op-set (PL-I2) and S2 info remain stated. Accepted.",
+  "noProductChange": "no production file changed; production source passes (control in every test)."
+ },
+ "findings": [],
+ "info": [
+  {"id": "PL-R1d-I1", "severity": "INFO", "text": "conversionPointerElements walks every embedded element/union term syntactically instead of the intersected type set: a superset, so it can only over-refuse. X11 interface{~*L|~*time.Location; ~*time.Location} (real set = identity) is refused on ea276. Acceptable for a defense gate; no change requested."},
+  {"id": "PL-R1d-I2", "severity": "INFO", "text": "a type-parameter OPERAND is never treated as a pointer (C3, X8) so any pointer-term target conversion from it refuses; conservative, unchanged from b47."},
+  {"id": "PL-R1d-I3", "severity": "INFO", "text": "independence caveat: the ea276 helper/loop bytes equal the reviewer's own cfec sketch. Mitigated by 8 new negatives + 4 positives outside the owner table, the old-b47 contrast run and the closure argument above; Root may weigh it."},
+  {"id": "PL-R1c-I1", "severity": "INFO", "text": "dangling comment retained because the old 75-case prefix is byte-frozen; cosmetic, not a blocker."}
+ ],
+ "notRunOrBounded": "generic type alias forms (type K[T any] = interface{~*T}, type PtrTo[T any] = *T) were dropped before execution because the module declares go 1.23 and generic aliases need go1.24; not attempted, no result claimed. Owner CI, Stage2 129, standalone 37, owner 202/19354-byte checks, owner old-b47 FULL and G5/G6 old red: not rerun. Local race (CGO 0), provisioned LAN, hosted race/LAN/main pytest/build, final Go, full Core: NOT RUN. Old Core 42164071724 / Stage1 42170068364 failures and original de71 field UNKNOWN retained. auth/clock/current/effects/entrypoint/self-measurement/install NULL/HOLD/ABSENT; A01-A40 NOT RUN; 5PC incomplete.",
+ "preservedAxes": "accepted merge/pin/diagnostics/public refusal/product/non-generic conversion/N1-N6/PL-R1b write forms not reopened; no unbounded generic, heap or storage audit.",
+ "acceptanceIsNot": "source/code-axis judgement only; not full Core, runtime or whole K2 complete",
+ "rootNext": "Root alone makes the precise ONE fresh full Core + Docs decision on ea276c97 (or not). Reviewer dispatched no Core or owner CI; only this review's own Docs run on its own branch."
+}
