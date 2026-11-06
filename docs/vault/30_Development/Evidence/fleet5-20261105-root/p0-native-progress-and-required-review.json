@@ -3,8 +3,8 @@
   "recordedAtKST": "2026-11-06T00:46:51+09:00",
   "rootBase": "2b1753ce59c09037b5e130a7ffe64794d1d45fdf",
   "priorRootCheckpoint": {
-    "SHA": "7c19fb28d52ac4da1232c98836f96f389e5cfdf2",
-    "Docs": 42303472719,
+    "SHA": "8c7f6e6ec746e97fb6bc584591e1984f94256eab",
+    "Docs": 42306645963,
     "exactHeadCorrelationAllJobsSuccess": true,
     "remoteMatches": true,
     "syncExits": [
@@ -12,13 +12,13 @@
       0,
       0
     ],
-    "independentlyMatchedNormalizedDestinationHashes": 2982,
+    "independentlyMatchedNormalizedDestinationHashes": 2986,
     "pending": 0,
     "conflicts": 0,
     "trackedAndUntrackedClean": true,
     "rootDocsOnly": true,
     "wholeProgramComplete": false,
-    "verifiedAtKST": "2026-11-07T07:18:09+09:00"
+    "verifiedAtKST": "2026-11-07T07:43:44+09:00"
   },
   "actualPlanLowReview": {
     "source": "803ad270562b1b75e44d26f9e14b965c714ab519",
@@ -2515,7 +2515,7 @@
     "ownerT1T2T3": "msg_620855c76519",
     "normativeRevisionReply": "msg_0392caf64d5d"
   },
-  "latestRecordAtKST": "2026-11-07T07:39:51+09:00",
+  "latestRecordAtKST": "2026-11-07T07:55:20+09:00",
   "optionalLowTokenTestDelta": {
     "source": "f0af307705b4923ebc3e231db5238af4c70aa389",
     "scope": "two otherwise-valid token payload corrections and JSON validity assertions; runtime unchanged",
@@ -3284,5 +3284,41 @@
   "D04R2CoreStatus": "completed",
   "D04R2CoreConclusion": "success",
   "D04R2ActualFullCore": "k2-d04-l1-r2-actual-full-core-root-verification.json",
-  "D04R2AuthorClosureGrant": "msg_4bbb275c5aad"
+  "D04R2AuthorClosureGrant": "msg_4bbb275c5aad",
+  "D04R2CompactCloseout": "k2-d04-r2-compact-closure-root-verification.json",
+  "H1H2Design": {
+    "atKST": "2026-11-07T07:55:20+09:00",
+    "card": "FLEET5-K2-H1-H2-AUTHORITY-DESIGN-20261107",
+    "ownerTask": "task_a95ef3d8ccce",
+    "ownerDispatch": "ctx_ed23b4a777d0",
+    "answeredQuestion": "msg_41bdd895631d",
+    "rootReply": "msg_10808c1899e9",
+    "baseReport": "1f073c03eb6673ac60806e8fbe008d391bc45864",
+    "productBaseline": "f2c1afb78b589b4b2cbcf3dcd4dc4f3c3f3bc856",
+    "proposalSHA256": "85d52cb6313bda9b6d97ce6c1cb3d4c3c6bebf8ef487775fb6c8bc7581ec9479",
+    "newBranch": "agent/codex/fleet5-k2-h1-h2-authority-design-20261107",
+    "status": "ACTIVATED_FINITE_DESIGN_ONLY_CANDIDATE_PENDING",
+    "scopeFile": "k2-h1-h2-authority-design-root-scope.txt",
+    "selectedLogicalPolicies": [
+      "independent control-plane/project trust-provisioning boundary, separately authenticated installation/readback",
+      "H1 immutable authorization capsule, H2 independently installed purpose/key/codec authorization; no record self-registration",
+      "explicit independent immutable expectedEffectiveVerdict parameter; no default",
+      "authenticated current status/clock/subject-version snapshot/final readback; retain original intervals",
+      "actual registration delivery/origin independently authenticated; raw equality fact-only"
+    ],
+    "deliverables": [
+      "closed authority/field-origin matrix",
+      "deterministic acquisition/failure/snapshot/readback order into existing private D04 inputs",
+      "ten causal H12 future acceptance specifications PROPOSED_NOT_RUN",
+      "bounded downstream dependency DAG",
+      "smallest subsequent code proposal DATA_ONLY"
+    ],
+    "actualBindings": null,
+    "P02Registration": "UNREGISTERED",
+    "actualRuntimeActionsGranted": false,
+    "positiveFactoryOrProductChangeGranted": false,
+    "independentContractReview": "PENDING_FROZEN_CANDIDATE_AND_ACTUAL_REVIEWER_RELEASE",
+    "actualA7ReviewUnchanged": "ctx_36ec44cc8ca0",
+    "wholeProgramComplete": false
+  }
 }

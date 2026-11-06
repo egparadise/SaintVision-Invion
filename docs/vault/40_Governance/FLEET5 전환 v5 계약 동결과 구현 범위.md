@@ -1,11 +1,11 @@
 ---
 doc_id: "GOV-FLEET5-BOOTSTRAP-V5-FREEZE-CODE-SCOPE-20261106"
 title: "FLEET5 전환 v5 계약 동결과 구현 범위"
-version: "1.0.31"
+version: "1.0.32"
 status: "active"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-11-07T07:39:51+09:00"
+updated: "2026-11-07T07:55:20+09:00"
 source_of_truth: "Git"
 ---
 
@@ -251,3 +251,8 @@ Root는f2c1/parent08e0의시험된Go2hash9361e40f와README허용상태문장만�
 ## 새 f2c1 실제 전체 CI와 간결한 종료기록
 
 NEWCore42300147891의exactf2c1/ref/manual/core.yml/attempt1/correlation과두job·필수step·원문ZIP/XML/GoJSONL·두binarycleanVCSmetadata가Root검증exit0으로확인됐다. Python9312pass46skip/Go142top506sub/P0213top101sub이며6optionalstep과unitDocker/nopackage skip은PASS로바꾸지않았다. 실제a967의L1/I3닫힘과CI축을따로수락하고msg_4bbb275c5aad로간결한보고서/정본근거다음readyDATA명세만배정했다. provider/factory/port/current/effect/실제등록·배포·5대인수는계속미제공이다.
+
+
+## D04 CODE/CI 간결한 종료 증거와 H1/H2 한정설계
+
+실제보고1f073/directf2c1·6ownAonly·기존Root/검토/CI증거귀속·Docs42307308086/all19를Root가검증했다. msg_10808c1899e9는같은Codex에독립custody·capsule/purpose키·독립기대값·인증currentstatus/clock/readback·등록origin의다섯논리정책으로H1/H2closedcontract와10미실행case/최소다음CODE명세를작성하도록허용한다. 실제bindingNULL_HOLD·P02/raw7UNREGISTERED·제품차이0이며계약독립수락·실제producer/port/positivefactory/current/effect/runtime는별도후속gate다.

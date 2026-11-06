@@ -1,15 +1,19 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.447"
+version: "1.0.448"
 status: "review"
 author: "Codex"
-updated: "2026-11-07T07:39:51+09:00"
+updated: "2026-11-07T07:55:20+09:00"
 source_of_truth: "Git"
 active_card: "FLEET5 continued supervision with PORTAL-REFRESH-FLEET-20261106"
-active_card_status: "D04f2c1actualCODEa967L1I3closed/Core42300147891fullArtifactsSUCCESS; A7R29690actualreviewctx36ecPENDING/19HOLD; fleetincomplete"
-active_card_next: "Claude actualA7R29690delta verdict then Root exactsource/Docs; D04 owner compactclosure+groundednextreadyDATAproposal; Root report/sync, no positive/runtimegrant"
+active_card_status: "D04f2c1CODE+Coreclosed/compact1f073verified; H1H2finiteDESIGNactivatedmsg1080/actualNULLHOLD; A7R29690actualreviewctx36ecPENDING; fleetincomplete"
+active_card_next: "K2Codex closedH1H2authoritycontract+10proposedcausalcases+smallestnextCODEproposal; Claude A7R29690actualdelta verdict; Root verifyfrozendesign then oneactualreview after predecessor exit/release"
 ---
+
+## 2026-11-07T07:55:20+09:00 D04 간결한 완료 증거 확인과 H1/H2 권한 계약 착수
+
+간결한D04완료보고1f073의6own추가문서·5입력hash/mode·Root원본8hash·실제a967원문·후속9pin·직접11log/exit0와Docs42307308086/all19를Root가대조했다. 제안85d52c를바탕으로같은Codex에H1/H2권한계약의한정설계카드를msg_10808c1899e9로착수시켰다. 독립custody·설치/목적키·명시기대값·현재상태/시계/최종readback·등록원본의논리정책을선택했고실제binding은NULL_HOLD다. A7실제검토ctx36ec와실5대인수미완료는그대로유지한다. 작업한것·고정SHA/CI/직접명령exit/원본로그·동기화증거·다음담당은Root History/Evidence에남겼다. 다음첫행동은같은K2Codex의한정설계완성과Claude의A7실제판정,Root의도착결과대조다.
 
 ## 2026-11-07T07:39:51+09:00 새 D04 실제 전체 CI 확인과 A7 실제 재검토 착수
 

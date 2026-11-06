@@ -1,0 +1,35 @@
+{
+  "atKST": "2026-11-07T07:55:20+09:00",
+  "card": "FLEET5-K2-H1-H2-AUTHORITY-DESIGN-20261107",
+  "ownerTask": "task_a95ef3d8ccce",
+  "ownerDispatch": "ctx_ed23b4a777d0",
+  "answeredQuestion": "msg_41bdd895631d",
+  "rootReply": "msg_10808c1899e9",
+  "baseReport": "1f073c03eb6673ac60806e8fbe008d391bc45864",
+  "productBaseline": "f2c1afb78b589b4b2cbcf3dcd4dc4f3c3f3bc856",
+  "proposalSHA256": "85d52cb6313bda9b6d97ce6c1cb3d4c3c6bebf8ef487775fb6c8bc7581ec9479",
+  "newBranch": "agent/codex/fleet5-k2-h1-h2-authority-design-20261107",
+  "status": "ACTIVATED_FINITE_DESIGN_ONLY_CANDIDATE_PENDING",
+  "scopeFile": "k2-h1-h2-authority-design-root-scope.txt",
+  "selectedLogicalPolicies": [
+    "independent control-plane/project trust-provisioning boundary, separately authenticated installation/readback",
+    "H1 immutable authorization capsule, H2 independently installed purpose/key/codec authorization; no record self-registration",
+    "explicit independent immutable expectedEffectiveVerdict parameter; no default",
+    "authenticated current status/clock/subject-version snapshot/final readback; retain original intervals",
+    "actual registration delivery/origin independently authenticated; raw equality fact-only"
+  ],
+  "deliverables": [
+    "closed authority/field-origin matrix",
+    "deterministic acquisition/failure/snapshot/readback order into existing private D04 inputs",
+    "ten causal H12 future acceptance specifications PROPOSED_NOT_RUN",
+    "bounded downstream dependency DAG",
+    "smallest subsequent code proposal DATA_ONLY"
+  ],
+  "actualBindings": null,
+  "P02Registration": "UNREGISTERED",
+  "actualRuntimeActionsGranted": false,
+  "positiveFactoryOrProductChangeGranted": false,
+  "independentContractReview": "PENDING_FROZEN_CANDIDATE_AND_ACTUAL_REVIEWER_RELEASE",
+  "actualA7ReviewUnchanged": "ctx_36ec44cc8ca0",
+  "wholeProgramComplete": false
+}
