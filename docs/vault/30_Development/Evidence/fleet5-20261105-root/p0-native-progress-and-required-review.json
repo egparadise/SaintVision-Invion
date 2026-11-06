@@ -3,8 +3,8 @@
   "recordedAtKST": "2026-11-06T00:46:51+09:00",
   "rootBase": "2b1753ce59c09037b5e130a7ffe64794d1d45fdf",
   "priorRootCheckpoint": {
-    "SHA": "aaf957a23f41e0ea9c7c3a8bfb2fb531b30ad7f6",
-    "Docs": 42283818157,
+    "SHA": "47f40fef225167cf65448fcc3683c8d9f76aa999",
+    "Docs": 42286990067,
     "exactHeadCorrelationAllJobsSuccess": true,
     "remoteMatches": true,
     "syncExits": [
@@ -12,13 +12,13 @@
       0,
       0
     ],
-    "independentlyMatchedNormalizedDestinationHashes": 2935,
+    "independentlyMatchedNormalizedDestinationHashes": 2947,
     "pending": 0,
     "conflicts": 0,
     "trackedAndUntrackedClean": true,
     "rootDocsOnly": true,
     "wholeProgramComplete": false,
-    "verifiedAtKST": "2026-11-07T04:57:07+09:00"
+    "verifiedAtKST": "2026-11-07T05:18:16+09:00"
   },
   "actualPlanLowReview": {
     "source": "803ad270562b1b75e44d26f9e14b965c714ab519",
@@ -2515,7 +2515,7 @@
     "ownerT1T2T3": "msg_620855c76519",
     "normativeRevisionReply": "msg_0392caf64d5d"
   },
-  "latestRecordAtKST": "2026-11-07T05:14:32+09:00",
+  "latestRecordAtKST": "2026-11-07T05:20:36+09:00",
   "optionalLowTokenTestDelta": {
     "source": "f0af307705b4923ebc3e231db5238af4c70aa389",
     "scope": "two otherwise-valid token payload corrections and JSON validity assertions; runtime unchanged",
@@ -3259,5 +3259,6 @@
   "D04PC3Preparation": "k2-d04-root-pc3-execution-preparation-gate.json",
   "BRev9gSource": "b-rev9g-source-root-verification.json",
   "D04ActualGo": "k2-d04-actual-root-isolated-go-summary.json",
-  "D04PublicationCut": "k2-d04-actual-go-publication-and-hosted-ci-root-cut.json"
+  "D04PublicationCut": "k2-d04-actual-go-publication-and-hosted-ci-root-cut.json",
+  "latestPhysicalReadOnlyObservation": "physical-readiness-refresh-20261107-0516.json"
 }
