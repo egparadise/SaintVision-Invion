@@ -1,0 +1,70 @@
+{
+  "source": "3a83707688f43570a7eaf9008989794979b3eb9f",
+  "branch": "agent/gemini/portal-refresh-fleet-ui-20261106",
+  "base": "53683020e3cfaf79ec4662f9a79b8b4dae28a628",
+  "task": "PORTAL-REFRESH-FLEET-20261106",
+  "author": "Gemini",
+  "atKST": "2026-11-06T20:10:00+09:00",
+  "CI": {
+    "docs": {
+      "run": 42207943051,
+      "jobIds": [
+        127859155285
+      ],
+      "conclusion": "success",
+      "exactHeadRefWorkflowEventCorrelationAttemptAllJobsSuccess": true
+    },
+    "frontend": {
+      "run": 42207931409,
+      "jobIds": [
+        127859117188,
+        127859117510
+      ],
+      "conclusion": "success",
+      "exactHeadRefWorkflowEventCorrelationAttemptAllJobsSuccess": true
+    },
+    "portalLoginHarness": {
+      "run": 42207878338,
+      "jobIds": [
+        127858939110
+      ],
+      "conclusion": "success"
+    }
+  },
+  "webArtifact": {
+    "source": "3a83707688f43570a7eaf9008989794979b3eb9f",
+    "FrontendRun": 42207931409,
+    "artifactId": 13498400518,
+    "artifactBytes": 1115545,
+    "artifactDigest": "sha256:3458bea031691fe11cfa69337f1e9e6857d220897a62f8f9d3d4966ebd94f4ce",
+    "portalReleaseArtifactId": 13497735996,
+    "portalReleaseDigest": "sha256:b1eb936141856dd676af72bde5f71769200243558fc7d3a6a68257f8066b489a"
+  },
+  "localVerification": {
+    "portalRefreshFleetUiTest": "exit 0 (12/12 passed)",
+    "vitestFullSuite": "exit 0 (103 files passed, 1230 tests passed)",
+    "typescriptCheck": "exit 0 (0 errors)",
+    "productionBuild": "exit 0 (built in 10.73s, dist bundle generated)",
+    "frontendIntegrity": "exit 0 (94 files scanned, 9 rules, 0 violations)",
+    "contractBindings": "exit 0 (57 fixtures, 21 bound types, 14 replay guards)",
+    "routeCoverage": "exit 0 (41 passed)",
+    "checkDocs": "exit 0 (PASS: 24 original hashes, 1259 versioned documents)",
+    "obsidianSyncCheck": "exit 0 (2826 managed files, 0 conflicts, no writes)",
+    "obsidianSyncStateSHA256": "4DA58376256FBB6C4570D291CB1B33DDE55DBD5ED2B3CE22295609E1743CAB7A"
+  },
+  "productChanges": {
+    "Header": "Honest unknown initial gateway state (online: null, rttMs: null), 2xx/401/404 transport response preserves online=true with real measured RTT, formatUserDisplayName formats raw oidc hashes",
+    "ClusterOverview": "Stable empty cluster rendering without panel unmount/flash during background polls, preserves error banner on initial unobserved failure, 76 style attributes and border-subtle tokens preserved",
+    "App": "Parameterised isBackground=true on 5s periodic intervals to prevent cyclical loading flicker, prevents purging cached state on background failure (retains truthful stale observation)",
+    "session": "Derives user friendly displayName from OIDC claims or fallback formatting"
+  },
+  "constraintsCompliance": {
+    "liveServicesUntouched": true,
+    "fiveNodesUnfabricated": true,
+    "triStateAndErrorGatesPreserved": true,
+    "hostChromeComputerUseAvoided": true,
+    "credentialsRecorded": false,
+    "independentReview": "PENDING",
+    "deployment": "NOTRUN"
+  }
+}
