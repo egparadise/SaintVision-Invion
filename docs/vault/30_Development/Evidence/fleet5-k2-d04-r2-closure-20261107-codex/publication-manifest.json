@@ -1,0 +1,49 @@
+{
+  "classification": "COMPACT_D04_CLOSURE_AND_NEXT_CUT_DATA_ONLY",
+  "atKST": "2026-11-07T07:47:04.718625+09:00",
+  "base": "f2c1afb78b589b4b2cbcf3dcd4dc4f3c3f3bc856",
+  "branch": "agent/codex/fleet5-k2-d04-r2-closure-20261107",
+  "files": [
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-d04-r2-closure-20261107-codex/context-and-provenance.json",
+      "bytes": 7443,
+      "mode": "100644",
+      "SHA256": "d37eb5e2c758b121157f268d09915abc3a4e33dbd51abf880669f6c9dabde967"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-d04-r2-closure-20261107-codex/local-gates.json",
+      "bytes": 9141,
+      "mode": "100644",
+      "SHA256": "f90520d38d335cd54f028d52eb2fad89fead876f9a04bb7efbc9bd5448cef90e"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-d04-r2-closure-20261107-codex/next-ready-proposal.json",
+      "bytes": 9230,
+      "mode": "100644",
+      "SHA256": "85d52cb6313bda9b6d97ce6c1cb3d4c3c6bebf8ef487775fb6c8bc7581ec9479"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-d04-r2-closure-20261107-codex/source-code-ci-review-closure.json",
+      "bytes": 11334,
+      "mode": "100644",
+      "SHA256": "89d87460970cc55680e5d08753553e3a6cda9a9e1019c102248bd9eaa3485c51"
+    },
+    {
+      "path": "docs/vault/30_Development/History/2026-11-07_FLEET5_K2_D04_R2_Closure_Codex.md",
+      "bytes": 7949,
+      "mode": "100644",
+      "SHA256": "430506e121eeabf6b2350c982083239f9c21caaa7d13c4eff8fbc221f2b3785c"
+    }
+  ],
+  "excludedSelf": true,
+  "productDelta": 0,
+  "priorImplementationRefFrozen": true,
+  "proposalSHA256": "85d52cb6313bda9b6d97ce6c1cb3d4c3c6bebf8ef487775fb6c8bc7581ec9479",
+  "proposalStatus": "DATA_ONLY_ROOT_ACTIVATION_AND_ACTUAL_REVIEW_REQUIRED",
+  "localGates11Exit0": true,
+  "canonicalCheckStateBefore": "00c27e0c04cb5ffe50b8e6aec9a9a34a11ed81668c393bc39a00ff65393d83a0",
+  "canonicalCheckStateAfter": "00c27e0c04cb5ffe50b8e6aec9a9a34a11ed81668c393bc39a00ff65393d83a0",
+  "ownDocs": "PENDING_ONE_EXACT_DISPATCH_AFTER_COMMIT",
+  "newCore": "NOT_REQUIRED_DOCS_ONLY_NO_RERUN",
+  "wholeK2Fleet": "INCOMPLETE"
+}

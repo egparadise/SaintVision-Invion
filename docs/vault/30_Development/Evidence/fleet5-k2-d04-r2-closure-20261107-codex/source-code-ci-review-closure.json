@@ -1,0 +1,295 @@
+{
+  "classification": "D04_R2_SOURCE_CODE_CI_AXIS_CLOSED_NOT_RUNTIME_OR_PROGRAM_ACCEPTANCE",
+  "atKST": "2026-11-07T07:43:11.015851+09:00",
+  "source": {
+    "commit": "f2c1afb78b589b4b2cbcf3dcd4dc4f3c3f3bc856",
+    "implementationRef": "agent/codex/fleet5-k2-d04-l1-r2-20261107",
+    "publicBoundary": "TrustUnknown/refusing default; no public call of private evaluator or opaque issuer",
+    "bothGoBytesExactlyRootTested": true,
+    "GoOnlyContentSHA256": "9361e40fd8390684cd263f4ddbbcd1c0d1d3da0b1e7d37b12db216971ff1aa7c",
+    "publishedThreeFileContentSHA256": "5a518d5510761d1c723029b5ffec1794ebd407e167bfdd3504f4d003244b2315",
+    "READMEStatusOnlyAfterTests": true
+  },
+  "unit": {
+    "executor": "Root isolated PC3, not author or reviewer rerun",
+    "actualAtKST": "2026-11-07T06:33:57+09:00",
+    "totals": {
+      "topLevel": 25,
+      "subtests": 230,
+      "fail": 0,
+      "skip": 0,
+      "caseRows": 92,
+      "distinctCompleteInputFingerprints": 90
+    },
+    "perPhase": [
+      {
+        "phase": 1,
+        "id": "new-l1-regression",
+        "startedKST": "2026-11-07T06:31:27+09:00",
+        "endedKST": "2026-11-07T06:31:55+09:00",
+        "command": [
+          "go",
+          "test",
+          "-p=1",
+          "-count=1",
+          "-json",
+          "-run",
+          "^TestP02InternalSignatureTableBound$",
+          "./internal/migrationcontext"
+        ],
+        "exit": 0,
+        "elapsedSeconds": 28.318,
+        "cgroupMemoryPeakBytes": 395309056,
+        "OOMKilled": false,
+        "sourceBeforeAfterEqual": true,
+        "topLevelPass": 1,
+        "subtestPass": 2
+      },
+      {
+        "phase": 2,
+        "id": "unchanged-original-observational-probe",
+        "startedKST": "2026-11-07T06:31:55+09:00",
+        "endedKST": "2026-11-07T06:31:55+09:00",
+        "command": [
+          "go",
+          "test",
+          "-p=1",
+          "-count=1",
+          "-run",
+          "^TestP02ReviewerProbeSignatureTableBound$",
+          "-v",
+          "./internal/migrationcontext"
+        ],
+        "exit": 0,
+        "elapsedSeconds": 0.504,
+        "cgroupMemoryPeakBytes": 79990784,
+        "OOMKilled": false,
+        "sourceBeforeAfterEqual": true,
+        "topLevelPass": 1,
+        "subtestPass": 0
+      },
+      {
+        "phase": 3,
+        "id": "exact-original-twelve-p02-regression-tests",
+        "startedKST": "2026-11-07T06:31:56+09:00",
+        "endedKST": "2026-11-07T06:31:57+09:00",
+        "command": [
+          "go",
+          "test",
+          "-p=1",
+          "-count=1",
+          "-json",
+          "-run",
+          "^(TestP02InternalOriginalSetAndPartition|TestP02InternalExactVerifiedTupleTable|TestP02InternalH3H5BindingsAndSnapshots|TestP02InternalProjectionEveryFieldAndOwnership|TestP02InternalTwoSourceProjectionMutants|TestP02InternalCauseOrderAndNullRefusal|TestP02InternalStrictLexicalCodec|TestP02InternalC2AndEpochDomains|TestP02InternalEightComponentsAndArtifact|TestP02InternalApprovalContract|TestP02InternalOriginalScopeRawUTF8|TestP02InternalPureEpochExactObjectBoundary)$",
+          "./internal/migrationcontext"
+        ],
+        "exit": 0,
+        "elapsedSeconds": 1.306,
+        "cgroupMemoryPeakBytes": 166576128,
+        "OOMKilled": false,
+        "sourceBeforeAfterEqual": true,
+        "topLevelPass": 12,
+        "subtestPass": 99
+      },
+      {
+        "phase": 4,
+        "id": "original-eleven-public-effect-source-census-plr-gates",
+        "startedKST": "2026-11-07T06:31:57+09:00",
+        "endedKST": "2026-11-07T06:33:57+09:00",
+        "command": [
+          "go",
+          "test",
+          "-p=1",
+          "-count=1",
+          "-json",
+          "-run",
+          "^(TestNullPortsAndOpaqueBoundary|TestWellFormedUnregisteredProvidersNeverAuthenticate|TestCopyRejectsCallbacksAndBoundsBeforeEncoding|TestResolvedObjectEffectBoundary|TestRepositoryBoundaryAndZeroEffects|TestWholePackageFullUnderlyingCensus|TestReviewR1CompileValidEffectAndAliasMutants|TestPLR1AActualBuildsThenBoundaryRefuses|TestPLR1BCompiledWriteTargetsAndReasons|TestPLR1CCompiledPointerConversionsAndControls|TestPLR1DCompiledTargetPointerTermsAndControls)$",
+          "./internal/migrationcontext"
+        ],
+        "exit": 0,
+        "elapsedSeconds": 119.875,
+        "cgroupMemoryPeakBytes": 678498304,
+        "OOMKilled": false,
+        "sourceBeforeAfterEqual": true,
+        "topLevelPass": 11,
+        "subtestPass": 129
+      }
+    ],
+    "originalProbe": "16all20;17OWNERSHIP/01_ANCHOR/immutable-signature-table/empty prefix",
+    "allocations": 0,
+    "repeatSemantics": "One warmup+one measurement of same input; no extra distinct case",
+    "sourceSnapshotEntries": 370,
+    "sourceBeforeAfterEqual": true
+  },
+  "sourceDocs": {
+    "run": 42299140025,
+    "job": 128172064106,
+    "source": "f2c1afb78b589b4b2cbcf3dcd4dc4f3c3f3bc856",
+    "all19Success": true,
+    "origin": "Existing exact published R2 receipt, not rerun"
+  },
+  "newSourceCore": {
+    "verifiedBy": "Root",
+    "verifiedAtKST": "2026-11-07T07:31:55+09:00",
+    "run": 42300147891,
+    "head": "f2c1afb78b589b4b2cbcf3dcd4dc4f3c3f3bc856",
+    "ref": "agent/codex/fleet5-k2-d04-l1-r2-20261107",
+    "event": "workflow_dispatch",
+    "path": ".github/workflows/core.yml",
+    "attempt": 1,
+    "correlation": "fleet5-d04-l1-r2-core-953a3e40ff0f482eb0b4e4a64c945d9b",
+    "jobs": [
+      {
+        "id": 128175516056,
+        "name": "s01-storage-roundtrip",
+        "steps": 16,
+        "conclusion": "success"
+      },
+      {
+        "id": 128175516644,
+        "name": "core",
+        "steps": 48,
+        "conclusion": "success"
+      }
+    ],
+    "allRequiredSuccess": true,
+    "optionalSkippedSteps": [
+      "FLEET5 early native Go peer-policy lifecycle proof",
+      "Publish FLEET5 native peer-phase proof (including expected baseline failure)",
+      "FLEET5 fixed native Go two-cycle proof",
+      "Publish FLEET5 fixed native proof",
+      "Collect fixed-SHA S08 build acceptance observations",
+      "Recompute S08 build acceptance verdict from raw artifacts"
+    ],
+    "JUnit": {
+      "total": 9358,
+      "passCount": 9312,
+      "skip": 46,
+      "fail": 0,
+      "error": 0
+    },
+    "Go": [
+      {
+        "path": "node-unit.jsonl",
+        "topLevelPass": 142,
+        "subtestPass": 506,
+        "skips": [
+          "github.com/egparadise/SaintVision-Invion/services/node-agent/cmd/inv-discover",
+          "TestDockerLiveCompatibility",
+          "github.com/egparadise/SaintVision-Invion/services/node-agent/tests/probe",
+          "github.com/egparadise/SaintVision-Invion/services/node-agent/transfer"
+        ],
+        "P02TopLevelPass": 13,
+        "P02SubtestPass": 101,
+        "SHA256": "6e185cd57647fe64d66b897d717f589369b439a91a4847f964a25b036d02c04f"
+      }
+    ],
+    "DockerCompatibility": "Distinct actual CI compatibility step SUCCESS; live-unit skip is not that step",
+    "artifacts": [
+      {
+        "id": 13546465208,
+        "name": "saintvision-core-evidence",
+        "zipBytes": 14023750,
+        "zipSHA256": "sha256:c403c54cc3b191f2effc17d1d64d4ceab00fb67b61a6740d713f227bcb6484b1",
+        "files": 35,
+        "uncompressedBytes": 26726068,
+        "verifiedExactSourceRun": true
+      },
+      {
+        "id": 13543596804,
+        "name": "saintvision-s01-storage-evidence-42300147891",
+        "zipBytes": 1771,
+        "zipSHA256": "sha256:6b69f59b87c96d223f694a834b2bf3f364413a4f4fe7a1a0266e698789c88ead",
+        "files": 5,
+        "uncompressedBytes": 1857,
+        "verifiedExactSourceRun": true
+      }
+    ],
+    "binaries": [
+      {
+        "file": "inv-discover",
+        "bytes": 10212675,
+        "SHA256": "f87932abafaa5f0bae2d0cc333d617b3e75f43d77ee1eddf35b8d876f8e90d3c",
+        "GoVersion": "go1.27.1",
+        "vcsRevision": "f2c1afb78b589b4b2cbcf3dcd4dc4f3c3f3bc856",
+        "vcsModifiedFalse": true,
+        "GOOS": "linux",
+        "GOARCH": "amd64",
+        "metadataReadOnly": true,
+        "binaryExecuted": false,
+        "deployed": false
+      },
+      {
+        "file": "inv-node",
+        "bytes": 13387338,
+        "SHA256": "6418ff5cd599258e65fcfb03b41363be656ccf9aa9241743f17c4c43a92b18f1",
+        "GoVersion": "go1.27.1",
+        "vcsRevision": "f2c1afb78b589b4b2cbcf3dcd4dc4f3c3f3bc856",
+        "vcsModifiedFalse": true,
+        "GOOS": "linux",
+        "GOARCH": "amd64",
+        "metadataReadOnly": true,
+        "binaryExecuted": false,
+        "deployed": false
+      }
+    ],
+    "artifactVerification": "Root verified original ZIP digest/size/safe members/source run; worker read existing proof only",
+    "installedOrExecuted": false
+  },
+  "independentReview": {
+    "source": "a967e5dc0baf6fa21e827303b609f716478ffa6b",
+    "directParent": "f2c1afb78b589b4b2cbcf3dcd4dc4f3c3f3bc856",
+    "verdict": "INTERNAL_CODE_ACCEPT_L1_CLOSED",
+    "scope": "Static reading of the 3-path delta plus Root-attributed unit evidence. Independent acceptance of the L1 code/test/README delta only; distinct from Root's Go pass, the pending full Core 42300147891, integration, runtime, production authentication and fleet acceptance.",
+    "findings": [],
+    "D04L1": "CLOSED",
+    "READMEI3": "CLOSED",
+    "Docs": 42302478610,
+    "job": 128183479509,
+    "correlation": "claude-k2-d04-l1-r2-f2c1-review-a967e5dc-ctx_06f0718be774",
+    "all19Success": true,
+    "reviewerGoRerun": false,
+    "reviewerLifecycle": "Actual succeeded/settled/exited/released per Root",
+    "historicalPendingCoreObservation": "Preserved as true at review time; new final Core proof is later"
+  },
+  "retainedInfo": [
+    {
+      "id": "D04-I1",
+      "status": "RETAINED_NONBLOCKING",
+      "meaning": "For at most16entries, general budget precedes missing capsule; ticket present with clock and H5 missing yields TIME before design INSTALLATION. No whole-model diagnostic equivalence."
+    },
+    {
+      "id": "D04-I2",
+      "status": "RETAINED_NONBLOCKING",
+      "meaning": "Go-only stricter predicates: positive floor; integer domains; nonempty ticket/evidence/artifact; subject-bound readback; raw Root-choice digest; C2 ASCII check. No widening or polish task."
+    },
+    {
+      "id": "D04-I4",
+      "status": "RETAINED_NONBLOCKING",
+      "meaning": "Private expectation has no array/object contents: nonempty raw array/object fails capsule equality at01; empty/scalar malformed expectations can reach05. No general typed-value equivalence."
+    },
+    {
+      "id": "D04R2-I5",
+      "status": "NEW_INFO_NONBLOCKING_NO_ACTION_REQUIRED",
+      "meaning": "Go len(slice) counts duplicate entries; design frozenset deduplicates. More than16entries may refuse when distinct set has at most16. Stricter fail-closed representation; no code fix required."
+    }
+  ],
+  "holds": {
+    "H1_H7_H3EA_expectedVerdictCustody_RD": "NULL_HOLD",
+    "rawSeven": "UNREGISTERED",
+    "A01_A40": "NOT_RUN",
+    "producer": false,
+    "positiveFactory": false,
+    "currentView": false,
+    "effects": false,
+    "liveCryptoOrInstallation": false,
+    "wholeK2": false,
+    "fleet5PC": false,
+    "global100": false,
+    "sourceInclusionOrIntegrationAccepted": false,
+    "portsInstallationAccepted": false,
+    "runtimeStateInference": "NONE; source/report axis only, not a new live failure"
+  },
+  "closureDocs": "PENDING_OWN_EXACT_DOCS",
+  "proposal": "DATA_ONLY_NO_NEXT_IMPLEMENTATION_GRANT"
+}

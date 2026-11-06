@@ -1,0 +1,133 @@
+{
+  "classification": "NEXT_READY_DATA_PROPOSAL_ONLY_NOT_GRANTED_IMPLEMENTED_ACCEPTED_OR_RUN",
+  "proposedCard": "FLEET5-K2-H1-H2-AUTHORITY-DESIGN-20261107",
+  "owner": "Codex after Root activation",
+  "independentReviewer": "One actual Claude through Root after author publication and reviewer release",
+  "priority": "Highest unblocked DESIGN successor for this K2 producer lane; real positive integration remains blocked, not called ready",
+  "objective": "Close independent H1 capsule trust installation and H2 purpose/key/codec authorization before any D04 private hypothesis can be consumed as authority. Produce one bounded purpose-authentication contract and explicit Root decision matrix, without a loader, factory, signature producer or effect implementation.",
+  "whyNow": "D04 consistency/code/CI is closed. Current accepted README names independently provisioned per-purpose attestation as next production dependency; ports.go authenticators still return constant refusals. H3-EA/expected-verdict and all later sources cannot authorize their own H1/H2. INFO-only polishing does not unblock this dependency.",
+  "baseline": {
+    "product": "f2c1afb78b589b4b2cbcf3dcd4dc4f3c3f3bc856",
+    "actualD04CodeReview": "a967e5dc0baf6fa21e827303b609f716478ffa6b",
+    "acceptedD04Design": "84ee9b1b43b8921ed1d0ef8bde6f3546013c1095 reviewed by actual6fa4c644a769b768d9212e5fa4a9083e5bf2947a",
+    "K1": "eb32b211ab3704935b9431747089ab0715582a74 remains pinned",
+    "frozenInputPins": "context-and-provenance.json nextCutFrozenInputs",
+    "wire": "Existing P02 format2/domain is UNREGISTERED; design only. No new accepted signer/domain/wire/role or K1/28/schema pin."
+  },
+  "minimalPaths": {
+    "proposedFutureHistory": "docs/vault/30_Development/History/2026-11-07_FLEET5_K2_H1_H2_Authority_Design_Codex.md",
+    "proposedFutureEvidence": "docs/vault/30_Development/Evidence/fleet5-k2-h1-h2-authority-design-20261107-codex/",
+    "productDelta": "ZERO for this first contract cut",
+    "forbidden": "All current product/tests/README/Go/modules/K1/schema/ADR/registry/shared boards/workflows/keys/PKI/hosts/automations/state"
+  },
+  "deliverables": [
+    "One H1/H2 authority graph from external custody/bootstrap to immutable installed capsule and independently authorized registry signer; no circular self-registration",
+    "Closed capsule field-origin and purpose/algorithm/domain/key/SPKI/scope/interval/expected-verdict matrix with source identity and authorizing Root decision for each field",
+    "Authenticated read snapshot/version/freshness/current-registration and before/after readback contract; no I/O under held DB locks; no caller-selected path/key/clock/verdict",
+    "Explicit absence/revocation/expiry/rollback/equivocation/TOCTOU refusal and static red/green acceptance table with causal earlier preconditions",
+    "Separate later authentication-code/integration/effect dependency DAG and exact Root decisions required before each grant"
+  ],
+  "RootDecisionMatrix": [
+    {
+      "id": "RD-H1-ORIGIN",
+      "decision": "Name independent custody/bootstrap provisioning authority, authenticated installation channel, public anchor provenance and protected registry identity/version. A file owner/mode/hash alone is insufficient.",
+      "actualBinding": null,
+      "status": "HOLD_UNTIL_ROOT_AND_ACTUAL_CONTRACT_REVIEW"
+    },
+    {
+      "id": "RD-H2-PURPOSE",
+      "decision": "Accept or reject exact P02 purpose/format/domain/message bytes/algorithm and separately scoped signer grant. Do not inherit K1 root-plan/root-seal roles or accept caller-selected keys.",
+      "actualBinding": null,
+      "status": "HOLD_UNREGISTERED"
+    },
+    {
+      "id": "RD-EFFECTIVE-EXPECTATION",
+      "decision": "Independently authorize exact expectedEffectiveVerdict policy and H3-EA issuer/purpose/scope; never learn it from the record being checked.",
+      "actualBinding": null,
+      "status": "HOLD"
+    },
+    {
+      "id": "RD-STATUS-TIME",
+      "decision": "Name independently authenticated current registration/nonrevocation, authenticated clock interval and read-snapshot/version authority. Preserve original signing intervals and offline-backdating residual.",
+      "actualBinding": null,
+      "status": "HOLD"
+    },
+    {
+      "id": "RD-REGISTRATION-ORIGIN",
+      "decision": "Authenticate actual registration capture/delivery/origin; existing raw-byte equality and pinned a0 hash remain facts only, no normalization or registration permission.",
+      "actualBinding": null,
+      "status": "HOLD"
+    }
+  ],
+  "acceptanceCases": [
+    {
+      "id": "H12-C01",
+      "purpose": "Conditional benign H1/H2 control only",
+      "earlier": "Independent provisioned anchor origin, exact purpose/key/scope/interval, authentic current registration and clock, closed canonical capsule, stable read version",
+      "green": "Design may describe H1/H2-bound result only; never InstalledPolicy or public success. Actual binding remains NULL/HOLD, so no present positive runtime case."
+    },
+    {
+      "id": "H12-C02",
+      "purpose": "Self-issued or caller-supplied root",
+      "earlier": "Canonical bytes and mathematically valid test signature under foreign key; all non-origin fields consistent",
+      "red": "TrustUnknown before any D04 authority use; no signer self-registration"
+    },
+    {
+      "id": "H12-C03",
+      "purpose": "Authentic signature, wrong purpose/domain or scope",
+      "earlier": "Correct independently installed anchor/current status; re-sign exact canonical alternate purpose/domain/selector/cohort/generation one at a time",
+      "red": "Purpose/scope/key authorization fails; malformed-signature/FORMAT rejection is not this proof"
+    },
+    {
+      "id": "H12-C04",
+      "purpose": "Changed expected verdict policy",
+      "earlier": "All H1/H2 identity, canonical and signature facts valid; untrusted record consistently requests another accepted-looking literal",
+      "red": "Independent capsule expectation is unchanged; refuse, never infer approval from label or green CI"
+    },
+    {
+      "id": "H12-C05",
+      "purpose": "Revoked/expired/unknown current authority",
+      "earlier": "Original signature valid at original consuming interval, exact subject/version selected",
+      "red": "Current independent status fails closed; no historical interval rewrite or backdated Now"
+    },
+    {
+      "id": "H12-C06",
+      "purpose": "Generation rollback/equal-version equivocation",
+      "earlier": "Authentic origin and signature; stable independent minimum/current version",
+      "red": "Older generation or equal-version different raw hash denied without floor reset/write"
+    },
+    {
+      "id": "H12-C07",
+      "purpose": "Raw registration copy without provenance",
+      "earlier": "Exact pinned bytes/hash and every internal join valid",
+      "red": "Registration-origin authority remains missing; UNKNOWN/HOLD, not fixture promotion"
+    },
+    {
+      "id": "H12-C08",
+      "purpose": "Snapshot changes during authenticated acquisition",
+      "earlier": "First read independently authenticated and all joins pass; current version/readback changes before consumption",
+      "red": "Refuse/reacquire only under named bounded read policy; no successful TOCTOU token invented"
+    },
+    {
+      "id": "H12-C09",
+      "purpose": "Clock or current status missing after valid original grant",
+      "earlier": "Canonical/signature/original interval and origin valid",
+      "red": "Unknown clock/status blocks positive consumption; no wider age/optimistic endpoint"
+    },
+    {
+      "id": "H12-C10",
+      "purpose": "Keep public and effect boundaries",
+      "earlier": "Even a hypothetical H1/H2 result; H3-H7/registration/entrypoint absent",
+      "red": "Public TrustUnknown/no opaque policy/history issuance; no nonce/signature/journal/Engine/DB/host action"
+    }
+  ],
+  "caseStatus": "PROPOSED_NOT_RUN; these are not A01-A40 and not crypto/runtime proof",
+  "dependenciesAndBoundaries": {
+    "designCanProceedNow": "Public source and existing accepted consistency contracts suffice to describe missing authority and exact decisions; no actual key/host permission needed",
+    "realProducerBlockedBy": "Root actual independent custody/key-policy/registration/clock/status decisions and actual contract review, then separate smallest code grant",
+    "afterDesign": "Root decision + actual Claude contract verdict -> separately granted minimal H1/H2 authentication code with isolated real crypto tests -> H3/H3-EA authenticated provenance/partition and H4-H6 current status/measurement/floors -> H7 versioned linked entrypoint/installation trust -> separately reviewed positive K2A integration -> separately granted K2B producers/effects and original runtime cases",
+    "currentAndEffects": "No ABSENT-head current view, fabricated ended-epoch live operation, new prepublication authority, crossmigration concurrency claim, normal floor change or unaccepted B protocol",
+    "parallelLane": "B A7R2 independent review remains separate; no code, state or claims touched",
+    "reviewBoundary": "Root chooses and activates this exact DATA proposal; the proposal/report Docs is no implementation or operational permission"
+  }
+}

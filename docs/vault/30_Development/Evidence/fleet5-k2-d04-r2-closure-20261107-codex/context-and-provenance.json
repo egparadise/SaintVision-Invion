@@ -1,0 +1,154 @@
+{
+  "classification": "COMPACT_DOC_ONLY_ATTRIBUTION_AND_PUBLIC_SOURCE_PINS",
+  "docID": "FLEET5-K2-D04-R2-CLOSURE-20261107-CODEX",
+  "version": "1.0.0",
+  "atKST": "2026-11-07T07:43:11.015851+09:00",
+  "task": "task_a95ef3d8ccce",
+  "dispatch": "ctx_ed23b4a777d0",
+  "grant": "msg_4bbb275c5aad",
+  "owner": "Codex",
+  "reviewer": "Actual source delta Claude a967; closure report and next cut not independently accepted",
+  "baseSHA": "f2c1afb78b589b4b2cbcf3dcd4dc4f3c3f3bc856",
+  "branch": "agent/codex/fleet5-k2-d04-r2-closure-20261107",
+  "canonicalRootHEAD": "8c7f6e6ec746e97fb6bc584591e1984f94256eab",
+  "boards": [
+    {
+      "path": "docs/vault/00_Index/\uc804\uccb4 \uac1c\ubc1c \uc9c4\ud589 \ud604\ud669.md",
+      "SHA256": "a3025d1c6f1befa07975658998c7159537775f171e48aa7dd9f881a7dbfaaeb2",
+      "metadata": "doc_id: \"INDEX-PROGRESS-001\"\r\ntitle: \"\uc804\uccb4 \uac1c\ubc1c \uc9c4\ud589 \ud604\ud669\"\r\nversion: \"1.0.486\"\r\nstatus: \"review\"\r\nauthor: \"Codex\"\r\nupdated: \"2026-11-07T07:39:51+09:00\"\r\nsource_of_truth: \"Git\"\r\nlatest_codex_card: \"D04f2c1Core42300147891actualSUCCESS/a967CODE_L1_I3closed; A7R29690actualreviewctx36ecPENDING/19HOLD; 5PCincomplete\""
+    },
+    {
+      "path": "docs/vault/30_Development/Agent\ubcc4 \uc791\uc5c5/Codex \uc791\uc5c5 \ud604\ud669.md",
+      "SHA256": "b87ec52b40aeaf148b750de2cfac09b0c6f1c26b8795e0130ce9b0796b04d6a4",
+      "metadata": "doc_id: \"WORKBOARD-CODEX-001\"\r\ntitle: \"Codex \uc791\uc5c5 \ud604\ud669\"\r\nversion: \"1.0.447\"\r\nstatus: \"review\"\r\nauthor: \"Codex\"\r\nupdated: \"2026-11-07T07:39:51+09:00\"\r\nsource_of_truth: \"Git\"\r\nactive_card: \"FLEET5 continued supervision with PORTAL-REFRESH-FLEET-20261106\"\r\nactive_card_status: \"D04f2c1actualCODEa967L1I3closed/Core42300147891fullArtifactsSUCCESS; A7R29690actualreviewctx36ecPENDING/19HOLD; fleetincomplete\"\r\nactive_card_next: \"Claude actualA7R29690delta verdict then Root exactsource/Docs; D04 owner compactclosure+groundednextreadyDATAproposal; Root report/sync, no positive/runtimegrant\""
+    }
+  ],
+  "skills": {
+    "agent-delivery": "1.1.0",
+    "core-reliability": "1.0.0"
+  },
+  "scope": "ONLY new unique History/Evidence; no product/test/README/schema/registry/board/workflow changes",
+  "sourceProofs": [
+    {
+      "origin": "Canonical Root .work/d04-l1-r2-actual-review-root-verified.json",
+      "SHA256": "1aa34f084a48417ef972f42aa061ae7b6a17515aa09367fa9e7f52d34e82d897",
+      "bytes": 2320,
+      "readOnly": true,
+      "rerun": false,
+      "rawCorpusCopied": false
+    },
+    {
+      "origin": "Canonical Root .work/d04-l1-r2-actual-review-original.json",
+      "SHA256": "887b0e991de3374a2c83ed559e72ceda622c2443356232595852a479fc00f932",
+      "bytes": 17111,
+      "readOnly": true,
+      "rerun": false,
+      "rawCorpusCopied": false
+    },
+    {
+      "origin": "Canonical Root .work/d04-l1-r2-full-core-root-verified.json",
+      "SHA256": "40ad1317f7c219f766d0140711f6020a03aabecb717a3f2ddfdba5539f194fb7",
+      "bytes": 2546,
+      "readOnly": true,
+      "rerun": false,
+      "rawCorpusCopied": false
+    },
+    {
+      "origin": "Canonical Root .work/d04-l1-r2-core-built-binaries-root-verified.json",
+      "SHA256": "db4f185d2dd8cb52948541b36f3b273c1660ca30a5954c2019bc00169403b229",
+      "bytes": 805,
+      "readOnly": true,
+      "rerun": false,
+      "rawCorpusCopied": false
+    },
+    {
+      "origin": "Canonical Root .work/d04-l1-r2-core-final-run.json",
+      "SHA256": "23316fc73f32690f2e50ed53609717510a687c6972bc050ce46b5d7d000db270",
+      "bytes": 13039,
+      "readOnly": true,
+      "rerun": false,
+      "rawCorpusCopied": false
+    },
+    {
+      "origin": "Canonical Root .work/d04-l1-r2-core-final-jobs.json",
+      "SHA256": "78fe8fb03c99d08e0897a92b8102e29c7a69b927c818dd0e9a4e10bbfa8c4bbf",
+      "bytes": 14274,
+      "readOnly": true,
+      "rerun": false,
+      "rawCorpusCopied": false
+    },
+    {
+      "origin": "Canonical Root .work/d04-l1-r2-core-final-artifacts.json",
+      "SHA256": "28499b0d7dd31d23034cfe64610b8547a39399ca45d64b1da9c47a4bd418cf7a",
+      "bytes": 1546,
+      "readOnly": true,
+      "rerun": false,
+      "rawCorpusCopied": false
+    },
+    {
+      "origin": "Canonical Root .work/d04-l1-r2-core-artifact-inventory.json",
+      "SHA256": "3731c047d63fc5d89ae0dd523bd92ce87c6cc014c3755c189e5566db7a80f4dd",
+      "bytes": 4242,
+      "readOnly": true,
+      "rerun": false,
+      "rawCorpusCopied": false
+    }
+  ],
+  "immutableReview": {
+    "source": "a967e5dc0baf6fa21e827303b609f716478ffa6b",
+    "directParent": "f2c1afb78b589b4b2cbcf3dcd4dc4f3c3f3bc856",
+    "path": "docs/vault/30_Development/Evidence/fleet5-k2-d04-l1-r2-f2c1-review-20261107-claude/review.json",
+    "SHA256": "887b0e991de3374a2c83ed559e72ceda622c2443356232595852a479fc00f932",
+    "matchesRootOriginal": true
+  },
+  "nextCutFrozenInputs": [
+    {
+      "source": "f2c1afb78b589b4b2cbcf3dcd4dc4f3c3f3bc856",
+      "path": "services/node-agent/internal/migrationcontext/README.md",
+      "SHA256": "00c1c544684ef36572540a40a79b1feaaf12af442257d7d9f9c26bc3271c2478"
+    },
+    {
+      "source": "f2c1afb78b589b4b2cbcf3dcd4dc4f3c3f3bc856",
+      "path": "services/node-agent/internal/migrationcontext/ports.go",
+      "SHA256": "db7c7e877afc6ee8bbf8ca2e2b6afad3b973a63a624d4bcd6ee2ad5ce649fb95"
+    },
+    {
+      "source": "f2c1afb78b589b4b2cbcf3dcd4dc4f3c3f3bc856",
+      "path": "services/node-agent/internal/migrationcontext/p02_inputs_internal.go",
+      "SHA256": "d1dbd3bf0ab261cffcc4112750142784f877a3b6499f95381d85f90281b0b07d"
+    },
+    {
+      "source": "f2c1afb78b589b4b2cbcf3dcd4dc4f3c3f3bc856",
+      "path": "services/node-agent/internal/migrationcontext/p02_evaluate_internal.go",
+      "SHA256": "2f29f521ffe358411baaa3d365f80f757c2be6df14043abdae787802a275b5c9"
+    },
+    {
+      "source": "f2c1afb78b589b4b2cbcf3dcd4dc4f3c3f3bc856",
+      "path": "services/node-agent/internal/migrationcontext/policy.go",
+      "SHA256": "ce6f1b9b1a1835276b248c3dbdb8fa42b68fa79fb5684748ea78694d104bbdd2"
+    },
+    {
+      "source": "f2c1afb78b589b4b2cbcf3dcd4dc4f3c3f3bc856",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-trusted-producer-contract-20261106-codex/rev2/contract.md",
+      "SHA256": "327975d68b8991ffeb90b0ec481544be07d3df76099266a7e73da1a8fa0cb727"
+    },
+    {
+      "source": "f2c1afb78b589b4b2cbcf3dcd4dc4f3c3f3bc856",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-p02-registry-attestation-rev2-20261107-codex/contract.md",
+      "SHA256": "19b5835ab728f1cce76cc01f7bf7c5cb85c486c945a8164321c3b925989e95a4"
+    },
+    {
+      "source": "f2c1afb78b589b4b2cbcf3dcd4dc4f3c3f3bc856",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-p02-registry-attestation-rev3-20261107-codex/contract.md",
+      "SHA256": "de290b978fe3d7fbea45488e5971492abace60f8b4235a513466c0cb738fbf99"
+    },
+    {
+      "source": "f2c1afb78b589b4b2cbcf3dcd4dc4f3c3f3bc856",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-p02-registry-attestation-rev3-20261107-codex/source-continuity-and-open-obligations.json",
+      "SHA256": "cad808ccbf2c7ca9b550fa709baa63b5b8d6e40e7a7ba5dc10b950361a28e5ea"
+    }
+  ],
+  "priorRawCorpus": "Already committed under f2c1 own Evidence; referenced, not recopied",
+  "actualProofAction": "Read/parsed/hash-compared existing originals only; no test/CI/artifact download or runtime action",
+  "AgentModel": "Not exposed; not invented"
+}

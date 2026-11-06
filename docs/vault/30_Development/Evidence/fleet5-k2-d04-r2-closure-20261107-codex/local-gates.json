@@ -1,0 +1,195 @@
+{
+  "classification": "COMPACT_DOC_ONLY_CLOSURE_GATE_RECEIPT",
+  "runs": [
+    {
+      "argv": [
+        "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+        "-B",
+        "tools/check_docs.py"
+      ],
+      "startedKST": "2026-11-07T07:45:13.195632+09:00",
+      "endedKST": "2026-11-07T07:45:46.879874+09:00",
+      "exit": 0,
+      "rawLog": ".work/d04-r2-closure-gates/01-check_docs.log",
+      "rawSHA256": "daff64a46805ad84883156cb063f7fd9218645be93e889c672aa43f0b2350553",
+      "tail": [
+        "PASS: 24 original hashes, 1271 versioned documents, wiki links, 48 tasks, 12 outcomes, owner/reviewer/skills, dependency DAG."
+      ]
+    },
+    {
+      "argv": [
+        "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+        "-B",
+        "tools/check_ontology_generation.py"
+      ],
+      "startedKST": "2026-11-07T07:45:46.880675+09:00",
+      "endedKST": "2026-11-07T07:45:49.294035+09:00",
+      "exit": 0,
+      "rawLog": ".work/d04-r2-closure-gates/02-check_ontology_generation.log",
+      "rawSHA256": "451b3d26c538962997f093bbfb8a5ceabffe134e154c1ff412f57590b076e150",
+      "tail": [
+        "PASS: 4 ontology artifacts are graph-equivalent to a fresh generation"
+      ]
+    },
+    {
+      "argv": [
+        "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+        "-B",
+        "tools/check_ontology.py"
+      ],
+      "startedKST": "2026-11-07T07:45:49.294446+09:00",
+      "endedKST": "2026-11-07T07:45:51.535407+09:00",
+      "exit": 0,
+      "rawLog": ".work/d04-r2-closure-gates/03-check_ontology.log",
+      "rawSHA256": "7cdc12bf64f50ba0964625161638a4c639cf22d786a57f04685bed0718e14042",
+      "tail": [
+        "PASS: RDF parsing, defined terms, TTL/JSON-LD equivalence, 48 task mappings, positive SHACL, 4 rejected invalid fixtures, 4 competency queries, Obsidian mirrors."
+      ]
+    },
+    {
+      "argv": [
+        "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+        "-B",
+        "tools/check_contract_bindings.py"
+      ],
+      "startedKST": "2026-11-07T07:45:51.535818+09:00",
+      "endedKST": "2026-11-07T07:46:04.591311+09:00",
+      "exit": 0,
+      "rawLog": ".work/d04-r2-closure-gates/04-check_contract_bindings.log",
+      "rawSHA256": "7d3493f361d1c522254d1dbd2e0a74b4dc3c54ef90bd9bfdec3a57666d7798ed",
+      "tail": [
+        "PASS check_contract_bindings: 57 fixtures each referenced by a test; 21 bound kernel response TYPES each have >=1 serving-anchor test (counted PER TYPE, not per anchor SITE: those types occupy 27 anchor sites; a multi-site type counts covered even if only one site is tested -- site-level weight is not decidable here, use tools/check_anchor_weight.py + the mutation harness); 14 replay guards present.",
+        "  UNIT NOTE: TYPE count <= SITE count. Multi-site types (per-type coverage can mask an untested site): ApprovalView(2 sites: ['approvals']), BusinessBindingView(2 sites: ['business_handoff']), BusinessEditLockReleaseView(2 sites: ['business_handoff']), BusinessEditLockView(2 sites: ['business_handoff']), ControlRunDetail(3 sites: ['control']), ControlRunView(2 sites: ['control']), EvidenceEnvelope(6 sites: ['build_governance', 'results', 'runs', 'shard_completion', 'storage_commit', 'storage_view']), ModelExecutionManifestObservation(2 sites: ['model_uri_resolver', 'model_view']), NodeExecutionPermit(2 sites: ['node_execution', 'node_transport']), NodeResourceSnapshot(4 sites: ['capacity', 'gpu', 'observation']), WorkspaceCheckoutView(2 sites: ['workspace_recovery']), WorkspaceEnqueueResult(3 sites: ['workspace_api']), WorkspacePrepareResult(2 sites: ['workspace_api']), WorkspaceRestoreView(2 sites: ['workspace_recovery']), WorkspaceStartEnqueueResult(3 sites: ['workspace_start']), WorkspaceStartPrepareResult(2 sites: ['workspace_start'])",
+        "  (Reporting sites is not a regression -- the TYPE number never meant 'sites verified'; this makes the counting unit explicit. EvidenceEnvelope-class multi-site anchors are why.)"
+      ]
+    },
+    {
+      "argv": [
+        "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+        "-B",
+        "tools/check_frontend_integrity.py"
+      ],
+      "startedKST": "2026-11-07T07:46:04.591740+09:00",
+      "endedKST": "2026-11-07T07:46:06.007497+09:00",
+      "exit": 0,
+      "rawLog": ".work/d04-r2-closure-gates/05-check_frontend_integrity.log",
+      "rawSHA256": "2a2f0348a4bdc71911a5eac47ef7fd7a1ca4573e71cce914cb6d6dd198392949",
+      "tail": [
+        "Scanning 94 frontend production source files under apps/web/src ...",
+        "",
+        "PASS Frontend Integrity Check: all 9 integrity rules satisfied (0 violations)."
+      ]
+    },
+    {
+      "argv": [
+        "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+        "-B",
+        "tools/check_doc_path_citations.py",
+        "--ratchet",
+        "--base-ref",
+        "f2c1afb78b589b4b2cbcf3dcd4dc4f3c3f3bc856"
+      ],
+      "startedKST": "2026-11-07T07:46:06.007883+09:00",
+      "endedKST": "2026-11-07T07:46:16.302980+09:00",
+      "exit": 0,
+      "rawLog": ".work/d04-r2-closure-gates/06-check_doc_path_citations.log",
+      "rawSHA256": "389921b50662776ed834a285f70fc44ab61f7d5bdb4c5249c0a73c98113980de",
+      "tail": [
+        "PASS check_doc_path_citations --ratchet: 290 broken citation(s), all in baseline, none stale, floor unchanged."
+      ]
+    },
+    {
+      "argv": [
+        "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+        "-B",
+        "tools/check_doc_single_source.py",
+        "--ratchet"
+      ],
+      "startedKST": "2026-11-07T07:46:16.303503+09:00",
+      "endedKST": "2026-11-07T07:46:17.123974+09:00",
+      "exit": 0,
+      "rawLog": ".work/d04-r2-closure-gates/07-check_doc_single_source.log",
+      "rawSHA256": "13b5f5afed05999109839be1baec4ef70ea3c71bcb267353e59eba0f2ae3e448",
+      "tail": [
+        "PASS check_doc_single_source --ratchet: 16 pairs, all in baseline, none stale."
+      ]
+    },
+    {
+      "argv": [
+        "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+        "-B",
+        "tools/check_response_freshness.py"
+      ],
+      "startedKST": "2026-11-07T07:46:17.124387+09:00",
+      "endedKST": "2026-11-07T07:46:17.258420+09:00",
+      "exit": 0,
+      "rawLog": ".work/d04-r2-closure-gates/08-check_response_freshness.log",
+      "rawSHA256": "ba85e5489b5c960d3fdd09acf663a0c157e70028c6d54044d4820a67c99570fc",
+      "tail": [
+        "  ok      saintvision:NodeResponse.lastHeartbeatAt",
+        "  ok      saintvision:ReplicaObservationResponse.observedAt",
+        "  (structural floor only. Whether a NEW response is freshness-critical is human judgment -- review this map when responses are added. Staleness behaviour needs a clock-advance test with PG.)"
+      ]
+    },
+    {
+      "argv": [
+        "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+        "-B",
+        "tools/test_sync.py"
+      ],
+      "startedKST": "2026-11-07T07:46:17.259030+09:00",
+      "endedKST": "2026-11-07T07:46:22.403789+09:00",
+      "exit": 0,
+      "rawLog": ".work/d04-r2-closure-gates/09-test_sync.log",
+      "rawSHA256": "ff5353c6fa99dd273793bc3f30056908c3466240b1d43101f480422eb3ac2837",
+      "tail": [
+        "Ran 14 tests in 4.816s",
+        "",
+        "OK"
+      ]
+    },
+    {
+      "argv": [
+        "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+        "-B",
+        "tools/build_docs.py"
+      ],
+      "startedKST": "2026-11-07T07:46:22.404253+09:00",
+      "endedKST": "2026-11-07T07:46:34.867770+09:00",
+      "exit": 0,
+      "rawLog": ".work/d04-r2-closure-gates/10-build_docs.log",
+      "rawSHA256": "463b01484a9d0e7e3b75acfb8904d2b0337b55e9a21ffc35ab1a48ec7eb3a124",
+      "tail": [
+        "BUILT: saintvision-guidelines.zip, 44408118 bytes. Documentation only."
+      ]
+    },
+    {
+      "argv": [
+        "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+        "-B",
+        "tools/sync_obsidian.py",
+        "--check",
+        "--state",
+        "D:\\Project\\SaintVision-Invion\\SaintVisionI-Invion\\.git\\obsidian-sync-state.json",
+        "--conflicts-out",
+        "D:\\Project\\SaintVisionI-Invion\\fleet5-k2-d04-l1-r2-20261107\\.work\\d04-r2-closure-sync-conflicts.json"
+      ],
+      "startedKST": "2026-11-07T07:46:34.891169+09:00",
+      "endedKST": "2026-11-07T07:46:48.814363+09:00",
+      "exit": 0,
+      "rawLog": ".work/d04-r2-closure-gates/11-sync_obsidian.log",
+      "rawSHA256": "97428d3e87cca3f355b05ca2b5dd171bd34291f408dcdc1739c5f48ab59d9c34",
+      "tail": [
+        "CHECK: 4193 managed files, 1742 pending exports, 0 conflicts. No writes."
+      ],
+      "canonicalStatePath": "D:\\Project\\SaintVision-Invion\\SaintVisionI-Invion\\.git\\obsidian-sync-state.json",
+      "stateBeforeSHA256": "00c27e0c04cb5ffe50b8e6aec9a9a34a11ed81668c393bc39a00ff65393d83a0",
+      "stateAfterSHA256": "00c27e0c04cb5ffe50b8e6aec9a9a34a11ed81668c393bc39a00ff65393d83a0",
+      "stateUnchanged": true,
+      "mode": "OFFICIAL_CHECK_ONLY"
+    }
+  ],
+  "allPassed": true,
+  "rootGrant": "msg_4bbb275c5aad",
+  "noApplyAdoptResolveStateWrite": true
+}
