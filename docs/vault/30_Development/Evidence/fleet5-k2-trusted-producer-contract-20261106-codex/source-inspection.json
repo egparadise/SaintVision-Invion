@@ -1,0 +1,197 @@
+{
+  "source": "eb32b211ab3704935b9431747089ab0715582a74",
+  "atKST": "2026-11-06T10:35:11.561721+09:00",
+  "files": [
+    {
+      "path": "services/node-agent/migrationverify/trust.go",
+      "source": "eb32b211ab3704935b9431747089ab0715582a74",
+      "rawSHA256": "d0e72b6f4d1ab08fe2bece5465c932b084983068a3049d73b69dd28922d07dd7",
+      "gitBlob": "0554cd16384573044045fb1ffd1ab81b03790b44"
+    },
+    {
+      "path": "services/node-agent/migrationverify/current.go",
+      "source": "eb32b211ab3704935b9431747089ab0715582a74",
+      "rawSHA256": "b8061a064d4578305cea31af3638ea35af2de0228abc9862107262aa44da385b",
+      "gitBlob": "2e87b0927767d83b486a6d21d0959be623552f4f"
+    },
+    {
+      "path": "services/node-agent/migrationverify/temporal.go",
+      "source": "eb32b211ab3704935b9431747089ab0715582a74",
+      "rawSHA256": "759519f626e8454e79219f6368d4befe2b3e734dca1ac80bf1585d60bcbc3eb7",
+      "gitBlob": "8820b8f11a8e18922fc11140cfa83af84bf17b63"
+    },
+    {
+      "path": "services/node-agent/migrationverify/verify.go",
+      "source": "eb32b211ab3704935b9431747089ab0715582a74",
+      "rawSHA256": "3834b97335c7af45b1c6ac2ab9eebbca196149e84faaf44dfbbb227a3f113743",
+      "gitBlob": "fa01d55c43637721525e7f2d7b1b691362f8abf2"
+    },
+    {
+      "path": "services/node-agent/migrationverify/native.go",
+      "source": "eb32b211ab3704935b9431747089ab0715582a74",
+      "rawSHA256": "8f08b4ed8f7c4108374e3197cee678841885cc1ed86214c10a2d97a7b9f4e2b0",
+      "gitBlob": "df95d10c6e0cc8a9ccece1fd89902ea56082750f"
+    },
+    {
+      "path": "services/node-agent/migrationverify/proofs.go",
+      "source": "eb32b211ab3704935b9431747089ab0715582a74",
+      "rawSHA256": "b6c6efcb7052a1b7091e0a4c460296d83ba890d57f5ceb3436b98738b6a4e4dd",
+      "gitBlob": "88e836695e43dbc762f3301988ab7566dc443362"
+    },
+    {
+      "path": "services/node-agent/migrationverify/recipes.go",
+      "source": "eb32b211ab3704935b9431747089ab0715582a74",
+      "rawSHA256": "37338bfdb939a107aa4748c1cc62e6eb810d0e5335e75173a1f82878719d8df8",
+      "gitBlob": "009762055645da0f836ad013faf257ba042abe4b"
+    },
+    {
+      "path": "services/node-agent/migrationverify/contracts.go",
+      "source": "eb32b211ab3704935b9431747089ab0715582a74",
+      "rawSHA256": "017102092eebf5cdde81616d07b64e4501781c2f4fa956d5895592198bb06967",
+      "gitBlob": "0d9b213157281fd068a9adc09839e00871f608d6"
+    },
+    {
+      "path": "services/node-agent/migrationverify/graph.go",
+      "source": "eb32b211ab3704935b9431747089ab0715582a74",
+      "rawSHA256": "81fbd517f0ba5bb4062a2a14cd2972f9ddae89c2d4e4f979cc7d1d2058da238c",
+      "gitBlob": "f0e73328228433537ee5e301f9ead2cf7c8ea066"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/source-pins.json",
+      "source": "eb32b211ab3704935b9431747089ab0715582a74",
+      "rawSHA256": "6c02c2e51f373ee74c823204e046ddc5381d3e52923f4479ece8c2ed70d56b99",
+      "gitBlob": "82f163823349e4917c8b2c1f20446ade18766eee"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/trust-bootstrap-contract.json",
+      "source": "eb32b211ab3704935b9431747089ab0715582a74",
+      "rawSHA256": "f42166c4545480a30112d1c6f92f374376941b129607d0c14168e8df373a5869",
+      "gitBlob": "b36c97241d5d5619e819d001a9717e25df8cc23f"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/recipe-definitions.json",
+      "source": "eb32b211ab3704935b9431747089ab0715582a74",
+      "rawSHA256": "b2db6df614fccb2c4918080101b78f7340733c5c04309bc6fd56895c6aeead58",
+      "gitBlob": "2d336d7feec9b588b7d77b6e73fe9dd015d2ed6f"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proof-slot-registry.json",
+      "source": "eb32b211ab3704935b9431747089ab0715582a74",
+      "rawSHA256": "3571fc0a775a5c8b50f0b49fad8fbc1c43db60dfba3a8df097aa4eb4cdf73758",
+      "gitBlob": "f98b5e853103333bc257c732b1e2da819e5c93ce"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/index.json",
+      "source": "eb32b211ab3704935b9431747089ab0715582a74",
+      "rawSHA256": "733b918383bc0c45abdd0c266bac4baf51c11eeeaaf6f44cd4e4ea2464d90582",
+      "gitBlob": "cd8e89c4e505fad1f2e941768db313ffc4f82701"
+    },
+    {
+      "path": "services/node-agent/cmd/inv-node/main.go",
+      "source": "eb32b211ab3704935b9431747089ab0715582a74",
+      "rawSHA256": "3471f3fa13ea9ac4d27fd27ca04747a1adf2348692f846484c39f28755c23a9a",
+      "gitBlob": "a966629ee7db6116535c51baee0f956e2fd384f8"
+    },
+    {
+      "path": "services/node-agent/transport/peer_floor.go",
+      "source": "eb32b211ab3704935b9431747089ab0715582a74",
+      "rawSHA256": "ac7480132f073fc129f98e1095b7d384313631c2f656ba762f607e1f1d62a2c3",
+      "gitBlob": "c2551c0366cf9d4c74e4b3096937b7d142355646"
+    },
+    {
+      "path": "services/node-agent/runtime/peer_floor_linux.go",
+      "source": "eb32b211ab3704935b9431747089ab0715582a74",
+      "rawSHA256": "03ba6c3e1c30c79837f6ccde37f793f6a97210497ff9be2d45a0e3716f73b9c0",
+      "gitBlob": "df8600ec30da8f9426f6bc7c18eaeb093aa80cc5"
+    },
+    {
+      "path": "services/node-agent/runtime/permit.go",
+      "source": "eb32b211ab3704935b9431747089ab0715582a74",
+      "rawSHA256": "65483a6e650fb523a06ab8ebe923fcbf916d973e190b1a0def5ee5273cdf171b",
+      "gitBlob": "084b9113190abfaa7e0279a4eb7a4e786bd03dff"
+    },
+    {
+      "path": "services/control-plane/src/inv/node_channels.py",
+      "source": "eb32b211ab3704935b9431747089ab0715582a74",
+      "rawSHA256": "3fad0bb24beb096522ea3335e3bf45f4e65f2d0d906177ef7e310aca1128502b",
+      "gitBlob": "30902552b9d584dd50182344d4a4140e32e41051"
+    },
+    {
+      "path": "services/control-plane/src/inv/leases.py",
+      "source": "eb32b211ab3704935b9431747089ab0715582a74",
+      "rawSHA256": "e968852cea4fecd011a97e3b665302cc31e3ddec22d505f0f4ce9af2420987b6",
+      "gitBlob": "a6b8229a0e300cc51a8b2d424ac4fde90dbbc01b"
+    },
+    {
+      "path": "services/control-plane/src/inv/app.py",
+      "source": "eb32b211ab3704935b9431747089ab0715582a74",
+      "rawSHA256": "3e3d0d0dc023dee937ac184532b043a26b2af7110887901c937cc6cdbaa2edea",
+      "gitBlob": "4adbcc5d0fd97eec0c535cf25d85031531c62a02"
+    },
+    {
+      "path": "deploy/lan/worker_peer_floor.py",
+      "source": "eb32b211ab3704935b9431747089ab0715582a74",
+      "rawSHA256": "c73c81adaedb2a7b3b8513cd874b093a71f7b5c147e2e08ea86f71a54c8d2fec",
+      "gitBlob": "b537809fb623ebc84dabc9f4b6a076948e1db3cc"
+    },
+    {
+      "path": "deploy/lan/worker_plain_rotation.py",
+      "source": "eb32b211ab3704935b9431747089ab0715582a74",
+      "rawSHA256": "bf3754a27f748b1dd58a7fc65a1f1831dddae6133f11ae17d0f7bf3ea59c46e5",
+      "gitBlob": "b0d01a5f1b12da9f2c9fa0cc562a16a64a497ec4"
+    },
+    {
+      "path": "deploy/lan/worker_config.py",
+      "source": "eb32b211ab3704935b9431747089ab0715582a74",
+      "rawSHA256": "909d1c25deb61c5c4795af49dab18f5a9722e5cbc1c034a18472b6a4427c192c",
+      "gitBlob": "e42f017ea011780ee2724866c3b11cdc087d7af6"
+    },
+    {
+      "path": "deploy/lan/worker_leaf_rotation.py",
+      "source": "eb32b211ab3704935b9431747089ab0715582a74",
+      "rawSHA256": "4e29685241a3e625e59aa64bcff07bdd69d4b0381c67687706a09fa960f75998",
+      "gitBlob": "2a03a3dd9445a51ffc1954a8878498ea51beab0b"
+    },
+    {
+      "path": "deploy/lan/peer_policy_phase.py",
+      "source": "eb32b211ab3704935b9431747089ab0715582a74",
+      "rawSHA256": "8aac0c65fb2a242b08287ba4206e6c7213fc18795903584b5b28abf3a10c17f8",
+      "gitBlob": "052b4a7e156e75a69bc4acf9656c12d25fd5a9d8"
+    },
+    {
+      "path": "deploy/lan/leaf_rotation_standalone_runtime.py",
+      "source": "eb32b211ab3704935b9431747089ab0715582a74",
+      "rawSHA256": "76be408878d1105099d3457937fe0a579c09d9eefc6c6d46f0e22679670e5665",
+      "gitBlob": "c1b6ec66a37e33a9fda8e6a015ca892f1f1034b7"
+    },
+    {
+      "path": "deploy/lan/leaf-rotation-runtime-lock.json",
+      "source": "eb32b211ab3704935b9431747089ab0715582a74",
+      "rawSHA256": "06710d854ff52578949249065dd009de6561bc779c4b21c5355262e59a527a8c",
+      "gitBlob": "8c4233eec428bf85712b97ced407f1932ed310d2"
+    }
+  ],
+  "NewVerifierNonTestOccurrences": [
+    "eb32b211ab3704935b9431747089ab0715582a74:services/node-agent/migrationverify/trust.go:136:func NewVerifier(installed InstalledTrust, context TrustedContext) (*Verifier, error) {"
+  ],
+  "K1PackageChangesSinceReviewed56651": [
+    "services/node-agent/migrationverify/README.md"
+  ],
+  "designSource": "8874b2dfe0dda9a019bd5f334636668290702e13",
+  "designReview": "6b12d3ab0e1f3e3cf623b62c528e0e096ba48af6",
+  "registrationRawSHA256": "a0a05427c40499ac32e52c58982a84bceb4b4e833b68c601f9373d93d80aa562",
+  "helperClosure": {
+    "moduleCount": 5,
+    "sevenFileClosure": [
+      "worker_config.py",
+      "worker_leaf_rotation.py",
+      "peer_policy_phase.py",
+      "worker_peer_floor.py",
+      "worker_plain_rotation.py",
+      "leaf_rotation_standalone_runtime.py",
+      "leaf-rotation-runtime-lock.json"
+    ],
+    "allModuleRawHashesMatchLiteralPins": true
+  },
+  "sourceOnlyNoPrivateReadsOrRuntimeCalls": true
+}

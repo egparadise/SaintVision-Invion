@@ -1,0 +1,35 @@
+{
+  "classification": "REPORTED_FROM_IMMUTABLE_PREDECESSOR_NOT_K2_CI",
+  "implementationSource": "56651cba697f2ab6fcd7166ca4e6ea11eac28113",
+  "combinedSource": "eb32b211ab3704935b9431747089ab0715582a74",
+  "actualCodeReview": "191b6f843a643ee4989ce28c9ebf1816963ffe28",
+  "codeReviewDocs": 42132923864,
+  "reviewedGoToCombinedDelta": "README only in K1 package; TEST/proof helper/focusedCI independent Root acceptance",
+  "RootSourceChoice": "msg_4f741ef0872c",
+  "RootFinalBoundedAcceptance": "msg_f96802b15040",
+  "Core": {
+    "run": 42138733821,
+    "jobs": [
+      127633370756,
+      127633370998
+    ],
+    "status": "SUCCESS",
+    "source": "eb32b211ab3704935b9431747089ab0715582a74",
+    "ref": "agent/codex/fleet5-prepare-rate-clock-test-20261106",
+    "runAttempt": 1
+  },
+  "sourceDocs": 42137296076,
+  "qualifiedReport": "f28fb41d6e566625d5feb27535d4c3d40fbc9100",
+  "reportDocs": 42142783600,
+  "originalPublicEvidenceGitBlobRawSHA256": {
+    "combined-source-ci-final.json": "ff5805a8c47357afc267a7431a7e217131068808dd2008b1ae7c15016f480860",
+    "combined-artifact-download-receipts.json": "b07ae9e5a11edada4e7b4c4e21bb748c55a1583329c3469516d52aa8f70fcded",
+    "compiled-binary-metadata.json": "bcca947adcdc524537eef5c99fd715fe531e2c5da597e202608c23e5de8654f9",
+    "combined-source-review-bindings.json": "8aed370f32dd64b22d167669fef11ddc3a27c8ac0c90e0deb70545a51e973e3b"
+  },
+  "historicalFailedCore": 42126222201,
+  "historicalCauseEstablished": false,
+  "installedTrustProven": false,
+  "K2ExecutableProven": false,
+  "completedCIReexecuted": false
+}

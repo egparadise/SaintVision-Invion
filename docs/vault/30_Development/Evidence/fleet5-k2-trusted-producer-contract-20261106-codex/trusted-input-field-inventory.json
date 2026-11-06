@@ -1,0 +1,106 @@
+{
+  "source": "eb32b211ab3704935b9431747089ab0715582a74",
+  "types": {
+    "InstalledTrust": [
+      "RegistrySHA256",
+      "Verifier",
+      "ContractPins",
+      "Grants",
+      "CohortID",
+      "Members",
+      "GraphBytes",
+      "GraphSHA256",
+      "NodeKinds"
+    ],
+    "VerifierPublication": [
+      "ID",
+      "SourceSHA",
+      "ArtifactSHA256",
+      "ReviewSHA",
+      "CIRunIDs"
+    ],
+    "ContractPin": [
+      "ContractSHA256",
+      "SchemaSHA256",
+      "Codec",
+      "RequiredVerifier"
+    ],
+    "KeyGrant": [
+      "Role",
+      "AuthorityScope",
+      "PublicKeyHex",
+      "NotBefore",
+      "NotAfter",
+      "Status"
+    ],
+    "MemberIdentity": [
+      "Slot",
+      "Scope",
+      "CertificateDER",
+      "CARootDER"
+    ],
+    "TrustedContext": [
+      "Now",
+      "SemanticInputs",
+      "Operations",
+      "History",
+      "MigrationOperationID",
+      "Challenges",
+      "Publications",
+      "Certificates",
+      "Current"
+    ],
+    "HistoricalContext": [
+      "Operations",
+      "Challenges"
+    ],
+    "OperationBinding": [
+      "MigrationID",
+      "OperationID",
+      "LeaseEnvelopeSHA256",
+      "FenceEpoch",
+      "AcquiredAt",
+      "ExpiresAt"
+    ],
+    "NativeChallenge": [
+      "Nonce",
+      "MigrationID",
+      "OperationID",
+      "ScopeSHA256",
+      "FenceEpoch",
+      "IssuedAt",
+      "ExpiresAt"
+    ],
+    "PublicationStatus": [
+      "Status",
+      "SubjectSHA256",
+      "PublishedAt",
+      "CheckedAt",
+      "ExpiresAt"
+    ],
+    "CertificateStatus": [
+      "Status",
+      "CheckedAt",
+      "ExpiresAt"
+    ],
+    "CurrentProjectionContext": [
+      "SetID",
+      "MigrationID",
+      "OperationID",
+      "PlanEnvelopeSHA256",
+      "LeaseEnvelopeSHA256",
+      "FenceEpoch",
+      "Sequence",
+      "InventoryHead",
+      "InventoryReadbackSHA256",
+      "MemberProjectionSHA256",
+      "NativeWitnesses"
+    ],
+    "CurrentNativeWitness": [
+      "Slot",
+      "Raw"
+    ]
+  },
+  "fieldCount": 73,
+  "onlyDeclaredFieldsNotAuthenticatedProducers": true
+}

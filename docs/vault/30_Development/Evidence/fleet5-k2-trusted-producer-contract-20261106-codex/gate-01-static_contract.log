@@ -1,0 +1,14 @@
+{
+  "classification": "STATIC_CONTRACT_CONSISTENCY_ONLY",
+  "declaredFieldsCovered": 73,
+  "producerRows": 19,
+  "unchangedProofContracts": 28,
+  "unchangedSevenFileHelperClosure": 7,
+  "originalRuntimeCaseIDsAndRedGreenPreserved": 40,
+  "normativeFailureExamples": 18,
+  "malformedStaticDocumentNegativesRejected": 4,
+  "runtimeCasesExecuted": 0,
+  "actualCryptoOrTrustedProducerExecution": false,
+  "allActualBindingsNullHOLD": true,
+  "effectAuthorityGranted": false
+}

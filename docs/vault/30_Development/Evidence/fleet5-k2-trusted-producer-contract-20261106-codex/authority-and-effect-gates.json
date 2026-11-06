@@ -1,0 +1,134 @@
+{
+  "status": "PROPOSED_INTERNAL_INTERFACES_NOT_DEPLOYED",
+  "interfaces": {
+    "K2A": [
+      "LoadInstalledPolicy(selector)",
+      "ReadHistory(scope,hashes,versions)",
+      "ReadCurrent(scope,expectedVersion)",
+      "Assemble(authenticatedPolicy,history,current,clock)",
+      "ValidateHistory(packet,snapshot)",
+      "DeriveCurrent(packet,snapshot)"
+    ],
+    "K2B": [
+      "AuthorizeEffect(method,immutableRequest,SnapshotToken,independentCapability)",
+      "ExecuteOwnedIntent(intentID)"
+    ]
+  },
+  "SnapshotToken": {
+    "authorizesEffects": false,
+    "fields": [
+      "registryVersion",
+      "grantVersion",
+      "publicationVersion",
+      "certificateVersion",
+      "orderedCohortIdentityKey",
+      "currentVersion",
+      "activeMigration",
+      "operation",
+      "HELDLeaseRawSHA256",
+      "maxFenceEpoch",
+      "maxSequence",
+      "inventoryHead",
+      "orderedMemberHashes",
+      "ownedRootDaemonVolumeContainerProcessGeneration",
+      "challengeVersion",
+      "clockInterval",
+      "authenticatedInputDigest"
+    ]
+  },
+  "K2AForbiddenEffects": [
+    "trust installation",
+    "private key read",
+    "sign",
+    "issue or consume challenge",
+    "reserve or lease write",
+    "create runtime temp or lock file",
+    "OpenJournal or pin",
+    "Engine ExecCreate/Start",
+    "host root mutation",
+    "SSH launch",
+    "issuer write",
+    "schedule write"
+  ],
+  "RootDecisions": [
+    {
+      "id": "D-PREPUBLICATION",
+      "owner": "Root",
+      "status": "HOLD",
+      "choice": "Default deny every bootstrap effect until separately reviewed closed phase authority; no weakening K1 PRESENT boundary"
+    },
+    {
+      "id": "D-CLOCK",
+      "owner": "Root",
+      "status": "HOLD",
+      "choice": "Provision independently authenticated clock source; proposed1second uncertainty conservative full-interval checks, separate from30s proof skew"
+    },
+    {
+      "id": "D-TRUST-INSTALL",
+      "owner": "Root",
+      "status": "HOLD",
+      "choice": "Actual public anchors/key custody/CA/offline registry installation and exact K2 package/runtime lock manifest"
+    },
+    {
+      "id": "D-COHORT-FENCE",
+      "owner": "Root",
+      "status": "HOLD",
+      "choice": "Authoritative cross-migration cohort CAS/fence/intent registry and proof every permitted mutator is mediated; generic execution lease not substitute"
+    }
+  ],
+  "effectStates": [
+    "REFUSED_NO_EFFECT",
+    "INTENT_COMMITTED",
+    "EFFECT_OUTCOME_UNKNOWN",
+    "READBACK_VERIFIED",
+    "BLOCKED_FORWARD_ONLY"
+  ],
+  "durableIntentFields": [
+    "method",
+    "operation",
+    "cohortFence",
+    "scope",
+    "requestDigest",
+    "expectedCurrentVersion",
+    "priorEvent",
+    "preimage",
+    "expectedPostimage",
+    "ownedIDsNamesGenerations",
+    "publicationDecision",
+    "deadline",
+    "actor",
+    "idempotencyKey"
+  ],
+  "errorCatalog": [
+    "ARTIFACT_OR_REVIEW_SCOPE_MISMATCH",
+    "CERTIFICATE_STATUS_UNKNOWN_REVOKED_OR_EXPIRED",
+    "CLOCK_UNTRUSTED",
+    "CONSUMING_TIME_OR_INDEPENDENT_ANCHOR_UNKNOWN",
+    "CROSS_MIGRATION_FENCE_OR_VERSION_CHANGED",
+    "CURRENT_NATIVE_WITNESS_UNKNOWN_MISMATCH_OR_EXPIRED",
+    "CURRENT_OPERATION_STALE_RELEASED_OR_UNKNOWN",
+    "EFFECT_NOT_ALLOWED_IN_K2A",
+    "EFFECT_OUTCOME_UNKNOWN",
+    "GENERATION_OR_ROLLBACK_BARRIER",
+    "GRAPH_AUTHORITY_UNKNOWN",
+    "HISTORICAL_BINDING_UNKNOWN",
+    "HISTORICAL_CHALLENGE_UNKNOWN_OR_REPLAY",
+    "IDEMPOTENCY_COLLISION",
+    "IDENTITY_OR_CA_UNKNOWN",
+    "INSTALLATION_OR_RUNTIME_CAPABILITY_UNKNOWN",
+    "KEY_GRANT_UNKNOWN_REVOKED_OR_OUTSIDE_USE_INTERVAL",
+    "LIVE_CHALLENGE_UNKNOWN_OR_REPLAY",
+    "NO_CURRENT_HEAD_OR_STALE_CURRENT_SET",
+    "PERMISSION_OR_CAPABILITY_UNKNOWN",
+    "PREPUBLICATION_AUTHORITY_UNDECIDED",
+    "PUBLICATION_UNKNOWN_REVOKED_EXPIRED_OR_BACKDATED",
+    "SEMANTIC_OBSERVATION_AUTHORITY_UNKNOWN",
+    "SEMANTIC_SOURCE_UNKNOWN",
+    "STALE_SNAPSHOT",
+    "TRUST_UNKNOWN_OR_PIN_MISMATCH"
+  ],
+  "noIOBehindHeldDBRowLocks": true,
+  "noTTLOwnershipTakeoverWithUnknownIntent": true,
+  "newWireOrSignerAccepted": false,
+  "actualBindings": "NULL_HOLD"
+}

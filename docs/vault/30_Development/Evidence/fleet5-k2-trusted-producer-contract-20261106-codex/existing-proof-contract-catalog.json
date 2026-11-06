@@ -1,0 +1,259 @@
+{
+  "source": "eb32b211ab3704935b9431747089ab0715582a74",
+  "contracts": [
+    {
+      "contractId": "saintvision-proof-build-provenance:1",
+      "producerRole": "build-service",
+      "signerRole": "build-attestor",
+      "freshness": "immutable-provenance",
+      "codec": "normalized-proof-v1",
+      "signatureDomainASCII": "saintvision/proof/build-provenance/v1",
+      "requiredVerifier": "pretrusted:build-provenance:1"
+    },
+    {
+      "contractId": "saintvision-proof-ci-attestation:1",
+      "producerRole": "github-actions",
+      "signerRole": "ci-attestor",
+      "freshness": "immutable-provenance",
+      "codec": "normalized-proof-v1",
+      "signatureDomainASCII": "saintvision/proof/ci-attestation/v1",
+      "requiredVerifier": "pretrusted:ci-attestation:1"
+    },
+    {
+      "contractId": "saintvision-proof-descendant-quiescence:1",
+      "producerRole": "owned-host-adapter",
+      "signerRole": "host-helper",
+      "freshness": "fresh",
+      "codec": "normalized-proof-v1",
+      "signatureDomainASCII": "saintvision/proof/descendant-quiescence/v1",
+      "requiredVerifier": "pretrusted:descendant-quiescence:1"
+    },
+    {
+      "contractId": "saintvision-proof-g2-planning-policy:1",
+      "producerRole": "root-operator",
+      "signerRole": "root-policy",
+      "freshness": "validity-bounded-approval",
+      "codec": "normalized-proof-v1",
+      "signatureDomainASCII": "saintvision/proof/g2-planning-policy/v1",
+      "requiredVerifier": "pretrusted:g2-planning-policy:1"
+    },
+    {
+      "contractId": "saintvision-proof-image-distribution:1",
+      "producerRole": "artifact-publisher",
+      "signerRole": "build-attestor",
+      "freshness": "immutable-provenance",
+      "codec": "normalized-proof-v1",
+      "signatureDomainASCII": "saintvision/proof/image-distribution/v1",
+      "requiredVerifier": "pretrusted:image-distribution:1"
+    },
+    {
+      "contractId": "saintvision-proof-independent-code-review:1",
+      "producerRole": "independent-reviewer",
+      "signerRole": "independent-reviewer",
+      "freshness": "immutable-provenance",
+      "codec": "normalized-proof-v1",
+      "signatureDomainASCII": "saintvision/proof/independent-code-review/v1",
+      "requiredVerifier": "pretrusted:independent-code-review:1"
+    },
+    {
+      "contractId": "saintvision-proof-independent-plan-review:1",
+      "producerRole": "independent-reviewer",
+      "signerRole": "independent-reviewer",
+      "freshness": "validity-bounded-approval",
+      "codec": "normalized-proof-v1",
+      "signatureDomainASCII": "saintvision/proof/independent-plan-review/v1",
+      "requiredVerifier": "pretrusted:independent-plan-review:1"
+    },
+    {
+      "contractId": "saintvision-proof-inventory-head-readback:1",
+      "producerRole": "cp-inventory-reader",
+      "signerRole": "cp-inventory",
+      "freshness": "fresh",
+      "codec": "normalized-proof-v1",
+      "signatureDomainASCII": "saintvision/proof/inventory-head-readback/v1",
+      "requiredVerifier": "pretrusted:inventory-head-readback:1"
+    },
+    {
+      "contractId": "saintvision-proof-launch-surface-inventory:1",
+      "producerRole": "root-launch-reader",
+      "signerRole": "root-observer",
+      "freshness": "fresh",
+      "codec": "normalized-proof-v1",
+      "signatureDomainASCII": "saintvision/proof/launch-surface-inventory/v1",
+      "requiredVerifier": "pretrusted:launch-surface-inventory:1"
+    },
+    {
+      "contractId": "saintvision-proof-m2-capability:1",
+      "producerRole": "native-test-producer",
+      "signerRole": "ci-attestor",
+      "freshness": "immutable-provenance",
+      "codec": "normalized-proof-v1",
+      "signatureDomainASCII": "saintvision/proof/m2-capability/v1",
+      "requiredVerifier": "pretrusted:m2-capability:1"
+    },
+    {
+      "contractId": "saintvision-proof-member-progress-evidence:1",
+      "producerRole": "owned-host-adapter",
+      "signerRole": "host-helper",
+      "freshness": "fresh",
+      "codec": "normalized-proof-v1",
+      "signatureDomainASCII": "saintvision/proof/member-progress-evidence/v1",
+      "requiredVerifier": "pretrusted:member-progress-evidence:1"
+    },
+    {
+      "contractId": "saintvision-proof-migration-effect-readback:1",
+      "producerRole": "owned-engine-adapter",
+      "signerRole": "host-helper",
+      "freshness": "fresh",
+      "codec": "normalized-proof-v1",
+      "signatureDomainASCII": "saintvision/proof/migration-effect-readback/v1",
+      "requiredVerifier": "pretrusted:migration-effect-readback:1"
+    },
+    {
+      "contractId": "saintvision-proof-migration-event-evidence:1",
+      "producerRole": "owned-host-adapter",
+      "signerRole": "host-helper",
+      "freshness": "fresh",
+      "codec": "normalized-proof-v1",
+      "signatureDomainASCII": "saintvision/proof/migration-event-evidence/v1",
+      "requiredVerifier": "pretrusted:migration-event-evidence:1"
+    },
+    {
+      "contractId": "saintvision-proof-native-two-cycle:1",
+      "producerRole": "native-test-producer",
+      "signerRole": "ci-attestor",
+      "freshness": "immutable-provenance",
+      "codec": "normalized-proof-v1",
+      "signatureDomainASCII": "saintvision/proof/native-two-cycle/v1",
+      "requiredVerifier": "pretrusted:native-two-cycle:1"
+    },
+    {
+      "contractId": "saintvision-proof-no-overlap:1",
+      "producerRole": "root-process-reader",
+      "signerRole": "root-observer",
+      "freshness": "fresh",
+      "codec": "normalized-proof-v1",
+      "signatureDomainASCII": "saintvision/proof/no-overlap/v1",
+      "requiredVerifier": "pretrusted:no-overlap:1"
+    },
+    {
+      "contractId": "saintvision-proof-node-floor-v2:1",
+      "producerRole": "actual-serving-node",
+      "signerRole": "node-leaf",
+      "freshness": "fresh",
+      "codec": "native-m2-v2",
+      "signatureDomainASCII": "saintvision/node-peer-policy-floor/v2",
+      "requiredVerifier": "pretrusted:node-floor-v2:1"
+    },
+    {
+      "contractId": "saintvision-proof-old-new-no-write:1",
+      "producerRole": "native-test-producer",
+      "signerRole": "ci-attestor",
+      "freshness": "immutable-provenance",
+      "codec": "normalized-proof-v1",
+      "signatureDomainASCII": "saintvision/proof/old-new-no-write/v1",
+      "requiredVerifier": "pretrusted:old-new-no-write:1"
+    },
+    {
+      "contractId": "saintvision-proof-owned-engine-exec:1",
+      "producerRole": "owned-engine-adapter",
+      "signerRole": "host-helper",
+      "freshness": "fresh",
+      "codec": "normalized-proof-v1",
+      "signatureDomainASCII": "saintvision/proof/owned-engine-exec/v1",
+      "requiredVerifier": "pretrusted:owned-engine-exec:1"
+    },
+    {
+      "contractId": "saintvision-proof-process-quiescence:1",
+      "producerRole": "owned-host-adapter",
+      "signerRole": "host-helper",
+      "freshness": "fresh",
+      "codec": "normalized-proof-v1",
+      "signatureDomainASCII": "saintvision/proof/process-quiescence/v1",
+      "requiredVerifier": "pretrusted:process-quiescence:1"
+    },
+    {
+      "contractId": "saintvision-proof-protected-tree-equality:1",
+      "producerRole": "owned-host-adapter",
+      "signerRole": "host-helper",
+      "freshness": "fresh",
+      "codec": "normalized-proof-v1",
+      "signatureDomainASCII": "saintvision/proof/protected-tree-equality/v1",
+      "requiredVerifier": "pretrusted:protected-tree-equality:1"
+    },
+    {
+      "contractId": "saintvision-proof-root-execution-decision:1",
+      "producerRole": "root-operator",
+      "signerRole": "root-execution",
+      "freshness": "fresh",
+      "codec": "normalized-proof-v1",
+      "signatureDomainASCII": "saintvision/proof/root-execution-decision/v1",
+      "requiredVerifier": "pretrusted:root-execution-decision:1"
+    },
+    {
+      "contractId": "saintvision-proof-root-publication-intent:1",
+      "producerRole": "root-operator",
+      "signerRole": "root-plan",
+      "freshness": "validity-bounded-approval",
+      "codec": "normalized-proof-v1",
+      "signatureDomainASCII": "saintvision/proof/root-publication-intent/v1",
+      "requiredVerifier": "pretrusted:root-publication-intent:1"
+    },
+    {
+      "contractId": "saintvision-proof-root-restart-restore:1",
+      "producerRole": "root-operator",
+      "signerRole": "root-execution",
+      "freshness": "fresh",
+      "codec": "normalized-proof-v1",
+      "signatureDomainASCII": "saintvision/proof/root-restart-restore/v1",
+      "requiredVerifier": "pretrusted:root-restart-restore:1"
+    },
+    {
+      "contractId": "saintvision-proof-root-seal-decision:1",
+      "producerRole": "root-operator",
+      "signerRole": "root-seal",
+      "freshness": "fresh",
+      "codec": "normalized-proof-v1",
+      "signatureDomainASCII": "saintvision/proof/root-seal-decision/v1",
+      "requiredVerifier": "pretrusted:root-seal-decision:1"
+    },
+    {
+      "contractId": "saintvision-proof-runtime-inspection-after:1",
+      "producerRole": "owned-engine-adapter",
+      "signerRole": "host-helper",
+      "freshness": "fresh",
+      "codec": "normalized-proof-v1",
+      "signatureDomainASCII": "saintvision/proof/runtime-inspection-after/v1",
+      "requiredVerifier": "pretrusted:runtime-inspection-after:1"
+    },
+    {
+      "contractId": "saintvision-proof-runtime-inspection-before:1",
+      "producerRole": "owned-engine-adapter",
+      "signerRole": "host-helper",
+      "freshness": "fresh",
+      "codec": "normalized-proof-v1",
+      "signatureDomainASCII": "saintvision/proof/runtime-inspection-before/v1",
+      "requiredVerifier": "pretrusted:runtime-inspection-before:1"
+    },
+    {
+      "contractId": "saintvision-proof-schedule-disabled-readback:1",
+      "producerRole": "root-schedule-reader",
+      "signerRole": "root-observer",
+      "freshness": "fresh",
+      "codec": "normalized-proof-v1",
+      "signatureDomainASCII": "saintvision/proof/schedule-disabled-readback/v1",
+      "requiredVerifier": "pretrusted:schedule-disabled-readback:1"
+    },
+    {
+      "contractId": "saintvision-proof-unchanged-mtls:1",
+      "producerRole": "owned-mtls-client",
+      "signerRole": "host-helper",
+      "freshness": "fresh",
+      "codec": "normalized-proof-v1",
+      "signatureDomainASCII": "saintvision/proof/unchanged-mtls/v1",
+      "requiredVerifier": "pretrusted:unchanged-mtls:1"
+    }
+  ],
+  "liveProducerInstallationForEveryRole": "UNKNOWN_HOLD",
+  "newWireSignerDomainIntroduced": false
+}

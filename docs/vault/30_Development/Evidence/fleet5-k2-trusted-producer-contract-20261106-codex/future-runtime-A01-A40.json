@@ -1,0 +1,638 @@
+{
+  "status": "PLANNED_NOT_RUN",
+  "classification": "STATIC_PLAN_ONLY",
+  "originalSource": "8874b2dfe0dda9a019bd5f334636668290702e13",
+  "originalPath": "docs/vault/30_Development/Evidence/fleet5-legacy-capability-bootstrap-plan-20261105/acceptance-matrix.json",
+  "originalRawSHA256": "e671501c9e901b117bafeef1de89ef6e1b0c3dccecc18eff29ba2e76c2071026",
+  "originalRedGreenAndIDsPreserved": true,
+  "cases": [
+    {
+      "id": "A01",
+      "gates": [
+        "G10"
+      ],
+      "red": "Null/uncompiled/unfrozen target or Docs-only provenance",
+      "green": "Actual published source/executable/image config+layers reproducible binding; exact native/CI/journal/M2/independent verdict",
+      "status": "NOT_RUN",
+      "executionEvidence": null,
+      "implementationOwner": "Codex",
+      "requiredTask": "K2A-TRUST",
+      "futurePermission": "Isolated test-owned Linux/Engine/PG and ephemeral fixture keys ONLY after separate Root implementation grant; physical/private operations remain excluded",
+      "mutantPurpose": "Implement the exact original red alternative; require denial before effect or UNKNOWN_FORWARD_ONLY after uncertainty; paired original green must execute without skip"
+    },
+    {
+      "id": "A02",
+      "gates": [
+        "G1",
+        "G2"
+      ],
+      "red": "Changed --image/profile/args/workload digest/Env/label/resource/security",
+      "green": "Runtime image only; exact old Cmd/permit image and full supported inspect projection preserved",
+      "status": "NOT_RUN",
+      "executionEvidence": null,
+      "implementationOwner": "Codex",
+      "requiredTask": "K2B-EFFECTS",
+      "futurePermission": "Isolated test-owned Linux/Engine/PG and ephemeral fixture keys ONLY after separate Root implementation grant; physical/private operations remain excluded",
+      "mutantPurpose": "Implement the exact original red alternative; require denial before effect or UNKNOWN_FORWARD_ONLY after uncertainty; paired original green must execute without skip"
+    },
+    {
+      "id": "A03",
+      "gates": [
+        "G1"
+      ],
+      "red": "Storage flag/socket/workspace/extra mount/unknown inspect config",
+      "green": "Exact storage-free observe state volume and endpoint, no extra bind or storage side effect",
+      "status": "NOT_RUN",
+      "executionEvidence": null,
+      "implementationOwner": "Codex",
+      "requiredTask": "K2B-EFFECTS",
+      "futurePermission": "Isolated test-owned Linux/Engine/PG and ephemeral fixture keys ONLY after separate Root implementation grant; physical/private operations remain excluded",
+      "mutantPurpose": "Implement the exact original red alternative; require denial before effect or UNKNOWN_FORWARD_ONLY after uncertainty; paired original green must execute without skip"
+    },
+    {
+      "id": "A04",
+      "gates": [
+        "G3"
+      ],
+      "red": "Credential recopy through install/prepare/repair/finish or host restore",
+      "green": "Existing volume protected tree byte/mode/UID exact, private bytes never exported",
+      "status": "NOT_RUN",
+      "executionEvidence": null,
+      "implementationOwner": "Codex",
+      "requiredTask": "K2B-EFFECTS",
+      "futurePermission": "Isolated test-owned Linux/Engine/PG and ephemeral fixture keys ONLY after separate Root implementation grant; physical/private operations remain excluded",
+      "mutantPurpose": "Implement the exact original red alternative; require denial before effect or UNKNOWN_FORWARD_ONLY after uncertainty; paired original green must execute without skip"
+    },
+    {
+      "id": "A05",
+      "gates": [
+        "G4"
+      ],
+      "red": "Unsigned snapshot or host mirror as M2; side-loaded new observer against old PID1",
+      "green": "Fresh fenced unsigned bridge explicitly bootstrap-only, then signed same-executable UID/PID1 nonce actual-journal M2 matching P/H/scope/hash",
+      "status": "NOT_RUN",
+      "executionEvidence": null,
+      "implementationOwner": "Codex",
+      "requiredTask": "K2A-CURRENT",
+      "futurePermission": "Isolated test-owned Linux/Engine/PG and ephemeral fixture keys ONLY after separate Root implementation grant; physical/private operations remain excluded",
+      "mutantPurpose": "Implement the exact original red alternative; require denial before effect or UNKNOWN_FORWARD_ONLY after uncertainty; paired original green must execute without skip"
+    },
+    {
+      "id": "A06",
+      "gates": [
+        "G6"
+      ],
+      "red": "New Go creates/normalizes protected identity/floor/lock content or rewrites format",
+      "green": "Real old-Go fixture journal unchanged by new startup/replay/M2/mTLS; protected bytes/mode/UID/tree exact",
+      "status": "NOT_RUN",
+      "executionEvidence": null,
+      "implementationOwner": "Codex",
+      "requiredTask": "K2B-EFFECTS",
+      "futurePermission": "Isolated test-owned Linux/Engine/PG and ephemeral fixture keys ONLY after separate Root implementation grant; physical/private operations remain excluded",
+      "mutantPurpose": "Implement the exact original red alternative; require denial before effect or UNKNOWN_FORWARD_ONLY after uncertainty; paired original green must execute without skip"
+    },
+    {
+      "id": "A07",
+      "gates": [
+        "G6"
+      ],
+      "red": "Observer invokes OpenJournal/pin or writes on malformed/scope/unavailable state",
+      "green": "Actual compiled early observer no OpenJournal; successful and rejected probes leave protected state unchanged",
+      "status": "NOT_RUN",
+      "executionEvidence": null,
+      "implementationOwner": "Codex",
+      "requiredTask": "K2B-EFFECTS",
+      "futurePermission": "Isolated test-owned Linux/Engine/PG and ephemeral fixture keys ONLY after separate Root implementation grant; physical/private operations remain excluded",
+      "mutantPurpose": "Implement the exact original red alternative; require denial before effect or UNKNOWN_FORWARD_ONLY after uncertainty; paired original green must execute without skip"
+    },
+    {
+      "id": "A08",
+      "gates": [
+        "G7"
+      ],
+      "red": "Extra historical/foreign volume consumer or wrong daemon/name/ID/label/writer",
+      "green": "Exact old stopped ID only before create; then retained old-backup+new ID consumers and no third writer",
+      "status": "NOT_RUN",
+      "executionEvidence": null,
+      "implementationOwner": "Codex",
+      "requiredTask": "K2B-EFFECTS",
+      "futurePermission": "Isolated test-owned Linux/Engine/PG and ephemeral fixture keys ONLY after separate Root implementation grant; physical/private operations remain excluded",
+      "mutantPurpose": "Implement the exact original red alternative; require denial before effect or UNKNOWN_FORWARD_ONLY after uncertainty; paired original green must execute without skip"
+    },
+    {
+      "id": "A09",
+      "gates": [
+        "G7"
+      ],
+      "red": "Timeout/parent exit used as quiescence; unknown stop outcome",
+      "green": "Actual owned process/descendant/workload exit plus stable state and consumer readbacks; uncertainty stays QUIESCENCE_UNKNOWN",
+      "status": "NOT_RUN",
+      "executionEvidence": null,
+      "implementationOwner": "Codex",
+      "requiredTask": "K2B-EFFECTS",
+      "futurePermission": "Isolated test-owned Linux/Engine/PG and ephemeral fixture keys ONLY after separate Root implementation grant; physical/private operations remain excluded",
+      "mutantPurpose": "Implement the exact original red alternative; require denial before effect or UNKNOWN_FORWARD_ONLY after uncertainty; paired original green must execute without skip"
+    },
+    {
+      "id": "A10",
+      "gates": [
+        "G5",
+        "G7"
+      ],
+      "red": "Crash before/after each reserve/fence/rename/create/start-intent/start/readback mutation",
+      "green": "Exact owned next-state resume only under same valid plan/prior-event/fence; every uncertain side effect blocks without old restart",
+      "status": "NOT_RUN",
+      "executionEvidence": null,
+      "implementationOwner": "Codex",
+      "requiredTask": "K2B-EFFECTS",
+      "futurePermission": "Isolated test-owned Linux/Engine/PG and ephemeral fixture keys ONLY after separate Root implementation grant; physical/private operations remain excluded",
+      "mutantPurpose": "Implement the exact original red alternative; require denial before effect or UNKNOWN_FORWARD_ONLY after uncertainty; paired original green must execute without skip"
+    },
+    {
+      "id": "A11",
+      "gates": [
+        "G5"
+      ],
+      "red": "Backup/archive/event collision or symlink/hardlink/ownership/mode/orphan ambiguity",
+      "green": "No overwrite or blind unlink; preserve evidence and block; private atomic fsynced chain",
+      "status": "NOT_RUN",
+      "executionEvidence": null,
+      "implementationOwner": "Codex",
+      "requiredTask": "K2B-EFFECTS",
+      "futurePermission": "Isolated test-owned Linux/Engine/PG and ephemeral fixture keys ONLY after separate Root implementation grant; physical/private operations remain excluded",
+      "mutantPurpose": "Implement the exact original red alternative; require denial before effect or UNKNOWN_FORWARD_ONLY after uncertainty; paired original green must execute without skip"
+    },
+    {
+      "id": "A12",
+      "gates": [
+        "G5"
+      ],
+      "red": "Wrong plan/prior-event/fence token, concurrent migrator or stale lease eviction",
+      "green": "Logical+OS ownership held through check/mutate/readback; exact reservation CAS and immutable chained events",
+      "status": "NOT_RUN",
+      "executionEvidence": null,
+      "implementationOwner": "Codex",
+      "requiredTask": "K2B-EFFECTS",
+      "futurePermission": "Isolated test-owned Linux/Engine/PG and ephemeral fixture keys ONLY after separate Root implementation grant; physical/private operations remain excluded",
+      "mutantPurpose": "Implement the exact original red alternative; require denial before effect or UNKNOWN_FORWARD_ONLY after uncertainty; paired original green must execute without skip"
+    },
+    {
+      "id": "A13",
+      "gates": [
+        "G8"
+      ],
+      "red": "Restart-policy restore on heartbeat/running alone or backup restart-policy change",
+      "green": "New-only restore after fresh actual M2+mTLS, unchanged authority, explicit root step and readback",
+      "status": "NOT_RUN",
+      "executionEvidence": null,
+      "implementationOwner": "Codex",
+      "requiredTask": "K2B-EFFECTS",
+      "futurePermission": "Isolated test-owned Linux/Engine/PG and ephemeral fixture keys ONLY after separate Root implementation grant; physical/private operations remain excluded",
+      "mutantPurpose": "Implement the exact original red alternative; require denial before effect or UNKNOWN_FORWARD_ONLY after uncertainty; paired original green must execute without skip"
+    },
+    {
+      "id": "A14",
+      "gates": [
+        "G9"
+      ],
+      "red": "Old entry enabled or executor/precheck/descendant overlaps despite three disabled",
+      "green": "Fresh exact IDs/config disabled readback and all-launch-surfaces no-overlap; old plan never re-enabled",
+      "status": "NOT_RUN",
+      "executionEvidence": null,
+      "implementationOwner": "Codex",
+      "requiredTask": "K2B-EFFECTS",
+      "futurePermission": "Isolated test-owned Linux/Engine/PG and ephemeral fixture keys ONLY after separate Root implementation grant; physical/private operations remain excluded",
+      "mutantPurpose": "Implement the exact original red alternative; require denial before effect or UNKNOWN_FORWARD_ONLY after uncertainty; paired original green must execute without skip"
+    },
+    {
+      "id": "A15",
+      "gates": [
+        "G2"
+      ],
+      "red": "Global agentImage or --image presented as actual new runtime identity; implicit field/channel rewrite",
+      "green": "Reviewed split inventory/API and strict consumers; both entries atomically published after proofs, legacy bytes and channel vector unchanged",
+      "status": "NOT_RUN",
+      "executionEvidence": null,
+      "implementationOwner": "Codex",
+      "requiredTask": "K2A-CURRENT",
+      "futurePermission": "Isolated test-owned Linux/Engine/PG and ephemeral fixture keys ONLY after separate Root implementation grant; physical/private operations remain excluded",
+      "mutantPurpose": "Implement the exact original red alternative; require denial before effect or UNKNOWN_FORWARD_ONLY after uncertainty; paired original green must execute without skip"
+    },
+    {
+      "id": "A16",
+      "gates": [
+        "G7"
+      ],
+      "red": "Key/cert/CA/epoch/Node/endpoint/P/H/C change or workloads/claims/offers nonzero",
+      "green": "Old fixed two-cohort identity/authority/P/H/C and idle remain exact through cutover",
+      "status": "NOT_RUN",
+      "executionEvidence": null,
+      "implementationOwner": "Codex",
+      "requiredTask": "K2A-CURRENT",
+      "futurePermission": "Isolated test-owned Linux/Engine/PG and ephemeral fixture keys ONLY after separate Root implementation grant; physical/private operations remain excluded",
+      "mutantPurpose": "Implement the exact original red alternative; require denial before effect or UNKNOWN_FORWARD_ONLY after uncertainty; paired original green must execute without skip"
+    },
+    {
+      "id": "A17",
+      "gates": [
+        "G4",
+        "G10"
+      ],
+      "red": "Fresh-five issuer/cohort or old-v1 helper/plan pins reused",
+      "green": "Exact old keys/CA/epoch/two identities; reviewed schema3 helper/new guard/new immutable pin closure",
+      "status": "NOT_RUN",
+      "executionEvidence": null,
+      "implementationOwner": "Codex",
+      "requiredTask": "K2A-TRUST",
+      "futurePermission": "Isolated test-owned Linux/Engine/PG and ephemeral fixture keys ONLY after separate Root implementation grant; physical/private operations remain excluded",
+      "mutantPurpose": "Implement the exact original red alternative; require denial before effect or UNKNOWN_FORWARD_ONLY after uncertainty; paired original green must execute without skip"
+    },
+    {
+      "id": "A18",
+      "gates": [
+        "G7",
+        "G9"
+      ],
+      "red": "Missing/expired deadline, elapsed operator window, insufficient budget or time override",
+      "green": "Root fresh actual validity/clock/windows and safety budget; maintenance versus normal renewal distinguished; missing means BLOCK/offline separately",
+      "status": "NOT_RUN",
+      "executionEvidence": null,
+      "implementationOwner": "Codex",
+      "requiredTask": "K2A-CURRENT",
+      "futurePermission": "Isolated test-owned Linux/Engine/PG and ephemeral fixture keys ONLY after separate Root implementation grant; physical/private operations remain excluded",
+      "mutantPurpose": "Implement the exact original red alternative; require denial before effect or UNKNOWN_FORWARD_ONLY after uncertainty; paired original green must execute without skip"
+    },
+    {
+      "id": "A19",
+      "gates": [
+        "G5"
+      ],
+      "red": "Start/expiry fails after possible pin then old policy/binary restored",
+      "green": "Forward-only blocked with both containers/volume/reservations; old valid cert or failed listener never permits restoration",
+      "status": "NOT_RUN",
+      "executionEvidence": null,
+      "implementationOwner": "Codex",
+      "requiredTask": "K2B-EFFECTS",
+      "futurePermission": "Isolated test-owned Linux/Engine/PG and ephemeral fixture keys ONLY after separate Root implementation grant; physical/private operations remain excluded",
+      "mutantPurpose": "Implement the exact original red alternative; require denial before effect or UNKNOWN_FORWARD_ONLY after uncertainty; paired original green must execute without skip"
+    },
+    {
+      "id": "A20",
+      "gates": [
+        "G6",
+        "G10"
+      ],
+      "red": "Old v1 equal-version different-hash final red hidden as green",
+      "green": "Keep baseline red; actual native TWO COMPLETED schema3 cycles per Node: P/P+1 overlap/P+2 final/P+3 overlap/P+4 final, C/C+1/C+2",
+      "status": "NOT_RUN",
+      "executionEvidence": null,
+      "implementationOwner": "Codex",
+      "requiredTask": "K2A-TRUST",
+      "futurePermission": "Isolated test-owned Linux/Engine/PG and ephemeral fixture keys ONLY after separate Root implementation grant; physical/private operations remain excluded",
+      "mutantPurpose": "Implement the exact original red alternative; require denial before effect or UNKNOWN_FORWARD_ONLY after uncertainty; paired original green must execute without skip"
+    },
+    {
+      "id": "A21",
+      "gates": [
+        "G4",
+        "G10"
+      ],
+      "red": "Old CP still authorized after final or wrong cert fingerprint narrowing",
+      "green": "Real mTLS new CP accepted and old CP rejected after each final; same CA/keys/epoch and bound policy hashes",
+      "status": "NOT_RUN",
+      "executionEvidence": null,
+      "implementationOwner": "Codex",
+      "requiredTask": "K2A-CURRENT",
+      "futurePermission": "Isolated test-owned Linux/Engine/PG and ephemeral fixture keys ONLY after separate Root implementation grant; physical/private operations remain excluded",
+      "mutantPurpose": "Implement the exact original red alternative; require denial before effect or UNKNOWN_FORWARD_ONLY after uncertainty; paired original green must execute without skip"
+    },
+    {
+      "id": "A22",
+      "gates": [
+        "G5",
+        "G10"
+      ],
+      "red": "Exact final retry recomputes P, rewinds overlap or discards/overwrites prior evidence",
+      "green": "Same-batch phase replay, partial/unknown/collision refusal and immutable finalized archive multi-cycle liveness",
+      "status": "NOT_RUN",
+      "executionEvidence": null,
+      "implementationOwner": "Codex",
+      "requiredTask": "K2B-EFFECTS",
+      "futurePermission": "Isolated test-owned Linux/Engine/PG and ephemeral fixture keys ONLY after separate Root implementation grant; physical/private operations remain excluded",
+      "mutantPurpose": "Implement the exact original red alternative; require denial before effect or UNKNOWN_FORWARD_ONLY after uncertainty; paired original green must execute without skip"
+    },
+    {
+      "id": "A23",
+      "gates": [
+        "G2",
+        "G7"
+      ],
+      "red": "One member fails but all-cohort inventory or renewal marked ready",
+      "green": "Explicit mixed migration states; no atomic inventory commit until both proofs; no renewal with missing member",
+      "status": "NOT_RUN",
+      "executionEvidence": null,
+      "implementationOwner": "Codex",
+      "requiredTask": "K2A-CURRENT",
+      "futurePermission": "Isolated test-owned Linux/Engine/PG and ephemeral fixture keys ONLY after separate Root implementation grant; physical/private operations remain excluded",
+      "mutantPurpose": "Implement the exact original red alternative; require denial before effect or UNKNOWN_FORWARD_ONLY after uncertainty; paired original green must execute without skip"
+    },
+    {
+      "id": "A24",
+      "gates": [
+        "G5",
+        "G9"
+      ],
+      "red": "Cleanup deletes Node/volume/backup or resets latch/claim/lock/old pending attempt",
+      "green": "All artifacts retained and old entries disabled; distinct new reviewed attempt/guard cannot erase old evidence",
+      "status": "NOT_RUN",
+      "executionEvidence": null,
+      "implementationOwner": "Codex",
+      "requiredTask": "K2B-EFFECTS",
+      "futurePermission": "Isolated test-owned Linux/Engine/PG and ephemeral fixture keys ONLY after separate Root implementation grant; physical/private operations remain excluded",
+      "mutantPurpose": "Implement the exact original red alternative; require denial before effect or UNKNOWN_FORWARD_ONLY after uncertainty; paired original green must execute without skip"
+    },
+    {
+      "id": "A25",
+      "gates": [
+        "G2",
+        "G10"
+      ],
+      "red": "Image Id/RepoDigest/config/diffID/archive/binary/source hashes swapped or missing offline RepoDigest treated as unsigned default",
+      "green": "Each distinct typed artifact resolves through real authenticated manifest/platform/config/layer/archive/build mapping; explicit proven offline absence only",
+      "status": "NOT_RUN",
+      "executionEvidence": null,
+      "implementationOwner": "Codex",
+      "requiredTask": "K2A-TRUST",
+      "futurePermission": "Isolated test-owned Linux/Engine/PG and ephemeral fixture keys ONLY after separate Root implementation grant; physical/private operations remain excluded",
+      "mutantPurpose": "Implement the exact original red alternative; require denial before effect or UNKNOWN_FORWARD_ONLY after uncertainty; paired original green must execute without skip"
+    },
+    {
+      "id": "A26",
+      "gates": [
+        "G2",
+        "G4"
+      ],
+      "red": "Valid signed M2 executable hash joined to wrong/unowned container/image/daemon or changed PID/start/restart generation",
+      "green": "Trusted owned image inspection before/after same nonce-bound M2 joins exact live container/process and published executable/image/source; process hash alone cannot prove image",
+      "status": "NOT_RUN",
+      "executionEvidence": null,
+      "implementationOwner": "Codex",
+      "requiredTask": "K2A-CURRENT",
+      "futurePermission": "Isolated test-owned Linux/Engine/PG and ephemeral fixture keys ONLY after separate Root implementation grant; physical/private operations remain excluded",
+      "mutantPurpose": "Implement the exact original red alternative; require denial before effect or UNKNOWN_FORWARD_ONLY after uncertainty; paired original green must execute without skip"
+    },
+    {
+      "id": "A27",
+      "gates": [
+        "G1",
+        "G7"
+      ],
+      "red": "Before/after Cmd argv/Entrypoint/live argv differs or any typed policy/floor/cert/SPKI/CA/signer/state identity hash differs",
+      "green": "Exact arrays and ordered hashes plus protected state and typed authority/scope equalities verified before inventory publish",
+      "status": "NOT_RUN",
+      "executionEvidence": null,
+      "implementationOwner": "Codex",
+      "requiredTask": "K2A-CURRENT",
+      "futurePermission": "Isolated test-owned Linux/Engine/PG and ephemeral fixture keys ONLY after separate Root implementation grant; physical/private operations remain excluded",
+      "mutantPurpose": "Implement the exact original red alternative; require denial before effect or UNKNOWN_FORWARD_ONLY after uncertainty; paired original green must execute without skip"
+    },
+    {
+      "id": "A28",
+      "gates": [
+        "G2",
+        "G9"
+      ],
+      "red": "Reader/producer/guard falls back to global agentImage/old manifest when typed runtime record absent/conflicting or consumes legacy report as provenance",
+      "green": "Closed reviewed consumer graph explicitly reads new authenticated per-Node record or blocks; out-of-scope legacy mutators remain excluded, historical reports unchanged",
+      "status": "NOT_RUN",
+      "executionEvidence": null,
+      "implementationOwner": "Codex",
+      "requiredTask": "K2A-TRUST",
+      "futurePermission": "Isolated test-owned Linux/Engine/PG and ephemeral fixture keys ONLY after separate Root implementation grant; physical/private operations remain excluded",
+      "mutantPurpose": "Implement the exact original red alternative; require denial before effect or UNKNOWN_FORWARD_ONLY after uncertainty; paired original green must execute without skip"
+    },
+    {
+      "id": "A29",
+      "findings": [
+        "R1"
+      ],
+      "gates": [
+        "G4",
+        "G7",
+        "G10"
+      ],
+      "red": "Retained migration backup rejected solely because no workspace label, or later current P/H/C/cert compared to historical migration baseline",
+      "green": "Real post-bootstrap M2 then later normal:3 TWO completed cycles succeed with exact typed owned journal, both retained stopped restart=no backup and current consumer, no backup delete; static predecessor stays fixed while legitimate current authority generation advances",
+      "status": "NOT_RUN",
+      "executionEvidence": null,
+      "implementationOwner": "Codex",
+      "requiredTask": "K2A-CURRENT",
+      "futurePermission": "Isolated test-owned Linux/Engine/PG and ephemeral fixture keys ONLY after separate Root implementation grant; physical/private operations remain excluded",
+      "mutantPurpose": "Implement the exact original red alternative; require denial before effect or UNKNOWN_FORWARD_ONLY after uncertainty; paired original green must execute without skip"
+    },
+    {
+      "id": "A30",
+      "findings": [
+        "R1"
+      ],
+      "gates": [
+        "G5",
+        "G7"
+      ],
+      "red": "Unrecorded/label-only/workspace-only extra, wrong journal schema/owner/fence/phase/current or backup ID/name/frozen inspect/volume, duplicate/third consumer, backup running or restart policy not no",
+      "green": "Only exact private owner/journal/immutable-event/common-fence verified typed migration predecessor admitted; every other consumer refused without removal or label workaround",
+      "status": "NOT_RUN",
+      "executionEvidence": null,
+      "implementationOwner": "Codex",
+      "requiredTask": "K2B-EFFECTS",
+      "futurePermission": "Isolated test-owned Linux/Engine/PG and ephemeral fixture keys ONLY after separate Root implementation grant; physical/private operations remain excluded",
+      "mutantPurpose": "Implement the exact original red alternative; require denial before effect or UNKNOWN_FORWARD_ONLY after uncertainty; paired original green must execute without skip"
+    },
+    {
+      "id": "A31",
+      "findings": [
+        "R2"
+      ],
+      "gates": [
+        "G5",
+        "G9"
+      ],
+      "red": "Any generic repair/prepare/finish/start/workspace/storage/recopy/direct-function mutator acts with nonterminal OR terminal migration marker, leaf markers absent, alternate bundle directory, boolean override or one-shot precheck",
+      "green": "Named common coded guard resolves trusted worker root and holds operation fence before first effect in every listed entrypoint; raw/unpatched allowed launch surface keeps HOLD; normal:3 new leased interface still works",
+      "status": "NOT_RUN",
+      "executionEvidence": null,
+      "implementationOwner": "Codex",
+      "requiredTask": "K2B-EFFECTS",
+      "futurePermission": "Isolated test-owned Linux/Engine/PG and ephemeral fixture keys ONLY after separate Root implementation grant; physical/private operations remain excluded",
+      "mutantPurpose": "Implement the exact original red alternative; require denial before effect or UNKNOWN_FORWARD_ONLY after uncertainty; paired original green must execute without skip"
+    },
+    {
+      "id": "A32",
+      "findings": [
+        "N1"
+      ],
+      "gates": [
+        "G4",
+        "G6",
+        "G10"
+      ],
+      "red": "Legacy servingProcessSHA256 raw cmdline or SameFile-only proof used as executable bytes, v1/missing new signed field accepted, process/executable changes during read",
+      "green": "Desired actual compiled v2 signs separate servingExecutableSHA256 bytes with same-file UID/live PID1 scope; strict new schema/domain verifier joins published executable; old v1 meaning preserved but cannot satisfy new proof",
+      "status": "NOT_RUN",
+      "executionEvidence": null,
+      "implementationOwner": "Codex",
+      "requiredTask": "K2A-TRUST",
+      "futurePermission": "Isolated test-owned Linux/Engine/PG and ephemeral fixture keys ONLY after separate Root implementation grant; physical/private operations remain excluded",
+      "mutantPurpose": "Implement the exact original red alternative; require denial before effect or UNKNOWN_FORWARD_ONLY after uncertainty; paired original green must execute without skip"
+    },
+    {
+      "id": "A33",
+      "findings": [
+        "R4"
+      ],
+      "gates": [
+        "G1",
+        "G4"
+      ],
+      "red": "Unknown/unrecorded/foreign M2 ExecID, missing actual ExecCreate ID, changed process or ambiguous ExecInspect outcome, arbitrary volatile ignore",
+      "green": "Exact observer Engine ExecID recorded before start under guard/nonce/current ID; bounded before/during/after ExecIDs match frozen Engine rules and finished exit0 proof; all other state remains stable",
+      "status": "NOT_RUN",
+      "executionEvidence": null,
+      "implementationOwner": "Codex",
+      "requiredTask": "K2A-CURRENT",
+      "futurePermission": "Isolated test-owned Linux/Engine/PG and ephemeral fixture keys ONLY after separate Root implementation grant; physical/private operations remain excluded",
+      "mutantPurpose": "Implement the exact original red alternative; require denial before effect or UNKNOWN_FORWARD_ONLY after uncertainty; paired original green must execute without skip"
+    },
+    {
+      "id": "A34",
+      "findings": [
+        "R4"
+      ],
+      "gates": [
+        "G1",
+        "G10"
+      ],
+      "red": "New image inherited Entrypoint/Env/Labels/User/WorkingDir or other runtime Config differs but container overrides hide it",
+      "green": "Actual old/new image Config exact required fields, same frozen scratch/COPY/ENTRYPOINT recipe plus new published binary only; no override masking or provenance labels altering inherited defaults",
+      "status": "NOT_RUN",
+      "executionEvidence": null,
+      "implementationOwner": "Codex",
+      "requiredTask": "K2B-EFFECTS",
+      "futurePermission": "Isolated test-owned Linux/Engine/PG and ephemeral fixture keys ONLY after separate Root implementation grant; physical/private operations remain excluded",
+      "mutantPurpose": "Implement the exact original red alternative; require denial before effect or UNKNOWN_FORWARD_ONLY after uncertainty; paired original green must execute without skip"
+    },
+    {
+      "id": "A35",
+      "findings": [
+        "N2"
+      ],
+      "gates": [
+        "G2",
+        "G4"
+      ],
+      "red": "Canonical JSON argv SHA directly compared to raw NUL cmdline SHA, all trailing NULs stripped, Unicode/empty arg/order/Entrypoint lost",
+      "green": "Exact strict UTF8/no embedded NUL mapping, remove one terminator only, preserve empty args; independent Cmd/Entrypoint/full argv JSON hashes and signed raw cmdline hash each compared in own domain",
+      "status": "NOT_RUN",
+      "executionEvidence": null,
+      "implementationOwner": "Codex",
+      "requiredTask": "K2A-CURRENT",
+      "futurePermission": "Isolated test-owned Linux/Engine/PG and ephemeral fixture keys ONLY after separate Root implementation grant; physical/private operations remain excluded",
+      "mutantPurpose": "Implement the exact original red alternative; require denial before effect or UNKNOWN_FORWARD_ONLY after uncertainty; paired original green must execute without skip"
+    },
+    {
+      "id": "A36",
+      "findings": [
+        "R1",
+        "R2"
+      ],
+      "gates": [
+        "G4",
+        "G7",
+        "G9"
+      ],
+      "red": "Bootstrap M2 demands terminal inventory before it can be produced, or later normal:3 requires a dead migration-owner lease forever",
+      "green": "Held migration lease plus exact new-start intent admits bootstrap observation only; immutable terminal seal plus a fresh common normal:3 operation lease admits later observation/rotation; generic terminal helpers stay denied",
+      "status": "NOT_RUN",
+      "executionEvidence": null,
+      "implementationOwner": "Codex",
+      "requiredTask": "K2A-CURRENT",
+      "futurePermission": "Isolated test-owned Linux/Engine/PG and ephemeral fixture keys ONLY after separate Root implementation grant; physical/private operations remain excluded",
+      "mutantPurpose": "Implement the exact original red alternative; require denial before effect or UNKNOWN_FORWARD_ONLY after uncertainty; paired original green must execute without skip"
+    },
+    {
+      "id": "A37",
+      "findings": [
+        "C1"
+      ],
+      "gates": [
+        "G5",
+        "G9"
+      ],
+      "red": "Register-LeafRenewalTask.ps1 creates/re-registers a task outside three disabled IDs or old Invoke/Scheduled runner executes in any migration phase",
+      "green": "Actual coded common fence explicitly DENIES all three scheduler surfaces including registration, direct invocation and new names; no side effect before denial",
+      "status": "NOT_RUN",
+      "executionEvidence": null,
+      "implementationOwner": "Codex",
+      "requiredTask": "K2B-EFFECTS",
+      "futurePermission": "Isolated test-owned Linux/Engine/PG and ephemeral fixture keys ONLY after separate Root implementation grant; physical/private operations remain excluded",
+      "mutantPurpose": "Implement the exact original red alternative; require denial before effect or UNKNOWN_FORWARD_ONLY after uncertainty; paired original green must execute without skip"
+    },
+    {
+      "id": "A38",
+      "findings": [
+        "C3"
+      ],
+      "gates": [
+        "G5",
+        "G7"
+      ],
+      "red": "Second binary migration/new migration ID or target attempts predecessor deletion/replacement/rotation or third consumer",
+      "green": "BLOCK until separately reviewed design; immutable first predecessor retained; exact first-plan resume and approved normal:3 leaf renewals remain distinct",
+      "status": "NOT_RUN",
+      "executionEvidence": null,
+      "implementationOwner": "Codex",
+      "requiredTask": "K2B-EFFECTS",
+      "futurePermission": "Isolated test-owned Linux/Engine/PG and ephemeral fixture keys ONLY after separate Root implementation grant; physical/private operations remain excluded",
+      "mutantPurpose": "Implement the exact original red alternative; require denial before effect or UNKNOWN_FORWARD_ONLY after uncertainty; paired original green must execute without skip"
+    },
+    {
+      "id": "A39",
+      "findings": [
+        "C2"
+      ],
+      "gates": [
+        "G4",
+        "G6",
+        "G10"
+      ],
+      "red": "V2 producer/verifier differ on nonASCII/HTML/control/U2028/U2029/supplementary Unicode, ASCII-only workaround, body newline or global old-signature normalization",
+      "green": "Actual Go and Python v2 cross-language golden body/domain-message byte and digest agreement; strict Unicode; no v1/outer receipt/CP commit byte rewrite",
+      "status": "NOT_RUN",
+      "executionEvidence": null,
+      "implementationOwner": "Codex",
+      "requiredTask": "K2A-TRUST",
+      "futurePermission": "Isolated test-owned Linux/Engine/PG and ephemeral fixture keys ONLY after separate Root implementation grant; physical/private operations remain excluded",
+      "mutantPurpose": "Implement the exact original red alternative; require denial before effect or UNKNOWN_FORWARD_ONLY after uncertainty; paired original green must execute without skip"
+    },
+    {
+      "id": "A40",
+      "findings": [
+        "C2"
+      ],
+      "gates": [
+        "G2",
+        "G4"
+      ],
+      "red": "Encoding negatives lack exact input or invalid UTF8/surrogate/argv NUL is normalized/accepted; JSON/raw domains mixed",
+      "green": "Published E04-E07 inputs/output-absence expectations/input digests independently reproduced; actual implementations reject each applicable invalid case; synthetic fixtures never become runtime provenance",
+      "status": "NOT_RUN",
+      "executionEvidence": null,
+      "implementationOwner": "Codex",
+      "requiredTask": "K2A-TRUST",
+      "futurePermission": "Isolated test-owned Linux/Engine/PG and ephemeral fixture keys ONLY after separate Root implementation grant; physical/private operations remain excluded",
+      "mutantPurpose": "Implement the exact original red alternative; require denial before effect or UNKNOWN_FORWARD_ONLY after uncertainty; paired original green must execute without skip"
+    }
+  ],
+  "caseExecutionCount": 0,
+  "documentGreenNotRuntimeGreen": true
+}

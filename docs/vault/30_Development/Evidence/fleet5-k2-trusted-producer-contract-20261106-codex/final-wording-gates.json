@@ -1,0 +1,27 @@
+{
+  "runs": [
+    {
+      "argv": [
+        "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+        "-B",
+        "docs\\vault\\30_Development\\Evidence\\fleet5-k2-trusted-producer-contract-20261106-codex\\validate_static_contract.py.txt"
+      ],
+      "exit": 0,
+      "startedKST": "2026-11-06T10:48:31.850573+09:00",
+      "endedKST": "2026-11-06T10:48:38.390567+09:00",
+      "log": "final-static_contract.log"
+    },
+    {
+      "argv": [
+        "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+        "-B",
+        "tools/check_docs.py"
+      ],
+      "exit": 0,
+      "startedKST": "2026-11-06T10:48:38.391121+09:00",
+      "endedKST": "2026-11-06T10:48:41.721867+09:00",
+      "log": "final-check_docs.log"
+    }
+  ],
+  "sourceChanges": "NONE; owner contract/history wording only"
+}

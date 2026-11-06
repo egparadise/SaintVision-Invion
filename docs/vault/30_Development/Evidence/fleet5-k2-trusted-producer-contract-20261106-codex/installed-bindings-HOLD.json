@@ -1,0 +1,64 @@
+{
+  "status": "UNKNOWN_HOLD",
+  "classification": "NONEXECUTING",
+  "actual": {
+    "registryAuthentication": null,
+    "workerRootTrustInstallation": null,
+    "CPTrustInstallation": null,
+    "ownerCustody": null,
+    "CAOfflinePolicy": null,
+    "RootReadiness": null,
+    "rootPlanAnchors": null,
+    "rootFenceAnchors": null,
+    "rootSealAnchors": null,
+    "cpInventoryAnchors": null,
+    "hostHelperAnchors": null,
+    "nodeCohortPublicDERCAIdentityRegistration": null,
+    "reviewerGrantRegistration": null,
+    "currentPublicationRegistry": null,
+    "certificateNonrevocationSource": null,
+    "historicalOperationArchive": null,
+    "historicalChallengeArchive": null,
+    "liveCohortFenceAuthority": null,
+    "authenticatedClockSource": null,
+    "clockMaximumUncertaintySeconds": null,
+    "K2TargetSource": null,
+    "K2TargetBinarySHA256": null,
+    "K2TargetImage": null,
+    "K2TargetHelperClosure": null,
+    "K2TargetRuntimeLock": null,
+    "K2TargetManifest": null,
+    "K2TargetReview": null,
+    "K2TargetCI": null,
+    "K2InstalledReceipt": null,
+    "K2RollbackContract": null,
+    "operatorWindow": null,
+    "actualValidityDeadlines": null,
+    "PC1AuthenticationReadiness": null,
+    "PC3GroupReadiness": null
+  },
+  "reportedContextOnly": {
+    "engineRequiredAPI": "1.45",
+    "Docker5MeasuredAPI": "1.41",
+    "separateKernelLinuxVM": "RESOURCE_UNAVAILABLE",
+    "resourceSnapshot": {
+      "memoryUsagePercent": 97,
+      "availableMiB": 482,
+      "freshRemeasurementPerformed": false
+    },
+    "oldTwoNodeSnapshot2034": {
+      "unsigned": true,
+      "floor": 1,
+      "activePolicyHashMatched": true,
+      "M2Proof": false,
+      "productionRenewalSafety": false
+    },
+    "oldTwoIdentitiesAreAllFive": false
+  },
+  "observedK1CIBinaryNotInstalledTarget": {
+    "source": "eb32b211ab3704935b9431747089ab0715582a74",
+    "sha256": "2aa70e1f42992790700a53b0989dfa1800785227021de9f7b0e13436be33fb8a"
+  },
+  "allOriginalRuntimeCases": "NOT_RUN",
+  "effectAuthorityGranted": false
+}

@@ -1,0 +1,139 @@
+{
+  "runs": [
+    {
+      "argv": [
+        "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+        "-B",
+        "docs\\vault\\30_Development\\Evidence\\fleet5-k2-trusted-producer-contract-20261106-codex\\validate_static_contract.py.txt"
+      ],
+      "exit": 0,
+      "startedKST": "2026-11-06T10:45:24.541988+09:00",
+      "endedKST": "2026-11-06T10:45:31.044262+09:00",
+      "log": "gate-01-static_contract.log"
+    },
+    {
+      "argv": [
+        "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+        "-B",
+        "tools/check_docs.py"
+      ],
+      "exit": 0,
+      "startedKST": "2026-11-06T10:45:31.057652+09:00",
+      "endedKST": "2026-11-06T10:45:49.066680+09:00",
+      "log": "gate-02-check_docs.log"
+    },
+    {
+      "argv": [
+        "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+        "-B",
+        "tools/check_ontology_generation.py"
+      ],
+      "exit": 0,
+      "startedKST": "2026-11-06T10:45:49.067098+09:00",
+      "endedKST": "2026-11-06T10:45:51.339444+09:00",
+      "log": "gate-03-check_ontology_generation.log"
+    },
+    {
+      "argv": [
+        "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+        "-B",
+        "tools/check_ontology.py"
+      ],
+      "exit": 0,
+      "startedKST": "2026-11-06T10:45:51.339810+09:00",
+      "endedKST": "2026-11-06T10:45:53.193550+09:00",
+      "log": "gate-04-check_ontology.log"
+    },
+    {
+      "argv": [
+        "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+        "-B",
+        "tools/check_contract_bindings.py"
+      ],
+      "exit": 0,
+      "startedKST": "2026-11-06T10:45:53.193924+09:00",
+      "endedKST": "2026-11-06T10:46:05.513536+09:00",
+      "log": "gate-05-check_contract_bindings.log"
+    },
+    {
+      "argv": [
+        "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+        "-B",
+        "tools/check_frontend_integrity.py"
+      ],
+      "exit": 0,
+      "startedKST": "2026-11-06T10:46:05.513989+09:00",
+      "endedKST": "2026-11-06T10:46:06.883171+09:00",
+      "log": "gate-06-check_frontend_integrity.log"
+    },
+    {
+      "argv": [
+        "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+        "-B",
+        "tools/check_doc_path_citations.py",
+        "--ratchet",
+        "--base-ref",
+        "eb32b211ab3704935b9431747089ab0715582a74"
+      ],
+      "exit": 0,
+      "startedKST": "2026-11-06T10:46:06.883558+09:00",
+      "endedKST": "2026-11-06T10:46:11.580835+09:00",
+      "log": "gate-07-check_doc_path_citations.log"
+    },
+    {
+      "argv": [
+        "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+        "-B",
+        "tools/check_doc_single_source.py",
+        "--ratchet"
+      ],
+      "exit": 0,
+      "startedKST": "2026-11-06T10:46:11.604939+09:00",
+      "endedKST": "2026-11-06T10:46:12.156876+09:00",
+      "log": "gate-08-check_doc_single_source.log"
+    },
+    {
+      "argv": [
+        "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+        "-B",
+        "tools/test_sync.py"
+      ],
+      "exit": 0,
+      "startedKST": "2026-11-06T10:46:12.157333+09:00",
+      "endedKST": "2026-11-06T10:46:17.027205+09:00",
+      "log": "gate-09-test_sync.log"
+    },
+    {
+      "argv": [
+        "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+        "-B",
+        "tools/build_docs.py"
+      ],
+      "exit": 0,
+      "startedKST": "2026-11-06T10:46:17.027593+09:00",
+      "endedKST": "2026-11-06T10:46:23.405941+09:00",
+      "log": "gate-10-build_docs.log"
+    },
+    {
+      "argv": [
+        "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+        "-B",
+        "tools/sync_obsidian.py",
+        "--check",
+        "--state",
+        "D:\\Project\\SaintVision-Invion\\SaintVisionI-Invion\\.git\\obsidian-sync-state.json"
+      ],
+      "exit": 0,
+      "startedKST": "2026-11-06T10:46:23.406397+09:00",
+      "endedKST": "2026-11-06T10:46:30.426097+09:00",
+      "log": "gate-11-sync_obsidian.log",
+      "canonicalStateSHA256Before": "131d015910d6be4f7211e2445a3f3c0b653d0211c6e0caa9dc0c76e4504b590b",
+      "canonicalStateSHA256After": "131d015910d6be4f7211e2445a3f3c0b653d0211c6e0caa9dc0c76e4504b590b",
+      "unchanged": true,
+      "authority": "explicit successor task sync path",
+      "noApplyAdoptResolve": true
+    }
+  ],
+  "classification": "STATIC_DOC_GATES_NOT_RUNTIME",
+  "noObsidianApply": true
+}

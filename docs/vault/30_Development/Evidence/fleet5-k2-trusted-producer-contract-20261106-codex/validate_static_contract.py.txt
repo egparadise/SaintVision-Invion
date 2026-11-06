@@ -1,0 +1,92 @@
+"""Validate proposal consistency only. No crypto/runtime/producer acceptance.
+
+Uses public Git objects and these owner documents; no network, key, DB, Engine,
+schedule or runtime state access. Exit0 never grants effect authority.
+"""
+import hashlib
+import json
+from pathlib import Path
+import re
+import subprocess
+import sys
+
+from jsonschema import Draft202012Validator
+
+ROOT=Path(__file__).resolve().parent
+BASE='eb32b211ab3704935b9431747089ab0715582a74'
+def read(name): return json.loads((ROOT/name).read_text(encoding='utf-8'))
+def raw(source,path): return subprocess.check_output(['git','show',source+':'+path])
+def sha(b): return hashlib.sha256(b).hexdigest()
+inventory=read('trusted-input-field-inventory.json')
+matrix=read('producer-matrix.json')
+expected={n+'.'+f for n,fs in inventory['types'].items() for f in fs}
+source=raw(BASE,'services/node-agent/migrationverify/trust.go').decode('utf-8')
+actual=set()
+for name in inventory['types']:
+    body=re.search(r'type '+name+r' struct\s*\{(.*?)\}',source,re.S).group(1)
+    for line in body.splitlines():
+        match=re.match(r'\s*([A-Z]\w*(?:\s*,\s*[A-Z]\w*)*)\s+',line)
+        if match:actual.update(name+'.'+x.strip() for x in match[1].split(','))
+assert actual==expected and len(expected)==73 and len(inventory['types'])==13
+covered={f for r in matrix['rows'] for f in r['inputs'] if not f.startswith('@')}
+assert covered==expected and len(matrix['rows'])==19
+for row in matrix['rows']:
+    for field in ('independentlyRequiredAuthority','validation','containingTransaction','currentReadback','onFailure'):
+        assert isinstance(row[field],str) and len(row[field])>10
+    assert row['untrustedCallerMaySupplyAuthority'] is False
+    assert row['existingDeployedAuthenticatedProducer']=='UNKNOWN_HOLD'
+    for ref in row['existingSource']:
+        assert ref['source']==BASE and raw(BASE,ref['path'])
+inspection=read('source-inspection.json')
+for entry in inspection['files']:
+    assert sha(raw(BASE,entry['path']))==entry['rawSHA256']
+assert inspection['K1PackageChangesSinceReviewed56651']==['services/node-agent/migrationverify/README.md']
+assert len(inspection['helperClosure']['sevenFileClosure'])==7
+catalog=read('existing-proof-contract-catalog.json')['contracts']
+assert len(catalog)==28
+assert sum(x['codec']=='native-m2-v2' for x in catalog)==1
+assert sum(x['codec']=='normalized-proof-v1' for x in catalog)==27
+
+cases=read('future-runtime-A01-A40.json')
+original_raw=raw(cases['originalSource'],cases['originalPath'])
+assert sha(original_raw)==cases['originalRawSHA256']
+original=json.loads(original_raw)['cases']
+assert [c['id'] for c in cases['cases']]==[f'A{i:02d}' for i in range(1,41)]
+for old,new in zip(original,cases['cases']):
+    assert all(new[k]==v for k,v in old.items()),old['id']
+    assert new['status']=='NOT_RUN' and new['executionEvidence'] is None
+    assert new['implementationOwner']=='Codex'
+assert cases['caseExecutionCount']==0
+bindings=read('installed-bindings-HOLD.json')
+assert bindings['status']=='UNKNOWN_HOLD' and all(v is None for v in bindings['actual'].values())
+assert bindings['effectAuthorityGranted'] is False
+schema=read('failure-examples.schema.json')
+Draft202012Validator.check_schema(schema)
+examples=read('failure-examples.json')
+Draft202012Validator(schema).validate(examples)
+assert len({x['id'] for x in examples['examples']})==len(examples['examples'])==18
+authority=read('authority-and-effect-gates.json')
+assert all(x['expectedRefusal'] in authority['errorCatalog'] for x in examples['examples'])
+assert all(x['onFailure'] in authority['errorCatalog'] for x in matrix['rows'])
+assert authority['SnapshotToken']['authorizesEffects'] is False
+assert authority['noIOBehindHeldDBRowLocks'] is True
+assert authority['noTTLOwnershipTakeoverWithUnknownIntent'] is True
+assert len(authority['RootDecisions'])==4 and all(d['status']=='HOLD' for d in authority['RootDecisions'])
+assert authority['newWireOrSignerAccepted'] is False
+
+# Deliberately malformed STATIC documents must fail closed schema validation.
+bad=dict(examples,unrecognizedAuthorityFlag=True)
+assert list(Draft202012Validator(schema).iter_errors(bad))
+bad=json.loads(json.dumps(examples));bad['runtimeExecutions']=1
+assert list(Draft202012Validator(schema).iter_errors(bad))
+bad=json.loads(json.dumps(examples));bad['examples'][0]['actualExecution']='PASS'
+assert list(Draft202012Validator(schema).iter_errors(bad))
+bad=json.loads(json.dumps(examples));bad['examples'][0]['effectDisposition']='ALLOW'
+assert list(Draft202012Validator(schema).iter_errors(bad))
+
+print(json.dumps({'classification':'STATIC_CONTRACT_CONSISTENCY_ONLY','declaredFieldsCovered':73,
+    'producerRows':19,'unchangedProofContracts':28,'unchangedSevenFileHelperClosure':7,
+    'originalRuntimeCaseIDsAndRedGreenPreserved':40,'normativeFailureExamples':18,
+    'malformedStaticDocumentNegativesRejected':4,'runtimeCasesExecuted':0,
+    'actualCryptoOrTrustedProducerExecution':False,'allActualBindingsNullHOLD':True,
+    'effectAuthorityGranted':False},indent=2))

@@ -1,0 +1,656 @@
+{
+  "source": "eb32b211ab3704935b9431747089ab0715582a74",
+  "references": [
+    {
+      "recipe": "build-provenance",
+      "source": "aliases",
+      "pointer": "/componentId"
+    },
+    {
+      "recipe": "build-provenance",
+      "source": "product",
+      "pointer": "/sourceSHA"
+    },
+    {
+      "recipe": "build-provenance",
+      "source": "product",
+      "pointer": "/artifactSHA256"
+    },
+    {
+      "recipe": "ci-attestation",
+      "source": "aliases",
+      "pointer": "/componentId"
+    },
+    {
+      "recipe": "ci-attestation",
+      "source": "ci",
+      "pointer": "/repository"
+    },
+    {
+      "recipe": "ci-attestation",
+      "source": "ci",
+      "pointer": "/workflow"
+    },
+    {
+      "recipe": "ci-attestation",
+      "source": "ci",
+      "pointer": "/headSHA"
+    },
+    {
+      "recipe": "ci-attestation",
+      "source": "ci",
+      "pointer": "/ref"
+    },
+    {
+      "recipe": "ci-attestation",
+      "source": "ci",
+      "pointer": "/event"
+    },
+    {
+      "recipe": "ci-attestation",
+      "source": "ci",
+      "pointer": "/runId"
+    },
+    {
+      "recipe": "ci-attestation",
+      "source": "ci",
+      "pointer": "/runAttempt"
+    },
+    {
+      "recipe": "ci-attestation",
+      "source": "ci",
+      "pointer": "/artifactSHA256"
+    },
+    {
+      "recipe": "independent-code-review",
+      "source": "aliases",
+      "pointer": "/componentId"
+    },
+    {
+      "recipe": "independent-code-review",
+      "source": "product",
+      "pointer": "/sourceSHA"
+    },
+    {
+      "recipe": "independent-code-review",
+      "source": "product",
+      "pointer": "/artifactSHA256"
+    },
+    {
+      "recipe": "independent-code-review",
+      "source": "product",
+      "pointer": "/independentReview/authorId"
+    },
+    {
+      "recipe": "independent-code-review",
+      "source": "product",
+      "pointer": "/independentReview/reviewerId"
+    },
+    {
+      "recipe": "image-distribution",
+      "source": "plan",
+      "pointer": "/acceptedP0/sourceSHA"
+    },
+    {
+      "recipe": "image-distribution",
+      "source": "image",
+      "pointer": "/dockerImageId"
+    },
+    {
+      "recipe": "image-distribution",
+      "source": "image",
+      "pointer": "/platformManifestDigest"
+    },
+    {
+      "recipe": "image-distribution",
+      "source": "image",
+      "pointer": "/configDigest"
+    },
+    {
+      "recipe": "image-distribution",
+      "source": "image",
+      "pointer": "/archiveSHA256"
+    },
+    {
+      "recipe": "image-distribution",
+      "source": "image",
+      "pointer": "/executableSHA256"
+    },
+    {
+      "recipe": "native-two-cycle",
+      "source": "plan",
+      "pointer": "/acceptedP0/sourceSHA"
+    },
+    {
+      "recipe": "native-two-cycle",
+      "source": "image",
+      "pointer": "/executableSHA256"
+    },
+    {
+      "recipe": "native-two-cycle",
+      "source": "facts",
+      "pointer": "/nativeFixtureCohortSHA256"
+    },
+    {
+      "recipe": "old-new-no-write",
+      "source": "plan",
+      "pointer": "/acceptedP0/sourceSHA"
+    },
+    {
+      "recipe": "old-new-no-write",
+      "source": "image",
+      "pointer": "/executableSHA256"
+    },
+    {
+      "recipe": "old-new-no-write",
+      "source": "facts",
+      "pointer": "/compatibilityFixtureSHA256"
+    },
+    {
+      "recipe": "m2-capability",
+      "source": "plan",
+      "pointer": "/acceptedP0/sourceSHA"
+    },
+    {
+      "recipe": "m2-capability",
+      "source": "image",
+      "pointer": "/executableSHA256"
+    },
+    {
+      "recipe": "g2-planning-policy",
+      "source": "aliases",
+      "pointer": "/cohortScopesSHA256"
+    },
+    {
+      "recipe": "g2-planning-policy",
+      "source": "policy",
+      "pointer": "/allowedRegistrySHA256"
+    },
+    {
+      "recipe": "independent-plan-review",
+      "source": "plan",
+      "pointer": "/planSubjectSHA256"
+    },
+    {
+      "recipe": "root-publication-intent",
+      "source": "plan",
+      "pointer": "/planSubjectSHA256"
+    },
+    {
+      "recipe": "schedule-disabled-readback",
+      "source": "aliases",
+      "pointer": "/cohortScopesSHA256"
+    },
+    {
+      "recipe": "schedule-disabled-readback",
+      "source": "facts",
+      "pointer": "/scheduleIds"
+    },
+    {
+      "recipe": "schedule-disabled-readback",
+      "source": "facts",
+      "pointer": "/scheduleConfigsAndTargetsSHA256"
+    },
+    {
+      "recipe": "launch-surface-inventory",
+      "source": "aliases",
+      "pointer": "/cohortScopesSHA256"
+    },
+    {
+      "recipe": "launch-surface-inventory",
+      "source": "facts",
+      "pointer": "/registeredSurfacesSHA256"
+    },
+    {
+      "recipe": "launch-surface-inventory",
+      "source": "facts",
+      "pointer": "/observedSurfaceSetSHA256"
+    },
+    {
+      "recipe": "no-overlap",
+      "source": "aliases",
+      "pointer": "/cohortScopesSHA256"
+    },
+    {
+      "recipe": "no-overlap",
+      "source": "facts",
+      "pointer": "/migrationOperationId"
+    },
+    {
+      "recipe": "inventory-head-readback",
+      "source": "facts",
+      "pointer": "/cohortId"
+    },
+    {
+      "recipe": "inventory-head-readback",
+      "source": "head",
+      "pointer": "/presence"
+    },
+    {
+      "recipe": "inventory-head-readback",
+      "source": "head",
+      "pointer": "/envelopeSHA256"
+    },
+    {
+      "recipe": "inventory-head-readback",
+      "source": "facts",
+      "pointer": "/cpInventoryRegistrationSHA256"
+    },
+    {
+      "recipe": "root-execution-decision",
+      "source": "aliases",
+      "pointer": "/finalPlanEnvelopeSHA256"
+    },
+    {
+      "recipe": "root-execution-decision",
+      "source": "body",
+      "pointer": "/operationId"
+    },
+    {
+      "recipe": "root-execution-decision",
+      "source": "plan",
+      "pointer": "/migrationId"
+    },
+    {
+      "recipe": "process-quiescence",
+      "source": "input",
+      "pointer": "/scope"
+    },
+    {
+      "recipe": "process-quiescence",
+      "source": "input",
+      "pointer": "/oldContainer/daemonIdentitySHA256"
+    },
+    {
+      "recipe": "process-quiescence",
+      "source": "body",
+      "pointer": "/arguments/oldContainerId"
+    },
+    {
+      "recipe": "process-quiescence",
+      "source": "input",
+      "pointer": "/volume/metadataSHA256"
+    },
+    {
+      "recipe": "process-quiescence",
+      "source": "body",
+      "pointer": "/operationId"
+    },
+    {
+      "recipe": "process-quiescence",
+      "source": "body",
+      "pointer": "/expectedFenceEpoch"
+    },
+    {
+      "recipe": "node-floor-v2",
+      "source": "input",
+      "pointer": "/scope"
+    },
+    {
+      "recipe": "node-floor-v2",
+      "source": "nodeFacts",
+      "pointer": "/observerNonce"
+    },
+    {
+      "recipe": "node-floor-v2",
+      "source": "input",
+      "pointer": "/authority/nodeLeafDERSHA256"
+    },
+    {
+      "recipe": "node-floor-v2",
+      "source": "input",
+      "pointer": "/floor/version"
+    },
+    {
+      "recipe": "node-floor-v2",
+      "source": "input",
+      "pointer": "/floor/policySHA256"
+    },
+    {
+      "recipe": "node-floor-v2",
+      "source": "input",
+      "pointer": "/floor/floorRawSHA256"
+    },
+    {
+      "recipe": "node-floor-v2",
+      "source": "input",
+      "pointer": "/floor/journalIdentitySHA256"
+    },
+    {
+      "recipe": "node-floor-v2",
+      "source": "input",
+      "pointer": "/floor/journalUID"
+    },
+    {
+      "recipe": "node-floor-v2",
+      "source": "image",
+      "pointer": "/executableSHA256"
+    },
+    {
+      "recipe": "node-floor-v2",
+      "source": "input",
+      "pointer": "/rawServingCmdlineSHA256"
+    },
+    {
+      "recipe": "unchanged-mtls",
+      "source": "input",
+      "pointer": "/scope"
+    },
+    {
+      "recipe": "unchanged-mtls",
+      "source": "input",
+      "pointer": "/channel/version"
+    },
+    {
+      "recipe": "unchanged-mtls",
+      "source": "input",
+      "pointer": "/authority/nodeLeafDERSHA256"
+    },
+    {
+      "recipe": "unchanged-mtls",
+      "source": "input",
+      "pointer": "/authority/controlLeafDERSHA256"
+    },
+    {
+      "recipe": "unchanged-mtls",
+      "source": "input",
+      "pointer": "/channel/endpoint"
+    },
+    {
+      "recipe": "unchanged-mtls",
+      "source": "input",
+      "pointer": "/authority"
+    },
+    {
+      "recipe": "protected-tree-equality",
+      "source": "input",
+      "pointer": "/scope"
+    },
+    {
+      "recipe": "protected-tree-equality",
+      "source": "input",
+      "pointer": "/volume/metadataSHA256"
+    },
+    {
+      "recipe": "protected-tree-equality",
+      "source": "input",
+      "pointer": "/volume/protectedTreeSHA256"
+    },
+    {
+      "recipe": "protected-tree-equality",
+      "source": "current",
+      "pointer": "/volume/protectedTreeSHA256"
+    },
+    {
+      "recipe": "protected-tree-equality",
+      "source": "aliases",
+      "pointer": "/operationId"
+    },
+    {
+      "recipe": "owned-engine-exec",
+      "source": "input",
+      "pointer": "/scope"
+    },
+    {
+      "recipe": "owned-engine-exec",
+      "source": "current",
+      "pointer": "/currentContainer/daemonIdentitySHA256"
+    },
+    {
+      "recipe": "owned-engine-exec",
+      "source": "current",
+      "pointer": "/currentContainer/id"
+    },
+    {
+      "recipe": "owned-engine-exec",
+      "source": "nodeFacts",
+      "pointer": "/execId"
+    },
+    {
+      "recipe": "owned-engine-exec",
+      "source": "nodeFacts",
+      "pointer": "/observerArgv"
+    },
+    {
+      "recipe": "owned-engine-exec",
+      "source": "input",
+      "pointer": "/floor/journalUID"
+    },
+    {
+      "recipe": "runtime-inspection-before",
+      "source": "input",
+      "pointer": "/scope"
+    },
+    {
+      "recipe": "runtime-inspection-before",
+      "source": "current",
+      "pointer": "/currentContainer/daemonIdentitySHA256"
+    },
+    {
+      "recipe": "runtime-inspection-before",
+      "source": "current",
+      "pointer": "/currentContainer/id"
+    },
+    {
+      "recipe": "runtime-inspection-before",
+      "source": "current",
+      "pointer": "/currentContainer/imageId"
+    },
+    {
+      "recipe": "runtime-inspection-before",
+      "source": "current",
+      "pointer": "/currentContainer/configSHA256"
+    },
+    {
+      "recipe": "runtime-inspection-before",
+      "source": "current",
+      "pointer": "/currentContainer/mountsSHA256"
+    },
+    {
+      "recipe": "runtime-inspection-before",
+      "source": "nodeFacts",
+      "pointer": "/processGenerationSHA256"
+    },
+    {
+      "recipe": "runtime-inspection-after",
+      "source": "input",
+      "pointer": "/scope"
+    },
+    {
+      "recipe": "runtime-inspection-after",
+      "source": "current",
+      "pointer": "/currentContainer/daemonIdentitySHA256"
+    },
+    {
+      "recipe": "runtime-inspection-after",
+      "source": "current",
+      "pointer": "/currentContainer/id"
+    },
+    {
+      "recipe": "runtime-inspection-after",
+      "source": "current",
+      "pointer": "/currentContainer/imageId"
+    },
+    {
+      "recipe": "runtime-inspection-after",
+      "source": "current",
+      "pointer": "/currentContainer/configSHA256"
+    },
+    {
+      "recipe": "runtime-inspection-after",
+      "source": "current",
+      "pointer": "/currentContainer/mountsSHA256"
+    },
+    {
+      "recipe": "runtime-inspection-after",
+      "source": "nodeFacts",
+      "pointer": "/processGenerationSHA256"
+    },
+    {
+      "recipe": "root-seal-decision",
+      "source": "aliases",
+      "pointer": "/finalPlanEnvelopeSHA256"
+    },
+    {
+      "recipe": "root-seal-decision",
+      "source": "body",
+      "pointer": "/arguments/inventoryEnvelopeSHA256"
+    },
+    {
+      "recipe": "root-seal-decision",
+      "source": "input",
+      "pointer": "/scope"
+    },
+    {
+      "recipe": "root-seal-decision",
+      "source": "plan",
+      "pointer": "/migrationId"
+    },
+    {
+      "recipe": "root-restart-restore",
+      "source": "aliases",
+      "pointer": "/finalPlanEnvelopeSHA256"
+    },
+    {
+      "recipe": "root-restart-restore",
+      "source": "input",
+      "pointer": "/scope"
+    },
+    {
+      "recipe": "root-restart-restore",
+      "source": "body",
+      "pointer": "/arguments/newContainerId"
+    },
+    {
+      "recipe": "root-restart-restore",
+      "source": "aliases",
+      "pointer": "/currentSealEnvelopeSHA256"
+    },
+    {
+      "recipe": "root-restart-restore",
+      "source": "body",
+      "pointer": "/operationId"
+    },
+    {
+      "recipe": "descendant-quiescence",
+      "source": "body",
+      "pointer": "/operationId"
+    },
+    {
+      "recipe": "descendant-quiescence",
+      "source": "body",
+      "pointer": "/expectedFenceEpoch"
+    },
+    {
+      "recipe": "member-progress-evidence",
+      "source": "body",
+      "pointer": "/planEnvelopeSHA256"
+    },
+    {
+      "recipe": "member-progress-evidence",
+      "source": "body",
+      "pointer": "/migrationId"
+    },
+    {
+      "recipe": "member-progress-evidence",
+      "source": "progress",
+      "pointer": "/scope"
+    },
+    {
+      "recipe": "member-progress-evidence",
+      "source": "progress",
+      "pointer": "/phase"
+    },
+    {
+      "recipe": "member-progress-evidence",
+      "source": "body",
+      "pointer": "/operationId"
+    },
+    {
+      "recipe": "member-progress-evidence",
+      "source": "body",
+      "pointer": "/sequence"
+    },
+    {
+      "recipe": "migration-effect-readback",
+      "source": "body",
+      "pointer": "/planEnvelopeSHA256"
+    },
+    {
+      "recipe": "migration-effect-readback",
+      "source": "body",
+      "pointer": "/migrationId"
+    },
+    {
+      "recipe": "migration-effect-readback",
+      "source": "body",
+      "pointer": "/operationId"
+    },
+    {
+      "recipe": "migration-effect-readback",
+      "source": "body",
+      "pointer": "/sequence"
+    },
+    {
+      "recipe": "migration-effect-readback",
+      "source": "body",
+      "pointer": "/method"
+    },
+    {
+      "recipe": "migration-effect-readback",
+      "source": "body",
+      "pointer": "/effect/kind"
+    },
+    {
+      "recipe": "migration-effect-readback",
+      "source": "body",
+      "pointer": "/effect/targetSlot"
+    },
+    {
+      "recipe": "migration-effect-readback",
+      "source": "body",
+      "pointer": "/effect/intentEventSHA256"
+    },
+    {
+      "recipe": "migration-effect-readback",
+      "source": "aliases",
+      "pointer": "/observedEffectOutcome"
+    },
+    {
+      "recipe": "migration-event-evidence",
+      "source": "body",
+      "pointer": "/planEnvelopeSHA256"
+    },
+    {
+      "recipe": "migration-event-evidence",
+      "source": "body",
+      "pointer": "/migrationId"
+    },
+    {
+      "recipe": "migration-event-evidence",
+      "source": "body",
+      "pointer": "/operationId"
+    },
+    {
+      "recipe": "migration-event-evidence",
+      "source": "body",
+      "pointer": "/sequence"
+    },
+    {
+      "recipe": "migration-event-evidence",
+      "source": "body",
+      "pointer": "/phase"
+    },
+    {
+      "recipe": "migration-event-evidence",
+      "source": "body",
+      "pointer": "/method"
+    },
+    {
+      "recipe": "migration-event-evidence",
+      "source": "body",
+      "pointer": "/recordKind"
+    }
+  ],
+  "recipeInputsDoNotCreateObservationAuthority": true
+}

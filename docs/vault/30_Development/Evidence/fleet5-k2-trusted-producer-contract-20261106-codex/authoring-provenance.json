@@ -1,0 +1,90 @@
+{
+  "atKST": "2026-11-06T10:43:49.141376+09:00",
+  "worktreeCreatedKST": "2026-11-06T10:29:33.581000+09:00",
+  "task": "task_a95ef3d8ccce",
+  "dispatch": "ctx_ed23b4a777d0",
+  "projectCard": "FLEET5-K2-TRUSTED-PRODUCER-CONTRACT-20261106",
+  "owner": "Codex",
+  "reviewer": "Claude through Root; actual assignment pending",
+  "base": "eb32b211ab3704935b9431747089ab0715582a74",
+  "worktree": "D:\\Project\\SaintVisionI-Invion\\fleet5-k2-trusted-producer-contract-20261106",
+  "branch": "agent/codex/fleet5-k2-trusted-producer-contract-20261106",
+  "OrcaWorktreeIdentity": "be4032ea-2858-46b8-bd1c-cedd75c3dc90",
+  "canonicalRootPublishedSourceAtTaskStart": "f2e7ca8fca42231d99add868511d3db7bb4692b4",
+  "documents": [
+    {
+      "docID": "INDEX-VIRTUAL-COMPUTER-001",
+      "version": "1.0.0",
+      "path": "docs/vault/00_Index/2026-09-15 단일 가상 컴퓨터 보강 설계 인덱스.md",
+      "rawSHA256": "35f2cca047fdb57ff2e2ad28e3847e9a7c0a19d6ace6fb36aa941042e872e9be"
+    },
+    {
+      "docID": "INDEX-PROGRESS-001",
+      "version": "1.0.432",
+      "path": "docs/vault/00_Index/전체 개발 진행 현황.md",
+      "rawSHA256": "891bc557091b0f4b52490f45e205251b5eeda14682a814752071d2e368a1a1d1"
+    },
+    {
+      "docID": "GUIDE-001",
+      "version": "1.1.0",
+      "path": "docs/vault/00_Index/최종 개발 계획 - 모든 개발의 지침.md",
+      "rawSHA256": "59223c5dff4b4bb6252c8061aebe975665e6eadf92db3659a3f89951b2cb149f"
+    },
+    {
+      "docID": "GOV-AGENT-001",
+      "version": "1.1.3",
+      "path": "docs/vault/40_Governance/Agent 역할과 인계 계약.md",
+      "rawSHA256": "128c054e72f9e001b3b32f914cce544bce5432eddccdbe1212d27180c3200823"
+    },
+    {
+      "docID": "GOV-CONTINUOUS-001",
+      "version": "1.1.0",
+      "path": "docs/vault/40_Governance/Agent 연속 실행과 최종 보고 정책.md",
+      "rawSHA256": "60c6a8d3130491bd4cab730cccc0e236fb038d1c7c816efa333acdc34a30cd8f"
+    },
+    {
+      "docID": "GOV-FLEET5-BOOTSTRAP-V5-FREEZE-CODE-SCOPE-20261106",
+      "version": "1.0.5",
+      "path": "docs/vault/40_Governance/FLEET5 전환 v5 계약 동결과 구현 범위.md",
+      "rawSHA256": "1495ec10e807cb1f8a0a20c5378a4d3e72013c359373d7ff3fedb14525d06178"
+    },
+    {
+      "docID": "GOV-GIT-001",
+      "version": "1.1.4",
+      "path": "docs/vault/40_Governance/Git Build Obsidian 운영 절차.md",
+      "rawSHA256": "fe5e8adc44a14c081ac767265a16434b72e4b3ebfb7719081fa166ad459e59e9"
+    },
+    {
+      "docID": "ADR-INDEX-001",
+      "version": "1.37.0",
+      "path": "docs/vault/40_Governance/설계 충돌 정정 및 ADR.md",
+      "rawSHA256": "771f7714a63af52d7c8aea2424db0b33a2fe96c759c51c81c23144daf7aeaf77"
+    },
+    {
+      "docID": "ROADMAP-VIRTUAL-COMPUTER-001",
+      "version": "1.0.0",
+      "path": "docs/vault/30_Development/57.81퍼센트 이후 단일 가상 컴퓨터 보강 로드맵.md",
+      "rawSHA256": "3a4527ffe53ebea114063692dd3bba826da8c279a93a9800919fff394df1a018"
+    },
+    {
+      "docID": "WORKBOARD-CODEX-001",
+      "version": "1.0.393",
+      "path": "docs/vault/30_Development/Agent별 작업/Codex 작업 현황.md",
+      "rawSHA256": "7e3bc6982032f30102e5029a8272bfa0474002eaf3ac7f86fa823c2f42b86c1c"
+    }
+  ],
+  "registrationManifestRawSHA256": "a0a05427c40499ac32e52c58982a84bceb4b4e833b68c601f9373d93d80aa562",
+  "authorizedRootFinalProofRawSHA256": "5833fd663cf9046162c899faaf8e9737925aa60e8397101cf16d12cbc5bd2213",
+  "skills": {
+    "agent-delivery": "1.1.0",
+    "core-reliability": "1.0.0",
+    "Orca": "1.4.248"
+  },
+  "taskAuthority": "Explicit successor dispatch; no shared registry self-registration",
+  "sourceAuditFirstExit": 1,
+  "sourceAuditFirstReason": "Read-only occurrence filter initially included README; corrected to Go only",
+  "sourceAuditCorrectedExit": 0,
+  "initialCanonicalReadExit": 1,
+  "initialCanonicalReadReason": "PowerShell pipeline Unicode path encoding; direct UTF8 Get-Content corrected, no private reads/mutations",
+  "allPlanningEvidenceStaticOnly": true
+}
