@@ -3,8 +3,8 @@
   "recordedAtKST": "2026-11-06T00:46:51+09:00",
   "rootBase": "2b1753ce59c09037b5e130a7ffe64794d1d45fdf",
   "priorRootCheckpoint": {
-    "SHA": "7830a92b12f0dca0a98f463841cc7e2c63576d6c",
-    "Docs": 42310647992,
+    "SHA": "28356eb243f3088880e8adf2da5691e7909037be",
+    "Docs": 42311673826,
     "exactHeadCorrelationAllJobsSuccess": true,
     "remoteMatches": true,
     "syncExits": [
@@ -12,13 +12,13 @@
       0,
       0
     ],
-    "independentlyMatchedNormalizedDestinationHashes": 2995,
+    "independentlyMatchedNormalizedDestinationHashes": 2998,
     "pending": 0,
     "conflicts": 0,
     "trackedAndUntrackedClean": true,
     "rootDocsOnly": true,
     "wholeProgramComplete": false,
-    "verifiedAtKST": "2026-11-07T08:16:49+09:00"
+    "verifiedAtKST": "2026-11-07T08:25:37+09:00"
   },
   "actualPlanLowReview": {
     "source": "803ad270562b1b75e44d26f9e14b965c714ab519",
@@ -2515,7 +2515,7 @@
     "ownerT1T2T3": "msg_620855c76519",
     "normativeRevisionReply": "msg_0392caf64d5d"
   },
-  "latestRecordAtKST": "2026-11-07T08:23:42+09:00",
+  "latestRecordAtKST": "2026-11-07T08:47:15+09:00",
   "optionalLowTokenTestDelta": {
     "source": "f0af307705b4923ebc3e231db5238af4c70aa389",
     "scope": "two otherwise-valid token payload corrections and JSON validity assertions; runtime unchanged",
@@ -3109,23 +3109,23 @@
   },
   "BRev7RootDecision": "b-rev7-concrete-root-decision.json",
   "activeActualReview": {
-    "atKST": "2026-11-07T08:23:42+09:00",
-    "status": "ACTUAL_H12_CONTRACT_REVIEW_STARTED_VERDICT_PENDING",
-    "target": "382fe3d86c14283dcb549f935205081db8b4eee4",
-    "sourceBranch": "agent/codex/fleet5-k2-h1-h2-authority-design-20261107",
-    "sourceDocs": 42310548604,
-    "ownerTask": "task_a95ef3d8ccce",
-    "ownerDispatch": "ctx_ed23b4a777d0",
-    "ownerQuestion": "msg_8e6a9c9d83b0",
-    "rootDesignGrant": "msg_10808c1899e9",
-    "task": "task_ce76beac4d2d",
-    "dispatch": "ctx_8cd16f1141a3",
-    "predecessor": "ctx_36ec44cc8ca0",
+    "atKST": "2026-11-07T08:47:15+09:00",
+    "status": "ACTUAL_B_MODE_ORIGIN_CONDITIONAL_SOURCE_REVIEW_STARTED_VERDICT_PENDING",
+    "target": "b3bbdc8d92a39f2f797a7680deb2770d6f705af0",
+    "sourceDocs": 42312934123,
+    "ownerTask": "task_a8fd2969f0b3",
+    "ownerDispatch": "ctx_6f0f8253b8a7",
+    "ownerQuestion": "msg_5fcc462b63c7",
+    "rootScope": "msg_ec880f3ed724",
+    "task": "task_696b2783bc0b",
+    "dispatch": "ctx_6b18bf1ef5b4",
+    "predecessor": "ctx_8cd16f1141a3",
     "predecessorFreshLifecycle": "succeeded_settled_exited_released",
     "independentVerdict": null,
-    "allActualBindings": null,
-    "nextCode": "DATA_ONLY_NOT_GRANTED",
-    "caseStatus": "H12_C01_C10_PROPOSED_NOT_RUN",
+    "acceptedBaselineDischarges": 0,
+    "original19HOLD": true,
+    "actualRuntimeB": 0,
+    "futureCode": "CAPTURE_ONCE_EXACT_STR_PROPOSAL_DATA_ONLY_NOT_GRANTED",
     "wholeProgramComplete": false
   },
   "nextReviewRequires": "newimmutableK2Low/Stage2 orB8 pilot/evidence; oneClaudeafteractualrelease",
@@ -3298,7 +3298,7 @@
     "productBaseline": "f2c1afb78b589b4b2cbcf3dcd4dc4f3c3f3bc856",
     "proposalSHA256": "85d52cb6313bda9b6d97ce6c1cb3d4c3c6bebf8ef487775fb6c8bc7581ec9479",
     "newBranch": "agent/codex/fleet5-k2-h1-h2-authority-design-20261107",
-    "status": "EXACT_PUBLISHED_DESIGN_DOCS_VERIFIED_ACTUAL_CONTRACT_REVIEW_PENDING",
+    "status": "ACTUAL_CONTRACT_REVISION_REQUIRED_R2_DESIGN_FIX_GRANTED_CANDIDATE_PENDING",
     "scopeFile": "k2-h1-h2-authority-design-root-scope.txt",
     "selectedLogicalPolicies": [
       "independent control-plane/project trust-provisioning boundary, separately authenticated installation/readback",
@@ -3321,7 +3321,7 @@
     "independentContractReview": "PENDING_FROZEN_CANDIDATE_AND_ACTUAL_REVIEWER_RELEASE",
     "actualA7ReviewUnchanged": "ctx_36ec44cc8ca0",
     "wholeProgramComplete": false,
-    "latestRecordAtKST": "2026-11-07T08:23:42+09:00",
+    "latestRecordAtKST": "2026-11-07T08:47:15+09:00",
     "localCandidate": "382fe3d86c14283dcb549f935205081db8b4eee4",
     "localParent": "1f073c03eb6673ac60806e8fbe008d391bc45864",
     "localOwnAddedDocs": 9,
@@ -3335,27 +3335,28 @@
     "source": "382fe3d86c14283dcb549f935205081db8b4eee4",
     "Docs": 42310548604,
     "rootVerifiedExactDocs": true,
-    "actualContractReview": {
-      "atKST": "2026-11-07T08:23:42+09:00",
-      "status": "ACTUAL_H12_CONTRACT_REVIEW_STARTED_VERDICT_PENDING",
-      "target": "382fe3d86c14283dcb549f935205081db8b4eee4",
-      "sourceBranch": "agent/codex/fleet5-k2-h1-h2-authority-design-20261107",
-      "sourceDocs": 42310548604,
-      "ownerTask": "task_a95ef3d8ccce",
-      "ownerDispatch": "ctx_ed23b4a777d0",
-      "ownerQuestion": "msg_8e6a9c9d83b0",
-      "rootDesignGrant": "msg_10808c1899e9",
-      "task": "task_ce76beac4d2d",
-      "dispatch": "ctx_8cd16f1141a3",
-      "predecessor": "ctx_36ec44cc8ca0",
-      "predecessorFreshLifecycle": "succeeded_settled_exited_released",
-      "independentVerdict": null,
-      "allActualBindings": null,
-      "nextCode": "DATA_ONLY_NOT_GRANTED",
-      "caseStatus": "H12_C01_C10_PROPOSED_NOT_RUN",
-      "wholeProgramComplete": false
-    },
-    "codeImplementationGranted": false
+    "actualContractReview": "8141a49bab3d0e7b94028a69d9a767e2abc25272",
+    "codeImplementationGranted": false,
+    "actualContractDocs": 42313093780,
+    "actualContractVerdict": "REVISION_REQUIRED",
+    "requiredFindings": [
+      {
+        "id": "H12R-M1",
+        "severity": "MEDIUM"
+      },
+      {
+        "id": "H12R-L1",
+        "severity": "LOW"
+      },
+      {
+        "id": "H12R-L2",
+        "severity": "LOW"
+      }
+    ],
+    "rootR2DesignFixReply": "msg_e41b206771c3",
+    "R2DesignBase": "382fe3d86c14283dcb549f935205081db8b4eee4",
+    "R2DesignBranch": "agent/codex/fleet5-k2-h1-h2-authority-design-r2-20261107",
+    "R2DesignCandidate": null
   },
   "A7R2ActualReview": "b-a7r2-actual-delta-review-root-verification.json",
   "A7R2L1": "CLOSED_BY_ACTUAL_INDEPENDENT_REVIEW",
@@ -3381,5 +3382,6 @@
     "runtimeOrSourceInclusionGranted": false,
     "wholeProgramComplete": false
   },
-  "H1H2PushRecovery": "k2-h12-first-push-readonly-recovery-check.json"
+  "H1H2PushRecovery": "k2-h12-first-push-readonly-recovery-check.json",
+  "BModeSource": "b-a7-mode-origin-source-root-verification.json"
 }

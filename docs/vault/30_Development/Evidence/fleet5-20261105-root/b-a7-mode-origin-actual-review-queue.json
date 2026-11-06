@@ -1,0 +1,20 @@
+{
+  "atKST": "2026-11-07T08:47:15+09:00",
+  "status": "ACTUAL_B_MODE_ORIGIN_CONDITIONAL_SOURCE_REVIEW_STARTED_VERDICT_PENDING",
+  "target": "b3bbdc8d92a39f2f797a7680deb2770d6f705af0",
+  "sourceDocs": 42312934123,
+  "ownerTask": "task_a8fd2969f0b3",
+  "ownerDispatch": "ctx_6f0f8253b8a7",
+  "ownerQuestion": "msg_5fcc462b63c7",
+  "rootScope": "msg_ec880f3ed724",
+  "task": "task_696b2783bc0b",
+  "dispatch": "ctx_6b18bf1ef5b4",
+  "predecessor": "ctx_8cd16f1141a3",
+  "predecessorFreshLifecycle": "succeeded_settled_exited_released",
+  "independentVerdict": null,
+  "acceptedBaselineDischarges": 0,
+  "original19HOLD": true,
+  "actualRuntimeB": 0,
+  "futureCode": "CAPTURE_ONCE_EXACT_STR_PROPOSAL_DATA_ONLY_NOT_GRANTED",
+  "wholeProgramComplete": false
+}

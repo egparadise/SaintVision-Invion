@@ -1,0 +1,100 @@
+{
+  "classification": "ACTUAL_INDEPENDENT_CLAUDE_H1_H2_AUTHORITY_CONTRACT_DESIGN_REVIEW_NOT_CODE_OR_RUNTIME_ACCEPTANCE",
+  "reviewer": "Claude (one reviewer, no helpers, no second reviewer)",
+  "task": "task_ce76beac4d2d",
+  "dispatch": "ctx_8cd16f1141a3",
+  "predecessor": "task_c2de6e9fd486 / ctx_36ec44cc8ca0 state=succeeded stage=settled liveness=exited terminalState=released (orca worker-show)",
+  "owner": "Codex task_a95ef3d8ccce / ctx_ed23b4a777d0; pending question msg_8e6a9c9d83b0; logical design grant msg_10808c1899e9",
+  "target": {
+    "commit": "382fe3d86c14283dcb549f935205081db8b4eee4",
+    "directParent": "1f073c03eb6673ac60806e8fbe008d391bc45864",
+    "remoteRef": "refs/heads/agent/codex/fleet5-k2-h1-h2-authority-design-20261107 = 382fe3 (git ls-remote)",
+    "productBaseline": "f2c1afb78b589b4b2cbcf3dcd4dc4f3c3f3bc856; git diff f2c1..382fe3 outside docs = empty",
+    "delta1f073": "9 added (8 Evidence + 1 History), 0 modified/deleted",
+    "pinsRecomputed": {
+      "contract.md": "b7a654f126b47ba0c4bf7c212fa62e1ac98b54b8005d1543202d4ce6b0f27ecf",
+      "authority-fields.json": "c47b0301df17158233da0afab050bfa780d347c321fe0f7778138d0298eb31e9",
+      "acceptance-cases.json": "4593fa50ef6175a1ea12f41fce7cd823b8f58afe736dc10b630cb836f5a90853",
+      "next-code-proposal.json": "f8b3f6d7aabe32e07bdbff56789ea327f544c43b64834035934f8cfe4f0f7fed",
+      "allMatch": true
+    },
+    "publicInputPinsRecomputed": "14/14 (9 frozen + 5 extra read-only, from f2c1 blobs)"
+  },
+  "readInputs": [
+    "Root .work/h1-h2-authority-design-root-cut.txt (five logical choices) and .work/h12-design-source-root-verified.json",
+    "Root boards: fleet-five-orchestration HEAD 28356eb2, Index 1.0.490, Claude board 1.2.130",
+    "382fe3 History + contract.md, authority-fields.json, acceptance-cases.json, next-code-proposal.json, context.json, structural-consistency.json, local-gates.json (gate argv only)",
+    "f2c1 P02 Rev3 contract + source-continuity-and-open-obligations.json; producer rev2 contract section 3 (key grants/status)",
+    "f2c1 p02_inputs_internal.go types; p02_evaluate_internal.go stages/anchor/signature/keyInterval/version/replay/freshness/readback/p02RecordIdentity; ports.go refusals; errors.go TrustUnknown; effect_gate_test.go pureExternalObjects + mutants; source_gate_test.go selector bans"
+  ],
+  "notRead": "B author current working code; full D04 schema/Go corpus; K1 proofs (not reopened)",
+  "verdict": "REVISION_REQUIRED",
+  "verdictScope": "Contract DESIGN only. One MEDIUM logic gap (closed matrix lacks the registration-delivery origin Root choice 5 requires) and two LOW precision gaps. Everything else in the five Root choices, G00..G10 order, time predicates, D04 handoff and next-code DATA proposal is accepted as design. Not a code grant, crypto execution, registration, producer or runtime acceptance. All actual bindings stay NULL/HOLD; a missing real key/endpoint is not a finding.",
+  "findings": [
+    {
+      "id": "H12R-M1",
+      "severity": "MEDIUM",
+      "kind": "LOGIC_GAP_IN_CLOSED_MATRIX (not an absent actual binding)",
+      "rootPolicy": "Choice 5: define exactly which independent delivery/origin assertion and current-status binding a future producer must supply; before/after readback must name the authenticated subject/version it binds",
+      "sourceFields": "authority-fields.json origins (5: H1_POLICY, H1_INSTALL, H2_AUTHZ, H4_STATUS, H4_CLOCK), H2IndependentPolicy (23), snapshotVector (27); contract.md lines 69-75, G04 and G08 rows; acceptance-cases H12-C07",
+      "observation": "The contract says registration has a DISTINCT missing origin obligation (lines 69-75). G04 names a REGISTRATION_ORIGIN failure, and C07 says 'H1 delivery is independently authenticated ... but omit the specific registration-origin delivery assertion'. context.json also lists actualBindings.registrationDelivery separately. But no origin row authenticates that assertion. No H2 slot carries its subject: deliveryOriginSubject is the H1 capsule delivery. No snapshotVector member binds its identity/version: the vector has a single deliveryID/deliveryVersion plus registryIdentity, which is the registry, not the registration. The G08 nonrevocation list (H1 delivery/capsule/H2 grant/key/registry/record) also omits it. Static check attempt 2: originsNamingRegistrationDelivery=[], h2SlotsNamingRegistrationDelivery=[], no vector member.",
+      "stage": "G04_AUTHENTICATED_SNAPSHOT (authenticity/origin), G08_STATUS_TIME (current status), G10_FINAL_READBACK (vector equality)",
+      "validCausalCase": "Static counterexample, not run. All 27 vector members, all G08-listed subjects and every earlier gate pass. An RD assertion for the exact a0/designRegistrationSHA256 bytes is present and well-formed. (a) Its issuer is an authority the closed matrix never names, so an implementer cannot tell which key must sign it. G04 could accept the H1 provisioner, the H4 status authority or any key, and the matrix cannot decide. (b) The current status of that registration delivery is REVOKED, but G08 as tabulated checks only the listed subjects, so the read proceeds. (c) The RD status/version changes between initial and final acquisition. G10 compares only the 27 members, so the change is not detected unless it happens to share statusVersion with H4. That sharing is undefined because no authority is assigned.",
+      "earlierPreconditions": "G00..G03 pass with an independently authenticated H1 delivery; grant/ticket/clock/status checkpoint authentic and ACTIVE; record canonical; valid expected-key signature; head/floor/ticket/H5 joins valid; same clock mechanism/epoch.",
+      "minimalFix": "(1) Add ONE origin row for the registration capture/delivery authority, or assign it explicitly to an existing origin with a distinct assertion type. Give it identity, authorizer (Root custody), valueOrigin (original immutable capture/publication identity + ordering, exact raw registration SHA = sourceConstants.designRegistrationSHA256, project/purpose/source/contract subject, destination registry generation) and actual UNBOUND_HOLD. (2) Add one H2IndependentPolicy slot registrationDeliverySubject joining those values. (3) Add registrationDeliveryID + registrationDeliveryVersion (or one exact equivalent pair) to snapshotVector. (4) Add the registration-delivery subject to the G08 current-status enumeration. (5) Name the C07 omitted assertion's authority accordingly. Counts change (23->24, 27->29 or as chosen), and author structural JSON/History update with them. No raw pin, raw7 registration or RD actual delivery changes; all stay UNREGISTERED/HOLD."
+    },
+    {
+      "id": "H12R-L1",
+      "severity": "LOW",
+      "kind": "PRECISION_GAP_BETWEEN_PROSE_AND_GATE_TABLE",
+      "sourceFields": "contract.md G08 row vs lines 149-156; authority-fields H2IndependentPolicy.bootstrapBindingIdentityVersion origin=H1_INSTALL",
+      "observation": "Prose says current authorization/nonrevocation includes the provisioner/status/clock authority grants, and the current bootstrap mapping comes from the independent Root-bound boundary, 'never by a key attesting its own authority'. The deterministic G08 row omits those authority grants (static: g08RowNamesProvisionerStatusClockGrants=false). The matrix gives the mapping identity/version origin H1_INSTALL, which is the provisioner's own installation assertion, rather than the G00 external binding/delivery mechanism.",
+      "stage": "G00_BINDING / G04 / G08",
+      "validCausalCase": "Static, not run. Mapping version N+1 at G00 de-authorizes status authority S. S still signs ACTIVE statements for every G08-listed subject. An implementation that follows the G08 table literally, and takes the mapping version from the provisioner's assertion, can accept S's statements. The prose forbids this; the table does not.",
+      "earlierPreconditions": "G00..G07 pass; S's statements are mathematically valid.",
+      "minimalFix": "Add 'provisioner/status/clock authority grants under the current G00 mapping' to the G08 row. State that their currency is decided only by the G00 external binding/delivery mechanism, never by those authorities' own statements. Set or annotate bootstrapBindingIdentityVersion's origin as that G00 binding, keeping actual UNBOUND_HOLD."
+    },
+    {
+      "id": "H12R-L2",
+      "severity": "LOW",
+      "kind": "CASE_CAUSAL_ISOLATION",
+      "sourceFields": "acceptance-cases H12-C09; contract.md G10 row ('re-evaluate every time bound ... overrun -> READBACK/EXPIRED')",
+      "observation": "C09 targets G08 after G07 with 'clock upper bound equals ticket OR response exclusive end'. The disjunction does not fix one cause. No case covers the late path, where the initial interval is strictly valid and the final authenticated clock reaches the minimum exclusive expiry at G10 (static: anyCaseTargetsG10Expired=false).",
+      "stage": "G08 vs G10",
+      "validCausalCase": "Initial [L,U] strictly inside every bound. Final same-mechanism/epoch sample has U_f == ticket.expiresAt, with record.validUntil, status.expiresAt, H5.expiresAt and keyNotAfter all strictly later. Vector unchanged. The expected refusal is G10 EXPIRED, not G08.",
+      "earlierPreconditions": "G00..G09 pass; G10 origin/subject, vector equality and clock mechanism/epoch/bracket pass before the final time predicate.",
+      "minimalFix": "Make C09 the late G10 exclusive-expiry case with ONE named bound (ticket.expiresAt) and every other bound strictly later. Optionally keep the G08 initial-equality boundary as a documented sub-condition of the same ID, credited separately. IDs stay H12-C01..C10, all PROPOSED_NOT_RUN."
+    }
+  ],
+  "acceptedAsDesign": [
+    "Five Root choices: one TrustProvisioner TCB with a finite UNBOUND binding list; candidate/package/caller/signer cannot authorize root/registry/capsule; P02 format/domain PROPOSED_UNREGISTERED; no K1 root-plan/root-seal inheritance; expectedEffectiveVerdict explicit, immutable, no default, NULL; current status + clock + one snapshot + final readback, zero retry, no ambient Now/DB-lock I/O/fence fiction; RD HOLD and raw7 UNREGISTERED (subject to M1).",
+    "Installation states UNBOUND..INVALIDATED; forward-only generation; equal-version different bytes refused; old generations preserved; status may refresh only for the same immutable subject; key intervals never extended.",
+    "G00..G10 order: admission bounded freeze precedes parsing; G01 origin before G03 capsule equality; grant authenticity at G04, authorization at G05 BEFORE record codec G06 and signature G07 (matches producer rev2 'acquire scope and grant before accepting a signer identity'); no stage needs the unparsed record before G06; G08 evaluates ACTIVE/time after G04 authenticity; G10 origin->vector->clock mechanism/epoch/bracket->time order.",
+    "Time predicates match f2c1 exactly: keyInterval (:280), freshness status/ticket-response/H5 (U-L<=1, ages<=120, exclusive expiries, MaxEpoch). The stricter U<keyNotAfter equals D04 and does not conflict with producer rev2's permissive historical-signature allowance.",
+    "D04 handoff: capsule 26 fields equal f2c1 p02Capsule; one 13-field tuple, not InstalledPolicy/History; no synthetic before/after; unchanged checkPolicyBindings before K1; public refusal TRUST_UNKNOWN_OR_PIN_MISMATCH (errors.go:7). C04's D04 prefix 01_ANCHOR..05_COMPONENTS -> 05_REVIEWS is the exact f2c1 STAGES prefix; kind 's'/1..128 matches D04 05_REVIEWS check (:393-394).",
+    "Equivocation at G09 is content-bound: f2c1 p02RecordIdentity hashes the stable body (format..reviews minus runningMeasurement), so equal-version different-content records mismatch currentRecordIdentity.",
+    "Cases C01-C08, C10 are causally constructed with full earlier prefixes. C03 keeps record purpose/domain/signature valid and changes only the independently authenticated grant (G05). C04 is an authentic nonapproval refused by D04 05_REVIEWS. C05 is REVOKED at G08 after G04 authenticity. C06 is older record vs authentic head/floor. C08 is a same-subject newer final version. No TEST_ONLY runtime switch.",
+    "next-code-proposal as DATA ONLY: one private helper + one test + exact path-scoped guard objects (ed25519.Verify, x509.ParsePKIXPublicKey, x509.MarshalPKIXPublicKey, all currently absent from f2c1 pureExternalObjects); fixed domain||NUL||canonical({body,signer}) via the existing signingInput; DER round-trip; 32-byte key before Verify (no panic); expected hash a pure input; bool is math only, never H1/H2 authentication. Named helpers p02Decode/p02EnvelopeSchema/signingInput exist at f2c1."
+  ],
+  "optionalPrecisionNotes": [
+    "N1 Admission overrun vs G02 'Overrun -> OWNERSHIP': name a single admission refusal class, or state that G02 handles only the typed node/aggregate budget after admission.",
+    "N2 Partition joins: G04 joins assertions to each other (grant<->status<->vector) and must not compare grant purpose/scope to the H1 policy. Otherwise C03 is credited to G04 instead of G05.",
+    "N3 D04 clock handoff: say which authenticated interval fills p02Inputs.clock (recommend the final one) and how the 27-vector maps to the 9-field before/after token.",
+    "N4 Code-grant precision: (a) the TESTKEY fixture source. The positive control needs a signature over a p02 message, so the grant must name either in-test NewKeyFromSeed/Sign in h12_signature_test.go with a declared non-secret TEST seed, or Root-isolated precomputed vectors. (b) Path scoping needs a NEW position->file check, because pureExternalObjects is a package-wide map, with mutants for use from another file and for method values. (c) Expected-hash format: exact lowercase 64-hex. (d) The helper must build a p02Context{envelopeValue} literal, because p02_evaluate_internal.go is not an allowed path. (e) ed25519.Verify is cofactorless and does not reject weak/small-order keys, so a true result is no key-quality claim; key choice stays with the independent grant.",
+    "N5 C06 could add an equal-version different-stable-identity variant; the same G09/D04 predicate covers it.",
+    "N6 C02: make the forged delivery assertion name its own candidate key as signer, so the case discriminates self-authorization from a merely bad signature.",
+    "N7 C07 wording 'TEST_ONLY base policy otherwise supplies protocol authorization' -> 'independently provisioned test authorities'; optionally add a present-but-wrong-origin variant.",
+    "N8 History says '11 nested groups'; the structural JSON says 7 declared type groups (11 nested matrix entries). Root already noted this; wording only.",
+    "N9 Until H6 supplies an authenticated anchorVersion minimum, H1 generation rollback protection rests on the current-status authority's supersession (a superseded generation is non-ACTIVE). Say so explicitly."
+  ],
+  "cryptoOrRuntimeProbeRequested": false,
+  "cryptoOrRuntimeProbeReason": "No finding needs crypto/runtime proof; all three are matrix/table/case logic.",
+  "staticCheck": {
+    "script": "reviewer_h12_static_check.py.txt (stdlib, git show blobs, no crypto/Go/network)",
+    "attempt1": "exit0 at 2026-11-07T08:30:45.886..08:30:47.407 KST; its RD regex used RD\\b under re.I and falsely matched 'record'. Preserved as reviewer-h12-static-attempt1.log.txt / -result-attempt1.json.",
+    "attempt2": "exit0 at 2026-11-07T08:31:10.450..08:31:11.470 KST; case-sensitive RD; reviewer-h12-static.log.txt / reviewer-h12-static-result.json",
+    "nature": "Structural/text facts only. Not authentication, crypto or runtime proof."
+  },
+  "preservedHolds": "Actual bindings all NULL/HOLD; public TrustUnknown; no InstalledPolicy/History; H1-H7/H3EA/expectedVerdict custody/RD NULL_HOLD; P02 raw7 UNREGISTERED; A01-A40 NOT_RUN; H12-C01..C10 PROPOSED_NOT_RUN; K1 immutable 13 types/73 fields, 28 pins; whole K2 and fleet 100 incomplete.",
+  "next": "Owner Codex (same task_a95ef3d8ccce) revises M1, L1 and L2 within the same DESIGN-only scope after a Root grant; Root then queues ONE actual narrow Claude delta review. No code grant follows from this review."
+}

@@ -1,15 +1,19 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.451"
+version: "1.0.452"
 status: "review"
 author: "Codex"
-updated: "2026-11-07T08:23:42+09:00"
+updated: "2026-11-07T08:47:15+09:00"
 source_of_truth: "Git"
 active_card: "FLEET5 continued supervision with PORTAL-REFRESH-FLEET-20261106"
-active_card_status: "H12exact382fe3normalretry+Docs42310548604verified/actualcontractreviewctx8cdPENDING; Bsinglemodeoriginactiveec880; actualbindingsNULLHOLD/fleetincomplete"
-active_card_next: "Claude actualH12contractverdict on382fe3; B Codex finite singlemodeorigin candidate; Root exactreview/Docs then concrete nextscope; noCODE/positive/runtimegrant from designpublication"
+active_card_status: "H12actual8141M1L1L2/R2DESIGNfixe41b; Bmodeb3bbverified/actualconditionalreviewctx6b18PENDING/19HOLD; noCODEgrant/fleetincomplete"
+active_card_next: "K2Codex narrowR2RDorigin+G00currency+C09G10expiry design; Claude Bmodeb3bb conditionalverdict+futurecodeDATA assessment; Root verifyactualfixedcandidate before one narrowreview, no positive/runtimegrant"
 ---
+
+## 2026-11-07T08:47:15+09:00 H1/H2 실제 설계 수정 배정과 모드 출처 독립 검토
+
+실제H12검토8141/Docs42313093780/all19의Medium1·Low2(RD증명origin/slot/vector/status누락, G00권한기원/G08통화성, C09늦은만료인과)를확인해같은작성자에R2설계만msg_e41b206771c3로배정했다. B모드출처b3bb의57ownA/55hash/14helper/최종11명령/25실제sourcehash/6ASTDATAcontrols/Docs42312934123/all19를대조했고전임자실제종료·해제뒤단일Claude ctx_6b18bf1ef5b4를시작했다.19HOLD·실제권한NULL·다음CODE미허용·실5대미완료는유지한다. 직접명령/exit/KST/Git/CI/검토원문·전제/미실행축/검토수명과다음담당은Root History/Evidence에보존했다.
 
 ## 2026-11-07T08:23:42+09:00 H1/H2 정상 게시 복구 확인과 실제 계약 검토 착수
 

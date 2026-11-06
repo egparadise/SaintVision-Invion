@@ -1,11 +1,11 @@
 ---
 doc_id: "GOV-FLEET5-B-BOOTSTRAP-SCOPE-20261106"
 title: "FLEET5 B 병행 역할과 전환 구현 범위 결정"
-version: "1.4.16"
+version: "1.4.17"
 status: "review"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-11-07T08:05:16+09:00"
+updated: "2026-11-07T08:47:15+09:00"
 source_of_truth: "Git"
 ---
 
@@ -188,3 +188,8 @@ Root는0e66/parent9cea의190ownA·93script/81원문copy/17최종실행전후hash
 ## A7 R2 실제 Low·오라클 닫힘과 모드 출처 한정 후속
 
 실제14523889/Docs42308611982/all19는A7R-L1과I3oracle을닫아PARTIAL_STATIC_EVIDENCE_ACCEPT_L1_CLOSED_KEEP_HOLD로판정했다. Root는12실제행·정확한barecensuskey와진단span·7controls와검토자exit/release를대조했다. INFOI1/I2/I4와새I5/I6는비차단정밀성메모로유지한다. msg_ec880f3ed724는sameB담당자에NodeDelivery동적모드ONE조건의유한source기원/최대6ASTDATAcontrol/최소후속CODE제안만허용한다. 원래19baseline/조건부body/HOLD/runtime0/allrealbindingsNULL_HOLD/globalcounts불변이며제품·DB/crypto/clock/current/effect·새13entry인가가아니다.
+
+
+## 모드 출처 조건부 후보 검증과 실제 단일 검토
+
+b3bb/direct9690의57ownA·55hash/14helper/최종11commandbracket/25실제sourcehash/6ASTDATAcontrols·Docs42312934123/all19를Root가대조했다. acceptedBaselineDischarges0/원래19byte불변/조건부genuinedataclass·receiver·field전제를유지하며actualH12reviewerexit/release뒤Claude ctx_6b18bf1ef5b4/task_696b2783bc0b가한정검토에착수했다. captureonce/exactstr제안은DATAONLY이며제품/새13entry/SQLnetworkeffect/runtime/전역권한승격이아니다.
