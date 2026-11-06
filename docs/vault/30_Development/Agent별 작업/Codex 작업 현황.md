@@ -1,15 +1,19 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.396"
+version: "1.0.397"
 status: "review"
 author: "Codex"
-updated: "2026-11-06T12:11:22+09:00"
+updated: "2026-11-06T12:25:24+09:00"
 source_of_truth: "Git"
 active_card: "FLEET5-20261105 five physical node orchestration"
-active_card_status: "B6actualecbd revisionneeded/rootrev7choicesdelivered; K2rev2contractpending; K1boundedcomplete; noactiveactualreview; wholephysicalincomplete"
-active_card_next: "BCodex narrowrev7DOCS/static/exactDocs; K2Codex narrowrev2contract/exactDocs; Root nextimmutableproposal ONEactualClaude thenprecisegrantorrevisions; nocode/effectsgrant"
+active_card_status: "K2rev2immutable4ce exactDocsSUCCESS/actualClaudef8bactive; B targetedrev7continues; K1boundedcomplete; noK2/Bimplementationgrant; wholephysicalincomplete"
+active_card_next: "ClaudeactualK2rev2verdict/ownDocs; Root exactreadonlyportsgrantorrevisions; BCodex targetedrev7/exactDocs thennextoneClaude; noeffect/installgrant"
 ---
+
+## 2026-11-06T12:25:24+09:00 K2 rev2 원문 확인과 실제 재검토
+
+작업한 것과 확인: K2 rev2 4ce63e8e는551d parent·고유문서50개 추가·이전 제안/제품diff0·exactDocs42155660700 성공을 Root가 확인했다. 실제 Claude task_f8b0caa87c81/ctx_f0eed1630fd5에 지적8건 해소와 작은 readonly trust/history port의 구현 준비 여부를 독립 재검토하도록 배정했다. 실제 registry/fence/clock/observation/설치 binding과40runtime은 HOLD/미실행이며 코드·효과 grant는 없다. 원질문 msg_ca431d7c508f는 실제 판정과 Root 결정까지 pending이다. 다음 첫 행동/담당은 Claude의 지적별 실제 종결 판정과 Root의 정확한 후속 범위 결정이며 B Codex는 기존 rev7 지시를 따른다.
 
 ## 2026-11-06T12:11:22+09:00 B rev6 실제 판정과 rev7 구체 선택
 
