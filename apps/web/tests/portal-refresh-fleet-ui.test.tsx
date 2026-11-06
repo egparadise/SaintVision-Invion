@@ -142,7 +142,8 @@ describe('PORTAL-REFRESH-FLEET-20261106: Stable Polling, Honest Gateway & Identi
       // It must not falsely claim empty state completed with 0 nodes
       const freshness = container.querySelector('[data-testid="cluster-freshness-indicator"]');
       expect(freshness).toBeNull();
-      expect(container.textContent).toContain('등록된 노드가 없습니다 (정상 조회 결과: 0대)');
+      expect(container.textContent).not.toContain('등록된 노드가 없습니다 (정상 조회 결과: 0대)');
+      expect(container.textContent).toContain('클러스터 노드 정보를 확인하고 있습니다...');
     });
   });
 
@@ -209,15 +210,30 @@ describe('PORTAL-REFRESH-FLEET-20261106: Stable Polling, Honest Gateway & Identi
             nodesState="error"
             nodeError="Network timeout"
             lastFetchedAt={snapshotTime}
+            onRefresh={vi.fn()}
           />
         );
       });
 
-      // Empty state card remains mounted
+      // Empty state card remains mounted (preventing flicker / layout flip)
       const emptySection = container.querySelector('[data-testid="cluster-overview-empty-state"]');
       expect(emptySection).not.toBeNull();
+      // Role="status" preserved
+      expect(emptySection?.getAttribute('role')).toBe('status');
       // Freshness indicator displays previous snapshot time
       expect(container.textContent).toContain(snapshotTime.toLocaleTimeString('ko-KR'));
+      // Stale warning alert must be visibly rendered (role=alert)
+      const staleWarning = container.querySelector('[data-testid="cluster-stale-warning"]');
+      expect(staleWarning).not.toBeNull();
+      expect(staleWarning?.getAttribute('role')).toBe('alert');
+      expect(staleWarning?.textContent).toContain('동기화 실패');
+      expect(staleWarning?.textContent).toContain('Network timeout');
+      expect(staleWarning?.textContent).toContain(snapshotTime.toLocaleTimeString('ko-KR'));
+      // Must NOT be presented as normal 0 nodes success
+      expect(container.textContent).not.toContain('정상 조회 결과: 0대');
+      expect(container.textContent).toContain('이전 관측 시점(스냅샷) 기준 등록된 노드가 없습니다');
+      // Retry button present
+      expect(container.querySelector('[data-testid="cluster-stale-retry-btn"]')).not.toBeNull();
       // Does not fall through to metric cards
       expect(container.textContent).not.toContain('CPU 코어');
     });
