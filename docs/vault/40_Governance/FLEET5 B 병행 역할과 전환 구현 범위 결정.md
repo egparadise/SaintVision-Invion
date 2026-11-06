@@ -1,11 +1,11 @@
 ---
 doc_id: "GOV-FLEET5-B-BOOTSTRAP-SCOPE-20261106"
 title: "FLEET5 B 병행 역할과 전환 구현 범위 결정"
-version: "1.4.14"
+version: "1.4.15"
 status: "review"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-11-07T06:58:12+09:00"
+updated: "2026-11-07T07:39:51+09:00"
 source_of_truth: "Git"
 ---
 
@@ -178,3 +178,8 @@ Root는0e66/parent9cea의190ownA·93script/81원문copy/17최종실행전후hash
 ## A7 R1 실제 Low 판정과 R2 parsed-audited 보강
 
 실제7a80/Docs42299221800는부분본문증거/19HOLD를보존했지만30parsed중18에guard누락을LowA7R-L1로남겼다. Root msg_e051a19e0010의R2fix-only는retention전기존guard를모든parsed에적용하고정확한baseline-mutantdelta를검증한다. 범위는b-a7-snapshot-r2-root-fix-cut.json이며기존19조건/계수·제품/port/runtime미허용은변함없다.
+
+
+## A7 R2 고정 증거와 실제 단일 Low 재검토
+
+9690/direct1550의125ownA·manifest123/34producer/최종11commandhashbracket·정확한19c2red/green/new5case·Docs42304684547/all19를Root가대조했다.30parsed=30audited·새18clean·기존조건부body/19blocksGrant/11retainedartifact와allglobals는보존됐으며Root는저자proof를재실행하지않았다. fresh06f검토자exit/release뒤실제Claude ctx_36ec44cc8ca0/task_c2de6e9fd486의좁은delta검토를시작했으나아직판정전이다.19HOLD/actualB0/allrealbindingsNULL_HOLD/A1A16PENDING과SOURCE_STATIC_UNRESOLVED_RUNTIME_PENDING은유지한다.

@@ -1,0 +1,45 @@
+{
+  "atKST": "2026-11-07T07:34:55+09:00",
+  "source": "969030dbc7716b9cadf75bd314713005306ed34c",
+  "base": "1550453d1f072a87fd9a7baa53d4fe4ce8a98d5d",
+  "branch": "agent/codex/fleet5-b-a7-snapshot-r2-20261107",
+  "ownAddedOnly": 125,
+  "allPriorPathsModesAndBlobsUnchanged": true,
+  "remoteExactAndR1RefPreserved": true,
+  "manifestSHA256": "a69dc82098438eb83b74cce31d2dd7f334b44da14237fc519e22ad2b062a5488",
+  "RootVerifiedManifestFileHashes": 123,
+  "RootRecomputedProducerAndInheritedHashes": 34,
+  "RootVerifiedFinalCommandBracketsAndRawLogHashes": 11,
+  "extraCanonicalAndPublicationChecksVerified": 2,
+  "preProofCanonicalBracketDiffersFromFinalOnly": {
+    "r2_seal.py": {
+      "atEarlyCheck": "326bfcbc5c6ebd87ac317dc9fe71e0909414e79172d90a6377110faf586df262",
+      "atFinalProof": "0d47b3e2c14a68d1b0250ff706666dca8546b2ab58ffd349de125a17fc531fb3"
+    }
+  },
+  "canonicalPerCallUnchangedHashes": [
+    "c028a9e43f3dfeb4c1934fc230f8e34c94b31599e14631b66dcdac37a2d85b85",
+    "4090c45d8d35ecb1f4559e4541467609ea22a29d5189d2460f510de9cd6927db"
+  ],
+  "RootByteComparedActual7a80Originals": 10,
+  "retainedAccountingModelLifecycleStageArtifactsEqual": 11,
+  "conditionalBodyAndOriginal19ObligationsExactlyPreserved": true,
+  "unchangedCopiedProducers": 22,
+  "RootMatchedActualParsedAuditedPathsToFrozenProduct": 30,
+  "newlyAuditedClean": 18,
+  "RootVerifiedRedExit": 1,
+  "RootVerifiedNewCases": 5,
+  "exactCounterexampleInputSHA256": "19c2e14eb3e586f5ed22e1fb0549fe51961a079557fba2bb07ca1b8410686191",
+  "Docs": 42304684547,
+  "job": 128190916971,
+  "correlation": "codex-a7-snapshot-r2-task_a8fd2969f0b3-969030dbc7716b9cadf75bd314713005306ed34c",
+  "rootVerifiedExactHeadRefEventPathAttemptAll19StepsSuccess": true,
+  "status": "SOURCE_STATIC_UNRESOLVED_RUNTIME_PENDING",
+  "callerClosureAccepted": false,
+  "remainingBlocksGrantObligations": 19,
+  "RootReranAuthorProofCommands": false,
+  "independentReview": null,
+  "actualRuntimeB": 0,
+  "allRealBindings": null,
+  "wholeProgramComplete": false
+}

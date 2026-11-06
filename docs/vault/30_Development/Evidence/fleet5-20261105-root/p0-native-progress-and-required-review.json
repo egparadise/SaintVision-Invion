@@ -3,8 +3,8 @@
   "recordedAtKST": "2026-11-06T00:46:51+09:00",
   "rootBase": "2b1753ce59c09037b5e130a7ffe64794d1d45fdf",
   "priorRootCheckpoint": {
-    "SHA": "305ef12002d35eec4257dd75014d4629460cc07b",
-    "Docs": 42301112538,
+    "SHA": "7c19fb28d52ac4da1232c98836f96f389e5cfdf2",
+    "Docs": 42303472719,
     "exactHeadCorrelationAllJobsSuccess": true,
     "remoteMatches": true,
     "syncExits": [
@@ -12,13 +12,13 @@
       0,
       0
     ],
-    "independentlyMatchedNormalizedDestinationHashes": 2980,
+    "independentlyMatchedNormalizedDestinationHashes": 2982,
     "pending": 0,
     "conflicts": 0,
     "trackedAndUntrackedClean": true,
     "rootDocsOnly": true,
     "wholeProgramComplete": false,
-    "verifiedAtKST": "2026-11-07T07:01:18+09:00"
+    "verifiedAtKST": "2026-11-07T07:18:09+09:00"
   },
   "actualPlanLowReview": {
     "source": "803ad270562b1b75e44d26f9e14b965c714ab519",
@@ -2515,7 +2515,7 @@
     "ownerT1T2T3": "msg_620855c76519",
     "normativeRevisionReply": "msg_0392caf64d5d"
   },
-  "latestRecordAtKST": "2026-11-07T07:16:09+09:00",
+  "latestRecordAtKST": "2026-11-07T07:39:51+09:00",
   "optionalLowTokenTestDelta": {
     "source": "f0af307705b4923ebc3e231db5238af4c70aa389",
     "scope": "two otherwise-valid token payload corrections and JSON validity assertions; runtime unchanged",
@@ -3108,7 +3108,25 @@
     "reviewOnlyPaths": 18
   },
   "BRev7RootDecision": "b-rev7-concrete-root-decision.json",
-  "activeActualReview": null,
+  "activeActualReview": {
+    "atKST": "2026-11-07T07:39:51+09:00",
+    "status": "ACTUAL_NARROW_R2_DELTA_REVIEW_STARTED_VERDICT_PENDING",
+    "target": "969030dbc7716b9cadf75bd314713005306ed34c",
+    "sourceBranch": "agent/codex/fleet5-b-a7-snapshot-r2-20261107",
+    "sourceDocs": 42304684547,
+    "ownerTask": "task_a8fd2969f0b3",
+    "ownerDispatch": "ctx_6f0f8253b8a7",
+    "ownerQuestion": "msg_649487e8b552",
+    "rootFixGrant": "msg_e051a19e0010",
+    "task": "task_c2de6e9fd486",
+    "dispatch": "ctx_36ec44cc8ca0",
+    "actualPredecessor": "ctx_06f0718be774",
+    "predecessorFreshLifecycle": "succeeded_settled_exited_released",
+    "independentVerdict": null,
+    "all19ResidualBlocksGrant": true,
+    "actualRuntimeB": 0,
+    "wholeProgramComplete": false
+  },
   "nextReviewRequires": "newimmutableK2Low/Stage2 orB8 pilot/evidence; oneClaudeafteractualrelease",
   "K2LatestImmutableProposalRootObservation": "k2-rev2-root-actual-contract-review-gate.json",
   "K2LatestActualReviewDispatch": {
@@ -3263,6 +3281,8 @@
   "A7R2Cut": "b-a7-snapshot-r2-root-fix-cut.json",
   "D04R2DeltaActual": "k2-d04-l1-r2-actual-delta-code-review-root-verification.json",
   "D04R2CodeL1": "CLOSED_BY_ACTUAL_INDEPENDENT_REVIEW",
-  "D04R2CoreStatus": "in_progress",
-  "D04R2CoreConclusion": null
+  "D04R2CoreStatus": "completed",
+  "D04R2CoreConclusion": "success",
+  "D04R2ActualFullCore": "k2-d04-l1-r2-actual-full-core-root-verification.json",
+  "D04R2AuthorClosureGrant": "msg_4bbb275c5aad"
 }

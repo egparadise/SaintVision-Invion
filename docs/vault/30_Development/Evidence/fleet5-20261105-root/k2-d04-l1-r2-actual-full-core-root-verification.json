@@ -1,0 +1,171 @@
+{
+  "atKST": "2026-11-07T07:31:55+09:00",
+  "source": "f2c1afb78b589b4b2cbcf3dcd4dc4f3c3f3bc856",
+  "branch": "agent/codex/fleet5-k2-d04-l1-r2-20261107",
+  "Core": 42300147891,
+  "correlation": "fleet5-d04-l1-r2-core-953a3e40ff0f482eb0b4e4a64c945d9b",
+  "exactHeadRefEventPathAttemptSuccess": true,
+  "jobs": [
+    {
+      "id": 128175516056,
+      "name": "s01-storage-roundtrip",
+      "steps": 16,
+      "conclusion": "success"
+    },
+    {
+      "id": 128175516644,
+      "name": "core",
+      "steps": 48,
+      "conclusion": "success"
+    }
+  ],
+  "allRequiredStepsSuccess": true,
+  "intentionalOptionalSkippedSteps": [
+    "FLEET5 early native Go peer-policy lifecycle proof",
+    "Publish FLEET5 native peer-phase proof (including expected baseline failure)",
+    "FLEET5 fixed native Go two-cycle proof",
+    "Publish FLEET5 fixed native proof",
+    "Collect fixed-SHA S08 build acceptance observations",
+    "Recompute S08 build acceptance verdict from raw artifacts"
+  ],
+  "JUnit": [
+    {
+      "name": "pytest",
+      "tests": 9358,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 46
+    }
+  ],
+  "Go": [
+    {
+      "path": "node-unit.jsonl",
+      "topLevelPass": 142,
+      "subtestPass": 506,
+      "skips": [
+        "github.com/egparadise/SaintVision-Invion/services/node-agent/cmd/inv-discover",
+        "TestDockerLiveCompatibility",
+        "github.com/egparadise/SaintVision-Invion/services/node-agent/tests/probe",
+        "github.com/egparadise/SaintVision-Invion/services/node-agent/transfer"
+      ],
+      "P02TopLevelPass": 13,
+      "P02SubtestPass": 101,
+      "SHA256": "6e185cd57647fe64d66b897d717f589369b439a91a4847f964a25b036d02c04f"
+    }
+  ],
+  "artifacts": [
+    {
+      "id": 13546465208,
+      "name": "saintvision-core-evidence",
+      "zipBytes": 14023750,
+      "zipSHA256": "sha256:c403c54cc3b191f2effc17d1d64d4ceab00fb67b61a6740d713f227bcb6484b1",
+      "files": 35,
+      "uncompressedBytes": 26726068,
+      "verifiedExactSourceRun": true
+    },
+    {
+      "id": 13543596804,
+      "name": "saintvision-s01-storage-evidence-42300147891",
+      "zipBytes": 1771,
+      "zipSHA256": "sha256:6b69f59b87c96d223f694a834b2bf3f364413a4f4fe7a1a0266e698789c88ead",
+      "files": 5,
+      "uncompressedBytes": 1857,
+      "verifiedExactSourceRun": true
+    }
+  ],
+  "actualFullCoreSourceAxis": "SUCCESS_WITH_EXPLICIT_DECLARED_SKIPS",
+  "codeReviewOrRuntimeAcceptanceInferred": false,
+  "wholeProgramComplete": false,
+  "JUnitPassed": 9312,
+  "JUnitSkippedReasons": [
+    {
+      "reason": "Actual Windows PowerShell launcher",
+      "count": 10
+    },
+    {
+      "reason": "Explicit browser smoke integration lane required (INV_BROWSER_SMOKE_INTEGRATION=1)",
+      "count": 1
+    },
+    {
+      "reason": "Intranet CA NSS DB live browser test requires Linux, certutil (libnss3-tools), and Playwright",
+      "count": 1
+    },
+    {
+      "reason": "PowerShell and csc.exe shim require Windows",
+      "count": 13
+    },
+    {
+      "reason": "PowerShell parser requires Windows",
+      "count": 2
+    },
+    {
+      "reason": "PowerShell required",
+      "count": 9
+    },
+    {
+      "reason": "Set INV_MLFLOW_LIVE_URI (the run-mlflow lane starts the server)",
+      "count": 3
+    },
+    {
+      "reason": "antigravity is not installed on this machine",
+      "count": 1
+    },
+    {
+      "reason": "claude is not installed on this machine",
+      "count": 1
+    },
+    {
+      "reason": "codex is not installed on this machine",
+      "count": 1
+    },
+    {
+      "reason": "gemini is not installed on this machine",
+      "count": 1
+    },
+    {
+      "reason": "run only through S11 Storage Failure Hosted Reference opt-in lane",
+      "count": 1
+    },
+    {
+      "reason": "run only through tools/placement_benchmark.py",
+      "count": 1
+    },
+    {
+      "reason": "run only through tools/placement_lock_wait_diagnostic.py",
+      "count": 1
+    }
+  ],
+  "binaryMetadata": [
+    {
+      "file": "inv-discover",
+      "bytes": 10212675,
+      "SHA256": "f87932abafaa5f0bae2d0cc333d617b3e75f43d77ee1eddf35b8d876f8e90d3c",
+      "GoVersion": "go1.27.1",
+      "vcsRevision": "f2c1afb78b589b4b2cbcf3dcd4dc4f3c3f3bc856",
+      "vcsModifiedFalse": true,
+      "GOOS": "linux",
+      "GOARCH": "amd64",
+      "metadataReadOnly": true,
+      "binaryExecuted": false,
+      "deployed": false
+    },
+    {
+      "file": "inv-node",
+      "bytes": 13387338,
+      "SHA256": "6418ff5cd599258e65fcfb03b41363be656ccf9aa9241743f17c4c43a92b18f1",
+      "GoVersion": "go1.27.1",
+      "vcsRevision": "f2c1afb78b589b4b2cbcf3dcd4dc4f3c3f3bc856",
+      "vcsModifiedFalse": true,
+      "GOOS": "linux",
+      "GOARCH": "amd64",
+      "metadataReadOnly": true,
+      "binaryExecuted": false,
+      "deployed": false
+    }
+  ],
+  "binaryExecuted": false,
+  "binaryDeployed": false,
+  "implementationIndependentReview": "a967e5dc0baf6fa21e827303b609f716478ffa6b",
+  "independentVerdict": "INTERNAL_CODE_ACCEPT_L1_CLOSED",
+  "physicalRuntimeAcceptance": false
+}

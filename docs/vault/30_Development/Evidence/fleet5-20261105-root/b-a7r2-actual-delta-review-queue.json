@@ -1,0 +1,19 @@
+{
+  "atKST": "2026-11-07T07:39:51+09:00",
+  "status": "ACTUAL_NARROW_R2_DELTA_REVIEW_STARTED_VERDICT_PENDING",
+  "target": "969030dbc7716b9cadf75bd314713005306ed34c",
+  "sourceBranch": "agent/codex/fleet5-b-a7-snapshot-r2-20261107",
+  "sourceDocs": 42304684547,
+  "ownerTask": "task_a8fd2969f0b3",
+  "ownerDispatch": "ctx_6f0f8253b8a7",
+  "ownerQuestion": "msg_649487e8b552",
+  "rootFixGrant": "msg_e051a19e0010",
+  "task": "task_c2de6e9fd486",
+  "dispatch": "ctx_36ec44cc8ca0",
+  "actualPredecessor": "ctx_06f0718be774",
+  "predecessorFreshLifecycle": "succeeded_settled_exited_released",
+  "independentVerdict": null,
+  "all19ResidualBlocksGrant": true,
+  "actualRuntimeB": 0,
+  "wholeProgramComplete": false
+}

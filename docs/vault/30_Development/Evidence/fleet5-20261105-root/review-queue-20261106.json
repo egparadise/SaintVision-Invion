@@ -1,6 +1,6 @@
 {
   "schema": "fleet5-root-review-resource-sequence:1",
-  "atKST": "2026-11-07T07:16:09+09:00",
+  "atKST": "2026-11-07T07:39:51+09:00",
   "completedB": {
     "task": "task_d4c4c809ed4e",
     "review": "ac9182c3e3d606ec027c0be2e90e049ff50d54f1",
@@ -12,9 +12,27 @@
     "verdict": "ACCEPT auxiliary delta at design/proposal level, no remaining blocker",
     "source": "8874b2dfe0dda9a019bd5f334636668290702e13"
   },
-  "active": null,
+  "active": {
+    "atKST": "2026-11-07T07:39:51+09:00",
+    "status": "ACTUAL_NARROW_R2_DELTA_REVIEW_STARTED_VERDICT_PENDING",
+    "target": "969030dbc7716b9cadf75bd314713005306ed34c",
+    "sourceBranch": "agent/codex/fleet5-b-a7-snapshot-r2-20261107",
+    "sourceDocs": 42304684547,
+    "ownerTask": "task_a8fd2969f0b3",
+    "ownerDispatch": "ctx_6f0f8253b8a7",
+    "ownerQuestion": "msg_649487e8b552",
+    "rootFixGrant": "msg_e051a19e0010",
+    "task": "task_c2de6e9fd486",
+    "dispatch": "ctx_36ec44cc8ca0",
+    "actualPredecessor": "ctx_06f0718be774",
+    "predecessorFreshLifecycle": "succeeded_settled_exited_released",
+    "independentVerdict": null,
+    "all19ResidualBlocksGrant": true,
+    "actualRuntimeB": 0,
+    "wholeProgramComplete": false
+  },
   "pending": [],
-  "authorParallelWork": "B author A7R2 development verifier reports30parsed=30audited/new18clean/19HOLD; final proof/docs in progress, not frozen or independently accepted. D04 author holdsf2c1 pending actualCore final.",
+  "authorParallelWork": "D04 author received actual a967 review and NEW f2c1 Core success; compact report-only closure and concrete next-ready DATA proposal granted by msg_4bbb275c5aad. B author9690 frozen awaiting actual R2 review.",
   "reason": "actuala7e9 and5a3c reviews+CI verified andprecisefixscopesdelivered; do notselfclose source/runtime",
   "genericApprovalMissing": false,
   "completedRL1": {
@@ -22,7 +40,7 @@
     "review": "0e53fc024ca773b7719182e170e5e126aeaf5b95",
     "verdict": "ACCEPT TEST-ONLY; R-L1 CLOSED; no new findings"
   },
-  "nextActualReviewTrigger": "Exact frozen A7R2 source/receipts/Docs after Root verification; predecessor06f now actually succeeded_settled_exited_released; no new reviewer until candidate is ready",
+  "nextActualReviewTrigger": "Actual A7R2 verdict and fresh lifecycle; do not start a second reviewer or poll mail.",
   "completedIntegration": {
     "task": "task_78064fb4b7ff",
     "dispatch": "ctx_ed7ec73163d6",
