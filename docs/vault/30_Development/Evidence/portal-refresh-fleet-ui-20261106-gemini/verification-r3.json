@@ -1,0 +1,128 @@
+{
+  "task": "PORTAL-REFRESH-POLLING-R3-20261106",
+  "author": "Gemini",
+  "atKST": "2026-11-07T02:40:00+09:00",
+  "base": "9c25f3c9cab162f424744d79f9a4e21729c40404",
+  "sourceCandidateInitial": "9cd017abf26a145d15a5c1b0d915662c3c71a724",
+  "sourceCandidateCorrected": "b48c2c4492f8aea4b55c33161733a9a6fb9eed8c",
+  "branch": "agent/gemini/portal-refresh-polling-r3-20261106",
+  "scope": {
+    "productPaths": [
+      "apps/web/src/app/App.tsx",
+      "apps/web/src/shared/ui/Header.tsx",
+      "apps/web/tests/portal-refresh-fleet-ui.test.tsx"
+    ],
+    "nonDocsIdenticalToSource": true
+  },
+  "reviewFindingsResolved": {
+    "UI-R2-M1": "Bounded second leg node certificate observation in App.tsx by passing controller.signal into fetchProjectNodeCertificates(targetPrj, controller.signal). Timeout covers the entire node+certificate observation operation. Hanging or 60s 504 sub-requests abort at 10s and trigger explicit error/staleness (probes R1, R1b, T1), never indefinitely claiming current zero success.",
+    "UI-R2-L1": "Enforced authoritative owned abort reason in catch blocks of fetchNodes, fetchRuns, fetchApprovals, and fetchWorkspaces. Only controller.signal.aborted with reason REQUEST_TIMEOUT is classified as a timeout; user cancellation or project switch supersede aborts return immediately without setting error/stale or displaying false 10s timeout text (probes R2, R2b, R5, R6).",
+    "UI-R2-L2": "Extended Header /healthz 4s timeout deadline across await res.json() by removing premature clearTimeout(timeoutId) before reading body. Non-abort malformed JSON SyntaxErrors map truthfully to degraded ('비정상 응답') preserving UI854-L1 closure, while body stalls past 4s abort and map truthfully to failure ('Offline') (probes H3, H3b, H4, H5).",
+    "UI-R2-L3": "Replaced superficial tests with real component DOM interactions: R8 real approval row click, reject button click, and confirmation modal confirm when approvalsState===error asserts decideApproval is never called (0 calls); R8c control test asserts decideApproval is called exactly once when valid; R9 ResourceExplorer retry button clears error banner and enters loading state while manual request is pending.",
+    "UI-R3-LintFix": "Smallest catch binding correction in fetchApprovals catch (catch without unused err binding), resolving ESLint @typescript-eslint/no-unused-vars failure observed in initial CI run 42247974625."
+  },
+  "testAttribution": "Tests R1, R1b, R2, R2b, R6, R8, R8c, R9, H3, H3b, H4, H5, T1 in apps/web/tests/portal-refresh-fleet-ui.test.tsx are OWNER reproductions of diagnostic reviewer test shapes. T1 verifies real client wrapper contracts and signal passing under mocked global fetch, not actual physical network/browser/SSO/TLS. Actual independent Claude R3 source review is SOURCE_AXIS_ACCEPT:626ab0eda10c22e8539546db8d9639092d88f7e7 on immutable b48 (Docs CI run 42263763156 job 128050178761 all 19 steps SUCCESS; static review with Root CI/guard evidence; 6 INFO limits remain; R2b late rejection no-op boundary noted).",
+  "localVerificationAttribution": "OWNER_REPORTED_EARLIER local CLI observations; complete source/WIP/KST/raw-log binding is not provided for every earlier entry and Root has not independently verified these local entries. Exact frozen b48 gates are direct hosted CI 1264 and Root PC3 three runs.",
+  "localVerification": {
+    "portalRefreshFleetUiTest": "exit 0 (46/46 passed in 835ms/980ms)",
+    "acc09ContrastTokens": "exit 0 (46/46 passed in 2121ms)",
+    "tscAppNoEmit": "exit 0 (cd apps/web; node node_modules/typescript/bin/tsc -p tsconfig.app.json --noEmit)",
+    "tscNodeNoEmit": "exit 0 (cd apps/web; node node_modules/typescript/bin/tsc -p tsconfig.node.json --noEmit)",
+    "viteBuild": "exit 0 (cd apps/web; node node_modules/vite/bin/vite.js build; dist/assets/index-DEIKEmX_.js 1,299.68 kB)",
+    "checkFrontendIntegrity": "exit 0 (all 9 integrity rules satisfied, 0 violations)",
+    "checkContractBindings": "exit 0 (57 fixtures, 21 bound response types, 14 replay guards)",
+    "pytestRouteCoverage": "exit 0 (41/41 passed in 1.43s)",
+    "checkDocs": "exit 0 (24 original hashes, 1262 versioned documents)",
+    "syncObsidianCheck": "exit 0 (python tools/sync_obsidian.py --check --state 'D:/Project/SaintVision-Invion/SaintVisionI-Invion/.git/obsidian-sync-state.json'; 2829 managed files, 0 conflicts; state hash verified identical 6367D282E9029B1BFC531D4145A4FB4890A010481E48EEE0E66ED2B7540FFEDD before and after)",
+    "localLint": "NOT_RUN_ENVIRONMENT_missing_shared_eslint (apps/web/node_modules/eslint/bin/eslint.js absent in junction, exit 1 MODULE_NOT_FOUND recorded honestly; full lint verified in hosted CI)"
+  },
+  "guardMutantExecutionProof": {
+    "executor": "ROOT OPERATOR (ad-hoc isolated execution on physical PC3; not an enforced host quota or node enrollment/5PC acceptance)",
+    "receiptPath": "D:/Project/SaintVisionI-Invion/fleet-five-orchestration-20261105/.work/uir3-pc3-guard-root-proof.json",
+    "receiptSHA256": "98f6949affbaac61186e32732e228d699738a3c6129e58a0a9e8a08dbd953ac7",
+    "environment": "Physical PC3, private export of exact b48, pinned node@sha256:01d566e8d94d8c619591d78652babfccd3c6992a3dffa9ed5ab39e11cf6c70e9 / Node v24.22.2, container 2 CPU, memory 2 GiB, memory+swap TOTAL 2 GiB (extra swap 0; dockerMemoryBytes 2147483648, dockerMemorySwapBytes 2147483648), pids 128, read-only rootfs, cap-drop ALL, no-new-privileges, nonroot UID 1000, network NONE. Direct cgroup observation on dependency container; each test HostConfig separately inspected.",
+    "suite": "Same 46-test actual-App suite (apps/web/tests/portal-refresh-fleet-ui.test.tsx) run serially under single worker",
+    "runs": {
+      "control_baseline": {
+        "exitCode": 0,
+        "passed": 46,
+        "failed": 0,
+        "status": "PASS"
+      },
+      "MD_noApprovalsErrorGuard": {
+        "exitCode": 1,
+        "passed": 45,
+        "failed": 1,
+        "killedBy": "R8 (approvalsState === error real reject click/modal confirmation asserts decideApproval is not called)",
+        "controlPassed": "R8c valid-click control passed",
+        "status": "KILLED_CAUSAL"
+      },
+      "ME_L3EventAsBackground": {
+        "exitCode": 1,
+        "passed": 45,
+        "failed": 1,
+        "killedBy": "R9 (ResourceExplorer retry button clears error banner and shows loading state while manual request pending)",
+        "controlPassed": "R8c valid-click control passed",
+        "status": "KILLED_CAUSAL"
+      }
+    },
+    "inputClosure": "281 apps/web + 165 contracts from Git b48; all 446 input hashes verified restored afterward; author real product/index never mutated",
+    "unexecutedDraft": "tools/run_uir3_mutants.py draft remained unexecuted and safely moved to ignored .work/run_uir3_mutants.py.draft"
+  },
+  "initialSourceCI": {
+    "sha": "9cd017abf26a145d15a5c1b0d915662c3c71a724",
+    "frontend": {
+      "run": 42247974625,
+      "conclusion": "failure",
+      "frontendJob": {
+        "id": 127995132127,
+        "conclusion": "failure",
+        "failedStep": "Run ESLint (App.tsx:487 unused catch err)"
+      },
+      "containerJob": {
+        "id": 127995132761,
+        "conclusion": "success"
+      }
+    }
+  },
+  "correctedSourceCI": {
+    "sha": "b48c2c4492f8aea4b55c33161733a9a6fb9eed8c",
+    "executedBy": "ROOT OPERATOR (authorized operational push & CI dispatch)",
+    "frontend": {
+      "run": 42254157322,
+      "event": "workflow_dispatch",
+      "workflow": ".github/workflows/frontend.yml",
+      "attempt": 1,
+      "conclusion": "success",
+      "frontendJob": {
+        "id": 128016761183,
+        "steps": 12,
+        "vitestFiles": 103,
+        "vitestTests": 1264,
+        "conclusion": "success"
+      },
+      "containerJob": {
+        "id": 128016761717,
+        "steps": 14,
+        "conclusion": "success"
+      }
+    },
+    "artifacts": {
+      "saintvisionWebDist": {
+        "id": 13520599988,
+        "sizeBytes": 1119300,
+        "digest": "sha256:7212b4870e3a142b8c44dc2629d5e6643401ae9e1d187d6234ecdf4059fd671d",
+        "byteVerifiedByRoot": true,
+        "extractedFiles": 13,
+        "expired": false
+      },
+      "containerRelease": {
+        "id": 13521388864,
+        "sizeBytes": 25985266,
+        "digest": "sha256:09e3b81e4034bcdbfff46eae89af6e34ffe0aac59382a95a10fe127f1e1baa3f"
+      }
+    }
+  },
+  "independentSourceReview": "SOURCE_AXIS_ACCEPT:626ab0eda10c22e8539546db8d9639092d88f7e7 (Docs CI 42263763156 / job 128050178761 all 19 SUCCESS, source b48 only, all prior M1/L1/L2/L3 CLOSED, no blocking findings; static independent Claude review + Root actual CI/guard evidence, no reviewer Node/browser execution, 6 INFO limits remain, source revision not required; report-only finalDocs/nondocs equality/deploy remain outside this verdict).",
+  "deploymentStatus": "PENDING (no production deployment, whole-program acceptance, or 5-PC hardware offering claimed; source-axis review accepted under 626ab0ed with final reportDocs/equivalence/deploy remaining Root operational gates)"
+}
