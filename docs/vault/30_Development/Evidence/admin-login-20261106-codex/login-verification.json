@@ -1,0 +1,22 @@
+{
+  "atKST": "2026-11-06T18:49:53+09:00",
+  "SSOAuthorizationCodePKCES256": true,
+  "tokenExchangeHTTP": 200,
+  "sessionHTTP": 200,
+  "administratorPermissionHTTP": 200,
+  "membersHTTP": 200,
+  "roleCode": "owner",
+  "canAdminister": true,
+  "canRequest": true,
+  "canApprove": true,
+  "anonymousSessionHTTP": 401,
+  "tokenPersisted": false,
+  "passwordPersisted": false,
+  "subjectLinked": true,
+  "scope": "one explicitly requested local portal account, project owner",
+  "credentialValuesRecorded": false,
+  "applicationSourceModified": false,
+  "backendRestored": true,
+  "frontendBuildDeployment": "PENDING",
+  "fivePCOrFleetAcceptanceChanged": false
+}
