@@ -315,7 +315,7 @@
       "effectClass": "SIDE_EFFECT",
       "effectSelection": "fixed method/rawPath/handler plus independently admitted exact request; same binding in schema/row/procedure/capability/consumer. Caller cannot downgrade.",
       "transportMethod": "NodeTLSClient.exchange",
-      "effectCounterexample": "72028 runtime/runner.go Observe:366 invokes reconcile; reconcile may Stop at :270 and finish Remove at :330 and journal Save. Actual path retained SIDE_EFFECT; no new pure read endpoint invented."
+      "effectCounterexample": "Actual Runner.Observe invokes reconcile; reconcile can Stop and finish can Remove/Save. Exact method-scoped file/line/hash proof is generated in transport-inventory.json readOnlyException. Actual path retained SIDE_EFFECT; no pure read endpoint invented."
     },
     {
       "kind": "CANCEL",

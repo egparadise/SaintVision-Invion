@@ -120,5 +120,5 @@ def build_catalog():
             row['source']=source_record('services/control-plane/src/inv/node_transport.py',call.lineno)
             row['transportMethod']='NodeTLSClient.'+transport[k]
             assert '_request(' in row['source']['exactLine']
-        if k=='RECEIPT_OBSERVE':row['effectCounterexample']='72028 runtime/runner.go Observe:366 invokes reconcile; reconcile may Stop at :270 and finish Remove at :330 and journal Save. Actual path retained SIDE_EFFECT; no new pure read endpoint invented.'
+        if k=='RECEIPT_OBSERVE':row['effectCounterexample']='Actual Runner.Observe invokes reconcile; reconcile can Stop and finish can Remove/Save. Exact method-scoped file/line/hash proof is generated in transport-inventory.json readOnlyException. Actual path retained SIDE_EFFECT; no pure read endpoint invented.'
     return d

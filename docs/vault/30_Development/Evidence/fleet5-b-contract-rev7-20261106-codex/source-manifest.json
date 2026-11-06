@@ -4604,8 +4604,8 @@
     "rank_contract.py": "c95f906069c7d8ce3221e523584aa16c89bd3ae1165bd5d8d76b6abbb58cc310",
     "plan_specs.py": "f325b8108085b8b113174b181185cd91fb7cb907f63dbd9554d2323a72f7044c",
     "writer_semantics.py": "461a4f2c8236d219c0c435d078eb87a73dd30799884d512141783e52f6449a5d",
-    "transport_inventory.py": "c22a821089b936b15e41a359e5cd24a13e336bd57ef03c829e9d167bb36ec94b",
-    "catalog.py": "3c4893bf058d1c12926556ff3d28d540b0ea98bfcf1e0a830741d19c55a6174b",
+    "transport_inventory.py": "515182994747db8ceb9f0669b35e13abec6e2a40dd7334d5b9f66350a496de8f",
+    "catalog.py": "a4dd17c61402ddd13bbf9746a16613ce5378715cb117101752fb4e0557b5542d",
     "io_contract.py": "539a49c3f7b56c7bc1a6898cd5fe5012e435259f3a34f00066414619b4a35f3d"
   },
   "ledgers": {
@@ -4655,13 +4655,13 @@
       "file": "functionPlans.jsonl",
       "rows": 3485,
       "bytes": 8115807,
-      "sha256": "88e8b249a4a1fbbc7221aa4e1e7001813bee1e86184b34ff852f438dc06aba90"
+      "sha256": "7d650fbe47e83f9714c922ffcfe1d93cef3d7a9319873bc9898ebf644f28409a"
     },
     "criticalEntries": {
       "file": "criticalEntries.jsonl",
       "rows": 21,
       "bytes": 139930,
-      "sha256": "73247267e4ea589730cdea93e73aeb29d26e4d8a52c7a84cf5c2ff0a21c01c2e"
+      "sha256": "18eb25cbcf70fbee42b42f12cf85f158adc03d859d63b728c23b533512fba32a"
     },
     "valueConstructorProofs": {
       "file": "valueConstructorProofs.jsonl",
@@ -26708,8 +26708,8 @@
     "enforcedRAMLimit": null,
     "OSChanges": false,
     "reviewResourceContext": "prior reviewer190-356MiB; stream normalized ledgers and run bounded selected subsets, not a 74MB aggregate parse",
-    "peakWorkingSetBytes": 646504448,
-    "workingSetBytes": 610201600
+    "peakWorkingSetBytes": 643637248,
+    "workingSetBytes": 612073472
   },
   "classificationCounts": {
     "UNRESOLVED": 21453,
@@ -26736,7 +26736,7 @@
     "script": "sanitize_display.py",
     "scriptSHA256": "bf21931c9978f39ebd01ba2fa458977d43562a0ff0009395c700b7fdbe71f9a8",
     "ledger": "display-redaction-ledger.json",
-    "originalManifestSHA256": "71765673bac07a7747190767519bd1708fd9705278d4ff191225008ef6d995e0",
+    "originalManifestSHA256": "d132658dddd38fc299e8ce73b5727f99a95178243628760238896c5d01589685",
     "changedRows": 22,
     "sourceCoordinatesAndExpressionHashes": "ORIGINAL Git bytes; display may be masked with field-level raw/display hashes"
   }

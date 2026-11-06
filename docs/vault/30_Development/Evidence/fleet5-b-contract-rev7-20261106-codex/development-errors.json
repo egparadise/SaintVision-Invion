@@ -52,6 +52,11 @@
       "kind": "staged raw line endings",
       "actual": "git diff --cached --check exit2 because byte-preserving CRLF JSON was treated as trailing CR; tool output truncated, no raw-log retention claim",
       "resolution": "scoped whitespace attribute permits CR-at-EOL while retaining blank-at-eol/blank-at-eof/space-before-tab; prior TXT/raw logs binary; raw hashes and producer/review bytes unchanged"
+    },
+    {
+      "kind": "final Go proof context",
+      "actual": "generic first-match anchors found Execute reconcile/Save and contract-selector probe branch instead of intended Observe/finish/effect branch",
+      "resolution": "constrain Go anchors to exact enclosing function, use actual heartbeat effect branch, assert Observe direct call366 and finish Save334; reemit exact producer provenance and all consumers before final head; earlier0c547 remains immutable historical docs head"
     }
   ],
   "finalLedgers": [

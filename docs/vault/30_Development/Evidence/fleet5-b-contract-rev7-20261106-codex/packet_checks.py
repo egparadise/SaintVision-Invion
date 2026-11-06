@@ -80,6 +80,9 @@ def main():
     for r in transport['callers']:
         current=source_record(r['path'],r['line']);check('caller-exact-source-'+r['path']+':'+str(r['line']),current['exactLine']==r['exactLine'] and current['fileSHA256']==r['fileSHA256'] and r['methodName'] in r['exactLine'])
     check('actual-receipts-side-effect-counterexample',transport['readOnlyException']['chosenEffect']=='SIDE_EFFECT' and len(transport['readOnlyException']['proof'])==5)
+    proof=transport['readOnlyException']['proof']
+    check('Observe-direct-reconcile-call-context',proof[1]['line']==366 and 'Observe(' in proof[1]['enclosingFunction'])
+    check('finish-removal-and-save-context',all('finish(' in proof[i]['enclosingFunction'] for i in (3,4)) and proof[4]['line']==334)
     check('13-purpose-specific-reader-predicates',len({r['purposeClass'] for r in transport['catalog']['plainReaders']})==13)
     check('plain-owner-activation-no-confirmation',matrix['procedures']['b_activate_owner_contribution']['requiresNodeConfirmation'] is False)
     wrong=deepcopy(matrix);wrong['procedures']['b_activate_owner_contribution']['requiresNodeConfirmation']=True

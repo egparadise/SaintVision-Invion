@@ -29,7 +29,7 @@
   "symbolicCases": 335,
   "boundedSourceCases": 41,
   "ownerPriorClosedRerunCases": 8,
-  "packetAssertions": 78358,
+  "packetAssertions": 78360,
   "streamedSourceLedgerBytes": 43994760,
   "displayMaskedRows": 22,
   "displayRawSourceBindingsPreserved": true,
@@ -38,8 +38,8 @@
     "enforcedRAMLimit": null,
     "OSChanges": false,
     "reviewResourceContext": "prior reviewer190-356MiB; stream normalized ledgers and run bounded selected subsets, not a 74MB aggregate parse",
-    "peakWorkingSetBytes": 646504448,
-    "workingSetBytes": 610201600
+    "peakWorkingSetBytes": 643637248,
+    "workingSetBytes": 612073472
   },
   "boundedSubsetMemory": {
     "scope": "this process only",

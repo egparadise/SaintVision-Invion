@@ -9,10 +9,10 @@
       ],
       "expectedExit": 0,
       "actualExit": 0,
-      "seconds": 30.626,
+      "seconds": 11.706,
       "log": "publication-gates-1.log",
       "sha256": "149edaef15646674894dfd9d60b252cd7109046ea00df34bfb9eed05e1cc86c3",
-      "kst": "2026-11-06T13:59:55.179254+09:00"
+      "kst": "2026-11-06T14:18:47.459624+09:00"
     },
     {
       "command": [
@@ -22,10 +22,10 @@
       ],
       "expectedExit": 0,
       "actualExit": 0,
-      "seconds": 2.328,
+      "seconds": 2.56,
       "log": "publication-gates-2.log",
       "sha256": "7cdc12bf64f50ba0964625161638a4c639cf22d786a57f04685bed0718e14042",
-      "kst": "2026-11-06T13:59:57.526747+09:00"
+      "kst": "2026-11-06T14:18:50.055969+09:00"
     },
     {
       "command": [
@@ -40,10 +40,10 @@
       ],
       "expectedExit": 0,
       "actualExit": 0,
-      "seconds": 11.506,
+      "seconds": 11.784,
       "log": "publication-gates-3.log",
-      "sha256": "74da4902865f3a0aaf2a17fac568952332b4dcc413b3c8744088b9acff778962",
-      "kst": "2026-11-06T14:00:09.039024+09:00"
+      "sha256": "2bc16313f6c84618798912d26630ff84382c6a916a01c40f3897b40a1129d0ac",
+      "kst": "2026-11-06T14:19:01.848512+09:00"
     },
     {
       "command": [
@@ -53,10 +53,10 @@
       ],
       "expectedExit": 0,
       "actualExit": 0,
-      "seconds": 7.677,
+      "seconds": 7.682,
       "log": "publication-gates-4.log",
       "sha256": "7d3493f361d1c522254d1dbd2e0a74b4dc3c54ef90bd9bfdec3a57666d7798ed",
-      "kst": "2026-11-06T14:00:16.742102+09:00"
+      "kst": "2026-11-06T14:19:09.561031+09:00"
     },
     {
       "command": [
@@ -66,10 +66,10 @@
       ],
       "expectedExit": 0,
       "actualExit": 0,
-      "seconds": 0.655,
+      "seconds": 0.8,
       "log": "publication-gates-5.log",
       "sha256": "2a2f0348a4bdc71911a5eac47ef7fd7a1ca4573e71cce914cb6d6dd198392949",
-      "kst": "2026-11-06T14:00:17.420384+09:00"
+      "kst": "2026-11-06T14:19:10.386871+09:00"
     },
     {
       "command": [
@@ -80,10 +80,10 @@
       ],
       "expectedExit": 0,
       "actualExit": 0,
-      "seconds": 0.848,
+      "seconds": 0.711,
       "log": "publication-gates-6.log",
       "sha256": "13b5f5afed05999109839be1baec4ef70ea3c71bcb267353e59eba0f2ae3e448",
-      "kst": "2026-11-06T14:00:18.270535+09:00"
+      "kst": "2026-11-06T14:19:11.104094+09:00"
     },
     {
       "command": [
@@ -93,10 +93,10 @@
       ],
       "expectedExit": 0,
       "actualExit": 0,
-      "seconds": 0.119,
+      "seconds": 0.106,
       "log": "publication-gates-7.log",
       "sha256": "ba85e5489b5c960d3fdd09acf663a0c157e70028c6d54044d4820a67c99570fc",
-      "kst": "2026-11-06T14:00:18.391833+09:00"
+      "kst": "2026-11-06T14:19:11.212256+09:00"
     },
     {
       "command": [
@@ -109,14 +109,14 @@
       ],
       "expectedExit": 0,
       "actualExit": 0,
-      "seconds": 4.656,
+      "seconds": 4.451,
       "log": "publication-gates-8.log",
       "sha256": "389921b50662776ed834a285f70fc44ab61f7d5bdb4c5249c0a73c98113980de",
-      "kst": "2026-11-06T14:00:23.049861+09:00"
+      "kst": "2026-11-06T14:19:15.666066+09:00"
     }
   ],
-  "canonicalSyncStateBeforeSHA256": "2442c54fbc3bf9582a55073aed82082019c6543bf9f46dd62300a72a7330cc53",
-  "canonicalSyncStateAfterSHA256": "2442c54fbc3bf9582a55073aed82082019c6543bf9f46dd62300a72a7330cc53",
+  "canonicalSyncStateBeforeSHA256": "49fba01268a37b0c85ed9075a5221dcf4e2ca111433b4b7e67d8818d2c544b0a",
+  "canonicalSyncStateAfterSHA256": "49fba01268a37b0c85ed9075a5221dcf4e2ca111433b4b7e67d8818d2c544b0a",
   "obsidianApply": false,
   "actualRuntimeB": 0
 }

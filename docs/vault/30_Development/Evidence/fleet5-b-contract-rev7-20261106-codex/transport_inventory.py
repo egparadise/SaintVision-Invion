@@ -56,12 +56,14 @@ def inventory():
     for row in catalog['ioKinds']:
         row['callerBoundaries']=[{'path':r['path'],'line':r['line'],'function':r['function'],'fileSHA256':r['fileSHA256']} for r in rows if any(v['kind']==row['kind'] for v in r.get('variants',[]))]
         if not row['kind'].startswith('B_') and not row['callerBoundaries']:errors.append({'kindWithoutCaller':row['kind']})
-    def go_anchor(path,needle):
-        raw=source_bytes(path);lines=raw.decode().splitlines();line=next(i for i,s in enumerate(lines,1) if needle in s)
-        return {'sourceSHA':BASE,'path':path,'fileSHA256':hashlib.sha256(raw).hexdigest(),'line':line,'exactLine':lines[line-1]}
-    counter=[go_anchor('services/node-agent/runtime/runner.go',x) for x in ('func (r *Runner) Observe','r.reconcile(*prior','r.engine.Stop(ctx, state.ID)','r.engine.Remove(ctx, state.ID, record)','r.journal.Save(receipt)')]
+    def go_anchor(path,needle,owner=None):
+        raw=source_bytes(path);lines=raw.decode().splitlines();start=next((i for i,text in enumerate(lines,1) if owner and owner in text),1)
+        end=next((i for i,text in enumerate(lines,1) if owner and i>start and text.startswith('func ')),len(lines)+1)
+        line=next(i for i,text in enumerate(lines,1) if start<=i<end and needle in text)
+        return {'sourceSHA':BASE,'path':path,'fileSHA256':hashlib.sha256(raw).hexdigest(),'line':line,'exactLine':lines[line-1],'enclosingFunction':owner,'functionStartLine':start,'functionEndExclusive':end}
+    counter=[go_anchor('services/node-agent/runtime/runner.go',needle,owner) for needle,owner in (('func (r *Runner) Observe','func (r *Runner) Observe('),('r.reconcile(*prior','func (r *Runner) Observe('),('r.engine.Stop(ctx, state.ID)','func (r *Runner) reconcile('),('r.engine.Remove(ctx, state.ID, record)','func (r *Runner) finish('),('r.journal.Save(receipt)','func (r *Runner) finish('))]
     handlers={k:go_anchor('services/node-agent/transport/server.go',n) for k,n in {
-      'HEARTBEAT_OBSERVE':'if probe || snapshot {','GPU_ACTIVE_OBSERVE':'telemetry.Sample(ctx)',
+      'HEARTBEAT_OBSERVE':'config := h.authority.config','GPU_ACTIVE_OBSERVE':'telemetry.Sample(ctx)',
       'STORAGE_SAMPLE':'h.storage.Sample(ctx, raw)','OBJECT_READ':'h.objects.Read(ctx, input)',
       'TERMINAL_FRAME':'engine.Terminal(ctx, raw)','QUARANTINE_RECONCILE':'recorder.Quarantine(ctx, raw)',
       'EXECUTE':'h.runner.Execute(ctx, raw)','CANCEL':'stopper.Cancel(ctx, raw)','RECEIPT_OBSERVE':'h.runner.Observe(ctx, raw)'}.items()}

@@ -805,7 +805,7 @@
         "effectClass": "SIDE_EFFECT",
         "effectSelection": "fixed method/rawPath/handler plus independently admitted exact request; same binding in schema/row/procedure/capability/consumer. Caller cannot downgrade.",
         "transportMethod": "NodeTLSClient.exchange",
-        "effectCounterexample": "72028 runtime/runner.go Observe:366 invokes reconcile; reconcile may Stop at :270 and finish Remove at :330 and journal Save. Actual path retained SIDE_EFFECT; no new pure read endpoint invented.",
+        "effectCounterexample": "Actual Runner.Observe invokes reconcile; reconcile can Stop and finish can Remove/Save. Exact method-scoped file/line/hash proof is generated in transport-inventory.json readOnlyException. Actual path retained SIDE_EFFECT; no pure read endpoint invented.",
         "callerBoundaries": [
           {
             "path": "services/control-plane/src/inv/node_transport.py",
@@ -1263,64 +1263,91 @@
       "sourceSHA": "72028cbac903c4415d9979f980a6e0f9948e914f",
       "path": "services/node-agent/transport/server.go",
       "fileSHA256": "c9c98084798eeda52a8f38bebc6a13f5e531deaf3c0016e4295ade19a500b8a2",
-      "line": 101,
-      "exactLine": "\tif probe || snapshot {"
+      "line": 223,
+      "exactLine": "\t\tconfig := h.authority.config",
+      "enclosingFunction": null,
+      "functionStartLine": 1,
+      "functionEndExclusive": 355
     },
     "GPU_ACTIVE_OBSERVE": {
       "sourceSHA": "72028cbac903c4415d9979f980a6e0f9948e914f",
       "path": "services/node-agent/transport/server.go",
       "fileSHA256": "c9c98084798eeda52a8f38bebc6a13f5e531deaf3c0016e4295ade19a500b8a2",
       "line": 230,
-      "exactLine": "\t\t\tresult, err = telemetry.Sample(ctx)"
+      "exactLine": "\t\t\tresult, err = telemetry.Sample(ctx)",
+      "enclosingFunction": null,
+      "functionStartLine": 1,
+      "functionEndExclusive": 355
     },
     "STORAGE_SAMPLE": {
       "sourceSHA": "72028cbac903c4415d9979f980a6e0f9948e914f",
       "path": "services/node-agent/transport/server.go",
       "fileSHA256": "c9c98084798eeda52a8f38bebc6a13f5e531deaf3c0016e4295ade19a500b8a2",
       "line": 129,
-      "exactLine": "\t\tresult, err := h.storage.Sample(ctx, raw)"
+      "exactLine": "\t\tresult, err := h.storage.Sample(ctx, raw)",
+      "enclosingFunction": null,
+      "functionStartLine": 1,
+      "functionEndExclusive": 355
     },
     "OBJECT_READ": {
       "sourceSHA": "72028cbac903c4415d9979f980a6e0f9948e914f",
       "path": "services/node-agent/transport/server.go",
       "fileSHA256": "c9c98084798eeda52a8f38bebc6a13f5e531deaf3c0016e4295ade19a500b8a2",
       "line": 203,
-      "exactLine": "\t\tresult, err := h.objects.Read(ctx, input)"
+      "exactLine": "\t\tresult, err := h.objects.Read(ctx, input)",
+      "enclosingFunction": null,
+      "functionStartLine": 1,
+      "functionEndExclusive": 355
     },
     "TERMINAL_FRAME": {
       "sourceSHA": "72028cbac903c4415d9979f980a6e0f9948e914f",
       "path": "services/node-agent/transport/server.go",
       "fileSHA256": "c9c98084798eeda52a8f38bebc6a13f5e531deaf3c0016e4295ade19a500b8a2",
       "line": 183,
-      "exactLine": "\t\tresult, err := engine.Terminal(ctx, raw)"
+      "exactLine": "\t\tresult, err := engine.Terminal(ctx, raw)",
+      "enclosingFunction": null,
+      "functionStartLine": 1,
+      "functionEndExclusive": 355
     },
     "QUARANTINE_RECONCILE": {
       "sourceSHA": "72028cbac903c4415d9979f980a6e0f9948e914f",
       "path": "services/node-agent/transport/server.go",
       "fileSHA256": "c9c98084798eeda52a8f38bebc6a13f5e531deaf3c0016e4295ade19a500b8a2",
       "line": 154,
-      "exactLine": "\t\tresult, err := recorder.Quarantine(ctx, raw)"
+      "exactLine": "\t\tresult, err := recorder.Quarantine(ctx, raw)",
+      "enclosingFunction": null,
+      "functionStartLine": 1,
+      "functionEndExclusive": 355
     },
     "EXECUTE": {
       "sourceSHA": "72028cbac903c4415d9979f980a6e0f9948e914f",
       "path": "services/node-agent/transport/server.go",
       "fileSHA256": "c9c98084798eeda52a8f38bebc6a13f5e531deaf3c0016e4295ade19a500b8a2",
       "line": 284,
-      "exactLine": "\t\tresult, err = h.runner.Execute(ctx, raw)"
+      "exactLine": "\t\tresult, err = h.runner.Execute(ctx, raw)",
+      "enclosingFunction": null,
+      "functionStartLine": 1,
+      "functionEndExclusive": 355
     },
     "CANCEL": {
       "sourceSHA": "72028cbac903c4415d9979f980a6e0f9948e914f",
       "path": "services/node-agent/transport/server.go",
       "fileSHA256": "c9c98084798eeda52a8f38bebc6a13f5e531deaf3c0016e4295ade19a500b8a2",
       "line": 280,
-      "exactLine": "\t\tresult, err = stopper.Cancel(ctx, raw)"
+      "exactLine": "\t\tresult, err = stopper.Cancel(ctx, raw)",
+      "enclosingFunction": null,
+      "functionStartLine": 1,
+      "functionEndExclusive": 355
     },
     "RECEIPT_OBSERVE": {
       "sourceSHA": "72028cbac903c4415d9979f980a6e0f9948e914f",
       "path": "services/node-agent/transport/server.go",
       "fileSHA256": "c9c98084798eeda52a8f38bebc6a13f5e531deaf3c0016e4295ade19a500b8a2",
       "line": 282,
-      "exactLine": "\t\tresult, err = h.runner.Observe(ctx, raw)"
+      "exactLine": "\t\tresult, err = h.runner.Observe(ctx, raw)",
+      "enclosingFunction": null,
+      "functionStartLine": 1,
+      "functionEndExclusive": 355
     }
   },
   "readOnlyException": {
@@ -1332,35 +1359,50 @@
         "path": "services/node-agent/runtime/runner.go",
         "fileSHA256": "ee2ec63fa6a0f28a2f0750be3aba5145fccc88df82819106207ea0c5828f49b9",
         "line": 343,
-        "exactLine": "func (r *Runner) Observe(ctx context.Context, envelope []byte) (Result, error) {"
+        "exactLine": "func (r *Runner) Observe(ctx context.Context, envelope []byte) (Result, error) {",
+        "enclosingFunction": "func (r *Runner) Observe(",
+        "functionStartLine": 343,
+        "functionEndExclusive": 370
       },
       {
         "sourceSHA": "72028cbac903c4415d9979f980a6e0f9948e914f",
         "path": "services/node-agent/runtime/runner.go",
         "fileSHA256": "ee2ec63fa6a0f28a2f0750be3aba5145fccc88df82819106207ea0c5828f49b9",
-        "line": 78,
-        "exactLine": "\t\tresult, err := r.reconcile(*prior, \"recovered\")"
+        "line": 366,
+        "exactLine": "\tresult, err := r.reconcile(*prior, \"recovered\")",
+        "enclosingFunction": "func (r *Runner) Observe(",
+        "functionStartLine": 343,
+        "functionEndExclusive": 370
       },
       {
         "sourceSHA": "72028cbac903c4415d9979f980a6e0f9948e914f",
         "path": "services/node-agent/runtime/runner.go",
         "fileSHA256": "ee2ec63fa6a0f28a2f0750be3aba5145fccc88df82819106207ea0c5828f49b9",
         "line": 267,
-        "exactLine": "\t\t_ = r.engine.Stop(ctx, state.ID)"
+        "exactLine": "\t\t_ = r.engine.Stop(ctx, state.ID)",
+        "enclosingFunction": "func (r *Runner) reconcile(",
+        "functionStartLine": 224,
+        "functionEndExclusive": 287
       },
       {
         "sourceSHA": "72028cbac903c4415d9979f980a6e0f9948e914f",
         "path": "services/node-agent/runtime/runner.go",
         "fileSHA256": "ee2ec63fa6a0f28a2f0750be3aba5145fccc88df82819106207ea0c5828f49b9",
         "line": 331,
-        "exactLine": "\tif err := r.engine.Remove(ctx, state.ID, record); err != nil {"
+        "exactLine": "\tif err := r.engine.Remove(ctx, state.ID, record); err != nil {",
+        "enclosingFunction": "func (r *Runner) finish(",
+        "functionStartLine": 287,
+        "functionEndExclusive": 343
       },
       {
         "sourceSHA": "72028cbac903c4415d9979f980a6e0f9948e914f",
         "path": "services/node-agent/runtime/runner.go",
         "fileSHA256": "ee2ec63fa6a0f28a2f0750be3aba5145fccc88df82819106207ea0c5828f49b9",
-        "line": 236,
-        "exactLine": "\t\tif err := r.journal.Save(receipt); err != nil {"
+        "line": 334,
+        "exactLine": "\tif err := r.journal.Save(receipt); err != nil {",
+        "enclosingFunction": "func (r *Runner) finish(",
+        "functionStartLine": 287,
+        "functionEndExclusive": 343
       }
     ],
     "reason": "Observe can Stop/Remove and persist receipt; no pure-read split exists in72028, so actual path stays side effect/HOLD on uncertainty"

@@ -1,7 +1,7 @@
 ---
 doc_id: "HIST-FLEET5-B-CONTRACT-REV7-001"
 title: "FLEET5 Rev7 effect-scoped IO and sound source-to-procedure grant boundary"
-version: "1.0.0"
+version: "1.0.1"
 status: "review"
 author: "Codex"
 reviewer: "Actual independent Claude whole Rev7 delta review via Root pending"
@@ -89,7 +89,7 @@ local protected-file read, never an invented HTTP/signed-file wire.
 | IDEMPOTENT_SAFETY | CANCEL, QUARANTINE_RECONCILE, B_GATE_INVALIDATE | Exact documented causal/target scope; fresh protected RECOVERY_OBSERVATION verifier may close PENDING/UNCERTAIN only with current identity/epoch/generation/channel/leaf, exact command/target/nonce and independently verified durable ACK or causally bound readback |
 | READ_ONLY | HEARTBEAT_OBSERVE, GPU_ACTIVE_OBSERVE, STORAGE_SAMPLE, OBJECT_READ, BUILD_HEALTH_READ, BUILD_CLEANUP_READ, B_ROLE_OBSERVE, B_FOLDER_ROOT_OBSERVE | Register for provenance, never business denial or security-version increment. Verified failure/timeout ordinary NO_EFFECT_ABANDONED without OP; late/duplicate/wrong response cannot reopen or refresh authority |
 
-Important actual exception: `services/node-agent/runtime/runner.go:343` Observe
+Important actual exception: `services/node-agent/runtime/runner.go:366` Observe
 may call reconcile, which Stop/Remove/persists the original receipt. Consequently
 `/v1/executions/receipts` stays SIDE_EFFECT/HOLD on uncertainty. The exact five Go
 anchors are generated in transport-inventory.json. No pure-read endpoint is invented.
@@ -249,7 +249,7 @@ Static/schema/symbolic checks cannot replace any of these.
 # Verification and next owner
 
 Exact commands/exits/KST/raw SHA256 are in source-checks.json, proof-checks.json and
-publication-gates.json; producer-refresh-checks.json binds the final whitespace-formatted emitter and its postprocessing/consumers. display-checks.json records masked-display postprocessing and consumer reruns. Final counts and memory are in packet-summary.json. The
+publication-gates.json; go-anchor-refresh-checks.json records the final method-scoped Go anchor correction and exact producer/consumer rerun; producer-refresh-checks.json binds the final whitespace-formatted emitter and its postprocessing/consumers. display-checks.json records masked-display postprocessing and consumer reruns. Final counts and memory are in packet-summary.json. The
 unchanged guard fixture is green; --require-coexistence is expected nonzero1 and
 continues proving the real source gap, not a task failure. Historical development
 failures/resource diagnostics are separate and never reclassified as final PASS.

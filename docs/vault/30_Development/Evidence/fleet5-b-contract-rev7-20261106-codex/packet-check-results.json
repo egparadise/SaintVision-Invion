@@ -1,5 +1,5 @@
 {
-  "assertions": 78358,
+  "assertions": 78360,
   "failed": 0,
   "namedChecks": [
     {
@@ -487,6 +487,16 @@
     },
     {
       "case": "actual-receipts-side-effect-counterexample",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "case": "Observe-direct-reconcile-call-context",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "case": "finish-removal-and-save-context",
       "pass": true,
       "detail": null
     },

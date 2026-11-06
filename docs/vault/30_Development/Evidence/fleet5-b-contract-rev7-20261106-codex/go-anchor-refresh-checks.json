@@ -1,0 +1,71 @@
+{
+  "reason": "exact method-scoped Go proof including catalog reference; original production/source ABI unchanged",
+  "commands": [
+    {
+      "command": [
+        "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+        "-B",
+        "docs\\vault\\30_Development\\Evidence\\fleet5-b-contract-rev7-20261106-codex\\source_analysis.py"
+      ],
+      "expectedExit": 0,
+      "actualExit": 0,
+      "seconds": 96.76,
+      "log": "go-anchor-refresh-checks-1.log",
+      "sha256": "3d835f77bda2eed86ff63378da1a1a78810e7d93e46bf427d089a9eee27eb653",
+      "kst": "2026-11-06T14:17:40.352647+09:00"
+    },
+    {
+      "command": [
+        "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+        "-B",
+        "docs\\vault\\30_Development\\Evidence\\fleet5-b-contract-rev7-20261106-codex\\sanitize_display.py"
+      ],
+      "expectedExit": 0,
+      "actualExit": 0,
+      "seconds": 1.945,
+      "log": "go-anchor-refresh-checks-2.log",
+      "sha256": "deb5727ee6d640d1437c6d39754aa91eb317dafc8c5b325d4df335ca8ad48ff4",
+      "kst": "2026-11-06T14:17:42.303841+09:00"
+    },
+    {
+      "command": [
+        "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+        "-B",
+        "docs\\vault\\30_Development\\Evidence\\fleet5-b-contract-rev7-20261106-codex\\reconcile.py"
+      ],
+      "expectedExit": 0,
+      "actualExit": 0,
+      "seconds": 1.899,
+      "log": "go-anchor-refresh-checks-3.log",
+      "sha256": "a647e469798426933185c80ced6c32abc2ae28b1bc700b67e7479ad974d71a51",
+      "kst": "2026-11-06T14:17:44.204790+09:00"
+    },
+    {
+      "command": [
+        "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+        "-B",
+        "docs\\vault\\30_Development\\Evidence\\fleet5-b-contract-rev7-20261106-codex\\link_plans.py"
+      ],
+      "expectedExit": 0,
+      "actualExit": 0,
+      "seconds": 1.942,
+      "log": "go-anchor-refresh-checks-4.log",
+      "sha256": "e61cdd9757b8d312c8709d8f8061e250ea985c69762ea73acac071b628a04e95",
+      "kst": "2026-11-06T14:17:46.155926+09:00"
+    },
+    {
+      "command": [
+        "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+        "-B",
+        "docs\\vault\\30_Development\\Evidence\\fleet5-b-contract-rev7-20261106-codex\\baseline_accounting.py"
+      ],
+      "expectedExit": 0,
+      "actualExit": 0,
+      "seconds": 1.465,
+      "log": "go-anchor-refresh-checks-5.log",
+      "sha256": "9ca44a04686c83af52f4047975b9a601e321c108abc7fce1a9fd3369cf9595b6",
+      "kst": "2026-11-06T14:17:47.623241+09:00"
+    }
+  ],
+  "actualRuntimeB": 0
+}
