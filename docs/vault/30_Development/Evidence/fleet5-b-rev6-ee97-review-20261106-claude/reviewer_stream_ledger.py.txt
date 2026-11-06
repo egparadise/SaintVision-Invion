@@ -1,0 +1,73 @@
+"""Bounded-memory streaming inspection of rev6 source-analysis.json (74MB). Never loads whole file."""
+import json, sys, collections, hashlib
+PATH=sys.argv[1]; CH=1<<20
+dec=json.JSONDecoder()
+class S:
+    def __init__(s,p):s.f=open(p,'rb');s.buf='';s.pos=0;s.eof=False;s.h=hashlib.sha256();s.n=0
+    def fill(s):
+        if s.eof:return False
+        b=s.f.read(CH)
+        if not b:s.eof=True;return False
+        s.h.update(b);s.n+=len(b);s.buf=s.buf[s.pos:]+b.decode('utf-8');s.pos=0;return True
+    def find(s,tok):
+        while True:
+            i=s.buf.find(tok,s.pos)
+            if i>=0:s.pos=i+len(tok);return True
+            keep=len(tok);s.pos=max(s.pos,len(s.buf)-keep)
+            if not s.fill():return False
+    def items(s):
+        # assumes positioned right after '['
+        while True:
+            while s.pos>=len(s.buf) and s.fill():pass
+            c=s.buf[s.pos] if s.pos<len(s.buf) else ''
+            if c==',':s.pos+=1;continue
+            if c==']':s.pos+=1;return
+            while True:
+                try:obj,end=dec.raw_decode(s.buf,s.pos);s.pos=end;break
+                except json.JSONDecodeError:
+                    if not s.fill():raise
+            yield obj
+            if s.pos>CH*4:s.buf=s.buf[s.pos:];s.pos=0
+    def value(s):
+        while True:
+            try:obj,end=dec.raw_decode(s.buf,s.pos);s.pos=end;return obj
+            except json.JSONDecodeError:
+                if not s.fill():raise
+s=S(PATH);out={}
+s.find('"files":');out['files']=s.value()
+s.find('"records":[');out['records']=sum(1 for _ in s.items())
+s.find('"writers":[');W=list(s.items());out['writers']=len(W)
+out['writerKinds']=collections.Counter(w['kind'] for w in W)
+s.find('"reachableFunctions":[');reach=list(s.items());out['reachableFunctionsFirstOccurrence']=len(reach)
+s.find('"unknownEdges":[');U=list(s.items());out['unknownEdges']=len(U)
+out['unknownReasons']=collections.Counter(u['reason'] for u in U)
+s.find('"functionPlans":[');crit={};n=0;stat=collections.Counter();plansfun={}
+for p in s.items():
+    n+=1;stat[p.get('supportStatus')]+=1
+    if p.get('criticalEntry'):crit[p['function']]=dict(tf=set(p['transitiveFunctions']),status=p['supportStatus'],unk=len(p['unknownIDs']),ctr=p.get('concreteEntryContracts'),locks=[(r['table'],r['mode']) for r in p['rankedResourceLocks']])
+out['functionPlans']=n;out['planStatus']=stat;out['critical']=len(crit)
+s.find('"allCallSites":[');out['allCallSites']=sum(1 for _ in s.items())
+s.find('"classifiedCalls":[');cls=collections.Counter();backlog_crit=[];allfn=set(reach)
+names=collections.defaultdict(set)
+for f in reach:names[f.split('.')[-1]].add(f)
+for c in s.items():
+    cls[c['classification']]+=1
+    if c['classification']=='NONAUTHORITY_UNRESOLVED_EXTERNAL_BACKLOG':
+        inc=[k for k,v in crit.items() if c['function'] in v['tf']]
+        if inc and c['method'] in names and c['method'] not in ('__init__',):
+            backlog_crit.append(dict(path=c['path'],line=c['line'],function=c['function'],spelling=c['spelling'],recv=c['provenance']['receiverType'],target=c['provenance']['qualifiedTarget'],nameMatches=sorted(names[c['method']])[:4],critical=len(inc)))
+out['classified']=cls
+s.find('"sqlScopeIssues":[');SQ=list(s.items());out['sqlScopeIssues']=len(SQ);out['sqlReasons']=collections.Counter(q.get('reason','')[:60] for q in SQ)
+s.find('"criticalEntries":[');CE=list(s.items());out['criticalEntries']=[(c['function'],c['supportStatus'],len(c['unknownIDs'])) for c in CE]
+while s.fill():pass
+out['bytes']=s.n;out['sha256']=s.h.hexdigest()
+out['backlogNameMatchInCriticalClosure']=len(backlog_crit)
+seen=set();uniq=[]
+for b in backlog_crit:
+    k=(b['path'],b['line'],b['spelling'])
+    if k not in seen:seen.add(k);uniq.append(b)
+out['backlogNameMatchInCriticalClosureUniqueSites']=len(uniq)
+out['backlogSpellingTop']=collections.Counter(b['spelling'] for b in uniq).most_common(40)
+out['backlogSamples']=uniq[:60]
+out['criticalLocks']={k:dict(status=v['status'],unk=v['unk'],tf=len(v['tf']),locks=v['locks']) for k,v in crit.items()}
+print(json.dumps(out,indent=1,default=lambda o:dict(o) if isinstance(o,collections.Counter) else sorted(o)))

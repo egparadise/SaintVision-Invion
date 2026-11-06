@@ -1,0 +1,32 @@
+"""Independent Claude M2/L1 counterexamples: analyze small 72028 subset + one synthetic probe per case (bounded memory)."""
+import sys,json,subprocess
+E=sys.argv[1];ROOT=sys.argv[2];sys.path.insert(0,E)
+import source_analysis as sc
+BASE=sc.BASE
+NEED=['services/control-plane/src/inv/leases.py','services/control-plane/src/inv/runs.py','services/control-plane/src/inv/db.py','src/saintvision/db/models/__init__.py','src/saintvision/db/models/resource.py']
+src={p:subprocess.check_output(['git','show',BASE+':'+p],cwd=ROOT) for p in NEED}
+CP='services/control-plane/src/inv/zz_claude_probe.py';API='src/saintvision/services/zz_claude_probe.py'
+CASES=[
+ ('C1-tuple-unpack-RunStore-transition',CP,'from .runs import RunStore\nfrom .db import BoundDatabase\ndef sneaky(db,t,conn,run):\n bound=BoundDatabase(db,t,conn)\n runs, other = RunStore(bound), []\n return runs.transition(t, run, "planned", expected_version=1)\n','authority edge to RunStore.transition must be resolved or BLOCK'),
+ ('C1b-control-baseline-single-assign',CP,'from .runs import RunStore\nfrom .db import BoundDatabase\ndef sneaky(db,t,conn,run):\n bound=BoundDatabase(db,t,conn)\n runs=RunStore(bound)\n return runs.transition(t, run, "planned", expected_version=1)\n','positive control'),
+ ('C2-session-advisory-with-xact-token',CP,'def sneaky(conn,k):\n return conn.execute("SELECT pg_advisory_xact_lock(%s), pg_advisory_lock(%s)",(k,k))\n','session advisory must be UNSUPPORTED'),
+ ('C3-percent-format-dynamic-table',CP,'def sneaky(conn,t,n):\n conn.execute("UPDATE inv.%s SET status=\'online\' WHERE node_id=%%s" % t,(n,))\n','dynamic identifier must be UNKNOWN/BLOCK'),
+ ('C3b-concat-dynamic-table',CP,'def sneaky(conn,t,n):\n conn.execute("UPDATE inv." + t + " SET status=\'online\' WHERE node_id=%s",(n,))\n','dynamic identifier must be UNKNOWN/BLOCK'),
+ ('C4-dict-dispatch-authority-helper',CP,'from . import leases\ndef sneaky(conn,r,p,k):\n return {"a":leases.lock_run}[k](conn,r,p)\n','dynamic dispatch on authority helper must BLOCK'),
+ ('C5-ORM-query-bulk-update',API,'from saintvision.db.models import Node\ndef sneaky(session,n):\n session.query(Node).filter(Node.node_id==n).update({"status":"active"})\n','ORM writer must be detected'),
+ ('C6-ORM-bulk-update-mappings',API,'from saintvision.db.models import Node\ndef sneaky(session,n):\n session.bulk_update_mappings(Node,[{"node_id":n,"status":"active"}])\n','ORM writer must be detected'),
+ ('C7-untyped-injected-store-reserve',CP,'def sneaky(store,conn,p,r):\n return store._admit_locked(conn,p,r)\n','untyped receiver whose method names a reached authority helper'),
+]
+out=[]
+for name,path,body,expect in CASES:
+    d=dict(src);d[path]=body.encode();g=sc.analyze(d)
+    calls=[dict(spelling=c['spelling'],classification=c['classification'],recv=c['provenance']['receiverType']) for c in g['classifiedCalls'] if c['path']==path]
+    recs=[dict(tables=r['tables'],modes=r['modes'],disp=r.get('scopeDisposition'),unresolved=r.get('unresolvedSQL')) for r in g['records'] if r['path']==path]
+    wr=[dict(table=w['table'],verb=w['verb'],cols=w['columns']) for w in g['writers'] if w['path']==path]
+    uw=[u['reason'] for u in g['unknownSqlWriters'] if u['path']==path]
+    sq=[q['reason'][:70] for q in g['sqlScopeIssues'] if q['path']==path]
+    ue=[u['spelling'] for u in g['unknownEdges'] if u['path']==path]
+    plan=[(p['function'],p['supportStatus'],[f for f in p['transitiveFunctions'] if f!=p['function']][:3]) for p in g['functionPlans'] if p['path']==path]
+    edges=[t for e in g['edges'] if e['path']==path for t in e['targets']]
+    out.append(dict(case=name,expect=expect,calls=calls,records=recs,writers=wr,unknownSqlWriters=uw,sqlScopeIssues=sq,unknownEdges=ue,edges=edges,plans=plan))
+    print(json.dumps(out[-1]),flush=True)

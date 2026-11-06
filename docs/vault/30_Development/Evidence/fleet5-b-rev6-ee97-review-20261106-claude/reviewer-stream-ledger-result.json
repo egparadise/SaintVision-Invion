@@ -1,0 +1,738 @@
+{
+ "files": 523,
+ "records": 1669,
+ "writers": 384,
+ "writerKinds": {
+  "SQL": 237,
+  "SQL_FUNCTION_OR_MIGRATION": 9,
+  "ORM_CONSTRUCTOR": 57,
+  "ORM_DML": 5,
+  "ORM_ATTRIBUTE": 70,
+  "ORM_CORE_DML": 6
+ },
+ "reachableFunctionsFirstOccurrence": 632,
+ "unknownEdges": 28,
+ "unknownReasons": {
+  "unresolved invocation on a source-proven authority receiver": 28
+ },
+ "functionPlans": 632,
+ "planStatus": {
+  "SUPPORTED_STATIC_PLAN": 464,
+  "UNSUPPORTED_PENDING_SCOPED_AUTHORITY_RESOLUTION": 168
+ },
+ "critical": 21,
+ "allCallSites": 47608,
+ "classified": {
+  "NONAUTHORITY_UNRESOLVED_EXTERNAL_BACKLOG": 29573,
+  "NONAUTHORITY_STDLIB": 5284,
+  "NONAUTHORITY_ATTRIBUTE_FACTORY": 221,
+  "RESOLVED_SOURCE_TARGET": 8289,
+  "NONAUTHORITY_MAPPING": 1567,
+  "RESOLVED_DB_RECORD": 2507,
+  "RESOLVED_TRANSACTION_OWNER": 46,
+  "RESOLVED_DB_CURSOR_FACTORY": 10,
+  "RESOLVED_TYPED_ORM_UOW": 83,
+  "BLOCK": 28
+ },
+ "sqlScopeIssues": 63,
+ "sqlReasons": {
+  "recorded DB API has unresolved SQL scope; no duplicate callg": 63
+ },
+ "criticalEntries": [
+  [
+   "inv.build_execution.BuildExecutionService._commit_consequences",
+   "SUPPORTED_STATIC_PLAN",
+   0
+  ],
+  [
+   "inv.build_execution.BuildExecutionService._mark_node_quarantined",
+   "SUPPORTED_STATIC_PLAN",
+   0
+  ],
+  [
+   "inv.build_execution.BuildExecutionService.execute",
+   "SUPPORTED_STATIC_PLAN",
+   0
+  ],
+  [
+   "inv.build_execution_worker.BuildExecutionIntentQueue.enqueue",
+   "SUPPORTED_STATIC_PLAN",
+   0
+  ],
+  [
+   "inv.build_preparations.BuildPreparationService._terminalize",
+   "SUPPORTED_STATIC_PLAN",
+   0
+  ],
+  [
+   "inv.model_commit.capture_locations",
+   "SUPPORTED_STATIC_PLAN",
+   0
+  ],
+  [
+   "inv.model_source.capture_channels",
+   "SUPPORTED_STATIC_PLAN",
+   0
+  ],
+  [
+   "inv.node_channels.provision_channel",
+   "SUPPORTED_STATIC_PLAN",
+   0
+  ],
+  [
+   "inv.node_channels.revoke_channel",
+   "SUPPORTED_STATIC_PLAN",
+   0
+  ],
+  [
+   "inv.node_transport.NodeDelivery._quarantine_gpu_node",
+   "SUPPORTED_STATIC_PLAN",
+   0
+  ],
+  [
+   "inv.node_transport.NodeDelivery.deliver",
+   "SUPPORTED_STATIC_PLAN",
+   0
+  ],
+  [
+   "inv.observation.NodeObservation.accept",
+   "SUPPORTED_STATIC_PLAN",
+   0
+  ],
+  [
+   "inv.observation.NodeObservation.mark_offline",
+   "SUPPORTED_STATIC_PLAN",
+   0
+  ],
+  [
+   "inv.results.ResultStore.complete",
+   "SUPPORTED_STATIC_PLAN",
+   0
+  ],
+  [
+   "inv.runs.RunStore.complete",
+   "SUPPORTED_STATIC_PLAN",
+   0
+  ],
+  [
+   "inv.shard_completion.ShardCompletion.once",
+   "SUPPORTED_STATIC_PLAN",
+   0
+  ],
+  [
+   "inv.storage_commit.StorageSampleStore.apply_sample",
+   "SUPPORTED_STATIC_PLAN",
+   0
+  ],
+  [
+   "saintvision.api.v1.settings.set_resource_offer",
+   "SUPPORTED_STATIC_PLAN",
+   0
+  ],
+  [
+   "saintvision.identity.node_auth.NodePrincipal.lock_current",
+   "SUPPORTED_STATIC_PLAN",
+   0
+  ],
+  [
+   "saintvision.services.settings.set_resource_offer",
+   "SUPPORTED_STATIC_PLAN",
+   0
+  ],
+  [
+   "saintvision.services.storage._owned_for_update",
+   "SUPPORTED_STATIC_PLAN",
+   0
+  ]
+ ],
+ "bytes": 74373915,
+ "sha256": "19944f326147bf0d83784534231de8434eab5268355fb796f3239772f8d6ae9d",
+ "backlogNameMatchInCriticalClosure": 12,
+ "backlogNameMatchInCriticalClosureUniqueSites": 12,
+ "backlogSpellingTop": [
+  [
+   "self.db.transaction",
+   4
+  ],
+  [
+   "files.get",
+   3
+  ],
+  [
+   "dispatched.receipt.get",
+   2
+  ],
+  [
+   "_statement_phase.get",
+   1
+  ],
+  [
+   "phase.get",
+   1
+  ],
+  [
+   "finish",
+   1
+  ]
+ ],
+ "backlogSamples": [
+  {
+   "path": "services/control-plane/src/inv/build_execution.py",
+   "line": 798,
+   "function": "inv.build_execution.BuildExecutionService.execute",
+   "spelling": "dispatched.receipt.get",
+   "recv": "inv.build_adapter.BuildAdapterResult.receipt",
+   "target": "inv.build_execution.dispatched.receipt.get",
+   "nameMatches": [
+    "inv.business_handoff.BusinessHandoff.get",
+    "inv.containment.Containment.get",
+    "inv.containment_approvals.ControlApprovals.get",
+    "inv.control.Control.get"
+   ],
+   "critical": 1
+  },
+  {
+   "path": "services/control-plane/src/inv/build_execution.py",
+   "line": 844,
+   "function": "inv.build_execution.BuildExecutionService.execute",
+   "spelling": "dispatched.receipt.get",
+   "recv": "inv.build_adapter.BuildAdapterResult.receipt",
+   "target": "inv.build_execution.dispatched.receipt.get",
+   "nameMatches": [
+    "inv.business_handoff.BusinessHandoff.get",
+    "inv.containment.Containment.get",
+    "inv.containment_approvals.ControlApprovals.get",
+    "inv.control.Control.get"
+   ],
+   "critical": 1
+  },
+  {
+   "path": "services/control-plane/src/inv/db.py",
+   "line": 233,
+   "function": "inv.db.Database.transaction",
+   "spelling": "_statement_phase.get",
+   "recv": "inv.db._statement_phase",
+   "target": "inv.db._statement_phase.get",
+   "nameMatches": [
+    "inv.business_handoff.BusinessHandoff.get",
+    "inv.containment.Containment.get",
+    "inv.containment_approvals.ControlApprovals.get",
+    "inv.control.Control.get"
+   ],
+   "critical": 8
+  },
+  {
+   "path": "services/control-plane/src/inv/db.py",
+   "line": 235,
+   "function": "inv.db.Database.transaction",
+   "spelling": "phase.get",
+   "recv": "UNRESOLVED_CALL_RETURN:inv.db._statement_phase.get",
+   "target": "inv.db.phase.get",
+   "nameMatches": [
+    "inv.business_handoff.BusinessHandoff.get",
+    "inv.containment.Containment.get",
+    "inv.containment_approvals.ControlApprovals.get",
+    "inv.control.Control.get"
+   ],
+   "critical": 8
+  },
+  {
+   "path": "services/control-plane/src/inv/observation.py",
+   "line": 52,
+   "function": "inv.observation.NodeObservation.accept",
+   "spelling": "self.db.transaction",
+   "recv": "inv.observation.NodeObservation.db",
+   "target": "inv.observation.self.db.transaction",
+   "nameMatches": [
+    "inv.db.Database.transaction"
+   ],
+   "critical": 1
+  },
+  {
+   "path": "services/control-plane/src/inv/observation.py",
+   "line": 139,
+   "function": "inv.observation.NodeObservation.mark_offline",
+   "spelling": "self.db.transaction",
+   "recv": "inv.observation.NodeObservation.db",
+   "target": "inv.observation.self.db.transaction",
+   "nameMatches": [
+    "inv.db.Database.transaction"
+   ],
+   "critical": 1
+  },
+  {
+   "path": "services/control-plane/src/inv/results.py",
+   "line": 164,
+   "function": "inv.results.ResultStore.complete",
+   "spelling": "self.db.transaction",
+   "recv": "inv.results.ResultStore.db",
+   "target": "inv.results.self.db.transaction",
+   "nameMatches": [
+    "inv.db.Database.transaction"
+   ],
+   "critical": 1
+  },
+  {
+   "path": "services/control-plane/src/inv/results.py",
+   "line": 212,
+   "function": "inv.results.ResultStore.complete",
+   "spelling": "files.get",
+   "recv": "UNRESOLVED_CALL_RETURN:inv.object_store.object_store_session",
+   "target": "inv.results.files.get",
+   "nameMatches": [
+    "inv.business_handoff.BusinessHandoff.get",
+    "inv.containment.Containment.get",
+    "inv.containment_approvals.ControlApprovals.get",
+    "inv.control.Control.get"
+   ],
+   "critical": 1
+  },
+  {
+   "path": "services/control-plane/src/inv/shard_completion.py",
+   "line": 46,
+   "function": "inv.shard_completion.ShardCompletion.once",
+   "spelling": "self.db.transaction",
+   "recv": "inv.shard_completion.ShardCompletion.db",
+   "target": "inv.shard_completion.self.db.transaction",
+   "nameMatches": [
+    "inv.db.Database.transaction"
+   ],
+   "critical": 1
+  },
+  {
+   "path": "services/control-plane/src/inv/shard_completion.py",
+   "line": 108,
+   "function": "inv.shard_completion.ShardCompletion.once",
+   "spelling": "files.get",
+   "recv": "inv.shard_completion.object_store_session(self.provider) if self.provider else nullcontext(None)",
+   "target": "inv.shard_completion.files.get",
+   "nameMatches": [
+    "inv.business_handoff.BusinessHandoff.get",
+    "inv.containment.Containment.get",
+    "inv.containment_approvals.ControlApprovals.get",
+    "inv.control.Control.get"
+   ],
+   "critical": 1
+  },
+  {
+   "path": "services/control-plane/src/inv/workspace_resume.py",
+   "line": 343,
+   "function": "inv.workspace_resume.commit_workspace_output",
+   "spelling": "files.get",
+   "recv": "inv.workspace_resume.files",
+   "target": "inv.workspace_resume.files.get",
+   "nameMatches": [
+    "inv.business_handoff.BusinessHandoff.get",
+    "inv.containment.Containment.get",
+    "inv.containment_approvals.ControlApprovals.get",
+    "inv.control.Control.get"
+   ],
+   "critical": 1
+  },
+  {
+   "path": "src/saintvision/api/v1/settings.py",
+   "line": 452,
+   "function": "saintvision.api.v1.settings.set_resource_offer",
+   "spelling": "finish",
+   "recv": "",
+   "target": "saintvision.api.v1.settings.finish",
+   "nameMatches": [
+    "inv.dispatch.DeliveryQueue.finish",
+    "saintvision.api.deps.optional_idempotent_write.finish"
+   ],
+   "critical": 1
+  }
+ ],
+ "criticalLocks": {
+  "inv.build_execution.BuildExecutionService._commit_consequences": {
+   "status": "SUPPORTED_STATIC_PLAN",
+   "unk": 0,
+   "tf": 2,
+   "locks": [
+    [
+     "inv.control_epoch",
+     "FOR SHARE"
+    ],
+    [
+     "inv.resource_leases",
+     "FOR UPDATE"
+    ],
+    [
+     "inv.build_execution_intents",
+     "FOR UPDATE"
+    ]
+   ]
+  },
+  "inv.build_execution.BuildExecutionService._mark_node_quarantined": {
+   "status": "SUPPORTED_STATIC_PLAN",
+   "unk": 0,
+   "tf": 2,
+   "locks": [
+    [
+     "inv.control_epoch",
+     "FOR SHARE"
+    ],
+    [
+     "inv.nodes",
+     "FOR UPDATE"
+    ]
+   ]
+  },
+  "inv.build_execution.BuildExecutionService.execute": {
+   "status": "SUPPORTED_STATIC_PLAN",
+   "unk": 0,
+   "tf": 21,
+   "locks": [
+    [
+     "inv.control_epoch",
+     "FOR SHARE"
+    ],
+    [
+     "inv.nodes",
+     "FOR UPDATE"
+    ],
+    [
+     "inv.business_projects",
+     "FOR SHARE"
+    ],
+    [
+     "inv.runs",
+     "FOR UPDATE"
+    ],
+    [
+     "inv.project_grants",
+     "FOR SHARE"
+    ],
+    [
+     "inv.business_subjects",
+     "FOR SHARE"
+    ],
+    [
+     "public.users",
+     "FOR SHARE"
+    ],
+    [
+     "public.project_members",
+     "FOR SHARE"
+    ],
+    [
+     "inv.resources",
+     "FOR UPDATE"
+    ],
+    [
+     "inv.resource_leases",
+     "FOR UPDATE"
+    ],
+    [
+     "public.projects",
+     "FOR SHARE"
+    ],
+    [
+     "inv.build_execution_intents",
+     "FOR UPDATE"
+    ],
+    [
+     "inv.idempotency",
+     "FOR UPDATE"
+    ]
+   ]
+  },
+  "inv.build_execution_worker.BuildExecutionIntentQueue.enqueue": {
+   "status": "SUPPORTED_STATIC_PLAN",
+   "unk": 0,
+   "tf": 2,
+   "locks": [
+    [
+     "inv.control_epoch",
+     "FOR SHARE"
+    ],
+    [
+     "inv.runs",
+     "FOR SHARE"
+    ],
+    [
+     "inv.build_execution_intents",
+     "FOR SHARE"
+    ]
+   ]
+  },
+  "inv.build_preparations.BuildPreparationService._terminalize": {
+   "status": "SUPPORTED_STATIC_PLAN",
+   "unk": 0,
+   "tf": 6,
+   "locks": [
+    [
+     "inv.control_epoch",
+     "FOR SHARE"
+    ],
+    [
+     "inv.approval_requests",
+     "FOR UPDATE"
+    ],
+    [
+     "inv.runs",
+     "FOR UPDATE"
+    ]
+   ]
+  },
+  "inv.model_commit.capture_locations": {
+   "status": "SUPPORTED_STATIC_PLAN",
+   "unk": 0,
+   "tf": 1,
+   "locks": [
+    [
+     "public.storage_contributions",
+     "FOR SHARE"
+    ],
+    [
+     "public.data_locations",
+     "FOR SHARE"
+    ]
+   ]
+  },
+  "inv.model_source.capture_channels": {
+   "status": "SUPPORTED_STATIC_PLAN",
+   "unk": 0,
+   "tf": 2,
+   "locks": [
+    [
+     "inv.node_channels",
+     "FOR SHARE"
+    ]
+   ]
+  },
+  "inv.node_channels.provision_channel": {
+   "status": "SUPPORTED_STATIC_PLAN",
+   "unk": 0,
+   "tf": 1,
+   "locks": [
+    [
+     "inv.control_epoch",
+     "FOR SHARE"
+    ],
+    [
+     "inv.nodes",
+     "FOR UPDATE"
+    ],
+    [
+     "inv.node_channels",
+     "FOR UPDATE"
+    ]
+   ]
+  },
+  "inv.node_channels.revoke_channel": {
+   "status": "SUPPORTED_STATIC_PLAN",
+   "unk": 0,
+   "tf": 1,
+   "locks": [
+    [
+     "inv.nodes",
+     "FOR UPDATE"
+    ],
+    [
+     "inv.node_channels",
+     "FOR UPDATE"
+    ]
+   ]
+  },
+  "inv.node_transport.NodeDelivery._quarantine_gpu_node": {
+   "status": "SUPPORTED_STATIC_PLAN",
+   "unk": 0,
+   "tf": 3,
+   "locks": [
+    [
+     "inv.control_epoch",
+     "FOR SHARE"
+    ],
+    [
+     "inv.nodes",
+     "FOR UPDATE"
+    ]
+   ]
+  },
+  "inv.node_transport.NodeDelivery.deliver": {
+   "status": "SUPPORTED_STATIC_PLAN",
+   "unk": 0,
+   "tf": 10,
+   "locks": [
+    [
+     "inv.control_epoch",
+     "FOR SHARE"
+    ],
+    [
+     "inv.nodes",
+     "FOR SHARE"
+    ],
+    [
+     "inv.nodes",
+     "FOR UPDATE"
+    ],
+    [
+     "inv.node_channels",
+     "FOR SHARE"
+    ],
+    [
+     "inv.runs",
+     "FOR UPDATE"
+    ],
+    [
+     "inv.resources",
+     "FOR UPDATE"
+    ]
+   ]
+  },
+  "inv.observation.NodeObservation.accept": {
+   "status": "SUPPORTED_STATIC_PLAN",
+   "unk": 0,
+   "tf": 2,
+   "locks": [
+    [
+     "inv.nodes",
+     "FOR UPDATE"
+    ],
+    [
+     "inv.node_channels",
+     "FOR SHARE"
+    ],
+    [
+     "inv.node_probes",
+     "FOR UPDATE"
+    ]
+   ]
+  },
+  "inv.observation.NodeObservation.mark_offline": {
+   "status": "SUPPORTED_STATIC_PLAN",
+   "unk": 0,
+   "tf": 1,
+   "locks": [
+    [
+     "inv.nodes",
+     "FOR UPDATE"
+    ]
+   ]
+  },
+  "inv.results.ResultStore.complete": {
+   "status": "SUPPORTED_STATIC_PLAN",
+   "unk": 0,
+   "tf": 8,
+   "locks": [
+    [
+     "inv.runs",
+     "FOR UPDATE"
+    ],
+    [
+     "inv.storage_objects",
+     "FOR UPDATE"
+    ]
+   ]
+  },
+  "inv.runs.RunStore.complete": {
+   "status": "SUPPORTED_STATIC_PLAN",
+   "unk": 0,
+   "tf": 6,
+   "locks": [
+    [
+     "inv.control_epoch",
+     "FOR SHARE"
+    ],
+    [
+     "inv.runs",
+     "FOR UPDATE"
+    ]
+   ]
+  },
+  "inv.shard_completion.ShardCompletion.once": {
+   "status": "SUPPORTED_STATIC_PLAN",
+   "unk": 0,
+   "tf": 6,
+   "locks": [
+    [
+     "inv.shard_plans",
+     "FOR UPDATE"
+    ],
+    [
+     "inv.runs",
+     "FOR UPDATE"
+    ]
+   ]
+  },
+  "inv.storage_commit.StorageSampleStore.apply_sample": {
+   "status": "SUPPORTED_STATIC_PLAN",
+   "unk": 0,
+   "tf": 2,
+   "locks": []
+  },
+  "saintvision.api.v1.settings.set_resource_offer": {
+   "status": "SUPPORTED_STATIC_PLAN",
+   "unk": 0,
+   "tf": 7,
+   "locks": [
+    [
+     "@transaction_advisory",
+     "TRANSACTION_ADVISORY"
+    ],
+    [
+     "public.nodes",
+     "FOR UPDATE"
+    ],
+    [
+     "public.users",
+     "FOR UPDATE"
+    ],
+    [
+     "public.node_capabilities",
+     "FOR UPDATE"
+    ],
+    [
+     "public.resource_offers",
+     "FOR UPDATE"
+    ]
+   ]
+  },
+  "saintvision.identity.node_auth.NodePrincipal.lock_current": {
+   "status": "SUPPORTED_STATIC_PLAN",
+   "unk": 0,
+   "tf": 1,
+   "locks": [
+    [
+     "public.nodes",
+     "FOR UPDATE"
+    ]
+   ]
+  },
+  "saintvision.services.settings.set_resource_offer": {
+   "status": "SUPPORTED_STATIC_PLAN",
+   "unk": 0,
+   "tf": 2,
+   "locks": [
+    [
+     "public.nodes",
+     "FOR UPDATE"
+    ],
+    [
+     "public.users",
+     "FOR UPDATE"
+    ],
+    [
+     "public.node_capabilities",
+     "FOR UPDATE"
+    ],
+    [
+     "public.resource_offers",
+     "FOR UPDATE"
+    ]
+   ]
+  },
+  "saintvision.services.storage._owned_for_update": {
+   "status": "SUPPORTED_STATIC_PLAN",
+   "unk": 0,
+   "tf": 1,
+   "locks": [
+    [
+     "public.storage_contributions",
+     "FOR UPDATE"
+    ]
+   ]
+  }
+ }
+}

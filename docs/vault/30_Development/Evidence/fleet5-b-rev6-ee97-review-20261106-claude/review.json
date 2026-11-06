@@ -1,0 +1,166 @@
+{
+  "schemaVersion": "fleet5-b-rev6-review:1",
+  "reviewer": "Claude (independent; author of target is Codex)",
+  "orcaTask": "task_98d80a7c3d96",
+  "dispatch": "ctx_6b02886ebfc1",
+  "owner": "Codex task_a8fd2969f0b3 / ctx_6f0f8253b8a7 (owner question msg_4b5c1d55aea3 stays pending for Root)",
+  "target": {
+    "sha": "ee97c27a5d135a4059256124290731cd2b791193",
+    "branch": "agent/codex/fleet5-b-contract-rev6-20261106",
+    "parent": "228e2a2062d8a64bce7f772f668da7df2fd2ac0d",
+    "remoteExact": true,
+    "docsRun": 42150067167,
+    "docsJob": 127670869695,
+    "docsEvent": "workflow_dispatch",
+    "docsTitle": "fleet5-rev6-task_a8fd2969f0b3-ee97c27a5d135a4059256124290731cd2b791193",
+    "docsAttempt": 1,
+    "docsJobSteps": "19/19 success",
+    "productSourceAnchor": "72028cbac903c4415d9979f980a6e0f9948e914f",
+    "productDiffVs72028": 0,
+    "filesOutsideOwnHistoryEvidence": 0,
+    "addedFiles": 66
+  },
+  "rootInputsRead": {
+    "decision": "fleet-five-orchestration-20261105 docs/vault/30_Development/Evidence/fleet5-20261105-root/b-rev6-concrete-root-decision.json sha256 580b79f9ba69392ea603dcf4c7832667407d66b047355c46da39efc41e8c3f10 (commit f2e7ca8f, read-only; branch head efaa6708)",
+    "governance": "FLEET5 B 병행 역할과 전환 구현 범위 결정.md v1.4.0 sha256 089e0003b8716a80a009f27633ee4fd2549fd4a5dda89577ba3bb67728dc64ae",
+    "rootReply": "msg_17afe2db8b82",
+    "typoNote": "Root 5416 -> 5426 is a count correction of the original rev5 unknown edges, treated as no new requirement"
+  },
+  "verdict": "REVISION_REQUIRED",
+  "verdictScope": "Whole bounded B rev6 DESIGN/CONTRACT delta under Root-chosen remedies. Schema/static/symbolic only. Not an implementation grant, partial freeze, registration or runtime acceptance.",
+  "blockingFindings": ["B6-M1", "B6-M2"],
+  "requiredBeforeImplementationGrant": ["B6-L1", "B6-L2", "B6-L3", "B6-L4"],
+  "info": ["B6-I1", "B6-I2"],
+  "priorFindingClosure": {
+    "B5-M1": "PARTIALLY CLOSED. Accepted: CommittedIOHandle carries no capability and a same-hash forged handle is refused; registration requires the original admitted request and proven commit; body/method/path/nonce/run/claim/generation substitution refused; one send per handle; poison or persistence-unknown leaves PENDING or UNCERTAIN with no ordinary authority; a restarted verifier cannot rebuild the capability; ACTIVE GPU observation keeps claims/lease/workload; terminal release only through the original receipt path; wrong-purpose, cross-operation and duplicate responses refused; orthogonal DRAIN/QUARANTINE/RETIRE facts keep drain through quarantine clear; another Node/tenant/epoch obligation does not deny this Node's admission; all 13 readers mapped to the exact 72028 lines. Residual: B6-M1 (lifecycle does not distinguish effect class or scope, giving operator-only recovery and hidden Node-wide denial).",
+    "B5-M2": "PARTIALLY CLOSED. Accepted: no second UNKNOWN for a recorded DB call; Mapping/dict/JSON-row get, stdlib and Timer provenance; literal getattr resolves; nonliteral getattr on an authority module BLOCKs; per-plan unknown attachment is consistent (623+9 checks); 21 critical plans exist. Residual: B6-M2 (the default bucket fails open for unresolved receivers, so 'zero unjustified blockers' is not real source-to-procedure feasibility).",
+    "B5-L1": "PARTIALLY CLOSED. W1-W16 shapes are covered by owner mutants (exit/log hashes reproduced for the lighter scripts; source_fixtures not re-run, see notRun). Residual: B6-L1.",
+    "B5-L2": "PARTIALLY CLOSED. All 31 B tables have explicit ranks in the shared catalog, anchors (810/820) come before tombstones (880), and lists sort by rank. Residual: B6-L2 (mode upgrade inside an entry), plus B6-I1.",
+    "B5-L3": "CLOSED (design). Service-side protected read of the full chain/tuple/epoch/fence/expiry, private HSM result, conditional publication. Reviewer attacks L3b-L3d pass. The read-only-registration starvation (A10) is part of B6-M1.",
+    "B5-L4": "CLOSED (design). Unsigned CP tombstone with OP/SAFE principal, causal hash and anchor version. Same-transaction INVALIDATE outbox. SAFE/REV invalidate-only, with cross-Node and ARM-via-outbox refused (L4b-L4e). No LINEAGE_TOMBSTONE domain or Node cache. CP gate advances only on a verified ACK. The rule that a transient INVALIDATE send failure needs OP recovery is part of B6-M1.",
+    "B5-L5": "CLOSED in authority/model. Plain activate_contribution stays owner + not-revoked (requiresNodeConfirmation=false). The B-only FolderRootObservation is closed, single-use, 30 s, binds C/DER/R/policy/root/consent, and preflight is not the installed RO mount. Residual drift: B6-L4."
+  },
+  "findings": [
+    {
+      "id": "B6-M1",
+      "severity": "MEDIUM (blocks design acceptance; M1 residual)",
+      "area": "Scoped IO obligation lifecycle: effect class, scope and liveness",
+      "statement": "All 16 IO kinds get the same lifecycle and failure rule (reader-io-catalog.json ioKinds[*].failure; model.World.register/failure/unresolved/eligible). That includes read-only observations with no Node-side effect. The model has four problems. (a) A routine read-only failure becomes UNCERTAIN, and only b_settle_uncertain_io (OP + independent physical proof) clears it. (b) Any PENDING_IO in a Node scope denies all 13 readers and refuses signing for that Node. This makes the Node single-flight for every plain and B admission. (c) A fuse-persistence failure on one operation fences the single global completion incarnation, so other Nodes' healthy operations also need OP after a restart. (d) An exact claimed TERMINAL_FRAME continuation is registered through fresh R03 eligibility (zero denial facts). Under DRAIN the 72028 behaviour (terminal.py:78 accepts online|draining) and catalog R12 both allow it, but the model refuses it. Root required no operator intervention for ordinary success, observation/restoration that stays possible, that a wrong-scope obligation never blocks another Node, and no permanent hidden block. Root's registration mandate named node_transport.py:289, build_execution.py:787 and the :835 parented read.",
+      "counterexamples": {
+        "A1 heartbeat timeout": "register HEARTBEAT_OBSERVE (/v1/heartbeats, 72028 observation.py:119 via NodeTLSClient.probe), invoke, failure() (a 3 s transport timeout) gives UNCERTAIN. eligible() is false for 13/13 readers. The next successful heartbeat confirms its own obligation, but the Node stays denied. Only an OP settle with a physical-proof record restores it.",
+        "A1b in-flight": "a registered, in-flight heartbeat with no failure already makes eligible('R03') false for the whole Node.",
+        "A2 renewal": "after a heartbeat timeout, same-config APPROVAL renewal signing is refused (protected_signing_read: unresolved(s)). The Node can drift to expiry while it waits for OP.",
+        "A10 signing starvation": "prepare an ARM, then a heartbeat registration on the same Node bumps authorityVersion, then HSM, then publish returns None. Routine observation traffic discards every concurrently prepared signature.",
+        "A3 single flight": "a second independent EXECUTE registration on the same Node, with disjoint resources, is refused while the first is PENDING. The plain profile is affected too, because readers and procedures are shared. This is an undeclared plain behaviour change from 72028's concurrent leases.",
+        "A5 cross-Node fence": "register on node-1 and node-2, then failure(node-1, persist_fuse=False) sets the global completionAuthority to FENCED_UNKNOWN. node-2's valid ACTIVE outcome is refused. After restart_verifier, node-2's LIVE capability becomes LOST_INCARNATION, eligible(node-2) is false and only OP can settle it.",
+        "A4 terminal under drain": "with a DRAIN fact, register(TERMINAL_FRAME) returns None. model.invoke has a DRAIN allowance for TERMINAL_FRAME that can never be reached.",
+        "also": "buildkit_transport.py:855 (the pre-dispatch quarantine-channel probe) is a read-only IO that this rule would make OP-recoverable. A transient B_GATE_INVALIDATE send failure leaves an UNCERTAIN obligation that needs OP even after a later verified INVALIDATED ACK/readback."
+      },
+      "evidence": ["reviewer-m1-attacks-result.json (20 cases, 13 flagged by the script; the reviewer drops A8: poisoning a victim op on a mismatched/forged response is conservative, because the actual outcome is then genuinely unknown)", "reviewer-l3l4-attacks-result.json A10", "reviewer_m1_attacks.py.txt", "reviewer_l3l4_attacks.py.txt"],
+      "rootDecisionNeeded": {
+        "question": "How should non-side-effect and idempotent-safety IO uncertainty close?",
+        "alternatives": {
+          "A (reviewer recommended)": "Add a closed per-kind effectClass to ioBinding and the catalog. SIDE_EFFECT (EXECUTE, BUILD_DISPATCH, TERMINAL_FRAME, B_GATE_ARM) keeps Root's UNCERTAIN -> SETTLED_PROTECTED. IDEMPOTENT_SAFETY (CANCEL, QUARANTINE_RECONCILE, B_GATE_INVALIDATE) may close ordinarily only through an independently verified exact command-hash ACK or durable receipt/readback; otherwise protected. READ_ONLY (RECEIPT_OBSERVE, HEARTBEAT_OBSERVE, GPU_ACTIVE_OBSERVE, STORAGE_SAMPLE, OBJECT_READ, BUILD_HEALTH_READ, BUILD_CLEANUP_READ, B_ROLE_OBSERVE, B_FOLDER_ROOT_OBSERVE) failure goes to an ordinary terminal NO_EFFECT_ABANDONED by the verifier, never counts as UNRESOLVED and never bumps the authority anchor version; liveness keeps the existing heartbeat/offline rules.",
+          "B": "Register obligations only at Root's named side-effect sites (:289 execute/cancel, :787, the parented :835, B gate ARM/INVALIDATE). Read-only observation keeps the existing authenticated nonce rules with no obligation.",
+          "C (not recommended)": "Keep the uniform OP settle and accept operator escalation for routine read-only loss."
+        }
+      },
+      "requiredFix": [
+        "Choose (Root) and encode the effect-class rule in the schema, catalog, authority predicates and model.",
+        "Scope the completion fence: a poison/persistence failure fences only that (tenant, Node, epoch, operation) capability. A whole-incarnation fence is reserved for actual verifier process/incarnation loss, and other scopes' LIVE capabilities stay usable.",
+        "Decide PENDING_IO admission scope (Root): either it denies only admissions that overlap its run/claim/resource binding (UNCERTAIN SIDE_EFFECT still denies the Node), or Node-wide single flight is declared as an explicit plain behaviour change with its capacity effect.",
+        "Register continuation kinds (TERMINAL_FRAME, OBJECT_READ, BUILD_CLEANUP_READ) against the exact claimed operation or parent handle with a per-kind denial-fact policy (DRAIN allowed for the exact claimed terminal), not fresh R03 eligibility.",
+        "Stateful fixtures: heartbeat timeout followed by a good heartbeat restores without OP; in-flight read-only does not deny; read-only registration does not discard a prepared signature; a side-effect timeout still requires protected recovery; a node-1 fuse failure does not affect node-2; terminal frame under DRAIN."
+      ]
+    },
+    {
+      "id": "B6-M2",
+      "severity": "MEDIUM (blocks design acceptance; M2 residual)",
+      "area": "Typed call classification fails open; 'zero unjustified blockers' is not real feasibility",
+      "statement": "In source_semantics.enhance, any call that is not a DB record, resolved target, typed transaction owner, typed Mapping/stdlib, or an authority-typed receiver falls into NONAUTHORITY_UNRESOLVED_EXTERNAL_BACKLOG. That bucket carries no provenance and is excluded from both plan closure and plan blockers. It holds 29,573 of the 47,608 call sites. Root required NONAUTHORITY only with actual receiver/source/import/type provenance, resolved Database/BoundDatabase/Session and injected transaction owners, explicit scoped UNKNOWN for dynamic dispatch, and no exclusion of needed call sites. The 21 critical plans are 'SUPPORTED_STATIC_PLAN, 0 unknown' because unresolved edges are dropped, not because they were resolved. The reverse also happens: value-object constructors are BLOCKed.",
+      "counterexamples": {
+        "actual 72028 dropped authority edge": "shard_recovery.py:179 `runs, approvals, prepared = RunStore(bound), ApprovalStore(bound), []` and :186 `runs.transition(...)` (the validated->planned run-state writer) are classified as backlog. ShardRecovery.prepare is SUPPORTED_STATIC_PLAN with no RunStore in transitiveFunctions. Synthetic C1 (tuple unpack) is backlog while control C1b (single assignment) resolves to RunStore.transition/_transition.",
+        "critical outer transactions unrecorded": "`self.db.transaction` at observation.py:52 (NodeObservation.accept), :139 (mark_offline), results.py:164 (ResultStore.complete) and shard_completion.py:46 (ShardCompletion.once) is backlog, not RESOLVED_TRANSACTION_OWNER. 107 transaction/begin calls stay backlog (76 self.db.transaction, 4 runtime(state).transaction, 5 env.db.transaction, ...). The owner fixture M2-runtime-constructor-transaction-owner passes only because its synthetic runtime() returns a literal Database(...); the 4 real runtime(state).transaction sites remain unresolved.",
+        "dynamic dispatch": "C4 `{\"a\": leases.lock_run}[k](conn, r, p)` is backlog (not BLOCK). C7 untyped injected `store._admit_locked(conn, p, r)` is backlog.",
+        "unjustified BLOCKs": "9 of the 28 BLOCK edges are frozen dataclass value-object constructors reached through a module alias (CapabilityInput, ObservationInput, ContributionInput, Announcement x2, ShardRequirement x2, ArtifactPin, DrillMeasurement) and 3 are Session.in_transaction status reads. They make the plain API entries api.v1.nodes.post_heartbeat, enroll_node and api.v1.storage.register_contribution UNSUPPORTED, with only the generic reason 'unresolved invocation on a source-proven authority receiver' and no scope/binding/future work."
+      },
+      "evidence": ["reviewer-stream-ledger-result.json", "reviewer-stream-backlog-result.json", "reviewer-stream-plans-result.json", "reviewer-m2-subset-probes-result.jsonl.txt (C1, C1b, C4, C7)"],
+      "requiredFix": [
+        "Make the default for an unresolved receiver UNRESOLVED and attach it causally to the affected plans. NONAUTHORITY needs positive provenance: value-object/dataclass with no DB or method calls, stdlib, typed Mapping, external client with a proven non-DB type.",
+        "Resolve tuple/starred assignments, constructor-injected attributes (self.db from Database/BoundDatabase at every constructor call site, otherwise an explicit per-plan UNKNOWN_TRANSACTION_OWNER), module-alias class constructors and returned runtime() owners.",
+        "Classify dict/list/subscript dispatch of an authority function as a scoped BLOCK.",
+        "Give every remaining unknown and SQL issue exact scope/binding/futureWork/blocksGrant fields.",
+        "Add actual-source fixtures: ShardRecovery.prepare reaches RunStore._transition; the four critical entries record their outer Database.transaction boundary; dict dispatch gives BLOCK; CapabilityInput gives a non-authority value object; post_heartbeat becomes a usable plan."
+      ]
+    },
+    {
+      "id": "B6-L1",
+      "severity": "LOW (required before implementation grant; L1 residual)",
+      "area": "Semantic writer regression gate misses further shapes",
+      "statement": "Counterexamples not covered by the 26 owner mutants. C3 `\"UPDATE inv.%s SET status='online' ...\" % t` and C3b string concatenation of the identifier both record as STATIC_NAMED_SCOPE with no writer and no unknownSqlWriter; the function is not even reached, so the audit is silent. Root explicitly forbade STATIC_NAMED_SCOPE for dynamic identifiers. C5 `session.query(Node).filter(...).update({...})` and C6 `session.bulk_update_mappings(Node, ...)` give a record on public.nodes but no writer. C2 `SELECT pg_advisory_xact_lock(%s), pg_advisory_lock(%s)` is labelled TRANSACTION_ADVISORY (the check is 'xact' in sql) and the plan is SUPPORTED. Semantic from/to checks are hard-coded for about 10 function names; Containment.change, provision/revoke channel enable/expiry and enroll/register have column coverage only. A git grep found no current 72028 instance of C2-C6, so the current 34-writer census is unaffected.",
+      "evidence": ["reviewer-m2-subset-probes-result.jsonl.txt (C2, C3, C3b, C5, C6)"],
+      "requiredFix": "Treat any non-constant SQL composition (BinOp % or +, .format, .join, JoinedStr) reaching execute as DYNAMIC (UNKNOWN/BLOCK) unless it comes from a closed literal set. Detect Query.update/delete and bulk_*_mappings as ORM writers. Classify advisory locks per call occurrence. Add explicit transition semantics for every RULES writer. Add W17-W22 mutants for these shapes."
+    },
+    {
+      "id": "B6-L2",
+      "severity": "LOW (required before implementation grant; L2 residual)",
+      "area": "Per-procedure normative lock lists versus the wrapped source body",
+      "statement": "In 12 of the 39 joined entries in source-procedure-lock-plans.json, the proposed procedure locks table X FOR SHARE while the source body it wraps locks X FOR UPDATE. Examples: PlacementStore.reserve, DeliveryQueue._can_start, ToolGateway.claim, ModelManifestStore._capture, provision/revoke_channel and build_adapter on inv.nodes; RunStore.complete and ResultStore.complete on inv.runs; Containment.change across four procedures. Running the prefix procedure first and then the original body upgrades SHARE to UPDATE inside one transaction, and two concurrent same-Node entries deadlock (PostgreSQL aborts one). 'Strongest mode per row' exists only as prose in plan_specs.withinRankOrder; rank_contract.check validates only rank sorting.",
+      "requiredFix": "Publish a merged per-entry lock list (procedure plus source plan, strongest mode per row, single acquisition in rank order) and a check that fails on any mode upgrade inside an entry. A two-session PG trace remains required at runtime."
+    },
+    {
+      "id": "B6-L3",
+      "severity": "LOW (required before implementation grant)",
+      "area": "IO registration anchors",
+      "statement": "reader-io-catalog.json ioKinds cite wrong lines for 4 kinds, and the artifact's own 'function' field shows it: HEARTBEAT_OBSERVE line 91 is `def resource_snapshot` (probe is 87-89); GPU_ACTIVE_OBSERVE line 95 is `def storage_sample` (resource_snapshot is 91-93); OBJECT_READ line 116 is inside storage_sample (read_chunk is 118-120); TERMINAL_FRAME line 120 is read_chunk (terminal_frame is 122-125). Transport kinds cite the client method, not the caller boundaries where registration and transaction context exist, and those boundaries are omitted: observation.py:119/124, buildkit_transport.py:855 (probe) and :978 (quarantine), model_remote.py:98, node_transfer.py:43, terminal.py:277, storage_check_collect.py:309, storage_commit.py:398. The History claims 'exact source function/line/hash'.",
+      "requiredFix": "Anchor each kind to every caller boundary with exact line/hash. Add a check that the cited exactLine contains the transport call for the kind's rawPath, and that every 72028 client transport call maps to exactly one kind or to an explicit exemption."
+    },
+    {
+      "id": "B6-L4",
+      "severity": "LOW (L5 residual documentation drift)",
+      "area": "Plain owner activation text",
+      "statement": "plan_specs.py's _owned_for_update contract says 'activation still requires Node folder confirmation and is not B admission'. This text is embedded in the critical plan saintvision.services.storage._owned_for_update in source-analysis.json (1 occurrence). It contradicts the Root L5 correction and authority-matrix b_activate_owner_contribution.requiresNodeConfirmation=false.",
+      "requiredFix": "Correct the text to owner + not-revoked (plain), keep folder observation B-only, and add a check that no plan or procedure text asserts plain folder confirmation."
+    }
+  ],
+  "infoFindings": [
+    {"id": "B6-I1", "statement": "6 rank collisions between inherited classes and the 'explicit original atomic receipt/evidence' ranks (2260 file_versions/result_commitments, 2301 evidence/node_stop_receipts, 2302 audit/result_completions, 2303 audit_log/shard_completions, 2305 public.evidence/storage_checks, 2306 lineage_events/node_channel_audit). Ties sort by name, so a total order exists, but the 'explicit distinct ranks' wording is inaccurate."},
+    {"id": "B6-I2", "statement": "link_plans joins 39 source functions (mapped writers plus the 13 readers), not all 632 plans. The 632 figure is the source-plan census, not procedure joins."}
+  ],
+  "independentlyReproduced": {
+    "ownerExitsAndLogHashes": "schema.py 0 (e3b0...), authority.py 0 (e3b0...), fixtures.py 0 {passed 547} (0b2c5837...), R4 probe 0 (6853f465...), R4 --require-coexistence 1 expected (26901da1...); all equal the owner proof-checks.json hashes. git status clean afterwards, so the regenerated contract.schema.json, authority-matrix.json, reader-io-catalog.json and fixture-results.json are byte-identical.",
+    "ledgerStreaming": "source-analysis.json streamed in 1 MiB chunks (never fully loaded): 74,373,915 bytes, sha256 19944f326147bf0d83784534231de8434eab5268355fb796f3239772f8d6ae9d = blob 33a43ad00937fc16ea0cc2d449de27f2a465b75c, matches source-command-record. files 523, records 1669, writers 384 total (34 on B tables per owner), functionPlans 632 (464 supported / 168 unsupported), critical 21 all supported with 0 unknown, unknownEdges 28, sqlScopeIssues 63, allCallSites 47,608.",
+    "priorPreservation": "9 prior-review files blob-identical to 8bac0838 originals; 4 prior-owner snapshots blob-identical to 228e2a20 rev5 originals; diff 228e..ee97 outside own Evidence/History = 0; product diff 72028..ee97 = 0.",
+    "readers13": "all 13 exactLine values match 72028 (placement:239/538, dispatch:79, leases:253, capacity:23, scheduler:106, build_adapter:138, gpu:97, model_commit:57, model_locality:27, tooling:203, terminal:78, node_channels:137); the same 13 as the prior review.",
+    "docsCI": "gh run view 42150067167: head ee97c27a, workflow_dispatch, attempt 1, success, job 127670869695 19/19 steps; ls-remote ref = ee97c27a."
+  },
+  "notRun": [
+    "source_analysis.py, reconcile.py, source_fixtures.py, link_plans.py full re-runs: available RAM measured at 190-356 MB (commit 61.2/65.3 GB) at 11:48 KST. Each run needs the full 523-file AST (about 50 s per mutant) or loads the 74 MB ledger. Replaced by bounded streaming plus 9 small-subset probes over actual 72028 files.",
+    "owner run_checks.py (would rewrite owner ledgers)",
+    "any PG/Docker/Node/SSH/PKI/crypto/VM/clock/crash/equipment command; Obsidian apply/adopt/resolve"
+  ],
+  "accepted": [
+    "46-surface carry-forward, R4 source guard and plain floor2/leaf3 unchanged; no new plain Node wire field",
+    "B-only FolderRootObservation closed schema/refusal shape (B-only domain proposed, signer REGISTERED_NODE_LEAF; production trust not granted)",
+    "unsigned CP tombstone / INVALIDATE outbox state set and existing durable gate ACK semantics",
+    "signing service prepare/HSM-private/conditional publication with version recheck",
+    "orthogonal denial facts and status-as-projection",
+    "honest level labels: actual new B Go/crypto/PG/Engine/crash/concurrency/equipment = 0, all real bindings NULL/HOLD, A1-A16 PENDING"
+  ],
+  "nextImplementationScopeIfRevisedAndAccepted": {
+    "note": "For Root's later grant decision only. The reviewer grants nothing.",
+    "firstModules": [
+      "Reviewed migration: inv.node_role_authority_anchors, lineage_anchors, denial_facts, safety_obligations (with effectClass), completion-authority (scoped), signing_intents, revocation_outbox, folder_root_observations, reconcile_evidence with rank_contract ranks; fixed SECURITY DEFINER procedures with search_path=pg_catalog, per-principal EXECUTE grants, RLS FORCE",
+      "CP inv/io_obligations module (register/mark_uncertain/confirm/abandon/settle, CommittedIOHandle, private completion capability) wired at node_transport.py:289 NodeDelivery.deliver and build_execution.py:779/787/835, then the caller boundaries listed in B6-L3 per Root's effect-class choice",
+      "13 reader replacements plus a typed scheduler snapshot producer; orthogonal-fact rewrites of containment.py, build_execution._mark_node_quarantined, node_transport._quarantine_gpu_node and observation.py status writers; shared plain cutover of the 34 writers",
+      "Separate signing-service process/DB login and revocation dispatcher; the B-only Node gate/folder observer (Go) after that"
+    ],
+    "requiredRuntimeCI": [
+      "pinned disposable PG: every principal x procedure, no direct DML/SET ROLE/RLS bypass, anchor phantom, publication-vs-revoke, admission-vs-registration, two-session lock/upgrade traces",
+      "crash injection at registration commit, before/after IO, receipt commit, fuse persistence, verifier restart, permission loss",
+      "HSM publication race, outbox retry/duplicate/ACK, Node gate durable ACK",
+      "real Linux Docker readonly/nonrecursive/rprivate mount plus workload host-path denials; five-PC storage+execution and four independent S05/S07 domains"
+    ]
+  },
+  "productDiffOfThisReview": 0
+}

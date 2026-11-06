@@ -1,0 +1,35 @@
+"""Bounded-memory streaming inspection of rev6 source-analysis.json (74MB). Never loads whole file."""
+import json, sys, collections, hashlib
+CH=1<<20
+dec=json.JSONDecoder()
+class S:
+    def __init__(s,p):s.f=open(p,'rb');s.buf='';s.pos=0;s.eof=False;s.h=hashlib.sha256();s.n=0
+    def fill(s):
+        if s.eof:return False
+        b=s.f.read(CH)
+        if not b:s.eof=True;return False
+        s.h.update(b);s.n+=len(b);s.buf=s.buf[s.pos:]+b.decode('utf-8');s.pos=0;return True
+    def find(s,tok):
+        while True:
+            i=s.buf.find(tok,s.pos)
+            if i>=0:s.pos=i+len(tok);return True
+            keep=len(tok);s.pos=max(s.pos,len(s.buf)-keep)
+            if not s.fill():return False
+    def items(s):
+        # assumes positioned right after '['
+        while True:
+            while s.pos>=len(s.buf) and s.fill():pass
+            c=s.buf[s.pos] if s.pos<len(s.buf) else ''
+            if c==',':s.pos+=1;continue
+            if c==']':s.pos+=1;return
+            while True:
+                try:obj,end=dec.raw_decode(s.buf,s.pos);s.pos=end;break
+                except json.JSONDecodeError:
+                    if not s.fill():raise
+            yield obj
+            if s.pos>CH*4:s.buf=s.buf[s.pos:];s.pos=0
+    def value(s):
+        while True:
+            try:obj,end=dec.raw_decode(s.buf,s.pos);s.pos=end;return obj
+            except json.JSONDecodeError:
+                if not s.fill():raise

@@ -1,0 +1,263 @@
+{
+ "inv.observation.NodeObservation.accept": {
+  "status": "SUPPORTED_STATIC_PLAN",
+  "critical": true,
+  "unknown": 0,
+  "tfHasRunTransition": [],
+  "locks": [
+   [
+    "inv.nodes",
+    "FOR UPDATE"
+   ],
+   [
+    "inv.node_channels",
+    "FOR SHARE"
+   ],
+   [
+    "inv.node_probes",
+    "FOR UPDATE"
+   ]
+  ],
+  "tb": [],
+  "ctr": "[{'discoverNodeResourceSet': 'authenticated Node+probe -> exact Node/shared channel, persisted probe nonce and current tuple; enumerate single affected Node before locks', 'outerTransaction': 'observation accept outer Database.transaction; nonce/probe receipt+telemetry update same transaction; signe"
+ },
+ "inv.observation.NodeObservation.mark_offline": {
+  "status": "SUPPORTED_STATIC_PLAN",
+  "critical": true,
+  "unknown": 0,
+  "tfHasRunTransition": [],
+  "locks": [
+   [
+    "inv.nodes",
+    "FOR UPDATE"
+   ]
+  ],
+  "tb": [],
+  "ctr": "[{'discoverNodeResourceSet': 'MVCC enumerate online Node IDs and tenant scopes with expired heartbeat; freeze sorted complete Node set and reread after lock prefix', 'outerTransaction': 'mark_offline transaction per bounded tenant/sorted Node batch; changed discovered set aborts batch/replans withou"
+ },
+ "inv.results.ResultStore.complete": {
+  "status": "SUPPORTED_STATIC_PLAN",
+  "critical": true,
+  "unknown": 0,
+  "tfHasRunTransition": [
+   "inv.runs.RunStore._transition"
+  ],
+  "locks": [
+   [
+    "inv.runs",
+    "FOR UPDATE"
+   ],
+   [
+    "inv.storage_objects",
+    "FOR UPDATE"
+   ]
+  ],
+  "tb": [],
+  "ctr": "[{'discoverNodeResourceSet': 'actual run/project/plan/request keys in parameters and listed query sites -> full persisted allocation/member Node IDs, public contributions/channels plus resource/claim set; for aggregate shards include ALL child Nodes, not just requester', 'outerTransaction': 'outer b"
+ },
+ "inv.shard_completion.ShardCompletion.once": {
+  "status": "SUPPORTED_STATIC_PLAN",
+  "critical": true,
+  "unknown": 0,
+  "tfHasRunTransition": [
+   "inv.runs.RunStore._transition"
+  ],
+  "locks": [
+   [
+    "inv.shard_plans",
+    "FOR UPDATE"
+   ],
+   [
+    "inv.runs",
+    "FOR UPDATE"
+   ]
+  ],
+  "tb": [],
+  "ctr": "[{'discoverNodeResourceSet': 'actual run/project/plan/request keys in parameters and listed query sites -> full persisted allocation/member Node IDs, public contributions/channels plus resource/claim set; for aggregate shards include ALL child Nodes, not just requester', 'outerTransaction': 'outer b"
+ },
+ "inv.shard_recovery.ShardRecovery.prepare": {
+  "status": "SUPPORTED_STATIC_PLAN",
+  "critical": false,
+  "unknown": 0,
+  "tfHasRunTransition": [],
+  "locks": [
+   [
+    "inv.shard_plans",
+    "FOR UPDATE"
+   ],
+   [
+    "inv.runs",
+    "FOR UPDATE"
+   ]
+  ],
+  "tb": [],
+  "ctr": "[{'discoverNodeResourceSet': {'parameters': ['self', 'principal', 'project', 'source_id', 'plan_id', 'intents', 'key'], 'querySites': [{'function': 'inv.leases.lock_run', 'line': 24, 'tables': ['inv.runs']}, {'function': 'inv.shard_recovery.ShardRecovery._source', 'line': 65, 'tables': ['inv.shard_r"
+ },
+ "inv.workspace_start.WorkspaceStart.prepare": {
+  "status": "SUPPORTED_STATIC_PLAN",
+  "critical": false,
+  "unknown": 0,
+  "tfHasRunTransition": [
+   "inv.runs.RunStore._transition"
+  ],
+  "locks": [
+   [
+    "inv.control_epoch",
+    "FOR SHARE"
+   ],
+   [
+    "inv.project_nodes",
+    "FOR SHARE"
+   ],
+   [
+    "inv.nodes",
+    "FOR SHARE"
+   ],
+   [
+    "public.nodes",
+    "FOR SHARE"
+   ],
+   [
+    "public.storage_contributions",
+    "FOR SHARE"
+   ],
+   [
+    "inv.node_channels",
+    "FOR SHARE"
+   ],
+   [
+    "inv.business_projects",
+    "FOR SHARE"
+   ],
+   [
+    "inv.runs",
+    "FOR UPDATE"
+   ],
+   [
+    "public.runs",
+    "FOR SHARE"
+   ],
+   [
+    "inv.project_grants",
+    "FOR SHARE"
+   ],
+   [
+    "inv.business_subjects",
+    "FOR SHARE"
+   ],
+   [
+    "public.users",
+    "FOR SHARE"
+   ],
+   [
+    "public.project_members",
+    "FOR SHARE"
+   ],
+   [
+    "public.data_locations",
+    "FOR SHARE"
+   ],
+   [
+    "public.projects",
+    "FOR SHARE"
+   ],
+   [
+    "public.workspaces",
+    "FOR SHARE"
+   ],
+   [
+    "public.workloads",
+    "FOR SHARE"
+   ],
+   [
+    "inv.idempotency",
+    "FOR UPDATE"
+   ]
+  ],
+  "tb": [
+   [
+    "self.db.transaction",
+    "OPEN_OUTER_TRANSACTION"
+   ]
+  ],
+  "ctr": "[{'discoverNodeResourceSet': {'parameters': ['self', 'principal', 'project', 'run_id', 'data', 'key'], 'querySites': [{'function': 'inv.approvals.ApprovalStore._audit', 'line': 154, 'tables': ['inv.approval_audit']}, {'function': 'inv.approvals.ApprovalStore._grant', 'line': 85, 'tables': ['inv.proj"
+ },
+ "saintvision.api.v1.nodes.enroll_node": {
+  "status": "UNSUPPORTED_PENDING_SCOPED_AUTHORITY_RESOLUTION",
+  "critical": false,
+  "unknown": 2,
+  "tfHasRunTransition": [],
+  "locks": [],
+  "tb": [
+   [
+    "session.begin",
+    "OPEN_OUTER_TRANSACTION"
+   ],
+   [
+    "session.begin",
+    "OPEN_OUTER_TRANSACTION"
+   ]
+  ],
+  "ctr": "[{'discoverNodeResourceSet': {'parameters': ['request', 'payload', 'response', 'tenant', 'idempotency_key', 'now', 'settings'], 'querySites': [{'function': 'saintvision.identity.tokens.consume_bootstrap_token', 'line': 93, 'tables': ['public.node_bootstrap_tokens']}, {'function': 'saintvision.identi"
+ },
+ "saintvision.api.v1.nodes.post_heartbeat": {
+  "status": "UNSUPPORTED_PENDING_SCOPED_AUTHORITY_RESOLUTION",
+  "critical": false,
+  "unknown": 2,
+  "tfHasRunTransition": [],
+  "locks": [
+   [
+    "public.nodes",
+    "FOR UPDATE"
+   ]
+  ],
+  "tb": [
+   [
+    "auth_session.begin",
+    "OPEN_OUTER_TRANSACTION"
+   ],
+   [
+    "session.begin",
+    "OPEN_OUTER_TRANSACTION"
+   ],
+   [
+    "session.begin",
+    "OPEN_OUTER_TRANSACTION"
+   ]
+  ],
+  "ctr": "[{'discoverNodeResourceSet': {'parameters': ['request', 'node_id', 'payload', 'now', 'settings'], 'querySites': [{'function': 'saintvision.identity.node_auth.NodePrincipal.lock_current', 'line': 108, 'tables': ['public.nodes']}, {'function': 'saintvision.identity.node_auth.NodePrincipal.lock_current"
+ },
+ "saintvision.api.v1.storage.register_contribution": {
+  "status": "UNSUPPORTED_PENDING_SCOPED_AUTHORITY_RESOLUTION",
+  "critical": false,
+  "unknown": 1,
+  "tfHasRunTransition": [],
+  "locks": [
+   [
+    "@transaction_advisory",
+    "TRANSACTION_ADVISORY"
+   ]
+  ],
+  "tb": [
+   [
+    "session.begin_nested",
+    "SAVEPOINT"
+   ]
+  ],
+  "ctr": "[{'discoverNodeResourceSet': {'parameters': ['request', 'payload', 'principal', 'session', 'settings', 'now', 'idempotency_key'], 'querySites': [{'function': 'saintvision.api.deps.serialise_idempotent_write', 'line': 154, 'tables': ['@transaction_advisory']}, {'function': 'saintvision.api.deps.store"
+ },
+ "saintvision.services.storage._owned_for_update": {
+  "status": "SUPPORTED_STATIC_PLAN",
+  "critical": true,
+  "unknown": 0,
+  "tfHasRunTransition": [],
+  "locks": [
+   [
+    "public.storage_contributions",
+    "FOR UPDATE"
+   ]
+  ],
+  "tb": [],
+  "ctr": "[{'discoverNodeResourceSet': 'contribution ID -> tenant/registered_by_user_id/Node ID by MVCC; authenticated owner from service binding; then lock single Node/public/contribution prefix', 'outerTransaction': 'API owner activation/withdrawal transaction includes idempotency and audit; no project-grad"
+ }
+}

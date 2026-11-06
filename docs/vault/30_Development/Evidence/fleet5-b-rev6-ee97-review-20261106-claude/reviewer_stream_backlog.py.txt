@@ -1,0 +1,18 @@
+import sys,json,collections
+sys.path.insert(0,sys.argv[2]);from stream_ledger_lib import S
+s=S(sys.argv[1]);s.find('"reachableFunctions":[');reach=set(s.items())
+s.find('"transactionBoundaries":[') if False else None
+s.find('"classifiedCalls":[')
+tx=collections.Counter();txsites=[];auth=collections.Counter();authsites=[]
+names={f.split('.')[-1] for f in reach}
+AUTH=('lock','reserve','transition','apply_sample','complete','record','admit','claim','release','quarantine','revoke','provision','commit')
+for c in s.items():
+    if c['classification']!='NONAUTHORITY_UNRESOLVED_EXTERNAL_BACKLOG':continue
+    m=c['method']
+    if m in('transaction','begin','begin_nested'):
+        tx[c['spelling']]+=1;txsites.append((c['path'].split('/')[-1],c['line'],c['function'],c['provenance']['receiverType']))
+    elif m in names and any(a in m for a in AUTH):
+        auth[c['spelling']]+=1;authsites.append((c['path'].split('/')[-1],c['line'],c['function'],c['spelling'],c['provenance']['receiverType']))
+s2=S(sys.argv[1]);s2.find('"transactionBoundaries":[');nb=sum(1 for _ in s2.items())
+print(json.dumps(dict(backlogTransactionCalls=sum(tx.values()),txTop=tx.most_common(15),txSitesSample=txsites[:25],recordedBoundaries=nb,
+  backlogAuthorityNamed=sum(auth.values()),authTop=auth.most_common(25),authSample=authsites[:30]),indent=1))

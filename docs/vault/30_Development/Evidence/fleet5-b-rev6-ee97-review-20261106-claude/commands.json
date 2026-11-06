@@ -1,0 +1,28 @@
+{
+ "schemaVersion": "fleet5-b-rev6-review-commands:1",
+ "environment": {
+  "host": "Windows 11 Pro 10.0.26300 (Git Bash + PowerShell 5.1)",
+  "worktree": "D:/Project/SaintVisionI-Invion/fleet5-bootstrap-v3-review-20261106 (reused released review workspace; was clean on the K2 review branch; new branch)",
+  "branch": "agent/claude/fleet5-b-rev6-ee97-review-20261106 created FROM ee97c27a5d135a4059256124290731cd2b791193 at about 11:40 KST",
+  "python": "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe = Python 3.14.7 (owner interpreter per proof-checks.json; read-only use, no installs)",
+  "memory": "11:48 KST: FreePhysical 85 MB, Available 190 MB, Committed 61,207 / 65,303 MB; later reading 356 MB available. Measured now, not historical.",
+  "noDB_PG_Docker_Node_SSH_PKI_VM_clock_schedule": true
+ },
+ "commands": [
+  {"atKST": "2026-11-06T11:40", "argv": "git fetch origin agent/codex/fleet5-b-contract-rev6-20261106; git rev-parse FETCH_HEAD ee97^; git checkout -b agent/claude/fleet5-b-rev6-ee97-review-20261106 ee97c27a", "exit": 0, "result": "FETCH_HEAD = ee97c27a, parent 228e2a20"},
+  {"atKST": "2026-11-06T11:41", "argv": "git diff --stat 228e2a20 ee97c27a; git diff --quiet 228e..ee97 -- . ':!<own Evidence>' ':!<own History>'; git diff --quiet 72028cba ee97 -- services src deploy tests tools packages", "exit": 0, "result": "66 added files, all in own Evidence/History; product diff 0"},
+  {"atKST": "2026-11-06T11:42", "argv": "read-only: fleet-five-orchestration-20261105 b-rev6-concrete-root-decision.json and Gov 'FLEET5 B 병행 역할과 전환 구현 범위 결정.md' (sha256sum, cat, grep)", "exit": 0, "result": "580b79f9... / 089e0003..., Gov v1.4.0; Root worktree not checked out or modified"},
+  {"atKST": "2026-11-06T11:44", "argv": "for each of 9 prior-review and 4 prior-owner snapshots: git rev-parse ee97:<copy> vs 8bac0838:<orig> / 228e2a20:<orig>", "exit": 0, "result": "9/9 and 4/4 blob-identical"},
+  {"atKST": "2026-11-06T11:46", "argv": "python -B scratch/m1_attacks.py <E> (imports owner model.py read-only)", "exit": 0, "scriptSha256": "b648b24a45bc705bf940751c8c4d4cdb58bdaf6c80e8d200162f8bf4e3dd7c4a", "result": "reviewer-m1-attacks-result.json"},
+  {"atKST": "2026-11-06T11:47", "argv": "git show 72028:services/control-plane/src/inv/{node_transport,terminal,buildkit_transport}.py | sed; git grep client IO call sites", "exit": 0, "result": "B6-L3 anchors and terminal draining fact"},
+  {"atKST": "2026-11-06T11:50", "argv": "python -B -I scratch/stream_ledger.py <E>/source-analysis.json (1 MiB chunk streaming, never full load)", "exit": 0, "scriptSha256": "a0168f6d53bbc7ed43db0a61ae2134e31d1c88122839cba587c00122f23882aa", "result": "bytes 74373915 sha256 19944f32...; counts in reviewer-stream-ledger-result.json"},
+  {"atKST": "2026-11-06T11:51", "argv": "python -B scratch/stream_backlog.py <ledger> <libdir>", "exit": 0, "scriptSha256": "cc83012607446a6b3aa6d674400bf44775990d7c8b639a3c6e76575a01eb2fa7", "caveat": "its field recordedBoundaries=0 is INVALID: it found the first '\"transactionBoundaries\":[' inside a functionPlan, not the top-level list. No conclusion uses it."},
+  {"atKST": "2026-11-06T11:52", "argv": "python -B scratch/m2_subset_probes.py <E> <root> (sc.analyze on 5 actual 72028 files + 1 synthetic probe per case)", "exit": 0, "scriptSha256": "a89771c234435748a24dd58c97e5ff9eff2de0b7685b85f23cfde581b1f0de02", "note": "first attempt exit 1: wrong models path src/saintvision/db/models.py; fixed to models/__init__.py + models/resource.py"},
+  {"atKST": "2026-11-06T11:54", "argv": "python -B <E>/schema.py; <E>/authority.py; <E>/fixtures.py; tests/proofs/fleet5_compute_storage_contract_probe.py; same --require-coexistence (stdout+stderr to scratch logs)", "exits": [0, 0, 0, 0, 1], "stdoutSha256": ["e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855", "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855", "0b2c5837fbf06c49bfa2ab05b64daed9eebdf14b48d9eef7aa3396a30e7ca4ea", "6853f465cbaf47a3d137a212e1252dc2794fb541f57855e93006c6c88ff831c7", "26901da1c34123066141d82ec7f1ddeb0ba4ee7a5a82854f9f3cee79f3d8745b"], "comparison": "all equal the owner proof-checks.json sha256; exit 1 for --require-coexistence is the expected original coexistence-gap proof", "sideEffect": "scripts rewrite their own outputs in the owner folder; git status afterwards was clean (byte-identical)"},
+  {"atKST": "2026-11-06T11:55", "argv": "python -B scratch/l3l4_attacks.py <E>; streaming count of 'activation still requires Node folder confirmation' in ledger", "exit": 0, "scriptSha256": "776c7708cf8b12f7a01f46e711d3760094e9e643bf57ca52184e78c681ba8365", "result": "A10 defect; L3b-d, L4b-e pass; stale text occurrences 1"},
+  {"atKST": "2026-11-06T11:57", "argv": "python -B scratch/stream_plans.py <ledger> <libdir> <names>", "exit": 0, "scriptSha256": "a1338ce3e60d01f1edb4ced4734fb3c6a2f06a37ae780f2b421db09d308fc6c4", "result": "reviewer-stream-plans-result.json"},
+  {"atKST": "2026-11-06T11:56", "argv": "gh run view 42150067167 --json headSha,headBranch,event,status,conclusion,displayTitle,workflowName,attempt,jobs; git ls-remote origin refs/heads/agent/codex/fleet5-b-contract-rev6-20261106", "exit": 0, "result": "ee97c27a, workflow_dispatch, attempt 1, success, job 127670869695 19/19; remote ref ee97c27a"}
+ ],
+ "notRun": ["source_analysis.py / reconcile.py / source_fixtures.py / link_plans.py full runs (RAM 190-356 MB available)", "owner run_checks.py", "any PG/Docker/Node/crypto/crash/equipment command", "Obsidian apply/adopt/resolve"],
+ "publicationGates": "see local-doc-gates.txt"
+}

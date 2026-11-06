@@ -1,0 +1,66 @@
+"""Independent Claude M1 attacks on rev6 symbolic model (read-only import, no writes to Evidence)."""
+import sys, json
+from copy import deepcopy
+E=sys.argv[1]; sys.path.insert(0,E)
+import model as m
+from authority import OP,VER,RUN,SAFE,REV
+R=[]
+def rec(name,actual,expected_by_contract,note):
+    R.append(dict(case=name,actual=actual,contractExpectation=expected_by_contract,defect=actual!=expected_by_contract,note=note))
+def phys(h):return m.seal('PROTECTED_PHYSICAL_RECOVERY',{'bindingHash':h.handle_hash,'recovery':'EXACT_PHYSICAL_RECONCILIATION'},'SYMBOLIC_OPERATOR_INDEPENDENT_PHYSICAL_VERIFIER')
+s=m.scope(); s2=m.scope(n='node-2')
+# A1 read-only heartbeat transient failure
+w=m.World();r=w.connect(RUN);v=w.connect(VER);op=w.connect(OP)
+b=m.binding(w,op='hb-1',kind='HEARTBEAT_OBSERVE');h=w.register(r,b)
+rec('A1-heartbeat-registers-obligation',h is not None,True,'read-only probe creates scoped obligation')
+rec('A1-inflight-heartbeat-denies-business',w.eligible('R03',s),True,'no side effect yet business denied for the whole Node during probe')
+w.invoke(h,b['bodySHA'],b['method'],b['rawPath']);w.failure(h)  # 3s timeout, routine network loss
+st=w.obligations[(m.sk(s),'hb-1')]['state']
+rec('A1-heartbeat-timeout-state',st,'NO_EFFECT_ABANDONED_or_ordinary','read-only IO uncertainty has no physical effect')
+rec('A1-after-timeout-all13-readers',[w.eligible(x,s) for x in w.readers].count(True),13,'Node business stays denied until OP')
+w2=deepcopy(w)
+rec('A1-ordinary-verifier-cannot-recover',w.confirm(v,h,w.outcome(h,'OBSERVED')),True,'ordinary path unavailable after read-only failure')
+b2=m.binding(w,op='hb-2',kind='HEARTBEAT_OBSERVE');h2=w.register(r,b2);w.invoke(h2,b2['bodySHA'],b2['method'],b2['rawPath'])
+rec('A1-next-good-heartbeat-confirms',w.confirm(v,h2,w.outcome(h2,'OBSERVED')),True,'')
+rec('A1-good-heartbeat-does-not-restore',w.eligible('R03',s),True,'only OP physical proof clears read-only timeout')
+rec('A1-needs-OP-physical-proof',w.settle(op,h,phys(h)),False,'operator escalation for a no-effect read')
+# A2 renewal signing denied while any read-only observation in flight / failed
+w=m.World();op=w.connect(OP);r=w.connect(RUN)
+b=m.binding(w,op='hb-x',kind='HEARTBEAT_OBSERVE');h=w.register(r,b);w.invoke(h,b['bodySHA'],b['method'],b['rawPath']);w.failure(h)
+rec('A2-same-config-renew-after-heartbeat-timeout',w.sign(op,s,'APPROVAL',m.sign_body(w,kind='APPROVAL')) is not None,True,'renewal blocked until OP physical recovery; may lead to expiry')
+# A3 single-flight per Node
+w=m.World();r=w.connect(RUN)
+h1=w.register(r,m.binding(w,op='exec-1'))
+h2=w.register(r,m.binding(w,op='exec-2'))
+rec('A3-second-independent-EXECUTE-same-Node',h2 is not None,'documented','per-Node single flight: any PENDING denies all other admissions incl. disjoint resources')
+# A4 terminal frame under DRAIN (catalog says draining may continue exact handle)
+w=m.World();r=w.connect(RUN);op=w.connect(OP)
+w.set_fact(op,s,'DRAIN')
+ht=w.register(r,m.binding(w,op='term-1',kind='TERMINAL_FRAME'))
+rec('A4-terminal-frame-registration-under-DRAIN',ht is not None,True,'catalog R12 says existing claimed terminal may continue under drain; register() requires eligible(R03) = no facts')
+# A5 cross-Node blast radius of one fuse-persistence failure
+w=m.World();r=w.connect(RUN);v=w.connect(VER);op=w.connect(OP)
+ha=w.register(r,m.binding(w,s=s,op='a',kind='GPU_ACTIVE_OBSERVE'))
+hb=w.register(r,m.binding(w,s=s2,op='b',kind='GPU_ACTIVE_OBSERVE'))
+w.failure(ha,persist_error=False,persist_fuse=False)
+rec('A5-node2-ordinary-success-after-node1-fuse-loss',w.confirm(v,hb,w.outcome(hb,'ACTIVE')),True,'global incarnation fence blocks other Node success')
+w.restart_verifier();nv=w.connect(VER)
+rec('A5-node2-after-restart-ordinary',w.confirm(nv,hb,w.outcome(hb,'ACTIVE')),True,'node-2 healthy op now needs OP physical proof')
+rec('A5-node2-eligible',w.eligible('R03',s2),True,'other-scope obligation failure denies node-2')
+# A6 exception before invalidate: residual capability exposure check
+w=m.World();r=w.connect(RUN);v=w.connect(VER)
+h=w.register(r,m.binding(w,op='x',kind='GPU_ACTIVE_OBSERVE'))
+cap=w.private_caps[h.handle_hash]
+rec('A6-capability-object-reachable-from-runtime-handle',hasattr(h,'capability') or 'cap' in dir(h),False,'handle carries no capability')
+# A7 wrong-purpose: register EXECUTE handle then confirm with GPU ACTIVE tag
+w=m.World();r=w.connect(RUN);v=w.connect(VER);h=w.register(r,m.binding(w,op='e'))
+rec('A7-EXECUTE-confirmed-by-ACTIVE',w.confirm(v,h,w.outcome(h,'ACTIVE')),False,'')
+# A8 cross-operation outcome reuse
+w=m.World();r=w.connect(RUN);v=w.connect(VER)
+h1=w.register(r,m.binding(w,op='o1',kind='GPU_ACTIVE_OBSERVE'));h2=w.register(r,m.binding(w,s=s2,op='o2',kind='GPU_ACTIVE_OBSERVE'))
+rec('A8-cross-operation-outcome',w.confirm(v,h2,w.outcome(h1,'ACTIVE')),False,'')
+rec('A8-cross-op-mismatch-poisons-victim',w.obligations[(m.sk(s2),'o2')]['state'],'PENDING_IO','a forged/duplicate response for another op poisons the victim op -> OP needed')
+# A9 duplicate response after confirm
+w=m.World();r=w.connect(RUN);v=w.connect(VER);h=w.register(r,m.binding(w,op='d',kind='GPU_ACTIVE_OBSERVE'));o=w.outcome(h,'ACTIVE')
+w.confirm(v,h,o);rec('A9-duplicate-response',w.confirm(v,h,o),False,'');rec('A9-dup-state',w.obligations[(m.sk(s),'d')]['state'],'CONFIRMED_OUTCOME','')
+json.dump(dict(cases=R,defects=[c['case'] for c in R if c['defect']]),sys.stdout,indent=1)

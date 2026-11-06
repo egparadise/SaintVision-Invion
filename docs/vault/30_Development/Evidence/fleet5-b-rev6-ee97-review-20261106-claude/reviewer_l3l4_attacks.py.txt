@@ -1,0 +1,36 @@
+import sys,json
+from copy import deepcopy
+E=sys.argv[1];sys.path.insert(0,E)
+import model as m
+from authority import OP,VER,RUN,SAFE,REV
+R=[];s=m.scope();s2=m.scope(n='node-2')
+def rec(n,a,e,note=''):R.append(dict(case=n,actual=a,expected=e,defect=a!=e,note=note))
+# A10 signing intent starved by routine read-only observation registration
+w=m.World();op=w.connect(OP);r=w.connect(RUN)
+i=w.prepare_sign(op,s,'GATE_CONTROL',m.sign_body(w));w.hsm_sign_private(i)
+w.register(r,m.binding(w,op='hb',kind='HEARTBEAT_OBSERVE'))
+rec('A10-ARM-publication-after-concurrent-heartbeat-registration',w.publish_sign(op,i) is not None,True,'any IO registration bumps authorityVersion and discards private signature')
+# L3b other-node revoke must not discard this node's intent
+w=m.World();op=w.connect(OP)
+i=w.prepare_sign(op,s,'GATE_CONTROL',m.sign_body(w));w.hsm_sign_private(i);w.revoke(op,s2,causal=m.H)
+rec('L3b-other-node-revoke-no-interference',w.publish_sign(op,i) is not None,True)
+# L3c publish by a different authenticated OP connection
+w=m.World();op=w.connect(OP);op2=w.connect(OP)
+i=w.prepare_sign(op,s,'GATE_CONTROL',m.sign_body(w));w.hsm_sign_private(i)
+rec('L3c-cross-connection-publication',w.publish_sign(op2,i) is None,True)
+# L3d replay publish after ISSUED
+w=m.World();op=w.connect(OP);i=w.prepare_sign(op,s,'GATE_CONTROL',m.sign_body(w));w.hsm_sign_private(i);first=w.publish_sign(op,i)
+rec('L3d-second-publication-refused',w.publish_sign(op,i) is None,True)
+# L4b SAFE outbox for node-1 used against node-2 gate
+w=m.World();safe=w.connect(SAFE);rev=w.connect(REV);oid=w.revoke(safe,s,causal=m.H)
+b=m.sign_body(w,s=s2,action='INVALIDATE_EXACT_GATE');b.update(outboxId=oid,lineageVersion=w.outbox[oid]['anchorVersion'],gateId=w.outbox[oid]['targetGateId'],releaseHash=w.outbox[oid]['targetReleaseHash'])
+rec('L4b-cross-node-outbox-invalidate',w.sign(rev,s2,'GATE_CONTROL',b) is None,True)
+# L4c REV cannot request ARM even with outbox
+w=m.World();rev=w.connect(REV);safe=w.connect(SAFE);oid=w.revoke(safe,s,causal=m.H)
+b=m.sign_body(w,action='ARM_EXACT_RELEASE',outid=oid)
+rec('L4c-dispatcher-ARM-via-outbox',w.sign(rev,s,'GATE_CONTROL',b) is None,True)
+# L4d tombstone without causal evidence refused
+w=m.World();op=w.connect(OP);rec('L4d-tombstone-requires-causal',w.revoke(op,s,causal=None) is None,True)
+# L4e RUN cannot tombstone
+w=m.World();rec('L4e-RUN-cannot-tombstone',w.revoke(w.connect(RUN),s,causal=m.H) is None,True)
+json.dump(R,sys.stdout,indent=0)

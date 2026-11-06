@@ -1,0 +1,9 @@
+import sys,json
+sys.path.insert(0,sys.argv[2]);from stream_ledger_lib import S
+want=set(sys.argv[3].split(','))
+s=S(sys.argv[1]);s.find('"functionPlans":[');out={}
+for p in s.items():
+    if p['function'] in want or any(p['function'].endswith(w) for w in want):
+        out[p['function']]=dict(status=p['supportStatus'],critical=p.get('criticalEntry'),unknown=len(p['unknownIDs']),tfHasRunTransition=[f for f in p['transitiveFunctions'] if 'RunStore' in f][:6],
+          locks=[(r['table'],r['mode']) for r in p['rankedResourceLocks']][:20],tb=[(b.get('spelling'),b.get('boundary')) for b in p.get('transactionBoundaries',[])][:6],ctr=str(p.get('concreteEntryContracts'))[:300])
+print(json.dumps(out,indent=1))
