@@ -56,5 +56,9 @@
   "currentCLIExecutionMode": "auto_confirmed",
   "persistentCLIDefault": "agentMode_auto_only",
   "modeEvidence": "portal-polling-r3-cli-auto-mode-root-verification.json",
-  "allFuturePromptsEliminatedClaim": false
+  "allFuturePromptsEliminatedClaim": false,
+  "sharedTypecheckCacheDecision": "portal-polling-r3-shared-typecheck-cache-root-decision.json",
+  "pendingTscBuildApproved": false,
+  "concreteLocalTypechecks": "two separate node typescript/bin/tsc -p tsconfig.app.json/node.json --noEmit; after exit0 own Vite build",
+  "scopeExpanded": false
 }

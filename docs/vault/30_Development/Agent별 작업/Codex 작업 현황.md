@@ -1,15 +1,19 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.424"
+version: "1.0.425"
 status: "review"
 author: "Codex"
-updated: "2026-11-06T23:44:24+09:00"
+updated: "2026-11-06T23:49:06+09:00"
 source_of_truth: "Git"
 active_card: "FLEET5 continued supervision with PORTAL-REFRESH-FLEET-20261106"
-active_card_status: "BRev9cactualClaude5ea/c5dctxe399launched; P02784/da137pending; UIR3edited/regressions; physicalincomplete"
+active_card_status: "B9cactualClaudeactive/P02pending; UIR3serialregression+safetypecheck; sharedtsc-bnotapproved; physicalincomplete"
 active_card_next: "ProcessactualBverdict/freshexitrelease; choosefrozenUIR3orP02next; originalasksbccbed/5bf8pending; noA7/D04grant/deploy"
 ---
+
+## 2026-11-06T23:49:06+09:00 UI 타입 검사 캐시 경계의 실제 확인
+
+현재 tsc -b는 공유 junction의 tsBuildInfo를 쓰므로 승인하지 않았다. 같은 Agent에 원래 범위 안의 두 tsc -p --noEmit 검사·자기 Vite 빌드를 구체 전달하고 대기 명령만 취소했다. 다음 첫 행동/담당은 Gemini가 실제 대체 검사 결과와 고정 후보를 제출하고, Root가 현재 Claude의 B 판정과 다음 단일 검토를 처리하는 것이다. CLI/Task 재시작·새 사용자 승인·제품 수락은 없었다.
 
 ## 2026-11-06T23:44:24+09:00 두 후보 검증과 실제 독립 검토 연결
 
