@@ -1,15 +1,19 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.400"
+version: "1.0.401"
 status: "review"
 author: "Codex"
-updated: "2026-11-06T13:48:38+09:00"
+updated: "2026-11-06T14:12:15+09:00"
 source_of_truth: "Git"
 active_card: "FLEET5-20261105 five physical node orchestration"
-active_card_status: "K2A de71candidate DocsSUCCESS/Corein_progress; localrace CGOdisabledNOTRUN; finiteCIcallbackactive thenactualClaude; B rev7/observationMediumOPEN/wholephysicalincomplete"
-active_card_next: "FixedCIterminal callback existingownerquestion thenRoot ONEactualimmutablede71codereview; failurepreserve/fixno blindrerun; no borrowedCI/productionauth; B rev7continues"
+active_card_status: "de71wholeCoreFAILURE; actualnewpackagehostedrace11/24PASS; actualClaudeCODEAXISc067active; sameCodex Stage1diagnostic; no finalacceptance/wholephysicalincomplete"
+active_card_next: "Claudeactualde71codeverdict; Codex separatebranchStage1sanitizeddiff+guardtests/focusedCI; Root evidencechoicebeforeanybehaviorfix thenchosencombinedfreshCoreDocs; B rev7/observationMediumpending"
 ---
+
+## 2026-11-06T14:12:15+09:00 Core 실패의 정밀 진단과 코드 축 병행 검토
+
+작업한 것과 확인: de71의 Core42164071724는 기존 LAN 업그레이드 관측 guard에서 실패했고 원인은 아직 미확정이다. Root는 실제 artifact를 파싱해 새 패키지 race11top/24sub 통과만 확인했다. Claude task_c067a20c86ed에 코드 축 검토를 배정하고 같은 Codex에게 별도 Stage1 진단을 허용했다. guard 완화·동작 변경은 미허용이며 최종 납품은 결합 소스의 새 전체 Core/Docs 성공이 필요하다. 원질문 msg_e880984e98ec에는 msg_94f6f2679db5로 정확한 별도 카드·분기·허용 파일·검증·결합 계획을 답했다. 다음 첫 행동/담당은 Claude의 실제 코드 판정, Codex의 Stage1 차이 증거, Root의 근거에 따른 다음 범위 결정이다.
 
 ## 2026-11-06T13:48:38+09:00 K2A 실제 후보와 새 CI 종료 감시
 

@@ -1,0 +1,108 @@
+{
+  "atKST": "2026-11-06T14:02:32+09:00",
+  "source": "de71c07c2b827eea50e2ca660f80d042334472c7",
+  "failureReport": "ff3169d360a707415d9b03484cf0cf3031f3912c",
+  "branch": "agent/codex/fleet5-k2a-trust-history-20261106",
+  "reportDocsOnlyParentDe71": true,
+  "reportDocsPaths": 16,
+  "remoteExact": true,
+  "CI": {
+    "FailedCore": {
+      "run": 42164071724,
+      "head": "de71c07c2b827eea50e2ca660f80d042334472c7",
+      "ref": "agent/codex/fleet5-k2a-trust-history-20261106",
+      "event": "workflow_dispatch",
+      "correlation": "FLEET5-K2A-Core-de71c07c2b82-20261106T1342KST",
+      "attempt": 1,
+      "status": "completed",
+      "conclusion": "failure",
+      "jobs": [
+        {
+          "id": 127716312164,
+          "name": "s01-storage-roundtrip",
+          "head": "de71c07c2b827eea50e2ca660f80d042334472c7",
+          "status": "completed",
+          "conclusion": "success",
+          "failedSteps": [],
+          "skippedSteps": []
+        },
+        {
+          "id": 127716312318,
+          "name": "core",
+          "head": "de71c07c2b827eea50e2ca660f80d042334472c7",
+          "status": "completed",
+          "conclusion": "failure",
+          "failedSteps": [
+            "Run provisioned LAN installer acceptance"
+          ],
+          "skippedSteps": [
+            "FLEET5 early native Go peer-policy lifecycle proof",
+            "Publish FLEET5 native peer-phase proof (including expected baseline failure)",
+            "FLEET5 fixed native Go two-cycle proof",
+            "Publish FLEET5 fixed native proof",
+            "Require executed LAN installer evidence",
+            "Run owned CX01 recovery drill evidence",
+            "Require executed CX01 recovery evidence",
+            "Verify build admission queue fairness on PostgreSQL",
+            "Require executed build admission queue evidence",
+            "Verify LAN pilot database scripts with real PostgreSQL",
+            "Require executed LAN pilot database evidence",
+            "Run python -m pytest --junitxml=dist/core-tests.xml -o faulthandler_timeout=45 --ignore=tests/integration/test_build_product_runtime_real_pg.py --ignore=tests/integration/test_lan_pilot_database_real_pg.py --ignore=tests/integration/test_desktop_browser.py --ignore=tests/integration/test_approval_browser.py --ignore=tests/integration/test_studio_browser.py --ignore=tests/integration/test_web_container.py --ignore=tests/integration/test_workspace_upgrade.py --ignore=tests/integration/test_lan_storage_install.py --ignore=tests/integration/test_s3_object_store_postgres.py --ignore=tests/integration/test_recovery_drill.py",
+            "Docker host hygiene (explicit lane)",
+            "Require executed evidence and declared platform skips",
+            "Collect fixed-SHA S08 build acceptance observations",
+            "Recompute S08 build acceptance verdict from raw artifacts",
+            "Run python -m build services/control-plane --outdir dist",
+            "Run go test ./...",
+            "Run npx --yes --package typescript@5.9.3 tsc --noEmit --strict packages/contracts-ts/src/index.ts",
+            "Post Run actions/setup-node@v4",
+            "Post Run actions/setup-go@v5",
+            "Post Run actions/setup-python@v5"
+          ]
+        }
+      ]
+    },
+    "SourceDocs": {
+      "run": 42164075078,
+      "head": "de71c07c2b827eea50e2ca660f80d042334472c7",
+      "ref": "agent/codex/fleet5-k2a-trust-history-20261106",
+      "event": "workflow_dispatch",
+      "correlation": "FLEET5-K2A-Docs-de71c07c2b82-20261106T1342KST",
+      "attempt": 1,
+      "status": "completed",
+      "conclusion": "success",
+      "jobs": [
+        {
+          "id": 127716312780,
+          "name": "docs",
+          "head": "de71c07c2b827eea50e2ca660f80d042334472c7",
+          "status": "completed",
+          "conclusion": "success",
+          "failedSteps": [],
+          "skippedSteps": []
+        }
+      ]
+    },
+    "ReportDocs": {
+      "run": 42165778183,
+      "head": "ff3169d360a707415d9b03484cf0cf3031f3912c",
+      "ref": "agent/codex/fleet5-k2a-trust-history-20261106",
+      "event": "workflow_dispatch",
+      "correlation": "FLEET5-K2A-failure-report-Docs-ff3169d360a7-20261106T1400KST",
+      "attempt": 1,
+      "status": "completed",
+      "conclusion": "success",
+      "jobs": [
+        {
+          "id": 127721815310,
+          "name": "docs",
+          "head": "ff3169d360a707415d9b03484cf0cf3031f3912c",
+          "status": "completed",
+          "conclusion": "success",
+          "failedSteps": [],
+          "skippedSteps": []
+        }
+      ]
+    }
+  }
+}

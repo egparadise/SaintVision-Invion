@@ -1,0 +1,43 @@
+{
+  "RootIndependentlyReadAndHashedAllSixGitBlobs": true,
+  "sameHelperAndTestAcrossThreeSources": true,
+  "records": [
+    {
+      "source": "eb32b211ab3704935b9431747089ab0715582a74",
+      "path": "deploy/lan/worker_peer_floor.py",
+      "SHA256": "c73c81adaedb2a7b3b8513cd874b093a71f7b5c147e2e08ea86f71a54c8d2fec",
+      "rawBytes": 13159
+    },
+    {
+      "source": "eb32b211ab3704935b9431747089ab0715582a74",
+      "path": "tests/integration/test_workspace_upgrade.py",
+      "SHA256": "54a730d522599e376b8246a0fe01488c4736763c651d8838b10ed4fa3271e6ba",
+      "rawBytes": 14846
+    },
+    {
+      "source": "4ce63e8ee78d957aa91e813f6ee226cc21abb52a",
+      "path": "deploy/lan/worker_peer_floor.py",
+      "SHA256": "c73c81adaedb2a7b3b8513cd874b093a71f7b5c147e2e08ea86f71a54c8d2fec",
+      "rawBytes": 13159
+    },
+    {
+      "source": "4ce63e8ee78d957aa91e813f6ee226cc21abb52a",
+      "path": "tests/integration/test_workspace_upgrade.py",
+      "SHA256": "54a730d522599e376b8246a0fe01488c4736763c651d8838b10ed4fa3271e6ba",
+      "rawBytes": 14846
+    },
+    {
+      "source": "de71c07c2b827eea50e2ca660f80d042334472c7",
+      "path": "deploy/lan/worker_peer_floor.py",
+      "SHA256": "c73c81adaedb2a7b3b8513cd874b093a71f7b5c147e2e08ea86f71a54c8d2fec",
+      "rawBytes": 13159
+    },
+    {
+      "source": "de71c07c2b827eea50e2ca660f80d042334472c7",
+      "path": "tests/integration/test_workspace_upgrade.py",
+      "SHA256": "54a730d522599e376b8246a0fe01488c4736763c651d8838b10ed4fa3271e6ba",
+      "rawBytes": 14846
+    }
+  ],
+  "actualFailureTupleField": "UNKNOWN"
+}

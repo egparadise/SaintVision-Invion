@@ -1,0 +1,37 @@
+{
+  "source": "de71c07c2b827eea50e2ca660f80d042334472c7",
+  "Core": 42164071724,
+  "overallCore": "FAILURE",
+  "artifactId": 13478861491,
+  "artifactBytes": 13211105,
+  "artifactSHA256": "9e4152c8c6b0bb981b7fa8e8befcf348d067f685c5a042bff7b38a8ba8d65bd9",
+  "rootDownloadedAndDigestMatched": true,
+  "unitEntry": "node-unit.jsonl",
+  "unitSHA256": "deedbc872729c3c3536fa9f74bdec3cd5fcbe414ec68445e5bc6119ecf9d86a3",
+  "rootParsedActualNewPackage": "github.com/egparadise/SaintVision-Invion/services/node-agent/internal/migrationcontext",
+  "newPackagePassed": true,
+  "newTopPass": 11,
+  "newSubtestPass": 24,
+  "newFailEvents": 0,
+  "wholeGoFailEvents": 0,
+  "passingTopTests": [
+    "TestNullPortsAndOpaqueBoundary",
+    "TestWellFormedUnregisteredProvidersNeverAuthenticate",
+    "TestAlreadyBoundSyntheticOriginalSelectorAndFreeze",
+    "TestCopyRejectsCallbacksAndBoundsBeforeEncoding",
+    "TestAlreadyBoundCurrentStatusAgeAndRefusalIsolation",
+    "TestSyntheticClockEnvelopeAndCompleteOutput",
+    "TestAlreadyBoundSyntheticCryptoHistoryEndpoints",
+    "TestAlreadyBoundPolicyJoinsDoNotAuthenticate",
+    "TestWholePackageFullUnderlyingCensus",
+    "TestCensusMutantsAfterSimulatedRawRepin",
+    "TestRepositoryBoundaryAndZeroEffects"
+  ],
+  "selectedXmlEntryNames": [
+    "lan-installer-tests.xml",
+    "workspace-tests.xml"
+  ],
+  "rawZipAndRawTestOutput": "ignoredprivateonly; noexport",
+  "wholeSuiteAccepted": false,
+  "actualFailureTupleField": "UNKNOWN logsno snapshots"
+}

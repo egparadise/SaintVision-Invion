@@ -3,8 +3,8 @@
   "recordedAtKST": "2026-11-06T00:46:51+09:00",
   "rootBase": "2b1753ce59c09037b5e130a7ffe64794d1d45fdf",
   "priorRootCheckpoint": {
-    "SHA": "41cf21221a5df17f6ba1ed625403534e83e199d2",
-    "Docs": 42160841252,
+    "SHA": "eec3dd2c589414f48f3eac56558f4b9ac1a4efd4",
+    "Docs": 42164893224,
     "exactHeadCorrelationAllJobsSuccess": true,
     "remoteMatches": true,
     "syncExits": [
@@ -12,13 +12,13 @@
       0,
       0
     ],
-    "independentlyMatchedNormalizedDestinationHashes": 2786,
+    "independentlyMatchedNormalizedDestinationHashes": 2787,
     "pending": 0,
     "conflicts": 0,
     "trackedAndUntrackedClean": true,
     "rootDocsOnly": true,
     "wholeProgramComplete": false,
-    "verifiedAtKST": "2026-11-06T13:11:11+09:00"
+    "verifiedAtKST": "2026-11-06T13:52:00+09:00"
   },
   "actualPlanLowReview": {
     "source": "803ad270562b1b75e44d26f9e14b965c714ab519",
@@ -2515,7 +2515,7 @@
     "ownerT1T2T3": "msg_620855c76519",
     "normativeRevisionReply": "msg_0392caf64d5d"
   },
-  "latestRecordAtKST": "2026-11-06T13:48:38+09:00",
+  "latestRecordAtKST": "2026-11-06T14:12:15+09:00",
   "optionalLowTokenTestDelta": {
     "source": "f0af307705b4923ebc3e231db5238af4c70aa389",
     "scope": "two otherwise-valid token payload corrections and JSON validity assertions; runtime unchanged",
@@ -3108,8 +3108,14 @@
     "reviewOnlyPaths": 18
   },
   "BRev7RootDecision": "b-rev7-concrete-root-decision.json",
-  "activeActualReview": null,
-  "nextReviewRequires": "actualnewde71CoreterminalSUCCESS andDocsSUCCESS orBrev7immutableDocs; oneClaude",
+  "activeActualReview": {
+    "task": "task_c067a20c86ed",
+    "dispatch": "ctx_adf96c8d66b4",
+    "source": "de71c07c2b827eea50e2ca660f80d042334472c7",
+    "scope": "CODEAXISONLY/fullCoreFAILED",
+    "verdict": null
+  },
+  "nextReviewRequires": "actualde71codeverdict; Rootchosencombinednewsource/freshCoreDocs beforeboundedsourceCIreportacceptance",
   "K2LatestImmutableProposalRootObservation": "k2-rev2-root-actual-contract-review-gate.json",
   "K2LatestActualReviewDispatch": {
     "dispatchId": "ctx_f0eed1630fd5",
@@ -3138,5 +3144,9 @@
   "K2ObservationStepMedium": "K2R2-M1 OPEN/separatecontractreview required before D-OBSERVATION acceptance",
   "K2ReadonlyAuthenticationSeamChoice": "k2a-authentication-seam-root-scope-clarification.json",
   "K2PositiveProductionAuthenticationGranted": false,
-  "K2NewReadonlyImplementationCandidate": "k2a-de71-root-source-ci-review-gate.json"
+  "K2NewReadonlyImplementationCandidate": "k2a-de71-root-source-ci-review-gate.json",
+  "K2ActualWholeCoreFailureReportRootObservation": "de71-failed-core-qualified-report-root-verification.json",
+  "K2ActualNewPackageRaceRootAudit": "de71-root-actual-race-artifact-audit.json",
+  "peerFloorStage1DiagnosticRootScope": "peer-floor-observation-diagnostic-root-scope.json",
+  "de71FiniteMonitorClosed": true
 }

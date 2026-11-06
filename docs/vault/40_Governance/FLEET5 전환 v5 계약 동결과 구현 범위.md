@@ -1,11 +1,11 @@
 ---
 doc_id: "GOV-FLEET5-BOOTSTRAP-V5-FREEZE-CODE-SCOPE-20261106"
 title: "FLEET5 전환 v5 계약 동결과 구현 범위"
-version: "1.0.8"
+version: "1.0.9"
 status: "active"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-11-06T13:08:37+09:00"
+updated: "2026-11-06T14:12:15+09:00"
 source_of_truth: "Git"
 ---
 
@@ -104,3 +104,14 @@ K2R2-M1은 관측 계약 안의 Medium으로 계속 열려 있다. immutable att
 따라서 이번 구현은 readonly 경계·null port·거부·binding/freeze/history selector/clock/K1 순수 검증 로직·권한 경계/Go type gate의 한정 단위다. 미등록 purpose/format의 근거는 hash·ACTIVE 표기·self-signed 자료가 일관돼도 인증으로 승격하지 않는다. 새 내부 proof 메시지·서명 domain/issuer·암호 검증 ABI를 이번 범위에 만들지 않으며 g2-planning-policy를 설치 인증으로 전용하지 않는다. 등록된 인증 형식과 실제 연결이 없으면 LoadInstalledPolicy와 후속 공개 경로는 계속 닫힌 오류로 거부한다. 이는 production positive authentication 또는 전체 K2A가 구현됐다는 뜻이 아니다.
 
 후속 로직의 양성 단위 시험은 *_test.go 안에서만 명시적으로 이미 binding된 합성 fixture를 구성할 수 있다. 이 시험은 누락된 외부 인증 단계를 의도적으로 우회한 후속 binding/copy/selector/time/K1 로직의 시험임을 표기한다. 공개 constructor·옵션·callback·production helper·verify=true로 신뢰 DTO를 만들 수 있게 하지 않는다. 실제 positive 인증은 purpose별 별도 검토된 provisioning/attestation 계약과 실제 등록 anchor/port, 후속 Root 구현 범위 결정에 의존한다. 기존 새 코드 CI/독립 검토와 observation/current/effect/installation HOLD 조건은 유지한다. 상세 근거와 지시는 Root Evidence k2a-authentication-seam-root-scope-clarification.json에 보존했다.
+
+
+## de71의 전체 Core 실패와 코드 검토·진단 병행
+
+Core42164071724는 기존 LAN upgrade 시험의 worker_peer_floor.py:217 소유 상태 변화 거부로 실패했다. main pytest와 뒤 build/go 단계는 skipped이며 전체 성공이 아니다. 새 패키지의 실제 hosted race11top/24sub 통과와 source Docs 성공은 별도 축이다. Root는 원본 artifact digest를 대조·다운로드하고 Go JSON을 직접 파싱한 뒤, 코드 검토를 먼저 병행하도록 순서를 정정했다. 이는 전체 CI gate를 완화한 것이 아니며 최종 한정 납품은 선택된 결합 SHA의 실제 새 Core/Docs 성공을 요구한다.
+
+같은 Codex에게 별도 카드 FLEET5-PEER-FLOOR-OBSERVATION-DIAGNOSTIC-20261106의 Stage1을 허용했다. 별도 branch는 ff3169d3에서 시작하고 de71 package는 고정한다. Stage1은 worker_peer_floor.observe의 기존 거부 조건을 그대로 유지하면서 안전한 변경 필드 경로·해시만 진단하고 대응 unit mutant를 추가하는 범위다. 필요한 경우 그 branch의 기존 고정 도구·이미지를 재사용하는 단일 hosted 진단 workflow를 최대20분·contents read·disposable Docker로 둘 수 있다. 기존 Core/Backend workflow·실장비는 바꾸지 않는다.
+
+Mounts 순서나 volume CreatedAt의 제외·정규화·retry·경고 후 성공은 현재 허용하지 않는다. 원래 실패의 실제 바뀐 tuple 필드는 로그에 snapshot이 없어 UNKNOWN이다. 인접 context의 정렬/CreatedAt 제외는 가설이며 새 합성 반례나 새 실행 통과가 과거의 무해한 원인을 입증하지 않는다. 동작 변경은 실제 차이와 identity 위협 경계를 확인하고 별도 Root 범위 및 실제 검토를 거쳐야 한다. helper 원문 변경은 새 closure 후보로 표시하며 예전 승인 hash를 재사용하거나 K1의28pin을 다시 묶지 않는다.
+
+현재 실제 Claude는 task_c067a20c86ed/ctx_adf96c8d66b4에서 immutable de71 코드 축만 검토한다. 실제 전체 Core 실패와 ff3169 failure-qualified 보고를 보존한다. 상세 권한·증거·결합 계획은 Root Evidence peer-floor-observation-diagnostic-root-scope.json에 있다. 관측 Medium·실제 인증/설치·5PC 운영 인수는 계속 미완료다.

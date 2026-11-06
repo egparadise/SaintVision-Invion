@@ -1,0 +1,18 @@
+{
+  "atKST": "2026-11-06T13:54:36+09:00",
+  "terminalState": "ACTUAL_CI_FAILURE_NO_REVIEW",
+  "actualReply": {
+    "ok": true,
+    "result": {
+      "messageId": "msg_1e5eb53d0056",
+      "next": "Finish the rest of your mail."
+    }
+  },
+  "callbackDelivered": true,
+  "closed": true,
+  "reviewStartedOrAccepted": false,
+  "rootVerifiedExecSessionExit": 0,
+  "execSession": 12251,
+  "noMonitorLeftRunning": true,
+  "noOrcaAutomationCreated": true
+}
