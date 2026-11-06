@@ -32,7 +32,7 @@ WORKER_MODULES = {
     'worker_config.py': '909d1c25deb61c5c4795af49dab18f5a9722e5cbc1c034a18472b6a4427c192c',
     'worker_leaf_rotation.py': '4e29685241a3e625e59aa64bcff07bdd69d4b0381c67687706a09fa960f75998',
     'peer_policy_phase.py': '8aac0c65fb2a242b08287ba4206e6c7213fc18795903584b5b28abf3a10c17f8',
-    'worker_peer_floor.py': 'c73c81adaedb2a7b3b8513cd874b093a71f7b5c147e2e08ea86f71a54c8d2fec',
+    'worker_peer_floor.py': '7665735eb5735be9fcb24f783f83ffe087c0d176e464a97df3022a4bd9f35799',
     'worker_plain_rotation.py': 'bf3754a27f748b1dd58a7fc65a1f1831dddae6133f11ae17d0f7bf3ea59c46e5',
 }
 WORKER_SHA256 = WORKER_MODULES[WORKER_ENTRY]
