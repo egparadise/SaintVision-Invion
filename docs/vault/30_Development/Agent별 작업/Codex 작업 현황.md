@@ -1,15 +1,19 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.437"
+version: "1.0.438"
 status: "review"
 author: "Codex"
-updated: "2026-11-07T03:59:21+09:00"
+updated: "2026-11-07T04:21:28+09:00"
 source_of_truth: "Git"
 active_card: "FLEET5 continued supervision with PORTAL-REFRESH-FLEET-20261106"
-active_card_status: "B9eactual764Low2/I1closed/Rev9ffix; P02Rev3Claudea658active; UIHTTPdeployed; browserTLS5PCpending"
-active_card_next: "Root actual P02Rev3 verdict and smallest separate cut; B Codex Rev9f five causalcases; next single review after actualrelease; no A7D04authgrant"
+active_card_status: "P02Rev3designACCEPT6fa/D04pureGoImplementation; B9factualClaude7fbactive; UIHTTPaccepted/TLS5PCpending"
+active_card_next: "Codex D04 implement pure internal codec + causal Go tests within memory limits; Root bounded PC3 if needed; actual B9f verdict then separate A7 cut only on acceptance"
 ---
+
+## 2026-11-07T04:21:28+09:00 실제 설계 수락과 내부 Go 검증 코드 착수
+
+P02 Rev3의 실제6fa4c 검토가43행 차이0·M1/L1닫힘·차단지적0으로 한정 설계를 수락했다. Root는 같은 Codex에게 기존 Node 패키지의 순수 내부D04 Go codec/joins/이중출처투영 구현을 별도 구체허용했다. 실제 인증·positive factory·port는여전히보류다. B Rev9f의175추가문서·82생성기/68원문copy/17실행전후hash·exactDocs를확인하고 검토자의실제종료·해제뒤 단일Claude 재검토를시작했다. 전체100%·5대인수는미완료다. 작업한 것·확인한 것·명령/exit/CI·SHA와 실제허용경계는 Root History/Evidence에남겼다. 다음첫행동/담당은Codex의D04구현/실제Go검증,Claude의B9f판정,Root의메모리제한내실행phase와다음구체cut·단일검토다.
 
 ## 2026-11-07T03:59:21+09:00 실제 CI 성공 대조와 기존 인증서 등록 점검
 

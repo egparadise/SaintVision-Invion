@@ -1,13 +1,18 @@
 ---
 doc_id: "GOV-FLEET5-BOOTSTRAP-V5-FREEZE-CODE-SCOPE-20261106"
 title: "FLEET5 전환 v5 계약 동결과 구현 범위"
-version: "1.0.22"
+version: "1.0.23"
 status: "active"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-11-07T03:52:04+09:00"
+updated: "2026-11-07T04:21:28+09:00"
 source_of_truth: "Git"
 ---
+
+## 현재 구현 허용 범위: D04 순수 내부 검증 코드 R1
+
+실제P02Rev3 review6fa4c/Docs42276591734가M1/L1을닫아한정설계를수락했다. Root msg_ccd8401cb2c5는별도로새privateGo codec/joins/41policy+5running투영/검증된signature-tuple DATA표와그실제시험만허용한다. 정확한경로·기존파일동결·4puretime object의최소예외·자원제한·출처·합격조건은k2-d04-internal-codec-r1-root-scope.json이정본이다. 원래K1소스/13types73·bridge·publicdefaultrefusal은불변이며새producer/factory/port/키/설치/current/effect와실제H1-H7/H3EA/RD인증등록은계속HOLD다. 실제코드·Go시험·독립CODE검토·CI·통합·운영인수는각각후속증거가필요하다.
+
 
 Root는 source8874b2dfe0dda9a019bd5f334636668290702e13과 실제 reviewer6b12d3ab0e1f3e3cf623b62c528e0e096ba48af6의 검토 원문을 읽고 Docs42101121186/Portal42101121325의 exact SHA·ref·전체 job 성공을 대조했다. V4-M1/I1/I2/I3는 닫혔고 제안 수준 수락이다. 실제 Go·crypto·Engine·장비 실행은 이 설계 수락에 포함되지 않는다.
 
