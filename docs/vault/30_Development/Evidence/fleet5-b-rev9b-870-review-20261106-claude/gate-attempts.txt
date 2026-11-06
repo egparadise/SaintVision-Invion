@@ -1,0 +1,9 @@
+Reviewer gate attempts, 2026-11-06 KST (kept separate from gate results).
+
+1. NOT_EXECUTED (blocked first attempt): one compound Git Bash command that would have run the 8 publication gates in a shell for-loop with $g expansion, cygpath and parameter substitution. The Claude Code built-in safety parser denied it before execution ("could not be checked for dangerous rm operations"). It contained no removal. Nothing ran and nothing was deleted or overwritten. Orca recorded escalation msg_stop_5aeb59fb1cd96181cafad2ee. Root reply msg_1ab7353e3840 said to reject it and rewrite with argv lists. Not retried in shell form.
+
+2. EXECUTED: reviewer_gate_driver.py.txt (Python subprocess.run with explicit argv lists, shell=False, cwd = worktree root, canonical state path literal, --conflicts-out to a fresh reviewer scratch path) at 22:17:07-22:18:49 KST. All 8 exit 0, canonical state SHA before == after (67a7d5d1...). Receipt: local-doc-gates.txt. This ran before gate-attempts.txt, reviewer_gate_driver.py.txt, local-doc-gates.txt and canonical-sync-check-before.log.txt were added.
+
+3. EXECUTED: the same driver on the final tree, written to fresh path local-doc-gates-final.txt (see that file).
+
+Earlier canonical CHECK (canonical-sync-check-before.log.txt, ~21:5x KST): 0 conflicts, state SHA 58e77662... unchanged across that check. The state SHA differed by attempt 2 (67a7d5d1...) because another session wrote the state in between. This reviewer never wrote the state, and each check was hash-equal across itself.

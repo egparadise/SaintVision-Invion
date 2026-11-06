@@ -1,0 +1,25 @@
+"""Reviewer serial rerun of the 20 owner proof commands; logs to scratch, never to Evidence."""
+import datetime,hashlib,json,subprocess,sys,time
+from pathlib import Path
+ROOT=Path(r'D:\Project\SaintVisionI-Invion\fleet5-bootstrap-v3-review-20261106')
+E=ROOT/'docs/vault/30_Development/Evidence/fleet5-b-rev9b-20261106-codex'
+OUT=Path(__file__).resolve().parent/'owner-reruns';OUT.mkdir(exist_ok=True)
+PY=r'D:\Project\SaintVisionI-Invion\.venv\Scripts\python.exe'
+spec=[([str(E/n)],0) for n in ('schema.py','authority.py','model_tests.py','rev9b_model_tests.py','retained_probes.py','bounded_analysis.py','analysis_rule_tests.py','rev9b_factory_binding_tests.py','rev9b_function_header_tests.py','rev9b_analysis_tests.py','t1_build.py','t1_tests.py','pending_contracts.py','edge_categories.py','packet_checks.py')]
+spec += [([str(E/'terminal_claim_regression.py'),str(E.parent/n)],code) for n,code in [('fleet5-b-contract-rev7-20261106-codex',1),('fleet5-b-rev8-revoke-portcut-20261106-codex',1),(E.name,0)]]
+spec += [(['tests/proofs/fleet5_compute_storage_contract_probe.py'],0),(['tests/proofs/fleet5_compute_storage_contract_probe.py','--require-coexistence'],1)]
+only=set(int(x) for x in sys.argv[1:]) or set(range(1,21))
+rows=[]
+for i,(args,exp) in enumerate(spec,1):
+    if i not in only:continue
+    cmd=[PY,'-B',str(E/'measured_run.py'),*args];t=time.monotonic()
+    r=subprocess.run(cmd,cwd=ROOT,stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
+    (OUT/f'rerun-{i}.log').write_bytes(r.stdout)
+    peak=None
+    for line in r.stdout.decode('utf8','replace').splitlines():
+        try:v=json.loads(line)
+        except ValueError:continue
+        if isinstance(v,dict) and 'ownerResourceMeasurement' in v:peak=v['ownerResourceMeasurement']['peakWorkingSetBytes']
+    row={'i':i,'argv':[Path(a).name if ':' in a else a for a in args],'expected':exp,'actual':r.returncode,'match':r.returncode==exp,'seconds':round(time.monotonic()-t,3),'peak':peak,'kst':datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=9))).isoformat(timespec='seconds'),'logSHA256':hashlib.sha256(r.stdout).hexdigest()}
+    rows.append(row);print(json.dumps(row),flush=True)
+(OUT/f'summary-{"-".join(map(str,sorted(only)))}.json').write_text(json.dumps(rows,indent=1))

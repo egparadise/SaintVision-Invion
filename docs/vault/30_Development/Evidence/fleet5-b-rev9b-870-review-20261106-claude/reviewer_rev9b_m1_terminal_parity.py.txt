@@ -1,0 +1,87 @@
+"""Reviewer (Claude) Rev9b M1 probe. Symbolic model only; no runtime.
+Usage: python -B reviewer_rev9b_m1_terminal_parity.py <absolute model dir> -> one JSON line.
+Asserts the imported model lives in the requested directory (B9-I6 lesson)."""
+import json, sys
+from pathlib import Path
+target = Path(sys.argv[1]).resolve(strict=True)
+sys.path.insert(0, str(target))
+import model, model_tests
+assert Path(model.__file__).resolve().parent == target and Path(model_tests.__file__).resolve().parent == target
+from model import World, binding, scope, sk, VER, OP
+from model_tests import setup, send, row
+out = {'model': target.name, 'cases': {}}
+def rec(k, v): out['cases'][k] = v
+def frame(w, c, p, op='frame'): return w.register(c, binding(w, op=op, kind='TERMINAL_FRAME', parent=p.handle_hash))
+def full(w, c, h):
+    if h is None: return 'REG_REFUSED'
+    if not send(w, h): return 'INVOKE_REFUSED'
+    return 'CONFIRMED' if w.confirm(c, h, w.outcome(h, 'OBSERVED')) else 'CONFIRM_REFUSED'
+has_tenant = hasattr(World(), 'tenant_execution')
+def stop(w, s, value=True):
+    if has_tenant: w.tenant_execution[(s['tenantId'], s['epoch'])]['killSwitch'] = value
+    return has_tenant
+def cond_apply(w, s, n, cond):
+    if cond == 'offline': n['liveness'] = 'offline'
+    elif cond == 'tenant': stop(w, s)
+    else: w.set_fact(w.connect(OP), s, 'QUARANTINE')
+for prof in ('PLAIN', 'B'):
+    # 1 offline then DRAIN (actual containment.py drain sets status 'draining' from any non-quarantined status)
+    w, s, n, c, p = setup(prof); n['liveness'] = 'offline'; w.set_fact(w.connect(OP), s, 'DRAIN')
+    rec(prof + '-offline-then-DRAIN', full(w, c, frame(w, c, p)))
+    # 2 DRAIN then offline (actual mark_offline only moves status='online'; draining stays draining)
+    w, s, n, c, p = setup(prof); w.set_fact(w.connect(OP), s, 'DRAIN'); n['liveness'] = 'offline'
+    rec(prof + '-DRAIN-then-offline', full(w, c, frame(w, c, p)))
+    # 3 QUARANTINE (actual status quarantined refuses)
+    w, s, n, c, p = setup(prof); w.set_fact(w.connect(OP), s, 'QUARANTINE')
+    rec(prof + '-QUARANTINE', full(w, c, frame(w, c, p)))
+    # 4 plain offline: register / prepared->offline / inflight->offline
+    w, s, n, c, p = setup(prof); n['liveness'] = 'offline'; rec(prof + '-offline-register', full(w, c, frame(w, c, p)))
+    w, s, n, c, p = setup(prof); h = frame(w, c, p); n['liveness'] = 'offline'
+    rec(prof + '-prepared-offline-R12', bool(h and w.eligible('R12', s, handle=h)))
+    rec(prof + '-prepared-offline', full(w, c, h))
+    w, s, n, c, p = setup(prof); h = frame(w, c, p); assert send(w, h); claims = set(n['activeClaims']); n['liveness'] = 'offline'
+    ok = w.confirm(c, h, w.outcome(h, 'OBSERVED'))
+    rec(prof + '-inflight-offline-confirm', {'confirmed': ok, 'row': row(w, h)['state'], 'cap': w.private_caps[h.handle_hash]['state'], 'claimsUnchanged': n['activeClaims'] == claims})
+    n['liveness'] = 'online'
+    rec(prof + '-inflight-offline-then-online-sameNode-R03', w.eligible('R03', s))
+    rec(prof + '-inflight-offline-then-online-new-frame', frame(w, c, p, 'frame-after') is not None)
+    # 5 normal positive
+    w, s, n, c, p = setup(prof); rec(prof + '-online-positive', full(w, c, frame(w, c, p)))
+    # 6 tenant stop phases
+    for phase in ('register', 'invoke', 'confirm'):
+        w, s, n, c, p = setup(prof); h = frame(w, c, p) if phase != 'register' else None
+        if phase == 'confirm': assert send(w, h)
+        stop(w, s)
+        if phase == 'register': res = full(w, c, frame(w, c, p))
+        elif phase == 'invoke': res = 'INVOKED' if send(w, h) else 'INVOKE_REFUSED'
+        else: res = 'CONFIRMED' if w.confirm(c, h, w.outcome(h, 'OBSERVED')) else 'CONFIRM_REFUSED'
+        rec(prof + '-tenant-stop-' + phase, res)
+    # 7 tenant stop + DRAIN: business exception never waives tenant stop
+    w, s, n, c, p = setup(prof); w.set_fact(w.connect(OP), s, 'DRAIN'); stop(w, s); rec(prof + '-tenant-stop-with-DRAIN', full(w, c, frame(w, c, p)))
+    # 8 another tenant's stop does not affect this tenant
+    w, s, n, c, p = setup(prof)
+    if has_tenant: w.tenant_execution[('tenant-OTHER', s['epoch'])] = {'known': True, 'killSwitch': True}
+    rec(prof + '-other-tenant-stop-isolation', full(w, c, frame(w, c, p)))
+    # 9 stop then clear before invoke (symbolic clear; actual clear additionally requires settled)
+    w, s, n, c, p = setup(prof); h = frame(w, c, p); stop(w, s); a = send(w, h); stop(w, s, False); b = send(w, h)
+    rec(prof + '-tenant-stop-then-clear-invoke', [a, b])
+    # 10 ordinary admission under tenant stop
+    # (node-2 has no pending parent, so R03 isolates the tenant gate; node-1 would be confounded by its PENDING parent)
+    w, s, n, c, p = setup(prof); s2 = scope(n='node-2'); w.nodes[sk(s2)]['profile'] = prof
+    before = w.eligible('R03', s2); stop(w, s); rec(prof + '-tenant-stop-R03-node2-before-after', [before, w.eligible('R03', s2)])
+    # 11 recovery lanes under offline / tenant stop / quarantine (compared across models)
+    for cond in ('offline', 'tenant', 'quarantine'):
+        for kind in ('CANCEL', 'RECEIPT_OBSERVE'):
+            w, s, n, c, p = setup(prof); cond_apply(w, s, n, cond)
+            h = w.register(c, binding(w, op=kind + '-r', kind=kind, parent=p.handle_hash))
+            rec(prof + '-recovery-' + cond + '-' + kind, 'REG_REFUSED' if h is None else ('INVOKED' if send(w, h) else 'INVOKE_REFUSED'))
+        w, s, n, c, p = setup(prof, kind='BUILD_DISPATCH'); w.seed_protected_cleanup_fixture(p); cond_apply(w, s, n, cond)
+        h = w.register(c, binding(w, op='cleanup-r', kind='BUILD_CLEANUP_READ', parent=p.handle_hash))
+        rec(prof + '-recovery-' + cond + '-BUILD_CLEANUP_READ', 'REG_REFUSED' if h is None else ('INVOKED' if send(w, h) else 'INVOKE_REFUSED'))
+    # 12 matched-claim requirements still bind when projection is draining
+    w, s, n, c, p = setup(prof); w.set_fact(w.connect(OP), s, 'DRAIN'); claim = row(w, p)['binding']['claimBindingSHA']
+    n['claimRights'][claim]['notAfter'] = w.now + 5; rec(prof + '-DRAIN-deadline-now+5', full(w, c, frame(w, c, p)))
+    w, s, n, c, p = setup(prof); w.set_fact(w.connect(OP), s, 'DRAIN'); claim = row(w, p)['binding']['claimBindingSHA']
+    n['claimRights'][claim]['leases'][0]['released'] = True; rec(prof + '-DRAIN-released-lease', full(w, c, frame(w, c, p)))
+out['tenantGateModelled'] = has_tenant
+print(json.dumps(out, sort_keys=True))
