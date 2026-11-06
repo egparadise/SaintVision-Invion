@@ -1,0 +1,84 @@
+{
+ "commit": "382fe3d86c14283dcb549f935205081db8b4eee4",
+ "pins": {
+  "contract.md": true,
+  "authority-fields.json": true,
+  "acceptance-cases.json": true,
+  "next-code-proposal.json": true
+ },
+ "checks": {
+  "counts": {
+   "capsule": 26,
+   "nestedEntries": 11,
+   "h2Slots": 23,
+   "h2SlotsUnique": 23,
+   "snapshotVector": 27,
+   "snapshotUnique": 27,
+   "origins": [
+    "H1_INSTALL",
+    "H1_POLICY",
+    "H2_AUTHZ",
+    "H4_CLOCK",
+    "H4_STATUS"
+   ]
+  },
+  "capsuleEqualsF2c1": true,
+  "rd": {
+   "originsNamingRegistrationDelivery": [],
+   "h2SlotsNamingRegistrationDelivery": [],
+   "snapshotVectorRegistrationMembers": [
+    "registryIdentity"
+   ],
+   "snapshotVectorDeliveryMembers": [
+    "deliveryID",
+    "deliveryVersion"
+   ],
+   "contractProseRequiresDistinctRD": true,
+   "contractG04NamesRD": true,
+   "caseC07Target": [
+    "G04_AUTHENTICATED_SNAPSHOT / REGISTRATION_ORIGIN"
+   ],
+   "caseC07SaysH1DeliveryDistinct": true,
+   "g08Enumeration": "Current independently authenticated registration/nonrevocation for every exact H1 delivery/capsule/H2 grant/key/registry/record subject must be ACTIVE. Original grant issue interval and whole authenticated current interval must satisfy all bounds; otherwise STATUS/TIME/EXPIRED."
+  },
+  "authorityGrants": {
+   "proseCoversAuthorityGrants": true,
+   "g08RowNamesProvisionerStatusClockGrants": false,
+   "bootstrapBindingSlotOrigin": [
+    "H1_INSTALL"
+   ]
+  },
+  "cases": {
+   "allProposedNotRun": true,
+   "C09target": [
+    "G08_STATUS_TIME"
+   ],
+   "C09lastEarlierPass": "G07_SIGNATURE",
+   "C09disjunctiveBound": true,
+   "anyCaseTargetsG10Expired": false,
+   "C06mentionsEqualVersionEquivocation": false,
+   "C03earlierPass": [
+    "G00_BINDING",
+    "G01_ORIGIN_DELIVERY",
+    "G02_OWNERSHIP",
+    "G03_CAPSULE",
+    "G04_AUTHENTICATED_SNAPSHOT"
+   ],
+   "C04target": [
+    "D04:05_REVIEWS"
+   ],
+   "D04stagesExistForC04": true
+  },
+  "nextCodeNamesExist": {
+   "p02Decode": true,
+   "p02EnvelopeSchema": true,
+   "signingInput": true
+  },
+  "effectGate": {
+   "allowlistIsPackageWideMap": true,
+   "ed25519VerifyAllowedNow": false,
+   "parsePKIXAllowedNow": false,
+   "marshalPKIXAllowedNow": false
+  }
+ }
+}

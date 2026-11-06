@@ -1,0 +1,20 @@
+{
+  "environment": "Windows 11, Git Bash + PowerShell. Python D:/Project/SaintVisionI-Invion/.venv 3.14.7 (-I -B for the static check, -B for gates), PYTHONUTF8=1. cwd = managed worktree fleet5-bootstrap-v3-review-20261106, new branch agent/claude/fleet5-k2-h12-382f-contract-review-20261107 from exact 382fe3d8. KST times. Serial only. Available memory 364 MB at start. No Go/Node/browser/crypto/keygen/signing/X509/Ed25519, no host/SSH/Docker/PG/PKI/clock/OS/process/permission actions, no installs.",
+  "provenance": [
+    {"argv": "git status --short; git rev-parse HEAD", "result": "clean, 145238898e8c86e1beb091b93efd712c70a6f5ba"},
+    {"argv": "orca orchestration worker-show --dispatch ctx_36ec44cc8ca0", "result": "task_c2de6e9fd486 succeeded / settled / exited / released"},
+    {"argv": "git fetch origin 382fe3d8...; git switch -c agent/claude/fleet5-k2-h12-382f-contract-review-20261107 382fe3d86c14283dcb549f935205081db8b4eee4", "result": "HEAD 382fe3d8, parent 1f073c03"},
+    {"argv": "git ls-remote origin refs/heads/agent/codex/fleet5-k2-h1-h2-authority-design-20261107", "result": "382fe3d86c14283dcb549f935205081db8b4eee4"},
+    {"argv": "git diff --stat 1f073c03 HEAD; git diff --name-only f2c1afb7 HEAD -- ':!docs'", "result": "9 added files; product delta empty"},
+    {"argv": "sha256 of git show HEAD:<4 pinned files> and worktree copies", "result": "all 4 match the brief pins"},
+    {"argv": "python -I: sha256 of git show <source>:<path> for context.json 9+5 inputs", "result": "14/14 match"},
+    {"argv": "read Root .work/h1-h2-authority-design-root-cut.txt, h12-design-source-root-verified.json, h12-contract-review-*.json", "result": "five logical choices; Root proof 08:20:06 KST; task ready, dispatch ctx_8cd16f1141a3"},
+    {"argv": "read Root boards at fleet-five-orchestration HEAD 28356eb2", "result": "Index 1.0.490 sha 53ad912b..., Claude board 1.2.130 sha ad4a5fca..."}
+  ],
+  "staticCheck": [
+    {"argv": ".venv python -I -B reviewer_h12_static_check.py <scratch>/reviewer-h12-static-result.json", "attempt": 1, "KST": "2026-11-07T08:30:45.886..08:30:47.407", "exit": 0, "note": "RD regex false positive (RD\\b under re.I matched 'record'); preserved"},
+    {"argv": "same, after making RD case-sensitive", "attempt": 2, "KST": "2026-11-07T08:31:10.450..08:31:11.470", "exit": 0, "note": "authoritative static facts for M1/L1/L2"}
+  ],
+  "gates": "reviewer_gate_driver.py.txt -> local-doc-gates.txt (11 serial gates; immediate canonical state hash before/after the sync CHECK call)",
+  "notDone": "No author gate reruns, no Go/test/crypto execution, no product/source/test/schema/README/board/registry/ADR/workflow/pin edits, no apply/adopt/resolve/state write, no helpers."
+}

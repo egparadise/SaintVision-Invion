@@ -1,0 +1,99 @@
+"""Reviewer bounded offline DATA/static check of the frozen H12 design at 382fe3 (stdlib only).
+
+No crypto, no Go, no network, no writes except the JSON result path given as argv[1].
+Reads blobs via `git show <commit>:<path>` (argv list, shell=False). Structural/text facts only;
+it proves nothing about authentication or runtime behaviour.
+"""
+import hashlib, json, re, subprocess, sys
+
+C = '382fe3d86c14283dcb549f935205081db8b4eee4'
+F2 = 'f2c1afb78b589b4b2cbcf3dcd4dc4f3c3f3bc856'
+E = 'docs/vault/30_Development/Evidence/fleet5-k2-h1-h2-authority-design-20261107-codex/'
+PINS = {'contract.md': 'b7a654f126b47ba0c4bf7c212fa62e1ac98b54b8005d1543202d4ce6b0f27ecf',
+        'authority-fields.json': 'c47b0301df17158233da0afab050bfa780d347c321fe0f7778138d0298eb31e9',
+        'acceptance-cases.json': '4593fa50ef6175a1ea12f41fce7cd823b8f58afe736dc10b630cb836f5a90853',
+        'next-code-proposal.json': 'f8b3f6d7aabe32e07bdbff56789ea327f544c43b64834035934f8cfe4f0f7fed'}
+
+
+def blob(commit, path):
+    return subprocess.run(['git', 'show', commit + ':' + path], capture_output=True, check=True).stdout
+
+
+out = {'commit': C, 'pins': {}, 'checks': {}}
+raw = {}
+for n, h in PINS.items():
+    raw[n] = blob(C, E + n)
+    out['pins'][n] = hashlib.sha256(raw[n]).hexdigest() == h
+m = json.loads(raw['authority-fields.json'])
+cases = json.loads(raw['acceptance-cases.json'])
+contract = raw['contract.md'].decode('utf-8')
+
+# 1. Counts (structural only).
+slots = [r['field'] for r in m['H2IndependentPolicy']]
+out['checks']['counts'] = {'capsule': len(m['H1Capsule']), 'nestedEntries': len(m['nestedFields']),
+                           'h2Slots': len(slots), 'h2SlotsUnique': len(set(slots)),
+                           'snapshotVector': len(m['snapshotVector']), 'snapshotUnique': len(set(m['snapshotVector'])),
+                           'origins': sorted(m['origins'])}
+
+# 2. Capsule field set equals frozen f2c1 p02Capsule declaration.
+src = blob(F2, 'services/node-agent/internal/migrationcontext/p02_inputs_internal.go').decode('utf-8')
+body = re.search(r'type p02Capsule struct \{(.*?)\n\}', src, re.S).group(1)
+decl = [ln.split()[0] for ln in body.strip().splitlines()]
+out['checks']['capsuleEqualsF2c1'] = decl == [r['field'] for r in m['H1Capsule']]
+
+# 3. Registration-delivery (RD) origin coverage in the CLOSED matrix vs prose/cases.
+def hits(text):
+    return [t for t in re.findall(r'[^.;\n]*registration[^.;\n]*', text, re.I)]
+# attempt2: RD is case-sensitive (attempt1 used RD\b under re.I, which falsely matched 'record').
+rd_terms = re.compile(r'(?i:registration[- ]?(?:origin|delivery|capture)|captured and delivered)|\bRD\b')
+out['checks']['rd'] = {
+    'originsNamingRegistrationDelivery': [k for k, v in m['origins'].items() if rd_terms.search(json.dumps(v))],
+    'h2SlotsNamingRegistrationDelivery': [r['field'] for r in m['H2IndependentPolicy'] if rd_terms.search(json.dumps(r))],
+    'snapshotVectorRegistrationMembers': [x for x in m['snapshotVector'] if 'regist' in x.lower()],
+    'snapshotVectorDeliveryMembers': [x for x in m['snapshotVector'] if 'deliver' in x.lower()],
+    'contractProseRequiresDistinctRD': bool(re.search(r'Registration has a distinct missing origin obligation', contract)),
+    'contractG04NamesRD': bool(re.search(r'G04_AUTHENTICATED_SNAPSHOT.*RD origin.*REGISTRATION_ORIGIN', contract)),
+    'caseC07Target': [c['expected'] for c in cases['cases'] if c['id'] == 'H12-C07'],
+    'caseC07SaysH1DeliveryDistinct': any('H1 delivery is independently authenticated' in c['constructionAndFullPreconditions'] for c in cases['cases'] if c['id'] == 'H12-C07'),
+    'g08Enumeration': re.search(r'\| G08_STATUS_TIME \| ([^|]*)\|', contract).group(1).strip(),
+}
+
+# 4. Authority-grant nonrevocation: prose vs G08 table row.
+g08 = out['checks']['rd']['g08Enumeration']
+out['checks']['authorityGrants'] = {
+    'proseCoversAuthorityGrants': 'includes those authority grants' in contract,
+    'g08RowNamesProvisionerStatusClockGrants': bool(re.search(r'provisioner|status authority|clock authority', g08, re.I)),
+    'bootstrapBindingSlotOrigin': [r['origin'] for r in m['H2IndependentPolicy'] if r['field'] == 'bootstrapBindingIdentityVersion'],
+}
+
+# 5. Case isolation facts.
+byid = {c['id']: c for c in cases['cases']}
+out['checks']['cases'] = {
+    'allProposedNotRun': all(c['status'] == 'PROPOSED_NOT_RUN' for c in cases['cases']),
+    'C09target': byid['H12-C09']['targetFailure'], 'C09lastEarlierPass': byid['H12-C09']['requiredEarlierPass'][-1],
+    'C09disjunctiveBound': 'ticket or response' in byid['H12-C09']['constructionAndFullPreconditions'],
+    'anyCaseTargetsG10Expired': any('G10' in ''.join(c['targetFailure']) and 'EXPIRED' in c['expected'] for c in cases['cases']),
+    'C06mentionsEqualVersionEquivocation': bool(re.search(r'equal[- ]version|equivocat', json.dumps(byid['H12-C06']), re.I)),
+    'C03earlierPass': byid['H12-C03']['requiredEarlierPass'],
+    'C04target': byid['H12-C04']['targetFailure'],
+    'D04stagesExistForC04': None,
+}
+ev = blob(F2, 'services/node-agent/internal/migrationcontext/p02_evaluate_internal.go').decode('utf-8')
+stages = re.search(r'return \[\]string\{("01_ANCHOR".*?)\}', ev).group(1)
+stages = re.findall(r'"([^"]+)"', stages)
+need = [s.split(':', 1)[1] for s in byid['H12-C04']['requiredEarlierPass'] + byid['H12-C04']['targetFailure'] if s.startswith('D04:')]
+out['checks']['cases']['D04stagesExistForC04'] = all(s in stages for s in need) and need == stages[:len(need)]
+
+# 6. Next-code proposal names exist at f2c1 (existence only).
+names = {'p02Decode': r'func p02Decode\(', 'p02EnvelopeSchema': r'func p02EnvelopeSchema\(', 'signingInput': r'func \(c \*p02Context\) signingInput\(\) \[\]byte'}
+files = ['p02_codec_internal.go', 'p02_schema_internal.go', 'p02_evaluate_internal.go']
+allsrc = ''.join(blob(F2, 'services/node-agent/internal/migrationcontext/' + f).decode('utf-8') for f in files)
+out['checks']['nextCodeNamesExist'] = {k: bool(re.search(v, allsrc)) for k, v in names.items()}
+eg = blob(F2, 'services/node-agent/internal/migrationcontext/effect_gate_test.go').decode('utf-8')
+allow = re.search(r'var pureExternalObjects = map\[string\]bool\{(.*?)\n\}', eg, re.S).group(1)
+out['checks']['effectGate'] = {'allowlistIsPackageWideMap': True,
+                               'ed25519VerifyAllowedNow': 'crypto/ed25519.Verify' in allow,
+                               'parsePKIXAllowedNow': 'ParsePKIXPublicKey' in allow,
+                               'marshalPKIXAllowedNow': 'MarshalPKIXPublicKey' in allow}
+json.dump(out, open(sys.argv[1], 'w', encoding='utf-8', newline='\n'), indent=1, ensure_ascii=False)
+print(json.dumps(out, indent=1, ensure_ascii=False))

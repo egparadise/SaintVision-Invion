@@ -1,0 +1,31 @@
+"""Reviewer serial local publication gates + canonical sync CHECK (argv only, shell=False, no apply/state write).
+
+Usage: python -B reviewer_gate_driver.py.txt <base-ref> <out.txt> <conflicts-out-dir>
+Records, for EVERY sync CHECK call, the canonical state SHA256 immediately before and after.
+"""
+import datetime, hashlib, subprocess, sys
+from pathlib import Path
+ROOT = Path(r'D:\Project\SaintVisionI-Invion\fleet5-bootstrap-v3-review-20261106')
+ST = Path('D:/Project/SaintVision-Invion/SaintVisionI-Invion/.git/obsidian-sync-state.json')
+BASE = sys.argv[1]; OUT = Path(sys.argv[2]); SCR = Path(sys.argv[3])
+def kst(): return datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=9))).isoformat(timespec='milliseconds')
+def sha(b): return hashlib.sha256(b).hexdigest()
+sync = ['tools/sync_obsidian.py', '--check', '--state', ST.as_posix(), '--conflicts-out', str(SCR / 'h12r-sync-conflicts.json')]
+gates = [['tools/check_docs.py'], ['tools/check_ontology_generation.py'], ['tools/check_ontology.py'], ['tools/check_contract_bindings.py'],
+         ['tools/check_frontend_integrity.py'], ['tools/check_doc_path_citations.py', '--ratchet', '--base-ref', BASE],
+         ['tools/check_doc_single_source.py', '--ratchet'], ['tools/check_response_freshness.py'], ['tools/test_sync.py'],
+         ['tools/build_docs.py'], sync]
+lines = ['Reviewer local gates, Windows, D:/Project/SaintVisionI-Invion/.venv Python 3.14.7 -B, PYTHONUTF8=1, cwd=worktree root, serial; tree = ' + BASE[:8] + ' + own review History/Evidence only.',
+         'sync_obsidian is CHECK only with the canonical Root state; --conflicts-out goes to reviewer scratch. No apply/adopt/resolve/state write. Raw logs: scratch h12r-gate-NN.log, sha256 below.']
+worst = 0
+for i, g in enumerate(gates, 1):
+    before = sha(ST.read_bytes()) if g is sync else None
+    a = kst(); r = subprocess.run([sys.executable, '-B', *g], cwd=ROOT, stdout=subprocess.PIPE, stderr=subprocess.STDOUT); b = kst(); worst = max(worst, r.returncode)
+    after = sha(ST.read_bytes()) if g is sync else None
+    (SCR / f'h12r-gate-{i:02d}.log').write_bytes(r.stdout)
+    shown = ' '.join('<scratch>/' + Path(x).name if x.startswith(str(SCR)) else x for x in g)
+    lines.append(f'{i:02d} {a}..{b} exit={r.returncode} logsha={sha(r.stdout)} :: python -B {shown}')
+    if g is sync: lines.append(f'    stateBefore {before} stateAfter {after}')
+    lines += ['    ' + t[:300] for t in r.stdout.decode('utf-8', 'replace').strip().splitlines()[-2:]]
+lines.append(f'worstExit={worst}')
+OUT.write_text('\n'.join(lines) + '\n', encoding='utf-8', newline='\n'); print('\n'.join(lines)); raise SystemExit(worst)
