@@ -1,0 +1,25 @@
+{
+  "environment": "Windows 11, PowerShell + Git Bash. Python: D:/Project/SaintVisionI-Invion/.venv 3.14.7, -B, and -I for probes. Env: PYTHONUTF8=1; PYTHONHASHSEED=0 and PYTHONDONTWRITEBYTECODE=1 for probes. cwd = worktree root fleet5-bootstrap-v3-review-20261106 on branch agent/claude/fleet5-b-a7-snapshot-9690-review-20261107, created from exact 969030db. Times are KST. Serial only. No installs; no OS/pagefile/process/service changes. Available memory: 237 MB at start, 311 MB at 07:43 and 315 MB at 07:47 KST.",
+  "provenance": [
+    {"argv": "orca orchestration worker-show --dispatch ctx_06f0718be774", "result": "task_a152e893e6de succeeded / settled / exited / released"},
+    {"argv": "git fetch origin 969030db ; git switch -c agent/claude/fleet5-b-a7-snapshot-9690-review-20261107 969030dbc7716b9cadf75bd314713005306ed34c ; git rev-parse HEAD HEAD^ ; git ls-remote origin", "result": "HEAD 969030db, parent 1550453d. Remote: codex r2 ref = 969030db, r1 ref = 1550453d, actual R1 review ref = 7a8012f4"},
+    {"argv": "git diff --name-status 1550453d 969030db", "result": "125 A, 0 M/D/R, only R2 Evidence prefix + R2 History"},
+    {"argv": "git show 7a8012f4:<History, review.json, commands.json, reviewer_a7_probes.py.txt, reviewer-a7-probes-result.json>", "result": "read first (49 rows; finding case has 4 rows SPAN/BODY/CENSUS/GUARD_ONLY)"},
+    {"argv": "read-only fleet-five-orchestration-20261105: HEAD 8c7f6e6e, Index 1.0.486, Claude board 1.2.130, .work/a7r2-root-fix-cut.txt, a7r2-narrow-review-spec.txt, a7r2-source-root-verified.json", "result": "read only"},
+    {"argv": "git diff 1550:<R1>/a7_inventory.py 969030db:<R2>/a7_inventory.py", "result": "12 +/- lines, the same as inventory-delta.patch.txt"}
+  ],
+  "reviewerRuns": [
+    {"attempt": 1, "argv": "python -B -I <R2 evidence abs>/measured_run.py <scratch>/reviewer_a7r2_probes.py <R2 evidence abs> <scratch>/reviewer-a7r2-probes-result.json", "exit": 1, "kstWindow": "2026-11-07T07:43:21..07:47:11",
+     "cause": "Reviewer harness bug. The last case's own precheck called frozen_source() on the new-file path before the census did, and raised CalledProcessError. All earlier rows ran and are in the log; no result JSON was written. Fix: the helper frozen_sha_or_missing (two edits, harness only). The pre-fix driver bytes were not retained separately.",
+     "log": "reviewer-a7r2-probes-attempt1.log.txt (UTF-8 BOM and CR removed; raw scratch sha256 011f24aa0f27f67c82b7783cf3763df4bd5abaf81e47f5ec8941d70c46946477)", "peakWorkingSetBytes": 148901888, "elapsedSeconds": 228.4},
+    {"attempt": 2, "argv": "same argv with the corrected driver", "exit": 0, "kstWindow": "2026-11-07T07:47:35..07:50:53",
+     "log": "reviewer-a7r2-probes.log.txt (UTF-8 BOM and CR removed; raw scratch sha256 558b74322f6a67d2936d791ab806ee0e1f5ba987a0540e9145b493e8a6502397)",
+     "result": "reviewer-a7r2-probes-result.json sha256 97c241065e11dbe6b9ec4ea157a04b8ee48732fe5c99c7558bc5cb2fdc234bc3", "driver": "reviewer_a7r2_probes.py.txt sha256 b91e601347f2cd7cb1a2def84ea80d1d29fd5aaeb107ad9b9baf7aa67ddcbc27",
+     "rows": "12 = 1 PRECONDITION + 1 COVERAGE + 1 PROVE baseline + 1 SPAN + 8 CENSUS_RED_GREEN (the exact case also runs body.prove and full prove red/green)", "peakWorkingSetBytes": 146444288, "elapsedSeconds": 196.4, "run": "retained as final; every row matches the expectation in review.json"},
+    {"argv": "python -B <scratch>/reviewer_gate_driver.py 969030dbc7716b9cadf75bd314713005306ed34c <scratch>/canonical-sync-check-before.txt <scratch>/gates sync-only", "exit": 0, "kst": "2026-11-07T07:52:11..07:52:48",
+     "stateSHA": "before 00c27e0c04cb5ffe50b8e6aec9a9a34a11ed81668c393bc39a00ff65393d83a0, after 00c27e0c04cb5ffe50b8e6aec9a9a34a11ed81668c393bc39a00ff65393d83a0", "result": "CHECK: 4815 managed, 2391 pending exports, 0 conflicts, no writes", "file": "canonical-sync-check-before.txt",
+     "driver": "reviewer_gate_driver.py.txt is byte-identical to the actual R1 review driver (actual-review-reviewer_gate_driver.py.txt)"}
+  ],
+  "localGates": "see local-doc-gates.txt (8 gates after authoring, own History/Evidence only)",
+  "notRun": "owner proof/docs/seal commands, generators, old corpora, model/terminal/recovery suites, full assembler. No Obsidian apply/adopt/resolve/state write"
+}
