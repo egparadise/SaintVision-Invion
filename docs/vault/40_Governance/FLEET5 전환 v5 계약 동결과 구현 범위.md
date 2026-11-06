@@ -1,11 +1,11 @@
 ---
 doc_id: "GOV-FLEET5-BOOTSTRAP-V5-FREEZE-CODE-SCOPE-20261106"
 title: "FLEET5 전환 v5 계약 동결과 구현 범위"
-version: "1.0.24"
+version: "1.0.25"
 status: "active"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-11-07T04:54:19+09:00"
+updated: "2026-11-07T05:14:32+09:00"
 source_of_truth: "Git"
 ---
 
@@ -216,3 +216,8 @@ Root는84ee고정후보의45own추가문서/44manifest/10actual973b6원문copy/8
 ## D04 실제 Go 구현과 PC3 도구 준비
 
 Codex는허용된privateGo20stage/41policy+5running projection과인과시험을작성중이며Go실행은NOT_RUN이다. Root는별도PC3ownjob의2CPU/2GiB nonroot networknone컨테이너에서CI와동일Go1.27.1 version명령0을확인해도구만준비했다. 실제동결WIP/Hash/시험명령의운영gate는k2-d04-root-pc3-execution-preparation-gate.json이다. 새factory/producer/port/실제H1-H7auth/current/effects·장비수락을허용하거나성공으로표시하지않는다.
+
+
+## D04 동결 Go 실제 검증과 정확한 게시 cut
+
+Root가정확한14WIP파일을실제Git84ee/eb32원본의3번PC격리Go1.27.1networknone컨테이너에서시험했다.23최상위/228하위·실패0/skip0·90case88고유입력·368소스전후불변을확인했고msg_3cf791b73706으로동일바이트게시/Docs와조건부RootONEhostedCore/후속단일CODE검토를구체허용했다. 근거와실행조건은k2-d04-actual-go-publication-and-hosted-ci-root-cut.json이다. 새factory/port/producer/auth/current/효과와실장비인수는여전히보류다.
