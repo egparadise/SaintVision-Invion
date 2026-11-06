@@ -1,0 +1,44 @@
+{
+  "startedAtKST": "2026-11-07T03:56:43+09:00",
+  "operator": "Root Codex",
+  "authorization": "Existing admin-login and explicit public certificate current-user Root registration authorization; no new CA/key/trust domain",
+  "publicCertThumbprint": "5105ED0FA68391A85DAC1DABC3347E2A6ECDCC38",
+  "publicCertSHA256": "bda68b6358fc42c765eb463cd1259a08eb4625578a945a8e2b8c839cc5641f37",
+  "storeTarget": "CurrentUser/Root",
+  "pinnedCAHTTPS": {
+    "http": 200,
+    "issuerMatches": true
+  },
+  "beforeStores": {
+    "ROOT": 0,
+    "CA": 0,
+    "MY": 0
+  },
+  "beforeDefaultWindowsHTTPS": {
+    "error": "URLError",
+    "verifyCode": 18,
+    "verifyMessage": "self-signed certificate"
+  },
+  "newPrivateKeyOrPasswordUsed": false,
+  "machineStoreChanged": false,
+  "browserControlled": false,
+  "importAttempted": true,
+  "certificateVerificationDisabled": false,
+  "importStartedAtKST": "2026-11-07T03:56:43+09:00",
+  "command": "Import-Certificate -FilePath <exact pinned public CER> -CertStoreLocation Cert:\\CurrentUser\\Root",
+  "timeoutSeconds": 15,
+  "importExit": 1,
+  "checkedAtKST": "2026-11-07T03:56:44+09:00",
+  "afterStores": {
+    "ROOT": 0,
+    "CA": 0,
+    "MY": 0
+  },
+  "afterDefaultWindowsHTTPS": {
+    "error": "URLError",
+    "verifyCode": 18,
+    "verifyMessage": "self-signed certificate"
+  },
+  "TLSDefaultWindowsTrustVerified": false,
+  "browserVisualAndActualSSO": "NOT_RUN_NOT_INFERRED"
+}

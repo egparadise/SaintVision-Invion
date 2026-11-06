@@ -1,15 +1,19 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.436"
+version: "1.0.437"
 status: "review"
 author: "Codex"
-updated: "2026-11-07T03:52:04+09:00"
+updated: "2026-11-07T03:59:21+09:00"
 source_of_truth: "Git"
 active_card: "FLEET5 continued supervision with PORTAL-REFRESH-FLEET-20261106"
 active_card_status: "B9eactual764Low2/I1closed/Rev9ffix; P02Rev3Claudea658active; UIHTTPdeployed; browserTLS5PCpending"
 active_card_next: "Root actual P02Rev3 verdict and smallest separate cut; B Codex Rev9f five causalcases; next single review after actualrelease; no A7D04authgrant"
 ---
+
+## 2026-11-07T03:59:21+09:00 실제 CI 성공 대조와 기존 인증서 등록 점검
+
+Root475의 첫 CI watch는GitHub jobs조회404/exit1이었지만, 같은기존run42274680219의정확한head/ref/고유correlation·19단계success를API로확인했다. 새commit·재dispatch·재실행없이sync0/0/0·2921hash를마쳤다. 기존공개IdP인증서등록은noninteractive UI거부exit1/저장소변경0이고기본WindowsTLS는오류18로남아있다. 보안확인GUI는도구의필수제한으로자동조작하지않으며B Rev9f보완과P02Rev3실제검토는계속한다. 작업한 것·실제명령/exit·검증/관측실패구분·동기화와다음담당을Root History/Evidence에보존했다. 다음첫행동/담당은Claude의실제P02Rev3판정과BCodex의Rev9f고정후보,Root의다음구체범위·단일실제검토이며기존인증서의로컬수동등록결과는여전히별도다.
 
 ## 2026-11-07T03:52:04+09:00 실제 Low 판정 반영과 다음 단일 검토
 

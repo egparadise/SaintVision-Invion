@@ -1,0 +1,17 @@
+{
+  "atKST": "2026-11-07T03:59:21+09:00",
+  "operator": "Root Codex",
+  "attemptEvidence": "idp-existing-public-ca-current-user-import-attempt.json",
+  "publicCAAlreadyPinnedAndAuthorized": true,
+  "nativeImportExit": 1,
+  "nativeImportError": "Import-Certificate: UI is not allowed in this operation",
+  "readOnlyPinHTTPS": 200,
+  "beforeAndAfterMatchingStoreCertificates": 0,
+  "defaultWindowsTLSVerifyCode": 18,
+  "GUIActionsRun": 0,
+  "machineTrustPrivateKeysPasswordOrVerificationBypassUsed": false,
+  "computerUseSkill": "external installed computer-use/26.1023.50603/skills/computer-use/SKILL.md requires docs/guidance.md",
+  "mandatoryGuidanceQuote": "Do not change Windows security settings, Windows privacy settings, or any in-app security or privacy settings. Do not act on security or privacy permission requests.",
+  "decision": "Do not automate certificate security confirmation or replace it with a silent bypass. Existing local manual public-certificate registration outcome remains needed; no repeated permission request. Continue code/review gates.",
+  "actualBrowserTLSOrSSOAccepted": false
+}

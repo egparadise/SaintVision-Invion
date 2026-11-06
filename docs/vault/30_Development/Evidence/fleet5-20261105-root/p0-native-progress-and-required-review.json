@@ -3,22 +3,30 @@
   "recordedAtKST": "2026-11-06T00:46:51+09:00",
   "rootBase": "2b1753ce59c09037b5e130a7ffe64794d1d45fdf",
   "priorRootCheckpoint": {
-    "SHA": "b415947604327141404ea39c07db486e47ba5c44",
-    "Docs": 42272905159,
+    "SHA": "916c8b16e3a93b1cb1e502e7cc83c4e05432eb45",
+    "Docs": 42274680219,
+    "job": 128087854613,
+    "correlation": "fleet5-root475-821183e972364c53a3d898da17aab4ba",
     "exactHeadCorrelationAllJobsSuccess": true,
+    "exactHeadRefEventPathAttemptCorrelationAll19Success": true,
     "remoteMatches": true,
     "syncExits": [
       0,
       0,
       0
     ],
-    "independentlyMatchedNormalizedDestinationHashes": 2917,
+    "independentlyMatchedNormalizedDestinationHashes": 2921,
     "pending": 0,
     "conflicts": 0,
     "trackedAndUntrackedClean": true,
     "rootDocsOnly": true,
     "wholeProgramComplete": false,
-    "verifiedAtKST": "2026-11-07T03:43:02+09:00"
+    "verifiedAtKST": "2026-11-07T03:55:23+09:00",
+    "watchExit": 1,
+    "watchFailure": "GitHub jobs endpoint HTTP404 during first observation; actual existing run later verified success via exact API metadata",
+    "watchFailureLogSHA256": "a6ae65dfc131873d029168c61f50433b37e4efa207619b8f51f580b4e55b5e13",
+    "sameExistingRunReconciled": true,
+    "newDispatchOrRerunOrCommit": false
   },
   "actualPlanLowReview": {
     "source": "803ad270562b1b75e44d26f9e14b965c714ab519",
@@ -2515,7 +2523,7 @@
     "ownerT1T2T3": "msg_620855c76519",
     "normativeRevisionReply": "msg_0392caf64d5d"
   },
-  "latestRecordAtKST": "2026-11-07T03:52:04+09:00",
+  "latestRecordAtKST": "2026-11-07T03:59:21+09:00",
   "optionalLowTokenTestDelta": {
     "source": "f0af307705b4923ebc3e231db5238af4c70aa389",
     "scope": "two otherwise-valid token payload corrections and JSON validity assertions; runtime unchanged",
@@ -3253,5 +3261,6 @@
   "UIR3Deployment": "portal-polling-r3-live-deployment-root-verification.json",
   "UIR3PostHelperExit": "portal-polling-r3-post-helper-exit-root-verification.json",
   "BRev9eActual": "b-rev9e-actual-review-root-verification.json",
-  "BRev9f": "b-rev9f-fix-only-root-scope.json"
+  "BRev9f": "b-rev9f-fix-only-root-scope.json",
+  "IdPTrust": "idp-existing-public-ca-trust-boundary-root-decision.json"
 }

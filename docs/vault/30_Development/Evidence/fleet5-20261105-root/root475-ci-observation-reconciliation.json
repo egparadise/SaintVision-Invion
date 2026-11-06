@@ -1,0 +1,26 @@
+{
+  "SHA": "916c8b16e3a93b1cb1e502e7cc83c4e05432eb45",
+  "Docs": 42274680219,
+  "job": 128087854613,
+  "correlation": "fleet5-root475-821183e972364c53a3d898da17aab4ba",
+  "exactHeadCorrelationAllJobsSuccess": true,
+  "exactHeadRefEventPathAttemptCorrelationAll19Success": true,
+  "remoteMatches": true,
+  "syncExits": [
+    0,
+    0,
+    0
+  ],
+  "independentlyMatchedNormalizedDestinationHashes": 2921,
+  "pending": 0,
+  "conflicts": 0,
+  "trackedAndUntrackedClean": true,
+  "rootDocsOnly": true,
+  "wholeProgramComplete": false,
+  "verifiedAtKST": "2026-11-07T03:55:23+09:00",
+  "watchExit": 1,
+  "watchFailure": "GitHub jobs endpoint HTTP404 during first observation; actual existing run later verified success via exact API metadata",
+  "watchFailureLogSHA256": "a6ae65dfc131873d029168c61f50433b37e4efa207619b8f51f580b4e55b5e13",
+  "sameExistingRunReconciled": true,
+  "newDispatchOrRerunOrCommit": false
+}
