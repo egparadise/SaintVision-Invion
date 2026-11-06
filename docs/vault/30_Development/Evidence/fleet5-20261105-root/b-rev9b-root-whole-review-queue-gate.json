@@ -1,0 +1,16 @@
+{
+  "atKST": "2026-11-06T20:52:52+09:00",
+  "source": "870486f98ba8fdc6d82f24c2610352a426f23a16",
+  "base": "3daf1a0d24c220586474a4b376609e62960b8ca6",
+  "branch": "agent/codex/fleet5-b-rev9b-20261106",
+  "rootVerification": "b-rev9b-source-root-verification.json",
+  "reviewTask": "task_a67e24d81ef8",
+  "status": "pending",
+  "dependsOn": "task_41987ea5739d",
+  "actualReviewStarted": false,
+  "scope": "WHOLEboundedRev9bdocs/model/staticdelta",
+  "ownerQuestionPending": "msg_8cebdb075c59",
+  "actualVerdict": null,
+  "nextCut": "OnlyRootconcretechoiceafteractualreview; snapshotA7notgrantednow; deliverdeferred",
+  "BProductOrPortGrant": false
+}

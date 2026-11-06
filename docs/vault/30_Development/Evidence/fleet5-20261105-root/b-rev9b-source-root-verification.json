@@ -1,0 +1,21 @@
+{
+  "atKST": "2026-11-06T20:37:56+09:00",
+  "source": "870486f98ba8fdc6d82f24c2610352a426f23a16",
+  "base": "3daf1a0d24c220586474a4b376609e62960b8ca6",
+  "branch": "agent/codex/fleet5-b-rev9b-20261106",
+  "onlyOwnUniqueAddedDocs": 123,
+  "productDiffVs72028": 0,
+  "remoteExact": true,
+  "Docs": 42211243730,
+  "job": 127870124147,
+  "correlation": "fleet5-rev9b-task_a8fd2969f0b3-870486f98ba8fdc6d82f24c2610352a426f23a16",
+  "rootVerifiedExactHeadRefEventPathAttemptAll19StepsSuccess": true,
+  "independentReview": null,
+  "BProductOrPortGrant": false,
+  "wholeProgramComplete": false,
+  "RootRecomputedProducerHashes": 39,
+  "producerTotalBytes": 338399,
+  "producerOrderAndBothStageArtifactHashesMatchGit": true,
+  "manifestSHA256": "79c0fdba0512aeaf9cc677c9f43b46889165cdbd0e6344cdf7f795251c447506",
+  "RootReranOwnerProofCommands": false
+}

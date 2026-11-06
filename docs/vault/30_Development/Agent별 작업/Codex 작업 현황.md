@@ -1,15 +1,19 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.416"
+version: "1.0.417"
 status: "review"
 author: "Codex"
-updated: "2026-11-06T20:17:42+09:00"
+updated: "2026-11-06T20:52:52+09:00"
 source_of_truth: "Git"
 active_card: "FLEET5 continued supervision with PORTAL-REFRESH-FLEET-20261106"
-active_card_status: "PC3Docker29.9.3API1.56/share/GPUqueryready; actualPLR1cN1N6closed/newR1dLOWfix; UI3ahealth/staleemptycontractfix; B9bcontinues; Root454sync2834recovered"
-active_card_next: "SameownersPLR1dtestonly/UIhealthproxyandstaleempty/B9bfix; RootnewfrozencandidateactualreviewthenpreciseCoreorfrontenddeploy; PC1access/PC5runtimeprerequisitesremain"
+active_card_status: "UI854source2d87exactFrontend2jobs/Docsverified; actualClaude599active; hashedartifact13filesstagedNOTDEPLOYED; PLR1dea276/B9b870sourceverifiedpending419/a67; physicalPC1SSH-PC5APIremain"
+active_card_next: "RoothandlesactualUIverdictthenqualifiedfrontenddeployment; startreadyPL419thenBa67onlyafteractualpredecessorexitrelease; ONEfreshCoreonlyafteractualPLacceptance/Rootchoice; noNodeorPKIshortcut"
 ---
+
+## 2026-11-06T20:52:52+09:00 수정 화면의 실제 검토와 배포 산출물 준비
+
+수정 UI2d87/보고854의 실제 Frontend 두 job·Docs 성공과 제품 변경8경로를 대조해 Claude의 우선 독립 검토를 시작했다. GitHub 빌드 ZIP/13파일을 해시 검증해 별도 배포 폴더에 준비했으며 서비스는 아직 바꾸지 않았다. K2 PL-R1d ea276의 동일3시험 변경·5495기존항목 불변과 두 Docs, B9b870의 고유123문서·39producer hash·Docs 성공을 확인해 UI→PL→B 순차 검토를 등록했다. 작업·CI·독립 검토·배포·5대 인수를 구분한다. 다음 첫 행동/담당은 Claude의 UI 실제 판정, Root의 검토된 artifact 배포와 후속 PL/B 순차 검토다. 아직 미수락 source를 배포하거나 가짜 Node로 표시하지 않는다.
 
 ## 2026-11-06T20:17:42+09:00 PC3 실제 준비 진전과 새 후보 보완
 

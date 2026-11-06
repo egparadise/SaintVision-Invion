@@ -1,0 +1,15 @@
+{
+  "atKST": "2026-11-06T20:52:52+09:00",
+  "source": "3311f4538da4957396fc694d87706e9d5e813ef2",
+  "final": "ea276c97ece2906dc1f29b44b65aa887379ea78f",
+  "branch": "agent/codex/fleet5-k2a-pl-r1d-20261106",
+  "rootVerification": "k2a-pl-r1d-source-root-verification.json",
+  "reviewTask": "task_41987ea5739d",
+  "status": "pending",
+  "dependsOn": "task_599e55626b4a",
+  "actualReviewStarted": false,
+  "scope": "VERY_NARROWpointertermconversion TEST_ONLYdelta",
+  "ownerQuestionPending": "msg_4b416731f99d",
+  "actualVerdict": null,
+  "fullCoreGrantedNow": false
+}

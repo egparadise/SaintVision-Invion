@@ -1,6 +1,6 @@
 {
   "schema": "fleet5-root-review-resource-sequence:1",
-  "atKST": "2026-11-06T20:17:42+09:00",
+  "atKST": "2026-11-06T20:52:52+09:00",
   "completedB": {
     "task": "task_d4c4c809ed4e",
     "review": "ac9182c3e3d606ec027c0be2e90e049ff50d54f1",
@@ -12,9 +12,58 @@
     "verdict": "ACCEPT auxiliary delta at design/proposal level, no remaining blocker",
     "source": "8874b2dfe0dda9a019bd5f334636668290702e13"
   },
-  "active": null,
-  "pending": null,
-  "authorParallelWork": "K2PLR1dthreefilesfix-only; Geminihealthproxy+staleemptycorrection; B9bstaticfixcontinues",
+  "active": {
+    "atKST": "2026-11-06T20:52:52+09:00",
+    "source": "2d87d7aa3af1e35e5980ab340d132df56ce52c66",
+    "final": "854a8eab0b6e236b62878f49ee941c700e458af0",
+    "branch": "agent/gemini/portal-refresh-fleet-ui-20261106",
+    "rootVerification": "portal-refresh-854-source-root-verification.json",
+    "artifactStaging": "portal-refresh-854-build-artifact-staging.json",
+    "reviewTask": "task_599e55626b4a",
+    "reviewDispatch": "ctx_15e621fbe050",
+    "reviewTerminal": "term_6c10ee03-939f-4312-9d89-9b9bd2157b64",
+    "receipt": "ready",
+    "scope": "WHOLEbounded8frontendpaths inclauthdisplay/proxy/poll/timeouttest",
+    "ownerQuestionPending": "msg_31779385396e",
+    "actualVerdict": null,
+    "actualReviewSHA": null,
+    "deployment": "NOT_RUN_PENDING_ACTUAL_REVIEW",
+    "independentBrowserOrFleetSSOAccepted": false
+  },
+  "pending": [
+    {
+      "atKST": "2026-11-06T20:52:52+09:00",
+      "source": "3311f4538da4957396fc694d87706e9d5e813ef2",
+      "final": "ea276c97ece2906dc1f29b44b65aa887379ea78f",
+      "branch": "agent/codex/fleet5-k2a-pl-r1d-20261106",
+      "rootVerification": "k2a-pl-r1d-source-root-verification.json",
+      "reviewTask": "task_41987ea5739d",
+      "status": "pending",
+      "dependsOn": "task_599e55626b4a",
+      "actualReviewStarted": false,
+      "scope": "VERY_NARROWpointertermconversion TEST_ONLYdelta",
+      "ownerQuestionPending": "msg_4b416731f99d",
+      "actualVerdict": null,
+      "fullCoreGrantedNow": false
+    },
+    {
+      "atKST": "2026-11-06T20:52:52+09:00",
+      "source": "870486f98ba8fdc6d82f24c2610352a426f23a16",
+      "base": "3daf1a0d24c220586474a4b376609e62960b8ca6",
+      "branch": "agent/codex/fleet5-b-rev9b-20261106",
+      "rootVerification": "b-rev9b-source-root-verification.json",
+      "reviewTask": "task_a67e24d81ef8",
+      "status": "pending",
+      "dependsOn": "task_41987ea5739d",
+      "actualReviewStarted": false,
+      "scope": "WHOLEboundedRev9bdocs/model/staticdelta",
+      "ownerQuestionPending": "msg_8cebdb075c59",
+      "actualVerdict": null,
+      "nextCut": "OnlyRootconcretechoiceafteractualreview; snapshotA7notgrantednow; deliverdeferred",
+      "BProductOrPortGrant": false
+    }
+  ],
+  "authorParallelWork": "All3frozencandidatesawaitactualverdict/Rootprecisecuts; sourceholdersnotselfclosed",
   "reason": "actuala7e9 and5a3c reviews+CI verified andprecisefixscopesdelivered; do notselfclose source/runtime",
   "genericApprovalMissing": false,
   "completedRL1": {
@@ -22,7 +71,7 @@
     "review": "0e53fc024ca773b7719182e170e5e126aeaf5b95",
     "verdict": "ACCEPT TEST-ONLY; R-L1 CLOSED; no new findings"
   },
-  "nextActualReviewTrigger": "newimmutablecorrectedcandidate+ownactualCI thenONEClaudeafterfreshrelease; no Core yet",
+  "nextActualReviewTrigger": "Onactualworker_done startreadyPLthenB ONLYafterfreshpredecessorsucceeded/settled/exited/released",
   "completedIntegration": {
     "task": "task_78064fb4b7ff",
     "dispatch": "ctx_ed7ec73163d6",
@@ -328,5 +377,6 @@
     "actualWorkerDone": "msg_959aed1e687c",
     "resource": "actualsucceeded/settled/exited/released",
     "RootConcreteReply": "msg_049b87bd98ba"
-  }
+  },
+  "priority": "User-visibleUIreview/deployfirst; thennarrowPLreviewenablesONEfuturehostedCorewhileBreviewcancontinue; ONEactualClaude"
 }

@@ -1,0 +1,112 @@
+{
+  "atKST": "2026-11-06T20:41:26+09:00",
+  "base": "53683020e3cfaf79ec4662f9a79b8b4dae28a628",
+  "source": "2d87d7aa3af1e35e5980ab340d132df56ce52c66",
+  "final": "854a8eab0b6e236b62878f49ee941c700e458af0",
+  "branch": "agent/gemini/portal-refresh-fleet-ui-20261106",
+  "remoteExact": true,
+  "productChanges": [
+    "apps/web/nginx.conf",
+    "apps/web/src/app/App.tsx",
+    "apps/web/src/features/auth/session.ts",
+    "apps/web/src/features/dashboard/ClusterOverview.tsx",
+    "apps/web/src/shared/ui/Header.tsx",
+    "apps/web/tests/fixture-problem-codes-integrity.test.ts",
+    "apps/web/tests/portal-refresh-fleet-ui.test.tsx",
+    "apps/web/vite.config.ts"
+  ],
+  "ownUniqueAddedDocs": 2,
+  "finalNonDocsEqualSource": true,
+  "CI": {
+    "Frontend": {
+      "run": 42211235450,
+      "head": "2d87d7aa3af1e35e5980ab340d132df56ce52c66",
+      "path": ".github/workflows/frontend.yml",
+      "ref": "agent/gemini/portal-refresh-fleet-ui-20261106",
+      "event": "workflow_dispatch",
+      "attempt": 1,
+      "actualCorrelation": "Frontend Build & Test",
+      "jobs": [
+        {
+          "id": 127870096841,
+          "name": "frontend",
+          "allStepConclusions": [
+            "success",
+            "success",
+            "success",
+            "success",
+            "success",
+            "success",
+            "success",
+            "success",
+            "success",
+            "success",
+            "success",
+            "success"
+          ]
+        },
+        {
+          "id": 127870097238,
+          "name": "Portal Container Build & Hardened Runtime Smoke",
+          "allStepConclusions": [
+            "success",
+            "success",
+            "success",
+            "success",
+            "success",
+            "success",
+            "success",
+            "success",
+            "success",
+            "success",
+            "success",
+            "success",
+            "success",
+            "success"
+          ]
+        }
+      ],
+      "exactHeadRefEventPathAttemptAllJobsSuccess": true
+    },
+    "Docs": {
+      "run": 42211665725,
+      "head": "854a8eab0b6e236b62878f49ee941c700e458af0",
+      "path": ".github/workflows/docs.yml",
+      "ref": "agent/gemini/portal-refresh-fleet-ui-20261106",
+      "event": "workflow_dispatch",
+      "attempt": 1,
+      "actualCorrelation": "Documentation Build",
+      "jobs": [
+        {
+          "id": 127871530308,
+          "name": "docs",
+          "allStepConclusions": [
+            "success",
+            "success",
+            "success",
+            "success",
+            "success",
+            "success",
+            "success",
+            "success",
+            "success",
+            "success",
+            "success",
+            "success",
+            "success",
+            "success",
+            "success",
+            "success",
+            "success",
+            "success",
+            "success"
+          ]
+        }
+      ],
+      "exactHeadRefEventPathAttemptAllJobsSuccess": true
+    }
+  },
+  "actualClaudeReview": null,
+  "deployment": "NOT_RUN",
+  "wholeProgramComplete": false
+}

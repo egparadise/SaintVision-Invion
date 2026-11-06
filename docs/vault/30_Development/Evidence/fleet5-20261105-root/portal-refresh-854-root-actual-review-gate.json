@@ -1,0 +1,18 @@
+{
+  "atKST": "2026-11-06T20:52:52+09:00",
+  "source": "2d87d7aa3af1e35e5980ab340d132df56ce52c66",
+  "final": "854a8eab0b6e236b62878f49ee941c700e458af0",
+  "branch": "agent/gemini/portal-refresh-fleet-ui-20261106",
+  "rootVerification": "portal-refresh-854-source-root-verification.json",
+  "artifactStaging": "portal-refresh-854-build-artifact-staging.json",
+  "reviewTask": "task_599e55626b4a",
+  "reviewDispatch": "ctx_15e621fbe050",
+  "reviewTerminal": "term_6c10ee03-939f-4312-9d89-9b9bd2157b64",
+  "receipt": "ready",
+  "scope": "WHOLEbounded8frontendpaths inclauthdisplay/proxy/poll/timeouttest",
+  "ownerQuestionPending": "msg_31779385396e",
+  "actualVerdict": null,
+  "actualReviewSHA": null,
+  "deployment": "NOT_RUN_PENDING_ACTUAL_REVIEW",
+  "independentBrowserOrFleetSSOAccepted": false
+}

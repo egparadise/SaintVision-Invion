@@ -1,0 +1,32 @@
+{
+  "atKST": "2026-11-06T20:50:28+09:00",
+  "source": "2d87d7aa3af1e35e5980ab340d132df56ce52c66",
+  "finalReport": "854a8eab0b6e236b62878f49ee941c700e458af0",
+  "FrontendRun": 42211235450,
+  "artifactId": 13499835128,
+  "artifactBytes": 1116712,
+  "artifactSHA256": "375cec90c8ec66fe2880a8f954d7264324ae95d1925710858fe99fb1f35936fe",
+  "GitHubDigestMatched": true,
+  "builtFileCount": 13,
+  "builtFileHashes": {
+    "assets/icons-DVYUNEhE.js": "94f3f917fa843a4e312937688a83f400ea3d5617d1f1e1f36d6bc643f78ffa9e",
+    "assets/index-jJ3-copl.js": "d31022dcccf475c5c9559c153d409f5b70c0ccb64214219d0cc50891d77f55b6",
+    "assets/icons-DVYUNEhE.js.map": "bdc634b37b1574e46b91990a227c6ecf862e6364ec9219a524c88741ee294ea3",
+    "assets/index-jJ3-copl.js.map": "49601748585179485c88f0390602c433031f03a1cf5e5f66f3bbde0c0b5c443d",
+    "assets/index-kKrfL4r3.css": "66d8552241923e10b189e3b9372f85205bccbf083a5dc19872d001fd91ad0d26",
+    "assets/query-DtERyQJL.js": "3a24ebe459ff24b83ef333288347529de609b65f1c25d5c5b74f2f8b20e2904d",
+    "assets/query-DtERyQJL.js.map": "d584967ed9a938c701324896050b1db23187d2a79840fe5fac55791a2eafc500",
+    "assets/vendor-CYSfZuHu.js": "d967cddbe86b7822415ceafb696d97dea5a491621955cb4127e0f3f96e5497eb",
+    "assets/vendor-CYSfZuHu.js.map": "037070c1858eff839f466f2431a724493a80f81c8f47484c4c6c21698885d15e",
+    "auth-config.js": "5b9a14cc56ea56e4ae58359adbc17de4a1ee2d9ca3da04973fb4f144f42a60e1",
+    "index.html": "1969a783434cb7b47061a6b03154fb1fc64dad9b791bbd5260cb1851fd4c0dae",
+    "manifest.json": "d4c3c0897d7be95321a37babc97bd922618cf8142dd9103faef1efe700fd343a",
+    "sw.js": "5befc07c048a6a49d7f7ec492fe1c04ae8b40283dcc8387ef4e6b2b92c516dcd"
+  },
+  "runtimePublicAuthConfigSHA256": "e041468a55ca5aa4e68f069f8b86d7b35c421be58f1e1232cd65e1c4134e83fa",
+  "credentialValuesIncluded": false,
+  "originalAuthConfigChanged": false,
+  "liveServiceChanged": false,
+  "actualClaudeReview": "PENDING ctx_15e621fbe050",
+  "deployment": "NOT_RUN_SOURCE_REVIEW_PENDING"
+}
