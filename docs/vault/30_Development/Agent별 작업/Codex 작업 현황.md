@@ -1,15 +1,19 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.411"
+version: "1.0.412"
 status: "review"
 author: "Codex"
-updated: "2026-11-06T17:34:35+09:00"
+updated: "2026-11-06T18:10:10+09:00"
 source_of_truth: "Git"
 active_card: "FLEET5-20261105 five physical node orchestration"
-active_card_status: "Actual7d97 combinedmerge/pin/diagnosticsaccept; PLR1b testonlyLow open; sameCodex narrow3filefix; B9T1independent; fullCore/5PCnotdone"
-active_card_next: "Codex newPLR1b TESTREADMEcandidate+exactDocs; Root oneactualnarrowreview whenimmutable; thenchooseonefreshCore; B9T1continue; acceptedproductbytes frozen"
+active_card_status: "B9final3daf/86docs/0productdiff/33hashes/exactDocsverified; actualwholeReviewctxde27active; K2PLR1b3filefixcontinues; no fullCore/physicalacceptance"
+active_card_next: "Claude actualwholeB9verdict+exactnextcut; K2Codex immutablePLR1bTESTREADMEcandidate+Docs thenoneactualnarrowreview; Root exactCoredecision onlyafteracceptance"
 ---
+
+## 2026-11-06T18:10:10+09:00 B Rev9 고정 소스와 실제 전체 delta 검토
+
+작업한 것과 확인: B Rev9-T1 최종3daf1a0d는 고유 문서86개 추가·제품 변경0이며 exact Docs42191613681의19단계 성공을 Root가 확인했다. producer/artifact33개·총1557302bytes의 Git 원본 해시와 두 단계 생성 순서도 독립 대조했다. 이전 검토자의 실제 exit/release 뒤 Claude task_522bf43089d4/ctx_de2750e94f9d에 전체 bounded delta 검토를 한 번 배정했다. 저자 시험의 재실행이나 설계 수락은 아니며 K2A PL-R1b 보강·전체 Core와5대 운영 인수는 남아 있다. 원질문 msg_ae8b4176e148은 실제 전체 판정·review SHA/Docs와 Root의 구체 다음 cut까지 pending이다. 다음 첫 행동/담당은 Claude의 Rev9 실제 판정, K2 Codex의 제한된 시험 보강, Root의 증거에 따른 후속 범위·순차 검토 배정이다.
 
 ## 2026-11-06T17:34:35+09:00 결합 판정 수신과 PL-R1b 우선 보강
 
