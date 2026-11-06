@@ -1,0 +1,124 @@
+{
+  "atKST": "2026-11-07T01:13:19+09:00",
+  "runtimeMetadata": {
+    "atKST": "2026-11-07T01:08:39+09:00",
+    "results": [
+      {
+        "pc": "PC2",
+        "startKST": "2026-11-07T01:08:38+09:00",
+        "endKST": "2026-11-07T01:08:38+09:00",
+        "sshExit": 0,
+        "runtimesQueryExit": 0,
+        "imagesQueryExit": 0,
+        "toolkitQueryExit": null,
+        "toolkitMissing": true,
+        "shareResolvesToIntendedHome": true,
+        "nvidiaRuntimeConfigured": false,
+        "existingCudaImageCount": 0
+      },
+      {
+        "pc": "PC3",
+        "startKST": "2026-11-07T01:08:38+09:00",
+        "endKST": "2026-11-07T01:08:39+09:00",
+        "sshExit": 0,
+        "runtimesQueryExit": 0,
+        "imagesQueryExit": 0,
+        "toolkitQueryExit": null,
+        "toolkitMissing": true,
+        "shareResolvesToIntendedHome": true,
+        "nvidiaRuntimeConfigured": false,
+        "existingCudaImageCount": 0
+      },
+      {
+        "pc": "PC4",
+        "startKST": "2026-11-07T01:08:39+09:00",
+        "endKST": "2026-11-07T01:08:39+09:00",
+        "sshExit": 0,
+        "runtimesQueryExit": 0,
+        "imagesQueryExit": 0,
+        "toolkitQueryExit": null,
+        "toolkitMissing": true,
+        "shareResolvesToIntendedHome": true,
+        "nvidiaRuntimeConfigured": false,
+        "existingCudaImageCount": 0
+      }
+    ],
+    "oneBoundedReadonlyAttemptPerPC": true,
+    "knownHostsUnchanged": true,
+    "runtimeOrContainerCreated": false,
+    "imagesPulled": false,
+    "nodeOrOfferAcceptance": false,
+    "GPUContainerExecutionProven": false,
+    "mutation": false
+  },
+  "prerequisiteMetadata": {
+    "atKST": "2026-11-07T01:10:24+09:00",
+    "results": [
+      {
+        "pc": "PC2",
+        "sshExit": 0,
+        "os": {
+          "VERSION_ID": "26.04",
+          "VERSION_CODENAME": "resolute",
+          "ID": "ubuntu"
+        },
+        "toolPathsAllAbsent": true,
+        "packageQueryExit": 1,
+        "nvidiaCDIFileCount": 0,
+        "noninteractiveSudoQueryExit": 1,
+        "runningContainerCount": 11,
+        "interactiveAuthenticationRequired": true
+      },
+      {
+        "pc": "PC3",
+        "sshExit": 0,
+        "os": {
+          "VERSION_ID": "26.04",
+          "VERSION_CODENAME": "resolute",
+          "ID": "ubuntu"
+        },
+        "toolPathsAllAbsent": true,
+        "packageQueryExit": 1,
+        "nvidiaCDIFileCount": 0,
+        "noninteractiveSudoQueryExit": 1,
+        "runningContainerCount": 0,
+        "interactiveAuthenticationRequired": true
+      },
+      {
+        "pc": "PC4",
+        "sshExit": 0,
+        "os": {
+          "VERSION_ID": "24.04",
+          "VERSION_CODENAME": "noble",
+          "ID": "ubuntu"
+        },
+        "toolPathsAllAbsent": true,
+        "packageQueryExit": 1,
+        "nvidiaCDIFileCount": 0,
+        "noninteractiveSudoQueryExit": 1,
+        "runningContainerCount": 7,
+        "interactiveAuthenticationRequired": true
+      }
+    ],
+    "knownHostsUnchanged": true,
+    "oneSudoReadOnlyListAttemptPerPC": true,
+    "passwordSuppliedOrGuessed": false,
+    "installOrRestartPerformed": false,
+    "runtimeOrContainerCreated": false,
+    "nodeOrOfferAcceptance": false,
+    "mutation": false
+  },
+  "interpretation": "PC2/3/4 host GPU observation is not Docker GPU usability; toolkit packages/tool paths/NVIDIA runtime/CDI absent. Container GPU execution still unproven.",
+  "nextConcreteWork": "Authorized local administrator installs/configures toolkit according to official instructions after preserving daemon config and scheduling existing containers; actual bounded container GPU proof after runtime ready. Root does not bypass sudo using Docker socket or supply guessed passwords.",
+  "installationSources": [
+    "https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/install-guide.html",
+    "https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/supported-platforms.html"
+  ],
+  "officialPlatformObservation": "Ubuntu24.04 and26.04 amd64 are listed. Docker runtime configuration modifies daemon.json and official procedure restarts Docker; not executed here.",
+  "busyContainerPreservation": "PC2 has11 and PC4 has7 currently running containers, ownership not established by this query. No stop/restart performed; PC3 currently0.",
+  "installationPerformed": false,
+  "runtimeRestartPerformed": false,
+  "GPUContainerExecutionProven": false,
+  "fiveResourceOffersVerified": false,
+  "wholeProgramComplete": false
+}

@@ -1,15 +1,19 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.428"
+version: "1.0.429"
 status: "review"
 author: "Codex"
-updated: "2026-11-07T01:06:36+09:00"
+updated: "2026-11-07T01:13:19+09:00"
 source_of_truth: "Git"
 active_card: "FLEET5 continued supervision with PORTAL-REFRESH-FLEET-20261106"
-active_card_status: "UIR3actualLintFailureMinimalFix; P02Rev2/BRev9d; noactiveClaude; TLSdefault18PinnedCA200; physicalincomplete"
-active_card_next: "Gemini fixes unusedcatch then fullLint/newsourceFrontend/finalDocs; Root verifies then ONE review; Codex Rev9d/Rev2; PC1actualkeyresult pending"
+active_card_status: "UIR3lintfix/newCIpending; P02Rev2/BRev9d; PC234GPUtoolkitMissing/AdminAuth; noactiveClaude; physicalincomplete"
+active_card_next: "Gemini correctedsourceCI/finalDocs then Root ONE review; Codex Rev9d/P02Rev2; localadmin GPUsetup and PC1keyresult; preserve busy containers"
 ---
+
+## 2026-11-07T01:13:19+09:00 실제 컨테이너 GPU 준비 조건 확인
+
+2·3·4번의 SSH·Docker 조회는 성공했지만 NVIDIA toolkit 패키지·실행 파일·runtime·CDI 설정이 없어 컨테이너 GPU 인수는 남는다. 세 장비의 sudo 읽기 조회도 로컬 인증을 요구했다. 기존 컨테이너와 설정을 보존했고 설치·재시작은 하지 않았다. Gemini는 UI lint 최소 수정과 새 후보 검증을, 두 Codex는 Rev9d·P02 Rev2 보완을 계속한다. 확인한 것은 엄격한 기존 host pin을 사용한 읽기 전용 메타데이터 조회이며 각 SSH exit0이다. 다음 첫 행동/담당은 Gemini와 두 Codex의 기존 보완, Root의 실제 후보 검증이며 장비 관리자는 실제 sudo 인증이 필요한 GPU 준비를 맡는다.
 
 ## 2026-11-07T01:06:36+09:00 UI 실제 CI 실패 교정과 TLS 읽기 검증
 
