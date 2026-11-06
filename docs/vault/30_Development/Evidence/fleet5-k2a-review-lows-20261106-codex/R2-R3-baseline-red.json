@@ -1,0 +1,20 @@
+{
+  "classification": "EXPECTED_BASELINE_RED_NOT_A_PRODUCTION_GATING_PASS",
+  "source": "ff3169d360a707415d9b03484cf0cf3031f3912c",
+  "onlyAddedTest": "review_lows_test.go",
+  "argv": [
+    "go",
+    "test",
+    "-p",
+    "1",
+    "-count=1",
+    "-run",
+    "TestReviewR[23]",
+    "-v",
+    "./internal/migrationcontext"
+  ],
+  "actualExit": 1,
+  "expectedExit": 1,
+  "observedKST": "2026-11-06T15:04:57.776548+09:00",
+  "noBaselineOrOldWorktreeEdits": true
+}

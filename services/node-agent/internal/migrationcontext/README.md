@@ -92,3 +92,47 @@ and attestation-verification contract **per purpose**, actual registered anchors
 and ports, and a future explicit implementation grant. No actual binding, clock
 mechanism, installation, D-COHORT, D-OBSERVATION, prepublication/current authority,
 K2B effect execution, or five-PC acceptance is completed here.
+
+The P02 provenance checks are a **partial necessary consistency subset**. Missing
+joins remain explicit HOLD obligations for the future independently provisioned
+and reviewed attestation contract: actual review VERDICT and exact target/scope;
+CI event, correlation, run attempt, required jobs and every required step's
+conclusion; artifact ID/digest/bytes; binary VCS/toolchain/module/helper closure;
+and Root's exact reviewed source choice/equivalence decision. Existing CIRef,
+CIWorkflow, CIAttempt and CIJobID presence checks do not verify those facts. No
+arbitrary review JSON, green workflow name, source filename/hash or role label
+authenticates them. This revision adds no new P02 proof format, fields, verifier
+ABI, registered producer, accepted wire or production positive factory. All
+public unregistered authentication paths still refuse and issue no opaque input.
+
+
+The reviewed Low revision strengthens the source gate with actual package
+Go/types resolution: exact current pure function/method objects are allowed,
+independent of import alias. Resolved references/calls are checked against that
+closed policy, including own interface and instantiated constraint dispatch.
+There is no strings/time wildcard. Ambient clock/timer functions, signing/key
+creation, certificate Verify/system roots, unresolved function-value callbacks,
+native linker sources, bodyless functions and linker directives are refused.
+Native inputs are checked in both reviewed production packages. The gate is
+source defense in depth, not protection from hostile same-process code.
+
+The census now derives actual explicit AND inferred K1 bridge objects, including
+NewVerifier, Verifier.Verify, Packet, Report and CanonicalJSON. It describes full
+transitive underlying types/signatures/variadics/receivers and sorted named plus
+pointer method sets. The original13/73/0 input metric remains a separate baseline;
+it does not describe the size of the larger complete object graph. New type-correct
+Packet/Report map/slice, CanonicalJSON variadic and value/pointer MarshalJSON
+mutations are detected after simulated raw repins; declaration-order controls
+stay equal. Existing raw K1 source pins remain frozen, with no automatic repin.
+
+
+The PL-R1a candidate limits own interface/constraint dispatch to unexported OWN
+method objects, and refuses exported methods or foreign interface embeddings,
+including aliased/transitive embeddings. Concrete own methods are a separate
+reviewed class. Foreign package-level variable reads permit only the resolved
+current time.UTC binding; taking a foreign package variable address is refused.
+Direct foreign variable writes resolve the same object, including dot imports.
+These are precise source-defense rules for the reviewed closure and tested attack
+classes, not arbitrary trusted-process isolation or a whole-program effect proof.
+They do not install an authority, provider or positive authentication path. Closure
+of the review finding remains subject to the actual final combined review.

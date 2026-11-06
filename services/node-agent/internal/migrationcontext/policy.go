@@ -240,6 +240,7 @@ func checkPolicyBindings(p policyData, measured runningData) error {
 	if len(p.Members) != 2 || p.Members[0].Slot != "PC2" || p.Members[1].Slot != "PC4" {
 		return refuse(TrustUnknown)
 	}
+	memberScopes := map[string]bool{}
 	for _, m := range p.Members {
 		sc, ok := m.Scope.(map[string]any)
 		if !ok || len(sc) != 3 || len(m.CertificateDER) == 0 || len(m.CARootDER) == 0 {
@@ -251,6 +252,14 @@ func checkPolicyBindings(p policyData, measured runningData) error {
 				return refuse(TrustUnknown)
 			}
 		}
+		canonical, e := canonicalValue(m.Scope)
+		if e != nil || memberScopes[string(canonical)] {
+			return refuse(TrustUnknown)
+		}
+		memberScopes[string(canonical)] = true
+	}
+	if bytes.Equal(p.Members[0].CertificateDER, p.Members[1].CertificateDER) {
+		return refuse(TrustUnknown)
 	}
 	for _, g := range p.Grants {
 		if g.Role == "" || g.Status != "ACTIVE" || !validHash(g.PublicKeyHex, 32) || g.AuthorityScope == nil || !utc(g.NotBefore) || !utc(g.NotAfter) || !g.NotBefore.Before(g.NotAfter) {
@@ -275,6 +284,7 @@ func checkPolicyBindings(p policyData, measured runningData) error {
 // current nonrevocation when verifying the original packet.
 func checkMemberBindings(p policyData) error {
 	seen := map[string]bool{}
+	memberSPKIs := map[string]bool{}
 	for _, g := range p.Grants {
 		b, e := canonicalValue(g.AuthorityScope)
 		if e != nil {
@@ -316,6 +326,10 @@ func checkMemberBindings(p policyData) error {
 		if !ok || len(cert.URIs) != 1 || cert.URIs[0].String() != uri {
 			return refuse(TrustUnknown)
 		}
+		if memberSPKIs[string(cert.RawSubjectPublicKeyInfo)] {
+			return refuse(TrustUnknown)
+		}
+		memberSPKIs[string(cert.RawSubjectPublicKeyInfo)] = true
 		want, e := canonicalValue(map[string]any{"class": "NODE", "scope": sc})
 		if e != nil {
 			return refuse(TrustUnknown)

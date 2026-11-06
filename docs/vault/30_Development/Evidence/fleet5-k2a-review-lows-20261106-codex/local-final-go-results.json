@@ -1,0 +1,54 @@
+{
+  "classification": "NEW_LOW_REVISION_LOCAL_ONLY_NO_BORROWED_HOSTED_PROOF",
+  "runs": [
+    {
+      "argv": [
+        "go",
+        "test",
+        "-p",
+        "1",
+        "-count=1",
+        "-v",
+        "./internal/migrationcontext"
+      ],
+      "exit": 0,
+      "startedKST": "2026-11-06T15:07:02.605850+09:00",
+      "endedKST": "2026-11-06T15:07:32.528498+09:00",
+      "log": "full-unit.log"
+    },
+    {
+      "argv": [
+        "go",
+        "vet",
+        "-p",
+        "1",
+        "./internal/migrationcontext",
+        "./migrationverify"
+      ],
+      "exit": 0,
+      "startedKST": "2026-11-06T15:07:32.529722+09:00",
+      "endedKST": "2026-11-06T15:07:37.137831+09:00",
+      "log": "vet.log"
+    },
+    {
+      "argv": [
+        "go",
+        "env",
+        "CGO_ENABLED",
+        "GOVERSION"
+      ],
+      "exit": 0,
+      "startedKST": "2026-11-06T15:07:37.138191+09:00",
+      "endedKST": "2026-11-06T15:07:37.214669+09:00",
+      "log": "go-env.log"
+    }
+  ],
+  "topLevelPasses": 16,
+  "subtestPasses": 72,
+  "censusSHA256": "7eee6ccb07b55399adecdd1dc3bb704aeaebc655d5f3739f29a8e5a7aaa4bfdc",
+  "localRace": {
+    "execution": "NOT_RUN",
+    "reason": "CGO_DISABLED_NO_ENVIRONMENT_CHANGE",
+    "requiredFutureProof": "Root-selected FINAL combined Core actual hosted race, never de71 borrowed proof"
+  }
+}

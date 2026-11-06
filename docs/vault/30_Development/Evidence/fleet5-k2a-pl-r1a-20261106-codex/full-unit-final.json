@@ -1,0 +1,16 @@
+{
+  "argv": [
+    "go",
+    "test",
+    "-p",
+    "1",
+    "-count=1",
+    "-v",
+    "./internal/migrationcontext"
+  ],
+  "exit": 0,
+  "expectedExit": 0,
+  "startedKST": "2026-11-06T16:37:22.906353+09:00",
+  "endedKST": "2026-11-06T16:38:11.475430+09:00",
+  "actualBuildExit0Count": 18
+}

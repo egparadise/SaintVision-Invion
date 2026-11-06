@@ -1,0 +1,15 @@
+{
+  "argv": [
+    "go",
+    "test",
+    "-p",
+    "1",
+    "-count=1",
+    "-run",
+    "TestReviewR[123]|TestResolvedObjectEffectBoundary|TestRepositoryBoundaryAndZeroEffects",
+    "-v",
+    "./internal/migrationcontext"
+  ],
+  "exit": 1,
+  "observedKST": "2026-11-06T14:55:12.081239+09:00"
+}

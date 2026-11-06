@@ -108,6 +108,21 @@ type typeGraph struct {
 	next                              int
 	localTypes, localFields, embedded int
 	err                               error
+	methods                           bool
+}
+
+func (g *typeGraph) methodSet(t types.Type) string {
+	set := types.NewMethodSet(t)
+	methods := make([]*types.Selection, set.Len())
+	for i := range methods {
+		methods[i] = set.At(i)
+	}
+	sort.Slice(methods, func(i, j int) bool { return objectID(methods[i].Obj()) < objectID(methods[j].Obj()) })
+	parts := []string{}
+	for _, m := range methods {
+		parts = append(parts, objectID(m.Obj())+":"+g.shape(m.Obj().Type()))
+	}
+	return "methods[" + strings.Join(parts, ";") + "]"
 }
 
 func (g *typeGraph) shape(t types.Type) string {
@@ -117,6 +132,10 @@ func (g *typeGraph) shape(t types.Type) string {
 	}
 	if id, ok := g.seen[t]; ok {
 		return fmt.Sprintf("ref#%d", id)
+	}
+	if g.next >= 100000 {
+		g.err = fmt.Errorf("type graph bound exceeded")
+		return "REFUSE"
 	}
 	g.next++
 	id := g.next
@@ -149,7 +168,12 @@ func (g *typeGraph) shape(t types.Type) string {
 		for i := 0; i < x.TypeParams().Len(); i++ {
 			params = append(params, g.shape(x.TypeParams().At(i)))
 		}
-		return wrap("named:" + pkg + "." + x.Obj().Name() + "[" + strings.Join(args, ",") + "]<" + strings.Join(params, ",") + ">=" + g.shape(x.Underlying()))
+		underlying := g.shape(x.Underlying())
+		methods := ""
+		if g.methods {
+			methods = g.methodSet(x) + "/pointer:" + g.methodSet(types.NewPointer(x))
+		}
+		return wrap("named:" + pkg + "." + x.Obj().Name() + "[" + strings.Join(args, ",") + "]<" + strings.Join(params, ",") + ">=" + underlying + methods)
 	case *types.Alias:
 		args := []string{}
 		for i := 0; i < x.TypeArgs().Len(); i++ {
@@ -178,13 +202,26 @@ func (g *typeGraph) shape(t types.Type) string {
 	case *types.Array:
 		return wrap(fmt.Sprintf("array:%d:%s", x.Len(), g.shape(x.Elem())))
 	case *types.Pointer:
-		return wrap("pointer:" + g.shape(x.Elem()))
+		underlying := g.shape(x.Elem())
+		methods := ""
+		if g.methods {
+			methods = g.methodSet(x)
+		}
+		return wrap("pointer:" + underlying + methods)
 	case *types.Signature:
 		p := []string{}
 		for i := 0; i < x.TypeParams().Len(); i++ {
 			p = append(p, g.shape(x.TypeParams().At(i)))
 		}
-		return wrap(fmt.Sprintf("func:variadic=%t:typeparams=%s:params=%s:results=%s", x.Variadic(), strings.Join(p, ","), g.shape(x.Params()), g.shape(x.Results())))
+		recv := ""
+		if x.Recv() != nil {
+			recv = g.shape(x.Recv().Type())
+		}
+		recvParams := []string{}
+		for i := 0; i < x.RecvTypeParams().Len(); i++ {
+			recvParams = append(recvParams, g.shape(x.RecvTypeParams().At(i)))
+		}
+		return wrap(fmt.Sprintf("func:variadic=%t:receiver=%s:recvparams=%s:typeparams=%s:params=%s:results=%s", x.Variadic(), recv, strings.Join(recvParams, ","), strings.Join(p, ","), g.shape(x.Params()), g.shape(x.Results())))
 	case *types.Tuple:
 		a := []string{}
 		for i := 0; i < x.Len(); i++ {
@@ -221,6 +258,112 @@ func (g *typeGraph) shape(t types.Type) string {
 type census struct {
 	shape                   string
 	types, fields, embedded int
+}
+
+var bridgeOnce sync.Once
+var bridgeIDs []string
+var bridgeIDError error
+
+func actualBridgeObjects(paths map[string]string) ([]string, error) {
+	bridgeOnce.Do(func() {
+		root, e := filepath.Abs("../../../..")
+		if e != nil {
+			bridgeIDError = e
+			return
+		}
+		src := map[string][]byte{}
+		entries, e := os.ReadDir(filepath.Join(root, filepath.FromSlash(ownDir)))
+		if e != nil {
+			bridgeIDError = e
+			return
+		}
+		for _, entry := range entries {
+			if strings.HasSuffix(entry.Name(), ".go") && !strings.HasSuffix(entry.Name(), "_test.go") {
+				b, e := os.ReadFile(filepath.Join(root, filepath.FromSlash(ownDir), entry.Name()))
+				if e != nil {
+					bridgeIDError = e
+					return
+				}
+				src[entry.Name()] = b
+			}
+		}
+		checked, e := checkSourcePackage(ownImport, src, paths, nil)
+		if e != nil {
+			bridgeIDError = e
+			return
+		}
+		ids := map[string]bool{}
+		for id, obj := range checked.info.Uses {
+			if checked.fset.Position(id.Pos()).Filename != "k1_bridge.go" || obj.Pkg() == nil || obj.Pkg().Path() != k1Import {
+				continue
+			}
+			switch obj.(type) {
+			case *types.Func, *types.TypeName:
+				ids[objectID(obj)] = true
+			}
+		}
+		// Inferred values (notably Verify's Report and NewVerifier's Verifier)
+		// are real bridge references even without an explicit k1.Type selector.
+		var inferred func(types.Type)
+		inferred = func(t types.Type) {
+			switch x := t.(type) {
+			case *types.Named:
+				if x.Obj().Pkg() != nil && x.Obj().Pkg().Path() == k1Import {
+					ids[objectID(x.Obj())] = true
+				}
+			case *types.Alias:
+				if x.Obj().Pkg() != nil && x.Obj().Pkg().Path() == k1Import {
+					ids[objectID(x.Obj())] = true
+				}
+			case *types.Pointer:
+				inferred(x.Elem())
+			case *types.Tuple:
+				for i := 0; i < x.Len(); i++ {
+					inferred(x.At(i).Type())
+				}
+			}
+		}
+		for expr, tv := range checked.info.Types {
+			if checked.fset.Position(expr.Pos()).Filename == "k1_bridge.go" {
+				inferred(tv.Type)
+			}
+		}
+		for _, required := range []string{"NewVerifier", "Verifier.Verify", "Packet", "Report", "CanonicalJSON"} {
+			if !ids[k1Import+"."+required] {
+				bridgeIDError = fmt.Errorf("missing actual bridged object %s", required)
+				return
+			}
+		}
+		for id := range ids {
+			bridgeIDs = append(bridgeIDs, id)
+		}
+		sort.Strings(bridgeIDs)
+	})
+	return bridgeIDs, bridgeIDError
+}
+
+func censusObject(pkg *types.Package, id string) (types.Object, error) {
+	name := strings.TrimPrefix(id, k1Import+".")
+	parts := strings.Split(name, ".")
+	if len(parts) == 1 {
+		obj := pkg.Scope().Lookup(name)
+		if obj == nil {
+			return nil, fmt.Errorf("missing K1 object %s", name)
+		}
+		return obj, nil
+	}
+	if len(parts) == 2 {
+		obj := pkg.Scope().Lookup(parts[0])
+		if obj == nil {
+			return nil, fmt.Errorf("missing K1 receiver %s", parts[0])
+		}
+		method, _, _ := types.LookupFieldOrMethod(types.NewPointer(obj.Type()), false, pkg, parts[1])
+		if method == nil {
+			return nil, fmt.Errorf("missing K1 method %s", name)
+		}
+		return method, nil
+	}
+	return nil, fmt.Errorf("unknown object shape %s", id)
 }
 
 func packageCensus(src map[string][]byte, paths map[string]string) (census, error) {
@@ -265,6 +408,21 @@ func packageCensus(src map[string][]byte, paths map[string]string) (census, erro
 	}
 	if g.err != nil {
 		return census{}, g.err
+	}
+	ids, e := actualBridgeObjects(paths)
+	if e != nil {
+		return census{}, e
+	}
+	full := &typeGraph{seen: map[types.Type]int{}, methods: true}
+	for _, id := range ids {
+		obj, e := censusObject(p, id)
+		if e != nil {
+			return census{}, e
+		}
+		parts = append(parts, "actual-bridge-object:"+id+"="+full.shape(obj.Type()))
+	}
+	if full.err != nil {
+		return census{}, full.err
 	}
 	return census{shape: strings.Join(parts, "\n"), types: g.localTypes, fields: g.localFields, embedded: g.embedded}, nil
 }
@@ -376,6 +534,7 @@ func TestCensusMutantsAfterSimulatedRawRepin(t *testing.T) {
 
 func TestRepositoryBoundaryAndZeroEffects(t *testing.T) {
 	root := repository(t)
+	requireResolvedEffectBoundary(t, root)
 	listed := strings.Fields(string(sourceCommand(t, root, "git", "ls-files", "--", "*.go", ":(glob)**/go.mod")))
 	paths := map[string]bool{}
 	modules := []string{}

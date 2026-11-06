@@ -1,0 +1,83 @@
+=== RUN   TestResolvedObjectEffectBoundary
+--- PASS: TestResolvedObjectEffectBoundary (0.91s)
+=== RUN   TestReviewR1CompileValidEffectAndAliasMutants
+=== RUN   TestReviewR1CompileValidEffectAndAliasMutants/aliased-time-Since
+=== RUN   TestReviewR1CompileValidEffectAndAliasMutants/aliased-time-Until
+=== RUN   TestReviewR1CompileValidEffectAndAliasMutants/function-alias-clock
+=== RUN   TestReviewR1CompileValidEffectAndAliasMutants/time-After
+=== RUN   TestReviewR1CompileValidEffectAndAliasMutants/aliased-seed
+=== RUN   TestReviewR1CompileValidEffectAndAliasMutants/aliased-generate
+=== RUN   TestReviewR1CompileValidEffectAndAliasMutants/aliased-sign
+=== RUN   TestReviewR1CompileValidEffectAndAliasMutants/create-certificate
+=== RUN   TestReviewR1CompileValidEffectAndAliasMutants/certificate-ambient-Verify
+=== RUN   TestReviewR1CompileValidEffectAndAliasMutants/certificate-method-expression
+=== RUN   TestReviewR1CompileValidEffectAndAliasMutants/system-roots
+=== RUN   TestReviewR1CompileValidEffectAndAliasMutants/unreviewed-pure-strings
+=== RUN   TestReviewR1CompileValidEffectAndAliasMutants/bodyless
+=== RUN   TestReviewR1CompileValidEffectAndAliasMutants/linkname
+=== RUN   TestReviewR1CompileValidEffectAndAliasMutants/pure-alias-control
+=== RUN   TestReviewR1CompileValidEffectAndAliasMutants/native.s
+=== RUN   TestReviewR1CompileValidEffectAndAliasMutants/native.S
+=== RUN   TestReviewR1CompileValidEffectAndAliasMutants/native.syso
+=== RUN   TestReviewR1CompileValidEffectAndAliasMutants/native.c
+=== RUN   TestReviewR1CompileValidEffectAndAliasMutants/native.h
+=== RUN   TestReviewR1CompileValidEffectAndAliasMutants/native.cc
+=== RUN   TestReviewR1CompileValidEffectAndAliasMutants/native.o
+=== RUN   TestReviewR1CompileValidEffectAndAliasMutants/assembly-compiles-but-refuses
+--- PASS: TestReviewR1CompileValidEffectAndAliasMutants (0.49s)
+    --- PASS: TestReviewR1CompileValidEffectAndAliasMutants/aliased-time-Since (0.01s)
+    --- PASS: TestReviewR1CompileValidEffectAndAliasMutants/aliased-time-Until (0.01s)
+    --- PASS: TestReviewR1CompileValidEffectAndAliasMutants/function-alias-clock (0.01s)
+    --- PASS: TestReviewR1CompileValidEffectAndAliasMutants/time-After (0.01s)
+    --- PASS: TestReviewR1CompileValidEffectAndAliasMutants/aliased-seed (0.01s)
+    --- PASS: TestReviewR1CompileValidEffectAndAliasMutants/aliased-generate (0.01s)
+    --- PASS: TestReviewR1CompileValidEffectAndAliasMutants/aliased-sign (0.01s)
+    --- PASS: TestReviewR1CompileValidEffectAndAliasMutants/create-certificate (0.01s)
+    --- PASS: TestReviewR1CompileValidEffectAndAliasMutants/certificate-ambient-Verify (0.01s)
+    --- PASS: TestReviewR1CompileValidEffectAndAliasMutants/certificate-method-expression (0.01s)
+    --- PASS: TestReviewR1CompileValidEffectAndAliasMutants/system-roots (0.01s)
+    --- PASS: TestReviewR1CompileValidEffectAndAliasMutants/unreviewed-pure-strings (0.01s)
+    --- PASS: TestReviewR1CompileValidEffectAndAliasMutants/bodyless (0.01s)
+    --- PASS: TestReviewR1CompileValidEffectAndAliasMutants/linkname (0.01s)
+    --- PASS: TestReviewR1CompileValidEffectAndAliasMutants/pure-alias-control (0.01s)
+    --- PASS: TestReviewR1CompileValidEffectAndAliasMutants/native.s (0.01s)
+    --- PASS: TestReviewR1CompileValidEffectAndAliasMutants/native.S (0.01s)
+    --- PASS: TestReviewR1CompileValidEffectAndAliasMutants/native.syso (0.01s)
+    --- PASS: TestReviewR1CompileValidEffectAndAliasMutants/native.c (0.01s)
+    --- PASS: TestReviewR1CompileValidEffectAndAliasMutants/native.h (0.01s)
+    --- PASS: TestReviewR1CompileValidEffectAndAliasMutants/native.cc (0.01s)
+    --- PASS: TestReviewR1CompileValidEffectAndAliasMutants/native.o (0.01s)
+    --- PASS: TestReviewR1CompileValidEffectAndAliasMutants/assembly-compiles-but-refuses (0.30s)
+=== RUN   TestReviewR2DistinctMemberBindings
+=== RUN   TestReviewR2DistinctMemberBindings/duplicate-scope-and-DER
+=== RUN   TestReviewR2DistinctMemberBindings/duplicate-canonical-scope
+=== RUN   TestReviewR2DistinctMemberBindings/duplicate-leaf-DER
+=== RUN   TestReviewR2DistinctMemberBindings/distinct-scope-DER-same-SPKI
+--- PASS: TestReviewR2DistinctMemberBindings (0.01s)
+    --- PASS: TestReviewR2DistinctMemberBindings/duplicate-scope-and-DER (0.00s)
+    --- PASS: TestReviewR2DistinctMemberBindings/duplicate-canonical-scope (0.00s)
+    --- PASS: TestReviewR2DistinctMemberBindings/duplicate-leaf-DER (0.00s)
+    --- PASS: TestReviewR2DistinctMemberBindings/distinct-scope-DER-same-SPKI (0.00s)
+=== RUN   TestReviewR3EveryOriginalOperationAndLease
+=== RUN   TestReviewR3EveryOriginalOperationAndLease/three-way-current-original-kept
+=== RUN   TestReviewR3EveryOriginalOperationAndLease/extra-operation-reuses-original-HELD
+=== RUN   TestReviewR3EveryOriginalOperationAndLease/extra-key-ID-mismatch
+=== RUN   TestReviewR3EveryOriginalOperationAndLease/extra-missing-migration
+=== RUN   TestReviewR3EveryOriginalOperationAndLease/extra-zero-fence
+=== RUN   TestReviewR3EveryOriginalOperationAndLease/extra-bad-hash
+=== RUN   TestReviewR3EveryOriginalOperationAndLease/extra-non-UTC
+=== RUN   TestReviewR3EveryOriginalOperationAndLease/extra-reversed-interval
+--- PASS: TestReviewR3EveryOriginalOperationAndLease (0.03s)
+    --- PASS: TestReviewR3EveryOriginalOperationAndLease/three-way-current-original-kept (0.00s)
+    --- PASS: TestReviewR3EveryOriginalOperationAndLease/extra-operation-reuses-original-HELD (0.00s)
+    --- PASS: TestReviewR3EveryOriginalOperationAndLease/extra-key-ID-mismatch (0.00s)
+    --- PASS: TestReviewR3EveryOriginalOperationAndLease/extra-missing-migration (0.00s)
+    --- PASS: TestReviewR3EveryOriginalOperationAndLease/extra-zero-fence (0.00s)
+    --- PASS: TestReviewR3EveryOriginalOperationAndLease/extra-bad-hash (0.00s)
+    --- PASS: TestReviewR3EveryOriginalOperationAndLease/extra-non-UTC (0.00s)
+    --- PASS: TestReviewR3EveryOriginalOperationAndLease/extra-reversed-interval (0.00s)
+=== RUN   TestRepositoryBoundaryAndZeroEffects
+    source_gate_test.go:567: repo modules=[packages/contracts-go/go.mod services/node-agent/go.mod]; Go files=95; production imports=[services/node-agent/internal/migrationcontext/k1_bridge.go:k1]; test imports=[]; immutable K1 definitions=[services/node-agent/migrationverify/trust.go:NewVerifier services/node-agent/migrationverify/verify.go:Verify services/node-agent/migrationverify/verify.go:VerifyCurrentProjectionSet]; sole bridge sites=[services/node-agent/internal/migrationcontext/k1_bridge.go:InstalledTrust services/node-agent/internal/migrationcontext/k1_bridge.go:TrustedContext services/node-agent/internal/migrationcontext/k1_bridge.go:NewVerifier]
+--- PASS: TestRepositoryBoundaryAndZeroEffects (0.98s)
+PASS
+ok  	github.com/egparadise/SaintVision-Invion/services/node-agent/internal/migrationcontext	4.038s

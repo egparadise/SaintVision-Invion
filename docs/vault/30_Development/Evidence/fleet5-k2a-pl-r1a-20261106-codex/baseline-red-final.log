@@ -1,0 +1,77 @@
+=== RUN   TestPLR1AActualBuildsThenBoundaryRefuses
+=== RUN   TestPLR1AActualBuildsThenBoundaryRefuses/own-interface-Certificate-Verify
+    pl_r1a_test.go:140: actual go build -p=1 ./internal/migrationcontext exit0; mutant body NOT executed
+    pl_r1a_test.go:147: want refusal=true, got <nil>
+=== RUN   TestPLR1AActualBuildsThenBoundaryRefuses/generic-constraint-Certificate-Verify
+    pl_r1a_test.go:140: actual go build -p=1 ./internal/migrationcontext exit0; mutant body NOT executed
+    pl_r1a_test.go:147: want refusal=true, got <nil>
+=== RUN   TestPLR1AActualBuildsThenBoundaryRefuses/instantiated-generic-interface
+    pl_r1a_test.go:140: actual go build -p=1 ./internal/migrationcontext exit0; mutant body NOT executed
+    pl_r1a_test.go:147: want refusal=true, got <nil>
+=== RUN   TestPLR1AActualBuildsThenBoundaryRefuses/own-interface-Time-Local
+    pl_r1a_test.go:140: actual go build -p=1 ./internal/migrationcontext exit0; mutant body NOT executed
+    pl_r1a_test.go:147: want refusal=true, got <nil>
+=== RUN   TestPLR1AActualBuildsThenBoundaryRefuses/pointer-write-foreign-Local
+    pl_r1a_test.go:140: actual go build -p=1 ./internal/migrationcontext exit0; mutant body NOT executed
+    pl_r1a_test.go:147: want refusal=true, got <nil>
+=== RUN   TestPLR1AActualBuildsThenBoundaryRefuses/pointer-address-allowed-read-UTC
+    pl_r1a_test.go:140: actual go build -p=1 ./internal/migrationcontext exit0; mutant body NOT executed
+    pl_r1a_test.go:147: want refusal=true, got <nil>
+=== RUN   TestPLR1AActualBuildsThenBoundaryRefuses/dot-import-foreign-Local-read
+    pl_r1a_test.go:140: actual go build -p=1 ./internal/migrationcontext exit0; mutant body NOT executed
+    pl_r1a_test.go:147: want refusal=true, got <nil>
+=== RUN   TestPLR1AActualBuildsThenBoundaryRefuses/dot-import-UTC-write
+    pl_r1a_test.go:140: actual go build -p=1 ./internal/migrationcontext exit0; mutant body NOT executed
+    pl_r1a_test.go:147: want refusal=true, got <nil>
+=== RUN   TestPLR1AActualBuildsThenBoundaryRefuses/selector-UTC-write-control
+    pl_r1a_test.go:140: actual go build -p=1 ./internal/migrationcontext exit0; mutant body NOT executed
+    pl_r1a_test.go:149: resolved gate refused=true after actual build exit0
+=== RUN   TestPLR1AActualBuildsThenBoundaryRefuses/foreign-interface-alias-transitive-embed
+    pl_r1a_test.go:140: actual go build -p=1 ./internal/migrationcontext exit0; mutant body NOT executed
+    pl_r1a_test.go:147: want refusal=true, got <nil>
+=== RUN   TestPLR1AActualBuildsThenBoundaryRefuses/interface-method-value-control
+    pl_r1a_test.go:140: actual go build -p=1 ./internal/migrationcontext exit0; mutant body NOT executed
+    pl_r1a_test.go:149: resolved gate refused=true after actual build exit0
+=== RUN   TestPLR1AActualBuildsThenBoundaryRefuses/embedded-concrete-promotion-control
+    pl_r1a_test.go:140: actual go build -p=1 ./internal/migrationcontext exit0; mutant body NOT executed
+    pl_r1a_test.go:149: resolved gate refused=true after actual build exit0
+=== RUN   TestPLR1AActualBuildsThenBoundaryRefuses/dot-import-clock-control
+    pl_r1a_test.go:140: actual go build -p=1 ./internal/migrationcontext exit0; mutant body NOT executed
+    pl_r1a_test.go:149: resolved gate refused=true after actual build exit0
+=== RUN   TestPLR1AActualBuildsThenBoundaryRefuses/package-function-value-control
+    pl_r1a_test.go:140: actual go build -p=1 ./internal/migrationcontext exit0; mutant body NOT executed
+    pl_r1a_test.go:149: resolved gate refused=true after actual build exit0
+=== RUN   TestPLR1AActualBuildsThenBoundaryRefuses/defer-clock-control
+    pl_r1a_test.go:140: actual go build -p=1 ./internal/migrationcontext exit0; mutant body NOT executed
+    pl_r1a_test.go:149: resolved gate refused=true after actual build exit0
+=== RUN   TestPLR1AActualBuildsThenBoundaryRefuses/closure-value-control
+    pl_r1a_test.go:140: actual go build -p=1 ./internal/migrationcontext exit0; mutant body NOT executed
+    pl_r1a_test.go:149: resolved gate refused=true after actual build exit0
+=== RUN   TestPLR1AActualBuildsThenBoundaryRefuses/unexported-own-interface-UTC-positive
+    pl_r1a_test.go:140: actual go build -p=1 ./internal/migrationcontext exit0; mutant body NOT executed
+    pl_r1a_test.go:149: resolved gate refused=false after actual build exit0
+=== RUN   TestPLR1AActualBuildsThenBoundaryRefuses/unexported-generic-constraint-positive
+    pl_r1a_test.go:140: actual go build -p=1 ./internal/migrationcontext exit0; mutant body NOT executed
+    pl_r1a_test.go:149: resolved gate refused=false after actual build exit0
+--- FAIL: TestPLR1AActualBuildsThenBoundaryRefuses (27.53s)
+    --- FAIL: TestPLR1AActualBuildsThenBoundaryRefuses/own-interface-Certificate-Verify (1.53s)
+    --- FAIL: TestPLR1AActualBuildsThenBoundaryRefuses/generic-constraint-Certificate-Verify (1.44s)
+    --- FAIL: TestPLR1AActualBuildsThenBoundaryRefuses/instantiated-generic-interface (1.55s)
+    --- FAIL: TestPLR1AActualBuildsThenBoundaryRefuses/own-interface-Time-Local (1.46s)
+    --- FAIL: TestPLR1AActualBuildsThenBoundaryRefuses/pointer-write-foreign-Local (1.43s)
+    --- FAIL: TestPLR1AActualBuildsThenBoundaryRefuses/pointer-address-allowed-read-UTC (1.56s)
+    --- FAIL: TestPLR1AActualBuildsThenBoundaryRefuses/dot-import-foreign-Local-read (1.47s)
+    --- FAIL: TestPLR1AActualBuildsThenBoundaryRefuses/dot-import-UTC-write (1.39s)
+    --- PASS: TestPLR1AActualBuildsThenBoundaryRefuses/selector-UTC-write-control (1.47s)
+    --- FAIL: TestPLR1AActualBuildsThenBoundaryRefuses/foreign-interface-alias-transitive-embed (1.46s)
+    --- PASS: TestPLR1AActualBuildsThenBoundaryRefuses/interface-method-value-control (1.62s)
+    --- PASS: TestPLR1AActualBuildsThenBoundaryRefuses/embedded-concrete-promotion-control (1.49s)
+    --- PASS: TestPLR1AActualBuildsThenBoundaryRefuses/dot-import-clock-control (1.49s)
+    --- PASS: TestPLR1AActualBuildsThenBoundaryRefuses/package-function-value-control (1.46s)
+    --- PASS: TestPLR1AActualBuildsThenBoundaryRefuses/defer-clock-control (1.46s)
+    --- PASS: TestPLR1AActualBuildsThenBoundaryRefuses/closure-value-control (1.47s)
+    --- PASS: TestPLR1AActualBuildsThenBoundaryRefuses/unexported-own-interface-UTC-positive (1.53s)
+    --- PASS: TestPLR1AActualBuildsThenBoundaryRefuses/unexported-generic-constraint-positive (1.45s)
+FAIL
+FAIL	github.com/egparadise/SaintVision-Invion/services/node-agent/internal/migrationcontext	28.951s
+FAIL

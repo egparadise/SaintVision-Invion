@@ -1,0 +1,101 @@
+{
+  "classification": "OWNER_LOCAL_LOW_REVISION_REVIEW_PENDING_NOT_CORE_OR_AUTH_ACCEPTANCE",
+  "rootGrant": "msg_37da39cf72b3",
+  "actualPredecessorReview": "49d0f904ee8b42d3c6d7b770a3514355c21309c9",
+  "base": "ff3169d360a707415d9b03484cf0cf3031f3912c",
+  "R1": {
+    "status": "IMPLEMENTED_LOCAL_PASS",
+    "proof": "Actual package Go/types object identities; exact current pure calls/references; aliases/ambient/signing/system-roots/certificate-Verify/native/bodyless/linkname/async/output negative cases and pure control; native check covers own+K1 source closure; real harmless assembly fixture builds then gate refuses."
+  },
+  "R2": {
+    "status": "IMPLEMENTED_LOCAL_PASS",
+    "proof": "Duplicate canonical scope/exact DER/SPKI across ordered PC2/PC4 refuses TRUST_UNKNOWN; two different valid synthetic Node certificates with same key tested; baseline red reproduced."
+  },
+  "R3": {
+    "status": "IMPLEMENTED_LOCAL_PASS",
+    "proof": "Every operation key/ID/migration/fence/hash/UTC interval checked; duplicate signed lease hash refused; actual two-operation control preserved; query+facts+new-op substitution with original kept and extra-op mutants refuse ORIGINAL before K1/public running-source gate; baseline red reproduced."
+  },
+  "R4": {
+    "status": "DOCUMENTED_HOLD_NOT_NEW_PRODUCER_OR_FORMAT",
+    "missingP02Joins": [
+      "actual review VERDICT+exact target/scope",
+      "CI event/correlation/run attempt",
+      "required jobs and every required-step conclusion",
+      "artifact ID/digest/bytes",
+      "binary VCS/toolchain/module/helper closure",
+      "Root exact reviewed source choice/equivalence decision"
+    ],
+    "presenceConsistencyChecksAreCompleteP02Verification": false,
+    "actualIndependentProvisioningAndAttestationContract": null,
+    "newFieldsWireOrABI": false
+  },
+  "R5": {
+    "status": "IMPLEMENTED_LOCAL_PASS",
+    "proof": "All explicit+inferred actual K1 bridge function/type objects; transitive full types/signatures/variadics/receivers/sorted named+pointer method sets; original input metric separate13/73/0; type-correct Packet/Report/CanonicalJSON/value+pointer MarshalJSON mutants detected; method declaration-order control stable; old G01G08R01R03 unchanged tests pass.",
+    "censusSHA256": "7eee6ccb07b55399adecdd1dc3bb704aeaebc655d5f3739f29a8e5a7aaa4bfdc"
+  },
+  "local": {
+    "classification": "NEW_LOW_REVISION_LOCAL_ONLY_NO_BORROWED_HOSTED_PROOF",
+    "runs": [
+      {
+        "argv": [
+          "go",
+          "test",
+          "-p",
+          "1",
+          "-count=1",
+          "-v",
+          "./internal/migrationcontext"
+        ],
+        "exit": 0,
+        "startedKST": "2026-11-06T15:07:02.605850+09:00",
+        "endedKST": "2026-11-06T15:07:32.528498+09:00",
+        "log": "full-unit.log"
+      },
+      {
+        "argv": [
+          "go",
+          "vet",
+          "-p",
+          "1",
+          "./internal/migrationcontext",
+          "./migrationverify"
+        ],
+        "exit": 0,
+        "startedKST": "2026-11-06T15:07:32.529722+09:00",
+        "endedKST": "2026-11-06T15:07:37.137831+09:00",
+        "log": "vet.log"
+      },
+      {
+        "argv": [
+          "go",
+          "env",
+          "CGO_ENABLED",
+          "GOVERSION"
+        ],
+        "exit": 0,
+        "startedKST": "2026-11-06T15:07:37.138191+09:00",
+        "endedKST": "2026-11-06T15:07:37.214669+09:00",
+        "log": "go-env.log"
+      }
+    ],
+    "topLevelPasses": 16,
+    "subtestPasses": 72,
+    "censusSHA256": "7eee6ccb07b55399adecdd1dc3bb704aeaebc655d5f3739f29a8e5a7aaa4bfdc",
+    "localRace": {
+      "execution": "NOT_RUN",
+      "reason": "CGO_DISABLED_NO_ENVIRONMENT_CHANGE",
+      "requiredFutureProof": "Root-selected FINAL combined Core actual hosted race, never de71 borrowed proof"
+    }
+  },
+  "productionPositiveFactory": "ABSENT",
+  "actualAuthBindings": null,
+  "clockMechanism": "HOLD",
+  "currentAPIs": "ABSENT",
+  "effects": "ABSENT",
+  "A01-A40": "NOT_RUN",
+  "newSourceHostedRace": "NOT_RUN_REQUIRED_ON_FINAL_ROOT_COMBINED_CORE",
+  "newExactDocs": "PENDING",
+  "actualDeltaReview": "PENDING_ROOT_QUEUED_AFTER_B7",
+  "noHelperWorkflowOrK1PinChanges": true
+}
