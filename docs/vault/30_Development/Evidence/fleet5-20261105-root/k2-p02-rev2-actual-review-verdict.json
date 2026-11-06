@@ -1,0 +1,140 @@
+{
+  "classification": "ACTUAL_INDEPENDENT_CLAUDE_NARROW_P02_REV2_CONTRACT_CANDIDATE_DELTA_REVIEW_NO_CODE_OR_TRUST_GRANT",
+  "reviewer": "Claude (Opus 5.5), one reviewer, no helpers/subagents",
+  "orca": {
+    "task": "task_2985fad8e54b",
+    "dispatch": "ctx_5a86c0b5814e",
+    "authorTask": "task_a95ef3d8ccce",
+    "authorDispatch": "ctx_ed23b4a777d0",
+    "authorAsk": "msg_2c68ae7fe2f3",
+    "rootGrant": "msg_d888d8ceb1e3",
+    "queuedAfter": "task_7143a8fe0491 / ctx_8d5d03bf83b3 (UI R3 source review 626ab0ed, committed and pushed: local HEAD == origin before this branch was created; Root Index latest_codex_card 'UIb48SourceAccept626 ... P02Rev2actual5a86active')"
+  },
+  "target": "58d7eb077efbcff5327ac298a39984fe1e39fdf1",
+  "base": "78468d0aec295c712dd1ea33bea1401d1d4939a4",
+  "targetBranch": "agent/codex/fleet5-k2-p02-registry-rev2-20261107",
+  "reviewBranch": "agent/claude/fleet5-k2-p02-r2-58d-review-20261107 (from exact 58d7eb07)",
+  "priorActualReview": "de4ef629220c626394a198f19aedf9aa7d2ac080 (REVISION_REQUIRED P02-M1 + L1-L5); its envelope acceptance retained, not reopened",
+  "scope": "ONLY the Rev2 delta for P02-M1 and P02-L1..L5 on Codex's own History 2026-11-07_FLEET5_K2_P02_registry_attestation_Rev2_Codex.md and Evidence fleet5-k2-p02-registry-attestation-rev2-20261107-codex, plus Root's RD-P02-R2-REGISTRATION-BYTES byte-origin question. Not K1/PL/merge/Core, not other providers, not any producer, wire, domain, ABI, key, anchor, D04 code or runtime.",
+  "rootFactsAcceptedNotRerun": "Root .work/p02r2-source-root-verified.json (02:29:11 KST): 51 own added docs only, base modes/blobs unchanged, productDiff 0, remote exact, manifest 50 inputs / 745154 B / 59643c8c..., 10 de4 originals byte-compared, 13 primary pins, 5 public component hashes, Docs 42259157167 / job 128034233863 all 19 SUCCESS, correlation FLEET5-K2-P02-REV2-58d7eb07-msg_d888d8ceb1e3. Reviewer did not re-query that run.",
+  "reviewerVerified": {
+    "remoteRef": "git fetch: origin/agent/codex/fleet5-k2-p02-registry-rev2-20261107 == FETCH_HEAD == 58d7eb07; 58d7eb07^ == 78468d0a; diff 78468..58d = 51 A, 0 M/D",
+    "primaryHashes": "scratch copies from target blobs: candidate_model.py e816e1f5..., candidate-envelope.schema.json 60d6c825..., policy-payload.schema.json 02d0b30f..., authority-scope.schema.json ccae1398...; schema_defs.schema(k) == each committed schema file",
+    "archivedOriginals": "V46: review-originals/*.raw (10) SHA256 multiset == the 10 actual de4 review blobs (native ls-tree -z object IDs + cat-file; no longpath/normalization change)",
+    "registrationBytes": "V44: commit 7ec1af26 blob at docs/vault/30_Development/Evidence/fleet5-20261105-root/bootstrap-v5-design-contract-registration-root.json = 15503 B, SHA256 876554dc..., contains no CR; exact LF->CRLF = a0a05427...",
+    "sourceComponents": "V45: graph from 8874b2df = 1034425 B / 7a87bcd8...; all 5 source-component-origins rows recomputed",
+    "k1Source": "58d tree: policy.go:43-61 policyData/provenance (41 leaves, 15 provenance), checkPolicyBindings policy.go:222-278 incl. measured runningData comparisons :272-277; k1_bridge.go:9-26 C2 via map json.Marshal (sorted keys, HTML escaping)"
+  },
+  "verdict": "REVISION_REQUIRED",
+  "verdictSummary": "Narrow. P02-M1 is closed in substance and L2-L5 are closed. L1 is NOT closed: the new effective-approval path has no acceptance predicate. An independently bound H3-EA statement whose effective verdict is a non-approval, or whose effective publication is relabelled to an ORIGINAL inherited review SHA, passes all 20 stages as SYNTHETIC_ALREADY_BOUND (V19/V20/V20b, preconditions bound, exact earlier-stage prefix). One new MEDIUM (P02R2-M1, one missing predicate set), one LOW (P02R2-L1, K1 two-sidedness of running comparisons), four INFO. No HIGH. Everything else is ACCEPT-ready for bounded design.",
+  "closedPriorFindings": {
+    "P02-M1": {
+      "status": "CLOSED_FOR_BOUNDED_DESIGN (projection subject to P02R2-M1 for Verifier.ReviewSHA/ReviewTargetSHA/ReviewScope only)",
+      "a_codec": "strict bounded canonical payload decoding on exact bytes + closed schema + strict C2 round-trip before any join (candidate_model.py:213-231). Reviewer V04-V13 (escape alias, exponent, -0, BOM, unknown self-asserted member, partial semanticPins, non-ASCII, unsorted C2 keys, lone surrogate, uppercase hex) each refuse FORMAT at 03_PAYLOAD/03_C2 behind a NEW valid already-bound envelope; owner P01-P13 agree.",
+      "b_joins": "selector/version/sourceSHA/executable/effective review/ordered ciRunIDs joins (candidate_model.py:243-249). Reviewer V14-V17: a SELF-CONSISTENT record (payload and facts changed together) still refuses at the independent coverage (05_REVIEWS), lifecycle version (06_VERSION), CI acquisition (05_CI) or H3 source (05_SOURCE); the payload cannot set its own expected value.",
+      "c_components": "all 8 payload-derived facts defined with exact bytes; reviewer-own Go-compatible C2 and raw-byte digests reproduce all 8 (V03); cohort digest == body.scopeSHA256 and swapping member scopes with every derived fact rebound in record AND source still refuses (V18). semanticPins/nodeKinds/graph/proof-slot/registration also join independent capsule.sourceConstants (candidate_model.py:256-261); owner D01-D07.",
+      "d_projection": "41 DTO leaves == c76 policyData leaves == payload-contract.json rows (V02). Integer CI IDs -> canonical decimal, primary run/job from capsule.primaryCI (not first green), ArtifactDigest=zip vs Verifier.ArtifactSHA256=executable, ApprovedReviewScope only from capsule vs ReviewScope from coverage, grant Status from independent H4 at GrantRegistrationID, exact UTC epochs (candidate_model.py:353-393; owner C01/C03/C04/Q01-Q11).",
+      "e_cases": "owner rows and reviewer V-rows run against NEW valid schema/canonical bytes with bound payload digest and signature tuple; reviewer re-checked those preconditions with its own code and the exact STAGES prefix for every bound row."
+    },
+    "P02-L1": {
+      "status": "NOT_CLOSED -> P02R2-M1",
+      "accepted": "ordered closed reviews[] preserves every original SHA/target/verdict/scope (owner R02-R05); complete capsule partition, reviewed/current byte equality, DIRECT iff original target == current source, coverage authority/purpose from capsule (V21-V23, owner R06-R11); K1 ReviewTargetSHA==SourceSHA preserved by projecting the effective current target; H3-EA root-effective-source-approval-candidate:1 stays ABSENT/UNREGISTERED/HOLD (contract.md:173-181, owner R01)."
+    },
+    "P02-L2": {
+      "status": "CLOSED",
+      "evidence": "one STAGES list drives evaluator, gate-order.json and test prefixes (V31: table == model, 14 reasons closed). Double faults V26-V30 return the declared first stage (STATUS before READBACK, TIME before READBACK, CI before ARTIFACT, SCOPE before payload join, 05_RUNNING before 07 primary CI); owner O01/O02 split the de4 R35 key-interval vs step5/6 cases honestly. Public refusal constant on every row."
+    },
+    "P02-L3": {
+      "status": "CLOSED",
+      "evidence": "all 144 schema patterns use ^...(?![\\s\\S]); V32 mutates EVERY string leaf of the valid envelope and payload with LF and CRLF (478 mutants): 0 schema leaks; V33 shows the old $ form accepts a trailing LF under python-jsonschema 4.26.0 and the new form refuses; V34 codec refuses an embedded LF at 03_ENVELOPE. Schema is not treated as the codec."
+    },
+    "P02-L4": {
+      "status": "CLOSED",
+      "evidence": "committed final report 97 rows / 97 distinct inputSHA256 / 4 controls / 93 refusals / 0 failures / 10 schema checks, every row earlierStagesExactlyPass, C01 != C02 input (V47; OWNER STATIC SYMBOLIC evidence only). attempt-01 (92 rows) and the smoke control are labelled non-final and not summed; base 100 rows / 98 distinct untouched. Reviewer-own fresh ticket + new expiry + new H5 + new issuedAt passes with unchanged stable identity and different bytes (V35/V36); a correct echo cannot replace a stale independent current head (V41) or missing lifecycle/H5 (owner H01/H02)."
+    },
+    "P02-L5": {
+      "status": "CLOSED",
+      "evidence": "requestBindingSHA256 = SHA256(C2(request_projection)) formed only from capsule/lifecycle/ticket/SHA256(exact H5 bytes) (candidate_model.py:157-163, 331-335); old signed response into the new ticket/H5 request refuses REPLAY even with both signatures bound (V37); correct echo with foreign-source, expired or UID-0 H5 refuses INSTALLATION/TIME (V38-V40); owner H03-H12. Legal fresh repeat preserved (V35). Signature table is an already-bound synthetic hypothesis, no Ed25519/X509/OS/clock/provider execution."
+    }
+  },
+  "findings": [
+    {
+      "id": "P02R2-M1",
+      "severity": "MEDIUM",
+      "title": "Effective source approval has no acceptance predicate: any verdict, and an original review SHA, are accepted as the current-source approval",
+      "source": "candidate_model.py:263-286 (_reviews checks effective shape, current target and equality to facts only; nothing tests eff['verdict'] or eff['publicationSHA'] against an independent expectation), :175-179 (closed capsule has approvedReviewScope/approvedReviewOutcomes for ORIGINAL reviews only), :369-378 (projection uses eff.publicationSHA/targetSourceSHA/scopeId); contract.md:173-181 ('a DIFFERENT independently authorized publication ... actual verdict'); fact-origins.json effectiveReviewVerdict row; K1 policyData has no verdict field, so nothing downstream catches it",
+      "counterexamples": [
+        "V19: H3-EA coverage statement with effective.verdict='SYNTHETIC_REVISION_REQUIRED_NOT_APPROVED', facts/source rebound consistently, new current head and request: SYNTHETIC_ALREADY_BOUND, all 20 stages passed.",
+        "V20: effective.publicationSHA set to original DIRECT review 2's SHA (verifier.reviewSHA and facts rebound): SYNTHETIC_ALREADY_BOUND although contract.md:173 requires a different publication.",
+        "V20b: effective.publicationSHA set to original INHERITED review 1 (raw target a1.. != current source b1..): SYNTHETIC_ALREADY_BOUND; the projection carries Verifier.ReviewSHA=a2.. (that original review) with Provenance.ReviewTargetSHA=b1.., i.e. K1 would read an old review as targeting current source - the raw-target relabel L1 forbids.",
+        "V24: capsule keys provide no expected effective verdict/publication."
+      ],
+      "whyNotH3Prerequisite": "This is the candidate's own acceptance semantics for the representation it introduced (L1 CONCRETE CHOICE), not an authority that a future producer supplies. A real H3-EA can authentically publish a non-approval; the model must refuse it.",
+      "blocks": "Closure of P02-L1 and the effective-approval part of the D04 projection (Verifier.ReviewSHA, Provenance.ReviewTargetSHA/ReviewScope). Does NOT block the envelope/payload codec, C2, joins, components or strict-signature parts.",
+      "minimalCorrection": "(1) Add an independently provisioned capsule expectation for the effective approval (e.g. closed approvedEffectiveVerdicts or the exact accepted verdict for root-effective-source-approval-candidate:1) and refuse PROVENANCE at 05_REVIEWS unless eff.verdict matches; (2) refuse when eff.publicationSHA equals any reviews[].reviewSHA or parts[].reviewSHA; (3) add the effectiveReviewVerdict/effective publication expectation origin to payload-contract.json/fact-origins.json; (4) add rebased already-bound negatives equivalent to V19/V20/V20b (first failure 05_REVIEWS, exact earlier prefix) plus the benign C01 control. No K1/schema-pin/contract-28 change."
+    },
+    {
+      "id": "P02R2-L1",
+      "severity": "LOW",
+      "title": "Provenance receipt/runtime-lock/linked-closure are projected from H5, making K1's approved-vs-measured comparison same-source; measured runningData projection is undefined",
+      "source": "candidate_model.py:370-372 (Provenance.RuntimeLockSHA256/InstallationReceiptSHA256/LinkedClosureSHA256 = h5[...]); contract.md:217-221; payload-contract.json covers the 41 policyData leaves but not checkPolicyBindings' second argument runningData; policy.go:272-277 compares measured.X with pr.X",
+      "counterexample": "V25 (design observation, no unsafe positive): with measured runningData necessarily from H5, K1's measured.InstallationReceiptSHA256/RuntimeLockSHA256/LinkedClosureSHA256 != pr.X checks compare H5 with H5. Safety currently rests only on P02 _running (candidate_model.py:315-317, owner H06/H10/H11), which joins H5 to the approved H3 facts - so the model is safe, but the future K1 defense-in-depth becomes vacuous, the H5-to-both-sides analogue of the forbidden facts-to-both-sides pattern.",
+      "minimalCorrection": "Project those three Provenance fields from the independently approved H3 installation facts (installationReceiptSHA256, runtimeLockSHA256, linkedClosureSHA256), keep RunningExecutableSHA256 from H5 as Root specified, and add a five-row runningData table (ExecutableSHA256, InstallationReceiptSHA256, SourceSHA, RuntimeLockSHA256, LinkedClosureSHA256 from H5). Alternatively state explicitly that K1's comparisons are redundant and P02 05_RUNNING is the sole gate."
+    }
+  ],
+  "info": [
+    {
+      "id": "P02R2-I1",
+      "text": "Independent private snapshots are not closed-typed: lifecycle.floor=true (V42) and ticket.issuedAt=true (V43) pass because Python bool is int; lifecycle/ticket key sets are open. The D04 private already-authenticated types must be closed, signed-width integers without bool. Not blocking for the symbolic design."
+    },
+    {
+      "id": "P02R2-I2",
+      "text": "rootChoiceSHA256 equals coverage.evidenceRawSHA256, a value declared inside the already-bound coverage object, not recomputed over raw approval bytes; a real H3-EA acquirer must compute it over the exact authenticated raw bytes."
+    },
+    {
+      "id": "P02R2-I3",
+      "text": "sourceTreeSHA256 is not derived from or joined to capsule.sourceParts; partition completeness is by capsule decree. Acceptable as stated in contract.md:162-171; name the tree-to-partition derivation if a future producer computes one."
+    },
+    {
+      "id": "P02R2-I4",
+      "text": "lifecycle status/keyStatus/sourceStatus/coverageStatus/receiptStatus are unkeyed flags, bound transitively through currentRecordIdentity and capsuleSHA256; a real H4 should key each status to its subject digest."
+    }
+  ],
+  "registrationByteOrigin": {
+    "decision": "RD-P02-R2-REGISTRATION-BYTES = HOLD_ACTUAL_AUTHENTICATION/REGISTRATION (Root)",
+    "reviewerAssessment": "Sound as a PROPOSED independently authenticated acquirer contract: (immutable commit 7ec1af26, exact path, blob 876554dc, fixed LF->CRLF serialization) deterministically yields the registered a0 bytes (V44) and the model refuses any other bytes, including LF-normalized ones (owner D06). It is a public byte-reconstruction fact only: it proves byte equality, not that the a0 registration was produced from that blob, not delivery of the original captured artifact, and not generic normalization permission. Before use, H3 must authenticate both the source identity and that exact serialization recipe as the registration's origin (or supply the original raw bytes). Old raw pin unchanged; no new source/domain/schema/Root key registered by this review.",
+    "graph": "exact 8874b2df object, not an assumed 78468-ancestry file (V45)"
+  },
+  "factProducersAndRemainingObligations": {
+    "capsule/bootstrap/issuer authorization incl. new effective-approval expectation": "Root custody + bootstrap loader; H1/H2 NULL/HOLD",
+    "source/review/CI/artifact": "future independently authorized H3 acquirer; NULL/HOLD",
+    "effective approval": "H3-EA root-effective-source-approval-candidate:1 ABSENT/UNREGISTERED/HOLD; named missing producer, not implied by any symbolic control",
+    "registration bytes": "RD-P02-R2-REGISTRATION-BYTES HOLD",
+    "lifecycle/ticket/clock": "H4 NULL/HOLD",
+    "receipt/running measurement": "H5 NULL/HOLD; registry echo has zero authentication weight",
+    "antirollback floor": "H6 NULL/HOLD",
+    "linked entrypoint": "H7 NULL/HOLD"
+  },
+  "limitations": [
+    "Symbolic review only: no Ed25519/X509/OS/provider/clock/runtime authentication, no producer executed (none exists). Owner test_contract.py and generators NOT executed (they write owner Evidence); the model, schema_defs and fixture_data were imported from byte-verified scratch copies of the target blobs.",
+    "Owner rows are counted as OWNER STATIC SYMBOLIC evidence, never as reviewer proof; reviewer proof is the 48 V-rows only.",
+    "Root-verified Docs/job/manifest facts accepted, not re-queried. No Core/Go/type-census/model-suite rerun, no Node/browser/full CI, no host/SSH/Docker/PG/OS action."
+  ],
+  "smallestNextSeam": "Codex P02 Rev3 fix-only on its own Evidence/History: close P02R2-M1 (effective verdict expectation + publication distinctness + 3 rebased negatives) and optionally P02R2-L1 (re-source three Provenance fields, add runningData table); then ONE narrow Claude delta check limited to those rows. After that Root may separately grant only the smallest pure INTERNAL D04 codec/projection/strict-signature seam on private already-authenticated types with default-refusal composition. If Root wants to start D04 earlier, the envelope + payload codec + C2 + joins/components + strict-signature parts are unaffected by P02R2-M1; only the effective-approval projection is. No factory, port, provider, key, current, readclock, installer or effect grant; reviewer self-grants nothing.",
+  "stillHold": "Actual H1-H7 NULL/HOLD; H3-EA and RD registration bytes HOLD; raw7 UNREGISTERED; A01-A40 NOT_RUN; whole K2/fleet INCOMPLETE. Accepted source/type/raw7/28 contracts/7 closure/13 types 73 baseline not reopened.",
+  "probes": {
+    "driver": "reviewer_p02r2_probes.py.txt",
+    "result": "reviewer-p02r2-probes-result.json",
+    "log": "reviewer-p02r2-probes.log.txt",
+    "count": 48,
+    "observedDiffersFromContract": [
+      "V19",
+      "V20",
+      "V20b",
+      "V24",
+      "V25",
+      "V42",
+      "V43"
+    ]
+  }
+}

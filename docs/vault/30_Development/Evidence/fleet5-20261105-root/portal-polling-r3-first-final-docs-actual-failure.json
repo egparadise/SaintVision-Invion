@@ -1,0 +1,92 @@
+{
+  "atKST": "2026-11-07T03:34:11+09:00",
+  "operator": "Root Codex",
+  "source": "b29a88174b3e505a1c96de7ae2452d2e6f5deb8a",
+  "run": 42267656218,
+  "job": 128063673399,
+  "conclusion": "failure",
+  "correlation": "PORTAL-R3-FINAL-b29a8817-Root-0ff7012aa542491789d8c4dc9e7d40fa",
+  "actualSteps": [
+    {
+      "name": "Set up job",
+      "conclusion": "success"
+    },
+    {
+      "name": "Run actions/checkout@v4",
+      "conclusion": "success"
+    },
+    {
+      "name": "Run actions/setup-python@v5",
+      "conclusion": "success"
+    },
+    {
+      "name": "Run python -m pip install -r requirements-docs.txt",
+      "conclusion": "success"
+    },
+    {
+      "name": "Run python tools/check_docs.py",
+      "conclusion": "success"
+    },
+    {
+      "name": "Repository path citations exist (ratchet; baseline may only shrink)",
+      "conclusion": "failure"
+    },
+    {
+      "name": "Run python tools/check_contract_bindings.py",
+      "conclusion": "skipped"
+    },
+    {
+      "name": "Run python tools/check_frontend_integrity.py",
+      "conclusion": "skipped"
+    },
+    {
+      "name": "Report fixture producer reachability",
+      "conclusion": "skipped"
+    },
+    {
+      "name": "Report client route coverage (report-only; promote per 검증검사도구_목록)",
+      "conclusion": "skipped"
+    },
+    {
+      "name": "Run actions/upload-artifact@v4",
+      "conclusion": "success"
+    },
+    {
+      "name": "Run python tools/test_sync.py",
+      "conclusion": "skipped"
+    },
+    {
+      "name": "Run python tools/check_ontology_generation.py",
+      "conclusion": "skipped"
+    },
+    {
+      "name": "Run python tools/check_ontology.py",
+      "conclusion": "skipped"
+    },
+    {
+      "name": "Build documentation bundle",
+      "conclusion": "skipped"
+    },
+    {
+      "name": "Run actions/upload-artifact@v4",
+      "conclusion": "skipped"
+    },
+    {
+      "name": "Post Run actions/setup-python@v5",
+      "conclusion": "skipped"
+    },
+    {
+      "name": "Post Run actions/checkout@v4",
+      "conclusion": "success"
+    },
+    {
+      "name": "Complete job",
+      "conclusion": "success"
+    }
+  ],
+  "cause": "Two newly broken repository path references in author History. Local check_docs alone did not cover path-ratchet. Root first-publication preflight omitted the local path-ratchet gate.",
+  "resolution": "Same author fixes only own two reports; same accepted product bytes. Root runs nine local checks before corrected nonforce push and one new exact-SHA Docs. Baseline not raised, old failure and skipped steps preserved.",
+  "correctedFinal": "f81768b61a92bc01f40c39bb662e36bfb7967424",
+  "correctedDocs": 42270929179,
+  "correctedAll19Success": true
+}

@@ -1,0 +1,16 @@
+{
+  "atKST": "2026-11-07T03:34:11+09:00",
+  "card": "FLEET5-K2-P02-REV3-FIX-ONLY-20261107",
+  "base": "58d7eb077efbcff5327ac298a39984fe1e39fdf1",
+  "authorTask": "task_a95ef3d8ccce",
+  "authorDispatch": "ctx_ed23b4a777d0",
+  "answeredQuestion": "msg_2c68ae7fe2f3",
+  "RootReply": "msg_0625f6605f95",
+  "actualReview": "973b6f8cca4c4a2f3dee698d52b93230ae2e8e4a",
+  "Docs": 42267816794,
+  "actualVerdict": "REVISION_REQUIRED",
+  "scope": "Root verifies actual independent review 973b6f8cca4c4a2f3dee698d52b93230ae2e8e4a / Docs42267816794 job128064233136 exact head/ref/manual/docs.yml/attempt1/correlation/all19 SUCCESS. Verdict REVISION_REQUIRED, bounded P02R2-M1 MEDIUM and P02R2-L1 LOW; all other prior closure retained. Continue SAME author Task a95/ctx_ed23b4a777d0, fix-only Rev3 from immutable58d7eb077efbcff5327ac298a39984fe1e39fdf1 on separate own branch/workspace via managed Orca if needed, no reinitialization/force/reset. Own History/Evidence only, no product code, D04/factory/provider/port/install/keys/Root auth granted.\nClose P02R2-M1 exactly: independently provisioned closed capsule expected effective verdict(s); refuse PROVENANCE at05_REVIEWS if effective verdict does not match; independently ensure effective publication differs from EVERY original reviews[].reviewSHA and parts[].reviewSHA; document origins of both expectations and payload-contract/fact-origin joins. Add separately rebased already-bound negatives equivalent actual reviewer V19/V20/V20b, exact earlier-stage prefix and benign C01 control, keep original review identities/targets/verdicts unchanged. Close L1 too: Provenance receipt/runtimeLock/linkedClosure from independently approved H3 installation facts; RunningExecutable from H5 unchanged; five-row measured runningData projection H5 Executable/Receipt/Source/RuntimeLock/LinkedClosure. Prove K1 comparisons retain two sources; no unsafe positive changes. Preserve all known H3-EA actual ABSENT/UNREGISTERED/HOLD and RD registration-byte HOLD; the byte recipe is fact-only not delivery/authentication.\nArchive the actual10 review docs unchanged and bind exact hashes, source version/base, owner/reviewer attribution, all original attempts. No retesting unaffected full suites/Core/Go/census/contracts, no new schema pin/contract28/type-baseline changes. INFO I1-I4 stay explicit future producer obligations; no scope expansion. Local meaningful symbolic/doc gates, normal commit/push, one exact Docs for frozen candidate, own report, official sync CHECK only before/after state hash unchanged. Then ask Root exact source/final SHAs, manifest hashes, CI correlation/allsteps, and whether one narrowly queued actual Claude delta check may proceed after the existing queue. Root will supervise that automatically. No request to user, no self-acceptance or fake producer/runtime/global100.\n",
+  "D04OrFactoryOrProducerGranted": false,
+  "actualH1H7": "NULL_HOLD",
+  "RDRegistrationBytes": "HOLD_BYTE_FACT_ONLY"
+}

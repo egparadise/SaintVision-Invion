@@ -1,0 +1,20 @@
+{
+  "atKST": "2026-11-07T03:34:11+09:00",
+  "decision": "ELIGIBLE_AFTER_THIS_ROOT_CHECKPOINT_CI_SYNC_AND_FRESH_PROCESS_PREFLIGHT",
+  "source": "b48c2c4492f8aea4b55c33161733a9a6fb9eed8c",
+  "qualifiedFinal": "f81768b61a92bc01f40c39bb662e36bfb7967424",
+  "qualifiedFinalDocs": 42270929179,
+  "independentSourceReview": "626ab0eda10c22e8539546db8d9639092d88f7e7",
+  "artifactReceipt": "portal-polling-r3-b48-artifact-root-verification.json",
+  "artifactSHA256": "7212b4870e3a142b8c44dc2629d5e6643401ae9e1d187d6234ecdf4059fd671d",
+  "builtFiles": 13,
+  "runtimePublicAuthConfigSHA256": "e041468a55ca5aa4e68f069f8b86d7b35c421be58f1e1232cd65e1c4134e83fa",
+  "ownedOldPreviewPID": 62056,
+  "oldOwnedProcessReadOnlyVerifiedAtKST": "2026-11-07T03:14:06+09:00",
+  "rollbackBuildBytesVerified": true,
+  "replacementScope": "Only the owned loopback3100 preview; proxy both /v1 and /healthz to existing8080; no-store. Preserve backend/DB/IdP, original public runtime config, all business containers.",
+  "nextVerification": "13 HTTP file hashes, health JSON200, anonymous real API401, protected listener identities, post-launch lifetime; browser/TLS/SSO remain separate.",
+  "deployed": false,
+  "actualFiveNodeAcceptance": false,
+  "wholeProgramComplete": false
+}

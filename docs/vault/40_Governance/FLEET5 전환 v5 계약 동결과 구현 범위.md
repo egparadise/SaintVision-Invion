@@ -1,11 +1,11 @@
 ---
 doc_id: "GOV-FLEET5-BOOTSTRAP-V5-FREEZE-CODE-SCOPE-20261106"
 title: "FLEET5 전환 v5 계약 동결과 구현 범위"
-version: "1.0.20"
+version: "1.0.21"
 status: "active"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-11-07T02:57:44+09:00"
+updated: "2026-11-07T03:34:11+09:00"
 source_of_truth: "Git"
 ---
 
@@ -196,3 +196,8 @@ ea276 Core42220638304의 필수42+16단계와 artifact XML/Go로그를 Root가 �
 ## P02 Rev2 고정 후보와 byte-origin 인증 보류
 
 source58d7eb07/Docs42259157167은51고유추가문서·50입력hash·10de4원문copy·5publicsourcecomponent를Root가대조했다. Root는공개7ec1 LF15503B에서고정LFtoCRLF로기존a0rawhash가복원된다는bytefact만확인했고RD-P02-R2-REGISTRATION-BYTES의실제acquirer/recipe인증·H3/H3EA등록은HOLD로결정했다. 원본rawpin과기존계약은불변이며일반정규화나새Rootkey/producer를허가하지않는다. 실제UIreviewer종료·해제후Claude task_2985fad8e54b/ctx_5a86c0b5814e의좁은Rev2계약검토를시작했다. D04순수내부codec/projection/strictsignature의첫코드범위도실제판정후Root의별도구체cut전까지미승인이다. 모든H1-H7actualNULLHOLD/raw7UNREGISTERED/40실행미수행을유지한다. 상세는k2-p02-rev2-byte-origin-root-decision.json이다.
+
+
+## P02 Rev2 실제 판정과 Rev3 한정 보완
+
+실제973b6 검토는 기존 payload codec/C2/joins/components와 L2-L5를 닫았지만 effective approval의 독립적 승인 verdict 기대와 원래 review SHA와의 구별 누락 Medium1을 확인했다. LOW1의 승인/측정 이중 출처도 같은 Rev3 범위에서 보완한다. Root msg_0625f6605f95의 정확한 own History/Evidence fix-only 범위는 k2-p02-rev3-fix-only-root-scope.json에 있다. D04·factory·실제 producer/acquirer·key·runtime·effects는 별도 실제 검토와 Root cut 전까지 미승인이다. H1-H7/H3EA NULLHOLD, raw7 UNREGISTERED, RD bytes 사실만·인증 HOLD,40실행미수행을 유지한다.

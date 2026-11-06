@@ -1,0 +1,40 @@
+{
+  "atKST": "2026-11-07T03:11:32+09:00",
+  "target": "58d7eb077efbcff5327ac298a39984fe1e39fdf1",
+  "actualReview": "973b6f8cca4c4a2f3dee698d52b93230ae2e8e4a",
+  "branch": "agent/claude/fleet5-k2-p02-r2-58d-review-20261107",
+  "Docs": 42267816794,
+  "job": 128064233136,
+  "correlation": "FLEET5-K2-P02-REV2-REVIEW-973b6f8c-task_2985fad8e54b",
+  "rootVerifiedExactHeadRefEventPathAttemptAll19StepsSuccess": true,
+  "remoteExact": true,
+  "uniqueAddedReviewDocs": 10,
+  "actualWorkerDone": "msg_3bd6adc50ca8",
+  "verdict": "REVISION_REQUIRED",
+  "findings": [
+    {
+      "id": "P02R2-M1",
+      "severity": "MEDIUM",
+      "title": "Effective source approval has no acceptance predicate: any verdict, and an original review SHA, are accepted as the current-source approval",
+      "source": "candidate_model.py:263-286 (_reviews checks effective shape, current target and equality to facts only; nothing tests eff['verdict'] or eff['publicationSHA'] against an independent expectation), :175-179 (closed capsule has approvedReviewScope/approvedReviewOutcomes for ORIGINAL reviews only), :369-378 (projection uses eff.publicationSHA/targetSourceSHA/scopeId); contract.md:173-181 ('a DIFFERENT independently authorized publication ... actual verdict'); fact-origins.json effectiveReviewVerdict row; K1 policyData has no verdict field, so nothing downstream catches it",
+      "counterexamples": [
+        "V19: H3-EA coverage statement with effective.verdict='SYNTHETIC_REVISION_REQUIRED_NOT_APPROVED', facts/source rebound consistently, new current head and request: SYNTHETIC_ALREADY_BOUND, all 20 stages passed.",
+        "V20: effective.publicationSHA set to original DIRECT review 2's SHA (verifier.reviewSHA and facts rebound): SYNTHETIC_ALREADY_BOUND although contract.md:173 requires a different publication.",
+        "V20b: effective.publicationSHA set to original INHERITED review 1 (raw target a1.. != current source b1..): SYNTHETIC_ALREADY_BOUND; the projection carries Verifier.ReviewSHA=a2.. (that original review) with Provenance.ReviewTargetSHA=b1.., i.e. K1 would read an old review as targeting current source - the raw-target relabel L1 forbids.",
+        "V24: capsule keys provide no expected effective verdict/publication."
+      ],
+      "whyNotH3Prerequisite": "This is the candidate's own acceptance semantics for the representation it introduced (L1 CONCRETE CHOICE), not an authority that a future producer supplies. A real H3-EA can authentically publish a non-approval; the model must refuse it.",
+      "blocks": "Closure of P02-L1 and the effective-approval part of the D04 projection (Verifier.ReviewSHA, Provenance.ReviewTargetSHA/ReviewScope). Does NOT block the envelope/payload codec, C2, joins, components or strict-signature parts.",
+      "minimalCorrection": "(1) Add an independently provisioned capsule expectation for the effective approval (e.g. closed approvedEffectiveVerdicts or the exact accepted verdict for root-effective-source-approval-candidate:1) and refuse PROVENANCE at 05_REVIEWS unless eff.verdict matches; (2) refuse when eff.publicationSHA equals any reviews[].reviewSHA or parts[].reviewSHA; (3) add the effectiveReviewVerdict/effective publication expectation origin to payload-contract.json/fact-origins.json; (4) add rebased already-bound negatives equivalent to V19/V20/V20b (first failure 05_REVIEWS, exact earlier prefix) plus the benign C01 control. No K1/schema-pin/contract-28 change."
+    },
+    {
+      "id": "P02R2-L1",
+      "severity": "LOW",
+      "title": "Provenance receipt/runtime-lock/linked-closure are projected from H5, making K1's approved-vs-measured comparison same-source; measured runningData projection is undefined",
+      "source": "candidate_model.py:370-372 (Provenance.RuntimeLockSHA256/InstallationReceiptSHA256/LinkedClosureSHA256 = h5[...]); contract.md:217-221; payload-contract.json covers the 41 policyData leaves but not checkPolicyBindings' second argument runningData; policy.go:272-277 compares measured.X with pr.X",
+      "counterexample": "V25 (design observation, no unsafe positive): with measured runningData necessarily from H5, K1's measured.InstallationReceiptSHA256/RuntimeLockSHA256/LinkedClosureSHA256 != pr.X checks compare H5 with H5. Safety currently rests only on P02 _running (candidate_model.py:315-317, owner H06/H10/H11), which joins H5 to the approved H3 facts - so the model is safe, but the future K1 defense-in-depth becomes vacuous, the H5-to-both-sides analogue of the forbidden facts-to-both-sides pattern.",
+      "minimalCorrection": "Project those three Provenance fields from the independently approved H3 installation facts (installationReceiptSHA256, runtimeLockSHA256, linkedClosureSHA256), keep RunningExecutableSHA256 from H5 as Root specified, and add a five-row runningData table (ExecutableSHA256, InstallationReceiptSHA256, SourceSHA, RuntimeLockSHA256, LinkedClosureSHA256 from H5). Alternatively state explicitly that K1's comparisons are redundant and P02 05_RUNNING is the sole gate."
+    }
+  ],
+  "D04Granted": false
+}

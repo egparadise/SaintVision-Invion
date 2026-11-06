@@ -1,0 +1,13 @@
+{
+  "atKST": "2026-11-07T03:26:25+09:00",
+  "reason": "Two pre-existing baseline references to ignored local dist appear stale only because author workspace contains previous local build output. No new broken citation remained.",
+  "source": "f81768b61a92bc01f40c39bb662e36bfb7967424",
+  "attempt1": {
+    "docs": 0,
+    "ontology": 0,
+    "pathRatchet": 1
+  },
+  "pushOrCIHadOccurred": false,
+  "baselineOrIgnoredBuildChanged": false,
+  "next": "Run same required gates on clean Orca-managed exact Git snapshot, preserve local files and original baseline."
+}

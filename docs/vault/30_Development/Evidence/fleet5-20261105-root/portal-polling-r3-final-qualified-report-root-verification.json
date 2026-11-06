@@ -1,0 +1,43 @@
+{
+  "atKST": "2026-11-07T03:27:50+09:00",
+  "operator": "Root Codex",
+  "source": "b48c2c4492f8aea4b55c33161733a9a6fb9eed8c",
+  "final": "f81768b61a92bc01f40c39bb662e36bfb7967424",
+  "priorFinal": "b29a88174b3e505a1c96de7ae2452d2e6f5deb8a",
+  "priorFinalDocs": 42267656218,
+  "priorFinalDocsConclusion": "FAILURE_PATH_CITATIONS_EXIT1_REMAINING_GATES_SKIPPED",
+  "branch": "agent/gemini/portal-refresh-polling-r3-20261106",
+  "onlyModifiedOwnDocs": [
+    "docs/vault/30_Development/Evidence/portal-refresh-fleet-ui-20261106-gemini/verification-r3.json",
+    "docs/vault/30_Development/History/2026-11-07_01-45-00_KST_PORTAL_REFRESH_POLLING_R3_Gemini.md"
+  ],
+  "finalParentIsPriorFinal": true,
+  "finalNonDocsEqualSource": true,
+  "expectedReportHashesMatched": {
+    "docs/vault/30_Development/Evidence/portal-refresh-fleet-ui-20261106-gemini/verification-r3.json": "a790334269e80e7c82602a8dc01ee6769434364d95b6037a4caa8ce9e063ae40",
+    "docs/vault/30_Development/History/2026-11-07_01-45-00_KST_PORTAL_REFRESH_POLLING_R3_Gemini.md": "b9cc1f4bfda769e74631cc2d2448ed6a6846ebe11fd1528ff558d89fe9443fa1"
+  },
+  "remoteExact": true,
+  "normalNonForcePush": true,
+  "rootLocalGateExits": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+  ],
+  "sourceReview": "626ab0eda10c22e8539546db8d9639092d88f7e7",
+  "sourceVerdict": "SOURCE_AXIS_ACCEPT",
+  "finalDocs": 42270929179,
+  "deployed": false,
+  "verifiedAtKST": "2026-11-07T03:28:29+09:00",
+  "finalDocsJob": 128074989117,
+  "correlation": "PORTAL-R3-CORRECTED-FINAL-f81768b6-Root-3e6a46a224894b25b4f825d4a68417ae",
+  "watchExit": 0,
+  "exactHeadRefEventPathAttemptCorrelationAll19Success": true,
+  "qualifiedReportDelivery": true
+}

@@ -1,0 +1,20 @@
+{
+  "atKST": "2026-11-07T03:36:34+09:00",
+  "operator": "Root Codex",
+  "source": "f81768b61a92bc01f40c39bb662e36bfb7967424",
+  "originalPath": "docs/vault/30_Development/History/2026-11-07_01-45-00_KST_PORTAL_REFRESH_POLLING_R3_Gemini.md",
+  "originalGitURL": "https://github.com/egparadise/SaintVision-Invion/blob/f81768b61a92bc01f40c39bb662e36bfb7967424/docs/vault/30_Development/History/2026-11-07_01-45-00_KST_PORTAL_REFRESH_POLLING_R3_Gemini.md",
+  "archivePath": "docs/vault/30_Development/Evidence/fleet5-20261105-root/portal-polling-r3-final-author-history.md.raw",
+  "originalAndArchivedSHA256": "b9cc1f4bfda769e74631cc2d2448ed6a6846ebe11fd1528ff558d89fe9443fa1",
+  "originalAuthorSourceUnchanged": true,
+  "authorFinalDocsStillSuccess": 42270929179,
+  "rootFirstAggregationAttempt": {
+    "docsExit": 0,
+    "ontologyExit": 0,
+    "pathsExit": 1,
+    "committedOrPushed": false
+  },
+  "cause": "Exact author Markdown refers to new source test absent from this documentation-only aggregation branch; the reference is valid at the author final SHA, as its successful hosted CI proved.",
+  "resolution": "Keep raw source report bytes as Evidence attachment and link canonical immutable Git source from Root own History. No baseline raise, source/test import, or author rewrite.",
+  "productChanged": false
+}
