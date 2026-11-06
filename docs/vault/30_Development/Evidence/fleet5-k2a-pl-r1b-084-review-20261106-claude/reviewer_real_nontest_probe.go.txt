@@ -1,0 +1,7 @@
+package migrationcontext
+
+import clock "time"
+
+type plReviewLaunder clock.Location
+
+func plReviewRealProbe() { *(*plReviewLaunder)(clock.UTC) = plReviewLaunder{} }

@@ -1,0 +1,17 @@
+"""Derive the fix-sketch probe variant: N1..N6 must now refuse with the sketch
+reason; every other case keeps its 484 expectation."""
+import re
+import sys
+
+src, dst = sys.argv[1], sys.argv[2]
+s = open(src, encoding="utf-8").read()
+s = s.replace("func TestClaudePLR1BReviewProbes(", "func TestClaudePLR1BFixSketchProbes(")
+count = 0
+for n in ["N1", "N2", "N3", "N4", "N5", "N6"]:
+    pat = re.compile(r'(\{"' + n + r'-[^"]*", ")ESCAPE(", `.*?`, )""\}', re.S)
+    s, k = pat.subn(r'\1FIXED\2"pointee-changing pointer conversion forbidden:"}', s)
+    count += k
+if count != 6:
+    raise SystemExit("expected 6 substitutions, got %d" % count)
+open(dst, "w", encoding="utf-8", newline="\n").write(s)
+print("variant written", count)

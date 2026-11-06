@@ -1,0 +1,33 @@
+"""Reviewer fix SKETCH (scratch fixture only, never committed to product/test
+source): refuse pointer-type conversions that change the pointee type, so a
+foreign pointee cannot be re-typed as an own named type before a write."""
+import sys
+from pathlib import Path
+
+p = Path(sys.argv[1])
+b = p.read_bytes()
+old = b"""				if checked.info.Types[call.Fun].IsType() {
+					return true
+				}
+"""
+new = b"""				if tv := checked.info.Types[call.Fun]; tv.IsType() {
+					// Reviewer sketch: a pointer conversion must keep the identical
+					// pointee type; (*Own)(foreignPtr) / (*OwnArray)(slice) would
+					// otherwise launder the type-based pointee fence.
+					if dst, ok := types.Unalias(tv.Type).Underlying().(*types.Pointer); ok && len(call.Args) == 1 {
+						at := checked.info.TypeOf(call.Args[0])
+						if b, ok := at.(*types.Basic); !ok || b.Kind() != types.UntypedNil {
+							src, ok := types.Unalias(at).Underlying().(*types.Pointer)
+							if !ok || !types.Identical(src.Elem(), dst.Elem()) {
+								failure = fmt.Errorf("pointee-changing pointer conversion forbidden: %s", types.TypeString(tv.Type, nil))
+								return false
+							}
+						}
+					}
+					return true
+				}
+"""
+if b.count(old) != 1:
+    raise SystemExit("anchor not found exactly once")
+p.write_bytes(b.replace(old, new, 1))
+print("applied")

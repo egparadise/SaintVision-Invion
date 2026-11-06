@@ -1,0 +1,33 @@
+Local publication gates, 2026-11-06 KST, Windows, D:/Project/SaintVisionI-Invion/.venv Python, PYTHONUTF8=1, serial; times KST.
+tree = 084bd9471673f7f4f41dc547c76a2411c066109b + this review's own uncommitted History/Evidence only (git status below).
+sync_obsidian ran CHECK only (worktree with canonical state, and Canonical Root official check before and after). No apply/adopt/resolve/state write; the fresh state was used, not the owner-time 9bfa8c78 or historical 39ba/26c355 values.
+[CanonicalRoot 05b8d2bc] BEFORE 18:54:28..18:54:44 exit=0 logsha=99960542f55f953e06529ae487b9cbbcf733d24d07df69d84670614b6164da43 :: python -B tools/sync_obsidian.py --check --state D:/Project/SaintVision-Invion/SaintVisionI-Invion/.git/obsidian-sync-state.json
+    CHECK: 2818 managed files, 0 pending exports, 0 conflicts. No writes.
+stateBefore 3e562e86d43484b36916265e0d3fced9eb657182f466dbca68590833e601a3c0 437137 mtime=2026-11-06 18:24:46.850796800 +0900
+19:05:36..19:05:53 exit=0 logsha=c6f62b6aeb2301b98117e95d7b058a8ac7f8fc467a41bf66311fffbd2a9f6a0f :: [worktree] python -B tools/check_docs.py
+    PASS: 24 original hashes, 1263 versioned documents, wiki links, 48 tasks, 12 outcomes, owner/reviewer/skills, dependency DAG.
+19:05:54..19:05:57 exit=0 logsha=451b3d26c538962997f093bbfb8a5ceabffe134e154c1ff412f57590b076e150 :: [worktree] python -B tools/check_ontology_generation.py
+    PASS: 4 ontology artifacts are graph-equivalent to a fresh generation
+19:05:57..19:06:00 exit=0 logsha=7cdc12bf64f50ba0964625161638a4c639cf22d786a57f04685bed0718e14042 :: [worktree] python -B tools/check_ontology.py
+    PASS: RDF parsing, defined terms, TTL/JSON-LD equivalence, 48 task mappings, positive SHACL, 4 rejected invalid fixtures, 4 competency queries, Obsidian mirrors.
+19:06:00..19:06:11 exit=0 logsha=7d3493f361d1c522254d1dbd2e0a74b4dc3c54ef90bd9bfdec3a57666d7798ed :: [worktree] python -B tools/check_contract_bindings.py
+      (Reporting sites is not a regression -- the TYPE number never meant 'sites verified'; this makes the counting unit explicit. EvidenceEnvelope-class multi-site anchors are why.)
+19:06:11..19:06:13 exit=0 logsha=2a2f0348a4bdc71911a5eac47ef7fd7a1ca4573e71cce914cb6d6dd198392949 :: [worktree] python -B tools/check_frontend_integrity.py
+    PASS Frontend Integrity Check: all 9 integrity rules satisfied (0 violations).
+19:06:13..19:06:18 exit=0 logsha=389921b50662776ed834a285f70fc44ab61f7d5bdb4c5249c0a73c98113980de :: [worktree] python -B tools/check_doc_path_citations.py --ratchet --base-ref 084bd9471673f7f4f41dc547c76a2411c066109b
+    PASS check_doc_path_citations --ratchet: 290 broken citation(s), all in baseline, none stale, floor unchanged.
+19:06:19..19:06:20 exit=0 logsha=13b5f5afed05999109839be1baec4ef70ea3c71bcb267353e59eba0f2ae3e448 :: [worktree] python -B tools/check_doc_single_source.py --ratchet
+    PASS check_doc_single_source --ratchet: 16 pairs, all in baseline, none stale.
+19:06:20..19:06:26 exit=0 logsha=a0ea64040ed2b509efad33562305b567cc4950394d0dd10c57354cd81bd4f84c :: [worktree] python -B tools/test_sync.py
+    CHECK: 2 managed files, 0 pending exports, 0 conflicts. No writes.
+19:06:27..19:06:36 exit=0 logsha=2e26408b65d9b2d3302bfa392ded1a7ec5ac904362672539796d3e892103bb9c :: [worktree] python -B tools/build_docs.py
+    BUILT: saintvision-guidelines.zip, 43133475 bytes. Documentation only.
+19:06:37..19:06:55 exit=0 logsha=6a70bdca9cce1c84e2c29ea835817289a9bf492daeba8fd8ac05acc6661e7a52 :: [worktree] python -B tools/sync_obsidian.py --check --state D:/Project/SaintVision-Invion/SaintVisionI-Invion/.git/obsidian-sync-state.json
+    CHECK: 3664 managed files, 1212 pending exports, 0 conflicts. No writes.
+stateAfter 3e562e86d43484b36916265e0d3fced9eb657182f466dbca68590833e601a3c0 437137 mtime=2026-11-06 18:24:46.850796800 +0900
+[CanonicalRoot 05b8d2bc] AFTER 19:07:12..19:07:32 exit=0 logsha=99960542f55f953e06529ae487b9cbbcf733d24d07df69d84670614b6164da43 :: python -B tools/sync_obsidian.py --check --state D:/Project/SaintVision-Invion/SaintVisionI-Invion/.git/obsidian-sync-state.json
+    CHECK: 2818 managed files, 0 pending exports, 0 conflicts. No writes.
+stateAfterCanonicalRootCheck 3e562e86d43484b36916265e0d3fced9eb657182f466dbca68590833e601a3c0 437137 mtime=2026-11-06 18:24:46.850796800 +0900
+git status --short (worktree):
+    ?? docs/vault/30_Development/Evidence/fleet5-k2a-pl-r1b-084-review-20261106-claude/
+    ?? docs/vault/30_Development/History/2026-11-06_19-05-00_KST_FLEET5_K2A_PL_R1b_084_독립검토_Claude.md

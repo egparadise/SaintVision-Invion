@@ -1,0 +1,64 @@
+{
+ "schemaVersion": "fleet5-k2a-pl-r1b-narrow-review:1",
+ "reviewer": "Claude (ONE reviewer, no helper/subagent)",
+ "orca": {"task": "task_54959cbb262a", "dispatch": "ctx_94f4cd146419", "dependency": "task_522bf43089d4 / ctx_de2750e94f9d succeeded/settled/exited/released (checked 2026-11-06 ~18:45 KST before start)"},
+ "owner": {"agent": "Codex", "task": "task_a95ef3d8ccce", "dispatch": "ctx_ed23b4a777d0", "pendingQuestion": "msg_22a921f5890e"},
+ "target": {
+  "immutableBase": "ac7498e82a0cf17fc95973fe9187aeb51c99d51e",
+  "source": "484e9173f5e065d4c42a4c5a519678791d7e8473",
+  "final": "084bd9471673f7f4f41dc547c76a2411c066109b",
+  "branch": "agent/codex/fleet5-k2a-pl-r1b-20261106",
+  "reviewerGitCheck": "origin branch == 084bd947; 084^ == 484e9173; 484^ == ac7498e8; origin stage2-combined == ac7498e8 (unchanged). ac74->084: 61 A (own PL-R1b History/Evidence only) + 3 M (effect_gate_test.go, pl_r1a_test.go, README.md); 0 D, 0 mode changes; ls-tree 5396 -> 5457. 484->084 non-docs: 0 paths. The 3 changed blob sha256 == owner final-local-results.json changedFilesSHA256."
+ },
+ "readInputs": [
+  "own prior review 7d979761 review.json (PL-R1b 7 escapes, 3 real non-test full-suite escapes, rootOptions)",
+  "Root k2a-pl-r1b-root-scope.json (choice FIX_TEST_ONLY_BEFORE_ONE_FRESH_CORE, fullCoreGrantedNow false) and Root .work/plr1b-source-root-verified.json (18:18:01 KST), read only, Canonical Root head 05b8d2bc",
+  "owner History 2026-11-06_FLEET5_K2A_PL_R1b_Codex.md and Evidence final-local-results.json, mutant-proof-results.json, preserved red/initial-failure logs"
+ ],
+ "verdict": "REVISION_REQUIRED",
+ "verdictScope": "narrow: ONE new LOW (PL-R1c) in the test-only PL-R1b source gate plus ONE Info (README precision). Everything else in the PL-R1b delta is accepted. PL-R1b / PL-R1a class (b) NOT CLOSED.",
+ "accepted": {
+  "writeFormCollection": "AssignStmt.Lhs (incl. tuple and select-case comm), RangeStmt.Key/Value only when Tok==ASSIGN, IncDecStmt.X. Together with the separate GoStmt/SendStmt refusal and the append/len/make-only builtin allowlist (copy/clear/delete refused), this covers the Go statement-level write forms.",
+  "foreignVarRule": "object identity via foreignPackageVar(usedObject) with Paren unwrapping; dot import and aliased import resolve by object, no package spelling heuristic.",
+  "addressPathWalk": "Paren/Star/Index/Slice/Selector walked to the root; Selector uses go/types Selection.Index() field path with explicit and implicit/promoted pointer dereferences; each pointee checked by ownPointeeWrite (types.Unalias, Named, own package path). Reviewer-independent refusals R1 double deref via &local, R2 type-assertion deref, R3 generic helper *T (TypeParam), R4 &foreignField builtin int pointee, R5 uncalled closure, R6 own-promoted then foreign pointer, R7 own named pointer to unnamed array: all refused with the intended reason.",
+  "sevenEscapes": "All 7 7d979 escapes refused for the intended reason in the clean 484 run (E1-range-UTC, range-dot-UTC: foreign state write forbidden: time.UTC; E2, local copy, E3, helper parameter, range-deref: foreign pointee write forbidden: time.Location).",
+  "indexedSlice": "SliceExpr walk covers a slice expression rooted in a pointer deref within the SAME target expression ((*p)[:][0]++). It does not and cannot cover a slice header copied first (S1) or received as a parameter (S2); see Info PL-R1b-I1.",
+  "reasonsPLI3": "assertPLReason binds every negative to a refusal-reason prefix; all 18 old owner cases have entries; all 36 new cases carry an exact reason; a negative without a contract fails. PL-I3 addressed.",
+  "positiveControls": "unexported own ports/generic interfaces, class (a) positives, UTC pure compare, own/local range = and range :=, own pointer local mutation, own array/scalar/alias pointers, local foreign value copy, local slice root: PASS. Reviewer P1 own identity pointer conversion and P2 own generic receiver: PASS.",
+  "UTCincdec": "clock.UTC++ is compiler-invalid (non-numeric *time.Location); owner records it as UNAVAILABLE / NOT boundary proof; the valid Certificate.Version++ forms are tested. Accepted.",
+  "initialFailures": "owner preserved: 2 alias diagnostic reason mismatches (actual refusals, wrong rendering; fixed by Unalias in the diagnostic without weakening the prefix assertion) and the first E1 scratch missing tests/proofs (FIXTURE_FAILURE, not negative proof); final complete-fixture logs distinct. Accepted as honest red/green.",
+  "productFreeze": "no product/deploy/K1/pin/module/schema/workflow byte change; README is the only non-test file changed.",
+  "noUnsafeReflect": "gate is go/ast + go/types only; own production imports remain the 10-entry allowlist (no unsafe/reflect)."
+ },
+ "findings": [
+  {
+   "id": "PL-R1c",
+   "severity": "LOW",
+   "blocking": "not for product behaviour; blocks calling PL-R1b / PL-R1a class (b) CLOSED",
+   "file": "services/node-agent/internal/migrationcontext/effect_gate_test.go:371-373 (sourceEffects: a CallExpr whose Fun is a type returns true with no check) together with ownPointeeWrite:225-234 (pointee accepted when its Named type is declared in this package)",
+   "defect": "The pointee fence is TYPE-based, and Go pointer conversions change the pointee type without changing the address. An own defined type over a foreign type (type L time.Location, package or function scope) makes (*L)(time.UTC) legal; a write through it is then an own named pointee and is accepted. The same holds for *x509.Certificate -> *C, &foreignField -> *ownInt, and Go 1.17 slice-to-array-pointer conversion to an own named array. This bypasses the exact promised PL-R1b property 'foreign pointee writes are refused even through a local pointer, helper parameter or an allowed pure call' for the same process-global utcLoc object as escape E2. It is not the declared storage-provenance limit: no alias or heap analysis is needed, only the type the gate already reads.",
+   "counterexample": "6 compile-valid mutants, each go build -p=1 exit 0 + re-typecheck 0, CURRENT 484 sourceEffects returns nil: N1 type plLaunder clock.Location; *(*plLaunder)(clock.UTC)=plLaunder{} | N2 function-local type L clock.Location; p:=(*L)(clock.UTC); *p=L{} | N3 func (l *L) reset(){*l=L{}} + (*L)(clock.Time{}.Location()).reset() | N4 type C x509.Certificate; (*C)(c).Version++ | N5 type n int; *(*n)(&c.Version)=1 | N6 type a [64]byte; (*a)(k)[0]++ for k ed25519.PrivateKey. End-to-end: N1 as a REAL non-test file plr1b_review_real_probe.go in a complete public archive of 484 (services/node-agent + packages/contracts-go + tests/proofs) with the 084 index read only: go build -p 1 -buildvcs=false ./... exit 0; FULL package suite with the exact corrected 484 test bytes exit 0 (18 top / 126 sub / 54 builds, 0 FAIL); FULL suite with the old ac74 test bytes exit 0 (17/90/18). No mutant body or initializer executed.",
+   "reachability": "Not reachable in present production: the 7 production files contain no pointer conversion and no own type defined over a foreign type. Defense-in-depth static gate only.",
+   "reviewerSelfCorrection": "7d979 fix (b) specified 'pointee type not declared in the own package'. That specification was itself incomplete with respect to conversions. The owner implemented it as specified.",
+   "fix": "Test-only and bounded, no alias analysis. In the sourceEffects conversion branch, when the target type's underlying is a pointer, require the operand to be untyped nil or a pointer whose element is types.Identical to the target element. Otherwise refuse with 'pointee-changing pointer conversion forbidden: <type>'. Add N1-N6 as negatives with that reason and P1 (identity own pointer conversion) as a positive. In the README, state that pointer conversions changing the pointee type are refused. Reviewer verified this sketch in scratch only (reviewer_fix_sketch.py.txt): FULL suite with the sketch plus the 17 reviewer probes exit 0 (19 top / 143 sub / 71 builds, 0 FAIL); N1-N6 refused with the sketch reason; all 54 owner cases, R1-R7, P1/P2 and S1/S2 unchanged; vet exit 0. The real N1 non-test file under the sketch: FULL suite exit 1, refused by the intended reason in all 5 production-source gates. Production passes unchanged. The sketch is not committed; the owner implements under a Root grant."
+  }
+ ],
+ "info": [
+  {
+   "id": "PL-R1b-I1",
+   "severity": "INFO",
+   "text": "Writes into slice and map element storage are not pointee writes and are accepted irrespective of backing storage: S1 k:=*p; k[0]++ for p *ed25519.PrivateKey and S2 func(k ed25519.PrivateKey){k[0]++} both compile and pass the 484 gate (and the sketch), as does append into a foreign backing array. This is the declared storage-provenance limit. No foreign global slice or map is reachable in the present closure (time.UTC is the only readable foreign variable and its fields are unexported). Recommend that the README say this explicitly next to the 'local value/range mutations remain allowed' sentence, so the SliceExpr root walk is not read as slice-storage ownership. No code change requested."
+  }
+ ],
+ "retainedInfo": "PL-I1 future factory must call checkPolicyBindings before K1; PL-I2 operation-set authentication stays with the future archive; PL-I4 implicit json.Marshal MarshalJSON/MarshalText dispatch and argument ownership remain limits: the README states all three. PL-I3 addressed. S2-I1..I5 unchanged.",
+ "readmeScope": "README 131-152 matches the checked write forms, the type gate and the declared limits, except that it does not mention conversions (PL-R1c) or slice/map storage (PL-R1b-I1). Public all-unregistered REFUSE, zero-effect census, import/native/K1 closure and the 13 types / 73 fields / 0 embedded K1 baseline: unchanged and PASS in the reviewer run.",
+ "preservedAxes": "Accepted combined merge 5353, pin, diagnostics, public refusal and PL-R1a interface dispatch class (a) remain accepted. They were not reopened, and their bytes are exact ac7498 in 084.",
+ "reviewerLocal": "clean 484 FULL package go test -p 1 -count=1 -v: exit 0, 18 top / 126 sub PASS / 54 mutant builds exit 0 / 0 FAIL, 18:55:11-18:56:59 KST; go vet ./internal/migrationcontext exit 0. Reviewer probes 17/17 build exit 0, 18:51:43-18:52:19 KST. Stage2 129 / standalone 37 NOT rerun (bytes unchanged).",
+ "notRun": "local race (CGO 0), provisioned LAN (no Docker), hosted race/LAN/main pytest/build, final Go, full Core: NOT RUN. These are a future Root decision only. Old Core 42164071724 / Stage1 42170068364 failures and the original de71 field UNKNOWN are retained. auth/clock/current/effects/entrypoint/self-measurement/install: NULL/HOLD/ABSENT; A01-A40 NOT RUN; 5PC incomplete.",
+ "acceptanceIsNot": "a source/code-axis judgement only; not full Core, runtime, or whole K2 complete",
+ "rootOptions": [
+  "Recommended: owner adds ONE more test-only commit on agent/codex/fleet5-k2a-pl-r1b-20261106 (effect_gate_test.go + pl_r1a_test.go + README only, PL-R1c fix + N1-N6/P1 + README I1 sentence). Claude reviews only that delta. Root then grants ONE fresh full Core + Docs on that exact SHA. This avoids a full Core on 084, which would change again.",
+  "Alternative: Root carries PL-R1c as a tracked non-blocking LOW and grants ONE full Core + Docs on 084bd947 now. PL-R1b / class (b) must then not be cited as CLOSED, and the README pointee sentence must be read with the conversion caveat."
+ ],
+ "noDispatch": "No Core or owner CI was dispatched by the reviewer. Only this review's own Docs run on its own branch."
+}

@@ -1,0 +1,108 @@
+{
+ "schemaVersion": "fleet5-k2a-pl-r1b-narrow-review-commands:1",
+ "environment": "Windows 11, Git Bash + PowerShell 5.1; Go go1.27.0 windows/amd64 CGO_ENABLED=0 (not changed); D:/Project/SaintVisionI-Invion/.venv Python; Go env GOTOOLCHAIN=local GOWORK=off GOPROXY=off GOSUMDB=off GOMAXPROCS=1. All runs serial (host free RAM ~290 MB). Fixtures = complete public git archives of 484e9173 in the session scratchpad, GIT_DIR read only; raw logs stay in scratch, only sha256 published here. R-real-full-ac74 swaps in the ac7498 effect_gate_test.go + pl_r1a_test.go bytes (git show) in the real fixture. X-* runs use the reviewer fix SKETCH in scratch only.",
+ "commands": [
+  {
+   "atKST": "2026-11-06T18:45",
+   "argv": "orca orchestration worker-show --dispatch ctx_de2750e94f9d --json; orca orchestration dispatch-show --task task_54959cbb262a --json",
+   "exit": 0,
+   "result": "dependency B9 task_522bf43089d4 state succeeded / stage settled / liveness exited / terminal released; own dispatch ctx_94f4cd146419 dispatched"
+  },
+  {
+   "atKST": "2026-11-06T18:46",
+   "argv": "git fetch --all; git rev-parse origin/agent/codex/fleet5-k2a-pl-r1b-20261106 origin/agent/codex/fleet5-k2a-stage2-combined-20261106; git diff --name-status/--summary ac7498e8 084bd947; git ls-tree -r | wc -l",
+   "exit": 0,
+   "result": "pl-r1b == 084bd947, combined == ac7498e8; 084^=484e9173, 484^=ac7498e8; 61 A own docs + 3 M (2 tests + README), 0 D, 0 mode change; 5396 -> 5457 rows; 484->084 non-docs 0"
+  },
+  {
+   "atKST": "2026-11-06T18:48",
+   "argv": "git switch -c agent/claude/fleet5-k2a-pl-r1b-084-review-20261106 084bd9471673f7f4f41dc547c76a2411c066109b",
+   "exit": 0
+  },
+  {
+   "atKST": "2026-11-06T18:50",
+   "argv": "git archive 484e9173 services/node-agent packages/contracts-go tests/proofs | tar -x (3 scratch fixtures); sha256 of the 3 changed files",
+   "exit": 0,
+   "result": "243f68ed...bf29 / e2552048...e5d5 / 010b6f91...02b4 == owner changedFilesSHA256"
+  },
+  {
+   "atKST": "2026-11-06T18:51:43-18:52:19",
+   "argv": "GIT_DIR=<this worktree gitdir> GIT_WORK_TREE=<probes fixture> go test -p 1 -count=1 -v -run TestClaudePLR1BReviewProbes ./internal/migrationcontext",
+   "exit": 0,
+   "logSha256": "4d81add1e33f5a50a9bc799ee9c44dfe83479df541c23a8852f2bf380ab364a9",
+   "result": "17/17 build exit0; N1-N6 ESCAPE (gate nil), S1/S2 LIMIT accepted, R1-R7 refused with intended reason, P1/P2 accepted"
+  },
+  {
+   "name": "R-real-build",
+   "argv": "go build -p 1 -buildvcs=false ./...",
+   "exit": 0,
+   "startKST": "2026-11-06T18:52:33.9841554+09:00",
+   "endKST": "2026-11-06T18:52:42.6098328+09:00",
+   "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "name": "R-real-full-484",
+   "argv": "go test -p 1 -count=1 -v ./internal/migrationcontext",
+   "exit": 0,
+   "startKST": "2026-11-06T18:52:42.9540211+09:00",
+   "endKST": "2026-11-06T18:54:23.8661927+09:00",
+   "logSha256": "7e7062a4831aededa8b7065d54456fcba13d2f0dc0b76240e3d4ace345303801"
+  },
+  {
+   "name": "R-real-full-ac74",
+   "argv": "go test -p 1 -count=1 -v ./internal/migrationcontext",
+   "exit": 0,
+   "startKST": "2026-11-06T18:54:24.4467651+09:00",
+   "endKST": "2026-11-06T18:55:11.3825983+09:00",
+   "logSha256": "82185f422da952805a9c9b46971b5e400c1902fe91d5d89f5dadb84458c8f24d"
+  },
+  {
+   "name": "C-clean-full-484",
+   "argv": "go test -p 1 -count=1 -v ./internal/migrationcontext",
+   "exit": 0,
+   "startKST": "2026-11-06T18:55:11.7844735+09:00",
+   "endKST": "2026-11-06T18:56:59.8359256+09:00",
+   "logSha256": "6494b1bf0de14c1dc591cd117c7f74afa3fb0c959253bc135ca1ccbd7c1d7918"
+  },
+  {
+   "name": "C-clean-vet-484",
+   "argv": "go vet ./internal/migrationcontext",
+   "exit": 0,
+   "startKST": "2026-11-06T18:57:00.2167748+09:00",
+   "endKST": "2026-11-06T18:57:05.1347774+09:00",
+   "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "name": "X-fix-full-with-probes",
+   "argv": "go test -p 1 -count=1 -v ./internal/migrationcontext",
+   "exit": 0,
+   "startKST": "2026-11-06T18:58:57.2746788+09:00",
+   "endKST": "2026-11-06T19:01:11.4130447+09:00",
+   "logSha256": "d5014e6a5a7d1c89692da0aaa384432180b462d436b0642f740f1ba4f0c9a088"
+  },
+  {
+   "name": "X-fix-vet",
+   "argv": "go vet ./internal/migrationcontext",
+   "exit": 0,
+   "startKST": "2026-11-06T19:01:11.7459273+09:00",
+   "endKST": "2026-11-06T19:01:13.6936143+09:00",
+   "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "name": "X-realfix-full",
+   "argv": "go test -p 1 -count=1 -v ./internal/migrationcontext",
+   "exit": 1,
+   "startKST": "2026-11-06T19:01:14.1055756+09:00",
+   "endKST": "2026-11-06T19:01:35.4030698+09:00",
+   "logSha256": "3a62ae96cca47194d41f837c246a9e62bd9120fa6e39631221a5b96684bbf968"
+  },
+  {
+   "atKST": "2026-11-06T18:54:27-18:54:44",
+   "argv": "[CanonicalRoot 05b8d2bc] python -B tools/sync_obsidian.py --check --state D:/Project/SaintVision-Invion/SaintVisionI-Invion/.git/obsidian-sync-state.json (fresh BEFORE)",
+   "exit": 0,
+   "logSha256": "99960542f55f953e06529ae487b9cbbcf733d24d07df69d84670614b6164da43",
+   "result": "CHECK: 2818 managed files, 0 pending exports, 0 conflicts. No writes. state 3e562e86d434...a3c0 437137 B mtime 18:24:46 KST unchanged across the check"
+  }
+ ],
+ "notRun": "local race (CGO 0), provisioned LAN, hosted race/LAN/main pytest/build/final Go/full Core, Stage2 129 / standalone 37 (unchanged bytes), env/compiler/CGO/OS/install/PG/Docker/SSH/PKI/Node/VM/clock/runtime actions: none"
+}
