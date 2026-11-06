@@ -1,11 +1,11 @@
 ---
 doc_id: "GOV-FLEET5-BOOTSTRAP-V5-FREEZE-CODE-SCOPE-20261106"
 title: "FLEET5 전환 v5 계약 동결과 구현 범위"
-version: "1.0.7"
+version: "1.0.8"
 status: "active"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-11-06T12:57:56+09:00"
+updated: "2026-11-06T13:08:37+09:00"
 source_of_truth: "Git"
 ---
 
@@ -95,3 +95,12 @@ ReadCurrent/현재 Assemble/DeriveCurrent/CurrentView/current SnapshotToken은 s
 K2R2-L1은 code gate에서 수정한다. 모든 non-test K1 파일을 실제 go/types로 검사하고 named map/slice/function의 underlying type을 포함한다. 기존 G01–G08과 R01–R03 변형을 검출하고 input stub으로 형태를 숨기지 않는다. 새 코드의 실제 로컬 검사·정확한 SHA의 새 Core/Docs·실제 Claude 코드 검토가 필요하며 이전 K1 CI를 차용하지 않는다.
 
 K2R2-M1은 관측 계약 안의 Medium으로 계속 열려 있다. immutable attempt body와 method별 permit/step idempotency·합법 상태 전이·UNKNOWN 재조정·ExecCreate 후 만료·normal:3 별도 slot을 별도 문서 delta와 실제 계약 검토로 닫아야 한다. 이 보완은 readonly 구현의 선행 조건이 아니며, 현재 attempt/permit 코드를 허용하지 않는다. 상세 범위·오류·검사·차단 항목은 Root Evidence k2a-trust-history-root-implementation-grant.json에 고정했다. 실제 연결·40runtime·5PC 운영 인수·전체 개발은 미완료다.
+
+
+## K2A 인증 형식 공백의 A 선택과 구현 범위 정밀화
+
+담당자가 msg_e5157d3b1280에서 확인한 형식 공백에 Root는 msg_f4259ea0de6b로 A를 선택했다. 4ce의 trust-bootstrap-contract.json은 실제로 PROPOSED_HOLD·actualAcceptance=false·모든 deploymentBindings=null이다. 기존28개 proof slot은 새 registry/archive/status/clock/running-code port의 완전한 인증 형식을 제공하지 않는다.
+
+따라서 이번 구현은 readonly 경계·null port·거부·binding/freeze/history selector/clock/K1 순수 검증 로직·권한 경계/Go type gate의 한정 단위다. 미등록 purpose/format의 근거는 hash·ACTIVE 표기·self-signed 자료가 일관돼도 인증으로 승격하지 않는다. 새 내부 proof 메시지·서명 domain/issuer·암호 검증 ABI를 이번 범위에 만들지 않으며 g2-planning-policy를 설치 인증으로 전용하지 않는다. 등록된 인증 형식과 실제 연결이 없으면 LoadInstalledPolicy와 후속 공개 경로는 계속 닫힌 오류로 거부한다. 이는 production positive authentication 또는 전체 K2A가 구현됐다는 뜻이 아니다.
+
+후속 로직의 양성 단위 시험은 *_test.go 안에서만 명시적으로 이미 binding된 합성 fixture를 구성할 수 있다. 이 시험은 누락된 외부 인증 단계를 의도적으로 우회한 후속 binding/copy/selector/time/K1 로직의 시험임을 표기한다. 공개 constructor·옵션·callback·production helper·verify=true로 신뢰 DTO를 만들 수 있게 하지 않는다. 실제 positive 인증은 purpose별 별도 검토된 provisioning/attestation 계약과 실제 등록 anchor/port, 후속 Root 구현 범위 결정에 의존한다. 기존 새 코드 CI/독립 검토와 observation/current/effect/installation HOLD 조건은 유지한다. 상세 근거와 지시는 Root Evidence k2a-authentication-seam-root-scope-clarification.json에 보존했다.

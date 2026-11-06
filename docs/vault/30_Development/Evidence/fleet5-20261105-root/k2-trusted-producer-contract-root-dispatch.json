@@ -16,7 +16,7 @@
   "noPrivateKeyOrDBSSHNodeDockerVMAction": true,
   "BRev6Independent": true,
   "wholeProgramComplete": false,
-  "latestObservationAtKST": "2026-11-06T12:57:56+09:00",
+  "latestObservationAtKST": "2026-11-06T13:08:37+09:00",
   "proposalSource": "551d7312bb9c806fd423dcf6074158a9802cbb14",
   "proposalDocs": 42146482617,
   "RootVerifiedProposalExactHeadRefEventAllJobsSuccess": true,
@@ -28,7 +28,7 @@
   "actualDirectReply": "msg_6df22674ff19",
   "actualReview": "5623dc00b676ce0b535350897069a3b7f1154eab",
   "actualVerdict": "REVISION_REQUIRED3Major5Low",
-  "currentAuthorization": "actualboundedreadonlyimplementation/newCoreDocs/independentreview; noeffects/current/entrypoint/install",
+  "currentAuthorization": "Achoice narrowreadonlyrefusal/bindingpurelogic+internaltestsynthetics; no newproofwire/crypto verifierABI/current/effects/install",
   "decision": "k2-rev2-concrete-root-decision.json",
   "latestProposalSource": "4ce63e8ee78d957aa91e813f6ee226cc21abb52a",
   "latestProposalDocs": 42155660700,
@@ -38,7 +38,11 @@
   "latestActualReview": "fe7e1ea03c2862fce305fb617a4d5782fe9c0d48",
   "latestActualVerdict": "BOUNDED_DESIGN_ACCEPT_FOR_K2A_TRUST_HISTORY_READINESS_ONLY",
   "actualDesignAcceptanceScope": "K2A-TRUST/HISTORY readinessONLY; observation/current/effectsnotaccepted",
-  "actualCodeGrantScope": "services/node-agent/internal/migrationcontext readonlyports/checkedfactories/defaultrefusals only",
+  "actualCodeGrantScope": "boundedreadonlyboundary/refusal/purevalidation/census only; no unregisteredpurposepositiveauthenticator",
   "rootDirectReply": "msg_18271633c26c",
-  "rootCodeGrant": "k2a-trust-history-root-implementation-grant.json"
+  "rootCodeGrant": "k2a-trust-history-root-implementation-grant.json",
+  "implementationScopeClarification": "k2a-authentication-seam-root-scope-clarification.json",
+  "latestScopeReply": "msg_f4259ea0de6b",
+  "positiveProductionAuthenticationGranted": false,
+  "actualK2AUsable": false
 }

@@ -1,15 +1,19 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.398"
+version: "1.0.399"
 status: "review"
 author: "Codex"
-updated: "2026-11-06T12:57:56+09:00"
+updated: "2026-11-06T13:08:37+09:00"
 source_of_truth: "Git"
 active_card: "FLEET5-20261105 five physical node orchestration"
-active_card_status: "K2rev2fe7e boundedreadonlydesignACCEPT/RootK2Acodegrantdelivered; B targetedrev7; observationMediumOPEN; K1boundedcomplete; wholephysicalincomplete"
-active_card_next: "Codex boundedK2Areadonlycode/boundary+censusgates/freshCoreDocs thenactualClaude; B rev7immutableDocs thenoneClaude; separateobservationstepcontractfix remainsHOLD"
+active_card_status: "K2A readonlyboundary/refusal slice underRootA; positiveproductionauth/newproofABI notgranted; B targetedrev7; observationMediumOPEN; K1boundedcomplete/wholephysicalincomplete"
+active_card_next: "Codex implementnull/refusal+purelogic/boundary+census/newCoreDocs/actualreview; explicitinternaltestauthbypasslabels; actualproviderpurposeformat remainsfuturedependency; B rev7continues"
 ---
+
+## 2026-11-06T13:08:37+09:00 K2A 인증 형식 공백의 A 선택
+
+작업한 것과 확인: K2A 담당자의 인증 형식 공백 질문에 Root가 A를 선택했다. 미등록 registry/archive/status/clock/running-code 근거는 계속 거부하며, 이번 구현은 readonly 경계·기본 거부·순수 binding/검증 로직과 시험으로 한정한다. 내부 시험의 이미 binding된 합성 자료는 실제 외부 인증 성공이 아니다. 새 proof 형식·암호 검증 ABI·운영 인증은 허용하지 않았다. 질문 msg_e5157d3b1280에 msg_f4259ea0de6b로 답했고 같은 K2 담당자가 독립적으로 준비된 경계/census/거부 로직 구현을 계속한다. 다음 첫 행동/담당은 Codex의 이 한정 구현·새 CI 제출과 Root의 실제 코드 검토 배정이다.
 
 ## 2026-11-06T12:57:56+09:00 K2 readonly 설계 수락과 정확한 구현 지시
 

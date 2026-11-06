@@ -58,9 +58,9 @@
   },
   "state": "ACTUAL_BOUNDED_DESIGN_ACCEPT_ROOT_READONLY_IMPLEMENTATION_GRANTED",
   "verdict": "BOUNDED_DESIGN_ACCEPT_FOR_K2A_TRUST_HISTORY_READINESS_ONLY",
-  "nextAction": "Codex actualboundedreadonlycode/defaultrefusals/boundaryandcensusgates/newexactCoreDocs; actualClaude code review; separateobservationstepcontract correctionpending",
+  "nextAction": "Codex nullports/refusal/bindingfreezeclockK1purelogic/boundarycensusgates; packageinternal *_test.go already-bound syntheticdownstreamchecksONLY; newCI/actualreview",
   "wholeProgramComplete": false,
-  "latestObservationAtKST": "2026-11-06T12:57:56+09:00",
+  "latestObservationAtKST": "2026-11-06T13:08:37+09:00",
   "actualReview": {
     "atKST": "2026-11-06T12:52:41+09:00",
     "source": "4ce63e8ee78d957aa91e813f6ee226cc21abb52a",
@@ -96,5 +96,12 @@
   "rootGrant": "k2a-trust-history-root-implementation-grant.json",
   "readonlyImplementationGranted": true,
   "effectOrCurrentOrInstallationGranted": false,
-  "currentAPIs": "ABSENT_NOT_STUBBED"
+  "currentAPIs": "ABSENT_NOT_STUBBED",
+  "implementationScopeClarification": "k2a-authentication-seam-root-scope-clarification.json",
+  "implementationScopeChoice": "A_REFUSAL_BOUNDARY_SLICE_ONLY_UNREGISTERED_AUTH_FORMATS_HOLD",
+  "clarificationQuestion": "msg_e5157d3b1280",
+  "clarificationRootReply": "msg_f4259ea0de6b",
+  "positiveProductionAuthenticationGranted": false,
+  "newProofFormatOrVerifierSeamGranted": false,
+  "actualK2AUsability": "NOT_READY until separatelyclosedacceptedpurposeformatsandactualinstalledbindings"
 }

@@ -1,0 +1,33 @@
+{
+  "schemaVersion": "fleet5-k2a-auth-seam-root-scope-clarification:1",
+  "atKST": "2026-11-06T13:07:21+09:00",
+  "priorGrantReply": "msg_18271633c26c",
+  "ownerQuestion": "msg_e5157d3b1280",
+  "rootDirectReply": {
+    "ok": true,
+    "result": {
+      "messageId": "msg_f4259ea0de6b",
+      "next": "Finish the rest of your mail."
+    }
+  },
+  "ownerTask": "task_a95ef3d8ccce",
+  "ownerDispatch": "ctx_ed23b4a777d0",
+  "card": "FLEET5-K2A-TRUST-HISTORY-20261106",
+  "choice": "A_REFUSAL_BOUNDARY_SLICE_UNREGISTERED_AUTH_PURPOSES_STAY_HOLD",
+  "rootReadSource": {
+    "source": "4ce63e8ee78d957aa91e813f6ee226cc21abb52a",
+    "path": "services/node-agent/migrationverify/resources/trust-bootstrap-contract.json",
+    "SHA256": "f42166c4545480a30112d1c6f92f374376941b129607d0c14168e8df373a5869",
+    "status": "PROPOSED_HOLD",
+    "allDeploymentBindingsNull": true,
+    "actualAcceptance": false
+  },
+  "positiveProductionAuthenticationGranted": false,
+  "newInternalProofFormatOrCryptographicSeamGranted": false,
+  "syntheticPositiveScope": "packageinternal *_test.go already-boundfixtures downstreamchecksONLY; explicitmissingexternalauthenticationbypasslabel",
+  "actualK2AUsability": "NOT_READY; separatelyreviewedpurpose-format/installbindingrequired",
+  "currentAuthorization": "boundedreadonlynullports/refusal/bindingfreezeclockK1purelogic/boundarycensusgates/newCI/actualcodereview",
+  "currentOrEffectsOrInstallationGranted": false,
+  "wholeProgramComplete": false,
+  "body": "CHOOSE A. This is an explicit scope clarification/narrowing of msg_18271633c26c, SAMEtask_a95ef3d8ccce/currentctx_ed23b4a777d0/cardFLEET5-K2A-TRUST-HISTORY-20261106, not another generic user approval. Root independently read exact4ce services/node-agent/migrationverify/resources/trust-bootstrap-contract.json: PROPOSED_HOLD/actualAcceptancefalse/all deploymentBindingsnull/externallyinstalledauthorityrequired/missingregistryfallbackforbidden. You correctly identified that the28 acceptedproofslots doNOTsupplycompleteauthenticationformats fornewproviderports. Do NOTrepurposeg2-planning-policy or fabricateinstallationprovenance.\n\nPOSITIVEPRODUCTIONAUTHENTICATIONISNOTGRANTED. Everymissing/unregisteredregistry/archive/status/clock/running-codeattestationpurpose/format MUSTremainHOLD and refuse throughitsclosedexistingcatalogcode, evenifrecordhashes/ACTIVElabels/role/tenant/scope/DER/time/provenancestringsareinternallyconsistent or signedbyselfissued/unknownkeys. No newPROPOSED_INTERNAL_ONLY cryptographic-proofwire/message/domain/issuer/verifierABI and no Bcryptoseam inthisimplementation. No protectedfilename/verify=true/publiccallback/embeddedanchor or portimplementationdeclaration authenticatesarecord. Metadata/binding/freezechecksarenecessary,butnotauthenticityandmustnotpromoterecords.\n\nCURRENTCODEDELIVERABLE is precisely READONLYBOUNDARY+REFUSALSLICE: nullports/defaultrefusals; closedtypeduntrustedinputversusopaquecheckedDTOs; allbinding/historyselector/copy-freeze/clockenvelope/K1bridge/purevalidationlogic; repo-wideboundaryandfullGo-typesunderlyingcensusgates; honestports/provenancecontracts andtests. LoadInstalledPolicy productionauthenticationcannotpositive-complete until aFUTUREseparatelyreviewedinstalledregistration/attestationcontract+actualbinding. ReadHistory/ValidateHistoryneedthatacceptedopaqueinput+theirindependentarchive/status/clock/running-codeauth; withcurrentlyunregisteredformats theyalsoMUSTrefuse. Neverlabelthisslice'completepositiveauthentication'/'K2Afullyusable'/'registryimplemented' orAcasesgreen. Narrowlyimplementedboundary/logic+tests maycomplete itsowncardafteractualCI/review only.\n\nKeep fixeddefault/errorpriority fromgrant. Null/unregisteredregistry=>TRUST_UNKNOWN_OR_PIN_MISMATCH; archive=>HISTORICAL_BINDING_UNKNOWN; clockunknown=>CLOCK_UNTRUSTED, mechanism/actualrunningstdlibunproven=>CLOCK_MECHANISM_UNPROVEN; publication/certstatusunknown=>theirclosedcodes; running-codeportnull=>INSTALLATION_OR_RUNTIME_CAPABILITY_UNKNOWN. Needn'tinventUNREGISTERED_FORMATerror. Testeachnegativeentrypointwithcounterfeitbutwellformed/selfsignedrecords andproveNOopaqueproductiontokenisissued. No unexportedconstructor pluspublicoption or callbackescape maymanufactureauthentication.\n\nDOWNSTREAMPOSITIVES are allowed ONLY using explicitlypackage-internal ALREADY-BOUND SYNTHETIC FIXTURES constructedin *_test.go (notnon-testproductionhelpers/exportedhooks/buildtagsreachableinordinarybuild). Suchfixtureconstruction intentionallybypassesmissingEXTERNALauthenticationforthesyntheticunitcase; LABELthatbypassandverifywhichlaterbinding/copy/selector/time/K1logicitexercises. This isnotLoadInstalledPolicypositiveproductionauthenticationandnottestinganexistentproviderattestationprotocol. UseexistingK1ephemeralsyntheticfixturepattern whereactualK1verificationuseful, no productionkeys/network/ports. Purebinding/clockfunctionscanbetestedonsyntheticstructuredinputswithoutclaimingauth. Ensure tests cannotaddpositivefakes/acceptedformatIDs/providertrustflagsintoproductiontablesorreturnaDTOthroughpublicconstructor. OpaqueDTOzero/JSON/foreignversionrefusalsandpublicservicewithanyunregisteredproviderrecordstillfailclosed.\n\nNo needtosolvefutureauthwirehere. DocumentONEexactremainingdependency: separatelyclosedreviewedindependentprovisioning/attestation-verificationcontractperpurpose+actualregisteredanchors/ports, thenfutureexplicitRootimplementationgrant. Keepphysical/installedtrust/CLOCK_MECHANISM/D-COHORT/D-OBSERVATION/PREPUBLICATION/currentAPIs/effects allHOLD/absent. SeparateK2R2-M1observationcontractcorrectionunchangedpending.\n\nProceedNOWwithindependentlyreadywhole-packageGo/typescensus(repo-wideboundary/G01-G08+R01-R03), nullports/refusals/downstreampurechecks andhonestsyntheticunitpositives, meaningfulseriallocalchecks thenFRESHCore+Docs/newimmutableSHA/actualClaude reviewasgranted. No newwire/domain/key/providerimplementation/PG/Node/VM/OS/clockmutation/workflow/dependency, nooldK1reopen/worker_donewholeK2. Rootupdatescanonicalscope; no moreapprovalneededforthisAchoice."
+}

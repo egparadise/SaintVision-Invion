@@ -3,8 +3,8 @@
   "recordedAtKST": "2026-11-06T00:46:51+09:00",
   "rootBase": "2b1753ce59c09037b5e130a7ffe64794d1d45fdf",
   "priorRootCheckpoint": {
-    "SHA": "aed226c2b7636a339bd411d4e01c2abfd648497a",
-    "Docs": 42156614206,
+    "SHA": "39e64b27a05c96f48979aa79ea5fafec842c4543",
+    "Docs": 42159800689,
     "exactHeadCorrelationAllJobsSuccess": true,
     "remoteMatches": true,
     "syncExits": [
@@ -12,13 +12,13 @@
       0,
       0
     ],
-    "independentlyMatchedNormalizedDestinationHashes": 2784,
+    "independentlyMatchedNormalizedDestinationHashes": 2785,
     "pending": 0,
     "conflicts": 0,
     "trackedAndUntrackedClean": true,
     "rootDocsOnly": true,
     "wholeProgramComplete": false,
-    "verifiedAtKST": "2026-11-06T12:28:10+09:00"
+    "verifiedAtKST": "2026-11-06T13:00:59+09:00"
   },
   "actualPlanLowReview": {
     "source": "803ad270562b1b75e44d26f9e14b965c714ab519",
@@ -2515,7 +2515,7 @@
     "ownerT1T2T3": "msg_620855c76519",
     "normativeRevisionReply": "msg_0392caf64d5d"
   },
-  "latestRecordAtKST": "2026-11-06T12:57:56+09:00",
+  "latestRecordAtKST": "2026-11-06T13:08:37+09:00",
   "optionalLowTokenTestDelta": {
     "source": "f0af307705b4923ebc3e231db5238af4c70aa389",
     "scope": "two otherwise-valid token payload corrections and JSON validity assertions; runtime unchanged",
@@ -3135,5 +3135,7 @@
     "uniqueReviewDocsPaths": 10
   },
   "K2ReadonlyImplementationGrant": "k2a-trust-history-root-implementation-grant.json",
-  "K2ObservationStepMedium": "K2R2-M1 OPEN/separatecontractreview required before D-OBSERVATION acceptance"
+  "K2ObservationStepMedium": "K2R2-M1 OPEN/separatecontractreview required before D-OBSERVATION acceptance",
+  "K2ReadonlyAuthenticationSeamChoice": "k2a-authentication-seam-root-scope-clarification.json",
+  "K2PositiveProductionAuthenticationGranted": false
 }
