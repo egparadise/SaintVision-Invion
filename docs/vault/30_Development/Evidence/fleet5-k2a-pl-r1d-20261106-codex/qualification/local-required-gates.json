@@ -1,0 +1,128 @@
+{
+  "classification": "DOCS_SOURCE_ONLY_NOT_PRODUCER_RUNTIME_ACCEPTANCE",
+  "runs": [
+    {
+      "argv": [
+        "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+        "-B",
+        "tools/check_docs.py"
+      ],
+      "exit": 0,
+      "startedKST": "2026-11-06T20:39:28.437655+09:00",
+      "endedKST": "2026-11-06T20:39:33.503975+09:00",
+      "log": "gate-01-check_docs.log"
+    },
+    {
+      "argv": [
+        "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+        "-B",
+        "tools/check_ontology_generation.py"
+      ],
+      "exit": 0,
+      "startedKST": "2026-11-06T20:39:33.504668+09:00",
+      "endedKST": "2026-11-06T20:39:35.777043+09:00",
+      "log": "gate-02-check_ontology_generation.log"
+    },
+    {
+      "argv": [
+        "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+        "-B",
+        "tools/check_ontology.py"
+      ],
+      "exit": 0,
+      "startedKST": "2026-11-06T20:39:35.777436+09:00",
+      "endedKST": "2026-11-06T20:39:37.804338+09:00",
+      "log": "gate-03-check_ontology.log"
+    },
+    {
+      "argv": [
+        "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+        "-B",
+        "tools/check_contract_bindings.py"
+      ],
+      "exit": 0,
+      "startedKST": "2026-11-06T20:39:37.804929+09:00",
+      "endedKST": "2026-11-06T20:39:45.770879+09:00",
+      "log": "gate-04-check_contract_bindings.log"
+    },
+    {
+      "argv": [
+        "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+        "-B",
+        "tools/check_frontend_integrity.py"
+      ],
+      "exit": 0,
+      "startedKST": "2026-11-06T20:39:45.771314+09:00",
+      "endedKST": "2026-11-06T20:39:46.201389+09:00",
+      "log": "gate-05-check_frontend_integrity.log"
+    },
+    {
+      "argv": [
+        "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+        "-B",
+        "tools/check_doc_path_citations.py",
+        "--ratchet",
+        "--base-ref",
+        "b47d5dd6cd23873c62602e02e85a8f82c9843dc5"
+      ],
+      "exit": 0,
+      "startedKST": "2026-11-06T20:39:46.201821+09:00",
+      "endedKST": "2026-11-06T20:39:49.923741+09:00",
+      "log": "gate-06-check_doc_path_citations.log"
+    },
+    {
+      "argv": [
+        "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+        "-B",
+        "tools/check_doc_single_source.py",
+        "--ratchet"
+      ],
+      "exit": 0,
+      "startedKST": "2026-11-06T20:39:49.924116+09:00",
+      "endedKST": "2026-11-06T20:39:50.323828+09:00",
+      "log": "gate-07-check_doc_single_source.log"
+    },
+    {
+      "argv": [
+        "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+        "-B",
+        "tools/test_sync.py"
+      ],
+      "exit": 0,
+      "startedKST": "2026-11-06T20:39:50.324210+09:00",
+      "endedKST": "2026-11-06T20:39:55.593261+09:00",
+      "log": "gate-08-test_sync.log"
+    },
+    {
+      "argv": [
+        "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+        "-B",
+        "tools/build_docs.py"
+      ],
+      "exit": 0,
+      "startedKST": "2026-11-06T20:39:55.593815+09:00",
+      "endedKST": "2026-11-06T20:40:02.220054+09:00",
+      "log": "gate-09-build_docs.log"
+    },
+    {
+      "argv": [
+        "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+        "-B",
+        "tools/sync_obsidian.py",
+        "--check",
+        "--state",
+        "D:\\Project\\SaintVision-Invion\\SaintVisionI-Invion\\.git\\obsidian-sync-state.json"
+      ],
+      "exit": 0,
+      "startedKST": "2026-11-06T20:40:02.244581+09:00",
+      "endedKST": "2026-11-06T20:40:11.420206+09:00",
+      "log": "gate-10-sync_obsidian.log",
+      "canonicalStatePath": "D:\\Project\\SaintVision-Invion\\SaintVisionI-Invion\\.git\\obsidian-sync-state.json",
+      "canonicalStateSHA256Before": "dcfdb284a97fb048592e857da5f80aede2811e82eb93feaa4d1dfb7446660629",
+      "canonicalStateSHA256After": "dcfdb284a97fb048592e857da5f80aede2811e82eb93feaa4d1dfb7446660629",
+      "unchanged": true,
+      "authority": "Root explicit canonical --check --state; no apply/adopt/resolve"
+    }
+  ],
+  "noApplyAdoptResolve": true
+}
