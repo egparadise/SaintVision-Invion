@@ -1,0 +1,120 @@
+{
+  "reviewer": "Claude (one actual independent reviewer, no helpers/subagents)",
+  "orca": { "task": "task_599e55626b4a", "dispatch": "ctx_15e621fbe050", "predecessorSettledPerRoot": "ctx_63ce6b6612b7/task_26dd9ebd51dd" },
+  "author": { "agent": "Gemini", "task": "task_9d814a8270e1", "dispatch": "ctx_d855f1849f6b", "awaitingAsk": "msg_31779385396e" },
+  "reviewBranch": "agent/claude/portal-refresh-854-review-20261106",
+  "reviewBranchBase": "854a8eab0b6e236b62878f49ee941c700e458af0",
+  "candidate": {
+    "final": "854a8eab0b6e236b62878f49ee941c700e458af0",
+    "source": "2d87d7aa3af1e35e5980ab340d132df56ce52c66",
+    "initialSource": "3a83707688f43570a7eaf9008989794979b3eb9f",
+    "base": "53683020e3cfaf79ec4662f9a79b8b4dae28a628",
+    "remoteBranchHeadAtReview": "854a8eab0b6e236b62878f49ee941c700e458af0",
+    "nonDocPaths": [
+      "apps/web/nginx.conf", "apps/web/src/app/App.tsx", "apps/web/src/features/auth/session.ts",
+      "apps/web/src/features/dashboard/ClusterOverview.tsx", "apps/web/src/shared/ui/Header.tsx",
+      "apps/web/tests/fixture-problem-codes-integrity.test.ts", "apps/web/tests/portal-refresh-fleet-ui.test.tsx",
+      "apps/web/vite.config.ts"
+    ],
+    "source2d87ToFinal854NonDocPaths": 0,
+    "blobIdentity854eq2d87": {
+      "apps/web/src/app/App.tsx": "825fd0a459ff81071a3432a34c753e7ffaf4a64d",
+      "apps/web/src/shared/ui/Header.tsx": "2c8be887c07bdfdc466a440d800cd1d0ed7173ce",
+      "apps/web/src/features/dashboard/ClusterOverview.tsx": "cb92fbe28c3de112d11b511b2957ca62f27f6e6a",
+      "apps/web/src/features/auth/session.ts": "5c7ce76a26eaef39b1e571fa5c3aa66c1456b2b9",
+      "apps/web/nginx.conf": "21d35ed113befa1325d23d3f2ef6459966e25ce0",
+      "apps/web/vite.config.ts": "0c5e084b9c58099c8794aec6d966bd6860070767",
+      "apps/web/tests/portal-refresh-fleet-ui.test.tsx": "c0b27feadfd59159b99560e7293c9ae007c466ea",
+      "apps/web/tests/fixture-problem-codes-integrity.test.ts": "10ba09f5341d6456938c5db50145154ff320b952"
+    },
+    "executedTreeProof": "git archive 854a8eab -> session scratch; git hash-object of every apps/web, contracts, tools blob equals the 854 tree (0 mismatches; apps/web 281/281). Dependencies: junction to supervision-integration-20261104/apps/web/node_modules, whose installed versions equal the 854 package-lock (265/265 entries, 0 mismatch); no install, no lock change. Author worktree src was never executed."
+  },
+  "verdict": "REVISION_REQUIRED",
+  "verdictScope": "UI source delta only. Not deployment, not artifact, not 5PC/resource acceptance, not whole-program done.",
+  "rootFindingClosure": {
+    "R-UI-M1": {
+      "status": "PARTIALLY_CLOSED",
+      "closed": [
+        "Header calls canonical GET /healthz (app.py:347 returns {status:'ok',version}) and requires res.ok + content-type application/json + body status==='ok'; HTML 200, JSON 404, JSON 503, JSON 200 status!=ok, and network errors are never online (probe H1 on 854; on base 5368 html200 and status-down were online).",
+        "Initial gateway and cluster state is null -> '확인 중...' with unknown dot; no fabricated online/8ms; Header defaults null instead of 5/5; App passes null until lastNodesFetchedAt.",
+        "Routing: nginx 443 'location = /healthz' mirrors existing /readyz upstream (proxy_pass control-plane:8080, Host, proxy_cache off) and inherits the server-level security-headers include because it declares no add_header; HTTP 80 'location /healthz return 200 OK text/plain' unchanged; Vite server.proxy and preview.proxy add /healthz. Root's private preview config .work/ui854-preview.config.mjs (read only) also proxies /healthz on 127.0.0.1:3100, so the SPA fallback is not hit on the intended preview path."
+      ],
+      "open": "UI-854-L1: network failure and a reachable-but-contract-error/unhealthy response are both labelled 'Offline'. Root R-UI-M1 explicitly asked to distinguish unknown/network error from reachable HTTP health-contract error/unhealthy."
+    },
+    "R-UI-M2": {
+      "status": "PARTIALLY_CLOSED",
+      "closed": [
+        "Empty card no longer unmounts or flips to metric cards across background polls (probe P1: same element over 6 cycles, no 'CPU 코어'; base fails).",
+        "Initial idle/loading without lastFetchedAt shows '클러스터 노드 정보를 확인하고 있습니다...' and not '정상 조회 결과: 0대' (P1).",
+        "Fast background failure after an observed empty snapshot shows cluster-stale-warning role=alert with error text, snapshot time and retry; recovery clears it (P2). Non-empty snapshot retained with stale banner (P3).",
+        "Latest-wins fences: an older late response is ignored (P4); project switch resets nodes/state/lastFetchedAt, Header back to '확인 중...', and the old project's late response is dropped (P5)."
+      ],
+      "open": "UI-854-M1: when every node request takes longer than the 5s poll interval, or hangs until a proxy timeout, every completion (success or error) is discarded by the request fence, so the empty card keeps claiming '등록된 노드가 없습니다 (정상 조회 결과: 0대)' with no stale banner indefinitely (P6, P7). Base 5368 did not show the current-success sentence in the same scenario."
+    }
+  },
+  "findings": [
+    {
+      "id": "UI-854-M1",
+      "severity": "Medium",
+      "source": "apps/web/src/app/App.tsx:287-336 (fetchNodes), 428-437 (5s interval); same pattern in fetchRuns/fetchApprovals/fetchWorkspaces",
+      "claim": "Background polling without an in-flight guard or request timeout starves under slow or hung responses: each new 5s poll increments nodeRequest, so the previous request's success or failure is always discarded, and with isBackground the state never leaves 'success'. The M2 'refresh failed silently rendered normal 0' failure therefore remains under latency >5s.",
+      "counterexample": "Probe P6: observed 0 nodes at t0, then every /nodes answer takes 6s and contains 1 node. After 60s: 13 calls, new node never shown, no cluster-stale-warning, '정상 조회 결과: 0대' still shown. Probe P7: every request hangs and is rejected 60s later (nginx proxy_read_timeout shape): no stale banner, the error is never shown, '정상 조회 결과: 0대' still shown. On base 5368 both reports have stillClaimsCurrentZero=false.",
+      "minimalFix": "Per resource, skip a background tick while that resource's previous request is still in flight (inFlightRef set before the request and cleared in finally, only for the same request id), so the outstanding success/error is applied. Bound each poll with AbortSignal.timeout(< interval or a documented bound) mapped to the error path, and/or treat lastFetchedAt older than N intervals as stale in ClusterOverview. Add App-level tests in the P6/P7 shape.",
+      "regression": "Behavioural change in this scenario versus base (base showed the loading/metrics fall-through, not the current-success sentence); the latest-wins starvation itself predates the delta."
+    },
+    {
+      "id": "UI-854-L1",
+      "severity": "Low",
+      "source": "apps/web/src/shared/ui/Header.tsx:39-73 (checkGateway), 225-232 (label)",
+      "claim": "Failure label collapse: network error, HTML 200 SPA fallback, JSON 404/503 and JSON status!=ok all render 'Gateway: Offline'. A reachable portal with a mis-routed or unhealthy health endpoint is reported as an unreachable gateway.",
+      "counterexample": "Probe H1 on 854: html200/json404/json503/jsonStatusDown/network all give offline=true; no distinct label.",
+      "minimalFix": "Keep online only for JSON status ok. Add a reachable-error state (for example '응답 오류 (HTTP 404)' or '비정상 응답') for any received HTTP response that fails the contract, and keep 'Offline' only for fetch rejection or timeout. Add Header tests per class."
+    },
+    {
+      "id": "UI-854-L2",
+      "severity": "Low",
+      "source": "apps/web/src/shared/ui/Header.tsx:39-73",
+      "claim": "Gateway checks have no request sequence fence and no timeout: overlapping checks are not ordered, so an older slow success can overwrite a newer failure and show an RTT that was not the latest observation; a hung check leaves '확인 중...' or the last state unchanged.",
+      "counterexample": "Probe H2: check 1 pending, check 2 rejects at 5s -> Offline; check 1 then resolves JSON ok -> Gateway shows Nms online. Present on base 5368 too (pre-existing).",
+      "minimalFix": "Sequence counter (apply only the latest check) plus AbortSignal.timeout below the 5s interval mapped to Offline."
+    },
+    {
+      "id": "UI-854-L3",
+      "severity": "Low",
+      "source": "apps/web/src/app/App.tsx:785 onRetryNodes={fetchNodes}; apps/web/src/features/desktop/ResourceExplorer.tsx:1172 onClick={onRetryNodes}",
+      "claim": "The click MouseEvent is passed as the new positional isBackground parameter (truthy), so the explicit nodes retry button in the Web Desktop resource explorer runs as a background poll: it does not show loading or clear the prior error until the result.",
+      "counterexample": "Static: fetchNodes(isBackground = false) receives the event object from onClick={onRetryNodes}; `if (!isBackground)` is false.",
+      "minimalFix": "Pass `onRetryNodes={() => fetchNodes(false)}` (or test `isBackground === true` inside fetch*)."
+    },
+    {
+      "id": "UI-854-L4",
+      "severity": "Low",
+      "source": "apps/web/tests/portal-refresh-fleet-ui.test.tsx (sections 1-9)",
+      "claim": "Test evidence does not exercise App polling: all UI tests render ClusterOverview/Header with hand-set props; section 8 greps config text; section 9 asserts a locally defined stand-in function, not App.handleApprove/handleReject. Root R-UI-M2 asked for repeated refresh, real project switch/logout scope reset and old-response tests.",
+      "counterexample": "Removing the isBackground branch or the approvalsState guard from App.tsx would leave these 20 tests green (they never mount App).",
+      "minimalFix": "Add App-level tests with fake timers and mocked apiClient (see reviewer probe P1-P7 shapes) plus an approve/reject click test with approvalsState=error that asserts no decision call."
+    }
+  ],
+  "info": [
+    "UI-854-I1 fixture-problem-codes-integrity.test.ts: only the per-test timeout changed to 20000ms; walk/pattern/canonical /^[A-Z]+-[0-9]{4}$/ assertions unchanged, no global testTimeout change. Isolated run 100ms on 854 bytes. No first failure or justification is recorded in the author History/Evidence; acceptable as non-weakening, but the reason should be recorded or the change reverted.",
+    "UI-854-I2 auth/session.ts: preferred_username/name/email from the ID token are read only after the existing nonce/iss/aud/azp/exp/iat checks and only after /v1/session returns a valid oidc:<64hex> subject, tenant and bounded expiresAt; they set user.name only. user.id stays identity.subjectId, tenantId stays from the server session, role stays '프로젝트별 권한'; repository grep shows user.name is used only for the Header pill. Signature verification still depends on config.jwks in completeLogin (pre-existing), so the display name can come from a signature-unverified but claim-checked token when JWKS is absent: display-only, no authority. formatUserDisplayName shortens a raw 'oidc:' name to 8 hex chars for display only.",
+    "UI-854-I3 approvals: handleApprove/handleReject refuse when approvalsState==='error' (static review); backend decision APIs remain the authority. Retained runs/workspaces in error state show only the app-level role=alert (no per-list last-success time for workspaces).",
+    "UI-854-I4 vite.config.ts adds an explicit preview block: preview default port changes from Vite's 4173 to 3000; host 0.0.0.0 was already inherited from server.host. Root's 3100 preview config sets host 127.0.0.1 itself.",
+    "UI-854-I5 Stale banner role=alert is nested inside the empty card's role=status section; both are announced, acceptable."
+  ],
+  "accepted": [
+    "Empty-cluster 5s flash root cause (loading state on every poll -> fall-through to metrics) is fixed for the dashboard ClusterOverview; /studio callback URL lands on the dashboard tab (App.tsx:560), which is the reported surface.",
+    "No fabricated 5/5, resources, statuses or timestamps; '정상 (5대 온라인)' simulation label renamed; header 0/0 only after a real observation.",
+    "Session/scope fences retained and strengthened: chooseProject now bumps all four request counters and resets states and lastFetchedAt; resetAuthenticatedState already reset everything.",
+    "nginx security headers/cache/proxy/auth routes otherwise unchanged; Authorization passthrough only on /v1/."
+  ],
+  "limits": [
+    "No live 3100/8080/8443 probing, no browser, no TLS: nginx and proxy behaviour reviewed from config text and Root's read-only preview config. Hosted CI Portal Container Hardened Runtime Smoke (Root-verified run 42211235450 job 127870097238) is the only container-level evidence and was not re-run.",
+    "Probes run in happy-dom with mocked fetch/apiClient and fake timers; they are not actual-browser or fleet SSO acceptance. Owner-cited Portal Login Harness 42207878338 is stale for 2d87/854 and heavily mocked.",
+    "Full Vitest serial run: 101 files/1232 tests passed; the 6 failures in agent-eval-runner and agent-mutation-guards were 'fatal: not a git repository' in the scratch export and passed (2 files/44 tests) with GIT_DIR pinned to HEAD 854a8eab. A first parallel full run crashed the node process (exit -1073740791) on a host with about 200MB free RAM; not a product failure.",
+    "Local production bundle name index-jJ3-copl.js differs from the owner's local index-VJNRr0e6.js; artifact identity is Root's responsibility from the CI artifact, not this review.",
+    "Backend, Go and old harness suites were not re-run (unchanged by this delta)."
+  ],
+  "nextAction": "Gemini fixes UI-854-M1 (required) and UI-854-L1..L4 in the same task as a new immutable candidate with fresh exact Frontend/Docs CI, then Root requests one narrow Claude re-review of that delta. Root does not deploy 854.",
+  "atKST": "2026-11-06T21:05:00+09:00"
+}

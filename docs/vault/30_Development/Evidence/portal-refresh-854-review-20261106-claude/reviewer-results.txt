@@ -1,0 +1,99 @@
+# Claude reviewer results - portal-refresh 854a8eab (raw excerpts; full logs kept in session scratch, sha256 listed)
+# probe file sha256: 3df1026a7386165b0e3cee102b59d5c9ff6bd026e9f1452cec86f6649363fc2e
+log vt-targeted.log sha256=18d461fab09ad391e8c511454765e278f0d3593b97d22f6e3b2802630a714929
+log vt-full.log sha256=8312505199d468862ebc394e583746c03a356bbe446c2808ae8c773c31afea5e
+log vt-full2.log sha256=ea4a98cff7107bfb950abcde1dd8c1e64f2c27272ceed0508c6b3902359e9643
+log vt-git2.log sha256=942c2e6f0d4936fb917e14ee1d1de17333626aea9d2baea9d6a5222d9a724b13
+log probe2.log sha256=4d6b5d80f5f430f048cd8253de0db0b97ab23003e68b1c292e9dde0b698a8434
+log probe-base.log sha256=7d854feef7ba15959ab7ea4d24b1192346c57891c65db0634cee0d27b2df3e0d
+log tsc.log sha256=e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+log build.log sha256=d6fcc2cbac149c56c28f4a1d497e1045d2505eddf1be87d404781af3cbfa6703
+log fi.log sha256=b09270953a583e1575551d53a4ccb19f16d01f2303ff80ef57be66bbaf74d5ab
+log cb.log sha256=7886596114d2d8bcfcee262e6b79618c664bf83afcb0e08e6ecec3facb6b0d84
+log rc.log sha256=5c217d5101b1dfbd17dceb3647af4edc55476772e80f620e635e97be3657f65f
+log eslint.log sha256=e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+log fixture.log sha256=9fbd9023ca6e37a7f25b0ac538d282c6159bc1fd094466dbeb25aed8adb78cd8
+log sync-before.log sha256=29d14d014ff52efb20e5c61c56a66f1482323be78e97801add60409ee1726bf0
+
+== vt-full.meta (parallel, crashed)
+start=2026-11-06T20:51:51.7519693+09:00
+exit=-1073740791 end=2026-11-06T20:52:03.8975889+09:00
+== vt-full2.meta (serial)
+exit=1 start=2026-11-06T20:54:48.7214679+09:00 end=2026-11-06T20:56:47.8735927+09:00
+== vt-full2 summary
+ Test Files  2 failed | 101 passed (103)
+      Tests  6 failed | 1232 passed (1238)
+== vt-full2 failing (env: scratch export has no .git)
+ FAIL  tests/agent-eval-runner.test.ts > G-07 100 Prompt / 30 Coding Golden Eval Runner (EVL-05) > executes full 130-ca
+ FAIL  tests/agent-eval-runner.test.ts > G-07 100 Prompt / 30 Coding Golden Eval Runner (EVL-05) > verifies committed c
+ FAIL  tests/agent-eval-runner.test.ts > G-07 100 Prompt / 30 Coding Golden Eval Runner (EVL-05) > Revert-fail: no-op s
+ FAIL  tests/agent-mutation-guards.test.ts > G-07 Mutation & Integrity Guards (MUT-01~03 & MUT-RUN-01~07) > MUT-RUN-07:
+ FAIL  tests/agent-mutation-guards.test.ts > G-07 Mutation & Integrity Guards (MUT-01~03 & MUT-RUN-01~07) > MUT-SCHEMA-
+ FAIL  tests/agent-mutation-guards.test.ts > G-07 Mutation & Integrity Guards (MUT-01~03 & MUT-RUN-01~07) > Card 138 N1
+node.exe : fatal: not a git repository (or any of the parent directories): .git
+== vt-git2 (GIT_DIR pinned HEAD=854a8eab, same two files)
+ Test Files  2 passed (2)
+      Tests  44 passed (44)
+== vt-targeted
+ Test Files  1 passed (1)
+      Tests  20 passed (20)
+== probe on candidate 854 (probe2.log)
+ ✓ Claude probe: App-level polling/scope/health behaviour at 854a8eab > P1 repeated empty polls keep the same empty card element, never flip to metrics, header 0/0 only after observation 78ms
+P6_REPORT {"callsDuring60s":13,"showsNewNode":false,"showsStaleBanner":false,"stillClaimsCurrentZero":true}
+ ✓ Claude probe: App-level polling/scope/health behaviour at 854a8eab > P2 empty snapshot then background failure shows role=alert stale banner with retry; recovery clears it 25ms
+ ✓ Claude probe: App-level polling/scope/health behaviour at 854a8eab > P3 non-empty snapshot retained on background failure with stale banner 25ms
+ ✓ Claude probe: App-level polling/scope/health behaviour at 854a8eab > P4 late older response is ignored after a newer poll completes (response order) 22ms
+ ✓ Claude probe: App-level polling/scope/health behaviour at 854a8eab > P5 project switch resets to unknown and drops the old project late response 25ms
+ ✓ Claude probe: App-level polling/scope/health behaviour at 854a8eab > P6 COUNTEREXAMPLE probe: every node poll slower than 5s -> are results/staleness ever shown? 21ms
+P7_REPORT {"showsStaleBanner":false,"showsError504":false,"stillClaimsCurrentZero":true}
+H1_LABEL html200 online=false offline=true unknown=false
+H1_LABEL json404 online=false offline=true unknown=false
+H1_LABEL json503 online=false offline=true unknown=false
+H1_LABEL jsonStatusDown online=false offline=true unknown=false
+H1_LABEL network online=false offline=true unknown=false
+H2_REPORT {"afterNewerFailureOffline":true,"afterOldSuccessOnline":true,"calls":2}
+ ✓ Claude probe: App-level polling/scope/health behaviour at 854a8eab > P7 COUNTEREXAMPLE probe: every node poll hangs then fails after 60s (nginx 504 shape) 63ms
+ ✓ Claude probe: Header /healthz > H1 failure label for html200 8ms
+ ✓ Claude probe: Header /healthz > H1 failure label for json404 9ms
+ ✓ Claude probe: Header /healthz > H1 failure label for json503 7ms
+ ✓ Claude probe: Header /healthz > H1 failure label for jsonStatusDown 7ms
+ ✓ Claude probe: Header /healthz > H1 failure label for network 7ms
+ ✓ Claude probe: Header /healthz > H2 COUNTEREXAMPLE probe: older slow success overwrites a newer failure (no request fence) 9ms
+      Tests  13 passed (13)
+== probe on base 5368 (probe-base.log)
+ × Claude probe: App-level polling/scope/health behaviour at 854a8eab > P1 repeated empty polls keep the same empty card element, never flip to metrics, header 0/0 only after observation 70ms
+ × Claude probe: App-level polling/scope/health behaviour at 854a8eab > P2 empty snapshot then background failure shows role=alert stale banner with retry; recovery clears it 45ms
+ × Claude probe: App-level polling/scope/health behaviour at 854a8eab > P3 non-empty snapshot retained on background failure with stale banner 27ms
+ ✓ Claude probe: App-level polling/scope/health behaviour at 854a8eab > P4 late older response is ignored after a newer poll completes (response order) 34ms
+P6_REPORT {"callsDuring60s":13,"showsNewNode":false,"showsStaleBanner":false,"stillClaimsCurrentZero":false}
+ × Claude probe: App-level polling/scope/health behaviour at 854a8eab > P5 project switch resets to unknown and drops the old project late response 39ms
+ ✓ Claude probe: App-level polling/scope/health behaviour at 854a8eab > P6 COUNTEREXAMPLE probe: every node poll slower than 5s -> are results/staleness ever shown? 28ms
+P7_REPORT {"showsStaleBanner":false,"showsError504":false,"stillClaimsCurrentZero":false}
+H1_LABEL html200 online=true offline=false unknown=false
+H1_LABEL json404 online=false offline=true unknown=false
+H1_LABEL json503 online=false offline=true unknown=false
+H1_LABEL jsonStatusDown online=true offline=false unknown=false
+H1_LABEL network online=false offline=true unknown=false
+H2_REPORT {"afterNewerFailureOffline":true,"afterOldSuccessOnline":true,"calls":2}
+ ✓ Claude probe: App-level polling/scope/health behaviour at 854a8eab > P7 COUNTEREXAMPLE probe: every node poll hangs then fails after 60s (nginx 504 shape) 104ms
+ × Claude probe: Header /healthz > H1 failure label for html200 9ms
+ ✓ Claude probe: Header /healthz > H1 failure label for json404 8ms
+ ✓ Claude probe: Header /healthz > H1 failure label for json503 8ms
+ × Claude probe: Header /healthz > H1 failure label for jsonStatusDown 11ms
+ ✓ Claude probe: Header /healthz > H1 failure label for network 11ms
+ ✓ Claude probe: Header /healthz > H2 COUNTEREXAMPLE probe: older slow success overwrites a newer failure (no request fence) 11ms
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 6 ⎯⎯⎯⎯⎯⎯⎯
+      Tests  6 failed | 7 passed (13)
+== tsc
+== build
+✓ built in 5.48s
+== frontend_integrity
+PASS Frontend Integrity Check: all 9 integrity rules satisfied (0 violations).
+== contract_bindings
+== route_coverage
+41 passed in 1.85s
+== fixture timeout test isolated
+ ✓ tests/fixture-problem-codes-integrity.test.ts > Card 126 / F6: ProblemDetails Fixture Code Format Integrity > enforces all ProblemDetails fixture codes across web tests conform to /^[A-Z]+-[0-9]{
+   Duration  793ms (transform 88ms, setup 0ms, import 103ms, tests 101ms, environment 0ms)
+== sync check before docs
+﻿CHECK: 2829 managed files, 13 pending exports, 0 conflicts. No writes.

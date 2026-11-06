@@ -1,0 +1,25 @@
+{
+  "host": "Windows 11 Pro 10.0.26300, node v24.10.0, Python 3.10.11, about 200MB free of 16GB RAM during runs",
+  "tree": "session scratch git-archive export of 854a8eab (blob-verified) + node_modules junction to supervision-integration-20261104 (lock-exact 265/265)",
+  "commands": [
+    { "atKST": "2026-11-06T20:51:35+09:00", "cmd": "node node_modules/vitest/vitest.mjs run tests/portal-refresh-fleet-ui.test.tsx", "exit": 0, "result": "1 file, 20/20 passed" },
+    { "atKST": "2026-11-06T20:51:51+09:00", "cmd": "node node_modules/vitest/vitest.mjs run (parallel, partial apps/web-only export)", "exit": -1073740791, "result": "node fast-fail crash after 12s under low RAM; partial export lacked repo files; superseded by the serial run below" },
+    { "atKST": "2026-11-06T20:54:48+09:00", "cmd": "node node_modules/vitest/vitest.mjs run --no-file-parallelism --maxWorkers=1 (full 854 export)", "exit": 1, "result": "103 files: 101 passed, 2 failed; 1238 tests: 1232 passed, 6 failed with 'fatal: not a git repository' (scratch export has no .git)" },
+    { "atKST": "2026-11-06T20:58:00+09:00", "cmd": "GIT_DIR=<own review worktree gitdir, HEAD=854a8eab> GIT_WORK_TREE=<export> vitest run tests/agent-eval-runner.test.ts tests/agent-mutation-guards.test.ts --maxWorkers=1", "exit": 0, "result": "2 files, 44/44 passed (includes the 6 env failures); read-only git rev-parse/hash-object" },
+    { "atKST": "2026-11-06T20:58:20+09:00", "cmd": "vitest run tests/zz-claude-review-probe-portal854.test.tsx (reviewer probe, scratch only, removed after)", "exit": 0, "result": "13/13 on 854; P6/P7/H1/H2 reports recorded in reviewer-results.txt" },
+    { "atKST": "2026-11-06T20:59:10+09:00", "cmd": "same probe on base 53683020 export (apps/web + contracts)", "exit": 1, "result": "6 failed / 7 passed: P1,P2,P3,P5,H1-html200,H1-jsonStatusDown fail on base (discriminates the fix)" },
+    { "atKST": "2026-11-06T20:59:51+09:00", "cmd": "node node_modules/typescript/bin/tsc -b", "exit": 0, "result": "no output" },
+    { "atKST": "2026-11-06T20:59:58+09:00", "cmd": "node node_modules/vite/bin/vite.js build", "exit": 0, "result": "built in 5.48s, index-jJ3-copl.js 1297736 bytes (chunk-size warning only); scratch dist removed afterwards" },
+    { "atKST": "2026-11-06T21:00:28+09:00", "cmd": "python tools/check_frontend_integrity.py", "exit": 0, "result": "94 files, 9 rules, 0 violations" },
+    { "atKST": "2026-11-06T21:00:28+09:00", "cmd": "python tools/check_contract_bindings.py", "exit": 0, "result": "57 fixtures, 21 bound types, 14 replay guards" },
+    { "atKST": "2026-11-06T21:00:28+09:00", "cmd": "python -m pytest tests/test_route_coverage.py -q", "exit": 0, "result": "41 passed in 1.85s" },
+    { "atKST": "2026-11-06T21:00:46+09:00", "cmd": "eslint <7 changed TS/TSX files> --max-warnings 0", "exit": 0, "result": "no output" },
+    { "atKST": "2026-11-06T21:01:30+09:00", "cmd": "vitest run tests/fixture-problem-codes-integrity.test.ts --reporter=verbose", "exit": 0, "result": "1 test 100ms (timeout 20000ms not needed in isolation)" },
+    { "atKST": "2026-11-06T21:02:04+09:00", "cmd": "python tools/sync_obsidian.py --check --state D:/Project/SaintVision-Invion/SaintVisionI-Invion/.git/obsidian-sync-state.json (before own docs)", "exit": 0, "result": "2829 managed, 13 pending exports, 0 conflicts, no writes; state sha256 E0B25141896FC33F51A7D8271670EB5ED68C96B1047814C1E35177D28BED51AE before=after" }
+  ],
+  "notRun": [
+    "live 3100/8080/8443, browser, TLS, Docker, PKI: out of scope by brief",
+    "whole backend/Go/old Portal Login Harness: unchanged by delta",
+    "owner CI re-dispatch: Root verified exact Frontend 42211235450 and Docs 42211665725"
+  ]
+}

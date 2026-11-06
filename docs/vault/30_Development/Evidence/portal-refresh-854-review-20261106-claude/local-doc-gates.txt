@@ -1,0 +1,33 @@
+Local publication gates, 2026-11-06 KST, Windows, D:/Project/SaintVisionI-Invion/.venv Python, PYTHONUTF8=1, serial (runner in reviewer scratch, logs in scratch; only sha256 published).
+tree = 854a8eab0b6e236b62878f49ee941c700e458af0 + this review's own uncommitted History/Evidence only (git status below).
+CanonicalRoot = D:/Project/SaintVisionI-Invion/fleet-five-orchestration-20261105 at c93d481f. sync_obsidian ran CHECK only; fresh read-only canonical state hash used; no apply/adopt/resolve/state write/stale export.
+[CanonicalRoot BEFORE] 2026-11-06T21:07:07+09:00..2026-11-06T21:07:17+09:00 exit=0 logsha=fc4c6b8dec847cf9e129f9d10a32f043ec60a61709853df11d7b343bdeead00a :: python -B tools/sync_obsidian.py --check --state D:\Project\SaintVision-Invion\SaintVisionI-Invion\.git\obsidian-sync-state.json
+    CHECK: 2847 managed files, 0 pending exports, 0 conflicts. No writes.
+    stateBefore=e0b25141896fc33f51a7d8271670eb5ed68c96b1047814c1e35177d28bed51ae stateAfter=e0b25141896fc33f51a7d8271670eb5ed68c96b1047814c1e35177d28bed51ae unchanged=True
+[worktree] 2026-11-06T21:07:17+09:00..2026-11-06T21:07:26+09:00 exit=0 logsha=8d8d813e2472c1f5140630a9df04494d82874e47a0f12aa7b130f2f36e42e905 :: python -B tools/check_docs.py
+    PASS: 24 original hashes, 1261 versioned documents, wiki links, 48 tasks, 12 outcomes, owner/reviewer/skills, dependency DAG.
+[worktree] 2026-11-06T21:07:26+09:00..2026-11-06T21:07:28+09:00 exit=0 logsha=8d94e24df1277fe43c5f9927c7cec6bcb64bc1cb6ce1ded97cf114e3a112b100 :: python -B tools/check_ontology_generation.py
+    PASS: 4 ontology artifacts are graph-equivalent to a fresh generation
+[worktree] 2026-11-06T21:07:28+09:00..2026-11-06T21:07:30+09:00 exit=0 logsha=1e60d5c51f45cc7852bec8912e0f958ac34c9f8cc4bf70c876ce34937014ae71 :: python -B tools/check_ontology.py
+    PASS: RDF parsing, defined terms, TTL/JSON-LD equivalence, 48 task mappings, positive SHACL, 4 rejected invalid fixtures, 4 competency queries, Obsidian mirrors.
+[worktree] 2026-11-06T21:07:30+09:00..2026-11-06T21:07:38+09:00 exit=0 logsha=606f8279fec8144dbdcc8cdc83bdbf5524bbc7a6de5154194b071f5f9c64da8c :: python -B tools/check_contract_bindings.py
+      (Reporting sites is not a regression -- the TYPE number never meant 'sites verified'; this makes the counting unit explicit. EvidenceEnvelope-class multi-site anchors are why.)
+[worktree] 2026-11-06T21:07:38+09:00..2026-11-06T21:07:38+09:00 exit=0 logsha=9e9bfcb0f6494682277ab3f5e37bc6d4bacfdefe0196acf27ee01dfda04291d9 :: python -B tools/check_frontend_integrity.py
+    PASS Frontend Integrity Check: all 9 integrity rules satisfied (0 violations).
+[worktree] 2026-11-06T21:07:38+09:00..2026-11-06T21:07:42+09:00 exit=0 logsha=ae32d8797e0bed59d20669e2a01f66dfc405277d6a68ffa2a57e25cbb204ab83 :: python -B tools/check_doc_path_citations.py --ratchet --base-ref 854a8eab0b6e236b62878f49ee941c700e458af0
+    PASS check_doc_path_citations --ratchet: 290 broken citation(s), all in baseline, none stale, floor unchanged.
+[worktree] 2026-11-06T21:07:42+09:00..2026-11-06T21:07:43+09:00 exit=0 logsha=9ad784152439057919b6105cb334a0199022fc74c697d99901e424191e46caa8 :: python -B tools/check_doc_single_source.py --ratchet
+    PASS check_doc_single_source --ratchet: 16 pairs, all in baseline, none stale.
+[worktree] 2026-11-06T21:07:43+09:00..2026-11-06T21:07:48+09:00 exit=0 logsha=140264c015bd9a0aca0b7b352650a5a48e5b7520964df49fcf043feac98742c0 :: python -B tools/test_sync.py
+    CHECK: 2 managed files, 0 pending exports, 0 conflicts. No writes.
+[worktree] 2026-11-06T21:07:48+09:00..2026-11-06T21:07:54+09:00 exit=0 logsha=9081c224f29f766002195193b54b8004ed367e6b9623690fa004cd9179521ac7 :: python -B tools/build_docs.py
+    BUILT: saintvision-guidelines.zip, 14788004 bytes. Documentation only.
+[worktree] 2026-11-06T21:07:54+09:00..2026-11-06T21:07:59+09:00 exit=0 logsha=9a064105636d3e255eb3a40d1e0b90a73f65874ae7132f9c175f3d358cfd242d :: python -B tools/sync_obsidian.py --check --state D:\Project\SaintVision-Invion\SaintVisionI-Invion\.git\obsidian-sync-state.json
+    CHECK: 2835 managed files, 19 pending exports, 0 conflicts. No writes.
+    stateBefore=e0b25141896fc33f51a7d8271670eb5ed68c96b1047814c1e35177d28bed51ae stateAfter=e0b25141896fc33f51a7d8271670eb5ed68c96b1047814c1e35177d28bed51ae unchanged=True
+[CanonicalRoot AFTER] 2026-11-06T21:07:59+09:00..2026-11-06T21:08:08+09:00 exit=0 logsha=fc4c6b8dec847cf9e129f9d10a32f043ec60a61709853df11d7b343bdeead00a :: python -B tools/sync_obsidian.py --check --state D:\Project\SaintVision-Invion\SaintVisionI-Invion\.git\obsidian-sync-state.json
+    CHECK: 2847 managed files, 0 pending exports, 0 conflicts. No writes.
+    stateBefore=e0b25141896fc33f51a7d8271670eb5ed68c96b1047814c1e35177d28bed51ae stateAfter=e0b25141896fc33f51a7d8271670eb5ed68c96b1047814c1e35177d28bed51ae unchanged=True
+git status --short (worktree):
+    ?? docs/vault/30_Development/Evidence/portal-refresh-854-review-20261106-claude/
+    ?? docs/vault/30_Development/History/2026-11-06_21-05-00_KST_PORTAL_REFRESH_854_독립검토_Claude.md

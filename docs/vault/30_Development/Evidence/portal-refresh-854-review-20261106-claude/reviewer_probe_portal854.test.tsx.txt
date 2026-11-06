@@ -1,0 +1,283 @@
+// @vitest-environment happy-dom
+// Claude independent review probe for portal-refresh 854a8eab (NOT a product test; scratch-only).
+// @ts-ignore
+globalThis.IS_REACT_ACT_ENVIRONMENT = true;
+import React, { act } from 'react';
+import { createRoot, type Root } from 'react-dom/client';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { App } from '../src/app/App';
+import { Header } from '../src/shared/ui/Header';
+import * as session from '../src/features/auth/session';
+import * as client from '../src/shared/api/client';
+import * as projects from '../src/shared/api/projectObservation';
+import * as runs from '../src/shared/api/runApprovalObservation';
+import * as fabric from '../src/features/desktop/fabricControlApi';
+import * as storage from '../src/shared/api/storageObservation';
+
+const t0 = Date.parse('2026-11-06T11:00:00Z');
+const projectA = 'prj_01ARZ3NDEKTSV4RRFFQ69G5FAV';
+const projectB = 'prj_01ARZ3NDEKTSV4RRFFQ69G5FAW';
+const nodeA = 'nod_01ARZ3NDEKTSV4RRFFQ69G5FAV';
+
+type Pending = { path: string; resolve: (v: any) => void; reject: (e: any) => void };
+
+describe('Claude probe: App-level polling/scope/health behaviour at 854a8eab', () => {
+  let root: Root;
+  let container: HTMLDivElement;
+  let nodeMode: 'empty' | 'one' | 'reject' | 'pending' | 'slow6s';
+  let nodeCalls: string[];
+  let pending: Pending[];
+
+  beforeEach(() => {
+    vi.useFakeTimers();
+    vi.setSystemTime(t0);
+    localStorage.clear();
+    container = document.createElement('div');
+    document.body.appendChild(container);
+    root = createRoot(container);
+    nodeMode = 'empty'; nodeCalls = []; pending = [];
+    vi.spyOn(globalThis, 'fetch').mockImplementation(async () =>
+      new Response(JSON.stringify({ status: 'ok', version: 'probe' }), { status: 200, headers: { 'content-type': 'application/json' } }));
+    vi.spyOn(session, 'hasLoginCallback').mockReturnValue(true);
+    vi.spyOn(session, 'completeLogin').mockImplementation(async () => ({
+      token: 'probe-token',
+      user: { id: 'oidc:' + 'a'.repeat(64), name: 'Probe User', role: '프로젝트별 권한', tenantId: 'ten_probe' },
+      expiresAt: Math.floor(Date.now() / 1000) + 1800,
+    }));
+    vi.spyOn(session, 'commitSession').mockImplementation(() => {});
+    vi.spyOn(client, 'onUnauthorized').mockImplementation(() => {});
+    vi.spyOn(projects, 'fetchProjects').mockResolvedValue([projectA, projectB].map(id => ({
+      id, name: id, tenantId: 'ten_probe', createdAt: new Date(t0).toISOString(),
+    })));
+    vi.spyOn(projects, 'fetchProjectWorkspaces').mockResolvedValue([]);
+    vi.spyOn(runs, 'fetchObservedRuns').mockResolvedValue([]);
+    vi.spyOn(runs, 'fetchObservedApprovals').mockResolvedValue([]);
+    vi.spyOn(fabric, 'getDiscoveryCandidates').mockResolvedValue([]);
+    vi.spyOn(fabric, 'getStorageContributions').mockResolvedValue([]);
+    vi.spyOn(fabric, 'getNodeResourceUsage').mockResolvedValue(null);
+    vi.spyOn(storage, 'fetchStorageObservation').mockResolvedValue(null);
+    vi.spyOn(client, 'apiClient').mockImplementation(async (path: string) => {
+      if (path.endsWith('/node-certificates')) throw new Error('certificate observation unavailable');
+      if (path.endsWith('/nodes')) {
+        nodeCalls.push(path);
+        const one = { items: [{ nodeId: nodeA, hostname: 'observed-node', status: 'online', osType: 'linux' }], total: 1 };
+        if (nodeMode === 'empty') return { items: [], total: 0 };
+        if (nodeMode === 'one') return one;
+        if (nodeMode === 'reject') throw new Error('PROBE-NODES-DOWN');
+        if (nodeMode === 'slow6s') {
+          return new Promise((resolve) => setTimeout(() => resolve(one), 6000));
+        }
+        return new Promise((resolve, reject) => pending.push({ path, resolve, reject }));
+      }
+      return {};
+    });
+  });
+
+  afterEach(() => {
+    act(() => root.unmount());
+    container.remove();
+    vi.restoreAllMocks();
+    vi.useRealTimers();
+  });
+
+  async function advance(ms: number) {
+    await act(async () => { await vi.advanceTimersByTimeAsync(ms); });
+  }
+  async function mount() {
+    await act(async () => root.render(<App />));
+    await advance(0);
+  }
+  async function chooseProject(id: string) {
+    const selector = container.querySelector<HTMLSelectElement>('[data-testid="project-selector"]');
+    expect(selector).not.toBeNull();
+    await act(async () => {
+      selector!.value = id;
+      selector!.dispatchEvent(new Event('change', { bubbles: true }));
+    });
+  }
+  const text = () => container.textContent ?? '';
+  const empty = () => container.querySelector('[data-testid="cluster-overview-empty-state"]');
+  const stale = () => container.querySelector('[data-testid="cluster-stale-warning"]');
+
+  it('P1 repeated empty polls keep the same empty card element, never flip to metrics, header 0/0 only after observation', async () => {
+    nodeMode = 'pending';
+    await mount();
+    // initial pending: not a registered-0 success, header unknown
+    expect(text()).toContain('클러스터 노드 정보를 확인하고 있습니다');
+    expect(text()).not.toContain('정상 조회 결과: 0대');
+    expect(text()).toContain('확인 중...');
+    pending.splice(0).forEach(p => p.resolve({ items: [], total: 0 }));
+    nodeMode = 'empty';
+    await advance(0);
+    const first = empty();
+    expect(first).not.toBeNull();
+    expect(text()).toContain('정상 조회 결과: 0대');
+    expect(text()).toContain('0/0');
+    let sameEveryCycle = true;
+    for (let i = 0; i < 6; i++) {
+      await advance(5000);
+      if (empty() !== first) sameEveryCycle = false;
+      if (text().includes('CPU 코어')) sameEveryCycle = false;
+    }
+    expect(sameEveryCycle).toBe(true);
+    expect(nodeCalls.length).toBeGreaterThanOrEqual(7);
+  });
+
+  it('P2 empty snapshot then background failure shows role=alert stale banner with retry; recovery clears it', async () => {
+    await mount();
+    expect(text()).toContain('정상 조회 결과: 0대');
+    const first = empty();
+    nodeMode = 'reject';
+    await advance(5000);
+    expect(stale()).not.toBeNull();
+    expect(stale()!.getAttribute('role')).toBe('alert');
+    expect(text()).toContain('PROBE-NODES-DOWN');
+    expect(text()).not.toContain('정상 조회 결과: 0대');
+    expect(container.querySelector('[data-testid="cluster-stale-retry-btn"]')).not.toBeNull();
+    expect(empty()).toBe(first); // no remount during failure
+    nodeMode = 'empty';
+    await advance(5000);
+    expect(stale()).toBeNull();
+    expect(text()).toContain('정상 조회 결과: 0대');
+  });
+
+  it('P3 non-empty snapshot retained on background failure with stale banner', async () => {
+    nodeMode = 'one';
+    await mount();
+    expect(text()).toContain('observed-node');
+    nodeMode = 'reject';
+    await advance(5000);
+    expect(stale()).not.toBeNull();
+    expect(text()).toContain('observed-node');
+  });
+
+  it('P4 late older response is ignored after a newer poll completes (response order)', async () => {
+    await mount();
+    nodeMode = 'pending';
+    await advance(5000); // poll #2 pending
+    await advance(5000); // poll #3 pending
+    expect(pending.length).toBe(2);
+    pending[1].resolve({ items: [], total: 0 });   // newer resolves first (empty)
+    await advance(0);
+    pending[0].resolve({ items: [{ nodeId: nodeA, hostname: 'late-old-node', status: 'online', osType: 'linux' }], total: 1 });
+    await advance(0);
+    expect(text()).not.toContain('late-old-node');
+  });
+
+  it('P5 project switch resets to unknown and drops the old project late response', async () => {
+    nodeMode = 'one';
+    await mount();
+    expect(text()).toContain('observed-node');
+    nodeMode = 'pending';
+    await advance(5000); // A poll in flight
+    const oldA = pending.splice(0);
+    expect(oldA.length).toBe(1);
+    expect(oldA[0].path).toContain(projectA);
+    await chooseProject(projectB);
+    await advance(0);
+    expect(text()).not.toContain('observed-node');
+    expect(text()).toContain('클러스터 노드 정보를 확인하고 있습니다');
+    expect(text()).toContain('확인 중...');
+    oldA[0].resolve({ items: [{ nodeId: nodeA, hostname: 'leaked-A-node', status: 'online', osType: 'linux' }], total: 1 });
+    await advance(0);
+    expect(text()).not.toContain('leaked-A-node');
+    const bReq = pending.filter(p => p.path.includes(projectB));
+    expect(bReq.length).toBeGreaterThan(0);
+  });
+
+  it('P6 COUNTEREXAMPLE probe: every node poll slower than 5s -> are results/staleness ever shown?', async () => {
+    await mount(); // first observation: 0 nodes at t0
+    expect(text()).toContain('정상 조회 결과: 0대');
+    nodeMode = 'slow6s'; // server now has 1 node but every answer takes 6s
+    await advance(60000);
+    const report = {
+      callsDuring60s: nodeCalls.length,
+      showsNewNode: text().includes('observed-node'),
+      showsStaleBanner: stale() !== null,
+      stillClaimsCurrentZero: text().includes('정상 조회 결과: 0대'),
+    };
+    console.log('P6_REPORT ' + JSON.stringify(report));
+    expect(report.callsDuring60s).toBeGreaterThan(10);
+  });
+
+  it('P7 COUNTEREXAMPLE probe: every node poll hangs then fails after 60s (nginx 504 shape)', async () => {
+    await mount();
+    nodeMode = 'pending';
+    await advance(5000);
+    let elapsed = 5000;
+    // reject each pending request 60s after it was issued (like proxy_read_timeout 60s)
+    const issued: Array<{ p: Pending; at: number }> = [];
+    for (let i = 0; i < 30; i++) {
+      pending.splice(0).forEach(p => issued.push({ p, at: elapsed }));
+      for (const it of issued) if (elapsed - it.at >= 60000 && it.p) { it.p.reject(new Error('PROBE-504')); (it as any).p = null; }
+      await advance(5000);
+      elapsed += 5000;
+    }
+    const report = {
+      showsStaleBanner: stale() !== null,
+      showsError504: text().includes('PROBE-504'),
+      stillClaimsCurrentZero: text().includes('정상 조회 결과: 0대'),
+    };
+    console.log('P7_REPORT ' + JSON.stringify(report));
+    expect(true).toBe(true);
+  });
+});
+
+describe('Claude probe: Header /healthz', () => {
+  let root: Root;
+  let container: HTMLDivElement;
+  beforeEach(() => {
+    vi.useFakeTimers();
+    container = document.createElement('div');
+    document.body.appendChild(container);
+    root = createRoot(container);
+  });
+  afterEach(() => {
+    act(() => root.unmount());
+    container.remove();
+    vi.restoreAllMocks();
+    vi.useRealTimers();
+  });
+  const render = async () => {
+    await act(async () => root.render(
+      <Header currentTheme="light" onToggleTheme={() => {}} activeTab="dashboard" onSelectTab={() => {}} />,
+    ));
+  };
+  const gw = () => (container.textContent ?? '').match(/Gateway:\s*([^클👤]*?)(?=👤|$|라이트|다크|☀|🌙)/)?.[1]?.trim() ?? container.textContent;
+
+  it.each([
+    ['html200', () => new Response('<!doctype html><html></html>', { status: 200, headers: { 'content-type': 'text/html' } })],
+    ['json404', () => new Response(JSON.stringify({ detail: 'nf' }), { status: 404, headers: { 'content-type': 'application/json' } })],
+    ['json503', () => new Response(JSON.stringify({ status: 'not_ready' }), { status: 503, headers: { 'content-type': 'application/json' } })],
+    ['jsonStatusDown', () => new Response(JSON.stringify({ status: 'down' }), { status: 200, headers: { 'content-type': 'application/json' } })],
+    ['network', () => { throw new TypeError('Failed to fetch'); }],
+  ] as const)('H1 failure label for %s', async (name, mk) => {
+    vi.spyOn(globalThis, 'fetch').mockImplementation(async () => (mk as any)());
+    await render();
+    await act(async () => { await vi.advanceTimersByTimeAsync(0); });
+    const t = container.textContent ?? '';
+    console.log(`H1_LABEL ${name} online=${t.includes('ms')} offline=${t.includes('Offline')} unknown=${t.includes('Gateway: 확인 중')}`);
+    expect(t).not.toMatch(/Gateway:\s*\d+ms/);
+  });
+
+  it('H2 COUNTEREXAMPLE probe: older slow success overwrites a newer failure (no request fence)', async () => {
+    let call = 0;
+    let resolveFirst: ((r: Response) => void) | null = null;
+    vi.spyOn(globalThis, 'fetch').mockImplementation(() => {
+      call++;
+      if (call === 1) return new Promise<Response>(r => { resolveFirst = r; });
+      return Promise.reject(new TypeError('Failed to fetch'));
+    });
+    await render();
+    await act(async () => { await vi.advanceTimersByTimeAsync(5000); }); // call 2 fails -> Offline
+    const afterNewerFailure = (container.textContent ?? '').includes('Offline');
+    await act(async () => {
+      resolveFirst!(new Response(JSON.stringify({ status: 'ok' }), { status: 200, headers: { 'content-type': 'application/json' } }));
+      await vi.advanceTimersByTimeAsync(0);
+    });
+    const t = container.textContent ?? '';
+    const report = { afterNewerFailureOffline: afterNewerFailure, afterOldSuccessOnline: /Gateway:\s*\d+ms/.test(t), calls: call };
+    console.log('H2_REPORT ' + JSON.stringify(report));
+    expect(call).toBeGreaterThanOrEqual(2);
+  });
+});
