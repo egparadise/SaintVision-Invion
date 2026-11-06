@@ -1,0 +1,35 @@
+{
+ "schemaVersion": "fleet5-b-rev7-review-commands:1",
+ "environment": {
+  "host": "Windows 11 Pro 10.0.26300 (Git Bash + PowerShell 5.1)",
+  "worktree": "D:/Project/SaintVisionI-Invion/fleet5-bootstrap-v3-review-20261106 (same released review workspace; clean on agent/claude/fleet5-k2a-de71-code-review-20261106 at start)",
+  "branch": "agent/claude/fleet5-b-rev7-33f7-review-20261106 created FROM 33f7c6b48883cb06d1ea7d645bdb88634eb1bca0 at about 14:34 KST",
+  "python": "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe = Python 3.14.7 (owner interpreter per proof-checks.json; read-only use, no installs)",
+  "memory": "14:36 KST FreePhysical 218 MB of 16151 MB; 14:43 KST 228 MB. No OS RAM limit enforced or changed.",
+  "noDB_PG_Docker_Node_SSH_PKI_VM_clock_schedule": true
+ },
+ "commands": [
+  {"atKST": "2026-11-06T14:33", "argv": "orca orchestration dispatch-show --task task_c067a20c86ed --json", "exit": 0, "result": "dependency dispatch ctx_adf96c8d66b4 status completed 2026-11-06T05:31:12.693Z"},
+  {"atKST": "2026-11-06T14:34", "argv": "git fetch origin agent/codex/fleet5-b-contract-rev7-20261106; git rev-parse FETCH_HEAD; git merge-base --is-ancestor ee97c27a FETCH_HEAD; git rev-list --count ee97c27a..FETCH_HEAD; git checkout -b agent/claude/fleet5-b-rev7-33f7-review-20261106 33f7c6b4", "exit": 0, "result": "FETCH_HEAD 33f7c6b4; 2 commits after ee97"},
+  {"atKST": "2026-11-06T14:35", "argv": "git diff --name-status ee97c27a HEAD; git diff --name-status 72028cba HEAD -- deploy services src migrations tests tools contracts packages apps .github", "exit": 0, "result": "131 A, all Rev7 History+Evidence; product diff 0 lines"},
+  {"atKST": "2026-11-06T14:36", "argv": "read-only: Rev7 History v1.0.1, review-resolution/packet-summary/revision-record, Root b-rev7-concrete-root-decision.json, git show ecbdaa3b:<prior review.json>", "exit": 0},
+  {"atKST": "2026-11-06T14:38", "argv": "git show 72028cba:services/node-agent/{transport/server.go,runtime/runner.go,runtime/quarantine.go,transport/storage.go,storage/sample.go}", "exit": 0, "result": "RECEIPT_OBSERVE mutation chain and per-handler effect class verified"},
+  {"atKST": "2026-11-06T14:40", "argv": "python -I -B reviewer_l3_transport.py <repo> <out> (first run exit 1: StopIteration on Observe as last Go func; fixed end-of-file sentinel, rerun)", "exits": [1, 0], "result": "reviewer-l3-transport-result.json"},
+  {"atKST": "2026-11-06T14:42-14:52", "argv": "owner checks individually, see owner-reruns.tsv.txt (KST, exit, stdout sha256, argv)", "exits": {"schema": 0, "authority": 0, "fixtures": 0, "prior_closed": 0, "r4": 0, "r4coexist": 1, "transport_inventory": 0, "packet_checks": 0, "source_fixtures": 0}, "comparison": "all stdout sha256 equal owner records; r4coexist exit 1 is the expected storage-workspace guard refusal", "sideEffect": "only source-fixture-results.json changed (self-measured memory); restored with git checkout; git status clean"},
+  {"atKST": "2026-11-06T14:44", "argv": "PowerShell Start-Process peak-WS wrapper for transport_inventory/packet_checks", "exit": "not captured (Start-Process ExitCode empty without cached handle); peak 4,284,416 B is the venv launcher shim, not the interpreter. Discarded; exits re-captured with bash rc above."},
+  {"atKST": "2026-11-06T14:49", "argv": "python -B reviewer_m1_rev7_attacks.py <E> <out> (imports owner model read-only)", "exit": 0, "result": "14 cases, 6 mismatches (C1-C4, C7, C7b)"},
+  {"atKST": "2026-11-06T14:50", "argv": "python -I -B reviewer_m2_port_taxonomy.py <E> <out>", "exit": 0, "result": "757 refs, 85% analysis-only, 7 zero-genuine entries"},
+  {"atKST": "2026-11-06T14:51", "argv": "python streaming reads of classifiedCalls.jsonl/unknownEdges.jsonl/records.jsonl/writers.jsonl/entry-lock-plans.json/transition-contracts.json (line-streamed, no aggregate parse)", "exit": 0},
+  {"atKST": "2026-11-06T14:55", "argv": "python -I -B reviewer_display_probe.py <repo> <E> <out>", "exit": 0, "result": "22 masked rows; 21 writer rows raw-segment sha == expressionSHA256"},
+  {"atKST": "2026-11-06T14:57", "argv": "python -B prior_m1_attacks.py <E> (git show ecbdaa3b:.../reviewer_m1_attacks.py.txt, sha256 b648b24a..., unchanged)", "exit": 0, "result": "prior-reviewer-m1-attacks-on-rev7-result.json; remaining flags are API drift"},
+  {"atKST": "2026-11-06T14:58", "argv": "gh run view 42167885479 --json headSha,headBranch,event,status,conclusion,displayTitle,workflowName,attempt,jobs; git ls-remote origin refs/heads/agent/codex/fleet5-b-contract-rev7-20261106", "exit": 0, "result": "33f7c6b4, workflow_dispatch, attempt 1, success, job 127728519281 19/19; remote ref 33f7c6b4"}
+ ],
+ "reviewerScripts": {
+  "reviewer_l3_transport.py.txt": "424f5b00f26e2153040b013b8eee7d4d14458887fa1892109c2ba67dbc094806",
+  "reviewer_m1_rev7_attacks.py.txt": "b78abead5b00069f3598a10a1501701cbc5b3c8e425b979bfc03b11dd56e4823",
+  "reviewer_m2_port_taxonomy.py.txt": "e13ae18527347e6d748e83510f0a6d82c890796d4ec589f2a964120671414634",
+  "reviewer_display_probe.py.txt": "811c12edf368e52b02bec5c3c9f73635e1391ca979686d84235973732b95965d"
+ },
+ "notRun": ["source_analysis.py full assembler and reconcile/link_plans/baseline_accounting/sanitize_display reruns", "owner run_checks.py", "any PG/Docker/Node/crypto/crash/equipment command", "Obsidian apply/adopt/resolve"],
+ "publicationGates": "see local-doc-gates.txt"
+}

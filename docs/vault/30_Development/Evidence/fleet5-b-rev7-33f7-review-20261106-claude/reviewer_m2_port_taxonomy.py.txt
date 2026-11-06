@@ -1,0 +1,40 @@
+"""Reviewer M2 probe: classify every critical-entry missingPort into analysis-only vs genuine
+authority/IO/credential/DB-function interfaces. Reads criticalEntries.jsonl (140 KB) only."""
+import json, re, sys, collections
+E, OUT = sys.argv[1], sys.argv[2]
+rows = [json.loads(l) for l in open(E + '/criticalEntries.jsonl', encoding='utf-8')]
+RULES = [
+ ('G_DB_FUNCTION_BODY', r"text\('SELECT public\.(apply_capability_offer|business_admin_allowed)"),
+ ('G_DB_CREDENTIAL_CONNECT', r'^(psycopg\.connect|conn\.close)$'),
+ ('G_EXTERNAL_IO_TRANSPORT', r'^(OneConnection|conn\.(request|getresponse|sock\..*)|response\.(close|getheader.*|read)|super\(\)\.connect|timer\.start|self\._runner\.run|os\.(open|fdopen|fstat|close)|path\.(lstat|open)|stat\.S_ISREG|stream\.read)$'),
+ ('G_INJECTED_RUNTIME_PORT', r'^(self\._clock(\(\).*)?|self\._now|self\._request_id_factory|database\.placement_metric_sink|_placement_logger\.info|LOGGER\.exception|self\.db\.transaction)$'),
+ ('G_FRAMEWORK_DI_AUTH', r'^(Depends|Header|router\.put)$'),
+ ('G_DYNAMIC_GETATTR', r'^getattr$'),
+ ('G_SQL_SCOPE', r'unresolved SQL scope'),
+ ('A_EXISTING_SOURCE_TYPE', r'^(DomainError|Exception\.__init__|ErrorCategory|RunState|BuildExecutionIntent|refuse|finish|locked|event_payload|challenge\.(validate|digest)|certificate_key\(.*\)\.verify)$'),
+ ('A_DB_RESULT_ON_RECORDED_CALL', r'^((observed_)?conn|cursor)\.execute\(.*\)\.(fetchone|fetchall)$|^conn\.execute\(.*\)\[.now.\]\.isoformat$'),
+ ('A_ORM_BUILDER_OR_UOW', r'^(select|insert|text)(\(.*)?$|^(session\.(scalars|execute|query)\(|select\(|insert\()|^(User|ResourceOffer|IdempotencyRecord)\.'),
+ ('A_CONTEXTVAR_STDLIB', r'^(_statement_phase|phase)\.(get|set|reset)$'),
+ ('A_SCHEMA_LIBRARY_PACKAGE_RESOURCE', r'^(FormatChecker|Draft202012Validator.*|files(\(.inv.\).*)?|files\.get)$'),
+ ('A_CRYPTO_NET_LIBRARY', r'^(x509\..*|cert\..*|hashes\.SHA256|ipaddress\.ip_address|urlsplit|digest\.(update|hexdigest)|int\.from_bytes|unicodedata\.normalize|PurePosixPath.*|nullcontext|deepcopy|Jsonb)$'),
+]
+def cat(callee):
+    for name, pat in RULES:
+        if re.search(pat, callee): return name
+    # residual: builtin str/list/dict/set/datetime/regex methods on local values
+    if re.search(r'\.(strip|lower|split|rsplit|replace|join|encode|isascii|isspace|casefold|endswith|startswith|removeprefix|fullmatch|match|append|add|get|items|values|move_to_end|popitem|total_seconds|isoformat|astimezone|is_finite|hexdigest)$', callee):
+        return 'A_BUILTIN_VALUE_METHOD'
+    return 'UNCLASSIFIED_REVIEW'
+per = {}; tot = collections.Counter(); examples = collections.defaultdict(set)
+for r in rows:
+    c = collections.Counter()
+    for p in r['missingPorts']:
+        fn, _, callee = p.partition(':'); k = cat(callee); c[k] += 1; tot[k] += 1; examples[k].add(callee[:110])
+    per[r['function']] = {'ports': len(r['missingPorts']), 'unknownIDs': len(r['unknownIDs']), 'byCategory': dict(c),
+        'genuine': sum(v for k, v in c.items() if k.startswith('G_')), 'analysisOnly': sum(v for k, v in c.items() if k.startswith('A_')), 'unclassified': c.get('UNCLASSIFIED_REVIEW', 0)}
+out = {'entries': per, 'totals': dict(tot), 'examples': {k: sorted(v)[:25] for k, v in examples.items()},
+       'analysisOnlyEntries': sorted(f for f, v in per.items() if v['genuine'] == 0 and v['unclassified'] == 0)}
+json.dump(out, open(OUT, 'w'), indent=1)
+print(json.dumps(out['totals'], indent=0)); print('analysis-only entries:', out['analysisOnlyEntries'])
+for f, v in sorted(per.items(), key=lambda x: x[1]['ports']): print(v['ports'], 'G=%d A=%d U=%d' % (v['genuine'], v['analysisOnly'], v['unclassified']), f, {k: n for k, n in v['byCategory'].items() if k.startswith('G_')})
+print('UNCLASSIFIED:', out['examples'].get('UNCLASSIFIED_REVIEW'))

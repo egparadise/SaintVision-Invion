@@ -1,0 +1,62 @@
+"""Reviewer L3/M1 probe: re-verify Rev7 transport-inventory against raw 72028 git bytes.
+Read-only: git show / ls-tree only; writes JSON to argv[2]."""
+import ast, hashlib, json, subprocess, sys
+REPO, OUT = sys.argv[1], sys.argv[2]
+BASE = '72028cbac903c4415d9979f980a6e0f9948e914f'
+EV = 'docs/vault/30_Development/Evidence/fleet5-b-contract-rev7-20261106-codex/transport-inventory.json'
+def show(p): return subprocess.check_output(['git', 'show', f'{BASE}:{p}'], cwd=REPO)
+inv = json.loads(subprocess.check_output(['git', 'show', f'HEAD:{EV}'], cwd=REPO))
+res = {'callerRows': len(inv['callers']), 'rowChecks': [], 'independentScan': {}, 'goHandlerChecks': [], 'goCounterChecks': []}
+METHODS = {'probe','resource_snapshot','storage_sample','read_chunk','terminal_frame','quarantine','collect_product_health','collect_cleanup_receipt','exchange'}
+def enclosing(tree, line):
+    best = None
+    for n in ast.walk(tree):
+        if isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef)) and n.lineno <= line <= n.end_lineno:
+            if best is None or n.lineno >= best.lineno: best = n
+    return best
+for r in inv['callers']:
+    raw = show(r['path']); lines = raw.decode('utf-8-sig').splitlines(); tree = ast.parse(raw.decode('utf-8-sig'))
+    calls = [c for c in ast.walk(tree) if isinstance(c, ast.Call) and c.lineno == r['line'] and isinstance(c.func, ast.Attribute) and c.func.attr == r['methodName']]
+    fn = enclosing(tree, r['line'])
+    cls = next((n.name for n in ast.walk(tree) if isinstance(n, ast.ClassDef) and fn is not None and fn in ast.walk(n)), None)
+    qual = (cls + '.' if cls else '') + (fn.name if fn else '?')
+    res['rowChecks'].append({'path': r['path'], 'line': r['line'], 'fileSHAok': hashlib.sha256(raw).hexdigest() == r['fileSHA256'],
+        'exactLineOk': lines[r['line'] - 1] == r['exactLine'], 'callAtLine': len(calls), 'callTextOk': any(ast.unparse(c) == r['call'] for c in calls),
+        'functionOk': qual == r['function'], 'reviewerFunction': qual, 'ownerFunction': r['function'],
+        'kinds': [(v['kind'], v['effectClass']) for v in r.get('variants', [])]})
+# independent scan of whole non-test python tree (not just inv/ and tools/)
+names = subprocess.check_output(['git', 'ls-tree', '-r', '--name-only', BASE], cwd=REPO).decode().splitlines()
+found = []
+for p in names:
+    if not p.endswith('.py') or '/tests/' in p or p.startswith('tests/') or '/test_' in p or p.startswith('docs/'): continue
+    try: tree = ast.parse(show(p).decode('utf-8-sig'))
+    except Exception as e: continue
+    for c in ast.walk(tree):
+        if isinstance(c, ast.Call) and isinstance(c.func, ast.Attribute) and (c.func.attr in METHODS or ast.unparse(c.func) == 'self._adapter.execute'):
+            found.append((p, c.lineno, ast.unparse(c.func)))
+inv_keys = {(r['path'], r['line']) for r in inv['callers']}
+res['independentScan'] = {'matches': len(found), 'notInInventory': [f for f in found if (f[0], f[1]) not in inv_keys], 'inventoryNotFound': sorted(inv_keys - {(f[0], f[1]) for f in found})}
+# Go handler anchors: map each anchored line to the actual rawPath branch in ServeHTTP
+go = show('services/node-agent/transport/server.go').decode().splitlines()
+branch_for = {'HEARTBEAT_OBSERVE': 'if probe || snapshot {', 'GPU_ACTIVE_OBSERVE': 'if snapshot {', 'STORAGE_SAMPLE': 'if storageSample {', 'OBJECT_READ': 'if chunk {',
+  'TERMINAL_FRAME': 'if terminal {', 'QUARANTINE_RECONCILE': 'if quarantine {', 'EXECUTE': '} else {', 'CANCEL': 'if cancelling {', 'RECEIPT_OBSERVE': '} else if r.URL.Path == "/v1/executions/receipts" {'}
+serve = next(i for i, t in enumerate(go, 1) if t.startswith('func (h *handler) ServeHTTP('))
+serve_end = next(i for i, t in enumerate(go, 1) if i > serve and t.startswith('func '))
+for k, a in inv['handlerAnchors'].items():
+    occurrences = [i for i, t in enumerate(go, 1) if a['exactLine'].strip() in t]
+    # nearest enclosing branch opener above the anchor at lower indentation
+    ind = len(go[a['line'] - 1]) - len(go[a['line'] - 1].lstrip('\t'))
+    opener = next((go[i - 1].strip() for i in range(a['line'] - 1, serve, -1) if (len(go[i - 1]) - len(go[i - 1].lstrip('\t'))) < ind and go[i - 1].strip().endswith('{')), None)
+    res['goHandlerChecks'].append({'kind': k, 'line': a['line'], 'inServeHTTP': serve < a['line'] < serve_end, 'ownerEnclosingFunction': a['enclosingFunction'],
+        'ownerRange': [a['functionStartLine'], a['functionEndExclusive']], 'reviewerServeHTTPRange': [serve, serve_end], 'needleOccurrencesInFile': occurrences,
+        'nearestBranch': opener, 'expectedBranch': branch_for[k], 'branchOk': opener == branch_for[k]})
+rg = show('services/node-agent/runtime/runner.go').decode().splitlines()
+for a in inv['readOnlyException']['proof']:
+    st = next(i for i, t in enumerate(rg, 1) if t.startswith(a['enclosingFunction']))
+    en = next((i for i, t in enumerate(rg, 1) if i > st and t.startswith('func ')), len(rg) + 1)
+    res['goCounterChecks'].append({'line': a['line'], 'fn': a['enclosingFunction'], 'rangeOk': [st, en] == [a['functionStartLine'], a['functionEndExclusive']], 'lineOk': rg[a['line'] - 1] == a['exactLine'], 'inRange': st <= a['line'] < en})
+json.dump(res, open(OUT, 'w'), indent=1)
+print(json.dumps({'rows': len(res['rowChecks']), 'rowsAllOk': all(c['fileSHAok'] and c['exactLineOk'] and c['callTextOk'] and c['functionOk'] for c in res['rowChecks']),
+  'scanMatches': res['independentScan']['matches'], 'notInInventory': res['independentScan']['notInInventory'], 'inventoryNotFound': res['independentScan']['inventoryNotFound'],
+  'goBranchOk': [(c['kind'], c['branchOk'], c['ownerEnclosingFunction'], c['needleOccurrencesInFile']) for c in res['goHandlerChecks']],
+  'goCounterOk': all(c['rangeOk'] and c['lineOk'] and c['inRange'] for c in res['goCounterChecks'])}, indent=0))

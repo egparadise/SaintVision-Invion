@@ -1,0 +1,241 @@
+[
+ {
+  "ledger": "writers.jsonl",
+  "path": "tools/run_s04_fe_matrix.py",
+  "line": 559,
+  "fields": [
+   "/allTransitionGuards/assignments/33/value",
+   "/allTransitionGuards/assignments/34/value"
+  ],
+  "rawSegmentFound": true,
+  "rawSegSHA_eq_expressionSHA256": true
+ },
+ {
+  "ledger": "writers.jsonl",
+  "path": "tools/run_s04_fe_matrix.py",
+  "line": 563,
+  "fields": [
+   "/allTransitionGuards/assignments/33/value",
+   "/allTransitionGuards/assignments/34/value"
+  ],
+  "rawSegmentFound": true,
+  "rawSegSHA_eq_expressionSHA256": true
+ },
+ {
+  "ledger": "writers.jsonl",
+  "path": "tools/run_s04_fe_matrix.py",
+  "line": 567,
+  "fields": [
+   "/allTransitionGuards/assignments/33/value",
+   "/allTransitionGuards/assignments/34/value"
+  ],
+  "rawSegmentFound": true,
+  "rawSegSHA_eq_expressionSHA256": true
+ },
+ {
+  "ledger": "writers.jsonl",
+  "path": "tools/run_s04_fe_matrix.py",
+  "line": 571,
+  "fields": [
+   "/allTransitionGuards/assignments/33/value",
+   "/allTransitionGuards/assignments/34/value"
+  ],
+  "rawSegmentFound": true,
+  "rawSegSHA_eq_expressionSHA256": true
+ },
+ {
+  "ledger": "writers.jsonl",
+  "path": "tools/run_s04_fe_matrix.py",
+  "line": 575,
+  "fields": [
+   "/allTransitionGuards/assignments/33/value",
+   "/allTransitionGuards/assignments/34/value"
+  ],
+  "rawSegmentFound": true,
+  "rawSegSHA_eq_expressionSHA256": true
+ },
+ {
+  "ledger": "writers.jsonl",
+  "path": "tools/run_s04_fe_matrix.py",
+  "line": 579,
+  "fields": [
+   "/allTransitionGuards/assignments/33/value",
+   "/allTransitionGuards/assignments/34/value"
+  ],
+  "rawSegmentFound": true,
+  "rawSegSHA_eq_expressionSHA256": true
+ },
+ {
+  "ledger": "writers.jsonl",
+  "path": "tools/run_s04_fe_matrix.py",
+  "line": 583,
+  "fields": [
+   "/allTransitionGuards/assignments/33/value",
+   "/allTransitionGuards/assignments/34/value"
+  ],
+  "rawSegmentFound": true,
+  "rawSegSHA_eq_expressionSHA256": true
+ },
+ {
+  "ledger": "writers.jsonl",
+  "path": "tools/run_s04_fe_matrix.py",
+  "line": 587,
+  "fields": [
+   "/allTransitionGuards/assignments/33/value",
+   "/allTransitionGuards/assignments/34/value"
+  ],
+  "rawSegmentFound": true,
+  "rawSegSHA_eq_expressionSHA256": true
+ },
+ {
+  "ledger": "writers.jsonl",
+  "path": "tools/run_s04_fe_matrix.py",
+  "line": 591,
+  "fields": [
+   "/allTransitionGuards/assignments/33/value",
+   "/allTransitionGuards/assignments/34/value"
+  ],
+  "rawSegmentFound": true,
+  "rawSegSHA_eq_expressionSHA256": true
+ },
+ {
+  "ledger": "writers.jsonl",
+  "path": "tools/run_s04_fe_matrix.py",
+  "line": 595,
+  "fields": [
+   "/allTransitionGuards/assignments/33/value",
+   "/allTransitionGuards/assignments/34/value"
+  ],
+  "rawSegmentFound": true,
+  "rawSegSHA_eq_expressionSHA256": true
+ },
+ {
+  "ledger": "writers.jsonl",
+  "path": "tools/run_s04_fe_matrix.py",
+  "line": 599,
+  "fields": [
+   "/allTransitionGuards/assignments/33/value",
+   "/allTransitionGuards/assignments/34/value"
+  ],
+  "rawSegmentFound": true,
+  "rawSegSHA_eq_expressionSHA256": true
+ },
+ {
+  "ledger": "writers.jsonl",
+  "path": "tools/run_s04_fe_matrix.py",
+  "line": 603,
+  "fields": [
+   "/allTransitionGuards/assignments/33/value",
+   "/allTransitionGuards/assignments/34/value"
+  ],
+  "rawSegmentFound": true,
+  "rawSegSHA_eq_expressionSHA256": true
+ },
+ {
+  "ledger": "writers.jsonl",
+  "path": "tools/run_s04_fe_matrix.py",
+  "line": 607,
+  "fields": [
+   "/allTransitionGuards/assignments/33/value",
+   "/allTransitionGuards/assignments/34/value"
+  ],
+  "rawSegmentFound": true,
+  "rawSegSHA_eq_expressionSHA256": true
+ },
+ {
+  "ledger": "writers.jsonl",
+  "path": "tools/run_s04_fe_matrix.py",
+  "line": 808,
+  "fields": [
+   "/allTransitionGuards/assignments/33/value",
+   "/allTransitionGuards/assignments/34/value"
+  ],
+  "rawSegmentFound": true,
+  "rawSegSHA_eq_expressionSHA256": true
+ },
+ {
+  "ledger": "writers.jsonl",
+  "path": "tools/run_s04_fe_matrix.py",
+  "line": 1100,
+  "fields": [
+   "/allTransitionGuards/assignments/33/value",
+   "/allTransitionGuards/assignments/34/value"
+  ],
+  "rawSegmentFound": true,
+  "rawSegSHA_eq_expressionSHA256": true
+ },
+ {
+  "ledger": "writers.jsonl",
+  "path": "tools/run_s04_fe_matrix.py",
+  "line": 1106,
+  "fields": [
+   "/allTransitionGuards/assignments/33/value",
+   "/allTransitionGuards/assignments/34/value"
+  ],
+  "rawSegmentFound": true,
+  "rawSegSHA_eq_expressionSHA256": true
+ },
+ {
+  "ledger": "writers.jsonl",
+  "path": "tools/run_s04_fe_matrix.py",
+  "line": 1115,
+  "fields": [
+   "/allTransitionGuards/assignments/33/value",
+   "/allTransitionGuards/assignments/34/value"
+  ],
+  "rawSegmentFound": true,
+  "rawSegSHA_eq_expressionSHA256": true
+ },
+ {
+  "ledger": "writers.jsonl",
+  "path": "tools/run_s04_fe_matrix.py",
+  "line": 1151,
+  "fields": [
+   "/allTransitionGuards/assignments/33/value",
+   "/allTransitionGuards/assignments/34/value"
+  ],
+  "rawSegmentFound": true,
+  "rawSegSHA_eq_expressionSHA256": true
+ },
+ {
+  "ledger": "writers.jsonl",
+  "path": "tools/run_s04_fe_matrix.py",
+  "line": 1153,
+  "fields": [
+   "/allTransitionGuards/assignments/33/value",
+   "/allTransitionGuards/assignments/34/value"
+  ],
+  "rawSegmentFound": true,
+  "rawSegSHA_eq_expressionSHA256": true
+ },
+ {
+  "ledger": "writers.jsonl",
+  "path": "tools/run_s04_fe_matrix.py",
+  "line": 1155,
+  "fields": [
+   "/allTransitionGuards/assignments/33/value",
+   "/allTransitionGuards/assignments/34/value"
+  ],
+  "rawSegmentFound": true,
+  "rawSegSHA_eq_expressionSHA256": true
+ },
+ {
+  "ledger": "writers.jsonl",
+  "path": "tools/run_s04_fe_matrix.py",
+  "line": 1157,
+  "fields": [
+   "/allTransitionGuards/assignments/33/value",
+   "/allTransitionGuards/assignments/34/value"
+  ],
+  "rawSegmentFound": true,
+  "rawSegSHA_eq_expressionSHA256": true
+ },
+ {
+  "ledger": "classifiedCalls.jsonl",
+  "path": null,
+  "line": 229,
+  "fields": [
+   "/exactLine"
+  ]
+ }
+]

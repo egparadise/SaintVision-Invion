@@ -1,0 +1,31 @@
+"""Reviewer probe: masked display rows still hash-bind to raw 72028 bytes. Prints hashes/counts only."""
+import ast, hashlib, json, subprocess, sys
+REPO, EV, OUT = sys.argv[1], sys.argv[2], sys.argv[3]
+BASE = '72028cbac903c4415d9979f980a6e0f9948e914f'
+h = lambda b: hashlib.sha256(b).hexdigest()
+cache = {}
+def seg(path, r):
+    if path not in cache: cache[path] = subprocess.check_output(['git', 'show', f'{BASE}:{path}'], cwd=REPO).decode('utf-8-sig')
+    text = cache[path]
+    node = type('N', (), {'lineno': r['line'], 'col_offset': r['column'], 'end_lineno': r['endLine'], 'end_col_offset': r['endColumn']})
+    return ast.get_source_segment(text, node)
+res = []
+for name in ('records.jsonl', 'writers.jsonl', 'classifiedCalls.jsonl'):
+    with open(f'{EV}/{name}', encoding='utf-8') as fh:
+        for line in fh:
+            if 'displayRedaction' not in line: continue
+            r = json.loads(line); dr = r['displayRedaction']
+            out = {'ledger': name, 'path': r.get('path'), 'line': r.get('line'), 'fields': [f['field'] for f in dr['fields']]}
+            if r.get('path') and 'endLine' in r:
+                raw = seg(r['path'], r)
+                out['rawSegmentFound'] = raw is not None
+                if raw is not None:
+                    out['rawSegSHA_eq_expressionSHA256'] = r.get('expressionSHA256') == h(raw.encode()) if 'expressionSHA256' in r else None
+                    exprf = next((f for f in dr['fields'] if f['field'] in ('/expression', '/spelling')), None)
+                    if exprf:
+                        out['displayDiffersFromRaw'] = exprf['displayTextSHA256'] != exprf['rawTextSHA256']
+                        out['ledgerRawTextSHA_matches_rawSource'] = exprf['rawTextSHA256'] == h(raw.encode()) or None
+            res.append(out)
+json.dump(res, open(OUT, 'w'), indent=1)
+import collections
+print(len(res), collections.Counter((x['ledger'], x.get('rawSegSHA_eq_expressionSHA256'), x.get('displayDiffersFromRaw'), x.get('ledgerRawTextSHA_matches_rawSource')) for x in res))

@@ -1,0 +1,154 @@
+{
+ "cases": [
+  {
+   "case": "A1-heartbeat-registers-obligation",
+   "actual": true,
+   "contractExpectation": true,
+   "defect": false,
+   "note": "read-only probe creates scoped obligation"
+  },
+  {
+   "case": "A1-inflight-heartbeat-denies-business",
+   "actual": true,
+   "contractExpectation": true,
+   "defect": false,
+   "note": "no side effect yet business denied for the whole Node during probe"
+  },
+  {
+   "case": "A1-heartbeat-timeout-state",
+   "actual": "NO_EFFECT_ABANDONED",
+   "contractExpectation": "NO_EFFECT_ABANDONED_or_ordinary",
+   "defect": true,
+   "note": "read-only IO uncertainty has no physical effect"
+  },
+  {
+   "case": "A1-after-timeout-all13-readers",
+   "actual": 11,
+   "contractExpectation": 13,
+   "defect": true,
+   "note": "Node business stays denied until OP"
+  },
+  {
+   "case": "A1-ordinary-verifier-cannot-recover",
+   "actual": false,
+   "contractExpectation": true,
+   "defect": true,
+   "note": "ordinary path unavailable after read-only failure"
+  },
+  {
+   "case": "A1-next-good-heartbeat-confirms",
+   "actual": true,
+   "contractExpectation": true,
+   "defect": false,
+   "note": ""
+  },
+  {
+   "case": "A1-good-heartbeat-does-not-restore",
+   "actual": true,
+   "contractExpectation": true,
+   "defect": false,
+   "note": "only OP physical proof clears read-only timeout"
+  },
+  {
+   "case": "A1-needs-OP-physical-proof",
+   "actual": false,
+   "contractExpectation": false,
+   "defect": false,
+   "note": "operator escalation for a no-effect read"
+  },
+  {
+   "case": "A2-same-config-renew-after-heartbeat-timeout",
+   "actual": true,
+   "contractExpectation": true,
+   "defect": false,
+   "note": "renewal blocked until OP physical recovery; may lead to expiry"
+  },
+  {
+   "case": "A3-second-independent-EXECUTE-same-Node",
+   "actual": false,
+   "contractExpectation": "documented",
+   "defect": true,
+   "note": "per-Node single flight: any PENDING denies all other admissions incl. disjoint resources"
+  },
+  {
+   "case": "A4-terminal-frame-registration-under-DRAIN",
+   "actual": false,
+   "contractExpectation": true,
+   "defect": true,
+   "note": "catalog R12 says existing claimed terminal may continue under drain; register() requires eligible(R03) = no facts"
+  },
+  {
+   "case": "A5-node2-ordinary-success-after-node1-fuse-loss",
+   "actual": false,
+   "contractExpectation": true,
+   "defect": true,
+   "note": "global incarnation fence blocks other Node success"
+  },
+  {
+   "case": "A5-node2-after-restart-ordinary",
+   "actual": false,
+   "contractExpectation": true,
+   "defect": true,
+   "note": "node-2 healthy op now needs OP physical proof"
+  },
+  {
+   "case": "A5-node2-eligible",
+   "actual": true,
+   "contractExpectation": true,
+   "defect": false,
+   "note": "other-scope obligation failure denies node-2"
+  },
+  {
+   "case": "A6-capability-object-reachable-from-runtime-handle",
+   "actual": false,
+   "contractExpectation": false,
+   "defect": false,
+   "note": "handle carries no capability"
+  },
+  {
+   "case": "A7-EXECUTE-confirmed-by-ACTIVE",
+   "actual": false,
+   "contractExpectation": false,
+   "defect": false,
+   "note": ""
+  },
+  {
+   "case": "A8-cross-operation-outcome",
+   "actual": false,
+   "contractExpectation": false,
+   "defect": false,
+   "note": ""
+  },
+  {
+   "case": "A8-cross-op-mismatch-poisons-victim",
+   "actual": "PENDING_IO",
+   "contractExpectation": "PENDING_IO",
+   "defect": false,
+   "note": "a forged/duplicate response for another op poisons the victim op -> OP needed"
+  },
+  {
+   "case": "A9-duplicate-response",
+   "actual": false,
+   "contractExpectation": false,
+   "defect": false,
+   "note": ""
+  },
+  {
+   "case": "A9-dup-state",
+   "actual": "PENDING_IO",
+   "contractExpectation": "CONFIRMED_OUTCOME",
+   "defect": true,
+   "note": ""
+  }
+ ],
+ "defects": [
+  "A1-heartbeat-timeout-state",
+  "A1-after-timeout-all13-readers",
+  "A1-ordinary-verifier-cannot-recover",
+  "A3-second-independent-EXECUTE-same-Node",
+  "A4-terminal-frame-registration-under-DRAIN",
+  "A5-node2-ordinary-success-after-node1-fuse-loss",
+  "A5-node2-after-restart-ordinary",
+  "A9-dup-state"
+ ]
+}

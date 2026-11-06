@@ -1,0 +1,545 @@
+{
+ "entries": {
+  "inv.build_execution.BuildExecutionService._mark_node_quarantined": {
+   "ports": 17,
+   "unknownIDs": 21,
+   "byCategory": {
+    "A_CRYPTO_NET_LIBRARY": 1,
+    "A_DB_RESULT_ON_RECORDED_CALL": 4,
+    "A_EXISTING_SOURCE_TYPE": 2,
+    "A_BUILTIN_VALUE_METHOD": 2,
+    "A_CONTEXTVAR_STDLIB": 4,
+    "G_DB_CREDENTIAL_CONNECT": 1,
+    "G_INJECTED_RUNTIME_PORT": 2,
+    "G_DYNAMIC_GETATTR": 1
+   },
+   "genuine": 4,
+   "analysisOnly": 13,
+   "unclassified": 0
+  },
+  "inv.build_execution.BuildExecutionService._commit_consequences": {
+   "ports": 37,
+   "unknownIDs": 75,
+   "byCategory": {
+    "A_BUILTIN_VALUE_METHOD": 6,
+    "A_EXISTING_SOURCE_TYPE": 7,
+    "A_CRYPTO_NET_LIBRARY": 2,
+    "A_DB_RESULT_ON_RECORDED_CALL": 6,
+    "A_SCHEMA_LIBRARY_PACKAGE_RESOURCE": 8,
+    "A_CONTEXTVAR_STDLIB": 4,
+    "G_DB_CREDENTIAL_CONNECT": 1,
+    "G_INJECTED_RUNTIME_PORT": 2,
+    "G_DYNAMIC_GETATTR": 1
+   },
+   "genuine": 4,
+   "analysisOnly": 33,
+   "unclassified": 0
+  },
+  "inv.build_execution.BuildExecutionService.execute": {
+   "ports": 186,
+   "unknownIDs": 329,
+   "byCategory": {
+    "A_EXISTING_SOURCE_TYPE": 45,
+    "A_CRYPTO_NET_LIBRARY": 15,
+    "A_DB_RESULT_ON_RECORDED_CALL": 26,
+    "A_BUILTIN_VALUE_METHOD": 50,
+    "G_DYNAMIC_GETATTR": 4,
+    "G_INJECTED_RUNTIME_PORT": 12,
+    "G_EXTERNAL_IO_TRANSPORT": 19,
+    "UNCLASSIFIED_REVIEW": 1,
+    "A_SCHEMA_LIBRARY_PACKAGE_RESOURCE": 8,
+    "A_CONTEXTVAR_STDLIB": 4,
+    "G_DB_CREDENTIAL_CONNECT": 2
+   },
+   "genuine": 37,
+   "analysisOnly": 148,
+   "unclassified": 1
+  },
+  "inv.build_execution_worker.BuildExecutionIntentQueue.enqueue": {
+   "ports": 30,
+   "unknownIDs": 44,
+   "byCategory": {
+    "A_EXISTING_SOURCE_TYPE": 5,
+    "A_CRYPTO_NET_LIBRARY": 3,
+    "A_DB_RESULT_ON_RECORDED_CALL": 5,
+    "A_BUILTIN_VALUE_METHOD": 1,
+    "A_SCHEMA_LIBRARY_PACKAGE_RESOURCE": 8,
+    "A_CONTEXTVAR_STDLIB": 4,
+    "G_DB_CREDENTIAL_CONNECT": 1,
+    "G_INJECTED_RUNTIME_PORT": 2,
+    "G_DYNAMIC_GETATTR": 1
+   },
+   "genuine": 4,
+   "analysisOnly": 26,
+   "unclassified": 0
+  },
+  "inv.build_preparations.BuildPreparationService._terminalize": {
+   "ports": 25,
+   "unknownIDs": 38,
+   "byCategory": {
+    "A_CRYPTO_NET_LIBRARY": 2,
+    "A_DB_RESULT_ON_RECORDED_CALL": 8,
+    "A_EXISTING_SOURCE_TYPE": 5,
+    "G_DYNAMIC_GETATTR": 2,
+    "A_CONTEXTVAR_STDLIB": 4,
+    "G_DB_CREDENTIAL_CONNECT": 1,
+    "G_INJECTED_RUNTIME_PORT": 2,
+    "A_BUILTIN_VALUE_METHOD": 1
+   },
+   "genuine": 5,
+   "analysisOnly": 20,
+   "unclassified": 0
+  },
+  "inv.model_commit.capture_locations": {
+   "ports": 5,
+   "unknownIDs": 5,
+   "byCategory": {
+    "A_DB_RESULT_ON_RECORDED_CALL": 3,
+    "A_BUILTIN_VALUE_METHOD": 1,
+    "A_EXISTING_SOURCE_TYPE": 1
+   },
+   "genuine": 0,
+   "analysisOnly": 5,
+   "unclassified": 0
+  },
+  "inv.model_source.capture_channels": {
+   "ports": 6,
+   "unknownIDs": 6,
+   "byCategory": {
+    "A_EXISTING_SOURCE_TYPE": 2,
+    "A_BUILTIN_VALUE_METHOD": 1,
+    "A_DB_RESULT_ON_RECORDED_CALL": 3
+   },
+   "genuine": 0,
+   "analysisOnly": 6,
+   "unclassified": 0
+  },
+  "inv.node_channels.provision_channel": {
+   "ports": 16,
+   "unknownIDs": 20,
+   "byCategory": {
+    "A_EXISTING_SOURCE_TYPE": 3,
+    "A_CRYPTO_NET_LIBRARY": 8,
+    "A_BUILTIN_VALUE_METHOD": 2,
+    "A_DB_RESULT_ON_RECORDED_CALL": 3
+   },
+   "genuine": 0,
+   "analysisOnly": 16,
+   "unclassified": 0
+  },
+  "inv.node_channels.revoke_channel": {
+   "ports": 3,
+   "unknownIDs": 3,
+   "byCategory": {
+    "A_EXISTING_SOURCE_TYPE": 1,
+    "A_DB_RESULT_ON_RECORDED_CALL": 2
+   },
+   "genuine": 0,
+   "analysisOnly": 3,
+   "unclassified": 0
+  },
+  "inv.node_transport.NodeDelivery._quarantine_gpu_node": {
+   "ports": 15,
+   "unknownIDs": 19,
+   "byCategory": {
+    "A_EXISTING_SOURCE_TYPE": 2,
+    "A_CONTEXTVAR_STDLIB": 4,
+    "A_DB_RESULT_ON_RECORDED_CALL": 4,
+    "G_DB_CREDENTIAL_CONNECT": 1,
+    "G_INJECTED_RUNTIME_PORT": 2,
+    "G_DYNAMIC_GETATTR": 1,
+    "A_CRYPTO_NET_LIBRARY": 1
+   },
+   "genuine": 4,
+   "analysisOnly": 11,
+   "unclassified": 0
+  },
+  "inv.node_transport.NodeDelivery.deliver": {
+   "ports": 75,
+   "unknownIDs": 98,
+   "byCategory": {
+    "A_EXISTING_SOURCE_TYPE": 14,
+    "A_DB_RESULT_ON_RECORDED_CALL": 17,
+    "A_SCHEMA_LIBRARY_PACKAGE_RESOURCE": 8,
+    "A_CONTEXTVAR_STDLIB": 4,
+    "G_DB_CREDENTIAL_CONNECT": 2,
+    "G_INJECTED_RUNTIME_PORT": 3,
+    "G_DYNAMIC_GETATTR": 1,
+    "A_BUILTIN_VALUE_METHOD": 3,
+    "A_CRYPTO_NET_LIBRARY": 12,
+    "G_EXTERNAL_IO_TRANSPORT": 11
+   },
+   "genuine": 17,
+   "analysisOnly": 58,
+   "unclassified": 0
+  },
+  "inv.observation.NodeObservation.accept": {
+   "ports": 36,
+   "unknownIDs": 47,
+   "byCategory": {
+    "A_SCHEMA_LIBRARY_PACKAGE_RESOURCE": 8,
+    "A_EXISTING_SOURCE_TYPE": 4,
+    "A_CONTEXTVAR_STDLIB": 4,
+    "A_DB_RESULT_ON_RECORDED_CALL": 9,
+    "G_DB_CREDENTIAL_CONNECT": 1,
+    "G_INJECTED_RUNTIME_PORT": 2,
+    "G_DYNAMIC_GETATTR": 1,
+    "A_BUILTIN_VALUE_METHOD": 6,
+    "A_CRYPTO_NET_LIBRARY": 1
+   },
+   "genuine": 4,
+   "analysisOnly": 32,
+   "unclassified": 0
+  },
+  "inv.observation.NodeObservation.mark_offline": {
+   "ports": 15,
+   "unknownIDs": 19,
+   "byCategory": {
+    "A_EXISTING_SOURCE_TYPE": 1,
+    "A_CONTEXTVAR_STDLIB": 4,
+    "A_DB_RESULT_ON_RECORDED_CALL": 5,
+    "G_DB_CREDENTIAL_CONNECT": 1,
+    "G_INJECTED_RUNTIME_PORT": 2,
+    "G_DYNAMIC_GETATTR": 1,
+    "A_BUILTIN_VALUE_METHOD": 1
+   },
+   "genuine": 4,
+   "analysisOnly": 11,
+   "unclassified": 0
+  },
+  "inv.results.ResultStore.complete": {
+   "ports": 71,
+   "unknownIDs": 94,
+   "byCategory": {
+    "A_EXISTING_SOURCE_TYPE": 21,
+    "A_DB_RESULT_ON_RECORDED_CALL": 14,
+    "A_SCHEMA_LIBRARY_PACKAGE_RESOURCE": 10,
+    "A_CONTEXTVAR_STDLIB": 4,
+    "G_DB_CREDENTIAL_CONNECT": 1,
+    "G_INJECTED_RUNTIME_PORT": 2,
+    "G_DYNAMIC_GETATTR": 3,
+    "A_CRYPTO_NET_LIBRARY": 4,
+    "A_BUILTIN_VALUE_METHOD": 12
+   },
+   "genuine": 6,
+   "analysisOnly": 65,
+   "unclassified": 0
+  },
+  "inv.runs.RunStore.complete": {
+   "ports": 44,
+   "unknownIDs": 56,
+   "byCategory": {
+    "A_EXISTING_SOURCE_TYPE": 11,
+    "A_DB_RESULT_ON_RECORDED_CALL": 9,
+    "A_SCHEMA_LIBRARY_PACKAGE_RESOURCE": 8,
+    "A_CONTEXTVAR_STDLIB": 4,
+    "G_DB_CREDENTIAL_CONNECT": 1,
+    "G_INJECTED_RUNTIME_PORT": 3,
+    "G_DYNAMIC_GETATTR": 1,
+    "A_CRYPTO_NET_LIBRARY": 4,
+    "A_BUILTIN_VALUE_METHOD": 1,
+    "G_EXTERNAL_IO_TRANSPORT": 2
+   },
+   "genuine": 7,
+   "analysisOnly": 37,
+   "unclassified": 0
+  },
+  "inv.shard_completion.ShardCompletion.once": {
+   "ports": 46,
+   "unknownIDs": 56,
+   "byCategory": {
+    "A_EXISTING_SOURCE_TYPE": 10,
+    "A_DB_RESULT_ON_RECORDED_CALL": 13,
+    "A_SCHEMA_LIBRARY_PACKAGE_RESOURCE": 9,
+    "A_CONTEXTVAR_STDLIB": 4,
+    "G_DB_CREDENTIAL_CONNECT": 1,
+    "G_INJECTED_RUNTIME_PORT": 2,
+    "G_DYNAMIC_GETATTR": 3,
+    "A_CRYPTO_NET_LIBRARY": 3,
+    "A_BUILTIN_VALUE_METHOD": 1
+   },
+   "genuine": 6,
+   "analysisOnly": 40,
+   "unclassified": 0
+  },
+  "inv.storage_commit.StorageSampleStore.apply_sample": {
+   "ports": 39,
+   "unknownIDs": 44,
+   "byCategory": {
+    "A_SCHEMA_LIBRARY_PACKAGE_RESOURCE": 8,
+    "A_EXISTING_SOURCE_TYPE": 9,
+    "A_CRYPTO_NET_LIBRARY": 14,
+    "A_BUILTIN_VALUE_METHOD": 7,
+    "A_DB_RESULT_ON_RECORDED_CALL": 1
+   },
+   "genuine": 0,
+   "analysisOnly": 39,
+   "unclassified": 0
+  },
+  "saintvision.api.v1.settings.set_resource_offer": {
+   "ports": 51,
+   "unknownIDs": 56,
+   "byCategory": {
+    "A_ORM_BUILDER_OR_UOW": 23,
+    "A_BUILTIN_VALUE_METHOD": 16,
+    "A_CRYPTO_NET_LIBRARY": 1,
+    "G_SQL_SCOPE": 1,
+    "G_DYNAMIC_GETATTR": 2,
+    "A_EXISTING_SOURCE_TYPE": 4,
+    "G_FRAMEWORK_DI_AUTH": 3,
+    "G_DB_FUNCTION_BODY": 1
+   },
+   "genuine": 7,
+   "analysisOnly": 44,
+   "unclassified": 0
+  },
+  "saintvision.identity.node_auth.NodePrincipal.lock_current": {
+   "ports": 7,
+   "unknownIDs": 7,
+   "byCategory": {
+    "A_EXISTING_SOURCE_TYPE": 2,
+    "A_BUILTIN_VALUE_METHOD": 1,
+    "A_ORM_BUILDER_OR_UOW": 4
+   },
+   "genuine": 0,
+   "analysisOnly": 7,
+   "unclassified": 0
+  },
+  "saintvision.services.settings.set_resource_offer": {
+   "ports": 27,
+   "unknownIDs": 28,
+   "byCategory": {
+    "A_EXISTING_SOURCE_TYPE": 2,
+    "A_BUILTIN_VALUE_METHOD": 8,
+    "A_ORM_BUILDER_OR_UOW": 16,
+    "G_DB_FUNCTION_BODY": 1
+   },
+   "genuine": 1,
+   "analysisOnly": 26,
+   "unclassified": 0
+  },
+  "saintvision.services.storage._owned_for_update": {
+   "ports": 6,
+   "unknownIDs": 6,
+   "byCategory": {
+    "A_EXISTING_SOURCE_TYPE": 2,
+    "A_BUILTIN_VALUE_METHOD": 1,
+    "A_ORM_BUILDER_OR_UOW": 3
+   },
+   "genuine": 0,
+   "analysisOnly": 6,
+   "unclassified": 0
+  }
+ },
+ "totals": {
+  "A_CRYPTO_NET_LIBRARY": 71,
+  "A_DB_RESULT_ON_RECORDED_CALL": 132,
+  "A_EXISTING_SOURCE_TYPE": 153,
+  "A_BUILTIN_VALUE_METHOD": 121,
+  "A_CONTEXTVAR_STDLIB": 48,
+  "G_DB_CREDENTIAL_CONNECT": 14,
+  "G_INJECTED_RUNTIME_PORT": 36,
+  "G_DYNAMIC_GETATTR": 22,
+  "A_SCHEMA_LIBRARY_PACKAGE_RESOURCE": 75,
+  "G_EXTERNAL_IO_TRANSPORT": 32,
+  "UNCLASSIFIED_REVIEW": 1,
+  "A_ORM_BUILDER_OR_UOW": 46,
+  "G_SQL_SCOPE": 1,
+  "G_FRAMEWORK_DI_AUTH": 3,
+  "G_DB_FUNCTION_BODY": 2
+ },
+ "examples": {
+  "A_CRYPTO_NET_LIBRARY": [
+   "Jsonb",
+   "PurePosixPath",
+   "PurePosixPath(path).is_absolute",
+   "cert.extensions.get_extension_for_class",
+   "cert.extensions.get_extension_for_class(x509.SubjectAlternativeName).value.get_values_for_type",
+   "cert.fingerprint",
+   "cert.fingerprint(hashes.SHA256()).hex",
+   "deepcopy",
+   "digest.hexdigest",
+   "digest.update",
+   "hashes.SHA256",
+   "int.from_bytes",
+   "ipaddress.ip_address",
+   "nullcontext",
+   "unicodedata.normalize",
+   "urlsplit",
+   "x509.load_der_x509_certificate",
+   "x509.load_der_x509_certificate(certificate_der).public_key"
+  ],
+  "A_DB_RESULT_ON_RECORDED_CALL": [
+   "conn.execute(\"INSERT INTO inv.idempotency(\\n        tenant_id,project_id,operation,key,request_hash,response\\n",
+   "conn.execute(\"SELECT node_id FROM inv.nodes WHERE status='online' ORDER BY node_id FOR UPDATE\").fetchall",
+   "conn.execute(\"SELECT p.* FROM inv.shard_parents p JOIN inv.runs r ON (p.tenant_id,p.run_id)=(r.tenant_id,r.run",
+   "conn.execute(\"SELECT r.rolsuper, r.rolbypassrls,\\n                    r.oid = n.nspowner AS owns_schema\\n     ",
+   "conn.execute(\"SELECT request_hash FROM inv.idempotency\\n            WHERE project_id=%s AND operation='build.d",
+   "conn.execute(\"UPDATE inv.nodes SET heartbeat_at=%s,probe_started_at=%s,clock_skew_seconds=%s,status=CASE WHEN ",
+   "conn.execute(\"UPDATE inv.nodes SET status='offline' WHERE node_id=%s AND heartbeat_at < clock_timestamp()-inte",
+   "conn.execute(\"UPDATE inv.runs SET state=%s,version=version+1,\\n            attempt=attempt+CASE WHEN %s='runni",
+   "conn.execute('SELECT * FROM inv.approval_requests WHERE approval_id=%s FOR UPDATE', (approval_id,)).fetchone",
+   "conn.execute('SELECT * FROM inv.build_execution_intents\\n                WHERE tenant_id=%s AND project_id=%s ",
+   "conn.execute('SELECT * FROM inv.business_subjects WHERE subject_id=%s FOR SHARE', (subject,)).fetchone",
+   "conn.execute('SELECT * FROM inv.node_channels WHERE node_id=%s FOR SHARE', (expected.node_id,)).fetchone",
+   "conn.execute('SELECT * FROM inv.node_channels WHERE node_id=%s FOR SHARE', (node_id,)).fetchone",
+   "conn.execute('SELECT * FROM inv.node_channels WHERE node_id=%s', (node.node_id,)).fetchone",
+   "conn.execute('SELECT * FROM inv.node_probes WHERE nonce=%s AND node_id=%s FOR UPDATE', (request['nonce'], node",
+   "conn.execute('SELECT * FROM inv.nodes WHERE node_id=%s FOR UPDATE', (node.node_id,)).fetchone",
+   "conn.execute('SELECT * FROM inv.project_grants WHERE project_id=%s AND subject_id=%s FOR SHARE', (project_id, ",
+   "conn.execute('SELECT * FROM inv.resource_leases WHERE run_id=%s AND released_at IS NULL ORDER BY lease_id', (r",
+   "conn.execute('SELECT * FROM inv.resource_leases\\n        WHERE lease_id=%s AND run_id=%s AND resource_id=%s FO",
+   "conn.execute('SELECT * FROM inv.resources WHERE resource_id=%s FOR UPDATE', (resource,)).fetchone",
+   "conn.execute('SELECT * FROM inv.result_commitments WHERE command_id=%s', (command_id,)).fetchone",
+   "conn.execute('SELECT * FROM inv.runs WHERE run_id=%s FOR UPDATE', (run_id,)).fetchone",
+   "conn.execute('SELECT * FROM inv.storage_objects WHERE project_id=%s AND object_id=%s FOR UPDATE', (project, id",
+   "conn.execute('SELECT * FROM inv.tool_claims WHERE command_id=%s', (receipt['commandId'],)).fetchone",
+   "conn.execute('SELECT *,clock_timestamp() AS now FROM inv.nodes WHERE node_id=%s FOR SHARE', (node.node_id,)).f"
+  ],
+  "A_EXISTING_SOURCE_TYPE": [
+   "BuildExecutionIntent",
+   "DomainError",
+   "ErrorCategory",
+   "Exception.__init__",
+   "RunState",
+   "certificate_key(certificate_der, challenge.channel, now).verify",
+   "challenge.digest",
+   "challenge.validate",
+   "event_payload",
+   "finish",
+   "locked",
+   "refuse"
+  ],
+  "A_BUILTIN_VALUE_METHOD": [
+   "''.join",
+   "', '.join",
+   "'/'.join",
+   "'\\x1f'.join",
+   "('storage:' + request_id).encode",
+   "(lease_expires - now).total_seconds",
+   "(now - observed).total_seconds",
+   "(now - observed_at).total_seconds",
+   "(now - pending['issued_at']).total_seconds",
+   "(now - provider.observed_at).total_seconds",
+   "(observed - now).total_seconds",
+   "(observed - pending['issued_at']).total_seconds",
+   "(row['now'] - row['heartbeat_at']).total_seconds",
+   "(self._clock().astimezone(timezone.utc) - observed).total_seconds",
+   "(unit or '').strip",
+   "(unit or '').strip().lower",
+   "FORWARD.get",
+   "SHA256_RE.fullmatch",
+   "_ACCEPTED.get",
+   "_CATEGORY.match",
+   "_CODE.match",
+   "_HEX_64.fullmatch",
+   "_PLATFORM_COMPONENT.fullmatch",
+   "_QUARANTINE_REASON.fullmatch",
+   "_SESSION_ID.fullmatch"
+  ],
+  "A_CONTEXTVAR_STDLIB": [
+   "_statement_phase.get",
+   "_statement_phase.reset",
+   "_statement_phase.set",
+   "phase.get"
+  ],
+  "G_DB_CREDENTIAL_CONNECT": [
+   "conn.close",
+   "psycopg.connect"
+  ],
+  "G_INJECTED_RUNTIME_PORT": [
+   "LOGGER.exception",
+   "_placement_logger.info",
+   "database.placement_metric_sink",
+   "self._clock",
+   "self._clock().astimezone",
+   "self._clock().astimezone(timezone.utc).isoformat",
+   "self._clock().astimezone(timezone.utc).isoformat().replace",
+   "self._now",
+   "self._request_id_factory",
+   "self.db.transaction"
+  ],
+  "G_DYNAMIC_GETATTR": [
+   "getattr"
+  ],
+  "A_SCHEMA_LIBRARY_PACKAGE_RESOURCE": [
+   "Draft202012Validator",
+   "Draft202012Validator(selected, format_checker=FormatChecker()).iter_errors",
+   "Draft202012Validator.check_schema",
+   "FormatChecker",
+   "files",
+   "files('inv').joinpath",
+   "files('inv').joinpath('generated/core.schema.json').read_text",
+   "files.get"
+  ],
+  "G_EXTERNAL_IO_TRANSPORT": [
+   "OneConnection",
+   "conn.getresponse",
+   "conn.request",
+   "conn.sock.getpeercert",
+   "conn.sock.settimeout",
+   "os.close",
+   "os.fdopen",
+   "os.fstat",
+   "os.open",
+   "path.lstat",
+   "path.open",
+   "response.close",
+   "response.getheader",
+   "response.getheader('Content-Type', '').split",
+   "response.read",
+   "self._runner.run",
+   "stat.S_ISREG",
+   "stream.read",
+   "super().connect",
+   "timer.start"
+  ],
+  "UNCLASSIFIED_REVIEW": [
+   "output.splitlines"
+  ],
+  "A_ORM_BUILDER_OR_UOW": [
+   "IdempotencyRecord.project_id.is_",
+   "ResourceOffer.effective_to.is_",
+   "User.user_id.in_",
+   "insert",
+   "insert(AuditEvent).values",
+   "select",
+   "select(Node).where",
+   "select(Node).where(Node.tenant_id == self.tenant_id, Node.node_id == self.node_id).with_for_update().execution",
+   "select(ResourceOffer).where",
+   "select(ResourceOffer).where(ResourceOffer.tenant_id == tenant_id, ResourceOffer.capability_id == capability_id",
+   "select(StorageContribution).where",
+   "select(User).where",
+   "select(User).where(User.tenant_id == tenant_id, User.user_id.in_(sorted({user_id, target_user_id or user_id}))",
+   "session.execute(select(StorageContribution).where(StorageContribution.tenant_id == tenant_id, StorageContribut",
+   "session.execute(text('SELECT applied,reason,resource_ids,capacity FROM public.apply_capability_offer(:t,CAST(:",
+   "session.query(IdempotencyRecord).filter",
+   "session.query(IdempotencyRecord).filter(IdempotencyRecord.tenant_id == principal.tenant_id, IdempotencyRecord.",
+   "session.scalars(select(Node).where(Node.node_id == capability.node_id, Node.tenant_id == tenant_id).with_for_u",
+   "session.scalars(select(Node).where(Node.tenant_id == self.tenant_id, Node.node_id == self.node_id).with_for_up",
+   "session.scalars(select(ResourceOffer).where(ResourceOffer.tenant_id == tenant_id, ResourceOffer.capability_id ",
+   "session.scalars(select(User).where(User.tenant_id == tenant_id, User.user_id.in_(sorted({user_id, target_user_",
+   "text"
+  ],
+  "G_SQL_SCOPE": [
+   "recorded DB API has unresolved SQL scope; no duplicate callgraph unknown"
+  ],
+  "G_FRAMEWORK_DI_AUTH": [
+   "Depends",
+   "Header",
+   "router.put"
+  ],
+  "G_DB_FUNCTION_BODY": [
+   "session.execute(text('SELECT public.business_admin_allowed(:t,:u,:p)'), {'t': tenant_id, 'u': user_id, 'p': pe"
+  ]
+ },
+ "analysisOnlyEntries": [
+  "inv.model_commit.capture_locations",
+  "inv.model_source.capture_channels",
+  "inv.node_channels.provision_channel",
+  "inv.node_channels.revoke_channel",
+  "inv.storage_commit.StorageSampleStore.apply_sample",
+  "saintvision.identity.node_auth.NodePrincipal.lock_current",
+  "saintvision.services.storage._owned_for_update"
+ ]
+}

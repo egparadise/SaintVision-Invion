@@ -1,0 +1,576 @@
+{
+ "callerRows": 19,
+ "rowChecks": [
+  {
+   "path": "services/control-plane/src/inv/build_execution.py",
+   "line": 779,
+   "fileSHAok": true,
+   "exactLineOk": true,
+   "callAtLine": 1,
+   "callTextOk": true,
+   "functionOk": true,
+   "reviewerFunction": "BuildExecutionService.execute",
+   "ownerFunction": "BuildExecutionService.execute",
+   "kinds": [
+    [
+     "BUILD_HEALTH_READ",
+     "READ_ONLY"
+    ]
+   ]
+  },
+  {
+   "path": "services/control-plane/src/inv/build_execution.py",
+   "line": 787,
+   "fileSHAok": true,
+   "exactLineOk": true,
+   "callAtLine": 1,
+   "callTextOk": true,
+   "functionOk": true,
+   "reviewerFunction": "BuildExecutionService.execute",
+   "ownerFunction": "BuildExecutionService.execute",
+   "kinds": [
+    [
+     "BUILD_DISPATCH",
+     "SIDE_EFFECT"
+    ]
+   ]
+  },
+  {
+   "path": "services/control-plane/src/inv/build_execution.py",
+   "line": 835,
+   "fileSHAok": true,
+   "exactLineOk": true,
+   "callAtLine": 1,
+   "callTextOk": true,
+   "functionOk": true,
+   "reviewerFunction": "BuildExecutionService.execute",
+   "ownerFunction": "BuildExecutionService.execute",
+   "kinds": [
+    [
+     "BUILD_CLEANUP_READ",
+     "READ_ONLY"
+    ]
+   ]
+  },
+  {
+   "path": "services/control-plane/src/inv/buildkit_transport.py",
+   "line": 895,
+   "fileSHAok": true,
+   "exactLineOk": true,
+   "callAtLine": 1,
+   "callTextOk": true,
+   "functionOk": true,
+   "reviewerFunction": "NodeAgentReceipts.daemon_identity",
+   "ownerFunction": "NodeAgentReceipts.daemon_identity",
+   "kinds": [
+    [
+     "BUILD_HEALTH_READ",
+     "READ_ONLY"
+    ]
+   ]
+  },
+  {
+   "path": "services/control-plane/src/inv/buildkit_transport.py",
+   "line": 978,
+   "fileSHAok": true,
+   "exactLineOk": true,
+   "callAtLine": 1,
+   "callTextOk": true,
+   "functionOk": true,
+   "reviewerFunction": "NodeAgentReceipts._record_quarantine",
+   "ownerFunction": "NodeAgentReceipts._record_quarantine",
+   "kinds": [
+    [
+     "QUARANTINE_RECONCILE",
+     "IDEMPOTENT_SAFETY"
+    ]
+   ]
+  },
+  {
+   "path": "services/control-plane/src/inv/buildkit_transport.py",
+   "line": 855,
+   "fileSHAok": true,
+   "exactLineOk": true,
+   "callAtLine": 1,
+   "callTextOk": true,
+   "functionOk": true,
+   "reviewerFunction": "NodeAgentReceipts.preflight_quarantine",
+   "ownerFunction": "NodeAgentReceipts.preflight_quarantine",
+   "kinds": [
+    [
+     "HEARTBEAT_OBSERVE",
+     "READ_ONLY"
+    ]
+   ]
+  },
+  {
+   "path": "services/control-plane/src/inv/model_remote.py",
+   "line": 98,
+   "fileSHAok": true,
+   "exactLineOk": true,
+   "callAtLine": 1,
+   "callTextOk": true,
+   "functionOk": true,
+   "reviewerFunction": "ConfiguredRemoteModelReader.read",
+   "ownerFunction": "ConfiguredRemoteModelReader.read",
+   "kinds": [
+    [
+     "OBJECT_READ",
+     "READ_ONLY"
+    ]
+   ]
+  },
+  {
+   "path": "services/control-plane/src/inv/node_transfer.py",
+   "line": 43,
+   "fileSHAok": true,
+   "exactLineOk": true,
+   "callAtLine": 1,
+   "callTextOk": true,
+   "functionOk": true,
+   "reviewerFunction": "NodeTransfer.fetch",
+   "ownerFunction": "NodeTransfer.fetch",
+   "kinds": [
+    [
+     "OBJECT_READ",
+     "READ_ONLY"
+    ]
+   ]
+  },
+  {
+   "path": "services/control-plane/src/inv/node_transport.py",
+   "line": 289,
+   "fileSHAok": true,
+   "exactLineOk": true,
+   "callAtLine": 1,
+   "callTextOk": true,
+   "functionOk": true,
+   "reviewerFunction": "NodeDelivery.deliver",
+   "ownerFunction": "NodeDelivery.deliver",
+   "kinds": [
+    [
+     "CANCEL",
+     "IDEMPOTENT_SAFETY"
+    ],
+    [
+     "RECEIPT_OBSERVE",
+     "SIDE_EFFECT"
+    ],
+    [
+     "EXECUTE",
+     "SIDE_EFFECT"
+    ]
+   ]
+  },
+  {
+   "path": "services/control-plane/src/inv/observation.py",
+   "line": 119,
+   "fileSHAok": true,
+   "exactLineOk": true,
+   "callAtLine": 1,
+   "callTextOk": true,
+   "functionOk": true,
+   "reviewerFunction": "NodeObservation.poll",
+   "ownerFunction": "NodeObservation.poll",
+   "kinds": [
+    [
+     "HEARTBEAT_OBSERVE",
+     "READ_ONLY"
+    ]
+   ]
+  },
+  {
+   "path": "services/control-plane/src/inv/observation.py",
+   "line": 124,
+   "fileSHAok": true,
+   "exactLineOk": true,
+   "callAtLine": 1,
+   "callTextOk": true,
+   "functionOk": true,
+   "reviewerFunction": "NodeObservation.poll_resources",
+   "ownerFunction": "NodeObservation.poll_resources",
+   "kinds": [
+    [
+     "GPU_ACTIVE_OBSERVE",
+     "READ_ONLY"
+    ]
+   ]
+  },
+  {
+   "path": "services/control-plane/src/inv/storage_check_collect.py",
+   "line": 309,
+   "fileSHAok": true,
+   "exactLineOk": true,
+   "callAtLine": 1,
+   "callTextOk": true,
+   "functionOk": true,
+   "reviewerFunction": "StorageCheckCollector.collect",
+   "ownerFunction": "StorageCheckCollector.collect",
+   "kinds": [
+    [
+     "STORAGE_SAMPLE",
+     "READ_ONLY"
+    ]
+   ]
+  },
+  {
+   "path": "services/control-plane/src/inv/storage_commit.py",
+   "line": 398,
+   "fileSHAok": true,
+   "exactLineOk": true,
+   "callAtLine": 1,
+   "callTextOk": true,
+   "functionOk": true,
+   "reviewerFunction": "StorageSampleStore.collect",
+   "ownerFunction": "StorageSampleStore.collect",
+   "kinds": [
+    [
+     "STORAGE_SAMPLE",
+     "READ_ONLY"
+    ]
+   ]
+  },
+  {
+   "path": "services/control-plane/src/inv/terminal.py",
+   "line": 277,
+   "fileSHAok": true,
+   "exactLineOk": true,
+   "callAtLine": 1,
+   "callTextOk": true,
+   "functionOk": true,
+   "reviewerFunction": "TerminalService.frame",
+   "ownerFunction": "TerminalService.frame",
+   "kinds": [
+    [
+     "TERMINAL_FRAME",
+     "SIDE_EFFECT"
+    ]
+   ]
+  },
+  {
+   "path": "tools/check_remote_workspace.py",
+   "line": 117,
+   "fileSHAok": true,
+   "exactLineOk": true,
+   "callAtLine": 1,
+   "callTextOk": true,
+   "functionOk": true,
+   "reviewerFunction": "main",
+   "ownerFunction": "main",
+   "kinds": [
+    [
+     "GPU_ACTIVE_OBSERVE",
+     "READ_ONLY"
+    ]
+   ]
+  },
+  {
+   "path": "tools/lan_execution.py",
+   "line": 174,
+   "fileSHAok": true,
+   "exactLineOk": true,
+   "callAtLine": 1,
+   "callTextOk": true,
+   "functionOk": true,
+   "reviewerFunction": "transmit_fault",
+   "ownerFunction": "transmit_fault",
+   "kinds": [
+    [
+     "EXECUTE",
+     "SIDE_EFFECT"
+    ]
+   ]
+  },
+  {
+   "path": "tools/lan_execution.py",
+   "line": 186,
+   "fileSHAok": true,
+   "exactLineOk": true,
+   "callAtLine": 1,
+   "callTextOk": true,
+   "functionOk": true,
+   "reviewerFunction": "recover",
+   "ownerFunction": "recover",
+   "kinds": [
+    [
+     "RECEIPT_OBSERVE",
+     "SIDE_EFFECT"
+    ]
+   ]
+  },
+  {
+   "path": "tools/lan_execution.py",
+   "line": 144,
+   "fileSHAok": true,
+   "exactLineOk": true,
+   "callAtLine": 1,
+   "callTextOk": true,
+   "functionOk": true,
+   "reviewerFunction": "_execute",
+   "ownerFunction": "_execute",
+   "kinds": [
+    [
+     "EXECUTE",
+     "SIDE_EFFECT"
+    ]
+   ]
+  },
+  {
+   "path": "tools/remote_workspace_entry.py",
+   "line": 205,
+   "fileSHAok": true,
+   "exactLineOk": true,
+   "callAtLine": 1,
+   "callTextOk": true,
+   "functionOk": true,
+   "reviewerFunction": "execute",
+   "ownerFunction": "execute",
+   "kinds": [
+    [
+     "RECEIPT_OBSERVE",
+     "SIDE_EFFECT"
+    ]
+   ]
+  }
+ ],
+ "independentScan": {
+  "matches": 22,
+  "notInInventory": [
+   [
+    "src/saintvision/adapters/conformance.py",
+    196,
+    "adapter.probe"
+   ],
+   [
+    "src/saintvision/adapters/tracking.py",
+    232,
+    "sink.probe"
+   ],
+   [
+    "src/saintvision/api/v1/adapters.py",
+    85,
+    "adapter.probe"
+   ]
+  ],
+  "inventoryNotFound": []
+ },
+ "goHandlerChecks": [
+  {
+   "kind": "HEARTBEAT_OBSERVE",
+   "line": 223,
+   "inServeHTTP": true,
+   "ownerEnclosingFunction": null,
+   "ownerRange": [
+    1,
+    355
+   ],
+   "reviewerServeHTTPRange": [
+    55,
+    316
+   ],
+   "needleOccurrencesInFile": [
+    223
+   ],
+   "nearestBranch": "if probe || snapshot {",
+   "expectedBranch": "if probe || snapshot {",
+   "branchOk": true
+  },
+  {
+   "kind": "GPU_ACTIVE_OBSERVE",
+   "line": 230,
+   "inServeHTTP": true,
+   "ownerEnclosingFunction": null,
+   "ownerRange": [
+    1,
+    355
+   ],
+   "reviewerServeHTTPRange": [
+    55,
+    316
+   ],
+   "needleOccurrencesInFile": [
+    230
+   ],
+   "nearestBranch": "if snapshot {",
+   "expectedBranch": "if snapshot {",
+   "branchOk": true
+  },
+  {
+   "kind": "STORAGE_SAMPLE",
+   "line": 129,
+   "inServeHTTP": true,
+   "ownerEnclosingFunction": null,
+   "ownerRange": [
+    1,
+    355
+   ],
+   "reviewerServeHTTPRange": [
+    55,
+    316
+   ],
+   "needleOccurrencesInFile": [
+    129
+   ],
+   "nearestBranch": "if storageSample {",
+   "expectedBranch": "if storageSample {",
+   "branchOk": true
+  },
+  {
+   "kind": "OBJECT_READ",
+   "line": 203,
+   "inServeHTTP": true,
+   "ownerEnclosingFunction": null,
+   "ownerRange": [
+    1,
+    355
+   ],
+   "reviewerServeHTTPRange": [
+    55,
+    316
+   ],
+   "needleOccurrencesInFile": [
+    203
+   ],
+   "nearestBranch": "if chunk {",
+   "expectedBranch": "if chunk {",
+   "branchOk": true
+  },
+  {
+   "kind": "TERMINAL_FRAME",
+   "line": 183,
+   "inServeHTTP": true,
+   "ownerEnclosingFunction": null,
+   "ownerRange": [
+    1,
+    355
+   ],
+   "reviewerServeHTTPRange": [
+    55,
+    316
+   ],
+   "needleOccurrencesInFile": [
+    183
+   ],
+   "nearestBranch": "if terminal {",
+   "expectedBranch": "if terminal {",
+   "branchOk": true
+  },
+  {
+   "kind": "QUARANTINE_RECONCILE",
+   "line": 154,
+   "inServeHTTP": true,
+   "ownerEnclosingFunction": null,
+   "ownerRange": [
+    1,
+    355
+   ],
+   "reviewerServeHTTPRange": [
+    55,
+    316
+   ],
+   "needleOccurrencesInFile": [
+    154
+   ],
+   "nearestBranch": "if quarantine {",
+   "expectedBranch": "if quarantine {",
+   "branchOk": true
+  },
+  {
+   "kind": "EXECUTE",
+   "line": 284,
+   "inServeHTTP": true,
+   "ownerEnclosingFunction": null,
+   "ownerRange": [
+    1,
+    355
+   ],
+   "reviewerServeHTTPRange": [
+    55,
+    316
+   ],
+   "needleOccurrencesInFile": [
+    284
+   ],
+   "nearestBranch": "} else {",
+   "expectedBranch": "} else {",
+   "branchOk": true
+  },
+  {
+   "kind": "CANCEL",
+   "line": 280,
+   "inServeHTTP": true,
+   "ownerEnclosingFunction": null,
+   "ownerRange": [
+    1,
+    355
+   ],
+   "reviewerServeHTTPRange": [
+    55,
+    316
+   ],
+   "needleOccurrencesInFile": [
+    280
+   ],
+   "nearestBranch": "if cancelling {",
+   "expectedBranch": "if cancelling {",
+   "branchOk": true
+  },
+  {
+   "kind": "RECEIPT_OBSERVE",
+   "line": 282,
+   "inServeHTTP": true,
+   "ownerEnclosingFunction": null,
+   "ownerRange": [
+    1,
+    355
+   ],
+   "reviewerServeHTTPRange": [
+    55,
+    316
+   ],
+   "needleOccurrencesInFile": [
+    282
+   ],
+   "nearestBranch": "} else if r.URL.Path == \"/v1/executions/receipts\" {",
+   "expectedBranch": "} else if r.URL.Path == \"/v1/executions/receipts\" {",
+   "branchOk": true
+  }
+ ],
+ "goCounterChecks": [
+  {
+   "line": 343,
+   "fn": "func (r *Runner) Observe(",
+   "rangeOk": true,
+   "lineOk": true,
+   "inRange": true
+  },
+  {
+   "line": 366,
+   "fn": "func (r *Runner) Observe(",
+   "rangeOk": true,
+   "lineOk": true,
+   "inRange": true
+  },
+  {
+   "line": 267,
+   "fn": "func (r *Runner) reconcile(",
+   "rangeOk": true,
+   "lineOk": true,
+   "inRange": true
+  },
+  {
+   "line": 331,
+   "fn": "func (r *Runner) finish(",
+   "rangeOk": true,
+   "lineOk": true,
+   "inRange": true
+  },
+  {
+   "line": 334,
+   "fn": "func (r *Runner) finish(",
+   "rangeOk": true,
+   "lineOk": true,
+   "inRange": true
+  }
+ ]
+}

@@ -1,0 +1,59 @@
+"""Reviewer Rev7 M1 attacks on the owner's symbolic model (imports owner modules read-only;
+writes only argv[2]). Each case states the 72028 behaviour it compares against."""
+import json, sys
+sys.path.insert(0, sys.argv[1]); sys.dont_write_bytecode = True
+from model import World, binding, scope, sk, VER, RUN, OP, SAFE, REV
+from io_contract import EFFECT, RECOVERY, fixture_footprint
+s = scope(); s2 = scope(n='node-2'); R = []
+def rec(case, value, expect, basis):
+    R.append({'case': case, 'observed': value, 'expected72028OrRoot': expect, 'matches': value == expect, 'basis': basis})
+def send(w, h):
+    b = w.obligations[w.handles[h.handle_hash]['key']]['binding']; return w.invoke(h, b['bodySHA'], b['method'], b['rawPath'])
+def state(w, h): return w.obligations[w.handles[h.handle_hash]['key']]['state']
+def world_with_parent():
+    w = World(); c = w.connect(VER); p = w.register(c, binding(w, op='parent')); assert p is not None; assert send(w, p); return w, c, p
+# C1 cancel under containment (72028: snapshot(observation_only=True) skips require_execution; dispatch forces cancel after start authority loss)
+w, c, p = world_with_parent(); w.set_fact(w.connect(OP), s, 'QUARANTINE', cause='containment')
+rec('C1-cancel-under-QUARANTINE-registers', w.register(c, binding(w, op='cancel', kind='CANCEL', parent=p.handle_hash)) is not None, True,
+    '72028 node_channels.py:126 observation_only skips require_execution; dispatch.py:177-184 cancel to obtain Node tombstone, leases kept until receipt')
+# C2 cancel after resource lease expiry
+w, c, p = world_with_parent(); w.now += 301
+rec('C2-cancel-after-lease-expiry-registers', w.register(c, binding(w, op='cancel', kind='CANCEL', parent=p.handle_hash)) is not None, True,
+    '72028 dispatch.acquire selects cancel without assert_fences/lease freshness; start_authority_lost -> cancel_and_await_receipt')
+# C3 receipt observe under QUARANTINE
+w, c, p = world_with_parent(); w.set_fact(w.connect(OP), s, 'QUARANTINE', cause='containment')
+rec('C3-receipt-observe-under-QUARANTINE-registers', w.register(c, binding(w, op='obs', kind='RECEIPT_OBSERVE', parent=p.handle_hash)) is not None, True,
+    '72028 dispatch.py:339 observation_only via snapshot(observation_only=True) without containment check')
+# C4 receipt observe after lease expiry
+w, c, p = world_with_parent(); w.now += 301
+rec('C4-receipt-observe-after-lease-expiry-registers', w.register(c, binding(w, op='obs', kind='RECEIPT_OBSERVE', parent=p.handle_hash)) is not None, True,
+    '72028 observe path has no resource-lease freshness requirement')
+# C5 cancel with Node offline/stale heartbeat
+w, c, p = world_with_parent(); w.nodes[sk(s)]['liveness'] = 'offline'
+rec('C5-cancel-node-offline-registers', w.register(c, binding(w, op='cancel', kind='CANCEL', parent=p.handle_hash)) is not None, True,
+    '72028 observation_only skips status/heartbeat freshness')
+# C6 cancel when parent EXECUTE is UNCERTAIN (timeout) - Root: CANCEL is IDEMPOTENT_SAFETY, may still be sent
+w, c, p = world_with_parent(); w.failure(p)
+h = w.register(c, binding(w, op='cancel', kind='CANCEL', parent=p.handle_hash))
+rec('C6-cancel-after-parent-UNCERTAIN-registers', h is not None, True, 'Root msg_8b52dd815cae: CANCEL IDEMPOTENT_SAFETY; 72028 cancel is the tombstone path for ambiguous execute')
+# C7 hint reader with no footprint during a known PENDING execute on another resource
+w = World(); c = w.connect(VER); a = w.register(c, binding(w, op='one')); send(w, a)
+rec('C7-R01-hint-no-footprint-while-other-execute-pending', w.eligible('R01', s), True, 'Rev7 History: deny only intersecting footprint; hints are not new admission')
+rec('C7b-R05-capacity-hint-no-footprint', w.eligible('R05', s), True, 'same')
+rec('C7c-R03-disjoint-footprint', w.eligible('R03', s, fixture_footprint('resource-9', 'run-9')), True, 'owner fixture parity')
+# C8 two uncertain executions on one node: each blocks the other's ordinary observation forever (expected: protected recovery only, by Root)
+w = World(); c = w.connect(VER); a = w.register(c, binding(w, op='a')); b = w.register(c, binding(w, op='b', resource='r2', run='run-2')); send(w, a); send(w, b); w.failure(a)
+rec('C8-uncertain-A-blocks-unrelated-R03-on-same-node', w.eligible('R03', s, fixture_footprint('r9', 'run-9')), False, 'Root: SIDE_EFFECT UNCERTAIN Node-scoped deny')
+rec('C8b-uncertain-A-does-not-block-node2', w.eligible('R03', s2, fixture_footprint()), True, 'Root: no cross-Node deny')
+# C9 READ_ONLY late response after abandon cannot confirm
+w = World(); c = w.connect(VER); h = w.register(c, binding(w, op='hb', kind='HEARTBEAT_OBSERVE')); send(w, h); w.failure(h)
+rec('C9-late-read-response-after-abandon-refused', w.confirm(c, h, w.outcome(h, 'OBSERVED')), False, 'Root: late/duplicate cannot reopen')
+# C10 caller downgrades receipts path to READ_ONLY via kind HEARTBEAT on /v1/executions/receipts
+w = World(); v = w.connect(VER); bad = binding(w, kind='HEARTBEAT_OBSERVE'); bad['rawPath'] = '/v1/executions/receipts'; w.original_requests[(sk(s), bad['operationId'])] = dict(bad)
+rec('C10-receipts-path-under-read-kind-refused', w.register(v, bad) is None, True, 'Go runner.go:366 Observe->reconcile mutates')
+# C11 rollback cannot resurrect a poisoned capability
+w = World(); c = w.connect(VER); h = w.register(c, binding(w)); send(w, h)
+import copy; before = copy.deepcopy(w.private_caps); w.failure(h, persist_error=False); restored = w.preserve_capability_death(before)
+rec('C11-rollback-keeps-capability-death', restored[h.handle_hash]['state'] != 'LIVE', True, 'Root completion fence')
+out = {'cases': R, 'mismatches': [r['case'] for r in R if not r['matches']]}
+json.dump(out, open(sys.argv[2], 'w'), indent=1); print(json.dumps(out['mismatches'])); print(len(R), 'cases')
