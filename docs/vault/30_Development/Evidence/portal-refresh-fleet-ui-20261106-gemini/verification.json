@@ -1,12 +1,13 @@
 {
   "source": "22c20a838fe0ab82a772641163ef553494c5bea3",
+  "branchHead": "5f3c9b7486e9aa4bb85b8cbb4213768393e8787b",
   "parentCandidate": "854a8eab0b6e236b62878f49ee941c700e458af0",
   "initialSource": "3a83707688f43570a7eaf9008989794979b3eb9f",
   "branch": "agent/gemini/portal-refresh-polling-r2-20261106",
   "base": "53683020e3cfaf79ec4662f9a79b8b4dae28a628",
   "task": "PORTAL-REFRESH-POLLING-R2-20261106",
   "author": "Gemini",
-  "atKST": "2026-11-06T21:44:00+09:00",
+  "atKST": "2026-11-06T21:47:00+09:00",
   "reviewFindingsResolved": {
     "UI-854-M1": "Slow / hung polling requests handled truthfully via monotonic sequence fence (request > appliedRef.current) and finite 10s request timeout. Responses slower than the 5s interval (e.g. 6s latency) are no longer discarded and apply cleanly (probe P6); hung requests time out at 10s and trigger explicit error/staleness (probe P7), never claiming current zero success indefinitely.",
     "UI-854-L1": "Header /healthz failure labels discriminated: non-200, HTML 200 SPA fallback, JSON 404/503, and JSON status!=ok render 'Gateway: 비정상 응답' with offline dot; network failure (fetch reject or timeout) renders 'Gateway: Offline' with offline dot. Online is strictly reserved for HTTP 200 + application/json + { status: 'ok' } (probe H1).",
@@ -16,9 +17,9 @@
   },
   "CI": {
     "docs": {
-      "run": 42219586479,
+      "run": 42220264732,
       "jobIds": [
-        127898008985
+        127900259847
       ],
       "conclusion": "success",
       "exactHeadRefWorkflowEventCorrelationAttemptAllJobsSuccess": true
