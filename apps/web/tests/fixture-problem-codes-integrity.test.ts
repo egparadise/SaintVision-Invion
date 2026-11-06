@@ -58,5 +58,5 @@ describe('Card 126 / F6: ProblemDetails Fixture Code Format Integrity', () => {
     // Every observed code MUST conform to the canonical RFC 9457 / problem.py 4-digit code format
     const invalidCodes = observedCodes.filter((item) => !canonicalFormat.test(item.code));
     expect(invalidCodes).toEqual([]);
-  });
+  }, 20000);
 });

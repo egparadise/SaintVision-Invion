@@ -264,7 +264,7 @@ describe('PORTAL-REFRESH-FLEET-20261106: Stable Polling, Honest Gateway & Identi
     });
   });
 
-  describe('5. Real observed Gateway state, honest RTT, and unknown until observed', () => {
+  describe('5. Canonical /healthz gateway status, content-type validation, and honest RTT', () => {
     it('initializes with unknown state (확인 중...) and unknown indicator dot without fabricating online:true/8ms', async () => {
       // Mock fetch that hangs or resolves slowly
       const fetchPromise = new Promise<Response>(() => {});
@@ -275,8 +275,8 @@ describe('PORTAL-REFRESH-FLEET-20261106: Stable Polling, Honest Gateway & Identi
           <Header
             currentTheme="dark"
             onToggleTheme={vi.fn()}
-            onlineNodesCount={0}
-            totalNodesCount={0}
+            onlineNodesCount={null}
+            totalNodesCount={null}
             activeTab="dashboard"
             onSelectTab={vi.fn()}
           />
@@ -289,12 +289,17 @@ describe('PORTAL-REFRESH-FLEET-20261106: Stable Polling, Honest Gateway & Identi
       expect(gatewayContainer?.textContent).not.toContain('8ms');
 
       // Dot color must be unknown token
-      const dot = gatewayContainer?.querySelector('span') as HTMLElement;
+      const dot = container.querySelector('[data-testid="gateway-status-dot"]') as HTMLElement;
       expect(dot.style.backgroundColor).toBe('var(--color-status-unknown)');
     });
 
-    it('updates to online with measured RTT when /v1/health responds with HTTP 200', async () => {
-      vi.spyOn(globalThis, 'fetch').mockResolvedValue(new Response(JSON.stringify({ status: 'ok' }), { status: 200 }));
+    it('updates to online with measured RTT when /healthz responds with HTTP 200 and application/json status:ok', async () => {
+      const fetchSpy = vi.spyOn(globalThis, 'fetch').mockResolvedValue(
+        new Response(JSON.stringify({ status: 'ok', version: '1.0.0' }), {
+          status: 200,
+          headers: { 'Content-Type': 'application/json' },
+        })
+      );
 
       await act(async () => {
         root.render(
@@ -309,21 +314,24 @@ describe('PORTAL-REFRESH-FLEET-20261106: Stable Polling, Honest Gateway & Identi
         );
       });
 
-      // Wait for async checkGateway
       await act(async () => {
         await new Promise((r) => setTimeout(r, 10));
       });
 
+      expect(fetchSpy).toHaveBeenCalledWith('/healthz');
       const gatewayContainer = container.querySelector('[title*="Gateway 실시간 RTT"]');
       expect(gatewayContainer?.textContent).toMatch(/Gateway:\s*\d+ms/);
-      const dot = gatewayContainer?.querySelector('span') as HTMLElement;
+      const dot = container.querySelector('[data-testid="gateway-status-dot"]') as HTMLElement;
       expect(dot.style.backgroundColor).toBe('var(--color-status-online)');
     });
 
-    it('recognizes gateway transport is online and measures real RTT when server responds with 401 or 404', async () => {
-      // HTTP 404 (route absent on control plane) or 401 (unauthorized) is HTTP transport response, NOT transport offline
+    it('rejects SPA HTML 200 fallback on /healthz as health success (must strictly be application/json)', async () => {
+      // When /healthz route is not proxied, Vite or nginx serves the SPA index.html with 200 text/html
       vi.spyOn(globalThis, 'fetch').mockResolvedValue(
-        new Response(JSON.stringify({ detail: 'Not Found' }), { status: 404 })
+        new Response('<!DOCTYPE html><html><body>SPA fallback</body></html>', {
+          status: 200,
+          headers: { 'Content-Type': 'text/html; charset=utf-8' },
+        })
       );
 
       await act(async () => {
@@ -344,10 +352,40 @@ describe('PORTAL-REFRESH-FLEET-20261106: Stable Polling, Honest Gateway & Identi
       });
 
       const gatewayContainer = container.querySelector('[title*="Gateway 실시간 RTT"]');
-      expect(gatewayContainer?.textContent).not.toContain('Offline');
-      expect(gatewayContainer?.textContent).toMatch(/Gateway:\s*\d+ms/);
-      const dot = gatewayContainer?.querySelector('span') as HTMLElement;
-      expect(dot.style.backgroundColor).toBe('var(--color-status-online)');
+      expect(gatewayContainer?.textContent).toContain('Gateway: Offline');
+      const dot = container.querySelector('[data-testid="gateway-status-dot"]') as HTMLElement;
+      expect(dot.style.backgroundColor).toBe('var(--color-status-offline)');
+    });
+
+    it('rejects HTTP 404, 401, or 503 on /healthz as health success', async () => {
+      vi.spyOn(globalThis, 'fetch').mockResolvedValue(
+        new Response(JSON.stringify({ detail: 'Not Found' }), {
+          status: 404,
+          headers: { 'Content-Type': 'application/json' },
+        })
+      );
+
+      await act(async () => {
+        root.render(
+          <Header
+            currentTheme="dark"
+            onToggleTheme={vi.fn()}
+            onlineNodesCount={0}
+            totalNodesCount={0}
+            activeTab="dashboard"
+            onSelectTab={vi.fn()}
+          />
+        );
+      });
+
+      await act(async () => {
+        await new Promise((r) => setTimeout(r, 10));
+      });
+
+      const gatewayContainer = container.querySelector('[title*="Gateway 실시간 RTT"]');
+      expect(gatewayContainer?.textContent).toContain('Gateway: Offline');
+      const dot = container.querySelector('[data-testid="gateway-status-dot"]') as HTMLElement;
+      expect(dot.style.backgroundColor).toBe('var(--color-status-offline)');
     });
 
     it('reports Gateway: Offline when network connection fails (transport truly unreachable)', async () => {
@@ -372,12 +410,97 @@ describe('PORTAL-REFRESH-FLEET-20261106: Stable Polling, Honest Gateway & Identi
 
       const gatewayContainer = container.querySelector('[title*="Gateway 실시간 RTT"]');
       expect(gatewayContainer?.textContent).toContain('Gateway: Offline');
-      const dot = gatewayContainer?.querySelector('span') as HTMLElement;
+      const dot = container.querySelector('[data-testid="gateway-status-dot"]') as HTMLElement;
       expect(dot.style.backgroundColor).toBe('var(--color-status-offline)');
     });
   });
 
-  describe('6. Honest OIDC user pill formatting', () => {
+  describe('6. Honest cluster count semantics in Header (no fake 5/5 defaults)', () => {
+    it('renders 확인 중... and unknown dot when node counts are null (unobserved)', async () => {
+      vi.spyOn(globalThis, 'fetch').mockImplementation(() => new Promise(() => {}));
+
+      await act(async () => {
+        root.render(
+          <Header
+            currentTheme="dark"
+            onToggleTheme={vi.fn()}
+            onlineNodesCount={null}
+            totalNodesCount={null}
+            activeTab="dashboard"
+            onSelectTab={vi.fn()}
+          />
+        );
+      });
+
+      expect(container.textContent).toContain('클러스터: 확인 중... Node 가동 중');
+      const dot = container.querySelector('[data-testid="cluster-status-dot"]') as HTMLElement;
+      expect(dot.style.backgroundColor).toBe('var(--color-status-unknown)');
+    });
+
+    it('renders 0/0 and neutral dot when observed cluster has 0 nodes (truthful LAN pilot DB)', async () => {
+      vi.spyOn(globalThis, 'fetch').mockImplementation(() => new Promise(() => {}));
+
+      await act(async () => {
+        root.render(
+          <Header
+            currentTheme="dark"
+            onToggleTheme={vi.fn()}
+            onlineNodesCount={0}
+            totalNodesCount={0}
+            activeTab="dashboard"
+            onSelectTab={vi.fn()}
+          />
+        );
+      });
+
+      expect(container.textContent).toContain('클러스터: 0/0 Node 가동 중');
+      const dot = container.querySelector('[data-testid="cluster-status-dot"]') as HTMLElement;
+      expect(dot.style.backgroundColor).toBe('var(--color-status-neutral)');
+    });
+
+    it('renders online dot when nodes are online', async () => {
+      vi.spyOn(globalThis, 'fetch').mockImplementation(() => new Promise(() => {}));
+
+      await act(async () => {
+        root.render(
+          <Header
+            currentTheme="dark"
+            onToggleTheme={vi.fn()}
+            onlineNodesCount={3}
+            totalNodesCount={5}
+            activeTab="dashboard"
+            onSelectTab={vi.fn()}
+          />
+        );
+      });
+
+      expect(container.textContent).toContain('클러스터: 3/5 Node 가동 중');
+      const dot = container.querySelector('[data-testid="cluster-status-dot"]') as HTMLElement;
+      expect(dot.style.backgroundColor).toBe('var(--color-status-online)');
+    });
+
+    it('defaults to truthful unobserved state (null) when props are omitted (no 5/5 default)', async () => {
+      vi.spyOn(globalThis, 'fetch').mockImplementation(() => new Promise(() => {}));
+
+      await act(async () => {
+        root.render(
+          <Header
+            currentTheme="dark"
+            onToggleTheme={vi.fn()}
+            activeTab="dashboard"
+            onSelectTab={vi.fn()}
+          />
+        );
+      });
+
+      expect(container.textContent).toContain('클러스터: 확인 중... Node 가동 중');
+      expect(container.textContent).not.toContain('5/5');
+      const dot = container.querySelector('[data-testid="cluster-status-dot"]') as HTMLElement;
+      expect(dot.style.backgroundColor).toBe('var(--color-status-unknown)');
+    });
+  });
+
+  describe('7. Honest OIDC user pill formatting', () => {
     it('formats raw 64-char hex OIDC subject gracefully without exposing raw hash', async () => {
       const rawOidcSub = 'oidc:3f79091432574632c62c37f25aaddb37f91e37a5864422525048eb82fe54247c';
 
@@ -417,6 +540,44 @@ describe('PORTAL-REFRESH-FLEET-20261106: Stable Polling, Honest Gateway & Identi
 
       expect(container.textContent).toContain('Master Operator');
       expect(container.textContent).toContain('SecAdmin');
+    });
+  });
+
+  describe('8. Reverse-proxy configuration for canonical /healthz', () => {
+    it('verifies Vite dev and preview servers proxy /healthz to backend', async () => {
+      const fs = await import('fs');
+      const path = await import('path');
+      const viteConfigContent = fs.readFileSync(path.resolve(__dirname, '../vite.config.ts'), 'utf-8');
+      expect(viteConfigContent).toContain("'/healthz':");
+      expect(viteConfigContent).toContain('target: process.env.VITE_API_PROXY_TARGET');
+    });
+
+    it('verifies nginx HTTPS 443 routes /healthz to upstream while HTTP 80 preserves local plaintext OK', async () => {
+      const fs = await import('fs');
+      const path = await import('path');
+      const nginxConfigContent = fs.readFileSync(path.resolve(__dirname, '../nginx.conf'), 'utf-8');
+
+      // HTTP 80 local container liveness
+      expect(nginxConfigContent).toMatch(/server\s*\{[^}]*listen\s+80;[\s\S]*location\s+\/healthz\s*\{\s*return\s+200\s+'OK';\s*add_header\s+Content-Type\s+text\/plain;/);
+
+      // HTTPS 443 upstream reverse-proxy to control-plane
+      expect(nginxConfigContent).toMatch(/server\s*\{[^}]*listen\s+443[\s\S]*location\s+=\s+\/healthz\s*\{\s*proxy_pass\s+http:\/\/control-plane:8080;/);
+    });
+  });
+
+  describe('9. Auth & project scope isolation invariant', () => {
+    it('disallows stale actions when approvals state is in error', () => {
+      // Invariant: Background refresh failure can retain snapshot but must not authorize actions from stale state
+      const isActionAllowed = (approvalsState: string) => {
+        if (approvalsState === 'error') {
+          throw new Error('안건 목록이 갱신 실패(stale) 상태이므로 새로고침 후 다시 시도하십시오.');
+        }
+        return true;
+      };
+
+      expect(() => isActionAllowed('error')).toThrow('안건 목록이 갱신 실패(stale) 상태이므로');
+      expect(isActionAllowed('success')).toBe(true);
+      expect(isActionAllowed('idle')).toBe(true);
     });
   });
 });

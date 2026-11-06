@@ -4,8 +4,8 @@ import { Button } from './Button';
 export interface HeaderProps {
   currentTheme: 'light' | 'dark';
   onToggleTheme: () => void;
-  onlineNodesCount?: number;
-  totalNodesCount?: number;
+  onlineNodesCount?: number | null;
+  totalNodesCount?: number | null;
   activeTab: string;
   onSelectTab: (tab: string) => void;
   currentUser?: { id: string; name: string; role: string } | null;
@@ -23,8 +23,8 @@ function formatUserDisplayName(name: string): string {
 export const Header: React.FC<HeaderProps> = ({
   currentTheme,
   onToggleTheme,
-  onlineNodesCount = 5,
-  totalNodesCount = 5,
+  onlineNodesCount = null,
+  totalNodesCount = null,
   activeTab,
   onSelectTab,
   currentUser,
@@ -41,12 +41,19 @@ export const Header: React.FC<HeaderProps> = ({
     const checkGateway = async () => {
       const start = performance.now();
       try {
-        const res = await fetch('/v1/health');
+        const res = await fetch('/healthz');
         const rtt = Math.round(performance.now() - start);
+        const contentType = res.headers.get('content-type') || '';
         if (isMounted) {
-          // HTTP 2xx, 401, or 404 confirms the gateway transport is online and responsive
-          if (res.ok || res.status === 401 || res.status === 404) {
-            setGatewayStatus({ online: true, rttMs: rtt });
+          // Canonical /healthz returns 200 with JSON { status: 'ok', version: ... }
+          // HTML fallback (200 text/html) or 401/404/500/503 is not health success
+          if (res.ok && contentType.includes('application/json')) {
+            const data = await res.json().catch(() => null);
+            if (data && data.status === 'ok') {
+              setGatewayStatus({ online: true, rttMs: rtt });
+            } else {
+              setGatewayStatus({ online: false, rttMs: null });
+            }
           } else {
             setGatewayStatus({ online: false, rttMs: null });
           }
@@ -160,16 +167,30 @@ export const Header: React.FC<HeaderProps> = ({
           }}
         >
           <span
+            data-testid="cluster-status-dot"
             style={{
               width: '8px',
               height: '8px',
               borderRadius: '50%',
-              backgroundColor: 'var(--color-status-online)',
+              backgroundColor:
+                onlineNodesCount === null || totalNodesCount === null
+                  ? 'var(--color-status-unknown)'
+                  : onlineNodesCount > 0
+                    ? 'var(--color-status-online)'
+                    : 'var(--color-status-neutral)',
               display: 'inline-block',
             }}
           />
           <span style={{ color: 'var(--color-text-secondary)' }}>
-            클러스터: <strong>{onlineNodesCount}/{totalNodesCount}</strong> Node 가동 중
+            클러스터:{' '}
+            {onlineNodesCount === null || totalNodesCount === null ? (
+              <strong>확인 중...</strong>
+            ) : (
+              <strong>
+                {onlineNodesCount}/{totalNodesCount}
+              </strong>
+            )}{' '}
+            Node 가동 중
           </span>
         </div>
 
@@ -186,6 +207,7 @@ export const Header: React.FC<HeaderProps> = ({
           title="Control Plane Gateway 실시간 RTT 지연시간"
         >
           <span
+            data-testid="gateway-status-dot"
             style={{
               width: '8px',
               height: '8px',

@@ -202,10 +202,16 @@ export const App: React.FC = () => {
   const selectedProject = projects.find(p => p.id === projectId);
   const chooseProject = (id: string) => {
     scopeRef.current += 1;
+    runRequest.current += 1;
+    approvalRequest.current += 1;
+    workspaceRequest.current += 1;
+    nodeRequest.current += 1;
     activeProject.current = id;
     setRunError(null); setApprovalError(null); setWorkspaceError(null); setNodeError(null);
     setProjectId(id); setRuns([]); setApprovals([]); setWorkspaces([]);
     setNodes([]); setCertificateObservation(null);
+    setNodesState('idle'); setRunsState('idle'); setApprovalsState('idle'); setWorkspacesState('idle');
+    setLastNodesFetchedAt(null); setLastRunsFetchedAt(null); setLastApprovalsFetchedAt(null);
     setSelectedNodeId(null); setNodeResourceUsage(null); setNodeResourceUsageState('idle'); setNodeResourceUsageError(null);
     setSelectedRunId(null); setSelectedWorkspaceId(null); setEvidenceRunId(null);
     setStudioWorkspaceId(null); setStudioRunId(null); setStudioNodeId(null); setStudioStep(1);
@@ -440,6 +446,9 @@ export const App: React.FC = () => {
     const currentScope = scopeRef.current;
     try {
       setActionError(null);
+      if (approvalsState === 'error') {
+        throw new Error('안건 목록이 갱신 실패(stale) 상태이므로 새로고침 후 다시 시도하십시오.');
+      }
       const approval = approvals.find((a) => a.id === approvalId);
       if (!approval || activeProject.current !== approval.projectId) throw new Error('승인 안건을 다시 선택하세요.');
       await approveReviewed(approval, shown);
@@ -464,6 +473,9 @@ export const App: React.FC = () => {
     const currentScope = scopeRef.current;
     try {
       setActionError(null);
+      if (approvalsState === 'error') {
+        throw new Error('안건 목록이 갱신 실패(stale) 상태이므로 새로고침 후 다시 시도하십시오.');
+      }
       const approval = approvals.find((a) => a.id === approvalId);
       if (!approval) throw new Error('승인 요청을 새로고침하세요.');
       await decideApproval(approval, 'reject');
@@ -569,8 +581,8 @@ export const App: React.FC = () => {
         onSwitchToDesktop={currentUser && projectId ? () => setDesktop(true) : undefined}
         currentTheme={theme}
         onToggleTheme={toggleTheme}
-        onlineNodesCount={nodes.filter((n) => n.status === 'online').length}
-        totalNodesCount={nodes.length}
+        onlineNodesCount={lastNodesFetchedAt ? nodes.filter((n) => n.status === 'online').length : null}
+        totalNodesCount={lastNodesFetchedAt ? nodes.length : null}
         activeTab={activeTab}
         onSelectTab={(tab) => {
           setActiveTab(tab);
@@ -694,7 +706,7 @@ export const App: React.FC = () => {
                   <span style={{ fontWeight: 600, color: 'var(--color-text-muted)' }}>화면 상태 시뮬레이션:</span>
                   {(
                     [
-                      { key: 'normal', label: '정상 (5대 온라인)' },
+                      { key: 'normal', label: '정상 관측' },
                       { key: 'loading', label: '로딩 중 (Skeleton)' },
                       { key: 'empty', label: '빈 상태 (Empty)' },
                       { key: 'error', label: '오류 (RFC 9457)' },
