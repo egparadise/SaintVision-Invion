@@ -1,0 +1,16 @@
+{
+  "source": "f2c1afb78b589b4b2cbcf3dcd4dc4f3c3f3bc856",
+  "branch": "agent/codex/fleet5-k2-d04-l1-r2-20261107",
+  "sourceGoContentSHA256": "9361e40fd8390684cd263f4ddbbcd1c0d1d3da0b1e7d37b12db216971ff1aa7c",
+  "Docs": 42299140025,
+  "correlation": "fleet5-d04-l1-r2-core-953a3e40ff0f482eb0b4e4a64c945d9b",
+  "requestedAtKST": "2026-11-07T06:51:38+09:00",
+  "workflow": "core.yml",
+  "rootScopeReply": "msg_010aeec31cf3",
+  "optionalProofInputs": false,
+  "singleDispatch": "INTENT_RECORDED_BEFORE_EXECUTION",
+  "CIResult": "PENDING",
+  "dispatchExit": 0,
+  "dispatchedAtKST": "2026-11-07T06:51:40+09:00",
+  "run": 42300147891
+}

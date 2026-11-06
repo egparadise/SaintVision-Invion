@@ -1,15 +1,19 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.444"
+version: "1.0.445"
 status: "review"
 author: "Codex"
-updated: "2026-11-07T06:40:38+09:00"
+updated: "2026-11-07T06:58:12+09:00"
 source_of_truth: "Git"
 active_card: "FLEET5 continued supervision with PORTAL-REFRESH-FLEET-20261106"
-active_card_status: "R1Core42287980945SUCCESS/actualCode879aINTERNAL_ACCEPT_LOW1; L1R2freshGo25top230subPASS/publication; A7partial1550reviewd6eactive/19blocks; fleetincomplete"
-active_card_next: "D04 author publishes testedGo2 with README-only actual-status update/Docs; Root exactnewsource then one freshCore and deltaCODEreview after A7 actual verdict/release; A7 pending577bb keeps19HOLD"
+active_card_status: "D04L1R2f2c1Go2exact/READMEstatus-only/Docs19PASS/Core42300147891pending/deltaCODE06factive; A7actual7a80LOW1/R2fix; actualRuntime0/19HOLD/fleetincomplete"
+active_card_next: "Claude actual D04L1R2 delta verdict; Root exact newCore final/artifacts/failures; B author A7R2allparsedguard fix/candidate then single actual review after proven release"
 ---
+
+## 2026-11-07T06:58:12+09:00 교정 코드의 정확한 게시·새 Core·한정 검토와 A7 검사 범위 보완
+
+R2의게시f2c1은실제시험한Go2바이트와같고README상태문장만후속갱신됐음을Root가141입력hash/79원문copy·exactDocs로확인했다. 새source로단한번Core42300147891를시작했고실제A7검토자종료해제뒤단일L1deltaCODE검토ctx_06f0718be774를배정했다. A7실제7a80검토의검사대상누락Low1은같은담당에게30parsed=30audited한정교정으로돌렸다. 19운영차단과전체·5대미완료는유지한다. 작업한것·확인한실제Git/CI/명령exit·Go2/README문서delta/141input/79원문hash·독립검토와자원수명·차단상태는Root History/Evidence에보존했다. 다음첫행동/담당은Claude의L1delta판정,Root의newCore최종원문검증,BCodex의A7R2한정교정이며전체완료로승격하지않는다.
 
 ## 2026-11-07T06:40:38+09:00 실제 전체 Core 성공과 남은 Low 교정 실제 검증
 

@@ -1,0 +1,71 @@
+{
+  "atKST": "2026-11-07T06:52:54+09:00",
+  "target": "1550453d1f072a87fd9a7baa53d4fe4ce8a98d5d",
+  "actualReview": "7a8012f47de5aa94a4264366df6722c1f6755a9c",
+  "branch": "agent/claude/fleet5-b-a7-snapshot-1550-review-20261107",
+  "Docs": 42299221800,
+  "job": 128172332633,
+  "correlation": "claude-b-a7-1550-review-7a8012f4-ctx_d6e29070eb5d",
+  "rootVerifiedExactHeadRefEventPathAttemptAll19StepsSuccess": true,
+  "remoteExact": true,
+  "onlyOwnAddedReviewFiles": 10,
+  "actualWorkerDone": "msg_17965d0f74aa",
+  "verdict": "REVISION_REQUIRED",
+  "findings": [
+    {
+      "id": "A7R-L1",
+      "severity": "LOW",
+      "layer": "CENSUS guard coverage (not body lock, not import binder, not parser, not stale hash)",
+      "source": "a7_inventory.py census(): `relevant=...` (retain only files with a NodeChannels call or any `.snapshot(` call, plus NC/CT/DB/ER) then `if not relevant:continue` precedes ra.audit and u.module_uses; a7_body.prove() guards only NC/CT/DB/ER. 18 of the 30 parsed lexical candidates therefore get no reflection or use-site guard.",
+      "validCase": {
+        "path": "services/control-plane/src/inv/node_certificates.py (parsed candidate, retainedForCallClosure=false)",
+        "frozenSHA256": "6e2bfb2d0cfa972eaf6f7d4ca3a1928cde7a2b3d0c21b80d03fbb4ff7ccf4901",
+        "inputSHA256": "19c2e14eb3e586f5ed22e1fb0549fe51961a079557fba2bb07ca1b8410686191",
+        "injected": [
+          [
+            75,
+            0,
+            75,
+            56,
+            "from .node_channels import NodeChannels as _ReviewerA7NC"
+          ],
+          [
+            76,
+            0,
+            76,
+            54,
+            "_ReviewerA7NC.snapshot = lambda self, node, **kw: None"
+          ]
+        ],
+        "body": "bodyAccepted=true, every gate passes (NODECHANNELS_DATABASE_FIELD ... NECESSARY_LEXICAL_LOAD_BINDINGS, 4x FROZEN_USE_SITE_SCOPE)",
+        "census": "0 obligations added and 0 removed vs the actual 72028 baseline; the file stays retainedForCallClosure=false",
+        "sameInputThroughRetainedGuard": "u.module_uses -> DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:WRITE_USE:inv.node_channels.NodeChannels.snapshot",
+        "layerControl": "the same patch appended to retained observation.py (input 0e4734a5...) adds A7_FULL_MODULE_USE_SITE_GUARD at census layer while the body layer stays ACCEPT, which is the correct layering",
+        "earlierPreconditions": "manifest 107/36 equal; mutant compiles; NC/CT/DB/ER unchanged at frozen hashes; nothing imported or executed"
+      },
+      "why": "Class monkeypatch is a declared A7 category (owner case class-monkeypatch). Out of NC it is neither refused nor surfaced as a named blocker, so the residual 19 do not cover it and callerClosureAccepted=not obligations would not see it once the 19 close. It does not change the current status (still SOURCE_STATIC_UNRESOLVED_RUNTIME_PENDING) or any count.",
+      "minimalCorrection": "Apply the existing ra.audit(PROTECTED) and u.module_uses guards to EVERY parsed lexical candidate (parsed == audited, as the accepted B t1 census does), emitting A7_RELEVANT_REFLECTION / A7_FULL_MODULE_USE_SITE_GUARD obligations. Reviewer ran both guards on all 18 non-retained candidates at frozen 72028 bytes: 0 relevant reflection hits and 0 use-site errors, so the 19 obligations, 30/10/10/7/12 inventories and global counts stay unchanged. Add the out-of-file monkeypatch as a source case whose oracle compares obligations against the baseline delta.",
+      "sameCorrectionOptional": "A new production file in the world currently makes census raise CalledProcessError (git show of a missing frozen path) instead of recording an obligation. That fails closed and is not a certification, but an explicit uncatalogued-source obligation would be clearer."
+    }
+  ],
+  "info": [
+    "I1 over-strict lexical gate (fail closed): a comment line added inside the snapshot With block (input 6130676a...) refuses UNRESOLVED:A7_NECESSARY_LEXICAL_BINDING:conn, because lexical_bindings.py:20-24 keys each binding event by the SHA of its whole enclosing statement source segment (here the With). A leading comment that shifts every span ACCEPTs. So the lexical gate is partly a source-text digest of the binding statement; the statement shape gates themselves are AST-semantic as stated. No correction required.",
+    "I2 otherSnapshotReceivers (remote_git.py:285 self.snapshot inside GitHubRepository, def at :173; workspace_git.py:167 repo.snapshot) carry blocksGrantForThisReceiver=true but are not in obligations, and callerClosureAccepted=not obligations ignores them. Both are git snapshot APIs, not NodeChannels, so there is no current effect. The local-alias NodeChannels receivers the reviewer tried in node_transfer.py are refused by the retained use-site guard. Optional: count them or record the resolved non-NodeChannels receiver explicitly.",
+    "I3 the owner census case caller-dynamic-purpose expects A7_PURPOSE_PROVENANCE, which the baseline already has (NodeDelivery), so its oracle cannot fail. Reviewer delta recompute adds A7_PURPOSE_PROVENANCE at observation.py [17,16,17,70] (plus the generic use-site guard), so the claimed result holds.",
+    "I4 BoundDatabase (db.py:112-133) is an existing database-shaped type: transaction(tenant) only compares tenant and yields the outer conn, with no new role/control-epoch/tenant-gate statements, and recovery_epoch copied from the outer db. The body's Database.transaction attestation is specifically inv.db.Database. The existing A7_DATABASE_OWNER_CLOSURE / A7_FORWARD_ROOT_TYPE_UNPROVEN obligations already cover it; naming it helps the future owner port. No census path shown here reaches NodeChannels with a BoundDatabase, but the unresolved roots are not closed."
+  ],
+  "actualCounterexampleLayersVerified": true,
+  "reviewerRows": 49,
+  "resources": {
+    "reviewerProbeProcessPeakWorkingSetBytes": 105259008,
+    "elapsedSeconds": 65.3,
+    "scope": "single serial reviewer process measured with the owner's measured_run.py; not aggregate or a quota",
+    "availableMemoryBeforeMB": [
+      101,
+      577
+    ]
+  },
+  "all19ResidualBlocksGrantPreserved": true,
+  "actualRuntimeB": 0,
+  "runtimeGrant": false
+}

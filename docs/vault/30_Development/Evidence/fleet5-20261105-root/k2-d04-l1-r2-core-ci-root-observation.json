@@ -1,0 +1,410 @@
+{
+  "atKST": "2026-11-07T06:58:12+09:00",
+  "run": 42300147891,
+  "head": "f2c1afb78b589b4b2cbcf3dcd4dc4f3c3f3bc856",
+  "branch": "agent/codex/fleet5-k2-d04-l1-r2-20261107",
+  "correlation": "fleet5-d04-l1-r2-core-953a3e40ff0f482eb0b4e4a64c945d9b",
+  "path": ".github/workflows/core.yml",
+  "event": "workflow_dispatch",
+  "attempt": 1,
+  "status": "in_progress",
+  "conclusion": null,
+  "artifactVerification": "PENDING",
+  "jobs": [
+    {
+      "id": 128175516056,
+      "name": "s01-storage-roundtrip",
+      "status": "completed",
+      "conclusion": "success",
+      "steps": [
+        {
+          "number": 1,
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "number": 2,
+          "name": "Initialize containers",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "number": 3,
+          "name": "Run actions/checkout@v4",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "number": 4,
+          "name": "Run actions/setup-python@v5",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "number": 5,
+          "name": "Install pinned product-conformance test dependencies",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "number": 6,
+          "name": "Start disposable MinIO candidate",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "number": 7,
+          "name": "Create disposable S01 Storage test bucket",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "number": 8,
+          "name": "Verify product ObjectStore adapter conformance",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "number": 9,
+          "name": "Verify product S3 persistence and PostgreSQL tenant boundary",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "number": 10,
+          "name": "Verify S01 Storage candidate SHA-256 roundtrip and cleanup",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "number": 11,
+          "name": "Stop disposable S01 Storage service",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "number": 12,
+          "name": "Run actions/upload-artifact@v4",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "number": 22,
+          "name": "Post Run actions/setup-python@v5",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "number": 23,
+          "name": "Post Run actions/checkout@v4",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "number": 24,
+          "name": "Stop containers",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "number": 25,
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success"
+        }
+      ]
+    },
+    {
+      "id": 128175516644,
+      "name": "core",
+      "status": "in_progress",
+      "conclusion": null,
+      "steps": [
+        {
+          "number": 1,
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "number": 2,
+          "name": "Run actions/checkout@v4",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "number": 3,
+          "name": "Run actions/setup-python@v5",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "number": 4,
+          "name": "Run actions/setup-go@v5",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "number": 5,
+          "name": "Run actions/setup-node@v4",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "number": 6,
+          "name": "Run python -m pip install -r requirements-test.txt -r requirements-docs.txt",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "number": 7,
+          "name": "FLEET5 early native Go peer-policy lifecycle proof",
+          "status": "completed",
+          "conclusion": "skipped"
+        },
+        {
+          "number": 8,
+          "name": "Publish FLEET5 native peer-phase proof (including expected baseline failure)",
+          "status": "completed",
+          "conclusion": "skipped"
+        },
+        {
+          "number": 9,
+          "name": "FLEET5 fixed native Go two-cycle proof",
+          "status": "completed",
+          "conclusion": "skipped"
+        },
+        {
+          "number": 10,
+          "name": "Publish FLEET5 fixed native proof",
+          "status": "completed",
+          "conclusion": "skipped"
+        },
+        {
+          "number": 11,
+          "name": "Start digest-pinned product ObjectStore service",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "number": 12,
+          "name": "Create disposable CX01 PostgreSQL",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "number": 13,
+          "name": "Regenerate contracts and detect drift",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "number": 14,
+          "name": "Upgrade each published migration head",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "number": 15,
+          "name": "Test Linux Node concurrency and crash boundaries",
+          "status": "in_progress",
+          "conclusion": null
+        },
+        {
+          "number": 16,
+          "name": "Build Node and isolated synthetic workload image",
+          "status": "pending",
+          "conclusion": null
+        },
+        {
+          "number": 17,
+          "name": "Verify Docker API negotiation and actual bounded execution",
+          "status": "pending",
+          "conclusion": null
+        },
+        {
+          "number": 18,
+          "name": "Build pinned Python workload image for kernel integration",
+          "status": "pending",
+          "conclusion": null
+        },
+        {
+          "number": 19,
+          "name": "Build owned LAN installer image and provide storage source root",
+          "status": "pending",
+          "conclusion": null
+        },
+        {
+          "number": 20,
+          "name": "Build production API image and require explicit configuration",
+          "status": "pending",
+          "conclusion": null
+        },
+        {
+          "number": 21,
+          "name": "Verify Workspace recovery boundary first",
+          "status": "pending",
+          "conclusion": null
+        },
+        {
+          "number": 22,
+          "name": "Verify containment controls and physical cleanup",
+          "status": "pending",
+          "conclusion": null
+        },
+        {
+          "number": 23,
+          "name": "Verify business handoff against the execution kernel",
+          "status": "pending",
+          "conclusion": null
+        },
+        {
+          "number": 24,
+          "name": "Verify bounded shard replacement on two real Nodes",
+          "status": "pending",
+          "conclusion": null
+        },
+        {
+          "number": 25,
+          "name": "Run provisioned LAN installer acceptance",
+          "status": "pending",
+          "conclusion": null
+        },
+        {
+          "number": 26,
+          "name": "Require executed LAN installer evidence",
+          "status": "pending",
+          "conclusion": null
+        },
+        {
+          "number": 27,
+          "name": "Run owned CX01 recovery drill evidence",
+          "status": "pending",
+          "conclusion": null
+        },
+        {
+          "number": 28,
+          "name": "Require executed CX01 recovery evidence",
+          "status": "pending",
+          "conclusion": null
+        },
+        {
+          "number": 29,
+          "name": "Verify build admission queue fairness on PostgreSQL",
+          "status": "pending",
+          "conclusion": null
+        },
+        {
+          "number": 30,
+          "name": "Require executed build admission queue evidence",
+          "status": "pending",
+          "conclusion": null
+        },
+        {
+          "number": 31,
+          "name": "Verify LAN pilot database scripts with real PostgreSQL",
+          "status": "pending",
+          "conclusion": null
+        },
+        {
+          "number": 32,
+          "name": "Require executed LAN pilot database evidence",
+          "status": "pending",
+          "conclusion": null
+        },
+        {
+          "number": 33,
+          "name": "Run python -m pytest --junitxml=dist/core-tests.xml -o faulthandler_timeout=45 --ignore=tests/integration/test_build_product_runtime_real_pg.py --ignore=tests/integration/test_lan_pilot_database_real_pg.py --ignore=tests/integration/test_desktop_browser.py --ignore=tests/integration/test_approval_browser.py --ignore=tests/integration/test_studio_browser.py --ignore=tests/integration/test_web_container.py --ignore=tests/integration/test_workspace_upgrade.py --ignore=tests/integration/test_lan_storage_install.py --ignore=tests/integration/test_s3_object_store_postgres.py --ignore=tests/integration/test_recovery_drill.py",
+          "status": "pending",
+          "conclusion": null
+        },
+        {
+          "number": 34,
+          "name": "Stop disposable product ObjectStore service",
+          "status": "pending",
+          "conclusion": null
+        },
+        {
+          "number": 35,
+          "name": "Docker host hygiene (explicit lane)",
+          "status": "pending",
+          "conclusion": null
+        },
+        {
+          "number": 36,
+          "name": "Require executed evidence and declared platform skips",
+          "status": "pending",
+          "conclusion": null
+        },
+        {
+          "number": 37,
+          "name": "Collect fixed-SHA S08 build acceptance observations",
+          "status": "pending",
+          "conclusion": null
+        },
+        {
+          "number": 38,
+          "name": "Recompute S08 build acceptance verdict from raw artifacts",
+          "status": "pending",
+          "conclusion": null
+        },
+        {
+          "number": 39,
+          "name": "Run python -m build services/control-plane --outdir dist",
+          "status": "pending",
+          "conclusion": null
+        },
+        {
+          "number": 40,
+          "name": "Run go test ./...",
+          "status": "pending",
+          "conclusion": null
+        },
+        {
+          "number": 41,
+          "name": "Run npx --yes --package typescript@5.9.3 tsc --noEmit --strict packages/contracts-ts/src/index.ts",
+          "status": "pending",
+          "conclusion": null
+        },
+        {
+          "number": 42,
+          "name": "Cleanup disposable CX01 PostgreSQL",
+          "status": "pending",
+          "conclusion": null
+        },
+        {
+          "number": 43,
+          "name": "Run actions/upload-artifact@v4",
+          "status": "pending",
+          "conclusion": null
+        },
+        {
+          "number": 83,
+          "name": "Post Run actions/setup-node@v4",
+          "status": "pending",
+          "conclusion": null
+        },
+        {
+          "number": 84,
+          "name": "Post Run actions/setup-go@v5",
+          "status": "pending",
+          "conclusion": null
+        },
+        {
+          "number": 85,
+          "name": "Post Run actions/setup-python@v5",
+          "status": "pending",
+          "conclusion": null
+        },
+        {
+          "number": 86,
+          "name": "Post Run actions/checkout@v4",
+          "status": "pending",
+          "conclusion": null
+        }
+      ]
+    }
+  ],
+  "wholeProgramComplete": false
+}

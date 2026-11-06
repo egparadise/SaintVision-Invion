@@ -1,15 +1,56 @@
 {
-  "atKST": "2026-11-07T06:40:38+09:00",
+  "atKST": "2026-11-07T06:58:12+09:00",
   "source": "1550453d1f072a87fd9a7baa53d4fe4ce8a98d5d",
   "base": "0e66b5ab2b5fbc131dd6e98f5d5e8930ac045148",
   "Docs": 42295460722,
   "sourceRootVerification": "b-a7-snapshot-r1-source-root-verification.json",
   "task": "task_8376b6d0ca39",
   "dispatch": "ctx_d6e29070eb5d",
-  "status": "DISPATCHED_PENDING_ACTUAL_PARTIAL_STATIC_VERDICT",
-  "ownerQuestion": "msg_577bb9090679",
+  "status": "ACTUAL_REVISION_REQUIRED_LOW_ONLY",
+  "ownerQuestion": null,
   "remainingBlocksGrant": 19,
   "candidateStatus": "SOURCE_STATIC_UNRESOLVED_RUNTIME_PENDING",
   "productOrPortOrRuntimeGrant": false,
-  "freshPreviousLifecycle": "ctx_1ddcf22e6a4c succeeded_settled_exited_released"
+  "freshPreviousLifecycle": "ctx_1ddcf22e6a4c succeeded_settled_exited_released",
+  "actualReview": "7a8012f47de5aa94a4264366df6722c1f6755a9c",
+  "actualDocs": 42299221800,
+  "findings": [
+    {
+      "id": "A7R-L1",
+      "severity": "LOW",
+      "layer": "CENSUS guard coverage (not body lock, not import binder, not parser, not stale hash)",
+      "source": "a7_inventory.py census(): `relevant=...` (retain only files with a NodeChannels call or any `.snapshot(` call, plus NC/CT/DB/ER) then `if not relevant:continue` precedes ra.audit and u.module_uses; a7_body.prove() guards only NC/CT/DB/ER. 18 of the 30 parsed lexical candidates therefore get no reflection or use-site guard.",
+      "validCase": {
+        "path": "services/control-plane/src/inv/node_certificates.py (parsed candidate, retainedForCallClosure=false)",
+        "frozenSHA256": "6e2bfb2d0cfa972eaf6f7d4ca3a1928cde7a2b3d0c21b80d03fbb4ff7ccf4901",
+        "inputSHA256": "19c2e14eb3e586f5ed22e1fb0549fe51961a079557fba2bb07ca1b8410686191",
+        "injected": [
+          [
+            75,
+            0,
+            75,
+            56,
+            "from .node_channels import NodeChannels as _ReviewerA7NC"
+          ],
+          [
+            76,
+            0,
+            76,
+            54,
+            "_ReviewerA7NC.snapshot = lambda self, node, **kw: None"
+          ]
+        ],
+        "body": "bodyAccepted=true, every gate passes (NODECHANNELS_DATABASE_FIELD ... NECESSARY_LEXICAL_LOAD_BINDINGS, 4x FROZEN_USE_SITE_SCOPE)",
+        "census": "0 obligations added and 0 removed vs the actual 72028 baseline; the file stays retainedForCallClosure=false",
+        "sameInputThroughRetainedGuard": "u.module_uses -> DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:WRITE_USE:inv.node_channels.NodeChannels.snapshot",
+        "layerControl": "the same patch appended to retained observation.py (input 0e4734a5...) adds A7_FULL_MODULE_USE_SITE_GUARD at census layer while the body layer stays ACCEPT, which is the correct layering",
+        "earlierPreconditions": "manifest 107/36 equal; mutant compiles; NC/CT/DB/ER unchanged at frozen hashes; nothing imported or executed"
+      },
+      "why": "Class monkeypatch is a declared A7 category (owner case class-monkeypatch). Out of NC it is neither refused nor surfaced as a named blocker, so the residual 19 do not cover it and callerClosureAccepted=not obligations would not see it once the 19 close. It does not change the current status (still SOURCE_STATIC_UNRESOLVED_RUNTIME_PENDING) or any count.",
+      "minimalCorrection": "Apply the existing ra.audit(PROTECTED) and u.module_uses guards to EVERY parsed lexical candidate (parsed == audited, as the accepted B t1 census does), emitting A7_RELEVANT_REFLECTION / A7_FULL_MODULE_USE_SITE_GUARD obligations. Reviewer ran both guards on all 18 non-retained candidates at frozen 72028 bytes: 0 relevant reflection hits and 0 use-site errors, so the 19 obligations, 30/10/10/7/12 inventories and global counts stay unchanged. Add the out-of-file monkeypatch as a source case whose oracle compares obligations against the baseline delta.",
+      "sameCorrectionOptional": "A new production file in the world currently makes census raise CalledProcessError (git show of a missing frozen path) instead of recording an obligation. That fails closed and is not a certification, but an explicit uncatalogued-source obligation would be clearer."
+    }
+  ],
+  "next": "b-a7-snapshot-r2-root-fix-cut.json",
+  "reviewerFinalLifecycle": "succeeded_settled_exited_released"
 }

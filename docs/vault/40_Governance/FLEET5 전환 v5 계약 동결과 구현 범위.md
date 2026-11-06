@@ -1,11 +1,11 @@
 ---
 doc_id: "GOV-FLEET5-BOOTSTRAP-V5-FREEZE-CODE-SCOPE-20261106"
 title: "FLEET5 전환 v5 계약 동결과 구현 범위"
-version: "1.0.28"
+version: "1.0.29"
 status: "active"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-11-07T06:40:38+09:00"
+updated: "2026-11-07T06:58:12+09:00"
 source_of_truth: "Git"
 ---
 
@@ -236,3 +236,8 @@ B9g실제90cc판정뒤검토자의종료해제를fresh로확인해단일Claude t
 ## 실제 Core 성공·내부 코드 수락과 L1R2 실제 검증
 
 정확한08e0의Core42287980945두job/모든필수단계·9358JUnit(9312pass46skip)/Go141top504sub·두LinuxbinaryGo1.27.1/vcs08e0/modifiedfalse를Root가원문artifact로대조했다. 실제879a코드검토는내부범위수락/비차단Low1이며Root가이를실제재현한뒤R2를새격리환경에서25top230sub/0fail0skip·92case90고유/zeroallocation·17tuple01OWNERSHIP빈prefix로검증했다. 새Go2바이트불변게시/README문서만상태갱신과향후newSHA Core/독립delta는k2-d04-l1-r2-publication-root-cut.json에명시한다. factory/provider/port/current/효과/실장비수락은없다.
+
+
+## L1R2 실제 게시·새 Core와 실제 delta 검토
+
+Root는f2c1/parent08e0의시험된Go2hash9361e40f와README허용상태문장만후속변경·141manifest입력/79원문·exactDocs42299140025/all19를대조했다. 단한번새Core42300147891/correlationfleet5-d04-l1-r2-core-953a3e40ff0f482eb0b4e4a64c945d9b를시작했고실제A7검토자의종료해제뒤단일L1deltaCODEtask_a152e893e6de/ctx_06f0718be774를배정했다. 새Core최종/독립닫힘은미판정이며기존08e0성공을빌리지않는다. factory/provider/port/current/효과/실장비수락없음을유지한다.

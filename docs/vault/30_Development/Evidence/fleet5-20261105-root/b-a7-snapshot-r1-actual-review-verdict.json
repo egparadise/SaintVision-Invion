@@ -1,0 +1,113 @@
+{
+  "review": "Actual independent Claude bounded A7 SNAPSHOT R1 PARTIAL STATIC EVIDENCE review",
+  "orca": {
+    "task": "task_8376b6d0ca39",
+    "dispatch": "ctx_d6e29070eb5d",
+    "reviewerBranch": "agent/claude/fleet5-b-a7-snapshot-1550-review-20261107",
+    "reviewerBase": "1550453d1f072a87fd9a7baa53d4fe4ce8a98d5d",
+    "precondition": "Root .work/a7r1-ready-before-start.json shows task_8376b6d0ca39 ready with dependency task_6d952cac2c9f (D04 CODE review ctx_1ddcf22e6a4c), and Root started this dispatch after it; that D04 review was this same reviewer's previous task (commit 879aea64) and is not reopened here"
+  },
+  "owner": {
+    "agent": "Codex",
+    "task": "task_a8fd2969f0b3",
+    "dispatch": "ctx_6f0f8253b8a7",
+    "pendingQuestion": "msg_577bb9090679",
+    "rootGrant": "msg_35937c8787d1 (.work/b-a7-snapshot-r1-root-cut.txt in fleet-five-orchestration-20261105)"
+  },
+  "target": "1550453d1f072a87fd9a7baa53d4fe4ce8a98d5d",
+  "directParent": "0e66b5ab2b5fbc131dd6e98f5d5e8930ac045148",
+  "productSource": "72028cbac903c4415d9979f980a6e0f9948e914f",
+  "targetDelta": "git diff --name-status 0e66b5ab 1550453d: 109 added (108 Evidence/fleet5-b-a7-snapshot-r1-20261107-codex + 1 History), 0 modified/deleted, 0 outside docs/vault",
+  "readFirst": {
+    "actual90cc": "History, review.json, commands.json, reviewer_gate_driver.py.txt and reviewer-rev9g-delta-probes.log.txt read directly from commit 90cccfb34718a8bb375bd7c1b7e06beb49670823 (B9f-L1/L2 CLOSED, INFO only, A7 UNSTARTED/NOT_GRANTED; no all-caller/runtime grant)",
+    "rootScope": ".work/b-a7-snapshot-r1-root-cut.txt, .work/a7r1-source-root-verified.json, .work/a7r1-narrow-review-spec.txt, a7r1-narrow-review-dispatch.json, a7r1-ready-before-start.json (read only)",
+    "rootBoards": "fleet-five-orchestration-20261105 HEAD da4f07eb, INDEX-PROGRESS-001 v1.0.482, WORKBOARD-CLAUDE-001 v1.2.130 (read only)",
+    "author": "History 2026-11-07_FLEET5_B_A7_Snapshot_R1_Codex.md; a7_common/a7_body/a7_inventory/a7_build/a7_verify/a7_tests/a7_record/a7_seal/a7_final/measured_run; callee_identity.py, source_bindings.py, lexical_bindings.py origin key, use_sites.py header, reflection_audit.py header; a7-snapshot-sidecar.json, a7-test-results.json, proof-final02.json, docs-final02.json, development-failures.json, proof-producer-hashes.json (committed blobs, not post-CI receipts)",
+    "product": "72028 node_channels.py:83-148, containment.py:15-18, db.py:55-245 (incl. BoundDatabase :112-133), errors.py, the 10 constructor sites and node_transport.py:227-286, observation.py, node_transfer.py, terminal.py:275, build_product_runtime.py:532-534, workspace_api.py:93-98, remote_git.py:173/285, workspace_git.py:167"
+  },
+  "preconditions": {
+    "manifestSHA256": "2a75a22f883f9ab9eba13e8b618c213710f7880f5df39769f10d8ab6bcf4ee43",
+    "manifestFiles": 107,
+    "fileMismatches": 0,
+    "producersAndInherited": 36,
+    "producerMismatches": 0,
+    "historyHashMatchesManifest": true,
+    "proofFinal02": "3 commands exit 0, producersUnchanged, after-map == manifest producers, raw log hashes match; docs-final02 8 commands exit 0, raw log hashes match, sync CHECK state unchanged",
+    "note": "Reviewer recomputed these at the committed bytes before its own probes; it did not rerun owner proof/docs commands"
+  },
+  "verdict": "REVISION_REQUIRED",
+  "severity": "LOW only (A7R-L1). No MEDIUM/HIGH. The body/helper/import/DB-dependency locks, normal vs observation matrix, 10/10 constructor and snapshot census, 19 explicit blockers and the HOLD status are otherwise sound and honestly qualified. The candidate stays PARTIAL/HOLD; nothing is granted.",
+  "findings": [
+    {
+      "id": "A7R-L1",
+      "severity": "LOW",
+      "layer": "CENSUS guard coverage (not body lock, not import binder, not parser, not stale hash)",
+      "source": "a7_inventory.py census(): `relevant=...` (retain only files with a NodeChannels call or any `.snapshot(` call, plus NC/CT/DB/ER) then `if not relevant:continue` precedes ra.audit and u.module_uses; a7_body.prove() guards only NC/CT/DB/ER. 18 of the 30 parsed lexical candidates therefore get no reflection or use-site guard.",
+      "validCase": {
+        "path": "services/control-plane/src/inv/node_certificates.py (parsed candidate, retainedForCallClosure=false)",
+        "frozenSHA256": "6e2bfb2d0cfa972eaf6f7d4ca3a1928cde7a2b3d0c21b80d03fbb4ff7ccf4901",
+        "inputSHA256": "19c2e14eb3e586f5ed22e1fb0549fe51961a079557fba2bb07ca1b8410686191",
+        "injected": [
+          [
+            75,
+            0,
+            75,
+            56,
+            "from .node_channels import NodeChannels as _ReviewerA7NC"
+          ],
+          [
+            76,
+            0,
+            76,
+            54,
+            "_ReviewerA7NC.snapshot = lambda self, node, **kw: None"
+          ]
+        ],
+        "body": "bodyAccepted=true, every gate passes (NODECHANNELS_DATABASE_FIELD ... NECESSARY_LEXICAL_LOAD_BINDINGS, 4x FROZEN_USE_SITE_SCOPE)",
+        "census": "0 obligations added and 0 removed vs the actual 72028 baseline; the file stays retainedForCallClosure=false",
+        "sameInputThroughRetainedGuard": "u.module_uses -> DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:WRITE_USE:inv.node_channels.NodeChannels.snapshot",
+        "layerControl": "the same patch appended to retained observation.py (input 0e4734a5...) adds A7_FULL_MODULE_USE_SITE_GUARD at census layer while the body layer stays ACCEPT, which is the correct layering",
+        "earlierPreconditions": "manifest 107/36 equal; mutant compiles; NC/CT/DB/ER unchanged at frozen hashes; nothing imported or executed"
+      },
+      "why": "Class monkeypatch is a declared A7 category (owner case class-monkeypatch). Out of NC it is neither refused nor surfaced as a named blocker, so the residual 19 do not cover it and callerClosureAccepted=not obligations would not see it once the 19 close. It does not change the current status (still SOURCE_STATIC_UNRESOLVED_RUNTIME_PENDING) or any count.",
+      "minimalCorrection": "Apply the existing ra.audit(PROTECTED) and u.module_uses guards to EVERY parsed lexical candidate (parsed == audited, as the accepted B t1 census does), emitting A7_RELEVANT_REFLECTION / A7_FULL_MODULE_USE_SITE_GUARD obligations. Reviewer ran both guards on all 18 non-retained candidates at frozen 72028 bytes: 0 relevant reflection hits and 0 use-site errors, so the 19 obligations, 30/10/10/7/12 inventories and global counts stay unchanged. Add the out-of-file monkeypatch as a source case whose oracle compares obligations against the baseline delta.",
+      "sameCorrectionOptional": "A new production file in the world currently makes census raise CalledProcessError (git show of a missing frozen path) instead of recording an obligation. That fails closed and is not a certification, but an explicit uncatalogued-source obligation would be clearer."
+    }
+  ],
+  "info": [
+    "I1 over-strict lexical gate (fail closed): a comment line added inside the snapshot With block (input 6130676a...) refuses UNRESOLVED:A7_NECESSARY_LEXICAL_BINDING:conn, because lexical_bindings.py:20-24 keys each binding event by the SHA of its whole enclosing statement source segment (here the With). A leading comment that shifts every span ACCEPTs. So the lexical gate is partly a source-text digest of the binding statement; the statement shape gates themselves are AST-semantic as stated. No correction required.",
+    "I2 otherSnapshotReceivers (remote_git.py:285 self.snapshot inside GitHubRepository, def at :173; workspace_git.py:167 repo.snapshot) carry blocksGrantForThisReceiver=true but are not in obligations, and callerClosureAccepted=not obligations ignores them. Both are git snapshot APIs, not NodeChannels, so there is no current effect. The local-alias NodeChannels receivers the reviewer tried in node_transfer.py are refused by the retained use-site guard. Optional: count them or record the resolved non-NodeChannels receiver explicitly.",
+    "I3 the owner census case caller-dynamic-purpose expects A7_PURPOSE_PROVENANCE, which the baseline already has (NodeDelivery), so its oracle cannot fail. Reviewer delta recompute adds A7_PURPOSE_PROVENANCE at observation.py [17,16,17,70] (plus the generic use-site guard), so the claimed result holds.",
+    "I4 BoundDatabase (db.py:112-133) is an existing database-shaped type: transaction(tenant) only compares tenant and yields the outer conn, with no new role/control-epoch/tenant-gate statements, and recovery_epoch copied from the outer db. The body's Database.transaction attestation is specifically inv.db.Database. The existing A7_DATABASE_OWNER_CLOSURE / A7_FORWARD_ROOT_TYPE_UNPROVEN obligations already cover it; naming it helps the future owner port. No census path shown here reaches NodeChannels with a BoundDatabase, but the unresolved roots are not closed."
+  ],
+  "confirmedSound": {
+    "pathMatrix": "From 72028 node_channels.py:124-148 and :104-117, containment.py:15-18. NORMAL: require_execution(conn) (tenant_controls kill_switch, AUTH-0061), node SELECT ... FOR SHARE with clock_timestamp, node recovery epoch, status online and 0<=DB now-heartbeat_at<=15 s, channel read and channel recovery epoch, proof(channel), assert_channel(conn) = channel FOR SHARE, enabled, certificate_not_after > DB clock, proof equality. OBSERVATION skips only the containment call and the online/heartbeat condition; everything else is identical. Python truthiness of observation_only, default False, with no exact-bool check, matches both branches. Note: the snapshot's own channel read is not FOR SHARE; the share lock is in assert_channel, which is what the History states.",
+    "bodyLocks": "Reviewer probes at final owner bytes: 5 benign controls ACCEPT (actual; leading comment shifting all NC spans; trailing comment in containment, db, errors). 12 counterexamples refuse at a named gate, all compiled only: containment rebinding after def, duplicate no-op def after/before, del (CALLEE_REBOUND); DomainError rebound in containment and node_channels (NECESSARY_LEXICAL_BINDING); assert_channel module rebinding (CALLEE_REBOUND); ChannelProof.__eq__ patch (WRITE_USE); heartbeat lower bound -1 and online check forced into observation (NORMAL_ONLINE_HEARTBEAT_0_15); host clock in assert_channel (CURRENT_CHANNEL_CERTIFICATE_PROOF); default observation_only=True (SNAPSHOT_SIGNATURE). Plus the owner's 31 refusal cases as recorded.",
+    "census": "Independent git grep with the owner pattern at 72028: 34 hits = 30 .py + 4 non-py (migrations 0005/0019 SQL, tools/baselines/doc_path_citations.txt, tools/rls-table-census.json). The 10 constructor sites equal Root's starting list. 10 linked snapshot sites; the NodeDelivery site (node_transport.py:280) is the only dynamic mode. NodeTransfer has no production constructor, so its state has 0 events. 19 obligations = 1 A7_PURPOSE_PROVENANCE + 8 A7_FORWARD_ROOT_TYPE_UNPROVEN + 10 A7_DATABASE_OWNER_CLOSURE.",
+    "qualification": "The History does not call body evidence a caller/runtime closure. It keeps dev02/dev03 exits as failures and calls the monkeypatch refusal the older WRITE_USE guard. It keeps 12 entries / 19 edges (16/3), 598/757/1071/21/573/218, model/lifecycle bytes, runtime B 0, real bindings NULL/HOLD and A1-A16 PENDING. The reviewer did not recompute those retained global artifacts; Root verified 11 of them byte-equal."
+  },
+  "residualBlockers": "All 19 explicit blocksGrant obligations remain: NodeDelivery observation_only or cancel_only value provenance; 10 Database owner closures (database x4, self.db, runtime(state) x4, a.e.db); 8 reverse-forwarding roots (worker.py:122/133, remote_workspace_entry.py:107/111/145, observer_worker.py:58, lan_pilot.py:3945, app.py:1323). Also outside the 19: observer lock, P-DBROLE, actual PG READ COMMITTED/SET LOCAL/two-session locks/clock/RLS role/auth/cutover.",
+  "notRun": [
+    "owner a7_tests/a7_build/a7_verify/a7_seal/run commands",
+    "generators pending_contracts/edge_categories",
+    "giant 523 assembler / 3485 plans / ledgers",
+    "old B9g corpus, model/recovery/terminal suites",
+    "import or execution of any product or mutant module",
+    "PG/DB, network, crypto, Go/Node/browser/host/SSH/Docker",
+    "Obsidian apply/adopt/resolve/state write"
+  ],
+  "resources": {
+    "reviewerProbeProcessPeakWorkingSetBytes": 105259008,
+    "elapsedSeconds": 65.3,
+    "scope": "single serial reviewer process measured with the owner's measured_run.py; not aggregate or a quota",
+    "availableMemoryBeforeMB": [
+      101,
+      577
+    ]
+  },
+  "unchanged": "actualRuntimeB 0; all real bindings NULL/HOLD; A1-A16 PENDING; A7 is a helper sidecar, not a thirteenth entry; status SOURCE_STATIC_UNRESOLVED_RUNTIME_PENDING; callerClosureAccepted false",
+  "nextFirstAction": {
+    "owner": "Root",
+    "action": "relay A7R-L1 to the author (msg_577bb9090679) and decide whether to grant the narrow guard-coverage correction; reviewer grants nothing and starts no follow-on scope"
+  }
+}

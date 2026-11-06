@@ -1,11 +1,11 @@
 ---
 doc_id: "GOV-FLEET5-B-BOOTSTRAP-SCOPE-20261106"
 title: "FLEET5 B 병행 역할과 전환 구현 범위 결정"
-version: "1.4.13"
+version: "1.4.14"
 status: "review"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-11-07T05:51:57+09:00"
+updated: "2026-11-07T06:58:12+09:00"
 source_of_truth: "Git"
 ---
 
@@ -173,3 +173,8 @@ Root는0e66/parent9cea의190ownA·93script/81원문copy/17최종실행전후hash
 ## 실제 Rev9g 수락과 별도 A7 snapshot 정적 증명 허용
 
 실제90cc/Docs42290423828는3원래반례의동일SHA/현재거부/선언변경되돌림수락과정상control을확인해Low2CLOSED/ACCEPT/INFO만남겼다. Root msg_35937c8787d1은exact0e66/고정product72028기반새자기문서·boundedAST A7snapshotsidecar만허용했다. 정확한범위는b-a7-snapshot-r1-root-cut.json이며제품코드/port/runtime권한은없다. 실제A7후속검토전정적수락도추정하지않는다.
+
+
+## A7 R1 실제 Low 판정과 R2 parsed-audited 보강
+
+실제7a80/Docs42299221800는부분본문증거/19HOLD를보존했지만30parsed중18에guard누락을LowA7R-L1로남겼다. Root msg_e051a19e0010의R2fix-only는retention전기존guard를모든parsed에적용하고정확한baseline-mutantdelta를검증한다. 범위는b-a7-snapshot-r2-root-fix-cut.json이며기존19조건/계수·제품/port/runtime미허용은변함없다.

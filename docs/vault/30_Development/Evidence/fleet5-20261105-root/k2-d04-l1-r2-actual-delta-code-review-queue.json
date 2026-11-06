@@ -1,0 +1,17 @@
+{
+  "atKST": "2026-11-07T06:58:12+09:00",
+  "source": "f2c1afb78b589b4b2cbcf3dcd4dc4f3c3f3bc856",
+  "base": "08e0f56eabe7d46518e17b8c3d6d7e296df880ac",
+  "Docs": 42299140025,
+  "task": "task_a152e893e6de",
+  "dispatch": "ctx_06f0718be774",
+  "status": "DISPATCHED_PENDING_ACTUAL_L1_DELTA_CODE_VERDICT",
+  "scope": "Exact3line earlybound/new16-17test/READMEstatus-onlydelta; accepted879a schema/joins untouched",
+  "testCodeBinding": "9361e40fd8390684cd263f4ddbbcd1c0d1d3da0b1e7d37b12db216971ff1aa7c",
+  "actualCore": 42300147891,
+  "CoreStatus": "in_progress",
+  "CoreConclusion": null,
+  "ownerQuestion": "msg_c57f6969d82e",
+  "freshPredecessorLifecycle": "ctx_d6e29070eb5d succeeded_settled_exited_released",
+  "runtimeOrFactoryGrant": false
+}
