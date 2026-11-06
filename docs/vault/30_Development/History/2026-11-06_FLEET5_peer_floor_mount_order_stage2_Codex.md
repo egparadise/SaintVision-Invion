@@ -89,3 +89,37 @@ new focused push run; no manual duplicate/Core rerun. Actual candidate CI/review
 remain pending; oldde71 field UNKNOWN and old failed runs remain preserved.
 
 Final units129PASS/exit0 after adding explicit8mount refusal. All10docs gates0 at15:21:39-15:23:18 KST; canonical sync before/after4f35e536195916a2b57517cb8cb95d7c894dfc0c6b391aaae775c03f70e749f9 unchanged/no apply. New raw helperSHA7665735eb5735be9fcb24f783f83ffe087c0d176e464a97df3022a4bd9f35799; diagnostic raw7aggregateb160f9c7a55e033c86331e1b5adef937f7b064b1e17e9d89663d667f1559d7db UNREGISTERED. One intended source+workflow push next; actual focused CI/Docs/independent code review remain pending.
+
+
+## Actual new candidate hosted result
+
+Published source01a4bebf55d23f11f85258746662d8b8a5cd0311 from exact52f, one purposeful
+workflow-changing PUSH. Actual run42174324865/attempt1/job127749166146/eventpush/
+exact branch/path/fixed full-SHA run-name completed SUCCESS; every step succeeded.
+All three predeclared independent exact-case executions ran once:0/0/0, each1case,
+0fail/error/skip, outcomeNEW_STAGE2_EXACT_CASE_PASS. No guard failure diagnostics.
+Artifact13483245465 ZIP SHAb7e3c2372557d97c27607376a8b5b7886555f1699c330585919beded64b08cdd
+matches GitHub digest; sanitized result/source-manifest prove exactsource and new
+helper7665735e/raw7b160f9c7 candidates. Raw ZIP remains ignored .work, no raw PKI/
+Config/env/nonce/private paths exported. Source Docs42174387586/job127749372289/
+19steps allSUCCESS on exact01a was actually read, not inferred from a workflow name.
+
+This proves only the NEW candidate's bounded exact integration case. Oldde71
+field remains UNKNOWN; old Core42164071724 and Stage1 run42170068364 remainFAILURE.
+Stage1 actual capture reporta8b6c1bd is docs-only over52f and its own Docs42174947293
+was dispatched, no repeated Stage1 samples. Lowdba1804b is a separate ff-based
+source; actual Low Docs42173025277/job127745030120/19stepsSUCCESS, local16top72sub/
+vet0, but hosted new-Low race still requires final combinedCore. Neither source
+claims installed trust, packaging readiness or positive K2A authentication.
+
+Actual code-delta review through one Claude after B7 remains PENDING. Root's
+independent proposal proof does not replace that owner-code review. Root chooses
+exact reviewed combined source only afterward, and one fresh fullCore+Docs/all
+required jobs/steps is still mandatory. Old launcher/lock/module/schema28 pins
+remain unchanged; this UNREGISTERED helper is refused by old standalone pins.
+No unilateral pin refresh/installation/clock/host/environment change was made.
+Next: publish this qualified report with docs gates and own exact Docs, then ask
+Root one actual Low/Stage2 delta review and final source choice; no whole K2/five-PC
+worker_done or acceptance claim.
+
+Actual hosted-report required10docs gates all exit0 at15:32:12-15:33:01 KST; canonical sync before/after4f35e536195916a2b57517cb8cb95d7c894dfc0c6b391aaae775c03f70e749f9 unchanged/no apply. This is docs-only over01a and cannot create another workflow-path push run. No source/test/workflow/K2/helper pin changed; actual independent code delta review and final combinedCore remain mandatory.

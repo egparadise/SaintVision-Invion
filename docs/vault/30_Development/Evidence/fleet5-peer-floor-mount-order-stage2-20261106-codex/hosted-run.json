@@ -1,0 +1,170 @@
+{
+  "run": {
+    "conclusion": "success",
+    "databaseId": 42174324865,
+    "displayTitle": "FLEET5-peer-floor-stage2-01a4bebf55d23f11f85258746662d8b8a5cd0311",
+    "event": "push",
+    "headBranch": "agent/codex/fleet5-peer-floor-mount-order-stage2-20261106",
+    "headSha": "01a4bebf55d23f11f85258746662d8b8a5cd0311",
+    "jobs": [
+      {
+        "completedAt": "2026-11-06T06:27:39Z",
+        "conclusion": "success",
+        "databaseId": 127749166146,
+        "name": "diagnose",
+        "startedAt": "2026-11-06T06:25:26Z",
+        "status": "completed",
+        "steps": [
+          {
+            "completedAt": "2026-11-06T06:25:28Z",
+            "conclusion": "success",
+            "name": "Set up job",
+            "number": 1,
+            "startedAt": "2026-11-06T06:25:27Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-11-06T06:25:35Z",
+            "conclusion": "success",
+            "name": "Run actions/checkout@v4",
+            "number": 2,
+            "startedAt": "2026-11-06T06:25:28Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-11-06T06:25:36Z",
+            "conclusion": "success",
+            "name": "Run actions/setup-python@v5",
+            "number": 3,
+            "startedAt": "2026-11-06T06:25:35Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-11-06T06:25:44Z",
+            "conclusion": "success",
+            "name": "Run actions/setup-go@v5",
+            "number": 4,
+            "startedAt": "2026-11-06T06:25:36Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-11-06T06:26:00Z",
+            "conclusion": "success",
+            "name": "Run python -m pip install -r requirements-test.txt -r requirements-docs.txt",
+            "number": 5,
+            "startedAt": "2026-11-06T06:25:44Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-11-06T06:26:01Z",
+            "conclusion": "success",
+            "name": "Require stage2 complete-field and guard unit tests",
+            "number": 6,
+            "startedAt": "2026-11-06T06:26:00Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-11-06T06:26:17Z",
+            "conclusion": "success",
+            "name": "Build exact source Node and existing fixture programs",
+            "number": 7,
+            "startedAt": "2026-11-06T06:26:01Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-11-06T06:26:33Z",
+            "conclusion": "success",
+            "name": "Build existing pinned Python workload fixture",
+            "number": 8,
+            "startedAt": "2026-11-06T06:26:17Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-11-06T06:26:34Z",
+            "conclusion": "success",
+            "name": "Build existing owned LAN Node fixture",
+            "number": 9,
+            "startedAt": "2026-11-06T06:26:33Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-11-06T06:27:32Z",
+            "conclusion": "success",
+            "name": "Three predeclared diagnostic samples of the exact failed test",
+            "number": 10,
+            "startedAt": "2026-11-06T06:26:34Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-11-06T06:27:33Z",
+            "conclusion": "success",
+            "name": "Publish sanitized diagnostics and source digests only",
+            "number": 11,
+            "startedAt": "2026-11-06T06:27:32Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-11-06T06:27:33Z",
+            "conclusion": "success",
+            "name": "Post Run actions/setup-go@v5",
+            "number": 20,
+            "startedAt": "2026-11-06T06:27:33Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-11-06T06:27:35Z",
+            "conclusion": "success",
+            "name": "Post Run actions/setup-python@v5",
+            "number": 21,
+            "startedAt": "2026-11-06T06:27:33Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-11-06T06:27:36Z",
+            "conclusion": "success",
+            "name": "Post Run actions/checkout@v4",
+            "number": 22,
+            "startedAt": "2026-11-06T06:27:35Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-11-06T06:27:36Z",
+            "conclusion": "success",
+            "name": "Complete job",
+            "number": 23,
+            "startedAt": "2026-11-06T06:27:36Z",
+            "status": "completed"
+          }
+        ],
+        "url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/42174324865/job/127749166146"
+      }
+    ],
+    "status": "completed",
+    "url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/42174324865"
+  },
+  "artifacts": {
+    "total_count": 1,
+    "artifacts": [
+      {
+        "id": 13483245465,
+        "node_id": "MDg6QXJ0aWZhY3QxMzQ4MzI0NTQ2NQ==",
+        "name": "peer-floor-observation-stage2-01a4bebf55d23f11f85258746662d8b8a5cd0311",
+        "size_in_bytes": 1767,
+        "url": "https://api.github.com/repos/egparadise/SaintVision-Invion/actions/artifacts/13483245465",
+        "archive_download_url": "https://api.github.com/repos/egparadise/SaintVision-Invion/actions/artifacts/13483245465/zip",
+        "expired": false,
+        "digest": "sha256:b7e3c2372557d97c27607376a8b5b7886555f1699c330585919beded64b08cdd",
+        "created_at": "2026-11-06T06:27:33Z",
+        "updated_at": "2026-11-06T06:27:33Z",
+        "expires_at": "2026-12-06T06:27:32Z",
+        "workflow_run": {
+          "id": 42174324865,
+          "repository_id": 1362259805,
+          "head_repository_id": 1362259805,
+          "head_branch": "agent/codex/fleet5-peer-floor-mount-order-stage2-20261106",
+          "head_sha": "01a4bebf55d23f11f85258746662d8b8a5cd0311"
+        }
+      }
+    ]
+  }
+}

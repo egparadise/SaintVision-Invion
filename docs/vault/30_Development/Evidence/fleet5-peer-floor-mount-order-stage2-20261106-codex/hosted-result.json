@@ -1,0 +1,68 @@
+{
+  "classification": "STAGE2_FIXED_CASE_CANDIDATE_NOT_CORE_OR_OPERATIONAL_ACCEPTANCE",
+  "sourceSHA": "01a4bebf55d23f11f85258746662d8b8a5cd0311",
+  "runId": "42174324865",
+  "attempt": "1",
+  "argv": [
+    "/opt/hostedtoolcache/Python/3.12.16/x64/bin/python",
+    "-B",
+    "-m",
+    "pytest",
+    "-q",
+    "tests/integration/test_workspace_upgrade.py::test_real_upgrade_preserves_credentials_journal_and_replays",
+    "-o",
+    "faulthandler_timeout=45"
+  ],
+  "maxSamples": 3,
+  "samplePurpose": "Independent owned fixture executions of exact prior failing test; never retry until pass",
+  "pythonBase": "python@sha256:4840d514c583a4d3d8cad3940e68dee6f0f6f3635c12fcd0a3d74c21a5b93a54",
+  "samples": [
+    {
+      "sampleId": "OBSERVATION_SAMPLE_1",
+      "exit": 0,
+      "timedOut": false,
+      "executedCases": 1,
+      "counts": {
+        "failure": 0,
+        "error": 0,
+        "skipped": 0
+      },
+      "rawOutputSHA256": "840de4476056750b09ad671148558929fe3a467b083b87e42ceda0fd2da15d69",
+      "diagnostics": [],
+      "outcome": "NEW_STAGE2_EXACT_CASE_PASS",
+      "acceptancePassed": true
+    },
+    {
+      "sampleId": "OBSERVATION_SAMPLE_2",
+      "exit": 0,
+      "timedOut": false,
+      "executedCases": 1,
+      "counts": {
+        "failure": 0,
+        "error": 0,
+        "skipped": 0
+      },
+      "rawOutputSHA256": "8eb33ad8c1db56f22da75e1f6b999bfcd155f524e02c557d53a6a5fcbef8f792",
+      "diagnostics": [],
+      "outcome": "NEW_STAGE2_EXACT_CASE_PASS",
+      "acceptancePassed": true
+    },
+    {
+      "sampleId": "OBSERVATION_SAMPLE_3",
+      "exit": 0,
+      "timedOut": false,
+      "executedCases": 1,
+      "counts": {
+        "failure": 0,
+        "error": 0,
+        "skipped": 0
+      },
+      "rawOutputSHA256": "ffc16c4e4788b812960ddd6e62ce46c45efd4b31a3bb3e1fe670570d16564f68",
+      "diagnostics": [],
+      "outcome": "NEW_STAGE2_EXACT_CASE_PASS",
+      "acceptancePassed": true
+    }
+  ],
+  "allExactCaseExecutionsPassed": true,
+  "originalDe71DifferingField": "UNKNOWN_NOT_RETROACTIVELY_INFERRED"
+}
