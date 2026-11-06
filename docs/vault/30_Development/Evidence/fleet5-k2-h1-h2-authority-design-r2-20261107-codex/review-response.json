@@ -1,0 +1,151 @@
+{
+  "classification": "R1_TO_R2_EXACT_STRUCTURAL_LOGIC_DELTAS_NOT_EXECUTED_AUTH_CASES",
+  "review": "8141a49bab3d0e7b94028a69d9a767e2abc25272",
+  "base": "382fe3d86c14283dcb549f935205081db8b4eee4",
+  "grant": "msg_e41b206771c3",
+  "findings": {
+    "M1": {
+      "newOrigin": {
+        "identity": "Distinct Root-authorized registration capture/delivery issuer identity under the external G00_BINDING, not H1_INSTALL capsule delivery issuer by inheritance",
+        "authorizer": "Root custody; G00 independently authorizes the exact RD issuer and purpose/scope",
+        "valueOrigin": "Original immutable registration capture/publication identity, ordering and time; exact raw registration SHA256 equals unchanged sourceConstants.designRegistrationSHA256; exact project/purpose/source/contract subject and destination registry generation; authenticated delivery identity/version and immutable raw assertion",
+        "actual": "UNBOUND_HOLD",
+        "subjectFields": [
+          "issuerIdentity",
+          "registrationDeliveryID",
+          "registrationDeliveryVersion",
+          "capturePublicationIdentity",
+          "captureOrdering",
+          "captureTime",
+          "rawRegistrationSHA256",
+          "projectIdentity",
+          "purpose",
+          "sourceSubject",
+          "contractSubject",
+          "destinationRegistryGeneration"
+        ],
+        "subjectJoins": [
+          "rawRegistrationSHA256 == capsule.sourceConstants.designRegistrationSHA256",
+          "destinationRegistryGeneration == independent installed capsule.generation",
+          "project/purpose/source/contract subject == independently authorized registration policy",
+          "issuerIdentity == distinct RD issuer authorized by current G00 binding"
+        ],
+        "currentStatus": "Exact RD capture/delivery subject and issuer grant require independently authenticated current nonrevocation under current G00 mapping",
+        "readback": "G10 authenticates same full RD subject/raw identity and registrationDeliveryID/version; equal ID/version with different assertion bytes is equivocation, never accepted"
+      },
+      "newH2Slot": {
+        "field": "registrationDeliverySubject",
+        "origin": "RD_CAPTURE_DELIVERY",
+        "join": "Exact issuer + original immutable capture/publication identity/ordering/time + registrationDeliveryID/version + rawRegistrationSHA256 == capsule.sourceConstants.designRegistrationSHA256 + project/purpose/source/contract subject + destination registry generation. Distinct from H1 capsule deliveryID/version. G04 origin joins, G08 current subject/issuer status, G10 full authenticated subject/raw-identity/version equality."
+      },
+      "newVectorFields": [
+        "registrationDeliveryID",
+        "registrationDeliveryVersion"
+      ],
+      "causalVariants": [
+        "C07 missing/wrong RD issuer -> G04",
+        "C05 revoked RD subject/authority -> G08",
+        "C08 changed RD version -> G10"
+      ]
+    },
+    "L1": {
+      "newOrigin": {
+        "identity": "Independent Root-bound external bootstrap mapping identity/version and approved delivery mechanism; outside all mapped authorities",
+        "authorizer": "Root custody under the selected project/control-plane bootstrap boundary",
+        "valueOrigin": "Independently authenticated CURRENT external mapping identity/version/currency; never learned from provisioner/status/clock/RD authority statements or candidate bytes",
+        "actual": "UNBOUND_HOLD"
+      },
+      "slotOriginBefore": "H1_INSTALL",
+      "slotOriginAfter": "G00_BINDING",
+      "G08Subjects": [
+        "H1 capsule delivery subject",
+        "installed H1 capsule subject",
+        "H2 registry grant subject",
+        "H2 registry key subject",
+        "registry subject",
+        "current record subject",
+        "RD_CAPTURE_DELIVERY registration capture/delivery subject",
+        "H1 provisioner authority grant under current G00 mapping",
+        "H4 status authority grant under current G00 mapping",
+        "H4 clock authority grant under current G00 mapping",
+        "RD_CAPTURE_DELIVERY authority grant under current G00 mapping"
+      ],
+      "currency": "Only the independently Root-bound CURRENT G00_BINDING mapping/checkpoint decides provisioner/status/clock/RD authority grant currency. Their own ACTIVE statements cannot supply or override that mapping. G04 authenticates source/checkpoint references; G08 evaluates current authorization, G10 repeats current G00 binding and full subject/vector comparison."
+    },
+    "L2": {
+      "C09before": {
+        "id": "H12-C09",
+        "purpose": "Exclusive expiry at authenticated final bound",
+        "requiredEarlierPass": [
+          "G00_BINDING",
+          "G01_ORIGIN_DELIVERY",
+          "G02_OWNERSHIP",
+          "G03_CAPSULE",
+          "G04_AUTHENTICATED_SNAPSHOT",
+          "G05_H2_AUTHORIZATION",
+          "G06_RECORD_CODEC",
+          "G07_SIGNATURE"
+        ],
+        "targetFailure": [
+          "G08_STATUS_TIME"
+        ],
+        "expected": "G08_STATUS_TIME / EXPIRED",
+        "constructionAndFullPreconditions": "All origin/key authorization/signature and integer/canonical predicates pass. Authenticated clock upper bound equals ticket or response exclusive end; other key/status/H5 bounds remain strictly valid. Refuse equality; no ambient clock, backdated Now, optimistic lower endpoint or widened age. Missing/untrusted clock separately refuses at G04 and cannot count as this expiry proof.",
+        "status": "PROPOSED_NOT_RUN"
+      },
+      "C09after": {
+        "id": "H12-C09",
+        "purpose": "Late final-ticket exclusive expiry",
+        "requiredEarlierPass": [
+          "G00_BINDING",
+          "G01_ORIGIN_DELIVERY",
+          "G02_OWNERSHIP",
+          "G03_CAPSULE",
+          "G04_AUTHENTICATED_SNAPSHOT",
+          "G05_H2_AUTHORIZATION",
+          "G06_RECORD_CODEC",
+          "G07_SIGNATURE",
+          "G08_STATUS_TIME",
+          "G09_VERSION_REPLAY"
+        ],
+        "targetFailure": [
+          "G10_FINAL_READBACK"
+        ],
+        "expected": "G10_FINAL_READBACK / EXPIRED (ticket.expiresAt only)",
+        "constructionAndFullPreconditions": "Initial authenticated [L,U] is strictly inside every bound and all G00..G09 pass. At G10, authenticated origin/subject, unchanged full29member vector including RD ID/version, same clock mechanism/epoch and valid monotonic bracket all pass BEFORE the time predicate. Final U_final == ticket.expiresAt. record.validUntil, status.expiresAt, H5.expiresAt and keyNotAfter are ALL strictly later than U_final, and all other lower/age predicates remain valid. Refuse only G10 EXPIRED, not G08, parser/signature/absent source or a disjunctive response bound.",
+        "status": "PROPOSED_NOT_RUN",
+        "finalEarlierSubchecks": [
+          "authenticated final origin and exact subject",
+          "full29field vector equality including G00 mapping and registrationDeliveryID/version",
+          "same clock mechanism/epoch and valid monotonic bracket"
+        ],
+        "exclusiveBoundary": "U_final == ticket.expiresAt",
+        "allOtherExclusiveEnds": "record.validUntil/status.expiresAt/H5.expiresAt/keyNotAfter > U_final"
+      }
+    }
+  },
+  "computedCounts": {
+    "origins": 7,
+    "H2Slots": 24,
+    "vectorMembers": 29,
+    "capsule": 26,
+    "nestedDeclaredTypeGroups": 7,
+    "nestedMatrixEntries": 11,
+    "tuple": 13,
+    "token": 9
+  },
+  "preserved": {
+    "capsuleAndNested": true,
+    "tupleToken": true,
+    "all14InputPins": true,
+    "stageOrder": true,
+    "timeFormulas": true,
+    "otherCaseRows": true,
+    "nextCodeSHA256": "f8b3f6d7aabe32e07bdbff56789ea327f544c43b64834035934f8cfe4f0f7fed",
+    "nextCodeStatus": "UNCHANGED_R1_DATA_ONLY_NO_CODE_GRANT",
+    "actualBindings": "UNBOUND_HOLD",
+    "rawSeven": "UNREGISTERED",
+    "A01A40": "NOT_RUN"
+  },
+  "nonblockingNotes": "N1-N9 retained in actual review-provenance; adjacent wording only, no expansion into code tasks"
+}

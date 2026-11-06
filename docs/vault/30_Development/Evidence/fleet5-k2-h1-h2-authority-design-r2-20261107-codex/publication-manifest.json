@@ -1,0 +1,88 @@
+{
+  "classification": "H12_R2_DESIGN_CORRECTION_PROPOSED_NOT_ACTUAL_TRUST",
+  "atKST": "2026-11-07T08:51:04.919824+09:00",
+  "base": "382fe3d86c14283dcb549f935205081db8b4eee4",
+  "productBaseline": "f2c1afb78b589b4b2cbcf3dcd4dc4f3c3f3bc856",
+  "branch": "agent/codex/fleet5-k2-h1-h2-authority-design-r2-20261107",
+  "files": [
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h1-h2-authority-design-r2-20261107-codex/acceptance-cases.json",
+      "bytes": 14114,
+      "mode": "100644",
+      "SHA256": "35f63a9132c310ddd54845c8ba65e51e3a6faa294255431d896d9872d7f00744"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h1-h2-authority-design-r2-20261107-codex/authority-fields.json",
+      "bytes": 20284,
+      "mode": "100644",
+      "SHA256": "6a8c67a33df3379ad12f4254182bbb33aced74c64fa593dfe44cb367411836e1"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h1-h2-authority-design-r2-20261107-codex/context.json",
+      "bytes": 6217,
+      "mode": "100644",
+      "SHA256": "3d2234e92c1ab477fb57090ab0c20d5a585dee8e4b74aefc71add61d43104046"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h1-h2-authority-design-r2-20261107-codex/contract.md",
+      "bytes": 20324,
+      "mode": "100644",
+      "SHA256": "b02ee1c7a09cf4565fc9e486d63103e29c3f0101ac20f86046a710d14c46a522"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h1-h2-authority-design-r2-20261107-codex/local-gates.json",
+      "bytes": 9247,
+      "mode": "100644",
+      "SHA256": "b86f6722155e30902c10f0e32b7dd82d68cf161d7882be30d11123d0a074b0b8"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h1-h2-authority-design-r2-20261107-codex/review-provenance.json",
+      "bytes": 17209,
+      "mode": "100644",
+      "SHA256": "52846dcf5b81777e10b976e1ff0b6a55f8a2f0d221c4a56908977fe7742e9f1b"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h1-h2-authority-design-r2-20261107-codex/review-response.json",
+      "bytes": 7966,
+      "mode": "100644",
+      "SHA256": "b53d6eca30e8f3c247410c20d49d17bc7b1d1a9680cd29a1bf908e47ae1f6893"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h1-h2-authority-design-r2-20261107-codex/structural-consistency.json",
+      "bytes": 776,
+      "mode": "100644",
+      "SHA256": "038b2c05d05fc7e4aac86351bbbe6bd7d84d7ff2c5425c51a5b76d720ebfc1f2"
+    },
+    {
+      "path": "docs/vault/30_Development/History/2026-11-07_FLEET5_K2_H1_H2_Authority_Design_R2_Codex.md",
+      "bytes": 6543,
+      "mode": "100644",
+      "SHA256": "b93d85b5296b1880977d28c4cbbfb6bdb5f29a24146486332858d7000d6cf343"
+    }
+  ],
+  "excludedSelf": true,
+  "productDelta": 0,
+  "priorRefsFrozen": true,
+  "artifactHashes": {
+    "acceptance-cases.json": "35f63a9132c310ddd54845c8ba65e51e3a6faa294255431d896d9872d7f00744",
+    "authority-fields.json": "6a8c67a33df3379ad12f4254182bbb33aced74c64fa593dfe44cb367411836e1",
+    "context.json": "3d2234e92c1ab477fb57090ab0c20d5a585dee8e4b74aefc71add61d43104046",
+    "contract.md": "b02ee1c7a09cf4565fc9e486d63103e29c3f0101ac20f86046a710d14c46a522",
+    "local-gates.json": "b86f6722155e30902c10f0e32b7dd82d68cf161d7882be30d11123d0a074b0b8",
+    "review-provenance.json": "52846dcf5b81777e10b976e1ff0b6a55f8a2f0d221c4a56908977fe7742e9f1b",
+    "review-response.json": "b53d6eca30e8f3c247410c20d49d17bc7b1d1a9680cd29a1bf908e47ae1f6893",
+    "structural-consistency.json": "038b2c05d05fc7e4aac86351bbbe6bd7d84d7ff2c5425c51a5b76d720ebfc1f2"
+  },
+  "selectedLogicalPolicy": "Root msg_10808c1899e9 choices1-5",
+  "contract": "PROPOSED_UNREVIEWED",
+  "actualBindings": "ALL_UNBOUND_NULL_HOLD",
+  "tenCases": "H12-C01..C10 PROPOSED_NOT_RUN",
+  "nextCode": "DATA_ONLY_NOT_GRANTED",
+  "localDocsGates11Exit0": true,
+  "canonicalStateBefore": "7b82bf9f1b973c5f1eec98ac2823b59b80db006ac944854bccc14ccd29703156",
+  "canonicalStateAfter": "7b82bf9f1b973c5f1eec98ac2823b59b80db006ac944854bccc14ccd29703156",
+  "ownDocs": "PENDING_ONE_EXACT_DISPATCH",
+  "actualIndependentContractReview": "PENDING_ROOT_CLAUDE_DELTA_AFTER_BMODE_RELEASE",
+  "A01A40": "NOT_RUN",
+  "wholeFleet": "INCOMPLETE"
+}

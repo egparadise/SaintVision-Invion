@@ -1,0 +1,25 @@
+{
+  "classification": "STRUCTURAL_SOURCE_REFERENCE_CHECK_ONLY_NOT_AUTH_CRYPTO_OR_RUNTIME_PROOF",
+  "atKST": "2026-11-07T08:47:36.737850+09:00",
+  "command": "main .venv Python3.14.7 -I -B inline stdlib JSON/regex/hash comparison",
+  "exit": 0,
+  "computedCounts": {
+    "origins": 7,
+    "H2Slots": 24,
+    "vectorMembers": 29,
+    "capsule": 26,
+    "nestedDeclaredTypeGroups": 7,
+    "nestedMatrixEntries": 11,
+    "tuple": 13,
+    "token": 9
+  },
+  "originReferencesClosed": true,
+  "RDOriginSubjectStatusReadbackExplicit": true,
+  "G00CurrencyNotSelfSupplied": true,
+  "C09LateTicketOnly": true,
+  "capsuleSourceTypesExact": true,
+  "all14PublicPinsUnchanged": true,
+  "allTenCases": "PROPOSED_NOT_RUN",
+  "reviewerOldChecksRerun": false,
+  "cryptoGoRuntime": "NOT_RUN"
+}

@@ -1,0 +1,572 @@
+{
+  "classification": "R2_PROPOSED_UNREVIEWED_LOGICAL_CONTRACT_ACTUAL_UNBOUND",
+  "origins": {
+    "H1_POLICY": {
+      "identity": "Project/control-plane TrustProvisioner policy authority, independently installed outside candidate",
+      "authorizer": "Root custody under selected bootstrap boundary",
+      "valueOrigin": "Authenticated immutable policy release; raw identity bound by H1 delivery",
+      "actual": "UNBOUND_HOLD"
+    },
+    "H1_INSTALL": {
+      "identity": "Same independently bound provisioning boundary installation assertion",
+      "authorizer": "Root custody; separately authenticated delivery",
+      "valueOrigin": "Original subject/generation/anchorVersion/raw-capsule readback and preserved delivery identity",
+      "actual": "UNBOUND_HOLD"
+    },
+    "H2_AUTHZ": {
+      "identity": "Root-provisioned per-purpose registry grant, not the candidate registry signer self-assertion",
+      "authorizer": "Root named H2 logical signer slot; registration not yet accepted",
+      "valueOrigin": "Independent policy authorization + authenticated current registration for exact grant/key subject",
+      "actual": "UNBOUND_HOLD"
+    },
+    "H4_STATUS": {
+      "identity": "Independently authorized current registration/read-snapshot authority",
+      "authorizer": "Root-provisioned status slot distinct from candidate assertions",
+      "valueOrigin": "Authenticated exact subject/version statement at a containing read checkpoint",
+      "actual": "UNBOUND_HOLD"
+    },
+    "H4_CLOCK": {
+      "identity": "Independently authorized clock/bracketing source",
+      "authorizer": "Root-approved clock mechanism and epoch",
+      "valueOrigin": "Authenticated original interval and monotonic bracketing; never ambient Now",
+      "actual": "UNBOUND_HOLD"
+    },
+    "G00_BINDING": {
+      "identity": "Independent Root-bound external bootstrap mapping identity/version and approved delivery mechanism; outside all mapped authorities",
+      "authorizer": "Root custody under the selected project/control-plane bootstrap boundary",
+      "valueOrigin": "Independently authenticated CURRENT external mapping identity/version/currency; never learned from provisioner/status/clock/RD authority statements or candidate bytes",
+      "actual": "UNBOUND_HOLD"
+    },
+    "RD_CAPTURE_DELIVERY": {
+      "identity": "Distinct Root-authorized registration capture/delivery issuer identity under the external G00_BINDING, not H1_INSTALL capsule delivery issuer by inheritance",
+      "authorizer": "Root custody; G00 independently authorizes the exact RD issuer and purpose/scope",
+      "valueOrigin": "Original immutable registration capture/publication identity, ordering and time; exact raw registration SHA256 equals unchanged sourceConstants.designRegistrationSHA256; exact project/purpose/source/contract subject and destination registry generation; authenticated delivery identity/version and immutable raw assertion",
+      "actual": "UNBOUND_HOLD",
+      "subjectFields": [
+        "issuerIdentity",
+        "registrationDeliveryID",
+        "registrationDeliveryVersion",
+        "capturePublicationIdentity",
+        "captureOrdering",
+        "captureTime",
+        "rawRegistrationSHA256",
+        "projectIdentity",
+        "purpose",
+        "sourceSubject",
+        "contractSubject",
+        "destinationRegistryGeneration"
+      ],
+      "subjectJoins": [
+        "rawRegistrationSHA256 == capsule.sourceConstants.designRegistrationSHA256",
+        "destinationRegistryGeneration == independent installed capsule.generation",
+        "project/purpose/source/contract subject == independently authorized registration policy",
+        "issuerIdentity == distinct RD issuer authorized by current G00 binding"
+      ],
+      "currentStatus": "Exact RD capture/delivery subject and issuer grant require independently authenticated current nonrevocation under current G00 mapping",
+      "readback": "G10 authenticates same full RD subject/raw identity and registrationDeliveryID/version; equal ID/version with different assertion bytes is equivocation, never accepted"
+    }
+  },
+  "H1Capsule": [
+    {
+      "field": "format",
+      "type": "string",
+      "origin": "H1_POLICY",
+      "join": "Root-selected protocol identity; exact p02Format; existing candidate remains UNREGISTERED"
+    },
+    {
+      "field": "purpose",
+      "type": "string",
+      "origin": "H1_POLICY",
+      "join": "Exact installed-policy-registry; signer/response cannot select another purpose"
+    },
+    {
+      "field": "selector",
+      "type": "string",
+      "origin": "H1_POLICY",
+      "join": "Opaque installed locator resolves exact selector; validSelector; body/ticket/status/readback equality"
+    },
+    {
+      "field": "scopeSHA256",
+      "type": "string",
+      "origin": "H1_POLICY",
+      "join": "SHA256 of independently approved exact old-two cohort scope under frozen C2; body/ticket/status equal"
+    },
+    {
+      "field": "generation",
+      "type": "string",
+      "origin": "H1_INSTALL",
+      "join": "Immutable delivered installation generation; body/lifecycle/readback equal; no caller reset"
+    },
+    {
+      "field": "keySPKI",
+      "type": "string",
+      "origin": "H2_AUTHZ",
+      "join": "SHA256 of full independently approved DER SubjectPublicKeyInfo; signer and authorized key equal, not raw key hash"
+    },
+    {
+      "field": "approvedReviewScope",
+      "type": "string",
+      "origin": "H1_POLICY",
+      "join": "Root-approved effective source-review scope; H3 evidence must match, never learned from review JSON"
+    },
+    {
+      "field": "rootApprovalIdentity",
+      "type": "string",
+      "origin": "H1_POLICY",
+      "join": "Independent H3-EA authority identity expectation; actual downstream binding absent"
+    },
+    {
+      "field": "rootApprovalPurpose",
+      "type": "string",
+      "origin": "H1_POLICY",
+      "join": "Independent H3-EA purpose expectation; candidate only, not an accepted inherited K1 role"
+    },
+    {
+      "field": "componentSHA256",
+      "type": "string",
+      "origin": "H1_POLICY",
+      "join": "Authorized application component subject; H5 measurement and request equality"
+    },
+    {
+      "field": "expectedRootSHA256",
+      "type": "string",
+      "origin": "H1_POLICY",
+      "join": "Approved runtime-root identity expectation, not a candidate path or UID assertion; H5 equality"
+    },
+    {
+      "field": "anchorVersion",
+      "type": "int64",
+      "origin": "H1_INSTALL",
+      "join": "Original immutable bootstrap anchor version; monotone independently installed authority, body/readback equal"
+    },
+    {
+      "field": "keyNotBefore",
+      "type": "int64",
+      "origin": "H2_AUTHZ",
+      "join": "Original registry signing-grant epoch, inclusive; no rewrite/extension"
+    },
+    {
+      "field": "keyNotAfter",
+      "type": "int64",
+      "origin": "H2_AUTHZ",
+      "join": "Original exclusive signing-grant end; both issue and full current clock interval inside"
+    },
+    {
+      "field": "expectedUID",
+      "type": "int64",
+      "origin": "H1_POLICY",
+      "join": "Independent runtime-profile expected UID0..4294967295; H5 equality; UID alone creates no trust"
+    },
+    {
+      "field": "minimumRecordVersion",
+      "type": "int64",
+      "origin": "H1_POLICY",
+      "join": "Independent lower bound; H6 protected floor and current head still separately required"
+    },
+    {
+      "field": "primaryCI",
+      "type": "p02PrimaryCI",
+      "origin": "H1_POLICY",
+      "join": "Exact independently approved primary run/job/name tuple; H3 authenticated CI joins"
+    },
+    {
+      "field": "sourceConstants",
+      "type": "p02SourceConstants",
+      "origin": "H1_POLICY",
+      "join": "Frozen independent K1/recipe/contract/graph/registration pins; values not selected by artifact"
+    },
+    {
+      "field": "memberBindings",
+      "type": "[]p02MemberBinding",
+      "origin": "H1_POLICY",
+      "join": "Ordered exact old-two members, public DER/CA/SPKI identities; never remap to all5"
+    },
+    {
+      "field": "sourceParts",
+      "type": "map[string]string",
+      "origin": "H1_POLICY",
+      "join": "Authorized partition names/current blob expectations; authenticated H3 tree derivation remains separate"
+    },
+    {
+      "field": "reviewedParts",
+      "type": "map[string]map[string]string",
+      "origin": "H1_POLICY",
+      "join": "Authorized original review-to-part/blob relation; H3 must prove original bytes/origins"
+    },
+    {
+      "field": "requiredParts",
+      "type": "[]string",
+      "origin": "H1_POLICY",
+      "join": "Complete exact authorized partition set; no omitted or caller-added part"
+    },
+    {
+      "field": "requiredSteps",
+      "type": "[]p02StepKey",
+      "origin": "H1_POLICY",
+      "join": "Independently required exact CI run/job/step IDs/names, no green-workflow shortcut"
+    },
+    {
+      "field": "optionalSteps",
+      "type": "[]p02StepKey",
+      "origin": "H1_POLICY",
+      "join": "Exact optional step allowlist; skip not pass; no caller relaxation"
+    },
+    {
+      "field": "approvedReviewOutcomes",
+      "type": "map[string]string",
+      "origin": "H1_POLICY",
+      "join": "Exact original immutable review identity/outcome map; H3 authentic originals retained"
+    },
+    {
+      "field": "expectedEffectiveVerdict",
+      "type": "p02Expectation",
+      "origin": "H1_POLICY",
+      "join": "Explicit immutable independent nonempty printable ASCII1..128byte literal; actual value NULL, no default/inference"
+    }
+  ],
+  "nestedFields": {
+    "primaryCI": {
+      "fields": [
+        "runID",
+        "jobID",
+        "jobName"
+      ],
+      "types": [
+        "int64",
+        "int64",
+        "string"
+      ],
+      "origin": "H1_POLICY",
+      "join": "Exact primary CI tuple, not inferred from current workflow name"
+    },
+    "sourceConstants": {
+      "fields": [
+        "k1SourcePinSetSHA256",
+        "recipeDefinitionsSHA256",
+        "derivedDigestContractSHA256",
+        "proofSlotRegistrySHA256",
+        "graphSHA256",
+        "nodeKindsSHA256",
+        "designRegistrationSHA256"
+      ],
+      "types": [
+        "string",
+        "string",
+        "string",
+        "string",
+        "string",
+        "string",
+        "string"
+      ],
+      "origin": "H1_POLICY",
+      "join": "Exact independently authorized raw pins; a0 registration equality alone does not prove origin"
+    },
+    "memberBindings[]": {
+      "fields": [
+        "slot",
+        "scope",
+        "certificateSHA256",
+        "caSHA256",
+        "sPKISHA256",
+        "publicKeyHex"
+      ],
+      "types": [
+        "string",
+        "p02NodeScope",
+        "string",
+        "string",
+        "string",
+        "string"
+      ],
+      "origin": "H1_POLICY",
+      "join": "Order and exact DER/CA/SPKI/public-key subject agreement; independent public identity, no key access"
+    },
+    "memberBindings[].scope": {
+      "fields": [
+        "tenantId",
+        "nodeId",
+        "recoveryEpoch"
+      ],
+      "types": [
+        "string",
+        "string",
+        "string"
+      ],
+      "origin": "H1_POLICY",
+      "join": "Exact old logical identity; never physical-PC remapping"
+    },
+    "requiredSteps[]": {
+      "fields": [
+        "runID",
+        "jobName",
+        "number",
+        "name"
+      ],
+      "types": [
+        "int64",
+        "string",
+        "int64",
+        "string"
+      ],
+      "origin": "H1_POLICY",
+      "join": "Exact required CI step tuple"
+    },
+    "optionalSteps[]": {
+      "fields": [
+        "runID",
+        "jobName",
+        "number",
+        "name"
+      ],
+      "types": [
+        "int64",
+        "string",
+        "int64",
+        "string"
+      ],
+      "origin": "H1_POLICY",
+      "join": "Exact optional CI tuple; no wildcard"
+    },
+    "sourceParts{}": {
+      "fields": [
+        "partId -> currentBlobSHA256"
+      ],
+      "origin": "H1_POLICY",
+      "join": "Every authorized part key/value, complete map"
+    },
+    "reviewedParts{}{}": {
+      "fields": [
+        "originalReviewSHA -> partId -> reviewedBlobSHA256"
+      ],
+      "origin": "H1_POLICY",
+      "join": "Original review/partition relation, complete authorized membership"
+    },
+    "requiredParts[]": {
+      "fields": [
+        "partId"
+      ],
+      "origin": "H1_POLICY",
+      "join": "Exact complete authorized list"
+    },
+    "approvedReviewOutcomes{}": {
+      "fields": [
+        "originalReviewSHA -> originalVerdictLiteral"
+      ],
+      "origin": "H1_POLICY",
+      "join": "Exact independently authorized original verdict; not effective approval"
+    },
+    "expectedEffectiveVerdict": {
+      "fields": [
+        "present",
+        "kind",
+        "literal",
+        "integer",
+        "boolean"
+      ],
+      "types": [
+        "bool",
+        "byte",
+        "string",
+        "int64",
+        "bool"
+      ],
+      "origin": "H1_POLICY",
+      "join": "Producer emits present=true/kind=s/exact literal. Inactive representation fields not another authority. Existing malformed scalar/array/object D04 diagnostic INFO limits remain unchanged"
+    }
+  },
+  "H2IndependentPolicy": [
+    {
+      "field": "bootstrapBindingIdentityVersion",
+      "origin": "G00_BINDING",
+      "join": "Current Root-bound external trust mapping identity/version and provisioner/status/clock identities; never candidate-provided"
+    },
+    {
+      "field": "projectControlPlaneScope",
+      "origin": "H1_POLICY",
+      "join": "Exact provisioned project/control-plane identity, never an IP/path"
+    },
+    {
+      "field": "registryIdentity",
+      "origin": "H1_POLICY",
+      "join": "Logical approved registry identity resolved only from installed locator"
+    },
+    {
+      "field": "signerSlot",
+      "origin": "H2_AUTHZ",
+      "join": "Minimal candidate H2_REGISTRY_SIGNER logical slot; UNREGISTERED, no K1 role inheritance"
+    },
+    {
+      "field": "purpose",
+      "origin": "H2_AUTHZ",
+      "join": "Exact p02Purpose installed-policy-registry"
+    },
+    {
+      "field": "format",
+      "origin": "H2_AUTHZ",
+      "join": "Exact fleet5-p02-registry-candidate:2"
+    },
+    {
+      "field": "domain",
+      "origin": "H2_AUTHZ",
+      "join": "Exact fleet5/p02/installed-policy-registry/candidate/v2 plus one NUL"
+    },
+    {
+      "field": "algorithm",
+      "origin": "H2_AUTHZ",
+      "join": "Proposed Ed25519, signature64bytes, public key32bytes; no alternate algorithm"
+    },
+    {
+      "field": "keyDER",
+      "origin": "H2_AUTHZ",
+      "join": "Independent public DER SPKI, parsed Ed25519 only and canonical DER roundtrip"
+    },
+    {
+      "field": "keySPKISHA256",
+      "origin": "H2_AUTHZ",
+      "join": "SHA256(full keyDER) == capsule.keySPKI == envelope.signer.keySPKISHA256"
+    },
+    {
+      "field": "selectorAndCohortScope",
+      "origin": "H1_POLICY",
+      "join": "Exact selector + independently derived old-two scope hash"
+    },
+    {
+      "field": "generationAndAnchorVersion",
+      "origin": "H1_INSTALL",
+      "join": "Exact immutable installed generation/anchorVersion and capsule raw identity"
+    },
+    {
+      "field": "grantInterval",
+      "origin": "H2_AUTHZ",
+      "join": "Original inclusive NotBefore/exclusive NotAfter; issue and full current clock bounds inside"
+    },
+    {
+      "field": "expectedEffectiveVerdict",
+      "origin": "H1_POLICY",
+      "join": "Exact immutable capsule parameter; actual literal NULL; H3-EA downstream must equal"
+    },
+    {
+      "field": "producerSourceAndClosure",
+      "origin": "H1_POLICY",
+      "join": "Independently approved producer source/binary/closure publication; actual new binding NULL, not record-supplied"
+    },
+    {
+      "field": "authenticatorSourceAndClosure",
+      "origin": "H1_POLICY",
+      "join": "Independently approved future verifier implementation/source/codec/stdlib closure; not current artifact self-pin"
+    },
+    {
+      "field": "codecIdentity",
+      "origin": "H1_POLICY",
+      "join": "Frozen exact p02 lexical/schema/canonical signing recipe; no caller marshaler or decoder"
+    },
+    {
+      "field": "grantRegistrationSubject",
+      "origin": "H4_STATUS",
+      "join": "Grant ID + exact raw grant hash + DER SPKI + purpose/scope/generation; current state ACTIVE"
+    },
+    {
+      "field": "deliveryOriginSubject",
+      "origin": "H1_INSTALL",
+      "join": "Delivery ID + authority identity + original authenticated publication/capture + capsule raw hash + generation + installed subject readback"
+    },
+    {
+      "field": "currentRegistrationSubject",
+      "origin": "H4_STATUS",
+      "join": "Exact delivery/capsule/grant/registry/record subjects and versioned current status, not a bare ACTIVE flag"
+    },
+    {
+      "field": "clockSubject",
+      "origin": "H4_CLOCK",
+      "join": "Authorized source/mechanism/epoch + original lower/upper sample and monotonic bracket"
+    },
+    {
+      "field": "requestRecordSubject",
+      "origin": "H4_STATUS",
+      "join": "Original ticket, stable record identity/version, capsule/generation/scope, H5 digest; ticket issuing remains downstream authority"
+    },
+    {
+      "field": "beforeAfterSubject",
+      "origin": "H4_STATUS",
+      "join": "Authenticated vector and snapshot ID below; no synthetic token success"
+    },
+    {
+      "field": "registrationDeliverySubject",
+      "origin": "RD_CAPTURE_DELIVERY",
+      "join": "Exact issuer + original immutable capture/publication identity/ordering/time + registrationDeliveryID/version + rawRegistrationSHA256 == capsule.sourceConstants.designRegistrationSHA256 + project/purpose/source/contract subject + destination registry generation. Distinct from H1 capsule deliveryID/version. G04 origin joins, G08 current subject/issuer status, G10 full authenticated subject/raw-identity/version equality."
+    }
+  ],
+  "snapshotVector": [
+    "trustBindingIdentity",
+    "trustBindingVersion",
+    "provisionerSPKISHA256",
+    "statusAuthoritySPKISHA256",
+    "clockAuthorityIdentity",
+    "projectControlPlaneScope",
+    "registryIdentity",
+    "deliveryID",
+    "deliveryVersion",
+    "capsuleRawSHA256",
+    "generation",
+    "anchorVersion",
+    "authorizationRawSHA256",
+    "authorizationVersion",
+    "keySPKISHA256",
+    "purpose",
+    "selector",
+    "scopeSHA256",
+    "componentSHA256",
+    "statusCheckpointIdentity",
+    "statusVersion",
+    "currentRecordIdentity",
+    "currentRecordVersion",
+    "ticketID",
+    "measurementSHA256",
+    "clockMechanismIdentity",
+    "clockEpoch",
+    "registrationDeliveryID",
+    "registrationDeliveryVersion"
+  ],
+  "p02SignatureTuple": [
+    "format",
+    "purpose",
+    "domain",
+    "keySPKI",
+    "capsuleSHA256",
+    "generation",
+    "selector",
+    "scopeSHA256",
+    "requestBindingSHA256",
+    "anchorVersion",
+    "recordVersion",
+    "signingInput",
+    "signature"
+  ],
+  "p02SnapshotToken": [
+    "revision",
+    "capsuleSHA256",
+    "generation",
+    "selector",
+    "scopeSHA256",
+    "recordIdentity",
+    "ticketID",
+    "measurementSHA256",
+    "recordVersion"
+  ],
+  "actualValues": "ALL_EXTERNAL_BINDINGS_NULL_HOLD; logical constant names are not credentials or accepted roles",
+  "numericAndLiteralConstraints": "Existing signed int64/epoch/safe-integer/UID/canonical/schema bounds and exact ASCII verdict1..128 preserved; no bool-to-int/coercion or widenings",
+  "currentStatusSubjects": [
+    "H1 capsule delivery subject",
+    "installed H1 capsule subject",
+    "H2 registry grant subject",
+    "H2 registry key subject",
+    "registry subject",
+    "current record subject",
+    "RD_CAPTURE_DELIVERY registration capture/delivery subject",
+    "H1 provisioner authority grant under current G00 mapping",
+    "H4 status authority grant under current G00 mapping",
+    "H4 clock authority grant under current G00 mapping",
+    "RD_CAPTURE_DELIVERY authority grant under current G00 mapping"
+  ],
+  "authorityCurrencyOrigin": "Only the independently Root-bound CURRENT G00_BINDING mapping/checkpoint decides provisioner/status/clock/RD authority grant currency. Their own ACTIVE statements cannot supply or override that mapping. G04 authenticates source/checkpoint references; G08 evaluates current authorization, G10 repeats current G00 binding and full subject/vector comparison."
+}
