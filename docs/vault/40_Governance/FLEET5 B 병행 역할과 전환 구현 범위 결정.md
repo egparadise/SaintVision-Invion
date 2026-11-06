@@ -1,11 +1,11 @@
 ---
 doc_id: "GOV-FLEET5-B-BOOTSTRAP-SCOPE-20261106"
 title: "FLEET5 B 병행 역할과 전환 구현 범위 결정"
-version: "1.4.7"
+version: "1.4.8"
 status: "review"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-11-07T00:31:11+09:00"
+updated: "2026-11-07T02:57:44+09:00"
 source_of_truth: "Git"
 ---
 
@@ -143,3 +143,8 @@ aa3387/Docs42224817650의 실제 검토는 M1·actual72028 T1/A8를 닫았지만
 ## Rev9c 실제 Low2 판정과 Rev9d 좁은 후속
 
 4288a1c4/Docs42240632854 실제검토는현재72028T1A8closure와정렬I1을보존했으나proofsource밖reflection과ownerparameter전달을놓치는Low2를남겼다. Root는msg_1a4f33b7e3e6로exact5ea기반Rev9d의새고유문서·bounded분석·targeted회귀만허용했다. 생산universe전체열거된reflection과current/frozenparameter고정점수정후한번실제좁은검토로연결하며A7snapshot/제품/port/runtime/freezegrant는아직0이다. model/lifecycle와집계·NULLHOLD는보존한다. 상세는b-rev9d-fix-only-root-scope.json이다.
+
+
+## Rev9d 실제 Low 판정과 Rev9e 고정 후보
+
+실제9266f719/Docs42257602765는원래3reflection/5parameter거부를확인했지만enumAPI의비리터럴key와__new__/callee재바인딩Low2를남겼다. Root는msg_533819c42490로54549기반9e의새고유증거수정만배정했다. 현재3ccc/Docs42264002754의174추가only·71script/54copy/20artifact·model/6accounting/stageorder는Root가대조했고task_d1f9b00b0306가실제P02검토뒤대기한다. A7snapshot/제품/port/freeze/runtime는아직미승인이고72028T1/A8기존수락·NULLHOLD는보존한다. 상세는b-rev9e-fix-only-root-scope.json과b-rev9e-source-root-verification.json이다.

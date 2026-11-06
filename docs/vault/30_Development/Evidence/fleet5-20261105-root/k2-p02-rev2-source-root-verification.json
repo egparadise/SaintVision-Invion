@@ -1,0 +1,33 @@
+{
+  "atKST": "2026-11-07T02:29:11+09:00",
+  "source": "58d7eb077efbcff5327ac298a39984fe1e39fdf1",
+  "base": "78468d0aec295c712dd1ea33bea1401d1d4939a4",
+  "branch": "agent/codex/fleet5-k2-p02-registry-rev2-20261107",
+  "onlyOwnUniqueAddedDocs": 51,
+  "allBaseModesBlobIDsUnchanged": true,
+  "productDiff": 0,
+  "remoteExact": true,
+  "acceptedParentRefPreserved": true,
+  "Docs": 42259157167,
+  "job": 128034233863,
+  "correlation": "FLEET5-K2-P02-REV2-58d7eb07-msg_d888d8ceb1e3",
+  "rootVerifiedExactHeadRefEventPathAttemptAll19StepsSuccess": true,
+  "RootRecomputedManifestInputHashes": 50,
+  "inputTotalBytes": 745154,
+  "manifestSHA256": "59643c8c3e5dcf5762ca239904cf1e4f84c103d8560993fa0f78db352ddf7bc9",
+  "RootByteComparedOriginalActualReviewCopies": 10,
+  "RootRecomputedPrimaryPins": 13,
+  "RootRecomputedPublicSourceComponentHashes": 5,
+  "RD_P02_R2_REGISTRATION_BYTES": {
+    "GitLFBlobSHA256": "876554dcb4fb28fcc7f2095778f1cdf12872fef5d13efc374b4716781a3c00e3",
+    "GitLFBytes": 15503,
+    "exactLFtoCRLFReconstructsExistingA0": true,
+    "existingRawPinUnchanged": true,
+    "independentSourceAcquirerOrRecipeAuthorization": "HOLD_NOT_GRANTED",
+    "actualH3OrH3EARegistered": false
+  },
+  "RootReranModelOrCore": false,
+  "independentReview": null,
+  "D04OrPositiveFactoryGranted": false,
+  "wholeK2OrFleetComplete": false
+}

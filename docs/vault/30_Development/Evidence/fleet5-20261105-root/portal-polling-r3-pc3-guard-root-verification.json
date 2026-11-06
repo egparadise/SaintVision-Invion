@@ -1,0 +1,150 @@
+{
+  "atKST": "2026-11-07T02:19:43+09:00",
+  "operator": "Root Codex",
+  "physicalPC": 3,
+  "source": "b48c2c4492f8aea4b55c33161733a9a6fb9eed8c",
+  "nodeVersion": "v24.22.2",
+  "pinnedImage": "node@sha256:01d566e8d94d8c619591d78652babfccd3c6992a3dffa9ed5ab39e11cf6c70e9",
+  "sourceArchiveSHA256": "75edd3fae4b9cc0a9129c123188e6de9b160a5c23bdc3377cd5ec9bfd4c1139d",
+  "sourceClosureSupplement": {
+    "source": "b48c2c4492f8aea4b55c33161733a9a6fb9eed8c",
+    "path": "contracts",
+    "archiveSHA256": "cd82af1613ded25ab6a585c75b4667cd2664c0069feef9298102e32e9beafb21",
+    "files": 165,
+    "driverSHA256": "03827713d01f86d7c3ef6c2650230010c9d39f3ddf63c7911d3923bb554e06cb",
+    "reason": "First control collected zero tests because frozen root contracts input was missing. Original failed suite/driver/start/log receipts preserved. This is environment input closure, not a product failure or mutant kill."
+  },
+  "rawPrivateReceiptSHA256": "80d638573d65f752274a3009ce338c99b14af1a5d61ec696b6f71427a1f9e99f",
+  "runs": {
+    "control": {
+      "status": "PASS",
+      "passed": 46,
+      "failed": 0,
+      "pending": 0,
+      "failedAssertions": [],
+      "command": [
+        "node",
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "tests/portal-refresh-fleet-ui.test.tsx",
+        "--no-file-parallelism",
+        "--maxWorkers=1",
+        "--reporter=json",
+        "--outputFile=/job/results-tests2/control-vitest.json"
+      ],
+      "containerCwd": "/job/apps/web",
+      "startKST": "2026-11-07T02:19:35+09:00",
+      "endKST": "2026-11-07T02:19:38+09:00",
+      "elapsedSeconds": 2.388,
+      "actualContainerExit": 0,
+      "dockerAttachExit": 0,
+      "executionLogSHA256": "237aacd4d8b3d659a38c95594b681873d73869e3e454134e6d8ca8a3c38d49fd",
+      "patchSHA256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "reportSHA256": "50094d28fca629e3828fa7696922f7f16ba82b66321125386574011cd04634e4",
+      "inputFileCount": 446,
+      "inputFileHashesSHA256": "a1425cd737345c5cf6b12f751597cf65154837f321b9d24f6a35d5833231504b",
+      "ownedContainerRemovedExit": 0,
+      "R8cValidClickControlVerifiedByDriver": true
+    },
+    "MD": {
+      "status": "KILLED_BY_NAMED_BEHAVIOR",
+      "passed": 45,
+      "failed": 1,
+      "pending": 0,
+      "failedAssertions": [
+        {
+          "title": "R8: when approvalsState === error, real reject button and modal click throws without calling decideApproval",
+          "failureMessages": [
+            "AssertionError: expected \"decideApproval\" to be called +0 times, but got 1 times\n    at /job/apps/web/tests/portal-refresh-fleet-ui.test.tsx:1069:25\n    at file:///job/apps/web/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+          ]
+        }
+      ],
+      "command": [
+        "node",
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "tests/portal-refresh-fleet-ui.test.tsx",
+        "--no-file-parallelism",
+        "--maxWorkers=1",
+        "--reporter=json",
+        "--outputFile=/job/results-tests2/MD-vitest.json"
+      ],
+      "containerCwd": "/job/apps/web",
+      "startKST": "2026-11-07T02:19:38+09:00",
+      "endKST": "2026-11-07T02:19:40+09:00",
+      "elapsedSeconds": 2.442,
+      "actualContainerExit": 1,
+      "dockerAttachExit": 1,
+      "executionLogSHA256": "1ea54a77760d928fbab43b93f85cecf8aa6432a03c5d0cb8b90a26f8c442973c",
+      "patchSHA256": "68dce2f1f0a7165544c57adf698a3ade432af088e2df1e6e602f52aa9e0e44d4",
+      "reportSHA256": "78dbee8d404d69ab9979a4bbe4d19ecee963be551d995acf61534881dff9c609",
+      "inputFileCount": 446,
+      "inputFileHashesSHA256": "3650d1068cdaaee5951235a6099440caadc9132752b38560f578ba4e01beb163",
+      "ownedContainerRemovedExit": 0,
+      "R8cValidClickControlVerifiedByDriver": true
+    },
+    "ME": {
+      "status": "KILLED_BY_NAMED_BEHAVIOR",
+      "passed": 45,
+      "failed": 1,
+      "pending": 0,
+      "failedAssertions": [
+        {
+          "title": "R9: clicking nodes-retry-btn in ResourceExplorer clears error banner and shows loading state while manual request is pending",
+          "failureMessages": [
+            "AssertionError: expected <div role=\"alert\" …(2)>…(4)</div> to be null\n    at /job/apps/web/tests/portal-refresh-fleet-ui.test.tsx:1133:84\n    at file:///job/apps/web/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+          ]
+        }
+      ],
+      "command": [
+        "node",
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "tests/portal-refresh-fleet-ui.test.tsx",
+        "--no-file-parallelism",
+        "--maxWorkers=1",
+        "--reporter=json",
+        "--outputFile=/job/results-tests2/ME-vitest.json"
+      ],
+      "containerCwd": "/job/apps/web",
+      "startKST": "2026-11-07T02:19:40+09:00",
+      "endKST": "2026-11-07T02:19:43+09:00",
+      "elapsedSeconds": 2.41,
+      "actualContainerExit": 1,
+      "dockerAttachExit": 1,
+      "executionLogSHA256": "d233268e1e23d49fc2c71c5bcd801bd492c342c21403db465de5c31aa0520822",
+      "patchSHA256": "13ed1c00b330cd4b5abc0db60cef9fa9a112c3703e30d86e301ab33d3ff9e5f6",
+      "reportSHA256": "6dc309dc54835c50bbd0b81f512cee92bf2fbecd1fcfa5059108912d90df589a",
+      "inputFileCount": 446,
+      "inputFileHashesSHA256": "d7ba4b50882ed3fbfc7681dddcb01ea1b9e0eddf59843ecc59574c3aecf286ad",
+      "ownedContainerRemovedExit": 0,
+      "R8cValidClickControlVerifiedByDriver": true
+    }
+  },
+  "resourceControls": {
+    "dockerMemoryBytes": 2147483648,
+    "dockerMemorySwapBytes": 2147483648,
+    "nanoCPUs": 2000000000,
+    "pidsLimit": 128,
+    "readonlyRootFS": true,
+    "capDropAll": true,
+    "noNewPrivileges": true,
+    "nonRootUID": 1000,
+    "allTestNetworks": "none",
+    "directCgroupObservationScope": "Dependency container: memory.max, cpu.max, pids.max; every test container config separately inspected",
+    "hardHostQuotaClaim": false
+  },
+  "reportedExpectedFailuresAreNotProductFailures": true,
+  "same46CasesAcrossThreeRunsNotNewUniqueCoverage": true,
+  "sourceExportRestoredAndAll446InputHashesVerified": true,
+  "mainAuthorTrackedNonDocsDiffExit": 0,
+  "existingHostContainersStopped": false,
+  "hostPackagesOrDaemonConfigChanged": false,
+  "olderHelperNeverExecuted": true,
+  "sourceExportAttempt1": "Archive safety preflight rejected apps parent directory before any remote mutation; corrected explicit safe directory handling",
+  "controlAttempt1": "0 tests collected because root contracts input missing; raw failed suite preserved; added same-b48 165 contracts files before successful three runs",
+  "ledgerCorrection": "Installation raw ledger cwd was planned host source path; its actual host CLI cwd was uninstrumented. Corrected hostCLICwd/containerWorkingDirectory fields before tests; original receipts preserved. Actual container cwd from Docker config.",
+  "independentClaudeR3Review": "PENDING",
+  "deployment": false,
+  "fiveNodeEnrollmentOrResourceOfferAcceptance": false
+}

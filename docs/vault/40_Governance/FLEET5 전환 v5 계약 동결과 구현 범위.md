@@ -1,11 +1,11 @@
 ---
 doc_id: "GOV-FLEET5-BOOTSTRAP-V5-FREEZE-CODE-SCOPE-20261106"
 title: "FLEET5 전환 v5 계약 동결과 구현 범위"
-version: "1.0.19"
+version: "1.0.20"
 status: "active"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-11-07T01:00:33+09:00"
+updated: "2026-11-07T02:57:44+09:00"
 source_of_truth: "Git"
 ---
 
@@ -191,3 +191,8 @@ ea276 Core42220638304의 필수42+16단계와 artifact XML/Go로그를 Root가 �
 ## P02 실제 de4 판정과 Rev2 설계 보완
 
 실제 de4ef629/Docs42244154165 판정은 REVISION_REQUIRED(Medium1·Low5)다. Root는 msg_d888d8ceb1e3로 정확한78468 기반 새 Rev2 branch의 고유 History/Evidence만 허용했다. payload strict codec·정확한 연결·모든 digest 유도·전체 policyData 출처 투영과 ordered reviews/독립 Root coverage, 게이트 순서, LF, 고유 입력 집계, zero-auth running echo를 보완한다. envelope 한정 설계 수락은 유지하되 payload와 coverage가 interface에 영향을 주므로 D04 구현은 아직 허용하지 않는다. 합성 already-bound 입력은 실제 인증이 아니며 H1-H7 actualNULL/HOLD·raw7UNREGISTERED·40실행 미수행을 유지한다. frozen Rev2 및 exact ownDocs 뒤 한 번의 좁은 실제 검토로 연결한다. 상세 정본은 k2-p02-rev2-fix-only-root-scope.json이다.
+
+
+## P02 Rev2 고정 후보와 byte-origin 인증 보류
+
+source58d7eb07/Docs42259157167은51고유추가문서·50입력hash·10de4원문copy·5publicsourcecomponent를Root가대조했다. Root는공개7ec1 LF15503B에서고정LFtoCRLF로기존a0rawhash가복원된다는bytefact만확인했고RD-P02-R2-REGISTRATION-BYTES의실제acquirer/recipe인증·H3/H3EA등록은HOLD로결정했다. 원본rawpin과기존계약은불변이며일반정규화나새Rootkey/producer를허가하지않는다. 실제UIreviewer종료·해제후Claude task_2985fad8e54b/ctx_5a86c0b5814e의좁은Rev2계약검토를시작했다. D04순수내부codec/projection/strictsignature의첫코드범위도실제판정후Root의별도구체cut전까지미승인이다. 모든H1-H7actualNULLHOLD/raw7UNREGISTERED/40실행미수행을유지한다. 상세는k2-p02-rev2-byte-origin-root-decision.json이다.

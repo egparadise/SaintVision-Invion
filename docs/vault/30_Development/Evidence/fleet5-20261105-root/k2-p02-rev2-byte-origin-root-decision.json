@@ -1,0 +1,18 @@
+{
+  "atKST": "2026-11-07T02:57:44+09:00",
+  "decisionId": "RD-P02-R2-REGISTRATION-BYTES",
+  "source": "58d7eb077efbcff5327ac298a39984fe1e39fdf1",
+  "publicByteFact": {
+    "GitLFBlobSHA256": "876554dcb4fb28fcc7f2095778f1cdf12872fef5d13efc374b4716781a3c00e3",
+    "GitLFBytes": 15503,
+    "exactLFtoCRLFReconstructsExistingA0": true,
+    "existingRawPinUnchanged": true,
+    "independentSourceAcquirerOrRecipeAuthorization": "HOLD_NOT_GRANTED",
+    "actualH3OrH3EARegistered": false
+  },
+  "decision": "HOLD_ACTUAL_AUTHENTICATION_AND_REGISTRATION",
+  "acceptedFactOnly": "Exact immutable GitLF blob plus a fixed LF-to-CRLF transform reconstructs existing a0. No captured original artifact or independent source-acquirer authentication is inferred.",
+  "genericNormalizationOrRepinGranted": false,
+  "actualH3OrH3EAOrProducer": "NULL_HOLD",
+  "D04OrFactoryGranted": false
+}

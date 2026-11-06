@@ -1,0 +1,96 @@
+{
+  "reviewer": "Claude (one actual independent narrow SOURCE reviewer, no helpers/subagents)",
+  "orca": {
+    "task": "task_7143a8fe0491",
+    "dispatch": "ctx_8d5d03bf83b3",
+    "predecessor": "B review task_b5c120568d18/ctx_9031e0499999 (start gate owned and verified by Root)"
+  },
+  "author": {
+    "agent": "Gemini",
+    "ownerTask": "task_8dfd2a5d01a2",
+    "ownerDispatch": "ctx_c8a99a3645b0",
+    "note": "prior author task closed; no new author agent; author final report is an UNFROZEN DRAFT and was not read as an input"
+  },
+  "reviewBranch": "agent/claude/portal-polling-r3-b48-review-20261107",
+  "reviewBranchBase": "b48c2c4492f8aea4b55c33161733a9a6fb9eed8c",
+  "target": {
+    "source": "b48c2c4492f8aea4b55c33161733a9a6fb9eed8c",
+    "initial": "9cd017abf26a145d15a5c1b0d915662c3c71a724",
+    "acceptedR2Base": "9c25f3c9cab162f424744d79f9a4e21729c40404",
+    "branch": "agent/gemini/portal-refresh-polling-r3-20261106",
+    "remoteBranchHeadAtReview": "b48c2c4492f8aea4b55c33161733a9a6fb9eed8c",
+    "parents": "b48^ = 9cd017ab, 9cd^ = 9c25f3c9",
+    "pathsR2toB48": [
+      "apps/web/src/app/App.tsx",
+      "apps/web/src/shared/ui/Header.tsx",
+      "apps/web/tests/portal-refresh-fleet-ui.test.tsx"
+    ],
+    "initialToB48": "App.tsx only, one line: '} catch (err: any) {' -> '} catch {' in fetchApprovals (binding was unused after R3)",
+    "blobsB48": {
+      "apps/web/src/app/App.tsx": "bf41cbd21e0679e90fd794b27e8491caf34eeb1f",
+      "apps/web/src/shared/ui/Header.tsx": "10ed412640f5151251a25d14e8e5405b62340d14",
+      "apps/web/tests/portal-refresh-fleet-ui.test.tsx": "e14d7f697bd6e5684fe853d2e607f06606d7b1ed",
+      "apps/web/src/shared/api/client.ts (unchanged since R2)": "23d40210f6a0b548b5e27fa3866c848ba7ec076b",
+      "apps/web/src/shared/api/nodeCertificateObservation.ts (unchanged since R2)": "52c560211db43b39f5232c0dad8fc93c57c49c5e",
+      "apps/web/src/features/desktop/ResourceExplorer.tsx (unchanged since R2)": "2ee822b647708dcae362bb289990b0c88bbc35e8"
+    },
+    "outOfScope": "No backend/auth/deps/workflow/wire/config path in R2->b48 (3 paths only)."
+  },
+  "verdict": "SOURCE_AXIS_ACCEPT",
+  "verdictScope": "Narrow UI R3 SOURCE b48 only, against the open R2 findings UI-R2-M1/L1/L2/L3 and their necessary interactions. NOT the author final report (unfrozen draft), NOT final Docs/NONDOCS equality (Root gates, not waived), NOT artifact/deployment/preview, NOT real browser/TLS/SSO, NOT 5PC/runtime acceptance, NOT whole FE registry or global 100.",
+  "priorFindingClosure": {
+    "UI-R2-M1": {
+      "status": "CLOSED",
+      "source": "App.tsx:355-363 fetchProjectNodeCertificates(targetPrj, controller.signal); inner catch rethrows when controller.signal.aborted, otherwise certObs = null. Timer App.tsx:333-335 covers both legs; clearTimeout at 365 only after both legs; outer catch 374-390; finally 391-393.",
+      "reasoning": "nodeCertificateObservation.ts:56-62 forwards signal into apiClient, which spreads options into fetch (client.ts:202-205, unchanged). A hung or 60s-504 certificate leg is now aborted by the same 10s deadline; the abort rejection reaches the outer catch with signal.reason = Error('REQUEST_TIMEOUT') -> isTimeout -> nodesState error + '클러스터 노드 응답 시간 초과 (10s Timeout)' when the session/scope/applied fences pass. A non-abort certificate failure still yields certObs = null and a node success (unchanged R2 behaviour). Applied/session/scope fences and stale-retention (nodes not cleared on error) are unchanged, so recovery (next good tick applies) and late-response ignoring are preserved.",
+      "tests": "R1 (cert hangs, /nodes 1 node): stale role=alert + '초과' at +15s, never current-0, cert signal aborted. R1b (cert 504 after 60s): stale at +30s and +70s. T1: real apiClient/fetchObservedRuns/fetchObservedApprovals/fetchProjectWorkspaces/fetchProjectNodeCertificates restored, only global fetch mocked; the /v1/projects/{id}/node-certificates fetch is matched by URL suffix, carries init.signal, and that signal is aborted at 10.5s. Static: dropping the signal makes T1 hasSignal false and makes R1 never settle; swallowing the abort in the inner catch makes R1 apply success (no stale) -> both regressions would fail these tests (reasoning, not executed by the reviewer).",
+      "limit": "T1 is mock-fetch transport, not network/browser; it asserts signal presence/aborted, not reason or UI outcome (UI outcome is R1/R1b under mocked apiClient)."
+    },
+    "UI-R2-L1": {
+      "status": "CLOSED",
+      "source": "App.tsx:376-382 (nodes), 431-437 (runs), 489-495 (approvals), 546-552 (workspaces): isTimeout = controller.signal.aborted && (reason?.message === 'REQUEST_TIMEOUT' || reason === 'REQUEST_TIMEOUT'); if aborted && !isTimeout -> return. The four R2 classifiers 'err?.name === AbortError || err?.message === REQUEST_TIMEOUT' are removed (0 remaining in App.tsx; reviewer regex).",
+      "reasoning": "The only REQUEST_TIMEOUT abort is the owner timer (4 sites); every other aborter (manual !isBg supersede 320-322/400-402/458-460/516-518, chooseProject 220-223, resetAuthenticatedState 141-144, unmount 578-585) calls abort() with no reason (DOMException AbortError), so they return without touching state and without the 10s banner. Each of those aborters sets its own state (superseder sets loading; chooseProject/logout reset to idle and bump scope/session/applied). A non-aborted rejection whose message is 'REQUEST_TIMEOUT' is not classified as timeout (isTimeout requires signal.aborted). Timer-owned hangs still become visible errors (P7, R1). finally clearTimeout and request > xAppliedRef fences unchanged. Older overlapping controllers (not in xAbortRef) keep their own deadline and are fenced; accepted bounded-overlap design not reopened.",
+      "tests": "R2 (manual refresh during in-flight background poll: no '응답 시간 초과', no stale, no fetch-error), R2b, R6 (logout), P5 (project switch), P7/R1 (real timeouts still visible), R9 (manual foreground state).",
+      "limit": "Supersede tests exist for nodes only; runs/approvals/workspaces rely on byte-identical classifier code (static). See UI-R3-I1 for the R2b late-reject step."
+    },
+    "UI-R2-L2": {
+      "status": "CLOSED",
+      "source": "Header.tsx:52-54 4s timer; 58 fetch; 61 seq/mount fence after headers; 66-74 body read under the deadline, inner catch (69) rethrows when currentController.signal.aborted, otherwise data = null; 75 rtt after body; 76 seq/mount fence re-checked after body; 85-87 outer catch -> offline if current; 88-90 finally holds the only clearTimeout (count 1).",
+      "reasoning": "Healthy headers followed by a stalled body are aborted at 4s; the body rejection is rethrown to the outer catch -> 'Offline' (truthful transport/body failure). An older body completing after a newer check returns at the seq fence, so it cannot overwrite a newer failure. A malformed non-abort JSON body -> data null -> degraded ('비정상 응답'). Fetch-phase hang -> abort -> Offline. HTML 200 / JSON 404/503 / status!=ok remain degraded; network rejection remains Offline. 4s < 5s interval, so at most one check is normally in flight.",
+      "tests": "H3 (body hangs after headers: healthy RTT -> Offline, no ms label at +60s; with the R2 placement the label would stay healthy), H3b (malformed JSON -> 비정상 응답, not Offline; recovers to RTT), H4 (fetch hang -> Offline at 4.1s), H5 (503 -> RTT -> network Offline), H1 five classes, H2 (older slow success cannot overwrite newer Offline).",
+      "limit": "Body-phase stale-overwrite is covered by the post-body seq fence statically; H2 exercises the headers-phase variant. happy-dom fetch/Response, not a real browser body stream."
+    },
+    "UI-R2-L3": {
+      "status": "CLOSED",
+      "source": "tests R8/R8c/R9 replace R2 P8/P9; R1/R1b/R2/R2b/R6/H3/H3b/H4/H5/T1 added (author-owned tests, reviewer-shaped).",
+      "reasoning": "R8 makes approvals fail on a real background tick, asserts approval-stale-warning, clicks the real approval-reject-button and the real '반려 확인' confirm, then asserts decideApproval called 0 times and '승인 반려 실패' shown. R8c, same click path with current approvals, asserts decideApproval called exactly once. R9 clicks the real ResourceExplorer nodes-retry-btn after an observed error banner and asserts the banner cleared and nodes-loading-state shown while the manual request is pending. Root's PC3 MD (both approval error guards removed) fails only R8 with 'expected decideApproval to be called +0 times, but got 1 times' at test line 1069 while R8c passes; ME (event-as-background via isBg + App direct retry + Explorer event forwarding) fails only R9 at line 1133 (banner still present). This is actual causal evidence (Root execution), and the reviewer verified that the control's 446 input files equal exact b48 bytes and that MD changes only App.tsx and ME only App.tsx + ResourceExplorer.tsx.",
+      "attribution": "These tests are owner reproductions of reviewer-shaped cases from the R2 review; their passing on b48 is hosted CI and Root PC3 evidence. The reviewer's independent part is the static reading of the tests and product code and the input/scope cross-checks; the reviewer did not execute any test.",
+      "limit": "Mutant patch bytes are referenced by SHA only in Root receipts; the reviewer verified the changed-file sets, not the patch text. R8 tab/item navigation is guarded by if(...) but the following non-null expectations and the MD kill show the real path ran. Approve-button guard is not App-executed (MD removes both guards; reject path kills it)."
+    }
+  },
+  "findings": [],
+  "info": [
+    "UI-R3-I1 (test precision, non-blocking): in R2b the mocked pending /nodes promise already rejects with signal.reason inside its abort listener when the manual refresh aborts it, so the later bgReq.reject(new Error('REQUEST_TIMEOUT')) is a no-op on a settled promise. R2b therefore proves supersede-with-AbortError is not a timeout (it would fail the R2 err.name classifier), but it does not exercise 'a late err.message REQUEST_TIMEOUT alone'. That property is established by the exact b48 source (no err.message/err.name classifier in any of the 4 catches). By static reasoning a re-added '|| err?.message === REQUEST_TIMEOUT' fallback would survive the current suite. Optional hardening: a pending mock that does not auto-reject on abort, so the late reject reaches the catch.",
+    "UI-R3-I2: T1 checks real-transport signal presence and aborted state on /node-certificates, /runs, /approvals, /workspaces but not abort reason or the resulting UI; the R2 reviewer T1 recorded REQUEST_TIMEOUT reasons on the primary legs. Combined with R1/R1b and source reading this is sufficient for M1 closure.",
+    "UI-R3-I3: With the R3 contract, a /node-certificates leg that keeps hanging while /nodes is healthy keeps the node view stale with the node timeout copy each cycle; the copy does not say which leg timed out. Intended by the R3 contract (whole node+certificate observation bounded); an operator hint would help.",
+    "UI-R3-I4: P9's recovery assertion was replaced by R9's foreground pending/loading assertion; App-level recovery after a manual retry is not asserted (background recovery is P2).",
+    "UI-R3-I5 (pre-existing, unchanged = UI-R2-I3): handleReject rethrows into ApprovalDetail without a catch; R8 registers an unhandledRejection listener but does not assert it. Harness limitation, not a new auth redesign and not a suppressed product success.",
+    "UI-R3-I6 (unchanged from R2): signal.reason === 'REQUEST_TIMEOUT' string branch is redundant (owner aborts with an Error); harmless. Success paths do not re-check signal.aborted; a transport that ignores abort could still apply a superseded success under the accepted monotone applied fence (pre-existing, not reachable with fetch)."
+  ],
+  "acceptedNotReopened": "Normal non-flicker, <=10s bounded slow/hung primary handling, monotone applied request/session/project/logout fence, HTTP-vs-offline label distinction, manual no-argument callback, bounded 2/3 overlap with per-controller deadlines and scope fences (older controllers not all cancelled).",
+  "evidenceAttribution": {
+    "reviewerOwnActual": "Read-only Git (rev-parse, ls-remote, diff, ls-tree, show), reviewer_verify_b48.py.txt (Python -I: source/parent/remote/scope, one-line lint delta, classifier/regex checks, 41 it + 1 it.each(5) = 46 cases, Root receipt SHA-256s, PC3 control 446/446 inputs equal b48 bytes, MD/ME changed-path sets) -> reviewer-verify-b48.json; read-only gh api/run view of Frontend 42254157322 and 42247974625; local doc gates (local-doc-gates.txt); own commit/push/one Docs dispatch.",
+    "rootActual": "Frontend 42254157322 verification, hosted Vitest 103 files/1264 tests summary from the job log, artifact 13520599988 download/SHA/13-file hashes, PC3 guard runs control/MD/ME (receipts uir3-b48-frontend-root-verified.json d743ba85..., uir3-b48-hosted-test-summary.json 61f3f273..., uir3-b48-build-artifact-verification.json cc87154d..., uir3-pc3-guard-root-proof.json 98f6949a..., raw uir3-pc3-final-receipts.json 80d63857...). Root executions, not the reviewer's.",
+    "hosted": "Frontend 42254157322 head b48 workflow_dispatch frontend.yml attempt 1: frontend 128016761183 12/12, container 128016761717 14/14 success (reviewer read-only re-check). Initial 9cd Frontend 42247974625 FAILED at 'Run ESLint' (unused catch binding); Vitest/discovery-type/build/upload skipped; container job 14/14 success. Preserved as a real failure; b48 is the correction.",
+    "excluded": "Author final report (unfrozen draft) and any author local claim; old 854/R2 artifacts; Docker strings as test/clock/Node authentication."
+  },
+  "limits": [
+    "Reviewer executed no Node/Vite/Vitest/browser/Docker (host memory constraint per Root brief). All behavioural claims beyond static reasoning rest on hosted CI and Root PC3 receipts, attributed as such.",
+    "Tests run in happy-dom with fake timers and mocked apiClient/session (T1: only global fetch mocked). Not a real browser, TLS, SSO, nginx or 5PC.",
+    "PC3 resource controls (network none, 2 CPU/2 GiB, pids 128, read-only rootfs, cap drop ALL, no-new-privileges, UID 1000) are Root-reported config inspections; whole-host quota is not claimed.",
+    "Root infrastructure failures before the successful runs (archive safety preflight rejection; first control 0 tests due to missing contracts input; install ledger host-cwd field uninstrumented) are preserved by Root and are not product failures or mutant kills.",
+    "The 46 cases are the same set across control/MD/ME; no new unique coverage claim."
+  ],
+  "nextAction": "Root: verify the author final report's NONDOCS tree equals b48 and its exact final Docs, publish the Root canonical checkpoint with these receipts, then decide staging. No source revision is required by this review. UI-R3-I1 test hardening is optional and may ride a later change. Deployment/preview, real browser/TLS/SSO and 5PC acceptance remain separate Root-owned gates.",
+  "atKST": "2026-11-07T02:35:00+09:00"
+}

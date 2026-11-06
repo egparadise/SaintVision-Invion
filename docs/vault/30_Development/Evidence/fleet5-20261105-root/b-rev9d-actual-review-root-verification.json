@@ -1,0 +1,14 @@
+{
+  "atKST": "2026-11-07T02:03:38+09:00",
+  "target": "54549b90774aab3599c0486a5217d0d1634baca8",
+  "actualReview": "9266f719fe97f41b9b4ba38cee4a963a3c1218dc",
+  "branch": "agent/claude/fleet5-b-rev9d-545-review-20261107",
+  "Docs": 42257602765,
+  "job": 128028852844,
+  "correlation": "claude-b-rev9d-545-review-9266f719-ctx_9031e0499999",
+  "rootVerifiedExactHeadRefEventPathAttemptAll19StepsSuccess": true,
+  "remoteExact": true,
+  "uniqueAddedReviewDocs": 14,
+  "actualWorkerDone": "msg_b1d892ae0c44",
+  "verdict": "REVISION_REQUIRED"
+}
