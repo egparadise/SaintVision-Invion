@@ -1,0 +1,22 @@
+{
+  "classification": "READONLY_PUBLIC_SOURCE_PREPARATION",
+  "base": "58d7eb077efbcff5327ac298a39984fe1e39fdf1",
+  "managedWorktree": "wt2:local:9f400b32-325b-42ba-b0f9-d3697925ff5b",
+  "parent": "wt2:local:6679e4fd-6de8-45a4-9d0d-4e2f2c474b01",
+  "rootCanonicalRead": {
+    "HEAD": "138534a667d344dec579e816a3e13bc190852a11",
+    "Index": "1.0.472",
+    "Codex": "1.0.433"
+  },
+  "sourceLookupFailure": {
+    "command": "Get-Content services/node-agent/migrationverify/policy.go",
+    "exit": 1,
+    "cause": "Incorrect public source path",
+    "correction": "rg --files policy.go resolved actual internal/migrationcontext/policy.go; no gate/test failure"
+  },
+  "originalReviewReadEncodingFailure": "Recorded in review-input-manifest.json; raw original bytes unchanged",
+  "noHelpers": true,
+  "noReinitialization": true,
+  "productDelta": 0,
+  "noActualPrivateOrRuntimeReads": true
+}

@@ -1,0 +1,94 @@
+{
+  "classification": "REV3_FIX_ONLY_STATIC_EXECUTION_NOT_PRODUCER_AUTHENTICATION",
+  "task": "task_a95ef3d8ccce",
+  "dispatch": "ctx_ed23b4a777d0",
+  "grant": "msg_0625f6605f95",
+  "base": "58d7eb077efbcff5327ac298a39984fe1e39fdf1",
+  "branch": "agent/codex/fleet5-k2-p02-registry-rev3-20261107",
+  "owner": "Codex",
+  "reviewer": "Actual narrow Claude delta through Root pending",
+  "skills": {
+    "agentDelivery": "1.1.0",
+    "coreReliability": "1.0.0",
+    "orca": "1.4.248"
+  },
+  "model": "Codex exact runtime model ID not exposed/not invented",
+  "Python": "3.14.7 (tags/v3.14.7:823f032, Aug  5 2026, 10:51:32) [MSC v.1944 64 bit (AMD64)]",
+  "executable": "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+  "jsonschema": "4.26.0",
+  "newDependencies": false,
+  "commands": [
+    {
+      "argv": [
+        "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+        "-I",
+        "-B",
+        ".work/build_rev3.py"
+      ],
+      "exit": 0
+    },
+    {
+      "argv": [
+        "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+        "-I",
+        "-B",
+        "docs\\vault\\30_Development\\Evidence\\fleet5-k2-p02-registry-attestation-rev3-20261107-codex\\test_rev3.py"
+      ],
+      "exit": 0,
+      "attempt": 2
+    }
+  ],
+  "executedRows": 15,
+  "distinctCompleteInputs": 15,
+  "controls": 1,
+  "refusals": 14,
+  "isolatedProjectionChecks": 8,
+  "pins": [
+    {
+      "file": "candidate_model.py",
+      "bytes": 28403,
+      "SHA256": "62ed38d3cd90d6e8105d7e613d25371ff866572647ab03641ba2aedae5430c18"
+    },
+    {
+      "file": "fixture_data.py",
+      "bytes": 13482,
+      "SHA256": "b3619dcd3e801691d3fe320f9c1f3a4db66475016b07b1be169e852a08cc8134"
+    },
+    {
+      "file": "test_rev3.py",
+      "bytes": 11474,
+      "SHA256": "6da1c0276943ad6b091214570e9db92580ced0e8389d74c7a32c2ed136064473"
+    },
+    {
+      "file": "contract.md",
+      "bytes": 9728,
+      "SHA256": "de290b978fe3d7fbea45488e5971492abace60f8b4235a513466c0cb738fbf99"
+    },
+    {
+      "file": "payload-contract.json",
+      "bytes": 26990,
+      "SHA256": "7d3d7ed48989afb559a4ff4404669543d0f046937e998787581bb17ba1df25e4"
+    },
+    {
+      "file": "fact-origins.json",
+      "bytes": 17489,
+      "SHA256": "252363544d573af0c0678e13d183f398333d657e05091f2100e0e2ef79a42078"
+    },
+    {
+      "file": "review-response.json",
+      "bytes": 1201,
+      "SHA256": "46d2017d3d428b65418d8d63567b4f616ee73c3d85ddc86432c1099eec4a2fe9"
+    },
+    {
+      "file": "test-results.json",
+      "bytes": 22800,
+      "SHA256": "095f6c587931a8ec038a57094bac14a5c4ec06f0a5069833c247935d7ce25253"
+    }
+  ],
+  "actualProducer": null,
+  "actualBindings": "NULL_HOLD",
+  "A01A40": "NOT_RUN",
+  "ownExactDocs": "AUTHORIZED_PENDING_AFTER_COMMIT",
+  "sourceFinal": "SAME_FUTURE_HEAD_EXTERNAL_API_BINDING",
+  "KST": "2026-11-07T03:21:11.498478+09:00"
+}

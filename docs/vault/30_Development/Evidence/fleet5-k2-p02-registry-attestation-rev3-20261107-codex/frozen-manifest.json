@@ -1,0 +1,255 @@
+{
+  "classification": "FROZEN_REV3_FIX_ONLY_CANDIDATE_NOT_AUTHORITY_OR_ACCEPTANCE",
+  "task": "task_a95ef3d8ccce",
+  "dispatch": "ctx_ed23b4a777d0",
+  "grant": "msg_0625f6605f95",
+  "baseSHA": "58d7eb077efbcff5327ac298a39984fe1e39fdf1",
+  "branch": "agent/codex/fleet5-k2-p02-registry-rev3-20261107",
+  "sourceFinalBinding": "SAME_ACTUAL_IMMUTABLE_HEAD_EXTERNAL_AFTER_COMMIT",
+  "selfExcluded": "frozen-manifest.json",
+  "inputs": [
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-p02-registry-attestation-rev3-20261107-codex/.gitattributes",
+      "bytes": 60,
+      "SHA256": "45c08938c724818744b203585e6a27085535ae679d4448af570f813aa08d1aa8"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-p02-registry-attestation-rev3-20261107-codex/build_rev3.py.txt",
+      "bytes": 9371,
+      "SHA256": "f3363700cb8ab460fb8cf161f63316a2f97620e5073caa0b3e3e444876f7d18b"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-p02-registry-attestation-rev3-20261107-codex/build_rev3_docs.py.txt",
+      "bytes": 20091,
+      "SHA256": "c4818928967ced69e534e78bd1d81a70540b34c6bd27c5dcaef97c977d4d228b"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-p02-registry-attestation-rev3-20261107-codex/candidate_model.py",
+      "bytes": 28403,
+      "SHA256": "62ed38d3cd90d6e8105d7e613d25371ff866572647ab03641ba2aedae5430c18"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-p02-registry-attestation-rev3-20261107-codex/contract.md",
+      "bytes": 9728,
+      "SHA256": "de290b978fe3d7fbea45488e5971492abace60f8b4235a513466c0cb738fbf99"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-p02-registry-attestation-rev3-20261107-codex/fact-origins.json",
+      "bytes": 17489,
+      "SHA256": "252363544d573af0c0678e13d183f398333d657e05091f2100e0e2ef79a42078"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-p02-registry-attestation-rev3-20261107-codex/fixture_data.py",
+      "bytes": 13482,
+      "SHA256": "b3619dcd3e801691d3fe320f9c1f3a4db66475016b07b1be169e852a08cc8134"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-p02-registry-attestation-rev3-20261107-codex/gate-01-check_docs.log",
+      "bytes": 126,
+      "SHA256": "a0d93856cd6463960e61e7b63a75cbf7c84a93773b94a511297823b609a20bdb"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-p02-registry-attestation-rev3-20261107-codex/gate-02-check_ontology_generation.log",
+      "bytes": 70,
+      "SHA256": "9d8298b5f2bd5db7b4548a54f9a88ff16463feb7d786c45e502c0900fb1a89e7"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-p02-registry-attestation-rev3-20261107-codex/gate-03-check_ontology.log",
+      "bytes": 162,
+      "SHA256": "e7d3aaf1eda371ff7035720c656da1e87c472c90cdc26d7a7e7161fdd4a0246f"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-p02-registry-attestation-rev3-20261107-codex/gate-04-check_contract_bindings.log",
+      "bytes": 1637,
+      "SHA256": "d20a071705a3f6c9c651eadefe41d48f3e045b209a7d547f9adafcaaa9657b2c"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-p02-registry-attestation-rev3-20261107-codex/gate-05-check_frontend_integrity.log",
+      "bytes": 148,
+      "SHA256": "5fcd00e09a33916acc1fbe04d132a92fc9315337073ec61fe392deb7ac613353"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-p02-registry-attestation-rev3-20261107-codex/gate-06-check_doc_path_citations.log",
+      "bytes": 111,
+      "SHA256": "a560a6b6ab2fd27754fb4b97f5997ebeb9968b3b6d95491420d6a6744eab5a6b"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-p02-registry-attestation-rev3-20261107-codex/gate-07-check_doc_single_source.log",
+      "bytes": 79,
+      "SHA256": "ef5067403172ab7be30011face3cf89221e099c773e0517cce6158a79345807a"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-p02-registry-attestation-rev3-20261107-codex/gate-08-test_sync.log",
+      "bytes": 2108,
+      "SHA256": "8d1e73b46e37eabede88cfca7c00ee66575626001b14621ae22fbb3656deed3c"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-p02-registry-attestation-rev3-20261107-codex/gate-09-build_docs.log",
+      "bytes": 71,
+      "SHA256": "7ddbd4c6186f80cb22195b187486a49ee0510c1c82fd24e0f1c535dda14a0b03"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-p02-registry-attestation-rev3-20261107-codex/gate-10-sync_obsidian.log",
+      "bytes": 73,
+      "SHA256": "b6b8564892c404830e30862b668e34579d6133c5910154de0bd01055f451374d"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-p02-registry-attestation-rev3-20261107-codex/local-execution-and-pins.json",
+      "bytes": 2874,
+      "SHA256": "253a1baed4d3aa1df178539d793e90747e3b5dd1388f27a4f5d5632ade4ffff3"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-p02-registry-attestation-rev3-20261107-codex/local-required-gates.json",
+      "bytes": 6057,
+      "SHA256": "a27051383217b7425f5320cecfc420a23e8acd99e781e08a00c4d6a8ecdb08e6"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-p02-registry-attestation-rev3-20261107-codex/model-delta.patch.txt",
+      "bytes": 2844,
+      "SHA256": "7934637657ccc4a1febe1fcedcdd0f9e47196970305e1aa989b198a9a484bf91"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-p02-registry-attestation-rev3-20261107-codex/payload-contract.json",
+      "bytes": 26990,
+      "SHA256": "7d3d7ed48989afb559a4ff4404669543d0f046937e998787581bb17ba1df25e4"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-p02-registry-attestation-rev3-20261107-codex/preparation-and-scope.json",
+      "bytes": 888,
+      "SHA256": "41187fcf0aaf1fdcfc19e5d84f27359b7dcd9be160a5175e2ae9c6dc4b50edb4"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-p02-registry-attestation-rev3-20261107-codex/review-input-manifest.json",
+      "bytes": 5975,
+      "SHA256": "1a96c95f53f0b71b8f842fdcc7b724df410124ebbc80fac79edf2e3a4183cd1b"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-p02-registry-attestation-rev3-20261107-codex/review-originals/00-.gitattributes.raw",
+      "bytes": 21,
+      "SHA256": "96a83569c84cfe3f57b7efe3dc61c249548d0fca4fed0e538b3587cdc97c95c1"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-p02-registry-attestation-rev3-20261107-codex/review-originals/01-canonical-sync-check-before.txt.raw",
+      "bytes": 880,
+      "SHA256": "78e660ff935ec398b0d8077c3ea75e4df96f01c0f89813ac33e37be50938fa2c"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-p02-registry-attestation-rev3-20261107-codex/review-originals/02-commands.json.raw",
+      "bytes": 4653,
+      "SHA256": "dda06d235c836f94f117e476efba8266ce2cb04b5906c5c912ba804ce525a8c0"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-p02-registry-attestation-rev3-20261107-codex/review-originals/03-local-doc-gates.txt.raw",
+      "bytes": 3496,
+      "SHA256": "a78dac9606d030edca1683ab997d505c034bcc2d1f3d96fba0f08eb6a090c573"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-p02-registry-attestation-rev3-20261107-codex/review-originals/04-review.json.raw",
+      "bytes": 17805,
+      "SHA256": "a985c26bee4a285bc0c7196dfba9758d5556c65f6aff323a76fa31c0d7c36f13"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-p02-registry-attestation-rev3-20261107-codex/review-originals/05-reviewer-p02r2-probes-result.json.raw",
+      "bytes": 29484,
+      "SHA256": "3a0aee0be3622c0723267ca43a23758a37cf26036dc728275d16700159f76886"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-p02-registry-attestation-rev3-20261107-codex/review-originals/06-reviewer-p02r2-probes.log.txt.raw",
+      "bytes": 3258,
+      "SHA256": "69234bf2269b90a71feab5c688c3b3e924de190d634dc4861f7cf2cc17cf059a"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-p02-registry-attestation-rev3-20261107-codex/review-originals/07-reviewer_gate_driver.py.txt.raw",
+      "bytes": 2355,
+      "SHA256": "b3dd3ed21c8fd8f323be0ffecf6abeba58a6b13efb64b0fd9b41cf1a345795c4"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-p02-registry-attestation-rev3-20261107-codex/review-originals/08-reviewer_p02r2_probes.py.txt.raw",
+      "bytes": 27725,
+      "SHA256": "0a86365a0406f5576dc4db62ef83c3676f21239ccacb4630910f097ed8903378"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-p02-registry-attestation-rev3-20261107-codex/review-originals/09-2026-11-07_03-05-00_KST_FLEET5_K2_P02_Rev2_58d_\uacc4\uc57d\ud6c4\ubcf4_\ub378\ud0c0\ub3c5\ub9bd\uac80\ud1a0_Claude.md.raw",
+      "bytes": 6545,
+      "SHA256": "4a394105c1080978c95a9d9ec1d0bba17460052b6f05d7cfed418f9a71fb66ba"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-p02-registry-attestation-rev3-20261107-codex/review-response.json",
+      "bytes": 1201,
+      "SHA256": "46d2017d3d428b65418d8d63567b4f616ee73c3d85ddc86432c1099eec4a2fe9"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-p02-registry-attestation-rev3-20261107-codex/run_required_gates.py.txt",
+      "bytes": 2583,
+      "SHA256": "d98231fb94959852a0a780f9fd8b405f13cb0766352b89c046ab28e88590cf08"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-p02-registry-attestation-rev3-20261107-codex/source-continuity-and-open-obligations.json",
+      "bytes": 3646,
+      "SHA256": "cad808ccbf2c7ca9b550fa709baa63b5b8d6e40e7a7ba5dc10b950361a28e5ea"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-p02-registry-attestation-rev3-20261107-codex/staged-whitespace-attempt01.json",
+      "bytes": 12374,
+      "SHA256": "13c20c8d9bcfa9bd6762c5a6a886d9079ce112ad926a94de9ce3f518e6b76c46"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-p02-registry-attestation-rev3-20261107-codex/test-results.json",
+      "bytes": 22800,
+      "SHA256": "095f6c587931a8ec038a57094bac14a5c4ec06f0a5069833c247935d7ce25253"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-p02-registry-attestation-rev3-20261107-codex/test-runs/attempt-01-driver.raw",
+      "bytes": 11478,
+      "SHA256": "7f10d87844321c6f4a63bb98d4ad03588477f9021eb3fd7c64c56665d69c4fff"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-p02-registry-attestation-rev3-20261107-codex/test-runs/attempt-01.json",
+      "bytes": 22800,
+      "SHA256": "feb971d062f6ad9b44c62031045a9b1b5d2c9009d17bff4c2932ff0afc14e2ac"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-p02-registry-attestation-rev3-20261107-codex/test-runs/attempt-02.json",
+      "bytes": 22800,
+      "SHA256": "095f6c587931a8ec038a57094bac14a5c4ec06f0a5069833c247935d7ce25253"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-p02-registry-attestation-rev3-20261107-codex/test-runs/source-byte-normalization.json",
+      "bytes": 558,
+      "SHA256": "35f8f1ccf8121433b63fe0d4a87d38b02c4cf83531d681abc853093f2b9e7ca4"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-p02-registry-attestation-rev3-20261107-codex/test_rev3.py",
+      "bytes": 11474,
+      "SHA256": "6da1c0276943ad6b091214570e9db92580ced0e8389d74c7a32c2ed136064473"
+    },
+    {
+      "path": "docs/vault/30_Development/History/2026-11-07_FLEET5_K2_P02_registry_attestation_Rev3_Codex.md",
+      "bytes": 5167,
+      "SHA256": "6fa851142d03499888a4ee320dd525cc50c8a4ce5575bdeb6f326a8ebd7b991a"
+    }
+  ],
+  "addedOwnPaths": 45,
+  "allTenLocalGatesExitZero": true,
+  "staticModel": {
+    "executedRows": 15,
+    "distinctCompleteInputTuples": 15,
+    "controls": 1,
+    "refusals": 14,
+    "failures": 0,
+    "isolatedProjectionChecks": 8,
+    "cryptographicAuthentication": false
+  },
+  "actualProducer": null,
+  "actualBindings": "NULL_HOLD",
+  "H3_EA": "ABSENT_UNREGISTERED_HOLD",
+  "RD_registration": "HOLD_FACT_ONLY_NOT_DELIVERY_AUTHENTICATION",
+  "rawSeven": "UNREGISTERED",
+  "A01A40": "NOT_RUN",
+  "actualDeltaReview": "PENDING_ROOT_ASSIGNMENT",
+  "wholeK2Fleet": "INCOMPLETE",
+  "KST": "2026-11-07T03:24:10.740425+09:00",
+  "freezeAttempt": 2,
+  "priorFreezeSHA256": "6a91f6040362a9900233965fb9a3b025fffa296759056c45887e74aa89434fae",
+  "stagedGateCorrection": "staged-whitespace-attempt01.json"
+}

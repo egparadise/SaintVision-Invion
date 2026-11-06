@@ -1,0 +1,24 @@
+{
+  "classification": "OWNER_REV3_RESPONSE_ACTUAL_NARROW_REVIEW_PENDING",
+  "actualReview": "973b6f8cca4c4a2f3dee698d52b93230ae2e8e4a",
+  "base": "58d7eb077efbcff5327ac298a39984fe1e39fdf1",
+  "owner": "Codex",
+  "reviewer": "Actual independent Claude through Root pending",
+  "responses": [
+    {
+      "id": "P02R2-M1",
+      "change": "Required independent exact expectedEffectiveVerdict; PROVENANCE05_REVIEWS on mismatch; effective publication distinct from every independently bound original/part identity",
+      "evidence": "M01/V19,M02/V20,M03/V20b plus M04 unused original,M05-M08 expectation controls; exact prior prefixes; C01"
+    },
+    {
+      "id": "P02R2-L1",
+      "change": "Three approved provenance identities H3; RunningExecutable H5 retained; explicit five-row H5 runningData with independent K1 counterparts",
+      "evidence": "H3/H5 receipt-lock-link evaluator negatives, eight isolated projection/mutant checks; immutable K1 source retained"
+    }
+  ],
+  "futureINFO": "P02R2-I1..I4 remain future producer obligations",
+  "allOtherClosure": "Retained, not rerun",
+  "actualBindings": "NULL_HOLD",
+  "H3_EA": "ABSENT_UNREGISTERED_HOLD",
+  "RD_registration": "HOLD_FACT_ONLY"
+}

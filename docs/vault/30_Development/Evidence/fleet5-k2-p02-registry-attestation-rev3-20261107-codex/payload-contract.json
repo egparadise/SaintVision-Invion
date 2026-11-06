@@ -1,0 +1,548 @@
+{
+  "classification": "REV3_FIX_ONLY_NORMATIVE_PAYLOAD_AND_TWO_SIDED_PROJECTION_CANDIDATE",
+  "onePayloadTable": true,
+  "format": "fleet5-p02-registry-candidate:2",
+  "payloadFields": [
+    {
+      "field": "cohortId",
+      "required": true,
+      "closedSchema": "policy-payload.schema.json#/properties/cohortId",
+      "parsing": "Canonical printable-ASCII payload JSON; bounded hex components decoded separately",
+      "actualOrigin": "Sealed registered policy publication under independent capsule; actual NULL/HOLD"
+    },
+    {
+      "field": "contractPins",
+      "required": true,
+      "closedSchema": "policy-payload.schema.json#/properties/contractPins",
+      "parsing": "Canonical printable-ASCII payload JSON; bounded hex components decoded separately",
+      "actualOrigin": "Sealed registered policy publication under independent capsule; actual NULL/HOLD"
+    },
+    {
+      "field": "designRegistrationHex",
+      "required": true,
+      "closedSchema": "policy-payload.schema.json#/properties/designRegistrationHex",
+      "parsing": "Canonical printable-ASCII payload JSON; bounded hex components decoded separately",
+      "actualOrigin": "Sealed registered policy publication under independent capsule; actual NULL/HOLD"
+    },
+    {
+      "field": "grants",
+      "required": true,
+      "closedSchema": "policy-payload.schema.json#/properties/grants",
+      "parsing": "Canonical printable-ASCII payload JSON; bounded hex components decoded separately",
+      "actualOrigin": "Sealed registered policy publication under independent capsule; actual NULL/HOLD"
+    },
+    {
+      "field": "graphHex",
+      "required": true,
+      "closedSchema": "policy-payload.schema.json#/properties/graphHex",
+      "parsing": "Canonical printable-ASCII payload JSON; bounded hex components decoded separately",
+      "actualOrigin": "Sealed registered policy publication under independent capsule; actual NULL/HOLD"
+    },
+    {
+      "field": "members",
+      "required": true,
+      "closedSchema": "policy-payload.schema.json#/properties/members",
+      "parsing": "Canonical printable-ASCII payload JSON; bounded hex components decoded separately",
+      "actualOrigin": "Sealed registered policy publication under independent capsule; actual NULL/HOLD"
+    },
+    {
+      "field": "nodeKinds",
+      "required": true,
+      "closedSchema": "policy-payload.schema.json#/properties/nodeKinds",
+      "parsing": "Canonical printable-ASCII payload JSON; bounded hex components decoded separately",
+      "actualOrigin": "Sealed registered policy publication under independent capsule; actual NULL/HOLD"
+    },
+    {
+      "field": "proofSlotRegistryHex",
+      "required": true,
+      "closedSchema": "policy-payload.schema.json#/properties/proofSlotRegistryHex",
+      "parsing": "Canonical printable-ASCII payload JSON; bounded hex components decoded separately",
+      "actualOrigin": "Sealed registered policy publication under independent capsule; actual NULL/HOLD"
+    },
+    {
+      "field": "selector",
+      "required": true,
+      "closedSchema": "policy-payload.schema.json#/properties/selector",
+      "parsing": "Canonical printable-ASCII payload JSON; bounded hex components decoded separately",
+      "actualOrigin": "Sealed registered policy publication under independent capsule; actual NULL/HOLD"
+    },
+    {
+      "field": "semanticPins",
+      "required": true,
+      "closedSchema": "policy-payload.schema.json#/properties/semanticPins",
+      "parsing": "Canonical printable-ASCII payload JSON; bounded hex components decoded separately",
+      "actualOrigin": "Sealed registered policy publication under independent capsule; actual NULL/HOLD"
+    },
+    {
+      "field": "verifier",
+      "required": true,
+      "closedSchema": "policy-payload.schema.json#/properties/verifier",
+      "parsing": "Canonical printable-ASCII payload JSON; bounded hex components decoded separately",
+      "actualOrigin": "Sealed registered policy publication under independent capsule; actual NULL/HOLD"
+    },
+    {
+      "field": "version",
+      "required": true,
+      "closedSchema": "policy-payload.schema.json#/properties/version",
+      "parsing": "Canonical printable-ASCII payload JSON; bounded hex components decoded separately",
+      "actualOrigin": "Sealed registered policy publication under independent capsule; actual NULL/HOLD"
+    }
+  ],
+  "derivedFacts": [
+    {
+      "fact": "policyPayloadSHA256",
+      "bytes": "EXACT canonical payload byte slice, no trailing LF",
+      "derivation": "SHA256(raw)",
+      "origin": "Authenticated registry publication plus strict decoding"
+    },
+    {
+      "fact": "graphSHA256",
+      "bytes": "decodeHex(payload.graphHex), exact registered raw graph, not normalized JSON",
+      "derivation": "SHA256(raw graph)",
+      "origin": "H3 graph source; exact registered design8874 graph hash"
+    },
+    {
+      "fact": "contractSetSHA256",
+      "bytes": "K1-C2(payload.contractPins) including exact28 ID/contract/schema/codec/verifier entries",
+      "derivation": "SHA256(C2)",
+      "origin": "Immutable28 source constants, sealed policy"
+    },
+    {
+      "fact": "semanticPinsSHA256",
+      "bytes": "K1-C2(payload.semanticPins), closed6-field map",
+      "derivation": "SHA256(C2)",
+      "origin": "Each field must equal independent installed-source constant; no missing default"
+    },
+    {
+      "fact": "cohortScopeSHA256",
+      "bytes": "K1-C2({class:COHORT,cohortId:payload.cohortId,members:[payload.members[0].scope,payload.members[1].scope]})",
+      "derivation": "SHA256(C2)",
+      "origin": "Exact ordered old two-member scopes, joins private capsule and body"
+    },
+    {
+      "fact": "keyGrantsSHA256",
+      "bytes": "K1-C2(ordered grants with role, decoded authorityScope AST, publicKeyHex, original notBefore/notAfter integers; EXCLUDES current status)",
+      "derivation": "SHA256(C2)",
+      "origin": "Sealed original grant facts; current ACTIVE is separate H4"
+    },
+    {
+      "fact": "registryProofSlotsSHA256",
+      "bytes": "decodeHex(payload.proofSlotRegistryHex), exact original raw bytes",
+      "derivation": "SHA256(raw)",
+      "origin": "H3 immutable proof-slot registry source, no reserialization"
+    },
+    {
+      "fact": "designRegistrationSHA256",
+      "bytes": "decodeHex(payload.designRegistrationHex), exact externally registered original bytes",
+      "derivation": "SHA256(raw)",
+      "origin": "H3 authenticated original a0 bytes or independently authorized explicit byte recipe; RD-P02-R2-REGISTRATION-BYTES still pending"
+    }
+  ],
+  "semanticPinFields": {
+    "k1SourcePinSetSHA256": "SHA256 exact immutable resources/source-pins.json",
+    "recipeDefinitionsSHA256": "SHA256 exact immutable resources/recipe-definitions.json",
+    "derivedDigestContractSHA256": "SHA256 exact immutable resources/derived-digest-contract.json",
+    "proofSlotRegistrySHA256": "SHA256 exact payload proofSlotRegistry bytes AND independent source pin",
+    "graphSHA256": "SHA256 exact graph bytes AND independent registered graph pin",
+    "nodeKindsSHA256": "SHA256 K1-C2(payload.nodeKinds) AND independent source pin"
+  },
+  "grantRegistrationID": "SHA256(K1-C2({role,authorityScope:DecodeC2(authorityScopeC2Hex),publicKeyHex,notBefore,notAfter})); status from independent H4 map at that ID",
+  "policyProjection": [
+    {
+      "field": "Selector",
+      "independentOrigin": "independently installed capsule.selector",
+      "conversionAndJoin": "Require payload.selector==body.selector==capsule.selector; project capsule selector",
+      "finalConsistencyGate": "07_PROJECTION",
+      "actualState": "NULL_HOLD",
+      "remainingAuthority": "H3/H4/H5 as named; no real binding"
+    },
+    {
+      "field": "Version",
+      "independentOrigin": "sealed payload.version plus independent current record version",
+      "conversionAndJoin": "Exact canonical decimal string of body.recordVersion; project string unchanged",
+      "finalConsistencyGate": "07_PROJECTION",
+      "actualState": "NULL_HOLD",
+      "remainingAuthority": "H3/H4/H5 as named; no real binding"
+    },
+    {
+      "field": "RegistrySHA256",
+      "independentOrigin": "exact owned canonical payload bytes after authentication",
+      "conversionAndJoin": "SHA256(raw payload bytes); no payload self-field allowed",
+      "finalConsistencyGate": "07_PROJECTION",
+      "actualState": "NULL_HOLD",
+      "remainingAuthority": "H3/H4/H5 as named; no real binding"
+    },
+    {
+      "field": "Verifier.ID",
+      "independentOrigin": "fixed source schema",
+      "conversionAndJoin": "Exact saintvision-migrationverify-k1:1",
+      "finalConsistencyGate": "07_PROJECTION",
+      "actualState": "NULL_HOLD",
+      "remainingAuthority": "H3/H4/H5 as named; no real binding"
+    },
+    {
+      "field": "Verifier.SourceSHA",
+      "independentOrigin": "private H3 authenticated source facts",
+      "conversionAndJoin": "Exact current selected source; payload verifier and effective coverage must join",
+      "finalConsistencyGate": "07_PROJECTION",
+      "actualState": "NULL_HOLD",
+      "remainingAuthority": "H3/H4/H5 as named; no real binding"
+    },
+    {
+      "field": "Verifier.ArtifactSHA256",
+      "independentOrigin": "private H3 executable artifact identity",
+      "conversionAndJoin": "Executable SHA256, never archive digest; payload and independent H5 must join",
+      "finalConsistencyGate": "07_PROJECTION",
+      "actualState": "NULL_HOLD",
+      "remainingAuthority": "H3/H4/H5 as named; no real binding"
+    },
+    {
+      "field": "Verifier.ReviewSHA",
+      "independentOrigin": "independently authenticated H3-EA effective approval publication",
+      "conversionAndJoin": "Project effective publication SHA40; preserve all raw original review SHAs separately; H3-EA UNREGISTERED and absent",
+      "finalConsistencyGate": "07_PROJECTION",
+      "actualState": "NULL_HOLD",
+      "remainingAuthority": "H3/H4/H5 as named; no real binding"
+    },
+    {
+      "field": "Verifier.CIRunIDs",
+      "independentOrigin": "sealed payload integers joined to exact authenticated ordered CI records",
+      "conversionAndJoin": "Each integer -> canonical base10 ASCII str without sign/whitespace/leading zero; same order as ciRuns",
+      "finalConsistencyGate": "07_PROJECTION",
+      "actualState": "NULL_HOLD",
+      "remainingAuthority": "H3/H4/H5 as named; no real binding"
+    },
+    {
+      "field": "ContractPins[*].ContractSHA256",
+      "independentOrigin": "sealed payload plus exact immutable28 source constants",
+      "conversionAndJoin": "Copy payload.contractSHA256 only after closed ID set/const equality; no repin",
+      "finalConsistencyGate": "07_PROJECTION",
+      "actualState": "NULL_HOLD",
+      "remainingAuthority": "H3/H4/H5 as named; no real binding"
+    },
+    {
+      "field": "ContractPins[*].SchemaSHA256",
+      "independentOrigin": "sealed payload plus exact immutable28 source constants",
+      "conversionAndJoin": "Copy payload.schemaSHA256 only after closed ID set/const equality; no repin",
+      "finalConsistencyGate": "07_PROJECTION",
+      "actualState": "NULL_HOLD",
+      "remainingAuthority": "H3/H4/H5 as named; no real binding"
+    },
+    {
+      "field": "ContractPins[*].Codec",
+      "independentOrigin": "sealed payload plus exact immutable28 source constants",
+      "conversionAndJoin": "Copy payload.codec only after closed ID set/const equality; no repin",
+      "finalConsistencyGate": "07_PROJECTION",
+      "actualState": "NULL_HOLD",
+      "remainingAuthority": "H3/H4/H5 as named; no real binding"
+    },
+    {
+      "field": "ContractPins[*].RequiredVerifier",
+      "independentOrigin": "sealed payload plus exact immutable28 source constants",
+      "conversionAndJoin": "Copy payload.requiredVerifier only after closed ID set/const equality; no repin",
+      "finalConsistencyGate": "07_PROJECTION",
+      "actualState": "NULL_HOLD",
+      "remainingAuthority": "H3/H4/H5 as named; no real binding"
+    },
+    {
+      "field": "Grants[*].Role",
+      "independentOrigin": "independently authorized sealed grant",
+      "conversionAndJoin": "Exact role string; role label alone creates no authorization",
+      "finalConsistencyGate": "07_PROJECTION",
+      "actualState": "NULL_HOLD",
+      "remainingAuthority": "H3/H4/H5 as named; no real binding"
+    },
+    {
+      "field": "Grants[*].AuthorityScope",
+      "independentOrigin": "exact payload authorityScopeC2Hex",
+      "conversionAndJoin": "Decode lowercase hex; strict K1 C2 roundtrip; closed NODE/COHORT/COMPONENT scope; copy primitive AST",
+      "finalConsistencyGate": "07_PROJECTION",
+      "actualState": "NULL_HOLD",
+      "remainingAuthority": "H3/H4/H5 as named; no real binding"
+    },
+    {
+      "field": "Grants[*].PublicKeyHex",
+      "independentOrigin": "independently provisioned grant/public identity",
+      "conversionAndJoin": "Exact32public Ed25519 bytes in lowercase64hex; not private key or DER SPKI hash",
+      "finalConsistencyGate": "07_PROJECTION",
+      "actualState": "NULL_HOLD",
+      "remainingAuthority": "H3/H4/H5 as named; no real binding"
+    },
+    {
+      "field": "Grants[*].NotBefore",
+      "independentOrigin": "original signed grant epoch seconds",
+      "conversionAndJoin": "0..253402300799 integer, no bool; time.Unix(s,0).UTC(), whole seconds; no Now substitution",
+      "finalConsistencyGate": "07_PROJECTION",
+      "actualState": "NULL_HOLD",
+      "remainingAuthority": "H3/H4/H5 as named; no real binding"
+    },
+    {
+      "field": "Grants[*].NotAfter",
+      "independentOrigin": "original signed grant epoch seconds",
+      "conversionAndJoin": "Same exact UTC conversion, NotBefore<NotAfter; preserve original expired intervals for history",
+      "finalConsistencyGate": "07_PROJECTION",
+      "actualState": "NULL_HOLD",
+      "remainingAuthority": "H3/H4/H5 as named; no real binding"
+    },
+    {
+      "field": "Grants[*].Status",
+      "independentOrigin": "private independent lifecycle.grants[GrantRegistrationID]",
+      "conversionAndJoin": "ACTIVE only at real current observation; never copied from payload or registry signer; missing/revoked UNKNOWN refuses",
+      "finalConsistencyGate": "07_PROJECTION",
+      "actualState": "NULL_HOLD",
+      "remainingAuthority": "H3/H4/H5 as named; no real binding"
+    },
+    {
+      "field": "CohortID",
+      "independentOrigin": "independently authorized sealed cohort",
+      "conversionAndJoin": "Copy payload.cohortId; exact derived ordered scope digest joins capsule",
+      "finalConsistencyGate": "07_PROJECTION",
+      "actualState": "NULL_HOLD",
+      "remainingAuthority": "H3/H4/H5 as named; no real binding"
+    },
+    {
+      "field": "Members[*].Slot",
+      "independentOrigin": "sealed payload plus independently provisioned public member bindings",
+      "conversionAndJoin": "payload.slot: Exact order PC2 then PC4, old logical two-node cohort",
+      "finalConsistencyGate": "07_PROJECTION",
+      "actualState": "NULL_HOLD",
+      "remainingAuthority": "H3/H4/H5 as named; no real binding"
+    },
+    {
+      "field": "Members[*].Scope",
+      "independentOrigin": "sealed payload plus independently provisioned public member bindings",
+      "conversionAndJoin": "payload.scope: Closed tenantId/nodeId/recoveryEpoch map; exact public identity/C2 bindings",
+      "finalConsistencyGate": "07_PROJECTION",
+      "actualState": "NULL_HOLD",
+      "remainingAuthority": "H3/H4/H5 as named; no real binding"
+    },
+    {
+      "field": "Members[*].CertificateDER",
+      "independentOrigin": "sealed payload plus independently provisioned public member bindings",
+      "conversionAndJoin": "payload.certificateDERHex: Strict hex -> exact original DER bytes; independent public bindings and unchanged K1 DER/SPKI/chain/URI/signature checks still mandatory",
+      "finalConsistencyGate": "07_PROJECTION",
+      "actualState": "NULL_HOLD",
+      "remainingAuthority": "H3/H4/H5 as named; no real binding"
+    },
+    {
+      "field": "Members[*].CARootDER",
+      "independentOrigin": "sealed payload plus independently provisioned public member bindings",
+      "conversionAndJoin": "payload.caRootDERHex: Strict hex -> exact original CA DER bytes; no system-root discovery",
+      "finalConsistencyGate": "07_PROJECTION",
+      "actualState": "NULL_HOLD",
+      "remainingAuthority": "H3/H4/H5 as named; no real binding"
+    },
+    {
+      "field": "GraphBytes",
+      "independentOrigin": "exact registered graph raw bytes from H3 source acquisition",
+      "conversionAndJoin": "Decode graphHex without newline/JSON normalization; model DTO represents []byte as hex",
+      "finalConsistencyGate": "07_PROJECTION",
+      "actualState": "NULL_HOLD",
+      "remainingAuthority": "H3/H4/H5 as named; no real binding"
+    },
+    {
+      "field": "GraphSHA256",
+      "independentOrigin": "GraphBytes",
+      "conversionAndJoin": "SHA256(exact decoded raw graph); must equal fact and independent source constant",
+      "finalConsistencyGate": "07_PROJECTION",
+      "actualState": "NULL_HOLD",
+      "remainingAuthority": "H3/H4/H5 as named; no real binding"
+    },
+    {
+      "field": "NodeKinds",
+      "independentOrigin": "sealed map plus independent semantic source pin",
+      "conversionAndJoin": "Exact primitive map; SHA256(K1-C2(map)) must equal independent nodeKinds pin; no guessed kinds",
+      "finalConsistencyGate": "07_PROJECTION",
+      "actualState": "NULL_HOLD",
+      "remainingAuthority": "H3/H4/H5 as named; no real binding"
+    },
+    {
+      "field": "Provenance.ReviewTargetSHA",
+      "independentOrigin": "H3-EA independently authorized effective target",
+      "conversionAndJoin": "Current sourceSHA from coverage, NOT any raw original reviewer target; unchanged K1 equality to SourceSHA",
+      "finalConsistencyGate": "07_PROJECTION",
+      "actualState": "NULL_HOLD",
+      "remainingAuthority": "H3/H4/H5 as named; no real binding"
+    },
+    {
+      "field": "Provenance.ReviewScope",
+      "independentOrigin": "H3-EA independently authorized effective scope",
+      "conversionAndJoin": "Coverage.effective.scopeId; no record-selected aggregate authorization",
+      "finalConsistencyGate": "07_PROJECTION",
+      "actualState": "NULL_HOLD",
+      "remainingAuthority": "H3/H4/H5 as named; no real binding"
+    },
+    {
+      "field": "Provenance.ApprovedReviewScope",
+      "independentOrigin": "independently installed capsule.approvedReviewScope",
+      "conversionAndJoin": "Never copy facts.effectiveReviewScope here; require equality to separately projected ReviewScope",
+      "finalConsistencyGate": "07_PROJECTION",
+      "actualState": "NULL_HOLD",
+      "remainingAuthority": "H3/H4/H5 as named; no real binding"
+    },
+    {
+      "field": "Provenance.BinaryVCS",
+      "independentOrigin": "private H3 source/artifact acquisition",
+      "conversionAndJoin": "Exact VCS revision equals current source; modified=false required separately",
+      "finalConsistencyGate": "07_PROJECTION",
+      "actualState": "NULL_HOLD",
+      "remainingAuthority": "H3/H4/H5 as named; no real binding"
+    },
+    {
+      "field": "Provenance.RuntimeLockSHA256",
+      "independentOrigin": "private independently approved H3 installation facts.runtimeLockSHA256",
+      "conversionAndJoin": "Exact approved installation digest; measured side independently from H5; P02 05_RUNNING and unchanged K1 compare both sources",
+      "finalConsistencyGate": "07_PROJECTION",
+      "actualState": "NULL_HOLD",
+      "remainingAuthority": "H3/H4/H5 as named; no real binding"
+    },
+    {
+      "field": "Provenance.CIHeadSHA",
+      "independentOrigin": "independent capsule.primaryCI.runId selects authenticated run",
+      "conversionAndJoin": "Exact run.headSHA, must equal current source",
+      "finalConsistencyGate": "07_PROJECTION",
+      "actualState": "NULL_HOLD",
+      "remainingAuthority": "H3/H4/H5 as named; no real binding"
+    },
+    {
+      "field": "Provenance.CIRef",
+      "independentOrigin": "same provisioned primary run",
+      "conversionAndJoin": "Exact authenticated ref",
+      "finalConsistencyGate": "07_PROJECTION",
+      "actualState": "NULL_HOLD",
+      "remainingAuthority": "H3/H4/H5 as named; no real binding"
+    },
+    {
+      "field": "Provenance.CIWorkflow",
+      "independentOrigin": "same provisioned primary run",
+      "conversionAndJoin": "Exact authenticated workflow path",
+      "finalConsistencyGate": "07_PROJECTION",
+      "actualState": "NULL_HOLD",
+      "remainingAuthority": "H3/H4/H5 as named; no real binding"
+    },
+    {
+      "field": "Provenance.CIRunID",
+      "independentOrigin": "capsule.primaryCI.runId, not first green item",
+      "conversionAndJoin": "Select exactly one run, canonical decimal string; member of Verifier.CIRunIDs",
+      "finalConsistencyGate": "07_PROJECTION",
+      "actualState": "NULL_HOLD",
+      "remainingAuthority": "H3/H4/H5 as named; no real binding"
+    },
+    {
+      "field": "Provenance.CIAttempt",
+      "independentOrigin": "authenticated selected run.attempt",
+      "conversionAndJoin": "Canonical decimal string of positive safe integer",
+      "finalConsistencyGate": "07_PROJECTION",
+      "actualState": "NULL_HOLD",
+      "remainingAuthority": "H3/H4/H5 as named; no real binding"
+    },
+    {
+      "field": "Provenance.CIJobID",
+      "independentOrigin": "capsule.primaryCI.jobId plus exact jobName",
+      "conversionAndJoin": "Select exactly one job inside selected run; canonical decimal string; no fallback",
+      "finalConsistencyGate": "07_PROJECTION",
+      "actualState": "NULL_HOLD",
+      "remainingAuthority": "H3/H4/H5 as named; no real binding"
+    },
+    {
+      "field": "Provenance.ArtifactDigest",
+      "independentOrigin": "private H3 original archive acquisition",
+      "conversionAndJoin": "Exactly artifactZipSHA256, distinct from executable Verifier.ArtifactSHA256",
+      "finalConsistencyGate": "07_PROJECTION",
+      "actualState": "NULL_HOLD",
+      "remainingAuthority": "H3/H4/H5 as named; no real binding"
+    },
+    {
+      "field": "Provenance.InstallationReceiptSHA256",
+      "independentOrigin": "private independently approved H3 installation facts.installationReceiptSHA256",
+      "conversionAndJoin": "Exact approved installation digest; measured side independently from H5; P02 05_RUNNING and unchanged K1 compare both sources",
+      "finalConsistencyGate": "07_PROJECTION",
+      "actualState": "NULL_HOLD",
+      "remainingAuthority": "H3/H4/H5 as named; no real binding"
+    },
+    {
+      "field": "Provenance.RunningExecutableSHA256",
+      "independentOrigin": "private independent H5.executableSHA256",
+      "conversionAndJoin": "Actual measured integration executable, not recipe/facts/echo; exact approved executable join",
+      "finalConsistencyGate": "07_PROJECTION",
+      "actualState": "NULL_HOLD",
+      "remainingAuthority": "H3/H4/H5 as named; no real binding"
+    },
+    {
+      "field": "Provenance.LinkedClosureSHA256",
+      "independentOrigin": "private independently approved H3 installation facts.linkedClosureSHA256",
+      "conversionAndJoin": "Exact approved installation digest; measured side independently from H5; P02 05_RUNNING and unchanged K1 compare both sources",
+      "finalConsistencyGate": "07_PROJECTION",
+      "actualState": "NULL_HOLD",
+      "remainingAuthority": "H3/H4/H5 as named; no real binding"
+    }
+  ],
+  "projectionLeafFields": 41,
+  "encoding": "Model DTO uses lowercase hex for Go []byte and UTC Z strings for Go time.Time; no opaque Go constructor",
+  "primaryTuple": "Independent capsule.primaryCI {runId,jobId,jobName}; exact lookup, no first/last green fallback",
+  "noSafetyFactDeleted": true,
+  "retainedBase": "58d7eb077efbcff5327ac298a39984fe1e39fdf1",
+  "effectiveApprovalAcceptance": [
+    {
+      "field": "effectiveReviewVerdict",
+      "expectation": "capsule.expectedEffectiveVerdict exact nonempty printable ASCII string <=128 bytes",
+      "origin": "Independent purpose-specific Root custody/bootstrap policy under future H1/H2 authorization; NOT record, coverage, raw review or inferred verdict",
+      "gate": "05_REVIEWS",
+      "failure": "PROVENANCE",
+      "actualValue": null,
+      "actualState": "NULL_HOLD"
+    },
+    {
+      "field": "effectiveReviewSHA / payload.verifier.reviewSHA",
+      "expectation": "effective publication differs from EVERY original reviews[].reviewSHA AND EVERY parts[].reviewSHA",
+      "origin": "Independent capsule.approvedReviewOutcomes identities plus authenticated original review acquisition plus independently authenticated Root coverage part map; all three sets joined before comparison",
+      "gate": "05_REVIEWS",
+      "failure": "PROVENANCE",
+      "actualValue": null,
+      "actualState": "NULL_HOLD"
+    }
+  ],
+  "runningDataProjection": [
+    {
+      "field": "ExecutableSHA256",
+      "independentOrigin": "private authenticated H5.executableSHA256",
+      "conversionAndJoin": "Exact measured value; no recipe/registry echo/source-fact substitution",
+      "actualState": "NULL_HOLD",
+      "unchangedK1Counterpart": "Verifier.ArtifactSHA256",
+      "counterpartIndependentOrigin": "H3 independently approved installation/source facts.binarySHA256"
+    },
+    {
+      "field": "InstallationReceiptSHA256",
+      "independentOrigin": "private authenticated H5.receiptSHA256",
+      "conversionAndJoin": "Exact measured value; no recipe/registry echo/source-fact substitution",
+      "actualState": "NULL_HOLD",
+      "unchangedK1Counterpart": "Provenance.InstallationReceiptSHA256",
+      "counterpartIndependentOrigin": "H3 independently approved installation/source facts.installationReceiptSHA256"
+    },
+    {
+      "field": "SourceSHA",
+      "independentOrigin": "private authenticated H5.sourceSHA",
+      "conversionAndJoin": "Exact measured value; no recipe/registry echo/source-fact substitution",
+      "actualState": "NULL_HOLD",
+      "unchangedK1Counterpart": "Verifier.SourceSHA",
+      "counterpartIndependentOrigin": "H3 independently approved installation/source facts.sourceSHA"
+    },
+    {
+      "field": "RuntimeLockSHA256",
+      "independentOrigin": "private authenticated H5.runtimeLockSHA256",
+      "conversionAndJoin": "Exact measured value; no recipe/registry echo/source-fact substitution",
+      "actualState": "NULL_HOLD",
+      "unchangedK1Counterpart": "Provenance.RuntimeLockSHA256",
+      "counterpartIndependentOrigin": "H3 independently approved installation/source facts.runtimeLockSHA256"
+    },
+    {
+      "field": "LinkedClosureSHA256",
+      "independentOrigin": "private authenticated H5.linkedClosureSHA256",
+      "conversionAndJoin": "Exact measured value; no recipe/registry echo/source-fact substitution",
+      "actualState": "NULL_HOLD",
+      "unchangedK1Counterpart": "Provenance.LinkedClosureSHA256",
+      "counterpartIndependentOrigin": "H3 independently approved installation/source facts.linkedClosureSHA256"
+    }
+  ],
+  "runningDataLeafFields": 5
+}

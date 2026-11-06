@@ -1,0 +1,90 @@
+{
+  "classification": "REV3_INHERITS_IMMUTABLE_SOURCE_AND_UNAFFECTED_PROOFS_NOT_RERUN",
+  "base": "58d7eb077efbcff5327ac298a39984fe1e39fdf1",
+  "rows": [
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-p02-registry-attestation-rev2-20261107-codex/candidate-envelope.schema.json",
+      "SHA256": "60d6c825d26e3c72f4c367e92200e0bc14c83642764c0dc27ec4d7c74a43d74c",
+      "bytes": 20526,
+      "changed": false,
+      "rerun": false
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-p02-registry-attestation-rev2-20261107-codex/policy-payload.schema.json",
+      "SHA256": "02d0b30fdd79b0263cdbafc42bd2bc0531c3e0ecbd8d55cbe72e6c91dfc320a1",
+      "bytes": 33135,
+      "changed": false,
+      "rerun": false
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-p02-registry-attestation-rev2-20261107-codex/authority-scope.schema.json",
+      "SHA256": "ccae13986377c1a670323983c0c24c1d2e05cc8cdeb6b9119d4560c65c15bf21",
+      "bytes": 2791,
+      "changed": false,
+      "rerun": false
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-p02-registry-attestation-rev2-20261107-codex/schema_defs.py",
+      "SHA256": "114000ff9ef276525ca303e91621fd5ef5efd8f30e59e39dd01d6000daeec6c4",
+      "bytes": 43738,
+      "changed": false,
+      "rerun": false
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-p02-registry-attestation-rev2-20261107-codex/gate-order.json",
+      "SHA256": "0ca6d5ae572d9a00d470930194c2f92394b46e073c72df192705ac45a63bc403",
+      "bytes": 3299,
+      "changed": false,
+      "rerun": false
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-p02-registry-attestation-rev2-20261107-codex/source-continuity.json",
+      "SHA256": "0f439375c37b75678eea9fe1bd12a95496662c1a5fda24a081b252ba5e4433bf",
+      "bytes": 512,
+      "changed": false,
+      "rerun": false
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-p02-registry-attestation-rev2-20261107-codex/test-results.json",
+      "SHA256": "7d4811da1e003968151503ec6974bfc6f70ef92101950a13b798dd55a1b44f0d",
+      "bytes": 113637,
+      "changed": false,
+      "rerun": false
+    },
+    {
+      "path": "services/node-agent/internal/migrationcontext/policy.go",
+      "SHA256": "ce6f1b9b1a1835276b248c3dbdb8fa42b68fa79fb5684748ea78694d104bbdd2",
+      "bytes": 12060,
+      "changed": false,
+      "rerun": false,
+      "sourceSections": "runningData plus checkPolicyBindings :272-277 source read only"
+    }
+  ],
+  "schemaPinsChanged": 0,
+  "contracts": 28,
+  "GoTypesBaseline": "13/73 unchanged NOT_RERUN",
+  "priorOwnerRows": "Rev1 100/98 distinct; Rev2 97/97 distinct; not summed",
+  "reviewerRows": "de4 38 and973 48 not rerun",
+  "INFO": [
+    {
+      "id": "P02R2-I1",
+      "futureObligation": "Real private source types closed, signed-width integers excluding bool; no symbolic current typing closure claimed"
+    },
+    {
+      "id": "P02R2-I2",
+      "futureObligation": "H3-EA acquirer computes exact raw authenticated approval byte digest; no self-declared evidence hash trust"
+    },
+    {
+      "id": "P02R2-I3",
+      "futureObligation": "Future H3 defines authenticated sourceTree-to-complete-partition derivation; capsule decree not a computed tree proof"
+    },
+    {
+      "id": "P02R2-I4",
+      "futureObligation": "Real H4 keys every independent status by exact subject digest and current version"
+    }
+  ],
+  "RD_registration": "HOLD; recipe equality fact only, not original capture/delivery/authentication",
+  "H3_EA": "ABSENT_UNREGISTERED_HOLD",
+  "actualProducer": null,
+  "A01A40": "NOT_RUN"
+}

@@ -1,0 +1,39 @@
+diff --git "a/docs\\vault\\30_Development\\Evidence\\fleet5-k2-p02-registry-attestation-rev2-20261107-codex\\candidate_model.py" "b/docs\\vault\\30_Development\\Evidence\\fleet5-k2-p02-registry-attestation-rev3-20261107-codex\\candidate_model.py"
+index 53a65968..82bb7bba 100644
+--- "a/docs\\vault\\30_Development\\Evidence\\fleet5-k2-p02-registry-attestation-rev2-20261107-codex\\candidate_model.py"
++++ "b/docs\\vault\\30_Development\\Evidence\\fleet5-k2-p02-registry-attestation-rev3-20261107-codex\\candidate_model.py"
+@@ -1 +1 @@
+-"""UNREGISTERED Rev2 symbolic contract model, never a production authenticator.
++"""UNREGISTERED Rev3 fix-only symbolic contract model, never a production authenticator.
+@@ -179 +179 @@ def _anchor(c):
+-        'minimumRecordVersion'}
++        'minimumRecordVersion','expectedEffectiveVerdict'}
+@@ -283,0 +284,6 @@ def _reviews(c):
++    # Acceptance policy is provisioned independently, never learned from coverage.
++    expected=cap['expectedEffectiveVerdict']
++    need(type(expected) is str and 0<len(expected)<=128,'PROVENANCE','closed-independent-effective-verdict-expectation')
++    need(eff['verdict']==expected,'PROVENANCE','independently-approved-effective-verdict')
++    original_ids=set(cap['approvedReviewOutcomes'])|set(mapping)|{part['reviewSHA'] for part in parts}
++    need(eff['publicationSHA'] not in original_ids,'PROVENANCE','effective-publication-distinct-from-every-original-and-part')
+@@ -352,0 +359,15 @@ def utc_epoch(value):
++def installation_provenance_projection(approved,measured):
++    # H3 approved installation facts stay separate from H5 actual observation.
++    return dict(RuntimeLockSHA256=approved['runtimeLockSHA256'],
++        InstallationReceiptSHA256=approved['installationReceiptSHA256'],
++        LinkedClosureSHA256=approved['linkedClosureSHA256'],
++        RunningExecutableSHA256=measured['executableSHA256'])
++
++
++def running_data_projection(measured):
++    # Semantic five-field DTO only; no Go opaque value or authentication.
++    return dict(ExecutableSHA256=measured['executableSHA256'],
++        InstallationReceiptSHA256=measured['receiptSHA256'],SourceSHA=measured['sourceSHA'],
++        RuntimeLockSHA256=measured['runtimeLockSHA256'],LinkedClosureSHA256=measured['linkedClosureSHA256'])
++
++
+@@ -370 +391 @@ def _project(c):
+-        ApprovedReviewScope=cap['approvedReviewScope'],BinaryVCS=s['binaryVCSRevision'],RuntimeLockSHA256=h['runtimeLockSHA256'],
++        ApprovedReviewScope=cap['approvedReviewScope'],BinaryVCS=s['binaryVCSRevision'],
+@@ -372 +393 @@ def _project(c):
+-        ArtifactDigest=s['artifactZipSHA256'],InstallationReceiptSHA256=h['receiptSHA256'],RunningExecutableSHA256=h['executableSHA256'],LinkedClosureSHA256=h['linkedClosureSHA256'])
++        ArtifactDigest=s['artifactZipSHA256'],**installation_provenance_projection(s,h))

@@ -1,0 +1,253 @@
+from pathlib import Path
+import json,hashlib,datetime,sys,importlib.metadata,subprocess
+E=Path('docs/vault/30_Development/Evidence/fleet5-k2-p02-registry-attestation-rev3-20261107-codex');P=E.parent/'fleet5-k2-p02-registry-attestation-rev2-20261107-codex'
+now=datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=9))).isoformat()
+def write(name,v):
+ (E/name).write_text(json.dumps(v,indent=2)+'\n' if not isinstance(v,str) else v,encoding='utf-8',newline='\n')
+t=json.loads((E/'payload-contract.json').read_bytes())
+for row,counterpart,source in zip(t['runningDataProjection'],['Verifier.ArtifactSHA256','Provenance.InstallationReceiptSHA256','Verifier.SourceSHA','Provenance.RuntimeLockSHA256','Provenance.LinkedClosureSHA256'],['binarySHA256','installationReceiptSHA256','sourceSHA','runtimeLockSHA256','linkedClosureSHA256']):
+ row['unchangedK1Counterpart']=counterpart;row['counterpartIndependentOrigin']='H3 independently approved installation/source facts.'+source
+write('payload-contract.json',t)
+contract='''# P02 Rev3 bounded effective approval and two-sided projection candidate
+
+Status: UNREGISTERED_FIX_ONLY_CANDIDATE_ACTUAL_DELTA_REVIEW_PENDING.
+Root msg_0625f6605f95 authorizes only P02R2-M1 and P02R2-L1 correction on
+base58d7eb077efbcff5327ac298a39984fe1e39fdf1. Actual Claude review973b6f8c
+is REVISION_REQUIRED, with M1 MEDIUM/L1 LOW and four future INFO obligations.
+All10 original documents, all48 actual reviewer probes and all original attempts
+are archived byte-exact under review-originals; none is rerun or relabelled.
+Parent97/97 owner rows and older100/98+38 evidence remain historical, not summed.
+
+This is a narrow replacement for the effective acceptance predicates in Rev2
+section4/05_REVIEWS and the three approved Provenance origins in section5/07.
+The new payload-contract.json retains ALL12 payload fields/8digest definitions/
+41policyData leaves, corrects the three origins, and adds five runningData rows
+plus two independent expectation joins. All other parent58d model/codec/schema/
+STAGES/14private reasons/public refusal semantics remain as accepted for bounded
+design. Candidate wire format:2/domain remain UNREGISTERED and unchanged. There
+is no new wire/schema pin/contract28/type baseline or accepted key/authority.
+
+## Acceptance goal, evidence and owner
+
+Goal -> evidence -> contract -> task -> owner: prevent an authentic non-approval
+or inherited raw review from becoming effective approval; preserve approved H3
+versus measured H5 comparisons at K1. Evidence is three rebased V19/V20/V20b
+negatives with exact preceding-stage traces, a benign C01, other affected
+negative controls and isolated two-source projection mutants. Codex owns this
+fix-only design/static model; Root verifies exact commit/Docs and assigns ONE
+actual narrow Claude delta review after the existing queue. No helper/reviewer
+is launched here. No self-acceptance or D04/factory/provider/port/install/key/
+current/clock/effect grant follows from any model label or green Docs workflow.
+
+## P02R2-M1: independent acceptance and a distinct publication
+
+The CLOSED private capsule requires expectedEffectiveVerdict. Its proposed
+representation is one exact nonempty printable-ASCII string of at most128bytes,
+not a free-form result learned from coverage or a string suffix heuristic. The
+actual purpose-specific accepted outcome must be independently authorized and
+provisioned by Root custody/bootstrap under future H1/H2 policy for H3-EA.
+That real policy/value/issuer/verifier/loader is NULL/HOLD; no production default
+or accepted verdict name is invented here. Missing field refuses ANCHOR at01.
+A present malformed or mismatching expectation refuses PROVENANCE at05_REVIEWS.
+The synthetic constant EXPECTED_EFFECTIVE_VERDICT is deliberately declared
+separately from EFFECTIVE, never copied out of that untrusted/adversarial record.
+Its string alone creates no trust and no production loader exists.
+
+After independently authenticated review rows, coverage origin/purpose,
+complete authorized partition, original targets/outcomes and effective shape/
+current target pass, require effective.verdict==capsule.expectedEffectiveVerdict.
+A real H3-EA may authentically publish a non-approval; origin authentication does
+not make it acceptable. Facts/source values rebound consistently cannot change
+the independent expectation. Failure is PROVENANCE at05_REVIEWS, before any
+source/projection/K1 use.
+
+Independently require effective.publicationSHA differ from EVERY original
+reviews[].reviewSHA AND EVERY parts[].reviewSHA. The deny set is the union of
+independently provisioned capsule.approvedReviewOutcomes keys, authenticated
+original review identities, and independently authenticated/authorized coverage
+parts. Those inputs are joined BEFORE this check; the response cannot remove an
+original, relabel a target/outcome, select its own scope-to-part authorization,
+or hide an unused original by excluding it from parts. Both direct and inherited
+originals, including an independently bound unused review, are covered. Failure
+is PROVENANCE at05_REVIEWS. No new exact publication hash is invented: the actual
+effective publication must separately be authenticated by still-missing H3-EA.
+
+payload-contract.json effectiveApprovalAcceptance and fact-origins.json
+rev3PrivateExpectations define both expectation origins, failure and joins.
+effectiveReviewVerdict joins the actual H3-EA result to the independent capsule
+expectation. effectiveReviewSHA joins the distinct authenticated effective
+publication to payload.verifier.reviewSHA, approved source facts and the future
+Verifier.ReviewSHA projection. Original reviews retain their own identities,
+targets, scopes, verdicts and byte closures. No original is made to target a newer
+source, and no approval label or arbitrary signed JSON is sufficient authority.
+
+## P02R2-L1: two independent policy-versus-measurement sources
+
+Provenance.InstallationReceiptSHA256, RuntimeLockSHA256 and LinkedClosureSHA256
+now project from independently approved H3 installation facts, respectively
+installationReceiptSHA256, runtimeLockSHA256 and linkedClosureSHA256. Those are
+approved expected installation identities, never live measurements or registry
+assertions. Provenance.RunningExecutableSHA256 remains private H5.executableSHA256
+as Root required; H3-approved Verifier.ArtifactSHA256 supplies its independent
+expected counterpart. Verifier.SourceSHA similarly remains H3 approved source.
+
+The separate five-row runningData projection is EXACTLY:
+
+| Measured runningData field | Independent measured origin | Unchanged K1 expected counterpart |
+| --- | --- | --- |
+| ExecutableSHA256 | H5.executableSHA256 | Verifier.ArtifactSHA256 from H3 |
+| InstallationReceiptSHA256 | H5.receiptSHA256 | Provenance.InstallationReceiptSHA256 from H3 |
+| SourceSHA | H5.sourceSHA | Verifier.SourceSHA from H3 |
+| RuntimeLockSHA256 | H5.runtimeLockSHA256 | Provenance.RuntimeLockSHA256 from H3 |
+| LinkedClosureSHA256 | H5.linkedClosureSHA256 | Provenance.LinkedClosureSHA256 from H3 |
+
+installation_provenance_projection(approved,measured) and running_data_projection
+are pure semantic DTO helpers only. They authenticate nothing, construct no Go
+opaque value, acquire no source and cannot call K1 or authorize any action.
+The main evaluator still gates H3/H5 equality at05_RUNNING before projection.
+The future assembly must freeze each independent source and perform unchanged
+checkPolicyBindings(policyData,runningData) BEFORE the future K1 constructor.
+Its immutable base58d source is services/node-agent/internal/migrationcontext/
+policy.go:272-277. Source/hash inspection is not Go execution or a new census.
+
+Tests perturb approved H3 and measured H5 independently. Full evaluator cases
+refuse INSTALLATION at05_RUNNING after exact earlier-stage prefix. Isolated DTO
+mutation checks demonstrate that unchanged K1's final comparison would detect
+each mismatched side; a deliberately regressed H5-to-both-sides mutant would pass
+that LAST comparison, proving why the two sources matter. Isolated mismatched
+DTOs are never called accepted policies or full K1/authentication evidence.
+Receipt/lock/link policy origins are H3; actual running values remain H5. The
+registry runningMeasurementSHA256 echo retains ZERO authentication weight.
+
+## Preserved holds and actual bounded evidence
+
+Final targeted run:15 evaluator rows/15distinct complete input tuples,1symbolic
+benign control/14refusals/0failures. Eight isolated projection/mutant checks are
+reported SEPARATELY, not added to evaluator or runtime case counts. Each targeted
+input is a valid retained-format canonical envelope/payload with already-bound
+digest/signature hypotheses. Tests fingerprint all bytes/types/private bound
+inputs, exclude case IDs/expected outcomes, reject duplicates and assert exact
+STAGES prefixes. No old-format/FORMAT rejection counts as M1 closure.
+Every production projection STILL refuses, including C01.
+
+Actual H1-H7 and expectedEffectiveVerdict authority/value remain NULL/HOLD.
+H3-EA root-effective-source-approval-candidate:1 is ABSENT/UNREGISTERED/HOLD.
+RD-P02-R2-REGISTRATION-BYTES remains HOLD: LF-to-CRLF equality is only a public
+byte-reconstruction fact, not original artifact delivery/capture, registration
+origin authentication, or normalization permission. No old raw pin changes.
+Raw7 stays UNREGISTERED and A01-A40 remain NOT_RUN. No real Ed25519/X509/provider/
+OS/clock/running process trust is executed; all private fixture inputs are
+SYNTHETIC_ALREADY_BOUND hypotheses with deliberately invalid cryptographic DER.
+All source/runtime/physical/issuer/owner-key readiness and whole-K2/FIVE acceptance
+remain outside this bounded correction and incomplete.
+
+INFO P02R2-I1..I4 remain explicit future producer work, not silently fixed or
+promoted: closed private source types/signed-width integers excluding bool; raw
+H3-EA evidence digest recomputed over authenticated bytes; authenticated source
+Tree-to-complete-partition derivation; H4 statuses keyed by exact subject digest.
+source-continuity-and-open-obligations.json retains their attribution.
+No unaffected full model suite/Core/Go/census/contract tests or CI is rerun.
+
+Normal own commit/push and ONE exact Docs are required after local docs gates.
+Official sync is CHECK only against Root's canonical --state path, with immediate
+before/after state hashes unchanged; no apply/adopt/resolve or global state write.
+Source=final/actualCI binding is recorded externally after freezing, avoiding
+self-referential report commits. Root's first next action is exact evidence/CI
+verification and ONE queued actual Claude delta check of M1/L1 only. Only Root
+may separately grant a later smallest D04 pure seam; no such grant exists now.
+'''
+write('contract.md',contract)
+review=dict(classification='OWNER_REV3_RESPONSE_ACTUAL_NARROW_REVIEW_PENDING',actualReview='973b6f8cca4c4a2f3dee698d52b93230ae2e8e4a',base='58d7eb077efbcff5327ac298a39984fe1e39fdf1',owner='Codex',reviewer='Actual independent Claude through Root pending',responses=[dict(id='P02R2-M1',change='Required independent exact expectedEffectiveVerdict; PROVENANCE05_REVIEWS on mismatch; effective publication distinct from every independently bound original/part identity',evidence='M01/V19,M02/V20,M03/V20b plus M04 unused original,M05-M08 expectation controls; exact prior prefixes; C01'),dict(id='P02R2-L1',change='Three approved provenance identities H3; RunningExecutable H5 retained; explicit five-row H5 runningData with independent K1 counterparts',evidence='H3/H5 receipt-lock-link evaluator negatives, eight isolated projection/mutant checks; immutable K1 source retained')],futureINFO='P02R2-I1..I4 remain future producer obligations',allOtherClosure='Retained, not rerun',actualBindings='NULL_HOLD',H3_EA='ABSENT_UNREGISTERED_HOLD',RD_registration='HOLD_FACT_ONLY')
+write('review-response.json',review)
+# Reuse only the required docs gate harness, point it at this scope and exact base.
+s=(P/'run_required_gates.py.txt').read_text(encoding='utf-8').replace('fleet5-k2-p02-registry-attestation-rev2-20261107-codex','fleet5-k2-p02-registry-attestation-rev3-20261107-codex').replace('.work/p02-rev2-gate-raw','.work/p02-rev3-gate-raw').replace('78468d0aec295c712dd1ea33bea1401d1d4939a4','58d7eb077efbcff5327ac298a39984fe1e39fdf1').replace('REQUIRED_DOCS_GATES_REV2_CANDIDATE_ONLY','REQUIRED_DOCS_GATES_REV3_FIX_ONLY_CANDIDATE')
+Path('.work/run_rev3_gates.py').write_text(s,encoding='utf-8',newline='\n');write('run_required_gates.py.txt',s)
+write('build_rev3.py.txt',Path('.work/build_rev3.py').read_text(encoding='utf-8-sig'))
+tr=json.loads((E/'test-results.json').read_bytes());assert tr['executedRows']==tr['distinctCompleteInputTuples']==15 and tr['failures']==0
+pins=[dict(file=x,bytes=(E/x).stat().st_size,SHA256=hashlib.sha256((E/x).read_bytes()).hexdigest()) for x in ('candidate_model.py','fixture_data.py','test_rev3.py','contract.md','payload-contract.json','fact-origins.json','review-response.json','test-results.json')]
+write('local-execution-and-pins.json',dict(classification='REV3_FIX_ONLY_STATIC_EXECUTION_NOT_PRODUCER_AUTHENTICATION',task='task_a95ef3d8ccce',dispatch='ctx_ed23b4a777d0',grant='msg_0625f6605f95',base='58d7eb077efbcff5327ac298a39984fe1e39fdf1',branch='agent/codex/fleet5-k2-p02-registry-rev3-20261107',owner='Codex',reviewer='Actual narrow Claude delta through Root pending',skills=dict(agentDelivery='1.1.0',coreReliability='1.0.0',orca='1.4.248'),model='Codex exact runtime model ID not exposed/not invented',Python=sys.version,executable=sys.executable,jsonschema=importlib.metadata.version('jsonschema'),newDependencies=False,commands=[dict(argv=[sys.executable,'-I','-B','.work/build_rev3.py'],exit=0),dict(argv=[sys.executable,'-I','-B',str(E/'test_rev3.py')],exit=0,attempt=2)],executedRows=15,distinctCompleteInputs=15,controls=1,refusals=14,isolatedProjectionChecks=8,pins=pins,actualProducer=None,actualBindings='NULL_HOLD',A01A40='NOT_RUN',ownExactDocs='AUTHORIZED_PENDING_AFTER_COMMIT',sourceFinal='SAME_FUTURE_HEAD_EXTERNAL_API_BINDING',KST=now))
+write('preparation-and-scope.json',dict(classification='READONLY_PUBLIC_SOURCE_PREPARATION',base='58d7eb077efbcff5327ac298a39984fe1e39fdf1',managedWorktree='wt2:local:9f400b32-325b-42ba-b0f9-d3697925ff5b',parent='wt2:local:6679e4fd-6de8-45a4-9d0d-4e2f2c474b01',rootCanonicalRead=dict(HEAD='138534a667d344dec579e816a3e13bc190852a11',Index='1.0.472',Codex='1.0.433'),sourceLookupFailure=dict(command='Get-Content services/node-agent/migrationverify/policy.go',exit=1,cause='Incorrect public source path',correction='rg --files policy.go resolved actual internal/migrationcontext/policy.go; no gate/test failure'),originalReviewReadEncodingFailure='Recorded in review-input-manifest.json; raw original bytes unchanged',noHelpers=True,noReinitialization=True,productDelta=0,noActualPrivateOrRuntimeReads=True))
+h=Path('docs/vault/30_Development/History/2026-11-07_FLEET5_K2_P02_registry_attestation_Rev3_Codex.md')
+history=f'''---
+doc_id: "HISTORY-FLEET5-20261107-K2-P02-REGISTRY-REV3-CODEX"
+title: "FLEET5 P02 Rev3 effective approval and two-sided projection correction"
+version: "1.0.0"
+status: "review"
+author: "Codex"
+reviewer: "Actual independent narrow Claude delta through Root pending"
+updated: "{now}"
+timezone: "Asia/Seoul"
+source_of_truth: "Git"
+base_sha: "58d7eb077efbcff5327ac298a39984fe1e39fdf1"
+task_ids: ["FLEET5-K2-P02-REGISTRY-REV3-20261107"]
+tags: ["fleet5", "codex", "p02", "rev3", "fix-only", "candidate"]
+---
+
+SAME Task task_a95ef3d8ccce / Dispatch ctx_ed23b4a777d0. Root actual grant
+msg_0625f6605f95 requests only P02R2-M1 MEDIUM and P02R2-L1 LOW corrections.
+Owner Codex, actual independent Claude review via Root pending. Canonical Root
+138534a667d344dec579e816a3e13bc190852a11 read Index1.0.472/Codex1.0.433;
+AGENTS/required plans and agent-delivery1.1.0/core-reliability1.0.0/Orca1.4.248
+continue to apply. Prompt/Context = this actual grant and actual973 review;
+Harness = own test_rev3.py; ROOF/graph/28contracts unchanged, no authority repin.
+Exact runtime model ID is not exposed and is not invented.
+
+Orca-managed worktree fleet5-k2-p02-registry-rev3-20261107, identity
+wt2:local:9f400b32-325b-42ba-b0f9-d3697925ff5b, own branch
+agent/codex/fleet5-k2-p02-registry-rev3-20261107 from exact58d7eb07.
+Setup skipped, no helper/agent launch, raw worktree or repository reinitialization.
+Only this unique History/Evidence fleet5-k2-p02-registry-attestation-rev3-20261107-codex
+may change. All previous source/refs/files/modes/pins/attempts stay frozen.
+
+Read actual973b6f8cca4c4a2f3dee698d52b93230ae2e8e4a review.json and complete
+probe/gate drivers before changes; copied all10 actual review docs byte-exact,
+including48 probes and original logs/attempts. Root verified its exact
+Docs42267816794/job128064233136/all19SUCCESS; not re-queried/rerun here.
+No author/reviewer attribution is exchanged. Actual before-counterexamples
+V19/V20/V20b are retained original evidence, not repeated as our execution.
+Read/display stdout encoding and one public source-path lookup failure are
+preserved in review-input-manifest/preparation-and-scope; no gate/test failure
+is hidden or silently retried.
+
+Goal -> evidence -> contract -> task -> owner: prevent authenticated nonapproval
+or old raw review identities from becoming effective approval and keep H3
+approved installation provenance distinct from H5 measured runningData. Codex
+adds an independent CLOSED capsule expectedEffectiveVerdict, an exact verdict
+acceptance predicate, and effective-publication distinctness from EVERY original
+and part review identity at05_REVIEWS/PROVENANCE. No original review target,
+identity/scope/verdict changes. Actual expectation/custody/producer stays NULL.
+Three approved receipt/runtimeLock/linkedClosure Provenance origins now come
+from H3; RunningExecutable remains H5. Five-row measured runningData originates
+only in H5 and unchanged K1 still compares it to H3 expectations.
+
+Actual targeted local run exit0:15rows/15distinct complete inputs,1symbolic benign
+control/14refusals/0failures; eight isolated projection/mutant checks separate,
+not runtime/extra evaluator cases. V19/V20/V20b equivalents are new valid already
+bound inputs, all earlier stages pass exactly before05_REVIEWS. Six receipt/
+lock/link negatives perturb both sources separately and retain05_RUNNING refusal.
+Production projection always refuses, including benign C01. Existing97/97,
+100/98 and actual48/38 historical probes are preserved, not summed or rerun.
+Exact commands/environment/model/table hashes: local-execution-and-pins.json.
+
+Actual H1-H7 and H3-EA ABSENT/UNREGISTERED/HOLD remain; RD registration-byte
+recipe is fact-only and HOLD for actual delivery/authentication. INFO I1-I4 stay
+future producer obligations. Raw7 UNREGISTERED, A01-A40 NOT_RUN, whole K2/FIVE
+incomplete. No product/Go/source-schema/workflow/dependency/board/registry/
+Obsidian-apply/private/PKI/key/CA/SSH/Docker/DB/Engine/host/clock/schedule action.
+No unaffected full suite/Core/Go/census/contract or accepted CI/proof rerun.
+
+Required local docs gates record each exit; official sync CHECK uses exact
+canonical --state with immediate before/after SHA unchanged, never apply/adopt/
+resolve/global write. After all pass: normal source=final commit/push and ONE
+exact Docs; actual head/ref/event/path/attempt/correlation/allsteps are recorded
+externally after freezing to avoid self-referential report commits.
+
+First next action/owner: Root verifies exact source/final/base/ref/manifest/raw
+review originals/actual CI, then queues ONE actual narrow Claude delta check
+for M1/L1 after the existing queue. Only Root may separately grant a later
+smallest D04 pure seam. This delivery is not whole-K2 worker_done, code grant,
+self-acceptance or any physical five-PC acceptance.
+'''
+h.write_text(history,encoding='utf-8',newline='\n')
+write('build_rev3_docs.py.txt',Path('.work/build_rev3_docs.py').read_text(encoding='utf-8-sig'))
+print(json.dumps(dict(documentsPrepared=True,modelSHA=pins[0]['SHA256'],testsSHA=pins[2]['SHA256'],KST=now)))

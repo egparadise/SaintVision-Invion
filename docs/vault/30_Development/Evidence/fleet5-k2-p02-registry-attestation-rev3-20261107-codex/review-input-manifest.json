@@ -1,0 +1,131 @@
+{
+  "classification": "ACTUAL_REV2_INDEPENDENT_REVIEW_ORIGINALS_NOT_RERUN",
+  "review": "973b6f8cca4c4a2f3dee698d52b93230ae2e8e4a",
+  "reviewer": "Claude Opus5.5 via Root",
+  "target": "58d7eb077efbcff5327ac298a39984fe1e39fdf1",
+  "base": "78468d0aec295c712dd1ea33bea1401d1d4939a4",
+  "verdict": "REVISION_REQUIRED",
+  "findingIDs": [
+    "P02R2-M1",
+    "P02R2-L1"
+  ],
+  "reviewerRows": 48,
+  "ownerRev2Rows": 97,
+  "ownerRev2Distinct": 97,
+  "files": [
+    {
+      "source": "973b6f8cca4c4a2f3dee698d52b93230ae2e8e4a",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-p02-r2-58d-review-20261107-claude/.gitattributes",
+      "objectID": "bb2789ad98e51258a73e184a7a912ab02c6a83c0",
+      "copiedAs": "review-originals/00-.gitattributes.raw",
+      "bytes": 21,
+      "SHA256": "96a83569c84cfe3f57b7efe3dc61c249548d0fca4fed0e538b3587cdc97c95c1",
+      "copyByteExact": true,
+      "executed": false
+    },
+    {
+      "source": "973b6f8cca4c4a2f3dee698d52b93230ae2e8e4a",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-p02-r2-58d-review-20261107-claude/canonical-sync-check-before.txt",
+      "objectID": "55a5284ee5df63fdfa4f9904fa8210923315428e",
+      "copiedAs": "review-originals/01-canonical-sync-check-before.txt.raw",
+      "bytes": 880,
+      "SHA256": "78e660ff935ec398b0d8077c3ea75e4df96f01c0f89813ac33e37be50938fa2c",
+      "copyByteExact": true,
+      "executed": false
+    },
+    {
+      "source": "973b6f8cca4c4a2f3dee698d52b93230ae2e8e4a",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-p02-r2-58d-review-20261107-claude/commands.json",
+      "objectID": "a6d52f6bb8656d8796dd53c65c2f83f951bc5426",
+      "copiedAs": "review-originals/02-commands.json.raw",
+      "bytes": 4653,
+      "SHA256": "dda06d235c836f94f117e476efba8266ce2cb04b5906c5c912ba804ce525a8c0",
+      "copyByteExact": true,
+      "executed": false
+    },
+    {
+      "source": "973b6f8cca4c4a2f3dee698d52b93230ae2e8e4a",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-p02-r2-58d-review-20261107-claude/local-doc-gates.txt",
+      "objectID": "411c460425f578bf61474c4d136f4c34f7f38e94",
+      "copiedAs": "review-originals/03-local-doc-gates.txt.raw",
+      "bytes": 3496,
+      "SHA256": "a78dac9606d030edca1683ab997d505c034bcc2d1f3d96fba0f08eb6a090c573",
+      "copyByteExact": true,
+      "executed": false
+    },
+    {
+      "source": "973b6f8cca4c4a2f3dee698d52b93230ae2e8e4a",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-p02-r2-58d-review-20261107-claude/review.json",
+      "objectID": "1cd7fb947641cbec5e43690cbbc74fcc0f816fb6",
+      "copiedAs": "review-originals/04-review.json.raw",
+      "bytes": 17805,
+      "SHA256": "a985c26bee4a285bc0c7196dfba9758d5556c65f6aff323a76fa31c0d7c36f13",
+      "copyByteExact": true,
+      "executed": false
+    },
+    {
+      "source": "973b6f8cca4c4a2f3dee698d52b93230ae2e8e4a",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-p02-r2-58d-review-20261107-claude/reviewer-p02r2-probes-result.json",
+      "objectID": "7b3b5c7b4ce4cad137c0e8620241e7255fbcbf99",
+      "copiedAs": "review-originals/05-reviewer-p02r2-probes-result.json.raw",
+      "bytes": 29484,
+      "SHA256": "3a0aee0be3622c0723267ca43a23758a37cf26036dc728275d16700159f76886",
+      "copyByteExact": true,
+      "executed": false
+    },
+    {
+      "source": "973b6f8cca4c4a2f3dee698d52b93230ae2e8e4a",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-p02-r2-58d-review-20261107-claude/reviewer-p02r2-probes.log.txt",
+      "objectID": "319eb778b31da53315cc5e79be03ba6be17e9281",
+      "copiedAs": "review-originals/06-reviewer-p02r2-probes.log.txt.raw",
+      "bytes": 3258,
+      "SHA256": "69234bf2269b90a71feab5c688c3b3e924de190d634dc4861f7cf2cc17cf059a",
+      "copyByteExact": true,
+      "executed": false
+    },
+    {
+      "source": "973b6f8cca4c4a2f3dee698d52b93230ae2e8e4a",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-p02-r2-58d-review-20261107-claude/reviewer_gate_driver.py.txt",
+      "objectID": "ac4a7cb332b305aca00155059bdc9ee7cdd50ba4",
+      "copiedAs": "review-originals/07-reviewer_gate_driver.py.txt.raw",
+      "bytes": 2355,
+      "SHA256": "b3dd3ed21c8fd8f323be0ffecf6abeba58a6b13efb64b0fd9b41cf1a345795c4",
+      "copyByteExact": true,
+      "executed": false
+    },
+    {
+      "source": "973b6f8cca4c4a2f3dee698d52b93230ae2e8e4a",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-p02-r2-58d-review-20261107-claude/reviewer_p02r2_probes.py.txt",
+      "objectID": "1a32c475ecac6414fbe58e1ffcdce23ca0a0ce08",
+      "copiedAs": "review-originals/08-reviewer_p02r2_probes.py.txt.raw",
+      "bytes": 27725,
+      "SHA256": "0a86365a0406f5576dc4db62ef83c3676f21239ccacb4630910f097ed8903378",
+      "copyByteExact": true,
+      "executed": false
+    },
+    {
+      "source": "973b6f8cca4c4a2f3dee698d52b93230ae2e8e4a",
+      "path": "docs/vault/30_Development/History/2026-11-07_03-05-00_KST_FLEET5_K2_P02_Rev2_58d_\uacc4\uc57d\ud6c4\ubcf4_\ub378\ud0c0\ub3c5\ub9bd\uac80\ud1a0_Claude.md",
+      "objectID": "deb1b8e288debff8ba28be0b007dec508f611e50",
+      "copiedAs": "review-originals/09-2026-11-07_03-05-00_KST_FLEET5_K2_P02_Rev2_58d_\uacc4\uc57d\ud6c4\ubcf4_\ub378\ud0c0\ub3c5\ub9bd\uac80\ud1a0_Claude.md.raw",
+      "bytes": 6545,
+      "SHA256": "4a394105c1080978c95a9d9ec1d0bba17460052b6f05d7cfed418f9a71fb66ba",
+      "copyByteExact": true,
+      "executed": false
+    }
+  ],
+  "readBeforeDesign": true,
+  "sourceFetch": "Exact public SHA fetched --no-write-fetch-head --no-tags after local bad-object lookup; no ref advanced",
+  "authoringReadFailure": {
+    "exit": 1,
+    "cause": "stdout cp949 cannot encode U2028 in actual probe text",
+    "correction": "Display ASCII escaped original bytes without modifying raw originals; no gate/test retry"
+  },
+  "rootVerifiedDocs": {
+    "run": 42267816794,
+    "job": 128064233136,
+    "all19Success": true,
+    "notRequeried": true
+  },
+  "KST": "2026-11-07T03:13:35.156154+09:00"
+}

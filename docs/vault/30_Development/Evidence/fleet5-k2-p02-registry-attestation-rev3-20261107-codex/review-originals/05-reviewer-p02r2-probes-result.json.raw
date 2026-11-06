@@ -1,0 +1,1058 @@
+{
+  "classification": "REVIEWER_SYMBOLIC_DELTA_PROBES_NO_CRYPTO_NO_PROVIDER_NO_RUNTIME",
+  "target": "58d7eb077efbcff5327ac298a39984fe1e39fdf1",
+  "pinnedInputs": {
+    "candidate_model.py": "e816e1f53803904d717df1fe247d75198e8ee6c2f94cf531cba238b48d868d9e",
+    "candidate-envelope.schema.json": "60d6c825d26e3c72f4c367e92200e0bc14c83642764c0dc27ec4d7c74a43d74c",
+    "policy-payload.schema.json": "02d0b30fdd79b0263cdbafc42bd2bc0531c3e0ecbd8d55cbe72e6c91dfc320a1",
+    "authority-scope.schema.json": "ccae13986377c1a670323983c0c24c1d2e05cc8cdeb6b9119d4560c65c15bf21"
+  },
+  "probes": 48,
+  "findingsWhereObservedDiffers": [
+    "V19",
+    "V20",
+    "V20b",
+    "V24",
+    "V25",
+    "V42",
+    "V43"
+  ],
+  "rows": [
+    {
+      "id": "V01",
+      "area": "control",
+      "contractExpects": "SYNTHETIC_ALREADY_BOUND",
+      "observed": "SYNTHETIC_ALREADY_BOUND",
+      "detail": "",
+      "alreadyBoundPreconditions": {
+        "envelopeSchemaValid": true,
+        "newFormat": true,
+        "payloadDigestBound": true,
+        "signatureTupleBound": true
+      },
+      "preconditionsOK": true,
+      "earlierStagesExactPrefix": true,
+      "finding": false,
+      "note": "owner fixture re-evaluated on reviewer copy; all 20 STAGES passed"
+    },
+    {
+      "id": "V02",
+      "area": "projection-41",
+      "contractExpects": [
+        41,
+        15,
+        true,
+        true
+      ],
+      "observed": [
+        41,
+        15,
+        true,
+        true
+      ],
+      "detail": null,
+      "alreadyBoundPreconditions": null,
+      "preconditionsOK": null,
+      "earlierStagesExactPrefix": null,
+      "finding": false,
+      "note": "model DTO leaves == c76 policy.go:43-61 policyData/provenance leaves (41, 15 provenance) == payload-contract.json policyProjection fields"
+    },
+    {
+      "id": "V03",
+      "area": "derived-8",
+      "contractExpects": [
+        8,
+        true,
+        true
+      ],
+      "observed": [
+        8,
+        true,
+        true
+      ],
+      "detail": null,
+      "alreadyBoundPreconditions": null,
+      "preconditionsOK": null,
+      "earlierStagesExactPrefix": null,
+      "finding": false,
+      "note": "reviewer-own C2 (Go Marshal HTML escaping) and raw-byte digests for all 8 payload-derived facts; cohort == body.scopeSHA256; COMPONENT scope C2 carries \\u0026 not raw &"
+    },
+    {
+      "id": "V04",
+      "area": "M1a-payload-codec",
+      "contractExpects": [
+        "FORMAT",
+        "03_PAYLOAD"
+      ],
+      "observed": [
+        "FORMAT",
+        "03_PAYLOAD"
+      ],
+      "detail": "closed-input-shape",
+      "alreadyBoundPreconditions": {
+        "envelopeSchemaValid": true,
+        "newFormat": true,
+        "payloadDigestBound": true,
+        "signatureTupleBound": true
+      },
+      "preconditionsOK": true,
+      "earlierStagesExactPrefix": true,
+      "finding": false,
+      "note": "unicode-escape alias inside payload"
+    },
+    {
+      "id": "V05",
+      "area": "M1a-payload-codec",
+      "contractExpects": [
+        "FORMAT",
+        "03_PAYLOAD"
+      ],
+      "observed": [
+        "FORMAT",
+        "03_PAYLOAD"
+      ],
+      "detail": "closed-input-shape",
+      "alreadyBoundPreconditions": {
+        "envelopeSchemaValid": true,
+        "newFormat": true,
+        "payloadDigestBound": true,
+        "signatureTupleBound": true
+      },
+      "preconditionsOK": true,
+      "earlierStagesExactPrefix": true,
+      "finding": false,
+      "note": "exponent integer alias"
+    },
+    {
+      "id": "V06",
+      "area": "M1a-payload-codec",
+      "contractExpects": [
+        "FORMAT",
+        "03_PAYLOAD"
+      ],
+      "observed": [
+        "FORMAT",
+        "03_PAYLOAD"
+      ],
+      "detail": "closed-input-shape",
+      "alreadyBoundPreconditions": {
+        "envelopeSchemaValid": true,
+        "newFormat": true,
+        "payloadDigestBound": true,
+        "signatureTupleBound": true
+      },
+      "preconditionsOK": true,
+      "earlierStagesExactPrefix": true,
+      "finding": false,
+      "note": "-0 integer"
+    },
+    {
+      "id": "V07",
+      "area": "M1a-payload-codec",
+      "contractExpects": [
+        "FORMAT",
+        "03_PAYLOAD"
+      ],
+      "observed": [
+        "FORMAT",
+        "03_PAYLOAD"
+      ],
+      "detail": "closed-input-shape",
+      "alreadyBoundPreconditions": {
+        "envelopeSchemaValid": true,
+        "newFormat": true,
+        "payloadDigestBound": true,
+        "signatureTupleBound": true
+      },
+      "preconditionsOK": true,
+      "earlierStagesExactPrefix": true,
+      "finding": false,
+      "note": "UTF-8 BOM"
+    },
+    {
+      "id": "V08",
+      "area": "M1a-payload-codec",
+      "contractExpects": [
+        "FORMAT",
+        "03_PAYLOAD"
+      ],
+      "observed": [
+        "FORMAT",
+        "03_PAYLOAD"
+      ],
+      "detail": "closed-policy-schema",
+      "alreadyBoundPreconditions": {
+        "envelopeSchemaValid": true,
+        "newFormat": true,
+        "payloadDigestBound": true,
+        "signatureTupleBound": true
+      },
+      "preconditionsOK": true,
+      "earlierStagesExactPrefix": true,
+      "finding": false,
+      "note": "unknown self-asserted current-status member"
+    },
+    {
+      "id": "V09",
+      "area": "M1a-payload-codec",
+      "contractExpects": [
+        "FORMAT",
+        "03_PAYLOAD"
+      ],
+      "observed": [
+        "FORMAT",
+        "03_PAYLOAD"
+      ],
+      "detail": "closed-policy-schema",
+      "alreadyBoundPreconditions": {
+        "envelopeSchemaValid": true,
+        "newFormat": true,
+        "payloadDigestBound": true,
+        "signatureTupleBound": true
+      },
+      "preconditionsOK": true,
+      "earlierStagesExactPrefix": true,
+      "finding": false,
+      "note": "partial semanticPins (5 of closed 6)"
+    },
+    {
+      "id": "V10",
+      "area": "M1a-payload-codec",
+      "contractExpects": [
+        "FORMAT",
+        "03_PAYLOAD"
+      ],
+      "observed": [
+        "FORMAT",
+        "03_PAYLOAD"
+      ],
+      "detail": "closed-input-shape",
+      "alreadyBoundPreconditions": {
+        "envelopeSchemaValid": true,
+        "newFormat": true,
+        "payloadDigestBound": true,
+        "signatureTupleBound": true
+      },
+      "preconditionsOK": true,
+      "earlierStagesExactPrefix": true,
+      "finding": false,
+      "note": "non-ASCII payload string"
+    },
+    {
+      "id": "V11",
+      "area": "M1a-C2",
+      "contractExpects": [
+        "FORMAT",
+        "03_C2"
+      ],
+      "observed": [
+        "FORMAT",
+        "03_C2"
+      ],
+      "detail": "closed-input-shape",
+      "alreadyBoundPreconditions": {
+        "envelopeSchemaValid": true,
+        "newFormat": true,
+        "payloadDigestBound": true,
+        "signatureTupleBound": true
+      },
+      "preconditionsOK": true,
+      "earlierStagesExactPrefix": true,
+      "finding": false,
+      "note": "C2 scope with unsorted keys"
+    },
+    {
+      "id": "V12",
+      "area": "M1a-C2",
+      "contractExpects": [
+        "FORMAT",
+        "03_C2"
+      ],
+      "observed": [
+        "FORMAT",
+        "03_C2"
+      ],
+      "detail": "closed-input-shape",
+      "alreadyBoundPreconditions": {
+        "envelopeSchemaValid": true,
+        "newFormat": true,
+        "payloadDigestBound": true,
+        "signatureTupleBound": true
+      },
+      "preconditionsOK": true,
+      "earlierStagesExactPrefix": true,
+      "finding": false,
+      "note": "C2 scope with lone surrogate escape"
+    },
+    {
+      "id": "V13",
+      "area": "M1a-C2",
+      "contractExpects": [
+        "FORMAT",
+        "03_PAYLOAD"
+      ],
+      "observed": [
+        "FORMAT",
+        "03_PAYLOAD"
+      ],
+      "detail": "closed-policy-schema",
+      "alreadyBoundPreconditions": {
+        "envelopeSchemaValid": true,
+        "newFormat": true,
+        "payloadDigestBound": true,
+        "signatureTupleBound": true
+      },
+      "preconditionsOK": true,
+      "earlierStagesExactPrefix": true,
+      "finding": false,
+      "note": "uppercase C2 hex (schema full-match refuses)"
+    },
+    {
+      "id": "V14",
+      "area": "M1b-join-independent",
+      "contractExpects": "REFUSE",
+      "observed": [
+        "PROVENANCE",
+        "05_REVIEWS"
+      ],
+      "detail": "coverage-current-source-and-original-set",
+      "alreadyBoundPreconditions": {
+        "envelopeSchemaValid": true,
+        "newFormat": true,
+        "payloadDigestBound": true,
+        "signatureTupleBound": true
+      },
+      "preconditionsOK": true,
+      "earlierStagesExactPrefix": true,
+      "finding": false,
+      "note": "payload.verifier.sourceSHA and facts.sourceSHA changed TOGETHER (record self-consistent); independent coverage/source keep old source"
+    },
+    {
+      "id": "V15",
+      "area": "M1b-version",
+      "contractExpects": [
+        "VERSION",
+        "06_VERSION"
+      ],
+      "observed": [
+        "VERSION",
+        "06_VERSION"
+      ],
+      "detail": "current-stable-record-and-protected-floor",
+      "alreadyBoundPreconditions": {
+        "envelopeSchemaValid": true,
+        "newFormat": true,
+        "payloadDigestBound": true,
+        "signatureTupleBound": true
+      },
+      "preconditionsOK": true,
+      "earlierStagesExactPrefix": true,
+      "finding": false,
+      "note": "payload.version and body.recordVersion self-consistently 8; independent lifecycle current/ticket still 7 -> payload cannot set expected version"
+    },
+    {
+      "id": "V16",
+      "area": "M1b-CI",
+      "contractExpects": [
+        "CI",
+        "05_CI"
+      ],
+      "observed": [
+        "CI",
+        "05_CI"
+      ],
+      "detail": "independently-acquired-CI-records",
+      "alreadyBoundPreconditions": {
+        "envelopeSchemaValid": true,
+        "newFormat": true,
+        "payloadDigestBound": true,
+        "signatureTupleBound": true
+      },
+      "preconditionsOK": true,
+      "earlierStagesExactPrefix": true,
+      "finding": false,
+      "note": "extra green run added consistently to ciRuns and payload ciRunIDs; independent CI acquisition unchanged"
+    },
+    {
+      "id": "V17",
+      "area": "M1b-join-independent",
+      "contractExpects": [
+        "PROVENANCE",
+        "05_SOURCE"
+      ],
+      "observed": [
+        "PROVENANCE",
+        "05_SOURCE"
+      ],
+      "detail": "independent-source-acquisition-facts",
+      "alreadyBoundPreconditions": {
+        "envelopeSchemaValid": true,
+        "newFormat": true,
+        "payloadDigestBound": true,
+        "signatureTupleBound": true
+      },
+      "preconditionsOK": true,
+      "earlierStagesExactPrefix": true,
+      "finding": false,
+      "note": "payload executable digest + facts.binarySHA256 changed together; independent H3 source still old"
+    },
+    {
+      "id": "V18",
+      "area": "M1c-cohort",
+      "contractExpects": [
+        "PROVENANCE",
+        "05_COMPONENTS"
+      ],
+      "observed": [
+        "PROVENANCE",
+        "05_COMPONENTS"
+      ],
+      "detail": "derived-cohort-to-independent-scope",
+      "alreadyBoundPreconditions": {
+        "envelopeSchemaValid": true,
+        "newFormat": true,
+        "payloadDigestBound": true,
+        "signatureTupleBound": true
+      },
+      "preconditionsOK": true,
+      "earlierStagesExactPrefix": true,
+      "finding": false,
+      "note": "member scopes swapped with every derived fact rebound in record AND source; cohort digest != independent capsule/body scope"
+    },
+    {
+      "id": "V19",
+      "area": "L1-effective-verdict",
+      "contractExpects": [
+        "PROVENANCE",
+        "05_REVIEWS"
+      ],
+      "observed": "SYNTHETIC_ALREADY_BOUND",
+      "detail": "",
+      "alreadyBoundPreconditions": {
+        "envelopeSchemaValid": true,
+        "newFormat": true,
+        "payloadDigestBound": true,
+        "signatureTupleBound": true
+      },
+      "preconditionsOK": true,
+      "earlierStagesExactPrefix": true,
+      "finding": true,
+      "note": "independently bound H3-EA statement whose effective verdict is NOT an approval; capsule has no expected effective verdict and _reviews never tests eff.verdict (candidate_model.py:282-286)"
+    },
+    {
+      "id": "V20",
+      "area": "L1-effective-distinct",
+      "contractExpects": [
+        "PROVENANCE",
+        "05_REVIEWS"
+      ],
+      "observed": "SYNTHETIC_ALREADY_BOUND",
+      "detail": "",
+      "alreadyBoundPreconditions": {
+        "envelopeSchemaValid": true,
+        "newFormat": true,
+        "payloadDigestBound": true,
+        "signatureTupleBound": true
+      },
+      "preconditionsOK": true,
+      "earlierStagesExactPrefix": true,
+      "finding": true,
+      "note": "effective publication relabelled as an ORIGINAL review SHA (contract.md:173 says a DIFFERENT publication); model has no distinctness gate"
+    },
+    {
+      "id": "V20b",
+      "area": "L1-effective-distinct",
+      "contractExpects": [
+        "PROVENANCE",
+        "05_REVIEWS"
+      ],
+      "observed": "SYNTHETIC_ALREADY_BOUND",
+      "detail": "",
+      "alreadyBoundPreconditions": {
+        "envelopeSchemaValid": true,
+        "newFormat": true,
+        "payloadDigestBound": true,
+        "signatureTupleBound": true
+      },
+      "preconditionsOK": true,
+      "earlierStagesExactPrefix": true,
+      "finding": true,
+      "note": "INHERITED original review 1 (target a1a1a1a1.. != current source) relabelled as effective publication",
+      "projectedRelabel": {
+        "VerifierReviewSHA": "a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2",
+        "ProvenanceReviewTargetSHA": "b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1",
+        "originalTargetOfThatReview": "a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1"
+      }
+    },
+    {
+      "id": "V21",
+      "area": "L1-origin",
+      "contractExpects": [
+        "PROVENANCE",
+        "05_REVIEWS"
+      ],
+      "observed": [
+        "PROVENANCE",
+        "05_REVIEWS"
+      ],
+      "detail": "independent-effective-approval-purpose-origin",
+      "alreadyBoundPreconditions": {
+        "envelopeSchemaValid": true,
+        "newFormat": true,
+        "payloadDigestBound": true,
+        "signatureTupleBound": true
+      },
+      "preconditionsOK": true,
+      "earlierStagesExactPrefix": true,
+      "finding": false,
+      "note": "coverage authority not the capsule rootApprovalIdentity"
+    },
+    {
+      "id": "V22",
+      "area": "L1-partition",
+      "contractExpects": [
+        "PROVENANCE",
+        "05_REVIEWS"
+      ],
+      "observed": [
+        "PROVENANCE",
+        "05_REVIEWS"
+      ],
+      "detail": "complete-ordered-source-partition",
+      "alreadyBoundPreconditions": {
+        "envelopeSchemaValid": true,
+        "newFormat": true,
+        "payloadDigestBound": true,
+        "signatureTupleBound": true
+      },
+      "preconditionsOK": true,
+      "earlierStagesExactPrefix": true,
+      "finding": false,
+      "note": "coverage adds a part the capsule partition does not list"
+    },
+    {
+      "id": "V23",
+      "area": "L1-outcomes",
+      "contractExpects": [
+        "PROVENANCE",
+        "05_REVIEWS"
+      ],
+      "observed": [
+        "PROVENANCE",
+        "05_REVIEWS"
+      ],
+      "detail": "independent-review-outcome-set",
+      "alreadyBoundPreconditions": {
+        "envelopeSchemaValid": true,
+        "newFormat": true,
+        "payloadDigestBound": true,
+        "signatureTupleBound": true
+      },
+      "preconditionsOK": true,
+      "earlierStagesExactPrefix": true,
+      "finding": false,
+      "note": "capsule no longer approves original review 1 outcome"
+    },
+    {
+      "id": "V24",
+      "area": "L1-effective-verdict",
+      "contractExpects": "capsule pins an expected effective verdict",
+      "observed": "capsule keys: approvedReviewOutcomes,approvedReviewScope,reviewedParts,rootApprovalIdentity,rootApprovalPurpose",
+      "detail": null,
+      "alreadyBoundPreconditions": null,
+      "preconditionsOK": null,
+      "earlierStagesExactPrefix": null,
+      "finding": true,
+      "note": "only approvedReviewScope/approvedReviewOutcomes(original)/rootApprovalIdentity/rootApprovalPurpose; nothing pins the effective verdict"
+    },
+    {
+      "id": "V25",
+      "area": "M1d-K1-two-sided",
+      "contractExpects": "Provenance receipt/lock/link from approved H3 facts; measured runningData from H5",
+      "observed": "Provenance.InstallationReceiptSHA256,Provenance.RuntimeLockSHA256,Provenance.LinkedClosureSHA256,Provenance.RunningExecutableSHA256 projected FROM H5 (candidate_model.py:370-372); runningData projection undefined",
+      "detail": null,
+      "alreadyBoundPreconditions": null,
+      "preconditionsOK": null,
+      "earlierStagesExactPrefix": null,
+      "finding": true,
+      "note": "with K1 measured runningData necessarily from H5, policy.go:268 measured.X != pr.X comparisons for receipt/lock/link become same-source; only P02 _running (candidate_model.py:315-317) holds the approved-vs-running join"
+    },
+    {
+      "id": "V26",
+      "area": "L2-order",
+      "contractExpects": [
+        "STATUS",
+        "06_STATUS"
+      ],
+      "observed": [
+        "STATUS",
+        "06_STATUS"
+      ],
+      "detail": "independent-current-status-not-record-claim",
+      "alreadyBoundPreconditions": {
+        "envelopeSchemaValid": true,
+        "newFormat": true,
+        "payloadDigestBound": true,
+        "signatureTupleBound": true
+      },
+      "preconditionsOK": true,
+      "earlierStagesExactPrefix": true,
+      "finding": false,
+      "note": "status + readback double fault"
+    },
+    {
+      "id": "V27",
+      "area": "L2-order",
+      "contractExpects": [
+        "TIME",
+        "06_TIME"
+      ],
+      "observed": [
+        "TIME",
+        "06_TIME"
+      ],
+      "detail": "whole-clock-interval",
+      "alreadyBoundPreconditions": {
+        "envelopeSchemaValid": true,
+        "newFormat": true,
+        "payloadDigestBound": true,
+        "signatureTupleBound": true
+      },
+      "preconditionsOK": true,
+      "earlierStagesExactPrefix": true,
+      "finding": false,
+      "note": "time + readback"
+    },
+    {
+      "id": "V28",
+      "area": "L2-order",
+      "contractExpects": [
+        "CI",
+        "05_CI"
+      ],
+      "observed": [
+        "CI",
+        "05_CI"
+      ],
+      "detail": "every-required-step-success",
+      "alreadyBoundPreconditions": {
+        "envelopeSchemaValid": true,
+        "newFormat": true,
+        "payloadDigestBound": true,
+        "signatureTupleBound": true
+      },
+      "preconditionsOK": true,
+      "earlierStagesExactPrefix": true,
+      "finding": false,
+      "note": "CI + artifact double fault"
+    },
+    {
+      "id": "V29",
+      "area": "L2-order",
+      "contractExpects": [
+        "SCOPE",
+        "04_SIGNATURE"
+      ],
+      "observed": [
+        "SCOPE",
+        "04_SIGNATURE"
+      ],
+      "detail": "exact-independent-capsule-binding",
+      "alreadyBoundPreconditions": {
+        "envelopeSchemaValid": true,
+        "newFormat": true,
+        "payloadDigestBound": true,
+        "signatureTupleBound": true
+      },
+      "preconditionsOK": true,
+      "earlierStagesExactPrefix": true,
+      "finding": false,
+      "note": "capsule scope + payload join"
+    },
+    {
+      "id": "V30",
+      "area": "L2-order",
+      "contractExpects": [
+        "INSTALLATION",
+        "05_RUNNING"
+      ],
+      "observed": [
+        "INSTALLATION",
+        "05_RUNNING"
+      ],
+      "detail": "actual-component-process-generation-root-UID",
+      "alreadyBoundPreconditions": {
+        "envelopeSchemaValid": true,
+        "newFormat": true,
+        "payloadDigestBound": true,
+        "signatureTupleBound": true
+      },
+      "preconditionsOK": true,
+      "earlierStagesExactPrefix": true,
+      "finding": false,
+      "note": "H5 foreign component (05) + primary CI missing (07)"
+    },
+    {
+      "id": "V31",
+      "area": "L2-table",
+      "contractExpects": [
+        true,
+        true,
+        true
+      ],
+      "observed": [
+        true,
+        true,
+        true
+      ],
+      "detail": null,
+      "alreadyBoundPreconditions": null,
+      "preconditionsOK": null,
+      "earlierStagesExactPrefix": null,
+      "finding": false,
+      "note": "gate-order.json == model STAGES; 14 closed reasons all reachable by table"
+    },
+    {
+      "id": "V32",
+      "area": "L3-schema",
+      "contractExpects": [
+        0
+      ],
+      "observed": [
+        0
+      ],
+      "detail": null,
+      "alreadyBoundPreconditions": null,
+      "preconditionsOK": null,
+      "earlierStagesExactPrefix": null,
+      "finding": false,
+      "note": "every string leaf of the valid envelope and payload (478 LF/CRLF mutants) rejected by the closed schemas; leaks=[]"
+    },
+    {
+      "id": "V33",
+      "area": "L3-schema",
+      "contractExpects": [
+        "OLD_DOLLAR_ACCEPTS_LF",
+        "NEW_REFUSES_LF"
+      ],
+      "observed": [
+        "OLD_DOLLAR_ACCEPTS_LF",
+        "NEW_REFUSES_LF"
+      ],
+      "detail": null,
+      "alreadyBoundPreconditions": null,
+      "preconditionsOK": null,
+      "earlierStagesExactPrefix": null,
+      "finding": false,
+      "note": "python-jsonschema re.search semantics demonstrated on both pattern forms"
+    },
+    {
+      "id": "V34",
+      "area": "L3-codec",
+      "contractExpects": [
+        "FORMAT",
+        "03_ENVELOPE"
+      ],
+      "observed": [
+        "FORMAT",
+        "03_ENVELOPE"
+      ],
+      "detail": "closed-input-shape",
+      "alreadyBoundPreconditions": {
+        "envelopeSchemaValid": false,
+        "newFormat": true,
+        "payloadDigestBound": true,
+        "signatureTupleBound": true
+      },
+      "preconditionsOK": false,
+      "earlierStagesExactPrefix": true,
+      "finding": false,
+      "note": "embedded LF in manifest string refused by codec printable subset (schema also refuses)"
+    },
+    {
+      "id": "V35",
+      "area": "L4-fresh-repeat",
+      "contractExpects": "SYNTHETIC_ALREADY_BOUND",
+      "observed": "SYNTHETIC_ALREADY_BOUND",
+      "detail": "",
+      "alreadyBoundPreconditions": {
+        "envelopeSchemaValid": true,
+        "newFormat": true,
+        "payloadDigestBound": true,
+        "signatureTupleBound": true
+      },
+      "preconditionsOK": true,
+      "earlierStagesExactPrefix": true,
+      "finding": false,
+      "note": "reviewer-own fresh ticket/new expiry/new H5/new issuedAt; stable identity unchanged, raw response changed"
+    },
+    {
+      "id": "V36",
+      "area": "L4-fresh-repeat",
+      "contractExpects": [
+        true,
+        true,
+        true
+      ],
+      "observed": [
+        true,
+        true,
+        true
+      ],
+      "detail": null,
+      "alreadyBoundPreconditions": null,
+      "preconditionsOK": null,
+      "earlierStagesExactPrefix": null,
+      "finding": false,
+      "note": "identity equal, bytes distinct"
+    },
+    {
+      "id": "V37",
+      "area": "L5-replay",
+      "contractExpects": [
+        "REPLAY",
+        "06_REPLAY"
+      ],
+      "observed": [
+        "REPLAY",
+        "06_REPLAY"
+      ],
+      "detail": "zero-weight-H5-echo-bound-through-client-request",
+      "alreadyBoundPreconditions": {
+        "envelopeSchemaValid": true,
+        "newFormat": true,
+        "payloadDigestBound": true,
+        "signatureTupleBound": true
+      },
+      "preconditionsOK": true,
+      "earlierStagesExactPrefix": true,
+      "finding": false,
+      "note": "old signed response (old request binding/echo) into the NEW ticket/H5 request"
+    },
+    {
+      "id": "V38",
+      "area": "L5-H5",
+      "contractExpects": [
+        "INSTALLATION",
+        "05_RUNNING"
+      ],
+      "observed": [
+        "INSTALLATION",
+        "05_RUNNING"
+      ],
+      "detail": "independent-H5-sourceSHA",
+      "alreadyBoundPreconditions": {
+        "envelopeSchemaValid": true,
+        "newFormat": true,
+        "payloadDigestBound": true,
+        "signatureTupleBound": true
+      },
+      "preconditionsOK": true,
+      "earlierStagesExactPrefix": true,
+      "finding": false,
+      "note": "correct signed echo of a FOREIGN-source H5 measurement"
+    },
+    {
+      "id": "V39",
+      "area": "L5-H5",
+      "contractExpects": [
+        "TIME",
+        "06_TIME"
+      ],
+      "observed": [
+        "TIME",
+        "06_TIME"
+      ],
+      "detail": "independent-H5-freshness-not-echo",
+      "alreadyBoundPreconditions": {
+        "envelopeSchemaValid": true,
+        "newFormat": true,
+        "payloadDigestBound": true,
+        "signatureTupleBound": true
+      },
+      "preconditionsOK": true,
+      "earlierStagesExactPrefix": true,
+      "finding": false,
+      "note": "correct echo, H5 expiry not strictly after the clock upper bound"
+    },
+    {
+      "id": "V40",
+      "area": "L5-H5",
+      "contractExpects": [
+        "INSTALLATION",
+        "05_RUNNING"
+      ],
+      "observed": [
+        "INSTALLATION",
+        "05_RUNNING"
+      ],
+      "detail": "actual-component-process-generation-root-UID",
+      "alreadyBoundPreconditions": {
+        "envelopeSchemaValid": true,
+        "newFormat": true,
+        "payloadDigestBound": true,
+        "signatureTupleBound": true
+      },
+      "preconditionsOK": true,
+      "earlierStagesExactPrefix": true,
+      "finding": false,
+      "note": "correct echo, H5 measured as UID 0 instead of provisioned UID"
+    },
+    {
+      "id": "V41",
+      "area": "L4-current",
+      "contractExpects": [
+        "VERSION",
+        "06_VERSION"
+      ],
+      "observed": [
+        "VERSION",
+        "06_VERSION"
+      ],
+      "detail": "current-stable-record-and-protected-floor",
+      "alreadyBoundPreconditions": {
+        "envelopeSchemaValid": true,
+        "newFormat": true,
+        "payloadDigestBound": true,
+        "signatureTupleBound": true
+      },
+      "preconditionsOK": true,
+      "earlierStagesExactPrefix": true,
+      "finding": false,
+      "note": "correct echo/signature but independent current head names another stable record"
+    },
+    {
+      "id": "V42",
+      "area": "source-typing",
+      "contractExpects": [
+        "VERSION",
+        "06_VERSION"
+      ],
+      "observed": "SYNTHETIC_ALREADY_BOUND",
+      "detail": "",
+      "alreadyBoundPreconditions": {
+        "envelopeSchemaValid": true,
+        "newFormat": true,
+        "payloadDigestBound": true,
+        "signatureTupleBound": true
+      },
+      "preconditionsOK": true,
+      "earlierStagesExactPrefix": true,
+      "finding": true,
+      "note": "bool floor in the independent lifecycle snapshot (only capsule/clock ints are type-checked)"
+    },
+    {
+      "id": "V43",
+      "area": "source-typing",
+      "contractExpects": [
+        "TIME",
+        "06_TIME"
+      ],
+      "observed": "SYNTHETIC_ALREADY_BOUND",
+      "detail": "",
+      "alreadyBoundPreconditions": {
+        "envelopeSchemaValid": true,
+        "newFormat": true,
+        "payloadDigestBound": true,
+        "signatureTupleBound": true
+      },
+      "preconditionsOK": true,
+      "earlierStagesExactPrefix": true,
+      "finding": true,
+      "note": "bool ticket issuedAt in the independent ticket snapshot"
+    },
+    {
+      "id": "V44",
+      "area": "RD-registration-bytes",
+      "contractExpects": [
+        15503,
+        "876554dcb4fb28fcc7f2095778f1cdf12872fef5d13efc374b4716781a3c00e3",
+        "a0a05427c40499ac32e52c58982a84bceb4b4e833b68c601f9373d93d80aa562",
+        false
+      ],
+      "observed": [
+        15503,
+        "876554dcb4fb28fcc7f2095778f1cdf12872fef5d13efc374b4716781a3c00e3",
+        "a0a05427c40499ac32e52c58982a84bceb4b4e833b68c601f9373d93d80aa562",
+        false
+      ],
+      "detail": null,
+      "alreadyBoundPreconditions": null,
+      "preconditionsOK": null,
+      "earlierStagesExactPrefix": null,
+      "finding": false,
+      "note": "blob 17e54d6449d6868c6c1d16205862c9b6d0618c3a; exact LF->CRLF reconstruction is a public byte fact only, not a capture or H3 authentication"
+    },
+    {
+      "id": "V45",
+      "area": "source-component-origins",
+      "contractExpects": [
+        1034425,
+        "7a87bcd81e3abcc27ab0d6ec7afafc93414749b42b139491b04840a8ed980fc9",
+        5
+      ],
+      "observed": [
+        1034425,
+        "7a87bcd81e3abcc27ab0d6ec7afafc93414749b42b139491b04840a8ed980fc9",
+        5
+      ],
+      "detail": null,
+      "alreadyBoundPreconditions": null,
+      "preconditionsOK": null,
+      "earlierStagesExactPrefix": null,
+      "finding": false,
+      "note": "graph from 8874 (not a 78468-ancestry file); 5 public components recomputed via ls-tree object IDs + cat-file"
+    },
+    {
+      "id": "V46",
+      "area": "archived-de4-originals",
+      "contractExpects": [
+        10,
+        10,
+        true
+      ],
+      "observed": [
+        10,
+        10,
+        true
+      ],
+      "detail": null,
+      "alreadyBoundPreconditions": null,
+      "preconditionsOK": null,
+      "earlierStagesExactPrefix": null,
+      "finding": false,
+      "note": "review-originals/*.raw multiset of SHA256 == actual de4 review blobs (native ls-tree object IDs + cat-file)"
+    },
+    {
+      "id": "V47",
+      "area": "L4-accounting",
+      "contractExpects": [
+        97,
+        97,
+        4,
+        93,
+        0,
+        true,
+        true,
+        10
+      ],
+      "observed": [
+        97,
+        97,
+        4,
+        93,
+        0,
+        true,
+        true,
+        10
+      ],
+      "detail": null,
+      "alreadyBoundPreconditions": null,
+      "preconditionsOK": null,
+      "earlierStagesExactPrefix": null,
+      "finding": false,
+      "note": "committed final owner report (owner static symbolic evidence only, not reviewer proof)"
+    }
+  ],
+  "completedKST": "2026-11-07T03:03:56+09:00"
+}

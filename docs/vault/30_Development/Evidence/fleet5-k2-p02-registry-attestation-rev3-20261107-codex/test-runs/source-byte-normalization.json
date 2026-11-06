@@ -1,0 +1,10 @@
+{
+  "classification": "NEW_OWN_TEST_DRIVER_BYTE_FREEZE_NOT_SEMANTIC_CHANGE",
+  "beforeSHA256": "7f10d87844321c6f4a63bb98d4ad03588477f9021eb3fd7c64c56665d69c4fff",
+  "afterSHA256": "6da1c0276943ad6b091214570e9db92580ced0e8389d74c7a32c2ed136064473",
+  "removedUTF8BOM": true,
+  "CRLFtoLF": 1,
+  "originalDriver": "attempt-01-driver.raw",
+  "originalAttemptUnchanged": "attempt-01.json",
+  "reason": "Bind published Git text blob to exact tested source bytes; rerun ONLY targeted15cases after new own source byte change; no unaffected full suite or CI rerun"
+}
