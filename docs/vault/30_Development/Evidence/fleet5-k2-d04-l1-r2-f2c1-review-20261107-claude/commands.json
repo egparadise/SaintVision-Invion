@@ -1,0 +1,73 @@
+{
+  "environment": "Windows 11. Count script uses system Python 3.10.11 with -I (stdlib only). Gates use D:/Project/SaintVisionI-Invion/.venv Python 3.14.7 -B with PYTHONUTF8=1. cwd is the managed worktree fleet5-bootstrap-v3-review-20261106 on agent/claude/fleet5-k2-d04-l1-r2-f2c1-review-20261107, created from exact f2c1afb7. Times are KST. Serial only; free physical memory about 255 MB at gate start. No Go/Node/browser/Core/live service/PG/Docker/SSH/PKI/OS/pagefile/process action; author source and Evidence untouched; no Git/OS setting change.",
+  "provenance": [
+    {
+      "argv": "read-only Root worktree fleet-five-orchestration-20261105 .work: a7r1-reviewer-before-d04-r2-start.json, a7r1-actual-review-root-verified.json, d04-l1-r2-review-ready-before-start.json, d04-l1-r2-delta-review-dispatch.json, d04-l1-r2-delta-review-spec.txt, d04-l1-r2-published-source-root-verified.json, d04-l1-r2-core-ci-dispatch.json",
+      "result": "A7 ctx_d6e29070eb5d succeeded/settled/exited/released (REVISION_REQUIRED LOW at 7a8012f4) before this dispatch; Root verified f2c1 publication; Core 42300147891 dispatched 06:51:40 KST, CIResult PENDING; no final Core file at review time"
+    },
+    {
+      "argv": "Root boards: git log (1552766f root483) and worktree Index frontmatter",
+      "result": "Index 1.0.484 updated 06:58:12 KST, latest_codex_card 'D04L1R2exactf2c1published/Core42300147891pending/deltaCODE06factive; ...'"
+    },
+    {
+      "argv": "git fetch -q origin ; git log -1 f2c1 ; git ls-remote origin refs/heads/agent/codex/fleet5-k2-d04-l1-r2-20261107",
+      "result": "f2c1afb78b589b4b2cbcf3dcd4dc4f3c3f3bc856, parent 08e0f56e, remote ref exact"
+    },
+    {
+      "argv": "git switch -c agent/claude/fleet5-k2-d04-l1-r2-f2c1-review-20261107 f2c1afb78b589b4b2cbcf3dcd4dc4f3c3f3bc856",
+      "result": "HEAD f2c1afb7"
+    },
+    {
+      "argv": "git show 879aea64:<12 review paths>",
+      "result": "full 879a History, review.json, commands.json, optional probe, gate files read first"
+    },
+    {
+      "argv": "git diff --name-status 08e0..f2c1 ; git diff 08e0 f2c1 -- p02_evaluate_internal.go README.md ; git show f2c1:<3 paths> | sha256sum",
+      "result": "142 paths = 138 Evidence + 1 History + 3 product; README 00c1c544, evaluator 2f29f521, regression 97d0c59b"
+    },
+    {
+      "argv": "sha256sum Evidence source-frozen/* source-preimages/* ; cmp source-frozen Go vs f2c1 ; diff source-frozen/README.md f2c1 README.md",
+      "result": "Go byte-equal; preimages equal 08e0 blobs; README only lines 193-194 -> 193-199"
+    },
+    {
+      "argv": "grep -rn 'immutable-signature-table|bounded-signature-tuple-table' services/node-agent/internal/migrationcontext",
+      "result": "one production site each (:47 new guard, :266 retained 04 guard), plus test and README"
+    }
+  ],
+  "staticReads": [
+    "f2c1: p02_evaluate_internal.go:1-140 and :240-300 (p02Evaluate, anchor, sources, signingInput, signature), p02_inputs_internal.go p02SignatureTuple (:156-170), p02Inputs (:182-196), p02FreezeSignatureTuple (:887-902), p02FreezeInputs signature copy (:1028-1031), p02BudgetInputs tail (:1055-1081), p02_signature_table_bound_test.go full, p02_contract_test.go:1-200 (fingerprint, hash, tuple, rebind, check/bound helpers), README.md:160-245",
+    "design 84ee (unchanged at f2c1): Evidence/fleet5-k2-p02-registry-attestation-rev3-20261107-codex/candidate_model.py STAGES :28-39, _anchor :169-183, _sources :185-195, _CHECKS and evaluate :416-433",
+    "author Evidence: post-test-readme-status-only.diff, root-baseline-originals/d04-full-core-root-verified.json.raw, root-r2-execution-originals/d04-l1-r2-actual-go-summary.json.raw, run_required_gates.py.txt, local-required-gates.json"
+  ],
+  "runs": [
+    {
+      "atKST": "2026-11-07T07:0x (not stamped)",
+      "argv": "python -I -c <inline count> over root-r2-execution-originals/d04-l1-r2-actual-case-rows.json.raw",
+      "exit": 0,
+      "result": "92 rows, 90 distinct beforeSHA256, one pre-existing triple 6579d51b..., L1-tuples-16 249562ba... and L1-tuples-17 69533191... unique"
+    },
+    {
+      "atKST": "2026-11-07T07:03:34..07:04:03",
+      "argv": "python -B reviewer_gate_driver.py.txt f2c1afb7... canonical-sync-check-before.txt <scratch>/gates sync-only",
+      "exit": 0,
+      "result": "4189 managed / 1738 pending / 0 conflicts; canonical state 4090c45d... unchanged before/after"
+    },
+    {
+      "atKST": "2026-11-07T07:07:33..07:08:24",
+      "argv": "python -B reviewer_gate_driver.py.txt f2c1afb7... local-doc-gates.txt <scratch>/gates",
+      "exit": 0,
+      "result": "9/9 PASS (check_docs 1271 docs, ontology_generation, ontology, sync CHECK 4195/1744/0 conflicts state 4090c45d... unchanged before/after, contract_bindings, frontend_integrity, single_source ratchet, response_freshness, path_citations ratchet 290 baseline)",
+      "final": "local-doc-gates.txt"
+    }
+  ],
+  "notRun": [
+    "any Go compile/test (Root PC3 25/230 accepted as attributed Root evidence)",
+    "full 168-schema comparison, original Go 23/228, full Core, old model/recovery/census-mutant suites (accepted evidence; not repeated)",
+    "owner tests/generators",
+    "Core/CI dispatch, rerun or API poll",
+    "Node/browser/full suites",
+    "a new probe (no new concern needed execution)"
+  ],
+  "syncCheck": "tools/sync_obsidian.py --check with canonical state D:/Project/SaintVision-Invion/SaintVisionI-Invion/.git/obsidian-sync-state.json; the full state SHA256 is read immediately before and after EACH check call; no apply/adopt/resolve/state write/export.",
+  "publication": "normal commit + push of own Evidence/History only, then ONE docs.yml workflow_dispatch on the review branch with a unique correlation_id. Run/job IDs are reported in worker_done and not committed, so that no commit has to report on itself."
+}

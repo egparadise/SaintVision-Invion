@@ -1,0 +1,5 @@
+Reviewer local gates, Windows, D:/Project/SaintVisionI-Invion/.venv Python 3.14.7 -B, PYTHONUTF8=1, cwd=worktree root, tree = f2c1afb7 + own review History/Evidence only.
+sync_obsidian is CHECK only with the canonical Root state; --conflicts-out goes to reviewer scratch. No apply/adopt/resolve/state write. Root may apply concurrently; a state change is recorded, not hidden.
+2026-11-07T07:03:34+09:00..2026-11-07T07:04:03+09:00 exit=0 logsha=e577fbcc2d14da4aae1d2555f0bb2114634ccad457ca9fbf12abf6313886869e :: python -B tools/sync_obsidian.py --check --state D:/Project/SaintVision-Invion/SaintVisionI-Invion/.git/obsidian-sync-state.json --conflicts-out <scratch>/sync-conflicts-canonical-sync-check-before.json
+    stateBefore 4090c45d8d35ecb1f4559e4541467609ea22a29d5189d2460f510de9cd6927db stateAfter 4090c45d8d35ecb1f4559e4541467609ea22a29d5189d2460f510de9cd6927db unchanged=True
+    CHECK: 4189 managed files, 1738 pending exports, 0 conflicts. No writes.

@@ -1,0 +1,91 @@
+{
+  "classification": "ACTUAL_INDEPENDENT_CLAUDE_NARROW_D04_L1_R2_CODE_README_DELTA_REVIEW_F2C1_STATIC_NO_TRUST_OR_RUNTIME_GRANT",
+  "reviewer": "Claude (Opus 5.5), one reviewer, no helpers/subagents",
+  "orca": {
+    "task": "task_a152e893e6de", "dispatch": "ctx_06f0718be774", "run": "run_e57ecd84a7bc",
+    "authorTask": "task_a95ef3d8ccce", "authorDispatch": "ctx_ed23b4a777d0", "authorPendingAsk": "msg_c57f6969d82e",
+    "rootImplementationGrant": "msg_d42e405d8bd0", "rootPublicationGrant": "msg_010aeec31cf3",
+    "startCondition": "Root .work/a7r1-reviewer-before-d04-r2-start.json: A7 review task_8376b6d0ca39 / ctx_d6e29070eb5d succeeded / settled / exited / released; its actual verdict REVISION_REQUIRED (LOW A7R-L1) at 7a8012f4 / Docs 42299221800 (.work/a7r1-actual-review-root-verified.json). .work/d04-l1-r2-review-ready-before-start.json: this task ready, deps [task_8376b6d0ca39]. Root boards read: committed root483 1552766f and the Root worktree Index 1.0.484 (06:58:12 KST, latest_codex_card 'D04L1R2exactf2c1published/Core42300147891pending/deltaCODE06factive; ...')."
+  },
+  "target": "f2c1afb78b589b4b2cbcf3dcd4dc4f3c3f3bc856",
+  "directParent": "08e0f56eabe7d46518e17b8c3d6d7e296df880ac",
+  "targetBranch": "agent/codex/fleet5-k2-d04-l1-r2-20261107 (ls-remote = f2c1)",
+  "reviewBranch": "agent/claude/fleet5-k2-d04-l1-r2-f2c1-review-20261107 (from exact f2c1)",
+  "priorReviewReadFirst": "879aea64e6896d6014f1b10d4ab63fda0de6073c (sibling of f2c1 on 08e0, not an ancestor): History, review.json, commands.json, optional_probe_signature_table_bound_test.go.txt, gate driver/logs read in full. Its verdict INTERNAL_CODE_ACCEPT narrow with LOW D04-L1 and INFO I1-I4. Schema 168/296, joins, projection 41+5, ownership, time whitelist and public null stay accepted there and are not re-audited here.",
+  "scope": "Narrow L1 delta only: the 3 product paths 08e0..f2c1 (p02_evaluate_internal.go +3 lines, new p02_signature_table_bound_test.go, README.md status/INFO text). Not a fresh whole design/Go/contract corpus audit.",
+  "reviewerCheckedIdentity": {
+    "pathCensus": "git diff --name-only 08e0..f2c1 = 142 paths: 138 under Evidence/fleet5-k2-d04-l1-r2-20261107-codex + 1 own History (all added) + 3 product paths (README.md M, p02_evaluate_internal.go M, p02_signature_table_bound_test.go A). No other path is added, modified, deleted or renamed.",
+    "blobSHA256AtF2c1": {"README.md": "00c1c544684ef36572540a40a79b1feaaf12af442257d7d9f9c26bc3271c2478", "p02_evaluate_internal.go": "2f29f521ffe358411baaa3d365f80f757c2be6df14043abdae787802a275b5c9", "p02_signature_table_bound_test.go": "97d0c59b2978f2d086a310257b93057ef6d65def990d0f6f4a47bcaabd4c49bd"},
+    "goFilesEqualFrozenTestedCopies": "cmp: both Go files at f2c1 are byte-equal to the author Evidence source-frozen/ copies (2f29f521 / 97d0c59b), which the Root receipt binds to the tested source.",
+    "preimages": "source-preimages README.md.raw ad261720 and p02_evaluate_internal.go.raw 35de87be equal the 08e0 blobs.",
+    "readmePostTestChange": "diff source-frozen/README.md (tested WIP a7199f43) vs published README (00c1c544): exactly one hunk, lines 193-194 (the 'R2 ... NOT_RUN at this WIP checkpoint' sentence) replaced by lines 193-199 (Root R2 receipt facts and PENDING clause). Every other README line, including all predicates and the INFO I1/I2/I4 text, is byte-identical to the tested WIP."
+  },
+  "rootFactsAcceptedNotRerun": {
+    "sourceIdentity": ".work/d04-l1-r2-published-source-root-verified.json (06:51:38 KST): exact f2c1/08e0/ref/remote, 3 product + 139 own docs, both Go files exactly Root-tested, Go content 9361e40f..., 3-file published content 5a518d55..., manifest c5c69769... with 141 inputs, 79 original copies byte-compared, Docs 42299140025 / job 128172064106 all 19 steps SUCCESS.",
+    "actualGo": "Root PC3 isolated run (packet 6e2aba8a..., golang@sha256:8d48e12e... Go 1.27.1, network none, 2 CPU / 2 GiB): 4 phases, 25 top / 230 sub, 0 fail / 0 skip, OOM false, 370 source+scratch hashes equal before/after; 92 P02_CASE rows / 90 distinct complete input fingerprints. Original 879a probe (unchanged, 412fd1ed...): 16 tuples pass all 20 stages; 17 tuples OWNERSHIP / 01_ANCHOR / immutable-signature-table, passed []. Allocation log: allocations=0, repeatedEvaluations=2, uniqueAdditionalInputs=0, before = after 69533191.... ROOT evidence, not rerun by the reviewer.",
+    "beforeFixReproduction": "Root reproduced the R1 L1 behaviour at 08e0 with the unmodified 879a probe: 17 tuples SIGNATURE / 04_SIGNATURE / bounded-signature-tuple-table after 5 passed stages (d04-bound-probe-root-proof.json).",
+    "reviewerCheckedOnlyFromRootRows": "Parsed the committed copy root-r2-execution-originals/d04-l1-r2-actual-case-rows.json.raw: 92 rows, 90 distinct beforeSHA256; the only repeated fingerprint is 6579d51b... (3 rows, pre-existing); L1-tuples-16 249562ba... (prior 20) and L1-tuples-17 69533191... (01_ANCHOR / OWNERSHIP, prior 0) each occur once. The allocation-log fingerprint equals the L1-tuples-17 row, so the measured repeat is the same input and adds no row."
+  },
+  "coreCI": {
+    "run": 42300147891, "correlation": "fleet5-d04-l1-r2-core-953a3e40ff0f482eb0b4e4a64c945d9b", "head": "f2c1afb7", "dispatchedAtKST": "2026-11-07T06:51:40+09:00", "optionalProofInputs": false,
+    "status": "PENDING. At review time Root .work has only d04-l1-r2-core-ci-dispatch.json (CIResult PENDING); no final jobs/steps/skips file exists for this run.",
+    "reviewerUse": "Not used as evidence. The old 08e0 Core 42287980945 success (9358 JUnit / 9312 pass / 46 skip, Go 141 / 504) is not borrowed for f2c1. Skipped optional steps are not passes. The reviewer did not poll, dispatch or rerun any Core/CI API."
+  },
+  "verdict": "INTERNAL_CODE_ACCEPT_L1_CLOSED",
+  "verdictScope": "Static reading of the 3-path delta plus Root-attributed unit evidence. Independent acceptance of the L1 code/test/README delta only; distinct from Root's Go pass, the pending full Core 42300147891, integration, runtime, production authentication and fleet acceptance.",
+  "verdictSummary": "D04-L1 is CLOSED: the new guard at p02_evaluate_internal.go:46-48 refuses more than 16 tuples as OWNERSHIP / 01_ANCHOR / immutable-signature-table with a nil passed prefix, before p02BudgetInputs and p02FreezeInputs, which is exactly the accepted design _anchor order (candidate_model.py:173 precedes the capsule _bound at :174). The guard reads only the slice length and returns constant strings, so nothing oversized is copied or allocated. 16 tuples are unchanged, and the later exact tuple/context membership, the general budget and publicRefusal TrustUnknown are untouched. The new regression is causal and non-vacuous. D04-I3 is CLOSED. INFO I1, I2 and I4 stay retained and are stated accurately in the README. One new INFO (D04R2-I5) records a pre-existing, unchanged fail-closed representation note. No HIGH/MEDIUM/LOW.",
+  "l1": {
+    "status": "CLOSED",
+    "code": "p02Evaluate :46-48: if len(prerequisites.signatures) > 16 { return p02Result{reason: \"OWNERSHIP\", stage: \"01_ANCHOR\", detail: \"immutable-signature-table\"} } — before budget (:49-52) and freeze (:53). The detail string occurs once in production (grep), so the refusal can only come from this guard.",
+    "designMatch": "candidate_model.py _anchor: (1) type(a) is BoundInputs ANCHOR, (2) raw/policy/artifact are bytes OWNERSHIP, (3) signatures frozenset with len <= 16 OWNERSHIP immutable-signature-table, then (4) capsule _bound. In Go, (1) and (2) cannot fail for the typed p02Inputs value and []byte parameters, so the guard as the first statement is the exact design first-reason position. Design STAGES 01_ANCHOR allows OWNERSHIP.",
+    "noOversizedCopy": "For n > 16 control returns before p02BudgetInputs (which walks every tuple) and p02FreezeInputs (make + copyBytes per tuple). The return value has nil passed and zero policy/running, and the strings are constants. This matches Root's measured allocations=0.",
+    "unchanged": "n <= 16: identical control flow to 08e0 (budget, freeze, 20 stages). 04 signature() keeps SCOPE capsule binding, pinned key, the now-redundant len <= 16 guard (:266; unreachable via p02Evaluate because freeze preserves length, kept as defence in depth, as the 879a minimal correction allowed), and exact 13-field + full domain+NUL+message + signature tuple membership. General budget 32 MiB / 100000 nodes and > 4096 budget refusal are unchanged for <= 16 tuples. publicRefusal() still returns refuse(TrustUnknown).",
+    "boundary": "Production delta is 3 lines inside the existing private p02Evaluate. There is no new func, type, import, caller, factory, provider, port, public Service hook, current clock, Engine, effect or K1 operation. The pure effect boundary is unchanged: the guard calls only the len builtin."
+  },
+  "testReview": {
+    "file": "p02_signature_table_bound_test.go (74 lines), TestP02InternalSignatureTableBound subtests 16 and 17",
+    "construction": "valid = deep copy of the benign fixture's single matching tuple. n-1 extras are deep copies with the last signature byte XOR byte(i), i = 1..n-1 (always non-zero, pairwise distinct), then valid is appended LAST.",
+    "independentPreconditions": "Canonical envelope and payload decode plus closed schema; payload SHA256 equals body.facts.policyPayloadSHA256; want = p02TestTuple(envelope, signingInput, unhex(signatureHex)); the last tuple DeepEqual want; no earlier tuple DeepEqual want. p02SignatureTuple has exactly the 13 fields that signature() compares, so DeepEqual inequality means that no earlier tuple can satisfy membership. signature() on a 1-tuple {valid} context passes (SCOPE capsule/generation/selector/scope/anchor binding, pinned key, domain). These are the same checks p02TestCheck(bound=true) makes, done by hand because bound=true would call signature() on the 17-table.",
+    "control16": "p02TestBound(…, \"\", \"\", \"\"): all 20 stages pass with the matching tuple at index 15. This proves that full message/context membership still scans to the end of a 16-table.",
+    "case17": "p02TestCheck exact OWNERSHIP / 01_ANCHOR / immutable-signature-table, prefix equal to stages[:0] (empty), publicRefusal TrustUnknown, owned-input fingerprint before == after; then AllocsPerRun(1) (one warm-up + one measured run of the same input) asserts 0 allocations, the same reason/stage/detail, an empty passed list and an unchanged fingerprint.",
+    "causal": "Subtests 16 and 17 differ by one extra non-matching tuple. 16 passes everything, so the 17 refusal is caused by the count. The unique detail string pins it to the new guard.",
+    "nonVacuous": "At 08e0 the same 17 input refuses SIGNATURE / 04_SIGNATURE (Root before-fix reproduction) and allocates in budget/freeze. So both the cause assertion and the allocation assertion would fail on the parent.",
+    "counts": "Two new P02_CASE rows with two new distinct fingerprints (88 -> 90 distinct of 90 -> 92 rows). The allocation repeat logs P02_L1_COPY_BUDGET, not P02_CASE, and is not counted as a case. The 879a probe's two outputs are not claimed as extra fingerprints.",
+    "observationsNoFinding": "Line 20 appends valid itself, so its slices alias the precondition copy used at :47. Nothing mutates them afterwards, and the fingerprint before == after checks cover it."
+  },
+  "multiFaultConsequences": {
+    "note": "Bounded to the L1 change under retained INFO I1. Not an all-multi-fault golden equivalence claim.",
+    "MF1_over16_plus_nilCapsule": "R1: budget, freeze, then ANCHOR / capsule-unavailable at 01. R2: OWNERSHIP / immutable-signature-table at 01. Design: signature check :173 precedes capsule _bound :174, so OWNERSHIP / immutable-signature-table. R2 now equals the design.",
+    "MF2_over16_plus_generalBudgetOverflow_or_over4096": "R1: OWNERSHIP / 01_ANCHOR / bounded-private-snapshots. R2: OWNERSHIP / 01_ANCHOR / immutable-signature-table. The design has no general snapshot budget ahead of :173, so R2 equals the design's first reason and detail. The reason and stage are the same as R1; only the private detail changes.",
+    "MF3_over16_plus_any_02_to_07_fault": "R2 and design both refuse at 01 (OWNERSHIP / immutable-signature-table). R1 refused at the earlier faulty stage or at 04.",
+    "MF4_atMost16": "Unchanged from 08e0. D04-I1 is retained: general budget precedes nil-capsule (both 01), and ticket present + clock and H5 missing gives TIME vs the design INSTALLATION.",
+    "MF5_designOnlyEarlierChecks": "The design's BoundInputs-type and bytes-type OWNERSHIP checks precede :173, but they have no Go representation. A nil Go []byte corresponds to design b'' (bytes), not None. So no reachable Go input orders differently on account of them."
+  },
+  "readme": {
+    "I3": "CLOSED. The stale 'Go tests are NOT_RUN' WIP sentence is gone. The current text separates R1 actual facts (08e0, Root 23/228, Docs 42287667048, Core 42287980945 success with declared optional skips, review 879a), R2 Root unit results (receipt 06:33:57 KST, 25/230, 0 fail/0 skip, 92/90, empty prefix, 0 allocations, probe PASS is not contract PASS), and R2 Docs/Core/independent delta review as PENDING until observed. Those R1 Core facts agree with Root d04-full-core-root-verified.json (both jobs success, declared optional skips listed). The PENDING clause is a conditional temporal statement and claims no success. Docs 42299140025 has since succeeded per Root, Core 42300147891 is still pending, and this review is the delta review.",
+    "scopeStatements": "Unchanged R1 README text still states owned inputs for a bounded sizing pass and deep freeze (no general isolation proof), only already-authenticated PRIVATE prerequisite hypotheses, verified signature tuple DATA, no authority/provider/positive authentication path, no new producer/wire/current view/effect grant, and all actual producers/anchors/custody/H1-H7/H3-EA NULL/HOLD.",
+    "infoText": "I1, I2 and I4 paragraphs match the 879a INFO text accurately: TIME before INSTALLATION; budget before missing capsule; R2 changes neither. The Go-only stricter list is positive floor, integer domains, non-empty ticket/evidence/artifact, subject-bound readback, Root-choice digest over supplied bytes, and C2 ASCII after schema. It is explicitly 'not a claim of complete design/Go diagnostic equivalence'. I4: empty array/object and scalar/129-byte values reach 05, while non-empty array/object fails raw/typed equality at 01. The 'actual Rev3 INFO' labels are renamed 'design-review INFO' with no change to any predicate.",
+    "technicalPredicatesChanged": false
+  },
+  "findings": [],
+  "info": [
+    {"id": "D04-I1", "status": "RETAINED", "text": "Unchanged by R2 for <= 16 tuples; stated in README. For > 16 tuples, R2 now equals the design first reason (MF1/MF2)."},
+    {"id": "D04-I2", "status": "RETAINED", "text": "Unchanged; listed in README as explicit precision limits."},
+    {"id": "D04-I3", "status": "CLOSED", "text": "See readme.I3."},
+    {"id": "D04-I4", "status": "RETAINED", "text": "Unchanged; README now states it precisely."},
+    {"id": "D04R2-I5", "status": "NEW_INFO_NON_BLOCKING_NO_ACTION_REQUIRED", "text": "This is a pre-existing representation note; R2 did not change it. The Go table is a slice, and both the new 01 guard and the 08e0 04 guard count len(slice), including duplicate tuples. The design table is a frozenset, so 17 slice entries with duplicates have no exact design analog: their distinct set may have <= 16 members. Go refuses such an input as OWNERSHIP / 01. This is fail-closed and only stricter, so it belongs with the I2 family. A future contract delta may state that the private table is duplicate-free or is counted by entries."}
+  ],
+  "retainedHolds": {
+    "actualH1-H7_H3EA_expectedVerdictCustody": "NULL/HOLD; the signature tuple table is synthetic DATA only",
+    "RD": "NULL_HOLD (Root)",
+    "raw7": "UNREGISTERED", "A01-A40": "NOT_RUN", "wholeK2/fleet/global100": "INCOMPLETE",
+    "notGranted": "no producer, opaque positive factory, port, current view/clock, effect, runtime, Engine, K1 operation or public Service hook"
+  },
+  "next": "Root: verify this review commit and its exact Docs run, and keep observing Core 42300147891 to its final jobs/steps/skips, without borrowing the 08e0 Core. The author has no required L1 action; D04R2-I5 is optional contract wording. The reviewer grants nothing.",
+  "limitations": [
+    "Static reading of the 3-path delta, the touched helpers (p02_contract_test.go p02TestCheck/p02TestBound/p02TestTuple/p02TestHash, p02_fixture_test.go, p02_inputs_internal.go tuple type/freeze/budget) and design candidate_model.py _anchor/_sources/evaluate. Bounded offline Python -I only to count the committed Root case-row copy.",
+    "No Go compile/test, Core/CI poll/dispatch/rerun, Node, browser, OS/pagefile/process, host/SSH/Docker/PG/PKI or permission action. Root's 25/230 run is attributed Root evidence.",
+    "No new probe was written: no new concern needed execution.",
+    "Multi-fault notes MF1-MF5 come from reading control flow and were not executed."
+  ]
+}
