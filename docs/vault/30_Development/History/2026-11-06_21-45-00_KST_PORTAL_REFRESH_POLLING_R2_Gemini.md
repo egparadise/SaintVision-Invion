@@ -42,7 +42,7 @@ source_of_truth: "Git"
     - `degraded`: 서버 응답 수신 성공했으나 규약 불일치(HTML 200, 404, 503, down) → `비정상 응답` (적색 도트)
     - `offline`: 네트워크 연결 실패(Failed to fetch) 또는 4초 타임아웃 초과 → `Offline` (적색 도트)
     - `unknown`: 초기 미관측 상태 → `확인 중...` (회색 도트)
-  - `tests/acc09-contrast-tokens.test.tsx`의 AST 스타일 속성 수(20개) 및 evaluated pair(정확히 11개) 래칫을 100% 준수함.
+  - `apps/web/tests/acc09-contrast-tokens.test.tsx`의 AST 스타일 속성 수(20개) 및 evaluated pair(정확히 11개) 래칫을 100% 준수함.
 
 ### 3) UI-854-L2 (Low): 게이트웨이 헬스체크 순서 역전 방지
 - **해결 조치**:
