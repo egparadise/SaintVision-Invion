@@ -22,8 +22,36 @@
   "currentAPIs": "ABSENT",
   "K2BEffects": "ABSENT",
   "A01-A40": "NOT_RUN",
-  "independentCodeReview": "PENDING",
-  "newExactCI": "PENDING",
+  "independentCodeReview": "NOT_STARTED_CORE_FAILED",
+  "newExactCI": {
+    "sourceSHA": "de71c07c2b827eea50e2ca660f80d042334472c7",
+    "Core": {
+      "run": 42164071724,
+      "attempt": 1,
+      "conclusion": "failure",
+      "coreJob": 127716312318,
+      "failedStep": "Run provisioned LAN installer acceptance",
+      "failedTest": "tests/integration/test_workspace_upgrade.py::test_real_upgrade_preserves_credentials_journal_and_replays",
+      "failureAt": "deploy/lan/worker_peer_floor.py:217",
+      "message": "Owned container/state changed during actual floor observation",
+      "lanSummary": "1 failed, 16 passed",
+      "laterMainPytest": "SKIPPED_NOT_SUCCESS",
+      "s01Job": 127716312164,
+      "s01Conclusion": "success"
+    },
+    "Docs": {
+      "run": 42164075078,
+      "job": 127716312780,
+      "conclusion": "success"
+    },
+    "hostedNewPackageRace": {
+      "topLevelPasses": 11,
+      "subtestPasses": 24,
+      "failedEvents": 0,
+      "wholeGoFailEvents": 0
+    },
+    "allRequiredJobsSuccess": false
+  },
   "local": {
     "focusedGoExit": 0,
     "topLevelPasses": 52,
@@ -82,5 +110,6 @@
     "syncStateSHA256Before": "d0b82b21910faf1f4c6e08896173138f790a5ae8aad37d5898468715b26cf66a",
     "syncStateSHA256After": "d0b82b21910faf1f4c6e08896173138f790a5ae8aad37d5898468715b26cf66a",
     "unchanged": true
-  }
+  },
+  "boundedDelivery": "PENDING_ROOT_EXTERNAL_SCOPE_DECISION"
 }

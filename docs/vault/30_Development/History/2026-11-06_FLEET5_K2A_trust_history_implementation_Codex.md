@@ -5,7 +5,7 @@ version: "1.0.0"
 status: "review"
 author: "Codex"
 reviewer: "Claude through Root; actual code review pending"
-updated: "2026-11-06T13:36:49+09:00"
+updated: "2026-11-06T13:59:21+09:00"
 timezone: "Asia/Seoul"
 source_of_truth: "Git"
 base_sha: "4ce63e8ee78d957aa91e813f6ee226cc21abb52a"
@@ -102,3 +102,39 @@ verified by scoped new-package tests and vet at13:39:49-13:40:04 KST, both exit0
 Final local source evidence is local-go-final2-results.json; no frozen K1 source
 or earlier accepted worktree/ref was changed. Fresh candidate CI and independent
 code review remain PENDING until actual immutable results are received.
+
+
+## Actual de71 CI failure and external scope boundary
+
+Published source candidate de71c07c2b827eea50e2ca660f80d042334472c7 on own branch.
+Core42164071724/attempt1 failed in core job127716312318, step Run provisioned LAN
+installer acceptance: tests/integration/test_workspace_upgrade.py::test_real_upgrade_preserves_credentials_journal_and_replays
+raised Owned container/state changed during actual floor observation at
+worker_peer_floor.py:217, with1 failed/16 passed. Later main pytest/build steps
+were SKIPPED, not success. S01 job127716312164 succeeded. Docs42164075078/job127716312780
+succeeded with all required steps. Root msg_1e5eb53d0056 confirms
+ACTUAL_CI_FAILURE_NO_REVIEW; no independent code review/acceptance has started.
+
+The earlier actual hosted Go race step succeeded. Its exact artifact records
+new-package11 top-level/24 subtests passing,0 package failure events and0 whole-Go
+failure events. This replaces the local race NOT_RUN gap only for the actual
+hosted source test, not for overall Core or installed/runtime authentication.
+Core evidence artifact13478861491 ZIP SHA256
+9e4152c8c6b0bb981b7fa8e8befcf348d067f685c5a042bff7b38a8ba8d65bd9 matches
+GitHub digest. Raw ZIP/logs remain ignored .work/de71-ci-failure, not exported.
+Only aggregate safe metadata/source pins are published in de71-ci-failure-analysis.json.
+
+Failing helper and test bytes are unchanged between eb32,4ce and de71; exact
+SHA256 pins are in that analysis. The failed barrier compares container identity,
+image/config/raw Mounts/start/restart fields plus full volume metadata and exact
+consumers across two real CI Docker reads. The logs do not record the two snapshots,
+so the specific differing field is UNKNOWN. Adjacent context normalization sorts
+Mounts and excludes CreatedAt, a concrete separate diagnostic candidate only;
+no harmless-metadata assumption, guard relaxation or actual live-fleet failure
+is inferred. Both failing source paths are outside the package-only grant.
+No outside source edits, environment mutation, blind Core rerun or helper worker
+was performed. First next action: Root assigns a separately scoped diagnosis/fix
+or an exact combined integration plan; bounded delivery and all-code review stay
+pending until actual required CI/review evidence exists.
+
+Failure-report documentation gates at13:57:43-13:58:28 KST all10 exited0; fresh records are in de71-failure-report-gates, preserving the original source gate files byte-exact from de71. Canonical sync before/after SHA2562442c54fbc3bf9582a55073aed82082019c6543bf9f46dd62300a72a7330cc53 is unchanged for this check; no apply/adopt/resolve. Product/test/workflow source remains exactly de71; this report does not claim Core acceptance or code review.

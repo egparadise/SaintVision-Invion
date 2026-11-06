@@ -1,0 +1,105 @@
+{
+  "classification": "FAILED_CORE_PRESERVED_NO_BORROWED_GREEN",
+  "sourceSHA": "de71c07c2b827eea50e2ca660f80d042334472c7",
+  "Core": {
+    "run": 42164071724,
+    "attempt": 1,
+    "conclusion": "failure",
+    "coreJob": 127716312318,
+    "failedStep": "Run provisioned LAN installer acceptance",
+    "failedTest": "tests/integration/test_workspace_upgrade.py::test_real_upgrade_preserves_credentials_journal_and_replays",
+    "failureAt": "deploy/lan/worker_peer_floor.py:217",
+    "message": "Owned container/state changed during actual floor observation",
+    "lanSummary": "1 failed, 16 passed",
+    "laterMainPytest": "SKIPPED_NOT_SUCCESS",
+    "s01Job": 127716312164,
+    "s01Conclusion": "success"
+  },
+  "Docs": {
+    "run": 42164075078,
+    "job": 127716312780,
+    "conclusion": "success"
+  },
+  "artifact": {
+    "id": 13478861491,
+    "name": "saintvision-core-evidence",
+    "zipSHA256": "9e4152c8c6b0bb981b7fa8e8befcf348d067f685c5a042bff7b38a8ba8d65bd9",
+    "bytes": 13211105,
+    "digestMatchesGitHub": true,
+    "rawZIP": "ignored .work/de71-ci-failure/core-evidence.zip; not exported"
+  },
+  "actualHostedGoRace": {
+    "step": "Test Linux Node concurrency and crash boundaries",
+    "stepConclusion": "success",
+    "package": "github.com/egparadise/SaintVision-Invion/services/node-agent/internal/migrationcontext",
+    "packagePass": true,
+    "topLevelPasses": 11,
+    "subtestPasses": 24,
+    "failedEvents": 0,
+    "passingTests": [
+      "TestNullPortsAndOpaqueBoundary",
+      "TestWellFormedUnregisteredProvidersNeverAuthenticate",
+      "TestAlreadyBoundSyntheticOriginalSelectorAndFreeze",
+      "TestCopyRejectsCallbacksAndBoundsBeforeEncoding",
+      "TestAlreadyBoundCurrentStatusAgeAndRefusalIsolation",
+      "TestSyntheticClockEnvelopeAndCompleteOutput",
+      "TestAlreadyBoundSyntheticCryptoHistoryEndpoints/current-selector",
+      "TestAlreadyBoundSyntheticCryptoHistoryEndpoints/publication-revoked",
+      "TestAlreadyBoundSyntheticCryptoHistoryEndpoints/certificate-revoked",
+      "TestAlreadyBoundSyntheticCryptoHistoryEndpoints/upper-endpoint-expiry",
+      "TestAlreadyBoundSyntheticCryptoHistoryEndpoints/raw-proof-corruption",
+      "TestAlreadyBoundSyntheticCryptoHistoryEndpoints",
+      "TestAlreadyBoundPolicyJoinsDoNotAuthenticate/wrong-executable",
+      "TestAlreadyBoundPolicyJoinsDoNotAuthenticate/archive-is-not-executable",
+      "TestAlreadyBoundPolicyJoinsDoNotAuthenticate/review-scope",
+      "TestAlreadyBoundPolicyJoinsDoNotAuthenticate/review-target",
+      "TestAlreadyBoundPolicyJoinsDoNotAuthenticate/ci-run",
+      "TestAlreadyBoundPolicyJoinsDoNotAuthenticate/wrong-node-DER",
+      "TestAlreadyBoundPolicyJoinsDoNotAuthenticate/wrong-node-grant",
+      "TestAlreadyBoundPolicyJoinsDoNotAuthenticate",
+      "TestWholePackageFullUnderlyingCensus",
+      "TestCensusMutantsAfterSimulatedRawRepin/G01",
+      "TestCensusMutantsAfterSimulatedRawRepin/G02",
+      "TestCensusMutantsAfterSimulatedRawRepin/G03",
+      "TestCensusMutantsAfterSimulatedRawRepin/G04",
+      "TestCensusMutantsAfterSimulatedRawRepin/G05",
+      "TestCensusMutantsAfterSimulatedRawRepin/G06",
+      "TestCensusMutantsAfterSimulatedRawRepin/G07",
+      "TestCensusMutantsAfterSimulatedRawRepin/G08",
+      "TestCensusMutantsAfterSimulatedRawRepin/R01",
+      "TestCensusMutantsAfterSimulatedRawRepin/R02",
+      "TestCensusMutantsAfterSimulatedRawRepin/R03",
+      "TestCensusMutantsAfterSimulatedRawRepin/cross-file-generic",
+      "TestCensusMutantsAfterSimulatedRawRepin",
+      "TestRepositoryBoundaryAndZeroEffects"
+    ],
+    "wholeGoFailEvents": 0,
+    "censusOutput": [
+      "source_gate_test.go:299: actual full package: 12 files, input types=13 fields=73 embedded=0 canonicalSHA256=7670b418ced1c650f41f9ececb0f2a06a466ebb3c174137a00d2e4ab62114bc2; same-toolchain immutable baseline"
+    ]
+  },
+  "unchangedFailureSourcePins": [
+    {
+      "path": "deploy/lan/worker_peer_floor.py",
+      "pins": {
+        "eb32b211ab3704935b9431747089ab0715582a74": "c73c81adaedb2a7b3b8513cd874b093a71f7b5c147e2e08ea86f71a54c8d2fec",
+        "4ce63e8ee78d957aa91e813f6ee226cc21abb52a": "c73c81adaedb2a7b3b8513cd874b093a71f7b5c147e2e08ea86f71a54c8d2fec",
+        "de71c07c2b827eea50e2ca660f80d042334472c7": "c73c81adaedb2a7b3b8513cd874b093a71f7b5c147e2e08ea86f71a54c8d2fec"
+      }
+    },
+    {
+      "path": "tests/integration/test_workspace_upgrade.py",
+      "pins": {
+        "eb32b211ab3704935b9431747089ab0715582a74": "54a730d522599e376b8246a0fe01488c4736763c651d8838b10ed4fa3271e6ba",
+        "4ce63e8ee78d957aa91e813f6ee226cc21abb52a": "54a730d522599e376b8246a0fe01488c4736763c651d8838b10ed4fa3271e6ba",
+        "de71c07c2b827eea50e2ca660f80d042334472c7": "54a730d522599e376b8246a0fe01488c4736763c651d8838b10ed4fa3271e6ba"
+      }
+    }
+  ],
+  "causeBoundary": "Tuple differs across two actual Docker reads. Exact differing tuple field is UNKNOWN; logs do not record before/after snapshots. No inference of harmless metadata-only difference or live failure.",
+  "sourceObservation": "observe compares raw Mounts list and full volume dict; adjacent context canonicalizes sorted Mounts and excludes CreatedAt. Candidate source for separate diagnosis, not established cause and not permission to relax identity guards.",
+  "scope": "Failure source/test are outside current package-only grant; no edits, retries or environment changes made.",
+  "review": "NOT_STARTED",
+  "boundedDelivery": "PENDING_ROOT_SCOPED_DECISION",
+  "observedKST": "2026-11-06T13:56:52.439150+09:00"
+}
