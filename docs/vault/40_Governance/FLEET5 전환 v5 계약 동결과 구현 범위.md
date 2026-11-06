@@ -1,11 +1,11 @@
 ---
 doc_id: "GOV-FLEET5-BOOTSTRAP-V5-FREEZE-CODE-SCOPE-20261106"
 title: "FLEET5 전환 v5 계약 동결과 구현 범위"
-version: "1.0.29"
+version: "1.0.30"
 status: "active"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-11-07T06:58:12+09:00"
+updated: "2026-11-07T07:16:09+09:00"
 source_of_truth: "Git"
 ---
 
@@ -241,3 +241,8 @@ B9g실제90cc판정뒤검토자의종료해제를fresh로확인해단일Claude t
 ## L1R2 실제 게시·새 Core와 실제 delta 검토
 
 Root는f2c1/parent08e0의시험된Go2hash9361e40f와README허용상태문장만후속변경·141manifest입력/79원문·exactDocs42299140025/all19를대조했다. 단한번새Core42300147891/correlationfleet5-d04-l1-r2-core-953a3e40ff0f482eb0b4e4a64c945d9b를시작했고실제A7검토자의종료해제뒤단일L1deltaCODEtask_a152e893e6de/ctx_06f0718be774를배정했다. 새Core최종/독립닫힘은미판정이며기존08e0성공을빌리지않는다. factory/provider/port/current/효과/실장비수락없음을유지한다.
+
+
+## 실제 L1delta·README 지적 닫힘
+
+실제a967/Docs42302478610은f2c1의L1delta를INTERNAL_CODE_ACCEPT_L1_CLOSED/findings0로판정하고I3도닫았다. 기존I1/I2/I4와중복tuple slice-vs-frozenset의새INFO I5는엄격한fail-closed정밀성메모다. 새Core42300147891의최종원문증거는아직대기이며old08e0성공을빌리지않는다. provider/opaquefactory/port/current/효과/실장비권한과실제등록은미제공이다.

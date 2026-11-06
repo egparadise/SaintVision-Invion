@@ -1,6 +1,6 @@
 {
   "schema": "fleet5-root-review-resource-sequence:1",
-  "atKST": "2026-11-07T06:58:12+09:00",
+  "atKST": "2026-11-07T07:16:09+09:00",
   "completedB": {
     "task": "task_d4c4c809ed4e",
     "review": "ac9182c3e3d606ec027c0be2e90e049ff50d54f1",
@@ -12,25 +12,9 @@
     "verdict": "ACCEPT auxiliary delta at design/proposal level, no remaining blocker",
     "source": "8874b2dfe0dda9a019bd5f334636668290702e13"
   },
-  "active": {
-    "atKST": "2026-11-07T06:58:12+09:00",
-    "source": "f2c1afb78b589b4b2cbcf3dcd4dc4f3c3f3bc856",
-    "base": "08e0f56eabe7d46518e17b8c3d6d7e296df880ac",
-    "Docs": 42299140025,
-    "task": "task_a152e893e6de",
-    "dispatch": "ctx_06f0718be774",
-    "status": "DISPATCHED_PENDING_ACTUAL_L1_DELTA_CODE_VERDICT",
-    "scope": "Exact3line earlybound/new16-17test/READMEstatus-onlydelta; accepted879a schema/joins untouched",
-    "testCodeBinding": "9361e40fd8390684cd263f4ddbbcd1c0d1d3da0b1e7d37b12db216971ff1aa7c",
-    "actualCore": 42300147891,
-    "CoreStatus": "in_progress",
-    "CoreConclusion": null,
-    "ownerQuestion": "msg_c57f6969d82e",
-    "freshPredecessorLifecycle": "ctx_d6e29070eb5d succeeded_settled_exited_released",
-    "runtimeOrFactoryGrant": false
-  },
+  "active": null,
   "pending": [],
-  "authorParallelWork": "Same B Codex fixes all30parsed guard coverage under A7R2 static-only; D04 author holds exactf2c1/newCore and actual L1delta verdict msg_c57f pending",
+  "authorParallelWork": "B author A7R2 development verifier reports30parsed=30audited/new18clean/19HOLD; final proof/docs in progress, not frozen or independently accepted. D04 author holdsf2c1 pending actualCore final.",
   "reason": "actuala7e9 and5a3c reviews+CI verified andprecisefixscopesdelivered; do notselfclose source/runtime",
   "genericApprovalMissing": false,
   "completedRL1": {
@@ -38,7 +22,7 @@
     "review": "0e53fc024ca773b7719182e170e5e126aeaf5b95",
     "verdict": "ACCEPT TEST-ONLY; R-L1 CLOSED; no new findings"
   },
-  "nextActualReviewTrigger": "Actual D04L1R2 verdict and fresh reviewer release, then frozen A7R2 candidate and its actual evidence; no duplicate reviewer",
+  "nextActualReviewTrigger": "Exact frozen A7R2 source/receipts/Docs after Root verification; predecessor06f now actually succeeded_settled_exited_released; no new reviewer until candidate is ready",
   "completedIntegration": {
     "task": "task_78064fb4b7ff",
     "dispatch": "ctx_ed7ec73163d6",
@@ -702,6 +686,55 @@
       }
     ],
     "next": "b-a7-snapshot-r2-root-fix-cut.json",
+    "reviewerFinalLifecycle": "succeeded_settled_exited_released"
+  },
+  "completedD04L1R2": {
+    "atKST": "2026-11-07T07:16:09+09:00",
+    "source": "f2c1afb78b589b4b2cbcf3dcd4dc4f3c3f3bc856",
+    "base": "08e0f56eabe7d46518e17b8c3d6d7e296df880ac",
+    "Docs": 42299140025,
+    "task": "task_a152e893e6de",
+    "dispatch": "ctx_06f0718be774",
+    "status": "ACTUAL_INTERNAL_CODE_ACCEPT_L1_CLOSED_I3_CLOSED_INFO_ONLY",
+    "scope": "Exact3line earlybound/new16-17test/READMEstatus-onlydelta; accepted879a schema/joins untouched",
+    "testCodeBinding": "9361e40fd8390684cd263f4ddbbcd1c0d1d3da0b1e7d37b12db216971ff1aa7c",
+    "actualCore": 42300147891,
+    "CoreStatus": "in_progress",
+    "CoreConclusion": null,
+    "ownerQuestion": "msg_c57f6969d82e",
+    "freshPredecessorLifecycle": "ctx_d6e29070eb5d succeeded_settled_exited_released",
+    "runtimeOrFactoryGrant": false,
+    "actualReview": "a967e5dc0baf6fa21e827303b609f716478ffa6b",
+    "actualDocs": 42302478610,
+    "actualWorkerDone": "msg_647d3192c25f",
+    "findings": [],
+    "info": [
+      {
+        "id": "D04-I1",
+        "status": "RETAINED",
+        "text": "Unchanged by R2 for <= 16 tuples; stated in README. For > 16 tuples, R2 now equals the design first reason (MF1/MF2)."
+      },
+      {
+        "id": "D04-I2",
+        "status": "RETAINED",
+        "text": "Unchanged; listed in README as explicit precision limits."
+      },
+      {
+        "id": "D04-I3",
+        "status": "CLOSED",
+        "text": "See readme.I3."
+      },
+      {
+        "id": "D04-I4",
+        "status": "RETAINED",
+        "text": "Unchanged; README now states it precisely."
+      },
+      {
+        "id": "D04R2-I5",
+        "status": "NEW_INFO_NON_BLOCKING_NO_ACTION_REQUIRED",
+        "text": "This is a pre-existing representation note; R2 did not change it. The Go table is a slice, and both the new 01 guard and the 08e0 04 guard count len(slice), including duplicate tuples. The design table is a frozenset, so 17 slice entries with duplicates have no exact design analog: their distinct set may have <= 16 members. Go refuses such an input as OWNERSHIP / 01. This is fail-closed and only stricter, so it belongs with the I2 family. A future contract delta may state that the private table is duplicate-free or is counted by entries."
+      }
+    ],
     "reviewerFinalLifecycle": "succeeded_settled_exited_released"
   }
 }

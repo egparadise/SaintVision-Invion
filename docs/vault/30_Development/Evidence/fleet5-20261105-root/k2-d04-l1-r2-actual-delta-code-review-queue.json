@@ -1,11 +1,11 @@
 {
-  "atKST": "2026-11-07T06:58:12+09:00",
+  "atKST": "2026-11-07T07:16:09+09:00",
   "source": "f2c1afb78b589b4b2cbcf3dcd4dc4f3c3f3bc856",
   "base": "08e0f56eabe7d46518e17b8c3d6d7e296df880ac",
   "Docs": 42299140025,
   "task": "task_a152e893e6de",
   "dispatch": "ctx_06f0718be774",
-  "status": "DISPATCHED_PENDING_ACTUAL_L1_DELTA_CODE_VERDICT",
+  "status": "ACTUAL_INTERNAL_CODE_ACCEPT_L1_CLOSED_I3_CLOSED_INFO_ONLY",
   "scope": "Exact3line earlybound/new16-17test/READMEstatus-onlydelta; accepted879a schema/joins untouched",
   "testCodeBinding": "9361e40fd8390684cd263f4ddbbcd1c0d1d3da0b1e7d37b12db216971ff1aa7c",
   "actualCore": 42300147891,
@@ -13,5 +13,37 @@
   "CoreConclusion": null,
   "ownerQuestion": "msg_c57f6969d82e",
   "freshPredecessorLifecycle": "ctx_d6e29070eb5d succeeded_settled_exited_released",
-  "runtimeOrFactoryGrant": false
+  "runtimeOrFactoryGrant": false,
+  "actualReview": "a967e5dc0baf6fa21e827303b609f716478ffa6b",
+  "actualDocs": 42302478610,
+  "actualWorkerDone": "msg_647d3192c25f",
+  "findings": [],
+  "info": [
+    {
+      "id": "D04-I1",
+      "status": "RETAINED",
+      "text": "Unchanged by R2 for <= 16 tuples; stated in README. For > 16 tuples, R2 now equals the design first reason (MF1/MF2)."
+    },
+    {
+      "id": "D04-I2",
+      "status": "RETAINED",
+      "text": "Unchanged; listed in README as explicit precision limits."
+    },
+    {
+      "id": "D04-I3",
+      "status": "CLOSED",
+      "text": "See readme.I3."
+    },
+    {
+      "id": "D04-I4",
+      "status": "RETAINED",
+      "text": "Unchanged; README now states it precisely."
+    },
+    {
+      "id": "D04R2-I5",
+      "status": "NEW_INFO_NON_BLOCKING_NO_ACTION_REQUIRED",
+      "text": "This is a pre-existing representation note; R2 did not change it. The Go table is a slice, and both the new 01 guard and the 08e0 04 guard count len(slice), including duplicate tuples. The design table is a frozenset, so 17 slice entries with duplicates have no exact design analog: their distinct set may have <= 16 members. Go refuses such an input as OWNERSHIP / 01. This is fail-closed and only stricter, so it belongs with the I2 family. A future contract delta may state that the private table is duplicate-free or is counted by entries."
+    }
+  ],
+  "reviewerFinalLifecycle": "succeeded_settled_exited_released"
 }

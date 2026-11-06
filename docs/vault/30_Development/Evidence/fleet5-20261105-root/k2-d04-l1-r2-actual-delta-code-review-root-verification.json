@@ -1,0 +1,49 @@
+{
+  "atKST": "2026-11-07T07:13:21+09:00",
+  "target": "f2c1afb78b589b4b2cbcf3dcd4dc4f3c3f3bc856",
+  "actualReview": "a967e5dc0baf6fa21e827303b609f716478ffa6b",
+  "branch": "agent/claude/fleet5-k2-d04-l1-r2-f2c1-review-20261107",
+  "Docs": 42302478610,
+  "job": 128183479509,
+  "correlation": "claude-k2-d04-l1-r2-f2c1-review-a967e5dc-ctx_06f0718be774",
+  "rootVerifiedExactHeadRefEventPathAttemptAll19StepsSuccess": true,
+  "remoteExact": true,
+  "onlyOwnAddedReviewFiles": 7,
+  "actualWorkerDone": "msg_647d3192c25f",
+  "verdict": "INTERNAL_CODE_ACCEPT_L1_CLOSED",
+  "L1": "CLOSED",
+  "I3": "CLOSED",
+  "findings": [],
+  "info": [
+    {
+      "id": "D04-I1",
+      "status": "RETAINED",
+      "text": "Unchanged by R2 for <= 16 tuples; stated in README. For > 16 tuples, R2 now equals the design first reason (MF1/MF2)."
+    },
+    {
+      "id": "D04-I2",
+      "status": "RETAINED",
+      "text": "Unchanged; listed in README as explicit precision limits."
+    },
+    {
+      "id": "D04-I3",
+      "status": "CLOSED",
+      "text": "See readme.I3."
+    },
+    {
+      "id": "D04-I4",
+      "status": "RETAINED",
+      "text": "Unchanged; README now states it precisely."
+    },
+    {
+      "id": "D04R2-I5",
+      "status": "NEW_INFO_NON_BLOCKING_NO_ACTION_REQUIRED",
+      "text": "This is a pre-existing representation note; R2 did not change it. The Go table is a slice, and both the new 01 guard and the 08e0 04 guard count len(slice), including duplicate tuples. The design table is a frozenset, so 17 slice entries with duplicates have no exact design analog: their distinct set may have <= 16 members. Go refuses such an input as OWNERSHIP / 01. This is fail-closed and only stricter, so it belongs with the I2 family. A future contract delta may state that the private table is duplicate-free or is counted by entries."
+    }
+  ],
+  "scope": "Static reading of the 3-path delta plus Root-attributed unit evidence. Independent acceptance of the L1 code/test/README delta only; distinct from Root's Go pass, the pending full Core 42300147891, integration, runtime, production authentication and fleet acceptance.",
+  "reviewerExecutedGo": false,
+  "newCoreFinalResultInferred": false,
+  "runtimeFactoryProducerPortGrant": false,
+  "wholeProgramComplete": false
+}

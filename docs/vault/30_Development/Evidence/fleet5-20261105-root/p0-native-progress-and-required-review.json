@@ -3,8 +3,8 @@
   "recordedAtKST": "2026-11-06T00:46:51+09:00",
   "rootBase": "2b1753ce59c09037b5e130a7ffe64794d1d45fdf",
   "priorRootCheckpoint": {
-    "SHA": "1552766f90269157a6f3eaedf51a16ecf7aedaba",
-    "Docs": 42299073609,
+    "SHA": "305ef12002d35eec4257dd75014d4629460cc07b",
+    "Docs": 42301112538,
     "exactHeadCorrelationAllJobsSuccess": true,
     "remoteMatches": true,
     "syncExits": [
@@ -12,13 +12,13 @@
       0,
       0
     ],
-    "independentlyMatchedNormalizedDestinationHashes": 2973,
+    "independentlyMatchedNormalizedDestinationHashes": 2980,
     "pending": 0,
     "conflicts": 0,
     "trackedAndUntrackedClean": true,
     "rootDocsOnly": true,
     "wholeProgramComplete": false,
-    "verifiedAtKST": "2026-11-07T06:45:15+09:00"
+    "verifiedAtKST": "2026-11-07T07:01:18+09:00"
   },
   "actualPlanLowReview": {
     "source": "803ad270562b1b75e44d26f9e14b965c714ab519",
@@ -2515,7 +2515,7 @@
     "ownerT1T2T3": "msg_620855c76519",
     "normativeRevisionReply": "msg_0392caf64d5d"
   },
-  "latestRecordAtKST": "2026-11-07T06:58:12+09:00",
+  "latestRecordAtKST": "2026-11-07T07:16:09+09:00",
   "optionalLowTokenTestDelta": {
     "source": "f0af307705b4923ebc3e231db5238af4c70aa389",
     "scope": "two otherwise-valid token payload corrections and JSON validity assertions; runtime unchanged",
@@ -3108,23 +3108,7 @@
     "reviewOnlyPaths": 18
   },
   "BRev7RootDecision": "b-rev7-concrete-root-decision.json",
-  "activeActualReview": {
-    "atKST": "2026-11-07T06:58:12+09:00",
-    "source": "f2c1afb78b589b4b2cbcf3dcd4dc4f3c3f3bc856",
-    "base": "08e0f56eabe7d46518e17b8c3d6d7e296df880ac",
-    "Docs": 42299140025,
-    "task": "task_a152e893e6de",
-    "dispatch": "ctx_06f0718be774",
-    "status": "DISPATCHED_PENDING_ACTUAL_L1_DELTA_CODE_VERDICT",
-    "scope": "Exact3line earlybound/new16-17test/READMEstatus-onlydelta; accepted879a schema/joins untouched",
-    "testCodeBinding": "9361e40fd8390684cd263f4ddbbcd1c0d1d3da0b1e7d37b12db216971ff1aa7c",
-    "actualCore": 42300147891,
-    "CoreStatus": "in_progress",
-    "CoreConclusion": null,
-    "ownerQuestion": "msg_c57f6969d82e",
-    "freshPredecessorLifecycle": "ctx_d6e29070eb5d succeeded_settled_exited_released",
-    "runtimeOrFactoryGrant": false
-  },
+  "activeActualReview": null,
   "nextReviewRequires": "newimmutableK2Low/Stage2 orB8 pilot/evidence; oneClaudeafteractualrelease",
   "K2LatestImmutableProposalRootObservation": "k2-rev2-root-actual-contract-review-gate.json",
   "K2LatestActualReviewDispatch": {
@@ -3276,5 +3260,9 @@
   "D04R2Core": "k2-d04-l1-r2-core-ci-root-observation.json",
   "D04R2DeltaReview": "k2-d04-l1-r2-actual-delta-code-review-queue.json",
   "A7R1Actual": "b-a7-snapshot-r1-actual-review-root-verification.json",
-  "A7R2Cut": "b-a7-snapshot-r2-root-fix-cut.json"
+  "A7R2Cut": "b-a7-snapshot-r2-root-fix-cut.json",
+  "D04R2DeltaActual": "k2-d04-l1-r2-actual-delta-code-review-root-verification.json",
+  "D04R2CodeL1": "CLOSED_BY_ACTUAL_INDEPENDENT_REVIEW",
+  "D04R2CoreStatus": "in_progress",
+  "D04R2CoreConclusion": null
 }

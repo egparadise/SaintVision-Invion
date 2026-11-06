@@ -1,5 +1,5 @@
 {
-  "atKST": "2026-11-07T06:58:12+09:00",
+  "atKST": "2026-11-07T07:16:09+09:00",
   "run": 42300147891,
   "head": "f2c1afb78b589b4b2cbcf3dcd4dc4f3c3f3bc856",
   "branch": "agent/codex/fleet5-k2-d04-l1-r2-20261107",
@@ -208,115 +208,115 @@
         {
           "number": 15,
           "name": "Test Linux Node concurrency and crash boundaries",
-          "status": "in_progress",
-          "conclusion": null
+          "status": "completed",
+          "conclusion": "success"
         },
         {
           "number": 16,
           "name": "Build Node and isolated synthetic workload image",
-          "status": "pending",
-          "conclusion": null
+          "status": "completed",
+          "conclusion": "success"
         },
         {
           "number": 17,
           "name": "Verify Docker API negotiation and actual bounded execution",
-          "status": "pending",
-          "conclusion": null
+          "status": "completed",
+          "conclusion": "success"
         },
         {
           "number": 18,
           "name": "Build pinned Python workload image for kernel integration",
-          "status": "pending",
-          "conclusion": null
+          "status": "completed",
+          "conclusion": "success"
         },
         {
           "number": 19,
           "name": "Build owned LAN installer image and provide storage source root",
-          "status": "pending",
-          "conclusion": null
+          "status": "completed",
+          "conclusion": "success"
         },
         {
           "number": 20,
           "name": "Build production API image and require explicit configuration",
-          "status": "pending",
-          "conclusion": null
+          "status": "completed",
+          "conclusion": "success"
         },
         {
           "number": 21,
           "name": "Verify Workspace recovery boundary first",
-          "status": "pending",
-          "conclusion": null
+          "status": "completed",
+          "conclusion": "success"
         },
         {
           "number": 22,
           "name": "Verify containment controls and physical cleanup",
-          "status": "pending",
-          "conclusion": null
+          "status": "completed",
+          "conclusion": "success"
         },
         {
           "number": 23,
           "name": "Verify business handoff against the execution kernel",
-          "status": "pending",
-          "conclusion": null
+          "status": "completed",
+          "conclusion": "success"
         },
         {
           "number": 24,
           "name": "Verify bounded shard replacement on two real Nodes",
-          "status": "pending",
-          "conclusion": null
+          "status": "completed",
+          "conclusion": "success"
         },
         {
           "number": 25,
           "name": "Run provisioned LAN installer acceptance",
-          "status": "pending",
-          "conclusion": null
+          "status": "completed",
+          "conclusion": "success"
         },
         {
           "number": 26,
           "name": "Require executed LAN installer evidence",
-          "status": "pending",
-          "conclusion": null
+          "status": "completed",
+          "conclusion": "success"
         },
         {
           "number": 27,
           "name": "Run owned CX01 recovery drill evidence",
-          "status": "pending",
-          "conclusion": null
+          "status": "completed",
+          "conclusion": "success"
         },
         {
           "number": 28,
           "name": "Require executed CX01 recovery evidence",
-          "status": "pending",
-          "conclusion": null
+          "status": "completed",
+          "conclusion": "success"
         },
         {
           "number": 29,
           "name": "Verify build admission queue fairness on PostgreSQL",
-          "status": "pending",
-          "conclusion": null
+          "status": "completed",
+          "conclusion": "success"
         },
         {
           "number": 30,
           "name": "Require executed build admission queue evidence",
-          "status": "pending",
-          "conclusion": null
+          "status": "completed",
+          "conclusion": "success"
         },
         {
           "number": 31,
           "name": "Verify LAN pilot database scripts with real PostgreSQL",
-          "status": "pending",
-          "conclusion": null
+          "status": "completed",
+          "conclusion": "success"
         },
         {
           "number": 32,
           "name": "Require executed LAN pilot database evidence",
-          "status": "pending",
-          "conclusion": null
+          "status": "completed",
+          "conclusion": "success"
         },
         {
           "number": 33,
           "name": "Run python -m pytest --junitxml=dist/core-tests.xml -o faulthandler_timeout=45 --ignore=tests/integration/test_build_product_runtime_real_pg.py --ignore=tests/integration/test_lan_pilot_database_real_pg.py --ignore=tests/integration/test_desktop_browser.py --ignore=tests/integration/test_approval_browser.py --ignore=tests/integration/test_studio_browser.py --ignore=tests/integration/test_web_container.py --ignore=tests/integration/test_workspace_upgrade.py --ignore=tests/integration/test_lan_storage_install.py --ignore=tests/integration/test_s3_object_store_postgres.py --ignore=tests/integration/test_recovery_drill.py",
-          "status": "pending",
+          "status": "in_progress",
           "conclusion": null
         },
         {
