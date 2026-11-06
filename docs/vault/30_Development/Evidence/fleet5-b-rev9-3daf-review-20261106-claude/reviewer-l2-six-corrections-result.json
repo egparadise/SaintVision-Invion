@@ -1,0 +1,377 @@
+{
+ "rows": [
+  {
+   "callRef": "0c55b8d56234",
+   "category": "ANALYSIS_RULE:A2",
+   "kind": null,
+   "path": "src/saintvision/errors.py",
+   "span": [
+    67,
+    15,
+    67,
+    34
+   ],
+   "fileSHAok": true,
+   "exprSHAok": true,
+   "expression": "ErrorCategory(head)",
+   "blocksGrant": true,
+   "actualBinding": null,
+   "callers": []
+  },
+  {
+   "callRef": "12fc7b761133",
+   "category": "NAMED_PORT:P-PUBLIC-SIGNATURE-VERIFY",
+   "kind": null,
+   "path": "services/control-plane/src/inv/storage_sampling.py",
+   "span": [
+    270,
+    8,
+    272,
+    9
+   ],
+   "fileSHAok": true,
+   "exprSHAok": true,
+   "expression": "certificate_key(certificate_der, challenge.channel, now).verify(\n            decoded[\"signature\"], D",
+   "blocksGrant": true,
+   "actualBinding": null,
+   "callers": []
+  },
+  {
+   "callRef": "2694f1602e6f",
+   "category": "ANALYSIS_RULE:A4",
+   "kind": null,
+   "path": "services/control-plane/src/inv/contracts.py",
+   "span": [
+    13,
+    8,
+    13,
+    78
+   ],
+   "fileSHAok": true,
+   "exprSHAok": true,
+   "expression": "files(\"inv\").joinpath(\"generated/core.schema.json\").read_text(\"utf-8\")",
+   "blocksGrant": true,
+   "actualBinding": null,
+   "callers": []
+  },
+  {
+   "callRef": "2805a1b95090",
+   "category": "ANALYSIS_RULE:A4",
+   "kind": null,
+   "path": "services/control-plane/src/inv/contracts.py",
+   "span": [
+    13,
+    8,
+    13,
+    59
+   ],
+   "fileSHAok": true,
+   "exprSHAok": true,
+   "expression": "files(\"inv\").joinpath(\"generated/core.schema.json\")",
+   "blocksGrant": true,
+   "actualBinding": null,
+   "callers": []
+  },
+  {
+   "callRef": "6f527581d8b2",
+   "category": "ANALYSIS_RULE:A2",
+   "kind": null,
+   "path": "src/saintvision/errors.py",
+   "span": [
+    100,
+    8,
+    100,
+    46
+   ],
+   "fileSHAok": true,
+   "exprSHAok": true,
+   "expression": "Exception.__init__(self, self.message)",
+   "blocksGrant": true,
+   "actualBinding": null,
+   "callers": []
+  },
+  {
+   "callRef": "bc24f7b22919",
+   "category": "IO_CATALOG_LINK:CANCEL",
+   "kind": "CANCEL",
+   "path": "services/control-plane/src/inv/node_transport.py",
+   "span": [
+    58,
+    8,
+    58,
+    25
+   ],
+   "fileSHAok": true,
+   "exprSHAok": true,
+   "expression": "super().connect()",
+   "blocksGrant": true,
+   "actualBinding": null,
+   "callers": [
+    {
+     "line": 289,
+     "function": "NodeDelivery.deliver",
+     "text": "result = self.client.exchange(",
+     "fileSHAok": true
+    }
+   ]
+  },
+  {
+   "callRef": "bc24f7b22919",
+   "category": "IO_CATALOG_LINK:EXECUTE",
+   "kind": "EXECUTE",
+   "path": "services/control-plane/src/inv/node_transport.py",
+   "span": [
+    58,
+    8,
+    58,
+    25
+   ],
+   "fileSHAok": true,
+   "exprSHAok": true,
+   "expression": "super().connect()",
+   "blocksGrant": true,
+   "actualBinding": null,
+   "callers": [
+    {
+     "line": 289,
+     "function": "NodeDelivery.deliver",
+     "text": "result = self.client.exchange(",
+     "fileSHAok": true
+    },
+    {
+     "line": 174,
+     "function": "transmit_fault",
+     "text": "result=client.exchange(channel,saved['envelope'])",
+     "fileSHAok": true
+    },
+    {
+     "line": 144,
+     "function": "_execute",
+     "text": "result=client.exchange(channel,envelope)",
+     "fileSHAok": true
+    }
+   ]
+  },
+  {
+   "callRef": "bc24f7b22919",
+   "category": "IO_CATALOG_LINK:GPU_ACTIVE_OBSERVE",
+   "kind": "GPU_ACTIVE_OBSERVE",
+   "path": "services/control-plane/src/inv/node_transport.py",
+   "span": [
+    58,
+    8,
+    58,
+    25
+   ],
+   "fileSHAok": true,
+   "exprSHAok": true,
+   "expression": "super().connect()",
+   "blocksGrant": true,
+   "actualBinding": null,
+   "callers": [
+    {
+     "line": 124,
+     "function": "NodeObservation.poll_resources",
+     "text": "snapshot = self.client.resource_snapshot(proof, request)",
+     "fileSHAok": true
+    },
+    {
+     "line": 117,
+     "function": "main",
+     "text": "probe=NodeTLSClient(**tls(args.state)).resource_snapshot(channel,{'nonce':uuid4().hex+uuid4().hex})",
+     "fileSHAok": true
+    }
+   ]
+  },
+  {
+   "callRef": "bc24f7b22919",
+   "category": "IO_CATALOG_LINK:HEARTBEAT_OBSERVE",
+   "kind": "HEARTBEAT_OBSERVE",
+   "path": "services/control-plane/src/inv/node_transport.py",
+   "span": [
+    58,
+    8,
+    58,
+    25
+   ],
+   "fileSHAok": true,
+   "exprSHAok": true,
+   "expression": "super().connect()",
+   "blocksGrant": true,
+   "actualBinding": null,
+   "callers": [
+    {
+     "line": 855,
+     "function": "NodeAgentReceipts.preflight_quarantine",
+     "text": "response = self._quarantine_client.probe(channel, request)",
+     "fileSHAok": true
+    },
+    {
+     "line": 119,
+     "function": "NodeObservation.poll",
+     "text": "response = self.client.probe(proof, request)",
+     "fileSHAok": true
+    }
+   ]
+  },
+  {
+   "callRef": "bc24f7b22919",
+   "category": "IO_CATALOG_LINK:OBJECT_READ",
+   "kind": "OBJECT_READ",
+   "path": "services/control-plane/src/inv/node_transport.py",
+   "span": [
+    58,
+    8,
+    58,
+    25
+   ],
+   "fileSHAok": true,
+   "exprSHAok": true,
+   "expression": "super().connect()",
+   "blocksGrant": true,
+   "actualBinding": null,
+   "callers": [
+    {
+     "line": 98,
+     "function": "ConfiguredRemoteModelReader.read",
+     "text": "result = self.client.read_chunk(by_node[location.node_id], request)",
+     "fileSHAok": true
+    },
+    {
+     "line": 43,
+     "function": "NodeTransfer.fetch",
+     "text": "result = self.client.read_chunk(channel, request)",
+     "fileSHAok": true
+    }
+   ]
+  },
+  {
+   "callRef": "bc24f7b22919",
+   "category": "IO_CATALOG_LINK:QUARANTINE_RECONCILE",
+   "kind": "QUARANTINE_RECONCILE",
+   "path": "services/control-plane/src/inv/node_transport.py",
+   "span": [
+    58,
+    8,
+    58,
+    25
+   ],
+   "fileSHAok": true,
+   "exprSHAok": true,
+   "expression": "super().connect()",
+   "blocksGrant": true,
+   "actualBinding": null,
+   "callers": [
+    {
+     "line": 978,
+     "function": "NodeAgentReceipts._record_quarantine",
+     "text": "receipt = self._quarantine_client.quarantine(channel, request)",
+     "fileSHAok": true
+    }
+   ]
+  },
+  {
+   "callRef": "bc24f7b22919",
+   "category": "IO_CATALOG_LINK:RECEIPT_OBSERVE",
+   "kind": "RECEIPT_OBSERVE",
+   "path": "services/control-plane/src/inv/node_transport.py",
+   "span": [
+    58,
+    8,
+    58,
+    25
+   ],
+   "fileSHAok": true,
+   "exprSHAok": true,
+   "expression": "super().connect()",
+   "blocksGrant": true,
+   "actualBinding": null,
+   "callers": [
+    {
+     "line": 289,
+     "function": "NodeDelivery.deliver",
+     "text": "result = self.client.exchange(",
+     "fileSHAok": true
+    },
+    {
+     "line": 186,
+     "function": "recover",
+     "text": "result=client.exchange(channel,saved['envelope'],observation_only=True)",
+     "fileSHAok": true
+    },
+    {
+     "line": 205,
+     "function": "execute",
+     "text": "duplicate = a.client.exchange(NodeChannels(a.e.db).snapshot(a.node,observation_only=True),envelope,observation_only=True",
+     "fileSHAok": true
+    }
+   ]
+  },
+  {
+   "callRef": "bc24f7b22919",
+   "category": "IO_CATALOG_LINK:STORAGE_SAMPLE",
+   "kind": "STORAGE_SAMPLE",
+   "path": "services/control-plane/src/inv/node_transport.py",
+   "span": [
+    58,
+    8,
+    58,
+    25
+   ],
+   "fileSHAok": true,
+   "exprSHAok": true,
+   "expression": "super().connect()",
+   "blocksGrant": true,
+   "actualBinding": null,
+   "callers": [
+    {
+     "line": 309,
+     "function": "StorageCheckCollector.collect",
+     "text": "envelope, certificate = self.client.storage_sample(challenge.channel, challenge)",
+     "fileSHAok": true
+    },
+    {
+     "line": 398,
+     "function": "StorageSampleStore.collect",
+     "text": "envelope, certificate = client.storage_sample(challenge.channel, challenge)",
+     "fileSHAok": true
+    }
+   ]
+  },
+  {
+   "callRef": "bc24f7b22919",
+   "category": "IO_CATALOG_LINK:TERMINAL_FRAME",
+   "kind": "TERMINAL_FRAME",
+   "path": "services/control-plane/src/inv/node_transport.py",
+   "span": [
+    58,
+    8,
+    58,
+    25
+   ],
+   "fileSHAok": true,
+   "exprSHAok": true,
+   "expression": "super().connect()",
+   "blocksGrant": true,
+   "actualBinding": null,
+   "callers": [
+    {
+     "line": 277,
+     "function": "TerminalService.frame",
+     "text": "result = runtime.client.terminal_frame(channel, {\"permit\": row[\"envelope\"], \"frame\": data})",
+     "fileSHAok": true
+    }
+   ]
+  }
+ ],
+ "rowCount": 14,
+ "uniqueRefs": 6,
+ "allBlocksGrant": true,
+ "allHashesOk": true,
+ "categoryCounts": {
+  "IO_CATALOG_LINK": 9,
+  "ANALYSIS_RULE:A2": 2,
+  "ANALYSIS_RULE:A4": 2,
+  "NAMED_PORT": 1
+ }
+}

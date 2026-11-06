@@ -1,0 +1,16 @@
+"""Reviewer probe: TERMINAL_FRAME register+invoke on a Node whose liveness is offline.
+Usage: python -B reviewer_offline_frame_probe.py <evidence-dir>  -> one JSON line."""
+import json, sys
+sys.path.insert(0, sys.argv[1])
+from model import World, binding, scope, sk, VER
+out = {}
+for profile in ('PLAIN', 'B'):
+    w = World(); s = scope(); n = w.nodes[sk(s)]; n['profile'] = profile; c = w.connect(VER)
+    p = w.register(c, binding(w, op='parent', kind='EXECUTE')); b = w.obligations[w.handles[p.handle_hash]['key']]['binding']
+    assert w.invoke(p, b['bodySHA'], b['method'], b['rawPath'])
+    n['liveness'] = 'offline'
+    h = w.register(c, binding(w, op='frame', kind='TERMINAL_FRAME', parent=p.handle_hash))
+    fb = w.obligations[w.handles[h.handle_hash]['key']]['binding'] if h else None
+    out[profile] = {'register': h is not None, 'invoke': bool(h and w.invoke(h, fb['bodySHA'], fb['method'], fb['rawPath'])),
+                    'R12_eligible': bool(h and w.eligible('R12', s, None, h))}
+print(json.dumps({'evidence': sys.argv[1].rstrip('/').split('/')[-1], 'offlineFrame': out, 'productRequires': 'terminal.py _current node status in {online,draining}'}))
