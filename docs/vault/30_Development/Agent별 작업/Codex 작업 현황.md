@@ -1,15 +1,19 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.413"
+version: "1.0.414"
 status: "review"
 author: "Codex"
-updated: "2026-11-06T18:22:06+09:00"
+updated: "2026-11-06T19:17:15+09:00"
 source_of_truth: "Git"
-active_card: "FLEET5-20261105 five physical node orchestration"
-active_card_status: "PLR1b084 source/2Docsverified; only3files+5393unchanged; narrowtask549pending behind B9ctxde27active; no sourceclosure/Core/physicalacceptance"
-active_card_next: "Claude actualB9wholeverdict/Rootnextcut; afterprioractualexitrelease start existingPLR1breadytaskonce; actualnarrowverdict thenRoot exactoneCoredecision"
+active_card: "ADMIN-LOGIN-20261106 with parallel FLEET5 supervision"
+active_card_status: "Requestedaccount actualSSO/adminAPI200/unauth401; source/buildCI/artifactverified; report-beforedeploy; defaultWindowstrust/GUIpending; B9bPLR1ccontinued"
+active_card_next: "Root Obsidianreport thenverifiedartifactlocalfrontenddeployment/postcheck; separateB9b/PLR1c candidates needactualreviewbeforeanyCore/runtimeacceptance"
 ---
+
+## 2026-11-06T19:17:15+09:00 관리자 로그인 실제 검증과 배포 전 보고
+
+사용자 요청 로컬 관리자 계정의 SSO·session·관리자 permission/members200과 비인증401을 실제 확인했다. 문서·Frontend 두 job CI와 빌드artifact hash를 검증하고 고유 보고3파일을 정본에 반영했다. Obsidian 보고 뒤 production frontend를 배포하며 Windows 기본 인증서 신뢰·브라우저 GUI는 미확인으로 남긴다. 별도 B9 실제2Medium/Low와 PL-R1c Low는 같은 두 Codex에게 정확한 fix-only 범위를 전달해 계속 진행한다. 다음 첫 행동/담당은 Root의 검증 산출물 frontend 배포·사후 점검이며 계정 비밀번호·DSN·token·privatekey는 공개 문서에 없다.
 
 ## 2026-11-06T18:22:06+09:00 PL-R1b 고정 후보와 실제 검토 대기열
 

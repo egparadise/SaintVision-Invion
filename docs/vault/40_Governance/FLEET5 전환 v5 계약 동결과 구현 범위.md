@@ -1,11 +1,11 @@
 ---
 doc_id: "GOV-FLEET5-BOOTSTRAP-V5-FREEZE-CODE-SCOPE-20261106"
 title: "FLEET5 전환 v5 계약 동결과 구현 범위"
-version: "1.0.13"
+version: "1.0.14"
 status: "active"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-11-06T17:34:35+09:00"
+updated: "2026-11-06T19:17:15+09:00"
 source_of_truth: "Git"
 ---
 
@@ -161,3 +161,8 @@ Codex는 의미 있는 순차 시험·기존 standalone 시험 불변·실제 �
 Root는 msg_6f62615d78a9로 같은 Codex에게 ac7498에서 새 PL-R1b branch를 만들어 effect_gate_test.go·pl_r1a_test.go·README와 고유 History/Evidence만 수정하도록 했다. Assign/Range ASSIGN/IncDec의 모든 write target과 parenthesis/index/selector root를 검사하고 실제 type에 따른 외부 pointee의 명시·암묵 dereference 쓰기를 거부한다. 실제7개 새 mutation·3개 전체 suite 반례의 old RED/new reason-bound 거부, 기존18개 case의 의도한 reason과 local/own-type/UTC 읽기 정상 사례를 보존한다. 비시험 Go·helper·pin·lock·schema·K1·workflow·의존성은 그대로다. 일반 alias/heap ownership 전체가 증명된다는 주장은 하지 않는다.
 
 Root는 전체 Core 전에 이 시험 보강을 하는 선택을 확정했다. 새 불변 후보와 own exact Docs 뒤 실제 Claude가 ac7498 대비 작은 delta만 검토한다. 이미 수락한 merge/pin/diagnostics 전체를 다시 열지 않는다. 그 판정 후 Root의 다음 정확한 결정으로 한 번의 fresh fullCore·Docs를 고정 최종 source에서 실행한다. 현재 ac7498/Core 실행은 부여하지 않았다. 이전 Core/Stage1 실패와 원래 차이 UNKNOWN, 새 hosted race·LAN·mainpytest·build 미실행, 실제 auth/clock/current/effects/설치·40runtime·5대 미완료는 보존한다. 정확한 본문은 k2a-pl-r1b-root-scope.json에 있다.
+
+
+## 실제 후속 검토와 제한된 다음 수정
+
+실제5a3c77f6/Docs42200327874는 PL-R1b의 원래7우회·write form·reason과 positive를 수락했지만 pointer conversion으로 같은 주소의 pointee 이름만 바꾸는 PL-R1c Low를 남겼다. Root는 msg_a58269f30929로 같은 Codex에게084 기반 새 test-only branch의3파일 보강만 지시했다. pointer target conversion은 untyped nil 또는 element가 types.Identical인 pointer operand만 허용하며 N1–N6/P1과 README 한계를 보강한다. 기존54사례와 acceptedmerge/pin/diagnostics·production bytes는 유지한다. 실제 새 delta 수락 뒤 한 번의 fresh Core를 선택하며 현재 Core grant는 없다. 정확한 범위는 k2a-pl-r1c-root-scope.json이다.

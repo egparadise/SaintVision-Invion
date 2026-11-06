@@ -1,0 +1,78 @@
+{
+  "atKST": "2026-11-06T19:17:15+09:00",
+  "scope": "explicit user-requested local portal account/project administrator",
+  "sourceImport": {
+    "priorRoot": "05b8d2bc666690a82a6268f744e78fbbc2294406",
+    "sourceCommits": [
+      "b2b64a4b7bc9c70852da99c75effe5ae2c3a27d1",
+      "56ad964558c55d0f16e14adfe7624c7cf368cf39"
+    ],
+    "rootImportCommits": [
+      "e02d79cd92233a94c1304fb5e1fb6e6d60e917a9",
+      "cfe22c65fd5525df2580fefbbd33cd41622f9065"
+    ],
+    "rootHead": "cfe22c65fd5525df2580fefbbd33cd41622f9065",
+    "onlyUniqueOwnDocs": 3,
+    "reportDocs": 42199924925,
+    "reportJob": 127832403033,
+    "reportExactHeadRefEventWorkflowCorrelationAttemptAll19StepsSuccess": true,
+    "applicationCodeChanged": false
+  },
+  "login": {
+    "atKST": "2026-11-06T18:49:53+09:00",
+    "SSOAuthorizationCodePKCES256": true,
+    "tokenExchangeHTTP": 200,
+    "sessionHTTP": 200,
+    "administratorPermissionHTTP": 200,
+    "membersHTTP": 200,
+    "roleCode": "owner",
+    "canAdminister": true,
+    "canRequest": true,
+    "canApprove": true,
+    "anonymousSessionHTTP": 401,
+    "tokenPersisted": false,
+    "passwordPersisted": false,
+    "subjectLinked": true
+  },
+  "CI": {
+    "source": "b2b64a4b7bc9c70852da99c75effe5ae2c3a27d1",
+    "branch": "agent/codex/admin-login-20261106",
+    "CI": {
+      "docs": {
+        "run": 42198460090,
+        "jobIds": [
+          127827531376
+        ],
+        "exactHeadRefWorkflowEventCorrelationAttemptAllJobsSuccess": true
+      },
+      "frontend": {
+        "run": 42198464199,
+        "jobIds": [
+          127827544145,
+          127827544343
+        ],
+        "exactHeadRefWorkflowEventCorrelationAttemptAllJobsSuccess": true
+      }
+    },
+    "verifiedAtKST": "2026-11-06T18:56:14+09:00"
+  },
+  "artifact": {
+    "source": "b2b64a4b7bc9c70852da99c75effe5ae2c3a27d1",
+    "FrontendRun": 42198464199,
+    "artifactId": 13492269040,
+    "artifactBytes": 1114732,
+    "artifactSHA256": "9f8765598305530e873838a91281198111569ef220f32be4d50b2fcabc43a12d",
+    "GitHubDigestMatched": true,
+    "builtFileCount": 13,
+    "runtimePublicAuthConfigSHA256": "e041468a55ca5aa4e68f069f8b86d7b35c421be58f1e1232cd65e1c4134e83fa",
+    "credentialValuesIncluded": false,
+    "applicationSourceChanged": false
+  },
+  "passwordDSNTokenPrivateKeyRecorded": false,
+  "backendRestored": true,
+  "frontendProductionDeployment": "NEXT_AFTER_THIS_OBSIDIAN_REPORT",
+  "defaultWindowsCertificateTrust": "NOT_VERIFIED/import waited/certutil timeout",
+  "browserGUI": "NOT_RUN_ComputerUse_Chrome_permission_denied",
+  "independentReview": "NOTRUN for operator account action; actual existing auth/provisioning path used",
+  "fivePCFLEETAuthorityChanged": false
+}

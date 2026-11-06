@@ -1,11 +1,11 @@
 ---
 doc_id: "GOV-FLEET5-B-BOOTSTRAP-SCOPE-20261106"
 title: "FLEET5 B 병행 역할과 전환 구현 범위 결정"
-version: "1.4.3"
+version: "1.4.4"
 status: "review"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-11-06T17:02:04+09:00"
+updated: "2026-11-06T19:17:15+09:00"
 source_of_truth: "Git"
 ---
 
@@ -123,3 +123,8 @@ Root는 같은 B Codex에게 msg_78b82487362a로 docs/static/symbolic Rev9-T1만
 다음 정적 시범은 inv.observation.NodeObservation.mark_offline과 Database.transaction이다. 필요한 A1c는 Connection/_ObservedConnection union과 원래 execute 결과를 증명하고 A3 ContextVar·A5 local container·좁은 A8 production NodeObservation.db constructor·T1 observability를 닫는다. 실제12개 공유 critical entry 집합을 이름으로 고정하고 다른 entry 상태는 올리지 않는다. A7 tools runtime import는 이 경로에 필요 없어 후속 snapshot/deliver로 미룬다. 출력 t1-mark-offline-closure.json은 SOURCE_STATIC_CLOSED_RUNTIME_PENDING이며 권한이 아니다.
 
 P-DBROLE/실제 PG role·READ COMMITTED·SET LOCAL·두 세션 lock·DB clock·logging handler·현재 인증·B cutover는 계속 NULL/HOLD다. statement_observer는 잠금 안에서 호출되므로 in-process/nonblocking/no-network/예외 격리 계약이 필요하고 현재 production observer/sink None의 출처를 증명한다. 전체523파일/3485계획을 다시 생성하지 않는다. pending_contracts 뒤 edge_categories의 두 producer 순서·fresh canonical state 해시를 기록하고 기존46면/R4/C2/C-P-R·signer/outbox/root/owner 권리와 미실행 증거를 보존한다. 실제 독립 Rev9 검토 전 B 제품 코드/port/freeze/runtime grant는 없다. 정확한 범위와 원문은 b-rev9-t1-root-scope.json에 둔다.
+
+
+## 실제 후속 검토와 제한된 다음 수정
+
+실제 a7e9f9d7/Docs42196493024는 Rev9의 matched-claim·cleanup 분리·hint 인증·한정 category 보완은 닫았으나 terminal Node/tenant 상태 parity와 누락된 ObservationWorker production root의2Medium·새 mutation escape Low를 남겼다. Root는 msg_b6b4813cb5c2로 같은 Codex에게3daf 기반 Rev9b fix-only를 지시했다. 실제 require_execution 및 online/draining parity, 모든 constructor root census와 lan_pilot.runtime local helper, 보호된 receiver use-site allowlist/alias·post-construction patch 거부를 보강한다. 고정19edge/12entry·전체598/757/1071/21·외부573/218·NULL bindings는 유지한다. A7은 실제 Rev9b 수락 뒤 snapshot만 선택할 후속 제안이며 deliver는 아직 범위가 아니다. 정확한 지시는 b-rev9b-root-scope.json에 있다.
