@@ -1,0 +1,2541 @@
+{
+  "classification": "SOURCE_UNION_ONLY_NOT_CORE_OR_RUNTIME_ACCEPTANCE",
+  "left": "21059451c23cebe8c038f76e437c390120205998",
+  "right": "cc82fb80e5913a739c9d2ef59bc4df2c503b7d92",
+  "mergeBase": "ff3169d360a707415d9b03484cf0cf3031f3912c",
+  "observedKST": "2026-11-06T16:39:52.447996+09:00",
+  "leftChangedPaths": 91,
+  "rightChangedPaths": 64,
+  "intersection": [],
+  "changedPathOwnership": [
+    {
+      "path": ".github/workflows/peer-floor-observation-diagnostic.yml",
+      "owner": "STAGE2_LEFT",
+      "base": null,
+      "left": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "1ce67deac8d43d8ee51555194abafbc866b289bb"
+      },
+      "right": null,
+      "expected": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "1ce67deac8d43d8ee51555194abafbc866b289bb"
+      }
+    },
+    {
+      "path": "deploy/lan/worker_peer_floor.py",
+      "owner": "STAGE2_LEFT",
+      "base": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "b537809fb623ebc84dabc9f4b6a076948e1db3cc"
+      },
+      "left": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "56fd9fc3c45df97d7c8f2c48ba1cd3efe223fd97"
+      },
+      "right": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "b537809fb623ebc84dabc9f4b6a076948e1db3cc"
+      },
+      "expected": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "56fd9fc3c45df97d7c8f2c48ba1cd3efe223fd97"
+      }
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2a-pl-r1a-20261106-codex/baseline-red-final.json",
+      "owner": "LOW_AND_PL_RIGHT",
+      "base": null,
+      "left": null,
+      "right": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "5ab8887aea9e67b2dca1099d25d1cc035394ae83"
+      },
+      "expected": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "5ab8887aea9e67b2dca1099d25d1cc035394ae83"
+      }
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2a-pl-r1a-20261106-codex/baseline-red-final.log",
+      "owner": "LOW_AND_PL_RIGHT",
+      "base": null,
+      "left": null,
+      "right": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "0a2a125b722248678636dc6580ac91bf746be260"
+      },
+      "expected": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "0a2a125b722248678636dc6580ac91bf746be260"
+      }
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2a-pl-r1a-20261106-codex/baseline-red.json",
+      "owner": "LOW_AND_PL_RIGHT",
+      "base": null,
+      "left": null,
+      "right": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "c74e61ce7a717fd1909d6efd2ee26aa01a0b8aeb"
+      },
+      "expected": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "c74e61ce7a717fd1909d6efd2ee26aa01a0b8aeb"
+      }
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2a-pl-r1a-20261106-codex/baseline-red.log",
+      "owner": "LOW_AND_PL_RIGHT",
+      "base": null,
+      "left": null,
+      "right": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "b509bdda885811c857e80069c6f7650eebf7185f"
+      },
+      "expected": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "b509bdda885811c857e80069c6f7650eebf7185f"
+      }
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2a-pl-r1a-20261106-codex/candidate-scope.json",
+      "owner": "LOW_AND_PL_RIGHT",
+      "base": null,
+      "left": null,
+      "right": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "b909a84ee0ef04cfc75acd1c7708b1dca509af72"
+      },
+      "expected": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "b909a84ee0ef04cfc75acd1c7708b1dca509af72"
+      }
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2a-pl-r1a-20261106-codex/focused-attempt1.json",
+      "owner": "LOW_AND_PL_RIGHT",
+      "base": null,
+      "left": null,
+      "right": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "bd0abb7a898b71792d4c7ab02c5ab23c7dcea51e"
+      },
+      "expected": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "bd0abb7a898b71792d4c7ab02c5ab23c7dcea51e"
+      }
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2a-pl-r1a-20261106-codex/focused-attempt1.log",
+      "owner": "LOW_AND_PL_RIGHT",
+      "base": null,
+      "left": null,
+      "right": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "12c0017712db0e4cab44222c8476011bbb7b76d4"
+      },
+      "expected": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "12c0017712db0e4cab44222c8476011bbb7b76d4"
+      }
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2a-pl-r1a-20261106-codex/full-unit-final.json",
+      "owner": "LOW_AND_PL_RIGHT",
+      "base": null,
+      "left": null,
+      "right": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "96231a0302f3ef465487cdc126f6d4493752cc7f"
+      },
+      "expected": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "96231a0302f3ef465487cdc126f6d4493752cc7f"
+      }
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2a-pl-r1a-20261106-codex/full-unit-final.log",
+      "owner": "LOW_AND_PL_RIGHT",
+      "base": null,
+      "left": null,
+      "right": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "153c1fc7dd8da6e032bcc97fc7e59a068fc9eff4"
+      },
+      "expected": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "153c1fc7dd8da6e032bcc97fc7e59a068fc9eff4"
+      }
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2a-pl-r1a-20261106-codex/full-unit.log",
+      "owner": "LOW_AND_PL_RIGHT",
+      "base": null,
+      "left": null,
+      "right": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "c13575d11496c9c986fd5b9751c25f788922241c"
+      },
+      "expected": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "c13575d11496c9c986fd5b9751c25f788922241c"
+      }
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2a-pl-r1a-20261106-codex/gate-01-check_docs.log",
+      "owner": "LOW_AND_PL_RIGHT",
+      "base": null,
+      "left": null,
+      "right": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "5031cae1445d9c1ab2a28d64a3daa47d42a5b30e"
+      },
+      "expected": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "5031cae1445d9c1ab2a28d64a3daa47d42a5b30e"
+      }
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2a-pl-r1a-20261106-codex/gate-02-check_ontology_generation.log",
+      "owner": "LOW_AND_PL_RIGHT",
+      "base": null,
+      "left": null,
+      "right": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "86845798ec818f6b53ceec117633ae92de989014"
+      },
+      "expected": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "86845798ec818f6b53ceec117633ae92de989014"
+      }
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2a-pl-r1a-20261106-codex/gate-03-check_ontology.log",
+      "owner": "LOW_AND_PL_RIGHT",
+      "base": null,
+      "left": null,
+      "right": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "cc3d8a0b904151d42ced50f84b4e1afaf7106383"
+      },
+      "expected": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "cc3d8a0b904151d42ced50f84b4e1afaf7106383"
+      }
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2a-pl-r1a-20261106-codex/gate-04-check_contract_bindings.log",
+      "owner": "LOW_AND_PL_RIGHT",
+      "base": null,
+      "left": null,
+      "right": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "729ff699f4f398e16f4d5cdcc846bfd6369a82bb"
+      },
+      "expected": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "729ff699f4f398e16f4d5cdcc846bfd6369a82bb"
+      }
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2a-pl-r1a-20261106-codex/gate-05-check_frontend_integrity.log",
+      "owner": "LOW_AND_PL_RIGHT",
+      "base": null,
+      "left": null,
+      "right": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "5fd3089b31a0aab23ef7d2dffec9dd162bfca842"
+      },
+      "expected": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "5fd3089b31a0aab23ef7d2dffec9dd162bfca842"
+      }
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2a-pl-r1a-20261106-codex/gate-06-check_doc_path_citations.log",
+      "owner": "LOW_AND_PL_RIGHT",
+      "base": null,
+      "left": null,
+      "right": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "7068dd5a829129bf0b22306c15dcbb2f364d2457"
+      },
+      "expected": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "7068dd5a829129bf0b22306c15dcbb2f364d2457"
+      }
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2a-pl-r1a-20261106-codex/gate-07-check_doc_single_source.log",
+      "owner": "LOW_AND_PL_RIGHT",
+      "base": null,
+      "left": null,
+      "right": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "49bcde309b5a7b1bbe880b43d3264cc84cd02eee"
+      },
+      "expected": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "49bcde309b5a7b1bbe880b43d3264cc84cd02eee"
+      }
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2a-pl-r1a-20261106-codex/gate-08-test_sync.log",
+      "owner": "LOW_AND_PL_RIGHT",
+      "base": null,
+      "left": null,
+      "right": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "a4da5b96a4b83a7ce2f9e51d5af517719281665c"
+      },
+      "expected": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "a4da5b96a4b83a7ce2f9e51d5af517719281665c"
+      }
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2a-pl-r1a-20261106-codex/gate-09-build_docs.log",
+      "owner": "LOW_AND_PL_RIGHT",
+      "base": null,
+      "left": null,
+      "right": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "da207344d93f114dd1835722009fe1944ac41bf4"
+      },
+      "expected": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "da207344d93f114dd1835722009fe1944ac41bf4"
+      }
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2a-pl-r1a-20261106-codex/gate-10-sync_obsidian.log",
+      "owner": "LOW_AND_PL_RIGHT",
+      "base": null,
+      "left": null,
+      "right": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "b32acde371dc3a40dcb7b5f06ef926c698ff5382"
+      },
+      "expected": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "b32acde371dc3a40dcb7b5f06ef926c698ff5382"
+      }
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2a-pl-r1a-20261106-codex/local-required-gates.json",
+      "owner": "LOW_AND_PL_RIGHT",
+      "base": null,
+      "left": null,
+      "right": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "d949f504589afe8be45e5912952d016ead5823c9"
+      },
+      "expected": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "d949f504589afe8be45e5912952d016ead5823c9"
+      }
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2a-pl-r1a-20261106-codex/local-results.json",
+      "owner": "LOW_AND_PL_RIGHT",
+      "base": null,
+      "left": null,
+      "right": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "1d818f0b46eac1d1ced3b4a1dad3c9b245bf4c17"
+      },
+      "expected": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "1d818f0b46eac1d1ced3b4a1dad3c9b245bf4c17"
+      }
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2a-pl-r1a-20261106-codex/run_gates.py.txt",
+      "owner": "LOW_AND_PL_RIGHT",
+      "base": null,
+      "left": null,
+      "right": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "bc0bf33de93a90393a5f7a63c054a5dca561dd87"
+      },
+      "expected": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "bc0bf33de93a90393a5f7a63c054a5dca561dd87"
+      }
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2a-pl-r1a-20261106-codex/vet-final.json",
+      "owner": "LOW_AND_PL_RIGHT",
+      "base": null,
+      "left": null,
+      "right": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "ac53fb222d6e943af99e010fde74c9f798700a6d"
+      },
+      "expected": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "ac53fb222d6e943af99e010fde74c9f798700a6d"
+      }
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2a-pl-r1a-20261106-codex/vet-final.log",
+      "owner": "LOW_AND_PL_RIGHT",
+      "base": null,
+      "left": null,
+      "right": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+      },
+      "expected": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+      }
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2a-pl-r1a-20261106-codex/vet.log",
+      "owner": "LOW_AND_PL_RIGHT",
+      "base": null,
+      "left": null,
+      "right": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+      },
+      "expected": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+      }
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2a-review-lows-20261106-codex/R1-R3-focused-attempt2.json",
+      "owner": "LOW_AND_PL_RIGHT",
+      "base": null,
+      "left": null,
+      "right": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "9e29e4805fc346b0b63ba0103dbf8a3ee338e2c3"
+      },
+      "expected": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "9e29e4805fc346b0b63ba0103dbf8a3ee338e2c3"
+      }
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2a-review-lows-20261106-codex/R1-R3-focused-attempt2.log",
+      "owner": "LOW_AND_PL_RIGHT",
+      "base": null,
+      "left": null,
+      "right": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "edd3bc062fe679b0f19a7a05e977502d3ac69eb2"
+      },
+      "expected": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "edd3bc062fe679b0f19a7a05e977502d3ac69eb2"
+      }
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2a-review-lows-20261106-codex/R1-R3-focused-attempt3.json",
+      "owner": "LOW_AND_PL_RIGHT",
+      "base": null,
+      "left": null,
+      "right": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "98e6e5e685a7d563afe51dd73e3be05116c57a07"
+      },
+      "expected": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "98e6e5e685a7d563afe51dd73e3be05116c57a07"
+      }
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2a-review-lows-20261106-codex/R1-R3-focused-attempt3.log",
+      "owner": "LOW_AND_PL_RIGHT",
+      "base": null,
+      "left": null,
+      "right": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "1d06611ff5155bc73e5dfbd8d0041e65f9697672"
+      },
+      "expected": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "1d06611ff5155bc73e5dfbd8d0041e65f9697672"
+      }
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2a-review-lows-20261106-codex/R1-R5-handoff.json",
+      "owner": "LOW_AND_PL_RIGHT",
+      "base": null,
+      "left": null,
+      "right": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "62409fe692cad51c3714fb6fdddaa69407cb393b"
+      },
+      "expected": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "62409fe692cad51c3714fb6fdddaa69407cb393b"
+      }
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2a-review-lows-20261106-codex/R2-R3-baseline-red.json",
+      "owner": "LOW_AND_PL_RIGHT",
+      "base": null,
+      "left": null,
+      "right": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "66467c731de9c8e6844dd9b35b278a08b41b1493"
+      },
+      "expected": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "66467c731de9c8e6844dd9b35b278a08b41b1493"
+      }
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2a-review-lows-20261106-codex/R2-R3-baseline-red.log",
+      "owner": "LOW_AND_PL_RIGHT",
+      "base": null,
+      "left": null,
+      "right": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "2d6a63ff04d9de6007d59439c0b503d32c79bf91"
+      },
+      "expected": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "2d6a63ff04d9de6007d59439c0b503d32c79bf91"
+      }
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2a-review-lows-20261106-codex/R5-census-attempt1.json",
+      "owner": "LOW_AND_PL_RIGHT",
+      "base": null,
+      "left": null,
+      "right": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "a8f62cbaae084d39c0b027bc8d844206803409e5"
+      },
+      "expected": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "a8f62cbaae084d39c0b027bc8d844206803409e5"
+      }
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2a-review-lows-20261106-codex/R5-census-attempt1.log",
+      "owner": "LOW_AND_PL_RIGHT",
+      "base": null,
+      "left": null,
+      "right": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "03a96e720a478ea55b13fb291f5f3f287dd00ad8"
+      },
+      "expected": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "03a96e720a478ea55b13fb291f5f3f287dd00ad8"
+      }
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2a-review-lows-20261106-codex/R5-focused.json",
+      "owner": "LOW_AND_PL_RIGHT",
+      "base": null,
+      "left": null,
+      "right": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "7c14716388533cd803349d4a6eaafbf817d5e14f"
+      },
+      "expected": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "7c14716388533cd803349d4a6eaafbf817d5e14f"
+      }
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2a-review-lows-20261106-codex/R5-focused.log",
+      "owner": "LOW_AND_PL_RIGHT",
+      "base": null,
+      "left": null,
+      "right": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "cd9f4880361eb3a1cb30ce668de2e69abc13b1a6"
+      },
+      "expected": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "cd9f4880361eb3a1cb30ce668de2e69abc13b1a6"
+      }
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2a-review-lows-20261106-codex/full-unit.log",
+      "owner": "LOW_AND_PL_RIGHT",
+      "base": null,
+      "left": null,
+      "right": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "cf952f563e0168bd34c14dbfe894b09b493d97d2"
+      },
+      "expected": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "cf952f563e0168bd34c14dbfe894b09b493d97d2"
+      }
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2a-review-lows-20261106-codex/gate-01-check_docs.log",
+      "owner": "LOW_AND_PL_RIGHT",
+      "base": null,
+      "left": null,
+      "right": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "595db90143b80b1e4539beba3a1dbc8df3916710"
+      },
+      "expected": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "595db90143b80b1e4539beba3a1dbc8df3916710"
+      }
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2a-review-lows-20261106-codex/gate-02-check_ontology_generation.log",
+      "owner": "LOW_AND_PL_RIGHT",
+      "base": null,
+      "left": null,
+      "right": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "86845798ec818f6b53ceec117633ae92de989014"
+      },
+      "expected": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "86845798ec818f6b53ceec117633ae92de989014"
+      }
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2a-review-lows-20261106-codex/gate-03-check_ontology.log",
+      "owner": "LOW_AND_PL_RIGHT",
+      "base": null,
+      "left": null,
+      "right": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "cc3d8a0b904151d42ced50f84b4e1afaf7106383"
+      },
+      "expected": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "cc3d8a0b904151d42ced50f84b4e1afaf7106383"
+      }
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2a-review-lows-20261106-codex/gate-04-check_contract_bindings.log",
+      "owner": "LOW_AND_PL_RIGHT",
+      "base": null,
+      "left": null,
+      "right": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "729ff699f4f398e16f4d5cdcc846bfd6369a82bb"
+      },
+      "expected": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "729ff699f4f398e16f4d5cdcc846bfd6369a82bb"
+      }
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2a-review-lows-20261106-codex/gate-05-check_frontend_integrity.log",
+      "owner": "LOW_AND_PL_RIGHT",
+      "base": null,
+      "left": null,
+      "right": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "5fd3089b31a0aab23ef7d2dffec9dd162bfca842"
+      },
+      "expected": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "5fd3089b31a0aab23ef7d2dffec9dd162bfca842"
+      }
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2a-review-lows-20261106-codex/gate-06-check_doc_path_citations.log",
+      "owner": "LOW_AND_PL_RIGHT",
+      "base": null,
+      "left": null,
+      "right": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "7068dd5a829129bf0b22306c15dcbb2f364d2457"
+      },
+      "expected": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "7068dd5a829129bf0b22306c15dcbb2f364d2457"
+      }
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2a-review-lows-20261106-codex/gate-07-check_doc_single_source.log",
+      "owner": "LOW_AND_PL_RIGHT",
+      "base": null,
+      "left": null,
+      "right": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "49bcde309b5a7b1bbe880b43d3264cc84cd02eee"
+      },
+      "expected": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "49bcde309b5a7b1bbe880b43d3264cc84cd02eee"
+      }
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2a-review-lows-20261106-codex/gate-08-test_sync.log",
+      "owner": "LOW_AND_PL_RIGHT",
+      "base": null,
+      "left": null,
+      "right": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "1ea8445ce3acdba6f093c482330149633c9de4ce"
+      },
+      "expected": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "1ea8445ce3acdba6f093c482330149633c9de4ce"
+      }
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2a-review-lows-20261106-codex/gate-09-build_docs.log",
+      "owner": "LOW_AND_PL_RIGHT",
+      "base": null,
+      "left": null,
+      "right": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "9ce10ad0960d843ecf21455159fe9ed9d4c38cee"
+      },
+      "expected": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "9ce10ad0960d843ecf21455159fe9ed9d4c38cee"
+      }
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2a-review-lows-20261106-codex/gate-10-sync_obsidian.log",
+      "owner": "LOW_AND_PL_RIGHT",
+      "base": null,
+      "left": null,
+      "right": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "7aaeee2977fa955361264f6cab237d80b803a9eb"
+      },
+      "expected": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "7aaeee2977fa955361264f6cab237d80b803a9eb"
+      }
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2a-review-lows-20261106-codex/go-env.log",
+      "owner": "LOW_AND_PL_RIGHT",
+      "base": null,
+      "left": null,
+      "right": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "092ec32f0ee2f00bd7eae5d73aa62f39b9e88af2"
+      },
+      "expected": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "092ec32f0ee2f00bd7eae5d73aa62f39b9e88af2"
+      }
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2a-review-lows-20261106-codex/local-final-go-results.json",
+      "owner": "LOW_AND_PL_RIGHT",
+      "base": null,
+      "left": null,
+      "right": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "d4642b0ea319ba56ad4f8bf3c8a3a2e94ccdc795"
+      },
+      "expected": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "d4642b0ea319ba56ad4f8bf3c8a3a2e94ccdc795"
+      }
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2a-review-lows-20261106-codex/local-required-gates.json",
+      "owner": "LOW_AND_PL_RIGHT",
+      "base": null,
+      "left": null,
+      "right": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "61495e7583809ef346696f19fc734f24c4885f96"
+      },
+      "expected": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "61495e7583809ef346696f19fc734f24c4885f96"
+      }
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2a-review-lows-20261106-codex/preserved-authoring-failures.json",
+      "owner": "LOW_AND_PL_RIGHT",
+      "base": null,
+      "left": null,
+      "right": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "a99322ec5af1a7e6d9ee24580611d1d4cd84d5c2"
+      },
+      "expected": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "a99322ec5af1a7e6d9ee24580611d1d4cd84d5c2"
+      }
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2a-review-lows-20261106-codex/run_gates.py.txt",
+      "owner": "LOW_AND_PL_RIGHT",
+      "base": null,
+      "left": null,
+      "right": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "bbfa55a06d86ec34610ad135a7e850b40503b7af"
+      },
+      "expected": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "bbfa55a06d86ec34610ad135a7e850b40503b7af"
+      }
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2a-review-lows-20261106-codex/vet.log",
+      "owner": "LOW_AND_PL_RIGHT",
+      "base": null,
+      "left": null,
+      "right": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+      },
+      "expected": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+      }
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-peer-floor-mount-order-stage2-20261106-codex/README.md",
+      "owner": "STAGE2_LEFT",
+      "base": null,
+      "left": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "2cda262e859f35a73a66e2ab45b80d633229c8f5"
+      },
+      "right": null,
+      "expected": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "2cda262e859f35a73a66e2ab45b80d633229c8f5"
+      }
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-peer-floor-mount-order-stage2-20261106-codex/candidate-helper-closure.json",
+      "owner": "STAGE2_LEFT",
+      "base": null,
+      "left": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "c44a4bbde442456e6bfeddf93515e329ed8560e7"
+      },
+      "right": null,
+      "expected": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "c44a4bbde442456e6bfeddf93515e329ed8560e7"
+      }
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-peer-floor-mount-order-stage2-20261106-codex/gate-01-check_docs.log",
+      "owner": "STAGE2_LEFT",
+      "base": null,
+      "left": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "5031cae1445d9c1ab2a28d64a3daa47d42a5b30e"
+      },
+      "right": null,
+      "expected": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "5031cae1445d9c1ab2a28d64a3daa47d42a5b30e"
+      }
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-peer-floor-mount-order-stage2-20261106-codex/gate-02-check_ontology_generation.log",
+      "owner": "STAGE2_LEFT",
+      "base": null,
+      "left": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "86845798ec818f6b53ceec117633ae92de989014"
+      },
+      "right": null,
+      "expected": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "86845798ec818f6b53ceec117633ae92de989014"
+      }
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-peer-floor-mount-order-stage2-20261106-codex/gate-03-check_ontology.log",
+      "owner": "STAGE2_LEFT",
+      "base": null,
+      "left": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "cc3d8a0b904151d42ced50f84b4e1afaf7106383"
+      },
+      "right": null,
+      "expected": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "cc3d8a0b904151d42ced50f84b4e1afaf7106383"
+      }
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-peer-floor-mount-order-stage2-20261106-codex/gate-04-check_contract_bindings.log",
+      "owner": "STAGE2_LEFT",
+      "base": null,
+      "left": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "729ff699f4f398e16f4d5cdcc846bfd6369a82bb"
+      },
+      "right": null,
+      "expected": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "729ff699f4f398e16f4d5cdcc846bfd6369a82bb"
+      }
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-peer-floor-mount-order-stage2-20261106-codex/gate-05-check_frontend_integrity.log",
+      "owner": "STAGE2_LEFT",
+      "base": null,
+      "left": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "5fd3089b31a0aab23ef7d2dffec9dd162bfca842"
+      },
+      "right": null,
+      "expected": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "5fd3089b31a0aab23ef7d2dffec9dd162bfca842"
+      }
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-peer-floor-mount-order-stage2-20261106-codex/gate-06-check_doc_path_citations.log",
+      "owner": "STAGE2_LEFT",
+      "base": null,
+      "left": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "7068dd5a829129bf0b22306c15dcbb2f364d2457"
+      },
+      "right": null,
+      "expected": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "7068dd5a829129bf0b22306c15dcbb2f364d2457"
+      }
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-peer-floor-mount-order-stage2-20261106-codex/gate-07-check_doc_single_source.log",
+      "owner": "STAGE2_LEFT",
+      "base": null,
+      "left": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "49bcde309b5a7b1bbe880b43d3264cc84cd02eee"
+      },
+      "right": null,
+      "expected": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "49bcde309b5a7b1bbe880b43d3264cc84cd02eee"
+      }
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-peer-floor-mount-order-stage2-20261106-codex/gate-08-test_sync.log",
+      "owner": "STAGE2_LEFT",
+      "base": null,
+      "left": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "47cb37ddbceafe091e022089f145f35122e8b76d"
+      },
+      "right": null,
+      "expected": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "47cb37ddbceafe091e022089f145f35122e8b76d"
+      }
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-peer-floor-mount-order-stage2-20261106-codex/gate-09-build_docs.log",
+      "owner": "STAGE2_LEFT",
+      "base": null,
+      "left": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "efabd3e57ac414b580d367690b049f061b71ac29"
+      },
+      "right": null,
+      "expected": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "efabd3e57ac414b580d367690b049f061b71ac29"
+      }
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-peer-floor-mount-order-stage2-20261106-codex/gate-10-sync_obsidian.log",
+      "owner": "STAGE2_LEFT",
+      "base": null,
+      "left": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "ad6c386bec93abcd24ff9d3a9bc5f7321a2c4162"
+      },
+      "right": null,
+      "expected": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "ad6c386bec93abcd24ff9d3a9bc5f7321a2c4162"
+      }
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-peer-floor-mount-order-stage2-20261106-codex/handoff.json",
+      "owner": "STAGE2_LEFT",
+      "base": null,
+      "left": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "07c86f12fc100c14a497d961ed4c2b27eda370f5"
+      },
+      "right": null,
+      "expected": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "07c86f12fc100c14a497d961ed4c2b27eda370f5"
+      }
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-peer-floor-mount-order-stage2-20261106-codex/hosted-report-gates/gate-01-check_docs.log",
+      "owner": "STAGE2_LEFT",
+      "base": null,
+      "left": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "5031cae1445d9c1ab2a28d64a3daa47d42a5b30e"
+      },
+      "right": null,
+      "expected": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "5031cae1445d9c1ab2a28d64a3daa47d42a5b30e"
+      }
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-peer-floor-mount-order-stage2-20261106-codex/hosted-report-gates/gate-02-check_ontology_generation.log",
+      "owner": "STAGE2_LEFT",
+      "base": null,
+      "left": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "86845798ec818f6b53ceec117633ae92de989014"
+      },
+      "right": null,
+      "expected": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "86845798ec818f6b53ceec117633ae92de989014"
+      }
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-peer-floor-mount-order-stage2-20261106-codex/hosted-report-gates/gate-03-check_ontology.log",
+      "owner": "STAGE2_LEFT",
+      "base": null,
+      "left": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "cc3d8a0b904151d42ced50f84b4e1afaf7106383"
+      },
+      "right": null,
+      "expected": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "cc3d8a0b904151d42ced50f84b4e1afaf7106383"
+      }
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-peer-floor-mount-order-stage2-20261106-codex/hosted-report-gates/gate-04-check_contract_bindings.log",
+      "owner": "STAGE2_LEFT",
+      "base": null,
+      "left": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "729ff699f4f398e16f4d5cdcc846bfd6369a82bb"
+      },
+      "right": null,
+      "expected": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "729ff699f4f398e16f4d5cdcc846bfd6369a82bb"
+      }
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-peer-floor-mount-order-stage2-20261106-codex/hosted-report-gates/gate-05-check_frontend_integrity.log",
+      "owner": "STAGE2_LEFT",
+      "base": null,
+      "left": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "5fd3089b31a0aab23ef7d2dffec9dd162bfca842"
+      },
+      "right": null,
+      "expected": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "5fd3089b31a0aab23ef7d2dffec9dd162bfca842"
+      }
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-peer-floor-mount-order-stage2-20261106-codex/hosted-report-gates/gate-06-check_doc_path_citations.log",
+      "owner": "STAGE2_LEFT",
+      "base": null,
+      "left": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "7068dd5a829129bf0b22306c15dcbb2f364d2457"
+      },
+      "right": null,
+      "expected": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "7068dd5a829129bf0b22306c15dcbb2f364d2457"
+      }
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-peer-floor-mount-order-stage2-20261106-codex/hosted-report-gates/gate-07-check_doc_single_source.log",
+      "owner": "STAGE2_LEFT",
+      "base": null,
+      "left": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "49bcde309b5a7b1bbe880b43d3264cc84cd02eee"
+      },
+      "right": null,
+      "expected": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "49bcde309b5a7b1bbe880b43d3264cc84cd02eee"
+      }
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-peer-floor-mount-order-stage2-20261106-codex/hosted-report-gates/gate-08-test_sync.log",
+      "owner": "STAGE2_LEFT",
+      "base": null,
+      "left": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "371f26dd589aae167ba25325454fa82bb54f410b"
+      },
+      "right": null,
+      "expected": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "371f26dd589aae167ba25325454fa82bb54f410b"
+      }
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-peer-floor-mount-order-stage2-20261106-codex/hosted-report-gates/gate-09-build_docs.log",
+      "owner": "STAGE2_LEFT",
+      "base": null,
+      "left": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "f11a3997788ccb2afc8a9a3a9e5b71c8d9593d17"
+      },
+      "right": null,
+      "expected": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "f11a3997788ccb2afc8a9a3a9e5b71c8d9593d17"
+      }
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-peer-floor-mount-order-stage2-20261106-codex/hosted-report-gates/gate-10-sync_obsidian.log",
+      "owner": "STAGE2_LEFT",
+      "base": null,
+      "left": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "d3ebf0cae9f299d67831d92f4ee99c2100b0e8f5"
+      },
+      "right": null,
+      "expected": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "d3ebf0cae9f299d67831d92f4ee99c2100b0e8f5"
+      }
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-peer-floor-mount-order-stage2-20261106-codex/hosted-report-gates/local-required-gates.json",
+      "owner": "STAGE2_LEFT",
+      "base": null,
+      "left": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "e51f8b84a2032c807db215092e8de947d899495b"
+      },
+      "right": null,
+      "expected": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "e51f8b84a2032c807db215092e8de947d899495b"
+      }
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-peer-floor-mount-order-stage2-20261106-codex/hosted-report-gates/run_gates.py.txt",
+      "owner": "STAGE2_LEFT",
+      "base": null,
+      "left": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "f9b90d5f60a28eb347a048ffbb0c27a6b5e195b6"
+      },
+      "right": null,
+      "expected": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "f9b90d5f60a28eb347a048ffbb0c27a6b5e195b6"
+      }
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-peer-floor-mount-order-stage2-20261106-codex/hosted-result.json",
+      "owner": "STAGE2_LEFT",
+      "base": null,
+      "left": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "d11b3e89f16c8607a4fa86d827804dde9b1d8bbe"
+      },
+      "right": null,
+      "expected": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "d11b3e89f16c8607a4fa86d827804dde9b1d8bbe"
+      }
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-peer-floor-mount-order-stage2-20261106-codex/hosted-run.json",
+      "owner": "STAGE2_LEFT",
+      "base": null,
+      "left": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "1008af0e0f10318d708326511ad99ef4e4ce9a46"
+      },
+      "right": null,
+      "expected": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "1008af0e0f10318d708326511ad99ef4e4ce9a46"
+      }
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-peer-floor-mount-order-stage2-20261106-codex/hosted-source-docs.json",
+      "owner": "STAGE2_LEFT",
+      "base": null,
+      "left": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "a5decff3bb03288eaa9894c622bbd582761d8a94"
+      },
+      "right": null,
+      "expected": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "a5decff3bb03288eaa9894c622bbd582761d8a94"
+      }
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-peer-floor-mount-order-stage2-20261106-codex/hosted-source-manifest.json",
+      "owner": "STAGE2_LEFT",
+      "base": null,
+      "left": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "24d0bd9608addf6229a95d14f4dfd3c7bd5b703a"
+      },
+      "right": null,
+      "expected": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "24d0bd9608addf6229a95d14f4dfd3c7bd5b703a"
+      }
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-peer-floor-mount-order-stage2-20261106-codex/local-required-gates.json",
+      "owner": "STAGE2_LEFT",
+      "base": null,
+      "left": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "a944fa90c120eab59b00205b1f993d54f2a8e313"
+      },
+      "right": null,
+      "expected": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "a944fa90c120eab59b00205b1f993d54f2a8e313"
+      }
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-peer-floor-mount-order-stage2-20261106-codex/run_gates.py.txt",
+      "owner": "STAGE2_LEFT",
+      "base": null,
+      "left": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "3a7693b493a1f93220d35eb8d2258a602bdc042f"
+      },
+      "right": null,
+      "expected": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "3a7693b493a1f93220d35eb8d2258a602bdc042f"
+      }
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-peer-floor-mount-order-stage2-20261106-codex/static-check.json",
+      "owner": "STAGE2_LEFT",
+      "base": null,
+      "left": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "deef203ce575818bed4fda2250d6eeaef57bd630"
+      },
+      "right": null,
+      "expected": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "deef203ce575818bed4fda2250d6eeaef57bd630"
+      }
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-peer-floor-mount-order-stage2-20261106-codex/unit-attempt1.json",
+      "owner": "STAGE2_LEFT",
+      "base": null,
+      "left": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "1cdffeebc757afa14397ab79734c600c0474acdb"
+      },
+      "right": null,
+      "expected": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "1cdffeebc757afa14397ab79734c600c0474acdb"
+      }
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-peer-floor-mount-order-stage2-20261106-codex/unit-attempt1.log",
+      "owner": "STAGE2_LEFT",
+      "base": null,
+      "left": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "9d03cf5b1c40f908a73c21e3cbe6538022d5f20e"
+      },
+      "right": null,
+      "expected": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "9d03cf5b1c40f908a73c21e3cbe6538022d5f20e"
+      }
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-peer-floor-mount-order-stage2-20261106-codex/unit-final.json",
+      "owner": "STAGE2_LEFT",
+      "base": null,
+      "left": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "b62e0a02367ccd004745c2fc8f659f521e42a9bb"
+      },
+      "right": null,
+      "expected": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "b62e0a02367ccd004745c2fc8f659f521e42a9bb"
+      }
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-peer-floor-mount-order-stage2-20261106-codex/unit-final.log",
+      "owner": "STAGE2_LEFT",
+      "base": null,
+      "left": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "970bc373e92814f4a49def1d71bdeb9a98819ff0"
+      },
+      "right": null,
+      "expected": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "970bc373e92814f4a49def1d71bdeb9a98819ff0"
+      }
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-peer-floor-observation-diagnostic-20261106-codex/README.md",
+      "owner": "STAGE2_LEFT",
+      "base": null,
+      "left": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "eaa13c3c4238b94eff29b78e5d8d6e660b931b1f"
+      },
+      "right": null,
+      "expected": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "eaa13c3c4238b94eff29b78e5d8d6e660b931b1f"
+      }
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-peer-floor-observation-diagnostic-20261106-codex/candidate-helper-closure.json",
+      "owner": "STAGE2_LEFT",
+      "base": null,
+      "left": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "6c96b2b9ece902aa11fd6d6c453de5292765eb21"
+      },
+      "right": null,
+      "expected": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "6c96b2b9ece902aa11fd6d6c453de5292765eb21"
+      }
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-peer-floor-observation-diagnostic-20261106-codex/dispatch-gap-gates/gate-01-check_docs.log",
+      "owner": "STAGE2_LEFT",
+      "base": null,
+      "left": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "595db90143b80b1e4539beba3a1dbc8df3916710"
+      },
+      "right": null,
+      "expected": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "595db90143b80b1e4539beba3a1dbc8df3916710"
+      }
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-peer-floor-observation-diagnostic-20261106-codex/dispatch-gap-gates/gate-02-check_ontology_generation.log",
+      "owner": "STAGE2_LEFT",
+      "base": null,
+      "left": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "86845798ec818f6b53ceec117633ae92de989014"
+      },
+      "right": null,
+      "expected": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "86845798ec818f6b53ceec117633ae92de989014"
+      }
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-peer-floor-observation-diagnostic-20261106-codex/dispatch-gap-gates/gate-03-check_ontology.log",
+      "owner": "STAGE2_LEFT",
+      "base": null,
+      "left": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "cc3d8a0b904151d42ced50f84b4e1afaf7106383"
+      },
+      "right": null,
+      "expected": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "cc3d8a0b904151d42ced50f84b4e1afaf7106383"
+      }
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-peer-floor-observation-diagnostic-20261106-codex/dispatch-gap-gates/gate-04-check_contract_bindings.log",
+      "owner": "STAGE2_LEFT",
+      "base": null,
+      "left": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "729ff699f4f398e16f4d5cdcc846bfd6369a82bb"
+      },
+      "right": null,
+      "expected": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "729ff699f4f398e16f4d5cdcc846bfd6369a82bb"
+      }
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-peer-floor-observation-diagnostic-20261106-codex/dispatch-gap-gates/gate-05-check_frontend_integrity.log",
+      "owner": "STAGE2_LEFT",
+      "base": null,
+      "left": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "5fd3089b31a0aab23ef7d2dffec9dd162bfca842"
+      },
+      "right": null,
+      "expected": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "5fd3089b31a0aab23ef7d2dffec9dd162bfca842"
+      }
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-peer-floor-observation-diagnostic-20261106-codex/dispatch-gap-gates/gate-06-check_doc_path_citations.log",
+      "owner": "STAGE2_LEFT",
+      "base": null,
+      "left": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "7068dd5a829129bf0b22306c15dcbb2f364d2457"
+      },
+      "right": null,
+      "expected": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "7068dd5a829129bf0b22306c15dcbb2f364d2457"
+      }
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-peer-floor-observation-diagnostic-20261106-codex/dispatch-gap-gates/gate-07-check_doc_single_source.log",
+      "owner": "STAGE2_LEFT",
+      "base": null,
+      "left": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "49bcde309b5a7b1bbe880b43d3264cc84cd02eee"
+      },
+      "right": null,
+      "expected": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "49bcde309b5a7b1bbe880b43d3264cc84cd02eee"
+      }
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-peer-floor-observation-diagnostic-20261106-codex/dispatch-gap-gates/gate-08-test_sync.log",
+      "owner": "STAGE2_LEFT",
+      "base": null,
+      "left": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "215d5cf167d3efc07244b87c476e871f690b345e"
+      },
+      "right": null,
+      "expected": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "215d5cf167d3efc07244b87c476e871f690b345e"
+      }
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-peer-floor-observation-diagnostic-20261106-codex/dispatch-gap-gates/gate-09-build_docs.log",
+      "owner": "STAGE2_LEFT",
+      "base": null,
+      "left": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "0d711c77381d04a734dd885f610f618d262079ce"
+      },
+      "right": null,
+      "expected": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "0d711c77381d04a734dd885f610f618d262079ce"
+      }
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-peer-floor-observation-diagnostic-20261106-codex/dispatch-gap-gates/gate-10-sync_obsidian.log",
+      "owner": "STAGE2_LEFT",
+      "base": null,
+      "left": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "173585921b48f443ad66a8b47c7df1f5c616bbf3"
+      },
+      "right": null,
+      "expected": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "173585921b48f443ad66a8b47c7df1f5c616bbf3"
+      }
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-peer-floor-observation-diagnostic-20261106-codex/dispatch-gap-gates/local-required-gates.json",
+      "owner": "STAGE2_LEFT",
+      "base": null,
+      "left": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "c32ceb6f006e7534e101fd978be805bbb1477d08"
+      },
+      "right": null,
+      "expected": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "c32ceb6f006e7534e101fd978be805bbb1477d08"
+      }
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-peer-floor-observation-diagnostic-20261106-codex/dispatch-gap-gates/run_gates.py.txt",
+      "owner": "STAGE2_LEFT",
+      "base": null,
+      "left": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "0612ad869f83255ff9c36a43159a55e8da11aa0c"
+      },
+      "right": null,
+      "expected": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "0612ad869f83255ff9c36a43159a55e8da11aa0c"
+      }
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-peer-floor-observation-diagnostic-20261106-codex/gate-01-check_docs.log",
+      "owner": "STAGE2_LEFT",
+      "base": null,
+      "left": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "595db90143b80b1e4539beba3a1dbc8df3916710"
+      },
+      "right": null,
+      "expected": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "595db90143b80b1e4539beba3a1dbc8df3916710"
+      }
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-peer-floor-observation-diagnostic-20261106-codex/gate-02-check_ontology_generation.log",
+      "owner": "STAGE2_LEFT",
+      "base": null,
+      "left": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "86845798ec818f6b53ceec117633ae92de989014"
+      },
+      "right": null,
+      "expected": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "86845798ec818f6b53ceec117633ae92de989014"
+      }
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-peer-floor-observation-diagnostic-20261106-codex/gate-03-check_ontology.log",
+      "owner": "STAGE2_LEFT",
+      "base": null,
+      "left": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "cc3d8a0b904151d42ced50f84b4e1afaf7106383"
+      },
+      "right": null,
+      "expected": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "cc3d8a0b904151d42ced50f84b4e1afaf7106383"
+      }
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-peer-floor-observation-diagnostic-20261106-codex/gate-04-check_contract_bindings.log",
+      "owner": "STAGE2_LEFT",
+      "base": null,
+      "left": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "729ff699f4f398e16f4d5cdcc846bfd6369a82bb"
+      },
+      "right": null,
+      "expected": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "729ff699f4f398e16f4d5cdcc846bfd6369a82bb"
+      }
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-peer-floor-observation-diagnostic-20261106-codex/gate-05-check_frontend_integrity.log",
+      "owner": "STAGE2_LEFT",
+      "base": null,
+      "left": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "5fd3089b31a0aab23ef7d2dffec9dd162bfca842"
+      },
+      "right": null,
+      "expected": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "5fd3089b31a0aab23ef7d2dffec9dd162bfca842"
+      }
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-peer-floor-observation-diagnostic-20261106-codex/gate-06-check_doc_path_citations.log",
+      "owner": "STAGE2_LEFT",
+      "base": null,
+      "left": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "7068dd5a829129bf0b22306c15dcbb2f364d2457"
+      },
+      "right": null,
+      "expected": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "7068dd5a829129bf0b22306c15dcbb2f364d2457"
+      }
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-peer-floor-observation-diagnostic-20261106-codex/gate-07-check_doc_single_source.log",
+      "owner": "STAGE2_LEFT",
+      "base": null,
+      "left": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "49bcde309b5a7b1bbe880b43d3264cc84cd02eee"
+      },
+      "right": null,
+      "expected": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "49bcde309b5a7b1bbe880b43d3264cc84cd02eee"
+      }
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-peer-floor-observation-diagnostic-20261106-codex/gate-08-test_sync.log",
+      "owner": "STAGE2_LEFT",
+      "base": null,
+      "left": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "0b01c66dba2186a91924d3db51eebca22364c85c"
+      },
+      "right": null,
+      "expected": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "0b01c66dba2186a91924d3db51eebca22364c85c"
+      }
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-peer-floor-observation-diagnostic-20261106-codex/gate-09-build_docs.log",
+      "owner": "STAGE2_LEFT",
+      "base": null,
+      "left": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "ea67b62bee898172c08dfde684131d4e31067a8e"
+      },
+      "right": null,
+      "expected": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "ea67b62bee898172c08dfde684131d4e31067a8e"
+      }
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-peer-floor-observation-diagnostic-20261106-codex/gate-10-sync_obsidian.log",
+      "owner": "STAGE2_LEFT",
+      "base": null,
+      "left": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "2f24ff8ced83fb3a71918eb90f6e12da5ae31f50"
+      },
+      "right": null,
+      "expected": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "2f24ff8ced83fb3a71918eb90f6e12da5ae31f50"
+      }
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-peer-floor-observation-diagnostic-20261106-codex/local-required-gates.json",
+      "owner": "STAGE2_LEFT",
+      "base": null,
+      "left": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "ccc76363e6bd9878ca11d952bf0f29059ef0d847"
+      },
+      "right": null,
+      "expected": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "ccc76363e6bd9878ca11d952bf0f29059ef0d847"
+      }
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-peer-floor-observation-diagnostic-20261106-codex/preserved-unit-attempt1.json",
+      "owner": "STAGE2_LEFT",
+      "base": null,
+      "left": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "f8aaf72566f36247592b7cafbc6e0609d0e7d764"
+      },
+      "right": null,
+      "expected": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "f8aaf72566f36247592b7cafbc6e0609d0e7d764"
+      }
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-peer-floor-observation-diagnostic-20261106-codex/push-bootstrap/gate-01-check_docs.log",
+      "owner": "STAGE2_LEFT",
+      "base": null,
+      "left": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "595db90143b80b1e4539beba3a1dbc8df3916710"
+      },
+      "right": null,
+      "expected": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "595db90143b80b1e4539beba3a1dbc8df3916710"
+      }
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-peer-floor-observation-diagnostic-20261106-codex/push-bootstrap/gate-02-check_ontology_generation.log",
+      "owner": "STAGE2_LEFT",
+      "base": null,
+      "left": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "86845798ec818f6b53ceec117633ae92de989014"
+      },
+      "right": null,
+      "expected": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "86845798ec818f6b53ceec117633ae92de989014"
+      }
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-peer-floor-observation-diagnostic-20261106-codex/push-bootstrap/gate-03-check_ontology.log",
+      "owner": "STAGE2_LEFT",
+      "base": null,
+      "left": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "cc3d8a0b904151d42ced50f84b4e1afaf7106383"
+      },
+      "right": null,
+      "expected": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "cc3d8a0b904151d42ced50f84b4e1afaf7106383"
+      }
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-peer-floor-observation-diagnostic-20261106-codex/push-bootstrap/gate-04-check_contract_bindings.log",
+      "owner": "STAGE2_LEFT",
+      "base": null,
+      "left": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "729ff699f4f398e16f4d5cdcc846bfd6369a82bb"
+      },
+      "right": null,
+      "expected": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "729ff699f4f398e16f4d5cdcc846bfd6369a82bb"
+      }
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-peer-floor-observation-diagnostic-20261106-codex/push-bootstrap/gate-05-check_frontend_integrity.log",
+      "owner": "STAGE2_LEFT",
+      "base": null,
+      "left": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "5fd3089b31a0aab23ef7d2dffec9dd162bfca842"
+      },
+      "right": null,
+      "expected": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "5fd3089b31a0aab23ef7d2dffec9dd162bfca842"
+      }
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-peer-floor-observation-diagnostic-20261106-codex/push-bootstrap/gate-06-check_doc_path_citations.log",
+      "owner": "STAGE2_LEFT",
+      "base": null,
+      "left": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "7068dd5a829129bf0b22306c15dcbb2f364d2457"
+      },
+      "right": null,
+      "expected": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "7068dd5a829129bf0b22306c15dcbb2f364d2457"
+      }
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-peer-floor-observation-diagnostic-20261106-codex/push-bootstrap/gate-07-check_doc_single_source.log",
+      "owner": "STAGE2_LEFT",
+      "base": null,
+      "left": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "49bcde309b5a7b1bbe880b43d3264cc84cd02eee"
+      },
+      "right": null,
+      "expected": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "49bcde309b5a7b1bbe880b43d3264cc84cd02eee"
+      }
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-peer-floor-observation-diagnostic-20261106-codex/push-bootstrap/gate-08-test_sync.log",
+      "owner": "STAGE2_LEFT",
+      "base": null,
+      "left": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "fd135866b67ae0f771a17a80f0771d51987c9c23"
+      },
+      "right": null,
+      "expected": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "fd135866b67ae0f771a17a80f0771d51987c9c23"
+      }
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-peer-floor-observation-diagnostic-20261106-codex/push-bootstrap/gate-09-build_docs.log",
+      "owner": "STAGE2_LEFT",
+      "base": null,
+      "left": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "5b48889f0435e94bc6d53f84ad392531cccc9a16"
+      },
+      "right": null,
+      "expected": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "5b48889f0435e94bc6d53f84ad392531cccc9a16"
+      }
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-peer-floor-observation-diagnostic-20261106-codex/push-bootstrap/gate-10-sync_obsidian.log",
+      "owner": "STAGE2_LEFT",
+      "base": null,
+      "left": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "ce0fb00d0553d6f2e65b2875ff4d16fdb6ddb047"
+      },
+      "right": null,
+      "expected": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "ce0fb00d0553d6f2e65b2875ff4d16fdb6ddb047"
+      }
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-peer-floor-observation-diagnostic-20261106-codex/push-bootstrap/local-required-gates.json",
+      "owner": "STAGE2_LEFT",
+      "base": null,
+      "left": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "4d1d280ee93dbdc1c0c2431bb70d3873164ea5f6"
+      },
+      "right": null,
+      "expected": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "4d1d280ee93dbdc1c0c2431bb70d3873164ea5f6"
+      }
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-peer-floor-observation-diagnostic-20261106-codex/push-bootstrap/run_gates.py.txt",
+      "owner": "STAGE2_LEFT",
+      "base": null,
+      "left": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "9f2a0f64c62c1f67907e1c6ec26b2e338967543e"
+      },
+      "right": null,
+      "expected": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "9f2a0f64c62c1f67907e1c6ec26b2e338967543e"
+      }
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-peer-floor-observation-diagnostic-20261106-codex/push-bootstrap/static-check.json",
+      "owner": "STAGE2_LEFT",
+      "base": null,
+      "left": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "98ac9488788a36cba704f3059173a3f9b50d1efd"
+      },
+      "right": null,
+      "expected": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "98ac9488788a36cba704f3059173a3f9b50d1efd"
+      }
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-peer-floor-observation-diagnostic-20261106-codex/push-bootstrap/unit.json",
+      "owner": "STAGE2_LEFT",
+      "base": null,
+      "left": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "2489ece4d35643058fecd7db4a6cec4355806211"
+      },
+      "right": null,
+      "expected": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "2489ece4d35643058fecd7db4a6cec4355806211"
+      }
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-peer-floor-observation-diagnostic-20261106-codex/push-bootstrap/unit.log",
+      "owner": "STAGE2_LEFT",
+      "base": null,
+      "left": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "a788500edd54b06bd749f3d1de11450b62806664"
+      },
+      "right": null,
+      "expected": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "a788500edd54b06bd749f3d1de11450b62806664"
+      }
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-peer-floor-observation-diagnostic-20261106-codex/registered-focused-workflow-inventory.json",
+      "owner": "STAGE2_LEFT",
+      "base": null,
+      "left": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "35a392444676e8f5f67b1622b91045d806869898"
+      },
+      "right": null,
+      "expected": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "35a392444676e8f5f67b1622b91045d806869898"
+      }
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-peer-floor-observation-diagnostic-20261106-codex/run_gates.py.txt",
+      "owner": "STAGE2_LEFT",
+      "base": null,
+      "left": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "cc878d0901fdda62ff1bde3b1005a201407bc925"
+      },
+      "right": null,
+      "expected": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "cc878d0901fdda62ff1bde3b1005a201407bc925"
+      }
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-peer-floor-observation-diagnostic-20261106-codex/stage1-dispatch-registration-gap.json",
+      "owner": "STAGE2_LEFT",
+      "base": null,
+      "left": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "767c5e1e066b335462bded3778ae1e305cc5b0d0"
+      },
+      "right": null,
+      "expected": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "767c5e1e066b335462bded3778ae1e305cc5b0d0"
+      }
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-peer-floor-observation-diagnostic-20261106-codex/stage1-unit-attempt2.json",
+      "owner": "STAGE2_LEFT",
+      "base": null,
+      "left": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "c128a68b9919b74fdb9e4734cf9ef380e9332b04"
+      },
+      "right": null,
+      "expected": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "c128a68b9919b74fdb9e4734cf9ef380e9332b04"
+      }
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-peer-floor-observation-diagnostic-20261106-codex/stage1-unit-attempt2.log",
+      "owner": "STAGE2_LEFT",
+      "base": null,
+      "left": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "c4a2efe5563f836f9374eef1b9b8e4977664f43d"
+      },
+      "right": null,
+      "expected": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "c4a2efe5563f836f9374eef1b9b8e4977664f43d"
+      }
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-peer-floor-observation-diagnostic-20261106-codex/stage1-unit-final.json",
+      "owner": "STAGE2_LEFT",
+      "base": null,
+      "left": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "25cb421684aca5ca72b379f3fbdcbd082df38f06"
+      },
+      "right": null,
+      "expected": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "25cb421684aca5ca72b379f3fbdcbd082df38f06"
+      }
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-peer-floor-observation-diagnostic-20261106-codex/stage1-unit-final.log",
+      "owner": "STAGE2_LEFT",
+      "base": null,
+      "left": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "52ab9e24259c1c87eb5c4c26a923a7ccf39c4180"
+      },
+      "right": null,
+      "expected": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "52ab9e24259c1c87eb5c4c26a923a7ccf39c4180"
+      }
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-peer-floor-observation-diagnostic-20261106-codex/workflow-static-check.json",
+      "owner": "STAGE2_LEFT",
+      "base": null,
+      "left": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "2ffdfd053518884189dbe5c1dfbf6c1e4699a44a"
+      },
+      "right": null,
+      "expected": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "2ffdfd053518884189dbe5c1dfbf6c1e4699a44a"
+      }
+    },
+    {
+      "path": "docs/vault/30_Development/History/2026-11-06_FLEET5_K2A_PL_R1a_Codex.md",
+      "owner": "LOW_AND_PL_RIGHT",
+      "base": null,
+      "left": null,
+      "right": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "6e934aeac568605e241dcc31fbec79b7059bf28a"
+      },
+      "expected": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "6e934aeac568605e241dcc31fbec79b7059bf28a"
+      }
+    },
+    {
+      "path": "docs/vault/30_Development/History/2026-11-06_FLEET5_K2A_review_lows_Codex.md",
+      "owner": "LOW_AND_PL_RIGHT",
+      "base": null,
+      "left": null,
+      "right": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "48a98cafae66f4c79f34aa19001d1fec86a2118c"
+      },
+      "expected": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "48a98cafae66f4c79f34aa19001d1fec86a2118c"
+      }
+    },
+    {
+      "path": "docs/vault/30_Development/History/2026-11-06_FLEET5_peer_floor_mount_order_stage2_Codex.md",
+      "owner": "STAGE2_LEFT",
+      "base": null,
+      "left": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "c5124d3a0890c65352b5bb8682781e9a4346aa86"
+      },
+      "right": null,
+      "expected": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "c5124d3a0890c65352b5bb8682781e9a4346aa86"
+      }
+    },
+    {
+      "path": "docs/vault/30_Development/History/2026-11-06_FLEET5_peer_floor_observation_diagnostic_Codex.md",
+      "owner": "STAGE2_LEFT",
+      "base": null,
+      "left": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "547ac7fbe1b0a2977e94ed2e3c5d3e2a7b9967b1"
+      },
+      "right": null,
+      "expected": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "547ac7fbe1b0a2977e94ed2e3c5d3e2a7b9967b1"
+      }
+    },
+    {
+      "path": "services/node-agent/internal/migrationcontext/README.md",
+      "owner": "LOW_AND_PL_RIGHT",
+      "base": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "f1cc2a37a2d2ff3ac65336d844db4691440ed824"
+      },
+      "left": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "f1cc2a37a2d2ff3ac65336d844db4691440ed824"
+      },
+      "right": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "f5d07bc78505f749b60057e2e52f242a82a4227d"
+      },
+      "expected": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "f5d07bc78505f749b60057e2e52f242a82a4227d"
+      }
+    },
+    {
+      "path": "services/node-agent/internal/migrationcontext/effect_gate_test.go",
+      "owner": "LOW_AND_PL_RIGHT",
+      "base": null,
+      "left": null,
+      "right": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "8b8f3c9b7f762b561f607900647388226a36e753"
+      },
+      "expected": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "8b8f3c9b7f762b561f607900647388226a36e753"
+      }
+    },
+    {
+      "path": "services/node-agent/internal/migrationcontext/history.go",
+      "owner": "LOW_AND_PL_RIGHT",
+      "base": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "6afef6e80f7f1994d57d6a56116af84d61ba34b8"
+      },
+      "left": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "6afef6e80f7f1994d57d6a56116af84d61ba34b8"
+      },
+      "right": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "22d93b5bfce10f25ce8676c884b055816d2da973"
+      },
+      "expected": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "22d93b5bfce10f25ce8676c884b055816d2da973"
+      }
+    },
+    {
+      "path": "services/node-agent/internal/migrationcontext/pl_r1a_test.go",
+      "owner": "LOW_AND_PL_RIGHT",
+      "base": null,
+      "left": null,
+      "right": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "4dc3917c52b1093c255ec00520d2e983f40cdeab"
+      },
+      "expected": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "4dc3917c52b1093c255ec00520d2e983f40cdeab"
+      }
+    },
+    {
+      "path": "services/node-agent/internal/migrationcontext/policy.go",
+      "owner": "LOW_AND_PL_RIGHT",
+      "base": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "1229c2daf3d1f8452a332d4a7a50510a4d2130cd"
+      },
+      "left": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "1229c2daf3d1f8452a332d4a7a50510a4d2130cd"
+      },
+      "right": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "eb906a24e4aa8fc54e7014d9a04668d84854871e"
+      },
+      "expected": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "eb906a24e4aa8fc54e7014d9a04668d84854871e"
+      }
+    },
+    {
+      "path": "services/node-agent/internal/migrationcontext/review_census_test.go",
+      "owner": "LOW_AND_PL_RIGHT",
+      "base": null,
+      "left": null,
+      "right": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "1d81c8c69d7c9a26d7b8c4870622f9f0fb812a7e"
+      },
+      "expected": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "1d81c8c69d7c9a26d7b8c4870622f9f0fb812a7e"
+      }
+    },
+    {
+      "path": "services/node-agent/internal/migrationcontext/review_lows_test.go",
+      "owner": "LOW_AND_PL_RIGHT",
+      "base": null,
+      "left": null,
+      "right": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "c07a0300d3671bb320b2430992e2e82af11955ee"
+      },
+      "expected": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "c07a0300d3671bb320b2430992e2e82af11955ee"
+      }
+    },
+    {
+      "path": "services/node-agent/internal/migrationcontext/source_gate_test.go",
+      "owner": "LOW_AND_PL_RIGHT",
+      "base": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "2c3ac5e8309918b4ca86a8ca1fa919fe71be98da"
+      },
+      "left": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "2c3ac5e8309918b4ca86a8ca1fa919fe71be98da"
+      },
+      "right": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "a395e5ff9824ddc01c27004f1627dfda2bb56b09"
+      },
+      "expected": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "a395e5ff9824ddc01c27004f1627dfda2bb56b09"
+      }
+    },
+    {
+      "path": "tests/core/test_worker_peer_floor_mount_order_stage2.py",
+      "owner": "STAGE2_LEFT",
+      "base": null,
+      "left": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "05b0ffb4b24d402a8be6ee5047e10891764969db"
+      },
+      "right": null,
+      "expected": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "05b0ffb4b24d402a8be6ee5047e10891764969db"
+      }
+    },
+    {
+      "path": "tests/core/test_worker_peer_floor_observation_diagnostics.py",
+      "owner": "STAGE2_LEFT",
+      "base": null,
+      "left": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "5226faf9afa6f02d0492da837bfedad43040c849"
+      },
+      "right": null,
+      "expected": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "5226faf9afa6f02d0492da837bfedad43040c849"
+      }
+    }
+  ],
+  "unchangedBaselinePathCount": 5198,
+  "unchangedBaselinePathBlobTableSHA256": "3f8398971d380c3f6d1ffb3b7ae885b058d815224be10653c9b296460a986349",
+  "expectedFullTreePathBlobTableSHA256": "558215cdce2ad5a23b19606858dcaf93154e2e8d8378a940b0c0a6152f5ab007",
+  "expectedTreePaths": 5353,
+  "indexExactExpectedUnion": true,
+  "indexAll5353ModeBlobsVerified": true,
+  "workflowByteExactLeft": true,
+  "workflowSHA256": "7ff44a0228a90da1166f869c0137538007af516cebdbfd4fdb36c39ed8d0d243",
+  "workflowCombinedRefInert": true
+}

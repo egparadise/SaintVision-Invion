@@ -1,0 +1,67 @@
+"""Read-only immutable Git union/pin verification; no installation or registration."""
+import ast
+import hashlib
+import json
+from pathlib import Path
+import subprocess
+
+LEFT = '21059451c23cebe8c038f76e437c390120205998'
+RIGHT = 'cc82fb80e5913a739c9d2ef59bc4df2c503b7d92'
+MERGE = 'a78bce7dd2ae020f084a6434ef4b77956bbe9e10'
+PIN = '66d4cd5175cbe28c19541cbfcbf3cb20b006370a'
+OUT = Path('docs/vault/30_Development/Evidence/fleet5-k2a-stage2-combined-20261106-codex')
+
+def git(*args):
+    return subprocess.check_output(['git', *args])
+
+def tree(ref):
+    result = {}
+    for entry in git('ls-tree', '-rz', ref).split(b'\0'):
+        if entry:
+            meta, path = entry.split(b'\t', 1)
+            mode, kind, blob = meta.decode().split()
+            result[path.decode()] = dict(mode=mode, type=kind, blob=blob)
+    return result
+
+def sha(raw):
+    return hashlib.sha256(raw).hexdigest()
+
+def canonical(value):
+    return (json.dumps(value, sort_keys=True, separators=(',', ':'))+'\n').encode()
+
+base = git('merge-base', LEFT, RIGHT).decode().strip()
+bt, lt, rt, mt = map(tree, (base, LEFT, RIGHT, MERGE))
+paths = sorted(set(bt) | set(lt) | set(rt))
+lc = {p for p in paths if bt.get(p) != lt.get(p)}
+rc = {p for p in paths if bt.get(p) != rt.get(p)}
+assert not lc & rc
+expected = {p: lt.get(p) if p in lc else rt.get(p) if p in rc else bt.get(p) for p in paths}
+expected = {p: v for p, v in expected.items() if v is not None}
+assert expected == mt
+assert git('show', '-s', '--format=%P', MERGE).decode().strip().split() == [LEFT, RIGHT]
+assert git('show', '-s', '--format=%P', PIN).decode().strip() == MERGE
+assert git('diff', '--numstat', MERGE, PIN).decode().strip() == '1\t1\tdeploy/lan/leaf_rotation_standalone_runtime.py'
+workflow = '.github/workflows/peer-floor-observation-diagnostic.yml'
+assert git('show', PIN+':'+workflow) == git('show', LEFT+':'+workflow)
+raw = git('show', PIN+':deploy/lan/leaf_rotation_standalone_runtime.py')
+values = {}
+for node in ast.parse(raw).body:
+    if isinstance(node, ast.Assign) and len(node.targets) == 1 and isinstance(node.targets[0], ast.Name):
+        if node.targets[0].id in ('WORKER_MODULES', 'BUNDLE_SCHEMA', 'INSTALL_SCHEMA', 'LOCK_SHA256'):
+            values[node.targets[0].id] = ast.literal_eval(node.value)
+modules = values['WORKER_MODULES']
+assert modules['worker_peer_floor.py'] == '7665735eb5735be9fcb24f783f83ffe087c0d176e464a97df3022a4bd9f35799'
+assert sha(canonical(modules)) == '7a2840babd2e337926735f5270a0be33fc51f59bf96be0348c46f98e8db15872'
+files = {name: sha(git('show', PIN+':deploy/lan/'+name)) for name in (*modules, 'leaf_rotation_standalone_runtime.py', 'leaf-rotation-runtime-lock.json')}
+assert all(files[name] == digest for name, digest in modules.items())
+assert files['leaf-rotation-runtime-lock.json'] == values['LOCK_SHA256'] == '06710d854ff52578949249065dd009de6561bc779c4b21c5355262e59a527a8c'
+assert sha(canonical(files)) == 'dfda9b355abc079d7cb082e716ed4ddbcc275c72b816e6642cf4b1b86fa10baa'
+assert values['BUNDLE_SCHEMA'] == 'saintvision-leaf-rotation-runtime-bundle:2'
+assert values['INSTALL_SCHEMA'] == 'saintvision-leaf-rotation-runtime-install:2'
+result = dict(classification='IMMUTABLE_SOURCE_ONLY_UNREGISTERED_CANDIDATE', mergeBase=base,
+              leftChangedPaths=len(lc), rightChangedPaths=len(rc), intersections=0,
+              mergedPathModesAndBlobsVerified=len(mt), actualMergeParents=[LEFT, RIGHT],
+              expectedUnionSHA256=sha(canonical(expected)), files=files,
+              moduleMapSHA256=sha(canonical(modules)), rawSevenFileCandidateSHA256=sha(canonical(files)))
+(OUT/'immutable-source-verification.json').write_text(json.dumps(result, indent=2)+'\n')
+print(json.dumps(result, indent=2))

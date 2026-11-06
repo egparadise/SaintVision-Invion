@@ -1,0 +1,24 @@
+{
+  "classification": "IMMUTABLE_SOURCE_ONLY_UNREGISTERED_CANDIDATE",
+  "mergeBase": "ff3169d360a707415d9b03484cf0cf3031f3912c",
+  "leftChangedPaths": 91,
+  "rightChangedPaths": 64,
+  "intersections": 0,
+  "mergedPathModesAndBlobsVerified": 5353,
+  "actualMergeParents": [
+    "21059451c23cebe8c038f76e437c390120205998",
+    "cc82fb80e5913a739c9d2ef59bc4df2c503b7d92"
+  ],
+  "expectedUnionSHA256": "558215cdce2ad5a23b19606858dcaf93154e2e8d8378a940b0c0a6152f5ab007",
+  "files": {
+    "worker_config.py": "909d1c25deb61c5c4795af49dab18f5a9722e5cbc1c034a18472b6a4427c192c",
+    "worker_leaf_rotation.py": "4e29685241a3e625e59aa64bcff07bdd69d4b0381c67687706a09fa960f75998",
+    "peer_policy_phase.py": "8aac0c65fb2a242b08287ba4206e6c7213fc18795903584b5b28abf3a10c17f8",
+    "worker_peer_floor.py": "7665735eb5735be9fcb24f783f83ffe087c0d176e464a97df3022a4bd9f35799",
+    "worker_plain_rotation.py": "bf3754a27f748b1dd58a7fc65a1f1831dddae6133f11ae17d0f7bf3ea59c46e5",
+    "leaf_rotation_standalone_runtime.py": "8a509dc2ee25aff9c355d3dadde6da0d245f55a17098cf2b43f4079e6a1e36d8",
+    "leaf-rotation-runtime-lock.json": "06710d854ff52578949249065dd009de6561bc779c4b21c5355262e59a527a8c"
+  },
+  "moduleMapSHA256": "7a2840babd2e337926735f5270a0be33fc51f59bf96be0348c46f98e8db15872",
+  "rawSevenFileCandidateSHA256": "dfda9b355abc079d7cb082e716ed4ddbcc275c72b816e6642cf4b1b86fa10baa"
+}

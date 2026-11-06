@@ -1,0 +1,31 @@
+{
+  "classification": "COMBINED_SOURCE_CANDIDATE_REVIEW_AND_CORE_PENDING",
+  "task": "task_a95ef3d8ccce",
+  "dispatch": "ctx_ed23b4a777d0",
+  "card": "FLEET5-K2A-STAGE2-COMBINED-20261106",
+  "owner": "Codex",
+  "reviewer": "Claude through Root pending",
+  "rootGrant": "msg_256747ff9f44",
+  "canonicalRootRead": "Index447/Codex408",
+  "base": "21059451c23cebe8c038f76e437c390120205998",
+  "plSource": "cc82fb80e5913a739c9d2ef59bc4df2c503b7d92",
+  "mergeSource": "a78bce7dd2ae020f084a6434ef4b77956bbe9e10",
+  "parents": [
+    "21059451c23cebe8c038f76e437c390120205998",
+    "cc82fb80e5913a739c9d2ef59bc4df2c503b7d92"
+  ],
+  "pinSource": "66d4cd5175cbe28c19541cbfcbf3cb20b006370a",
+  "pinOnlyOneLine": true,
+  "k1AllTrackedFilesUnchangedFromEb32": true,
+  "goDependenciesUnchanged": true,
+  "standaloneAcceptanceTestUnedited": {
+    "path": "tests/test_lan_leaf_rotation_standalone_runtime.py",
+    "blob": "dad400be90c1071d30a1b7505e26d669db2e031f",
+    "SHA256": "f5be523c1f242267becbee14e1e24941b8c9b2e5a71524dba6a12802d509b210"
+  },
+  "orCaWorktreeIdentity": "7c6cbc73-5907-4894-a71e-b50dcb1be411",
+  "observedKST": "2026-11-06T16:41:08.820704+09:00",
+  "authClockCurrentEffectsInstall": "NULL_HOLD_ABSENT",
+  "A01_A40": "NOT_RUN",
+  "FIVEAcceptance": "INCOMPLETE"
+}

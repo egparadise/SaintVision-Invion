@@ -1,0 +1,8 @@
+A	.github/workflows/peer-floor-observation-diagnostic.yml
+M	deploy/lan/leaf_rotation_standalone_runtime.py
+M	deploy/lan/worker_peer_floor.py
+M	services/node-agent/internal/migrationcontext/README.md
+M	services/node-agent/internal/migrationcontext/effect_gate_test.go
+A	services/node-agent/internal/migrationcontext/pl_r1a_test.go
+A	tests/core/test_worker_peer_floor_mount_order_stage2.py
+A	tests/core/test_worker_peer_floor_observation_diagnostics.py
