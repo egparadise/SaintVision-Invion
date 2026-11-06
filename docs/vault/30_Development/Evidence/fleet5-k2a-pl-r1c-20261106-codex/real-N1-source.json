@@ -1,0 +1,5 @@
+{
+  "SHA256": "9d3e71cf91c6d4afb5613fb87824f5f65c310a90eba333c366a0f9feb1418281",
+  "source": "package migrationcontext\nimport clock \"time\"\ntype plR1CReal clock.Location\nfunc plR1CUnusedRealProbe(){*(*plR1CReal)(clock.UTC)=plR1CReal{}}\n",
+  "scope": "Unused non-test function; no call or initializer; no body execution"
+}

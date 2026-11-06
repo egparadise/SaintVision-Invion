@@ -1,0 +1,30 @@
+CHECK: 1 managed files, 0 pending exports, 0 conflicts. No writes.
+EXPORTED: 0 files; all 1 destination hashes match. Unmanaged files untouched.
+EXPORTED: 1 files; all 1 destination hashes match. Unmanaged files untouched.
+EXPORTED: 0 files; all 1 destination hashes match. Unmanaged files untouched.
+EXPORTED: 1 files; all 1 destination hashes match. Unmanaged files untouched.
+CHECK: 2 managed files, 0 pending exports, 0 conflicts. No writes.
+.CONFLICTS: 1 unmanaged destination collisions remain; no vault files written.
+  ADOPTED: 1 identical-file hashes recorded in local state before abort.
+  grouped by reason:
+         1  no-baseline
+  full list (1): C:\Users\inviz\AppData\Local\Temp\tmpzkzzyqv7\repo\.work\obsidian-sync-conflicts.json
+  no-baseline = the tool has no manifest/state record for these; it cannot tell a real edit from an un-recorded prior sync. --adopt-identical records only matching files; it does not resolve divergent files.
+...usage: test_sync.py [-h] (--check | --apply) [--vault VAULT] [--state STATE]
+                    [--conflicts-out CONFLICTS_OUT] [--adopt-identical]
+                    [--resolve-conflicts-from PATHS_FILE]
+test_sync.py: error: --resolve-conflicts-from requires --apply
+....RESOLVED: 1 explicitly approved paths were written from the repository.
+  RESOLVED: approved.md
+CONFLICTS: 1 unmanaged destination collisions remain; only listed conflicts were written; pending exports were skipped.
+  grouped by reason:
+         1  no-baseline
+  full list (1): C:\Users\inviz\AppData\Local\Temp\tmpd_us2g5z\repo\.work\obsidian-sync-conflicts.json
+  no-baseline = the tool has no manifest/state record for these; it cannot tell a real edit from an un-recorded prior sync. --adopt-identical records only matching files; it does not resolve divergent files.
+....Sync error (ValueError): Resolution list includes paths that are not current conflicts: stale.md
+.Sync error (ValueError): Resolution list includes paths that are not current conflicts: one.md, two.md
+.
+----------------------------------------------------------------------
+Ran 14 tests in 5.108s
+
+OK

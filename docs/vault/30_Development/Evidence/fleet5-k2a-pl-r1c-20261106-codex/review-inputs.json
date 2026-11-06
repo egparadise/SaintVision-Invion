@@ -1,0 +1,8 @@
+{
+  "actualReviewSHA": "5a3c77f6cfc0e6aea9b276ac7d65f7f1a7fb98b1",
+  "probePath": "docs/vault/30_Development/Evidence/fleet5-k2a-pl-r1b-084-review-20261106-claude/reviewer_plr1b_probe_test.go.txt",
+  "probeSHA256": "f7fef8b84466ac10cc00995b58b5e4cebe16ba89b7247b4a987c334101374153",
+  "sketchPath": "docs/vault/30_Development/Evidence/fleet5-k2a-pl-r1b-084-review-20261106-claude/reviewer_fix_sketch.py.txt",
+  "sketchSHA256": "b0c0037827ec7ab06a6b192ba6d07dbd43eeff0e7533e74dd002d04efdfc5f5b",
+  "scope": "Read actual immutable reviewer sketch/probes; owner adaptation, not review of this new candidate"
+}

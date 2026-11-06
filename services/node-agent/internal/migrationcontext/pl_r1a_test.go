@@ -299,3 +299,99 @@ func probe(){c:=x509.Certificate{};c.Version++;c.SerialNumber=nil}`, ""},
 		})
 	}
 }
+
+// New owner-run PL-R1c cases; actual independent delta review is pending.
+func TestPLR1CCompiledPointerConversionsAndControls(t *testing.T) {
+	root := repository(t)
+	original := ownProductionSources(t, root)
+	paths := exports(t, root)
+	control, e := checkSourcePackage(ownImport, original, paths, nil)
+	if e != nil {
+		t.Fatal(e)
+	}
+	if e = sourceEffects(original, control); e != nil {
+		t.Fatal("actual pure source must pass", e)
+	}
+	// Owner adaptation of actual 5a3c reviewer probes: empty want accepts a
+	// declared storage limit or positive control; N1-N6 require conversion refusal.
+	// otherwise the intended refusal prefix.
+	cases := []struct{ name, kind, code, want string }{
+		// Conversion laundering: foreign pointee re-typed as own named type.
+		{"N1-conv-UTC-package-type", "CONVERSION_NEGATIVE", `import clock "time"
+type plLaunder clock.Location
+func probe(){*(*plLaunder)(clock.UTC)=plLaunder{}}`, "pointee-changing pointer conversion forbidden:"},
+		{"N2-conv-UTC-local-type-alias-var", "CONVERSION_NEGATIVE", `import clock "time"
+func probe(){type L clock.Location;p:=(*L)(clock.UTC);*p=L{}}`, "pointee-changing pointer conversion forbidden:"},
+		{"N3-conv-Location-own-method", "CONVERSION_NEGATIVE", `import clock "time"
+type L clock.Location
+func (l *L) reset(){*l=L{}}
+func probe(){(*L)(clock.Time{}.Location()).reset()}`, "pointee-changing pointer conversion forbidden:"},
+		{"N4-conv-Certificate-field", "CONVERSION_NEGATIVE", `import "crypto/x509"
+type C x509.Certificate
+func probe(c *x509.Certificate){(*C)(c).Version++}`, "pointee-changing pointer conversion forbidden:"},
+		{"N5-conv-foreign-field-address", "CONVERSION_NEGATIVE", `import "crypto/x509"
+type n int
+func probe(c *x509.Certificate){*(*n)(&c.Version)=1}`, "pointee-changing pointer conversion forbidden:"},
+		{"N6-slice-to-own-array-pointer", "CONVERSION_NEGATIVE", `import ed "crypto/ed25519"
+type a [64]byte
+func probe(k ed.PrivateKey){(*a)(k)[0]++}`, "pointee-changing pointer conversion forbidden:"},
+		// Reference-typed storage: declared provenance limit (not pointees).
+		{"S1-slice-local-copy-of-pointee", "LIMIT", `import ed "crypto/ed25519"
+func probe(p *ed.PrivateKey){k:=*p;k[0]++}`, ""},
+		{"S2-slice-parameter", "LIMIT", `import ed "crypto/ed25519"
+func probe(k ed.PrivateKey){k[0]++}`, ""},
+		// Independent refusals the 484 gate must keep.
+		{"R1-double-deref-local", "REFUSE", `import clock "time"
+func probe(){p:=clock.UTC;q:=&p;**q=clock.Location{}}`, "foreign pointee write forbidden: time.Location"},
+		{"R2-type-assert-deref", "REFUSE", `import clock "time"
+func probe(v any){*v.(*clock.Location)=clock.Location{}}`, "foreign pointee write forbidden: time.Location"},
+		{"R3-generic-helper-typeparam", "REFUSE", `import clock "time"
+func set[T any](p *T,v T){*p=v}
+func probe(){set(clock.UTC,clock.Location{})}`, "foreign pointee write forbidden: T"},
+		{"R4-foreign-field-address-builtin", "REFUSE", `import "crypto/x509"
+func probe(c *x509.Certificate){p:=&c.Version;*p=1}`, "foreign pointee write forbidden: int"},
+		{"R5-uncalled-closure-deref", "REFUSE", `import clock "time"
+func probe(){f:=func(){*clock.UTC=clock.Location{}};_=f}`, "foreign pointee write forbidden: time.Location"},
+		{"R6-promoted-own-then-foreign", "REFUSE", `import "crypto/x509"
+type in struct{c *x509.Certificate}
+type out struct{*in}
+func probe(o out){o.c.Version++}`, "foreign pointee write forbidden: crypto/x509.Certificate"},
+		{"R7-own-named-pointer-to-unnamed", "REFUSE", `type P *[1]int
+func probe(p P){p[0]=1}`, "foreign pointee write forbidden: [1]int"},
+		// Positive controls the fix must preserve.
+		{"P1-own-identity-conversion", "POSITIVE", `type o struct{N int}
+func probe(p *o){(*o)(p).N++}`, ""},
+		{"P2-own-generic-receiver", "POSITIVE", `type box[T any] struct{v T}
+func (b *box[T]) set(v T){b.v=v}
+func probe(){(&box[int]{}).set(1)}`, ""},
+		{"P3-untyped-nil", "POSITIVE", `type o struct{N int}
+func probe(){_=(*o)(nil)}`, ""},
+		{"P4-alias-identical-element", "POSITIVE", `type o struct{N int}
+type Alias=o
+type PointerAlias=*Alias
+func probe(p *o){PointerAlias(p).N++}`, ""},
+		{"P5-named-pointer-identical-element", "POSITIVE", `type o struct{N int}
+type Pointer *o
+func probe(p *o){Pointer(p).N++}`, ""},
+		{"P6-unrelated-value-conversion", "POSITIVE", `type n int
+func probe(){_=n(1)}`, ""},
+	}
+	for _, m := range cases {
+		t.Run(m.name, func(t *testing.T) {
+			src := copyMap(original)
+			src["pl_review_probe.go"] = []byte("package migrationcontext\n" + m.code)
+			buildPLMutation(t, root, src)
+			checked, e := checkSourcePackage(ownImport, src, paths, nil)
+			if e != nil {
+				t.Fatal("actual built source must typecheck", e)
+			}
+			e = sourceEffects(src, checked)
+			reason := "<nil>"
+			if e != nil {
+				reason = e.Error()
+			}
+			t.Logf("OWNER_PLR1C_PROBE case=%s kind=%s build=0 typecheck=0 refused=%t reason=%s", m.name, m.kind, e != nil, reason)
+			assertPLReason(t, m.name, m.want != "", []string{m.want}, e)
+		})
+	}
+}

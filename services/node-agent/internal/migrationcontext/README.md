@@ -141,12 +141,21 @@ builtin, unnamed or unresolved pointees are conservatively refused even through
 a local pointer, helper parameter or an allowed pure call. Own named pointee
 types and local value/range mutations remain allowed. This type restriction is
 not proof of storage ownership or whole-program pointer/alias provenance.
+The PL-R1c candidate refuses pointee-changing conversions to underlying pointer
+types: the operand must be untyped nil or a pointer with an identical element
+type (`types.Identical` after alias/named-pointer resolution). An own defined
+pointee name cannot launder a foreign pointer; slice-to-array-pointer conversions
+are refused by this rule. Identity pointer and unrelated value conversions stay
+allowed. PL-R1b-I1 remains explicit: writes into slice/map element storage and
+append into backing arrays are generally unchecked, including a copied slice
+header or a slice parameter. Walking a SliceExpr root is not storage ownership.
 These are precise source-defense rules for the reviewed closure and tested attack
 classes, not arbitrary trusted-process isolation or a whole-program effect proof.
 Implicit argument dispatch through allowed `json.Marshal` (MarshalJSON/MarshalText)
 and argument ownership remain limits (PL-I4), not a general effect/isolation proof.
 They do not install an authority, provider or positive authentication path. The
-actual combined review closed interface class (a); PL-R1b/foreign-write class (b)
-closure remains subject to actual independent narrow review. PL-I1 future factory
+actual combined review closed interface class (a); accepted PL-R1b write forms
+remain accepted, and PL-R1c/foreign-write class (b) closure remains subject to
+actual independent narrow review. PL-I1 future factory
 must call checkPolicyBindings before K1; PL-I2 operation-set authentication stays
 with the future archive. No new producer, wire, current view or effect grant.

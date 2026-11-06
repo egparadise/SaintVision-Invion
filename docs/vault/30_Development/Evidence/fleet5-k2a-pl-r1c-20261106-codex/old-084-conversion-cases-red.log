@@ -1,0 +1,116 @@
+=== RUN   TestPLR1CCompiledPointerConversionsAndControls
+=== RUN   TestPLR1CCompiledPointerConversionsAndControls/N1-conv-UTC-package-type
+    pl_r1a_test.go:383: actual go build -p=1 ./internal/migrationcontext exit0; mutant body NOT executed
+    pl_r1a_test.go:393: OWNER_PLR1C_PROBE case=N1-conv-UTC-package-type kind=CONVERSION_NEGATIVE build=0 typecheck=0 refused=false reason=<nil>
+    pl_r1a_test.go:394: REASON case=N1-conv-UTC-package-type build=0 typecheck=0 refused=false reason=<nil>
+    pl_r1a_test.go:394: want intended refusal prefixes=["pointee-changing pointer conversion forbidden:"], got=<nil>
+=== RUN   TestPLR1CCompiledPointerConversionsAndControls/N2-conv-UTC-local-type-alias-var
+    pl_r1a_test.go:383: actual go build -p=1 ./internal/migrationcontext exit0; mutant body NOT executed
+    pl_r1a_test.go:393: OWNER_PLR1C_PROBE case=N2-conv-UTC-local-type-alias-var kind=CONVERSION_NEGATIVE build=0 typecheck=0 refused=false reason=<nil>
+    pl_r1a_test.go:394: REASON case=N2-conv-UTC-local-type-alias-var build=0 typecheck=0 refused=false reason=<nil>
+    pl_r1a_test.go:394: want intended refusal prefixes=["pointee-changing pointer conversion forbidden:"], got=<nil>
+=== RUN   TestPLR1CCompiledPointerConversionsAndControls/N3-conv-Location-own-method
+    pl_r1a_test.go:383: actual go build -p=1 ./internal/migrationcontext exit0; mutant body NOT executed
+    pl_r1a_test.go:393: OWNER_PLR1C_PROBE case=N3-conv-Location-own-method kind=CONVERSION_NEGATIVE build=0 typecheck=0 refused=false reason=<nil>
+    pl_r1a_test.go:394: REASON case=N3-conv-Location-own-method build=0 typecheck=0 refused=false reason=<nil>
+    pl_r1a_test.go:394: want intended refusal prefixes=["pointee-changing pointer conversion forbidden:"], got=<nil>
+=== RUN   TestPLR1CCompiledPointerConversionsAndControls/N4-conv-Certificate-field
+    pl_r1a_test.go:383: actual go build -p=1 ./internal/migrationcontext exit0; mutant body NOT executed
+    pl_r1a_test.go:393: OWNER_PLR1C_PROBE case=N4-conv-Certificate-field kind=CONVERSION_NEGATIVE build=0 typecheck=0 refused=false reason=<nil>
+    pl_r1a_test.go:394: REASON case=N4-conv-Certificate-field build=0 typecheck=0 refused=false reason=<nil>
+    pl_r1a_test.go:394: want intended refusal prefixes=["pointee-changing pointer conversion forbidden:"], got=<nil>
+=== RUN   TestPLR1CCompiledPointerConversionsAndControls/N5-conv-foreign-field-address
+    pl_r1a_test.go:383: actual go build -p=1 ./internal/migrationcontext exit0; mutant body NOT executed
+    pl_r1a_test.go:393: OWNER_PLR1C_PROBE case=N5-conv-foreign-field-address kind=CONVERSION_NEGATIVE build=0 typecheck=0 refused=false reason=<nil>
+    pl_r1a_test.go:394: REASON case=N5-conv-foreign-field-address build=0 typecheck=0 refused=false reason=<nil>
+    pl_r1a_test.go:394: want intended refusal prefixes=["pointee-changing pointer conversion forbidden:"], got=<nil>
+=== RUN   TestPLR1CCompiledPointerConversionsAndControls/N6-slice-to-own-array-pointer
+    pl_r1a_test.go:383: actual go build -p=1 ./internal/migrationcontext exit0; mutant body NOT executed
+    pl_r1a_test.go:393: OWNER_PLR1C_PROBE case=N6-slice-to-own-array-pointer kind=CONVERSION_NEGATIVE build=0 typecheck=0 refused=false reason=<nil>
+    pl_r1a_test.go:394: REASON case=N6-slice-to-own-array-pointer build=0 typecheck=0 refused=false reason=<nil>
+    pl_r1a_test.go:394: want intended refusal prefixes=["pointee-changing pointer conversion forbidden:"], got=<nil>
+=== RUN   TestPLR1CCompiledPointerConversionsAndControls/S1-slice-local-copy-of-pointee
+    pl_r1a_test.go:383: actual go build -p=1 ./internal/migrationcontext exit0; mutant body NOT executed
+    pl_r1a_test.go:393: OWNER_PLR1C_PROBE case=S1-slice-local-copy-of-pointee kind=LIMIT build=0 typecheck=0 refused=false reason=<nil>
+    pl_r1a_test.go:394: REASON case=S1-slice-local-copy-of-pointee build=0 typecheck=0 refused=false reason=<nil>
+=== RUN   TestPLR1CCompiledPointerConversionsAndControls/S2-slice-parameter
+    pl_r1a_test.go:383: actual go build -p=1 ./internal/migrationcontext exit0; mutant body NOT executed
+    pl_r1a_test.go:393: OWNER_PLR1C_PROBE case=S2-slice-parameter kind=LIMIT build=0 typecheck=0 refused=false reason=<nil>
+    pl_r1a_test.go:394: REASON case=S2-slice-parameter build=0 typecheck=0 refused=false reason=<nil>
+=== RUN   TestPLR1CCompiledPointerConversionsAndControls/R1-double-deref-local
+    pl_r1a_test.go:383: actual go build -p=1 ./internal/migrationcontext exit0; mutant body NOT executed
+    pl_r1a_test.go:393: OWNER_PLR1C_PROBE case=R1-double-deref-local kind=REFUSE build=0 typecheck=0 refused=true reason=foreign pointee write forbidden: time.Location
+    pl_r1a_test.go:394: REASON case=R1-double-deref-local build=0 typecheck=0 refused=true reason=foreign pointee write forbidden: time.Location
+=== RUN   TestPLR1CCompiledPointerConversionsAndControls/R2-type-assert-deref
+    pl_r1a_test.go:383: actual go build -p=1 ./internal/migrationcontext exit0; mutant body NOT executed
+    pl_r1a_test.go:393: OWNER_PLR1C_PROBE case=R2-type-assert-deref kind=REFUSE build=0 typecheck=0 refused=true reason=foreign pointee write forbidden: time.Location
+    pl_r1a_test.go:394: REASON case=R2-type-assert-deref build=0 typecheck=0 refused=true reason=foreign pointee write forbidden: time.Location
+=== RUN   TestPLR1CCompiledPointerConversionsAndControls/R3-generic-helper-typeparam
+    pl_r1a_test.go:383: actual go build -p=1 ./internal/migrationcontext exit0; mutant body NOT executed
+    pl_r1a_test.go:393: OWNER_PLR1C_PROBE case=R3-generic-helper-typeparam kind=REFUSE build=0 typecheck=0 refused=true reason=foreign pointee write forbidden: T
+    pl_r1a_test.go:394: REASON case=R3-generic-helper-typeparam build=0 typecheck=0 refused=true reason=foreign pointee write forbidden: T
+=== RUN   TestPLR1CCompiledPointerConversionsAndControls/R4-foreign-field-address-builtin
+    pl_r1a_test.go:383: actual go build -p=1 ./internal/migrationcontext exit0; mutant body NOT executed
+    pl_r1a_test.go:393: OWNER_PLR1C_PROBE case=R4-foreign-field-address-builtin kind=REFUSE build=0 typecheck=0 refused=true reason=foreign pointee write forbidden: int
+    pl_r1a_test.go:394: REASON case=R4-foreign-field-address-builtin build=0 typecheck=0 refused=true reason=foreign pointee write forbidden: int
+=== RUN   TestPLR1CCompiledPointerConversionsAndControls/R5-uncalled-closure-deref
+    pl_r1a_test.go:383: actual go build -p=1 ./internal/migrationcontext exit0; mutant body NOT executed
+    pl_r1a_test.go:393: OWNER_PLR1C_PROBE case=R5-uncalled-closure-deref kind=REFUSE build=0 typecheck=0 refused=true reason=foreign pointee write forbidden: time.Location
+    pl_r1a_test.go:394: REASON case=R5-uncalled-closure-deref build=0 typecheck=0 refused=true reason=foreign pointee write forbidden: time.Location
+=== RUN   TestPLR1CCompiledPointerConversionsAndControls/R6-promoted-own-then-foreign
+    pl_r1a_test.go:383: actual go build -p=1 ./internal/migrationcontext exit0; mutant body NOT executed
+    pl_r1a_test.go:393: OWNER_PLR1C_PROBE case=R6-promoted-own-then-foreign kind=REFUSE build=0 typecheck=0 refused=true reason=foreign pointee write forbidden: crypto/x509.Certificate
+    pl_r1a_test.go:394: REASON case=R6-promoted-own-then-foreign build=0 typecheck=0 refused=true reason=foreign pointee write forbidden: crypto/x509.Certificate
+=== RUN   TestPLR1CCompiledPointerConversionsAndControls/R7-own-named-pointer-to-unnamed
+    pl_r1a_test.go:383: actual go build -p=1 ./internal/migrationcontext exit0; mutant body NOT executed
+    pl_r1a_test.go:393: OWNER_PLR1C_PROBE case=R7-own-named-pointer-to-unnamed kind=REFUSE build=0 typecheck=0 refused=true reason=foreign pointee write forbidden: [1]int
+    pl_r1a_test.go:394: REASON case=R7-own-named-pointer-to-unnamed build=0 typecheck=0 refused=true reason=foreign pointee write forbidden: [1]int
+=== RUN   TestPLR1CCompiledPointerConversionsAndControls/P1-own-identity-conversion
+    pl_r1a_test.go:383: actual go build -p=1 ./internal/migrationcontext exit0; mutant body NOT executed
+    pl_r1a_test.go:393: OWNER_PLR1C_PROBE case=P1-own-identity-conversion kind=POSITIVE build=0 typecheck=0 refused=false reason=<nil>
+    pl_r1a_test.go:394: REASON case=P1-own-identity-conversion build=0 typecheck=0 refused=false reason=<nil>
+=== RUN   TestPLR1CCompiledPointerConversionsAndControls/P2-own-generic-receiver
+    pl_r1a_test.go:383: actual go build -p=1 ./internal/migrationcontext exit0; mutant body NOT executed
+    pl_r1a_test.go:393: OWNER_PLR1C_PROBE case=P2-own-generic-receiver kind=POSITIVE build=0 typecheck=0 refused=false reason=<nil>
+    pl_r1a_test.go:394: REASON case=P2-own-generic-receiver build=0 typecheck=0 refused=false reason=<nil>
+=== RUN   TestPLR1CCompiledPointerConversionsAndControls/P3-untyped-nil
+    pl_r1a_test.go:383: actual go build -p=1 ./internal/migrationcontext exit0; mutant body NOT executed
+    pl_r1a_test.go:393: OWNER_PLR1C_PROBE case=P3-untyped-nil kind=POSITIVE build=0 typecheck=0 refused=false reason=<nil>
+    pl_r1a_test.go:394: REASON case=P3-untyped-nil build=0 typecheck=0 refused=false reason=<nil>
+=== RUN   TestPLR1CCompiledPointerConversionsAndControls/P4-alias-identical-element
+    pl_r1a_test.go:383: actual go build -p=1 ./internal/migrationcontext exit0; mutant body NOT executed
+    pl_r1a_test.go:393: OWNER_PLR1C_PROBE case=P4-alias-identical-element kind=POSITIVE build=0 typecheck=0 refused=false reason=<nil>
+    pl_r1a_test.go:394: REASON case=P4-alias-identical-element build=0 typecheck=0 refused=false reason=<nil>
+=== RUN   TestPLR1CCompiledPointerConversionsAndControls/P5-named-pointer-identical-element
+    pl_r1a_test.go:383: actual go build -p=1 ./internal/migrationcontext exit0; mutant body NOT executed
+    pl_r1a_test.go:393: OWNER_PLR1C_PROBE case=P5-named-pointer-identical-element kind=POSITIVE build=0 typecheck=0 refused=false reason=<nil>
+    pl_r1a_test.go:394: REASON case=P5-named-pointer-identical-element build=0 typecheck=0 refused=false reason=<nil>
+=== RUN   TestPLR1CCompiledPointerConversionsAndControls/P6-unrelated-value-conversion
+    pl_r1a_test.go:383: actual go build -p=1 ./internal/migrationcontext exit0; mutant body NOT executed
+    pl_r1a_test.go:393: OWNER_PLR1C_PROBE case=P6-unrelated-value-conversion kind=POSITIVE build=0 typecheck=0 refused=false reason=<nil>
+    pl_r1a_test.go:394: REASON case=P6-unrelated-value-conversion build=0 typecheck=0 refused=false reason=<nil>
+--- FAIL: TestPLR1CCompiledPointerConversionsAndControls (36.47s)
+    --- FAIL: TestPLR1CCompiledPointerConversionsAndControls/N1-conv-UTC-package-type (1.66s)
+    --- FAIL: TestPLR1CCompiledPointerConversionsAndControls/N2-conv-UTC-local-type-alias-var (1.66s)
+    --- FAIL: TestPLR1CCompiledPointerConversionsAndControls/N3-conv-Location-own-method (1.89s)
+    --- FAIL: TestPLR1CCompiledPointerConversionsAndControls/N4-conv-Certificate-field (2.05s)
+    --- FAIL: TestPLR1CCompiledPointerConversionsAndControls/N5-conv-foreign-field-address (1.70s)
+    --- FAIL: TestPLR1CCompiledPointerConversionsAndControls/N6-slice-to-own-array-pointer (1.88s)
+    --- PASS: TestPLR1CCompiledPointerConversionsAndControls/S1-slice-local-copy-of-pointee (1.54s)
+    --- PASS: TestPLR1CCompiledPointerConversionsAndControls/S2-slice-parameter (1.49s)
+    --- PASS: TestPLR1CCompiledPointerConversionsAndControls/R1-double-deref-local (1.58s)
+    --- PASS: TestPLR1CCompiledPointerConversionsAndControls/R2-type-assert-deref (1.49s)
+    --- PASS: TestPLR1CCompiledPointerConversionsAndControls/R3-generic-helper-typeparam (1.53s)
+    --- PASS: TestPLR1CCompiledPointerConversionsAndControls/R4-foreign-field-address-builtin (1.52s)
+    --- PASS: TestPLR1CCompiledPointerConversionsAndControls/R5-uncalled-closure-deref (1.44s)
+    --- PASS: TestPLR1CCompiledPointerConversionsAndControls/R6-promoted-own-then-foreign (1.50s)
+    --- PASS: TestPLR1CCompiledPointerConversionsAndControls/R7-own-named-pointer-to-unnamed (1.73s)
+    --- PASS: TestPLR1CCompiledPointerConversionsAndControls/P1-own-identity-conversion (1.42s)
+    --- PASS: TestPLR1CCompiledPointerConversionsAndControls/P2-own-generic-receiver (1.49s)
+    --- PASS: TestPLR1CCompiledPointerConversionsAndControls/P3-untyped-nil (1.56s)
+    --- PASS: TestPLR1CCompiledPointerConversionsAndControls/P4-alias-identical-element (1.66s)
+    --- PASS: TestPLR1CCompiledPointerConversionsAndControls/P5-named-pointer-identical-element (1.78s)
+    --- PASS: TestPLR1CCompiledPointerConversionsAndControls/P6-unrelated-value-conversion (1.50s)
+FAIL
+FAIL	github.com/egparadise/SaintVision-Invion/services/node-agent/internal/migrationcontext	38.593s
+FAIL

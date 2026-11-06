@@ -368,7 +368,27 @@ func sourceEffects(src map[string][]byte, checked checkedSource) error {
 				return false
 			}
 			if call, ok := n.(*ast.CallExpr); ok {
-				if checked.info.Types[call.Fun].IsType() {
+				if tv := checked.info.Types[call.Fun]; tv.IsType() {
+					// Pointer conversions must preserve element identity. An own
+					// defined pointee name cannot confer ownership of a foreign
+					// address, nor can a slice become an own array pointer here.
+					if dst, ok := pointerElement(tv.Type); ok {
+						var operand types.Type
+						if len(call.Args) == 1 {
+							operand = checked.info.TypeOf(call.Args[0])
+						}
+						nilOperand := false
+						if b, ok := operand.(*types.Basic); ok {
+							nilOperand = b.Kind() == types.UntypedNil
+						}
+						if !nilOperand {
+							src, ok := pointerElement(operand)
+							if !ok || !types.Identical(src, dst) {
+								failure = fmt.Errorf("pointee-changing pointer conversion forbidden: %s", types.TypeString(tv.Type, nil))
+								return false
+							}
+						}
+					}
 					return true
 				}
 				fun := call.Fun
