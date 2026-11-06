@@ -127,11 +127,9 @@ def test_every_original_tuple_field_still_refuses(observation, field, path, cate
     assert path in d["changedPaths"] and category in d["categories"]
 
 
-def test_mounts_permutation_is_classified_but_still_refuses_stage1(observation):
+def test_mounts_permutation_accepts_stage2_only(observation):
     observation["after"]["Mounts"].reverse()
-    d = diagnostic(observation)
-    assert d["categories"] == ["MOUNTS_ORDER_ONLY"]
-    assert d["changedPaths"] == ["container.Mounts"]
+    assert run_observe(observation) == observation["wire"]
 
 
 def test_created_at_only_is_classified_but_still_refuses_stage1(observation):
@@ -152,8 +150,14 @@ def test_unhashable_oversize_unknown_keys_are_bounded_and_redacted(observation):
 
 def test_many_mount_differences_truncate_without_accepting(observation):
     a = observation
-    a["before"]["Mounts"] = [{k: "PRIVATE_SENTINEL_OLD" for k in floor._MOUNT_DIAGNOSTIC_FIELDS} for _ in range(8)]
-    a["after"]["Mounts"] = [{k: "PRIVATE_SENTINEL_NEW" for k in floor._MOUNT_DIAGNOSTIC_FIELDS} for _ in range(8)]
+    # Stage2 rejects >2 mounts before comparison. Keep this a bounds test using
+    # supported topology and many REAL field changes, still a strict refusal.
+    for i in range(2):
+        for key in ("Name","Source","Driver","Mode","Propagation"):
+            a["before"]["Mounts"][i][key]="PRIVATE_SENTINEL_OLD"
+            a["after"]["Mounts"][i][key]="PRIVATE_SENTINEL_NEW"
+    for key in floor._CONFIG_DIAGNOSTIC_FIELDS:
+        if key!="Cmd":a["after"]["Config"][key]="PRIVATE_SENTINEL_NEW"
     d = diagnostic(a)
     assert "MOUNTS_CHANGED" in d["categories"]
     assert d["truncated"] and len(d["changedPaths"]) == 24
@@ -205,8 +209,8 @@ def test_plain_target_security_guards_are_not_relaxed(observation,monkeypatch,fa
     with pytest.raises(ValueError):floor._plain({},value)
 
 
-def test_all_observe_guards_and_predicate_are_source_identical_except_failure_annotation():
-    old = subprocess.check_output(["git", "show", "ff3169d360a707415d9b03484cf0cf3031f3912c:deploy/lan/worker_peer_floor.py"], cwd=ROOT).decode()
+def test_stage2_ast_delta_is_only_two_mount_operands_and_new_validator():
+    old = subprocess.check_output(["git", "show", "52f935acced837d500af5932c3d26882e091f25a:deploy/lan/worker_peer_floor.py"], cwd=ROOT).decode()
     previous = ast.parse(old)
     current = ast.parse((ROOT / "deploy/lan/worker_peer_floor.py").read_text(encoding="utf-8"))
     def function(tree, name): return next(n for n in tree.body if isinstance(n,ast.FunctionDef) and n.name == name)
@@ -214,7 +218,19 @@ def test_all_observe_guards_and_predicate_are_source_identical_except_failure_an
     old_guard = old_observe.body[-2]
     new_guard = new_observe.body[-2]
     assert isinstance(old_guard,ast.If) and isinstance(new_guard,ast.If)
-    assert ast.dump(old_guard.test) == ast.dump(new_guard.test)
+    wrapped=[]
+    class Unwrap(ast.NodeTransformer):
+        def visit_Call(self,node):
+            if isinstance(node.func,ast.Name) and node.func.id=="_ordered_plain_mounts":
+                assert len(node.args)==1 and not node.keywords
+                value=node.args[0]
+                assert isinstance(value,ast.Subscript) and isinstance(value.value,ast.Name)
+                assert value.value.id in ("before","after") and isinstance(value.slice,ast.Constant) and value.slice.value=="Mounts"
+                wrapped.append(value.value.id)
+                return value
+            return self.generic_visit(node)
+    new_guard.test=Unwrap().visit(new_guard.test)
+    assert wrapped==["before","after"] and ast.dump(old_guard.test)==ast.dump(new_guard.test)
     assert len(new_guard.body)==1 and isinstance(new_guard.body[0],ast.Raise)
     assert new_guard.body[0].cause is None
     calls=[n for n in ast.walk(new_guard.body[0]) if isinstance(n,ast.Call)]
@@ -222,7 +238,8 @@ def test_all_observe_guards_and_predicate_are_source_identical_except_failure_an
     assert isinstance(calls[1].func,ast.Name) and calls[1].func.id=="_observation_diagnostic"
     assert [n.id for n in calls[1].args]==["before","after","volume","volume_after","consumers","consumers_after"]
     assert not calls[1].keywords
-    new_guard.body = old_guard.body
     assert ast.dump(old_observe) == ast.dump(new_observe)
-    for name in ("target","_plain","regular","docker","context","stopped_entries"):
+    old_names={n.name for n in previous.body if isinstance(n,ast.FunctionDef)}
+    assert {n.name for n in current.body if isinstance(n,ast.FunctionDef)}==old_names|{"_ordered_plain_mounts"}
+    for name in old_names-{"observe"}:
         assert ast.dump(function(previous,name)) == ast.dump(function(current,name))

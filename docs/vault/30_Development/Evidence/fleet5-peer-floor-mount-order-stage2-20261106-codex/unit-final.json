@@ -1,0 +1,15 @@
+{
+  "argv": [
+    "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+    "-B",
+    "-m",
+    "pytest",
+    "tests/core/test_worker_peer_floor_observation_diagnostics.py",
+    "tests/core/test_worker_peer_floor_mount_order_stage2.py",
+    "tests/core/test_lan_workspace_upgrade.py",
+    "-q"
+  ],
+  "exit": 0,
+  "observedKST": "2026-11-06T15:24:26.085746+09:00",
+  "classification": "CONTROLLED_ADAPTER_ACTUAL_SOURCE_NOT_HOSTED_DOCKER_PROOF"
+}

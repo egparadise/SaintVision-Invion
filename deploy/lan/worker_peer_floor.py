@@ -298,6 +298,35 @@ def _observation_diagnostic(before, after, volume, volume_after, consumers, cons
     return raw
 
 
+def _ordered_plain_mounts(mounts):
+    """Validate the supported topology; sort whole records by unique destination.
+
+    No field/value is projected, rewritten or dropped. Existing target/repair/
+    _plain ownership checks remain mandatory on both reads. Only enumeration
+    order is ignored; full dictionaries (including unknown metadata) still equal.
+    """
+    if type(mounts) is not list or len(mounts) not in (1, 2):
+        raise ValueError("Owned plain Node mount topology is ambiguous")
+    seen = set()
+    for mount in mounts:
+        if type(mount) is not dict or any(type(key) is not str for key in mount):
+            raise ValueError("Owned plain Node mount record is malformed")
+        destination = mount.get("Destination")
+        if (type(destination) is not str or destination not in ("/state", "/var/run/docker.sock")
+                or destination in seen):
+            raise ValueError("Owned plain Node mount destination is ambiguous")
+        expected = "volume" if destination == "/state" else "bind"
+        if type(mount.get("Type")) is not str or mount["Type"] != expected or mount.get("RW") is not True:
+            raise ValueError("Owned plain Node mount type/permission differs")
+        for key in ("Name", "Source", "Driver", "Mode", "Propagation"):
+            if key in mount and type(mount[key]) is not str:
+                raise ValueError("Owned plain Node mount metadata is malformed")
+        seen.add(destination)
+    if "/state" not in seen:
+        raise ValueError("Owned plain Node state mount is missing")
+    return sorted(mounts, key=lambda mount: mount["Destination"])
+
+
 def observe(worker_root, rotation, files, *, nonce=None):
     manifest, name, before, args, volume, consumers = target(worker_root)
     if (manifest["nodeId"], manifest["tenantId"], manifest["epoch"]) != (rotation["nodeId"], rotation["tenantId"], rotation["recoveryEpoch"]):
@@ -323,7 +352,7 @@ def observe(worker_root, rotation, files, *, nonce=None):
     _, _, after, _, volume_after, consumers_after = target(worker_root)
     if not after["State"].get("Running") or after["State"].get("Restarting"):
         raise ValueError("Actual Node stopped during floor observation")
-    if (before["Id"], before["Image"], before["Config"], before["Mounts"], before["State"].get("StartedAt"), before.get("RestartCount"), volume, consumers) != (after["Id"], after["Image"], after["Config"], after["Mounts"], after["State"].get("StartedAt"), after.get("RestartCount"), volume_after, consumers_after):
+    if (before["Id"], before["Image"], before["Config"], _ordered_plain_mounts(before["Mounts"]), before["State"].get("StartedAt"), before.get("RestartCount"), volume, consumers) != (after["Id"], after["Image"], after["Config"], _ordered_plain_mounts(after["Mounts"]), after["State"].get("StartedAt"), after.get("RestartCount"), volume_after, consumers_after):
         raise ValueError(OBSERVATION_CHANGE_PREFIX + "; diagnostic=" +
                          _observation_diagnostic(before, after, volume, volume_after, consumers, consumers_after))
     return value

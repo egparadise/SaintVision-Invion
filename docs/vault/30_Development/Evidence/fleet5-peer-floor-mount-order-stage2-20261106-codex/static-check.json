@@ -1,0 +1,10 @@
+{
+  "classification": "STATIC_WORKFLOW_AND_SCOPE_NOT_HOSTED_PROOF",
+  "triggerBranch": "agent/codex/fleet5-peer-floor-mount-order-stage2-20261106",
+  "oneWorkflowPath": true,
+  "one20MinuteJob": true,
+  "threeDeclared240SecondSamples": true,
+  "yamlInlineCompile": "PASS",
+  "unitResult": "128PASS_EXIT0",
+  "codeReview": "PENDING"
+}

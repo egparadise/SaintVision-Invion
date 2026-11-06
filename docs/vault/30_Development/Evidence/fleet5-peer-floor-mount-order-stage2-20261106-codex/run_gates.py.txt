@@ -1,0 +1,47 @@
+"""Required documentation gates, serial and fail-closed; no sync apply/state writes."""
+import datetime
+import hashlib
+import json
+from pathlib import Path
+import subprocess
+import sys
+
+root = Path.cwd()
+evidence = root / 'docs/vault/30_Development/Evidence/fleet5-peer-floor-mount-order-stage2-20261106-codex'
+state = Path('D:/Project/SaintVision-Invion/SaintVisionI-Invion/.git/obsidian-sync-state.json')
+commands = [
+    ['tools/check_docs.py'],
+    ['tools/check_ontology_generation.py'],
+    ['tools/check_ontology.py'],
+    ['tools/check_contract_bindings.py'],
+    ['tools/check_frontend_integrity.py'],
+    ['tools/check_doc_path_citations.py', '--ratchet', '--base-ref', '52f935acced837d500af5932c3d26882e091f25a'],
+    ['tools/check_doc_single_source.py', '--ratchet'],
+    ['tools/test_sync.py'],
+    ['tools/build_docs.py'],
+    ['tools/sync_obsidian.py', '--check', '--state', str(state)],
+]
+report = {'classification': 'DOCS_SOURCE_ONLY_NOT_PRODUCER_RUNTIME_ACCEPTANCE', 'runs': [], 'noApplyAdoptResolve': True}
+for index, args in enumerate(commands, 1):
+    before = hashlib.sha256(state.read_bytes()).hexdigest() if args[0].endswith('sync_obsidian.py') else None
+    command = [sys.executable, '-B', *args]
+    started = datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=9))).isoformat()
+    print(json.dumps({'starting': command, 'kst': started}), flush=True)
+    result = subprocess.run(command, capture_output=True)
+    name = f'gate-{index:02d}-{Path(args[0]).stem}.log'
+    (evidence / name).write_bytes(result.stdout + result.stderr)
+    item = {'argv': command, 'exit': result.returncode, 'startedKST': started,
+            'endedKST': datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=9))).isoformat(), 'log': name}
+    if before is not None:
+        after = hashlib.sha256(state.read_bytes()).hexdigest()
+        item.update(canonicalStatePath=str(state), canonicalStateSHA256Before=before,
+                    canonicalStateSHA256After=after, unchanged=before == after,
+                    authority='Root explicit canonical --check --state; no apply/adopt/resolve')
+    report['runs'].append(item)
+    (evidence / 'local-required-gates.json').write_text(json.dumps(report, indent=2) + '\n', encoding='utf-8')
+    print(json.dumps(item), flush=True)
+    if result.returncode:
+        print((result.stdout + result.stderr).decode(errors='replace')[-4500:], flush=True)
+        sys.exit(result.returncode)
+    if before is not None and before != after:
+        raise RuntimeError('canonical global state changed; preserve and ask Root scope')

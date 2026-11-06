@@ -1,9 +1,9 @@
-name: Peer floor observation stage1 diagnostic
-run-name: ${{ github.event_name == 'push' && format('FLEET5-peer-floor-stage1-{0}', github.sha) || inputs.correlation_id || github.workflow }}
+name: Peer floor mount order stage2 candidate
+run-name: ${{ github.event_name == 'push' && format('FLEET5-peer-floor-stage2-{0}', github.sha) || inputs.correlation_id || github.workflow }}
 on:
   push:
     branches:
-      - agent/codex/fleet5-peer-floor-observation-diagnostic-20261106
+      - agent/codex/fleet5-peer-floor-mount-order-stage2-20261106
     paths:
       - .github/workflows/peer-floor-observation-diagnostic.yml
   workflow_dispatch:
@@ -15,7 +15,7 @@ permissions:
   contents: read
 jobs:
   diagnose:
-    if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/agent/codex/fleet5-peer-floor-observation-diagnostic-20261106'
+    if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/agent/codex/fleet5-peer-floor-mount-order-stage2-20261106'
     runs-on: ubuntu-latest
     timeout-minutes: 20
     env:
@@ -40,8 +40,8 @@ jobs:
           go-version: '1.27.1'
           cache: false
       - run: python -m pip install -r requirements-test.txt -r requirements-docs.txt
-      - name: Require stage1 guard and redaction unit tests
-        run: python -B -m pytest tests/core/test_worker_peer_floor_observation_diagnostics.py tests/core/test_lan_workspace_upgrade.py -q
+      - name: Require stage2 complete-field and guard unit tests
+        run: python -B -m pytest tests/core/test_worker_peer_floor_observation_diagnostics.py tests/core/test_worker_peer_floor_mount_order_stage2.py tests/core/test_lan_workspace_upgrade.py -q
       - name: Build exact source Node and existing fixture programs
         working-directory: services/node-agent
         run: |
@@ -100,7 +100,7 @@ jobs:
               return dict(diagnosticVersion=1, classification='REFUSAL_DIAGNOSTIC_ONLY', changedPaths=paths,
                           categories=categories, hashes=hashes, truncated=value['truncated'])
 
-          report = dict(classification='STAGE1_DIAGNOSIS_NOT_BEHAVIOUR_FIX_OR_CORE_ACCEPTANCE', sourceSHA=source,
+          report = dict(classification='STAGE2_FIXED_CASE_CANDIDATE_NOT_CORE_OR_OPERATIONAL_ACCEPTANCE', sourceSHA=source,
                         runId=os.environ['GITHUB_RUN_ID'], attempt=os.environ['GITHUB_RUN_ATTEMPT'],
                         argv=command, maxSamples=3, samplePurpose='Independent owned fixture executions of exact prior failing test; never retry until pass',
                         pythonBase=os.environ['DIAGNOSTIC_PYTHON_BASE'], samples=[])
@@ -129,7 +129,7 @@ jobs:
                   passed = exit_code == 0 and len(cases) == 1 and not any(counts.values())
                   item = dict(sampleId=sample_id,exit=exit_code,timedOut=timed_out,executedCases=len(cases),counts=counts,
                               rawOutputSHA256=hashlib.sha256(raw).hexdigest(),diagnostics=diagnostics[:4],
-                              outcome='NOT_REPRODUCED' if passed else 'ACTUAL_GUARD_DIAGNOSTIC_CAPTURED' if diagnostics else 'FAILURE_WITHOUT_SANITIZED_GUARD_CAPTURE',
+                              outcome='NEW_STAGE2_EXACT_CASE_PASS' if passed else 'ACTUAL_GUARD_DIAGNOSTIC_CAPTURED' if diagnostics else 'FAILURE_WITHOUT_SANITIZED_GUARD_CAPTURE',
                               acceptancePassed=passed)
                   report['samples'].append(item)
                   print(json.dumps(item,sort_keys=True))
@@ -149,7 +149,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: peer-floor-observation-stage1-${{ github.sha }}
+          name: peer-floor-observation-stage2-${{ github.sha }}
           path: dist/peer-floor-observation-diagnostic/
           if-no-files-found: error
           retention-days: 30
