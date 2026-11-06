@@ -1,15 +1,19 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.390"
+version: "1.0.391"
 status: "review"
 author: "Codex"
-updated: "2026-11-06T08:47:49+09:00"
+updated: "2026-11-06T09:17:48+09:00"
 source_of_truth: "Git"
 active_card: "FLEET5-20261105 five physical node orchestration"
-active_card_status: "K1 56651 CoreFAILED1prep-rate test; actualClaudeeeb GoReviewactive; authorfailedreport then isolatedTESTclockcard; B rev5; physicalincomplete"
-active_card_next: "K1 Codex actualfailedCore report then deterministicrealPG test-onlyclock card; Claude actual56651verdict; Root independenttestdelta and combinedsourcechoice beforeONEfreshCore; B Codex rev5"
+active_card_status: "K1 codeACCEPT191b butfullCoreFAILURE; separateTESTclock/README/hostedPG16lane; B5 actualClaude b176active; physicalincomplete"
+active_card_next: "Codex isolatedTEST+README+fixedfocusedPG16CI; Root independentdelta+realPGresults thencombinedsource beforeONEfreshCore; Claude B5 actualverdict; B owner awaitconcretegrant"
 ---
+
+## 2026-11-06T09:17:48+09:00 실제 K1 코드 판정과 다음 B 검토
+
+작업한 것과 확인: K1 수정56651cba는 실제191b6f84/Docs42132923864에서 코드 delta가 수락됐고 전체Core 실패는 별도 교정 중이다. 실패 보고a413/Docs42133327925와 공식 known-state check0를 Root가 확인했다. B rev5 228e/Docs42132640734는 실제 Claude task task_b176020315c8/ctx ctx_391e15f3a280에서 검토를 시작했다. Root는 동기화 기준 차이를 실제8개 target/Git/state hash로 확인하고 공식 명령의 실제0을 확보했다. 저자도 같은0 뒤 정상 게시해 정본 export 순서 제한을 해제했다. 다음 첫 행동/담당: Codex는 격리 TEST+README/고정 hosted PG16, Claude는 실제 B5 판정, Root는 실제 새 delta와 PG 결과를 검토한 뒤 결합 소스를 고른다. 제품·Go·실장비 변경과 K2 구현은 아직 아니다.
 
 ## 2026-11-06T08:47:49+09:00 전체 Core 실패와 별도 시각 시험 카드
 

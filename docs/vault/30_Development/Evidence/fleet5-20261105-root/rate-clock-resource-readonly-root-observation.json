@@ -1,0 +1,21 @@
+{
+  "schemaVersion": "fleet5-rate-clock-local-resource-readonly:1",
+  "atKST": "2026-11-06T09:17:48+09:00",
+  "memory": {
+    "loadPercent": 97,
+    "availablePhysicalMiB": 482,
+    "totalPhysicalMiB": 16151,
+    "availableCommitMiB": 4382
+  },
+  "knownInstalledPgBinaryPathsFound": [],
+  "scopedSearchFileMatches": 6612,
+  "searchCompletedNormally": true,
+  "privateMetadataOnlyCandidates": 2,
+  "verifiedTestOwnedPGEndpoint": false,
+  "searchNotProofNoPossiblePGExists": true,
+  "psutilInstalledOrUsed": false,
+  "nativeOwnedSearchCleanupResult": "PowerShell returned0/no exact owned parent proven/no processaction; originalsearchlatercompleted0normally",
+  "unknownUserProcessKill": false,
+  "newLocalPGDockerVMOrCredentialUse": false,
+  "nextScope": "fixed hostedPG16 testlane perRootdecision; fullCoregate stillfailed"
+}

@@ -1,0 +1,13 @@
+{
+  "schemaVersion": "fleet5-failedcore-root-remote-artifact-check:1",
+  "atKST": "2026-11-06T09:17:48+09:00",
+  "artifact": 13463945019,
+  "Core": 42126222201,
+  "source": "56651cba697f2ab6fcd7166ca4e6ea11eac28113",
+  "actualRemoteSize": 13394626,
+  "actualRemoteDigest": "sha256:25512901100943d57c2e9e48cee7d6e55f6ae134bdcbba4c86ffde088290655e",
+  "expired": false,
+  "rootDownloadedRawOrParsedXMLAgain": false,
+  "parsedCountsProvenance": "qualifiedownera413 artifactparser; Rootverifiedremoteidentity+immutablequalifiedreport/Docs; no rawJUnit/ZIPexport",
+  "wholeCoreResult": "FAILURE preserved"
+}

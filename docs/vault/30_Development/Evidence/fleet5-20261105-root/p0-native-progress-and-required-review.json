@@ -3,8 +3,8 @@
   "recordedAtKST": "2026-11-06T00:46:51+09:00",
   "rootBase": "2b1753ce59c09037b5e130a7ffe64794d1d45fdf",
   "priorRootCheckpoint": {
-    "SHA": "e588599b34cffc44331d7079ae3fe6369cf16765",
-    "Docs": 42129270859,
+    "SHA": "3c2be24544ff8f1da09bb2a44c73df26532981bf",
+    "Docs": 42132223189,
     "exactHeadCorrelationAllJobsSuccess": true,
     "remoteMatches": true,
     "syncExits": [
@@ -12,13 +12,13 @@
       0,
       0
     ],
-    "independentlyMatchedNormalizedDestinationHashes": 2747,
+    "independentlyMatchedNormalizedDestinationHashes": 2749,
     "pending": 0,
     "conflicts": 0,
     "trackedAndUntrackedClean": true,
     "rootDocsOnly": true,
     "wholeProgramComplete": false,
-    "verifiedAtKST": "2026-11-06T08:27:56+09:00"
+    "verifiedAtKST": "2026-11-06T08:49:31+09:00"
   },
   "actualPlanLowReview": {
     "source": "803ad270562b1b75e44d26f9e14b965c714ab519",
@@ -1871,6 +1871,36 @@
       "source": "14c7c936e056c685e85ee8f34f6185aa27ed9a2c",
       "path": "docs/vault/30_Development/Evidence/fleet5-b-rev4-2a08-review-20261106-claude/census-audit-result.json",
       "SHA256": "ec36160cc15d1adfac164827a8c10f4a85c2e74522391bbb288ab801bd1736ba"
+    },
+    {
+      "source": "191b6f843a643ee4989ce28c9ebf1816963ffe28",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k1-temporal-56651-review-20261106-claude/review.json",
+      "SHA256": "581efd7e92827221af4e1cc8b305f6a2949b71fbb6961af05ea7cc47609d1b89"
+    },
+    {
+      "source": "a413c0c2e9a6d070321480f9c216b8aa07e5fd74",
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-v5-k1-temporal-ci-20261106-codex/core-artifact-download-receipt.json",
+      "SHA256": "d79ce58c14883cb6ab522befc145041536fdf89e840022222cd2270e3caa77a1"
+    },
+    {
+      "source": "a413c0c2e9a6d070321480f9c216b8aa07e5fd74",
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-v5-k1-temporal-ci-20261106-codex/core-test-counts.json",
+      "SHA256": "297c5e0f1cd8cca42222b8ef300eb18144268238779cf1eb871f8212f6266de3"
+    },
+    {
+      "source": "a413c0c2e9a6d070321480f9c216b8aa07e5fd74",
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-v5-k1-temporal-ci-20261106-codex/node-race-observation.json",
+      "SHA256": "6f978f892febfd4d7c6c651a4e8b36bf4656e4534a657586d64f88f5b6e89ef1"
+    },
+    {
+      "source": "a413c0c2e9a6d070321480f9c216b8aa07e5fd74",
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-v5-k1-temporal-ci-20261106-codex/report-known-state-check.json",
+      "SHA256": "33c485ce7383355fcd39e34c540ead69d5a1d41a219addace919135f1a8585c1"
+    },
+    {
+      "source": "a413c0c2e9a6d070321480f9c216b8aa07e5fd74",
+      "path": "docs/vault/30_Development/Evidence/fleet5-bootstrap-v5-k1-temporal-ci-20261106-codex/report-scope-audit.json",
+      "SHA256": "3265b5d43f52dc543f506e5483cd75172687e10cabd03f9404f79aff33bb34eb"
     }
   ],
   "notGatheredRawOrSharedArtifacts": [
@@ -2455,7 +2485,7 @@
     "ownerT1T2T3": "msg_620855c76519",
     "normativeRevisionReply": "msg_0392caf64d5d"
   },
-  "latestRecordAtKST": "2026-11-06T08:47:49+09:00",
+  "latestRecordAtKST": "2026-11-06T09:17:48+09:00",
   "optionalLowTokenTestDelta": {
     "source": "f0af307705b4923ebc3e231db5238af4c70aa389",
     "scope": "two otherwise-valid token payload corrections and JSON validity assertions; runtime unchanged",
@@ -2769,10 +2799,10 @@
     "sourceFullCoreAccepted": true,
     "actualCodeReviewTask": "task_5627222e0f59",
     "actualCodeReviewDispatch": "ctx_0918954c585c",
-    "currentAuthorization": "same failedCIreport then isolated sequentialTEST-only clock card; no runtime/source567changes; no newwholeCI until Rootreviewedcombinedsourcechoice",
+    "currentAuthorization": "isolatedTESTclock+README-onlyR1+fixedhostedPG16 focusedworkflow; actualRootreview/combinedsourcechoice beforeONEnewwholeCore",
     "reviewDocs": 42119997927,
     "actualDecisionMessage": "msg_87002d358dbb",
-    "actualCodeAccepted": false,
+    "actualCodeAccepted": true,
     "sourceFullCoreAcceptanceScope": "CI pass for REJECTED c6f only; code M1/M2 stillopen",
     "qualifiedOldSourceReport": "37fe879ff37f4e673f059cc8e41f1c7c787f45dc",
     "reportDocs": 42121661622,
@@ -2781,10 +2811,15 @@
     "correctedSourceDocs": 42126225708,
     "correctedSourceCore": 42126222201,
     "correctedSourceCoreAtObservation": "actual terminalFAILURE Core42126222201 mainpyteststep33",
-    "actualCorrectedDeltaReview": "actual Claude running/verdict pending",
+    "actualCorrectedDeltaReview": "COMPLETED191b ACCEPTcodeonly",
     "actualCorrectedDeltaReviewTask": "task_eeb63f89fecd",
     "actualCorrectedDeltaReviewDispatch": "ctx_c6a8ddbbde6d",
-    "correctedSourceFullCoreAccepted": false
+    "correctedSourceFullCoreAccepted": false,
+    "actualCorrectedDeltaReviewDocs": 42132923864,
+    "acceptanceAxis": "implementation only; fullCorefailed andwholeK1cardnotdone",
+    "qualifiedFailedReport": "a413c0c2e9a6d070321480f9c216b8aa07e5fd74",
+    "qualifiedFailedReportDocs": 42133327925,
+    "K2AndPhysical": "NOTRUN"
   },
   "broadBRevision3ActualReviewGate": "b-rev3-root-review-gate.json",
   "broadBRevision3SourceObservation": "b-rev3-root-source-observation.json",
@@ -2993,5 +3028,10 @@
   "K1ActualCorrectedDeltaReviewGate": "k1-temporal-actual-review-gate.json",
   "K1FinishedTurnSupervision": "k1-temporal-finished-turn-supervision.json",
   "K1CorrectedFullCoreActualFailure": "k1-56651-core-failure-root-observation.json",
-  "separatePreparationRateClockTestCard": "core-preparation-rate-clock-test-root-decision.json"
+  "separatePreparationRateClockTestCard": "core-preparation-rate-clock-test-root-decision.json",
+  "K1ActualCorrectedCodeAxisDecision": "k1-temporal-actual-code-axis-root-decision.json",
+  "K1QualifiedFailedReportRootObservation": "k1-failed-qualified-report-root-observation.json",
+  "K1ReportKnownStateDecision": "k1-report-root-known-state-publication-decision.json",
+  "BRevision5ActualReviewGate": "b-rev5-root-review-gate.json",
+  "rateClockHostedLaneDecision": "rate-clock-focused-hosted-lane-root-decision.json"
 }

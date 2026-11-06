@@ -1,0 +1,108 @@
+{
+  "schemaVersion": "fleet5-k1-report-root-known-state-check:1",
+  "atKST": "2026-11-06T08:52:25+09:00",
+  "authorSource": "56651cba697f2ab6fcd7166ca4e6ea11eac28113",
+  "canonicalRootCheckpoint": {
+    "SHA": "3c2be24544ff8f1da09bb2a44c73df26532981bf",
+    "Docs": 42132223189,
+    "exactHeadCorrelationAllJobsSuccess": true,
+    "remoteMatches": true,
+    "syncExits": [
+      0,
+      0,
+      0
+    ],
+    "independentlyMatchedNormalizedDestinationHashes": 2749,
+    "pending": 0,
+    "conflicts": 0,
+    "trackedAndUntrackedClean": true,
+    "rootDocsOnly": true,
+    "wholeProgramComplete": false,
+    "verifiedAtKST": "2026-11-06T08:49:31+09:00"
+  },
+  "rootAndAuthorGitCommonStatesAreDifferent": true,
+  "syncToolNormalizedBytesIdentical": true,
+  "priorAuthorDefaultCheckExit": 3,
+  "priorEightCollisionsPreserved": true,
+  "eightActualTargetsMatchCanonicalGitSourceAndAcceptedState": [
+    {
+      "path": "00_Index/전체 개발 진행 현황.md",
+      "sourceGitNormalizedSHA256": "020469bb892ed4cca94c79ac0608b9eb06c096a30ef49a1b8cb204a4d0e9fa6e",
+      "destinationNormalizedSHA256": "020469bb892ed4cca94c79ac0608b9eb06c096a30ef49a1b8cb204a4d0e9fa6e",
+      "acceptedStateMatches": true,
+      "originalAuthorReason": "both-diverged"
+    },
+    {
+      "path": "30_Development/Agent별 작업/Codex 작업 현황.md",
+      "sourceGitNormalizedSHA256": "b54a150a0c46b40a6151f7b97af981ff8d6583890f8ec96ddd249cf0e046c870",
+      "destinationNormalizedSHA256": "b54a150a0c46b40a6151f7b97af981ff8d6583890f8ec96ddd249cf0e046c870",
+      "acceptedStateMatches": true,
+      "originalAuthorReason": "both-diverged"
+    },
+    {
+      "path": "30_Development/Evidence/card150-intranet-pki-lan-pilot.json",
+      "sourceGitNormalizedSHA256": "9a8009241c1f10cf766ee3d3f0ac26560aa1ed3295c6a247bcca43606f527b59",
+      "destinationNormalizedSHA256": "9a8009241c1f10cf766ee3d3f0ac26560aa1ed3295c6a247bcca43606f527b59",
+      "acceptedStateMatches": true,
+      "originalAuthorReason": "no-baseline"
+    },
+    {
+      "path": "30_Development/Evidence/fleet5-20261105-root/verifier-corrections.md",
+      "sourceGitNormalizedSHA256": "3bb6c926e7f2b86b2936b19828cb86fc4fd157bd2bb3ddb0b4a44827b81767ce",
+      "destinationNormalizedSHA256": "3bb6c926e7f2b86b2936b19828cb86fc4fd157bd2bb3ddb0b4a44827b81767ce",
+      "acceptedStateMatches": true,
+      "originalAuthorReason": "no-baseline"
+    },
+    {
+      "path": "30_Development/Evidence/fleet5-setup-integration-20261105-codex/candidate-ci-72028cba.json",
+      "sourceGitNormalizedSHA256": "4eba82c1d307fd4ea0b2e259513dbece7735d12c748b451ede2d2f1ff856333e",
+      "destinationNormalizedSHA256": "4eba82c1d307fd4ea0b2e259513dbece7735d12c748b451ede2d2f1ff856333e",
+      "acceptedStateMatches": true,
+      "originalAuthorReason": "no-baseline"
+    },
+    {
+      "path": "30_Development/History/2026-11-05_FLEET5_compute_storage_contract_Codex.md",
+      "sourceGitNormalizedSHA256": "51713321b8377103b9abdb3fe36e085cf8c5ae05152cacaf22f6baff8395663d",
+      "destinationNormalizedSHA256": "51713321b8377103b9abdb3fe36e085cf8c5ae05152cacaf22f6baff8395663d",
+      "acceptedStateMatches": true,
+      "originalAuthorReason": "no-baseline"
+    },
+    {
+      "path": "30_Development/History/2026-11-05_FLEET5_setup_integration_Codex.md",
+      "sourceGitNormalizedSHA256": "d32c76218ac8a0aadfd5950d7c2e9d17c19a738b9ca9c6038534dc6ff116d50a",
+      "destinationNormalizedSHA256": "d32c76218ac8a0aadfd5950d7c2e9d17c19a738b9ca9c6038534dc6ff116d50a",
+      "acceptedStateMatches": true,
+      "originalAuthorReason": "no-baseline"
+    },
+    {
+      "path": "30_Development/History/2026-11-05_기존5대_오케스트레이션_착수_Codex.md",
+      "sourceGitNormalizedSHA256": "997f75917dc671984cfaff9a6e869aa0d1ee3520bc802e2589859e6ed22d231d",
+      "destinationNormalizedSHA256": "997f75917dc671984cfaff9a6e869aa0d1ee3520bc802e2589859e6ed22d231d",
+      "acceptedStateMatches": true,
+      "originalAuthorReason": "no-baseline"
+    }
+  ],
+  "actualOfficialCheckArgv": [
+    "D:\\Project\\SaintVisionI-Invion\\https-github.com-egparadise-SaintVision-Invion.git\\.venv\\Scripts\\python.exe",
+    "-X",
+    "utf8",
+    "-B",
+    "D:\\Project\\SaintVisionI-Invion\\fleet5-bootstrap-v5-k1-temporal-report-20261106\\tools\\sync_obsidian.py",
+    "--check",
+    "--state",
+    "D:\\Project\\SaintVisionI-Invion\\fleet-five-orchestration-20261105\\.work\\root429-export-state-snapshot-k1-report.json",
+    "--conflicts-out",
+    "D:\\Project\\SaintVisionI-Invion\\fleet-five-orchestration-20261105\\.work\\k1-report-root-state-check-conflicts.json"
+  ],
+  "actualOfficialCheckExit": 0,
+  "actualOfficialCheckOutput": "CHECK: 3299 managed files, 847 pending exports, 0 conflicts. No writes.\n",
+  "stateSnapshotSHA256": "fba5142a1c60a04825a54c95dc4bca49b7b7a45afa18e12f613f60683af4d59e",
+  "snapshotAndCanonicalStateUnchanged": true,
+  "eightRealTargetsUnchanged": true,
+  "authorPendingFiles": 38,
+  "pendingFilesAllUniqueOwnedScope": true,
+  "vaultApplyAdoptResolveManifestWrites": false,
+  "publicationDecision": "author may run same exact official --check --state snapshot, require0 then normal unique report commit/push/ownDocs; NO apply from stalebranch",
+  "wholeCoreFailureRemains": true,
+  "wholeProgramComplete": false
+}

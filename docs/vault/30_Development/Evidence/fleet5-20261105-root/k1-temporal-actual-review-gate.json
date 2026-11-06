@@ -41,9 +41,9 @@
     "fullCoreStillRequiredBeforeCodeAcceptance": true
   },
   "currentCoreSnapshot": "k1-56651-core-failure-root-observation.json",
-  "verdict": null,
-  "actualDeltaReviewCompleted": false,
-  "codeAccepted": false,
+  "verdict": "ACCEPT code delta only",
+  "actualDeltaReviewCompleted": true,
+  "codeAccepted": true,
   "wholeProgramComplete": false,
   "explicitReviewScope": [
     "M1 exact HELD/latest epoch+sequence and independentcurrenthead",
@@ -55,7 +55,7 @@
   ],
   "fullCoreArtifactQualifiedReportStillRequired": true,
   "noSecondReviewerOrCodeAuthorStarted": true,
-  "latestObservationAtKST": "2026-11-06T08:47:49+09:00",
+  "latestObservationAtKST": "2026-11-06T09:17:48+09:00",
   "fullCoreGate": "FAILED actual56651/Core42126222201; separate test-reliability card pending",
   "actualCodeAccepted": false,
   "CIBlockerNotice": {
@@ -64,5 +64,43 @@
       "messageId": "msg_b020041e659c"
     }
   },
-  "nextAction": "Claude exact56651 actual Go verdict; same authorfailedCIreport then separate test-only card; Root actual combinedsource choice before freshCI"
+  "nextAction": "separateTEST+README/realPG focusedlane review; reviewedcombinedsource+freshfullCore; no K1carddone",
+  "actualReview": "191b6f843a643ee4989ce28c9ebf1816963ffe28",
+  "actualReviewDocs": 42132923864,
+  "rootVerifiedReviewExactHeadRefAllJobsSuccess": true,
+  "codeAcceptanceScope": "IMPLEMENTATION only; fullCorefailed/K2physicalpending",
+  "actualWorkerDone": "msg_cfce6b990da4",
+  "nonBlockingResiduals": [
+    {
+      "id": "R1",
+      "severity": "Low (documentation)",
+      "text": "The README does not state the PRESENT-head-only current derivation boundary (only the owner History does), and the remaining ABSENT branch in VerifyCurrentProjectionSet can no longer succeed. Fold into the README at the next K1 touch or K2 handoff; no code change required."
+    },
+    {
+      "id": "R2",
+      "severity": "Info",
+      "text": "latestCurrent compares fences only within the same migrationId/plan and the registered cohort scopes (an owner test asserts other-migration leases are ignored). Cross-migration cohort fencing remains the responsibility of the K2 live Operations input."
+    },
+    {
+      "id": "R3",
+      "severity": "Info",
+      "text": "A signed record time selects its own key interval, so a holder of an expired but still granted key could backdate. Causal joins and installed-graph time pins mitigate this (retime probes deny). This is an inherent offline residual."
+    },
+    {
+      "id": "R4",
+      "severity": "Info",
+      "text": "Historical native consumption is allowed up to 30s before the challenge IssuedAt (live requires >= IssuedAt), which is within the Root 30s skew decision."
+    },
+    {
+      "id": "R5",
+      "severity": "Info",
+      "text": "The concurrent test covers Verify only. VerifyCurrentProjectionSet concurrency rests on static review (no post-constructor writes) plus the hosted Linux race run of the existing suite."
+    },
+    {
+      "id": "R6",
+      "severity": "Info (pre-existing, not delta)",
+      "text": "Trusted SemanticInputs fields that verification never reads (for example plan proof-reference keys and policy descriptors) can be nil without effect, because proofs are bound to the signed plan record. Unchanged from c6f."
+    }
+  ],
+  "resource": "succeeded/settled/exited/released thenreusedforB5"
 }

@@ -1,11 +1,11 @@
 ---
 doc_id: "GOV-FLEET5-BOOTSTRAP-V5-FREEZE-CODE-SCOPE-20261106"
 title: "FLEET5 전환 v5 계약 동결과 구현 범위"
-version: "1.0.2"
+version: "1.0.3"
 status: "active"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-11-06T07:25:51+09:00"
+updated: "2026-11-06T09:17:48+09:00"
 source_of_truth: "Git"
 ---
 
@@ -46,3 +46,14 @@ K1은 서로 다른 시점의 보존 이력을 검증해야 한다. 종료된 ep
 추가로 malformed trusted SemanticInputs를 panic 대신 오류로 거부하고, native leaf의 명시적 ServerAuth EKU와 DigitalSignature, challenge issue/expiry 창, bounded packet byte snapshot과 최신 actual testcount를 보완한다. challenge는 IssuedAt-30초 이내 skew가 허용되므로 5초 전 관측을 잘못된 negative로 꾸미지 않으며 범위 밖/만료 경계를 시험한다. concurrent caller가 복사 중 입력을 바꾸는 것까지 안전하다고 주장하지 않는다. 새 multi-time crypto fixture에서 과거 lease 만료·120초 경과 뒤 current epoch2만 live인 정상/거부 경계를 실제로 확인해야 한다.
 
 수정은 c6f 기반 별도 고립 branch의 migrationverify와 고유 테스트/문서로 제한한다. 기존 c6f/current Core를 취소·advance·재실행하거나 그 성공을 새 수정 SHA의 성공으로 쓰지 않는다. 수정 SHA·실제 CI·독립 delta review 전까지 K1/K2/live trust/40future runtime/실장비 수락은 보류한다.
+
+
+## K1 temporal 코드의 실제 검토와 남은 CI 축
+
+수정56651cba/package d8321059는 실제191b6f84 검토/Docs42132923864에서 code delta ACCEPT를 받았다. Root가 원문·exact head/ref/전체 job·remote·제품 diff0를 대조했다. M1/M2와 L1–L5는 실제 인과 반례·정상 사례로 닫혔다. 이는 구현 축의 한정 수락이고 전체Core42126222201은 Python rate-limit 시험1건으로 실패 상태다. K1 카드 완료·K2·설치 trust·운영/5대 인수로 바꾸지 않는다.
+
+새 typed History는 현재 Operations/Challenges와 분리한 독립 입력이고 current NativeWitnesses는 현재의 원래 Node 증명이다. 현재 파생은 PRESENT인 인증된 inventory head가 있어야 한다. ABSENT의 초기 단계에는 인증된 expected-native-state 근거가 없어 현재 view를 내지 않고 거부하며 역사 Verify는 가능하다. 이 한계를 README에 다음 touch에서 명시하는 R1 Low를 저자에게 배정했다. Go/testdata/schema/28 source pin 변경 없이 설명만 추가한다. 정규화27+원래 native1 producer wire와 설계 등록 manifest는 바뀌지 않았다.
+
+다른 migration 사이의 cohort fence, History/current native/challenge/상태·인증서/publication/설치 trust/artifact/CI/review 입력의 실제 독립 생성·인증은 K2 의무다. 서명 시각에 의존하는 offline 역사 검증의 backdating 잔여 한계와 caller-owned 동시성 조건을 보존한다. 이 타입이나 서명 fixture가 실시간 producer 구현을 대신하지 않는다.
+
+실패 보고a413c0c2/Docs42133327925는 사실 보고로만 수락한다. 분 경계는 실제 실패 원인으로 미확정이다. 같은 Codex의 별도 TEST-clock 카드와 README-only 교정·고정 목적 hosted PG16 시험 경로를 허용했다. 기존 Core/Backend workflow·제품·Go는 그대로 두며 선택 시험의 성공은 fullCore가 아니다. Root가 실제 시험/README/CI delta와 실제 PG 결과를 검토하고 결합 SHA를 고른 뒤에만 새 전체Core/Docs를 진행한다. 현재 코드 수락을 근거로 실패 CI를 재실행하거나 K1 최종 worker_done을 하지 않는다. [실제 독립 코드 검토](https://github.com/egparadise/SaintVision-Invion/blob/191b6f843a643ee4989ce28c9ebf1816963ffe28/docs/vault/30_Development/History/2026-11-06_08-50-00_KST_FLEET5_K1_56651cba_temporal_delta_%EB%8F%85%EB%A6%BD%EA%B2%80%ED%86%A0_Claude.md)와 k1-temporal-actual-code-axis-root-decision.json에 근거를 보존했다.

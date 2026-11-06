@@ -1,0 +1,101 @@
+{
+  "schemaVersion": "fleet5-k1-actual-code-axis-acceptance-root:1",
+  "atKST": "2026-11-06T09:01:14+09:00",
+  "source": "56651cba697f2ab6fcd7166ca4e6ea11eac28113",
+  "actualReview": {
+    "sourceOrReview": "191b6f843a643ee4989ce28c9ebf1816963ffe28",
+    "branch": "agent/claude/fleet5-k1-temporal-56651-review-20261106",
+    "Docs": 42132923864,
+    "job": 127613767272,
+    "rootVerifiedExactHeadRefAllJobsSuccess": true,
+    "remoteExact": true,
+    "correlation": "Documentation Build",
+    "packageTreeUnchanged": true,
+    "productDiffVs56651": 0,
+    "actualReviewPath": "docs/vault/30_Development/Evidence/fleet5-k1-temporal-56651-review-20261106-claude/review.json",
+    "reviewJSONSHA256": "581efd7e92827221af4e1cc8b305f6a2949b71fbb6961af05ea7cc47609d1b89"
+  },
+  "actualVerdict": "ACCEPT (code delta, K1 package scope)",
+  "RootAdoptsImplementationAxisOnly": true,
+  "closed": [
+    "M1",
+    "M2",
+    "L1",
+    "L2",
+    "L3",
+    "L4",
+    "L5"
+  ],
+  "newAppApiBoundaryAccepted": {
+    "History": "Typed HistoricalContext is separate from live Operations/Challenges. Verify uses History only and needs no current input. Every History op must equal an authenticated HELD lease (scopes, plan, window, epoch). Probes found no trust crossing.",
+    "NativeWitnesses": "Exactly one per registered member, in order, authenticated at Now against the current challenge, current op/epoch, certificate nonrevocation at Now, key at Now and the 120s age; expected state comes from the PRESENT head inventory declaration. Old retained, time-relabelled, wrong-nonce, cross-member and relabelled historical-challenge witnesses all deny.",
+    "absentHeadFailClosed": "ACCEPTED AS AN EXPLICIT K1 BOUNDARY. Current derivation is defined only for sets whose current inventory head is PRESENT; ABSENT-head sets (cohort-01..27 shape, pre-publication migration phase) always fail closed at the native gate (unit probe). This is correct: K1 has no authenticated expected-native-state source for an ABSENT head, and inventing one would add a trust input. Usefulness limit: K1 gives no current view during the ABSENT phase, although history still authenticates it. VerifyCurrentProjectionSet keeps an ABSENT branch that can no longer succeed.",
+    "noHistoricalHeadAsCurrent": "The current head must equal the set field and a readback re-verified live at Now (<=120s, current op, CP key at Now); a stale readback at +121s denies.",
+    "k2Obligations": "K2 must actually produce and authenticate History, Current.NativeWitnesses, challenges, publication/certificate status, installed trust and artifact/CI/review inputs. K1 assertions are not their implementation."
+  },
+  "nonBlockingResiduals": [
+    {
+      "id": "R1",
+      "severity": "Low (documentation)",
+      "text": "The README does not state the PRESENT-head-only current derivation boundary (only the owner History does), and the remaining ABSENT branch in VerifyCurrentProjectionSet can no longer succeed. Fold into the README at the next K1 touch or K2 handoff; no code change required."
+    },
+    {
+      "id": "R2",
+      "severity": "Info",
+      "text": "latestCurrent compares fences only within the same migrationId/plan and the registered cohort scopes (an owner test asserts other-migration leases are ignored). Cross-migration cohort fencing remains the responsibility of the K2 live Operations input."
+    },
+    {
+      "id": "R3",
+      "severity": "Info",
+      "text": "A signed record time selects its own key interval, so a holder of an expired but still granted key could backdate. Causal joins and installed-graph time pins mitigate this (retime probes deny). This is an inherent offline residual."
+    },
+    {
+      "id": "R4",
+      "severity": "Info",
+      "text": "Historical native consumption is allowed up to 30s before the challenge IssuedAt (live requires >= IssuedAt), which is within the Root 30s skew decision."
+    },
+    {
+      "id": "R5",
+      "severity": "Info",
+      "text": "The concurrent test covers Verify only. VerifyCurrentProjectionSet concurrency rests on static review (no post-constructor writes) plus the hosted Linux race run of the existing suite."
+    },
+    {
+      "id": "R6",
+      "severity": "Info (pre-existing, not delta)",
+      "text": "Trusted SemanticInputs fields that verification never reads (for example plan proof-reference keys and policy descriptors) can be nil without effect, because proofs are bound to the signed plan record. Unchanged from c6f."
+    }
+  ],
+  "wholeCoreGate": "FAILURE42126222201",
+  "qualifiedFailedReport": {
+    "atKST": "2026-11-06T08:59:18+09:00",
+    "report": "a413c0c2e9a6d070321480f9c216b8aa07e5fd74",
+    "branch": "agent/codex/fleet5-bootstrap-v5-k1-temporal-report-20261106",
+    "source": "56651cba697f2ab6fcd7166ca4e6ea11eac28113",
+    "productDiff": 0,
+    "uniqueDocsFiles": 42,
+    "remoteExact": true,
+    "committedKnownStateEvidence": [
+      "docs/vault/30_Development/Evidence/fleet5-bootstrap-v5-k1-temporal-ci-20261106-codex/report-gate-08-test_sync.log",
+      "docs/vault/30_Development/Evidence/fleet5-bootstrap-v5-k1-temporal-ci-20261106-codex/report-known-state-check.json",
+      "docs/vault/30_Development/Evidence/fleet5-bootstrap-v5-k1-temporal-ci-20261106-codex/report-known-state-check.log",
+      "docs/vault/30_Development/Evidence/fleet5-bootstrap-v5-k1-temporal-ci-20261106-codex/report-scope-audit.json",
+      "docs/vault/30_Development/Evidence/fleet5-bootstrap-v5-k1-temporal-ci-20261106-codex/root-known-state-command.json",
+      "docs/vault/30_Development/Evidence/fleet5-bootstrap-v5-k1-temporal-ci-20261106-codex/root-known-state-gate-proof.json",
+      "docs/vault/30_Development/History/2026-11-06_FLEET5_K1_temporal_CI_delivery_Codex.md"
+    ],
+    "reportDocs": 42133327925,
+    "reportDocsSuccess": true,
+    "baselineHoldSafeToRelease": "committed explicit-state0 must be inspected; no sharedwritesneeded forreportpublication",
+    "reportDocsJob": 127615152751,
+    "rootVerifiedExactReportHeadRefAllJobsSuccess": true
+  },
+  "nextAuthorizedScope": "isolated TEST-clock card plus README-onlyR1; allGo/testdata/source28pins unchanged; Rootactualreview+combinedsourcechoicebeforeONEfreshfullCore",
+  "authorMessage": {
+    "ok": true,
+    "result": {
+      "messageId": "msg_b56d7fd0b616"
+    }
+  },
+  "wholeK1CardDone": false,
+  "K2OrPhysicalAccepted": false
+}

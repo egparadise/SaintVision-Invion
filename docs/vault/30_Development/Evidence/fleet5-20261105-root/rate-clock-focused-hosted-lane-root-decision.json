@@ -1,0 +1,25 @@
+{
+  "schemaVersion": "fleet5-rate-clock-focused-hosted-lane-root-decision:1",
+  "atKST": "2026-11-06T09:14:58+09:00",
+  "statusMessage": "msg_93d9c14acdbc",
+  "owner": "same ctx_ceecb3824e33 sequential TEST-onlycard",
+  "actualHostMemory": {
+    "loadPercent": 97,
+    "availablePhysicalMiB": 482,
+    "totalPhysicalMiB": 16151,
+    "availableCommitMiB": 4382
+  },
+  "verifiedLocalPG": "none verified; no productionorunknownDSN used",
+  "newCIScope": ".github/workflows/preparation-rate-clock.yml exactbranch/fixedfile hostedPG16 Python3.12 Go1.27.1 <=20min read-onlypermissions",
+  "existingCoreAndBackendChanged": false,
+  "newWholeCoreAuthorized": false,
+  "nextGate": "Rootactualtest+README+CIreview andrealPGfocusedresults thenexactcombinedsourcechoice",
+  "scopeReply": {
+    "ok": true,
+    "result": {
+      "messageId": "msg_2f135030b23c"
+    }
+  },
+  "rootBody": "CONCRETE real-PG resource decision for statusmsg_93d9c14acdbc and same FLEET5-CORE-PREP-RATE-CLOCK-20261106. Root readactual Core/Backend/conftest harness. Existing Core dispatch onlyhas correlation/nativeproof/S08 flags, nofocusedpytestlane; do not try inventedinputs/rerunoldfullCore. No verifiedtestownedlocalPG endpoint found: mainDSNabsent/pathbinariesabsent, installedPGknownpathsnone; scopedfilename searchreturnedmostlyoldsourcecopies andnoactiveverifiedtestharness. FreshRootmemory97percent/482MiBavailable/4382MiBcommit; doNOTstartlocalPG/Docker/VM orreuseproduction/pilotDSN.\n\nAUTHORIZE narrow CI-only scope extension: ONE new fixed-purpose workflow .github/workflows/preparation-rate-clock.yml in your SAME isolatedtestbranch plus only minimal UNIQUE test proof/helper if needed. ExistingCore/Backend/otherworkflows unchanged. This is a focused REAL TEST-PG lane, never a substitute wholeCore result. Use GitHubhostedubuntu, pinnedrepoPython3.12/Go1.27.1/currentrequirements and ephemeralpostgres:16 testservice (reuseBackendownedservice/harness semantics, fixedCI-onlycredentials; no productionsecrets). Trace actual workspace_http/storage/node_runtime fixtures and copy only neededexistingCore prerequisites (hostedDocker/Nodebinary+testimage etc asactuallyneeded), not wholeunrelatedsuites. Installonlyexistingpinnedrequirements onhostedrunner; no localpip.\nWorkflow name explicitly Preparation rate clock real PG, NOTCoreBuild/BackendBuild. TriggerfirstsourcePUSH onlyonEXACTbranch agent/codex/fleet5-prepare-rate-clock-test-20261106 and relevant exactworkflow/test/helperpaths (no broad agent/globaltrigger orarbitrarypytest/cmd/DSNinput). contents:read, no deploysecrets/SSH/productionenvironment, boundedjob<=20m, no cancel/rerunofexistingCore. A newworkflowpushcanstart its ownselectedjob withoutrequiringnewfileondefaultbranch; recordactualcreatedrun/event/sourcehead/ref. Ifremotepermission/eventrejects, preserveactualerror andaskRoot; no forcepush/dummytrigger/permissionchanges.\n\nRun FULL affected tests/integration/test_build_preparations_real_pg.py with realINV_TEST_ADMIN_DSN againstONLYthatjob'sPG16service and originalconftest uniqueinv_test_UUID/inv_app_UUID/Alembic/NOBYPASSRLS/auditedcleanup. Require meaningfulpositive originalsamewindowandnewboundarycases collected/executed, exactexpectederrors/counterrows,0unexpectedskip,0failure/error. CI mustfailifDB unavailable, nofallbackmock/CIunset/skip/deselectthebadcase. Separate expected-red originalassumption/causalcontrol evidence mustassert exactintendedfailure andnot hidepositive failures; noxfail/retry/catch409or429loosening. No symbolic/modelresultcalledrealPG. Keep actualK1Go/testdata/pins56651 unchanged apartfromalreadyapprovedREADME R1 only.\nAlways capture artifact XML/logs/provenance/source/toolversions/positivecounts and structuredredcontrol outcomes inclonfailure. RawJUnit/ZIP remainGitHub/privateignored, no rawGit/vault export; publicparsedcounts/hashes/failuredetails only. NoNodehardware/PKI/globalstate/localDockerwrites.\n\nNormalgates/commit/push oneimmutabletest+README+focusedCI source areauthorized, so its newfixedfocusedjob mayrun ONCE automaticallyonthatpush; ownDocs followsnormal. This is NOT authorization forwholeCore rerun. Root independentlyreviewsactualtest+README+YAML andactualfocusedPGresults, then choosesexactcombinedfinalSHA andauthorizesONEfreshfullCore/Docs. Ifadditionalfixes needed, onlyrerunafteractualcausalcode/YAMLchange recorded; preservefirstred/everyrun/source separately.\nForpublicationreadonlysync, useofficial tools/sync_obsidian.py --check --state D:/Project/SaintVision-Invion/SaintVisionI-Invion/.git/obsidian-sync-state.json (actualcanonicalRootstate, differentfromyourdefaultGitcommonrepo). Require0/recordhashbeforeafter/noapply/adopt/resolve/manifest. Root'sold429snapshotisnotcurrentafternewRootsync. Unknownremainingcollisionsorstatechange: preserveactualpaths/askRoot; nooverwrite. Pendingstaleexportsneverpermission.\nProceed focusedworkflow/testimplementation oncurrentcard; no newagent/task/userapproval. RootactualK1code191b ACCEPT andfailedreporta413/Docs42133327925 wereverified; fullCorestillFAILED, allK2/physicalpending.",
+  "wholeProgramComplete": false
+}

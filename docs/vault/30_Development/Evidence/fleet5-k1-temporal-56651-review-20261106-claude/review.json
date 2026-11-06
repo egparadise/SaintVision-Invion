@@ -1,0 +1,157 @@
+{
+ "schemaVersion": "fleet5-k1-temporal-delta-review:1",
+ "reviewer": "Claude (independent; single worker, no subagents)",
+ "orca": {
+  "task": "task_eeb63f89fecd",
+  "dispatch": "ctx_c6a8ddbbde6d",
+  "run": "run_e57ecd84a7bc",
+  "ownerTask": "task_38393b5d1865/ctx_ceecb3824e33 (Codex)"
+ },
+ "target": {
+  "source": "56651cba697f2ab6fcd7166ca4e6ea11eac28113",
+  "branch": "agent/codex/fleet5-bootstrap-v5-k1-temporal-fixes-20261106",
+  "parent": "c6f0d95ecbcd79fac96673c194e2368b510ad827",
+  "packageTree": "d83210590fdc064613d106b5a333b7ff8f3fa2ca",
+  "packageTreeVerifiedLocally": true,
+  "deltaFiles": 49,
+  "productDelta": "migrationverify: README, native.go, proofs.go, trust.go, verify.go, new current.go and temporal.go; tests crypto_fixture/native_history/security modified, new temporal_fixture/temporal_security/temporal tests. Others: owner History (2) and owner Evidence."
+ },
+ "priorReview": {
+  "commit": "c2b15b707d94bca001d0d63c6486cfe9fd5cbcae",
+  "docs": 42119997927,
+  "verdict": "REVISION REQUIRED M1/M2 L1-L5"
+ },
+ "rootDecision": "Root Evidence/fleet5-20261105-root/k1-c6f-root-revision-decision.json (msg_87002d358dbb) read at Root c10e7f35; status msg_b020041e659c received during review",
+ "verdict": "ACCEPT (code delta, K1 package scope)",
+ "verdictScope": "IMPLEMENTATION axis only. CI axis: exact-source Core 42126222201 TERMINAL FAILURE on an unrelated Python test, so no whole-Core success is claimed. TRUST-INTEGRATION (K2) and PHYSICAL are NOT RUN.",
+ "blockingFindings": [],
+ "closedFirstFindings": {
+  "M1": {
+   "status": "CLOSED",
+   "evidence": "Fully consistent live contexts per set (Current rebuilt from each set, its own op supplied as current, new current challenges, both native witnesses re-signed at Now with those nonces), in the single-instant and the durable fixture, 8 repeats each: cohort-33 DENY via RELEASED-in-history or superseded-by-higher-epoch (map order), cohort-34 DENY lease not HELD, cohort-35 DENY not-latest sequence, cohort-36 ACCEPT. Scratch mutant with latestCurrent removed: single-instant 33 and 35 and durable 35 ACCEPT (24 accepts), durable 33 stops at op-expired and 34 at the HELD gate. The new gates are the causal guards, not a SetID mismatch."
+  },
+  "M2": {
+   "status": "CLOSED",
+   "evidence": "Durable fixture (epoch1 HELD 0..300 released 68, epoch2 600..1200, Now 630): Verify ACCEPT with epoch1 absent from current Operations and also with Operations/Challenges/Current all nil. DENY: epoch1 or restore missing from History, epoch1 moved to current-only, History window widened, wrong epoch, RELEASED hash given as HELD; historical challenge issued >30s after observation, expiring at observation, wrong nonce/epoch, historical challenges only in the current map; host-helper key expired before release event 68, node-leaf key starting after observation 32 or expiring before 52, root-fence key expired before 600; Now before the last signed event 620; certificate REVOKED or stale 121s at Now; publication REVOKED or published after Now. ACCEPT: host-helper key expiring at 625 (after last use, before Now). Records retimed -5s: unsigned -> Ed25519 deny; re-signed with the legitimate key -> causal journal join or pinned graph deny."
+  },
+  "L1": {
+   "status": "CLOSED",
+   "evidence": "365 SemanticInputs paths x {nil, number, object} = 830 cases: 0 panics (16 constructor deny, 370 verify/current deny, 444 unaffected). Nil History/Certificates/Publications/Current/head/member projections, nil verifier and empty packet deny without panic."
+  },
+  "L2": {
+   "status": "CLOSED",
+   "evidence": "native.go requires explicit ExtKeyUsageServerAuth and KeyUsageDigitalSignature, matching transport/trust.go hasUsage; owner no-EKU/client-only/no-DigitalSignature negatives pass in this run; chain/exact DER/URI/scope checks unchanged."
+  },
+  "L3": {
+   "status": "CLOSED",
+   "evidence": "Historical and live: IssuedAt-30s <= observed < ExpiresAt. Live probes: observed Now-30s ACCEPT, Now-31s DENY, challenge ExpiresAt==Now DENY. Owner historical -5/-30 accept and -31/expiry deny pass in this run."
+  },
+  "L4": {
+   "status": "CLOSED",
+   "evidence": "snapshotPacket enforces count/byte bounds before allocation and copies maps and bytes; the constructor JSON deep-copies History and NativeWitnesses. Probe: caller mutation of History ops/challenges, witness bytes, member projections and member DER after NewVerifier, and mutation of the returned Report.Digests, leave Verify and current ACCEPT. Concurrency holds only under the caller-ownership contract; no claim is made for uncoordinated mutators."
+  },
+  "L5": {
+   "status": "CLOSED",
+   "evidence": "Original owner History adds a dated correction: 235/121 relabelled as earlier attempts (06:11/06:16), final attempt4 06:28:10-31 = 61/238, K1 30/124; frozen c6f/37fe refs not rewritten."
+  }
+ },
+ "newAppApiReview": {
+  "History": "Typed HistoricalContext is separate from live Operations/Challenges. Verify uses History only and needs no current input. Every History op must equal an authenticated HELD lease (scopes, plan, window, epoch). Probes found no trust crossing.",
+  "NativeWitnesses": "Exactly one per registered member, in order, authenticated at Now against the current challenge, current op/epoch, certificate nonrevocation at Now, key at Now and the 120s age; expected state comes from the PRESENT head inventory declaration. Old retained, time-relabelled, wrong-nonce, cross-member and relabelled historical-challenge witnesses all deny.",
+  "absentHeadFailClosed": "ACCEPTED AS AN EXPLICIT K1 BOUNDARY. Current derivation is defined only for sets whose current inventory head is PRESENT; ABSENT-head sets (cohort-01..27 shape, pre-publication migration phase) always fail closed at the native gate (unit probe). This is correct: K1 has no authenticated expected-native-state source for an ABSENT head, and inventing one would add a trust input. Usefulness limit: K1 gives no current view during the ABSENT phase, although history still authenticates it. VerifyCurrentProjectionSet keeps an ABSENT branch that can no longer succeed.",
+  "noHistoricalHeadAsCurrent": "The current head must equal the set field and a readback re-verified live at Now (<=120s, current op, CP key at Now); a stale readback at +121s denies.",
+  "k2Obligations": "K2 must actually produce and authenticate History, Current.NativeWitnesses, challenges, publication/certificate status, installed trust and artifact/CI/review inputs. K1 assertions are not their implementation."
+ },
+ "nonBlockingResiduals": [
+  {
+   "id": "R1",
+   "severity": "Low (documentation)",
+   "text": "The README does not state the PRESENT-head-only current derivation boundary (only the owner History does), and the remaining ABSENT branch in VerifyCurrentProjectionSet can no longer succeed. Fold into the README at the next K1 touch or K2 handoff; no code change required."
+  },
+  {
+   "id": "R2",
+   "severity": "Info",
+   "text": "latestCurrent compares fences only within the same migrationId/plan and the registered cohort scopes (an owner test asserts other-migration leases are ignored). Cross-migration cohort fencing remains the responsibility of the K2 live Operations input."
+  },
+  {
+   "id": "R3",
+   "severity": "Info",
+   "text": "A signed record time selects its own key interval, so a holder of an expired but still granted key could backdate. Causal joins and installed-graph time pins mitigate this (retime probes deny). This is an inherent offline residual."
+  },
+  {
+   "id": "R4",
+   "severity": "Info",
+   "text": "Historical native consumption is allowed up to 30s before the challenge IssuedAt (live requires >= IssuedAt), which is within the Root 30s skew decision."
+  },
+  {
+   "id": "R5",
+   "severity": "Info",
+   "text": "The concurrent test covers Verify only. VerifyCurrentProjectionSet concurrency rests on static review (no post-constructor writes) plus the hosted Linux race run of the existing suite."
+  },
+  {
+   "id": "R6",
+   "severity": "Info (pre-existing, not delta)",
+   "text": "Trusted SemanticInputs fields that verification never reads (for example plan proof-reference keys and policy descriptors) can be nil without effect, because proofs are bound to the signed plan record. Unchanged from c6f."
+  }
+ ],
+ "unchangedPrimitives": "git diff c6f..56651 is empty for ed25519.go, json.go, graph.go, recipes.go, contracts.go, schemas.go, resources/, testdata/, vectors_test.go and ed25519_test.go. The first review's 45 Ed25519 vectors re-run on 56651 give results byte-identical to the c6f run (45/45). Not re-run: Python independent signer, 15 forgeries, SPKI18/DER4 (unchanged code, accepted from the first review).",
+ "localTests": {
+  "environment": "Windows amd64 go1.27.0 CGO_ENABLED=0; local -race NOT RUN",
+  "focusedK1": "42 top / 165 PASS events / 0 fail / 0 skip, exit 0, 08:13:45-08:14:27 KST",
+  "fullNode": "build 0, vet 0, test 0; 73 top / 279 PASS events / 0 fail / 0 test skip; 7 packages pass, 6 no-test-files packages, 08:14:42-08:15:30 KST"
+ },
+ "hostedCI": {
+  "Docs": {
+   "run": 42126225708,
+   "job": 127591021794,
+   "headSha": "56651cba697f2ab6fcd7166ca4e6ea11eac28113",
+   "conclusion": "success"
+  },
+  "Core": {
+   "run": 42126222201,
+   "headSha": "56651cba697f2ab6fcd7166ca4e6ea11eac28113",
+   "conclusion": "failure",
+   "jobs": {
+    "127591007024 s01-storage-roundtrip": "success",
+    "127591007221 core": "failure"
+   },
+   "steps": {
+    "15 Test Linux Node concurrency and crash boundaries (go test -race -json ./...)": "success",
+    "33 python -m pytest": "failure: 1 failed, 9214 passed, 46 skipped, 2 deselected",
+    "40 go test ./...": "skipped after step 33 failure",
+    "7-10 optional native proofs and 35-41": "skipped (not pass)"
+   },
+   "failedTest": "tests/integration/test_build_preparations_real_pg.py::test_prepare_rate_limit_is_enforced_before_repeated_failed_work (GRAPH-0003/409/False vs RES-0007/429/True)",
+   "classification": "UNRELATED CI GATE FAILED. The delta has no Python or test changes, and the same test passed in c6f Core 42113810160 step 33. Cause not established (a rate-window timing effect is only a hypothesis). Not reproduced, because DB operations are out of scope.",
+   "jobLogSha256": "ae92c0f50533ca89caafcd42b9fb48f4fd8432c022deab49e6df3f2638dd54ae",
+   "jobLogBytes": 417144,
+   "rawLogOrArtifactCommitted": false,
+   "nodeRaceCountsParsed": false
+  }
+ },
+ "failedOrPreservedProbes": [
+  "Probe attempt1 (08:19:17-08:29:21 KST) exit 1: 104/104 M1/M2/current probes behaved as expected, then the L1 fuzz exceeded the go test default 10m timeout (harness, not product). L1/L4 were re-run alone with a reduced path set as attempt2 (-timeout 40m), exit 0.",
+  "M1 mutant run exit 1 by design (32 expectation misses = accepts and other gates once latestCurrent is removed)."
+ ],
+ "remaining": [
+  "Root: decide a Core rerun or combined source for an all-success exact Core (Codex isolated test-only clock card per msg_b020041e659c)",
+  "K2 trusted producers for History/NativeWitnesses/challenges/status/installed trust",
+  "40 runtime cases and 5-PC acceptance NOT RUN",
+  "R1 README wording at the next touch"
+ ],
+ "evidenceFiles": {
+  "count_go_json.py.txt": "1e3812dd099d0676a9144dabd634778a5ea57fe43ad025c4d1b5038b7b59ecc9",
+  "ed25519-go-results-56651.json": "05a87a6fd0079671ba458749c73efe05f4ba241ac334eeedcf255700001bf1ff",
+  "k1-pkg.jsonl": "4a77d7bba0bdb0b7e5703adcfbdd1c631804b11977b77844f5232a2999e7dc01",
+  "local-doc-gates.txt": "2df654a16b9cba14240c3b642f7d909d8a0e37a1581ca15147f050e8ccdd03f0",
+  "m1-mutant-latestCurrent-removed-results.jsonl": "832bf8df42affdd5304a93dea633bdef3363e1ba4d35691701cdaa4f26ac8a67",
+  "node-all.jsonl": "8bf5ead9d63e91c3de101b575d41bc8a01768deafced6a0c29473f7597840229",
+  "probe-attempt1-m1-m2-current-results.jsonl": "cd5c2545bddde8da5e24357062178ce5588baad9db8ff1cd14cbff72ad7d391d",
+  "probe-attempt2-l1-l4-results.jsonl": "dcddc0d8f9e3c133634d014f117afa73450b6b4a9d58152a6b18cd94252d28ac",
+  "retime-results.jsonl": "33aa0831324029f901036550e8b15c64fbfdb2e62a671451a8a1ed52abc3b7f1",
+  "semantic-root-field-nil-results.txt": "b24df74c5ec4272c4f34f6a748ab42835b26daca6b45e97880bd553a8cf2fa20",
+  "zz_claude_review_planbind_test.go.txt": "dbbf0a9c10e94335afc1affbb2f57f8f377ab9d607c1736cb33298ca6d10f73d",
+  "zz_claude_review_probe_test.go.txt": "08b3b9ce3b080009874083b9c8e9b805199d866c394979e7e242a0b0feb6478a",
+  "zz_claude_review_retime_test.go.txt": "33fa7c403e2246b9a7f70342a456355be30c7a1af290f3a77a64df9168db53b5"
+ }
+}

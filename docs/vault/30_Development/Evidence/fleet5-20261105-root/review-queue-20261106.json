@@ -1,6 +1,6 @@
 {
   "schema": "fleet5-root-review-resource-sequence:1",
-  "atKST": "2026-11-06T08:47:49+09:00",
+  "atKST": "2026-11-06T09:17:48+09:00",
   "completedB": {
     "task": "task_d4c4c809ed4e",
     "review": "ac9182c3e3d606ec027c0be2e90e049ff50d54f1",
@@ -13,14 +13,14 @@
     "source": "8874b2dfe0dda9a019bd5f334636668290702e13"
   },
   "active": {
-    "task": "task_eeb63f89fecd",
-    "dispatch": "ctx_c6a8ddbbde6d",
-    "source": "56651cba697f2ab6fcd7166ca4e6ea11eac28113",
-    "scope": "ONE actual K1 corrected temporal code+new trusted app inputs delta review",
-    "state": "ready inputaccepted/live; actual verdict pending"
+    "task": "task_b176020315c8",
+    "dispatch": "ctx_391e15f3a280",
+    "source": "228e2a2062d8a64bce7f772f668da7df2fd2ac0d",
+    "scope": "ONE actual whole B rev5 coupledcontractdelta",
+    "state": "ready actualdispatch; verdictpending"
   },
   "pending": null,
-  "authorParallelWork": "K1 author SAME failedCore artifact/report then isolated TEST-only rate-clock card; B rev5 sourceanalysis/contracts",
+  "authorParallelWork": "K1 acceptedcode+failedCIreport preserved; sameauthor isolatedrate TEST+README+focusedhostedPG16 lane; B owner waitsactualB5verdict",
   "reason": "one actual Claude reviewer after proven settled/exited/released B4; corrected ownDocs and Linux race passed, fullCore still required",
   "genericApprovalMissing": false,
   "completedRL1": {
@@ -28,7 +28,7 @@
     "review": "0e53fc024ca773b7719182e170e5e126aeaf5b95",
     "verdict": "ACCEPT TEST-ONLY; R-L1 CLOSED; no new findings"
   },
-  "nextActualReviewTrigger": "existing Claude actual56651 verdict; Root reviews actual testdelta when published, then chooses combined finalsource before freshCore",
+  "nextActualReviewTrigger": "current B5actualverdict; Rootactualtest+README+CI source+focusedPGresults thenreviewedcombinedsource beforeONEfullCore",
   "completedIntegration": {
     "task": "task_78064fb4b7ff",
     "dispatch": "ctx_ed7ec73163d6",
@@ -75,5 +75,17 @@
   "K1FinishedTurnSteer": "msg_c4f86971960b",
   "K1CorrectedFullCore": "actual56651/Core42126222201 FAILURE; no rerun/borrowedgreen",
   "K1SeparateRateTestCard": "FLEET5-CORE-PREP-RATE-CLOCK-20261106",
-  "additionalAuthorOrReviewerStarted": false
+  "additionalAuthorOrReviewerStarted": false,
+  "completedK1CorrectedCodeReview": {
+    "task": "task_eeb63f89fecd",
+    "dispatch": "ctx_c6a8ddbbde6d",
+    "source": "56651cba697f2ab6fcd7166ca4e6ea11eac28113",
+    "review": "191b6f843a643ee4989ce28c9ebf1816963ffe28",
+    "Docs": 42132923864,
+    "verdict": "ACCEPT code delta/M1M2L1L5 CLOSED, notwholeCI",
+    "workerDone": "msg_cfce6b990da4",
+    "resource": "succeeded/settled/exited/released beforeB5start"
+  },
+  "K1CodeAxis": "ACCEPT191b/Docs42132923864; wholeCoreFAILURE remains",
+  "K1QualifiedFailedReport": "a413c0c2e9a6d070321480f9c216b8aa07e5fd74"
 }
