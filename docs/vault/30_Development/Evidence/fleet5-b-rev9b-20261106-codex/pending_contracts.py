@@ -1,0 +1,27 @@
+"""Producer1: staged contract document only. Stage1 is NEVER final proof."""
+import hashlib,json
+from pathlib import Path
+E=Path(__file__).resolve().parent;R8=E.parent/'fleet5-b-rev8-revoke-portcut-20261106-codex'
+def main():
+    d=json.loads((R8/'pending-interface-contracts.json').read_bytes());t=json.loads((E/'t1-mark-offline-closure.json').read_bytes())
+    for c in d['contracts']:
+        if c['id'] in ('T1','P-DBROLE'):
+            c['sharedOwnerReferencedCriticalEntries']=t['sharedOwnerReferencedCriticalEntries']
+            c['sourceClosureReference']='t1-mark-offline-closure.json'
+            c['observability']={'productionSourceBindings':'All seven actual Database constructors omit observer/sink or exact None; Database defaults and BoundDatabase copying remain source-grounded; bounded post-construction load/store contexts checked','statementObserver':'P-T1-OBSERVER-LOCK-SAFETY NAMED_RUNTIME_PENDING outside fixed 19-edge census; inside held locks: in-process, nonblocking, no network/subprocess, exception-contained, no authority. None source default is not runtime handler proof','placementMetricSink':'After connection context closes; same restricted effects','logger':'Existing logging.getLogger(inv.placement); handler/configuration runtime PENDING, never assumed pure','actualBinding':None}
+            c['verificationDependencies']+=['Exact12 critical-entry set named, no count13','Only five listed A1c Connection results close; no general76-edge closure','Six derived production and twenty separately catalogued harness constructor calls; three class database-input unions; local lan_pilot.runtime and remote_workspace_entry.database single-return proofs','A7 cross-module deferred; local runtime helper is within this fix-only proof','Actual roles/current auth/credentials/cutover/PG/two-session/clock semantics/log handlers NOT_RUN']
+        if c['id']=='T3':c['protectedBuildCleanupRead']='Exact original BUILD_DISPATCH admitted session/request/approval/decision/daemon/lease/resource/fence and held owned protected root/current read purpose; may read after stop/release/deadline. No read-based release/UNKNOWN settle; original typed _commit_consequences/CAS only. No new file/HTTP/auth wire. Actual binding NULL/T3_RUNTIME_PENDING.'
+    d['contracts'].append({'id':'P-PUBLIC-SIGNATURE-VERIFY','status':'DESIGN_ONLY_PENDING_EXISTING_AUTHORITY_VERIFICATION','actualBinding':None,'codeGrant':False,'portGrant':False,
+      'wiring':'Exact inv.storage_sampling.verify_sample certificate_key(...).verify edge added by Producer2',
+      'authentication':'Existing storage challenge current Node/tenant/epoch/channel C/DER/certificate identity/validity and Ed25519 public key. No private key/signing/randomness/system-root/network exemption.',
+      'input':'Exact retained storage challenge, bounded canonical signed payload/envelope, certificate DER and current trusted time as required by existing verify_sample; no user signer or hash substitute.',
+      'output':'Existing VerifiedSample input to typed CP append/check/nonce-consumption transaction, no equipment or storage acceptance by signature alone.',
+      'error':'Malformed/base64/size/canonical/challenge/signer/cert/time/signature mismatch rejects. Unknown verification authority remains pending; never pure-value conversion.',
+      'ownership':'Existing public verification only; protected signing key never accessed by this task or interface.',
+      'transaction':'Original sample verification before typed CP sample commit; current channel/root/version/owner authorization rechecked by original consumer.',
+      'effect':'Authority-bearing PUBLIC_SIGNATURE_VERIFY, not signing and not generic crypto purity.',
+      'verificationDependencies':['Exact current source identity/algorithm/signer/challenge binding proof','Actual crypto/role/PG/storage acceptance NOT_RUN','Root future concrete binding/grant decision'],
+      'sourceScope':'Named existing verification dependency, not a newly registered runtime port'})
+    d['artifactStage']='PRODUCER1_INTERMEDIATE_NOT_FINAL_PROOF';d['source']='72028cbac903c4415d9979f980a6e0f9948e914f';d['actualRuntimeB']=0
+    p=E/'pending-interface-contracts.stage1.json';p.write_bytes((json.dumps(d,indent=2)+'\n').encode());print(json.dumps({'stage1SHA256':hashlib.sha256(p.read_bytes()).hexdigest(),'finalProof':False,'nextRequiredProducer':'edge_categories.py'}))
+if __name__=='__main__':main()

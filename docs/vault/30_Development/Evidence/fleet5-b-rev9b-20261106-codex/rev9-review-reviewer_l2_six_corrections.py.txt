@@ -1,0 +1,30 @@
+"""Reviewer check of Rev9 targeted-category-delta six outside-cut corrections against 72028 bytes.
+Usage: python -B reviewer_l2_six_corrections.py <targeted-category-delta.json> <out.json>  (cwd = repo root)"""
+import ast, hashlib, json, subprocess, sys
+C = '72028cbac903c4415d9979f980a6e0f9948e914f'
+d = json.load(open(sys.argv[1], encoding='utf-8')); named = set(d['reviewNamedOutsideCutRefs'])
+cache = {}
+def src(p):
+    if p not in cache: cache[p] = subprocess.check_output(['git', 'show', C + ':' + p]).decode('utf-8-sig')
+    return cache[p]
+out = []
+for x in d['deltas']:
+    if x['callRef'] not in named: continue
+    s = src(x['source']['path']); l, c0, el, ec = x['source']['span']
+    node = next((n for n in ast.walk(ast.parse(s)) if isinstance(n, ast.Call) and (n.lineno, n.col_offset, n.end_lineno, n.end_col_offset) == (l, c0, el, ec)), None)
+    seg = ast.get_source_segment(s, node) if node else None
+    b = x.get('binding') or {}
+    callers = []
+    for cb in b.get('exactCallerBoundaries', []):
+        cs = src(cb['path']); line = cs.splitlines()[cb['line'] - 1].strip()
+        callers.append({'line': cb['line'], 'function': cb['function'], 'text': line[:120], 'fileSHAok': hashlib.sha256(cs.encode()).hexdigest() == cb['fileSHA256']})
+    out.append({'callRef': x['callRef'][:12], 'category': x['category'], 'kind': b.get('kind'), 'path': x['source']['path'], 'span': x['source']['span'],
+                'fileSHAok': hashlib.sha256(s.encode()).hexdigest() == x['source']['sourceFileSHA256'],
+                'exprSHAok': bool(seg) and hashlib.sha256(seg.encode()).hexdigest() == x['source']['expressionSHA256'],
+                'expression': (seg or '')[:100], 'blocksGrant': x['blocksGrant'], 'actualBinding': x['actualBinding'], 'callers': callers})
+res = {'rows': out, 'rowCount': len(out), 'uniqueRefs': len({r['callRef'] for r in out}), 'allBlocksGrant': all(r['blocksGrant'] for r in out),
+       'allHashesOk': all(r['fileSHAok'] and r['exprSHAok'] and all(c['fileSHAok'] for c in r['callers']) for r in out),
+       'categoryCounts': {k: sum(1 for r in out if r['category'].startswith(k)) for k in ('IO_CATALOG_LINK', 'ANALYSIS_RULE:A2', 'ANALYSIS_RULE:A4', 'NAMED_PORT')}}
+open(sys.argv[2], 'w', encoding='utf-8', newline='\n').write(json.dumps(res, indent=1) + '\n')
+print(json.dumps({k: v for k, v in res.items() if k != 'rows'}))
+for r in out: print(r['category'], r['kind'], r['path'].split('/')[-1], r['span'][0], r['expression'][:50], [(c['line'], c['function'], c['text'][:70]) for c in r['callers']])

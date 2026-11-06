@@ -1,0 +1,119 @@
+{
+  "executionOwner": "Codex",
+  "notIndependentReview": true,
+  "exactOriginal70Command": [
+    "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+    "-B",
+    "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105\\docs\\vault\\30_Development\\Evidence\\fleet5-b-rev9b-20261106-codex\\rev9-review-reviewer_rev9_l1_t1_mutations.py.txt",
+    "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105\\docs\\vault\\30_Development\\Evidence\\fleet5-b-rev9b-20261106-codex",
+    "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105\\docs\\vault\\30_Development\\Evidence\\fleet5-b-rev9b-20261106-codex\\owner-original-reviewer70-results.json"
+  ],
+  "exactOriginal70Exit": 0,
+  "exactOriginal70SoundGaps": [],
+  "exactOriginal70PositiveFailures": [],
+  "additionalCases": [
+    {
+      "case": "exact-original70-replay",
+      "pass": true
+    },
+    {
+      "case": "exact70-current-producer-sanity",
+      "pass": true
+    },
+    {
+      "case": "derived-census-actual-positive",
+      "pass": true
+    },
+    {
+      "case": "all-three-constructor-input-unions",
+      "pass": true
+    },
+    {
+      "case": "local-helper-returns-source-proven",
+      "pass": true
+    },
+    {
+      "case": "helper-object-return",
+      "pass": true,
+      "reason": "RECEIVER_UNION_UNPROVEN:CONSTRUCTOR_INPUT:inv.observation.NodeObservation",
+      "parsePassed": true,
+      "sourceSHA256": "351cb8356082f7ce7bc2f1b013d9117b87582048cc056010fb4afc8e4d1b0cb0"
+    },
+    {
+      "case": "helper-foreign-return",
+      "pass": true,
+      "reason": "RECEIVER_UNION_UNPROVEN:CONSTRUCTOR_INPUT:inv.observation.NodeObservation",
+      "parsePassed": true,
+      "sourceSHA256": "da52767653e08ba3dcc138384f431e8eaebd32f4686b3a2463ba6166573f72bc"
+    },
+    {
+      "case": "helper-alias-escape",
+      "pass": true,
+      "reason": "RECEIVER_UNION_UNPROVEN:CONSTRUCTOR_INPUT:inv.observation.NodeObservation",
+      "parsePassed": true,
+      "sourceSHA256": "a8548adc4c4b0a9f7430dcc6e65bfd3cc2ebafac0cf05be1bdbe974864645d19"
+    },
+    {
+      "case": "helper-rebound",
+      "pass": true,
+      "reason": "RECEIVER_UNION_UNPROVEN:CONSTRUCTOR_INPUT:inv.observation.NodeObservation",
+      "parsePassed": true,
+      "sourceSHA256": "526c5caf6a15764a199df872cdae8426fbe25639bdd23a9595ff019a9d8201cf"
+    },
+    {
+      "case": "import-alias-constructor-census",
+      "pass": true
+    },
+    {
+      "case": "import-alias-full-use-site-proof",
+      "pass": true,
+      "reason": null
+    },
+    {
+      "case": "owner-use-site-foreign(owner=self.db)",
+      "pass": true,
+      "reason": "DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:OWNER_READ:self.db",
+      "producerSanity": true
+    },
+    {
+      "case": "owner-use-site-foreign([self.db])",
+      "pass": true,
+      "reason": "DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:OWNER_READ:self.db",
+      "producerSanity": true
+    },
+    {
+      "case": "owner-use-site-foreign(self.db.transaction)",
+      "pass": true,
+      "reason": "DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:OWNER_READ:self.db.transaction",
+      "producerSanity": true
+    },
+    {
+      "case": "owner-use-site-alias = self.db",
+      "pass": true,
+      "reason": "DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:OWNER_READ:self.db",
+      "producerSanity": true
+    },
+    {
+      "case": "owner-use-site-foreign(owner=self)",
+      "pass": true,
+      "reason": "DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:INSTANCE:self",
+      "producerSanity": true
+    },
+    {
+      "case": "extra-production-root-not-dropped",
+      "pass": true
+    },
+    {
+      "case": "extra-unknown-root-refused",
+      "pass": true,
+      "reason": "RECEIVER_UNION_UNPROVEN:CONSTRUCTOR_INPUT:inv.observer_worker.ObservationWorker"
+    },
+    {
+      "case": "harness-alias-call-catalogued-separately",
+      "pass": true
+    }
+  ],
+  "effectfulMutantsImportedOrExecuted": false,
+  "actualRuntimeB": 0,
+  "runtimeBindings": null
+}

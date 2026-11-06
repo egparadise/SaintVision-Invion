@@ -1,0 +1,7 @@
+{
+  "scope": "synthetic-source-validator-only",
+  "expectedFailure": true,
+  "coexistenceSupported": false,
+  "rejectedByUnmodifiedSource": "Workspace upgrade does not support storage contribution; preserve this Node and use a separate plain Node for workspace acceptance"
+}
+{"ownerResourceMeasurement": {"target": "tests/proofs/fleet5_compute_storage_contract_probe.py", "peakWorkingSetBytes": 25518080, "elapsedSeconds": 0.079, "OSMemoryLimitEnforced": false, "serial": true}}

@@ -1,0 +1,6 @@
+{"evidence": "fleet5-b-contract-rev7-20261106-codex", "offlineFrame": {"PLAIN": {"register": true, "invoke": true, "R12_eligible": false}, "B": {"register": true, "invoke": true, "R12_eligible": false}}, "productRequires": "terminal.py _current node status in {online,draining}"}
+exit=0
+{"evidence": "fleet5-b-rev8-revoke-portcut-20261106-codex", "offlineFrame": {"PLAIN": {"register": true, "invoke": true, "R12_eligible": false}, "B": {"register": true, "invoke": true, "R12_eligible": false}}, "productRequires": "terminal.py _current node status in {online,draining}"}
+exit=0
+{"evidence": "fleet5-b-rev9-t1-20261106-codex", "offlineFrame": {"PLAIN": {"register": true, "invoke": true, "R12_eligible": false}, "B": {"register": true, "invoke": true, "R12_eligible": false}}, "productRequires": "terminal.py _current node status in {online,draining}"}
+exit=0

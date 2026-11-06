@@ -1,0 +1,12 @@
+[
+  {
+    "case": "argument-shadow",
+    "acceptedBeforeFix": true,
+    "parsedOnly": true
+  },
+  {
+    "case": "decorator",
+    "acceptedBeforeFix": true,
+    "parsedOnly": true
+  }
+]

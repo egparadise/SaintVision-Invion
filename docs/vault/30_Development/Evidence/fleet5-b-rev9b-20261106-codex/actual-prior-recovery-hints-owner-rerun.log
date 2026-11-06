@@ -1,0 +1,696 @@
+{
+ "cases": [
+  {
+   "actual": "REFUSE",
+   "claim": "TERMINAL_FRAME needs its matched claim live; a released claim cannot keep terminal continuation",
+   "defect": false,
+   "expected": "REFUSE",
+   "id": "PLAIN:TF-after-cancel-release",
+   "note": "matchedReleased=True otherActiveClaims=1 leaseActive=True workloadActive=True claimRightsRetained=True parentState=PENDING_IO"
+  },
+  {
+   "actual": "REFUSE",
+   "claim": "TERMINAL_FRAME after the original EXECUTE is CONFIRMED TERMINAL_CLEAN must refuse",
+   "defect": false,
+   "expected": "REFUSE",
+   "id": "PLAIN:TF-after-parent-terminal-clean",
+   "note": "parentState=CONFIRMED_OUTCOME leaseActive=True (seed claim-1 keeps Node booleans true)"
+  },
+  {
+   "actual": "REFUSE",
+   "claim": "control: with no other claim the Node-wide booleans refuse",
+   "defect": false,
+   "expected": "REFUSE",
+   "id": "PLAIN:TF-control-no-other-claim",
+   "note": ""
+  },
+  {
+   "actual": "NO_CHANGE",
+   "claim": "second terminal receipt for released claim changes no claim version",
+   "defect": false,
+   "expected": "NO_CHANGE",
+   "id": "PLAIN:RO-after-release-no-double-version",
+   "note": "register=True confirm=True"
+  },
+  {
+   "actual": "REFUSE",
+   "claim": "CANCEL parent must be original EXECUTE",
+   "defect": false,
+   "expected": "REFUSE",
+   "id": "PLAIN:CANCEL-parent-not-EXECUTE",
+   "note": ""
+  },
+  {
+   "actual": "REFUSE",
+   "claim": "CANCEL cannot chain from a CANCEL handle",
+   "defect": false,
+   "expected": "REFUSE",
+   "id": "PLAIN:CANCEL-chain",
+   "note": ""
+  },
+  {
+   "actual": "REFUSE",
+   "claim": "no recovery lane against a protected-settled parent",
+   "defect": false,
+   "expected": "REFUSE",
+   "id": "PLAIN:CANCEL-after-protected-settle",
+   "note": "settled=True"
+  },
+  {
+   "actual": "REFUSE",
+   "claim": "RETIRE that revokes channel/observe/key refuses ordinary recovery",
+   "defect": false,
+   "expected": "REFUSE",
+   "id": "PLAIN:RETIRE+channelEnabled",
+   "note": ""
+  },
+  {
+   "actual": "REFUSE",
+   "claim": "RETIRE that revokes channel/observe/key refuses ordinary recovery",
+   "defect": false,
+   "expected": "REFUSE",
+   "id": "PLAIN:RETIRE+observeGrantLive",
+   "note": ""
+  },
+  {
+   "actual": "REFUSE",
+   "claim": "RETIRE that revokes channel/observe/key refuses ordinary recovery",
+   "defect": false,
+   "expected": "REFUSE",
+   "id": "PLAIN:RETIRE+keyLive",
+   "note": ""
+  },
+  {
+   "actual": "ALLOW_FACT_KEPT",
+   "claim": "business RETIRE alone keeps the exact recovery lane and keeps the fact",
+   "defect": false,
+   "expected": "ALLOW_FACT_KEPT",
+   "id": "PLAIN:RETIRE-business-only",
+   "note": ""
+  },
+  {
+   "actual": "REFUSE",
+   "claim": "node-1 parent cannot be cancelled through node-2 scope",
+   "defect": false,
+   "expected": "REFUSE",
+   "id": "PLAIN:CANCEL-cross-node-parent",
+   "note": ""
+  },
+  {
+   "actual": "REFUSE",
+   "claim": "after process loss ordinary RECEIPT_OBSERVE refuses (parent cap LOST)",
+   "defect": false,
+   "expected": "REFUSE",
+   "id": "PLAIN:restart-RO",
+   "note": ""
+  },
+  {
+   "actual": "ALLOW",
+   "claim": "after process loss safety CANCEL still allowed under current auth",
+   "defect": false,
+   "expected": "ALLOW",
+   "id": "PLAIN:restart-CANCEL",
+   "note": ""
+  },
+  {
+   "actual": "DEAD",
+   "claim": "original completion cap stays dead",
+   "defect": false,
+   "expected": "DEAD",
+   "id": "PLAIN:restart-no-revival",
+   "note": ""
+  },
+  {
+   "actual": "ONLY_MATCHED",
+   "claim": "cancel terminal receipt releases only matched claim",
+   "defect": false,
+   "expected": "ONLY_MATCHED",
+   "id": "PLAIN:multi-claim-only-matched",
+   "note": ""
+  },
+  {
+   "actual": "REFUSE",
+   "claim": "another original command receipt cannot release through this cancel",
+   "defect": false,
+   "expected": "REFUSE",
+   "id": "PLAIN:foreign-kernel-receipt",
+   "note": "claimsUnchanged=True"
+  },
+  {
+   "actual": "ONCE",
+   "claim": "confirm once; same operation id cannot re-register",
+   "defect": false,
+   "expected": "ONCE",
+   "id": "PLAIN:replay",
+   "note": ""
+  },
+  {
+   "actual": "REFUSE",
+   "claim": "RECEIPT_OBSERVE needs exact TERMINAL_CLEAN kernel receipt",
+   "defect": false,
+   "expected": "REFUSE",
+   "id": "PLAIN:RO-ack-without-terminal",
+   "note": "rowNow=UNCERTAIN"
+  },
+  {
+   "actual": "OWN_ONLY",
+   "claim": "recovery ACK closes cancel obligation only; parent UNCERTAIN; claims kept",
+   "defect": false,
+   "expected": "OWN_ONLY",
+   "id": "PLAIN:safety-ACK-own-only",
+   "note": ""
+  },
+  {
+   "actual": "HOLD",
+   "claim": "UNKNOWN parent keeps Node-wide hold for fresh admission",
+   "defect": false,
+   "expected": "HOLD",
+   "id": "PLAIN:UNKNOWN-still-holds",
+   "note": ""
+  },
+  {
+   "actual": "REFUSE",
+   "claim": "no public flag selects the recovery lane",
+   "defect": false,
+   "expected": "REFUSE",
+   "id": "PLAIN:observation_only-flag",
+   "note": ""
+  },
+  {
+   "actual": "REFUSE",
+   "claim": "fresh EXECUTE still refused under QUARANTINE",
+   "defect": false,
+   "expected": "REFUSE",
+   "id": "PLAIN:EXECUTE-under-quarantine",
+   "note": ""
+  },
+  {
+   "actual": {
+    "A": "HINT_OVERLAP",
+    "A-alias": "HINT_OVERLAP",
+    "B": "HINT_AVAILABLE",
+    "S": "HINT_AVAILABLE",
+    "U": "MISSING_RESOURCE_SCOPE",
+    "missing": "MISSING_RESOURCE_SCOPE"
+   },
+   "claim": "mixed: A/alias overlap, B disjoint, unknown/missing explicit, SHARE-only disjoint",
+   "defect": false,
+   "expected": {
+    "A": "HINT_OVERLAP",
+    "A-alias": "HINT_OVERLAP",
+    "B": "HINT_AVAILABLE",
+    "S": "HINT_AVAILABLE",
+    "U": "MISSING_RESOURCE_SCOPE",
+    "missing": "MISSING_RESOURCE_SCOPE"
+   },
+   "id": "PLAIN:R01-mixed",
+   "note": ""
+  },
+  {
+   "actual": "UNCHANGED",
+   "claim": "hint queries never mutate authority version/facts",
+   "defect": false,
+   "expected": "UNCHANGED",
+   "id": "PLAIN:R01-no-mutation",
+   "note": ""
+  },
+  {
+   "actual": "HINT_AVAILABLE",
+   "claim": "caller footprint cannot turn disjoint B into overlap",
+   "defect": false,
+   "expected": "HINT_AVAILABLE",
+   "id": "PLAIN:R01-forged-footprint-ignored",
+   "note": ""
+  },
+  {
+   "actual": "HINT_OVERLAP",
+   "claim": "re-query reflects current DB scope",
+   "defect": false,
+   "expected": "HINT_OVERLAP",
+   "id": "PLAIN:R01-later-scope-change",
+   "note": ""
+  },
+  {
+   "actual": "RAISES",
+   "claim": "R01/R05 cannot be used as boolean eligibility",
+   "defect": false,
+   "expected": "RAISES",
+   "id": "PLAIN:R01-boolean-path-closed",
+   "note": ""
+  },
+  {
+   "actual": "AUTHORITY_DENIED",
+   "claim": "connection scoped to another Node is AUTHORITY_DENIED",
+   "defect": false,
+   "expected": "AUTHORITY_DENIED",
+   "id": "PLAIN:R01-wrong-scope-conn",
+   "note": ""
+  },
+  {
+   "actual": "HINT_AVAILABLE",
+   "claim": "UNKNOWN on node-1 does not hold node-2 hint",
+   "defect": false,
+   "expected": "HINT_AVAILABLE",
+   "id": "PLAIN:R01-unknown-other-node",
+   "note": ""
+  },
+  {
+   "actual": "MISSING_RESOURCE_SCOPE",
+   "claim": "observation: missing scope is reported before UNKNOWN hold",
+   "defect": false,
+   "expected": "MISSING_RESOURCE_SCOPE",
+   "id": "PLAIN:R01-unknown-precedes-missing",
+   "note": "non-authorizing either way"
+  },
+  {
+   "actual": {
+    "A": "HINT_OVERLAP",
+    "A-alias": "HINT_OVERLAP",
+    "B": "HINT_AVAILABLE",
+    "S": "HINT_AVAILABLE",
+    "U": "MISSING_RESOURCE_SCOPE",
+    "missing": "MISSING_RESOURCE_SCOPE"
+   },
+   "claim": "mixed: A/alias overlap, B disjoint, unknown/missing explicit, SHARE-only disjoint",
+   "defect": false,
+   "expected": {
+    "A": "HINT_OVERLAP",
+    "A-alias": "HINT_OVERLAP",
+    "B": "HINT_AVAILABLE",
+    "S": "HINT_AVAILABLE",
+    "U": "MISSING_RESOURCE_SCOPE",
+    "missing": "MISSING_RESOURCE_SCOPE"
+   },
+   "id": "PLAIN:R05-mixed",
+   "note": ""
+  },
+  {
+   "actual": "UNCHANGED",
+   "claim": "hint queries never mutate authority version/facts",
+   "defect": false,
+   "expected": "UNCHANGED",
+   "id": "PLAIN:R05-no-mutation",
+   "note": ""
+  },
+  {
+   "actual": "HINT_AVAILABLE",
+   "claim": "caller footprint cannot turn disjoint B into overlap",
+   "defect": false,
+   "expected": "HINT_AVAILABLE",
+   "id": "PLAIN:R05-forged-footprint-ignored",
+   "note": ""
+  },
+  {
+   "actual": "HINT_OVERLAP",
+   "claim": "re-query reflects current DB scope",
+   "defect": false,
+   "expected": "HINT_OVERLAP",
+   "id": "PLAIN:R05-later-scope-change",
+   "note": ""
+  },
+  {
+   "actual": "RAISES",
+   "claim": "R01/R05 cannot be used as boolean eligibility",
+   "defect": false,
+   "expected": "RAISES",
+   "id": "PLAIN:R05-boolean-path-closed",
+   "note": ""
+  },
+  {
+   "actual": "AUTHORITY_DENIED",
+   "claim": "connection scoped to another Node is AUTHORITY_DENIED",
+   "defect": false,
+   "expected": "AUTHORITY_DENIED",
+   "id": "PLAIN:R05-wrong-scope-conn",
+   "note": ""
+  },
+  {
+   "actual": "HINT_AVAILABLE",
+   "claim": "UNKNOWN on node-1 does not hold node-2 hint",
+   "defect": false,
+   "expected": "HINT_AVAILABLE",
+   "id": "PLAIN:R05-unknown-other-node",
+   "note": ""
+  },
+  {
+   "actual": "MISSING_RESOURCE_SCOPE",
+   "claim": "observation: missing scope is reported before UNKNOWN hold",
+   "defect": false,
+   "expected": "MISSING_RESOURCE_SCOPE",
+   "id": "PLAIN:R05-unknown-precedes-missing",
+   "note": "non-authorizing either way"
+  },
+  {
+   "actual": "REFUSE",
+   "claim": "TERMINAL_FRAME needs its matched claim live; a released claim cannot keep terminal continuation",
+   "defect": false,
+   "expected": "REFUSE",
+   "id": "B:TF-after-cancel-release",
+   "note": "matchedReleased=True otherActiveClaims=1 leaseActive=True workloadActive=True claimRightsRetained=True parentState=PENDING_IO"
+  },
+  {
+   "actual": "REFUSE",
+   "claim": "TERMINAL_FRAME after the original EXECUTE is CONFIRMED TERMINAL_CLEAN must refuse",
+   "defect": false,
+   "expected": "REFUSE",
+   "id": "B:TF-after-parent-terminal-clean",
+   "note": "parentState=CONFIRMED_OUTCOME leaseActive=True (seed claim-1 keeps Node booleans true)"
+  },
+  {
+   "actual": "REFUSE",
+   "claim": "control: with no other claim the Node-wide booleans refuse",
+   "defect": false,
+   "expected": "REFUSE",
+   "id": "B:TF-control-no-other-claim",
+   "note": ""
+  },
+  {
+   "actual": "NO_CHANGE",
+   "claim": "second terminal receipt for released claim changes no claim version",
+   "defect": false,
+   "expected": "NO_CHANGE",
+   "id": "B:RO-after-release-no-double-version",
+   "note": "register=True confirm=True"
+  },
+  {
+   "actual": "REFUSE",
+   "claim": "CANCEL parent must be original EXECUTE",
+   "defect": false,
+   "expected": "REFUSE",
+   "id": "B:CANCEL-parent-not-EXECUTE",
+   "note": ""
+  },
+  {
+   "actual": "REFUSE",
+   "claim": "CANCEL cannot chain from a CANCEL handle",
+   "defect": false,
+   "expected": "REFUSE",
+   "id": "B:CANCEL-chain",
+   "note": ""
+  },
+  {
+   "actual": "REFUSE",
+   "claim": "no recovery lane against a protected-settled parent",
+   "defect": false,
+   "expected": "REFUSE",
+   "id": "B:CANCEL-after-protected-settle",
+   "note": "settled=True"
+  },
+  {
+   "actual": "REFUSE",
+   "claim": "RETIRE that revokes channel/observe/key refuses ordinary recovery",
+   "defect": false,
+   "expected": "REFUSE",
+   "id": "B:RETIRE+channelEnabled",
+   "note": ""
+  },
+  {
+   "actual": "REFUSE",
+   "claim": "RETIRE that revokes channel/observe/key refuses ordinary recovery",
+   "defect": false,
+   "expected": "REFUSE",
+   "id": "B:RETIRE+observeGrantLive",
+   "note": ""
+  },
+  {
+   "actual": "REFUSE",
+   "claim": "RETIRE that revokes channel/observe/key refuses ordinary recovery",
+   "defect": false,
+   "expected": "REFUSE",
+   "id": "B:RETIRE+keyLive",
+   "note": ""
+  },
+  {
+   "actual": "ALLOW_FACT_KEPT",
+   "claim": "business RETIRE alone keeps the exact recovery lane and keeps the fact",
+   "defect": false,
+   "expected": "ALLOW_FACT_KEPT",
+   "id": "B:RETIRE-business-only",
+   "note": ""
+  },
+  {
+   "actual": "REFUSE",
+   "claim": "node-1 parent cannot be cancelled through node-2 scope",
+   "defect": false,
+   "expected": "REFUSE",
+   "id": "B:CANCEL-cross-node-parent",
+   "note": ""
+  },
+  {
+   "actual": "REFUSE",
+   "claim": "after process loss ordinary RECEIPT_OBSERVE refuses (parent cap LOST)",
+   "defect": false,
+   "expected": "REFUSE",
+   "id": "B:restart-RO",
+   "note": ""
+  },
+  {
+   "actual": "ALLOW",
+   "claim": "after process loss safety CANCEL still allowed under current auth",
+   "defect": false,
+   "expected": "ALLOW",
+   "id": "B:restart-CANCEL",
+   "note": ""
+  },
+  {
+   "actual": "DEAD",
+   "claim": "original completion cap stays dead",
+   "defect": false,
+   "expected": "DEAD",
+   "id": "B:restart-no-revival",
+   "note": ""
+  },
+  {
+   "actual": "ONLY_MATCHED",
+   "claim": "cancel terminal receipt releases only matched claim",
+   "defect": false,
+   "expected": "ONLY_MATCHED",
+   "id": "B:multi-claim-only-matched",
+   "note": ""
+  },
+  {
+   "actual": "REFUSE",
+   "claim": "another original command receipt cannot release through this cancel",
+   "defect": false,
+   "expected": "REFUSE",
+   "id": "B:foreign-kernel-receipt",
+   "note": "claimsUnchanged=True"
+  },
+  {
+   "actual": "ONCE",
+   "claim": "confirm once; same operation id cannot re-register",
+   "defect": false,
+   "expected": "ONCE",
+   "id": "B:replay",
+   "note": ""
+  },
+  {
+   "actual": "REFUSE",
+   "claim": "RECEIPT_OBSERVE needs exact TERMINAL_CLEAN kernel receipt",
+   "defect": false,
+   "expected": "REFUSE",
+   "id": "B:RO-ack-without-terminal",
+   "note": "rowNow=UNCERTAIN"
+  },
+  {
+   "actual": "OWN_ONLY",
+   "claim": "recovery ACK closes cancel obligation only; parent UNCERTAIN; claims kept",
+   "defect": false,
+   "expected": "OWN_ONLY",
+   "id": "B:safety-ACK-own-only",
+   "note": ""
+  },
+  {
+   "actual": "HOLD",
+   "claim": "UNKNOWN parent keeps Node-wide hold for fresh admission",
+   "defect": false,
+   "expected": "HOLD",
+   "id": "B:UNKNOWN-still-holds",
+   "note": ""
+  },
+  {
+   "actual": "REFUSE",
+   "claim": "no public flag selects the recovery lane",
+   "defect": false,
+   "expected": "REFUSE",
+   "id": "B:observation_only-flag",
+   "note": ""
+  },
+  {
+   "actual": "REFUSE",
+   "claim": "fresh EXECUTE still refused under QUARANTINE",
+   "defect": false,
+   "expected": "REFUSE",
+   "id": "B:EXECUTE-under-quarantine",
+   "note": ""
+  },
+  {
+   "actual": "ALLOW",
+   "claim": "observation: B approval-lineage revocation is not channel auth; safety CANCEL continues",
+   "defect": false,
+   "expected": "ALLOW",
+   "id": "B:CANCEL-after-B-lineage-revoke",
+   "note": "design observation for Root; not stated in catalog"
+  },
+  {
+   "actual": {
+    "A": "HINT_OVERLAP",
+    "A-alias": "HINT_OVERLAP",
+    "B": "HINT_AVAILABLE",
+    "S": "HINT_AVAILABLE",
+    "U": "MISSING_RESOURCE_SCOPE",
+    "missing": "MISSING_RESOURCE_SCOPE"
+   },
+   "claim": "mixed: A/alias overlap, B disjoint, unknown/missing explicit, SHARE-only disjoint",
+   "defect": false,
+   "expected": {
+    "A": "HINT_OVERLAP",
+    "A-alias": "HINT_OVERLAP",
+    "B": "HINT_AVAILABLE",
+    "S": "HINT_AVAILABLE",
+    "U": "MISSING_RESOURCE_SCOPE",
+    "missing": "MISSING_RESOURCE_SCOPE"
+   },
+   "id": "B:R01-mixed",
+   "note": ""
+  },
+  {
+   "actual": "UNCHANGED",
+   "claim": "hint queries never mutate authority version/facts",
+   "defect": false,
+   "expected": "UNCHANGED",
+   "id": "B:R01-no-mutation",
+   "note": ""
+  },
+  {
+   "actual": "HINT_AVAILABLE",
+   "claim": "caller footprint cannot turn disjoint B into overlap",
+   "defect": false,
+   "expected": "HINT_AVAILABLE",
+   "id": "B:R01-forged-footprint-ignored",
+   "note": ""
+  },
+  {
+   "actual": "HINT_OVERLAP",
+   "claim": "re-query reflects current DB scope",
+   "defect": false,
+   "expected": "HINT_OVERLAP",
+   "id": "B:R01-later-scope-change",
+   "note": ""
+  },
+  {
+   "actual": "RAISES",
+   "claim": "R01/R05 cannot be used as boolean eligibility",
+   "defect": false,
+   "expected": "RAISES",
+   "id": "B:R01-boolean-path-closed",
+   "note": ""
+  },
+  {
+   "actual": "AUTHORITY_DENIED",
+   "claim": "connection scoped to another Node is AUTHORITY_DENIED",
+   "defect": false,
+   "expected": "AUTHORITY_DENIED",
+   "id": "B:R01-wrong-scope-conn",
+   "note": ""
+  },
+  {
+   "actual": "HINT_AVAILABLE",
+   "claim": "UNKNOWN on node-1 does not hold node-2 hint",
+   "defect": false,
+   "expected": "HINT_AVAILABLE",
+   "id": "B:R01-unknown-other-node",
+   "note": ""
+  },
+  {
+   "actual": "MISSING_RESOURCE_SCOPE",
+   "claim": "observation: missing scope is reported before UNKNOWN hold",
+   "defect": false,
+   "expected": "MISSING_RESOURCE_SCOPE",
+   "id": "B:R01-unknown-precedes-missing",
+   "note": "non-authorizing either way"
+  },
+  {
+   "actual": {
+    "A": "HINT_OVERLAP",
+    "A-alias": "HINT_OVERLAP",
+    "B": "HINT_AVAILABLE",
+    "S": "HINT_AVAILABLE",
+    "U": "MISSING_RESOURCE_SCOPE",
+    "missing": "MISSING_RESOURCE_SCOPE"
+   },
+   "claim": "mixed: A/alias overlap, B disjoint, unknown/missing explicit, SHARE-only disjoint",
+   "defect": false,
+   "expected": {
+    "A": "HINT_OVERLAP",
+    "A-alias": "HINT_OVERLAP",
+    "B": "HINT_AVAILABLE",
+    "S": "HINT_AVAILABLE",
+    "U": "MISSING_RESOURCE_SCOPE",
+    "missing": "MISSING_RESOURCE_SCOPE"
+   },
+   "id": "B:R05-mixed",
+   "note": ""
+  },
+  {
+   "actual": "UNCHANGED",
+   "claim": "hint queries never mutate authority version/facts",
+   "defect": false,
+   "expected": "UNCHANGED",
+   "id": "B:R05-no-mutation",
+   "note": ""
+  },
+  {
+   "actual": "HINT_AVAILABLE",
+   "claim": "caller footprint cannot turn disjoint B into overlap",
+   "defect": false,
+   "expected": "HINT_AVAILABLE",
+   "id": "B:R05-forged-footprint-ignored",
+   "note": ""
+  },
+  {
+   "actual": "HINT_OVERLAP",
+   "claim": "re-query reflects current DB scope",
+   "defect": false,
+   "expected": "HINT_OVERLAP",
+   "id": "B:R05-later-scope-change",
+   "note": ""
+  },
+  {
+   "actual": "RAISES",
+   "claim": "R01/R05 cannot be used as boolean eligibility",
+   "defect": false,
+   "expected": "RAISES",
+   "id": "B:R05-boolean-path-closed",
+   "note": ""
+  },
+  {
+   "actual": "AUTHORITY_DENIED",
+   "claim": "connection scoped to another Node is AUTHORITY_DENIED",
+   "defect": false,
+   "expected": "AUTHORITY_DENIED",
+   "id": "B:R05-wrong-scope-conn",
+   "note": ""
+  },
+  {
+   "actual": "HINT_AVAILABLE",
+   "claim": "UNKNOWN on node-1 does not hold node-2 hint",
+   "defect": false,
+   "expected": "HINT_AVAILABLE",
+   "id": "B:R05-unknown-other-node",
+   "note": ""
+  },
+  {
+   "actual": "MISSING_RESOURCE_SCOPE",
+   "claim": "observation: missing scope is reported before UNKNOWN hold",
+   "defect": false,
+   "expected": "MISSING_RESOURCE_SCOPE",
+   "id": "B:R05-unknown-precedes-missing",
+   "note": "non-authorizing either way"
+  }
+ ],
+ "defects": [],
+ "model": "fleet5-b-rev9b-20261106-codex",
+ "reviewer": "Claude independent",
+ "scope": "SYMBOLIC Rev8 model attacks only; no runtime/Node/PG/crypto evidence"
+}

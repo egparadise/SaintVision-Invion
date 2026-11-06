@@ -1,0 +1,199 @@
+{
+  "executionOwner": "Codex",
+  "cases": [
+    {
+      "case": "PLAIN-offline-register",
+      "pass": true
+    },
+    {
+      "case": "PLAIN-offline-invoke",
+      "pass": true
+    },
+    {
+      "case": "PLAIN-offline-confirm",
+      "pass": true
+    },
+    {
+      "case": "PLAIN-late-offline-frame-protected-hold",
+      "pass": true
+    },
+    {
+      "case": "PLAIN-projection-online",
+      "pass": true
+    },
+    {
+      "case": "PLAIN-projection-draining",
+      "pass": true
+    },
+    {
+      "case": "PLAIN-DRAIN-fact-positive",
+      "pass": true
+    },
+    {
+      "case": "PLAIN-tenant-stop-or-unknown-{'known': True, 'killSwitch': True}",
+      "pass": true
+    },
+    {
+      "case": "PLAIN-tenant-stop-other-node-{'known': True, 'killSwitch': True}",
+      "pass": true
+    },
+    {
+      "case": "PLAIN-tenant-stop-recovery-CANCEL{'known': True, 'killSwitch': True}",
+      "pass": true
+    },
+    {
+      "case": "PLAIN-tenant-stop-recovery-RECEIPT_OBSERVE{'known': True, 'killSwitch': True}",
+      "pass": true
+    },
+    {
+      "case": "PLAIN-tenant-stop-or-unknown-{'known': False, 'killSwitch': False}",
+      "pass": true
+    },
+    {
+      "case": "PLAIN-tenant-stop-other-node-{'known': False, 'killSwitch': False}",
+      "pass": true
+    },
+    {
+      "case": "PLAIN-tenant-stop-recovery-CANCEL{'known': False, 'killSwitch': False}",
+      "pass": true
+    },
+    {
+      "case": "PLAIN-tenant-stop-recovery-RECEIPT_OBSERVE{'known': False, 'killSwitch': False}",
+      "pass": true
+    },
+    {
+      "case": "PLAIN-tenant-stop-or-unknown-None",
+      "pass": true
+    },
+    {
+      "case": "PLAIN-tenant-stop-other-node-None",
+      "pass": true
+    },
+    {
+      "case": "PLAIN-tenant-stop-recovery-CANCELNone",
+      "pass": true
+    },
+    {
+      "case": "PLAIN-tenant-stop-recovery-RECEIPT_OBSERVENone",
+      "pass": true
+    },
+    {
+      "case": "PLAIN-tenant-stop-before-confirm",
+      "pass": true
+    },
+    {
+      "case": "PLAIN-tenant-stop-prepared-both-nodes",
+      "pass": true
+    },
+    {
+      "case": "PLAIN-tenant-stop-new-both-nodes",
+      "pass": true
+    },
+    {
+      "case": "B-offline-register",
+      "pass": true
+    },
+    {
+      "case": "B-offline-invoke",
+      "pass": true
+    },
+    {
+      "case": "B-offline-confirm",
+      "pass": true
+    },
+    {
+      "case": "B-late-offline-frame-protected-hold",
+      "pass": true
+    },
+    {
+      "case": "B-projection-online",
+      "pass": true
+    },
+    {
+      "case": "B-projection-draining",
+      "pass": true
+    },
+    {
+      "case": "B-DRAIN-fact-positive",
+      "pass": true
+    },
+    {
+      "case": "B-tenant-stop-or-unknown-{'known': True, 'killSwitch': True}",
+      "pass": true
+    },
+    {
+      "case": "B-tenant-stop-other-node-{'known': True, 'killSwitch': True}",
+      "pass": true
+    },
+    {
+      "case": "B-tenant-stop-recovery-CANCEL{'known': True, 'killSwitch': True}",
+      "pass": true
+    },
+    {
+      "case": "B-tenant-stop-recovery-RECEIPT_OBSERVE{'known': True, 'killSwitch': True}",
+      "pass": true
+    },
+    {
+      "case": "B-tenant-stop-or-unknown-{'known': False, 'killSwitch': False}",
+      "pass": true
+    },
+    {
+      "case": "B-tenant-stop-other-node-{'known': False, 'killSwitch': False}",
+      "pass": true
+    },
+    {
+      "case": "B-tenant-stop-recovery-CANCEL{'known': False, 'killSwitch': False}",
+      "pass": true
+    },
+    {
+      "case": "B-tenant-stop-recovery-RECEIPT_OBSERVE{'known': False, 'killSwitch': False}",
+      "pass": true
+    },
+    {
+      "case": "B-tenant-stop-or-unknown-None",
+      "pass": true
+    },
+    {
+      "case": "B-tenant-stop-other-node-None",
+      "pass": true
+    },
+    {
+      "case": "B-tenant-stop-recovery-CANCELNone",
+      "pass": true
+    },
+    {
+      "case": "B-tenant-stop-recovery-RECEIPT_OBSERVENone",
+      "pass": true
+    },
+    {
+      "case": "B-tenant-stop-before-confirm",
+      "pass": true
+    },
+    {
+      "case": "B-tenant-stop-prepared-both-nodes",
+      "pass": true
+    },
+    {
+      "case": "B-tenant-stop-new-both-nodes",
+      "pass": true
+    },
+    {
+      "case": "wrapper-refuses-not-a-real-model-directory",
+      "pass": true
+    },
+    {
+      "case": "wrapper-refuses-D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105\\docs\\vault\\30_Development\\Evidence\\__missing_rev9b_model__",
+      "pass": true
+    },
+    {
+      "case": "wrapper-refuses-D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105\\docs\\vault\\30_Development\\Evidence",
+      "pass": true
+    }
+  ],
+  "scope": "SYMBOLIC_ONLY",
+  "actualRuntimeB": 0,
+  "trackedInfo": {
+    "versionAttemptCAS": "TRACKED_INFO_ONLY_NOT_CHANGED_NO_NEW_RECEIPT_FIELDS",
+    "inflightFrame": "UNCERTAIN/POISONED same-Node HOLD needs existing protected settlement, never generic receipt/ACK clear"
+  }
+}

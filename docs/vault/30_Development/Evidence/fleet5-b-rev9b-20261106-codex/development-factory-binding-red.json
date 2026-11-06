@@ -1,0 +1,5 @@
+{
+  "scope": "OWNER STATIC ONLY, parsed not executed",
+  "safeFactoryAccepted": true,
+  "reboundFactoryAccepted": true
+}

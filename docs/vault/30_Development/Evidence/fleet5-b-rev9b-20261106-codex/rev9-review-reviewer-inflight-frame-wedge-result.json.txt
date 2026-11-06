@@ -1,0 +1,1 @@
+{"PLAIN": {"lateConfirm": false, "frameRow": "UNCERTAIN", "frameCap": "POISONED", "disjointSameNodeAdmission": false, "otherNodeAdmission": true}, "B": {"lateConfirm": false, "frameRow": "UNCERTAIN", "frameCap": "POISONED", "disjointSameNodeAdmission": false, "otherNodeAdmission": true}}

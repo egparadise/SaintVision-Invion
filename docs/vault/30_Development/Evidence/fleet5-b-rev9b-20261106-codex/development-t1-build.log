@@ -1,0 +1,16 @@
+python.exe : Traceback (most recent call last):
+위치 줄:3 문자:1
++ & D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe -B "$ev/t1_ ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (Traceback (most recent call last)::String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+  File "D:\Project\SaintVisionI-Invion\fleet5-compute-storage-contract-20261105\docs\vault\30_Development\Evidence\flee
+t5-b-rev9b-20261106-codex\t1_build.py", line 79, in <module>
+    if __name__=='__main__':main()
+                            ~~~~^^
+  File "D:\Project\SaintVisionI-Invion\fleet5-compute-storage-contract-20261105\docs\vault\30_Development\Evidence\flee
+t5-b-rev9b-20261106-codex\t1_build.py", line 37, in main
+    rule='A5_LOCAL';proof,error=t.local_list(source,node);assert not error,error
+                                                                 ^^^^^^^^^
+AssertionError: DYNAMIC_BLOCK:RECEIVER_LOAD_NOT_ALLOWLISTED

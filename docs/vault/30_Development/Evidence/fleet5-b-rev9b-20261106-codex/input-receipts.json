@@ -1,0 +1,396 @@
+{
+  "task": "FLEET5-B-REV9B-FIX-ONLY-20261106",
+  "orcaTask": "task_a8fd2969f0b3",
+  "dispatch": "ctx_6f0f8253b8a7",
+  "owner": "Codex",
+  "reviewer": "Actual independent Claude through Root; Rev9b PENDING",
+  "rootMessage": "msg_b6b4813cb5c2",
+  "base": "3daf1a0d24c220586474a4b376609e62960b8ca6",
+  "productSource": "72028cbac903c4415d9979f980a6e0f9948e914f",
+  "rootHeadAtRead": "53683020e3cfaf79ec4662f9a79b8b4dae28a628",
+  "scope": "Fix-only DOCS/schema/static/symbolic. Terminal projection/tenant guard, exhaustive constructor census/local helper, bounded use-site allowlists; no A7 or runtime grant.",
+  "kst": "2026-11-06T19:26:30.882765+09:00",
+  "docs": [
+    {
+      "path": "ROOT_READ_ONLY/docs/vault/00_Index/\uc804\uccb4 \uac1c\ubc1c \uc9c4\ud589 \ud604\ud669.md",
+      "sha256": "1181c5f2437f78f89c319b8ce761d71400fb425c42ce8183755b838426f90f22",
+      "frontmatter": "doc_id: \"INDEX-PROGRESS-001\"\r\ntitle: \"\uc804\uccb4 \uac1c\ubc1c \uc9c4\ud589 \ud604\ud669\"\r\nversion: \"1.0.453\"\r\nstatus: \"review\"\r\nauthor: \"Codex\"\r\nupdated: \"2026-11-06T19:17:15+09:00\"\r\nsource_of_truth: \"Git\"\r\nlatest_codex_card: \"Requestedlocaladmin SSO/permissionsverified; build2jobs/artifactsuccess; report beforefrontenddeployment; certificate/UIpending; actualB9b+PLR1c fixescontinue; fullprogramincomplete\""
+    },
+    {
+      "path": "ROOT_READ_ONLY/docs/vault/30_Development/Agent\ubcc4 \uc791\uc5c5/Codex \uc791\uc5c5 \ud604\ud669.md",
+      "sha256": "68dabdda17c6dff09153b49762dfaa0e3c0bad69336458fccbae82567666ed8e",
+      "frontmatter": "doc_id: \"WORKBOARD-CODEX-001\"\r\ntitle: \"Codex \uc791\uc5c5 \ud604\ud669\"\r\nversion: \"1.0.414\"\r\nstatus: \"review\"\r\nauthor: \"Codex\"\r\nupdated: \"2026-11-06T19:17:15+09:00\"\r\nsource_of_truth: \"Git\"\r\nactive_card: \"ADMIN-LOGIN-20261106 with parallel FLEET5 supervision\"\r\nactive_card_status: \"Requestedaccount actualSSO/adminAPI200/unauth401; source/buildCI/artifactverified; report-beforedeploy; defaultWindowstrust/GUIpending; B9bPLR1ccontinued\"\r\nactive_card_next: \"Root Obsidianreport thenverifiedartifactlocalfrontenddeployment/postcheck; separateB9b/PLR1c candidates needactualreviewbeforeanyCore/runtimeacceptance\""
+    },
+    {
+      "path": "ROOT_READ_ONLY/docs/vault/00_Index/2026-09-15 \ub2e8\uc77c \uac00\uc0c1 \ucef4\ud4e8\ud130 \ubcf4\uac15 \uc124\uacc4 \uc778\ub371\uc2a4.md",
+      "sha256": "35f2cca047fdb57ff2e2ad28e3847e9a7c0a19d6ace6fb36aa941042e872e9be",
+      "frontmatter": "doc_id: \"INDEX-VIRTUAL-COMPUTER-001\"\ntitle: \"2026-09-15 \ub2e8\uc77c \uac00\uc0c1 \ucef4\ud4e8\ud130 \ubcf4\uac15 \uc124\uacc4 \uc778\ub371\uc2a4\"\nversion: \"1.0.0\"\nstatus: \"accepted\"\nauthor: \"Codex\"\nupdated: \"2026-09-15T11:20:06+09:00\"\nsource_of_truth: \"Git and Obsidian paired update\"\ntags: [\"saintvision\", \"inv\", \"web-desktop\", \"distributed-model\", \"roadmap\"]"
+    },
+    {
+      "path": "ROOT_READ_ONLY/docs/vault/30_Development/57.81\ud37c\uc13c\ud2b8 \uc774\ud6c4 \ub2e8\uc77c \uac00\uc0c1 \ucef4\ud4e8\ud130 \ubcf4\uac15 \ub85c\ub4dc\ub9f5.md",
+      "sha256": "3a4527ffe53ebea114063692dd3bba826da8c279a93a9800919fff394df1a018",
+      "frontmatter": "doc_id: \"ROADMAP-VIRTUAL-COMPUTER-001\"\ntitle: \"57.81\ud37c\uc13c\ud2b8 \uc774\ud6c4 \ub2e8\uc77c \uac00\uc0c1 \ucef4\ud4e8\ud130 \ubcf4\uac15 \ub85c\ub4dc\ub9f5\"\nversion: \"1.0.0\"\nstatus: \"accepted\"\nauthor: \"Codex\"\nupdated: \"2026-09-15T11:20:06+09:00\"\nsource_of_truth: \"Git and Obsidian paired update\"\ntags: [\"saintvision\", \"roadmap\", \"web-desktop\", \"storage-fabric\", \"agents\"]"
+    },
+    {
+      "path": "ROOT_READ_ONLY/docs/vault/40_Governance/Agent \uc5f0\uc18d \uc2e4\ud589\uacfc \ucd5c\uc885 \ubcf4\uace0 \uc815\ucc45.md",
+      "sha256": "60c6a8d3130491bd4cab730cccc0e236fb038d1c7c816efa333acdc34a30cd8f",
+      "frontmatter": "doc_id: \"GOV-CONTINUOUS-001\"\ntitle: \"Agent \uc5f0\uc18d \uc2e4\ud589\uacfc \ucd5c\uc885 \ubcf4\uace0 \uc815\ucc45\"\nversion: \"1.1.0\"\nstatus: \"accepted\"\nauthor: \"Codex\"\nupdated: \"2026-09-21T14:33:00+09:00\"\nsource_of_truth: \"Git and Obsidian paired update\"\ntags: [\"saintvision\", \"agents\", \"autonomy\", \"governance\"]"
+    },
+    {
+      "path": "ROOT_READ_ONLY/docs/vault/00_Index/\ucd5c\uc885 \uac1c\ubc1c \uacc4\ud68d - \ubaa8\ub4e0 \uac1c\ubc1c\uc758 \uc9c0\uce68.md",
+      "sha256": "59223c5dff4b4bb6252c8061aebe975665e6eadf92db3659a3f89951b2cb149f",
+      "frontmatter": "doc_id: \"GUIDE-001\"\ntitle: \"\ucd5c\uc885 \uac1c\ubc1c \uacc4\ud68d - \ubaa8\ub4e0 \uac1c\ubc1c\uc758 \uc9c0\uce68\"\nversion: \"1.1.0\"\nstatus: \"baseline\"\nauthor: \"Codex\"\nupdated: \"2026-09-11T17:15:06+09:00\"\ntimezone: \"Asia/Seoul\"\nsource_of_truth: \"Git\"\ntags: [\"saintvision\", \"final-plan\"]\naliases: [\"\ucd5c\uc885 \uacc4\ubc1c \uacc4\ud68c - \ubaa8\ub4e0 \uac1c\ubc1c\uc758 \uc9c0\uce68\", \"\ucd5c\uc885 \uac1c\ubc1c \uc9c0\uce68\"]"
+    },
+    {
+      "path": "ROOT_READ_ONLY/docs/vault/40_Governance/\uc124\uacc4 \ucda9\ub3cc \uc815\uc815 \ubc0f ADR.md",
+      "sha256": "771f7714a63af52d7c8aea2424db0b33a2fe96c759c51c81c23144daf7aeaf77",
+      "frontmatter": "doc_id: \"ADR-INDEX-001\"\ntitle: \"\uc124\uacc4 \ucda9\ub3cc \uc815\uc815 \ubc0f ADR\"\nversion: \"1.37.0\"\nstatus: \"baseline\"\nauthor: \"Codex\"\nupdated: \"2026-09-23T03:10:00+09:00\"\ntimezone: \"Asia/Seoul\"\nsource_of_truth: \"Git\"\ntags: [\"saintvision\", \"final-plan\"]"
+    },
+    {
+      "path": "ROOT_READ_ONLY/docs/vault/40_Governance/Agent \uc5ed\ud560\uacfc \uc778\uacc4 \uacc4\uc57d.md",
+      "sha256": "128c054e72f9e001b3b32f914cce544bce5432eddccdbe1212d27180c3200823",
+      "frontmatter": "doc_id: \"GOV-AGENT-001\"\ntitle: \"Agent \uc5ed\ud560\uacfc \uc778\uacc4 \uacc4\uc57d\"\nversion: \"1.1.3\"\nstatus: \"baseline\"\nauthor: \"Codex\"\nupdated: \"2026-09-21T18:47:00+09:00\"\ntimezone: \"Asia/Seoul\"\nsource_of_truth: \"Git\"\ntags: [\"saintvision\", \"final-plan\"]"
+    },
+    {
+      "path": "ROOT_READ_ONLY/docs/vault/40_Governance/Git Build Obsidian \uc6b4\uc601 \uc808\ucc28.md",
+      "sha256": "fe5e8adc44a14c081ac767265a16434b72e4b3ebfb7719081fa166ad459e59e9",
+      "frontmatter": "doc_id: \"GOV-GIT-001\"\ntitle: \"Git Build Obsidian \uc6b4\uc601 \uc808\ucc28\"\nversion: \"1.1.4\"\nstatus: \"baseline\"\nauthor: \"Codex\"\nupdated: \"2026-09-22T19:25:00+09:00\"\ntimezone: \"Asia/Seoul\"\nsource_of_truth: \"Git\"\ntags: [\"saintvision\", \"final-plan\"]"
+    },
+    {
+      "path": "ROOT_READ_ONLY/docs/vault/40_Governance/Agent \uc9c0\uc18d \uac1c\ubc1c \uc6b4\uc601 \uaddc\uce59.md",
+      "sha256": "63839c440ead6dc07300a0e18d5024fb9aadbddf546707156c39af7ee9495c84",
+      "frontmatter": "doc_id: \"GOV-CONTINUITY-001\"\ntitle: \"Agent \uc9c0\uc18d \uac1c\ubc1c \uc6b4\uc601 \uaddc\uce59\"\nversion: \"1.0.0\"\nstatus: \"review\"\nauthor: \"Codex\"\nupdated: \"2026-09-21T14:05:43+09:00\"\nsource_of_truth: \"Git\""
+    },
+    {
+      "path": "AGENTS.md",
+      "sha256": "c12a50a38f81c12a647f9b6f4592a205cd899e76d29190202a6ae73b12c04b27"
+    },
+    {
+      "path": "skills/agent-delivery/SKILL.md",
+      "sha256": "9596c1d4a132c3de90fd99ed2095b8271da7a31532e8487aa6d7d93151ac3830"
+    },
+    {
+      "path": "skills/core-reliability/SKILL.md",
+      "sha256": "4650a371befb5a59cd9f3ce87c2e2dab732aa7e9b89e57885cb67f0e64f0ef76"
+    },
+    {
+      "path": "docs/task-registry.json",
+      "sha256": "7c6b339c7487aae652cc5c5e04f6e933249c83930019e798ec24006794b07644"
+    }
+  ],
+  "copiedProducers": [
+    {
+      "file": "model.py",
+      "source": "Rev9@3daf1a0d",
+      "sha256": "e047bdc0579f0b078b489f9d3aad32d3b264e0028cb7adf1247f365ab5515b5f"
+    },
+    {
+      "file": "lifecycle.py",
+      "source": "Rev9@3daf1a0d",
+      "sha256": "895ad5dcd10bc45920e87a4b0253685d5aed77ca0b6a2ebc6ff7a71470a5e974"
+    },
+    {
+      "file": "io_contract.py",
+      "source": "Rev9@3daf1a0d",
+      "sha256": "f8870b3dc0ad9963b9dea04e5371aa456169bb4967fd95e5cbca6d392a6ae6d8"
+    },
+    {
+      "file": "schema.py",
+      "source": "Rev9@3daf1a0d",
+      "sha256": "8f726fd30ab6ada4280eb632fbecad1cc28aae3200c8b0379dca23df9fb7657f"
+    },
+    {
+      "file": "authority.py",
+      "source": "Rev9@3daf1a0d",
+      "sha256": "0941f705002db011b0c762b45730162f89e46f5f16efb1cfb533403eb49297ab"
+    },
+    {
+      "file": "catalog.py",
+      "source": "Rev9@3daf1a0d",
+      "sha256": "e581bfce8a3107c1b9752513b2b2b517f4205289355f943fa6f2f679ebeb1383"
+    },
+    {
+      "file": "rank_contract.py",
+      "source": "Rev9@3daf1a0d",
+      "sha256": "c95f906069c7d8ce3221e523584aa16c89bd3ae1165bd5d8d76b6abbb58cc310"
+    },
+    {
+      "file": "bounded_analysis.py",
+      "source": "Rev9@3daf1a0d",
+      "sha256": "03d53a9431c326b297ad786e03852edb88e43323e2dc4791761c36e7072730ca"
+    },
+    {
+      "file": "analysis_rules.py",
+      "source": "Rev9@3daf1a0d",
+      "sha256": "84c175efd08f3c124e9b30f4d3cf04e4bb6f6bb473f362b22e58151e184a2b47"
+    },
+    {
+      "file": "mutation_fixture.py",
+      "source": "Rev9@3daf1a0d",
+      "sha256": "2ed03fa1780fd216c528a49a28911f1427197503c8358a6b94bbd285a583dea6"
+    },
+    {
+      "file": "t1_provenance.py",
+      "source": "Rev9@3daf1a0d",
+      "sha256": "210be9a6b90296d25a5e9f260904e0ce01ecd5ee7e51ab73469480cba18c29ed"
+    },
+    {
+      "file": "t1_build.py",
+      "source": "Rev9@3daf1a0d",
+      "sha256": "2f1a0b64f05b1b81ba72524a9225306423e78c9183d511dc364ed50446cb84c2"
+    },
+    {
+      "file": "model_tests.py",
+      "source": "Rev9@3daf1a0d",
+      "sha256": "275544fc465d9bccfa659efb2f8a451984945a9e37aaa843b218130885067f6d"
+    },
+    {
+      "file": "analysis_rule_tests.py",
+      "source": "Rev9@3daf1a0d",
+      "sha256": "8fd361caddb552e0d93b815a372fcae6a1ff22c6ec1732b2fca689231782ce6a"
+    },
+    {
+      "file": "t1_tests.py",
+      "source": "Rev9@3daf1a0d",
+      "sha256": "4fbe26dee3390e9c356f777f3d2148aef8fe0bf8dbb6e20dbb7829b5f67897ed"
+    },
+    {
+      "file": "retained_probes.py",
+      "source": "Rev9@3daf1a0d",
+      "sha256": "c1616b3b359c35737a9526fea0d48d046a06762eca74eb1ac49f314ea977338a"
+    },
+    {
+      "file": "pending_contracts.py",
+      "source": "Rev9@3daf1a0d",
+      "sha256": "e0dd1ee5d468096704a38b1b28c39f6e55bc3aa1e24bd1f5d3895a5f51db9e16"
+    },
+    {
+      "file": "edge_categories.py",
+      "source": "Rev9@3daf1a0d",
+      "sha256": "d16ae559ca4b12c36d52a61d183fb2b1d3bdf38e6e8a54d511e4414e72cd18dd"
+    },
+    {
+      "file": "packet_checks.py",
+      "source": "Rev9@3daf1a0d",
+      "sha256": "6f2547ee3a800a85fdcbbd6ea03a3b16f9ff0b91acf7ff5c83309d48c13c9919"
+    },
+    {
+      "file": "run_checks.py",
+      "source": "Rev9@3daf1a0d",
+      "sha256": "782bc32e1353cfa6e2da7a2b5b6b8b2d428c15941ac9086021fdfb9f6854d31c"
+    },
+    {
+      "file": "measured_run.py",
+      "source": "Rev9@3daf1a0d",
+      "sha256": "61f7dcfdb00a873c2423e463b5beee5fa623bbf04c392e7ae9e30cdb297ed62e"
+    },
+    {
+      "file": "terminal_claim_regression.py",
+      "source": "Rev9@3daf1a0d",
+      "sha256": "fad4e25e286a8472f7c996743c47a9867642b78c2e2f4e9b033697e109cb5282"
+    }
+  ],
+  "actualPriorReview": [
+    {
+      "commit": "a7e9f9d7ca7803533bccf84f443591cbcd2bd5dc",
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-rev9-3daf-review-20261106-claude/commands.json",
+      "sha256": "24ed079d00373c7e239fd74590829a7092367f8f365d86f1e444a4bc3321f54a"
+    },
+    {
+      "commit": "a7e9f9d7ca7803533bccf84f443591cbcd2bd5dc",
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-rev9-3daf-review-20261106-claude/local-doc-gates.txt",
+      "sha256": "78b6d4a6dba56c886b2c2bec1b29e7b8fd004f8a349dafe26b833ced16be5140"
+    },
+    {
+      "commit": "a7e9f9d7ca7803533bccf84f443591cbcd2bd5dc",
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-rev9-3daf-review-20261106-claude/owner-reruns.tsv.txt",
+      "sha256": "e3149f61b8c96f7f220536542f27616f81bfda003c99783e4a692b4d7d0e455d"
+    },
+    {
+      "commit": "a7e9f9d7ca7803533bccf84f443591cbcd2bd5dc",
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-rev9-3daf-review-20261106-claude/review.json",
+      "sha256": "4b01b24483913c575bf766a5bc52d531f15fbf4a602a434448982d6a43ca3697"
+    },
+    {
+      "commit": "a7e9f9d7ca7803533bccf84f443591cbcd2bd5dc",
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-rev9-3daf-review-20261106-claude/reviewer-inflight-frame-wedge-result.json.txt",
+      "sha256": "f7681fea49b873edee17504d69ffbd6dbe056d8c70e057b662a55e00e09137d5"
+    },
+    {
+      "commit": "a7e9f9d7ca7803533bccf84f443591cbcd2bd5dc",
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-rev9-3daf-review-20261106-claude/reviewer-l2-six-corrections-result.json",
+      "sha256": "8fa5932b6c708a44589281a5cef3bdcc01ae6624b9c1361d7234163476a05b8f"
+    },
+    {
+      "commit": "a7e9f9d7ca7803533bccf84f443591cbcd2bd5dc",
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-rev9-3daf-review-20261106-claude/reviewer-offline-frame-probe-result.jsonl.txt",
+      "sha256": "48bc4efd645ba4a81a92d34ab35d5f085b68d1cf69d74c92512f6b39b6471a24"
+    },
+    {
+      "commit": "a7e9f9d7ca7803533bccf84f443591cbcd2bd5dc",
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-rev9-3daf-review-20261106-claude/reviewer-rev9-l1-t1-mutations-result.json",
+      "sha256": "0944710f658e9a22c93bbddfc82cf9a6a095709cc380effcb90df89892f1e186"
+    },
+    {
+      "commit": "a7e9f9d7ca7803533bccf84f443591cbcd2bd5dc",
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-rev9-3daf-review-20261106-claude/reviewer-rev9-m1-l3-attacks-result.json",
+      "sha256": "b0b51f31a7e10e159cfc076bc30a8285d5f11089fe0332cdcfd4d4092c1ba2c0"
+    },
+    {
+      "commit": "a7e9f9d7ca7803533bccf84f443591cbcd2bd5dc",
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-rev9-3daf-review-20261106-claude/reviewer-rev9-m1-l3-attacks-run1-fixturebug-result.json",
+      "sha256": "34ca03e2c6e46b449f0a8fd5ca28326c553f9591189b31fa8d67a5178a2374b6"
+    },
+    {
+      "commit": "a7e9f9d7ca7803533bccf84f443591cbcd2bd5dc",
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-rev9-3daf-review-20261106-claude/reviewer_inflight_frame_wedge.py.txt",
+      "sha256": "78c06ad7a5b129b8918352f4ad1d581961c4850c0721ab1836a37eac94175cbc"
+    },
+    {
+      "commit": "a7e9f9d7ca7803533bccf84f443591cbcd2bd5dc",
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-rev9-3daf-review-20261106-claude/reviewer_l2_six_corrections.py.txt",
+      "sha256": "174a791faa6d458f7238e1d309f3058efa89a1b138ab2d2ba9cc2b0ef2283c9c"
+    },
+    {
+      "commit": "a7e9f9d7ca7803533bccf84f443591cbcd2bd5dc",
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-rev9-3daf-review-20261106-claude/reviewer_offline_frame_probe.py.txt",
+      "sha256": "9cc889a8be4dbfc52bf155ed84b253b91de314e6c2766f00b9a4e10a6e1cefd3"
+    },
+    {
+      "commit": "a7e9f9d7ca7803533bccf84f443591cbcd2bd5dc",
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-rev9-3daf-review-20261106-claude/reviewer_rev9_l1_t1_mutations.py.txt",
+      "sha256": "a7c8f11d279630c9b997af0fabc7d7a84f2ef8b0eb8de1f90927523dc28626a4"
+    },
+    {
+      "commit": "a7e9f9d7ca7803533bccf84f443591cbcd2bd5dc",
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-rev9-3daf-review-20261106-claude/reviewer_rev9_m1_l3_attacks.py.txt",
+      "sha256": "b4478ea5fe186a2889b54ce8a002b559b2bc0a63aba49dc8c4d0d6646498e5d3"
+    }
+  ],
+  "immutableRetained": [
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-contract-rev7-20261106-codex/classifiedCalls.jsonl",
+      "sha256": "4d61a286b6201567bf0724136fb4c4393251e20e9b870879d76cf77db7f5812e",
+      "bytes": 24948352
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-contract-rev7-20261106-codex/criticalEntries.jsonl",
+      "sha256": "18eb25cbcf70fbee42b42f12cf85f158adc03d859d63b728c23b533512fba32a",
+      "bytes": 139930
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-contract-rev7-20261106-codex/entry-lock-plans.json",
+      "sha256": "accf56f215c243e20b0536a67986685e27e3dfb3bb558c5c482e5acbf80938a9",
+      "bytes": 738397
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-contract-rev7-20261106-codex/functionPlans.jsonl",
+      "sha256": "7d650fbe47e83f9714c922ffcfe1d93cef3d7a9319873bc9898ebf644f28409a",
+      "bytes": 8115807
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-contract-rev7-20261106-codex/records.jsonl",
+      "sha256": "2638625a21b476d7493c563619e117381c82afe30a0f06056e5d44fe14bd9079",
+      "bytes": 1646605
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-contract-rev7-20261106-codex/retained-surface-carry-forward.json",
+      "sha256": "daacd402dfa8df0ac8515d06b6c8cf6d5cde984f4c843fbc999ff68e03aa4f0c",
+      "bytes": 540
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-contract-rev7-20261106-codex/source-manifest.json",
+      "sha256": "0901aabf4d4187351b72292941957a80191cbbe7b3e07260ff87d30fa2139434",
+      "bytes": 1305127
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-contract-rev7-20261106-codex/sourceFiles.jsonl",
+      "sha256": "c64f664c78250d4510db8bca539c94ad76a947ea661ae3f9ce93b936b7c52303",
+      "bytes": 66624
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-contract-rev7-20261106-codex/sqlScopeIssues.jsonl",
+      "sha256": "ed78ce2d35bf8d7513c115bf22bc09db12335bab6af7d485d5187a3386df4229",
+      "bytes": 278711
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-contract-rev7-20261106-codex/transactionBoundaries.jsonl",
+      "sha256": "1e77eca3bfefe15ed15d85257a8879cf71a399a8ce7c9d84ce74f3198b7448f8",
+      "bytes": 99342
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-contract-rev7-20261106-codex/transport-inventory.json",
+      "sha256": "04f592f337e8de61dc34e2c3c16c74dfd78d4b9a16b6a797b9996e2b1f392826",
+      "bytes": 89605
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-contract-rev7-20261106-codex/unknownEdges.jsonl",
+      "sha256": "91c925d3864753e893c710de7b4dcccca3502c7e2652c7737535fe65b3e0526f",
+      "bytes": 6012094
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-contract-rev7-20261106-codex/unknownSqlWriters.jsonl",
+      "sha256": "5424915a272de18ed4a56b3b83bd0b0323549be684094f7f25a85b9c4f2c3ad5",
+      "bytes": 161230
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-contract-rev7-20261106-codex/valueConstructorProofs.jsonl",
+      "sha256": "8dd4c4335a2fe4bab11fcc16e159d3c407fdf2e99feb49eddec4bc6c86ce3747",
+      "bytes": 182173
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-contract-rev7-20261106-codex/writers.jsonl",
+      "sha256": "e1be3bbb8cdc35bcb2ed998a8f5b15f1ab572fcc57c74d71eeb225fd466f750b",
+      "bytes": 2343892
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-rev8-revoke-portcut-20261106-codex/critical-edge-categories.json",
+      "sha256": "197cb68ff78dfdccd878d3b595a13c9e0a9d3c77de48d76218bc80a3f90933a0",
+      "bytes": 1350095
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-rev8-revoke-portcut-20261106-codex/pilot-closure.json",
+      "sha256": "9e9f7155bba7ff3e657a7f9b9fc9380c4051cb9380f85b5f84a24d82482966f1",
+      "bytes": 24523
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-rev8-revoke-portcut-20261106-codex/writer-census-delta.json",
+      "sha256": "40494695825789c24758cec36505016e6db0667335c6d46f91ab3e6f95659d6e",
+      "bytes": 1633
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-rev8-revoke-portcut-20261106-codex/pending-interface-contracts.json",
+      "sha256": "a69f551579d9e6aab3000470c93409f8a0167cfc6fadc81799200e1624ce1ca0",
+      "bytes": 54320
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-rev8-revoke-portcut-20261106-codex/transport-delta.json",
+      "sha256": "9394b7b01a95c26177d04f5be1ad3a0f77984a31feae69d84a945456aa6e20d1",
+      "bytes": 10700
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-rev9-t1-20261106-codex/t1-mark-offline-closure.json",
+      "sha256": "8f7952335800c48ba2068b3ac36e32c22f2f77a74bc3fe3ca6af92177265a0ad",
+      "bytes": 94365
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-rev9-t1-20261106-codex/targeted-category-delta.json",
+      "sha256": "bb46b0c48dd9b926095d59db4eb47e88eab7c01b184b734c1b7480cb259bee26",
+      "bytes": 88263
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-rev9-t1-20261106-codex/producer-order.json",
+      "sha256": "aed91124a6142da6e5e04028e986a2ef89d5fc8f8ac2dffe751cd4dcce90bd8d",
+      "bytes": 764
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-rev9-t1-20261106-codex/pending-interface-contracts.json",
+      "sha256": "79a03d49424b508470bf29cb724f4b6591b5cdfc7a370b557c0f8dd1674fe393",
+      "bytes": 96580
+    }
+  ],
+  "actualRuntimeB": 0,
+  "realBindings": null,
+  "A1_A16": "PENDING",
+  "partialFreeze": false
+}

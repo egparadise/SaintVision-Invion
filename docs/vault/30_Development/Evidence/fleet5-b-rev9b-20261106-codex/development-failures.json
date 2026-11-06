@@ -1,0 +1,51 @@
+{
+  "scope": "OWNER development checks only; no production code or runtime actions",
+  "events": [
+    {
+      "check": "First exact original70 reviewer mutation rerun",
+      "actualScriptExit": 0,
+      "reportedSoundGaps": 1,
+      "artifact": "owner-reviewer70-pre-write-guard.json",
+      "finding": "Unbound Database.transaction assignment in observation.py was not recognized as a protected canonical class",
+      "fix": "Every Attribute/Subscript write in the bounded source scope now requires its own frozen use-site, including unresolved receivers; no silent write exemption"
+    },
+    {
+      "check": "rev9b_model_tests.py initial owner run",
+      "actualExit": 1,
+      "finding": "Fixture built operationId by concatenating a dict repr; closed schema refused it before the recovery policy was reached",
+      "fix": "Use a valid stable operationId and keep each gate case in its own World so the negative/positive reaches the intended guard"
+    },
+    {
+      "check": "t1_build.py development run",
+      "actualExit": 1,
+      "artifact": "development-t1-build.log",
+      "finding": "Local-list receiver allowlist compared the call node from a separate AST against the function AST; legitimate changed.append was refused",
+      "fix": "Match the exact source span and expression within the current function AST, then allow only that append receiver and the separately checked return; final measured t1_build and 83 T1 cases pass"
+    },
+    {
+      "check": "First publication check_docs.py",
+      "actualExit": 1,
+      "receipt": "development-failed-publication-gates.json",
+      "finding": "PowerShell redirected a development traceback log as UTF-16; canonical docs validator requires UTF-8",
+      "fix": "Converted only own development log to UTF-8; preserved failed publication receipt and log; no source or validator change",
+      "originalUTF16SHA256": "d3d36cc6f9c939dea5fa58a30573e0b8f7e92a9af4e4e1f23d3f0c960776e254",
+      "convertedUTF8SHA256": "40f9893ac7fcb7b12331df94949369c7658cb3f1c5b39dfbde33a5d60a68f12f"
+    },
+    {
+      "check": "Final narrow dataclass factory binding probe",
+      "actualScriptExit": 0,
+      "artifact": "development-factory-binding-red.json",
+      "reportedSemanticGap": true,
+      "finding": "AST predicate accepted a foreign callable rebound to dict under the narrow field(default_factory=dict) exception",
+      "fix": "Require unshadowed builtin dict for that individual exception; four AST-only controls retain safe positive and refuse assignment/import-alias/class substitutions"
+    },
+    {
+      "check": "Enclosing function-header binding probe",
+      "actualScriptExit": 0,
+      "artifact": "development-function-header-red.json",
+      "reportedSemanticGap": true,
+      "finding": "Unchanged protected load contexts did not include function arguments/decorators, allowing a shadowing class parameter or foreign callable decorator",
+      "fix": "Use-site key includes every enclosing function header, without whole body hashing; three focused controls retain positive and reject both semantic changes"
+    }
+  ]
+}

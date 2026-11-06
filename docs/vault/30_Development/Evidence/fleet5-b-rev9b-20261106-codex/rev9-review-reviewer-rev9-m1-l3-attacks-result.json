@@ -1,0 +1,886 @@
+{
+ "reviewer": "Claude independent",
+ "target": "3daf1a0d24c220586474a4b376609e62960b8ca6",
+ "scope": "SYMBOLIC model attacks only; not B runtime",
+ "cases": [
+  {
+   "case": "PLAIN:M1-offline-node-frame-register",
+   "observed": true,
+   "expected": false,
+   "match": false,
+   "note": "terminal.py _current node status online/draining"
+  },
+  {
+   "case": "PLAIN:M1-offline-node-frame-invoke",
+   "observed": true,
+   "expected": false,
+   "match": false,
+   "note": ""
+  },
+  {
+   "case": "PLAIN:M1-offline-node-R12-eligible-query",
+   "observed": false,
+   "expected": false,
+   "match": true,
+   "note": ""
+  },
+  {
+   "case": "PLAIN:M1-prepared-then-offline-invoke",
+   "observed": true,
+   "expected": false,
+   "match": false,
+   "note": ""
+  },
+  {
+   "case": "PLAIN:M1-release-A-other-claim-B-rights-unchanged",
+   "observed": true,
+   "expected": true,
+   "match": true,
+   "note": ""
+  },
+  {
+   "case": "PLAIN:M1-release-A-frame-B-still-positive",
+   "observed": true,
+   "expected": true,
+   "match": true,
+   "note": ""
+  },
+  {
+   "case": "PLAIN:M1-release-A-frame-A-refused-with-other-active",
+   "observed": true,
+   "expected": true,
+   "match": true,
+   "note": ""
+  },
+  {
+   "case": "PLAIN:M1-cancel-then-original-receipt-no-double-release",
+   "observed": [
+    2,
+    true
+   ],
+   "expected": [
+    2,
+    true
+   ],
+   "match": true,
+   "note": ""
+  },
+  {
+   "case": "PLAIN:M1-readmitted-claim-old-parent-frame-refused",
+   "observed": true,
+   "expected": true,
+   "match": true,
+   "note": ""
+  },
+  {
+   "case": "PLAIN:M1-readmitted-claim-new-parent-frame-positive",
+   "observed": true,
+   "expected": true,
+   "match": true,
+   "note": ""
+  },
+  {
+   "case": "PLAIN:M1-readmit-register-blocked-while-old-parent-pending",
+   "observed": true,
+   "expected": true,
+   "match": true,
+   "note": "unresolved overlap invariant"
+  },
+  {
+   "case": "PLAIN:M1-INFO-stale-version-receipt-tombstones-newer-seeded-rights",
+   "observed": [
+    true,
+    "TERMINAL_TOMBSTONED",
+    true
+   ],
+   "expected": [
+    true,
+    "TERMINAL_TOMBSTONED",
+    true
+   ],
+   "match": true,
+   "note": "only reachable by fixture seeding; real admission gated by unresolved overlap; defence-in-depth CAS recommended"
+  },
+  {
+   "case": "PLAIN:M1-matched-lease-expired-after-prepare-invoke",
+   "observed": false,
+   "expected": false,
+   "match": true,
+   "note": ""
+  },
+  {
+   "case": "PLAIN:M1-deadline-now+5-reached-after-prepare-invoke",
+   "observed": false,
+   "expected": false,
+   "match": true,
+   "note": ""
+  },
+  {
+   "case": "PLAIN:M1-rights-version-mismatch",
+   "observed": true,
+   "expected": true,
+   "match": true,
+   "note": ""
+  },
+  {
+   "case": "PLAIN:M1-build-parent-frame-refused",
+   "observed": true,
+   "expected": true,
+   "match": true,
+   "note": ""
+  },
+  {
+   "case": "PLAIN:M1-after-restart-frame-refused",
+   "observed": true,
+   "expected": true,
+   "match": true,
+   "note": ""
+  },
+  {
+   "case": "PLAIN:M1-cross-node-frame-refused",
+   "observed": true,
+   "expected": true,
+   "match": true,
+   "note": ""
+  },
+  {
+   "case": "PLAIN:M1-node-bools-never-substitute",
+   "observed": true,
+   "expected": true,
+   "match": true,
+   "note": ""
+  },
+  {
+   "case": "PLAIN:M1-recovery-ack-closes-cancel-without-release",
+   "observed": [
+    true,
+    true,
+    1
+   ],
+   "expected": [
+    true,
+    true,
+    1
+   ],
+   "match": true,
+   "note": ""
+  },
+  {
+   "case": "PLAIN:M1-cancel-lane-after-tombstone-identity-lookup",
+   "observed": true,
+   "expected": true,
+   "match": true,
+   "note": "safety stop of possibly running UNKNOWN parent stays available; no TERMINAL access"
+  },
+  {
+   "case": "PLAIN:M1-terminal-after-tombstone-UNKNOWN-parent-refused",
+   "observed": true,
+   "expected": true,
+   "match": true,
+   "note": ""
+  },
+  {
+   "case": "PLAIN:CR-current-auth-channelEnabled",
+   "observed": true,
+   "expected": true,
+   "match": true,
+   "note": ""
+  },
+  {
+   "case": "PLAIN:CR-current-auth-keyLive",
+   "observed": true,
+   "expected": true,
+   "match": true,
+   "note": ""
+  },
+  {
+   "case": "PLAIN:CR-current-auth-certNotAfter",
+   "observed": true,
+   "expected": true,
+   "match": true,
+   "note": ""
+  },
+  {
+   "case": "PLAIN:CR-current-auth-observeGrantLive",
+   "observed": true,
+   "expected": true,
+   "match": true,
+   "note": ""
+  },
+  {
+   "case": "PLAIN:CR-current-auth-observeGrantUntil",
+   "observed": true,
+   "expected": true,
+   "match": true,
+   "note": ""
+  },
+  {
+   "case": "PLAIN:CR-current-auth-fenced",
+   "observed": true,
+   "expected": true,
+   "match": true,
+   "note": ""
+  },
+  {
+   "case": "PLAIN:CR-current-auth-C",
+   "observed": true,
+   "expected": true,
+   "match": true,
+   "note": ""
+  },
+  {
+   "case": "PLAIN:CR-current-auth-DER",
+   "observed": true,
+   "expected": true,
+   "match": true,
+   "note": ""
+  },
+  {
+   "case": "PLAIN:CR-current-auth-generation",
+   "observed": true,
+   "expected": true,
+   "match": true,
+   "note": ""
+  },
+  {
+   "case": "PLAIN:CR-read-grant-revoked",
+   "observed": true,
+   "expected": true,
+   "match": true,
+   "note": ""
+  },
+  {
+   "case": "PLAIN:CR-read-grant-expired-after-prepare-invoke",
+   "observed": false,
+   "expected": false,
+   "match": true,
+   "note": ""
+  },
+  {
+   "case": "PLAIN:CR-wrong-purpose-even-if-both-views-agree",
+   "observed": true,
+   "expected": true,
+   "match": true,
+   "note": ""
+  },
+  {
+   "case": "PLAIN:CR-execute-parent-fixture-refused",
+   "observed": false,
+   "expected": false,
+   "match": true,
+   "note": ""
+  },
+  {
+   "case": "PLAIN:CR-read-under-quarantine-no-effect",
+   "observed": [
+    true,
+    true
+   ],
+   "expected": [
+    true,
+    true
+   ],
+   "match": true,
+   "note": "read-only evidence lane; facts/claims/versions unchanged"
+  },
+  {
+   "case": "PLAIN:CR-UNKNOWN-parent-read-no-settlement",
+   "observed": [
+    true,
+    true
+   ],
+   "expected": [
+    true,
+    true
+   ],
+   "match": true,
+   "note": ""
+  },
+  {
+   "case": "PLAIN:CR-terminal-clean-label-refused-live-claim",
+   "observed": [
+    false,
+    true,
+    1
+   ],
+   "expected": [
+    false,
+    true,
+    1
+   ],
+   "match": true,
+   "note": ""
+  },
+  {
+   "case": "PLAIN:CR-cross-node-refused",
+   "observed": true,
+   "expected": true,
+   "match": true,
+   "note": ""
+  },
+  {
+   "case": "PLAIN:CR-duplicate-op-refused",
+   "observed": [
+    true,
+    true
+   ],
+   "expected": [
+    true,
+    true
+   ],
+   "match": true,
+   "note": ""
+  },
+  {
+   "case": "PLAIN:L3-hint-liveness",
+   "observed": [
+    "AUTHORITY_DENIED",
+    true
+   ],
+   "expected": [
+    "AUTHORITY_DENIED",
+    true
+   ],
+   "match": true,
+   "note": ""
+  },
+  {
+   "case": "PLAIN:L3-hint-grantLive",
+   "observed": [
+    "AUTHORITY_DENIED",
+    true
+   ],
+   "expected": [
+    "AUTHORITY_DENIED",
+    true
+   ],
+   "match": true,
+   "note": ""
+  },
+  {
+   "case": "PLAIN:L3-hint-expiresAt",
+   "observed": [
+    "AUTHORITY_DENIED",
+    true
+   ],
+   "expected": [
+    "AUTHORITY_DENIED",
+    true
+   ],
+   "match": true,
+   "note": ""
+  },
+  {
+   "case": "PLAIN:L3-hint-certNotAfter",
+   "observed": [
+    "AUTHORITY_DENIED",
+    true
+   ],
+   "expected": [
+    "AUTHORITY_DENIED",
+    true
+   ],
+   "match": true,
+   "note": ""
+  },
+  {
+   "case": "PLAIN:L3-hint-cross-node-connection",
+   "observed": "AUTHORITY_DENIED",
+   "expected": "AUTHORITY_DENIED",
+   "match": true,
+   "note": ""
+  },
+  {
+   "case": "PLAIN:L3-hint-after-restart-own-node-UNKNOWN-hold",
+   "observed": "UNKNOWN_PARENT_HOLD",
+   "expected": "UNKNOWN_PARENT_HOLD",
+   "match": true,
+   "note": "LIVE parent cap -> LOST_INCARNATION"
+  },
+  {
+   "case": "PLAIN:L3-hint-UNKNOWN-other-node-not-held",
+   "observed": "NO_CANDIDATES",
+   "expected": "NO_CANDIDATES",
+   "match": true,
+   "note": ""
+  },
+  {
+   "case": "PLAIN:L3-hint-UNKNOWN-other-node-available",
+   "observed": "HINT_AVAILABLE",
+   "expected": "HINT_AVAILABLE",
+   "match": true,
+   "note": ""
+  },
+  {
+   "case": "PLAIN:L3-hint-missing-scope-no-mutation",
+   "observed": [
+    "MISSING_RESOURCE_SCOPE",
+    true
+   ],
+   "expected": [
+    "MISSING_RESOURCE_SCOPE",
+    true
+   ],
+   "match": true,
+   "note": ""
+  },
+  {
+   "case": "PLAIN:L3-hint-forged-disjoint-caller-footprint-for-A-ignored",
+   "observed": "HINT_OVERLAP",
+   "expected": "HINT_OVERLAP",
+   "match": true,
+   "note": ""
+  },
+  {
+   "case": "B:M1-offline-node-frame-register",
+   "observed": true,
+   "expected": false,
+   "match": false,
+   "note": "terminal.py _current node status online/draining"
+  },
+  {
+   "case": "B:M1-offline-node-frame-invoke",
+   "observed": true,
+   "expected": false,
+   "match": false,
+   "note": ""
+  },
+  {
+   "case": "B:M1-offline-node-R12-eligible-query",
+   "observed": false,
+   "expected": false,
+   "match": true,
+   "note": ""
+  },
+  {
+   "case": "B:M1-prepared-then-offline-invoke",
+   "observed": true,
+   "expected": false,
+   "match": false,
+   "note": ""
+  },
+  {
+   "case": "B:M1-release-A-other-claim-B-rights-unchanged",
+   "observed": true,
+   "expected": true,
+   "match": true,
+   "note": ""
+  },
+  {
+   "case": "B:M1-release-A-frame-B-still-positive",
+   "observed": true,
+   "expected": true,
+   "match": true,
+   "note": ""
+  },
+  {
+   "case": "B:M1-release-A-frame-A-refused-with-other-active",
+   "observed": true,
+   "expected": true,
+   "match": true,
+   "note": ""
+  },
+  {
+   "case": "B:M1-cancel-then-original-receipt-no-double-release",
+   "observed": [
+    2,
+    true
+   ],
+   "expected": [
+    2,
+    true
+   ],
+   "match": true,
+   "note": ""
+  },
+  {
+   "case": "B:M1-readmitted-claim-old-parent-frame-refused",
+   "observed": true,
+   "expected": true,
+   "match": true,
+   "note": ""
+  },
+  {
+   "case": "B:M1-readmitted-claim-new-parent-frame-positive",
+   "observed": true,
+   "expected": true,
+   "match": true,
+   "note": ""
+  },
+  {
+   "case": "B:M1-readmit-register-blocked-while-old-parent-pending",
+   "observed": true,
+   "expected": true,
+   "match": true,
+   "note": "unresolved overlap invariant"
+  },
+  {
+   "case": "B:M1-INFO-stale-version-receipt-tombstones-newer-seeded-rights",
+   "observed": [
+    true,
+    "TERMINAL_TOMBSTONED",
+    true
+   ],
+   "expected": [
+    true,
+    "TERMINAL_TOMBSTONED",
+    true
+   ],
+   "match": true,
+   "note": "only reachable by fixture seeding; real admission gated by unresolved overlap; defence-in-depth CAS recommended"
+  },
+  {
+   "case": "B:M1-matched-lease-expired-after-prepare-invoke",
+   "observed": false,
+   "expected": false,
+   "match": true,
+   "note": ""
+  },
+  {
+   "case": "B:M1-deadline-now+5-reached-after-prepare-invoke",
+   "observed": false,
+   "expected": false,
+   "match": true,
+   "note": ""
+  },
+  {
+   "case": "B:M1-rights-version-mismatch",
+   "observed": true,
+   "expected": true,
+   "match": true,
+   "note": ""
+  },
+  {
+   "case": "B:M1-build-parent-frame-refused",
+   "observed": true,
+   "expected": true,
+   "match": true,
+   "note": ""
+  },
+  {
+   "case": "B:M1-after-restart-frame-refused",
+   "observed": true,
+   "expected": true,
+   "match": true,
+   "note": ""
+  },
+  {
+   "case": "B:M1-cross-node-frame-refused",
+   "observed": true,
+   "expected": true,
+   "match": true,
+   "note": ""
+  },
+  {
+   "case": "B:M1-node-bools-never-substitute",
+   "observed": true,
+   "expected": true,
+   "match": true,
+   "note": ""
+  },
+  {
+   "case": "B:M1-recovery-ack-closes-cancel-without-release",
+   "observed": [
+    true,
+    true,
+    1
+   ],
+   "expected": [
+    true,
+    true,
+    1
+   ],
+   "match": true,
+   "note": ""
+  },
+  {
+   "case": "B:M1-cancel-lane-after-tombstone-identity-lookup",
+   "observed": true,
+   "expected": true,
+   "match": true,
+   "note": "safety stop of possibly running UNKNOWN parent stays available; no TERMINAL access"
+  },
+  {
+   "case": "B:M1-terminal-after-tombstone-UNKNOWN-parent-refused",
+   "observed": true,
+   "expected": true,
+   "match": true,
+   "note": ""
+  },
+  {
+   "case": "B:CR-current-auth-channelEnabled",
+   "observed": true,
+   "expected": true,
+   "match": true,
+   "note": ""
+  },
+  {
+   "case": "B:CR-current-auth-keyLive",
+   "observed": true,
+   "expected": true,
+   "match": true,
+   "note": ""
+  },
+  {
+   "case": "B:CR-current-auth-certNotAfter",
+   "observed": true,
+   "expected": true,
+   "match": true,
+   "note": ""
+  },
+  {
+   "case": "B:CR-current-auth-observeGrantLive",
+   "observed": true,
+   "expected": true,
+   "match": true,
+   "note": ""
+  },
+  {
+   "case": "B:CR-current-auth-observeGrantUntil",
+   "observed": true,
+   "expected": true,
+   "match": true,
+   "note": ""
+  },
+  {
+   "case": "B:CR-current-auth-fenced",
+   "observed": true,
+   "expected": true,
+   "match": true,
+   "note": ""
+  },
+  {
+   "case": "B:CR-current-auth-C",
+   "observed": true,
+   "expected": true,
+   "match": true,
+   "note": ""
+  },
+  {
+   "case": "B:CR-current-auth-DER",
+   "observed": true,
+   "expected": true,
+   "match": true,
+   "note": ""
+  },
+  {
+   "case": "B:CR-current-auth-generation",
+   "observed": true,
+   "expected": true,
+   "match": true,
+   "note": ""
+  },
+  {
+   "case": "B:CR-read-grant-revoked",
+   "observed": true,
+   "expected": true,
+   "match": true,
+   "note": ""
+  },
+  {
+   "case": "B:CR-read-grant-expired-after-prepare-invoke",
+   "observed": false,
+   "expected": false,
+   "match": true,
+   "note": ""
+  },
+  {
+   "case": "B:CR-wrong-purpose-even-if-both-views-agree",
+   "observed": true,
+   "expected": true,
+   "match": true,
+   "note": ""
+  },
+  {
+   "case": "B:CR-execute-parent-fixture-refused",
+   "observed": false,
+   "expected": false,
+   "match": true,
+   "note": ""
+  },
+  {
+   "case": "B:CR-read-under-quarantine-no-effect",
+   "observed": [
+    true,
+    true
+   ],
+   "expected": [
+    true,
+    true
+   ],
+   "match": true,
+   "note": "read-only evidence lane; facts/claims/versions unchanged"
+  },
+  {
+   "case": "B:CR-UNKNOWN-parent-read-no-settlement",
+   "observed": [
+    true,
+    true
+   ],
+   "expected": [
+    true,
+    true
+   ],
+   "match": true,
+   "note": ""
+  },
+  {
+   "case": "B:CR-terminal-clean-label-refused-live-claim",
+   "observed": [
+    false,
+    true,
+    1
+   ],
+   "expected": [
+    false,
+    true,
+    1
+   ],
+   "match": true,
+   "note": ""
+  },
+  {
+   "case": "B:CR-cross-node-refused",
+   "observed": true,
+   "expected": true,
+   "match": true,
+   "note": ""
+  },
+  {
+   "case": "B:CR-duplicate-op-refused",
+   "observed": [
+    true,
+    true
+   ],
+   "expected": [
+    true,
+    true
+   ],
+   "match": true,
+   "note": ""
+  },
+  {
+   "case": "B:CR-lineage-tombstone-not-channel-revoke",
+   "observed": true,
+   "expected": true,
+   "match": true,
+   "note": "catalog: lineage tombstone alone is not observe/channel revocation"
+  },
+  {
+   "case": "B:L3-hint-liveness",
+   "observed": [
+    "AUTHORITY_DENIED",
+    true
+   ],
+   "expected": [
+    "AUTHORITY_DENIED",
+    true
+   ],
+   "match": true,
+   "note": ""
+  },
+  {
+   "case": "B:L3-hint-grantLive",
+   "observed": [
+    "AUTHORITY_DENIED",
+    true
+   ],
+   "expected": [
+    "AUTHORITY_DENIED",
+    true
+   ],
+   "match": true,
+   "note": ""
+  },
+  {
+   "case": "B:L3-hint-expiresAt",
+   "observed": [
+    "AUTHORITY_DENIED",
+    true
+   ],
+   "expected": [
+    "AUTHORITY_DENIED",
+    true
+   ],
+   "match": true,
+   "note": ""
+  },
+  {
+   "case": "B:L3-hint-certNotAfter",
+   "observed": [
+    "AUTHORITY_DENIED",
+    true
+   ],
+   "expected": [
+    "AUTHORITY_DENIED",
+    true
+   ],
+   "match": true,
+   "note": ""
+  },
+  {
+   "case": "B:L3-hint-cross-node-connection",
+   "observed": "AUTHORITY_DENIED",
+   "expected": "AUTHORITY_DENIED",
+   "match": true,
+   "note": ""
+  },
+  {
+   "case": "B:L3-hint-after-restart-own-node-UNKNOWN-hold",
+   "observed": "UNKNOWN_PARENT_HOLD",
+   "expected": "UNKNOWN_PARENT_HOLD",
+   "match": true,
+   "note": "LIVE parent cap -> LOST_INCARNATION"
+  },
+  {
+   "case": "B:L3-hint-UNKNOWN-other-node-not-held",
+   "observed": "NO_CANDIDATES",
+   "expected": "NO_CANDIDATES",
+   "match": true,
+   "note": ""
+  },
+  {
+   "case": "B:L3-hint-UNKNOWN-other-node-available",
+   "observed": "HINT_AVAILABLE",
+   "expected": "HINT_AVAILABLE",
+   "match": true,
+   "note": ""
+  },
+  {
+   "case": "B:L3-hint-missing-scope-no-mutation",
+   "observed": [
+    "MISSING_RESOURCE_SCOPE",
+    true
+   ],
+   "expected": [
+    "MISSING_RESOURCE_SCOPE",
+    true
+   ],
+   "match": true,
+   "note": ""
+  },
+  {
+   "case": "B:L3-hint-forged-disjoint-caller-footprint-for-A-ignored",
+   "observed": "HINT_OVERLAP",
+   "expected": "HINT_OVERLAP",
+   "match": true,
+   "note": ""
+  },
+  {
+   "case": "B:L3-hint-lineage-tombstone-business-denied",
+   "observed": "AUTHORITY_DENIED",
+   "expected": "AUTHORITY_DENIED",
+   "match": true,
+   "note": ""
+  }
+ ],
+ "total": 102,
+ "mismatches": [
+  "PLAIN:M1-offline-node-frame-register",
+  "PLAIN:M1-offline-node-frame-invoke",
+  "PLAIN:M1-prepared-then-offline-invoke",
+  "B:M1-offline-node-frame-register",
+  "B:M1-offline-node-frame-invoke",
+  "B:M1-prepared-then-offline-invoke"
+ ]
+}

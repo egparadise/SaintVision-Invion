@@ -1,0 +1,118 @@
+{
+  "executionOwner": "Codex OWNER reproduction of original Claude-authored scripts",
+  "notIndependentRev9Review": true,
+  "tfOriginalScriptUnmodified": [
+    {
+      "expectedDefect": true,
+      "observed": {
+        "defect": true,
+        "matchedClaimReleased": true,
+        "model": "fleet5-b-contract-rev7-20261106-codex",
+        "nodeLeaseActive": true,
+        "otherClaimsOnNode": [
+          "claim-1"
+        ],
+        "parentConfirmedTerminalClean": true,
+        "releasedClaimRightsRetained": true,
+        "terminalFrameInvoked": true,
+        "terminalFrameRegistered": true
+      },
+      "receipt": {
+        "command": [
+          "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+          "-B",
+          "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105\\docs\\vault\\30_Development\\Evidence\\fleet5-b-rev9b-20261106-codex\\prior-reviewer_tf_released_claim_probe.py.txt",
+          "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105\\docs\\vault\\30_Development\\Evidence\\fleet5-b-contract-rev7-20261106-codex"
+        ],
+        "actualExit": 0,
+        "scriptSHA256": "1cc13e8b8428afb2737e763b0fe8e4dca6498b70007e8f2d7dc23206044ac4e8",
+        "stdoutSHA256": "5d56303e6fc69cbe3145b7fb5784b08edc18e8b647699aef5d5f4e76f926829a",
+        "log": "actual-tf-probe-fleet5-b-contract-rev7-20261106-codex.log"
+      }
+    },
+    {
+      "expectedDefect": true,
+      "observed": {
+        "defect": true,
+        "matchedClaimReleased": true,
+        "model": "fleet5-b-rev8-revoke-portcut-20261106-codex",
+        "nodeLeaseActive": true,
+        "otherClaimsOnNode": [
+          "claim-1"
+        ],
+        "parentConfirmedTerminalClean": true,
+        "releasedClaimRightsRetained": true,
+        "terminalFrameInvoked": true,
+        "terminalFrameRegistered": true
+      },
+      "receipt": {
+        "command": [
+          "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+          "-B",
+          "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105\\docs\\vault\\30_Development\\Evidence\\fleet5-b-rev9b-20261106-codex\\prior-reviewer_tf_released_claim_probe.py.txt",
+          "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105\\docs\\vault\\30_Development\\Evidence\\fleet5-b-rev8-revoke-portcut-20261106-codex"
+        ],
+        "actualExit": 0,
+        "scriptSHA256": "1cc13e8b8428afb2737e763b0fe8e4dca6498b70007e8f2d7dc23206044ac4e8",
+        "stdoutSHA256": "8662b0c85b1bdee172ea2ffa8f94e4e1649ab8647f568ce3bca516d7f09c43e5",
+        "log": "actual-tf-probe-fleet5-b-rev8-revoke-portcut-20261106-codex.log"
+      }
+    },
+    {
+      "expectedDefect": false,
+      "observed": {
+        "defect": false,
+        "matchedClaimReleased": true,
+        "model": "fleet5-b-rev9b-20261106-codex",
+        "nodeLeaseActive": true,
+        "otherClaimsOnNode": [
+          "claim-1"
+        ],
+        "parentConfirmedTerminalClean": true,
+        "releasedClaimRightsRetained": true,
+        "terminalFrameInvoked": false,
+        "terminalFrameRegistered": false
+      },
+      "receipt": {
+        "command": [
+          "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+          "-B",
+          "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105\\docs\\vault\\30_Development\\Evidence\\fleet5-b-rev9b-20261106-codex\\prior-reviewer_tf_released_claim_probe.py.txt",
+          "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105\\docs\\vault\\30_Development\\Evidence\\fleet5-b-rev9b-20261106-codex"
+        ],
+        "actualExit": 0,
+        "scriptSHA256": "1cc13e8b8428afb2737e763b0fe8e4dca6498b70007e8f2d7dc23206044ac4e8",
+        "stdoutSHA256": "d2b114f13e6335e5453bc9bb45322f909fbff5461b2a18ffba4dc8dd86abbed6",
+        "log": "actual-tf-probe-fleet5-b-rev9b-20261106-codex.log"
+      }
+    }
+  ],
+  "retainedRecoveryHintCases": 79,
+  "retainedRecoveryReceipt": {
+    "command": [
+      "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+      "-B",
+      "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105\\docs\\vault\\30_Development\\Evidence\\fleet5-b-rev9b-20261106-codex\\prior-reviewer_m1_l2_rev8_attacks.py.txt",
+      "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105\\docs\\vault\\30_Development\\Evidence\\fleet5-b-rev9b-20261106-codex"
+    ],
+    "actualExit": 0,
+    "scriptSHA256": "b51a88933dc528b57bdf759bcdcbbeff652f3e19496ad86850dc936d61df43dc",
+    "stdoutSHA256": "0ab516670e3e8b81c2c12aa6673171de9b564c617a24da28d872b5eeb869add4",
+    "log": "actual-prior-recovery-hints-owner-rerun.log"
+  },
+  "retainedPriorClosedCases": 8,
+  "retainedPriorClosedReceipt": {
+    "command": [
+      "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+      "-B",
+      "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105\\docs\\vault\\30_Development\\Evidence\\fleet5-b-contract-rev7-20261106-codex\\prior-reviewer_l3l4_attacks.py.txt",
+      "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105\\docs\\vault\\30_Development\\Evidence\\fleet5-b-rev9b-20261106-codex"
+    ],
+    "actualExit": 0,
+    "scriptSHA256": "776c7708cf8b12f7a01f46e711d3760094e9e643bf57ca52184e78c681ba8365",
+    "stdoutSHA256": "f3f29399c6d6a8b916ea98df62753ec479ef505832b6c7b0e9f8c12f6343376c",
+    "log": "actual-prior-closed-owner-rerun.log"
+  },
+  "actualRuntimeB": 0,
+  "realBindings": null
+}
