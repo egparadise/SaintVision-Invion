@@ -1,0 +1,106 @@
+"""Independent reviewer mutations of the Rev8 A1/A2 analysis rules (owner bounded_analysis.py).
+
+Key difference from owner analysis_tests.py: every source mutation re-parses the mutated
+text AND shifts the recorded ledger spans by the inserted line count, so a rule can only
+"block" because of its own predicate, not because of an expression-hash/span mismatch.
+No application import/DB/Node IO. Reads <=3 source files via owner git-show cache.
+"""
+import ast, sys, json, copy, hashlib
+sys.dont_write_bytecode = True
+sys.path.insert(0, sys.argv[1])
+import bounded_analysis as a  # noqa: E402
+
+results = []
+
+
+def case(cid, claim, expected, actual, note=''):
+    results.append({'id': cid, 'claim': claim, 'expected': expected, 'actual': actual, 'defect': expected != actual, 'note': note})
+
+
+text = a.source('services/control-plane/src/inv/node_channels.py')
+calls = [c for c in a.rows('classifiedCalls') if c['function'] == a.PILOT]
+records = [r for r in a.rows('records') if r['function'] == a.PILOT]
+unknown = [c for c in calls if c['classification'] == 'UNRESOLVED' and 'fetchone' in c['spelling']]
+lines = text.splitlines(keepends=True)
+pilot_fn = next(f for f in a.functions(text) if f.name == 'revoke_channel')
+# provision_channel has a byte-identical with-header at an earlier line; bind to the pilot function only.
+with_line = next(i for i, l in enumerate(lines, 1) if i > pilot_fn.lineno and l.startswith('    with conn.transaction(), conn.cursor(row_factory=tuple_row) as cursor:'))
+assert pilot_fn.lineno < with_line <= pilot_fn.end_lineno
+
+
+def shifted(rows, after, k):
+    out = []
+    for r in rows:
+        r = copy.deepcopy(r)
+        if r['line'] > after:
+            r['line'] += k; r['endLine'] += k
+        out.append(r)
+    return out
+
+
+def mutate_after_with(stmt):
+    m = ''.join(lines[:with_line]) + '        ' + stmt + '\n' + ''.join(lines[with_line:])
+    return m, shifted(records, with_line, 1), shifted(calls, with_line, 1)
+
+
+def a1(mtext, mrecords, mcalls, target):
+    node = next(n for n in ast.walk(ast.parse(mtext)) if isinstance(n, ast.Call)
+                and a.span(n) == (target['line'], target['column'], target['endLine'], target['endColumn']))
+    return a.cursor_result(mtext, node, mrecords, mcalls)
+
+
+# Baseline on actual source.
+case('A1-baseline-actual', 'actual recorded fetchone results close', 'PROOF', 'PROOF' if all(a1(text, records, calls, u) for u in unknown) else 'NONE')
+
+# Owner test 'A1-cursor-rebinding-BLOCK' reconstructed: mutated text but ORIGINAL node/spans.
+owner_mut = text.replace('    with conn.transaction(), conn.cursor(row_factory=tuple_row) as cursor:\n        cursor.execute(',
+                         '    with conn.transaction(), conn.cursor(row_factory=tuple_row) as cursor:\n        cursor = foreign_cursor\n        cursor.execute(')
+orig_node = a.node_at(text, unknown[0]); inner = orig_node.func.value
+seg = ast.get_source_segment(owner_mut, inner) or ''
+rec = next(r for r in records if a.span(inner) == (r['line'], r['column'], r['endLine'], r['endColumn']))
+hash_mismatch = hashlib.sha256(seg.encode()).hexdigest() != rec['expressionSHA256']
+case('owner-rebinding-test-is-span-vacuous',
+     'owner A1-cursor-rebinding-BLOCK passes for its own predicate, not an expression-hash/span mismatch',
+     'PREDICATE', 'HASH_MISMATCH' if hash_mismatch else 'PREDICATE',
+     'owner passes original-text node spans against mutated text; the segment at the old span is no longer the recorded execute')
+
+# Correct span-shifted mutations.
+for stmt, expect, cid in [
+        ('cursor = foreign_cursor', 'NONE', 'A1-shifted-name-rebind'),
+        ('cursor.execute = foreign_execute', 'NONE', 'A1-shifted-attribute-monkeypatch'),
+        ("setattr(cursor, 'execute', foreign_execute)", 'NONE', 'A1-shifted-setattr-monkeypatch'),
+        ('(cursor := foreign_cursor)', 'NONE', 'A1-shifted-walrus-rebind'),
+        ('conn = foreign_conn', 'PROOF', 'A1-shifted-benign-conn-rebind-after-cursor'),
+        ('pass', 'PROOF', 'A1-shifted-control-pass')]:
+    m, r2, c2 = mutate_after_with(stmt)
+    got = 'PROOF' if a1(m, r2, c2, shifted([unknown[0]], with_line, 1)[0]) else 'NONE'
+    case(cid, 'A1 must refuse receiver laundering/monkeypatch after the recorded cursor factory' if expect == 'NONE'
+         else 'control: statement that cannot change the already-created cursor keeps proof', expect, got)
+
+# A2 constructor mutations of actual inv/errors.py DomainError.
+errors = a.source('services/control-plane/src/inv/errors.py')
+case('A2-baseline', 'actual DomainError closes', True, a.error_initializer(errors, 'DomainError'))
+for cid, mutated in [
+        ('A2-metaclass-keyword', errors.replace('class DomainError(Exception):', 'class DomainError(Exception, metaclass=Evil):')),
+        ('A2-reimport-dataclass-shadow', errors.replace('from dataclasses import dataclass\n', 'from dataclasses import dataclass\nfrom evil import dataclass\n')),
+        ('A2-import-Exception-shadow', errors.replace('from dataclasses import dataclass\n', 'from dataclasses import dataclass\nfrom evil import Exception\n')),
+        ('A2-module-getattr-hook', errors + '\n\ndef __getattr__(name):\n    return name\n'),
+        ('A2-init_subclass-on-base', errors.replace('class DomainError(Exception):', 'class _B(Exception):\n    def __init_subclass__(cls, **kw):\n        socket.send(b"x")\n\n\n@dataclass\nclass DomainError(_B):', 1)),
+        ('A2-str-field-default-factory-call', errors.replace('    retryable: bool = False', '    retryable: bool = field(default_factory=dict)'))]:
+    got = a.error_initializer(mutated, 'DomainError')
+    # Benign controls: owner-allowed field factory; module __getattr__ only serves missing module attributes.
+    expected = cid in ('A2-str-field-default-factory-call', 'A2-module-getattr-hook')
+    case(cid, 'A2 must refuse constructor-time code injection' if not expected else 'control: cannot affect DomainError construction', expected, got)
+
+# A2 call-site provenance: the rule checks the import exists but not later rebinding of the name in the caller.
+caller_mut = text + '\n\nDomainError = foreign_factory\n'
+tree = ast.parse(caller_mut)
+import_ok = any(isinstance(n, ast.ImportFrom) and n.module == 'errors' and n.level == 1 and any(x.name == 'DomainError' and not x.asname for x in n.names) for n in tree.body)
+rebound = any(isinstance(n, ast.Name) and n.id == 'DomainError' and isinstance(n.ctx, ast.Store) for n in ast.walk(tree))
+case('A2-caller-name-rebinding-checked', 'A2 call-site proof must reject a later module rebinding of DomainError', 'CHECKED',
+     'UNCHECKED' if import_ok and rebound else 'CHECKED',
+     'bounded_analysis.main asserts only ImportFrom presence and trusts immutable inferredTarget; no Store-of-DomainError scan')
+
+print(json.dumps({'reviewer': 'Claude independent', 'scope': 'static AST mutations of owner A1/A2 rule functions only',
+                  'cases': results, 'defects': [r['id'] for r in results if r['defect']],
+                  'sourceFiles': len(a.CACHE), 'sourceBytes': sum(map(len, a.CACHE.values()))}, indent=1, sort_keys=True))

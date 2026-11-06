@@ -1,0 +1,106 @@
+"""Reviewer (Claude) Rev9b M2/L1 static probes against the OWNER pipeline.
+Parse-only: no mutant is imported or executed. Every mutant is fresh-AST valid and
+passes a producer-sanity check (recorded witness spans/expression hashes for the
+touched file still resolve on the mutated bytes) BEFORE its verdict is read.
+Usage: python -B reviewer_rev9b_m2_l1_static.py <absolute Rev9b evidence dir> <out.json>"""
+import ast, hashlib, json, subprocess, sys
+from collections import Counter
+from pathlib import Path
+E = Path(sys.argv[1]).resolve(strict=True); OUT = Path(sys.argv[2])
+sys.path.insert(0, str(E))
+import t1_provenance as t, constructor_graph as cg, use_sites as u, source_bindings as sb
+assert Path(t.__file__).resolve().parent == E and Path(cg.__file__).resolve().parent == E
+ROOT = sb.ROOT; SRC = sb.SOURCE
+def sha(s): return hashlib.sha256(s.encode()).hexdigest()
+closure = json.loads((E / 't1-mark-offline-closure.json').read_bytes())
+A8 = closure['narrowA8Proof']
+WITNESS = [r['source'] for r in A8['completeConstructorGraph']['productionConstructorProofs']] + [h['source'] for h in A8['completeConstructorGraph']['localHelperProofs']] + [{'path': d['path'], 'span': d['span'], 'expressionSHA256': d['expressionSHA256']} for d in A8['productionDatabaseConstructors']]
+def sanity(path, mutated, intentionally_changed=()):
+    """Fresh AST + every recorded witness in this file still resolves (span + expression hash), except spans the case deliberately rewrites."""
+    tree = ast.parse(mutated); checked = 0
+    for w in WITNESS:
+        if w['path'] != path or tuple(w['span']) in intentionally_changed: continue
+        l, c, el, ec = w['span']
+        node = next((n for n in ast.walk(tree) if getattr(n, 'lineno', None) == l and n.col_offset == c and n.end_lineno == el and n.end_col_offset == ec), None)
+        if node is None or sha(ast.get_source_segment(mutated, node)) != w['expressionSHA256']: return False, checked
+        checked += 1
+    return True, checked
+core = t.read_batch([t.CP + n for n in t.CORE] + ['tools/remote_workspace_entry.py']); ctors = t.read_batch(t.MAIN_CTOR_PATHS)
+R = []
+def case(name, expected, verdict, **data):
+    R.append({'case': name, 'expected': expected, 'observed': verdict, 'asExpected': expected == verdict, **data}); print(json.dumps(R[-1])[:400], flush=True)
+def run(name, path, mutated, expected, changed=(), feed='both'):
+    ok, checked = sanity(path, mutated, changed)
+    if not ok: case(name, expected, 'SANITY_FAILED'); return
+    c2 = dict(core); k2 = dict(ctors)
+    if path in c2: c2[path] = mutated
+    if path in k2: k2[path] = mutated
+    _, gerr = cg.prove({**c2, **k2}); _, perr = t.provenance(c2, k2)
+    case(name, expected, 'ACCEPT' if perr is None else 'REFUSE', graphError=gerr, provenanceError=perr, sourceSHA256=sha(mutated), producerSanity=True, witnessesChecked=checked, parsedOnly=True)
+# ---------- positives ----------
+owner, err = t.provenance(core, ctors); g = owner['completeConstructorGraph'] if owner else None
+case('actual-positive', 'ACCEPT', 'ACCEPT' if err is None else 'REFUSE', error=err, production=len(g['census']['production']), harness=len(g['census']['harness']), unions=g['classDbInputUnions'])
+# ---------- independent census (reviewer's own, repo-wide, all paths) ----------
+names = {'ObservationWorker', 'NodeObservation', 'RestrictedWorkspaceRuntime'}
+files = subprocess.check_output(['git', 'grep', '-l', '-E', '|'.join(names), SRC, '--', '*.py'], cwd=ROOT).decode().split()
+mine = []
+for entry in files:
+    p = entry.split(':', 1)[1]; s = subprocess.check_output(['git', 'show', SRC + ':' + p], cwd=ROOT).decode('utf-8-sig'); tr = ast.parse(s)
+    for n in ast.walk(tr):
+        if isinstance(n, ast.Call):
+            nm = n.func.id if isinstance(n.func, ast.Name) else n.func.attr if isinstance(n.func, ast.Attribute) else None
+            alias = {a.asname: a.name for x in ast.walk(tr) if isinstance(x, ast.ImportFrom) for a in x.names if a.asname}
+            if nm in names or alias.get(nm) in names: mine.append((p, n.lineno))
+own = sorted((r['source']['path'], r['source']['span'][0]) for r in g['census']['production'] + g['census']['harness'])
+case('independent-repo-wide-constructor-census-equals-owner', True, sorted(mine) == own, reviewerCount=len(mine), ownerCount=len(own), reviewerProduction=len([m for m in mine if not m[0].startswith('tests/')]), filesWithNames=len(files))
+fw = subprocess.check_output(['git', 'grep', '-n', 'configured_workspace', SRC, '--', '*.py'], cwd=ROOT).decode().splitlines()
+case('forwarding-caller-configured_workspace-repo-wide', 'app.py:1323 + self-recursion only (tests monkeypatch)', 'app.py:1323 + self-recursion only (tests monkeypatch)' if [x.split(':')[1] + ':' + x.split(':')[2] for x in fw if 'configured_workspace(' in x and 'def ' not in x] == ['services/control-plane/src/inv/app.py:1323', 'services/control-plane/src/inv/workspace_config.py:87'] else 'OTHER', lines=fw)
+census_paths = [f['path'] for f in g['census']['sourceFiles']]
+case('owner-derived-census-files-include-forwarding-caller-app.py', False, 'services/control-plane/src/inv/app.py' in census_paths, note='app.py enters only through the hand-written t1_provenance.CORE list', censusCommand=g['census']['command'])
+# ---------- M2 negatives: lan_pilot root forms ----------
+LP = 'tools/lan_pilot.py'; lp = ctors[LP]; CALL = 'ObservationWorker(runtime(state), '; CSPAN = (3945, 15, 3945, 82)
+run('lan_pilot-local-alias-assignment', LP, lp.replace(CALL, 'OW(object(), ', 1) + '\nOW = ObservationWorker\n', 'REFUSE', {CSPAN})
+run('lan_pilot-subclass-root', LP, lp.replace(CALL, '_W(object(), ', 1) + '\nclass _W(ObservationWorker):\n    pass\n', 'REFUSE', {CSPAN})
+run('lan_pilot-lambda-box', LP, lp.replace(CALL, '(lambda *a: ObservationWorker(object(), a[1]))(runtime(state), ', 1), 'REFUSE', {CSPAN})
+run('lan_pilot-list-box', LP, lp.replace(CALL, '[ObservationWorker][0](object(), ', 1), 'REFUSE', {CSPAN})
+same_line_import = lambda s, mod: s.replace('\nimport argparse\n', '\nimport argparse, ' + mod + '\n', 1)
+run('lan_pilot-importlib-attribute-root', LP, same_line_import(lp, 'importlib').replace(CALL, "importlib.import_module('inv.observer_worker').ObservationWorker(object(), ", 1), 'REFUSE', {CSPAN})
+run('lan_pilot-string-reflective-root-object', LP, same_line_import(lp, 'operator').replace(CALL, "operator.attrgetter('ObservationWorker')(sys.modules['inv.observer_worker'])(object(), ", 1), 'REFUSE', {CSPAN})
+run('lan_pilot-string-reflective-root-foreign-db', LP, same_line_import(lp, 'operator').replace(CALL, "operator.attrgetter('ObservationWorker')(sys.modules['inv.observer_worker'])(foreign_database, ", 1), 'REFUSE', {CSPAN})
+m = same_line_import(lp, 'operator').replace(CALL, "operator.attrgetter('ObservationWorker')(sys.modules['inv.observer_worker'])(runtime(state), ", 1)
+c2 = dict(ctors); c2[LP] = m; gg, _ = cg.prove({**core, **c2})
+case('lan_pilot-string-reflective-root-census-row-count', 6, len(gg['census']['production']) if gg else None, note='a vanished production root is not itself a refusal')
+# ---------- M2: forwarding-caller layer ----------
+AP = t.CP + 'app.py'
+run('app.py-extra-configured_workspace-caller-in-sources', AP, core[AP] + '\nfrom .workspace_config import configured_workspace as _cw\n\ndef _extra_root(tenant, settings):\n    return _cw(foreign_database, tenant, settings)\n', 'REFUSE')
+BH = t.CP + 'business_handoff.py'; bh = sb.frozen_source(BH)
+bm = bh + '\nfrom .workspace_config import configured_workspace as _cw\n\ndef _extra_root(tenant, settings):\n    return _cw(foreign_database, tenant, settings)\n'
+ast.parse(bm)
+cen = cg.current_census({BH: bm}); _, perr = t.provenance(core, ctors)
+case('uncatalogued-production-file-extra-configured_workspace-caller-owner-pipeline', 'REFUSE', 'ACCEPT' if perr is None else 'REFUSE', provenanceError=perr, censusProductionRows=len(cen['production']), mutantFileInOwnerInputs=BH in {**core, **ctors}, sourceSHA256=sha(bm), parsedOnly=True)
+_, gerr = cg.prove({**core, **ctors, BH: bm})
+case('same-mutant-when-file-is-hand-added-to-sources', 'REFUSE', 'ACCEPT' if gerr is None else 'REFUSE', graphError=gerr)
+# ---------- M2 INFO: graph binding forms (flow-insensitive, With/For targets untracked) ----------
+OW = t.CP + 'observer_worker.py'; ow = core[OW]; WLINE = '        worker = ObservationWorker(db, NodeTLSClient(**tls))\n'
+assert ow.count(WLINE) == 1
+for label, stmt in (('with-as-rebind', '        with foreign_context() as db:\n            pass\n'), ('for-target-rebind', '        for db in (foreign_database,):\n            pass\n')):
+    mm = ow.replace(WLINE, stmt + WLINE, 1); ok, chk = sanity(OW, mm, {(58, 17, 58, 60), (18, 43, 18, 76)})
+    c2 = dict(core); k2 = dict(ctors); c2[OW] = mm; k2[OW] = mm
+    _, gerr = cg.prove({**c2, **k2}); _, perr = t.provenance(c2, k2)
+    case('observer_worker-' + label + '-graph-vs-full', 'graph ACCEPT masked by use-site REFUSE', ('graph ACCEPT' if gerr is None else 'graph REFUSE') + ' / ' + ('full ACCEPT' if perr is None else 'full REFUSE'), graphError=gerr, provenanceError=perr, producerSanity=ok, sourceSHA256=sha(mm))
+# ---------- L1 negatives / escapes ----------
+DBLINE = '        worker = ObservationWorker(db, NodeTLSClient(**tls))\n'
+for label, stmt in (('post-construction-observer-store', 'db.statement_observer = print'), ('generic-setattr-spelling', "setattr(db, 'statement_' + 'observer', print)"),
+                    ('nested-owner-db-store', 'worker.observer.db = foreign_database'), ('worker-escape-to-foreign', 'foreign(worker)'), ('db-transaction-method-escape', 'foreign(db.transaction)')):
+    run('observer_worker-' + label, OW, ow.replace(DBLINE, DBLINE + '        ' + stmt + '\n', 1), 'REFUSE', {(58, 17, 58, 60), (18, 43, 18, 76)})
+WC = t.CP + 'workspace_config.py'; wc = core[WC]; LOOP = '    for runtime in pool.values():\n        runtime.destinations = pool\n'
+assert wc.count(LOOP) == 1
+for label, stmt in (('for-target-owner-escape', 'register_runtime(runtime)'), ('for-target-owner-db-escape', 'register_runtime(runtime.db)'), ('for-target-owner-db-method-escape', 'register_runtime(runtime.db.transaction)'),
+                    ('for-target-owner-db-store-control', 'runtime.db = foreign_database'), ('result-owner-escape-control', 'register_runtime(result.runtime)')):
+    run('workspace_config-' + label, WC, wc.replace(LOOP, LOOP + '        from foreign_module import register_runtime\n        ' + stmt + '\n', 1), 'REFUSE')
+APPLINE = '            workspace = configured_workspace(database, identity.tenant_id, settings["workspace"])\n'
+assert core[AP].count(APPLINE) == 1
+for label, stmt in (('factory-result-owner-escape', 'register_workspace(workspace)'), ('factory-result-db-escape', 'register_workspace(workspace.runtime.db)'), ('factory-result-db-store-control', 'workspace.runtime.db = foreign_database')):
+    run('app.py-' + label, AP, core[AP].replace(APPLINE, APPLINE + '            from foreign_module import register_workspace\n            ' + stmt + '\n', 1), 'REFUSE')
+OUT.write_text(json.dumps({'reviewer': 'Claude', 'evidence': E.name, 'source': SRC, 'cases': R, 'effectfulMutantsImportedOrExecuted': False, 'actualRuntimeB': 0}, indent=1))
+print(json.dumps({'cases': len(R), 'unexpected': [r['case'] for r in R if not r['asExpected']]}))

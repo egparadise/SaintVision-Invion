@@ -1,0 +1,45 @@
+{
+  "task": "FLEET5-B-REV9E-FIX-ONLY-20261107",
+  "modelLifecycleSHA256": {
+    "model.py": "f7384016f72b5f6b9d369925a3a6d864012f286351db38d97993a5f95be78acf",
+    "lifecycle.py": "710c6aafa1829d9aecc25b8e591c4f2a8ec01b0927a45cf6e7ba7b13b75977b0"
+  },
+  "obligations": [
+    {
+      "id": "B9B-I3-FUTURE-TENANT-EPOCH",
+      "state": "PENDING_BEFORE_ANY_EPOCH_WRITER",
+      "currentBound": "Model tenant_execution is keyed by tenantId/epoch; control_epoch is fixed and current scope must match it; model bytes intentionally unchanged",
+      "trigger": "Any future model epoch writer or cross-epoch Node admission",
+      "requiredBeforeGrant": [
+        "Preserve tenant-wide kill-switch denial across epochs or prove equivalent tenant-wide containment",
+        "Test stopped tenant with a newly added Node under a new epoch",
+        "Keep terminal register/invoke/confirm and all-Node stop predicates current"
+      ],
+      "actualBinding": null,
+      "codeGrant": false,
+      "runtimeGrant": false
+    },
+    {
+      "id": "B9C-I3-HARNESS-FUNCTION-SCOPE-ALIASES",
+      "state": "INFO_HARNESS_ONLY_LIMITATION",
+      "path": "tests/core/test_object_store_provider_binding.py",
+      "lines": [
+        500,
+        514
+      ],
+      "bound": "Module-scope exports and resolved calls are inventoried; function-scope import aliases used only for monkeypatches are not an exhaustive harness alias inventory",
+      "productionStatusUpgrade": false
+    },
+    {
+      "id": "B9B-I4-NO-NEW-USE-SCOPE",
+      "state": "RETAINED_SCOPE_BOUND",
+      "bound": "Frozen72028 allowlists prove no new protected uses; they do not prove existing uses benign. Full receiver, parameter and universe provenance is required; graph alone is insufficient.",
+      "actualBinding": null
+    }
+  ],
+  "sourceUniverseBound": "Frozen72028 grep union plus supplied overlays. Every changed source must be supplied; this is not arbitrary Python/unprovided-module reflection completeness.",
+  "discoverySeedBound": "Frozen parameter/allowlist factories and exports are seeded from current bounded discovery. Frozen-only exact context/multiplicity remains required; this information does not upgrade existing-use benignity or runtime acceptance.",
+  "actualRuntimeB": 0,
+  "realBindings": null,
+  "A1_A16": "PENDING"
+}

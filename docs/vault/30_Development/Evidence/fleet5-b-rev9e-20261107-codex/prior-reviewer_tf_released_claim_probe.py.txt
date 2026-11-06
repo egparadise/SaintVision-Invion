@@ -1,0 +1,27 @@
+"""Reviewer probe: TERMINAL_FRAME continuation after the matched claim is released.
+
+Runs the same scenario against a given owner model directory (immutable Rev7 or Rev8)
+to classify the defect as retained vs new. Symbolic only.
+"""
+import sys, json
+sys.dont_write_bytecode = True
+sys.path.insert(0, sys.argv[1])
+import model as M  # noqa: E402
+
+w = M.World(); s = M.scope(); c = w.connect(M.VER); n = w.nodes[M.sk(s)]
+p = w.register(c, M.binding(w, op='parent'))
+b = w.obligations[w.handles[p.handle_hash]['key']]['binding']
+assert w.invoke(p, b['bodySHA'], b['method'], b['rawPath'])
+claim = b['claimBindingSHA']
+confirmed = w.confirm(c, p, w.outcome(p, 'TERMINAL_CLEAN'))
+released = claim not in n['activeClaims']
+t = w.register(c, M.binding(w, op='frame', kind='TERMINAL_FRAME', parent=p.handle_hash))
+sent = False
+if t is not None:
+    tb = w.obligations[w.handles[t.handle_hash]['key']]['binding']
+    sent = w.invoke(t, tb['bodySHA'], tb['method'], tb['rawPath'])
+print(json.dumps({'model': sys.argv[1].replace('\\', '/').split('/Evidence/')[-1], 'parentConfirmedTerminalClean': confirmed,
+                  'matchedClaimReleased': released, 'otherClaimsOnNode': sorted(x for x in n['activeClaims'] if x != claim),
+                  'nodeLeaseActive': n['leaseActive'], 'releasedClaimRightsRetained': claim in n.get('claimRights', {}),
+                  'terminalFrameRegistered': t is not None, 'terminalFrameInvoked': sent,
+                  'defect': bool(released and t is not None and sent)}, sort_keys=True))

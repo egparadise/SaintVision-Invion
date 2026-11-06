@@ -1,0 +1,336 @@
+{
+  "cases": [
+    {
+      "case": "sys-name",
+      "pass": true,
+      "unknown": true,
+      "sha256": "3ea5d7eeb92e982066bcad2219c6eb0c6b4c307acd4f9f12dfcc709511ea2ea3"
+    },
+    {
+      "case": "sys-fstring",
+      "pass": true,
+      "unknown": true,
+      "sha256": "93b8d3cc69e25746da0cb8ad19760e8efa2c9748881f1f07e2695efc9e1abc49"
+    },
+    {
+      "case": "sys-attribute",
+      "pass": true,
+      "unknown": true,
+      "sha256": "6a63f189d9a3c17729a39b2f615f4b118248769c8b1bbafc83ec7e117441425a"
+    },
+    {
+      "case": "sys-subscript",
+      "pass": true,
+      "unknown": true,
+      "sha256": "54521a97ccbe5188d9f258245de8c60c3a5ffc640babf37f58fb2b6c94699500"
+    },
+    {
+      "case": "importlib-call",
+      "pass": true,
+      "unknown": true,
+      "sha256": "62b82e454c030665a3584731fc8045515cb1d4b908a550515c594a7f145c8998"
+    },
+    {
+      "case": "getattr-name",
+      "pass": true,
+      "unknown": true,
+      "sha256": "b45d1be0cb1c642d926040fa2c20dbe51e01e2d7116bb9a8d1b837733cff456a"
+    },
+    {
+      "case": "inspect-name",
+      "pass": true,
+      "unknown": true,
+      "sha256": "1af17c7a944b53e425978dc02683e2030f933e6028542f67797e857523deb81c"
+    },
+    {
+      "case": "attrgetter-name",
+      "pass": true,
+      "unknown": true,
+      "sha256": "315de6230a5764327d7a494d0cd9e9ad1377c2d4ed98dea4046ff4b00d46b9b3"
+    },
+    {
+      "case": "methodcaller-name",
+      "pass": true,
+      "unknown": true,
+      "sha256": "014a99b5f2a77ce710f57fbc877fca504c5f67881ffba08dc04b751237aa41c5"
+    },
+    {
+      "case": "import-name",
+      "pass": true,
+      "unknown": true,
+      "sha256": "b1ad3d22c719d427f8c951ea15b2a392c30d84d3cfa1066c3465ce96c7b32ecd"
+    },
+    {
+      "case": "import-keyword",
+      "pass": true,
+      "unknown": true,
+      "sha256": "3b2a2e90fb6015a882510cf4e92221ccd7507b90b4f76085ef34ae2d27bc3a4f"
+    },
+    {
+      "case": "over-depth",
+      "pass": true,
+      "unknown": true,
+      "sha256": "279b0999090c53df6d95db00e066b0482a0e992cdae4063b9f63a0091f14ff36"
+    },
+    {
+      "case": "over-length",
+      "pass": true,
+      "unknown": true,
+      "sha256": "cb0e7b894fc9e25ae86967fe6e55f2ad06d06e00686e25ff1fc2a9cb36d45f00"
+    },
+    {
+      "case": "benign-literal",
+      "pass": true,
+      "unknown": false,
+      "sha256": "91a88bb15d3cce8c35e514fc6e187accc53fa16a98e79cb6b4f1bbe56cc6d768"
+    },
+    {
+      "case": "unused-import-string",
+      "pass": true,
+      "unknown": false,
+      "sha256": "a15641804f8aec5c245e1655affd2327a500db57f5ff861e54cce78826f22874"
+    },
+    {
+      "case": "bounded-literal",
+      "pass": true,
+      "unknown": false,
+      "sha256": "fd61ea90b9c14671fed6e4164f17cd149cafa0e91798281ec348c56848343df5"
+    },
+    {
+      "case": "new-varargs",
+      "pass": true,
+      "reason": "UNRESOLVED:CLASS_CONSTRUCTION_BINDING",
+      "sourceSHA256": "4af55f6f58487ae5dbd884f2f23745a793c3327f6014d5ce093535a21c05a99a",
+      "iterations": 1,
+      "iterationBound": 6,
+      "bindings": []
+    },
+    {
+      "case": "new-without-init",
+      "pass": true,
+      "reason": "UNRESOLVED:CLASS_CONSTRUCTION_BINDING",
+      "sourceSHA256": "b55305fc7cebe15440175866243dddcedd4bb73eaaafc3e354425ffc0ab1da8e",
+      "iterations": 1,
+      "iterationBound": 4,
+      "bindings": []
+    },
+    {
+      "case": "in-proof-base-new",
+      "pass": true,
+      "reason": "UNRESOLVED:CLASS_CONSTRUCTION_BINDING",
+      "sourceSHA256": "c9f6b8af69b1aa1c69b663e6e32a9c86abc9b4101d49aea3d2ea6e35fecc2df6",
+      "iterations": 1,
+      "iterationBound": 6,
+      "bindings": []
+    },
+    {
+      "case": "metaclass",
+      "pass": true,
+      "reason": "UNRESOLVED:CLASS_CONSTRUCTION_BINDING",
+      "sourceSHA256": "283afc92023c4f77098aa8038985123522cc21738a0433cb3f0544c6f49a46fb",
+      "iterations": 1,
+      "iterationBound": 4,
+      "bindings": []
+    },
+    {
+      "case": "unknown-base",
+      "pass": true,
+      "reason": "UNRESOLVED:CLASS_CONSTRUCTION_BINDING",
+      "sourceSHA256": "82db59d29e55840e828f2051dd76073a23f7cc183e51c14f01e663114b59ff83",
+      "iterations": 1,
+      "iterationBound": 4,
+      "bindings": []
+    },
+    {
+      "case": "rebind",
+      "pass": true,
+      "reason": "UNRESOLVED:CALLEE_REBOUND",
+      "sourceSHA256": "3e57e5976156595611836e41507fdee08929d499b7aba58e4fef0314749e361b",
+      "iterations": 1,
+      "iterationBound": 5,
+      "bindings": []
+    },
+    {
+      "case": "alias-before-rebind",
+      "pass": true,
+      "reason": "UNRESOLVED:CALLEE_REBOUND",
+      "sourceSHA256": "30e6128dc7577f9dc9c373f71bc947d561d1cc55ba997eda87e883e9f59c0417",
+      "iterations": 1,
+      "iterationBound": 6,
+      "bindings": []
+    },
+    {
+      "case": "delete",
+      "pass": true,
+      "reason": "UNRESOLVED:CALLEE_REBOUND",
+      "sourceSHA256": "884d164f40b7a517e724ec87ecf14b5fdda1c24d96313292a3b08e55a09cb1ad",
+      "iterations": 1,
+      "iterationBound": 3,
+      "bindings": []
+    },
+    {
+      "case": "import-shadow",
+      "pass": true,
+      "reason": "UNRESOLVED:CALLEE_REBOUND",
+      "sourceSHA256": "dfbb66b9f9d0bae0b245bd46ef86706c6848c7e96b129ddf1a7466e3ec48a975",
+      "iterations": 1,
+      "iterationBound": 3,
+      "bindings": []
+    },
+    {
+      "case": "global-rebind",
+      "pass": true,
+      "reason": "UNRESOLVED:CALLEE_REBOUND",
+      "sourceSHA256": "37e4d4fb016b2d2f2e0b279cb492a0e9f4456dce5b76a7f044abb1d2fbf6664f",
+      "iterations": 1,
+      "iterationBound": 3,
+      "bindings": []
+    },
+    {
+      "case": "new-decorator",
+      "pass": true,
+      "reason": "UNRESOLVED:CALLEE_REBOUND",
+      "sourceSHA256": "06287f8a3e2b648022c376de677812435a52803a97f412ceb7708e05b9333df3",
+      "iterations": 1,
+      "iterationBound": 4,
+      "bindings": []
+    },
+    {
+      "case": "unrelated-local",
+      "pass": true,
+      "reason": null,
+      "sourceSHA256": "ad916921bca4ba3e8c850d9ba8fe645119c5f1ff6b70f5d697fac405bc49c4d4",
+      "iterations": 2,
+      "iterationBound": 3,
+      "bindings": [
+        {
+          "source": {
+            "path": "fixtures/b9e_units.py",
+            "function": "fixtures.b9e_units.",
+            "span": [
+              8,
+              0,
+              8,
+              12
+            ],
+            "fileSHA256": "ad916921bca4ba3e8c850d9ba8fe645119c5f1ff6b70f5d697fac405bc49c4d4",
+            "expressionSHA256": "6c07db265f5b9c31f92d25b396a00894414fca69b85f81ac6c2d574b99570c8f"
+          },
+          "target": "fixtures.b9e_units.accept",
+          "targetPath": "fixtures/b9e_units.py",
+          "formal": "slot",
+          "boundReceiverSkipped": false,
+          "argument": "held",
+          "argumentEvidence": [
+            {
+              "span": [
+                8,
+                7,
+                8,
+                11
+              ],
+              "sourceExpressionSHA256": "c20dea4d876b5b8fb0a1814b43017030cea6d4ac30b2d9ae71b404d2faba49b5"
+            }
+          ],
+          "argumentForm": "ORIGINAL_SOURCE_EXPRESSION",
+          "binding": "ACTUAL_POSITION_OR_KEYWORD_NAME; packs cite their original expression members, never a synthetic source span"
+        }
+      ]
+    },
+    {
+      "case": "ordinary-init",
+      "pass": true,
+      "reason": null,
+      "sourceSHA256": "6ff2c71d1d17c47b1df82c5f816d72c5f782a997534e68ac1037b66ff4583d50",
+      "iterations": 2,
+      "iterationBound": 4,
+      "bindings": [
+        {
+          "source": {
+            "path": "fixtures/b9e_units.py",
+            "function": "fixtures.b9e_units.",
+            "span": [
+              6,
+              0,
+              6,
+              9
+            ],
+            "fileSHA256": "6ff2c71d1d17c47b1df82c5f816d72c5f782a997534e68ac1037b66ff4583d50",
+            "expressionSHA256": "dca20354f8e495967d0923598971b3c1f2229e08742633f1d67db08a3b58059f"
+          },
+          "target": "fixtures.b9e_units.Box.__init__",
+          "targetPath": "fixtures/b9e_units.py",
+          "formal": "slot",
+          "boundReceiverSkipped": true,
+          "argument": "held",
+          "argumentEvidence": [
+            {
+              "span": [
+                6,
+                4,
+                6,
+                8
+              ],
+              "sourceExpressionSHA256": "c20dea4d876b5b8fb0a1814b43017030cea6d4ac30b2d9ae71b404d2faba49b5"
+            }
+          ],
+          "argumentForm": "ORIGINAL_SOURCE_EXPRESSION",
+          "binding": "ACTUAL_POSITION_OR_KEYWORD_NAME; packs cite their original expression members, never a synthetic source span"
+        }
+      ]
+    },
+    {
+      "case": "unowned-rebound",
+      "pass": true,
+      "reason": null,
+      "sourceSHA256": "da39b213972034a4455dfb947274b4c5da75f337294e1c1c9e809101ee821a8b",
+      "iterations": 1,
+      "iterationBound": 5,
+      "bindings": []
+    },
+    {
+      "case": "kwargs-member",
+      "pass": true,
+      "reason": null,
+      "sourceSHA256": "daad68ec39e76bb30a0bba3faf6dd5c2fede0e4adb3c5be92a364a5ea41e1e6d",
+      "iterations": 3,
+      "iterationBound": 3,
+      "bindings": [
+        {
+          "source": {
+            "path": "fixtures/b9e_units.py",
+            "function": "fixtures.b9e_units.",
+            "span": [
+              5,
+              0,
+              5,
+              17
+            ],
+            "fileSHA256": "daad68ec39e76bb30a0bba3faf6dd5c2fede0e4adb3c5be92a364a5ea41e1e6d",
+            "expressionSHA256": "6c85cc60590ff3cf8bd45f53c974f889e1a334f60dc3a5e442cc5a7f9a0376fe"
+          },
+          "target": "fixtures.b9e_units.accept",
+          "targetPath": "fixtures/b9e_units.py",
+          "formal": "extra",
+          "boundReceiverSkipped": false,
+          "argument": "{'slot': held}",
+          "argumentEvidence": [
+            {
+              "span": [
+                5,
+                12,
+                5,
+                16
+              ],
+              "sourceExpressionSHA256": "c20dea4d876b5b8fb0a1814b43017030cea6d4ac30b2d9ae71b404d2faba49b5"
+            }
+          ],
+          "argumentForm": "EXPLICIT_KEYWORDS_TO_KWARG_DICT",
+          "binding": "ACTUAL_POSITION_OR_KEYWORD_NAME; packs cite their original expression members, never a synthetic source span"
+        }
+      ]
+    }
+  ],
+  "effectfulFixturesExecuted": false,
+  "actualRuntimeB": 0
+}

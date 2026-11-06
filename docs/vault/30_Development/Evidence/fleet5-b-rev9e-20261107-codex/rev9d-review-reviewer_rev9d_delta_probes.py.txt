@@ -1,0 +1,192 @@
+"""Claude independent Rev9d delta probes (B9c-L1/L2 + optional keyword/dotted). Parse-only fixtures.
+
+Usage: python -B reviewer_rev9d_delta_probes.py.txt <rev9d evidence dir> <out.json>
+Imports the OWNER analysis producers from <evidence dir> (static AST code only) and
+feeds in-memory source overlays over frozen git 72028. No product file is written,
+and no mutant source is imported or executed (ast.parse only).
+Every full-provenance mutant is checked before its verdict: AST-valid, no new unbound
+names versus the frozen file, and every recorded 54549 closure witness span/hash
+resolves in the mutated sources.
+"""
+import ast, builtins, json, sys
+from collections import Counter
+from pathlib import Path
+E = Path(sys.argv[1]).resolve(strict=True); OUT = Path(sys.argv[2]); sys.path.insert(0, str(E))
+import t1_provenance as t, constructor_graph as cg, source_bindings as sb
+import forwarding_discovery as fd, parameter_flow as pf, use_sites as u, call_binding as cb, reflection_audit as ra
+for m in (t, cg, sb, fd, pf, u, cb, ra):
+    assert Path(m.__file__).resolve().parent == E, m.__file__
+CP = t.CP; LP = 'tools/lan_pilot.py'; WC = CP + 'workspace_config.py'; AP = CP + 'app.py'; WA = CP + 'workspace_api.py'
+BH = CP + 'business_handoff.py'; BA = CP + 'business_auth.py'
+core = t.read_batch([CP + n for n in t.CORE] + ['tools/remote_workspace_entry.py']); ctors = t.read_batch(t.MAIN_CTOR_PATHS)
+S = {**core, **ctors}
+closure = json.loads((E / 't1-mark-offline-closure.json').read_bytes())
+A8 = closure['narrowA8Proof']; g = A8['completeConstructorGraph']
+W = [r['source'] for r in g['productionConstructorProofs']] + [r['source'] for r in g['localHelperProofs']] + \
+    [{'path': r['path'], 'span': r['span'], 'expressionSHA256': r['expressionSHA256']} for r in A8['productionDatabaseConstructors']]
+FROZEN_ROOTS = cg.frozen_root_keys()
+assert sum(FROZEN_ROOTS.values()) == 6 and len(FROZEN_ROOTS) == 6, FROZEN_ROOTS
+R = []; INFO = {}
+
+def unbound(source):
+    tr = ast.parse(source); bound = set(dir(builtins))
+    for n in ast.walk(tr):
+        if isinstance(n, (ast.Import, ast.ImportFrom)): bound.update((a.asname or a.name).split('.')[0] for a in n.names)
+        elif isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)): bound.add(n.name)
+        elif isinstance(n, ast.arg): bound.add(n.arg)
+        elif isinstance(n, ast.Name) and isinstance(n.ctx, (ast.Store, ast.Del)): bound.add(n.id)
+        elif isinstance(n, ast.ExceptHandler) and n.name: bound.add(n.name)
+    return {n.id for n in ast.walk(tr) if isinstance(n, ast.Name) and isinstance(n.ctx, ast.Load) and n.id not in bound}
+
+def witnesses(sources):
+    checked = 0
+    for w in W:
+        src = sources.get(w['path']) or sb.frozen_source(w['path']); tree = ast.parse(src)
+        node = next((n for n in ast.walk(tree) if hasattr(n, 'lineno') and [n.lineno, n.col_offset, n.end_lineno, n.end_col_offset] == w['span']), None)
+        assert node is not None and sb.sha(ast.get_source_segment(src, node)) == w['expressionSHA256'], ('WITNESS', w)
+        checked += 1
+    return checked
+
+def must_replace(src, old, new):
+    assert src.count(old) == 1, ('ANCHOR', old[:80], src.count(old)); return src.replace(old, new, 1)
+
+def roots_preserved(universe):
+    census = cg.current_census(universe); facts = {p: sb.Facts(p, s) for p, s in universe.items() if p in S}
+    keys = Counter(cg.root_key(r, facts[r['source']['path']]) for r in census['production'] if r['source']['path'] in facts)
+    return census, not (FROZEN_ROOTS - keys)
+
+def run(name, changes=None, world=None, expect=None, note=None, graph_only=False, finding=None):
+    changes = changes or {}; world = world or {}
+    changed = {**S, **changes}
+    for p, s in {**changes, **world}.items():
+        ast.parse(s)
+        nb = sorted(unbound(s) - unbound(sb.frozen_source(p))); assert not nb, (name, nb)
+    checked = witnesses({**world, **changed})
+    c2 = {p: changed[p] for p in core}; k2 = {p: changed[p] for p in ctors}
+    if graph_only: out, err = cg.prove({**c2, **k2}, world or None)
+    else: out, err = t.provenance(c2, k2, universe_overrides=world or None)
+    universe = {**world, **changed}
+    census, preserved = roots_preserved(universe)
+    disc, derr = fd.discover(census['production'], universe)
+    audits = {a['path']: len(a['newRelevantHits']) for a in census['reflectionAudits'] + (disc['reflectionAudits'] if disc else [])}
+    observed = 'ACCEPT' if err is None else 'REFUSE'
+    row = {'case': name, 'observed': observed, 'reason': err, 'expected': expect,
+           'matchesExpectation': expect is None or observed == expect.split(':', 1)[0] and (':' not in expect or (err or '').startswith(expect.split(':', 1)[1])),
+           'finding': finding, 'mode': 'cg.prove graph only' if graph_only else 't1_provenance.provenance (full)',
+           'astValid': True, 'newUnboundNames': [], 'witnessesChecked': checked,
+           'mutatedSHA256': {p: sb.sha(s) for p, s in sorted({**changes, **world}.items())},
+           'visibleProductionRoots': len(census['production']), 'sixFrozenRootsPreserved': preserved, 'discoveryError': derr,
+           'discoveredProductionFiles': disc['productionFiles'] if disc else None,
+           'newRelevantReflectionHitsByPath': {p: n for p, n in sorted(audits.items()) if n}, 'note': note}
+    R.append(row); print(json.dumps({'case': name, 'observed': observed, 'reason': err, 'expected': expect}), flush=True)
+    return row
+
+TAILF = '\n\n\ndef _claude_root(tenant, settings):\n    return '
+# ---------------- 0. actual positive and parsed-universe inventory
+r0 = run('actual-72028-positive', expect='ACCEPT')
+census0 = cg.current_census(S); disc0, _ = fd.discover(census0['production'], S)
+parsed = sorted({x['path'] for x in census0['sourceFiles']} | {x['path'] for x in disc0['sourceFiles']})
+audited = sorted({x['path'] for x in census0['reflectionAudits']} | {x['path'] for x in disc0['reflectionAudits']})
+frozen_hits = {a['path']: len(a['hits']) for a in census0['reflectionAudits'] + disc0['reflectionAudits'] if a['hits']}
+INFO['parsedUniverse'] = {'censusFiles': len(census0['sourceFiles']), 'discoveryFiles': len(disc0['sourceFiles']), 'unionParsed': len(parsed),
+                          'unionAudited': len(audited), 'parsedEqualsAudited': parsed == audited, 'paths': parsed,
+                          'productionParsed': sorted(p for p in parsed if not p.startswith('tests/')),
+                          'frozenRelevantHitsByPath': frozen_hits, 'discoveryProductionFiles': disc0['productionFiles']}
+
+# ---------------- 1. L1: actual three 4288 business_auth counterexamples (six genuine roots retained)
+for label, body in [
+    ('attrgetter-sys-modules-root', "import operator\nimport sys\n\n\ndef _claude_hidden_root():\n    return operator.attrgetter('ObservationWorker')(sys.modules['inv.observer_worker'])(object(), None)\n"),
+    ('importlib-configured_workspace', "import importlib\n" + TAILF + "importlib.import_module('inv.workspace_config').configured_workspace(object(), tenant, settings)\n"),
+    ('sys-modules-configured_workspace', "import sys\n" + TAILF + "sys.modules['inv.workspace_config'].configured_workspace(object(), tenant, settings)\n"),
+]:
+    run('L1-4288-repro-' + label, world={BA: sb.frozen_source(BA) + '\n' + body}, expect='REFUSE:UNRESOLVED:RELEVANT_REFLECTION_OUTSIDE_PROOF_SOURCES:' + BA)
+# retained earlier refusals
+run('L1-retained-outside-importlib-attribute', world={BA: sb.frozen_source(BA) + "\nimport importlib\n\n\ndef _claude_hidden_root():\n    return importlib.import_module('inv.observer_worker').ObservationWorker(object(), None)\n"}, expect='REFUSE')
+run('L1-retained-outside-module-getattr', world={BA: sb.frozen_source(BA) + "\nfrom . import workspace_config as _claude_wc\n" + TAILF + "getattr(_claude_wc, 'configured_workspace')(object(), tenant, settings)\n"}, expect='REFUSE')
+run('L1-control-outside-benign-database-helper', world={BA: sb.frozen_source(BA) + "\nfrom .db import Database\n\n\ndef _claude_db(dsn):\n    return Database(dsn)\n"}, expect='ACCEPT')
+run('L1-control-outside-assigned-string-unused-import', world={BA: sb.frozen_source(BA) + "\nimport operator\n_CLAUDE_NOTE = 'inv.workspace_config.configured_workspace'\n"}, expect='ACCEPT')
+# independent: same enumerated APIs, protected name reaches the key through a non-literal expression
+for label, body in [
+    ('sys-modules-string-variable-forwarder', "import sys\n_CLAUDE_MOD = 'inv.workspace_config'\n" + TAILF + "sys.modules[_CLAUDE_MOD].configured_workspace(object(), tenant, settings)\n"),
+    ('sys-modules-fstring-forwarder', "import sys\n" + TAILF + "sys.modules[f\"inv.{'workspace_config'}\"].configured_workspace(object(), tenant, settings)\n"),
+    ('importlib-join-forwarder', "import importlib\n" + TAILF + "importlib.import_module('.'.join(('inv', 'workspace_config'))).configured_workspace(object(), tenant, settings)\n"),
+    ('getattr-importlib-variable-constructor-root', "import importlib\n_CLAUDE_MOD = 'inv.observer_worker'\n_CLAUDE_NAME = 'ObservationWorker'\n\n\ndef _claude_hidden_root():\n    return getattr(importlib.import_module(_CLAUDE_MOD), _CLAUDE_NAME)(object(), None)\n"),
+]:
+    run('L1-independent-nonliteral-key-' + label, world={BA: sb.frozen_source(BA) + '\n' + body}, expect='REFUSE',
+        finding='B9d-L1 candidate if ACCEPT', note='enumerated API (sys.modules/importlib/getattr) with computed/variable key naming a protected module/constructor; six genuine roots retained')
+# optional finite dotted-literal tightening: inside bound, beyond bound, controls
+run('L1-dotted-pkgutil-literal', world={BA: sb.frozen_source(BA) + "\nimport pkgutil\n\n\ndef _claude_hidden_root():\n    return pkgutil.resolve_name('inv.observer_worker:ObservationWorker')(object(), None)\n"}, expect='REFUSE')
+run('L1-dotted-pkgutil-concat-4', world={BA: sb.frozen_source(BA) + "\nimport pkgutil\n\n\ndef _claude_hidden_root():\n    return pkgutil.resolve_name('inv.' + 'observer_' + 'worker:' + 'Observation' + 'Worker')(object(), None)\n"}, expect='REFUSE', note='4 additions: inside the declared bound')
+run('L1-dotted-pkgutil-concat-5-beyond-bound', world={BA: sb.frozen_source(BA) + "\nimport pkgutil\n\n\ndef _claude_hidden_root():\n    return pkgutil.resolve_name('i' + 'nv.' + 'observer_' + 'worker:' + 'Observation' + 'Worker')(object(), None)\n"}, note='declared-bound observation only (>4 levels); not a demand')
+run('L1-dotted-pkgutil-join-beyond-bound', world={BA: sb.frozen_source(BA) + "\nimport pkgutil\n\n\ndef _claude_hidden_root():\n    return pkgutil.resolve_name(':'.join(('inv.observer_worker', 'ObservationWorker')))(object(), None)\n"}, note='declared-bound observation only (non-literal argument to a non-enumerated resolver); not a demand')
+run('L1-dotted-control-pkgutil-unrelated', world={BA: sb.frozen_source(BA) + "\nimport pkgutil\n\n\ndef _claude_resolve():\n    return pkgutil.resolve_name('json:dumps')\n"}, expect='ACCEPT')
+run('L1-dotted-control-log-message', world={BA: sb.frozen_source(BA) + "\nimport logging\n\n\ndef _claude_log():\n    logging.getLogger(__name__).info('inv.observer_worker started for %s', 'tenant')\n"}, expect='ACCEPT')
+run('L1-dotted-conservative-log-dotted-prefix', world={BA: sb.frozen_source(BA) + "\nimport logging\n\n\ndef _claude_log():\n    logging.getLogger('inv.db.query')\n"}, note='records conservative false-positive behavior of the dotted tightening (fail closed)')
+
+# ---------------- 2. L2: actual five 4288 parameter escapes
+init = '        self.db, self.working, self.runtime = database, working, runtime\n'
+for expr in ('runtime', 'runtime.db', 'runtime.db.transaction'):
+    run('L2-4288-repro-WorkspaceAPI-init-' + expr, {WA: must_replace(S[WA], init, init + '        import foreign_module\n        foreign_module.register_runtime(' + expr + ')\n')}, expect='REFUSE:DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:INSTANCE:runtime')
+svc = '            raise DomainError("SYS-0001", "Workspace admission is not configured", 503)\n        return workspace\n'
+for expr in ('workspace', 'workspace.runtime.db'):
+    run('L2-4288-repro-create_app-workspace_service-' + expr, {AP: must_replace(S[AP], svc, '            raise DomainError("SYS-0001", "Workspace admission is not configured", 503)\n        import foreign_module; foreign_module.register_workspace(' + expr + '); return workspace\n')}, expect='REFUSE:DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:INSTANCE:workspace')
+# same function, unowned formal control (working is a WorkingGenerations, not an owner)
+run('L2-control-WorkspaceAPI-init-unowned-working', {WA: must_replace(S[WA], init, init + '        import foreign_module\n        foreign_module.register_note(working)\n')}, expect='ACCEPT')
+# 4288 L3 derived-name closures retained
+loop = '    for runtime in pool.values():\n        runtime.destinations = pool\n'
+run('L2-retained-loop-derived-runtime-db', {WC: must_replace(S[WC], loop, loop + '        import foreign_module\n        foreign_module.register_runtime(runtime.db)\n')}, expect='REFUSE:DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:')
+ret = '    return result\n'
+run('L2-retained-dict-comprehension', {WC: must_replace(S[WC], ret, '    import foreign_module\n    mirror = {k: v.db for k, v in pool.items()}\n    foreign_module.register_runtime(mirror)\n' + ret)}, expect='REFUSE:DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:')
+# independent binder-identity probes: Python calls __new__ with the class-call arguments
+blank_new = '        self.control, self.ledger = Control(database), ApprovalStore(database)\n\n    def _scope('
+run('L2-independent-WorkspaceAPI-__new__-receives-runtime', {WA: must_replace(S[WA], blank_new,
+    '        self.control, self.ledger = Control(database), ApprovalStore(database)\n'
+    '    def __new__(cls, *args, **kwargs): import foreign_module; foreign_module.register_runtime(args[2]); return super().__new__(cls)\n'
+    '    def _scope(')}, expect='REFUSE', finding='B9d-L2 candidate if ACCEPT',
+    note='workspace_config.py:44 WorkspaceAPI(database, working, runtime) runs WorkspaceAPI.__new__(cls, database, working, runtime) before __init__; binder maps class calls to __init__ only. Blank line 130 replaced, no line shift.')
+# independent: module-level rebinding of a frozen callee that receives a seeded DB connection
+guard = '\n\n\nif __name__ == "__main__":\n'
+run('L2-independent-lan_pilot-callee-rebinding-conn', {LP: must_replace(S[LP], guard,
+    '\ndef _claude_wrap(fn): import foreign_module; return lambda *a, **k: (foreign_module.register_conn(a[4]), fn(*a, **k))[1]\n'
+    '_current_finalized_batch = _claude_wrap(_current_finalized_batch)\nif __name__ == "__main__":\n')}, expect='REFUSE', finding='B9d-L2 candidate if ACCEPT',
+    note='frozen calls lan_pilot:1872/1990 pass conn as 5th positional to _current_finalized_batch; a module-level rebinding before the __main__ guard makes the real callee the wrapper. Two blank lines replaced, no line shift before the guard.')
+run('L2-control-app-factory-rebinding', {AP: S[AP] + '\n\ndef _claude_wrap(fn):\n    return fn\n\n\ncreate_app = _claude_wrap(create_app)\n'}, expect='REFUSE', note='create_app is an owner factory symbol; its rebinding is an audited FORWARDING_FACTORY_SYMBOL use')
+
+# ---------------- 3. optional keyword mapping (graph-only vs full provenance)
+cw = '\nfrom .workspace_config import configured_workspace as _cw\n'
+kwf = {BH: sb.frozen_source(BH) + cw + '\n\ndef _claude_kwf(database, tenant, settings):\n    return _cw(database=database, tenant=tenant, settings=settings)\n',
+       BA: sb.frozen_source(BA) + '\nfrom .business_handoff import _claude_kwf\n\n\ndef _claude_root(tenant, settings):\n    return _claude_kwf(object(), tenant, settings)\n'}
+r = run('KW-keyword-forwarder-higher-hop-inventory', world=kwf, expect='REFUSE:UNCATALOGUED_PRODUCTION_SOURCE:')
+r['higherHopInventoried'] = BA in (r['discoveredProductionFiles'] or [])
+ws = '            workspace = configured_workspace(database, identity.tenant_id, settings["workspace"])\n'
+kw_app = must_replace(S[AP], ws, ws + '            _claude_extra = configured_workspace(database=object(), tenant=identity.tenant_id, settings=settings["workspace"])\n')
+rg = run('KW-keyword-object-in-source-graph-only', {AP: kw_app}, graph_only=True, expect='REFUSE')
+rf = run('KW-keyword-object-in-source-full', {AP: kw_app}, expect='REFUSE')
+use, use_err = u.module_uses(kw_app, AP, instances=True, factories=A8['boundedParameterProvenance']['ownerFactorySymbols'], parameter_context=A8['boundedParameterProvenance'])
+rf['independentUseSiteCheckReason'] = use_err
+
+# ---------------- 4. AST-only binder fixtures (lexical binder output, not provenance)
+P = 'fixtures/claude_b9d_binder.py'
+PRE = 'from inv.workspace_api import WorkspaceAPI as Owner\nfrom foreign_module import receive\nheld = Owner(None, None, None)\n'
+B = []
+for name, body, q, formal, want in [
+    ('posonly-formal', 'def accept(slot, /, other=None):\n    return receive(slot)\naccept(held)\n', 'accept', 'slot', True),
+    ('kwonly-formal', 'def accept(*, slot):\n    return receive(slot)\naccept(slot=held)\n', 'accept', 'slot', True),
+    ('explicit-kw-into-kwargs', 'def accept(**extra):\n    return receive(extra)\naccept(slot=held)\n', 'accept', 'extra', True),
+    ('unowned-same-function', 'def accept(slot, note):\n    return receive(note)\naccept(held, "plain")\n', 'accept', 'note', False),
+    ('class-call-__new__', 'class Box:\n    def __new__(cls, *args):\n        receive(args)\n        return super().__new__(cls)\n    def __init__(self, slot):\n        self.slot = None\nBox(held)\n', 'Box.__new__', 'args', None),
+    ('decorated-callee', 'def swap(fn):\n    return lambda a, b: fn(b, a)\n@swap\ndef accept(note, slot):\n    return receive(slot)\naccept(held, "plain")\n', 'accept', 'slot', None),
+    ('rebound-callee', 'def accept(slot):\n    return None\ndef wrap(fn):\n    return lambda *a: receive(a)\naccept = wrap(accept)\naccept(held)\n', 'accept', 'slot', None),
+]:
+    src = PRE + body; ast.parse(src); data, error = pf.solve({P: src})
+    owned = sorted(data['parameters'].get(P, {}).get(q, [])) if data else None
+    B.append({'case': name, 'sourceSHA256': sb.sha(src), 'error': error, 'unresolved': [x['reason'] for x in (data or {}).get('unresolved', [])],
+              'ownedFormalsAt': {q: owned}, 'bindings': [(x['target'], x['formal'], x['boundReceiverSkipped']) for x in (data or {}).get('bindings', [])],
+              'expectedFormalOwned': want, 'formalOwned': formal in (owned or []),
+              'matchesExpectation': want is None or (formal in (owned or [])) is want})
+    print(json.dumps(B[-1]), flush=True)
+
+d = {'reviewer': 'Claude independent', 'target': E.name, 'frozenRootKeys': len(FROZEN_ROOTS), 'info': INFO, 'cases': R, 'binderFixtures': B,
+     'mismatches': [x['case'] for x in R if not x['matchesExpectation']] + [x['case'] for x in B if not x['matchesExpectation']],
+     'effectfulMutantsImportedOrExecuted': False, 'productFilesWritten': 0}
+OUT.write_bytes((json.dumps(d, indent=1) + '\n').encode()); print(json.dumps({'cases': len(R), 'binder': len(B), 'mismatches': d['mismatches']}))

@@ -1,0 +1,4656 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:saintvision:proposal:fleet5-b-rev9b-t1",
+  "$defs": {
+    "hash": {
+      "type": "string",
+      "minLength": 64,
+      "maxLength": 64,
+      "pattern": "^[0-9a-f]{64}(?![\\s\\S])"
+    },
+    "identifier": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}(?![\\s\\S])"
+    },
+    "time": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 9007199254740991
+    },
+    "root": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "deviceMajorHex8",
+        "deviceMinorHex8",
+        "inodeHex16",
+        "filesystem",
+        "contextId",
+        "uid",
+        "modeOctal4"
+      ],
+      "properties": {
+        "deviceMajorHex8": {
+          "type": "string",
+          "minLength": 8,
+          "maxLength": 8,
+          "pattern": "^[0-9a-f]{8}(?![\\s\\S])"
+        },
+        "deviceMinorHex8": {
+          "type": "string",
+          "minLength": 8,
+          "maxLength": 8,
+          "pattern": "^[0-9a-f]{8}(?![\\s\\S])"
+        },
+        "inodeHex16": {
+          "type": "string",
+          "minLength": 16,
+          "maxLength": 16,
+          "pattern": "^[0-9a-f]{16}(?![\\s\\S])"
+        },
+        "filesystem": {
+          "enum": [
+            "ext4",
+            "xfs",
+            "btrfs"
+          ]
+        },
+        "contextId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}(?![\\s\\S])"
+        },
+        "uid": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 4294967295
+        },
+        "modeOctal4": {
+          "enum": [
+            "0700",
+            "0750"
+          ]
+        }
+      }
+    },
+    "tuple": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "nodeId",
+        "cohortId",
+        "operationId",
+        "epoch",
+        "C",
+        "R",
+        "P",
+        "DER",
+        "configSha256",
+        "policySha256",
+        "imageSha256",
+        "exeSha256",
+        "peerFloorSha256",
+        "storageFloorSha256",
+        "root",
+        "generation",
+        "gateId"
+      ],
+      "properties": {
+        "nodeId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}(?![\\s\\S])"
+        },
+        "cohortId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}(?![\\s\\S])"
+        },
+        "operationId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}(?![\\s\\S])"
+        },
+        "epoch": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}(?![\\s\\S])"
+        },
+        "C": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 2147483647
+        },
+        "R": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 2147483647
+        },
+        "P": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "DER": {
+          "type": "string",
+          "minLength": 64,
+          "maxLength": 64,
+          "pattern": "^[0-9a-f]{64}(?![\\s\\S])"
+        },
+        "configSha256": {
+          "type": "string",
+          "minLength": 64,
+          "maxLength": 64,
+          "pattern": "^[0-9a-f]{64}(?![\\s\\S])"
+        },
+        "policySha256": {
+          "type": "string",
+          "minLength": 64,
+          "maxLength": 64,
+          "pattern": "^[0-9a-f]{64}(?![\\s\\S])"
+        },
+        "imageSha256": {
+          "type": "string",
+          "minLength": 64,
+          "maxLength": 64,
+          "pattern": "^[0-9a-f]{64}(?![\\s\\S])"
+        },
+        "exeSha256": {
+          "type": "string",
+          "minLength": 64,
+          "maxLength": 64,
+          "pattern": "^[0-9a-f]{64}(?![\\s\\S])"
+        },
+        "peerFloorSha256": {
+          "type": "string",
+          "minLength": 64,
+          "maxLength": 64,
+          "pattern": "^[0-9a-f]{64}(?![\\s\\S])"
+        },
+        "storageFloorSha256": {
+          "type": "string",
+          "minLength": 64,
+          "maxLength": 64,
+          "pattern": "^[0-9a-f]{64}(?![\\s\\S])"
+        },
+        "root": {
+          "$ref": "#/$defs/root"
+        },
+        "generation": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}(?![\\s\\S])"
+        },
+        "gateId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}(?![\\s\\S])"
+        }
+      }
+    },
+    "producer": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "producerId",
+        "artifactSha256",
+        "version",
+        "observedAt",
+        "nonce",
+        "proofSha256"
+      ],
+      "properties": {
+        "producerId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}(?![\\s\\S])"
+        },
+        "artifactSha256": {
+          "type": "string",
+          "minLength": 64,
+          "maxLength": 64,
+          "pattern": "^[0-9a-f]{64}(?![\\s\\S])"
+        },
+        "version": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}(?![\\s\\S])"
+        },
+        "observedAt": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "nonce": {
+          "type": "string",
+          "minLength": 64,
+          "maxLength": 64,
+          "pattern": "^[0-9a-f]{64}(?![\\s\\S])"
+        },
+        "proofSha256": {
+          "type": "string",
+          "minLength": 64,
+          "maxLength": 64,
+          "pattern": "^[0-9a-f]{64}(?![\\s\\S])"
+        }
+      }
+    },
+    "capability": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "producer",
+        "contextKind",
+        "hostId",
+        "vmUuid",
+        "hostKernelId",
+        "vmKernelBootId",
+        "nodeKernelBootId",
+        "hypervisor",
+        "hostOS",
+        "hostLogicalCpus",
+        "hostCpuAvailableMilliCpus",
+        "hostPhysicalTotalBytes",
+        "hostPhysicalAvailableBytes",
+        "hostCommitLimitBytes",
+        "hostCommitAvailableBytes",
+        "hostDiskCapacityBytes",
+        "hostDiskAvailableBytes",
+        "vmVcpus",
+        "vmRamBytes",
+        "vmDiskBytes",
+        "vmPhysicalAvailableBytes",
+        "vmCommitAvailableBytes",
+        "guestNativeFsAvailableBytes",
+        "root",
+        "socketPath",
+        "engineApi",
+        "engineVersion",
+        "engineId",
+        "sourceAncestry",
+        "routes",
+        "ports",
+        "endpointTests",
+        "vmCpuCapacityMilliCpus",
+        "vmCpuAvailableMilliCpus",
+        "hostProducer",
+        "vmProducer",
+        "launcherAdapterSha256",
+        "hostClock",
+        "guestClock",
+        "vmSpecHash"
+      ],
+      "properties": {
+        "producer": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "producerId",
+            "artifactSha256",
+            "version",
+            "observedAt",
+            "nonce",
+            "proofSha256"
+          ],
+          "properties": {
+            "producerId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128,
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}(?![\\s\\S])"
+            },
+            "artifactSha256": {
+              "type": "string",
+              "minLength": 64,
+              "maxLength": 64,
+              "pattern": "^[0-9a-f]{64}(?![\\s\\S])"
+            },
+            "version": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128,
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}(?![\\s\\S])"
+            },
+            "observedAt": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 9007199254740991
+            },
+            "nonce": {
+              "type": "string",
+              "minLength": 64,
+              "maxLength": 64,
+              "pattern": "^[0-9a-f]{64}(?![\\s\\S])"
+            },
+            "proofSha256": {
+              "type": "string",
+              "minLength": 64,
+              "maxLength": 64,
+              "pattern": "^[0-9a-f]{64}(?![\\s\\S])"
+            }
+          }
+        },
+        "contextKind": {
+          "const": "managed-separate-kernel-linux-vm-v1"
+        },
+        "hostId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}(?![\\s\\S])"
+        },
+        "vmUuid": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}(?![\\s\\S])"
+        },
+        "hostKernelId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}(?![\\s\\S])"
+        },
+        "vmKernelBootId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}(?![\\s\\S])"
+        },
+        "nodeKernelBootId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}(?![\\s\\S])"
+        },
+        "hypervisor": {
+          "enum": [
+            "hyperv",
+            "vmware",
+            "kvm"
+          ]
+        },
+        "hostOS": {
+          "enum": [
+            "windows",
+            "linux"
+          ]
+        },
+        "hostLogicalCpus": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "hostCpuAvailableMilliCpus": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "hostPhysicalTotalBytes": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "hostPhysicalAvailableBytes": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "hostCommitLimitBytes": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "hostCommitAvailableBytes": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "hostDiskCapacityBytes": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "hostDiskAvailableBytes": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "vmVcpus": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "vmRamBytes": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "vmDiskBytes": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "vmPhysicalAvailableBytes": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "vmCommitAvailableBytes": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "guestNativeFsAvailableBytes": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "root": {
+          "$ref": "#/$defs/root"
+        },
+        "socketPath": {
+          "const": "/var/run/docker.sock"
+        },
+        "engineApi": {
+          "const": "1.45"
+        },
+        "engineVersion": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}(?![\\s\\S])"
+        },
+        "engineId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}(?![\\s\\S])"
+        },
+        "sourceAncestry": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "enum": [
+              "ext4",
+              "xfs",
+              "btrfs"
+            ]
+          }
+        },
+        "routes": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "interfaceId",
+              "destination",
+              "gateway",
+              "producerRef"
+            ],
+            "properties": {
+              "interfaceId": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128,
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}(?![\\s\\S])"
+              },
+              "destination": {
+                "type": "string",
+                "minLength": 3,
+                "maxLength": 64,
+                "pattern": "^[0-9A-Fa-f:.]+/[0-9]{1,3}(?![\\s\\S])"
+              },
+              "gateway": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128,
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}(?![\\s\\S])"
+              },
+              "producerRef": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128,
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}(?![\\s\\S])"
+              }
+            }
+          }
+        },
+        "ports": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "port",
+              "owner",
+              "reservedFor"
+            ],
+            "properties": {
+              "port": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 65535
+              },
+              "owner": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128,
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}(?![\\s\\S])"
+              },
+              "reservedFor": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128,
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}(?![\\s\\S])"
+              }
+            }
+          }
+        },
+        "endpointTests": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "targetId",
+              "routeInterface",
+              "tcpLatencyMillis",
+              "tlsPeerSha256",
+              "status",
+              "observedAt"
+            ],
+            "properties": {
+              "targetId": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128,
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}(?![\\s\\S])"
+              },
+              "routeInterface": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128,
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}(?![\\s\\S])"
+              },
+              "tcpLatencyMillis": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991
+              },
+              "tlsPeerSha256": {
+                "type": "string",
+                "minLength": 64,
+                "maxLength": 64,
+                "pattern": "^[0-9a-f]{64}(?![\\s\\S])"
+              },
+              "status": {
+                "const": "CONNECTED_TLS_VERIFIED"
+              },
+              "observedAt": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 9007199254740991
+              }
+            }
+          }
+        },
+        "vmCpuCapacityMilliCpus": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "vmCpuAvailableMilliCpus": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "hostProducer": {
+          "$ref": "#/$defs/producer"
+        },
+        "vmProducer": {
+          "$ref": "#/$defs/producer"
+        },
+        "launcherAdapterSha256": {
+          "type": "string",
+          "minLength": 64,
+          "maxLength": 64,
+          "pattern": "^[0-9a-f]{64}(?![\\s\\S])"
+        },
+        "hostClock": {
+          "$ref": "#/$defs/clockMeasurement"
+        },
+        "guestClock": {
+          "$ref": "#/$defs/clockMeasurement"
+        },
+        "vmSpecHash": {
+          "type": "string",
+          "minLength": 64,
+          "maxLength": 64,
+          "pattern": "^[0-9a-f]{64}(?![\\s\\S])"
+        }
+      }
+    },
+    "roleUse": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "releaseHash",
+        "delegationHash",
+        "receiptHash",
+        "nodeId",
+        "epoch",
+        "generation",
+        "gateId",
+        "purpose",
+        "method",
+        "path",
+        "bodyHash",
+        "nonce",
+        "issuedAt",
+        "expiresAt"
+      ],
+      "properties": {
+        "releaseHash": {
+          "type": "string",
+          "minLength": 64,
+          "maxLength": 64,
+          "pattern": "^[0-9a-f]{64}(?![\\s\\S])"
+        },
+        "delegationHash": {
+          "type": "string",
+          "minLength": 64,
+          "maxLength": 64,
+          "pattern": "^[0-9a-f]{64}(?![\\s\\S])"
+        },
+        "receiptHash": {
+          "type": "string",
+          "minLength": 64,
+          "maxLength": 64,
+          "pattern": "^[0-9a-f]{64}(?![\\s\\S])"
+        },
+        "nodeId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}(?![\\s\\S])"
+        },
+        "epoch": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}(?![\\s\\S])"
+        },
+        "generation": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}(?![\\s\\S])"
+        },
+        "gateId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}(?![\\s\\S])"
+        },
+        "purpose": {
+          "enum": [
+            "EXECUTION",
+            "MODEL",
+            "TRANSFER",
+            "TERMINAL",
+            "STORAGE_COLLECT"
+          ]
+        },
+        "method": {
+          "const": "POST"
+        },
+        "path": {
+          "enum": [
+            "/v1/executions",
+            "/v1/objects/read",
+            "/v1/terminals/frame",
+            "/v1/storage/sample"
+          ]
+        },
+        "bodyHash": {
+          "type": "string",
+          "minLength": 64,
+          "maxLength": 64,
+          "pattern": "^[0-9a-f]{64}(?![\\s\\S])"
+        },
+        "nonce": {
+          "type": "string",
+          "minLength": 64,
+          "maxLength": 64,
+          "pattern": "^[0-9a-f]{64}(?![\\s\\S])"
+        },
+        "issuedAt": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "expiresAt": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "purpose": {
+                "enum": [
+                  "EXECUTION",
+                  "MODEL"
+                ]
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "path": {
+                "const": "/v1/executions"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "purpose": {
+                "enum": [
+                  "TRANSFER"
+                ]
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "path": {
+                "const": "/v1/objects/read"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "purpose": {
+                "enum": [
+                  "TERMINAL"
+                ]
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "path": {
+                "const": "/v1/terminals/frame"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "purpose": {
+                "enum": [
+                  "STORAGE_COLLECT"
+                ]
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "path": {
+                "const": "/v1/storage/sample"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "token": {
+      "type": "string",
+      "maxLength": 65536,
+      "pattern": "^v1\\.[A-Za-z0-9_-]+\\.[0-9a-f]{128}(?![\\s\\S])"
+    },
+    "displayLabel": {
+      "type": "string",
+      "maxLength": 128,
+      "description": "Unicode code points, additionally <=512 strict UTF8 bytes; no NFC; no controls/surrogates"
+    },
+    "release": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "releaseId",
+        "approvalHash",
+        "static",
+        "operationId",
+        "generation",
+        "gateId",
+        "activationLedgerId",
+        "expectedPriorCurrentPointerHash",
+        "useKeyHash",
+        "issuerServiceId",
+        "issuerTLSHash",
+        "issuedAt",
+        "expiresAt"
+      ],
+      "properties": {
+        "releaseId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}(?![\\s\\S])"
+        },
+        "approvalHash": {
+          "type": "string",
+          "minLength": 64,
+          "maxLength": 64,
+          "pattern": "^[0-9a-f]{64}(?![\\s\\S])"
+        },
+        "static": {
+          "$ref": "#/$defs/static"
+        },
+        "operationId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}(?![\\s\\S])"
+        },
+        "generation": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}(?![\\s\\S])"
+        },
+        "gateId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}(?![\\s\\S])"
+        },
+        "activationLedgerId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}(?![\\s\\S])"
+        },
+        "expectedPriorCurrentPointerHash": {
+          "type": "string",
+          "minLength": 64,
+          "maxLength": 64,
+          "pattern": "^[0-9a-f]{64}(?![\\s\\S])"
+        },
+        "useKeyHash": {
+          "type": "string",
+          "minLength": 64,
+          "maxLength": 64,
+          "pattern": "^[0-9a-f]{64}(?![\\s\\S])"
+        },
+        "issuerServiceId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}(?![\\s\\S])"
+        },
+        "issuerTLSHash": {
+          "type": "string",
+          "minLength": 64,
+          "maxLength": 64,
+          "pattern": "^[0-9a-f]{64}(?![\\s\\S])"
+        },
+        "issuedAt": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "expiresAt": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        }
+      }
+    },
+    "delegation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "delegationId",
+        "releaseHash",
+        "nodeId",
+        "epoch",
+        "generation",
+        "gateId",
+        "usePublicKeyHex64",
+        "useKeyHash",
+        "issuerServiceId",
+        "issuerTLSHash",
+        "purposes",
+        "issuedAt",
+        "expiresAt"
+      ],
+      "properties": {
+        "delegationId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}(?![\\s\\S])"
+        },
+        "releaseHash": {
+          "type": "string",
+          "minLength": 64,
+          "maxLength": 64,
+          "pattern": "^[0-9a-f]{64}(?![\\s\\S])"
+        },
+        "nodeId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}(?![\\s\\S])"
+        },
+        "epoch": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}(?![\\s\\S])"
+        },
+        "generation": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}(?![\\s\\S])"
+        },
+        "gateId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}(?![\\s\\S])"
+        },
+        "usePublicKeyHex64": {
+          "type": "string",
+          "minLength": 64,
+          "maxLength": 64,
+          "pattern": "^[0-9a-f]{64}(?![\\s\\S])"
+        },
+        "useKeyHash": {
+          "type": "string",
+          "minLength": 64,
+          "maxLength": 64,
+          "pattern": "^[0-9a-f]{64}(?![\\s\\S])"
+        },
+        "issuerServiceId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}(?![\\s\\S])"
+        },
+        "issuerTLSHash": {
+          "type": "string",
+          "minLength": 64,
+          "maxLength": 64,
+          "pattern": "^[0-9a-f]{64}(?![\\s\\S])"
+        },
+        "purposes": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "EXECUTION",
+              "MODEL",
+              "TRANSFER",
+              "TERMINAL",
+              "STORAGE_COLLECT"
+            ]
+          }
+        },
+        "issuedAt": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "expiresAt": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        }
+      }
+    },
+    "safety": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "nodeId",
+        "epoch",
+        "action",
+        "method",
+        "path",
+        "permitHash",
+        "bodyHash",
+        "nonce",
+        "issuedAt",
+        "expiresAt"
+      ],
+      "properties": {
+        "nodeId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}(?![\\s\\S])"
+        },
+        "epoch": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}(?![\\s\\S])"
+        },
+        "action": {
+          "enum": [
+            "CANCEL_EXACT_COMMAND",
+            "QUARANTINE_EXACT_OBLIGATION"
+          ]
+        },
+        "method": {
+          "const": "POST"
+        },
+        "path": {
+          "enum": [
+            "/v1/executions/cancel",
+            "/v1/builds/quarantine"
+          ]
+        },
+        "permitHash": {
+          "type": "string",
+          "minLength": 64,
+          "maxLength": 64,
+          "pattern": "^[0-9a-f]{64}(?![\\s\\S])"
+        },
+        "bodyHash": {
+          "type": "string",
+          "minLength": 64,
+          "maxLength": 64,
+          "pattern": "^[0-9a-f]{64}(?![\\s\\S])"
+        },
+        "nonce": {
+          "type": "string",
+          "minLength": 64,
+          "maxLength": 64,
+          "pattern": "^[0-9a-f]{64}(?![\\s\\S])"
+        },
+        "issuedAt": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "expiresAt": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "action": {
+                "const": "CANCEL_EXACT_COMMAND"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "path": {
+                "const": "/v1/executions/cancel"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "action": {
+                "const": "QUARANTINE_EXACT_OBLIGATION"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "path": {
+                "const": "/v1/builds/quarantine"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "roleConfig": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "role",
+        "operatorReleaseAnchorSha256",
+        "operatorReleasePublicPath",
+        "safetyAnchorSha256",
+        "safetyPublicPath",
+        "contextId",
+        "gateProtocol",
+        "useProtocol"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": "saintvision-node-role-config:2"
+        },
+        "role": {
+          "const": "workspace-storage-ro-v1"
+        },
+        "operatorReleaseAnchorSha256": {
+          "type": "string",
+          "minLength": 64,
+          "maxLength": 64,
+          "pattern": "^[0-9a-f]{64}(?![\\s\\S])"
+        },
+        "operatorReleasePublicPath": {
+          "const": "/state/role-release-authority.pub"
+        },
+        "safetyAnchorSha256": {
+          "type": "string",
+          "minLength": 64,
+          "maxLength": 64,
+          "pattern": "^[0-9a-f]{64}(?![\\s\\S])"
+        },
+        "safetyPublicPath": {
+          "const": "/state/role-safety-authority.pub"
+        },
+        "contextId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}(?![\\s\\S])"
+        },
+        "gateProtocol": {
+          "const": "saintvision-node-role-release:1"
+        },
+        "useProtocol": {
+          "const": "saintvision-node-role-use:1"
+        }
+      }
+    },
+    "observeInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "nonce"
+      ],
+      "properties": {
+        "nonce": {
+          "type": "string",
+          "minLength": 64,
+          "maxLength": 64,
+          "pattern": "^[0-9a-f]{64}(?![\\s\\S])"
+        }
+      }
+    },
+    "budget": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "contextId",
+        "hostId",
+        "vmUuid",
+        "vcpus",
+        "guestRamBytes",
+        "guestDiskBytes",
+        "hostMemoryHeadroomBytes",
+        "hostDiskHeadroomBytes",
+        "guestNativeFreeMinBytes",
+        "hostCpuSpareMinMilliCpus",
+        "expiresAt",
+        "cohortId",
+        "vmSpecHash",
+        "hostProbeHash",
+        "guestProbeHash",
+        "approvedSkewMillis",
+        "nonce",
+        "issuedAt"
+      ],
+      "properties": {
+        "contextId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}(?![\\s\\S])"
+        },
+        "hostId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}(?![\\s\\S])"
+        },
+        "vmUuid": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}(?![\\s\\S])"
+        },
+        "vcpus": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "guestRamBytes": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "guestDiskBytes": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "hostMemoryHeadroomBytes": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "hostDiskHeadroomBytes": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "guestNativeFreeMinBytes": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "hostCpuSpareMinMilliCpus": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "expiresAt": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "cohortId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}(?![\\s\\S])"
+        },
+        "vmSpecHash": {
+          "type": "string",
+          "minLength": 64,
+          "maxLength": 64,
+          "pattern": "^[0-9a-f]{64}(?![\\s\\S])"
+        },
+        "hostProbeHash": {
+          "type": "string",
+          "minLength": 64,
+          "maxLength": 64,
+          "pattern": "^[0-9a-f]{64}(?![\\s\\S])"
+        },
+        "guestProbeHash": {
+          "type": "string",
+          "minLength": 64,
+          "maxLength": 64,
+          "pattern": "^[0-9a-f]{64}(?![\\s\\S])"
+        },
+        "approvedSkewMillis": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 30000
+        },
+        "nonce": {
+          "type": "string",
+          "minLength": 64,
+          "maxLength": 64,
+          "pattern": "^[0-9a-f]{64}(?![\\s\\S])"
+        },
+        "issuedAt": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        }
+      }
+    },
+    "signedEnvelope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "payloadBase64url",
+        "signatureHex128"
+      ],
+      "properties": {
+        "kind": {
+          "enum": [
+            "APPROVAL",
+            "RELEASE",
+            "DELEGATION",
+            "GATE_CONTROL",
+            "GATE_ACK",
+            "DELIVERY_CHALLENGE",
+            "KEY_POSSESSION",
+            "KEY_DELIVERY_RECEIPT",
+            "ROLE_USE",
+            "SAFETY",
+            "CONTEXT_BUDGET",
+            "GATE_OBSERVATION",
+            "FOLDER_ROOT_OBSERVATION"
+          ]
+        },
+        "payloadBase64url": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 65536,
+          "pattern": "^[A-Za-z0-9_-]+(?![\\s\\S])"
+        },
+        "signatureHex128": {
+          "type": "string",
+          "minLength": 128,
+          "maxLength": 128,
+          "pattern": "^[0-9a-f]{128}(?![\\s\\S])"
+        }
+      }
+    },
+    "gateControl": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "action",
+        "method",
+        "path",
+        "staticHash",
+        "nodeId",
+        "epoch",
+        "generation",
+        "gateId",
+        "expectedPriorGateId",
+        "releaseHash",
+        "delegationHash",
+        "useKeyHash",
+        "nonce",
+        "issuedAt",
+        "expiresAt",
+        "expectedPriorRecordHash",
+        "expectedPriorSequence"
+      ],
+      "properties": {
+        "action": {
+          "enum": [
+            "ARM_EXACT_RELEASE",
+            "INVALIDATE_EXACT_GATE"
+          ]
+        },
+        "method": {
+          "const": "POST"
+        },
+        "path": {
+          "const": "/v1/roles/gate"
+        },
+        "staticHash": {
+          "type": "string",
+          "minLength": 64,
+          "maxLength": 64,
+          "pattern": "^[0-9a-f]{64}(?![\\s\\S])"
+        },
+        "nodeId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}(?![\\s\\S])"
+        },
+        "epoch": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}(?![\\s\\S])"
+        },
+        "generation": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}(?![\\s\\S])"
+        },
+        "gateId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}(?![\\s\\S])"
+        },
+        "expectedPriorGateId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}(?![\\s\\S])"
+        },
+        "releaseHash": {
+          "type": "string",
+          "minLength": 64,
+          "maxLength": 64,
+          "pattern": "^[0-9a-f]{64}(?![\\s\\S])"
+        },
+        "delegationHash": {
+          "type": "string",
+          "minLength": 64,
+          "maxLength": 64,
+          "pattern": "^[0-9a-f]{64}(?![\\s\\S])"
+        },
+        "useKeyHash": {
+          "type": "string",
+          "minLength": 64,
+          "maxLength": 64,
+          "pattern": "^[0-9a-f]{64}(?![\\s\\S])"
+        },
+        "nonce": {
+          "type": "string",
+          "minLength": 64,
+          "maxLength": 64,
+          "pattern": "^[0-9a-f]{64}(?![\\s\\S])"
+        },
+        "issuedAt": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "expiresAt": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "expectedPriorRecordHash": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$(?![\\s\\S])"
+        },
+        "expectedPriorSequence": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        }
+      }
+    },
+    "static": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "nodeId",
+        "cohortId",
+        "epoch",
+        "C",
+        "R",
+        "P",
+        "DER",
+        "configSha256",
+        "policySha256",
+        "imageSha256",
+        "exeSha256",
+        "peerFloorSha256",
+        "storageFloorSha256",
+        "root",
+        "tenantId"
+      ],
+      "properties": {
+        "nodeId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}(?![\\s\\S])"
+        },
+        "cohortId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}(?![\\s\\S])"
+        },
+        "epoch": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}(?![\\s\\S])"
+        },
+        "C": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 2147483647
+        },
+        "R": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 2147483647
+        },
+        "P": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "DER": {
+          "type": "string",
+          "minLength": 64,
+          "maxLength": 64,
+          "pattern": "^[0-9a-f]{64}(?![\\s\\S])"
+        },
+        "configSha256": {
+          "type": "string",
+          "minLength": 64,
+          "maxLength": 64,
+          "pattern": "^[0-9a-f]{64}(?![\\s\\S])"
+        },
+        "policySha256": {
+          "type": "string",
+          "minLength": 64,
+          "maxLength": 64,
+          "pattern": "^[0-9a-f]{64}(?![\\s\\S])"
+        },
+        "imageSha256": {
+          "type": "string",
+          "minLength": 64,
+          "maxLength": 64,
+          "pattern": "^[0-9a-f]{64}(?![\\s\\S])"
+        },
+        "exeSha256": {
+          "type": "string",
+          "minLength": 64,
+          "maxLength": 64,
+          "pattern": "^[0-9a-f]{64}(?![\\s\\S])"
+        },
+        "peerFloorSha256": {
+          "type": "string",
+          "minLength": 64,
+          "maxLength": 64,
+          "pattern": "^[0-9a-f]{64}(?![\\s\\S])"
+        },
+        "storageFloorSha256": {
+          "type": "string",
+          "minLength": 64,
+          "maxLength": 64,
+          "pattern": "^[0-9a-f]{64}(?![\\s\\S])"
+        },
+        "root": {
+          "$ref": "#/$defs/root"
+        },
+        "tenantId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}(?![\\s\\S])"
+        }
+      }
+    },
+    "operatorGrant": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "grantId",
+        "nodeIds",
+        "staticHash",
+        "purposes",
+        "issuedAt",
+        "expiresAt",
+        "revoked"
+      ],
+      "properties": {
+        "grantId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}(?![\\s\\S])"
+        },
+        "nodeIds": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}(?![\\s\\S])"
+          }
+        },
+        "staticHash": {
+          "type": "string",
+          "minLength": 64,
+          "maxLength": 64,
+          "pattern": "^[0-9a-f]{64}(?![\\s\\S])"
+        },
+        "purposes": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "APPROVAL_RENEW_SAME_CONFIG",
+              "REAPPROVE_SAME_CONFIG",
+              "READMIT_SAME_CONFIG",
+              "FRESH_ACTIVATE"
+            ]
+          }
+        },
+        "issuedAt": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "expiresAt": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "revoked": {
+          "type": "boolean"
+        }
+      }
+    },
+    "trust": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "nodeDER",
+        "nodeCertificateNotBefore",
+        "nodeCertificateNotAfter",
+        "operatorTrustNotBefore",
+        "operatorTrustNotAfter",
+        "cpTrustNotAfter",
+        "revoked"
+      ],
+      "properties": {
+        "nodeDER": {
+          "type": "string",
+          "minLength": 64,
+          "maxLength": 64,
+          "pattern": "^[0-9a-f]{64}(?![\\s\\S])"
+        },
+        "nodeCertificateNotBefore": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "nodeCertificateNotAfter": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "operatorTrustNotBefore": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "operatorTrustNotAfter": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "cpTrustNotAfter": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "revoked": {
+          "type": "boolean"
+        }
+      }
+    },
+    "candidate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "candidateId",
+        "static",
+        "generation",
+        "nodeProofHash",
+        "hostProofHash",
+        "nonce",
+        "observedAt",
+        "expiresAt"
+      ],
+      "properties": {
+        "candidateId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}(?![\\s\\S])"
+        },
+        "static": {
+          "$ref": "#/$defs/static"
+        },
+        "generation": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}(?![\\s\\S])"
+        },
+        "nodeProofHash": {
+          "type": "string",
+          "minLength": 64,
+          "maxLength": 64,
+          "pattern": "^[0-9a-f]{64}(?![\\s\\S])"
+        },
+        "hostProofHash": {
+          "type": "string",
+          "minLength": 64,
+          "maxLength": 64,
+          "pattern": "^[0-9a-f]{64}(?![\\s\\S])"
+        },
+        "nonce": {
+          "type": "string",
+          "minLength": 64,
+          "maxLength": 64,
+          "pattern": "^[0-9a-f]{64}(?![\\s\\S])"
+        },
+        "observedAt": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "expiresAt": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        }
+      }
+    },
+    "approval": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "approvalId",
+        "priorApprovalHash",
+        "static",
+        "operationId",
+        "operatorGrantHash",
+        "trustHash",
+        "candidateHash",
+        "purpose",
+        "nonce",
+        "issuedAt",
+        "expiresAt",
+        "rootLineageID"
+      ],
+      "properties": {
+        "approvalId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}(?![\\s\\S])"
+        },
+        "priorApprovalHash": {
+          "type": "string",
+          "minLength": 64,
+          "maxLength": 64,
+          "pattern": "^[0-9a-f]{64}(?![\\s\\S])"
+        },
+        "static": {
+          "$ref": "#/$defs/static"
+        },
+        "operationId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}(?![\\s\\S])"
+        },
+        "operatorGrantHash": {
+          "type": "string",
+          "minLength": 64,
+          "maxLength": 64,
+          "pattern": "^[0-9a-f]{64}(?![\\s\\S])"
+        },
+        "trustHash": {
+          "type": "string",
+          "minLength": 64,
+          "maxLength": 64,
+          "pattern": "^[0-9a-f]{64}(?![\\s\\S])"
+        },
+        "candidateHash": {
+          "type": "string",
+          "minLength": 64,
+          "maxLength": 64,
+          "pattern": "^[0-9a-f]{64}(?![\\s\\S])"
+        },
+        "purpose": {
+          "enum": [
+            "APPROVAL_RENEW_SAME_CONFIG",
+            "REAPPROVE_SAME_CONFIG",
+            "FRESH_ACTIVATE"
+          ]
+        },
+        "nonce": {
+          "type": "string",
+          "minLength": 64,
+          "maxLength": 64,
+          "pattern": "^[0-9a-f]{64}(?![\\s\\S])"
+        },
+        "issuedAt": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "expiresAt": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "rootLineageID": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$(?![\\s\\S])"
+        }
+      }
+    },
+    "gateAck": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "nodeId",
+        "tenantId",
+        "nodeCertificateSHA256",
+        "action",
+        "commandHash",
+        "requestBodyHash",
+        "releaseHash",
+        "delegationHash",
+        "useKeyHash",
+        "gateId",
+        "priorGateId",
+        "generation",
+        "epoch",
+        "static",
+        "nonce",
+        "observedAt",
+        "expiresAt",
+        "localGateRecordId",
+        "priorLocalGateRecordId",
+        "state",
+        "sequence",
+        "priorSequence"
+      ],
+      "properties": {
+        "nodeId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}(?![\\s\\S])"
+        },
+        "tenantId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}(?![\\s\\S])"
+        },
+        "nodeCertificateSHA256": {
+          "type": "string",
+          "minLength": 64,
+          "maxLength": 64,
+          "pattern": "^[0-9a-f]{64}(?![\\s\\S])"
+        },
+        "action": {
+          "enum": [
+            "ARM_EXACT_RELEASE",
+            "INVALIDATE_EXACT_GATE"
+          ]
+        },
+        "commandHash": {
+          "type": "string",
+          "minLength": 64,
+          "maxLength": 64,
+          "pattern": "^[0-9a-f]{64}(?![\\s\\S])"
+        },
+        "requestBodyHash": {
+          "type": "string",
+          "minLength": 64,
+          "maxLength": 64,
+          "pattern": "^[0-9a-f]{64}(?![\\s\\S])"
+        },
+        "releaseHash": {
+          "type": "string",
+          "minLength": 64,
+          "maxLength": 64,
+          "pattern": "^[0-9a-f]{64}(?![\\s\\S])"
+        },
+        "delegationHash": {
+          "type": "string",
+          "minLength": 64,
+          "maxLength": 64,
+          "pattern": "^[0-9a-f]{64}(?![\\s\\S])"
+        },
+        "useKeyHash": {
+          "type": "string",
+          "minLength": 64,
+          "maxLength": 64,
+          "pattern": "^[0-9a-f]{64}(?![\\s\\S])"
+        },
+        "gateId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}(?![\\s\\S])"
+        },
+        "priorGateId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}(?![\\s\\S])"
+        },
+        "generation": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}(?![\\s\\S])"
+        },
+        "epoch": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}(?![\\s\\S])"
+        },
+        "static": {
+          "$ref": "#/$defs/static"
+        },
+        "nonce": {
+          "type": "string",
+          "minLength": 64,
+          "maxLength": 64,
+          "pattern": "^[0-9a-f]{64}(?![\\s\\S])"
+        },
+        "observedAt": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "expiresAt": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "localGateRecordId": {
+          "type": "string",
+          "minLength": 64,
+          "maxLength": 64,
+          "pattern": "^[0-9a-f]{64}(?![\\s\\S])"
+        },
+        "priorLocalGateRecordId": {
+          "type": "string",
+          "minLength": 64,
+          "maxLength": 64,
+          "pattern": "^[0-9a-f]{64}(?![\\s\\S])"
+        },
+        "state": {
+          "enum": [
+            "ARMED",
+            "INVALIDATED"
+          ]
+        },
+        "sequence": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "priorSequence": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        }
+      }
+    },
+    "deliveryChallenge": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "deliveryId",
+        "challengeId",
+        "activationLedgerId",
+        "activationLedgerHash",
+        "releaseHash",
+        "delegationHash",
+        "useKeyHash",
+        "gateAckHash",
+        "nodeId",
+        "cohortId",
+        "epoch",
+        "generation",
+        "gateId",
+        "staticHash",
+        "issuerServiceId",
+        "issuerTLSHash",
+        "nonce",
+        "issuedAt",
+        "expiresAt"
+      ],
+      "properties": {
+        "deliveryId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}(?![\\s\\S])"
+        },
+        "challengeId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}(?![\\s\\S])"
+        },
+        "activationLedgerId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}(?![\\s\\S])"
+        },
+        "activationLedgerHash": {
+          "type": "string",
+          "minLength": 64,
+          "maxLength": 64,
+          "pattern": "^[0-9a-f]{64}(?![\\s\\S])"
+        },
+        "releaseHash": {
+          "type": "string",
+          "minLength": 64,
+          "maxLength": 64,
+          "pattern": "^[0-9a-f]{64}(?![\\s\\S])"
+        },
+        "delegationHash": {
+          "type": "string",
+          "minLength": 64,
+          "maxLength": 64,
+          "pattern": "^[0-9a-f]{64}(?![\\s\\S])"
+        },
+        "useKeyHash": {
+          "type": "string",
+          "minLength": 64,
+          "maxLength": 64,
+          "pattern": "^[0-9a-f]{64}(?![\\s\\S])"
+        },
+        "gateAckHash": {
+          "type": "string",
+          "minLength": 64,
+          "maxLength": 64,
+          "pattern": "^[0-9a-f]{64}(?![\\s\\S])"
+        },
+        "nodeId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}(?![\\s\\S])"
+        },
+        "cohortId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}(?![\\s\\S])"
+        },
+        "epoch": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}(?![\\s\\S])"
+        },
+        "generation": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}(?![\\s\\S])"
+        },
+        "gateId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}(?![\\s\\S])"
+        },
+        "staticHash": {
+          "type": "string",
+          "minLength": 64,
+          "maxLength": 64,
+          "pattern": "^[0-9a-f]{64}(?![\\s\\S])"
+        },
+        "issuerServiceId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}(?![\\s\\S])"
+        },
+        "issuerTLSHash": {
+          "type": "string",
+          "minLength": 64,
+          "maxLength": 64,
+          "pattern": "^[0-9a-f]{64}(?![\\s\\S])"
+        },
+        "nonce": {
+          "type": "string",
+          "minLength": 64,
+          "maxLength": 64,
+          "pattern": "^[0-9a-f]{64}(?![\\s\\S])"
+        },
+        "issuedAt": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "expiresAt": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        }
+      }
+    },
+    "keyPossession": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "challengeHash",
+        "challenge"
+      ],
+      "properties": {
+        "challengeHash": {
+          "type": "string",
+          "minLength": 64,
+          "maxLength": 64,
+          "pattern": "^[0-9a-f]{64}(?![\\s\\S])"
+        },
+        "challenge": {
+          "$ref": "#/$defs/deliveryChallenge"
+        }
+      }
+    },
+    "keyDeliveryReceipt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "deliveryId",
+        "challengeId",
+        "activationLedgerId",
+        "activationLedgerHash",
+        "releaseHash",
+        "delegationHash",
+        "useKeyHash",
+        "gateAckHash",
+        "nodeId",
+        "cohortId",
+        "epoch",
+        "generation",
+        "gateId",
+        "staticHash",
+        "issuerServiceId",
+        "issuerTLSHash",
+        "nonce",
+        "issuedAt",
+        "expiresAt",
+        "receiptId",
+        "challengeHash",
+        "possessionHash",
+        "consumptionLedgerId",
+        "priorCurrentPointerHash",
+        "priorState",
+        "currentState"
+      ],
+      "properties": {
+        "deliveryId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}(?![\\s\\S])"
+        },
+        "challengeId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}(?![\\s\\S])"
+        },
+        "activationLedgerId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}(?![\\s\\S])"
+        },
+        "activationLedgerHash": {
+          "type": "string",
+          "minLength": 64,
+          "maxLength": 64,
+          "pattern": "^[0-9a-f]{64}(?![\\s\\S])"
+        },
+        "releaseHash": {
+          "type": "string",
+          "minLength": 64,
+          "maxLength": 64,
+          "pattern": "^[0-9a-f]{64}(?![\\s\\S])"
+        },
+        "delegationHash": {
+          "type": "string",
+          "minLength": 64,
+          "maxLength": 64,
+          "pattern": "^[0-9a-f]{64}(?![\\s\\S])"
+        },
+        "useKeyHash": {
+          "type": "string",
+          "minLength": 64,
+          "maxLength": 64,
+          "pattern": "^[0-9a-f]{64}(?![\\s\\S])"
+        },
+        "gateAckHash": {
+          "type": "string",
+          "minLength": 64,
+          "maxLength": 64,
+          "pattern": "^[0-9a-f]{64}(?![\\s\\S])"
+        },
+        "nodeId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}(?![\\s\\S])"
+        },
+        "cohortId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}(?![\\s\\S])"
+        },
+        "epoch": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}(?![\\s\\S])"
+        },
+        "generation": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}(?![\\s\\S])"
+        },
+        "gateId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}(?![\\s\\S])"
+        },
+        "staticHash": {
+          "type": "string",
+          "minLength": 64,
+          "maxLength": 64,
+          "pattern": "^[0-9a-f]{64}(?![\\s\\S])"
+        },
+        "issuerServiceId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}(?![\\s\\S])"
+        },
+        "issuerTLSHash": {
+          "type": "string",
+          "minLength": 64,
+          "maxLength": 64,
+          "pattern": "^[0-9a-f]{64}(?![\\s\\S])"
+        },
+        "nonce": {
+          "type": "string",
+          "minLength": 64,
+          "maxLength": 64,
+          "pattern": "^[0-9a-f]{64}(?![\\s\\S])"
+        },
+        "issuedAt": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "expiresAt": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "receiptId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}(?![\\s\\S])"
+        },
+        "challengeHash": {
+          "type": "string",
+          "minLength": 64,
+          "maxLength": 64,
+          "pattern": "^[0-9a-f]{64}(?![\\s\\S])"
+        },
+        "possessionHash": {
+          "type": "string",
+          "minLength": 64,
+          "maxLength": 64,
+          "pattern": "^[0-9a-f]{64}(?![\\s\\S])"
+        },
+        "consumptionLedgerId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}(?![\\s\\S])"
+        },
+        "priorCurrentPointerHash": {
+          "type": "string",
+          "minLength": 64,
+          "maxLength": 64,
+          "pattern": "^[0-9a-f]{64}(?![\\s\\S])"
+        },
+        "priorState": {
+          "const": "CONSUMED_PENDING_RECEIPT"
+        },
+        "currentState": {
+          "const": "DELIVERED_CURRENT"
+        }
+      }
+    },
+    "observationScope": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "status",
+            "businessAuthority",
+            "source",
+            "tenantId",
+            "nodeId",
+            "currentControlEpoch",
+            "targetNodeEpoch",
+            "targetDER",
+            "currentTuple",
+            "provenanceHash",
+            "intentId",
+            "method",
+            "paths",
+            "challenge",
+            "issuedAt",
+            "expiresAt",
+            "diagnostic"
+          ],
+          "properties": {
+            "kind": {
+              "const": "OBSERVATION_SCOPE"
+            },
+            "status": {
+              "const": "AVAILABLE"
+            },
+            "businessAuthority": {
+              "const": false
+            },
+            "source": {
+              "enum": [
+                "CURRENT_REGISTERED",
+                "FROZEN_INTENT_TARGET"
+              ]
+            },
+            "tenantId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128,
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}(?![\\s\\S])"
+            },
+            "nodeId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128,
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}(?![\\s\\S])"
+            },
+            "currentControlEpoch": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128,
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}(?![\\s\\S])"
+            },
+            "targetNodeEpoch": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128,
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}(?![\\s\\S])"
+            },
+            "targetDER": {
+              "type": "string",
+              "minLength": 64,
+              "maxLength": 64,
+              "pattern": "^[0-9a-f]{64}(?![\\s\\S])"
+            },
+            "currentTuple": {
+              "$ref": "#/$defs/static"
+            },
+            "provenanceHash": {
+              "type": "string",
+              "minLength": 64,
+              "maxLength": 64,
+              "pattern": "^[0-9a-f]{64}(?![\\s\\S])"
+            },
+            "intentId": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "maxLength": 128
+            },
+            "method": {
+              "const": "POST"
+            },
+            "paths": {
+              "type": "array",
+              "minItems": 1,
+              "uniqueItems": true,
+              "items": {
+                "enum": [
+                  "/v1/heartbeats",
+                  "/v1/snapshots",
+                  "/v1/roles/observe",
+                  "/v1/executions/receipts"
+                ]
+              }
+            },
+            "challenge": {
+              "type": "string",
+              "minLength": 64,
+              "maxLength": 64,
+              "pattern": "^[0-9a-f]{64}(?![\\s\\S])"
+            },
+            "issuedAt": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 9007199254740991
+            },
+            "expiresAt": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 9007199254740991
+            },
+            "diagnostic": {
+              "enum": [
+                "OBSERVE_ONLY",
+                "RECONCILE_ONLY"
+              ]
+            }
+          },
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "source": {
+                    "const": "CURRENT_REGISTERED"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "intentId": {
+                    "const": null
+                  }
+                }
+              }
+            },
+            {
+              "if": {
+                "properties": {
+                  "source": {
+                    "const": "FROZEN_INTENT_TARGET"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "intentId": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 128,
+                    "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}(?![\\s\\S])"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "status",
+            "businessAuthority",
+            "reason",
+            "nodeId",
+            "observedAt"
+          ],
+          "properties": {
+            "kind": {
+              "const": "OBSERVATION_SCOPE"
+            },
+            "status": {
+              "enum": [
+                "AUTHORITY_UNAVAILABLE",
+                "SCOPE_DENIED",
+                "EXPIRED",
+                "UNKNOWN_SCOPE"
+              ]
+            },
+            "businessAuthority": {
+              "const": false
+            },
+            "reason": {
+              "enum": [
+                "INVALID_TRUST",
+                "EPOCH_UNAVAILABLE",
+                "NO_OBSERVER_GRANT",
+                "MISSING_PROTECTED_INTENT",
+                "UNKNOWN_CURRENT_TUPLE"
+              ]
+            },
+            "nodeId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128,
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}(?![\\s\\S])"
+            },
+            "observedAt": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 9007199254740991
+            }
+          }
+        }
+      ]
+    },
+    "clockMeasurement": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "target",
+        "targetId",
+        "contextId",
+        "challenge",
+        "clockOffsetMillis",
+        "uncertaintyMillis",
+        "syncSource",
+        "method",
+        "producerId",
+        "producerArtifactHash",
+        "evidenceHash",
+        "observedAt"
+      ],
+      "properties": {
+        "target": {
+          "enum": [
+            "HOST",
+            "GUEST"
+          ]
+        },
+        "targetId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}(?![\\s\\S])"
+        },
+        "contextId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}(?![\\s\\S])"
+        },
+        "challenge": {
+          "type": "string",
+          "minLength": 64,
+          "maxLength": 64,
+          "pattern": "^[0-9a-f]{64}(?![\\s\\S])"
+        },
+        "clockOffsetMillis": {
+          "type": "integer",
+          "minimum": -9007199254740991,
+          "maximum": 9007199254740991
+        },
+        "uncertaintyMillis": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "syncSource": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}(?![\\s\\S])"
+        },
+        "method": {
+          "const": "AUTHENTICATED_CP_ROUNDTRIP_BOUND"
+        },
+        "producerId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}(?![\\s\\S])"
+        },
+        "producerArtifactHash": {
+          "type": "string",
+          "minLength": 64,
+          "maxLength": 64,
+          "pattern": "^[0-9a-f]{64}(?![\\s\\S])"
+        },
+        "evidenceHash": {
+          "type": "string",
+          "minLength": 64,
+          "maxLength": 64,
+          "pattern": "^[0-9a-f]{64}(?![\\s\\S])"
+        },
+        "observedAt": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        }
+      }
+    },
+    "durableGateRecord": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "commandHash",
+        "priorRecord",
+        "generation",
+        "sequence",
+        "state",
+        "gateId",
+        "releaseHash",
+        "delegationHash",
+        "staticHash"
+      ],
+      "properties": {
+        "commandHash": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$(?![\\s\\S])"
+        },
+        "priorRecord": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$(?![\\s\\S])"
+        },
+        "generation": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$(?![\\s\\S])"
+        },
+        "sequence": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "state": {
+          "enum": [
+            "ARMED",
+            "INVALIDATED"
+          ]
+        },
+        "gateId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$(?![\\s\\S])"
+        },
+        "releaseHash": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$(?![\\s\\S])"
+        },
+        "delegationHash": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$(?![\\s\\S])"
+        },
+        "staticHash": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$(?![\\s\\S])"
+        }
+      }
+    },
+    "gateObserveInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "nonce"
+      ],
+      "properties": {
+        "nonce": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$(?![\\s\\S])"
+        }
+      }
+    },
+    "gateObservation": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "status",
+            "businessAuthority",
+            "method",
+            "path",
+            "nodeId",
+            "epoch",
+            "generation",
+            "nonce",
+            "observedAt",
+            "expiresAt",
+            "recordId",
+            "record",
+            "sequence",
+            "retiredGateIDs",
+            "retiredReleaseHashes",
+            "originalAckHash",
+            "originalAckExpiresAt"
+          ],
+          "properties": {
+            "status": {
+              "const": "AVAILABLE"
+            },
+            "businessAuthority": {
+              "const": false
+            },
+            "method": {
+              "const": "POST"
+            },
+            "path": {
+              "const": "/v1/roles/observe"
+            },
+            "nodeId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128,
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$(?![\\s\\S])"
+            },
+            "epoch": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128,
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$(?![\\s\\S])"
+            },
+            "generation": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128,
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$(?![\\s\\S])"
+            },
+            "nonce": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$(?![\\s\\S])"
+            },
+            "observedAt": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 9007199254740991
+            },
+            "expiresAt": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 9007199254740991
+            },
+            "recordId": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$(?![\\s\\S])"
+            },
+            "record": {
+              "$ref": "#/$defs/durableGateRecord"
+            },
+            "sequence": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 9007199254740991
+            },
+            "retiredGateIDs": {
+              "type": "array",
+              "uniqueItems": true,
+              "items": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128,
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$(?![\\s\\S])"
+              }
+            },
+            "retiredReleaseHashes": {
+              "type": "array",
+              "uniqueItems": true,
+              "items": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$(?![\\s\\S])"
+              }
+            },
+            "originalAckHash": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$(?![\\s\\S])"
+            },
+            "originalAckExpiresAt": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 9007199254740991
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "status",
+            "businessAuthority",
+            "nodeId",
+            "nonce",
+            "observedAt",
+            "reason",
+            "recovery"
+          ],
+          "properties": {
+            "status": {
+              "enum": [
+                "SCOPE_DENIED",
+                "UNKNOWN_RECORD",
+                "STALE_ACK",
+                "CONFLICT",
+                "EXPIRED"
+              ]
+            },
+            "businessAuthority": {
+              "const": false
+            },
+            "nodeId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128,
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$(?![\\s\\S])"
+            },
+            "nonce": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$(?![\\s\\S])"
+            },
+            "observedAt": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 9007199254740991
+            },
+            "reason": {
+              "enum": [
+                "AUTHENTICATION",
+                "MISSING_DURABLE_PROOF",
+                "ORIGINAL_ACK_EXPIRED",
+                "INCONSISTENT_HISTORY",
+                "READBACK_EXPIRED"
+              ]
+            },
+            "recovery": {
+              "const": "B-RECOVERY1_HOLD"
+            }
+          }
+        }
+      ]
+    },
+    "signerRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "authenticatedCaller",
+        "kind",
+        "purpose",
+        "domain",
+        "scopeHash",
+        "bodyHash"
+      ],
+      "properties": {
+        "authenticatedCaller": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$(?![\\s\\S])"
+        },
+        "kind": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$(?![\\s\\S])"
+        },
+        "purpose": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$(?![\\s\\S])"
+        },
+        "domain": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$(?![\\s\\S])"
+        },
+        "scopeHash": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$(?![\\s\\S])"
+        },
+        "bodyHash": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$(?![\\s\\S])"
+        }
+      }
+    },
+    "scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "tenantId",
+        "nodeId",
+        "epoch"
+      ],
+      "properties": {
+        "tenantId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$(?![\\s\\S])"
+        },
+        "nodeId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$(?![\\s\\S])"
+        },
+        "epoch": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$(?![\\s\\S])"
+        }
+      }
+    },
+    "ioFootprint": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "known",
+        "rows"
+      ],
+      "properties": {
+        "known": {
+          "type": "boolean"
+        },
+        "rows": {
+          "type": "array",
+          "maxItems": 1024,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "rank",
+              "table",
+              "key",
+              "mode"
+            ],
+            "properties": {
+              "rank": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991
+              },
+              "table": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128,
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$(?![\\s\\S])"
+              },
+              "key": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 512
+              },
+              "mode": {
+                "enum": [
+                  "SHARE",
+                  "UPDATE"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "ioBinding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "scope",
+        "operationId",
+        "attemptId",
+        "effectClass",
+        "footprint",
+        "kind",
+        "method",
+        "rawPath",
+        "channelVersion",
+        "nodeDER",
+        "targetBindingSHA",
+        "ownerBindingSHA",
+        "bodySHA",
+        "existingPermitOrApprovalSHA",
+        "nonce",
+        "runId",
+        "generation",
+        "claimBindingSHA",
+        "parentHandleHash",
+        "parentCommandSHA",
+        "admittedClaimVersion",
+        "executionAttemptId",
+        "protectedReadBindingSHA"
+      ],
+      "properties": {
+        "scope": {
+          "$ref": "#/$defs/scope"
+        },
+        "operationId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$(?![\\s\\S])"
+        },
+        "attemptId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$(?![\\s\\S])"
+        },
+        "effectClass": {
+          "enum": [
+            "READ_ONLY",
+            "IDEMPOTENT_SAFETY",
+            "SIDE_EFFECT"
+          ]
+        },
+        "footprint": {
+          "$ref": "#/$defs/ioFootprint"
+        },
+        "kind": {
+          "enum": [
+            "EXECUTE",
+            "RECEIPT_OBSERVE",
+            "CANCEL",
+            "BUILD_DISPATCH",
+            "BUILD_CLEANUP_READ",
+            "BUILD_HEALTH_READ",
+            "GPU_ACTIVE_OBSERVE",
+            "HEARTBEAT_OBSERVE",
+            "STORAGE_SAMPLE",
+            "OBJECT_READ",
+            "TERMINAL_FRAME",
+            "QUARANTINE_RECONCILE",
+            "B_GATE_ARM",
+            "B_GATE_INVALIDATE",
+            "B_ROLE_OBSERVE",
+            "B_FOLDER_ROOT_OBSERVE"
+          ]
+        },
+        "method": {
+          "enum": [
+            "POST",
+            "LOCAL_READ",
+            "ADAPTER_EXECUTE",
+            "B_PREFLIGHT_OBSERVE"
+          ]
+        },
+        "rawPath": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1024
+        },
+        "channelVersion": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "nodeDER": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$(?![\\s\\S])"
+        },
+        "targetBindingSHA": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$(?![\\s\\S])"
+        },
+        "ownerBindingSHA": {
+          "oneOf": [
+            {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$(?![\\s\\S])"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "bodySHA": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$(?![\\s\\S])"
+        },
+        "existingPermitOrApprovalSHA": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$(?![\\s\\S])"
+        },
+        "nonce": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$(?![\\s\\S])"
+        },
+        "runId": {
+          "oneOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128,
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$(?![\\s\\S])"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "generation": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$(?![\\s\\S])"
+        },
+        "claimBindingSHA": {
+          "oneOf": [
+            {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$(?![\\s\\S])"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "parentHandleHash": {
+          "oneOf": [
+            {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$(?![\\s\\S])"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "parentCommandSHA": {
+          "oneOf": [
+            {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$(?![\\s\\S])"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "admittedClaimVersion": {
+          "oneOf": [
+            {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 9007199254740991
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "executionAttemptId": {
+          "oneOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128,
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$(?![\\s\\S])"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "protectedReadBindingSHA": {
+          "oneOf": [
+            {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$(?![\\s\\S])"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "enum": [
+                  "EXECUTE",
+                  "CANCEL",
+                  "RECEIPT_OBSERVE",
+                  "BUILD_DISPATCH",
+                  "BUILD_CLEANUP_READ",
+                  "TERMINAL_FRAME"
+                ]
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "runId": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128,
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$(?![\\s\\S])"
+              },
+              "claimBindingSHA": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$(?![\\s\\S])"
+              },
+              "ownerBindingSHA": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$(?![\\s\\S])"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "EXECUTE"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "effectClass": {
+                "const": "SIDE_EFFECT"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "BUILD_DISPATCH"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "effectClass": {
+                "const": "SIDE_EFFECT"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "TERMINAL_FRAME"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "effectClass": {
+                "const": "SIDE_EFFECT"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "B_GATE_ARM"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "effectClass": {
+                "const": "SIDE_EFFECT"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "RECEIPT_OBSERVE"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "effectClass": {
+                "const": "SIDE_EFFECT"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "CANCEL"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "effectClass": {
+                "const": "IDEMPOTENT_SAFETY"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "QUARANTINE_RECONCILE"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "effectClass": {
+                "const": "IDEMPOTENT_SAFETY"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "B_GATE_INVALIDATE"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "effectClass": {
+                "const": "IDEMPOTENT_SAFETY"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "HEARTBEAT_OBSERVE"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "effectClass": {
+                "const": "READ_ONLY"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "GPU_ACTIVE_OBSERVE"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "effectClass": {
+                "const": "READ_ONLY"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "STORAGE_SAMPLE"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "effectClass": {
+                "const": "READ_ONLY"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "OBJECT_READ"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "effectClass": {
+                "const": "READ_ONLY"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "BUILD_HEALTH_READ"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "effectClass": {
+                "const": "READ_ONLY"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "BUILD_CLEANUP_READ"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "effectClass": {
+                "const": "READ_ONLY"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "B_ROLE_OBSERVE"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "effectClass": {
+                "const": "READ_ONLY"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "B_FOLDER_ROOT_OBSERVE"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "effectClass": {
+                "const": "READ_ONLY"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "enum": [
+                  "TERMINAL_FRAME",
+                  "OBJECT_READ",
+                  "BUILD_CLEANUP_READ",
+                  "RECEIPT_OBSERVE",
+                  "CANCEL"
+                ]
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "parentHandleHash": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$(?![\\s\\S])"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "EXECUTE"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "method": {
+                "const": "POST"
+              },
+              "rawPath": {
+                "const": "/v1/executions"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "RECEIPT_OBSERVE"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "method": {
+                "const": "POST"
+              },
+              "rawPath": {
+                "const": "/v1/executions/receipts"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "CANCEL"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "method": {
+                "const": "POST"
+              },
+              "rawPath": {
+                "const": "/v1/executions/cancel"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "BUILD_DISPATCH"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "method": {
+                "const": "ADAPTER_EXECUTE"
+              },
+              "rawPath": {
+                "const": "existing admitted adapter dispatch descriptor; no invented HTTP endpoint"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "BUILD_CLEANUP_READ"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "method": {
+                "const": "LOCAL_READ"
+              },
+              "rawPath": {
+                "const": "existing PRODUCT_CLEANUP_RECEIPT_PREFIX + exact build_session_id + .json under held protected transport directory"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "BUILD_HEALTH_READ"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "method": {
+                "const": "LOCAL_READ"
+              },
+              "rawPath": {
+                "const": "existing PRODUCT_HEALTH_RECEIPT under held protected transport directory"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "GPU_ACTIVE_OBSERVE"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "method": {
+                "const": "POST"
+              },
+              "rawPath": {
+                "const": "/v1/snapshots"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "HEARTBEAT_OBSERVE"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "method": {
+                "const": "POST"
+              },
+              "rawPath": {
+                "const": "/v1/heartbeats"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "STORAGE_SAMPLE"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "method": {
+                "const": "POST"
+              },
+              "rawPath": {
+                "const": "/v1/storage/sample"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "OBJECT_READ"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "method": {
+                "const": "POST"
+              },
+              "rawPath": {
+                "const": "/v1/objects/read"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "TERMINAL_FRAME"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "method": {
+                "const": "POST"
+              },
+              "rawPath": {
+                "const": "/v1/terminals/frame"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "QUARANTINE_RECONCILE"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "method": {
+                "const": "POST"
+              },
+              "rawPath": {
+                "const": "/v1/builds/quarantine"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "B_GATE_ARM"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "method": {
+                "const": "POST"
+              },
+              "rawPath": {
+                "const": "/v1/roles/gate"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "B_GATE_INVALIDATE"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "method": {
+                "const": "POST"
+              },
+              "rawPath": {
+                "const": "/v1/roles/gate"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "B_ROLE_OBSERVE"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "method": {
+                "const": "POST"
+              },
+              "rawPath": {
+                "const": "/v1/roles/observe"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "B_FOLDER_ROOT_OBSERVE"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "method": {
+                "const": "B_PREFLIGHT_OBSERVE"
+              },
+              "rawPath": {
+                "const": "authorized contributed path only; no physical value bound yet"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "enum": [
+                  "TERMINAL_FRAME",
+                  "BUILD_CLEANUP_READ",
+                  "RECEIPT_OBSERVE",
+                  "CANCEL"
+                ]
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "parentCommandSHA": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$(?![\\s\\S])"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "enum": [
+                  "EXECUTE",
+                  "BUILD_DISPATCH",
+                  "TERMINAL_FRAME"
+                ]
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "admittedClaimVersion": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 9007199254740991
+              },
+              "executionAttemptId": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128,
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$(?![\\s\\S])"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "BUILD_CLEANUP_READ"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "protectedReadBindingSHA": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$(?![\\s\\S])"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "ioObligation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "binding",
+        "bindingHash",
+        "state",
+        "completionService",
+        "completionIncarnation",
+        "completionCapabilityHash",
+        "verifiedOutcomeHash",
+        "causalErrorHash",
+        "protectedRecoveryHash"
+      ],
+      "properties": {
+        "binding": {
+          "$ref": "#/$defs/ioBinding"
+        },
+        "bindingHash": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$(?![\\s\\S])"
+        },
+        "state": {
+          "enum": [
+            "PENDING_IO",
+            "CONFIRMED_OUTCOME",
+            "UNCERTAIN",
+            "SETTLED_PROTECTED",
+            "NO_EFFECT",
+            "NO_EFFECT_ABANDONED"
+          ]
+        },
+        "completionService": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$(?![\\s\\S])"
+        },
+        "completionIncarnation": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$(?![\\s\\S])"
+        },
+        "completionCapabilityHash": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$(?![\\s\\S])"
+        },
+        "verifiedOutcomeHash": {
+          "oneOf": [
+            {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$(?![\\s\\S])"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "causalErrorHash": {
+          "oneOf": [
+            {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$(?![\\s\\S])"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "protectedRecoveryHash": {
+          "oneOf": [
+            {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$(?![\\s\\S])"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "completionAuthority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "serviceId",
+        "incarnation",
+        "state",
+        "durableSequence",
+        "lastErrorHash"
+      ],
+      "properties": {
+        "serviceId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$(?![\\s\\S])"
+        },
+        "incarnation": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$(?![\\s\\S])"
+        },
+        "state": {
+          "enum": [
+            "ACTIVE",
+            "FENCED_UNKNOWN",
+            "RETIRED"
+          ]
+        },
+        "durableSequence": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "lastErrorHash": {
+          "oneOf": [
+            {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$(?![\\s\\S])"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "denialFact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "scope",
+        "factKind",
+        "causeOperationId",
+        "present",
+        "evidenceHash",
+        "protectedClearHash"
+      ],
+      "properties": {
+        "scope": {
+          "$ref": "#/$defs/scope"
+        },
+        "factKind": {
+          "enum": [
+            "DRAIN",
+            "QUARANTINE",
+            "RETIRE"
+          ]
+        },
+        "causeOperationId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$(?![\\s\\S])"
+        },
+        "present": {
+          "type": "boolean"
+        },
+        "evidenceHash": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$(?![\\s\\S])"
+        },
+        "protectedClearHash": {
+          "oneOf": [
+            {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$(?![\\s\\S])"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "cpTombstoneRecord": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "scope",
+        "rootLineageID",
+        "revokedAncestorHash",
+        "authenticatedPrincipal",
+        "causalEvidenceHash",
+        "auditRef",
+        "anchorVersion",
+        "recordedAt"
+      ],
+      "properties": {
+        "scope": {
+          "$ref": "#/$defs/scope"
+        },
+        "rootLineageID": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$(?![\\s\\S])"
+        },
+        "revokedAncestorHash": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$(?![\\s\\S])"
+        },
+        "authenticatedPrincipal": {
+          "enum": [
+            "sv_b_operator",
+            "sv_b_safety"
+          ]
+        },
+        "causalEvidenceHash": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$(?![\\s\\S])"
+        },
+        "auditRef": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$(?![\\s\\S])"
+        },
+        "anchorVersion": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "recordedAt": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        }
+      }
+    },
+    "signingIntent": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "intentId",
+        "scope",
+        "authenticatedService",
+        "kind",
+        "purpose",
+        "domain",
+        "bodyHash",
+        "authorityVersion",
+        "lineageVersion",
+        "authorityFootprintHash",
+        "state",
+        "issuedSignatureHash",
+        "issuedAt",
+        "expiresAt"
+      ],
+      "properties": {
+        "intentId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$(?![\\s\\S])"
+        },
+        "scope": {
+          "$ref": "#/$defs/scope"
+        },
+        "authenticatedService": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$(?![\\s\\S])"
+        },
+        "kind": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$(?![\\s\\S])"
+        },
+        "purpose": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$(?![\\s\\S])"
+        },
+        "domain": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "bodyHash": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$(?![\\s\\S])"
+        },
+        "authorityVersion": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "lineageVersion": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "authorityFootprintHash": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$(?![\\s\\S])"
+        },
+        "state": {
+          "enum": [
+            "PREPARED",
+            "HSM_UNPUBLISHED",
+            "ISSUED",
+            "DISCARDED",
+            "HOLD"
+          ]
+        },
+        "issuedSignatureHash": {
+          "oneOf": [
+            {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$(?![\\s\\S])"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "issuedAt": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "expiresAt": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        }
+      }
+    },
+    "revocationOutbox": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "outboxId",
+        "scope",
+        "rootLineageID",
+        "ancestorHash",
+        "anchorVersion",
+        "targetGateId",
+        "targetReleaseHash",
+        "state",
+        "commandHash",
+        "ackHash",
+        "causalEvidenceHash"
+      ],
+      "properties": {
+        "outboxId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$(?![\\s\\S])"
+        },
+        "scope": {
+          "$ref": "#/$defs/scope"
+        },
+        "rootLineageID": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$(?![\\s\\S])"
+        },
+        "ancestorHash": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$(?![\\s\\S])"
+        },
+        "anchorVersion": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "targetGateId": {
+          "oneOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128,
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$(?![\\s\\S])"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "targetReleaseHash": {
+          "oneOf": [
+            {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$(?![\\s\\S])"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "state": {
+          "enum": [
+            "PENDING",
+            "PREPARED",
+            "SIGNED_UNPUBLISHED",
+            "READY_TO_DISPATCH",
+            "DISPATCHED_AWAIT_ACK",
+            "ACK_RECORDED",
+            "UNKNOWN_TARGET_HOLD",
+            "RETRY_SAME_COMMAND",
+            "EXPIRED_HOLD",
+            "RECONCILIATION_REQUIRED"
+          ]
+        },
+        "commandHash": {
+          "oneOf": [
+            {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$(?![\\s\\S])"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "ackHash": {
+          "oneOf": [
+            {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$(?![\\s\\S])"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "causalEvidenceHash": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$(?![\\s\\S])"
+        }
+      }
+    },
+    "folderRootObservation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "stage",
+        "purpose",
+        "businessAuthority",
+        "scope",
+        "contributionId",
+        "normalizedPath",
+        "heldRoot",
+        "generation",
+        "channelVersion",
+        "nodeDER",
+        "policyR",
+        "policyHash",
+        "ownerConsentVersion",
+        "observePermitHash",
+        "challenge",
+        "observedAt",
+        "expiresAt"
+      ],
+      "properties": {
+        "kind": {
+          "const": "FOLDER_ROOT_OBSERVATION"
+        },
+        "stage": {
+          "const": "PREFLIGHT_ROOT_IDENTITY"
+        },
+        "purpose": {
+          "const": "B_PREFLIGHT_FOLDER_ROOT"
+        },
+        "businessAuthority": {
+          "const": false
+        },
+        "scope": {
+          "$ref": "#/$defs/scope"
+        },
+        "contributionId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$(?![\\s\\S])"
+        },
+        "normalizedPath": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4096
+        },
+        "heldRoot": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "device",
+            "inode",
+            "mountId",
+            "mountNamespaceId",
+            "mountIdentityHash"
+          ],
+          "properties": {
+            "device": {
+              "type": "string",
+              "pattern": "^(0|[1-9][0-9]{0,19})$(?![\\s\\S])"
+            },
+            "inode": {
+              "type": "string",
+              "pattern": "^(0|[1-9][0-9]{0,19})$(?![\\s\\S])"
+            },
+            "mountId": {
+              "type": "string",
+              "pattern": "^(0|[1-9][0-9]{0,19})$(?![\\s\\S])"
+            },
+            "mountNamespaceId": {
+              "type": "string",
+              "pattern": "^(0|[1-9][0-9]{0,19})$(?![\\s\\S])"
+            },
+            "mountIdentityHash": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$(?![\\s\\S])"
+            }
+          }
+        },
+        "generation": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$(?![\\s\\S])"
+        },
+        "channelVersion": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "nodeDER": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$(?![\\s\\S])"
+        },
+        "policyR": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "policyHash": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$(?![\\s\\S])"
+        },
+        "ownerConsentVersion": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "observePermitHash": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$(?![\\s\\S])"
+        },
+        "challenge": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$(?![\\s\\S])"
+        },
+        "observedAt": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "expiresAt": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        }
+      }
+    },
+    "folderRootResponse": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "status",
+            "observation"
+          ],
+          "properties": {
+            "status": {
+              "const": "AVAILABLE"
+            },
+            "observation": {
+              "$ref": "#/$defs/folderRootObservation"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "status",
+            "businessAuthority",
+            "scope",
+            "challenge",
+            "observedAt",
+            "reason"
+          ],
+          "properties": {
+            "status": {
+              "enum": [
+                "SCOPE_DENIED",
+                "ROOT_UNKNOWN",
+                "PATH_UNSAFE",
+                "EXPIRED",
+                "CHANNEL_MISMATCH",
+                "OWNER_UNAVAILABLE"
+              ]
+            },
+            "businessAuthority": {
+              "const": false
+            },
+            "scope": {
+              "$ref": "#/$defs/scope"
+            },
+            "challenge": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$(?![\\s\\S])"
+            },
+            "observedAt": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 9007199254740991
+            },
+            "reason": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128,
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$(?![\\s\\S])"
+            }
+          }
+        }
+      ]
+    },
+    "candidateHintResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "candidateId",
+        "businessAuthority"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "HINT_AVAILABLE",
+            "HINT_OVERLAP",
+            "MISSING_RESOURCE_SCOPE",
+            "UNKNOWN_PARENT_HOLD",
+            "AUTHORITY_DENIED"
+          ]
+        },
+        "candidateId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$(?![\\s\\S])"
+        },
+        "businessAuthority": {
+          "const": false
+        }
+      }
+    },
+    "internalErrorClass": {
+      "enum": [
+        "MISSING_RESOURCE_SCOPE",
+        "AUTH_SCOPE_DENIED",
+        "AUTHENTICATION_EXPIRED",
+        "CHANNEL_CHANGED",
+        "PARENT_BINDING_MISMATCH",
+        "PARENT_UNKNOWN_PROTECTED_ONLY",
+        "DEAD_COMPLETION_CAPABILITY",
+        "ORIGINAL_RECEIPT_MISMATCH"
+      ]
+    }
+  },
+  "description": "PROPOSED SCHEMA/STATIC/SYMBOLIC ONLY. Unsigned CP tombstones, CP-only IO handles/intents; new folder observation B-only; plain floor2 wire unchanged. Strict decoder, C2, actual authority and temporal predicates remain required.",
+  "x-proposal-continuationPolicy": {
+    "TERMINAL_FRAME": {
+      "lane": "EXACT_MATCHED_CLAIM_LIVE_TERMINAL",
+      "nodeProjection": [
+        "online",
+        "draining"
+      ],
+      "tenantExecutionGate": "KNOWN_AND_KILL_SWITCH_FALSE",
+      "parentKind": "EXECUTE",
+      "parentState": "PENDING_IO_LIVE_CURRENT_INCARNATION",
+      "sameAdmittedClaimVersion": true,
+      "matchedClaimActive": true,
+      "perRunWorkload": "RUNNING_CURRENT_ATTEMPT",
+      "allSameRunLeases": "KNOWN_UNRELEASED_UNEXPIRED",
+      "deadline": "STRICTLY_GREATER_THAN_NOW_PLUS_5",
+      "liveExecutionLease": true,
+      "liveActivationLease": true,
+      "businessFactsAllowed": [
+        "DRAIN"
+      ],
+      "unknownParent": "REFUSE"
+    },
+    "CANCEL": {
+      "lane": "CURRENT_AUTHENTICATED_RECOVERY",
+      "liveExecutionLease": false,
+      "liveActivationLease": false,
+      "businessFactsAllowed": [
+        "DRAIN",
+        "QUARANTINE",
+        "RETIRE"
+      ],
+      "unknownParent": "ALLOW_SAFETY_ONLY"
+    },
+    "RECEIPT_OBSERVE": {
+      "lane": "CURRENT_AUTHENTICATED_RECOVERY",
+      "liveExecutionLease": false,
+      "liveActivationLease": false,
+      "businessFactsAllowed": [
+        "DRAIN",
+        "QUARANTINE",
+        "RETIRE"
+      ],
+      "unknownParent": "PROTECTED_RECONCILE_ONLY"
+    },
+    "OBJECT_READ": {
+      "lane": "EXACT_ORIGINAL_READ_AUTHORIZATION",
+      "unknownParent": "REFUSE"
+    },
+    "BUILD_CLEANUP_READ": {
+      "lane": "EXACT_PROTECTED_BUILD_EVIDENCE_READ",
+      "parentKind": "BUILD_DISPATCH",
+      "liveExecutionLease": false,
+      "runningWorkloadRequired": false,
+      "afterPhysicalCompletionOrRelease": "READ_ALLOWED_IF_EXACT_PROTECTED_PURPOSE_CURRENT_AUTH",
+      "unknownParent": "BOUNDED_READ_ONLY_NO_SETTLEMENT",
+      "claimRelease": "ONLY_ORIGINAL_TYPED_KERNEL_CONSEQUENCE_CAS",
+      "runtimeBinding": "NULL_T3_RUNTIME_PENDING"
+    }
+  }
+}

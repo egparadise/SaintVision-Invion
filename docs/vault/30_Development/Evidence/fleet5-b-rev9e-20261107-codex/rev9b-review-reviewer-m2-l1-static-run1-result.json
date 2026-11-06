@@ -1,0 +1,369 @@
+{
+ "reviewer": "Claude",
+ "evidence": "fleet5-b-rev9b-20261106-codex",
+ "source": "72028cbac903c4415d9979f980a6e0f9948e914f",
+ "cases": [
+  {
+   "case": "actual-positive",
+   "expected": "ACCEPT",
+   "observed": "ACCEPT",
+   "asExpected": true,
+   "error": null,
+   "production": 6,
+   "harness": 20,
+   "unions": {
+    "inv.observation.NodeObservation": [
+     "inv.db.Database"
+    ],
+    "inv.observer_worker.ObservationWorker": [
+     "inv.db.Database"
+    ],
+    "inv.workspace_api.RestrictedWorkspaceRuntime": [
+     "inv.db.Database"
+    ]
+   }
+  },
+  {
+   "case": "independent-repo-wide-constructor-census-equals-owner",
+   "expected": true,
+   "observed": true,
+   "asExpected": true,
+   "reviewerCount": 26,
+   "ownerCount": 26,
+   "reviewerProduction": 6,
+   "filesWithNames": 15
+  },
+  {
+   "case": "forwarding-caller-configured_workspace-repo-wide",
+   "expected": "app.py:1323 + self-recursion only (tests monkeypatch)",
+   "observed": "app.py:1323 + self-recursion only (tests monkeypatch)",
+   "asExpected": true,
+   "lines": [
+    "72028cbac903c4415d9979f980a6e0f9948e914f:services/control-plane/src/inv/app.py:1321:            from .workspace_config import configured_workspace",
+    "72028cbac903c4415d9979f980a6e0f9948e914f:services/control-plane/src/inv/app.py:1323:            workspace = configured_workspace(database, identity.tenant_id, settings[\"workspace\"])",
+    "72028cbac903c4415d9979f980a6e0f9948e914f:services/control-plane/src/inv/workspace_config.py:13:def configured_workspace(database, tenant, settings):",
+    "72028cbac903c4415d9979f980a6e0f9948e914f:services/control-plane/src/inv/workspace_config.py:87:        configured = configured_workspace(database, tenant, target)",
+    "72028cbac903c4415d9979f980a6e0f9948e914f:tests/core/test_object_store_provider_binding.py:514:    monkeypatch.setattr(workspace_module, \"configured_workspace\", lambda *_args: workspace)"
+   ]
+  },
+  {
+   "case": "owner-derived-census-files-include-forwarding-caller-app.py",
+   "expected": false,
+   "observed": false,
+   "asExpected": true,
+   "note": "app.py enters only through the hand-written t1_provenance.CORE list",
+   "censusCommand": [
+    "git",
+    "grep",
+    "-l",
+    "-E",
+    "ObservationWorker|NodeObservation|RestrictedWorkspaceRuntime|import[[:space:]].*(observer_worker|observation|workspace_api)",
+    "72028cbac903c4415d9979f980a6e0f9948e914f",
+    "--",
+    "services/control-plane/src",
+    "src",
+    "tools",
+    "tests"
+   ]
+  },
+  {
+   "case": "lan_pilot-local-alias-assignment",
+   "expected": "REFUSE",
+   "observed": "REFUSE",
+   "asExpected": true,
+   "graphError": null,
+   "provenanceError": "DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:SYMBOL:inv.observer_worker.ObservationWorker",
+   "sourceSHA256": "2e78f3846aa6aaf8861364ec14239456ff05ded77a687d59a7f40ed8b90b6d9d",
+   "producerSanity": true,
+   "witnessesChecked": 2,
+   "parsedOnly": true
+  },
+  {
+   "case": "lan_pilot-subclass-root",
+   "expected": "REFUSE",
+   "observed": "REFUSE",
+   "asExpected": true,
+   "graphError": null,
+   "provenanceError": "DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:SYMBOL:inv.observer_worker.ObservationWorker",
+   "sourceSHA256": "bc202db0b3f5e5a3708f2809cd4cb52443f3d7b0dca2596289c74322da3a0dc1",
+   "producerSanity": true,
+   "witnessesChecked": 2,
+   "parsedOnly": true
+  },
+  {
+   "case": "lan_pilot-lambda-box",
+   "expected": "REFUSE",
+   "observed": "REFUSE",
+   "asExpected": true,
+   "graphError": "RECEIVER_UNION_UNPROVEN:CONSTRUCTOR_INPUT:inv.observation.NodeObservation",
+   "provenanceError": "RECEIVER_UNION_UNPROVEN:CONSTRUCTOR_INPUT:inv.observation.NodeObservation",
+   "sourceSHA256": "1ce3e301d78531eaae3f9182432ea9c4db23992007233f2efdcab93ff789f9a2",
+   "producerSanity": true,
+   "witnessesChecked": 2,
+   "parsedOnly": true
+  },
+  {
+   "case": "lan_pilot-list-box",
+   "expected": "REFUSE",
+   "observed": "REFUSE",
+   "asExpected": true,
+   "graphError": null,
+   "provenanceError": "DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:SYMBOL:builtins.object",
+   "sourceSHA256": "f9d9217a2ed93999462079b9ea0fcbaccc68d802da32376fa35ff5505b08944f",
+   "producerSanity": true,
+   "witnessesChecked": 2,
+   "parsedOnly": true
+  },
+  {
+   "case": "lan_pilot-importlib-attribute-root",
+   "expected": "REFUSE",
+   "observed": "REFUSE",
+   "asExpected": true,
+   "graphError": "RECEIVER_UNION_UNPROVEN:CONSTRUCTOR_BINDING",
+   "provenanceError": "RECEIVER_UNION_UNPROVEN:CONSTRUCTOR_BINDING",
+   "sourceSHA256": "bc7fe89f9fc4bf75fe7ebeabb2a072a6baed504ceb7a3e0eb69a994f0c8ecb1f",
+   "producerSanity": true,
+   "witnessesChecked": 2,
+   "parsedOnly": true
+  },
+  {
+   "case": "lan_pilot-string-reflective-root-object",
+   "expected": "REFUSE",
+   "observed": "REFUSE",
+   "asExpected": true,
+   "graphError": null,
+   "provenanceError": "DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:SYMBOL:builtins.object",
+   "sourceSHA256": "f2a0b357185ce4e7893c999cecbb0db85ee0d571af1384935d3a9cec3b7b8c0b",
+   "producerSanity": true,
+   "witnessesChecked": 2,
+   "parsedOnly": true
+  },
+  {
+   "case": "lan_pilot-string-reflective-root-foreign-db",
+   "expected": "REFUSE",
+   "observed": "ACCEPT",
+   "asExpected": false,
+   "graphError": null,
+   "provenanceError": null,
+   "sourceSHA256": "c0932df6e63631c68ab9523bcdf94fcffa01e26cc76761ba090124b2dd99944d",
+   "producerSanity": true,
+   "witnessesChecked": 2,
+   "parsedOnly": true
+  },
+  {
+   "case": "lan_pilot-string-reflective-root-census-row-count",
+   "expected": 6,
+   "observed": 5,
+   "asExpected": false,
+   "note": "a vanished production root is not itself a refusal"
+  },
+  {
+   "case": "app.py-extra-configured_workspace-caller-in-sources",
+   "expected": "REFUSE",
+   "observed": "REFUSE",
+   "asExpected": true,
+   "graphError": "RECEIVER_UNION_UNPROVEN:CONSTRUCTOR_INPUT:inv.observation.NodeObservation",
+   "provenanceError": "RECEIVER_UNION_UNPROVEN:CONSTRUCTOR_INPUT:inv.observation.NodeObservation",
+   "sourceSHA256": "bcb4bb685a875a605ebac30927edf30effd30b371bd30c5707c902719ec77309",
+   "producerSanity": true,
+   "witnessesChecked": 1,
+   "parsedOnly": true
+  },
+  {
+   "case": "uncatalogued-production-file-extra-configured_workspace-caller-owner-pipeline",
+   "expected": "REFUSE",
+   "observed": "ACCEPT",
+   "asExpected": false,
+   "provenanceError": null,
+   "censusProductionRows": 6,
+   "mutantFileInOwnerInputs": false,
+   "sourceSHA256": "d6279044ed4fbdfffda2c5122d2945d3e4d87fe6bbb5e7363d32cc46aed76076",
+   "parsedOnly": true
+  },
+  {
+   "case": "same-mutant-when-file-is-hand-added-to-sources",
+   "expected": "REFUSE",
+   "observed": "REFUSE",
+   "asExpected": true,
+   "graphError": "RECEIVER_UNION_UNPROVEN:CONSTRUCTOR_INPUT:inv.observation.NodeObservation"
+  },
+  {
+   "case": "observer_worker-with-as-rebind-graph-vs-full",
+   "expected": "graph ACCEPT masked by use-site REFUSE",
+   "observed": "graph ACCEPT / full REFUSE",
+   "asExpected": false,
+   "graphError": null,
+   "provenanceError": "DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:INSTANCE:db",
+   "producerSanity": true,
+   "sourceSHA256": "ceb84fa5f78af2eb32bcaa053149dff1cc2a4d203b0d2a2ad8056e5ed6951fdb"
+  },
+  {
+   "case": "observer_worker-for-target-rebind-graph-vs-full",
+   "expected": "graph ACCEPT masked by use-site REFUSE",
+   "observed": "graph ACCEPT / full REFUSE",
+   "asExpected": false,
+   "graphError": null,
+   "provenanceError": "DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:INSTANCE:db",
+   "producerSanity": true,
+   "sourceSHA256": "71f091f54ec168a49c1be15c3884710f251b8f93b9b5ea997c068bf4d53485a2"
+  },
+  {
+   "case": "observer_worker-post-construction-observer-store",
+   "expected": "REFUSE",
+   "observed": "REFUSE",
+   "asExpected": true,
+   "graphError": null,
+   "provenanceError": "DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:WRITE_USE:db.statement_observer",
+   "sourceSHA256": "732df0b03a153b061f415035a05f651abf514b2c7897068963ce41c872437c4f",
+   "producerSanity": true,
+   "witnessesChecked": 1,
+   "parsedOnly": true
+  },
+  {
+   "case": "observer_worker-generic-setattr-spelling",
+   "expected": "REFUSE",
+   "observed": "REFUSE",
+   "asExpected": true,
+   "graphError": null,
+   "provenanceError": "DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:SYMBOL:builtins.setattr",
+   "sourceSHA256": "6deb9e6625cdc888f361a29eb9e29d2452fea864203aebdf0eaf5ed177ef3bac",
+   "producerSanity": true,
+   "witnessesChecked": 1,
+   "parsedOnly": true
+  },
+  {
+   "case": "observer_worker-nested-owner-db-store",
+   "expected": "REFUSE",
+   "observed": "REFUSE",
+   "asExpected": true,
+   "graphError": null,
+   "provenanceError": "DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:WRITE_USE:worker.observer.db",
+   "sourceSHA256": "ed164d36353b80364f5382bb42acd03d2a7b78a71a65c3e209f33eeaebf32311",
+   "producerSanity": true,
+   "witnessesChecked": 1,
+   "parsedOnly": true
+  },
+  {
+   "case": "observer_worker-worker-escape-to-foreign",
+   "expected": "REFUSE",
+   "observed": "REFUSE",
+   "asExpected": true,
+   "graphError": null,
+   "provenanceError": "DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:INSTANCE:worker",
+   "sourceSHA256": "a9092f7f61a7f5b38575bcb5ebc1c7d3ec0a4f7a3de2c8daa46dd804830ea26b",
+   "producerSanity": true,
+   "witnessesChecked": 1,
+   "parsedOnly": true
+  },
+  {
+   "case": "observer_worker-db-transaction-method-escape",
+   "expected": "REFUSE",
+   "observed": "REFUSE",
+   "asExpected": true,
+   "graphError": null,
+   "provenanceError": "DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:INSTANCE:db",
+   "sourceSHA256": "2a6e81969f63bd58c7a42702af8fa9b8a21dcd190f24e5657006ff640e6da236",
+   "producerSanity": true,
+   "witnessesChecked": 1,
+   "parsedOnly": true
+  },
+  {
+   "case": "workspace_config-for-target-owner-escape",
+   "expected": "REFUSE",
+   "observed": "ACCEPT",
+   "asExpected": false,
+   "graphError": null,
+   "provenanceError": null,
+   "sourceSHA256": "caefbf8911dfff33a4ac07796c82dfb4d2ccbf8a485a67104dee557dd889bc53",
+   "producerSanity": true,
+   "witnessesChecked": 1,
+   "parsedOnly": true
+  },
+  {
+   "case": "workspace_config-for-target-owner-db-escape",
+   "expected": "REFUSE",
+   "observed": "ACCEPT",
+   "asExpected": false,
+   "graphError": null,
+   "provenanceError": null,
+   "sourceSHA256": "25a319a33f1851121d2ab36f64ca1d2b9e894aadea1995627eccfe54fa6031ee",
+   "producerSanity": true,
+   "witnessesChecked": 1,
+   "parsedOnly": true
+  },
+  {
+   "case": "workspace_config-for-target-owner-db-method-escape",
+   "expected": "REFUSE",
+   "observed": "ACCEPT",
+   "asExpected": false,
+   "graphError": null,
+   "provenanceError": null,
+   "sourceSHA256": "e74d907db5af0297ec16b6d891cb8858aa81d7ec190c0114e097f4eb085860bd",
+   "producerSanity": true,
+   "witnessesChecked": 1,
+   "parsedOnly": true
+  },
+  {
+   "case": "workspace_config-for-target-owner-db-store-control",
+   "expected": "REFUSE",
+   "observed": "REFUSE",
+   "asExpected": true,
+   "graphError": null,
+   "provenanceError": "DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:WRITE_USE:runtime.db",
+   "sourceSHA256": "00918b559969fc4e92abda5b7b2d780fd9fc582c1a0b636fa7f78c30130ad138",
+   "producerSanity": true,
+   "witnessesChecked": 1,
+   "parsedOnly": true
+  },
+  {
+   "case": "workspace_config-result-owner-escape-control",
+   "expected": "REFUSE",
+   "observed": "REFUSE",
+   "asExpected": true,
+   "graphError": null,
+   "provenanceError": "DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:INSTANCE:result",
+   "sourceSHA256": "47c0c819d279b60c9dcd36e9f412ed89b0efab1c283148f5d962051058db2f27",
+   "producerSanity": true,
+   "witnessesChecked": 1,
+   "parsedOnly": true
+  },
+  {
+   "case": "app.py-factory-result-owner-escape",
+   "expected": "REFUSE",
+   "observed": "ACCEPT",
+   "asExpected": false,
+   "graphError": null,
+   "provenanceError": null,
+   "sourceSHA256": "5ed7c55f79a8c59d0d974f2810480028a023a8947db6e55790955b11ed4144e8",
+   "producerSanity": true,
+   "witnessesChecked": 1,
+   "parsedOnly": true
+  },
+  {
+   "case": "app.py-factory-result-db-escape",
+   "expected": "REFUSE",
+   "observed": "ACCEPT",
+   "asExpected": false,
+   "graphError": null,
+   "provenanceError": null,
+   "sourceSHA256": "5df41923057c5a2298bb3ad6065623c7fe1cbf47d49064718ca483d6a329b8a9",
+   "producerSanity": true,
+   "witnessesChecked": 1,
+   "parsedOnly": true
+  },
+  {
+   "case": "app.py-factory-result-db-store-control",
+   "expected": "REFUSE",
+   "observed": "REFUSE",
+   "asExpected": true,
+   "graphError": null,
+   "provenanceError": "DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:WRITE_USE:workspace.runtime.db",
+   "sourceSHA256": "47b797de54fc5955805f7ade6655dc995c3f40637731fc464162a68d48ffbf74",
+   "producerSanity": true,
+   "witnessesChecked": 1,
+   "parsedOnly": true
+  }
+ ],
+ "effectfulMutantsImportedOrExecuted": false,
+ "actualRuntimeB": 0
+}

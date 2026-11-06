@@ -1,0 +1,106 @@
+{
+  "review": "Actual independent Claude NARROW Rev9d delta review",
+  "orca": {"task": "task_b5c120568d18", "dispatch": "ctx_9031e0499999", "reviewerBranch": "agent/claude/fleet5-b-rev9d-545-review-20261107", "reviewerBase": "54549b90774aab3599c0486a5217d0d1634baca8"},
+  "owner": {"agent": "Codex", "task": "task_a8fd2969f0b3", "dispatch": "ctx_6f0f8253b8a7", "pendingQuestion": "msg_a7abe9c3b6d6", "rootFixGrant": "msg_1a4f33b7e3e6"},
+  "target": "54549b90774aab3599c0486a5217d0d1634baca8",
+  "base": "5ea87937f1b542f8cbe32c08dc224526965a8e2d",
+  "productSource": "72028cbac903c4415d9979f980a6e0f9948e914f",
+  "priorActualReview": {"commit": "4288a1c403bc15ac1174c49e512ab8c7314d522f", "docs": 42240632854, "verdict": "LOW-only REVISION_REQUIRED (B9c-L1/L2)"},
+  "rootSourceReceiptAccepted": {"path": "fleet-five-orchestration-20261105/.work/b9d-source-root-verified.json", "docs": 42252480330, "job": 128010937512, "rerunByReviewer": false, "note": "Root CI/raw-hash receipt taken as Root evidence, not as semantic review"},
+  "verdict": "REVISION_REQUIRED",
+  "severity": "LOW only; no MEDIUM; actual frozen 72028 T1/A8 closure stands (positive ACCEPT at the final 54549 producers)",
+  "items": {
+    "B9c-L1": {
+      "status": "PARTIAL -> B9d-L1 (LOW)",
+      "closed": [
+        "the three actual 4288 business_auth.py counterexamples (attrgetter+sys.modules root, importlib configured_workspace, sys.modules configured_workspace) refuse UNCATALOGUED_PRODUCTION_SOURCE:business_auth.py with 2/1/1 relevant hits recorded and the six frozen roots preserved",
+        "retained refusals: importlib attribute root, module import + getattr forwarder",
+        "controls ACCEPT: outside Database helper, assigned protected string plus unused operator import",
+        "reviewer-computed parsed universe: census 20 + discovery 11 files, union 25 (11 production), parsed set == audited set; frozen 72028 relevant hits 0 (owner 25 is reproduced, not taken as a count-only closure)"
+      ],
+      "open": {
+        "id": "B9d-L1",
+        "severity": "LOW",
+        "source": "reflection_audit.py hits(): an enumerated API (sys.modules / importlib / builtins.getattr) counts only when a string LITERAL or a resolvable symbol in the expression is protected; a computed or variable key is never relevant",
+        "counterexamples": [
+          "L1-independent-nonliteral-key-sys-modules-string-variable-forwarder: _CLAUDE_MOD = 'inv.workspace_config'; sys.modules[_CLAUDE_MOD].configured_workspace(object(), tenant, settings) -> ACCEPT",
+          "L1-independent-nonliteral-key-sys-modules-fstring-forwarder: sys.modules[f\"inv.{'workspace_config'}\"].configured_workspace(object(), ...) -> ACCEPT",
+          "L1-independent-nonliteral-key-importlib-join-forwarder: importlib.import_module('.'.join(('inv', 'workspace_config'))).configured_workspace(object(), ...) -> ACCEPT",
+          "L1-independent-nonliteral-key-getattr-importlib-variable-constructor-root: getattr(importlib.import_module(_CLAUDE_MOD), _CLAUDE_NAME)(object(), None) with 'inv.observer_worker'/'ObservationWorker' -> ACCEPT (hidden 7th root, six genuine roots preserved)"
+        ],
+        "validity": "business_auth.py overlay only, valid AST, no new unbound names, 15/15 closure witnesses, six frozen roots preserved, all prior preconditions pass; nothing imported or executed",
+        "minimalCorrection": "In reflection_audit.hits treat an enumerated API whose module/name/key argument is not a str literal within the declared bound (Name, Attribute, Call, JoinedStr, Subscript, BinOp beyond 4) as relevant-unknown (e.g. ENUMERATED_REFLECTION_NONLITERAL_KEY) in every parsed production file: exact frozen match or refuse. Optionally add forwarder short-name parity in forwarding_discovery (an unresolved call whose callee spelling ends in a tracked forwarder/export short name -> UNRESOLVED:RELEVANT_FORWARDER_BINDING), as the census already does for the three constructors. Regression: these 4 refuse; existing controls and the 72028 positive still ACCEPT."
+      }
+    },
+    "optionalDottedLiteralTightening": {
+      "status": "ACCEPTED as a finite bound",
+      "observed": "literal and 4-addition pkgutil.resolve_name refuse; json:dumps resolver and a log message containing 'inv.observer_worker started' ACCEPT; logging.getLogger('inv.db.query') refuses (conservative false positive, fail closed)",
+      "finiteBound": "any Call positional/keyword argument that is a str Constant <=512 chars or an Add BinOp tree of depth <=4 whose value is, or starts with, a protected/tracked module path followed by '.' or ':'",
+      "residualUnsupported": ["5+ additions (observed ACCEPT, declared)", "':'.join / format / % / f-string arguments to non-enumerated resolvers (observed ACCEPT, declared)", "strings held in variables", "vars()/__dict__/globals()/eval/exec in OUTSIDE files (use-site REFLECTION applies only to proof bodies)", "modules outside frozen grep union supplied overlays"],
+      "demand": false
+    },
+    "B9c-L2": {
+      "status": "PARTIAL -> B9d-L2 (LOW)",
+      "closed": [
+        "the five actual 4288 escapes refuse: WorkspaceAPI.__init__ runtime/runtime.db/runtime.db.transaction -> DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:INSTANCE:runtime; nested create_app.workspace_service workspace/workspace.runtime.db -> ...:INSTANCE:workspace",
+        "same-function unowned control: WorkspaceAPI.__init__ working (WorkingGenerations) to a foreign call ACCEPTs",
+        "loop-derived runtime.db and dict-comprehension closures retained",
+        "binder fixtures: positional-only, keyword-only and unowned-vs-owned formal bind correctly",
+        "frozen-only allowlist confirmed in code: baseline_sites uses frozen parameter facts; current/frozen binding counts 576/576"
+      ],
+      "open": {
+        "id": "B9d-L2",
+        "severity": "LOW",
+        "source": "call_binding.target/arguments choose the lexical def: a class call binds only Class.__init__, and a module-level rebinding/decorator of the callee name is ignored; use_sites does not audit a Store of a non-factory callee name",
+        "counterexamples": [
+          "L2-independent-WorkspaceAPI-__new__-receives-runtime: one-line __new__(cls, *args, **kwargs) sending args[2] to foreign_module.register_runtime replaces blank workspace_api.py line 130; workspace_config.py:44 WorkspaceAPI(database, working, runtime) runs __new__ with the same arguments -> ACCEPT",
+          "L2-independent-lan_pilot-callee-rebinding-conn: '_current_finalized_batch = _claude_wrap(_current_finalized_batch)' plus a one-line wrapper sending a[4] to foreign_module.register_conn replace the two blank lines before the __main__ guard; frozen lan_pilot.py:1872 and :1990 (conn from psycopg.connect(state['adminDSN'])) pass conn as the 5th positional -> ACCEPT"
+        ],
+        "fixtureCorroboration": "AST-only solve(): class-call-__new__ binds only Box.__init__; decorated-callee binds the lexical formal 'note' although the swap decorator delivers the value to 'slot'; rebound-callee binds the original def",
+        "control": "L2-control-app-factory-rebinding: create_app = _claude_wrap(create_app) refuses FORWARDING_FACTORY_SYMBOL:inv.app.create_app (factory names are audited; non-factory callee names are not)",
+        "validity": "valid AST, no new unbound names, 15/15 witnesses, no line shift before the anchors, six roots preserved, all prior preconditions pass",
+        "actual72028": "reviewer scan of the 11 parsed production proof files: 0 __new__/__call__, 0 class keywords/metaclass, 0 module-level rebinding of a def name, 0 global; decorators only contextmanager, asynccontextmanager, staticmethod and FastAPI route decorators",
+        "minimalCorrection": "When an owned argument reaches a binder target: (1) a class call whose class (or in-proof base) defines __new__ or has metaclass/class keywords not frozen-identical refuses UNRESOLVED:CLASS_CONSTRUCTION_BINDING, or also binds the arguments to __new__ (cls skipped) so the existing variadic/keyword-spread refusals apply; (2) a target whose name is assigned/deleted/global/import-shadowed in its module, or decorated by anything outside staticmethod/classmethod/contextmanager/asynccontextmanager (or a frozen-identical decorator list), refuses UNRESOLVED:CALLEE_REBOUND, mirroring constructor_graph.helper_return HELPER_REBIND/HELPER_IMPORT_SHADOW. Regression: the two counterexamples refuse; the factory-rebinding control keeps refusing; the 72028 positive still ACCEPTs."
+      }
+    },
+    "optionalKeywordMapping": {
+      "status": "ACCEPTED",
+      "observed": "keyword forwarder: UNCATALOGUED_PRODUCTION_SOURCE names business_auth.py and business_handoff.py, so the higher hop is inventoried; in-source keyword-only object now refuses in graph-only mode (RECEIVER_UNION_UNPROVEN:CONSTRUCTOR_INPUT:inv.observation.NodeObservation) and in full provenance; a separate module_uses check of the same app.py still refuses DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:INSTANCE:_claude_extra, so the use-site evidence is not dropped",
+      "original47RawMismatch": "owner label L2-keyword-only-in-source-full refusing earlier is a stronger refusal, not a lost closure"
+    },
+    "pendingObligations": {
+      "status": "ACCEPTED",
+      "observed": "B9B-I3-FUTURE-TENANT-EPOCH PENDING_BEFORE_ANY_EPOCH_WRITER with no model change (model/lifecycle bytes equal 5ea); B9C-I3 harness-only function-scope alias limitation at tests/core/test_object_store_provider_binding.py:500/514 kept harness-only, no production upgrade; B9B-I4 no-new-use vs 72028 stays distinct from benignity of existing uses"
+    },
+    "info": [
+      "B9d-I1 (fail closed): explicit named keywords into **kwargs return UNRESOLVED:PARAMETER_OWNERSHIP_DID_NOT_CONVERGE in a minimal fixture. The solve() iteration bound counts posonly/args/kwonly formals but not vararg/kwarg, and not factory growth. The actual 72028 run converged in 1 iteration. Add those to the bound.",
+      "B9d-I2 (future bound): the universe is the frozen 72028 grep plus the supplied overlays. A future mutation proof is only as complete as its overlay set, so every changed file must be supplied.",
+      "B9d-I3: the frozen allowlist and prior factories are seeded from the current discovery's factories and exports. Allowlist keys are still frozen contexts with multiplicity, and no self-authorization was found."
+    ]
+  },
+  "evidenceChecks": {
+    "producers": "60/60 committed blob SHA and bytes match proof-producer-hashes.json, 461755 B",
+    "rawCopies": "42/42 match; the 10 rev9c-review-* copies equal the 4288 blobs",
+    "modelLifecycle": "model.py f7384016..., lifecycle.py 710c6aaf...; bytes equal the 5ea copies",
+    "accounting6": "targeted-category-delta, writer-census-delta, reader-io-catalog, authority-matrix, contract.schema, pilot-closure byte-identical to 5ea",
+    "order": "pending_contracts.py (8669d801...) then edge_categories.py (d16ae559...); stage1 dee5bde0..., final 5c9a4e42..., closure 0b255759..., manifest 92563192... equal committed blobs",
+    "seal": "c79faaf3... matches manifest; 15 source + 7 artifact hashes equal final committed bytes; the seal is POST_RUN at 01:04:05 KST, after the 00:53/00:54/01:01 runs (all exit 0). Producer stability between run and seal cannot be shown from the seal, and the seal says so. The reviewer's own run at the final producers reproduces all 8 refusals.",
+    "commandLedgers": "proof-checks 20/20 actual==expected (R4 0/1 kept), publication-gates 8/8 exit 0",
+    "notRerun": "owner proof commands, model182/terminal47/recovery79+8, owner 70/19/31/83/29 replays, deterministic generation; inherited replays are not counted as independent coverage"
+  },
+  "reviewerRuns": {
+    "probes": {"cases": 33, "binderFixtures": 7, "exit": 0, "peakWorkingSetBytes": 130297856, "elapsedSeconds": 305.7, "mismatchClassification": {
+      "expectedReasonPrefixOnly": ["L1-4288-repro-attrgetter-sys-modules-root", "L1-4288-repro-importlib-configured_workspace", "L1-4288-repro-sys-modules-configured_workspace"],
+      "findings": ["L1-independent-nonliteral-key-sys-modules-string-variable-forwarder", "L1-independent-nonliteral-key-sys-modules-fstring-forwarder", "L1-independent-nonliteral-key-importlib-join-forwarder", "L1-independent-nonliteral-key-getattr-importlib-variable-constructor-root", "L2-independent-WorkspaceAPI-__new__-receives-runtime", "L2-independent-lan_pilot-callee-rebinding-conn"],
+      "info": ["explicit-kw-into-kwargs (B9d-I1)"],
+      "note": "The first three refuse. Only the reviewer's guessed reason prefix (RELEVANT_REFLECTION_OUTSIDE_PROOF_SOURCES) differed from the earlier UNCATALOGUED_PRODUCTION_SOURCE, which the owner contract allows."}}
+  },
+  "unchangedBoundaries": "19 T1 edges (16 analysis/3 runtime), 12 entries, 598/757/1071/21, 573 outside, 218 backlog carried by byte-identical accounting artifacts; observer lock safety outside19; expected R4 exits 0/1; all real bindings NULL/HOLD, runtime B0, A1-A16 PENDING; per-process peaks are observations only",
+  "notDone": "no B product/port/freeze/DB/Engine/SSH/issuer/install/current/effect/physical/whole-Core grant; no mutant import/execution; no full 523 assembler/3485 plans/giant ledger; no Obsidian apply/adopt/resolve/state write; no shared board/registry/ADR/pin/workflow edits; no helpers/subagents",
+  "nextCut": [
+    "Rev9e fix-only from exact 54549: B9d-L1 non-literal enumerated reflection key plus optional forwarder short-name parity, B9d-L2 class-construction/callee-identity binder refusal, and the B9d-I1 bound. Use the reviewer's 6 counterexamples plus the existing controls. Then ONE narrow Claude delta review.",
+    "A7 NodeChannels.snapshot stays UNSTARTED until an actual acceptance and a separate Root grant."
+  ],
+  "A7": "UNSTARTED",
+  "actualRuntimeB": 0
+}

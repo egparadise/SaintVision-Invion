@@ -1,0 +1,22 @@
+{
+  "environment": "Windows 11, Git Bash, D:/Project/SaintVisionI-Invion/.venv Python 3.14.7 with -B, PYTHONUTF8=1, cwd = worktree root fleet5-bootstrap-v3-review-20261106 on branch agent/claude/fleet5-b-rev9d-545-review-20261107 created from exact 54549b90. Times KST. Serial only; no installs, no OS/pagefile/process/service changes.",
+  "provenance": [
+    {"argv": "git fetch origin agent/codex/fleet5-b-rev9d-20261107 ; git rev-parse FETCH_HEAD", "result": "54549b90774aab3599c0486a5217d0d1634baca8"},
+    {"argv": "git diff --name-status 5ea87937 54549b90", "result": "175 A (174 Evidence/fleet5-b-rev9d-20261107-codex + 1 History), 0 M/D"},
+    {"argv": "git checkout -b agent/claude/fleet5-b-rev9d-545-review-20261107 54549b90774aab3599c0486a5217d0d1634baca8", "result": "HEAD 54549b90"},
+    {"argv": "read fleet-five-orchestration-20261105 (read-only): HEAD c21e0e2b, Index 1.0.470 updated 2026-11-07T01:45:07+09:00, Claude board 1.2.130, .work/b9d-source-root-verified.json, .work/p02-reviewer-before-b9d-start.json (ctx_9785b4d4f081 succeeded/settled/exited/released)", "result": "read only"}
+  ],
+  "staticReads": [
+    "owner History and producers reflection_audit, call_binding, parameter_flow (new), use_sites, owner_transfer, constructor_graph, forwarding_discovery, source_bindings, t1_provenance, t1_build, pending_contracts (git diff vs 5ea copies), parameter_binding_tests, universe_audit_tests, rev9d_gap_driver, pending-obligations.json, completed-regression-source-seal.json, proof-producer-hashes.json, proof-checks.json, publication-gates.json",
+    "prior actual review 4288a1c4 History, review and reviewer_rev9c_delta_probes driver"
+  ],
+  "reviewerRuns": [
+    {"argv": "PYTHONHASHSEED=0 PYTHONUTF8=1 python -B <rev9d>/measured_run.py reviewer_rev9d_delta_probes.py.txt <rev9d dir abs> reviewer-rev9d-delta-probes-result.json", "exit": 0, "kstWindow": "approx 2026-11-07T01:46..01:51 (elapsed 305.7 s; not separately stamped)", "log": "reviewer-rev9d-delta-probes.log.txt", "cases": 33, "binderFixtures": 7, "peakWorkingSetBytes": 130297856, "run": "single run1, retained as final"},
+    {"argv": "python -B reviewer_verify_hashes.py.txt > reviewer-hash-receipt-checks.json", "exit": 1, "attempts": 2, "why": "reviewer script quoting SyntaxError, no output; a sed fix did not apply (same error), then fixed with an exact editor replacement"},
+    {"argv": "python -B reviewer_verify_hashes.py.txt > reviewer-hash-receipt-checks.json", "exit": 0},
+    {"argv": "python -B reviewer_scan_72028_binder_forms.py.txt > reviewer-scan-72028-binder-forms.txt", "exit": 0},
+    {"argv": "python -B reviewer_gate_driver.py.txt 54549b90... canonical-sync-check-before.txt <scratch> sync-only", "exit": 0, "stateSHA": "abec5cd3... before == after", "note": "CHECK: 4044 managed, 1619 pending exports (this branch tree vs canonical state), 0 conflicts, no writes"},
+    {"argv": "python -B reviewer_gate_driver.py.txt 54549b90... local-doc-gates.txt <scratch>", "exit": 0, "result": "8/8 exit 0 (local-doc-gates.txt); sync CHECK state 3617d545... before == after (canonical state changed from abec5cd3... between the two reviewer checks, i.e. Root applied between calls; each call is read-only), 4055 managed, 1630 pending exports, 0 conflicts"}
+  ],
+  "notRun": "owner run_checks/proof commands, model/terminal/recovery suites, deterministic generation, full assembler; no Obsidian apply/adopt/resolve/state write"
+}

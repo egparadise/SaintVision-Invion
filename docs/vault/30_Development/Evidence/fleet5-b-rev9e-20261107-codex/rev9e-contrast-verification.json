@@ -1,0 +1,175 @@
+{
+  "actual9266GapsNowRefused": [
+    {
+      "case": "sys-variable",
+      "old": "ACCEPT",
+      "new": "REFUSE",
+      "reason": "UNCATALOGUED_PRODUCTION_SOURCE:services/control-plane/src/inv/business_auth.py"
+    },
+    {
+      "case": "sys-fstring",
+      "old": "ACCEPT",
+      "new": "REFUSE",
+      "reason": "UNCATALOGUED_PRODUCTION_SOURCE:services/control-plane/src/inv/business_auth.py"
+    },
+    {
+      "case": "importlib-join",
+      "old": "ACCEPT",
+      "new": "REFUSE",
+      "reason": "UNCATALOGUED_PRODUCTION_SOURCE:services/control-plane/src/inv/business_auth.py"
+    },
+    {
+      "case": "getattr-variable-hidden-seventh",
+      "old": "ACCEPT",
+      "new": "REFUSE",
+      "reason": "UNCATALOGUED_PRODUCTION_SOURCE:services/control-plane/src/inv/business_auth.py"
+    },
+    {
+      "case": "WorkspaceAPI-new-runtime",
+      "old": "ACCEPT",
+      "new": "REFUSE",
+      "reason": "UNRESOLVED:CLASS_CONSTRUCTION_BINDING"
+    },
+    {
+      "case": "nonfactory-rebound-conn",
+      "old": "ACCEPT",
+      "new": "REFUSE",
+      "reason": "UNRESOLVED:CALLEE_REBOUND"
+    }
+  ],
+  "controls": [
+    {
+      "case": "actual72028-positive",
+      "actual9266Gap": false,
+      "expectedNew": "ACCEPT",
+      "observed": "ACCEPT",
+      "reason": null,
+      "astValid": true,
+      "newUnboundNames": [],
+      "witnessesChecked": 15,
+      "sixFrozenRootsPreserved": true,
+      "visibleRoots": 6,
+      "hiddenSemanticRootsInFixture": 0,
+      "fixtureSemanticRootCount": 6,
+      "mutatedSHA256": {},
+      "newUnknownReflectionHits": 0,
+      "effectfulMutantsImportedOrExecuted": false
+    },
+    {
+      "case": "outside-assigned-string-unused-import",
+      "actual9266Gap": false,
+      "expectedNew": "ACCEPT",
+      "observed": "ACCEPT",
+      "reason": null,
+      "astValid": true,
+      "newUnboundNames": [],
+      "witnessesChecked": 15,
+      "sixFrozenRootsPreserved": true,
+      "visibleRoots": 6,
+      "hiddenSemanticRootsInFixture": 0,
+      "fixtureSemanticRootCount": 6,
+      "mutatedSHA256": {
+        "services/control-plane/src/inv/business_auth.py": "1a2f1df576f16c9b6aedfa986c7c0d95da3eb2a746b7e8d3c9f29a42ced6779d"
+      },
+      "newUnknownReflectionHits": 0,
+      "effectfulMutantsImportedOrExecuted": false
+    },
+    {
+      "case": "outside-benign-database-helper",
+      "actual9266Gap": false,
+      "expectedNew": "ACCEPT",
+      "observed": "ACCEPT",
+      "reason": null,
+      "astValid": true,
+      "newUnboundNames": [],
+      "witnessesChecked": 15,
+      "sixFrozenRootsPreserved": true,
+      "visibleRoots": 6,
+      "hiddenSemanticRootsInFixture": 0,
+      "fixtureSemanticRootCount": 6,
+      "mutatedSHA256": {
+        "services/control-plane/src/inv/business_auth.py": "76ffaa515ad853eb230c1fdedb22b19cd3ce6ef6eb468abdf7e655f0a63c7eb8"
+      },
+      "newUnknownReflectionHits": 0,
+      "effectfulMutantsImportedOrExecuted": false
+    },
+    {
+      "case": "same-function-unowned-working",
+      "actual9266Gap": false,
+      "expectedNew": "ACCEPT",
+      "observed": "ACCEPT",
+      "reason": null,
+      "astValid": true,
+      "newUnboundNames": [],
+      "witnessesChecked": 15,
+      "sixFrozenRootsPreserved": true,
+      "visibleRoots": 6,
+      "hiddenSemanticRootsInFixture": 0,
+      "fixtureSemanticRootCount": 6,
+      "mutatedSHA256": {
+        "services/control-plane/src/inv/workspace_api.py": "141c63b1bab2584193046d467ae87d06d26f4434e9a8cf52985a9f2ddbaee79d"
+      },
+      "newUnknownReflectionHits": 0,
+      "effectfulMutantsImportedOrExecuted": false
+    },
+    {
+      "case": "outside-benign-literal-reflection",
+      "actual9266Gap": false,
+      "expectedNew": "ACCEPT",
+      "observed": "ACCEPT",
+      "reason": null,
+      "astValid": true,
+      "newUnboundNames": [],
+      "witnessesChecked": 15,
+      "sixFrozenRootsPreserved": true,
+      "visibleRoots": 6,
+      "hiddenSemanticRootsInFixture": 0,
+      "fixtureSemanticRootCount": 6,
+      "mutatedSHA256": {
+        "services/control-plane/src/inv/business_auth.py": "73a8ddd2f68c05234e00817035ce4073bbed8b86c863d281d8ed5d915ea2534b"
+      },
+      "newUnknownReflectionHits": 0,
+      "effectfulMutantsImportedOrExecuted": false
+    },
+    {
+      "case": "unrelated-local-callee-name",
+      "actual9266Gap": false,
+      "expectedNew": "ACCEPT",
+      "observed": "ACCEPT",
+      "reason": null,
+      "astValid": true,
+      "newUnboundNames": [],
+      "witnessesChecked": 15,
+      "sixFrozenRootsPreserved": true,
+      "visibleRoots": 6,
+      "hiddenSemanticRootsInFixture": 0,
+      "fixtureSemanticRootCount": 6,
+      "mutatedSHA256": {
+        "tools/lan_pilot.py": "ed7a8b296685b8818b1cdd692aeb4cdb36ed47401986c867ef0a728e3207a11f"
+      },
+      "newUnknownReflectionHits": 0,
+      "effectfulMutantsImportedOrExecuted": false
+    },
+    {
+      "case": "existing-factory-rebind-control",
+      "actual9266Gap": false,
+      "expectedNew": "REFUSE",
+      "observed": "REFUSE",
+      "reason": "UNRESOLVED:CALLEE_REBOUND",
+      "astValid": true,
+      "newUnboundNames": [],
+      "witnessesChecked": 15,
+      "sixFrozenRootsPreserved": true,
+      "visibleRoots": 6,
+      "hiddenSemanticRootsInFixture": 0,
+      "fixtureSemanticRootCount": 6,
+      "mutatedSHA256": {
+        "services/control-plane/src/inv/app.py": "1d3b90309aea12e96a4fcdd4a85ccb9516a14e0136898f027f3b9d5e6f6d69ac"
+      },
+      "newUnknownReflectionHits": 0,
+      "effectfulMutantsImportedOrExecuted": false
+    }
+  ],
+  "reasonPrefixPolicy": "Declared conservative refusal is refusal; reviewer guessed prefix-only mismatches remain REFUSALS, never semantic gaps",
+  "actualRuntimeB": 0
+}

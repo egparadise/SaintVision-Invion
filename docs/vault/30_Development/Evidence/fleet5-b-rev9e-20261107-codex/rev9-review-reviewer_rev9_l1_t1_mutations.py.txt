@@ -1,0 +1,145 @@
+"""Independent Claude reviewer A1c/A8/A2 source-mutation probes against Rev9 3daf1a0d.
+
+Usage: python -B reviewer_rev9_l1_t1_mutations.py <rev9-evidence-dir> <out.json>
+Uses the ACTUAL owner predicates (analysis_rules / t1_provenance / mutation_fixture)
+as a library. Mutated sources are parsed only: never imported or executed.
+Every A1c mutant is reparsed and its records rebased; producer sanity must pass
+first, so a refusal can't come from a stale span.
+Expected = reviewer requirement (Root scope: unknown dynamic mutation => refuse).
+"""
+import ast, json, sys
+sys.path.insert(0, sys.argv[1])
+import bounded_analysis as a
+import analysis_rules as r
+import t1_provenance as t
+from mutation_fixture import rebase, after_line
+
+R = []
+def rec(case, accepted, expect_refuse=True, **data):
+    R.append({'case': case, 'acceptedByOwnerPredicate': accepted, 'reviewerExpectsRefusal': expect_refuse,
+              'soundGap': bool(accepted and expect_refuse), **data})
+
+core = t.read_batch([t.CP + n for n in t.CORE] + ['tools/remote_workspace_entry.py'])
+ctors = t.read_batch(t.MAIN_CTOR_PATHS)
+owner, err = t.provenance(core, ctors); assert not err, err
+FNS = ('inv.db.Database.transaction', 'inv.observation.NodeObservation.mark_offline')
+calls = [c for c in a.rows('classifiedCalls') if c['function'] in FNS]
+records = [x for x in a.rows('records') if x['function'] in FNS]
+targets = [c for c in calls if c['blocksGrant'] and isinstance(a.node_at(core[c['path']], c).func, ast.Attribute) and a.node_at(core[c['path']], c).func.attr in ('fetchone', 'fetchall')]
+assert len(targets) == 5
+sel = {'mark_offline.conn': next(c for c in targets if c['function'].endswith('mark_offline')),
+       'transaction.conn': next(c for c in targets if c['function'].endswith('transaction') and c['spelling'].startswith('conn.')),
+       'transaction.observed_conn': next(c for c in targets if c['spelling'].startswith('observed_conn.'))}
+
+def a1c(label, target, mcore, mctors, mutated_path):
+    """Run the owner A1c pipeline on mutated inputs; returns (accepted, reason, sanity)."""
+    path = target['path']; src = mcore[path]
+    if mutated_path == path:
+        cs = rebase(core[path], src, [c for c in calls if c['path'] == path]); rs = rebase(core[path], src, [x for x in records if x['path'] == path])
+    else:
+        cs = [c for c in calls if c['path'] == path]; rs = [x for x in records if x['path'] == path]
+    tar = next(c for c in cs if c['id'] == target['id']); node = a.node_at(src, tar)
+    sanity, serr = r.producer_sanity(src, node, rs, cs)
+    if not sanity: return None, serr, False
+    mo, oerr = t.provenance(mcore, mctors)
+    if not mo: return False, oerr, True
+    res = r.connection_result_explain(src, node, rs, cs, mcore[t.CP + 'db.py'], mo)
+    return bool(res['proof']), res['reason'], True
+
+def fn_of(source, qual): return t.function(source, qual)
+
+# --- (1) receiver escape forms not covered by positional-Name scan ---
+for key, target in sel.items():
+    path = target['path']; source = core[path]; receiver = key.split('.')[1]
+    fn = next(f for f in t.qualified_functions(source).values() if f.lineno <= target['line'] <= f.end_lineno)
+    if receiver == 'observed_conn': line = next(n.end_lineno for n in ast.walk(fn) if isinstance(n, ast.Assign) and any(isinstance(x, ast.Name) and x.id == receiver for x in n.targets))
+    else: line = next(i.context_expr.end_lineno for n in ast.walk(fn) if isinstance(n, ast.With) for i in n.items if isinstance(i.optional_vars, ast.Name) and i.optional_vars.id == 'conn')
+    indent = ' ' * (len(source.splitlines()[target['line'] - 1]) - len(source.splitlines()[target['line'] - 1].lstrip()))
+    for stmt in [f'foreign(c={receiver})', f'foreign([{receiver}])', f'foreign(*[{receiver}])', f'hook = lambda: {receiver}\nforeign(hook)',
+                 f"box = {{'c': {receiver}}}\nforeign(box)", f'foreign.attach(conn={receiver})', f'foreign({receiver}.execute)',
+                 f'{receiver}.__class__.execute = foreign', f'foreign({receiver})']:
+        mutated = after_line(source, line, stmt, indent); ast.parse(mutated)
+        mc = dict(core); mc[path] = mutated
+        acc, reason, sane = a1c(key, target, mc, ctors, path)
+        rec(f'A1c-escape[{key}] {stmt.splitlines()[-1]}', acc, True, reason=reason, producerSanity=sane, mutatedSourceSHA256=r.sha(mutated))
+
+# --- (2) Database-receiver monkeypatch on the transaction owner (mark_offline) ---
+target = sel['mark_offline.conn']; obs_path = t.CP + 'observation.py'; obs = core[obs_path]
+mo_fn = fn_of(obs, 'NodeObservation.mark_offline'); init_fn = fn_of(obs, 'NodeObservation.__init__')
+for label, mutated in [
+        ('mark_offline-start self.db.transaction = foreign', after_line(obs, mo_fn.lineno, 'self.db.transaction = foreign')),
+        ('mark_offline-start self.db.__class__ = foreign', after_line(obs, mo_fn.lineno, 'self.db.__class__ = foreign')),
+        ('mark_offline-start vars(self.db).update(transaction=foreign)', after_line(obs, mo_fn.lineno, 'vars(self.db).update(transaction=foreign)')),
+        ('__init__-end self.db.transaction = foreign', after_line(obs, init_fn.end_lineno, 'self.db.transaction = foreign')),
+        ('module-end from .db import Database as _D; _D.transaction = foreign', obs + '\nfrom .db import Database as _D\n_D.transaction = foreign\n'),
+        ('module-end Database.transaction = foreign (control)', obs + '\nDatabase.transaction = foreign\n')]:
+    ast.parse(mutated); mc = dict(core); mc[obs_path] = mutated
+    acc, reason, sane = a1c('mark_offline.conn', target, mc, ctors, obs_path)
+    rec('A1c/A8-owner-patch ' + label, acc, True, reason=reason, producerSanity=sane, mutatedSourceSHA256=r.sha(mutated))
+
+# --- (3) root-site instance patch after production Database construction ---
+ow_path = t.CP + 'observer_worker.py'; ow = core[ow_path]; main = fn_of(ow, 'main')
+asg = next(n for n in ast.walk(main) if isinstance(n, ast.Assign) and any(isinstance(x, ast.Name) and x.id == 'db' for x in n.targets))
+ind = ' ' * asg.col_offset
+for stmt in ('db.transaction = foreign', 'db.statement_observer = foreign_socket_send', 'db.placement_metric_sink = foreign_subprocess_run'):
+    mutated = after_line(ow, asg.end_lineno, stmt, ind); ast.parse(mutated)
+    mc = dict(core); mc[ow_path] = mutated; mk = dict(ctors); mk[ow_path] = mutated
+    acc, reason, sane = a1c('mark_offline.conn', target, mc, mk, ow_path)
+    rec('A8-root-instance-patch observer_worker.main ' + stmt, acc, True, reason=reason, producerSanity=sane, mutatedSourceSHA256=r.sha(mutated))
+
+# --- (3b) omitted production ObservationWorker root: tools/lan_pilot.py observe() ---
+lp = 'tools/lan_pilot.py'; lan = ctors[lp]
+assert lan.count('ObservationWorker(runtime(state), ') == 1
+for label, mutated in [('ObservationWorker(runtime(state)) -> ObservationWorker(foreign_database)', lan.replace('ObservationWorker(runtime(state), ', 'ObservationWorker(foreign_database, ', 1)),
+                       ('ObservationWorker(runtime(state)) -> ObservationWorker(BoundDatabase_like(...))', lan.replace('ObservationWorker(runtime(state), ', 'ObservationWorker(object(), ', 1)),
+                       ('module-end runtime = foreign_runtime', lan + '\nruntime = foreign_runtime\n')]:
+    ast.parse(mutated); mk = dict(ctors); mk[lp] = mutated
+    acc, reason, sane = a1c('mark_offline.conn', target, core, mk, lp)
+    rec('A8-lan_pilot-root ' + label, acc, True, reason=reason, producerSanity=sane, mutatedSourceSHA256=r.sha(mutated))
+
+# --- (4) db.py module-level class mutation forms (union member / observed class) ---
+db_path = t.CP + 'db.py'; db = core[db_path]
+for label, tail in [
+        ('import psycopg as _pg; _pg.Connection.execute = foreign', 'import psycopg as _pg\n_pg.Connection.execute = foreign\n'),
+        ('from psycopg import Connection as _PC; _PC.execute = foreign', 'from psycopg import Connection as _PC\n_PC.execute = foreign\n'),
+        ('import builtins; builtins.setattr(_ObservedConnection, execute)', "import builtins\nbuiltins.setattr(_ObservedConnection, 'execute', foreign)\n"),
+        ('type.__setattr__(_ObservedConnection, execute)', "type.__setattr__(_ObservedConnection, 'execute', foreign)\n"),
+        ("globals()['_ObservedConnection'].execute = foreign", "globals()['_ObservedConnection'].execute = foreign\n"),
+        ('psycopg.Connection.execute = foreign (control)', 'psycopg.Connection.execute = foreign\n')]:
+    mutated = db + '\n' + tail; ast.parse(mutated); mc = dict(core); mc[db_path] = mutated
+    for key in ('transaction.conn', 'transaction.observed_conn'):
+        acc, reason, sane = a1c(key, sel[key], mc, ctors, db_path)
+        rec(f'A1c-db-module[{key}] ' + label, acc, True, reason=reason, producerSanity=sane, mutatedSourceSHA256=r.sha(mutated))
+    _, uerr = t.observed_union(mutated)
+    rec('INFO union-only ' + label, uerr is None, None, reason=uerr, note='observed_union alone; pipeline row above is the verdict')
+
+# --- (5) A2 DomainError mutation forms ---
+errors = core[t.CP + 'errors.py']
+for label, mutated in [
+        ('errors.py head import builtins; builtins.Exception = foreign', 'import builtins\nbuiltins.Exception = foreign\n' + errors),
+        ('errors.py end type.__setattr__(DomainError, __init__)', errors + "\ntype.__setattr__(DomainError, '__init__', foreign)\n"),
+        ('errors.py end import builtins; builtins.setattr(DomainError, __init__)', errors + "\nimport builtins\nbuiltins.setattr(DomainError, '__init__', foreign)\n"),
+        ("errors.py end globals()['DomainError'].__init__ = foreign", errors + "\nglobals()['DomainError'].__init__ = foreign\n"),
+        ('errors.py end DomainError.__init__ = foreign (control)', errors + '\nDomainError.__init__ = foreign\n')]:
+    ast.parse(mutated)
+    rec('A2-error_initializer ' + label, bool(r.error_initializer(mutated, 'DomainError')), True)
+for label, mutated in [
+        ('db.py end from . import errors as _e; _e.DomainError.__init__ = foreign', db + '\nfrom . import errors as _e\n_e.DomainError.__init__ = foreign\n'),
+        ('db.py end type.__setattr__(DomainError, __init__)', db + "\ntype.__setattr__(DomainError, '__init__', foreign)\n"),
+        ('db.py end DomainError.__init__ = foreign (control)', db + '\nDomainError.__init__ = foreign\n')]:
+    ast.parse(mutated)
+    rec('A2-constructor_binding ' + label, bool(r.constructor_binding(mutated)), True)
+# positives: actual unmodified sources must stay accepted
+for key, target in sel.items():
+    acc, reason, sane = a1c(key, target, core, ctors, None)
+    rec(f'POSITIVE actual A1c[{key}]', acc, False, reason=reason, producerSanity=sane)
+rec('POSITIVE actual A2 error_initializer', bool(r.error_initializer(errors, 'DomainError')), False)
+rec('POSITIVE actual A2 constructor_binding', bool(r.constructor_binding(db)), False)
+
+gaps = [x['case'] for x in R if x['soundGap']]
+bad_pos = [x['case'] for x in R if x['case'].startswith('POSITIVE') and not x['acceptedByOwnerPredicate']]
+out = {'reviewer': 'Claude independent', 'target': '3daf1a0d24c220586474a4b376609e62960b8ca6', 'source': a.SOURCE,
+       'scope': 'BOUNDED STATIC mutation probes of owner predicates; mutants parsed only, never imported/executed',
+       'cases': R, 'total': len(R), 'soundGaps': gaps, 'positiveFailures': bad_pos}
+open(sys.argv[2], 'w', encoding='utf-8', newline='\n').write(json.dumps(out, indent=1) + '\n')
+print(json.dumps({'total': len(R), 'soundGaps': len(gaps), 'positiveFailures': bad_pos}))

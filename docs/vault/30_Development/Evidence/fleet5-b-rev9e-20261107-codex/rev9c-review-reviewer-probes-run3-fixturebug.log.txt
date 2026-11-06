@@ -1,0 +1,65 @@
+{"case": "actual-72028-positive", "observed": "ACCEPT", "reason": null, "expected": "ACCEPT"}
+{"case": "L1-aa3387-repro-state", "observed": "REFUSE", "reason": "UNRESOLVED:CONSTRUCTOR_ROOT_REMOVED_OR_HIDDEN", "expected": "REFUSE:UNRESOLVED:CONSTRUCTOR_ROOT_REMOVED_OR_HIDDEN"}
+{"case": "L1-aa3387-repro-runtime-state", "observed": "REFUSE", "reason": "UNRESOLVED:CONSTRUCTOR_ROOT_REMOVED_OR_HIDDEN", "expected": "REFUSE:UNRESOLVED:CONSTRUCTOR_ROOT_REMOVED_OR_HIDDEN"}
+{"case": "L1-root-argument-changed", "observed": "REFUSE", "reason": "UNRESOLVED:CONSTRUCTOR_ROOT_REMOVED_OR_HIDDEN", "expected": "REFUSE:UNRESOLVED:CONSTRUCTOR_ROOT_REMOVED_OR_HIDDEN"}
+{"case": "L1-root-moved-to-helper", "observed": "REFUSE", "reason": "UNRESOLVED:CONSTRUCTOR_ROOT_REMOVED_OR_HIDDEN", "expected": "REFUSE:UNRESOLVED:CONSTRUCTOR_ROOT_REMOVED_OR_HIDDEN"}
+{"case": "L1-six-plus-hidden-importlib-attr", "observed": "REFUSE", "reason": "RECEIVER_UNION_UNPROVEN:CONSTRUCTOR_BINDING", "expected": "REFUSE"}
+{"case": "L1-six-plus-hidden-operator-module-alias", "observed": "REFUSE", "reason": "UNRESOLVED:RELEVANT_REFLECTION_USE_NOT_ALLOWLISTED:REFLECTION_NAMESPACE:sys.modules", "expected": "REFUSE"}
+{"case": "L1-six-plus-hidden-sys-modules-get", "observed": "REFUSE", "reason": "RECEIVER_UNION_UNPROVEN:CONSTRUCTOR_BINDING", "expected": "REFUSE"}
+{"case": "L1-six-plus-hidden-methodcaller-transaction", "observed": "REFUSE", "reason": "UNRESOLVED:RELEVANT_REFLECTION_USE_NOT_ALLOWLISTED:REFLECTION_NAMESPACE:operator.methodcaller", "expected": "REFUSE"}
+{"case": "L1-six-plus-hidden-from-operator-alias", "observed": "REFUSE", "reason": "UNRESOLVED:RELEVANT_REFLECTION_USE_NOT_ALLOWLISTED:REFLECTION_NAMESPACE:sys.modules", "expected": "REFUSE"}
+{"case": "L1-six-plus-hidden-from-sys-modules-alias", "observed": "REFUSE", "reason": "RECEIVER_UNION_UNPROVEN:CONSTRUCTOR_BINDING", "expected": "REFUSE"}
+{"case": "L1-six-plus-hidden-from-inspect-alias", "observed": "REFUSE", "reason": "UNRESOLVED:RELEVANT_REFLECTION_USE_NOT_ALLOWLISTED:REFLECTION_NAMESPACE:inspect.getattr_static", "expected": "REFUSE"}
+{"case": "L1-bound-pkgutil-resolve-name", "observed": "ACCEPT", "reason": null, "expected": null}
+{"case": "L1-outside-file-hidden-root-operator-sys", "observed": "ACCEPT", "reason": null, "expected": "REFUSE"}
+{"case": "L1-outside-file-hidden-root-importlib", "observed": "REFUSE", "reason": "UNCATALOGUED_PRODUCTION_SOURCE:services/control-plane/src/inv/business_auth.py", "expected": "REFUSE"}
+{"case": "L1-control-unused-imports-and-log-string", "observed": "ACCEPT", "reason": null, "expected": "ACCEPT"}
+{"case": "L1-control-class-alias-root", "observed": "ACCEPT", "reason": null, "expected": "ACCEPT"}
+{"case": "L1-control-from-package-module-alias-root", "observed": "ACCEPT", "reason": null, "expected": "ACCEPT"}
+{"case": "L2-aa3387-repro-business-handoff-alias", "observed": "REFUSE", "reason": "UNCATALOGUED_PRODUCTION_SOURCE:services/control-plane/src/inv/business_handoff.py", "expected": "REFUSE:UNCATALOGUED_PRODUCTION_SOURCE:"}
+{"case": "L2-three-hop-fixed-point", "observed": "REFUSE", "reason": "UNCATALOGUED_PRODUCTION_SOURCE:services/control-plane/src/inv/business_auth.py,services/control-plane/src/inv/business_handoff.py,services/control-plane/src/inv/business_surface.py", "expected": "REFUSE:UNCATALOGUED_PRODUCTION_SOURCE:"}
+{"case": "L2-keyword-only-call-outside", "observed": "REFUSE", "reason": "UNCATALOGUED_PRODUCTION_SOURCE:services/control-plane/src/inv/business_handoff.py", "expected": "REFUSE:UNCATALOGUED_PRODUCTION_SOURCE:"}
+{"case": "L2-keyword-forwarder-higher-hop-inventory", "observed": "REFUSE", "reason": "UNCATALOGUED_PRODUCTION_SOURCE:services/control-plane/src/inv/business_handoff.py", "expected": "REFUSE:UNCATALOGUED_PRODUCTION_SOURCE:"}
+{"case": "L2-outside-reflective-forwarder-call-importlib", "observed": "ACCEPT", "reason": null, "expected": "REFUSE"}
+{"case": "L2-outside-reflective-forwarder-call-sys-modules", "observed": "ACCEPT", "reason": null, "expected": "REFUSE"}
+{"case": "L2-control-module-import-getattr", "observed": "REFUSE", "reason": "UNCATALOGUED_PRODUCTION_SOURCE:services/control-plane/src/inv/business_auth.py", "expected": "REFUSE:UNCATALOGUED_PRODUCTION_SOURCE:"}
+{"case": "L2-control-function-scope-import-call", "observed": "REFUSE", "reason": "UNCATALOGUED_PRODUCTION_SOURCE:services/control-plane/src/inv/business_auth.py", "expected": "REFUSE:UNCATALOGUED_PRODUCTION_SOURCE:"}
+{"case": "L2-control-benign-local-database-helper", "observed": "ACCEPT", "reason": null, "expected": "ACCEPT"}
+{"case": "L2-control-harness-two-hop-separated", "observed": "ACCEPT", "reason": null, "expected": "ACCEPT"}
+{"case": "L2-keyword-only-in-source-graph-only", "observed": "ACCEPT", "reason": null, "expected": null}
+{"case": "L2-keyword-only-in-source-full", "observed": "REFUSE", "reason": "DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:INSTANCE:_claude_extra", "expected": "REFUSE:DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:"}
+{"case": "L3-aa3387-repro-runtime-runtime", "observed": "REFUSE", "reason": "DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:INSTANCE:runtime", "expected": "REFUSE:DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:"}
+{"case": "L3-aa3387-repro-runtime-runtime.db", "observed": "REFUSE", "reason": "DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:INSTANCE:runtime", "expected": "REFUSE:DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:"}
+{"case": "L3-aa3387-repro-runtime-runtime.db.transaction", "observed": "REFUSE", "reason": "DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:INSTANCE:runtime", "expected": "REFUSE:DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:"}
+{"case": "L3-aa3387-repro-workspace-workspace", "observed": "REFUSE", "reason": "DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:INSTANCE:workspace", "expected": "REFUSE:DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:"}
+{"case": "L3-aa3387-repro-workspace-workspace.runtime.db", "observed": "REFUSE", "reason": "DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:INSTANCE:workspace", "expected": "REFUSE:DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:"}
+{"case": "L3-variant-tuple-unpack-items", "observed": "REFUSE", "reason": "DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:INSTANCE:_node_id", "expected": "REFUSE:DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:"}
+{"case": "L3-variant-walrus-filter", "observed": "REFUSE", "reason": "DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:INSTANCE:picked", "expected": "REFUSE:DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:"}
+{"case": "L3-variant-dict-comprehension-value", "observed": "REFUSE", "reason": "DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:INSTANCE:mirror", "expected": "REFUSE:DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:"}
+{"case": "L3-variant-container-append-then-loop", "observed": "REFUSE", "reason": "DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:INSTANCE:result", "expected": "REFUSE:DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:"}
+{"case": "L3-variant-lambda-closure", "observed": "REFUSE", "reason": "DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:INSTANCE:result", "expected": "REFUSE:DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:"}
+{"case": "L3-param-WorkspaceAPI-init-runtime", "observed": "ACCEPT", "reason": null, "expected": "REFUSE"}
+{"case": "L3-param-WorkspaceAPI-init-runtime.db", "observed": "ACCEPT", "reason": null, "expected": "REFUSE"}
+{"case": "L3-param-WorkspaceAPI-init-runtime.db.transaction", "observed": "ACCEPT", "reason": null, "expected": "REFUSE"}
+{"ownerResourceMeasurement": {"target": "docs/vault/30_Development/Evidence/fleet5-b-rev9c-5ea-review-20261106-claude/reviewer_rev9c_delta_probes.py.txt", "peakWorkingSetBytes": 126287872, "elapsedSeconds": 212.253, "OSMemoryLimitEnforced": false, "serial": true}}
+Traceback (most recent call last):
+  File "D:\Project\SaintVisionI-Invion\fleet5-bootstrap-v3-review-20261106\docs\vault\30_Development\Evidence\fleet5-b-rev9c-20261106-codex\measured_run.py", line 20, in <module>
+    if __name__=='__main__':main()
+                            ~~~~^^
+  File "D:\Project\SaintVisionI-Invion\fleet5-bootstrap-v3-review-20261106\docs\vault\30_Development\Evidence\fleet5-b-rev9c-20261106-codex\measured_run.py", line 9, in main
+    try:runpy.run_path(target,run_name='__main__')
+        ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen runpy>", line 294, in run_path
+  File "<frozen runpy>", line 98, in _run_module_code
+  File "<frozen runpy>", line 88, in _run_code
+  File "docs/vault/30_Development/Evidence/fleet5-b-rev9c-5ea-review-20261106-claude/reviewer_rev9c_delta_probes.py.txt", line 185, in <module>
+    run('L3-param-create_app-workspace_service-' + expr, {AP: must_replace(S[AP], svc, '    def workspace_service():\n        import foreign_module\n        foreign_module.register_workspace(' + expr + ')\n        if workspace is None:\n')}, expect='REFUSE',
+    ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        note='create_app workspace parameter receives configured_workspace result via app.py:1405 workspace=workspace')
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "docs/vault/30_Development/Evidence/fleet5-b-rev9c-5ea-review-20261106-claude/reviewer_rev9c_delta_probes.py.txt", line 61, in run
+    checked = witnesses({**world, **changed}, skip)
+  File "docs/vault/30_Development/Evidence/fleet5-b-rev9c-5ea-review-20261106-claude/reviewer_rev9c_delta_probes.py.txt", line 46, in witnesses
+    assert node is not None and sb.sha(ast.get_source_segment(src, node)) == w['expressionSHA256'], ('WITNESS', w)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: ('WITNESS', {'path': 'services/control-plane/src/inv/app.py', 'span': [1313, 19, 1318, 9], 'expressionSHA256': '13018cbdcbfbea2e34c9f731c9ad7b42977b455aa11c3f5b3010785c7b6bf780'})

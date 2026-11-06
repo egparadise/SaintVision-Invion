@@ -1,0 +1,47 @@
+{
+  "scope": "Rev9e own static checks only",
+  "events": [
+    {
+      "stage": "prepare_rev9e.py first invocation",
+      "exit": 1,
+      "reason": "Console cp949 cannot encode Root document U+2013; no input receipts/copies written before failure",
+      "fix": "stdout explicitly UTF-8; same guarded one-time preparation rerun"
+    },
+    {
+      "kst": "2026-11-07T02:27:19.940820+09:00",
+      "stage": "apply_patch batching",
+      "reason": "Patch rejected duplicate operations on run_checks.py before any changes; split into Add and Update",
+      "effect": "No source execution"
+    },
+    {
+      "stage": "first proof run",
+      "command": "python.exe -B run_checks.py",
+      "exit": 1,
+      "failure": "verify_rev9e.py --contrasts exit1: baseline Server call falsely refused CLASS_CONSTRUCTION_BINDING",
+      "cause": "New no-init class handling treated frozen inherited Server initializer as a newly unprovable constructor",
+      "source": "tools/lan_pilot.py:4049 serve.Server",
+      "fix": "Exact frozen call/function/span can retain its old out-of-binder status only after independent construction identity checks; custom __new__ remains rejected",
+      "evidence": "development-first-run-proof-checks.json",
+      "retainedValidCommands": [
+        3,
+        4
+      ],
+      "rerun": "Only affected new units/binder/new causal cases, then remaining source/order/hash/R4 checks; no unchanged broad suite"
+    },
+    {
+      "stage": "diagnosis of first positive failure",
+      "command": "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe -B - (inline static pf.solve over frozen core/constructors)",
+      "exit": 0,
+      "result": "sole unresolved binding: tools.lan_pilot.serve.Server.__init__, tools/lan_pilot.py:4049",
+      "measurement": "not instrumented; not included as a measured command or peak",
+      "productImported": false
+    },
+    {
+      "stage": "finalize_rev9e.py first invocation",
+      "exit": 1,
+      "reason": "Final selective-refresh ledger persisted only11 rows: two reused tail rows were printed/verified but not flushed to JSON",
+      "fix": "Runner final flush; restore exact two tail receipts from completed-before-final-identity-proof-checks.json after matching log hashes/exits; no source analysis or product rerun",
+      "semanticSourceFailure": false
+    }
+  ]
+}
