@@ -1,0 +1,120 @@
+[
+ {
+  "case": "MA1-foreign-node-obligation-denies-this-node",
+  "observed": false,
+  "note": "model cp_eligible ignores obligation tenant/Node/epoch scope; fixture quarantine-EXECUTE-loss-still-denied is scope-vacuous"
+ },
+ {
+  "case": "MA2-model-has-settle-transition",
+  "observed": false,
+  "note": "only pre_io_obligation and raise_quarantine are modelled; no success/settle/clear transition or negative"
+ },
+ {
+  "case": "MA2b-normal-success-after-PRE_IO-still-denied",
+  "observed": false,
+  "note": "an obligation registered before ordinary successful IO keeps the Node ineligible; only OP-protected settle exists in matrix"
+ },
+ {
+  "case": "MA3-guarded-command-refuses-revoked-ARM",
+  "observed": true,
+  "note": "CP planner command() refuses"
+ },
+ {
+  "case": "MA3b-signing-service-signs-revoked-descendant-ARM",
+  "observed": true,
+  "note": "service_sign OP policy is kind+shape only; model comment claims signing service refuses ARM of revoked descendant"
+ },
+ {
+  "case": "MA3c-Node-ARMs-revoked-descendant",
+  "observed": true,
+  "note": "Node has no tombstone knowledge (knownLineageRevocations never populated); CP CAS still refuses below"
+ },
+ {
+  "case": "MA3d-CP-CAS-still-refuses",
+  "observed": false,
+  "note": "CP lineage gate holds; impact availability/HOLD only"
+ },
+ {
+  "case": "MA4-SAFE-can-revoke-lineage",
+  "observed": true,
+  "note": "matrix EXECUTE [OP,SAFE]"
+ },
+ {
+  "case": "MA4b-SAFE-cannot-sign-LINEAGE_TOMBSTONE",
+  "observed": true,
+  "note": "signing policy grants LINEAGE_TOMBSTONE only to OP; signed tombstone domain has no Node consumer in model"
+ },
+ {
+  "case": "MA4c-Node-learns-tombstone",
+  "observed": false,
+  "note": "no model path populates Node tombstones"
+ },
+ {
+  "case": "MA5-caller-sv_b_runtime-APPROVAL",
+  "observed": true,
+  "note": "policy keyed on installed caller id string"
+ },
+ {
+  "case": "MA5-caller-sv_b_verifier-APPROVAL",
+  "observed": true,
+  "note": "policy keyed on installed caller id string"
+ },
+ {
+  "case": "MA5-caller-sv_b_use_issuer-APPROVAL",
+  "observed": true,
+  "note": "policy keyed on installed caller id string"
+ },
+ {
+  "case": "MA5-caller-sv_b_safety-APPROVAL",
+  "observed": true,
+  "note": "policy keyed on installed caller id string"
+ },
+ {
+  "case": "MA5-caller-sv_b_budget_approver-APPROVAL",
+  "observed": true,
+  "note": "policy keyed on installed caller id string"
+ },
+ {
+  "case": "MA5-caller-sv_b_delivery_controller-APPROVAL",
+  "observed": true,
+  "note": "policy keyed on installed caller id string"
+ },
+ {
+  "case": "MA6-resolve-1s-before-ACK-expiry",
+  "observed": true,
+  "note": "allowed while original ACK valid"
+ },
+ {
+  "case": "MA6b-CAS-after-ACK-expiry",
+  "observed": false,
+  "note": "CAS refuses; switch remains fenced"
+ },
+ {
+  "case": "MA6c-switch-fenced-and-node-armed",
+  "observed": [
+   true,
+   "ARMED"
+  ],
+  "note": "B-RECOVERY1 HOLD with Node ARMED; no recovery path modelled"
+ },
+ {
+  "case": "MA6d-fresh-renewal-blocked",
+  "observed": true,
+  "note": "no ordinary renewal escape"
+ },
+ {
+  "case": "MA7-refusal-businessAuthority-true-rejected",
+  "observed": false,
+  "note": "expect False"
+ },
+ {
+  "case": "MA7b-refusal-with-record-rejected",
+  "observed": false,
+  "note": "expect False"
+ },
+ {
+  "case": "MA7c-AVAILABLE-without-originalAck-rejected",
+  "observed": false,
+  "note": "expect False"
+ }
+]

@@ -1,0 +1,1669 @@
+{
+ "baselineAuditErrors": [],
+ "baselineMatrixWriters": 34,
+ "cases": [
+  {
+   "case": "W1-deny-only-writer-reversed-to-clear",
+   "auditErrors": [],
+   "writers": [
+    {
+     "path": "services/control-plane/src/inv/node_transport.py",
+     "line": 247,
+     "function": "inv.node_transport.NodeDelivery._quarantine_gpu_node",
+     "table": "inv.nodes",
+     "verb": "UPDATE",
+     "columns": [
+      "status"
+     ],
+     "disposition": "RETIRE_DIRECT_DML_REPLACE_NAMED_PROCEDURE",
+     "replacement": [
+      "b_raise_node_quarantine"
+     ],
+     "expression": "conn.execute(\n                \"UPDATE inv.nodes SET status='online' WHERE node_id=%s\",\n                (node.node_id,),\n            )"
+    }
+   ],
+   "records": [
+    {
+     "function": "inv.node_transport.NodeDelivery._quarantine_gpu_node",
+     "line": 241,
+     "tables": [
+      "inv.nodes"
+     ],
+     "modes": [
+      "FOR UPDATE"
+     ],
+     "scope": "STATIC_NAMED_SCOPE",
+     "unresolved": false
+    },
+    {
+     "function": "inv.node_transport.NodeDelivery._quarantine_gpu_node",
+     "line": 247,
+     "tables": [
+      "inv.nodes"
+     ],
+     "modes": [],
+     "scope": "STATIC_NAMED_SCOPE",
+     "unresolved": false
+    }
+   ],
+   "edges": [
+    {
+     "function": "inv.node_transport.NodeDelivery._quarantine_gpu_node",
+     "spelling": "self.db.transaction",
+     "targets": [
+      "inv.db.Database.transaction"
+     ]
+    },
+    {
+     "function": "inv.node_transport.NodeDelivery._quarantine_gpu_node",
+     "spelling": "event",
+     "targets": [
+      "inv.runs.event"
+     ]
+    },
+    {
+     "function": "inv.node_transport.NodeDelivery.deliver",
+     "spelling": "self.channels.snapshot",
+     "targets": [
+      "inv.node_channels.NodeChannels.snapshot"
+     ]
+    },
+    {
+     "function": "inv.node_transport.NodeDelivery.deliver",
+     "spelling": "self.receipts.record",
+     "targets": [
+      "inv.node_execution.NodeReceiptStore.record"
+     ]
+    },
+    {
+     "function": "inv.node_transport.NodeDelivery.deliver",
+     "spelling": "self._quarantine_gpu_node",
+     "targets": [
+      "inv.node_transport.NodeDelivery._quarantine_gpu_node"
+     ]
+    }
+   ],
+   "unknownEdges": [
+    {
+     "function": "inv.node_transport.NodeTLSClient._request",
+     "spelling": "conn.request"
+    },
+    {
+     "function": "inv.node_transport.NodeTLSClient._request",
+     "spelling": "timer.cancel"
+    },
+    {
+     "function": "inv.node_transport.NodeDelivery._quarantine_gpu_node",
+     "spelling": "conn.execute"
+    },
+    {
+     "function": "inv.node_transport.NodeDelivery._quarantine_gpu_node",
+     "spelling": "conn.execute"
+    },
+    {
+     "function": "inv.node_transport.NodeDelivery.deliver",
+     "spelling": "payload['launch'].get"
+    }
+   ],
+   "plans": [
+    {
+     "function": "inv.node_transport.NodeDelivery._quarantine_gpu_node",
+     "locks": [
+      {
+       "table": "inv.control_epoch",
+       "mode": "FOR SHARE",
+       "rank": 0,
+       "disposition": "NAMED_RANK"
+      },
+      {
+       "table": "inv.nodes",
+       "mode": "FOR UPDATE",
+       "rank": 4,
+       "disposition": "NAMED_RANK"
+      }
+     ],
+     "unresolved": 0
+    },
+    {
+     "function": "inv.node_transport.NodeDelivery.deliver",
+     "locks": [
+      {
+       "table": "inv.control_epoch",
+       "mode": "FOR SHARE",
+       "rank": 0,
+       "disposition": "NAMED_RANK"
+      },
+      {
+       "table": "inv.nodes",
+       "mode": "FOR SHARE",
+       "rank": 4,
+       "disposition": "NAMED_RANK"
+      },
+      {
+       "table": "inv.nodes",
+       "mode": "FOR UPDATE",
+       "rank": 4,
+       "disposition": "NAMED_RANK"
+      },
+      {
+       "table": "inv.node_channels",
+       "mode": "FOR SHARE",
+       "rank": 7,
+       "disposition": "NAMED_RANK"
+      },
+      {
+       "table": "inv.runs",
+       "mode": "FOR UPDATE",
+       "rank": 14,
+       "disposition": "NAMED_RANK"
+      },
+      {
+       "table": "inv.resources",
+       "mode": "FOR UPDATE",
+       "rank": 16,
+       "disposition": "NAMED_RANK"
+      }
+     ],
+     "unresolved": 0
+    }
+   ],
+   "totalMatrixWriters": 34
+  },
+  {
+   "case": "W2-observation-writer-clears-quarantine",
+   "auditErrors": [],
+   "writers": [
+    {
+     "path": "services/control-plane/src/inv/observation.py",
+     "line": 87,
+     "function": "inv.observation.NodeObservation.accept",
+     "table": "inv.nodes",
+     "verb": "UPDATE",
+     "columns": [
+      "clock_skew_seconds",
+      "heartbeat_at",
+      "probe_started_at",
+      "status"
+     ],
+     "disposition": "RETIRE_DIRECT_DML_REPLACE_NAMED_PROCEDURE",
+     "replacement": [
+      "b_commit_node_observation"
+     ],
+     "expression": "conn.execute(\n                \"UPDATE inv.nodes SET heartbeat_at=%s,probe_started_at=%s,clock_skew_seconds=%s,status='online' WHERE node_id=%s RETURNING status\""
+    },
+    {
+     "path": "services/control-plane/src/inv/observation.py",
+     "line": 145,
+     "function": "inv.observation.NodeObservation.mark_offline",
+     "table": "inv.nodes",
+     "verb": "UPDATE",
+     "columns": [
+      "status"
+     ],
+     "disposition": "RETIRE_DIRECT_DML_REPLACE_NAMED_PROCEDURE",
+     "replacement": [
+      "b_commit_node_observation"
+     ],
+     "expression": "conn.execute(\n                    \"UPDATE inv.nodes SET status='offline' WHERE node_id=%s AND heartbeat_at < clock_timestamp()-interval '60 seconds' AND status="
+    }
+   ],
+   "records": [
+    {
+     "function": "inv.observation.NodeObservation.begin",
+     "line": 20,
+     "tables": [
+      "inv.node_probes"
+     ],
+     "modes": [],
+     "scope": "STATIC_NAMED_SCOPE",
+     "unresolved": false
+    },
+    {
+     "function": "inv.observation.NodeObservation.accept",
+     "line": 53,
+     "tables": [
+      "inv.nodes"
+     ],
+     "modes": [
+      "FOR UPDATE"
+     ],
+     "scope": "STATIC_NAMED_SCOPE",
+     "unresolved": false
+    },
+    {
+     "function": "inv.observation.NodeObservation.accept",
+     "line": 59,
+     "tables": [
+      "inv.node_probes"
+     ],
+     "modes": [
+      "FOR UPDATE"
+     ],
+     "scope": "STATIC_NAMED_SCOPE",
+     "unresolved": false
+    },
+    {
+     "function": "inv.observation.NodeObservation.accept",
+     "line": 63,
+     "tables": [],
+     "modes": [],
+     "scope": "STATIC_NAMED_SCOPE",
+     "unresolved": false
+    },
+    {
+     "function": "inv.observation.NodeObservation.accept",
+     "line": 83,
+     "tables": [
+      "inv.node_probes"
+     ],
+     "modes": [],
+     "scope": "STATIC_NAMED_SCOPE",
+     "unresolved": false
+    },
+    {
+     "function": "inv.observation.NodeObservation.accept",
+     "line": 87,
+     "tables": [
+      "inv.nodes"
+     ],
+     "modes": [],
+     "scope": "STATIC_NAMED_SCOPE",
+     "unresolved": false
+    },
+    {
+     "function": "inv.observation.NodeObservation.accept",
+     "line": 97,
+     "tables": [
+      "inv.node_resource_snapshots"
+     ],
+     "modes": [],
+     "scope": "STATIC_NAMED_SCOPE",
+     "unresolved": false
+    },
+    {
+     "function": "inv.observation.NodeObservation.mark_offline",
+     "line": 140,
+     "tables": [
+      "inv.nodes"
+     ],
+     "modes": [
+      "FOR UPDATE"
+     ],
+     "scope": "STATIC_NAMED_SCOPE",
+     "unresolved": false
+    },
+    {
+     "function": "inv.observation.NodeObservation.mark_offline",
+     "line": 145,
+     "tables": [
+      "inv.nodes"
+     ],
+     "modes": [],
+     "scope": "STATIC_NAMED_SCOPE",
+     "unresolved": false
+    }
+   ],
+   "edges": [
+    {
+     "function": "inv.observation.NodeObservation.begin",
+     "spelling": "self.channels.snapshot",
+     "targets": [
+      "inv.node_channels.NodeChannels.snapshot"
+     ]
+    },
+    {
+     "function": "inv.observation.NodeObservation.accept",
+     "spelling": "assert_channel",
+     "targets": [
+      "inv.node_channels.assert_channel"
+     ]
+    },
+    {
+     "function": "inv.observation.NodeObservation.poll",
+     "spelling": "self.begin",
+     "targets": [
+      "inv.observation.NodeObservation.begin"
+     ]
+    },
+    {
+     "function": "inv.observation.NodeObservation.poll",
+     "spelling": "self.accept",
+     "targets": [
+      "inv.observation.NodeObservation.accept"
+     ]
+    },
+    {
+     "function": "inv.observation.NodeObservation.poll_resources",
+     "spelling": "self.begin",
+     "targets": [
+      "inv.observation.NodeObservation.begin"
+     ]
+    },
+    {
+     "function": "inv.observation.NodeObservation.poll_resources",
+     "spelling": "self.accept",
+     "targets": [
+      "inv.observation.NodeObservation.accept"
+     ]
+    }
+   ],
+   "unknownEdges": [
+    {
+     "function": "inv.observation.NodeObservation.begin",
+     "spelling": "self.db.transaction"
+    },
+    {
+     "function": "inv.observation.NodeObservation.begin",
+     "spelling": "conn.execute"
+    },
+    {
+     "function": "inv.observation.NodeObservation.accept",
+     "spelling": "self.db.transaction"
+    },
+    {
+     "function": "inv.observation.NodeObservation.accept",
+     "spelling": "conn.execute"
+    },
+    {
+     "function": "inv.observation.NodeObservation.accept",
+     "spelling": "conn.execute"
+    },
+    {
+     "function": "inv.observation.NodeObservation.accept",
+     "spelling": "conn.execute"
+    },
+    {
+     "function": "inv.observation.NodeObservation.accept",
+     "spelling": "conn.execute"
+    },
+    {
+     "function": "inv.observation.NodeObservation.accept",
+     "spelling": "conn.execute"
+    },
+    {
+     "function": "inv.observation.NodeObservation.accept",
+     "spelling": "conn.execute"
+    },
+    {
+     "function": "inv.observation.NodeObservation.mark_offline",
+     "spelling": "self.db.transaction"
+    },
+    {
+     "function": "inv.observation.NodeObservation.mark_offline",
+     "spelling": "conn.execute"
+    },
+    {
+     "function": "inv.observation.NodeObservation.mark_offline",
+     "spelling": "conn.execute"
+    }
+   ],
+   "plans": [
+    {
+     "function": "inv.observation.NodeObservation.accept",
+     "locks": [
+      {
+       "table": "inv.nodes",
+       "mode": "FOR UPDATE",
+       "rank": 4,
+       "disposition": "NAMED_RANK"
+      },
+      {
+       "table": "inv.node_channels",
+       "mode": "FOR SHARE",
+       "rank": 7,
+       "disposition": "NAMED_RANK"
+      },
+      {
+       "table": "inv.node_probes",
+       "mode": "FOR UPDATE",
+       "rank": 21,
+       "disposition": "NAMED_RANK"
+      }
+     ],
+     "unresolved": 0
+    },
+    {
+     "function": "inv.observation.NodeObservation.begin",
+     "locks": [
+      {
+       "table": "inv.control_epoch",
+       "mode": "FOR SHARE",
+       "rank": 0,
+       "disposition": "NAMED_RANK"
+      },
+      {
+       "table": "inv.nodes",
+       "mode": "FOR SHARE",
+       "rank": 4,
+       "disposition": "NAMED_RANK"
+      },
+      {
+       "table": "inv.node_channels",
+       "mode": "FOR SHARE",
+       "rank": 7,
+       "disposition": "NAMED_RANK"
+      }
+     ],
+     "unresolved": 0
+    },
+    {
+     "function": "inv.observation.NodeObservation.mark_offline",
+     "locks": [
+      {
+       "table": "inv.nodes",
+       "mode": "FOR UPDATE",
+       "rank": 4,
+       "disposition": "NAMED_RANK"
+      }
+     ],
+     "unresolved": 0
+    },
+    {
+     "function": "inv.observation.NodeObservation.poll",
+     "locks": [
+      {
+       "table": "inv.control_epoch",
+       "mode": "FOR SHARE",
+       "rank": 0,
+       "disposition": "NAMED_RANK"
+      },
+      {
+       "table": "inv.nodes",
+       "mode": "FOR SHARE",
+       "rank": 4,
+       "disposition": "NAMED_RANK"
+      },
+      {
+       "table": "inv.nodes",
+       "mode": "FOR UPDATE",
+       "rank": 4,
+       "disposition": "NAMED_RANK"
+      },
+      {
+       "table": "inv.node_channels",
+       "mode": "FOR SHARE",
+       "rank": 7,
+       "disposition": "NAMED_RANK"
+      },
+      {
+       "table": "inv.node_probes",
+       "mode": "FOR UPDATE",
+       "rank": 21,
+       "disposition": "NAMED_RANK"
+      }
+     ],
+     "unresolved": 0
+    },
+    {
+     "function": "inv.observation.NodeObservation.poll_resources",
+     "locks": [
+      {
+       "table": "inv.control_epoch",
+       "mode": "FOR SHARE",
+       "rank": 0,
+       "disposition": "NAMED_RANK"
+      },
+      {
+       "table": "inv.nodes",
+       "mode": "FOR SHARE",
+       "rank": 4,
+       "disposition": "NAMED_RANK"
+      },
+      {
+       "table": "inv.nodes",
+       "mode": "FOR UPDATE",
+       "rank": 4,
+       "disposition": "NAMED_RANK"
+      },
+      {
+       "table": "inv.node_channels",
+       "mode": "FOR SHARE",
+       "rank": 7,
+       "disposition": "NAMED_RANK"
+      },
+      {
+       "table": "inv.node_probes",
+       "mode": "FOR UPDATE",
+       "rank": 21,
+       "disposition": "NAMED_RANK"
+      }
+     ],
+     "unresolved": 0
+    }
+   ],
+   "totalMatrixWriters": 34
+  },
+  {
+   "case": "W3-ORM-core-insert-public-nodes",
+   "auditErrors": [],
+   "writers": [],
+   "records": [
+    {
+     "function": "saintvision.services.zz_claude_probe.sneaky",
+     "line": 5,
+     "tables": [
+      "public.nodes"
+     ],
+     "modes": [],
+     "scope": "STATIC_NAMED_SCOPE",
+     "unresolved": false
+    }
+   ],
+   "edges": [],
+   "unknownEdges": [
+    {
+     "function": "saintvision.services.zz_claude_probe.sneaky",
+     "spelling": "session.execute"
+    }
+   ],
+   "plans": [],
+   "totalMatrixWriters": 34
+  },
+  {
+   "case": "W4-fstring-dynamic-table-DML",
+   "auditErrors": [],
+   "writers": [],
+   "records": [
+    {
+     "function": "inv.zz_claude_probe.sneaky",
+     "line": 2,
+     "tables": [],
+     "modes": [],
+     "scope": "STATIC_NAMED_SCOPE",
+     "unresolved": false
+    }
+   ],
+   "edges": [],
+   "unknownEdges": [
+    {
+     "function": "inv.zz_claude_probe.sneaky",
+     "spelling": "conn.execute"
+    }
+   ],
+   "plans": [],
+   "totalMatrixWriters": 34
+  },
+  {
+   "case": "W5-unqualified-public-nodes-text",
+   "auditErrors": [],
+   "writers": [],
+   "records": [
+    {
+     "function": "saintvision.services.zz_claude_probe.sneaky",
+     "line": 4,
+     "tables": [],
+     "modes": [],
+     "scope": "STATIC_NAMED_SCOPE",
+     "unresolved": false
+    }
+   ],
+   "edges": [],
+   "unknownEdges": [
+    {
+     "function": "saintvision.services.zz_claude_probe.sneaky",
+     "spelling": "session.execute"
+    }
+   ],
+   "plans": [],
+   "totalMatrixWriters": 34
+  },
+  {
+   "case": "W6-setattr-ORM-status",
+   "auditErrors": [],
+   "writers": [],
+   "records": [
+    {
+     "function": "saintvision.services.zz_claude_probe.sneaky",
+     "line": 4,
+     "tables": [
+      "public.nodes"
+     ],
+     "modes": [],
+     "scope": "STATIC_NAMED_SCOPE",
+     "unresolved": false
+    }
+   ],
+   "edges": [],
+   "unknownEdges": [
+    {
+     "function": "saintvision.services.zz_claude_probe.sneaky",
+     "spelling": "session.get"
+    }
+   ],
+   "plans": [],
+   "totalMatrixWriters": 34
+  },
+  {
+   "case": "W7-positive-ORM-attribute-status",
+   "auditErrors": [
+    "UNMAPPED_WRITER:saintvision.services.zz_claude_probe.sneaky"
+   ],
+   "writers": [
+    {
+     "path": "src/saintvision/services/zz_claude_probe.py",
+     "line": 5,
+     "function": "saintvision.services.zz_claude_probe.sneaky",
+     "table": "public.nodes",
+     "verb": "UPDATE",
+     "columns": [
+      "status"
+     ],
+     "disposition": "UNMAPPED_WRITER_BLOCK",
+     "replacement": [],
+     "expression": "node.status = \"active\""
+    }
+   ],
+   "records": [
+    {
+     "function": "saintvision.services.zz_claude_probe.sneaky",
+     "line": 4,
+     "tables": [
+      "public.nodes"
+     ],
+     "modes": [],
+     "scope": "STATIC_NAMED_SCOPE",
+     "unresolved": false
+    }
+   ],
+   "edges": [],
+   "unknownEdges": [
+    {
+     "function": "saintvision.services.zz_claude_probe.sneaky",
+     "spelling": "session.get"
+    }
+   ],
+   "plans": [
+    {
+     "function": "saintvision.services.zz_claude_probe.sneaky",
+     "locks": [],
+     "unresolved": 0
+    }
+   ],
+   "totalMatrixWriters": 35
+  },
+  {
+   "case": "W8-positive-new-SQL-writer-public-contribution",
+   "auditErrors": [
+    "UNMAPPED_WRITER:saintvision.services.zz_claude_probe.sneaky"
+   ],
+   "writers": [
+    {
+     "path": "src/saintvision/services/zz_claude_probe.py",
+     "line": 4,
+     "function": "saintvision.services.zz_claude_probe.sneaky",
+     "table": "public.storage_contributions",
+     "verb": "UPDATE",
+     "columns": [
+      "status"
+     ],
+     "disposition": "UNMAPPED_WRITER_BLOCK",
+     "replacement": [],
+     "expression": "session.execute(text(\"UPDATE public.storage_contributions SET status='active' WHERE contribution_id=:c\"), {\"c\": c})"
+    }
+   ],
+   "records": [
+    {
+     "function": "saintvision.services.zz_claude_probe.sneaky",
+     "line": 4,
+     "tables": [
+      "public.storage_contributions"
+     ],
+     "modes": [],
+     "scope": "STATIC_NAMED_SCOPE",
+     "unresolved": false
+    }
+   ],
+   "edges": [],
+   "unknownEdges": [
+    {
+     "function": "saintvision.services.zz_claude_probe.sneaky",
+     "spelling": "session.execute"
+    }
+   ],
+   "plans": [
+    {
+     "function": "saintvision.services.zz_claude_probe.sneaky",
+     "locks": [],
+     "unresolved": 0
+    }
+   ],
+   "totalMatrixWriters": 35
+  },
+  {
+   "case": "W9-rename-mapped-function",
+   "auditErrors": [
+    "UNMAPPED_WRITER:inv.build_execution.BuildExecutionService._mark_node_q"
+   ],
+   "writers": [
+    {
+     "path": "services/control-plane/src/inv/build_execution.py",
+     "line": 304,
+     "function": "inv.build_execution.BuildExecutionService._mark_node_q",
+     "table": "inv.nodes",
+     "verb": "UPDATE",
+     "columns": [
+      "status"
+     ],
+     "disposition": "UNMAPPED_WRITER_BLOCK",
+     "replacement": [],
+     "expression": "conn.execute(\n                \"UPDATE inv.nodes SET status='quarantined' WHERE node_id=%s\",\n                (leased_node_id,),\n            )"
+    }
+   ],
+   "records": [
+    {
+     "function": "inv.build_execution.BuildExecutionService._mark_node_q",
+     "line": 298,
+     "tables": [
+      "inv.nodes"
+     ],
+     "modes": [
+      "FOR UPDATE"
+     ],
+     "scope": "STATIC_NAMED_SCOPE",
+     "unresolved": false
+    },
+    {
+     "function": "inv.build_execution.BuildExecutionService._mark_node_q",
+     "line": 304,
+     "tables": [
+      "inv.nodes"
+     ],
+     "modes": [],
+     "scope": "STATIC_NAMED_SCOPE",
+     "unresolved": false
+    }
+   ],
+   "edges": [],
+   "unknownEdges": [],
+   "plans": [
+    {
+     "function": "inv.build_execution.BuildExecutionService._commit_consequences",
+     "locks": [
+      {
+       "table": "inv.control_epoch",
+       "mode": "FOR SHARE",
+       "rank": 0,
+       "disposition": "NAMED_RANK"
+      },
+      {
+       "table": "inv.resource_leases",
+       "mode": "FOR UPDATE",
+       "rank": 17,
+       "disposition": "NAMED_RANK"
+      },
+      {
+       "table": "inv.build_execution_intents",
+       "mode": "FOR UPDATE",
+       "rank": 21,
+       "disposition": "NAMED_RANK"
+      }
+     ],
+     "unresolved": 0
+    },
+    {
+     "function": "inv.build_execution.BuildExecutionService._database_now",
+     "locks": [
+      {
+       "table": "inv.control_epoch",
+       "mode": "FOR SHARE",
+       "rank": 0,
+       "disposition": "NAMED_RANK"
+      }
+     ],
+     "unresolved": 0
+    },
+    {
+     "function": "inv.build_execution.BuildExecutionService._leased_node_id",
+     "locks": [
+      {
+       "table": "inv.control_epoch",
+       "mode": "FOR SHARE",
+       "rank": 0,
+       "disposition": "NAMED_RANK"
+      }
+     ],
+     "unresolved": 0
+    },
+    {
+     "function": "inv.build_execution.BuildExecutionService._mark_node_q",
+     "locks": [
+      {
+       "table": "inv.control_epoch",
+       "mode": "FOR SHARE",
+       "rank": 0,
+       "disposition": "NAMED_RANK"
+      },
+      {
+       "table": "inv.nodes",
+       "mode": "FOR UPDATE",
+       "rank": 4,
+       "disposition": "NAMED_RANK"
+      }
+     ],
+     "unresolved": 0
+    },
+    {
+     "function": "inv.build_execution.BuildExecutionService._record_preflight_unavailable",
+     "locks": [
+      {
+       "table": "inv.control_epoch",
+       "mode": "FOR SHARE",
+       "rank": 0,
+       "disposition": "NAMED_RANK"
+      }
+     ],
+     "unresolved": 0
+    },
+    {
+     "function": "inv.build_execution.BuildExecutionService.execute",
+     "locks": [
+      {
+       "table": "inv.control_epoch",
+       "mode": "FOR SHARE",
+       "rank": 0,
+       "disposition": "NAMED_RANK"
+      },
+      {
+       "table": "inv.nodes",
+       "mode": "FOR UPDATE",
+       "rank": 4,
+       "disposition": "NAMED_RANK"
+      },
+      {
+       "table": "inv.business_projects",
+       "mode": "FOR SHARE",
+       "rank": 9,
+       "disposition": "NAMED_RANK"
+      },
+      {
+       "table": "inv.runs",
+       "mode": "FOR UPDATE",
+       "rank": 14,
+       "disposition": "NAMED_RANK"
+      },
+      {
+       "table": "inv.business_subjects",
+       "mode": "FOR SHARE",
+       "rank": 15,
+       "disposition": "NAMED_RANK"
+      },
+      {
+       "table": "inv.project_grants",
+       "mode": "FOR SHARE",
+       "rank": 15,
+       "disposition": "NAMED_RANK"
+      },
+      {
+       "table": "public.project_members",
+       "mode": "FOR SHARE",
+       "rank": 15,
+       "disposition": "NAMED_RANK"
+      },
+      {
+       "table": "public.users",
+       "mode": "FOR SHARE",
+       "rank": 15,
+       "disposition": "NAMED_RANK"
+      },
+      {
+       "table": "inv.resources",
+       "mode": "FOR UPDATE",
+       "rank": 16,
+       "disposition": "NAMED_RANK"
+      },
+      {
+       "table": "inv.resource_leases",
+       "mode": "FOR UPDATE",
+       "rank": 17,
+       "disposition": "NAMED_RANK"
+      },
+      {
+       "table": "inv.build_execution_intents",
+       "mode": "FOR UPDATE",
+       "rank": 21,
+       "disposition": "NAMED_RANK"
+      },
+      {
+       "table": "public.projects",
+       "mode": "FOR SHARE",
+       "rank": 21,
+       "disposition": "NAMED_RANK"
+      },
+      {
+       "table": "inv.idempotency",
+       "mode": "FOR UPDATE",
+       "rank": 22,
+       "disposition": "NAMED_RANK"
+      }
+     ],
+     "unresolved": 0
+    }
+   ],
+   "totalMatrixWriters": 34
+  },
+  {
+   "case": "W10-delete-real-deny-only-writer",
+   "auditErrors": [],
+   "writers": [],
+   "records": [
+    {
+     "function": "inv.node_transport.NodeDelivery._quarantine_gpu_node",
+     "line": 241,
+     "tables": [
+      "inv.nodes"
+     ],
+     "modes": [
+      "FOR UPDATE"
+     ],
+     "scope": "STATIC_NAMED_SCOPE",
+     "unresolved": false
+    }
+   ],
+   "edges": [
+    {
+     "function": "inv.node_transport.NodeDelivery._quarantine_gpu_node",
+     "spelling": "self.db.transaction",
+     "targets": [
+      "inv.db.Database.transaction"
+     ]
+    },
+    {
+     "function": "inv.node_transport.NodeDelivery._quarantine_gpu_node",
+     "spelling": "event",
+     "targets": [
+      "inv.runs.event"
+     ]
+    },
+    {
+     "function": "inv.node_transport.NodeDelivery.deliver",
+     "spelling": "self.channels.snapshot",
+     "targets": [
+      "inv.node_channels.NodeChannels.snapshot"
+     ]
+    },
+    {
+     "function": "inv.node_transport.NodeDelivery.deliver",
+     "spelling": "self.receipts.record",
+     "targets": [
+      "inv.node_execution.NodeReceiptStore.record"
+     ]
+    },
+    {
+     "function": "inv.node_transport.NodeDelivery.deliver",
+     "spelling": "self._quarantine_gpu_node",
+     "targets": [
+      "inv.node_transport.NodeDelivery._quarantine_gpu_node"
+     ]
+    }
+   ],
+   "unknownEdges": [
+    {
+     "function": "inv.node_transport.NodeTLSClient._request",
+     "spelling": "conn.request"
+    },
+    {
+     "function": "inv.node_transport.NodeTLSClient._request",
+     "spelling": "timer.cancel"
+    },
+    {
+     "function": "inv.node_transport.NodeDelivery._quarantine_gpu_node",
+     "spelling": "conn.execute"
+    },
+    {
+     "function": "inv.node_transport.NodeDelivery.deliver",
+     "spelling": "payload['launch'].get"
+    }
+   ],
+   "plans": [
+    {
+     "function": "inv.node_transport.NodeDelivery._quarantine_gpu_node",
+     "locks": [
+      {
+       "table": "inv.control_epoch",
+       "mode": "FOR SHARE",
+       "rank": 0,
+       "disposition": "NAMED_RANK"
+      },
+      {
+       "table": "inv.nodes",
+       "mode": "FOR UPDATE",
+       "rank": 4,
+       "disposition": "NAMED_RANK"
+      }
+     ],
+     "unresolved": 0
+    },
+    {
+     "function": "inv.node_transport.NodeDelivery.deliver",
+     "locks": [
+      {
+       "table": "inv.control_epoch",
+       "mode": "FOR SHARE",
+       "rank": 0,
+       "disposition": "NAMED_RANK"
+      },
+      {
+       "table": "inv.nodes",
+       "mode": "FOR SHARE",
+       "rank": 4,
+       "disposition": "NAMED_RANK"
+      },
+      {
+       "table": "inv.nodes",
+       "mode": "FOR UPDATE",
+       "rank": 4,
+       "disposition": "NAMED_RANK"
+      },
+      {
+       "table": "inv.node_channels",
+       "mode": "FOR SHARE",
+       "rank": 7,
+       "disposition": "NAMED_RANK"
+      },
+      {
+       "table": "inv.runs",
+       "mode": "FOR UPDATE",
+       "rank": 14,
+       "disposition": "NAMED_RANK"
+      },
+      {
+       "table": "inv.resources",
+       "mode": "FOR UPDATE",
+       "rank": 16,
+       "disposition": "NAMED_RANK"
+      }
+     ],
+     "unresolved": 0
+    }
+   ],
+   "totalMatrixWriters": 33
+  },
+  {
+   "case": "W11-second-writer-same-mapped-function-new-column",
+   "auditErrors": [
+    "WRITER_COLUMN_UNCOVERED:saintvision.services.storage.activate_contribution"
+   ],
+   "writers": [
+    {
+     "path": "src/saintvision/services/storage.py",
+     "line": 76,
+     "function": "saintvision.services.storage.register_contribution",
+     "table": "public.storage_contributions",
+     "verb": "INSERT",
+     "columns": [
+      "available_bytes",
+      "capacity_bytes",
+      "contribution_id",
+      "declared_path",
+      "mode",
+      "node_id",
+      "normalized_path",
+      "registered_at",
+      "registered_by_user_id",
+      "status",
+      "tenant_id"
+     ],
+     "disposition": "RETIRE_DIRECT_DML_REPLACE_NAMED_PROCEDURE",
+     "replacement": [
+      "b_register_owner_contribution"
+     ],
+     "expression": "StorageContribution(\n        contribution_id=new_id(\"storage_contribution\"),\n        tenant_id=tenant_id,\n        node_id=payload.node_id,\n        declared_path"
+    },
+    {
+     "path": "src/saintvision/services/storage.py",
+     "line": 109,
+     "function": "saintvision.services.storage.activate_contribution",
+     "table": "public.storage_contributions",
+     "verb": "UPDATE",
+     "columns": [
+      "status"
+     ],
+     "disposition": "RETIRE_DIRECT_DML_REPLACE_NAMED_PROCEDURE",
+     "replacement": [
+      "b_activate_owner_contribution"
+     ],
+     "expression": "contribution.status = \"active\""
+    },
+    {
+     "path": "src/saintvision/services/storage.py",
+     "line": 110,
+     "function": "saintvision.services.storage.activate_contribution",
+     "table": "public.storage_contributions",
+     "verb": "UPDATE",
+     "columns": [
+      "registered_by_user_id"
+     ],
+     "disposition": "RETIRE_DIRECT_DML_REPLACE_NAMED_PROCEDURE",
+     "replacement": [
+      "b_activate_owner_contribution"
+     ],
+     "expression": "contribution.registered_by_user_id = actor_user_id"
+    },
+    {
+     "path": "src/saintvision/services/storage.py",
+     "line": 127,
+     "function": "saintvision.services.storage.revoke_contribution",
+     "table": "public.storage_contributions",
+     "verb": "UPDATE",
+     "columns": [
+      "status"
+     ],
+     "disposition": "RETIRE_DIRECT_DML_REPLACE_NAMED_PROCEDURE",
+     "replacement": [
+      "b_revoke_owner_contribution"
+     ],
+     "expression": "contribution.status = \"revoked\""
+    },
+    {
+     "path": "src/saintvision/services/storage.py",
+     "line": 128,
+     "function": "saintvision.services.storage.revoke_contribution",
+     "table": "public.storage_contributions",
+     "verb": "UPDATE",
+     "columns": [
+      "revoked_at"
+     ],
+     "disposition": "RETIRE_DIRECT_DML_REPLACE_NAMED_PROCEDURE",
+     "replacement": [
+      "b_revoke_owner_contribution"
+     ],
+     "expression": "contribution.revoked_at = now"
+    }
+   ],
+   "records": [
+    {
+     "function": "saintvision.services.storage.register_contribution",
+     "line": 64,
+     "tables": [
+      "public.nodes"
+     ],
+     "modes": [],
+     "scope": "STATIC_NAMED_SCOPE",
+     "unresolved": false
+    },
+    {
+     "function": "saintvision.services.storage.register_contribution",
+     "line": 89,
+     "tables": [
+      "public.storage_contributions"
+     ],
+     "modes": [],
+     "scope": "STATIC_NAMED_SCOPE",
+     "unresolved": false
+    },
+    {
+     "function": "saintvision.services.storage.catalogue_location",
+     "line": 167,
+     "tables": [
+      "public.nodes",
+      "public.storage_contributions"
+     ],
+     "modes": [],
+     "scope": "STATIC_NAMED_SCOPE",
+     "unresolved": false
+    },
+    {
+     "function": "saintvision.services.storage.catalogue_location",
+     "line": 198,
+     "tables": [
+      "public.data_locations"
+     ],
+     "modes": [],
+     "scope": "STATIC_NAMED_SCOPE",
+     "unresolved": false
+    },
+    {
+     "function": "saintvision.services.storage.mark_verified",
+     "line": 219,
+     "tables": [
+      "public.data_locations"
+     ],
+     "modes": [],
+     "scope": "STATIC_NAMED_SCOPE",
+     "unresolved": false
+    },
+    {
+     "function": "saintvision.services.storage.pin_retention",
+     "line": 246,
+     "tables": [
+      "public.data_locations"
+     ],
+     "modes": [],
+     "scope": "STATIC_NAMED_SCOPE",
+     "unresolved": false
+    },
+    {
+     "function": "saintvision.services.storage.list_contributions",
+     "line": 276,
+     "tables": [
+      "public.storage_contributions"
+     ],
+     "modes": [],
+     "scope": "STATIC_NAMED_SCOPE",
+     "unresolved": false
+    },
+    {
+     "function": "saintvision.services.storage.list_locations",
+     "line": 314,
+     "tables": [
+      "public.data_locations"
+     ],
+     "modes": [],
+     "scope": "STATIC_NAMED_SCOPE",
+     "unresolved": false
+    },
+    {
+     "function": "saintvision.services.storage._load_contribution",
+     "line": 321,
+     "tables": [
+      "public.storage_contributions"
+     ],
+     "modes": [],
+     "scope": "STATIC_NAMED_SCOPE",
+     "unresolved": false
+    },
+    {
+     "function": "saintvision.services.storage._owned_for_update",
+     "line": 338,
+     "tables": [
+      "public.storage_contributions"
+     ],
+     "modes": [
+      "FOR UPDATE"
+     ],
+     "scope": "STATIC_NAMED_SCOPE",
+     "unresolved": false
+    },
+    {
+     "function": "saintvision.services.storage._owned_for_update",
+     "line": 339,
+     "tables": [
+      "public.storage_contributions"
+     ],
+     "modes": [
+      "FOR UPDATE"
+     ],
+     "scope": "STATIC_NAMED_SCOPE",
+     "unresolved": false
+    },
+    {
+     "function": "saintvision.services.storage.list_project_locations",
+     "line": 412,
+     "tables": [
+      "public.data_locations"
+     ],
+     "modes": [],
+     "scope": "STATIC_NAMED_SCOPE",
+     "unresolved": false
+    }
+   ],
+   "edges": [
+    {
+     "function": "saintvision.services.storage.activate_contribution",
+     "spelling": "_owned_for_update",
+     "targets": [
+      "saintvision.services.storage._owned_for_update"
+     ]
+    },
+    {
+     "function": "saintvision.services.storage.revoke_contribution",
+     "spelling": "_owned_for_update",
+     "targets": [
+      "saintvision.services.storage._owned_for_update"
+     ]
+    },
+    {
+     "function": "saintvision.services.storage.locked_contribution",
+     "spelling": "_owned_for_update",
+     "targets": [
+      "saintvision.services.storage._owned_for_update"
+     ]
+    }
+   ],
+   "unknownEdges": [
+    {
+     "function": "saintvision.services.storage.register_contribution",
+     "spelling": "session.get"
+    },
+    {
+     "function": "saintvision.services.storage.catalogue_location",
+     "spelling": "session.get"
+    },
+    {
+     "function": "saintvision.services.storage.mark_verified",
+     "spelling": "session.get"
+    },
+    {
+     "function": "saintvision.services.storage.pin_retention",
+     "spelling": "session.get"
+    },
+    {
+     "function": "saintvision.services.storage._load_contribution",
+     "spelling": "session.get"
+    },
+    {
+     "function": "saintvision.services.storage._owned_for_update",
+     "spelling": "session.execute"
+    }
+   ],
+   "plans": [
+    {
+     "function": "saintvision.services.storage._owned_for_update",
+     "locks": [
+      {
+       "table": "public.storage_contributions",
+       "mode": "FOR UPDATE",
+       "rank": 6,
+       "disposition": "NAMED_RANK"
+      }
+     ],
+     "unresolved": 0
+    },
+    {
+     "function": "saintvision.services.storage.activate_contribution",
+     "locks": [
+      {
+       "table": "public.storage_contributions",
+       "mode": "FOR UPDATE",
+       "rank": 6,
+       "disposition": "NAMED_RANK"
+      }
+     ],
+     "unresolved": 0
+    },
+    {
+     "function": "saintvision.services.storage.catalogue_location",
+     "locks": [],
+     "unresolved": 0
+    },
+    {
+     "function": "saintvision.services.storage.locked_contribution",
+     "locks": [
+      {
+       "table": "public.storage_contributions",
+       "mode": "FOR UPDATE",
+       "rank": 6,
+       "disposition": "NAMED_RANK"
+      }
+     ],
+     "unresolved": 0
+    },
+    {
+     "function": "saintvision.services.storage.mark_verified",
+     "locks": [],
+     "unresolved": 0
+    },
+    {
+     "function": "saintvision.services.storage.pin_retention",
+     "locks": [],
+     "unresolved": 0
+    },
+    {
+     "function": "saintvision.services.storage.register_contribution",
+     "locks": [],
+     "unresolved": 0
+    },
+    {
+     "function": "saintvision.services.storage.revoke_contribution",
+     "locks": [
+      {
+       "table": "public.storage_contributions",
+       "mode": "FOR UPDATE",
+       "rank": 6,
+       "disposition": "NAMED_RANK"
+      }
+     ],
+     "unresolved": 0
+    }
+   ],
+   "totalMatrixWriters": 35
+  },
+  {
+   "case": "L1-dotted-import-as-alias",
+   "auditErrors": [],
+   "writers": [],
+   "records": [],
+   "edges": [
+    {
+     "function": "inv.zz_claude_probe.sneaky",
+     "spelling": "L.lock_run",
+     "targets": [
+      "inv.leases.lock_run"
+     ]
+    }
+   ],
+   "unknownEdges": [],
+   "plans": [
+    {
+     "function": "inv.zz_claude_probe.sneaky",
+     "locks": [
+      {
+       "table": "inv.runs",
+       "mode": "FOR UPDATE",
+       "rank": 14,
+       "disposition": "NAMED_RANK"
+      }
+     ],
+     "unresolved": 0
+    }
+   ],
+   "totalMatrixWriters": 34
+  },
+  {
+   "case": "L2-self-attribute-instance",
+   "auditErrors": [],
+   "writers": [],
+   "records": [],
+   "edges": [
+    {
+     "function": "inv.zz_claude_probe.Sneaky.go",
+     "spelling": "self.store._admit_locked",
+     "targets": [
+      "inv.leases.LeaseStore._admit_locked"
+     ]
+    }
+   ],
+   "unknownEdges": [],
+   "plans": [
+    {
+     "function": "inv.zz_claude_probe.Sneaky.go",
+     "locks": [
+      {
+       "table": "inv.runs",
+       "mode": "FOR UPDATE",
+       "rank": 14,
+       "disposition": "NAMED_RANK"
+      }
+     ],
+     "unresolved": 0
+    }
+   ],
+   "totalMatrixWriters": 34
+  },
+  {
+   "case": "L3-imported-SQL-constant-other-module",
+   "auditErrors": [],
+   "writers": [],
+   "records": [
+    {
+     "function": "inv.zz_claude_probe.sneaky",
+     "line": 4,
+     "tables": [
+      "inv.nodes"
+     ],
+     "modes": [
+      "FOR NO KEY UPDATE"
+     ],
+     "scope": "STATIC_NAMED_SCOPE",
+     "unresolved": false
+    }
+   ],
+   "edges": [],
+   "unknownEdges": [
+    {
+     "function": "inv.zz_claude_probe.sneaky",
+     "spelling": "conn.execute"
+    }
+   ],
+   "plans": [
+    {
+     "function": "inv.zz_claude_probe.sneaky",
+     "locks": [
+      {
+       "table": "inv.nodes",
+       "mode": "FOR NO KEY UPDATE",
+       "rank": 4,
+       "disposition": "NAMED_RANK"
+      }
+     ],
+     "unresolved": 0
+    }
+   ],
+   "totalMatrixWriters": 34
+  },
+  {
+   "case": "L4-class-attribute-SQL-constant",
+   "auditErrors": [],
+   "writers": [],
+   "records": [
+    {
+     "function": "inv.zz_claude_probe.Sneaky.go",
+     "line": 5,
+     "tables": [],
+     "modes": [],
+     "scope": "UNKNOWN_SQL_SCOPE_BLOCK_THIS_ENTRY",
+     "unresolved": true
+    }
+   ],
+   "edges": [],
+   "unknownEdges": [
+    {
+     "function": "inv.zz_claude_probe.Sneaky.go",
+     "spelling": "conn.execute"
+    }
+   ],
+   "plans": [
+    {
+     "function": "inv.zz_claude_probe.Sneaky.go",
+     "locks": [],
+     "unresolved": 1
+    }
+   ],
+   "totalMatrixWriters": 34
+  },
+  {
+   "case": "L5-getattr-dynamic-helper",
+   "auditErrors": [],
+   "writers": [],
+   "records": [],
+   "edges": [],
+   "unknownEdges": [],
+   "plans": [],
+   "totalMatrixWriters": 34
+  },
+  {
+   "case": "L6-advisory-session-lock-online",
+   "auditErrors": [],
+   "writers": [],
+   "records": [
+    {
+     "function": "inv.zz_claude_probe.sneaky",
+     "line": 2,
+     "tables": [
+      "@transaction_advisory"
+     ],
+     "modes": [
+      "SESSION_ADVISORY_OFFLINE_ONLY"
+     ],
+     "scope": "STATIC_NAMED_SCOPE",
+     "unresolved": false
+    }
+   ],
+   "edges": [],
+   "unknownEdges": [
+    {
+     "function": "inv.zz_claude_probe.sneaky",
+     "spelling": "conn.execute"
+    }
+   ],
+   "plans": [
+    {
+     "function": "inv.zz_claude_probe.sneaky",
+     "locks": [
+      {
+       "table": "@transaction_advisory",
+       "mode": "SESSION_ADVISORY_OFFLINE_ONLY",
+       "rank": 3,
+       "disposition": "NAMED_RANK"
+      }
+     ],
+     "unresolved": 0
+    }
+   ],
+   "totalMatrixWriters": 34
+  },
+  {
+   "case": "L7-inverted-order-runs-then-nodes",
+   "auditErrors": [],
+   "writers": [],
+   "records": [
+    {
+     "function": "inv.zz_claude_probe.sneaky",
+     "line": 2,
+     "tables": [
+      "inv.runs"
+     ],
+     "modes": [
+      "FOR UPDATE"
+     ],
+     "scope": "STATIC_NAMED_SCOPE",
+     "unresolved": false
+    },
+    {
+     "function": "inv.zz_claude_probe.sneaky",
+     "line": 3,
+     "tables": [
+      "inv.nodes"
+     ],
+     "modes": [
+      "FOR UPDATE"
+     ],
+     "scope": "STATIC_NAMED_SCOPE",
+     "unresolved": false
+    }
+   ],
+   "edges": [],
+   "unknownEdges": [
+    {
+     "function": "inv.zz_claude_probe.sneaky",
+     "spelling": "conn.execute"
+    },
+    {
+     "function": "inv.zz_claude_probe.sneaky",
+     "spelling": "conn.execute"
+    }
+   ],
+   "plans": [
+    {
+     "function": "inv.zz_claude_probe.sneaky",
+     "locks": [
+      {
+       "table": "inv.nodes",
+       "mode": "FOR UPDATE",
+       "rank": 4,
+       "disposition": "NAMED_RANK"
+      },
+      {
+       "table": "inv.runs",
+       "mode": "FOR UPDATE",
+       "rank": 14,
+       "disposition": "NAMED_RANK"
+      }
+     ],
+     "unresolved": 0
+    }
+   ],
+   "totalMatrixWriters": 34
+  }
+ ]
+}
