@@ -3,8 +3,8 @@
   "recordedAtKST": "2026-11-06T00:46:51+09:00",
   "rootBase": "2b1753ce59c09037b5e130a7ffe64794d1d45fdf",
   "priorRootCheckpoint": {
-    "SHA": "f748a9703f3dc5dfd85fae431b50de9798960a9b",
-    "Docs": 42237441427,
+    "SHA": "8ad2a1ebfe3aa940d4d7ea7ed47dd9707634f7e6",
+    "Docs": 42244034472,
     "exactHeadCorrelationAllJobsSuccess": true,
     "remoteMatches": true,
     "syncExits": [
@@ -12,13 +12,13 @@
       0,
       0
     ],
-    "independentlyMatchedNormalizedDestinationHashes": 2872,
+    "independentlyMatchedNormalizedDestinationHashes": 2876,
     "pending": 0,
     "conflicts": 0,
     "trackedAndUntrackedClean": true,
     "rootDocsOnly": true,
     "wholeProgramComplete": false,
-    "verifiedAtKST": "2026-11-06T23:51:05+09:00"
+    "verifiedAtKST": "2026-11-07T00:34:08+09:00"
   },
   "actualPlanLowReview": {
     "source": "803ad270562b1b75e44d26f9e14b965c714ab519",
@@ -2515,7 +2515,7 @@
     "ownerT1T2T3": "msg_620855c76519",
     "normativeRevisionReply": "msg_0392caf64d5d"
   },
-  "latestRecordAtKST": "2026-11-07T00:31:11+09:00",
+  "latestRecordAtKST": "2026-11-07T01:00:33+09:00",
   "optionalLowTokenTestDelta": {
     "source": "f0af307705b4923ebc3e231db5238af4c70aa389",
     "scope": "two otherwise-valid token payload corrections and JSON validity assertions; runtime unchanged",
@@ -3108,25 +3108,7 @@
     "reviewOnlyPaths": 18
   },
   "BRev7RootDecision": "b-rev7-concrete-root-decision.json",
-  "activeActualReview": {
-    "atKST": "2026-11-07T00:31:11+09:00",
-    "source": "78468d0aec295c712dd1ea33bea1401d1d4939a4",
-    "base": "c76d0d66895503adde39288544929ff35cd6c281",
-    "branch": "agent/codex/fleet5-k2-p02-registry-design-20261106",
-    "rootVerification": "k2-p02-registry-candidate-source-root-verification.json",
-    "reviewTask": "task_da1378fed8fe",
-    "status": "actual_contract_review_launched",
-    "dependsOn": "task_c5d0e8ae0837",
-    "actualReviewStarted": true,
-    "ownerQuestionPending": "msg_5bf8ccb0d95d",
-    "actualVerdict": null,
-    "productImplementationGranted": false,
-    "spec": "ONE actual independent Claude CONTRACT-CANDIDATE review, after actual B Rev9c review is settled/exited/released (Root owns start; do NOT start yourself). Target78468d0aec295c712dd1ea33bea1401d1d4939a4, directparent/basec76d0d66895503adde39288544929ff35cd6c281, branchagent/codex/fleet5-k2-p02-registry-design-20261106. Root Git/API verified35ONLY added own History/Evidence paths/allbaseblobs unchanged/remoteexact, Docs42234905242/job127949897305/head/ref/workflow_dispatch/docs.yml/attempt1/correlationFLEET5-K2-P02-REGISTRY-DESIGN-78468d0a-msg_f68dc38baa0f/all19SUCCESS. Root recomputed33 manifest input hashes/358866B (manifest self excluded), exact normative contract/model/harness/two schema digests. No production producer exists; actualProducerSHA256NULL. Root did NOT rerun model tests or accept contract/wire. Canonical .work/p02-source-root-verified.json.\n\nAuthor SAME task_a95ef3d8ccce/ctx_ed23b4a777d0, actual ask msg_5bf8ccb0d95d pending your verdict/exactSHA/Docs then Root smallest concrete seam. Root grant msg_f68dc38baa0f, canonical Evidence k2-p02-registry-attestation-design-root-scope.json. Read ONE normative contract.md, authority/refusal/provisioning tables, candidate-envelope.schema.json, policy-payload.schema.json, candidate_model.py/test_candidate.py, final candidate-test-results.json, local-execution-and-pins.json/source-inspection.json and immutable manifest in Evidencefleet5-k2-p02-registry-attestation-design-20261106-codex; ownHistory2026-11-06_FLEET5_K2_P02_registry_attestation_design_Codex.md. Read actual approved4ce/fe7 design, current c76 migrationcontext and prior actual7d979761/0c5 reviews where needed; don't reopen accepted K1/PL/merge/pins/Core. Exact source/c76 normal Core42220638304 and Docs/qualified delivery already accepted bounded by Root; optional6 skipped, no physical acceptance.\n\nReview purpose ONLY installed-policy/registry READ-SNAPSHOT independently provisioned attestation as PROPOSED/UNREGISTERED design. Six other actual auth/source/clock/status/running/etc providers remain distinct dependencies, not implicitly implemented/approved. Required: externally provisioned immutable purpose/scope/key+schema+format+verifier authorization independent of caller/provider/plan/payload. Real Root custody/bootstrap loader/capsule generation/anchors are NULL/HOLD and must not be simulated into trusted authority. Payload cannot choose its own trusted expected values. Existing node-leaf/planning/TLS/28contract grants do NOT authorize registry trust. No new registered producer/wire/domain/ABI accepted automatically.\n\nAssess closed provisioning capsuleSHA256+generation, Root independent source choice/equivalence, actual review VERDICT/target/scope/coverage, CI head/ref/event/path/correlation/attempt/exact required job+step sets and allowed optional skips, artifact ID/digest/size/bytes, binaryVCS/toolchain/module/helper/runtime-lock/linkedclosure, independent installation receipt and actual-running V0/V1 joins. Explicitly identify fact producer, authenticated origin and remaining provisioning obligation. Hash/string equality alone is consistency. No registry self-attestation of its own current authenticity or running executable.\n\nNormative candidate RegistrySHA256 maps exact sealed policy payload bytes EXCLUDING self-hash field, separate from proof-slot/source-registration/graph digests. Stable RegistryRecordIdentity excludes fresh tickets/time/signature/running-proof digest; fresh read response signs them without publishing a new registry version. Check all safety-relevant stable fields remain bound, legal fresh same-record repeat vs replay/version equivocation, authorization/freshness/history boundary, generation/capsule/floor substitution and revocation/backdating/rollback. Original source anchors precede record; current head/status/running measurement acquired independently, no circular evidence. First-publication ABSENT stays HOLD. H1-H7 ticket/status/clock/running/antirollback mechanisms MUST remain named dependencies with actualNULL, not wished away by a synthetic oracle.\n\nAssess proposed deterministic bounded bytes/parser/projection/signature grammar, unknown/duplicate/malformed/noncanonical fields and scalar/size/depth limits; exact selector/version/cohort/source joins, authority partition, frozen ownership, checkPolicyBindings BEFORE future K1, closed14private reasons + unchanged opaque public refusal. Examine model vs normative contract/schema consistency with independent valid counterexamples/benign controls. Author100cases=4SYNTHETIC_ALREADY_BOUND+96negative/0failure, 3envelope+5policy schema mutants are OWNER STATIC SYMBOLIC proof ONLY. Model signature table is explicitly already-bound, no Ed25519/X509/OS/provider/clock/runtime authentication; production projection ALWAYS refuses. Do not demand nonexistent producer execution as though scope included it, and don't grant positive auth from the tests. Two superseded passing reports are not extra unique coverage; preserve N46 fixture-order/generator syntax failures and actual corrected final output.\n\nIdentify actual blockers to candidate design readiness separately from known unimplemented production prerequisites. Deliver ACCEPT_FOR_BOUNDED_DESIGN or precise REVISION_REQUIRED severity/source/valid causal counterexample/minimal correction, limitations and smallest follow-on seam recommendation. Root AFTER verdict may consider only a pure internal bounded codec/projection/strict-signature seam on private already-authenticated types with default-refusal composition; NO positive factory/port/provider/key/anchor registration/readclock/installer/current/effect grant. All real custody/anchors/status/clock/running/receipt/entrypointNULLHOLD, raw7UNREGISTERED, A01A40NOT_RUN, wholeK2/fleetINCOMPLETE.\n\nONE Claude/no helpers. Existing fleet5-bootstrap-v3-review-20261106 workspace after previous review actual exit/release; new own branch agent/claude/fleet5-k2-p02-784-review-20261106 FROM78468. Own unique reviewerHistoryEvidence only, owned ignored serial scratch; no author/production/Go/test/README/workflow/pins/boards/registry/source-original edits or live services/PG/Docker/SSH/issuer/privatekeys/OS/pagefile/clock/processkill/automation/Obsidianapply. Read pure candidate code before bounded serial evaluation; no authoring-generator execution unless clearly needed and wholly isolated. No broad/recursive deletes or protected-path compound gates. No full Core rerun/install/browser/TLS/SSO/physical claims.\n\nRead fresh canonical Root boards (Root4620da41084/Docs42233566720/sync2866hash0pending0conflicts/cleanGit23:25:09KST or newer). Official child sync --check --state D:/Project/SaintVision-Invion/SaintVisionI-Invion/.git/obsidian-sync-state.json readonly only, hash immediately before/after EACH check, no apply/adopt/resolve/statewrites/staleexport; Root may apply BETWEEN checks. Capture meaningful actual commands/exits/KST/limits, own normal commit/push/ONE exact Docs/unique correlation/head/ref/manual/docs.yml/attempt1/all19. worker_done actual reviewSHA/branch/Docs/target/verdict/next; no generic user approval questions. Do not start while B reviewer still owns resources.\n",
-    "reviewDispatch": "ctx_9785b4d4f081",
-    "reviewTerminal": "term_c4a34f25-e0b7-4722-ae72-d39858ccca5a",
-    "workerStartReceipt": "ready",
-    "predecessor": "B9c actual succeeded/settled/exited/released freshly verified; no manual release/retry"
-  },
+  "activeActualReview": null,
   "nextReviewRequires": "newimmutableK2Low/Stage2 orB8 pilot/evidence; oneClaudeafteractualrelease",
   "K2LatestImmutableProposalRootObservation": "k2-rev2-root-actual-contract-review-gate.json",
   "K2LatestActualReviewDispatch": {
@@ -3229,5 +3211,8 @@
   "B9cSource": "b-rev9c-source-root-verification.json",
   "P02Source": "k2-p02-registry-candidate-source-root-verification.json",
   "B9cActualReview": "b-rev9c-actual-review-root-verification.json",
-  "UIR3PreFreeze": "portal-polling-r3-pre-freeze-source-preservation-root-scope.json"
+  "UIR3PreFreeze": "portal-polling-r3-pre-freeze-source-preservation-root-scope.json",
+  "P02ActualReview": "k2-p02-actual-review-root-verification.json",
+  "P02Next": "k2-p02-rev2-fix-only-root-scope.json",
+  "UIR3Source": "portal-polling-r3-source-ci-pending-root-checkpoint.json"
 }

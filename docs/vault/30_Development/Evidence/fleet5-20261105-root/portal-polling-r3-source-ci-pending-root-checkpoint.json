@@ -1,0 +1,32 @@
+{
+  "source": "9cd017abf26a145d15a5c1b0d915662c3c71a724",
+  "base": "9c25f3c9cab162f424744d79f9a4e21729c40404",
+  "branch": "agent/gemini/portal-refresh-polling-r3-20261106",
+  "originVerifiedExpected": true,
+  "paths": [
+    [
+      "M",
+      "apps/web/src/app/App.tsx"
+    ],
+    [
+      "M",
+      "apps/web/src/shared/ui/Header.tsx"
+    ],
+    [
+      "M",
+      "apps/web/tests/portal-refresh-fleet-ui.test.tsx"
+    ]
+  ],
+  "whitespaceExit": 0,
+  "privateKeyMarkersAbsent": true,
+  "pushForce": false,
+  "RootCIOrIndependentAcceptance": false,
+  "atKST": "2026-11-07T01:00:33+09:00",
+  "firstFrontendDispatchAuthorizedOnce": "2026-11-07T00:58:17+09:00",
+  "sourceCommitAndRemoteVerified": true,
+  "localGates": "OWNER_REPORT_PENDING",
+  "exactFrontendCI": "DISPATCHED_RESULTS_PENDING",
+  "finalDocs": "OWNER_REPORT_PENDING",
+  "formalIndependentAcceptance": false,
+  "deployed": false
+}

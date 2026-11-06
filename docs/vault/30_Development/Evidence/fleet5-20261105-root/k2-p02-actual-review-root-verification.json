@@ -1,0 +1,14 @@
+{
+  "atKST": "2026-11-07T00:39:34+09:00",
+  "target": "78468d0aec295c712dd1ea33bea1401d1d4939a4",
+  "actualReview": "de4ef629220c626394a198f19aedf9aa7d2ac080",
+  "branch": "agent/claude/fleet5-k2-p02-784-review-20261106",
+  "Docs": 42244154165,
+  "job": 127981861690,
+  "correlation": "FLEET5-K2-P02-784-REVIEW-de4ef629-task_da1378fed8fe",
+  "rootVerifiedExactHeadRefEventPathAttemptAll19StepsSuccess": true,
+  "remoteExact": true,
+  "uniqueAddedReviewDocs": 10,
+  "actualWorkerDone": "msg_20f6a0a95a33",
+  "verdict": "REVISION_REQUIRED"
+}

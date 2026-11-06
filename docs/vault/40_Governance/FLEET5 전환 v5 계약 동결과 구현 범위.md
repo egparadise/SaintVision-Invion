@@ -1,11 +1,11 @@
 ---
 doc_id: "GOV-FLEET5-BOOTSTRAP-V5-FREEZE-CODE-SCOPE-20261106"
 title: "FLEET5 전환 v5 계약 동결과 구현 범위"
-version: "1.0.18"
+version: "1.0.19"
 status: "active"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-11-06T23:44:24+09:00"
+updated: "2026-11-07T01:00:33+09:00"
 source_of_truth: "Git"
 ---
 
@@ -186,3 +186,8 @@ ea276 Core42220638304의 필수42+16단계와 artifact XML/Go로그를 Root가 �
 ## P02 계약 후보의 고정 납품과 독립 검토 대기
 
 78468d0a는c76직접후속35개고유문서추가만이며Docs42234905242의정확한head/ref/attempt/all19성공과33manifest입력hash를Root가검증했다. 100정적symbolic사례는실제producer·clock·running인증이아니고모든실제bindingNULLHOLD다. Root는task_da1378fed8fe를B실제검토task_c5d0e8ae0837뒤의존검토로등록했다. 아직계약수락·format등록·D04codec/positivefactory구현grant는없다. 실제판정뒤최소다음seam을결정한다. 상세는k2-p02-root-contract-review-queue-gate.json이다.
+
+
+## P02 실제 de4 판정과 Rev2 설계 보완
+
+실제 de4ef629/Docs42244154165 판정은 REVISION_REQUIRED(Medium1·Low5)다. Root는 msg_d888d8ceb1e3로 정확한78468 기반 새 Rev2 branch의 고유 History/Evidence만 허용했다. payload strict codec·정확한 연결·모든 digest 유도·전체 policyData 출처 투영과 ordered reviews/독립 Root coverage, 게이트 순서, LF, 고유 입력 집계, zero-auth running echo를 보완한다. envelope 한정 설계 수락은 유지하되 payload와 coverage가 interface에 영향을 주므로 D04 구현은 아직 허용하지 않는다. 합성 already-bound 입력은 실제 인증이 아니며 H1-H7 actualNULL/HOLD·raw7UNREGISTERED·40실행 미수행을 유지한다. frozen Rev2 및 exact ownDocs 뒤 한 번의 좁은 실제 검토로 연결한다. 상세 정본은 k2-p02-rev2-fix-only-root-scope.json이다.

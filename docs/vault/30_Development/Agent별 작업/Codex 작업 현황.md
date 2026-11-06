@@ -1,15 +1,19 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.426"
+version: "1.0.427"
 status: "review"
 author: "Codex"
-updated: "2026-11-07T00:31:11+09:00"
+updated: "2026-11-07T01:00:33+09:00"
 source_of_truth: "Git"
 active_card: "FLEET5 continued supervision with PORTAL-REFRESH-FLEET-20261106"
-active_card_status: "B9cactual4288Low2/Rev9dFixOnly; P02Claude978active; UIR3sourcepreservationandgates; PC1keyregistrationpending/PC5API1.41"
-active_card_next: "ActualP02verdict/freshexitrelease thenreadyUIR3orRev9d; noA7/D04/deploygrant; verifyPC1onlyafteractualkeyresult; noall100claim"
+active_card_status: "P02actualde4M1L5Rev2FixOnly; UIR3source9cdCIreportpending; BRev9d; noactiveClaude; physicalincomplete"
+active_card_next: "Root verifies exactUIR3CI/report then ONE narrow review; owners finish Rev9d/P02Rev2; PC1actualkeyresult then SSH; noD04A7deploy100claim"
 ---
+
+## 2026-11-07T01:00:33+09:00 P02 실제 판정 반영과 UI 고정 후보
+
+P02의 실제 de4ef629 검토는 정책 payload의 정규 형식·envelope 연결·해시 유도·필드별 출처 투영에 Medium1건과 Low5건을 확인했다. 같은 Codex에 Rev2 설계 보완을 배정했고 D04 코드 착수는 보류한다. UI R3는 실제9cd017ab를 commit/push했으며 첫 Frontend CI와 최종 보고를 진행한다. B Rev9d도 병행하며 실제 검토자는 종료·해제된 상태다. PC1 공개키 등록 결과와 PC5 Docker API 교정 및 실제5대 노드·자원 인수는 여전히 남는다. 확인한 것은 실제 Git/gh API/Orca 상태이며 로컬 시험은 작성자 보고 수신 전이다. 다음 첫 행동/담당: Gemini의 UI CI·보고, 두 Codex의 보완, Root의 exact 증거 확인과 단일 실제 검토 배정이다.
 
 ## 2026-11-07T00:31:11+09:00 실제 Low 판정과 P02 검토·연결 보강
 
