@@ -1,0 +1,25 @@
+{
+  "environment": "Windows 11, D:/Project/SaintVisionI-Invion/.venv Python 3.14.7 (-I/-B for probes), jsonschema 4.26.0 (existing, nothing installed), PYTHONUTF8=1, cwd = worktree root fleet5-bootstrap-v3-review-20261106 on branch agent/claude/fleet5-k2-p02-r2-58d-review-20261107 created from exact 58d7eb07. Times KST (PowerShell clock). Serial only; no Node/browser/full CI/live service/PG/Docker/SSH/issuer/private key/OS/pagefile/clock/process action; owner Evidence untouched; no Git/OS longpath setting change.",
+  "provenance": [
+    {"argv": "git rev-parse HEAD origin/agent/claude/portal-polling-r3-b48-review-20261107", "result": "both 626ab0ed: prior UI R3 review committed and pushed before reuse; worktree clean"},
+    {"argv": "git fetch origin agent/codex/fleet5-k2-p02-registry-rev2-20261107 ; git rev-parse FETCH_HEAD 58d7eb07^", "result": "58d7eb077efbcff5327ac298a39984fe1e39fdf1 ; parent 78468d0aec295c712dd1ea33bea1401d1d4939a4"},
+    {"argv": "git diff --stat 78468d0a 58d7eb07", "result": "51 files added (50 Evidence + 1 History), 0 modified/deleted"},
+    {"argv": "git switch -c agent/claude/fleet5-k2-p02-r2-58d-review-20261107 58d7eb077efbcff5327ac298a39984fe1e39fdf1", "result": "HEAD 58d7eb07"},
+    {"argv": "read-only Root worktree fleet-five-orchestration-20261105: git rev-parse HEAD ; git status --short ; board version lines ; .work/p02-rev2-root-scope.txt ; .work/p02r2-source-root-verified.json ; .work/p02r2-ready-before-start.json", "result": "Root HEAD 138534a6 (2026-11-07 02:58:46 +0900, newer than 471e3a19), clean; Index 1.0.472 (latest_codex_card '... P02Rev2actual5a86active'), Claude board 1.2.130"}
+  ],
+  "staticReads": [
+    "actual de4ef629 review.json, reviewer_p02_probes.py.txt, reviewer_gate_driver.py.txt, commands.json, local-doc-gates.txt, History",
+    "Rev2: contract.md (335 lines), candidate_model.py (414), schema_defs.py, fixture_data.py, test_contract.py, payload-contract.json, gate-order.json, fact-origins.json, review-response.json, source-component-origins.json, test-results.json, test-runs/index.json + attempt-01 summary, local-execution-and-pins.json, owner History",
+    "58d tree K1 source: services/node-agent/internal/migrationcontext/policy.go:43-61,222-278 ; k1_bridge.go:9-26 ; migrationverify/json.go:162-167 ; migrationverify/trust.go:286-295"
+  ],
+  "runs": [
+    {"atKST": "2026-11-07T02:58 (approx, not stamped)", "argv": "git show 58d7eb07:<EV>/<7 primary files> > <scratch>/p02r2/model/ ; sha256sum", "exit": 0, "result": "model e816e1f5, envelope 60d6c825, payload 02d0b30f, C2 ccae1398 equal Root/owner pins"},
+    {"atKST": "2026-11-07T02:58:17..02:58:24", "argv": "python -I -B reviewer_p02r2_probes.py <worktree> <scratch>/run1 <scratch>/run1/result.json (run1, 47 probes)", "exit": 0, "note": "development run; superseded (V20b added, cosmetic fixes); log not retained"},
+    {"atKST": "2026-11-07T03:01:16", "argv": "python -I -B reviewer_p02r2_probes.py <worktree> <scratch>/final <scratch>/final/reviewer-p02r2-probes-result.json (48 probes)", "exit": 0, "note": "superseded only to correct two policy.go line citations inside probe notes; identical observed values"},
+    {"atKST": "2026-11-07T03:03:56", "argv": "python -I -B reviewer_p02r2_probes.py.txt <worktree> <scratch>/final <scratch>/final/reviewer-p02r2-probes-result.json (FINAL, 48 probes)", "exit": 0, "log": "reviewer-p02r2-probes.log.txt (bash redirect, LF, no BOM)", "observedDiffersFromContract": 7},
+    {"atKST": "2026-11-07T03:00:25..03:01:01", "argv": "python -B reviewer_gate_driver.py.txt 58d7eb07 canonical-sync-check-before.txt <scratch>/gates sync-only", "exit": 0, "result": "3880 managed / 1428 pending / 0 conflicts; canonical state c3043aee... unchanged before/after"},
+    {"atKST": "2026-11-07T03:05:36..03:06:46", "argv": "python -B reviewer_gate_driver.py.txt 58d7eb07 local-doc-gates.txt <scratch>/gates", "exit": 0, "result": "8/8 PASS (check_docs 1268 docs, ontology, sync CHECK 3889/1437/0 conflicts state c3043aee... unchanged, contract_bindings, frontend_integrity, single_source ratchet, response_freshness, path_citations ratchet 290 baseline)"}
+  ],
+  "notRun": ["owner test_contract.py (writes owner test-runs/test-results)", "owner make_rev2_schema/build_rev2_tables generators", "Core/Go/type census/original model suites", "any crypto/provider/runtime/producer"],
+  "syncCheck": "tools/sync_obsidian.py --check with canonical state D:/Project/SaintVision-Invion/SaintVisionI-Invion/.git/obsidian-sync-state.json; SHA256 of the state recorded immediately before/after EACH check; no apply/adopt/resolve/state write/export. Root may apply between calls."
+}

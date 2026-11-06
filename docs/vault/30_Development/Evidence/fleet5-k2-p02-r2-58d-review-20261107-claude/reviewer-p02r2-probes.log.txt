@@ -1,0 +1,49 @@
+V01 ok | "SYNTHETIC_ALREADY_BOUND" | 
+V02 ok | [41, 15, true, true] | None
+V03 ok | [8, true, true] | None
+V04 ok | ["FORMAT", "03_PAYLOAD"] | closed-input-shape
+V05 ok | ["FORMAT", "03_PAYLOAD"] | closed-input-shape
+V06 ok | ["FORMAT", "03_PAYLOAD"] | closed-input-shape
+V07 ok | ["FORMAT", "03_PAYLOAD"] | closed-input-shape
+V08 ok | ["FORMAT", "03_PAYLOAD"] | closed-policy-schema
+V09 ok | ["FORMAT", "03_PAYLOAD"] | closed-policy-schema
+V10 ok | ["FORMAT", "03_PAYLOAD"] | closed-input-shape
+V11 ok | ["FORMAT", "03_C2"] | closed-input-shape
+V12 ok | ["FORMAT", "03_C2"] | closed-input-shape
+V13 ok | ["FORMAT", "03_PAYLOAD"] | closed-policy-schema
+V14 ok | ["PROVENANCE", "05_REVIEWS"] | coverage-current-source-and-original-set
+V15 ok | ["VERSION", "06_VERSION"] | current-stable-record-and-protected-floor
+V16 ok | ["CI", "05_CI"] | independently-acquired-CI-records
+V17 ok | ["PROVENANCE", "05_SOURCE"] | independent-source-acquisition-facts
+V18 ok | ["PROVENANCE", "05_COMPONENTS"] | derived-cohort-to-independent-scope
+V19 FINDING | "SYNTHETIC_ALREADY_BOUND" | 
+V20 FINDING | "SYNTHETIC_ALREADY_BOUND" | 
+V20b FINDING | "SYNTHETIC_ALREADY_BOUND" | 
+V21 ok | ["PROVENANCE", "05_REVIEWS"] | independent-effective-approval-purpose-origin
+V22 ok | ["PROVENANCE", "05_REVIEWS"] | complete-ordered-source-partition
+V23 ok | ["PROVENANCE", "05_REVIEWS"] | independent-review-outcome-set
+V24 FINDING | "capsule keys: approvedReviewOutcomes,approvedReviewScope,reviewedParts,rootApprovalIdentity,rootApprovalPurpose" | None
+V25 FINDING | "Provenance.InstallationReceiptSHA256,Provenance.RuntimeLockSHA256,Provenance.LinkedClosureSHA256,Provenance.RunningExecutableSHA256 projected FROM H5 (candidate_model.py:370-372); runningData project | None
+V26 ok | ["STATUS", "06_STATUS"] | independent-current-status-not-record-claim
+V27 ok | ["TIME", "06_TIME"] | whole-clock-interval
+V28 ok | ["CI", "05_CI"] | every-required-step-success
+V29 ok | ["SCOPE", "04_SIGNATURE"] | exact-independent-capsule-binding
+V30 ok | ["INSTALLATION", "05_RUNNING"] | actual-component-process-generation-root-UID
+V31 ok | [true, true, true] | None
+V32 ok | [0] | None
+V33 ok | ["OLD_DOLLAR_ACCEPTS_LF", "NEW_REFUSES_LF"] | None
+V34 ok | ["FORMAT", "03_ENVELOPE"] | closed-input-shape
+V35 ok | "SYNTHETIC_ALREADY_BOUND" | 
+V36 ok | [true, true, true] | None
+V37 ok | ["REPLAY", "06_REPLAY"] | zero-weight-H5-echo-bound-through-client-request
+V38 ok | ["INSTALLATION", "05_RUNNING"] | independent-H5-sourceSHA
+V39 ok | ["TIME", "06_TIME"] | independent-H5-freshness-not-echo
+V40 ok | ["INSTALLATION", "05_RUNNING"] | actual-component-process-generation-root-UID
+V41 ok | ["VERSION", "06_VERSION"] | current-stable-record-and-protected-floor
+V42 FINDING | "SYNTHETIC_ALREADY_BOUND" | 
+V43 FINDING | "SYNTHETIC_ALREADY_BOUND" | 
+V44 ok | [15503, "876554dcb4fb28fcc7f2095778f1cdf12872fef5d13efc374b4716781a3c00e3", "a0a05427c40499ac32e52c58982a84bceb4b4e833b68c601f9373d93d80aa562", false] | None
+V45 ok | [1034425, "7a87bcd81e3abcc27ab0d6ec7afafc93414749b42b139491b04840a8ed980fc9", 5] | None
+V46 ok | [10, 10, true] | None
+V47 ok | [97, 97, 4, 93, 0, true, true, 10] | None
+findings ['V19', 'V20', 'V20b', 'V24', 'V25', 'V42', 'V43']
