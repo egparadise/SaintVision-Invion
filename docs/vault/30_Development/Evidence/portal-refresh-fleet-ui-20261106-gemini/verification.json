@@ -1,24 +1,29 @@
 {
-  "source": "3a83707688f43570a7eaf9008989794979b3eb9f",
+  "source": "2d87d7aa3af1e35e5980ab340d132df56ce52c66",
+  "initialSource": "3a83707688f43570a7eaf9008989794979b3eb9f",
   "branch": "agent/gemini/portal-refresh-fleet-ui-20261106",
   "base": "53683020e3cfaf79ec4662f9a79b8b4dae28a628",
   "task": "PORTAL-REFRESH-FLEET-20261106",
   "author": "Gemini",
-  "atKST": "2026-11-06T20:10:00+09:00",
+  "atKST": "2026-11-06T20:36:00+09:00",
+  "rootFindingsResolved": {
+    "R-UI-M1": "Header /healthz canonical validation (JSON + status: ok) instead of /v1/health with ANY 2xx/401/404; added Vite dev/preview /healthz reverse-proxy and nginx HTTPS 443 upstream route while preserving HTTP 80 plaintext 'OK'; truthful initial cluster count null/0 (no fake 5/5 default)",
+    "R-UI-M2": "ClusterOverview empty cluster background refresh failure displays visible cluster-stale-warning (role=alert) with lastFetchedAt snapshot time and retry button; initial pending (!lastFetchedAt) truthfully displays '클러스터 노드 정보를 확인하고 있습니다...' without claiming '정상 조회 결과: 0대'; stable empty card retained without remount or metric card flicker; 76 style attributes and border tokens preserved"
+  },
   "CI": {
     "docs": {
-      "run": 42207943051,
+      "run": 42211247163,
       "jobIds": [
-        127859155285
+        127870134953
       ],
       "conclusion": "success",
       "exactHeadRefWorkflowEventCorrelationAttemptAllJobsSuccess": true
     },
     "frontend": {
-      "run": 42207931409,
+      "run": 42211235450,
       "jobIds": [
-        127859117188,
-        127859117510
+        127870096841,
+        127870097238
       ],
       "conclusion": "success",
       "exactHeadRefWorkflowEventCorrelationAttemptAllJobsSuccess": true
@@ -32,31 +37,33 @@
     }
   },
   "webArtifact": {
-    "source": "3a83707688f43570a7eaf9008989794979b3eb9f",
-    "FrontendRun": 42207931409,
-    "artifactId": 13498400518,
-    "artifactBytes": 1115545,
-    "artifactDigest": "sha256:3458bea031691fe11cfa69337f1e9e6857d220897a62f8f9d3d4966ebd94f4ce",
-    "portalReleaseArtifactId": 13497735996,
-    "portalReleaseDigest": "sha256:b1eb936141856dd676af72bde5f71769200243558fc7d3a6a68257f8066b489a"
+    "source": "2d87d7aa3af1e35e5980ab340d132df56ce52c66",
+    "FrontendRun": 42211235450,
+    "artifactId": 13499835128,
+    "artifactBytes": 1116712,
+    "artifactDigest": "sha256:375cec90c8ec66fe2880a8f954d7264324ae95d1925710858fe99fb1f35936fe",
+    "portalReleaseArtifactId": 13499830407,
+    "portalReleaseDigest": "sha256:65ecbb17516ab4e044921282774d5bb3df60b38d016ede65deea4c995eae499f"
   },
   "localVerification": {
-    "portalRefreshFleetUiTest": "exit 0 (12/12 passed)",
-    "vitestFullSuite": "exit 0 (103 files passed, 1230 tests passed)",
+    "portalRefreshFleetUiTest": "exit 0 (20/20 passed)",
+    "vitestFullSuite": "exit 0 (103 files passed, 1238 tests passed)",
     "typescriptCheck": "exit 0 (0 errors)",
-    "productionBuild": "exit 0 (built in 10.73s, dist bundle generated)",
+    "productionBuild": "exit 0 (built in 4.84s, dist bundle generated)",
     "frontendIntegrity": "exit 0 (94 files scanned, 9 rules, 0 violations)",
     "contractBindings": "exit 0 (57 fixtures, 21 bound types, 14 replay guards)",
-    "routeCoverage": "exit 0 (41 passed)",
-    "checkDocs": "exit 0 (PASS: 24 original hashes, 1259 versioned documents)",
-    "obsidianSyncCheck": "exit 0 (2826 managed files, 0 conflicts, no writes)",
-    "obsidianSyncStateSHA256": "4DA58376256FBB6C4570D291CB1B33DDE55DBD5ED2B3CE22295609E1743CAB7A"
+    "routeCoverage": "exit 0 (41 passed in 2.90s)",
+    "checkDocs": "exit 0 (PASS: 24 original hashes, 1260 versioned documents)",
+    "obsidianSyncCheck": "exit 0 (2828 managed files, 0 conflicts, no writes)",
+    "obsidianSyncStateSHA256": "DCFDB284A97FB048592E857DA5F80AEDE2811E82EB93FEAA4D1DFB7446660629"
   },
   "productChanges": {
-    "Header": "Honest unknown initial gateway state (online: null, rttMs: null), 2xx/401/404 transport response preserves online=true with real measured RTT, formatUserDisplayName formats raw oidc hashes",
-    "ClusterOverview": "Stable empty cluster rendering without panel unmount/flash during background polls, preserves error banner on initial unobserved failure, 76 style attributes and border-subtle tokens preserved",
-    "App": "Parameterised isBackground=true on 5s periodic intervals to prevent cyclical loading flicker, prevents purging cached state on background failure (retains truthful stale observation)",
-    "session": "Derives user friendly displayName from OIDC claims or fallback formatting"
+    "Header": "Canonical /healthz check requiring JSON response and status==='ok', truthful initial gateway state (online: null, rttMs: null) with '확인 중...', truthful cluster counts null/0 without fake 5/5 defaults, formatUserDisplayName formats raw oidc hashes",
+    "ClusterOverview": "Stable empty cluster rendering without panel unmount/flash during background polls; on background refresh failure with cached 0 nodes renders visible cluster-stale-warning (role=alert) with last snapshot time and retry button; initial pending renders loading text without claiming '정상 조회 결과: 0대'; exact 76 AST style attributes strictly preserved",
+    "App": "Parameterised isBackground=true on 5s periodic intervals to prevent cyclical loading flicker; retains truthful stale observation on error; scope fences and stale action guards prevent unauthorized actions when permissions/approvals are in error",
+    "session": "Derives user friendly displayName from OIDC claims or fallback formatting after verified server session",
+    "viteConfig": "Reverse-proxy /healthz in dev and preview to backend target",
+    "nginxConfig": "HTTPS 443 proxies /healthz to control-plane upstream while HTTP 80 preserves local plaintext 'OK'"
   },
   "constraintsCompliance": {
     "liveServicesUntouched": true,
