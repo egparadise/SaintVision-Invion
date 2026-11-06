@@ -1,15 +1,19 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.405"
+version: "1.0.406"
 status: "review"
 author: "Codex"
-updated: "2026-11-06T15:18:50+09:00"
+updated: "2026-11-06T15:47:51+09:00"
 source_of_truth: "Git"
 active_card: "FLEET5-20261105 five physical node orchestration"
-active_card_status: "B7actual97bb2M2L/rootnarrowRev8revoke_channelpilotdelivered; K2Low+Stage2candidate; noactiveClaudeuntilnewcandidate; noBcode/wholephysicalincomplete"
-active_card_next: "B Codex Rev8perkindrecovery/hints/typedanalysispilot+exactDocs; K2Codex LowcheckpointthenStage2actualCI; Root nextimmutable ONEactualreview andcombinedCoreDocs decision"
+active_card_status: "Lowdba+Stage201a actualpairReviewctx8aactive/Stage2focused3PASS; LownewraceNOTRUN; closurepinsunregistered/combinedsourcepending; B8pilot/wholephysicalincomplete"
+active_card_next: "Claude per-targetLow+Stage2verdict/exactpinregistrationcut+ownDocs; Root concretecombinedsource/integrationgrant thenfreshCoreDocs; B Codex smallRev8pilot; no borrowedCI"
 ---
+
+## 2026-11-06T15:47:51+09:00 K2A 보강·Stage2 실제 delta 검토
+
+작업한 것과 확인: K2A 보강dba1804b와Stage2수정01a4bebf의 허용 경로·부모·현재remote와5개exact CI 성공을 Root가 확인했다. Stage2 원본artifact를 파싱해 고정 표본3개가 각각1회/실패·오류·skip0임을 확인했다. 단일 Claude task_de20693ba7c9/ctx_8a1710587147에 두 코드의 실제 delta 검토와 결합 전 standalone pin의 정확한 갱신 범위 검토를 배정했다. 새 코드 수락·pin 등록·결합 SHA·전체Core 성공은 아직 아니다. 원질문 msg_6823df024379는 실제 판정과 정확한 다음 결합 범위 결정까지 pending이다. 다음 첫 행동/담당은 Claude의 대상별 판정과 Root의 결합·새 pin 범위 결정이다.
 
 ## 2026-11-06T15:18:50+09:00 B rev7 실제 보완 판정과 작은 rev8 지시
 

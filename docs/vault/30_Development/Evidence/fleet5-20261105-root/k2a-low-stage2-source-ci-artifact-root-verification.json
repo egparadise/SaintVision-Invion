@@ -1,0 +1,232 @@
+{
+  "atKST": "2026-11-06T15:42:47+09:00",
+  "Low": {
+    "source": "dba1804b1d180eda2bf0439952e9706782109fd6",
+    "parent": "ff3169d360a707415d9b03484cf0cf3031f3912c",
+    "allowedOnly": true,
+    "paths": [
+      "docs/vault/30_Development/Evidence/fleet5-k2a-review-lows-20261106-codex/R1-R3-focused-attempt2.json",
+      "docs/vault/30_Development/Evidence/fleet5-k2a-review-lows-20261106-codex/R1-R3-focused-attempt2.log",
+      "docs/vault/30_Development/Evidence/fleet5-k2a-review-lows-20261106-codex/R1-R3-focused-attempt3.json",
+      "docs/vault/30_Development/Evidence/fleet5-k2a-review-lows-20261106-codex/R1-R3-focused-attempt3.log",
+      "docs/vault/30_Development/Evidence/fleet5-k2a-review-lows-20261106-codex/R1-R5-handoff.json",
+      "docs/vault/30_Development/Evidence/fleet5-k2a-review-lows-20261106-codex/R2-R3-baseline-red.json",
+      "docs/vault/30_Development/Evidence/fleet5-k2a-review-lows-20261106-codex/R2-R3-baseline-red.log",
+      "docs/vault/30_Development/Evidence/fleet5-k2a-review-lows-20261106-codex/R5-census-attempt1.json",
+      "docs/vault/30_Development/Evidence/fleet5-k2a-review-lows-20261106-codex/R5-census-attempt1.log",
+      "docs/vault/30_Development/Evidence/fleet5-k2a-review-lows-20261106-codex/R5-focused.json",
+      "docs/vault/30_Development/Evidence/fleet5-k2a-review-lows-20261106-codex/R5-focused.log",
+      "docs/vault/30_Development/Evidence/fleet5-k2a-review-lows-20261106-codex/full-unit.log",
+      "docs/vault/30_Development/Evidence/fleet5-k2a-review-lows-20261106-codex/gate-01-check_docs.log",
+      "docs/vault/30_Development/Evidence/fleet5-k2a-review-lows-20261106-codex/gate-02-check_ontology_generation.log",
+      "docs/vault/30_Development/Evidence/fleet5-k2a-review-lows-20261106-codex/gate-03-check_ontology.log",
+      "docs/vault/30_Development/Evidence/fleet5-k2a-review-lows-20261106-codex/gate-04-check_contract_bindings.log",
+      "docs/vault/30_Development/Evidence/fleet5-k2a-review-lows-20261106-codex/gate-05-check_frontend_integrity.log",
+      "docs/vault/30_Development/Evidence/fleet5-k2a-review-lows-20261106-codex/gate-06-check_doc_path_citations.log",
+      "docs/vault/30_Development/Evidence/fleet5-k2a-review-lows-20261106-codex/gate-07-check_doc_single_source.log",
+      "docs/vault/30_Development/Evidence/fleet5-k2a-review-lows-20261106-codex/gate-08-test_sync.log",
+      "docs/vault/30_Development/Evidence/fleet5-k2a-review-lows-20261106-codex/gate-09-build_docs.log",
+      "docs/vault/30_Development/Evidence/fleet5-k2a-review-lows-20261106-codex/gate-10-sync_obsidian.log",
+      "docs/vault/30_Development/Evidence/fleet5-k2a-review-lows-20261106-codex/go-env.log",
+      "docs/vault/30_Development/Evidence/fleet5-k2a-review-lows-20261106-codex/local-final-go-results.json",
+      "docs/vault/30_Development/Evidence/fleet5-k2a-review-lows-20261106-codex/local-required-gates.json",
+      "docs/vault/30_Development/Evidence/fleet5-k2a-review-lows-20261106-codex/preserved-authoring-failures.json",
+      "docs/vault/30_Development/Evidence/fleet5-k2a-review-lows-20261106-codex/run_gates.py.txt",
+      "docs/vault/30_Development/Evidence/fleet5-k2a-review-lows-20261106-codex/vet.log",
+      "docs/vault/30_Development/History/2026-11-06_FLEET5_K2A_review_lows_Codex.md",
+      "services/node-agent/internal/migrationcontext/README.md",
+      "services/node-agent/internal/migrationcontext/effect_gate_test.go",
+      "services/node-agent/internal/migrationcontext/history.go",
+      "services/node-agent/internal/migrationcontext/policy.go",
+      "services/node-agent/internal/migrationcontext/review_census_test.go",
+      "services/node-agent/internal/migrationcontext/review_lows_test.go",
+      "services/node-agent/internal/migrationcontext/source_gate_test.go"
+    ]
+  },
+  "Stage2": {
+    "source": "01a4bebf55d23f11f85258746662d8b8a5cd0311",
+    "base": "52f935acced837d500af5932c3d26882e091f25a",
+    "actualParent": "52f935acced837d500af5932c3d26882e091f25a",
+    "allowedOnly": true,
+    "paths": [
+      ".github/workflows/peer-floor-observation-diagnostic.yml",
+      "deploy/lan/worker_peer_floor.py",
+      "docs/vault/30_Development/Evidence/fleet5-peer-floor-mount-order-stage2-20261106-codex/README.md",
+      "docs/vault/30_Development/Evidence/fleet5-peer-floor-mount-order-stage2-20261106-codex/candidate-helper-closure.json",
+      "docs/vault/30_Development/Evidence/fleet5-peer-floor-mount-order-stage2-20261106-codex/gate-01-check_docs.log",
+      "docs/vault/30_Development/Evidence/fleet5-peer-floor-mount-order-stage2-20261106-codex/gate-02-check_ontology_generation.log",
+      "docs/vault/30_Development/Evidence/fleet5-peer-floor-mount-order-stage2-20261106-codex/gate-03-check_ontology.log",
+      "docs/vault/30_Development/Evidence/fleet5-peer-floor-mount-order-stage2-20261106-codex/gate-04-check_contract_bindings.log",
+      "docs/vault/30_Development/Evidence/fleet5-peer-floor-mount-order-stage2-20261106-codex/gate-05-check_frontend_integrity.log",
+      "docs/vault/30_Development/Evidence/fleet5-peer-floor-mount-order-stage2-20261106-codex/gate-06-check_doc_path_citations.log",
+      "docs/vault/30_Development/Evidence/fleet5-peer-floor-mount-order-stage2-20261106-codex/gate-07-check_doc_single_source.log",
+      "docs/vault/30_Development/Evidence/fleet5-peer-floor-mount-order-stage2-20261106-codex/gate-08-test_sync.log",
+      "docs/vault/30_Development/Evidence/fleet5-peer-floor-mount-order-stage2-20261106-codex/gate-09-build_docs.log",
+      "docs/vault/30_Development/Evidence/fleet5-peer-floor-mount-order-stage2-20261106-codex/gate-10-sync_obsidian.log",
+      "docs/vault/30_Development/Evidence/fleet5-peer-floor-mount-order-stage2-20261106-codex/local-required-gates.json",
+      "docs/vault/30_Development/Evidence/fleet5-peer-floor-mount-order-stage2-20261106-codex/run_gates.py.txt",
+      "docs/vault/30_Development/Evidence/fleet5-peer-floor-mount-order-stage2-20261106-codex/static-check.json",
+      "docs/vault/30_Development/Evidence/fleet5-peer-floor-mount-order-stage2-20261106-codex/unit-attempt1.json",
+      "docs/vault/30_Development/Evidence/fleet5-peer-floor-mount-order-stage2-20261106-codex/unit-attempt1.log",
+      "docs/vault/30_Development/Evidence/fleet5-peer-floor-mount-order-stage2-20261106-codex/unit-final.json",
+      "docs/vault/30_Development/Evidence/fleet5-peer-floor-mount-order-stage2-20261106-codex/unit-final.log",
+      "docs/vault/30_Development/History/2026-11-06_FLEET5_peer_floor_mount_order_stage2_Codex.md",
+      "tests/core/test_worker_peer_floor_mount_order_stage2.py",
+      "tests/core/test_worker_peer_floor_observation_diagnostics.py"
+    ],
+    "qualifiedReport": "21059451c23cebe8c038f76e437c390120205998",
+    "reportProductDiff": 0
+  },
+  "Stage1QualifiedReport": "a8b6c1bdc15da51df099605cf50a75586577e4de",
+  "CI": {
+    "LowDocs": {
+      "source": "dba1804b1d180eda2bf0439952e9706782109fd6",
+      "branch": "agent/codex/fleet5-k2a-review-lows-20261106",
+      "run": 42173025277,
+      "event": "workflow_dispatch",
+      "workflowPath": ".github/workflows/docs.yml",
+      "correlation": "FLEET5-K2A-review-Lows-Docs-dba1804b1d18-20261106T1513KST",
+      "attempt": 1,
+      "status": "completed",
+      "conclusion": "success",
+      "jobs": [
+        127745030120
+      ],
+      "allStepsSuccess": true
+    },
+    "Stage2Focused": {
+      "source": "01a4bebf55d23f11f85258746662d8b8a5cd0311",
+      "branch": "agent/codex/fleet5-peer-floor-mount-order-stage2-20261106",
+      "run": 42174324865,
+      "event": "push",
+      "workflowPath": ".github/workflows/peer-floor-observation-diagnostic.yml",
+      "correlation": "FLEET5-peer-floor-stage2-01a4bebf55d23f11f85258746662d8b8a5cd0311",
+      "attempt": 1,
+      "status": "completed",
+      "conclusion": "success",
+      "jobs": [
+        127749166146
+      ],
+      "allStepsSuccess": true
+    },
+    "Stage2SourceDocs": {
+      "source": "01a4bebf55d23f11f85258746662d8b8a5cd0311",
+      "branch": "agent/codex/fleet5-peer-floor-mount-order-stage2-20261106",
+      "run": 42174387586,
+      "event": "workflow_dispatch",
+      "workflowPath": ".github/workflows/docs.yml",
+      "correlation": "FLEET5-peer-floor-stage2-Docs-01a4bebf55d2-20261106T1527KST",
+      "attempt": 1,
+      "status": "completed",
+      "conclusion": "success",
+      "jobs": [
+        127749372289
+      ],
+      "allStepsSuccess": true
+    },
+    "Stage2ReportDocs": {
+      "source": "21059451c23cebe8c038f76e437c390120205998",
+      "branch": "agent/codex/fleet5-peer-floor-mount-order-stage2-20261106",
+      "run": 42175312016,
+      "event": "workflow_dispatch",
+      "workflowPath": ".github/workflows/docs.yml",
+      "correlation": "FLEET5-peer-floor-stage2-report-Docs-21059451c23c-20261106T1534KST",
+      "attempt": 1,
+      "status": "completed",
+      "conclusion": "success",
+      "jobs": [
+        127752309207
+      ],
+      "allStepsSuccess": true
+    },
+    "Stage1ReportDocs": {
+      "source": "a8b6c1bdc15da51df099605cf50a75586577e4de",
+      "branch": "agent/codex/fleet5-peer-floor-observation-diagnostic-20261106",
+      "run": 42174947293,
+      "event": "workflow_dispatch",
+      "workflowPath": ".github/workflows/docs.yml",
+      "correlation": "FLEET5-peer-floor-stage1-report-Docs-a8b6c1bdc15d-20261106T1531KST",
+      "attempt": 1,
+      "status": "completed",
+      "conclusion": "success",
+      "jobs": [
+        127751158198
+      ],
+      "allStepsSuccess": true
+    }
+  },
+  "Stage2ActualArtifact": {
+    "id": 13483245465,
+    "bytes": 1767,
+    "SHA256": "b7e3c2372557d97c27607376a8b5b7886555f1699c330585919beded64b08cdd",
+    "rootDownloadedDigestMatched": true,
+    "resultSHA256": "27cd06cd4820b9866c8b8474346ae99a378b3be175a0b00a13d164ef0f4ac3f2",
+    "manifestSHA256": "9e8d05efd97a24c93e3fcd4c932ae043b95082eb645027e52f13eb9231b6c782",
+    "rootParsedAll3ExecutedPassNoSkip": true,
+    "samples": [
+      {
+        "sampleId": "OBSERVATION_SAMPLE_1",
+        "exit": 0,
+        "timedOut": false,
+        "executedCases": 1,
+        "counts": {
+          "failure": 0,
+          "error": 0,
+          "skipped": 0
+        },
+        "rawOutputSHA256": "840de4476056750b09ad671148558929fe3a467b083b87e42ceda0fd2da15d69",
+        "diagnostics": [],
+        "outcome": "NEW_STAGE2_EXACT_CASE_PASS",
+        "acceptancePassed": true
+      },
+      {
+        "sampleId": "OBSERVATION_SAMPLE_2",
+        "exit": 0,
+        "timedOut": false,
+        "executedCases": 1,
+        "counts": {
+          "failure": 0,
+          "error": 0,
+          "skipped": 0
+        },
+        "rawOutputSHA256": "8eb33ad8c1db56f22da75e1f6b999bfcd155f524e02c557d53a6a5fcbef8f792",
+        "diagnostics": [],
+        "outcome": "NEW_STAGE2_EXACT_CASE_PASS",
+        "acceptancePassed": true
+      },
+      {
+        "sampleId": "OBSERVATION_SAMPLE_3",
+        "exit": 0,
+        "timedOut": false,
+        "executedCases": 1,
+        "counts": {
+          "failure": 0,
+          "error": 0,
+          "skipped": 0
+        },
+        "rawOutputSHA256": "ffc16c4e4788b812960ddd6e62ce46c45efd4b31a3bb3e1fe670570d16564f68",
+        "diagnostics": [],
+        "outcome": "NEW_STAGE2_EXACT_CASE_PASS",
+        "acceptancePassed": true
+      }
+    ],
+    "sourceManifest": {
+      "classification": "NEW_UNREGISTERED_RAW_SEVEN_FILE_CANDIDATE_NOT_INSTALLED_TRUST",
+      "sourceSHA": "01a4bebf55d23f11f85258746662d8b8a5cd0311",
+      "files": {
+        "worker_config.py": "909d1c25deb61c5c4795af49dab18f5a9722e5cbc1c034a18472b6a4427c192c",
+        "worker_leaf_rotation.py": "4e29685241a3e625e59aa64bcff07bdd69d4b0381c67687706a09fa960f75998",
+        "peer_policy_phase.py": "8aac0c65fb2a242b08287ba4206e6c7213fc18795903584b5b28abf3a10c17f8",
+        "worker_peer_floor.py": "7665735eb5735be9fcb24f783f83ffe087c0d176e464a97df3022a4bd9f35799",
+        "worker_plain_rotation.py": "bf3754a27f748b1dd58a7fc65a1f1831dddae6133f11ae17d0f7bf3ea59c46e5",
+        "leaf_rotation_standalone_runtime.py": "76be408878d1105099d3457937fe0a579c09d9eefc6c6d46f0e22679670e5665",
+        "leaf-rotation-runtime-lock.json": "06710d854ff52578949249065dd009de6561bc779c4b21c5355262e59a527a8c"
+      },
+      "rawSevenFileCandidateSHA256": "b160f9c7a55e033c86331e1b5adef937f7b064b1e17e9d89663d667f1559d7db",
+      "binarySHA256": "c66c9cce10c0d32bdb1a28d2695d92a7a06ef8e78156e9bfa330666cc78d3ac0"
+    },
+    "rawZIP": "ignoredprivateonly",
+    "wholeCoreAccepted": false
+  },
+  "rootVerifiedThreeCurrentRemoteHeads": true
+}

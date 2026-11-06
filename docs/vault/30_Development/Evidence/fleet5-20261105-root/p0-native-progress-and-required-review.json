@@ -3,8 +3,8 @@
   "recordedAtKST": "2026-11-06T00:46:51+09:00",
   "rootBase": "2b1753ce59c09037b5e130a7ffe64794d1d45fdf",
   "priorRootCheckpoint": {
-    "SHA": "eb3d0ec35c4e6546d3534de93d7d6c311049266e",
-    "Docs": 42172222921,
+    "SHA": "8993b1fcd92ec4dd16c351586e58aa76031a486e",
+    "Docs": 42173842157,
     "exactHeadCorrelationAllJobsSuccess": true,
     "remoteMatches": true,
     "syncExits": [
@@ -12,13 +12,13 @@
       0,
       0
     ],
-    "independentlyMatchedNormalizedDestinationHashes": 2800,
+    "independentlyMatchedNormalizedDestinationHashes": 2802,
     "pending": 0,
     "conflicts": 0,
     "trackedAndUntrackedClean": true,
     "rootDocsOnly": true,
     "wholeProgramComplete": false,
-    "verifiedAtKST": "2026-11-06T15:06:32+09:00"
+    "verifiedAtKST": "2026-11-06T15:22:56+09:00"
   },
   "actualPlanLowReview": {
     "source": "803ad270562b1b75e44d26f9e14b965c714ab519",
@@ -2515,7 +2515,7 @@
     "ownerT1T2T3": "msg_620855c76519",
     "normativeRevisionReply": "msg_0392caf64d5d"
   },
-  "latestRecordAtKST": "2026-11-06T15:18:50+09:00",
+  "latestRecordAtKST": "2026-11-06T15:47:51+09:00",
   "optionalLowTokenTestDelta": {
     "source": "f0af307705b4923ebc3e231db5238af4c70aa389",
     "scope": "two otherwise-valid token payload corrections and JSON validity assertions; runtime unchanged",
@@ -3108,7 +3108,15 @@
     "reviewOnlyPaths": 18
   },
   "BRev7RootDecision": "b-rev7-concrete-root-decision.json",
-  "activeActualReview": null,
+  "activeActualReview": {
+    "task": "task_de20693ba7c9",
+    "dispatch": "ctx_8a1710587147",
+    "sources": [
+      "dba1804b1d180eda2bf0439952e9706782109fd6",
+      "01a4bebf55d23f11f85258746662d8b8a5cd0311"
+    ],
+    "verdict": null
+  },
   "nextReviewRequires": "newimmutableK2Low/Stage2 orB8 pilot/evidence; oneClaudeafteractualrelease",
   "K2LatestImmutableProposalRootObservation": "k2-rev2-root-actual-contract-review-gate.json",
   "K2LatestActualReviewDispatch": {
@@ -3153,5 +3161,7 @@
   "RootIndependentStage2ProposalProof": "stage2-mount-order-independent-root-proposal-review.json",
   "Stage2CandidateImplementationGrant": "stage2-mount-order-root-candidate-grant.json",
   "B7ActualWholeReviewRootObservation": "b-rev7-actual-whole-review-root-verification.json",
-  "B8ConcreteRevokePilotDecision": "b-rev8-revoke-pilot-root-decision.json"
+  "B8ConcreteRevokePilotDecision": "b-rev8-revoke-pilot-root-decision.json",
+  "LowStage2ActualSourceCIArtifactRootAudit": "k2a-low-stage2-source-ci-artifact-root-verification.json",
+  "LowStage2ActualPairReviewGate": "k2a-low-stage2-root-actual-pair-review-gate.json"
 }
