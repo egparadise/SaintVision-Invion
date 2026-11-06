@@ -1,0 +1,15 @@
+{
+  "classification": "NEW_UNREGISTERED_RAW_SEVEN_FILE_CANDIDATE_NOT_INSTALLED_TRUST",
+  "sourceSHA": "52f935acced837d500af5932c3d26882e091f25a",
+  "files": {
+    "worker_config.py": "909d1c25deb61c5c4795af49dab18f5a9722e5cbc1c034a18472b6a4427c192c",
+    "worker_leaf_rotation.py": "4e29685241a3e625e59aa64bcff07bdd69d4b0381c67687706a09fa960f75998",
+    "peer_policy_phase.py": "8aac0c65fb2a242b08287ba4206e6c7213fc18795903584b5b28abf3a10c17f8",
+    "worker_peer_floor.py": "17378b802f42000d74c1dc5d6136bcf5b1454846584b0555b950eb74bd35b406",
+    "worker_plain_rotation.py": "bf3754a27f748b1dd58a7fc65a1f1831dddae6133f11ae17d0f7bf3ea59c46e5",
+    "leaf_rotation_standalone_runtime.py": "76be408878d1105099d3457937fe0a579c09d9eefc6c6d46f0e22679670e5665",
+    "leaf-rotation-runtime-lock.json": "06710d854ff52578949249065dd009de6561bc779c4b21c5355262e59a527a8c"
+  },
+  "rawSevenFileCandidateSHA256": "d9ddc67bfe7250d9276f7e2a88c0f994caed8fa9d0972239d3ce33303dfab3fb",
+  "binarySHA256": "99cac1bb65334f2f2502e87e80ac8d0e37490846164d2e05a09ceb1482af85e7"
+}

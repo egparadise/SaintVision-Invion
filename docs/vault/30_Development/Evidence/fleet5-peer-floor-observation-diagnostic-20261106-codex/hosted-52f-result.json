@@ -1,0 +1,86 @@
+{
+  "classification": "STAGE1_DIAGNOSIS_NOT_BEHAVIOUR_FIX_OR_CORE_ACCEPTANCE",
+  "sourceSHA": "52f935acced837d500af5932c3d26882e091f25a",
+  "runId": "42170068364",
+  "attempt": "1",
+  "argv": [
+    "/opt/hostedtoolcache/Python/3.12.16/x64/bin/python",
+    "-B",
+    "-m",
+    "pytest",
+    "-q",
+    "tests/integration/test_workspace_upgrade.py::test_real_upgrade_preserves_credentials_journal_and_replays",
+    "-o",
+    "faulthandler_timeout=45"
+  ],
+  "maxSamples": 3,
+  "samplePurpose": "Independent owned fixture executions of exact prior failing test; never retry until pass",
+  "pythonBase": "python@sha256:4840d514c583a4d3d8cad3940e68dee6f0f6f3635c12fcd0a3d74c21a5b93a54",
+  "samples": [
+    {
+      "sampleId": "OBSERVATION_SAMPLE_1",
+      "exit": 0,
+      "timedOut": false,
+      "executedCases": 1,
+      "counts": {
+        "failure": 0,
+        "error": 0,
+        "skipped": 0
+      },
+      "rawOutputSHA256": "4bf2db5393e8753dd0d8abfac2d4a505f5681bfd968c8d24cb1b96789d0b8017",
+      "diagnostics": [],
+      "outcome": "NOT_REPRODUCED",
+      "acceptancePassed": true
+    },
+    {
+      "sampleId": "OBSERVATION_SAMPLE_2",
+      "exit": 0,
+      "timedOut": false,
+      "executedCases": 1,
+      "counts": {
+        "failure": 0,
+        "error": 0,
+        "skipped": 0
+      },
+      "rawOutputSHA256": "7a5d103f271b204bfd58263afdde0f473393165dc7848b2461eb5bad906f6a77",
+      "diagnostics": [],
+      "outcome": "NOT_REPRODUCED",
+      "acceptancePassed": true
+    },
+    {
+      "sampleId": "OBSERVATION_SAMPLE_3",
+      "exit": 1,
+      "timedOut": false,
+      "executedCases": 1,
+      "counts": {
+        "failure": 1,
+        "error": 0,
+        "skipped": 0
+      },
+      "rawOutputSHA256": "d7987e8c825d87295ca36a33b3ff161d515a70acb70acfe2f3ed20752c3b00c8",
+      "diagnostics": [
+        {
+          "diagnosticVersion": 1,
+          "classification": "REFUSAL_DIAGNOSTIC_ONLY",
+          "changedPaths": [
+            "container.Mounts"
+          ],
+          "categories": [
+            "MOUNTS_ORDER_ONLY"
+          ],
+          "hashes": {
+            "container.Mounts": {
+              "afterSHA256": "6459769ad96f3c3f292f84aca90172ad4500a11a2581e529fa3200f6d7f79405",
+              "beforeSHA256": "f1c4240485b916674a6724a17280fc7bc334aec4b4767e810e089437d3b67ce1"
+            }
+          },
+          "truncated": false
+        }
+      ],
+      "outcome": "ACTUAL_GUARD_DIAGNOSTIC_CAPTURED",
+      "acceptancePassed": false
+    }
+  ],
+  "allExactCaseExecutionsPassed": false,
+  "originalDe71DifferingField": "UNKNOWN_NOT_RETROACTIVELY_INFERRED"
+}

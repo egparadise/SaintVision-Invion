@@ -116,3 +116,33 @@ historical, stage2 NOT_GRANTED. Next is this ONE real workflow-changing commit/
 push, observe its actual push run; no manual duplicate/empty commit/old Core run.
 
 Bootstrap required10docs gates all exit0 at14:39:22-14:41:19 KST. Canonical sync before/after6385dee13cfa9d89410bdfca6c181a103d311ab9e6c8d68c401cbdaaa21f32b8 unchanged, no apply/adopt/resolve. Workflow header is the only source delta from34e; helper/tests/K2/Go/old workflows remain byte-identical. Push exactly once to create the new push event; no manual duplicate run.
+
+
+## Actual finite hosted capture (not green acceptance)
+
+Single actual PUSH run42170068364/attempt1 on52f935acced837d500af5932c3d26882e091f25a,
+exact branch/path/run-name/job127735558839, completed FAILURE. Three samples ran
+exactly once:0/0/1. Samples1/2 passed NOT_REPRODUCED; sample3 exit1 captured only
+container.Mounts / MOUNTS_ORDER_ONLY, truncatedfalse. Raw whole-Mounts SHA256
+beforef1c4240485b916674a6724a17280fc7bc334aec4b4767e810e089437d3b67ce1 and
+after6459769ad96f3c3f292f84aca90172ad4500a11a2581e529fa3200f6d7f79405 differ;
+complete per-mount canonical digest multiset/count matches by reviewed classifier.
+All other original tuple fields were equal in this NEW sample. Artifact13479979191,
+2015bytes/ZIP SHA38634e7deecfd13b44451c04906975aa8840aa0a08e23999d031fd8ec5675814
+matches GitHub digest. Only sanitized result/source-manifest/run metadata is
+published; raw ZIP remains ignored .work. Originalde71 field remains UNKNOWN;
+Core42164071724 and new42170068364 failures are preserved, not retried or relabelled.
+Source Docs42170255824/job127736159915/19steps allSUCCESS on exact52f was read.
+
+Root independently verified the actual capture in msg_a29466460f6d and separately
+reviewed the order-only proposal with53 synthetic/45negative cases; not a claimed
+Claude code review. Root grants isolated Stage2 from52f AFTER clean Low checkpoint.
+Lowdba1804b fromff is separately published; Stage2 source01a4bebf from52f has its own
+branch/unit/evidence/workflow and actual run42174324865 in progress. This Stage1
+branch changes ONLY its report now, no source/helper/test/workflow alteration and
+therefore no second path-filtered push execution. Stage1 source/hash remain52f.
+Next Root action is actual Low/Stage2 code delta review and final combined source
+choice/one fullCore+Docs. All production auth/current/effect/install/five-PC and
+40-runtime acceptance remain HOLD/ABSENT/NOT_RUN; this report is diagnosis only.
+
+Actual Stage1 report gates all10 exit0 at15:27:06-15:28:18 KST; canonical sync before/after4f35e536195916a2b57517cb8cb95d7c894dfc0c6b391aaae775c03f70e749f9 unchanged/no apply. Report is docs-only from52f and cannot trigger the single-workflow-path PUSH lane. Stage1 FAILURES remain qualified; Stage2 has separate source01a4bebf/run42174324865, not acceptance borrowed here.
