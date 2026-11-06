@@ -1,6 +1,6 @@
 {
   "schema": "fleet5-root-review-resource-sequence:1",
-  "atKST": "2026-11-06T22:08:52+09:00",
+  "atKST": "2026-11-06T22:47:40+09:00",
   "completedB": {
     "task": "task_d4c4c809ed4e",
     "review": "ac9182c3e3d606ec027c0be2e90e049ff50d54f1",
@@ -13,45 +13,28 @@
     "source": "8874b2dfe0dda9a019bd5f334636668290702e13"
   },
   "active": {
-    "atKST": "2026-11-06T20:52:52+09:00",
-    "source": "870486f98ba8fdc6d82f24c2610352a426f23a16",
-    "base": "3daf1a0d24c220586474a4b376609e62960b8ca6",
-    "branch": "agent/codex/fleet5-b-rev9b-20261106",
-    "rootVerification": "b-rev9b-source-root-verification.json",
-    "reviewTask": "task_a67e24d81ef8",
-    "status": "actualreviewactive",
-    "dependsOn": "task_41987ea5739d",
+    "atKST": "2026-11-06T22:47:40+09:00",
+    "source": "22c20a838fe0ab82a772641163ef553494c5bea3",
+    "final": "9c25f3c9cab162f424744d79f9a4e21729c40404",
+    "branch": "agent/gemini/portal-refresh-polling-r2-20261106",
+    "rootVerification": "portal-polling-r2-source-root-verification.json",
+    "reviewTask": "task_855e5f3977e0",
+    "status": "actual_narrow_review_active",
+    "dependsOn": "task_a67e24d81ef8",
     "actualReviewStarted": true,
-    "scope": "WHOLEboundedRev9bdocs/model/staticdelta",
-    "ownerQuestionPending": "msg_8cebdb075c59",
+    "scope": "NARROWM1+L1L4polling/timeout/header/manualcallback/actualApptests",
     "actualVerdict": null,
-    "nextCut": "OnlyRootconcretechoiceafteractualreview; snapshotA7notgrantednow; deliverdeferred",
-    "BProductOrPortGrant": false,
-    "reviewDispatch": "ctx_99a4e28b6c25",
-    "reviewTerminal": "term_3f256f99-b615-417a-ba6e-d42d141c280d",
+    "deployment": "NOT_RUN_PENDING_ACTUAL_REVIEW",
+    "authorPacketActualWorkerDone": "msg_170d7bc04c59",
+    "authorTaskOutcome": "succeeded_DELIVERY_ONLY",
+    "officialRegistryOrProductDone": false,
+    "reviewDispatch": "ctx_ed14d0be16a1",
+    "reviewTerminal": "term_2a4365d1-ee04-4161-a728-66e15efbb148",
     "workerStartReceipt": "ready",
-    "predecessor": "PL419/ctxfb actualsucceeded/settled; guardedreleasealready_released then freshactualexited/released verified"
+    "predecessor": "B9b actual succeeded/settled/exited/released independently verified before start"
   },
-  "pending": [
-    {
-      "atKST": "2026-11-06T22:08:52+09:00",
-      "source": "22c20a838fe0ab82a772641163ef553494c5bea3",
-      "final": "9c25f3c9cab162f424744d79f9a4e21729c40404",
-      "branch": "agent/gemini/portal-refresh-polling-r2-20261106",
-      "rootVerification": "portal-polling-r2-source-root-verification.json",
-      "reviewTask": "task_855e5f3977e0",
-      "status": "pending",
-      "dependsOn": "task_a67e24d81ef8",
-      "actualReviewStarted": false,
-      "scope": "NARROWM1+L1L4polling/timeout/header/manualcallback/actualApptests",
-      "actualVerdict": null,
-      "deployment": "NOT_RUN_PENDING_ACTUAL_REVIEW",
-      "authorPacketActualWorkerDone": "msg_170d7bc04c59",
-      "authorTaskOutcome": "succeeded_DELIVERY_ONLY",
-      "officialRegistryOrProductDone": false
-    }
-  ],
-  "authorParallelWork": "K2authorobservesONEhostedCore/qualifiedreport; BactualClaudeactive; UIauthorpacketsettledpendingactualreview; no liveartifactdeployment",
+  "pending": [],
+  "authorParallelWork": "B Rev9c fix-only; K2 P02 registry attestation candidate design; current UI actual reviewer only",
   "reason": "actuala7e9 and5a3c reviews+CI verified andprecisefixscopesdelivered; do notselfclose source/runtime",
   "genericApprovalMissing": false,
   "completedRL1": {
@@ -59,7 +42,7 @@
     "review": "0e53fc024ca773b7719182e170e5e126aeaf5b95",
     "verdict": "ACCEPT TEST-ONLY; R-L1 CLOSED; no new findings"
   },
-  "nextActualReviewTrigger": "Bactualworker_done thenreadyUIR2task855 onlyafterfreshBactualexit/release",
+  "nextActualReviewTrigger": "Process UI actual worker_done; only then fresh actual exit/release, next frozen ready candidate",
   "completedIntegration": {
     "task": "task_78064fb4b7ff",
     "dispatch": "ctx_ed7ec73163d6",
@@ -362,5 +345,13 @@
     "actualWorkerDone": "msg_56ca4f3dc828",
     "resource": "actualexited/released after guardedalready_released",
     "RootConcreteReply": "msg_9cb645b95305"
+  },
+  "completedB9b": {
+    "actualWorkerDone": "msg_8d95be38c6ab",
+    "actualReview": "aa3387b80765e9a4b3cb06c71b86086b490c495b",
+    "Docs": 42224817650,
+    "verdict": "REVISION_REQUIRED (narrow, LOW-only; no MEDIUM; M1 CLOSED; actual-source T1/A8 closure on 72028 bytes stands)",
+    "resource": "actual_succeeded_settled_exited_released",
+    "RootFixScope": "b-rev9c-fix-only-root-scope.json"
   }
 }

@@ -1,15 +1,19 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.419"
+version: "1.0.420"
 status: "review"
 author: "Codex"
-updated: "2026-11-06T22:08:52+09:00"
+updated: "2026-11-06T22:47:40+09:00"
 source_of_truth: "Git"
 active_card: "FLEET5 continued supervision with PORTAL-REFRESH-FLEET-20261106"
-active_card_status: "PLR1dactual0c5bCODEACCEPT; exactEAONECore42220638304inprogress/SourceDocs42220644407all19success; B9bClaudea67ctx99active; UIR2actual9c25review855pending; authorpacketdoneonly; PC1SSH-PC5APIremain"
-active_card_next: "ObserveexistingCoreonly/noretry; BactualverdictthenreadyUIR2afterfreshactualexitrelease; stage/deployONLYactualacceptednewUI; preserve854hold/NULLHOLD/5PCincomplete"
+active_card_status: "ea276requiredCoreSUCCESS/c76boundedDeliveryAccepted; B9bactualLOW3Rev9cfix; K2P02candidateDesign; UIR2actualClaude855ctxed14active; physicalincomplete"
+active_card_next: "ProcessUIactualverdictthenverifiedartifactdeploy; BRev9cfix/K2P02designparallel; noCoreduplicate/no854deploy; realNULLHOLD"
 ---
+
+## 2026-11-06T22:47:40+09:00 Core의 실제 성공과 다음 작업 배정
+
+정확한 ea276의 Core42220638304 필수 단계와 두 artifact를 Root가 확인하고 c76 보고/Docs42226143609까지 K2의 한정 납품을 수락했다. B9b 실제 aa3387 검토의 Low3건은 Rev9c 수정으로, K2의 다음 의존성은 P02 설치 정책 출처 인증의 계약 후보로 배정했다. UI R2는 실제 Claude ctx_ed14 검토 중이며 아직 배포하지 않았다. PC1 SSH·PC5 API와 실제 노드 등록·자원 인수는 남아 있다. 확인 명령과 실제 exit·CI·artifact는 History 및 Root Evidence에 분리했다. 다음 첫 행동/담당: Claude는 UI 판정, 두 Codex는 Rev9c/P02 후보, Root는 실제 판정에 따른 배포와 증거 확인을 수행한다.
 
 ## 2026-11-06T22:08:52+09:00 K2 실제 한정 수락·전체 Core 실행과 수정 UI 검토 연결
 

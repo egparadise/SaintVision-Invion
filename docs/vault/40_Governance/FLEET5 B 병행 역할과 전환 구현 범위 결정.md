@@ -1,11 +1,11 @@
 ---
 doc_id: "GOV-FLEET5-B-BOOTSTRAP-SCOPE-20261106"
 title: "FLEET5 B 병행 역할과 전환 구현 범위 결정"
-version: "1.4.4"
+version: "1.4.5"
 status: "review"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-11-06T19:17:15+09:00"
+updated: "2026-11-06T22:47:40+09:00"
 source_of_truth: "Git"
 ---
 
@@ -128,3 +128,8 @@ P-DBROLE/실제 PG role·READ COMMITTED·SET LOCAL·두 세션 lock·DB clock·l
 ## 실제 후속 검토와 제한된 다음 수정
 
 실제 a7e9f9d7/Docs42196493024는 Rev9의 matched-claim·cleanup 분리·hint 인증·한정 category 보완은 닫았으나 terminal Node/tenant 상태 parity와 누락된 ObservationWorker production root의2Medium·새 mutation escape Low를 남겼다. Root는 msg_b6b4813cb5c2로 같은 Codex에게3daf 기반 Rev9b fix-only를 지시했다. 실제 require_execution 및 online/draining parity, 모든 constructor root census와 lan_pilot.runtime local helper, 보호된 receiver use-site allowlist/alias·post-construction patch 거부를 보강한다. 고정19edge/12entry·전체598/757/1071/21·외부573/218·NULL bindings는 유지한다. A7은 실제 Rev9b 수락 뒤 snapshot만 선택할 후속 제안이며 deliver는 아직 범위가 아니다. 정확한 지시는 b-rev9b-root-scope.json에 있다.
+
+
+## Rev9b 실제 Low 판정과 Rev9c 수정 범위
+
+aa3387/Docs42224817650의 실제 검토는 M1·actual72028 T1/A8를 닫았지만 reflection constructor census/forwarding caller fixedpoint/owner-instance escape의 Low3건을 남겼다. Root msg_8f20f55b48dc는 exact870 기반 새 고유 문서·bounded분석·targeted회귀만 Rev9c로 허용한다. modelbytes와 기존집계·NULLHOLD를 보존하고 A7 NodeChannels.snapshot/제품/port/runtime는 아직 허용하지 않는다. 실제 좁은 delta 수락 뒤 다음 A7 cut을 정한다. 전체 Python ownership/reflective completeness로 주장하지 않는다. 상세는 b-rev9c-fix-only-root-scope.json이다.

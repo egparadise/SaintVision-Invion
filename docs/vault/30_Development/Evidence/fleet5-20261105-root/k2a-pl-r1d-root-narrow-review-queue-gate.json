@@ -20,7 +20,11 @@
   "actualReviewDocs": 42219022532,
   "actualWorkerDone": "msg_56ca4f3dc828",
   "rootReply": "msg_9cb645b95305",
-  "fullCoreStatus": "in_progress_asof_2026-11-06T21:56:54+09:00",
+  "fullCoreStatus": "SUCCESS_required_normal_jobs",
   "fullCoreRun": 42220638304,
-  "fullCoreSucceeded": false
+  "fullCoreSucceeded": true,
+  "qualifiedReport": "c76d0d66895503adde39288544929ff35cd6c281",
+  "qualifiedReportDocs": 42226143609,
+  "boundedDeliveryAcceptedByRoot": true,
+  "nextScope": "k2-p02-registry-attestation-design-root-scope.json"
 }

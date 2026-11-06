@@ -1,11 +1,11 @@
 ---
 doc_id: "GOV-FLEET5-BOOTSTRAP-V5-FREEZE-CODE-SCOPE-20261106"
 title: "FLEET5 전환 v5 계약 동결과 구현 범위"
-version: "1.0.16"
+version: "1.0.17"
 status: "active"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-11-06T22:08:52+09:00"
+updated: "2026-11-06T22:47:40+09:00"
 source_of_truth: "Git"
 ---
 
@@ -176,3 +176,8 @@ cfec7b81094b487ed068eac08a228cb99dd7509a/Docs42208154603은 기존 N1–N6·non-
 ## PL-R1d 실제 코드 축 수락과 단일 fresh Core 범위
 
 0c5bfc1a2e3738877f25e6370a600c445fe75a17/Docs42219022532의 실제 좁은 검토가 G1–G6·pointer-term 변환 경계를 한정 수락했다. finding0/INFO4이며 intersection 과잉거부·typeparam operand 보수거부·reviewer sketch와 helper 동일(새13probe/oldcontrast로 완화)·주석을 추적한다. Root는 msg_9cb645b95305로 정확한ea276/branchagent-codex-fleet5-k2a-pl-r1d-20261106의 normal전체Core1회+SourceDocs1회를 승인했다. actualCore42220638304는실행중/SourceDocs42220644407는19단계성공이다. 선택proofflags는false이고새S08/native2cycle/40runtime/5대인수가아니다. 실패시재시도나source/pin/role/설치변경은새Root결정전없다. 구체권한과unique correlation은k2a-pl-r1d-one-fresh-core-root-scope.json이다.
+
+
+## 실제 정상 Core·한정 납품 수락과 P02 계약 후보
+
+ea276 Core42220638304의 필수42+16단계와 artifact XML/Go로그를 Root가 직접 대조해 정상CI 성공을 확인했다. optional6단계는 SKIPPED이고 새 S08/native-cycle·40runtime·실장비 성공은 아니다. directchild c76 보고/Docs42226143609까지 한정 code/Core/qualified-delivery를 수락했다. Root msg_f68dc38baa0f는 exactc76 기반 새 P02 installed-policy registry 독립 provisioning/attestation 계약 후보만 허용한다. 새 고유 History/Evidence·schema·비제품순수평가기/합성시험 범위이며 새 wire/domain/ABI/anchor등록이나 positive factory구현은 수락되지 않았다. 실제 review/CI/artifact/설치·실행closure의 독립 출처·인증·회수·신선도·bootstrap순환을 닫고 실제 별도 계약검토 뒤 최소구현을 결정한다. 상세는 k2-p02-registry-attestation-design-root-scope.json이고 실제 binding은 NULL/HOLD다.

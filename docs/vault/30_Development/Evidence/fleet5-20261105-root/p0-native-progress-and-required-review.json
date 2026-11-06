@@ -3,8 +3,8 @@
   "recordedAtKST": "2026-11-06T00:46:51+09:00",
   "rootBase": "2b1753ce59c09037b5e130a7ffe64794d1d45fdf",
   "priorRootCheckpoint": {
-    "SHA": "779d0034aacea9ea9d98e4547262b260542a9be2",
-    "Docs": 42216872433,
+    "SHA": "2cdd189e76430bbbbaf29938ac95d1ccd47940c1",
+    "Docs": 42223348286,
     "exactHeadCorrelationAllJobsSuccess": true,
     "remoteMatches": true,
     "syncExits": [
@@ -12,13 +12,13 @@
       0,
       0
     ],
-    "independentlyMatchedNormalizedDestinationHashes": 2849,
+    "independentlyMatchedNormalizedDestinationHashes": 2855,
     "pending": 0,
     "conflicts": 0,
     "trackedAndUntrackedClean": true,
     "rootDocsOnly": true,
     "wholeProgramComplete": false,
-    "verifiedAtKST": "2026-11-06T21:21:42+09:00"
+    "verifiedAtKST": "2026-11-06T22:11:57+09:00"
   },
   "actualPlanLowReview": {
     "source": "803ad270562b1b75e44d26f9e14b965c714ab519",
@@ -2515,7 +2515,7 @@
     "ownerT1T2T3": "msg_620855c76519",
     "normativeRevisionReply": "msg_0392caf64d5d"
   },
-  "latestRecordAtKST": "2026-11-06T22:08:52+09:00",
+  "latestRecordAtKST": "2026-11-06T22:47:40+09:00",
   "optionalLowTokenTestDelta": {
     "source": "f0af307705b4923ebc3e231db5238af4c70aa389",
     "scope": "two otherwise-valid token payload corrections and JSON validity assertions; runtime unchanged",
@@ -3109,24 +3109,25 @@
   },
   "BRev7RootDecision": "b-rev7-concrete-root-decision.json",
   "activeActualReview": {
-    "atKST": "2026-11-06T20:52:52+09:00",
-    "source": "870486f98ba8fdc6d82f24c2610352a426f23a16",
-    "base": "3daf1a0d24c220586474a4b376609e62960b8ca6",
-    "branch": "agent/codex/fleet5-b-rev9b-20261106",
-    "rootVerification": "b-rev9b-source-root-verification.json",
-    "reviewTask": "task_a67e24d81ef8",
-    "status": "actualreviewactive",
-    "dependsOn": "task_41987ea5739d",
+    "atKST": "2026-11-06T22:47:40+09:00",
+    "source": "22c20a838fe0ab82a772641163ef553494c5bea3",
+    "final": "9c25f3c9cab162f424744d79f9a4e21729c40404",
+    "branch": "agent/gemini/portal-refresh-polling-r2-20261106",
+    "rootVerification": "portal-polling-r2-source-root-verification.json",
+    "reviewTask": "task_855e5f3977e0",
+    "status": "actual_narrow_review_active",
+    "dependsOn": "task_a67e24d81ef8",
     "actualReviewStarted": true,
-    "scope": "WHOLEboundedRev9bdocs/model/staticdelta",
-    "ownerQuestionPending": "msg_8cebdb075c59",
+    "scope": "NARROWM1+L1L4polling/timeout/header/manualcallback/actualApptests",
     "actualVerdict": null,
-    "nextCut": "OnlyRootconcretechoiceafteractualreview; snapshotA7notgrantednow; deliverdeferred",
-    "BProductOrPortGrant": false,
-    "reviewDispatch": "ctx_99a4e28b6c25",
-    "reviewTerminal": "term_3f256f99-b615-417a-ba6e-d42d141c280d",
+    "deployment": "NOT_RUN_PENDING_ACTUAL_REVIEW",
+    "authorPacketActualWorkerDone": "msg_170d7bc04c59",
+    "authorTaskOutcome": "succeeded_DELIVERY_ONLY",
+    "officialRegistryOrProductDone": false,
+    "reviewDispatch": "ctx_ed14d0be16a1",
+    "reviewTerminal": "term_2a4365d1-ee04-4161-a728-66e15efbb148",
     "workerStartReceipt": "ready",
-    "predecessor": "PL419/ctxfb actualsucceeded/settled; guardedreleasealready_released then freshactualexited/released verified"
+    "predecessor": "B9b actual succeeded/settled/exited/released independently verified before start"
   },
   "nextReviewRequires": "newimmutableK2Low/Stage2 orB8 pilot/evidence; oneClaudeafteractualrelease",
   "K2LatestImmutableProposalRootObservation": "k2-rev2-root-actual-contract-review-gate.json",
@@ -3177,25 +3178,7 @@
   "LowStage2ActualPairReviewGate": "k2a-low-stage2-root-actual-pair-review-gate.json",
   "BRev8SourceAudit": "b-rev8-final-source-root-verification.json",
   "BRev8WholeReviewGate": "b-rev8-root-whole-review-queue-gate.json",
-  "queuedActualReview": [
-    {
-      "atKST": "2026-11-06T22:08:52+09:00",
-      "source": "22c20a838fe0ab82a772641163ef553494c5bea3",
-      "final": "9c25f3c9cab162f424744d79f9a4e21729c40404",
-      "branch": "agent/gemini/portal-refresh-polling-r2-20261106",
-      "rootVerification": "portal-polling-r2-source-root-verification.json",
-      "reviewTask": "task_855e5f3977e0",
-      "status": "pending",
-      "dependsOn": "task_a67e24d81ef8",
-      "actualReviewStarted": false,
-      "scope": "NARROWM1+L1L4polling/timeout/header/manualcallback/actualApptests",
-      "actualVerdict": null,
-      "deployment": "NOT_RUN_PENDING_ACTUAL_REVIEW",
-      "authorPacketActualWorkerDone": "msg_170d7bc04c59",
-      "authorTaskOutcome": "succeeded_DELIVERY_ONLY",
-      "officialRegistryOrProductDone": false
-    }
-  ],
+  "queuedActualReview": [],
   "LowStage2ActualReviewVerification": "k2a-low-stage2-actual-review-root-verification.json",
   "LowStage2ConcreteIntegrationScope": "k2a-low-stage2-combined-root-scope.json",
   "combinedSourceAccepted": false,
@@ -3236,5 +3219,9 @@
   "PLR1dOneCoreScope": "k2a-pl-r1d-one-fresh-core-root-scope.json",
   "PLR1dFreshCI": "k2a-pl-r1d-fresh-ci-root-observation.json",
   "UIR2Source": "portal-polling-r2-source-root-verification.json",
-  "UIR2AuthorPacketDeliveryOnly": true
+  "UIR2AuthorPacketDeliveryOnly": true,
+  "PLR1dFullCore": "k2a-pl-r1d-full-core-root-verification.json",
+  "PLR1dBoundedDelivery": "k2a-pl-r1d-qualified-delivery-root-acceptance.json",
+  "K2Next": "k2-p02-registry-attestation-design-root-scope.json",
+  "BNext": "b-rev9c-fix-only-root-scope.json"
 }

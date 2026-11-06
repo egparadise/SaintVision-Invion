@@ -1,0 +1,19 @@
+{
+  "atKST": "2026-11-06T22:40:13+09:00",
+  "source": "ea276c97ece2906dc1f29b44b65aa887379ea78f",
+  "qualifiedReport": "c76d0d66895503adde39288544929ff35cd6c281",
+  "branch": "agent/codex/fleet5-k2a-pl-r1d-20261106",
+  "reportDirectParentSource": true,
+  "only55OwnAddedDocs": true,
+  "nonDocsUnchanged": true,
+  "remoteExact": true,
+  "Docs": 42226143609,
+  "job": 127920019655,
+  "correlation": "FLEET5-K2A-PL-R1D-FRESH-CORE-REPORT-c76d0d66-f9d03be414344825a2fa5f908f34f985",
+  "exactHeadRefEventPathAttemptAll19StepsSuccess": true,
+  "boundedDeliveryAcceptedByRoot": true,
+  "wholeK2OrFleetAccepted": false,
+  "atRootAcceptanceKST": "2026-11-06T22:47:40+09:00",
+  "acceptanceScope": "PL-R1d bounded code + normal required Core + qualified delivery only",
+  "RootReply": "msg_f68dc38baa0f"
+}
