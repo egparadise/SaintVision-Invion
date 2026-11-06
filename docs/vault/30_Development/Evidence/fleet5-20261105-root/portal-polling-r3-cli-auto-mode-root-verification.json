@@ -1,0 +1,120 @@
+{
+  "atKST": "2026-11-06T23:23:17+09:00",
+  "priorRootCheckpoint": {
+    "SHA": "098dffd754fdd47614c88e722c516b7cd915d48d",
+    "Docs": 42231218965,
+    "exactHeadCorrelationAllJobsSuccess": true,
+    "remoteMatches": true,
+    "syncExits": [
+      0,
+      0,
+      0
+    ],
+    "independentlyMatchedNormalizedDestinationHashes": 2865,
+    "pending": 0,
+    "conflicts": 0,
+    "trackedAndUntrackedClean": true,
+    "rootDocsOnly": true,
+    "wholeProgramComplete": false,
+    "verifiedAtKST": "2026-11-06T23:09:48+09:00"
+  },
+  "task": "task_8dfd2a5d01a2",
+  "dispatch": "ctx_c8a99a3645b0",
+  "additionalReadOnlyMenus": [
+    {
+      "atKST": "2026-11-06T23:08:53+09:00",
+      "escalation": "msg_stop_655ebde187e5fe10b4a77b21",
+      "task": "task_8dfd2a5d01a2",
+      "dispatch": "ctx_c8a99a3645b0",
+      "command": "git show 71f26dbfc648a8140ac688df3fa89d6952d81d0d --stat",
+      "selected": "1 allow exact read-only actual review stat once",
+      "persistentSettingsChanged": false,
+      "approvalResponseAccepted": true,
+      "newOrRetriedWorker": false
+    },
+    {
+      "atKST": "2026-11-06T23:12:11+09:00",
+      "escalation": "msg_stop_13a1542f40be852338b3b0f9",
+      "task": "task_8dfd2a5d01a2",
+      "dispatch": "ctx_c8a99a3645b0",
+      "command": "git show 71f26dbfc648a8140ac688df3fa89d6952d81d0d:docs/vault/30_Development/Evidence/portal-polling-r2-9c25-review-20261106-claude/review.json",
+      "authorization": "Read-only exact immutable reviewer evidence, explicitly required by Root R3 scope and prior user authorization",
+      "selected": "1 allow exact reviewed command once",
+      "persistentSettingsChanged": false,
+      "approvalResponseAccepted": true,
+      "newOrRetriedWorker": false
+    },
+    {
+      "atKST": "2026-11-06T23:14:36+09:00",
+      "escalation": "msg_stop_b0ce01abd715fc5268f29768",
+      "task": "task_8dfd2a5d01a2",
+      "dispatch": "ctx_c8a99a3645b0",
+      "command": "git show 71f26dbfc648a8140ac688df3fa89d6952d81d0d:docs/vault/30_Development/Evidence/portal-polling-r2-9c25-review-20261106-claude/review.json | Select-String -Pattern '\"findings\":' -Context 0,60",
+      "authorization": "Read-only exact immutable review findings extraction, required by the authorized R3 fix scope",
+      "selected": "1 allow exact reviewed command once",
+      "persistentSettingsChanged": false,
+      "approvalResponseAccepted": true,
+      "newOrRetriedWorker": false
+    },
+    {
+      "atKST": "2026-11-06T23:18:53+09:00",
+      "escalation": "msg_stop_dc10bf9a3bd28c995c8fdf86",
+      "task": "task_8dfd2a5d01a2",
+      "dispatch": "ctx_c8a99a3645b0",
+      "command": "git show 71f26dbfc648a8140ac688df3fa89d6952d81d0d:docs/vault/30_Development/Evidence/portal-polling-r2-9c25-review-20261106-claude/reviewer_probe_uir2.test.tsx.txt",
+      "authorization": "Read-only exact immutable reviewer probe required for authorized R3 tests; current CLI session switched to documented auto mode, pre-existing prompt confirmed once",
+      "selected": "1 allow exact reviewed command once",
+      "persistentSettingsChanged": false,
+      "approvalResponseAccepted": true,
+      "newOrRetriedWorker": false
+    },
+    {
+      "atKST": "2026-11-06T23:22:08+09:00",
+      "escalation": "msg_stop_7b145e309178011eaff81bff",
+      "task": "task_8dfd2a5d01a2",
+      "dispatch": "ctx_c8a99a3645b0",
+      "command": "git log -1 --format=fuller",
+      "authorization": "Read-only current candidate metadata required by authorized R3 work; approve existing queued menu once, auto mode already confirmed",
+      "selected": "1 allow exact reviewed command once",
+      "persistentSettingsChanged": false,
+      "approvalResponseAccepted": true,
+      "newOrRetriedWorker": false
+    }
+  ],
+  "actualCLI": "C:/Users/inviz/AppData/Local/agy/bin/agy.EXE",
+  "nativeHelpExit": 0,
+  "sessionDefaultWasRequestReview": true,
+  "currentModeFooter": "esc to cancel                                                                                auto · Gemini 3.8 Flash · high",
+  "currentModeConfirmed": "auto",
+  "persistentDefaultChange": {
+    "atKST": "2026-11-06T23:19:57+09:00",
+    "settingsPath": "C:\\Users\\inviz\\.gemini\\antigravity-cli\\settings.json",
+    "fieldChanged": "agentMode",
+    "beforeValue": null,
+    "afterValue": "auto",
+    "beforeSHA256": "3db4af6e6751b55f9c8828a4e69b8b67b9bcad59021f6b87a609eee140a5dae2",
+    "afterSHA256": "9affc86ccfc10d04496eda49ed65bf5776dab2297c95a1f301fe8143e9381746",
+    "backupLocalPrivateOnly": true,
+    "otherKeysUnchanged": true,
+    "permissionsOrToolPermissionEdited": false,
+    "wildcardAllowAdded": false,
+    "dangerouslySkipPermissionsEnabled": false,
+    "mainSessionSandboxChanged": false,
+    "liveServicesOrNodeChanged": false,
+    "currentWorkerSession": "auto already confirmed in actual terminal footer via documented Shift+Tab",
+    "task": "task_8dfd2a5d01a2",
+    "dispatch": "ctx_c8a99a3645b0",
+    "authorization": "prior explicit user request to change execution settings and continue all approved project work",
+    "officialReference": "https://antigravity.google/docs/cli/modes",
+    "wholeProgramComplete": false
+  },
+  "officialReferences": [
+    "https://antigravity.google/docs/cli/modes",
+    "https://antigravity.google/docs/cli/reference/",
+    "https://antigravity.google/docs/permissions?tab=cli"
+  ],
+  "limitation": "Auto is not unconditional approval; an existing git log menu was observed after switching and answered. No claim that all future prompts are eliminated. Actual code/test/CI/review/deploy remain pending.",
+  "mainSandboxOrLiveServicesChanged": false,
+  "newOrRetriedWorker": false,
+  "wholeProgramComplete": false
+}

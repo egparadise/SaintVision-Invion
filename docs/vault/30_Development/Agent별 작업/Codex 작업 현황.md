@@ -1,15 +1,19 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.422"
+version: "1.0.423"
 status: "review"
 author: "Codex"
-updated: "2026-11-06T23:06:51+09:00"
+updated: "2026-11-06T23:23:17+09:00"
 source_of_truth: "Git"
 active_card: "FLEET5 continued supervision with PORTAL-REFRESH-FLEET-20261106"
-active_card_status: "R3exactbranchreadyafter3authorizedmenus; R2actual1M3Lnotdeployable; BRev9c/K2P02continue; no5PCacceptance"
+active_card_status: "R3currentagyautoConfirmed/defaultautoSaved; readonlymenusRootanswered; R2actual1M3Lhold; BRev9c/K2P02continue; physicalincomplete"
 active_card_next: "GeminiR3exactsourceCIthenONEnarrowactualreview; BRev9c/K2P02candidateparallel; doNOTdeploy9c854; actualUIreviewerexitedreleased"
 ---
+
+## 2026-11-06T23:23:17+09:00 CLI auto 전환과 남은 실제 개발
+
+반복 조회 승인 요청의 실제 agy CLI·기본 실행 모드와 공식 설정을 확인했다. 현재 세션을 auto로 바꾸고 기본 agentMode만 저장했으며 다른 설정·모델·권한 규칙을 보존했다. 기존 대기 조회5건은 직접 응답했고 auto에서도 기존git log메뉴가 남았음을 기록한다. 다음 첫 행동/담당은 Gemini R3의 실제 수정·고정CI, Root의 메시지 처리와 실제 좁은 검토다.
 
 ## 2026-11-06T23:06:51+09:00 R3 명령 대기 처리와 실제 분기 확인
 

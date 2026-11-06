@@ -52,5 +52,9 @@
   "authorBranchPreparationObserved": true,
   "authorObservedHead": "9c25f3c9cab162f424744d79f9a4e21729c40404",
   "menuRecovery": "portal-polling-r3-author-menu-recovery-root-verification.json",
-  "newOrRetriedWorker": false
+  "newOrRetriedWorker": false,
+  "currentCLIExecutionMode": "auto_confirmed",
+  "persistentCLIDefault": "agentMode_auto_only",
+  "modeEvidence": "portal-polling-r3-cli-auto-mode-root-verification.json",
+  "allFuturePromptsEliminatedClaim": false
 }
