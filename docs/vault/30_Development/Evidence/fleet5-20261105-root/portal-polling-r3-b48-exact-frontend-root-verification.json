@@ -1,0 +1,46 @@
+{
+  "atKST": "2026-11-07T01:39:15+09:00",
+  "operator": "Root Codex",
+  "source": "b48c2c4492f8aea4b55c33161733a9a6fb9eed8c",
+  "branch": "agent/gemini/portal-refresh-polling-r3-20261106",
+  "Frontend": 42254157322,
+  "event": "workflow_dispatch",
+  "path": ".github/workflows/frontend.yml",
+  "attempt": 1,
+  "watchExit": 0,
+  "conclusion": "success",
+  "exactHeadRefEventPathAttemptAndBothJobsAllStepsSuccess": true,
+  "jobs": [
+    {
+      "id": 128016761183,
+      "name": "frontend",
+      "conclusion": "success",
+      "steps": 12
+    },
+    {
+      "id": 128016761717,
+      "name": "Portal Container Build & Hardened Runtime Smoke",
+      "conclusion": "success",
+      "steps": 14
+    }
+  ],
+  "artifacts": [
+    {
+      "id": 13521388864,
+      "name": "saintvision-portal-release",
+      "size_in_bytes": 25985266,
+      "digest": "sha256:09e3b81e4034bcdbfff46eae89af6e34ffe0aac59382a95a10fe127f1e1baa3f",
+      "expired": false
+    },
+    {
+      "id": 13520599988,
+      "name": "saintvision-web-dist",
+      "size_in_bytes": 1119300,
+      "digest": "sha256:7212b4870e3a142b8c44dc2629d5e6643401ae9e1d187d6234ecdf4059fd671d",
+      "expired": false
+    }
+  ],
+  "localLint": "NOT_RUN_ENVIRONMENT_missing_shared_eslint",
+  "independentAcceptance": false,
+  "deployed": false
+}

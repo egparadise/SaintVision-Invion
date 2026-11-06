@@ -1,15 +1,19 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.430"
+version: "1.0.431"
 status: "review"
 author: "Codex"
-updated: "2026-11-07T01:40:04+09:00"
+updated: "2026-11-07T01:45:07+09:00"
 source_of_truth: "Git"
 active_card: "FLEET5 continued supervision with PORTAL-REFRESH-FLEET-20261106"
-active_card_status: "BRev9d54549Claude903active; UIR3b48RootPushFirstFrontend42254157322pending; P02Rev2; actual5PCincomplete"
-active_card_next: "Root handles actualBverdict then readyUI/P02review after actualexitrelease; verifyb48CI and authorfinalDocs; noA7D04deploy until actualgates"
+active_card_status: "UIR3b48FrontendBothPASS1264testsArtifact13Verified; ownfinalReportReviewDeployPending; BRev9dClaude903active; P02Rev2; actual5PCincomplete"
+active_card_next: "Gemini freezes own report then Root exactpush/finalDocs; Bactualverdict/freshexitrelease then ONE readyUI/P02review; deploy only acceptedR3; physicalrequirementsremain"
 ---
+
+## 2026-11-07T01:45:07+09:00 실제 UI CI 성공과 산출물 바이트 검증
+
+화면 수정 b48c2c44의 실제 Frontend42254157322 두 job·26단계가 모두 성공했고 hosted Vitest103파일1264시험도 실패·skip0이다. Root는 실제 빌드ZIP1119300B의 GitHub digest와 안전한13파일을 검증해 별도 준비했다. 현재 서비스는 보존했으며 Gemini 최종 보고·그 고정 소스 Docs와 Claude 독립 UI 검토 뒤 배포한다. B Rev9d는 실제 Claude 검토 중이고 K2 Rev2와 실제5대 인수는 계속 남는다. 확인은 Root가 직접 실행한 gh watch/API/실제 job로그·artifact ZIP hash와 경로 검증이며 로컬·브라우저·실장비 시험으로 쓰지 않는다. 다음 첫 행동/담당은 Gemini 최종 보고, Root 고정 보고 CI·단일 실제 검토 연결, Claude Rev9d 판정과 K2 Codex Rev2다.
 
 ## 2026-11-07T01:40:04+09:00 고정 보완본의 실제 검토와 Root CI 운영
 

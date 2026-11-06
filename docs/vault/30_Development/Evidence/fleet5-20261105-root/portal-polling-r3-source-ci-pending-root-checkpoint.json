@@ -21,17 +21,19 @@
   "privateKeyMarkersAbsent": true,
   "pushForce": false,
   "RootCIOrIndependentAcceptance": false,
-  "atKST": "2026-11-07T01:40:04+09:00",
+  "atKST": "2026-11-07T01:45:07+09:00",
   "firstFrontendDispatchAuthorizedOnce": "2026-11-07T00:58:17+09:00",
   "sourceCommitAndRemoteVerified": true,
   "localGates": "OWNER_REPORT_PENDING",
   "exactFrontendCI": "42247974625_FAILED_ESLINT_UNUSED_CATCH",
-  "finalDocs": "OWNER_REPORT_PENDING",
+  "finalDocs": "PENDING_OWN_FINAL_REPORT",
   "formalIndependentAcceptance": false,
   "deployed": false,
   "failureAndMinimalFix": "portal-polling-r3-first-frontend-failure-root-correction.json",
   "correctedSource": "b48c2c4492f8aea4b55c33161733a9a6fb9eed8c",
   "correctedSourceRootOps": "portal-polling-r3-b48-root-source-and-ci-dispatch.json",
   "correctedSourceFrontend": 42254157322,
-  "correctedSourceFrontendResult": "PENDING_at_dispatch_receipt"
+  "correctedSourceFrontendResult": "SUCCESS_BOTH_JOBS_ALL_STEPS",
+  "correctedSourceHostedTests": 1264,
+  "correctedSourceArtifactFiles": 13
 }

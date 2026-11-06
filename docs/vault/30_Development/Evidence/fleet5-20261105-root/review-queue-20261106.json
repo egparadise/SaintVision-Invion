@@ -1,6 +1,6 @@
 {
   "schema": "fleet5-root-review-resource-sequence:1",
-  "atKST": "2026-11-07T01:40:04+09:00",
+  "atKST": "2026-11-07T01:45:07+09:00",
   "completedB": {
     "task": "task_d4c4c809ed4e",
     "review": "ac9182c3e3d606ec027c0be2e90e049ff50d54f1",
@@ -305,7 +305,7 @@
     "task": "task_8dfd2a5d01a2",
     "dispatch": "ctx_c8a99a3645b0",
     "scope": "R3 M1+L1L2L3",
-    "status": "b48_exact_minimal_source_pushed_by_Root_first_Frontend42254157322_in_progress_report_pending",
+    "status": "b48_FrontendBothJobsSuccess1264Tests_Artifact13Verified_OwnFinalReportPending",
     "actualAcceptance": false,
     "deployment": false,
     "source": "b48c2c4492f8aea4b55c33161733a9a6fb9eed8c",

@@ -1,0 +1,16 @@
+{
+  "run": 42254157322,
+  "job": 128016761183,
+  "source": "b48c2c4492f8aea4b55c33161733a9a6fb9eed8c",
+  "execution": "GitHub-hosted CI, not Root local tests",
+  "testFilesPassed": 103,
+  "testsPassed": 1264,
+  "failed": 0,
+  "skipped": 0,
+  "actualSummaryLines": [
+    "frontend\tRun Vitest Unit Tests\t2026-11-06T16:38:50.4131341Z  Test Files  103 passed (103)",
+    "frontend\tRun Vitest Unit Tests\t2026-11-06T16:38:50.4135360Z       Tests  1264 passed (1264)"
+  ],
+  "fullLogReadExit": 0,
+  "oldParserLimitation": "Caret-rendered ANSI sequences initially hid the Tests line; original log preserved, parser only corrected without rerunning tests"
+}
