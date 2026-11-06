@@ -1,0 +1,11 @@
+{
+  "schemaVersion": "fleet5-k2-production-caller-root-observation:1",
+  "atKST": "2026-11-06T11:03:03+09:00",
+  "source": "eb32b211ab3704935b9431747089ab0715582a74",
+  "actualNonTestGoNewVerifierOccurrences": [
+    "eb32b211ab3704935b9431747089ab0715582a74:services/node-agent/migrationverify/trust.go:136:func NewVerifier(installed InstalledTrust, context TrustedContext) (*Verifier, error) {"
+  ],
+  "onlyDefinitionNoActualCaller": true,
+  "meaning": "observedinv-nodeVCSbinaryandK1libraryCI doNOTproveinstalledusableK1K2entrypoint",
+  "codeOrLiveTrustAccepted": false
+}

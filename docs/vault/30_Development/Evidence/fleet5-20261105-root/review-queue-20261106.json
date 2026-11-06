@@ -1,6 +1,6 @@
 {
   "schema": "fleet5-root-review-resource-sequence:1",
-  "atKST": "2026-11-06T10:33:00+09:00",
+  "atKST": "2026-11-06T11:03:03+09:00",
   "completedB": {
     "task": "task_d4c4c809ed4e",
     "review": "ac9182c3e3d606ec027c0be2e90e049ff50d54f1",
@@ -12,9 +12,15 @@
     "verdict": "ACCEPT auxiliary delta at design/proposal level, no remaining blocker",
     "source": "8874b2dfe0dda9a019bd5f334636668290702e13"
   },
-  "active": null,
+  "active": {
+    "task": "task_ac1819feb2d7",
+    "dispatch": "ctx_5613e3659b52",
+    "source": "551d7312bb9c806fd423dcf6074158a9802cbb14",
+    "scope": "ONE actual K2 trustedproducer/effectboundary DESIGNcontractreview",
+    "state": "ready actualdispatch; verdictpending"
+  },
   "pending": null,
-  "authorParallelWork": "NEW K2designfirst task_a95ef3d8ccce/ctx_ed23b4a777d0; B rev6author continues",
+  "authorParallelWork": "K2ownerawaitsactualreview/Rootdecision; B rev6author continues; no newruntimecodegrant",
   "reason": "one actual Claude reviewer after proven settled/exited/released B4; corrected ownDocs and Linux race passed, fullCore still required",
   "genericApprovalMissing": false,
   "completedRL1": {
@@ -22,7 +28,7 @@
     "review": "0e53fc024ca773b7719182e170e5e126aeaf5b95",
     "verdict": "ACCEPT TEST-ONLY; R-L1 CLOSED; no new findings"
   },
-  "nextActualReviewTrigger": "K2proposal/ownDocs orB6immutable/ownDocs; oneactualClaude review sequenced",
+  "nextActualReviewTrigger": "actualK2verdict; B6finalimmutable/Docs afteravailableoneClaude resource",
   "completedIntegration": {
     "task": "task_78064fb4b7ff",
     "dispatch": "ctx_ed7ec73163d6",

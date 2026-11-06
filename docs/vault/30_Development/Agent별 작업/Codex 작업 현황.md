@@ -1,15 +1,19 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.393"
+version: "1.0.394"
 status: "review"
 author: "Codex"
-updated: "2026-11-06T10:33:00+09:00"
+updated: "2026-11-06T11:03:03+09:00"
 source_of_truth: "Git"
 active_card: "FLEET5-20261105 five physical node orchestration"
-active_card_status: "K1boundedCOMPLETE/CoreallSUCCESS/f28verified; newK2design a95/ctxed23 ready; B rev6; physicalwholeincomplete"
-active_card_next: "K2 Codex newtaska95/ctxed23 close actualtrustedproducer/effectboundaryproposal+Docs; B Codexrev6; Root oneactualreview afterimmutableheads; no oldK1CI reruns"
+active_card_status: "K2proposal551 actualClaudeac18 reviewactive/RootdecisionsHOLD; K1boundedcomplete; B6authorcontinues; physicalwholeincomplete"
+active_card_next: "Claude actualK2contractverdict/ownDocs; Root exactdecisions/corrections thenboundednextscope; B Codexrev6immutable/Docs; no runtime/installationgrant"
 ---
+
+## 2026-11-06T11:03:03+09:00 K2 불변 제안과 실제 검토 배정
+
+작업한 것과 확인: K2 제안551d7312는 eb32 parent·고유 문서31개·제품diff0·exactDocs42146482617 성공을 Root가 확인했다. 실제 Claude task_ac1819feb2d7/ctx_5613e3659b52에 trusted producer/effect 경계의 독립 검토를 한 번 배정했다. 설치 trust·cohort fence·prepublication·clock 결정은 HOLD이며 코드/운영 인수는 아니다. Root는 실제 contract/history를 읽고 신선한 witness의 Engine Exec 권한과 current 파생 간 순환 가능성, 초기 ABSENT 단계, 설치 trust/clock/fence의 실제 출처를 구체 검토 항목으로 지정했다. 다음 첫 행동/담당은 Claude의 실제 판정과 Root의 명명된 결정이며 B Codex는 rev6를 계속한다.
 
 ## 2026-11-06T10:33:00+09:00 K1 실제 완료와 K2 별도 착수
 

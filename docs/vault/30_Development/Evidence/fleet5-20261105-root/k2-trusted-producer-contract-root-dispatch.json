@@ -15,5 +15,13 @@
   "futureActualIndependentReviewer": "Claude viaRoot afterimmutableproposal/ownDocs",
   "noPrivateKeyOrDBSSHNodeDockerVMAction": true,
   "BRev6Independent": true,
-  "wholeProgramComplete": false
+  "wholeProgramComplete": false,
+  "latestObservationAtKST": "2026-11-06T11:03:03+09:00",
+  "proposalSource": "551d7312bb9c806fd423dcf6074158a9802cbb14",
+  "proposalDocs": 42146482617,
+  "RootVerifiedProposalExactHeadRefEventAllJobsSuccess": true,
+  "actualReviewGate": "k2-551-root-actual-review-gate.json",
+  "ownerQuestionPending": "msg_3adfd8134a89",
+  "actualDesignAccepted": false,
+  "actualCodeGrant": false
 }

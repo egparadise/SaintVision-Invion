@@ -3,8 +3,8 @@
   "recordedAtKST": "2026-11-06T00:46:51+09:00",
   "rootBase": "2b1753ce59c09037b5e130a7ffe64794d1d45fdf",
   "priorRootCheckpoint": {
-    "SHA": "f2e7ca8fca42231d99add868511d3db7bb4692b4",
-    "Docs": 42140305962,
+    "SHA": "b60ee3ce0ea033ef6a6173d7c5a0aae8806b79fe",
+    "Docs": 42144765145,
     "exactHeadCorrelationAllJobsSuccess": true,
     "remoteMatches": true,
     "syncExits": [
@@ -12,13 +12,13 @@
       0,
       0
     ],
-    "independentlyMatchedNormalizedDestinationHashes": 2769,
+    "independentlyMatchedNormalizedDestinationHashes": 2778,
     "pending": 0,
     "conflicts": 0,
     "trackedAndUntrackedClean": true,
     "rootDocsOnly": true,
     "wholeProgramComplete": false,
-    "verifiedAtKST": "2026-11-06T09:56:54+09:00"
+    "verifiedAtKST": "2026-11-06T10:36:01+09:00"
   },
   "actualPlanLowReview": {
     "source": "803ad270562b1b75e44d26f9e14b965c714ab519",
@@ -2515,7 +2515,7 @@
     "ownerT1T2T3": "msg_620855c76519",
     "normativeRevisionReply": "msg_0392caf64d5d"
   },
-  "latestRecordAtKST": "2026-11-06T10:33:00+09:00",
+  "latestRecordAtKST": "2026-11-06T11:03:03+09:00",
   "optionalLowTokenTestDelta": {
     "source": "f0af307705b4923ebc3e231db5238af4c70aa389",
     "scope": "two otherwise-valid token payload corrections and JSON validity assertions; runtime unchanged",
@@ -3085,5 +3085,17 @@
   "K1FinalActualWorkerDone": "msg_6987f7ecdcb5",
   "K1FinalBoundedHandoff": "k1-final-bounded-root-handoff.json",
   "K2ActualDesignDispatch": "k2-trusted-producer-contract-root-dispatch.json",
-  "CIoneShotMonitorClosure": "eb32-core-terminal-monitor-root-closure.json"
+  "CIoneShotMonitorClosure": "eb32-core-terminal-monitor-root-closure.json",
+  "K2ImmutableProposalRootObservation": "k2-551-root-actual-review-gate.json",
+  "K2ActualReviewDispatch": {
+    "dispatchId": "ctx_5613e3659b52",
+    "taskId": "task_ac1819feb2d7",
+    "runId": "run_e57ecd84a7bc",
+    "state": "ready",
+    "agent": "claude",
+    "mode": "terminal",
+    "terminal": "term_083d3ed9-77ac-4358-9954-feb4a25084d4",
+    "workspace": "d98dc9d3-fe61-4cb2-9776-dff349347a61::D:/Project/SaintVisionI-Invion/fleet5-bootstrap-v3-review-20261106",
+    "next": "Orca wakes you when workers report; end your turn when you're done."
+  }
 }
