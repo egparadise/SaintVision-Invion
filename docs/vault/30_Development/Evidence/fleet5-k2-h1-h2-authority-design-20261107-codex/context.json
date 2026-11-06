@@ -1,0 +1,124 @@
+{
+  "classification": "DESIGN_ONLY_SELECTED_POLICIES_NOT_ACTUAL_TRUST",
+  "docID": "FLEET5-K2-H1-H2-AUTHORITY-DESIGN-20261107-CODEX",
+  "version": "1.0.0",
+  "atKST": "2026-11-07T07:59:56.478032+09:00",
+  "task": "task_a95ef3d8ccce",
+  "dispatch": "ctx_ed23b4a777d0",
+  "grant": "msg_10808c1899e9",
+  "owner": "Codex",
+  "reviewer": "Future actual Claude contract review via Root, PENDING",
+  "branch": "agent/codex/fleet5-k2-h1-h2-authority-design-20261107",
+  "base": "1f073c03eb6673ac60806e8fbe008d391bc45864",
+  "productBaseline": "f2c1afb78b589b4b2cbcf3dcd4dc4f3c3f3bc856",
+  "canonicalRootHEAD": "e27b2f43a2607ddb2de58b71e1691866f17cce3f",
+  "canonicalBoards": [
+    {
+      "path": "docs/vault/00_Index/\uc804\uccb4 \uac1c\ubc1c \uc9c4\ud589 \ud604\ud669.md",
+      "SHA256": "16719208cefa8306dba8be1c19b28acd4ba4022f70a980860e6b4aa6ddf0052d",
+      "metadata": "doc_id: \"INDEX-PROGRESS-001\"\r\ntitle: \"\uc804\uccb4 \uac1c\ubc1c \uc9c4\ud589 \ud604\ud669\"\r\nversion: \"1.0.487\"\r\nstatus: \"review\"\r\nauthor: \"Codex\"\r\nupdated: \"2026-11-07T07:55:20+09:00\"\r\nsource_of_truth: \"Git\"\r\nlatest_codex_card: \"D04compact1f073verified/Core+CODEclosed; H1H2finiteDESIGNactivatedmsg1080/actualNULLHOLD; A7R29690actualreviewctx36ecPENDING; fleetincomplete\""
+    },
+    {
+      "path": "docs/vault/30_Development/Agent\ubcc4 \uc791\uc5c5/Codex \uc791\uc5c5 \ud604\ud669.md",
+      "SHA256": "5cfb53c4f70d82c30fe3b213723460e9879becc74b838b83e2f1a4f627605f53",
+      "metadata": "doc_id: \"WORKBOARD-CODEX-001\"\r\ntitle: \"Codex \uc791\uc5c5 \ud604\ud669\"\r\nversion: \"1.0.448\"\r\nstatus: \"review\"\r\nauthor: \"Codex\"\r\nupdated: \"2026-11-07T07:55:20+09:00\"\r\nsource_of_truth: \"Git\"\r\nactive_card: \"FLEET5 continued supervision with PORTAL-REFRESH-FLEET-20261106\"\r\nactive_card_status: \"D04f2c1CODE+Coreclosed/compact1f073verified; H1H2finiteDESIGNactivatedmsg1080/actualNULLHOLD; A7R29690actualreviewctx36ecPENDING; fleetincomplete\"\r\nactive_card_next: \"K2Codex closedH1H2authoritycontract+10proposedcausalcases+smallestnextCODEproposal; Claude A7R29690actualdelta verdict; Root verifyfrozendesign then oneactualreview after predecessor exit/release\""
+    }
+  ],
+  "skills": {
+    "agent-delivery": "1.1.0",
+    "core-reliability": "1.0.0"
+  },
+  "scope": "Only new unique History/Evidence; product delta0",
+  "nineFrozenPublicInputs": [
+    {
+      "source": "f2c1afb78b589b4b2cbcf3dcd4dc4f3c3f3bc856",
+      "path": "services/node-agent/internal/migrationcontext/README.md",
+      "SHA256": "00c1c544684ef36572540a40a79b1feaaf12af442257d7d9f9c26bc3271c2478"
+    },
+    {
+      "source": "f2c1afb78b589b4b2cbcf3dcd4dc4f3c3f3bc856",
+      "path": "services/node-agent/internal/migrationcontext/ports.go",
+      "SHA256": "db7c7e877afc6ee8bbf8ca2e2b6afad3b973a63a624d4bcd6ee2ad5ce649fb95"
+    },
+    {
+      "source": "f2c1afb78b589b4b2cbcf3dcd4dc4f3c3f3bc856",
+      "path": "services/node-agent/internal/migrationcontext/p02_inputs_internal.go",
+      "SHA256": "d1dbd3bf0ab261cffcc4112750142784f877a3b6499f95381d85f90281b0b07d"
+    },
+    {
+      "source": "f2c1afb78b589b4b2cbcf3dcd4dc4f3c3f3bc856",
+      "path": "services/node-agent/internal/migrationcontext/p02_evaluate_internal.go",
+      "SHA256": "2f29f521ffe358411baaa3d365f80f757c2be6df14043abdae787802a275b5c9"
+    },
+    {
+      "source": "f2c1afb78b589b4b2cbcf3dcd4dc4f3c3f3bc856",
+      "path": "services/node-agent/internal/migrationcontext/policy.go",
+      "SHA256": "ce6f1b9b1a1835276b248c3dbdb8fa42b68fa79fb5684748ea78694d104bbdd2"
+    },
+    {
+      "source": "f2c1afb78b589b4b2cbcf3dcd4dc4f3c3f3bc856",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-trusted-producer-contract-20261106-codex/rev2/contract.md",
+      "SHA256": "327975d68b8991ffeb90b0ec481544be07d3df76099266a7e73da1a8fa0cb727"
+    },
+    {
+      "source": "f2c1afb78b589b4b2cbcf3dcd4dc4f3c3f3bc856",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-p02-registry-attestation-rev2-20261107-codex/contract.md",
+      "SHA256": "19b5835ab728f1cce76cc01f7bf7c5cb85c486c945a8164321c3b925989e95a4"
+    },
+    {
+      "source": "f2c1afb78b589b4b2cbcf3dcd4dc4f3c3f3bc856",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-p02-registry-attestation-rev3-20261107-codex/contract.md",
+      "SHA256": "de290b978fe3d7fbea45488e5971492abace60f8b4235a513466c0cb738fbf99"
+    },
+    {
+      "source": "f2c1afb78b589b4b2cbcf3dcd4dc4f3c3f3bc856",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-p02-registry-attestation-rev3-20261107-codex/source-continuity-and-open-obligations.json",
+      "SHA256": "cad808ccbf2c7ca9b550fa709baa63b5b8d6e40e7a7ba5dc10b950361a28e5ea"
+    }
+  ],
+  "extraReadOnlyInputs": [
+    {
+      "source": "f2c1afb78b589b4b2cbcf3dcd4dc4f3c3f3bc856",
+      "path": "services/node-agent/internal/migrationcontext/p02_codec_internal.go",
+      "SHA256": "10b1a4b6ed8c1bbcf08029cd137195597476e9b8078e56dd2bf67bfa4e43d9db"
+    },
+    {
+      "source": "f2c1afb78b589b4b2cbcf3dcd4dc4f3c3f3bc856",
+      "path": "services/node-agent/internal/migrationcontext/p02_wire_internal.go",
+      "SHA256": "6472966beab52792d2e9955680afee13dea81be944323aa440bf0d560eb35748"
+    },
+    {
+      "source": "f2c1afb78b589b4b2cbcf3dcd4dc4f3c3f3bc856",
+      "path": "services/node-agent/internal/migrationcontext/p02_canonical_internal.go",
+      "SHA256": "88fc45ec259d3a9ea38ea8095044c9fc3d5feba45832a45a2d7bf0cf0c3b5bf4"
+    },
+    {
+      "source": "f2c1afb78b589b4b2cbcf3dcd4dc4f3c3f3bc856",
+      "path": "services/node-agent/internal/migrationcontext/effect_gate_test.go",
+      "SHA256": "871e1b1ca26e6bcdcc4ea7af2e8a290dc7a9b615f201c46aa7bf1102e0af7c04"
+    },
+    {
+      "source": "f2c1afb78b589b4b2cbcf3dcd4dc4f3c3f3bc856",
+      "path": "services/node-agent/internal/migrationcontext/source_gate_test.go",
+      "SHA256": "10c0229040b40d2dd0653979b4761da4e35baab5d519b8d52dbe368928c0c780"
+    }
+  ],
+  "selectedPoliciesSource": "Root actual msg_10808c1899e9 choices1-5; logical choices selected, actual bindings UNBOUND",
+  "actualBindings": {
+    "trustProvisioner": null,
+    "deliveryChannel": null,
+    "publicAnchors": null,
+    "registryIdentity": null,
+    "signerSPKI": null,
+    "statusAuthority": null,
+    "clockAuthority": null,
+    "registrationDelivery": null,
+    "expectedEffectiveVerdict": null
+  },
+  "K1": "eb32b211ab3704935b9431747089ab0715582a74/13types73fields/28pins unchanged",
+  "actualCrypto": "NOT_RUN_PROHIBITED_IN_THIS_CUT",
+  "runtime": "NOT_RUN",
+  "A01A40": "NOT_RUN",
+  "priorRefs": "UNCHANGED",
+  "inspectionNote": "One Windows rg wildcard inspection error123 corrected using -g; not a gate/test or source mutation"
+}

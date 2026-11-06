@@ -1,0 +1,57 @@
+{
+  "classification": "SMALLEST_FUTURE_CODE_DATA_ONLY_NOT_GRANTED",
+  "objective": "Replace the H2 mathematical-signature hypothesis with a bounded real public-key signature check; leave all trust installation/origin/status authority absent and public refusal unchanged.",
+  "after": [
+    "Actual independent H1/H2 contract review and Root exact code grant",
+    "Root chooses exact implementation source base and pins accepted candidate bytes without registering production trust"
+  ],
+  "proposedBaseProduct": "f2c1afb78b589b4b2cbcf3dcd4dc4f3c3f3bc856; design report commit supplied through Orca after publication",
+  "allowedPaths": [
+    {
+      "path": "services/node-agent/internal/migrationcontext/h12_signature_internal.go",
+      "delta": "NEW private pure crypto-only helper; no producer/loader/issuer/opaque input"
+    },
+    {
+      "path": "services/node-agent/internal/migrationcontext/h12_signature_test.go",
+      "delta": "NEW isolated test-only public DER/signature fixtures; no persisted private keys or production test switch"
+    },
+    {
+      "path": "services/node-agent/internal/migrationcontext/effect_gate_test.go",
+      "delta": "Only exact resolved objects crypto/ed25519.Verify, crypto/x509.ParsePKIXPublicKey, crypto/x509.MarshalPKIXPublicKey in the NEW helper source path; deny them elsewhere. No global wildcard/grant. Existing pure-object and alias/write/interface/native denial cases retained."
+    },
+    {
+      "path": "services/node-agent/internal/migrationcontext/source_gate_test.go",
+      "delta": "Narrow old selector ban exception for the exact resolved Ed25519 Verify at the NEW helper path, under the stricter resolved effect gate. All other Ed25519 uses except existing PublicKey remain forbidden; no K1/import/constructor/opacity/census changes."
+    }
+  ],
+  "interface": "PROPOSED private h12CheckRegistrySignature(rawRecord []byte, publicSPKIDER []byte, independentlyExpectedSPKISHA256 string) (p02SignatureTuple, bool). bool means mathematical/canonical checks only, NEVER authentication/installation/permission. No caller message/domain/codec/algorithm callback, no exported API.",
+  "algorithm": [
+    "Exclusive-owner inputs; bound record<=existing2MiB, public DER<=4096bytes, signature exactly64; freeze copies before parsing; no concurrent-mutation/isolation claim",
+    "Use existing fixed p02Decode + p02EnvelopeSchema; read existing closed envelope; signer SPKI must equal independently expected SPKI and SHA256(exact supplied public DER)",
+    "ParsePKIXPublicKey, require exact ed25519.PublicKey32bytes; MarshalPKIXPublicKey and require byte-equal DER to reject alternate/trailing encodings; public-key parsing only, no certificate chain/system-root authority",
+    "Use existing p02Context.signingInput over checked envelopeValue: fixed p02Domain || NUL || exact canonical JSON({body,signer}); do not accept supplied message or alternate purpose/format",
+    "Call only ed25519.Verify with exact derived message/signature; on failure return zero tuple/false; on success construct the existing13field p02SignatureTuple DATA with exact bytes/context; no p02Inputs, policy, service or opaque issuer",
+    "No call from production Service/authenticateRegistry, no installation of H1/H2 bindings, no p02Evaluate composition or public positive path in this first code cut"
+  ],
+  "necessaryGuardGap": "Current accepted source intentionally refuses Ed25519.Verify and PKIX parse/marshal objects. Any code grant must expressly include the two guard files above and path-scoped exact objects; do not silently weaken them or alias around the gate.",
+  "futureTests": [
+    "Known valid TESTKEY public DER/signature control; independent test oracle verifies exact fixed message",
+    "Valid32byte key/wrong DER SPKI expected hash, foreign key and wrong-key signature fail with canonical record intact",
+    "Schema-valid body/signer/message/signature one-byte tamper without resigning fails cryptographic check; malformed record is separately classified and not a semantic signature kill",
+    "Signature generated for another domain/NUL/body/signer representation fails fixed-domain check; separately re-signed schema-valid foreign-scope record may pass MATH ONLY, demonstrating that full H1/H2 authorization is still required",
+    "Non-Ed25519 SPKI, noncanonical/trailing DER, wrong key/signature length and invalid signature fail without panic; size cap before parse/copy",
+    "Root isolated actual test execution of new tests and affected public refusal/effect/source/opacity/census gates; actual compile failures are failures, no silent retry",
+    "Guard mutants using aliased Sign/GenerateKey/NewKeyFromSeed/CreateCertificate/ambient certificate Verify/system roots/clock/network/native effects still refuse; new objects used outside allowed helper path refuse",
+    "Public null/unregistered sources and all opaque issuers remain refusing even for mathematically valid self-issued signatures; full ten H12 acquisition cases remain future dependencies, not claimed by this small helper"
+  ],
+  "notGranted": [
+    "Actual code now",
+    "H1 custody/bootstrap/delivery adapter or authority registration",
+    "H4 clock/status/readback acquisition",
+    "H3-EA, H5-H7, positive factory/ports/current/K1 consumer or effects",
+    "wire/signer/domain/role registration or K1/28/schema/module repin",
+    "Any signing/key generation outside future isolated test-only fixtures"
+  ],
+  "actualCustody": "ALL_NULL_HOLD; helper cannot turn supplied SPKI/hash/test signature into installed trust",
+  "review": "Actual separate Claude CODE review via Root after future implementation; no author selfgrant"
+}

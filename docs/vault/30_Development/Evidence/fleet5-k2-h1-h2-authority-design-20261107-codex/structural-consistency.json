@@ -1,0 +1,28 @@
+{
+  "classification": "STRUCTURAL_COMPLETENESS_ONLY_NOT_AUTHENTICATION_OR_TEST_PROOF",
+  "atKST": "2026-11-07T08:06:53.801104+09:00",
+  "command": "Existing main .venv Python3.14.7 -I -B inline stdlib JSON/regex source-field/reference comparison",
+  "exit": 0,
+  "H1CapsuleFields": 26,
+  "nestedDeclaredTypeGroupsChecked": 7,
+  "H2LogicalSlots": 23,
+  "proposedCaseIDs": [
+    "H12-C01",
+    "H12-C02",
+    "H12-C03",
+    "H12-C04",
+    "H12-C05",
+    "H12-C06",
+    "H12-C07",
+    "H12-C08",
+    "H12-C09",
+    "H12-C10"
+  ],
+  "fieldSetsEqualFrozenSource": true,
+  "originReferencesClosed": true,
+  "snapshotFieldsUnique": true,
+  "allTenCases": "PROPOSED_NOT_RUN",
+  "cryptoExecuted": false,
+  "GoExecuted": false,
+  "actualBindings": "NULL_HOLD"
+}

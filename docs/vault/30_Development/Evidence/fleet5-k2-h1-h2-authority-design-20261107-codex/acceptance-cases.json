@@ -1,0 +1,243 @@
+{
+  "classification": "TEN_CAUSAL_FUTURE_SPECIFICATIONS_PROPOSED_NOT_RUN",
+  "caseIDs": [
+    "H12-C01",
+    "H12-C02",
+    "H12-C03",
+    "H12-C04",
+    "H12-C05",
+    "H12-C06",
+    "H12-C07",
+    "H12-C08",
+    "H12-C09",
+    "H12-C10"
+  ],
+  "stages": [
+    "G00_BINDING",
+    "G01_ORIGIN_DELIVERY",
+    "G02_OWNERSHIP",
+    "G03_CAPSULE",
+    "G04_AUTHENTICATED_SNAPSHOT",
+    "G05_H2_AUTHORIZATION",
+    "G06_RECORD_CODEC",
+    "G07_SIGNATURE",
+    "G08_STATUS_TIME",
+    "G09_VERSION_REPLAY",
+    "G10_FINAL_READBACK"
+  ],
+  "fixtureDiscipline": "Future independently re-signable TESTKEY source hypotheses only in isolated reviewed tests; no keys/signatures generated or Ed25519/X509 executed here. TEST_ONLY conditions cannot be runtime options or installed truth.",
+  "globalPreconditions": [
+    "All non-targeted logical sources present and origin-authenticated under distinct independently provisioned test authorities",
+    "Whole canonical capsule/record, valid expected-key signature, exact original intervals/current statuses/head and request joins checked by independent test oracles before evaluating later negatives",
+    "For each row assert exact first failed H12 stage/detail or named downstream D04 stage and full earlier-prefix; snapshot exact bytes before/after",
+    "A setup/compile/parser/bad-signature/absent-unrelated-source failure cannot be credited to a later purpose/status/version/readback case",
+    "All ten remain NOT_RUN, not original A01-A40, no crypto/runtime proof or percentages"
+  ],
+  "cases": [
+    {
+      "id": "H12-C01",
+      "purpose": "Conditional benign control",
+      "requiredEarlierPass": [
+        "G00_BINDING",
+        "G01_ORIGIN_DELIVERY",
+        "G02_OWNERSHIP",
+        "G03_CAPSULE",
+        "G04_AUTHENTICATED_SNAPSHOT",
+        "G05_H2_AUTHORIZATION",
+        "G06_RECORD_CODEC",
+        "G07_SIGNATURE",
+        "G08_STATUS_TIME",
+        "G09_VERSION_REPLAY",
+        "G10_FINAL_READBACK"
+      ],
+      "targetFailure": [],
+      "expected": "All logical gates pass under independently bound TEST_ONLY source hypotheses; one exact tuple DATA, not installed trust/public success",
+      "constructionAndFullPreconditions": "All sources originate from independent synthetic provisioning/status/clock authorities, not the record signer. Exact capsule/DER/grant, current ACTIVE subjects, fresh full clock interval, current head/ticket/H5 and final authenticated vector equal.",
+      "status": "PROPOSED_NOT_RUN"
+    },
+    {
+      "id": "H12-C02",
+      "purpose": "Foreign/self-issued bootstrap chain",
+      "requiredEarlierPass": [
+        "G00_BINDING"
+      ],
+      "targetFailure": [
+        "G01_ORIGIN_DELIVERY"
+      ],
+      "expected": "G01_ORIGIN_DELIVERY / ORIGIN",
+      "constructionAndFullPreconditions": "Keep fixed valid registry signature and closed data; replace only delivery-origin assertion with one signed by the candidate registry key instead of independently pinned provisioning authority. All source objects remain present. Independent future oracle confirms candidate signature valid, but no origin authorization.",
+      "status": "PROPOSED_NOT_RUN"
+    },
+    {
+      "id": "H12-C03",
+      "purpose": "Authentic key granted another purpose/scope",
+      "requiredEarlierPass": [
+        "G00_BINDING",
+        "G01_ORIGIN_DELIVERY",
+        "G02_OWNERSHIP",
+        "G03_CAPSULE",
+        "G04_AUTHENTICATED_SNAPSHOT"
+      ],
+      "targetFailure": [
+        "G05_H2_AUTHORIZATION"
+      ],
+      "expected": "G05_H2_AUTHORIZATION / AUTHORIZATION",
+      "constructionAndFullPreconditions": "Keep canonical target purpose/domain/body and its valid signature UNCHANGED. Independently re-sign only external H2 grant for another purpose or foreign selector under the provisioning TESTKEY; current status authenticates that exact foreign grant as ACTIVE. Earlier origin/schema/status authenticity pass; authorization fails. Do not mutate fixed body purpose into a parser refusal.",
+      "status": "PROPOSED_NOT_RUN"
+    },
+    {
+      "id": "H12-C04",
+      "purpose": "Authentic nonapproval cannot choose capsule expectation",
+      "requiredEarlierPass": [
+        "G00_BINDING",
+        "G01_ORIGIN_DELIVERY",
+        "G02_OWNERSHIP",
+        "G03_CAPSULE",
+        "G04_AUTHENTICATED_SNAPSHOT",
+        "G05_H2_AUTHORIZATION",
+        "G06_RECORD_CODEC",
+        "G07_SIGNATURE",
+        "G08_STATUS_TIME",
+        "G09_VERSION_REPLAY",
+        "G10_FINAL_READBACK",
+        "D04:01_ANCHOR",
+        "D04:02_SOURCES",
+        "D04:03_ENVELOPE",
+        "D04:03_PAYLOAD",
+        "D04:03_C2",
+        "D04:04_SIGNATURE",
+        "D04:04_KEY_INTERVAL",
+        "D04:05_PAYLOAD_JOINS",
+        "D04:05_COMPONENTS"
+      ],
+      "targetFailure": [
+        "D04:05_REVIEWS"
+      ],
+      "expected": "D04 PROVENANCE / 05_REVIEWS / independently-approved-effective-verdict",
+      "constructionAndFullPreconditions": "Independent immutable capsule literal TEST_EXPECT_A stays fixed. H3-EA result, body/source facts and payload are consistently rebound to TEST_RESULT_B and independently re-signed with all original review/partition/digest/interval prerequisites valid. H12 may authenticate origin/signature; D04 must reject the distinct result. No production accepted literal chosen.",
+      "status": "PROPOSED_NOT_RUN"
+    },
+    {
+      "id": "H12-C05",
+      "purpose": "Current revocation after historically valid signature",
+      "requiredEarlierPass": [
+        "G00_BINDING",
+        "G01_ORIGIN_DELIVERY",
+        "G02_OWNERSHIP",
+        "G03_CAPSULE",
+        "G04_AUTHENTICATED_SNAPSHOT",
+        "G05_H2_AUTHORIZATION",
+        "G06_RECORD_CODEC",
+        "G07_SIGNATURE"
+      ],
+      "targetFailure": [
+        "G08_STATUS_TIME"
+      ],
+      "expected": "G08_STATUS_TIME / REVOKED",
+      "constructionAndFullPreconditions": "Keep original and current key intervals, canonical record, exact signature, source subjects and clock valid. Independently sign current status REVOKED for the exact grant/key subject. G04 validates its authenticity/subject, not its ACTIVE decision; reject only at G08. No malformed signature, expiry or absent-source credit.",
+      "status": "PROPOSED_NOT_RUN"
+    },
+    {
+      "id": "H12-C06",
+      "purpose": "Authentic older record versus current head/floor",
+      "requiredEarlierPass": [
+        "G00_BINDING",
+        "G01_ORIGIN_DELIVERY",
+        "G02_OWNERSHIP",
+        "G03_CAPSULE",
+        "G04_AUTHENTICATED_SNAPSHOT",
+        "G05_H2_AUTHORIZATION",
+        "G06_RECORD_CODEC",
+        "G07_SIGNATURE",
+        "G08_STATUS_TIME"
+      ],
+      "targetFailure": [
+        "G09_VERSION_REPLAY"
+      ],
+      "expected": "G09_VERSION_REPLAY / VERSION",
+      "constructionAndFullPreconditions": "Keep exact same capsule/generation/key grant and valid signature/interval. Present authentic old record version V while authenticated current snapshot contains newer head/floor V+1. The original still-valid ticket can remain in the same checkpoint after head advancement. All sources are present/authentic and final vector otherwise stable; no floor reset/write.",
+      "status": "PROPOSED_NOT_RUN"
+    },
+    {
+      "id": "H12-C07",
+      "purpose": "Exact registration bytes without delivery origin",
+      "requiredEarlierPass": [
+        "G00_BINDING",
+        "G01_ORIGIN_DELIVERY",
+        "G02_OWNERSHIP",
+        "G03_CAPSULE"
+      ],
+      "targetFailure": [
+        "G04_AUTHENTICATED_SNAPSHOT"
+      ],
+      "expected": "G04_AUTHENTICATED_SNAPSHOT / REGISTRATION_ORIGIN",
+      "constructionAndFullPreconditions": "H1 delivery is independently authenticated. Supply exact pinned registration bytes/a0 identity and a present authenticated status checkpoint, but omit the specific registration-origin delivery assertion for those bytes. TEST_ONLY base policy otherwise supplies protocol authorization. This tests missing origin, not an absent whole source or raw inequality.",
+      "status": "PROPOSED_NOT_RUN"
+    },
+    {
+      "id": "H12-C08",
+      "purpose": "Authenticated final version changes",
+      "requiredEarlierPass": [
+        "G00_BINDING",
+        "G01_ORIGIN_DELIVERY",
+        "G02_OWNERSHIP",
+        "G03_CAPSULE",
+        "G04_AUTHENTICATED_SNAPSHOT",
+        "G05_H2_AUTHORIZATION",
+        "G06_RECORD_CODEC",
+        "G07_SIGNATURE",
+        "G08_STATUS_TIME",
+        "G09_VERSION_REPLAY"
+      ],
+      "targetFailure": [
+        "G10_FINAL_READBACK"
+      ],
+      "expected": "G10_FINAL_READBACK / READBACK",
+      "constructionAndFullPreconditions": "All initial bindings/signatures/status/time/head/ticket/H5 pass. Final readback is validly authenticated for the same subject but newer status/checkpoint/version; clock remains valid. Reject rather than promoting new token to initial success; zero automatic retry. Invalid readback signature is a separate earlier-origin failure, not this case.",
+      "status": "PROPOSED_NOT_RUN"
+    },
+    {
+      "id": "H12-C09",
+      "purpose": "Exclusive expiry at authenticated final bound",
+      "requiredEarlierPass": [
+        "G00_BINDING",
+        "G01_ORIGIN_DELIVERY",
+        "G02_OWNERSHIP",
+        "G03_CAPSULE",
+        "G04_AUTHENTICATED_SNAPSHOT",
+        "G05_H2_AUTHORIZATION",
+        "G06_RECORD_CODEC",
+        "G07_SIGNATURE"
+      ],
+      "targetFailure": [
+        "G08_STATUS_TIME"
+      ],
+      "expected": "G08_STATUS_TIME / EXPIRED",
+      "constructionAndFullPreconditions": "All origin/key authorization/signature and integer/canonical predicates pass. Authenticated clock upper bound equals ticket or response exclusive end; other key/status/H5 bounds remain strictly valid. Refuse equality; no ambient clock, backdated Now, optimistic lower endpoint or widened age. Missing/untrusted clock separately refuses at G04 and cannot count as this expiry proof.",
+      "status": "PROPOSED_NOT_RUN"
+    },
+    {
+      "id": "H12-C10",
+      "purpose": "No public/opaque/effect authority from private checks",
+      "requiredEarlierPass": [
+        "G00_BINDING",
+        "G01_ORIGIN_DELIVERY",
+        "G02_OWNERSHIP",
+        "G03_CAPSULE",
+        "G04_AUTHENTICATED_SNAPSHOT",
+        "G05_H2_AUTHORIZATION",
+        "G06_RECORD_CODEC",
+        "G07_SIGNATURE",
+        "G08_STATUS_TIME",
+        "G09_VERSION_REPLAY",
+        "G10_FINAL_READBACK"
+      ],
+      "targetFailure": [
+        "PUBLIC_DEFAULT_REFUSAL"
+      ],
+      "expected": "Public TrustUnknown; no InstalledPolicy/History/effect",
+      "constructionAndFullPreconditions": "A private TEST_ONLY H1/H2 control may pass, but production bindings/ports and H3-H7 remain NULL. Public NewService remains null/refusing; no fixture source injection. Verify absence of positive opaque factory/port/current and zero signing/nonce/journal/host/DB/Engine/network effects. Private crypto result is never public authorization.",
+      "status": "PROPOSED_NOT_RUN"
+    }
+  ]
+}

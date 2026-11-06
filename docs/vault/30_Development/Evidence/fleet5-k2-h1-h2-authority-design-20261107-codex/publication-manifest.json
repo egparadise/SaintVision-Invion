@@ -1,0 +1,81 @@
+{
+  "classification": "H12_DESIGN_ONLY_PROPOSED_UNREVIEWED_NOT_ACTUAL_TRUST",
+  "atKST": "2026-11-07T08:09:21.807740+09:00",
+  "base": "1f073c03eb6673ac60806e8fbe008d391bc45864",
+  "productBaseline": "f2c1afb78b589b4b2cbcf3dcd4dc4f3c3f3bc856",
+  "branch": "agent/codex/fleet5-k2-h1-h2-authority-design-20261107",
+  "files": [
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h1-h2-authority-design-20261107-codex/acceptance-cases.json",
+      "bytes": 10903,
+      "mode": "100644",
+      "SHA256": "4593fa50ef6175a1ea12f41fce7cd823b8f58afe736dc10b630cb836f5a90853"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h1-h2-authority-design-20261107-codex/authority-fields.json",
+      "bytes": 16452,
+      "mode": "100644",
+      "SHA256": "c47b0301df17158233da0afab050bfa780d347c321fe0f7778138d0298eb31e9"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h1-h2-authority-design-20261107-codex/context.json",
+      "bytes": 6668,
+      "mode": "100644",
+      "SHA256": "e3ec7f558f4c6888ee37fa8fbec9b07b953284025debdbbcdbca999dc87699e8"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h1-h2-authority-design-20261107-codex/contract.md",
+      "bytes": 16026,
+      "mode": "100644",
+      "SHA256": "b7a654f126b47ba0c4bf7c212fa62e1ac98b54b8005d1543202d4ce6b0f27ecf"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h1-h2-authority-design-20261107-codex/local-gates.json",
+      "bytes": 9211,
+      "mode": "100644",
+      "SHA256": "ee056d663684334743066c62f65e0fbe1c969ec666ea791993654070a3c8f25c"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h1-h2-authority-design-20261107-codex/next-code-proposal.json",
+      "bytes": 5661,
+      "mode": "100644",
+      "SHA256": "f8b3f6d7aabe32e07bdbff56789ea327f544c43b64834035934f8cfe4f0f7fed"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h1-h2-authority-design-20261107-codex/structural-consistency.json",
+      "bytes": 752,
+      "mode": "100644",
+      "SHA256": "a8e0e533340c3ccc6d4969cb884ad80ed9fe595fc04bc055c89343168bf26e64"
+    },
+    {
+      "path": "docs/vault/30_Development/History/2026-11-07_FLEET5_K2_H1_H2_Authority_Design_Codex.md",
+      "bytes": 7146,
+      "mode": "100644",
+      "SHA256": "90b1c1f98d808c6cdcc56d914aa3a0bc69a3505ccfa629eb75e978ba715c9a8f"
+    }
+  ],
+  "excludedSelf": true,
+  "productDelta": 0,
+  "priorRefsFrozen": true,
+  "artifactHashes": {
+    "acceptance-cases.json": "4593fa50ef6175a1ea12f41fce7cd823b8f58afe736dc10b630cb836f5a90853",
+    "authority-fields.json": "c47b0301df17158233da0afab050bfa780d347c321fe0f7778138d0298eb31e9",
+    "context.json": "e3ec7f558f4c6888ee37fa8fbec9b07b953284025debdbbcdbca999dc87699e8",
+    "contract.md": "b7a654f126b47ba0c4bf7c212fa62e1ac98b54b8005d1543202d4ce6b0f27ecf",
+    "local-gates.json": "ee056d663684334743066c62f65e0fbe1c969ec666ea791993654070a3c8f25c",
+    "next-code-proposal.json": "f8b3f6d7aabe32e07bdbff56789ea327f544c43b64834035934f8cfe4f0f7fed",
+    "structural-consistency.json": "a8e0e533340c3ccc6d4969cb884ad80ed9fe595fc04bc055c89343168bf26e64"
+  },
+  "selectedLogicalPolicy": "Root msg_10808c1899e9 choices1-5",
+  "contract": "PROPOSED_UNREVIEWED",
+  "actualBindings": "ALL_UNBOUND_NULL_HOLD",
+  "tenCases": "H12-C01..C10 PROPOSED_NOT_RUN",
+  "nextCode": "DATA_ONLY_NOT_GRANTED",
+  "localDocsGates11Exit0": true,
+  "canonicalStateBefore": "1ab09fec4c83c4ebfaa6892d1d69a772c02b37e8fd771c76dad811b7730c6de6",
+  "canonicalStateAfter": "1ab09fec4c83c4ebfaa6892d1d69a772c02b37e8fd771c76dad811b7730c6de6",
+  "ownDocs": "PENDING_ONE_EXACT_DISPATCH",
+  "actualIndependentContractReview": "PENDING_ROOT_CLAUDE_QUEUE_AFTER_A7_RELEASE",
+  "A01A40": "NOT_RUN",
+  "wholeFleet": "INCOMPLETE"
+}
