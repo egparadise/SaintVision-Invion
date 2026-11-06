@@ -1,0 +1,53 @@
+{
+ "schemaVersion": "fleet5-k2a-pl-r1c-narrow-review:1",
+ "reviewer": "Claude (ONE reviewer, no helper/subagent)",
+ "orca": {"task": "task_26dd9ebd51dd", "dispatch": "ctx_63ce6b6612b7", "predecessor": "ctx_94f4cd146419 / task_54959cbb262a succeeded/settled/exited/released (Root-verified 19:40 KST)"},
+ "owner": {"agent": "Codex", "task": "task_a95ef3d8ccce", "dispatch": "ctx_ed23b4a777d0", "pendingAsk": "msg_7215f61639b2"},
+ "target": {
+  "immutableBase": "084bd9471673f7f4f41dc547c76a2411c066109b",
+  "source": "e93ceb3b4981a7be7ac11755e1afa9d4b6201902",
+  "final": "b47d5dd6cd23873c62602e02e85a8f82c9843dc5",
+  "branch": "agent/codex/fleet5-k2a-pl-r1c-20261106 (frozen; reviewer branched from exact b47)",
+  "reviewerGitCheck": "origin branch == b47d5dd6; e93^ == 084bd947; 084->b47: 3 M (README.md, effect_gate_test.go, pl_r1a_test.go) + 41 A own docs, 0 D, 0 mode change; e93->b47 non-docs 0 paths. e93 effect_gate_test.go sha256 e0c969e0...522e == clean scratch archive. Root .work/plr1c-source-root-verified.json read only (5454 unchanged base rows, both Docs runs); reviewer did not rerun owner CI or the 202-byte owner check."
+ },
+ "readInputs": [
+  "own prior review 5a3c77f6 review.json + reviewer_fix_sketch.py.txt + reviewer_plr1b_probe_test.go.txt (sha256 b0c00378...5f5b / f7fef8b8...4153 == owner review-inputs.json)",
+  "owner History 2026-11-06_FLEET5_K2A_PL_R1c_Codex.md v1.0.1 and Evidence fleet5-k2a-pl-r1c-20261106-codex (final-local-results, proof-results, review-inputs, real-N1 logs, runners)",
+  "Root .work/plr1c-source-root-verified.json in canonical fleet-five-orchestration-20261105 (read only)"
+ ],
+ "verdict": "REVISION_REQUIRED",
+ "verdictScope": "narrow: ONE new LOW (PL-R1d) inside the exact pointee-changing conversion scope; ONE cosmetic Info. Everything else in the PL-R1c delta is accepted. N1-N6 are closed; the conversion class is NOT closed while type-parameter targets bypass the rule.",
+ "accepted": {
+  "N1N6Closure": "reviewer clean e93 FULL package: N1-N6 each build0/typecheck0 and refused 'pointee-changing pointer conversion forbidden: *OWN.{plLaunder,L,L,C,n,a}'. Owner old-084 red log preserved.",
+  "ruleForNonGenericTargets": "When types.Unalias(target).Underlying() is *types.Pointer, operand must be untyped nil or pointerElement(operand) types.Identical to the target element. Verified: chained identity-then-launder C1, own->foreign reverse C2 (conservative refusal), type-param OPERAND to own pointer C3 (operand underlying is interface => refused), uncalled closure C4, function-local named type inside a helper METHOD C5, package-level var initializer C7, alias to own-pointer target C8: all refused with the intended conversion reason. Foreign named pointer identity conversion followed by a write C6 is refused by the write rule (foreign pointee write forbidden: time.Location).",
+  "controls": "P7 alias to foreign pointer identity, P8 alias element identity, P9 foreign VALUE conversion copy L(*clock.UTC), P10 typed nil own pointer: accepted. Owner P1-P6, S1/S2, R1-R7 identical in the reviewer run.",
+  "counts": "reviewer clean e93 FULL go test -p 1 -count=1 -v ./internal/migrationcontext exit 0: 19 top / 147 sub PASS, 21 OWNER_PLR1C lines (6 conversion refusals, 7 R refusals, 6 positives, 2 limits) == owner claim; go vet exit 0.",
+  "readme": "README PL-R1b-I1 sentence explicitly keeps slice/map element storage and append backing arrays unchecked (copied header / slice parameter) and says walking a SliceExpr root is not storage ownership: matches the bounded fence. Own named pointee is stated as a TYPE restriction, not storage ownership. Accepted, except the conversion sentence needs the type-parameter qualification (PL-R1d).",
+  "noProductChange": "production files unchanged (present 7 production files: no pointer conversion; the only generic is copyMap[V any])."
+ },
+ "findings": [
+  {
+   "id": "PL-R1d",
+   "severity": "LOW",
+   "blocking": "not product behaviour; blocks calling the PL-R1c conversion class / PL-R1a class (b) CLOSED",
+   "file": "services/node-agent/internal/migrationcontext/effect_gate_test.go:375 (if dst, ok := pointerElement(tv.Type); ok) with pointerElement:236-243",
+   "defect": "The rule only fires when the conversion TARGET's underlying type is a pointer. For a type parameter P the underlying type is its constraint interface, so pointerElement(P) is false and the conversion is accepted unchecked. A constraint interface{*L} or ~*L, with L an own defined type over a foreign type, makes P(foreignPtr) legal Go; the instantiated pointee is the own named L and every subsequent write passes ownPointeeWrite. The b47 README promise 'An own defined pointee name cannot launder a foreign pointer; slice-to-array-pointer conversions are refused by this rule' is therefore false for generic targets. Same process-global utcLoc object as N1.",
+   "counterexample": "4 compile-valid mutants, go build -p=1 exit0 + re-typecheck0, CURRENT e93 sourceEffects nil: G1 type L clock.Location; func launder[P interface{*L}](x *clock.Location) P {return P(x)}; *launder[*L](clock.UTC)=L{} | G2 func set[P ~*L](x *clock.Location){*P(x)=L{}}; set[*L](clock.UTC) | G3 type C x509.Certificate; func bump[P ~*C](c *x509.Certificate){(*P(c)).Version++} | G4 type a [64]byte; func bump[P ~*a](k ed25519.PrivateKey){(*P(k))[0]++} (slice->own array pointer through P). Real NON-TEST G1 file (unused, never executed) in a complete public archive of e93: go build -p 1 -buildvcs=false ./... exit 0 and TestResolvedObjectEffectBoundary (the production-source gate) exit 0 = escape.",
+   "reachability": "Not reachable in present production (no generic pointer conversion, no own type over a foreign type). Defense-in-depth static gate only.",
+   "reviewerSelfCorrection": "The 5a3c fix sketch and its contract ('target underlying POINTER') had the same omission; the owner implemented the contract as specified.",
+   "fix": "Test-only, bounded, no alias/heap analysis: compute the conversion target's pointer elements as the target's own pointer element OR, for a *types.TypeParam, every pointer term of its constraint type set (recursively through embedded interfaces and *types.Union terms); apply the existing untyped-nil / types.Identical element check to each. Add G1-G4 as conversion negatives (reason prefix 'pointee-changing pointer conversion forbidden:', type string P) and qualify the README sentence to include pointer-term type-parameter targets. Reviewer verified this SKETCH in scratch only (reviewer_plr1c_fix_sketch.py.txt): FULL package with sketch + 16 reviewer probes exit 0 on attempt 2 (20 top / 163 sub, 0 FAIL; attempt 1 was a host OOM, not a gate result), G1-G4 refused 'pointee-changing pointer conversion forbidden: P', all 75 owner cases, C1-C8 and P7-P10 unchanged, vet exit 0; real non-test G1 under the sketch: TestResolvedObjectEffectBoundary exit 1 with that reason. Production source passes unchanged. Sketch not committed."
+  }
+ ],
+ "info": [
+  {"id": "PL-R1c-I1", "severity": "INFO", "text": "pl_r1a_test.go new case-table comment has a dangling line '// otherwise the intended refusal prefix.' after the sentence it belonged to; cosmetic only."}
+ ],
+ "retainedInfo": "PL-R1b-I1 slice/map/backing storage remains declared unchecked (not a requirement here). PL-I1 factory-before-K1, PL-I2 archive operation-set auth, PL-I4 implicit Marshal dispatch/argument ownership, S2 info: tracked, not redesigned.",
+ "preservedAxes": "Accepted merge/pin/diagnostics/public refusal/product/Stage2 and PL-R1b write forms not reopened. No unbounded generics or ownership audit beyond the promised conversion fence.",
+ "notRun": "owner CI not rerun; Stage2 129 / standalone 37 not rerun; owner 202-byte check not rerun; local race (CGO 0), provisioned LAN, hosted race/LAN/main pytest/build, final Go, full Core: NOT RUN. Old Core 42164071724 / Stage1 42170068364 failures and original de71 field UNKNOWN retained. auth/clock/current/effects/entrypoint/self-measurement/install NULL/HOLD/ABSENT; A01-A40 NOT RUN; 5PC incomplete.",
+ "acceptanceIsNot": "source/code-axis judgement only; not full Core, runtime or whole K2 complete",
+ "rootOptions": [
+  "Recommended: owner adds ONE more test-only commit (effect_gate_test.go + pl_r1a_test.go + README only: type-param pointer-term rule + G1-G4 + README qualification + optional comment cleanup); Claude reviews only that delta; Root then grants ONE fresh full Core + Docs on that exact SHA.",
+  "Alternative: Root carries PL-R1d as a tracked non-blocking LOW and grants ONE full Core + Docs on b47d5dd6 now; the conversion class / class (b) must then not be cited as CLOSED and the README conversion sentence read with the generic-target caveat."
+ ],
+ "noDispatch": "No Core or owner CI dispatched by the reviewer. Only this review's own Docs run on its own branch."
+}

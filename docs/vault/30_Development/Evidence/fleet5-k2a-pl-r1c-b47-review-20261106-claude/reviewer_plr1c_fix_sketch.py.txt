@@ -1,0 +1,47 @@
+"""Claude PL-R1c b47 review fix SKETCH (scratch only, not a product change).
+Extends the b47 conversion rule to conversion targets that are type
+parameters: every pointer term in the target's type set must have an element
+types.Identical to the operand element (or the operand is untyped nil)."""
+import pathlib, sys
+p = pathlib.Path(sys.argv[1])
+s = p.read_text(encoding="utf-8")
+old_helper = "func writeTargetBoundary(expr ast.Expr, info *types.Info) error {"
+helper = '''// conversionPointerElements returns every pointer element a conversion target
+// can denote: the target itself, or each pointer term of a type parameter's
+// constraint type set (recursively through embedded interfaces and unions).
+func conversionPointerElements(t types.Type, out []types.Type) []types.Type {
+	if t == nil {
+		return out
+	}
+	switch x := types.Unalias(t).(type) {
+	case *types.TypeParam:
+		return conversionPointerElements(x.Constraint(), out)
+	case *types.Union:
+		for i := 0; i < x.Len(); i++ {
+			out = conversionPointerElements(x.Term(i).Type(), out)
+		}
+		return out
+	}
+	if iface, ok := types.Unalias(t).Underlying().(*types.Interface); ok {
+		for i := 0; i < iface.NumEmbeddeds(); i++ {
+			out = conversionPointerElements(iface.EmbeddedType(i), out)
+		}
+		return out
+	}
+	if e, ok := pointerElement(t); ok {
+		out = append(out, e)
+	}
+	return out
+}
+
+'''
+assert s.count(old_helper) == 1
+s = s.replace(old_helper, helper + old_helper)
+old = '''					if dst, ok := pointerElement(tv.Type); ok {
+						var operand types.Type'''
+new = '''					for _, dst := range conversionPointerElements(tv.Type, nil) {
+						var operand types.Type'''
+assert s.count(old) == 1
+s = s.replace(old, new)
+p.write_text(s, encoding="utf-8", newline="\n")
+print("patched", p)
