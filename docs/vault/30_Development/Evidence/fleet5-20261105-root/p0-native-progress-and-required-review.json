@@ -3,8 +3,8 @@
   "recordedAtKST": "2026-11-06T00:46:51+09:00",
   "rootBase": "2b1753ce59c09037b5e130a7ffe64794d1d45fdf",
   "priorRootCheckpoint": {
-    "SHA": "efaa6708280061ebffe8412af0373205dc7837fb",
-    "Docs": 42148006969,
+    "SHA": "6bf6dc36a05ac3cf7bb10c98c1e53647648c4857",
+    "Docs": 42152344556,
     "exactHeadCorrelationAllJobsSuccess": true,
     "remoteMatches": true,
     "syncExits": [
@@ -12,13 +12,13 @@
       0,
       0
     ],
-    "independentlyMatchedNormalizedDestinationHashes": 2780,
+    "independentlyMatchedNormalizedDestinationHashes": 2782,
     "pending": 0,
     "conflicts": 0,
     "trackedAndUntrackedClean": true,
     "rootDocsOnly": true,
     "wholeProgramComplete": false,
-    "verifiedAtKST": "2026-11-06T11:06:11+09:00"
+    "verifiedAtKST": "2026-11-06T11:46:53+09:00"
   },
   "actualPlanLowReview": {
     "source": "803ad270562b1b75e44d26f9e14b965c714ab519",
@@ -2515,7 +2515,7 @@
     "ownerT1T2T3": "msg_620855c76519",
     "normativeRevisionReply": "msg_0392caf64d5d"
   },
-  "latestRecordAtKST": "2026-11-06T11:44:14+09:00",
+  "latestRecordAtKST": "2026-11-06T12:11:22+09:00",
   "optionalLowTokenTestDelta": {
     "source": "f0af307705b4923ebc3e231db5238af4c70aa389",
     "scope": "two otherwise-valid token payload corrections and JSON validity assertions; runtime unchanged",
@@ -3094,5 +3094,20 @@
     "verdict": "REVISION_REQUIRED3Major5Low"
   },
   "K2ActualContractVerdictRootDecision": "k2-rev2-concrete-root-decision.json",
-  "BRev6ActualWholeReviewGate": "b-rev6-root-actual-whole-review-gate.json"
+  "BRev6ActualWholeReviewGate": "b-rev6-root-actual-whole-review-gate.json",
+  "BRev6ActualWholeReviewVerdict": {
+    "atKST": "2026-11-06T12:06:10+09:00",
+    "source": "ee97c27a5d135a4059256124290731cd2b791193",
+    "actualReview": "ecbdaa3beca33e4cb4efc943f6bd9c4b02620291",
+    "branch": "agent/claude/fleet5-b-rev6-ee97-review-20261106",
+    "Docs": 42154177711,
+    "job": 127684265102,
+    "correlation": "fleet5-b-rev6-review-task_98d80a7c3d96-ecbdaa3beca33e4cb4efc943f6bd9c4b02620291",
+    "rootVerifiedExactHeadRefEventAllJobsSuccess": true,
+    "remoteExact": true,
+    "reviewOnlyPaths": 18
+  },
+  "BRev7RootDecision": "b-rev7-concrete-root-decision.json",
+  "activeActualReview": null,
+  "nextReviewRequires": "actualimmutableK2rev2 orBrev7 with exactDocs; no newworker merely idle"
 }

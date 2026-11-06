@@ -1,15 +1,19 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.395"
+version: "1.0.396"
 status: "review"
 author: "Codex"
-updated: "2026-11-06T11:44:14+09:00"
+updated: "2026-11-06T12:11:22+09:00"
 source_of_truth: "Git"
 active_card: "FLEET5-20261105 five physical node orchestration"
-active_card_status: "K2actual5623 revisionneeded/rootconcreterev2delivered; B6ee97 actualClaude98d8active; K1boundedcomplete; wholephysicalincomplete"
-active_card_next: "K2Codex narrowrev2DOCS/static/exactDocs; Claude actualwholeB6verdict/ownDocs; Root exactgrantorrevisions thenK2deltaqueue; noimplementation/effectgrant"
+active_card_status: "B6actualecbd revisionneeded/rootrev7choicesdelivered; K2rev2contractpending; K1boundedcomplete; noactiveactualreview; wholephysicalincomplete"
+active_card_next: "BCodex narrowrev7DOCS/static/exactDocs; K2Codex narrowrev2contract/exactDocs; Root nextimmutableproposal ONEactualClaude thenprecisegrantorrevisions; nocode/effectsgrant"
 ---
+
+## 2026-11-06T12:11:22+09:00 B rev6 실제 판정과 rev7 구체 선택
+
+작업한 것과 확인: 실제 B rev6 검토 ecbdaa3b/Docs42154177711는2Medium·4Low 보완을 남겼다. Root는 effectClass A와 자원/claim 겹침에 따른 PENDING 차단, operation 범위의 completion fence, 미해결 호출의 기본 차단, entry별 lock 병합을 선택해 기존 담당자에게 rev7 지시를 전달했다. 서명 service·CP tombstone/outbox·B-only folder 관측의 닫힌 설계는 보존하며 제품 코드 grant는 없다. 원질문 msg_4b5c1d55aea3에 msg_8b52dd815cae로 직접 답했다. 다음 첫 행동/담당은 B Codex의 좁은 rev7 및 K2 Codex의 rev2 불변 계약·CI 제출이고, Root는 준비된 다음 제안에 단일 실제 Claude 검토를 배정한다.
 
 ## 2026-11-06T11:44:14+09:00 K2 실제 판정의 보완 지시와 B rev6 검토
 

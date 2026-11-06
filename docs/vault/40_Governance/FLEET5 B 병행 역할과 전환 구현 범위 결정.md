@@ -1,11 +1,11 @@
 ---
 doc_id: "GOV-FLEET5-B-BOOTSTRAP-SCOPE-20261106"
 title: "FLEET5 B 병행 역할과 전환 구현 범위 결정"
-version: "1.4.0"
+version: "1.4.1"
 status: "review"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-11-06T09:52:19+09:00"
+updated: "2026-11-06T12:11:22+09:00"
 source_of_truth: "Git"
 ---
 
@@ -80,3 +80,18 @@ PRE_IO obligation은 tenant/Node/epoch/operation별로 닫는다. 등록이 실�
 Signing service 자체가 ARM/RELEASE/DELEGATION 등의 현재 승인·계보·tombstone·epoch/fence를 확인한다. 외부 signer가 있으면 준비 intent 뒤 조건부 issuance publication을 검증하며 DB lock을 네트워크 너머 유지하지 않는다. CP tombstone은 권한 있는 DB principal과 causal evidence/audit로 인증하는 unsigned record로 정한다. 존재하지 않는 Node tombstone consumer·별도 domain 주장을 제거하고, authoritative outbox와 기존 signed INVALIDATE/gate ACK/expiry 경계를 명시한다. SAFE caller는 보호된 service에서 정확한 INVALIDATE만 요청하며 ARM을 요청할 수 없다.
 
 Root의 앞선 folder-confirmation 문구를 정정한다. 실제 plain activation은 등록 소유자와 revoked 여부만 확인하므로 그 동작을 보존한다. 새 folder/root 관측은 B-only readonly-root 승인에 추가하며 필요한 closed artifact/producer/rights/서명·검증자를 제안으로 명시한다. 사전 root identity 관측은 설치 후 readonly mount 증거를 대신하지 않는다. 실제72028에 이미 확인 artifact가 있다고 쓰지 않는다. 상세 지시는 b-rev6-concrete-root-decision.json이며 모든 실제 binding NULL/HOLD와 A1–A16 미실행을 유지한다.
+
+
+## rev6 실제 검토 후 rev7의 효과 유형과 차단 범위 선택
+
+실제 Claude ecbdaa3b/Docs42154177711는 B6-M1/M2와L1–L4를 남겼다. 서명 service 내부의 조건부 공개·unsigned CP tombstone와 기존 INVALIDATE outbox·B-only folder 관측의 authority/model은 설계상 닫혔다. Root는 msg_8b52dd815cae로 같은 담당자에게 한 번의 좁은 rev7 문서·schema·정적 source-plan 수정만 지시했다. 제품 구현·부분 동결·운영 인수는 허용하지 않았다.
+
+기존의 모든 IO에 동일한 불확실성 복구를 적용하던 규칙을 이 절의 **효과 유형 A**로 정정한다. SIDE_EFFECT는 불확실하면 독립된 보호 복구를 유지한다. IDEMPOTENT_SAFETY는 현재 권한 아래 정확한 원래 command hash의 독립 검증된 durable ACK/readback으로만 별도 제한된 복구 경로에서 닫을 수 있다. READ_ONLY는 실패한 관측 시도를 NO_EFFECT_ABANDONED로 일반 종료하고, 업무 차단이나 authority version 상승을 일으키지 않는다. read 실패 종료는 이전 실행 불확실성·quarantine·drain을 지우지 않으며 heartbeat/offline의 실제 상태 규칙도 유지한다. 효과 유형은 실제 method/path/handler와 등록 binding에 고정하며 caller가 낮출 수 없다.
+
+알려진 SIDE_EFFECT PENDING은 인증된 run/claim/resource/role footprint가 겹치는 새 admission만 차단한다. 불확실한 실행은 해당 tenant/Node/epoch를 보수적으로 차단하고, 범위 자체가 불명확한 PENDING도 그 operation에 한해 Node 범위를 유지한다. 정상적인 서로 다른 자원 claim의 동시 실행은 기존 capacity 규칙을 보존한다. 정확히 claim된 terminal은 DRAIN 중에도 원래 continuation 정책을 적용하며 새 R03 selection으로 바꾸지 않는다. 관측·복구는 각 kind의 목적과 parent handle로 평가한다.
+
+completion fuse의 한 operation 실패를 다른 Node의 정상 capability까지 전파하지 않는다. 실제 verifier process/incarnation 소실은 별도로 다루며 effectClass별로 안전하게 복구한다. 단순 IO ledger 기록과 보안 authority 변경의 version을 구분해 read 등록이 준비된 서명을 굶기지 않게 한다. 실제 revoke·expiry·drain·겹치는 claim 변경의 조건부 publication 검사는 유지한다.
+
+미해결 호출의 기본 분류는 UNRESOLVED이며 영향받는 entry에 인과적으로 연결한다. NONAUTHORITY는 실제 타입·import·source provenance가 있어야 한다. tuple/injected database/runtime transaction·dynamic dispatch를 닫고, 모든 미해결 항목의 scope/binding/futureWork/blocksGrant를 기록한다. 각 entry의 procedure와 감싼 원본 body lock을 합쳐 같은 row의 가장 강한 mode를 한 번에 전체 순서로 획득하며 SHARE→UPDATE 승격을 금지한다. 632개는 source plan 집계이고 실제 procedure join은39개라는 차이를 보존한다. 상세 반례·선택·합격 조건은 Root Evidence b-rev7-concrete-root-decision.json에 고정했다.
+
+실제 검토 재현은547 schema/authority·R4와 bounded stream·작은 source subset까지다. 메모리 부족으로 full source-analysis/reconcile/source-fixtures/link-plans는 재실행하지 않았다. 이를 전체1905 독립 재현으로 쓰지 않는다. 원래74MB ledger는 불변 Git에 보존하며 관리/공유 vault에 복제하지 않는다. 실제 B runtime·A1–A16·장비 인수는 미완료다.
