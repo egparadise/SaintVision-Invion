@@ -7,7 +7,7 @@
   "dispatch": "ctx_6f0f8253b8a7",
   "answeredQuestion": "msg_bccbed800e8b",
   "RootReply": "msg_1a4f33b7e3e6",
-  "actualReview": "4288a1c403bc15ac1174c49e512ab8c7314d522f",
+  "actualReview": "b-rev9d-root-narrow-review-queue-gate.json",
   "actualReviewDocs": 42240632854,
   "actualVerdict": "REVISION_REQUIRED (narrow, LOW-only; no MEDIUM; actual-source T1/A8 closure on 72028 bytes stands; A7 NodeChannels.snapshot NOT yet grantable)",
   "requiredFixes": [
@@ -18,5 +18,9 @@
   "status": "AUTHORIZED_FIX_ONLY",
   "A7Granted": false,
   "productOrRuntimeGranted": false,
-  "realBindings": "NULL_HOLD"
+  "realBindings": "NULL_HOLD",
+  "latestObservationAtKST": "2026-11-07T01:40:04+09:00",
+  "frozenCandidate": "54549b90774aab3599c0486a5217d0d1634baca8",
+  "sourceVerification": "b-rev9d-source-root-verification.json",
+  "independentAcceptance": false
 }

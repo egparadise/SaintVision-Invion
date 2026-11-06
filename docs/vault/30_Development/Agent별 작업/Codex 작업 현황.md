@@ -1,15 +1,19 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.429"
+version: "1.0.430"
 status: "review"
 author: "Codex"
-updated: "2026-11-07T01:13:19+09:00"
+updated: "2026-11-07T01:40:04+09:00"
 source_of_truth: "Git"
 active_card: "FLEET5 continued supervision with PORTAL-REFRESH-FLEET-20261106"
-active_card_status: "UIR3lintfix/newCIpending; P02Rev2/BRev9d; PC234GPUtoolkitMissing/AdminAuth; noactiveClaude; physicalincomplete"
-active_card_next: "Gemini correctedsourceCI/finalDocs then Root ONE review; Codex Rev9d/P02Rev2; localadmin GPUsetup and PC1keyresult; preserve busy containers"
+active_card_status: "BRev9d54549Claude903active; UIR3b48RootPushFirstFrontend42254157322pending; P02Rev2; actual5PCincomplete"
+active_card_next: "Root handles actualBverdict then readyUI/P02review after actualexitrelease; verifyb48CI and authorfinalDocs; noA7D04deploy until actualgates"
 ---
+
+## 2026-11-07T01:40:04+09:00 고정 보완본의 실제 검토와 Root CI 운영
+
+Rev9d54549의175추가문서·제품차이0·60생성기/42참조hash와 exactDocs19단계 성공을 Root가 확인하고, 이전 검토자의 실제 종료·해제 뒤 Claude의 좁은 검토를 시작했다. UI의 lint 최소 수정 b48c2c44도 확인해 Root가 정상 push와 첫 Frontend42254157322를 직접 실행했다. CI 결과·작성자 최종 보고·UI 독립 검토·배포는 아직 남으며 K2 Rev2와 실제5대 자원 연동도 계속 진행한다. 다음 첫 행동/담당은 Claude의 Rev9d 판정, Root의 b48 실제 CI 확인, Gemini 최종 보고와 K2 Codex Rev2 보완이다. source/CI/독립 검토/장비 인수는 따로 유지한다.
 
 ## 2026-11-07T01:13:19+09:00 실제 컨테이너 GPU 준비 조건 확인
 
