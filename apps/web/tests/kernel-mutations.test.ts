@@ -7,6 +7,7 @@ import { approvalChallengeFixture } from './fixtures/approval-challenge';
 let traceCount = 0;
 vi.mock('@/shared/api/client', () => ({
   apiClient: vi.fn(),
+  getAuthToken: () => 'isolated-kernel-mutation-session',
   generateTraceId: () => `test-intent-key-${++traceCount}`,
   clearAuthToken: () => {
     globalThis.__sv_auth_teardown_listeners?.forEach((fn) => fn());

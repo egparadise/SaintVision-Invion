@@ -64,7 +64,7 @@ function ScopedFirstWorkspacePanel({ scope, onRunObserved, onNavigateApprovals }
 
   useEffect(() => {
     const generation = ++live.current; const credential = getAuthToken();
-    setWorkspaces([]); setIntent(null); setError(null);
+    setWorkspaces([]); setIntent(null); setError(credential ? null : '인증이 종료되었습니다. 다시 로그인하세요.');
     const stop = onAuthTeardown(() => { live.current++; setIntent(null); setFrozen(null); setResult(null); setRun(null); setError('인증이 종료되었습니다. 다시 로그인하세요.'); });
     if (credential) fetchProjectWorkspaces(scope.projectId).then(rows => {
       if (live.current === generation && getAuthToken() === credential) setWorkspaces(rows);

@@ -129,16 +129,18 @@ def test_same_key_races_one_atomic_triple_and_original_snapshot_timestamp(intent
     assert counts(a)==tuple(n+v for n,v in zip(before,(1,1,1,1,1)))
 
 
-@pytest.mark.parametrize("change",["suspended-user","disabled-subject","disabled-business","revoked-kernel","role","workspace","version","spec","digest","node","containment"])
+@pytest.mark.parametrize("change",["suspended-user","suspended-project","disabled-subject","disabled-business","revoked-kernel","role","workspace","workspace-version","version","spec","digest","node","containment"])
 def test_replay_rechecks_current_authority_and_intent(intents,change):
     a=intents;item=create_intent(a);first=create_run(a,item);assert first.status_code==201,first.text
     with psycopg.connect(a.e.owner) as conn:
         if change=="suspended-user":conn.execute("UPDATE public.users SET status='suspended' WHERE user_id=%s",(a.user,))
+        if change=="suspended-project":conn.execute("UPDATE public.projects SET status='suspended' WHERE project_id=%s",(a.e.project,))
         if change=="disabled-subject":conn.execute("UPDATE inv.business_subjects SET enabled=false WHERE subject_id=%s",(a.jwt.subject("requester"),))
         if change=="disabled-business":conn.execute("UPDATE inv.business_projects SET enabled=false WHERE project_id=%s",(a.e.project,))
         if change=="revoked-kernel":conn.execute("UPDATE inv.project_grants SET enabled=false WHERE project_id=%s AND subject_id=%s",(a.e.project,a.jwt.subject("requester")))
         if change=="role":conn.execute("UPDATE public.project_members SET role_code='viewer' WHERE project_id=%s AND user_id=%s",(a.e.project,a.user))
         if change=="workspace":conn.execute("UPDATE public.workspaces SET status='suspended' WHERE workspace_id=%s",(a.workspace_id,))
+        if change=="workspace-version":conn.execute("UPDATE public.workspaces SET version=version+1 WHERE workspace_id=%s",(a.workspace_id,))
         if change=="version":conn.execute("UPDATE public.workloads SET version=version+1 WHERE workload_id=%s",(item["workload"]["workloadId"],))
         if change=="spec":conn.execute("UPDATE public.workloads SET spec=jsonb_set(spec,'{workspaceId}',to_jsonb(%s::text)) WHERE workload_id=%s",(new_id("wsp"),item["workload"]["workloadId"]))
         if change=="digest":conn.execute("UPDATE public.workloads SET spec_sha256=%s WHERE workload_id=%s",("f"*64,item["workload"]["workloadId"]))
@@ -215,9 +217,10 @@ def test_helper_privileges_rls_and_missing_context_are_real_not_superuser_result
     with psycopg.connect(a.e.runtime) as conn:
         for rollback in (False,True):
             conn.execute("SELECT set_config('inv.first_workspace_subject',%s,true)",(a.jwt.subject("requester"),))
-        conn.execute("SELECT set_config('inv.first_workspace_epoch',%s,true)",(a.e.epoch,))
+            conn.execute("SELECT set_config('inv.first_workspace_epoch',%s,true)",(a.e.epoch,))
             conn.rollback() if rollback else conn.commit()
             assert not conn.execute("SELECT nullif(current_setting('inv.first_workspace_subject',true),'')").fetchone()[0]
+            assert not conn.execute("SELECT nullif(current_setting('inv.first_workspace_epoch',true),'')").fetchone()[0]
             conn.rollback()
 
 
@@ -261,6 +264,7 @@ def test_hostile_search_path_cannot_redirect_qualified_helper_writes(intents):
     a=intents;item=create_intent(a);run_id=new_id("run")
     with a.e.db.transaction(a.e.tenant) as conn:
         conn.execute("SELECT set_config('inv.first_workspace_subject',%s,true)",(a.jwt.subject("requester"),))
+        conn.execute("SELECT set_config('inv.first_workspace_epoch',%s,true)",(a.e.epoch,))
         conn.execute("CREATE TEMP TABLE runs(marker text)")
         conn.execute("SET LOCAL search_path=pg_temp,public,inv,pg_catalog")
         conn.execute("SELECT inv.append_first_workspace_run(%s,%s,%s,%s,1,1,%s,%s)",

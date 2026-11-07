@@ -1,0 +1,18 @@
+{
+  "sourceSHA": "9907e14c1882b91dfab8ab3b441563ddba66a57b",
+  "Frontend": 42362449898,
+  "Backend": 42362454951,
+  "Docs": 42362457092,
+  "FrontendResult": "11 failed,1323 passed,1 unhandled error; 105 files,4 failed101passed; first-workspace-contract64passed, b48refresh46passed, panel4passed2failed",
+  "BackendResult": "3.12 and3.14 collection blocked by authored test indentation after local source-context insertion; no runtime test pass claimed",
+  "successfulPortalRuntimeSmoke": true,
+  "successfulDocs": true,
+  "corrections": [
+    "Fix indentation and AST-check every changed Python source",
+    "Add explicit isolated session read to existing mocks; preserve all original decision assertions and new actual-auth-change refusal",
+    "Wait for native WebCrypto completion before frozen DOM assertions; retain digest/state/gate assertions",
+    "Keep expired-session alert through effect rerender",
+    "Extend the existing strict contrast AST audit to Studio plus the new child, retaining total252 style declarations and unchanged 4.5/3.0 contrast/zero-violation checks; inventory exactly removes retired banner colored objects and adds actual child border token; no assertion or exclusion is disabled"
+  ],
+  "status": "Fresh four-workflow candidate required; no source or live acceptance claimed"
+}

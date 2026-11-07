@@ -469,6 +469,7 @@ const COLOR_LITERAL_MULTISET_BASELINE: Record<string, Record<string, number>> = 
   "features/runs/RunList.tsx": {},
   "features/runs/SealRecordPanel.tsx": {},
   "features/studio/DeveloperStudio.tsx": {},
+  "features/studio/FirstWorkspacePanel.tsx": {},
   "features/terminal/WebTerminal.tsx": {},
   "features/workspaces/ExecutionResultView.tsx": {},
   "features/workspaces/WorkspaceCreateModal.tsx": {},
@@ -3338,7 +3339,9 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
   // 9g-2. [Card 206 / ACC-09] Dynamic AST Style-Pair Contrast Calculator & Strict Coverage Ratchet: DeveloperStudio
   it('ACC-09 / Card 206: DeveloperStudio style objects maintain valid contrast pairings and reject 1:1 collisions and defective combinations', () => {
     const filePath = path.resolve(__dirname, '../src/features/studio/DeveloperStudio.tsx');
-    const content = fs.readFileSync(filePath, 'utf-8');
+    // The first-Run flow moved four style declarations out of the retired dispatch
+    // banner into this actual child. Audit both files with the same contrast rules.
+    const content = fs.readFileSync(filePath, 'utf-8') + '\n' + fs.readFileSync(path.resolve(__dirname, '../src/features/studio/FirstWorkspacePanel.tsx'), 'utf-8');
     const sf = ts.createSourceFile('DeveloperStudio.tsx', content, ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX);
 
     interface Branch {
@@ -3576,12 +3579,12 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
 
     // Exact ratchet assertions covering 100% of DeveloperStudio style declarations
     expect(totalStyleAttrs, 'Total style attributes in DeveloperStudio must be exactly 252').toBe(252);
-    expect(checkedObjects, 'Style objects with explicit background and foreground must be exactly 36').toBe(36);
-    expect(checkedPairs, 'Evaluated foreground-background pairs across conditional branches must be exactly 157').toBe(157);
-    expect(unboundColorObjects, 'Elements with foreground color inheriting container background must be exactly 92').toBe(92);
-    expect(checkedObjects + unboundColorObjects, 'Total covered color style objects must be exactly 128').toBe(128);
+    expect(checkedObjects, 'Style objects with explicit background and foreground must be exactly 35').toBe(35);
+    expect(checkedPairs, 'Evaluated foreground-background pairs across conditional branches must be exactly 154').toBe(154);
+    expect(unboundColorObjects, 'Elements with foreground color inheriting container background must be exactly 90').toBe(90);
+    expect(checkedObjects + unboundColorObjects, 'Total covered color style objects must be exactly 125').toBe(125);
     expect(checkedBorderObjects, 'Style objects with explicit border token declarations must be exactly 68').toBe(68);
-    expect(checkedBorderPairs, 'Evaluated border-background pairs across conditional and container branches must be exactly 93').toBe(93);
+    expect(checkedBorderPairs, 'Evaluated border-background pairs across conditional and container branches must be exactly 95').toBe(95);
     expect(violations, `Expected 0 style-pair contrast/collision violations in DeveloperStudio, got:\n${violations.join('\n')}`).toEqual([]);
   });
 
@@ -11428,8 +11431,8 @@ describe('ACC-09 WCAG 2.2 AA Contrast Compliance & Strict Fail-Closed Token Inve
     }
 
     // Exact count verification for var(--color-border-subtle)
-    expect(borderSubtleCount, 'var(--color-border-subtle) exact occurrence count in apps/web/src must be 487').toBe(487);
-    expect(borderSubtleFiles.size, 'var(--color-border-subtle) file count in apps/web/src must be 36').toBe(36);
+    expect(borderSubtleCount, 'var(--color-border-subtle) exact occurrence count in apps/web/src must be 488').toBe(488);
+    expect(borderSubtleFiles.size, 'var(--color-border-subtle) file count in apps/web/src must be 37').toBe(37);
 
     // Fail-closed check 3: Total files with color literals must not exceed baseline file count
     const baselineFileCount = Object.keys(COLOR_LITERAL_MULTISET_BASELINE).length;

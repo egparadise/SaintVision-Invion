@@ -6,7 +6,7 @@ import { apiClient } from '../src/shared/api/client';
 import { approveReviewed, fetchApprovalReview, reviewedAction, reviewIdentity, type ApprovalReview } from '../src/shared/api/approvalReview';
 import { ApprovalDetail } from '../src/features/approvals/ApprovalDetail';
 import { approvalReviewFixture, buildApprovalReviewFixture } from './fixtures/approval-review';
-vi.mock('../src/shared/api/client', () => ({ apiClient: vi.fn(), generateTraceId: () => 'unique-test-key' }));
+vi.mock('../src/shared/api/client', () => ({ apiClient: vi.fn(), generateTraceId: () => 'unique-test-key', getAuthToken: () => 'isolated-review-session' }));
 const api = vi.mocked(apiClient);
 beforeEach(() => { api.mockReset(); });
 const item = (): ApprovalItem => ({ id: approvalReviewFixture.approval.approvalId,

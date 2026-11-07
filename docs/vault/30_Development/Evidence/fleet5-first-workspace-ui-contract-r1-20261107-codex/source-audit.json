@@ -1,0 +1,349 @@
+{
+  "atKST": "2026-11-07T19:14:08.885798+09:00",
+  "deliveryBase": "1efea494f026e932360c35ae811b6423d874a2e7",
+  "backendBase": "1efea494f026e932360c35ae811b6423d874a2e7",
+  "importedFrontendSource": "b48c2c4492f8aea4b55c33161733a9a6fb9eed8c",
+  "frozenRoot": "23a6cadef31053a35deae187c6991e48ebd70ff0",
+  "checkoutHEAD": "9907e14c1882b91dfab8ab3b441563ddba66a57b",
+  "note": "Working source/data audit; final committed SHA is supplied by publication receipt, not predicted here",
+  "imports": [
+    {
+      "path": "apps/web/nginx.conf",
+      "ref": "b48c2c4492f8aea4b55c33161733a9a6fb9eed8c",
+      "blob": "21d35ed113befa1325d23d3f2ef6459966e25ce0",
+      "bytes": 5432,
+      "SHA256": "f4acab57ffe9807efc415d0cc3e2690db1b357d7535ac094b519cd923d0d36f4",
+      "currentAcceptedBytesPreserved": true,
+      "integrationAdjustment": null
+    },
+    {
+      "path": "apps/web/src/app/App.tsx",
+      "ref": "b48c2c4492f8aea4b55c33161733a9a6fb9eed8c",
+      "blob": "bf41cbd21e0679e90fd794b27e8491caf34eeb1f",
+      "bytes": 49965,
+      "SHA256": "21939698561f9f7f0d5825b33f0aefb1070a20d1fdbf62ff42d6475266cbeaa4",
+      "currentAcceptedBytesPreserved": true,
+      "integrationAdjustment": null
+    },
+    {
+      "path": "apps/web/src/features/auth/session.ts",
+      "ref": "b48c2c4492f8aea4b55c33161733a9a6fb9eed8c",
+      "blob": "5c7ce76a26eaef39b1e571fa5c3aa66c1456b2b9",
+      "bytes": 35704,
+      "SHA256": "4df0f6413607577301891b068c63a9e2e96bce79e1d036ea9f231a67b3fe6cba",
+      "currentAcceptedBytesPreserved": true,
+      "integrationAdjustment": null
+    },
+    {
+      "path": "apps/web/src/features/dashboard/ClusterOverview.tsx",
+      "ref": "b48c2c4492f8aea4b55c33161733a9a6fb9eed8c",
+      "blob": "cb92fbe28c3de112d11b511b2957ca62f27f6e6a",
+      "bytes": 24139,
+      "SHA256": "f68909d98891de0a377ed7dce55a3bd8498ccb8014c7d10f67352062819aa48e",
+      "currentAcceptedBytesPreserved": true,
+      "integrationAdjustment": null
+    },
+    {
+      "path": "apps/web/src/features/desktop/ResourceExplorer.tsx",
+      "ref": "b48c2c4492f8aea4b55c33161733a9a6fb9eed8c",
+      "blob": "2ee822b647708dcae362bb289990b0c88bbc35e8",
+      "bytes": 136298,
+      "SHA256": "7d8dfb516d4fbc82e4686e1db03d5b9d0016a8195e9312f45ae272c16e0f320b",
+      "currentAcceptedBytesPreserved": true,
+      "integrationAdjustment": null
+    },
+    {
+      "path": "apps/web/src/shared/api/projectObservation.ts",
+      "ref": "b48c2c4492f8aea4b55c33161733a9a6fb9eed8c",
+      "blob": "0331832d17e4606bb389cec1330520e4d27574a9",
+      "bytes": 2149,
+      "SHA256": "0fe50dc2f7b5d5aa97b7e81bc16cbe1617986da6ca60e103c48a87c58db659d0",
+      "currentAcceptedBytesPreserved": true,
+      "integrationAdjustment": null
+    },
+    {
+      "path": "apps/web/src/shared/api/runApprovalObservation.ts",
+      "ref": "b48c2c4492f8aea4b55c33161733a9a6fb9eed8c",
+      "blob": "6e592d6e9cf4ed611e38ff17187201fa83f8e859",
+      "bytes": 2531,
+      "SHA256": "86f619628444fdc4b33754a16542eaee28e682eabe8b75a77f631b0619084718",
+      "currentAcceptedBytesPreserved": true,
+      "integrationAdjustment": null
+    },
+    {
+      "path": "apps/web/src/shared/ui/Header.tsx",
+      "ref": "b48c2c4492f8aea4b55c33161733a9a6fb9eed8c",
+      "blob": "10ed412640f5151251a25d14e8e5405b62340d14",
+      "bytes": 11244,
+      "SHA256": "cfbf858b1d4546532eec154edbdbac91bb45df680bd8d3331488839ae0e41b3a",
+      "currentAcceptedBytesPreserved": true,
+      "integrationAdjustment": null
+    },
+    {
+      "path": "apps/web/tests/fixture-problem-codes-integrity.test.ts",
+      "ref": "b48c2c4492f8aea4b55c33161733a9a6fb9eed8c",
+      "blob": "10ba09f5341d6456938c5db50145154ff320b952",
+      "bytes": 2369,
+      "SHA256": "be0e458b2a7a8eaf81949e50f8bad2906d7e02c0169c266068b5274d03b84c24",
+      "currentAcceptedBytesPreserved": true,
+      "integrationAdjustment": null
+    },
+    {
+      "path": "apps/web/tests/portal-refresh-fleet-ui.test.tsx",
+      "ref": "b48c2c4492f8aea4b55c33161733a9a6fb9eed8c",
+      "blob": "e14d7f697bd6e5684fe853d2e607f06606d7b1ed",
+      "bytes": 51985,
+      "SHA256": "571beaae7c9ca3231e8d6231fc1521350813d19e67015b0bff351126bf332950",
+      "currentAcceptedBytesPreserved": true,
+      "integrationAdjustment": null
+    },
+    {
+      "path": "apps/web/vite.config.ts",
+      "ref": "b48c2c4492f8aea4b55c33161733a9a6fb9eed8c",
+      "blob": "0c5e084b9c58099c8794aec6d966bd6860070767",
+      "bytes": 1283,
+      "SHA256": "8cfeffe85ec2f5eaaf2242f2d3e146588f6a007d6aa0087e2841d5992a2f3700",
+      "currentAcceptedBytesPreserved": true,
+      "integrationAdjustment": null
+    }
+  ],
+  "oldMigrationFilesUnchanged": 109,
+  "oldSchemaDefinitionsUnchanged": 184,
+  "unchangedTrees": {
+    "src": "5507dfb820d54a8778c4cf5e3551368f11b6105f",
+    "deploy": "5a98abd52d78c2dea952b257123bea2f01dffa64",
+    ".github": "1fd636d0791458f131f13df3201f362e45155006",
+    "skills": "dc117f0b750e4ff029e87b5f7ed53ee2f69862ca",
+    "docs/sources": "ace2050db53e98c7e876bee7668c8450095ec74d"
+  },
+  "changedPythonASTCount": 17,
+  "changes": [
+    {
+      "path": "apps/web/nginx.conf",
+      "bytes": 5432,
+      "SHA256": "f4acab57ffe9807efc415d0cc3e2690db1b357d7535ac094b519cd923d0d36f4"
+    },
+    {
+      "path": "apps/web/src/app/App.tsx",
+      "bytes": 49965,
+      "SHA256": "21939698561f9f7f0d5825b33f0aefb1070a20d1fdbf62ff42d6475266cbeaa4"
+    },
+    {
+      "path": "apps/web/src/features/auth/session.ts",
+      "bytes": 35704,
+      "SHA256": "4df0f6413607577301891b068c63a9e2e96bce79e1d036ea9f231a67b3fe6cba"
+    },
+    {
+      "path": "apps/web/src/features/dashboard/ClusterOverview.tsx",
+      "bytes": 24139,
+      "SHA256": "f68909d98891de0a377ed7dce55a3bd8498ccb8014c7d10f67352062819aa48e"
+    },
+    {
+      "path": "apps/web/src/features/desktop/ResourceExplorer.tsx",
+      "bytes": 136298,
+      "SHA256": "7d8dfb516d4fbc82e4686e1db03d5b9d0016a8195e9312f45ae272c16e0f320b"
+    },
+    {
+      "path": "apps/web/src/features/studio/DeveloperStudio.tsx",
+      "bytes": 129707,
+      "SHA256": "5f3b31ad1796c803f0fc9d62acffe5067505fdb92560e578c5c99ce8c29bd542"
+    },
+    {
+      "path": "apps/web/src/features/studio/FirstWorkspacePanel.tsx",
+      "bytes": 18527,
+      "SHA256": "446a2d587677472f63eafc3577347bdc598e825d07a05ad37e8665bbc7e765a2"
+    },
+    {
+      "path": "apps/web/src/shared/api/firstWorkspace.ts",
+      "bytes": 21993,
+      "SHA256": "9069156f6731ed7cbd7f501ba0aa567dfbb4150f1fa22aa6e87023d4b9879d0d"
+    },
+    {
+      "path": "apps/web/src/shared/api/kernelMutations.ts",
+      "bytes": 6039,
+      "SHA256": "f2fb25b933ef5f2608870e6fc05df1bca5f32d0cec2e814ed816a0cb5fe5f41a"
+    },
+    {
+      "path": "apps/web/src/shared/api/projectObservation.ts",
+      "bytes": 2149,
+      "SHA256": "0fe50dc2f7b5d5aa97b7e81bc16cbe1617986da6ca60e103c48a87c58db659d0"
+    },
+    {
+      "path": "apps/web/src/shared/api/runApprovalObservation.ts",
+      "bytes": 2531,
+      "SHA256": "86f619628444fdc4b33754a16542eaee28e682eabe8b75a77f631b0619084718"
+    },
+    {
+      "path": "apps/web/src/shared/api/workspaceFirstIntent.ts",
+      "bytes": 4848,
+      "SHA256": "1f85156af8b55b45a67fa517702f93b9acacd5a4c6c15dae4415f370b112ac88"
+    },
+    {
+      "path": "apps/web/src/shared/ui/Header.tsx",
+      "bytes": 11244,
+      "SHA256": "cfbf858b1d4546532eec154edbdbac91bb45df680bd8d3331488839ae0e41b3a"
+    },
+    {
+      "path": "apps/web/tests/acc09-contrast-tokens.test.tsx",
+      "bytes": 685163,
+      "SHA256": "54f9e213e1a8fa4a3f17cd11c4ae12bfe48eafcbc2df464ea3a6250d0fc5d361"
+    },
+    {
+      "path": "apps/web/tests/approval-review.test.tsx",
+      "bytes": 7247,
+      "SHA256": "d93e6388b78044a8f8df51f879f84024250177888094a090099b25c67fbecfe1"
+    },
+    {
+      "path": "apps/web/tests/first-workspace-contract.test.ts",
+      "bytes": 22353,
+      "SHA256": "a4151f8855815611a4a64a5e46cd7baba7b7280e70662eb87275b2543444bbf6"
+    },
+    {
+      "path": "apps/web/tests/first-workspace-panel.test.tsx",
+      "bytes": 8723,
+      "SHA256": "e66c64eede0353ca81208a08ab8bee9dbc48d7f65fe425814e9e31828e1e2eef"
+    },
+    {
+      "path": "apps/web/tests/fixture-problem-codes-integrity.test.ts",
+      "bytes": 2369,
+      "SHA256": "be0e458b2a7a8eaf81949e50f8bad2906d7e02c0169c266068b5274d03b84c24"
+    },
+    {
+      "path": "apps/web/tests/fixtures/first-workspace-golden.json",
+      "bytes": 12201,
+      "SHA256": "248a3b7abf4ebbeaae4e6854d33f1f0a619f0361ab0accde7a031c52e421c523"
+    },
+    {
+      "path": "apps/web/tests/kernel-mutations.test.ts",
+      "bytes": 11781,
+      "SHA256": "4b35b386c7298343ef2e1e68ff69d599361c92d6b3df61fe54e0cc1bdb407997"
+    },
+    {
+      "path": "apps/web/tests/portal-refresh-fleet-ui.test.tsx",
+      "bytes": 51985,
+      "SHA256": "571beaae7c9ca3231e8d6231fc1521350813d19e67015b0bff351126bf332950"
+    },
+    {
+      "path": "apps/web/vite.config.ts",
+      "bytes": 1283,
+      "SHA256": "8cfeffe85ec2f5eaaf2242f2d3e146588f6a007d6aa0087e2841d5992a2f3700"
+    },
+    {
+      "path": "contracts/v1alpha1/core.schema.json",
+      "bytes": 183358,
+      "SHA256": "0f7bd5f35e5f3747020220e263c465f96c5c92bcad94eb47073d66ac4cba9e87"
+    },
+    {
+      "path": "migrations/versions/0068_first_workspace_intent.py",
+      "bytes": 676,
+      "SHA256": "d22e5d2cad43bbe673e222ff5b0e7d866539fdf982cb2c9bf8404f105cb661b3"
+    },
+    {
+      "path": "packages/contracts-go/contracts.go",
+      "bytes": 54288,
+      "SHA256": "0be4a569162de3b738808cd3e11feda8efcc0aff52e15d1599c105ac79bdf750"
+    },
+    {
+      "path": "packages/contracts-ts/src/index.ts",
+      "bytes": 37485,
+      "SHA256": "7138bbcdcd9ce8bca21066c5e5d908401420a0d0a09fbf064f3df339663c4d6f"
+    },
+    {
+      "path": "services/control-plane/src/inv/app.py",
+      "bytes": 59660,
+      "SHA256": "a5aa847ae287fc870031b4abefb7fb06bafe60482828198da3878f8a381ab5a3"
+    },
+    {
+      "path": "services/control-plane/src/inv/generated/core.schema.json",
+      "bytes": 183358,
+      "SHA256": "0f7bd5f35e5f3747020220e263c465f96c5c92bcad94eb47073d66ac4cba9e87"
+    },
+    {
+      "path": "services/control-plane/src/inv/generated/models.py",
+      "bytes": 75542,
+      "SHA256": "58b710edd97f317118e66f12959ae0b79b9e90e52ff8ef40ed02420d04b7962d"
+    },
+    {
+      "path": "services/control-plane/src/inv/migrations/0068_first_workspace_intent.sql",
+      "bytes": 14771,
+      "SHA256": "8b79f55289661d7590dbe24e60d60d319360e7fcaf35454fe21c722fe11905d3"
+    },
+    {
+      "path": "services/control-plane/src/inv/workspace_intents.py",
+      "bytes": 11776,
+      "SHA256": "7b51fb02f5a79383e50edc3be8bce4a56155e3d94aa4d2d9b248c05f94207dd1"
+    },
+    {
+      "path": "services/node-agent/internal/wire/core.schema.json",
+      "bytes": 183358,
+      "SHA256": "0f7bd5f35e5f3747020220e263c465f96c5c92bcad94eb47073d66ac4cba9e87"
+    },
+    {
+      "path": "tests/core/test_build_policy_resource_budget.py",
+      "bytes": 2946,
+      "SHA256": "9ce2118ca4a5ecbfcb9a0276f8eff923b85857ac1983276bdd542cf987fd9054"
+    },
+    {
+      "path": "tests/core/test_eval_suite_project_scope_migration.py",
+      "bytes": 12868,
+      "SHA256": "955b12d91901e1acb29f5b294d567a865a705025f874252f01f7b272b33e7019"
+    },
+    {
+      "path": "tests/core/test_model_version_measurements_migration.py",
+      "bytes": 29091,
+      "SHA256": "27b2ff4436f15e98fddbbf5763e83601370b81c74bfcea8494ebc420d31ff843"
+    },
+    {
+      "path": "tests/core/test_object_store_locator_migration.py",
+      "bytes": 7983,
+      "SHA256": "251cb2ab3ac7b1f013c1c54f36ca4679b8bc2b90f1af21c7465b40a16b9e9fb0"
+    },
+    {
+      "path": "tests/core/test_release_acceptance_resolver.py",
+      "bytes": 5230,
+      "SHA256": "909fd7d2259782797825a77b781bc16ea6de420e1888187f1af20cb93f3ba84c"
+    },
+    {
+      "path": "tests/core/test_workspace_first_intent_contract.py",
+      "bytes": 3184,
+      "SHA256": "d7c8d5f9f0c83d3f9afea6a71159b17a856b3a3e8be3cd6eeb643e2d9f06dd33"
+    },
+    {
+      "path": "tests/integration/test_eval_suite_project_scope_real_pg.py",
+      "bytes": 14497,
+      "SHA256": "45b5167d4a3b82d001437e5a19968f26eaede0fac14412ebd05f5ee722222d7f"
+    },
+    {
+      "path": "tests/integration/test_model_version_digest_scope_real_pg.py",
+      "bytes": 13845,
+      "SHA256": "8719029b4bcf372c4cc5d8a493b1432937bc1e738f20b2ac3d7b07037ad038e9"
+    },
+    {
+      "path": "tests/integration/test_model_version_measurements_real_pg.py",
+      "bytes": 29809,
+      "SHA256": "cdbd583112bf02501ae17d89239f08587f4c885d41fd8e003f3e1ea178f82435"
+    },
+    {
+      "path": "tests/integration/test_release_acceptance_resolver_real_pg.py",
+      "bytes": 22392,
+      "SHA256": "edaca0bc4c24bdbf1cd70abe6c3acd242274d2a30745466ca4ed1822f4c4144d"
+    },
+    {
+      "path": "tests/integration/test_workspace_first_intents.py",
+      "bytes": 19109,
+      "SHA256": "c6d50556e71821d7446b7f9fe9046d06a69dd25f9883edeb78ea42b93d54d469"
+    },
+    {
+      "path": "tools/definer-policy.json",
+      "bytes": 5235,
+      "SHA256": "bd8ee78e0bd1d6f731d9823e3c7ef22170c32c3e50c9ca78ee030ba52b810123"
+    }
+  ],
+  "fullCanonicalSyncBytes": 500344,
+  "fullCanonicalSyncSHA256": "368bc72302840e416fdfe5c9fb01a2f0753e244cd40c055a8a07a5c967d07ab9",
+  "fullCanonicalSyncUnchanged": true,
+  "localProductTestExecution": false,
+  "actualHardwareOrApprovalExecution": false,
+  "independentReview": "PENDING_ACTUAL_CLAUDE",
+  "wholeProgramComplete": false
+}

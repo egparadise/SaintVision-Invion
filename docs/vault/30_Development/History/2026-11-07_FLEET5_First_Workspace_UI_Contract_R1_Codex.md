@@ -1,7 +1,7 @@
 ---
 doc_id: "HISTORY-FLEET5-FIRST-WORKSPACE-UI-R1-20261107-CODEX"
 title: "FLEET5 first Workspace UI contract R1"
-version: "1.0.1"
+version: "1.0.2"
 status: "review"
 author: "Codex"
 updated: "2026-11-07"
@@ -19,3 +19,5 @@ Tests use explicitly isolated identities and a cross-language data vector derive
 Local source/docs/ontology/path/single-source/sync CHECK evidence, exact candidate SHA/workflow jobs/steps/artifact digests, backend tree identity and final handoff will be added after their actual execution. Full canonical sync-state before/after bytes must match; no APPLY or old-vault export is permitted. Prior untracked publication receipts are preserved.
 
 Next action: Codex B integrates Root's exact bounded API candidate and completes hosted tests/build/docs; Root requests actual independent Claude review and owns protected PC3 API/portal routing, real identities/votes and actual Run execution. Implementation, local checks, CI, independent review and operations are separate acceptance states. Original19HOLD/discharges0/runtimeB0/A1-A16/H1-H7/H3EA/RDNULL_HOLD/raw7UNREGISTERED/A01-A40NOT_RUN remain unchanged. No browser/Run/5PC or whole-program completion is claimed.
+
+Hosted correction evidence: [first candidate](../Evidence/fleet5-first-workspace-ui-contract-r1-20261107-codex/first-ci-corrections.json), [second candidate](../Evidence/fleet5-first-workspace-ui-contract-r1-20261107-codex/second-ci-corrections.json). The second portal hardened runtime smoke and Docs succeeded, while unit tests and Backend collection failed; no failed candidate is accepted. [Source audit](../Evidence/fleet5-first-workspace-ui-contract-r1-20261107-codex/source-audit.json) verifies the exact eleven b48 imports, all prior migration bytes, prior schema definitions and protected source/deploy/workflow trees. Corrected code needs new exact Frontend/Core/Backend/Docs runs.

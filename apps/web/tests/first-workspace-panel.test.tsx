@@ -10,6 +10,13 @@ let root: Root; let host: HTMLDivElement;
 const ready = { workspaceId: golden.workload.workspaceId, projectId: golden.scope.projectId, name: 'Isolated CPU Workspace',
   status: 'ready', nodeId: golden.workload.targetNodeId, toolName: null, createdAt: '2026-11-07T00:00:00Z', allowedNext: ['suspended'] };
 const buttons = () => Array.from(host.querySelectorAll('button'));
+async function untilVisible(test: () => boolean) {
+  const deadline = Date.now() + 2000;
+  while (!test() && Date.now() < deadline) {
+    await act(async () => { await new Promise(resolve => setTimeout(resolve, 10)); });
+  }
+  expect(test(), host.textContent ?? 'Missing first Workspace UI').toBe(true);
+}
 beforeEach(() => {
   (globalThis as any).IS_REACT_ACT_ENVIRONMENT = true;
   sessionStorage.clear(); client.clearAuthToken(); client.setAuthToken('isolated-panel-token');
@@ -71,6 +78,7 @@ describe('first Workspace visible prerequisite and scope guards', () => {
     const prepare = buttons().find(b => b.textContent?.startsWith('입력 동결'))!;
     expect(prepare.disabled).toBe(false);
     await act(async () => prepare.click());
+    await untilVisible(() => host.querySelector('[data-testid="first-frozen-action"]') !== null);
     expect(host.querySelector('[data-testid="first-frozen-action"]')?.textContent).toContain(golden.prepared.approval.actionDigest);
     expect(host.querySelector('[data-testid="first-run-state"]')?.textContent).toContain('awaiting_approval');
     expect(buttons().find(b => b.textContent?.startsWith('원래 요청자 enqueue'))?.disabled).toBe(true);
