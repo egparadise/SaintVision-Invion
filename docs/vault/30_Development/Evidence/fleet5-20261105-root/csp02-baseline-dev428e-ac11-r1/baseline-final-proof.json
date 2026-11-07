@@ -1,0 +1,31 @@
+{
+  "atKST": "2026-11-08T02:34:05+09:00",
+  "runID": 42396627296,
+  "source": "428e5fc6b822d33e7e76316f443716b03579efa0",
+  "branch": "agent/codex/fleet5-csp-static-validator-r1-20261108",
+  "correlation": "fleet5-root-csp02-baseline-dev428e-7179ec272d3b4ae9ad2ed1432ee9b3cd",
+  "workflow": ".github/workflows/ac11-accessibility-e2e.yml",
+  "attempt": 1,
+  "watchExit": 1,
+  "conclusion": "failure",
+  "jobID": 128475294431,
+  "failedSteps": [
+    "Run desktop accessibility invariants in real Chrome",
+    "Upload accessibility E2E evidence"
+  ],
+  "exactSourceRefPathCorrelationEventAttempt1": true,
+  "actualDevPathFailureConfirmed": true,
+  "exactCJSDefaultImportSyntaxErrorCaptured": true,
+  "observedFailureSnippets": [
+    "2026-11-07T17:32:31.7765376Z   [BROWSER PAGEERROR] The requested module '/src/contracts/node-certificate-validator.cjs?import' does not provide an export named 'default'",
+    "2026-11-07T17:32:31.7831850Z playwright._impl._errors.TimeoutError: Locator.wait_for: Timeout 10000ms exceeded.",
+    "2026-11-07T17:32:31.7832530Z   - waiting for locator(\"header\") to be visible"
+  ],
+  "officialJobLogSHA256": "9bdb52a85d19b3e0389ee406b7659bd576b9e8e7d1c55e46f8774e0737ed0553",
+  "officialJobLogBytes": 183381,
+  "staticReviewCausalChainRemainsSeparateFromRuntimeErrorText": true,
+  "runtimeFailureExpectedNotSuccess": true,
+  "productAcceptance": false,
+  "mainProductExecution": false,
+  "wholeProgramComplete": false
+}

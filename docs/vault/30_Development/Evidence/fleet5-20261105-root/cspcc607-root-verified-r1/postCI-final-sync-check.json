@@ -1,0 +1,14 @@
+{
+  "command": "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe -B tools/sync_obsidian.py --check",
+  "exit": 0,
+  "atKST": "2026-11-08T02:59:59.187662+09:00",
+  "bytes": 529870,
+  "SHA256": "43600e1941cb3527e80adc2daac2064c53a44d129094da53869e6f50d46e334e",
+  "fullBytesEqual": true,
+  "apply": false,
+  "managedFiles": 4981,
+  "pendingExports": 2530,
+  "conflicts": 0,
+  "noWrites": true,
+  "interpretation": "Older source-branch view only; Root integrates own delta and must not export this old whole vault"
+}

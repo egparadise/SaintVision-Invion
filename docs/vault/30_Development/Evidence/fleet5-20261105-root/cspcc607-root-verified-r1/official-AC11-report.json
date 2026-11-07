@@ -1,0 +1,133 @@
+{
+  "schemaVersion": "1.2.0",
+  "runPurpose": "s11-ac11-accessibility-e2e-hosted",
+  "axis": "accessibility-e2e",
+  "sourceRunId": "42398681339",
+  "sourceHeadSha": "cc6076254d5b8f54804081a8b1994d76d86cf81a",
+  "checkoutTreeSha": "793d1f02d580ebbdc67669709f528ef6e10b07d7",
+  "cleanCheckout": true,
+  "startedAt": "2026-11-07T17:56:17Z",
+  "finishedAt": "2026-11-07T17:57:38.110984Z",
+  "environment": {
+    "topology": "github-hosted-single-runner",
+    "runnerImage": "ubuntu26-Linux-X64",
+    "browser": "Google Chrome 156.0.8078.79 (Blink engine)",
+    "frontendTransport": "vite-dev-server-with-browser-node-fixture",
+    "credentialsRequired": false,
+    "physicalFiveNodeComparable": false
+  },
+  "targetRef": {
+    "commit": "505a5f4b040badfbe1e703d5cac091ddf1db9620",
+    "path": "docs/vault/30_Development/S11_AC11_accessibility_user_device_target_v1.md",
+    "blob": "737853bbde0bc3da077c37acea132552e55f8eb9",
+    "criteria": {
+      "canonicalJourneyFailureCount": {
+        "operator": "eq",
+        "value": 0
+      },
+      "desktopInvariantFailureCount": {
+        "operator": "eq",
+        "value": 0
+      },
+      "contrastFailureCount": {
+        "operator": "eq",
+        "value": 0
+      },
+      "keyboardFailureCount": {
+        "operator": "eq",
+        "value": 0
+      },
+      "manualAcceptanceMissingCount": {
+        "operator": "eq",
+        "value": 0
+      }
+    }
+  },
+  "verdict": "MEASURED_FAIL",
+  "acceptanceClaim": false,
+  "artifactSha256": null,
+  "artifactStatus": "PENDING_UPLOAD",
+  "artifactUnit": "github-actions-uploaded-zip",
+  "cleanup": {
+    "isolatedBrowserContainerRemoved": true,
+    "producerTempResidueCount": null
+  },
+  "limitation": "hosted automatic measurement; same-SHA user-device keyboard/screen-reader acceptance absent",
+  "payload": {
+    "journeyIds": [
+      "test_actual_browser_quorum_snapshot_and_no_duplicate_vote",
+      "test_actual_browser_stale_run_and_revoked_review_are_rejected",
+      "test_browser_real_catalogue_owner_scope_and_revocation",
+      "test_browser_real_committed_model_and_current_permission",
+      "test_full_studio_login_project_approval_and_logout"
+    ],
+    "browserPhysicalCaseCount": 6,
+    "invariantIds": [
+      "inv01_bidirectionalSwitcher",
+      "inv02_trafficLightControls",
+      "inv03_dynamicZIndex",
+      "inv04_dockIntegration",
+      "inv05_keyboardAltTab",
+      "inv06_modalEscapeDismissal",
+      "inv07_layoutPersistence",
+      "inv08_colorContrastAA",
+      "inv09_honestCapacityMetrics"
+    ],
+    "inputDigests": {
+      "browserProofSha256": "ea3434dbce69039872369cc62e21e6eb8db8ed4883b7472689b65806c24d23be",
+      "caseIdentitiesSha256": "2c9607e9d71244a90f1d6972ff0f34005b39d0f73019bc827b5cbd055a4903e9",
+      "browserJunitSha256": "73b54a5a7c35f5665c2627845963cd35bb51a50e8e5240e28a6bc6cb98143d72",
+      "desktopInvariantSha256": "671eedf279a11a608e75ae61ac78c5845da67bca3b1dbdd63455cecd5b03163e"
+    },
+    "observations": [
+      {
+        "metric": "canonicalJourneyFailureCount",
+        "n": 5,
+        "successCount": 5,
+        "failureCount": 0,
+        "skipCount": 0,
+        "value": 0,
+        "errorsByClass": {}
+      },
+      {
+        "metric": "desktopInvariantFailureCount",
+        "n": 9,
+        "successCount": 9,
+        "failureCount": 0,
+        "skipCount": 0,
+        "value": 0,
+        "errorsByClass": {}
+      },
+      {
+        "metric": "contrastFailureCount",
+        "n": 3,
+        "successCount": 3,
+        "failureCount": 0,
+        "skipCount": 0,
+        "value": 0,
+        "errorsByClass": {}
+      },
+      {
+        "metric": "keyboardFailureCount",
+        "n": 2,
+        "successCount": 2,
+        "failureCount": 0,
+        "skipCount": 0,
+        "value": 0,
+        "errorsByClass": {}
+      },
+      {
+        "metric": "manualAcceptanceMissingCount",
+        "n": 1,
+        "successCount": 0,
+        "failureCount": 1,
+        "skipCount": 0,
+        "value": 1,
+        "errorsByClass": {
+          "manual-acceptance-not-supplied": 1
+        }
+      }
+    ]
+  },
+  "payloadSha256": "cfb1d02e8e1770eb94f88d983116b30b713b92253474db9e274fd2451a9c5121"
+}

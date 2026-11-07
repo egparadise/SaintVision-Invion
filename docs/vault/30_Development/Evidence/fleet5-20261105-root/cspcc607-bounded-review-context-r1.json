@@ -1,0 +1,73 @@
+{
+  "atKST": "2026-11-08T03:10:29+09:00",
+  "taskID": "FLEET5-CSP02-CC607-BOUNDED-DELTA-REVIEW-PREP-20261108",
+  "owner": "Root Codex",
+  "managementBase": "41c3e18ff16d97299567a0403ce018c2ca767ea5",
+  "sourceCandidate": "cc6076254d5b8f54804081a8b1994d76d86cf81a",
+  "deltaBase": "428e5fc6b822d33e7e76316f443716b03579efa0",
+  "inheritedSoundR1Review": "4a29b57e6c6ccb75eed50147c00d52d3c8d6ac04",
+  "authorLifecycle": {
+    "state": "succeeded",
+    "stage": "settled",
+    "liveness": "exited",
+    "terminalState": "released"
+  },
+  "officialFreshCI": [
+    {
+      "workflow": "frontend",
+      "runID": 42398676174,
+      "correlation": "fleet5-cr-csp02-esm-dev-compat-frontend-027b7e5070bc421a850566f3f6536e4a",
+      "exactSourceRefPathEventAttempt1": true,
+      "jobs": [
+        {
+          "id": 128481506876,
+          "name": "Portal Container Build & Hardened Runtime Smoke",
+          "steps": 14,
+          "allSuccess": true
+        },
+        {
+          "id": 128481507227,
+          "name": "frontend",
+          "steps": 17,
+          "allSuccess": true
+        }
+      ]
+    },
+    {
+      "workflow": "docs",
+      "runID": 42398678884,
+      "correlation": "fleet5-cr-csp02-esm-dev-compat-docs-c25f9ede2f13420bad258a433c295bcd",
+      "exactSourceRefPathEventAttempt1": true,
+      "jobs": [
+        {
+          "id": 128481515015,
+          "name": "docs",
+          "steps": 19,
+          "allSuccess": true
+        }
+      ]
+    },
+    {
+      "workflow": "ac11-accessibility-e2e",
+      "runID": 42398681339,
+      "correlation": "fleet5-cr-csp02-esm-dev-compat-ac11-accessibility-e2e-b9eed416f63b43538106690cc3bd8cd1",
+      "exactSourceRefPathEventAttempt1": true,
+      "jobs": [
+        {
+          "id": 128481522162,
+          "name": "accessibility-e2e",
+          "steps": 14,
+          "allSuccess": true
+        }
+      ]
+    }
+  ],
+  "automatedCaseSummary": "1351 unit tests,6 browser cases,5 journeys,9 invariants,3 contrast and2 keyboard checks pass",
+  "normalizedAC11Verdict": "MEASURED_FAIL",
+  "manualAcceptanceMissingCount": 1,
+  "manualAcceptanceGateDischarged": false,
+  "sourceIndependentReview": "READY_ONE_ACTUAL_BOUNDED_CLAUDE_DELTA_REVIEW",
+  "actualNewFrontendActivation": "NOT_RUN",
+  "genuineWorkspaceReadyVersion2NodeNull": "PRESERVED",
+  "wholeProgramComplete": false
+}

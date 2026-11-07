@@ -1,0 +1,64 @@
+{
+  "base": "428e5fc6b822d33e7e76316f443716b03579efa0",
+  "backendSource": "96afd799d49717fd40e4ddabd538d82accbe1958",
+  "paths": {
+    "contracts": {
+      "baseObject": "b2b24a6d9baf24302f3590f4f30fe851ccb81ef1",
+      "unchanged": true
+    },
+    "packages": {
+      "baseObject": "7c445bdbc929f6597c0b39b598f9726032c67ad7",
+      "unchanged": true
+    },
+    "services": {
+      "baseObject": "5c9918adc48c76c88b5119f44516bb332924f067",
+      "unchanged": true
+    },
+    "migrations": {
+      "baseObject": "b1d35598829437c39dab7f60e9521bf8627e6832",
+      "unchanged": true
+    },
+    "src": {
+      "baseObject": "5507dfb820d54a8778c4cf5e3551368f11b6105f",
+      "unchanged": true
+    },
+    "tests": {
+      "baseObject": "f0c6e9f537989b71f57b2185fd43c6abbaf4369e",
+      "unchanged": true
+    },
+    "deploy": {
+      "baseObject": "5a98abd52d78c2dea952b257123bea2f01dffa64",
+      "unchanged": true
+    },
+    "apps/studio": {
+      "baseObject": "faf648da92d7f63e74e7e1d158deb923d42a6a8c",
+      "unchanged": true
+    },
+    "apps/web/package-lock.json": {
+      "baseObject": "7cd35bcec966ac001d6481f9712ff06546879222",
+      "unchanged": true
+    },
+    ".github/workflows/ac11-accessibility-e2e.yml": {
+      "baseObject": "2c72288b5fd5f6e83ccdfe0ed08b29de620e938d",
+      "unchanged": true
+    },
+    "tools/run_real_browser_acceptance.py": {
+      "baseObject": "74683e101b38bac66ff4e689c8da09a886330e0c",
+      "unchanged": true
+    },
+    "tools/collect_ac11_accessibility_e2e.py": {
+      "baseObject": "2a550db5fd63f121ae6e512c4e1bdb9f38deb445",
+      "unchanged": true
+    },
+    "tools/verify_portal_strict_csp_browser.py": {
+      "baseObject": "6127e8460247816c956e1b34eee56c746cc98776",
+      "unchanged": true
+    }
+  },
+  "semanticTailIdenticalTo": [
+    "428e5fc6b822d33e7e76316f443716b03579efa0",
+    "96afd799d49717fd40e4ddabd538d82accbe1958"
+  ],
+  "SQL0068SHA256": "8b79f55289661d7590dbe24e60d60d319360e7fcaf35454fe21c722fe11905d3",
+  "AC11WorkflowUnchanged": true
+}

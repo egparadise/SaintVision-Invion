@@ -1,0 +1,79 @@
+{
+  "fixtureOnly": true,
+  "actualPC3BrowserAcceptance": false,
+  "anonymousOnly": true,
+  "sandbox": true,
+  "csp": "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self' data:; connect-src 'self' https://idp.sv.lan; frame-ancestors 'none'; object-src 'none'; base-uri 'self'; form-action 'self';",
+  "securityHeadersSHA256": "1365881a4f7a50e65c41d4083735fc547d8e6103439abe3759227b37a87bc731",
+  "distSHA256": {
+    "assets/icons-DVYUNEhE.js": "94f3f917fa843a4e312937688a83f400ea3d5617d1f1e1f36d6bc643f78ffa9e",
+    "assets/icons-DVYUNEhE.js.map": "bdc634b37b1574e46b91990a227c6ecf862e6364ec9219a524c88741ee294ea3",
+    "assets/index-Dzl2cYez.js": "d67f22a4da1c54d7158ed70765d6815d328684233e268def41c7c33c3ef4a669",
+    "assets/index-Dzl2cYez.js.map": "8ad517d558ed3d9702e75b37cb2042b376da6a11bf7033ae14224bb85da55716",
+    "assets/index-kKrfL4r3.css": "66d8552241923e10b189e3b9372f85205bccbf083a5dc19872d001fd91ad0d26",
+    "assets/query-DtERyQJL.js": "3a24ebe459ff24b83ef333288347529de609b65f1c25d5c5b74f2f8b20e2904d",
+    "assets/query-DtERyQJL.js.map": "d584967ed9a938c701324896050b1db23187d2a79840fe5fac55791a2eafc500",
+    "assets/vendor-CYSfZuHu.js": "d967cddbe86b7822415ceafb696d97dea5a491621955cb4127e0f3f96e5497eb",
+    "assets/vendor-CYSfZuHu.js.map": "037070c1858eff839f466f2431a724493a80f81c8f47484c4c6c21698885d15e",
+    "auth-config.js": "5b9a14cc56ea56e4ae58359adbc17de4a1ee2d9ca3da04973fb4f144f42a60e1",
+    "index.html": "a3dabb59cf001795282b799334353504e1410fdb90f163381b3e5115f3f3f281",
+    "manifest.json": "d4c3c0897d7be95321a37babc97bd922618cf8142dd9103faef1efe700fd343a",
+    "sw.js": "5befc07c048a6a49d7f7ec492fe1c04ae8b40283dcc8387ef4e6b2b92c516dcd"
+  },
+  "bundledAjvCompilerModules": [],
+  "browserVersion": "156.0.8078.79",
+  "negativeControl": {
+    "functionBlocked": true,
+    "evalBlocked": true
+  },
+  "rootChildren": 1,
+  "knownBase96MissingFavicon": [
+    {
+      "url": "http://127.0.0.1:39563/favicon.svg",
+      "status": 404
+    }
+  ],
+  "bootPassed": true,
+  "pageErrors": [],
+  "requestFailures": [],
+  "responses": [
+    {
+      "url": "http://127.0.0.1:39563/",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:39563/assets/index-kKrfL4r3.css",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:39563/assets/query-DtERyQJL.js",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:39563/auth-config.js",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:39563/assets/vendor-CYSfZuHu.js",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:39563/assets/index-Dzl2cYez.js",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:39563/favicon.svg",
+      "status": 404
+    }
+  ],
+  "requestMethods": [
+    "GET",
+    "GET",
+    "GET",
+    "GET",
+    "GET",
+    "GET",
+    "GET"
+  ],
+  "cspErrors": []
+}

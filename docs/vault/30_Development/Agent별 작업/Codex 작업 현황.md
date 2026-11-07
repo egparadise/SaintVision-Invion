@@ -1,15 +1,19 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.487"
+version: "1.0.488"
 status: "review"
 author: "Codex"
-updated: "2026-11-08T02:34:04+09:00"
+updated: "2026-11-08T03:10:29+09:00"
 source_of_truth: "Git"
 active_card: "FLEET5 continued supervision with PORTAL-REFRESH-FLEET-20261106"
-active_card_status: "ActualClaude4a29ChangesRequired_OneMediumCR-CSP02DevLocalCJSBootRegression; ProductionCSP428eCorrectionSound; ExactBaselineAC11Dispatched_BoundedESMSourceOwnerReady"
-active_card_next: "Actual Orca Codex fixes CR-CSP02 require-free ESM dev/build compatibility, preserves canonical validator/security/old tests and adds hosted dev proof plus exact Frontend+Docs. Root watches exact baseline42396627296, then one actual Claude delta review. OldB48/API96/schema0068/realWorkspaceReadyV2 retained; real Run/5PC gates remain."
+active_card_status: "CSP02cc607ExactCIAndDevESMProofVerified_1351Tests6Cases9InvariantsPass_ManualGate1Held_ActualBoundedClaudeDeltaReady_NoNewFrontendActivation"
+active_card_next: "Root publishes immutablecc607 proof then starts exactly one actual Claude bounded delta review inheriting soundR1; defer RootAPPLY during review snapshot window. After acceptance deploy exact frontend to PC3 and verify actual strictCSP login/no-blink/resources. Manual acceptance/real votes/Run/PC1/PC5/renewal/all5 remain."
 ---
+
+## 2026-11-08T03:10:29+09:00 ESM dev 후보1351시험·6브라우저사례 검증과 한정 재검토 준비
+
+CR-CSP-02 수정 후보cc607의공식Frontend42398676174/2job31단계·Docs42398678884/19단계·AC1142398681339/14단계와실제로그1351/1351시험·6/6브라우저사례를Root가직접대조했다. 정상화보고는5/5journeys·9/9invariants·대비3/3·키보드2/2의자동실패0이고manualAcceptanceMissingCount1때문에MEASURED_FAIL/acceptanceClaimfalse를그대로유지한다. require-freeESM·canonical/lock/generator/outputhash·strictCSP실제CIbrowser/dist13개hash·보호backend/SQL/AC11불변과semanticTail동일을확인했다. 작성자는실제종료/해제됐으며이제기존R1의타당판정을상속하는한정Claude델타검토를진행한다. 실제PC3새화면재활성·사용자브라우저/Run/5대인수는아직남는다. 다음첫행동/담당은Root의exact입력게시와actualClaude델타검토배정이다.
 
 ## 2026-11-08T02:34:04+09:00 실제 R1 검토 결과와 CR-CSP02 한정 수정 준비
 

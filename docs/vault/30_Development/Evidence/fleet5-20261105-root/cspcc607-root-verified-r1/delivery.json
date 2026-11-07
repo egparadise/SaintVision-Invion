@@ -1,0 +1,1921 @@
+{
+  "task": "CR-CSP-02",
+  "owner": "Codex",
+  "atKST": "2026-11-08T02:58:40.884354+09:00",
+  "sourceSHA": "cc6076254d5b8f54804081a8b1994d76d86cf81a",
+  "branch": "agent/codex/fleet5-csp02-esm-dev-compat-r1-20261108",
+  "deliveryBase": "428e5fc6b822d33e7e76316f443716b03579efa0",
+  "backendSource": "96afd799d49717fd40e4ddabd538d82accbe1958",
+  "remoteMatches": true,
+  "trackedClean": true,
+  "freshWorkflows": [
+    {
+      "workflow": "frontend",
+      "runID": 42398676174,
+      "sourceSHA": "cc6076254d5b8f54804081a8b1994d76d86cf81a",
+      "ref": "agent/codex/fleet5-csp02-esm-dev-compat-r1-20261108",
+      "correlation": "fleet5-cr-csp02-esm-dev-compat-frontend-027b7e5070bc421a850566f3f6536e4a",
+      "event": "workflow_dispatch",
+      "attempt": 1,
+      "conclusion": "success",
+      "url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/42398676174",
+      "jobs": [
+        {
+          "id": 128481506876,
+          "name": "Portal Container Build & Hardened Runtime Smoke",
+          "conclusion": "success",
+          "steps": [
+            {
+              "name": "Set up job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 1,
+              "started_at": "2026-11-07T17:55:28Z",
+              "completed_at": "2026-11-07T17:55:28Z"
+            },
+            {
+              "name": "Run actions/checkout@v4",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 2,
+              "started_at": "2026-11-07T17:55:28Z",
+              "completed_at": "2026-11-07T17:55:35Z"
+            },
+            {
+              "name": "Build Portal Docker Image with BuildKit",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 3,
+              "started_at": "2026-11-07T17:55:35Z",
+              "completed_at": "2026-11-07T17:56:37Z"
+            },
+            {
+              "name": "Verify Lane-Internal Built Image Identity (Self-Derived)",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 4,
+              "started_at": "2026-11-07T17:56:37Z",
+              "completed_at": "2026-11-07T17:56:37Z"
+            },
+            {
+              "name": "Produce Portal Release Tarball and Strict Release Evidence (Codex r6 Block 1)",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 5,
+              "started_at": "2026-11-07T17:56:37Z",
+              "completed_at": "2026-11-07T17:56:37Z"
+            },
+            {
+              "name": "Upload Portal Release Artifacts (Tarball & Evidence JSON)",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 6,
+              "started_at": "2026-11-07T17:56:37Z",
+              "completed_at": "2026-11-07T17:56:40Z"
+            },
+            {
+              "name": "Verify Portal Load Release Script (--verify-only)",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 7,
+              "started_at": "2026-11-07T17:56:40Z",
+              "completed_at": "2026-11-07T17:56:40Z"
+            },
+            {
+              "name": "Setup Mock Upstream HTTPS Server and Test PKI",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 8,
+              "started_at": "2026-11-07T17:56:40Z",
+              "completed_at": "2026-11-07T17:56:41Z"
+            },
+            {
+              "name": "Launch Portal Container via portal-up.sh",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 9,
+              "started_at": "2026-11-07T17:56:41Z",
+              "completed_at": "2026-11-07T17:56:44Z"
+            },
+            {
+              "name": "Execute Hardened Runtime Verification via curl",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 10,
+              "started_at": "2026-11-07T17:56:44Z",
+              "completed_at": "2026-11-07T17:56:47Z"
+            },
+            {
+              "name": "Verify Automatic Rollback on Production Swap Failure (R6-H1 & R6-H2)",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 11,
+              "started_at": "2026-11-07T17:56:47Z",
+              "completed_at": "2026-11-07T17:56:50Z"
+            },
+            {
+              "name": "Teardown Portal Container via portal-down.sh",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 12,
+              "started_at": "2026-11-07T17:56:50Z",
+              "completed_at": "2026-11-07T17:56:51Z"
+            },
+            {
+              "name": "Post Run actions/checkout@v4",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 24,
+              "started_at": "2026-11-07T17:56:51Z",
+              "completed_at": "2026-11-07T17:56:51Z"
+            },
+            {
+              "name": "Complete job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 25,
+              "started_at": "2026-11-07T17:56:51Z",
+              "completed_at": "2026-11-07T17:56:51Z"
+            }
+          ]
+        },
+        {
+          "id": 128481507227,
+          "name": "frontend",
+          "conclusion": "success",
+          "steps": [
+            {
+              "name": "Set up job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 1,
+              "started_at": "2026-11-07T17:55:28Z",
+              "completed_at": "2026-11-07T17:55:29Z"
+            },
+            {
+              "name": "Run actions/checkout@v4",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 2,
+              "started_at": "2026-11-07T17:55:29Z",
+              "completed_at": "2026-11-07T17:55:37Z"
+            },
+            {
+              "name": "Run actions/setup-node@v4",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 3,
+              "started_at": "2026-11-07T17:55:37Z",
+              "completed_at": "2026-11-07T17:55:40Z"
+            },
+            {
+              "name": "Install dependencies",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 4,
+              "started_at": "2026-11-07T17:55:40Z",
+              "completed_at": "2026-11-07T17:55:46Z"
+            },
+            {
+              "name": "Run ESLint",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 5,
+              "started_at": "2026-11-07T17:55:46Z",
+              "completed_at": "2026-11-07T17:55:54Z"
+            },
+            {
+              "name": "Run Vitest Unit Tests",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 6,
+              "started_at": "2026-11-07T17:55:54Z",
+              "completed_at": "2026-11-07T17:56:41Z"
+            },
+            {
+              "name": "Check generated discovery contract type",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 7,
+              "started_at": "2026-11-07T17:56:41Z",
+              "completed_at": "2026-11-07T17:56:42Z"
+            },
+            {
+              "name": "TypeScript Check & Production Build",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 8,
+              "started_at": "2026-11-07T17:56:42Z",
+              "completed_at": "2026-11-07T17:56:55Z"
+            },
+            {
+              "name": "Run actions/setup-python@v5",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 9,
+              "started_at": "2026-11-07T17:56:55Z",
+              "completed_at": "2026-11-07T17:56:55Z"
+            },
+            {
+              "name": "Install pinned hosted browser regression harness",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 10,
+              "started_at": "2026-11-07T17:56:55Z",
+              "completed_at": "2026-11-07T17:56:57Z"
+            },
+            {
+              "name": "Boot actual built frontend under canonical strict CSP",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 11,
+              "started_at": "2026-11-07T17:56:57Z",
+              "completed_at": "2026-11-07T17:57:00Z"
+            },
+            {
+              "name": "Upload strict CSP browser and standalone generation evidence",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 12,
+              "started_at": "2026-11-07T17:57:00Z",
+              "completed_at": "2026-11-07T17:57:01Z"
+            },
+            {
+              "name": "Upload Web Build Artifact",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 13,
+              "started_at": "2026-11-07T17:57:01Z",
+              "completed_at": "2026-11-07T17:57:03Z"
+            },
+            {
+              "name": "Post Run actions/setup-python@v5",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 24,
+              "started_at": "2026-11-07T17:57:03Z",
+              "completed_at": "2026-11-07T17:57:03Z"
+            },
+            {
+              "name": "Post Run actions/setup-node@v4",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 25,
+              "started_at": "2026-11-07T17:57:03Z",
+              "completed_at": "2026-11-07T17:57:04Z"
+            },
+            {
+              "name": "Post Run actions/checkout@v4",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 26,
+              "started_at": "2026-11-07T17:57:04Z",
+              "completed_at": "2026-11-07T17:57:04Z"
+            },
+            {
+              "name": "Complete job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 27,
+              "started_at": "2026-11-07T17:57:04Z",
+              "completed_at": "2026-11-07T17:57:04Z"
+            }
+          ]
+        }
+      ],
+      "artifacts": [
+        {
+          "id": 13584880565,
+          "node_id": "MDg6QXJ0aWZhY3QxMzU4NDg4MDU2NQ==",
+          "name": "saintvision-portal-release",
+          "size_in_bytes": 25702721,
+          "url": "https://api.github.com/repos/egparadise/SaintVision-Invion/actions/artifacts/13584880565",
+          "archive_download_url": "https://api.github.com/repos/egparadise/SaintVision-Invion/actions/artifacts/13584880565/zip",
+          "expired": false,
+          "digest": "sha256:ea8b01e2580a26833557cd0ae7442173ca500fed7858daa320dda121994eec03",
+          "created_at": "2026-11-07T17:56:39Z",
+          "updated_at": "2026-11-07T17:56:39Z",
+          "expires_at": "2026-11-21T17:56:38Z",
+          "workflow_run": {
+            "id": 42398676174,
+            "repository_id": 1362259805,
+            "head_repository_id": 1362259805,
+            "head_branch": "agent/codex/fleet5-csp02-esm-dev-compat-r1-20261108",
+            "head_sha": "cc6076254d5b8f54804081a8b1994d76d86cf81a"
+          }
+        },
+        {
+          "id": 13584641025,
+          "node_id": "MDg6QXJ0aWZhY3QxMzU4NDY0MTAyNQ==",
+          "name": "saintvision-web-dist",
+          "size_in_bytes": 978139,
+          "url": "https://api.github.com/repos/egparadise/SaintVision-Invion/actions/artifacts/13584641025",
+          "archive_download_url": "https://api.github.com/repos/egparadise/SaintVision-Invion/actions/artifacts/13584641025/zip",
+          "expired": false,
+          "digest": "sha256:733cfda537e7466d8bdaa8c941c257d0a71cbaff1b65a5ce5cbd70b59814dcd6",
+          "created_at": "2026-11-07T17:57:03Z",
+          "updated_at": "2026-11-07T17:57:03Z",
+          "expires_at": "2026-11-21T17:57:02Z",
+          "workflow_run": {
+            "id": 42398676174,
+            "repository_id": 1362259805,
+            "head_repository_id": 1362259805,
+            "head_branch": "agent/codex/fleet5-csp02-esm-dev-compat-r1-20261108",
+            "head_sha": "cc6076254d5b8f54804081a8b1994d76d86cf81a"
+          },
+          "downloadedZIPVerifiedSHA256": "733cfda537e7466d8bdaa8c941c257d0a71cbaff1b65a5ce5cbd70b59814dcd6"
+        },
+        {
+          "id": 13584192802,
+          "node_id": "MDg6QXJ0aWZhY3QxMzU4NDE5MjgwMg==",
+          "name": "saintvision-portal-strict-csp-evidence",
+          "size_in_bytes": 14921,
+          "url": "https://api.github.com/repos/egparadise/SaintVision-Invion/actions/artifacts/13584192802",
+          "archive_download_url": "https://api.github.com/repos/egparadise/SaintVision-Invion/actions/artifacts/13584192802/zip",
+          "expired": false,
+          "digest": "sha256:c4662ec3405d1b26a4194be64fe756281b73772197c93cbbafe6363a9eac4932",
+          "created_at": "2026-11-07T17:57:01Z",
+          "updated_at": "2026-11-07T17:57:01Z",
+          "expires_at": "2026-11-21T17:57:00Z",
+          "workflow_run": {
+            "id": 42398676174,
+            "repository_id": 1362259805,
+            "head_repository_id": 1362259805,
+            "head_branch": "agent/codex/fleet5-csp02-esm-dev-compat-r1-20261108",
+            "head_sha": "cc6076254d5b8f54804081a8b1994d76d86cf81a"
+          },
+          "downloadedZIPVerifiedSHA256": "c4662ec3405d1b26a4194be64fe756281b73772197c93cbbafe6363a9eac4932"
+        }
+      ],
+      "hardenedRuntimeSmokeExecuted": true,
+      "imageIdentityConsole": [
+        "2026-11-07T17:56:37.0547378Z echo \"Built Image ID (lane-internal execution consistency check): $IMAGE_ID\"",
+        "2026-11-07T17:56:37.1109896Z Built Image ID (lane-internal execution consistency check): sha256:5c6596772c36b4eb3ef8af54ff99e49324f3afcb01b625a33f947dbe0f886482",
+        "2026-11-07T17:56:37.1205150Z     \"codeSha\": \"$COMMIT_SHA\",",
+        "2026-11-07T17:56:37.1205498Z     \"imageId\": \"$IMAGE_ID\",",
+        "2026-11-07T17:56:37.1205844Z     \"tarSha256\": \"$TAR_SHA256\",",
+        "2026-11-07T17:56:37.1206276Z     \"buildRunId\": str(\"$RUN_ID\"),",
+        "2026-11-07T17:56:37.8282990Z   \"codeSha\": \"cc6076254d5b8f54804081a8b1994d76d86cf81a\",",
+        "2026-11-07T17:56:37.8283576Z   \"imageId\": \"sha256:5c6596772c36b4eb3ef8af54ff99e49324f3afcb01b625a33f947dbe0f886482\",",
+        "2026-11-07T17:56:37.8284194Z   \"tarSha256\": \"5d902105cd53d6c2a37c439492033163ae685af8b93e2b8ba8eb1310b8708f86\",",
+        "2026-11-07T17:56:37.8284654Z   \"buildRunId\": \"42398676174\","
+      ],
+      "portalRelease": {
+        "codeSha": "cc6076254d5b8f54804081a8b1994d76d86cf81a",
+        "imageId": "sha256:5c6596772c36b4eb3ef8af54ff99e49324f3afcb01b625a33f947dbe0f886482",
+        "tarSha256": "5d902105cd53d6c2a37c439492033163ae685af8b93e2b8ba8eb1310b8708f86",
+        "buildRunId": "42398676174"
+      },
+      "vitest": {
+        "filesPassed": 106,
+        "passed": 1351,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "deselected": 0,
+        "rawSummaryLines": [
+          "2026-11-07T17:56:41.5310361Z  Test Files  106 passed (106)",
+          "2026-11-07T17:56:41.5315854Z       Tests  1351 passed (1351)"
+        ],
+        "source": "official job console summary; all collected tests passed"
+      },
+      "distFilesSHA256": {
+        "assets/icons-DVYUNEhE.js": "94f3f917fa843a4e312937688a83f400ea3d5617d1f1e1f36d6bc643f78ffa9e",
+        "assets/icons-DVYUNEhE.js.map": "bdc634b37b1574e46b91990a227c6ecf862e6364ec9219a524c88741ee294ea3",
+        "assets/index-Dzl2cYez.js": "d67f22a4da1c54d7158ed70765d6815d328684233e268def41c7c33c3ef4a669",
+        "assets/index-Dzl2cYez.js.map": "8ad517d558ed3d9702e75b37cb2042b376da6a11bf7033ae14224bb85da55716",
+        "assets/index-kKrfL4r3.css": "66d8552241923e10b189e3b9372f85205bccbf083a5dc19872d001fd91ad0d26",
+        "assets/query-DtERyQJL.js": "3a24ebe459ff24b83ef333288347529de609b65f1c25d5c5b74f2f8b20e2904d",
+        "assets/query-DtERyQJL.js.map": "d584967ed9a938c701324896050b1db23187d2a79840fe5fac55791a2eafc500",
+        "assets/vendor-CYSfZuHu.js": "d967cddbe86b7822415ceafb696d97dea5a491621955cb4127e0f3f96e5497eb",
+        "assets/vendor-CYSfZuHu.js.map": "037070c1858eff839f466f2431a724493a80f81c8f47484c4c6c21698885d15e",
+        "auth-config.js": "5b9a14cc56ea56e4ae58359adbc17de4a1ee2d9ca3da04973fb4f144f42a60e1",
+        "index.html": "a3dabb59cf001795282b799334353504e1410fdb90f163381b3e5115f3f3f281",
+        "manifest.json": "d4c3c0897d7be95321a37babc97bd922618cf8142dd9103faef1efe700fd343a",
+        "sw.js": "5befc07c048a6a49d7f7ec492fe1c04ae8b40283dcc8387ef4e6b2b92c516dcd"
+      },
+      "strictCSPBrowser": {
+        "fixtureOnly": true,
+        "actualPC3BrowserAcceptance": false,
+        "anonymousOnly": true,
+        "sandbox": true,
+        "csp": "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self' data:; connect-src 'self' https://idp.sv.lan; frame-ancestors 'none'; object-src 'none'; base-uri 'self'; form-action 'self';",
+        "securityHeadersSHA256": "1365881a4f7a50e65c41d4083735fc547d8e6103439abe3759227b37a87bc731",
+        "distSHA256": {
+          "assets/icons-DVYUNEhE.js": "94f3f917fa843a4e312937688a83f400ea3d5617d1f1e1f36d6bc643f78ffa9e",
+          "assets/icons-DVYUNEhE.js.map": "bdc634b37b1574e46b91990a227c6ecf862e6364ec9219a524c88741ee294ea3",
+          "assets/index-Dzl2cYez.js": "d67f22a4da1c54d7158ed70765d6815d328684233e268def41c7c33c3ef4a669",
+          "assets/index-Dzl2cYez.js.map": "8ad517d558ed3d9702e75b37cb2042b376da6a11bf7033ae14224bb85da55716",
+          "assets/index-kKrfL4r3.css": "66d8552241923e10b189e3b9372f85205bccbf083a5dc19872d001fd91ad0d26",
+          "assets/query-DtERyQJL.js": "3a24ebe459ff24b83ef333288347529de609b65f1c25d5c5b74f2f8b20e2904d",
+          "assets/query-DtERyQJL.js.map": "d584967ed9a938c701324896050b1db23187d2a79840fe5fac55791a2eafc500",
+          "assets/vendor-CYSfZuHu.js": "d967cddbe86b7822415ceafb696d97dea5a491621955cb4127e0f3f96e5497eb",
+          "assets/vendor-CYSfZuHu.js.map": "037070c1858eff839f466f2431a724493a80f81c8f47484c4c6c21698885d15e",
+          "auth-config.js": "5b9a14cc56ea56e4ae58359adbc17de4a1ee2d9ca3da04973fb4f144f42a60e1",
+          "index.html": "a3dabb59cf001795282b799334353504e1410fdb90f163381b3e5115f3f3f281",
+          "manifest.json": "d4c3c0897d7be95321a37babc97bd922618cf8142dd9103faef1efe700fd343a",
+          "sw.js": "5befc07c048a6a49d7f7ec492fe1c04ae8b40283dcc8387ef4e6b2b92c516dcd"
+        },
+        "bundledAjvCompilerModules": [],
+        "browserVersion": "156.0.8078.79",
+        "negativeControl": {
+          "functionBlocked": true,
+          "evalBlocked": true
+        },
+        "rootChildren": 1,
+        "knownBase96MissingFavicon": [
+          {
+            "url": "http://127.0.0.1:39563/favicon.svg",
+            "status": 404
+          }
+        ],
+        "bootPassed": true,
+        "pageErrors": [],
+        "requestFailures": [],
+        "responses": [
+          {
+            "url": "http://127.0.0.1:39563/",
+            "status": 200
+          },
+          {
+            "url": "http://127.0.0.1:39563/assets/index-kKrfL4r3.css",
+            "status": 200
+          },
+          {
+            "url": "http://127.0.0.1:39563/assets/query-DtERyQJL.js",
+            "status": 200
+          },
+          {
+            "url": "http://127.0.0.1:39563/auth-config.js",
+            "status": 200
+          },
+          {
+            "url": "http://127.0.0.1:39563/assets/vendor-CYSfZuHu.js",
+            "status": 200
+          },
+          {
+            "url": "http://127.0.0.1:39563/assets/index-Dzl2cYez.js",
+            "status": 200
+          },
+          {
+            "url": "http://127.0.0.1:39563/favicon.svg",
+            "status": 404
+          }
+        ],
+        "requestMethods": [
+          "GET",
+          "GET",
+          "GET",
+          "GET",
+          "GET",
+          "GET",
+          "GET"
+        ],
+        "cspErrors": []
+      },
+      "standaloneValidatorManifest": {
+        "schema": "contracts/v1alpha1/core.schema.json",
+        "ref": "https://saintvision.ai/contracts/v1alpha1/core.schema.json#/$defs/ProjectNodeCertificateObservationResponse",
+        "format": "esm",
+        "selfContained": true,
+        "schemaSHA256": "f8bb8fa801f64d622ebcdc1c4c3383833632ccfb05a740493e3a5cb86e44404f",
+        "generatorSHA256": "eb1b7d2a1f667f9a8616d95b43b54716e3d3a4a7b8744ddacc4a777d8cc44042",
+        "lockSHA256": "1fa82239ec4bb731ef649acfeac84ac4a1dfb2fa5801824502adf053e8892fbd",
+        "ajv": "8.20.0",
+        "ajvFormats": "3.0.1",
+        "esbuild": "0.25.12",
+        "runtimeInputs": [
+          {
+            "path": "node_modules/ajv-formats/dist/formats.js",
+            "SHA256": "b61693a26869970a92cc1fe832c931ccd3afe8b6d66802b19c48306349e84880"
+          }
+        ],
+        "validatorSHA256": "476a803e51aa3f03e7512cfdf246462a63998e8657dc8afc5a622b0652a1d860"
+      }
+    },
+    {
+      "workflow": "docs",
+      "runID": 42398678884,
+      "sourceSHA": "cc6076254d5b8f54804081a8b1994d76d86cf81a",
+      "ref": "agent/codex/fleet5-csp02-esm-dev-compat-r1-20261108",
+      "correlation": "fleet5-cr-csp02-esm-dev-compat-docs-c25f9ede2f13420bad258a433c295bcd",
+      "event": "workflow_dispatch",
+      "attempt": 1,
+      "conclusion": "success",
+      "url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/42398678884",
+      "jobs": [
+        {
+          "id": 128481515015,
+          "name": "docs",
+          "conclusion": "success",
+          "steps": [
+            {
+              "name": "Set up job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 1,
+              "started_at": "2026-11-07T17:55:29Z",
+              "completed_at": "2026-11-07T17:55:30Z"
+            },
+            {
+              "name": "Run actions/checkout@v4",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 2,
+              "started_at": "2026-11-07T17:55:30Z",
+              "completed_at": "2026-11-07T17:55:34Z"
+            },
+            {
+              "name": "Run actions/setup-python@v5",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 3,
+              "started_at": "2026-11-07T17:55:34Z",
+              "completed_at": "2026-11-07T17:55:34Z"
+            },
+            {
+              "name": "Run python -m pip install -r requirements-docs.txt",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 4,
+              "started_at": "2026-11-07T17:55:34Z",
+              "completed_at": "2026-11-07T17:55:36Z"
+            },
+            {
+              "name": "Run python tools/check_docs.py",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 5,
+              "started_at": "2026-11-07T17:55:36Z",
+              "completed_at": "2026-11-07T17:55:37Z"
+            },
+            {
+              "name": "Repository path citations exist (ratchet; baseline may only shrink)",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 6,
+              "started_at": "2026-11-07T17:55:37Z",
+              "completed_at": "2026-11-07T17:55:39Z"
+            },
+            {
+              "name": "Run python tools/check_contract_bindings.py",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 7,
+              "started_at": "2026-11-07T17:55:39Z",
+              "completed_at": "2026-11-07T17:55:46Z"
+            },
+            {
+              "name": "Run python tools/check_frontend_integrity.py",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 8,
+              "started_at": "2026-11-07T17:55:46Z",
+              "completed_at": "2026-11-07T17:55:46Z"
+            },
+            {
+              "name": "Report fixture producer reachability",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 9,
+              "started_at": "2026-11-07T17:55:46Z",
+              "completed_at": "2026-11-07T17:55:46Z"
+            },
+            {
+              "name": "Report client route coverage (report-only; promote per \uac80\uc99d\uac80\uc0ac\ub3c4\uad6c_\ubaa9\ub85d)",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 10,
+              "started_at": "2026-11-07T17:55:46Z",
+              "completed_at": "2026-11-07T17:55:47Z"
+            },
+            {
+              "name": "Run actions/upload-artifact@v4",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 11,
+              "started_at": "2026-11-07T17:55:47Z",
+              "completed_at": "2026-11-07T17:55:47Z"
+            },
+            {
+              "name": "Run python tools/test_sync.py",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 12,
+              "started_at": "2026-11-07T17:55:47Z",
+              "completed_at": "2026-11-07T17:55:48Z"
+            },
+            {
+              "name": "Run python tools/check_ontology_generation.py",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 13,
+              "started_at": "2026-11-07T17:55:48Z",
+              "completed_at": "2026-11-07T17:55:49Z"
+            },
+            {
+              "name": "Run python tools/check_ontology.py",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 14,
+              "started_at": "2026-11-07T17:55:49Z",
+              "completed_at": "2026-11-07T17:55:51Z"
+            },
+            {
+              "name": "Build documentation bundle",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 15,
+              "started_at": "2026-11-07T17:55:51Z",
+              "completed_at": "2026-11-07T17:55:54Z"
+            },
+            {
+              "name": "Run actions/upload-artifact@v4",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 16,
+              "started_at": "2026-11-07T17:55:54Z",
+              "completed_at": "2026-11-07T17:55:56Z"
+            },
+            {
+              "name": "Post Run actions/setup-python@v5",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 31,
+              "started_at": "2026-11-07T17:55:56Z",
+              "completed_at": "2026-11-07T17:55:57Z"
+            },
+            {
+              "name": "Post Run actions/checkout@v4",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 32,
+              "started_at": "2026-11-07T17:55:57Z",
+              "completed_at": "2026-11-07T17:55:57Z"
+            },
+            {
+              "name": "Complete job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 33,
+              "started_at": "2026-11-07T17:55:57Z",
+              "completed_at": "2026-11-07T17:55:57Z"
+            }
+          ]
+        }
+      ],
+      "artifacts": [
+        {
+          "id": 13584298784,
+          "node_id": "MDg6QXJ0aWZhY3QxMzU4NDI5ODc4NA==",
+          "name": "saintvision-guidelines",
+          "size_in_bytes": 48192309,
+          "url": "https://api.github.com/repos/egparadise/SaintVision-Invion/actions/artifacts/13584298784",
+          "archive_download_url": "https://api.github.com/repos/egparadise/SaintVision-Invion/actions/artifacts/13584298784/zip",
+          "expired": false,
+          "digest": "sha256:3a14d7f534299a88067b2e28e41f6e6e50b2d72035b6770c663f4dc60764d8ee",
+          "created_at": "2026-11-07T17:55:56Z",
+          "updated_at": "2026-11-07T17:55:56Z",
+          "expires_at": "2026-12-07T17:55:54Z",
+          "workflow_run": {
+            "id": 42398678884,
+            "repository_id": 1362259805,
+            "head_repository_id": 1362259805,
+            "head_branch": "agent/codex/fleet5-csp02-esm-dev-compat-r1-20261108",
+            "head_sha": "cc6076254d5b8f54804081a8b1994d76d86cf81a"
+          }
+        },
+        {
+          "id": 13583989588,
+          "node_id": "MDg6QXJ0aWZhY3QxMzU4Mzk4OTU4OA==",
+          "name": "route-coverage-report",
+          "size_in_bytes": 1915,
+          "url": "https://api.github.com/repos/egparadise/SaintVision-Invion/actions/artifacts/13583989588",
+          "archive_download_url": "https://api.github.com/repos/egparadise/SaintVision-Invion/actions/artifacts/13583989588/zip",
+          "expired": false,
+          "digest": "sha256:f7deb2b8a04ddf37eef8435531f92424d9452b7761c9cd302b457686751f57cf",
+          "created_at": "2026-11-07T17:55:47Z",
+          "updated_at": "2026-11-07T17:55:47Z",
+          "expires_at": "2026-12-07T17:55:47Z",
+          "workflow_run": {
+            "id": 42398678884,
+            "repository_id": 1362259805,
+            "head_repository_id": 1362259805,
+            "head_branch": "agent/codex/fleet5-csp02-esm-dev-compat-r1-20261108",
+            "head_sha": "cc6076254d5b8f54804081a8b1994d76d86cf81a"
+          },
+          "downloadedZIPVerifiedSHA256": "f7deb2b8a04ddf37eef8435531f92424d9452b7761c9cd302b457686751f57cf"
+        }
+      ]
+    },
+    {
+      "workflow": "ac11-accessibility-e2e",
+      "runID": 42398681339,
+      "sourceSHA": "cc6076254d5b8f54804081a8b1994d76d86cf81a",
+      "ref": "agent/codex/fleet5-csp02-esm-dev-compat-r1-20261108",
+      "correlation": "fleet5-cr-csp02-esm-dev-compat-ac11-accessibility-e2e-b9eed416f63b43538106690cc3bd8cd1",
+      "event": "workflow_dispatch",
+      "attempt": 1,
+      "conclusion": "success",
+      "url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/42398681339",
+      "jobs": [
+        {
+          "id": 128481522162,
+          "name": "accessibility-e2e",
+          "conclusion": "success",
+          "steps": [
+            {
+              "name": "Set up job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 1,
+              "started_at": "2026-11-07T17:55:31Z",
+              "completed_at": "2026-11-07T17:55:32Z"
+            },
+            {
+              "name": "Checkout exact source head",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 2,
+              "started_at": "2026-11-07T17:55:32Z",
+              "completed_at": "2026-11-07T17:55:38Z"
+            },
+            {
+              "name": "Run actions/setup-python@v5",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 3,
+              "started_at": "2026-11-07T17:55:38Z",
+              "completed_at": "2026-11-07T17:55:40Z"
+            },
+            {
+              "name": "Run actions/setup-node@v4",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 4,
+              "started_at": "2026-11-07T17:55:40Z",
+              "completed_at": "2026-11-07T17:55:42Z"
+            },
+            {
+              "name": "Install browser lane dependencies",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 5,
+              "started_at": "2026-11-07T17:55:42Z",
+              "completed_at": "2026-11-07T17:56:17Z"
+            },
+            {
+              "name": "Run six browser cases for five canonical journeys",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 6,
+              "started_at": "2026-11-07T17:56:17Z",
+              "completed_at": "2026-11-07T17:57:04Z"
+            },
+            {
+              "name": "Run desktop accessibility invariants in real Chrome",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 7,
+              "started_at": "2026-11-07T17:57:04Z",
+              "completed_at": "2026-11-07T17:57:37Z"
+            },
+            {
+              "name": "Normalize fail-closed AC-11 evidence",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 8,
+              "started_at": "2026-11-07T17:57:37Z",
+              "completed_at": "2026-11-07T17:57:38Z"
+            },
+            {
+              "name": "Validate redacted evidence shape",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 9,
+              "started_at": "2026-11-07T17:57:38Z",
+              "completed_at": "2026-11-07T17:57:38Z"
+            },
+            {
+              "name": "Upload accessibility E2E evidence",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 10,
+              "started_at": "2026-11-07T17:57:38Z",
+              "completed_at": "2026-11-07T17:57:39Z"
+            },
+            {
+              "name": "Post Run actions/setup-node@v4",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 18,
+              "started_at": "2026-11-07T17:57:39Z",
+              "completed_at": "2026-11-07T17:57:39Z"
+            },
+            {
+              "name": "Post Run actions/setup-python@v5",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 19,
+              "started_at": "2026-11-07T17:57:39Z",
+              "completed_at": "2026-11-07T17:57:39Z"
+            },
+            {
+              "name": "Post Checkout exact source head",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 20,
+              "started_at": "2026-11-07T17:57:39Z",
+              "completed_at": "2026-11-07T17:57:39Z"
+            },
+            {
+              "name": "Complete job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 21,
+              "started_at": "2026-11-07T17:57:39Z",
+              "completed_at": "2026-11-07T17:57:39Z"
+            }
+          ]
+        }
+      ],
+      "artifacts": [
+        {
+          "id": 13585020187,
+          "node_id": "MDg6QXJ0aWZhY3QxMzU4NTAyMDE4Nw==",
+          "name": "s11-ac11-accessibility-cc6076254d5b8f54804081a8b1994d76d86cf81a",
+          "size_in_bytes": 2213,
+          "url": "https://api.github.com/repos/egparadise/SaintVision-Invion/actions/artifacts/13585020187",
+          "archive_download_url": "https://api.github.com/repos/egparadise/SaintVision-Invion/actions/artifacts/13585020187/zip",
+          "expired": false,
+          "digest": "sha256:8a780d12955a8fa0fe2b4103d16d0ea685ee788c207bd5236587a1ba3ca414bc",
+          "created_at": "2026-11-07T17:57:39Z",
+          "updated_at": "2026-11-07T17:57:39Z",
+          "expires_at": "2026-12-07T17:57:38Z",
+          "workflow_run": {
+            "id": 42398681339,
+            "repository_id": 1362259805,
+            "head_repository_id": 1362259805,
+            "head_branch": "agent/codex/fleet5-csp02-esm-dev-compat-r1-20261108",
+            "head_sha": "cc6076254d5b8f54804081a8b1994d76d86cf81a"
+          },
+          "downloadedZIPVerifiedSHA256": "8a780d12955a8fa0fe2b4103d16d0ea685ee788c207bd5236587a1ba3ca414bc"
+        }
+      ],
+      "actualBrowserCaseCounts": {
+        "exitCode": 0,
+        "tests": {
+          "failure": 0,
+          "error": 0,
+          "skipped": 0,
+          "passed": 6
+        },
+        "unverified": null,
+        "evidence": ".work/ac11-accessibility-browser.json"
+      },
+      "redactedAC11Report": {
+        "schemaVersion": "1.2.0",
+        "runPurpose": "s11-ac11-accessibility-e2e-hosted",
+        "axis": "accessibility-e2e",
+        "sourceRunId": "42398681339",
+        "sourceHeadSha": "cc6076254d5b8f54804081a8b1994d76d86cf81a",
+        "checkoutTreeSha": "793d1f02d580ebbdc67669709f528ef6e10b07d7",
+        "cleanCheckout": true,
+        "startedAt": "2026-11-07T17:56:17Z",
+        "finishedAt": "2026-11-07T17:57:38.110984Z",
+        "environment": {
+          "topology": "github-hosted-single-runner",
+          "runnerImage": "ubuntu26-Linux-X64",
+          "browser": "Google Chrome 156.0.8078.79 (Blink engine)",
+          "frontendTransport": "vite-dev-server-with-browser-node-fixture",
+          "credentialsRequired": false,
+          "physicalFiveNodeComparable": false
+        },
+        "targetRef": {
+          "commit": "505a5f4b040badfbe1e703d5cac091ddf1db9620",
+          "path": "docs/vault/30_Development/S11_AC11_accessibility_user_device_target_v1.md",
+          "blob": "737853bbde0bc3da077c37acea132552e55f8eb9",
+          "criteria": {
+            "canonicalJourneyFailureCount": {
+              "operator": "eq",
+              "value": 0
+            },
+            "desktopInvariantFailureCount": {
+              "operator": "eq",
+              "value": 0
+            },
+            "contrastFailureCount": {
+              "operator": "eq",
+              "value": 0
+            },
+            "keyboardFailureCount": {
+              "operator": "eq",
+              "value": 0
+            },
+            "manualAcceptanceMissingCount": {
+              "operator": "eq",
+              "value": 0
+            }
+          }
+        },
+        "verdict": "MEASURED_FAIL",
+        "acceptanceClaim": false,
+        "artifactSha256": null,
+        "artifactStatus": "PENDING_UPLOAD",
+        "artifactUnit": "github-actions-uploaded-zip",
+        "cleanup": {
+          "isolatedBrowserContainerRemoved": true,
+          "producerTempResidueCount": null
+        },
+        "limitation": "hosted automatic measurement; same-SHA user-device keyboard/screen-reader acceptance absent",
+        "payload": {
+          "journeyIds": [
+            "test_actual_browser_quorum_snapshot_and_no_duplicate_vote",
+            "test_actual_browser_stale_run_and_revoked_review_are_rejected",
+            "test_browser_real_catalogue_owner_scope_and_revocation",
+            "test_browser_real_committed_model_and_current_permission",
+            "test_full_studio_login_project_approval_and_logout"
+          ],
+          "browserPhysicalCaseCount": 6,
+          "invariantIds": [
+            "inv01_bidirectionalSwitcher",
+            "inv02_trafficLightControls",
+            "inv03_dynamicZIndex",
+            "inv04_dockIntegration",
+            "inv05_keyboardAltTab",
+            "inv06_modalEscapeDismissal",
+            "inv07_layoutPersistence",
+            "inv08_colorContrastAA",
+            "inv09_honestCapacityMetrics"
+          ],
+          "inputDigests": {
+            "browserProofSha256": "ea3434dbce69039872369cc62e21e6eb8db8ed4883b7472689b65806c24d23be",
+            "caseIdentitiesSha256": "2c9607e9d71244a90f1d6972ff0f34005b39d0f73019bc827b5cbd055a4903e9",
+            "browserJunitSha256": "73b54a5a7c35f5665c2627845963cd35bb51a50e8e5240e28a6bc6cb98143d72",
+            "desktopInvariantSha256": "671eedf279a11a608e75ae61ac78c5845da67bca3b1dbdd63455cecd5b03163e"
+          },
+          "observations": [
+            {
+              "metric": "canonicalJourneyFailureCount",
+              "n": 5,
+              "successCount": 5,
+              "failureCount": 0,
+              "skipCount": 0,
+              "value": 0,
+              "errorsByClass": {}
+            },
+            {
+              "metric": "desktopInvariantFailureCount",
+              "n": 9,
+              "successCount": 9,
+              "failureCount": 0,
+              "skipCount": 0,
+              "value": 0,
+              "errorsByClass": {}
+            },
+            {
+              "metric": "contrastFailureCount",
+              "n": 3,
+              "successCount": 3,
+              "failureCount": 0,
+              "skipCount": 0,
+              "value": 0,
+              "errorsByClass": {}
+            },
+            {
+              "metric": "keyboardFailureCount",
+              "n": 2,
+              "successCount": 2,
+              "failureCount": 0,
+              "skipCount": 0,
+              "value": 0,
+              "errorsByClass": {}
+            },
+            {
+              "metric": "manualAcceptanceMissingCount",
+              "n": 1,
+              "successCount": 0,
+              "failureCount": 1,
+              "skipCount": 0,
+              "value": 1,
+              "errorsByClass": {
+                "manual-acceptance-not-supplied": 1
+              }
+            }
+          ]
+        },
+        "payloadSha256": "cfb1d02e8e1770eb94f88d983116b30b713b92253474db9e274fd2451a9c5121"
+      },
+      "normalizedCriterionCounts": {
+        "tests": 5,
+        "passed": 4,
+        "failures": 1,
+        "errors": 0,
+        "skipped": 0,
+        "reason": "Only manualAcceptanceMissingCount remains1; all automated measurements pass; no real-device acceptance claim"
+      }
+    }
+  ],
+  "changedPaths": [
+    ".github/workflows/frontend.yml",
+    "apps/web/.gitignore",
+    "apps/web/eslint.config.js",
+    "apps/web/package.json",
+    "apps/web/scripts/node-certificate-validator.mjs",
+    "apps/web/src/contracts/node-certificate-validator.d.mts",
+    "apps/web/src/shared/api/nodeCertificateObservation.ts",
+    "apps/web/tests/browser/vite.config.ts",
+    "apps/web/tests/node-certificate-validator-csp.test.ts",
+    "apps/web/vite.config.ts",
+    "docs/vault/30_Development/Agent\ubcc4 \uc791\uc5c5/Codex \uc791\uc5c5 \ud604\ud669.md",
+    "docs/vault/30_Development/Evidence/fleet5-csp02-esm-dev-compat-r1-20261108-codex/.gitattributes",
+    "docs/vault/30_Development/Evidence/fleet5-csp02-esm-dev-compat-r1-20261108-codex/README.md",
+    "docs/vault/30_Development/Evidence/fleet5-csp02-esm-dev-compat-r1-20261108-codex/baseline-baseline-final-proof.json",
+    "docs/vault/30_Development/Evidence/fleet5-csp02-esm-dev-compat-r1-20261108-codex/baseline-baseline-final-proof.json.raw",
+    "docs/vault/30_Development/Evidence/fleet5-csp02-esm-dev-compat-r1-20261108-codex/baseline-final-jobs.json",
+    "docs/vault/30_Development/Evidence/fleet5-csp02-esm-dev-compat-r1-20261108-codex/baseline-final-jobs.json.raw",
+    "docs/vault/30_Development/Evidence/fleet5-csp02-esm-dev-compat-r1-20261108-codex/baseline-final-run.json",
+    "docs/vault/30_Development/Evidence/fleet5-csp02-esm-dev-compat-r1-20261108-codex/baseline-final-run.json.raw",
+    "docs/vault/30_Development/Evidence/fleet5-csp02-esm-dev-compat-r1-20261108-codex/ci-receipts.py",
+    "docs/vault/30_Development/Evidence/fleet5-csp02-esm-dev-compat-r1-20261108-codex/context.json",
+    "docs/vault/30_Development/Evidence/fleet5-csp02-esm-dev-compat-r1-20261108-codex/first-corrected-source-ci-failure.json",
+    "docs/vault/30_Development/Evidence/fleet5-csp02-esm-dev-compat-r1-20261108-codex/inherited-r1-review.json",
+    "docs/vault/30_Development/Evidence/fleet5-csp02-esm-dev-compat-r1-20261108-codex/inherited-r1-review.json.raw",
+    "docs/vault/30_Development/Evidence/fleet5-csp02-esm-dev-compat-r1-20261108-codex/inherited-r1-root-verification.json",
+    "docs/vault/30_Development/Evidence/fleet5-csp02-esm-dev-compat-r1-20261108-codex/inherited-r1-root-verification.json.raw",
+    "docs/vault/30_Development/Evidence/fleet5-csp02-esm-dev-compat-r1-20261108-codex/local-gates.json",
+    "docs/vault/30_Development/Evidence/fleet5-csp02-esm-dev-compat-r1-20261108-codex/local-gates.py",
+    "docs/vault/30_Development/Evidence/fleet5-csp02-esm-dev-compat-r1-20261108-codex/prepublication-proof-format-correction.json",
+    "docs/vault/30_Development/Evidence/fleet5-csp02-esm-dev-compat-r1-20261108-codex/protected-components.json",
+    "docs/vault/30_Development/Evidence/fleet5-csp02-esm-dev-compat-r1-20261108-codex/public-input-pins.json",
+    "docs/vault/30_Development/Evidence/fleet5-csp02-esm-dev-compat-r1-20261108-codex/read-pins.json",
+    "docs/vault/30_Development/Evidence/fleet5-csp02-esm-dev-compat-r1-20261108-codex/root526-public-proof.json",
+    "docs/vault/30_Development/Evidence/fleet5-csp02-esm-dev-compat-r1-20261108-codex/root526-public-proof.json.raw",
+    "docs/vault/30_Development/Evidence/fleet5-csp02-esm-dev-compat-r1-20261108-codex/second-corrected-source-ac11-measurement.json",
+    "docs/vault/30_Development/Evidence/fleet5-csp02-esm-dev-compat-r1-20261108-codex/sync-state-after.json",
+    "docs/vault/30_Development/Evidence/fleet5-csp02-esm-dev-compat-r1-20261108-codex/sync-state-before.json",
+    "docs/vault/30_Development/Evidence/fleet5-csp02-esm-dev-compat-r1-20261108-codex/sync-state-comparison.json",
+    "docs/vault/30_Development/History/2026-11-08_FLEET5_CR-CSP-02_ESM_dev_Codex.md"
+  ],
+  "patchSHA256": "4127684ff9337d04c9779d2cc902fdf6c192f32d8727e8b2c893d51c333fe041",
+  "protectedRecursiveListingSHA256": "cccbfb121c172f1e9a77aeff8b550f619117f3493a6549c5fe0a2109a0ec59bd",
+  "protectedComponents": {
+    "contracts": {
+      "baseObject": "b2b24a6d9baf24302f3590f4f30fe851ccb81ef1",
+      "unchanged": true
+    },
+    "packages": {
+      "baseObject": "7c445bdbc929f6597c0b39b598f9726032c67ad7",
+      "unchanged": true
+    },
+    "services": {
+      "baseObject": "5c9918adc48c76c88b5119f44516bb332924f067",
+      "unchanged": true
+    },
+    "migrations": {
+      "baseObject": "b1d35598829437c39dab7f60e9521bf8627e6832",
+      "unchanged": true
+    },
+    "src": {
+      "baseObject": "5507dfb820d54a8778c4cf5e3551368f11b6105f",
+      "unchanged": true
+    },
+    "tests": {
+      "baseObject": "f0c6e9f537989b71f57b2185fd43c6abbaf4369e",
+      "unchanged": true
+    },
+    "deploy": {
+      "baseObject": "5a98abd52d78c2dea952b257123bea2f01dffa64",
+      "unchanged": true
+    },
+    "apps/studio": {
+      "baseObject": "faf648da92d7f63e74e7e1d158deb923d42a6a8c",
+      "unchanged": true
+    },
+    "apps/web/package-lock.json": {
+      "baseObject": "7cd35bcec966ac001d6481f9712ff06546879222",
+      "unchanged": true
+    },
+    ".github/workflows/ac11-accessibility-e2e.yml": {
+      "baseObject": "2c72288b5fd5f6e83ccdfe0ed08b29de620e938d",
+      "unchanged": true
+    },
+    "tools/run_real_browser_acceptance.py": {
+      "baseObject": "74683e101b38bac66ff4e689c8da09a886330e0c",
+      "unchanged": true
+    },
+    "tools/collect_ac11_accessibility_e2e.py": {
+      "baseObject": "2a550db5fd63f121ae6e512c4e1bdb9f38deb445",
+      "unchanged": true
+    },
+    "tools/verify_portal_strict_csp_browser.py": {
+      "baseObject": "6127e8460247816c956e1b34eee56c746cc98776",
+      "unchanged": true
+    }
+  },
+  "SQL0068SHA256": "8b79f55289661d7590dbe24e60d60d319360e7fcaf35454fe21c722fe11905d3",
+  "semanticValidatorTailByteIdentical": true,
+  "inheritedOnly": {
+    "backendCoreSource": "96afd799d49717fd40e4ddabd538d82accbe1958",
+    "frontend905": "42368189302 is historical evidence only, not a new-head run",
+    "backendOrCoreRerun": false,
+    "backendCoreRuns": [
+      {
+        "id": 42378656486,
+        "head_sha": "96afd799d49717fd40e4ddabd538d82accbe1958",
+        "head_branch": "agent/codex/fleet5-first-workspace-cr90501-tests-r1-20261107",
+        "event": "workflow_dispatch",
+        "run_attempt": 1,
+        "conclusion": "success",
+        "html_url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/42378656486"
+      },
+      {
+        "id": 42374998823,
+        "head_sha": "96afd799d49717fd40e4ddabd538d82accbe1958",
+        "head_branch": "agent/codex/fleet5-first-workspace-cr90501-tests-r1-20261107",
+        "event": "workflow_dispatch",
+        "run_attempt": 1,
+        "conclusion": "success",
+        "html_url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/42374998823"
+      }
+    ]
+  },
+  "canonicalState": {
+    "bytes": 529870,
+    "SHA256": "43600e1941cb3527e80adc2daac2064c53a44d129094da53869e6f50d46e334e",
+    "fullBytesEqual": true,
+    "checkOnly": true,
+    "apply": false
+  },
+  "localGates": [
+    {
+      "argv": [
+        "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+        "-B",
+        "tools/check_docs.py"
+      ],
+      "atKST": "2026-11-08T02:56:10.766336+09:00",
+      "exit": 0,
+      "stdout": "PASS: 24 original hashes, 1285 versioned documents, wiki links, 48 tasks, 12 outcomes, owner/reviewer/skills, dependency DAG.\r\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+        "-B",
+        "tools/check_ontology.py"
+      ],
+      "atKST": "2026-11-08T02:56:24.133573+09:00",
+      "exit": 0,
+      "stdout": "PASS: RDF parsing, defined terms, TTL/JSON-LD equivalence, 48 task mappings, positive SHACL, 4 rejected invalid fixtures, 4 competency queries, Obsidian mirrors.\r\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+        "-B",
+        "tools/check_doc_path_citations.py",
+        "--ratchet",
+        "--base-ref",
+        "428e5fc6b822d33e7e76316f443716b03579efa0"
+      ],
+      "atKST": "2026-11-08T02:56:26.755430+09:00",
+      "exit": 0,
+      "stdout": "PASS check_doc_path_citations --ratchet: 290 broken citation(s), all in baseline, none stale, floor unchanged.\r\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+        "-B",
+        "tools/check_doc_single_source.py",
+        "--ratchet"
+      ],
+      "atKST": "2026-11-08T02:56:32.720878+09:00",
+      "exit": 0,
+      "stdout": "PASS check_doc_single_source --ratchet: 16 pairs, all in baseline, none stale.\r\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+        "-B",
+        "tools/check_contract_bindings.py"
+      ],
+      "atKST": "2026-11-08T02:56:33.650638+09:00",
+      "exit": 0,
+      "stdout": "PASS check_contract_bindings: 57 fixtures each referenced by a test; 21 bound kernel response TYPES each have >=1 serving-anchor test (counted PER TYPE, not per anchor SITE: those types occupy 27 anchor sites; a multi-site type counts covered even if only one site is tested -- site-level weight is not decidable here, use tools/check_anchor_weight.py + the mutation harness); 14 replay guards present.\r\n  UNIT NOTE: TYPE count <= SITE count. Multi-site types (per-type coverage can mask an untested site): ApprovalView(2 sites: ['approvals']), BusinessBindingView(2 sites: ['business_handoff']), BusinessEditLockReleaseView(2 sites: ['business_handoff']), BusinessEditLockView(2 sites: ['business_handoff']), ControlRunDetail(3 sites: ['control']), ControlRunView(2 sites: ['control']), EvidenceEnvelope(6 sites: ['build_governance', 'results', 'runs', 'shard_completion', 'storage_commit', 'storage_view']), ModelExecutionManifestObservation(2 sites: ['model_uri_resolver', 'model_view']), NodeExecutionPermit(2 sites: ['node_execution', 'node_transport']), NodeResourceSnapshot(4 sites: ['capacity', 'gpu', 'observation']), WorkspaceCheckoutView(2 sites: ['workspace_recovery']), WorkspaceEnqueueResult(3 sites: ['workspace_api']), WorkspaceFirstRunCreateResult(2 sites: ['workspace_intents']), WorkspacePrepareResult(2 sites: ['workspace_api']), WorkspaceRestoreView(2 sites: ['workspace_recovery']), WorkspaceStartEnqueueResult(3 sites: ['workspace_start']), WorkspaceStartPrepareResult(2 sites: ['workspace_start'])\r\n  (Reporting sites is not a regression -- the TYPE number never meant 'sites verified'; this makes the counting unit explicit. EvidenceEnvelope-class multi-site anchors are why.)\r\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+        "-B",
+        "tools/check_frontend_integrity.py"
+      ],
+      "atKST": "2026-11-08T02:56:41.487209+09:00",
+      "exit": 0,
+      "stdout": "Scanning 97 frontend production source files under apps/web/src ...\r\n\r\nPASS Frontend Integrity Check: all 9 integrity rules satisfied (0 violations).\r\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+        "-B",
+        "tools/sync_obsidian.py",
+        "--check"
+      ],
+      "atKST": "2026-11-08T02:56:42.492292+09:00",
+      "exit": 0,
+      "stdout": "CHECK: 4967 managed files, 2516 pending exports, 0 conflicts. No writes.\r\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "atKST": "2026-11-08T02:57:06.623540+09:00",
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    }
+  ],
+  "firstCorrectedSourceFailure": {
+    "sourceSHA": "8e3fdbd076c03bd9f0cc9424c9089a19a3640b07",
+    "runID": 42398028486,
+    "attempt": 1,
+    "correlation": "fleet5-cr-csp02-esm-dev-compat-frontend-652d0651feff43e2b4fe5adf04cf4700",
+    "conclusion": "failure",
+    "failedJob": 128479523557,
+    "failedStep": "Run Vitest Unit Tests",
+    "files": {
+      "passed": 105,
+      "failed": 1,
+      "total": 106
+    },
+    "tests": {
+      "passed": 1350,
+      "failed": 1,
+      "total": 1351,
+      "errors": 0,
+      "skipped": 0,
+      "deselected": 0
+    },
+    "actualFailure": "TypeError: SourceTextModule is not a constructor",
+    "cause": "Node launcher --experimental-vm-modules was not propagated into Vitest workers",
+    "disposition": "Pass VM module parser flag through Vitest execArgv to actual workers; keep SourceTextModule loader/negative controls and all cases/counts/timeouts",
+    "remainingSteps": "Type/build/strict-CSP/dist upload skipped after test failure; portal job separately success",
+    "jobs": [
+      {
+        "id": 128479523557,
+        "run_id": 42398028486,
+        "workflow_name": "fleet5-cr-csp02-esm-dev-compat-frontend-652d0651feff43e2b4fe5adf04cf4700",
+        "head_branch": "agent/codex/fleet5-csp02-esm-dev-compat-r1-20261108",
+        "run_url": "https://api.github.com/repos/egparadise/SaintVision-Invion/actions/runs/42398028486",
+        "run_attempt": 1,
+        "node_id": "CR_kwDOUTJvXc8AAAAd6fny5Q",
+        "head_sha": "8e3fdbd076c03bd9f0cc9424c9089a19a3640b07",
+        "url": "https://api.github.com/repos/egparadise/SaintVision-Invion/actions/jobs/128479523557",
+        "html_url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/42398028486/job/128479523557",
+        "status": "completed",
+        "conclusion": "failure",
+        "created_at": "2026-11-07T17:47:25Z",
+        "started_at": "2026-11-07T17:47:27Z",
+        "completed_at": "2026-11-07T17:48:31Z",
+        "name": "frontend",
+        "steps": [
+          {
+            "name": "Set up job",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 1,
+            "started_at": "2026-11-07T17:47:27Z",
+            "completed_at": "2026-11-07T17:47:28Z"
+          },
+          {
+            "name": "Run actions/checkout@v4",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 2,
+            "started_at": "2026-11-07T17:47:28Z",
+            "completed_at": "2026-11-07T17:47:33Z"
+          },
+          {
+            "name": "Run actions/setup-node@v4",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 3,
+            "started_at": "2026-11-07T17:47:33Z",
+            "completed_at": "2026-11-07T17:47:33Z"
+          },
+          {
+            "name": "Install dependencies",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 4,
+            "started_at": "2026-11-07T17:47:33Z",
+            "completed_at": "2026-11-07T17:47:57Z"
+          },
+          {
+            "name": "Run ESLint",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 5,
+            "started_at": "2026-11-07T17:47:57Z",
+            "completed_at": "2026-11-07T17:48:02Z"
+          },
+          {
+            "name": "Run Vitest Unit Tests",
+            "status": "completed",
+            "conclusion": "failure",
+            "number": 6,
+            "started_at": "2026-11-07T17:48:02Z",
+            "completed_at": "2026-11-07T17:48:29Z"
+          },
+          {
+            "name": "Check generated discovery contract type",
+            "status": "completed",
+            "conclusion": "skipped",
+            "number": 7,
+            "started_at": "2026-11-07T17:48:29Z",
+            "completed_at": "2026-11-07T17:48:29Z"
+          },
+          {
+            "name": "TypeScript Check & Production Build",
+            "status": "completed",
+            "conclusion": "skipped",
+            "number": 8,
+            "started_at": "2026-11-07T17:48:29Z",
+            "completed_at": "2026-11-07T17:48:29Z"
+          },
+          {
+            "name": "Run actions/setup-python@v5",
+            "status": "completed",
+            "conclusion": "skipped",
+            "number": 9,
+            "started_at": "2026-11-07T17:48:29Z",
+            "completed_at": "2026-11-07T17:48:29Z"
+          },
+          {
+            "name": "Install pinned hosted browser regression harness",
+            "status": "completed",
+            "conclusion": "skipped",
+            "number": 10,
+            "started_at": "2026-11-07T17:48:29Z",
+            "completed_at": "2026-11-07T17:48:29Z"
+          },
+          {
+            "name": "Boot actual built frontend under canonical strict CSP",
+            "status": "completed",
+            "conclusion": "skipped",
+            "number": 11,
+            "started_at": "2026-11-07T17:48:29Z",
+            "completed_at": "2026-11-07T17:48:29Z"
+          },
+          {
+            "name": "Upload strict CSP browser and standalone generation evidence",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 12,
+            "started_at": "2026-11-07T17:48:29Z",
+            "completed_at": "2026-11-07T17:48:30Z"
+          },
+          {
+            "name": "Upload Web Build Artifact",
+            "status": "completed",
+            "conclusion": "skipped",
+            "number": 13,
+            "started_at": "2026-11-07T17:48:30Z",
+            "completed_at": "2026-11-07T17:48:30Z"
+          },
+          {
+            "name": "Post Run actions/setup-node@v4",
+            "status": "completed",
+            "conclusion": "skipped",
+            "number": 25,
+            "started_at": "2026-11-07T17:48:30Z",
+            "completed_at": "2026-11-07T17:48:30Z"
+          },
+          {
+            "name": "Post Run actions/checkout@v4",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 26,
+            "started_at": "2026-11-07T17:48:30Z",
+            "completed_at": "2026-11-07T17:48:30Z"
+          },
+          {
+            "name": "Complete job",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 27,
+            "started_at": "2026-11-07T17:48:30Z",
+            "completed_at": "2026-11-07T17:48:30Z"
+          }
+        ],
+        "check_run_url": "https://api.github.com/repos/egparadise/SaintVision-Invion/check-runs/128479523557",
+        "labels": [
+          "ubuntu-latest"
+        ],
+        "runner_id": 1000020565,
+        "runner_name": "GitHub Actions 1000020565",
+        "runner_group_id": 0,
+        "runner_group_name": "GitHub Actions"
+      },
+      {
+        "id": 128479523684,
+        "run_id": 42398028486,
+        "workflow_name": "fleet5-cr-csp02-esm-dev-compat-frontend-652d0651feff43e2b4fe5adf04cf4700",
+        "head_branch": "agent/codex/fleet5-csp02-esm-dev-compat-r1-20261108",
+        "run_url": "https://api.github.com/repos/egparadise/SaintVision-Invion/actions/runs/42398028486",
+        "run_attempt": 1,
+        "node_id": "CR_kwDOUTJvXc8AAAAd6fnzZA",
+        "head_sha": "8e3fdbd076c03bd9f0cc9424c9089a19a3640b07",
+        "url": "https://api.github.com/repos/egparadise/SaintVision-Invion/actions/jobs/128479523684",
+        "html_url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/42398028486/job/128479523684",
+        "status": "completed",
+        "conclusion": "success",
+        "created_at": "2026-11-07T17:47:25Z",
+        "started_at": "2026-11-07T17:47:27Z",
+        "completed_at": "2026-11-07T17:48:30Z",
+        "name": "Portal Container Build & Hardened Runtime Smoke",
+        "steps": [
+          {
+            "name": "Set up job",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 1,
+            "started_at": "2026-11-07T17:47:27Z",
+            "completed_at": "2026-11-07T17:47:28Z"
+          },
+          {
+            "name": "Run actions/checkout@v4",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 2,
+            "started_at": "2026-11-07T17:47:28Z",
+            "completed_at": "2026-11-07T17:47:33Z"
+          },
+          {
+            "name": "Build Portal Docker Image with BuildKit",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 3,
+            "started_at": "2026-11-07T17:47:33Z",
+            "completed_at": "2026-11-07T17:48:16Z"
+          },
+          {
+            "name": "Verify Lane-Internal Built Image Identity (Self-Derived)",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 4,
+            "started_at": "2026-11-07T17:48:16Z",
+            "completed_at": "2026-11-07T17:48:16Z"
+          },
+          {
+            "name": "Produce Portal Release Tarball and Strict Release Evidence (Codex r6 Block 1)",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 5,
+            "started_at": "2026-11-07T17:48:16Z",
+            "completed_at": "2026-11-07T17:48:16Z"
+          },
+          {
+            "name": "Upload Portal Release Artifacts (Tarball & Evidence JSON)",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 6,
+            "started_at": "2026-11-07T17:48:16Z",
+            "completed_at": "2026-11-07T17:48:18Z"
+          },
+          {
+            "name": "Verify Portal Load Release Script (--verify-only)",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 7,
+            "started_at": "2026-11-07T17:48:18Z",
+            "completed_at": "2026-11-07T17:48:18Z"
+          },
+          {
+            "name": "Setup Mock Upstream HTTPS Server and Test PKI",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 8,
+            "started_at": "2026-11-07T17:48:18Z",
+            "completed_at": "2026-11-07T17:48:19Z"
+          },
+          {
+            "name": "Launch Portal Container via portal-up.sh",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 9,
+            "started_at": "2026-11-07T17:48:19Z",
+            "completed_at": "2026-11-07T17:48:22Z"
+          },
+          {
+            "name": "Execute Hardened Runtime Verification via curl",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 10,
+            "started_at": "2026-11-07T17:48:22Z",
+            "completed_at": "2026-11-07T17:48:25Z"
+          },
+          {
+            "name": "Verify Automatic Rollback on Production Swap Failure (R6-H1 & R6-H2)",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 11,
+            "started_at": "2026-11-07T17:48:25Z",
+            "completed_at": "2026-11-07T17:48:28Z"
+          },
+          {
+            "name": "Teardown Portal Container via portal-down.sh",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 12,
+            "started_at": "2026-11-07T17:48:28Z",
+            "completed_at": "2026-11-07T17:48:28Z"
+          },
+          {
+            "name": "Post Run actions/checkout@v4",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 24,
+            "started_at": "2026-11-07T17:48:28Z",
+            "completed_at": "2026-11-07T17:48:28Z"
+          },
+          {
+            "name": "Complete job",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 25,
+            "started_at": "2026-11-07T17:48:28Z",
+            "completed_at": "2026-11-07T17:48:28Z"
+          }
+        ],
+        "check_run_url": "https://api.github.com/repos/egparadise/SaintVision-Invion/check-runs/128479523684",
+        "labels": [
+          "ubuntu-latest"
+        ],
+        "runner_id": 1000020564,
+        "runner_name": "GitHub Actions 1000020564",
+        "runner_group_id": 0,
+        "runner_group_name": "GitHub Actions"
+      }
+    ]
+  },
+  "mainProductExecution": false,
+  "actualPC3BrowserAcceptance": false,
+  "actualUsersVotesRuns": false,
+  "independentReview": "Pending one actual Claude started by Root after this worker settles/exits/releases",
+  "nextOwner": "Root: verify exact artifacts, actual Claude review, then controlled same-CSP PC3 deployment/browser/API check",
+  "remainingGates": [
+    "actual PC3 strict-CSP browser/login/no-blink/resource verification",
+    "two real distinct nonrequester approvers",
+    "requester enqueue and genuine Run/output",
+    "all5/GPU/storage/renewal/reconnect/reboot"
+  ],
+  "holds": "Original19HOLD/discharges0/runtimeB0/A1-A16/H1-H7/H3EA/RDNULL_HOLD/raw7UNREGISTERED/A01-A40NOT_RUN",
+  "receiptPublication": "Post-CI data is untracked and Root-ready; tracked source/docs are published at sourceSHA; no self-referential final-SHA commit claim",
+  "baseline428Failure": {
+    "atKST": "2026-11-08T02:34:05+09:00",
+    "runID": 42396627296,
+    "source": "428e5fc6b822d33e7e76316f443716b03579efa0",
+    "branch": "agent/codex/fleet5-csp-static-validator-r1-20261108",
+    "correlation": "fleet5-root-csp02-baseline-dev428e-7179ec272d3b4ae9ad2ed1432ee9b3cd",
+    "workflow": ".github/workflows/ac11-accessibility-e2e.yml",
+    "attempt": 1,
+    "watchExit": 1,
+    "conclusion": "failure",
+    "jobID": 128475294431,
+    "failedSteps": [
+      "Run desktop accessibility invariants in real Chrome",
+      "Upload accessibility E2E evidence"
+    ],
+    "exactSourceRefPathCorrelationEventAttempt1": true,
+    "actualDevPathFailureConfirmed": true,
+    "exactCJSDefaultImportSyntaxErrorCaptured": true,
+    "observedFailureSnippets": [
+      "2026-11-07T17:32:31.7765376Z   [BROWSER PAGEERROR] The requested module '/src/contracts/node-certificate-validator.cjs?import' does not provide an export named 'default'",
+      "2026-11-07T17:32:31.7831850Z playwright._impl._errors.TimeoutError: Locator.wait_for: Timeout 10000ms exceeded.",
+      "2026-11-07T17:32:31.7832530Z   - waiting for locator(\"header\") to be visible"
+    ],
+    "officialJobLogSHA256": "9bdb52a85d19b3e0389ee406b7659bd576b9e8e7d1c55e46f8774e0737ed0553",
+    "officialJobLogBytes": 183381,
+    "staticReviewCausalChainRemainsSeparateFromRuntimeErrorText": true,
+    "runtimeFailureExpectedNotSuccess": true,
+    "productAcceptance": false,
+    "mainProductExecution": false,
+    "wholeProgramComplete": false
+  },
+  "secondCorrectedSourceMeasurement": {
+    "sourceSHA": "3bd660b5d45cfcbdb19e4c2bf2d0792c53c60685",
+    "run": 42398323596,
+    "job": 128480424902,
+    "officialJobAndSteps": "success but continue-on-error journey output is a measured failure, not acceptance",
+    "rawCaseSummary": [
+      "2026-11-07T17:52:43.6846840Z {\"exitCode\": 1, \"tests\": {\"failure\": 2, \"error\": 0, \"skipped\": 0, \"passed\": 4}, \"unverified\": null, \"evidence\": \".work/ac11-accessibility-browser.json\"}"
+    ],
+    "redactedReport": {
+      "schemaVersion": "1.2.0",
+      "runPurpose": "s11-ac11-accessibility-e2e-hosted",
+      "axis": "accessibility-e2e",
+      "sourceRunId": "42398323596",
+      "sourceHeadSha": "3bd660b5d45cfcbdb19e4c2bf2d0792c53c60685",
+      "checkoutTreeSha": "b402bf8e16ff9c8c5d4b1819b72eb1d922fc83c9",
+      "cleanCheckout": true,
+      "startedAt": "2026-11-07T17:51:50Z",
+      "finishedAt": "2026-11-07T17:53:15.950363Z",
+      "environment": {
+        "topology": "github-hosted-single-runner",
+        "runnerImage": "ubuntu26-Linux-X64",
+        "browser": "Google Chrome 156.0.8078.79 (Blink engine)",
+        "frontendTransport": "vite-dev-server-with-browser-node-fixture",
+        "credentialsRequired": false,
+        "physicalFiveNodeComparable": false
+      },
+      "targetRef": {
+        "commit": "505a5f4b040badfbe1e703d5cac091ddf1db9620",
+        "path": "docs/vault/30_Development/S11_AC11_accessibility_user_device_target_v1.md",
+        "blob": "737853bbde0bc3da077c37acea132552e55f8eb9",
+        "criteria": {
+          "canonicalJourneyFailureCount": {
+            "operator": "eq",
+            "value": 0
+          },
+          "desktopInvariantFailureCount": {
+            "operator": "eq",
+            "value": 0
+          },
+          "contrastFailureCount": {
+            "operator": "eq",
+            "value": 0
+          },
+          "keyboardFailureCount": {
+            "operator": "eq",
+            "value": 0
+          },
+          "manualAcceptanceMissingCount": {
+            "operator": "eq",
+            "value": 0
+          }
+        }
+      },
+      "verdict": "MEASURED_FAIL",
+      "acceptanceClaim": false,
+      "artifactSha256": null,
+      "artifactStatus": "PENDING_UPLOAD",
+      "artifactUnit": "github-actions-uploaded-zip",
+      "cleanup": {
+        "isolatedBrowserContainerRemoved": true,
+        "producerTempResidueCount": null
+      },
+      "limitation": "hosted automatic measurement; same-SHA user-device keyboard/screen-reader acceptance absent",
+      "payload": {
+        "journeyIds": [
+          "test_actual_browser_quorum_snapshot_and_no_duplicate_vote",
+          "test_actual_browser_stale_run_and_revoked_review_are_rejected",
+          "test_browser_real_catalogue_owner_scope_and_revocation",
+          "test_browser_real_committed_model_and_current_permission",
+          "test_full_studio_login_project_approval_and_logout"
+        ],
+        "browserPhysicalCaseCount": 6,
+        "invariantIds": [
+          "inv01_bidirectionalSwitcher",
+          "inv02_trafficLightControls",
+          "inv03_dynamicZIndex",
+          "inv04_dockIntegration",
+          "inv05_keyboardAltTab",
+          "inv06_modalEscapeDismissal",
+          "inv07_layoutPersistence",
+          "inv08_colorContrastAA",
+          "inv09_honestCapacityMetrics"
+        ],
+        "inputDigests": {
+          "browserProofSha256": "29a68535fa0c8fdd46ac3a8aac10901869d9d72b84c7784bc059e2bb84493273",
+          "caseIdentitiesSha256": "2c9607e9d71244a90f1d6972ff0f34005b39d0f73019bc827b5cbd055a4903e9",
+          "browserJunitSha256": "6d9bdf2b1b3c4b0b0b97f5ca400daa252d07514aa7237677d72e45b44c10ccf3",
+          "desktopInvariantSha256": "965f3fc146b773419018cb6b5e5ef49b6d74078310bae2bb59ca36d7c6a85f4a"
+        },
+        "observations": [
+          {
+            "metric": "canonicalJourneyFailureCount",
+            "n": 5,
+            "successCount": 4,
+            "failureCount": 1,
+            "skipCount": 0,
+            "value": 1,
+            "errorsByClass": {
+              "browser-journey-failed": 1
+            }
+          },
+          {
+            "metric": "desktopInvariantFailureCount",
+            "n": 9,
+            "successCount": 9,
+            "failureCount": 0,
+            "skipCount": 0,
+            "value": 0,
+            "errorsByClass": {}
+          },
+          {
+            "metric": "contrastFailureCount",
+            "n": 3,
+            "successCount": 3,
+            "failureCount": 0,
+            "skipCount": 0,
+            "value": 0,
+            "errorsByClass": {}
+          },
+          {
+            "metric": "keyboardFailureCount",
+            "n": 2,
+            "successCount": 2,
+            "failureCount": 0,
+            "skipCount": 0,
+            "value": 0,
+            "errorsByClass": {}
+          },
+          {
+            "metric": "manualAcceptanceMissingCount",
+            "n": 1,
+            "successCount": 0,
+            "failureCount": 1,
+            "skipCount": 0,
+            "value": 1,
+            "errorsByClass": {
+              "manual-acceptance-not-supplied": 1
+            }
+          }
+        ]
+      },
+      "payloadSha256": "2de9a844eb2c2d0b9e6a907d0e04f4834345588f06d4a25c4b4f89a5f31d3971"
+    },
+    "causalSourceProof": [
+      "test_studio_browser.py has the only multiplicity2 journey; normalized failedJourneyCount1 and raw physicalFailures2 identify its two variants by closed-set source multiplicity",
+      "browser_page launches Node/Vite --config tests/browser/vite.config.ts directly, bypassing npm predev",
+      "studio journey requests root App graph before later desktop-invariants npm dev generates ignored ESM; this earlier graph requires the missing generated module"
+    ],
+    "correction": "Generate identical canonical ESM in the direct Vite browser fixture config before linking; no test/assertion/normalizer/workflow/timeout change",
+    "manualAcceptanceStillMissing": true
+  },
+  "inheritedSoundR1": {
+    "source": "4a29b57e6c6ccb75eed50147c00d52d3c8d6ac04",
+    "verdict": "CHANGES_REQUIRED_ONE_BOUNDED_DEV_ENTRY_POINT_DEFECT_KEEP_REAL_DEPLOYMENT_GATES",
+    "productionCorrectionSoundInherited": true,
+    "newReview": "Root-owned pending actual bounded delta review"
+  },
+  "newRegression": {
+    "priorCasesRetained": 14,
+    "newNativeESMBoundaryCases": 1,
+    "SourceTextModuleActualESM": true,
+    "stringsAndWasmGenerationDisabled": true,
+    "directViteBrowserFixtureGeneratesSameCanonicalESM": true,
+    "AC11WorkflowNormalizerAssertionsTimeoutUnchanged": true
+  },
+  "dispatchReceipts": [
+    {
+      "workflow": "frontend",
+      "sourceSHA": "cc6076254d5b8f54804081a8b1994d76d86cf81a",
+      "ref": "agent/codex/fleet5-csp02-esm-dev-compat-r1-20261108",
+      "correlation": "fleet5-cr-csp02-esm-dev-compat-frontend-027b7e5070bc421a850566f3f6536e4a",
+      "atUTC": "2026-11-07T17:55:22.339630+00:00",
+      "dispatchExit": 0,
+      "runID": 42398676174
+    },
+    {
+      "workflow": "docs",
+      "sourceSHA": "cc6076254d5b8f54804081a8b1994d76d86cf81a",
+      "ref": "agent/codex/fleet5-csp02-esm-dev-compat-r1-20261108",
+      "correlation": "fleet5-cr-csp02-esm-dev-compat-docs-c25f9ede2f13420bad258a433c295bcd",
+      "atUTC": "2026-11-07T17:55:24.206667+00:00",
+      "dispatchExit": 0,
+      "runID": 42398678884
+    },
+    {
+      "workflow": "ac11-accessibility-e2e",
+      "sourceSHA": "cc6076254d5b8f54804081a8b1994d76d86cf81a",
+      "ref": "agent/codex/fleet5-csp02-esm-dev-compat-r1-20261108",
+      "correlation": "fleet5-cr-csp02-esm-dev-compat-ac11-accessibility-e2e-b9eed416f63b43538106690cc3bd8cd1",
+      "atUTC": "2026-11-07T17:55:26.067941+00:00",
+      "dispatchExit": 0,
+      "runID": 42398681339
+    }
+  ],
+  "semanticTailComparisonBases": [
+    "428e5fc6b822d33e7e76316f443716b03579efa0",
+    "96afd799d49717fd40e4ddabd538d82accbe1958"
+  ],
+  "gitCommits": [
+    {
+      "sourceSHA": "8e3fdbd076c03bd9f0cc9424c9089a19a3640b07",
+      "KST": "2026-11-08T02:47:03+09:00",
+      "subject": "fix(web): bundle canonical validator as self-contained ESM for dev and build",
+      "commitExit": 0,
+      "pushExit": 0,
+      "setupHooksDisabled": true
+    },
+    {
+      "sourceSHA": "3bd660b5d45cfcbdb19e4c2bf2d0792c53c60685",
+      "KST": "2026-11-08T02:50:50+09:00",
+      "subject": "test(web): enable ESM VM parser in actual Vitest workers",
+      "commitExit": 0,
+      "pushExit": 0,
+      "setupHooksDisabled": true
+    },
+    {
+      "sourceSHA": "cc6076254d5b8f54804081a8b1994d76d86cf81a",
+      "KST": "2026-11-08T02:55:16+09:00",
+      "subject": "fix(web): prepare canonical ESM for directly launched browser fixture",
+      "commitExit": 0,
+      "pushExit": 0,
+      "setupHooksDisabled": true
+    }
+  ],
+  "publicInputPins": [
+    {
+      "path": "baseline-baseline-final-proof.json",
+      "bytes": 1450,
+      "SHA256": "36252158f6af93347b58daa50fee9eb02ca0a5851a7f3cec1c6e9712642d6f9c",
+      "rawPath": "baseline-baseline-final-proof.json.raw",
+      "rawBytes": 1481,
+      "rawSHA256": "3a1c2d65672b8bb12138b81624b49e63ba104e0009ecffee02a5c03314494645",
+      "parsedJSONEqual": true
+    },
+    {
+      "path": "baseline-final-jobs.json",
+      "bytes": 4959,
+      "SHA256": "31176ca5838c6028dbbe4de43635d35d573a9877099a73ae0f44fca13323a217",
+      "rawPath": "baseline-final-jobs.json.raw",
+      "rawBytes": 3469,
+      "rawSHA256": "3483b0bfaeb400bf421286a12ed959c674a2087d465fc12ebfe9b28775c949e5",
+      "parsedJSONEqual": true
+    },
+    {
+      "path": "baseline-final-run.json",
+      "bytes": 14440,
+      "SHA256": "311265ed1d65c944d4d036a65f20688645dd5a9d218edba259b9e4b4dcec8ba0",
+      "rawPath": "baseline-final-run.json.raw",
+      "rawBytes": 13111,
+      "rawSHA256": "e5e187929a7587b4f848c88a9642040b0afa0362dc5ac6c7426aec4c9295a3c7",
+      "parsedJSONEqual": true
+    },
+    {
+      "path": "inherited-r1-review.json",
+      "bytes": 13673,
+      "SHA256": "eb982feca945c13061b20b39c603684a24f88d5be6a723df4daffe6d6dbf9bf0",
+      "rawPath": "inherited-r1-review.json.raw",
+      "rawBytes": 13673,
+      "rawSHA256": "eb982feca945c13061b20b39c603684a24f88d5be6a723df4daffe6d6dbf9bf0",
+      "parsedJSONEqual": true
+    },
+    {
+      "path": "inherited-r1-root-verification.json",
+      "bytes": 1169,
+      "SHA256": "e8b5503eb2419a3181a3a97dd0af9f1d4f4e3d4b386d625959ebd604b0a2a1d0",
+      "rawPath": "inherited-r1-root-verification.json.raw",
+      "rawBytes": 1169,
+      "rawSHA256": "e8b5503eb2419a3181a3a97dd0af9f1d4f4e3d4b386d625959ebd604b0a2a1d0",
+      "parsedJSONEqual": true
+    },
+    {
+      "path": "root526-public-proof.json",
+      "bytes": 426,
+      "SHA256": "33283224de2b056eae7aa98b6cb52ee2b711d26264af876d28cfc74e0325fff8",
+      "rawPath": "root526-public-proof.json.raw",
+      "rawBytes": 444,
+      "rawSHA256": "ebffa1fdb4612813da263de74959d96614d0cdd0e98c659dc6f97e592852e984",
+      "parsedJSONEqual": true
+    }
+  ],
+  "standaloneOutputTextAudit": {
+    "rawRequireCallText": false,
+    "moduleExportsText": false,
+    "evalOrFunctionConstructorText": false,
+    "bytes": 21468
+  },
+  "postCIFinalSyncCheck": {
+    "command": "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe -B tools/sync_obsidian.py --check",
+    "exit": 0,
+    "atKST": "2026-11-08T02:59:59.187662+09:00",
+    "bytes": 529870,
+    "SHA256": "43600e1941cb3527e80adc2daac2064c53a44d129094da53869e6f50d46e334e",
+    "fullBytesEqual": true,
+    "apply": false,
+    "managedFiles": 4981,
+    "pendingExports": 2530,
+    "conflicts": 0,
+    "noWrites": true,
+    "interpretation": "Older source-branch view only; Root integrates own delta and must not export this old whole vault"
+  },
+  "rootReadyReceiptFiles": [
+    "delivery.json",
+    "publication-receipt.py",
+    "source-diff-cc6076254d5b.patch",
+    "local-gates-final-cc6076254d5b.json",
+    "postCI-final-sync-check.json",
+    "sync-state-postCI-after.json"
+  ]
+}
