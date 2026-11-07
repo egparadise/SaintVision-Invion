@@ -1,0 +1,14 @@
+{
+  "path": "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261107\\never.txt",
+  "bytes": 2,
+  "hex": "780a",
+  "SHA256": "73cb3858a687a8494ca3323053016282f3dad39d42cf62ca4e79dda2aac7d9ac",
+  "parentEntries": [
+    "never.txt"
+  ],
+  "state": "RETAINED_AFTER_AUTHOR_REPORTED_AUTOMATIC_POLICY_REJECTION_NONBLOCKING_TO_CODE_REVIEW",
+  "RootReadOnlyVerified": true,
+  "RootDeletionOrMoveAttempted": false,
+  "sourceCommitAndCIUnaffected": true,
+  "approvalReviewReportedReason": "blocked by policy"
+}

@@ -1,6 +1,6 @@
 {
   "schema": "fleet5-root-review-resource-sequence:1",
-  "atKST": "2026-11-07T10:29:55+09:00",
+  "atKST": "2026-11-07T11:27:47+09:00",
   "completedB": {
     "task": "task_d4c4c809ed4e",
     "review": "ac9182c3e3d606ec027c0be2e90e049ff50d54f1",
@@ -12,9 +12,53 @@
     "verdict": "ACCEPT auxiliary delta at design/proposal level, no remaining blocker",
     "source": "8874b2dfe0dda9a019bd5f334636668290702e13"
   },
-  "active": null,
-  "pending": [],
-  "authorParallelWork": "B frozen exacttestedPythoncandidate normalpublication/DocsCoreBackend; K2 fixedWIP02 real28top274subPASS/5oldregressions restored, normalpublication/DocsCore authorizedmsg934. No actualCODEreview yet.",
+  "active": {
+    "atKST": "2026-11-07T11:27:47+09:00",
+    "status": "ACTUAL_INDEPENDENT_B_OPERATION_CODE_REVIEW_STARTED_VERDICT_PENDING",
+    "target": "746789a36091c8601afea23fe176069e2fa7d87b",
+    "base": "b3bbdc8d92a39f2f797a7680deb2770d6f705af0",
+    "branch": "agent/codex/fleet5-b-a7-operation-guard-r1-20261107",
+    "task": "task_1e856e06e90a",
+    "dispatch": "ctx_fe0931cf5bde",
+    "workspace": "d98dc9d3-fe61-4cb2-9776-dff349347a61::D:/Project/SaintVisionI-Invion/fleet5-b-operation-7467-code-review-20261107",
+    "agent": "claude",
+    "startReceiptState": "ready",
+    "sourceDocs": 42323636412,
+    "sourceCore": 42323639274,
+    "sourceBackend": 42323642052,
+    "predecessorActualLifecycle": {
+      "state": "succeeded",
+      "stage": "settled",
+      "liveness": "exited",
+      "terminalState": "released"
+    },
+    "authorAwaitingVerdictQuestion": "msg_9efd2479aece",
+    "independentVerdict": null,
+    "actualAuthority": null,
+    "wholeProgramComplete": false
+  },
+  "pending": [
+    {
+      "atKST": "2026-11-07T11:27:47+09:00",
+      "status": "H12_ACTUAL_CODE_REVIEW_TASK_QUEUED_NOT_STARTED",
+      "target": "6d7ee3d85bd0e47eb7b787234c10d5dbfdb3a9e8",
+      "base": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed",
+      "branch": "agent/codex/fleet5-k2-h12-signature-code-r1-20261107",
+      "task": "task_7cf5765e1538",
+      "dependency": "task_1e856e06e90a",
+      "dependencyDispatch": "ctx_fe0931cf5bde",
+      "actualReviewerDispatch": null,
+      "workerStarted": false,
+      "sourceDocs": 42324844830,
+      "sourceCore": 42324848063,
+      "authorAwaitingVerdictQuestion": "msg_9e7956d99942",
+      "startCondition": "Predecessor task settled and ready dependency, then fresh proven actual predecessor exited/released; one Claude only.",
+      "independentVerdict": null,
+      "actualAuthority": null,
+      "wholeProgramComplete": false
+    }
+  ],
+  "authorParallelWork": "Both authors preserve exact published candidates and evidence at one actual-verdict ask each. B review is actually started; H12 is queued behind it, not started.",
   "reason": "actuala7e9 and5a3c reviews+CI verified andprecisefixscopesdelivered; do notselfclose source/runtime",
   "genericApprovalMissing": false,
   "completedRL1": {
@@ -22,7 +66,7 @@
     "review": "0e53fc024ca773b7719182e170e5e126aeaf5b95",
     "verdict": "ACCEPT TEST-ONLY; R-L1 CLOSED; no new findings"
   },
-  "nextActualReviewTrigger": "Concrete immutable published candidate and exact appropriate requiredCI results; one actual reviewer after fresh exited/released lifecycle.",
+  "nextActualReviewTrigger": "Actual B CODE verdict then fresh predecessor exited/released and task7cf ready; never launch a second reviewer or poll mail.",
   "completedIntegration": {
     "task": "task_78064fb4b7ff",
     "dispatch": "ctx_ed7ec73163d6",

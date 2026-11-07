@@ -1,15 +1,19 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.459"
+version: "1.0.460"
 status: "review"
 author: "Codex"
-updated: "2026-11-07T10:35:12+09:00"
+updated: "2026-11-07T11:27:47+09:00"
 source_of_truth: "Git"
 active_card: "FLEET5 continued supervision with PORTAL-REFRESH-FLEET-20261106"
-active_card_status: "H12fixedWIP02NEWactual4phasePASS28top274sub/5oldregressionsrestored->publish934DocsCorepending; BpublishDocsCoreBackendpending; actualCODEreviewpending/NULL_HOLD/fleetincomplete"
-active_card_next: "K2 Codex exact4testedGitblobs normalcommit/push/ONEexactDocsCore; B Codex exactPythoncandidatepublication/ONEexactDocsCoreBackend; Root actualimmutableCI receipts then singleindependentCODEreview, no authority/runtimegrant."
+active_card_status: "B7467DocsCoreBackendPASS->actualClaudeCODEctxfe09pending; H126d7DocsCorePASS->task7cfqueueddep1e; authorsawaitrealverdicts; actualNULL_HOLD/fleetincomplete"
+active_card_next: "Root actualB_CODEverdict then provenexit/release and readyH12task7cf start; authors keep7467/6d7 immutable at questions9efd/9e795; no task100/rolegrant/cleanupbypass."
 ---
+
+## 2026-11-07T11:27:47+09:00 두 고정 구현의 실제 CI 수신과 독립 코드 검토 순서
+
+전달 경계 후보 746789a의 문서·Core·Backend CI와 서명 후보 6d7ee3d의 문서·Core CI를 Root가 실제 커밋·원격 ref·워크플로·산출물로 대조했다. 전달 경계는 별도 Claude ctx_fe0931cf5bde의 실제 코드 검토를 시작했고 서명 후보는 task_7cf5765e1538로 순서를 기다린다. 작성자는 각 후보를 고정하고 실제 판정 질문 하나씩 대기한다. CI 성공을 독립 코드 수락·실권한·5대 운영 인수·전체 완료로 승격하지 않는다. 직접 명령·exit·SHA·CI ID/correlation·원문 해시·건너뜀·각 결과 출처와 다음 담당은 Root History/Evidence에 보존했다. 별도 2바이트 파일은 자동 승인 검토의 정책 차단 후 보존했으며 코드 검토를 막지 않는다.
 
 ## 2026-11-07T10:35:12+09:00 5대 장비의 새 읽기 전용 준비 실측
 

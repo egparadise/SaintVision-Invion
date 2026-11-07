@@ -1,0 +1,116 @@
+{
+  "atKST": "2026-11-07T11:05:29+09:00",
+  "source": "746789a36091c8601afea23fe176069e2fa7d87b",
+  "base": "b3bbdc8d92a39f2f797a7680deb2770d6f705af0",
+  "branch": "agent/codex/fleet5-b-a7-operation-guard-r1-20261107",
+  "remoteExact": true,
+  "nameStatusCounts": {
+    "A": 93,
+    "M": 1
+  },
+  "onlyNonDocs": [
+    "services/control-plane/src/inv/dispatch.py",
+    "tests/core/test_delivery_operation_origin.py"
+  ],
+  "exactRootTestedProductAndTestGitBlobHashes": true,
+  "packetSHA256": "6aed7e3406c5a2b1419882e54eee8c28e9398431705e7e5f614d1db0d084f96a",
+  "verifiedSafePacketEntries": 46,
+  "all45ManifestInputsMatched": true,
+  "rootFreshExactSourceRefHeadEventPathAttemptCorrelationsThreeCIAllJobsSuccess": true,
+  "Docs": 42323636412,
+  "Core": 42323639274,
+  "BackendRun": 42323642052,
+  "DocsStepsSuccess": 19,
+  "CoreMainSteps": {
+    "success": 42,
+    "conditionalSkipped": 6
+  },
+  "CoreStorageStepsSuccess": 16,
+  "CoreJUnit": {
+    "tests": 9283,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 46,
+    "passed": 9237
+  },
+  "CoreNewOperationCasesDirectJUnit": 24,
+  "CoreGo": {
+    "testPass": 178,
+    "topLevelPass": 67,
+    "subtestPass": 111,
+    "testSkip": 1,
+    "packageSkip": 3,
+    "fail": 0
+  },
+  "Backend": [
+    {
+      "job": 128253765787,
+      "python": "3.14",
+      "passed": 8879,
+      "skipped": 75,
+      "deselected": 2,
+      "failures": 0,
+      "errors": 0,
+      "source": "Fresh official job log plus successful required JUnit validation gate; no downloaded Backend XML claim."
+    },
+    {
+      "job": 128253765886,
+      "python": "3.12",
+      "passed": 8879,
+      "skipped": 75,
+      "deselected": 2,
+      "failures": 0,
+      "errors": 0,
+      "source": "Fresh official job log plus successful required JUnit validation gate; no downloaded Backend XML claim."
+    }
+  ],
+  "MLflowLogPassed": 3,
+  "officialCoreArtifactDigestMatchesActualZIP": true,
+  "publishedWheelDispatchByteEqualsSource": true,
+  "builtLinuxBinaryMetadata": [
+    {
+      "file": "inv-discover",
+      "bytes": 10212675,
+      "SHA256": "1e05b73f910c20d870094046df74e10c4822f34b20ef97b600f2eb5dba705ddf",
+      "vcsRevision": "746789a36091c8601afea23fe176069e2fa7d87b",
+      "vcsModifiedFalse": true,
+      "GoVersion": "1.27.1",
+      "metadataReadOnly": true,
+      "binaryExecuted": false
+    },
+    {
+      "file": "inv-node",
+      "bytes": 13387338,
+      "SHA256": "c99371298f8870b602764fb5e9327a55ad2b72f2f3e71df6643e2d8ab21ff1c8",
+      "vcsRevision": "746789a36091c8601afea23fe176069e2fa7d87b",
+      "vcsModifiedFalse": true,
+      "GoVersion": "1.27.1",
+      "metadataReadOnly": true,
+      "binaryExecuted": false
+    }
+  ],
+  "binaryExecutedOrDeployed": false,
+  "raw3496WrapperAndBothZIPsByteVerified": true,
+  "old29HelpersUnchanged": true,
+  "verificationRecovery": "Direct gh job-log read was refused by CLI terminal-escape protection before rendering. Preserved error; used official GitHub connector decoded-log API, never disabled escape protection. Existing exact metadata/artifact checks were replayed from saved original readbacks; no tests/builds/CI dispatch repeated.",
+  "legacyGuard": "REFUSED_UNCHANGED_NOT_CLEAN",
+  "original19": "HOLD",
+  "actualRuntimeB": 0,
+  "actualAuthority": null,
+  "strayIncident": {
+    "path": "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261107\\never.txt",
+    "bytes": 2,
+    "hex": "780a",
+    "SHA256": "73cb3858a687a8494ca3323053016282f3dad39d42cf62ca4e79dda2aac7d9ac",
+    "parentEntries": [
+      "never.txt"
+    ],
+    "state": "RETAINED_AFTER_AUTHOR_REPORTED_AUTOMATIC_POLICY_REJECTION_NONBLOCKING_TO_CODE_REVIEW",
+    "RootReadOnlyVerified": true,
+    "RootDeletionOrMoveAttempted": false,
+    "sourceCommitAndCIUnaffected": true,
+    "approvalReviewReportedReason": "blocked by policy"
+  },
+  "independentCODEReview": "PENDING",
+  "wholeProgramComplete": false
+}

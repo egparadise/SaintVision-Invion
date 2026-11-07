@@ -1,11 +1,11 @@
 ---
 doc_id: "GOV-FLEET5-B-BOOTSTRAP-SCOPE-20261106"
 title: "FLEET5 B 병행 역할과 전환 구현 범위 결정"
-version: "1.4.20"
+version: "1.4.21"
 status: "review"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-11-07T10:18:15+09:00"
+updated: "2026-11-07T11:27:47+09:00"
 source_of_truth: "Git"
 ---
 
@@ -208,3 +208,8 @@ e75b의실제CONDITIONAL_MODE_SOURCE_EVIDENCE_ACCEPT_KEEP_19_HOLD와LowL1/C1C2�
 ## 고정 WIP02 게시 단계와 원문 한 경로의 JSON 표현
 
 Root는실제24GREEN/인과BASE1RED의code/test와같은WIP02를직접대조하고msgfb188로정상게시·동일SHA Docs/Core/Backend각1회후실제CODE검토를허용했다. rawlog한개공백gate2에는msg193의정확JSON표현예외만허용하며원문/두ZIP/oldmanifest/공백gate는불변이다. 14기존receipt와raw1의잔여untracked를정확기록한다. 게시/3CI/CODE검토는현재미완료이며19HOLD/actualRuntimeB0/NULL권한/실5대인수는승격하지않는다.
+
+
+## 게시 후보 7467의 실제 전체 CI와 별도 CODE 검토
+
+Root는 source746의 Docs/Core/Backend exact CI와 실제 새unit24·Core9237pass46skip·Backend각8879pass75skip·packaged dispatch bytes를 대조했다. 실제 Claude ctxfe09/task1e의 CODE 검토가 진행 중이며 이전 LowL1/C1/C2 충족 여부와 기존19HOLD는 구별한다. 6d7 서명 후보도 actual Docs/Core를 통과했지만 그 CODE review는 순서 대기다. 밖의2바이트 파일은 자동 승인 검토의 정책 차단 후 보존하며 원래코드/CI/검토를 막지 않는다. 전체B·실권한·5PC 인수는 미완료다.
