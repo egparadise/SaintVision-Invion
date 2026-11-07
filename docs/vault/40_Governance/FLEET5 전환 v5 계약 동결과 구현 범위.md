@@ -1,11 +1,11 @@
 ---
 doc_id: "GOV-FLEET5-BOOTSTRAP-V5-FREEZE-CODE-SCOPE-20261106"
 title: "FLEET5 전환 v5 계약 동결과 구현 범위"
-version: "1.0.35"
+version: "1.0.36"
 status: "active"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-11-07T08:47:15+09:00"
+updated: "2026-11-07T09:00:27+09:00"
 source_of_truth: "Git"
 ---
 
@@ -271,3 +271,8 @@ NEWCore42300147891의exactf2c1/ref/manual/core.yml/attempt1/correlation과두job
 ## 실제 H12 계약 지적과 R2 설계 교정
 
 8141/Docs42313093780/all19의M1RDorigin/slot/vector/status·L1G00기원/authoritycurrency·L2G10늦은단일expiry인과를Root가검증해msg_e41b206771c3로같은작성자R2설계만허용했다. 나머지정책/시간/단계/nextCODEDATA는수락된범위를유지하고논리7origin/24H2slot/29vector와10미실행case정밀성을실제set으로확인한다. 실제bindingNULL_HOLD·암호/CODE/등록/positive/runtime미허용은그대로다.
+
+
+## H12 R2 고정 설계 후보와 좁은 재검토 대기열
+
+0bf8/direct382fe3의10ownA/9manifestinput/14pin/11actual8141원본·기존5origin/26capsule/27vectorprefix·기타H2/6case/단계/time식보존과Docs42314572353/all19를Root가대조했다. 논리7origin/24H2slot/29vector와10PROPOSEDcase는구조확인이지M1/L1/L2의독립닫힘이아니다. B모드task696의실제판정/종료·해제뒤한번수행할재검토task638219a79555를등록했으며새검토자는아직미시작이다. 실제bindingNULL_HOLD/nextCODEDATAONLY/producer·positive·runtime·5대인수미완료는유지한다.

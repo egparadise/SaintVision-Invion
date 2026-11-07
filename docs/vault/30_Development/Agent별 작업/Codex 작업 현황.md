@@ -1,15 +1,19 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.452"
+version: "1.0.453"
 status: "review"
 author: "Codex"
-updated: "2026-11-07T08:47:15+09:00"
+updated: "2026-11-07T09:00:27+09:00"
 source_of_truth: "Git"
 active_card: "FLEET5 continued supervision with PORTAL-REFRESH-FLEET-20261106"
-active_card_status: "H12actual8141M1L1L2/R2DESIGNfixe41b; Bmodeb3bbverified/actualconditionalreviewctx6b18PENDING/19HOLD; noCODEgrant/fleetincomplete"
-active_card_next: "K2Codex narrowR2RDorigin+G00currency+C09G10expiry design; Claude Bmodeb3bb conditionalverdict+futurecodeDATA assessment; Root verifyactualfixedcandidate before one narrowreview, no positive/runtimegrant"
+active_card_status: "H12R20bf8verified/Docs42314572353/task6382queuedNOTSTARTEDafterBmode696; activeBmode6b18; M1L1L2semanticPENDING/actualNULLHOLD/fleetincomplete"
+active_card_next: "Claude Bmodeb3bb actualverdict then Root exactreview/CI/freshlifecycle/custody; startqueuedreadyH12R2task6382 once; no extra reviewer orCODEgrant before semanticverdict"
 ---
+
+## 2026-11-07T09:00:27+09:00 H1/H2 R2 고정 증거와 의존 재검토 순서 확정
+
+H12보완0bf852a6/direct382fe3의10own추가문서·9manifestinput·14pin·실제8141원본11Git객체와기존5origin/26capsule/27vectorprefix/기타H2·6case/단계/시간식보존·Docs42314572353/all19를Root가대조했다. 새7origin/24H2slot/29vector와10미실행case는구조확인으로만기록한다. 진행중B모드검토task696뒤의한정H12R2재검토task6382를대기열에등록했으며추가검토자는시작하지않았다. 세지적의독립닫힘/실제권한/5대인수·전체완료는아직아니다. 직접명령/exit/KST/Git/CI/원래log·구조대조와미실행축·다음담당은Root History/Evidence에보존했다.
 
 ## 2026-11-07T08:47:15+09:00 H1/H2 실제 설계 수정 배정과 모드 출처 독립 검토
 

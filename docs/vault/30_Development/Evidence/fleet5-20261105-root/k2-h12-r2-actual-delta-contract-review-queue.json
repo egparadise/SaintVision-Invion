@@ -1,0 +1,21 @@
+{
+  "atKST": "2026-11-07T09:00:27+09:00",
+  "status": "FROZEN_R2_DOCS_VERIFIED_DEPENDENT_REVIEW_TASK_QUEUED_NOT_STARTED",
+  "target": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed",
+  "sourceBranch": "agent/codex/fleet5-k2-h1-h2-authority-design-r2-20261107",
+  "sourceDocs": 42314572353,
+  "ownerTask": "task_a95ef3d8ccce",
+  "ownerDispatch": "ctx_ed23b4a777d0",
+  "ownerQuestion": "msg_16c9f2a0ec9b",
+  "rootFixGrant": "msg_e41b206771c3",
+  "task": "task_638219a79555",
+  "dependency": "task_696b2783bc0b",
+  "dependencyDispatch": "ctx_6b18bf1ef5b4",
+  "workerStarted": false,
+  "dispatch": null,
+  "independentVerdict": null,
+  "findingsClosure": "M1_L1_L2_CANDIDATE_CORRECTIONS_NOT_YET_INDEPENDENTLY_CLOSED",
+  "actualBindings": null,
+  "codeImplementationGranted": false,
+  "wholeProgramComplete": false
+}
