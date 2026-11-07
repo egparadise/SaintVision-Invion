@@ -1,0 +1,194 @@
+{
+ "tool": "integration_data_checks.py",
+ "atKST": "2026-11-07T13:51:11+09:00",
+ "python": "3.10.11",
+ "exact": "7033778ad3d2bc284e36f7e29be7597dbb7d9f23",
+ "base": "6d7ee3d85bd0e47eb7b787234c10d5dbfdb3a9e8",
+ "accepted746": "746789a36091c8601afea23fe176069e2fa7d87b",
+ "productExecution": "NONE (git object reads + ast.parse only)",
+ "checks": {
+  "G1_exact_parent_is_base": {
+   "ok": true,
+   "detail": {
+    "parent": "6d7ee3d85bd0e47eb7b787234c10d5dbfdb3a9e8"
+   }
+  },
+  "G2_complete_delta_46_only_two_code_plus_author_docs": {
+   "ok": true,
+   "detail": {
+    "count": 46,
+    "productM": [
+     "services/control-plane/src/inv/dispatch.py"
+    ],
+    "testA": [
+     "tests/core/test_delivery_operation_origin.py"
+    ],
+    "authorEvidenceA": 43,
+    "authorHistoryA": 1,
+    "other": []
+   }
+  },
+  "G3_two_blob_sha256": {
+   "ok": true,
+   "detail": {
+    "services/control-plane/src/inv/dispatch.py": "82f029614537eb5bab56934e4b6736fe3dd52ece54b9b9a3996815b131e41de4",
+    "tests/core/test_delivery_operation_origin.py": "3dacdb63f83ab1d8075ddcbe422d82daad20bd56f643adee0fc7ae97715925d2"
+   }
+  },
+  "G4_blobs_equal_accepted_746": {
+   "ok": true,
+   "detail": {
+    "746": {
+     "services/control-plane/src/inv/dispatch.py": "6ff21a1c820f0832ea9075c5dd83a78426ae22e2",
+     "tests/core/test_delivery_operation_origin.py": "8592dbd811f4c78b1237a0f93a672b06fe35060f"
+    },
+    "703": {
+     "services/control-plane/src/inv/dispatch.py": "6ff21a1c820f0832ea9075c5dd83a78426ae22e2",
+     "tests/core/test_delivery_operation_origin.py": "8592dbd811f4c78b1237a0f93a672b06fe35060f"
+    }
+   }
+  },
+  "G5_dispatch_preimage_746parent_equals_6d7": {
+   "ok": true,
+   "detail": {
+    "746parent": "af287f3e3744b08a282e84af0bfa5790e4c92072",
+    "6d7": "af287f3e3744b08a282e84af0bfa5790e4c92072"
+   }
+  },
+  "G6_node_agent_tree_equal": {
+   "ok": true,
+   "detail": {
+    "6d7": "d3de3a19d4dd541a9d4b5d9e6fd25ae88951e702",
+    "703": "d3de3a19d4dd541a9d4b5d9e6fd25ae88951e702",
+    "entries": 202
+   }
+  },
+  "G7_clean_three_way_merge_nondoc_equal": {
+   "ok": true,
+   "detail": {
+    "mergeTree": "0e01ff4a4fc8671945b7907e059bf6d1c8783f1d",
+    "nonDocTopEntries": 32
+   }
+  },
+  "G8_746parent_nondoc_equals_mergebase": {
+   "ok": true,
+   "detail": {
+    "mergeBase": "72028cbac903c4415d9979f980a6e0f9948e914f",
+    "nonDocDiff": []
+   }
+  },
+  "X1_6d7_side_nonGo_changes_have_no_delivery_refs": {
+   "ok": true,
+   "detail": {
+    "files": [
+     ".github/workflows/peer-floor-observation-diagnostic.yml",
+     ".github/workflows/preparation-rate-clock.yml",
+     "deploy/lan/leaf_rotation_standalone_runtime.py",
+     "deploy/lan/worker_peer_floor.py",
+     "tests/core/test_worker_peer_floor_mount_order_stage2.py",
+     "tests/core/test_worker_peer_floor_observation_diagnostics.py",
+     "tests/integration/test_build_preparations_real_pg.py",
+     "tests/proofs/run_preparation_rate_clock.py",
+     "tests/test_backend_leaf_runtime_contract.py",
+     "tests/test_build_fleet5_setup_packet.py",
+     "tests/test_fleet5_plain_reentry.py",
+     "tests/test_fleet5_settled_launcher.py"
+    ],
+    "hits": []
+   }
+  },
+  "A1_once_capture_guard_before_deliver_in_existing_try": {
+   "ok": true,
+   "detail": {
+    "guard": "type(operation) is not str or operation not in ('execute', 'observe', 'cancel')",
+    "kw": {
+     "observation_only": "operation == 'observe'",
+     "cancel_only": "operation == 'cancel'"
+    },
+    "tryBodyLen": 3,
+    "handler": "Exception"
+   }
+  },
+  "A2_once_reads_attempt_operation_exactly_once": {
+   "ok": true,
+   "detail": {
+    "reads": 1
+   }
+  },
+  "A3_acquire_operation_only_builtin_literals": {
+   "ok": true,
+   "detail": {
+    "assignments": [
+     "'cancel' if run['state'] in {'cancelled', 'failed'} or row['operation'] == 'cancel' else 'observe'",
+     "'cancel'",
+     "'execute'"
+    ]
+   }
+  },
+  "A4_finish_unchanged_vs_6d7_and_reads_operation_only_under_not_sent": {
+   "ok": true,
+   "detail": {
+    "finishOperationReads": [
+     "attempt.operation"
+    ]
+   }
+  },
+  "A5_only_DeliveryWorker_once_changed": {
+   "ok": true,
+   "detail": {
+    "changed": [
+     "DeliveryWorker.once"
+    ]
+   }
+  },
+  "T1_test_imports_and_24_cases": {
+   "ok": true,
+   "detail": {
+    "imports": [
+     "from types import SimpleNamespace",
+     "import inv.containment as containment",
+     "import inv.dispatch as dispatch",
+     "import pytest"
+    ],
+    "cases": {
+     "test_builtin_domain_is_captured_once_and_forwarded_as_exact_bools": 3,
+     "test_rejected_origin_never_delivers_or_invokes_rich_methods": 14,
+     "test_capture_property_error_uses_existing_handler_and_finish": 1,
+     "test_none_attempt_preserves_reconciliation_and_followup_branches": 4,
+     "test_stopped_finish_preserves_followup_order": 2
+    },
+    "total": 24
+   }
+  },
+  "T2_no_test_basename_collision": {
+   "ok": true,
+   "detail": {
+    "matches": [
+     "tests/core/test_delivery_operation_origin.py"
+    ]
+   }
+  },
+  "R1_root_receipts_bind_exact_source_base": {
+   "ok": true,
+   "detail": {
+    "sourceReceiptSHA256": "8f4fc3f7003cec2682f66efdc00c609657defeee0a06bfefe56b344ad63a8ac6",
+    "ciReceiptSHA256": "c06c73451ac3e2fb3f3887a7692609600ec9e1580d2957043594f9141e0f6930"
+   }
+  },
+  "R2_root_core_xml_9382_46skip_0fail": {
+   "ok": true,
+   "detail": {
+    "path": "core-tests.xml",
+    "tests": 9382,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 46
+   }
+  }
+ },
+ "passed": 18,
+ "failed": [],
+ "total": 18,
+ "gitArgvCount": 39,
+ "gitArgvAllRc0": true
+}

@@ -1,0 +1,213 @@
+"""Claude independent DATA checks for joint 703 integration review.
+
+Git object reads via argv subprocess and Python ast.parse of blob bytes only.
+No product import, no pytest, no product execution. Writes one JSON result.
+Usage: python -I integration_data_checks.py <repo> <out.json> <rootSourceJson> <rootCIJson>
+"""
+import ast
+import hashlib
+import json
+import subprocess
+import sys
+from datetime import datetime, timedelta, timezone
+
+KST = timezone(timedelta(hours=9))
+EXACT = "7033778ad3d2bc284e36f7e29be7597dbb7d9f23"
+BASE = "6d7ee3d85bd0e47eb7b787234c10d5dbfdb3a9e8"
+ACC746 = "746789a36091c8601afea23fe176069e2fa7d87b"
+DISPATCH = "services/control-plane/src/inv/dispatch.py"
+TEST = "tests/core/test_delivery_operation_origin.py"
+AUTHOR_EVID = "docs/vault/30_Development/Evidence/fleet5-cpu-integration-pin-r1-20261107-codex/"
+AUTHOR_HIST = "docs/vault/30_Development/History/2026-11-07_FLEET5_CPU_Integration_Pin_R1_Codex.md"
+EXPECT_SHA = {
+    DISPATCH: "82f029614537eb5bab56934e4b6736fe3dd52ece54b9b9a3996815b131e41de4",
+    TEST: "3dacdb63f83ab1d8075ddcbe422d82daad20bd56f643adee0fc7ae97715925d2",
+}
+REPO = sys.argv[1]
+argv_log = []
+
+
+def git(*args, binary=False):
+    cmd = ["git", "-C", REPO, *args]
+    p = subprocess.run(cmd, capture_output=True)
+    argv_log.append({"argv": cmd[3:], "rc": p.returncode})
+    if p.returncode != 0:
+        raise SystemExit("git failed: %r rc=%d %s" % (args, p.returncode, p.stderr[:300]))
+    return p.stdout if binary else p.stdout.decode("utf-8")
+
+
+def blob(ref, path):
+    return git("show", "%s:%s" % (ref, path), binary=True)
+
+
+def rev(spec):
+    return git("rev-parse", spec).strip()
+
+
+checks = {}
+fail = []
+
+
+def check(name, ok, detail):
+    checks[name] = {"ok": bool(ok), "detail": detail}
+    if not ok:
+        fail.append(name)
+
+
+# 1. Git topology and complete delta
+check("G1_exact_parent_is_base", rev(EXACT + "^") == BASE and git("rev-list", "--count", BASE + ".." + EXACT).strip() == "1",
+      {"parent": rev(EXACT + "^")})
+ns = [l.split("\t") for l in git("-c", "diff.renameLimit=0", "diff", "--no-renames", "--name-status", BASE, EXACT).splitlines() if l]
+classes = {"productM": [], "testA": [], "authorEvidenceA": 0, "authorHistoryA": 0, "other": []}
+for status, path in ns:
+    if path == DISPATCH and status == "M":
+        classes["productM"].append(path)
+    elif path == TEST and status == "A":
+        classes["testA"].append(path)
+    elif path.startswith(AUTHOR_EVID) and status == "A":
+        classes["authorEvidenceA"] += 1
+    elif path == AUTHOR_HIST and status == "A":
+        classes["authorHistoryA"] += 1
+    else:
+        classes["other"].append([status, path])
+check("G2_complete_delta_46_only_two_code_plus_author_docs",
+      len(ns) == 46 and classes["productM"] == [DISPATCH] and classes["testA"] == [TEST]
+      and classes["authorHistoryA"] == 1 and classes["authorEvidenceA"] == 43 and not classes["other"],
+      {"count": len(ns), **classes})
+sha = {p: hashlib.sha256(blob(EXACT, p)).hexdigest() for p in EXPECT_SHA}
+check("G3_two_blob_sha256", sha == EXPECT_SHA, sha)
+b746 = {p: rev("%s:%s" % (ACC746, p)) for p in EXPECT_SHA}
+b703 = {p: rev("%s:%s" % (EXACT, p)) for p in EXPECT_SHA}
+check("G4_blobs_equal_accepted_746", b746 == b703, {"746": b746, "703": b703})
+p746 = rev(ACC746 + "^")
+pre = {"746parent": rev("%s:%s" % (p746, DISPATCH)), "6d7": rev("%s:%s" % (BASE, DISPATCH))}
+check("G5_dispatch_preimage_746parent_equals_6d7", pre["746parent"] == pre["6d7"], {"746parent": p746, **pre})
+na = {"6d7": rev(BASE + ":services/node-agent"), "703": rev(EXACT + ":services/node-agent")}
+na_count = len([l for l in git("ls-tree", "-r", "--name-only", EXACT, "--", "services/node-agent").splitlines() if l])
+check("G6_node_agent_tree_equal", na["6d7"] == na["703"] == "d3de3a19d4dd541a9d4b5d9e6fd25ae88951e702" and na_count == 202,
+      {**na, "entries": na_count})
+mt = git("merge-tree", "--write-tree", BASE, ACC746).splitlines()[0].strip()
+top_m = [l for l in git("ls-tree", mt).splitlines() if not l.endswith("\tdocs")]
+top_x = [l for l in git("ls-tree", EXACT).splitlines() if not l.endswith("\tdocs")]
+check("G7_clean_three_way_merge_nondoc_equal", top_m == top_x, {"mergeTree": mt, "nonDocTopEntries": len(top_x)})
+mb = git("merge-base", BASE, ACC746).strip()
+nd = [l for l in git("-c", "diff.renameLimit=0", "diff", "--no-renames", "--name-only", mb, p746).splitlines() if l and not l.startswith("docs/")]
+check("G8_746parent_nondoc_equals_mergebase", nd == [], {"mergeBase": mb, "nonDocDiff": nd})
+
+# 2. 6d7-side changes never reference delivery symbols
+sym = ("inv.dispatch", ".dispatch import", "DeliveryWorker", "DeliveryQueue", "DeliveryAttempt", "observation_only", "cancel_only")
+side = [l for l in git("-c", "diff.renameLimit=0", "diff", "--no-renames", "--name-only", mb, BASE).splitlines()
+        if l and not l.startswith("docs/") and not l.startswith("services/node-agent/")]
+hits = []
+for path in side:
+    text = blob(BASE, path).decode("utf-8", "replace")
+    for s in sym:
+        if s in text:
+            hits.append([path, s])
+check("X1_6d7_side_nonGo_changes_have_no_delivery_refs", hits == [], {"files": side, "hits": hits})
+
+# 3. AST of dispatch.py at 703
+src = blob(EXACT, DISPATCH)
+tree = ast.parse(src)
+cls = {n.name: n for n in tree.body if isinstance(n, ast.ClassDef)}
+once = [f for f in cls["DeliveryWorker"].body if isinstance(f, ast.FunctionDef) and f.name == "once"][0]
+tries = [n for n in ast.walk(once) if isinstance(n, ast.Try)]
+t = tries[0]
+first, guard, call_stmt = t.body[0], t.body[1], t.body[2]
+cap_ok = (isinstance(first, ast.Assign) and first.targets[0].id == "operation"
+          and isinstance(first.value, ast.Attribute) and first.value.attr == "operation"
+          and first.value.value.id == "attempt")
+guard_ok = isinstance(guard, ast.If) and isinstance(guard.body[0], ast.Raise) and not guard.orelse
+gsrc = ast.unparse(guard.test)
+guard_shape = gsrc == "type(operation) is not str or operation not in ('execute', 'observe', 'cancel')"
+call = call_stmt.value
+kw = {k.arg: ast.unparse(k.value) for k in call.keywords}
+call_ok = (ast.unparse(call.func) == "self.delivery.deliver" and kw == {
+    "observation_only": "operation == 'observe'", "cancel_only": "operation == 'cancel'"})
+reads = [n for n in ast.walk(once) if isinstance(n, ast.Attribute) and n.attr == "operation"]
+handler = t.handlers[0]
+handler_ok = ast.unparse(handler.type) == "Exception" and len(t.handlers) == 1
+check("A1_once_capture_guard_before_deliver_in_existing_try",
+      cap_ok and guard_ok and guard_shape and call_ok and len(tries) == 1 and handler_ok and len(t.body) == 3,
+      {"guard": gsrc, "kw": kw, "tryBodyLen": len(t.body), "handler": ast.unparse(handler.type)})
+check("A2_once_reads_attempt_operation_exactly_once", len(reads) == 1, {"reads": len(reads)})
+acq = [f for f in cls["DeliveryQueue"].body if isinstance(f, ast.FunctionDef) and f.name == "acquire"][0]
+assigns = []
+for n in ast.walk(acq):
+    if isinstance(n, ast.Assign) and any(isinstance(tg, ast.Name) and tg.id == "operation" for tg in n.targets):
+        assigns.append(ast.unparse(n.value))
+consts_ok = all(a in ("'cancel'", "'execute'") or a.startswith("'cancel' if ") for a in assigns)
+check("A3_acquire_operation_only_builtin_literals", consts_ok and len(assigns) == 3, {"assignments": assigns})
+fin = [f for f in cls["DeliveryQueue"].body if isinstance(f, ast.FunctionDef) and f.name == "finish"][0]
+fin_reads = [ast.unparse(n) for n in ast.walk(fin) if isinstance(n, ast.Attribute) and n.attr == "operation"]
+check("A4_finish_unchanged_vs_6d7_and_reads_operation_only_under_not_sent",
+      ast.dump(fin) == ast.dump([f for f in [c for c in ast.parse(blob(BASE, DISPATCH)).body if isinstance(c, ast.ClassDef) and c.name == "DeliveryQueue"][0].body if isinstance(f, ast.FunctionDef) and f.name == "finish"][0]),
+      {"finishOperationReads": fin_reads})
+# every other top-level def/class in dispatch is AST-equal to 6d7 except DeliveryWorker.once
+old = ast.parse(blob(BASE, DISPATCH))
+def members(t):
+    out = {}
+    for n in t.body:
+        if isinstance(n, ast.ClassDef):
+            for m in n.body:
+                out["%s.%s" % (n.name, getattr(m, "name", type(m).__name__))] = ast.dump(m)
+        else:
+            out[getattr(n, "name", ast.unparse(n)[:60])] = ast.dump(n)
+    return out
+mo, mn = members(old), members(tree)
+changed = sorted(k for k in set(mo) | set(mn) if mo.get(k) != mn.get(k))
+check("A5_only_DeliveryWorker_once_changed", changed == ["DeliveryWorker.once"], {"changed": changed})
+
+# 4. Test file AST: imports, case counts
+tsrc = blob(EXACT, TEST)
+tt = ast.parse(tsrc)
+imports = sorted({ast.unparse(n) for n in tt.body if isinstance(n, (ast.Import, ast.ImportFrom))})
+fns = [n for n in tt.body if isinstance(n, ast.FunctionDef) and n.name.startswith("test_")]
+def count_cases(fn):
+    total = 1
+    for d in fn.decorator_list:
+        if isinstance(d, ast.Call) and ast.unparse(d.func) == "pytest.mark.parametrize":
+            arg = d.args[1]
+            if isinstance(arg, ast.Name):
+                v = [n for n in tt.body if isinstance(n, ast.Assign) and n.targets[0].id == arg.id][0].value
+                total *= len(v.elts)
+            else:
+                total *= len(arg.elts)
+    return total
+cases = {f.name: count_cases(f) for f in fns}
+check("T1_test_imports_and_24_cases",
+      imports == ["from types import SimpleNamespace", "import inv.containment as containment", "import inv.dispatch as dispatch", "import pytest"]
+      and sum(cases.values()) == 24,
+      {"imports": imports, "cases": cases, "total": sum(cases.values())})
+tname = [l for l in git("ls-tree", "-r", "--name-only", EXACT, "--", "tests").splitlines() if l.endswith("/test_delivery_operation_origin.py")]
+check("T2_no_test_basename_collision", tname == [TEST], {"matches": tname})
+
+# 5. Root receipts hashed as DATA
+rs = json.load(open(sys.argv[3], encoding="utf-8"))
+rc = json.load(open(sys.argv[4], encoding="utf-8"))
+check("R1_root_receipts_bind_exact_source_base",
+      rs["source"] == rc["source"] == EXACT and rs["base"] == rc["base"] == BASE
+      and rs["completeChangedPathCount"] == 46 and rs["acceptedSourceSHA256"] == EXPECT_SHA
+      and rc["originCasesDirectCorePASS"] == 24 and rc["actualAuthority"] is None and rc["wholeProgramComplete"] is False,
+      {"sourceReceiptSHA256": hashlib.sha256(open(sys.argv[3], "rb").read()).hexdigest(),
+       "ciReceiptSHA256": hashlib.sha256(open(sys.argv[4], "rb").read()).hexdigest()})
+core = [x for x in rc["JUnitReportsSeparateNotSummed"] if x["path"] == "core-tests.xml"][0]
+check("R2_root_core_xml_9382_46skip_0fail", core == {"path": "core-tests.xml", "tests": 9382, "failures": 0, "errors": 0, "skipped": 46},
+      core)
+
+out = {
+    "tool": "integration_data_checks.py",
+    "atKST": datetime.now(KST).isoformat(timespec="seconds"),
+    "python": sys.version.split()[0],
+    "exact": EXACT, "base": BASE, "accepted746": ACC746,
+    "productExecution": "NONE (git object reads + ast.parse only)",
+    "checks": checks,
+    "passed": len(checks) - len(fail), "failed": fail, "total": len(checks),
+    "gitArgvCount": len(argv_log),
+    "gitArgvAllRc0": all(a["rc"] == 0 for a in argv_log),
+}
+with open(sys.argv[2], "w", encoding="utf-8", newline="\n") as fh:
+    json.dump(out, fh, ensure_ascii=False, indent=1)
+    fh.write("\n")
+print("checks %d passed %d failed %s" % (len(checks), out["passed"], fail))
+sys.exit(1 if fail else 0)

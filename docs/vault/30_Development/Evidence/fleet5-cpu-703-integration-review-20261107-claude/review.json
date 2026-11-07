@@ -1,0 +1,82 @@
+{
+ "task": "FLEET5-CPU-703-INDEPENDENT-INTEGRATION-REVIEW-20261107",
+ "orca": {"task": "task_65b33b98a1b9", "dispatch": "ctx_1ba53b566ab1", "predecessor": "ctx_cfee4b4aa2e7/task_7c3f0ee2e044 (observed settled by Root before start; not re-observed by reviewer)"},
+ "reviewer": "Claude (one actual reviewer; no helper, subagent or second reviewer)",
+ "author": "Codex",
+ "startKST": "2026-11-07T13:49:53+09:00",
+ "branch": "agent/claude/fleet5-cpu-703-integration-review-20261107",
+ "branchCreatedFrom": "7033778ad3d2bc284e36f7e29be7597dbb7d9f23",
+ "target": {
+  "exact": "7033778ad3d2bc284e36f7e29be7597dbb7d9f23",
+  "directBase": "6d7ee3d85bd0e47eb7b787234c10d5dbfdb3a9e8",
+  "authorBranch": "agent/codex/fleet5-cpu-integration-pin-r1-20261107",
+  "authorRemoteRefAtReview": "7033778ad3d2bc284e36f7e29be7597dbb7d9f23",
+  "acceptedConstituentSources": {"A7OperationGuard": "746789a36091c8601afea23fe176069e2fa7d87b", "H12PrivateMath": "6d7ee3d85bd0e47eb7b787234c10d5dbfdb3a9e8"}
+ },
+ "rootBoardsRead": {
+  "rootWorktree": "D:/Project/SaintVisionI-Invion/fleet-five-orchestration-20261105",
+  "rootHEAD": "03ec16750bd5af8a3bf7c1578f5dcbebe6bc65cf",
+  "INDEX-PROGRESS-001": "1.0.504",
+  "WORKBOARD-CODEX-001": "1.0.465",
+  "WORKBOARD-CLAUDE-001": "1.2.130",
+  "HISTORY-FLEET5-20261105-START-CODEX": "1.0.113",
+  "candidate703Boards": "historical only"
+ },
+ "scope": "Integration delta only: accepted 746 dispatch operation-origin guard + its unit test placed onto accepted 6d7 H12 source. Not a re-review of 746 or 6d7 constituents; their narrow verdicts are cited, not re-derived.",
+ "verdict": "ACCEPT_JOINT_703_INTEGRATION_CODE_KEEP_ACTUAL_HOLD",
+ "severity": {"mandatoryCurrentScope": 0, "HIGH": 0, "MEDIUM": 0, "LOW": 0, "INFO": 3},
+ "integrationFacts": [
+  "Exact 703 has one parent 6d7; complete delta 46 paths = M dispatch.py + A test_delivery_operation_origin.py + 43 author Evidence A + 1 author History A; no other path.",
+  "dispatch.py SHA256 82f02961... (blob 6ff21a1c) and test SHA256 3dacdb63... (blob 8592dbd8) equal the accepted 746 blobs.",
+  "dispatch.py preimage at 746 parent b3bbdc8d equals 6d7 (blob af287f3e); 746 parent non-doc tree equals merge-base 72028cba.",
+  "git merge-tree 6d7+746 = 0e01ff4a, conflict-free; its 32 non-doc top-level entries equal exact 703. Docs differ only because 746's own Evidence is not carried, which is intended.",
+  "services/node-agent tree d3de3a19 (202 entries) equal at 6d7 and 703.",
+  "No non-doc, non-node-agent file changed on the 6d7 side (2 workflows, 2 deploy/lan, 8 tests) references inv.dispatch, DeliveryWorker/Queue/Attempt, observation_only or cancel_only. The H12 Go code and the Python delivery path share no import or symbol."
+ ],
+ "codeReview": {
+  "file": "services/control-plane/src/inv/dispatch.py",
+  "lines": "336-344 (DeliveryWorker.once)",
+  "onlyChangedMember": "DeliveryWorker.once (AST: every other function/class member equal to 6d7)",
+  "controlFlow": "operation captured once from attempt.operation (line 336) inside the existing try; type(operation) is str and membership in the builtin tuple is checked (337) before any rich comparison; ValueError (338) goes to the existing except Exception handler, maps to SYS-0001 with not_sent False, then queue.finish takes the ordinary backoff/uncertain path; deliver is never called for a rejected value.",
+  "operationIdentity": "DeliveryQueue.acquire assigns operation only from builtin literals 'cancel'/'observe'/'execute' (3 assignments) and persists the same value in the UPDATE and delivery_reserved event before constructing the frozen DeliveryAttempt; the real path therefore always passes the guard and the forwarded flags are identical in value to the old expressions.",
+  "immutableCapture": "once has exactly one attempt.operation read; both kwargs use the local; type(...) is str rejects str subclasses before == is evaluated.",
+  "deliveryContract": "NodeDelivery.deliver(node, permit, *, observation_only=False, cancel_only=False) unchanged; flags are now exact bools.",
+  "rejectionPersistenceRetry": "DeliveryQueue.finish is AST-equal to 6d7. Rejection writes last_error_code SYS-0001 and capped backoff under worker_token check; no new SQL, column, event, migration or state transition.",
+  "dependencies": "No new import in dispatch.py. The test imports only types, pytest, inv.containment, inv.dispatch; no basename collision; tests/conftest.py, pyproject.toml, core.yml and backend.yml unchanged from merge-base."
+ },
+ "findings": [
+  {"id": "J703-I1", "severity": "INFO", "mandatory": false, "where": "dispatch.py:284 DeliveryQueue.finish", "text": "finish re-reads attempt.operation only when not_sent is true. Rejected-origin paths always pass not_sent False, so the guard path never reaches it, and the real frozen DeliveryAttempt carries a builtin literal. Pre-existing, unchanged in 703, already acknowledged in the test spy comment. Not an integration defect."},
+  {"id": "J703-I2", "severity": "INFO", "mandatory": false, "where": "dispatch.py:338", "text": "A rejected origin maps to the generic SYS-0001 and stays uncertain with capped retry instead of a dedicated terminal code. It is unreachable from the real acquire (literals only), so this is fail-closed defense-in-depth. A distinct error code could be a FUTURE observability card; not required now."},
+  {"id": "J703-I3", "severity": "INFO", "mandatory": false, "where": "tests/core/test_delivery_operation_origin.py", "text": "The 24 cases exercise the real once with replaced collaborators and make no SQL claim. Real-PG queue behaviour for valid operations is covered only by the existing suites in the hosted Backend/Core lanes at 703, which passed. Root ran the 746 BASE causal RED on its original source; it was not rerun on 703 and is not needed for the integration verdict because the once member is byte-identical to 746."}
+ ],
+ "constituentReviewsCitedNotRedone": {
+  "746": "dc18f6681627aca9d3eceb7d5a85dbc97b551b5b ACCEPT_NARROW_CODE_KEEP_HOLD",
+  "6d7": "0761de1846d715594b6c7d9db276dff9f5b86bae ACCEPT_NARROW_PRIVATE_MATH_AND_SCOPED_GUARD_CODE_KEEP_HOLD; optional H12C-L1 is not an outstanding mandatory defect",
+  "b51": "f489e7e9f1be1687ba2f5f1ff7075dd85a6f4656 closed OPG-L1 only for collector.collect()+probe.evaluate_discovered; finite.current_world remains base-seeded; legacy INSTANCE:operation remains REFUSED"
+ },
+ "ciAt703": {
+  "reviewerReadOnlyGhApi": "run/jobs metadata only; no dispatch, no artifact download",
+  "docs": {"run": 42335285577, "job": 128290723992, "event": "workflow_dispatch", "attempt": 1, "conclusion": "success", "steps": "success=19", "title": "FLEET5-CPU-INTEGRATION-R1-DOCS-7033778ad3d2-f33034956307"},
+  "core": {"run": 42335287638, "jobs": {"128290730592 core": "success=42, skipped=6", "128290730407 s01-storage-roundtrip": "success=16"}, "attempt": 1, "conclusion": "success", "title": "FLEET5-CPU-INTEGRATION-R1-CORE-7033778ad3d2-73d3d1b3c353", "skippedStepsDeclaredOptional": "steps 7,8,9,10 (inputs.run_fleet5_peer_phase_proof / _fixed_proof) and 37,38 (inputs.run_s08_acceptance)"},
+  "backend": {"run": 42335289761, "jobs": {"128290737435 backend (3.14)": "success=18, skipped=2", "128290737705 backend (3.12)": "success=20", "128290737412 mlflow-live": "success=9"}, "attempt": 1, "conclusion": "success", "title": "FLEET5-CPU-INTEGRATION-R1-BACKEND-7033778ad3d2-34e4fbc3ed4d", "skippedStepsDeclaredOptional": "3.14 steps 7 and 9, if: matrix.python-version == '3.12'"},
+  "allHeadSha": "7033778ad3d2bc284e36f7e29be7597dbb7d9f23",
+  "allHeadBranch": "agent/codex/fleet5-cpu-integration-pin-r1-20261107",
+  "countsAttribution": "Core XML 9382=9336 pass+46 skip, 24 origin cases, Go 146/550, Docker 1/4, Backend 8977/75/2 and MLflow 3 come from the Root-verified receipt (parsed here as DATA). The reviewer did not download or parse artifacts, XML or log ZIPs.",
+  "rootReceipts": {
+   ".work/joint-703-source-root-verified.json": "8f4fc3f7003cec2682f66efdc00c609657defeee0a06bfefe56b344ad63a8ac6",
+   ".work/joint-703-final-ci-artifacts-root-verified.json": "c06c73451ac3e2fb3f3887a7692609600ec9e1580d2957043594f9141e0f6930"
+  },
+  "authorLocalPostCIReceipt": "post-ci-integration-receipt.local.json e6240679... and post-ci-file-index.local.json 4da8c280... are author-local, not part of the 703 CI tree; not read or modified by the reviewer"
+ },
+ "ownDataChecks": {
+  "script": "integration_data_checks.py.txt",
+  "argv": ["C:/Users/inviz/AppData/Local/Programs/Python/Python310/python.exe", "-I", "integration_data_checks.py", "<worktree>", "<evidence>/integration-data-checks.json", "<root>/.work/joint-703-source-root-verified.json", "<root>/.work/joint-703-final-ci-artifacts-root-verified.json"],
+  "attempts": [{"n": 1, "out": "scratch dry.json", "exit": 0, "checks": "18/18"}, {"n": 2, "out": "integration-data-checks.json", "exit": 0, "checks": "18/18"}],
+  "method": "git object reads by argv and ast.parse of blob bytes; no product import or execution"
+ },
+ "notRun": ["product import/app", "pytest", "Go/compiler", "crypto", "Node/browser/runtime", "SSH/Docker/PG", "install/PKI/trust/OS/process/credential changes", "new Core/Backend/Frontend CI", "old finite corpus/main() scripts", "746 causal RED rerun", "artifact/log download"],
+ "notGranted": ["install", "deploy", "merge", "runtime authority", "trust", "binding", "registration"],
+ "heldUnchanged": "Original19 HOLD; acceptedBaselineDischarges0; runtimeB0; A1-A16 PENDING; H1-H7/H3EA/RD NULL_HOLD; raw7 UNREGISTERED; A01-A40 NOT_RUN; full 5PC and whole program incomplete. One CPU Node registration, project link, fresh resource observation, two distinct non-requester Run approvals and an executed command with audit are not proven. No private H12 result implies runtime authority.",
+ "freshCpuAdmissionCandidate": "not read or reviewed; separate CODE task with its own CI/review gate",
+ "next": "Root/Codex aggregator receives this verdict and decides the next scope (first actual CPU preflight is Root-owned)."
+}

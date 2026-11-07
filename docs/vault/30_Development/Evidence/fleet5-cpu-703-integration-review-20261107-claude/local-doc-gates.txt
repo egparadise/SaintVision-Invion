@@ -1,0 +1,16 @@
+Reviewer local gates, Windows, D:\Project\SaintVisionI-Invion\.venv\Scripts\python.exe 3.14.7 -B, PYTHONUTF8=1, cwd=worktree root, serial; tree = 7033778a + own staged review History/Evidence only.
+sync_obsidian is CHECK only with the canonical Root state; --conflicts-out goes to reviewer scratch. No apply/adopt/resolve/state write/export. Raw logs: scratch j703-gate-NN.log, sha256 below.
+01 2026-11-07T13:54:18.912+09:00..2026-11-07T13:54:42.340+09:00 exit=0 logsha=faacec022aa7931f81b0bfc68eb38fff5d2b11838a7a3ea36d213fc7cb852b33 :: python -B tools/check_docs.py
+    PASS: 24 original hashes, 1278 versioned documents, wiki links, 48 tasks, 12 outcomes, owner/reviewer/skills, dependency DAG.
+02 2026-11-07T13:54:42.342+09:00..2026-11-07T13:54:45.408+09:00 exit=0 logsha=7cdc12bf64f50ba0964625161638a4c639cf22d786a57f04685bed0718e14042 :: python -B tools/check_ontology.py
+    PASS: RDF parsing, defined terms, TTL/JSON-LD equivalence, 48 task mappings, positive SHACL, 4 rejected invalid fixtures, 4 competency queries, Obsidian mirrors.
+03 2026-11-07T13:54:45.409+09:00..2026-11-07T13:54:51.300+09:00 exit=0 logsha=389921b50662776ed834a285f70fc44ab61f7d5bdb4c5249c0a73c98113980de :: python -B tools/check_doc_path_citations.py --ratchet --base-ref 7033778ad3d2bc284e36f7e29be7597dbb7d9f23
+    PASS check_doc_path_citations --ratchet: 290 broken citation(s), all in baseline, none stale, floor unchanged.
+04 2026-11-07T13:54:51.301+09:00..2026-11-07T13:54:51.844+09:00 exit=0 logsha=13b5f5afed05999109839be1baec4ef70ea3c71bcb267353e59eba0f2ae3e448 :: python -B tools/check_doc_single_source.py --ratchet
+    PASS check_doc_single_source --ratchet: 16 pairs, all in baseline, none stale.
+05 2026-11-07T13:54:51.848+09:00..2026-11-07T13:55:03.041+09:00 exit=0 logsha=dd9c43445a39f632fd1aab8a98ec4c93f9a8d0d56bff64a96b3c148ab6fdf086 :: python -B tools/sync_obsidian.py --check --state D:/Project/SaintVision-Invion/SaintVisionI-Invion/.git/obsidian-sync-state.json --conflicts-out <scratch>/j703-sync-conflicts.json
+    stateBefore c7928b50f511ed4741696e01affb4c0d150a38e577a7e424bedcdf137fd76dae len=482077 files=3098
+    stateAfter  c7928b50f511ed4741696e01affb4c0d150a38e577a7e424bedcdf137fd76dae len=482077 files=3098 byteEqual=True fullJSONEqual=True
+    CHECK: 4526 managed files, 2075 pending exports, 0 conflicts. No writes.
+06 2026-11-07T13:55:03.045+09:00..2026-11-07T13:55:03.595+09:00 exit=0 logsha=e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 :: git diff --cached --check 7033778ad3d2bc284e36f7e29be7597dbb7d9f23
+worstExit=0
