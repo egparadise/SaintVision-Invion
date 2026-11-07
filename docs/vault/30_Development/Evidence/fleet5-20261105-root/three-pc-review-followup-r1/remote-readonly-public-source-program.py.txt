@@ -1,0 +1,13 @@
+import base64,hashlib,importlib.machinery,json,os,subprocess,sys
+from pathlib import Path
+sha=lambda b:hashlib.sha256(b).hexdigest()
+ops=Path('/home/saintvision-invion3/saintvision-share/ops-fresh-cpu-1efea-r1-20261107');assert Path(sys.prefix).resolve()==ops/'venv' and os.getuid()==1000
+cli=ops/'fresh_cpu_admission.py';assert sha(cli.read_bytes())=='8129ab5acf7061b0bc1834aa1142ae944471b1b177f018c810de34ea9a53fe7d'
+shadow=cli.resolve().parents[1]/'services/control-plane/src';assert not shadow.exists() and not shadow.is_symlink()
+sys.path.insert(0,str(shadow));pkg=importlib.machinery.PathFinder.find_spec('inv',sys.path);assert pkg is not None
+spec=importlib.machinery.PathFinder.find_spec('inv.fresh_cpu_admission',pkg.submodule_search_locations);assert spec is not None and Path(spec.origin).resolve()==ops/'venv/lib/python3.14/site-packages/inv/fresh_cpu_admission.py'
+assert sha(Path(spec.origin).read_bytes())=='76407ced1411f42a5eddd71c894f541b8691d461d4eb1eaea30f63b8bcf90d2c'
+ctx=ops/'build-observer-r1/context';df=(ctx/'Dockerfile.r2').read_bytes();boot=(ctx/'observer-bootstrap.py').read_bytes();assert len(df)<8192 and len(boot)<8192 and sha(df)=='260f52d71a52172ecf852391e47d3f9e78afa970be466a73eeb52076daa32113' and sha(boot)=='8cccc5a123b17bd369d1b55ab9fddd9830558d4006ce722582197b25cd09547d'
+probe="import hashlib,json,pathlib; p=pathlib.Path('/observer-bootstrap.py'); print(json.dumps({'bootstrapSHA256':hashlib.sha256(p.read_bytes()).hexdigest()}))"
+q=subprocess.run(['docker','exec','b8a2f8f55e524837c4b7db14565ec5f960c4492bc3b9df6972e7f1f153c2aec5','python','-I','-B','-c',probe],capture_output=True,timeout=10);assert q.returncode==0 and not q.stderr;inside=json.loads(q.stdout);assert inside['bootstrapSHA256']==sha(boot)
+print(json.dumps({'status':'READONLY_IMPORT_PATH_AND_OBSERVER_PUBLIC_BYTES_VERIFIED','DBWrites':False,'CLIExecution':False,'productModuleImported':False,'shareSourceShadowPath':str(shadow),'shareSourceShadowPathExists':False,'actualCLIPathInsertionReproduced':True,'resolvedLibraryOrigin':spec.origin,'resolvedLibrarySHA256':sha(Path(spec.origin).read_bytes()),'DockerfileR2Base64':base64.b64encode(df).decode(),'DockerfileR2SHA256':sha(df),'bootstrapBase64':base64.b64encode(boot).decode(),'bootstrapSHA256':sha(boot),'runningObserverBootstrapSHA256':inside['bootstrapSHA256'],'privateMaterialReadOrEmitted':False,'observerRestartOrNewLoop':False}))

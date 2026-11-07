@@ -1,0 +1,8 @@
+ARG PYTHON_IMAGE
+FROM ${PYTHON_IMAGE}
+ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1
+COPY saintvision_control_plane-0.1.0-py3-none-any.whl /tmp/saintvision_control_plane-0.1.0-py3-none-any.whl
+RUN python -m pip --disable-pip-version-check install --no-input --no-cache-dir --only-binary=:all: --index-url https://pypi.org/simple /tmp/saintvision_control_plane-0.1.0-py3-none-any.whl && python -m pip check && rm /tmp/saintvision_control_plane-0.1.0-py3-none-any.whl
+COPY observer-bootstrap.py /observer-bootstrap.py
+USER 1000:1000
+ENTRYPOINT ["python","-I","-B","/observer-bootstrap.py"]

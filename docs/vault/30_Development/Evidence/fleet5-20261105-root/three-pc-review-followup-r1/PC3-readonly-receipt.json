@@ -1,0 +1,23 @@
+{
+  "atKST": "2026-11-07T17:39:44+09:00",
+  "SSHExit": 0,
+  "stderrBytes": 0,
+  "knownHostsUnchanged": true,
+  "rawDiagnosticSuppressed": true,
+  "remote": {
+    "status": "READONLY_IMPORT_PATH_AND_OBSERVER_PUBLIC_BYTES_VERIFIED",
+    "DBWrites": false,
+    "CLIExecution": false,
+    "productModuleImported": false,
+    "shareSourceShadowPath": "/home/saintvision-invion3/saintvision-share/services/control-plane/src",
+    "shareSourceShadowPathExists": false,
+    "actualCLIPathInsertionReproduced": true,
+    "resolvedLibraryOrigin": "/home/saintvision-invion3/saintvision-share/ops-fresh-cpu-1efea-r1-20261107/venv/lib/python3.14/site-packages/inv/fresh_cpu_admission.py",
+    "resolvedLibrarySHA256": "76407ced1411f42a5eddd71c894f541b8691d461d4eb1eaea30f63b8bcf90d2c",
+    "DockerfileR2SHA256": "260f52d71a52172ecf852391e47d3f9e78afa970be466a73eeb52076daa32113",
+    "bootstrapSHA256": "8cccc5a123b17bd369d1b55ab9fddd9830558d4006ce722582197b25cd09547d",
+    "runningObserverBootstrapSHA256": "8cccc5a123b17bd369d1b55ab9fddd9830558d4006ce722582197b25cd09547d",
+    "privateMaterialReadOrEmitted": false,
+    "observerRestartOrNewLoop": false
+  }
+}

@@ -1,0 +1,37 @@
+import hashlib,json,os,socket,stat,subprocess,sys,time
+from pathlib import Path
+sha=lambda b:hashlib.sha256(b).hexdigest();phase='verify-exact-new-owned-node-state';result={'scope':'ONE_NEW_NODE_SERVICE_ONLY','tenantWorkloadOrUserApprovalExecuted':False,'oldNodeStateChanges':False,'privateCAClientSignerOrDBCredentialMounted':False,'wholeProgramComplete':False}
+try:
+ p=json.loads(sys.stdin.buffer.read(65537));plan=p['publicPlan'];nd=Path(plan['plannedNewNodeDirectory']).resolve();ops=Path(plan['ownedNewEnvironment']).resolve();state=nd/'state';name=plan['plannedContainerName']
+ assert os.getuid()==1000 and nd.is_dir() and (nd.stat().st_mode&0o777)==0o700 and state.is_dir() and (state.stat().st_mode&0o777)==0o700 and state.stat().st_uid==1000
+ assert not list(state.iterdir()),'Fresh state must be empty; no reuse/cleanup'
+ assert sha((nd/'peer-policy.json').read_bytes())==p['peerPolicySHA256'] and len((nd/'launch-signer.pub').read_bytes())==32
+ assert (nd/'node-key.pem').lstat().st_mode&0o077==0 and (nd/'node-key.pem').stat().st_uid==1000
+ assert not any((nd/n).exists() for n in ['ca-key.pem','cp-client-key.pem','launch-signer-key.pem'])
+ q=subprocess.run(['docker','container','inspect',name],capture_output=True,timeout=10);assert q.returncode!=0,'Container name collision; do not reuse'
+ for path in ['/proc/net/tcp','/proc/net/tcp6']:
+  for line in Path(path).read_text().splitlines()[1:]:
+   c=line.split();assert not(c[3]=='0A' and int(c[1].split(':')[-1],16)==19443),'Node endpoint port collision'
+ def inspect_image(ref):
+  q=subprocess.run(['docker','image','inspect',ref],capture_output=True,timeout=10);assert q.returncode==0;return json.loads(q.stdout)[0]
+ ni=inspect_image(p['NodeImageID']);wi=inspect_image(p['workloadImageID']);assert ni['Config']['Entrypoint']==['/inv-node'] and ni['Config']['Labels']['org.opencontainers.image.revision']==plan['source']
+ assert wi['Config']['User']=='65532:65532' and wi['Config']['Entrypoint']==['/inv-supervisor'] and not wi['Config'].get('Volumes')
+ assert p['profile']['images']==[wi['Id']] and p['profile']['max_cpu_millis']==500 and p['profile']['max_memory_bytes']==67108864
+ gid=Path('/var/run/docker.sock').stat().st_gid;assert gid>=0 and stat.S_ISSOCK(Path('/var/run/docker.sock').stat().st_mode)
+ runtime={'source':plan['source'],'nodeImageID':ni['Id'],'profile':p['profile'],'policyVersion':p['policyVersion'],'tenant':plan['tenant'],'epoch':plan['epoch'],'node':plan['newPlannedIDs']['nodeId'],'project':plan['project'],'resources':{'cpu':plan['newPlannedIDs']['cpuResourceId'],'memory':plan['newPlannedIDs']['memoryResourceId']},'selectedState':'new bind directory /state; planned named volume unused','CPWorkspaceConfiguration':'NOT_YET_CONFIGURED','userRunApproval':'NOT_GRANTED'}
+ rp=ops/'runtime-profile-r1.public.json';assert not rp.exists();rp.write_text(json.dumps(runtime,indent=2)+'\n',encoding='utf-8');rp.chmod(0o600)
+ nodeargs=['--tenant',plan['tenant'],'--node',plan['newPlannedIDs']['nodeId'],'--epoch',plan['epoch'],'--profile',p['profile']['version'],'--image',wi['Id'],'--executable','/usr/local/bin/python3','--state','/state','--public-key','/config/launch-signer.pub','--socket','/var/run/docker.sock','--serve','--listen','0.0.0.0:19443','--tls-cert','/config/node-cert.pem','--tls-key','/config/node-key.pem','--client-ca','/config/client-ca.pem','--peer-policy','/config/peer-policy.json']
+ args=['docker','create','--name',name,'--label','ai.saintvision.node='+plan['newPlannedIDs']['nodeId'],'--label','ai.saintvision.owner=root-cpu-1efea-r1','--restart','unless-stopped','--user','1000:1000','--group-add',str(gid),'--cpus','0.5','--memory','256m','--memory-swap','256m','--pids-limit','64','--read-only','--cap-drop','ALL','--security-opt','no-new-privileges','--network','bridge','--publish','192.168.45.143:19443:19443/tcp','--tmpfs','/tmp:rw,nosuid,nodev,size=16m','--mount','type=bind,src='+str(nd)+',dst=/config,readonly','--mount','type=bind,src='+str(state)+',dst=/state','--mount','type=bind,src=/var/run/docker.sock,dst=/var/run/docker.sock',ni['Id'],*nodeargs]
+ phase='create-only-new-node-container';q=subprocess.run(args,capture_output=True,timeout=15);assert q.returncode==0;cid=q.stdout.decode().strip();result['containerId']=cid;result['containerName']=name
+ phase='start-only-new-node-container';q=subprocess.run(['docker','start',cid],capture_output=True,timeout=15);assert q.returncode==0
+ time.sleep(1)
+ q=subprocess.run(['docker','inspect',cid],capture_output=True,timeout=10);assert q.returncode==0;v=json.loads(q.stdout)[0];hc=v['HostConfig'];cfg=v['Config'];mounts=v['Mounts']
+ assert v['State']['Running'] and not v['State']['Restarting'] and v['RestartCount']==0
+ assert cfg['Image']==ni['Id'] and cfg['User']=='1000:1000' and cfg['Cmd']==nodeargs
+ assert hc['ReadonlyRootfs'] and hc['Memory']==hc['MemorySwap']==268435456 and hc['NanoCpus']==500000000 and hc['PidsLimit']==64
+ assert hc['CapDrop']==['ALL'] and 'no-new-privileges' in hc['SecurityOpt'] and hc['NetworkMode']=='bridge'
+ actual={x['Destination']:(x['Source'],x['RW']) for x in mounts};assert actual['/config']==(str(nd),False) and actual['/state']==(str(state),True) and actual['/var/run/docker.sock'][0]=='/var/run/docker.sock' and set(actual)=={'/config','/state','/var/run/docker.sock'}
+ assert hc['PortBindings']=={'19443/tcp':[{'HostIp':'192.168.45.143','HostPort':'19443'}]}
+ result.update(status='NODE_SERVICE_RUNNING_EXACT_CONFIGURATION_NO_OBSERVATION_YET',phase='actual-inspect-matches-scope',NodeImageID=ni['Id'],workloadImageID=wi['Id'],user=cfg['User'],dockerSocketSupplementaryGID=gid,serviceCPUQuotaNanoCpus=hc['NanoCpus'],serviceMemoryBytes=hc['Memory'],pidsLimit=hc['PidsLimit'],readOnlyRootFS=True,capDrop=hc['CapDrop'],securityOptions=hc['SecurityOpt'],stateBind=str(state),configMountReadOnly=True,noNamedVolumeCreated=True,portBindings=hc['PortBindings'],restarting=False,restartCount=0,runtimeProfileSHA256=sha(rp.read_bytes()),nodeArgv=nodeargs,realMTLSResourceObservation='NOT_RUN',actualDBNodeMayStillBeOffline=True)
+except BaseException as error:result.update(status='HOLD_NODE_START_OR_INSPECTION_FAILED',phase=phase,errorClass=type(error).__name__,rawDiagnosticSuppressed=True)
+print(json.dumps(result));raise SystemExit(0 if result.get('status')=='NODE_SERVICE_RUNNING_EXACT_CONFIGURATION_NO_OBSERVATION_YET' else 2)

@@ -1,15 +1,19 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.471"
+version: "1.0.472"
 status: "review"
 author: "Codex"
-updated: "2026-11-07T17:17:11+09:00"
+updated: "2026-11-07T17:58:51+09:00"
 source_of_truth: "Git"
 active_card: "FLEET5 continued supervision with PORTAL-REFRESH-FLEET-20261106"
-active_card_status: "PC2PC3PC4NewNodesRunning_ContinuousFreshRealObservation_FreshOwnerProjectAPI3Nodes200; CPWorkspaceRecipeAndIndependentPilotReviewReady; PC1SSH_PC5Docker_RealApproversRun_FivePCPending"
-active_card_next: "After checkpoint dispatch finite source-only CP workspace/routing recipe to B and one actual Claude independent public deployment-evidence review. Root handles results, current PC1/5 blockers and real workspace/approval/run/renewal; no all5 or browser acceptance claim."
+active_card_status: "ThreeNodeObservationEvidenceActual7d8Accepted_RootFourOperationalFollowupsVerified_WorkspaceRecipe427Accepted_LiveB48FrontendSeparateFrom1efea; BoundedUIFirstStartRepairReady_PC1AuthUserAction_PC5MemoryDocker_WorkspaceRunFivePCPending"
+active_card_next: "After checkpoint assign B actual bounded first Workspace UI contract implementation preserving accepted11 b48 frontend imports on1efea backend, hosted Frontend/Core/Docs validation then one actual Claude. Root owns protected PC3 API/package/JWKS/roles/roots/policy and route preparation. PC1 local public-key registration status and additional real approver identity remain pending; no synthetic votes or main app execution."
 ---
+
+## 2026-11-07T17:58:51+09:00 3대관측 독립수락과 실행UI계약 수리 준비
+
+3대CPU관측증거는실제Claude7d8b9a82에서필수수정0으로수락됐고Root가49입력hash·정확Docs19단계를대조했다. 네LOW운영조건은정본줄바꿈차이·PC2/4실행문자열·observerbootstrap/Dockerfile원문·CLI실제import경로를공개/실조회로보강했다. B의workspace설정recipe42743222도48sourcepin·4입력/22증거·107정적검증·정확Docs19단계로수락했다. Studio의Run생성본문/멱등키및첫prepare/enqueue누락은실제수정대상이다. 현재배포b48frontend와1efea커널은다른source여서기존11frontend변경을보존해통합한다. 메인메모리98.22percent제약은유지하고1번PC공개키등록응답을기다린다. 실제workspace/Run/5대완료는아니다. 실제source·exit·CI·보강·미완료와다음담당은Root History/Evidence에보존했다.
 
 ## 2026-11-07T17:17:11+09:00 실제2·3·4번PC 연속관측과 후속분담
 

@@ -1,0 +1,118 @@
+{
+  "atKST": "2026-11-07T17:56:44+09:00",
+  "currentPortalListenerMetadata": {
+    "atKST": "2026-11-07T17:51:15+09:00",
+    "scope": "MAIN_READONLY_LISTENER_PROCESS_AND_MEMORY_METADATA",
+    "port": 3100,
+    "processes": [
+      {
+        "PID": 62240,
+        "executableName": "node.exe",
+        "createdAt": "2026-11-07T03:39:39.6856200+09:00",
+        "commandLineSHA256": "d4fb0145521898c682ae5edf5915b34f201b421e67e3e8f1f1a0348d9ba3aa01",
+        "hasViteToken": true,
+        "explicitProjectScriptPaths": [
+          "D:\\Project\\SaintVisionI-Invion\\https-github.com-egparadise-SaintVision-Invion.git\\apps\\web\\node_modules\\vite\\bin\\vite.js",
+          "D:\\Project\\SaintVisionI-Invion\\fleet-five-orchestration-20261105\\.work\\uir3-b48-preview.config.mjs"
+        ],
+        "rawCommandLinePersisted": false
+      }
+    ],
+    "memory": {
+      "totalBytes": 16935796736,
+      "freeBytes": 300666880,
+      "usedPercent": 98.22
+    },
+    "processOrOSChanges": false,
+    "mainProductExecutionRestrictionRemains": true,
+    "mainProcessCutover": "NOT_RUN",
+    "wholeProgramComplete": false
+  },
+  "currentPortalKind": "Vite PREVIEW of built b48 artifact, not Vite source dev/HMR server",
+  "currentBuildArtifact": {
+    "source": "b48c2c4492f8aea4b55c33161733a9a6fb9eed8c",
+    "frontendCI": 42254157322,
+    "artifactID": 13520599988,
+    "artifactSHA256": "7212b4870e3a142b8c44dc2629d5e6643401ae9e1d187d6234ecdf4059fd671d",
+    "actualSourceReview": "626ab0eda10c22e8539546db8d9639092d88f7e7",
+    "reviewDocs": 42263763156
+  },
+  "currentPreviewConfigSHA256": "4370889ec774a59528afd725432cd3441b3985f60bec1642d743a06e3c3acbf1",
+  "currentProxyTarget": "http://127.0.0.1:8080",
+  "candidateKernelSource": "1efea494f026e932360c35ae811b6423d874a2e7",
+  "acceptedFrontendIsAncestorOfKernelSource": false,
+  "frontendPathsDifferingFromKernel": [
+    {
+      "mode": "M",
+      "path": "apps/web/nginx.conf",
+      "acceptedFrontendBlob": "21d35ed113befa1325d23d3f2ef6459966e25ce0",
+      "acceptedFrontendSHA256": "f4acab57ffe9807efc415d0cc3e2690db1b357d7535ac094b519cd923d0d36f4"
+    },
+    {
+      "mode": "M",
+      "path": "apps/web/src/app/App.tsx",
+      "acceptedFrontendBlob": "bf41cbd21e0679e90fd794b27e8491caf34eeb1f",
+      "acceptedFrontendSHA256": "21939698561f9f7f0d5825b33f0aefb1070a20d1fdbf62ff42d6475266cbeaa4"
+    },
+    {
+      "mode": "M",
+      "path": "apps/web/src/features/auth/session.ts",
+      "acceptedFrontendBlob": "5c7ce76a26eaef39b1e571fa5c3aa66c1456b2b9",
+      "acceptedFrontendSHA256": "4df0f6413607577301891b068c63a9e2e96bce79e1d036ea9f231a67b3fe6cba"
+    },
+    {
+      "mode": "M",
+      "path": "apps/web/src/features/dashboard/ClusterOverview.tsx",
+      "acceptedFrontendBlob": "cb92fbe28c3de112d11b511b2957ca62f27f6e6a",
+      "acceptedFrontendSHA256": "f68909d98891de0a377ed7dce55a3bd8498ccb8014c7d10f67352062819aa48e"
+    },
+    {
+      "mode": "M",
+      "path": "apps/web/src/features/desktop/ResourceExplorer.tsx",
+      "acceptedFrontendBlob": "2ee822b647708dcae362bb289990b0c88bbc35e8",
+      "acceptedFrontendSHA256": "7d8dfb516d4fbc82e4686e1db03d5b9d0016a8195e9312f45ae272c16e0f320b"
+    },
+    {
+      "mode": "M",
+      "path": "apps/web/src/shared/api/projectObservation.ts",
+      "acceptedFrontendBlob": "0331832d17e4606bb389cec1330520e4d27574a9",
+      "acceptedFrontendSHA256": "0fe50dc2f7b5d5aa97b7e81bc16cbe1617986da6ca60e103c48a87c58db659d0"
+    },
+    {
+      "mode": "M",
+      "path": "apps/web/src/shared/api/runApprovalObservation.ts",
+      "acceptedFrontendBlob": "6e592d6e9cf4ed611e38ff17187201fa83f8e859",
+      "acceptedFrontendSHA256": "86f619628444fdc4b33754a16542eaee28e682eabe8b75a77f631b0619084718"
+    },
+    {
+      "mode": "M",
+      "path": "apps/web/src/shared/ui/Header.tsx",
+      "acceptedFrontendBlob": "10ed412640f5151251a25d14e8e5405b62340d14",
+      "acceptedFrontendSHA256": "cfbf858b1d4546532eec154edbdbac91bb45df680bd8d3331488839ae0e41b3a"
+    },
+    {
+      "mode": "M",
+      "path": "apps/web/tests/fixture-problem-codes-integrity.test.ts",
+      "acceptedFrontendBlob": "10ba09f5341d6456938c5db50145154ff320b952",
+      "acceptedFrontendSHA256": "be0e458b2a7a8eaf81949e50f8bad2906d7e02c0169c266068b5274d03b84c24"
+    },
+    {
+      "mode": "A",
+      "path": "apps/web/tests/portal-refresh-fleet-ui.test.tsx",
+      "acceptedFrontendBlob": "e14d7f697bd6e5684fe853d2e607f06606d7b1ed",
+      "acceptedFrontendSHA256": "571beaae7c9ca3231e8d6231fc1521350813d19e67015b0bff351126bf332950"
+    },
+    {
+      "mode": "M",
+      "path": "apps/web/vite.config.ts",
+      "acceptedFrontendBlob": "0c5e084b9c58099c8794aec6d966bd6860070767",
+      "acceptedFrontendSHA256": "8cfeffe85ec2f5eaaf2242f2d3e146588f6a007d6aa0087e2841d5992a2f3700"
+    }
+  ],
+  "sameFirstStartPrepareEnqueueGapAlsoInAcceptedFrontend": true,
+  "requiredIntegrationDisposition": "New bounded UI-contract implementation must preserve/adopt ALL11 accepted b48 frontend changes on fixed1efea kernel base, then add first Workspace flow. Do not replace the live R3 observation/refresh frontend with older1efea App without those changes. Document separate source authorities and new combined finalSHA/CI.",
+  "mainExecutionRestriction": "Still applies; free RAM300666880B/98.22percent used. No main Node/app/Go/crypto/browser execution, OS changes or unrelated process termination.",
+  "RootProposedFutureRouteOnly": "Prepare exact combined new frontend and workspace API on PC3 first; a transport-only same-origin main3100 SSH forward after controlled stop of exact Root-owned old preview is a candidate Root operation, not executed or independently accepted. No worker may touch main processes or actual configs.",
+  "actualRouteOrServiceChanged": false,
+  "wholeProgramComplete": false
+}

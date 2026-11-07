@@ -1,0 +1,174 @@
+{
+  "atKST": "2026-11-07T17:50:35+09:00",
+  "originalIndependentReview": "7d8b9a820bf6b4862c46a9afdd431262b9b5e024",
+  "RootDispositionOnlyNotAnotherReviewerVerdict": true,
+  "FT-L1": {
+    "status": "ROOT_DOCUMENTED_CANONICAL_LF_NORMALIZATION",
+    "originalCapturedCRLFBytes": 735,
+    "originalCapturedSHA256": "ecd66dcadcbf49fbeb3ed19390fa6bbb6925d358d3c64c198c6c8f0297c8db49",
+    "canonicalRoot510LFBytes": 720,
+    "canonicalGitLF_SHA256": "f199a6680367eb23a4ab98fd26f6b6e1389d2dec5477280d90dee9927f07db4a",
+    "CRLFReconstructionByteExact": true,
+    "JSONSemanticsEqual": true,
+    "originalFrozenInventoryPreserved": true
+  },
+  "FT-L2": {
+    "status": "ROOT_PUBLISHED_RENDERED_INVOCATION_BYTES_AND_RULE",
+    "templateSHA256": "e4dbc30260ab61ef162f45a080143a01f886544c7ff1f8ca8add1f12bdc0a08d",
+    "renders": [
+      {
+        "PC": "PC2",
+        "path": "PC2-node-start-rendered.py.txt",
+        "SHA256": "91da3b7940afa19a30d02d34be768d94a9bf900d1fa76049c6af433d7d240990",
+        "bytes": 6343,
+        "literalSubstitution": "192.168.45.222 -> 192.168.45.143",
+        "replacementCount": 2,
+        "meaning": "Reconstructed exact invocation source from preserved template and Root launch rule; not a new execution or an independently captured pre-start file"
+      },
+      {
+        "PC": "PC4",
+        "path": "PC4-node-start-rendered.py.txt",
+        "SHA256": "f68493ad806451e69e6742d402b241d253090d83a1672fbc4a83ccf0aff186ab",
+        "bytes": 6343,
+        "literalSubstitution": "192.168.45.222 -> 192.168.45.210",
+        "replacementCount": 2,
+        "meaning": "Reconstructed exact invocation source from preserved template and Root launch rule; not a new execution or an independently captured pre-start file"
+      }
+    ]
+  },
+  "FT-L3": {
+    "status": "ROOT_PUBLISHED_EXACT_PUBLIC_BOOTSTRAP_AND_DOCKERFILE_MATCHING_CAPTURE_AND_RUNNING_CONTAINER",
+    "bootstrapSHA256": "8cccc5a123b17bd369d1b55ab9fddd9830558d4006ce722582197b25cd09547d",
+    "DockerfileR2SHA256": "260f52d71a52172ecf852391e47d3f9e78afa970be466a73eeb52076daa32113",
+    "noCustomWhileLoopInBootstrap": true,
+    "standardMainCalls": 1,
+    "sourceOnlyPrivateFilePathsNoSecretValues": true
+  },
+  "FT-L4": {
+    "status": "ROOT_READONLY_EXACT_SHARE_SHADOW_ABSENCE_AND_EFFECTIVE_IMPORT_ORIGIN_VERIFIED",
+    "probe": "PC3-readonly-receipt.json",
+    "verifiedAtKST": "2026-11-07T17:39:44+09:00",
+    "actualShadowPathExists": false,
+    "resolvedLibrarySHA256": "76407ced1411f42a5eddd71c894f541b8691d461d4eb1eaea30f63b8bcf90d2c",
+    "futureRequirement": "Recheck exact shadow absence/effective library origin/hash immediately before EVERY future candidate CLI invocation; this timestamped check is not a permanent filesystem guarantee",
+    "noCLIOrProductModuleExecutionForThisProbe": true
+  },
+  "FT-I1PostStartInventory": [
+    {
+      "PC": "PC2",
+      "all7PriorNamesStillPresent": true,
+      "newPlannedNodeNamePresent": true,
+      "currentContainers": [
+        {
+          "name": "saintvision-nod_01M6TGQZ8S3DAFS7TYE8TY1PX2",
+          "shortContainerId": "fd4bdef2db94",
+          "image": "de654cd38530",
+          "status": "Up 37 minutes"
+        },
+        {
+          "name": "saintvision-nod_01m6jfq4qtr5ew9n8abmm87yfx",
+          "shortContainerId": "8f9f85f0bf9a",
+          "image": "fd5b14b1474f",
+          "status": "Up 3 days"
+        },
+        {
+          "name": "saintvision-nod_01m5xpmgd498eqsv8f5c91qds3",
+          "shortContainerId": "540b56f75415",
+          "image": "fd5b14b1474f",
+          "status": "Up 11 days"
+        },
+        {
+          "name": "saintvision-nod_01m54rwcr2sf9yyvr0na871ty9",
+          "shortContainerId": "b982d6538a9e",
+          "image": "fd5b14b1474f",
+          "status": "Up 2 weeks"
+        },
+        {
+          "name": "saintvision-nod_01m4a1dxa0krvbhxmtww2k67v9",
+          "shortContainerId": "845e92c5dd9f",
+          "image": "fd5b14b1474f",
+          "status": "Up 4 weeks"
+        },
+        {
+          "name": "saintvision-nod_01m3pv6frk6z32y7w3y5rgjnzt",
+          "shortContainerId": "2c8c556db239",
+          "image": "e29a48a796b6",
+          "status": "Up 5 weeks"
+        },
+        {
+          "name": "saintvision-nod_01m3ptp800fsy01xte2e1d9ww6",
+          "shortContainerId": "aa7d920e1920",
+          "image": "e29a48a796b6",
+          "status": "Created"
+        },
+        {
+          "name": "saintvision-nod_01m353dar7em8tetzn1fkrnprg",
+          "shortContainerId": "426a3591c01d",
+          "image": "60a2fd5f6b73",
+          "status": "Up 6 weeks"
+        }
+      ],
+      "meaning": "Current post-start name/ID/image/status inventory only; no old config/identity/journal reads or mutation and no earlier-ID claim"
+    },
+    {
+      "PC": "PC4",
+      "all7PriorNamesStillPresent": true,
+      "newPlannedNodeNamePresent": true,
+      "currentContainers": [
+        {
+          "name": "saintvision-nod_01M6TGSXV1J7XWC5D5H7N6EW1D",
+          "shortContainerId": "e74fde5e18c6",
+          "image": "de654cd38530",
+          "status": "Up 37 minutes"
+        },
+        {
+          "name": "saintvision-nod_01m6jfq4qt9qc9bmyw1tvsht8e",
+          "shortContainerId": "ff7f0b1808e9",
+          "image": "fd5b14b1474f",
+          "status": "Up 3 days"
+        },
+        {
+          "name": "saintvision-nod_01m5xpmgd4ktw3w0vmadk6wv4n",
+          "shortContainerId": "e7ecfa913a5f",
+          "image": "fd5b14b1474f",
+          "status": "Up 11 days"
+        },
+        {
+          "name": "saintvision-nod_01m54rwcr2x8bp4ychpt9p4xc2",
+          "shortContainerId": "f63d323f917b",
+          "image": "fd5b14b1474f",
+          "status": "Up 2 weeks"
+        },
+        {
+          "name": "saintvision-nod_01m4a1dxa0qvc90829j7nfz7qq",
+          "shortContainerId": "39054b3a998c",
+          "image": "fd5b14b1474f",
+          "status": "Up 4 weeks"
+        },
+        {
+          "name": "saintvision-nod_01m3pv6frktj53fqncdt2k2acv",
+          "shortContainerId": "44c560408612",
+          "image": "e29a48a796b6",
+          "status": "Up 5 weeks"
+        },
+        {
+          "name": "saintvision-nod_01m3ptp800eemwmdykezz3cwnp",
+          "shortContainerId": "876dafbf111b",
+          "image": "e29a48a796b6",
+          "status": "Created"
+        },
+        {
+          "name": "saintvision-nod_01m355nx3y7x64av1b90n2nkqd",
+          "shortContainerId": "d91b0852d1cc",
+          "image": "60a2fd5f6b73",
+          "status": "Up 6 weeks"
+        }
+      ],
+      "meaning": "Current post-start name/ID/image/status inventory only; no old config/identity/journal reads or mutation and no earlier-ID claim"
+    }
+  ],
+  "knownHostsUnchanged": true,
+  "noNodeRestartOrKeyRegenerationOrDBMutation": true,
+  "mandatorySourceProductFixesForPilot": 0,
+  "allFivePCsOrActualRunComplete": false
+}

@@ -1,0 +1,86 @@
+{
+  "deliveryBase": "5ba7cfb795135e1f74c0d3e83e0fea285d3cc987",
+  "productSource": "1efea494f026e932360c35ae811b6423d874a2e7",
+  "commands": [
+    {
+      "startAtKST": "2026-11-07T17:38:11+09:00",
+      "endAtKST": "2026-11-07T17:38:47+09:00",
+      "argv": [
+        "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+        "-B",
+        "tools/check_docs.py"
+      ],
+      "exit": 0,
+      "stdoutUTF8": "PASS: 24 original hashes, 1269 versioned documents, wiki links, 48 tasks, 12 outcomes, owner/reviewer/skills, dependency DAG.\r\n",
+      "stderrUTF8": ""
+    },
+    {
+      "startAtKST": "2026-11-07T17:38:47+09:00",
+      "endAtKST": "2026-11-07T17:38:49+09:00",
+      "argv": [
+        "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+        "-B",
+        "tools/check_ontology.py"
+      ],
+      "exit": 0,
+      "stdoutUTF8": "PASS: RDF parsing, defined terms, TTL/JSON-LD equivalence, 48 task mappings, positive SHACL, 4 rejected invalid fixtures, 4 competency queries, Obsidian mirrors.\r\n",
+      "stderrUTF8": ""
+    },
+    {
+      "startAtKST": "2026-11-07T17:38:49+09:00",
+      "endAtKST": "2026-11-07T17:38:55+09:00",
+      "argv": [
+        "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+        "-B",
+        "tools/check_doc_path_citations.py",
+        "--ratchet",
+        "--base-ref",
+        "5ba7cfb795135e1f74c0d3e83e0fea285d3cc987"
+      ],
+      "exit": 0,
+      "stdoutUTF8": "PASS check_doc_path_citations --ratchet: 290 broken citation(s), all in baseline, none stale, floor unchanged.\r\n",
+      "stderrUTF8": ""
+    },
+    {
+      "startAtKST": "2026-11-07T17:38:55+09:00",
+      "endAtKST": "2026-11-07T17:38:56+09:00",
+      "argv": [
+        "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+        "-B",
+        "tools/check_doc_single_source.py",
+        "--ratchet"
+      ],
+      "exit": 0,
+      "stdoutUTF8": "PASS check_doc_single_source --ratchet: 16 pairs, all in baseline, none stale.\r\n",
+      "stderrUTF8": ""
+    },
+    {
+      "startAtKST": "2026-11-07T17:38:56+09:00",
+      "endAtKST": "2026-11-07T17:39:22+09:00",
+      "argv": [
+        "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+        "-B",
+        "tools/sync_obsidian.py",
+        "--check"
+      ],
+      "exit": 0,
+      "stdoutUTF8": "CHECK: 5089 managed files, 2665 pending exports, 0 conflicts. No writes.\r\n",
+      "stderrUTF8": ""
+    },
+    {
+      "startAtKST": "2026-11-07T17:39:22+09:00",
+      "endAtKST": "2026-11-07T17:39:23+09:00",
+      "argv": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exit": 0,
+      "stdoutUTF8": "",
+      "stderrUTF8": ""
+    }
+  ],
+  "complete": true,
+  "allZero": true,
+  "syncMode": "CHECK_ONLY"
+}

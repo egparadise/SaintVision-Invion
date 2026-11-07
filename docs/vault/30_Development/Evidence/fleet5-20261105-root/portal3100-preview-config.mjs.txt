@@ -1,0 +1,8 @@
+export default {
+  root: 'D:/Project/SaintVisionI-Invion/fleet-five-orchestration-20261105/.work/uir3-b48-build',
+  publicDir: false,
+  build: { outDir: '.', emptyOutDir: false },
+  preview: { host: '127.0.0.1', port: 3100, strictPort: true, headers: { 'Cache-Control': 'no-store' },
+    proxy: { '/v1': { target: 'http://127.0.0.1:8080', changeOrigin: true }, '/healthz': { target: 'http://127.0.0.1:8080', changeOrigin: true } }
+  }
+};

@@ -1,5 +1,5 @@
 {
-  "atKST": "2026-11-07T17:17:11+09:00",
+  "atKST": "2026-11-07T17:58:51+09:00",
   "source": "1efea494f026e932360c35ae811b6423d874a2e7",
   "owner": "Root Codex",
   "priorRootCheckpoint": {
@@ -923,7 +923,33 @@
     "PC2 new key preparation initially expected absent nodes parent to exist; read-only proved no new state or key residue, r2 created only exact new0700 parent and reused original frozen IDs",
     "PC2 public trust install acknowledged strict TLS/key match but returned153stderr bytes; source public-certificate naive-time property deprecation was reproduced/captured. r2 checked existing installed bytes/key/TLS without rewriting/regenerating, used aware property for PC4, then continued."
   ],
-  "independentOperationalEvidenceReview": "READY_NOT_STARTED; no reviewer claim until actual dispatch and verdict",
+  "independentOperationalEvidenceReview": {
+    "status": "ACTUAL_INDEPENDENT_REVIEW_ACCEPTED_PILOT_ONLY",
+    "review": "7d8b9a820bf6b4862c46a9afdd431262b9b5e024",
+    "Docs": 42356203297,
+    "verdict": "ACCEPT_THREE_NODE_CPU_OBSERVATION_EVIDENCE_KEEP_REMAINING_LIVE_HOLDS",
+    "mandatoryDefects": 0,
+    "severity": {
+      "HIGH": 0,
+      "MEDIUM": 0,
+      "LOW": 4,
+      "INFO": 8
+    },
+    "meaning": "Independent public source/evidence consistency review of Root measurements, not reviewer own hardware probes",
+    "lifecycle": {
+      "dispatchId": "ctx_9dcd414de698",
+      "taskId": "task_682a17fab13c",
+      "runId": "run_e57ecd84a7bc",
+      "followUpOf": "ctx_2a0f382b4d2f",
+      "state": "succeeded",
+      "stage": "settled",
+      "liveness": "exited",
+      "terminal": "term_11b8517ddc4f274171e7e797eab8d801",
+      "terminalState": "released",
+      "workspace": "d98dc9d3-fe61-4cb2-9776-dff349347a61::D:/Project/SaintVisionI-Invion/fleet5-fresh-cpu-reconcile-entry-review-20261107",
+      "waitingOnHuman": "unknown"
+    }
+  },
   "nextSourceOnlyTask": "FLEET5-CP-WORKSPACE-DEPLOYMENT-RECIPE-R1-20261107 ready for Codex B; minimal exact source bindings for PC3 workspace API and current portal routing under main-resource constraint, no real credentials/config access",
   "PC1": "One current pinned SSH attempt exit255; previous failure public-key auth. No current successful SSH/Docker/onboarding proof",
   "PC5": "Existing Docker API1.41 below selected1.45 and main-host resource restrictions; no Node run or upgrade",
@@ -935,5 +961,367 @@
   "originalRuntimeB": 0,
   "allFivePCsComplete": false,
   "actualUserWorkloadRun": "NOT_RUN",
-  "wholeProgramComplete": false
+  "wholeProgramComplete": false,
+  "RootNonblockingOperationalObligations": {
+    "atKST": "2026-11-07T17:50:35+09:00",
+    "originalIndependentReview": "7d8b9a820bf6b4862c46a9afdd431262b9b5e024",
+    "RootDispositionOnlyNotAnotherReviewerVerdict": true,
+    "FT-L1": {
+      "status": "ROOT_DOCUMENTED_CANONICAL_LF_NORMALIZATION",
+      "originalCapturedCRLFBytes": 735,
+      "originalCapturedSHA256": "ecd66dcadcbf49fbeb3ed19390fa6bbb6925d358d3c64c198c6c8f0297c8db49",
+      "canonicalRoot510LFBytes": 720,
+      "canonicalGitLF_SHA256": "f199a6680367eb23a4ab98fd26f6b6e1389d2dec5477280d90dee9927f07db4a",
+      "CRLFReconstructionByteExact": true,
+      "JSONSemanticsEqual": true,
+      "originalFrozenInventoryPreserved": true
+    },
+    "FT-L2": {
+      "status": "ROOT_PUBLISHED_RENDERED_INVOCATION_BYTES_AND_RULE",
+      "templateSHA256": "e4dbc30260ab61ef162f45a080143a01f886544c7ff1f8ca8add1f12bdc0a08d",
+      "renders": [
+        {
+          "PC": "PC2",
+          "path": "PC2-node-start-rendered.py.txt",
+          "SHA256": "91da3b7940afa19a30d02d34be768d94a9bf900d1fa76049c6af433d7d240990",
+          "bytes": 6343,
+          "literalSubstitution": "192.168.45.222 -> 192.168.45.143",
+          "replacementCount": 2,
+          "meaning": "Reconstructed exact invocation source from preserved template and Root launch rule; not a new execution or an independently captured pre-start file"
+        },
+        {
+          "PC": "PC4",
+          "path": "PC4-node-start-rendered.py.txt",
+          "SHA256": "f68493ad806451e69e6742d402b241d253090d83a1672fbc4a83ccf0aff186ab",
+          "bytes": 6343,
+          "literalSubstitution": "192.168.45.222 -> 192.168.45.210",
+          "replacementCount": 2,
+          "meaning": "Reconstructed exact invocation source from preserved template and Root launch rule; not a new execution or an independently captured pre-start file"
+        }
+      ]
+    },
+    "FT-L3": {
+      "status": "ROOT_PUBLISHED_EXACT_PUBLIC_BOOTSTRAP_AND_DOCKERFILE_MATCHING_CAPTURE_AND_RUNNING_CONTAINER",
+      "bootstrapSHA256": "8cccc5a123b17bd369d1b55ab9fddd9830558d4006ce722582197b25cd09547d",
+      "DockerfileR2SHA256": "260f52d71a52172ecf852391e47d3f9e78afa970be466a73eeb52076daa32113",
+      "noCustomWhileLoopInBootstrap": true,
+      "standardMainCalls": 1,
+      "sourceOnlyPrivateFilePathsNoSecretValues": true
+    },
+    "FT-L4": {
+      "status": "ROOT_READONLY_EXACT_SHARE_SHADOW_ABSENCE_AND_EFFECTIVE_IMPORT_ORIGIN_VERIFIED",
+      "probe": "PC3-readonly-receipt.json",
+      "verifiedAtKST": "2026-11-07T17:39:44+09:00",
+      "actualShadowPathExists": false,
+      "resolvedLibrarySHA256": "76407ced1411f42a5eddd71c894f541b8691d461d4eb1eaea30f63b8bcf90d2c",
+      "futureRequirement": "Recheck exact shadow absence/effective library origin/hash immediately before EVERY future candidate CLI invocation; this timestamped check is not a permanent filesystem guarantee",
+      "noCLIOrProductModuleExecutionForThisProbe": true
+    },
+    "FT-I1PostStartInventory": [
+      {
+        "PC": "PC2",
+        "all7PriorNamesStillPresent": true,
+        "newPlannedNodeNamePresent": true,
+        "currentContainers": [
+          {
+            "name": "saintvision-nod_01M6TGQZ8S3DAFS7TYE8TY1PX2",
+            "shortContainerId": "fd4bdef2db94",
+            "image": "de654cd38530",
+            "status": "Up 37 minutes"
+          },
+          {
+            "name": "saintvision-nod_01m6jfq4qtr5ew9n8abmm87yfx",
+            "shortContainerId": "8f9f85f0bf9a",
+            "image": "fd5b14b1474f",
+            "status": "Up 3 days"
+          },
+          {
+            "name": "saintvision-nod_01m5xpmgd498eqsv8f5c91qds3",
+            "shortContainerId": "540b56f75415",
+            "image": "fd5b14b1474f",
+            "status": "Up 11 days"
+          },
+          {
+            "name": "saintvision-nod_01m54rwcr2sf9yyvr0na871ty9",
+            "shortContainerId": "b982d6538a9e",
+            "image": "fd5b14b1474f",
+            "status": "Up 2 weeks"
+          },
+          {
+            "name": "saintvision-nod_01m4a1dxa0krvbhxmtww2k67v9",
+            "shortContainerId": "845e92c5dd9f",
+            "image": "fd5b14b1474f",
+            "status": "Up 4 weeks"
+          },
+          {
+            "name": "saintvision-nod_01m3pv6frk6z32y7w3y5rgjnzt",
+            "shortContainerId": "2c8c556db239",
+            "image": "e29a48a796b6",
+            "status": "Up 5 weeks"
+          },
+          {
+            "name": "saintvision-nod_01m3ptp800fsy01xte2e1d9ww6",
+            "shortContainerId": "aa7d920e1920",
+            "image": "e29a48a796b6",
+            "status": "Created"
+          },
+          {
+            "name": "saintvision-nod_01m353dar7em8tetzn1fkrnprg",
+            "shortContainerId": "426a3591c01d",
+            "image": "60a2fd5f6b73",
+            "status": "Up 6 weeks"
+          }
+        ],
+        "meaning": "Current post-start name/ID/image/status inventory only; no old config/identity/journal reads or mutation and no earlier-ID claim"
+      },
+      {
+        "PC": "PC4",
+        "all7PriorNamesStillPresent": true,
+        "newPlannedNodeNamePresent": true,
+        "currentContainers": [
+          {
+            "name": "saintvision-nod_01M6TGSXV1J7XWC5D5H7N6EW1D",
+            "shortContainerId": "e74fde5e18c6",
+            "image": "de654cd38530",
+            "status": "Up 37 minutes"
+          },
+          {
+            "name": "saintvision-nod_01m6jfq4qt9qc9bmyw1tvsht8e",
+            "shortContainerId": "ff7f0b1808e9",
+            "image": "fd5b14b1474f",
+            "status": "Up 3 days"
+          },
+          {
+            "name": "saintvision-nod_01m5xpmgd4ktw3w0vmadk6wv4n",
+            "shortContainerId": "e7ecfa913a5f",
+            "image": "fd5b14b1474f",
+            "status": "Up 11 days"
+          },
+          {
+            "name": "saintvision-nod_01m54rwcr2x8bp4ychpt9p4xc2",
+            "shortContainerId": "f63d323f917b",
+            "image": "fd5b14b1474f",
+            "status": "Up 2 weeks"
+          },
+          {
+            "name": "saintvision-nod_01m4a1dxa0qvc90829j7nfz7qq",
+            "shortContainerId": "39054b3a998c",
+            "image": "fd5b14b1474f",
+            "status": "Up 4 weeks"
+          },
+          {
+            "name": "saintvision-nod_01m3pv6frktj53fqncdt2k2acv",
+            "shortContainerId": "44c560408612",
+            "image": "e29a48a796b6",
+            "status": "Up 5 weeks"
+          },
+          {
+            "name": "saintvision-nod_01m3ptp800eemwmdykezz3cwnp",
+            "shortContainerId": "876dafbf111b",
+            "image": "e29a48a796b6",
+            "status": "Created"
+          },
+          {
+            "name": "saintvision-nod_01m355nx3y7x64av1b90n2nkqd",
+            "shortContainerId": "d91b0852d1cc",
+            "image": "60a2fd5f6b73",
+            "status": "Up 6 weeks"
+          }
+        ],
+        "meaning": "Current post-start name/ID/image/status inventory only; no old config/identity/journal reads or mutation and no earlier-ID claim"
+      }
+    ],
+    "knownHostsUnchanged": true,
+    "noNodeRestartOrKeyRegenerationOrDBMutation": true,
+    "mandatorySourceProductFixesForPilot": 0,
+    "allFivePCsOrActualRunComplete": false
+  },
+  "actualWorkspaceRecipeRootReview": {
+    "atKST": "2026-11-07T17:49:14+09:00",
+    "planCommit": "427432220fe245ec90d7f5b5c6c16ca50eb63def",
+    "deliveryBase": "5ba7cfb795135e1f74c0d3e83e0fea285d3cc987",
+    "sourceTarget": "1efea494f026e932360c35ae811b6423d874a2e7",
+    "RootEvidenceSource": "baaa8ea99919a7fec40f8f853a648f4067d7248d",
+    "remoteExact": true,
+    "directParentExact": true,
+    "onlyOwn12AddedDocs": true,
+    "all48SourceBlobFileLineExcerptPinsMatch": true,
+    "all4PublicInputsAnd22InventoryPinsMatch": true,
+    "all6WireShapesMatch": true,
+    "author107StaticChecksExit0": true,
+    "fullCanonicalSyncBytesIdentical": true,
+    "fullCanonicalSyncSHA256": "99d9a77a918440cc9a1f67c57ed3eba158df0a470a841da07f0b2b37af9f5d8e",
+    "fullCanonicalSyncBytes": 494269,
+    "Docs": 42356516840,
+    "DocsJob": 128355684329,
+    "correlation": "fleet5-cp-workspace-deploy-r1-20261107-23e7aa84-3149-4cf8-adea-26497abcd78b",
+    "exactManualDocsAll19Success": true,
+    "RootPlanReview": "ACCEPT_EXACT_PC3_WORKSPACE_DEPLOYMENT_RECIPE_AND_BOUNDED_FRONTEND_CONTRACT_GAP_KEEP_LIVE_HOLDS",
+    "mandatoryNextCodeChange": "Studio must create EmptyRequest with stable Idempotency-Key, prepare actual frozen first Workspace intent, obtain two genuine nonrequester votes, requester enqueues; do not claim creation is placement/execution",
+    "supportedAPIRoute": "PC3 API with offline wrapped public JWKS, separate existing restricted business/kernel roles, exact source business package plus CP wheel, private roots/object provider and signer/TLS; no real deployment run",
+    "portalConstraint": "Fixed frontend API relative path/Vite startup proxy; source has no hot API upstream config. Main process reconfiguration unresolved. Root may plan preserving same browser origin with transport cutover; do not claim approved/live source behavior beyond actual proof.",
+    "lifecycle": {
+      "dispatchId": "ctx_604188e68378",
+      "taskId": "task_81d7e3dcdf88",
+      "runId": "run_e57ecd84a7bc",
+      "followUpOf": "ctx_6f0f8253b8a7",
+      "state": "succeeded",
+      "stage": "settled",
+      "liveness": "exited",
+      "terminal": "term_5ef0ee1f3fc13ffe1d62f76f3d4b1078",
+      "terminalState": "released",
+      "workspace": "d98dc9d3-fe61-4cb2-9776-dff349347a61::D:/Project/SaintVisionI-Invion/fleet5-compute-storage-contract-20261105",
+      "waitingOnHuman": "unknown"
+    },
+    "wholeProgramComplete": false
+  },
+  "liveFrontendSourceDisposition": {
+    "atKST": "2026-11-07T17:56:44+09:00",
+    "currentPortalListenerMetadata": {
+      "atKST": "2026-11-07T17:51:15+09:00",
+      "scope": "MAIN_READONLY_LISTENER_PROCESS_AND_MEMORY_METADATA",
+      "port": 3100,
+      "processes": [
+        {
+          "PID": 62240,
+          "executableName": "node.exe",
+          "createdAt": "2026-11-07T03:39:39.6856200+09:00",
+          "commandLineSHA256": "d4fb0145521898c682ae5edf5915b34f201b421e67e3e8f1f1a0348d9ba3aa01",
+          "hasViteToken": true,
+          "explicitProjectScriptPaths": [
+            "D:\\Project\\SaintVisionI-Invion\\https-github.com-egparadise-SaintVision-Invion.git\\apps\\web\\node_modules\\vite\\bin\\vite.js",
+            "D:\\Project\\SaintVisionI-Invion\\fleet-five-orchestration-20261105\\.work\\uir3-b48-preview.config.mjs"
+          ],
+          "rawCommandLinePersisted": false
+        }
+      ],
+      "memory": {
+        "totalBytes": 16935796736,
+        "freeBytes": 300666880,
+        "usedPercent": 98.22
+      },
+      "processOrOSChanges": false,
+      "mainProductExecutionRestrictionRemains": true,
+      "mainProcessCutover": "NOT_RUN",
+      "wholeProgramComplete": false
+    },
+    "currentPortalKind": "Vite PREVIEW of built b48 artifact, not Vite source dev/HMR server",
+    "currentBuildArtifact": {
+      "source": "b48c2c4492f8aea4b55c33161733a9a6fb9eed8c",
+      "frontendCI": 42254157322,
+      "artifactID": 13520599988,
+      "artifactSHA256": "7212b4870e3a142b8c44dc2629d5e6643401ae9e1d187d6234ecdf4059fd671d",
+      "actualSourceReview": "626ab0eda10c22e8539546db8d9639092d88f7e7",
+      "reviewDocs": 42263763156
+    },
+    "currentPreviewConfigSHA256": "4370889ec774a59528afd725432cd3441b3985f60bec1642d743a06e3c3acbf1",
+    "currentProxyTarget": "http://127.0.0.1:8080",
+    "candidateKernelSource": "1efea494f026e932360c35ae811b6423d874a2e7",
+    "acceptedFrontendIsAncestorOfKernelSource": false,
+    "frontendPathsDifferingFromKernel": [
+      {
+        "mode": "M",
+        "path": "apps/web/nginx.conf",
+        "acceptedFrontendBlob": "21d35ed113befa1325d23d3f2ef6459966e25ce0",
+        "acceptedFrontendSHA256": "f4acab57ffe9807efc415d0cc3e2690db1b357d7535ac094b519cd923d0d36f4"
+      },
+      {
+        "mode": "M",
+        "path": "apps/web/src/app/App.tsx",
+        "acceptedFrontendBlob": "bf41cbd21e0679e90fd794b27e8491caf34eeb1f",
+        "acceptedFrontendSHA256": "21939698561f9f7f0d5825b33f0aefb1070a20d1fdbf62ff42d6475266cbeaa4"
+      },
+      {
+        "mode": "M",
+        "path": "apps/web/src/features/auth/session.ts",
+        "acceptedFrontendBlob": "5c7ce76a26eaef39b1e571fa5c3aa66c1456b2b9",
+        "acceptedFrontendSHA256": "4df0f6413607577301891b068c63a9e2e96bce79e1d036ea9f231a67b3fe6cba"
+      },
+      {
+        "mode": "M",
+        "path": "apps/web/src/features/dashboard/ClusterOverview.tsx",
+        "acceptedFrontendBlob": "cb92fbe28c3de112d11b511b2957ca62f27f6e6a",
+        "acceptedFrontendSHA256": "f68909d98891de0a377ed7dce55a3bd8498ccb8014c7d10f67352062819aa48e"
+      },
+      {
+        "mode": "M",
+        "path": "apps/web/src/features/desktop/ResourceExplorer.tsx",
+        "acceptedFrontendBlob": "2ee822b647708dcae362bb289990b0c88bbc35e8",
+        "acceptedFrontendSHA256": "7d8dfb516d4fbc82e4686e1db03d5b9d0016a8195e9312f45ae272c16e0f320b"
+      },
+      {
+        "mode": "M",
+        "path": "apps/web/src/shared/api/projectObservation.ts",
+        "acceptedFrontendBlob": "0331832d17e4606bb389cec1330520e4d27574a9",
+        "acceptedFrontendSHA256": "0fe50dc2f7b5d5aa97b7e81bc16cbe1617986da6ca60e103c48a87c58db659d0"
+      },
+      {
+        "mode": "M",
+        "path": "apps/web/src/shared/api/runApprovalObservation.ts",
+        "acceptedFrontendBlob": "6e592d6e9cf4ed611e38ff17187201fa83f8e859",
+        "acceptedFrontendSHA256": "86f619628444fdc4b33754a16542eaee28e682eabe8b75a77f631b0619084718"
+      },
+      {
+        "mode": "M",
+        "path": "apps/web/src/shared/ui/Header.tsx",
+        "acceptedFrontendBlob": "10ed412640f5151251a25d14e8e5405b62340d14",
+        "acceptedFrontendSHA256": "cfbf858b1d4546532eec154edbdbac91bb45df680bd8d3331488839ae0e41b3a"
+      },
+      {
+        "mode": "M",
+        "path": "apps/web/tests/fixture-problem-codes-integrity.test.ts",
+        "acceptedFrontendBlob": "10ba09f5341d6456938c5db50145154ff320b952",
+        "acceptedFrontendSHA256": "be0e458b2a7a8eaf81949e50f8bad2906d7e02c0169c266068b5274d03b84c24"
+      },
+      {
+        "mode": "A",
+        "path": "apps/web/tests/portal-refresh-fleet-ui.test.tsx",
+        "acceptedFrontendBlob": "e14d7f697bd6e5684fe853d2e607f06606d7b1ed",
+        "acceptedFrontendSHA256": "571beaae7c9ca3231e8d6231fc1521350813d19e67015b0bff351126bf332950"
+      },
+      {
+        "mode": "M",
+        "path": "apps/web/vite.config.ts",
+        "acceptedFrontendBlob": "0c5e084b9c58099c8794aec6d966bd6860070767",
+        "acceptedFrontendSHA256": "8cfeffe85ec2f5eaaf2242f2d3e146588f6a007d6aa0087e2841d5992a2f3700"
+      }
+    ],
+    "sameFirstStartPrepareEnqueueGapAlsoInAcceptedFrontend": true,
+    "requiredIntegrationDisposition": "New bounded UI-contract implementation must preserve/adopt ALL11 accepted b48 frontend changes on fixed1efea kernel base, then add first Workspace flow. Do not replace the live R3 observation/refresh frontend with older1efea App without those changes. Document separate source authorities and new combined finalSHA/CI.",
+    "mainExecutionRestriction": "Still applies; free RAM300666880B/98.22percent used. No main Node/app/Go/crypto/browser execution, OS changes or unrelated process termination.",
+    "RootProposedFutureRouteOnly": "Prepare exact combined new frontend and workspace API on PC3 first; a transport-only same-origin main3100 SSH forward after controlled stop of exact Root-owned old preview is a candidate Root operation, not executed or independently accepted. No worker may touch main processes or actual configs.",
+    "actualRouteOrServiceChanged": false,
+    "wholeProgramComplete": false
+  },
+  "PC1CurrentAuthenticationAndUserAction": {
+    "probe": {
+      "atKST": "2026-11-07T17:42:14+09:00",
+      "target": "PC1 inviz@192.168.45.13",
+      "SSHExit": 255,
+      "classifiedResult": "PUBLIC_KEY_AUTHENTICATION_REJECTED",
+      "stderrBytes": 62,
+      "remoteMutations": 0,
+      "attempts": 1,
+      "knownHostsUnchanged": true,
+      "rawDiagnosticSuppressed": true
+    },
+    "recoveryScript": {
+      "target": "PC1 inviz@192.168.45.13",
+      "path": "D:\\Project\\SaintVisionI-Invion\\deliverables\\2026-11-07\\PC1_SSH_공개키_등록.sh",
+      "scriptSHA256": "fff777f068cf9e6c0c3c747f0ee6b125075263aedcb0d683a8c1b04cf73822f2",
+      "publicKeyFingerprint": "SHA256:ey1iqWkzuF52IMaT86+rWOE9b13ODaA2dMn2orZ9BEg",
+      "privateKeyReadOrEmitted": false,
+      "executedOnPC1": false,
+      "purpose": "User local console append exact coordinator PUBLIC key, preserve existing authorized keys, then Root retries fixed pinned SSH",
+      "authenticationBlocker": "PUBLIC_KEY_AUTHENTICATION_REJECTED",
+      "atKST": "2026-11-07T17:43:54+09:00",
+      "previousDraftSHA256": "318934319286fea161389ea082f2c7e5006f0a154128890dd6930e213cccc4ae",
+      "strictAccountAndLANAddressGuardAdded": true,
+      "LinuxBashSyntaxCheckExit": 0,
+      "syntaxCheckOnly": true,
+      "scriptExecutedOnAnyHost": false,
+      "knownHostsUnchanged": true
+    },
+    "request": "One actual local-console public-key registration status requested asynchronously; pending. No password/private-key requested."
+  }
 }

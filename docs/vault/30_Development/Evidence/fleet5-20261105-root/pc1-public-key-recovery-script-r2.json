@@ -1,0 +1,17 @@
+{
+  "target": "PC1 inviz@192.168.45.13",
+  "path": "D:\\Project\\SaintVisionI-Invion\\deliverables\\2026-11-07\\PC1_SSH_공개키_등록.sh",
+  "scriptSHA256": "fff777f068cf9e6c0c3c747f0ee6b125075263aedcb0d683a8c1b04cf73822f2",
+  "publicKeyFingerprint": "SHA256:ey1iqWkzuF52IMaT86+rWOE9b13ODaA2dMn2orZ9BEg",
+  "privateKeyReadOrEmitted": false,
+  "executedOnPC1": false,
+  "purpose": "User local console append exact coordinator PUBLIC key, preserve existing authorized keys, then Root retries fixed pinned SSH",
+  "authenticationBlocker": "PUBLIC_KEY_AUTHENTICATION_REJECTED",
+  "atKST": "2026-11-07T17:43:54+09:00",
+  "previousDraftSHA256": "318934319286fea161389ea082f2c7e5006f0a154128890dd6930e213cccc4ae",
+  "strictAccountAndLANAddressGuardAdded": true,
+  "LinuxBashSyntaxCheckExit": 0,
+  "syntaxCheckOnly": true,
+  "scriptExecutedOnAnyHost": false,
+  "knownHostsUnchanged": true
+}

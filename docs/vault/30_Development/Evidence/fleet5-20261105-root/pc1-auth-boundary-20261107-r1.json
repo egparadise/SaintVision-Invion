@@ -1,0 +1,11 @@
+{
+  "atKST": "2026-11-07T17:42:14+09:00",
+  "target": "PC1 inviz@192.168.45.13",
+  "SSHExit": 255,
+  "classifiedResult": "PUBLIC_KEY_AUTHENTICATION_REJECTED",
+  "stderrBytes": 62,
+  "remoteMutations": 0,
+  "attempts": 1,
+  "knownHostsUnchanged": true,
+  "rawDiagnosticSuppressed": true
+}

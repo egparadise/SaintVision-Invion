@@ -1,6 +1,6 @@
 {
   "schema": "fleet5-root-review-resource-sequence:1",
-  "atKST": "2026-11-07T17:17:11+09:00",
+  "atKST": "2026-11-07T17:58:51+09:00",
   "completedB": {
     "task": "task_d4c4c809ed4e",
     "review": "ac9182c3e3d606ec027c0be2e90e049ff50d54f1",
@@ -22,11 +22,7 @@
     "review": "0e53fc024ca773b7719182e170e5e126aeaf5b95",
     "verdict": "ACCEPT TEST-ONLY; R-L1 CLOSED; no new findings"
   },
-  "nextActualReviewTrigger": {
-    "task": "FLEET5-THREE-CPU-PILOT-EVIDENCE-REVIEW-R1-20261107",
-    "reviewer": "One actual Claude to be dispatched after Root checkpoint, no receipt/verdict yet",
-    "scope": "Independent source/public evidence chain review of actual Root deployment, no real configs or credential-bearing transcripts"
-  },
+  "nextActualReviewTrigger": "One Claude reviews bounded UI candidate only after exact final Frontend/Core/Docs checks and real worker report. Current7d8 actual reviewer exited/released; no optional-low repeat loop. Root handles protected PC3 API setup and physical PC1/5 and actual approvals/run separately.",
   "completedIntegration": {
     "task": "task_78064fb4b7ff",
     "dispatch": "ctx_ed7ec73163d6",
@@ -1036,9 +1032,13 @@
     "Docs": 42333724088
   },
   "parallelImplementation": {
-    "task": "FLEET5-CP-WORKSPACE-DEPLOYMENT-RECIPE-R1-20261107",
-    "owner": "Codex B to be dispatched after Root checkpoint; not yet started",
-    "scope": "Exact source-only minimal configured workspace and portal/API routing recipe, no product/runtime or credentials access"
+    "task": "FLEET5-FIRST-WORKSPACE-UI-CONTRACT-R1-20261107",
+    "owner": "Codex B to dispatch after Root511 checkpoint",
+    "reviewer": "One actual Claude after final code CI; NOT_STARTED",
+    "backendBase": "1efea494f026e932360c35ae811b6423d874a2e7",
+    "acceptedFrontendBase": "b48c2c4492f8aea4b55c33161733a9a6fb9eed8c",
+    "status": "READY_NOT_STARTED",
+    "scope": "Preserve11 accepted live b48 frontend changes on1efea kernel base; implement EmptyRequest+stableIdempotencyKey->actualfirstWorkspacePrepare->genuineapprovalstate->requesterEnqueue->actualreceipt/result status. No backend/schema/policy weakening or fake actor/votes; hosted CI only, no main product execution or deployment."
   },
   "CPUJoinSourceMap": {
     "task": "task_a95ef3d8ccce",
@@ -2649,6 +2649,362 @@
     "originalRuntimeB": 0,
     "allFivePCsComplete": false,
     "actualUserWorkloadRun": "NOT_RUN",
+    "wholeProgramComplete": false
+  },
+  "latestPilotActualReview": {
+    "atKST": "2026-11-07T17:41:19+09:00",
+    "review": "7d8b9a820bf6b4862c46a9afdd431262b9b5e024",
+    "source": "1efea494f026e932360c35ae811b6423d874a2e7",
+    "RootEvidenceSource": "baaa8ea99919a7fec40f8f853a648f4067d7248d",
+    "directParentExact": true,
+    "remoteExact": true,
+    "onlyOwn7AddedDocs": true,
+    "all49RootInputHashesMatch": true,
+    "dataProbeGitBytesSHA256": "b408dbf2103f53270962ee3675d92de665e51ffe081dd115f8971cf7a6f4bf29",
+    "Docs": 42356203297,
+    "DocsJob": 128354722451,
+    "correlation": "threecpu-pilot-review-7d8b9a82-docs-3052fcabbf66",
+    "exactManualDocsAll19Success": true,
+    "verdict": "ACCEPT_THREE_NODE_CPU_OBSERVATION_EVIDENCE_KEEP_REMAINING_LIVE_HOLDS",
+    "mandatoryDefects": 0,
+    "severity": {
+      "HIGH": 0,
+      "MEDIUM": 0,
+      "LOW": 4,
+      "INFO": 8
+    },
+    "findings": [
+      {
+        "id": "FT-L1",
+        "severity": "LOW",
+        "mandatory": false,
+        "class": "conditional Root operational obligation (evidence hygiene)",
+        "where": "pc3-actual-cpu-pilot-r1/public-receipt-inventory.json entry pc3-observer-tunnel-r1/start-receipt.json",
+        "fact": "Pinned 735B/ecd66dca… but the committed blob is 720B/f199a668…. Reviewer reconstruction: replacing LF by CRLF in the blob gives exactly 735B/ecd66dca…, so the pin is of the pre-commit CRLF PowerShell file and repository eol=lf normalisation changed the bytes. Content is identical; the other 40 inventory entries match byte-exactly.",
+        "disposition": "Root should note the normalisation (or re-pin the committed LF bytes) in its next checkpoint. Not a tampering indication and not a product defect."
+      },
+      {
+        "id": "FT-L2",
+        "severity": "LOW",
+        "mandatory": false,
+        "class": "conditional Root operational obligation (invocation-byte provenance)",
+        "where": "three-pc-actual-cpu-pilot-r1/pc24-node-start-r2/node-start-template-remote-program.py.txt:24,34",
+        "fact": "The published node-start program is a template containing the PC3 address 192.168.45.222 twice (publish flag and PortBindings assertion). The PC2/PC4 receipts show 192.168.45.143/.210, so the bytes actually executed on PC2/PC4 differ from the published file and are neither published nor hashed. The recorded docker inspect results (asserted by the same program shape) bind the actual configuration.",
+        "disposition": "Root should record the rendering rule (only that address literal substituted) and the SHA256 of each rendered PC2/PC4 program, or publish them. Non-blocking for observation acceptance."
+      },
+      {
+        "id": "FT-L3",
+        "severity": "LOW",
+        "mandatory": false,
+        "class": "conditional Root operational obligation (observer provenance)",
+        "where": "pc3-actual-cpu-pilot-r1/pc3-standard-observer-image-r1/wheel-name-r2-receipt.json",
+        "fact": "The observer runs /observer-bootstrap.py (SHA 8cccc5a1…) built by Dockerfile r2 (260f52d7…); neither file's bytes are public. Source inv.observer_worker.main reads INV_RUNTIME_DSN from the environment, so a bootstrap must read the secret file and enter the standard main. 'Standard observer, no custom poll loop' is therefore Root-attested; the reviewer can confirm only that the observed cadence and probe counts are consistent with the source loop.",
+        "disposition": "Root should publish the bootstrap and Dockerfile r2 bytes (no secret content) or an AST summary pinned to those SHAs before treating the observer image as a reviewed standard deployment beyond this pilot."
+      },
+      {
+        "id": "FT-L4",
+        "severity": "LOW",
+        "mandatory": false,
+        "class": "conditional Root operational obligation (import provenance)",
+        "where": "tools/fresh_cpu_admission.py:24 (1efea, SHA 8129ab5a…) as copied to the operator ops directory",
+        "fact": "The CLI inserts Path(__file__).resolve().parents[1]/'services/control-plane/src' at sys.path[0]. For the copied ops/fresh_cpu_admission.py that is <share>/services/control-plane/src on the PC3 operator host. The wrapper verifies the venv site-packages library SHA, not the module the CLI actually imports; that is the same module only if that share path is absent. The recomputed digests and 1efea-only APPLY receipt fields (readbackVerifiedBeforeCommit, nodeControlSeedVersion) are consistent with the verified library, so no contradiction exists.",
+        "disposition": "Before further CLI use, Root should record read-only absence of <share>/services/control-plane/src (or invoke the library via a pinned entry that adds no path). No product change required for this acceptance."
+      }
+    ],
+    "info": [
+      {
+        "id": "FT-I1",
+        "fact": "image-load receipt fields tagOverwrite:false and oldContainerMutation:false are literal constants, not measurements. Preservation of the 7 old container records per PC2/PC4 is supported by construction (no destructive docker or SQL verbs in any published program; containers reference image IDs), not by a post-start re-inventory."
+      },
+      {
+        "id": "FT-I2",
+        "fact": "PC2/PC4 admission receipts' PC field names the target Node; execution was in the PC3 operator venv (python3.14 site-packages path; Root History 17:10:39 section)."
+      },
+      {
+        "id": "FT-I3",
+        "fact": "The PLAN wrapper does not pin the CLI SHA (APPLY does); PLAN is read-only with a before==after zero-count readback."
+      },
+      {
+        "id": "FT-I4",
+        "fact": "PC3 PKI/admission/start remote programs and PC3 peer-policy body are not public; PC3 evidence is receipts plus the public leaf/request, which the reviewer re-derived (digest/request hash/identity)."
+      },
+      {
+        "id": "FT-I5",
+        "fact": "Each Node container mounts the host docker socket, which is host-root-equivalent by design; the container hardening flags do not confine that authority. Workload isolation was not exercised (NOT_RUN)."
+      },
+      {
+        "id": "FT-I6",
+        "fact": "Signatures (CSR self-signature, leaf/CA, TLS handshakes) were not re-verified by the reviewer; only DER structure, key equality, AKI/SKI linkage and hashes were checked."
+      },
+      {
+        "id": "FT-I7",
+        "fact": "Freshness margins: max snapshot/heartbeat age 2.10 s in the pair and 3.20 s at API read versus the 15 s source threshold; cycle ~7.6 s."
+      },
+      {
+        "id": "FT-I8",
+        "fact": "Default Windows trust failed the IdP TLS (self-signed, verify code 18) while the explicitly trusted existing public chain succeeded with no insecure option; this remains an operational HOLD, not a defect of the pilot evidence."
+      }
+    ],
+    "reviewerLifecycle": {
+      "dispatchId": "ctx_9dcd414de698",
+      "taskId": "task_682a17fab13c",
+      "runId": "run_e57ecd84a7bc",
+      "followUpOf": "ctx_2a0f382b4d2f",
+      "state": "succeeded",
+      "stage": "settled",
+      "liveness": "exited",
+      "terminal": "term_11b8517ddc4f274171e7e797eab8d801",
+      "terminalState": "released",
+      "workspace": "d98dc9d3-fe61-4cb2-9776-dff349347a61::D:/Project/SaintVisionI-Invion/fleet5-fresh-cpu-reconcile-entry-review-20261107",
+      "waitingOnHuman": "unknown"
+    },
+    "RootRuntimeEvidenceIsNotReviewerRuntimeProbe": true,
+    "sourcePins": [
+      {
+        "path": "cpu-fresh-admission-code-r1-root-activation.json",
+        "sha256": "2c6d41a5cc35ba39c4fa3da5c4190bd73d12c13b5ebb39a0b741637f2e1985e0"
+      },
+      {
+        "path": "cpu-reconcile-entry-ee1-root-verification.json",
+        "sha256": "2a505db4089319f0a754de2ca3a13734349e67f6e6bb6b4a70de18fab95de1a3"
+      },
+      {
+        "path": "fresh-cpu-reconcile-entry-r1/operator_reconcile_fresh_cpu.py.txt",
+        "sha256": "42e89b6173cd9a8ad1cfa6998da30f068d6409e03e803b523bfb7f076576a3aa"
+      },
+      {
+        "path": "one-cpu-node-plan-r1.public.json",
+        "sha256": "5b2a70bd9bc8217592f7cd953f18dd3516ecacfd132f6281134fbc718731213a"
+      },
+      {
+        "path": "pc3-actual-cpu-pilot-r1-root-activation.json",
+        "sha256": "4065fc76bbd052104850d4af8002296dfd1ca27dfc947e554ea8764cd7c2bbdd"
+      },
+      {
+        "path": "pc3-actual-cpu-pilot-r1/fresh-admin-pc3-api-r1.json",
+        "sha256": "519a710c315e63135d0987c6adf4af9c8566453a285d6556b4a2975bc63bd6d6"
+      },
+      {
+        "path": "pc3-actual-cpu-pilot-r1/idp-trust-readonly-r1.json",
+        "sha256": "3a6cd4fb7e75eae4e508256c563ef68872843020dcb05db90d690a2f463cd064"
+      },
+      {
+        "path": "pc3-actual-cpu-pilot-r1/pc3-admission-apply-r1/receipt.json",
+        "sha256": "0843a013a54ca27c63631374e3af4cb3397a74faeaab60f8242f158dc3f6aa14"
+      },
+      {
+        "path": "pc3-actual-cpu-pilot-r1/pc3-admission-plan-r1/receipt.json",
+        "sha256": "1b21410fb663afe1cac87c557f87f41837036a0791990934655d4a4a324c5e74"
+      },
+      {
+        "path": "pc3-actual-cpu-pilot-r1/pc3-cpu-images-r1/receipt.json",
+        "sha256": "b4e98d5da3b3f1995470a7d8de2fba78e26c5638766a9d0e6c285804113acd1d"
+      },
+      {
+        "path": "pc3-actual-cpu-pilot-r1/pc3-cpu-images-r1/workload-r2-receipt.json",
+        "sha256": "6ec50a767ae789e06326e153273e470ba20bb5c7b6b7adcd061c4804c4f2d35c"
+      },
+      {
+        "path": "pc3-actual-cpu-pilot-r1/pc3-cpu-pki-r1/receipt.json",
+        "sha256": "15ac20406291ad5ffe2ed4fdbfca531ff6f9a036301df4bf8a2306d8770530ea"
+      },
+      {
+        "path": "pc3-actual-cpu-pilot-r1/pc3-docker-minapi-go-readonly-r1.json",
+        "sha256": "880a60306ff9e0152c6577360703d7b843fdcd086fc5c2fe4fec1f81bc0c3c40"
+      },
+      {
+        "path": "pc3-actual-cpu-pilot-r1/pc3-node-start-r1/receipt.json",
+        "sha256": "1b3d1bf9a6504856da8618ba19a7153edaeec05f55efdca5a3ece1ba61a53f97"
+      },
+      {
+        "path": "pc3-actual-cpu-pilot-r1/pc3-observer-tunnel-r1/start-receipt.json",
+        "sha256": "f199a6680367eb23a4ab98fd26f6b6e1389d2dec5477280d90dee9927f07db4a"
+      },
+      {
+        "path": "pc3-actual-cpu-pilot-r1/pc3-one-node-resource-observation-r1/receipt.json",
+        "sha256": "c38f294c1cb7201dd8f14121a002f643a2929ea43f4d9cde02d05b3fede4275c"
+      },
+      {
+        "path": "pc3-actual-cpu-pilot-r1/pc3-standard-observer-image-r1/receipt.json",
+        "sha256": "428ba69dd54bbac89d0e723f7ef2dace8591a4ac73d1af056f5aa94777489eeb"
+      },
+      {
+        "path": "pc3-actual-cpu-pilot-r1/pc3-standard-observer-image-r1/wheel-name-r2-receipt.json",
+        "sha256": "b18cdf708ef3ee8c0c1575b98590ff0507cf5e5d464138811d08475ba73fd480"
+      },
+      {
+        "path": "pc3-actual-cpu-pilot-r1/pc3-standard-observer-start-r1/continuity-readonly-r1.json",
+        "sha256": "553a7fcc65157a6fb4ee6ca3f22adf1f8820cffd354ff60059dc255d4cd2681b"
+      },
+      {
+        "path": "pc3-actual-cpu-pilot-r1/pc3-standard-observer-start-r1/diagnosis-readonly.json",
+        "sha256": "ae950b23aa59bc573a1c824b2c38722193cd217fb2cbe918f6733711bf00a81f"
+      },
+      {
+        "path": "pc3-actual-cpu-pilot-r1/pc3-standard-observer-start-r1/receipt.json",
+        "sha256": "12dca075ec5d8d99207e49ca4802da85533a2c7eb62810ebdb09ff467b5908c6"
+      },
+      {
+        "path": "pc3-actual-cpu-pilot-r1/pc3-standard-observer-start-r1/step-diagnosis-r1.json",
+        "sha256": "039c7283a0847d19288f3fc508250b3b29dd53800d7e60a8fadb3829b2d47ad2"
+      },
+      {
+        "path": "pc3-actual-cpu-pilot-r1/public-receipt-inventory.json",
+        "sha256": "4067d664b79261f03426937399433a0432472a799da1d9fc6ad759d54188fcb5"
+      },
+      {
+        "path": "pc3-actual-cpu-pilot-r1/runtime-plan-5ba-root-verified.json",
+        "sha256": "ddf22ee9ba54ab702de374bbf3020e8e1fcede11023f5b5d7e4d775471723823"
+      },
+      {
+        "path": "pc3-actual-cpu-pilot-r1/standard-observer-scope-preflight-r1.json",
+        "sha256": "97235d8d6ddacdb2bc904b1041f63fb9c146682c2358929cc228d1dafc4858e2"
+      },
+      {
+        "path": "three-pc-actual-cpu-pilot-r1-root-activation.json",
+        "sha256": "f119d097f41e82f89a89fc29913dc8fef317522546cabaed4d8a826d33765cf7"
+      },
+      {
+        "path": "three-pc-actual-cpu-pilot-r1/fresh-admin-three-pc-api-r1.json",
+        "sha256": "f233850348945229ee373940c1fc551ed9b279542a107f53e172a3c3aed046d4"
+      },
+      {
+        "path": "three-pc-actual-cpu-pilot-r1/pc124-current-readiness-r1.json",
+        "sha256": "c9dbe921443afcc448981e732d062660cfbebbb54049ee8eb3584a7b7e7ab398"
+      },
+      {
+        "path": "three-pc-actual-cpu-pilot-r1/pc24-admission-r1/apply-remote-program.py.txt",
+        "sha256": "3bf386a21b075f426d9c5958d3e59d6ee2a1572b3dc34acf286d251c3a109df6"
+      },
+      {
+        "path": "three-pc-actual-cpu-pilot-r1/pc24-admission-r1/plan-remote-program.py.txt",
+        "sha256": "077b5e831f61bd7b3d66714309a6719ffd4753634321d649c27f944910ea6e0e"
+      },
+      {
+        "path": "three-pc-actual-cpu-pilot-r1/pc24-admission-r1/receipt.json",
+        "sha256": "fc9b4c0a2ef1379543bdf3c62de16836a913389a0caf68cc3b6da7a9b2370091"
+      },
+      {
+        "path": "three-pc-actual-cpu-pilot-r1/pc24-current-readiness-r2.json",
+        "sha256": "f550472ff55fce9b099c550ed38d7f92d833f595f15385377d234b1f536b40d6"
+      },
+      {
+        "path": "three-pc-actual-cpu-pilot-r1/pc24-image-transfer-r1/receipt.json",
+        "sha256": "723725a3790a83277b6ae2d37345c35f39447edbb59f8dce7eaab3a7a67f37e7"
+      },
+      {
+        "path": "three-pc-actual-cpu-pilot-r1/pc24-new-node-preparation-r1/PC2-public-plan.json",
+        "sha256": "a1e52443ccd971b68c703c71deb1bc1ea9beb80adbc4645b44d1f1d5db573d3e"
+      },
+      {
+        "path": "three-pc-actual-cpu-pilot-r1/pc24-new-node-preparation-r1/PC2-receipt.json",
+        "sha256": "76c00d7e6de2f7110f19290b04ed69325b66d471f00c266f6982f88bad60e4e8"
+      },
+      {
+        "path": "three-pc-actual-cpu-pilot-r1/pc24-new-node-preparation-r1/PC2-scope-readonly-cause.json",
+        "sha256": "1bdc6c453bb1af5086ac46605289c5fc92cc78eed149891b9ef933c16f8912ca"
+      },
+      {
+        "path": "three-pc-actual-cpu-pilot-r1/pc24-new-node-preparation-r2/PC2-public-plan.json",
+        "sha256": "a1e52443ccd971b68c703c71deb1bc1ea9beb80adbc4645b44d1f1d5db573d3e"
+      },
+      {
+        "path": "three-pc-actual-cpu-pilot-r1/pc24-new-node-preparation-r2/PC4-public-plan.json",
+        "sha256": "7a2a8e8bf2037dd8a0344049613948800566add126fddbfc425d1aafebe689cc"
+      },
+      {
+        "path": "three-pc-actual-cpu-pilot-r1/pc24-new-node-preparation-r2/receipt.json",
+        "sha256": "216012fc0b0a55b9b69082bd84586018a5fdffe150275122c2a5550dbb5c85fe"
+      },
+      {
+        "path": "three-pc-actual-cpu-pilot-r1/pc24-new-node-preparation-r2/remote-key-csr-program.py.txt",
+        "sha256": "5c0202f6d814ac6ce7a67cf14e87954c56f2679255987a99b89802bb05a1af35"
+      },
+      {
+        "path": "three-pc-actual-cpu-pilot-r1/pc24-node-start-r1/PC2-public-trust-receipt.json",
+        "sha256": "e355874dea5a9a13de93d176f1ece6b03b1e1d2ba81533d21195aa913335ae7b"
+      },
+      {
+        "path": "three-pc-actual-cpu-pilot-r1/pc24-node-start-r2/image-load-remote-program.py.txt",
+        "sha256": "af60edfe0db666510ac19cda537513ba824e91dc061dcff99261e39312812375"
+      },
+      {
+        "path": "three-pc-actual-cpu-pilot-r1/pc24-node-start-r2/node-start-template-remote-program.py.txt",
+        "sha256": "e4dbc30260ab61ef162f45a080143a01f886544c7ff1f8ca8add1f12bdc0a08d"
+      },
+      {
+        "path": "three-pc-actual-cpu-pilot-r1/pc24-node-start-r2/public-trust-remote-program.py.txt",
+        "sha256": "39e44db1fdf79e5b89f5ccae281515fd0160485342e41333b47bbb372b565826"
+      },
+      {
+        "path": "three-pc-actual-cpu-pilot-r1/pc24-node-start-r2/receipt.json",
+        "sha256": "38ef758ed2b248403c73891053d36025bddbd9266cc4798c8eeb9b2422e6a1f2"
+      },
+      {
+        "path": "three-pc-actual-cpu-pilot-r1/pc24-pilot-ca-signing-r1/receipt.json",
+        "sha256": "fd92f15a44803a99c804289d0dea97c17c90222d4701eb17d445b90aacd99fdc"
+      },
+      {
+        "path": "three-pc-actual-cpu-pilot-r1/pc24-pilot-ca-signing-r1/remote-signing-program.py.txt",
+        "sha256": "74e47801c4a150cb3a7fb1e47e4417624b040edde20a75fd3f35bb47627f03fa"
+      },
+      {
+        "path": "three-pc-actual-cpu-pilot-r1/public-evidence-inventory.json",
+        "sha256": "01ca4cf6368c7723426fa90bd0c892a25a74b0522a45b9f008c58b28364073c6"
+      },
+      {
+        "path": "three-pc-actual-cpu-pilot-r1/three-pc-continuity-readonly-r1.json",
+        "sha256": "70cfb4da95d21c083f065b28c0450006aadacc237c37d385bc3a33475a492e6e"
+      }
+    ],
+    "canonicalGitBlobSHA256": {
+      "docs/vault/30_Development/Evidence/fleet5-three-cpu-pilot-review-r1-20261107-claude/.gitattributes": "96a83569c84cfe3f57b7efe3dc61c249548d0fca4fed0e538b3587cdc97c95c1",
+      "docs/vault/30_Development/Evidence/fleet5-three-cpu-pilot-review-r1-20261107-claude/local-doc-gates.txt": "489ee80bad08572ad7f8092378d7e610a837b65b6e4072ee5fc82d93f5a08b29",
+      "docs/vault/30_Development/Evidence/fleet5-three-cpu-pilot-review-r1-20261107-claude/pilot-evidence-probe.json": "b408dbf2103f53270962ee3675d92de665e51ffe081dd115f8971cf7a6f4bf29",
+      "docs/vault/30_Development/Evidence/fleet5-three-cpu-pilot-review-r1-20261107-claude/pilot_evidence_probe.py.txt": "9bf50a0258e200d4d34bf1d4578d755a9d89864935429d93e6cb244a62ae2609",
+      "docs/vault/30_Development/Evidence/fleet5-three-cpu-pilot-review-r1-20261107-claude/review.json": "2f7c4d2bb70ef4cfa0440443f5b470683ad0bd1270f68661d94e8eb69ecb26d9",
+      "docs/vault/30_Development/Evidence/fleet5-three-cpu-pilot-review-r1-20261107-claude/reviewer_gate_driver.py.txt": "c734ea2490cc3242cbfbe312d68745a18b3211707aa58389c5cdeb13c1c5f58c",
+      "docs/vault/30_Development/History/2026-11-07_FLEET5_Three_CPU_Pilot_Evidence_Review_Claude.md": "90c1221a764dfb31c015eee800174aaf13dee82ba2a1d2e7aa87de2dd67727d9"
+    },
+    "wholeProgramComplete": false
+  },
+  "latestWorkspaceRecipe": {
+    "atKST": "2026-11-07T17:49:14+09:00",
+    "planCommit": "427432220fe245ec90d7f5b5c6c16ca50eb63def",
+    "deliveryBase": "5ba7cfb795135e1f74c0d3e83e0fea285d3cc987",
+    "sourceTarget": "1efea494f026e932360c35ae811b6423d874a2e7",
+    "RootEvidenceSource": "baaa8ea99919a7fec40f8f853a648f4067d7248d",
+    "remoteExact": true,
+    "directParentExact": true,
+    "onlyOwn12AddedDocs": true,
+    "all48SourceBlobFileLineExcerptPinsMatch": true,
+    "all4PublicInputsAnd22InventoryPinsMatch": true,
+    "all6WireShapesMatch": true,
+    "author107StaticChecksExit0": true,
+    "fullCanonicalSyncBytesIdentical": true,
+    "fullCanonicalSyncSHA256": "99d9a77a918440cc9a1f67c57ed3eba158df0a470a841da07f0b2b37af9f5d8e",
+    "fullCanonicalSyncBytes": 494269,
+    "Docs": 42356516840,
+    "DocsJob": 128355684329,
+    "correlation": "fleet5-cp-workspace-deploy-r1-20261107-23e7aa84-3149-4cf8-adea-26497abcd78b",
+    "exactManualDocsAll19Success": true,
+    "RootPlanReview": "ACCEPT_EXACT_PC3_WORKSPACE_DEPLOYMENT_RECIPE_AND_BOUNDED_FRONTEND_CONTRACT_GAP_KEEP_LIVE_HOLDS",
+    "mandatoryNextCodeChange": "Studio must create EmptyRequest with stable Idempotency-Key, prepare actual frozen first Workspace intent, obtain two genuine nonrequester votes, requester enqueues; do not claim creation is placement/execution",
+    "supportedAPIRoute": "PC3 API with offline wrapped public JWKS, separate existing restricted business/kernel roles, exact source business package plus CP wheel, private roots/object provider and signer/TLS; no real deployment run",
+    "portalConstraint": "Fixed frontend API relative path/Vite startup proxy; source has no hot API upstream config. Main process reconfiguration unresolved. Root may plan preserving same browser origin with transport cutover; do not claim approved/live source behavior beyond actual proof.",
+    "lifecycle": {
+      "dispatchId": "ctx_604188e68378",
+      "taskId": "task_81d7e3dcdf88",
+      "runId": "run_e57ecd84a7bc",
+      "followUpOf": "ctx_6f0f8253b8a7",
+      "state": "succeeded",
+      "stage": "settled",
+      "liveness": "exited",
+      "terminal": "term_5ef0ee1f3fc13ffe1d62f76f3d4b1078",
+      "terminalState": "released",
+      "workspace": "d98dc9d3-fe61-4cb2-9776-dff349347a61::D:/Project/SaintVisionI-Invion/fleet5-compute-storage-contract-20261105",
+      "waitingOnHuman": "unknown"
+    },
     "wholeProgramComplete": false
   }
 }

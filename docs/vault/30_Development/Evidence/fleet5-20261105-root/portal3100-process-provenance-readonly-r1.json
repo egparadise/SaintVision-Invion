@@ -1,0 +1,28 @@
+{
+  "atKST": "2026-11-07T17:51:15+09:00",
+  "scope": "MAIN_READONLY_LISTENER_PROCESS_AND_MEMORY_METADATA",
+  "port": 3100,
+  "processes": [
+    {
+      "PID": 62240,
+      "executableName": "node.exe",
+      "createdAt": "2026-11-07T03:39:39.6856200+09:00",
+      "commandLineSHA256": "d4fb0145521898c682ae5edf5915b34f201b421e67e3e8f1f1a0348d9ba3aa01",
+      "hasViteToken": true,
+      "explicitProjectScriptPaths": [
+        "D:\\Project\\SaintVisionI-Invion\\https-github.com-egparadise-SaintVision-Invion.git\\apps\\web\\node_modules\\vite\\bin\\vite.js",
+        "D:\\Project\\SaintVisionI-Invion\\fleet-five-orchestration-20261105\\.work\\uir3-b48-preview.config.mjs"
+      ],
+      "rawCommandLinePersisted": false
+    }
+  ],
+  "memory": {
+    "totalBytes": 16935796736,
+    "freeBytes": 300666880,
+    "usedPercent": 98.22
+  },
+  "processOrOSChanges": false,
+  "mainProductExecutionRestrictionRemains": true,
+  "mainProcessCutover": "NOT_RUN",
+  "wholeProgramComplete": false
+}

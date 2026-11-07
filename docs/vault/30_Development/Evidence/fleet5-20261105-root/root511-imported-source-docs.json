@@ -1,0 +1,103 @@
+{
+  "atKST": "2026-11-07T17:58:51+09:00",
+  "imports": [
+    {
+      "source": "7d8b9a820bf6b4862c46a9afdd431262b9b5e024",
+      "path": "docs/vault/30_Development/Evidence/fleet5-three-cpu-pilot-review-r1-20261107-claude/.gitattributes",
+      "SHA256": "96a83569c84cfe3f57b7efe3dc61c249548d0fca4fed0e538b3587cdc97c95c1"
+    },
+    {
+      "source": "7d8b9a820bf6b4862c46a9afdd431262b9b5e024",
+      "path": "docs/vault/30_Development/Evidence/fleet5-three-cpu-pilot-review-r1-20261107-claude/local-doc-gates.txt",
+      "SHA256": "489ee80bad08572ad7f8092378d7e610a837b65b6e4072ee5fc82d93f5a08b29"
+    },
+    {
+      "source": "7d8b9a820bf6b4862c46a9afdd431262b9b5e024",
+      "path": "docs/vault/30_Development/Evidence/fleet5-three-cpu-pilot-review-r1-20261107-claude/pilot-evidence-probe.json",
+      "SHA256": "b408dbf2103f53270962ee3675d92de665e51ffe081dd115f8971cf7a6f4bf29"
+    },
+    {
+      "source": "7d8b9a820bf6b4862c46a9afdd431262b9b5e024",
+      "path": "docs/vault/30_Development/Evidence/fleet5-three-cpu-pilot-review-r1-20261107-claude/pilot_evidence_probe.py.txt",
+      "SHA256": "9bf50a0258e200d4d34bf1d4578d755a9d89864935429d93e6cb244a62ae2609"
+    },
+    {
+      "source": "7d8b9a820bf6b4862c46a9afdd431262b9b5e024",
+      "path": "docs/vault/30_Development/Evidence/fleet5-three-cpu-pilot-review-r1-20261107-claude/review.json",
+      "SHA256": "2f7c4d2bb70ef4cfa0440443f5b470683ad0bd1270f68661d94e8eb69ecb26d9"
+    },
+    {
+      "source": "7d8b9a820bf6b4862c46a9afdd431262b9b5e024",
+      "path": "docs/vault/30_Development/Evidence/fleet5-three-cpu-pilot-review-r1-20261107-claude/reviewer_gate_driver.py.txt",
+      "SHA256": "c734ea2490cc3242cbfbe312d68745a18b3211707aa58389c5cdeb13c1c5f58c"
+    },
+    {
+      "source": "7d8b9a820bf6b4862c46a9afdd431262b9b5e024",
+      "path": "docs/vault/30_Development/History/2026-11-07_FLEET5_Three_CPU_Pilot_Evidence_Review_Claude.md",
+      "SHA256": "74372f44c2a90cf7e8e5150cedfeb89ac1cd7639716c6037011748b455e860ac",
+      "originalSourceSHA256": "90c1221a764dfb31c015eee800174aaf13dee82ba2a1d2e7aa87de2dd67727d9",
+      "RootImportAdjustment": "One relative cross-source CLI line citation converted to immutable source1efea GitHub URL. Original review.json and original review Git blob remain unchanged."
+    },
+    {
+      "source": "427432220fe245ec90d7f5b5c6c16ca50eb63def",
+      "path": "docs/vault/30_Development/Evidence/fleet5-cp-workspace-deploy-recipe-r1-20261107-codex/context.json",
+      "SHA256": "f5e241afd73ba09cb072b5252d6362ee1d6d85904f49e759b4fb3635116a595f"
+    },
+    {
+      "source": "427432220fe245ec90d7f5b5c6c16ca50eb63def",
+      "path": "docs/vault/30_Development/Evidence/fleet5-cp-workspace-deploy-recipe-r1-20261107-codex/delivery-precommit.json",
+      "SHA256": "7df67a8945409fdb7124b2aec4ce1e998e7f0909be8c031570505f179e92ebbb"
+    },
+    {
+      "source": "427432220fe245ec90d7f5b5c6c16ca50eb63def",
+      "path": "docs/vault/30_Development/Evidence/fleet5-cp-workspace-deploy-recipe-r1-20261107-codex/local-gates.json",
+      "SHA256": "26cc1003b8e88a3c2f26133cc590caffccd4d11681ff18e6aca7ff6fbaa08bae"
+    },
+    {
+      "source": "427432220fe245ec90d7f5b5c6c16ca50eb63def",
+      "path": "docs/vault/30_Development/Evidence/fleet5-cp-workspace-deploy-recipe-r1-20261107-codex/recipe.md",
+      "SHA256": "6a02f22a2f884e05877392d9f21d2d2a8d7badc798be4932d9022a2d0957f92b"
+    },
+    {
+      "source": "427432220fe245ec90d7f5b5c6c16ca50eb63def",
+      "path": "docs/vault/30_Development/Evidence/fleet5-cp-workspace-deploy-recipe-r1-20261107-codex/source-bindings.json",
+      "SHA256": "7c3bd4f7cbf69d3dd31c4e75e00f7f361a2638e83cd74f93e1c705503ef046a5"
+    },
+    {
+      "source": "427432220fe245ec90d7f5b5c6c16ca50eb63def",
+      "path": "docs/vault/30_Development/Evidence/fleet5-cp-workspace-deploy-recipe-r1-20261107-codex/static-verification.json",
+      "SHA256": "f0f401628ee3c55779dc01a839e84f0517d6de1b464e305d4188085740737bb4"
+    },
+    {
+      "source": "427432220fe245ec90d7f5b5c6c16ca50eb63def",
+      "path": "docs/vault/30_Development/Evidence/fleet5-cp-workspace-deploy-recipe-r1-20261107-codex/sync-state-after.json",
+      "SHA256": "58582bed7c697f58325634fd5f43b3cf034ce15f4e8bdc4fb7121dcb8353f453"
+    },
+    {
+      "source": "427432220fe245ec90d7f5b5c6c16ca50eb63def",
+      "path": "docs/vault/30_Development/Evidence/fleet5-cp-workspace-deploy-recipe-r1-20261107-codex/sync-state-before.json",
+      "SHA256": "774aaf6027049551e8d8bb24459c046bd0ca77fa1665d5b68928a42ec042e99d"
+    },
+    {
+      "source": "427432220fe245ec90d7f5b5c6c16ca50eb63def",
+      "path": "docs/vault/30_Development/Evidence/fleet5-cp-workspace-deploy-recipe-r1-20261107-codex/sync-state-comparison.json",
+      "SHA256": "eb0454dd20c79df8d3af9fb566c25319f1a1ce2e1725565fbac86afb6968173f"
+    },
+    {
+      "source": "427432220fe245ec90d7f5b5c6c16ca50eb63def",
+      "path": "docs/vault/30_Development/Evidence/fleet5-cp-workspace-deploy-recipe-r1-20261107-codex/typed-examples.json",
+      "SHA256": "13f2a0e63be63778f80e078c8f9645ad6b42347403a2dc28809fca2bc5042e0b"
+    },
+    {
+      "source": "427432220fe245ec90d7f5b5c6c16ca50eb63def",
+      "path": "docs/vault/30_Development/Evidence/fleet5-cp-workspace-deploy-recipe-r1-20261107-codex/verify-static.py",
+      "SHA256": "af3e481dcd08685090dce858471c00d51d55fadfaa6fb264d09f7d62a6728409"
+    },
+    {
+      "source": "427432220fe245ec90d7f5b5c6c16ca50eb63def",
+      "path": "docs/vault/30_Development/History/2026-11-07_FLEET5_CP_Workspace_Deployment_Recipe_R1_Codex.md",
+      "SHA256": "28e7cdbd9b611149e6e1d5889ebd986fb50df15aa85d97d8857beba6b463690b"
+    }
+  ],
+  "noWholeOldVaultExport": true
+}

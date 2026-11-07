@@ -1,0 +1,18 @@
+{
+  "atKST": "2026-11-07T18:02:41+09:00",
+  "base": "baaa8ea99919a7fec40f8f853a648f4067d7248d",
+  "gate": "check_doc_path_citations.py --ratchet --base-ref baaa8ea99919a7fec40f8f853a648f4067d7248d",
+  "firstExit": 1,
+  "reason": "Imported review authored on1efea referenced local tools/fresh_cpu_admission.py:24; docs-only Root branch lacks that product file",
+  "adjustment": {
+    "source": "7d8b9a820bf6b4862c46a9afdd431262b9b5e024",
+    "path": "docs/vault/30_Development/History/2026-11-07_FLEET5_Three_CPU_Pilot_Evidence_Review_Claude.md",
+    "SHA256": "74372f44c2a90cf7e8e5150cedfeb89ac1cd7639716c6037011748b455e860ac",
+    "originalSourceSHA256": "90c1221a764dfb31c015eee800174aaf13dee82ba2a1d2e7aa87de2dd67727d9",
+    "RootImportAdjustment": "One relative cross-source CLI line citation converted to immutable source1efea GitHub URL. Original review.json and original review Git blob remain unchanged."
+  },
+  "failureOutput": "FAIL (regression): 1 NEW broken path citation(s) not in the baseline:\r\n  + 30_Development/History/2026-11-07_FLEET5_Three_CPU_Pilot_Evidence_Review_Claude.md || tools/fresh_cpu_admission.py:24  [path does not exist]\r\n  Fix the document to cite a real path (or drop the line suffix). Adding a baseline line is a\r\n  visible, reviewable raise of the floor in tools/baselines/doc_path_citations.txt -- not for new inventions.\r\n",
+  "originalReviewJSONEdited": false,
+  "productCodeOrBaselineFloorChanged": false,
+  "commitPushBeforeGateRecovery": false
+}
