@@ -1,0 +1,45 @@
+{
+  "total_count": 2,
+  "artifacts": [
+    {
+      "id": 13573309228,
+      "node_id": "MDg6QXJ0aWZhY3QxMzU3MzMwOTIyOA==",
+      "name": "saintvision-core-evidence",
+      "size_in_bytes": 14055875,
+      "url": "https://api.github.com/repos/egparadise/SaintVision-Invion/actions/artifacts/13573309228",
+      "archive_download_url": "https://api.github.com/repos/egparadise/SaintVision-Invion/actions/artifacts/13573309228/zip",
+      "expired": false,
+      "digest": "sha256:9f7f1b04c7eba92bc2130923c8f348fc7efec1700f189f0d374e1592c5ee0441",
+      "created_at": "2026-11-07T12:04:34Z",
+      "updated_at": "2026-11-07T12:04:34Z",
+      "expires_at": "2026-12-07T12:04:33Z",
+      "workflow_run": {
+        "id": 42368191648,
+        "repository_id": 1362259805,
+        "head_repository_id": 1362259805,
+        "head_branch": "agent/codex/fleet5-first-workspace-ui-contract-r1-20261107",
+        "head_sha": "90578f49ea400958fcdbc1ded3908d624e856f57"
+      }
+    },
+    {
+      "id": 13572721843,
+      "node_id": "MDg6QXJ0aWZhY3QxMzU3MjcyMTg0Mw==",
+      "name": "saintvision-s01-storage-evidence-42368191648",
+      "size_in_bytes": 1768,
+      "url": "https://api.github.com/repos/egparadise/SaintVision-Invion/actions/artifacts/13572721843",
+      "archive_download_url": "https://api.github.com/repos/egparadise/SaintVision-Invion/actions/artifacts/13572721843/zip",
+      "expired": false,
+      "digest": "sha256:b277c6482157422d6eb67ae4dd1fa2c1fdb36a33511fb6150df3200bcbbb5de5",
+      "created_at": "2026-11-07T11:27:32Z",
+      "updated_at": "2026-11-07T11:27:32Z",
+      "expires_at": "2026-12-07T11:27:31Z",
+      "workflow_run": {
+        "id": 42368191648,
+        "repository_id": 1362259805,
+        "head_repository_id": 1362259805,
+        "head_branch": "agent/codex/fleet5-first-workspace-ui-contract-r1-20261107",
+        "head_sha": "90578f49ea400958fcdbc1ded3908d624e856f57"
+      }
+    }
+  ]
+}

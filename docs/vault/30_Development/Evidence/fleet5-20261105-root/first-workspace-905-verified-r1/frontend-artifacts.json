@@ -1,0 +1,45 @@
+{
+  "total_count": 2,
+  "artifacts": [
+    {
+      "id": 13572229367,
+      "node_id": "MDg6QXJ0aWZhY3QxMzU3MjIyOTM2Nw==",
+      "name": "saintvision-web-dist",
+      "size_in_bytes": 1148694,
+      "url": "https://api.github.com/repos/egparadise/SaintVision-Invion/actions/artifacts/13572229367",
+      "archive_download_url": "https://api.github.com/repos/egparadise/SaintVision-Invion/actions/artifacts/13572229367/zip",
+      "expired": false,
+      "digest": "sha256:5045f2ef1f6f120c1ee644168a21979e1f7df3f88241bb49c0397f5b244e2bf0",
+      "created_at": "2026-11-07T11:27:40Z",
+      "updated_at": "2026-11-07T11:27:40Z",
+      "expires_at": "2026-11-21T11:27:38Z",
+      "workflow_run": {
+        "id": 42368189302,
+        "repository_id": 1362259805,
+        "head_repository_id": 1362259805,
+        "head_branch": "agent/codex/fleet5-first-workspace-ui-contract-r1-20261107",
+        "head_sha": "90578f49ea400958fcdbc1ded3908d624e856f57"
+      }
+    },
+    {
+      "id": 13572119449,
+      "node_id": "MDg6QXJ0aWZhY3QxMzU3MjExOTQ0OQ==",
+      "name": "saintvision-portal-release",
+      "size_in_bytes": 26041723,
+      "url": "https://api.github.com/repos/egparadise/SaintVision-Invion/actions/artifacts/13572119449",
+      "archive_download_url": "https://api.github.com/repos/egparadise/SaintVision-Invion/actions/artifacts/13572119449/zip",
+      "expired": false,
+      "digest": "sha256:4bfc0ee88cbebae8108c1d9f05685fe6a5646a01ee1ea5167424d381e4a8fe99",
+      "created_at": "2026-11-07T11:27:45Z",
+      "updated_at": "2026-11-07T11:27:45Z",
+      "expires_at": "2026-11-21T11:27:43Z",
+      "workflow_run": {
+        "id": 42368189302,
+        "repository_id": 1362259805,
+        "head_repository_id": 1362259805,
+        "head_branch": "agent/codex/fleet5-first-workspace-ui-contract-r1-20261107",
+        "head_sha": "90578f49ea400958fcdbc1ded3908d624e856f57"
+      }
+    }
+  ]
+}

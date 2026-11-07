@@ -1,0 +1,196 @@
+{
+  "atKST": "2026-11-07T21:12:35+09:00",
+  "source": "90578f49ea400958fcdbc1ded3908d624e856f57",
+  "base": "1efea494f026e932360c35ae811b6423d874a2e7",
+  "acceptedFrontend": "b48c2c4492f8aea4b55c33161733a9a6fb9eed8c",
+  "remoteExact": true,
+  "old109MigrationBytesUnchanged": true,
+  "old184DefinitionsUnchanged": true,
+  "accepted11FrontendImportsExact": true,
+  "protectedTreesUnchanged": true,
+  "officialCI": [
+    {
+      "name": "frontend",
+      "runID": 42368189302,
+      "correlation": "fleet5-first-workspace-frontend-c7fce8c5cb024fa6846ad8922c6ea76d",
+      "attempt": 1,
+      "jobCount": 2,
+      "allJobsSuccess": true,
+      "stepDispositionMatchesAuthorExactly": true,
+      "officialArtifactCount": 2
+    },
+    {
+      "name": "core",
+      "runID": 42368191648,
+      "correlation": "fleet5-first-workspace-core-7931e102712143dfb7110746bac93c07",
+      "attempt": 1,
+      "jobCount": 2,
+      "allJobsSuccess": true,
+      "stepDispositionMatchesAuthorExactly": true,
+      "officialArtifactCount": 2
+    },
+    {
+      "name": "backend",
+      "runID": 42368193399,
+      "correlation": "fleet5-first-workspace-backend-c557c94f16a74a07b3ea0b1fc7ebe06d",
+      "attempt": 1,
+      "jobCount": 3,
+      "allJobsSuccess": true,
+      "stepDispositionMatchesAuthorExactly": true,
+      "officialArtifactCount": 2
+    },
+    {
+      "name": "docs",
+      "runID": 42368195169,
+      "correlation": "fleet5-first-workspace-docs-1f6a72b74a8a473b8f79878d61f90f17",
+      "attempt": 1,
+      "jobCount": 1,
+      "allJobsSuccess": true,
+      "stepDispositionMatchesAuthorExactly": true,
+      "officialArtifactCount": 2
+    }
+  ],
+  "officialEightJobsAllSuccess": true,
+  "officialArtifactMetadataAllMatch": true,
+  "coreArtifactDigest": "sha256:9f7f1b04c7eba92bc2130923c8f348fc7efec1700f189f0d374e1592c5ee0441",
+  "coreArchiveFilesHashed": 35,
+  "CIDataRecomputedNotRerun": [
+    {
+      "path": "build-product-runtime-real-pg.xml",
+      "counts": {
+        "passed": 13,
+        "failure": 0,
+        "error": 0,
+        "skipped": 0
+      },
+      "skipReasons": {}
+    },
+    {
+      "path": "business-handoff-tests.xml",
+      "counts": {
+        "passed": 17,
+        "failure": 0,
+        "error": 0,
+        "skipped": 0
+      },
+      "skipReasons": {}
+    },
+    {
+      "path": "containment-tests.xml",
+      "counts": {
+        "passed": 28,
+        "failure": 0,
+        "error": 0,
+        "skipped": 0
+      },
+      "skipReasons": {}
+    },
+    {
+      "path": "core-tests.xml",
+      "counts": {
+        "passed": 9452,
+        "failure": 0,
+        "error": 0,
+        "skipped": 46
+      },
+      "skipReasons": {
+        "PowerShell and csc.exe shim require Windows": 13,
+        "PowerShell parser requires Windows": 2,
+        "PowerShell required": 9,
+        "Actual Windows PowerShell launcher": 10,
+        "Explicit browser smoke integration lane required (INV_BROWSER_SMOKE_INTEGRATION=1)": 1,
+        "Set INV_MLFLOW_LIVE_URI (the run-mlflow lane starts the server)": 3,
+        "run only through tools/placement_benchmark.py": 1,
+        "run only through tools/placement_lock_wait_diagnostic.py": 1,
+        "run only through S11 Storage Failure Hosted Reference opt-in lane": 1,
+        "claude is not installed on this machine": 1,
+        "codex is not installed on this machine": 1,
+        "gemini is not installed on this machine": 1,
+        "antigravity is not installed on this machine": 1,
+        "Intranet CA NSS DB live browser test requires Linux, certutil (libnss3-tools), and Playwright": 1
+      }
+    },
+    {
+      "path": "cx01-recovery-tests.xml",
+      "counts": {
+        "passed": 20,
+        "failure": 0,
+        "error": 0,
+        "skipped": 0
+      },
+      "skipReasons": {}
+    },
+    {
+      "path": "docker-host-tests.xml",
+      "counts": {
+        "passed": 2,
+        "failure": 0,
+        "error": 0,
+        "skipped": 0
+      },
+      "skipReasons": {}
+    },
+    {
+      "path": "lan-installer-tests.xml",
+      "counts": {
+        "passed": 17,
+        "failure": 0,
+        "error": 0,
+        "skipped": 0
+      },
+      "skipReasons": {}
+    },
+    {
+      "path": "lan-pilot-database-real-pg.xml",
+      "counts": {
+        "passed": 2,
+        "failure": 0,
+        "error": 0,
+        "skipped": 0
+      },
+      "skipReasons": {}
+    },
+    {
+      "path": "node-unit.jsonl",
+      "testAndSubtestEvents": {
+        "pass": 696,
+        "fail": 0,
+        "skip": 1
+      }
+    },
+    {
+      "path": "shard-recovery-tests.xml",
+      "counts": {
+        "passed": 21,
+        "failure": 0,
+        "error": 0,
+        "skipped": 0
+      },
+      "skipReasons": {}
+    },
+    {
+      "path": "workspace-tests.xml",
+      "counts": {
+        "passed": 23,
+        "failure": 0,
+        "error": 0,
+        "skipped": 0
+      },
+      "skipReasons": {}
+    }
+  ],
+  "fullCanonicalWindowClosedBytesIdentical": true,
+  "canonicalBytes": 500344,
+  "canonicalSHA256": "368bc72302840e416fdfe5c9fb01a2f0753e244cd40c055a8a07a5c967d07ab9",
+  "authorPublicationUntrackedByDesignRootWillPublish": true,
+  "authorLifecycle": {
+    "state": "succeeded",
+    "stage": "settled",
+    "liveness": "exited",
+    "terminalState": "released"
+  },
+  "actualIndependentCodeReview": "PENDING",
+  "deploymentAuthorizedByThisVerification": false,
+  "realUserRunOrFivePCAccepted": false,
+  "wholeProgramComplete": false
+}

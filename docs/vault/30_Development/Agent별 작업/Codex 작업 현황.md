@@ -1,15 +1,19 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.477"
+version: "1.0.478"
 status: "review"
 author: "Codex"
-updated: "2026-11-07T19:50:51+09:00"
+updated: "2026-11-07T21:15:29+09:00"
 source_of_truth: "Git"
 active_card: "FLEET5 continued supervision with PORTAL-REFRESH-FLEET-20261106"
-active_card_status: "BFirstWorkspaceA88Backend14FailuresBeingFixed_RootAC11ExactTwoSignatureDecisionDelivered_FinalCIReviewDeploymentPending_RootCanonicalApplyDeferred"
-active_card_next: "B Task72ad09258a5c/ctx200 implements exact R1 serving+atomic binding+UI, real restricted-role hosted tests and final Frontend/Core/Backend/Docs; one actual Claude then Root protected deployment. Root must defer canonical APPLY until B full snapshot closes. PC1 local key registration/additional real approver identity remain pending; no fake ready/workload/votes/Run."
+active_card_status: "FirstWorkspace905OfficialCI8JobsArtifactsVerified_AuthorExitedReleased_OneActualClaudeReady_RootLatestCanonicalCatchUpThenReview_ActualDeploymentPending"
+active_card_next: "Root latest docs CI and canonical check/apply/check after closed B window; then one actual Claude code review on905. Exact source/8 jobs/artifacts verified; do not deploy before review. PC1 key registration/additional real approver/PC5 memory and real Run/five-PC gates remain pending."
 ---
+
+## 2026-11-07T21:15:29+09:00 첫 Workspace 최종 후보의 공식 CI·원본 대조
+
+첫 Workspace 기능의 고정 소스90578f49에 대해 Root가 공식 Frontend/Core/Backend/Docs의 수동 attempt1·8개 job 성공과 산출물 digest를 직접 대조했다. 기존109 migration·184 schema정의와 수락된 b48의11 frontend파일은 불변이고, Core archive의35파일 hash·JUnit·Go결과를 재실행 없이 재계산했다. 작성자는 실제 종료·해제됐고 공유상태500344bytes도 작업 전후 동일하다. 이제 최신 보고를 Obsidian에 반영한 뒤 한 실제 Claude 독립 코드 검토로 넘긴다. 실배포·실사용 Run·5대 인수는 미완료다. 현재 reviewer는 미배정이며 실제 착수/완료를 대신 표시하지 않는다.
 
 ## 2026-11-07T19:50:51+09:00 AC11 목록 변경의 Root 결정과 B 수정 계속
 

@@ -1,0 +1,139 @@
+{
+  "atKST": "2026-11-07T21:15:29+09:00",
+  "authorWorkerDone": "msg_a381d6651848",
+  "source": "90578f49ea400958fcdbc1ded3908d624e856f57",
+  "files": [
+    {
+      "path": "root-verification.json",
+      "rawBytes": 5586,
+      "rawSHA256": "36a9462d4ef0781358681fe21957b86ef131a55524057d0d7c108f471333e051",
+      "GitLFBytes": 5390,
+      "GitLFSHA256": "dc0a619ed12ee550480bb8b40405c817ff6ac0625672332b27dc3b96c7865656",
+      "transformation": "CRLF to LF only, parsed JSON unchanged"
+    },
+    {
+      "path": "author-publication.json",
+      "rawBytes": 100751,
+      "rawSHA256": "5a65dac69a17fa0f65f173cd23a0f1f64071220c08ccae3238e2d8deb7573e8a",
+      "GitLFBytes": 98318,
+      "GitLFSHA256": "92a8619161ca6d54aedfe8b95d19daf30a744934803005a22949d59c5fec3771",
+      "transformation": "CRLF to LF only, parsed JSON unchanged"
+    },
+    {
+      "path": "core-artifact-file-hashes.json",
+      "rawBytes": 5598,
+      "rawSHA256": "1882bdfc73a068396840eb21c19358d89f652e968190bd35d6d0e529cc9a8f35",
+      "GitLFBytes": 5421,
+      "GitLFSHA256": "104937dc8effa587a5523f2bcc9ea0640d52e0178a76be17338149500cba5e26",
+      "transformation": "CRLF to LF only, parsed JSON unchanged"
+    },
+    {
+      "path": "CI-measurements-recomputed.json",
+      "rawBytes": 2843,
+      "rawSHA256": "f64c91eab739d692e805c55c6c0bafd299dcd3e32b5b74d568c3a30af1f7b7b8",
+      "GitLFBytes": 2718,
+      "GitLFSHA256": "c2c64fb0418c35a4e76f728ac55a22dfd7fd63d92f9a562f0deee5d0fc89959b",
+      "transformation": "CRLF to LF only, parsed JSON unchanged"
+    },
+    {
+      "path": "frontend-run.json",
+      "rawBytes": 14645,
+      "rawSHA256": "3c7da75e71e2c515d8cc0a433f9fc44a8725efec45a1b7c6181e215a89adeeef",
+      "GitLFBytes": 14421,
+      "GitLFSHA256": "f50ab70befcd47e1629f4fcb4257261264a7dc0005686b81404f20da41ea9e80",
+      "transformation": "CRLF to LF only, parsed JSON unchanged"
+    },
+    {
+      "path": "frontend-jobs.json",
+      "rawBytes": 9731,
+      "rawSHA256": "f84e219d534af652cf64f48b286b06fdffbdbd45b546cb0d72dc923e690ec6e0",
+      "GitLFBytes": 9462,
+      "GitLFSHA256": "7193d85d546ec01dde48de9dabb25e345f4f85544b9309d6648fe4e33eda5ab5",
+      "transformation": "CRLF to LF only, parsed JSON unchanged"
+    },
+    {
+      "path": "frontend-artifacts.json",
+      "rawBytes": 1946,
+      "rawSHA256": "9f8b0c177c810f048689f619eb590445054315b263b305c2ff79ccfb88850adb",
+      "GitLFBytes": 1901,
+      "GitLFSHA256": "902792de0cbf83900f37f61bfec5511c1313f0f59e9108280f5e16eb2de2f48d",
+      "transformation": "CRLF to LF only, parsed JSON unchanged"
+    },
+    {
+      "path": "core-run.json",
+      "rawBytes": 14633,
+      "rawSHA256": "8dbb67755eea88c6a6913ceee5ffca9f0ca61e6afaca5dc2a31be4eff35e3652",
+      "GitLFBytes": 14409,
+      "GitLFSHA256": "e6c231f2a3a4103b98aad1c0deda666e8db805d82ed11dcc567f30c6c45a3e8f",
+      "transformation": "CRLF to LF only, parsed JSON unchanged"
+    },
+    {
+      "path": "core-jobs.json",
+      "rawBytes": 21102,
+      "rawSHA256": "2b171b4005519cb3c1f2584b785fe20b6f2ba62f3d4655a386f56adc78e4b9bc",
+      "GitLFBytes": 20529,
+      "GitLFSHA256": "dcb0bb3460be135ea278ba647742a7bcccf67e274929e8680245589bb4b9695c",
+      "transformation": "CRLF to LF only, parsed JSON unchanged"
+    },
+    {
+      "path": "core-artifacts.json",
+      "rawBytes": 1966,
+      "rawSHA256": "4dead86e0d35c24628b901e1982604b0ef89ae30ad0ad82c75bb3382ea17b109",
+      "GitLFBytes": 1921,
+      "GitLFSHA256": "d7431782a9b83c5865bb70916ce348028dea65127d5a072c8520cc79f36e0356",
+      "transformation": "CRLF to LF only, parsed JSON unchanged"
+    },
+    {
+      "path": "backend-run.json",
+      "rawBytes": 14642,
+      "rawSHA256": "160d6f707ea4906a6affb752a030c151a5ee7939b8334ce05a63d6c9b3c57c26",
+      "GitLFBytes": 14418,
+      "GitLFSHA256": "953ccd41eb8165af45d299206ed0fa5dbe771563444e098855b990ab7001ae5f",
+      "transformation": "CRLF to LF only, parsed JSON unchanged"
+    },
+    {
+      "path": "backend-jobs.json",
+      "rawBytes": 17226,
+      "rawSHA256": "81cb44ccdcefb9bb87f09bba1b15a03341c2afb0978b673f31ed17a595c96f6e",
+      "GitLFBytes": 16745,
+      "GitLFSHA256": "475fe3b5342e276de537077d5328011ec618f56cf90bac4a8f04f9342154e5de",
+      "transformation": "CRLF to LF only, parsed JSON unchanged"
+    },
+    {
+      "path": "backend-artifacts.json",
+      "rawBytes": 2027,
+      "rawSHA256": "4520993c7cc8552359dbf51b93bb0cbaf6ea05549b4d03a4234445afe3ba8ca7",
+      "GitLFBytes": 1982,
+      "GitLFSHA256": "48a1366eb8f2440f2f534119c191eaf49474aa76962b87774db689265e6dcf36",
+      "transformation": "CRLF to LF only, parsed JSON unchanged"
+    },
+    {
+      "path": "docs-run.json",
+      "rawBytes": 14633,
+      "rawSHA256": "8a3061f240429317d7148bdab462fc6b311b0d6d1201da1bf4f4ad5900646ebd",
+      "GitLFBytes": 14409,
+      "GitLFSHA256": "a78cf346bc48f689d63cc48d25b63af4d3074955712dc7d1a56eb302e50460f2",
+      "transformation": "CRLF to LF only, parsed JSON unchanged"
+    },
+    {
+      "path": "docs-jobs.json",
+      "rawBytes": 6541,
+      "rawSHA256": "c7fb2c0971d4bd6bae8349ed247876bbc14dfc0422ecb1f6d21a508d45c3984f",
+      "GitLFBytes": 6356,
+      "GitLFSHA256": "daa45441951b13ebee89de3ce6c6588d7d74a88e08a7ca9a3b061ec5b9058d31",
+      "transformation": "CRLF to LF only, parsed JSON unchanged"
+    },
+    {
+      "path": "docs-artifacts.json",
+      "rawBytes": 1940,
+      "rawSHA256": "8420ef783a559872f314caea3677a33528e611f4dc0f6845b29e9f7c678b85c6",
+      "GitLFBytes": 1895,
+      "GitLFSHA256": "333f33daa560c544e43102220bfe480d13b6f90aa50990aaf1c5e68d2d7eb425",
+      "transformation": "CRLF to LF only, parsed JSON unchanged"
+    }
+  ],
+  "postCIPublicationOwnership": "Root freezes final author receipt and official CI metadata; source SHA stays immutable",
+  "coreArchivePublicReadonlyPath": "D:/Project/SaintVisionI-Invion/fleet5-compute-storage-contract-20261105/docs/vault/30_Development/Evidence/fleet5-first-workspace-ui-contract-r1-20261107-codex/ci-90578f49ea40-core-evidence.zip",
+  "archiveSHA256": "9f7f1b04c7eba92bc2130923c8f348fc7efec1700f189f0d374e1592c5ee0441",
+  "noBinaryArchiveCommitted": true
+}

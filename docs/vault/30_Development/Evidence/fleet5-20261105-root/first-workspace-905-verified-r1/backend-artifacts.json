@@ -1,0 +1,45 @@
+{
+  "total_count": 2,
+  "artifacts": [
+    {
+      "id": 13572880508,
+      "node_id": "MDg6QXJ0aWZhY3QxMzU3Mjg4MDUwOA==",
+      "name": "fleet5-settled-pinned-3.12-90578f49ea400958fcdbc1ded3908d624e856f57",
+      "size_in_bytes": 6020,
+      "url": "https://api.github.com/repos/egparadise/SaintVision-Invion/actions/artifacts/13572880508",
+      "archive_download_url": "https://api.github.com/repos/egparadise/SaintVision-Invion/actions/artifacts/13572880508/zip",
+      "expired": false,
+      "digest": "sha256:64bdd98d5671b4a5fdfe04077e077dcafe4f6305e973f38a01502cd6b24c521b",
+      "created_at": "2026-11-07T11:28:20Z",
+      "updated_at": "2026-11-07T11:28:20Z",
+      "expires_at": "2027-02-05T11:26:34Z",
+      "workflow_run": {
+        "id": 42368193399,
+        "repository_id": 1362259805,
+        "head_repository_id": 1362259805,
+        "head_branch": "agent/codex/fleet5-first-workspace-ui-contract-r1-20261107",
+        "head_sha": "90578f49ea400958fcdbc1ded3908d624e856f57"
+      }
+    },
+    {
+      "id": 13572681180,
+      "node_id": "MDg6QXJ0aWZhY3QxMzU3MjY4MTE4MA==",
+      "name": "fleet5-settled-pinned-3.14-90578f49ea400958fcdbc1ded3908d624e856f57",
+      "size_in_bytes": 1768,
+      "url": "https://api.github.com/repos/egparadise/SaintVision-Invion/actions/artifacts/13572681180",
+      "archive_download_url": "https://api.github.com/repos/egparadise/SaintVision-Invion/actions/artifacts/13572681180/zip",
+      "expired": false,
+      "digest": "sha256:d6fbf86ddb85cb9521a654fab42528a2b74b3ee3075444cfcd6aadff40fda684",
+      "created_at": "2026-11-07T11:28:01Z",
+      "updated_at": "2026-11-07T11:28:01Z",
+      "expires_at": "2027-02-05T11:26:34Z",
+      "workflow_run": {
+        "id": 42368193399,
+        "repository_id": 1362259805,
+        "head_repository_id": 1362259805,
+        "head_branch": "agent/codex/fleet5-first-workspace-ui-contract-r1-20261107",
+        "head_sha": "90578f49ea400958fcdbc1ded3908d624e856f57"
+      }
+    }
+  ]
+}
