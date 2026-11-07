@@ -4,7 +4,7 @@ title: "Claude 작업 현황"
 version: "1.2.131"
 status: "review"
 author: "Claude"
-updated: "2026-11-08T08:52:00+09:00"
+updated: "2026-11-08T08:35:00+09:00"
 
 
 
