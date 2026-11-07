@@ -1,44 +1,32 @@
 import { createHash } from 'node:crypto';
 import { spawnSync } from 'node:child_process';
 import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
-import { createRequire } from 'node:module';
 import { tmpdir } from 'node:os';
-import { dirname, join } from 'node:path';
-import { fileURLToPath } from 'node:url';
-import { createContext, runInContext } from 'node:vm';
+import { join } from 'node:path';
+import { fileURLToPath, pathToFileURL } from 'node:url';
+import { createContext, runInContext, SourceTextModule } from 'node:vm';
+import ts from 'typescript';
 import { describe, expect, it } from 'vitest';
 import { checkedNodeCertificateObservation } from '../src/shared/api/nodeCertificateObservation';
 
 const webRoot = fileURLToPath(new URL('..', import.meta.url));
-const generated = join(webRoot, 'src/contracts/node-certificate-validator.cjs');
+const generated = join(webRoot, 'src/contracts/node-certificate-validator.mjs');
 const fixture = () => JSON.parse(readFileSync(new URL('../../../contracts/fixtures/project-node-certificate-observation-response.json', import.meta.url), 'utf8'));
 const now = Date.parse('2026-11-04T04:00:00+00:00');
 
-// Every JS dependency executes in the SAME realm with string and Wasm generation disabled.
-// Supplying a host require would leave format/helper imports outside this regression's boundary.
-function loadWithoutCodeGeneration() {
+// Parse/link/evaluate the actual ESM in one realm with string/Wasm generation
+// disabled. Any residual external dependency is an error, never a host require.
+async function loadWithoutCodeGeneration() {
   const context = createContext({}, { codeGeneration: { strings: false, wasm: false } });
-  const modules = new Map<string, { exports: any }>();
-  const load = (filename: string): any => {
-    if (modules.has(filename)) return modules.get(filename)!.exports;
-    const module = { exports: {} };
-    modules.set(filename, module);
-    const require = (id: string) => {
-      const resolved = createRequire(filename).resolve(id);
-      if (!resolved.endsWith('.js') && !resolved.endsWith('.cjs')) throw new Error(`Unexpected validator dependency: ${id}`);
-      return load(resolved);
-    };
-    const body = readFileSync(filename, 'utf8');
-    const execute = runInContext(`(function(require,module,exports,__filename,__dirname){${body}\n})`, context, { filename });
-    execute(require, module, module.exports, filename, dirname(filename));
-    return module.exports;
-  };
-  return { context, validate: load(generated) as (value: unknown) => boolean };
+  const module = new SourceTextModule(readFileSync(generated, 'utf8'), { context, identifier: generated });
+  await module.link(id => { throw new Error(`Unexpected validator dependency: ${id}`); });
+  await module.evaluate();
+  return { context, validate: (module.namespace as { default: (value: unknown) => boolean }).default };
 }
 
 describe('CR-CSP-01 canonical standalone validator', () => {
-  it('imports and validates with string-code generation forbidden, including imported format helpers', () => {
-    const { context, validate } = loadWithoutCodeGeneration();
+  it('imports and validates with string-code generation forbidden, including bundled format helpers', async () => {
+    const { context, validate } = await loadWithoutCodeGeneration();
     expect(() => runInContext('new Function("return 1")()', context)).toThrow(/Code generation from strings disallowed/);
     expect(() => runInContext('eval("1")', context)).toThrow(/Code generation from strings disallowed/);
     expect(validate(fixture())).toBe(true);
@@ -55,6 +43,30 @@ describe('CR-CSP-01 canonical standalone validator', () => {
     expect(validate(invalid)).toBe(false);
     invalid.items = Array.from({ length: 201 }, () => fixture().items[0]);
     expect(validate(invalid)).toBe(false);
+  });
+
+  it('has a real default ESM export and loads natively without CommonJS globals or external imports', () => {
+    const code = readFileSync(generated, 'utf8');
+    const source = ts.createSourceFile(generated, code, ts.ScriptTarget.ES2022, true, ts.ScriptKind.JS);
+    const commonJS: string[] = [];
+    const visit = (node: ts.Node) => {
+      if (ts.isCallExpression(node) && ts.isIdentifier(node.expression) && node.expression.text === 'require') commonJS.push('require()');
+      if (ts.isPropertyAccessExpression(node) && ts.isIdentifier(node.expression) &&
+          node.expression.text === 'module' && node.name.text === 'exports') commonJS.push('module.exports');
+      if (ts.isElementAccessExpression(node) && ts.isIdentifier(node.expression) &&
+          node.expression.text === 'module' && ts.isStringLiteral(node.argumentExpression) &&
+          node.argumentExpression.text === 'exports') commonJS.push('module[exports]');
+      ts.forEachChild(node, visit);
+    };
+    visit(source);
+    expect(commonJS).toEqual([]);
+    const nativeImport = spawnSync(process.execPath, ['--input-type=module', '-e',
+      `import { readFileSync } from 'node:fs';
+       const module = await import(${JSON.stringify(pathToFileURL(generated).href)});
+       const fixture = JSON.parse(readFileSync(${JSON.stringify(fileURLToPath(new URL('../../../contracts/fixtures/project-node-certificate-observation-response.json', import.meta.url)))}, 'utf8'));
+       if (typeof module.default !== 'function' || !module.default(fixture)) process.exit(1);`],
+    { encoding: 'utf8' });
+    expect(nativeImport.status, nativeImport.stderr).toBe(0);
   });
 
   it.each([
@@ -94,12 +106,14 @@ describe('CR-CSP-01 canonical standalone validator', () => {
     try {
       expect(run('--check').status).toBe(1);
       expect(run('--write').status).toBe(0);
-      const path = join(directory, 'node-certificate-validator.cjs');
+      const path = join(directory, 'node-certificate-validator.mjs');
       const manifestPath = join(directory, 'node-certificate-validator.manifest.json');
       const first = readFileSync(path);
       const manifest = readFileSync(manifestPath, 'utf8');
       expect(first.equals(readFileSync(generated))).toBe(true);
       const metadata = JSON.parse(manifest);
+      expect(metadata.format).toBe('esm');
+      expect(metadata.selfContained).toBe(true);
       const schemaBytes = readFileSync(new URL('../../../contracts/v1alpha1/core.schema.json', import.meta.url));
       expect(metadata.schemaSHA256).toBe(createHash('sha256').update(schemaBytes).digest('hex'));
       expect(run('--check').status).toBe(0);

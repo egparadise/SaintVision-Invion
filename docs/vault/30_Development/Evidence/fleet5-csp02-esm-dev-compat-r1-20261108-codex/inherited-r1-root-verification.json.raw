@@ -1,0 +1,32 @@
+{
+  "atKST": "2026-11-08T02:31:57+09:00",
+  "reviewSource": "4a29b57e6c6ccb75eed50147c00d52d3c8d6ac04",
+  "reviewBase": "86acd9816f3ba397d02a07e90d2e912e414b1bac",
+  "reviewedTarget": "428e5fc6b822d33e7e76316f443716b03579efa0",
+  "actualVerdict": "CHANGES_REQUIRED_ONE_BOUNDED_DEV_ENTRY_POINT_DEFECT_KEEP_REAL_DEPLOYMENT_GATES",
+  "remainingMandatoryCodeDefects": [
+    {
+      "id": "CR-CSP-02",
+      "severity": "Medium",
+      "kind": "dev entry point regression",
+      "evidenceAtReview": "static locked-Vite source, not executed by reviewer"
+    }
+  ],
+  "productionBuildCorrectionSoundPerActualReview": true,
+  "RootInputPinsMatched": 21,
+  "ownFourDocsOnlyDirectParentRemoteExact": true,
+  "Docs": 42396250008,
+  "DocsJob": 128474140394,
+  "exactManualAttempt1All19Success": true,
+  "canonicalFullBytesMatchAtRootVerification": true,
+  "canonicalBytes": 527399,
+  "canonicalSHA256": "d25cf6dce45fc7047884c5705f386527368b6ae44e85ce39b9120b74748a33d7",
+  "reviewerLifecycle": {
+    "state": "succeeded",
+    "stage": "settled",
+    "liveness": "exited",
+    "terminalState": "released"
+  },
+  "actualDeploymentAccepted": false,
+  "wholeProgramComplete": false
+}

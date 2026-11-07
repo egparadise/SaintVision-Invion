@@ -86,7 +86,7 @@ jobs:
           name: saintvision-portal-strict-csp-evidence
           path: |
             artifacts/portal-strict-csp/
-            apps/web/src/contracts/node-certificate-validator.cjs
+            apps/web/src/contracts/node-certificate-validator.mjs
             apps/web/src/contracts/node-certificate-validator.manifest.json
           retention-days: 14
 

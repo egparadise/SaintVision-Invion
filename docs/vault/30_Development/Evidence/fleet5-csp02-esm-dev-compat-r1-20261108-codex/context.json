@@ -1,0 +1,17 @@
+{
+  "docID": "EVIDENCE-FLEET5-CSP02-ESM-DEV-COMPAT-R1-CODEX",
+  "version": "1.0.0",
+  "task": "CR-CSP-02",
+  "taskID": "task_e18b8724de5b",
+  "dispatchID": "ctx_e508c89f62b7",
+  "owner": "Codex",
+  "base": "428e5fc6b822d33e7e76316f443716b03579efa0",
+  "backendSource": "96afd799d49717fd40e4ddabd538d82accbe1958",
+  "branch": "agent/codex/fleet5-csp02-esm-dev-compat-r1-20261108",
+  "rootManagement": "41c3e18ff16d97299567a0403ce018c2ca767ea5",
+  "atKST": "2026-11-08T02:40:23.388228+09:00",
+  "canonicalBytes": 529870,
+  "canonicalSHA256": "43600e1941cb3527e80adc2daac2064c53a44d129094da53869e6f50d46e334e",
+  "mainProductExecution": false,
+  "review": "Root starts one actual Claude delta review after settlement/release; inherits soundR1"
+}

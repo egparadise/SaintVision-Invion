@@ -1,3 +1,3 @@
 # Ephemeral standalone output: regenerated from canonical schema and locked Ajv on every entry point.
-/src/contracts/node-certificate-validator.cjs
+/src/contracts/node-certificate-validator.mjs
 /src/contracts/node-certificate-validator.manifest.json

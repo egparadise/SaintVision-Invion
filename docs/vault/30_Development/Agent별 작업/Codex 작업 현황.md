@@ -11,6 +11,11 @@ active_card_status: "Physical PC map corrected; actual PC4 read-only share and f
 active_card_next: "Integrate reviewed source revisions with both current-tooling bindings, regenerate exact new archive/verified-finalized classifier, run all8CI; complete PC1keyDocker/PC3group/PC5runtime then real5Node acceptance"
 ---
 
+## 2026-11-08T02:44:28+09:00 CR-CSP-02 ESM dev/build 한정 수정
+
+작업한 것 → 확인한 것: actual R1의 sound production 판단을 상속하고 Root의 exact428e AC11 dev 실패를 보존하며 self-contained ESM 수정과 실제 module 경계 회귀를 구현한다. 최신 공통 관리 정본은 Root526/41c3e18이며 Main 제품 실행 없이 경량8 gates와 exact hosted Frontend/Docs/AC11 증거를 모은다. 다음 첫 행동/담당은 Root의 exact artifact 대조와 actual Claude delta 검토, 수락 후 Root만 실 PC3 배포·사용자 승인·Run·5PC를 검증한다. [[2026-11-08_FLEET5_CR-CSP-02_ESM_dev_Codex]] 및 [[30_Development/Evidence/fleet5-csp02-esm-dev-compat-r1-20261108-codex/README]]를 인계하며 옛 전체 vault를 export하지 않는다.
+
+
 ## 2026-11-08T01:42:11+09:00 CR-CSP-01 실제 strict-CSP 부팅 결함 수정
 
 작업한 것 → 확인한 것: accepted96 새 branch에서 canonical standalone 생성·문자열 코드 생성 금지 회귀·실제 dist strict-CSP hosted 부팅 gate를 구현했다. Main 제품 실행 없이 source/docs 검사와 exact Frontend/Docs CI를 수집한다. 최신 공통 관리 정본은 Root524/76c06dc8이며 이 branch 전체 vault를 export하지 않는다. 다음 첫 행동/담당은 Root의 exact artifact 대조와 actual Claude 독립 검토이며, 수락 뒤 Root만 PC3 실제 배포·브라우저·승인·Run·5PC를 검증한다. 최종 증거는 [[30_Development/Evidence/fleet5-csp-static-validator-r1-20261108-codex/README]] 및 [[2026-11-08_FLEET5_CR-CSP-01_static_validator_Codex]]에 연결한다.

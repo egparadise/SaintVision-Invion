@@ -1,0 +1,7 @@
+{
+  "observedExit": 2,
+  "command": "git diff --cached --check",
+  "cause": "Exact public receipt CR/CRLF bytes were detected as trailing whitespace after disabling text normalization",
+  "correction": "Preserve exact input bytes in explicit binary .raw copies and full-state binary snapshots; normalized readable JSON has identical parsed values and separate hashes; no product/CI/assertion change",
+  "rawInputsNotDeleted": true
+}

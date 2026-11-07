@@ -1,0 +1,56 @@
+[
+  {
+    "path": "baseline-baseline-final-proof.json",
+    "bytes": 1450,
+    "SHA256": "36252158f6af93347b58daa50fee9eb02ca0a5851a7f3cec1c6e9712642d6f9c",
+    "rawPath": "baseline-baseline-final-proof.json.raw",
+    "rawBytes": 1481,
+    "rawSHA256": "3a1c2d65672b8bb12138b81624b49e63ba104e0009ecffee02a5c03314494645",
+    "parsedJSONEqual": true
+  },
+  {
+    "path": "baseline-final-jobs.json",
+    "bytes": 4959,
+    "SHA256": "31176ca5838c6028dbbe4de43635d35d573a9877099a73ae0f44fca13323a217",
+    "rawPath": "baseline-final-jobs.json.raw",
+    "rawBytes": 3469,
+    "rawSHA256": "3483b0bfaeb400bf421286a12ed959c674a2087d465fc12ebfe9b28775c949e5",
+    "parsedJSONEqual": true
+  },
+  {
+    "path": "baseline-final-run.json",
+    "bytes": 14440,
+    "SHA256": "311265ed1d65c944d4d036a65f20688645dd5a9d218edba259b9e4b4dcec8ba0",
+    "rawPath": "baseline-final-run.json.raw",
+    "rawBytes": 13111,
+    "rawSHA256": "e5e187929a7587b4f848c88a9642040b0afa0362dc5ac6c7426aec4c9295a3c7",
+    "parsedJSONEqual": true
+  },
+  {
+    "path": "inherited-r1-review.json",
+    "bytes": 13673,
+    "SHA256": "eb982feca945c13061b20b39c603684a24f88d5be6a723df4daffe6d6dbf9bf0",
+    "rawPath": "inherited-r1-review.json.raw",
+    "rawBytes": 13673,
+    "rawSHA256": "eb982feca945c13061b20b39c603684a24f88d5be6a723df4daffe6d6dbf9bf0",
+    "parsedJSONEqual": true
+  },
+  {
+    "path": "inherited-r1-root-verification.json",
+    "bytes": 1169,
+    "SHA256": "e8b5503eb2419a3181a3a97dd0af9f1d4f4e3d4b386d625959ebd604b0a2a1d0",
+    "rawPath": "inherited-r1-root-verification.json.raw",
+    "rawBytes": 1169,
+    "rawSHA256": "e8b5503eb2419a3181a3a97dd0af9f1d4f4e3d4b386d625959ebd604b0a2a1d0",
+    "parsedJSONEqual": true
+  },
+  {
+    "path": "root526-public-proof.json",
+    "bytes": 426,
+    "SHA256": "33283224de2b056eae7aa98b6cb52ee2b711d26264af876d28cfc74e0325fff8",
+    "rawPath": "root526-public-proof.json.raw",
+    "rawBytes": 444,
+    "rawSHA256": "ebffa1fdb4612813da263de74959d96614d0cdd0e98c659dc6f97e592852e984",
+    "parsedJSONEqual": true
+  }
+]

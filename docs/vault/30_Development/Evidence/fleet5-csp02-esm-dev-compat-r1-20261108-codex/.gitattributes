@@ -1,0 +1,4 @@
+# Raw input archives and full canonical-state copies preserve exact bytes.
+*.raw binary
+sync-state-before.json binary
+sync-state-after.json binary

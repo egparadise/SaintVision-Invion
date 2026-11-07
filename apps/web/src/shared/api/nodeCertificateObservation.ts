@@ -1,4 +1,4 @@
-import validate from '@/contracts/node-certificate-validator.cjs';
+import validate from '@/contracts/node-certificate-validator.mjs';
 import type { ProjectNodeCertificateObservationResponse, NodeCertificateTrustSummary } from '@/contracts/node-certificate-observation';
 import { apiClient } from './client';
 
