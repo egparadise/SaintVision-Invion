@@ -1,0 +1,16 @@
+{
+  "argv": [
+    "git",
+    "diff",
+    "--check",
+    "b3bbdc8d92a39f2f797a7680deb2770d6f705af0"
+  ],
+  "startKST": "2026-11-07T10:18:17.882604+09:00",
+  "endKST": "2026-11-07T10:18:19.545988+09:00",
+  "exit": 0,
+  "rawSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "rawBytes": 0,
+  "encoding": "utf-8",
+  "text": "",
+  "cause": "Root msg_193e85c36227 exact one-file JSON representation and appended History; no product/test/proof change"
+}

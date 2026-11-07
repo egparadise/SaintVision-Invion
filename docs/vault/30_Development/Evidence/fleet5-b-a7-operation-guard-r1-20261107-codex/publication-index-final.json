@@ -1,0 +1,820 @@
+{
+  "atKST": "2026-11-07T10:19:12.868751+09:00",
+  "base": "b3bbdc8d92a39f2f797a7680deb2770d6f705af0",
+  "RootDecisions": [
+    "msg_fb188c4045e5",
+    "msg_193e85c36227"
+  ],
+  "productTestBindings": {
+    "services/control-plane/src/inv/dispatch.py": {
+      "canonicalStagedBlobSHA256": "82f029614537eb5bab56934e4b6736fe3dd52ece54b9b9a3996815b131e41de4",
+      "RootTestedRawSHA256": "82f029614537eb5bab56934e4b6736fe3dd52ece54b9b9a3996815b131e41de4",
+      "exact": true,
+      "bytes": 15823
+    },
+    "tests/core/test_delivery_operation_origin.py": {
+      "canonicalStagedBlobSHA256": "3dacdb63f83ab1d8075ddcbe422d82daad20bd56f643adee0fc7ae97715925d2",
+      "RootTestedRawSHA256": "3dacdb63f83ab1d8075ddcbe422d82daad20bd56f643adee0fc7ae97715925d2",
+      "exact": true,
+      "bytes": 9520
+    }
+  },
+  "canonicalWrapperGitBlobSHA256": "5c6d7e0bf13a399e9ec3020885b391d852a0927e006f1539ba4564eb7b311679",
+  "wrapperWindowsWorkingCopySHA256": "5c6d7e0bf13a399e9ec3020885b391d852a0927e006f1539ba4564eb7b311679",
+  "wrapperDecodedRawSHA256": "8a74f36b57b55743b89d451a94d4109dc996f0758d4ad4f4c23ff4fffc364c4a",
+  "wrapperDecodedRawBytes": 3496,
+  "wrapperMatchesWorkingAndBothWIPRawEntries": true,
+  "rawStandaloneExcluded": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/review-original-local-doc-gates.txt",
+  "immutableOtherWIPEntriesAnd29HelpersUnchanged": true,
+  "allOtherOwnedStagePathsPreserved": true,
+  "stageEntriesBeforeThisReceipt": [
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/check_finite_compatibility.py",
+      "workingRawSHA256": "d5a87a077ed68d7e1baa777faabb012f4802b6656ae5b29566d7e0ad62fc808c",
+      "canonicalGitBlobSHA256": "d5a87a077ed68d7e1baa777faabb012f4802b6656ae5b29566d7e0ad62fc808c",
+      "workingBytes": 12036,
+      "GitBlobBytes": 12036,
+      "rawEqualsCanonical": true
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/complete-product-test.diff.txt",
+      "workingRawSHA256": "075b20d4ed4345c92a7863cadbb1d5361711b8458903787972d11f2075b0f292",
+      "canonicalGitBlobSHA256": "075b20d4ed4345c92a7863cadbb1d5361711b8458903787972d11f2075b0f292",
+      "workingBytes": 10963,
+      "GitBlobBytes": 10963,
+      "rawEqualsCanonical": true
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/control-inputs.json",
+      "workingRawSHA256": "ffca532b4e769f2f2ec7cc7c3da29a69907f47f84407ca93d103a0462d50bdb3",
+      "canonicalGitBlobSHA256": "ffca532b4e769f2f2ec7cc7c3da29a69907f47f84407ca93d103a0462d50bdb3",
+      "workingBytes": 706803,
+      "GitBlobBytes": 706803,
+      "rawEqualsCanonical": true
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/control-results.json",
+      "workingRawSHA256": "f48b2811f0b248a087e0338e843e3d8dadd9e3849c4e2448579d7f26a254218a",
+      "canonicalGitBlobSHA256": "f48b2811f0b248a087e0338e843e3d8dadd9e3849c4e2448579d7f26a254218a",
+      "workingBytes": 10013,
+      "GitBlobBytes": 10013,
+      "rawEqualsCanonical": true
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/existing-guard-refusal.json",
+      "workingRawSHA256": "3f5e6214ca11c7b08f54412f3f351242651bc6b9b4477df0f9512859488c5759",
+      "canonicalGitBlobSHA256": "3f5e6214ca11c7b08f54412f3f351242651bc6b9b4477df0f9512859488c5759",
+      "workingBytes": 3011,
+      "GitBlobBytes": 3011,
+      "rawEqualsCanonical": true
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/finite_compatibility.py",
+      "workingRawSHA256": "e61b538446e0ba0b8b254874fadf9c820a3341a40dbf1ec51b63f95e32a105bf",
+      "canonicalGitBlobSHA256": "e61b538446e0ba0b8b254874fadf9c820a3341a40dbf1ec51b63f95e32a105bf",
+      "workingBytes": 10229,
+      "GitBlobBytes": 10229,
+      "rawEqualsCanonical": true
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/fleet5-a7-operation-guard-r1-wip01.zip",
+      "workingRawSHA256": "28c87c268baaf551dde15fcb35f0eb6d3b24b6861e8c1cfcb845fcb6e0a96f37",
+      "canonicalGitBlobSHA256": "28c87c268baaf551dde15fcb35f0eb6d3b24b6861e8c1cfcb845fcb6e0a96f37",
+      "workingBytes": 1119013,
+      "GitBlobBytes": 1119013,
+      "rawEqualsCanonical": true
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/fleet5-a7-operation-guard-r1-wip02.zip",
+      "workingRawSHA256": "ce2e8c8802c4c4b805cd38f5fe49117f472f0b44bb2f1c4adb80759924670fbb",
+      "canonicalGitBlobSHA256": "ce2e8c8802c4c4b805cd38f5fe49117f472f0b44bb2f1c4adb80759924670fbb",
+      "workingBytes": 2623087,
+      "GitBlobBytes": 2623087,
+      "rawEqualsCanonical": true
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/freeze_wip.py",
+      "workingRawSHA256": "d763ea387f0f604864dfe4414c4de04bc199444c79e43bb15f9c512248a8bfb4",
+      "canonicalGitBlobSHA256": "d763ea387f0f604864dfe4414c4de04bc199444c79e43bb15f9c512248a8bfb4",
+      "workingBytes": 7201,
+      "GitBlobBytes": 7201,
+      "rawEqualsCanonical": true
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/freeze_wip02.py",
+      "workingRawSHA256": "485211b1367d36976b8566e8d307431407c18ece233639c943f22b33834a0be1",
+      "canonicalGitBlobSHA256": "485211b1367d36976b8566e8d307431407c18ece233639c943f22b33834a0be1",
+      "workingBytes": 9325,
+      "GitBlobBytes": 9325,
+      "rawEqualsCanonical": true
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/inputs.json",
+      "workingRawSHA256": "db87e3c6545105cafc93abbe78e53e2de85facada6363bd0b2773a5e4391706b",
+      "canonicalGitBlobSHA256": "db87e3c6545105cafc93abbe78e53e2de85facada6363bd0b2773a5e4391706b",
+      "workingBytes": 22339,
+      "GitBlobBytes": 22339,
+      "rawEqualsCanonical": true
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/inspect_refusal.py",
+      "workingRawSHA256": "2173e9db71cc70a46dacce69e0e9b0d48527f25e0e4a8d301822fb0666fbe249",
+      "canonicalGitBlobSHA256": "2173e9db71cc70a46dacce69e0e9b0d48527f25e0e4a8d301822fb0666fbe249",
+      "workingBytes": 2306,
+      "GitBlobBytes": 2306,
+      "rawEqualsCanonical": true
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/operation-obligation-auxiliary.json",
+      "workingRawSHA256": "ce57e9d0110c2293939b954a9075dd63b885c5cf2e2acc78ce886da8d4acbe9c",
+      "canonicalGitBlobSHA256": "ce57e9d0110c2293939b954a9075dd63b885c5cf2e2acc78ce886da8d4acbe9c",
+      "workingBytes": 15369,
+      "GitBlobBytes": 15369,
+      "rawEqualsCanonical": true
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/operation-origin-graph.json",
+      "workingRawSHA256": "37b8b654f4b2808914a2a7a53ff0b43f27b0ccb816df6f804073fd606d7ba250",
+      "canonicalGitBlobSHA256": "37b8b654f4b2808914a2a7a53ff0b43f27b0ccb816df6f804073fd606d7ba250",
+      "workingBytes": 124522,
+      "GitBlobBytes": 124522,
+      "rawEqualsCanonical": true
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/operation_proof.py",
+      "workingRawSHA256": "d5f68c4a1bff9b3f59055a72c1b3dfca97b1b5af674e08da19a729ab9bb66e49",
+      "canonicalGitBlobSHA256": "d5f68c4a1bff9b3f59055a72c1b3dfca97b1b5af674e08da19a729ab9bb66e49",
+      "workingBytes": 21312,
+      "GitBlobBytes": 21312,
+      "rawEqualsCanonical": true
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/prepare.py",
+      "workingRawSHA256": "7ab1f2b986a0771d57e6502462abd035b2f7964b172d21f0c104d55a7c35beb7",
+      "canonicalGitBlobSHA256": "7ab1f2b986a0771d57e6502462abd035b2f7964b172d21f0c104d55a7c35beb7",
+      "workingBytes": 5385,
+      "GitBlobBytes": 5385,
+      "rawEqualsCanonical": true
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/prepare_wip02.py",
+      "workingRawSHA256": "3bf2f4629e28af4e277f5dfe1d7051eba8c3a8571e01dd86a47a3742b2732c0b",
+      "canonicalGitBlobSHA256": "3bf2f4629e28af4e277f5dfe1d7051eba8c3a8571e01dd86a47a3742b2732c0b",
+      "workingBytes": 5919,
+      "GitBlobBytes": 5919,
+      "rawEqualsCanonical": true
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/publication-approved-stage-paths.json",
+      "workingRawSHA256": "5247d330b1d62b0f66db92910fc0c4e03dca771d73b7a248bdec580d67e56935",
+      "canonicalGitBlobSHA256": "5247d330b1d62b0f66db92910fc0c4e03dca771d73b7a248bdec580d67e56935",
+      "workingBytes": 14493,
+      "GitBlobBytes": 14493,
+      "rawEqualsCanonical": true
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/publication-doc-read.json",
+      "workingRawSHA256": "8f1a248c0374a1fe3c3c6f123881dadd18a5f63bd716fec226577f7c5bc6ede5",
+      "canonicalGitBlobSHA256": "8f1a248c0374a1fe3c3c6f123881dadd18a5f63bd716fec226577f7c5bc6ede5",
+      "workingBytes": 1818,
+      "GitBlobBytes": 1818,
+      "rawEqualsCanonical": true
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/publication-final-gate01.json",
+      "workingRawSHA256": "e495158dd53e9420a2d1def8b037d278df63c68d860f3f0135c2807ab389cc31",
+      "canonicalGitBlobSHA256": "e495158dd53e9420a2d1def8b037d278df63c68d860f3f0135c2807ab389cc31",
+      "workingBytes": 591,
+      "GitBlobBytes": 591,
+      "rawEqualsCanonical": true
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/publication-final-gate02.json",
+      "workingRawSHA256": "bfba96236008ff0e76a00d7bd6ebecc6ca66a7080e6918aab5ccb918db5f39a0",
+      "canonicalGitBlobSHA256": "bfba96236008ff0e76a00d7bd6ebecc6ca66a7080e6918aab5ccb918db5f39a0",
+      "workingBytes": 673,
+      "GitBlobBytes": 673,
+      "rawEqualsCanonical": true
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/publication-final-gate03.json",
+      "workingRawSHA256": "1a0e2a315d757f89bf60d622589488b18bed8e66fdb72a90bfb99ff680dbd4e6",
+      "canonicalGitBlobSHA256": "1a0e2a315d757f89bf60d622589488b18bed8e66fdb72a90bfb99ff680dbd4e6",
+      "workingBytes": 573,
+      "GitBlobBytes": 573,
+      "rawEqualsCanonical": true
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/publication-final-gate04.json",
+      "workingRawSHA256": "102c6f50b4bfe327b6f1e8db0b77230dc0775ccdd97b95ee246688c0c541feef",
+      "canonicalGitBlobSHA256": "102c6f50b4bfe327b6f1e8db0b77230dc0775ccdd97b95ee246688c0c541feef",
+      "workingBytes": 1120,
+      "GitBlobBytes": 1120,
+      "rawEqualsCanonical": true
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/publication-final-gates-complete.json",
+      "workingRawSHA256": "782f7f4f3b4bfb8f81df3b25eccb7df92c958bc0ac33a8b5144a44dd00839b87",
+      "canonicalGitBlobSHA256": "782f7f4f3b4bfb8f81df3b25eccb7df92c958bc0ac33a8b5144a44dd00839b87",
+      "workingBytes": 3304,
+      "GitBlobBytes": 3304,
+      "rawEqualsCanonical": true
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/publication-final-sync-state-after.json",
+      "workingRawSHA256": "e4a1518712fe4f1734598e123d0c1cbca2a5ac1b3e82f00d994eed8bb4f114de",
+      "canonicalGitBlobSHA256": "e4a1518712fe4f1734598e123d0c1cbca2a5ac1b3e82f00d994eed8bb4f114de",
+      "workingBytes": 472404,
+      "GitBlobBytes": 472404,
+      "rawEqualsCanonical": true
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/publication-final-sync-state-before.json",
+      "workingRawSHA256": "e4a1518712fe4f1734598e123d0c1cbca2a5ac1b3e82f00d994eed8bb4f114de",
+      "canonicalGitBlobSHA256": "e4a1518712fe4f1734598e123d0c1cbca2a5ac1b3e82f00d994eed8bb4f114de",
+      "workingBytes": 472404,
+      "GitBlobBytes": 472404,
+      "rawEqualsCanonical": true
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/publication-gate01-raw.json",
+      "workingRawSHA256": "f612566261be0bc8478522548d9da62ff3888c8f9fc6b5579e4a2f80a3eb7acd",
+      "canonicalGitBlobSHA256": "f612566261be0bc8478522548d9da62ff3888c8f9fc6b5579e4a2f80a3eb7acd",
+      "workingBytes": 271,
+      "GitBlobBytes": 271,
+      "rawEqualsCanonical": true
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/publication-gate01-receipt.json",
+      "workingRawSHA256": "6ad4e7f26dea30ae1801550c4d59348283925bc1f114892e5ea5b7bbc10999c6",
+      "canonicalGitBlobSHA256": "6ad4e7f26dea30ae1801550c4d59348283925bc1f114892e5ea5b7bbc10999c6",
+      "workingBytes": 377,
+      "GitBlobBytes": 377,
+      "rawEqualsCanonical": true
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/publication-gate02-raw.json",
+      "workingRawSHA256": "35a8e4377c500d9d16113a83e87ba7494bef180b4086ce81914693ebc117ae17",
+      "canonicalGitBlobSHA256": "35a8e4377c500d9d16113a83e87ba7494bef180b4086ce81914693ebc117ae17",
+      "workingBytes": 307,
+      "GitBlobBytes": 307,
+      "rawEqualsCanonical": true
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/publication-gate02-receipt.json",
+      "workingRawSHA256": "09ef4ed57703b054b613a2e4b93162db4f7881e937c99b752e54741923b2956d",
+      "canonicalGitBlobSHA256": "09ef4ed57703b054b613a2e4b93162db4f7881e937c99b752e54741923b2956d",
+      "workingBytes": 381,
+      "GitBlobBytes": 381,
+      "rawEqualsCanonical": true
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/publication-gate03-raw.json",
+      "workingRawSHA256": "f9fc99af2637a0627afb4d41c0c58b236ad7b90c9f2c289474e08e5322db9575",
+      "canonicalGitBlobSHA256": "f9fc99af2637a0627afb4d41c0c58b236ad7b90c9f2c289474e08e5322db9575",
+      "workingBytes": 256,
+      "GitBlobBytes": 256,
+      "rawEqualsCanonical": true
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/publication-gate03-receipt.json",
+      "workingRawSHA256": "77578d94bcb780e7097bc19a3290219410c4cded55e2fc86654c1b88ed794585",
+      "canonicalGitBlobSHA256": "77578d94bcb780e7097bc19a3290219410c4cded55e2fc86654c1b88ed794585",
+      "workingBytes": 474,
+      "GitBlobBytes": 474,
+      "rawEqualsCanonical": true
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/publication-gate04-raw.json",
+      "workingRawSHA256": "ca0daeb7057ac6f2d9e0ba5666dceebff751ba79e0d11a4584d793012767e50a",
+      "canonicalGitBlobSHA256": "ca0daeb7057ac6f2d9e0ba5666dceebff751ba79e0d11a4584d793012767e50a",
+      "workingBytes": 223,
+      "GitBlobBytes": 223,
+      "rawEqualsCanonical": true
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/publication-gate04-receipt.json",
+      "workingRawSHA256": "2612c98e0ad5d62849b33cb7df4091e7278d33aded4cad33c765cbcf6967245b",
+      "canonicalGitBlobSHA256": "2612c98e0ad5d62849b33cb7df4091e7278d33aded4cad33c765cbcf6967245b",
+      "workingBytes": 407,
+      "GitBlobBytes": 407,
+      "rawEqualsCanonical": true
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/publication-gate05-raw.json",
+      "workingRawSHA256": "02473f297c6b650052271af70b0761020b9dd3957fa5ebcea5931d9d688fb352",
+      "canonicalGitBlobSHA256": "02473f297c6b650052271af70b0761020b9dd3957fa5ebcea5931d9d688fb352",
+      "workingBytes": 217,
+      "GitBlobBytes": 217,
+      "rawEqualsCanonical": true
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/publication-gate05-receipt.json",
+      "workingRawSHA256": "b3919355b428f1febcb9f4f89f09b707aa20c1a007d0b345700998790f0783be",
+      "canonicalGitBlobSHA256": "b3919355b428f1febcb9f4f89f09b707aa20c1a007d0b345700998790f0783be",
+      "workingBytes": 1136,
+      "GitBlobBytes": 1136,
+      "rawEqualsCanonical": true
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/publication-gate06-raw.json",
+      "workingRawSHA256": "97d65f91e0572ecd1fbacc21301225fb2650c81156e310a653d74c611027a7ed",
+      "canonicalGitBlobSHA256": "97d65f91e0572ecd1fbacc21301225fb2650c81156e310a653d74c611027a7ed",
+      "workingBytes": 140,
+      "GitBlobBytes": 140,
+      "rawEqualsCanonical": true
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/publication-gate06-receipt.json",
+      "workingRawSHA256": "89957dd56a3ba76376633179437d2ccdc833509400831442d28216b682371050",
+      "canonicalGitBlobSHA256": "89957dd56a3ba76376633179437d2ccdc833509400831442d28216b682371050",
+      "workingBytes": 358,
+      "GitBlobBytes": 358,
+      "rawEqualsCanonical": true
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/publication-gates-complete.json",
+      "workingRawSHA256": "6c03c263c25459e70554153e24c5d2115d13b02450bc1f79586ced6ccd9d3955",
+      "canonicalGitBlobSHA256": "6c03c263c25459e70554153e24c5d2115d13b02450bc1f79586ced6ccd9d3955",
+      "workingBytes": 3668,
+      "GitBlobBytes": 3668,
+      "rawEqualsCanonical": true
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/publication-raw-representation.json",
+      "workingRawSHA256": "296c01ad1e3685979bfc4100cb7f022ff14361c0b35b9949abe0a15c1a1e1e67",
+      "canonicalGitBlobSHA256": "296c01ad1e3685979bfc4100cb7f022ff14361c0b35b9949abe0a15c1a1e1e67",
+      "workingBytes": 2462,
+      "GitBlobBytes": 2462,
+      "rawEqualsCanonical": true
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/publication-root-context.json",
+      "workingRawSHA256": "5f66d64a7441f9f791df60d50c1520fe7c5956d28d41ee4d0d51d3f3e11536fb",
+      "canonicalGitBlobSHA256": "5f66d64a7441f9f791df60d50c1520fe7c5956d28d41ee4d0d51d3f3e11536fb",
+      "workingBytes": 6007,
+      "GitBlobBytes": 6007,
+      "rawEqualsCanonical": true
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/publication-stage-blocker.json",
+      "workingRawSHA256": "10349a6154eeab16aa5096cd169fb76e078384a24ec42efa32f3935211d74770",
+      "canonicalGitBlobSHA256": "10349a6154eeab16aa5096cd169fb76e078384a24ec42efa32f3935211d74770",
+      "workingBytes": 11432,
+      "GitBlobBytes": 11432,
+      "rawEqualsCanonical": true
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/publication-stage-paths.json",
+      "workingRawSHA256": "8dbb0e29c6ce7d0da98faf6d708bd70a3d80d3bc52c08cb9a0ead1595f978fe4",
+      "canonicalGitBlobSHA256": "8dbb0e29c6ce7d0da98faf6d708bd70a3d80d3bc52c08cb9a0ead1595f978fe4",
+      "workingBytes": 9470,
+      "GitBlobBytes": 9470,
+      "rawEqualsCanonical": true
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/publication-stage-stop.json",
+      "workingRawSHA256": "99d21a50ef30986d13a360b40cdc16784e3c6bb8e4ad44e4698a1fb632a5cd11",
+      "canonicalGitBlobSHA256": "99d21a50ef30986d13a360b40cdc16784e3c6bb8e4ad44e4698a1fb632a5cd11",
+      "workingBytes": 403,
+      "GitBlobBytes": 403,
+      "rawEqualsCanonical": true
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/publication-sync-state-after.json",
+      "workingRawSHA256": "e4a1518712fe4f1734598e123d0c1cbca2a5ac1b3e82f00d994eed8bb4f114de",
+      "canonicalGitBlobSHA256": "e4a1518712fe4f1734598e123d0c1cbca2a5ac1b3e82f00d994eed8bb4f114de",
+      "workingBytes": 472404,
+      "GitBlobBytes": 472404,
+      "rawEqualsCanonical": true
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/publication-sync-state-before.json",
+      "workingRawSHA256": "e4a1518712fe4f1734598e123d0c1cbca2a5ac1b3e82f00d994eed8bb4f114de",
+      "canonicalGitBlobSHA256": "e4a1518712fe4f1734598e123d0c1cbca2a5ac1b3e82f00d994eed8bb4f114de",
+      "workingBytes": 472404,
+      "GitBlobBytes": 472404,
+      "rawEqualsCanonical": true
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/publication-wrap-gate01.json",
+      "workingRawSHA256": "be6dd17dd0641ddd0aa087822f8abc74603fa3ca0ba9b09ad952159ef024f94a",
+      "canonicalGitBlobSHA256": "be6dd17dd0641ddd0aa087822f8abc74603fa3ca0ba9b09ad952159ef024f94a",
+      "workingBytes": 625,
+      "GitBlobBytes": 625,
+      "rawEqualsCanonical": true
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/publication-wrap-gate02.json",
+      "workingRawSHA256": "ddd266ec07eb0bdbd25953511882dd5b2c90defbfa3d7d0f7e70168b46d711cd",
+      "canonicalGitBlobSHA256": "ddd266ec07eb0bdbd25953511882dd5b2c90defbfa3d7d0f7e70168b46d711cd",
+      "workingBytes": 665,
+      "GitBlobBytes": 665,
+      "rawEqualsCanonical": true
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/publication-wrap-gate03.json",
+      "workingRawSHA256": "8b9d1e570f6b52394a0180fb8506b8fe567331e490172b5388ee9ddd105b02fe",
+      "canonicalGitBlobSHA256": "8b9d1e570f6b52394a0180fb8506b8fe567331e490172b5388ee9ddd105b02fe",
+      "workingBytes": 707,
+      "GitBlobBytes": 707,
+      "rawEqualsCanonical": true
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/publication-wrap-gate04.json",
+      "workingRawSHA256": "9676f813f658833693bc9ddb199d162494a894d5f192e700b7745cc985e086b6",
+      "canonicalGitBlobSHA256": "9676f813f658833693bc9ddb199d162494a894d5f192e700b7745cc985e086b6",
+      "workingBytes": 607,
+      "GitBlobBytes": 607,
+      "rawEqualsCanonical": true
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/publication-wrap-gate05.json",
+      "workingRawSHA256": "733a6f5af34892e8f35544ce333059b7647965416a0afed18b909ae423e2f506",
+      "canonicalGitBlobSHA256": "733a6f5af34892e8f35544ce333059b7647965416a0afed18b909ae423e2f506",
+      "workingBytes": 1153,
+      "GitBlobBytes": 1153,
+      "rawEqualsCanonical": true
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/publication-wrap-gate06.json",
+      "workingRawSHA256": "16bdb88217d5639a1238f05fa7bd34a23a4eac2be6f41931c3f80568fd2cb3a1",
+      "canonicalGitBlobSHA256": "16bdb88217d5639a1238f05fa7bd34a23a4eac2be6f41931c3f80568fd2cb3a1",
+      "workingBytes": 475,
+      "GitBlobBytes": 475,
+      "rawEqualsCanonical": true
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/publication-wrap-gates-complete.json",
+      "workingRawSHA256": "2ffd013d5c1407f1f7189fd584e5088b89bdfe69c03a4dd8e4b6d67d8cbab1c5",
+      "canonicalGitBlobSHA256": "2ffd013d5c1407f1f7189fd584e5088b89bdfe69c03a4dd8e4b6d67d8cbab1c5",
+      "workingBytes": 4705,
+      "GitBlobBytes": 4705,
+      "rawEqualsCanonical": true
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/publication-wrap-sync-state-after.json",
+      "workingRawSHA256": "e4a1518712fe4f1734598e123d0c1cbca2a5ac1b3e82f00d994eed8bb4f114de",
+      "canonicalGitBlobSHA256": "e4a1518712fe4f1734598e123d0c1cbca2a5ac1b3e82f00d994eed8bb4f114de",
+      "workingBytes": 472404,
+      "GitBlobBytes": 472404,
+      "rawEqualsCanonical": true
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/publication-wrap-sync-state-before.json",
+      "workingRawSHA256": "e4a1518712fe4f1734598e123d0c1cbca2a5ac1b3e82f00d994eed8bb4f114de",
+      "canonicalGitBlobSHA256": "e4a1518712fe4f1734598e123d0c1cbca2a5ac1b3e82f00d994eed8bb4f114de",
+      "workingBytes": 472404,
+      "GitBlobBytes": 472404,
+      "rawEqualsCanonical": true
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/publication_gates.py",
+      "workingRawSHA256": "1a8c190c882cdf74569ef69ce2d03cc669c4541db387fdc42d33ffd868bd7bf9",
+      "canonicalGitBlobSHA256": "1a8c190c882cdf74569ef69ce2d03cc669c4541db387fdc42d33ffd868bd7bf9",
+      "workingBytes": 5162,
+      "GitBlobBytes": 5162,
+      "rawEqualsCanonical": true
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/refusal-inspection.json",
+      "workingRawSHA256": "6adb470b1c4022329a6ff531c5a0608a0565798657dcce46005fe1543637945b",
+      "canonicalGitBlobSHA256": "6adb470b1c4022329a6ff531c5a0608a0565798657dcce46005fe1543637945b",
+      "workingBytes": 478,
+      "GitBlobBytes": 478,
+      "rawEqualsCanonical": true
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/refusal-inspection.log.txt",
+      "workingRawSHA256": "4e1ec805a412ab5ae1ce0766f9b186856e0d62c17fe65f6c099e69bb44f49517",
+      "canonicalGitBlobSHA256": "0c07348d34147ac26956d39bfb7a5385647bfdcbe7d4af44966848e41fe691c1",
+      "workingBytes": 1058,
+      "GitBlobBytes": 1057,
+      "rawEqualsCanonical": false
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/review-original-canonical-sync-check-before.txt",
+      "workingRawSHA256": "9f6d1eb4250de590a0acc1cea1752dadff8fca9a9d882efdcd533eb3c394f93a",
+      "canonicalGitBlobSHA256": "9f6d1eb4250de590a0acc1cea1752dadff8fca9a9d882efdcd533eb3c394f93a",
+      "workingBytes": 880,
+      "GitBlobBytes": 880,
+      "rawEqualsCanonical": true
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/review-original-commands.json",
+      "workingRawSHA256": "3cfed71c71ce7d6119a1439a5ab3103e45cb43164e88be72982301d1da5a913a",
+      "canonicalGitBlobSHA256": "3cfed71c71ce7d6119a1439a5ab3103e45cb43164e88be72982301d1da5a913a",
+      "workingBytes": 4449,
+      "GitBlobBytes": 4449,
+      "rawEqualsCanonical": true
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/review-original-gitattributes.txt",
+      "workingRawSHA256": "96a83569c84cfe3f57b7efe3dc61c249548d0fca4fed0e538b3587cdc97c95c1",
+      "canonicalGitBlobSHA256": "96a83569c84cfe3f57b7efe3dc61c249548d0fca4fed0e538b3587cdc97c95c1",
+      "workingBytes": 21,
+      "GitBlobBytes": 21,
+      "rawEqualsCanonical": true
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/review-original-history.md.txt",
+      "workingRawSHA256": "9d327ffd956114f54f0cd1b71aa66e611a08aee8f15ecb8de815c70797415db5",
+      "canonicalGitBlobSHA256": "9d327ffd956114f54f0cd1b71aa66e611a08aee8f15ecb8de815c70797415db5",
+      "workingBytes": 15385,
+      "GitBlobBytes": 15385,
+      "rawEqualsCanonical": true
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/review-original-local-doc-gates.raw.json",
+      "workingRawSHA256": "5c6d7e0bf13a399e9ec3020885b391d852a0927e006f1539ba4564eb7b311679",
+      "canonicalGitBlobSHA256": "5c6d7e0bf13a399e9ec3020885b391d852a0927e006f1539ba4564eb7b311679",
+      "workingBytes": 3835,
+      "GitBlobBytes": 3835,
+      "rawEqualsCanonical": true
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/review-original-review.json",
+      "workingRawSHA256": "88b102e9319e35b1ea8fbbb7d0b3aac9c72d122bdab3714f30ed04b0612ea221",
+      "canonicalGitBlobSHA256": "88b102e9319e35b1ea8fbbb7d0b3aac9c72d122bdab3714f30ed04b0612ea221",
+      "workingBytes": 19107,
+      "GitBlobBytes": 19107,
+      "rawEqualsCanonical": true
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/review-original-reviewer-mode-future-rule-result.json",
+      "workingRawSHA256": "e5f5ddcbca6c397d35d03b2823e96dab09aee40f74464cf68d37a38822b058a9",
+      "canonicalGitBlobSHA256": "e5f5ddcbca6c397d35d03b2823e96dab09aee40f74464cf68d37a38822b058a9",
+      "workingBytes": 662,
+      "GitBlobBytes": 662,
+      "rawEqualsCanonical": true
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/review-original-reviewer-mode-future-rule.log.txt",
+      "workingRawSHA256": "d23ef94ccc4aa54bd0a60999af1557e899b4383f98d8342b1beb3069bddf2ac2",
+      "canonicalGitBlobSHA256": "d23ef94ccc4aa54bd0a60999af1557e899b4383f98d8342b1beb3069bddf2ac2",
+      "workingBytes": 882,
+      "GitBlobBytes": 882,
+      "rawEqualsCanonical": true
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/review-original-reviewer-mode-probes-result.json",
+      "workingRawSHA256": "22606ab8a9dc1225cbbde54e843df0ccf3fa2df4248b9c3b3d7dece13f37e841",
+      "canonicalGitBlobSHA256": "22606ab8a9dc1225cbbde54e843df0ccf3fa2df4248b9c3b3d7dece13f37e841",
+      "workingBytes": 24641,
+      "GitBlobBytes": 24641,
+      "rawEqualsCanonical": true
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/review-original-reviewer-mode-probes.log.txt",
+      "workingRawSHA256": "48ab4eb628f29b93a84c05f2fd60e0c7c8740b56f93d12ac95db50491a9468ca",
+      "canonicalGitBlobSHA256": "48ab4eb628f29b93a84c05f2fd60e0c7c8740b56f93d12ac95db50491a9468ca",
+      "workingBytes": 11320,
+      "GitBlobBytes": 11320,
+      "rawEqualsCanonical": true
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/review-original-reviewer_gate_driver.py.txt",
+      "workingRawSHA256": "b3dd3ed21c8fd8f323be0ffecf6abeba58a6b13efb64b0fd9b41cf1a345795c4",
+      "canonicalGitBlobSHA256": "b3dd3ed21c8fd8f323be0ffecf6abeba58a6b13efb64b0fd9b41cf1a345795c4",
+      "workingBytes": 2355,
+      "GitBlobBytes": 2355,
+      "rawEqualsCanonical": true
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/review-original-reviewer_mode_future_rule.py.txt",
+      "workingRawSHA256": "29855ad6a707f80d48d1dd7ff90670b257b0a8ad83a028d702004724d107cfd4",
+      "canonicalGitBlobSHA256": "29855ad6a707f80d48d1dd7ff90670b257b0a8ad83a028d702004724d107cfd4",
+      "workingBytes": 2015,
+      "GitBlobBytes": 2015,
+      "rawEqualsCanonical": true
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/review-original-reviewer_mode_probes.py.txt",
+      "workingRawSHA256": "bcfc829a8f5862676023ad8e879924ed00934cec2e5bfebde29df8aa17356518",
+      "canonicalGitBlobSHA256": "bcfc829a8f5862676023ad8e879924ed00934cec2e5bfebde29df8aa17356518",
+      "workingBytes": 22277,
+      "GitBlobBytes": 22277,
+      "rawEqualsCanonical": true
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/root-collect-public-projection.json",
+      "workingRawSHA256": "99c15e906720e14b635200a14a68944683c7cf305f654e26e83bc7645e974d66",
+      "canonicalGitBlobSHA256": "99c15e906720e14b635200a14a68944683c7cf305f654e26e83bc7645e974d66",
+      "workingBytes": 30135,
+      "GitBlobBytes": 30135,
+      "rawEqualsCanonical": true
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/root-run-plan.json",
+      "workingRawSHA256": "ce4bf877428b582d97f7685bfbc4f5f0ccf754aaba533a305b85e65d779c8b12",
+      "canonicalGitBlobSHA256": "ce4bf877428b582d97f7685bfbc4f5f0ccf754aaba533a305b85e65d779c8b12",
+      "workingBytes": 3150,
+      "GitBlobBytes": 3150,
+      "rawEqualsCanonical": true
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/root-verified-unit-observation.json",
+      "workingRawSHA256": "e34c2d254a684d510980b06964ec9c1c6b61ce0e18d3db4aa88163e804ecef50",
+      "canonicalGitBlobSHA256": "1733f943d0c0eda70419cfc48ea7a694d5ffc147c07950aad284c8da6535ab25",
+      "workingBytes": 2517,
+      "GitBlobBytes": 2453,
+      "rawEqualsCanonical": false
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/source-world.json",
+      "workingRawSHA256": "f7c29608517b6f17934cd34b7ff0f431e62654aec86f3ac47f1a05c9629bf2d6",
+      "canonicalGitBlobSHA256": "f7c29608517b6f17934cd34b7ff0f431e62654aec86f3ac47f1a05c9629bf2d6",
+      "workingBytes": 8134,
+      "GitBlobBytes": 8134,
+      "rawEqualsCanonical": true
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/static-inspection-attempt1.json",
+      "workingRawSHA256": "40b5f895922b21ffe860e649bb68578266aaf97786776a1cb2965fe6be63a44c",
+      "canonicalGitBlobSHA256": "40b5f895922b21ffe860e649bb68578266aaf97786776a1cb2965fe6be63a44c",
+      "workingBytes": 482,
+      "GitBlobBytes": 482,
+      "rawEqualsCanonical": true
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/static-inspection-attempt1.log.txt",
+      "workingRawSHA256": "583224da5fea81269b744d996dccc20b5388a9908bae81ee8f54a23da51388fa",
+      "canonicalGitBlobSHA256": "998823e6585c2bf4c31fa10f7288321a11713d1eeb469954ecb7e426eccde60a",
+      "workingBytes": 722,
+      "GitBlobBytes": 720,
+      "rawEqualsCanonical": false
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/static_checks.py",
+      "workingRawSHA256": "f7843e4c2a3dea7023e6b2bbe5e2d0b2a500807323d5b8ca42ad91f464859d01",
+      "canonicalGitBlobSHA256": "f7843e4c2a3dea7023e6b2bbe5e2d0b2a500807323d5b8ca42ad91f464859d01",
+      "workingBytes": 10067,
+      "GitBlobBytes": 10067,
+      "rawEqualsCanonical": true
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/syntax-source-inspection.json",
+      "workingRawSHA256": "4e44290ff1c241d6b86690ee36b2f499544be67af89297d09819db712ff8bdb8",
+      "canonicalGitBlobSHA256": "4e44290ff1c241d6b86690ee36b2f499544be67af89297d09819db712ff8bdb8",
+      "workingBytes": 2531,
+      "GitBlobBytes": 2531,
+      "rawEqualsCanonical": true
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/wip01-manifest.json",
+      "workingRawSHA256": "c0b9fa5cfc75567f62ad2a31f70a9e178798505dfc7e3facb101f6d899bcaa9a",
+      "canonicalGitBlobSHA256": "c0b9fa5cfc75567f62ad2a31f70a9e178798505dfc7e3facb101f6d899bcaa9a",
+      "workingBytes": 13134,
+      "GitBlobBytes": 13134,
+      "rawEqualsCanonical": true
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/wip01-receipt.json",
+      "workingRawSHA256": "10258952890133b0174177b5f049c9188a28b05a354b3e6ef814a4f934235a78",
+      "canonicalGitBlobSHA256": "10258952890133b0174177b5f049c9188a28b05a354b3e6ef814a4f934235a78",
+      "workingBytes": 10065,
+      "GitBlobBytes": 10065,
+      "rawEqualsCanonical": true
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/wip02-finite-control-results.json",
+      "workingRawSHA256": "179f569e99a59bac848b0bc04655249e2897cf3bfbdae98f5fb50c64a70b849b",
+      "canonicalGitBlobSHA256": "179f569e99a59bac848b0bc04655249e2897cf3bfbdae98f5fb50c64a70b849b",
+      "workingBytes": 69618,
+      "GitBlobBytes": 69618,
+      "rawEqualsCanonical": true
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/wip02-finite-proof.json",
+      "workingRawSHA256": "97fa75e072be288ba19c95ae68037c655d96eabd180e0a3c703908a5af72f6db",
+      "canonicalGitBlobSHA256": "97fa75e072be288ba19c95ae68037c655d96eabd180e0a3c703908a5af72f6db",
+      "workingBytes": 52141,
+      "GitBlobBytes": 52141,
+      "rawEqualsCanonical": true
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/wip02-full-product-test.diff.txt",
+      "workingRawSHA256": "075b20d4ed4345c92a7863cadbb1d5361711b8458903787972d11f2075b0f292",
+      "canonicalGitBlobSHA256": "075b20d4ed4345c92a7863cadbb1d5361711b8458903787972d11f2075b0f292",
+      "workingBytes": 10963,
+      "GitBlobBytes": 10963,
+      "rawEqualsCanonical": true
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/wip02-inputs.json",
+      "workingRawSHA256": "06fa7b927a2e1bb9d3ffece06e3de962fa395ccf7a3873b70272da2900f6848b",
+      "canonicalGitBlobSHA256": "06fa7b927a2e1bb9d3ffece06e3de962fa395ccf7a3873b70272da2900f6848b",
+      "workingBytes": 10767,
+      "GitBlobBytes": 10767,
+      "rawEqualsCanonical": true
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/wip02-legacy-run.json",
+      "workingRawSHA256": "37b8b654f4b2808914a2a7a53ff0b43f27b0ccb816df6f804073fd606d7ba250",
+      "canonicalGitBlobSHA256": "37b8b654f4b2808914a2a7a53ff0b43f27b0ccb816df6f804073fd606d7ba250",
+      "workingBytes": 124522,
+      "GitBlobBytes": 124522,
+      "rawEqualsCanonical": true
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/wip02-manifest.json",
+      "workingRawSHA256": "635dcf509c9ff77617e603b3f592b9b302b016e91e52de2cb7ced1b1edb6bc05",
+      "canonicalGitBlobSHA256": "635dcf509c9ff77617e603b3f592b9b302b016e91e52de2cb7ced1b1edb6bc05",
+      "workingBytes": 24703,
+      "GitBlobBytes": 24703,
+      "rawEqualsCanonical": true
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/wip02-receipt.json",
+      "workingRawSHA256": "21a6f348a3158441f6696ae8155f279d494e3f0469ebf3e7c829370cb14b20ac",
+      "canonicalGitBlobSHA256": "21a6f348a3158441f6696ae8155f279d494e3f0469ebf3e7c829370cb14b20ac",
+      "workingBytes": 14237,
+      "GitBlobBytes": 14237,
+      "rawEqualsCanonical": true
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/wip02-static-attempt1.json",
+      "workingRawSHA256": "a95a39631310eb0bce941fdfe8db5852c0bca1ae1ea074fefe2a9a59b120fce2",
+      "canonicalGitBlobSHA256": "a95a39631310eb0bce941fdfe8db5852c0bca1ae1ea074fefe2a9a59b120fce2",
+      "workingBytes": 581,
+      "GitBlobBytes": 581,
+      "rawEqualsCanonical": true
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/wip02-static-attempt1.log.txt",
+      "workingRawSHA256": "8ac215a57c4102968f9c011d9968c935b2a21121b95f36d5c408bb886cbf37a6",
+      "canonicalGitBlobSHA256": "56c4839cd8cbaf43c8babd53c425f280dba72388e194abbc0f4520d8ce10e016",
+      "workingBytes": 287,
+      "GitBlobBytes": 286,
+      "rawEqualsCanonical": false
+    },
+    {
+      "path": "docs/vault/30_Development/History/2026-11-07_FLEET5_B_A7_Operation_Guard_R1_Codex.md",
+      "workingRawSHA256": "b72634b1c51b9e024274f51388e3de0044287f77551962901c3581c7896d63b9",
+      "canonicalGitBlobSHA256": "b72634b1c51b9e024274f51388e3de0044287f77551962901c3581c7896d63b9",
+      "workingBytes": 17260,
+      "GitBlobBytes": 17260,
+      "rawEqualsCanonical": true
+    },
+    {
+      "path": "services/control-plane/src/inv/dispatch.py",
+      "workingRawSHA256": "82f029614537eb5bab56934e4b6736fe3dd52ece54b9b9a3996815b131e41de4",
+      "canonicalGitBlobSHA256": "82f029614537eb5bab56934e4b6736fe3dd52ece54b9b9a3996815b131e41de4",
+      "workingBytes": 15823,
+      "GitBlobBytes": 15823,
+      "rawEqualsCanonical": true
+    },
+    {
+      "path": "tests/core/test_delivery_operation_origin.py",
+      "workingRawSHA256": "3dacdb63f83ab1d8075ddcbe422d82daad20bd56f643adee0fc7ae97715925d2",
+      "canonicalGitBlobSHA256": "3dacdb63f83ab1d8075ddcbe422d82daad20bd56f643adee0fc7ae97715925d2",
+      "workingBytes": 9520,
+      "GitBlobBytes": 9520,
+      "rawEqualsCanonical": true
+    }
+  ],
+  "normalizationChanges": [
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/refusal-inspection.log.txt",
+      "workingRawSHA256": "4e1ec805a412ab5ae1ce0766f9b186856e0d62c17fe65f6c099e69bb44f49517",
+      "canonicalGitBlobSHA256": "0c07348d34147ac26956d39bfb7a5385647bfdcbe7d4af44966848e41fe691c1",
+      "workingBytes": 1058,
+      "GitBlobBytes": 1057,
+      "rawEqualsCanonical": false
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/root-verified-unit-observation.json",
+      "workingRawSHA256": "e34c2d254a684d510980b06964ec9c1c6b61ce0e18d3db4aa88163e804ecef50",
+      "canonicalGitBlobSHA256": "1733f943d0c0eda70419cfc48ea7a694d5ffc147c07950aad284c8da6535ab25",
+      "workingBytes": 2517,
+      "GitBlobBytes": 2453,
+      "rawEqualsCanonical": false
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/static-inspection-attempt1.log.txt",
+      "workingRawSHA256": "583224da5fea81269b744d996dccc20b5388a9908bae81ee8f54a23da51388fa",
+      "canonicalGitBlobSHA256": "998823e6585c2bf4c31fa10f7288321a11713d1eeb469954ecb7e426eccde60a",
+      "workingBytes": 722,
+      "GitBlobBytes": 720,
+      "rawEqualsCanonical": false
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/wip02-static-attempt1.log.txt",
+      "workingRawSHA256": "8ac215a57c4102968f9c011d9968c935b2a21121b95f36d5c408bb886cbf37a6",
+      "canonicalGitBlobSHA256": "56c4839cd8cbaf43c8babd53c425f280dba72388e194abbc0f4520d8ce10e016",
+      "workingBytes": 287,
+      "GitBlobBytes": 286,
+      "rawEqualsCanonical": false
+    }
+  ],
+  "diffCachedCheckExit": 0,
+  "knownUntrackedResiduals": {
+    "priorOtherCardReceipts": 14,
+    "ownRawOriginal": 1
+  },
+  "wholeWorktreeClean": false,
+  "independentCODEReview": "PENDING",
+  "original19HOLD": true,
+  "runtimeB": 0,
+  "realBindings": null
+}

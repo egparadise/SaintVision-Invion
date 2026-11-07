@@ -1,0 +1,14 @@
+{
+  "argv": [
+    "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+    "-B",
+    "docs\\vault\\30_Development\\Evidence\\fleet5-b-a7-operation-guard-r1-20261107-codex\\check_finite_compatibility.py"
+  ],
+  "startKST": "2026-11-07T09:53:28.114616+09:00",
+  "endKST": "2026-11-07T09:54:07.203211+09:00",
+  "exit": 0,
+  "logSHA256": "8ac215a57c4102968f9c011d9968c935b2a21121b95f36d5c408bb886cbf37a6",
+  "kind": "AST_SOURCE_HASH_AND_FINITE_MUTATION_ONLY",
+  "actualProductExecutionByAuthor": false,
+  "RootRuntimeUnitObservations": "attributed copy, not author rerun"
+}

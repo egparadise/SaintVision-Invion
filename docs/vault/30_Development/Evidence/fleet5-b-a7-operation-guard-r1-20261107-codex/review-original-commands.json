@@ -1,0 +1,26 @@
+{
+  "environment": "Windows 11, PowerShell + Git Bash. Python: D:/Project/SaintVisionI-Invion/.venv 3.14.7 with -B; gate driver with PYTHONUTF8=1, probes with PYTHONIOENCODING=utf-8. cwd = worktree root fleet5-bootstrap-v3-review-20261106 on branch agent/claude/fleet5-b-a7-mode-b3bb-review-20261107, created from exact b3bbdc8d. Times are KST (PowerShell Korea Standard Time). Serial only. No installs; no OS/pagefile/process/service changes. Available memory: 348 MB before the probe, 305 MB at its start.",
+  "provenance": [
+    {"argv": "orca orchestration worker-show --dispatch ctx_8cd16f1141a3", "result": "task_ce76beac4d2d succeeded / settled / exited / released"},
+    {"argv": "git status --short ; git rev-parse HEAD", "result": "clean, 8141a49bab3d0e7b94028a69d9a767e2abc25272"},
+    {"argv": "git switch -c agent/claude/fleet5-b-a7-mode-b3bb-review-20261107 b3bbdc8d92a39f2f797a7680deb2770d6f705af0 ; git rev-list --parents -n1 b3bbdc8d", "result": "HEAD b3bbdc8d, parent 969030db"},
+    {"argv": "git show 14523889:<History, review.json, commands.json, reviewer-a7r2-probes-result.json, attempt1/attempt2 logs>", "result": "read first; 12 historical rows, not counted as new coverage"},
+    {"argv": "read-only fleet-five-orchestration-20261105 HEAD 28356eb2: Index 1.0.491, Claude board 1.2.130, .work/a7-mode-origin-r1-root-cut.txt, b-mode-origin-review-spec.txt, b-mode-source-root-verified.json, b-mode-review-ready-before-start.json", "result": "read only"},
+    {"argv": "git show 72028cba:<node_transport.py, node_channels.py, dispatch.py, worker.py, tools/remote_workspace_entry.py>", "result": "read the mode-relevant source lines listed in review.json readFirst.productSourceRead"}
+  ],
+  "reviewerRuns": [
+    {"argv": "python -B <R2 evidence abs>/measured_run.py <scratch>/reviewer_mode_probes.py <worktree root> <scratch>/reviewer-mode-probes-result.json", "exit": 0, "kstWindow": "2026-11-07T08:53:58..08:54:47",
+     "log": "reviewer-mode-probes.log.txt (UTF-8 BOM and CR from the PowerShell redirect removed; raw scratch sha256 75b1eeb657f0e3f88570b6622bc524558d0d824a38a94f27050089c4db5c9acf)",
+     "driver": "reviewer_mode_probes.py.txt sha256 bcfc829a8f5862676023ad8e879924ed00934cec2e5bfebde29df8aa17356518", "result": "reviewer-mode-probes-result.json sha256 22606ab8a9dc1225cbbde54e843df0ccf3fa2df4248b9c3b3d7dece13f37e841",
+     "rows": "13 = P0 preconditions, P1 lexical universe, P2 AST census, P3 structural facts, P4 four RULE mutants + four ANALYZE runs (actual + 3 mutants), P5 future-code DATA", "peakWorkingSetBytes": 120668160, "elapsedSeconds": 46.7, "attempts": "one attempt, exit 0"},
+    {"argv": "python -B <R2 evidence abs>/measured_run.py <scratch>/reviewer_mode_future_rule.py <worktree root> <scratch>/reviewer-mode-future-rule-result.json", "exit": 0, "kstWindow": "2026-11-07T08:57:27..08:57:29",
+     "log": "reviewer-mode-future-rule.log.txt (BOM/CR removed; raw scratch sha256 7548c69a055731f9fc3cf11355b97e1150f91eb8e9c566553853f434a0830a0a)",
+     "driver": "reviewer_mode_future_rule.py.txt sha256 29855ad6a707f80d48d1dd7ff90670b257b0a8ad83a028d702004724d107cfd4", "result": "reviewer-mode-future-rule-result.json sha256 e5f5ddcbca6c397d35d03b2823e96dab09aee40f74464cf68d37a38822b058a9", "peakWorkingSetBytes": 29687808, "elapsedSeconds": 1.4, "attempts": "one attempt, exit 0"},
+    {"argv": "python -B <scratch>/reviewer_gate_driver.py b3bbdc8d92a39f2f797a7680deb2770d6f705af0 <scratch>/canonical-sync-check-before.txt <scratch>/gates sync-only", "exit": 0, "kst": "2026-11-07T08:56:11..08:56:44",
+     "stateSHA": "before 7b82bf9f1b973c5f1eec98ac2823b59b80db006ac944854bccc14ccd29703156, after the same", "result": "CHECK: 4872 managed, 2448 pending exports, 0 conflicts, no writes", "file": "canonical-sync-check-before.txt",
+     "note": "The state differs from the author's 5eea4626... because Root applied changes in between. That change is preserved and not adopted.",
+     "driver": "reviewer_gate_driver.py.txt is byte-identical to the actual 1452 review driver (sha256 b3dd3ed21c8fd8f323be0ffecf6abeba58a6b13efb64b0fd9b41cf1a345795c4)"}
+  ],
+  "localGates": "see local-doc-gates.txt (8 gates after authoring, own History/Evidence only, each canonical CHECK with immediate before/after state hashes)",
+  "notRun": "owner mode/controls/run/docs commands, generators, old corpora, model/terminal/recovery suites, full assembler. No Obsidian apply/adopt/resolve/state write"
+}

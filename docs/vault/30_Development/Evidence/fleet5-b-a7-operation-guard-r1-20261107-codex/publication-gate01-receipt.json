@@ -1,0 +1,12 @@
+{
+  "argv": [
+    "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+    "-B",
+    "tools/check_docs.py"
+  ],
+  "endKST": "2026-11-07T10:05:55.240175+09:00",
+  "exit": 0,
+  "rawOutputSHA256": "a15905c3581d181c64f26135a101b6e87ba4d106025d0320e4e26c6649881cc0",
+  "rawOutputWrapper": "publication-gate01-raw.json",
+  "startKST": "2026-11-07T10:05:19.319507+09:00"
+}

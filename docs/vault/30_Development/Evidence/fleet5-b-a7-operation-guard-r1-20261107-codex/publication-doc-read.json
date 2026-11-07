@@ -1,0 +1,20 @@
+{
+  "atKST": "2026-11-07T10:07:34.421350+09:00",
+  "rootDecision": "msg_fb188c4045e5",
+  "rootGitHEAD": "c59c9dc15c36a7c1658e24651d6127ae91cb6ce3",
+  "canonicalDocs": [
+    {
+      "path": "ROOT_READ_ONLY/docs/vault/00_Index/전체 개발 진행 현황.md",
+      "sha256": "a4887038fcf1491918d0c7e0aa61c7c6a31104f8cde933f9b0355a50e63c967b",
+      "frontmatter": "doc_id: \"INDEX-PROGRESS-001\"\r\ntitle: \"전체 개발 진행 현황\"\r\nversion: \"1.0.495\"\r\nstatus: \"review\"\r\nauthor: \"Codex\"\r\nupdated: \"2026-11-07T09:54:32+09:00\"\r\nsource_of_truth: \"Git\"\r\nlatest_codex_card: \"H12actual381fM1L1L2CLOSED->privateGoWIP7461TESTSNOTRUN; Bactual24GREEN/realBASEcausal1RED->proofonlyWIP02f730; original19HOLD/actualNULL/fleetincomplete\""
+    },
+    {
+      "path": "ROOT_READ_ONLY/docs/vault/30_Development/Agent별 작업/Codex 작업 현황.md",
+      "sha256": "439352bbeb198692d2ab00a6cfeabc0a79ecbc2283bf62cd5012523b66bc5684",
+      "frontmatter": "doc_id: \"WORKBOARD-CODEX-001\"\r\ntitle: \"Codex 작업 현황\"\r\nversion: \"1.0.456\"\r\nstatus: \"review\"\r\nauthor: \"Codex\"\r\nupdated: \"2026-11-07T09:54:32+09:00\"\r\nsource_of_truth: \"Git\"\r\nactive_card: \"FLEET5 continued supervision with PORTAL-REFRESH-FLEET-20261106\"\r\nactive_card_status: \"H12actual381fM1L1L2CLOSED->privateGoWIP7461TESTSNOTRUN; Bactual24GREEN/realBASEcausal1RED->proofonlyWIP02f730; original19HOLD/actualNULL/fleetincomplete\"\r\nactive_card_next: \"B Codex exacttestedbytes proof-onlyWIP02; K2 Codex fourpathprivateGoWIP; Root immutablepacketverification then boundedactualGo tests/publication/CI/singleCODEreview. Actual5PCacceptance stillblocked.\""
+    }
+  ],
+  "base": "b3bbdc8d92a39f2f797a7680deb2770d6f705af0",
+  "owner": "Codex",
+  "reviewer": "Actual independent CODE review through Root PENDING"
+}

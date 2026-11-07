@@ -1,0 +1,411 @@
+{
+  "base": "b3bbdc8d92a39f2f797a7680deb2770d6f705af0",
+  "branch": "agent/codex/fleet5-b-a7-operation-guard-r1-20261107",
+  "developmentFailures": [
+    {
+      "cause": "cp949 stdout UnicodeEncodeError before completion",
+      "correction": "UTF8 stdout in this script; no product executed",
+      "exit": 1,
+      "phase": "read-only current docs stdout inventory"
+    }
+  ],
+  "dispatch": "ctx_6f0f8253b8a7",
+  "docs": [
+    {
+      "bytes": 521830,
+      "frontmatter": "doc_id: \"INDEX-PROGRESS-001\"\r\ntitle: \"전체 개발 진행 현황\"\r\nversion: \"1.0.493\"\r\nstatus: \"review\"\r\nauthor: \"Codex\"\r\nupdated: \"2026-11-07T09:13:21+09:00\"\r\nsource_of_truth: \"Git\"\r\nlatest_codex_card: \"Bmodeactuale75bconditionalKEEP19/LowL1C1C2->operationguardWIPdb48TESTSNOTRUN; H12R20bf8actualreviewctx2e3PENDING; actualNULLHOLD/fleetincomplete\"",
+      "path": "ROOT_READ_ONLY/docs/vault/00_Index/전체 개발 진행 현황.md",
+      "sameBytesAsPriorRead": false,
+      "sha256": "ab6c0bf30ca7abcdef2626c76102211cf97448e7fce535b6a141a30ab437d695"
+    },
+    {
+      "bytes": 464357,
+      "frontmatter": "doc_id: \"WORKBOARD-CODEX-001\"\r\ntitle: \"Codex 작업 현황\"\r\nversion: \"1.0.454\"\r\nstatus: \"review\"\r\nauthor: \"Codex\"\r\nupdated: \"2026-11-07T09:13:21+09:00\"\r\nsource_of_truth: \"Git\"\r\nactive_card: \"FLEET5 continued supervision with PORTAL-REFRESH-FLEET-20261106\"\r\nactive_card_status: \"Bmodeactuale75bconditionalKEEP19/LowL1C1C2->operationguardWIPdb48TESTSNOTRUN; H12R20bf8actualreviewctx2e3PENDING; actualNULLHOLD/fleetincomplete\"\r\nactive_card_next: \"B Codex exactonceguard+newunit+staticL1C1/C2 WIPpacket ASTonly; Root boundedisolatedPythonverification on frozenbytes before publication; Claude H12R2actualdeltaverdict; no runtime/fullBgrant\"",
+      "path": "ROOT_READ_ONLY/docs/vault/30_Development/Agent별 작업/Codex 작업 현황.md",
+      "sameBytesAsPriorRead": false,
+      "sha256": "b125aa026bd782169feb24b297d5724e5dd164a384ebc29a6b57d5efff9830c6"
+    },
+    {
+      "bytes": 2085,
+      "frontmatter": "doc_id: \"INDEX-VIRTUAL-COMPUTER-001\"\ntitle: \"2026-09-15 단일 가상 컴퓨터 보강 설계 인덱스\"\nversion: \"1.0.0\"\nstatus: \"accepted\"\nauthor: \"Codex\"\nupdated: \"2026-09-15T11:20:06+09:00\"\nsource_of_truth: \"Git and Obsidian paired update\"\ntags: [\"saintvision\", \"inv\", \"web-desktop\", \"distributed-model\", \"roadmap\"]",
+      "path": "ROOT_READ_ONLY/docs/vault/00_Index/2026-09-15 단일 가상 컴퓨터 보강 설계 인덱스.md",
+      "sameBytesAsPriorRead": true,
+      "sha256": "35f2cca047fdb57ff2e2ad28e3847e9a7c0a19d6ace6fb36aa941042e872e9be"
+    },
+    {
+      "bytes": 7674,
+      "frontmatter": "doc_id: \"ROADMAP-VIRTUAL-COMPUTER-001\"\ntitle: \"57.81퍼센트 이후 단일 가상 컴퓨터 보강 로드맵\"\nversion: \"1.0.0\"\nstatus: \"accepted\"\nauthor: \"Codex\"\nupdated: \"2026-09-15T11:20:06+09:00\"\nsource_of_truth: \"Git and Obsidian paired update\"\ntags: [\"saintvision\", \"roadmap\", \"web-desktop\", \"storage-fabric\", \"agents\"]",
+      "path": "ROOT_READ_ONLY/docs/vault/30_Development/57.81퍼센트 이후 단일 가상 컴퓨터 보강 로드맵.md",
+      "sameBytesAsPriorRead": true,
+      "sha256": "3a4527ffe53ebea114063692dd3bba826da8c279a93a9800919fff394df1a018"
+    },
+    {
+      "bytes": 7196,
+      "frontmatter": "doc_id: \"GOV-CONTINUOUS-001\"\ntitle: \"Agent 연속 실행과 최종 보고 정책\"\nversion: \"1.1.0\"\nstatus: \"accepted\"\nauthor: \"Codex\"\nupdated: \"2026-09-21T14:33:00+09:00\"\nsource_of_truth: \"Git and Obsidian paired update\"\ntags: [\"saintvision\", \"agents\", \"autonomy\", \"governance\"]",
+      "path": "ROOT_READ_ONLY/docs/vault/40_Governance/Agent 연속 실행과 최종 보고 정책.md",
+      "sameBytesAsPriorRead": true,
+      "sha256": "60c6a8d3130491bd4cab730cccc0e236fb038d1c7c816efa333acdc34a30cd8f"
+    },
+    {
+      "bytes": 6488,
+      "frontmatter": "doc_id: \"GUIDE-001\"\ntitle: \"최종 개발 계획 - 모든 개발의 지침\"\nversion: \"1.1.0\"\nstatus: \"baseline\"\nauthor: \"Codex\"\nupdated: \"2026-09-11T17:15:06+09:00\"\ntimezone: \"Asia/Seoul\"\nsource_of_truth: \"Git\"\ntags: [\"saintvision\", \"final-plan\"]\naliases: [\"최종 계발 계회 - 모든 개발의 지침\", \"최종 개발 지침\"]",
+      "path": "ROOT_READ_ONLY/docs/vault/00_Index/최종 개발 계획 - 모든 개발의 지침.md",
+      "sameBytesAsPriorRead": true,
+      "sha256": "59223c5dff4b4bb6252c8061aebe975665e6eadf92db3659a3f89951b2cb149f"
+    },
+    {
+      "bytes": 29130,
+      "frontmatter": "doc_id: \"ADR-INDEX-001\"\ntitle: \"설계 충돌 정정 및 ADR\"\nversion: \"1.37.0\"\nstatus: \"baseline\"\nauthor: \"Codex\"\nupdated: \"2026-09-23T03:10:00+09:00\"\ntimezone: \"Asia/Seoul\"\nsource_of_truth: \"Git\"\ntags: [\"saintvision\", \"final-plan\"]",
+      "path": "ROOT_READ_ONLY/docs/vault/40_Governance/설계 충돌 정정 및 ADR.md",
+      "sameBytesAsPriorRead": true,
+      "sha256": "771f7714a63af52d7c8aea2424db0b33a2fe96c759c51c81c23144daf7aeaf77"
+    },
+    {
+      "bytes": 4619,
+      "frontmatter": "doc_id: \"GOV-AGENT-001\"\ntitle: \"Agent 역할과 인계 계약\"\nversion: \"1.1.3\"\nstatus: \"baseline\"\nauthor: \"Codex\"\nupdated: \"2026-09-21T18:47:00+09:00\"\ntimezone: \"Asia/Seoul\"\nsource_of_truth: \"Git\"\ntags: [\"saintvision\", \"final-plan\"]",
+      "path": "ROOT_READ_ONLY/docs/vault/40_Governance/Agent 역할과 인계 계약.md",
+      "sameBytesAsPriorRead": true,
+      "sha256": "128c054e72f9e001b3b32f914cce544bce5432eddccdbe1212d27180c3200823"
+    },
+    {
+      "bytes": 8552,
+      "frontmatter": "doc_id: \"GOV-GIT-001\"\ntitle: \"Git Build Obsidian 운영 절차\"\nversion: \"1.1.4\"\nstatus: \"baseline\"\nauthor: \"Codex\"\nupdated: \"2026-09-22T19:25:00+09:00\"\ntimezone: \"Asia/Seoul\"\nsource_of_truth: \"Git\"\ntags: [\"saintvision\", \"final-plan\"]",
+      "path": "ROOT_READ_ONLY/docs/vault/40_Governance/Git Build Obsidian 운영 절차.md",
+      "sameBytesAsPriorRead": true,
+      "sha256": "fe5e8adc44a14c081ac767265a16434b72e4b3ebfb7719081fa166ad459e59e9"
+    },
+    {
+      "bytes": 6473,
+      "frontmatter": "doc_id: \"GOV-CONTINUITY-001\"\ntitle: \"Agent 지속 개발 운영 규칙\"\nversion: \"1.0.0\"\nstatus: \"review\"\nauthor: \"Codex\"\nupdated: \"2026-09-21T14:05:43+09:00\"\nsource_of_truth: \"Git\"",
+      "path": "ROOT_READ_ONLY/docs/vault/40_Governance/Agent 지속 개발 운영 규칙.md",
+      "sameBytesAsPriorRead": true,
+      "sha256": "63839c440ead6dc07300a0e18d5024fb9aadbddf546707156c39af7ee9495c84"
+    },
+    {
+      "bytes": 7086,
+      "frontmatter": null,
+      "path": "AGENTS.md",
+      "sameBytesAsPriorRead": true,
+      "sha256": "c12a50a38f81c12a647f9b6f4592a205cd899e76d29190202a6ae73b12c04b27"
+    },
+    {
+      "bytes": 1276,
+      "frontmatter": "name: agent-delivery\ndescription: Every SaintVision task delivery\nversion: 1.1.0",
+      "path": "skills/agent-delivery/SKILL.md",
+      "sameBytesAsPriorRead": true,
+      "sha256": "9596c1d4a132c3de90fd99ed2095b8271da7a31532e8487aa6d7d93151ac3830"
+    },
+    {
+      "bytes": 619,
+      "frontmatter": "name: core-reliability\ndescription: Codex high difficulty reliability work\nversion: 1.0.0",
+      "path": "skills/core-reliability/SKILL.md",
+      "sameBytesAsPriorRead": true,
+      "sha256": "4650a371befb5a59cd9f3ce87c2e2dab732aa7e9b89e57885cb67f0e64f0ef76"
+    },
+    {
+      "bytes": 42011,
+      "frontmatter": null,
+      "path": "docs/task-registry.json",
+      "sameBytesAsPriorRead": true,
+      "sha256": "7c6b339c7487aae652cc5c5e04f6e933249c83930019e798ec24006794b07644"
+    }
+  ],
+  "globalStatus": {
+    "A1A16": "pending",
+    "acceptedDischarges": 0,
+    "accounting": [
+      598,
+      757,
+      1071,
+      21,
+      573,
+      218
+    ],
+    "actualRuntimeB": 0,
+    "baseline19": "HOLD unchanged",
+    "edges": 19,
+    "entries": 12,
+    "fleet": "incomplete",
+    "realBindings": null,
+    "split": [
+      16,
+      3
+    ]
+  },
+  "immutableHelperInputs": [
+    {
+      "objectID": "3acd5a56c6c8e75f46776b5edfa35041451ef1b9",
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-snapshot-r2-20261107-codex/a7_body.py",
+      "sha256": "d884cd4dacb3d4ed21db135342969507196f40f30df6ce65cf271d70d976e665"
+    },
+    {
+      "objectID": "e51e6ee9cbe9c88bffe584857738882c2527bc9e",
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-snapshot-r2-20261107-codex/a7_build.py",
+      "sha256": "3a89d59473cb7036dbfa3147ca067b8895525fdec576d522eedcc8a499913114"
+    },
+    {
+      "objectID": "70d2e7d62666a3bb0c6b2c92927d1a1f3f3a2ba2",
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-snapshot-r2-20261107-codex/a7_common.py",
+      "sha256": "decb55caf99d02582debe7de23779622a3352779a095fa2ea58cc9715186431b"
+    },
+    {
+      "objectID": "4fda37cabfc6bab5ee960f5921bbfd4da9e5712b",
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-snapshot-r2-20261107-codex/a7_inventory.py",
+      "sha256": "059760377971e433afab3ba207807eedfd5632c1887ef6ba399c1ce39d359787"
+    },
+    {
+      "objectID": "7a1dbb2651d5de3e295fa817666355f0267fd046",
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-snapshot-r2-20261107-codex/a7_record.py",
+      "sha256": "1732947b66d21d67f5bc02e3b26552148fd4912b5e4dd2ff2aaf0af536c310a6"
+    },
+    {
+      "objectID": "47eb547b83770c766d182e5d4cb3d44fe16f122c",
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-snapshot-r2-20261107-codex/analysis_rules.py",
+      "sha256": "c3ceff61cde7c0adc8267590a13ebcec1b56e56e06624058cc8fbd283c8a4244"
+    },
+    {
+      "objectID": "018710f3b0e6e1d04a280834272db972fd1da248",
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-snapshot-r2-20261107-codex/bounded_analysis.py",
+      "sha256": "03d53a9431c326b297ad786e03852edb88e43323e2dc4791761c36e7072730ca"
+    },
+    {
+      "objectID": "6c3621edc98f7263b91d37568ada8497176896e9",
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-snapshot-r2-20261107-codex/call_binding.py",
+      "sha256": "d1bd5ff2e8212555b95c09a4c24669245341897e42e84a732cbcda25bf058f8b"
+    },
+    {
+      "objectID": "ac1dfc8cca1ccd5a3dd263263a6c47c6a484447f",
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-snapshot-r2-20261107-codex/callee_identity.py",
+      "sha256": "8e119d5ff4c3916ac41b2147cc09ccbaf6597ab7ef24df4d56cc169611ca37aa"
+    },
+    {
+      "objectID": "aab6513f5b5bf9e825fe54886f93ac27ac48c532",
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-snapshot-r2-20261107-codex/constructor_graph.py",
+      "sha256": "1ec99021b4d1160bcee15c43032cbe21554625e345b46b19112c2697e670dfa3"
+    },
+    {
+      "objectID": "f10a0bad50d9fa189d4556660294b7389135920a",
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-snapshot-r2-20261107-codex/edge_categories.py",
+      "sha256": "d16ae559ca4b12c36d52a61d183fb2b1d3bdf38e6e8a54d511e4414e72cd18dd"
+    },
+    {
+      "objectID": "f2bd325723328c6e486db48a056a853a9515eb3d",
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-snapshot-r2-20261107-codex/forwarding_discovery.py",
+      "sha256": "05512ea4a76ff4e8814eab8f192f01c0995a8cf91c203c3ca816d9c36d6a1c85"
+    },
+    {
+      "objectID": "6e1bdd46c6661733d618922952fec174721447dc",
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-snapshot-r2-20261107-codex/lexical_bindings.py",
+      "sha256": "6f678154e856c67554b7a569ae54c74fe46d35bf7d197a149272d968f9978edc"
+    },
+    {
+      "objectID": "9acf6fb4879407fca0d5481f8a994274cd8589c6",
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-snapshot-r2-20261107-codex/lifecycle.py",
+      "sha256": "710c6aafa1829d9aecc25b8e591c4f2a8ec01b0927a45cf6e7ba7b13b75977b0"
+    },
+    {
+      "objectID": "cea5731eb2c5e353336e73887a9992545c5666f2",
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-snapshot-r2-20261107-codex/measured_run.py",
+      "sha256": "61f7dcfdb00a873c2423e463b5beee5fa623bbf04c392e7ae9e30cdb297ed62e"
+    },
+    {
+      "objectID": "fe9b04c16e5eecec17ec763f6dcfdc0590d76df6",
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-snapshot-r2-20261107-codex/model.py",
+      "sha256": "f7384016f72b5f6b9d369925a3a6d864012f286351db38d97993a5f95be78acf"
+    },
+    {
+      "objectID": "af2622a0f526cf3c6d393f6a6a6738eb6ac3887d",
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-snapshot-r2-20261107-codex/owner_transfer.py",
+      "sha256": "68623be32888be9cd25023dd0096aefeedffe00dd905784e3de59525b5d84ff7"
+    },
+    {
+      "objectID": "a2f287a8c672e8b6a982e1498998770e8da5d2c9",
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-snapshot-r2-20261107-codex/parameter_flow.py",
+      "sha256": "b72a4e160dbc0f94b82f53ff150098a54b5fd871debcd4e59295fb437c6fa606"
+    },
+    {
+      "objectID": "546d0375d0485662db9da4f9bdeb131a9e972377",
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-snapshot-r2-20261107-codex/pending_contracts.py",
+      "sha256": "9617fbe48b25d23774cd91e83a42572d6b3e8437397e15b4b9f1c38c16804a4f"
+    },
+    {
+      "objectID": "6a2a9ac861c31278caf56739c7c1d8a7c09ae2f0",
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-snapshot-r2-20261107-codex/prepare_r2.py",
+      "sha256": "74c706c4ec33b9f0a9b14d814e5d9f00c71cc02135855e65c321016654826165"
+    },
+    {
+      "objectID": "81d8a4bf01f3d989d304be7c85c138aae0633e0b",
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-snapshot-r2-20261107-codex/r2_final.py",
+      "sha256": "9c2d63cb105e6f6633b7e2dd82ac09a211902d29e80994d59f1868df5cd9df89"
+    },
+    {
+      "objectID": "83ad04cf364816f11bd4d462165572baeec40882",
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-snapshot-r2-20261107-codex/r2_seal.py",
+      "sha256": "0d47b3e2c14a68d1b0250ff706666dca8546b2ab58ffd349de125a17fc531fb3"
+    },
+    {
+      "objectID": "fc9b9aaf0e13c1a465316210a04a490b06350cba",
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-snapshot-r2-20261107-codex/r2_tests.py",
+      "sha256": "a51b71d51bcc0c509135351b13e1dedd6ec81e51f63e7736c0703e8e07807bf5"
+    },
+    {
+      "objectID": "bcebb632826a8b796a63e2c2d4bb09f180a69115",
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-snapshot-r2-20261107-codex/r2_verify.py",
+      "sha256": "b75b531650a79d233f8919b7e13e4261ce11341f3e5d99eaf0458e59d0a9517b"
+    },
+    {
+      "objectID": "44e51ffec7f9fc5c049c595abae1b2edb78f9a83",
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-snapshot-r2-20261107-codex/reflection_audit.py",
+      "sha256": "bd63d00f0e82703ab31c566b3596003a651b285e032649035007f5fc74afa95c"
+    },
+    {
+      "objectID": "30d30e2d796a7fe23e972da4028444a48c3b485c",
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-snapshot-r2-20261107-codex/source_bindings.py",
+      "sha256": "29dd7070de00fabd1cd4c5824227db0689104910922a0ae28634f12a62efe7e9"
+    },
+    {
+      "objectID": "c75032bf120529980d37a16ea5ebeb7f6cc69c6e",
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-snapshot-r2-20261107-codex/t1_provenance.py",
+      "sha256": "b8fd9df42e64c3227e0713bba448e20c1125e0c2e6a5bd524c53410c5194d948"
+    },
+    {
+      "objectID": "eb14aca7f9c63cc1ab0bec6f258bbf3692f7233b",
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-snapshot-r2-20261107-codex/use_sites.py",
+      "sha256": "4a1fbb3f42180bf3d43698121a863fdb1ed2f723394f2a85864a2afc54b647dc"
+    },
+    {
+      "objectID": "be7248a85ace6da41f0307fe1810721b0ae6e6d9",
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-mode-origin-r1-20261107-codex/mode.py",
+      "sha256": "0f17230b6b1aa2c8345cb2e138fbc684a1e76eb2694b089d79dc6bc21d3755d7"
+    }
+  ],
+  "kst": "2026-11-07T09:17:55.190596+09:00",
+  "localAllowed": "Syntax/AST/source/hash/static DATA inspection only; no product import/test execution",
+  "notRun": [
+    "actual Python product imports/pytest",
+    "Go/Node/browser/full Core",
+    "network/host/SSH/Docker/PG/crypto/PKI",
+    "Docs/ontology/sync publication gates",
+    "commit/push/CI",
+    "independent operation guard review"
+  ],
+  "orcaTask": "task_a8fd2969f0b3",
+  "owner": "Codex",
+  "priorImmutableProductSource": "72028cbac903c4415d9979f980a6e0f9948e914f",
+  "reviewOriginals": [
+    {
+      "bytes": 21,
+      "commit": "e75b051d8dcd39b24dba4b648d74d7f7adecbd0f",
+      "copy": "review-original-gitattributes.txt",
+      "objectID": "bb2789ad98e51258a73e184a7a912ab02c6a83c0",
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-mode-b3bb-review-20261107-claude/.gitattributes",
+      "sha256": "96a83569c84cfe3f57b7efe3dc61c249548d0fca4fed0e538b3587cdc97c95c1"
+    },
+    {
+      "bytes": 880,
+      "commit": "e75b051d8dcd39b24dba4b648d74d7f7adecbd0f",
+      "copy": "review-original-canonical-sync-check-before.txt",
+      "objectID": "efa210b452ae7c469f117a79d368be5f316724bf",
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-mode-b3bb-review-20261107-claude/canonical-sync-check-before.txt",
+      "sha256": "9f6d1eb4250de590a0acc1cea1752dadff8fca9a9d882efdcd533eb3c394f93a"
+    },
+    {
+      "bytes": 4449,
+      "commit": "e75b051d8dcd39b24dba4b648d74d7f7adecbd0f",
+      "copy": "review-original-commands.json",
+      "objectID": "9b334d60e9ba4a63d9f9e6c87d22b22189793705",
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-mode-b3bb-review-20261107-claude/commands.json",
+      "sha256": "3cfed71c71ce7d6119a1439a5ab3103e45cb43164e88be72982301d1da5a913a"
+    },
+    {
+      "bytes": 3496,
+      "commit": "e75b051d8dcd39b24dba4b648d74d7f7adecbd0f",
+      "copy": "review-original-local-doc-gates.txt",
+      "objectID": "a00a3fe3c2087a6e729ec13087917d5d2756d215",
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-mode-b3bb-review-20261107-claude/local-doc-gates.txt",
+      "sha256": "8a74f36b57b55743b89d451a94d4109dc996f0758d4ad4f4c23ff4fffc364c4a"
+    },
+    {
+      "bytes": 19107,
+      "commit": "e75b051d8dcd39b24dba4b648d74d7f7adecbd0f",
+      "copy": "review-original-review.json",
+      "objectID": "238cc8632c51d08930f8be3a490309dffcbac29b",
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-mode-b3bb-review-20261107-claude/review.json",
+      "sha256": "88b102e9319e35b1ea8fbbb7d0b3aac9c72d122bdab3714f30ed04b0612ea221"
+    },
+    {
+      "bytes": 662,
+      "commit": "e75b051d8dcd39b24dba4b648d74d7f7adecbd0f",
+      "copy": "review-original-reviewer-mode-future-rule-result.json",
+      "objectID": "d0e5227ee5bc58bc0d8fb459420332bfcd96aca3",
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-mode-b3bb-review-20261107-claude/reviewer-mode-future-rule-result.json",
+      "sha256": "e5f5ddcbca6c397d35d03b2823e96dab09aee40f74464cf68d37a38822b058a9"
+    },
+    {
+      "bytes": 882,
+      "commit": "e75b051d8dcd39b24dba4b648d74d7f7adecbd0f",
+      "copy": "review-original-reviewer-mode-future-rule.log.txt",
+      "objectID": "af9e8c4f730389ae3457c07063948c1aabeebe21",
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-mode-b3bb-review-20261107-claude/reviewer-mode-future-rule.log.txt",
+      "sha256": "d23ef94ccc4aa54bd0a60999af1557e899b4383f98d8342b1beb3069bddf2ac2"
+    },
+    {
+      "bytes": 24641,
+      "commit": "e75b051d8dcd39b24dba4b648d74d7f7adecbd0f",
+      "copy": "review-original-reviewer-mode-probes-result.json",
+      "objectID": "a1f46822eaed3b978f0ec9235fcce5d48591489a",
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-mode-b3bb-review-20261107-claude/reviewer-mode-probes-result.json",
+      "sha256": "22606ab8a9dc1225cbbde54e843df0ccf3fa2df4248b9c3b3d7dece13f37e841"
+    },
+    {
+      "bytes": 11320,
+      "commit": "e75b051d8dcd39b24dba4b648d74d7f7adecbd0f",
+      "copy": "review-original-reviewer-mode-probes.log.txt",
+      "objectID": "19adff254d98a711c18943dc75081fa2c25cbe68",
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-mode-b3bb-review-20261107-claude/reviewer-mode-probes.log.txt",
+      "sha256": "48ab4eb628f29b93a84c05f2fd60e0c7c8740b56f93d12ac95db50491a9468ca"
+    },
+    {
+      "bytes": 2355,
+      "commit": "e75b051d8dcd39b24dba4b648d74d7f7adecbd0f",
+      "copy": "review-original-reviewer_gate_driver.py.txt",
+      "objectID": "ac4a7cb332b305aca00155059bdc9ee7cdd50ba4",
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-mode-b3bb-review-20261107-claude/reviewer_gate_driver.py.txt",
+      "sha256": "b3dd3ed21c8fd8f323be0ffecf6abeba58a6b13efb64b0fd9b41cf1a345795c4"
+    },
+    {
+      "bytes": 2015,
+      "commit": "e75b051d8dcd39b24dba4b648d74d7f7adecbd0f",
+      "copy": "review-original-reviewer_mode_future_rule.py.txt",
+      "objectID": "74b27a7d85046228a522114bb0f7528d67cf665a",
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-mode-b3bb-review-20261107-claude/reviewer_mode_future_rule.py.txt",
+      "sha256": "29855ad6a707f80d48d1dd7ff90670b257b0a8ad83a028d702004724d107cfd4"
+    },
+    {
+      "bytes": 22277,
+      "commit": "e75b051d8dcd39b24dba4b648d74d7f7adecbd0f",
+      "copy": "review-original-reviewer_mode_probes.py.txt",
+      "objectID": "09ce930a2fd0a8f31168aea71f444aeebc71190b",
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-mode-b3bb-review-20261107-claude/reviewer_mode_probes.py.txt",
+      "sha256": "bcfc829a8f5862676023ad8e879924ed00934cec2e5bfebde29df8aa17356518"
+    },
+    {
+      "bytes": 15385,
+      "commit": "e75b051d8dcd39b24dba4b648d74d7f7adecbd0f",
+      "copy": "review-original-history.md.txt",
+      "objectID": "fc2940e3ea41aaa1fc415c0c7a93f03c02345da1",
+      "path": "docs/vault/30_Development/History/2026-11-07_FLEET5_B_A7_Mode_B3BB_독립검토_Claude.md",
+      "sha256": "9d327ffd956114f54f0cd1b71aa66e611a08aee8f15ecb8de815c70797415db5"
+    }
+  ],
+  "reviewer": "Independent actual operation guard review through Root PENDING",
+  "rootHeadAtRead": "c23ae5d19773f627b796f860200ba6e6079d62e7",
+  "rootMessage": "msg_db48b2c9a36e",
+  "scope": [
+    "DeliveryWorker.once only in services/control-plane/src/inv/dispatch.py",
+    "new tests/core/test_delivery_operation_origin.py",
+    "only own unique Evidence prefix and History"
+  ],
+  "sourceWorld": "Real base Git b3bb for all first-party files, overlay only current WIP dispatch.py; not product72028 labelled as WIP",
+  "task": "FLEET5-B-A7-OPERATION-GUARD-R1-20261107"
+}

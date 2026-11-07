@@ -1,0 +1,12 @@
+{
+  "argv": [
+    "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+    "-B",
+    "tools/check_ontology.py"
+  ],
+  "endKST": "2026-11-07T10:05:59.698528+09:00",
+  "exit": 0,
+  "rawOutputSHA256": "7cdc12bf64f50ba0964625161638a4c639cf22d786a57f04685bed0718e14042",
+  "rawOutputWrapper": "publication-gate02-raw.json",
+  "startKST": "2026-11-07T10:05:55.241809+09:00"
+}

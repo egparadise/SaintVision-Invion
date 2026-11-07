@@ -1,0 +1,6 @@
+{
+  "encoding": "utf-8",
+  "rawBytes": 80,
+  "rawSHA256": "13b5f5afed05999109839be1baec4ef70ea3c71bcb267353e59eba0f2ae3e448",
+  "text": "PASS check_doc_single_source --ratchet: 16 pairs, all in baseline, none stale.\r\n"
+}

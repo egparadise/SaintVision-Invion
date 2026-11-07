@@ -1,0 +1,13 @@
+{
+  "argv": [
+    "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+    "-B",
+    "docs\\vault\\30_Development\\Evidence\\fleet5-b-a7-operation-guard-r1-20261107-codex\\static_checks.py"
+  ],
+  "startKST": "2026-11-07T09:21:00.367803+09:00",
+  "endKST": "2026-11-07T09:21:54.754256+09:00",
+  "exit": 0,
+  "logSHA256": "583224da5fea81269b744d996dccc20b5388a9908bae81ee8f54a23da51388fa",
+  "kind": "AST_SOURCE_HASH_STATIC_DATA_ONLY",
+  "actualProductTests": "NOT_RUN"
+}

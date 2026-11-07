@@ -1,0 +1,43 @@
+{
+  "atKST": "2026-11-07T10:16:10.752568+09:00",
+  "RootDecision": "msg_193e85c36227",
+  "originalRawPath": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/review-original-local-doc-gates.txt",
+  "wrapperPath": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/review-original-local-doc-gates.raw.json",
+  "rawBytes": 3496,
+  "rawSHA256": "8a74f36b57b55743b89d451a94d4109dc996f0758d4ad4f4c23ff4fffc364c4a",
+  "artifactEncoding": "JSON-embedded-verbatim-UTF8",
+  "frozenEntries": [
+    {
+      "zipPath": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/fleet5-a7-operation-guard-r1-wip01.zip",
+      "zipSHA256": "28c87c268baaf551dde15fcb35f0eb6d3b24b6861e8c1cfcb845fcb6e0a96f37",
+      "entryPath": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/review-original-local-doc-gates.txt",
+      "entryBytes": 3496,
+      "entrySHA256": "8a74f36b57b55743b89d451a94d4109dc996f0758d4ad4f4c23ff4fffc364c4a"
+    },
+    {
+      "zipPath": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/fleet5-a7-operation-guard-r1-wip02.zip",
+      "zipSHA256": "ce2e8c8802c4c4b805cd38f5fe49117f472f0b44bb2f1c4adb80759924670fbb",
+      "entryPath": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/review-original-local-doc-gates.txt",
+      "entryBytes": 3496,
+      "entrySHA256": "8a74f36b57b55743b89d451a94d4109dc996f0758d4ad4f4c23ff4fffc364c4a"
+    }
+  ],
+  "absentStandaloneGitPath": true,
+  "reason": "immutable process output trailing whitespace",
+  "baseStandalonePathAbsent": true,
+  "literalIndexRemoval": [
+    "git",
+    "rm",
+    "--cached",
+    "--",
+    "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/review-original-local-doc-gates.txt"
+  ],
+  "indexRemovalExit": 0,
+  "allOtherStagedPathsPreserved": true,
+  "rawWorkingCopyUnchanged": true,
+  "wrapperWindowsWorkingCopySHA256": "5c6d7e0bf13a399e9ec3020885b391d852a0927e006f1539ba4564eb7b311679",
+  "canonicalWrapperGitBlobSHA256": "recorded separately after staging; avoids self-hash recursion",
+  "knownUntrackedResiduals": "exact one own raw copy plus prior14 other-card receipts, plus any explicitly reported post-publication receipts",
+  "oldFrozenManifests": "Historical packet manifests; not all raw entries are standalone published Git paths",
+  "codeAndTestChanged": false
+}

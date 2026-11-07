@@ -1,0 +1,291 @@
+"""Reviewer probes for A7 mode-origin R1 (b3bbdc8d). Pure AST/static DATA, one serial process.
+
+No product or mutant module is imported or executed. Mutants are source text parsed by the
+author's pinned rule/analyze (which only parse). The P5 DATA check evaluates the proposed guard
+EXPRESSION on reviewer-made values only; it is Python-semantics data, not product validation.
+"""
+import ast, hashlib, json, re, subprocess, sys
+from collections import Counter
+from pathlib import Path
+
+ROOT = Path(sys.argv[1]).resolve()
+OUT = Path(sys.argv[2]).resolve()
+E = ROOT / 'docs/vault/30_Development/Evidence/fleet5-b-a7-mode-origin-r1-20261107-codex'
+PRODUCT = '72028cbac903c4415d9979f980a6e0f9948e914f'
+TARGET = 'b3bbdc8d92a39f2f797a7680deb2770d6f705af0'
+BASE = '969030dbc7716b9cadf75bd314713005306ed34c'
+REVIEW = '145238898e8c86e1beb091b93efd712c70a6f5ba'
+CP = 'services/control-plane/src/inv/'
+DC, NT, WK, REMOTE = CP + 'dispatch.py', CP + 'node_transport.py', CP + 'worker.py', 'tools/remote_workspace_entry.py'
+NAMES = {'NodeDelivery', 'DeliveryWorker', 'DeliveryQueue', 'DeliveryAttempt'}
+rows = []
+
+
+def git(*a):
+    return subprocess.check_output(['git', *a], cwd=ROOT)
+
+
+def sha(b):
+    return hashlib.sha256(b if isinstance(b, bytes) else b.encode()).hexdigest()
+
+
+def emit(row):
+    rows.append(row)
+    print(json.dumps(row, sort_keys=True)[:1500], flush=True)
+
+
+def blobs(commit, paths):
+    """Read many blobs with one git cat-file --batch process."""
+    p = subprocess.Popen(['git', 'cat-file', '--batch'], cwd=ROOT, stdin=subprocess.PIPE, stdout=subprocess.PIPE)
+    out = {}
+    for path in paths:
+        p.stdin.write(f'{commit}:{path}\n'.encode()); p.stdin.flush()
+        header = p.stdout.readline().split()
+        size = int(header[2]); data = p.stdout.read(size); p.stdout.read(1)
+        out[path] = data
+    p.stdin.close(); p.wait()
+    return out
+
+
+# ---------------- P0 preconditions on committed bytes ----------------
+ns = git('diff', '--name-status', BASE, TARGET).decode('utf8').splitlines()
+statuses = Counter(l.split('\t')[0] for l in ns)
+paths = [l.split('\t', 1)[1] for l in ns]
+inside = all(p.startswith('docs/vault/30_Development/Evidence/fleet5-b-a7-mode-origin-r1-20261107-codex/') or p == 'docs/vault/30_Development/History/2026-11-07_FLEET5_B_A7_Mode_Origin_R1_Codex.md' for p in paths)
+productDelta = git('diff', '--name-only', PRODUCT, TARGET, '--', 'services', 'src', 'tools', 'apps', 'packages').decode().split()
+manifest = json.loads(git('show', f'{TARGET}:{E.relative_to(ROOT).as_posix()}/manifest.json'))
+mf_bad = [f['file'] for f in manifest['files'] if sha(git('show', f'{TARGET}:{E.relative_to(ROOT).as_posix()}/{f["file"]}')) != f['sha256']]
+hist = manifest['history']
+histOk = sha(git('show', f'{TARGET}:{hist["path"]}')) == hist['sha256']
+inputs = json.loads(git('show', f'{TARGET}:{E.relative_to(ROOT).as_posix()}/inputs.json'))
+orig_bad = []
+for o in inputs['reviewOriginals']:
+    copy = git('show', f'{TARGET}:{E.relative_to(ROOT).as_posix()}/{o["copy"]}')
+    blob = git('show', f'{REVIEW}:{o["path"]}')
+    oid = git('rev-parse', f'{REVIEW}:{o["path"]}').decode().strip()
+    if not (copy == blob and sha(blob) == o['sha256'] and oid == o['objectID']):
+        orig_bad.append(o['copy'])
+pred_bad = [x['path'] for x in inputs['immutablePredecessor'] if sha(git('show', f'{TARGET}:{x["path"]}')) != x['sha256'] or git('rev-parse', f'{BASE}:{x["path"]}').decode().strip() != x['objectID']]
+emit({'case': 'P0-preconditions', 'targetDeltaStatus': dict(statuses), 'allInsideOwnPaths': inside, 'productDeltaPaths': productDelta,
+      'manifestSHA256': sha(git('show', f'{TARGET}:{E.relative_to(ROOT).as_posix()}/manifest.json')), 'manifestFiles': len(manifest['files']),
+      'manifestFileMismatches': mf_bad, 'historyHashOk': histOk, 'reviewOriginals': len(inputs['reviewOriginals']), 'reviewOriginalMismatches': orig_bad,
+      'immutablePredecessors': len(inputs['immutablePredecessor']), 'immutablePredecessorMismatches': pred_bad,
+      'graphSHA256': sha(git('show', f'{TARGET}:{E.relative_to(ROOT).as_posix()}/mode-origin-graph.json')),
+      'auxiliarySHA256': sha(git('show', f'{TARGET}:{E.relative_to(ROOT).as_posix()}/mode-obligation-auxiliary.json'))})
+
+# ---------------- P1 independent lexical universe (no git grep) ----------------
+graph = json.loads(git('show', f'{TARGET}:{E.relative_to(ROOT).as_posix()}/mode-origin-graph.json'))
+authorPaths = {f['path']: f['sha256'] for f in graph['parsedScope']}
+tree = [p for p in git('ls-tree', '-r', '--name-only', PRODUCT, '--', 'services/control-plane/src', 'src', 'tools').decode('utf8').splitlines() if p.endswith('.py')]
+src = blobs(PRODUCT, tree)
+PAT = re.compile(r'NodeDelivery|DeliveryWorker|DeliveryAttempt|DeliveryQueue|node_transport|from\s.*dispatch|import\s.*dispatch|\.deliver\b')
+mine = sorted(p for p in tree if any(PAT.search(l) for l in src[p].decode('utf-8-sig').splitlines()))
+# A wider superset over the same roots: any mention of the stems (to disclose what the selector leaves out)
+WIDE = re.compile(r'deliver|dispatch|Delivery|node_transport')
+wide = sorted(p for p in tree if WIDE.search(src[p].decode('utf-8-sig')))
+outside = []
+for p in wide:
+    if p in mine:
+        continue
+    s = src[p].decode('utf-8-sig')
+    hits = sorted({m.group(0) for m in re.finditer(r'\w*(?:deliver|dispatch|Delivery|node_transport)\w*', s)})
+    outside.append({'path': p, 'tokens': hits[:12]})
+emit({'case': 'P1-lexical-universe-independent', 'pyFilesInRoots': len(tree), 'reviewerSelectorPaths': len(mine), 'authorPaths': len(authorPaths),
+      'setEqual': set(mine) == set(authorPaths), 'onlyReviewer': sorted(set(mine) - set(authorPaths)), 'onlyAuthor': sorted(set(authorPaths) - set(mine)),
+      'sha256EqualGitBlob': all(sha(src[p].decode('utf-8-sig')) == authorPaths[p] for p in mine if p in authorPaths),
+      'wideSupersetPaths': len(wide), 'wideNotSelected': outside})
+
+# ---------------- P2 independent AST reference census over the 25 ----------------
+census = {'symbolRefs': Counter(), 'deliverAttrs': [], 'attrStores': [], 'reflectionStrings': [], 'subclasses': [], 'importEvents': Counter(), 'nonCallSymbolRefs': []}
+for p in mine:
+    s = src[p].decode('utf-8-sig'); t = ast.parse(s, p)
+    parent = {}
+    for n in ast.walk(t):
+        for c in ast.iter_child_nodes(n):
+            parent[id(c)] = n
+    for n in ast.walk(t):
+        if isinstance(n, ast.ImportFrom):
+            mod = ('.' * n.level) + (n.module or '')
+            for a in n.names:
+                if 'dispatch' in mod or 'node_transport' in mod or a.name in NAMES or a.name in {'dispatch', 'node_transport'}:
+                    census['importEvents'][(p, mod, a.name, a.asname)] += 1
+        elif isinstance(n, ast.Import):
+            for a in n.names:
+                if 'dispatch' in a.name or 'node_transport' in a.name:
+                    census['importEvents'][(p, a.name, None, a.asname)] += 1
+        name = n.id if isinstance(n, ast.Name) else n.attr if isinstance(n, ast.Attribute) else None
+        if name in NAMES:
+            par = parent.get(id(n))
+            role = 'CALL_FUNC' if isinstance(par, ast.Call) and par.func is n else 'CLASS_BASE' if isinstance(par, ast.ClassDef) and n in par.bases else 'ANNOTATION' if isinstance(par, (ast.arg, ast.AnnAssign)) and getattr(par, 'annotation', None) is n else 'OTHER'
+            census['symbolRefs'][(p, name, role)] += 1
+            if role not in ('CALL_FUNC',):
+                census['nonCallSymbolRefs'].append({'path': p, 'name': name, 'role': role, 'span': [n.lineno, n.col_offset, n.end_lineno, n.end_col_offset], 'text': ast.get_source_segment(s, par) [:120] if par is not None else None})
+        if isinstance(n, ast.Attribute) and n.attr == 'deliver':
+            census['deliverAttrs'].append({'path': p, 'span': [n.lineno, n.col_offset, n.end_lineno, n.end_col_offset], 'text': ast.get_source_segment(s, n)})
+        if isinstance(n, ast.Attribute) and isinstance(n.ctx, (ast.Store, ast.Del)) and n.attr in {'delivery', 'queue', 'operation', 'deliver', 'acquire', 'once', 'channels'}:
+            census['attrStores'].append({'path': p, 'span': [n.lineno, n.col_offset, n.end_lineno, n.end_col_offset], 'text': ast.get_source_segment(s, n)})
+        if isinstance(n, ast.Call) and isinstance(n.func, ast.Name) and n.func.id in {'getattr', 'setattr', 'delattr', 'hasattr'} and len(n.args) >= 2 and isinstance(n.args[1], ast.Constant) and n.args[1].value in {'deliver', 'delivery', 'queue', 'operation', 'acquire', 'once', 'channels'}:
+            census['reflectionStrings'].append({'path': p, 'span': [n.lineno, n.col_offset], 'text': ast.get_source_segment(s, n)})
+        if isinstance(n, ast.ClassDef):
+            for b in n.bases:
+                bn = b.id if isinstance(b, ast.Name) else b.attr if isinstance(b, ast.Attribute) else None
+                if bn in NAMES:
+                    census['subclasses'].append({'path': p, 'class': n.name, 'base': bn})
+callCount = Counter()
+for (p, name, role), k in census['symbolRefs'].items():
+    if role == 'CALL_FUNC':
+        callCount[name] += k
+authorCtor = Counter(c['target'].rsplit('.', 1)[1] for c in graph['constructorInventory'])
+emit({'case': 'P2-ast-reference-census', 'callFuncByName': dict(callCount), 'authorConstructorByName': dict(authorCtor), 'equal': dict(callCount) == dict(authorCtor),
+      'nonCallSymbolRefs': census['nonCallSymbolRefs'], 'deliverAttrs': census['deliverAttrs'], 'attrStores': census['attrStores'],
+      'reflectionStrings': census['reflectionStrings'], 'subclasses': census['subclasses'],
+      'importEvents': sorted([list(k) + [v] for k, v in census['importEvents'].items()], key=str)})
+
+# ---------------- P3 dispatch / node_transport structural facts ----------------
+ds = src[DC].decode('utf-8-sig'); dt = ast.parse(ds); nts = src[NT].decode('utf-8-sig'); ntt = ast.parse(nts)
+def cls(t, name):
+    return next(n for n in t.body if isinstance(n, ast.ClassDef) and n.name == name)
+def meth(c, name):
+    return next(n for n in c.body if isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef)) and n.name == name)
+Q, W, A = cls(dt, 'DeliveryQueue'), cls(dt, 'DeliveryWorker'), cls(dt, 'DeliveryAttempt')
+ND = cls(ntt, 'NodeDelivery')
+acq, once, init, fin = meth(Q, 'acquire'), meth(W, 'once'), meth(W, '__init__'), meth(Q, 'finish')
+dlv = meth(ND, 'deliver')
+fns = {'DeliveryQueue.acquire': acq, 'DeliveryWorker.once': once, 'DeliveryWorker.__init__': init, 'NodeDelivery.deliver': dlv, 'DeliveryQueue.finish': fin}
+modTopStores = Counter()
+for t_, label in ((dt, 'dispatch'), (ntt, 'node_transport')):
+    for n in t_.body:
+        tgts = []
+        if isinstance(n, (ast.Assign, ast.AnnAssign, ast.AugAssign)):
+            tgts = [x.id for tt in (n.targets if isinstance(n, ast.Assign) else [n.target]) for x in ast.walk(tt) if isinstance(x, ast.Name)]
+        elif isinstance(n, (ast.FunctionDef, ast.ClassDef, ast.AsyncFunctionDef)):
+            tgts = [n.name]
+        elif isinstance(n, (ast.Import, ast.ImportFrom)):
+            tgts = [(a.asname or a.name).split('.')[0] for a in n.names]
+        for x in tgts:
+            modTopStores[(label, x)] += 1
+shadow = {f'{k[0]}:{k[1]}': v for k, v in modTopStores.items() if k[1] in {'type', 'str', 'bool', 'dataclass', 'DeliveryAttempt', 'DeliveryQueue', 'DeliveryWorker', 'NodeDelivery', 'ValueError', 'DomainError', 'NodeChannels', 'Exception', 'isinstance', 'getattr'}}
+opStores = [{'span': [n.lineno, n.col_offset, n.end_lineno, n.end_col_offset], 'stmt': ast.get_source_segment(ds, n)[:160]} for n in ast.walk(acq) if isinstance(n, (ast.Assign,)) and any(isinstance(x, ast.Name) and x.id == 'operation' for x in n.targets)]
+opReadsOnce = [[n.lineno, n.col_offset] for n in ast.walk(once) if isinstance(n, ast.Attribute) and n.attr == 'operation']
+opReadsFinish = [{'span': [n.lineno, n.col_offset], 'stmt': ast.get_source_segment(ds, parent_n)[:80]} for parent_n in ast.walk(fin) for n in ast.iter_child_nodes(parent_n) if isinstance(n, ast.Attribute) and n.attr == 'operation']
+returns = [[r.lineno, ast.get_source_segment(ds, r)[:40]] for r in ast.walk(acq) if isinstance(r, ast.Return)]
+tryNode = next(n for n in once.body if isinstance(n, ast.Try))
+handler = tryNode.handlers[0]
+emit({'case': 'P3-structural-facts', 'decorators': {k: [ast.unparse(d) for d in v.decorator_list] for k, v in fns.items()},
+      'asyncOrGenerator': {k: isinstance(v, ast.AsyncFunctionDef) or any(isinstance(x, (ast.Yield, ast.YieldFrom, ast.Await)) for x in ast.walk(v)) for k, v in fns.items()},
+      'classDecorators': {c.name: [ast.unparse(d) for d in c.decorator_list] for c in (Q, W, A, ND)},
+      'classBases': {c.name: [ast.unparse(b) for b in c.bases] for c in (Q, W, A, ND)},
+      'otherMethodsNamed': {c.name: [n.name for n in c.body if isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef))] for c in (Q, W, ND)},
+      'selfQueueDeliveryStoresInWorker': [[n.lineno, ast.get_source_segment(ds, n)] for n in ast.walk(W) if isinstance(n, ast.Attribute) and isinstance(n.ctx, ast.Store)],
+      'attemptFieldOrder': [n.target.id for n in A.body if isinstance(n, ast.AnnAssign)], 'attemptFieldAnnotations': [ast.unparse(n.annotation) for n in A.body if isinstance(n, ast.AnnAssign)],
+      'attemptClassOtherBody': [type(n).__name__ for n in A.body if not isinstance(n, ast.AnnAssign)],
+      'moduleTopLevelBindingsOfInterest': shadow, 'operationAssignsInAcquire': opStores, 'acquireReturns': returns,
+      'operationReadsInOnce': opReadsOnce, 'operationReadsInFinish': opReadsFinish,
+      'onceTryHandler': ast.unparse(handler.type), 'onceTryHandlerBody': [ast.unparse(x) for x in handler.body],
+      'deliverCallInsideTry': any(isinstance(x, ast.Call) and ast.unparse(x.func) == 'self.delivery.deliver' for x in ast.walk(tryNode)),
+      'deliverSignature': ast.unparse(dlv.args), 'snapshotCall': [ast.unparse(x) for x in ast.walk(dlv) if isinstance(x, ast.Call) and ast.unparse(x.func) == 'self.channels.snapshot'],
+      'flagStoresInDeliver': [x.id for x in ast.walk(dlv) if isinstance(x, ast.Name) and x.id in {'observation_only', 'cancel_only'} and isinstance(x.ctx, ast.Store)],
+      'flagReadsInDeliver': sorted(Counter(x.id for x in ast.walk(dlv) if isinstance(x, ast.Name) and x.id in {'observation_only', 'cancel_only'} and isinstance(x.ctx, ast.Load)).items())})
+
+# ---------------- P4 reviewer sensitivity mutants with the author's pinned rule/analyze ----------------
+sys.path.insert(0, str(E))
+import mode  # parses only; its helpers come from the pinned R2 evidence dir
+base = {p: src[p].decode('utf-8-sig') for p in (DC, NT, WK, REMOTE)}
+for p in base:
+    assert mode.sha(base[p]) == authorPaths[p]
+
+
+def ruled(world):
+    facts = {p: mode.Facts(p, world.get(p, s)) for p, s in base.items()}
+    with mode.scope():
+        r = mode.rule(facts)
+    return {'status': r['status'], 'reason': r['reason'], 'edgesBeforeVerdict': [e['kind'] for e in r['edges']]}
+
+
+def status_of(result):
+    ok = result['modeRule']['status'].startswith('CONDITIONAL') and result['guardCompatibilityClean'] and result['constructorArgumentBindingsValid'] and all(r['kind'] == 'CALL' for r in result['deliverReferences'])
+    return 'CONDITIONAL_SOURCE_CANDIDATE_RUNTIME_AND_OWNER_PREMISES_PENDING' if ok else 'UNRESOLVED_MODE_ORIGIN'
+
+
+def analyzed(world):
+    r = mode.analyze(world)
+    return {'cardStatus': status_of(r), 'rule': r['modeRule']['status'], 'ruleReason': r['modeRule']['reason'], 'guardClean': r['guardCompatibilityClean'],
+            'guardErrors': [[g['path'], g['error']] for g in r['auditedScope'] if g['error']], 'reflectionNew': [[g['path'], g['reflection']['newRelevantHits']] for g in r['auditedScope'] if g['reflection']['newRelevantHits']],
+            'deliverReferences': [[x['source']['path'], x['source']['span'], x['expression'], x['kind']] for x in r['deliverReferences']],
+            'constructors': len(r['constructorInventory']), 'parsed': len(r['parsedScope'])}
+
+
+def mutate(path, old, new, count=1):
+    s = base.get(path) or src[path].decode('utf-8-sig')
+    assert s.count(old) >= 1, (path, old)
+    m = s.replace(old, new, count)
+    assert m != s
+    compile(m, path, 'exec', dont_inherit=True)
+    return m
+
+
+LP = 'tools/lan_pilot.py'
+lp = src[LP].decode('utf-8-sig')
+second = lp + '\n\ndef _reviewer_second_deliver(delivery, node, permit):\n    return delivery.deliver(node, permit, observation_only="foreign-tag")\n'
+compile(second, LP, 'exec', dont_inherit=True)
+deco_acq = mutate(DC, '    def acquire(self, tenant_id', '    @_reviewer_wrap\n    def acquire(self, tenant_id').replace('\n\ndef persist_delivery(', '\n\ndef _reviewer_wrap(f):\n    return f\n\n\ndef persist_delivery(', 1)
+compile(deco_acq, DC, 'exec', dont_inherit=True)
+recv = mutate(WK, '    worker = DeliveryWorker(db, delivery, output_provider=output_provider)\n', '    worker = DeliveryWorker(db, delivery, output_provider=output_provider)\n    worker.delivery = object()\n')
+mutants = [
+    ('R-domain-literal-change', 'RULE', {DC: mutate(DC, '                else "observe"\n', '                else "observed"\n')}, ('UNRESOLVED', 'OPERATION_LITERAL_DOMAIN_CHANGED')),
+    ('R-sixth-argument-swap', 'RULE', {DC: mutate(DC, '                token,\n                operation,\n', '                token,\n                "execute",\n')}, ('UNRESOLVED', 'ATTEMPT_CONSTRUCTOR_FORWARDING_CHANGED')),
+    ('R-cancel-keyword-swap', 'RULE', {DC: mutate(DC, 'cancel_only=attempt.operation == "cancel"', 'cancel_only=attempt.operation == "observe"')}, ('UNRESOLVED', 'MODE_FORWARDING_CHANGED')),
+    ('R-decorated-acquire', 'RULE', {DC: deco_acq}, None),
+]
+for name, layer, world, expected in mutants:
+    r = ruled(world)
+    emit({'case': 'P4-' + name, 'layer': layer, 'inputSHA256': {p: sha(s) for p, s in world.items()}, 'syntaxValid': True, **r,
+          'expected': expected, 'expectationMet': None if expected is None else (r['status'], r['reason']) == expected})
+emit({'case': 'P4-A-actual-analyze', 'layer': 'ANALYZE', **analyzed({})})
+for name, world in [('A-second-unconstrained-deliver-caller', {LP: second}), ('A-worker-receiver-replacement', {WK: recv}), ('A-decorated-acquire', {DC: deco_acq})]:
+    emit({'case': 'P4-' + name, 'layer': 'ANALYZE', 'inputSHA256': {p: sha(s) for p, s in world.items()}, 'syntaxValid': True, **analyzed(world)})
+
+# ---------------- P5 future-code proposal DATA (no product execution) ----------------
+proposal = json.loads(git('show', f'{TARGET}:{E.relative_to(ROOT).as_posix()}/mode-obligation-auxiliary.json'))['minimalFutureCodeProposal']
+guard_src = 'type(operation) is not str or operation not in ("execute", "observe", "cancel")'
+assert guard_src in proposal['futureCode']
+guard = compile(guard_src, '<proposed-guard>', 'eval', dont_inherit=True)
+calls = Counter()
+class Hostile(str):
+    def __eq__(self, other): calls['__eq__'] += 1; return True
+    def __ne__(self, other): calls['__ne__'] += 1; return False
+    def __hash__(self): calls['__hash__'] += 1; return 0
+    def __bool__(self): calls['__bool__'] += 1; return True
+class Foreign:
+    def __eq__(self, other): calls['F__eq__'] += 1; return True
+    def __bool__(self): calls['F__bool__'] += 1; return True
+    __hash__ = object.__hash__
+data = []
+for label, v in [('execute', 'execute'), ('observe', 'observe'), ('cancel', 'cancel'), ('Execute', 'Execute'), ('empty', ''), ('bytes', b'observe'), ('none', None), ('int', 1), ('str-subclass-hostile', Hostile('observe')), ('foreign-eq', Foreign())]:
+    before = dict(calls)
+    rejected = eval(guard, {'__builtins__': {'type': type, 'str': str}}, {'operation': v})
+    custom = {k: calls[k] - before.get(k, 0) for k in calls if calls[k] - before.get(k, 0)}
+    row = {'value': label, 'rejected': rejected, 'customCallsDuringGuard': custom}
+    if not rejected:
+        o, c = v == 'observe', v == 'cancel'
+        row.update({'observation_only': o, 'cancel_only': c, 'types': [type(o).__name__, type(c).__name__], 'orResult': o or c, 'orType': type(o or c).__name__})
+    data.append(row)
+# Placement DATA: textual application to frozen dispatch.py, parse only.
+old_call = '            self.delivery.deliver(\n                attempt.node,\n                attempt.envelope,\n                observation_only=attempt.operation == "observe",\n                cancel_only=attempt.operation == "cancel",\n            )\n'
+new_call = ('            operation = attempt.operation\n            if type(operation) is not str or operation not in ("execute", "observe", "cancel"):\n                raise ValueError("Unsupported delivery operation origin")\n'
+            '            self.delivery.deliver(\n                attempt.node,\n                attempt.envelope,\n                observation_only=operation == "observe",\n                cancel_only=operation == "cancel",\n            )\n')
+assert base[DC].count(old_call) == 1
+future = base[DC].replace(old_call, new_call)
+compile(future, DC, 'exec', dont_inherit=True)
+ft = ast.parse(future); fonce = meth(cls(ft, 'DeliveryWorker'), 'once'); ftry = next(n for n in fonce.body if isinstance(n, ast.Try))
+first_two = [ast.unparse(x) for x in ftry.body[:2]]
+fopReads = [[n.lineno] for n in ast.walk(fonce) if isinstance(n, ast.Attribute) and n.attr == 'operation']
+ffin = meth(cls(ft, 'DeliveryQueue'), 'finish')
+emit({'case': 'P5-future-code-data', 'kind': 'PYTHON_SEMANTICS_DATA_ON_REVIEWER_VALUES_NOT_PRODUCT_VALIDATION', 'guardExpression': guard_src, 'rows': data,
+      'placement': {'parsesAfterTextualApplication': True, 'tryBodyFirstStatements': first_two, 'raiseInsideTry': isinstance(ftry.body[1], ast.If) and isinstance(ftry.body[1].body[0], ast.Raise),
+                    'handlerCatches': ast.unparse(ftry.handlers[0].type), 'handlerMapsNonDomainTo': 'SYS-0001 (exc.code only for DomainError); not_sent requires DomainError',
+                    'attemptOperationReadsInFutureOnce': fopReads, 'finishStillReadsAttemptOperation': [ast.get_source_segment(future, x) for x in ast.walk(ffin) if isinstance(x, ast.Compare) and 'attempt.operation' in ast.unparse(x)],
+                    'productDeltaThisReview': 0, 'futureDispatchSHA256': sha(future)}})
+
+OUT.write_bytes((json.dumps({'rows': rows, 'count': len(rows)}, sort_keys=True, indent=1) + '\n').encode())
+print(json.dumps({'rows': len(rows)}))

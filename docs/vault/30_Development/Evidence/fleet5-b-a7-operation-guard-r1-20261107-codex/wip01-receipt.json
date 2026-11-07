@@ -1,0 +1,211 @@
+{
+  "actualProductTests": "NOT_RUN",
+  "allPathsSafeRelative": true,
+  "argv": [
+    "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+    "-B",
+    "docs\\vault\\30_Development\\Evidence\\fleet5-b-a7-operation-guard-r1-20261107-codex\\freeze_wip.py"
+  ],
+  "base": "b3bbdc8d92a39f2f797a7680deb2770d6f705af0",
+  "candidate": "UNRESOLVED_OPERATION_ORIGIN",
+  "checks": "source/hash/AST/archive readback only; no product tests/imports",
+  "entryCount": 36,
+  "entrySet": [
+    {
+      "bytes": 10963,
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/complete-product-test.diff.txt",
+      "sha256": "075b20d4ed4345c92a7863cadbb1d5361711b8458903787972d11f2075b0f292"
+    },
+    {
+      "bytes": 706803,
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/control-inputs.json",
+      "sha256": "ffca532b4e769f2f2ec7cc7c3da29a69907f47f84407ca93d103a0462d50bdb3"
+    },
+    {
+      "bytes": 10013,
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/control-results.json",
+      "sha256": "f48b2811f0b248a087e0338e843e3d8dadd9e3849c4e2448579d7f26a254218a"
+    },
+    {
+      "bytes": 3011,
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/existing-guard-refusal.json",
+      "sha256": "3f5e6214ca11c7b08f54412f3f351242651bc6b9b4477df0f9512859488c5759"
+    },
+    {
+      "bytes": 7201,
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/freeze_wip.py",
+      "sha256": "d763ea387f0f604864dfe4414c4de04bc199444c79e43bb15f9c512248a8bfb4"
+    },
+    {
+      "bytes": 22339,
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/inputs.json",
+      "sha256": "db87e3c6545105cafc93abbe78e53e2de85facada6363bd0b2773a5e4391706b"
+    },
+    {
+      "bytes": 2306,
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/inspect_refusal.py",
+      "sha256": "2173e9db71cc70a46dacce69e0e9b0d48527f25e0e4a8d301822fb0666fbe249"
+    },
+    {
+      "bytes": 15369,
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/operation-obligation-auxiliary.json",
+      "sha256": "ce57e9d0110c2293939b954a9075dd63b885c5cf2e2acc78ce886da8d4acbe9c"
+    },
+    {
+      "bytes": 124522,
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/operation-origin-graph.json",
+      "sha256": "37b8b654f4b2808914a2a7a53ff0b43f27b0ccb816df6f804073fd606d7ba250"
+    },
+    {
+      "bytes": 21312,
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/operation_proof.py",
+      "sha256": "d5f68c4a1bff9b3f59055a72c1b3dfca97b1b5af674e08da19a729ab9bb66e49"
+    },
+    {
+      "bytes": 5385,
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/prepare.py",
+      "sha256": "7ab1f2b986a0771d57e6502462abd035b2f7964b172d21f0c104d55a7c35beb7"
+    },
+    {
+      "bytes": 478,
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/refusal-inspection.json",
+      "sha256": "6adb470b1c4022329a6ff531c5a0608a0565798657dcce46005fe1543637945b"
+    },
+    {
+      "bytes": 1058,
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/refusal-inspection.log.txt",
+      "sha256": "4e1ec805a412ab5ae1ce0766f9b186856e0d62c17fe65f6c099e69bb44f49517"
+    },
+    {
+      "bytes": 880,
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/review-original-canonical-sync-check-before.txt",
+      "sha256": "9f6d1eb4250de590a0acc1cea1752dadff8fca9a9d882efdcd533eb3c394f93a"
+    },
+    {
+      "bytes": 4449,
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/review-original-commands.json",
+      "sha256": "3cfed71c71ce7d6119a1439a5ab3103e45cb43164e88be72982301d1da5a913a"
+    },
+    {
+      "bytes": 21,
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/review-original-gitattributes.txt",
+      "sha256": "96a83569c84cfe3f57b7efe3dc61c249548d0fca4fed0e538b3587cdc97c95c1"
+    },
+    {
+      "bytes": 15385,
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/review-original-history.md.txt",
+      "sha256": "9d327ffd956114f54f0cd1b71aa66e611a08aee8f15ecb8de815c70797415db5"
+    },
+    {
+      "bytes": 3496,
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/review-original-local-doc-gates.txt",
+      "sha256": "8a74f36b57b55743b89d451a94d4109dc996f0758d4ad4f4c23ff4fffc364c4a"
+    },
+    {
+      "bytes": 19107,
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/review-original-review.json",
+      "sha256": "88b102e9319e35b1ea8fbbb7d0b3aac9c72d122bdab3714f30ed04b0612ea221"
+    },
+    {
+      "bytes": 662,
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/review-original-reviewer-mode-future-rule-result.json",
+      "sha256": "e5f5ddcbca6c397d35d03b2823e96dab09aee40f74464cf68d37a38822b058a9"
+    },
+    {
+      "bytes": 882,
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/review-original-reviewer-mode-future-rule.log.txt",
+      "sha256": "d23ef94ccc4aa54bd0a60999af1557e899b4383f98d8342b1beb3069bddf2ac2"
+    },
+    {
+      "bytes": 24641,
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/review-original-reviewer-mode-probes-result.json",
+      "sha256": "22606ab8a9dc1225cbbde54e843df0ccf3fa2df4248b9c3b3d7dece13f37e841"
+    },
+    {
+      "bytes": 11320,
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/review-original-reviewer-mode-probes.log.txt",
+      "sha256": "48ab4eb628f29b93a84c05f2fd60e0c7c8740b56f93d12ac95db50491a9468ca"
+    },
+    {
+      "bytes": 2355,
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/review-original-reviewer_gate_driver.py.txt",
+      "sha256": "b3dd3ed21c8fd8f323be0ffecf6abeba58a6b13efb64b0fd9b41cf1a345795c4"
+    },
+    {
+      "bytes": 2015,
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/review-original-reviewer_mode_future_rule.py.txt",
+      "sha256": "29855ad6a707f80d48d1dd7ff90670b257b0a8ad83a028d702004724d107cfd4"
+    },
+    {
+      "bytes": 22277,
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/review-original-reviewer_mode_probes.py.txt",
+      "sha256": "bcfc829a8f5862676023ad8e879924ed00934cec2e5bfebde29df8aa17356518"
+    },
+    {
+      "bytes": 3150,
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/root-run-plan.json",
+      "sha256": "ce4bf877428b582d97f7685bfbc4f5f0ccf754aaba533a305b85e65d779c8b12"
+    },
+    {
+      "bytes": 8134,
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/source-world.json",
+      "sha256": "f7c29608517b6f17934cd34b7ff0f431e62654aec86f3ac47f1a05c9629bf2d6"
+    },
+    {
+      "bytes": 482,
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/static-inspection-attempt1.json",
+      "sha256": "40b5f895922b21ffe860e649bb68578266aaf97786776a1cb2965fe6be63a44c"
+    },
+    {
+      "bytes": 722,
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/static-inspection-attempt1.log.txt",
+      "sha256": "583224da5fea81269b744d996dccc20b5388a9908bae81ee8f54a23da51388fa"
+    },
+    {
+      "bytes": 10067,
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/static_checks.py",
+      "sha256": "f7843e4c2a3dea7023e6b2bbe5e2d0b2a500807323d5b8ca42ad91f464859d01"
+    },
+    {
+      "bytes": 2531,
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/syntax-source-inspection.json",
+      "sha256": "4e44290ff1c241d6b86690ee36b2f499544be67af89297d09819db712ff8bdb8"
+    },
+    {
+      "bytes": 13134,
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/wip01-manifest.json",
+      "sha256": "c0b9fa5cfc75567f62ad2a31f70a9e178798505dfc7e3facb101f6d899bcaa9a"
+    },
+    {
+      "bytes": 6816,
+      "path": "docs/vault/30_Development/History/2026-11-07_FLEET5_B_A7_Operation_Guard_R1_Codex.md",
+      "sha256": "73136f17ab2d92fddc9054866cc8c890c539c504f431eb41b78df91346016bea"
+    },
+    {
+      "bytes": 15823,
+      "path": "services/control-plane/src/inv/dispatch.py",
+      "sha256": "82f029614537eb5bab56934e4b6736fe3dd52ece54b9b9a3996815b131e41de4"
+    },
+    {
+      "bytes": 9520,
+      "path": "tests/core/test_delivery_operation_origin.py",
+      "sha256": "3dacdb63f83ab1d8075ddcbe422d82daad20bd56f643adee0fc7ae97715925d2"
+    }
+  ],
+  "exitOnSuccessfulReceipt": 0,
+  "fullArchiveReadbackAndCurrentFileHashMatch": true,
+  "guardChanged": false,
+  "independentOperationGuardReview": "PENDING",
+  "manifestSHA256": "c0b9fa5cfc75567f62ad2a31f70a9e178798505dfc7e3facb101f6d899bcaa9a",
+  "packet": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/fleet5-a7-operation-guard-r1-wip01.zip",
+  "productSHA256": "82f029614537eb5bab56934e4b6736fe3dd52ece54b9b9a3996815b131e41de4",
+  "publication": "NOT_AUTHORIZED at this WIP stage; no commit/push/CI",
+  "realBindings": null,
+  "reason": "EXISTING_GUARD_REFUSED_WIP_PATTERN",
+  "runtimeB": 0,
+  "schema": "FLEET5_WIP01_FROZEN_RECEIPT_V1",
+  "testSHA256": "3dacdb63f83ab1d8075ddcbe422d82daad20bd56f643adee0fc7ae97715925d2",
+  "zipBytes": 1119013,
+  "zipCRCCheck": "PASS",
+  "zipSHA256": "28c87c268baaf551dde15fcb35f0eb6d3b24b6861e8c1cfcb845fcb6e0a96f37"
+}

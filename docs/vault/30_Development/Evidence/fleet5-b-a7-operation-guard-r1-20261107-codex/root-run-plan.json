@@ -1,0 +1,40 @@
+{
+  "schema": "FLEET5_A7_OPERATION_GUARD_WIP_ROOT_PLAN_V1",
+  "rootMessage": "msg_db48b2c9a36e",
+  "base": "b3bbdc8d92a39f2f797a7680deb2770d6f705af0",
+  "localActualProductImportOrTests": "NOT_RUN",
+  "localDocsGatesCommitPushCI": "NOT_RUN; new Root step required before publication",
+  "isolationOwner": "Root",
+  "dependencyRule": "Reconstruct actual base checkout, tests/conftest.py, real product import closure and pinned repository dependency declarations; no stubs, package installation or host services by this worker",
+  "overlayOnlyNonDocs": [
+    "services/control-plane/src/inv/dispatch.py",
+    "tests/core/test_delivery_operation_origin.py"
+  ],
+  "green": {
+    "source": "real BASE plus exact WIP01 two-file overlay",
+    "argv": ["<Root isolated existing Python>", "-B", "-m", "pytest", "-q", "tests/core/test_delivery_operation_origin.py"],
+    "expectedExit": 0,
+    "staticPlannedCases": 24,
+    "requiredReceipt": "Exact reconstructed source/test/conftest/dependency hashes, isolated argv/environment, full pytest output, collected cases, exit code, no DB/network/service fixture execution"
+  },
+  "red": {
+    "source": "separate real BASE checkout with actual b3bb dispatch.py unchanged; overlay only same WIP01 new unit file",
+    "argv": ["<Root isolated existing Python>", "-B", "-m", "pytest", "-q", "tests/core/test_delivery_operation_origin.py::test_rejected_origin_never_delivers_or_invokes_rich_methods[foreign-equal]"],
+    "expectedExit": 1,
+    "intendedFailure": "case.deliveries == [] assertion, message Rejected operation reached actual once's delivery call",
+    "preconditions": ["actual inv.dispatch imported", "actual DeliveryWorker.once called", "reconciler-init, reconcile, acquire events asserted first", "finish event and exactly one finish call asserted before decisive RED assertion"],
+    "rejectFalseRed": "Import, dependency, collection, fixture-precondition or unrelated error is not a causal RED receipt",
+    "implementationRule": "Do not execute copied, extracted or reimplemented once; use the real baseline module file through ordinary Python import"
+  },
+  "static": {
+    "argv": ["python", "-B", "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/static_checks.py"],
+    "localExit": 0,
+    "controls": 9,
+    "modeRule": "CONDITIONAL_CAPTURED_MODE_ORIGIN_CANDIDATE",
+    "wholeCandidate": "UNRESOLVED_OPERATION_ORIGIN",
+    "reason": "EXISTING_GUARD_REFUSED_WIP_PATTERN",
+    "exactExistingGuardRefusal": "DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:INSTANCE:operation"
+  },
+  "decisionQuestion": "Does Root authorize a separate bounded OWN-proof compatibility contract for exactly this captured operation/guard/forwarding pattern, with immutable old helpers/19 HOLD and no generic name/span/hash allowance, or keep WIP held? Specify exact allowed proof delta after actual-import GREEN and causal BASE RED receipts; Codex has added no allowance.",
+  "unaccepted": ["actual runtime B", "DB/network/TLS/Engine behavior", "operation permission", "source/caller inclusion beyond bounded premises", "whole B", "fleet acceptance", "independent operation guard review"]
+}

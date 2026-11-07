@@ -1,0 +1,83 @@
+{
+  "actualExistingGuardReason": "DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:INSTANCE:operation",
+  "allowanceWasAdded": false,
+  "effect": "Whole WIP candidate remains UNRESOLVED; this diagnostic confers no credit or discharge",
+  "firstPartyWorldBase": "b3bbdc8d92a39f2f797a7680deb2770d6f705af0",
+  "firstRefusedSite": {
+    "contextKind": "Store",
+    "enclosingContext": "operation = attempt.operation",
+    "expression": "operation",
+    "key": "(('DeliveryWorker.once', (('DeliveryWorker.once', 'FunctionDef', \"arguments(args=[arg(arg='self'), arg(arg='tenant_id')], kwonlyargs=[arg(arg='command_id'), arg(arg='control_only')], kw_defaults=[Constant(value=None), Constant(value=False)])\", (), None, ()),)), 'INSTANCE:operation', \"Assign(targets=[Name(id='operation', ctx=Store())], value=Attribute(value=Name(id='attempt', ctx=Load()), attr='operation', ctx=Load()))\")",
+    "nodeKind": "Name",
+    "remainingFrozenMultiplicity": 0,
+    "source": {
+      "expressionSHA256": "9bf5a24e4aa779981ac41f1a0f8713ec758e12df95fa51866869849c06e51175",
+      "fileSHA256": "82f029614537eb5bab56934e4b6736fe3dd52ece54b9b9a3996815b131e41de4",
+      "function": "inv.dispatch.DeliveryWorker.once",
+      "path": "services/control-plane/src/inv/dispatch.py",
+      "span": [
+        336,
+        12,
+        336,
+        21
+      ]
+    },
+    "tag": "INSTANCE:operation"
+  },
+  "guardBaseline": "72028cbac903c4415d9979f980a6e0f9948e914f",
+  "guardFile": "docs/vault/30_Development/Evidence/fleet5-b-a7-snapshot-r2-20261107-codex/use_sites.py",
+  "guardFileSHA256": "4a1fbb3f42180bf3d43698121a863fdb1ed2f723394f2a85864a2afc54b647dc",
+  "guardWasChanged": false,
+  "ownerDerivation": {
+    "ownerReturningFunctions": [
+      "inv.dispatch.DeliveryQueue.acquire",
+      "inv.dispatch.DeliveryWorker.once"
+    ],
+    "owners": {
+      "": [],
+      "DeliveryQueue": [],
+      "DeliveryQueue.__init__": [
+        "self"
+      ],
+      "DeliveryQueue._can_start": [
+        "actors",
+        "approval",
+        "model",
+        "ready",
+        "requester",
+        "store",
+        "v",
+        "voters"
+      ],
+      "DeliveryQueue.acquire": [
+        "a",
+        "allocations",
+        "claim",
+        "conn",
+        "current",
+        "now",
+        "row",
+        "run"
+      ],
+      "DeliveryQueue.finish": [
+        "conn",
+        "row",
+        "run"
+      ],
+      "DeliveryWorker": [],
+      "DeliveryWorker.__init__": [
+        "self"
+      ],
+      "DeliveryWorker.once": [
+        "attempt",
+        "operation",
+        "outcome",
+        "parent",
+        "reconciled"
+      ],
+      "persist_delivery": []
+    },
+    "scope": "Bounded conservative MAY-owner relevance; parameter facts come from argument bindings, not runtime/workspace name heuristics; full provenance/use-site checks required"
+  },
+  "rootDecisionRequired": "Root must specify a bounded proof compatibility contract for the exact capture/guard/forwarding pattern, or keep this WIP held; do not weaken the existing guard implicitly"
+}

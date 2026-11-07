@@ -1,0 +1,20 @@
+"""P6: author's pinned mode rule on the textual application of the proposed future code (parse only)."""
+import hashlib, json, subprocess, sys
+from pathlib import Path
+ROOT = Path(sys.argv[1]).resolve(); OUT = Path(sys.argv[2]).resolve()
+E = ROOT / 'docs/vault/30_Development/Evidence/fleet5-b-a7-mode-origin-r1-20261107-codex'
+sys.path.insert(0, str(E))
+import mode
+base = {p: mode.frozen_source(p) for p in (mode.DC, mode.NT, mode.WK, mode.REMOTE)}
+old_call = '            self.delivery.deliver(\n                attempt.node,\n                attempt.envelope,\n                observation_only=attempt.operation == "observe",\n                cancel_only=attempt.operation == "cancel",\n            )\n'
+new_call = ('            operation = attempt.operation\n            if type(operation) is not str or operation not in ("execute", "observe", "cancel"):\n                raise ValueError("Unsupported delivery operation origin")\n'
+            '            self.delivery.deliver(\n                attempt.node,\n                attempt.envelope,\n                observation_only=operation == "observe",\n                cancel_only=operation == "cancel",\n            )\n')
+assert base[mode.DC].count(old_call) == 1
+future = base[mode.DC].replace(old_call, new_call); compile(future, mode.DC, 'exec', dont_inherit=True)
+facts = {p: mode.Facts(p, future if p == mode.DC else s) for p, s in base.items()}
+with mode.scope():
+    r = mode.rule(facts)
+row = {'case': 'P6-current-rule-on-proposed-future-code', 'futureDispatchSHA256': hashlib.sha256(future.encode()).hexdigest(), 'status': r['status'], 'reason': r['reason'],
+       'detail': r.get('detail'), 'edgesBeforeVerdict': [e['kind'] for e in r['edges']],
+       'meaning': 'the pinned rule is shaped to the current once text; an implementing card must re-specify the static rule for capture+guard+captured-local forwarding'}
+OUT.write_bytes((json.dumps({'rows': [row]}, sort_keys=True, indent=1) + '\n').encode()); print(json.dumps(row, sort_keys=True))

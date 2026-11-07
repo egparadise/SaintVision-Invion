@@ -1,0 +1,6 @@
+{
+  "encoding": "utf-8",
+  "rawBytes": 163,
+  "rawSHA256": "7cdc12bf64f50ba0964625161638a4c639cf22d786a57f04685bed0718e14042",
+  "text": "PASS: RDF parsing, defined terms, TTL/JSON-LD equivalence, 48 task mappings, positive SHACL, 4 rejected invalid fixtures, 4 competency queries, Obsidian mirrors.\r\n"
+}

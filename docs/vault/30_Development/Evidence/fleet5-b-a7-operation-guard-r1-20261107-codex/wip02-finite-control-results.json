@@ -1,0 +1,1797 @@
+{
+  "acceptedBaselineDischarges": 0,
+  "allExpected": true,
+  "count": 21,
+  "legacyHelpersModified": false,
+  "productOrMutantsExecuted": false,
+  "rows": [
+    {
+      "changedInputs": [],
+      "expectationMet": true,
+      "expectedReason": null,
+      "layer": "NEW_FINITE_COMPATIBILITY_ONLY",
+      "legacyGuardCredited": false,
+      "name": "exact-accepted-delta",
+      "otherActualInputsUnchanged": true,
+      "reason": null,
+      "result": {
+        "capturedLocalReferenceKinds": {
+          "Load": 4,
+          "Store": 1
+        },
+        "changedOtherPaths": [],
+        "closedGrammarReason": null,
+        "expectedOwnerDerivationSHA256": "c135d36f07fc81143e7e9b95ce56d2b4382bfea4a5d5fdf0a297a5b6c3e5298f",
+        "other24RawBytesEqualRealBASE": true,
+        "ownerDerivationReason": null,
+        "reason": null,
+        "referenceContract": {
+          "directNodeIdentityRequired": true,
+          "forwardCallWitness": {
+            "expressionSHA256": "476fd474759435bc098bef7e35bc2bdc8e58826f015228e59a6ee794db8867cb",
+            "fileSHA256": "82f029614537eb5bab56934e4b6736fe3dd52ece54b9b9a3996815b131e41de4",
+            "function": "inv.dispatch.DeliveryWorker.once",
+            "path": "services/control-plane/src/inv/dispatch.py",
+            "span": [
+              339,
+              12,
+              344,
+              13
+            ]
+          },
+          "projectedForwardAttribute": {
+            "expressionSHA256": "26a4e065c848c1fb80b56f62bc7cae559f203434e03608f75572d2fe7eedf297",
+            "fileSHA256": "82f029614537eb5bab56934e4b6736fe3dd52ece54b9b9a3996815b131e41de4",
+            "function": "inv.dispatch.DeliveryWorker.once",
+            "path": "services/control-plane/src/inv/dispatch.py",
+            "span": [
+              339,
+              12,
+              339,
+              33
+            ]
+          },
+          "reason": null,
+          "references": [
+            {
+              "attributeKind": "Attribute",
+              "attributeSource": {
+                "expressionSHA256": "26a4e065c848c1fb80b56f62bc7cae559f203434e03608f75572d2fe7eedf297",
+                "fileSHA256": "82f029614537eb5bab56934e4b6736fe3dd52ece54b9b9a3996815b131e41de4",
+                "function": "inv.dispatch.DeliveryWorker.once",
+                "path": "services/control-plane/src/inv/dispatch.py",
+                "span": [
+                  339,
+                  12,
+                  339,
+                  33
+                ]
+              },
+              "callKind": "Call",
+              "callSource": {
+                "expressionSHA256": "476fd474759435bc098bef7e35bc2bdc8e58826f015228e59a6ee794db8867cb",
+                "fileSHA256": "82f029614537eb5bab56934e4b6736fe3dd52ece54b9b9a3996815b131e41de4",
+                "function": "inv.dispatch.DeliveryWorker.once",
+                "path": "services/control-plane/src/inv/dispatch.py",
+                "span": [
+                  339,
+                  12,
+                  344,
+                  13
+                ]
+              },
+              "directCallFunc": true
+            }
+          ],
+          "sameKindWitnessComparison": true
+        },
+        "scopedSourceCount": 25,
+        "sourcePathSetEqual": true,
+        "wholeModuleNormalizedASTEqualsDerivedBASEPlusExactDelta": true
+      },
+      "runtimeOrTestedHashGateCredited": false,
+      "syntaxValid": true
+    },
+    {
+      "changedInputs": [
+        {
+          "path": "services/control-plane/src/inv/dispatch.py",
+          "sha256": "e4f87a01b4d9c3a8c7d04bef4669c4262b867f392628a22c51e4c2445a4cf143"
+        }
+      ],
+      "expectationMet": true,
+      "expectedReason": "CAPTURE_GUARD_GRAMMAR_CHANGED",
+      "layer": "NEW_FINITE_COMPATIBILITY_ONLY",
+      "legacyGuardCredited": false,
+      "name": "missing-type-gate",
+      "otherActualInputsUnchanged": true,
+      "reason": "CAPTURE_GUARD_GRAMMAR_CHANGED",
+      "result": {
+        "capturedLocalReferenceKinds": null,
+        "changedOtherPaths": [],
+        "closedGrammarReason": "CAPTURE_GUARD_GRAMMAR_CHANGED",
+        "expectedOwnerDerivationSHA256": "c135d36f07fc81143e7e9b95ce56d2b4382bfea4a5d5fdf0a297a5b6c3e5298f",
+        "other24RawBytesEqualRealBASE": true,
+        "ownerDerivationReason": null,
+        "reason": "CAPTURE_GUARD_GRAMMAR_CHANGED",
+        "referenceContract": {
+          "directNodeIdentityRequired": true,
+          "forwardCallWitness": {
+            "expressionSHA256": "476fd474759435bc098bef7e35bc2bdc8e58826f015228e59a6ee794db8867cb",
+            "fileSHA256": "e4f87a01b4d9c3a8c7d04bef4669c4262b867f392628a22c51e4c2445a4cf143",
+            "function": "inv.dispatch.DeliveryWorker.once",
+            "path": "services/control-plane/src/inv/dispatch.py",
+            "span": [
+              339,
+              12,
+              344,
+              13
+            ]
+          },
+          "projectedForwardAttribute": {
+            "expressionSHA256": "26a4e065c848c1fb80b56f62bc7cae559f203434e03608f75572d2fe7eedf297",
+            "fileSHA256": "e4f87a01b4d9c3a8c7d04bef4669c4262b867f392628a22c51e4c2445a4cf143",
+            "function": "inv.dispatch.DeliveryWorker.once",
+            "path": "services/control-plane/src/inv/dispatch.py",
+            "span": [
+              339,
+              12,
+              339,
+              33
+            ]
+          },
+          "reason": null,
+          "references": [
+            {
+              "attributeKind": "Attribute",
+              "attributeSource": {
+                "expressionSHA256": "26a4e065c848c1fb80b56f62bc7cae559f203434e03608f75572d2fe7eedf297",
+                "fileSHA256": "e4f87a01b4d9c3a8c7d04bef4669c4262b867f392628a22c51e4c2445a4cf143",
+                "function": "inv.dispatch.DeliveryWorker.once",
+                "path": "services/control-plane/src/inv/dispatch.py",
+                "span": [
+                  339,
+                  12,
+                  339,
+                  33
+                ]
+              },
+              "callKind": "Call",
+              "callSource": {
+                "expressionSHA256": "476fd474759435bc098bef7e35bc2bdc8e58826f015228e59a6ee794db8867cb",
+                "fileSHA256": "e4f87a01b4d9c3a8c7d04bef4669c4262b867f392628a22c51e4c2445a4cf143",
+                "function": "inv.dispatch.DeliveryWorker.once",
+                "path": "services/control-plane/src/inv/dispatch.py",
+                "span": [
+                  339,
+                  12,
+                  344,
+                  13
+                ]
+              },
+              "directCallFunc": true
+            }
+          ],
+          "sameKindWitnessComparison": true
+        },
+        "scopedSourceCount": 25,
+        "sourcePathSetEqual": true,
+        "wholeModuleNormalizedASTEqualsDerivedBASEPlusExactDelta": false
+      },
+      "runtimeOrTestedHashGateCredited": false,
+      "syntaxValid": true
+    },
+    {
+      "changedInputs": [
+        {
+          "path": "services/control-plane/src/inv/dispatch.py",
+          "sha256": "e82e55aae83785cd545dd610980a9bcf5118a281820cf9155069a467d51b40fe"
+        }
+      ],
+      "expectationMet": true,
+      "expectedReason": "CAPTURE_GUARD_GRAMMAR_CHANGED",
+      "layer": "NEW_FINITE_COMPATIBILITY_ONLY",
+      "legacyGuardCredited": false,
+      "name": "wrong-boolean-connective",
+      "otherActualInputsUnchanged": true,
+      "reason": "CAPTURE_GUARD_GRAMMAR_CHANGED",
+      "result": {
+        "capturedLocalReferenceKinds": null,
+        "changedOtherPaths": [],
+        "closedGrammarReason": "CAPTURE_GUARD_GRAMMAR_CHANGED",
+        "expectedOwnerDerivationSHA256": "c135d36f07fc81143e7e9b95ce56d2b4382bfea4a5d5fdf0a297a5b6c3e5298f",
+        "other24RawBytesEqualRealBASE": true,
+        "ownerDerivationReason": null,
+        "reason": "CAPTURE_GUARD_GRAMMAR_CHANGED",
+        "referenceContract": {
+          "directNodeIdentityRequired": true,
+          "forwardCallWitness": {
+            "expressionSHA256": "476fd474759435bc098bef7e35bc2bdc8e58826f015228e59a6ee794db8867cb",
+            "fileSHA256": "e82e55aae83785cd545dd610980a9bcf5118a281820cf9155069a467d51b40fe",
+            "function": "inv.dispatch.DeliveryWorker.once",
+            "path": "services/control-plane/src/inv/dispatch.py",
+            "span": [
+              339,
+              12,
+              344,
+              13
+            ]
+          },
+          "projectedForwardAttribute": {
+            "expressionSHA256": "26a4e065c848c1fb80b56f62bc7cae559f203434e03608f75572d2fe7eedf297",
+            "fileSHA256": "e82e55aae83785cd545dd610980a9bcf5118a281820cf9155069a467d51b40fe",
+            "function": "inv.dispatch.DeliveryWorker.once",
+            "path": "services/control-plane/src/inv/dispatch.py",
+            "span": [
+              339,
+              12,
+              339,
+              33
+            ]
+          },
+          "reason": null,
+          "references": [
+            {
+              "attributeKind": "Attribute",
+              "attributeSource": {
+                "expressionSHA256": "26a4e065c848c1fb80b56f62bc7cae559f203434e03608f75572d2fe7eedf297",
+                "fileSHA256": "e82e55aae83785cd545dd610980a9bcf5118a281820cf9155069a467d51b40fe",
+                "function": "inv.dispatch.DeliveryWorker.once",
+                "path": "services/control-plane/src/inv/dispatch.py",
+                "span": [
+                  339,
+                  12,
+                  339,
+                  33
+                ]
+              },
+              "callKind": "Call",
+              "callSource": {
+                "expressionSHA256": "476fd474759435bc098bef7e35bc2bdc8e58826f015228e59a6ee794db8867cb",
+                "fileSHA256": "e82e55aae83785cd545dd610980a9bcf5118a281820cf9155069a467d51b40fe",
+                "function": "inv.dispatch.DeliveryWorker.once",
+                "path": "services/control-plane/src/inv/dispatch.py",
+                "span": [
+                  339,
+                  12,
+                  344,
+                  13
+                ]
+              },
+              "directCallFunc": true
+            }
+          ],
+          "sameKindWitnessComparison": true
+        },
+        "scopedSourceCount": 25,
+        "sourcePathSetEqual": true,
+        "wholeModuleNormalizedASTEqualsDerivedBASEPlusExactDelta": false
+      },
+      "runtimeOrTestedHashGateCredited": false,
+      "syntaxValid": true
+    },
+    {
+      "changedInputs": [
+        {
+          "path": "services/control-plane/src/inv/dispatch.py",
+          "sha256": "39e5c0f00f92e9a17d866e53aec4921e3c13e25d250681ef5b5cc773e4924629"
+        }
+      ],
+      "expectationMet": true,
+      "expectedReason": "CAPTURE_GUARD_GRAMMAR_CHANGED",
+      "layer": "NEW_FINITE_COMPATIBILITY_ONLY",
+      "legacyGuardCredited": false,
+      "name": "widened-admitted-type",
+      "otherActualInputsUnchanged": true,
+      "reason": "CAPTURE_GUARD_GRAMMAR_CHANGED",
+      "result": {
+        "capturedLocalReferenceKinds": null,
+        "changedOtherPaths": [],
+        "closedGrammarReason": "CAPTURE_GUARD_GRAMMAR_CHANGED",
+        "expectedOwnerDerivationSHA256": "c135d36f07fc81143e7e9b95ce56d2b4382bfea4a5d5fdf0a297a5b6c3e5298f",
+        "other24RawBytesEqualRealBASE": true,
+        "ownerDerivationReason": null,
+        "reason": "CAPTURE_GUARD_GRAMMAR_CHANGED",
+        "referenceContract": {
+          "directNodeIdentityRequired": true,
+          "forwardCallWitness": {
+            "expressionSHA256": "476fd474759435bc098bef7e35bc2bdc8e58826f015228e59a6ee794db8867cb",
+            "fileSHA256": "39e5c0f00f92e9a17d866e53aec4921e3c13e25d250681ef5b5cc773e4924629",
+            "function": "inv.dispatch.DeliveryWorker.once",
+            "path": "services/control-plane/src/inv/dispatch.py",
+            "span": [
+              339,
+              12,
+              344,
+              13
+            ]
+          },
+          "projectedForwardAttribute": {
+            "expressionSHA256": "26a4e065c848c1fb80b56f62bc7cae559f203434e03608f75572d2fe7eedf297",
+            "fileSHA256": "39e5c0f00f92e9a17d866e53aec4921e3c13e25d250681ef5b5cc773e4924629",
+            "function": "inv.dispatch.DeliveryWorker.once",
+            "path": "services/control-plane/src/inv/dispatch.py",
+            "span": [
+              339,
+              12,
+              339,
+              33
+            ]
+          },
+          "reason": null,
+          "references": [
+            {
+              "attributeKind": "Attribute",
+              "attributeSource": {
+                "expressionSHA256": "26a4e065c848c1fb80b56f62bc7cae559f203434e03608f75572d2fe7eedf297",
+                "fileSHA256": "39e5c0f00f92e9a17d866e53aec4921e3c13e25d250681ef5b5cc773e4924629",
+                "function": "inv.dispatch.DeliveryWorker.once",
+                "path": "services/control-plane/src/inv/dispatch.py",
+                "span": [
+                  339,
+                  12,
+                  339,
+                  33
+                ]
+              },
+              "callKind": "Call",
+              "callSource": {
+                "expressionSHA256": "476fd474759435bc098bef7e35bc2bdc8e58826f015228e59a6ee794db8867cb",
+                "fileSHA256": "39e5c0f00f92e9a17d866e53aec4921e3c13e25d250681ef5b5cc773e4924629",
+                "function": "inv.dispatch.DeliveryWorker.once",
+                "path": "services/control-plane/src/inv/dispatch.py",
+                "span": [
+                  339,
+                  12,
+                  344,
+                  13
+                ]
+              },
+              "directCallFunc": true
+            }
+          ],
+          "sameKindWitnessComparison": true
+        },
+        "scopedSourceCount": 25,
+        "sourcePathSetEqual": true,
+        "wholeModuleNormalizedASTEqualsDerivedBASEPlusExactDelta": false
+      },
+      "runtimeOrTestedHashGateCredited": false,
+      "syntaxValid": true
+    },
+    {
+      "changedInputs": [
+        {
+          "path": "services/control-plane/src/inv/dispatch.py",
+          "sha256": "1d25fd85fc096d29645befb14895e568c95605ef4162644c19e67f58b4d11384"
+        }
+      ],
+      "expectationMet": true,
+      "expectedReason": "CAPTURE_GUARD_GRAMMAR_CHANGED",
+      "layer": "NEW_FINITE_COMPATIBILITY_ONLY",
+      "legacyGuardCredited": false,
+      "name": "widened-domain",
+      "otherActualInputsUnchanged": true,
+      "reason": "CAPTURE_GUARD_GRAMMAR_CHANGED",
+      "result": {
+        "capturedLocalReferenceKinds": null,
+        "changedOtherPaths": [],
+        "closedGrammarReason": "CAPTURE_GUARD_GRAMMAR_CHANGED",
+        "expectedOwnerDerivationSHA256": "c135d36f07fc81143e7e9b95ce56d2b4382bfea4a5d5fdf0a297a5b6c3e5298f",
+        "other24RawBytesEqualRealBASE": true,
+        "ownerDerivationReason": null,
+        "reason": "CAPTURE_GUARD_GRAMMAR_CHANGED",
+        "referenceContract": {
+          "directNodeIdentityRequired": true,
+          "forwardCallWitness": {
+            "expressionSHA256": "476fd474759435bc098bef7e35bc2bdc8e58826f015228e59a6ee794db8867cb",
+            "fileSHA256": "1d25fd85fc096d29645befb14895e568c95605ef4162644c19e67f58b4d11384",
+            "function": "inv.dispatch.DeliveryWorker.once",
+            "path": "services/control-plane/src/inv/dispatch.py",
+            "span": [
+              339,
+              12,
+              344,
+              13
+            ]
+          },
+          "projectedForwardAttribute": {
+            "expressionSHA256": "26a4e065c848c1fb80b56f62bc7cae559f203434e03608f75572d2fe7eedf297",
+            "fileSHA256": "1d25fd85fc096d29645befb14895e568c95605ef4162644c19e67f58b4d11384",
+            "function": "inv.dispatch.DeliveryWorker.once",
+            "path": "services/control-plane/src/inv/dispatch.py",
+            "span": [
+              339,
+              12,
+              339,
+              33
+            ]
+          },
+          "reason": null,
+          "references": [
+            {
+              "attributeKind": "Attribute",
+              "attributeSource": {
+                "expressionSHA256": "26a4e065c848c1fb80b56f62bc7cae559f203434e03608f75572d2fe7eedf297",
+                "fileSHA256": "1d25fd85fc096d29645befb14895e568c95605ef4162644c19e67f58b4d11384",
+                "function": "inv.dispatch.DeliveryWorker.once",
+                "path": "services/control-plane/src/inv/dispatch.py",
+                "span": [
+                  339,
+                  12,
+                  339,
+                  33
+                ]
+              },
+              "callKind": "Call",
+              "callSource": {
+                "expressionSHA256": "476fd474759435bc098bef7e35bc2bdc8e58826f015228e59a6ee794db8867cb",
+                "fileSHA256": "1d25fd85fc096d29645befb14895e568c95605ef4162644c19e67f58b4d11384",
+                "function": "inv.dispatch.DeliveryWorker.once",
+                "path": "services/control-plane/src/inv/dispatch.py",
+                "span": [
+                  339,
+                  12,
+                  344,
+                  13
+                ]
+              },
+              "directCallFunc": true
+            }
+          ],
+          "sameKindWitnessComparison": true
+        },
+        "scopedSourceCount": 25,
+        "sourcePathSetEqual": true,
+        "wholeModuleNormalizedASTEqualsDerivedBASEPlusExactDelta": false
+      },
+      "runtimeOrTestedHashGateCredited": false,
+      "syntaxValid": true
+    },
+    {
+      "changedInputs": [
+        {
+          "path": "services/control-plane/src/inv/dispatch.py",
+          "sha256": "b2fa954a5cdd7986eeebad5b31a920908c59c9617fbbdf8a7afaabd341e7bc17"
+        }
+      ],
+      "expectationMet": true,
+      "expectedReason": "CAPTURED_LOCAL_REFERENCE_SET_CHANGED",
+      "layer": "NEW_FINITE_COMPATIBILITY_ONLY",
+      "legacyGuardCredited": false,
+      "name": "extra-captured-local-reference",
+      "otherActualInputsUnchanged": true,
+      "reason": "CAPTURED_LOCAL_REFERENCE_SET_CHANGED",
+      "result": {
+        "capturedLocalReferenceKinds": null,
+        "changedOtherPaths": [],
+        "closedGrammarReason": "CAPTURED_LOCAL_REFERENCE_SET_CHANGED",
+        "expectedOwnerDerivationSHA256": "c135d36f07fc81143e7e9b95ce56d2b4382bfea4a5d5fdf0a297a5b6c3e5298f",
+        "other24RawBytesEqualRealBASE": true,
+        "ownerDerivationReason": null,
+        "reason": "CAPTURED_LOCAL_REFERENCE_SET_CHANGED",
+        "referenceContract": {
+          "directNodeIdentityRequired": true,
+          "forwardCallWitness": {
+            "expressionSHA256": "476fd474759435bc098bef7e35bc2bdc8e58826f015228e59a6ee794db8867cb",
+            "fileSHA256": "b2fa954a5cdd7986eeebad5b31a920908c59c9617fbbdf8a7afaabd341e7bc17",
+            "function": "inv.dispatch.DeliveryWorker.once",
+            "path": "services/control-plane/src/inv/dispatch.py",
+            "span": [
+              340,
+              12,
+              345,
+              13
+            ]
+          },
+          "projectedForwardAttribute": {
+            "expressionSHA256": "26a4e065c848c1fb80b56f62bc7cae559f203434e03608f75572d2fe7eedf297",
+            "fileSHA256": "b2fa954a5cdd7986eeebad5b31a920908c59c9617fbbdf8a7afaabd341e7bc17",
+            "function": "inv.dispatch.DeliveryWorker.once",
+            "path": "services/control-plane/src/inv/dispatch.py",
+            "span": [
+              340,
+              12,
+              340,
+              33
+            ]
+          },
+          "reason": null,
+          "references": [
+            {
+              "attributeKind": "Attribute",
+              "attributeSource": {
+                "expressionSHA256": "26a4e065c848c1fb80b56f62bc7cae559f203434e03608f75572d2fe7eedf297",
+                "fileSHA256": "b2fa954a5cdd7986eeebad5b31a920908c59c9617fbbdf8a7afaabd341e7bc17",
+                "function": "inv.dispatch.DeliveryWorker.once",
+                "path": "services/control-plane/src/inv/dispatch.py",
+                "span": [
+                  340,
+                  12,
+                  340,
+                  33
+                ]
+              },
+              "callKind": "Call",
+              "callSource": {
+                "expressionSHA256": "476fd474759435bc098bef7e35bc2bdc8e58826f015228e59a6ee794db8867cb",
+                "fileSHA256": "b2fa954a5cdd7986eeebad5b31a920908c59c9617fbbdf8a7afaabd341e7bc17",
+                "function": "inv.dispatch.DeliveryWorker.once",
+                "path": "services/control-plane/src/inv/dispatch.py",
+                "span": [
+                  340,
+                  12,
+                  345,
+                  13
+                ]
+              },
+              "directCallFunc": true
+            }
+          ],
+          "sameKindWitnessComparison": true
+        },
+        "scopedSourceCount": 25,
+        "sourcePathSetEqual": true,
+        "wholeModuleNormalizedASTEqualsDerivedBASEPlusExactDelta": false
+      },
+      "runtimeOrTestedHashGateCredited": false,
+      "syntaxValid": true
+    },
+    {
+      "changedInputs": [
+        {
+          "path": "services/control-plane/src/inv/dispatch.py",
+          "sha256": "8dea8f2587b77eab38200ccd32837741cc52f132faba705955661eba5e1502a1"
+        }
+      ],
+      "expectationMet": true,
+      "expectedReason": "CAPTURED_LOCAL_REFERENCE_SET_CHANGED",
+      "layer": "NEW_FINITE_COMPATIBILITY_ONLY",
+      "legacyGuardCredited": false,
+      "name": "extra-captured-local-store",
+      "otherActualInputsUnchanged": true,
+      "reason": "CAPTURED_LOCAL_REFERENCE_SET_CHANGED",
+      "result": {
+        "capturedLocalReferenceKinds": null,
+        "changedOtherPaths": [],
+        "closedGrammarReason": "CAPTURED_LOCAL_REFERENCE_SET_CHANGED",
+        "expectedOwnerDerivationSHA256": "c135d36f07fc81143e7e9b95ce56d2b4382bfea4a5d5fdf0a297a5b6c3e5298f",
+        "other24RawBytesEqualRealBASE": true,
+        "ownerDerivationReason": null,
+        "reason": "CAPTURED_LOCAL_REFERENCE_SET_CHANGED",
+        "referenceContract": {
+          "directNodeIdentityRequired": true,
+          "forwardCallWitness": {
+            "expressionSHA256": "476fd474759435bc098bef7e35bc2bdc8e58826f015228e59a6ee794db8867cb",
+            "fileSHA256": "8dea8f2587b77eab38200ccd32837741cc52f132faba705955661eba5e1502a1",
+            "function": "inv.dispatch.DeliveryWorker.once",
+            "path": "services/control-plane/src/inv/dispatch.py",
+            "span": [
+              340,
+              12,
+              345,
+              13
+            ]
+          },
+          "projectedForwardAttribute": {
+            "expressionSHA256": "26a4e065c848c1fb80b56f62bc7cae559f203434e03608f75572d2fe7eedf297",
+            "fileSHA256": "8dea8f2587b77eab38200ccd32837741cc52f132faba705955661eba5e1502a1",
+            "function": "inv.dispatch.DeliveryWorker.once",
+            "path": "services/control-plane/src/inv/dispatch.py",
+            "span": [
+              340,
+              12,
+              340,
+              33
+            ]
+          },
+          "reason": null,
+          "references": [
+            {
+              "attributeKind": "Attribute",
+              "attributeSource": {
+                "expressionSHA256": "26a4e065c848c1fb80b56f62bc7cae559f203434e03608f75572d2fe7eedf297",
+                "fileSHA256": "8dea8f2587b77eab38200ccd32837741cc52f132faba705955661eba5e1502a1",
+                "function": "inv.dispatch.DeliveryWorker.once",
+                "path": "services/control-plane/src/inv/dispatch.py",
+                "span": [
+                  340,
+                  12,
+                  340,
+                  33
+                ]
+              },
+              "callKind": "Call",
+              "callSource": {
+                "expressionSHA256": "476fd474759435bc098bef7e35bc2bdc8e58826f015228e59a6ee794db8867cb",
+                "fileSHA256": "8dea8f2587b77eab38200ccd32837741cc52f132faba705955661eba5e1502a1",
+                "function": "inv.dispatch.DeliveryWorker.once",
+                "path": "services/control-plane/src/inv/dispatch.py",
+                "span": [
+                  340,
+                  12,
+                  345,
+                  13
+                ]
+              },
+              "directCallFunc": true
+            }
+          ],
+          "sameKindWitnessComparison": true
+        },
+        "scopedSourceCount": 25,
+        "sourcePathSetEqual": true,
+        "wholeModuleNormalizedASTEqualsDerivedBASEPlusExactDelta": false
+      },
+      "runtimeOrTestedHashGateCredited": false,
+      "syntaxValid": true
+    },
+    {
+      "changedInputs": [
+        {
+          "path": "services/control-plane/src/inv/dispatch.py",
+          "sha256": "b64d3b1d77bed79cf9fb59e3d50971eb57db6f8b578dc3161e436547d0cf0c0d"
+        }
+      ],
+      "expectationMet": true,
+      "expectedReason": "CAPTURED_LOCAL_REFERENCE_SET_CHANGED",
+      "layer": "NEW_FINITE_COMPATIBILITY_ONLY",
+      "legacyGuardCredited": false,
+      "name": "extra-captured-local-pass-through",
+      "otherActualInputsUnchanged": true,
+      "reason": "CAPTURED_LOCAL_REFERENCE_SET_CHANGED",
+      "result": {
+        "capturedLocalReferenceKinds": null,
+        "changedOtherPaths": [],
+        "closedGrammarReason": "CAPTURED_LOCAL_REFERENCE_SET_CHANGED",
+        "expectedOwnerDerivationSHA256": "c135d36f07fc81143e7e9b95ce56d2b4382bfea4a5d5fdf0a297a5b6c3e5298f",
+        "other24RawBytesEqualRealBASE": true,
+        "ownerDerivationReason": null,
+        "reason": "CAPTURED_LOCAL_REFERENCE_SET_CHANGED",
+        "referenceContract": {
+          "directNodeIdentityRequired": true,
+          "forwardCallWitness": {
+            "expressionSHA256": "806644baeeba585956445bbd640631922f9352790eae8eaf26858d048aea4abb",
+            "fileSHA256": "b64d3b1d77bed79cf9fb59e3d50971eb57db6f8b578dc3161e436547d0cf0c0d",
+            "function": "inv.dispatch.DeliveryWorker.once",
+            "path": "services/control-plane/src/inv/dispatch.py",
+            "span": [
+              339,
+              12,
+              345,
+              13
+            ]
+          },
+          "projectedForwardAttribute": {
+            "expressionSHA256": "26a4e065c848c1fb80b56f62bc7cae559f203434e03608f75572d2fe7eedf297",
+            "fileSHA256": "b64d3b1d77bed79cf9fb59e3d50971eb57db6f8b578dc3161e436547d0cf0c0d",
+            "function": "inv.dispatch.DeliveryWorker.once",
+            "path": "services/control-plane/src/inv/dispatch.py",
+            "span": [
+              339,
+              12,
+              339,
+              33
+            ]
+          },
+          "reason": null,
+          "references": [
+            {
+              "attributeKind": "Attribute",
+              "attributeSource": {
+                "expressionSHA256": "26a4e065c848c1fb80b56f62bc7cae559f203434e03608f75572d2fe7eedf297",
+                "fileSHA256": "b64d3b1d77bed79cf9fb59e3d50971eb57db6f8b578dc3161e436547d0cf0c0d",
+                "function": "inv.dispatch.DeliveryWorker.once",
+                "path": "services/control-plane/src/inv/dispatch.py",
+                "span": [
+                  339,
+                  12,
+                  339,
+                  33
+                ]
+              },
+              "callKind": "Call",
+              "callSource": {
+                "expressionSHA256": "806644baeeba585956445bbd640631922f9352790eae8eaf26858d048aea4abb",
+                "fileSHA256": "b64d3b1d77bed79cf9fb59e3d50971eb57db6f8b578dc3161e436547d0cf0c0d",
+                "function": "inv.dispatch.DeliveryWorker.once",
+                "path": "services/control-plane/src/inv/dispatch.py",
+                "span": [
+                  339,
+                  12,
+                  345,
+                  13
+                ]
+              },
+              "directCallFunc": true
+            }
+          ],
+          "sameKindWitnessComparison": true
+        },
+        "scopedSourceCount": 25,
+        "sourcePathSetEqual": true,
+        "wholeModuleNormalizedASTEqualsDerivedBASEPlusExactDelta": false
+      },
+      "runtimeOrTestedHashGateCredited": false,
+      "syntaxValid": true
+    },
+    {
+      "changedInputs": [
+        {
+          "path": "services/control-plane/src/inv/dispatch.py",
+          "sha256": "d74efa9003d6036c0185df5ee91ffb25ae5d7c6b054b48c4da7a0ab825ea45c9"
+        }
+      ],
+      "expectationMet": true,
+      "expectedReason": "CAPTURED_LOCAL_REFERENCE_SET_CHANGED",
+      "layer": "NEW_FINITE_COMPATIBILITY_ONLY",
+      "legacyGuardCredited": false,
+      "name": "extra-captured-local-alias",
+      "otherActualInputsUnchanged": true,
+      "reason": "CAPTURED_LOCAL_REFERENCE_SET_CHANGED",
+      "result": {
+        "capturedLocalReferenceKinds": null,
+        "changedOtherPaths": [],
+        "closedGrammarReason": "CAPTURED_LOCAL_REFERENCE_SET_CHANGED",
+        "expectedOwnerDerivationSHA256": "c135d36f07fc81143e7e9b95ce56d2b4382bfea4a5d5fdf0a297a5b6c3e5298f",
+        "other24RawBytesEqualRealBASE": true,
+        "ownerDerivationReason": "OWNER_DERIVATION_CHANGED",
+        "reason": "CAPTURED_LOCAL_REFERENCE_SET_CHANGED",
+        "referenceContract": {
+          "directNodeIdentityRequired": true,
+          "forwardCallWitness": {
+            "expressionSHA256": "476fd474759435bc098bef7e35bc2bdc8e58826f015228e59a6ee794db8867cb",
+            "fileSHA256": "d74efa9003d6036c0185df5ee91ffb25ae5d7c6b054b48c4da7a0ab825ea45c9",
+            "function": "inv.dispatch.DeliveryWorker.once",
+            "path": "services/control-plane/src/inv/dispatch.py",
+            "span": [
+              340,
+              12,
+              345,
+              13
+            ]
+          },
+          "projectedForwardAttribute": {
+            "expressionSHA256": "26a4e065c848c1fb80b56f62bc7cae559f203434e03608f75572d2fe7eedf297",
+            "fileSHA256": "d74efa9003d6036c0185df5ee91ffb25ae5d7c6b054b48c4da7a0ab825ea45c9",
+            "function": "inv.dispatch.DeliveryWorker.once",
+            "path": "services/control-plane/src/inv/dispatch.py",
+            "span": [
+              340,
+              12,
+              340,
+              33
+            ]
+          },
+          "reason": null,
+          "references": [
+            {
+              "attributeKind": "Attribute",
+              "attributeSource": {
+                "expressionSHA256": "26a4e065c848c1fb80b56f62bc7cae559f203434e03608f75572d2fe7eedf297",
+                "fileSHA256": "d74efa9003d6036c0185df5ee91ffb25ae5d7c6b054b48c4da7a0ab825ea45c9",
+                "function": "inv.dispatch.DeliveryWorker.once",
+                "path": "services/control-plane/src/inv/dispatch.py",
+                "span": [
+                  340,
+                  12,
+                  340,
+                  33
+                ]
+              },
+              "callKind": "Call",
+              "callSource": {
+                "expressionSHA256": "476fd474759435bc098bef7e35bc2bdc8e58826f015228e59a6ee794db8867cb",
+                "fileSHA256": "d74efa9003d6036c0185df5ee91ffb25ae5d7c6b054b48c4da7a0ab825ea45c9",
+                "function": "inv.dispatch.DeliveryWorker.once",
+                "path": "services/control-plane/src/inv/dispatch.py",
+                "span": [
+                  340,
+                  12,
+                  345,
+                  13
+                ]
+              },
+              "directCallFunc": true
+            }
+          ],
+          "sameKindWitnessComparison": true
+        },
+        "scopedSourceCount": 25,
+        "sourcePathSetEqual": true,
+        "wholeModuleNormalizedASTEqualsDerivedBASEPlusExactDelta": false
+      },
+      "runtimeOrTestedHashGateCredited": false,
+      "syntaxValid": true
+    },
+    {
+      "changedInputs": [
+        {
+          "path": "services/control-plane/src/inv/dispatch.py",
+          "sha256": "77585d478467df930c7ccf75f17ced158f74d27a414aff4f5f8f7bee1f250521"
+        }
+      ],
+      "expectationMet": true,
+      "expectedReason": "CAPTURED_LOCAL_REFERENCE_SET_CHANGED",
+      "layer": "NEW_FINITE_COMPATIBILITY_ONLY",
+      "legacyGuardCredited": false,
+      "name": "extra-captured-local-closure",
+      "otherActualInputsUnchanged": true,
+      "reason": "CAPTURED_LOCAL_REFERENCE_SET_CHANGED",
+      "result": {
+        "capturedLocalReferenceKinds": null,
+        "changedOtherPaths": [],
+        "closedGrammarReason": "CAPTURED_LOCAL_REFERENCE_SET_CHANGED",
+        "expectedOwnerDerivationSHA256": "c135d36f07fc81143e7e9b95ce56d2b4382bfea4a5d5fdf0a297a5b6c3e5298f",
+        "other24RawBytesEqualRealBASE": true,
+        "ownerDerivationReason": null,
+        "reason": "CAPTURED_LOCAL_REFERENCE_SET_CHANGED",
+        "referenceContract": {
+          "directNodeIdentityRequired": true,
+          "forwardCallWitness": {
+            "expressionSHA256": "476fd474759435bc098bef7e35bc2bdc8e58826f015228e59a6ee794db8867cb",
+            "fileSHA256": "77585d478467df930c7ccf75f17ced158f74d27a414aff4f5f8f7bee1f250521",
+            "function": "inv.dispatch.DeliveryWorker.once",
+            "path": "services/control-plane/src/inv/dispatch.py",
+            "span": [
+              340,
+              12,
+              345,
+              13
+            ]
+          },
+          "projectedForwardAttribute": {
+            "expressionSHA256": "26a4e065c848c1fb80b56f62bc7cae559f203434e03608f75572d2fe7eedf297",
+            "fileSHA256": "77585d478467df930c7ccf75f17ced158f74d27a414aff4f5f8f7bee1f250521",
+            "function": "inv.dispatch.DeliveryWorker.once",
+            "path": "services/control-plane/src/inv/dispatch.py",
+            "span": [
+              340,
+              12,
+              340,
+              33
+            ]
+          },
+          "reason": null,
+          "references": [
+            {
+              "attributeKind": "Attribute",
+              "attributeSource": {
+                "expressionSHA256": "26a4e065c848c1fb80b56f62bc7cae559f203434e03608f75572d2fe7eedf297",
+                "fileSHA256": "77585d478467df930c7ccf75f17ced158f74d27a414aff4f5f8f7bee1f250521",
+                "function": "inv.dispatch.DeliveryWorker.once",
+                "path": "services/control-plane/src/inv/dispatch.py",
+                "span": [
+                  340,
+                  12,
+                  340,
+                  33
+                ]
+              },
+              "callKind": "Call",
+              "callSource": {
+                "expressionSHA256": "476fd474759435bc098bef7e35bc2bdc8e58826f015228e59a6ee794db8867cb",
+                "fileSHA256": "77585d478467df930c7ccf75f17ced158f74d27a414aff4f5f8f7bee1f250521",
+                "function": "inv.dispatch.DeliveryWorker.once",
+                "path": "services/control-plane/src/inv/dispatch.py",
+                "span": [
+                  340,
+                  12,
+                  345,
+                  13
+                ]
+              },
+              "directCallFunc": true
+            }
+          ],
+          "sameKindWitnessComparison": true
+        },
+        "scopedSourceCount": 25,
+        "sourcePathSetEqual": true,
+        "wholeModuleNormalizedASTEqualsDerivedBASEPlusExactDelta": false
+      },
+      "runtimeOrTestedHashGateCredited": false,
+      "syntaxValid": true
+    },
+    {
+      "changedInputs": [
+        {
+          "path": "services/control-plane/src/inv/dispatch.py",
+          "sha256": "2ec2971be6fb6e7323c38689c10ca91553f2cdc2b7b1414f1aece30c6bc846de"
+        }
+      ],
+      "expectationMet": true,
+      "expectedReason": "CAPTURED_OPERATION_ACCESS_SET_CHANGED",
+      "layer": "NEW_FINITE_COMPATIBILITY_ONLY",
+      "legacyGuardCredited": false,
+      "name": "extra-property-access",
+      "otherActualInputsUnchanged": true,
+      "reason": "CAPTURED_OPERATION_ACCESS_SET_CHANGED",
+      "result": {
+        "capturedLocalReferenceKinds": null,
+        "changedOtherPaths": [],
+        "closedGrammarReason": "CAPTURED_OPERATION_ACCESS_SET_CHANGED",
+        "expectedOwnerDerivationSHA256": "c135d36f07fc81143e7e9b95ce56d2b4382bfea4a5d5fdf0a297a5b6c3e5298f",
+        "other24RawBytesEqualRealBASE": true,
+        "ownerDerivationReason": "OWNER_DERIVATION_CHANGED",
+        "reason": "CAPTURED_OPERATION_ACCESS_SET_CHANGED",
+        "referenceContract": {
+          "directNodeIdentityRequired": true,
+          "forwardCallWitness": {
+            "expressionSHA256": "476fd474759435bc098bef7e35bc2bdc8e58826f015228e59a6ee794db8867cb",
+            "fileSHA256": "2ec2971be6fb6e7323c38689c10ca91553f2cdc2b7b1414f1aece30c6bc846de",
+            "function": "inv.dispatch.DeliveryWorker.once",
+            "path": "services/control-plane/src/inv/dispatch.py",
+            "span": [
+              340,
+              12,
+              345,
+              13
+            ]
+          },
+          "projectedForwardAttribute": {
+            "expressionSHA256": "26a4e065c848c1fb80b56f62bc7cae559f203434e03608f75572d2fe7eedf297",
+            "fileSHA256": "2ec2971be6fb6e7323c38689c10ca91553f2cdc2b7b1414f1aece30c6bc846de",
+            "function": "inv.dispatch.DeliveryWorker.once",
+            "path": "services/control-plane/src/inv/dispatch.py",
+            "span": [
+              340,
+              12,
+              340,
+              33
+            ]
+          },
+          "reason": null,
+          "references": [
+            {
+              "attributeKind": "Attribute",
+              "attributeSource": {
+                "expressionSHA256": "26a4e065c848c1fb80b56f62bc7cae559f203434e03608f75572d2fe7eedf297",
+                "fileSHA256": "2ec2971be6fb6e7323c38689c10ca91553f2cdc2b7b1414f1aece30c6bc846de",
+                "function": "inv.dispatch.DeliveryWorker.once",
+                "path": "services/control-plane/src/inv/dispatch.py",
+                "span": [
+                  340,
+                  12,
+                  340,
+                  33
+                ]
+              },
+              "callKind": "Call",
+              "callSource": {
+                "expressionSHA256": "476fd474759435bc098bef7e35bc2bdc8e58826f015228e59a6ee794db8867cb",
+                "fileSHA256": "2ec2971be6fb6e7323c38689c10ca91553f2cdc2b7b1414f1aece30c6bc846de",
+                "function": "inv.dispatch.DeliveryWorker.once",
+                "path": "services/control-plane/src/inv/dispatch.py",
+                "span": [
+                  340,
+                  12,
+                  345,
+                  13
+                ]
+              },
+              "directCallFunc": true
+            }
+          ],
+          "sameKindWitnessComparison": true
+        },
+        "scopedSourceCount": 25,
+        "sourcePathSetEqual": true,
+        "wholeModuleNormalizedASTEqualsDerivedBASEPlusExactDelta": false
+      },
+      "runtimeOrTestedHashGateCredited": false,
+      "syntaxValid": true
+    },
+    {
+      "changedInputs": [
+        {
+          "path": "services/control-plane/src/inv/dispatch.py",
+          "sha256": "24721d5ec5b16f2d79ddc1d546b19c6651545da95ed432f9e42eba51ff9cff61"
+        }
+      ],
+      "expectationMet": true,
+      "expectedReason": "CAPTURE_FORWARDING_GRAMMAR_CHANGED",
+      "layer": "NEW_FINITE_COMPATIBILITY_ONLY",
+      "legacyGuardCredited": false,
+      "name": "wrong-forwarded-literal",
+      "otherActualInputsUnchanged": true,
+      "reason": "CAPTURE_FORWARDING_GRAMMAR_CHANGED",
+      "result": {
+        "capturedLocalReferenceKinds": null,
+        "changedOtherPaths": [],
+        "closedGrammarReason": "CAPTURE_FORWARDING_GRAMMAR_CHANGED",
+        "expectedOwnerDerivationSHA256": "c135d36f07fc81143e7e9b95ce56d2b4382bfea4a5d5fdf0a297a5b6c3e5298f",
+        "other24RawBytesEqualRealBASE": true,
+        "ownerDerivationReason": null,
+        "reason": "CAPTURE_FORWARDING_GRAMMAR_CHANGED",
+        "referenceContract": {
+          "directNodeIdentityRequired": true,
+          "forwardCallWitness": {
+            "expressionSHA256": "39c14d397da37cf4111b7d2b6f6782e10f62b1de383bee547925bca7111cfab6",
+            "fileSHA256": "24721d5ec5b16f2d79ddc1d546b19c6651545da95ed432f9e42eba51ff9cff61",
+            "function": "inv.dispatch.DeliveryWorker.once",
+            "path": "services/control-plane/src/inv/dispatch.py",
+            "span": [
+              339,
+              12,
+              344,
+              13
+            ]
+          },
+          "projectedForwardAttribute": {
+            "expressionSHA256": "26a4e065c848c1fb80b56f62bc7cae559f203434e03608f75572d2fe7eedf297",
+            "fileSHA256": "24721d5ec5b16f2d79ddc1d546b19c6651545da95ed432f9e42eba51ff9cff61",
+            "function": "inv.dispatch.DeliveryWorker.once",
+            "path": "services/control-plane/src/inv/dispatch.py",
+            "span": [
+              339,
+              12,
+              339,
+              33
+            ]
+          },
+          "reason": null,
+          "references": [
+            {
+              "attributeKind": "Attribute",
+              "attributeSource": {
+                "expressionSHA256": "26a4e065c848c1fb80b56f62bc7cae559f203434e03608f75572d2fe7eedf297",
+                "fileSHA256": "24721d5ec5b16f2d79ddc1d546b19c6651545da95ed432f9e42eba51ff9cff61",
+                "function": "inv.dispatch.DeliveryWorker.once",
+                "path": "services/control-plane/src/inv/dispatch.py",
+                "span": [
+                  339,
+                  12,
+                  339,
+                  33
+                ]
+              },
+              "callKind": "Call",
+              "callSource": {
+                "expressionSHA256": "39c14d397da37cf4111b7d2b6f6782e10f62b1de383bee547925bca7111cfab6",
+                "fileSHA256": "24721d5ec5b16f2d79ddc1d546b19c6651545da95ed432f9e42eba51ff9cff61",
+                "function": "inv.dispatch.DeliveryWorker.once",
+                "path": "services/control-plane/src/inv/dispatch.py",
+                "span": [
+                  339,
+                  12,
+                  344,
+                  13
+                ]
+              },
+              "directCallFunc": true
+            }
+          ],
+          "sameKindWitnessComparison": true
+        },
+        "scopedSourceCount": 25,
+        "sourcePathSetEqual": true,
+        "wholeModuleNormalizedASTEqualsDerivedBASEPlusExactDelta": false
+      },
+      "runtimeOrTestedHashGateCredited": false,
+      "syntaxValid": true
+    },
+    {
+      "changedInputs": [
+        {
+          "path": "services/control-plane/src/inv/dispatch.py",
+          "sha256": "bbe5f543b48036cc8ab6672ef18d976d4d53a1b06950be9e049bbd39a9e554c9"
+        }
+      ],
+      "expectationMet": true,
+      "expectedReason": "BUILTIN_BINDING_CHANGED",
+      "layer": "NEW_FINITE_COMPATIBILITY_ONLY",
+      "legacyGuardCredited": false,
+      "name": "shadowed-type",
+      "otherActualInputsUnchanged": true,
+      "reason": "BUILTIN_BINDING_CHANGED",
+      "result": {
+        "capturedLocalReferenceKinds": null,
+        "changedOtherPaths": [],
+        "closedGrammarReason": "BUILTIN_BINDING_CHANGED",
+        "expectedOwnerDerivationSHA256": "c135d36f07fc81143e7e9b95ce56d2b4382bfea4a5d5fdf0a297a5b6c3e5298f",
+        "other24RawBytesEqualRealBASE": true,
+        "ownerDerivationReason": null,
+        "reason": "BUILTIN_BINDING_CHANGED",
+        "referenceContract": {
+          "directNodeIdentityRequired": true,
+          "forwardCallWitness": {
+            "expressionSHA256": "476fd474759435bc098bef7e35bc2bdc8e58826f015228e59a6ee794db8867cb",
+            "fileSHA256": "bbe5f543b48036cc8ab6672ef18d976d4d53a1b06950be9e049bbd39a9e554c9",
+            "function": "inv.dispatch.DeliveryWorker.once",
+            "path": "services/control-plane/src/inv/dispatch.py",
+            "span": [
+              340,
+              12,
+              345,
+              13
+            ]
+          },
+          "projectedForwardAttribute": {
+            "expressionSHA256": "26a4e065c848c1fb80b56f62bc7cae559f203434e03608f75572d2fe7eedf297",
+            "fileSHA256": "bbe5f543b48036cc8ab6672ef18d976d4d53a1b06950be9e049bbd39a9e554c9",
+            "function": "inv.dispatch.DeliveryWorker.once",
+            "path": "services/control-plane/src/inv/dispatch.py",
+            "span": [
+              340,
+              12,
+              340,
+              33
+            ]
+          },
+          "reason": null,
+          "references": [
+            {
+              "attributeKind": "Attribute",
+              "attributeSource": {
+                "expressionSHA256": "26a4e065c848c1fb80b56f62bc7cae559f203434e03608f75572d2fe7eedf297",
+                "fileSHA256": "bbe5f543b48036cc8ab6672ef18d976d4d53a1b06950be9e049bbd39a9e554c9",
+                "function": "inv.dispatch.DeliveryWorker.once",
+                "path": "services/control-plane/src/inv/dispatch.py",
+                "span": [
+                  340,
+                  12,
+                  340,
+                  33
+                ]
+              },
+              "callKind": "Call",
+              "callSource": {
+                "expressionSHA256": "476fd474759435bc098bef7e35bc2bdc8e58826f015228e59a6ee794db8867cb",
+                "fileSHA256": "bbe5f543b48036cc8ab6672ef18d976d4d53a1b06950be9e049bbd39a9e554c9",
+                "function": "inv.dispatch.DeliveryWorker.once",
+                "path": "services/control-plane/src/inv/dispatch.py",
+                "span": [
+                  340,
+                  12,
+                  345,
+                  13
+                ]
+              },
+              "directCallFunc": true
+            }
+          ],
+          "sameKindWitnessComparison": true
+        },
+        "scopedSourceCount": 25,
+        "sourcePathSetEqual": true,
+        "wholeModuleNormalizedASTEqualsDerivedBASEPlusExactDelta": false
+      },
+      "runtimeOrTestedHashGateCredited": false,
+      "syntaxValid": true
+    },
+    {
+      "changedInputs": [
+        {
+          "path": "services/control-plane/src/inv/dispatch.py",
+          "sha256": "d79f8fc5beb7fa727af5943beccf95fffa3057c6c9552a622809d70ac650b865"
+        }
+      ],
+      "expectationMet": true,
+      "expectedReason": "BUILTIN_BINDING_CHANGED",
+      "layer": "NEW_FINITE_COMPATIBILITY_ONLY",
+      "legacyGuardCredited": false,
+      "name": "shadowed-str",
+      "otherActualInputsUnchanged": true,
+      "reason": "BUILTIN_BINDING_CHANGED",
+      "result": {
+        "capturedLocalReferenceKinds": null,
+        "changedOtherPaths": [],
+        "closedGrammarReason": "BUILTIN_BINDING_CHANGED",
+        "expectedOwnerDerivationSHA256": "c135d36f07fc81143e7e9b95ce56d2b4382bfea4a5d5fdf0a297a5b6c3e5298f",
+        "other24RawBytesEqualRealBASE": true,
+        "ownerDerivationReason": null,
+        "reason": "BUILTIN_BINDING_CHANGED",
+        "referenceContract": {
+          "directNodeIdentityRequired": true,
+          "forwardCallWitness": {
+            "expressionSHA256": "476fd474759435bc098bef7e35bc2bdc8e58826f015228e59a6ee794db8867cb",
+            "fileSHA256": "d79f8fc5beb7fa727af5943beccf95fffa3057c6c9552a622809d70ac650b865",
+            "function": "inv.dispatch.DeliveryWorker.once",
+            "path": "services/control-plane/src/inv/dispatch.py",
+            "span": [
+              340,
+              12,
+              345,
+              13
+            ]
+          },
+          "projectedForwardAttribute": {
+            "expressionSHA256": "26a4e065c848c1fb80b56f62bc7cae559f203434e03608f75572d2fe7eedf297",
+            "fileSHA256": "d79f8fc5beb7fa727af5943beccf95fffa3057c6c9552a622809d70ac650b865",
+            "function": "inv.dispatch.DeliveryWorker.once",
+            "path": "services/control-plane/src/inv/dispatch.py",
+            "span": [
+              340,
+              12,
+              340,
+              33
+            ]
+          },
+          "reason": null,
+          "references": [
+            {
+              "attributeKind": "Attribute",
+              "attributeSource": {
+                "expressionSHA256": "26a4e065c848c1fb80b56f62bc7cae559f203434e03608f75572d2fe7eedf297",
+                "fileSHA256": "d79f8fc5beb7fa727af5943beccf95fffa3057c6c9552a622809d70ac650b865",
+                "function": "inv.dispatch.DeliveryWorker.once",
+                "path": "services/control-plane/src/inv/dispatch.py",
+                "span": [
+                  340,
+                  12,
+                  340,
+                  33
+                ]
+              },
+              "callKind": "Call",
+              "callSource": {
+                "expressionSHA256": "476fd474759435bc098bef7e35bc2bdc8e58826f015228e59a6ee794db8867cb",
+                "fileSHA256": "d79f8fc5beb7fa727af5943beccf95fffa3057c6c9552a622809d70ac650b865",
+                "function": "inv.dispatch.DeliveryWorker.once",
+                "path": "services/control-plane/src/inv/dispatch.py",
+                "span": [
+                  340,
+                  12,
+                  345,
+                  13
+                ]
+              },
+              "directCallFunc": true
+            }
+          ],
+          "sameKindWitnessComparison": true
+        },
+        "scopedSourceCount": 25,
+        "sourcePathSetEqual": true,
+        "wholeModuleNormalizedASTEqualsDerivedBASEPlusExactDelta": false
+      },
+      "runtimeOrTestedHashGateCredited": false,
+      "syntaxValid": true
+    },
+    {
+      "changedInputs": [
+        {
+          "path": "services/control-plane/src/inv/dispatch.py",
+          "sha256": "0bef3fb6b58bf9c6440e97ec5d609fcd597a5eb329b1bd4a97e5e98b4830e197"
+        }
+      ],
+      "expectationMet": true,
+      "expectedReason": "BUILTIN_BINDING_CHANGED",
+      "layer": "NEW_FINITE_COMPATIBILITY_ONLY",
+      "legacyGuardCredited": false,
+      "name": "shadowed-ValueError",
+      "otherActualInputsUnchanged": true,
+      "reason": "BUILTIN_BINDING_CHANGED",
+      "result": {
+        "capturedLocalReferenceKinds": null,
+        "changedOtherPaths": [],
+        "closedGrammarReason": "BUILTIN_BINDING_CHANGED",
+        "expectedOwnerDerivationSHA256": "c135d36f07fc81143e7e9b95ce56d2b4382bfea4a5d5fdf0a297a5b6c3e5298f",
+        "other24RawBytesEqualRealBASE": true,
+        "ownerDerivationReason": null,
+        "reason": "BUILTIN_BINDING_CHANGED",
+        "referenceContract": {
+          "directNodeIdentityRequired": true,
+          "forwardCallWitness": {
+            "expressionSHA256": "476fd474759435bc098bef7e35bc2bdc8e58826f015228e59a6ee794db8867cb",
+            "fileSHA256": "0bef3fb6b58bf9c6440e97ec5d609fcd597a5eb329b1bd4a97e5e98b4830e197",
+            "function": "inv.dispatch.DeliveryWorker.once",
+            "path": "services/control-plane/src/inv/dispatch.py",
+            "span": [
+              340,
+              12,
+              345,
+              13
+            ]
+          },
+          "projectedForwardAttribute": {
+            "expressionSHA256": "26a4e065c848c1fb80b56f62bc7cae559f203434e03608f75572d2fe7eedf297",
+            "fileSHA256": "0bef3fb6b58bf9c6440e97ec5d609fcd597a5eb329b1bd4a97e5e98b4830e197",
+            "function": "inv.dispatch.DeliveryWorker.once",
+            "path": "services/control-plane/src/inv/dispatch.py",
+            "span": [
+              340,
+              12,
+              340,
+              33
+            ]
+          },
+          "reason": null,
+          "references": [
+            {
+              "attributeKind": "Attribute",
+              "attributeSource": {
+                "expressionSHA256": "26a4e065c848c1fb80b56f62bc7cae559f203434e03608f75572d2fe7eedf297",
+                "fileSHA256": "0bef3fb6b58bf9c6440e97ec5d609fcd597a5eb329b1bd4a97e5e98b4830e197",
+                "function": "inv.dispatch.DeliveryWorker.once",
+                "path": "services/control-plane/src/inv/dispatch.py",
+                "span": [
+                  340,
+                  12,
+                  340,
+                  33
+                ]
+              },
+              "callKind": "Call",
+              "callSource": {
+                "expressionSHA256": "476fd474759435bc098bef7e35bc2bdc8e58826f015228e59a6ee794db8867cb",
+                "fileSHA256": "0bef3fb6b58bf9c6440e97ec5d609fcd597a5eb329b1bd4a97e5e98b4830e197",
+                "function": "inv.dispatch.DeliveryWorker.once",
+                "path": "services/control-plane/src/inv/dispatch.py",
+                "span": [
+                  340,
+                  12,
+                  345,
+                  13
+                ]
+              },
+              "directCallFunc": true
+            }
+          ],
+          "sameKindWitnessComparison": true
+        },
+        "scopedSourceCount": 25,
+        "sourcePathSetEqual": true,
+        "wholeModuleNormalizedASTEqualsDerivedBASEPlusExactDelta": false
+      },
+      "runtimeOrTestedHashGateCredited": false,
+      "syntaxValid": true
+    },
+    {
+      "changedInputs": [
+        {
+          "path": "tools/lan_pilot.py",
+          "sha256": "abb17b22020e6c93820ac9543e1a54a9813d746dcd8dd4851b9543fd0ef93a5e"
+        }
+      ],
+      "expectationMet": true,
+      "expectedReason": "DELIVER_REFERENCE_SET_CHANGED",
+      "layer": "NEW_FINITE_COMPATIBILITY_ONLY",
+      "legacyGuardCredited": false,
+      "name": "reviewer-valid-second-deliver-reference",
+      "otherActualInputsUnchanged": true,
+      "reason": "DELIVER_REFERENCE_SET_CHANGED",
+      "result": {
+        "capturedLocalReferenceKinds": {
+          "Load": 4,
+          "Store": 1
+        },
+        "changedOtherPaths": [
+          "tools/lan_pilot.py"
+        ],
+        "closedGrammarReason": null,
+        "expectedOwnerDerivationSHA256": "c135d36f07fc81143e7e9b95ce56d2b4382bfea4a5d5fdf0a297a5b6c3e5298f",
+        "other24RawBytesEqualRealBASE": false,
+        "ownerDerivationReason": "OWNER_DERIVATION_CHANGED",
+        "reason": "DELIVER_REFERENCE_SET_CHANGED",
+        "referenceContract": {
+          "directNodeIdentityRequired": true,
+          "forwardCallWitness": {
+            "expressionSHA256": "476fd474759435bc098bef7e35bc2bdc8e58826f015228e59a6ee794db8867cb",
+            "fileSHA256": "82f029614537eb5bab56934e4b6736fe3dd52ece54b9b9a3996815b131e41de4",
+            "function": "inv.dispatch.DeliveryWorker.once",
+            "path": "services/control-plane/src/inv/dispatch.py",
+            "span": [
+              339,
+              12,
+              344,
+              13
+            ]
+          },
+          "projectedForwardAttribute": {
+            "expressionSHA256": "26a4e065c848c1fb80b56f62bc7cae559f203434e03608f75572d2fe7eedf297",
+            "fileSHA256": "82f029614537eb5bab56934e4b6736fe3dd52ece54b9b9a3996815b131e41de4",
+            "function": "inv.dispatch.DeliveryWorker.once",
+            "path": "services/control-plane/src/inv/dispatch.py",
+            "span": [
+              339,
+              12,
+              339,
+              33
+            ]
+          },
+          "reason": "DELIVER_REFERENCE_SET_CHANGED",
+          "references": [
+            {
+              "attributeKind": "Attribute",
+              "attributeSource": {
+                "expressionSHA256": "26a4e065c848c1fb80b56f62bc7cae559f203434e03608f75572d2fe7eedf297",
+                "fileSHA256": "82f029614537eb5bab56934e4b6736fe3dd52ece54b9b9a3996815b131e41de4",
+                "function": "inv.dispatch.DeliveryWorker.once",
+                "path": "services/control-plane/src/inv/dispatch.py",
+                "span": [
+                  339,
+                  12,
+                  339,
+                  33
+                ]
+              },
+              "callKind": "Call",
+              "callSource": {
+                "expressionSHA256": "476fd474759435bc098bef7e35bc2bdc8e58826f015228e59a6ee794db8867cb",
+                "fileSHA256": "82f029614537eb5bab56934e4b6736fe3dd52ece54b9b9a3996815b131e41de4",
+                "function": "inv.dispatch.DeliveryWorker.once",
+                "path": "services/control-plane/src/inv/dispatch.py",
+                "span": [
+                  339,
+                  12,
+                  344,
+                  13
+                ]
+              },
+              "directCallFunc": true
+            },
+            {
+              "attributeKind": "Attribute",
+              "attributeSource": {
+                "expressionSHA256": "7d44be75e53a0789decfb37e4912b5f1f8f3cad081fd4348e93a0b4203a18374",
+                "fileSHA256": "abb17b22020e6c93820ac9543e1a54a9813d746dcd8dd4851b9543fd0ef93a5e",
+                "function": "tools.lan_pilot._reviewer_second_deliver",
+                "path": "tools/lan_pilot.py",
+                "span": [
+                  4275,
+                  11,
+                  4275,
+                  27
+                ]
+              },
+              "callKind": "Call",
+              "callSource": {
+                "expressionSHA256": "b91ef45c9d9c284b996cb0ece9a3a1757098202e790fa0ef010fb03ab9770c91",
+                "fileSHA256": "abb17b22020e6c93820ac9543e1a54a9813d746dcd8dd4851b9543fd0ef93a5e",
+                "function": "tools.lan_pilot._reviewer_second_deliver",
+                "path": "tools/lan_pilot.py",
+                "span": [
+                  4275,
+                  11,
+                  4275,
+                  73
+                ]
+              },
+              "directCallFunc": true
+            }
+          ],
+          "sameKindWitnessComparison": true
+        },
+        "scopedSourceCount": 25,
+        "sourcePathSetEqual": true,
+        "wholeModuleNormalizedASTEqualsDerivedBASEPlusExactDelta": true
+      },
+      "runtimeOrTestedHashGateCredited": false,
+      "syntaxValid": true
+    },
+    {
+      "changedInputs": [
+        {
+          "path": "tools/lan_pilot.py",
+          "sha256": "8b821597d012e56eda8a6e177e831a141b7eadfc92d76ff2922f2ed0158668ff"
+        }
+      ],
+      "expectationMet": true,
+      "expectedReason": "DELIVER_REFERENCE_SET_CHANGED",
+      "layer": "NEW_FINITE_COMPATIBILITY_ONLY",
+      "legacyGuardCredited": false,
+      "name": "noncall-deliver-reference",
+      "otherActualInputsUnchanged": true,
+      "reason": "DELIVER_REFERENCE_SET_CHANGED",
+      "result": {
+        "capturedLocalReferenceKinds": {
+          "Load": 4,
+          "Store": 1
+        },
+        "changedOtherPaths": [
+          "tools/lan_pilot.py"
+        ],
+        "closedGrammarReason": null,
+        "expectedOwnerDerivationSHA256": "c135d36f07fc81143e7e9b95ce56d2b4382bfea4a5d5fdf0a297a5b6c3e5298f",
+        "other24RawBytesEqualRealBASE": false,
+        "ownerDerivationReason": "OWNER_DERIVATION_CHANGED",
+        "reason": "DELIVER_REFERENCE_SET_CHANGED",
+        "referenceContract": {
+          "directNodeIdentityRequired": true,
+          "forwardCallWitness": {
+            "expressionSHA256": "476fd474759435bc098bef7e35bc2bdc8e58826f015228e59a6ee794db8867cb",
+            "fileSHA256": "82f029614537eb5bab56934e4b6736fe3dd52ece54b9b9a3996815b131e41de4",
+            "function": "inv.dispatch.DeliveryWorker.once",
+            "path": "services/control-plane/src/inv/dispatch.py",
+            "span": [
+              339,
+              12,
+              344,
+              13
+            ]
+          },
+          "projectedForwardAttribute": {
+            "expressionSHA256": "26a4e065c848c1fb80b56f62bc7cae559f203434e03608f75572d2fe7eedf297",
+            "fileSHA256": "82f029614537eb5bab56934e4b6736fe3dd52ece54b9b9a3996815b131e41de4",
+            "function": "inv.dispatch.DeliveryWorker.once",
+            "path": "services/control-plane/src/inv/dispatch.py",
+            "span": [
+              339,
+              12,
+              339,
+              33
+            ]
+          },
+          "reason": "DELIVER_REFERENCE_SET_CHANGED",
+          "references": [
+            {
+              "attributeKind": "Attribute",
+              "attributeSource": {
+                "expressionSHA256": "26a4e065c848c1fb80b56f62bc7cae559f203434e03608f75572d2fe7eedf297",
+                "fileSHA256": "82f029614537eb5bab56934e4b6736fe3dd52ece54b9b9a3996815b131e41de4",
+                "function": "inv.dispatch.DeliveryWorker.once",
+                "path": "services/control-plane/src/inv/dispatch.py",
+                "span": [
+                  339,
+                  12,
+                  339,
+                  33
+                ]
+              },
+              "callKind": "Call",
+              "callSource": {
+                "expressionSHA256": "476fd474759435bc098bef7e35bc2bdc8e58826f015228e59a6ee794db8867cb",
+                "fileSHA256": "82f029614537eb5bab56934e4b6736fe3dd52ece54b9b9a3996815b131e41de4",
+                "function": "inv.dispatch.DeliveryWorker.once",
+                "path": "services/control-plane/src/inv/dispatch.py",
+                "span": [
+                  339,
+                  12,
+                  344,
+                  13
+                ]
+              },
+              "directCallFunc": true
+            },
+            {
+              "attributeKind": "Attribute",
+              "attributeSource": {
+                "expressionSHA256": "7d44be75e53a0789decfb37e4912b5f1f8f3cad081fd4348e93a0b4203a18374",
+                "fileSHA256": "8b821597d012e56eda8a6e177e831a141b7eadfc92d76ff2922f2ed0158668ff",
+                "function": "tools.lan_pilot._finite_reference",
+                "path": "tools/lan_pilot.py",
+                "span": [
+                  4275,
+                  11,
+                  4275,
+                  27
+                ]
+              },
+              "callKind": "Return",
+              "callSource": null,
+              "directCallFunc": false
+            }
+          ],
+          "sameKindWitnessComparison": true
+        },
+        "scopedSourceCount": 25,
+        "sourcePathSetEqual": true,
+        "wholeModuleNormalizedASTEqualsDerivedBASEPlusExactDelta": true
+      },
+      "runtimeOrTestedHashGateCredited": false,
+      "syntaxValid": true
+    },
+    {
+      "changedInputs": [
+        {
+          "path": "services/control-plane/src/inv/dispatch.py",
+          "sha256": "c269c0d0e3f8f44d695636ec8f03427dd0f0322774e7dcb7f2af1388fac45ea6"
+        }
+      ],
+      "expectationMet": true,
+      "expectedReason": "WHOLE_MODULE_DELTA_CHANGED",
+      "layer": "NEW_FINITE_COMPATIBILITY_ONLY",
+      "legacyGuardCredited": false,
+      "name": "modified-otherfunction",
+      "otherActualInputsUnchanged": true,
+      "reason": "WHOLE_MODULE_DELTA_CHANGED",
+      "result": {
+        "capturedLocalReferenceKinds": {
+          "Load": 4,
+          "Store": 1
+        },
+        "changedOtherPaths": [],
+        "closedGrammarReason": null,
+        "expectedOwnerDerivationSHA256": "c135d36f07fc81143e7e9b95ce56d2b4382bfea4a5d5fdf0a297a5b6c3e5298f",
+        "other24RawBytesEqualRealBASE": true,
+        "ownerDerivationReason": null,
+        "reason": "WHOLE_MODULE_DELTA_CHANGED",
+        "referenceContract": {
+          "directNodeIdentityRequired": true,
+          "forwardCallWitness": {
+            "expressionSHA256": "488cfee2019ba8c93a83857fd3270cf75f00ecac47560e1ca0bc375d1df75fb0",
+            "fileSHA256": "c269c0d0e3f8f44d695636ec8f03427dd0f0322774e7dcb7f2af1388fac45ea6",
+            "function": "inv.dispatch.DeliveryWorker.once",
+            "path": "services/control-plane/src/inv/dispatch.py",
+            "span": [
+              158,
+              12,
+              158,
+              141
+            ]
+          },
+          "projectedForwardAttribute": {
+            "expressionSHA256": "26a4e065c848c1fb80b56f62bc7cae559f203434e03608f75572d2fe7eedf297",
+            "fileSHA256": "c269c0d0e3f8f44d695636ec8f03427dd0f0322774e7dcb7f2af1388fac45ea6",
+            "function": "inv.dispatch.DeliveryWorker.once",
+            "path": "services/control-plane/src/inv/dispatch.py",
+            "span": [
+              158,
+              12,
+              158,
+              33
+            ]
+          },
+          "reason": null,
+          "references": [
+            {
+              "attributeKind": "Attribute",
+              "attributeSource": {
+                "expressionSHA256": "26a4e065c848c1fb80b56f62bc7cae559f203434e03608f75572d2fe7eedf297",
+                "fileSHA256": "c269c0d0e3f8f44d695636ec8f03427dd0f0322774e7dcb7f2af1388fac45ea6",
+                "function": "inv.dispatch.DeliveryWorker.once",
+                "path": "services/control-plane/src/inv/dispatch.py",
+                "span": [
+                  158,
+                  12,
+                  158,
+                  33
+                ]
+              },
+              "callKind": "Call",
+              "callSource": {
+                "expressionSHA256": "488cfee2019ba8c93a83857fd3270cf75f00ecac47560e1ca0bc375d1df75fb0",
+                "fileSHA256": "c269c0d0e3f8f44d695636ec8f03427dd0f0322774e7dcb7f2af1388fac45ea6",
+                "function": "inv.dispatch.DeliveryWorker.once",
+                "path": "services/control-plane/src/inv/dispatch.py",
+                "span": [
+                  158,
+                  12,
+                  158,
+                  141
+                ]
+              },
+              "directCallFunc": true
+            }
+          ],
+          "sameKindWitnessComparison": true
+        },
+        "scopedSourceCount": 25,
+        "sourcePathSetEqual": true,
+        "wholeModuleNormalizedASTEqualsDerivedBASEPlusExactDelta": false
+      },
+      "runtimeOrTestedHashGateCredited": false,
+      "syntaxValid": true
+    },
+    {
+      "changedInputs": [
+        {
+          "path": "services/control-plane/src/inv/worker.py",
+          "sha256": "24f5c12780d4ef962c17c9ec3cc01d7e547e141a6de53d0b0cb5ac00d3ceba41"
+        }
+      ],
+      "expectationMet": true,
+      "expectedReason": "SOURCE_WORLD_BYTES_CHANGED",
+      "layer": "NEW_FINITE_COMPATIBILITY_ONLY",
+      "legacyGuardCredited": false,
+      "name": "modified-wrong-file",
+      "otherActualInputsUnchanged": true,
+      "reason": "SOURCE_WORLD_BYTES_CHANGED",
+      "result": {
+        "capturedLocalReferenceKinds": {
+          "Load": 4,
+          "Store": 1
+        },
+        "changedOtherPaths": [
+          "services/control-plane/src/inv/worker.py"
+        ],
+        "closedGrammarReason": null,
+        "expectedOwnerDerivationSHA256": "c135d36f07fc81143e7e9b95ce56d2b4382bfea4a5d5fdf0a297a5b6c3e5298f",
+        "other24RawBytesEqualRealBASE": false,
+        "ownerDerivationReason": null,
+        "reason": "SOURCE_WORLD_BYTES_CHANGED",
+        "referenceContract": {
+          "directNodeIdentityRequired": true,
+          "forwardCallWitness": {
+            "expressionSHA256": "476fd474759435bc098bef7e35bc2bdc8e58826f015228e59a6ee794db8867cb",
+            "fileSHA256": "82f029614537eb5bab56934e4b6736fe3dd52ece54b9b9a3996815b131e41de4",
+            "function": "inv.dispatch.DeliveryWorker.once",
+            "path": "services/control-plane/src/inv/dispatch.py",
+            "span": [
+              339,
+              12,
+              344,
+              13
+            ]
+          },
+          "projectedForwardAttribute": {
+            "expressionSHA256": "26a4e065c848c1fb80b56f62bc7cae559f203434e03608f75572d2fe7eedf297",
+            "fileSHA256": "82f029614537eb5bab56934e4b6736fe3dd52ece54b9b9a3996815b131e41de4",
+            "function": "inv.dispatch.DeliveryWorker.once",
+            "path": "services/control-plane/src/inv/dispatch.py",
+            "span": [
+              339,
+              12,
+              339,
+              33
+            ]
+          },
+          "reason": null,
+          "references": [
+            {
+              "attributeKind": "Attribute",
+              "attributeSource": {
+                "expressionSHA256": "26a4e065c848c1fb80b56f62bc7cae559f203434e03608f75572d2fe7eedf297",
+                "fileSHA256": "82f029614537eb5bab56934e4b6736fe3dd52ece54b9b9a3996815b131e41de4",
+                "function": "inv.dispatch.DeliveryWorker.once",
+                "path": "services/control-plane/src/inv/dispatch.py",
+                "span": [
+                  339,
+                  12,
+                  339,
+                  33
+                ]
+              },
+              "callKind": "Call",
+              "callSource": {
+                "expressionSHA256": "476fd474759435bc098bef7e35bc2bdc8e58826f015228e59a6ee794db8867cb",
+                "fileSHA256": "82f029614537eb5bab56934e4b6736fe3dd52ece54b9b9a3996815b131e41de4",
+                "function": "inv.dispatch.DeliveryWorker.once",
+                "path": "services/control-plane/src/inv/dispatch.py",
+                "span": [
+                  339,
+                  12,
+                  344,
+                  13
+                ]
+              },
+              "directCallFunc": true
+            }
+          ],
+          "sameKindWitnessComparison": true
+        },
+        "scopedSourceCount": 25,
+        "sourcePathSetEqual": true,
+        "wholeModuleNormalizedASTEqualsDerivedBASEPlusExactDelta": true
+      },
+      "runtimeOrTestedHashGateCredited": false,
+      "syntaxValid": true
+    },
+    {
+      "changedInputs": [
+        {
+          "path": "services/control-plane/src/inv/containment.py",
+          "sha256": "b8fcc399d9517b20d604d8da9ed91655c73f9ace285b083f18f708ba66ab129f"
+        }
+      ],
+      "expectationMet": true,
+      "expectedReason": "SOURCE_WORLD_PATH_SET_CHANGED",
+      "layer": "NEW_FINITE_COMPATIBILITY_ONLY",
+      "legacyGuardCredited": false,
+      "name": "modified-unrelated-module",
+      "otherActualInputsUnchanged": true,
+      "reason": "SOURCE_WORLD_PATH_SET_CHANGED",
+      "result": {
+        "extraPaths": [
+          "services/control-plane/src/inv/containment.py"
+        ],
+        "missingPaths": [],
+        "reason": "SOURCE_WORLD_PATH_SET_CHANGED",
+        "sourcePathSetEqual": false
+      },
+      "runtimeOrTestedHashGateCredited": false,
+      "syntaxValid": true
+    },
+    {
+      "expectationMet": true,
+      "expectedReason": "OWNER_DERIVATION_CHANGED",
+      "kind": "diagnostic data mutation; not a product source execution",
+      "layer": "EXACT_OWNER_DERIVATION_COMPARISON",
+      "legacyGuardCredited": false,
+      "name": "unexpected-owner-derivation-data",
+      "reason": "OWNER_DERIVATION_CHANGED"
+    }
+  ]
+}

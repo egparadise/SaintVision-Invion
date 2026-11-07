@@ -1,0 +1,275 @@
+diff --git a/services/control-plane/src/inv/dispatch.py b/services/control-plane/src/inv/dispatch.py
+index af287f3e..6ff21a1c 100644
+--- a/services/control-plane/src/inv/dispatch.py
++++ b/services/control-plane/src/inv/dispatch.py
+@@ -333,11 +333,14 @@ class DeliveryWorker:
+             return outcome if outcome != "idle" else parent if parent != "idle" else reconciled
+         error, not_sent = None, False
+         try:
++            operation = attempt.operation
++            if type(operation) is not str or operation not in ("execute", "observe", "cancel"):
++                raise ValueError("Unsupported delivery operation origin")
+             self.delivery.deliver(
+                 attempt.node,
+                 attempt.envelope,
+-                observation_only=attempt.operation == "observe",
+-                cancel_only=attempt.operation == "cancel",
++                observation_only=(operation == "observe"),
++                cancel_only=(operation == "cancel"),
+             )
+         except Exception as exc:
+             error = exc.code if isinstance(exc, DomainError) else "SYS-0001"
+--- /dev/null
++++ b/tests/core/test_delivery_operation_origin.py
+@@ -0,0 +1,251 @@
++"""Exercise the real DeliveryWorker.once at its delivery boundary, without a DB.
++
++Reconciliation and acquire occur before the guard. Those real collaborators are
++replaced here; this file makes no claim about their SQL or queue.finish's SQL.
++The actual worker method and its existing exception handler remain under test.
++"""
++
++from types import SimpleNamespace
++
++import pytest
++
++import inv.containment as containment
++import inv.dispatch as dispatch
++
++
++class OperationAttempt:
++    def __init__(self, first, *, later=None, capture_error=None):
++        self.node = object()
++        self.envelope = {"synthetic": "operation-origin-unit"}
++        self.command_id = "synthetic-command"
++        self.first = first
++        self.later = later
++        self.capture_error = capture_error
++        self.operation_reads = 0
++
++    @property
++    def operation(self):
++        self.operation_reads += 1
++        if self.capture_error is not None:
++            raise self.capture_error
++        return self.first if self.operation_reads == 1 else self.later
++
++
++class HostileMethods:
++    def _touch(self, method):
++        self.calls.append(method)
++        raise AssertionError("Rejected operation invoked " + method)
++
++    def __eq__(self, other):
++        return self._touch("eq")
++
++    def __ne__(self, other):
++        return self._touch("ne")
++
++    def __hash__(self):
++        return self._touch("hash")
++
++    def __bool__(self):
++        return self._touch("bool")
++
++
++class HostileForeign(HostileMethods):
++    def __init__(self, calls):
++        self.calls = calls
++
++
++class HostileString(HostileMethods, str):
++    def __new__(cls, value, calls):
++        instance = str.__new__(cls, value)
++        instance.calls = calls
++        return instance
++
++
++class ForeignEqual:
++    """Old once admits this object: both rich comparisons return True."""
++
++    def __init__(self, calls):
++        self.calls = calls
++
++    def __eq__(self, other):
++        self.calls.append("eq")
++        return True
++
++    def __ne__(self, other):
++        self.calls.append("ne")
++        return False
++
++    def __hash__(self):
++        self.calls.append("hash")
++        return 0
++
++    def __bool__(self):
++        self.calls.append("bool")
++        return True
++
++
++@pytest.fixture
++def boundary(monkeypatch):
++    """Use actual once with minimal collaborators, not an extracted method."""
++    def make(attempt, *, finish_outcome="uncertain", output="idle", parent="idle"):
++        events, deliveries, finishes = [], [], []
++        database = object()
++
++        class Reconciler:
++            def __init__(self, received):
++                assert received is database
++                events.append("reconciler-init")
++
++            def once(self, tenant_id):
++                assert tenant_id == "synthetic-tenant"
++                events.append("reconcile")
++                return "reconciled"
++
++        class Queue:
++            db = database
++
++            def acquire(self, tenant_id, *, command_id, control_only):
++                assert tenant_id == "synthetic-tenant"
++                assert command_id == "requested-command"
++                assert type(control_only) is bool
++                events.append("acquire")
++                return attempt
++
++            def finish(self, received, *, error_code, not_sent):
++                assert received is attempt
++                events.append("finish")
++                # Spy only; does not emulate DeliveryQueue.finish's SQL or its
++                # separate short-circuited operation read when not_sent is true.
++                finishes.append((error_code, not_sent))
++                return finish_outcome
++
++        class Delivery:
++            def deliver(self, node, envelope, *, observation_only, cancel_only):
++                assert node is attempt.node
++                assert envelope is attempt.envelope
++                events.append("deliver")
++                deliveries.append((observation_only, cancel_only))
++
++        class Followup:
++            def __init__(self, label, result):
++                self.label, self.result = label, result
++
++            def once(self, tenant_id, *, command_id):
++                assert tenant_id == "synthetic-tenant"
++                expected = "requested-command" if attempt is None else attempt.command_id
++                assert command_id == expected
++                events.append(self.label)
++                return self.result
++
++        monkeypatch.setattr(containment, "ContainmentReconciler", Reconciler)
++        worker = object.__new__(dispatch.DeliveryWorker)
++        worker.queue = Queue()
++        worker.delivery = Delivery()
++        worker.outputs = Followup("outputs", output)
++        worker.parents = Followup("parents", parent)
++        return SimpleNamespace(worker=worker, events=events, deliveries=deliveries, finishes=finishes)
++
++    return make
++
++
++def run_once(case, *, control_only=False):
++    return case.worker.once(
++        "synthetic-tenant", command_id="requested-command", control_only=control_only
++    )
++
++
++@pytest.mark.parametrize(
++    "operation, expected",
++    [("execute", (False, False)), ("observe", (True, False)), ("cancel", (False, True))],
++    ids=["execute", "observe", "cancel"],
++)
++def test_builtin_domain_is_captured_once_and_forwarded_as_exact_bools(boundary, operation, expected):
++    # A second read would return a foreign value and violate the one-read rule.
++    attempt = OperationAttempt(operation, later=object())
++    case = boundary(attempt)
++    assert run_once(case) == "uncertain"
++    assert case.events == ["reconciler-init", "reconcile", "acquire", "deliver", "finish"]
++    assert attempt.operation_reads == 1
++    assert len(case.deliveries) == 1
++    actual = case.deliveries[0]
++    assert all(type(flag) is bool for flag in actual)
++    assert actual[0] is expected[0] and actual[1] is expected[1]
++    assert case.finishes == [(None, False)]
++    assert case.finishes[0][1] is False
++
++
++INVALID = [
++    pytest.param(lambda calls: None, id="none"),
++    pytest.param(lambda calls: False, id="false"),
++    pytest.param(lambda calls: True, id="true"),
++    pytest.param(lambda calls: 0, id="zero"),
++    pytest.param(lambda calls: 1, id="one"),
++    pytest.param(lambda calls: b"observe", id="bytes"),
++    pytest.param(lambda calls: "", id="empty"),
++    pytest.param(lambda calls: "Observe", id="wrong-case"),
++    pytest.param(lambda calls: "unknown", id="foreign-literal"),
++    pytest.param(lambda calls: object(), id="foreign-object"),
++    pytest.param(lambda calls: ForeignEqual(calls), id="foreign-equal"),
++    pytest.param(lambda calls: HostileForeign(calls), id="hostile-foreign"),
++    pytest.param(lambda calls: HostileString("observe", calls), id="hostile-str-subclass"),
++    pytest.param(lambda calls: type("PlainString", (str,), {})("observe"), id="plain-str-subclass"),
++]
++
++
++@pytest.mark.parametrize("factory", INVALID)
++def test_rejected_origin_never_delivers_or_invokes_rich_methods(boundary, factory):
++    calls = []
++    attempt = OperationAttempt(factory(calls), later="execute")
++    case = boundary(attempt)
++    assert run_once(case) == "uncertain"
++    # Assert earlier fixture preconditions before the decisive RED assertion.
++    assert case.events[:3] == ["reconciler-init", "reconcile", "acquire"]
++    assert case.events[-1] == "finish"
++    assert len(case.finishes) == 1
++    assert case.deliveries == [], "Rejected operation reached actual once's delivery call"
++    assert calls == [], "Rejected operation invoked a rich comparison/hash/truth method"
++    assert attempt.operation_reads == 1
++    assert case.events == ["reconciler-init", "reconcile", "acquire", "finish"]
++    assert case.finishes == [("SYS-0001", False)]
++    assert case.finishes[0][1] is False
++
++
++def test_capture_property_error_uses_existing_handler_and_finish(boundary):
++    attempt = OperationAttempt(None, capture_error=RuntimeError("synthetic capture error"))
++    case = boundary(attempt)
++    assert run_once(case) == "uncertain"
++    assert case.events == ["reconciler-init", "reconcile", "acquire", "finish"]
++    assert attempt.operation_reads == 1
++    assert case.deliveries == []
++    assert case.finishes == [("SYS-0001", False)]
++    assert case.finishes[0][1] is False
++
++
++@pytest.mark.parametrize(
++    "control_only, output, parent, expected, followups",
++    [
++        (True, "idle", "idle", "reconciled", []),
++        (False, "idle", "idle", "reconciled", ["outputs", "parents"]),
++        (False, "ingested", "parent", "ingested", ["outputs", "parents"]),
++        (False, "idle", "parent", "parent", ["outputs", "parents"]),
++    ],
++    ids=["control-only", "idle", "output-priority", "parent-priority"],
++)
++def test_none_attempt_preserves_reconciliation_and_followup_branches(
++    boundary, control_only, output, parent, expected, followups
++):
++    case = boundary(None, output=output, parent=parent)
++    assert run_once(case, control_only=control_only) == expected
++    assert case.events == ["reconciler-init", "reconcile", "acquire"] + followups
++    assert case.deliveries == [] and case.finishes == []
++
++
++@pytest.mark.parametrize("control_only", [False, True], ids=["followup", "control-only"])
++def test_stopped_finish_preserves_followup_order(boundary, control_only):
++    attempt = OperationAttempt("cancel", later=object())
++    case = boundary(attempt, finish_outcome="stopped")
++    assert run_once(case, control_only=control_only) == "stopped"
++    expected = ["reconciler-init", "reconcile", "acquire", "deliver", "finish"]
++    assert case.events == expected + ([] if control_only else ["outputs", "parents"])
++    assert attempt.operation_reads == 1
++    assert case.finishes == [(None, False)]

@@ -1,0 +1,26 @@
+{
+  "argv": [
+    "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+    "-B",
+    "tools/sync_obsidian.py",
+    "--check",
+    "--state",
+    "D:\\Project\\SaintVision-Invion\\SaintVisionI-Invion\\.git\\obsidian-sync-state.json",
+    "--conflicts-out",
+    "docs\\vault\\30_Development\\Evidence\\fleet5-b-a7-operation-guard-r1-20261107-codex\\publication-wrap-sync-conflicts.json"
+  ],
+  "startKST": "2026-11-07T10:17:31.735296+09:00",
+  "endKST": "2026-11-07T10:18:17.881413+09:00",
+  "exit": 0,
+  "rawSHA256": "44376d762f5b820c388e9f398ae941e9a487213f4576ecde95ea02e82097b058",
+  "rawBytes": 74,
+  "encoding": "utf-8",
+  "text": "CHECK: 4972 managed files, 2548 pending exports, 0 conflicts. No writes.\r\n",
+  "cause": "Root msg_193e85c36227 exact one-file JSON representation and appended History; no product/test/proof change",
+  "fullStateBeforeSHA256": "e4a1518712fe4f1734598e123d0c1cbca2a5ac1b3e82f00d994eed8bb4f114de",
+  "fullStateAfterSHA256": "e4a1518712fe4f1734598e123d0c1cbca2a5ac1b3e82f00d994eed8bb4f114de",
+  "fullStateBeforeBytes": 472404,
+  "fullStateAfterBytes": 472404,
+  "stateBytesEqual": true,
+  "CHECKOnly": true
+}

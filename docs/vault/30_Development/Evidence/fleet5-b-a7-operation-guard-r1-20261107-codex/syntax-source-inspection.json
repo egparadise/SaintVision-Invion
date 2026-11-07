@@ -1,0 +1,76 @@
+{
+  "actualProductTests": "NOT_RUN",
+  "actualRuntimeB": 0,
+  "base": "b3bbdc8d92a39f2f797a7680deb2770d6f705af0",
+  "currentWitnessReplay": [
+    {
+      "attribute": {
+        "expressionSHA256": "26a4e065c848c1fb80b56f62bc7cae559f203434e03608f75572d2fe7eedf297",
+        "fileSHA256": "82f029614537eb5bab56934e4b6736fe3dd52ece54b9b9a3996815b131e41de4",
+        "function": "inv.dispatch.DeliveryWorker.once",
+        "path": "services/control-plane/src/inv/dispatch.py",
+        "span": [
+          339,
+          12,
+          339,
+          33
+        ]
+      },
+      "attributeKind": "Attribute",
+      "call": {
+        "expressionSHA256": "476fd474759435bc098bef7e35bc2bdc8e58826f015228e59a6ee794db8867cb",
+        "fileSHA256": "82f029614537eb5bab56934e4b6736fe3dd52ece54b9b9a3996815b131e41de4",
+        "function": "inv.dispatch.DeliveryWorker.once",
+        "path": "services/control-plane/src/inv/dispatch.py",
+        "span": [
+          339,
+          12,
+          344,
+          13
+        ]
+      },
+      "directCallFuncIdentity": true,
+      "parentKind": "Call"
+    }
+  ],
+  "files": [
+    {
+      "ASTParse": true,
+      "bytes": 15823,
+      "executed": false,
+      "path": "services/control-plane/src/inv/dispatch.py",
+      "sha256": "82f029614537eb5bab56934e4b6736fe3dd52ece54b9b9a3996815b131e41de4"
+    },
+    {
+      "ASTParse": true,
+      "bytes": 9520,
+      "executed": false,
+      "path": "tests/core/test_delivery_operation_origin.py",
+      "sha256": "3dacdb63f83ab1d8075ddcbe422d82daad20bd56f643adee0fc7ae97715925d2"
+    },
+    {
+      "ASTParse": true,
+      "bytes": 21312,
+      "executed": false,
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/operation_proof.py",
+      "sha256": "d5f68c4a1bff9b3f59055a72c1b3dfca97b1b5af674e08da19a729ab9bb66e49"
+    },
+    {
+      "ASTParse": true,
+      "bytes": 5385,
+      "executed": false,
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/prepare.py",
+      "sha256": "7ab1f2b986a0771d57e6502462abd035b2f7964b172d21f0c104d55a7c35beb7"
+    },
+    {
+      "ASTParse": true,
+      "bytes": 10067,
+      "executed": false,
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/static_checks.py",
+      "sha256": "f7843e4c2a3dea7023e6b2bbe5e2d0b2a500807323d5b8ca42ad91f464859d01"
+    }
+  ],
+  "inverseExactPatchModuleASTEqualsBASE": true,
+  "queueFinishASTUnchanged": true,
+  "testModuleImportedOrExecuted": false
+}

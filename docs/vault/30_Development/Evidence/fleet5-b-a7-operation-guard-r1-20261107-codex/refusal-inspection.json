@@ -1,0 +1,13 @@
+{
+  "argv": [
+    "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+    "-B",
+    "docs\\vault\\30_Development\\Evidence\\fleet5-b-a7-operation-guard-r1-20261107-codex\\inspect_refusal.py"
+  ],
+  "startKST": "2026-11-07T09:23:25.579204+09:00",
+  "endKST": "2026-11-07T09:23:26.103340+09:00",
+  "exit": 0,
+  "logSHA256": "4e1ec805a412ab5ae1ce0766f9b186856e0d62c17fe65f6c099e69bb44f49517",
+  "kind": "AST_SOURCE_DIAGNOSTIC_ONLY",
+  "actualProductTests": "NOT_RUN"
+}

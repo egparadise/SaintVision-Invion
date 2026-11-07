@@ -1,0 +1,13 @@
+{
+  "argv": [
+    "git",
+    "diff",
+    "--cached",
+    "--check"
+  ],
+  "atKST": "2026-11-07T10:09:31.640507+09:00",
+  "exit": 2,
+  "encoding": "utf-8",
+  "rawSHA256": "14b2aec1b372f2c432c56c1b1bccb7183b5479b2310c44282e8a9ce44f1af63c",
+  "text": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/review-original-local-doc-gates.txt:14: trailing whitespace.\n+    \n"
+}

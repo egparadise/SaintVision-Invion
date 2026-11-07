@@ -1,0 +1,16 @@
+{
+  "argv": [
+    "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+    "-B",
+    "tools/check_doc_single_source.py",
+    "--ratchet"
+  ],
+  "startKST": "2026-11-07T10:17:31.037812+09:00",
+  "endKST": "2026-11-07T10:17:31.551702+09:00",
+  "exit": 0,
+  "rawSHA256": "13b5f5afed05999109839be1baec4ef70ea3c71bcb267353e59eba0f2ae3e448",
+  "rawBytes": 80,
+  "encoding": "utf-8",
+  "text": "PASS check_doc_single_source --ratchet: 16 pairs, all in baseline, none stale.\r\n",
+  "cause": "Root msg_193e85c36227 exact one-file JSON representation and appended History; no product/test/proof change"
+}

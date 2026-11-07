@@ -1,0 +1,13 @@
+{
+  "argv": [
+    "git",
+    "diff",
+    "--check",
+    "b3bbdc8d92a39f2f797a7680deb2770d6f705af0"
+  ],
+  "endKST": "2026-11-07T10:06:35.805063+09:00",
+  "exit": 0,
+  "rawOutputSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "rawOutputWrapper": "publication-gate06-raw.json",
+  "startKST": "2026-11-07T10:06:34.776161+09:00"
+}

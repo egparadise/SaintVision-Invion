@@ -1,0 +1,97 @@
+{
+  "actualProductTestsByAuthor": false,
+  "allExit0": true,
+  "atKST": "2026-11-07T10:06:35.816176+09:00",
+  "receipts": [
+    {
+      "argv": [
+        "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+        "-B",
+        "tools/check_docs.py"
+      ],
+      "endKST": "2026-11-07T10:05:55.240175+09:00",
+      "exit": 0,
+      "rawOutputSHA256": "a15905c3581d181c64f26135a101b6e87ba4d106025d0320e4e26c6649881cc0",
+      "rawOutputWrapper": "publication-gate01-raw.json",
+      "startKST": "2026-11-07T10:05:19.319507+09:00"
+    },
+    {
+      "argv": [
+        "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+        "-B",
+        "tools/check_ontology.py"
+      ],
+      "endKST": "2026-11-07T10:05:59.698528+09:00",
+      "exit": 0,
+      "rawOutputSHA256": "7cdc12bf64f50ba0964625161638a4c639cf22d786a57f04685bed0718e14042",
+      "rawOutputWrapper": "publication-gate02-raw.json",
+      "startKST": "2026-11-07T10:05:55.241809+09:00"
+    },
+    {
+      "argv": [
+        "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+        "-B",
+        "tools/check_doc_path_citations.py",
+        "--ratchet",
+        "--base-ref",
+        "b3bbdc8d92a39f2f797a7680deb2770d6f705af0"
+      ],
+      "endKST": "2026-11-07T10:06:11.046288+09:00",
+      "exit": 0,
+      "rawOutputSHA256": "389921b50662776ed834a285f70fc44ab61f7d5bdb4c5249c0a73c98113980de",
+      "rawOutputWrapper": "publication-gate03-raw.json",
+      "startKST": "2026-11-07T10:05:59.725969+09:00"
+    },
+    {
+      "argv": [
+        "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+        "-B",
+        "tools/check_doc_single_source.py",
+        "--ratchet"
+      ],
+      "endKST": "2026-11-07T10:06:11.543384+09:00",
+      "exit": 0,
+      "rawOutputSHA256": "13b5f5afed05999109839be1baec4ef70ea3c71bcb267353e59eba0f2ae3e448",
+      "rawOutputWrapper": "publication-gate04-raw.json",
+      "startKST": "2026-11-07T10:06:11.071167+09:00"
+    },
+    {
+      "CHECKOnly": true,
+      "argv": [
+        "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+        "-B",
+        "tools/sync_obsidian.py",
+        "--check",
+        "--state",
+        "D:\\Project\\SaintVision-Invion\\SaintVisionI-Invion\\.git\\obsidian-sync-state.json",
+        "--conflicts-out",
+        "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105\\docs\\vault\\30_Development\\Evidence\\fleet5-b-a7-operation-guard-r1-20261107-codex\\publication-sync-check-conflicts.json"
+      ],
+      "endKST": "2026-11-07T10:06:34.753270+09:00",
+      "exit": 0,
+      "fullStateAfterBytes": 472404,
+      "fullStateAfterSHA256": "e4a1518712fe4f1734598e123d0c1cbca2a5ac1b3e82f00d994eed8bb4f114de",
+      "fullStateBeforeBytes": 472404,
+      "fullStateBeforeSHA256": "e4a1518712fe4f1734598e123d0c1cbca2a5ac1b3e82f00d994eed8bb4f114de",
+      "rawOutputSHA256": "1042975184359e78c1b2f4f6465d80bf2ee34e7c66626b2f113fbf3e660922a0",
+      "rawOutputWrapper": "publication-gate05-raw.json",
+      "startKST": "2026-11-07T10:06:11.563022+09:00",
+      "stateBytesEqual": true,
+      "stateChangePolicy": "Root may advance concurrently; actual changes retained, never overwritten"
+    },
+    {
+      "argv": [
+        "git",
+        "diff",
+        "--check",
+        "b3bbdc8d92a39f2f797a7680deb2770d6f705af0"
+      ],
+      "endKST": "2026-11-07T10:06:35.805063+09:00",
+      "exit": 0,
+      "rawOutputSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rawOutputWrapper": "publication-gate06-raw.json",
+      "startKST": "2026-11-07T10:06:34.776161+09:00"
+    }
+  ],
+  "stateSnapshotsFullAndIndependent": true
+}

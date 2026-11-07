@@ -1,0 +1,1 @@
+{"classification": "EXACT_CAPTURE_GUARD_DELTA_COVERED_WITH_LEGACY_REFUSAL_PRESERVED", "legacyStatus": "REFUSED", "controls": 21, "allExpected": true, "scopedFiles": 25, "actualAuthorProductExecution": false, "RootUnitGreenPassed": 24, "RootCausalRedFailed": 1, "baselineDischarges": 0}

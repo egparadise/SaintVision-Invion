@@ -1,0 +1,174 @@
+{
+  "atKST": "2026-11-07T10:18:58.217869+09:00",
+  "RootDecision": "msg_193e85c36227",
+  "base": "b3bbdc8d92a39f2f797a7680deb2770d6f705af0",
+  "explicitPaths": [
+    "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/check_finite_compatibility.py",
+    "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/complete-product-test.diff.txt",
+    "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/control-inputs.json",
+    "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/control-results.json",
+    "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/existing-guard-refusal.json",
+    "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/finite_compatibility.py",
+    "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/fleet5-a7-operation-guard-r1-wip01.zip",
+    "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/fleet5-a7-operation-guard-r1-wip02.zip",
+    "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/freeze_wip.py",
+    "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/freeze_wip02.py",
+    "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/inputs.json",
+    "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/inspect_refusal.py",
+    "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/operation-obligation-auxiliary.json",
+    "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/operation-origin-graph.json",
+    "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/operation_proof.py",
+    "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/prepare.py",
+    "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/prepare_wip02.py",
+    "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/publication-approved-stage-paths.json",
+    "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/publication-doc-read.json",
+    "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/publication-final-gate01.json",
+    "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/publication-final-gate02.json",
+    "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/publication-final-gate03.json",
+    "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/publication-final-gate04.json",
+    "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/publication-final-gates-complete.json",
+    "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/publication-final-sync-state-after.json",
+    "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/publication-final-sync-state-before.json",
+    "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/publication-gate01-raw.json",
+    "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/publication-gate01-receipt.json",
+    "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/publication-gate02-raw.json",
+    "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/publication-gate02-receipt.json",
+    "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/publication-gate03-raw.json",
+    "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/publication-gate03-receipt.json",
+    "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/publication-gate04-raw.json",
+    "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/publication-gate04-receipt.json",
+    "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/publication-gate05-raw.json",
+    "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/publication-gate05-receipt.json",
+    "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/publication-gate06-raw.json",
+    "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/publication-gate06-receipt.json",
+    "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/publication-gates-complete.json",
+    "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/publication-raw-representation.json",
+    "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/publication-root-context.json",
+    "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/publication-stage-blocker.json",
+    "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/publication-stage-paths.json",
+    "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/publication-stage-stop.json",
+    "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/publication-sync-state-after.json",
+    "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/publication-sync-state-before.json",
+    "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/publication-wrap-gate01.json",
+    "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/publication-wrap-gate02.json",
+    "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/publication-wrap-gate03.json",
+    "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/publication-wrap-gate04.json",
+    "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/publication-wrap-gate05.json",
+    "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/publication-wrap-gate06.json",
+    "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/publication-wrap-gates-complete.json",
+    "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/publication-wrap-sync-state-after.json",
+    "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/publication-wrap-sync-state-before.json",
+    "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/publication_gates.py",
+    "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/refusal-inspection.json",
+    "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/refusal-inspection.log.txt",
+    "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/review-original-canonical-sync-check-before.txt",
+    "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/review-original-commands.json",
+    "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/review-original-gitattributes.txt",
+    "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/review-original-history.md.txt",
+    "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/review-original-local-doc-gates.raw.json",
+    "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/review-original-review.json",
+    "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/review-original-reviewer-mode-future-rule-result.json",
+    "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/review-original-reviewer-mode-future-rule.log.txt",
+    "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/review-original-reviewer-mode-probes-result.json",
+    "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/review-original-reviewer-mode-probes.log.txt",
+    "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/review-original-reviewer_gate_driver.py.txt",
+    "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/review-original-reviewer_mode_future_rule.py.txt",
+    "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/review-original-reviewer_mode_probes.py.txt",
+    "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/root-collect-public-projection.json",
+    "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/root-run-plan.json",
+    "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/root-verified-unit-observation.json",
+    "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/source-world.json",
+    "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/static-inspection-attempt1.json",
+    "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/static-inspection-attempt1.log.txt",
+    "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/static_checks.py",
+    "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/syntax-source-inspection.json",
+    "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/wip01-manifest.json",
+    "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/wip01-receipt.json",
+    "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/wip02-finite-control-results.json",
+    "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/wip02-finite-proof.json",
+    "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/wip02-full-product-test.diff.txt",
+    "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/wip02-inputs.json",
+    "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/wip02-legacy-run.json",
+    "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/wip02-manifest.json",
+    "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/wip02-receipt.json",
+    "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/wip02-static-attempt1.json",
+    "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/wip02-static-attempt1.log.txt",
+    "docs/vault/30_Development/History/2026-11-07_FLEET5_B_A7_Operation_Guard_R1_Codex.md",
+    "services/control-plane/src/inv/dispatch.py",
+    "tests/core/test_delivery_operation_origin.py"
+  ],
+  "excludedExactRawPath": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/review-original-local-doc-gates.txt",
+  "excludedOtherCardReceipts": [
+    {
+      "SHA256": "82075c3707541925e2e2a32ac048a1d811d30197f4aeb5786b1c0c18c4f5c8c2",
+      "bytes": 4428,
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-mode-origin-r1-20261107-codex/ci-jobs-first.json"
+    },
+    {
+      "SHA256": "df17a2f508a609c209adbe1fc062f27e9b6d30ad934a2244c60acbbf8d858b3d",
+      "bytes": 13113,
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-mode-origin-r1-20261107-codex/ci-run-first.json"
+    },
+    {
+      "SHA256": "3de63ef2f14a6e1dcef2f7f8a6ea4cd7f2951acaf94501b7601a42e9585ab1fc",
+      "bytes": 5534,
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-mode-origin-r1-20261107-codex/committed-verification.json"
+    },
+    {
+      "SHA256": "dc7ed81294c92425c0fe27a9dda998c7c7502fa935d20d118596d88059e9f6c8",
+      "bytes": 5341,
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-mode-origin-r1-20261107-codex/publication-receipt.json"
+    },
+    {
+      "SHA256": "00e257e66a25014647296b71586441d3abf221d27c484084c2a5c6adba56fffd",
+      "bytes": 3753,
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-snapshot-r1-20261107-codex/ci-jobs-first.json"
+    },
+    {
+      "SHA256": "ab2e910bcf94e424816cc3039e9f0d320bbbb3d8e58271ec02f729b905a6fe6f",
+      "bytes": 4422,
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-snapshot-r1-20261107-codex/ci-jobs-observation02.json"
+    },
+    {
+      "SHA256": "304676b72660ce002f52446de97f31662625091a4e35f10add485b0fc9945dc2",
+      "bytes": 13106,
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-snapshot-r1-20261107-codex/ci-run-first.json"
+    },
+    {
+      "SHA256": "55180a08d22fda9c171512aafac8a1bc3fa46e0a295ae667d8c54d6838393527",
+      "bytes": 13109,
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-snapshot-r1-20261107-codex/ci-run-observation02.json"
+    },
+    {
+      "SHA256": "f5df4da030a259625910f16e04fa6f490fb086d6b275e7a049f215db3b04e121",
+      "bytes": 20032,
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-snapshot-r1-20261107-codex/committed-receipt-verification.json"
+    },
+    {
+      "SHA256": "50d1c2ebfe11dc4182303547f35c218ecd5463678592032aeff9d14cd1fae93e",
+      "bytes": 4448,
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-snapshot-r1-20261107-codex/publication-receipt.json"
+    },
+    {
+      "SHA256": "9320d15ea4ec81dfd5bfa6b18b1fc32bac8d7c93feacdd426cb84102909a39b3",
+      "bytes": 4422,
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-snapshot-r2-20261107-codex/ci-jobs-first.json"
+    },
+    {
+      "SHA256": "51649b5b9bcf1fc3c0c08e16859d56cc545d5bb3c8452ea4a2e1deedaf0e7684",
+      "bytes": 13087,
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-snapshot-r2-20261107-codex/ci-run-first.json"
+    },
+    {
+      "SHA256": "5f7ad3a551f4e86f43ab507906a2fbc7a2a91e8b080b85d93f199f683a6f95e2",
+      "bytes": 21651,
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-snapshot-r2-20261107-codex/committed-receipt-verification.json"
+    },
+    {
+      "SHA256": "16466fd1140db20d816ccfc087cd87150e43fa59717ecc2c54d2d3bfe1802360",
+      "bytes": 4439,
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-snapshot-r2-20261107-codex/publication-receipt.json"
+    }
+  ],
+  "existingOwnedIndexReconciled": true
+}

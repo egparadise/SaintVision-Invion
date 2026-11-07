@@ -1,0 +1,80 @@
+{
+  "receipts": [
+    {
+      "argv": [
+        "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+        "-B",
+        "tools/check_docs.py"
+      ],
+      "startKST": "2026-11-07T10:07:59.753486+09:00",
+      "endKST": "2026-11-07T10:08:13.110583+09:00",
+      "exit": 0,
+      "rawSHA256": "a15905c3581d181c64f26135a101b6e87ba4d106025d0320e4e26c6649881cc0",
+      "rawBytes": 127,
+      "encoding": "utf-8",
+      "text": "PASS: 24 original hashes, 1266 versioned documents, wiki links, 48 tasks, 12 outcomes, owner/reviewer/skills, dependency DAG.\r\n",
+      "cause": "new appended publication History; no ontology/source/product/test changes"
+    },
+    {
+      "argv": [
+        "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+        "-B",
+        "tools/check_doc_path_citations.py",
+        "--ratchet",
+        "--base-ref",
+        "b3bbdc8d92a39f2f797a7680deb2770d6f705af0"
+      ],
+      "startKST": "2026-11-07T10:08:13.111670+09:00",
+      "endKST": "2026-11-07T10:08:17.528591+09:00",
+      "exit": 0,
+      "rawSHA256": "389921b50662776ed834a285f70fc44ab61f7d5bdb4c5249c0a73c98113980de",
+      "rawBytes": 112,
+      "encoding": "utf-8",
+      "text": "PASS check_doc_path_citations --ratchet: 290 broken citation(s), all in baseline, none stale, floor unchanged.\r\n",
+      "cause": "new appended publication History; no ontology/source/product/test changes"
+    },
+    {
+      "argv": [
+        "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+        "-B",
+        "tools/check_doc_single_source.py",
+        "--ratchet"
+      ],
+      "startKST": "2026-11-07T10:08:17.529286+09:00",
+      "endKST": "2026-11-07T10:08:17.951752+09:00",
+      "exit": 0,
+      "rawSHA256": "13b5f5afed05999109839be1baec4ef70ea3c71bcb267353e59eba0f2ae3e448",
+      "rawBytes": 80,
+      "encoding": "utf-8",
+      "text": "PASS check_doc_single_source --ratchet: 16 pairs, all in baseline, none stale.\r\n",
+      "cause": "new appended publication History; no ontology/source/product/test changes"
+    },
+    {
+      "argv": [
+        "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+        "-B",
+        "tools/sync_obsidian.py",
+        "--check",
+        "--state",
+        "D:\\Project\\SaintVision-Invion\\SaintVisionI-Invion\\.git\\obsidian-sync-state.json",
+        "--conflicts-out",
+        "docs\\vault\\30_Development\\Evidence\\fleet5-b-a7-operation-guard-r1-20261107-codex\\publication-final-sync-conflicts.json"
+      ],
+      "startKST": "2026-11-07T10:08:17.988309+09:00",
+      "endKST": "2026-11-07T10:08:37.325796+09:00",
+      "exit": 0,
+      "rawSHA256": "19e2954d75e7870349ec70961b974b83ad81cb7d0104eda023a89c73617e117a",
+      "rawBytes": 74,
+      "encoding": "utf-8",
+      "text": "CHECK: 4959 managed files, 2535 pending exports, 0 conflicts. No writes.\r\n",
+      "cause": "new appended publication History; no ontology/source/product/test changes",
+      "fullStateBeforeSHA256": "e4a1518712fe4f1734598e123d0c1cbca2a5ac1b3e82f00d994eed8bb4f114de",
+      "fullStateAfterSHA256": "e4a1518712fe4f1734598e123d0c1cbca2a5ac1b3e82f00d994eed8bb4f114de",
+      "fullStateBeforeBytes": 472404,
+      "fullStateAfterBytes": 472404,
+      "stateBytesEqual": true,
+      "CHECKOnly": true
+    }
+  ],
+  "allExit0": true
+}

@@ -1,0 +1,185 @@
+{
+  "base": "b3bbdc8d92a39f2f797a7680deb2770d6f705af0",
+  "count": 25,
+  "currentDispatchSHA256": "82f029614537eb5bab56934e4b6736fe3dd52ece54b9b9a3996815b131e41de4",
+  "currentTestSHA256": "3dacdb63f83ab1d8075ddcbe422d82daad20bd56f643adee0fc7ae97715925d2",
+  "files": [
+    {
+      "baseGitBlobSHA256": "7483d65fcb1032aeb05b4d2dd56e09e714cff8ca676de0f80fc3a2f5e447e9af",
+      "bytes": 22165,
+      "inputKind": "REAL_BASE_GIT_BLOB",
+      "path": "services/control-plane/src/inv/build_product_runtime.py",
+      "sha256": "7483d65fcb1032aeb05b4d2dd56e09e714cff8ca676de0f80fc3a2f5e447e9af"
+    },
+    {
+      "baseGitBlobSHA256": "4a33428502279b88e510b5447382814bb115ddf2bff4f88f5bfcbb93f3c1a404",
+      "bytes": 15823,
+      "inputKind": "CURRENT_WIP_DISPATCH",
+      "path": "services/control-plane/src/inv/dispatch.py",
+      "sha256": "82f029614537eb5bab56934e4b6736fe3dd52ece54b9b9a3996815b131e41de4"
+    },
+    {
+      "baseGitBlobSHA256": "796f61fe8404c2c3a8a4be08eca75d98e3c442a30c04077c66b278e7d60c6737",
+      "bytes": 4737,
+      "inputKind": "REAL_BASE_GIT_BLOB",
+      "path": "services/control-plane/src/inv/model_remote.py",
+      "sha256": "796f61fe8404c2c3a8a4be08eca75d98e3c442a30c04077c66b278e7d60c6737"
+    },
+    {
+      "baseGitBlobSHA256": "3559bbcdf9568f8930654d860b0edd980eca71c835cde3fe7380a69dd56e18f4",
+      "bytes": 12319,
+      "inputKind": "REAL_BASE_GIT_BLOB",
+      "path": "services/control-plane/src/inv/node_transport.py",
+      "sha256": "3559bbcdf9568f8930654d860b0edd980eca71c835cde3fe7380a69dd56e18f4"
+    },
+    {
+      "baseGitBlobSHA256": "6bbdf815554fe1f0157247732ddc4dc3069686685c291ef83add55c8f3e92003",
+      "bytes": 2821,
+      "inputKind": "REAL_BASE_GIT_BLOB",
+      "path": "services/control-plane/src/inv/observer_worker.py",
+      "sha256": "6bbdf815554fe1f0157247732ddc4dc3069686685c291ef83add55c8f3e92003"
+    },
+    {
+      "baseGitBlobSHA256": "e954e1ef8dcae97756a50428af66c9a328e4d362f1aee7d630588431d09b1308",
+      "bytes": 9784,
+      "inputKind": "REAL_BASE_GIT_BLOB",
+      "path": "services/control-plane/src/inv/output_ingestion.py",
+      "sha256": "e954e1ef8dcae97756a50428af66c9a328e4d362f1aee7d630588431d09b1308"
+    },
+    {
+      "baseGitBlobSHA256": "5efd1057f9208cdb29670073bd8ea5e96f98cfbd5a8173f4daa764d3db5db52e",
+      "bytes": 12723,
+      "inputKind": "REAL_BASE_GIT_BLOB",
+      "path": "services/control-plane/src/inv/remote_git.py",
+      "sha256": "5efd1057f9208cdb29670073bd8ea5e96f98cfbd5a8173f4daa764d3db5db52e"
+    },
+    {
+      "baseGitBlobSHA256": "900b2b5b3381da451a14a49a2b079b2f9851ea3bc91f30798c9fcde243ceab9a",
+      "bytes": 16901,
+      "inputKind": "REAL_BASE_GIT_BLOB",
+      "path": "services/control-plane/src/inv/result_view.py",
+      "sha256": "900b2b5b3381da451a14a49a2b079b2f9851ea3bc91f30798c9fcde243ceab9a"
+    },
+    {
+      "baseGitBlobSHA256": "bae67c856cc8bdae52c1f06c4b6e36302e17ae0dd53a24fc01557cae19a3e226",
+      "bytes": 19960,
+      "inputKind": "REAL_BASE_GIT_BLOB",
+      "path": "services/control-plane/src/inv/storage_check_collect.py",
+      "sha256": "bae67c856cc8bdae52c1f06c4b6e36302e17ae0dd53a24fc01557cae19a3e226"
+    },
+    {
+      "baseGitBlobSHA256": "4e43aa43e8dc9b8ab78af0fde78f9e83b83d7bfdc77b7362ad565741f6f94e8a",
+      "bytes": 10765,
+      "inputKind": "REAL_BASE_GIT_BLOB",
+      "path": "services/control-plane/src/inv/storage_sampling.py",
+      "sha256": "4e43aa43e8dc9b8ab78af0fde78f9e83b83d7bfdc77b7362ad565741f6f94e8a"
+    },
+    {
+      "baseGitBlobSHA256": "fe294d648b34d617df94449974fc82fed904639b80b8a5da2c9d34f32606bf8e",
+      "bytes": 17862,
+      "inputKind": "REAL_BASE_GIT_BLOB",
+      "path": "services/control-plane/src/inv/terminal.py",
+      "sha256": "fe294d648b34d617df94449974fc82fed904639b80b8a5da2c9d34f32606bf8e"
+    },
+    {
+      "baseGitBlobSHA256": "de5f6213b196784c6c4280d31a17fba9fe1669eb466edee14197664b37f2ac6c",
+      "bytes": 15889,
+      "inputKind": "REAL_BASE_GIT_BLOB",
+      "path": "services/control-plane/src/inv/tooling.py",
+      "sha256": "de5f6213b196784c6c4280d31a17fba9fe1669eb466edee14197664b37f2ac6c"
+    },
+    {
+      "baseGitBlobSHA256": "3010b2409bb285de960eb322792b1062ed066275307c9bea53a2cc767b65d4e3",
+      "bytes": 7594,
+      "inputKind": "REAL_BASE_GIT_BLOB",
+      "path": "services/control-plane/src/inv/worker.py",
+      "sha256": "3010b2409bb285de960eb322792b1062ed066275307c9bea53a2cc767b65d4e3"
+    },
+    {
+      "baseGitBlobSHA256": "7b77a716b4fb56e951fce110d347ac41f16d1d80d4722ba9d1410a1869b351cb",
+      "bytes": 4125,
+      "inputKind": "REAL_BASE_GIT_BLOB",
+      "path": "services/control-plane/src/inv/workspace_config.py",
+      "sha256": "7b77a716b4fb56e951fce110d347ac41f16d1d80d4722ba9d1410a1869b351cb"
+    },
+    {
+      "baseGitBlobSHA256": "32c8fae52eb947605c53801d609e9826c514b53c2392f07f1fb9ff605303449b",
+      "bytes": 14468,
+      "inputKind": "REAL_BASE_GIT_BLOB",
+      "path": "services/control-plane/src/inv/workspace_resume.py",
+      "sha256": "32c8fae52eb947605c53801d609e9826c514b53c2392f07f1fb9ff605303449b"
+    },
+    {
+      "baseGitBlobSHA256": "e97af6a21a46ebfc2f836a5339005510dcd3dcd257640a4b375bdb52bd3b0bda",
+      "bytes": 12213,
+      "inputKind": "REAL_BASE_GIT_BLOB",
+      "path": "src/saintvision/services/eval_execution.py",
+      "sha256": "e97af6a21a46ebfc2f836a5339005510dcd3dcd257640a4b375bdb52bd3b0bda"
+    },
+    {
+      "baseGitBlobSHA256": "3550db9c20fb7e2118f66f0337ed787dd22a166a6ff8cf1c6e9490f9ae9df6e3",
+      "bytes": 13260,
+      "inputKind": "REAL_BASE_GIT_BLOB",
+      "path": "tools/check_remote_workspace.py",
+      "sha256": "3550db9c20fb7e2118f66f0337ed787dd22a166a6ff8cf1c6e9490f9ae9df6e3"
+    },
+    {
+      "baseGitBlobSHA256": "3a2e134e04ac36ec81a20280e47e2f9deb9c190c2f5bed5c26e1ad05206210ed",
+      "bytes": 76378,
+      "inputKind": "REAL_BASE_GIT_BLOB",
+      "path": "tools/intranet_e2e_smoke.py",
+      "sha256": "3a2e134e04ac36ec81a20280e47e2f9deb9c190c2f5bed5c26e1ad05206210ed"
+    },
+    {
+      "baseGitBlobSHA256": "cd4be84de9a60c03c32daa8e831a527ed9014169e151c7a436383772a5d4ddc0",
+      "bytes": 11689,
+      "inputKind": "REAL_BASE_GIT_BLOB",
+      "path": "tools/lan_execution.py",
+      "sha256": "cd4be84de9a60c03c32daa8e831a527ed9014169e151c7a436383772a5d4ddc0"
+    },
+    {
+      "baseGitBlobSHA256": "2c626540f495499423b707b063a6cab6a53e1be3af8c324f46af88a94ac8f652",
+      "bytes": 198894,
+      "inputKind": "REAL_BASE_GIT_BLOB",
+      "path": "tools/lan_pilot.py",
+      "sha256": "2c626540f495499423b707b063a6cab6a53e1be3af8c324f46af88a94ac8f652"
+    },
+    {
+      "baseGitBlobSHA256": "b88449375aa8377d1e069e151d297ca9bd964495a4807d7e3eab26b111da6842",
+      "bytes": 2115,
+      "inputKind": "REAL_BASE_GIT_BLOB",
+      "path": "tools/post_landing_select_run.py",
+      "sha256": "b88449375aa8377d1e069e151d297ca9bd964495a4807d7e3eab26b111da6842"
+    },
+    {
+      "baseGitBlobSHA256": "2203c2d424ecd7651dcd099b4fd6fb051bd872e919a8bcad44fd2b4043897b2e",
+      "bytes": 14829,
+      "inputKind": "REAL_BASE_GIT_BLOB",
+      "path": "tools/prepare_server_config.py",
+      "sha256": "2203c2d424ecd7651dcd099b4fd6fb051bd872e919a8bcad44fd2b4043897b2e"
+    },
+    {
+      "baseGitBlobSHA256": "e69fa8ff6c51bd3880f5ec388fe97288a4256169377e17d9d6aa5b7ec2f32c27",
+      "bytes": 14741,
+      "inputKind": "REAL_BASE_GIT_BLOB",
+      "path": "tools/remote_workspace_entry.py",
+      "sha256": "e69fa8ff6c51bd3880f5ec388fe97288a4256169377e17d9d6aa5b7ec2f32c27"
+    },
+    {
+      "baseGitBlobSHA256": "67388ba4a7ac07156bf70d9286691d1a0dfe1fb76f976cf91f0b1df84dc6743b",
+      "bytes": 34190,
+      "inputKind": "REAL_BASE_GIT_BLOB",
+      "path": "tools/run_ac11_exact_sha_aggregate.py",
+      "sha256": "67388ba4a7ac07156bf70d9286691d1a0dfe1fb76f976cf91f0b1df84dc6743b"
+    },
+    {
+      "baseGitBlobSHA256": "92296b5f070cd97440889b12b487876cd64240408fe4faa918597dfcc6c7e82c",
+      "bytes": 7618,
+      "inputKind": "REAL_BASE_GIT_BLOB",
+      "path": "tools/run_s04_db_evidence.py",
+      "sha256": "92296b5f070cd97440889b12b487876cd64240408fe4faa918597dfcc6c7e82c"
+    }
+  ],
+  "productStubCount": 0,
+  "sourceOrTestExecuted": false
+}

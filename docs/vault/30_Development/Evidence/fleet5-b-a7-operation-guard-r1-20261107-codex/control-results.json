@@ -1,0 +1,260 @@
+{
+  "acceptedDischarges": 0,
+  "actualProductOrMutantsExecuted": false,
+  "allExpected": true,
+  "count": 9,
+  "rows": [
+    {
+      "earlierGuardCredit": false,
+      "expectationMet": true,
+      "expectedReason": null,
+      "expectedStatus": "CONDITIONAL_CAPTURED_MODE_ORIGIN_CANDIDATE",
+      "inputSHA256": {
+        "services/control-plane/src/inv/dispatch.py": "82f029614537eb5bab56934e4b6736fe3dd52ece54b9b9a3996815b131e41de4"
+      },
+      "layer": "DIRECT_CAPTURE_FORWARD_RULE",
+      "name": "actual-WIP",
+      "reason": null,
+      "status": "CONDITIONAL_CAPTURED_MODE_ORIGIN_CANDIDATE"
+    },
+    {
+      "earlierGuardCredit": false,
+      "expectationMet": true,
+      "expectedReason": null,
+      "expectedStatus": "CONDITIONAL_CAPTURED_MODE_ORIGIN_CANDIDATE",
+      "inputSHA256": {
+        "services/control-plane/src/inv/dispatch.py": "5ebb15dac7a05dd92b3f2e973cb28a430924fc35f0c99c692d5e8521b3c54dcd"
+      },
+      "layer": "DIRECT_CAPTURE_FORWARD_RULE",
+      "name": "benign-leading-comment",
+      "reason": null,
+      "status": "CONDITIONAL_CAPTURED_MODE_ORIGIN_CANDIDATE"
+    },
+    {
+      "earlierGuardCredit": false,
+      "expectationMet": true,
+      "expectedReason": "OPERATION_CAPTURE_GUARD_CHANGED",
+      "expectedStatus": "UNRESOLVED",
+      "inputSHA256": {
+        "services/control-plane/src/inv/dispatch.py": "7edd2ddfa17cd2904c8c0d49bc58ce480aaf1815422a0225f902fd95cbcb519a"
+      },
+      "layer": "DIRECT_CAPTURE_FORWARD_RULE",
+      "name": "capture-removed",
+      "reason": "OPERATION_CAPTURE_GUARD_CHANGED",
+      "status": "UNRESOLVED"
+    },
+    {
+      "earlierGuardCredit": false,
+      "expectationMet": true,
+      "expectedReason": "OPERATION_CAPTURE_GUARD_CHANGED",
+      "expectedStatus": "UNRESOLVED",
+      "inputSHA256": {
+        "services/control-plane/src/inv/dispatch.py": "1d25fd85fc096d29645befb14895e568c95605ef4162644c19e67f58b4d11384"
+      },
+      "layer": "DIRECT_CAPTURE_FORWARD_RULE",
+      "name": "guard-domain-expanded",
+      "reason": "OPERATION_CAPTURE_GUARD_CHANGED",
+      "status": "UNRESOLVED"
+    },
+    {
+      "earlierGuardCredit": false,
+      "expectationMet": true,
+      "expectedReason": "MODE_FORWARDING_CHANGED",
+      "expectedStatus": "UNRESOLVED",
+      "inputSHA256": {
+        "services/control-plane/src/inv/dispatch.py": "db3f1163e2526a08901ea4b17f98747df9b674062a228194422121aaeabe74d0"
+      },
+      "layer": "DIRECT_CAPTURE_FORWARD_RULE",
+      "name": "forwarding-changed",
+      "reason": "MODE_FORWARDING_CHANGED",
+      "status": "UNRESOLVED"
+    },
+    {
+      "earlierGuardCredit": false,
+      "expectationMet": true,
+      "expectedReason": "OPERATION_CAPTURE_GUARD_CHANGED",
+      "expectedStatus": "UNRESOLVED",
+      "inputSHA256": {
+        "services/control-plane/src/inv/dispatch.py": "8dea8f2587b77eab38200ccd32837741cc52f132faba705955661eba5e1502a1"
+      },
+      "layer": "DIRECT_CAPTURE_FORWARD_RULE",
+      "name": "second-operation-store",
+      "reason": "OPERATION_CAPTURE_GUARD_CHANGED",
+      "status": "UNRESOLVED"
+    },
+    {
+      "constructorBindingsValid": true,
+      "constructors": 9,
+      "earlierGuardCredit": false,
+      "earlierGuardRefusals": [
+        {
+          "error": "DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:INSTANCE:operation",
+          "newReflection": [],
+          "path": "services/control-plane/src/inv/dispatch.py"
+        }
+      ],
+      "earlierGuardRefusalsSameAsWIP": true,
+      "expectationMet": true,
+      "inputSHA256": {
+        "services/control-plane/src/inv/dispatch.py": "82f029614537eb5bab56934e4b6736fe3dd52ece54b9b9a3996815b131e41de4",
+        "tools/lan_pilot.py": "abb17b22020e6c93820ac9543e1a54a9813d746dcd8dd4851b9543fd0ef93a5e"
+      },
+      "layer": "WHOLE_SCOPED_DELIVER_REFERENCE_SET",
+      "modeRuleReason": null,
+      "modeRuleStatus": "CONDITIONAL_CAPTURED_MODE_ORIGIN_CANDIDATE",
+      "mutatedCallerGuardClean": true,
+      "name": "reviewer-valid-second-caller",
+      "parsed": 25,
+      "reason": "DELIVER_REFERENCE_SET_CHANGED",
+      "referenceContract": {
+        "acceptedDischarge": false,
+        "binding": "current path + fileSHA256 + function + span + expressionSHA256 AND actual AST node kinds/direct Call.func parent relation; not text/name/span alone",
+        "forwardingCallSource": {
+          "expressionSHA256": "476fd474759435bc098bef7e35bc2bdc8e58826f015228e59a6ee794db8867cb",
+          "fileSHA256": "82f029614537eb5bab56934e4b6736fe3dd52ece54b9b9a3996815b131e41de4",
+          "function": "inv.dispatch.DeliveryWorker.once",
+          "path": "services/control-plane/src/inv/dispatch.py",
+          "span": [
+            339,
+            12,
+            344,
+            13
+          ]
+        },
+        "projectedAttributeSource": {
+          "expressionSHA256": "26a4e065c848c1fb80b56f62bc7cae559f203434e03608f75572d2fe7eedf297",
+          "fileSHA256": "82f029614537eb5bab56934e4b6736fe3dd52ece54b9b9a3996815b131e41de4",
+          "function": "inv.dispatch.DeliveryWorker.once",
+          "path": "services/control-plane/src/inv/dispatch.py",
+          "span": [
+            339,
+            12,
+            339,
+            33
+          ]
+        },
+        "reason": "DELIVER_REFERENCE_SET_CHANGED",
+        "referenceCount": 2,
+        "status": "UNRESOLVED"
+      },
+      "referenceCount": 2,
+      "status": "UNRESOLVED_OPERATION_ORIGIN"
+    },
+    {
+      "constructorBindingsValid": true,
+      "constructors": 9,
+      "earlierGuardCredit": false,
+      "earlierGuardRefusals": [
+        {
+          "error": "DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:INSTANCE:operation",
+          "newReflection": [],
+          "path": "services/control-plane/src/inv/dispatch.py"
+        }
+      ],
+      "earlierGuardRefusalsSameAsWIP": true,
+      "expectationMet": true,
+      "inputSHA256": {
+        "services/control-plane/src/inv/dispatch.py": "82f029614537eb5bab56934e4b6736fe3dd52ece54b9b9a3996815b131e41de4",
+        "tools/lan_pilot.py": "1a0806c8c8c6f4bdf4f34c5ac33a2ebe281bcc9771b53cf6408a531905201cce"
+      },
+      "layer": "WHOLE_SCOPED_DELIVER_REFERENCE_SET",
+      "modeRuleReason": null,
+      "modeRuleStatus": "CONDITIONAL_CAPTURED_MODE_ORIGIN_CANDIDATE",
+      "mutatedCallerGuardClean": true,
+      "name": "noncall-reference",
+      "parsed": 25,
+      "reason": "DELIVER_REFERENCE_SET_CHANGED",
+      "referenceContract": {
+        "acceptedDischarge": false,
+        "binding": "current path + fileSHA256 + function + span + expressionSHA256 AND actual AST node kinds/direct Call.func parent relation; not text/name/span alone",
+        "forwardingCallSource": {
+          "expressionSHA256": "476fd474759435bc098bef7e35bc2bdc8e58826f015228e59a6ee794db8867cb",
+          "fileSHA256": "82f029614537eb5bab56934e4b6736fe3dd52ece54b9b9a3996815b131e41de4",
+          "function": "inv.dispatch.DeliveryWorker.once",
+          "path": "services/control-plane/src/inv/dispatch.py",
+          "span": [
+            339,
+            12,
+            344,
+            13
+          ]
+        },
+        "projectedAttributeSource": {
+          "expressionSHA256": "26a4e065c848c1fb80b56f62bc7cae559f203434e03608f75572d2fe7eedf297",
+          "fileSHA256": "82f029614537eb5bab56934e4b6736fe3dd52ece54b9b9a3996815b131e41de4",
+          "function": "inv.dispatch.DeliveryWorker.once",
+          "path": "services/control-plane/src/inv/dispatch.py",
+          "span": [
+            339,
+            12,
+            339,
+            33
+          ]
+        },
+        "reason": "DELIVER_REFERENCE_SET_CHANGED",
+        "referenceCount": 2,
+        "status": "UNRESOLVED"
+      },
+      "referenceCount": 2,
+      "status": "UNRESOLVED_OPERATION_ORIGIN"
+    },
+    {
+      "constructorBindingsValid": true,
+      "constructors": 9,
+      "earlierGuardCredit": false,
+      "earlierGuardRefusals": [
+        {
+          "error": "DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:INSTANCE:operation",
+          "newReflection": [],
+          "path": "services/control-plane/src/inv/dispatch.py"
+        }
+      ],
+      "earlierGuardRefusalsSameAsWIP": true,
+      "expectationMet": true,
+      "inputSHA256": {
+        "services/control-plane/src/inv/dispatch.py": "82f029614537eb5bab56934e4b6736fe3dd52ece54b9b9a3996815b131e41de4",
+        "tools/lan_pilot.py": "a4bc58fce6a765696853b2162bdec24325accd8900efb975f069374310a11cb9"
+      },
+      "layer": "WHOLE_SCOPED_DELIVER_REFERENCE_SET",
+      "modeRuleReason": null,
+      "modeRuleStatus": "CONDITIONAL_CAPTURED_MODE_ORIGIN_CANDIDATE",
+      "mutatedCallerGuardClean": true,
+      "name": "second-unconstrained-caller",
+      "parsed": 25,
+      "reason": "DELIVER_REFERENCE_SET_CHANGED",
+      "referenceContract": {
+        "acceptedDischarge": false,
+        "binding": "current path + fileSHA256 + function + span + expressionSHA256 AND actual AST node kinds/direct Call.func parent relation; not text/name/span alone",
+        "forwardingCallSource": {
+          "expressionSHA256": "476fd474759435bc098bef7e35bc2bdc8e58826f015228e59a6ee794db8867cb",
+          "fileSHA256": "82f029614537eb5bab56934e4b6736fe3dd52ece54b9b9a3996815b131e41de4",
+          "function": "inv.dispatch.DeliveryWorker.once",
+          "path": "services/control-plane/src/inv/dispatch.py",
+          "span": [
+            339,
+            12,
+            344,
+            13
+          ]
+        },
+        "projectedAttributeSource": {
+          "expressionSHA256": "26a4e065c848c1fb80b56f62bc7cae559f203434e03608f75572d2fe7eedf297",
+          "fileSHA256": "82f029614537eb5bab56934e4b6736fe3dd52ece54b9b9a3996815b131e41de4",
+          "function": "inv.dispatch.DeliveryWorker.once",
+          "path": "services/control-plane/src/inv/dispatch.py",
+          "span": [
+            339,
+            12,
+            339,
+            33
+          ]
+        },
+        "reason": "DELIVER_REFERENCE_SET_CHANGED",
+        "referenceCount": 2,
+        "status": "UNRESOLVED"
+      },
+      "referenceCount": 2,
+      "status": "UNRESOLVED_OPERATION_ORIGIN"
+    }
+  ]
+}

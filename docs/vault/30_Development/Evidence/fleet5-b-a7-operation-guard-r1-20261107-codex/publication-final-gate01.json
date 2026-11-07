@@ -1,0 +1,15 @@
+{
+  "argv": [
+    "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+    "-B",
+    "tools/check_docs.py"
+  ],
+  "startKST": "2026-11-07T10:07:59.753486+09:00",
+  "endKST": "2026-11-07T10:08:13.110583+09:00",
+  "exit": 0,
+  "rawSHA256": "a15905c3581d181c64f26135a101b6e87ba4d106025d0320e4e26c6649881cc0",
+  "rawBytes": 127,
+  "encoding": "utf-8",
+  "text": "PASS: 24 original hashes, 1266 versioned documents, wiki links, 48 tasks, 12 outcomes, owner/reviewer/skills, dependency DAG.\r\n",
+  "cause": "new appended publication History; no ontology/source/product/test changes"
+}

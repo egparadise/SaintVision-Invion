@@ -1,0 +1,13 @@
+{
+  "argv": [
+    "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+    "-B",
+    "tools/check_doc_single_source.py",
+    "--ratchet"
+  ],
+  "endKST": "2026-11-07T10:06:11.543384+09:00",
+  "exit": 0,
+  "rawOutputSHA256": "13b5f5afed05999109839be1baec4ef70ea3c71bcb267353e59eba0f2ae3e448",
+  "rawOutputWrapper": "publication-gate04-raw.json",
+  "startKST": "2026-11-07T10:06:11.071167+09:00"
+}

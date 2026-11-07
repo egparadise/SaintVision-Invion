@@ -1,0 +1,205 @@
+{
+  "atKST": "2026-11-07T09:45:14+09:00",
+  "logs": {
+    "green-tests.xml": {
+      "SHA256": "7448243a76f40808577785714d579ef572a7b80d4d66771d3493168b491cedd6",
+      "bytes": 4029,
+      "text": "<?xml version=\"1.0\" encoding=\"utf-8\"?><testsuites name=\"pytest tests\"><testsuite name=\"pytest\" errors=\"0\" failures=\"0\" skipped=\"0\" tests=\"24\" time=\"0.404\" timestamp=\"2026-11-07T00:45:00.391425+00:00\" hostname=\"5dc45ace7380\"><testcase classname=\"tests.core.test_delivery_operation_origin\" name=\"test_builtin_domain_is_captured_once_and_forwarded_as_exact_bools[execute]\" time=\"0.001\" /><testcase classname=\"tests.core.test_delivery_operation_origin\" name=\"test_builtin_domain_is_captured_once_and_forwarded_as_exact_bools[observe]\" time=\"0.000\" /><testcase classname=\"tests.core.test_delivery_operation_origin\" name=\"test_builtin_domain_is_captured_once_and_forwarded_as_exact_bools[cancel]\" time=\"0.000\" /><testcase classname=\"tests.core.test_delivery_operation_origin\" name=\"test_rejected_origin_never_delivers_or_invokes_rich_methods[none]\" time=\"0.000\" /><testcase classname=\"tests.core.test_delivery_operation_origin\" name=\"test_rejected_origin_never_delivers_or_invokes_rich_methods[false]\" time=\"0.000\" /><testcase classname=\"tests.core.test_delivery_operation_origin\" name=\"test_rejected_origin_never_delivers_or_invokes_rich_methods[true]\" time=\"0.000\" /><testcase classname=\"tests.core.test_delivery_operation_origin\" name=\"test_rejected_origin_never_delivers_or_invokes_rich_methods[zero]\" time=\"0.000\" /><testcase classname=\"tests.core.test_delivery_operation_origin\" name=\"test_rejected_origin_never_delivers_or_invokes_rich_methods[one]\" time=\"0.000\" /><testcase classname=\"tests.core.test_delivery_operation_origin\" name=\"test_rejected_origin_never_delivers_or_invokes_rich_methods[bytes]\" time=\"0.000\" /><testcase classname=\"tests.core.test_delivery_operation_origin\" name=\"test_rejected_origin_never_delivers_or_invokes_rich_methods[empty]\" time=\"0.000\" /><testcase classname=\"tests.core.test_delivery_operation_origin\" name=\"test_rejected_origin_never_delivers_or_invokes_rich_methods[wrong-case]\" time=\"0.000\" /><testcase classname=\"tests.core.test_delivery_operation_origin\" name=\"test_rejected_origin_never_delivers_or_invokes_rich_methods[foreign-literal]\" time=\"0.000\" /><testcase classname=\"tests.core.test_delivery_operation_origin\" name=\"test_rejected_origin_never_delivers_or_invokes_rich_methods[foreign-object]\" time=\"0.000\" /><testcase classname=\"tests.core.test_delivery_operation_origin\" name=\"test_rejected_origin_never_delivers_or_invokes_rich_methods[foreign-equal]\" time=\"0.000\" /><testcase classname=\"tests.core.test_delivery_operation_origin\" name=\"test_rejected_origin_never_delivers_or_invokes_rich_methods[hostile-foreign]\" time=\"0.000\" /><testcase classname=\"tests.core.test_delivery_operation_origin\" name=\"test_rejected_origin_never_delivers_or_invokes_rich_methods[hostile-str-subclass]\" time=\"0.000\" /><testcase classname=\"tests.core.test_delivery_operation_origin\" name=\"test_rejected_origin_never_delivers_or_invokes_rich_methods[plain-str-subclass]\" time=\"0.000\" /><testcase classname=\"tests.core.test_delivery_operation_origin\" name=\"test_capture_property_error_uses_existing_handler_and_finish\" time=\"0.000\" /><testcase classname=\"tests.core.test_delivery_operation_origin\" name=\"test_none_attempt_preserves_reconciliation_and_followup_branches[control-only]\" time=\"0.001\" /><testcase classname=\"tests.core.test_delivery_operation_origin\" name=\"test_none_attempt_preserves_reconciliation_and_followup_branches[idle]\" time=\"0.001\" /><testcase classname=\"tests.core.test_delivery_operation_origin\" name=\"test_none_attempt_preserves_reconciliation_and_followup_branches[output-priority]\" time=\"0.001\" /><testcase classname=\"tests.core.test_delivery_operation_origin\" name=\"test_none_attempt_preserves_reconciliation_and_followup_branches[parent-priority]\" time=\"0.000\" /><testcase classname=\"tests.core.test_delivery_operation_origin\" name=\"test_stopped_finish_preserves_followup_order[followup]\" time=\"0.000\" /><testcase classname=\"tests.core.test_delivery_operation_origin\" name=\"test_stopped_finish_preserves_followup_order[control-only]\" time=\"0.000\" /></testsuite></testsuites>"
+    },
+    "green.stderr": {
+      "SHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "text": ""
+    },
+    "green.stdout": {
+      "SHA256": "14dec3be0edf79aaef55d8512c3082d0a647e83300bfff97c1d82b8ed7f61da5",
+      "bytes": 99,
+      "text": "........................                                                 [100%]\n24 passed in 0.40s\n"
+    },
+    "pip-check.txt": {
+      "SHA256": "9261363b733079a641c2e4cc9bc46ffa1d8336945a87f807b6cf68847dbc9b09",
+      "bytes": 30,
+      "text": "No broken requirements found.\n"
+    },
+    "pip-freeze.txt": {
+      "SHA256": "4bebc0439a397e2dbb088753472e6f3b3d2e1249c0b86ed3e04cc0402a518f0e",
+      "bytes": 1217,
+      "text": "alembic==1.19.2\nannotated-doc==0.0.5\nannotated-types==0.8.0\nanyio==4.16.0\nargcomplete==3.7.2\narrow==1.4.0\nattrs==26.1.0\nblack==26.10.1\nbuild==1.6.0\ncertifi==2026.10.23\ncffi==2.1.1\nclick==8.5.1\ncryptography==50.0.1\ndatamodel-code-generator==0.77.0\nfastapi==0.141.1\nfqdn==1.6.0\ngenson==1.4.0\ngreenlet==3.5.6\nh11==0.16.0\nhttpcore==1.0.9\nhttpx==0.28.1\nidna==3.20\ninflect==7.6.0\niniconfig==2.3.1\nisoduration==20.11.0\nisort==8.0.1\njaraco.functools==4.6.0\nJinja2==3.1.6\njsonpointer==3.10\njsonschema==4.26.0\njsonschema-specifications==2025.9.1\nMako==1.4.3\nMarkupSafe==3.0.4\nmore-itertools==11.2.1\nmypy_extensions==1.2.0\npackaging==26.3\npathspec==1.1.1\npip==26.2.1\nplatformdirs==4.14.5\npluggy==1.7.0\npsycopg==3.3.5\npsycopg-binary==3.3.5\npycparser==3.12\npydantic==2.13.5\npydantic_core==2.46.5\nPygments==2.21.0\nPyJWT==2.15.1\npyparsing==3.3.3\npyproject_hooks==1.3.3\npytest==9.1.1\npython-dateutil==4.0.0\npytokens==0.4.1\nPyYAML==6.0.3\nrdflib==7.1.4\nreferencing==0.37.0\nrfc3339-validator==0.1.4\nrfc3987==1.3.8\nrpds-py==2026.9.1\nsix==1.17.0\nSQLAlchemy==2.0.52\nstarlette==1.10.0\ntypeguard==4.6.0\ntyping-inspection==0.4.5\ntyping_extensions==4.16.0\ntzdata==2026.6\nuri-template==1.3.0\nuvicorn==0.52.4\nwebcolors==25.10.0\nwebsockets==17.1\n"
+    },
+    "red-tests.xml": {
+      "SHA256": "b7515a5a2700c5e0cc8ba6594ec628663fecbe682331b5b6fa834d44e040fb91",
+      "bytes": 1694,
+      "text": "<?xml version=\"1.0\" encoding=\"utf-8\"?><testsuites name=\"pytest tests\"><testsuite name=\"pytest\" errors=\"0\" failures=\"1\" skipped=\"0\" tests=\"1\" time=\"0.404\" timestamp=\"2026-11-07T00:45:08.789374+00:00\" hostname=\"c20adcd66b3d\"><testcase classname=\"tests.core.test_delivery_operation_origin\" name=\"test_rejected_origin_never_delivers_or_invokes_rich_methods[foreign-equal]\" time=\"0.001\"><failure message=\"AssertionError: Rejected operation reached actual once's delivery call&#10;assert [(True, False)] == []&#10;  &#10;  Left contains one more item: (True, False)&#10;  Use -v to get more diff\">boundary = &lt;function boundary.&lt;locals&gt;.make at 0x7643fe3040f0&gt;\nfactory = &lt;function &lt;lambda&gt; at 0x7643fe3157a0&gt;\n\n    @pytest.mark.parametrize(\"factory\", INVALID)\n    def test_rejected_origin_never_delivers_or_invokes_rich_methods(boundary, factory):\n        calls = []\n        attempt = OperationAttempt(factory(calls), later=\"execute\")\n        case = boundary(attempt)\n        assert run_once(case) == \"uncertain\"\n        # Assert earlier fixture preconditions before the decisive RED assertion.\n        assert case.events[:3] == [\"reconciler-init\", \"reconcile\", \"acquire\"]\n        assert case.events[-1] == \"finish\"\n        assert len(case.finishes) == 1\n&gt;       assert case.deliveries == [], \"Rejected operation reached actual once's delivery call\"\nE       AssertionError: Rejected operation reached actual once's delivery call\nE       assert [(True, False)] == []\nE         \nE         Left contains one more item: (True, False)\nE         Use -v to get more diff\n\ntests/core/test_delivery_operation_origin.py:205: AssertionError</failure></testcase></testsuite></testsuites>"
+    },
+    "red.stderr": {
+      "SHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "text": ""
+    },
+    "red.stdout": {
+      "SHA256": "08a8817587bbf6522c43811638c1e9ba0d3bdead0ee891e01f5d1ad7b60450b7",
+      "bytes": 1501,
+      "text": "F                                                                        [100%]\n=================================== FAILURES ===================================\n__ test_rejected_origin_never_delivers_or_invokes_rich_methods[foreign-equal] __\n\nboundary = <function boundary.<locals>.make at 0x7643fe3040f0>\nfactory = <function <lambda> at 0x7643fe3157a0>\n\n    @pytest.mark.parametrize(\"factory\", INVALID)\n    def test_rejected_origin_never_delivers_or_invokes_rich_methods(boundary, factory):\n        calls = []\n        attempt = OperationAttempt(factory(calls), later=\"execute\")\n        case = boundary(attempt)\n        assert run_once(case) == \"uncertain\"\n        # Assert earlier fixture preconditions before the decisive RED assertion.\n        assert case.events[:3] == [\"reconciler-init\", \"reconcile\", \"acquire\"]\n        assert case.events[-1] == \"finish\"\n        assert len(case.finishes) == 1\n>       assert case.deliveries == [], \"Rejected operation reached actual once's delivery call\"\nE       AssertionError: Rejected operation reached actual once's delivery call\nE       assert [(True, False)] == []\nE         \nE         Left contains one more item: (True, False)\nE         Use -v to get more diff\n\ntests/core/test_delivery_operation_origin.py:205: AssertionError\n=========================== short test summary info ============================\nFAILED tests/core/test_delivery_operation_origin.py::test_rejected_origin_never_delivers_or_invokes_rich_methods[foreign-equal]\n1 failed in 0.40s\n"
+    },
+    "runtime-version.txt": {
+      "SHA256": "57c6ea790e5cf7d4bb2bb57d0deac4424f45807147198044791b226e75db2e72",
+      "bytes": 57,
+      "text": "Python 3.14.7 (main, Sep 19 2026, 01:01:59) [GCC 14.2.0]\n"
+    },
+    "setup.stderr": {
+      "SHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "text": ""
+    },
+    "setup.stdout": {
+      "SHA256": "3c961b0fb6ce7b8ea89f64315e3b5ab5ef7a5f6066398804788ac18a1ac7a44e",
+      "bytes": 66,
+      "text": "{\"setup\": \"complete\", \"wheelCount\": 68, \"productImported\": false}\n"
+    },
+    "wheel-inventory.json": {
+      "SHA256": "213823871fd7b82e2f151640b8b0ae2b1e8cb791c10c163d98f3960887cc5be6",
+      "bytes": 11451,
+      "text": "[\n  {\n    \"name\": \"alembic-1.19.2-py3-none-any.whl\",\n    \"bytes\": 267399,\n    \"SHA256\": \"32d553dcd577e6fe5c3c63e91468526d35e4dcecafe865d7db4e9b328fa93cb2\"\n  },\n  {\n    \"name\": \"annotated_doc-0.0.5-py3-none-any.whl\",\n    \"bytes\": 5302,\n    \"SHA256\": \"117bac03a25ede5df5440e855b32d556049ca169ead221505badf432fed4b101\"\n  },\n  {\n    \"name\": \"annotated_types-0.8.0-py3-none-any.whl\",\n    \"bytes\": 13427,\n    \"SHA256\": \"f072f4d804ea359e4eaf198b1af7a8b0943881a87f31bb764f8bf219bb9419e0\"\n  },\n  {\n    \"name\": \"anyio-4.16.0-py3-none-any.whl\",\n    \"bytes\": 134521,\n    \"SHA256\": \"c66ae634e0b8228396b801741beb3294326d4b6102f7bba4041c0dfb58c29026\"\n  },\n  {\n    \"name\": \"argcomplete-3.7.2-py3-none-any.whl\",\n    \"bytes\": 43294,\n    \"SHA256\": \"6029205678bdd9c1c728a155f5f9ecf5812393f969eef58807641a2bc2aa5b19\"\n  },\n  {\n    \"name\": \"arrow-1.4.0-py3-none-any.whl\",\n    \"bytes\": 68797,\n    \"SHA256\": \"749f0769958ebdc79c173ff0b0670d59051a535fa26e8eba02953dc19eb43205\"\n  },\n  {\n    \"name\": \"attrs-26.1.0-py3-none-any.whl\",\n    \"bytes\": 67548,\n    \"SHA256\": \"c647aa4a12dfbad9333ca4e71fe62ddc36f4e63b2d260a37a8b83d2f043ac309\"\n  },\n  {\n    \"name\": \"black-26.10.1-cp314-cp314-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl\",\n    \"bytes\": 2047807,\n    \"SHA256\": \"289282aa2e09d3162312a3be1788ff21b08e9ea9cc4a81e656024728b32428fb\"\n  },\n  {\n    \"name\": \"build-1.6.0-py3-none-any.whl\",\n    \"bytes\": 31187,\n    \"SHA256\": \"f7aaf1ebbb79178a02ba248bb524f2176b256017e17e8e4bd4289c7b38cc2bad\"\n  },\n  {\n    \"name\": \"certifi-2026.10.23-py3-none-any.whl\",\n    \"bytes\": 135082,\n    \"SHA256\": \"e9b54de76e530bb6cf0ccd036787103acb58fd42ba930ea8bf948ddbaa2f61d1\"\n  },\n  {\n    \"name\": \"cffi-2.1.1-cp314-cp314-manylinux2014_x86_64.manylinux_2_17_x86_64.whl\",\n    \"bytes\": 221525,\n    \"SHA256\": \"b0431303acaea1089ad4b3e9ce4e6518193def1118d4073ca848635ee4ea2e96\"\n  },\n  {\n    \"name\": \"click-8.5.1-py3-none-any.whl\",\n    \"bytes\": 126163,\n    \"SHA256\": \"8bb5376d2006950386f8c6427613334a2acadc5f559cb80e638d00b4df957e37\"\n  },\n  {\n    \"name\": \"cryptography-50.0.1-cp311-abi3-manylinux_2_34_x86_64.whl\",\n    \"bytes\": 4746230,\n    \"SHA256\": \"51afcfceb15597cf2635068e4ac9a56b2abde622edde17f37d85fd7b5306497a\"\n  },\n  {\n    \"name\": \"datamodel_code_generator-0.77.0-py3-none-any.whl\",\n    \"bytes\": 667908,\n    \"SHA256\": \"9780e5f3a447d1b2cf284d8eab9330b8db37ebf660813a240e7d325abaf19aea\"\n  },\n  {\n    \"name\": \"fastapi-0.141.1-py3-none-any.whl\",\n    \"bytes\": 131954,\n    \"SHA256\": \"bfb91aa2d334c61cb35ba9a116fc123b3d3df31640b801cf57a7a78ec3f603b3\"\n  },\n  {\n    \"name\": \"fqdn-1.6.0-py3-none-any.whl\",\n    \"bytes\": 12569,\n    \"SHA256\": \"6c793c312ccfa29981e1135b3ef5e1277ebe639731a6b0f7350d90e96e63f0b4\"\n  },\n  {\n    \"name\": \"genson-1.4.0-py3-none-any.whl\",\n    \"bytes\": 24484,\n    \"SHA256\": \"03bc71bbe52defde70660cc4dcd1ea1097997da5a1cbb90a9dbd3acc7c9e1b65\"\n  },\n  {\n    \"name\": \"greenlet-3.5.6-cp314-cp314-manylinux_2_24_x86_64.manylinux_2_28_x86_64.whl\",\n    \"bytes\": 670773,\n    \"SHA256\": \"9a09d59bef1db94f384b5bcc2d523694d338f3df6b757aeeaf7baca5d0c0be88\"\n  },\n  {\n    \"name\": \"h11-0.16.0-py3-none-any.whl\",\n    \"bytes\": 37515,\n    \"SHA256\": \"63cf8bbe7522de3bf65932fda1d9c2772064ffb3dae62d55932da54b31cb6c86\"\n  },\n  {\n    \"name\": \"httpcore-1.0.9-py3-none-any.whl\",\n    \"bytes\": 78784,\n    \"SHA256\": \"2d400746a40668fc9dec9810239072b40b4484b640a8c38fd654a024c7a1bf55\"\n  },\n  {\n    \"name\": \"httpx-0.28.1-py3-none-any.whl\",\n    \"bytes\": 73517,\n    \"SHA256\": \"d909fcccc110f8c7faf814ca82a9a4d816bc5a6dbfea25d6591d6985b8ba59ad\"\n  },\n  {\n    \"name\": \"idna-3.20-py3-none-any.whl\",\n    \"bytes\": 69583,\n    \"SHA256\": \"ab7ae7122974553370f0bdb919e1a960b2cd1bc1ef0276416d896db81c14582c\"\n  },\n  {\n    \"name\": \"inflect-7.6.0-py3-none-any.whl\",\n    \"bytes\": 37777,\n    \"SHA256\": \"9fefad5c0c174d8a38f8c33d3033817e38fca8475f7f226c62efc39d46c83e8a\"\n  },\n  {\n    \"name\": \"iniconfig-2.3.1-py3-none-any.whl\",\n    \"bytes\": 7552,\n    \"SHA256\": \"9121e2c1fdb355232495be3194c8dfe87ccc2d5dee45947b78e68f499790d7a7\"\n  },\n  {\n    \"name\": \"isoduration-20.11.0-py3-none-any.whl\",\n    \"bytes\": 11321,\n    \"SHA256\": \"b2904c2a4228c3d44f409c8ae8e2370eb21a26f7ac2ec5446df141dde3452042\"\n  },\n  {\n    \"name\": \"isort-8.0.1-py3-none-any.whl\",\n    \"bytes\": 89733,\n    \"SHA256\": \"28b89bc70f751b559aeca209e6120393d43fbe2490de0559662be7a9787e3d75\"\n  },\n  {\n    \"name\": \"jaraco_functools-4.6.0-py3-none-any.whl\",\n    \"bytes\": 11677,\n    \"SHA256\": \"99e3dc0060c5cbe8fcd1cdb36258e2a65ca40f1566b2033b12abb1bb44dd3c30\"\n  },\n  {\n    \"name\": \"jinja2-3.1.6-py3-none-any.whl\",\n    \"bytes\": 134899,\n    \"SHA256\": \"85ece4451f492d0c13c5dd7c13a64681a86afae63a5f347908daf103ce6d2f67\"\n  },\n  {\n    \"name\": \"jsonpointer-3.10-py3-none-any.whl\",\n    \"bytes\": 10376,\n    \"SHA256\": \"3b08b9e5239f1b683e31c9561c350d75ce3fa8cdd407130ca8491fdb0c9e56f3\"\n  },\n  {\n    \"name\": \"jsonschema-4.26.0-py3-none-any.whl\",\n    \"bytes\": 90630,\n    \"SHA256\": \"d489f15263b8d200f8387e64b4c3a75f06629559fb73deb8fdfb525f2dab50ce\"\n  },\n  {\n    \"name\": \"jsonschema_specifications-2025.9.1-py3-none-any.whl\",\n    \"bytes\": 18437,\n    \"SHA256\": \"98802fee3a11ee76ecaca44429fda8a41bff98b00a0f2838151b113f210cc6fe\"\n  },\n  {\n    \"name\": \"mako-1.4.3-py3-none-any.whl\",\n    \"bytes\": 80164,\n    \"SHA256\": \"723296007c870bfd6b3f0c3230dba7198096e5269297ebf5e4eff9e7ffa39d4f\"\n  },\n  {\n    \"name\": \"markupsafe-3.0.4-cp314-cp314-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl\",\n    \"bytes\": 23049,\n    \"SHA256\": \"a8e9f292fcda89b324f2f5c91d13f1424a153e40fc2756f38ee23b15835ff300\"\n  },\n  {\n    \"name\": \"more_itertools-11.2.1-py3-none-any.whl\",\n    \"bytes\": 74405,\n    \"SHA256\": \"35a7377edd1dd6608dcb2cdf534ded55ea32d49448875ad042cd3f879fb1ded0\"\n  },\n  {\n    \"name\": \"mypy_extensions-1.2.0-py3-none-any.whl\",\n    \"bytes\": 5114,\n    \"SHA256\": \"993e7a20aa5671eb41a7132cf555af30062da99729601601b9a8382b11cae768\"\n  },\n  {\n    \"name\": \"packaging-26.3-py3-none-any.whl\",\n    \"bytes\": 129956,\n    \"SHA256\": \"d7193f7c8e4e93f444fde0262bf90af30e16fa0ad0ad44cb553c87339b23cd1c\"\n  },\n  {\n    \"name\": \"pathspec-1.1.1-py3-none-any.whl\",\n    \"bytes\": 57328,\n    \"SHA256\": \"a00ce642f577bf7f473932318056212bc4f8bfdf53128c78bbd5af0b9b20b189\"\n  },\n  {\n    \"name\": \"platformdirs-4.14.5-py3-none-any.whl\",\n    \"bytes\": 35402,\n    \"SHA256\": \"8e778c6fa421516f4d3369449f8df3b0e1b72c0e0005fe88e3ec772d0a14e750\"\n  },\n  {\n    \"name\": \"pluggy-1.7.0-py3-none-any.whl\",\n    \"bytes\": 27082,\n    \"SHA256\": \"7dd7b0d8832ba3cb632c306926ded123429211b83641b35dc5c41ad2d34f9bec\"\n  },\n  {\n    \"name\": \"psycopg-3.3.5-py3-none-any.whl\",\n    \"bytes\": 213598,\n    \"SHA256\": \"ce5aa5cdb4f9379f00f487590e5890bfa7df9a164648c969ffa628505e21af4e\"\n  },\n  {\n    \"name\": \"psycopg_binary-3.3.5-cp314-cp314-manylinux2014_x86_64.manylinux_2_17_x86_64.whl\",\n    \"bytes\": 5236206,\n    \"SHA256\": \"f45d77e398542ce0937d9fa3cd9d84e9c5fc6b34c50a66404ae840bada312750\"\n  },\n  {\n    \"name\": \"pycparser-3.12-py3-none-any.whl\",\n    \"bytes\": 62600,\n    \"SHA256\": \"a076f3f489b39b43ed13563a1dafe42447445bec2e294154ec5c57fcdda4c85e\"\n  },\n  {\n    \"name\": \"pydantic-2.13.5-py3-none-any.whl\",\n    \"bytes\": 472589,\n    \"SHA256\": \"346a034f080da3755d8e9cb5e00e8b07de1d39e4f6e2c87d8ab7cafa0b269a73\"\n  },\n  {\n    \"name\": \"pydantic_core-2.46.5-cp314-cp314-manylinux_2_17_x86_64.manylinux2014_x86_64.whl\",\n    \"bytes\": 2068352,\n    \"SHA256\": \"54d510bac3ee52247af28ed4bb18a1e799f040ac60fd2bf5ccd4c92f1fbe786f\"\n  },\n  {\n    \"name\": \"pygments-2.21.0-py3-none-any.whl\",\n    \"bytes\": 1250147,\n    \"SHA256\": \"2363c69b61c4a97c838da3b130dcd6468f4848992b21a82f2a63ec34377137d9\"\n  },\n  {\n    \"name\": \"pyjwt-2.15.1-py3-none-any.whl\",\n    \"bytes\": 33860,\n    \"SHA256\": \"42d59d631f7768a1028a64c7ff581a9bf7519804daf91fc5b6c56e30eec5e193\"\n  },\n  {\n    \"name\": \"pyparsing-3.3.3-py3-none-any.whl\",\n    \"bytes\": 126420,\n    \"SHA256\": \"ece8c00a69cf01b45d0b1dedabb469c90d8caf996d4fda40f147627a122849a4\"\n  },\n  {\n    \"name\": \"pyproject_hooks-1.3.3-py3-none-any.whl\",\n    \"bytes\": 10724,\n    \"SHA256\": \"5fc53fdac9f7bd63fbcdc868fb5f90b4784d78a53a3d3388cd738b807441a20b\"\n  },\n  {\n    \"name\": \"pytest-9.1.1-py3-none-any.whl\",\n    \"bytes\": 386536,\n    \"SHA256\": \"37a86b45efb9a47a61a36449063e8e18d0cab3161329fc099eb21783169c4f0c\"\n  },\n  {\n    \"name\": \"python_dateutil-4.0.0-py3-none-any.whl\",\n    \"bytes\": 92853,\n    \"SHA256\": \"a5e246f79eb80475e691bf93862cead98decd8a498cf53ba0516fcdc0f50dc1c\"\n  },\n  {\n    \"name\": \"pytokens-0.4.1-cp314-cp314-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl\",\n    \"bytes\": 268071,\n    \"SHA256\": \"dc74c035f9bfca0255c1af77ddd2d6ae8419012805453e4b0e7513e17904545d\"\n  },\n  {\n    \"name\": \"pyyaml-6.0.3-cp314-cp314-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl\",\n    \"bytes\": 794175,\n    \"SHA256\": \"c458b6d084f9b935061bc36216e8a69a7e293a2f1e68bf956dcd9e6cbcd143f5\"\n  },\n  {\n    \"name\": \"rdflib-7.1.4-py3-none-any.whl\",\n    \"bytes\": 565051,\n    \"SHA256\": \"72f4adb1990fa5241abd22ddaf36d7cafa5d91d9ff2ba13f3086d339b213d997\"\n  },\n  {\n    \"name\": \"referencing-0.37.0-py3-none-any.whl\",\n    \"bytes\": 26766,\n    \"SHA256\": \"381329a9f99628c9069361716891d34ad94af76e461dcb0335825aecc7692231\"\n  },\n  {\n    \"name\": \"rfc3339_validator-0.1.4-py2.py3-none-any.whl\",\n    \"bytes\": 3490,\n    \"SHA256\": \"24f6ec1eda14ef823da9e36ec7113124b39c04d50a4d3d3a3c2859577e7791fa\"\n  },\n  {\n    \"name\": \"rfc3987-1.3.8-py2.py3-none-any.whl\",\n    \"bytes\": 13377,\n    \"SHA256\": \"10702b1e51e5658843460b189b185c0366d2cf4cff716f13111b0ea9fd2dce53\"\n  },\n  {\n    \"name\": \"rpds_py-2026.9.1-cp314-cp314-manylinux_2_17_x86_64.manylinux2014_x86_64.whl\",\n    \"bytes\": 371623,\n    \"SHA256\": \"eac2f5dbafd585dfe31f86a23ebf0d3ba480a9d49ebc87947267b5608d4ea0cd\"\n  },\n  {\n    \"name\": \"six-1.17.0-py2.py3-none-any.whl\",\n    \"bytes\": 11050,\n    \"SHA256\": \"4721f391ed90541fddacab5acf947aa0d3dc7d27b2e1e8eda2be8970586c3274\"\n  },\n  {\n    \"name\": \"sqlalchemy-2.0.52-cp314-cp314-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl\",\n    \"bytes\": 3323642,\n    \"SHA256\": \"812bae5138bfc0aa46fb0686da0fc7f581f68e2bbb05bc24c3713bebaedd1437\"\n  },\n  {\n    \"name\": \"starlette-1.10.0-py3-none-any.whl\",\n    \"bytes\": 80571,\n    \"SHA256\": \"478c0ab3b4ced6e82719849c118fa406f0278a3499c1a898cd15cd31bdc38ce4\"\n  },\n  {\n    \"name\": \"typeguard-4.6.0-py3-none-any.whl\",\n    \"bytes\": 36884,\n    \"SHA256\": \"79878165bb86f2cf5d41d159a0ff1792a796cf496882d2fe1b1c6c7049b9cdd7\"\n  },\n  {\n    \"name\": \"typing_extensions-4.16.0-py3-none-any.whl\",\n    \"bytes\": 45571,\n    \"SHA256\": \"481caa481374e813c1b176ada14e97f1f67a4539ce9cfeb3f350d78d6370c2e8\"\n  },\n  {\n    \"name\": \"typing_inspection-0.4.5-py3-none-any.whl\",\n    \"bytes\": 14874,\n    \"SHA256\": \"bc210535442b39e1bf2805e0c7a17dfd6a4ace760c84c7f7d16245d23a6b1c39\"\n  },\n  {\n    \"name\": \"tzdata-2026.6-py2.py3-none-any.whl\",\n    \"bytes\": 348210,\n    \"SHA256\": \"0a10eec6e13ef16b627fabed9a5f2ba61a62b1c67f327305f4e7e412a70b4aec\"\n  },\n  {\n    \"name\": \"uri_template-1.3.0-py3-none-any.whl\",\n    \"bytes\": 11140,\n    \"SHA256\": \"a44a133ea12d44a0c0f06d7d42a52d71282e77e2f937d8abd5655b8d56fc1363\"\n  },\n  {\n    \"name\": \"uvicorn-0.52.4-py3-none-any.whl\",\n    \"bytes\": 79871,\n    \"SHA256\": \"f86e41a149d7d05a9969337e3946a9c171c06a5d42680896daaba624aeac8da1\"\n  },\n  {\n    \"name\": \"webcolors-25.10.0-py3-none-any.whl\",\n    \"bytes\": 14905,\n    \"SHA256\": \"032c727334856fc0b968f63daa252a1ac93d33db2f5267756623c210e57a4f1d\"\n  },\n  {\n    \"name\": \"websockets-17.1-cp314-cp314-manylinux1_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl\",\n    \"bytes\": 224685,\n    \"SHA256\": \"6f42912fa9eb4cb7c7ec9fde9b3332ba339eb8a8811981043d4029599f3d950b\"\n  }\n]\n"
+    }
+  },
+  "phaseReceipts": {
+    "extract": {
+      "allTransferHashesReverified": true,
+      "atKST": "2026-11-07T09:44:21+09:00",
+      "base": "b3bbdc8d92a39f2f797a7680deb2770d6f705af0",
+      "greenInputSHA256": "6bf7a5e474aa1c7c910f0367479263e2d28615964a54cfe10b4c865adefc09b5",
+      "greenProductSHA256": "82f029614537eb5bab56934e4b6736fe3dd52ece54b9b9a3996815b131e41de4",
+      "newTestFilesPerTree": 1,
+      "noGitMetadataNoSyntheticCheckout": true,
+      "productExecuted": false,
+      "realGitDerivedTrackedFilesPerTree": 1179,
+      "redInputSHA256": "14bc41373f1a4970d49fb8d443bc3f35952af938b6e0d4c063465a56a1426914",
+      "redRealBaseProductSHA256": "4a33428502279b88e510b5447382814bb115ddf2bff4f88f5bfcbb93f3c1a404",
+      "testSHA256": "3dacdb63f83ab1d8075ddcbe422d82daad20bd56f643adee0fc7ae97715925d2"
+    },
+    "green": {
+      "OOMKilled": false,
+      "base": "b3bbdc8d92a39f2f797a7680deb2770d6f705af0",
+      "businessContainersChanged": false,
+      "containerID": "5dc45ace738096c8adea7fbd3a716cc0789cec773af51d586bc87edf81fe87d4",
+      "containerName": "sv-root-b-py-45ec174adece-green",
+      "directContainerExit": 0,
+      "endedAtKST": "2026-11-07T09:45:01+09:00",
+      "extraSwapBytes": 0,
+      "hostPackagesInstalled": false,
+      "image": "python@sha256:51dafde81dbdb6ebde285137a295cf18a47ca95234fe388a343719cb97305b3d",
+      "imageID": "sha256:51dafde81dbdb6ebde285137a295cf18a47ca95234fe388a343719cb97305b3d",
+      "inputTreesUnchanged": {
+        "green": true,
+        "red": true
+      },
+      "memoryBytes": 2147483648,
+      "memorySwapTotalBytes": 2147483648,
+      "nanoCPUs": 2000000000,
+      "network": "none",
+      "onlyOwnJobBind": true,
+      "phase": "green",
+      "pidsLimit": 128,
+      "productExecuted": true,
+      "readOnlyRoot": true,
+      "startedAtKST": "2026-11-07T09:44:58+09:00",
+      "stateError": "",
+      "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdoutSHA256": "14dec3be0edf79aaef55d8512c3082d0a647e83300bfff97c1d82b8ed7f61da5",
+      "testCommand": [
+        "/job/venv/bin/python",
+        "-B",
+        "-m",
+        "pytest",
+        "-q",
+        "tests/core/test_delivery_operation_origin.py",
+        "--junitxml=/job/green-tests.xml",
+        "-o",
+        "cache_dir=/job/pytest-cache-green"
+      ],
+      "user": "1000:1000",
+      "workingDirectory": "/job/green"
+    },
+    "red": {
+      "OOMKilled": false,
+      "base": "b3bbdc8d92a39f2f797a7680deb2770d6f705af0",
+      "businessContainersChanged": false,
+      "containerID": "c20adcd66b3d2621df2a53cff75462156439dde01cb4512a0a0dbd0ffc6463de",
+      "containerName": "sv-root-b-py-45ec174adece-red",
+      "directContainerExit": 1,
+      "endedAtKST": "2026-11-07T09:45:09+09:00",
+      "extraSwapBytes": 0,
+      "hostPackagesInstalled": false,
+      "image": "python@sha256:51dafde81dbdb6ebde285137a295cf18a47ca95234fe388a343719cb97305b3d",
+      "imageID": "sha256:51dafde81dbdb6ebde285137a295cf18a47ca95234fe388a343719cb97305b3d",
+      "inputTreesUnchanged": {
+        "green": true,
+        "red": true
+      },
+      "memoryBytes": 2147483648,
+      "memorySwapTotalBytes": 2147483648,
+      "nanoCPUs": 2000000000,
+      "network": "none",
+      "onlyOwnJobBind": true,
+      "phase": "red",
+      "pidsLimit": 128,
+      "productExecuted": true,
+      "readOnlyRoot": true,
+      "startedAtKST": "2026-11-07T09:45:07+09:00",
+      "stateError": "",
+      "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdoutSHA256": "08a8817587bbf6522c43811638c1e9ba0d3bdead0ee891e01f5d1ad7b60450b7",
+      "testCommand": [
+        "/job/venv/bin/python",
+        "-B",
+        "-m",
+        "pytest",
+        "-q",
+        "tests/core/test_delivery_operation_origin.py::test_rejected_origin_never_delivers_or_invokes_rich_methods[foreign-equal]",
+        "--junitxml=/job/red-tests.xml",
+        "-o",
+        "cache_dir=/job/pytest-cache-red"
+      ],
+      "user": "1000:1000",
+      "workingDirectory": "/job/red"
+    },
+    "setup": {
+      "OOMKilled": false,
+      "base": "b3bbdc8d92a39f2f797a7680deb2770d6f705af0",
+      "businessContainersChanged": false,
+      "containerID": "0791a340269b191ea1ab878c415b2c58b145b74a19974a046377f8ccace89753",
+      "containerName": "sv-root-b-py-45ec174adece-setup",
+      "directContainerExit": 0,
+      "endedAtKST": "2026-11-07T09:44:42+09:00",
+      "extraSwapBytes": 0,
+      "hostPackagesInstalled": false,
+      "image": "python@sha256:51dafde81dbdb6ebde285137a295cf18a47ca95234fe388a343719cb97305b3d",
+      "imageID": "sha256:51dafde81dbdb6ebde285137a295cf18a47ca95234fe388a343719cb97305b3d",
+      "inputTreesUnchanged": {
+        "green": true,
+        "red": true
+      },
+      "memoryBytes": 2147483648,
+      "memorySwapTotalBytes": 2147483648,
+      "nanoCPUs": 2000000000,
+      "network": "bridge",
+      "onlyOwnJobBind": true,
+      "phase": "setup",
+      "pidsLimit": 128,
+      "productExecuted": false,
+      "readOnlyRoot": true,
+      "startedAtKST": "2026-11-07T09:44:28+09:00",
+      "stateError": "",
+      "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdoutSHA256": "3c961b0fb6ce7b8ea89f64315e3b5ab5ef7a5f6066398804788ac18a1ac7a44e",
+      "testCommand": [
+        "python",
+        "-B",
+        "-c",
+        "\nimport hashlib,json,os,subprocess,sys\nfrom pathlib import Path\nj=Path('/job');(j/'home').mkdir(exist_ok=True);(j/'pip-cache').mkdir(exist_ok=True)\ndef run(args,out):\n with (j/out).open('wb') as f:q=subprocess.run(args,stdout=f,stderr=subprocess.STDOUT)\n if q.returncode:raise SystemExit(q.returncode)\nrun([sys.executable,'-VV'],'runtime-version.txt')\nrun([sys.executable,'-m','venv','/job/venv'],'venv-create.txt')\npy='/job/venv/bin/python'\nrun([py,'-m','pip','--disable-pip-version-check','--no-input','download','--index-url','https://pypi.org/simple','--only-binary=:all:','--dest','/job/wheels','-r','requirements-test.txt'],'pip-download.txt')\nrun([py,'-m','pip','--disable-pip-version-check','--no-input','install','--no-index','--find-links','/job/wheels','--only-binary=:all:','--no-compile','-r','requirements-test.txt'],'pip-install.txt')\nrun([py,'-m','pip','freeze','--all'],'pip-freeze.txt')\nrun([py,'-m','pip','check'],'pip-check.txt')\nrows=[{'name':p.name,'bytes':p.stat().st_size,'SHA256':hashlib.sha256(p.read_bytes()).hexdigest()} for p in sorted((j/'wheels').iterdir()) if p.is_file()]\n(j/'wheel-inventory.json').write_text(json.dumps(rows,indent=2)+'\\n')\nprint(json.dumps({'setup':'complete','wheelCount':len(rows),'productImported':False}),flush=True)\n"
+      ],
+      "user": "1000:1000",
+      "workingDirectory": "/job/green"
+    }
+  }
+}

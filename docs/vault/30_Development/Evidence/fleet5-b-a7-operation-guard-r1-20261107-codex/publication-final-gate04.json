@@ -1,0 +1,26 @@
+{
+  "argv": [
+    "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+    "-B",
+    "tools/sync_obsidian.py",
+    "--check",
+    "--state",
+    "D:\\Project\\SaintVision-Invion\\SaintVisionI-Invion\\.git\\obsidian-sync-state.json",
+    "--conflicts-out",
+    "docs\\vault\\30_Development\\Evidence\\fleet5-b-a7-operation-guard-r1-20261107-codex\\publication-final-sync-conflicts.json"
+  ],
+  "startKST": "2026-11-07T10:08:17.988309+09:00",
+  "endKST": "2026-11-07T10:08:37.325796+09:00",
+  "exit": 0,
+  "rawSHA256": "19e2954d75e7870349ec70961b974b83ad81cb7d0104eda023a89c73617e117a",
+  "rawBytes": 74,
+  "encoding": "utf-8",
+  "text": "CHECK: 4959 managed files, 2535 pending exports, 0 conflicts. No writes.\r\n",
+  "cause": "new appended publication History; no ontology/source/product/test changes",
+  "fullStateBeforeSHA256": "e4a1518712fe4f1734598e123d0c1cbca2a5ac1b3e82f00d994eed8bb4f114de",
+  "fullStateAfterSHA256": "e4a1518712fe4f1734598e123d0c1cbca2a5ac1b3e82f00d994eed8bb4f114de",
+  "fullStateBeforeBytes": 472404,
+  "fullStateAfterBytes": 472404,
+  "stateBytesEqual": true,
+  "CHECKOnly": true
+}

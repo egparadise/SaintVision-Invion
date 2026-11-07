@@ -1,0 +1,1565 @@
+{
+  "RootUnitObservationAttribution": {
+    "OOMKilled": false,
+    "WIPPacketSHA256": "28c87c268baaf551dde15fcb35f0eb6d3b24b6861e8c1cfcb845fcb6e0a96f37",
+    "actualInterpreter": "Python 3.14.7 (main, Sep 19 2026, 01:01:59) [GCC 14.2.0]",
+    "actualMemoryPeakBytes": null,
+    "actualRuntimeB": 0,
+    "actualSQLNetworkServiceOrNodeDelivery": "NOT_RUN; external collaborators are unit spies; real once is called",
+    "atKST": "2026-11-07T09:46:10+09:00",
+    "base": "b3bbdc8d92a39f2f797a7680deb2770d6f705af0",
+    "dependencyVenvBeforeAfterContentInventory": "NOT_MEASURED; pinned wheel inventory / real pip freeze retained; first-party input hashes were compared before and after",
+    "firstPartyInputTreesUnchangedAcrossAllPhases": true,
+    "green": {
+      "directExit": 0,
+      "endedAtKST": "2026-11-07T09:45:01+09:00",
+      "errors": 0,
+      "failures": 0,
+      "passed": 24,
+      "skipped": 0,
+      "startedAtKST": "2026-11-07T09:44:58+09:00",
+      "tests": 24
+    },
+    "greenProductSHA256": "82f029614537eb5bab56934e4b6736fe3dd52ece54b9b9a3996815b131e41de4",
+    "image": "python@sha256:51dafde81dbdb6ebde285137a295cf18a47ca95234fe388a343719cb97305b3d",
+    "legacyGuardStatus": "UNCHANGED_GUARD_REFUSED_EXACT_NEW_CAPTURE; separate own-proof decision pending",
+    "networkNoneForProductTests": true,
+    "noProductExtractionExecutionOrImportStubs": true,
+    "original19HOLD": true,
+    "pipCheckExit": 0,
+    "publicPinnedRequirementsInstalled": true,
+    "realConftestsAndPyprojectPythonpathUsed": true,
+    "red": {
+      "actualDecisiveAssertion": "Rejected operation reached actual once's delivery call",
+      "actualDeliveryArguments": [
+        [
+          true,
+          false
+        ]
+      ],
+      "directExit": 1,
+      "earlierImportFixtureAndOnceCallReached": true,
+      "endedAtKST": "2026-11-07T09:45:09+09:00",
+      "errors": 0,
+      "failures": 1,
+      "passed": 0,
+      "skipped": 0,
+      "startedAtKST": "2026-11-07T09:45:07+09:00",
+      "tests": 1
+    },
+    "redRealBaseProductSHA256": "4a33428502279b88e510b5447382814bb115ddf2bff4f88f5bfcbb93f3c1a404",
+    "resourceLimits": {
+      "CPUs": 2,
+      "extraSwapBytes": 0,
+      "memoryGiB": 2,
+      "onlyOwnJobBind": true,
+      "pids": 128,
+      "readOnlyRoot": true,
+      "totalMemorySwapGiB": 2,
+      "user": "1000:1000"
+    },
+    "sourceKind": "1179 real Git-derived tracked first-party files plus exact WIP test; no Git metadata / no synthetic checkout",
+    "testSHA256": "3dacdb63f83ab1d8075ddcbe422d82daad20bd56f643adee0fc7ae97715925d2",
+    "wheelCount": 68,
+    "wholeProgramComplete": false
+  },
+  "acceptedBaselineDischarges": 0,
+  "actualProductExecutedByThisAuthor": false,
+  "actualWholeModuleASTSHA256": "a940497f15f35163e1c79b00853c781e0f81d1d49d401635f8cb9acf21ce9c56",
+  "base": "b3bbdc8d92a39f2f797a7680deb2770d6f705af0",
+  "baseline19": "HOLD unchanged",
+  "classification": "EXACT_CAPTURE_GUARD_DELTA_COVERED_WITH_LEGACY_REFUSAL_PRESERVED",
+  "expectedWholeModuleASTSHA256": "a940497f15f35163e1c79b00853c781e0f81d1d49d401635f8cb9acf21ce9c56",
+  "finiteResult": {
+    "capturedLocalReferenceKinds": {
+      "Load": 4,
+      "Store": 1
+    },
+    "changedOtherPaths": [],
+    "closedGrammarReason": null,
+    "expectedOwnerDerivationSHA256": "c135d36f07fc81143e7e9b95ce56d2b4382bfea4a5d5fdf0a297a5b6c3e5298f",
+    "other24RawBytesEqualRealBASE": true,
+    "ownerDerivation": {
+      "services/control-plane/src/inv/build_product_runtime.py": {
+        "ownerReturningFunctions": [
+          "inv.build_product_runtime.BuildExecutionAdmissionStore.promote_next",
+          "inv.build_product_runtime.BuildExecutionAdmissionStore.record",
+          "inv.build_product_runtime.BuildExecutionAdmissionStore.record_on_connection",
+          "inv.build_product_runtime.BuildProductRuntime.once",
+          "inv.build_product_runtime.TrustedBuildAdmissionEntry.record_committed",
+          "inv.build_product_runtime.configured_tenant_product_runtime"
+        ],
+        "owners": {
+          "": [],
+          "BuildExecutionAdmissionStore": [],
+          "BuildExecutionAdmissionStore.__init__": [
+            "self"
+          ],
+          "BuildExecutionAdmissionStore._require_committed_approval": [
+            "actors",
+            "approval",
+            "approvals",
+            "dispatched",
+            "expected_decision",
+            "preparation",
+            "row",
+            "snapshot",
+            "votes"
+          ],
+          "BuildExecutionAdmissionStore.promote_next": [
+            "admission",
+            "conn",
+            "intent",
+            "now",
+            "principal",
+            "stored"
+          ],
+          "BuildExecutionAdmissionStore.record": [
+            "conn"
+          ],
+          "BuildExecutionAdmissionStore.record_on_connection": [
+            "candidate",
+            "inserted",
+            "now",
+            "stored"
+          ],
+          "BuildProductRuntime": [],
+          "BuildProductRuntime.__init__": [],
+          "TrustedBuildAdmissionEntry": [],
+          "TrustedBuildAdmissionEntry.__init__": [
+            "self"
+          ],
+          "TrustedBuildAdmissionEntry.record_committed": [
+            "method"
+          ],
+          "_row": [],
+          "configured_tenant_product_runtime": [
+            "adapter",
+            "channel",
+            "queue",
+            "receipts",
+            "service",
+            "worker"
+          ]
+        },
+        "scope": "Bounded conservative MAY-owner relevance; parameter facts come from argument bindings, not runtime/workspace name heuristics; full provenance/use-site checks required"
+      },
+      "services/control-plane/src/inv/dispatch.py": {
+        "ownerReturningFunctions": [
+          "inv.dispatch.DeliveryQueue.acquire",
+          "inv.dispatch.DeliveryWorker.once"
+        ],
+        "owners": {
+          "": [],
+          "DeliveryQueue": [],
+          "DeliveryQueue.__init__": [
+            "self"
+          ],
+          "DeliveryQueue._can_start": [
+            "actors",
+            "approval",
+            "model",
+            "ready",
+            "requester",
+            "store",
+            "v",
+            "voters"
+          ],
+          "DeliveryQueue.acquire": [
+            "a",
+            "allocations",
+            "claim",
+            "conn",
+            "current",
+            "now",
+            "row",
+            "run"
+          ],
+          "DeliveryQueue.finish": [
+            "conn",
+            "row",
+            "run"
+          ],
+          "DeliveryWorker": [],
+          "DeliveryWorker.__init__": [
+            "self"
+          ],
+          "DeliveryWorker.once": [
+            "attempt",
+            "operation",
+            "outcome",
+            "parent",
+            "reconciled"
+          ],
+          "persist_delivery": []
+        },
+        "scope": "Bounded conservative MAY-owner relevance; parameter facts come from argument bindings, not runtime/workspace name heuristics; full provenance/use-site checks required"
+      },
+      "services/control-plane/src/inv/model_remote.py": {
+        "ownerReturningFunctions": [],
+        "owners": {
+          "": [],
+          "ConfiguredRemoteModelReader": [],
+          "ConfiguredRemoteModelReader.__init__": [],
+          "ConfiguredRemoteModelReader.read": [
+            "chunk",
+            "result"
+          ]
+        },
+        "scope": "Bounded conservative MAY-owner relevance; parameter facts come from argument bindings, not runtime/workspace name heuristics; full provenance/use-site checks required"
+      },
+      "services/control-plane/src/inv/node_transport.py": {
+        "ownerReturningFunctions": [
+          "inv.node_transport.NodeDelivery.deliver",
+          "inv.node_transport.NodeTLSClient._request",
+          "inv.node_transport.NodeTLSClient.exchange",
+          "inv.node_transport.NodeTLSClient.probe",
+          "inv.node_transport.NodeTLSClient.quarantine",
+          "inv.node_transport.NodeTLSClient.read_chunk",
+          "inv.node_transport.NodeTLSClient.resource_snapshot",
+          "inv.node_transport.NodeTLSClient.storage_sample",
+          "inv.node_transport.NodeTLSClient.terminal_frame"
+        ],
+        "owners": {
+          "": [],
+          "NodeDelivery": [],
+          "NodeDelivery.__init__": [
+            "self"
+          ],
+          "NodeDelivery._quarantine_gpu_node": [
+            "conn",
+            "current"
+          ],
+          "NodeDelivery.deliver": [
+            "channel",
+            "claim",
+            "gpu_allocation",
+            "payload",
+            "receipt",
+            "result"
+          ],
+          "NodeTLSClient": [],
+          "NodeTLSClient.__init__": [],
+          "NodeTLSClient._request": [
+            "_",
+            "conn",
+            "fingerprint",
+            "peer_certificate",
+            "raw",
+            "response",
+            "result",
+            "timeout",
+            "timer",
+            "wire_socket"
+          ],
+          "NodeTLSClient.storage_sample": [
+            "request",
+            "value"
+          ],
+          "private_key": [],
+          "strict_json": [],
+          "strict_json.pairs": []
+        },
+        "scope": "Bounded conservative MAY-owner relevance; parameter facts come from argument bindings, not runtime/workspace name heuristics; full provenance/use-site checks required"
+      },
+      "services/control-plane/src/inv/observer_worker.py": {
+        "ownerReturningFunctions": [
+          "inv.observer_worker.ObservationWorker.once"
+        ],
+        "owners": {
+          "": [],
+          "ObservationWorker": [],
+          "ObservationWorker.__init__": [
+            "self"
+          ],
+          "ObservationWorker.once": [
+            "conn",
+            "results",
+            "rows"
+          ],
+          "main": [
+            "conn",
+            "db",
+            "worker"
+          ]
+        },
+        "scope": "Bounded conservative MAY-owner relevance; parameter facts come from argument bindings, not runtime/workspace name heuristics; full provenance/use-site checks required"
+      },
+      "services/control-plane/src/inv/output_ingestion.py": {
+        "ownerReturningFunctions": [],
+        "owners": {
+          "": [],
+          "OutputIngestion": [],
+          "OutputIngestion.__init__": [
+            "self"
+          ],
+          "OutputIngestion.once": [
+            "candidate",
+            "command",
+            "conn",
+            "current",
+            "data",
+            "delivery",
+            "evidence",
+            "execution",
+            "job",
+            "launch",
+            "receipt",
+            "results",
+            "run",
+            "store",
+            "workspace"
+          ],
+          "evidence_id": [],
+          "output_bytes": [
+            "artifact"
+          ]
+        },
+        "scope": "Bounded conservative MAY-owner relevance; parameter facts come from argument bindings, not runtime/workspace name heuristics; full provenance/use-site checks required"
+      },
+      "services/control-plane/src/inv/remote_git.py": {
+        "ownerReturningFunctions": [
+          "inv.remote_git.GitHubRepository._request",
+          "inv.remote_git.GitHubRepository.head",
+          "inv.remote_git.GitHubRepository.publish",
+          "inv.remote_git.GitHubRepository.snapshot"
+        ],
+        "owners": {
+          "": [],
+          "GitHubRepository": [],
+          "GitHubRepository.__init__": [
+            "self"
+          ],
+          "GitHubRepository._request": [
+            "conn",
+            "raw",
+            "result",
+            "token",
+            "value"
+          ],
+          "GitHubRepository.changes": [],
+          "GitHubRepository.head": [
+            "result"
+          ],
+          "GitHubRepository.publish": [
+            "result",
+            "value"
+          ],
+          "GitHubRepository.reconcile": [
+            "info",
+            "parents",
+            "raw"
+          ],
+          "GitHubRepository.snapshot": [
+            "blob",
+            "blob_id",
+            "data",
+            "entries",
+            "entry",
+            "info",
+            "p",
+            "path",
+            "tree",
+            "tree_id"
+          ],
+          "export_snapshot": [],
+          "git_files": [],
+          "oid": []
+        },
+        "scope": "Bounded conservative MAY-owner relevance; parameter facts come from argument bindings, not runtime/workspace name heuristics; full provenance/use-site checks required"
+      },
+      "services/control-plane/src/inv/result_view.py": {
+        "ownerReturningFunctions": [
+          "inv.result_view.ResultView._current",
+          "inv.result_view.ResultView._files",
+          "inv.result_view.ResultView._output",
+          "inv.result_view.ResultView._scope",
+          "inv.result_view.ResultView.artifacts",
+          "inv.result_view.ResultView.attempts",
+          "inv.result_view.ResultView.download",
+          "inv.result_view.ResultView.logs",
+          "inv.result_view.ResultView.result"
+        ],
+        "owners": {
+          "": [],
+          "ResultView": [],
+          "ResultView.__init__": [
+            "self"
+          ],
+          "ResultView._current": [
+            "row"
+          ],
+          "ResultView._download_ticket": [],
+          "ResultView._files": [
+            "launch",
+            "raw"
+          ],
+          "ResultView._output": [],
+          "ResultView._provider_bytes": [
+            "files",
+            "provider"
+          ],
+          "ResultView._scope": [
+            "project",
+            "row",
+            "run"
+          ],
+          "ResultView._ticket_matches": [],
+          "ResultView.artifacts": [
+            "conn",
+            "f",
+            "files",
+            "items",
+            "row",
+            "run"
+          ],
+          "ResultView.attempts": [
+            "conn",
+            "items",
+            "r",
+            "rows"
+          ],
+          "ResultView.download": [
+            "artifact",
+            "conn",
+            "content",
+            "current_run",
+            "file",
+            "files",
+            "item",
+            "raw",
+            "row",
+            "run",
+            "ticket"
+          ],
+          "ResultView.logs": [
+            "artifact",
+            "changed",
+            "conn",
+            "result",
+            "row",
+            "run"
+          ],
+          "ResultView.result": [
+            "artifact",
+            "conn",
+            "receipt",
+            "row",
+            "run"
+          ],
+          "_checked": [],
+          "_time": []
+        },
+        "scope": "Bounded conservative MAY-owner relevance; parameter facts come from argument bindings, not runtime/workspace name heuristics; full provenance/use-site checks required"
+      },
+      "services/control-plane/src/inv/storage_check_collect.py": {
+        "ownerReturningFunctions": [
+          "inv.storage_check_collect.StorageCheckCollector._authority",
+          "inv.storage_check_collect.StorageCheckCollector.collect",
+          "inv.storage_check_collect.configured_storage_sample_collector"
+        ],
+        "owners": {
+          "": [],
+          "CatalogueProjectReader": [],
+          "CatalogueProjectReader.__init__": [],
+          "CatalogueProjectReader.contribution_is_wholly_in": [
+            "connection",
+            "row"
+          ],
+          "StorageCheckCollector": [],
+          "StorageCheckCollector.__init__": [
+            "self"
+          ],
+          "StorageCheckCollector._authority": [
+            "granted",
+            "row"
+          ],
+          "StorageCheckCollector.collect": [
+            "certificate",
+            "challenge",
+            "conn",
+            "context",
+            "envelope",
+            "outcome",
+            "prior",
+            "response",
+            "response_hash",
+            "result"
+          ],
+          "configured_storage_sample_collector": [
+            "client"
+          ],
+          "derive_request_id": []
+        },
+        "scope": "Bounded conservative MAY-owner relevance; parameter facts come from argument bindings, not runtime/workspace name heuristics; full provenance/use-site checks required"
+      },
+      "services/control-plane/src/inv/storage_sampling.py": {
+        "ownerReturningFunctions": [
+          "inv.storage_sampling.ConfiguredSampler.collect",
+          "inv.storage_sampling.verify_sample"
+        ],
+        "owners": {
+          "": [],
+          "Challenge": [],
+          "Challenge.digest": [],
+          "Challenge.validate": [
+            "c",
+            "item",
+            "p",
+            "path",
+            "value"
+          ],
+          "ConfiguredSampler": [],
+          "ConfiguredSampler.collect": [
+            "payload",
+            "public_key",
+            "result"
+          ],
+          "canonical": [],
+          "certificate_key": [],
+          "new_challenge": [],
+          "verify_sample": [
+            "actual_hash",
+            "item",
+            "observation",
+            "observations",
+            "result",
+            "size"
+          ]
+        },
+        "scope": "Bounded conservative MAY-owner relevance; parameter facts come from argument bindings, not runtime/workspace name heuristics; full provenance/use-site checks required"
+      },
+      "services/control-plane/src/inv/terminal.py": {
+        "ownerReturningFunctions": [
+          "inv.terminal.TerminalService._current",
+          "inv.terminal.TerminalService.frame",
+          "inv.terminal.TerminalService.issue",
+          "inv.terminal.TerminalService.redeem"
+        ],
+        "owners": {
+          "": [],
+          "TerminalService": [],
+          "TerminalService.__init__": [],
+          "TerminalService._connection": [
+            "row"
+          ],
+          "TerminalService._current": [
+            "l",
+            "launch",
+            "leases",
+            "node",
+            "now",
+            "row",
+            "run"
+          ],
+          "TerminalService.frame": [
+            "_",
+            "channel",
+            "completed",
+            "conn",
+            "inserted",
+            "launch",
+            "node",
+            "now",
+            "p",
+            "prior",
+            "result",
+            "row",
+            "runtime"
+          ],
+          "TerminalService.issue": [
+            "conn",
+            "launch",
+            "now",
+            "result",
+            "row",
+            "session"
+          ],
+          "TerminalService.redeem": [
+            "conn",
+            "current",
+            "launch",
+            "now",
+            "principal",
+            "row",
+            "ticket",
+            "used"
+          ],
+          "TerminalService.release": [
+            "conn"
+          ],
+          "TerminalText": [],
+          "TerminalText.accept": [
+            "c",
+            "line",
+            "raw",
+            "self"
+          ]
+        },
+        "scope": "Bounded conservative MAY-owner relevance; parameter facts come from argument bindings, not runtime/workspace name heuristics; full provenance/use-site checks required"
+      },
+      "services/control-plane/src/inv/tooling.py": {
+        "ownerReturningFunctions": [
+          "inv.tooling.ToolGateway.claim"
+        ],
+        "owners": {
+          "": [],
+          "ToolGateway": [],
+          "ToolGateway.__init__": [
+            "self"
+          ],
+          "ToolGateway.claim": [
+            "actors",
+            "admitted",
+            "allocation",
+            "allocations",
+            "approval",
+            "conn",
+            "deadline",
+            "decision",
+            "dispatch",
+            "expected",
+            "expires",
+            "gpu_allocation",
+            "health",
+            "kind",
+            "now",
+            "plan",
+            "prior",
+            "r",
+            "requester",
+            "resources",
+            "result",
+            "row",
+            "run",
+            "v",
+            "votes",
+            "workspace_input"
+          ],
+          "claim_view": []
+        },
+        "scope": "Bounded conservative MAY-owner relevance; parameter facts come from argument bindings, not runtime/workspace name heuristics; full provenance/use-site checks required"
+      },
+      "services/control-plane/src/inv/worker.py": {
+        "ownerReturningFunctions": [],
+        "owners": {
+          "": [],
+          "_output_provider": [],
+          "main": [
+            "build_runtime",
+            "conn",
+            "db",
+            "delivery",
+            "worker"
+          ],
+          "main.consume": [
+            "outcome"
+          ],
+          "main.consume_builds": [
+            "outcome"
+          ],
+          "validated_worker_configuration": []
+        },
+        "scope": "Bounded conservative MAY-owner relevance; parameter facts come from argument bindings, not runtime/workspace name heuristics; full provenance/use-site checks required"
+      },
+      "services/control-plane/src/inv/workspace_config.py": {
+        "ownerReturningFunctions": [
+          "inv.workspace_config.configured_workspace"
+        ],
+        "owners": {
+          "": [],
+          "configured_workspace": [
+            "configured",
+            "pool",
+            "result",
+            "runtime",
+            "signing_key"
+          ]
+        },
+        "scope": "Bounded conservative MAY-owner relevance; parameter facts come from argument bindings, not runtime/workspace name heuristics; full provenance/use-site checks required"
+      },
+      "services/control-plane/src/inv/workspace_resume.py": {
+        "ownerReturningFunctions": [
+          "inv.workspace_resume.WorkspaceResume._prepare",
+          "inv.workspace_resume.WorkspaceResume.enqueue",
+          "inv.workspace_resume.WorkspaceResume.prepare",
+          "inv.workspace_resume.approved_resume"
+        ],
+        "owners": {
+          "": [],
+          "WorkspaceResume": [],
+          "WorkspaceResume.__init__": [
+            "self"
+          ],
+          "WorkspaceResume._prepare": [
+            "_",
+            "prior",
+            "raw",
+            "ref",
+            "row",
+            "run",
+            "workload"
+          ],
+          "WorkspaceResume.enqueue": [
+            "admitted",
+            "bound",
+            "conn",
+            "l",
+            "leases",
+            "prior",
+            "run",
+            "store"
+          ],
+          "WorkspaceResume.prepare": [
+            "conn",
+            "request_hash",
+            "root_fd"
+          ],
+          "approved_resume": [
+            "raw",
+            "row"
+          ],
+          "bounded_snapshot": [],
+          "commit_workspace_output": [
+            "content",
+            "delivery",
+            "launch",
+            "obj",
+            "raw",
+            "step"
+          ],
+          "workspace_output": []
+        },
+        "scope": "Bounded conservative MAY-owner relevance; parameter facts come from argument bindings, not runtime/workspace name heuristics; full provenance/use-site checks required"
+      },
+      "src/saintvision/services/eval_execution.py": {
+        "ownerReturningFunctions": [
+          "saintvision.services.eval_execution.execute_case"
+        ],
+        "owners": {
+          "": [],
+          "CaseOutcome": [
+            "observed"
+          ],
+          "_check": [],
+          "_expectation": [],
+          "_observed": [],
+          "_try_cancel": [],
+          "execute_case": [],
+          "run_suite": []
+        },
+        "scope": "Bounded conservative MAY-owner relevance; parameter facts come from argument bindings, not runtime/workspace name heuristics; full provenance/use-site checks required"
+      },
+      "tools/check_remote_workspace.py": {
+        "ownerReturningFunctions": [
+          "tools.check_remote_workspace.boundary"
+        ],
+        "owners": {
+          "": [],
+          "boundary": [
+            "claims",
+            "gate",
+            "grants",
+            "leases"
+          ],
+          "copy_private": [],
+          "main": [
+            "config",
+            "probe"
+          ],
+          "self_node": []
+        },
+        "scope": "Bounded conservative MAY-owner relevance; parameter facts come from argument bindings, not runtime/workspace name heuristics; full provenance/use-site checks required"
+      },
+      "tools/intranet_e2e_smoke.py": {
+        "ownerReturningFunctions": [
+          "tools.intranet_e2e_smoke.bundle_read_pinned.pinned",
+          "tools.intranet_e2e_smoke.observe_client_known",
+          "tools.intranet_e2e_smoke.observe_configuration_bound",
+          "tools.intranet_e2e_smoke.observe_control_plane",
+          "tools.intranet_e2e_smoke.observe_grant_refused",
+          "tools.intranet_e2e_smoke.observe_https",
+          "tools.intranet_e2e_smoke.observe_jwks"
+        ],
+        "owners": {
+          "": [],
+          "Deadline": [],
+          "Deadline.remaining": [],
+          "addresses_in": [],
+          "as_json": [],
+          "assert_no_addresses": [],
+          "assert_no_credentials": [],
+          "blocked": [],
+          "bundle_read_pinned": [
+            "original"
+          ],
+          "bundle_read_pinned.pinned": [
+            "accepted"
+          ],
+          "canonical_issuer": [],
+          "certificate_authorities": [],
+          "dechunk": [],
+          "expiry_date": [],
+          "failed": [],
+          "https_request": [],
+          "key_material": [],
+          "loopback_host": [],
+          "main": [],
+          "named_bundle_defects": [],
+          "observe_client_known": [],
+          "observe_configuration_bound": [],
+          "observe_control_plane": [],
+          "observe_discovery": [],
+          "observe_grant_refused": [],
+          "observe_https": [],
+          "observe_jwks": [],
+          "observe_name": [],
+          "parser": [],
+          "passed": [],
+          "peer_certificate": [],
+          "plain_request": [],
+          "post_token": [],
+          "product_verifier": [],
+          "read_bounded": [],
+          "read_control_plane_configuration": [],
+          "render_markdown": [],
+          "run": [],
+          "same_origin": [],
+          "same_origin.origin": [],
+          "signed_but_invalid_token": [],
+          "signed_but_invalid_token.segment": [],
+          "smoke_verdict": [],
+          "split_response": [],
+          "trusted_context": [],
+          "unmeasured": [],
+          "validate_evidence": [],
+          "verifier_refusal": []
+        },
+        "scope": "Bounded conservative MAY-owner relevance; parameter facts come from argument bindings, not runtime/workspace name heuristics; full provenance/use-site checks required"
+      },
+      "tools/lan_execution.py": {
+        "ownerReturningFunctions": [
+          "tools.lan_execution.context"
+        ],
+        "owners": {
+          "": [],
+          "_execute": [],
+          "bundle": [],
+          "context": [
+            "client"
+          ],
+          "execute": [
+            "conn",
+            "row"
+          ],
+          "permit": [],
+          "recover": [],
+          "transmit_fault": [],
+          "verify_result": [],
+          "write_report": []
+        },
+        "scope": "Bounded conservative MAY-owner relevance; parameter facts come from argument bindings, not runtime/workspace name heuristics; full provenance/use-site checks required"
+      },
+      "tools/lan_pilot.py": {
+        "ownerReturningFunctions": [
+          "tools.lan_pilot._channel_row",
+          "tools.lan_pilot._dsn_with_passfile",
+          "tools.lan_pilot._normal_floor_input",
+          "tools.lan_pilot._require_same_external_database",
+          "tools.lan_pilot.external_dsn_password",
+          "tools.lan_pilot.read_external_dsn",
+          "tools.lan_pilot.runtime"
+        ],
+        "owners": {
+          "": [],
+          "_batch_material": [],
+          "_channel_row": [
+            "row"
+          ],
+          "_current_finalized_batch": [
+            "row"
+          ],
+          "_dsn_with_passfile": [
+            "database",
+            "host",
+            "info",
+            "port"
+          ],
+          "_finalized_predecessor": [
+            "conn"
+          ],
+          "_load_batch_journal": [],
+          "_load_external_ca": [],
+          "_load_offline_authorization": [],
+          "_load_offline_authorization.strict_object": [],
+          "_load_revocations": [],
+          "_normal_floor_input": [
+            "nonce",
+            "path",
+            "value"
+          ],
+          "_pem_certificates": [],
+          "_plain_cp_floor": [],
+          "_read_pgpass": [],
+          "_require_same_external_database": [
+            "admin",
+            "identity",
+            "runtime_identity",
+            "runtime_info"
+          ],
+          "_rotation_digest": [],
+          "_rotation_material": [],
+          "_utc_z": [],
+          "_validate_current_control_leaf": [],
+          "_validate_expired_historical_leaf": [],
+          "_validate_rotation_receipt": [],
+          "_verify_batch_archive": [],
+          "_write_batch_journal": [],
+          "_write_fully_expired_rotation_public_material": [],
+          "_write_rotation_public_material": [],
+          "abandon_expired_prepared_leaf_rotation_batch": [
+            "conn",
+            "row"
+          ],
+          "abandon_expired_prepared_leaf_rotation_batch.prior_archive": [],
+          "active_configured_nodes": [],
+          "add_requested_nodes": [],
+          "artifact_for_client": [],
+          "atomic_write": [],
+          "bind_db_auth": [
+            "admin_dsn",
+            "admin_info",
+            "conn",
+            "database",
+            "encryption",
+            "memberships",
+            "methods",
+            "no_credential",
+            "rejected",
+            "role_privileges",
+            "row",
+            "runtime_dsn",
+            "runtime_role",
+            "state",
+            "wrong_credential"
+          ],
+          "bundle": [
+            "image",
+            "inspected",
+            "manifest",
+            "node",
+            "node_output",
+            "nodes",
+            "prebuilt_image",
+            "prebuilt_inspect",
+            "state"
+          ],
+          "commit_leaf_rotation": [
+            "_not_after",
+            "certificate_sha256",
+            "commit_receipt",
+            "commit_receipt_body",
+            "committed_version",
+            "conn",
+            "enabled",
+            "endpoint",
+            "row",
+            "version"
+          ],
+          "commit_leaf_rotation_batch": [
+            "conn",
+            "kill",
+            "row"
+          ],
+          "configured_nodes": [],
+          "enroll": [
+            "cert",
+            "conn",
+            "key",
+            "previous"
+          ],
+          "ensure_node_policy": [],
+          "ensure_pilot_pki": [],
+          "exclusive_file": [],
+          "external_dsn_password": [
+            "info"
+          ],
+          "init": [
+            "added",
+            "conn",
+            "database",
+            "env",
+            "exists",
+            "info",
+            "node",
+            "prior",
+            "provisioned_nodes",
+            "requested_download_port",
+            "requested_node_port",
+            "runtime_dsn",
+            "runtime_info",
+            "runtime_password",
+            "runtime_role",
+            "state",
+            "url"
+          ],
+          "load": [],
+          "load_pilot_ca_key": [],
+          "load_prebuilt_image": [],
+          "main": [],
+          "manifest_for_node": [],
+          "node_by_id": [],
+          "node_certificate_path": [],
+          "node_from_csr": [],
+          "node_public_directory": [],
+          "node_state_directory": [],
+          "node_status_rows": [
+            "public_snapshot",
+            "received_at",
+            "row",
+            "snap",
+            "snapshot"
+          ],
+          "normalized_state": [],
+          "observe": [
+            "observer",
+            "result"
+          ],
+          "pilot_runtime_role": [
+            "database"
+          ],
+          "prepare_fully_expired_leaf_rotation_recovery_batch": [],
+          "prepare_fully_expired_leaf_rotation_recovery_batch.baseline": [],
+          "prepare_fully_expired_leaf_rotation_recovery_batch.validate_baselines": [
+            "conn",
+            "row"
+          ],
+          "prepare_leaf_rotation": [
+            "channel",
+            "channel_fingerprint",
+            "channel_not_after",
+            "conn",
+            "enabled",
+            "endpoint",
+            "manifest",
+            "manifest_raw",
+            "material",
+            "version"
+          ],
+          "prepare_leaf_rotation_batch": [
+            "child",
+            "conn",
+            "nonce",
+            "observation_dir",
+            "p"
+          ],
+          "prepare_leaf_rotation_recovery_batch": [
+            "common",
+            "conn",
+            "files",
+            "key",
+            "manifest",
+            "manifest_raw",
+            "next_node",
+            "proposal",
+            "proposal_raw",
+            "recovery_record",
+            "replacement",
+            "replacement_not_after",
+            "replacement_overlap",
+            "row",
+            "shared_control_raw",
+            "values"
+          ],
+          "read_external_dsn": [
+            "database",
+            "info",
+            "port"
+          ],
+          "retire_leaf_rotation_batch": [
+            "archive_raw",
+            "conn",
+            "control_key"
+          ],
+          "revoke_node_certificate": [
+            "conn",
+            "row",
+            "version"
+          ],
+          "revoke_server_node_colocation": [
+            "conn",
+            "row",
+            "version"
+          ],
+          "revoked_colocation_state": [],
+          "run": [],
+          "save": [],
+          "serve": [],
+          "serve.Handler": [],
+          "serve.Handler.do_GET": [
+            "length",
+            "stream",
+            "target"
+          ],
+          "serve.Server": [],
+          "stage_leaf_rotation_batch": [
+            "_not_after",
+            "certificate_sha256",
+            "committed_version",
+            "conn",
+            "enabled",
+            "endpoint",
+            "row",
+            "version"
+          ],
+          "status": [],
+          "tls": [],
+          "validate_node_ips": [],
+          "validate_pilot_database_name": [],
+          "write": []
+        },
+        "scope": "Bounded conservative MAY-owner relevance; parameter facts come from argument bindings, not runtime/workspace name heuristics; full provenance/use-site checks required"
+      },
+      "tools/post_landing_select_run.py": {
+        "ownerReturningFunctions": [],
+        "owners": {
+          "": [],
+          "main": [],
+          "matching": []
+        },
+        "scope": "Bounded conservative MAY-owner relevance; parameter facts come from argument bindings, not runtime/workspace name heuristics; full provenance/use-site checks required"
+      },
+      "tools/prepare_server_config.py": {
+        "ownerReturningFunctions": [],
+        "owners": {
+          "": [],
+          "_volume_name": [],
+          "_write_and_verify": [],
+          "collect": [],
+          "collect.reference": [],
+          "docker": [],
+          "prepare": [],
+          "read_regular": [],
+          "strict_json": [],
+          "strict_json.object_pairs": []
+        },
+        "scope": "Bounded conservative MAY-owner relevance; parameter facts come from argument bindings, not runtime/workspace name heuristics; full provenance/use-site checks required"
+      },
+      "tools/remote_workspace_entry.py": {
+        "ownerReturningFunctions": [
+          "tools.remote_workspace_entry.client",
+          "tools.remote_workspace_entry.database",
+          "tools.remote_workspace_entry.execute",
+          "tools.remote_workspace_entry.receipt",
+          "tools.remote_workspace_entry.setup"
+        ],
+        "owners": {
+          "": [],
+          "cancel": [],
+          "child": [
+            "db",
+            "outcome"
+          ],
+          "execute": [
+            "completion",
+            "duplicate",
+            "envelope",
+            "pending",
+            "result",
+            "worker"
+          ],
+          "initialize": [
+            "config",
+            "conn",
+            "environment",
+            "info",
+            "result",
+            "url"
+          ],
+          "main": [
+            "report"
+          ],
+          "receipt": [],
+          "setup": [
+            "a",
+            "amount",
+            "conn",
+            "db",
+            "e",
+            "kind",
+            "resource",
+            "response"
+          ],
+          "write": []
+        },
+        "scope": "Bounded conservative MAY-owner relevance; parameter facts come from argument bindings, not runtime/workspace name heuristics; full provenance/use-site checks required"
+      },
+      "tools/run_ac11_exact_sha_aggregate.py": {
+        "ownerReturningFunctions": [],
+        "owners": {
+          "": [],
+          "_artifact_digest": [],
+          "_pairs": [],
+          "_row_id": [],
+          "_run_receipt": [],
+          "_zip_documents": [],
+          "artifact_for_run": [],
+          "bind_producer": [],
+          "branch_name": [],
+          "command": [],
+          "command_json": [],
+          "correlation_id": [],
+          "dispatch_and_wait": [],
+          "ensure_remote_ref": [],
+          "exact_rows": [],
+          "iso": [],
+          "list_runs": [],
+          "load_producers": [],
+          "local_checkout": [],
+          "main": [],
+          "orchestrate": [],
+          "parser": [],
+          "real_runner": [],
+          "recompute": [],
+          "repository_name": [],
+          "source_sha": [],
+          "strict_json": [],
+          "usable_rows": [],
+          "utc": [],
+          "validate_run": [],
+          "validate_run_path": [],
+          "view_run": [],
+          "wait_existing": []
+        },
+        "scope": "Bounded conservative MAY-owner relevance; parameter facts come from argument bindings, not runtime/workspace name heuristics; full provenance/use-site checks required"
+      },
+      "tools/run_s04_db_evidence.py": {
+        "ownerReturningFunctions": [],
+        "owners": {
+          "": [],
+          "main": [],
+          "measurement_provenance": [],
+          "parser": [],
+          "validate_junit": [],
+          "validate_report": [],
+          "validated_paths": []
+        },
+        "scope": "Bounded conservative MAY-owner relevance; parameter facts come from argument bindings, not runtime/workspace name heuristics; full provenance/use-site checks required"
+      }
+    },
+    "ownerDerivationReason": null,
+    "reason": null,
+    "referenceContract": {
+      "directNodeIdentityRequired": true,
+      "forwardCallWitness": {
+        "expressionSHA256": "476fd474759435bc098bef7e35bc2bdc8e58826f015228e59a6ee794db8867cb",
+        "fileSHA256": "82f029614537eb5bab56934e4b6736fe3dd52ece54b9b9a3996815b131e41de4",
+        "function": "inv.dispatch.DeliveryWorker.once",
+        "path": "services/control-plane/src/inv/dispatch.py",
+        "span": [
+          339,
+          12,
+          344,
+          13
+        ]
+      },
+      "projectedForwardAttribute": {
+        "expressionSHA256": "26a4e065c848c1fb80b56f62bc7cae559f203434e03608f75572d2fe7eedf297",
+        "fileSHA256": "82f029614537eb5bab56934e4b6736fe3dd52ece54b9b9a3996815b131e41de4",
+        "function": "inv.dispatch.DeliveryWorker.once",
+        "path": "services/control-plane/src/inv/dispatch.py",
+        "span": [
+          339,
+          12,
+          339,
+          33
+        ]
+      },
+      "reason": null,
+      "references": [
+        {
+          "attributeKind": "Attribute",
+          "attributeSource": {
+            "expressionSHA256": "26a4e065c848c1fb80b56f62bc7cae559f203434e03608f75572d2fe7eedf297",
+            "fileSHA256": "82f029614537eb5bab56934e4b6736fe3dd52ece54b9b9a3996815b131e41de4",
+            "function": "inv.dispatch.DeliveryWorker.once",
+            "path": "services/control-plane/src/inv/dispatch.py",
+            "span": [
+              339,
+              12,
+              339,
+              33
+            ]
+          },
+          "callKind": "Call",
+          "callSource": {
+            "expressionSHA256": "476fd474759435bc098bef7e35bc2bdc8e58826f015228e59a6ee794db8867cb",
+            "fileSHA256": "82f029614537eb5bab56934e4b6736fe3dd52ece54b9b9a3996815b131e41de4",
+            "function": "inv.dispatch.DeliveryWorker.once",
+            "path": "services/control-plane/src/inv/dispatch.py",
+            "span": [
+              339,
+              12,
+              344,
+              13
+            ]
+          },
+          "directCallFunc": true
+        }
+      ],
+      "sameKindWitnessComparison": true
+    },
+    "scopedSourceCount": 25,
+    "sourcePathSetEqual": true,
+    "wholeModuleNormalizedASTEqualsDerivedBASEPlusExactDelta": true
+  },
+  "gitTrackedDeltaPaths": [
+    "services/control-plane/src/inv/dispatch.py"
+  ],
+  "independentCODEReview": "PENDING through Root",
+  "legacyGuardCompatibilityClean": false,
+  "legacyRefusalDiagnosticSHA256": "3f5e6214ca11c7b08f54412f3f351242651bc6b9b4477df0f9512859488c5759",
+  "legacyRefusals": [
+    {
+      "error": "DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:INSTANCE:operation",
+      "path": "services/control-plane/src/inv/dispatch.py",
+      "reflection": []
+    }
+  ],
+  "legacyStatus": "REFUSED",
+  "newStaticControls": 21,
+  "oldBaselineOrProofsChanged": false,
+  "oldGuardAllowanceAdded": false,
+  "premises": [
+    "genuine builtin type/str/ValueError and genuine receiver/plain-field hypotheses remain explicit",
+    "no hostile receiver/property/frame/metaclass exemption or heap completeness is granted",
+    "property read itself and earlier reconciliation/acquire effects have happened before value rejection",
+    "existing finish uncertainty and distinct SQL operation read are unchanged; no SQL/runtime proof here",
+    "NodeDelivery defaults/truthiness/or and delivery permission are unchanged and unaccepted"
+  ],
+  "publication": "NOT_RUN; Root next step required",
+  "realBindings": null,
+  "rootDecision": "msg_f730b53fb339",
+  "runtimeB": 0,
+  "sourceWorld": [
+    {
+      "baseSHA256": "7483d65fcb1032aeb05b4d2dd56e09e714cff8ca676de0f80fc3a2f5e447e9af",
+      "bytes": 22165,
+      "input": "raw real BASE Git bytes",
+      "path": "services/control-plane/src/inv/build_product_runtime.py",
+      "sha256": "7483d65fcb1032aeb05b4d2dd56e09e714cff8ca676de0f80fc3a2f5e447e9af"
+    },
+    {
+      "baseSHA256": "4a33428502279b88e510b5447382814bb115ddf2bff4f88f5bfcbb93f3c1a404",
+      "bytes": 15823,
+      "input": "unchanged tested WIP dispatch",
+      "path": "services/control-plane/src/inv/dispatch.py",
+      "sha256": "82f029614537eb5bab56934e4b6736fe3dd52ece54b9b9a3996815b131e41de4"
+    },
+    {
+      "baseSHA256": "796f61fe8404c2c3a8a4be08eca75d98e3c442a30c04077c66b278e7d60c6737",
+      "bytes": 4737,
+      "input": "raw real BASE Git bytes",
+      "path": "services/control-plane/src/inv/model_remote.py",
+      "sha256": "796f61fe8404c2c3a8a4be08eca75d98e3c442a30c04077c66b278e7d60c6737"
+    },
+    {
+      "baseSHA256": "3559bbcdf9568f8930654d860b0edd980eca71c835cde3fe7380a69dd56e18f4",
+      "bytes": 12319,
+      "input": "raw real BASE Git bytes",
+      "path": "services/control-plane/src/inv/node_transport.py",
+      "sha256": "3559bbcdf9568f8930654d860b0edd980eca71c835cde3fe7380a69dd56e18f4"
+    },
+    {
+      "baseSHA256": "6bbdf815554fe1f0157247732ddc4dc3069686685c291ef83add55c8f3e92003",
+      "bytes": 2821,
+      "input": "raw real BASE Git bytes",
+      "path": "services/control-plane/src/inv/observer_worker.py",
+      "sha256": "6bbdf815554fe1f0157247732ddc4dc3069686685c291ef83add55c8f3e92003"
+    },
+    {
+      "baseSHA256": "e954e1ef8dcae97756a50428af66c9a328e4d362f1aee7d630588431d09b1308",
+      "bytes": 9784,
+      "input": "raw real BASE Git bytes",
+      "path": "services/control-plane/src/inv/output_ingestion.py",
+      "sha256": "e954e1ef8dcae97756a50428af66c9a328e4d362f1aee7d630588431d09b1308"
+    },
+    {
+      "baseSHA256": "5efd1057f9208cdb29670073bd8ea5e96f98cfbd5a8173f4daa764d3db5db52e",
+      "bytes": 12723,
+      "input": "raw real BASE Git bytes",
+      "path": "services/control-plane/src/inv/remote_git.py",
+      "sha256": "5efd1057f9208cdb29670073bd8ea5e96f98cfbd5a8173f4daa764d3db5db52e"
+    },
+    {
+      "baseSHA256": "900b2b5b3381da451a14a49a2b079b2f9851ea3bc91f30798c9fcde243ceab9a",
+      "bytes": 16901,
+      "input": "raw real BASE Git bytes",
+      "path": "services/control-plane/src/inv/result_view.py",
+      "sha256": "900b2b5b3381da451a14a49a2b079b2f9851ea3bc91f30798c9fcde243ceab9a"
+    },
+    {
+      "baseSHA256": "bae67c856cc8bdae52c1f06c4b6e36302e17ae0dd53a24fc01557cae19a3e226",
+      "bytes": 19960,
+      "input": "raw real BASE Git bytes",
+      "path": "services/control-plane/src/inv/storage_check_collect.py",
+      "sha256": "bae67c856cc8bdae52c1f06c4b6e36302e17ae0dd53a24fc01557cae19a3e226"
+    },
+    {
+      "baseSHA256": "4e43aa43e8dc9b8ab78af0fde78f9e83b83d7bfdc77b7362ad565741f6f94e8a",
+      "bytes": 10765,
+      "input": "raw real BASE Git bytes",
+      "path": "services/control-plane/src/inv/storage_sampling.py",
+      "sha256": "4e43aa43e8dc9b8ab78af0fde78f9e83b83d7bfdc77b7362ad565741f6f94e8a"
+    },
+    {
+      "baseSHA256": "fe294d648b34d617df94449974fc82fed904639b80b8a5da2c9d34f32606bf8e",
+      "bytes": 17862,
+      "input": "raw real BASE Git bytes",
+      "path": "services/control-plane/src/inv/terminal.py",
+      "sha256": "fe294d648b34d617df94449974fc82fed904639b80b8a5da2c9d34f32606bf8e"
+    },
+    {
+      "baseSHA256": "de5f6213b196784c6c4280d31a17fba9fe1669eb466edee14197664b37f2ac6c",
+      "bytes": 15889,
+      "input": "raw real BASE Git bytes",
+      "path": "services/control-plane/src/inv/tooling.py",
+      "sha256": "de5f6213b196784c6c4280d31a17fba9fe1669eb466edee14197664b37f2ac6c"
+    },
+    {
+      "baseSHA256": "3010b2409bb285de960eb322792b1062ed066275307c9bea53a2cc767b65d4e3",
+      "bytes": 7594,
+      "input": "raw real BASE Git bytes",
+      "path": "services/control-plane/src/inv/worker.py",
+      "sha256": "3010b2409bb285de960eb322792b1062ed066275307c9bea53a2cc767b65d4e3"
+    },
+    {
+      "baseSHA256": "7b77a716b4fb56e951fce110d347ac41f16d1d80d4722ba9d1410a1869b351cb",
+      "bytes": 4125,
+      "input": "raw real BASE Git bytes",
+      "path": "services/control-plane/src/inv/workspace_config.py",
+      "sha256": "7b77a716b4fb56e951fce110d347ac41f16d1d80d4722ba9d1410a1869b351cb"
+    },
+    {
+      "baseSHA256": "32c8fae52eb947605c53801d609e9826c514b53c2392f07f1fb9ff605303449b",
+      "bytes": 14468,
+      "input": "raw real BASE Git bytes",
+      "path": "services/control-plane/src/inv/workspace_resume.py",
+      "sha256": "32c8fae52eb947605c53801d609e9826c514b53c2392f07f1fb9ff605303449b"
+    },
+    {
+      "baseSHA256": "e97af6a21a46ebfc2f836a5339005510dcd3dcd257640a4b375bdb52bd3b0bda",
+      "bytes": 12213,
+      "input": "raw real BASE Git bytes",
+      "path": "src/saintvision/services/eval_execution.py",
+      "sha256": "e97af6a21a46ebfc2f836a5339005510dcd3dcd257640a4b375bdb52bd3b0bda"
+    },
+    {
+      "baseSHA256": "3550db9c20fb7e2118f66f0337ed787dd22a166a6ff8cf1c6e9490f9ae9df6e3",
+      "bytes": 13260,
+      "input": "raw real BASE Git bytes",
+      "path": "tools/check_remote_workspace.py",
+      "sha256": "3550db9c20fb7e2118f66f0337ed787dd22a166a6ff8cf1c6e9490f9ae9df6e3"
+    },
+    {
+      "baseSHA256": "3a2e134e04ac36ec81a20280e47e2f9deb9c190c2f5bed5c26e1ad05206210ed",
+      "bytes": 76378,
+      "input": "raw real BASE Git bytes",
+      "path": "tools/intranet_e2e_smoke.py",
+      "sha256": "3a2e134e04ac36ec81a20280e47e2f9deb9c190c2f5bed5c26e1ad05206210ed"
+    },
+    {
+      "baseSHA256": "cd4be84de9a60c03c32daa8e831a527ed9014169e151c7a436383772a5d4ddc0",
+      "bytes": 11689,
+      "input": "raw real BASE Git bytes",
+      "path": "tools/lan_execution.py",
+      "sha256": "cd4be84de9a60c03c32daa8e831a527ed9014169e151c7a436383772a5d4ddc0"
+    },
+    {
+      "baseSHA256": "2c626540f495499423b707b063a6cab6a53e1be3af8c324f46af88a94ac8f652",
+      "bytes": 198894,
+      "input": "raw real BASE Git bytes",
+      "path": "tools/lan_pilot.py",
+      "sha256": "2c626540f495499423b707b063a6cab6a53e1be3af8c324f46af88a94ac8f652"
+    },
+    {
+      "baseSHA256": "b88449375aa8377d1e069e151d297ca9bd964495a4807d7e3eab26b111da6842",
+      "bytes": 2115,
+      "input": "raw real BASE Git bytes",
+      "path": "tools/post_landing_select_run.py",
+      "sha256": "b88449375aa8377d1e069e151d297ca9bd964495a4807d7e3eab26b111da6842"
+    },
+    {
+      "baseSHA256": "2203c2d424ecd7651dcd099b4fd6fb051bd872e919a8bcad44fd2b4043897b2e",
+      "bytes": 14829,
+      "input": "raw real BASE Git bytes",
+      "path": "tools/prepare_server_config.py",
+      "sha256": "2203c2d424ecd7651dcd099b4fd6fb051bd872e919a8bcad44fd2b4043897b2e"
+    },
+    {
+      "baseSHA256": "e69fa8ff6c51bd3880f5ec388fe97288a4256169377e17d9d6aa5b7ec2f32c27",
+      "bytes": 14741,
+      "input": "raw real BASE Git bytes",
+      "path": "tools/remote_workspace_entry.py",
+      "sha256": "e69fa8ff6c51bd3880f5ec388fe97288a4256169377e17d9d6aa5b7ec2f32c27"
+    },
+    {
+      "baseSHA256": "67388ba4a7ac07156bf70d9286691d1a0dfe1fb76f976cf91f0b1df84dc6743b",
+      "bytes": 34190,
+      "input": "raw real BASE Git bytes",
+      "path": "tools/run_ac11_exact_sha_aggregate.py",
+      "sha256": "67388ba4a7ac07156bf70d9286691d1a0dfe1fb76f976cf91f0b1df84dc6743b"
+    },
+    {
+      "baseSHA256": "92296b5f070cd97440889b12b487876cd64240408fe4faa918597dfcc6c7e82c",
+      "bytes": 7618,
+      "input": "raw real BASE Git bytes",
+      "path": "tools/run_s04_db_evidence.py",
+      "sha256": "92296b5f070cd97440889b12b487876cd64240408fe4faa918597dfcc6c7e82c"
+    }
+  ],
+  "syntaxOnly": [
+    {
+      "path": "services/control-plane/src/inv/dispatch.py",
+      "sha256": "82f029614537eb5bab56934e4b6736fe3dd52ece54b9b9a3996815b131e41de4"
+    },
+    {
+      "path": "tests/core/test_delivery_operation_origin.py",
+      "sha256": "3dacdb63f83ab1d8075ddcbe422d82daad20bd56f643adee0fc7ae97715925d2"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/check_finite_compatibility.py",
+      "sha256": "d5a87a077ed68d7e1baa777faabb012f4802b6656ae5b29566d7e0ad62fc808c"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/finite_compatibility.py",
+      "sha256": "e61b538446e0ba0b8b254874fadf9c820a3341a40dbf1ec51b63f95e32a105bf"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/freeze_wip.py",
+      "sha256": "d763ea387f0f604864dfe4414c4de04bc199444c79e43bb15f9c512248a8bfb4"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/inspect_refusal.py",
+      "sha256": "2173e9db71cc70a46dacce69e0e9b0d48527f25e0e4a8d301822fb0666fbe249"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/operation_proof.py",
+      "sha256": "d5f68c4a1bff9b3f59055a72c1b3dfca97b1b5af674e08da19a729ab9bb66e49"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/prepare.py",
+      "sha256": "7ab1f2b986a0771d57e6502462abd035b2f7964b172d21f0c104d55a7c35beb7"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/prepare_wip02.py",
+      "sha256": "3bf2f4629e28af4e277f5dfe1d7051eba8c3a8571e01dd86a47a3742b2732c0b"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/static_checks.py",
+      "sha256": "f7843e4c2a3dea7023e6b2bbe5e2d0b2a500807323d5b8ca42ad91f464859d01"
+    }
+  ],
+  "testedProductAndTestRawHashesMatchRoot": true,
+  "unexpectedUntrackedProductionPaths": []
+}
