@@ -1,0 +1,13 @@
+{
+  "path": "D:/Project/SaintVision-Invion/SaintVisionI-Invion/.git/obsidian-sync-state.json",
+  "beforeAtKST": "2026-11-07T21:20:43+09:00",
+  "beforeBytes": 506663,
+  "beforeSHA256": "100edcbb4ab919810d0a8c45b58c7cef5adcf188349d5375b70b451c480ae0c1",
+  "afterLocalGatesBytes": 506663,
+  "afterLocalGatesSHA256": "100edcbb4ab919810d0a8c45b58c7cef5adcf188349d5375b70b451c480ae0c1",
+  "fullBytesEqual": true,
+  "comparisonMethod": "full byte comparison of a scratch copy taken before any gate against the live file after all gates",
+  "syncCheckOutput": "CHECK: 4600 managed files, 2149 pending exports, 0 conflicts. No writes.",
+  "pendingExportsMeaning": "This review branch is based on source 905, which is older than Root's vault; the pending exports are not applied. Root alone owns APPLY, and no old vault was exported, adopted or reset.",
+  "checkOnly": true
+}

@@ -1,0 +1,73 @@
+[
+  {
+    "argv": [
+      "venv-python",
+      "-B",
+      "tools/check_docs.py"
+    ],
+    "atKST": "2026-11-07T21:33:40+09:00",
+    "exit": 0,
+    "stdoutTail": "PASS: 24 original hashes, 1281 versioned documents, wiki links, 48 tasks, 12 outcomes, owner/reviewer/skills, dependency DAG.\r\n",
+    "stderrTail": ""
+  },
+  {
+    "argv": [
+      "venv-python",
+      "-B",
+      "tools/check_ontology.py"
+    ],
+    "atKST": "2026-11-07T21:33:45+09:00",
+    "exit": 0,
+    "stdoutTail": "PASS: RDF parsing, defined terms, TTL/JSON-LD equivalence, 48 task mappings, positive SHACL, 4 rejected invalid fixtures, 4 competency queries, Obsidian mirrors.\r\n",
+    "stderrTail": ""
+  },
+  {
+    "argv": [
+      "venv-python",
+      "-B",
+      "tools/check_doc_path_citations.py",
+      "--ratchet",
+      "--base-ref",
+      "90578f49ea400958fcdbc1ded3908d624e856f57"
+    ],
+    "atKST": "2026-11-07T21:33:48+09:00",
+    "exit": 0,
+    "stdoutTail": "PASS check_doc_path_citations --ratchet: 290 broken citation(s), all in baseline, none stale, floor unchanged.\r\n",
+    "stderrTail": ""
+  },
+  {
+    "argv": [
+      "venv-python",
+      "-B",
+      "tools/check_doc_single_source.py",
+      "--ratchet"
+    ],
+    "atKST": "2026-11-07T21:33:51+09:00",
+    "exit": 0,
+    "stdoutTail": "PASS check_doc_single_source --ratchet: 16 pairs, all in baseline, none stale.\r\n",
+    "stderrTail": ""
+  },
+  {
+    "argv": [
+      "venv-python",
+      "-B",
+      "tools/sync_obsidian.py",
+      "--check"
+    ],
+    "atKST": "2026-11-07T21:33:52+09:00",
+    "exit": 0,
+    "stdoutTail": "CHECK: 4602 managed files, 2151 pending exports, 0 conflicts. No writes.\r\n",
+    "stderrTail": ""
+  },
+  {
+    "argv": [
+      "git",
+      "diff",
+      "--check"
+    ],
+    "atKST": "2026-11-07T21:33:58+09:00",
+    "exit": 0,
+    "stdoutTail": "",
+    "stderrTail": ""
+  }
+]

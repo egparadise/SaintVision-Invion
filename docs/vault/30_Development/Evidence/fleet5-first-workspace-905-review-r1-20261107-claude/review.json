@@ -1,0 +1,104 @@
+{
+  "docID": "FLEET5-FIRST-WORKSPACE-905-INDEPENDENT-CODE-REVIEW-R1-20261107-CLAUDE",
+  "version": "1.0.0",
+  "atKST": "2026-11-07T21:30:03+09:00",
+  "task": "FLEET5-FIRST-WORKSPACE-905-INDEPENDENT-CODE-REVIEW-R1-20261107",
+  "orcaTaskID": "task_78c38a4a863c",
+  "orcaDispatchID": "ctx_d81ff9be418f",
+  "reviewer": "Claude (actual independent code reviewer; not the implementation author)",
+  "author": "Codex B ctx_20044c1f6fae / task_72ad09258a5c (settled/exited/released per Root brief)",
+  "architectureReviewer": "Root Codex (R1 freeze and AC11 catalogue decision; architecture only)",
+  "obsidianApplyOwner": "Root only; this reviewer ran sync --check only",
+  "reviewBranch": "agent/claude/fleet5-first-workspace-905-review-r1-20261107",
+  "reviewBranchBase": "90578f49ea400958fcdbc1ded3908d624e856f57",
+  "target": {
+    "source": "90578f49ea400958fcdbc1ded3908d624e856f57",
+    "productBase": "1efea494f026e932360c35ae811b6423d874a2e7",
+    "acceptedFrontend": "b48c2c4492f8aea4b55c33161733a9a6fb9eed8c",
+    "rootManagementCheckpoint": "7454c7e2ce77ac4eb3415ccaec1ad0f84b949864",
+    "sourceCommits": ["414f7144", "9907e14c", "a88fd600", "84cebed4", "ab9c66fa", "90578f49"],
+    "changedPaths": 86,
+    "scopeReviewed": "All changed production, schema, migration, frontend, test and AC11 evidence-policy paths between base and source, not Docs only"
+  },
+  "boardsRead": {
+    "progressBoard": "docs/vault/00_Index/전체 개발 진행 현황.md v1.0.517 @7454c7e2",
+    "claudeBoard": "docs/vault/30_Development/Agent별 작업/Claude 작업 현황.md v1.2.130 @7454c7e2",
+    "governance": "AGENTS.md, skills/agent-delivery/SKILL.md @90578f49"
+  },
+  "rootInputPins": {
+    "first-workspace-intent-contract-freeze-r1/root-freeze.json": {"bytes": 9040, "sha256": "3c520986da5598ec341bdb93fa167632fb9804faacc543a10484f2b90db53d1b"},
+    "first-workspace-intent-contract-freeze-r1/original-proposal.json": {"bytes": 12370, "sha256": "956501a4a4787dde515c141a60d82ac5f9b6635ef31a9dbfedec0a3c77b26d1f"},
+    "first-workspace-ac11-catalogue-delta-r1/root-decision.json": {"bytes": 4691, "sha256": "370e1beb630e0d873763a5f4af643b44d68a4c8dd3df0732aaf8a625baf7d1da"},
+    "first-workspace-ac11-catalogue-delta-r1/reviewed-source-authorized.json": {"bytes": 3780, "sha256": "d1b1d642a4c331e1ede2a4c5f064e0fa8a1e7197431dea94a98914029c858602"},
+    "first-workspace-ac11-catalogue-delta-r1/root-architecture-decision.md": {"bytes": 4462, "sha256": "0ecda05cae5acb1eee5f0f3095c2250ec3cc270cce82faa10c6641f84bd18683"},
+    "first-workspace-905-verified-r1/root-verification.json": {"bytes": 5390, "sha256": "dc0a619ed12ee550480bb8b40405c817ff6ac0625672332b27dc3b96c7865656"},
+    "first-workspace-905-verified-r1/CI-measurements-recomputed.json": {"bytes": 2718, "sha256": "c2c64fb0418c35a4e76f728ac55a22dfd7fd63d92f9a562f0deee5d0fc89959b"},
+    "live-frontend-source-disposition-r1.json": {"bytes": 5763, "sha256": "6c7119f1ea900268a0da248106c8dc6ce603fbfc264347a418888bab728d707c"},
+    "portal3100-process-provenance-readonly-r1.json": {"bytes": 986, "sha256": "cbb048b88e27b891b787b23984584d155f8e2fb308539a9a9e7356be70d12f9e"},
+    "pathPrefix": "docs/vault/30_Development/Evidence/fleet5-20261105-root/ (read from immutable 7454c7e2 via git show)"
+  },
+  "ciArchiveRead": {
+    "path": "D:/Project/SaintVisionI-Invion/fleet5-compute-storage-contract-20261105/docs/vault/30_Development/Evidence/fleet5-first-workspace-ui-contract-r1-20261107-codex/ci-90578f49ea40-core-evidence.zip",
+    "bytes": 14055875,
+    "sha256": "9f7f1b04c7eba92bc2130923c8f348fc7efec1700f189f0d374e1592c5ee0441",
+    "hashValidatedFirst": true,
+    "officialCoreArtifact": 13573309228,
+    "readAs": "data only: zip member list, core-tests.xml JUnit, node-unit.jsonl; nothing extracted or executed",
+    "members": 35
+  },
+  "verdict": "CHANGES_REQUIRED_ONE_BOUNDED_TEST_ADEQUACY_DEFECT_KEEP_REAL_DEPLOYMENT_GATES",
+  "verdictRationale": "The production implementation (Python service, routes, 0068 SQL/role/grants/RLS, schema additions, frontend helper/panel/approval display and AC11 pin chain) satisfies the six frozen R1 amendments on every point I traced, and I found no production code defect. One R1-TRUST-required proof is not delivered: the definer direct-call negative tests for missing subject context and cross-tenant context never reach those guards, and append_first_workspace_intent has no direct-call negative test at all, so deleting its SQL-side closed-shape/CPU/GPU/target guards would fail no behavioral test (only the repinnable catalogue hash). The fix is test-only and bounded. ACCEPT_FIRST_WORKSPACE_R1_CODE_KEEP_REAL_DEPLOYMENT_GATES is not issued until that proof exists at an exact SHA with hosted Core/Backend success.",
+  "mandatoryCodeDefects": [
+    {
+      "id": "CR-905-01",
+      "severity": "Medium",
+      "category": "test-adequacy against required R1-TRUST amendment",
+      "location": "tests/integration/test_workspace_first_intents.py:214-219 (direct-call loop); no direct-call test exists for inv.append_first_workspace_intent (services/control-plane/src/inv/migrations/0068_first_workspace_intent.sql:41-102)",
+      "failedInvariant": "R1-TRUST requires direct-call, missing-context and cross-tenant tests against the SECURITY DEFINER helpers; Root catalogue decision lists the helper-side rechecks (current epoch/kill switch, requester/project linkage, ready Workspace, current intent/versions/hash) as required security properties. A test that cannot fail when a guard is removed does not prove that guard.",
+      "causalExample": "The loop sets inv.tenant_id (and, in case 2, inv.first_workspace_subject) but never sets inv.first_workspace_epoch. Both cases therefore raise at the first guard (0068 SQL lines 48-51, 'Current epoch and tenant admission required'), so the 'missing subject' (lines 52-53) and 'cross-tenant' paths are never reached. Separately, append_first_workspace_intent is reached only through create_intent after Python validate_contract/_validate have already rejected oversize CPU, GPU, extra keys and wrong target. Mutation check: delete the GPU/cpuMillis/memory/closed-key/target-membership predicates at SQL lines 65-99. No behavioral test fails. Only the catalogue definitionSHA256 pin notices, and that pin is mechanically repinned under the bounded-correction rule (as already happened in this series). Meanwhile an inv_kernel connection with the GUCs set could insert a GPU or oversized workload through the definer owner's INSERT grant.",
+      "boundedFix": "Test-only; no production, SQL, migration or definer-hash change. (a) In the existing loop, set inv.first_workspace_epoch to the current epoch so each case reaches its own guard, and assert the specific exception text (missing subject -> 'Verified service context required'; subject of tenant A with inv.tenant_id=other -> refused before any write). (b) Add direct-call negatives for inv.append_first_workspace_intent under the restricted runtime role with otherwise complete valid context, one property changed per case: gpuCount 1, cpuMillis 501, memoryBytes 8388607, an extra key such as workspaceStart, a canonical/sha mismatch, a non-ready or version-mismatched Workspace, a targetNodeId not enabled in project_nodes, and spec tenantId differing from inv.tenant_id. Each case asserts InsufficientPrivilege and unchanged workload counts. (c) Add equivalent direct-call negatives for append_first_workspace_run with full valid context and a stale workspace version, a stale workload version, a sha mismatch and a non-ready Workspace. Then publish a new exact SHA with hosted Core and Backend success; the AC11 definer/migration pins stay unchanged because the SQL bytes do not change.",
+      "suggestedOwner": "Codex B (author) or as Root dispatches; Claude re-reviews only the test delta and its exact-SHA CI"
+    }
+  ],
+  "rootPreDeployOperationalObligations": [
+    "O1 Migration privilege: 0068 ALTERs function ownership to inv_first_workspace_writer, and its DO block refuses any pg_auth_members row for that role. Apply it as a superuser on the actual target PostgreSQL. A non-superuser CREATEROLE migrator cannot SET ROLE to the new owner, and on PG16+ CREATE ROLE would auto-grant the creator membership, which the safety check correctly refuses. Hosted CI proves only the superuser test path.",
+    "O2 Irreversible head: 0068.downgrade raises, so recovery is forward-fix only. Take a schema backup before apply. The AC11 migration-rehearsal reversible-segment axis may now report the workflow-accepted structural NOT_APPLICABLE (no-reversible-tail) at this head; treat that as expected, not as a regression or a pass.",
+    "O3 Packaging: redeploy the control-plane package (routes plus 0068 resource) and the web build together. Running PC2/3/4 Node images at 1efea need no redeploy for this change: node-agent Go code is unchanged, the embedded wire schema only gained additive definitions, and launch/approval/start wire shapes are unchanged (the existing optional WorkloadSpec.targetNodeId is used). The hosted execution test ran the 905-built Node, so compatibility with the live 1efea binary is inferred from the additive-only diff and still needs live confirmation.",
+    "O4 Runtime prerequisites for a non-refused list/create: a configured RestrictedWorkspaceRuntime whose Node is enabled in inv.project_nodes for the project; profile max memory at least 8388608 with at most 64 images and 64 executables (otherwise AUTH-0044 503); a genuinely ready Workspace via the existing admin path; business linkage (enabled business_projects, enabled business_subjects mapping to an active user, project_members role owner/maintainer/operator, kernel project_grants enabled+can_request); and a verified oidc:<64hex> subject.",
+    "O5 Fail-closed listing: any pre-existing workload whose spec.workspaceId equals the selected Workspace but is not a bounded CPU intent (GPU, extra keys, another target, digest drift) makes the whole first-intents list refuse (403/409), by R1 design. Inventory such rows before enabling the UI for a Workspace.",
+    "O6 Retained live gates, unchanged and not converted into code defects: protected API packages/dependencies/JWKS/private roots/separate restricted DSNs/provider/signer/TLS/policy/queue inventory/schema backup+apply; genuine ready Workspace and actual selected intent/Run; two real distinct non-requester approvals (extra real identity pending); Root same-origin portal migration under the main memory constraint; PC1 SSH publickey registration response; PC5 RAM/actual Linux VM Node/transport/sandbox/admission (Docker API 1.41 is supported by accepted minimum 1.41 / client ceiling 1.45); GPU/storage/physical resources/browser/renewal/tunnel reboot-reconnect/recovery/five-PC acceptance."
+  ],
+  "optionalNotes": [
+    "N1 Status/role revocation racing a create is protected structurally: the Python precheck and both helpers take FOR SHARE on project_grants, business_projects, projects, business_subjects, users, project_members, workspaces and project_nodes in the same order, under READ COMMITTED re-evaluation and 500ms lock / 2s statement timeouts. The revocation matrix itself is sequential (13 cases). I record this, not a defect.",
+    "N2 public.runs.state stays 'draft' after kernel success (test_workspace_first_intent_execution.py:63). This is the existing mirror semantics. The UI reads kernel Run/result endpoints, so public.runs.state must not be read as execution state."
+  ],
+  "amendmentFindings": {
+    "R1-PLACEMENT": "Satisfied. NULL node_id stays logical; target comes from the configured runtime Node with enabled project_nodes membership (Python _selected/_node_membership with lock, SQL lines 97-99/134-137); a nonNULL mismatch is refused in both layers; a stored targetNodeId must match (_validate); reads never rewrite spec/hash; no Node row, readiness or placement is fabricated.",
+    "R1-MEMORY": "Satisfied. WorkspaceFirstProfile.minMemoryBytes const 8388608; WorkspaceFirstResources memory 8388608..67108864, cpu 1..500, gpu/minVram const 0; profile below 8MiB -> AUTH-0044 503 prerequisite; compile_launch still enforces the configured profile; generic ResourceRequest/WorkloadSpec unchanged (schema diff is additive-only; control-plane and node wire copies byte-identical to contracts).",
+    "R1-WIRE": "Satisfied. Three paths and shapes as frozen; tenant/project/workspace/workload IDs and canonical SHA matched to row and context; requesterId oidc:[a-f0-9]{64}; ETag regexes are exact strong canonical base10 with lowercase hex and MAX_SAFE bound; If-Match added to the duplicate-header refusal set; Idempotency-Key via existing ASCII33..126/1..200 helper; Cache-Control no-store on all three routes; replay returns the stored original observedAt.",
+    "R1-LOCKS": "Satisfied in source. Database.transaction sets tenant, epoch FOR SHARE and the tenant_controls barrier first; then Control.grant and business permission; then ledger INSERT ON CONFLICT + SELECT FOR UPDATE; then the Workspace FOR SHARE, project_nodes FOR SHARE and workload FOR SHARE locks with version/digest checks before the initial-vs-replay decision. Helper locks are reentrant re-acquisitions in the same order. One transaction covers inv.runs, public.runs, inv.business_runs, the outbox event and the ledger response, with rollback proven by the trigger-injection test. Same-key HTTP races (3x intent, 3x run) and replay-vs-first-prepare were run on real PG under the restricted role.",
+    "R1-TRUST": "Implementation satisfied: writer NOLOGIN/NOSUPERUSER/NOBYPASSRLS/NOCREATEDB/NOCREATEROLE/NOINHERIT with membership/ownership refusal; SECURITY DEFINER with SET search_path=pg_catalog and row_security=on; all objects schema-qualified; exact column grants; tenant policies TO writer on the six public tables, with inv.* covered by the existing PUBLIC tenant_isolation policies; EXECUTE revoked from PUBLIC/inv_app and granted to inv_kernel only; GUCs set transaction-locally after authenticated principal resolution, and the documented compromised-SQL-credential boundary is stated honestly. Proof incomplete -> CR-905-01.",
+    "R1-PREREQUISITES": "Satisfied. The shared Boundary reader bounds the total body to 65536 bytes (413) with strict JSON for every POST, including the new routes; command 1..64 x 1..4096 non-NUL; invalid stored rows fail the read (409/403) instead of being filtered; generic POST project/runs, approval/quorum/prepare/enqueue/output/containment unchanged; exactly one forward Alembic revision 0068 after 0067 plus one SQL resource; the 109 old migration files are byte-unchanged."
+  },
+  "frontendFindings": "No mandatory defect. The 11 b48 paths are blob-identical in 905. The selected flow reads the server page and explicitly selects one intent (no first/latest default); create POSTs '{}' with intent If-Match and a sessionStorage-persisted 32-hex key; requesterId, intentEtag and canonical workload are re-bound after creation and current state is re-read; prepare builds a bounded canonical snapshot (content<=32768, archive<=65536, total UTF-8 body<=65536) and verifies frozen bytes/SHA/actionDigest/approval binding; ApprovalReviewPanel appears only for non-requesters and now displays frozen startId/stepId/input SHA/bytes/node/profile/policy/actionDigest/status; enqueue requires an approved 2-of-2 unexpired current-version approval for the original requester; enqueue acceptance is not presented as execution; the token/generation/selection guards discard stale responses; and the 4xx-final vs unknown distinction keeps key and bytes. The removed Studio dispatch had injected requestedBy/riskLevel into a non-EmptyRequest body. Vitest results are mock-based and are not browser acceptance.",
+  "ac11Findings": "No defect. The Root-approved delta is exactly the two signatures at revision 0068, 15 -> 17 count in aggregator and tests with set equality and negative mutation tests retained. definer-policy.json sourceMigrationSHA256 8b79f552... equals the SHA-256 of the 0068 SQL at both a88fd600 and 90578f49 (SQL unchanged since 9907e14c), and test_current_catalogue_matches_complete_policy passed in the official Core JUnit, so definitionSHA256 a92b76b6.../7acaf7b9... match the real catalogue. Every pin verified by git rev-parse: allowlist blob 8b7b2700 at 84cebed4 and 905; registry e29596df at ab9c66fa and 905; importer 50799b77; definer-policy 5d9cd484; scan allowlist 77e02158; checker 5831f8d8; 84cebed4 and ab9c66fa are ancestors of 905. The reviewed source is byte-identical to Root's reviewed-source-authorized.json (blob 0b1f5164). check_definer_functions, collect_rls_evidence, write_ac11_security_allowlist, .github, deploy, skills and docs/sources are unchanged. Existing-test edits are honest head/count updates; the downgrade tests were restructured because 0068 is irreversible but still execute real 0054/0058 DDL.",
+  "checksActuallyRun": [
+    {"what": "git diff/ls-tree/rev-parse/merge-base/cat-file pin and path verification (base..source, b48 blob equality, old migration bytes, AC11 pins)", "exit": 0},
+    {"what": "PowerShell Get-FileHash of CI zip and canonical sync-state", "exit": 0},
+    {"what": "python -I zipfile/ElementTree/json bounded reads of the CI archive (no extraction, no execution)", "exit": 0},
+    {"what": "local docs/ontology/path-citation/single-source/sync --check gates", "recordedIn": "local-gates.json in this directory", "exit": "see local-gates.json"}
+  ],
+  "notRunByReviewer": "No pytest, Vitest, Node/npm, Go, compiler, browser, container, DB, SSH, HTTP login, product import or crypto execution on restricted MAIN. Hosted CI is evidence, not my independent test execution.",
+  "reportedCI": {
+    "rootVerified": "Frontend 42368189302, Core 42368191648, Backend 42368193399, Docs 42368195169; same 905 SHA, workflow_dispatch attempt 1, 8 jobs success; correlations per root-verification.json",
+    "reviewerRecomputedFromArchive": "Core JUnit 9452 pass / 46 skip / 0 fail (skips: 34 Windows PowerShell/csc, 3 MLflow live lane, 4 absent agent CLIs, 1 browser smoke lane, 1 NSS live browser, 1 placement benchmark, 1 lock-wait diagnostic, 1 storage hosted reference); Go node-unit 696 named pass / 0 fail / 1 skip (runtime TestDockerLiveCompatibility, executed by a separate live Docker lane); all 35 tests/integration/test_workspace_first_intents.py cases, all 9 tests/core/test_workspace_first_intent_contract.py cases and the Linux tests/integration/test_workspace_first_intent_execution.py case passed",
+    "authorReportedOnly": "Frontend 1336 tests; Backend per-matrix 9092 (job success independently verified by Root)",
+    "coverageCaveat": "CI Node receipt/output is isolated CI execution with fixture identities and approvals, not real users, real votes, hardware/GPU, browser acceptance or 5PC acceptance"
+  },
+  "rootReproductionRequested": false,
+  "rootReproductionReason": "No unresolved source contradiction; CR-905-01 is decidable from source and needs no rerun",
+  "preservedStatus": "Original19HOLD/discharges0/runtimeB0/A1-A16/H1-H7/H3EA/RDNULL_HOLD/raw7UNREGISTERED/A01-A40NOT_RUN unchanged",
+  "notClaimed": ["final code acceptance", "live deployment", "real approvals", "actual Run/output", "browser acceptance", "5PC acceptance", "whole-program completion"],
+  "nextFirstAction": "Root dispatches the bounded CR-905-01 test fix to the author lane; after exact-SHA hosted Core/Backend success, one actual Claude re-review of that test delta. Root owns O1-O6.",
+  "wholeProgramComplete": false
+}

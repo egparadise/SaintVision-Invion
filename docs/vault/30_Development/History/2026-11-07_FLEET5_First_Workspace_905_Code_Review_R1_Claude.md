@@ -1,0 +1,19 @@
+---
+doc_id: "HISTORY-FLEET5-FIRST-WORKSPACE-905-CODE-REVIEW-R1-20261107-CLAUDE"
+title: "FLEET5 first Workspace 905 independent code review R1"
+version: "1.0.0"
+status: "review"
+author: "Claude"
+updated: "2026-11-07"
+source_of_truth: "Git"
+---
+
+Task FLEET5-FIRST-WORKSPACE-905-INDEPENDENT-CODE-REVIEW-R1-20261107 (Orca task_78c38a4a863c). Claude is the actual independent code reviewer; the implementation author is Codex B task_72ad09258a5c, the architecture reviewer is Root Codex, and Root is the only Obsidian APPLY owner. Target source is `90578f49ea400958fcdbc1ded3908d624e856f57` on base `1efea494f026e932360c35ae811b6423d874a2e7`, with the accepted frontend `b48c2c4492f8aea4b55c33161733a9a6fb9eed8c` and Root checkpoint `7454c7e2ce77ac4eb3415ccaec1ad0f84b949864`. Review branch: `agent/claude/fleet5-first-workspace-905-review-r1-20261107`. Root inputs were read from the immutable checkpoint by `git show`, with their hashes pinned in [review](../Evidence/fleet5-first-workspace-905-review-r1-20261107-claude/review.json).
+
+**Verdict: CHANGES_REQUIRED_ONE_BOUNDED_TEST_ADEQUACY_DEFECT_KEEP_REAL_DEPLOYMENT_GATES.** I traced the production implementation across all 86 changed paths against the six frozen R1 amendments and found no production code defect. The checks covered selected-context routes, versions/ETags, idempotent replay, lock order, one-transaction rollback, the 0068 role/grants/RLS/definer settings, additive-only schema, the frontend select/create/prepare/approve/enqueue/observe flow, and the AC11 two-signature pin chain. CR-905-01 (Medium, test-only) remains: the direct-call negatives in `tests/integration/test_workspace_first_intents.py:214-219` never set the epoch GUC, so the missing-subject and cross-tenant cases stop at the first guard. `inv.append_first_workspace_intent` also has no direct-call negative test, so its SQL-side CPU/GPU/closed-shape/target guards have no behavioral proof. The bounded fix adds tests only; SQL bytes and definer pins stay unchanged.
+
+Root pre-deploy obligations are separate from code defects. Apply 0068 as a superuser, since ownership transfer to a non-member role is involved and PG16+ CREATEROLE auto-membership is refused. 0068 is irreversible, so take a backup and use forward fixes only. The AC11 reversible segment may become structural NOT_APPLICABLE. Redeploy control-plane and web together; Nodes do not need redeploy, because node-agent Go is unchanged and the wire schema change is additive only. Runtime profile, membership and business-linkage prerequisites must be in place. Any non-CPU workload already bound to a Workspace makes its listing refuse. All previously retained live gates stay as they were.
+
+Checks I ran: git pin/path/blob verification; SHA-256 of the official Core archive (`9f7f1b04…0441`, 14,055,875 B, artifact 13573309228), confirmed before any read; and bounded JUnit/JSONL data reads. From the archive I recomputed Core at 9452 pass / 46 skip and Go at 696 pass / 0 fail / 1 opt-in skip, and all new first-intent cases passed. The local docs gates are in [local gates](../Evidence/fleet5-first-workspace-905-review-r1-20261107-claude/local-gates.json). I ran no pytest, Vitest, Node, Go, browser, DB, container or product execution on MAIN. Hosted CI is Root-verified evidence, not my independent test execution, and the Frontend/Backend counts are author-reported. CI Node execution used fixture identities and is not user, browser or 5PC acceptance. Original19HOLD/discharges0/runtimeB0/A1-A16/H1-H7/H3EA/RDNULL_HOLD/raw7UNREGISTERED/A01-A40NOT_RUN unchanged.
+
+Next action: Root dispatches the CR-905-01 test fix to the author lane. After exact-SHA hosted Core/Backend success, one actual Claude re-reviews that delta. Root owns O1–O6 and live gates. No deployment, real approval, Run, browser or whole-program completion is claimed.
