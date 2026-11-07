@@ -1,0 +1,26 @@
+{
+  "approvalMessageID": "msg_3a56f7361779",
+  "questionMessageID": "msg_a907e6644b3c",
+  "fromRun": "run_e57ecd84a7bc",
+  "atKST": "2026-11-08T04:01:30.108629+09:00",
+  "sameTask": true,
+  "taskID": "task_83732e149ebb",
+  "dispatchID": "ctx_02638d160ba6",
+  "approvedProposalSHA256": "736cd6ca263cd5e16cd03575e42720e617bbf9d4963811e1ad5d002641074379",
+  "scope": "ONLY one positive DOM completion wait using existing untilVisible before unchanged required selector assertion",
+  "preserve": [
+    "all1351cases/assertions",
+    "original2000ms helper",
+    "Vitest/AC11 timeouts",
+    "real crypto validation",
+    "no skips/mocks/product changes",
+    "soundR1/R2"
+  ],
+  "sourceFailure": "2c6bbdbe43cc5d2abdb753675d1ecaffac4399fc Frontend42403333297/job128495638404 retained; scheduling-race hypothesis only, no production defect disproval claim",
+  "canonicalApplyDeferred": true,
+  "sealedRootInput": "Root528/6c12a9f1c74a5d9f6d4bce139ed6ee0a084f98fe",
+  "Root529": "Working report only; not read/modified/adopted",
+  "appliedDiff": "1\t0\tapps/web/tests/first-workspace-panel.test.tsx",
+  "applyCheckExit": 0,
+  "applyExit": 0
+}

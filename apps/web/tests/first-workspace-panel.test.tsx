@@ -72,6 +72,7 @@ describe('first Workspace visible prerequisite and scope guards', () => {
     await act(async () => root.render(<FirstWorkspacePanel scope={golden.scope} approvals={[]} onRunObserved={observed} />));
     const select = host.querySelector('[aria-label="Ready Workspace"]') as HTMLSelectElement;
     await act(async () => { select.value = ready.workspaceId; select.dispatchEvent(new Event('change', { bubbles: true })); });
+    await untilVisible(() => host.querySelector('[aria-label="현재 CPU intent"]') !== null);
     const intentSelect = host.querySelector('[aria-label="현재 CPU intent"]') as HTMLSelectElement;
     expect(intentSelect).not.toBeNull();
     await act(async () => { intentSelect.value = golden.workload.workloadId; intentSelect.dispatchEvent(new Event('change', { bubbles: true })); });

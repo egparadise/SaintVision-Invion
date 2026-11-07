@@ -17,3 +17,5 @@ source_of_truth: "Git"
 다음 첫 행동/담당: Root가 exact artifact와 fresh-direct browser proof를 대조하고 중앙config/새proof에 한정한 actual Claude 검토를 시작한다. 수락 뒤 Root만 PC3 배포·실브라우저·로그인·자원·수동 사용자기기·승인·Run/output/5PC를 검증한다. canonical APPLY는 Root뿐이며 오래된 전체 vault를 export하지 않는다.
 
 [[30_Development/Evidence/fleet5-csp02-central-vite-init-r1-20261108-codex/README]]
+
+2c6bbdbe의 fresh-direct 실제브라우저 proof는 통과했으나 기존 FirstWorkspace 즉시 DOM assertion1건이 실패해1350pass/1fail/0skip을 보존했다. Root msg_3a56f7361779는 제안 SHA256736cd6ca263cd5e16cd03575e42720e617bbf9d4963811e1ad5d002641074379의 한 줄 untilVisible 동기화만 승인했다. 같은2000ms helper·모든1351 cases/assertions·기존timeout·실제crypto는 유지하고 새 exact source의 세 workflows를 다시 실행한다. scheduling-race 가설을 기록하며 한 실패로 제품 결함 부재를 주장하지 않는다. sealed Root528/full-state536738B window는 그대로 유지한다.

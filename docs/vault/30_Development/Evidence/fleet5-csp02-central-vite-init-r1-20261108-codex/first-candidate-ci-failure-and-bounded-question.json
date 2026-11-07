@@ -1,0 +1,48 @@
+{
+  "sourceSHA": "2c6bbdbe43cc5d2abdb753675d1ecaffac4399fc",
+  "frontendRun": 42403333297,
+  "frontendJob": 128495638404,
+  "conclusion": "failure",
+  "failedStep": "Run Vitest Unit Tests",
+  "testFile": "apps/web/tests/first-workspace-panel.test.tsx",
+  "case": "renders actual selected intent, draft, frozen action and pending approval without claiming execution",
+  "actualFailure": "line76 intentSelect unexpectedly null",
+  "testCounts": {
+    "passed": 1350,
+    "failed": 1,
+    "errors": 0,
+    "skipped": 0,
+    "deselected": 0,
+    "total": 1351
+  },
+  "directFreshBrowserProof": "ci-2c6bbdbe43cc-clean-direct-result.json",
+  "directArtifact": 13586103362,
+  "directArtifactDigest": "sha256:f1abae493f3a186e8431786b457de5173fecef1f07aaa6e4e1925705ce887d3f",
+  "otherResults": {
+    "portalJob": 128495638176,
+    "portal": "success",
+    "docsRun": 42403335483,
+    "docs": "all19success",
+    "ac11Run": 42403337848,
+    "ac11Job": "success"
+  },
+  "causalSource": {
+    "testSHA256": "6a634cc5e59986d4caabba7e85a6842089c8a03587408159cfa9c46dd4e79e7d",
+    "apiSHA256": "1f85156af8b55b45a67fa517702f93b9acacd5a4c6c15dae4415f370b112ac88",
+    "panelSHA256": "52c631392f4a7b3f6070f73df5508100772e023db2058fc1a57d1b785c7ebc64",
+    "unchangedFromCC607": true,
+    "asyncBoundary": "fetchReadyIntents awaits assertReadyIntent/workspaceSHA256 -> crypto.subtle.digest before effect setPage; test asserts DOM immediately after dispatch act, with no completion wait",
+    "interpretation": "Source supports scheduling-race hypothesis; no production defect established from this single observed failure"
+  },
+  "boundedProposal": {
+    "path": "proposed-first-workspace-async-wait.patch",
+    "SHA256": "736cd6ca263cd5e16cd03575e42720e617bbf9d4963811e1ad5d002641074379",
+    "change": "Add one wait for same required intent selector using existing untilVisible helper before unchanged assertion",
+    "timeout": "Existing helper2000ms unchanged; Vitest/AC11 timeouts unchanged",
+    "assertions": "all retained",
+    "count": "1351 unchanged",
+    "productChanges": "none"
+  },
+  "scopeQuestion": "Existing First Workspace test is outside requested central-config/new-proof delta; ask Root before touching it",
+  "sameHeadRedispatched": false
+}
