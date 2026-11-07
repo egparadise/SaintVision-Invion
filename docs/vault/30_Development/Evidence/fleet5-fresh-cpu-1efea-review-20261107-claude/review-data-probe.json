@@ -1,0 +1,568 @@
+{
+ "candidate": "1efea494f026e932360c35ae811b6423d874a2e7",
+ "deltaPathCount": 56,
+ "deltaStatusSet": [
+  "A"
+ ],
+ "directParent": "7033778ad3d2bc284e36f7e29be7597dbb7d9f23",
+ "directParentMatches": true,
+ "nonDocPaths": [
+  "services/control-plane/src/inv/fresh_cpu_admission.py",
+  "tests/core/test_fresh_cpu_admission.py",
+  "tests/core/test_fresh_cpu_admission_cli.py",
+  "tools/fresh_cpu_admission.py"
+ ],
+ "onlyFourSourcesPlusOwnDocsAllAdded": true,
+ "ownDocPathCount": 52,
+ "sources": {
+  "services/control-plane/src/inv/fresh_cpu_admission.py": {
+   "bytes": 15096,
+   "calls": [
+    "DomainError",
+    "NodePrincipal",
+    "PreparedAdmission",
+    "UUID",
+    "_idle",
+    "_operator",
+    "_preflight",
+    "_readback",
+    "_receipt",
+    "any",
+    "base64.b64decode",
+    "base64.b64encode",
+    "certificate_identity",
+    "conn.cursor",
+    "conn.transaction",
+    "cursor.execute",
+    "dataclass",
+    "decode",
+    "encode",
+    "endpoint_parts",
+    "fetchall",
+    "fetchone",
+    "frozenset",
+    "hashlib.sha256",
+    "hexdigest",
+    "item.digest",
+    "item.plan_body",
+    "json.dumps",
+    "json.loads",
+    "len",
+    "prepare_request",
+    "provision_channel",
+    "raw.decode",
+    "re.fullmatch",
+    "refuse",
+    "self.not_after.isoformat",
+    "self.plan_body",
+    "set",
+    "sorted",
+    "str",
+    "type"
+   ],
+   "expectedSha256Matches": true,
+   "imports": [
+    ".errors",
+    ".node_channels",
+    ".tooling",
+    "base64",
+    "binascii",
+    "dataclasses",
+    "hashlib",
+    "json",
+    "psycopg",
+    "psycopg.pq",
+    "psycopg.rows",
+    "re",
+    "uuid"
+   ],
+   "sha256": "76407ced1411f42a5eddd71c894f541b8691d461d4eb1eaea30f63b8bcf90d2c",
+   "sqlLiterals": [
+    {
+     "line": 176,
+     "sql": "SELECT set_config('inv.tenant_id',%s,true)",
+     "tenantPredicateOrValue": true
+    },
+    {
+     "line": 164,
+     "sql": "SELECT count(*)=5 AND coalesce(bool_and(has_table_privilege(current_user,c.oid,'INSERT')),false) AND has_schema_privilege(current_user,'inv','USAGE') FROM pg_catalog.pg_class c JOIN pg_catalog.pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname='inv' AND c.relname IN ('nodes','resources','project_nodes','node_channels','node_channel_audit')",
+     "tenantPredicateOrValue": false
+    },
+    {
+     "line": 210,
+     "sql": "SELECT EXISTS(SELECT 1 FROM inv.nodes WHERE tenant_id=%s AND node_id=%s), EXISTS(SELECT 1 FROM inv.resources WHERE tenant_id=%s AND resource_id IN (%s,%s)), EXISTS(SELECT 1 FROM inv.project_nodes WHERE tenant_id=%s AND node_id=%s), EXISTS(SELECT 1 FROM inv.node_channels WHERE tenant_id=%s AND node_id=%s), EXISTS(SELECT 1 FROM inv.node_channel_audit WHERE tenant_id=%s AND node_id=%s)",
+     "tenantPredicateOrValue": true
+    },
+    {
+     "line": 244,
+     "sql": "SELECT status,recovery_epoch FROM inv.nodes WHERE tenant_id=%s AND node_id=%s",
+     "tenantPredicateOrValue": true
+    },
+    {
+     "line": 246,
+     "sql": "SELECT resource_id,node_id,kind,capacity,offered FROM inv.resources WHERE tenant_id=%s AND node_id=%s ORDER BY resource_id",
+     "tenantPredicateOrValue": true
+    },
+    {
+     "line": 253,
+     "sql": "SELECT project_id,enabled FROM inv.project_nodes WHERE tenant_id=%s AND node_id=%s",
+     "tenantPredicateOrValue": true
+    },
+    {
+     "line": 255,
+     "sql": "SELECT recovery_epoch,version,endpoint,certificate_sha256, certificate_not_after,enabled FROM inv.node_channels WHERE tenant_id=%s AND node_id=%s",
+     "tenantPredicateOrValue": true
+    },
+    {
+     "line": 258,
+     "sql": "SELECT version,action,certificate_sha256 FROM inv.node_channel_audit WHERE tenant_id=%s AND node_id=%s",
+     "tenantPredicateOrValue": true
+    },
+    {
+     "line": 260,
+     "sql": "SELECT version,kill_switch,updated_at FROM inv.tenant_controls WHERE tenant_id=%s",
+     "tenantPredicateOrValue": true
+    },
+    {
+     "line": 262,
+     "sql": "SELECT version FROM inv.node_controls WHERE tenant_id=%s AND node_id=%s",
+     "tenantPredicateOrValue": true
+    },
+    {
+     "line": 290,
+     "sql": "INSERT INTO inv.nodes(tenant_id,node_id,status,recovery_epoch) VALUES(%s,%s,'offline',%s)",
+     "tenantPredicateOrValue": true
+    },
+    {
+     "line": 292,
+     "sql": "INSERT INTO inv.resources (tenant_id,resource_id,node_id,kind,capacity,offered) VALUES(%s,%s,%s,'cpu',%s,%s),(%s,%s,%s,'memory',%s,%s)",
+     "tenantPredicateOrValue": true
+    },
+    {
+     "line": 297,
+     "sql": "INSERT INTO inv.project_nodes(tenant_id,project_id,node_id,enabled) VALUES(%s,%s,%s,true)",
+     "tenantPredicateOrValue": true
+    },
+    {
+     "line": 331,
+     "sql": "SELECT set_config('inv.tenant_id',%s,true)",
+     "tenantPredicateOrValue": true
+    },
+    {
+     "line": 179,
+     "sql": "SELECT epoch FROM inv.control_epoch WHERE singleton",
+     "tenantPredicateOrValue": false
+    },
+    {
+     "line": 184,
+     "sql": "SELECT tenant_id FROM inv.tenants WHERE tenant_id=%s",
+     "tenantPredicateOrValue": true
+    },
+    {
+     "line": 188,
+     "sql": "SELECT project_id FROM inv.projects WHERE tenant_id=%s AND project_id=%s",
+     "tenantPredicateOrValue": true
+    },
+    {
+     "line": 194,
+     "sql": "SELECT version,kill_switch,updated_at FROM inv.tenant_controls WHERE tenant_id=%s",
+     "tenantPredicateOrValue": true
+    },
+    {
+     "line": 200,
+     "sql": "SELECT enabled FROM inv.business_projects WHERE tenant_id=%s AND project_id=%s",
+     "tenantPredicateOrValue": true
+    },
+    {
+     "line": 205,
+     "sql": "SELECT status FROM public.projects WHERE tenant_id=%s AND project_id=%s",
+     "tenantPredicateOrValue": true
+    },
+    {
+     "line": 332,
+     "sql": "SELECT epoch FROM inv.control_epoch WHERE singleton",
+     "tenantPredicateOrValue": false
+    },
+    {
+     "line": 335,
+     "sql": "SELECT version,kill_switch,updated_at FROM inv.tenant_controls WHERE tenant_id=%s",
+     "tenantPredicateOrValue": true
+    }
+   ]
+  },
+  "tests/core/test_fresh_cpu_admission.py": {
+   "bytes": 20176,
+   "calls": [
+    "Barrier",
+    "LoseCommitAcknowledgement",
+    "NodePrincipal",
+    "OSError",
+    "SimpleNamespace",
+    "ThreadPoolExecutor",
+    "Transaction",
+    "add_extension",
+    "barrier.wait",
+    "base64.b64decode",
+    "base64.b64encode",
+    "certificate.public_bytes",
+    "collision.endswith",
+    "commit",
+    "conn.execute",
+    "conn.transaction",
+    "connect",
+    "datetime.now",
+    "db.connect",
+    "decode",
+    "deepcopy",
+    "digest",
+    "driver_connect",
+    "ed25519.Ed25519PrivateKey.generate",
+    "encode",
+    "encoded",
+    "expect_refusal",
+    "fetchall",
+    "fetchone",
+    "format",
+    "getattr",
+    "inner.__enter__",
+    "inner.__exit__",
+    "issuer_name",
+    "json.dumps",
+    "key.public_key",
+    "len",
+    "list",
+    "monkeypatch.setattr",
+    "new_id",
+    "node_uri",
+    "not_valid_after",
+    "not_valid_before",
+    "object",
+    "original",
+    "owner_engine.url.translate_connect_args",
+    "pool.map",
+    "project_capacity",
+    "provision_channel",
+    "public_key",
+    "pytest.mark.parametrize",
+    "pytest.raises",
+    "range",
+    "request_factory",
+    "self.conn.transaction",
+    "serial_number",
+    "sign",
+    "snapshot",
+    "sorted",
+    "sql.Identifier",
+    "sql.SQL",
+    "str",
+    "subject.apply_admission",
+    "subject.plan_admission",
+    "subject.prepare_request",
+    "subject.reconcile_admission",
+    "subject_name",
+    "timedelta",
+    "uuid4",
+    "x509.BasicConstraints",
+    "x509.CertificateBuilder",
+    "x509.ExtendedKeyUsage",
+    "x509.Name",
+    "x509.NameAttribute",
+    "x509.SubjectAlternativeName",
+    "x509.UniformResourceIdentifier",
+    "x509.random_serial_number"
+   ],
+   "expectedSha256Matches": true,
+   "imports": [
+    "base64",
+    "concurrent.futures",
+    "copy",
+    "cryptography",
+    "cryptography.hazmat.primitives",
+    "cryptography.hazmat.primitives.asymmetric",
+    "cryptography.x509.oid",
+    "datetime",
+    "inv",
+    "inv.capacity",
+    "inv.errors",
+    "inv.ids",
+    "inv.node_channels",
+    "inv.tooling",
+    "json",
+    "psycopg",
+    "psycopg.rows",
+    "pytest",
+    "threading",
+    "types",
+    "uuid"
+   ],
+   "sha256": "882e5ff9757a2372173c8410277929786f99791b3d9a5bf4e010eeda8d1bceaa",
+   "testFunctions": [
+    {
+     "cases": 1,
+     "line": 127,
+     "name": "test_plan_select_only_and_apply_commits_exact_offline_rows",
+     "postgresMark": true,
+     "usesFreshDb": true
+    },
+    {
+     "cases": 2,
+     "line": 161,
+     "name": "test_real_nonoperator_role_cannot_admit",
+     "postgresMark": true,
+     "usesFreshDb": true
+    },
+    {
+     "cases": 4,
+     "line": 175,
+     "name": "test_scope_epoch_version_refusals_preserve_every_row",
+     "postgresMark": true,
+     "usesFreshDb": true
+    },
+    {
+     "cases": 1,
+     "line": 197,
+     "name": "test_matching_certificate_with_wrong_current_epoch_is_refused",
+     "postgresMark": true,
+     "usesFreshDb": true
+    },
+    {
+     "cases": 3,
+     "line": 207,
+     "name": "test_existing_business_link_requires_enabled_active_project",
+     "postgresMark": true,
+     "usesFreshDb": true
+    },
+    {
+     "cases": 1,
+     "line": 224,
+     "name": "test_kill_switch_does_not_block_metadata_and_is_not_cleared",
+     "postgresMark": true,
+     "usesFreshDb": true
+    },
+    {
+     "cases": 5,
+     "line": 237,
+     "name": "test_existing_identity_or_channel_is_never_repaired",
+     "postgresMark": true,
+     "usesFreshDb": true
+    },
+    {
+     "cases": 1,
+     "line": 260,
+     "name": "test_changed_plan_and_outer_transaction_cannot_apply",
+     "postgresMark": true,
+     "usesFreshDb": true
+    },
+    {
+     "cases": 1,
+     "line": 279,
+     "name": "test_real_sql_failure_after_channel_audit_rolls_back_all_rows",
+     "postgresMark": true,
+     "usesFreshDb": true
+    },
+    {
+     "cases": 1,
+     "line": 291,
+     "name": "test_actual_readback_inconsistency_rolls_back",
+     "postgresMark": true,
+     "usesFreshDb": true
+    },
+    {
+     "cases": 1,
+     "line": 304,
+     "name": "test_ready_plan_rechecks_controls_on_apply",
+     "postgresMark": true,
+     "usesFreshDb": true
+    },
+    {
+     "cases": 1,
+     "line": 315,
+     "name": "test_unknown_commit_requires_read_only_reconcile_not_retry",
+     "postgresMark": true,
+     "usesFreshDb": true
+    },
+    {
+     "cases": 1,
+     "line": 362,
+     "name": "test_concurrent_duplicate_has_one_committed_winner_no_partial",
+     "postgresMark": true,
+     "usesFreshDb": true
+    },
+    {
+     "cases": 19,
+     "line": 394,
+     "name": "test_closed_request_types_and_limits_before_any_db",
+     "postgresMark": false,
+     "usesFreshDb": false
+    },
+    {
+     "cases": 1,
+     "line": 401,
+     "name": "test_duplicate_keys_ids_nonfinite_oversize_and_noncanonical_base64",
+     "postgresMark": false,
+     "usesFreshDb": false
+    },
+    {
+     "cases": 1,
+     "line": 417,
+     "name": "test_missing_tenant_with_matching_public_identity_is_refused",
+     "postgresMark": true,
+     "usesFreshDb": true
+    },
+    {
+     "cases": 7,
+     "line": 424,
+     "name": "test_public_certificate_identity_rejections",
+     "postgresMark": false,
+     "usesFreshDb": false
+    },
+    {
+     "cases": 4,
+     "line": 443,
+     "name": "test_endpoint_contract_is_unchanged",
+     "postgresMark": false,
+     "usesFreshDb": false
+    }
+   ]
+  },
+  "tests/core/test_fresh_cpu_admission_cli.py": {
+   "bytes": 7285,
+   "calls": [
+    "AssertionError",
+    "BoundStream",
+    "BytesIO",
+    "Connection",
+    "DomainError",
+    "Path",
+    "RuntimeError",
+    "SimpleNamespace",
+    "all",
+    "calls.append",
+    "capsys.readouterr",
+    "cli.main",
+    "db.connect",
+    "digest",
+    "driver_environment.items",
+    "encode",
+    "encoded",
+    "importlib.util.module_from_spec",
+    "importlib.util.spec_from_file_location",
+    "json.loads",
+    "monkeypatch.delenv",
+    "monkeypatch.setattr",
+    "monkeypatch.setenv",
+    "prepare_request",
+    "pytest.mark.parametrize",
+    "request_factory",
+    "resolve",
+    "snapshot",
+    "spec.loader.exec_module",
+    "stdin"
+   ],
+   "expectedSha256Matches": true,
+   "imports": [
+    "importlib.util",
+    "inv.errors",
+    "inv.fresh_cpu_admission",
+    "io",
+    "json",
+    "pathlib",
+    "pytest",
+    "test_fresh_cpu_admission",
+    "types"
+   ],
+   "sha256": "cb23b2b15bf7a3a75851f97d07336efeee50830e979591032fe9ee3a8a089f96",
+   "testFunctions": [
+    {
+     "cases": 1,
+     "line": 30,
+     "name": "test_cli_default_plan_and_explicit_apply_use_real_db",
+     "postgresMark": true,
+     "usesFreshDb": true
+    },
+    {
+     "cases": 6,
+     "line": 62,
+     "name": "test_rejected_argv_never_echoes_argument_values",
+     "postgresMark": false,
+     "usesFreshDb": false
+    },
+    {
+     "cases": 5,
+     "line": 74,
+     "name": "test_exception_and_request_secrets_never_escape",
+     "postgresMark": false,
+     "usesFreshDb": false
+    },
+    {
+     "cases": 1,
+     "line": 110,
+     "name": "test_digest_refused_before_connection_and_input_read_is_bounded",
+     "postgresMark": false,
+     "usesFreshDb": false
+    },
+    {
+     "cases": 1,
+     "line": 129,
+     "name": "test_missing_selected_environment_is_closed",
+     "postgresMark": false,
+     "usesFreshDb": false
+    },
+    {
+     "cases": 1,
+     "line": 136,
+     "name": "test_trusted_operator_driver_profile_is_forwarded_without_rewrite",
+     "postgresMark": false,
+     "usesFreshDb": false
+    }
+   ]
+  },
+  "tools/fresh_cpu_admission.py": {
+   "bytes": 3701,
+   "calls": [
+    "DomainError",
+    "Path",
+    "SafeParser",
+    "SystemExit",
+    "_error",
+    "apply_admission",
+    "bool",
+    "item.digest",
+    "json.dumps",
+    "main",
+    "os.environ.get",
+    "parser.add_argument",
+    "parser.parse_args",
+    "plan_admission",
+    "prepare_request",
+    "print",
+    "psycopg.connect",
+    "re.fullmatch",
+    "resolve",
+    "str",
+    "sys.path.insert",
+    "sys.stdin.buffer.read",
+    "type"
+   ],
+   "expectedSha256Matches": true,
+   "imports": [
+    "argparse",
+    "inv.errors",
+    "inv.fresh_cpu_admission",
+    "json",
+    "os",
+    "pathlib",
+    "psycopg",
+    "re",
+    "sys"
+   ],
+   "sha256": "8129ab5acf7061b0bc1834aa1142ae944471b1b177f018c810de34ea9a53fe7d",
+   "sqlLiterals": []
+  }
+ },
+ "testTotalsFromAST": {
+  "cases": 70,
+  "functions": 24,
+  "postgresFreshDbCases": 25
+ }
+}
