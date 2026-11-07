@@ -1,15 +1,19 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.457"
+version: "1.0.458"
 status: "review"
 author: "Codex"
-updated: "2026-11-07T10:18:15+09:00"
+updated: "2026-11-07T10:29:55+09:00"
 source_of_truth: "Git"
 active_card: "FLEET5 continued supervision with PORTAL-REFRESH-FLEET-20261106"
-active_card_status: "BexactWIP02verified->normalpublishfb188+rawJSONexception193/CIpending; H12actualGoP1P2P3PASSP4FAIL5leaf->typeblockfix0abc; original19HOLD/actualNULL/fleetincomplete"
-active_card_next: "B Codex immutabletestedbytes normalpublication+exactDocsCoreBackend thenCODEreviewASK; K2 Codex ONLYnewH12typeblock fix preservesoldPLR and other3files thenWIP02; Root verifyfixedWIP/realGo revalidation, no routineapproval."
+active_card_status: "H12fixedWIP02NEWactual4phasePASS28top274sub/5oldregressionsrestored->publish934DocsCorepending; BpublishDocsCoreBackendpending; actualCODEreviewpending/NULL_HOLD/fleetincomplete"
+active_card_next: "K2 Codex exact4testedGitblobs normalcommit/push/ONEexactDocsCore; B Codex exactPythoncandidatepublication/ONEexactDocsCoreBackend; Root actualimmutableCI receipts then singleindependentCODEreview, no authority/runtimegrant."
 ---
+
+## 2026-11-07T10:29:55+09:00 고정 서명 수정본의 새 실제 4단계 통과와 정상 게시 배정
+
+K2수정WIP02는새H12타입검사한부분만교정했고나머지3파일·기존PLRfixture를보존했다. Root가125entry/124manifest입력·원래99기록·371Git입력을대조한뒤새격리환경에서같은4단계를모두실제재실행했다. 상위28·하위274시험이모두통과했고실패/skip0·전373파일불변이며이전5회귀의정확한기존원인/positive가복구됐다. msg934로고정코드정상게시·동일SHA Docs/Core CI후독립CODE검토만허용했다. B게시/CI는별도로계속하며실권한·5대인수·전체완료는아니다. 명령/직접exit/KST/실제counts·원문/해시·반복·자원·다음담당과미실행축은Root History/Evidence에보존했다.
 
 ## 2026-11-07T10:18:15+09:00 B 고정 게시 단계와 H12 실제 회귀 실패의 한정 교정
 

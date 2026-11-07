@@ -1,0 +1,48 @@
+{
+  "atKST": "2026-11-07T10:26:38+09:00",
+  "fixedWIP02SHA256": "f4e1532a97a5b84d177917607dc2947965107ad7faedc78f5b0cdd004aacd018",
+  "actualFiveOldRegressionsClosed": [
+    {
+      "test": "TestPLR1BCompiledWriteTargetsAndReasons/slice-root-foreign-pointee",
+      "WIP01": "FAIL_AFTER_COMPILE0_TYPECHECK0_WRONG_EARLY_H12_TYPE_GUARD",
+      "WIP02": "PASS_AFTER_COMPILE0_TYPECHECK0",
+      "actualFixedOutcome": "EXISTING_FOREIGN_POINTEE_WRITE_CAUSE_RESTORED",
+      "rawFixedOutput": "=== RUN   TestPLR1BCompiledWriteTargetsAndReasons/slice-root-foreign-pointee\n    pl_r1a_test.go:292: actual go build -p=1 ./internal/migrationcontext exit0; mutant body NOT executed\n    pl_r1a_test.go:298: REASON case=slice-root-foreign-pointee build=0 typecheck=0 refused=true reason=foreign pointee write forbidden: crypto/ed25519.PrivateKey\n--- PASS: TestPLR1BCompiledWriteTargetsAndReasons/slice-root-foreign-pointee (1.22s)\n"
+    },
+    {
+      "test": "TestPLR1CCompiledPointerConversionsAndControls/N6-slice-to-own-array-pointer",
+      "WIP01": "FAIL_AFTER_COMPILE0_TYPECHECK0_WRONG_EARLY_H12_TYPE_GUARD",
+      "WIP02": "PASS_AFTER_COMPILE0_TYPECHECK0",
+      "actualFixedOutcome": "EXISTING_POINTER_CONVERSION_CAUSE_RESTORED",
+      "rawFixedOutput": "=== RUN   TestPLR1CCompiledPointerConversionsAndControls/N6-slice-to-own-array-pointer\n    pl_r1a_test.go:383: actual go build -p=1 ./internal/migrationcontext exit0; mutant body NOT executed\n    pl_r1a_test.go:393: OWNER_PLR1C_PROBE case=N6-slice-to-own-array-pointer kind=CONVERSION_NEGATIVE build=0 typecheck=0 refused=true reason=pointee-changing pointer conversion forbidden: *github.com/egparadise/SaintVision-Invion/services/node-agent/internal/migrationcontext.a\n    pl_r1a_test.go:394: REASON case=N6-slice-to-own-array-pointer build=0 typecheck=0 refused=true reason=pointee-changing pointer conversion forbidden: *github.com/egparadise/SaintVision-Invion/services/node-agent/internal/migrationcontext.a\n--- PASS: TestPLR1CCompiledPointerConversionsAndControls/N6-slice-to-own-array-pointer (1.21s)\n"
+    },
+    {
+      "test": "TestPLR1CCompiledPointerConversionsAndControls/S1-slice-local-copy-of-pointee",
+      "WIP01": "FAIL_AFTER_COMPILE0_TYPECHECK0_WRONG_EARLY_H12_TYPE_GUARD",
+      "WIP02": "PASS_AFTER_COMPILE0_TYPECHECK0",
+      "actualFixedOutcome": "EXISTING_POSITIVE_DATA_LIMIT_CONTROL_PASSES",
+      "rawFixedOutput": "=== RUN   TestPLR1CCompiledPointerConversionsAndControls/S1-slice-local-copy-of-pointee\n    pl_r1a_test.go:383: actual go build -p=1 ./internal/migrationcontext exit0; mutant body NOT executed\n    pl_r1a_test.go:393: OWNER_PLR1C_PROBE case=S1-slice-local-copy-of-pointee kind=LIMIT build=0 typecheck=0 refused=false reason=<nil>\n    pl_r1a_test.go:394: REASON case=S1-slice-local-copy-of-pointee build=0 typecheck=0 refused=false reason=<nil>\n--- PASS: TestPLR1CCompiledPointerConversionsAndControls/S1-slice-local-copy-of-pointee (1.23s)\n"
+    },
+    {
+      "test": "TestPLR1CCompiledPointerConversionsAndControls/S2-slice-parameter",
+      "WIP01": "FAIL_AFTER_COMPILE0_TYPECHECK0_WRONG_EARLY_H12_TYPE_GUARD",
+      "WIP02": "PASS_AFTER_COMPILE0_TYPECHECK0",
+      "actualFixedOutcome": "EXISTING_POSITIVE_DATA_LIMIT_CONTROL_PASSES",
+      "rawFixedOutput": "=== RUN   TestPLR1CCompiledPointerConversionsAndControls/S2-slice-parameter\n    pl_r1a_test.go:383: actual go build -p=1 ./internal/migrationcontext exit0; mutant body NOT executed\n    pl_r1a_test.go:393: OWNER_PLR1C_PROBE case=S2-slice-parameter kind=LIMIT build=0 typecheck=0 refused=false reason=<nil>\n    pl_r1a_test.go:394: REASON case=S2-slice-parameter build=0 typecheck=0 refused=false reason=<nil>\n--- PASS: TestPLR1CCompiledPointerConversionsAndControls/S2-slice-parameter (1.19s)\n"
+    },
+    {
+      "test": "TestPLR1DCompiledTargetPointerTermsAndControls/G4-typeparam-target-slice-to-own-array",
+      "WIP01": "FAIL_AFTER_COMPILE0_TYPECHECK0_WRONG_EARLY_H12_TYPE_GUARD",
+      "WIP02": "PASS_AFTER_COMPILE0_TYPECHECK0",
+      "actualFixedOutcome": "EXISTING_POINTER_CONVERSION_CAUSE_RESTORED",
+      "rawFixedOutput": "=== RUN   TestPLR1DCompiledTargetPointerTermsAndControls/G4-typeparam-target-slice-to-own-array\n    pl_r1a_test.go:516: actual go build -p=1 ./internal/migrationcontext exit0; mutant body NOT executed\n    pl_r1a_test.go:526: OWNER_PLR1D_PROBE case=G4-typeparam-target-slice-to-own-array kind=CONVERSION_NEGATIVE build=0 typecheck=0 refused=true reason=pointee-changing pointer conversion forbidden: P\n    pl_r1a_test.go:527: REASON case=G4-typeparam-target-slice-to-own-array build=0 typecheck=0 refused=true reason=pointee-changing pointer conversion forbidden: P\n--- PASS: TestPLR1DCompiledTargetPointerTermsAndControls/G4-typeparam-target-slice-to-own-array (1.22s)\n"
+    }
+  ],
+  "existingOldFixturesAndExpectedCausesUnchanged": true,
+  "exact32Math12Guard92P02RowsByteEqualToFirstRun": true,
+  "newRunNotBorrowedFromFirstRun": true,
+  "rootActualFixedAllFourSerialPhasesPass": true,
+  "independentCODEReview": "PENDING",
+  "actualAuthority": null,
+  "wholeProgramComplete": false
+}
