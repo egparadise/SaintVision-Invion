@@ -1,0 +1,62 @@
+"""Immutable Git/JSON/hash/official CI metadata only; no product execution."""
+import concurrent.futures,datetime,hashlib,json,re,subprocess
+from pathlib import Path
+r=Path(__file__).resolve().parents[1];worker=r.parent/'fleet5-compute-storage-contract-20261105';rel='docs/vault/30_Development/Evidence/fleet5-current-three-node-renewal-plan-r1-20261108-codex';folder=worker/rel
+out=r/'.work/current-three-node-renewal-plan-root-verification-r1';assert not out.exists();out.mkdir()
+raw=(folder/'delivery.json').read_bytes();assert hashlib.sha256(raw).hexdigest()=='59c4cd3cadda4974eacd74b7d6735dd462caa3878bb1e9c1ad6f45006992427d'
+v=json.loads(raw);sha=v['planSHA'];base=v['base'];rootsha='66b42d572b9ffe31134e191f57d07ca362f0d1af'
+assert sha=='a3c6984fa25c6cf179827e15e4259000e7bd294e' and base=='abb7074e3da0d547ac81d3da33dce347d5c656af'
+assert v['taskID']=='task_8298b23be39f' and v['dispatchID']=='ctx_cc3c139fd6e0'
+assert v['planOnly'] and v['currentGenerationsUnknown'] and v['earliestAuthorizedActualStart'] is None
+assert all(v[k] is False for k in ['productImplementation','rotationOrCryptoExecution','remoteExecution','sourceAcceptance','wholeProgramComplete'])
+def git(*args):return subprocess.check_output(['git',*args],cwd=r)
+assert git('rev-parse',sha+'^').decode().strip()==base
+changed=list(filter(None,git('diff','--name-only','-z',base,sha).decode('utf-8').split('\0')))
+assert len(changed)==28 and changed==v['changedPaths'] and all(x.startswith('docs/vault/30_Development/') for x in changed)
+assert git('ls-remote','origin','refs/heads/'+v['branch']).decode().split()[0]==sha
+protected=[]
+for name,record in v['protectedTrees']['paths'].items():
+    a=git('rev-parse',base+':'+name).decode().strip();b=git('rev-parse',sha+':'+name).decode().strip();assert a==b==record['baseGitObject']==record['candidateGitObject'];protected.append(name)
+assert len(v['sourcePins'])==21 and len(v['rootInputPins'])==11
+for item in v['sourcePins']:
+    b=git('show',item['source']+':'+item['path']);assert len(b)==item['bytes'] and hashlib.sha256(b).hexdigest()==item['SHA256']
+    assert b==git('show',base+':'+item['path'])==git('show',sha+':'+item['path'])
+    lines=b.decode('utf-8').splitlines()
+    for span in item['ranges']:assert '\n'.join(lines[span['start']-1:span['end']])==span['excerpt']
+for item in v['rootInputPins']:
+    assert item['source']==rootsha;b=git('show',rootsha+':'+item['path']);assert len(b)==item['bytes'] and hashlib.sha256(b).hexdigest()==item['SHA256']
+    suffix=item['path'].split('fleet5-20261105-root/',1)[1];assert git('show',sha+':'+rel+'/root-inputs/'+suffix)==b
+    assert (r/item['path']).read_bytes().replace(b'\r\n',b'\n')==b.replace(b'\r\n',b'\n')
+manifest_raw=git('show',sha+':'+rel+'/operation-manifest.json');assert hashlib.sha256(manifest_raw).hexdigest()==v['manifestSHA256'];manifest=json.loads(manifest_raw)
+assert manifest['executable'] is False and manifest['operatingAuthorization'] is None and manifest['independentReviewer'] is None
+assert manifest['scope']['exactMemberCount']==3 and manifest['scope']['membershipOrCAOrKeyReplacementAllowed'] is False
+assert len(v['localMetadataGates'])==6 and all(x['exit']==0 for x in v['localMetadataGates']) and v['postCISyncCHECK']['exit']==0
+canon=Path(r'D:\Project\SaintVision-Invion\SaintVisionI-Invion\.git\obsidian-sync-state.json').read_bytes();digest=hashlib.sha256(canon).hexdigest()
+assert len(canon)==575395 and digest=='ce2b8d11efab6cc12be57925b0f6504698ec6dbb49ece4ba8a584ef1c4a897b8'
+cs=v['canonicalState'];assert cs['fullBytesEqual'] and cs['APPLY'] is False
+assert all(cs[x]==len(canon) for x in ['startBytes','endBytes','postCIBytes']) and all(cs[x]==digest for x in ['startSHA256','endSHA256','postCISHA256'])
+gh=r'C:\Program Files\GitHub CLI\gh.exe';rid=42419449079;job=128544506528
+paths={'run':f'actions/runs/{rid}','jobs':f'actions/runs/{rid}/jobs?per_page=100','artifacts':f'actions/runs/{rid}/artifacts','job-log':f'actions/jobs/{job}/logs'}
+def get(entry):
+    name,path=entry;q=subprocess.run([gh,'api','repos/egparadise/SaintVision-Invion/'+path],capture_output=True,timeout=60);assert q.returncode==0,(name,q.returncode)
+    (out/(name+('.log' if name=='job-log' else '.json'))).write_bytes(q.stdout);return name,q.stdout
+with concurrent.futures.ThreadPoolExecutor(max_workers=4) as pool:official=dict(pool.map(get,paths.items()))
+a=json.loads(official['run']);jobs=json.loads(official['jobs']);arts=json.loads(official['artifacts'])
+assert a['id']==rid and a['head_sha']==sha and a['head_branch']==v['branch'] and a['display_title']==v['exactDocs']['dispatch']['correlation']
+assert a['event']=='workflow_dispatch' and a['path']=='.github/workflows/docs.yml' and a['run_attempt']==1 and a['status']=='completed' and a['conclusion']=='success'
+assert jobs['total_count']==len(jobs['jobs'])==1;j=jobs['jobs'][0]
+assert j['id']==job and j['head_sha']==sha and j['run_attempt']==1 and j['status']=='completed' and j['conclusion']=='success'
+assert len(j['steps'])==19 and all(x['conclusion']=='success' for x in j['steps'])
+assert len(arts['artifacts'])==len(v['exactDocs']['artifacts'])==2
+artifact_pins=[]
+for art in arts['artifacts']:
+    old=next(x for x in v['exactDocs']['artifacts'] if x['id']==art['id']);assert art['digest']==old['digest'] and not art['expired'] and art['workflow_run']['head_sha']==sha
+    path=folder/old['downloadedZIP'];assert path.stat().st_size==art['size_in_bytes'];h=hashlib.sha256()
+    with path.open('rb') as stream:
+        for chunk in iter(lambda:stream.read(1048576),b''):h.update(chunk)
+    assert 'sha256:'+h.hexdigest()==art['digest'];artifact_pins.append({'id':art['id'],'bytes':art['size_in_bytes'],'SHA256':h.hexdigest(),'officialDigestAndActualWorkerZIPMatched':True})
+log=official['job-log'];old=v['exactDocs']['logs'][0];assert len(log)==old['bytes'] and hashlib.sha256(log).hexdigest()==old['SHA256']
+for line in old['consoleResultLines']:assert line in log.decode('utf-8-sig')
+(out/'delivery.json').write_bytes(raw)
+result={'verifiedAtKST':datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=9))).isoformat(timespec='seconds'),'planSHA':sha,'base':base,'Root536':rootsha,'deliverySHA256':hashlib.sha256(raw).hexdigest(),'changedDocsOnlyPaths':len(changed),'protectedTrees':protected,'exactSourcePinsAndExcerptRangesVerified':21,'exactRoot536SetupAndReconnectPinsVerified':11,'metadataGatesActualRecordedExit0':6,'exactManualAttempt1Docs':rid,'officialAll19SuccessJob':job,'officialArtifactDigestsAndActualZIPs':artifact_pins,'officialJobLogSHA256':hashlib.sha256(log).hexdigest(),'canonicalStartEndPostCICurrentFullBytesMatch':True,'canonicalBytes':len(canon),'canonicalSHA256':digest,'planOnly':True,'actualIndependentReview':False,'actualRenewal':False,'nextImplementationGate':'Current UID1000 split-bind/single-CA and CP publication adapters missing; actual Claude plan review first','wholeProgramComplete':False}
+(out/'receipt.json').write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n',encoding='utf-8');print(json.dumps(result),flush=True)

@@ -1,0 +1,259 @@
+{
+  "atKST": "2026-11-07T17:12:58+09:00",
+  "status": "PC2_AND_PC4_NEW_EXACT_NODE_SERVICES_RUNNING",
+  "results": [
+    {
+      "PC": "PC2",
+      "node": "nod_01M6TGQZ8S3DAFS7TYE8TY1PX2",
+      "trust": {
+        "atKST": "2026-11-07T17:12:50+09:00",
+        "PC": "PC2",
+        "stage": "public-trust",
+        "SSHExit": 0,
+        "stderrBytes": 0,
+        "rawDiagnosticSuppressed": true,
+        "remote": {
+          "status": "PUBLIC_TRUST_INSTALLED_PRIVATE_KEY_MATCHES_STRICT_TLS_CONTEXT_LOADED",
+          "mode": "READONLY_RECONCILE_EXISTING_ACKNOWLEDGED_NEW_FILES",
+          "originalAcknowledgedInstallNotRepeated": true,
+          "publicFilesByteMatch": true,
+          "capturedKnownPublicCertificatePropertyWarningClasses": [
+            "CryptographyDeprecationWarning"
+          ],
+          "NodeDER_SHA256": "ec4b6be14dd8be8ec3eaecbf4b58a27cb567449931cf2e3668422f647eaaf415",
+          "privateKeysTransferred": false,
+          "NodeStarted": false
+        }
+      },
+      "imageLoad": {
+        "atKST": "2026-11-07T17:12:53+09:00",
+        "PC": "PC2",
+        "stage": "image-load",
+        "SSHExit": 0,
+        "stderrBytes": 0,
+        "rawDiagnosticSuppressed": true,
+        "remote": {
+          "status": "EXACT_PRODUCT_IMAGES_LOADED",
+          "imageIDs": [
+            "sha256:de654cd385307ac7147baf6757a480f803361eb5b30d40c7991b272a6889d87f",
+            "sha256:ffee58e8dbefc6c0db68810cd1597f8cc589cf01112c434ed7fda8d4af415634"
+          ],
+          "bundleSHA256": "7f7b9d3b1f9eb44a85753a49d6d6283c1cf2f8d68b9c3f59f2bbdc7019795688",
+          "tagOverwrite": false,
+          "oldContainerMutation": false
+        }
+      },
+      "start": {
+        "atKST": "2026-11-07T17:12:54+09:00",
+        "PC": "PC2",
+        "stage": "node-start",
+        "SSHExit": 0,
+        "stderrBytes": 0,
+        "rawDiagnosticSuppressed": true,
+        "remote": {
+          "scope": "ONE_NEW_NODE_SERVICE_ONLY",
+          "tenantWorkloadOrUserApprovalExecuted": false,
+          "oldNodeStateChanges": false,
+          "privateCAClientSignerOrDBCredentialMounted": false,
+          "wholeProgramComplete": false,
+          "containerId": "fd4bdef2db94c434b740916d50fc0d3e80c5aa49bfe01f45b415f23877e03084",
+          "containerName": "saintvision-nod_01M6TGQZ8S3DAFS7TYE8TY1PX2",
+          "status": "NODE_SERVICE_RUNNING_EXACT_CONFIGURATION_NO_OBSERVATION_YET",
+          "phase": "actual-inspect-matches-scope",
+          "NodeImageID": "sha256:de654cd385307ac7147baf6757a480f803361eb5b30d40c7991b272a6889d87f",
+          "workloadImageID": "sha256:ffee58e8dbefc6c0db68810cd1597f8cc589cf01112c434ed7fda8d4af415634",
+          "user": "1000:1000",
+          "dockerSocketSupplementaryGID": 117,
+          "serviceCPUQuotaNanoCpus": 500000000,
+          "serviceMemoryBytes": 268435456,
+          "pidsLimit": 64,
+          "readOnlyRootFS": true,
+          "capDrop": [
+            "ALL"
+          ],
+          "securityOptions": [
+            "no-new-privileges"
+          ],
+          "stateBind": "/home/saintvision-invion/saintvision-share/nodes/nod_01M6TGQZ8S3DAFS7TYE8TY1PX2/state",
+          "configMountReadOnly": true,
+          "noNamedVolumeCreated": true,
+          "portBindings": {
+            "19443/tcp": [
+              {
+                "HostIp": "192.168.45.143",
+                "HostPort": "19443"
+              }
+            ]
+          },
+          "restarting": false,
+          "restartCount": 0,
+          "runtimeProfileSHA256": "0b4b1299671fb5df8845755be061e46cb24ab7ab70546235198644fab93c1c9f",
+          "nodeArgv": [
+            "--tenant",
+            "97968b42-68aa-40ce-af5e-3a33e2fc2205",
+            "--node",
+            "nod_01M6TGQZ8S3DAFS7TYE8TY1PX2",
+            "--epoch",
+            "bcd581be-31b4-4aca-86e6-3ca31b69ed09",
+            "--profile",
+            "cpu-pilot-1efea-r1",
+            "--image",
+            "sha256:ffee58e8dbefc6c0db68810cd1597f8cc589cf01112c434ed7fda8d4af415634",
+            "--executable",
+            "/usr/local/bin/python3",
+            "--state",
+            "/state",
+            "--public-key",
+            "/config/launch-signer.pub",
+            "--socket",
+            "/var/run/docker.sock",
+            "--serve",
+            "--listen",
+            "0.0.0.0:19443",
+            "--tls-cert",
+            "/config/node-cert.pem",
+            "--tls-key",
+            "/config/node-key.pem",
+            "--client-ca",
+            "/config/client-ca.pem",
+            "--peer-policy",
+            "/config/peer-policy.json"
+          ],
+          "realMTLSResourceObservation": "NOT_RUN",
+          "actualDBNodeMayStillBeOffline": true
+        }
+      }
+    },
+    {
+      "PC": "PC4",
+      "node": "nod_01M6TGSXV1J7XWC5D5H7N6EW1D",
+      "trust": {
+        "atKST": "2026-11-07T17:12:55+09:00",
+        "PC": "PC4",
+        "stage": "public-trust",
+        "SSHExit": 0,
+        "stderrBytes": 0,
+        "rawDiagnosticSuppressed": true,
+        "remote": {
+          "privateKeysTransferred": false,
+          "oldNodeStateChanged": false,
+          "NodeStarted": false,
+          "status": "PUBLIC_TRUST_INSTALLED_PRIVATE_KEY_MATCHES_STRICT_TLS_CONTEXT_LOADED",
+          "node": "nod_01M6TGSXV1J7XWC5D5H7N6EW1D",
+          "NodeDER_SHA256": "bc5a3763c7a34f3a5e51315209b0a388ccab5f99b76337ecca3cfe18a6b4c686",
+          "newPublicFileHashes": {
+            "node-cert.pem": "cde79d8c5b0dffe16982be314a75af5b66b04ca36fa9b75de46b0e8ddaddb664",
+            "client-ca.pem": "b8d777ab04c65a44f827fdda9629d54a086e9ff8cc752b90a09023a93341c5a3",
+            "launch-signer.pub": "21baf6f95ff93c3a55b1fc2e01a134b8833d6fdeaac051126c9bed2b86df051b",
+            "peer-policy.json": "54751b1903acbf69978be206dee13aa98e05c0757f2d929762dfae8b78e45ab8"
+          },
+          "privateKeyStillLocal": true,
+          "privateKeyMode": "0600 uid1000",
+          "CAAndClientAndLaunchPrivateKeyOnTarget": false
+        }
+      },
+      "imageLoad": {
+        "atKST": "2026-11-07T17:12:56+09:00",
+        "PC": "PC4",
+        "stage": "image-load",
+        "SSHExit": 0,
+        "stderrBytes": 0,
+        "rawDiagnosticSuppressed": true,
+        "remote": {
+          "status": "EXACT_PRODUCT_IMAGES_LOADED",
+          "imageIDs": [
+            "sha256:de654cd385307ac7147baf6757a480f803361eb5b30d40c7991b272a6889d87f",
+            "sha256:ffee58e8dbefc6c0db68810cd1597f8cc589cf01112c434ed7fda8d4af415634"
+          ],
+          "bundleSHA256": "7f7b9d3b1f9eb44a85753a49d6d6283c1cf2f8d68b9c3f59f2bbdc7019795688",
+          "tagOverwrite": false,
+          "oldContainerMutation": false
+        }
+      },
+      "start": {
+        "atKST": "2026-11-07T17:12:58+09:00",
+        "PC": "PC4",
+        "stage": "node-start",
+        "SSHExit": 0,
+        "stderrBytes": 0,
+        "rawDiagnosticSuppressed": true,
+        "remote": {
+          "scope": "ONE_NEW_NODE_SERVICE_ONLY",
+          "tenantWorkloadOrUserApprovalExecuted": false,
+          "oldNodeStateChanges": false,
+          "privateCAClientSignerOrDBCredentialMounted": false,
+          "wholeProgramComplete": false,
+          "containerId": "e74fde5e18c65df59e3f19e4ba988c43ff27a3ff76021412eb71cc79957d489e",
+          "containerName": "saintvision-nod_01M6TGSXV1J7XWC5D5H7N6EW1D",
+          "status": "NODE_SERVICE_RUNNING_EXACT_CONFIGURATION_NO_OBSERVATION_YET",
+          "phase": "actual-inspect-matches-scope",
+          "NodeImageID": "sha256:de654cd385307ac7147baf6757a480f803361eb5b30d40c7991b272a6889d87f",
+          "workloadImageID": "sha256:ffee58e8dbefc6c0db68810cd1597f8cc589cf01112c434ed7fda8d4af415634",
+          "user": "1000:1000",
+          "dockerSocketSupplementaryGID": 984,
+          "serviceCPUQuotaNanoCpus": 500000000,
+          "serviceMemoryBytes": 268435456,
+          "pidsLimit": 64,
+          "readOnlyRootFS": true,
+          "capDrop": [
+            "ALL"
+          ],
+          "securityOptions": [
+            "no-new-privileges"
+          ],
+          "stateBind": "/home/inviz/saintvision-share/nodes/nod_01M6TGSXV1J7XWC5D5H7N6EW1D/state",
+          "configMountReadOnly": true,
+          "noNamedVolumeCreated": true,
+          "portBindings": {
+            "19443/tcp": [
+              {
+                "HostIp": "192.168.45.210",
+                "HostPort": "19443"
+              }
+            ]
+          },
+          "restarting": false,
+          "restartCount": 0,
+          "runtimeProfileSHA256": "7f7912b16ef0f0fb80a5dbb3c115a6283c3081acb6fcf57b9dcfd20c252e4615",
+          "nodeArgv": [
+            "--tenant",
+            "97968b42-68aa-40ce-af5e-3a33e2fc2205",
+            "--node",
+            "nod_01M6TGSXV1J7XWC5D5H7N6EW1D",
+            "--epoch",
+            "bcd581be-31b4-4aca-86e6-3ca31b69ed09",
+            "--profile",
+            "cpu-pilot-1efea-r1",
+            "--image",
+            "sha256:ffee58e8dbefc6c0db68810cd1597f8cc589cf01112c434ed7fda8d4af415634",
+            "--executable",
+            "/usr/local/bin/python3",
+            "--state",
+            "/state",
+            "--public-key",
+            "/config/launch-signer.pub",
+            "--socket",
+            "/var/run/docker.sock",
+            "--serve",
+            "--listen",
+            "0.0.0.0:19443",
+            "--tls-cert",
+            "/config/node-cert.pem",
+            "--tls-key",
+            "/config/node-key.pem",
+            "--client-ca",
+            "/config/client-ca.pem",
+            "--peer-policy",
+            "/config/peer-policy.json"
+          ],
+          "realMTLSResourceObservation": "NOT_RUN",
+          "actualDBNodeMayStillBeOffline": true
+        }
+      }
+    }
+  ],
+  "knownHostsUnchanged": true,
+  "actualFreshResourceObservation": "NEEDS_SEPARATE_READBACK",
+  "workloadRun": "NOT_RUN",
+  "wholeProgramComplete": false
+}

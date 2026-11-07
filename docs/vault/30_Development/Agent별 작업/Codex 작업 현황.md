@@ -1,15 +1,19 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.497"
+version: "1.0.498"
 status: "review"
 author: "Codex"
-updated: "2026-11-08T06:52:37+09:00"
+updated: "2026-11-08T07:22:16+09:00"
 source_of_truth: "Git"
 active_card: "FLEET5 continued supervision with PORTAL-REFRESH-FLEET-20261106"
-active_card_status: "Actual3NodeProcessesRestartedOnceSameCIDIdentityPKIStateAndFreshResources; UI30sAccepted_RunNotExecutedExpiredApproval_PC1PC5FullFivePCPending"
-active_card_next: "Publish Root536 exact Docs and canonical Obsidian, then proceed only with remaining ready work and real prerequisite changes. No source correction/review pending; real 2-nonrequester identity/current approval, PC1 enrollment, safe PC5 Node, full GPU/storage/manual/renewal/physicalOS reboot remain. Existing three Node process reconnect actually verified; original formal hold gates unchanged."
+active_card_status: "Current3NodeRenewalPlanA3c698MetadataVerified_NotYetActualIndependentReview; OldToolingProfileSingleCAAuthorityCPContextAdapterGaps_NoRotation; PriorUIAnd3ProcessRecoveryAccepted"
+active_card_next: "Finish Root537 exact Docs/canonical sync, then dispatch one actual Claude plan review on a3c698. Current policy deadline 2026-11-08T16:15:30KST; no old renewer reactivation, guessed floor, private material transfer or rotation before code/CI/independent review/Root preflight release. Genuine2approvers/PC1key/PC5safeNode/GPUstorage/manual/all5 remain."
 ---
+
+## 2026-11-08T07:22:16+09:00 현재3대 갱신계획 원본 대조와 실제 검토 준비
+
+실제Codex a3c698계획은현재3대의UID1000 split-bind/profile·단일CA·현재authority와CP SSLContext전환adapter가없어구형normal갱신의직접적용을HOLD로판정했다. Root는abb707직접base/28docs변경·제품tree불변·source21개/Root536원본11개·정확Docs42419449079/job128544506528전19단계·실제routeZIP/공식joblog와575395B canonical전후/postCI/current완전일치를대조했다. guidelinesZIP은공식metadata digest만확인했고내용검증으로쓰지않는다. 실제작성자종료·해제후계획/증거27문서만가져왔고오래된자기진행판은덮어쓰지않았다. 다음은단한실제Claude계획검토이며아직수락/구현/인증서발급/회전/5대완료가아니다. 현재정책마감은오늘16:15:30KST이며기존3대화면·제한자원/재연결증거와모든원래HOLD를유지한다. 다음첫행동/담당은Root537게시/동기화뒤Root의실제Claude배정이며아직검토가있었다고기록하지않는다.
 
 ## 2026-11-08T06:52:37+09:00 실제 3대 Node 프로세스 재시작·같은 신원 복귀 검증
 

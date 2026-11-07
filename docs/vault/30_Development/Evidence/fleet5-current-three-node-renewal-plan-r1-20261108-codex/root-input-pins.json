@@ -1,0 +1,68 @@
+[
+  {
+    "source": "66b42d572b9ffe31134e191f57d07ca362f0d1af",
+    "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/pc3-actual-cpu-pilot-r1/pc3-cpu-pki-r1/receipt.json",
+    "bytes": 3798,
+    "SHA256": "15ac20406291ad5ffe2ed4fdbfca531ff6f9a036301df4bf8a2306d8770530ea"
+  },
+  {
+    "source": "66b42d572b9ffe31134e191f57d07ca362f0d1af",
+    "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/three-pc-actual-cpu-pilot-r1/pc24-pilot-ca-signing-r1/receipt.json",
+    "bytes": 8708,
+    "SHA256": "fd92f15a44803a99c804289d0dea97c17c90222d4701eb17d445b90aacd99fdc"
+  },
+  {
+    "source": "66b42d572b9ffe31134e191f57d07ca362f0d1af",
+    "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/three-pc-actual-cpu-pilot-r1/pc24-pilot-ca-signing-r1/remote-signing-program.py.txt",
+    "bytes": 5665,
+    "SHA256": "74e47801c4a150cb3a7fb1e47e4417624b040edde20a75fd3f35bb47627f03fa"
+  },
+  {
+    "source": "66b42d572b9ffe31134e191f57d07ca362f0d1af",
+    "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/three-pc-actual-cpu-pilot-r1/pc24-node-start-r2/node-start-template-remote-program.py.txt",
+    "bytes": 6343,
+    "SHA256": "e4dbc30260ab61ef162f45a080143a01f886544c7ff1f8ca8add1f12bdc0a08d"
+  },
+  {
+    "source": "66b42d572b9ffe31134e191f57d07ca362f0d1af",
+    "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/three-owned-node-process-reconnect-r1/preflight/PC3.json",
+    "bytes": 3012,
+    "SHA256": "4831ecc9f937b3238e5160b510009b86e4143075626c95da8f0866ea2ac5b010"
+  },
+  {
+    "source": "66b42d572b9ffe31134e191f57d07ca362f0d1af",
+    "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/three-owned-node-process-reconnect-r1/reconciled-continuation/receipt.json",
+    "bytes": 18707,
+    "SHA256": "a79b7e4ce5dbbbd60f835434678b5115cbb5d7472437304826d98f49d46298d5"
+  },
+  {
+    "source": "66b42d572b9ffe31134e191f57d07ca362f0d1af",
+    "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/three-owned-node-process-reconnect-r1/root-independent-metadata-verification.json",
+    "bytes": 10098,
+    "SHA256": "91d835664a3c7ca365ea871026c51488ace6ae0b0372ce633152a459bb9a5ffb"
+  },
+  {
+    "source": "66b42d572b9ffe31134e191f57d07ca362f0d1af",
+    "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/pc3-actual-cpu-pilot-r1/pc3-node-start-r1/receipt.json",
+    "bytes": 2503,
+    "SHA256": "1b3d1bf9a6504856da8618ba19a7153edaeec05f55efdca5a3ece1ba61a53f97"
+  },
+  {
+    "source": "66b42d572b9ffe31134e191f57d07ca362f0d1af",
+    "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/three-pc-actual-cpu-pilot-r1/pc24-node-start-r2/receipt.json",
+    "bytes": 9758,
+    "SHA256": "38ef758ed2b248403c73891053d36025bddbd9266cc4798c8eeb9b2422e6a1f2"
+  },
+  {
+    "source": "66b42d572b9ffe31134e191f57d07ca362f0d1af",
+    "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/three-owned-node-process-reconnect-r1/preflight/PC2.json",
+    "bytes": 3002,
+    "SHA256": "9f593fab61af65f2c5b0253aaa2168433c176f1f009470f148a00caffed5bda8"
+  },
+  {
+    "source": "66b42d572b9ffe31134e191f57d07ca362f0d1af",
+    "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/three-owned-node-process-reconnect-r1/preflight/PC4.json",
+    "bytes": 2858,
+    "SHA256": "932480d92a0dbee3938c3d905c98f98991c41f571c32c43184681bbd8145c0b1"
+  }
+]

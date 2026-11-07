@@ -1,0 +1,1161 @@
+{
+  "taskID": "task_8298b23be39f",
+  "dispatchID": "ctx_cc3c139fd6e0",
+  "owner": "Actual Orca Codex",
+  "atKST": "2026-11-08T07:13:56.915277+09:00",
+  "planSHA": "a3c6984fa25c6cf179827e15e4259000e7bd294e",
+  "base": "abb7074e3da0d547ac81d3da33dce347d5c656af",
+  "branch": "agent/codex/fleet5-current-three-node-renewal-plan-r1-20261108",
+  "planOnly": true,
+  "productImplementation": false,
+  "rotationOrCryptoExecution": false,
+  "remoteExecution": false,
+  "currentGenerationsUnknown": true,
+  "sourceAcceptance": false,
+  "independentReview": "One actual Claude required later; not yet performed",
+  "exactDocs": {
+    "run": {
+      "id": 42419449079,
+      "name": "fleet5-current-three-node-renewal-plan-docs-0bd884ad1c27426e8657328558460d23",
+      "node_id": "WFR_kwLOUTJvXc8AAAAJ4GVs9w",
+      "head_branch": "agent/codex/fleet5-current-three-node-renewal-plan-r1-20261108",
+      "head_sha": "a3c6984fa25c6cf179827e15e4259000e7bd294e",
+      "path": ".github/workflows/docs.yml",
+      "display_title": "fleet5-current-three-node-renewal-plan-docs-0bd884ad1c27426e8657328558460d23",
+      "run_number": 3581,
+      "event": "workflow_dispatch",
+      "status": "completed",
+      "conclusion": "success",
+      "workflow_id": 353763799,
+      "check_suite_id": 114920084887,
+      "check_suite_node_id": "CS_kwDOUTJvXc8AAAAawcVVlw",
+      "url": "https://api.github.com/repos/egparadise/SaintVision-Invion/actions/runs/42419449079",
+      "html_url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/42419449079",
+      "pull_requests": [],
+      "created_at": "2026-11-07T22:11:38Z",
+      "updated_at": "2026-11-07T22:12:15Z",
+      "actor": {
+        "login": "egparadise",
+        "id": 92619035,
+        "node_id": "U_kgDOBYVBGw",
+        "avatar_url": "https://avatars.githubusercontent.com/u/92619035?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/egparadise",
+        "html_url": "https://github.com/egparadise",
+        "followers_url": "https://api.github.com/users/egparadise/followers",
+        "following_url": "https://api.github.com/users/egparadise/following{/other_user}",
+        "gists_url": "https://api.github.com/users/egparadise/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/egparadise/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/egparadise/subscriptions",
+        "organizations_url": "https://api.github.com/users/egparadise/orgs",
+        "repos_url": "https://api.github.com/users/egparadise/repos",
+        "events_url": "https://api.github.com/users/egparadise/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/egparadise/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "run_attempt": 1,
+      "referenced_workflows": [],
+      "run_started_at": "2026-11-07T22:11:38Z",
+      "triggering_actor": {
+        "login": "egparadise",
+        "id": 92619035,
+        "node_id": "U_kgDOBYVBGw",
+        "avatar_url": "https://avatars.githubusercontent.com/u/92619035?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/egparadise",
+        "html_url": "https://github.com/egparadise",
+        "followers_url": "https://api.github.com/users/egparadise/followers",
+        "following_url": "https://api.github.com/users/egparadise/following{/other_user}",
+        "gists_url": "https://api.github.com/users/egparadise/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/egparadise/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/egparadise/subscriptions",
+        "organizations_url": "https://api.github.com/users/egparadise/orgs",
+        "repos_url": "https://api.github.com/users/egparadise/repos",
+        "events_url": "https://api.github.com/users/egparadise/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/egparadise/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "jobs_url": "https://api.github.com/repos/egparadise/SaintVision-Invion/actions/runs/42419449079/jobs",
+      "logs_url": "https://api.github.com/repos/egparadise/SaintVision-Invion/actions/runs/42419449079/logs",
+      "check_suite_url": "https://api.github.com/repos/egparadise/SaintVision-Invion/check-suites/114920084887",
+      "artifacts_url": "https://api.github.com/repos/egparadise/SaintVision-Invion/actions/runs/42419449079/artifacts",
+      "cancel_url": "https://api.github.com/repos/egparadise/SaintVision-Invion/actions/runs/42419449079/cancel",
+      "rerun_url": "https://api.github.com/repos/egparadise/SaintVision-Invion/actions/runs/42419449079/rerun",
+      "previous_attempt_url": null,
+      "workflow_url": "https://api.github.com/repos/egparadise/SaintVision-Invion/actions/workflows/353763799",
+      "head_commit": {
+        "id": "a3c6984fa25c6cf179827e15e4259000e7bd294e",
+        "tree_id": "c54591973deb21274ba4cf77dc167bf0bac5e506",
+        "message": "docs: plan safe renewal preflight for current three-node CPU cohort",
+        "timestamp": "2026-11-07T22:11:16Z",
+        "author": {
+          "name": "chanyu",
+          "email": "chanyu@inviz.co.kr"
+        },
+        "committer": {
+          "name": "chanyu",
+          "email": "chanyu@inviz.co.kr"
+        }
+      },
+      "repository": {
+        "id": 1362259805,
+        "node_id": "R_kgDOUTJvXQ",
+        "name": "SaintVision-Invion",
+        "full_name": "egparadise/SaintVision-Invion",
+        "private": false,
+        "owner": {
+          "login": "egparadise",
+          "id": 92619035,
+          "node_id": "U_kgDOBYVBGw",
+          "avatar_url": "https://avatars.githubusercontent.com/u/92619035?v=4",
+          "gravatar_id": "",
+          "url": "https://api.github.com/users/egparadise",
+          "html_url": "https://github.com/egparadise",
+          "followers_url": "https://api.github.com/users/egparadise/followers",
+          "following_url": "https://api.github.com/users/egparadise/following{/other_user}",
+          "gists_url": "https://api.github.com/users/egparadise/gists{/gist_id}",
+          "starred_url": "https://api.github.com/users/egparadise/starred{/owner}{/repo}",
+          "subscriptions_url": "https://api.github.com/users/egparadise/subscriptions",
+          "organizations_url": "https://api.github.com/users/egparadise/orgs",
+          "repos_url": "https://api.github.com/users/egparadise/repos",
+          "events_url": "https://api.github.com/users/egparadise/events{/privacy}",
+          "received_events_url": "https://api.github.com/users/egparadise/received_events",
+          "type": "User",
+          "user_view_type": "public",
+          "site_admin": false
+        },
+        "html_url": "https://github.com/egparadise/SaintVision-Invion",
+        "description": null,
+        "fork": false,
+        "url": "https://api.github.com/repos/egparadise/SaintVision-Invion",
+        "forks_url": "https://api.github.com/repos/egparadise/SaintVision-Invion/forks",
+        "keys_url": "https://api.github.com/repos/egparadise/SaintVision-Invion/keys{/key_id}",
+        "collaborators_url": "https://api.github.com/repos/egparadise/SaintVision-Invion/collaborators{/collaborator}",
+        "teams_url": "https://api.github.com/repos/egparadise/SaintVision-Invion/teams",
+        "hooks_url": "https://api.github.com/repos/egparadise/SaintVision-Invion/hooks",
+        "issue_events_url": "https://api.github.com/repos/egparadise/SaintVision-Invion/issues/events{/number}",
+        "events_url": "https://api.github.com/repos/egparadise/SaintVision-Invion/events",
+        "assignees_url": "https://api.github.com/repos/egparadise/SaintVision-Invion/assignees{/user}",
+        "branches_url": "https://api.github.com/repos/egparadise/SaintVision-Invion/branches{/branch}",
+        "tags_url": "https://api.github.com/repos/egparadise/SaintVision-Invion/tags",
+        "blobs_url": "https://api.github.com/repos/egparadise/SaintVision-Invion/git/blobs{/sha}",
+        "git_tags_url": "https://api.github.com/repos/egparadise/SaintVision-Invion/git/tags{/sha}",
+        "git_refs_url": "https://api.github.com/repos/egparadise/SaintVision-Invion/git/refs{/sha}",
+        "trees_url": "https://api.github.com/repos/egparadise/SaintVision-Invion/git/trees{/sha}",
+        "statuses_url": "https://api.github.com/repos/egparadise/SaintVision-Invion/statuses/{sha}",
+        "languages_url": "https://api.github.com/repos/egparadise/SaintVision-Invion/languages",
+        "stargazers_url": "https://api.github.com/repos/egparadise/SaintVision-Invion/stargazers",
+        "contributors_url": "https://api.github.com/repos/egparadise/SaintVision-Invion/contributors",
+        "subscribers_url": "https://api.github.com/repos/egparadise/SaintVision-Invion/subscribers",
+        "subscription_url": "https://api.github.com/repos/egparadise/SaintVision-Invion/subscription",
+        "commits_url": "https://api.github.com/repos/egparadise/SaintVision-Invion/commits{/sha}",
+        "git_commits_url": "https://api.github.com/repos/egparadise/SaintVision-Invion/git/commits{/sha}",
+        "comments_url": "https://api.github.com/repos/egparadise/SaintVision-Invion/comments{/number}",
+        "issue_comment_url": "https://api.github.com/repos/egparadise/SaintVision-Invion/issues/comments{/number}",
+        "contents_url": "https://api.github.com/repos/egparadise/SaintVision-Invion/contents/{+path}",
+        "compare_url": "https://api.github.com/repos/egparadise/SaintVision-Invion/compare/{base}...{head}",
+        "merges_url": "https://api.github.com/repos/egparadise/SaintVision-Invion/merges",
+        "archive_url": "https://api.github.com/repos/egparadise/SaintVision-Invion/{archive_format}{/ref}",
+        "downloads_url": "https://api.github.com/repos/egparadise/SaintVision-Invion/downloads",
+        "issues_url": "https://api.github.com/repos/egparadise/SaintVision-Invion/issues{/number}",
+        "pulls_url": "https://api.github.com/repos/egparadise/SaintVision-Invion/pulls{/number}",
+        "milestones_url": "https://api.github.com/repos/egparadise/SaintVision-Invion/milestones{/number}",
+        "notifications_url": "https://api.github.com/repos/egparadise/SaintVision-Invion/notifications{?since,all,participating}",
+        "labels_url": "https://api.github.com/repos/egparadise/SaintVision-Invion/labels{/name}",
+        "releases_url": "https://api.github.com/repos/egparadise/SaintVision-Invion/releases{/id}",
+        "deployments_url": "https://api.github.com/repos/egparadise/SaintVision-Invion/deployments"
+      },
+      "head_repository": {
+        "id": 1362259805,
+        "node_id": "R_kgDOUTJvXQ",
+        "name": "SaintVision-Invion",
+        "full_name": "egparadise/SaintVision-Invion",
+        "private": false,
+        "owner": {
+          "login": "egparadise",
+          "id": 92619035,
+          "node_id": "U_kgDOBYVBGw",
+          "avatar_url": "https://avatars.githubusercontent.com/u/92619035?v=4",
+          "gravatar_id": "",
+          "url": "https://api.github.com/users/egparadise",
+          "html_url": "https://github.com/egparadise",
+          "followers_url": "https://api.github.com/users/egparadise/followers",
+          "following_url": "https://api.github.com/users/egparadise/following{/other_user}",
+          "gists_url": "https://api.github.com/users/egparadise/gists{/gist_id}",
+          "starred_url": "https://api.github.com/users/egparadise/starred{/owner}{/repo}",
+          "subscriptions_url": "https://api.github.com/users/egparadise/subscriptions",
+          "organizations_url": "https://api.github.com/users/egparadise/orgs",
+          "repos_url": "https://api.github.com/users/egparadise/repos",
+          "events_url": "https://api.github.com/users/egparadise/events{/privacy}",
+          "received_events_url": "https://api.github.com/users/egparadise/received_events",
+          "type": "User",
+          "user_view_type": "public",
+          "site_admin": false
+        },
+        "html_url": "https://github.com/egparadise/SaintVision-Invion",
+        "description": null,
+        "fork": false,
+        "url": "https://api.github.com/repos/egparadise/SaintVision-Invion",
+        "forks_url": "https://api.github.com/repos/egparadise/SaintVision-Invion/forks",
+        "keys_url": "https://api.github.com/repos/egparadise/SaintVision-Invion/keys{/key_id}",
+        "collaborators_url": "https://api.github.com/repos/egparadise/SaintVision-Invion/collaborators{/collaborator}",
+        "teams_url": "https://api.github.com/repos/egparadise/SaintVision-Invion/teams",
+        "hooks_url": "https://api.github.com/repos/egparadise/SaintVision-Invion/hooks",
+        "issue_events_url": "https://api.github.com/repos/egparadise/SaintVision-Invion/issues/events{/number}",
+        "events_url": "https://api.github.com/repos/egparadise/SaintVision-Invion/events",
+        "assignees_url": "https://api.github.com/repos/egparadise/SaintVision-Invion/assignees{/user}",
+        "branches_url": "https://api.github.com/repos/egparadise/SaintVision-Invion/branches{/branch}",
+        "tags_url": "https://api.github.com/repos/egparadise/SaintVision-Invion/tags",
+        "blobs_url": "https://api.github.com/repos/egparadise/SaintVision-Invion/git/blobs{/sha}",
+        "git_tags_url": "https://api.github.com/repos/egparadise/SaintVision-Invion/git/tags{/sha}",
+        "git_refs_url": "https://api.github.com/repos/egparadise/SaintVision-Invion/git/refs{/sha}",
+        "trees_url": "https://api.github.com/repos/egparadise/SaintVision-Invion/git/trees{/sha}",
+        "statuses_url": "https://api.github.com/repos/egparadise/SaintVision-Invion/statuses/{sha}",
+        "languages_url": "https://api.github.com/repos/egparadise/SaintVision-Invion/languages",
+        "stargazers_url": "https://api.github.com/repos/egparadise/SaintVision-Invion/stargazers",
+        "contributors_url": "https://api.github.com/repos/egparadise/SaintVision-Invion/contributors",
+        "subscribers_url": "https://api.github.com/repos/egparadise/SaintVision-Invion/subscribers",
+        "subscription_url": "https://api.github.com/repos/egparadise/SaintVision-Invion/subscription",
+        "commits_url": "https://api.github.com/repos/egparadise/SaintVision-Invion/commits{/sha}",
+        "git_commits_url": "https://api.github.com/repos/egparadise/SaintVision-Invion/git/commits{/sha}",
+        "comments_url": "https://api.github.com/repos/egparadise/SaintVision-Invion/comments{/number}",
+        "issue_comment_url": "https://api.github.com/repos/egparadise/SaintVision-Invion/issues/comments{/number}",
+        "contents_url": "https://api.github.com/repos/egparadise/SaintVision-Invion/contents/{+path}",
+        "compare_url": "https://api.github.com/repos/egparadise/SaintVision-Invion/compare/{base}...{head}",
+        "merges_url": "https://api.github.com/repos/egparadise/SaintVision-Invion/merges",
+        "archive_url": "https://api.github.com/repos/egparadise/SaintVision-Invion/{archive_format}{/ref}",
+        "downloads_url": "https://api.github.com/repos/egparadise/SaintVision-Invion/downloads",
+        "issues_url": "https://api.github.com/repos/egparadise/SaintVision-Invion/issues{/number}",
+        "pulls_url": "https://api.github.com/repos/egparadise/SaintVision-Invion/pulls{/number}",
+        "milestones_url": "https://api.github.com/repos/egparadise/SaintVision-Invion/milestones{/number}",
+        "notifications_url": "https://api.github.com/repos/egparadise/SaintVision-Invion/notifications{?since,all,participating}",
+        "labels_url": "https://api.github.com/repos/egparadise/SaintVision-Invion/labels{/name}",
+        "releases_url": "https://api.github.com/repos/egparadise/SaintVision-Invion/releases{/id}",
+        "deployments_url": "https://api.github.com/repos/egparadise/SaintVision-Invion/deployments"
+      }
+    },
+    "jobs": [
+      {
+        "id": 128544506528,
+        "run_id": 42419449079,
+        "workflow_name": "fleet5-current-three-node-renewal-plan-docs-0bd884ad1c27426e8657328558460d23",
+        "head_branch": "agent/codex/fleet5-current-three-node-renewal-plan-r1-20261108",
+        "run_url": "https://api.github.com/repos/egparadise/SaintVision-Invion/actions/runs/42419449079",
+        "run_attempt": 1,
+        "node_id": "CR_kwDOUTJvXc8AAAAd7dmCoA",
+        "head_sha": "a3c6984fa25c6cf179827e15e4259000e7bd294e",
+        "url": "https://api.github.com/repos/egparadise/SaintVision-Invion/actions/jobs/128544506528",
+        "html_url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/42419449079/job/128544506528",
+        "status": "completed",
+        "conclusion": "success",
+        "created_at": "2026-11-07T22:11:39Z",
+        "started_at": "2026-11-07T22:11:42Z",
+        "completed_at": "2026-11-07T22:12:14Z",
+        "name": "docs",
+        "steps": [
+          {
+            "name": "Set up job",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 1,
+            "started_at": "2026-11-07T22:11:43Z",
+            "completed_at": "2026-11-07T22:11:44Z"
+          },
+          {
+            "name": "Run actions/checkout@v4",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 2,
+            "started_at": "2026-11-07T22:11:44Z",
+            "completed_at": "2026-11-07T22:11:49Z"
+          },
+          {
+            "name": "Run actions/setup-python@v5",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 3,
+            "started_at": "2026-11-07T22:11:49Z",
+            "completed_at": "2026-11-07T22:11:50Z"
+          },
+          {
+            "name": "Run python -m pip install -r requirements-docs.txt",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 4,
+            "started_at": "2026-11-07T22:11:50Z",
+            "completed_at": "2026-11-07T22:11:53Z"
+          },
+          {
+            "name": "Run python tools/check_docs.py",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 5,
+            "started_at": "2026-11-07T22:11:53Z",
+            "completed_at": "2026-11-07T22:11:54Z"
+          },
+          {
+            "name": "Repository path citations exist (ratchet; baseline may only shrink)",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 6,
+            "started_at": "2026-11-07T22:11:54Z",
+            "completed_at": "2026-11-07T22:11:55Z"
+          },
+          {
+            "name": "Run python tools/check_contract_bindings.py",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 7,
+            "started_at": "2026-11-07T22:11:55Z",
+            "completed_at": "2026-11-07T22:12:00Z"
+          },
+          {
+            "name": "Run python tools/check_frontend_integrity.py",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 8,
+            "started_at": "2026-11-07T22:12:00Z",
+            "completed_at": "2026-11-07T22:12:00Z"
+          },
+          {
+            "name": "Report fixture producer reachability",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 9,
+            "started_at": "2026-11-07T22:12:00Z",
+            "completed_at": "2026-11-07T22:12:00Z"
+          },
+          {
+            "name": "Report client route coverage (report-only; promote per \uac80\uc99d\uac80\uc0ac\ub3c4\uad6c_\ubaa9\ub85d)",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 10,
+            "started_at": "2026-11-07T22:12:00Z",
+            "completed_at": "2026-11-07T22:12:01Z"
+          },
+          {
+            "name": "Run actions/upload-artifact@v4",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 11,
+            "started_at": "2026-11-07T22:12:01Z",
+            "completed_at": "2026-11-07T22:12:02Z"
+          },
+          {
+            "name": "Run python tools/test_sync.py",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 12,
+            "started_at": "2026-11-07T22:12:02Z",
+            "completed_at": "2026-11-07T22:12:03Z"
+          },
+          {
+            "name": "Run python tools/check_ontology_generation.py",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 13,
+            "started_at": "2026-11-07T22:12:03Z",
+            "completed_at": "2026-11-07T22:12:04Z"
+          },
+          {
+            "name": "Run python tools/check_ontology.py",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 14,
+            "started_at": "2026-11-07T22:12:04Z",
+            "completed_at": "2026-11-07T22:12:05Z"
+          },
+          {
+            "name": "Build documentation bundle",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 15,
+            "started_at": "2026-11-07T22:12:05Z",
+            "completed_at": "2026-11-07T22:12:08Z"
+          },
+          {
+            "name": "Run actions/upload-artifact@v4",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 16,
+            "started_at": "2026-11-07T22:12:08Z",
+            "completed_at": "2026-11-07T22:12:11Z"
+          },
+          {
+            "name": "Post Run actions/setup-python@v5",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 31,
+            "started_at": "2026-11-07T22:12:11Z",
+            "completed_at": "2026-11-07T22:12:12Z"
+          },
+          {
+            "name": "Post Run actions/checkout@v4",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 32,
+            "started_at": "2026-11-07T22:12:12Z",
+            "completed_at": "2026-11-07T22:12:12Z"
+          },
+          {
+            "name": "Complete job",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 33,
+            "started_at": "2026-11-07T22:12:12Z",
+            "completed_at": "2026-11-07T22:12:12Z"
+          }
+        ],
+        "check_run_url": "https://api.github.com/repos/egparadise/SaintVision-Invion/check-runs/128544506528",
+        "labels": [
+          "ubuntu-latest"
+        ],
+        "runner_id": 1000020625,
+        "runner_name": "GitHub Actions 1000020625",
+        "runner_group_id": 0,
+        "runner_group_name": "GitHub Actions"
+      }
+    ],
+    "artifacts": [
+      {
+        "id": 13593026734,
+        "node_id": "MDg6QXJ0aWZhY3QxMzU5MzAyNjczNA==",
+        "name": "route-coverage-report",
+        "size_in_bytes": 1915,
+        "url": "https://api.github.com/repos/egparadise/SaintVision-Invion/actions/artifacts/13593026734",
+        "archive_download_url": "https://api.github.com/repos/egparadise/SaintVision-Invion/actions/artifacts/13593026734/zip",
+        "expired": false,
+        "digest": "sha256:009658c460a3d1563608f7bd7ff5974000a563aabde7e5216c9bc28a9001e2f1",
+        "created_at": "2026-11-07T22:12:02Z",
+        "updated_at": "2026-11-07T22:12:02Z",
+        "expires_at": "2026-12-07T22:12:01Z",
+        "workflow_run": {
+          "id": 42419449079,
+          "repository_id": 1362259805,
+          "head_repository_id": 1362259805,
+          "head_branch": "agent/codex/fleet5-current-three-node-renewal-plan-r1-20261108",
+          "head_sha": "a3c6984fa25c6cf179827e15e4259000e7bd294e"
+        },
+        "digestSource": "Official GitHub artifact API",
+        "downloadedZIP": "ci-a3c6984fa25c-route-coverage-report.zip",
+        "downloadedZIPVerifiedSHA256": "009658c460a3d1563608f7bd7ff5974000a563aabde7e5216c9bc28a9001e2f1"
+      },
+      {
+        "id": 13592334806,
+        "node_id": "MDg6QXJ0aWZhY3QxMzU5MjMzNDgwNg==",
+        "name": "saintvision-guidelines",
+        "size_in_bytes": 49728626,
+        "url": "https://api.github.com/repos/egparadise/SaintVision-Invion/actions/artifacts/13592334806",
+        "archive_download_url": "https://api.github.com/repos/egparadise/SaintVision-Invion/actions/artifacts/13592334806/zip",
+        "expired": false,
+        "digest": "sha256:13139281d7f91d84905ac9698007276e8d720d973b7017dff7b579f1e28ff700",
+        "created_at": "2026-11-07T22:12:11Z",
+        "updated_at": "2026-11-07T22:12:11Z",
+        "expires_at": "2026-12-07T22:12:08Z",
+        "workflow_run": {
+          "id": 42419449079,
+          "repository_id": 1362259805,
+          "head_repository_id": 1362259805,
+          "head_branch": "agent/codex/fleet5-current-three-node-renewal-plan-r1-20261108",
+          "head_sha": "a3c6984fa25c6cf179827e15e4259000e7bd294e"
+        },
+        "digestSource": "Official GitHub artifact API"
+      }
+    ],
+    "dispatch": {
+      "workflow": "docs",
+      "sourceSHA": "a3c6984fa25c6cf179827e15e4259000e7bd294e",
+      "ref": "agent/codex/fleet5-current-three-node-renewal-plan-r1-20261108",
+      "correlation": "fleet5-current-three-node-renewal-plan-docs-0bd884ad1c27426e8657328558460d23",
+      "atUTC": "2026-11-07T22:11:36.910934+00:00",
+      "dispatchExit": 0,
+      "runID": 42419449079
+    },
+    "all19StepsSuccess": true,
+    "logs": [
+      {
+        "path": "ci-a3c6984fa25c-job-128544506528.log",
+        "bytes": 47421,
+        "SHA256": "41e79fd6957afec1310b42bbb243e2810820f776aebd8c93bb16a2612150ae29",
+        "source": "Official exact-head Docs job log",
+        "consoleResultLines": [
+          "2026-11-07T22:11:54.1078115Z PASS: 24 original hashes, 1291 versioned documents, wiki links, 48 tasks, 12 outcomes, owner/reviewer/skills, dependency DAG.",
+          "2026-11-07T22:12:04.1277045Z PASS: 4 ontology artifacts are graph-equivalent to a fresh generation",
+          "2026-11-07T22:12:05.7337877Z PASS: RDF parsing, defined terms, TTL/JSON-LD equivalence, 48 task mappings, positive SHACL, 4 rejected invalid fixtures, 4 competency queries, Obsidian mirrors."
+        ]
+      }
+    ]
+  },
+  "localMetadataGates": [
+    {
+      "argv": [
+        "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+        "-B",
+        "tools/check_docs.py"
+      ],
+      "atKST": "2026-11-08T07:09:01.362906+09:00",
+      "exit": 0,
+      "stdout": "PASS: 24 original hashes, 1291 versioned documents, wiki links, 48 tasks, 12 outcomes, owner/reviewer/skills, dependency DAG.\r\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+        "-B",
+        "tools/check_ontology.py"
+      ],
+      "atKST": "2026-11-08T07:09:44.643009+09:00",
+      "exit": 0,
+      "stdout": "PASS: RDF parsing, defined terms, TTL/JSON-LD equivalence, 48 task mappings, positive SHACL, 4 rejected invalid fixtures, 4 competency queries, Obsidian mirrors.\r\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+        "-B",
+        "tools/check_doc_path_citations.py",
+        "--ratchet",
+        "--base-ref",
+        "abb7074e3da0d547ac81d3da33dce347d5c656af"
+      ],
+      "atKST": "2026-11-08T07:09:47.493549+09:00",
+      "exit": 0,
+      "stdout": "PASS check_doc_path_citations --ratchet: 290 broken citation(s), all in baseline, none stale, floor unchanged.\r\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+        "-B",
+        "tools/check_doc_single_source.py",
+        "--ratchet"
+      ],
+      "atKST": "2026-11-08T07:09:54.629652+09:00",
+      "exit": 0,
+      "stdout": "PASS check_doc_single_source --ratchet: 16 pairs, all in baseline, none stale.\r\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+        "-B",
+        "tools/sync_obsidian.py",
+        "--check"
+      ],
+      "atKST": "2026-11-08T07:09:55.022838+09:00",
+      "exit": 0,
+      "stdout": "CHECK: 5175 managed files, 2724 pending exports, 0 conflicts. No writes.\r\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "atKST": "2026-11-08T07:10:20.889184+09:00",
+      "exit": 0,
+      "stdout": "",
+      "stderr": "warning: in the working copy of 'docs/vault/30_Development/Agent\ubcc4 \uc791\uc5c5/Codex \uc791\uc5c5 \ud604\ud669.md', CRLF will be replaced by LF the next time Git touches it\n"
+    }
+  ],
+  "postCISyncCHECK": {
+    "atKST": "2026-11-08T07:13:32.828181+09:00",
+    "argv": [
+      "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+      "-B",
+      "tools/sync_obsidian.py",
+      "--check"
+    ],
+    "exit": 0,
+    "stdout": "CHECK: 5184 managed files, 2733 pending exports, 0 conflicts. No writes.\r\n",
+    "stderr": ""
+  },
+  "canonicalState": {
+    "startBytes": 575395,
+    "endBytes": 575395,
+    "postCIBytes": 575395,
+    "startSHA256": "ce2b8d11efab6cc12be57925b0f6504698ec6dbb49ece4ba8a584ef1c4a897b8",
+    "endSHA256": "ce2b8d11efab6cc12be57925b0f6504698ec6dbb49ece4ba8a584ef1c4a897b8",
+    "postCISHA256": "ce2b8d11efab6cc12be57925b0f6504698ec6dbb49ece4ba8a584ef1c4a897b8",
+    "fullBytesEqual": true,
+    "APPLY": false
+  },
+  "changedPaths": [
+    "docs/vault/30_Development/Agent\ubcc4 \uc791\uc5c5/Codex \uc791\uc5c5 \ud604\ud669.md",
+    "docs/vault/30_Development/Current three-Node pilot renewal preflight and recovery plan R1.md",
+    "docs/vault/30_Development/Evidence/fleet5-current-three-node-renewal-plan-r1-20261108-codex/.gitattributes",
+    "docs/vault/30_Development/Evidence/fleet5-current-three-node-renewal-plan-r1-20261108-codex/ci-receipts.py",
+    "docs/vault/30_Development/Evidence/fleet5-current-three-node-renewal-plan-r1-20261108-codex/context.json",
+    "docs/vault/30_Development/Evidence/fleet5-current-three-node-renewal-plan-r1-20261108-codex/local-gates.json",
+    "docs/vault/30_Development/Evidence/fleet5-current-three-node-renewal-plan-r1-20261108-codex/manifest-data-check.json",
+    "docs/vault/30_Development/Evidence/fleet5-current-three-node-renewal-plan-r1-20261108-codex/metadata-gates.py",
+    "docs/vault/30_Development/Evidence/fleet5-current-three-node-renewal-plan-r1-20261108-codex/operation-manifest.json",
+    "docs/vault/30_Development/Evidence/fleet5-current-three-node-renewal-plan-r1-20261108-codex/protected-trees.json",
+    "docs/vault/30_Development/Evidence/fleet5-current-three-node-renewal-plan-r1-20261108-codex/read-pins.json",
+    "docs/vault/30_Development/Evidence/fleet5-current-three-node-renewal-plan-r1-20261108-codex/root-input-pins.json",
+    "docs/vault/30_Development/Evidence/fleet5-current-three-node-renewal-plan-r1-20261108-codex/root-inputs/pc3-actual-cpu-pilot-r1/pc3-cpu-pki-r1/receipt.json",
+    "docs/vault/30_Development/Evidence/fleet5-current-three-node-renewal-plan-r1-20261108-codex/root-inputs/pc3-actual-cpu-pilot-r1/pc3-node-start-r1/receipt.json",
+    "docs/vault/30_Development/Evidence/fleet5-current-three-node-renewal-plan-r1-20261108-codex/root-inputs/three-owned-node-process-reconnect-r1/preflight/PC2.json",
+    "docs/vault/30_Development/Evidence/fleet5-current-three-node-renewal-plan-r1-20261108-codex/root-inputs/three-owned-node-process-reconnect-r1/preflight/PC3.json",
+    "docs/vault/30_Development/Evidence/fleet5-current-three-node-renewal-plan-r1-20261108-codex/root-inputs/three-owned-node-process-reconnect-r1/preflight/PC4.json",
+    "docs/vault/30_Development/Evidence/fleet5-current-three-node-renewal-plan-r1-20261108-codex/root-inputs/three-owned-node-process-reconnect-r1/reconciled-continuation/receipt.json",
+    "docs/vault/30_Development/Evidence/fleet5-current-three-node-renewal-plan-r1-20261108-codex/root-inputs/three-owned-node-process-reconnect-r1/root-independent-metadata-verification.json",
+    "docs/vault/30_Development/Evidence/fleet5-current-three-node-renewal-plan-r1-20261108-codex/root-inputs/three-pc-actual-cpu-pilot-r1/pc24-node-start-r2/node-start-template-remote-program.py.txt",
+    "docs/vault/30_Development/Evidence/fleet5-current-three-node-renewal-plan-r1-20261108-codex/root-inputs/three-pc-actual-cpu-pilot-r1/pc24-node-start-r2/receipt.json",
+    "docs/vault/30_Development/Evidence/fleet5-current-three-node-renewal-plan-r1-20261108-codex/root-inputs/three-pc-actual-cpu-pilot-r1/pc24-pilot-ca-signing-r1/receipt.json",
+    "docs/vault/30_Development/Evidence/fleet5-current-three-node-renewal-plan-r1-20261108-codex/root-inputs/three-pc-actual-cpu-pilot-r1/pc24-pilot-ca-signing-r1/remote-signing-program.py.txt",
+    "docs/vault/30_Development/Evidence/fleet5-current-three-node-renewal-plan-r1-20261108-codex/source-contract-map.json",
+    "docs/vault/30_Development/Evidence/fleet5-current-three-node-renewal-plan-r1-20261108-codex/sync-state-after.json",
+    "docs/vault/30_Development/Evidence/fleet5-current-three-node-renewal-plan-r1-20261108-codex/sync-state-before.json",
+    "docs/vault/30_Development/Evidence/fleet5-current-three-node-renewal-plan-r1-20261108-codex/sync-state-comparison.json",
+    "docs/vault/30_Development/History/2026-11-08_07-08_KST_current_three_node_renewal_plan_Codex.md"
+  ],
+  "patchSHA256": "dbb7d578fd33f03654ade97c67df1b7767fbbece3f86c0834a4c19cd77d35030",
+  "protectedTrees": {
+    "base": "abb7074e3da0d547ac81d3da33dce347d5c656af",
+    "paths": {
+      "apps": {
+        "baseGitObject": "c0150985c59318e2245c8357865a128d7ffaf706",
+        "unchanged": true,
+        "candidateGitObject": "c0150985c59318e2245c8357865a128d7ffaf706"
+      },
+      "contracts": {
+        "baseGitObject": "b2b24a6d9baf24302f3590f4f30fe851ccb81ef1",
+        "unchanged": true,
+        "candidateGitObject": "b2b24a6d9baf24302f3590f4f30fe851ccb81ef1"
+      },
+      "packages": {
+        "baseGitObject": "7c445bdbc929f6597c0b39b598f9726032c67ad7",
+        "unchanged": true,
+        "candidateGitObject": "7c445bdbc929f6597c0b39b598f9726032c67ad7"
+      },
+      "services": {
+        "baseGitObject": "5c9918adc48c76c88b5119f44516bb332924f067",
+        "unchanged": true,
+        "candidateGitObject": "5c9918adc48c76c88b5119f44516bb332924f067"
+      },
+      "src": {
+        "baseGitObject": "5507dfb820d54a8778c4cf5e3551368f11b6105f",
+        "unchanged": true,
+        "candidateGitObject": "5507dfb820d54a8778c4cf5e3551368f11b6105f"
+      },
+      "migrations": {
+        "baseGitObject": "b1d35598829437c39dab7f60e9521bf8627e6832",
+        "unchanged": true,
+        "candidateGitObject": "b1d35598829437c39dab7f60e9521bf8627e6832"
+      },
+      "tests": {
+        "baseGitObject": "f0c6e9f537989b71f57b2185fd43c6abbaf4369e",
+        "unchanged": true,
+        "candidateGitObject": "f0c6e9f537989b71f57b2185fd43c6abbaf4369e"
+      },
+      "tools": {
+        "baseGitObject": "844b01989774dec695b667b571030cdb558e5cb5",
+        "unchanged": true,
+        "candidateGitObject": "844b01989774dec695b667b571030cdb558e5cb5"
+      },
+      "deploy": {
+        "baseGitObject": "40924935653e3c9a83cb4295e72a1463fd8400b3",
+        "unchanged": true,
+        "candidateGitObject": "40924935653e3c9a83cb4295e72a1463fd8400b3"
+      },
+      ".github": {
+        "baseGitObject": "f5cb8563418b74a143bf8b142bc9daaac01ed395",
+        "unchanged": true,
+        "candidateGitObject": "f5cb8563418b74a143bf8b142bc9daaac01ed395"
+      },
+      "skills": {
+        "baseGitObject": "dc117f0b750e4ff029e87b5f7ed53ee2f69862ca",
+        "unchanged": true,
+        "candidateGitObject": "dc117f0b750e4ff029e87b5f7ed53ee2f69862ca"
+      },
+      "docs/sources": {
+        "baseGitObject": "ace2050db53e98c7e876bee7668c8450095ec74d",
+        "unchanged": true,
+        "candidateGitObject": "ace2050db53e98c7e876bee7668c8450095ec74d"
+      },
+      "docs/task-registry.json": {
+        "baseGitObject": "3d7b5be755d15b5f181b9cbbed33b2a8f4b56e87",
+        "unchanged": true,
+        "candidateGitObject": "3d7b5be755d15b5f181b9cbbed33b2a8f4b56e87"
+      },
+      "docs/source-manifest.json": {
+        "baseGitObject": "6558e0566b5b7c019d20b14b53f7c0f63dae1d49",
+        "unchanged": true,
+        "candidateGitObject": "6558e0566b5b7c019d20b14b53f7c0f63dae1d49"
+      }
+    }
+  },
+  "rootInputPins": [
+    {
+      "source": "66b42d572b9ffe31134e191f57d07ca362f0d1af",
+      "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/pc3-actual-cpu-pilot-r1/pc3-cpu-pki-r1/receipt.json",
+      "bytes": 3798,
+      "SHA256": "15ac20406291ad5ffe2ed4fdbfca531ff6f9a036301df4bf8a2306d8770530ea"
+    },
+    {
+      "source": "66b42d572b9ffe31134e191f57d07ca362f0d1af",
+      "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/three-pc-actual-cpu-pilot-r1/pc24-pilot-ca-signing-r1/receipt.json",
+      "bytes": 8708,
+      "SHA256": "fd92f15a44803a99c804289d0dea97c17c90222d4701eb17d445b90aacd99fdc"
+    },
+    {
+      "source": "66b42d572b9ffe31134e191f57d07ca362f0d1af",
+      "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/three-pc-actual-cpu-pilot-r1/pc24-pilot-ca-signing-r1/remote-signing-program.py.txt",
+      "bytes": 5665,
+      "SHA256": "74e47801c4a150cb3a7fb1e47e4417624b040edde20a75fd3f35bb47627f03fa"
+    },
+    {
+      "source": "66b42d572b9ffe31134e191f57d07ca362f0d1af",
+      "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/three-pc-actual-cpu-pilot-r1/pc24-node-start-r2/node-start-template-remote-program.py.txt",
+      "bytes": 6343,
+      "SHA256": "e4dbc30260ab61ef162f45a080143a01f886544c7ff1f8ca8add1f12bdc0a08d"
+    },
+    {
+      "source": "66b42d572b9ffe31134e191f57d07ca362f0d1af",
+      "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/three-owned-node-process-reconnect-r1/preflight/PC3.json",
+      "bytes": 3012,
+      "SHA256": "4831ecc9f937b3238e5160b510009b86e4143075626c95da8f0866ea2ac5b010"
+    },
+    {
+      "source": "66b42d572b9ffe31134e191f57d07ca362f0d1af",
+      "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/three-owned-node-process-reconnect-r1/reconciled-continuation/receipt.json",
+      "bytes": 18707,
+      "SHA256": "a79b7e4ce5dbbbd60f835434678b5115cbb5d7472437304826d98f49d46298d5"
+    },
+    {
+      "source": "66b42d572b9ffe31134e191f57d07ca362f0d1af",
+      "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/three-owned-node-process-reconnect-r1/root-independent-metadata-verification.json",
+      "bytes": 10098,
+      "SHA256": "91d835664a3c7ca365ea871026c51488ace6ae0b0372ce633152a459bb9a5ffb"
+    },
+    {
+      "source": "66b42d572b9ffe31134e191f57d07ca362f0d1af",
+      "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/pc3-actual-cpu-pilot-r1/pc3-node-start-r1/receipt.json",
+      "bytes": 2503,
+      "SHA256": "1b3d1bf9a6504856da8618ba19a7153edaeec05f55efdca5a3ece1ba61a53f97"
+    },
+    {
+      "source": "66b42d572b9ffe31134e191f57d07ca362f0d1af",
+      "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/three-pc-actual-cpu-pilot-r1/pc24-node-start-r2/receipt.json",
+      "bytes": 9758,
+      "SHA256": "38ef758ed2b248403c73891053d36025bddbd9266cc4798c8eeb9b2422e6a1f2"
+    },
+    {
+      "source": "66b42d572b9ffe31134e191f57d07ca362f0d1af",
+      "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/three-owned-node-process-reconnect-r1/preflight/PC2.json",
+      "bytes": 3002,
+      "SHA256": "9f593fab61af65f2c5b0253aaa2168433c176f1f009470f148a00caffed5bda8"
+    },
+    {
+      "source": "66b42d572b9ffe31134e191f57d07ca362f0d1af",
+      "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/three-owned-node-process-reconnect-r1/preflight/PC4.json",
+      "bytes": 2858,
+      "SHA256": "932480d92a0dbee3938c3d905c98f98991c41f571c32c43184681bbd8145c0b1"
+    }
+  ],
+  "sourcePins": [
+    {
+      "source": "1efea494f026e932360c35ae811b6423d874a2e7",
+      "path": "services/node-agent/transport/peer_floor.go",
+      "SHA256": "ac7480132f073fc129f98e1095b7d384313631c2f656ba762f607e1f1d62a2c3",
+      "bytes": 3564,
+      "baseBytesIdentical": true,
+      "ranges": [
+        {
+          "start": 22,
+          "end": 29,
+          "excerpt": "// locking out the serving Node. Missing/incoherent/private state is refused.\nfunc ObservePeerPolicyFloor(config node.Config, state, policy, certPath, keyPath, nonce string, servingPID int) (map[string]any, error) {\n\trejected := errors.New(\"NODE-0041: authenticated actual peer floor unavailable\")\n\tif !peerFloorNonce.MatchString(nonce) || certPath != filepath.Join(filepath.Dir(state), \"node-cert.pem\") || keyPath != filepath.Join(filepath.Dir(state), \"node-key.pem\") {\n\t\treturn nil, rejected\n\t}\n\tcertRaw, err := SafeFile(certPath, false)\n\tif err != nil {"
+        },
+        {
+          "start": 34,
+          "end": 86,
+          "excerpt": "\t\treturn nil, rejected\n\t}\n\tpair, err := tls.X509KeyPair(certRaw, keyRaw)\n\tif err != nil || len(pair.Certificate) == 0 {\n\t\treturn nil, rejected\n\t}\n\tcert, err := x509.ParseCertificate(pair.Certificate[0])\n\tkey, ok := pair.PrivateKey.(ed25519.PrivateKey)\n\tnow := time.Now()\n\tif err != nil || !ok || cert.IsCA || !hasUsage(cert, x509.ExtKeyUsageServerAuth) || len(cert.URIs) != 1 || cert.URIs[0].String() != Identity(config.TenantID, config.NodeID, config.Epoch) || now.Before(cert.NotBefore) || !now.Before(cert.NotAfter) {\n\t\treturn nil, rejected\n\t}\n\tfloor, err := node.ReadPeerPolicyFloor(state, policy, config)\n\tif err != nil {\n\t\treturn nil, err\n\t}\n\tprocessHash, err := node.PeerFloorServingProcess(servingPID, state, policy, config, floor.JournalUID)\n\tif err != nil {\n\t\treturn nil, err\n\t}\n\texecutableHash, err := node.ServingExecutableSHA256(servingPID, floor.JournalUID)\n\tif err != nil {\n\t\treturn nil, err\n\t}\n\tcurrent, err := SafeFile(certPath, false)\n\tif err != nil || sha256.Sum256(current) != sha256.Sum256(certRaw) {\n\t\treturn nil, rejected\n\t}\n\tcurrentKey, err := SafeFile(keyPath, true)\n\tif err != nil || sha256.Sum256(currentKey) != sha256.Sum256(keyRaw) {\n\t\treturn nil, rejected\n\t}\n\tlastFloor, err := node.ReadPeerPolicyFloor(state, policy, config)\n\tif err != nil || lastFloor != floor {\n\t\treturn nil, rejected\n\t}\n\tlastProcess, err := node.PeerFloorServingProcess(servingPID, state, policy, config, floor.JournalUID)\n\tif err != nil || lastProcess != processHash {\n\t\treturn nil, rejected\n\t}\n\tlastExecutable, err := node.ServingExecutableSHA256(servingPID, floor.JournalUID)\n\tif err != nil || lastExecutable != executableHash {\n\t\treturn nil, rejected\n\t}\n\tder := sha256.Sum256(cert.Raw)\n\tbody := map[string]any{\"schemaVersion\": \"saintvision-node-peer-policy-floor:2\", \"tenantId\": config.TenantID, \"nodeId\": config.NodeID, \"recoveryEpoch\": config.Epoch, \"nonce\": nonce, \"observedAt\": now.Unix(), \"certificateDER_SHA256\": hex.EncodeToString(der[:]), \"peerPolicyVersion\": floor.Version, \"peerPolicySHA256\": floor.Hash, \"floorSHA256\": floor.FloorSHA256, \"journalIdentitySHA256\": floor.JournalIdentitySHA256, \"journalUID\": floor.JournalUID, \"servingPID\": servingPID, \"servingProcessSHA256\": processHash, \"servingExecutableSHA256\": executableHash, \"plainServingProcess\": true}\n\traw, err := CanonicalPeerFloorBody(body)\n\tif err != nil {\n\t\treturn nil, rejected\n\t}\n\tbody[\"nodeSignature\"] = hex.EncodeToString(ed25519.Sign(key, append([]byte(PeerFloorDomain), raw...)))\n\treturn body, nil\n}"
+        }
+      ]
+    },
+    {
+      "source": "1efea494f026e932360c35ae811b6423d874a2e7",
+      "path": "services/node-agent/runtime/peer_floor_linux.go",
+      "SHA256": "03ba6c3e1c30c79837f6ccde37f793f6a97210497ff9be2d45a0e3716f73b9c0",
+      "bytes": 13506,
+      "baseBytesIdentical": true,
+      "ranges": [
+        {
+          "start": 36,
+          "end": 102,
+          "excerpt": "\n// Hash descriptor bytes of the actual owned serving executable. This is\n// deliberately distinct from the raw /proc cmdline hash and image digest.\nfunc ServingExecutableSHA256(pid int, uid uint32) (string, error) {\n\tif pid < 1 {\n\t\treturn \"\", peerFloorUnavailable\n\t}\n\tbase := fmt.Sprintf(\"/proc/%d\", pid)\n\tstart := func() (string, error) {\n\t\tinfo, err := os.Stat(base)\n\t\tif err != nil {\n\t\t\treturn \"\", peerFloorUnavailable\n\t\t}\n\t\towner, ok := info.Sys().(*syscall.Stat_t)\n\t\tif !ok || owner.Uid != uid {\n\t\t\treturn \"\", peerFloorUnavailable\n\t\t}\n\t\traw, err := os.ReadFile(base + \"/stat\")\n\t\tend := bytes.LastIndexByte(raw, ')')\n\t\tif err != nil || end < 1 {\n\t\t\treturn \"\", peerFloorUnavailable\n\t\t}\n\t\tfields := strings.Fields(string(raw[end+1:]))\n\t\tif len(fields) < 20 {\n\t\t\treturn \"\", peerFloorUnavailable\n\t\t}\n\t\tif _, err := strconv.ParseUint(fields[19], 10, 64); err != nil {\n\t\t\treturn \"\", peerFloorUnavailable\n\t\t}\n\t\treturn fields[19], nil\n\t}\n\tfirstStart, err := start()\n\tif err != nil {\n\t\treturn \"\", err\n\t}\n\tf, err := os.Open(base + \"/exe\") // intentional kernel proc descriptor link\n\tif err != nil {\n\t\treturn \"\", peerFloorUnavailable\n\t}\n\tdefer f.Close()\n\tbefore, err := f.Stat()\n\tself, selfErr := os.Stat(\"/proc/self/exe\")\n\tif err != nil || selfErr != nil || !before.Mode().IsRegular() || !os.SameFile(before, self) || before.Size() < 1 || before.Size() > 128*1024*1024 {\n\t\treturn \"\", peerFloorUnavailable\n\t}\n\tmetadata, ok := before.Sys().(*syscall.Stat_t)\n\tif !ok || metadata.Uid != uid || metadata.Mode&0022 != 0 {\n\t\treturn \"\", peerFloorUnavailable\n\t}\n\th := sha256.New()\n\tn, err := io.Copy(h, io.LimitReader(f, 128*1024*1024+1))\n\tafter, statErr := f.Stat()\n\tcurrent, currentErr := os.Stat(base + \"/exe\")\n\tlastStart, startErr := start()\n\tif err != nil || n != before.Size() || statErr != nil || currentErr != nil || startErr != nil || firstStart != lastStart || !os.SameFile(before, after) || !os.SameFile(before, current) {\n\t\treturn \"\", peerFloorUnavailable\n\t}\n\tlast, ok := after.Sys().(*syscall.Stat_t)\n\tif !ok || metadata.Size != last.Size || metadata.Mode != last.Mode || metadata.Uid != last.Uid || metadata.Gid != last.Gid || metadata.Nlink != last.Nlink || metadata.Mtim != last.Mtim || metadata.Ctim != last.Ctim {\n\t\treturn \"\", peerFloorUnavailable\n\t}\n\tnamed, ok := current.Sys().(*syscall.Stat_t)\n\tif !ok || named.Size != metadata.Size || named.Mode != metadata.Mode || named.Uid != metadata.Uid || named.Gid != metadata.Gid || named.Nlink != metadata.Nlink || named.Mtim != metadata.Mtim || named.Ctim != metadata.Ctim {\n\t\treturn \"\", peerFloorUnavailable\n\t}\n\treturn hex.EncodeToString(h.Sum(nil)), nil\n}"
+        },
+        {
+          "start": 107,
+          "end": 199,
+          "excerpt": "func PeerFloorServingProcess(pid int, state, policy string, config Config, uid uint32) (string, error) {\n\tif pid < 1 {\n\t\treturn \"\", peerFloorUnavailable\n\t}\n\tbase := fmt.Sprintf(\"/proc/%d\", pid)\n\tinfo, err := os.Stat(base)\n\tif err != nil {\n\t\treturn \"\", peerFloorUnavailable\n\t}\n\towner, ok := info.Sys().(*syscall.Stat_t)\n\tif !ok || owner.Uid != uid {\n\t\treturn \"\", peerFloorUnavailable\n\t}\n\tserving, err := os.Stat(base + \"/exe\")\n\tif err != nil {\n\t\treturn \"\", peerFloorUnavailable\n\t}\n\tself, err := os.Stat(\"/proc/self/exe\")\n\tif err != nil || !os.SameFile(serving, self) {\n\t\treturn \"\", peerFloorUnavailable\n\t}\n\traw, err := os.ReadFile(base + \"/cmdline\")\n\tif err != nil || len(raw) == 0 || len(raw) > 65536 || raw[len(raw)-1] != 0 || !utf8.Valid(raw) {\n\t\treturn \"\", peerFloorUnavailable\n\t}\n\targs := strings.Split(strings.TrimSuffix(string(raw), \"\\x00\"), \"\\x00\")\n\tserve := 0\n\tfor _, arg := range args {\n\t\tname := strings.TrimLeft(strings.SplitN(arg, \"=\", 2)[0], \"-\")\n\t\tif name == \"serve\" && arg != \"--serve\" || name == \"recover\" || name == \"permit\" || name == \"observe-peer-policy-floor\" {\n\t\t\treturn \"\", peerFloorUnavailable\n\t\t}\n\t\tif arg == \"--serve\" {\n\t\t\tserve++\n\t\t}\n\t\tif strings.TrimLeft(strings.SplitN(arg, \"=\", 2)[0], \"-\") == \"storage-policy\" {\n\t\t\treturn \"\", peerFloorUnavailable\n\t\t}\n\t}\n\tif serve != 1 {\n\t\treturn \"\", peerFloorUnavailable\n\t}\n\tparent := filepath.Dir(state)\n\tfor flag, expected := range map[string]string{\"--tenant\": config.TenantID, \"--node\": config.NodeID, \"--epoch\": config.Epoch, \"--state\": state, \"--peer-policy\": policy, \"--tls-cert\": filepath.Join(parent, \"node-cert.pem\"), \"--tls-key\": filepath.Join(parent, \"node-key.pem\"), \"--client-ca\": filepath.Join(parent, \"ca.pem\"), \"--public-key\": filepath.Join(parent, \"signer.pub\")} {\n\t\tcount := 0\n\t\tfor i, arg := range args {\n\t\t\tif strings.TrimLeft(strings.SplitN(arg, \"=\", 2)[0], \"-\") == strings.TrimPrefix(flag, \"--\") && arg != flag {\n\t\t\t\treturn \"\", peerFloorUnavailable\n\t\t\t}\n\t\t\tif arg == flag {\n\t\t\t\tcount++\n\t\t\t\tif i+1 >= len(args) || args[i+1] != expected {\n\t\t\t\t\treturn \"\", peerFloorUnavailable\n\t\t\t\t}\n\t\t\t}\n\t\t}\n\t\tif count != 1 {\n\t\t\treturn \"\", peerFloorUnavailable\n\t\t}\n\t}\n\tprofiles, sockets := 0, 0\n\tfor i, arg := range args {\n\t\tname := strings.TrimLeft(strings.SplitN(arg, \"=\", 2)[0], \"-\")\n\t\tif name == \"profile\" {\n\t\t\tprofiles++\n\t\t\tif arg != \"--profile\" || i+1 >= len(args) || (args[i+1] != \"lan-observe-v1\" && args[i+1] != \"lan-test-v1\" && args[i+1] != \"lan-workspace-v1\") {\n\t\t\t\treturn \"\", peerFloorUnavailable\n\t\t\t}\n\t\t}\n\t\tif name == \"socket\" {\n\t\t\tsockets++\n\t\t\tif arg != \"--socket\" || i+1 >= len(args) || args[i+1] != \"/var/run/docker.sock\" {\n\t\t\t\treturn \"\", peerFloorUnavailable\n\t\t\t}\n\t\t}\n\t}\n\tif profiles != 1 || sockets > 1 {\n\t\treturn \"\", peerFloorUnavailable\n\t}\n\tmounts, err := os.ReadFile(\"/proc/self/mountinfo\")\n\tif err != nil {\n\t\treturn \"\", peerFloorUnavailable\n\t}\n\tfor _, line := range strings.Split(string(mounts), \"\\n\") {\n\t\tfields := strings.Fields(line)\n\t\tif len(fields) > 4 && (fields[4] == \"/contribution\" || strings.HasPrefix(fields[4], \"/contribution/\")) {\n\t\t\treturn \"\", peerFloorUnavailable\n\t\t}\n\t}\n\tdigest := sha256.Sum256(raw)\n\treturn hex.EncodeToString(digest[:]), nil\n}\n"
+        }
+      ]
+    },
+    {
+      "source": "1efea494f026e932360c35ae811b6423d874a2e7",
+      "path": "services/node-agent/runtime/journal.go",
+      "SHA256": "0bf50af78984eed047c1fdb2a10e230a8e7eb4669893539d54d05d454097f9b6",
+      "bytes": 12966,
+      "baseBytesIdentical": true,
+      "ranges": [
+        {
+          "start": 339,
+          "end": 391,
+          "excerpt": "// PinPeerPolicy persists an anti-rollback floor separately from allocation fences.\n// Caller serializes policy updates; the journal process lock prevents other writers.\nfunc (j *Journal) PinPeerPolicy(version int64, hash string) error {\n\tif version < 1 || version > 9007199254740991 || !hexID.MatchString(hash) {\n\t\treturn errors.New(\"NODE-0041: invalid peer policy floor\")\n\t}\n\tpath := filepath.Join(j.root, \".peer-policy\")\n\tvar prior struct {\n\t\tVersion int64\n\t\tHash    string\n\t}\n\tnext := struct {\n\t\tVersion int64\n\t\tHash    string\n\t}{version, hash}\n\terr := readPrivate(path, &prior)\n\tif os.IsNotExist(err) {\n\t\treturn j.create(path, next)\n\t}\n\tif err != nil {\n\t\treturn errors.New(\"NODE-0041: peer policy journal unavailable\")\n\t}\n\tif prior.Version < 1 || !hexID.MatchString(prior.Hash) {\n\t\treturn errors.New(\"NODE-0041: corrupt peer policy floor\")\n\t}\n\tif version < prior.Version || (version == prior.Version && hash != prior.Hash) {\n\t\treturn errors.New(\"NODE-0041: peer policy rollback rejected\")\n\t}\n\tif next == prior {\n\t\treturn nil\n\t}\n\tfile, err := os.CreateTemp(j.root, \".peer-policy-\")\n\tif err != nil {\n\t\treturn err\n\t}\n\traw, _ := json.Marshal(next)\n\t_, err = file.Write(raw)\n\tif err == nil {\n\t\terr = file.Sync()\n\t}\n\tname := file.Name()\n\tcloseErr := file.Close()\n\tif err == nil {\n\t\terr = closeErr\n\t}\n\tif err == nil {\n\t\terr = os.Rename(name, path)\n\t}\n\tif err == nil {\n\t\terr = j.syncDir()\n\t}\n\treturn err\n}"
+        }
+      ]
+    },
+    {
+      "source": "1efea494f026e932360c35ae811b6423d874a2e7",
+      "path": "services/node-agent/transport/trust.go",
+      "SHA256": "3b5dd89f9d6bdeb777d81f822688ece6c04b549080f53e8f7487bf70789b20df",
+      "bytes": 5422,
+      "baseBytesIdentical": true,
+      "ranges": [
+        {
+          "start": 50,
+          "end": 100,
+          "excerpt": "\tpem, err := SafeFile(ca, false)\n\tif err != nil {\n\t\treturn nil, err\n\t}\n\troots := x509.NewCertPool()\n\tif !roots.AppendCertsFromPEM(pem) {\n\t\treturn nil, errors.New(\"NODE-0042: explicit client CA required\")\n\t}\n\ta := &Authority{config: config, policyPath: policy, roots: roots, pin: pin}\n\tif pin == nil {\n\t\treturn nil, errors.New(\"NODE-0041: durable policy floor required\")\n\t}\n\tif _, err := a.policy(); err != nil {\n\t\treturn nil, err\n\t}\n\treturn a, nil\n}\nfunc (a *Authority) policy() (contracts.NodePeerPolicy, error) {\n\ta.mutex.Lock()\n\tdefer a.mutex.Unlock()\n\tvar policy contracts.NodePeerPolicy\n\traw, err := SafeFile(a.policyPath, false)\n\tif err != nil {\n\t\treturn policy, err\n\t}\n\tif err = wire.Validate(\"NodePeerPolicy\", raw); err != nil {\n\t\treturn policy, err\n\t}\n\tif err = json.Unmarshal(raw, &policy); err != nil {\n\t\treturn policy, err\n\t}\n\tif string(policy.TenantId) != a.config.TenantID || string(policy.NodeId) != a.config.NodeID || policy.RecoveryEpoch != a.config.Epoch {\n\t\treturn policy, errors.New(\"NODE-0041: peer policy scope differs\")\n\t}\n\thash := sha256.Sum256(raw)\n\tif err = a.pin(policy.Version, hex.EncodeToString(hash[:])); err != nil {\n\t\treturn policy, err\n\t}\n\texpiry, err := time.Parse(time.RFC3339Nano, string(policy.ExpiresAt))\n\tnow := time.Now()\n\tif err != nil || !expiry.After(now) || expiry.After(now.Add(7*24*time.Hour)) {\n\t\treturn policy, errors.New(\"NODE-0041: peer policy expired or unbounded\")\n\t}\n\treturn policy, nil\n}\nfunc hasUsage(cert *x509.Certificate, usage x509.ExtKeyUsage) bool {\n\tfor _, actual := range cert.ExtKeyUsage {\n\t\tif actual == usage {\n\t\t\treturn true\n\t\t}\n\t}"
+        },
+        {
+          "start": 133,
+          "end": 154,
+          "excerpt": "\t\t\treturn nil, err\n\t\t}\n\t\tkeyPEM, err := SafeFile(keyPath, true)\n\t\tif err != nil {\n\t\t\treturn nil, err\n\t\t}\n\t\tpair, err := tls.X509KeyPair(certPEM, keyPEM)\n\t\tif err != nil || len(pair.Certificate) == 0 {\n\t\t\treturn nil, errors.New(\"NODE-0042: TLS key pair rejected\")\n\t\t}\n\t\tleaf, err := x509.ParseCertificate(pair.Certificate[0])\n\t\tnow := time.Now()\n\t\tif err != nil || leaf.IsCA || !hasUsage(leaf, x509.ExtKeyUsageServerAuth) || len(leaf.URIs) != 1 || leaf.URIs[0].String() != Identity(a.config.TenantID, a.config.NodeID, a.config.Epoch) || now.Before(leaf.NotBefore) || !now.Before(leaf.NotAfter) {\n\t\t\treturn nil, errors.New(\"NODE-0042: Node server identity rejected\")\n\t\t}\n\t\treturn &pair, nil\n\t}\n\tif _, err := get(nil); err != nil {\n\t\treturn nil, err\n\t}\n\treturn &tls.Config{MinVersion: tls.VersionTLS13, ClientAuth: tls.RequireAndVerifyClientCert, ClientCAs: a.roots, GetCertificate: get, SessionTicketsDisabled: true, NextProtos: []string{\"http/1.1\"}, VerifyConnection: func(s tls.ConnectionState) error { return a.Authorize(&s) }}, nil\n}"
+        }
+      ]
+    },
+    {
+      "source": "1efea494f026e932360c35ae811b6423d874a2e7",
+      "path": "services/node-agent/transport/server.go",
+      "SHA256": "c9c98084798eeda52a8f38bebc6a13f5e531deaf3c0016e4295ade19a500b8a2",
+      "bytes": 10103,
+      "baseBytesIdentical": true,
+      "ranges": [
+        {
+          "start": 55,
+          "end": 97,
+          "excerpt": "func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {\n\tif h.authority.Authorize(r.TLS) != nil {\n\t\treject(w, 403)\n\t\treturn\n\t}\n\tprobe := r.URL.Path == \"/v1/heartbeats\"\n\tsnapshot := r.URL.Path == \"/v1/snapshots\"\n\tchunk := r.URL.Path == \"/v1/objects/read\"\n\tterminal := r.URL.Path == \"/v1/terminals/frame\"\n\tcancelling := r.URL.Path == \"/v1/executions/cancel\"\n\tquarantine := r.URL.Path == \"/v1/builds/quarantine\"\n\tstorageSample := r.URL.Path == \"/v1/storage/sample\"\n\tif r.Method != \"POST\" || (r.URL.Path != \"/v1/executions\" && r.URL.Path != \"/v1/executions/receipts\" && !probe && !cancelling && !quarantine && !snapshot && !chunk && !terminal && !storageSample) || r.URL.RawQuery != \"\" || r.URL.RawPath != \"\" {\n\t\treject(w, 404)\n\t\treturn\n\t}\n\tif r.Header.Get(\"Content-Type\") != \"application/json\" || r.Header.Get(\"Content-Encoding\") != \"\" {\n\t\treject(w, 415)\n\t\treturn\n\t}\n\tslot := h.slot\n\tif probe || cancelling || quarantine || snapshot {\n\t\tslot = h.controlSlot\n\t}\n\tif chunk {\n\t\tslot = h.transferSlot\n\t}\n\tif terminal {\n\t\tslot = h.terminalSlot\n\t}\n\tif storageSample {\n\t\tif h.storage == nil {\n\t\t\treject(w, 503)\n\t\t\treturn\n\t\t}\n\t\tslot = h.storageSlot\n\t}\n\tselect {\n\tcase slot <- struct{}{}:\n\t\tdefer func() { <-slot }()\n\tdefault:\n\t\treject(w, 429)\n\t\treturn"
+        }
+      ]
+    },
+    {
+      "source": "1efea494f026e932360c35ae811b6423d874a2e7",
+      "path": "services/node-agent/cmd/inv-node/main.go",
+      "SHA256": "3471f3fa13ea9ac4d27fd27ca04747a1adf2348692f846484c39f28755c23a9a",
+      "bytes": 7307,
+      "baseBytesIdentical": true,
+      "ranges": [
+        {
+          "start": 55,
+          "end": 70,
+          "excerpt": "\tflag.BoolVar(&observePeerFloor, \"observe-peer-policy-floor\", false, \"read/sign existing durable peer floor without journal mutation\")\n\tflag.StringVar(&peerFloorNonce, \"peer-floor-nonce\", \"\", \"fresh operator peer-floor observation nonce\")\n\tflag.IntVar(&peerFloorServingPID, \"peer-floor-serving-pid\", 1, \"actual serving inv-node PID (container default 1)\")\n\tflag.Parse()\n\tif observePeerFloor {\n\t\tif !strictPeerFloorArguments(os.Args[1:]) || serve || recoverOnly || permit != \"\" || storagePolicy != \"\" || state == \"\" || config.TenantID == \"\" || config.NodeID == \"\" || config.Epoch == \"\" {\n\t\t\treturn fmt.Errorf(\"NODE-0005: exclusive explicit peer floor observation required\")\n\t\t}\n\t\tresult, err := transport.ObservePeerPolicyFloor(config, state, peerPolicy, tlsCert, tlsKey, peerFloorNonce, peerFloorServingPID)\n\t\tif err != nil {\n\t\t\treturn err\n\t\t}\n\t\treturn json.NewEncoder(os.Stdout).Encode(result)\n\t}\n\tif serve && (recoverOnly || permit != \"\") {\n\t\treturn fmt.Errorf(\"NODE-0005: choose one execution mode\")"
+        }
+      ]
+    },
+    {
+      "source": "1efea494f026e932360c35ae811b6423d874a2e7",
+      "path": "deploy/lan/worker_config.py",
+      "SHA256": "909d1c25deb61c5c4795af49dab18f5a9722e5cbc1c034a18472b6a4427c192c",
+      "bytes": 16855,
+      "baseBytesIdentical": true,
+      "ranges": [
+        {
+          "start": 239,
+          "end": 270,
+          "excerpt": "def repair_target(manifest, container):\n    name='saintvision-'+manifest['nodeId'].lower()\n    config=container.get('Config',{})\n    state=container.get('State',{})\n    if (container.get('Name')!='/'+name\n            or config.get('Labels',{}).get('ai.saintvision.node')!=manifest['nodeId']\n            or state.get('Status') not in ('exited','created')\n            or state.get('Running') or state.get('Restarting')\n            or config.get('User','')!=''):\n        raise ValueError('Repair requires this Node\\'s stopped root-user container')\n    mounts=[m for m in container.get('Mounts',[]) if m.get('Destination')=='/state']\n    if (len(mounts)!=1 or mounts[0].get('Type')!='volume'\n            or mounts[0].get('Name')!=name+'-state' or not mounts[0].get('RW')):\n        raise ValueError('Repair state volume differs; journal preserved')\n    args=config.get('Cmd',[])\n    required={'--node':manifest['nodeId'],'--tenant':manifest['tenantId'],\n              '--epoch':manifest['epoch'],'--state':'/state/journal',\n              '--public-key':'/state/signer.pub','--tls-key':'/state/node-key.pem',\n              '--tls-cert':'/state/node-cert.pem','--client-ca':'/state/ca.pem',\n              '--peer-policy':'/state/peer-policy.json'}\n    for flag,value in required.items():\n        if args.count(flag)!=1 or args[args.index(flag)+1:args.index(flag)+2]!=[value]:\n            raise ValueError('Repair container identity or file path differs: '+flag)\n\n\ndef check_running(container):\n    baseline=None\n    for attempt in range(6):\n        raw=subprocess.run(['docker','inspect','--format',\n                            '{{.State.Running}} {{.State.Restarting}} {{.RestartCount}}',container],\n                           capture_output=True, text=True, check=True, timeout=10).stdout.strip()\n        parts=raw.split()"
+        }
+      ]
+    },
+    {
+      "source": "1efea494f026e932360c35ae811b6423d874a2e7",
+      "path": "deploy/lan/worker_peer_floor.py",
+      "SHA256": "7665735eb5735be9fcb24f783f83ffe087c0d176e464a97df3022a4bd9f35799",
+      "bytes": 21083,
+      "baseBytesIdentical": true,
+      "ranges": [
+        {
+          "start": 126,
+          "end": 175,
+          "excerpt": "    for flag in (\"--state\", \"--peer-policy\", \"--tls-cert\", \"--tls-key\", \"--profile\"):\n        if args.count(flag) != 1 or not args[args.index(flag) + 1:args.index(flag) + 2]:\n            raise ValueError(\"Actual Node floor path/profile arguments are ambiguous\")\n    if args[args.index(\"--state\") + 1] != \"/state/journal\" or args[args.index(\"--peer-policy\") + 1] != \"/state/peer-policy.json\":\n        raise ValueError(\"Actual Node state paths require an explicit supported migration\")\n    if args[args.index(\"--profile\") + 1] not in (\"lan-observe-v1\", \"lan-test-v1\", \"lan-workspace-v1\"):\n        raise ValueError(\"Unsupported plain Node profile\")\n    for arg in args:\n        if arg.split(\"=\", 1)[0] in (\"--socket\", \"-socket\"):\n            if arg != \"--socket\" or args.count(\"--socket\") != 1 or args[args.index(arg) + 1:args.index(arg) + 2] != [\"/var/run/docker.sock\"]:\n                raise ValueError(\"Only the existing default local daemon is supported\")\n    sockets = 0\n    for mount in value.get(\"Mounts\", []):\n        if mount.get(\"Destination\") == \"/state\":\n            continue\n        if (mount.get(\"Destination\") == \"/var/run/docker.sock\" and mount.get(\"Type\") == \"bind\"\n                and mount.get(\"Source\") == \"/var/run/docker.sock\" and mount.get(\"RW\") is True\n                and mount.get(\"Propagation\") == \"rprivate\"):\n            sockets += 1\n            if sockets == 1:\n                continue\n        raise ValueError(\"Contribution or unknown mounts require separately accepted renewal\")\n    host = value.get(\"HostConfig\", {})\n    if host.get(\"Privileged\") or not host.get(\"ReadonlyRootfs\"):\n        raise ValueError(\"Plain Node container isolation differs\")\n    if not re.fullmatch(r\"[a-f0-9]{64}\", value.get(\"Id\", \"\")):\n        raise ValueError(\"Actual container identity differs\")\n    if not current and (value[\"State\"].get(\"Running\") or host.get(\"RestartPolicy\", {}).get(\"Name\") != \"no\"):\n        raise ValueError(\"A retained backup may not be a state-volume writer\")\n    return args\n\n\ndef target(worker_root):\n    no_migration(worker_root, leaf_observation=True)\n    manifest = phase.strict(regular(Path(worker_root) / \"manifest.json\"))\n    node = manifest[\"nodeId\"]\n    if not re.fullmatch(r\"nod_[0-9A-HJKMNP-TV-Z]{26}\", node):\n        raise ValueError(\"Actual Node identity is invalid\")\n    name = \"saintvision-\" + node.lower()\n    value = phase.strict(docker(\"container\", \"inspect\", name))[0]\n    args = _plain(manifest, value)\n    volume_name = name + \"-state\"\n    volume = phase.strict(docker(\"volume\", \"inspect\", volume_name))[0]\n    if volume.get(\"Name\") != volume_name or volume.get(\"Labels\", {}).get(\"ai.saintvision.node\") != node:\n        raise ValueError(\"Actual Node state volume ownership differs\")\n    consumers = docker(\"ps\", \"-aq\", \"--no-trunc\", \"--filter\", \"volume=\" + volume_name).decode().split()\n    if value[\"Id\"] not in consumers or len(consumers) > 2 or len(consumers) != len(set(consumers)):\n        raise ValueError(\"Actual Node state volume consumers differ\")\n    # Workspace preserves exactly one fenced predecessor. It is not a separate\n    # journal backup and is never restarted here. Unknown consumers are refused."
+        }
+      ]
+    },
+    {
+      "source": "1efea494f026e932360c35ae811b6423d874a2e7",
+      "path": "deploy/lan/peer_policy_phase.py",
+      "SHA256": "8aac0c65fb2a242b08287ba4206e6c7213fc18795903584b5b28abf3a10c17f8",
+      "bytes": 10466,
+      "baseBytesIdentical": true,
+      "ranges": [
+        {
+          "start": 11,
+          "end": 30,
+          "excerpt": "SCHEMA = \"saintvision-lan-leaf-rotation:3\"\nBATCH_SCHEMA = \"saintvision-lan-leaf-rotation-batch:3\"\nMAX_VERSION = 9007199254740991\nCLOCK_SKEW_SECONDS = 30\nFRESH_SECONDS = 120\nMIN_EXPIRY_SECONDS = 600\nPEER_FIELDS = {\n    \"currentPeerPolicyVersion\", \"currentPeerPolicySHA256\",\n    \"overlapPeerPolicyVersion\", \"overlapPeerPolicySHA256\",\n    \"finalPeerPolicyVersion\", \"finalPeerPolicySHA256\", \"floorObservationSHA256\",\n}\nEXTRA_FILES = (\"previous-node-cert.pem\", \"previous-peer-policy.json\", \"peer-floor-observation.json\")\nFLOOR_KEYS = {\n    \"schemaVersion\", \"tenantId\", \"nodeId\", \"recoveryEpoch\", \"nonce\", \"observedAt\",\n    \"certificateDER_SHA256\", \"peerPolicyVersion\", \"peerPolicySHA256\", \"floorSHA256\",\n    \"journalIdentitySHA256\", \"journalUID\", \"nodeSignature\",\n    \"servingPID\", \"servingProcessSHA256\", \"servingExecutableSHA256\", \"plainServingProcess\",\n}\nDOMAIN = b\"saintvision/node-peer-policy-floor/v2\\x00\"\nHEX = re.compile(r\"[0-9a-f]{64}\\Z\")"
+        },
+        {
+          "start": 87,
+          "end": 98,
+          "excerpt": "def versions(manifest):\n    p = version(manifest[\"currentPeerPolicyVersion\"], 2) - 2\n    if manifest[\"overlapPeerPolicyVersion\"] != p + 1 or manifest[\"finalPeerPolicyVersion\"] != p + 2:\n        raise ValueError(\"Peer phases must be exact independent P+1/P+2\")\n    version(manifest[\"overlapPeerPolicyVersion\"])\n    version(manifest[\"finalPeerPolicyVersion\"])\n    version(manifest[\"targetChannelVersion\"])\n    if manifest[\"targetChannelVersion\"] != version(manifest[\"currentChannelVersion\"], 1):\n        raise ValueError(\"Channel CAS must remain exactly C+1\")\n    for key in PEER_FIELDS - {\"currentPeerPolicyVersion\", \"overlapPeerPolicyVersion\", \"finalPeerPolicyVersion\"}:\n        if not isinstance(manifest.get(key), str) or not HEX.fullmatch(manifest[key]):\n            raise ValueError(\"Peer phase digest is invalid\")"
+        },
+        {
+          "start": 110,
+          "end": 175,
+          "excerpt": "def current_policy(raw, *, version_number, scope, control_fingerprint, now):\n    value = strict(raw)\n    if (not isinstance(value, dict) or set(value) != {\"version\", \"tenantId\", \"nodeId\", \"recoveryEpoch\", \"expiresAt\", \"clientFingerprints\"}\n            or type(value[\"version\"]) is not int or value[\"version\"] != version_number\n            or (value[\"tenantId\"], value[\"nodeId\"], value[\"recoveryEpoch\"]) != (scope[\"tenantId\"], scope[\"nodeId\"], scope.get(\"recoveryEpoch\", scope.get(\"epoch\")))\n            or value[\"clientFingerprints\"] != [control_fingerprint]):\n        raise ValueError(\"Current peer policy scope, version or CP pin differs\")\n    expiry = datetime.fromisoformat(value[\"expiresAt\"].replace(\"Z\", \"+00:00\"))\n    if expiry.tzinfo is None or not now < expiry <= now + timedelta(days=7):\n        raise ValueError(\"Current peer authority is expired or unbounded; separate offline recovery required\")\n    return value\n\n\ndef validate_policy(raw, manifest, phase, *, now=None, before_write=False):\n    value = strict(raw)\n    expected = {\n        \"version\": manifest[phase + \"PeerPolicyVersion\"],\n        \"tenantId\": manifest[\"tenantId\"], \"nodeId\": manifest[\"nodeId\"],\n        \"recoveryEpoch\": manifest[\"recoveryEpoch\"],\n        \"expiresAt\": manifest[\"overlapExpiresAt\"] if phase == \"overlap\" else manifest[\"certificateNotAfter\"],\n        \"clientFingerprints\": ([manifest[\"currentControlCertificateSHA256\"], manifest[\"nextControlCertificateSHA256\"]]\n                               if phase == \"overlap\" else [manifest[\"nextControlCertificateSHA256\"]]),\n    }\n    if value != expected or type(value.get(\"version\")) is not int or digest(raw) != manifest[phase + \"PeerPolicySHA256\"]:\n        raise ValueError(\"Exact peer phase policy differs\")\n    if before_write:\n        now = now or datetime.now(timezone.utc)\n        expiry = datetime.fromisoformat(value[\"expiresAt\"].replace(\"Z\", \"+00:00\"))\n        if expiry.tzinfo is None or not now + timedelta(seconds=MIN_EXPIRY_SECONDS + CLOCK_SKEW_SECONDS) < expiry <= now + timedelta(days=7, seconds=-CLOCK_SKEW_SECONDS):\n            raise ValueError(\"Peer policy expiry is unsafe before active publication\")\n    return value\n\n\ndef verify_floor(value, certificate_raw, scope, *, nonce=None, now=None, fresh=True):\n    if not isinstance(value, dict) or set(value) != FLOOR_KEYS or value[\"schemaVersion\"] != \"saintvision-node-peer-policy-floor:2\":\n        raise ValueError(\"Actual Node floor observation shape differs\")\n    version(value[\"peerPolicyVersion\"])\n    if type(value[\"observedAt\"]) is not int or type(value[\"journalUID\"]) is not int or not 0 <= value[\"journalUID\"] <= 4294967295:\n        raise ValueError(\"Actual Node floor observation integer differs\")\n    if type(value[\"servingPID\"]) is not int or value[\"servingPID\"] < 1 or value[\"plainServingProcess\"] is not True:\n        raise ValueError(\"Actual serving plain Node process is unproved\")\n    for key in (\"nonce\", \"certificateDER_SHA256\", \"peerPolicySHA256\", \"floorSHA256\", \"journalIdentitySHA256\", \"servingProcessSHA256\", \"servingExecutableSHA256\"):\n        if not isinstance(value[key], str) or not HEX.fullmatch(value[key]):\n            raise ValueError(\"Actual Node floor observation digest differs\")\n    if nonce is not None and value[\"nonce\"] != nonce:\n        raise ValueError(\"Actual Node floor observation nonce differs\")\n    if (value[\"tenantId\"], value[\"nodeId\"], value[\"recoveryEpoch\"]) != (scope[\"tenantId\"], scope[\"nodeId\"], scope.get(\"recoveryEpoch\", scope.get(\"epoch\"))):\n        raise ValueError(\"Actual Node floor identity differs\")\n    cert = x509.load_pem_x509_certificate(certificate_raw)\n    observed = datetime.fromtimestamp(value[\"observedAt\"], timezone.utc)\n    uri = f'spiffe://saintvision.ai/tenant/{value[\"tenantId\"]}/node/{value[\"nodeId\"]}/epoch/{value[\"recoveryEpoch\"]}'\n    if (cert.fingerprint(hashes.SHA256()).hex() != value[\"certificateDER_SHA256\"]\n            or cert.extensions.get_extension_for_class(x509.BasicConstraints).value.ca\n            or cert.extensions.get_extension_for_class(x509.SubjectAlternativeName).value.get_values_for_type(x509.UniformResourceIdentifier) != [uri]\n            or ExtendedKeyUsageOID.SERVER_AUTH not in cert.extensions.get_extension_for_class(x509.ExtendedKeyUsage).value\n            or not cert.not_valid_before_utc <= observed < cert.not_valid_after_utc):\n        raise ValueError(\"Actual Node floor certificate binding differs\")\n    if fresh:\n        now = now or datetime.now(timezone.utc)\n        if not -CLOCK_SKEW_SECONDS <= (now - observed).total_seconds() <= FRESH_SECONDS:\n            raise ValueError(\"Actual Node floor observation is stale or clock-uncertain\")\n    signature = value[\"nodeSignature\"]\n    if not isinstance(signature, str) or not re.fullmatch(r\"[0-9a-f]{128}\", signature):\n        raise ValueError(\"Actual Node floor signature differs\")\n    body = {key: item for key, item in value.items() if key != \"nodeSignature\"}\n    cert.public_key().verify(bytes.fromhex(signature), DOMAIN + floor_canonical(body))"
+        }
+      ]
+    },
+    {
+      "source": "1efea494f026e932360c35ae811b6423d874a2e7",
+      "path": "deploy/lan/worker_plain_rotation.py",
+      "SHA256": "bf3754a27f748b1dd58a7fc65a1f1831dddae6133f11ae17d0f7bf3ea59c46e5",
+      "bytes": 25708,
+      "baseBytesIdentical": true,
+      "ranges": [
+        {
+          "start": 126,
+          "end": 190,
+          "excerpt": "            raise ValueError(\"Actual floor is outside this install phase; do not recompute generations\")\n        if record is None:\n            if observed_phase != \"current\" or observed[\"certificateDER_SHA256\"] != manifest[\"currentNodeCertificateSHA256\"]:\n                raise ValueError(\"Initial actual pre-floor/current DER differs\")\n            proposal_floor = phase.strict(files['peer-floor-observation.json'])\n            for field in ('floorSHA256','journalIdentitySHA256','journalUID','servingProcessSHA256','servingExecutableSHA256'):\n                if observed[field] != proposal_floor[field]:\n                    raise ValueError('Actual current process/journal differs from the frozen proposal observation')\n            if (legacy._regular(root / \"node-cert.pem\") != files[\"previous-node-cert.pem\"]\n                    or legacy._regular(root / \"peer-policy.json\") != files[\"previous-peer-policy.json\"]):\n                raise ValueError(\"Existing host public bytes differ from the frozen actual current tuple\")\n            backup = root / \"leaf-rotation-backup\" / manifest[\"rotationId\"]\n            legacy._owned_directory(backup.parent)\n            legacy._owned_directory(backup)\n            for name in (\"node-cert.pem\", \"peer-policy.json\"):\n                body = legacy._regular(root / name)\n                if (backup / name).exists() and legacy._regular(backup / name) != body:\n                    raise ValueError(\"Prior public material backup collision\")\n                if not (backup / name).exists():\n                    legacy._atomic(backup / name, body)\n            # This conservative durable barrier PRECEDES every host/live policy\n            # exposure. Never infer rollback permission from a later old floor.\n            record = {**frozen, \"phase\": \"installing\", \"restartRequired\": True,\n                      \"peerSchemaVersion\": 3, \"publicationIntent\": True,\n                      \"peerPhaseBinding\": phase.binding(manifest),\n                      \"prePeerFloor\": observed, \"targetContext\": target}\n            legacy._atomic(root / \"leaf-rotation.json\", phase.canonical(record))\n            kill(\"after-publication-intent\")\n        if (record.get(\"publicationIntent\") is not True or record.get(\"peerSchemaVersion\") != 3\n                or record.get(\"peerPhaseBinding\") != phase.binding(manifest)):\n            raise ValueError(\"Frozen publication intent differs; unknown state is blocked\")\n        _verify_record(record, manifest, files, raw)\n        if record.get(\"phase\") == \"restarted\":\n            phase.match_floor(observed, manifest, \"overlap\")\n            return record[\"receipt\"]\n        if record.get(\"phase\") not in {\"installing\", \"installed\"}:\n            raise ValueError(\"Unknown normal :3 state is blocked\")\n        _target(root, record)\n        kill(\"before-install\")\n        legacy._atomic(root / \"node-cert.pem\", files[\"node-cert.pem\"])\n        kill(\"after-node-certificate\")\n        legacy._atomic(root / \"peer-policy.json\", files[\"peer-policy-overlap.json\"])\n        kill(\"after-overlap-publication\")\n        record = {**record, \"phase\": \"installed\"}\n        legacy._atomic(root / \"leaf-rotation.json\", phase.canonical(record))\n        kill(\"before-restart\")\n        restart(root)\n        kill(\"after-restart-before-ack\")\n        _target(root, record)\n        post = _floor(root, manifest, files)\n        phase.match_floor(post, manifest, \"overlap\")\n        if post['servingExecutableSHA256'] != record['prePeerFloor']['servingExecutableSHA256']:\n            raise ValueError('Renewal changed serving executable')\n        if post[\"certificateDER_SHA256\"] != manifest[\"nextNodeCertificateSHA256\"]:\n            raise ValueError(\"Actual restarted Node DER differs\")\n        body = {\"schemaVersion\": phase.SCHEMA, **frozen, \"nodeId\": manifest[\"nodeId\"],\n                \"installedNodeCertificateSHA256\": manifest[\"nextNodeCertificateSHA256\"],\n                \"installedAt\": datetime.now(timezone.utc).isoformat().replace(\"+00:00\", \"Z\"), \"restartObserved\": True,\n                **phase.binding(manifest), \"prePeerFloor\": record[\"prePeerFloor\"], \"postPeerFloor\": post}\n        receipt = _sign(root, body)\n        record = {**record, \"phase\": \"restarted\", \"restartRequired\": False, \"receipt\": receipt}\n        legacy._atomic(root / \"leaf-rotation.json\", phase.canonical(record))\n        return receipt\n\n"
+        },
+        {
+          "start": 194,
+          "end": 265,
+          "excerpt": "    root = Path(worker_root)\n    from worker_config import no_migration\n    no_migration(root)\n    with legacy._exclusive(root / \"leaf-rotation.lock\"):\n        record = _record(root)\n        if not record or record.get(\"peerSchemaVersion\") != 3 or record.get(\"phase\") not in {\"restarted\", \"finalizing\", \"finalized\"}:\n            raise ValueError(\"Exact normal :3 overlap/final state required\")\n        validated = legacy.validate_bundle(bundle, root, now=now, installed=True, finalized=record[\"phase\"] == \"finalized\")\n        manifest, files = validated[\"manifest\"], validated[\"files\"]\n        raw = legacy._regular(Path(bundle) / \"rotation.json\")\n        expected = phase.commit_body(manifest, raw)\n        receipt_raw = legacy._regular(Path(commit_receipt))\n        receipt = phase.strict(receipt_raw)\n        if not phase.signed_shape(receipt, expected, \"controlSignature\"):\n            raise ValueError(\"CP commit does not bind exact final peer P+2/hash\")\n        from cryptography import x509\n        x509.load_pem_x509_certificate(files[\"control-cert.pem\"]).public_key().verify(bytes.fromhex(receipt[\"controlSignature\"]), legacy._canonical(expected))\n        if any(record.get(k) != v for k, v in identity(manifest, raw).items()):\n            raise ValueError(\"Finalization proposal differs\")\n        _verify_record(record, manifest, files, raw)\n        _target(root, record)\n        observed = _floor(root, manifest, files)\n        overlap = (manifest[\"overlapPeerPolicyVersion\"], manifest[\"overlapPeerPolicySHA256\"])\n        final = (manifest[\"finalPeerPolicyVersion\"], manifest[\"finalPeerPolicySHA256\"])\n        actual = (observed[\"peerPolicyVersion\"], observed[\"peerPolicySHA256\"])\n        if actual not in {overlap, final}:\n            raise ValueError(\"Actual floor is outside exact overlap/final phases\")\n        if record[\"phase\"] == \"finalized\" and actual != final:\n            raise ValueError(\"Finalized journal disagrees with actual final floor\")\n        if actual == overlap:\n            phase.validate_policy(files[\"peer-policy-final.json\"], manifest, \"final\", now=now, before_write=True)\n            record = {**record, \"phase\": \"finalizing\", \"restartRequired\": True}\n            legacy._atomic(root / \"leaf-rotation.json\", phase.canonical(record))\n            legacy._atomic(root / \"peer-policy.json\", files[\"peer-policy-final.json\"])\n            restart(root)\n            _target(root, record)\n            observed = _floor(root, manifest, files)\n            phase.match_floor(observed, manifest, \"final\")\n        if legacy._regular(root / \"peer-policy.json\") != files[\"peer-policy-final.json\"]:\n            raise ValueError(\"Exact final bytes differ; never reinstall overlap\")\n        phase.match_floor(observed, manifest, \"final\")\n        if observed['servingExecutableSHA256'] != record['prePeerFloor']['servingExecutableSHA256']:\n            raise ValueError('Finalization changed serving executable')\n        # Freeze the first authenticated final observation durably before archive\n        # publication. A replay's fresh nonce must never change immutable bytes.\n        final_floor = record.get(\"finalPeerFloor\", observed)\n        if record[\"phase\"] != \"finalized\":\n            frozen = {**record, \"phase\": \"finalizing\", \"restartRequired\": False, \"finalPeerFloor\": final_floor}\n            legacy._atomic(root / \"leaf-rotation.json\", phase.canonical(frozen))\n        record = {**record, \"phase\": \"finalized\", \"restartRequired\": False, \"finalPeerFloor\": final_floor}\n        raw_record = (legacy._regular(root / \"leaf-rotation.json\") if _record(root).get(\"phase\") == \"finalized\"\n                      else phase.canonical(record))\n        if phase.strict(raw_record) != record:\n            # Exact replay retains the first final observation and original bytes.\n            prior = phase.strict(raw_record)\n            if prior.get(\"phase\") == \"finalized\":\n                phase.match_floor(prior[\"finalPeerFloor\"], manifest, \"final\")\n                record = prior\n            else:\n                raise ValueError(\"Final journal differs\")\n        archive_dir = root / \"leaf-rotation-finalized\"\n        legacy._owned_directory(archive_dir)\n        evidence = legacy._finalized_evidence(validated, raw, receipt_raw, record, raw_record)\n        legacy._immutable(archive_dir / (manifest[\"rotationId\"] + \".json\"), evidence, publish=True)\n        if _record(root).get(\"phase\") != \"finalized\":\n            legacy._atomic(root / \"leaf-rotation.json\", raw_record)\n        return dict(rotationId=manifest[\"rotationId\"], finalized=True, channelVersion=manifest[\"targetChannelVersion\"],\n                    finalPeerPolicyVersion=manifest[\"finalPeerPolicyVersion\"], finalPeerPolicySHA256=manifest[\"finalPeerPolicySHA256\"])\n\n\ndef rollback(*args, **kwargs):\n    raise ValueError(\"Normal :3 publication intent is forward-only; old restoration is not authorized by a failed start, phase flag or old certificate\")"
+        }
+      ]
+    },
+    {
+      "source": "1efea494f026e932360c35ae811b6423d874a2e7",
+      "path": "deploy/lan/worker_leaf_rotation.py",
+      "SHA256": "4e29685241a3e625e59aa64bcff07bdd69d4b0381c67687706a09fa960f75998",
+      "bytes": 54096,
+      "baseBytesIdentical": true,
+      "ranges": [
+        {
+          "start": 466,
+          "end": 499,
+          "excerpt": "def _atomic(path: Path, data: bytes) -> None:\n    temporary = path.with_name(path.name + \".next\")\n    if temporary.exists() or temporary.is_symlink():\n        temporary.unlink()\n    descriptor = os.open(temporary, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)\n    try:\n        with os.fdopen(descriptor, \"wb\") as stream:\n            stream.write(data)\n            stream.flush()\n            os.fsync(stream.fileno())\n        os.replace(temporary, path)\n        if os.name != \"nt\":\n            directory = os.open(path.parent, os.O_RDONLY)\n            try:\n                os.fsync(directory)\n            finally:\n                os.close(directory)\n    finally:\n        if temporary.exists():\n            temporary.unlink()\n\n\n@contextmanager\ndef _exclusive(path: Path):\n    try:\n        descriptor = os.open(path, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)\n    except FileExistsError:\n        raise ValueError(\"Another leaf rotation writer owns the Node lock\") from None\n    try:\n        os.close(descriptor)\n        yield\n    finally:\n        path.unlink(missing_ok=True)\n"
+        },
+        {
+          "start": 1029,
+          "end": 1062,
+          "excerpt": "def rollback(\n    bundle: Path,\n    worker_root: Path,\n    *,\n    restart: Callable[[Path], None],\n    now: datetime | None = None,\n) -> dict:\n    \"\"\"Restore the prior public material only while both prior authorities are fresh.\"\"\"\n    runtime_preflight()\n    if peer_phase.strict(_regular(Path(bundle) / \"rotation.json\")).get(\"schemaVersion\") == peer_phase.SCHEMA:\n        from worker_plain_rotation import rollback as plain_rollback\n        return plain_rollback(bundle, worker_root, restart=restart, now=now)\n    raise ValueError(\"Legacy rollback is blocked: publication and actual floor/CP state are unknown; preserve current bytes and journal for separate offline recovery\")\n\ndef docker_restart(worker_root: Path) -> None:\n    manifest = json.loads((worker_root / \"manifest.json\").read_text(\"utf-8\"))\n    node_id = manifest[\"nodeId\"]\n    if not NODE_ID.fullmatch(node_id):\n        raise ValueError(\"Worker manifest Node identity is invalid\")\n    container = \"saintvision-\" + node_id.lower()\n    from worker_config import check_running, install_files\n\n    # A running Authority rereads peer bytes on every handshake. Stop the exact\n    # owned plain container BEFORE any volume copy; publication intent is already\n    # durable in :3 and every error thereafter remains forward-only/blocked.\n    _, _, before, _, _, _ = worker_peer_floor.target(worker_root)\n    subprocess.run([\"docker\", \"stop\", before[\"Id\"]], check=True, timeout=60, capture_output=True)\n    _, _, stopped, _, _, _ = worker_peer_floor.target(worker_root)\n    if stopped[\"Id\"] != before[\"Id\"] or stopped[\"State\"].get(\"Running\"):\n        raise ValueError(\"Owned Node changed or did not quiesce before public-file copy\")\n    install_files(container, worker_root, rotation_publication=True)\n    subprocess.run([\"docker\", \"start\", before[\"Id\"]], check=True, timeout=60, capture_output=True)\n    check_running(container)\n"
+        }
+      ]
+    },
+    {
+      "source": "1efea494f026e932360c35ae811b6423d874a2e7",
+      "path": "deploy/lan/README.md",
+      "SHA256": "3ee37ad59a30f0b93415f47bc821080f5c37d770bfeba058a1cc7d5a0529a093",
+      "bytes": 44097,
+      "baseBytesIdentical": true,
+      "ranges": [
+        {
+          "start": 354,
+          "end": 487,
+          "excerpt": "most six days. Expiry fails closed. `lan_pilot.py prepare-leaf-rotation` now\nuses strict normal schema `:3` and requires a signed CSR for the already pinned\nNode key, the exact externally pinned issuing chain, the issuer's revocation\nregistry, and an independently nonced fresh signed actual Go floor observation\n(`--peer-floor-observation`, `--peer-floor-nonce`). Batch preparation requires\n`--peer-floor-observations` with exactly every configured active member before\nany proposal/channel mutation. It refuses an early,\nrevoked, disabled, wrong-key, wrong-node, expired, or stale-version rotation and\nemits public material only. The Node runs `worker_leaf_rotation.py install`; that\ntool verifies every public byte, writes the Node leaf and a bounded two-Control-\nPlane overlap policy with fsync/rename, records durable publication intent before\nchanging either public file, copies and verifies them before restart, and keeps\nan exact retry journal. A CP commit requires that Node receipt and\nuses the existing channel-version CAS before atomically publishing the matching\nControl Plane and Node public leaves. The Node then runs `finalize` with the CP\ncommit receipt, reducing the policy to the new Control Plane fingerprint. The\nactual durable peer version P advances to P+1 for overlap and P+2 for final;\nthe independent CP channel C advances only to C+1 through the existing CAS.\nInstall receipts bind signed actual pre/post floors, and final evidence binds\nthe signed actual final floor. The actual M2 `:2` response signs the raw cmdline\ndigest and separately the actual serving executable descriptor bytes digest.\nIts domain/body encoding is distinct from the unchanged outer receipt/CP commit\ncanonical JSON plus newline. Existing images without this capability refuse.\nPublication intent is forward-only: `rollback` refuses even if an old leaf is\nstill valid. Legacy `:1`/`:2` are retained for exact historical verification;\nnew live installs, in-flight conversion and expired/partial normal recovery\nrefuse. Windows reboot\ndoes not automatically relaunch the server's observer or download process. The\nworker and database use `unless-stopped`.\n\nFinalization preserves a public proof in\n`<worker-root>/leaf-rotation-finalized/<rotationId>.json`: the exact finalized\njournal bytes, proposal, public bundle, signed Node install receipt and signed\nCP commit receipt. Publication never replaces an existing archive. A distinct\nnormal Node rotation may replace the active journal only when this proof binds\nthe same tenant, Node, epoch, address, issuing chain, current certificates and\nfinal policy to the next channel generation. Partial, unknown, rolled-back or\ninconsistent state remains blocked; the previous backup and private key remain\nin place. A legacy finalized journal without this proof requires replaying\n`finalize` with its original bundle and signed CP receipt while its current\nleaves remain valid; replay does not restart an already finalized Node.\n\nFor a multi-Node batch, `switched` records the CP commit and does not establish\nthat every Node finalized. After each Node finalizes, use the same reviewed\nworker runtime to export a signed public attestation:\n\n```text\npython3 -I -B deploy/lan/leaf_rotation_standalone_runtime.py run \\\n  --runtime-dir <reviewed-runtime> --worker-script ./worker_leaf_rotation.py -- \\\n  attest-finalized --bundle <node-proposal> --worker-root <worker-state> > <node-finalized.json>\n```\n\nTransfer each public attestation through the reviewed operator path. Each\ncontains the immutable public proof and a distinct signature from that Node's\nactive private key; an unsigned success flag or install receipt is insufficient.\nOn the CP, explicitly retire the batch with every member's unique attestation:\n\n```text\npython tools/lan_pilot.py --state <pilot-state> retire-leaf-rotation-batch \\\n  --bundle <batch> --finalized-receipt <node1-finalized.json> \\\n  --finalized-receipt <node2-finalized.json>\n```\n\nRepeat `--finalized-receipt` once for every active member, including all five\nwhen the batch has five Nodes. Retirement verifies the exact batch, signatures,\nCA, tenant, epoch, member set, current CP/Node leaves, final policies and locked\nchannel versions/expiry/endpoints. It preserves the exact switched journal,\nbatch and signed proofs in a CP-signed, no-overwrite archive under\n`<pilot-state>/leaf-rotation-finalized/<batchId>.json`, then atomically records\nterminal phase `finalized`. Partial/unknown/inconsistent state cannot retire.\nLegacy switched journals use this same explicit proof-based command; legacy\nNode finalizations first need the exact finalize replay described above.\n\nThe next normal prepare uses a distinct output and verifies this archived\npredecessor against current authority before publishing a successor generation.\nExact same-batch prepare/commit replay keeps the terminal phase; a complete\nsuccessor publication interrupted before journal replacement can resume after\nrevalidation. Keep old proposal directories, backups, archives and receipts.\nTransfer finalized attestation files without changing their bytes, including\nwhitespace, encoding and line endings. Retirement archives the exact transferred\nbytes; a crash replay requires the original files. Reformatting or reserializing\nequivalent JSON is refused and is not a supported recovery path.\n\nRetirement and normal succession require exactly the same active member set,\ntenant, recovery epoch, pinned CA, Node addresses, and Node/CP keys. Adding,\nremoving, revoking or re-IPing a member, changing an authority or rotating a key\nblocks this path. This tooling does not support arbitrary cohort/key changes.\nFor a new five-PC setup, initialize the full five-member cohort only when all\nfive are ready; an initial smaller cohort cannot later append members through\nnormal post-rotation succession. Existing observation cohorts remain separate.\n\nAfter a crash between immutable archive linking and staging-file removal,\nexplicit finalize/retirement replay removes only an owned, regular `.next`\nwhose bytes exactly match the already verified archive. It preserves that\narchive and refuses unequal, partial, foreign or redirected residue. Read-only\npreflight does not remove staging evidence. External setup classifiers must\nverify the canonical signed archives and all member proofs before treating\n`finalized` as settled; the phase string alone is insufficient.\nAny predecessor `.next` blocks successor Node installation and CP batch\npreparation, including a byte-identical completed staging link. Replay that\nexact predecessor's `finalize` or `retire-leaf-rotation-batch` with its original\ninputs first. Only the verified publishing replay may clean an owned equal\nduplicate; successor and preflight paths never delete it. Unequal, partial,\nforeign or redirected evidence remains blocked for separate reviewed recovery.\nThis lifecycle is not permission to clear a journal or reset a scheduler latch;\nscheduled-plan changes and operational acceptance remain separate work.\n\nFor the bounded stopped-publication case, `resume-publication --bundle <exact>\n--worker-root <owned-state>` may start only the same recorded stopped container\nwhose actual volume already contains the exact frozen phase credentials. A\nfinal phase also requires `--commit-receipt <exact-signed-CP-receipt>`. Strict\nactual-volume reads provide start eligibility only; the command requires a NEW\nsigned actual Go expected-phase observation after start. It copies no files,\nnever restores an old phase, and never creates/replaces an image/container.\nAn already-running retry only observes. A stop before the frozen files reached\nthe volume remains blocked; unknown/expired/mismatched state needs separately\nreviewed recovery. The original install/finalize protocol retains its own receipt\nand archive steps.\n\n`verify-settled --worker-root <owned-state>` is read-only and checks the original\nfinalized `:3` journal/archive, exact bytes/signatures, absence of staging residue,\ncurrent credentials and a fresh actual final M2. `repair-current` permits only\nthose exact same credential bytes on the same running container, with pre/post\nverification; stopped nodes first use the bounded re-entry above. Generic\nworkspace/execution helpers permit only idempotent checks after settlement.\nImage/profile/container/mount/storage migrations and migration markers remain\nblocked under their separate future contracts. The pinned standalone verifier\nmust be present; these paths never install packages or accept a force flag.\n\nThe standalone lifecycle result is versioned `:3`: two CLI fixture cycles, four\nphase restarts, `rollbackRejected=true` and `rolledBack=false`, strict boolean/\ninteger fields and original archives preserved. Its synthetic daemon is an\ninteroperability fixture; actual Go and actual Linux Docker proofs are separate\nrequired CI lanes. Legacy scheduled-renewal examples below do not implement the"
+        }
+      ]
+    },
+    {
+      "source": "1efea494f026e932360c35ae811b6423d874a2e7",
+      "path": "tools/lan_pilot.py",
+      "SHA256": "2c626540f495499423b707b063a6cab6a53e1be3af8c324f46af88a94ac8f652",
+      "bytes": 198894,
+      "baseBytesIdentical": true,
+      "ranges": [
+        {
+          "start": 397,
+          "end": 433,
+          "excerpt": "def _load_external_ca(key_path, password_path, chain_path):\n    values = (key_path, password_path, chain_path)\n    if not all(values):\n        raise ValueError(\"External CA key, password file, and chain are all required\")\n    for value in values:\n        if value.is_symlink() or not value.is_file():\n            raise ValueError(\"External CA inputs must be regular files\")\n    key_raw = key_path.read_bytes()\n    password = password_path.read_bytes().strip()\n    chain_raw = chain_path.read_bytes()\n    if not password or len(password) > 1024 or len(chain_raw) > 65536:\n        raise ValueError(\"External CA input is invalid\")\n    key = serialization.load_pem_private_key(key_raw, password=password)\n    certificates = _pem_certificates(chain_raw)\n    if not isinstance(key, Ed25519PrivateKey) or len(certificates) != 2:\n        raise ValueError(\"External CA must be one Ed25519 intermediate and one root\")\n    intermediate, root = certificates\n    now = datetime.now(timezone.utc)\n    basic = intermediate.extensions.get_extension_for_class(x509.BasicConstraints).value\n    root_basic = root.extensions.get_extension_for_class(x509.BasicConstraints).value\n    if (\n        not basic.ca\n        or basic.path_length != 0\n        or not root_basic.ca\n        or root_basic.path_length != 1\n        or not intermediate.not_valid_before_utc <= now < intermediate.not_valid_after_utc\n        or not root.not_valid_before_utc <= now < root.not_valid_after_utc\n        or key.public_key().public_bytes_raw() != intermediate.public_key().public_bytes_raw()\n    ):\n        raise ValueError(\"External CA constraints or key binding differ\")\n    root.public_key().verify(intermediate.signature, intermediate.tbs_certificate_bytes)\n    return key_raw, password, chain_raw, key, intermediate\n\n\ndef ensure_pilot_pki(path, state, args):\n    external = any(\n        getattr(args, name, None) is not None"
+        },
+        {
+          "start": 1564,
+          "end": 1589,
+          "excerpt": "def _plain_cp_floor(path, state, node, channel, observation, nonce, now):\n    raw = worker_rotation._regular(node_certificate_path(path, state, node))\n    policy_raw = worker_rotation._regular(node_policy_path(path, state, node))\n    policy = peer_phase.strict(policy_raw)\n    peer_phase.verify_floor(observation, raw, {\"tenantId\": state[\"tenantId\"], \"nodeId\": node[\"nodeId\"], \"epoch\": state[\"epoch\"]}, nonce=nonce, now=now)\n    if observation[\"plainServingProcess\"] is not True or observation[\"servingPID\"] != 1:\n        raise ValueError(\"Storage/unsupported serving process requires separately accepted compound renewal\")\n    p = peer_phase.version(observation[\"peerPolicyVersion\"], 2) - 2\n    peer_phase.version(channel[0], 1)\n    current_control = x509.load_pem_x509_certificate(worker_rotation._regular(path / \"control-cert.pem\"))\n    if (channel[1] != fingerprint(x509.load_pem_x509_certificate(raw)) or channel[3] is not True\n            or channel[2] <= now or channel[4] != f'https://{node[\"nodeIP\"]}:{node[\"nodePort\"]}'\n            or peer_phase.digest(policy_raw) != observation[\"peerPolicySHA256\"]\n            or policy != {\"version\": p, \"tenantId\": state[\"tenantId\"], \"nodeId\": node[\"nodeId\"],\n                          \"recoveryEpoch\": state[\"epoch\"], \"expiresAt\": policy.get(\"expiresAt\"),\n                          \"clientFingerprints\": [fingerprint(current_control)]}\n            or type(policy.get(\"version\")) is not int):\n        raise ValueError(\"CP-recorded policy/channel and actual Node durable floor differ\")\n    expiry = worker_rotation._utc(policy[\"expiresAt\"])\n    if not now < expiry <= now + timedelta(days=7):\n        raise ValueError(\"Current plain peer authority is expired/unbounded; normal recovery is blocked\")\n    chain_raw = worker_rotation._regular(path / \"ca.pem\")\n    chain = worker_rotation._certificates(chain_raw)\n    if len(chain) != 2 or peer_phase.digest(chain_raw) != state.get(\"caBundleSHA256\"):\n        raise ValueError(\"Plain peer preflight issuing pin differs\")\n    worker_rotation._leaf(raw, intermediate=chain[0], uri=node_uri(NodePrincipal(state[\"tenantId\"], node[\"nodeId\"]), state[\"epoch\"]),"
+        },
+        {
+          "start": 2031,
+          "end": 2136,
+          "excerpt": "def _write_rotation_public_material(\n    output,\n    *,\n    state,\n    node,\n    current_node,\n    current_control,\n    control_key,\n    public_key,\n    ca_key,\n    intermediate,\n    chain_raw,\n    revocations,\n    now,\n    current_version,\n    overlap_seconds,\n    leaf_valid_seconds,\n    rotation_id,\n    peer_floor_observation,\n    peer_floor_nonce,\n    current_policy_raw,\n    current_node_raw,\n    shared_control_raw=None,\n):\n    # Normal :3 never derives P from C or from a host policy mirror alone.\n    if (type(leaf_valid_seconds) is not int or not 60 <= leaf_valid_seconds <= 518400\n            or type(overlap_seconds) is not int or not peer_phase.MIN_EXPIRY_SECONDS + peer_phase.CLOCK_SKEW_SECONDS < overlap_seconds <= MAXIMUM_OVERLAP_SECONDS):\n        raise ValueError(\"Normal peer phase lifetime/overlap is invalid\")\n    peer_phase.verify_floor(peer_floor_observation, current_node_raw,\n                           {\"tenantId\": state[\"tenantId\"], \"nodeId\": node[\"nodeId\"], \"epoch\": state[\"epoch\"]},\n                           nonce=peer_floor_nonce, now=now)\n    p = peer_phase.version(peer_floor_observation[\"peerPolicyVersion\"], 2) - 2\n    previous_policy = peer_phase.strict(current_policy_raw)\n    if (type(previous_policy.get(\"version\")) is not int or previous_policy[\"version\"] != p\n            or peer_phase.digest(current_policy_raw) != peer_floor_observation[\"peerPolicySHA256\"]):\n        raise ValueError(\"CP-recorded peer policy differs from actual Go floor\")\n    peer_phase.current_policy(current_policy_raw, version_number=p,\n                              scope={\"tenantId\": state[\"tenantId\"], \"nodeId\": node[\"nodeId\"], \"epoch\": state[\"epoch\"]},\n                              control_fingerprint=fingerprint(current_control), now=now)\n    peer_phase.version(current_version, 1)\n    principal = NodePrincipal(state[\"tenantId\"], node[\"nodeId\"])\n    if current_node.public_key().public_bytes_raw() != public_key.public_bytes_raw():\n        raise ValueError(\"Recovery CSR does not preserve the pinned Node key\")\n    current_identity = certificate_identity(\n        current_node.public_bytes(serialization.Encoding.DER), principal, state[\"epoch\"], now=now\n    )\n    current_names = current_node.extensions.get_extension_for_class(\n        x509.SubjectAlternativeName\n    ).value\n    if (\n        current_identity != (fingerprint(current_node), current_node.not_valid_after_utc)\n        or current_names.get_values_for_type(x509.IPAddress)\n        != [ipaddress.ip_address(node[\"nodeIP\"])]\n        or current_node.issuer != intermediate.subject\n        or fingerprint(current_node) in revocations\n        or fingerprint(current_control) in revocations\n    ):\n        raise ValueError(\"Recovery Node or Control Plane identity is invalid or revoked\")\n    intermediate.public_key().verify(current_node.signature, current_node.tbs_certificate_bytes)\n    _validate_current_control_leaf(current_control, intermediate, state=state, now=now)\n    lifetime = timedelta(seconds=leaf_valid_seconds)\n    next_node = issue(\n        ca_key,\n        intermediate,\n        public_key,\n        node_uri(principal, state[\"epoch\"]),\n        address=node[\"nodeIP\"],\n        now=now,\n        valid_for=lifetime,\n    )\n    if shared_control_raw is None:\n        next_control = issue(\n            ca_key,\n            intermediate,\n            control_key.public_key(),\n            f'spiffe://saintvision.ai/tenant/{state[\"tenantId\"]}/control-plane/epoch/{state[\"epoch\"]}',\n            now=now,\n            valid_for=lifetime,\n        )\n    else:\n        next_control = x509.load_pem_x509_certificate(shared_control_raw)\n        _validate_current_control_leaf(next_control, intermediate, state=state, now=now)\n    if (next_control.public_key().public_bytes_raw() != control_key.public_key().public_bytes_raw()\n            or fingerprint(next_control) in revocations\n            or current_control.public_key().public_bytes_raw() != control_key.public_key().public_bytes_raw()):\n        raise ValueError(\"Normal renewal must preserve the exact Control Plane key and unrevoked leaf\")\n    not_after = min(next_node.not_valid_after_utc, next_control.not_valid_after_utc)\n    overlap_expires = min(now + timedelta(seconds=overlap_seconds), not_after)\n    if overlap_expires <= now + timedelta(minutes=10):\n        raise ValueError(\"Recovery overlap is too short to complete safely\")\n    target_version = current_version + 1\n    overlap_policy = {\n        \"version\": p + 1,\n        \"tenantId\": state[\"tenantId\"],\n        \"nodeId\": node[\"nodeId\"],\n        \"recoveryEpoch\": state[\"epoch\"],\n        \"expiresAt\": _utc_z(overlap_expires),\n        \"clientFingerprints\": [fingerprint(current_control), fingerprint(next_control)],\n    }\n    final_policy = {\n        **overlap_policy,\n        \"version\": p + 2,\n        \"expiresAt\": _utc_z(not_after),\n        \"clientFingerprints\": [fingerprint(next_control)],\n    }\n    material = {"
+        },
+        {
+          "start": 2997,
+          "end": 3040,
+          "excerpt": "def prepare_leaf_rotation_batch(args):\n    \"\"\"Issue one shared next CP leaf and exact per-Node public bundles.\"\"\"\n    path, state = args.state, load(args.state)\n    active = sorted(active_configured_nodes(state), key=lambda item: item[\"nodeId\"])\n    if len(active) < 2:\n        raise ValueError(\"A leaf rotation batch requires at least two active Nodes\")\n    csrs = {}\n    for csr_path in args.csr:\n        raw = csr_path.read_bytes()\n        node = node_from_csr(state, raw)\n        if node[\"nodeId\"] in csrs:\n            raise ValueError(\"Each active Node CSR must be supplied exactly once\")\n        csrs[node[\"nodeId\"]] = csr_path\n    if set(csrs) != {node[\"nodeId\"] for node in active}:\n        raise ValueError(\"The rotation batch must include every active Node\")\n    output = args.output.resolve()\n    with exclusive_file(path / \"leaf-rotation.lock\"):\n        # Every selected member must prove its actual floor matches CP-recorded\n        # exact bytes BEFORE any child bundle/publication/journal/CAS mutation.\n        observation_dir = getattr(args, \"peer_floor_observations\", None)\n        nonce = getattr(args, \"peer_floor_nonce\", None)\n        if observation_dir is None or not isinstance(nonce, str) or not peer_phase.HEX.fullmatch(nonce):\n            raise ValueError(\"Normal :3 batch requires all actual signed floor files and independent nonce\")\n        observation_dir = Path(observation_dir)\n        if observation_dir.is_symlink() or not observation_dir.is_dir():\n            raise ValueError(\"Actual floor observation directory is unsafe\")\n        if {p.name for p in observation_dir.iterdir()} != {node[\"nodeId\"] + \".json\" for node in active}:\n            raise ValueError(\"Actual floor observation cohort differs\")\n        floor_observations = {node[\"nodeId\"]: peer_phase.strict(worker_rotation._regular(observation_dir / (node[\"nodeId\"] + \".json\"))) for node in active}\n        preflight_now = datetime.now(timezone.utc)\n        with psycopg.connect(state[\"adminDSN\"]) as conn:\n            conn.execute(\"SELECT set_config('inv.tenant_id',%s,true)\", (state[\"tenantId\"],))\n            for node in active:\n                _plain_cp_floor(path, state, node, _channel_row(conn, state, node), floor_observations[node[\"nodeId\"]], nonce, preflight_now)\n        journal = _load_batch_journal(path)\n        if output.exists():\n            raw, manifest, bundles = _batch_material(output)\n            if set(bundles) != set(csrs):\n                raise ValueError(\"Existing rotation batch is not an exact active-Node retry\")\n            for node_id, csr_path in csrs.items():\n                public = csr_public_key(csr_path.read_bytes(), node_id)\n                next_node = x509.load_pem_x509_certificate(bundles[node_id][2][\"node-cert.pem\"])\n                if public.public_bytes_raw() != next_node.public_key().public_bytes_raw():\n                    raise ValueError(\"Existing rotation batch CSR binding differs\")"
+        },
+        {
+          "start": 3282,
+          "end": 3377,
+          "excerpt": "def prepare_leaf_rotation(args):\n    \"\"\"Issue public rotation material from a Node-owned CSR without installing it.\"\"\"\n    path, state = args.state, load(args.state)\n    if len(active_configured_nodes(state)) != 1 and not getattr(args, \"_batch_mode\", False):\n        raise ValueError(\"Multiple active Nodes require one shared leaf rotation batch\")\n    node = node_from_csr(state, args.csr.read_bytes())\n    if node.get(\"credentialRevoked\"):\n        raise ValueError(\"Revoked Node credentials cannot be rotated\")\n    output = args.output.resolve()\n    lock = (\n        nullcontext()\n        if getattr(args, \"_batch_lock_held\", False)\n        else exclusive_file(path / \"leaf-rotation.lock\")\n    )\n    with lock:\n        public = csr_public_key(args.csr.read_bytes(), node[\"nodeId\"])\n        current_node_path = node_certificate_path(path, state, node)\n        current_node_raw = current_node_path.read_bytes()\n        current_node = x509.load_pem_x509_certificate(current_node_raw)\n        if current_node.public_key().public_bytes_raw() != public.public_bytes_raw():\n            raise ValueError(\"Rotation CSR does not preserve the pinned Node key\")\n        current_control_raw = (path / \"control-cert.pem\").read_bytes()\n        current_control = x509.load_pem_x509_certificate(current_control_raw)\n        control_key = serialization.load_pem_private_key(\n            (path / \"control-key.pem\").read_bytes(), password=None\n        )\n        if (\n            control_key.public_key().public_bytes_raw()\n            != current_control.public_key().public_bytes_raw()\n        ):\n            raise ValueError(\"Pinned Control Plane key and leaf differ\")\n        now = getattr(args, \"_batch_now\", None) or datetime.now(timezone.utc)\n        safety = timedelta(hours=args.safety_window_hours)\n        if (\n            min(current_node.not_valid_after_utc, current_control.not_valid_after_utc)\n            > now + safety\n        ):\n            raise ValueError(\"Leaf rotation requested before the configured safety window\")\n        revocations = _load_revocations(args.revocations)\n        if fingerprint(current_node) in revocations or fingerprint(current_control) in revocations:\n            raise ValueError(\"A current rotation identity is revoked\")\n        _, _, chain_raw, ca_key, intermediate = _load_external_ca(\n            args.ca_key, args.ca_key_password_file, args.ca_chain\n        )\n        if _rotation_digest(chain_raw) != state.get(\"caBundleSHA256\"):\n            raise ValueError(\"External issuing chain differs from the pilot pin\")\n        principal = NodePrincipal(state[\"tenantId\"], node[\"nodeId\"])\n        current_identity = certificate_identity(\n            current_node.public_bytes(serialization.Encoding.DER),\n            principal,\n            state[\"epoch\"],\n            now=now,\n        )\n        current_names = current_node.extensions.get_extension_for_class(\n            x509.SubjectAlternativeName\n        ).value\n        if current_identity != (\n            fingerprint(current_node),\n            current_node.not_valid_after_utc,\n        ) or current_names.get_values_for_type(x509.IPAddress) != [\n            ipaddress.ip_address(node[\"nodeIP\"])\n        ]:\n            raise ValueError(\"Current Node leaf is not bound to the exact issuing chain\")\n        intermediate.public_key().verify(current_node.signature, current_node.tbs_certificate_bytes)\n        if current_node.issuer != intermediate.subject:\n            raise ValueError(\"Current Node leaf is not bound to the exact issuing chain\")\n        _validate_current_control_leaf(current_control, intermediate, state=state, now=now)\n        policy_raw = worker_rotation._regular(node_policy_path(path, state, node))\n        policy = peer_phase.strict(policy_raw)\n        floor_observation, floor_nonce = _normal_floor_input(args, node)\n        with psycopg.connect(state[\"adminDSN\"]) as conn:\n            conn.execute(\"SELECT set_config('inv.tenant_id',%s,true)\", (state[\"tenantId\"],))\n            channel = _channel_row(conn, state, node)\n        version, channel_fingerprint, channel_not_after, enabled, endpoint = channel\n        _plain_cp_floor(path, state, node, channel, floor_observation, floor_nonce, now)\n        if (\n            not enabled\n            or channel_fingerprint != fingerprint(current_node)\n            or channel_not_after <= now\n            or endpoint != f'https://{node[\"nodeIP\"]}:{node[\"nodePort\"]}'\n            or policy\n            != {\n                \"version\": floor_observation[\"peerPolicyVersion\"],\n                \"tenantId\": state[\"tenantId\"],\n                \"nodeId\": node[\"nodeId\"],\n                \"recoveryEpoch\": state[\"epoch\"],\n                \"expiresAt\": policy.get(\"expiresAt\"),\n                \"clientFingerprints\": [fingerprint(current_control)],\n            }\n        ):\n            raise ValueError(\n                \"Pinned Node channel or peer policy differs from current public material\"\n            )\n        if output.exists():\n            raw, manifest, files = _rotation_material(output)\n            next_node = x509.load_pem_x509_certificate(files[\"node-cert.pem\"])"
+        },
+        {
+          "start": 3540,
+          "end": 3780,
+          "excerpt": "def stage_leaf_rotation_batch(args):\n    \"\"\"CAS one restarted Node while keeping the global CP leaf unchanged.\"\"\"\n    path, state = args.state, load(args.state)\n    batch_raw, batch, bundles = _batch_material(args.bundle.resolve())\n    if batch[\"schemaVersion\"] != peer_phase.BATCH_SCHEMA:\n        raise ValueError(\"Live normal staging requires :3 actual peer-floor acknowledgement\")\n    if set(bundles) != {node[\"nodeId\"] for node in active_configured_nodes(state)}:\n        raise ValueError(\"Leaf rotation batch no longer matches the complete active Node set\")\n    receipt_value = json.loads(args.node_receipt.read_text(\"utf-8\"))\n    node_id = receipt_value.get(\"nodeId\")\n    if node_id not in bundles:\n        raise ValueError(\"Node receipt is not part of this leaf rotation batch\")\n    bundle = args.bundle.resolve() / f\"nodes/{node_id}\"\n    _raw, manifest, files, node, _control_key = _validate_rotation_receipt(\n        path, state, bundle, args.node_receipt\n    )\n    if manifest[\"rotationId\"] != batch[\"batchId\"]:\n        raise ValueError(\"Node proposal differs from the leaf rotation batch\")\n    with exclusive_file(path / \"leaf-rotation.lock\"):\n        journal = _load_batch_journal(path)\n        _assert_batch_journal(\n            journal, manifest_raw=batch_raw, manifest=batch, bundle=args.bundle.resolve()\n        )\n        if journal[\"phase\"] in {\"switched\", \"finalized\"}:\n            raise ValueError(\"A switched leaf rotation batch cannot stage another Node\")\n        with psycopg.connect(state[\"adminDSN\"]) as conn:\n            conn.execute(\"SELECT set_config('inv.tenant_id',%s,true)\", (state[\"tenantId\"],))\n            row = _channel_row(conn, state, node, lock=True)\n            version, certificate_sha256, _not_after, enabled, endpoint = row\n            if (version, certificate_sha256, enabled) == (\n                manifest[\"currentChannelVersion\"],\n                manifest[\"currentNodeCertificateSHA256\"],\n                True,\n            ):\n                committed_version = provision_channel(\n                    conn,\n                    NodePrincipal(state[\"tenantId\"], node_id),\n                    epoch=state[\"epoch\"],\n                    endpoint=endpoint,\n                    certificate_der=x509.load_pem_x509_certificate(\n                        files[\"node-cert.pem\"]\n                    ).public_bytes(serialization.Encoding.DER),\n                    expected_version=manifest[\"currentChannelVersion\"],\n                )\n                replay = False\n            elif (version, certificate_sha256, enabled) == (\n                manifest[\"targetChannelVersion\"],\n                manifest[\"nextNodeCertificateSHA256\"],\n                True,\n            ):\n                committed_version = version\n                replay = True\n            else:\n                raise ValueError(\"Channel changed; concurrent or stale rotation refused\")\n        staged = set(journal[\"stagedNodeIds\"])\n        staged.add(node_id)\n        phase = \"staged\" if staged == set(bundles) else \"staging\"\n        _write_batch_journal(\n            path,\n            manifest_raw=batch_raw,\n            manifest=batch,\n            bundle=args.bundle.resolve(),\n            phase=phase,\n            staged=staged,\n        )\n    print(\n        json.dumps(\n            {\n                \"staged\": True,\n                \"idempotentReplay\": replay,\n                \"batchId\": batch[\"batchId\"],\n                \"nodeId\": node_id,\n                \"channelVersion\": committed_version,\n                \"globalControlLeafSwitched\": False,\n            }\n        )\n    )\n\n\ndef commit_leaf_rotation_batch(args):\n    \"\"\"Switch the shared CP leaf only after every restarted Node channel is staged.\"\"\"\n    path, state = args.state, load(args.state)\n    batch_path = args.bundle.resolve()\n    batch_raw, batch, bundles = _batch_material(batch_path)\n    if batch[\"schemaVersion\"] != peer_phase.BATCH_SCHEMA:\n        raise ValueError(\"Live normal commit requires the exact :3 batch contract\")\n    if set(bundles) != {node[\"nodeId\"] for node in active_configured_nodes(state)}:\n        raise ValueError(\"Leaf rotation batch no longer matches the complete active Node set\")\n    output = args.output.resolve()\n    kill = getattr(args, \"_kill\", lambda _point: None)\n    with exclusive_file(path / \"leaf-rotation.lock\"):\n        journal = _load_batch_journal(path)\n        _assert_batch_journal(journal, manifest_raw=batch_raw, manifest=batch, bundle=batch_path)\n        if set(journal[\"stagedNodeIds\"]) != set(bundles):\n            raise ValueError(\"Every Node must restart and stage before the shared CP leaf switches\")\n        with psycopg.connect(state[\"adminDSN\"]) as conn:\n            conn.execute(\"SELECT set_config('inv.tenant_id',%s,true)\", (state[\"tenantId\"],))\n            if journal[\"phase\"] == \"finalized\":\n                _verify_batch_archive(path, state, journal, batch_raw, batch, bundles, conn)\n            for node_id, (_raw, manifest, _files) in bundles.items():\n                node = node_by_id(state, node_id)\n                row = _channel_row(conn, state, node, lock=True)\n                if (row[0], row[1], row[3]) != (\n                    manifest[\"targetChannelVersion\"],\n                    manifest[\"nextNodeCertificateSHA256\"],\n                    True,\n                ):\n                    raise ValueError(\"A staged Node channel changed before batch commit\")\n        shared_control = next(iter(bundles.values()))[2][\"control-cert.pem\"]\n        current_control = (path / \"control-cert.pem\").read_bytes()\n        current_fingerprint = fingerprint(x509.load_pem_x509_certificate(current_control))\n        if current_fingerprint == batch[\"currentControlCertificateSHA256\"]:\n            kill(\"before-control-switch\")\n            atomic_write(path / \"control-cert.pem\", shared_control)\n            switched_replay = False\n            kill(\"after-control-switch\")\n        elif current_fingerprint == batch[\"nextControlCertificateSHA256\"]:\n            switched_replay = True\n        else:\n            raise ValueError(\"Global Control Plane leaf changed outside this rotation batch\")\n        for node_id, (_raw, manifest, files) in bundles.items():\n            node = node_by_id(state, node_id)\n            atomic_write(node_certificate_path(path, state, node), files[\"node-cert.pem\"])\n            atomic_write(node_policy_path(path, state, node), files[\"peer-policy-final.json\"])\n        if journal[\"phase\"] != \"finalized\":\n            _write_batch_journal(\n                path,\n                manifest_raw=batch_raw,\n                manifest=batch,\n                bundle=batch_path,\n                phase=\"switched\",\n                staged=bundles,\n            )\n        output.mkdir(parents=True, exist_ok=True)\n        if output.is_symlink():\n            raise ValueError(\"Batch commit receipt directory must not be a symlink\")\n        control_key = serialization.load_pem_private_key(\n            (path / \"control-key.pem\").read_bytes(), password=None\n        )\n        if not isinstance(control_key, Ed25519PrivateKey):\n            raise ValueError(\"Control Plane receipt signing key type differs\")\n        for node_id, (proposal_raw, manifest, _files) in bundles.items():\n            body = {\n                \"schemaVersion\": manifest[\"schemaVersion\"],\n                \"rotationId\": manifest[\"rotationId\"],\n                \"proposalDigest\": _rotation_digest(proposal_raw),\n                \"nodeId\": node_id,\n                \"channelVersion\": manifest[\"targetChannelVersion\"],\n                \"certificateSHA256\": manifest[\"nextNodeCertificateSHA256\"],\n                \"committed\": True,\n                **peer_phase.binding(manifest),\n            }\n            receipt_raw = _canonical_json(\n                {**body, \"controlSignature\": control_key.sign(_canonical_json(body)).hex()}\n            )\n            target = output / f\"{node_id}.json\"\n            if target.exists() and target.read_bytes() != receipt_raw:\n                raise ValueError(\"Existing batch commit receipt differs\")\n            atomic_write(target, receipt_raw)\n    print(\n        json.dumps(\n            {\n                \"committed\": True,\n                \"idempotentReplay\": switched_replay,\n                \"batchId\": batch[\"batchId\"],\n                \"nodeCount\": len(bundles),\n                \"globalControlLeafSwitched\": True,\n                \"nodeOverlapFinalizationRequired\": True,\n            }\n        )\n    )\n\n\ndef commit_leaf_rotation(args):\n    \"\"\"CAS the DB channel, then durably publish matching CP/Node public material.\"\"\"\n    path, state = args.state, load(args.state)\n    if len(active_configured_nodes(state)) != 1:\n        raise ValueError(\"Multiple active Nodes require one shared leaf rotation batch\")\n    manifest_raw, manifest, files, node, control_key = _validate_rotation_receipt(\n        path, state, args.bundle, args.node_receipt\n    )\n    if manifest[\"schemaVersion\"] != peer_phase.SCHEMA:\n        raise ValueError(\"Live normal commit requires :3 actual peer-floor acknowledgement\")\n    proposal_digest = _rotation_digest(manifest_raw)\n    with exclusive_file(path / \"leaf-rotation.lock\"):\n        with psycopg.connect(state[\"adminDSN\"]) as conn:\n            conn.execute(\"SELECT set_config('inv.tenant_id',%s,true)\", (state[\"tenantId\"],))\n            row = _channel_row(conn, state, node, lock=True)\n            version, certificate_sha256, _not_after, enabled, endpoint = row\n            if (version, certificate_sha256, enabled) == (\n                manifest[\"currentChannelVersion\"],\n                manifest[\"currentNodeCertificateSHA256\"],\n                True,\n            ):\n                committed_version = provision_channel(\n                    conn,\n                    NodePrincipal(state[\"tenantId\"], node[\"nodeId\"]),\n                    epoch=state[\"epoch\"],\n                    endpoint=endpoint,\n                    certificate_der=x509.load_pem_x509_certificate(\n                        files[\"node-cert.pem\"]\n                    ).public_bytes(serialization.Encoding.DER),\n                    expected_version=manifest[\"currentChannelVersion\"],\n                )\n            elif (version, certificate_sha256, enabled) == (\n                manifest[\"targetChannelVersion\"],\n                manifest[\"nextNodeCertificateSHA256\"],\n                True,\n            ):\n                committed_version = version\n            else:\n                raise ValueError(\"Channel changed; concurrent or stale rotation refused\")\n        atomic_write(path / \"control-cert.pem\", files[\"control-cert.pem\"])\n        atomic_write(node_certificate_path(path, state, node), files[\"node-cert.pem\"])\n        atomic_write(node_policy_path(path, state, node), files[\"peer-policy-final.json\"])\n        commit_receipt_body = {\n            \"schemaVersion\": manifest[\"schemaVersion\"],\n            \"rotationId\": manifest[\"rotationId\"],\n            \"proposalDigest\": proposal_digest,\n            \"nodeId\": manifest[\"nodeId\"],\n            \"channelVersion\": committed_version,\n            \"certificateSHA256\": manifest[\"nextNodeCertificateSHA256\"],\n            \"committed\": True,\n            **peer_phase.binding(manifest),\n        }\n        commit_receipt = {\n            **commit_receipt_body,\n            \"controlSignature\": control_key.sign(_canonical_json(commit_receipt_body)).hex(),\n        }\n        atomic_write(args.output.resolve(), _canonical_json(commit_receipt))\n    print(\n        json.dumps(\n            {\n                **commit_receipt,\n                \"idempotentReplay\": committed_version == version,\n                \"restartObserverRequired\": True,\n                \"nodeOverlapFinalizationRequired\": True,\n            }\n        )\n    )\n"
+        },
+        {
+          "start": 4136,
+          "end": 4250,
+          "excerpt": "    p = commands.add_parser(\n        \"prepare-leaf-rotation\",\n        help=\"Issue a public Node/control rotation from a Node-owned CSR without installing it\",\n    )\n    p.add_argument(\"--csr\", type=Path, required=True)\n    p.add_argument(\"--output\", type=Path, required=True)\n    p.add_argument(\"--peer-floor-observation\", type=Path, required=True, help=\"Fresh signed actual Go floor; host mirror is not accepted\")\n    p.add_argument(\"--peer-floor-nonce\", required=True, help=\"Independent outstanding floor challenge nonce\")\n    p.add_argument(\"--ca-key\", type=Path, required=True)\n    p.add_argument(\"--ca-key-password-file\", type=Path, required=True)\n    p.add_argument(\"--ca-chain\", type=Path, required=True)\n    p.add_argument(\"--revocations\", type=Path, required=True)\n    p.add_argument(\"--safety-window-hours\", type=int, choices=range(1, 169), default=48)\n    p.add_argument(\n        \"--overlap-seconds\",\n        type=int,\n        choices=range(600, MAXIMUM_OVERLAP_SECONDS + 1),\n        default=DEFAULT_ROTATION_OVERLAP_SECONDS,\n    )\n    p.add_argument(\"--leaf-valid-seconds\", type=int, choices=range(60, 518401), default=518400)\n    p = commands.add_parser(\n        \"abandon-expired-prepared-leaf-rotation-batch\",\n        help=(\n            \"Archive only an expired, entirely unstaged batch after proving CP and channels \"\n            \"remain unchanged\"\n        ),\n    )\n    p.add_argument(\"--bundle\", type=Path, required=True)\n    p = commands.add_parser(\n        \"prepare-leaf-rotation-batch\",\n        help=\"Issue one shared Control Plane leaf and exact bundles for every active Node\",\n    )\n    p.add_argument(\"--peer-floor-observations\", type=Path, required=True, help=\"Exact active-Node observation directory\")\n    p.add_argument(\"--peer-floor-nonce\", required=True)\n    p.add_argument(\"--csr\", type=Path, action=\"append\", required=True)\n    p.add_argument(\"--output\", type=Path, required=True)\n    p.add_argument(\"--ca-key\", type=Path, required=True)\n    p.add_argument(\"--ca-key-password-file\", type=Path, required=True)\n    p.add_argument(\"--ca-chain\", type=Path, required=True)\n    p.add_argument(\"--revocations\", type=Path, required=True)\n    p.add_argument(\"--safety-window-hours\", type=int, choices=range(1, 169), default=48)\n    p.add_argument(\n        \"--overlap-seconds\",\n        type=int,\n        choices=range(600, MAXIMUM_OVERLAP_SECONDS + 1),\n        default=DEFAULT_ROTATION_OVERLAP_SECONDS,\n    )\n    p.add_argument(\"--leaf-valid-seconds\", type=int, choices=range(60, 518401), default=518400)\n    p = commands.add_parser(\n        \"prepare-leaf-rotation-recovery-batch\",\n        help=\"Supersede one expired partial batch with a fresh exact all-Node batch\",\n    )\n    p.add_argument(\"--expired-batch\", type=Path, required=True)\n    p.add_argument(\"--csr\", type=Path, action=\"append\", required=True)\n    p.add_argument(\"--output\", type=Path, required=True)\n    p.add_argument(\"--ca-key\", type=Path, required=True)\n    p.add_argument(\"--ca-key-password-file\", type=Path, required=True)\n    p.add_argument(\"--ca-chain\", type=Path, required=True)\n    p.add_argument(\"--revocations\", type=Path, required=True)\n    p.add_argument(\"--safety-window-hours\", type=int, choices=range(1, 169), default=48)\n    p.add_argument(\n        \"--overlap-seconds\",\n        type=int,\n        choices=range(600, MAXIMUM_OVERLAP_SECONDS + 1),\n        default=DEFAULT_ROTATION_OVERLAP_SECONDS,\n    )\n    p.add_argument(\"--leaf-valid-seconds\", type=int, choices=range(60, 518401), default=518400)\n    p = commands.add_parser(\n        \"prepare-fully-expired-leaf-rotation-recovery-batch\",\n        help=(\n            \"Create one fresh all-Node authority from expired signed identity history and an \"\n            \"exact private offline authorization\"\n        ),\n    )\n    p.add_argument(\"--expired-batch\", type=Path, required=True)\n    p.add_argument(\"--offline-authorization\", type=Path, required=True)\n    p.add_argument(\"--csr\", type=Path, action=\"append\", required=True)\n    p.add_argument(\"--output\", type=Path, required=True)\n    p.add_argument(\"--ca-key\", type=Path, required=True)\n    p.add_argument(\"--ca-key-password-file\", type=Path, required=True)\n    p.add_argument(\"--ca-chain\", type=Path, required=True)\n    p.add_argument(\"--revocations\", type=Path, required=True)\n    p.add_argument(\n        \"--overlap-seconds\",\n        type=int,\n        choices=range(600, MAXIMUM_OVERLAP_SECONDS + 1),\n        default=DEFAULT_ROTATION_OVERLAP_SECONDS,\n        help=\"Bounded offline execution deadline; expired CP authority is never included\",\n    )\n    p.add_argument(\"--leaf-valid-seconds\", type=int, choices=range(60, 518401), default=518400)\n    p = commands.add_parser(\n        \"stage-leaf-rotation-batch\",\n        help=\"CAS one restarted Node channel without switching the shared Control Plane leaf\",\n    )\n    p.add_argument(\"--bundle\", type=Path, required=True)\n    p.add_argument(\"--node-receipt\", type=Path, required=True)\n    p = commands.add_parser(\n        \"commit-leaf-rotation-batch\",\n        help=\"Switch one shared Control Plane leaf after every Node is restarted and staged\",\n    )\n    p.add_argument(\"--bundle\", type=Path, required=True)\n    p.add_argument(\"--output\", type=Path, required=True)\n    p = commands.add_parser(\n        \"retire-leaf-rotation-batch\",\n        help=\"Archive a switched batch only with every Node's signed finalization proof\",\n    )\n    p.add_argument(\"--bundle\", type=Path, required=True)\n    p.add_argument(\"--finalized-receipt\", type=Path, action=\"append\", required=True)\n    p = commands.add_parser(\n        \"commit-leaf-rotation\",\n        help=\"Commit an installed Node rotation with channel CAS and durable public material\",\n    )\n    p.add_argument(\"--bundle\", type=Path, required=True)\n    p.add_argument(\"--node-receipt\", type=Path, required=True)\n    p.add_argument(\"--output\", type=Path, required=True)"
+        }
+      ]
+    },
+    {
+      "source": "1efea494f026e932360c35ae811b6423d874a2e7",
+      "path": "tools/lan_pki.py",
+      "SHA256": "8880087eacc4729795d344b65eaaefed907dcb748c87243328ae461d8b867d5c",
+      "bytes": 3906,
+      "baseBytesIdentical": true,
+      "ranges": [
+        {
+          "start": 43,
+          "end": 80,
+          "excerpt": "    now = now or datetime.now(timezone.utc)\n    valid_for = valid_for or timedelta(days=6)\n    if not timedelta(minutes=1) <= valid_for <= timedelta(days=6):\n        raise ValueError(\"Node leaf lifetime must be between one minute and six days\")\n    names = [x509.UniformResourceIdentifier(uri)]\n    if address is not None:\n        names.append(x509.IPAddress(ip_address(address)))\n    cert = (\n        x509.CertificateBuilder()\n        .subject_name(x509.Name([x509.NameAttribute(NameOID.COMMON_NAME, \"SaintVision LAN peer\")]))\n        .issuer_name(ca_cert.subject)\n        .public_key(public_key)\n        .serial_number(x509.random_serial_number())\n        .not_valid_before(now - timedelta(minutes=5))\n        .not_valid_after(min(now + valid_for, ca_cert.not_valid_after_utc))\n        .add_extension(x509.BasicConstraints(ca=False, path_length=None), critical=True)\n        .add_extension(\n            x509.KeyUsage(True, False, False, False, False, False, False, None, None), critical=True\n        )\n        .add_extension(\n            x509.ExtendedKeyUsage(\n                [ExtendedKeyUsageOID.SERVER_AUTH if address else ExtendedKeyUsageOID.CLIENT_AUTH]\n            ),\n            critical=False,\n        )\n        .add_extension(x509.SubjectKeyIdentifier.from_public_key(public_key), critical=False)\n        .add_extension(\n            x509.AuthorityKeyIdentifier.from_issuer_public_key(ca_key.public_key()), critical=False\n        )\n        .add_extension(x509.SubjectAlternativeName(names), critical=False)\n        .sign(ca_key, None)\n    )\n    return cert\n\n\ndef csr_public_key(raw, node_id):\n    if len(raw) > 16384:\n        raise ValueError(\"CSR exceeds limit\")"
+        }
+      ]
+    },
+    {
+      "source": "96afd799d49717fd40e4ddabd538d82accbe1958",
+      "path": "services/control-plane/src/inv/app.py",
+      "SHA256": "a5aa847ae287fc870031b4abefb7fb06bafe60482828198da3878f8a381ab5a3",
+      "bytes": 59660,
+      "baseBytesIdentical": true,
+      "ranges": [
+        {
+          "start": 513,
+          "end": 532,
+          "excerpt": "    @api.get(\"/v1/projects/{project}/runs\")\n    def runs(\n        project: str,\n        after: str | None = None,\n        limit: int = 50,\n        identity=Depends(authenticated),\n    ):\n        return control.list_runs(identity.principal, project, after=after, limit=limit)\n\n    @api.post(\"/v1/projects/{project}/runs\", status_code=201)\n    async def create(project: str, request: Request, identity=Depends(authenticated)):\n        validate_contract(\"EmptyRequest\", await request.json())\n        return await run_in_threadpool(control.create, identity.principal, project, key(request))\n\n    @api.get(\"/v1/projects/{project}/runs/{run_id}\")\n    def run(project: str, run_id: str, identity=Depends(authenticated)):\n        return control.get(identity.principal, project, run_id)\n\n    # Both URL forms use the canonical kernel, never public.runs CRUD state.\n    from .result_view import ResultView"
+        },
+        {
+          "start": 719,
+          "end": 741,
+          "excerpt": "    @api.get(\"/v1/projects/{project}/nodes\")\n    def nodes(project: str, identity=Depends(authenticated)):\n        return control.nodes(identity.principal, project)\n\n    @api.get(\"/v1/projects/{project}/node-certificates\")\n    def node_certificates(project: str, identity=Depends(authenticated)):\n        from .node_certificates import serve\n\n        return JSONResponse(\n            serve(control, identity.principal, project),\n            headers={\"Cache-Control\": \"no-store\"},\n        )\n\n    @api.get(\"/v1/projects/{project}/nodes/{node_id}/resource-usage\")\n    def node_resource_usage(project: str, node_id: str, identity=Depends(authenticated)):\n        from .node_resource_usage import serve\n\n        return serve(control, identity.principal, project, node_id)\n\n    @api.get(\"/v1/projects/{project}/capacity\")\n    def capacity(project: str, identity=Depends(authenticated)):\n        return control.capacity(identity.principal, project)\n"
+        }
+      ]
+    },
+    {
+      "source": "96afd799d49717fd40e4ddabd538d82accbe1958",
+      "path": "services/control-plane/src/inv/node_certificates.py",
+      "SHA256": "6e2bfb2d0cfa972eaf6f7d4ca3a1928cde7a2b3d0c21b80d03fbb4ff7ccf4901",
+      "bytes": 3111,
+      "baseBytesIdentical": true,
+      "ranges": [
+        {
+          "start": 14,
+          "end": 38,
+          "excerpt": "RENEWAL_WINDOW = timedelta(days=2)\n\n\ndef certificate_summary(items, observed_at, *, complete):\n    unknown = {\n        'state': 'unknown', 'earliestCertificateNotAfter': None,\n        'renewalWindowStartsAt': None, 'secondsUntilEarliestExpiry': None,\n    }\n    if not complete or not items or any(\n        item['channelEnabled'] is not True or item['certificateNotAfter'] is None\n        for item in items\n    ):\n        return unknown\n    from datetime import datetime\n\n    earliest = min(datetime.fromisoformat(item['certificateNotAfter']) for item in items)\n    starts = earliest - RENEWAL_WINDOW\n    state = 'expired' if earliest <= observed_at else (\n        'renewal-window' if starts <= observed_at else 'ok'\n    )\n    return {\n        'state': state,\n        'earliestCertificateNotAfter': earliest.isoformat(),\n        'renewalWindowStartsAt': starts.isoformat(),\n        'secondsUntilEarliestExpiry': math.floor((earliest - observed_at).total_seconds()),"
+        },
+        {
+          "start": 42,
+          "end": 73,
+          "excerpt": "def serve(control, principal, project):\n    with control.db.transaction(principal.tenant_id) as conn:\n        # The existing project grant precedes every metadata query.\n        control.grant(conn, principal, project)\n        observed_at = conn.execute('SELECT clock_timestamp() AS now').fetchone()['now']\n        rows = conn.execute(\n            '''SELECT n.node_id,c.certificate_not_after,c.enabled AS channel_enabled\n            FROM inv.nodes n JOIN inv.project_nodes p USING(tenant_id,node_id)\n            LEFT JOIN inv.node_channels c ON c.tenant_id=n.tenant_id AND c.node_id=n.node_id\n                AND c.recovery_epoch=n.recovery_epoch AND c.recovery_epoch=%s::uuid\n            WHERE p.project_id=%s AND p.enabled ORDER BY n.node_id LIMIT 201''',\n            (control.db.recovery_epoch, project),\n        ).fetchall()\n        complete = len(rows) <= MAX_NODES\n        items = [\n            {\n                'nodeId': row['node_id'],\n                'certificateNotAfter': row['certificate_not_after'].astimezone(timezone.utc).isoformat()\n                if row['certificate_not_after'] is not None else None,\n                'channelEnabled': row['channel_enabled'],\n            }\n            for row in rows[:MAX_NODES]\n        ]\n        response = {\n            'source': 'execution-kernel', 'scope': 'project-node-certificates',\n            'projectId': project,\n            'observedAt': observed_at.astimezone(timezone.utc).isoformat(),\n            'complete': complete, 'items': items,\n            'trust': certificate_summary(items, observed_at, complete=complete),\n        }\n        validate_contract(\"ProjectNodeCertificateObservationResponse\", response)\n        return response"
+        }
+      ]
+    },
+    {
+      "source": "96afd799d49717fd40e4ddabd538d82accbe1958",
+      "path": "services/control-plane/src/inv/node_channels.py",
+      "SHA256": "3fad0bb24beb096522ea3335e3bf45f4e65f2d0d906177ef7e310aca1128502b",
+      "bytes": 8898,
+      "baseBytesIdentical": true,
+      "ranges": [
+        {
+          "start": 151,
+          "end": 202,
+          "excerpt": "def provision_channel(\n    conn, node: NodePrincipal, *, epoch, endpoint, certificate_der, expected_version\n):\n    \"\"\"Trusted operator connection only; DB grants enforce that separation.\n\n    Call within the operator's transaction/tenant context. No runtime HTTP route.\n    The candidate certificate identity is derived from bytes, never a body hash.\n    \"\"\"\n    endpoint_parts(endpoint)\n    epoch = str(UUID(epoch))\n    fingerprint, not_after = certificate_identity(certificate_der, node, epoch)\n    with conn.transaction(), conn.cursor(row_factory=tuple_row) as cursor:\n        current_epoch = cursor.execute(\n            \"SELECT epoch FROM inv.control_epoch WHERE singleton FOR SHARE\"\n        ).fetchone()\n        if not current_epoch or str(current_epoch[0]) != epoch:\n            raise DomainError(\"NODE-0033\", \"Operator epoch differs\", 403)\n        row = cursor.execute(\n            \"SELECT recovery_epoch FROM inv.nodes WHERE tenant_id=%s AND node_id=%s FOR UPDATE\",\n            (node.tenant_id, node.node_id),\n        ).fetchone()\n        if not row or str(row[0]) != epoch:\n            raise DomainError(\"NODE-0033\", \"Node epoch differs\", 403)\n        previous = cursor.execute(\n            \"SELECT version FROM inv.node_channels WHERE tenant_id=%s AND node_id=%s FOR UPDATE\",\n            (node.tenant_id, node.node_id),\n        ).fetchone()\n        if type(expected_version) is not int or expected_version != (\n            previous[0] if previous else 0\n        ):\n            raise DomainError(\"NODE-0034\", \"Channel version conflict\", 409)\n        version = expected_version + 1\n        cursor.execute(\n            \"\"\"INSERT INTO inv.node_channels(tenant_id,node_id,recovery_epoch,version,endpoint,certificate_sha256,certificate_not_after,enabled)\n            VALUES(%s,%s,%s,%s,%s,%s,%s,true) ON CONFLICT(tenant_id,node_id) DO UPDATE SET\n            recovery_epoch=excluded.recovery_epoch,version=excluded.version,endpoint=excluded.endpoint,\n            certificate_sha256=excluded.certificate_sha256,certificate_not_after=excluded.certificate_not_after,enabled=true\"\"\",\n            (\n                node.tenant_id,\n                node.node_id,\n                epoch,\n                version,\n                endpoint,\n                fingerprint,\n                not_after,\n            ),\n        )\n        cursor.execute(\n            \"INSERT INTO inv.node_channel_audit(tenant_id,node_id,version,action,certificate_sha256) VALUES(%s,%s,%s,'provision',%s)\",\n            (node.tenant_id, node.node_id, version, fingerprint),\n        )\n        return version"
+        }
+      ]
+    },
+    {
+      "source": "96afd799d49717fd40e4ddabd538d82accbe1958",
+      "path": "services/control-plane/src/inv/node_transport.py",
+      "SHA256": "3559bbcdf9568f8930654d860b0edd980eca71c835cde3fe7380a69dd56e18f4",
+      "bytes": 12319,
+      "baseBytesIdentical": true,
+      "ranges": [
+        {
+          "start": 61,
+          "end": 79,
+          "excerpt": "class NodeTLSClient:\n    def __init__(self, *, ca_file, certificate_file, key_file, timeout=40):\n        if type(timeout) not in (int, float) or not 0.1 <= timeout <= 40:\n            raise DomainError(\"NODE-0031\", \"Invalid Node transport timeout\", 422)\n        try:\n            # Build explicit trust without SSLKEYLOGFILE/system trust side effects.\n            self.context = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)\n            self.context.load_verify_locations(cafile=str(ca_file))\n            self.context.minimum_version = ssl.TLSVersion.TLSv1_3\n            self.context.verify_flags |= ssl.VERIFY_X509_STRICT\n            self.context.verify_flags &= ~ssl.VERIFY_X509_PARTIAL_CHAIN\n            self.context.load_cert_chain(str(certificate_file), private_key(key_file))\n        except (OSError, ValueError, ssl.SSLError):\n            raise DomainError(\n                \"NODE-0031\", \"Explicit Node TLS credentials unavailable\", 503\n            ) from None\n        self.timeout = timeout\n\n    def exchange(self, channel, permit, *, observation_only=False, cancel_only=False):"
+        },
+        {
+          "start": 87,
+          "end": 90,
+          "excerpt": "    def probe(self, channel, request):\n        validate_contract(\"NodeProbeInput\", request)\n        return self._request(channel, request, \"/v1/heartbeats\", \"NodeProbeResult\")\n"
+        },
+        {
+          "start": 172,
+          "end": 196,
+          "excerpt": "        try:\n            conn.connect()  # CA, hostname, EKU and TLS version before sending bytes.\n            wire_socket[0] = conn.sock\n            if conn.sock is None or monotonic() >= deadline:\n                raise DomainError(\"NODE-0030\", \"Node delivery deadline exceeded\", 503)\n            peer_certificate = conn.sock.getpeercert(binary_form=True)\n            fingerprint, _ = certificate_identity(\n                peer_certificate,\n                NodePrincipal(channel.tenant_id, channel.node_id),\n                channel.recovery_epoch,\n            )\n            if fingerprint != channel.certificate_sha256 or monotonic() >= deadline:\n                raise DomainError(\"NODE-0032\", \"Pinned Node certificate rejected\", 403)\n            conn.sock.settimeout(max(0.001, deadline - monotonic()))\n            conn.request(\n                \"POST\",\n                path,\n                body,\n                {\"Content-Type\": \"application/json\", \"Connection\": \"close\"},\n            )\n            response = conn.getresponse()\n            if response.status == 429 and path in {\n                \"/v1/heartbeats\",\n                \"/v1/snapshots\",\n                \"/v1/storage/sample\","
+        }
+      ]
+    },
+    {
+      "source": "96afd799d49717fd40e4ddabd538d82accbe1958",
+      "path": "services/control-plane/src/inv/fresh_cpu_admission.py",
+      "SHA256": "76407ced1411f42a5eddd71c894f541b8691d461d4eb1eaea30f63b8bcf90d2c",
+      "bytes": 15096,
+      "baseBytesIdentical": true,
+      "ranges": [
+        {
+          "start": 208,
+          "end": 221,
+          "excerpt": "        if not business[0] or not public or public[0] != \"active\":\n            refuse(\"FRESH-0005\")\n    collision = cursor.execute(\"\"\"SELECT\n        EXISTS(SELECT 1 FROM inv.nodes WHERE tenant_id=%s AND node_id=%s),\n        EXISTS(SELECT 1 FROM inv.resources WHERE tenant_id=%s AND resource_id IN (%s,%s)),\n        EXISTS(SELECT 1 FROM inv.project_nodes WHERE tenant_id=%s AND node_id=%s),\n        EXISTS(SELECT 1 FROM inv.node_channels WHERE tenant_id=%s AND node_id=%s),\n        EXISTS(SELECT 1 FROM inv.node_channel_audit WHERE tenant_id=%s AND node_id=%s)\"\"\",\n        (item.tenant, item.node, item.tenant, item.cpu, item.memory,\n         item.tenant, item.node, item.tenant, item.node, item.tenant, item.node),\n    ).fetchone()\n    if any(collision):\n        refuse(\"FRESH-0008\")\n    return control"
+        }
+      ]
+    },
+    {
+      "source": "96afd799d49717fd40e4ddabd538d82accbe1958",
+      "path": "services/control-plane/src/inv/observation.py",
+      "SHA256": "b515ceda8b066466cf4cdf5fa88d04803220398c436d29ab7c5fd2793bf5748f",
+      "bytes": 6736,
+      "baseBytesIdentical": true,
+      "ranges": [
+        {
+          "start": 15,
+          "end": 25,
+          "excerpt": "\n    def begin(self, node):\n        proof = self.channels.snapshot(node, observation_only=True)\n        nonce = secrets.token_hex(32)\n        with self.db.transaction(node.tenant_id) as conn:\n            conn.execute(\n                \"INSERT INTO inv.node_probes(tenant_id,node_id,nonce) VALUES(%s,%s,%s)\",\n                (node.tenant_id, node.node_id, nonce),\n            )\n        return proof, {\"nonce\": nonce}\n"
+        }
+      ]
+    },
+    {
+      "source": "1efea494f026e932360c35ae811b6423d874a2e7",
+      "path": "deploy/lan/Dockerfile.node.remote",
+      "SHA256": "38e3b6ea2d4dcdef6c85108124324bfafd012fcd5119912bf0f61eca9999b1ae",
+      "bytes": 418,
+      "baseBytesIdentical": true,
+      "ranges": [
+        {
+          "start": 1,
+          "end": 12,
+          "excerpt": "FROM golang@sha256:60deed95d3888cc5e4d9ff8a10c54e5edc008c6ae3fba6187be6fb592e19e8c0 AS build\n\nWORKDIR /src\nCOPY services/node-agent ./services/node-agent\nCOPY packages/contracts-go ./packages/contracts-go\nWORKDIR /src/services/node-agent\nRUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 \\\n    go build -trimpath -o /out/inv-node ./cmd/inv-node\n\nFROM scratch\nCOPY --from=build /out/inv-node /inv-node\nENTRYPOINT [\"/inv-node\"]\n"
+        }
+      ]
+    }
+  ],
+  "manifestSHA256": "ee29bf60da7d5b1b00e383a7a63b3cdcb3a4e72297de68bea992c8118cdaada5",
+  "operatingConclusion": "HOLD: current split-bind UID1000 CPU profile, single-CA issuer and current authority/CP context adapter gaps prevent as-is normal renewal",
+  "nextImplementation": "FLEET5-CURRENT-CPU-COHORT-RENEWAL-ADAPTER-R1: separately dispatched code, affected hosted CI, actual source review, Root preflight and explicit operating release",
+  "earliestDefault48hLeafWindow": "2026-11-07T07:15:30Z",
+  "earliestKnownDeadlineKST": "2026-11-08T16:15:30+09:00",
+  "earliestAuthorizedActualStart": null,
+  "nextOwner": "Root: verify plan/CI/pins/state after worker release, resume sole canonical publication ownership and dispatch genuinely separate actual Claude plan review",
+  "noFreshProductCIClaim": "Docs only; product/crypto/rotation/5PC acceptance NOT_RUN, inherited runtime1efea/API96/UIabb707 remain distinct",
+  "holds": "Original19HOLD/discharges0/runtimeB0/A1-A16/H1-H7/H3EA/RDNULL_HOLD/raw7UNREGISTERED/A01-A40NOT_RUN",
+  "wholeProgramComplete": false,
+  "commit": {
+    "SHA": "a3c6984fa25c6cf179827e15e4259000e7bd294e",
+    "atKST": "2026-11-08T07:11:16+09:00",
+    "commitExit": 0,
+    "pushExit": 0,
+    "hooksDisabled": true
+  },
+  "receiptPublication": "Published tracked plan/docs source at planSHA; exact-head postCI receipt/artifacts remain Root-ready untracked to avoid self-reference"
+}

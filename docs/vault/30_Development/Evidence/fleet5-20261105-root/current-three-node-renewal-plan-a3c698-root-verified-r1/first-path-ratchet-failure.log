@@ -1,0 +1,14 @@
+FAIL (regression): 11 NEW broken path citation(s) not in the baseline:
+  + 30_Development/Current three-Node pilot renewal preflight and recovery plan R1.md || deploy/lan/peer_policy_phase.py:13  [path does not exist]
+  + 30_Development/Current three-Node pilot renewal preflight and recovery plan R1.md || deploy/lan/peer_policy_phase.py:87  [path does not exist]
+  + 30_Development/Current three-Node pilot renewal preflight and recovery plan R1.md || deploy/lan/worker_config.py:239  [line 239 beyond 172 lines]
+  + 30_Development/Current three-Node pilot renewal preflight and recovery plan R1.md || deploy/lan/worker_peer_floor.py:119  [path does not exist]
+  + 30_Development/Current three-Node pilot renewal preflight and recovery plan R1.md || deploy/lan/worker_plain_rotation.py:264  [path does not exist]
+  + 30_Development/Current three-Node pilot renewal preflight and recovery plan R1.md || deploy/lan/worker_plain_rotation.py:95  [path does not exist]
+  + 30_Development/Current three-Node pilot renewal preflight and recovery plan R1.md || services/control-plane/src/inv/fresh_cpu_admission.py:208  [path does not exist]
+  + 30_Development/Current three-Node pilot renewal preflight and recovery plan R1.md || services/node-agent/runtime/peer_floor_linux.go:107  [path does not exist]
+  + 30_Development/Current three-Node pilot renewal preflight and recovery plan R1.md || services/node-agent/runtime/peer_floor_linux.go:150  [path does not exist]
+  + 30_Development/Current three-Node pilot renewal preflight and recovery plan R1.md || services/node-agent/transport/peer_floor.go:22  [path does not exist]
+  + 30_Development/Current three-Node pilot renewal preflight and recovery plan R1.md || services/node-agent/transport/peer_floor.go:26  [path does not exist]
+  Fix the document to cite a real path (or drop the line suffix). Adding a baseline line is a
+  visible, reviewable raise of the floor in tools/baselines/doc_path_citations.txt -- not for new inventions.

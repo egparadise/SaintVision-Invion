@@ -1,0 +1,207 @@
+{
+  "atKST": "2026-11-08T06:52:37+09:00",
+  "taskID": "FLEET5-THREE-EXACT-OWNED-IDLE-NODE-PROCESS-RECONNECT-20261108",
+  "managementBase": "cc0c56e0d10f85f222bd70e420eacaef7ba29a9b",
+  "owner": "Root Codex operator",
+  "implementationSource": "1efea494f026e932360c35ae811b6423d874a2e7",
+  "UIAcceptedSource": "abb7074e3da0d547ac81d3da33dce347d5c656af",
+  "priorActualUISourceReviewer": "Claude 29046535c0bb0e2629286c8c678f563080f30a67",
+  "newIndependentReviewOfThisOperatingAction": false,
+  "operatingObservationAtKST": "2026-11-08T06:49:35+09:00",
+  "actualThreeNodeProcessRestartAndRecoveryAccepted": true,
+  "nodes": [
+    {
+      "PC": 2,
+      "nodeId": "nod_01M6TGQZ8S3DAFS7TYE8TY1PX2",
+      "containerId": "fd4bdef2db94c434b740916d50fc0d3e80c5aa49bfe01f45b415f23877e03084",
+      "oldPID": 3396744,
+      "newPID": 3498919,
+      "newStartedAt": "2026-11-07T21:39:57.845745085Z",
+      "sameIdentityAndImage": true,
+      "allConfigCertificatePrivateKeyAndStateHashesUnchanged": true,
+      "comparedFileHashes": 8,
+      "actualHeartbeatAt": "2026-11-07T21:49:18.948228+00:00",
+      "observedHeartbeatAgeSeconds": 1.590492,
+      "restartsPerformed": 1,
+      "actualCPUAndMemoryReobserved": true,
+      "physicalOSReboot": false
+    },
+    {
+      "PC": 3,
+      "nodeId": "nod_01M6TAWG25JTA3F7J7S1EE4N2W",
+      "containerId": "702fa3fbc43e8deded94e67c6e5299eb4549958e074ba4aeb40c216db29752f7",
+      "oldPID": 603060,
+      "newPID": 692332,
+      "newStartedAt": "2026-11-07T21:49:20.986639356Z",
+      "sameIdentityAndImage": true,
+      "allConfigCertificatePrivateKeyAndStateHashesUnchanged": true,
+      "comparedFileHashes": 8,
+      "actualHeartbeatAt": "2026-11-07T21:49:25.625447+00:00",
+      "observedHeartbeatAgeSeconds": 2.228973,
+      "restartsPerformed": 1,
+      "actualCPUAndMemoryReobserved": true,
+      "physicalOSReboot": false
+    },
+    {
+      "PC": 4,
+      "nodeId": "nod_01M6TGSXV1J7XWC5D5H7N6EW1D",
+      "containerId": "e74fde5e18c65df59e3f19e4ba988c43ff27a3ff76021412eb71cc79957d489e",
+      "oldPID": 424480,
+      "newPID": 453802,
+      "newStartedAt": "2026-11-07T21:49:28.266847692Z",
+      "sameIdentityAndImage": true,
+      "allConfigCertificatePrivateKeyAndStateHashesUnchanged": true,
+      "comparedFileHashes": 8,
+      "actualHeartbeatAt": "2026-11-07T21:49:32.875491+00:00",
+      "observedHeartbeatAgeSeconds": 2.082764,
+      "restartsPerformed": 1,
+      "actualCPUAndMemoryReobserved": true,
+      "physicalOSReboot": false
+    }
+  ],
+  "finalOffered": {
+    "cpuMillis": 1500,
+    "memoryBytes": 201326592
+  },
+  "sameIdentityKeysCertificatesPoliciesAndStateHashes": true,
+  "PC2FirstRestartSuccessfulDespiteCLIWarning": true,
+  "PC2RestartReplayed": false,
+  "PC3AndPC4RestartedOnceEach": true,
+  "lostPrePasswordHelperStoppedOnlyAfterExactProcessAndNoOutputDirectoryProof": true,
+  "outputWarningAndPreMutationSyntaxErrorPreserved": true,
+  "physicalOSReboot": false,
+  "actualWorkloadExecuted": false,
+  "actualEnqueueOrVotes": false,
+  "MainProductExecution": false,
+  "PC1SSHKeyEnrollmentAndPC5SafeNodeAdmissionStillMissing": true,
+  "genuineTwoNonrequesterApproversAndValidCurrentProposalStillMissing": true,
+  "GPUStorageAllFivePCManualRenewalAndPhysicalOSRebootAcceptance": false,
+  "wholeProgramComplete": false,
+  "copiedEvidence": [
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/three-owned-node-process-reconnect-r1/preflight/PC2.json",
+      "bytes": 3063,
+      "SHA256": "4e8b66a115af13e08e47f1de888308e607877d4c4694172ff0a3af01eba90bfe"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/three-owned-node-process-reconnect-r1/preflight/PC3.json",
+      "bytes": 3073,
+      "SHA256": "fa1e21249cafbdb845e790f97f396869e697d174d85fb9c1a56461f8c3520c5f"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/three-owned-node-process-reconnect-r1/preflight/PC4.json",
+      "bytes": 2919,
+      "SHA256": "351de8874bbee1b759f488034eae98f0359b2ec20b020c52c6a26f37c1c879bf"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/three-owned-node-process-reconnect-r1/preflight/remote-program.py.txt",
+      "bytes": 1744,
+      "SHA256": "56f6084ec9c42ac43c76f03cb4f350926bfd901770dcf8d61d0485f13e9153a2"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/three-owned-node-process-reconnect-r1/preflight/summary.json",
+      "bytes": 8734,
+      "SHA256": "1955597731ca1703f425fa348d2ada112a53ee384251765c65f718eaf3b0af1f"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/three-owned-node-process-reconnect-r1/first-driver-warning-hold/PC2-intent.json",
+      "bytes": 2966,
+      "SHA256": "992a96b01f93e65ab8ef6edecc9ad31ac6823c09ff20a9170cee429cb05a2c84"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/three-owned-node-process-reconnect-r1/first-driver-warning-hold/PC2-restart.json",
+      "bytes": 59,
+      "SHA256": "870f23b4114ef34739fb541fd43304ec91facab6965df7ba3f492b9958cc22fc"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/three-owned-node-process-reconnect-r1/first-driver-warning-hold/project-runs-before.json",
+      "bytes": 290,
+      "SHA256": "a084d74242c3b62f773443149b3a775b4615b9c9fa3e589d080f816c61dc1282"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/three-owned-node-process-reconnect-r1/first-driver-warning-hold/remote-program.py.txt",
+      "bytes": 3778,
+      "SHA256": "85600f7acc08bc2472c39a8eda72e8a80eb54287c6885129f37d17f8bfede7b9"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/three-owned-node-process-reconnect-r1/reconciled-continuation/PC2-CP-recovery-readonly-reconciled.json",
+      "bytes": 5221,
+      "SHA256": "3b7e23dead3a817fbf9fcbca52e566d42aa1c4f5a9643bb52b18c3c013343733"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/three-owned-node-process-reconnect-r1/reconciled-continuation/PC2-current-readonly-inspection.json",
+      "bytes": 2643,
+      "SHA256": "d257a404dea5393ee47ac6d4c53594c629f16c09d139673a048fcc778793ed3e"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/three-owned-node-process-reconnect-r1/reconciled-continuation/PC2-original-completed-restart-journal.json",
+      "bytes": 2011,
+      "SHA256": "d1e02643b81423dc3c7d419b08247ef384b439c0edd0c57cabb1c419672180d5"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/three-owned-node-process-reconnect-r1/reconciled-continuation/PC3-CP-recovery.json",
+      "bytes": 5201,
+      "SHA256": "899955708b2e81387267425109acc473d3652796bbc03e1a086a09cb52297e02"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/three-owned-node-process-reconnect-r1/reconciled-continuation/PC3-intent.json",
+      "bytes": 2976,
+      "SHA256": "dd377cbf153ec7efa7216f13c829dff49aac2a81dc06a4ce1bfaec5c62b0b735"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/three-owned-node-process-reconnect-r1/reconciled-continuation/PC3-restart.json",
+      "bytes": 4315,
+      "SHA256": "5fef0598223cd154f22239442ac7ee52e67a07357ee9279595ba59d993cda7dc"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/three-owned-node-process-reconnect-r1/reconciled-continuation/PC4-CP-recovery.json",
+      "bytes": 4935,
+      "SHA256": "331e3675fd1b48abaa199793668b5ee54e48117b72e88eceae0ef809286ad647"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/three-owned-node-process-reconnect-r1/reconciled-continuation/PC4-intent.json",
+      "bytes": 2822,
+      "SHA256": "3055a3502630a78a2b4f49636a17d4980c84fe39e22d8da4ef87527074aadc90"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/three-owned-node-process-reconnect-r1/reconciled-continuation/PC4-restart.json",
+      "bytes": 4049,
+      "SHA256": "c5dc9c3c255bb0f41257b97213450de60f73041982894072d91a234798ca7cdd"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/three-owned-node-process-reconnect-r1/reconciled-continuation/project-runs-before.json",
+      "bytes": 290,
+      "SHA256": "a084d74242c3b62f773443149b3a775b4615b9c9fa3e589d080f816c61dc1282"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/three-owned-node-process-reconnect-r1/reconciled-continuation/receipt.json",
+      "bytes": 18707,
+      "SHA256": "a79b7e4ce5dbbbd60f835434678b5115cbb5d7472437304826d98f49d46298d5"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/three-owned-node-process-reconnect-r1/reconciled-continuation/remote-program.py.txt",
+      "bytes": 4014,
+      "SHA256": "0211b01d7a5f224088b09261c8dbcaef24601e93cbda27b4a2909e533979f60f"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/three-owned-node-process-reconnect-r1/preflight_owned_three_node_reconnect_r1.py.txt",
+      "bytes": 3961,
+      "SHA256": "5c7a76f6302ea731b38dd36e1e434b680f4aecc71655529e58962a84526898f8"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/three-owned-node-process-reconnect-r1/verify_three_owned_node_process_reconnect_r1.py.txt",
+      "bytes": 9458,
+      "SHA256": "f60a435f47df73843be784f12c8a6d11a34ee471bd4a416f572c08c6709fd37c"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/three-owned-node-process-reconnect-r1/reconcile_node2_continue_node34_reconnect_r2.py.txt",
+      "bytes": 5089,
+      "SHA256": "a320e2371b7a39e7163ed08664a1647cac077517331732f746933f70284c2bb7"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/three-owned-node-process-reconnect-r1/reconcile_node2_continue_node34_reconnect_expanded_r2.py.txt",
+      "bytes": 16987,
+      "SHA256": "7750d05b6c46a390e2e11b2fa77656da76a48ece5424543fab956279d8374d94"
+    }
+  ]
+}

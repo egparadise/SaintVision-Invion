@@ -1,0 +1,6 @@
+{
+  "exit": 2,
+  "kind": "Root raw log text publication whitespace failure, not product/CI failure",
+  "stdout": "docs/vault/30_Development/Evidence/fleet5-20261105-root/current-three-node-renewal-plan-a3c698-root-verified-r1/job-log.log:170: trailing whitespace.\n+2026-11-07T22:11:53.2103166Z \ndocs/vault/30_Development/Evidence/fleet5-20261105-root/current-three-node-renewal-plan-a3c698-root-verified-r1/job-log.log:172: trailing whitespace.\n+2026-11-07T22:11:53.2120797Z \ndocs/vault/30_Development/Evidence/fleet5-20261105-root/current-three-node-renewal-plan-a3c698-root-verified-r1/job-log.log:227: trailing whitespace.\n+2026-11-07T22:11:54.1223276Z   PUSH_BEFORE: \ndocs/vault/30_Development/Evidence/fleet5-20261105-root/current-three-node-renewal-plan-a3c698-root-verified-r1/job-log.log:259: trailing whitespace.\n+2026-11-07T22:12:00.7346813Z \ndocs/vault/30_Development/Evidence/fleet5-20261105-root/current-three-node-renewal-plan-a3c698-root-verified-r1/job-log.log:416: trailing whitespace.\n+2026-11-07T22:12:03.3951158Z \n",
+  "resolution": "Same exact 47421 raw bytes preserved as base64 JSON with original SHA256; no Git/checker/baseline relaxation."
+}

@@ -1,0 +1,186 @@
+{
+  "atKST": "2026-11-08T07:24:08+09:00",
+  "originalPlanSHA": "a3c6984fa25c6cf179827e15e4259000e7bd294e",
+  "originalPlanVersion": "1.0.0",
+  "managementCopyVersion": "1.0.1",
+  "sourcePath": "docs/vault/30_Development/Current three-Node pilot renewal preflight and recovery plan R1.md",
+  "originalGitBlobSHA256": "fa611f66ca353a8cfa522fc3a44299289884f632771e3b32168d7193981d2f3c",
+  "managementCopySHA256": "e79e13c165975a2015c6258699e1c3b04c79372ce70fff2f9349380a48bf9268",
+  "citationChanges": [
+    {
+      "original": "`services/control-plane/src/inv/node_certificates.py:14`",
+      "applicableSource": "96afd799d49717fd40e4ddabd538d82accbe1958",
+      "permalink": "https://github.com/egparadise/SaintVision-Invion/blob/96afd799d49717fd40e4ddabd538d82accbe1958/services/control-plane/src/inv/node_certificates.py#L14"
+    },
+    {
+      "original": "`tools/lan_pilot.py:3313`",
+      "applicableSource": "1efea494f026e932360c35ae811b6423d874a2e7",
+      "permalink": "https://github.com/egparadise/SaintVision-Invion/blob/1efea494f026e932360c35ae811b6423d874a2e7/tools/lan_pilot.py#L3313"
+    },
+    {
+      "original": "`deploy/lan/peer_policy_phase.py:13`",
+      "applicableSource": "1efea494f026e932360c35ae811b6423d874a2e7",
+      "permalink": "https://github.com/egparadise/SaintVision-Invion/blob/1efea494f026e932360c35ae811b6423d874a2e7/deploy/lan/peer_policy_phase.py#L13"
+    },
+    {
+      "original": "`tools/lan_pilot.py:2055`",
+      "applicableSource": "1efea494f026e932360c35ae811b6423d874a2e7",
+      "permalink": "https://github.com/egparadise/SaintVision-Invion/blob/1efea494f026e932360c35ae811b6423d874a2e7/tools/lan_pilot.py#L2055"
+    },
+    {
+      "original": "`tools/lan_pki.py:42`",
+      "applicableSource": "1efea494f026e932360c35ae811b6423d874a2e7",
+      "permalink": "https://github.com/egparadise/SaintVision-Invion/blob/1efea494f026e932360c35ae811b6423d874a2e7/tools/lan_pki.py#L42"
+    },
+    {
+      "original": "`deploy/lan/worker_leaf_rotation.py:72`",
+      "applicableSource": "1efea494f026e932360c35ae811b6423d874a2e7",
+      "permalink": "https://github.com/egparadise/SaintVision-Invion/blob/1efea494f026e932360c35ae811b6423d874a2e7/deploy/lan/worker_leaf_rotation.py#L72"
+    },
+    {
+      "original": "`services/control-plane/src/inv/app.py:719`",
+      "applicableSource": "96afd799d49717fd40e4ddabd538d82accbe1958",
+      "permalink": "https://github.com/egparadise/SaintVision-Invion/blob/96afd799d49717fd40e4ddabd538d82accbe1958/services/control-plane/src/inv/app.py#L719"
+    },
+    {
+      "original": "`services/control-plane/src/inv/node_certificates.py:42`",
+      "applicableSource": "96afd799d49717fd40e4ddabd538d82accbe1958",
+      "permalink": "https://github.com/egparadise/SaintVision-Invion/blob/96afd799d49717fd40e4ddabd538d82accbe1958/services/control-plane/src/inv/node_certificates.py#L42"
+    },
+    {
+      "original": "`services/control-plane/src/inv/app.py:527`",
+      "applicableSource": "96afd799d49717fd40e4ddabd538d82accbe1958",
+      "permalink": "https://github.com/egparadise/SaintVision-Invion/blob/96afd799d49717fd40e4ddabd538d82accbe1958/services/control-plane/src/inv/app.py#L527"
+    },
+    {
+      "original": "`services/control-plane/src/inv/observation.py:16`",
+      "applicableSource": "96afd799d49717fd40e4ddabd538d82accbe1958",
+      "permalink": "https://github.com/egparadise/SaintVision-Invion/blob/96afd799d49717fd40e4ddabd538d82accbe1958/services/control-plane/src/inv/observation.py#L16"
+    },
+    {
+      "original": "`services/control-plane/src/inv/node_transport.py:87`",
+      "applicableSource": "96afd799d49717fd40e4ddabd538d82accbe1958",
+      "permalink": "https://github.com/egparadise/SaintVision-Invion/blob/96afd799d49717fd40e4ddabd538d82accbe1958/services/control-plane/src/inv/node_transport.py#L87"
+    },
+    {
+      "original": "`services/node-agent/transport/server.go:55`",
+      "applicableSource": "1efea494f026e932360c35ae811b6423d874a2e7",
+      "permalink": "https://github.com/egparadise/SaintVision-Invion/blob/1efea494f026e932360c35ae811b6423d874a2e7/services/node-agent/transport/server.go#L55"
+    },
+    {
+      "original": "`services/node-agent/cmd/inv-node/main.go:55`",
+      "applicableSource": "1efea494f026e932360c35ae811b6423d874a2e7",
+      "permalink": "https://github.com/egparadise/SaintVision-Invion/blob/1efea494f026e932360c35ae811b6423d874a2e7/services/node-agent/cmd/inv-node/main.go#L55"
+    },
+    {
+      "original": "`services/node-agent/transport/peer_floor.go:22`",
+      "applicableSource": "1efea494f026e932360c35ae811b6423d874a2e7",
+      "permalink": "https://github.com/egparadise/SaintVision-Invion/blob/1efea494f026e932360c35ae811b6423d874a2e7/services/node-agent/transport/peer_floor.go#L22"
+    },
+    {
+      "original": "`services/node-agent/runtime/peer_floor_linux.go:107`",
+      "applicableSource": "1efea494f026e932360c35ae811b6423d874a2e7",
+      "permalink": "https://github.com/egparadise/SaintVision-Invion/blob/1efea494f026e932360c35ae811b6423d874a2e7/services/node-agent/runtime/peer_floor_linux.go#L107"
+    },
+    {
+      "original": "`tools/lan_pilot.py:2997`",
+      "applicableSource": "1efea494f026e932360c35ae811b6423d874a2e7",
+      "permalink": "https://github.com/egparadise/SaintVision-Invion/blob/1efea494f026e932360c35ae811b6423d874a2e7/tools/lan_pilot.py#L2997"
+    },
+    {
+      "original": "`deploy/lan/worker_plain_rotation.py:95`",
+      "applicableSource": "1efea494f026e932360c35ae811b6423d874a2e7",
+      "permalink": "https://github.com/egparadise/SaintVision-Invion/blob/1efea494f026e932360c35ae811b6423d874a2e7/deploy/lan/worker_plain_rotation.py#L95"
+    },
+    {
+      "original": "`services/control-plane/src/inv/node_channels.py:151`",
+      "applicableSource": "96afd799d49717fd40e4ddabd538d82accbe1958",
+      "permalink": "https://github.com/egparadise/SaintVision-Invion/blob/96afd799d49717fd40e4ddabd538d82accbe1958/services/control-plane/src/inv/node_channels.py#L151"
+    },
+    {
+      "original": "`services/control-plane/src/inv/fresh_cpu_admission.py:208`",
+      "applicableSource": "96afd799d49717fd40e4ddabd538d82accbe1958",
+      "permalink": "https://github.com/egparadise/SaintVision-Invion/blob/96afd799d49717fd40e4ddabd538d82accbe1958/services/control-plane/src/inv/fresh_cpu_admission.py#L208"
+    },
+    {
+      "original": "`services/node-agent/transport/peer_floor.go:26`",
+      "applicableSource": "1efea494f026e932360c35ae811b6423d874a2e7",
+      "permalink": "https://github.com/egparadise/SaintVision-Invion/blob/1efea494f026e932360c35ae811b6423d874a2e7/services/node-agent/transport/peer_floor.go#L26"
+    },
+    {
+      "original": "`services/node-agent/runtime/peer_floor_linux.go:150`",
+      "applicableSource": "1efea494f026e932360c35ae811b6423d874a2e7",
+      "permalink": "https://github.com/egparadise/SaintVision-Invion/blob/1efea494f026e932360c35ae811b6423d874a2e7/services/node-agent/runtime/peer_floor_linux.go#L150"
+    },
+    {
+      "original": "`deploy/lan/Dockerfile.node.remote:12`",
+      "applicableSource": "1efea494f026e932360c35ae811b6423d874a2e7",
+      "permalink": "https://github.com/egparadise/SaintVision-Invion/blob/1efea494f026e932360c35ae811b6423d874a2e7/deploy/lan/Dockerfile.node.remote#L12"
+    },
+    {
+      "original": "`deploy/lan/worker_config.py:239`",
+      "applicableSource": "1efea494f026e932360c35ae811b6423d874a2e7",
+      "permalink": "https://github.com/egparadise/SaintVision-Invion/blob/1efea494f026e932360c35ae811b6423d874a2e7/deploy/lan/worker_config.py#L239"
+    },
+    {
+      "original": "`deploy/lan/worker_peer_floor.py:119`",
+      "applicableSource": "1efea494f026e932360c35ae811b6423d874a2e7",
+      "permalink": "https://github.com/egparadise/SaintVision-Invion/blob/1efea494f026e932360c35ae811b6423d874a2e7/deploy/lan/worker_peer_floor.py#L119"
+    },
+    {
+      "original": "`tools/lan_pilot.py:397`",
+      "applicableSource": "1efea494f026e932360c35ae811b6423d874a2e7",
+      "permalink": "https://github.com/egparadise/SaintVision-Invion/blob/1efea494f026e932360c35ae811b6423d874a2e7/tools/lan_pilot.py#L397"
+    },
+    {
+      "original": "`services/control-plane/src/inv/node_transport.py:61`",
+      "applicableSource": "96afd799d49717fd40e4ddabd538d82accbe1958",
+      "permalink": "https://github.com/egparadise/SaintVision-Invion/blob/96afd799d49717fd40e4ddabd538d82accbe1958/services/control-plane/src/inv/node_transport.py#L61"
+    },
+    {
+      "original": "`services/node-agent/transport/trust.go:50`",
+      "applicableSource": "1efea494f026e932360c35ae811b6423d874a2e7",
+      "permalink": "https://github.com/egparadise/SaintVision-Invion/blob/1efea494f026e932360c35ae811b6423d874a2e7/services/node-agent/transport/trust.go#L50"
+    },
+    {
+      "original": "`services/control-plane/src/inv/node_transport.py:61`",
+      "applicableSource": "96afd799d49717fd40e4ddabd538d82accbe1958",
+      "permalink": "https://github.com/egparadise/SaintVision-Invion/blob/96afd799d49717fd40e4ddabd538d82accbe1958/services/control-plane/src/inv/node_transport.py#L61"
+    },
+    {
+      "original": "`deploy/lan/peer_policy_phase.py:87`",
+      "applicableSource": "1efea494f026e932360c35ae811b6423d874a2e7",
+      "permalink": "https://github.com/egparadise/SaintVision-Invion/blob/1efea494f026e932360c35ae811b6423d874a2e7/deploy/lan/peer_policy_phase.py#L87"
+    },
+    {
+      "original": "`services/node-agent/runtime/journal.go:339`",
+      "applicableSource": "1efea494f026e932360c35ae811b6423d874a2e7",
+      "permalink": "https://github.com/egparadise/SaintVision-Invion/blob/1efea494f026e932360c35ae811b6423d874a2e7/services/node-agent/runtime/journal.go#L339"
+    },
+    {
+      "original": "`services/control-plane/src/inv/node_channels.py:151`",
+      "applicableSource": "96afd799d49717fd40e4ddabd538d82accbe1958",
+      "permalink": "https://github.com/egparadise/SaintVision-Invion/blob/96afd799d49717fd40e4ddabd538d82accbe1958/services/control-plane/src/inv/node_channels.py#L151"
+    },
+    {
+      "original": "`deploy/lan/worker_leaf_rotation.py:466`",
+      "applicableSource": "1efea494f026e932360c35ae811b6423d874a2e7",
+      "permalink": "https://github.com/egparadise/SaintVision-Invion/blob/1efea494f026e932360c35ae811b6423d874a2e7/deploy/lan/worker_leaf_rotation.py#L466"
+    },
+    {
+      "original": "`deploy/lan/worker_plain_rotation.py:264`",
+      "applicableSource": "1efea494f026e932360c35ae811b6423d874a2e7",
+      "permalink": "https://github.com/egparadise/SaintVision-Invion/blob/1efea494f026e932360c35ae811b6423d874a2e7/deploy/lan/worker_plain_rotation.py#L264"
+    },
+    {
+      "original": "`services/node-agent/transport/trust.go:72`",
+      "applicableSource": "1efea494f026e932360c35ae811b6423d874a2e7",
+      "permalink": "https://github.com/egparadise/SaintVision-Invion/blob/1efea494f026e932360c35ae811b6423d874a2e7/services/node-agent/transport/trust.go#L72"
+    }
+  ],
+  "pathGateFailurePreserved": true,
+  "pathCheckerOrBaselineChanged": false,
+  "productSourceChanged": false,
+  "planDecisionOrManifestChanged": false,
+  "actualIndependentReview": false
+}

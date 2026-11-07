@@ -1,0 +1,257 @@
+{
+  "schemaVersion": "saintvision-current-three-node-renewal-plan:1",
+  "documentId": "PLAN-FLEET5-CURRENT-THREE-NODE-RENEWAL-R1",
+  "taskId": "task_8298b23be39f",
+  "dispatchId": "ctx_cc3c139fd6e0",
+  "kind": "PROPOSED_NONEXECUTING_PUBLIC_OPERATION_MANIFEST",
+  "status": "HOLD_IMPLEMENTATION_AND_REVIEW_REQUIRED",
+  "executable": false,
+  "operatingAuthorization": null,
+  "operator": "Root only, future separately authorized action",
+  "author": "Actual Orca Codex",
+  "independentReviewer": null,
+  "requiredIndependentReviewer": "One actual Claude dispatched by Root after author release",
+  "sources": {
+    "deliveryBase": "abb7074e3da0d547ac81d3da33dce347d5c656af",
+    "runtime": "1efea494f026e932360c35ae811b6423d874a2e7",
+    "API": "96afd799d49717fd40e4ddabd538d82accbe1958",
+    "schema": "0068 unchanged",
+    "UI": "abb7074e3da0d547ac81d3da33dce347d5c656af",
+    "management": "66b42d572b9ffe31134e191f57d07ca362f0d1af",
+    "sourcePins": "source-contract-map.json",
+    "operatingInputPins": "root-input-pins.json",
+    "governancePins": "read-pins.json"
+  },
+  "scope": {
+    "tenantId": "97968b42-68aa-40ce-af5e-3a33e2fc2205",
+    "recoveryEpoch": "bcd581be-31b4-4aca-86e6-3ca31b69ed09",
+    "projectId": "prj_01M6NDBHVD2DZQ1Q38DCKN1XE3",
+    "exactMemberCount": 3,
+    "profile": "cpu-pilot-1efea-r1",
+    "ownedImage": "sha256:de654cd385307ac7147baf6757a480f803361eb5b30d40c7991b272a6889d87f",
+    "ownerLabel": "ai.saintvision.owner=root-cpu-1efea-r1",
+    "configMount": "/config read-only bind of each account ~/saintvision-share/nodes/NodeID",
+    "stateMount": "/state read-write bind of the same host directory child/state",
+    "UID": "1000:1000",
+    "rootReadOnly": true,
+    "capDrop": "ALL",
+    "noNewPrivileges": true,
+    "socket": "existing /var/run/docker.sock only",
+    "keyChoice": "RETAIN_EXISTING_NODE_CP_CA_LAUNCH_KEYS",
+    "membershipOrCAOrKeyReplacementAllowed": false
+  },
+  "nodes": [
+    {
+      "PC": 2,
+      "account": "saintvision-invion",
+      "address": "192.168.45.143",
+      "nodeId": "nod_01M6TGQZ8S3DAFS7TYE8TY1PX2",
+      "endpoint": "https://192.168.45.143:19443",
+      "containerId": "fd4bdef2db94c434b740916d50fc0d3e80c5aa49bfe01f45b415f23877e03084",
+      "currentChannelGeneration": null,
+      "currentSignedPeerGeneration": null,
+      "currentSignedFloor": null,
+      "proposedNextLeaf": null,
+      "installReceipt": null,
+      "finalizedAttestation": null,
+      "operationResult": "NOT_RUN"
+    },
+    {
+      "PC": 3,
+      "account": "saintvision-invion3",
+      "address": "192.168.45.222",
+      "nodeId": "nod_01M6TAWG25JTA3F7J7S1EE4N2W",
+      "endpoint": "https://192.168.45.222:19443",
+      "containerId": "702fa3fbc43e8deded94e67c6e5299eb4549958e074ba4aeb40c216db29752f7",
+      "currentChannelGeneration": null,
+      "currentSignedPeerGeneration": null,
+      "currentSignedFloor": null,
+      "proposedNextLeaf": null,
+      "installReceipt": null,
+      "finalizedAttestation": null,
+      "operationResult": "NOT_RUN"
+    },
+    {
+      "PC": 4,
+      "account": "inviz",
+      "address": "192.168.45.210",
+      "nodeId": "nod_01M6TGSXV1J7XWC5D5H7N6EW1D",
+      "endpoint": "https://192.168.45.210:19443",
+      "containerId": "e74fde5e18c65df59e3f19e4ba988c43ff27a3ff76021412eb71cc79957d489e",
+      "currentChannelGeneration": null,
+      "currentSignedPeerGeneration": null,
+      "currentSignedFloor": null,
+      "proposedNextLeaf": null,
+      "installReceipt": null,
+      "finalizedAttestation": null,
+      "operationResult": "NOT_RUN"
+    }
+  ],
+  "historicalTimingInputsFromRoot536": {
+    "peerPoliciesExpireAt": "2026-11-08T07:15:30Z",
+    "peerPoliciesExpireAtKST": "2026-11-08T16:15:30+09:00",
+    "nodeAndCPClientLeavesNotAfter": "2026-11-09T07:15:30Z",
+    "CANotAfter": "2026-11-14T07:15:30Z",
+    "initialPeerVersionHistoricalOnly": 1,
+    "initialPeerVersionIsCurrentSignedObservation": false,
+    "publicCAFileSHA256": "b8d777ab04c65a44f827fdda9629d54a086e9ff8cc752b90a09023a93341c5a3",
+    "sharedCPClientDER_SHA256Historical": "48911c5ddf7d12f05b9866feea0f0005c193d76a956274e2510492d0c2f76481",
+    "processReconnectObservedAtKST": "2026-11-08T06:49:35+09:00",
+    "processReconnectProvesRenewalOrFloorContents": false
+  },
+  "derivedPlanningBoundsNotNewRuntimeOutputs": {
+    "default48hLeafWindowStartsAt": "2026-11-07T07:15:30Z",
+    "earliestKnownBlockingDeadline": "2026-11-08T07:15:30Z",
+    "earliestAuthorizedActualStart": null,
+    "selectedExecutionWindow": null,
+    "selectedOverlapSeconds": null,
+    "selectedLeafTTLSeconds": null,
+    "normalReferenceBounds": {
+      "floorFreshSeconds": 120,
+      "clockSkewSeconds": 30,
+      "strictPolicyWriteRemainingSecondsGreaterThan": 630,
+      "overlapSecondsStrictlyGreaterThan": 630,
+      "maximumOverlapSeconds": 21600,
+      "defaultOverlapSecondsNotSelected": 14400,
+      "leafTTLSecondsRange": [60, 518400],
+      "leafNotAfterMustNotExceedCurrentCA": true,
+      "generationMaximum": 9007199254740991,
+      "peerArithmetic": "P_i -> P_i+1 overlap -> P_i+2 final, from fresh signed current P_i",
+      "channelArithmetic": "C_i -> C_i+1 CAS, independent from P_i"
+    }
+  },
+  "privateHandlesToBeBoundOnlyByRootLater": {
+    "CAKey": null,
+    "CAKeyPasswordOrCustody": null,
+    "CPClientKey": null,
+    "restrictedProvisioningConnection": null,
+    "nodeOwnedCSRs": null,
+    "revocationRegistry": null,
+    "operationNonce": null,
+    "proposalBytesAndDigest": null,
+    "CPCommitReceipt": null,
+    "retirementArchive": null
+  },
+  "contracts": {
+    "projectReads": {
+      "method": "GET",
+      "paths": [
+        "/v1/projects/{project}/nodes",
+        "/v1/projects/{project}/node-certificates",
+        "/v1/projects/{project}/nodes/{node}/resource-usage",
+        "/v1/projects/{project}/capacity",
+        "/v1/projects/{project}/runs/run_01M6VXSMM9SV8MAB7K4B1YCRX8"
+      ],
+      "actor": "Existing genuine authenticated user with real project grant",
+      "credentialValue": null,
+      "result": null,
+      "execution": "NOT_RUN"
+    },
+    "technicalHeartbeat": {
+      "method": "POST",
+      "path": "/v1/heartbeats",
+      "authority": "Existing CP observer mTLS TLS1.3, exact CA/SPIFFE/DER/channel pins; not bearer auth",
+      "bodyContract": "NodeProbeInput, nonce lower-case hex64, actual value null",
+      "nonce": null,
+      "result": null,
+      "hasOperationalSideEffects": true,
+      "sideEffectNote": "CP probe/heartbeat records and Node durable policy pinning; not worker read-only execution",
+      "execution": "NOT_RUN"
+    },
+    "actualSignedFloor": {
+      "method": "LOCAL_CLI_NOT_HTTP",
+      "entryPoint": "inv-node --observe-peer-policy-floor",
+      "bodyContract": "saintvision-node-peer-policy-floor:2, signed actual serving process/executable/journal/floor/DER/nonce",
+      "currentCPUProfileSupported": false,
+      "nonce": null,
+      "result": null,
+      "execution": "NOT_RUN"
+    },
+    "renewalHTTPRoute": null,
+    "renewalIdempotencyHeader": null,
+    "operatorLibraryCAS": {
+      "entryPoint": "inv.node_channels.provision_channel",
+      "actor": "Restricted Root-owned provisioning actor, never CP runtime/user browser",
+      "expectedCurrentVersion": null,
+      "candidateDER": null,
+      "CASResult": null,
+      "auditReceipt": null,
+      "execution": "NOT_RUN"
+    }
+  },
+  "mandatoryImplementationGaps": [
+    {
+      "id": "CPU-RENEW-G1",
+      "finding": "Signed floor and worker target reject exact current profile, /state journal with /config credentials, UID1000 split binds; executable owner compatibility also unproved",
+      "source": "source-contract-map.json: peer_floor.go, peer_floor_linux.go, worker_config.py, worker_peer_floor.py",
+      "status": "HOLD"
+    },
+    {
+      "id": "CPU-RENEW-G2",
+      "finding": "Current pinned single dedicated CA does not satisfy normal two-certificate root/intermediate issuer contract",
+      "source": "tools/lan_pilot.py:397 and :1564; Root genuine pilot public setup",
+      "status": "HOLD"
+    },
+    {
+      "id": "CPU-RENEW-G3",
+      "finding": "No proved current-cohort authority registry/receipt protocol or CP live SSLContext refresh binding; fresh admission is not renewal",
+      "source": "tools/lan_pilot.py:2997, inv/node_transport.py:61, inv/fresh_cpu_admission.py:208",
+      "status": "HOLD"
+    }
+  ],
+  "requiredNextTask": {
+    "id": "FLEET5-CURRENT-CPU-COHORT-RENEWAL-ADAPTER-R1",
+    "status": "PROPOSED_NOT_IMPLEMENTED",
+    "owner": "Codex after separate dispatch",
+    "reviewer": "One actual independent Claude after exact final code and affected hosted CI",
+    "requiredProofs": [
+      "Exact current CPU split-bind UID1000 signed serving proof; wrong UID/profile/path/executable/nonce/journal refusal",
+      "Real hosted Linux Docker mount/file visibility, atomic path and crash controls, no Main product execution",
+      "Exact pinned single-CA issuance and negative key/revocation/expiry/chain controls; no generic verifier weakening",
+      "Two complete three-member shared-client cycles with independent P/C, CAS races, exact retry and irreversible-floor rollback refusal",
+      "Protected CP context replacement and stale-context refusal",
+      "Actual source review and Root private preflight/explicit operating release",
+      "Separate identity/journal-preserving image/CID migration authorization if serving binary change is required"
+    ],
+    "implementationSHA": null,
+    "CI": null,
+    "reviewResult": null
+  },
+  "conditionalFuturePhases": [
+    {"phase": "READ_ONLY_PREFLIGHT", "state": "NOT_RUN", "output": null},
+    {"phase": "PREPARE_EXACT_ALL3_PUBLIC_BATCH", "state": "NOT_RUN", "output": null},
+    {"phase": "DURABLE_INTENT_AND_PER_NODE_OVERLAP_INSTALL", "state": "NOT_RUN", "proposedCanaryOrder": [2, 4, 3], "output": null},
+    {"phase": "PER_NODE_C_PLUS_1_CAS_AFTER_SIGNED_INSTALL", "state": "NOT_RUN", "output": null},
+    {"phase": "SWITCH_SHARED_CP_CLIENT_AFTER_ALL3_STAGED", "state": "NOT_RUN", "output": null},
+    {"phase": "FINAL_POLICY_P_PLUS_2_AND_NODE_ATTESTATIONS", "state": "NOT_RUN", "output": null},
+    {"phase": "IMMUTABLE_CP_RETIREMENT_AND_FRESH_RESOURCE_READBACK", "state": "NOT_RUN", "output": null}
+  ],
+  "recovery": {
+    "beforePublicationIntent": "NO_ROTATION: preserve all active bytes, keys, C/P, journals and services; keep staged public evidence",
+    "afterPublicationIntent": "FORWARD_ONLY: no old certificate/policy restoration, floor reset, DB version decrement, journal deletion or new operation after uncertainty",
+    "uncertainResult": "Freeze exact original bytes/operation; Root reconciles actual CID/process/floor/CAS/audit/receipts before exact reviewed replay",
+    "expiredOrUnprovableState": "HOLD separately reviewed offline forward recovery; current CPU adapter is not implemented",
+    "rollbackExecuted": "NOT_RUN",
+    "forwardRecoveryExecuted": "NOT_RUN"
+  },
+  "protectedDependencyActions": "NONE_AUTHORIZED",
+  "canonicalState": {
+    "startBytes": 575395,
+    "startSHA256": "ce2b8d11efab6cc12be57925b0f6504698ec6dbb49ece4ba8a584ef1c4a897b8",
+    "mode": "CHECK_ONLY",
+    "RootOnlyAPPLY": true
+  },
+  "existingBusinessGate": {
+    "runId": "run_01M6VXSMM9SV8MAB7K4B1YCRX8",
+    "lastReportedState": "awaiting_approval",
+    "lastReportedVersion": 4,
+    "lastReportedAttempt": 0,
+    "approvalId": "apr_01M6VXSPZ0252M2SJ8ZA5E11QE",
+    "approvalExpiredAtKST": "2026-11-08T06:24:26+09:00",
+    "genuineTwoDistinctNonrequesterApprovers": null,
+    "votesEnqueueExecution": "NOT_RUN",
+    "renewalGrantsBusinessApproval": false
+  },
+  "holds": "Original19HOLD/discharges0/runtimeB0/A1-A16/H1-H7/H3EA/RDNULL_HOLD/raw7UNREGISTERED/A01-A40NOT_RUN",
+  "wholeProgramComplete": false
+}

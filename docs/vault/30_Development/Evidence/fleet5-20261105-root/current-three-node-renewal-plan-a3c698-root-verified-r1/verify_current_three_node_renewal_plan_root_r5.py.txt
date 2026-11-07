@@ -1,0 +1,25 @@
+from pathlib import Path
+r=Path(__file__).resolve().parents[1]
+p=(r/'.work/verify_current_three_node_renewal_plan_root_r1.py').read_text(encoding='utf-8')
+p=p.replace('current-three-node-renewal-plan-root-verification-r1','current-three-node-renewal-plan-root-verification-r5')
+a="for span in item['ranges']:assert '\\n'.join(lines[span['start']-1:span['end']])==span['excerpt']"
+b="""for span in item['ranges']:
+        exactLineRange='\\n'.join(lines[span['start']-1:span['end']])==span['excerpt']
+        exactFullFileWithEOFTerminator=span['start']==1 and span['end']==len(lines) and span['excerpt']==b.decode('utf-8')
+        assert exactLineRange or exactFullFileWithEOFTerminator"""
+assert a in p;p=p.replace(a,b)
+p=p.replace("[gh,'api','repos/egparadise/SaintVision-Invion/'+path]","[gh,'api','--allow-escape-sequences','repos/egparadise/SaintVision-Invion/'+path]")
+a="""path=folder/old['downloadedZIP'];assert path.stat().st_size==art['size_in_bytes'];h=hashlib.sha256()
+    with path.open('rb') as stream:
+        for chunk in iter(lambda:stream.read(1048576),b''):h.update(chunk)
+    assert 'sha256:'+h.hexdigest()==art['digest'];artifact_pins.append({'id':art['id'],'bytes':art['size_in_bytes'],'SHA256':h.hexdigest(),'officialDigestAndActualWorkerZIPMatched':True})"""
+b="""if 'downloadedZIP' in old:
+        path=folder/old['downloadedZIP'];assert path.stat().st_size==art['size_in_bytes'];h=hashlib.sha256()
+        with path.open('rb') as stream:
+            for chunk in iter(lambda:stream.read(1048576),b''):h.update(chunk)
+        assert 'sha256:'+h.hexdigest()==art['digest'];artifact_pins.append({'id':art['id'],'bytes':art['size_in_bytes'],'SHA256':h.hexdigest(),'officialDigestAndActualWorkerZIPMatched':True})
+    else:
+        artifact_pins.append({'id':art['id'],'bytes':art['size_in_bytes'],'officialDigest':art['digest'],'actualZIPDownloadedOrContentsUsedByRoot':False,'scope':'Official metadata only; no actual ZIP-content verification claimed'})"""
+assert a in p;p=p.replace(a,b)
+p=p.replace('officialArtifactDigestsAndActualZIPs','officialArtifactMetadataAndAvailableZIPVerification')
+exec(compile(p,str(__file__),'exec'),{'__file__':str(__file__),'__name__':'__main__'})

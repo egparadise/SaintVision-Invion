@@ -1,6 +1,6 @@
 {
   "schema": "fleet5-root-review-resource-sequence:1",
-  "atKST": "2026-11-08T06:52:37+09:00",
+  "atKST": "2026-11-08T07:22:16+09:00",
   "completedB": {
     "task": "task_d4c4c809ed4e",
     "review": "ac9182c3e3d606ec027c0be2e90e049ff50d54f1",
@@ -13,7 +13,13 @@
     "source": "8874b2dfe0dda9a019bd5f334636668290702e13"
   },
   "active": null,
-  "pending": [],
+  "pending": [
+    {
+      "kind": "ACTUAL_CLAUDE_PLAN_REVIEW",
+      "target": "a3c6984fa25c6cf179827e15e4259000e7bd294e",
+      "state": "READY_NOT_DISPATCHED_ROOT537_PUBLICATION_FIRST"
+    }
+  ],
   "authorParallelWork": "B frozen b51 awaiting actual delta verdict; H12 accepted6d7 plus read-only five-row audit delivered, Root owns first CPU journey preflight. Optional Low backlog is not a mandatory new scope.",
   "reason": "actuala7e9 and5a3c reviews+CI verified andprecisefixscopesdelivered; do notselfclose source/runtime",
   "genericApprovalMissing": false,
@@ -22,7 +28,7 @@
     "review": "0e53fc024ca773b7719182e170e5e126aeaf5b95",
     "verdict": "ACCEPT TEST-ONLY; R-L1 CLOSED; no new findings"
   },
-  "nextActualReviewTrigger": "Actual 3-Node idle process reconnect complete. No source implementation/review pending. Genuine approver identities/current decisions, PC1 enrollment and safe PC5 prerequisites remain; evaluate remaining renewal window from accepted source without restoring old disabled renewers or resetting floors. Root is sole credential/operator and canonical APPLY owner.",
+  "nextActualReviewTrigger": "After Root537 exact Docs/Obsidian and all prior workers released, dispatch one actual Claude independent plan review. Do not execute old renewers or current rotation. Then scope accepted current-cohort adapter code/hosted proof/source review and Root private preflight.",
   "completedIntegration": {
     "task": "task_78064fb4b7ff",
     "dispatch": "ctx_ed7ec73163d6",
@@ -4058,6 +4064,203 @@
     "PC1SSHKeyEnrollmentAndPC5SafeNodeAdmissionStillMissing": true,
     "genuineTwoNonrequesterApproversAndValidCurrentProposalStillMissing": true,
     "GPUStorageAllFivePCManualRenewalAndPhysicalOSRebootAcceptance": false,
+    "wholeProgramComplete": false
+  },
+  "RootCurrentThreeNodeRenewalPlan": {
+    "atKST": "2026-11-08T07:22:16+09:00",
+    "taskID": "FLEET5-CURRENT-THREE-NODE-RENEWAL-PLAN-ROOT-VERIFY-AND-ACTUAL-REVIEW-PREP-20261108",
+    "owner": "Root Codex coordinator",
+    "managementBase": "66b42d572b9ffe31134e191f57d07ca362f0d1af",
+    "planSHA": "a3c6984fa25c6cf179827e15e4259000e7bd294e",
+    "actualAuthorDispatch": "ctx_cc3c139fd6e0",
+    "actualAuthorTask": "task_8298b23be39f",
+    "authorExitedAndReleased": true,
+    "actualReviewerPriorDispatch": "ctx_3a1660628584",
+    "reviewerExitedAndReleased": true,
+    "sourceAnchorsVerified": 21,
+    "originalSetupAndReconnectInputsVerified": 11,
+    "exactPlanDocs": 42419449079,
+    "all19StepsActualSuccess": true,
+    "rootVerification": "r5 immutable Git/hash/official metadata/actual route ZIP/job log",
+    "planOnly": true,
+    "actualPlanIndependentReview": false,
+    "rotationAllowed": false,
+    "missingCurrentProfileSingleCAAuthorityAndCPContextAdapters": true,
+    "earliestPolicyDeadlineKST": "2026-11-08T16:15:30+09:00",
+    "default48hLeafWindowAlreadyOpenAtKST": "2026-11-07T16:15:30+09:00",
+    "currentGenerations": "null/unknown; no synthetic signed floor",
+    "actualRotationOrEnqueueVotes": false,
+    "rootCanonicalSoleApplyOwnershipResumedAfterActualExit": true,
+    "nextActionOwner": "Root completes Root537 exact Docs and Obsidian then starts one actual Claude plan review. Code implementation and operating release are later distinct gates.",
+    "metadataVerificationCorrections": [
+      "r1/r2 source excerpt comparator omitted Dockerfile final EOF line terminator; r3 verifies exact full file bytes for this full-file range. All 21 source SHA/bytes unchanged.",
+      "r3 official GH job log read refused terminal escape sequences; r4 uses documented --allow-escape-sequences to capture raw log without rendering it.",
+      "r4 assumed both artifacts had actual downloaded ZIPs; actual receipt only downloads route ZIP. r5 verifies route actual ZIP and guidelines official metadata only, makes no guidelines content verification claim."
+    ],
+    "imports": [
+      {
+        "source": "a3c6984fa25c6cf179827e15e4259000e7bd294e",
+        "path": "docs/vault/30_Development/Current three-Node pilot renewal preflight and recovery plan R1.md",
+        "bytes": 29413,
+        "SHA256": "fa611f66ca353a8cfa522fc3a44299289884f632771e3b32168d7193981d2f3c"
+      },
+      {
+        "source": "a3c6984fa25c6cf179827e15e4259000e7bd294e",
+        "path": "docs/vault/30_Development/Evidence/fleet5-current-three-node-renewal-plan-r1-20261108-codex/.gitattributes",
+        "bytes": 38,
+        "SHA256": "0420344ee4c3a78126364b7063f81a2f738e7dd30d1460d0e8dc29f1449979cd"
+      },
+      {
+        "source": "a3c6984fa25c6cf179827e15e4259000e7bd294e",
+        "path": "docs/vault/30_Development/Evidence/fleet5-current-three-node-renewal-plan-r1-20261108-codex/ci-receipts.py",
+        "bytes": 3275,
+        "SHA256": "f4acaed0fba130945d355c040eb4e87450b96be63705b1e0a9344df49bc7873a"
+      },
+      {
+        "source": "a3c6984fa25c6cf179827e15e4259000e7bd294e",
+        "path": "docs/vault/30_Development/Evidence/fleet5-current-three-node-renewal-plan-r1-20261108-codex/context.json",
+        "bytes": 1605,
+        "SHA256": "9d4fb817d0774cf540ed25f465621824eebf371d53279deccd62a6c136192787"
+      },
+      {
+        "source": "a3c6984fa25c6cf179827e15e4259000e7bd294e",
+        "path": "docs/vault/30_Development/Evidence/fleet5-current-three-node-renewal-plan-r1-20261108-codex/local-gates.json",
+        "bytes": 2249,
+        "SHA256": "b0e238e13b58f9db8db224a3cebc04caadc4315d9d7aaa30c318b942ea6e0947"
+      },
+      {
+        "source": "a3c6984fa25c6cf179827e15e4259000e7bd294e",
+        "path": "docs/vault/30_Development/Evidence/fleet5-current-three-node-renewal-plan-r1-20261108-codex/manifest-data-check.json",
+        "bytes": 245,
+        "SHA256": "a6e476a637f6605effb4afb0e40fdfc4343189311be58a38ac204bf6f3d95921"
+      },
+      {
+        "source": "a3c6984fa25c6cf179827e15e4259000e7bd294e",
+        "path": "docs/vault/30_Development/Evidence/fleet5-current-three-node-renewal-plan-r1-20261108-codex/metadata-gates.py",
+        "bytes": 2160,
+        "SHA256": "e5b16985aae7513fbe276af86278a8177f141cfb14f8a79e8bfde73e6124657d"
+      },
+      {
+        "source": "a3c6984fa25c6cf179827e15e4259000e7bd294e",
+        "path": "docs/vault/30_Development/Evidence/fleet5-current-three-node-renewal-plan-r1-20261108-codex/operation-manifest.json",
+        "bytes": 11706,
+        "SHA256": "ee29bf60da7d5b1b00e383a7a63b3cdcb3a4e72297de68bea992c8118cdaada5"
+      },
+      {
+        "source": "a3c6984fa25c6cf179827e15e4259000e7bd294e",
+        "path": "docs/vault/30_Development/Evidence/fleet5-current-three-node-renewal-plan-r1-20261108-codex/protected-trees.json",
+        "bytes": 1717,
+        "SHA256": "c3ca5be9465839adf1c7f7bb4dc40115ae3e6dcd91759c9e508697908d810397"
+      },
+      {
+        "source": "a3c6984fa25c6cf179827e15e4259000e7bd294e",
+        "path": "docs/vault/30_Development/Evidence/fleet5-current-three-node-renewal-plan-r1-20261108-codex/read-pins.json",
+        "bytes": 8177,
+        "SHA256": "7a75092aa2a98adbbf651c760d299ba8957aa5adbcd883184ed939a747a3f191"
+      },
+      {
+        "source": "a3c6984fa25c6cf179827e15e4259000e7bd294e",
+        "path": "docs/vault/30_Development/Evidence/fleet5-current-three-node-renewal-plan-r1-20261108-codex/root-input-pins.json",
+        "bytes": 3360,
+        "SHA256": "f019f640e9f2e8e5fb06acbc77fc33e57faf28e3b4269f7a05502a39e250ba7f"
+      },
+      {
+        "source": "a3c6984fa25c6cf179827e15e4259000e7bd294e",
+        "path": "docs/vault/30_Development/Evidence/fleet5-current-three-node-renewal-plan-r1-20261108-codex/root-inputs/pc3-actual-cpu-pilot-r1/pc3-cpu-pki-r1/receipt.json",
+        "bytes": 3798,
+        "SHA256": "15ac20406291ad5ffe2ed4fdbfca531ff6f9a036301df4bf8a2306d8770530ea"
+      },
+      {
+        "source": "a3c6984fa25c6cf179827e15e4259000e7bd294e",
+        "path": "docs/vault/30_Development/Evidence/fleet5-current-three-node-renewal-plan-r1-20261108-codex/root-inputs/pc3-actual-cpu-pilot-r1/pc3-node-start-r1/receipt.json",
+        "bytes": 2503,
+        "SHA256": "1b3d1bf9a6504856da8618ba19a7153edaeec05f55efdca5a3ece1ba61a53f97"
+      },
+      {
+        "source": "a3c6984fa25c6cf179827e15e4259000e7bd294e",
+        "path": "docs/vault/30_Development/Evidence/fleet5-current-three-node-renewal-plan-r1-20261108-codex/root-inputs/three-owned-node-process-reconnect-r1/preflight/PC2.json",
+        "bytes": 3002,
+        "SHA256": "9f593fab61af65f2c5b0253aaa2168433c176f1f009470f148a00caffed5bda8"
+      },
+      {
+        "source": "a3c6984fa25c6cf179827e15e4259000e7bd294e",
+        "path": "docs/vault/30_Development/Evidence/fleet5-current-three-node-renewal-plan-r1-20261108-codex/root-inputs/three-owned-node-process-reconnect-r1/preflight/PC3.json",
+        "bytes": 3012,
+        "SHA256": "4831ecc9f937b3238e5160b510009b86e4143075626c95da8f0866ea2ac5b010"
+      },
+      {
+        "source": "a3c6984fa25c6cf179827e15e4259000e7bd294e",
+        "path": "docs/vault/30_Development/Evidence/fleet5-current-three-node-renewal-plan-r1-20261108-codex/root-inputs/three-owned-node-process-reconnect-r1/preflight/PC4.json",
+        "bytes": 2858,
+        "SHA256": "932480d92a0dbee3938c3d905c98f98991c41f571c32c43184681bbd8145c0b1"
+      },
+      {
+        "source": "a3c6984fa25c6cf179827e15e4259000e7bd294e",
+        "path": "docs/vault/30_Development/Evidence/fleet5-current-three-node-renewal-plan-r1-20261108-codex/root-inputs/three-owned-node-process-reconnect-r1/reconciled-continuation/receipt.json",
+        "bytes": 18707,
+        "SHA256": "a79b7e4ce5dbbbd60f835434678b5115cbb5d7472437304826d98f49d46298d5"
+      },
+      {
+        "source": "a3c6984fa25c6cf179827e15e4259000e7bd294e",
+        "path": "docs/vault/30_Development/Evidence/fleet5-current-three-node-renewal-plan-r1-20261108-codex/root-inputs/three-owned-node-process-reconnect-r1/root-independent-metadata-verification.json",
+        "bytes": 10098,
+        "SHA256": "91d835664a3c7ca365ea871026c51488ace6ae0b0372ce633152a459bb9a5ffb"
+      },
+      {
+        "source": "a3c6984fa25c6cf179827e15e4259000e7bd294e",
+        "path": "docs/vault/30_Development/Evidence/fleet5-current-three-node-renewal-plan-r1-20261108-codex/root-inputs/three-pc-actual-cpu-pilot-r1/pc24-node-start-r2/node-start-template-remote-program.py.txt",
+        "bytes": 6343,
+        "SHA256": "e4dbc30260ab61ef162f45a080143a01f886544c7ff1f8ca8add1f12bdc0a08d"
+      },
+      {
+        "source": "a3c6984fa25c6cf179827e15e4259000e7bd294e",
+        "path": "docs/vault/30_Development/Evidence/fleet5-current-three-node-renewal-plan-r1-20261108-codex/root-inputs/three-pc-actual-cpu-pilot-r1/pc24-node-start-r2/receipt.json",
+        "bytes": 9758,
+        "SHA256": "38ef758ed2b248403c73891053d36025bddbd9266cc4798c8eeb9b2422e6a1f2"
+      },
+      {
+        "source": "a3c6984fa25c6cf179827e15e4259000e7bd294e",
+        "path": "docs/vault/30_Development/Evidence/fleet5-current-three-node-renewal-plan-r1-20261108-codex/root-inputs/three-pc-actual-cpu-pilot-r1/pc24-pilot-ca-signing-r1/receipt.json",
+        "bytes": 8708,
+        "SHA256": "fd92f15a44803a99c804289d0dea97c17c90222d4701eb17d445b90aacd99fdc"
+      },
+      {
+        "source": "a3c6984fa25c6cf179827e15e4259000e7bd294e",
+        "path": "docs/vault/30_Development/Evidence/fleet5-current-three-node-renewal-plan-r1-20261108-codex/root-inputs/three-pc-actual-cpu-pilot-r1/pc24-pilot-ca-signing-r1/remote-signing-program.py.txt",
+        "bytes": 5665,
+        "SHA256": "74e47801c4a150cb3a7fb1e47e4417624b040edde20a75fd3f35bb47627f03fa"
+      },
+      {
+        "source": "a3c6984fa25c6cf179827e15e4259000e7bd294e",
+        "path": "docs/vault/30_Development/Evidence/fleet5-current-three-node-renewal-plan-r1-20261108-codex/source-contract-map.json",
+        "bytes": 108500,
+        "SHA256": "b9be2924d9c45c90716acc6bd8eeca224c3ce9c5479fa03a3a75b32f4292ced0"
+      },
+      {
+        "source": "a3c6984fa25c6cf179827e15e4259000e7bd294e",
+        "path": "docs/vault/30_Development/Evidence/fleet5-current-three-node-renewal-plan-r1-20261108-codex/sync-state-after.json",
+        "bytes": 575395,
+        "SHA256": "ce2b8d11efab6cc12be57925b0f6504698ec6dbb49ece4ba8a584ef1c4a897b8"
+      },
+      {
+        "source": "a3c6984fa25c6cf179827e15e4259000e7bd294e",
+        "path": "docs/vault/30_Development/Evidence/fleet5-current-three-node-renewal-plan-r1-20261108-codex/sync-state-before.json",
+        "bytes": 575395,
+        "SHA256": "ce2b8d11efab6cc12be57925b0f6504698ec6dbb49ece4ba8a584ef1c4a897b8"
+      },
+      {
+        "source": "a3c6984fa25c6cf179827e15e4259000e7bd294e",
+        "path": "docs/vault/30_Development/Evidence/fleet5-current-three-node-renewal-plan-r1-20261108-codex/sync-state-comparison.json",
+        "bytes": 278,
+        "SHA256": "93cc3ffb2470780d1c9874530ad0062733e85f14af234fad3f699d5362fab31f"
+      },
+      {
+        "source": "a3c6984fa25c6cf179827e15e4259000e7bd294e",
+        "path": "docs/vault/30_Development/History/2026-11-08_07-08_KST_current_three_node_renewal_plan_Codex.md",
+        "bytes": 2836,
+        "SHA256": "d4a9b60e5146d5eff1b7e33d842d7209812ed96a1abb8e95e5752a4f869d54d2"
+      }
+    ],
     "wholeProgramComplete": false
   }
 }

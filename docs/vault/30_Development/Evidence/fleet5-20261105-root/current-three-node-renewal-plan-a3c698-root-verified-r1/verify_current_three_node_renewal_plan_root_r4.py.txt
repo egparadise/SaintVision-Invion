@@ -1,0 +1,8 @@
+from pathlib import Path
+r=Path(__file__).resolve().parents[1]
+p=(r/'.work/verify_current_three_node_renewal_plan_root_r3.py').read_text(encoding='utf-8')
+p=p.replace('current-three-node-renewal-plan-root-verification-r3','current-three-node-renewal-plan-root-verification-r4')
+needle="exec(compile(p,str(__file__),'exec')"
+assert needle in p
+p=p.replace(needle,"p=p.replace(\"[gh,'api','repos/egparadise/SaintVision-Invion/'+path]\",\"[gh,'api','--allow-escape-sequences','repos/egparadise/SaintVision-Invion/'+path]\")\n"+needle)
+exec(compile(p,str(__file__),'exec'),{'__file__':str(__file__),'__name__':'__main__'})

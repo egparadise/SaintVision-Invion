@@ -1,0 +1,11 @@
+from pathlib import Path
+r=Path(__file__).resolve().parents[1]
+p=(r/'.work/verify_current_three_node_renewal_plan_root_r1.py').read_text(encoding='utf-8')
+a="for span in item['ranges']:assert '\\n'.join(lines[span['start']-1:span['end']])==span['excerpt']"
+b="""for span in item['ranges']:
+        exactLineRange='\\n'.join(lines[span['start']-1:span['end']])==span['excerpt']
+        exactFullFileWithEOFTerminator=span['start']==1 and span['end']==len(lines) and span['excerpt']==b.decode('utf-8')
+        assert exactLineRange or exactFullFileWithEOFTerminator"""
+assert a in p;p=p.replace(a,b)
+p=p.replace('current-three-node-renewal-plan-root-verification-r1','current-three-node-renewal-plan-root-verification-r3')
+exec(compile(p,str(__file__),'exec'),{'__file__':str(__file__),'__name__':'__main__'})

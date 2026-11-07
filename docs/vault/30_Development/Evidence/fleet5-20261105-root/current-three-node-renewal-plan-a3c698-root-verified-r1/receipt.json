@@ -1,0 +1,53 @@
+{
+  "verifiedAtKST": "2026-11-08T07:20:12+09:00",
+  "planSHA": "a3c6984fa25c6cf179827e15e4259000e7bd294e",
+  "base": "abb7074e3da0d547ac81d3da33dce347d5c656af",
+  "Root536": "66b42d572b9ffe31134e191f57d07ca362f0d1af",
+  "deliverySHA256": "59c4cd3cadda4974eacd74b7d6735dd462caa3878bb1e9c1ad6f45006992427d",
+  "changedDocsOnlyPaths": 28,
+  "protectedTrees": [
+    "apps",
+    "contracts",
+    "packages",
+    "services",
+    "src",
+    "migrations",
+    "tests",
+    "tools",
+    "deploy",
+    ".github",
+    "skills",
+    "docs/sources",
+    "docs/task-registry.json",
+    "docs/source-manifest.json"
+  ],
+  "exactSourcePinsAndExcerptRangesVerified": 21,
+  "exactRoot536SetupAndReconnectPinsVerified": 11,
+  "metadataGatesActualRecordedExit0": 6,
+  "exactManualAttempt1Docs": 42419449079,
+  "officialAll19SuccessJob": 128544506528,
+  "officialArtifactMetadataAndAvailableZIPVerification": [
+    {
+      "id": 13593026734,
+      "bytes": 1915,
+      "SHA256": "009658c460a3d1563608f7bd7ff5974000a563aabde7e5216c9bc28a9001e2f1",
+      "officialDigestAndActualWorkerZIPMatched": true
+    },
+    {
+      "id": 13592334806,
+      "bytes": 49728626,
+      "officialDigest": "sha256:13139281d7f91d84905ac9698007276e8d720d973b7017dff7b579f1e28ff700",
+      "actualZIPDownloadedOrContentsUsedByRoot": false,
+      "scope": "Official metadata only; no actual ZIP-content verification claimed"
+    }
+  ],
+  "officialJobLogSHA256": "41e79fd6957afec1310b42bbb243e2810820f776aebd8c93bb16a2612150ae29",
+  "canonicalStartEndPostCICurrentFullBytesMatch": true,
+  "canonicalBytes": 575395,
+  "canonicalSHA256": "ce2b8d11efab6cc12be57925b0f6504698ec6dbb49ece4ba8a584ef1c4a897b8",
+  "planOnly": true,
+  "actualIndependentReview": false,
+  "actualRenewal": false,
+  "nextImplementationGate": "Current UID1000 split-bind/single-CA and CP publication adapters missing; actual Claude plan review first",
+  "wholeProgramComplete": false
+}
