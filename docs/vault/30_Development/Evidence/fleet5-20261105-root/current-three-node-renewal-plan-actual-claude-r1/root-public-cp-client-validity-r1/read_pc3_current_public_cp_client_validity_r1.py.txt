@@ -1,0 +1,25 @@
+"""Read exactly one existing public certificate on PC3; no keys, mutation or Main crypto."""
+import datetime,hashlib,json,shlex,subprocess
+from pathlib import Path
+r=Path(__file__).resolve().parents[1];w=r/'.work';out=w/'pc3-public-cp-client-validity-r1';assert not out.exists();out.mkdir()
+plan=json.loads((w/'one-cpu-node-plan-r1.public.json').read_bytes());interpreter=plan['verifiedInterpreter'];assert interpreter.startswith('/home/saintvision-invion3/saintvision-share/ops-fresh-cpu-1efea-r1-20261107/') and interpreter.endswith('/bin/python')
+program=r'''import datetime,json,stat
+from pathlib import Path
+from cryptography import x509
+from cryptography.hazmat.primitives import hashes
+path=Path('/home/saintvision-invion3/saintvision-share/ops-fresh-cpu-1efea-r1-20261107/pki-r1/cp-client-cert.pem')
+assert not path.is_symlink()
+s=path.stat();assert stat.S_ISREG(s.st_mode) and s.st_size<16384 and s.st_uid==1000
+raw=path.read_bytes();cert=x509.load_pem_x509_certificate(raw);fingerprint=cert.fingerprint(hashes.SHA256()).hex()
+assert fingerprint=='48911c5ddf7d12f05b9866feea0f0005c193d76a956274e2510492d0c2f76481'
+uris=cert.extensions.get_extension_for_class(x509.SubjectAlternativeName).value.get_values_for_type(x509.UniformResourceIdentifier)
+assert uris==['spiffe://saintvision.ai/tenant/97968b42-68aa-40ce-af5e-3a33e2fc2205/control-plane/epoch/bcd581be-31b4-4aca-86e6-3ca31b69ed09']
+now=datetime.datetime.now(datetime.timezone.utc)
+print(json.dumps({'atUTC':now.isoformat(timespec='seconds'),'publicCertificatePath':str(path),'CPClientDER_SHA256':fingerprint,'notBefore':cert.not_valid_before_utc.isoformat(),'notAfter':cert.not_valid_after_utc.isoformat(),'URI':uris[0],'dateValidAtRead':cert.not_valid_before_utc<=now<cert.not_valid_after_utc,'readExactlyPublicCertificate':True,'privateKeyRead':False,'newTLSContextOrHandshakeExecuted':False,'liveActiveClientContextsAttested':False,'fileOrProcessMutation':False}))
+'''
+(out/'remote-read-only-public-certificate.py.txt').write_text(program,encoding='utf-8')
+known=Path(r'D:\Project\SaintVisionI-Invion\fleet5-worker-readiness-20261105\.work\f5-low-closure-26607075f612\known_hosts.f5.pinned');before=known.read_bytes();assert hashlib.sha256(before).hexdigest()=='0dcbf0f4cfc363e4affc30810ad8a9e57bd2c4a31991e2c8285bdae7052ec2d2'
+argv=['ssh','-T','-i',r'C:\Users\inviz\.ssh\sv-lan-ed25519','-o','IdentitiesOnly=yes','-o','BatchMode=yes','-o','ConnectionAttempts=1','-o','ConnectTimeout=5','-o','StrictHostKeyChecking=yes','-o','UserKnownHostsFile='+str(known),'saintvision-invion3@192.168.45.222',interpreter,'-I','-B','-c',shlex.quote(program)]
+q=subprocess.run(argv,capture_output=True,timeout=25);result={'atKST':datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=9))).isoformat(timespec='seconds'),'SSHExit':q.returncode,'stderrBytes':len(q.stderr),'knownHostsUnchanged':known.read_bytes()==before,'remote':json.loads(q.stdout) if q.stdout else None,'mainProductOrCryptoExecution':False,'wholeProgramComplete':False}
+(out/'receipt.json').write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n',encoding='utf-8');assert q.returncode==0 and not q.stderr and result['knownHostsUnchanged'];assert result['remote']['dateValidAtRead']
+print(json.dumps(result),flush=True)

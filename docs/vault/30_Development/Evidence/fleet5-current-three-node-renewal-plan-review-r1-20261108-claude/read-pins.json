@@ -1,0 +1,254 @@
+{
+  "docID": "EVIDENCE-FLEET5-CURRENT-THREE-NODE-RENEWAL-PLAN-REVIEW-R1-20261108-CLAUDE-READ-PINS",
+  "version": "1.0.0",
+  "meaning": "Exact Git blobs this reviewer read. SHA256 is of the committed blob bytes (git show).",
+  "reviewInputs": [
+    {
+      "source": "a3c6984fa25c6cf179827e15e4259000e7bd294e",
+      "path": "docs/vault/30_Development/Current three-Node pilot renewal preflight and recovery plan R1.md",
+      "bytes": 29413,
+      "SHA256": "fa611f66ca353a8cfa522fc3a44299289884f632771e3b32168d7193981d2f3c",
+      "version": "1.0.0"
+    },
+    {
+      "source": "a3c6984fa25c6cf179827e15e4259000e7bd294e",
+      "path": "docs/vault/30_Development/Evidence/fleet5-current-three-node-renewal-plan-r1-20261108-codex/operation-manifest.json",
+      "bytes": 11706,
+      "SHA256": "ee29bf60da7d5b1b00e383a7a63b3cdcb3a4e72297de68bea992c8118cdaada5"
+    },
+    {
+      "source": "a3c6984fa25c6cf179827e15e4259000e7bd294e",
+      "path": "docs/vault/30_Development/Evidence/fleet5-current-three-node-renewal-plan-r1-20261108-codex/source-contract-map.json",
+      "bytes": 108500,
+      "SHA256": "b9be2924d9c45c90716acc6bd8eeca224c3ce9c5479fa03a3a75b32f4292ced0"
+    },
+    {
+      "source": "a3c6984fa25c6cf179827e15e4259000e7bd294e",
+      "path": "docs/vault/30_Development/Evidence/fleet5-current-three-node-renewal-plan-r1-20261108-codex/root-input-pins.json",
+      "bytes": 3360,
+      "SHA256": "f019f640e9f2e8e5fb06acbc77fc33e57faf28e3b4269f7a05502a39e250ba7f"
+    },
+    {
+      "source": "a3c6984fa25c6cf179827e15e4259000e7bd294e",
+      "path": "docs/vault/30_Development/Evidence/fleet5-current-three-node-renewal-plan-r1-20261108-codex/read-pins.json",
+      "bytes": 8177,
+      "SHA256": "7a75092aa2a98adbbf651c760d299ba8957aa5adbcd883184ed939a747a3f191"
+    },
+    {
+      "source": "a3c6984fa25c6cf179827e15e4259000e7bd294e",
+      "path": "docs/vault/30_Development/Evidence/fleet5-current-three-node-renewal-plan-r1-20261108-codex/context.json",
+      "bytes": 1605,
+      "SHA256": "9d4fb817d0774cf540ed25f465621824eebf371d53279deccd62a6c136192787"
+    },
+    {
+      "source": "a2d7977196363955de0cdc9dd1a412e1c5297199",
+      "path": "docs/vault/30_Development/Current three-Node pilot renewal preflight and recovery plan R1.md",
+      "bytes": 34628,
+      "SHA256": "e79e13c165975a2015c6258699e1c3b04c79372ce70fff2f9349380a48bf9268",
+      "version": "1.0.1"
+    },
+    {
+      "source": "a2d7977196363955de0cdc9dd1a412e1c5297199",
+      "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/current-three-node-renewal-plan-a3c698-root-verified-r1/source-reference-publication-adaptation.json",
+      "bytes": 11114,
+      "SHA256": "b1b17e2e860f11f3b33954a972e523be4da6211ab8d4f74ef98fa2c828319df4"
+    },
+    {
+      "source": "a2d7977196363955de0cdc9dd1a412e1c5297199",
+      "path": "docs/vault/00_Index/전체 개발 진행 현황.md",
+      "bytes": 521028,
+      "SHA256": "395ba78cf5a64c1f289a3ba3b7934eeb0ef09914df3ad984d2a2499813d9a67f",
+      "version": "1.0.537"
+    },
+    {
+      "source": "a2d7977196363955de0cdc9dd1a412e1c5297199",
+      "path": "docs/vault/30_Development/Agent별 작업/Codex 작업 현황.md",
+      "bytes": 506514,
+      "SHA256": "992f7b7a2cb49be8d8f80b50da11ccb60e5218e3987e173acf9fabc8f5e8c88a",
+      "version": "1.0.498"
+    },
+    {
+      "source": "a2d7977196363955de0cdc9dd1a412e1c5297199",
+      "path": "docs/vault/30_Development/History/2026-11-05_기존5대_오케스트레이션_착수_Codex.md",
+      "bytes": 777067,
+      "SHA256": "5f526c596365e3fe561b120158235d1d3919f928c6fd0e8b410b3c25f2ebd374",
+      "version": "1.0.146"
+    },
+    {
+      "source": "a2d7977196363955de0cdc9dd1a412e1c5297199",
+      "path": "docs/vault/30_Development/Agent별 작업/Claude 작업 현황.md",
+      "bytes": 645029,
+      "SHA256": "ad4a5fca80686f1edcbaf9a0abda8fbf5aaccfb0a68f1c03a67b8a32de15236b",
+      "version": "1.2.130"
+    },
+    {
+      "source": "29046535c0bb0e2629286c8c678f563080f30a67",
+      "path": "AGENTS.md",
+      "bytes": 7086,
+      "SHA256": "c12a50a38f81c12a647f9b6f4592a205cd899e76d29190202a6ae73b12c04b27"
+    },
+    {
+      "source": "29046535c0bb0e2629286c8c678f563080f30a67",
+      "path": "skills/agent-delivery/SKILL.md",
+      "bytes": 1276,
+      "SHA256": "9596c1d4a132c3de90fd99ed2095b8271da7a31532e8487aa6d7d93151ac3830",
+      "version": "1.1.0"
+    }
+  ],
+  "sourceBlobsRead": [
+    {
+      "source": "1efea494f026e932360c35ae811b6423d874a2e7",
+      "path": "services/node-agent/transport/trust.go",
+      "bytes": 5422,
+      "SHA256": "3b5dd89f9d6bdeb777d81f822688ece6c04b549080f53e8f7487bf70789b20df",
+      "identicalAtReviewBase29046535": true
+    },
+    {
+      "source": "1efea494f026e932360c35ae811b6423d874a2e7",
+      "path": "services/node-agent/runtime/peer_floor_linux.go",
+      "bytes": 13506,
+      "SHA256": "03ba6c3e1c30c79837f6ccde37f793f6a97210497ff9be2d45a0e3716f73b9c0",
+      "identicalAtReviewBase29046535": true
+    },
+    {
+      "source": "1efea494f026e932360c35ae811b6423d874a2e7",
+      "path": "services/node-agent/transport/peer_floor.go",
+      "bytes": 3564,
+      "SHA256": "ac7480132f073fc129f98e1095b7d384313631c2f656ba762f607e1f1d62a2c3",
+      "identicalAtReviewBase29046535": true
+    },
+    {
+      "source": "1efea494f026e932360c35ae811b6423d874a2e7",
+      "path": "services/node-agent/cmd/inv-node/main.go",
+      "bytes": 7307,
+      "SHA256": "3471f3fa13ea9ac4d27fd27ca04747a1adf2348692f846484c39f28755c23a9a",
+      "identicalAtReviewBase29046535": true
+    },
+    {
+      "source": "1efea494f026e932360c35ae811b6423d874a2e7",
+      "path": "services/node-agent/runtime/journal.go",
+      "bytes": 12966,
+      "SHA256": "0bf50af78984eed047c1fdb2a10e230a8e7eb4669893539d54d05d454097f9b6",
+      "identicalAtReviewBase29046535": true
+    },
+    {
+      "source": "1efea494f026e932360c35ae811b6423d874a2e7",
+      "path": "deploy/lan/peer_policy_phase.py",
+      "bytes": 10466,
+      "SHA256": "8aac0c65fb2a242b08287ba4206e6c7213fc18795903584b5b28abf3a10c17f8",
+      "identicalAtReviewBase29046535": true
+    },
+    {
+      "source": "1efea494f026e932360c35ae811b6423d874a2e7",
+      "path": "deploy/lan/worker_plain_rotation.py",
+      "bytes": 25708,
+      "SHA256": "bf3754a27f748b1dd58a7fc65a1f1831dddae6133f11ae17d0f7bf3ea59c46e5",
+      "identicalAtReviewBase29046535": true
+    },
+    {
+      "source": "1efea494f026e932360c35ae811b6423d874a2e7",
+      "path": "deploy/lan/worker_peer_floor.py",
+      "bytes": 21083,
+      "SHA256": "7665735eb5735be9fcb24f783f83ffe087c0d176e464a97df3022a4bd9f35799",
+      "identicalAtReviewBase29046535": true
+    },
+    {
+      "source": "1efea494f026e932360c35ae811b6423d874a2e7",
+      "path": "deploy/lan/worker_config.py",
+      "bytes": 16855,
+      "SHA256": "909d1c25deb61c5c4795af49dab18f5a9722e5cbc1c034a18472b6a4427c192c",
+      "identicalAtReviewBase29046535": true
+    },
+    {
+      "source": "1efea494f026e932360c35ae811b6423d874a2e7",
+      "path": "deploy/lan/Dockerfile.node",
+      "bytes": 62,
+      "SHA256": "6f750372a41047188260bea2e7f7789d0fd76eddd7525d176fec0b0f2203ff9d",
+      "identicalAtReviewBase29046535": true
+    },
+    {
+      "source": "1efea494f026e932360c35ae811b6423d874a2e7",
+      "path": "deploy/lan/Dockerfile.node.remote",
+      "bytes": 418,
+      "SHA256": "38e3b6ea2d4dcdef6c85108124324bfafd012fcd5119912bf0f61eca9999b1ae",
+      "identicalAtReviewBase29046535": true
+    },
+    {
+      "source": "1efea494f026e932360c35ae811b6423d874a2e7",
+      "path": "tools/lan_pilot.py",
+      "bytes": 198894,
+      "SHA256": "2c626540f495499423b707b063a6cab6a53e1be3af8c324f46af88a94ac8f652",
+      "identicalAtReviewBase29046535": true
+    },
+    {
+      "source": "1efea494f026e932360c35ae811b6423d874a2e7",
+      "path": "tools/lan_pki.py",
+      "bytes": 3906,
+      "SHA256": "8880087eacc4729795d344b65eaaefed907dcb748c87243328ae461d8b867d5c",
+      "identicalAtReviewBase29046535": true
+    },
+    {
+      "source": "1efea494f026e932360c35ae811b6423d874a2e7",
+      "path": "deploy/lan/worker_leaf_rotation.py",
+      "bytes": 54096,
+      "SHA256": "4e29685241a3e625e59aa64bcff07bdd69d4b0381c67687706a09fa960f75998",
+      "identicalAtReviewBase29046535": true
+    },
+    {
+      "source": "96afd799d49717fd40e4ddabd538d82accbe1958",
+      "path": "services/control-plane/src/inv/node_transport.py",
+      "bytes": 12319,
+      "SHA256": "3559bbcdf9568f8930654d860b0edd980eca71c835cde3fe7380a69dd56e18f4",
+      "identicalAtReviewBase29046535": true
+    },
+    {
+      "source": "96afd799d49717fd40e4ddabd538d82accbe1958",
+      "path": "services/control-plane/src/inv/observer_worker.py",
+      "bytes": 2821,
+      "SHA256": "6bbdf815554fe1f0157247732ddc4dc3069686685c291ef83add55c8f3e92003",
+      "identicalAtReviewBase29046535": true
+    },
+    {
+      "source": "96afd799d49717fd40e4ddabd538d82accbe1958",
+      "path": "services/control-plane/src/inv/worker.py",
+      "bytes": 7594,
+      "SHA256": "3010b2409bb285de960eb322792b1062ed066275307c9bea53a2cc767b65d4e3",
+      "identicalAtReviewBase29046535": true
+    },
+    {
+      "source": "96afd799d49717fd40e4ddabd538d82accbe1958",
+      "path": "services/control-plane/src/inv/workspace_config.py",
+      "bytes": 4125,
+      "SHA256": "7b77a716b4fb56e951fce110d347ac41f16d1d80d4722ba9d1410a1869b351cb",
+      "identicalAtReviewBase29046535": true
+    },
+    {
+      "source": "96afd799d49717fd40e4ddabd538d82accbe1958",
+      "path": "services/control-plane/src/inv/build_product_runtime.py",
+      "bytes": 22165,
+      "SHA256": "7483d65fcb1032aeb05b4d2dd56e09e714cff8ca676de0f80fc3a2f5e447e9af",
+      "identicalAtReviewBase29046535": true
+    },
+    {
+      "source": "96afd799d49717fd40e4ddabd538d82accbe1958",
+      "path": "services/control-plane/src/inv/storage_check_collect.py",
+      "bytes": 19960,
+      "SHA256": "bae67c856cc8bdae52c1f06c4b6e36302e17ae0dd53a24fc01557cae19a3e226",
+      "identicalAtReviewBase29046535": true
+    },
+    {
+      "source": "96afd799d49717fd40e4ddabd538d82accbe1958",
+      "path": "services/control-plane/src/inv/app.py",
+      "bytes": 59660,
+      "SHA256": "a5aa847ae287fc870031b4abefb7fb06bafe60482828198da3878f8a381ab5a3",
+      "identicalAtReviewBase29046535": true
+    },
+    {
+      "source": "96afd799d49717fd40e4ddabd538d82accbe1958",
+      "path": "services/control-plane/src/inv/node_channels.py",
+      "bytes": 8898,
+      "SHA256": "3fad0bb24beb096522ea3335e3bf45f4e65f2d0d906177ef7e310aca1128502b",
+      "identicalAtReviewBase29046535": true
+    }
+  ]
+}

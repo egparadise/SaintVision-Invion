@@ -1,0 +1,45 @@
+"""Root binding of the actual independent static plan review; metadata only."""
+import concurrent.futures,datetime,hashlib,json,re,subprocess
+from pathlib import Path
+r=Path(__file__).resolve().parents[1];w=r/'.work';out=w/'current-three-node-renewal-plan-actual-claude-root-verification-r1';assert not out.exists();out.mkdir()
+sha='f29228ed28c651cb2470b45d9f8d14521e1ce75d';base='29046535c0bb0e2629286c8c678f563080f30a67';rootsha='a2d7977196363955de0cdc9dd1a412e1c5297199';plan='a3c6984fa25c6cf179827e15e4259000e7bd294e';branch='agent/claude/fleet5-current-three-node-renewal-plan-review-r1-20261108';prefix='docs/vault/30_Development/Evidence/fleet5-current-three-node-renewal-plan-review-r1-20261108-claude'
+def git(*args):return subprocess.check_output(['git',*args],cwd=r)
+def blob(ref,path):return git('show',ref+':'+path)
+assert git('rev-parse',sha+'^').decode().strip()==base and git('ls-remote','origin','refs/heads/'+branch).decode().split()[0]==sha
+names=list(filter(None,git('diff','--name-only','-z',base,sha).decode('utf-8').split('\0')))
+assert len(names)==5 and all(x.startswith(prefix+'/') or x=='docs/vault/30_Development/History/2026-11-08_FLEET5_Current_Three_Node_Renewal_Plan_Review_R1_Claude.md' for x in names)
+v=json.loads(blob(sha,prefix+'/review.json'));pins=json.loads(blob(sha,prefix+'/read-pins.json'));gates=json.loads(blob(sha,prefix+'/local-gates.json'));state=json.loads(blob(sha,prefix+'/sync-state-comparison.json'))
+assert v['orcaTaskID']=='task_f69368c7f664' and v['orcaDispatchID']=='ctx_a4e143e61944' and v['authorReviewerDistinct']
+assert v['verdict']=='REQUEST_CHANGES' and v['mandatoryBlockers']==2 and len(v['findings'])==6
+assert [x['id'] for x in v['findings'] if x['mandatory']]==['PLAN-REVIEW-R1-F1','PLAN-REVIEW-R1-F2']
+assert all(v[k] is False for k in ['applyPerformed','canonicalWritten','wholeProgramComplete'])
+assert len(pins['reviewInputs'])==14 and len(pins['sourceBlobsRead'])==22
+for item in pins['reviewInputs']+pins['sourceBlobsRead']:
+    b=blob(item['source'],item['path']);assert len(b)==item['bytes'] and hashlib.sha256(b).hexdigest()==item['SHA256']
+    if item.get('identicalAtReviewBase29046535'):assert blob(base,item['path'])==b
+planpath='docs/vault/30_Development/Current three-Node pilot renewal preflight and recovery plan R1.md'
+old=blob(plan,planpath);new=blob(rootsha,planpath);assert len(old)==v['originalPlan']['planBlobBytes'] and hashlib.sha256(old).hexdigest()==v['originalPlan']['planBlobSHA256']
+assert len(new)==v['root537ManagementCopy']['copyBytes'] and hashlib.sha256(new).hexdigest()==v['root537ManagementCopy']['copySHA256']
+adaptpath='docs/vault/30_Development/Evidence/fleet5-20261105-root/current-three-node-renewal-plan-a3c698-root-verified-r1/source-reference-publication-adaptation.json';adapt=json.loads(blob(rootsha,adaptpath));assert len(adapt['citationChanges'])==34
+text=new.decode('utf-8');hits=re.findall(r'\[([^\]]+)\]\((https://github\.com/egparadise/SaintVision-Invion/blob/[^)]+)\)',text)
+assert hits==[(x['original'][1:-1],x['permalink']) for x in adapt['citationChanges']]
+text=re.sub(r'\[([^\]]+)\]\((https://github\.com/egparadise/SaintVision-Invion/blob/[^)]+)\)',lambda m:'`'+m.group(1)+'`',text)
+text=text.replace('version: "1.0.1"','version: "1.0.0"',1);updated=re.search(r'updated: "[^"]+"',old.decode('utf-8')).group(0);text=re.sub(r'updated: "[^"]+"',updated,text,count=1)
+text,n=re.subn(r'Publication note \(Root537\):[^\n]+\n\n','',text,count=1);assert n==1 and text.encode()==old
+imports=json.loads(blob(rootsha,'docs/vault/30_Development/Evidence/fleet5-20261105-root/current-three-node-renewal-plan-a3c698-root-verified-r1/root-current-state.json'))['imports'];assert len(imports)==27
+assert sum(blob(plan,x['path'])==blob(rootsha,x['path']) for x in imports)==26
+assert gates['baseRef']==base and gates['allExitZero']
+for key in ['initialPass','finalPassAllReviewFilesPresent']:assert len(gates[key])==6 and all(x['exit']==0 for x in gates[key])
+canonical=Path(r'D:\Project\SaintVision-Invion\SaintVisionI-Invion\.git\obsidian-sync-state.json').read_bytes();snapshot=(w/'current-three-node-renewal-plan-claude-canonical-before-r1.raw').read_bytes();digest=hashlib.sha256(canonical).hexdigest()
+assert canonical==snapshot and len(canonical)==584102 and digest=='9bcb66e67518a57aede1276f4b083c28840d3ae83f5a3c4296b1e33f355fed9a'
+assert state['beforeBytes']==state['afterLocalGatesBytes']==len(canonical) and state['beforeSHA256']==state['afterLocalGatesSHA256']==digest and state['fullBytesEqual'] and state['applyPerformed'] is False
+gh=r'C:\Program Files\GitHub CLI\gh.exe';rid=42421987817;jobid=128552186947;corr='fleet5-claude-renewal-plan-review-r1-a98d23cab63f444ba3d74a7abade8c8b'
+def get(item):
+    label,suffix=item;q=subprocess.run([gh,'api','repos/egparadise/SaintVision-Invion/actions/runs/'+str(rid)+suffix],capture_output=True,timeout=60);assert q.returncode==0
+    (out/(label+'.json')).write_bytes(q.stdout);return label,json.loads(q.stdout)
+with concurrent.futures.ThreadPoolExecutor(max_workers=2) as pool:data=dict(pool.map(get,[('run',''),('jobs','/jobs?per_page=100')]))
+a=data['run'];j=data['jobs'];assert a['head_sha']==sha and a['head_branch']==branch and a['display_title']==corr and a['event']=='workflow_dispatch' and a['path']=='.github/workflows/docs.yml' and a['run_attempt']==1 and a['status']=='completed' and a['conclusion']=='success'
+assert j['total_count']==len(j['jobs'])==1;j=j['jobs'][0];assert j['id']==jobid and j['head_sha']==sha and j['status']=='completed' and j['conclusion']=='success' and j['run_attempt']==1 and len(j['steps'])==19 and all(x['conclusion']=='success' for x in j['steps'])
+for filename,obj in [('review.json',v),('read-pins.json',pins),('local-gates.json',gates),('sync-state-comparison.json',state)]:(out/filename).write_bytes(blob(sha,prefix+'/'+filename))
+result={'verifiedAtKST':datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=9))).isoformat(timespec='seconds'),'actualReviewSHA':sha,'directBase':base,'Root537':rootsha,'originalPlan':plan,'onlyOwnReviewFilesChanged':5,'exactInputPinsVerified':14,'exactSourceBlobPinsVerified':22,'RootCitationOnlyAdaptation34ReversedAndOriginalBytesMatched':True,'unchangedPlanImportsVerified':26,'recordedSixLocalGatesPassedTwice':True,'exactReviewDocs':rid,'all19SuccessJob':jobid,'correlation':corr,'canonicalReviewerStartEndAndRootPostCIActualFullBytesMatch':True,'canonicalBytes':len(canonical),'canonicalSHA256':digest,'verdict':'REQUEST_CHANGES','mandatoryBlockers':2,'findings':v['findings'],'reviewScope':'Actual separate Claude static source and plan review; no independent product/crypto/Linux runtime execution','authorAndReviewerDistinct':True,'ownClaudeBoardUpdatedInThisReview':False,'boardFollowupRequiredAtNextActualReviewerTask':True,'actualRenewal':False,'actualMigrationOrRestart':False,'wholeProgramComplete':False}
+(out/'receipt.json').write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n',encoding='utf-8');print(json.dumps({k:z for k,z in result.items() if k!='findings'}),flush=True)

@@ -1,15 +1,19 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.498"
+version: "1.0.499"
 status: "review"
 author: "Codex"
-updated: "2026-11-08T07:22:16+09:00"
+updated: "2026-11-08T07:50:04+09:00"
 source_of_truth: "Git"
 active_card: "FLEET5 continued supervision with PORTAL-REFRESH-FLEET-20261106"
-active_card_status: "Current3NodeRenewalPlanA3c698MetadataVerified_NotYetActualIndependentReview; OldToolingProfileSingleCAAuthorityCPContextAdapterGaps_NoRotation; PriorUIAnd3ProcessRecoveryAccepted"
-active_card_next: "Finish Root537 exact Docs/canonical sync, then dispatch one actual Claude plan review on a3c698. Current policy deadline 2026-11-08T16:15:30KST; no old renewer reactivation, guessed floor, private material transfer or rotation before code/CI/independent review/Root preflight release. Genuine2approvers/PC1key/PC5safeNode/GPUstorage/manual/all5 remain."
+active_card_status: "ActualClaudeF292PlanREQUEST_CHANGES_F1DeadlineFork_F2RequiredMigration; SourceStaticReviewVerifiedNotRuntime; OriginalCodexR2Ready; NoCurrentRotationMigrationOrRestart"
+active_card_next: "Publish Root538 exact Docs/Obsidian then original actual Codex plan R2 addresses all6 findings; subsequent actual Claude delta. Normal cutoff remains null/HOLD until real frozen budget/predecessors. After16:15:30KST no current Node restart/reboot/migration, separate expired-authority forward recovery bounded by Nodeleaf11-09 and CA11-14; real2approvers/PC1key/PC5safeNode/fullGPUstorage/manual/all5 remain."
 ---
+
+## 2026-11-08T07:50:04+09:00 갱신계획 실제 Claude 검토와 필수 수정 인계
+
+실제Claude f29228ed는a3c698갱신계획을필수2건보완으로판정했다. F1은정책만료후CPmTLS거부/Node기동불가를반영한cutoff·재시작금지HOLD·별도만료권한forward-recovery분기가없음이고,F2는서빙동일바이너리M2제약때문에새Go/image/CID이행이조건부가아닌필수선행임을반영하지못함이다. F3~F6으로CPclient생성5곳·CPleafnotAfter증거·COPY라인11·CA만료후같은CA복구불가를보완한다. Root는실제검토14입력/22source·직접parent/자기문서5개·정확Docs42421987817/job128552186947전19단계·canonical584102B전체동일과34인용역변환/26사본불변을확인했다. 실제검토자종료·해제후게시권한을재개했으며원작성자R2→실제Claudedelta→시점별필수이행/adapter또는별도만료복구로이어간다. 실제갱신/이행/추가재시작은0이고5대전체완료가아니다. 다음첫행동/담당은Root538정확게시와원작성자CodexR2이며,현재계획을수락된것으로쓰지않는다. 실제검토R1은ownClaudeboard수정이없어그사실을별도추적하고다음실제검토작업에board/History동시갱신을요구한다.
 
 ## 2026-11-08T07:22:16+09:00 현재3대 갱신계획 원본 대조와 실제 검토 준비
 

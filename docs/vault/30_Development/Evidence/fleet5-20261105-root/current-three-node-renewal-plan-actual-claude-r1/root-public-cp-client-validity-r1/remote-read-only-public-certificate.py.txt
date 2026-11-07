@@ -1,0 +1,13 @@
+import datetime,json,stat
+from pathlib import Path
+from cryptography import x509
+from cryptography.hazmat.primitives import hashes
+path=Path('/home/saintvision-invion3/saintvision-share/ops-fresh-cpu-1efea-r1-20261107/pki-r1/cp-client-cert.pem')
+assert not path.is_symlink()
+s=path.stat();assert stat.S_ISREG(s.st_mode) and s.st_size<16384 and s.st_uid==1000
+raw=path.read_bytes();cert=x509.load_pem_x509_certificate(raw);fingerprint=cert.fingerprint(hashes.SHA256()).hex()
+assert fingerprint=='48911c5ddf7d12f05b9866feea0f0005c193d76a956274e2510492d0c2f76481'
+uris=cert.extensions.get_extension_for_class(x509.SubjectAlternativeName).value.get_values_for_type(x509.UniformResourceIdentifier)
+assert uris==['spiffe://saintvision.ai/tenant/97968b42-68aa-40ce-af5e-3a33e2fc2205/control-plane/epoch/bcd581be-31b4-4aca-86e6-3ca31b69ed09']
+now=datetime.datetime.now(datetime.timezone.utc)
+print(json.dumps({'atUTC':now.isoformat(timespec='seconds'),'publicCertificatePath':str(path),'CPClientDER_SHA256':fingerprint,'notBefore':cert.not_valid_before_utc.isoformat(),'notAfter':cert.not_valid_after_utc.isoformat(),'URI':uris[0],'dateValidAtRead':cert.not_valid_before_utc<=now<cert.not_valid_after_utc,'readExactlyPublicCertificate':True,'privateKeyRead':False,'newTLSContextOrHandshakeExecuted':False,'liveActiveClientContextsAttested':False,'fileOrProcessMutation':False}))
