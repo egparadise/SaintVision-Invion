@@ -1,11 +1,11 @@
 ---
 doc_id: "GOV-FLEET5-B-BOOTSTRAP-SCOPE-20261106"
 title: "FLEET5 B 병행 역할과 전환 구현 범위 결정"
-version: "1.4.19"
+version: "1.4.20"
 status: "review"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-11-07T09:49:11+09:00"
+updated: "2026-11-07T10:18:15+09:00"
 source_of_truth: "Git"
 ---
 
@@ -203,3 +203,8 @@ e75b의실제CONDITIONAL_MODE_SOURCE_EVIDENCE_ACCEPT_KEEP_19_HOLD와LowL1/C1C2�
 ## 전달 operation guard 실제 단위 증거와 own-proof 보완
 
 고정WIP01은3번PC공식Python3.14.7격리에서실제24GREEN과realbaseforeign-equal한case의인과RED1을확인했다. 정확product/test해시·JUnit/원문·직접exit·환경·입력불변과미측정축은RootEvidence에보존했다. legacyguard는변경없이실제REFUSED이며msgf730은시험된코드를바꾸지않는정확전체ASTdelta의newown-proof만허용한다. oldbaselineallowance/19조건해제/runtimeB권한/전역수치·운영인수승격이아니다. 정상게시/CI/별도실제CODE검토는후속이다.
+
+
+## 고정 WIP02 게시 단계와 원문 한 경로의 JSON 표현
+
+Root는실제24GREEN/인과BASE1RED의code/test와같은WIP02를직접대조하고msgfb188로정상게시·동일SHA Docs/Core/Backend각1회후실제CODE검토를허용했다. rawlog한개공백gate2에는msg193의정확JSON표현예외만허용하며원문/두ZIP/oldmanifest/공백gate는불변이다. 14기존receipt와raw1의잔여untracked를정확기록한다. 게시/3CI/CODE검토는현재미완료이며19HOLD/actualRuntimeB0/NULL권한/실5대인수는승격하지않는다.

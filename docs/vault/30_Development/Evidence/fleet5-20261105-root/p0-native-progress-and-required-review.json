@@ -3,8 +3,8 @@
   "recordedAtKST": "2026-11-06T00:46:51+09:00",
   "rootBase": "2b1753ce59c09037b5e130a7ffe64794d1d45fdf",
   "priorRootCheckpoint": {
-    "SHA": "c23ae5d19773f627b796f860200ba6e6079d62e7",
-    "Docs": 42316970617,
+    "SHA": "c59c9dc15c36a7c1658e24651d6127ae91cb6ce3",
+    "Docs": 42321084604,
     "exactHeadCorrelationAllJobsSuccess": true,
     "remoteMatches": true,
     "syncExits": [
@@ -12,13 +12,13 @@
       0,
       0
     ],
-    "independentlyMatchedNormalizedDestinationHashes": 3009,
+    "independentlyMatchedNormalizedDestinationHashes": 3032,
     "pending": 0,
     "conflicts": 0,
     "trackedAndUntrackedClean": true,
     "rootDocsOnly": true,
     "wholeProgramComplete": false,
-    "verifiedAtKST": "2026-11-07T09:15:36+09:00"
+    "verifiedAtKST": "2026-11-07T09:56:33+09:00"
   },
   "actualPlanLowReview": {
     "source": "803ad270562b1b75e44d26f9e14b965c714ab519",
@@ -2515,7 +2515,7 @@
     "ownerT1T2T3": "msg_620855c76519",
     "normativeRevisionReply": "msg_0392caf64d5d"
   },
-  "latestRecordAtKST": "2026-11-07T09:49:11+09:00",
+  "latestRecordAtKST": "2026-11-07T10:18:15+09:00",
   "optionalLowTokenTestDelta": {
     "source": "f0af307705b4923ebc3e231db5238af4c70aa389",
     "scope": "two otherwise-valid token payload corrections and JSON validity assertions; runtime unchanged",
@@ -3279,7 +3279,7 @@
     "productBaseline": "f2c1afb78b589b4b2cbcf3dcd4dc4f3c3f3bc856",
     "proposalSHA256": "85d52cb6313bda9b6d97ce6c1cb3d4c3c6bebf8ef487775fb6c8bc7581ec9479",
     "newBranch": "agent/codex/fleet5-k2-h1-h2-authority-design-20261107",
-    "status": "R2_CONTRACT_INDEPENDENTLY_ACCEPTED_THREE_CLOSED_PRIVATE_MATH_WIP_ONLY",
+    "status": "R2_CONTRACT_ACCEPTED_PRIVATE_MATH_CODE_R1_OLD_PLR_REGRESSION_FIX_PENDING",
     "scopeFile": "k2-h1-h2-authority-design-root-scope.txt",
     "selectedLogicalPolicies": [
       "independent control-plane/project trust-provisioning boundary, separately authenticated installation/readback",
@@ -3302,7 +3302,7 @@
     "independentContractReview": "PENDING_FROZEN_CANDIDATE_AND_ACTUAL_REVIEWER_RELEASE",
     "actualA7ReviewUnchanged": "ctx_36ec44cc8ca0",
     "wholeProgramComplete": false,
-    "latestRecordAtKST": "2026-11-07T09:49:11+09:00",
+    "latestRecordAtKST": "2026-11-07T10:18:15+09:00",
     "localCandidate": "382fe3d86c14283dcb549f935205081db8b4eee4",
     "localParent": "1f073c03eb6673ac60806e8fbe008d391bc45864",
     "localOwnAddedDocs": 9,
@@ -3412,7 +3412,7 @@
     },
     "R2SemanticVerdict": "CONTRACT_DESIGN_ACCEPT_M1_L1_L2_CLOSED_KEEP_ACTUAL_HOLD",
     "latestCodeWIP": {
-      "atKST": "2026-11-07T09:49:11+09:00",
+      "atKST": "2026-11-07T10:18:15+09:00",
       "ownerTask": "task_a95ef3d8ccce",
       "ownerDispatch": "ctx_ed23b4a777d0",
       "card": "FLEET5-K2-H12-SIGNATURE-CODE-R1-20261107",
@@ -3421,7 +3421,7 @@
       "independentVerdict": "CONTRACT_DESIGN_ACCEPT_M1_L1_L2_CLOSED_KEEP_ACTUAL_HOLD",
       "rootWIPCodeReply": "msg_7461bcdf99a4",
       "branch": "agent/codex/fleet5-k2-h12-signature-code-r1-20261107",
-      "status": "FOUR_PATH_PRIVATE_SIGNATURE_MATH_WIP_GRANTED_TESTS_PUBLICATION_NOT_RUN",
+      "status": "ACTUAL_R1_PHASES1_3_PASS_PHASE4_FAIL5_LEAF_NARROW_TYPE_GUARD_FIX_WIP_GRANTED",
       "allowedPaths": [
         "services/node-agent/internal/migrationcontext/h12_signature_internal.go",
         "services/node-agent/internal/migrationcontext/h12_signature_test.go",
@@ -3434,7 +3434,334 @@
       "commitPushCIAllowedAtThisStage": false,
       "publicSuccessFactoryServiceOrRuntimeAuthorityGranted": false,
       "actualBindings": null,
-      "wholeProgramComplete": false
+      "wholeProgramComplete": false,
+      "frozenWIP": {
+        "atKST": "2026-11-07T10:06:09+09:00",
+        "base": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed",
+        "packetSHA256": "f320083d6837c315e5900aae85e7be771a3754c70794715ededb40d55a18641c",
+        "packetBytes": 97887,
+        "verifiedSafePacketEntries": 21,
+        "manifestSHA256": "924e7ab820f76b2a0888bc11044740537b438f77091fb712e307a4528539aa19",
+        "sourceFiles": [
+          {
+            "path": "services/node-agent/internal/migrationcontext/effect_gate_test.go",
+            "change": "M",
+            "preimage": {
+              "mode": "100644",
+              "blobOID": "cc3258e5a4a9b407a3425c5fa2d5b0ff68897b80",
+              "SHA256": "871e1b1ca26e6bcdcc4ea7af2e8a290dc7a9b615f201c46aa7bf1102e0af7c04",
+              "bytes": 19751,
+              "raw": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/effect_gate_test.go.preimage.raw"
+            },
+            "current": {
+              "mode": "100644",
+              "blobOID": "19f2673c2fa4634d79616175080b983a30641772",
+              "SHA256": "eaf6ae9a9bb40a68fa92be4a3f2f42b05b1d69218f60497d747b78586fb59fd5",
+              "bytes": 27623,
+              "encoding": "UTF-8 without BOM, LF",
+              "raw": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/effect_gate_test.go.current.raw"
+            }
+          },
+          {
+            "path": "services/node-agent/internal/migrationcontext/source_gate_test.go",
+            "change": "M",
+            "preimage": {
+              "mode": "100644",
+              "blobOID": "a395e5ff9824ddc01c27004f1627dfda2bb56b09",
+              "SHA256": "10c0229040b40d2dd0653979b4761da4e35baab5d519b8d52dbe368928c0c780",
+              "bytes": 23505,
+              "raw": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/source_gate_test.go.preimage.raw"
+            },
+            "current": {
+              "mode": "100644",
+              "blobOID": "fe2b1ec68e6aac39e57dcf4bd50917e5b0bd8a75",
+              "SHA256": "0ad2989b6f36224352516e17f278b957cc25077f657560975e0ebcb063ff9208",
+              "bytes": 25737,
+              "encoding": "UTF-8 without BOM, LF",
+              "raw": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/source_gate_test.go.current.raw"
+            }
+          },
+          {
+            "path": "services/node-agent/internal/migrationcontext/h12_signature_internal.go",
+            "change": "A",
+            "preimage": null,
+            "current": {
+              "mode": "100644",
+              "blobOID": "6beb6a342d3b7d9f3fcdfd610e03d038e66d5a49",
+              "SHA256": "f9e3e808d8951c2da6fee4b45364f64bb5c909a33a90c3a6074c99b8cb6e4def",
+              "bytes": 2505,
+              "encoding": "UTF-8 without BOM, LF",
+              "raw": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/h12_signature_internal.go.current.raw"
+            }
+          },
+          {
+            "path": "services/node-agent/internal/migrationcontext/h12_signature_test.go",
+            "change": "A",
+            "preimage": null,
+            "current": {
+              "mode": "100644",
+              "blobOID": "ec386c7e3530c88a10305efc7f29ba66fcdf245b",
+              "SHA256": "94f9bd56deaa371125ceba49f5d7a21d30a4bc34575fed4747f693b51d1ce020",
+              "bytes": 12939,
+              "encoding": "UTF-8 without BOM, LF",
+              "raw": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/h12_signature_test.go.current.raw"
+            }
+          }
+        ],
+        "fourCurrentFilesByteMatchedIncludingNewUntracked": true,
+        "bothPreimagesMatchedRealGit": true,
+        "oldGlobalPureExternalObjectsMapByteIdentical": true,
+        "completePatchSHA256": "7eab0cfb280287908bb8a06a82f0cb6a2a15e19806316bfdd0a587a7140a92e5",
+        "realGitDependencyInputs": 371,
+        "declaredPlanInputsMatched": 360,
+        "additionalRootCompleteModuleResources": [
+          "services/node-agent/internal/migrationcontext/README.md",
+          "services/node-agent/internal/wire/core.schema.json",
+          "services/node-agent/migrationverify/README.md",
+          "services/node-agent/migrationverify/testdata/actual-bindings-HOLD.json",
+          "services/node-agent/migrationverify/testdata/artifact-reference-graph.json",
+          "services/node-agent/migrationverify/testdata/derived-byte-ordering-vectors.json",
+          "services/node-agent/migrationverify/testdata/dummy-signer-policy.json",
+          "services/node-agent/migrationverify/testdata/reference-graph-coverage.json",
+          "services/node-agent/migrationverify/testdata/scenario-inputs.json",
+          "services/node-agent/migrationverify/testdata/scenario-objects.json",
+          "services/node-agent/tests/probe/Dockerfile"
+        ],
+        "rootInitialSelectionAssertion": "Initially required declared plan to equal all module-root files; bounded difference showed11additional real non-Go baseline resources/docs, included explicitly instead of claiming they were in author plan. No product executed.",
+        "realTwoModulesContractsK1HistoryPlatformAndInertSourcesNoStubs": true,
+        "requiredGitObjects": [
+          "0bf852a66b2eb01f95da65ebbad0360a04ea6fed",
+          "eb32b211ab3704935b9431747089ab0715582a74"
+        ],
+        "recordBound": {
+          "actualExistingEnvelopeLimitBytes": 2097152,
+          "actualPayloadLimitIsSeparate16MiB": true,
+          "RootGrantLabelCorrection": "Use existing p02EnvelopeLimit=2MiB as the already intended bound; no scope widening."
+        },
+        "authorProductGoCryptoExecution": "NOT_RUN",
+        "RootActualGoTests": "NOT_RUN_PENDING_ISOLATED_SETUP",
+        "codeCommit": null,
+        "actualBindings": null,
+        "wholeProgramComplete": false,
+        "all20NonselfPayloadManifestHashesVerified": true
+      },
+      "actualGoResult": {
+        "atKST": "2026-11-07T10:13:30+09:00",
+        "base": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed",
+        "codeCommit": null,
+        "packetSHA256": "f320083d6837c315e5900aae85e7be771a3754c70794715ededb40d55a18641c",
+        "manifestSHA256": "924e7ab820f76b2a0888bc11044740537b438f77091fb712e307a4528539aa19",
+        "operator": "Root Codex",
+        "environment": "Actual PC3 official pinned Go1.27.1 linux/amd64; nonroot1000; networknone;2CPU;2GiBmemory+swapTOTAL2GiB;read-onlyroot;ownjobonly",
+        "realGitSourceInputsVerified": 371,
+        "fourFilesOverlayOnly": true,
+        "allFrozenSourceFilesBeforeAfterEqual": true,
+        "frozenSourceFileCount": 373,
+        "phaseResults": [
+          {
+            "phase": 1,
+            "id": "math-canonical-ownership-admission",
+            "startedAtKST": "2026-11-07T10:09:12+09:00",
+            "endedAtKST": "2026-11-07T10:09:40+09:00",
+            "directExit": 0,
+            "elapsedSeconds": 28.366,
+            "topLevelPassed": 2,
+            "subtestsPassed": 32,
+            "cgroupMemoryPeakBytes": 401268736,
+            "OOMKilled": false,
+            "sourceBeforeAfterUnchanged": true,
+            "failEvents": [],
+            "skipEvents": [],
+            "ownExitedContainerRemoved": true,
+            "topLevelFailed": 0,
+            "subtestsFailed": 0,
+            "packageFailEvents": 0
+          },
+          {
+            "phase": 2,
+            "id": "new-exact-object-file-directcall-probes",
+            "startedAtKST": "2026-11-07T10:09:40+09:00",
+            "endedAtKST": "2026-11-07T10:09:42+09:00",
+            "directExit": 0,
+            "elapsedSeconds": 1.463,
+            "topLevelPassed": 2,
+            "subtestsPassed": 12,
+            "cgroupMemoryPeakBytes": 84881408,
+            "OOMKilled": false,
+            "sourceBeforeAfterUnchanged": true,
+            "failEvents": [],
+            "skipEvents": [],
+            "ownExitedContainerRemoved": true,
+            "topLevelFailed": 0,
+            "subtestsFailed": 0,
+            "packageFailEvents": 0
+          },
+          {
+            "phase": 3,
+            "id": "existing-d04-private-consistency",
+            "startedAtKST": "2026-11-07T10:09:42+09:00",
+            "endedAtKST": "2026-11-07T10:09:43+09:00",
+            "directExit": 0,
+            "elapsedSeconds": 1.465,
+            "topLevelPassed": 13,
+            "subtestsPassed": 101,
+            "cgroupMemoryPeakBytes": 161263616,
+            "OOMKilled": false,
+            "sourceBeforeAfterUnchanged": true,
+            "failEvents": [],
+            "skipEvents": [],
+            "ownExitedContainerRemoved": true,
+            "topLevelFailed": 0,
+            "subtestsFailed": 0,
+            "packageFailEvents": 0
+          },
+          {
+            "phase": 4,
+            "id": "existing-public-refusal-effect-source-census-plr",
+            "startedAtKST": "2026-11-07T10:09:43+09:00",
+            "endedAtKST": "2026-11-07T10:11:46+09:00",
+            "directExit": 1,
+            "elapsedSeconds": 122.772,
+            "topLevelPassed": 8,
+            "subtestsPassed": 124,
+            "cgroupMemoryPeakBytes": 681029632,
+            "OOMKilled": false,
+            "sourceBeforeAfterUnchanged": true,
+            "failEvents": [
+              "TestPLR1BCompiledWriteTargetsAndReasons/slice-root-foreign-pointee",
+              "TestPLR1BCompiledWriteTargetsAndReasons",
+              "TestPLR1CCompiledPointerConversionsAndControls/N6-slice-to-own-array-pointer",
+              "TestPLR1CCompiledPointerConversionsAndControls/S1-slice-local-copy-of-pointee",
+              "TestPLR1CCompiledPointerConversionsAndControls/S2-slice-parameter",
+              "TestPLR1CCompiledPointerConversionsAndControls",
+              "TestPLR1DCompiledTargetPointerTermsAndControls/G4-typeparam-target-slice-to-own-array",
+              "TestPLR1DCompiledTargetPointerTermsAndControls",
+              "github.com/egparadise/SaintVision-Invion/services/node-agent/internal/migrationcontext"
+            ],
+            "skipEvents": [],
+            "ownExitedContainerRemoved": true,
+            "topLevelFailed": 3,
+            "subtestsFailed": 5,
+            "packageFailEvents": 1
+          }
+        ],
+        "allFourPhasesActuallyPass": false,
+        "actualTopLevelPassed": 25,
+        "actualSubtestsPassed": 269,
+        "actualTopLevelFailed": 3,
+        "actualSubtestsFailed": 5,
+        "actualPackageFailEvents": 1,
+        "actualFailEvents": 9,
+        "actualSkippedEvents": 0,
+        "H12MathTableRows": 32,
+        "H12DistinctFullArgumentFingerprints": 32,
+        "H12TrueMathControls": 2,
+        "H12LayerCounts": {
+          "math": 9,
+          "expected-key": 7,
+          "admission": 2,
+          "DER": 5,
+          "codec/signature-encoding": 2,
+          "admission/codec": 7
+        },
+        "H12GuardActualCompileTypedRows": 12,
+        "H12GuardDistinctFixtureFingerprints": 12,
+        "H12ResolverCompilerControls": 2,
+        "H12AdmissionMeasurement": [
+          {
+            "allocations": 0.0,
+            "actualOversizeEvaluationRepeats": 2,
+            "additionalUniqueInputs": 0,
+            "inputSHA256": "0da11651d986542a4faf3285d8160ea08b30fa20b4c09d0ef19a96c5cad629d8"
+          }
+        ],
+        "H12AdditionalOwnershipValidInputRepeat": 1,
+        "H12TargetHelperEvaluationsByTableAndInspectedTestFlow": 35,
+        "H12ExtraDistinctInputsFromOwnershipOrAdmission": 0,
+        "P02CausalRows": 92,
+        "P02DistinctFullInputFingerprints": 90,
+        "originalReceiptFiles": 99,
+        "originalIndexSHA256": "84df652b43ff9a8ed8bcfe285b287ea25e9a5fd461da4ec531a2ee410ea5a0aa",
+        "RootTestedSourceFiles": [
+          {
+            "path": "services/node-agent/internal/migrationcontext/effect_gate_test.go",
+            "change": "M",
+            "preimage": {
+              "mode": "100644",
+              "blobOID": "cc3258e5a4a9b407a3425c5fa2d5b0ff68897b80",
+              "SHA256": "871e1b1ca26e6bcdcc4ea7af2e8a290dc7a9b615f201c46aa7bf1102e0af7c04",
+              "bytes": 19751,
+              "raw": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/effect_gate_test.go.preimage.raw"
+            },
+            "current": {
+              "mode": "100644",
+              "blobOID": "19f2673c2fa4634d79616175080b983a30641772",
+              "SHA256": "eaf6ae9a9bb40a68fa92be4a3f2f42b05b1d69218f60497d747b78586fb59fd5",
+              "bytes": 27623,
+              "encoding": "UTF-8 without BOM, LF",
+              "raw": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/effect_gate_test.go.current.raw"
+            }
+          },
+          {
+            "path": "services/node-agent/internal/migrationcontext/source_gate_test.go",
+            "change": "M",
+            "preimage": {
+              "mode": "100644",
+              "blobOID": "a395e5ff9824ddc01c27004f1627dfda2bb56b09",
+              "SHA256": "10c0229040b40d2dd0653979b4761da4e35baab5d519b8d52dbe368928c0c780",
+              "bytes": 23505,
+              "raw": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/source_gate_test.go.preimage.raw"
+            },
+            "current": {
+              "mode": "100644",
+              "blobOID": "fe2b1ec68e6aac39e57dcf4bd50917e5b0bd8a75",
+              "SHA256": "0ad2989b6f36224352516e17f278b957cc25077f657560975e0ebcb063ff9208",
+              "bytes": 25737,
+              "encoding": "UTF-8 without BOM, LF",
+              "raw": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/source_gate_test.go.current.raw"
+            }
+          },
+          {
+            "path": "services/node-agent/internal/migrationcontext/h12_signature_internal.go",
+            "change": "A",
+            "preimage": null,
+            "current": {
+              "mode": "100644",
+              "blobOID": "6beb6a342d3b7d9f3fcdfd610e03d038e66d5a49",
+              "SHA256": "f9e3e808d8951c2da6fee4b45364f64bb5c909a33a90c3a6074c99b8cb6e4def",
+              "bytes": 2505,
+              "encoding": "UTF-8 without BOM, LF",
+              "raw": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/h12_signature_internal.go.current.raw"
+            }
+          },
+          {
+            "path": "services/node-agent/internal/migrationcontext/h12_signature_test.go",
+            "change": "A",
+            "preimage": null,
+            "current": {
+              "mode": "100644",
+              "blobOID": "ec386c7e3530c88a10305efc7f29ba66fcdf245b",
+              "SHA256": "94f9bd56deaa371125ceba49f5d7a21d30a4bc34575fed4747f693b51d1ce020",
+              "bytes": 12939,
+              "encoding": "UTF-8 without BOM, LF",
+              "raw": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/h12_signature_test.go.current.raw"
+            }
+          }
+        ],
+        "independentCODEReview": "PENDING",
+        "productCI": "NOT_RUN",
+        "mathEvidenceAuthenticatesOrInstallsAuthority": false,
+        "actualH1H7Bindings": null,
+        "rawSeven": "UNREGISTERED",
+        "A01A40": "NOT_RUN",
+        "wholeProgramComplete": false
+      },
+      "rootFixReply": "msg_0abc80a909cd",
+      "latestWriteScope": [
+        "services/node-agent/internal/migrationcontext/effect_gate_test.go newly added H12 type block only",
+        "own NEW evidence/history/WIP02"
+      ],
+      "threeOtherWIPFilesImmutable": true
     }
   },
   "A7R2ActualReview": "b-a7r2-actual-delta-review-root-verification.json",
@@ -3464,7 +3791,7 @@
   "H1H2PushRecovery": "k2-h12-first-push-readonly-recovery-check.json",
   "BModeSource": "b-a7-mode-origin-source-root-verification.json",
   "BOperationGuardWIP": {
-    "atKST": "2026-11-07T09:49:11+09:00",
+    "atKST": "2026-11-07T10:18:15+09:00",
     "card": "FLEET5-B-A7-OPERATION-GUARD-R1-20261107",
     "ownerTask": "task_a8fd2969f0b3",
     "ownerDispatch": "ctx_6f0f8253b8a7",
@@ -3473,7 +3800,7 @@
     "base": "b3bbdc8d92a39f2f797a7680deb2770d6f705af0",
     "frozenOriginalProduct": "72028cbac903c4415d9979f980a6e0f9948e914f",
     "newBranch": "agent/codex/fleet5-b-a7-operation-guard-r1-20261107",
-    "status": "EXACT_WIP01_ACTUAL_24_GREEN_AND_CAUSAL_REAL_BASE_RED_VERIFIED_OWN_PROOF_WIP02_PENDING",
+    "status": "WIP02_EXACT_SOURCE_VERIFIED_NORMAL_PUBLICATION_GRANTED_ONE_IMMUTABLE_RAW_LOG_JSON_EXCEPTION",
     "allowedProductPaths": [
       "services/control-plane/src/inv/dispatch.py",
       "tests/core/test_delivery_operation_origin.py"
@@ -3491,7 +3818,7 @@
     },
     "productUnitTests": "NOT_RUN_PENDING_FROZEN_WIP_AND_ROOT_ISOLATION",
     "authorMainProductExecutionGranted": false,
-    "commitPushCIGrantedAtThisStage": false,
+    "commitPushCIGrantedAtThisStage": "ONE_NORMAL_CANDIDATE_PUBLICATION_AND_EXACT_DOCS_CORE_BACKEND_CI_ONLY",
     "rootIsolatedVerificationRequired": true,
     "actualRuntimeB": 0,
     "original19BaselineUnchanged": true,
@@ -3564,10 +3891,118 @@
     "rootProofCompatibilityReply": "msg_f730b53fb339",
     "legacyGuardStatus": "UNCHANGED_REFUSED_EXPECTED_NEW_CAPTURE_NOT_CLEAN",
     "ownFiniteCompatibilityProof": "AUTHORIZED_NOT_YET_SUBMITTED",
-    "productTestBytesFrozen": true
+    "productTestBytesFrozen": true,
+    "WIP02": {
+      "atKST": "2026-11-07T10:01:47+09:00",
+      "base": "b3bbdc8d92a39f2f797a7680deb2770d6f705af0",
+      "WIP02SHA256": "ce2e8c8802c4c4b805cd38f5fe49117f472f0b44bb2f1c4adb80759924670fbb",
+      "WIP02Bytes": 2623087,
+      "verifiedSafeEntries": 52,
+      "all51NonselfManifestInputsAnd52ReceiptInputsMatched": true,
+      "authorBranchAndDirtyScopeVerified": true,
+      "priorUntrackedOtherCardReceiptsPreservedExcludedFromPublication": [
+        {
+          "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-mode-origin-r1-20261107-codex/ci-jobs-first.json",
+          "bytes": 4428,
+          "SHA256": "82075c3707541925e2e2a32ac048a1d811d30197f4aeb5786b1c0c18c4f5c8c2"
+        },
+        {
+          "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-mode-origin-r1-20261107-codex/ci-run-first.json",
+          "bytes": 13113,
+          "SHA256": "df17a2f508a609c209adbe1fc062f27e9b6d30ad934a2244c60acbbf8d858b3d"
+        },
+        {
+          "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-mode-origin-r1-20261107-codex/committed-verification.json",
+          "bytes": 5534,
+          "SHA256": "3de63ef2f14a6e1dcef2f7f8a6ea4cd7f2951acaf94501b7601a42e9585ab1fc"
+        },
+        {
+          "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-mode-origin-r1-20261107-codex/publication-receipt.json",
+          "bytes": 5341,
+          "SHA256": "dc7ed81294c92425c0fe27a9dda998c7c7502fa935d20d118596d88059e9f6c8"
+        },
+        {
+          "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-snapshot-r1-20261107-codex/ci-jobs-first.json",
+          "bytes": 3753,
+          "SHA256": "00e257e66a25014647296b71586441d3abf221d27c484084c2a5c6adba56fffd"
+        },
+        {
+          "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-snapshot-r1-20261107-codex/ci-jobs-observation02.json",
+          "bytes": 4422,
+          "SHA256": "ab2e910bcf94e424816cc3039e9f0d320bbbb3d8e58271ec02f729b905a6fe6f"
+        },
+        {
+          "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-snapshot-r1-20261107-codex/ci-run-first.json",
+          "bytes": 13106,
+          "SHA256": "304676b72660ce002f52446de97f31662625091a4e35f10add485b0fc9945dc2"
+        },
+        {
+          "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-snapshot-r1-20261107-codex/ci-run-observation02.json",
+          "bytes": 13109,
+          "SHA256": "55180a08d22fda9c171512aafac8a1bc3fa46e0a295ae667d8c54d6838393527"
+        },
+        {
+          "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-snapshot-r1-20261107-codex/committed-receipt-verification.json",
+          "bytes": 20032,
+          "SHA256": "f5df4da030a259625910f16e04fa6f490fb086d6b275e7a049f215db3b04e121"
+        },
+        {
+          "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-snapshot-r1-20261107-codex/publication-receipt.json",
+          "bytes": 4448,
+          "SHA256": "50d1c2ebfe11dc4182303547f35c218ecd5463678592032aeff9d14cd1fae93e"
+        },
+        {
+          "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-snapshot-r2-20261107-codex/ci-jobs-first.json",
+          "bytes": 4422,
+          "SHA256": "9320d15ea4ec81dfd5bfa6b18b1fc32bac8d7c93feacdd426cb84102909a39b3"
+        },
+        {
+          "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-snapshot-r2-20261107-codex/ci-run-first.json",
+          "bytes": 13087,
+          "SHA256": "51649b5b9bcf1fc3c0c08e16859d56cc545d5bb3c8452ea4a2e1deedaf0e7684"
+        },
+        {
+          "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-snapshot-r2-20261107-codex/committed-receipt-verification.json",
+          "bytes": 21651,
+          "SHA256": "5f7ad3a551f4e86f43ab507906a2fbc7a2a91e8b080b85d93f199f683a6f95e2"
+        },
+        {
+          "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-snapshot-r2-20261107-codex/publication-receipt.json",
+          "bytes": 4439,
+          "SHA256": "16466fd1140db20d816ccfc087cd87150e43fa59717ecc2c54d2d3bfe1802360"
+        }
+      ],
+      "rootVerificationPriorAttempts": "Two overstrict/incomplete untracked-scope assertions failed before archive verification; full bounded listing identified exact14 prior post-CI receipts across three earlier cards, preserved and excluded without treating owner worktree as clean.",
+      "productAndTestExactRootTestedBytesUnchanged": true,
+      "productSHA256": "82f029614537eb5bab56934e4b6736fe3dd52ece54b9b9a3996815b131e41de4",
+      "testSHA256": "3dacdb63f83ab1d8075ddcbe422d82daad20bd56f643adee0fc7ae97715925d2",
+      "whole25SourceWorldComparedToRealBaseGit": true,
+      "wholeProductModuleOnlyExactOnceASTDelta": true,
+      "unchangedOldGitHelperCount": 29,
+      "wholeReferenceSetOneSameKindCallFuncBoundToForwardWitness": true,
+      "originalStaticControlsReported": 21,
+      "allOriginalStaticControlExpectedReasonsMatched": true,
+      "RootReranAuthorStaticOrProductTests": false,
+      "RootActualGreenPassed": 24,
+      "RootActualCausalRealBaseRedFailed": 1,
+      "RootRawUnitReceiptAndAll12LogPayloadsByteMatched": true,
+      "finiteClassification": "EXACT_CAPTURE_GUARD_DELTA_COVERED_WITH_LEGACY_REFUSAL_PRESERVED",
+      "legacyGuardStatus": "REFUSED_UNCHANGED_PRESERVED_NOT_CLEAN",
+      "original19HOLD": true,
+      "actualRuntimeB": 0,
+      "independentCODEReview": "PENDING_AFTER_PUBLICATION_CI",
+      "wholeProgramComplete": false
+    },
+    "rootPublicationReply": "msg_fb188c4045e5",
+    "rootRawPublicationException": "msg_193e85c36227",
+    "candidateCommit": null,
+    "actualCI": null,
+    "independentCODEReview": "PENDING",
+    "knownPriorUntrackedReceipts": 14,
+    "additionalUntrackedFrozenRawLog": 1
   },
   "H12SignatureWIP": {
-    "atKST": "2026-11-07T09:49:11+09:00",
+    "atKST": "2026-11-07T10:18:15+09:00",
     "ownerTask": "task_a95ef3d8ccce",
     "ownerDispatch": "ctx_ed23b4a777d0",
     "card": "FLEET5-K2-H12-SIGNATURE-CODE-R1-20261107",
@@ -3576,7 +4011,7 @@
     "independentVerdict": "CONTRACT_DESIGN_ACCEPT_M1_L1_L2_CLOSED_KEEP_ACTUAL_HOLD",
     "rootWIPCodeReply": "msg_7461bcdf99a4",
     "branch": "agent/codex/fleet5-k2-h12-signature-code-r1-20261107",
-    "status": "FOUR_PATH_PRIVATE_SIGNATURE_MATH_WIP_GRANTED_TESTS_PUBLICATION_NOT_RUN",
+    "status": "ACTUAL_R1_PHASES1_3_PASS_PHASE4_FAIL5_LEAF_NARROW_TYPE_GUARD_FIX_WIP_GRANTED",
     "allowedPaths": [
       "services/node-agent/internal/migrationcontext/h12_signature_internal.go",
       "services/node-agent/internal/migrationcontext/h12_signature_test.go",
@@ -3589,6 +4024,333 @@
     "commitPushCIAllowedAtThisStage": false,
     "publicSuccessFactoryServiceOrRuntimeAuthorityGranted": false,
     "actualBindings": null,
-    "wholeProgramComplete": false
+    "wholeProgramComplete": false,
+    "frozenWIP": {
+      "atKST": "2026-11-07T10:06:09+09:00",
+      "base": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed",
+      "packetSHA256": "f320083d6837c315e5900aae85e7be771a3754c70794715ededb40d55a18641c",
+      "packetBytes": 97887,
+      "verifiedSafePacketEntries": 21,
+      "manifestSHA256": "924e7ab820f76b2a0888bc11044740537b438f77091fb712e307a4528539aa19",
+      "sourceFiles": [
+        {
+          "path": "services/node-agent/internal/migrationcontext/effect_gate_test.go",
+          "change": "M",
+          "preimage": {
+            "mode": "100644",
+            "blobOID": "cc3258e5a4a9b407a3425c5fa2d5b0ff68897b80",
+            "SHA256": "871e1b1ca26e6bcdcc4ea7af2e8a290dc7a9b615f201c46aa7bf1102e0af7c04",
+            "bytes": 19751,
+            "raw": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/effect_gate_test.go.preimage.raw"
+          },
+          "current": {
+            "mode": "100644",
+            "blobOID": "19f2673c2fa4634d79616175080b983a30641772",
+            "SHA256": "eaf6ae9a9bb40a68fa92be4a3f2f42b05b1d69218f60497d747b78586fb59fd5",
+            "bytes": 27623,
+            "encoding": "UTF-8 without BOM, LF",
+            "raw": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/effect_gate_test.go.current.raw"
+          }
+        },
+        {
+          "path": "services/node-agent/internal/migrationcontext/source_gate_test.go",
+          "change": "M",
+          "preimage": {
+            "mode": "100644",
+            "blobOID": "a395e5ff9824ddc01c27004f1627dfda2bb56b09",
+            "SHA256": "10c0229040b40d2dd0653979b4761da4e35baab5d519b8d52dbe368928c0c780",
+            "bytes": 23505,
+            "raw": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/source_gate_test.go.preimage.raw"
+          },
+          "current": {
+            "mode": "100644",
+            "blobOID": "fe2b1ec68e6aac39e57dcf4bd50917e5b0bd8a75",
+            "SHA256": "0ad2989b6f36224352516e17f278b957cc25077f657560975e0ebcb063ff9208",
+            "bytes": 25737,
+            "encoding": "UTF-8 without BOM, LF",
+            "raw": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/source_gate_test.go.current.raw"
+          }
+        },
+        {
+          "path": "services/node-agent/internal/migrationcontext/h12_signature_internal.go",
+          "change": "A",
+          "preimage": null,
+          "current": {
+            "mode": "100644",
+            "blobOID": "6beb6a342d3b7d9f3fcdfd610e03d038e66d5a49",
+            "SHA256": "f9e3e808d8951c2da6fee4b45364f64bb5c909a33a90c3a6074c99b8cb6e4def",
+            "bytes": 2505,
+            "encoding": "UTF-8 without BOM, LF",
+            "raw": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/h12_signature_internal.go.current.raw"
+          }
+        },
+        {
+          "path": "services/node-agent/internal/migrationcontext/h12_signature_test.go",
+          "change": "A",
+          "preimage": null,
+          "current": {
+            "mode": "100644",
+            "blobOID": "ec386c7e3530c88a10305efc7f29ba66fcdf245b",
+            "SHA256": "94f9bd56deaa371125ceba49f5d7a21d30a4bc34575fed4747f693b51d1ce020",
+            "bytes": 12939,
+            "encoding": "UTF-8 without BOM, LF",
+            "raw": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/h12_signature_test.go.current.raw"
+          }
+        }
+      ],
+      "fourCurrentFilesByteMatchedIncludingNewUntracked": true,
+      "bothPreimagesMatchedRealGit": true,
+      "oldGlobalPureExternalObjectsMapByteIdentical": true,
+      "completePatchSHA256": "7eab0cfb280287908bb8a06a82f0cb6a2a15e19806316bfdd0a587a7140a92e5",
+      "realGitDependencyInputs": 371,
+      "declaredPlanInputsMatched": 360,
+      "additionalRootCompleteModuleResources": [
+        "services/node-agent/internal/migrationcontext/README.md",
+        "services/node-agent/internal/wire/core.schema.json",
+        "services/node-agent/migrationverify/README.md",
+        "services/node-agent/migrationverify/testdata/actual-bindings-HOLD.json",
+        "services/node-agent/migrationverify/testdata/artifact-reference-graph.json",
+        "services/node-agent/migrationverify/testdata/derived-byte-ordering-vectors.json",
+        "services/node-agent/migrationverify/testdata/dummy-signer-policy.json",
+        "services/node-agent/migrationverify/testdata/reference-graph-coverage.json",
+        "services/node-agent/migrationverify/testdata/scenario-inputs.json",
+        "services/node-agent/migrationverify/testdata/scenario-objects.json",
+        "services/node-agent/tests/probe/Dockerfile"
+      ],
+      "rootInitialSelectionAssertion": "Initially required declared plan to equal all module-root files; bounded difference showed11additional real non-Go baseline resources/docs, included explicitly instead of claiming they were in author plan. No product executed.",
+      "realTwoModulesContractsK1HistoryPlatformAndInertSourcesNoStubs": true,
+      "requiredGitObjects": [
+        "0bf852a66b2eb01f95da65ebbad0360a04ea6fed",
+        "eb32b211ab3704935b9431747089ab0715582a74"
+      ],
+      "recordBound": {
+        "actualExistingEnvelopeLimitBytes": 2097152,
+        "actualPayloadLimitIsSeparate16MiB": true,
+        "RootGrantLabelCorrection": "Use existing p02EnvelopeLimit=2MiB as the already intended bound; no scope widening."
+      },
+      "authorProductGoCryptoExecution": "NOT_RUN",
+      "RootActualGoTests": "NOT_RUN_PENDING_ISOLATED_SETUP",
+      "codeCommit": null,
+      "actualBindings": null,
+      "wholeProgramComplete": false,
+      "all20NonselfPayloadManifestHashesVerified": true
+    },
+    "actualGoResult": {
+      "atKST": "2026-11-07T10:13:30+09:00",
+      "base": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed",
+      "codeCommit": null,
+      "packetSHA256": "f320083d6837c315e5900aae85e7be771a3754c70794715ededb40d55a18641c",
+      "manifestSHA256": "924e7ab820f76b2a0888bc11044740537b438f77091fb712e307a4528539aa19",
+      "operator": "Root Codex",
+      "environment": "Actual PC3 official pinned Go1.27.1 linux/amd64; nonroot1000; networknone;2CPU;2GiBmemory+swapTOTAL2GiB;read-onlyroot;ownjobonly",
+      "realGitSourceInputsVerified": 371,
+      "fourFilesOverlayOnly": true,
+      "allFrozenSourceFilesBeforeAfterEqual": true,
+      "frozenSourceFileCount": 373,
+      "phaseResults": [
+        {
+          "phase": 1,
+          "id": "math-canonical-ownership-admission",
+          "startedAtKST": "2026-11-07T10:09:12+09:00",
+          "endedAtKST": "2026-11-07T10:09:40+09:00",
+          "directExit": 0,
+          "elapsedSeconds": 28.366,
+          "topLevelPassed": 2,
+          "subtestsPassed": 32,
+          "cgroupMemoryPeakBytes": 401268736,
+          "OOMKilled": false,
+          "sourceBeforeAfterUnchanged": true,
+          "failEvents": [],
+          "skipEvents": [],
+          "ownExitedContainerRemoved": true,
+          "topLevelFailed": 0,
+          "subtestsFailed": 0,
+          "packageFailEvents": 0
+        },
+        {
+          "phase": 2,
+          "id": "new-exact-object-file-directcall-probes",
+          "startedAtKST": "2026-11-07T10:09:40+09:00",
+          "endedAtKST": "2026-11-07T10:09:42+09:00",
+          "directExit": 0,
+          "elapsedSeconds": 1.463,
+          "topLevelPassed": 2,
+          "subtestsPassed": 12,
+          "cgroupMemoryPeakBytes": 84881408,
+          "OOMKilled": false,
+          "sourceBeforeAfterUnchanged": true,
+          "failEvents": [],
+          "skipEvents": [],
+          "ownExitedContainerRemoved": true,
+          "topLevelFailed": 0,
+          "subtestsFailed": 0,
+          "packageFailEvents": 0
+        },
+        {
+          "phase": 3,
+          "id": "existing-d04-private-consistency",
+          "startedAtKST": "2026-11-07T10:09:42+09:00",
+          "endedAtKST": "2026-11-07T10:09:43+09:00",
+          "directExit": 0,
+          "elapsedSeconds": 1.465,
+          "topLevelPassed": 13,
+          "subtestsPassed": 101,
+          "cgroupMemoryPeakBytes": 161263616,
+          "OOMKilled": false,
+          "sourceBeforeAfterUnchanged": true,
+          "failEvents": [],
+          "skipEvents": [],
+          "ownExitedContainerRemoved": true,
+          "topLevelFailed": 0,
+          "subtestsFailed": 0,
+          "packageFailEvents": 0
+        },
+        {
+          "phase": 4,
+          "id": "existing-public-refusal-effect-source-census-plr",
+          "startedAtKST": "2026-11-07T10:09:43+09:00",
+          "endedAtKST": "2026-11-07T10:11:46+09:00",
+          "directExit": 1,
+          "elapsedSeconds": 122.772,
+          "topLevelPassed": 8,
+          "subtestsPassed": 124,
+          "cgroupMemoryPeakBytes": 681029632,
+          "OOMKilled": false,
+          "sourceBeforeAfterUnchanged": true,
+          "failEvents": [
+            "TestPLR1BCompiledWriteTargetsAndReasons/slice-root-foreign-pointee",
+            "TestPLR1BCompiledWriteTargetsAndReasons",
+            "TestPLR1CCompiledPointerConversionsAndControls/N6-slice-to-own-array-pointer",
+            "TestPLR1CCompiledPointerConversionsAndControls/S1-slice-local-copy-of-pointee",
+            "TestPLR1CCompiledPointerConversionsAndControls/S2-slice-parameter",
+            "TestPLR1CCompiledPointerConversionsAndControls",
+            "TestPLR1DCompiledTargetPointerTermsAndControls/G4-typeparam-target-slice-to-own-array",
+            "TestPLR1DCompiledTargetPointerTermsAndControls",
+            "github.com/egparadise/SaintVision-Invion/services/node-agent/internal/migrationcontext"
+          ],
+          "skipEvents": [],
+          "ownExitedContainerRemoved": true,
+          "topLevelFailed": 3,
+          "subtestsFailed": 5,
+          "packageFailEvents": 1
+        }
+      ],
+      "allFourPhasesActuallyPass": false,
+      "actualTopLevelPassed": 25,
+      "actualSubtestsPassed": 269,
+      "actualTopLevelFailed": 3,
+      "actualSubtestsFailed": 5,
+      "actualPackageFailEvents": 1,
+      "actualFailEvents": 9,
+      "actualSkippedEvents": 0,
+      "H12MathTableRows": 32,
+      "H12DistinctFullArgumentFingerprints": 32,
+      "H12TrueMathControls": 2,
+      "H12LayerCounts": {
+        "math": 9,
+        "expected-key": 7,
+        "admission": 2,
+        "DER": 5,
+        "codec/signature-encoding": 2,
+        "admission/codec": 7
+      },
+      "H12GuardActualCompileTypedRows": 12,
+      "H12GuardDistinctFixtureFingerprints": 12,
+      "H12ResolverCompilerControls": 2,
+      "H12AdmissionMeasurement": [
+        {
+          "allocations": 0.0,
+          "actualOversizeEvaluationRepeats": 2,
+          "additionalUniqueInputs": 0,
+          "inputSHA256": "0da11651d986542a4faf3285d8160ea08b30fa20b4c09d0ef19a96c5cad629d8"
+        }
+      ],
+      "H12AdditionalOwnershipValidInputRepeat": 1,
+      "H12TargetHelperEvaluationsByTableAndInspectedTestFlow": 35,
+      "H12ExtraDistinctInputsFromOwnershipOrAdmission": 0,
+      "P02CausalRows": 92,
+      "P02DistinctFullInputFingerprints": 90,
+      "originalReceiptFiles": 99,
+      "originalIndexSHA256": "84df652b43ff9a8ed8bcfe285b287ea25e9a5fd461da4ec531a2ee410ea5a0aa",
+      "RootTestedSourceFiles": [
+        {
+          "path": "services/node-agent/internal/migrationcontext/effect_gate_test.go",
+          "change": "M",
+          "preimage": {
+            "mode": "100644",
+            "blobOID": "cc3258e5a4a9b407a3425c5fa2d5b0ff68897b80",
+            "SHA256": "871e1b1ca26e6bcdcc4ea7af2e8a290dc7a9b615f201c46aa7bf1102e0af7c04",
+            "bytes": 19751,
+            "raw": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/effect_gate_test.go.preimage.raw"
+          },
+          "current": {
+            "mode": "100644",
+            "blobOID": "19f2673c2fa4634d79616175080b983a30641772",
+            "SHA256": "eaf6ae9a9bb40a68fa92be4a3f2f42b05b1d69218f60497d747b78586fb59fd5",
+            "bytes": 27623,
+            "encoding": "UTF-8 without BOM, LF",
+            "raw": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/effect_gate_test.go.current.raw"
+          }
+        },
+        {
+          "path": "services/node-agent/internal/migrationcontext/source_gate_test.go",
+          "change": "M",
+          "preimage": {
+            "mode": "100644",
+            "blobOID": "a395e5ff9824ddc01c27004f1627dfda2bb56b09",
+            "SHA256": "10c0229040b40d2dd0653979b4761da4e35baab5d519b8d52dbe368928c0c780",
+            "bytes": 23505,
+            "raw": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/source_gate_test.go.preimage.raw"
+          },
+          "current": {
+            "mode": "100644",
+            "blobOID": "fe2b1ec68e6aac39e57dcf4bd50917e5b0bd8a75",
+            "SHA256": "0ad2989b6f36224352516e17f278b957cc25077f657560975e0ebcb063ff9208",
+            "bytes": 25737,
+            "encoding": "UTF-8 without BOM, LF",
+            "raw": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/source_gate_test.go.current.raw"
+          }
+        },
+        {
+          "path": "services/node-agent/internal/migrationcontext/h12_signature_internal.go",
+          "change": "A",
+          "preimage": null,
+          "current": {
+            "mode": "100644",
+            "blobOID": "6beb6a342d3b7d9f3fcdfd610e03d038e66d5a49",
+            "SHA256": "f9e3e808d8951c2da6fee4b45364f64bb5c909a33a90c3a6074c99b8cb6e4def",
+            "bytes": 2505,
+            "encoding": "UTF-8 without BOM, LF",
+            "raw": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/h12_signature_internal.go.current.raw"
+          }
+        },
+        {
+          "path": "services/node-agent/internal/migrationcontext/h12_signature_test.go",
+          "change": "A",
+          "preimage": null,
+          "current": {
+            "mode": "100644",
+            "blobOID": "ec386c7e3530c88a10305efc7f29ba66fcdf245b",
+            "SHA256": "94f9bd56deaa371125ceba49f5d7a21d30a4bc34575fed4747f693b51d1ce020",
+            "bytes": 12939,
+            "encoding": "UTF-8 without BOM, LF",
+            "raw": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/h12_signature_test.go.current.raw"
+          }
+        }
+      ],
+      "independentCODEReview": "PENDING",
+      "productCI": "NOT_RUN",
+      "mathEvidenceAuthenticatesOrInstallsAuthority": false,
+      "actualH1H7Bindings": null,
+      "rawSeven": "UNREGISTERED",
+      "A01A40": "NOT_RUN",
+      "wholeProgramComplete": false
+    },
+    "rootFixReply": "msg_0abc80a909cd",
+    "latestWriteScope": [
+      "services/node-agent/internal/migrationcontext/effect_gate_test.go newly added H12 type block only",
+      "own NEW evidence/history/WIP02"
+    ],
+    "threeOtherWIPFilesImmutable": true
   }
 }

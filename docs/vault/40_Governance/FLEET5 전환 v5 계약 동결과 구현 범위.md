@@ -1,11 +1,11 @@
 ---
 doc_id: "GOV-FLEET5-BOOTSTRAP-V5-FREEZE-CODE-SCOPE-20261106"
 title: "FLEET5 전환 v5 계약 동결과 구현 범위"
-version: "1.0.38"
+version: "1.0.39"
 status: "active"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-11-07T09:49:11+09:00"
+updated: "2026-11-07T10:18:15+09:00"
 source_of_truth: "Git"
 ---
 
@@ -286,3 +286,8 @@ NEWCore42300147891의exactf2c1/ref/manual/core.yml/attempt1/correlation과두job
 ## H12 R2 계약 실제 수락 뒤 private 수학 WIP
 
 실제381f/Docs42317786398/all19가M1/L1/L2를닫았다. Root별도msg7461은exact0bf8base/4경로의private서명수학과한정resolvedobject/sourcefile/directcallguard·syntheticfixture시험WIP만허용한다. 실제authoritybinding/publicsuccess/clock/status/currentregistration·positivefactory·배포는아니며actualGo/crypto검증은고정WIP뒤Root격리에서실행한다. N4/N10~N14의선택과미실행축은Rootactivation/scope/Evidence를따른다.
+
+
+## H12 서명 CODE R1 실제 Go 회귀와 새 type 범위 교정
+
+R2설계계약의실제381f수락은유지한다. 별도고정private수학WIP의실제앞선3phase는통과했으나기존PLR5leaf가새H12typepolicy의과잉거부로실패했다. msg0abc는새helperTYPE제약만제범위에맞추고기존DATA/foreignwrite/conversion정책·positiveLIMIT와다른3파일을보존하는한블록fixWIP만허용한다. Rootgrant상수명은실제2MiBEnvelopeLimit으로정정하며범위는불변이다. 실제실패/원문/배정은RootEvidence,게시/CI/authority/runtime인수는미허용이다.

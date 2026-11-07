@@ -1,5 +1,5 @@
 {
-  "atKST": "2026-11-07T09:49:11+09:00",
+  "atKST": "2026-11-07T10:18:15+09:00",
   "card": "FLEET5-B-A7-OPERATION-GUARD-R1-20261107",
   "ownerTask": "task_a8fd2969f0b3",
   "ownerDispatch": "ctx_6f0f8253b8a7",
@@ -8,7 +8,7 @@
   "base": "b3bbdc8d92a39f2f797a7680deb2770d6f705af0",
   "frozenOriginalProduct": "72028cbac903c4415d9979f980a6e0f9948e914f",
   "newBranch": "agent/codex/fleet5-b-a7-operation-guard-r1-20261107",
-  "status": "EXACT_WIP01_ACTUAL_24_GREEN_AND_CAUSAL_REAL_BASE_RED_VERIFIED_OWN_PROOF_WIP02_PENDING",
+  "status": "WIP02_EXACT_SOURCE_VERIFIED_NORMAL_PUBLICATION_GRANTED_ONE_IMMUTABLE_RAW_LOG_JSON_EXCEPTION",
   "allowedProductPaths": [
     "services/control-plane/src/inv/dispatch.py",
     "tests/core/test_delivery_operation_origin.py"
@@ -26,7 +26,7 @@
   },
   "productUnitTests": "NOT_RUN_PENDING_FROZEN_WIP_AND_ROOT_ISOLATION",
   "authorMainProductExecutionGranted": false,
-  "commitPushCIGrantedAtThisStage": false,
+  "commitPushCIGrantedAtThisStage": "ONE_NORMAL_CANDIDATE_PUBLICATION_AND_EXACT_DOCS_CORE_BACKEND_CI_ONLY",
   "rootIsolatedVerificationRequired": true,
   "actualRuntimeB": 0,
   "original19BaselineUnchanged": true,
@@ -99,5 +99,113 @@
   "rootProofCompatibilityReply": "msg_f730b53fb339",
   "legacyGuardStatus": "UNCHANGED_REFUSED_EXPECTED_NEW_CAPTURE_NOT_CLEAN",
   "ownFiniteCompatibilityProof": "AUTHORIZED_NOT_YET_SUBMITTED",
-  "productTestBytesFrozen": true
+  "productTestBytesFrozen": true,
+  "WIP02": {
+    "atKST": "2026-11-07T10:01:47+09:00",
+    "base": "b3bbdc8d92a39f2f797a7680deb2770d6f705af0",
+    "WIP02SHA256": "ce2e8c8802c4c4b805cd38f5fe49117f472f0b44bb2f1c4adb80759924670fbb",
+    "WIP02Bytes": 2623087,
+    "verifiedSafeEntries": 52,
+    "all51NonselfManifestInputsAnd52ReceiptInputsMatched": true,
+    "authorBranchAndDirtyScopeVerified": true,
+    "priorUntrackedOtherCardReceiptsPreservedExcludedFromPublication": [
+      {
+        "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-mode-origin-r1-20261107-codex/ci-jobs-first.json",
+        "bytes": 4428,
+        "SHA256": "82075c3707541925e2e2a32ac048a1d811d30197f4aeb5786b1c0c18c4f5c8c2"
+      },
+      {
+        "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-mode-origin-r1-20261107-codex/ci-run-first.json",
+        "bytes": 13113,
+        "SHA256": "df17a2f508a609c209adbe1fc062f27e9b6d30ad934a2244c60acbbf8d858b3d"
+      },
+      {
+        "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-mode-origin-r1-20261107-codex/committed-verification.json",
+        "bytes": 5534,
+        "SHA256": "3de63ef2f14a6e1dcef2f7f8a6ea4cd7f2951acaf94501b7601a42e9585ab1fc"
+      },
+      {
+        "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-mode-origin-r1-20261107-codex/publication-receipt.json",
+        "bytes": 5341,
+        "SHA256": "dc7ed81294c92425c0fe27a9dda998c7c7502fa935d20d118596d88059e9f6c8"
+      },
+      {
+        "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-snapshot-r1-20261107-codex/ci-jobs-first.json",
+        "bytes": 3753,
+        "SHA256": "00e257e66a25014647296b71586441d3abf221d27c484084c2a5c6adba56fffd"
+      },
+      {
+        "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-snapshot-r1-20261107-codex/ci-jobs-observation02.json",
+        "bytes": 4422,
+        "SHA256": "ab2e910bcf94e424816cc3039e9f0d320bbbb3d8e58271ec02f729b905a6fe6f"
+      },
+      {
+        "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-snapshot-r1-20261107-codex/ci-run-first.json",
+        "bytes": 13106,
+        "SHA256": "304676b72660ce002f52446de97f31662625091a4e35f10add485b0fc9945dc2"
+      },
+      {
+        "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-snapshot-r1-20261107-codex/ci-run-observation02.json",
+        "bytes": 13109,
+        "SHA256": "55180a08d22fda9c171512aafac8a1bc3fa46e0a295ae667d8c54d6838393527"
+      },
+      {
+        "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-snapshot-r1-20261107-codex/committed-receipt-verification.json",
+        "bytes": 20032,
+        "SHA256": "f5df4da030a259625910f16e04fa6f490fb086d6b275e7a049f215db3b04e121"
+      },
+      {
+        "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-snapshot-r1-20261107-codex/publication-receipt.json",
+        "bytes": 4448,
+        "SHA256": "50d1c2ebfe11dc4182303547f35c218ecd5463678592032aeff9d14cd1fae93e"
+      },
+      {
+        "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-snapshot-r2-20261107-codex/ci-jobs-first.json",
+        "bytes": 4422,
+        "SHA256": "9320d15ea4ec81dfd5bfa6b18b1fc32bac8d7c93feacdd426cb84102909a39b3"
+      },
+      {
+        "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-snapshot-r2-20261107-codex/ci-run-first.json",
+        "bytes": 13087,
+        "SHA256": "51649b5b9bcf1fc3c0c08e16859d56cc545d5bb3c8452ea4a2e1deedaf0e7684"
+      },
+      {
+        "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-snapshot-r2-20261107-codex/committed-receipt-verification.json",
+        "bytes": 21651,
+        "SHA256": "5f7ad3a551f4e86f43ab507906a2fbc7a2a91e8b080b85d93f199f683a6f95e2"
+      },
+      {
+        "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-snapshot-r2-20261107-codex/publication-receipt.json",
+        "bytes": 4439,
+        "SHA256": "16466fd1140db20d816ccfc087cd87150e43fa59717ecc2c54d2d3bfe1802360"
+      }
+    ],
+    "rootVerificationPriorAttempts": "Two overstrict/incomplete untracked-scope assertions failed before archive verification; full bounded listing identified exact14 prior post-CI receipts across three earlier cards, preserved and excluded without treating owner worktree as clean.",
+    "productAndTestExactRootTestedBytesUnchanged": true,
+    "productSHA256": "82f029614537eb5bab56934e4b6736fe3dd52ece54b9b9a3996815b131e41de4",
+    "testSHA256": "3dacdb63f83ab1d8075ddcbe422d82daad20bd56f643adee0fc7ae97715925d2",
+    "whole25SourceWorldComparedToRealBaseGit": true,
+    "wholeProductModuleOnlyExactOnceASTDelta": true,
+    "unchangedOldGitHelperCount": 29,
+    "wholeReferenceSetOneSameKindCallFuncBoundToForwardWitness": true,
+    "originalStaticControlsReported": 21,
+    "allOriginalStaticControlExpectedReasonsMatched": true,
+    "RootReranAuthorStaticOrProductTests": false,
+    "RootActualGreenPassed": 24,
+    "RootActualCausalRealBaseRedFailed": 1,
+    "RootRawUnitReceiptAndAll12LogPayloadsByteMatched": true,
+    "finiteClassification": "EXACT_CAPTURE_GUARD_DELTA_COVERED_WITH_LEGACY_REFUSAL_PRESERVED",
+    "legacyGuardStatus": "REFUSED_UNCHANGED_PRESERVED_NOT_CLEAN",
+    "original19HOLD": true,
+    "actualRuntimeB": 0,
+    "independentCODEReview": "PENDING_AFTER_PUBLICATION_CI",
+    "wholeProgramComplete": false
+  },
+  "rootPublicationReply": "msg_fb188c4045e5",
+  "rootRawPublicationException": "msg_193e85c36227",
+  "candidateCommit": null,
+  "actualCI": null,
+  "independentCODEReview": "PENDING",
+  "knownPriorUntrackedReceipts": 14,
+  "additionalUntrackedFrozenRawLog": 1
 }

@@ -1,0 +1,29 @@
+{
+  "atKST": "2026-11-07T09:55:25+09:00",
+  "mode": "cleanup",
+  "containers": [
+    {
+      "phase": "setup",
+      "containerID": "0791a340269b191ea1ab878c415b2c58b145b74a19974a046377f8ccace89753",
+      "name": "sv-root-b-py-45ec174adece-setup",
+      "directTestExit": 0,
+      "removeExit": 0
+    },
+    {
+      "phase": "green",
+      "containerID": "5dc45ace738096c8adea7fbd3a716cc0789cec773af51d586bc87edf81fe87d4",
+      "name": "sv-root-b-py-45ec174adece-green",
+      "directTestExit": 0,
+      "removeExit": 0
+    },
+    {
+      "phase": "red",
+      "containerID": "c20adcd66b3d2621df2a53cff75462156439dde01cb4512a0a0dbd0ffc6463de",
+      "name": "sv-root-b-py-45ec174adece-red",
+      "directTestExit": 1,
+      "removeExit": 0
+    }
+  ],
+  "onlyOwnedExitedContainers": true,
+  "businessContainersChanged": false
+}

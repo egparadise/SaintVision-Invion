@@ -1,0 +1,63 @@
+{
+  "atKST": "2026-11-07T10:18:15+09:00",
+  "leafFailures": [
+    {
+      "test": "TestPLR1BCompiledWriteTargetsAndReasons/slice-root-foreign-pointee",
+      "realCompilerExit": 0,
+      "actualTypecheckExit": 0,
+      "failureKind": "NEW_OVERBROAD_H12_TYPE_GUARD_INTERCEPTS_OLD_PLR_DATA_POLICY",
+      "actualNewReason": "h12 crypto type scope forbidden: crypto/ed25519.PrivateKey",
+      "expectedOldCauseOrPositiveControl": "foreign pointee write forbidden",
+      "mutantBodyExecuted": false,
+      "rawOutput": "=== RUN   TestPLR1BCompiledWriteTargetsAndReasons/slice-root-foreign-pointee\n    pl_r1a_test.go:292: actual go build -p=1 ./internal/migrationcontext exit0; mutant body NOT executed\n    pl_r1a_test.go:298: REASON case=slice-root-foreign-pointee build=0 typecheck=0 refused=true reason=h12 crypto type scope forbidden: crypto/ed25519.PrivateKey at pl_probe.go\n    pl_r1a_test.go:298: want intended refusal prefixes=[\"foreign pointee write forbidden: crypto/ed25519.PrivateKey\"], got=h12 crypto type scope forbidden: crypto/ed25519.PrivateKey at pl_probe.go\n--- FAIL: TestPLR1BCompiledWriteTargetsAndReasons/slice-root-foreign-pointee (1.21s)\n"
+    },
+    {
+      "test": "TestPLR1CCompiledPointerConversionsAndControls/N6-slice-to-own-array-pointer",
+      "realCompilerExit": 0,
+      "actualTypecheckExit": 0,
+      "failureKind": "NEW_OVERBROAD_H12_TYPE_GUARD_INTERCEPTS_OLD_PLR_DATA_POLICY",
+      "actualNewReason": "h12 crypto type scope forbidden: crypto/ed25519.PrivateKey",
+      "expectedOldCauseOrPositiveControl": "pointee-changing pointer conversion forbidden",
+      "mutantBodyExecuted": false,
+      "rawOutput": "=== RUN   TestPLR1CCompiledPointerConversionsAndControls/N6-slice-to-own-array-pointer\n    pl_r1a_test.go:383: actual go build -p=1 ./internal/migrationcontext exit0; mutant body NOT executed\n    pl_r1a_test.go:393: OWNER_PLR1C_PROBE case=N6-slice-to-own-array-pointer kind=CONVERSION_NEGATIVE build=0 typecheck=0 refused=true reason=h12 crypto type scope forbidden: crypto/ed25519.PrivateKey at pl_review_probe.go\n    pl_r1a_test.go:394: REASON case=N6-slice-to-own-array-pointer build=0 typecheck=0 refused=true reason=h12 crypto type scope forbidden: crypto/ed25519.PrivateKey at pl_review_probe.go\n    pl_r1a_test.go:394: want intended refusal prefixes=[\"pointee-changing pointer conversion forbidden:\"], got=h12 crypto type scope forbidden: crypto/ed25519.PrivateKey at pl_review_probe.go\n--- FAIL: TestPLR1CCompiledPointerConversionsAndControls/N6-slice-to-own-array-pointer (1.21s)\n"
+    },
+    {
+      "test": "TestPLR1CCompiledPointerConversionsAndControls/S1-slice-local-copy-of-pointee",
+      "realCompilerExit": 0,
+      "actualTypecheckExit": 0,
+      "failureKind": "NEW_OVERBROAD_H12_TYPE_GUARD_INTERCEPTS_OLD_PLR_DATA_POLICY",
+      "actualNewReason": "h12 crypto type scope forbidden: crypto/ed25519.PrivateKey",
+      "expectedOldCauseOrPositiveControl": "positive LIMIT control",
+      "mutantBodyExecuted": false,
+      "rawOutput": "=== RUN   TestPLR1CCompiledPointerConversionsAndControls/S1-slice-local-copy-of-pointee\n    pl_r1a_test.go:383: actual go build -p=1 ./internal/migrationcontext exit0; mutant body NOT executed\n    pl_r1a_test.go:393: OWNER_PLR1C_PROBE case=S1-slice-local-copy-of-pointee kind=LIMIT build=0 typecheck=0 refused=true reason=h12 crypto type scope forbidden: crypto/ed25519.PrivateKey at pl_review_probe.go\n    pl_r1a_test.go:394: REASON case=S1-slice-local-copy-of-pointee build=0 typecheck=0 refused=true reason=h12 crypto type scope forbidden: crypto/ed25519.PrivateKey at pl_review_probe.go\n    pl_r1a_test.go:394: positive control refused: h12 crypto type scope forbidden: crypto/ed25519.PrivateKey at pl_review_probe.go\n--- FAIL: TestPLR1CCompiledPointerConversionsAndControls/S1-slice-local-copy-of-pointee (1.22s)\n"
+    },
+    {
+      "test": "TestPLR1CCompiledPointerConversionsAndControls/S2-slice-parameter",
+      "realCompilerExit": 0,
+      "actualTypecheckExit": 0,
+      "failureKind": "NEW_OVERBROAD_H12_TYPE_GUARD_INTERCEPTS_OLD_PLR_DATA_POLICY",
+      "actualNewReason": "h12 crypto type scope forbidden: crypto/ed25519.PrivateKey",
+      "expectedOldCauseOrPositiveControl": "positive LIMIT control",
+      "mutantBodyExecuted": false,
+      "rawOutput": "=== RUN   TestPLR1CCompiledPointerConversionsAndControls/S2-slice-parameter\n    pl_r1a_test.go:383: actual go build -p=1 ./internal/migrationcontext exit0; mutant body NOT executed\n    pl_r1a_test.go:393: OWNER_PLR1C_PROBE case=S2-slice-parameter kind=LIMIT build=0 typecheck=0 refused=true reason=h12 crypto type scope forbidden: crypto/ed25519.PrivateKey at pl_review_probe.go\n    pl_r1a_test.go:394: REASON case=S2-slice-parameter build=0 typecheck=0 refused=true reason=h12 crypto type scope forbidden: crypto/ed25519.PrivateKey at pl_review_probe.go\n    pl_r1a_test.go:394: positive control refused: h12 crypto type scope forbidden: crypto/ed25519.PrivateKey at pl_review_probe.go\n--- FAIL: TestPLR1CCompiledPointerConversionsAndControls/S2-slice-parameter (1.22s)\n"
+    },
+    {
+      "test": "TestPLR1DCompiledTargetPointerTermsAndControls/G4-typeparam-target-slice-to-own-array",
+      "realCompilerExit": 0,
+      "actualTypecheckExit": 0,
+      "failureKind": "NEW_OVERBROAD_H12_TYPE_GUARD_INTERCEPTS_OLD_PLR_DATA_POLICY",
+      "actualNewReason": "h12 crypto type scope forbidden: crypto/ed25519.PrivateKey",
+      "expectedOldCauseOrPositiveControl": "pointee-changing pointer conversion forbidden",
+      "mutantBodyExecuted": false,
+      "rawOutput": "=== RUN   TestPLR1DCompiledTargetPointerTermsAndControls/G4-typeparam-target-slice-to-own-array\n    pl_r1a_test.go:516: actual go build -p=1 ./internal/migrationcontext exit0; mutant body NOT executed\n    pl_r1a_test.go:526: OWNER_PLR1D_PROBE case=G4-typeparam-target-slice-to-own-array kind=CONVERSION_NEGATIVE build=0 typecheck=0 refused=true reason=h12 crypto type scope forbidden: crypto/ed25519.PrivateKey at pl_review_probe.go\n    pl_r1a_test.go:527: REASON case=G4-typeparam-target-slice-to-own-array build=0 typecheck=0 refused=true reason=h12 crypto type scope forbidden: crypto/ed25519.PrivateKey at pl_review_probe.go\n    pl_r1a_test.go:527: want intended refusal prefixes=[\"pointee-changing pointer conversion forbidden:\"], got=h12 crypto type scope forbidden: crypto/ed25519.PrivateKey at pl_review_probe.go\n--- FAIL: TestPLR1DCompiledTargetPointerTermsAndControls/G4-typeparam-target-slice-to-own-array (1.22s)\n"
+    }
+  ],
+  "failedLeafSubtests": 5,
+  "failedTopLevelParents": 3,
+  "failedPackageEvents": 1,
+  "rootFixReply": "msg_0abc80a909cd",
+  "noPublicationOrCIGranted": true,
+  "narrowFixOnly": "effect_gate_test.go newly added H12 Ed25519 type policy scope; old PLR fixtures/expected causes/positive controls unchanged; other3WIPsourcefiles frozen",
+  "actualH1H7": null,
+  "wholeProgramComplete": false
+}

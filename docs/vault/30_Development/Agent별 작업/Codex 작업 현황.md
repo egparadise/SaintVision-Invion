@@ -1,15 +1,19 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.456"
+version: "1.0.457"
 status: "review"
 author: "Codex"
-updated: "2026-11-07T09:54:32+09:00"
+updated: "2026-11-07T10:18:15+09:00"
 source_of_truth: "Git"
 active_card: "FLEET5 continued supervision with PORTAL-REFRESH-FLEET-20261106"
-active_card_status: "H12actual381fM1L1L2CLOSED->privateGoWIP7461TESTSNOTRUN; Bactual24GREEN/realBASEcausal1RED->proofonlyWIP02f730; original19HOLD/actualNULL/fleetincomplete"
-active_card_next: "B Codex exacttestedbytes proof-onlyWIP02; K2 Codex fourpathprivateGoWIP; Root immutablepacketverification then boundedactualGo tests/publication/CI/singleCODEreview. Actual5PCacceptance stillblocked."
+active_card_status: "BexactWIP02verified->normalpublishfb188+rawJSONexception193/CIpending; H12actualGoP1P2P3PASSP4FAIL5leaf->typeblockfix0abc; original19HOLD/actualNULL/fleetincomplete"
+active_card_next: "B Codex immutabletestedbytes normalpublication+exactDocsCoreBackend thenCODEreviewASK; K2 Codex ONLYnewH12typeblock fix preservesoldPLR and other3files thenWIP02; Root verifyfixedWIP/realGo revalidation, no routineapproval."
 ---
+
+## 2026-11-07T10:18:15+09:00 B 고정 게시 단계와 H12 실제 회귀 실패의 한정 교정
+
+B고정WIP02의52entry·25source·29기존helper·21정적control과실제시험된제품/testbytes를Root가대조해정상게시·Docs/Core/Backend CI를허용했다. 원래rawlog의공백gate2는원문보존JSON표현으로만처리한다. K2서명WIP의실제Go앞선3phase는통과했지만마지막기존PLR에서새타입검사의과잉거부로leaf5건이실패했다. 기존원문·인과·출처와실패를보존하고기존PLR규칙을바꾸지않는새타입검사한블록수정만배정했다. 실제5대인수·권한·전체완료는아니다. 실제명령·직접exit·KST·정확WIP/원문99index·행/유일입력hash·미실행축·다음담당은Root History/Evidence에보존했다.
 
 ## 2026-11-07T09:54:32+09:00 실제 시험 원문의 공개 artifact 해시 축 대조
 
