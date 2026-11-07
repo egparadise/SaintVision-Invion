@@ -1,15 +1,23 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.490"
+version: "1.0.491"
 status: "review"
 author: "Codex"
-updated: "2026-11-08T04:17:09+09:00"
+updated: "2026-11-08T04:34:48+09:00"
 source_of_truth: "Git"
 active_card: "FLEET5 continued supervision with PORTAL-REFRESH-FLEET-20261106"
-active_card_status: "CentralViteE4e07ExactCIAndFreshDirectBrowserVerified_1351Tests6Cases_ExactOneLineWaitMatched_ActualAuthorExitedReleased_BoundedClaudeReviewReady_ManualRealDeploy5PCPending"
-active_card_next: "Root publishes Root529 exact e4e07 and approval proofs after author exit, then starts one actual Claude central-config/new-direct-proof/approved-wait delta review. Inherit soundR1R2. After acceptance Root deploys exact frontend and verifies actual PC3 strictCSP login/no-blink/resources; manual/real votes/Run/PC1/PC5/renewal/all5 remain."
+active_card_status: "ActualClaude20d9AcceptsE4e07_Mandatory0_CR-CSP02ClosedAtSource; OriginalReviewAnd38Pins2BoardsDocs19FullCanonicalVerified_ActualReviewerExitedReleased; ExactPC3DeploymentBrowserNext"
+active_card_next: "Root completes queued Root530 exact Docs/Obsidian publication now actual review window ended, then stages and deploys official exact e4e07 frontend on owned PC3 loopback port with oldb48 rollback retained; actual strictCSP/login/resources/no-blink verification and guarded owned SSH route switch. Manual real votes/Run/PC1/PC5/GPUstorage/renewal/all5 remain."
 ---
+
+## 2026-11-08T04:34:48+09:00 중앙 실행e4e07 실제 독립 수락과 PC3 배포 준비
+
+실제Claude20d9bf86이e4e07중앙Vite수정분을필수결함0으로수락해잔여CR-CSP02를source수준에서닫았다. Root는직접parent63f3·자기문서4개·remoteexact·입력38개/진행판2개hash·정확Docs42406525619/job128505317216/19단계·canonical542132B완전일치를대조했다. 최초대조시검토자는settled/reclaimable로자동해제전이었으므로APPLY를보류했고종료/exited/released확인후게시를재개했다. 기존canonicalESM/검증의미/CSP/backend/SQL/15회귀와정확대기1행만수정한1351시험을보존한다. 다음은Root의정확공식e4e07artifact PC3배포와실제로그인/자원/깜빡임확인이며manualMissing1/실제승인Run/PC1PC5/GPUstorage/5대인수는아직남는다. 다음첫행동/담당은Root의Root530게시/동기화뒤정확artifact격리배포이며실제새화면운영인수는아직미완료다.
+
+## 2026-11-08T04:25:03+09:00 중앙 실행e4e07 실제 Claude R3 착수
+
+Root529는Git a5e8bd98·정확Docs42405551870전19단계·Obsidian3427hash일치/check-apply-check0/pending0/conflict0/clean까지완료했다. 작성자와기존검토자의실제종료/해제를확인한뒤같은Claude에게중앙mainVite설정·freshdirectproof·승인된비동기대기1행만R3한정검토로전달했다. 실제ctx_7b1a435f3b4f/task_ce91b9bbce0b의reopened/ready접수는확인했으며판정원문은아직없다. 검토창기준canonical542132B/SHA3b0a0767ec583f116ba71000477f0aa197b4d64b6fe5285ef31d55f39cffba5d를보존하고RootAPPLY를보류한다. 기존타당한R1/R2를상속하며새실배포·manualdevice·실제승인/Run·PC1/PC5·5대인수는남는다. 다음첫행동/담당은actualClaude의한정판정과Root의원본대조이며아직검토완료/배포수락이아니다. 본Root530기록의게시/동기화는검토창종료뒤완료한다.
 
 ## 2026-11-08T04:17:09+09:00 중앙 실행e4e07 검증과 Root529 진행 기록 마무리
 

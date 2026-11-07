@@ -1,0 +1,23 @@
+{
+  "atKST": "2026-11-08T04:34:48+09:00",
+  "taskID": "FLEET5-CSP02-CENTRAL-VITE-ACCEPT-AND-DEPLOY-20261108",
+  "owner": "Root Codex",
+  "managementBase": "a5e8bd98141e6f81887c8dca9956da525fe99d33",
+  "source": "e4e07bfd6b94e57edc64d158e208df01b9319deb",
+  "actualIndependentReview": "20d9bf8622a0f0624a323b92acaeb33cea91fb9e",
+  "actualVerdict": "ACCEPT_CR_CSP02_CENTRAL_VITE_DELTA_KEEP_MANUAL_AND_REAL_DEPLOYMENT_GATES",
+  "codeFinding": "CR-CSP02_CLOSED_AT_SOURCE",
+  "actualReviewDocs": 42406525619,
+  "rootInputPinsMatched": 38,
+  "RootBoardPinsMatched": 2,
+  "reviewerLifecycle": {
+    "state": "succeeded",
+    "stage": "settled",
+    "liveness": "exited",
+    "terminalState": "released"
+  },
+  "canonicalFullBytesMatchedBeforeRootApply": true,
+  "Root530Publication": "IN_PROGRESS_AFTER_REVIEW_WINDOW",
+  "actualNewFrontendActivation": "NOT_RUN",
+  "wholeProgramComplete": false
+}

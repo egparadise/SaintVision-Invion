@@ -1,0 +1,28 @@
+{
+  "atKST": "2026-11-08T04:33:45+09:00",
+  "reviewSource": "20d9bf8622a0f0624a323b92acaeb33cea91fb9e",
+  "reviewBase": "63f3eeb661c565d864e14c2395f68c6715d109c0",
+  "reviewedTarget": "e4e07bfd6b94e57edc64d158e208df01b9319deb",
+  "actualVerdict": "ACCEPT_CR_CSP02_CENTRAL_VITE_DELTA_KEEP_MANUAL_AND_REAL_DEPLOYMENT_GATES",
+  "remainingMandatoryCodeDefects": 0,
+  "crCsp02SourceFindingClosed": true,
+  "RootInputPinsMatched": 38,
+  "RootBoardPinsMatched": 2,
+  "ownFourDocsOnlyDirectParentRemoteExact": true,
+  "Docs": 42406525619,
+  "DocsJob": 128505317216,
+  "exactManualAttempt1All19Success": true,
+  "sixLocalMetadataGatesExit0": true,
+  "canonicalFullBytesMatchAtRootVerification": true,
+  "canonicalBytes": 542132,
+  "canonicalSHA256": "3b0a0767ec583f116ba71000477f0aa197b4d64b6fe5285ef31d55f39cffba5d",
+  "reviewerLifecycle": {
+    "state": "succeeded",
+    "stage": "settled",
+    "liveness": "exited",
+    "terminalState": "released"
+  },
+  "actualDeploymentAccepted": false,
+  "manualAcceptanceMissingCount": 1,
+  "wholeProgramComplete": false
+}
