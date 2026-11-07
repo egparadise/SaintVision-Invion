@@ -1,15 +1,19 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.466"
+version: "1.0.467"
 status: "review"
 author: "Codex"
-updated: "2026-11-07T14:01:39+09:00"
+updated: "2026-11-07T14:23:47+09:00"
 source_of_truth: "Git"
 active_card: "FLEET5 continued supervision with PORTAL-REFRESH-FLEET-20261106"
-active_card_status: "Joint703SourceThreeCIActualIndependent702ReviewAccepted_TaskDone; FreshCPUAdmissionOwnCandidateCIReviewPending; ActualRuntimeFivePCIncomplete"
-active_card_next: "Codex deliver own freshCPU admission candidate/required CI; Root verify and start one actual independent review only when ready. Then pinned actual one-node registration/observation/Run journey. Need additional existing approver identity and real two-voter approvals; no fabricated votes or actual authority."
+active_card_status: "FreshCPUAdmission1efeaFourNewFilesThreeCI_70New25PGPASS_RootVerified_IndependentReviewReady; ActualRuntimeFivePCIncomplete"
+active_card_next: "Root start one actual Claude CODE review1efea after verified own three CI/new70cases25actualPG. Preserve raw WIP and original holds. No liveadmission before verdict and pinned operator/certificate/target/profile. Additional approver identity and real two-voter approvals still pending for actual Run."
 ---
+
+## 2026-11-07T14:23:47+09:00 신규CPU등록 후보1efea와 실제PG시험
+
+신규CPU등록 후보1efea는703직계이며4신규소스/시험과52자체문서만 추가했다. Docs·Core·Backend가 같은소스/브랜치/attempt1로 성공했고 Root가원본319입력hash와다운로드한2ZIP공식digest·13별도XML을대조했다. 신규70case/24함수와실제필수PG25case모두성공·skip/실패/오류/미수집0을소스AST와JUnit으로확인했다. 기존제품코드는불변이다. 다음은실제단일Claude독립CODE검토이며실등록·자원관측·Run·5대인수는아직미완료다. 실제명령·exit·SHA·CI·Evidence·미확인·후속담당은 Root History에 기록했다.
 
 ## 2026-11-07T14:01:39+09:00 통합703 독립 검토 수락과 작업 완료
 

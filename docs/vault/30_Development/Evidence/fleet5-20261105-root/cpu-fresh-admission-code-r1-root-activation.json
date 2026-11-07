@@ -1,11 +1,11 @@
 {
-  "atKST": "2026-11-07T14:01:39+09:00",
+  "atKST": "2026-11-07T14:23:47+09:00",
   "task": "FLEET5-FRESH-CPU-ADMISSION-CODE-R1-20261107",
   "parentOrcaTask": "task_a95ef3d8ccce",
   "dispatch": "ctx_ed23b4a777d0",
   "owner": "Codex",
   "futureReviewer": "Actual independent Claude, not yet started",
-  "status": "BASE703_SOURCE_CI_REVIEW_ACCEPTED_AWAIT_OWN_NEW_ADMISSION_CANDIDATE_AND_REQUIRED_CI",
+  "status": "PUBLISHED_1EFEA_FOUR_NEW_FILES_OWN_THREE_CI_ROOT_VERIFIED_INDEPENDENT_REVIEW_READY",
   "base": "7033778ad3d2bc284e36f7e29be7597dbb7d9f23",
   "scopeMessage": "msg_e716b2cba047",
   "stdinClarification": "msg_5fa2d17d863e",
@@ -29,10 +29,10 @@
   "publicationDependency": "Concrete WIP01 inspected; Root authorized new candidate commit/push and one exact Docs/Core/Backend as early test candidate. Candidate CI/review and actual operational request remain prerequisites for done/deploy.",
   "runtimeOrPKIGrant": false,
   "authorRealConfigCredentialAccess": "DENIED; source and explicitly typed Root observations only",
-  "implementation": "WIP01_SOURCE_VERIFIED_ONLY; authorized wording/test update may advance live files; original manifest/patch preserved",
-  "localProductTests": "NOT_RUN",
-  "hostedNewCodeCI": "AWAIT_ACTUAL_CANDIDATE",
-  "independentCODEReview": "NOT_STARTED_FOR_NEW_ADMISSION_CODE",
+  "implementation": "PUBLISHED_FOUR_NEW_FILES_NO_EXISTING_703_PRODUCT_EDITS",
+  "localProductTests": "NOT_RUN_ON_MAIN",
+  "hostedNewCodeCI": "ALL_THREE_EXACT_SOURCE_SUCCESS;70NEWCASE_PASS_INCLUDING25ACTUAL_MANDATORY_PG",
+  "independentCODEReview": "READY_NOT_YET_STARTED_AT_CHECKPOINT",
   "wholeProgramComplete": false,
   "originalWIP01RootVerification": "cpu-fresh-admission-wip01-root-verification.json",
   "publicationGrantMessage": "msg_97efddc65fbd",
@@ -40,5 +40,232 @@
   "baseIndependentIntegrationReview": "ACCEPTED_ACTUAL_7023992F_DIRECT_703",
   "driverBoundary": "Ordinary psycopg/libpq auth/TLS including Root operator-approved file references allowed within selected DB connection. Tool is not a libpq DSN/filesystem sandbox; Root freezes target and driver environment, no silent TLS rewrite. Worker real config/secret access still denied.",
   "baseReview": "7023992f3a183b690f35bbf00f38983cbdcbca4c",
-  "baseDispositionMessage": "msg_0749172c23bb"
+  "baseDispositionMessage": "msg_0749172c23bb",
+  "candidate": "1efea494f026e932360c35ae811b6423d874a2e7",
+  "candidateBranch": "agent/codex/fleet5-fresh-cpu-admission-r1-20261107",
+  "actualCandidateVerification": {
+    "atKST": "2026-11-07T14:21:59+09:00",
+    "source": "1efea494f026e932360c35ae811b6423d874a2e7",
+    "base": "7033778ad3d2bc284e36f7e29be7597dbb7d9f23",
+    "branch": "agent/codex/fleet5-fresh-cpu-admission-r1-20261107",
+    "remoteExact": true,
+    "completeAddedPathCount": 56,
+    "onlyFourNewSourceTestsAnd52OwnDocs": true,
+    "sourceSHA256": {
+      "services/control-plane/src/inv/fresh_cpu_admission.py": "76407ced1411f42a5eddd71c894f541b8691d461d4eb1eaea30f63b8bcf90d2c",
+      "tools/fresh_cpu_admission.py": "8129ab5acf7061b0bc1834aa1142ae944471b1b177f018c810de34ea9a53fe7d",
+      "tests/core/test_fresh_cpu_admission.py": "882e5ff9757a2372173c8410277929786f99791b3d9a5bf4e010eeda8d1bceaa",
+      "tests/core/test_fresh_cpu_admission_cli.py": "cb23b2b15bf7a3a75851f97d07336efeee50830e979591032fe9ee3a8a089f96"
+    },
+    "noExisting703ProductTestContractsMigrationWorkflowChanges": true,
+    "lanes": [
+      {
+        "workflow": "docs.yml",
+        "run": 42339493314,
+        "correlation": "freshcpu-1efea494-docs-37e26ae0fb9f",
+        "exactSourceRefEventPathAttempt": true,
+        "conclusion": "success",
+        "jobs": [
+          {
+            "id": 128303801557,
+            "name": "docs",
+            "steps": {
+              "success": 19
+            }
+          }
+        ]
+      },
+      {
+        "workflow": "core.yml",
+        "run": 42339495593,
+        "correlation": "freshcpu-1efea494-core-37e26ae0fb9f",
+        "exactSourceRefEventPathAttempt": true,
+        "conclusion": "success",
+        "jobs": [
+          {
+            "id": 128303806751,
+            "name": "core",
+            "steps": {
+              "success": 42,
+              "skipped": 6
+            }
+          },
+          {
+            "id": 128303806992,
+            "name": "s01-storage-roundtrip",
+            "steps": {
+              "success": 16
+            }
+          }
+        ]
+      },
+      {
+        "workflow": "backend.yml",
+        "run": 42339497490,
+        "correlation": "freshcpu-1efea494-backend-37e26ae0fb9f",
+        "exactSourceRefEventPathAttempt": true,
+        "conclusion": "success",
+        "jobs": [
+          {
+            "id": 128303813419,
+            "name": "mlflow-live",
+            "steps": {
+              "success": 9
+            }
+          },
+          {
+            "id": 128303813590,
+            "name": "backend (3.14)",
+            "steps": {
+              "success": 18,
+              "skipped": 2
+            }
+          },
+          {
+            "id": 128303813647,
+            "name": "backend (3.12)",
+            "steps": {
+              "success": 20
+            }
+          }
+        ]
+      }
+    ],
+    "allThreeExactCI": true,
+    "authorLocalFinalReportSHA256": "c125c02d2c1c5458e1a8e262b889afc0871bfd4619cd3cbcb3b797280ddb61cb",
+    "all319FiniteLocalInputHashesMatch": true,
+    "artifactVerification": {
+      "twoDownloadedOriginalZIPDigestsFreshOfficialMatch": [
+        13561281150,
+        13560974148
+      ],
+      "otherFourFreshOfficialMetadataOnlyNotDownloaded": true
+    },
+    "separate13XMLReportsNotSummed": [
+      {
+        "member": "s01-storage-roundtrip.xml",
+        "cases": 1,
+        "counts": {
+          "passed": 1
+        }
+      },
+      {
+        "member": "s3-product-object-store.xml",
+        "cases": 2,
+        "counts": {
+          "passed": 2
+        }
+      },
+      {
+        "member": "s3-product-postgres.xml",
+        "cases": 3,
+        "counts": {
+          "passed": 3
+        }
+      },
+      {
+        "member": "business-handoff-tests.xml",
+        "cases": 17,
+        "counts": {
+          "passed": 17
+        }
+      },
+      {
+        "member": "build-product-runtime-real-pg.xml",
+        "cases": 13,
+        "counts": {
+          "passed": 13
+        }
+      },
+      {
+        "member": "containment-tests.xml",
+        "cases": 28,
+        "counts": {
+          "passed": 28
+        }
+      },
+      {
+        "member": "core-tests.xml",
+        "cases": 9452,
+        "counts": {
+          "passed": 9406,
+          "skipped": 46
+        }
+      },
+      {
+        "member": "cx01-recovery-tests.xml",
+        "cases": 20,
+        "counts": {
+          "passed": 20
+        }
+      },
+      {
+        "member": "docker-host-tests.xml",
+        "cases": 2,
+        "counts": {
+          "passed": 2
+        }
+      },
+      {
+        "member": "lan-installer-tests.xml",
+        "cases": 17,
+        "counts": {
+          "passed": 17
+        }
+      },
+      {
+        "member": "lan-pilot-database-real-pg.xml",
+        "cases": 2,
+        "counts": {
+          "passed": 2
+        }
+      },
+      {
+        "member": "shard-recovery-tests.xml",
+        "cases": 21,
+        "counts": {
+          "passed": 21
+        }
+      },
+      {
+        "member": "workspace-tests.xml",
+        "cases": 23,
+        "counts": {
+          "passed": 23
+        }
+      }
+    ],
+    "newCaseSourceASTJUnitJoin": {
+      "functions": 24,
+      "cases": 70,
+      "passed": 70,
+      "failure": 0,
+      "error": 0,
+      "skip": 0,
+      "uncollected": 0,
+      "actualMandatoryPGCases": 25,
+      "mandatoryIdentification": "Actual source test fresh_db fixture arguments, shared migrated/owner_engine fixture source read; no private DB or product execution by Root"
+    },
+    "GoRace": {
+      "topPass": 146,
+      "subPass": 550,
+      "testSkip": 1,
+      "noTestPackageSkip": 3,
+      "fail": 0
+    },
+    "requiredDocker": "HOSTED_CI_1TOP4SUBPASS0SKIP_NOT_FIVE_PCS",
+    "BackendEachMatrix": "9047PASS75SKIP2DESELECT0FAIL0ERROR; author-fetched official logs parsed, fresh runner XML gates confirmed; no Backend percase XML claim",
+    "MLflowPass": 3,
+    "wheelNewLibraryExactCandidate": true,
+    "twoGoBinariesRevision1efeaModifiedFalseStaticOnly": true,
+    "originalRawWIPZipPreservedGitLFNotRawHash": true,
+    "WIP01ProductionExecutableASTUnchangedOnlyDriverBoundaryWording": true,
+    "PGTestByteEqualWIP01AndCLIOnlyAppendedTrustedProfileTest": true,
+    "firstRootSourceRead": "Object not yet fetched in Root repository; git fetch of exact published candidate branch exit0, then source/AST reads exit0. No candidate change or CI retry.",
+    "independentCODEReview": "PENDING_ACTUAL_CLAUDE",
+    "localProductExecution": "NOT_RUN",
+    "actualAuthority": null,
+    "runtimeOrFivePCAcceptance": false,
+    "wholeProgramComplete": false
+  }
 }
