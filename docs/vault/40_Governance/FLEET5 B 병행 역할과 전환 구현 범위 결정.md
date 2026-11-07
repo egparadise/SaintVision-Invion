@@ -1,11 +1,11 @@
 ---
 doc_id: "GOV-FLEET5-B-BOOTSTRAP-SCOPE-20261106"
 title: "FLEET5 B 병행 역할과 전환 구현 범위 결정"
-version: "1.4.21"
+version: "1.4.22"
 status: "review"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-11-07T11:27:47+09:00"
+updated: "2026-11-07T11:38:47+09:00"
 source_of_truth: "Git"
 ---
 
@@ -213,3 +213,8 @@ Root는실제24GREEN/인과BASE1RED의code/test와같은WIP02를직접대조하�
 ## 게시 후보 7467의 실제 전체 CI와 별도 CODE 검토
 
 Root는 source746의 Docs/Core/Backend exact CI와 실제 새unit24·Core9237pass46skip·Backend각8879pass75skip·packaged dispatch bytes를 대조했다. 실제 Claude ctxfe09/task1e의 CODE 검토가 진행 중이며 이전 LowL1/C1/C2 충족 여부와 기존19HOLD는 구별한다. 6d7 서명 후보도 actual Docs/Core를 통과했지만 그 CODE review는 순서 대기다. 밖의2바이트 파일은 자동 승인 검토의 정책 차단 후 보존하며 원래코드/CI/검토를 막지 않는다. 전체B·실권한·5PC 인수는 미완료다.
+
+
+## 전달 경계 7467의 실제 코드 수락과 미래 proof 재사용 조건
+
+전달 경계 746789a는 실제 독립 검토 dc18f668/Docs42329333553의 ACCEPT_NARROW_CODE_KEEP_HOLD를 받았다. Root는 direct parent·원격 ref·17개 own 추가 문서·정적 11/11·추가 control 9/9와 정확한 수동 Docs 19단계 성공을 대조했다. 실제 검토자의 종료·해제 뒤 서명 후보 6d7ee3d의 단일 Claude ctx_5cdc22d019b8/task_7cf5765e1538을 시작했다. B 작성자에는 미래 검증 재사용의 새 파일 탐지 Low OPG-L1만 새 own 증거로 보완하도록 회신했다. 제품 수정은 없으며 기존 19 HOLD·실권한 NULL·5대 운영 인수 미완료를 유지한다. LOW OPG-L1은 actual746에는 비차단이며 미래 사용 전 새 evaluated-tree selector수집 증거가 필요하다. 기존제품/test는수정하지않고새 own문서증거만배정했다. 기존19조건의실제완료나merge/deploy/권한부여로바꾸지않는다.

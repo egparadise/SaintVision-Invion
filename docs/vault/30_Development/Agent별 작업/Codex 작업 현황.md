@@ -1,15 +1,19 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.460"
+version: "1.0.461"
 status: "review"
 author: "Codex"
-updated: "2026-11-07T11:27:47+09:00"
+updated: "2026-11-07T11:38:47+09:00"
 source_of_truth: "Git"
 active_card: "FLEET5 continued supervision with PORTAL-REFRESH-FLEET-20261106"
-active_card_status: "B7467DocsCoreBackendPASS->actualClaudeCODEctxfe09pending; H126d7DocsCorePASS->task7cfqueueddep1e; authorsawaitrealverdicts; actualNULL_HOLD/fleetincomplete"
-active_card_next: "Root actualB_CODEverdict then provenexit/release and readyH12task7cf start; authors keep7467/6d7 immutable at questions9efd/9e795; no task100/rolegrant/cleanupbypass."
+active_card_status: "B7467actualCODEACCEPT_KEEP_HOLD; OPG-L1future-selector-proofassigned; H126d7actualClaudeCODEctx5cdcverdictpending; fleetincomplete"
+active_card_next: "Actual Claude H12 CODE verdict; B author new OPG-L1 proof delivery. Root verifies next results, preserve accepted746/6d7 and actual authority NULL_HOLD; no mailbox polling."
 ---
+
+## 2026-11-07T11:38:47+09:00 전달 경계의 실제 코드 수락과 서명 코드 독립 검토
+
+전달 경계 746789a는 실제 독립 검토 dc18f668/Docs42329333553의 ACCEPT_NARROW_CODE_KEEP_HOLD를 받았다. Root는 direct parent·원격 ref·17개 own 추가 문서·정적 11/11·추가 control 9/9와 정확한 수동 Docs 19단계 성공을 대조했다. 실제 검토자의 종료·해제 뒤 서명 후보 6d7ee3d의 단일 Claude ctx_5cdc22d019b8/task_7cf5765e1538을 시작했다. B 작성자에는 미래 검증 재사용의 새 파일 탐지 Low OPG-L1만 새 own 증거로 보완하도록 회신했다. 제품 수정은 없으며 기존 19 HOLD·실권한 NULL·5대 운영 인수 미완료를 유지한다. 원문·명령·직접 exit·SHA·CI·다음 담당은 Root History/Evidence에 보존했다.
 
 ## 2026-11-07T11:27:47+09:00 두 고정 구현의 실제 CI 수신과 독립 코드 검토 순서
 
