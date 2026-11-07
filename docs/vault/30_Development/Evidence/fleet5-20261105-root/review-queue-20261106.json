@@ -1,6 +1,6 @@
 {
   "schema": "fleet5-root-review-resource-sequence:1",
-  "atKST": "2026-11-07T15:27:11+09:00",
+  "atKST": "2026-11-07T17:02:18+09:00",
   "completedB": {
     "task": "task_d4c4c809ed4e",
     "review": "ac9182c3e3d606ec027c0be2e90e049ff50d54f1",
@@ -22,7 +22,7 @@
     "review": "0e53fc024ca773b7719182e170e5e126aeaf5b95",
     "verdict": "ACCEPT TEST-ONLY; R-L1 CLOSED; no new findings"
   },
-  "nextActualReviewTrigger": "No further source or optional-Low review loop. Root sends exact accepted1efea and newly frozen public one-node plan to B for finite source-derived runtime config. Then Root binds real auth/CA/Node profile and proceeds to physical admission/observation.",
+  "nextActualReviewTrigger": "No optional-low review loop. Actual PC3 current-project pilot registered once and continuously observed; real authenticated project nodes/capacity/usage HTTP200. Root continues PC2/PC4 onboarding, CP workspace, TLS trust/renewal and actual approval/run gaps. No other agent review claimed.",
   "completedIntegration": {
     "task": "task_78064fb4b7ff",
     "dispatch": "ctx_ed7ec73163d6",
@@ -1031,15 +1031,7 @@
     "verdict": "ACCEPT_SELECTOR_DISCOVERY_DELTA_CLOSE_OPG_L1_KEEP_ACTUAL_HOLD",
     "Docs": 42333724088
   },
-  "parallelImplementation": {
-    "task": "FLEET5-ONE-CPU-NODE-RUNTIME-PLAN-R1-20261107",
-    "owner": "Codex B ctx_6f0f8253b8a7",
-    "reviewer": "Root Codex actual plan review, not pre-claimed",
-    "status": "READY_FOR_SPECIFIC_SOURCE_DATA_ONLY_FOLLOWUP_AFTER_CHECKPOINT",
-    "source": "1efea494f026e932360c35ae811b6423d874a2e7",
-    "publicPlan": "one-cpu-node-plan-r1.public.json",
-    "scope": "Derive exact minimal fresh CPU Node TLS/launch-key/peer-policy/profile/image/CLI/config templates and current CP workspace admission gap from source, with explicit Root-pending cryptographic/auth fields. No real profile/credential/config/PKI/host/DB access or mutation."
-  },
+  "parallelImplementation": null,
   "CPUJoinSourceMap": {
     "task": "task_a95ef3d8ccce",
     "dispatch": "ctx_ed23b4a777d0",
@@ -1676,6 +1668,40 @@
     "actualEntryOrAPPLY": "NOT_RUN",
     "actualProfileHostRequestIdentityLeafNodeImageFence": "NOT_YET_FULLY_BOUND",
     "actualAuthority": null,
+    "wholeProgramComplete": false
+  },
+  "latestRuntimeRecipeActualRootAcceptance": {
+    "atKST": "2026-11-07T16:07:49+09:00",
+    "planCommit": "5ba7cfb795135e1f74c0d3e83e0fea285d3cc987",
+    "deliveryBase": "b51d827e507a35aca3737e31103bd3b3311298a5",
+    "sourceTarget": "1efea494f026e932360c35ae811b6423d874a2e7",
+    "remoteExact": true,
+    "directParentExact": true,
+    "onlyOwnAddedDocs": 11,
+    "all38SourceBlobFileLineExcerptPinsMatch": true,
+    "all7RootPublicInputsMatch": true,
+    "all6ContractShapesMatch": true,
+    "author83StaticChecksExit0": true,
+    "Docs": 42349194567,
+    "DocsJob": 128333490253,
+    "correlation": "fleet5-one-cpu-runtime-plan-r1-20261107-6f0875cf-b03c-4684-9257-4978f844dd15",
+    "exactManualDocsAll19Success": true,
+    "RootPlanReview": "ACCEPT_SOURCE_DERIVED_MINIMAL_RUNTIME_RECIPE_KEEP_UNBOUND_AND_LIVE_HOLDS",
+    "RootReviewMeaning": "Root read deployment/PKI/peerpolicy/profile/Nodeargv/workspace/observation plus actual source bindings. Correct source-only obligations. Actual daemonMinAPI, image/supervisor build, auth/PKI/private profile and mutations not accepted from a plan.",
+    "lifecycle": {
+      "dispatchId": "ctx_6f0f8253b8a7",
+      "taskId": "task_a8fd2969f0b3",
+      "runId": "run_e57ecd84a7bc",
+      "state": "succeeded",
+      "stage": "settled",
+      "liveness": "exited",
+      "terminal": "term_540cb735-f9a3-4432-a631-f6949789350f",
+      "terminalState": "released",
+      "workspace": "d98dc9d3-fe61-4cb2-9776-dff349347a61::D:/Project/SaintVisionI-Invion/fleet5-compute-storage-contract-20261105",
+      "waitingOnHuman": "unknown"
+    },
+    "actualAuthority": null,
+    "actualAdmission": "NOT_RUN",
     "wholeProgramComplete": false
   }
 }

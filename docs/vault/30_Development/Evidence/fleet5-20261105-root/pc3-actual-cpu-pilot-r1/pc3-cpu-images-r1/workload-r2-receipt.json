@@ -1,0 +1,40 @@
+{
+  "atKST": "2026-11-07T16:19:17+09:00",
+  "SSHExit": 0,
+  "knownHostsUnchanged": true,
+  "stderrBytes": 0,
+  "rawDiagnosticsSuppressed": true,
+  "remote": {
+    "scope": "WORKLOAD_IMAGE_KNOWN_CAUSE_RECOVERY_ONLY",
+    "NodeOrAPIOrDBOrPKIServiceStarted": false,
+    "actualAdmission": "NOT_RUN",
+    "wholeProgramComplete": false,
+    "buildExit": 0,
+    "buildStdoutBytes": 0,
+    "buildStderrBytes": 2531,
+    "status": "IMAGES_BUILT_INSPECTED_NOT_DEPLOYED",
+    "phase": "actual-config-and-base-layer-inspection",
+    "NodeImageID": "sha256:de654cd385307ac7147baf6757a480f803361eb5b30d40c7991b272a6889d87f",
+    "workloadImageID": "sha256:ffee58e8dbefc6c0db68810cd1597f8cc589cf01112c434ed7fda8d4af415634",
+    "PythonBaseImageID": "sha256:51dafde81dbdb6ebde285137a295cf18a47ca95234fe388a343719cb97305b3d",
+    "PythonBaseRepoDigest": "python@sha256:51dafde81dbdb6ebde285137a295cf18a47ca95234fe388a343719cb97305b3d",
+    "baseRootFSLayersPrefixMatch": true,
+    "supervisorSHA256": "f8d67ec61e44cae269e5912e12d8d6fb36abd60293d7bc4eecdf7dcd0ed33690",
+    "NodeSourceRevision": "1efea494f026e932360c35ae811b6423d874a2e7",
+    "workloadImageUser": "65532:65532",
+    "workloadImageEntrypoint": [
+      "/inv-supervisor"
+    ],
+    "workloadImageLabels": {
+      "ai.saintvision.output": "bounded-streams-v1",
+      "ai.saintvision.owner": "root-cpu-1efea-r1",
+      "ai.saintvision.supervisor": "deadline-v1",
+      "ai.saintvision.workspace": "snapshot-tmpfs-v1",
+      "org.opencontainers.image.revision": "1efea494f026e932360c35ae811b6423d874a2e7"
+    },
+    "workloadDeclaredVolumes": null,
+    "DockerfileUnchanged": true,
+    "originalFailurePreserved": true,
+    "artifactSmokeExecution": "NOT_RUN"
+  }
+}

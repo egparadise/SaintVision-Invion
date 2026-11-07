@@ -1,15 +1,19 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.469"
+version: "1.0.470"
 status: "review"
 author: "Codex"
-updated: "2026-11-07T15:27:11+09:00"
+updated: "2026-11-07T17:02:18+09:00"
 source_of_truth: "Git"
 active_card: "FLEET5 continued supervision with PORTAL-REFRESH-FLEET-20261106"
-active_card_status: "ReconcileEntryActualEe1Accepted_PC3IsolatedOperatorEnvInstalledHashesVerified_PublicNodePlanFrozen_NotEnrolled; AuthTLSWorkspaceRuntimeBindingsPending_FivePCIncomplete"
-active_card_next: "B source-only exact minimal CPU Node/config recipe on1efea using public planned IDs; Root binds actual auth/profile/CA/client/leaf/signer/image/fence. PC3 wheel/venv ready but no entry/Node/DB admission run. Additional approver identity/two real nonrequester votes still pending for actual Run."
+active_card_status: "PC3FreshNodeSingleApplyAck_Running_ContinuousRealObservation_FreshOwnerProjectAPI200; PC2PC4Onboarding_CPWorkspace_TLSTrustAndRenewal_TwoRealApprovers_ActualRun_FivePCPending"
+active_card_next: "Root checks PC2/PC4 current readiness and performs isolated fresh onboarding. Preserve PC3 journal/PKI, keep observer and pinned SSH forward. Resolve current workspace/TLS trust/renewal and real approval identities before actual user Run; no fake votes or all5 claims."
 ---
+
+## 2026-11-07T17:02:18+09:00 실제3번PC 등록·연속관측·현재관리자API
+
+3번PC의새Node를현재프로젝트에단한번등록했고정확한commit응답과DB연결행을대조했다. 검증된Node와실제소스Supervisor이미지를격리실행하며mTLS자원수집을확인했다. 상시관측서비스는수동호출없는두표본에서heartbeat·snapshot·probe가증가했고online을유지했다. 실제관리자PKCE로그인후프로젝트nodes/capacity/resource-usage는모두HTTP200이며CPU500m·메모리64MiB시험배정량을measured로표시한다. 기본Windows인증서검증은실패했고기존공개chain명시검증만성공했다. 5대전체·사용자작업Run·workspace·갱신/복구는미완료다. 명령·exit·원본실패·수정·SHA·CI·다음담당은Root History와공개Evidence에기록했다.
 
 ## 2026-11-07T15:27:11+09:00 실제PC3 전용환경과 신규Node 계획
 

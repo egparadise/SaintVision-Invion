@@ -1,0 +1,347 @@
+{
+  "atKST": "2026-11-07T17:02:18+09:00",
+  "source": "1efea494f026e932360c35ae811b6423d874a2e7",
+  "owner": "Root Codex",
+  "sourceReview": "6bd81ef0531b4a58438c98618e92d5ad9985c12b",
+  "runtimeRecipePlan": "5ba7cfb795135e1f74c0d3e83e0fea285d3cc987",
+  "runtimeRecipeActualRootReview": "ACCEPT_SOURCE_DERIVED_MINIMAL_RUNTIME_RECIPE_KEEP_UNBOUND_AND_LIVE_HOLDS",
+  "priorRootCheckpoint": {
+    "SHA": "ae211280c5c8ab50b19303450288ba1421af827e",
+    "Docs": 42347156724,
+    "exactHeadCorrelationAllJobsSuccess": true,
+    "remoteMatches": true,
+    "syncExits": [
+      0,
+      0,
+      0
+    ],
+    "independentlyMatchedNormalizedDestinationHashes": 3110,
+    "pending": 0,
+    "conflicts": 0,
+    "trackedAndUntrackedClean": true,
+    "rootDocsOnly": true,
+    "wholeProgramComplete": false,
+    "verifiedAtKST": "2026-11-07T15:29:31+09:00"
+  },
+  "actualNodeRegistration": {
+    "atKST": "2026-11-07T16:25:24+09:00",
+    "SSHExit": 0,
+    "knownHostsUnchanged": true,
+    "stderrBytes": 0,
+    "rawDiagnosticAndPrivateProfileSuppressed": true,
+    "remote": {
+      "mode": "APPLY",
+      "actualAdmission": "COMMITTED_ACKNOWLEDGED",
+      "profileOrCredentialValuesEmitted": false,
+      "NodeOrWorkloadOrUserApprovalExecuted": false,
+      "automaticRetryAllowed": false,
+      "wholeProgramComplete": false,
+      "before": {
+        "node": 0,
+        "resources": 0,
+        "project_links": 0,
+        "channels": 0,
+        "audit": 0,
+        "controls": 0
+      },
+      "CLIExit": 0,
+      "CLIStdoutBytes": 947,
+      "CLIStderrBytes": 0,
+      "status": "COMMITTED_ACK_AND_EXACT_SCOPE_READBACK",
+      "phase": "single-apply-complete",
+      "sameNamedServerSystemID": true,
+      "currentEpochMatches": true,
+      "tenantControlsUnchanged": true,
+      "after": {
+        "node": 1,
+        "resources": 2,
+        "project_links": 1,
+        "channels": 1,
+        "audit": 1,
+        "controls": 1
+      },
+      "nodeStatus": "offline",
+      "channel": {
+        "version": 1,
+        "certificate_sha256": "f146cb95a863afbaa7e809616e745dec97dca947de56420ed70cd2f8d6c7f644",
+        "endpoint": "https://192.168.45.222:19443",
+        "enabled": true
+      },
+      "snapshotCount": 0,
+      "planDigest": "95a6d6b50208e4951687e5465626bdd7fe4f0383d0104671b1e21c42275e70ac",
+      "applyAttempts": 1,
+      "reconcileAttempts": 0,
+      "operatorRoleNotUserApproval": true
+    }
+  },
+  "actualNodeService": {
+    "atKST": "2026-11-07T16:27:16+09:00",
+    "SSHExit": 0,
+    "knownHostsUnchanged": true,
+    "stderrBytes": 0,
+    "rawDiagnosticsSuppressed": true,
+    "remote": {
+      "scope": "ONE_NEW_NODE_SERVICE_ONLY",
+      "tenantWorkloadOrUserApprovalExecuted": false,
+      "oldNodeStateChanges": false,
+      "privateCAClientSignerOrDBCredentialMounted": false,
+      "wholeProgramComplete": false,
+      "containerId": "702fa3fbc43e8deded94e67c6e5299eb4549958e074ba4aeb40c216db29752f7",
+      "containerName": "saintvision-nod_01M6TAWG25JTA3F7J7S1EE4N2W",
+      "status": "NODE_SERVICE_RUNNING_EXACT_CONFIGURATION_NO_OBSERVATION_YET",
+      "phase": "actual-inspect-matches-scope",
+      "NodeImageID": "sha256:de654cd385307ac7147baf6757a480f803361eb5b30d40c7991b272a6889d87f",
+      "workloadImageID": "sha256:ffee58e8dbefc6c0db68810cd1597f8cc589cf01112c434ed7fda8d4af415634",
+      "user": "1000:1000",
+      "dockerSocketSupplementaryGID": 973,
+      "serviceCPUQuotaNanoCpus": 500000000,
+      "serviceMemoryBytes": 268435456,
+      "pidsLimit": 64,
+      "readOnlyRootFS": true,
+      "capDrop": [
+        "ALL"
+      ],
+      "securityOptions": [
+        "no-new-privileges"
+      ],
+      "stateBind": "/home/saintvision-invion3/saintvision-share/nodes/nod_01M6TAWG25JTA3F7J7S1EE4N2W/state",
+      "configMountReadOnly": true,
+      "noNamedVolumeCreated": true,
+      "portBindings": {
+        "19443/tcp": [
+          {
+            "HostIp": "192.168.45.222",
+            "HostPort": "19443"
+          }
+        ]
+      },
+      "restarting": false,
+      "restartCount": 0,
+      "runtimeProfileSHA256": "73c96d4bc765d96ce33e40e179d13e6252175f12c543f3f4187a2e015ef2724b",
+      "nodeArgv": [
+        "--tenant",
+        "97968b42-68aa-40ce-af5e-3a33e2fc2205",
+        "--node",
+        "nod_01M6TAWG25JTA3F7J7S1EE4N2W",
+        "--epoch",
+        "bcd581be-31b4-4aca-86e6-3ca31b69ed09",
+        "--profile",
+        "cpu-pilot-1efea-r1",
+        "--image",
+        "sha256:ffee58e8dbefc6c0db68810cd1597f8cc589cf01112c434ed7fda8d4af415634",
+        "--executable",
+        "/usr/local/bin/python3",
+        "--state",
+        "/state",
+        "--public-key",
+        "/config/launch-signer.pub",
+        "--socket",
+        "/var/run/docker.sock",
+        "--serve",
+        "--listen",
+        "0.0.0.0:19443",
+        "--tls-cert",
+        "/config/node-cert.pem",
+        "--tls-key",
+        "/config/node-key.pem",
+        "--client-ca",
+        "/config/client-ca.pem",
+        "--peer-policy",
+        "/config/peer-policy.json"
+      ],
+      "realMTLSResourceObservation": "NOT_RUN",
+      "actualDBNodeMayStillBeOffline": true
+    }
+  },
+  "continuousResourceObservation": {
+    "atKST": "2026-11-07T16:57:41+09:00",
+    "scope": "READ_ONLY_TWO_SAMPLES_EXACT_EXISTING_OBSERVER",
+    "DBWrites": false,
+    "observerInvocations": 0,
+    "profileValuesEmitted": false,
+    "wholeProgramComplete": false,
+    "firstSample": {
+      "status": "online",
+      "heartbeat_at": "2026-11-07 07:57:39.133927+00:00",
+      "heartbeat_age_seconds": 2.808429,
+      "received_at": "2026-11-07 07:57:39.133927+00:00",
+      "snapshot_age_seconds": 2.808521,
+      "channel_version": 1,
+      "consumedProbeCount": 101
+    },
+    "secondSample": {
+      "status": "online",
+      "heartbeat_at": "2026-11-07 07:57:46.769709+00:00",
+      "heartbeat_age_seconds": 2.176849,
+      "received_at": "2026-11-07 07:57:46.769709+00:00",
+      "snapshot_age_seconds": 2.176855,
+      "channel_version": 1,
+      "consumedProbeCount": 102
+    },
+    "tenantNodeStatuses": [
+      {
+        "node_id": "nod_01M6NC3HEDGYP9ZE6DMPBJM2M9",
+        "status": "offline"
+      },
+      {
+        "node_id": "nod_01M6TAWG25JTA3F7J7S1EE4N2W",
+        "status": "online"
+      }
+    ],
+    "service": {
+      "running": true,
+      "restartCount": 0,
+      "image": "sha256:79745d9caadd9680cfa0176a1a16b3cec44875b38d7278e9694cf4c1fdea6241",
+      "user": "1000:1000",
+      "credentialInDockerEnv": false,
+      "sandbox": {
+        "ReadonlyRootfs": true,
+        "Memory": 268435456,
+        "MemorySwap": 268435456,
+        "NanoCpus": 250000000,
+        "PidsLimit": 64,
+        "NetworkMode": "host",
+        "PortBindings": {},
+        "CapDrop": [
+          "ALL"
+        ],
+        "SecurityOpt": [
+          "no-new-privileges"
+        ],
+        "RestartPolicy": {
+          "Name": "unless-stopped",
+          "MaximumRetryCount": 0
+        }
+      },
+      "mounts": [
+        {
+          "destination": "/config/observer.json",
+          "rw": false
+        },
+        {
+          "destination": "/tls/ca-cert.pem",
+          "rw": false
+        },
+        {
+          "destination": "/tls/cp-client-cert.pem",
+          "rw": false
+        },
+        {
+          "destination": "/tls/cp-client-key.pem",
+          "rw": false
+        },
+        {
+          "destination": "/run/secrets/runtime-dsn",
+          "rw": false
+        }
+      ]
+    },
+    "fresh": true,
+    "advancedWithoutManualObservation": true,
+    "status": "CONTINUOUS_REAL_OBSERVER_CONFIRMED"
+  },
+  "freshUserAuthenticatedProjectAPI": {
+    "atKST": "2026-11-07T17:00:06+09:00",
+    "status": "REAL_ADMIN_PKCE_PROJECT_NODE_AND_CAPACITY_VERIFIED",
+    "SSOAuthorizationCodePKCES256": true,
+    "tokenExchangeHTTP": 200,
+    "sessionHTTP": 200,
+    "sessionFieldNamesOnly": [
+      "expiresAt",
+      "subjectId",
+      "tenantId"
+    ],
+    "administratorPermissionHTTP": 200,
+    "roleCode": "owner",
+    "canAdminister": true,
+    "project": "prj_01M6NDBHVD2DZQ1Q38DCKN1XE3",
+    "nodesHTTP": 200,
+    "capacityHTTP": 200,
+    "resourceUsageHTTP": 200,
+    "authorizedNodeCount": 1,
+    "targetNode": {
+      "nodeId": "nod_01M6TAWG25JTA3F7J7S1EE4N2W",
+      "status": "online",
+      "lastHeartbeatAt": "2026-11-07T08:00:06.135107+00:00"
+    },
+    "heartbeatAgeSecondsAtRead": 0.715026,
+    "targetCapacity": {
+      "nodeId": "nod_01M6TAWG25JTA3F7J7S1EE4N2W",
+      "offered": {
+        "cpuMillis": 500,
+        "memoryBytes": 67108864
+      },
+      "spare": {
+        "cpuMillis": 500,
+        "memoryBytes": 67108864
+      },
+      "measured": true
+    },
+    "resourceUsage": {
+      "source": "execution-kernel",
+      "nodeId": "nod_01M6TAWG25JTA3F7J7S1EE4N2W",
+      "stateAsOf": "2026-11-07T08:00:06.135107+00:00",
+      "resources": [
+        {
+          "resourceId": "res_01M6TAWG25QSR4HH7XWWJSB0W0",
+          "kind": "cpu",
+          "unit": "millicores",
+          "capacity": 500,
+          "offered": 500,
+          "reserved": 0,
+          "spare": 500,
+          "measured": true,
+          "observedAt": "2026-11-07T08:00:06.135107+00:00"
+        },
+        {
+          "resourceId": "res_01M6TAWG25ZHS2RG3NHQX4SPEH",
+          "kind": "memory",
+          "unit": "bytes",
+          "capacity": 67108864,
+          "offered": 67108864,
+          "reserved": 0,
+          "spare": 67108864,
+          "measured": true,
+          "observedAt": "2026-11-07T08:00:06.135107+00:00"
+        }
+      ]
+    },
+    "totalOffered": {
+      "cpuMillis": 500,
+      "memoryBytes": 67108864
+    },
+    "spareNow": {
+      "cpuMillis": 500,
+      "memoryBytes": 67108864
+    },
+    "anonymousSessionHTTP": 401,
+    "tokenPersisted": false,
+    "passwordPersisted": false,
+    "defaultWindowsTLSVerified": false,
+    "explicitExistingPublicChainTLSVerified": true,
+    "insecureTLSOptionUsed": false,
+    "actualUserRunAndTwoNonRequesterVotes": "NOT_RUN",
+    "browserSelectedProject": "NOT_OBSERVED",
+    "wholeProgramComplete": false
+  },
+  "operationalIndependentReview": "NOT_CLAIMED; source and operator entry reviewed, actual operations verified by Root",
+  "completedPCCountForCurrentProjectPilot": 1,
+  "allFivePCsComplete": false,
+  "actualApprovedUserWorkloadRun": "NOT_RUN",
+  "additionalApproverIdentityAndTwoDistinctNonRequesterVotes": "PENDING_USER_IDENTITY; do not fabricate or relax policy",
+  "CPWorkspaceConfigured": false,
+  "WindowsDefaultIdPTLS": "FAILED_SELF_SIGNED_CERT; explicit existing public chain verified; no insecure TLS used",
+  "observerServiceFailureDisposition": "Initial startup verification assertion failed. Original receipt preserved. Later standard once returned observed1/unavailable0 and a separate READ_ONLY pair, without manual observation, proved current continuous advance. Initial assertion exact cause not established; no restart/rebuild/Node reset was performed.",
+  "persistentTransport": "Root-owned hidden strict SSH reverse loopback, current process start receipt; no automatic reconnect/OS startup recovery proof yet",
+  "pilotExpiry": "peer policy 2026-11-08T07:15:30Z; leaves 2026-11-09T07:15:30Z; renewal still needed for lasting operation",
+  "remainingPCs": {
+    "PC1": "previous SSH public-key authentication refused; no fresh setup evidence",
+    "PC2": "previous SSH/Docker usable; current project fresh identity/onboarding not done",
+    "PC4": "previous SSH/Docker usable; current project fresh identity/onboarding not done",
+    "PC5": "Docker API1.41 below selected1.45 profile; main-host resource restriction still applies"
+  },
+  "originalHoldBaselineDischarges": 0,
+  "originalRuntimeB": 0,
+  "wholeProgramComplete": false,
+  "nextOwner": "Root: current PC2/PC4 readiness and isolated fresh onboarding; source-only worker: minimal configured workspace configuration evidence if needed"
+}

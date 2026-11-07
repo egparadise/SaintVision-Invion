@@ -1,0 +1,37 @@
+{
+  "atKST": "2026-11-07T16:08:39+09:00",
+  "SSHExit": 0,
+  "knownHostsUnchanged": true,
+  "observation": {
+    "readOnly": true,
+    "uid": 1000,
+    "unixTime": 1794035319.2762904,
+    "dockerSocketGID": 973,
+    "docker": {
+      "Version": "29.9.3",
+      "ApiVersion": "1.56",
+      "MinAPIVersion": "1.40",
+      "Os": "linux",
+      "Arch": "amd64"
+    },
+    "actualGETv1_45VersionStatus": 200,
+    "negotiatedVersionData": {
+      "ApiVersion": "1.56",
+      "MinAPIVersion": "1.40",
+      "Os": "linux",
+      "Arch": "amd64"
+    },
+    "goPath": null,
+    "selectedExistingBuildImageNames": [
+      "golang\t1.27.1-bookworm\t8d48e12ec567",
+      "python\t3.14.7-slim\t51dafde81dbd"
+    ]
+  },
+  "RootToHostClockOffsetBoundsSeconds": [
+    -0.009817838668823242,
+    0.37446045875549316
+  ],
+  "actualNodeOrWorkloadOrDBMutation": false,
+  "wholeProgramComplete": false,
+  "client1_45ActuallyAccepted": true
+}

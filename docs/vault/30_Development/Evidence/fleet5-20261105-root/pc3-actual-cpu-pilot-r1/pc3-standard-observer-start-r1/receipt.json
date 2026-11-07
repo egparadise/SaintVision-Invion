@@ -1,0 +1,26 @@
+{
+  "atKST": "2026-11-07T16:44:54+09:00",
+  "SSHExit": 2,
+  "knownHostsUnchanged": true,
+  "stderrBytes": 0,
+  "rawDiagnosticAndPrivateProfileSuppressed": true,
+  "remote": {
+    "scope": "UNCHANGED_STANDARD_OBSERVER_SELECTED_TENANT_CURRENT_EPOCH",
+    "operatorOwnerCredentialPersisted": false,
+    "runtimeCredentialValuesEmitted": false,
+    "userRunOrApprovalsExecuted": false,
+    "wholeProgramComplete": false,
+    "actualRuntimeRoleClass": {
+      "rolsuper": false,
+      "rolbypassrls": false,
+      "member_inv_kernel": true
+    },
+    "sameNamedServerThroughPersistentTunnel": true,
+    "containerId": "b8a2f8f55e524837c4b7db14565ec5f960c4492bc3b9df6972e7f1f153c2aec5",
+    "containerName": "saintvision-observer-97968b42-bcd581be-r1",
+    "status": "HOLD_STANDARD_OBSERVER_DEPLOYMENT_UNRESOLVED",
+    "phase": "start-only-selected-standard-observer",
+    "errorClass": "AssertionError",
+    "rawDiagnosticSuppressed": true
+  }
+}

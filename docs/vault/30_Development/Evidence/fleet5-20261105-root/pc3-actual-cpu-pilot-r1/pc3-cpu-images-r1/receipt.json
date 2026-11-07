@@ -1,0 +1,44 @@
+{
+  "atKST": "2026-11-07T16:14:09+09:00",
+  "SSHExit": 2,
+  "knownHostsUnchanged": true,
+  "stderrBytes": 0,
+  "rawDiagnosticsSuppressed": true,
+  "remote": {
+    "scope": "TARGET_IMAGE_PREPARATION_ONLY",
+    "NodeOrAPIOrDBOrPKIServiceStarted": false,
+    "actualAdmission": "NOT_RUN",
+    "wholeProgramComplete": false,
+    "GoCompilerImageID": "sha256:8d48e12ec56735e9358640898b9d9b9fcca110612ed8a5567438c0a1baa24e66",
+    "PythonBaseImageID": "sha256:51dafde81dbdb6ebde285137a295cf18a47ca95234fe388a343719cb97305b3d",
+    "PythonBaseRepoDigests": [
+      "python@sha256:51dafde81dbdb6ebde285137a295cf18a47ca95234fe388a343719cb97305b3d"
+    ],
+    "stages": [
+      {
+        "stage": "compile-supervisor",
+        "exit": 0,
+        "stdoutBytes": 0,
+        "stderrBytes": 106
+      },
+      {
+        "stage": "build-node-image",
+        "exit": 0,
+        "stdoutBytes": 0,
+        "stderrBytes": 1013
+      },
+      {
+        "stage": "build-workload-image",
+        "exit": 1,
+        "stdoutBytes": 0,
+        "stderrBytes": 1474
+      }
+    ],
+    "supervisorSHA256": "f8d67ec61e44cae269e5912e12d8d6fb36abd60293d7bc4eecdf7dcd0ed33690",
+    "workloadDockerfileSHA256": "9e96a96d98afe4e396e9313a151ad7c2c6416698e8ea015d22474e449f1ebadb",
+    "status": "HOLD_BUILD_FAILED",
+    "phase": "build-workload-image",
+    "errorClass": "AssertionError",
+    "rawDiagnosticSuppressed": true
+  }
+}

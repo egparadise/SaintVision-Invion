@@ -1,0 +1,43 @@
+{
+  "atKST": "2026-11-07T16:41:06+09:00",
+  "source": "1efea494f026e932360c35ae811b6423d874a2e7",
+  "readOnlyPreflight": true,
+  "DBWrites": false,
+  "selectedTenant": "97968b42-68aa-40ce-af5e-3a33e2fc2205",
+  "selectedEpoch": "bcd581be-31b4-4aca-86e6-3ca31b69ed09",
+  "actualEnabledCurrentChannels": [
+    {
+      "node_id": "nod_01M6TAWG25JTA3F7J7S1EE4N2W",
+      "endpoint": "https://192.168.45.222:19443",
+      "version": 1
+    }
+  ],
+  "actualTenantNodeStatusBefore": [
+    {
+      "node_id": "nod_01M6NC3HEDGYP9ZE6DMPBJM2M9",
+      "status": "online",
+      "heartbeat_at": "2026-11-05 08:09:48.260426+00:00",
+      "stale_60s": true
+    },
+    {
+      "node_id": "nod_01M6TAWG25JTA3F7J7S1EE4N2W",
+      "status": "online",
+      "heartbeat_at": "2026-11-07 07:29:54.713183+00:00",
+      "stale_60s": true
+    }
+  ],
+  "runtimeRoleClass": {
+    "rolsuper": false,
+    "rolbypassrls": false,
+    "member_inv_kernel": true
+  },
+  "RootDisposition": "Authorize unchanged inv.observer_worker for THIS tenant/current epoch, max5 enabled approved channels, currently exactly the new Node. Standard mark_offline may change status only of this tenants nodes with heartbeat older than60s, including the preexisting unlinked Node and the newly enrolled Node if stale. This is honest liveness maintenance, not identity/journal/volume/grant/lease/Run mutation. Future channels enter only through separately approved operator onboarding.",
+  "allowedPersistentEffects": [
+    "Fresh nonce/heartbeat/snapshot of enabled approved current-epoch channels in this tenant",
+    "Standard stale>60s online->offline status in this tenant; no other tenants or state cleanup"
+  ],
+  "runtimeCredentialsPolicy": "Existing non-superuser/non-BYPASSRLS inv_kernel-member login only, fixed protected uid1000/mode0600 secret file outside Node mounts; no operator-owner credential persistence or Docker Config.Env secret",
+  "neededTransport": "Root-owned hidden persistent strict SSH reverse-loopback forwarding only; no LAN DB bind/global OS setting or existing process kill",
+  "actualServiceStart": "NOT_RUN",
+  "wholeProgramComplete": false
+}

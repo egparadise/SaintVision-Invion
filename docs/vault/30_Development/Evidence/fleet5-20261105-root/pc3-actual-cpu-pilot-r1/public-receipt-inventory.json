@@ -1,0 +1,103 @@
+{
+  "atKST": "2026-11-07T17:02:18+09:00",
+  "selectedFiles": [
+    {
+      "sourceWorkPath": "runtime-plan-5ba-root-verified.json",
+      "bytes": 1572,
+      "SHA256": "ddf22ee9ba54ab702de374bbf3020e8e1fcede11023f5b5d7e4d775471723823"
+    },
+    {
+      "sourceWorkPath": "pc3-docker-minapi-go-readonly-r1.json",
+      "bytes": 919,
+      "SHA256": "880a60306ff9e0152c6577360703d7b843fdcd086fc5c2fe4fec1f81bc0c3c40"
+    },
+    {
+      "sourceWorkPath": "pc3-cpu-images-r1/receipt.json",
+      "bytes": 1396,
+      "SHA256": "b4e98d5da3b3f1995470a7d8de2fba78e26c5638766a9d0e6c285804113acd1d"
+    },
+    {
+      "sourceWorkPath": "pc3-cpu-images-r1/workload-r2-receipt.json",
+      "bytes": 1712,
+      "SHA256": "6ec50a767ae789e06326e153273e470ba20bb5c7b6b7adcd061c4804c4f2d35c"
+    },
+    {
+      "sourceWorkPath": "pc3-cpu-pki-r1/receipt.json",
+      "bytes": 3798,
+      "SHA256": "15ac20406291ad5ffe2ed4fdbfca531ff6f9a036301df4bf8a2306d8770530ea"
+    },
+    {
+      "sourceWorkPath": "pc3-admission-plan-r1/receipt.json",
+      "bytes": 1617,
+      "SHA256": "1b21410fb663afe1cac87c557f87f41837036a0791990934655d4a4a324c5e74"
+    },
+    {
+      "sourceWorkPath": "pc3-admission-apply-r1/receipt.json",
+      "bytes": 1427,
+      "SHA256": "0843a013a54ca27c63631374e3af4cb3397a74faeaab60f8242f158dc3f6aa14"
+    },
+    {
+      "sourceWorkPath": "pc3-node-start-r1/receipt.json",
+      "bytes": 2503,
+      "SHA256": "1b3d1bf9a6504856da8618ba19a7153edaeec05f55efdca5a3ece1ba61a53f97"
+    },
+    {
+      "sourceWorkPath": "pc3-one-node-resource-observation-r1/receipt.json",
+      "bytes": 1853,
+      "SHA256": "c38f294c1cb7201dd8f14121a002f643a2929ea43f4d9cde02d05b3fede4275c"
+    },
+    {
+      "sourceWorkPath": "pc3-standard-observer-image-r1/receipt.json",
+      "bytes": 522,
+      "SHA256": "428ba69dd54bbac89d0e723f7ef2dace8591a4ac73d1af056f5aa94777489eeb"
+    },
+    {
+      "sourceWorkPath": "pc3-standard-observer-image-r1/wheel-name-r2-receipt.json",
+      "bytes": 1567,
+      "SHA256": "b18cdf708ef3ee8c0c1575b98590ff0507cf5e5d464138811d08475ba73fd480"
+    },
+    {
+      "sourceWorkPath": "standard-observer-scope-preflight-r1.json",
+      "bytes": 2125,
+      "SHA256": "97235d8d6ddacdb2bc904b1041f63fb9c146682c2358929cc228d1dafc4858e2"
+    },
+    {
+      "sourceWorkPath": "pc3-observer-tunnel-r1/start-receipt.json",
+      "bytes": 735,
+      "SHA256": "ecd66dcadcbf49fbeb3ed19390fa6bbb6925d358d3c64c198c6c8f0297c8db49"
+    },
+    {
+      "sourceWorkPath": "pc3-standard-observer-start-r1/receipt.json",
+      "bytes": 941,
+      "SHA256": "12dca075ec5d8d99207e49ca4802da85533a2c7eb62810ebdb09ff467b5908c6"
+    },
+    {
+      "sourceWorkPath": "pc3-standard-observer-start-r1/diagnosis-readonly.json",
+      "bytes": 503,
+      "SHA256": "ae950b23aa59bc573a1c824b2c38722193cd217fb2cbe918f6733711bf00a81f"
+    },
+    {
+      "sourceWorkPath": "pc3-standard-observer-start-r1/step-diagnosis-r1.json",
+      "bytes": 5815,
+      "SHA256": "039c7283a0847d19288f3fc508250b3b29dd53800d7e60a8fadb3829b2d47ad2"
+    },
+    {
+      "sourceWorkPath": "pc3-standard-observer-start-r1/continuity-readonly-r1.json",
+      "bytes": 2202,
+      "SHA256": "553a7fcc65157a6fb4ee6ca3f22adf1f8820cffd354ff60059dc255d4cd2681b"
+    },
+    {
+      "sourceWorkPath": "idp-trust-readonly-r1.json",
+      "bytes": 447,
+      "SHA256": "3a6cd4fb7e75eae4e508256c563ef68872843020dcb05db90d690a2f463cd064"
+    },
+    {
+      "sourceWorkPath": "fresh-admin-pc3-api-r1.json",
+      "bytes": 2248,
+      "SHA256": "519a710c315e63135d0987c6adf4af9c8566453a285d6556b4a2975bc63bd6d6"
+    }
+  ],
+  "privateMaterialCopied": false,
+  "rawDriverAndBuildLogsCopied": false,
+  "frozenEarlierPlanNotOverwritten": true
+}

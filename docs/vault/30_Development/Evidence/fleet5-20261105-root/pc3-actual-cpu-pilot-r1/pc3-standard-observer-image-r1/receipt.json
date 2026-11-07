@@ -1,0 +1,18 @@
+{
+  "atKST": "2026-11-07T16:39:02+09:00",
+  "SSHExit": 2,
+  "knownHostsUnchanged": true,
+  "stderrBytes": 0,
+  "rawDiagnosticsSuppressed": true,
+  "remote": {
+    "scope": "UNCHANGED_STANDARD_OBSERVER_IMAGE_ONLY",
+    "DBOrNodeOrUserWorkloadStarted": false,
+    "credentialBuildInput": false,
+    "wholeProgramComplete": false,
+    "buildExit": 1,
+    "status": "HOLD_OBSERVER_IMAGE_BUILD_FAILED",
+    "phase": "build-standard-observer-image",
+    "errorClass": "AssertionError",
+    "rawDiagnosticSuppressed": true
+  }
+}

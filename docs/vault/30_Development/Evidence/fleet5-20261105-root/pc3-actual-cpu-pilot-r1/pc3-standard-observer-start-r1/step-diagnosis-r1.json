@@ -1,0 +1,252 @@
+{
+  "scope": "ALREADY_AUTHORIZED_STANDARD_OBSERVER_DIAGNOSTIC",
+  "credentialValuesEmitted": false,
+  "context": {
+    "tenant": "97968b42-68aa-40ce-af5e-3a33e2fc2205",
+    "readonly": "off"
+  },
+  "visibleChannels": [
+    {
+      "node_id": "nod_01M6TAWG25JTA3F7J7S1EE4N2W",
+      "enabled": true,
+      "recovery_epoch": "bcd581be-31b4-4aca-86e6-3ca31b69ed09"
+    }
+  ],
+  "markedOffline": [],
+  "workerResult": {
+    "observed": 1,
+    "unavailable": 0
+  },
+  "status": "DIAGNOSTIC_STEP_COMPLETED",
+  "stage": "standard-worker-once",
+  "safeSQLObserverEvents": [
+    {
+      "phase": "transaction-pre-placement-lock",
+      "sqlState": null,
+      "errorType": null,
+      "outcome": "success"
+    },
+    {
+      "phase": "transaction-pre-placement-lock",
+      "sqlState": null,
+      "errorType": null,
+      "outcome": "success"
+    },
+    {
+      "phase": "transaction-pre-placement-lock",
+      "sqlState": null,
+      "errorType": null,
+      "outcome": "success"
+    },
+    {
+      "phase": "transaction-pre-placement-lock",
+      "sqlState": null,
+      "errorType": null,
+      "outcome": "success"
+    },
+    {
+      "phase": "transaction-pre-placement-lock",
+      "sqlState": null,
+      "errorType": null,
+      "outcome": "success"
+    },
+    {
+      "phase": "transaction-pre-placement-lock",
+      "sqlState": null,
+      "errorType": null,
+      "outcome": "success"
+    },
+    {
+      "phase": "transaction-pre-placement-lock",
+      "sqlState": null,
+      "errorType": null,
+      "outcome": "success"
+    },
+    {
+      "phase": "transaction-pre-placement-lock",
+      "sqlState": null,
+      "errorType": null,
+      "outcome": "success"
+    },
+    {
+      "phase": "transaction-pre-placement-lock",
+      "sqlState": null,
+      "errorType": null,
+      "outcome": "success"
+    },
+    {
+      "phase": "transaction-pre-placement-lock",
+      "sqlState": null,
+      "errorType": null,
+      "outcome": "success"
+    },
+    {
+      "phase": "transaction-pre-placement-lock",
+      "sqlState": null,
+      "errorType": null,
+      "outcome": "success"
+    },
+    {
+      "phase": "transaction-pre-placement-lock",
+      "sqlState": null,
+      "errorType": null,
+      "outcome": "success"
+    },
+    {
+      "phase": "transaction-pre-placement-lock",
+      "sqlState": null,
+      "errorType": null,
+      "outcome": "success"
+    },
+    {
+      "phase": "transaction-pre-placement-lock",
+      "sqlState": null,
+      "errorType": null,
+      "outcome": "success"
+    },
+    {
+      "phase": "transaction-pre-placement-lock",
+      "sqlState": null,
+      "errorType": null,
+      "outcome": "success"
+    },
+    {
+      "phase": "transaction-pre-placement-lock",
+      "sqlState": null,
+      "errorType": null,
+      "outcome": "success"
+    },
+    {
+      "phase": "transaction-pre-placement-lock",
+      "sqlState": null,
+      "errorType": null,
+      "outcome": "success"
+    },
+    {
+      "phase": "transaction-pre-placement-lock",
+      "sqlState": null,
+      "errorType": null,
+      "outcome": "success"
+    },
+    {
+      "phase": "transaction-pre-placement-lock",
+      "sqlState": null,
+      "errorType": null,
+      "outcome": "success"
+    },
+    {
+      "phase": "transaction-pre-placement-lock",
+      "sqlState": null,
+      "errorType": null,
+      "outcome": "success"
+    },
+    {
+      "phase": "transaction-pre-placement-lock",
+      "sqlState": null,
+      "errorType": null,
+      "outcome": "success"
+    },
+    {
+      "phase": "transaction-pre-placement-lock",
+      "sqlState": null,
+      "errorType": null,
+      "outcome": "success"
+    },
+    {
+      "phase": "transaction-pre-placement-lock",
+      "sqlState": null,
+      "errorType": null,
+      "outcome": "success"
+    },
+    {
+      "phase": "transaction-pre-placement-lock",
+      "sqlState": null,
+      "errorType": null,
+      "outcome": "success"
+    },
+    {
+      "phase": "transaction-pre-placement-lock",
+      "sqlState": null,
+      "errorType": null,
+      "outcome": "success"
+    },
+    {
+      "phase": "transaction-pre-placement-lock",
+      "sqlState": null,
+      "errorType": null,
+      "outcome": "success"
+    },
+    {
+      "phase": "transaction-pre-placement-lock",
+      "sqlState": null,
+      "errorType": null,
+      "outcome": "success"
+    },
+    {
+      "phase": "transaction-pre-placement-lock",
+      "sqlState": null,
+      "errorType": null,
+      "outcome": "success"
+    },
+    {
+      "phase": "transaction-pre-placement-lock",
+      "sqlState": null,
+      "errorType": null,
+      "outcome": "success"
+    },
+    {
+      "phase": "transaction-pre-placement-lock",
+      "sqlState": null,
+      "errorType": null,
+      "outcome": "success"
+    },
+    {
+      "phase": "transaction-pre-placement-lock",
+      "sqlState": null,
+      "errorType": null,
+      "outcome": "success"
+    },
+    {
+      "phase": "transaction-pre-placement-lock",
+      "sqlState": null,
+      "errorType": null,
+      "outcome": "success"
+    },
+    {
+      "phase": "transaction-pre-placement-lock",
+      "sqlState": null,
+      "errorType": null,
+      "outcome": "success"
+    },
+    {
+      "phase": "transaction-pre-placement-lock",
+      "sqlState": null,
+      "errorType": null,
+      "outcome": "success"
+    },
+    {
+      "phase": "transaction-pre-placement-lock",
+      "sqlState": null,
+      "errorType": null,
+      "outcome": "success"
+    },
+    {
+      "phase": "transaction-pre-placement-lock",
+      "sqlState": null,
+      "errorType": null,
+      "outcome": "success"
+    },
+    {
+      "phase": "transaction-pre-placement-lock",
+      "sqlState": null,
+      "errorType": null,
+      "outcome": "success"
+    },
+    {
+      "phase": "transaction-pre-placement-lock",
+      "sqlState": null,
+      "errorType": null,
+      "outcome": "success"
+    }
+  ]
+}

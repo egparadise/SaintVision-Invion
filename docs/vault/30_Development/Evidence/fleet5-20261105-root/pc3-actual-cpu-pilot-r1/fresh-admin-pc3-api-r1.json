@@ -1,0 +1,84 @@
+{
+  "atKST": "2026-11-07T17:00:06+09:00",
+  "status": "REAL_ADMIN_PKCE_PROJECT_NODE_AND_CAPACITY_VERIFIED",
+  "SSOAuthorizationCodePKCES256": true,
+  "tokenExchangeHTTP": 200,
+  "sessionHTTP": 200,
+  "sessionFieldNamesOnly": [
+    "expiresAt",
+    "subjectId",
+    "tenantId"
+  ],
+  "administratorPermissionHTTP": 200,
+  "roleCode": "owner",
+  "canAdminister": true,
+  "project": "prj_01M6NDBHVD2DZQ1Q38DCKN1XE3",
+  "nodesHTTP": 200,
+  "capacityHTTP": 200,
+  "resourceUsageHTTP": 200,
+  "authorizedNodeCount": 1,
+  "targetNode": {
+    "nodeId": "nod_01M6TAWG25JTA3F7J7S1EE4N2W",
+    "status": "online",
+    "lastHeartbeatAt": "2026-11-07T08:00:06.135107+00:00"
+  },
+  "heartbeatAgeSecondsAtRead": 0.715026,
+  "targetCapacity": {
+    "nodeId": "nod_01M6TAWG25JTA3F7J7S1EE4N2W",
+    "offered": {
+      "cpuMillis": 500,
+      "memoryBytes": 67108864
+    },
+    "spare": {
+      "cpuMillis": 500,
+      "memoryBytes": 67108864
+    },
+    "measured": true
+  },
+  "resourceUsage": {
+    "source": "execution-kernel",
+    "nodeId": "nod_01M6TAWG25JTA3F7J7S1EE4N2W",
+    "stateAsOf": "2026-11-07T08:00:06.135107+00:00",
+    "resources": [
+      {
+        "resourceId": "res_01M6TAWG25QSR4HH7XWWJSB0W0",
+        "kind": "cpu",
+        "unit": "millicores",
+        "capacity": 500,
+        "offered": 500,
+        "reserved": 0,
+        "spare": 500,
+        "measured": true,
+        "observedAt": "2026-11-07T08:00:06.135107+00:00"
+      },
+      {
+        "resourceId": "res_01M6TAWG25ZHS2RG3NHQX4SPEH",
+        "kind": "memory",
+        "unit": "bytes",
+        "capacity": 67108864,
+        "offered": 67108864,
+        "reserved": 0,
+        "spare": 67108864,
+        "measured": true,
+        "observedAt": "2026-11-07T08:00:06.135107+00:00"
+      }
+    ]
+  },
+  "totalOffered": {
+    "cpuMillis": 500,
+    "memoryBytes": 67108864
+  },
+  "spareNow": {
+    "cpuMillis": 500,
+    "memoryBytes": 67108864
+  },
+  "anonymousSessionHTTP": 401,
+  "tokenPersisted": false,
+  "passwordPersisted": false,
+  "defaultWindowsTLSVerified": false,
+  "explicitExistingPublicChainTLSVerified": true,
+  "insecureTLSOptionUsed": false,
+  "actualUserRunAndTwoNonRequesterVotes": "NOT_RUN",
+  "browserSelectedProject": "NOT_OBSERVED",
+  "wholeProgramComplete": false
+}

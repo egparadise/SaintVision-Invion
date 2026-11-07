@@ -1,0 +1,19 @@
+{
+  "atKST": "2026-11-07T16:59:25.178249",
+  "results": [
+    {
+      "trustProfile": "WindowsDefault",
+      "insecureTLS": false,
+      "errorClass": "SSLCertVerificationError",
+      "certificateVerifyCode": 18,
+      "certificateVerifyMessage": "self-signed certificate",
+      "errno": 1
+    },
+    {
+      "trustProfile": "ExistingExplicitPublicChain",
+      "insecureTLS": false,
+      "HTTP": 200,
+      "expectedIssuer": true
+    }
+  ]
+}

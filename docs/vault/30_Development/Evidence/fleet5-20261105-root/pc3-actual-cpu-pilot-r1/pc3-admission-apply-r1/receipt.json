@@ -1,0 +1,51 @@
+{
+  "atKST": "2026-11-07T16:25:24+09:00",
+  "SSHExit": 0,
+  "knownHostsUnchanged": true,
+  "stderrBytes": 0,
+  "rawDiagnosticAndPrivateProfileSuppressed": true,
+  "remote": {
+    "mode": "APPLY",
+    "actualAdmission": "COMMITTED_ACKNOWLEDGED",
+    "profileOrCredentialValuesEmitted": false,
+    "NodeOrWorkloadOrUserApprovalExecuted": false,
+    "automaticRetryAllowed": false,
+    "wholeProgramComplete": false,
+    "before": {
+      "node": 0,
+      "resources": 0,
+      "project_links": 0,
+      "channels": 0,
+      "audit": 0,
+      "controls": 0
+    },
+    "CLIExit": 0,
+    "CLIStdoutBytes": 947,
+    "CLIStderrBytes": 0,
+    "status": "COMMITTED_ACK_AND_EXACT_SCOPE_READBACK",
+    "phase": "single-apply-complete",
+    "sameNamedServerSystemID": true,
+    "currentEpochMatches": true,
+    "tenantControlsUnchanged": true,
+    "after": {
+      "node": 1,
+      "resources": 2,
+      "project_links": 1,
+      "channels": 1,
+      "audit": 1,
+      "controls": 1
+    },
+    "nodeStatus": "offline",
+    "channel": {
+      "version": 1,
+      "certificate_sha256": "f146cb95a863afbaa7e809616e745dec97dca947de56420ed70cd2f8d6c7f644",
+      "endpoint": "https://192.168.45.222:19443",
+      "enabled": true
+    },
+    "snapshotCount": 0,
+    "planDigest": "95a6d6b50208e4951687e5465626bdd7fe4f0383d0104671b1e21c42275e70ac",
+    "applyAttempts": 1,
+    "reconcileAttempts": 0,
+    "operatorRoleNotUserApproval": true
+  }
+}

@@ -1,0 +1,54 @@
+{
+  "atKST": "2026-11-07T16:29:54+09:00",
+  "SSHExit": 0,
+  "knownHostsUnchanged": true,
+  "stderrBytes": 0,
+  "rawDiagnosticAndPrivateProfileSuppressed": true,
+  "remote": {
+    "scope": "ONE_NEW_NODE_AUTHENTICATED_RESOURCE_OBSERVATION",
+    "pollAttempts": 1,
+    "profileOrCredentialValuesEmitted": false,
+    "userWorkloadOrApprovalExecuted": false,
+    "wholeProgramComplete": false,
+    "continuousObserverEstablished": false,
+    "actualRuntimeRoleClass": {
+      "rolsuper": false,
+      "rolbypassrls": false,
+      "member_inv_kernel": true
+    },
+    "status": "ACTUAL_MTLS_SINGLE_RESOURCE_SNAPSHOT_ACCEPTED_ONLINE",
+    "phase": "readback-verified",
+    "existingLibraryPollResult": {
+      "nodeId": "nod_01M6TAWG25JTA3F7J7S1EE4N2W",
+      "status": "online",
+      "lastHeartbeatAt": "2026-11-07T07:29:54.713183+00:00",
+      "profileVersion": "cpu-pilot-1efea-r1"
+    },
+    "nodeStatus": "online",
+    "heartbeatAt": "2026-11-07T07:29:54.713183+00:00",
+    "clockSkewSeconds": 0.000592,
+    "resourceSnapshot": {
+      "tenantId": "97968b42-68aa-40ce-af5e-3a33e2fc2205",
+      "nodeId": "nod_01M6TAWG25JTA3F7J7S1EE4N2W",
+      "recoveryEpoch": "bcd581be-31b4-4aca-86e6-3ca31b69ed09",
+      "observedAt": "2026-11-07T07:29:54.713775722Z",
+      "cpuCapacityMillis": 12000,
+      "cpuBusyMillis": 200,
+      "memoryCapacityBytes": 15938240512,
+      "memoryAvailableBytes": 11331022848
+    },
+    "snapshotReceivedAt": "2026-11-07T07:29:54.713183+00:00",
+    "channelVersion": 1,
+    "probesBefore": {
+      "probes": 0,
+      "consumed": 0
+    },
+    "probesAfter": {
+      "probes": 1,
+      "consumed": 1
+    },
+    "tenantControlsUnchanged": true,
+    "NodeTransportTLSv1_3_ExplicitCAClientIdentityAndPinnedLeaf": true,
+    "continuousFreshness": "ONE_SAMPLE_ONLY; requires scoped recurring observer for ongoing <=15s freshness"
+  }
+}

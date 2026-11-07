@@ -1,0 +1,87 @@
+{
+  "atKST": "2026-11-07T16:57:41+09:00",
+  "scope": "READ_ONLY_TWO_SAMPLES_EXACT_EXISTING_OBSERVER",
+  "DBWrites": false,
+  "observerInvocations": 0,
+  "profileValuesEmitted": false,
+  "wholeProgramComplete": false,
+  "firstSample": {
+    "status": "online",
+    "heartbeat_at": "2026-11-07 07:57:39.133927+00:00",
+    "heartbeat_age_seconds": 2.808429,
+    "received_at": "2026-11-07 07:57:39.133927+00:00",
+    "snapshot_age_seconds": 2.808521,
+    "channel_version": 1,
+    "consumedProbeCount": 101
+  },
+  "secondSample": {
+    "status": "online",
+    "heartbeat_at": "2026-11-07 07:57:46.769709+00:00",
+    "heartbeat_age_seconds": 2.176849,
+    "received_at": "2026-11-07 07:57:46.769709+00:00",
+    "snapshot_age_seconds": 2.176855,
+    "channel_version": 1,
+    "consumedProbeCount": 102
+  },
+  "tenantNodeStatuses": [
+    {
+      "node_id": "nod_01M6NC3HEDGYP9ZE6DMPBJM2M9",
+      "status": "offline"
+    },
+    {
+      "node_id": "nod_01M6TAWG25JTA3F7J7S1EE4N2W",
+      "status": "online"
+    }
+  ],
+  "service": {
+    "running": true,
+    "restartCount": 0,
+    "image": "sha256:79745d9caadd9680cfa0176a1a16b3cec44875b38d7278e9694cf4c1fdea6241",
+    "user": "1000:1000",
+    "credentialInDockerEnv": false,
+    "sandbox": {
+      "ReadonlyRootfs": true,
+      "Memory": 268435456,
+      "MemorySwap": 268435456,
+      "NanoCpus": 250000000,
+      "PidsLimit": 64,
+      "NetworkMode": "host",
+      "PortBindings": {},
+      "CapDrop": [
+        "ALL"
+      ],
+      "SecurityOpt": [
+        "no-new-privileges"
+      ],
+      "RestartPolicy": {
+        "Name": "unless-stopped",
+        "MaximumRetryCount": 0
+      }
+    },
+    "mounts": [
+      {
+        "destination": "/config/observer.json",
+        "rw": false
+      },
+      {
+        "destination": "/tls/ca-cert.pem",
+        "rw": false
+      },
+      {
+        "destination": "/tls/cp-client-cert.pem",
+        "rw": false
+      },
+      {
+        "destination": "/tls/cp-client-key.pem",
+        "rw": false
+      },
+      {
+        "destination": "/run/secrets/runtime-dsn",
+        "rw": false
+      }
+    ]
+  },
+  "fresh": true,
+  "advancedWithoutManualObservation": true,
+  "status": "CONTINUOUS_REAL_OBSERVER_CONFIRMED"
+}

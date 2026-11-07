@@ -1,0 +1,58 @@
+{
+  "atKST": "2026-11-07T16:21:33+09:00",
+  "SSHExit": 0,
+  "knownHostsUnchanged": true,
+  "stderrBytes": 0,
+  "rawDiagnosticAndPrivateProfileSuppressed": true,
+  "remote": {
+    "mode": "PLAN",
+    "DBPersistentWrites": false,
+    "actualAdmission": "NOT_RUN",
+    "profileOrCredentialValuesEmitted": false,
+    "wholeProgramComplete": false,
+    "CLIExit": 0,
+    "CLIStdoutBytes": 875,
+    "CLIStderrBytes": 0,
+    "status": "READY_ACTUAL_READONLY_PLAN_TARGET_AND_PROFILE_VERIFIED",
+    "phase": "actual-cli-ready-and-zero-writes-readback",
+    "sameNamedServerSystemID": true,
+    "existingOperatorRoleClass": {
+      "rolsuper": true,
+      "rolbypassrls": true,
+      "rolcanlogin": true
+    },
+    "currentEpochMatches": true,
+    "tenantControls": {
+      "version": 0,
+      "kill_switch": false
+    },
+    "selectedBusinessLinkedProjectActive": true,
+    "plannedTargetCountsBefore": {
+      "node": 0,
+      "resources": 0,
+      "project_links": 0,
+      "channels": 0,
+      "audit": 0,
+      "controls": 0
+    },
+    "plannedTargetCountsAfter": {
+      "node": 0,
+      "resources": 0,
+      "project_links": 0,
+      "channels": 0,
+      "audit": 0,
+      "controls": 0
+    },
+    "CLIReadyPlanDigest": "95a6d6b50208e4951687e5465626bdd7fe4f0383d0104671b1e21c42275e70ac",
+    "childEnvironmentNames": [
+      "LANG",
+      "PATH",
+      "PYTHONDONTWRITEBYTECODE",
+      "PYTHONNOUSERSITE",
+      "SV_FRESH_NODE_EXPECTED_PLAN_SHA256",
+      "SV_FRESH_NODE_OPERATOR_DSN"
+    ],
+    "actualUserOIDCOrRunApproval": "NOT_PERFORMED_NOT_SUBSTITUTED_BY_OPERATOR_ROLE",
+    "NodeOrWorkloadExecuted": false
+  }
+}

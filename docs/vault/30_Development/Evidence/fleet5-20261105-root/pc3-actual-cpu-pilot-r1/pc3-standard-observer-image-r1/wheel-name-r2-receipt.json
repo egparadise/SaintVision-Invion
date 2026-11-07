@@ -1,0 +1,39 @@
+{
+  "atKST": "2026-11-07T16:40:17+09:00",
+  "SSHExit": 0,
+  "knownHostsUnchanged": true,
+  "stderrBytes": 0,
+  "rawDiagnosticsSuppressed": true,
+  "remote": {
+    "scope": "OBSERVER_IMAGE_KNOWN_CAUSE_PACKAGING_CORRECTION",
+    "DBOrNodeOrUserWorkloadStarted": false,
+    "credentialBuildInput": false,
+    "wholeProgramComplete": false,
+    "originalFailureSHA256": "16be5bcf6010407680ddf2872f26d56e2b955c697ee63904c587d42c083ed749",
+    "buildExit": 0,
+    "status": "STANDARD_OBSERVER_IMAGE_BUILT_VERIFIED_NOT_STARTED",
+    "phase": "actual-image-source-pins-verified",
+    "imageID": "sha256:79745d9caadd9680cfa0176a1a16b3cec44875b38d7278e9694cf4c1fdea6241",
+    "user": "1000:1000",
+    "entrypoint": [
+      "python",
+      "-I",
+      "-B",
+      "/observer-bootstrap.py"
+    ],
+    "bootstrapSHA256": "8cccc5a123b17bd369d1b55ab9fddd9830558d4006ce722582197b25cd09547d",
+    "DockerfileR1Preserved": true,
+    "DockerfileR2SHA256": "260f52d71a52172ecf852391e47d3f9e78afa970be466a73eeb52076daa32113",
+    "metadata": {
+      "librarySHA256": "76407ced1411f42a5eddd71c894f541b8691d461d4eb1eaea30f63b8bcf90d2c",
+      "versions": {
+        "saintvision-control-plane": "0.1.0",
+        "psycopg": "3.3.5",
+        "cryptography": "50.0.1"
+      }
+    },
+    "buildDirectory": "/home/saintvision-invion3/saintvision-share/ops-fresh-cpu-1efea-r1-20261107/build-observer-r1",
+    "knownCause": "Original /tmp/candidate.whl lost required wheel filename. Correct copied filename only; same verified wheel and product source.",
+    "originalFailurePreserved": true
+  }
+}

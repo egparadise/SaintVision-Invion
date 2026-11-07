@@ -1,0 +1,16 @@
+{
+    "atKST":  "2026-11-07T16:42:47.2870453+09:00",
+    "owner":  "Root Codex",
+    "pid":  11396,
+    "processStartTime":  "2026-11-07T16:42:45.2600973+09:00",
+    "executable":  "C:\\Windows\\System32\\OpenSSH\\ssh.exe",
+    "executableSHA256":  "98d447730047f5df91373e852d057928a921c3d1e89938700ab656ba84b19dc8",
+    "hidden":  true,
+    "credentialValuesInArguments":  false,
+    "forward":  "PC3 loopback127.0.0.1:15461 to CP loopback127.0.0.1:55461 over strict pinned SSH",
+    "knownHostsSHA256":  "0dcbf0f4cfc363e4affc30810ad8a9e57bd2c4a31991e2c8285bdae7052ec2d2",
+    "existingProcessesKilled":  false,
+    "DBLANBindChanged":  false,
+    "remoteDatabaseProof":  "PENDING",
+    "wholeProgramComplete":  false
+}

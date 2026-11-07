@@ -1,0 +1,19 @@
+{
+  "readOnly": true,
+  "containerId": "b8a2f8f55e524837c4b7db14565ec5f960c4492bc3b9df6972e7f1f153c2aec5",
+  "running": true,
+  "restarting": false,
+  "exitCode": 0,
+  "restartCount": 0,
+  "diagnosticBytes": 0,
+  "bootstrapPermissionDenied": false,
+  "closedBootstrapUnavailable": false,
+  "closedProductConfigurationUnavailable": false,
+  "rawDiagnosticsSuppressed": true,
+  "imageBootstrapFileMetadata": {
+    "mode": "0o664",
+    "uid": 0,
+    "readableByEffectiveUser": true,
+    "euid": 1000
+  }
+}
