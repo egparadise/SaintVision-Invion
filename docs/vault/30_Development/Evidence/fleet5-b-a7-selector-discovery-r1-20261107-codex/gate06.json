@@ -1,0 +1,17 @@
+{
+  "argv": [
+    "git",
+    "diff",
+    "--check",
+    "746789a36091c8601afea23fe176069e2fa7d87b"
+  ],
+  "cwd": "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105",
+  "directExit": 0,
+  "endKST": "2026-11-07T11:50:57.969672+09:00",
+  "interpreter": "3.14.7 (tags/v3.14.7:823f032, Aug  5 2026, 10:51:32) [MSC v.1944 64 bit (AMD64)]",
+  "outputEncoding": "UTF8-in-JSON-verbatim",
+  "rawBytes": 0,
+  "rawSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "rawUTF8": "",
+  "startKST": "2026-11-07T11:50:57.474116+09:00"
+}

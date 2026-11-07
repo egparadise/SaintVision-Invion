@@ -1,0 +1,16 @@
+{
+  "argv": [
+    "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+    "-B",
+    "tools/check_docs.py"
+  ],
+  "cwd": "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105",
+  "directExit": 0,
+  "endKST": "2026-11-07T11:50:02.929851+09:00",
+  "interpreter": "3.14.7 (tags/v3.14.7:823f032, Aug  5 2026, 10:51:32) [MSC v.1944 64 bit (AMD64)]",
+  "outputEncoding": "UTF8-in-JSON-verbatim",
+  "rawBytes": 127,
+  "rawSHA256": "1c8a60541b81e15e16f844674cf8802beed0b1ee2c9e9dd7e3ef863bd5e2ab83",
+  "rawUTF8": "PASS: 24 original hashes, 1267 versioned documents, wiki links, 48 tasks, 12 outcomes, owner/reviewer/skills, dependency DAG.\r\n",
+  "startKST": "2026-11-07T11:49:17.481612+09:00"
+}

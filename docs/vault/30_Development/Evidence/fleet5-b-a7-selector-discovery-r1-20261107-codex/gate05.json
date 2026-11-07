@@ -1,0 +1,28 @@
+{
+  "CHECKOnly": true,
+  "argv": [
+    "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+    "-B",
+    "tools/sync_obsidian.py",
+    "--check",
+    "--state",
+    "D:\\Project\\SaintVision-Invion\\SaintVisionI-Invion\\.git\\obsidian-sync-state.json",
+    "--conflicts-out",
+    "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105\\docs\\vault\\30_Development\\Evidence\\fleet5-b-a7-selector-discovery-r1-20261107-codex\\sync-check-conflicts.json"
+  ],
+  "concurrentStatePolicy": "Retain actual Root state changes; no author state write/apply/adopt/resolve/export",
+  "cwd": "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105",
+  "directExit": 0,
+  "endKST": "2026-11-07T11:50:57.457774+09:00",
+  "fullStateAfterBytes": 477592,
+  "fullStateAfterSHA256": "c8b317b46e90100f2c8551c798e5ceb0fdfa1a6a22f47f9ed4f724be9bbdd908",
+  "fullStateBeforeBytes": 477592,
+  "fullStateBeforeSHA256": "c8b317b46e90100f2c8551c798e5ceb0fdfa1a6a22f47f9ed4f724be9bbdd908",
+  "interpreter": "3.14.7 (tags/v3.14.7:823f032, Aug  5 2026, 10:51:32) [MSC v.1944 64 bit (AMD64)]",
+  "outputEncoding": "UTF8-in-JSON-verbatim",
+  "rawBytes": 74,
+  "rawSHA256": "108f72b3d9242fd8b92c3d38de389877f15b9c14ef820199072b3b2ee88f4dee",
+  "rawUTF8": "CHECK: 5043 managed files, 2619 pending exports, 0 conflicts. No writes.\r\n",
+  "startKST": "2026-11-07T11:50:19.060561+09:00",
+  "stateBytesEqual": true
+}

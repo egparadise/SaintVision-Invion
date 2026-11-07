@@ -1,0 +1,43 @@
+{
+  "bothInventoriesIndependent": true,
+  "commit": {
+    "classification": "EXACT_CAPTURE_GUARD_DELTA_COVERED_WITH_LEGACY_REFUSAL_PRESERVED",
+    "existingFinitePredicateRan": true,
+    "other24RawBytesEqualRealBASE": true,
+    "ownerDerivationReason": null,
+    "reason": null,
+    "referenceCount": 1,
+    "wholeModuleNormalizedASTEqual": true
+  },
+  "commitWorkingExactRawBytesEqual": true,
+  "legacyActualWorldInputCommit": "746789a36091c8601afea23fe176069e2fa7d87b",
+  "legacyConstructorCount": 9,
+  "legacyGuardCompatibilityClean": false,
+  "legacyHistoricalQueryBase": "b3bbdc8d92a39f2f797a7680deb2770d6f705af0",
+  "legacyOldAllowancesChanged": false,
+  "legacyParsedAuditedCount": [
+    25,
+    25
+  ],
+  "legacyRefusals": [
+    {
+      "error": "DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:INSTANCE:operation",
+      "newReflection": [],
+      "path": "services/control-plane/src/inv/dispatch.py"
+    }
+  ],
+  "legacyStatus": "REFUSED",
+  "oldHelpersUnchanged": true,
+  "productAndTestByteHashesUnchanged": true,
+  "realBindings": null,
+  "runtimeB": 0,
+  "working": {
+    "classification": "EXACT_CAPTURE_GUARD_DELTA_COVERED_WITH_LEGACY_REFUSAL_PRESERVED",
+    "existingFinitePredicateRan": true,
+    "other24RawBytesEqualRealBASE": true,
+    "ownerDerivationReason": null,
+    "reason": null,
+    "referenceCount": 1,
+    "wholeModuleNormalizedASTEqual": true
+  }
+}

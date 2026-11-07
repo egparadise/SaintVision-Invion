@@ -1,0 +1,1345 @@
+{
+  "acceptedBaselineDischarges": 0,
+  "actualRuntimeB": 0,
+  "allExpected": true,
+  "count": 6,
+  "genuineWorkingTreeMembership": "actual-working-inventory.json, real Git index membership; filesystem fixtures have no tracked/untracked proof",
+  "independentDeltaReview": "PENDING",
+  "inheritedInjectedControl": {
+    "classification": "INHERITED_CALLER_INJECTED_WORLD_CONTROL_NOT_TREE_DISCOVERY",
+    "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/wip02-finite-control-results.json",
+    "publishedSHA256": "179f569e99a59bac848b0bc04655249e2897cf3bfbdae98f5fb50c64a70b849b",
+    "row": {
+      "changedInputs": [
+        {
+          "path": "services/control-plane/src/inv/containment.py",
+          "sha256": "b8fcc399d9517b20d604d8da9ed91655c73f9ace285b083f18f708ba66ab129f"
+        }
+      ],
+      "expectationMet": true,
+      "expectedReason": "SOURCE_WORLD_PATH_SET_CHANGED",
+      "layer": "NEW_FINITE_COMPATIBILITY_ONLY",
+      "legacyGuardCredited": false,
+      "name": "modified-unrelated-module",
+      "otherActualInputsUnchanged": true,
+      "reason": "SOURCE_WORLD_PATH_SET_CHANGED",
+      "result": {
+        "extraPaths": [
+          "services/control-plane/src/inv/containment.py"
+        ],
+        "missingPaths": [],
+        "reason": "SOURCE_WORLD_PATH_SET_CHANGED",
+        "sourcePathSetEqual": false
+      },
+      "runtimeOrTestedHashGateCredited": false,
+      "syntaxValid": true
+    }
+  },
+  "noCleanupAttempted": true,
+  "rows": [
+    {
+      "expectationMet": true,
+      "expectedReason": null,
+      "fixtureIsRealGitCommitOrCheckout": false,
+      "fixtureMembershipNotClaimedTrackedOrUntracked": true,
+      "inventory": {
+        "baseWorldUsedForDiscovery": false,
+        "enumeratedProductionPythonCount": 25,
+        "filesystemFixtureIsGitCommit": false,
+        "pathsDerivedFromEvaluatedTarget": true,
+        "productOrMutantRuntimeExecuted": false,
+        "productionRoots": [
+          "services/control-plane/src",
+          "src",
+          "tools"
+        ],
+        "queryReceipts": [
+          {
+            "argv": [
+              "git",
+              "--literal-pathspecs",
+              "grep",
+              "--no-index",
+              "--no-exclude-standard",
+              "-l",
+              "-z",
+              "-E",
+              "NodeDelivery|DeliveryWorker|DeliveryAttempt|DeliveryQueue|node_transport|from[[:space:]].*dispatch|import[[:space:]].*dispatch|\\.deliver\\b",
+              "--",
+              "services/control-plane/src/inv/build_product_runtime.py",
+              "services/control-plane/src/inv/dispatch.py",
+              "services/control-plane/src/inv/model_remote.py",
+              "services/control-plane/src/inv/node_transport.py",
+              "services/control-plane/src/inv/observer_worker.py",
+              "services/control-plane/src/inv/output_ingestion.py",
+              "services/control-plane/src/inv/remote_git.py",
+              "services/control-plane/src/inv/result_view.py",
+              "services/control-plane/src/inv/storage_check_collect.py",
+              "services/control-plane/src/inv/storage_sampling.py",
+              "services/control-plane/src/inv/terminal.py",
+              "services/control-plane/src/inv/tooling.py",
+              "services/control-plane/src/inv/worker.py",
+              "services/control-plane/src/inv/workspace_config.py",
+              "services/control-plane/src/inv/workspace_resume.py",
+              "src/saintvision/services/eval_execution.py",
+              "tools/check_remote_workspace.py",
+              "tools/intranet_e2e_smoke.py",
+              "tools/lan_execution.py",
+              "tools/lan_pilot.py",
+              "tools/post_landing_select_run.py",
+              "tools/prepare_server_config.py",
+              "tools/remote_workspace_entry.py",
+              "tools/run_ac11_exact_sha_aggregate.py",
+              "tools/run_s04_db_evidence.py"
+            ],
+            "exit": 0,
+            "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stderrUTF8": "",
+            "stdoutSHA256": "95a838725ef6ee1311bc831a35d701fd4b3d120707f61200e2846997fd3f9cc0"
+          }
+        ],
+        "requestedRef": null,
+        "resolvedTargetCommitOrWorkingHEAD": null,
+        "root": "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105\\.work\\fleet5-selector-discovery-r1-bkiapjw_\\fixture-exact-selected-source",
+        "selectedCount": 25,
+        "selectedInventory": [
+          {
+            "ASTParseOnly": true,
+            "bytes": 22165,
+            "decodedTextSHA256": "7483d65fcb1032aeb05b4d2dd56e09e714cff8ca676de0f80fc3a2f5e447e9af",
+            "gitBlobID": null,
+            "membership": "NOT_A_GIT_TREE_FILESYSTEM_FIXTURE",
+            "path": "services/control-plane/src/inv/build_product_runtime.py",
+            "rawSHA256": "7483d65fcb1032aeb05b4d2dd56e09e714cff8ca676de0f80fc3a2f5e447e9af"
+          },
+          {
+            "ASTParseOnly": true,
+            "bytes": 15823,
+            "decodedTextSHA256": "82f029614537eb5bab56934e4b6736fe3dd52ece54b9b9a3996815b131e41de4",
+            "gitBlobID": null,
+            "membership": "NOT_A_GIT_TREE_FILESYSTEM_FIXTURE",
+            "path": "services/control-plane/src/inv/dispatch.py",
+            "rawSHA256": "82f029614537eb5bab56934e4b6736fe3dd52ece54b9b9a3996815b131e41de4"
+          },
+          {
+            "ASTParseOnly": true,
+            "bytes": 4737,
+            "decodedTextSHA256": "796f61fe8404c2c3a8a4be08eca75d98e3c442a30c04077c66b278e7d60c6737",
+            "gitBlobID": null,
+            "membership": "NOT_A_GIT_TREE_FILESYSTEM_FIXTURE",
+            "path": "services/control-plane/src/inv/model_remote.py",
+            "rawSHA256": "796f61fe8404c2c3a8a4be08eca75d98e3c442a30c04077c66b278e7d60c6737"
+          },
+          {
+            "ASTParseOnly": true,
+            "bytes": 12319,
+            "decodedTextSHA256": "3559bbcdf9568f8930654d860b0edd980eca71c835cde3fe7380a69dd56e18f4",
+            "gitBlobID": null,
+            "membership": "NOT_A_GIT_TREE_FILESYSTEM_FIXTURE",
+            "path": "services/control-plane/src/inv/node_transport.py",
+            "rawSHA256": "3559bbcdf9568f8930654d860b0edd980eca71c835cde3fe7380a69dd56e18f4"
+          },
+          {
+            "ASTParseOnly": true,
+            "bytes": 2821,
+            "decodedTextSHA256": "6bbdf815554fe1f0157247732ddc4dc3069686685c291ef83add55c8f3e92003",
+            "gitBlobID": null,
+            "membership": "NOT_A_GIT_TREE_FILESYSTEM_FIXTURE",
+            "path": "services/control-plane/src/inv/observer_worker.py",
+            "rawSHA256": "6bbdf815554fe1f0157247732ddc4dc3069686685c291ef83add55c8f3e92003"
+          },
+          {
+            "ASTParseOnly": true,
+            "bytes": 9784,
+            "decodedTextSHA256": "e954e1ef8dcae97756a50428af66c9a328e4d362f1aee7d630588431d09b1308",
+            "gitBlobID": null,
+            "membership": "NOT_A_GIT_TREE_FILESYSTEM_FIXTURE",
+            "path": "services/control-plane/src/inv/output_ingestion.py",
+            "rawSHA256": "e954e1ef8dcae97756a50428af66c9a328e4d362f1aee7d630588431d09b1308"
+          },
+          {
+            "ASTParseOnly": true,
+            "bytes": 12723,
+            "decodedTextSHA256": "5efd1057f9208cdb29670073bd8ea5e96f98cfbd5a8173f4daa764d3db5db52e",
+            "gitBlobID": null,
+            "membership": "NOT_A_GIT_TREE_FILESYSTEM_FIXTURE",
+            "path": "services/control-plane/src/inv/remote_git.py",
+            "rawSHA256": "5efd1057f9208cdb29670073bd8ea5e96f98cfbd5a8173f4daa764d3db5db52e"
+          },
+          {
+            "ASTParseOnly": true,
+            "bytes": 16901,
+            "decodedTextSHA256": "900b2b5b3381da451a14a49a2b079b2f9851ea3bc91f30798c9fcde243ceab9a",
+            "gitBlobID": null,
+            "membership": "NOT_A_GIT_TREE_FILESYSTEM_FIXTURE",
+            "path": "services/control-plane/src/inv/result_view.py",
+            "rawSHA256": "900b2b5b3381da451a14a49a2b079b2f9851ea3bc91f30798c9fcde243ceab9a"
+          },
+          {
+            "ASTParseOnly": true,
+            "bytes": 19960,
+            "decodedTextSHA256": "bae67c856cc8bdae52c1f06c4b6e36302e17ae0dd53a24fc01557cae19a3e226",
+            "gitBlobID": null,
+            "membership": "NOT_A_GIT_TREE_FILESYSTEM_FIXTURE",
+            "path": "services/control-plane/src/inv/storage_check_collect.py",
+            "rawSHA256": "bae67c856cc8bdae52c1f06c4b6e36302e17ae0dd53a24fc01557cae19a3e226"
+          },
+          {
+            "ASTParseOnly": true,
+            "bytes": 10765,
+            "decodedTextSHA256": "4e43aa43e8dc9b8ab78af0fde78f9e83b83d7bfdc77b7362ad565741f6f94e8a",
+            "gitBlobID": null,
+            "membership": "NOT_A_GIT_TREE_FILESYSTEM_FIXTURE",
+            "path": "services/control-plane/src/inv/storage_sampling.py",
+            "rawSHA256": "4e43aa43e8dc9b8ab78af0fde78f9e83b83d7bfdc77b7362ad565741f6f94e8a"
+          },
+          {
+            "ASTParseOnly": true,
+            "bytes": 17862,
+            "decodedTextSHA256": "fe294d648b34d617df94449974fc82fed904639b80b8a5da2c9d34f32606bf8e",
+            "gitBlobID": null,
+            "membership": "NOT_A_GIT_TREE_FILESYSTEM_FIXTURE",
+            "path": "services/control-plane/src/inv/terminal.py",
+            "rawSHA256": "fe294d648b34d617df94449974fc82fed904639b80b8a5da2c9d34f32606bf8e"
+          },
+          {
+            "ASTParseOnly": true,
+            "bytes": 15889,
+            "decodedTextSHA256": "de5f6213b196784c6c4280d31a17fba9fe1669eb466edee14197664b37f2ac6c",
+            "gitBlobID": null,
+            "membership": "NOT_A_GIT_TREE_FILESYSTEM_FIXTURE",
+            "path": "services/control-plane/src/inv/tooling.py",
+            "rawSHA256": "de5f6213b196784c6c4280d31a17fba9fe1669eb466edee14197664b37f2ac6c"
+          },
+          {
+            "ASTParseOnly": true,
+            "bytes": 7594,
+            "decodedTextSHA256": "3010b2409bb285de960eb322792b1062ed066275307c9bea53a2cc767b65d4e3",
+            "gitBlobID": null,
+            "membership": "NOT_A_GIT_TREE_FILESYSTEM_FIXTURE",
+            "path": "services/control-plane/src/inv/worker.py",
+            "rawSHA256": "3010b2409bb285de960eb322792b1062ed066275307c9bea53a2cc767b65d4e3"
+          },
+          {
+            "ASTParseOnly": true,
+            "bytes": 4125,
+            "decodedTextSHA256": "7b77a716b4fb56e951fce110d347ac41f16d1d80d4722ba9d1410a1869b351cb",
+            "gitBlobID": null,
+            "membership": "NOT_A_GIT_TREE_FILESYSTEM_FIXTURE",
+            "path": "services/control-plane/src/inv/workspace_config.py",
+            "rawSHA256": "7b77a716b4fb56e951fce110d347ac41f16d1d80d4722ba9d1410a1869b351cb"
+          },
+          {
+            "ASTParseOnly": true,
+            "bytes": 14468,
+            "decodedTextSHA256": "32c8fae52eb947605c53801d609e9826c514b53c2392f07f1fb9ff605303449b",
+            "gitBlobID": null,
+            "membership": "NOT_A_GIT_TREE_FILESYSTEM_FIXTURE",
+            "path": "services/control-plane/src/inv/workspace_resume.py",
+            "rawSHA256": "32c8fae52eb947605c53801d609e9826c514b53c2392f07f1fb9ff605303449b"
+          },
+          {
+            "ASTParseOnly": true,
+            "bytes": 12213,
+            "decodedTextSHA256": "e97af6a21a46ebfc2f836a5339005510dcd3dcd257640a4b375bdb52bd3b0bda",
+            "gitBlobID": null,
+            "membership": "NOT_A_GIT_TREE_FILESYSTEM_FIXTURE",
+            "path": "src/saintvision/services/eval_execution.py",
+            "rawSHA256": "e97af6a21a46ebfc2f836a5339005510dcd3dcd257640a4b375bdb52bd3b0bda"
+          },
+          {
+            "ASTParseOnly": true,
+            "bytes": 13260,
+            "decodedTextSHA256": "3550db9c20fb7e2118f66f0337ed787dd22a166a6ff8cf1c6e9490f9ae9df6e3",
+            "gitBlobID": null,
+            "membership": "NOT_A_GIT_TREE_FILESYSTEM_FIXTURE",
+            "path": "tools/check_remote_workspace.py",
+            "rawSHA256": "3550db9c20fb7e2118f66f0337ed787dd22a166a6ff8cf1c6e9490f9ae9df6e3"
+          },
+          {
+            "ASTParseOnly": true,
+            "bytes": 76378,
+            "decodedTextSHA256": "3a2e134e04ac36ec81a20280e47e2f9deb9c190c2f5bed5c26e1ad05206210ed",
+            "gitBlobID": null,
+            "membership": "NOT_A_GIT_TREE_FILESYSTEM_FIXTURE",
+            "path": "tools/intranet_e2e_smoke.py",
+            "rawSHA256": "3a2e134e04ac36ec81a20280e47e2f9deb9c190c2f5bed5c26e1ad05206210ed"
+          },
+          {
+            "ASTParseOnly": true,
+            "bytes": 11689,
+            "decodedTextSHA256": "cd4be84de9a60c03c32daa8e831a527ed9014169e151c7a436383772a5d4ddc0",
+            "gitBlobID": null,
+            "membership": "NOT_A_GIT_TREE_FILESYSTEM_FIXTURE",
+            "path": "tools/lan_execution.py",
+            "rawSHA256": "cd4be84de9a60c03c32daa8e831a527ed9014169e151c7a436383772a5d4ddc0"
+          },
+          {
+            "ASTParseOnly": true,
+            "bytes": 198894,
+            "decodedTextSHA256": "2c626540f495499423b707b063a6cab6a53e1be3af8c324f46af88a94ac8f652",
+            "gitBlobID": null,
+            "membership": "NOT_A_GIT_TREE_FILESYSTEM_FIXTURE",
+            "path": "tools/lan_pilot.py",
+            "rawSHA256": "2c626540f495499423b707b063a6cab6a53e1be3af8c324f46af88a94ac8f652"
+          },
+          {
+            "ASTParseOnly": true,
+            "bytes": 2115,
+            "decodedTextSHA256": "b88449375aa8377d1e069e151d297ca9bd964495a4807d7e3eab26b111da6842",
+            "gitBlobID": null,
+            "membership": "NOT_A_GIT_TREE_FILESYSTEM_FIXTURE",
+            "path": "tools/post_landing_select_run.py",
+            "rawSHA256": "b88449375aa8377d1e069e151d297ca9bd964495a4807d7e3eab26b111da6842"
+          },
+          {
+            "ASTParseOnly": true,
+            "bytes": 14829,
+            "decodedTextSHA256": "2203c2d424ecd7651dcd099b4fd6fb051bd872e919a8bcad44fd2b4043897b2e",
+            "gitBlobID": null,
+            "membership": "NOT_A_GIT_TREE_FILESYSTEM_FIXTURE",
+            "path": "tools/prepare_server_config.py",
+            "rawSHA256": "2203c2d424ecd7651dcd099b4fd6fb051bd872e919a8bcad44fd2b4043897b2e"
+          },
+          {
+            "ASTParseOnly": true,
+            "bytes": 14741,
+            "decodedTextSHA256": "e69fa8ff6c51bd3880f5ec388fe97288a4256169377e17d9d6aa5b7ec2f32c27",
+            "gitBlobID": null,
+            "membership": "NOT_A_GIT_TREE_FILESYSTEM_FIXTURE",
+            "path": "tools/remote_workspace_entry.py",
+            "rawSHA256": "e69fa8ff6c51bd3880f5ec388fe97288a4256169377e17d9d6aa5b7ec2f32c27"
+          },
+          {
+            "ASTParseOnly": true,
+            "bytes": 34190,
+            "decodedTextSHA256": "67388ba4a7ac07156bf70d9286691d1a0dfe1fb76f976cf91f0b1df84dc6743b",
+            "gitBlobID": null,
+            "membership": "NOT_A_GIT_TREE_FILESYSTEM_FIXTURE",
+            "path": "tools/run_ac11_exact_sha_aggregate.py",
+            "rawSHA256": "67388ba4a7ac07156bf70d9286691d1a0dfe1fb76f976cf91f0b1df84dc6743b"
+          },
+          {
+            "ASTParseOnly": true,
+            "bytes": 7618,
+            "decodedTextSHA256": "92296b5f070cd97440889b12b487876cd64240408fe4faa918597dfcc6c7e82c",
+            "gitBlobID": null,
+            "membership": "NOT_A_GIT_TREE_FILESYSTEM_FIXTURE",
+            "path": "tools/run_s04_db_evidence.py",
+            "rawSHA256": "92296b5f070cd97440889b12b487876cd64240408fe4faa918597dfcc6c7e82c"
+          }
+        ],
+        "selector": "NodeDelivery|DeliveryWorker|DeliveryAttempt|DeliveryQueue|node_transport|from[[:space:]].*dispatch|import[[:space:]].*dispatch|\\.deliver\\b",
+        "selectorEngine": "git grep -E (original POSIX ERE, no Python regex translation)",
+        "targetKind": "filesystem-fixture",
+        "workingModel": "No symlinks; read/encoding failures unresolved. Filesystem paths/content/stamps rechecked around selector; not an atomic hostile-filesystem/runtime proof."
+      },
+      "name": "fixture-exact-selected-source",
+      "normalEnumerationReadEntrypoint": true,
+      "preselectedWorldInjectedInsteadOfDiscovery": false,
+      "realProductWorktreeMutated": false,
+      "reason": null,
+      "result": {
+        "classification": "EXACT_CAPTURE_GUARD_DELTA_COVERED_WITH_LEGACY_REFUSAL_PRESERVED",
+        "existingFinitePredicateRan": true,
+        "other24RawBytesEqualRealBASE": true,
+        "ownerDerivationReason": null,
+        "reason": null,
+        "referenceCount": 1,
+        "wholeModuleNormalizedASTEqual": true
+      },
+      "runtimeExecuted": false,
+      "selectedDeliverReferenceCount": 1,
+      "target": "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105\\.work\\fleet5-selector-discovery-r1-bkiapjw_\\fixture-exact-selected-source",
+      "targetKind": "filesystem-fixture"
+    },
+    {
+      "expectationMet": true,
+      "expectedReason": "SOURCE_WORLD_PATH_SET_CHANGED",
+      "fixtureIsRealGitCommitOrCheckout": false,
+      "fixtureMembershipNotClaimedTrackedOrUntracked": true,
+      "inventory": {
+        "baseWorldUsedForDiscovery": false,
+        "enumeratedProductionPythonCount": 26,
+        "filesystemFixtureIsGitCommit": false,
+        "pathsDerivedFromEvaluatedTarget": true,
+        "productOrMutantRuntimeExecuted": false,
+        "productionRoots": [
+          "services/control-plane/src",
+          "src",
+          "tools"
+        ],
+        "queryReceipts": [
+          {
+            "argv": [
+              "git",
+              "--literal-pathspecs",
+              "grep",
+              "--no-index",
+              "--no-exclude-standard",
+              "-l",
+              "-z",
+              "-E",
+              "NodeDelivery|DeliveryWorker|DeliveryAttempt|DeliveryQueue|node_transport|from[[:space:]].*dispatch|import[[:space:]].*dispatch|\\.deliver\\b",
+              "--",
+              "services/control-plane/src/inv/build_product_runtime.py",
+              "services/control-plane/src/inv/dispatch.py",
+              "services/control-plane/src/inv/model_remote.py",
+              "services/control-plane/src/inv/node_transport.py",
+              "services/control-plane/src/inv/observer_worker.py",
+              "services/control-plane/src/inv/output_ingestion.py",
+              "services/control-plane/src/inv/remote_git.py",
+              "services/control-plane/src/inv/result_view.py",
+              "services/control-plane/src/inv/storage_check_collect.py",
+              "services/control-plane/src/inv/storage_sampling.py",
+              "services/control-plane/src/inv/terminal.py",
+              "services/control-plane/src/inv/tooling.py",
+              "services/control-plane/src/inv/worker.py",
+              "services/control-plane/src/inv/workspace_config.py",
+              "services/control-plane/src/inv/workspace_resume.py",
+              "src/saintvision/services/eval_execution.py",
+              "tools/check_remote_workspace.py",
+              "tools/fixture_second_deliver.py",
+              "tools/intranet_e2e_smoke.py",
+              "tools/lan_execution.py",
+              "tools/lan_pilot.py",
+              "tools/post_landing_select_run.py",
+              "tools/prepare_server_config.py",
+              "tools/remote_workspace_entry.py",
+              "tools/run_ac11_exact_sha_aggregate.py",
+              "tools/run_s04_db_evidence.py"
+            ],
+            "exit": 0,
+            "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stderrUTF8": "",
+            "stdoutSHA256": "3101bd22293b716de47fa9c96a2a0a7f9e2929a828a65ddf940a0b4de3201a77"
+          }
+        ],
+        "requestedRef": null,
+        "resolvedTargetCommitOrWorkingHEAD": null,
+        "root": "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105\\.work\\fleet5-selector-discovery-r1-bkiapjw_\\TREE-DISCOVERY-new-matching-module",
+        "selectedCount": 26,
+        "selectedInventory": [
+          {
+            "ASTParseOnly": true,
+            "bytes": 22165,
+            "decodedTextSHA256": "7483d65fcb1032aeb05b4d2dd56e09e714cff8ca676de0f80fc3a2f5e447e9af",
+            "gitBlobID": null,
+            "membership": "NOT_A_GIT_TREE_FILESYSTEM_FIXTURE",
+            "path": "services/control-plane/src/inv/build_product_runtime.py",
+            "rawSHA256": "7483d65fcb1032aeb05b4d2dd56e09e714cff8ca676de0f80fc3a2f5e447e9af"
+          },
+          {
+            "ASTParseOnly": true,
+            "bytes": 15823,
+            "decodedTextSHA256": "82f029614537eb5bab56934e4b6736fe3dd52ece54b9b9a3996815b131e41de4",
+            "gitBlobID": null,
+            "membership": "NOT_A_GIT_TREE_FILESYSTEM_FIXTURE",
+            "path": "services/control-plane/src/inv/dispatch.py",
+            "rawSHA256": "82f029614537eb5bab56934e4b6736fe3dd52ece54b9b9a3996815b131e41de4"
+          },
+          {
+            "ASTParseOnly": true,
+            "bytes": 4737,
+            "decodedTextSHA256": "796f61fe8404c2c3a8a4be08eca75d98e3c442a30c04077c66b278e7d60c6737",
+            "gitBlobID": null,
+            "membership": "NOT_A_GIT_TREE_FILESYSTEM_FIXTURE",
+            "path": "services/control-plane/src/inv/model_remote.py",
+            "rawSHA256": "796f61fe8404c2c3a8a4be08eca75d98e3c442a30c04077c66b278e7d60c6737"
+          },
+          {
+            "ASTParseOnly": true,
+            "bytes": 12319,
+            "decodedTextSHA256": "3559bbcdf9568f8930654d860b0edd980eca71c835cde3fe7380a69dd56e18f4",
+            "gitBlobID": null,
+            "membership": "NOT_A_GIT_TREE_FILESYSTEM_FIXTURE",
+            "path": "services/control-plane/src/inv/node_transport.py",
+            "rawSHA256": "3559bbcdf9568f8930654d860b0edd980eca71c835cde3fe7380a69dd56e18f4"
+          },
+          {
+            "ASTParseOnly": true,
+            "bytes": 2821,
+            "decodedTextSHA256": "6bbdf815554fe1f0157247732ddc4dc3069686685c291ef83add55c8f3e92003",
+            "gitBlobID": null,
+            "membership": "NOT_A_GIT_TREE_FILESYSTEM_FIXTURE",
+            "path": "services/control-plane/src/inv/observer_worker.py",
+            "rawSHA256": "6bbdf815554fe1f0157247732ddc4dc3069686685c291ef83add55c8f3e92003"
+          },
+          {
+            "ASTParseOnly": true,
+            "bytes": 9784,
+            "decodedTextSHA256": "e954e1ef8dcae97756a50428af66c9a328e4d362f1aee7d630588431d09b1308",
+            "gitBlobID": null,
+            "membership": "NOT_A_GIT_TREE_FILESYSTEM_FIXTURE",
+            "path": "services/control-plane/src/inv/output_ingestion.py",
+            "rawSHA256": "e954e1ef8dcae97756a50428af66c9a328e4d362f1aee7d630588431d09b1308"
+          },
+          {
+            "ASTParseOnly": true,
+            "bytes": 12723,
+            "decodedTextSHA256": "5efd1057f9208cdb29670073bd8ea5e96f98cfbd5a8173f4daa764d3db5db52e",
+            "gitBlobID": null,
+            "membership": "NOT_A_GIT_TREE_FILESYSTEM_FIXTURE",
+            "path": "services/control-plane/src/inv/remote_git.py",
+            "rawSHA256": "5efd1057f9208cdb29670073bd8ea5e96f98cfbd5a8173f4daa764d3db5db52e"
+          },
+          {
+            "ASTParseOnly": true,
+            "bytes": 16901,
+            "decodedTextSHA256": "900b2b5b3381da451a14a49a2b079b2f9851ea3bc91f30798c9fcde243ceab9a",
+            "gitBlobID": null,
+            "membership": "NOT_A_GIT_TREE_FILESYSTEM_FIXTURE",
+            "path": "services/control-plane/src/inv/result_view.py",
+            "rawSHA256": "900b2b5b3381da451a14a49a2b079b2f9851ea3bc91f30798c9fcde243ceab9a"
+          },
+          {
+            "ASTParseOnly": true,
+            "bytes": 19960,
+            "decodedTextSHA256": "bae67c856cc8bdae52c1f06c4b6e36302e17ae0dd53a24fc01557cae19a3e226",
+            "gitBlobID": null,
+            "membership": "NOT_A_GIT_TREE_FILESYSTEM_FIXTURE",
+            "path": "services/control-plane/src/inv/storage_check_collect.py",
+            "rawSHA256": "bae67c856cc8bdae52c1f06c4b6e36302e17ae0dd53a24fc01557cae19a3e226"
+          },
+          {
+            "ASTParseOnly": true,
+            "bytes": 10765,
+            "decodedTextSHA256": "4e43aa43e8dc9b8ab78af0fde78f9e83b83d7bfdc77b7362ad565741f6f94e8a",
+            "gitBlobID": null,
+            "membership": "NOT_A_GIT_TREE_FILESYSTEM_FIXTURE",
+            "path": "services/control-plane/src/inv/storage_sampling.py",
+            "rawSHA256": "4e43aa43e8dc9b8ab78af0fde78f9e83b83d7bfdc77b7362ad565741f6f94e8a"
+          },
+          {
+            "ASTParseOnly": true,
+            "bytes": 17862,
+            "decodedTextSHA256": "fe294d648b34d617df94449974fc82fed904639b80b8a5da2c9d34f32606bf8e",
+            "gitBlobID": null,
+            "membership": "NOT_A_GIT_TREE_FILESYSTEM_FIXTURE",
+            "path": "services/control-plane/src/inv/terminal.py",
+            "rawSHA256": "fe294d648b34d617df94449974fc82fed904639b80b8a5da2c9d34f32606bf8e"
+          },
+          {
+            "ASTParseOnly": true,
+            "bytes": 15889,
+            "decodedTextSHA256": "de5f6213b196784c6c4280d31a17fba9fe1669eb466edee14197664b37f2ac6c",
+            "gitBlobID": null,
+            "membership": "NOT_A_GIT_TREE_FILESYSTEM_FIXTURE",
+            "path": "services/control-plane/src/inv/tooling.py",
+            "rawSHA256": "de5f6213b196784c6c4280d31a17fba9fe1669eb466edee14197664b37f2ac6c"
+          },
+          {
+            "ASTParseOnly": true,
+            "bytes": 7594,
+            "decodedTextSHA256": "3010b2409bb285de960eb322792b1062ed066275307c9bea53a2cc767b65d4e3",
+            "gitBlobID": null,
+            "membership": "NOT_A_GIT_TREE_FILESYSTEM_FIXTURE",
+            "path": "services/control-plane/src/inv/worker.py",
+            "rawSHA256": "3010b2409bb285de960eb322792b1062ed066275307c9bea53a2cc767b65d4e3"
+          },
+          {
+            "ASTParseOnly": true,
+            "bytes": 4125,
+            "decodedTextSHA256": "7b77a716b4fb56e951fce110d347ac41f16d1d80d4722ba9d1410a1869b351cb",
+            "gitBlobID": null,
+            "membership": "NOT_A_GIT_TREE_FILESYSTEM_FIXTURE",
+            "path": "services/control-plane/src/inv/workspace_config.py",
+            "rawSHA256": "7b77a716b4fb56e951fce110d347ac41f16d1d80d4722ba9d1410a1869b351cb"
+          },
+          {
+            "ASTParseOnly": true,
+            "bytes": 14468,
+            "decodedTextSHA256": "32c8fae52eb947605c53801d609e9826c514b53c2392f07f1fb9ff605303449b",
+            "gitBlobID": null,
+            "membership": "NOT_A_GIT_TREE_FILESYSTEM_FIXTURE",
+            "path": "services/control-plane/src/inv/workspace_resume.py",
+            "rawSHA256": "32c8fae52eb947605c53801d609e9826c514b53c2392f07f1fb9ff605303449b"
+          },
+          {
+            "ASTParseOnly": true,
+            "bytes": 12213,
+            "decodedTextSHA256": "e97af6a21a46ebfc2f836a5339005510dcd3dcd257640a4b375bdb52bd3b0bda",
+            "gitBlobID": null,
+            "membership": "NOT_A_GIT_TREE_FILESYSTEM_FIXTURE",
+            "path": "src/saintvision/services/eval_execution.py",
+            "rawSHA256": "e97af6a21a46ebfc2f836a5339005510dcd3dcd257640a4b375bdb52bd3b0bda"
+          },
+          {
+            "ASTParseOnly": true,
+            "bytes": 13260,
+            "decodedTextSHA256": "3550db9c20fb7e2118f66f0337ed787dd22a166a6ff8cf1c6e9490f9ae9df6e3",
+            "gitBlobID": null,
+            "membership": "NOT_A_GIT_TREE_FILESYSTEM_FIXTURE",
+            "path": "tools/check_remote_workspace.py",
+            "rawSHA256": "3550db9c20fb7e2118f66f0337ed787dd22a166a6ff8cf1c6e9490f9ae9df6e3"
+          },
+          {
+            "ASTParseOnly": true,
+            "bytes": 118,
+            "decodedTextSHA256": "f1bea62c02c3ef54fe5db3bbc22046f51cb685d2ac1511f35d48e828737c1afd",
+            "gitBlobID": null,
+            "membership": "NOT_A_GIT_TREE_FILESYSTEM_FIXTURE",
+            "path": "tools/fixture_second_deliver.py",
+            "rawSHA256": "f1bea62c02c3ef54fe5db3bbc22046f51cb685d2ac1511f35d48e828737c1afd"
+          },
+          {
+            "ASTParseOnly": true,
+            "bytes": 76378,
+            "decodedTextSHA256": "3a2e134e04ac36ec81a20280e47e2f9deb9c190c2f5bed5c26e1ad05206210ed",
+            "gitBlobID": null,
+            "membership": "NOT_A_GIT_TREE_FILESYSTEM_FIXTURE",
+            "path": "tools/intranet_e2e_smoke.py",
+            "rawSHA256": "3a2e134e04ac36ec81a20280e47e2f9deb9c190c2f5bed5c26e1ad05206210ed"
+          },
+          {
+            "ASTParseOnly": true,
+            "bytes": 11689,
+            "decodedTextSHA256": "cd4be84de9a60c03c32daa8e831a527ed9014169e151c7a436383772a5d4ddc0",
+            "gitBlobID": null,
+            "membership": "NOT_A_GIT_TREE_FILESYSTEM_FIXTURE",
+            "path": "tools/lan_execution.py",
+            "rawSHA256": "cd4be84de9a60c03c32daa8e831a527ed9014169e151c7a436383772a5d4ddc0"
+          },
+          {
+            "ASTParseOnly": true,
+            "bytes": 198894,
+            "decodedTextSHA256": "2c626540f495499423b707b063a6cab6a53e1be3af8c324f46af88a94ac8f652",
+            "gitBlobID": null,
+            "membership": "NOT_A_GIT_TREE_FILESYSTEM_FIXTURE",
+            "path": "tools/lan_pilot.py",
+            "rawSHA256": "2c626540f495499423b707b063a6cab6a53e1be3af8c324f46af88a94ac8f652"
+          },
+          {
+            "ASTParseOnly": true,
+            "bytes": 2115,
+            "decodedTextSHA256": "b88449375aa8377d1e069e151d297ca9bd964495a4807d7e3eab26b111da6842",
+            "gitBlobID": null,
+            "membership": "NOT_A_GIT_TREE_FILESYSTEM_FIXTURE",
+            "path": "tools/post_landing_select_run.py",
+            "rawSHA256": "b88449375aa8377d1e069e151d297ca9bd964495a4807d7e3eab26b111da6842"
+          },
+          {
+            "ASTParseOnly": true,
+            "bytes": 14829,
+            "decodedTextSHA256": "2203c2d424ecd7651dcd099b4fd6fb051bd872e919a8bcad44fd2b4043897b2e",
+            "gitBlobID": null,
+            "membership": "NOT_A_GIT_TREE_FILESYSTEM_FIXTURE",
+            "path": "tools/prepare_server_config.py",
+            "rawSHA256": "2203c2d424ecd7651dcd099b4fd6fb051bd872e919a8bcad44fd2b4043897b2e"
+          },
+          {
+            "ASTParseOnly": true,
+            "bytes": 14741,
+            "decodedTextSHA256": "e69fa8ff6c51bd3880f5ec388fe97288a4256169377e17d9d6aa5b7ec2f32c27",
+            "gitBlobID": null,
+            "membership": "NOT_A_GIT_TREE_FILESYSTEM_FIXTURE",
+            "path": "tools/remote_workspace_entry.py",
+            "rawSHA256": "e69fa8ff6c51bd3880f5ec388fe97288a4256169377e17d9d6aa5b7ec2f32c27"
+          },
+          {
+            "ASTParseOnly": true,
+            "bytes": 34190,
+            "decodedTextSHA256": "67388ba4a7ac07156bf70d9286691d1a0dfe1fb76f976cf91f0b1df84dc6743b",
+            "gitBlobID": null,
+            "membership": "NOT_A_GIT_TREE_FILESYSTEM_FIXTURE",
+            "path": "tools/run_ac11_exact_sha_aggregate.py",
+            "rawSHA256": "67388ba4a7ac07156bf70d9286691d1a0dfe1fb76f976cf91f0b1df84dc6743b"
+          },
+          {
+            "ASTParseOnly": true,
+            "bytes": 7618,
+            "decodedTextSHA256": "92296b5f070cd97440889b12b487876cd64240408fe4faa918597dfcc6c7e82c",
+            "gitBlobID": null,
+            "membership": "NOT_A_GIT_TREE_FILESYSTEM_FIXTURE",
+            "path": "tools/run_s04_db_evidence.py",
+            "rawSHA256": "92296b5f070cd97440889b12b487876cd64240408fe4faa918597dfcc6c7e82c"
+          }
+        ],
+        "selector": "NodeDelivery|DeliveryWorker|DeliveryAttempt|DeliveryQueue|node_transport|from[[:space:]].*dispatch|import[[:space:]].*dispatch|\\.deliver\\b",
+        "selectorEngine": "git grep -E (original POSIX ERE, no Python regex translation)",
+        "targetKind": "filesystem-fixture",
+        "workingModel": "No symlinks; read/encoding failures unresolved. Filesystem paths/content/stamps rechecked around selector; not an atomic hostile-filesystem/runtime proof."
+      },
+      "name": "TREE-DISCOVERY-new-matching-module",
+      "normalEnumerationReadEntrypoint": true,
+      "preselectedWorldInjectedInsteadOfDiscovery": false,
+      "realProductWorktreeMutated": false,
+      "reason": "SOURCE_WORLD_PATH_SET_CHANGED",
+      "result": {
+        "existingFinitePredicateRan": false,
+        "extraPaths": [
+          "tools/fixture_second_deliver.py"
+        ],
+        "missingPaths": [],
+        "reason": "SOURCE_WORLD_PATH_SET_CHANGED"
+      },
+      "runtimeExecuted": false,
+      "selectedDeliverReferenceCount": 2,
+      "target": "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105\\.work\\fleet5-selector-discovery-r1-bkiapjw_\\TREE-DISCOVERY-new-matching-module",
+      "targetKind": "filesystem-fixture"
+    },
+    {
+      "expectationMet": true,
+      "expectedReason": "SOURCE_WORLD_PATH_SET_CHANGED",
+      "fixtureIsRealGitCommitOrCheckout": false,
+      "fixtureMembershipNotClaimedTrackedOrUntracked": true,
+      "inventory": {
+        "baseWorldUsedForDiscovery": false,
+        "enumeratedProductionPythonCount": 24,
+        "filesystemFixtureIsGitCommit": false,
+        "pathsDerivedFromEvaluatedTarget": true,
+        "productOrMutantRuntimeExecuted": false,
+        "productionRoots": [
+          "services/control-plane/src",
+          "src",
+          "tools"
+        ],
+        "queryReceipts": [
+          {
+            "argv": [
+              "git",
+              "--literal-pathspecs",
+              "grep",
+              "--no-index",
+              "--no-exclude-standard",
+              "-l",
+              "-z",
+              "-E",
+              "NodeDelivery|DeliveryWorker|DeliveryAttempt|DeliveryQueue|node_transport|from[[:space:]].*dispatch|import[[:space:]].*dispatch|\\.deliver\\b",
+              "--",
+              "services/control-plane/src/inv/build_product_runtime.py",
+              "services/control-plane/src/inv/dispatch.py",
+              "services/control-plane/src/inv/model_remote.py",
+              "services/control-plane/src/inv/node_transport.py",
+              "services/control-plane/src/inv/observer_worker.py",
+              "services/control-plane/src/inv/output_ingestion.py",
+              "services/control-plane/src/inv/remote_git.py",
+              "services/control-plane/src/inv/result_view.py",
+              "services/control-plane/src/inv/storage_check_collect.py",
+              "services/control-plane/src/inv/storage_sampling.py",
+              "services/control-plane/src/inv/terminal.py",
+              "services/control-plane/src/inv/tooling.py",
+              "services/control-plane/src/inv/workspace_config.py",
+              "services/control-plane/src/inv/workspace_resume.py",
+              "src/saintvision/services/eval_execution.py",
+              "tools/check_remote_workspace.py",
+              "tools/intranet_e2e_smoke.py",
+              "tools/lan_execution.py",
+              "tools/lan_pilot.py",
+              "tools/post_landing_select_run.py",
+              "tools/prepare_server_config.py",
+              "tools/remote_workspace_entry.py",
+              "tools/run_ac11_exact_sha_aggregate.py",
+              "tools/run_s04_db_evidence.py"
+            ],
+            "exit": 0,
+            "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stderrUTF8": "",
+            "stdoutSHA256": "b4b934a7e510a6fe0365f67e65b5af9914957a6ed3ecd1a54361355469694774"
+          }
+        ],
+        "requestedRef": null,
+        "resolvedTargetCommitOrWorkingHEAD": null,
+        "root": "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105\\.work\\fleet5-selector-discovery-r1-bkiapjw_\\TREE-DISCOVERY-missing-selected-module",
+        "selectedCount": 24,
+        "selectedInventory": [
+          {
+            "ASTParseOnly": true,
+            "bytes": 22165,
+            "decodedTextSHA256": "7483d65fcb1032aeb05b4d2dd56e09e714cff8ca676de0f80fc3a2f5e447e9af",
+            "gitBlobID": null,
+            "membership": "NOT_A_GIT_TREE_FILESYSTEM_FIXTURE",
+            "path": "services/control-plane/src/inv/build_product_runtime.py",
+            "rawSHA256": "7483d65fcb1032aeb05b4d2dd56e09e714cff8ca676de0f80fc3a2f5e447e9af"
+          },
+          {
+            "ASTParseOnly": true,
+            "bytes": 15823,
+            "decodedTextSHA256": "82f029614537eb5bab56934e4b6736fe3dd52ece54b9b9a3996815b131e41de4",
+            "gitBlobID": null,
+            "membership": "NOT_A_GIT_TREE_FILESYSTEM_FIXTURE",
+            "path": "services/control-plane/src/inv/dispatch.py",
+            "rawSHA256": "82f029614537eb5bab56934e4b6736fe3dd52ece54b9b9a3996815b131e41de4"
+          },
+          {
+            "ASTParseOnly": true,
+            "bytes": 4737,
+            "decodedTextSHA256": "796f61fe8404c2c3a8a4be08eca75d98e3c442a30c04077c66b278e7d60c6737",
+            "gitBlobID": null,
+            "membership": "NOT_A_GIT_TREE_FILESYSTEM_FIXTURE",
+            "path": "services/control-plane/src/inv/model_remote.py",
+            "rawSHA256": "796f61fe8404c2c3a8a4be08eca75d98e3c442a30c04077c66b278e7d60c6737"
+          },
+          {
+            "ASTParseOnly": true,
+            "bytes": 12319,
+            "decodedTextSHA256": "3559bbcdf9568f8930654d860b0edd980eca71c835cde3fe7380a69dd56e18f4",
+            "gitBlobID": null,
+            "membership": "NOT_A_GIT_TREE_FILESYSTEM_FIXTURE",
+            "path": "services/control-plane/src/inv/node_transport.py",
+            "rawSHA256": "3559bbcdf9568f8930654d860b0edd980eca71c835cde3fe7380a69dd56e18f4"
+          },
+          {
+            "ASTParseOnly": true,
+            "bytes": 2821,
+            "decodedTextSHA256": "6bbdf815554fe1f0157247732ddc4dc3069686685c291ef83add55c8f3e92003",
+            "gitBlobID": null,
+            "membership": "NOT_A_GIT_TREE_FILESYSTEM_FIXTURE",
+            "path": "services/control-plane/src/inv/observer_worker.py",
+            "rawSHA256": "6bbdf815554fe1f0157247732ddc4dc3069686685c291ef83add55c8f3e92003"
+          },
+          {
+            "ASTParseOnly": true,
+            "bytes": 9784,
+            "decodedTextSHA256": "e954e1ef8dcae97756a50428af66c9a328e4d362f1aee7d630588431d09b1308",
+            "gitBlobID": null,
+            "membership": "NOT_A_GIT_TREE_FILESYSTEM_FIXTURE",
+            "path": "services/control-plane/src/inv/output_ingestion.py",
+            "rawSHA256": "e954e1ef8dcae97756a50428af66c9a328e4d362f1aee7d630588431d09b1308"
+          },
+          {
+            "ASTParseOnly": true,
+            "bytes": 12723,
+            "decodedTextSHA256": "5efd1057f9208cdb29670073bd8ea5e96f98cfbd5a8173f4daa764d3db5db52e",
+            "gitBlobID": null,
+            "membership": "NOT_A_GIT_TREE_FILESYSTEM_FIXTURE",
+            "path": "services/control-plane/src/inv/remote_git.py",
+            "rawSHA256": "5efd1057f9208cdb29670073bd8ea5e96f98cfbd5a8173f4daa764d3db5db52e"
+          },
+          {
+            "ASTParseOnly": true,
+            "bytes": 16901,
+            "decodedTextSHA256": "900b2b5b3381da451a14a49a2b079b2f9851ea3bc91f30798c9fcde243ceab9a",
+            "gitBlobID": null,
+            "membership": "NOT_A_GIT_TREE_FILESYSTEM_FIXTURE",
+            "path": "services/control-plane/src/inv/result_view.py",
+            "rawSHA256": "900b2b5b3381da451a14a49a2b079b2f9851ea3bc91f30798c9fcde243ceab9a"
+          },
+          {
+            "ASTParseOnly": true,
+            "bytes": 19960,
+            "decodedTextSHA256": "bae67c856cc8bdae52c1f06c4b6e36302e17ae0dd53a24fc01557cae19a3e226",
+            "gitBlobID": null,
+            "membership": "NOT_A_GIT_TREE_FILESYSTEM_FIXTURE",
+            "path": "services/control-plane/src/inv/storage_check_collect.py",
+            "rawSHA256": "bae67c856cc8bdae52c1f06c4b6e36302e17ae0dd53a24fc01557cae19a3e226"
+          },
+          {
+            "ASTParseOnly": true,
+            "bytes": 10765,
+            "decodedTextSHA256": "4e43aa43e8dc9b8ab78af0fde78f9e83b83d7bfdc77b7362ad565741f6f94e8a",
+            "gitBlobID": null,
+            "membership": "NOT_A_GIT_TREE_FILESYSTEM_FIXTURE",
+            "path": "services/control-plane/src/inv/storage_sampling.py",
+            "rawSHA256": "4e43aa43e8dc9b8ab78af0fde78f9e83b83d7bfdc77b7362ad565741f6f94e8a"
+          },
+          {
+            "ASTParseOnly": true,
+            "bytes": 17862,
+            "decodedTextSHA256": "fe294d648b34d617df94449974fc82fed904639b80b8a5da2c9d34f32606bf8e",
+            "gitBlobID": null,
+            "membership": "NOT_A_GIT_TREE_FILESYSTEM_FIXTURE",
+            "path": "services/control-plane/src/inv/terminal.py",
+            "rawSHA256": "fe294d648b34d617df94449974fc82fed904639b80b8a5da2c9d34f32606bf8e"
+          },
+          {
+            "ASTParseOnly": true,
+            "bytes": 15889,
+            "decodedTextSHA256": "de5f6213b196784c6c4280d31a17fba9fe1669eb466edee14197664b37f2ac6c",
+            "gitBlobID": null,
+            "membership": "NOT_A_GIT_TREE_FILESYSTEM_FIXTURE",
+            "path": "services/control-plane/src/inv/tooling.py",
+            "rawSHA256": "de5f6213b196784c6c4280d31a17fba9fe1669eb466edee14197664b37f2ac6c"
+          },
+          {
+            "ASTParseOnly": true,
+            "bytes": 4125,
+            "decodedTextSHA256": "7b77a716b4fb56e951fce110d347ac41f16d1d80d4722ba9d1410a1869b351cb",
+            "gitBlobID": null,
+            "membership": "NOT_A_GIT_TREE_FILESYSTEM_FIXTURE",
+            "path": "services/control-plane/src/inv/workspace_config.py",
+            "rawSHA256": "7b77a716b4fb56e951fce110d347ac41f16d1d80d4722ba9d1410a1869b351cb"
+          },
+          {
+            "ASTParseOnly": true,
+            "bytes": 14468,
+            "decodedTextSHA256": "32c8fae52eb947605c53801d609e9826c514b53c2392f07f1fb9ff605303449b",
+            "gitBlobID": null,
+            "membership": "NOT_A_GIT_TREE_FILESYSTEM_FIXTURE",
+            "path": "services/control-plane/src/inv/workspace_resume.py",
+            "rawSHA256": "32c8fae52eb947605c53801d609e9826c514b53c2392f07f1fb9ff605303449b"
+          },
+          {
+            "ASTParseOnly": true,
+            "bytes": 12213,
+            "decodedTextSHA256": "e97af6a21a46ebfc2f836a5339005510dcd3dcd257640a4b375bdb52bd3b0bda",
+            "gitBlobID": null,
+            "membership": "NOT_A_GIT_TREE_FILESYSTEM_FIXTURE",
+            "path": "src/saintvision/services/eval_execution.py",
+            "rawSHA256": "e97af6a21a46ebfc2f836a5339005510dcd3dcd257640a4b375bdb52bd3b0bda"
+          },
+          {
+            "ASTParseOnly": true,
+            "bytes": 13260,
+            "decodedTextSHA256": "3550db9c20fb7e2118f66f0337ed787dd22a166a6ff8cf1c6e9490f9ae9df6e3",
+            "gitBlobID": null,
+            "membership": "NOT_A_GIT_TREE_FILESYSTEM_FIXTURE",
+            "path": "tools/check_remote_workspace.py",
+            "rawSHA256": "3550db9c20fb7e2118f66f0337ed787dd22a166a6ff8cf1c6e9490f9ae9df6e3"
+          },
+          {
+            "ASTParseOnly": true,
+            "bytes": 76378,
+            "decodedTextSHA256": "3a2e134e04ac36ec81a20280e47e2f9deb9c190c2f5bed5c26e1ad05206210ed",
+            "gitBlobID": null,
+            "membership": "NOT_A_GIT_TREE_FILESYSTEM_FIXTURE",
+            "path": "tools/intranet_e2e_smoke.py",
+            "rawSHA256": "3a2e134e04ac36ec81a20280e47e2f9deb9c190c2f5bed5c26e1ad05206210ed"
+          },
+          {
+            "ASTParseOnly": true,
+            "bytes": 11689,
+            "decodedTextSHA256": "cd4be84de9a60c03c32daa8e831a527ed9014169e151c7a436383772a5d4ddc0",
+            "gitBlobID": null,
+            "membership": "NOT_A_GIT_TREE_FILESYSTEM_FIXTURE",
+            "path": "tools/lan_execution.py",
+            "rawSHA256": "cd4be84de9a60c03c32daa8e831a527ed9014169e151c7a436383772a5d4ddc0"
+          },
+          {
+            "ASTParseOnly": true,
+            "bytes": 198894,
+            "decodedTextSHA256": "2c626540f495499423b707b063a6cab6a53e1be3af8c324f46af88a94ac8f652",
+            "gitBlobID": null,
+            "membership": "NOT_A_GIT_TREE_FILESYSTEM_FIXTURE",
+            "path": "tools/lan_pilot.py",
+            "rawSHA256": "2c626540f495499423b707b063a6cab6a53e1be3af8c324f46af88a94ac8f652"
+          },
+          {
+            "ASTParseOnly": true,
+            "bytes": 2115,
+            "decodedTextSHA256": "b88449375aa8377d1e069e151d297ca9bd964495a4807d7e3eab26b111da6842",
+            "gitBlobID": null,
+            "membership": "NOT_A_GIT_TREE_FILESYSTEM_FIXTURE",
+            "path": "tools/post_landing_select_run.py",
+            "rawSHA256": "b88449375aa8377d1e069e151d297ca9bd964495a4807d7e3eab26b111da6842"
+          },
+          {
+            "ASTParseOnly": true,
+            "bytes": 14829,
+            "decodedTextSHA256": "2203c2d424ecd7651dcd099b4fd6fb051bd872e919a8bcad44fd2b4043897b2e",
+            "gitBlobID": null,
+            "membership": "NOT_A_GIT_TREE_FILESYSTEM_FIXTURE",
+            "path": "tools/prepare_server_config.py",
+            "rawSHA256": "2203c2d424ecd7651dcd099b4fd6fb051bd872e919a8bcad44fd2b4043897b2e"
+          },
+          {
+            "ASTParseOnly": true,
+            "bytes": 14741,
+            "decodedTextSHA256": "e69fa8ff6c51bd3880f5ec388fe97288a4256169377e17d9d6aa5b7ec2f32c27",
+            "gitBlobID": null,
+            "membership": "NOT_A_GIT_TREE_FILESYSTEM_FIXTURE",
+            "path": "tools/remote_workspace_entry.py",
+            "rawSHA256": "e69fa8ff6c51bd3880f5ec388fe97288a4256169377e17d9d6aa5b7ec2f32c27"
+          },
+          {
+            "ASTParseOnly": true,
+            "bytes": 34190,
+            "decodedTextSHA256": "67388ba4a7ac07156bf70d9286691d1a0dfe1fb76f976cf91f0b1df84dc6743b",
+            "gitBlobID": null,
+            "membership": "NOT_A_GIT_TREE_FILESYSTEM_FIXTURE",
+            "path": "tools/run_ac11_exact_sha_aggregate.py",
+            "rawSHA256": "67388ba4a7ac07156bf70d9286691d1a0dfe1fb76f976cf91f0b1df84dc6743b"
+          },
+          {
+            "ASTParseOnly": true,
+            "bytes": 7618,
+            "decodedTextSHA256": "92296b5f070cd97440889b12b487876cd64240408fe4faa918597dfcc6c7e82c",
+            "gitBlobID": null,
+            "membership": "NOT_A_GIT_TREE_FILESYSTEM_FIXTURE",
+            "path": "tools/run_s04_db_evidence.py",
+            "rawSHA256": "92296b5f070cd97440889b12b487876cd64240408fe4faa918597dfcc6c7e82c"
+          }
+        ],
+        "selector": "NodeDelivery|DeliveryWorker|DeliveryAttempt|DeliveryQueue|node_transport|from[[:space:]].*dispatch|import[[:space:]].*dispatch|\\.deliver\\b",
+        "selectorEngine": "git grep -E (original POSIX ERE, no Python regex translation)",
+        "targetKind": "filesystem-fixture",
+        "workingModel": "No symlinks; read/encoding failures unresolved. Filesystem paths/content/stamps rechecked around selector; not an atomic hostile-filesystem/runtime proof."
+      },
+      "name": "TREE-DISCOVERY-missing-selected-module",
+      "normalEnumerationReadEntrypoint": true,
+      "preselectedWorldInjectedInsteadOfDiscovery": false,
+      "realProductWorktreeMutated": false,
+      "reason": "SOURCE_WORLD_PATH_SET_CHANGED",
+      "result": {
+        "existingFinitePredicateRan": false,
+        "extraPaths": [],
+        "missingPaths": [
+          "services/control-plane/src/inv/worker.py"
+        ],
+        "reason": "SOURCE_WORLD_PATH_SET_CHANGED"
+      },
+      "runtimeExecuted": false,
+      "selectedDeliverReferenceCount": 1,
+      "target": "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105\\.work\\fleet5-selector-discovery-r1-bkiapjw_\\TREE-DISCOVERY-missing-selected-module",
+      "targetKind": "filesystem-fixture"
+    },
+    {
+      "expectationMet": true,
+      "expectedReason": null,
+      "fixtureIsRealGitCommitOrCheckout": false,
+      "fixtureMembershipNotClaimedTrackedOrUntracked": true,
+      "inventory": {
+        "baseWorldUsedForDiscovery": false,
+        "enumeratedProductionPythonCount": 26,
+        "filesystemFixtureIsGitCommit": false,
+        "pathsDerivedFromEvaluatedTarget": true,
+        "productOrMutantRuntimeExecuted": false,
+        "productionRoots": [
+          "services/control-plane/src",
+          "src",
+          "tools"
+        ],
+        "queryReceipts": [
+          {
+            "argv": [
+              "git",
+              "--literal-pathspecs",
+              "grep",
+              "--no-index",
+              "--no-exclude-standard",
+              "-l",
+              "-z",
+              "-E",
+              "NodeDelivery|DeliveryWorker|DeliveryAttempt|DeliveryQueue|node_transport|from[[:space:]].*dispatch|import[[:space:]].*dispatch|\\.deliver\\b",
+              "--",
+              "services/control-plane/src/inv/build_product_runtime.py",
+              "services/control-plane/src/inv/dispatch.py",
+              "services/control-plane/src/inv/model_remote.py",
+              "services/control-plane/src/inv/node_transport.py",
+              "services/control-plane/src/inv/observer_worker.py",
+              "services/control-plane/src/inv/output_ingestion.py",
+              "services/control-plane/src/inv/remote_git.py",
+              "services/control-plane/src/inv/result_view.py",
+              "services/control-plane/src/inv/storage_check_collect.py",
+              "services/control-plane/src/inv/storage_sampling.py",
+              "services/control-plane/src/inv/terminal.py",
+              "services/control-plane/src/inv/tooling.py",
+              "services/control-plane/src/inv/worker.py",
+              "services/control-plane/src/inv/workspace_config.py",
+              "services/control-plane/src/inv/workspace_resume.py",
+              "src/saintvision/services/eval_execution.py",
+              "tools/check_remote_workspace.py",
+              "tools/fixture_nonmatching.py",
+              "tools/intranet_e2e_smoke.py",
+              "tools/lan_execution.py",
+              "tools/lan_pilot.py",
+              "tools/post_landing_select_run.py",
+              "tools/prepare_server_config.py",
+              "tools/remote_workspace_entry.py",
+              "tools/run_ac11_exact_sha_aggregate.py",
+              "tools/run_s04_db_evidence.py"
+            ],
+            "exit": 0,
+            "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stderrUTF8": "",
+            "stdoutSHA256": "95a838725ef6ee1311bc831a35d701fd4b3d120707f61200e2846997fd3f9cc0"
+          }
+        ],
+        "requestedRef": null,
+        "resolvedTargetCommitOrWorkingHEAD": null,
+        "root": "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105\\.work\\fleet5-selector-discovery-r1-bkiapjw_\\TREE-DISCOVERY-nonmatching-module",
+        "selectedCount": 25,
+        "selectedInventory": [
+          {
+            "ASTParseOnly": true,
+            "bytes": 22165,
+            "decodedTextSHA256": "7483d65fcb1032aeb05b4d2dd56e09e714cff8ca676de0f80fc3a2f5e447e9af",
+            "gitBlobID": null,
+            "membership": "NOT_A_GIT_TREE_FILESYSTEM_FIXTURE",
+            "path": "services/control-plane/src/inv/build_product_runtime.py",
+            "rawSHA256": "7483d65fcb1032aeb05b4d2dd56e09e714cff8ca676de0f80fc3a2f5e447e9af"
+          },
+          {
+            "ASTParseOnly": true,
+            "bytes": 15823,
+            "decodedTextSHA256": "82f029614537eb5bab56934e4b6736fe3dd52ece54b9b9a3996815b131e41de4",
+            "gitBlobID": null,
+            "membership": "NOT_A_GIT_TREE_FILESYSTEM_FIXTURE",
+            "path": "services/control-plane/src/inv/dispatch.py",
+            "rawSHA256": "82f029614537eb5bab56934e4b6736fe3dd52ece54b9b9a3996815b131e41de4"
+          },
+          {
+            "ASTParseOnly": true,
+            "bytes": 4737,
+            "decodedTextSHA256": "796f61fe8404c2c3a8a4be08eca75d98e3c442a30c04077c66b278e7d60c6737",
+            "gitBlobID": null,
+            "membership": "NOT_A_GIT_TREE_FILESYSTEM_FIXTURE",
+            "path": "services/control-plane/src/inv/model_remote.py",
+            "rawSHA256": "796f61fe8404c2c3a8a4be08eca75d98e3c442a30c04077c66b278e7d60c6737"
+          },
+          {
+            "ASTParseOnly": true,
+            "bytes": 12319,
+            "decodedTextSHA256": "3559bbcdf9568f8930654d860b0edd980eca71c835cde3fe7380a69dd56e18f4",
+            "gitBlobID": null,
+            "membership": "NOT_A_GIT_TREE_FILESYSTEM_FIXTURE",
+            "path": "services/control-plane/src/inv/node_transport.py",
+            "rawSHA256": "3559bbcdf9568f8930654d860b0edd980eca71c835cde3fe7380a69dd56e18f4"
+          },
+          {
+            "ASTParseOnly": true,
+            "bytes": 2821,
+            "decodedTextSHA256": "6bbdf815554fe1f0157247732ddc4dc3069686685c291ef83add55c8f3e92003",
+            "gitBlobID": null,
+            "membership": "NOT_A_GIT_TREE_FILESYSTEM_FIXTURE",
+            "path": "services/control-plane/src/inv/observer_worker.py",
+            "rawSHA256": "6bbdf815554fe1f0157247732ddc4dc3069686685c291ef83add55c8f3e92003"
+          },
+          {
+            "ASTParseOnly": true,
+            "bytes": 9784,
+            "decodedTextSHA256": "e954e1ef8dcae97756a50428af66c9a328e4d362f1aee7d630588431d09b1308",
+            "gitBlobID": null,
+            "membership": "NOT_A_GIT_TREE_FILESYSTEM_FIXTURE",
+            "path": "services/control-plane/src/inv/output_ingestion.py",
+            "rawSHA256": "e954e1ef8dcae97756a50428af66c9a328e4d362f1aee7d630588431d09b1308"
+          },
+          {
+            "ASTParseOnly": true,
+            "bytes": 12723,
+            "decodedTextSHA256": "5efd1057f9208cdb29670073bd8ea5e96f98cfbd5a8173f4daa764d3db5db52e",
+            "gitBlobID": null,
+            "membership": "NOT_A_GIT_TREE_FILESYSTEM_FIXTURE",
+            "path": "services/control-plane/src/inv/remote_git.py",
+            "rawSHA256": "5efd1057f9208cdb29670073bd8ea5e96f98cfbd5a8173f4daa764d3db5db52e"
+          },
+          {
+            "ASTParseOnly": true,
+            "bytes": 16901,
+            "decodedTextSHA256": "900b2b5b3381da451a14a49a2b079b2f9851ea3bc91f30798c9fcde243ceab9a",
+            "gitBlobID": null,
+            "membership": "NOT_A_GIT_TREE_FILESYSTEM_FIXTURE",
+            "path": "services/control-plane/src/inv/result_view.py",
+            "rawSHA256": "900b2b5b3381da451a14a49a2b079b2f9851ea3bc91f30798c9fcde243ceab9a"
+          },
+          {
+            "ASTParseOnly": true,
+            "bytes": 19960,
+            "decodedTextSHA256": "bae67c856cc8bdae52c1f06c4b6e36302e17ae0dd53a24fc01557cae19a3e226",
+            "gitBlobID": null,
+            "membership": "NOT_A_GIT_TREE_FILESYSTEM_FIXTURE",
+            "path": "services/control-plane/src/inv/storage_check_collect.py",
+            "rawSHA256": "bae67c856cc8bdae52c1f06c4b6e36302e17ae0dd53a24fc01557cae19a3e226"
+          },
+          {
+            "ASTParseOnly": true,
+            "bytes": 10765,
+            "decodedTextSHA256": "4e43aa43e8dc9b8ab78af0fde78f9e83b83d7bfdc77b7362ad565741f6f94e8a",
+            "gitBlobID": null,
+            "membership": "NOT_A_GIT_TREE_FILESYSTEM_FIXTURE",
+            "path": "services/control-plane/src/inv/storage_sampling.py",
+            "rawSHA256": "4e43aa43e8dc9b8ab78af0fde78f9e83b83d7bfdc77b7362ad565741f6f94e8a"
+          },
+          {
+            "ASTParseOnly": true,
+            "bytes": 17862,
+            "decodedTextSHA256": "fe294d648b34d617df94449974fc82fed904639b80b8a5da2c9d34f32606bf8e",
+            "gitBlobID": null,
+            "membership": "NOT_A_GIT_TREE_FILESYSTEM_FIXTURE",
+            "path": "services/control-plane/src/inv/terminal.py",
+            "rawSHA256": "fe294d648b34d617df94449974fc82fed904639b80b8a5da2c9d34f32606bf8e"
+          },
+          {
+            "ASTParseOnly": true,
+            "bytes": 15889,
+            "decodedTextSHA256": "de5f6213b196784c6c4280d31a17fba9fe1669eb466edee14197664b37f2ac6c",
+            "gitBlobID": null,
+            "membership": "NOT_A_GIT_TREE_FILESYSTEM_FIXTURE",
+            "path": "services/control-plane/src/inv/tooling.py",
+            "rawSHA256": "de5f6213b196784c6c4280d31a17fba9fe1669eb466edee14197664b37f2ac6c"
+          },
+          {
+            "ASTParseOnly": true,
+            "bytes": 7594,
+            "decodedTextSHA256": "3010b2409bb285de960eb322792b1062ed066275307c9bea53a2cc767b65d4e3",
+            "gitBlobID": null,
+            "membership": "NOT_A_GIT_TREE_FILESYSTEM_FIXTURE",
+            "path": "services/control-plane/src/inv/worker.py",
+            "rawSHA256": "3010b2409bb285de960eb322792b1062ed066275307c9bea53a2cc767b65d4e3"
+          },
+          {
+            "ASTParseOnly": true,
+            "bytes": 4125,
+            "decodedTextSHA256": "7b77a716b4fb56e951fce110d347ac41f16d1d80d4722ba9d1410a1869b351cb",
+            "gitBlobID": null,
+            "membership": "NOT_A_GIT_TREE_FILESYSTEM_FIXTURE",
+            "path": "services/control-plane/src/inv/workspace_config.py",
+            "rawSHA256": "7b77a716b4fb56e951fce110d347ac41f16d1d80d4722ba9d1410a1869b351cb"
+          },
+          {
+            "ASTParseOnly": true,
+            "bytes": 14468,
+            "decodedTextSHA256": "32c8fae52eb947605c53801d609e9826c514b53c2392f07f1fb9ff605303449b",
+            "gitBlobID": null,
+            "membership": "NOT_A_GIT_TREE_FILESYSTEM_FIXTURE",
+            "path": "services/control-plane/src/inv/workspace_resume.py",
+            "rawSHA256": "32c8fae52eb947605c53801d609e9826c514b53c2392f07f1fb9ff605303449b"
+          },
+          {
+            "ASTParseOnly": true,
+            "bytes": 12213,
+            "decodedTextSHA256": "e97af6a21a46ebfc2f836a5339005510dcd3dcd257640a4b375bdb52bd3b0bda",
+            "gitBlobID": null,
+            "membership": "NOT_A_GIT_TREE_FILESYSTEM_FIXTURE",
+            "path": "src/saintvision/services/eval_execution.py",
+            "rawSHA256": "e97af6a21a46ebfc2f836a5339005510dcd3dcd257640a4b375bdb52bd3b0bda"
+          },
+          {
+            "ASTParseOnly": true,
+            "bytes": 13260,
+            "decodedTextSHA256": "3550db9c20fb7e2118f66f0337ed787dd22a166a6ff8cf1c6e9490f9ae9df6e3",
+            "gitBlobID": null,
+            "membership": "NOT_A_GIT_TREE_FILESYSTEM_FIXTURE",
+            "path": "tools/check_remote_workspace.py",
+            "rawSHA256": "3550db9c20fb7e2118f66f0337ed787dd22a166a6ff8cf1c6e9490f9ae9df6e3"
+          },
+          {
+            "ASTParseOnly": true,
+            "bytes": 76378,
+            "decodedTextSHA256": "3a2e134e04ac36ec81a20280e47e2f9deb9c190c2f5bed5c26e1ad05206210ed",
+            "gitBlobID": null,
+            "membership": "NOT_A_GIT_TREE_FILESYSTEM_FIXTURE",
+            "path": "tools/intranet_e2e_smoke.py",
+            "rawSHA256": "3a2e134e04ac36ec81a20280e47e2f9deb9c190c2f5bed5c26e1ad05206210ed"
+          },
+          {
+            "ASTParseOnly": true,
+            "bytes": 11689,
+            "decodedTextSHA256": "cd4be84de9a60c03c32daa8e831a527ed9014169e151c7a436383772a5d4ddc0",
+            "gitBlobID": null,
+            "membership": "NOT_A_GIT_TREE_FILESYSTEM_FIXTURE",
+            "path": "tools/lan_execution.py",
+            "rawSHA256": "cd4be84de9a60c03c32daa8e831a527ed9014169e151c7a436383772a5d4ddc0"
+          },
+          {
+            "ASTParseOnly": true,
+            "bytes": 198894,
+            "decodedTextSHA256": "2c626540f495499423b707b063a6cab6a53e1be3af8c324f46af88a94ac8f652",
+            "gitBlobID": null,
+            "membership": "NOT_A_GIT_TREE_FILESYSTEM_FIXTURE",
+            "path": "tools/lan_pilot.py",
+            "rawSHA256": "2c626540f495499423b707b063a6cab6a53e1be3af8c324f46af88a94ac8f652"
+          },
+          {
+            "ASTParseOnly": true,
+            "bytes": 2115,
+            "decodedTextSHA256": "b88449375aa8377d1e069e151d297ca9bd964495a4807d7e3eab26b111da6842",
+            "gitBlobID": null,
+            "membership": "NOT_A_GIT_TREE_FILESYSTEM_FIXTURE",
+            "path": "tools/post_landing_select_run.py",
+            "rawSHA256": "b88449375aa8377d1e069e151d297ca9bd964495a4807d7e3eab26b111da6842"
+          },
+          {
+            "ASTParseOnly": true,
+            "bytes": 14829,
+            "decodedTextSHA256": "2203c2d424ecd7651dcd099b4fd6fb051bd872e919a8bcad44fd2b4043897b2e",
+            "gitBlobID": null,
+            "membership": "NOT_A_GIT_TREE_FILESYSTEM_FIXTURE",
+            "path": "tools/prepare_server_config.py",
+            "rawSHA256": "2203c2d424ecd7651dcd099b4fd6fb051bd872e919a8bcad44fd2b4043897b2e"
+          },
+          {
+            "ASTParseOnly": true,
+            "bytes": 14741,
+            "decodedTextSHA256": "e69fa8ff6c51bd3880f5ec388fe97288a4256169377e17d9d6aa5b7ec2f32c27",
+            "gitBlobID": null,
+            "membership": "NOT_A_GIT_TREE_FILESYSTEM_FIXTURE",
+            "path": "tools/remote_workspace_entry.py",
+            "rawSHA256": "e69fa8ff6c51bd3880f5ec388fe97288a4256169377e17d9d6aa5b7ec2f32c27"
+          },
+          {
+            "ASTParseOnly": true,
+            "bytes": 34190,
+            "decodedTextSHA256": "67388ba4a7ac07156bf70d9286691d1a0dfe1fb76f976cf91f0b1df84dc6743b",
+            "gitBlobID": null,
+            "membership": "NOT_A_GIT_TREE_FILESYSTEM_FIXTURE",
+            "path": "tools/run_ac11_exact_sha_aggregate.py",
+            "rawSHA256": "67388ba4a7ac07156bf70d9286691d1a0dfe1fb76f976cf91f0b1df84dc6743b"
+          },
+          {
+            "ASTParseOnly": true,
+            "bytes": 7618,
+            "decodedTextSHA256": "92296b5f070cd97440889b12b487876cd64240408fe4faa918597dfcc6c7e82c",
+            "gitBlobID": null,
+            "membership": "NOT_A_GIT_TREE_FILESYSTEM_FIXTURE",
+            "path": "tools/run_s04_db_evidence.py",
+            "rawSHA256": "92296b5f070cd97440889b12b487876cd64240408fe4faa918597dfcc6c7e82c"
+          }
+        ],
+        "selector": "NodeDelivery|DeliveryWorker|DeliveryAttempt|DeliveryQueue|node_transport|from[[:space:]].*dispatch|import[[:space:]].*dispatch|\\.deliver\\b",
+        "selectorEngine": "git grep -E (original POSIX ERE, no Python regex translation)",
+        "targetKind": "filesystem-fixture",
+        "workingModel": "No symlinks; read/encoding failures unresolved. Filesystem paths/content/stamps rechecked around selector; not an atomic hostile-filesystem/runtime proof."
+      },
+      "name": "TREE-DISCOVERY-nonmatching-module",
+      "normalEnumerationReadEntrypoint": true,
+      "preselectedWorldInjectedInsteadOfDiscovery": false,
+      "realProductWorktreeMutated": false,
+      "reason": null,
+      "result": {
+        "classification": "EXACT_CAPTURE_GUARD_DELTA_COVERED_WITH_LEGACY_REFUSAL_PRESERVED",
+        "existingFinitePredicateRan": true,
+        "other24RawBytesEqualRealBASE": true,
+        "ownerDerivationReason": null,
+        "reason": null,
+        "referenceCount": 1,
+        "wholeModuleNormalizedASTEqual": true
+      },
+      "runtimeExecuted": false,
+      "selectedDeliverReferenceCount": 1,
+      "target": "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105\\.work\\fleet5-selector-discovery-r1-bkiapjw_\\TREE-DISCOVERY-nonmatching-module",
+      "targetKind": "filesystem-fixture"
+    },
+    {
+      "detail": {
+        "error": "'utf-8' codec can't decode byte 0xff in position 11: invalid start byte",
+        "path": "tools/fixture_bad_encoding.py"
+      },
+      "existingFinitePredicateRan": false,
+      "expectationMet": true,
+      "expectedReason": "SOURCE_ENCODING_UNRESOLVED",
+      "fixtureIsRealGitCommitOrCheckout": false,
+      "fixtureMembershipNotClaimedTrackedOrUntracked": true,
+      "name": "encoding-failure-not-dropped",
+      "normalEnumerationReadEntrypoint": true,
+      "preselectedWorldInjectedInsteadOfDiscovery": false,
+      "realProductWorktreeMutated": false,
+      "reason": "SOURCE_ENCODING_UNRESOLVED",
+      "runtimeExecuted": false,
+      "target": "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105\\.work\\fleet5-selector-discovery-r1-bkiapjw_\\encoding-failure-not-dropped",
+      "targetKind": "filesystem-fixture",
+      "unresolvedReason": "SOURCE_ENCODING_UNRESOLVED"
+    },
+    {
+      "detail": {
+        "error": "invalid syntax (tools/fixture_bad_parse.py, line 1)",
+        "path": "tools/fixture_bad_parse.py"
+      },
+      "existingFinitePredicateRan": false,
+      "expectationMet": true,
+      "expectedReason": "SELECTED_SOURCE_PARSE_UNRESOLVED",
+      "fixtureIsRealGitCommitOrCheckout": false,
+      "fixtureMembershipNotClaimedTrackedOrUntracked": true,
+      "name": "selected-parse-failure-not-dropped",
+      "normalEnumerationReadEntrypoint": true,
+      "preselectedWorldInjectedInsteadOfDiscovery": false,
+      "realProductWorktreeMutated": false,
+      "reason": "SELECTED_SOURCE_PARSE_UNRESOLVED",
+      "runtimeExecuted": false,
+      "target": "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105\\.work\\fleet5-selector-discovery-r1-bkiapjw_\\selected-parse-failure-not-dropped",
+      "targetKind": "filesystem-fixture",
+      "unresolvedReason": "SELECTED_SOURCE_PARSE_UNRESOLVED"
+    }
+  ],
+  "temporaryDataRoot": "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105\\.work\\fleet5-selector-discovery-r1-bkiapjw_"
+}

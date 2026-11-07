@@ -1,0 +1,17 @@
+{
+  "argv": [
+    "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+    "-B",
+    "tools/check_doc_single_source.py",
+    "--ratchet"
+  ],
+  "cwd": "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105",
+  "directExit": 0,
+  "endKST": "2026-11-07T11:50:19.040849+09:00",
+  "interpreter": "3.14.7 (tags/v3.14.7:823f032, Aug  5 2026, 10:51:32) [MSC v.1944 64 bit (AMD64)]",
+  "outputEncoding": "UTF8-in-JSON-verbatim",
+  "rawBytes": 80,
+  "rawSHA256": "13b5f5afed05999109839be1baec4ef70ea3c71bcb267353e59eba0f2ae3e448",
+  "rawUTF8": "PASS check_doc_single_source --ratchet: 16 pairs, all in baseline, none stale.\r\n",
+  "startKST": "2026-11-07T11:50:18.109206+09:00"
+}

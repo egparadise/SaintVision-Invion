@@ -1,0 +1,831 @@
+{
+  "rows": [
+    {
+      "control": "fixture-exact-selected-source",
+      "targetKind": "filesystem-fixture",
+      "target": "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105\\.work\\fleet5-selector-discovery-r1-bkiapjw_\\fixture-exact-selected-source",
+      "physicallyPresentPythonFiles": [
+        {
+          "path": "services/control-plane/src/inv/build_product_runtime.py",
+          "bytes": 22165,
+          "sha256": "7483d65fcb1032aeb05b4d2dd56e09e714cff8ca676de0f80fc3a2f5e447e9af"
+        },
+        {
+          "path": "services/control-plane/src/inv/dispatch.py",
+          "bytes": 15823,
+          "sha256": "82f029614537eb5bab56934e4b6736fe3dd52ece54b9b9a3996815b131e41de4"
+        },
+        {
+          "path": "services/control-plane/src/inv/model_remote.py",
+          "bytes": 4737,
+          "sha256": "796f61fe8404c2c3a8a4be08eca75d98e3c442a30c04077c66b278e7d60c6737"
+        },
+        {
+          "path": "services/control-plane/src/inv/node_transport.py",
+          "bytes": 12319,
+          "sha256": "3559bbcdf9568f8930654d860b0edd980eca71c835cde3fe7380a69dd56e18f4"
+        },
+        {
+          "path": "services/control-plane/src/inv/observer_worker.py",
+          "bytes": 2821,
+          "sha256": "6bbdf815554fe1f0157247732ddc4dc3069686685c291ef83add55c8f3e92003"
+        },
+        {
+          "path": "services/control-plane/src/inv/output_ingestion.py",
+          "bytes": 9784,
+          "sha256": "e954e1ef8dcae97756a50428af66c9a328e4d362f1aee7d630588431d09b1308"
+        },
+        {
+          "path": "services/control-plane/src/inv/remote_git.py",
+          "bytes": 12723,
+          "sha256": "5efd1057f9208cdb29670073bd8ea5e96f98cfbd5a8173f4daa764d3db5db52e"
+        },
+        {
+          "path": "services/control-plane/src/inv/result_view.py",
+          "bytes": 16901,
+          "sha256": "900b2b5b3381da451a14a49a2b079b2f9851ea3bc91f30798c9fcde243ceab9a"
+        },
+        {
+          "path": "services/control-plane/src/inv/storage_check_collect.py",
+          "bytes": 19960,
+          "sha256": "bae67c856cc8bdae52c1f06c4b6e36302e17ae0dd53a24fc01557cae19a3e226"
+        },
+        {
+          "path": "services/control-plane/src/inv/storage_sampling.py",
+          "bytes": 10765,
+          "sha256": "4e43aa43e8dc9b8ab78af0fde78f9e83b83d7bfdc77b7362ad565741f6f94e8a"
+        },
+        {
+          "path": "services/control-plane/src/inv/terminal.py",
+          "bytes": 17862,
+          "sha256": "fe294d648b34d617df94449974fc82fed904639b80b8a5da2c9d34f32606bf8e"
+        },
+        {
+          "path": "services/control-plane/src/inv/tooling.py",
+          "bytes": 15889,
+          "sha256": "de5f6213b196784c6c4280d31a17fba9fe1669eb466edee14197664b37f2ac6c"
+        },
+        {
+          "path": "services/control-plane/src/inv/worker.py",
+          "bytes": 7594,
+          "sha256": "3010b2409bb285de960eb322792b1062ed066275307c9bea53a2cc767b65d4e3"
+        },
+        {
+          "path": "services/control-plane/src/inv/workspace_config.py",
+          "bytes": 4125,
+          "sha256": "7b77a716b4fb56e951fce110d347ac41f16d1d80d4722ba9d1410a1869b351cb"
+        },
+        {
+          "path": "services/control-plane/src/inv/workspace_resume.py",
+          "bytes": 14468,
+          "sha256": "32c8fae52eb947605c53801d609e9826c514b53c2392f07f1fb9ff605303449b"
+        },
+        {
+          "path": "src/saintvision/services/eval_execution.py",
+          "bytes": 12213,
+          "sha256": "e97af6a21a46ebfc2f836a5339005510dcd3dcd257640a4b375bdb52bd3b0bda"
+        },
+        {
+          "path": "tools/check_remote_workspace.py",
+          "bytes": 13260,
+          "sha256": "3550db9c20fb7e2118f66f0337ed787dd22a166a6ff8cf1c6e9490f9ae9df6e3"
+        },
+        {
+          "path": "tools/intranet_e2e_smoke.py",
+          "bytes": 76378,
+          "sha256": "3a2e134e04ac36ec81a20280e47e2f9deb9c190c2f5bed5c26e1ad05206210ed"
+        },
+        {
+          "path": "tools/lan_execution.py",
+          "bytes": 11689,
+          "sha256": "cd4be84de9a60c03c32daa8e831a527ed9014169e151c7a436383772a5d4ddc0"
+        },
+        {
+          "path": "tools/lan_pilot.py",
+          "bytes": 198894,
+          "sha256": "2c626540f495499423b707b063a6cab6a53e1be3af8c324f46af88a94ac8f652"
+        },
+        {
+          "path": "tools/post_landing_select_run.py",
+          "bytes": 2115,
+          "sha256": "b88449375aa8377d1e069e151d297ca9bd964495a4807d7e3eab26b111da6842"
+        },
+        {
+          "path": "tools/prepare_server_config.py",
+          "bytes": 14829,
+          "sha256": "2203c2d424ecd7651dcd099b4fd6fb051bd872e919a8bcad44fd2b4043897b2e"
+        },
+        {
+          "path": "tools/remote_workspace_entry.py",
+          "bytes": 14741,
+          "sha256": "e69fa8ff6c51bd3880f5ec388fe97288a4256169377e17d9d6aa5b7ec2f32c27"
+        },
+        {
+          "path": "tools/run_ac11_exact_sha_aggregate.py",
+          "bytes": 34190,
+          "sha256": "67388ba4a7ac07156bf70d9286691d1a0dfe1fb76f976cf91f0b1df84dc6743b"
+        },
+        {
+          "path": "tools/run_s04_db_evidence.py",
+          "bytes": 7618,
+          "sha256": "92296b5f070cd97440889b12b487876cd64240408fe4faa918597dfcc6c7e82c"
+        }
+      ],
+      "fileCount": 25,
+      "fixtureIsGitTree": false,
+      "normalCollectorResult": null
+    },
+    {
+      "control": "TREE-DISCOVERY-new-matching-module",
+      "targetKind": "filesystem-fixture",
+      "target": "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105\\.work\\fleet5-selector-discovery-r1-bkiapjw_\\TREE-DISCOVERY-new-matching-module",
+      "physicallyPresentPythonFiles": [
+        {
+          "path": "services/control-plane/src/inv/build_product_runtime.py",
+          "bytes": 22165,
+          "sha256": "7483d65fcb1032aeb05b4d2dd56e09e714cff8ca676de0f80fc3a2f5e447e9af"
+        },
+        {
+          "path": "services/control-plane/src/inv/dispatch.py",
+          "bytes": 15823,
+          "sha256": "82f029614537eb5bab56934e4b6736fe3dd52ece54b9b9a3996815b131e41de4"
+        },
+        {
+          "path": "services/control-plane/src/inv/model_remote.py",
+          "bytes": 4737,
+          "sha256": "796f61fe8404c2c3a8a4be08eca75d98e3c442a30c04077c66b278e7d60c6737"
+        },
+        {
+          "path": "services/control-plane/src/inv/node_transport.py",
+          "bytes": 12319,
+          "sha256": "3559bbcdf9568f8930654d860b0edd980eca71c835cde3fe7380a69dd56e18f4"
+        },
+        {
+          "path": "services/control-plane/src/inv/observer_worker.py",
+          "bytes": 2821,
+          "sha256": "6bbdf815554fe1f0157247732ddc4dc3069686685c291ef83add55c8f3e92003"
+        },
+        {
+          "path": "services/control-plane/src/inv/output_ingestion.py",
+          "bytes": 9784,
+          "sha256": "e954e1ef8dcae97756a50428af66c9a328e4d362f1aee7d630588431d09b1308"
+        },
+        {
+          "path": "services/control-plane/src/inv/remote_git.py",
+          "bytes": 12723,
+          "sha256": "5efd1057f9208cdb29670073bd8ea5e96f98cfbd5a8173f4daa764d3db5db52e"
+        },
+        {
+          "path": "services/control-plane/src/inv/result_view.py",
+          "bytes": 16901,
+          "sha256": "900b2b5b3381da451a14a49a2b079b2f9851ea3bc91f30798c9fcde243ceab9a"
+        },
+        {
+          "path": "services/control-plane/src/inv/storage_check_collect.py",
+          "bytes": 19960,
+          "sha256": "bae67c856cc8bdae52c1f06c4b6e36302e17ae0dd53a24fc01557cae19a3e226"
+        },
+        {
+          "path": "services/control-plane/src/inv/storage_sampling.py",
+          "bytes": 10765,
+          "sha256": "4e43aa43e8dc9b8ab78af0fde78f9e83b83d7bfdc77b7362ad565741f6f94e8a"
+        },
+        {
+          "path": "services/control-plane/src/inv/terminal.py",
+          "bytes": 17862,
+          "sha256": "fe294d648b34d617df94449974fc82fed904639b80b8a5da2c9d34f32606bf8e"
+        },
+        {
+          "path": "services/control-plane/src/inv/tooling.py",
+          "bytes": 15889,
+          "sha256": "de5f6213b196784c6c4280d31a17fba9fe1669eb466edee14197664b37f2ac6c"
+        },
+        {
+          "path": "services/control-plane/src/inv/worker.py",
+          "bytes": 7594,
+          "sha256": "3010b2409bb285de960eb322792b1062ed066275307c9bea53a2cc767b65d4e3"
+        },
+        {
+          "path": "services/control-plane/src/inv/workspace_config.py",
+          "bytes": 4125,
+          "sha256": "7b77a716b4fb56e951fce110d347ac41f16d1d80d4722ba9d1410a1869b351cb"
+        },
+        {
+          "path": "services/control-plane/src/inv/workspace_resume.py",
+          "bytes": 14468,
+          "sha256": "32c8fae52eb947605c53801d609e9826c514b53c2392f07f1fb9ff605303449b"
+        },
+        {
+          "path": "src/saintvision/services/eval_execution.py",
+          "bytes": 12213,
+          "sha256": "e97af6a21a46ebfc2f836a5339005510dcd3dcd257640a4b375bdb52bd3b0bda"
+        },
+        {
+          "path": "tools/check_remote_workspace.py",
+          "bytes": 13260,
+          "sha256": "3550db9c20fb7e2118f66f0337ed787dd22a166a6ff8cf1c6e9490f9ae9df6e3"
+        },
+        {
+          "path": "tools/fixture_second_deliver.py",
+          "bytes": 118,
+          "sha256": "f1bea62c02c3ef54fe5db3bbc22046f51cb685d2ac1511f35d48e828737c1afd"
+        },
+        {
+          "path": "tools/intranet_e2e_smoke.py",
+          "bytes": 76378,
+          "sha256": "3a2e134e04ac36ec81a20280e47e2f9deb9c190c2f5bed5c26e1ad05206210ed"
+        },
+        {
+          "path": "tools/lan_execution.py",
+          "bytes": 11689,
+          "sha256": "cd4be84de9a60c03c32daa8e831a527ed9014169e151c7a436383772a5d4ddc0"
+        },
+        {
+          "path": "tools/lan_pilot.py",
+          "bytes": 198894,
+          "sha256": "2c626540f495499423b707b063a6cab6a53e1be3af8c324f46af88a94ac8f652"
+        },
+        {
+          "path": "tools/post_landing_select_run.py",
+          "bytes": 2115,
+          "sha256": "b88449375aa8377d1e069e151d297ca9bd964495a4807d7e3eab26b111da6842"
+        },
+        {
+          "path": "tools/prepare_server_config.py",
+          "bytes": 14829,
+          "sha256": "2203c2d424ecd7651dcd099b4fd6fb051bd872e919a8bcad44fd2b4043897b2e"
+        },
+        {
+          "path": "tools/remote_workspace_entry.py",
+          "bytes": 14741,
+          "sha256": "e69fa8ff6c51bd3880f5ec388fe97288a4256169377e17d9d6aa5b7ec2f32c27"
+        },
+        {
+          "path": "tools/run_ac11_exact_sha_aggregate.py",
+          "bytes": 34190,
+          "sha256": "67388ba4a7ac07156bf70d9286691d1a0dfe1fb76f976cf91f0b1df84dc6743b"
+        },
+        {
+          "path": "tools/run_s04_db_evidence.py",
+          "bytes": 7618,
+          "sha256": "92296b5f070cd97440889b12b487876cd64240408fe4faa918597dfcc6c7e82c"
+        }
+      ],
+      "fileCount": 26,
+      "fixtureIsGitTree": false,
+      "normalCollectorResult": "SOURCE_WORLD_PATH_SET_CHANGED"
+    },
+    {
+      "control": "TREE-DISCOVERY-missing-selected-module",
+      "targetKind": "filesystem-fixture",
+      "target": "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105\\.work\\fleet5-selector-discovery-r1-bkiapjw_\\TREE-DISCOVERY-missing-selected-module",
+      "physicallyPresentPythonFiles": [
+        {
+          "path": "services/control-plane/src/inv/build_product_runtime.py",
+          "bytes": 22165,
+          "sha256": "7483d65fcb1032aeb05b4d2dd56e09e714cff8ca676de0f80fc3a2f5e447e9af"
+        },
+        {
+          "path": "services/control-plane/src/inv/dispatch.py",
+          "bytes": 15823,
+          "sha256": "82f029614537eb5bab56934e4b6736fe3dd52ece54b9b9a3996815b131e41de4"
+        },
+        {
+          "path": "services/control-plane/src/inv/model_remote.py",
+          "bytes": 4737,
+          "sha256": "796f61fe8404c2c3a8a4be08eca75d98e3c442a30c04077c66b278e7d60c6737"
+        },
+        {
+          "path": "services/control-plane/src/inv/node_transport.py",
+          "bytes": 12319,
+          "sha256": "3559bbcdf9568f8930654d860b0edd980eca71c835cde3fe7380a69dd56e18f4"
+        },
+        {
+          "path": "services/control-plane/src/inv/observer_worker.py",
+          "bytes": 2821,
+          "sha256": "6bbdf815554fe1f0157247732ddc4dc3069686685c291ef83add55c8f3e92003"
+        },
+        {
+          "path": "services/control-plane/src/inv/output_ingestion.py",
+          "bytes": 9784,
+          "sha256": "e954e1ef8dcae97756a50428af66c9a328e4d362f1aee7d630588431d09b1308"
+        },
+        {
+          "path": "services/control-plane/src/inv/remote_git.py",
+          "bytes": 12723,
+          "sha256": "5efd1057f9208cdb29670073bd8ea5e96f98cfbd5a8173f4daa764d3db5db52e"
+        },
+        {
+          "path": "services/control-plane/src/inv/result_view.py",
+          "bytes": 16901,
+          "sha256": "900b2b5b3381da451a14a49a2b079b2f9851ea3bc91f30798c9fcde243ceab9a"
+        },
+        {
+          "path": "services/control-plane/src/inv/storage_check_collect.py",
+          "bytes": 19960,
+          "sha256": "bae67c856cc8bdae52c1f06c4b6e36302e17ae0dd53a24fc01557cae19a3e226"
+        },
+        {
+          "path": "services/control-plane/src/inv/storage_sampling.py",
+          "bytes": 10765,
+          "sha256": "4e43aa43e8dc9b8ab78af0fde78f9e83b83d7bfdc77b7362ad565741f6f94e8a"
+        },
+        {
+          "path": "services/control-plane/src/inv/terminal.py",
+          "bytes": 17862,
+          "sha256": "fe294d648b34d617df94449974fc82fed904639b80b8a5da2c9d34f32606bf8e"
+        },
+        {
+          "path": "services/control-plane/src/inv/tooling.py",
+          "bytes": 15889,
+          "sha256": "de5f6213b196784c6c4280d31a17fba9fe1669eb466edee14197664b37f2ac6c"
+        },
+        {
+          "path": "services/control-plane/src/inv/workspace_config.py",
+          "bytes": 4125,
+          "sha256": "7b77a716b4fb56e951fce110d347ac41f16d1d80d4722ba9d1410a1869b351cb"
+        },
+        {
+          "path": "services/control-plane/src/inv/workspace_resume.py",
+          "bytes": 14468,
+          "sha256": "32c8fae52eb947605c53801d609e9826c514b53c2392f07f1fb9ff605303449b"
+        },
+        {
+          "path": "src/saintvision/services/eval_execution.py",
+          "bytes": 12213,
+          "sha256": "e97af6a21a46ebfc2f836a5339005510dcd3dcd257640a4b375bdb52bd3b0bda"
+        },
+        {
+          "path": "tools/check_remote_workspace.py",
+          "bytes": 13260,
+          "sha256": "3550db9c20fb7e2118f66f0337ed787dd22a166a6ff8cf1c6e9490f9ae9df6e3"
+        },
+        {
+          "path": "tools/intranet_e2e_smoke.py",
+          "bytes": 76378,
+          "sha256": "3a2e134e04ac36ec81a20280e47e2f9deb9c190c2f5bed5c26e1ad05206210ed"
+        },
+        {
+          "path": "tools/lan_execution.py",
+          "bytes": 11689,
+          "sha256": "cd4be84de9a60c03c32daa8e831a527ed9014169e151c7a436383772a5d4ddc0"
+        },
+        {
+          "path": "tools/lan_pilot.py",
+          "bytes": 198894,
+          "sha256": "2c626540f495499423b707b063a6cab6a53e1be3af8c324f46af88a94ac8f652"
+        },
+        {
+          "path": "tools/post_landing_select_run.py",
+          "bytes": 2115,
+          "sha256": "b88449375aa8377d1e069e151d297ca9bd964495a4807d7e3eab26b111da6842"
+        },
+        {
+          "path": "tools/prepare_server_config.py",
+          "bytes": 14829,
+          "sha256": "2203c2d424ecd7651dcd099b4fd6fb051bd872e919a8bcad44fd2b4043897b2e"
+        },
+        {
+          "path": "tools/remote_workspace_entry.py",
+          "bytes": 14741,
+          "sha256": "e69fa8ff6c51bd3880f5ec388fe97288a4256169377e17d9d6aa5b7ec2f32c27"
+        },
+        {
+          "path": "tools/run_ac11_exact_sha_aggregate.py",
+          "bytes": 34190,
+          "sha256": "67388ba4a7ac07156bf70d9286691d1a0dfe1fb76f976cf91f0b1df84dc6743b"
+        },
+        {
+          "path": "tools/run_s04_db_evidence.py",
+          "bytes": 7618,
+          "sha256": "92296b5f070cd97440889b12b487876cd64240408fe4faa918597dfcc6c7e82c"
+        }
+      ],
+      "fileCount": 24,
+      "fixtureIsGitTree": false,
+      "normalCollectorResult": "SOURCE_WORLD_PATH_SET_CHANGED"
+    },
+    {
+      "control": "TREE-DISCOVERY-nonmatching-module",
+      "targetKind": "filesystem-fixture",
+      "target": "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105\\.work\\fleet5-selector-discovery-r1-bkiapjw_\\TREE-DISCOVERY-nonmatching-module",
+      "physicallyPresentPythonFiles": [
+        {
+          "path": "services/control-plane/src/inv/build_product_runtime.py",
+          "bytes": 22165,
+          "sha256": "7483d65fcb1032aeb05b4d2dd56e09e714cff8ca676de0f80fc3a2f5e447e9af"
+        },
+        {
+          "path": "services/control-plane/src/inv/dispatch.py",
+          "bytes": 15823,
+          "sha256": "82f029614537eb5bab56934e4b6736fe3dd52ece54b9b9a3996815b131e41de4"
+        },
+        {
+          "path": "services/control-plane/src/inv/model_remote.py",
+          "bytes": 4737,
+          "sha256": "796f61fe8404c2c3a8a4be08eca75d98e3c442a30c04077c66b278e7d60c6737"
+        },
+        {
+          "path": "services/control-plane/src/inv/node_transport.py",
+          "bytes": 12319,
+          "sha256": "3559bbcdf9568f8930654d860b0edd980eca71c835cde3fe7380a69dd56e18f4"
+        },
+        {
+          "path": "services/control-plane/src/inv/observer_worker.py",
+          "bytes": 2821,
+          "sha256": "6bbdf815554fe1f0157247732ddc4dc3069686685c291ef83add55c8f3e92003"
+        },
+        {
+          "path": "services/control-plane/src/inv/output_ingestion.py",
+          "bytes": 9784,
+          "sha256": "e954e1ef8dcae97756a50428af66c9a328e4d362f1aee7d630588431d09b1308"
+        },
+        {
+          "path": "services/control-plane/src/inv/remote_git.py",
+          "bytes": 12723,
+          "sha256": "5efd1057f9208cdb29670073bd8ea5e96f98cfbd5a8173f4daa764d3db5db52e"
+        },
+        {
+          "path": "services/control-plane/src/inv/result_view.py",
+          "bytes": 16901,
+          "sha256": "900b2b5b3381da451a14a49a2b079b2f9851ea3bc91f30798c9fcde243ceab9a"
+        },
+        {
+          "path": "services/control-plane/src/inv/storage_check_collect.py",
+          "bytes": 19960,
+          "sha256": "bae67c856cc8bdae52c1f06c4b6e36302e17ae0dd53a24fc01557cae19a3e226"
+        },
+        {
+          "path": "services/control-plane/src/inv/storage_sampling.py",
+          "bytes": 10765,
+          "sha256": "4e43aa43e8dc9b8ab78af0fde78f9e83b83d7bfdc77b7362ad565741f6f94e8a"
+        },
+        {
+          "path": "services/control-plane/src/inv/terminal.py",
+          "bytes": 17862,
+          "sha256": "fe294d648b34d617df94449974fc82fed904639b80b8a5da2c9d34f32606bf8e"
+        },
+        {
+          "path": "services/control-plane/src/inv/tooling.py",
+          "bytes": 15889,
+          "sha256": "de5f6213b196784c6c4280d31a17fba9fe1669eb466edee14197664b37f2ac6c"
+        },
+        {
+          "path": "services/control-plane/src/inv/worker.py",
+          "bytes": 7594,
+          "sha256": "3010b2409bb285de960eb322792b1062ed066275307c9bea53a2cc767b65d4e3"
+        },
+        {
+          "path": "services/control-plane/src/inv/workspace_config.py",
+          "bytes": 4125,
+          "sha256": "7b77a716b4fb56e951fce110d347ac41f16d1d80d4722ba9d1410a1869b351cb"
+        },
+        {
+          "path": "services/control-plane/src/inv/workspace_resume.py",
+          "bytes": 14468,
+          "sha256": "32c8fae52eb947605c53801d609e9826c514b53c2392f07f1fb9ff605303449b"
+        },
+        {
+          "path": "src/saintvision/services/eval_execution.py",
+          "bytes": 12213,
+          "sha256": "e97af6a21a46ebfc2f836a5339005510dcd3dcd257640a4b375bdb52bd3b0bda"
+        },
+        {
+          "path": "tools/check_remote_workspace.py",
+          "bytes": 13260,
+          "sha256": "3550db9c20fb7e2118f66f0337ed787dd22a166a6ff8cf1c6e9490f9ae9df6e3"
+        },
+        {
+          "path": "tools/fixture_nonmatching.py",
+          "bytes": 35,
+          "sha256": "c8828869b89a748382e8dcd1bae329c31d5b7a136d9caa2914790a7b8261a443"
+        },
+        {
+          "path": "tools/intranet_e2e_smoke.py",
+          "bytes": 76378,
+          "sha256": "3a2e134e04ac36ec81a20280e47e2f9deb9c190c2f5bed5c26e1ad05206210ed"
+        },
+        {
+          "path": "tools/lan_execution.py",
+          "bytes": 11689,
+          "sha256": "cd4be84de9a60c03c32daa8e831a527ed9014169e151c7a436383772a5d4ddc0"
+        },
+        {
+          "path": "tools/lan_pilot.py",
+          "bytes": 198894,
+          "sha256": "2c626540f495499423b707b063a6cab6a53e1be3af8c324f46af88a94ac8f652"
+        },
+        {
+          "path": "tools/post_landing_select_run.py",
+          "bytes": 2115,
+          "sha256": "b88449375aa8377d1e069e151d297ca9bd964495a4807d7e3eab26b111da6842"
+        },
+        {
+          "path": "tools/prepare_server_config.py",
+          "bytes": 14829,
+          "sha256": "2203c2d424ecd7651dcd099b4fd6fb051bd872e919a8bcad44fd2b4043897b2e"
+        },
+        {
+          "path": "tools/remote_workspace_entry.py",
+          "bytes": 14741,
+          "sha256": "e69fa8ff6c51bd3880f5ec388fe97288a4256169377e17d9d6aa5b7ec2f32c27"
+        },
+        {
+          "path": "tools/run_ac11_exact_sha_aggregate.py",
+          "bytes": 34190,
+          "sha256": "67388ba4a7ac07156bf70d9286691d1a0dfe1fb76f976cf91f0b1df84dc6743b"
+        },
+        {
+          "path": "tools/run_s04_db_evidence.py",
+          "bytes": 7618,
+          "sha256": "92296b5f070cd97440889b12b487876cd64240408fe4faa918597dfcc6c7e82c"
+        }
+      ],
+      "fileCount": 26,
+      "fixtureIsGitTree": false,
+      "normalCollectorResult": null
+    },
+    {
+      "control": "encoding-failure-not-dropped",
+      "targetKind": "filesystem-fixture",
+      "target": "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105\\.work\\fleet5-selector-discovery-r1-bkiapjw_\\encoding-failure-not-dropped",
+      "physicallyPresentPythonFiles": [
+        {
+          "path": "services/control-plane/src/inv/build_product_runtime.py",
+          "bytes": 22165,
+          "sha256": "7483d65fcb1032aeb05b4d2dd56e09e714cff8ca676de0f80fc3a2f5e447e9af"
+        },
+        {
+          "path": "services/control-plane/src/inv/dispatch.py",
+          "bytes": 15823,
+          "sha256": "82f029614537eb5bab56934e4b6736fe3dd52ece54b9b9a3996815b131e41de4"
+        },
+        {
+          "path": "services/control-plane/src/inv/model_remote.py",
+          "bytes": 4737,
+          "sha256": "796f61fe8404c2c3a8a4be08eca75d98e3c442a30c04077c66b278e7d60c6737"
+        },
+        {
+          "path": "services/control-plane/src/inv/node_transport.py",
+          "bytes": 12319,
+          "sha256": "3559bbcdf9568f8930654d860b0edd980eca71c835cde3fe7380a69dd56e18f4"
+        },
+        {
+          "path": "services/control-plane/src/inv/observer_worker.py",
+          "bytes": 2821,
+          "sha256": "6bbdf815554fe1f0157247732ddc4dc3069686685c291ef83add55c8f3e92003"
+        },
+        {
+          "path": "services/control-plane/src/inv/output_ingestion.py",
+          "bytes": 9784,
+          "sha256": "e954e1ef8dcae97756a50428af66c9a328e4d362f1aee7d630588431d09b1308"
+        },
+        {
+          "path": "services/control-plane/src/inv/remote_git.py",
+          "bytes": 12723,
+          "sha256": "5efd1057f9208cdb29670073bd8ea5e96f98cfbd5a8173f4daa764d3db5db52e"
+        },
+        {
+          "path": "services/control-plane/src/inv/result_view.py",
+          "bytes": 16901,
+          "sha256": "900b2b5b3381da451a14a49a2b079b2f9851ea3bc91f30798c9fcde243ceab9a"
+        },
+        {
+          "path": "services/control-plane/src/inv/storage_check_collect.py",
+          "bytes": 19960,
+          "sha256": "bae67c856cc8bdae52c1f06c4b6e36302e17ae0dd53a24fc01557cae19a3e226"
+        },
+        {
+          "path": "services/control-plane/src/inv/storage_sampling.py",
+          "bytes": 10765,
+          "sha256": "4e43aa43e8dc9b8ab78af0fde78f9e83b83d7bfdc77b7362ad565741f6f94e8a"
+        },
+        {
+          "path": "services/control-plane/src/inv/terminal.py",
+          "bytes": 17862,
+          "sha256": "fe294d648b34d617df94449974fc82fed904639b80b8a5da2c9d34f32606bf8e"
+        },
+        {
+          "path": "services/control-plane/src/inv/tooling.py",
+          "bytes": 15889,
+          "sha256": "de5f6213b196784c6c4280d31a17fba9fe1669eb466edee14197664b37f2ac6c"
+        },
+        {
+          "path": "services/control-plane/src/inv/worker.py",
+          "bytes": 7594,
+          "sha256": "3010b2409bb285de960eb322792b1062ed066275307c9bea53a2cc767b65d4e3"
+        },
+        {
+          "path": "services/control-plane/src/inv/workspace_config.py",
+          "bytes": 4125,
+          "sha256": "7b77a716b4fb56e951fce110d347ac41f16d1d80d4722ba9d1410a1869b351cb"
+        },
+        {
+          "path": "services/control-plane/src/inv/workspace_resume.py",
+          "bytes": 14468,
+          "sha256": "32c8fae52eb947605c53801d609e9826c514b53c2392f07f1fb9ff605303449b"
+        },
+        {
+          "path": "src/saintvision/services/eval_execution.py",
+          "bytes": 12213,
+          "sha256": "e97af6a21a46ebfc2f836a5339005510dcd3dcd257640a4b375bdb52bd3b0bda"
+        },
+        {
+          "path": "tools/check_remote_workspace.py",
+          "bytes": 13260,
+          "sha256": "3550db9c20fb7e2118f66f0337ed787dd22a166a6ff8cf1c6e9490f9ae9df6e3"
+        },
+        {
+          "path": "tools/fixture_bad_encoding.py",
+          "bytes": 12,
+          "sha256": "2d5d5860e5326bfa6d44819e9ad65498103d5bf45d6bd527d844f96d9fc3f954"
+        },
+        {
+          "path": "tools/intranet_e2e_smoke.py",
+          "bytes": 76378,
+          "sha256": "3a2e134e04ac36ec81a20280e47e2f9deb9c190c2f5bed5c26e1ad05206210ed"
+        },
+        {
+          "path": "tools/lan_execution.py",
+          "bytes": 11689,
+          "sha256": "cd4be84de9a60c03c32daa8e831a527ed9014169e151c7a436383772a5d4ddc0"
+        },
+        {
+          "path": "tools/lan_pilot.py",
+          "bytes": 198894,
+          "sha256": "2c626540f495499423b707b063a6cab6a53e1be3af8c324f46af88a94ac8f652"
+        },
+        {
+          "path": "tools/post_landing_select_run.py",
+          "bytes": 2115,
+          "sha256": "b88449375aa8377d1e069e151d297ca9bd964495a4807d7e3eab26b111da6842"
+        },
+        {
+          "path": "tools/prepare_server_config.py",
+          "bytes": 14829,
+          "sha256": "2203c2d424ecd7651dcd099b4fd6fb051bd872e919a8bcad44fd2b4043897b2e"
+        },
+        {
+          "path": "tools/remote_workspace_entry.py",
+          "bytes": 14741,
+          "sha256": "e69fa8ff6c51bd3880f5ec388fe97288a4256169377e17d9d6aa5b7ec2f32c27"
+        },
+        {
+          "path": "tools/run_ac11_exact_sha_aggregate.py",
+          "bytes": 34190,
+          "sha256": "67388ba4a7ac07156bf70d9286691d1a0dfe1fb76f976cf91f0b1df84dc6743b"
+        },
+        {
+          "path": "tools/run_s04_db_evidence.py",
+          "bytes": 7618,
+          "sha256": "92296b5f070cd97440889b12b487876cd64240408fe4faa918597dfcc6c7e82c"
+        }
+      ],
+      "fileCount": 26,
+      "fixtureIsGitTree": false,
+      "normalCollectorResult": "SOURCE_ENCODING_UNRESOLVED"
+    },
+    {
+      "control": "selected-parse-failure-not-dropped",
+      "targetKind": "filesystem-fixture",
+      "target": "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105\\.work\\fleet5-selector-discovery-r1-bkiapjw_\\selected-parse-failure-not-dropped",
+      "physicallyPresentPythonFiles": [
+        {
+          "path": "services/control-plane/src/inv/build_product_runtime.py",
+          "bytes": 22165,
+          "sha256": "7483d65fcb1032aeb05b4d2dd56e09e714cff8ca676de0f80fc3a2f5e447e9af"
+        },
+        {
+          "path": "services/control-plane/src/inv/dispatch.py",
+          "bytes": 15823,
+          "sha256": "82f029614537eb5bab56934e4b6736fe3dd52ece54b9b9a3996815b131e41de4"
+        },
+        {
+          "path": "services/control-plane/src/inv/model_remote.py",
+          "bytes": 4737,
+          "sha256": "796f61fe8404c2c3a8a4be08eca75d98e3c442a30c04077c66b278e7d60c6737"
+        },
+        {
+          "path": "services/control-plane/src/inv/node_transport.py",
+          "bytes": 12319,
+          "sha256": "3559bbcdf9568f8930654d860b0edd980eca71c835cde3fe7380a69dd56e18f4"
+        },
+        {
+          "path": "services/control-plane/src/inv/observer_worker.py",
+          "bytes": 2821,
+          "sha256": "6bbdf815554fe1f0157247732ddc4dc3069686685c291ef83add55c8f3e92003"
+        },
+        {
+          "path": "services/control-plane/src/inv/output_ingestion.py",
+          "bytes": 9784,
+          "sha256": "e954e1ef8dcae97756a50428af66c9a328e4d362f1aee7d630588431d09b1308"
+        },
+        {
+          "path": "services/control-plane/src/inv/remote_git.py",
+          "bytes": 12723,
+          "sha256": "5efd1057f9208cdb29670073bd8ea5e96f98cfbd5a8173f4daa764d3db5db52e"
+        },
+        {
+          "path": "services/control-plane/src/inv/result_view.py",
+          "bytes": 16901,
+          "sha256": "900b2b5b3381da451a14a49a2b079b2f9851ea3bc91f30798c9fcde243ceab9a"
+        },
+        {
+          "path": "services/control-plane/src/inv/storage_check_collect.py",
+          "bytes": 19960,
+          "sha256": "bae67c856cc8bdae52c1f06c4b6e36302e17ae0dd53a24fc01557cae19a3e226"
+        },
+        {
+          "path": "services/control-plane/src/inv/storage_sampling.py",
+          "bytes": 10765,
+          "sha256": "4e43aa43e8dc9b8ab78af0fde78f9e83b83d7bfdc77b7362ad565741f6f94e8a"
+        },
+        {
+          "path": "services/control-plane/src/inv/terminal.py",
+          "bytes": 17862,
+          "sha256": "fe294d648b34d617df94449974fc82fed904639b80b8a5da2c9d34f32606bf8e"
+        },
+        {
+          "path": "services/control-plane/src/inv/tooling.py",
+          "bytes": 15889,
+          "sha256": "de5f6213b196784c6c4280d31a17fba9fe1669eb466edee14197664b37f2ac6c"
+        },
+        {
+          "path": "services/control-plane/src/inv/worker.py",
+          "bytes": 7594,
+          "sha256": "3010b2409bb285de960eb322792b1062ed066275307c9bea53a2cc767b65d4e3"
+        },
+        {
+          "path": "services/control-plane/src/inv/workspace_config.py",
+          "bytes": 4125,
+          "sha256": "7b77a716b4fb56e951fce110d347ac41f16d1d80d4722ba9d1410a1869b351cb"
+        },
+        {
+          "path": "services/control-plane/src/inv/workspace_resume.py",
+          "bytes": 14468,
+          "sha256": "32c8fae52eb947605c53801d609e9826c514b53c2392f07f1fb9ff605303449b"
+        },
+        {
+          "path": "src/saintvision/services/eval_execution.py",
+          "bytes": 12213,
+          "sha256": "e97af6a21a46ebfc2f836a5339005510dcd3dcd257640a4b375bdb52bd3b0bda"
+        },
+        {
+          "path": "tools/check_remote_workspace.py",
+          "bytes": 13260,
+          "sha256": "3550db9c20fb7e2118f66f0337ed787dd22a166a6ff8cf1c6e9490f9ae9df6e3"
+        },
+        {
+          "path": "tools/fixture_bad_parse.py",
+          "bytes": 36,
+          "sha256": "86dbf7969d3b2d32baeef580840e8b29990c79e2612df46ffe2317aa7842e216"
+        },
+        {
+          "path": "tools/intranet_e2e_smoke.py",
+          "bytes": 76378,
+          "sha256": "3a2e134e04ac36ec81a20280e47e2f9deb9c190c2f5bed5c26e1ad05206210ed"
+        },
+        {
+          "path": "tools/lan_execution.py",
+          "bytes": 11689,
+          "sha256": "cd4be84de9a60c03c32daa8e831a527ed9014169e151c7a436383772a5d4ddc0"
+        },
+        {
+          "path": "tools/lan_pilot.py",
+          "bytes": 198894,
+          "sha256": "2c626540f495499423b707b063a6cab6a53e1be3af8c324f46af88a94ac8f652"
+        },
+        {
+          "path": "tools/post_landing_select_run.py",
+          "bytes": 2115,
+          "sha256": "b88449375aa8377d1e069e151d297ca9bd964495a4807d7e3eab26b111da6842"
+        },
+        {
+          "path": "tools/prepare_server_config.py",
+          "bytes": 14829,
+          "sha256": "2203c2d424ecd7651dcd099b4fd6fb051bd872e919a8bcad44fd2b4043897b2e"
+        },
+        {
+          "path": "tools/remote_workspace_entry.py",
+          "bytes": 14741,
+          "sha256": "e69fa8ff6c51bd3880f5ec388fe97288a4256169377e17d9d6aa5b7ec2f32c27"
+        },
+        {
+          "path": "tools/run_ac11_exact_sha_aggregate.py",
+          "bytes": 34190,
+          "sha256": "67388ba4a7ac07156bf70d9286691d1a0dfe1fb76f976cf91f0b1df84dc6743b"
+        },
+        {
+          "path": "tools/run_s04_db_evidence.py",
+          "bytes": 7618,
+          "sha256": "92296b5f070cd97440889b12b487876cd64240408fe4faa918597dfcc6c7e82c"
+        }
+      ],
+      "fileCount": 26,
+      "fixtureIsGitTree": false,
+      "normalCollectorResult": "SELECTED_SOURCE_PARSE_UNRESOLVED"
+    }
+  ],
+  "sourceMutationOrRuntimeExecuted": false,
+  "noCleanupAttempted": true
+}

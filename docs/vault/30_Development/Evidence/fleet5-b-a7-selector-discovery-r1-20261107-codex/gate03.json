@@ -1,0 +1,19 @@
+{
+  "argv": [
+    "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+    "-B",
+    "tools/check_doc_path_citations.py",
+    "--ratchet",
+    "--base-ref",
+    "746789a36091c8601afea23fe176069e2fa7d87b"
+  ],
+  "cwd": "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105",
+  "directExit": 0,
+  "endKST": "2026-11-07T11:50:18.108550+09:00",
+  "interpreter": "3.14.7 (tags/v3.14.7:823f032, Aug  5 2026, 10:51:32) [MSC v.1944 64 bit (AMD64)]",
+  "outputEncoding": "UTF8-in-JSON-verbatim",
+  "rawBytes": 112,
+  "rawSHA256": "389921b50662776ed834a285f70fc44ab61f7d5bdb4c5249c0a73c98113980de",
+  "rawUTF8": "PASS check_doc_path_citations --ratchet: 290 broken citation(s), all in baseline, none stale, floor unchanged.\r\n",
+  "startKST": "2026-11-07T11:50:05.872083+09:00"
+}

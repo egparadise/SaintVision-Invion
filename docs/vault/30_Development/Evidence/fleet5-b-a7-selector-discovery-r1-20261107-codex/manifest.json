@@ -1,0 +1,119 @@
+{
+  "task": "FLEET5-B-A7-SELECTOR-DISCOVERY-R1-20261107",
+  "base": "746789a36091c8601afea23fe176069e2fa7d87b",
+  "owner": "Codex",
+  "reviewer": "Actual independent delta review through Root PENDING",
+  "atKST": "2026-11-07T11:51:50.693188+09:00",
+  "files": [
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-selector-discovery-r1-20261107-codex/collector.py",
+      "bytes": 9078,
+      "workingRawSHA256": "1ec06ad14750f2277241bdb1997508b8f5f57687ac96e4248a08075425e69ac5"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-selector-discovery-r1-20261107-codex/deliver.py",
+      "bytes": 4395,
+      "workingRawSHA256": "acdd248bf88da8672f2be6c57fe9f2af3f0884b84dfa1155f5bf5af32f4fc9fc"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-selector-discovery-r1-20261107-codex/fixture-input-inventories.json",
+      "bytes": 32667,
+      "workingRawSHA256": "ec468a87d4c8631a9c27f2e8e9286b29b00eb090b87c38d8e59152f4eb231cc4"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-selector-discovery-r1-20261107-codex/gate01.json",
+      "bytes": 722,
+      "workingRawSHA256": "9664d282438af5a5ed291400c3f6052ab914bffa4a342e310d471deeb06ba925"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-selector-discovery-r1-20261107-codex/gate02.json",
+      "bytes": 762,
+      "workingRawSHA256": "14cfdced49c1c5b18ed94cbd1db16e88a3b43203b8c4749f569af4dc3b1aea83"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-selector-discovery-r1-20261107-codex/gate03.json",
+      "bytes": 804,
+      "workingRawSHA256": "690c62ee6965fa03b70d3c405ed1735bca61134bcbf3902ac5d69b92b8dd5375"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-selector-discovery-r1-20261107-codex/gate04.json",
+      "bytes": 704,
+      "workingRawSHA256": "00ce4287bd65ae8637989610142915c4b71d8db78ce77b46f1ea680c1546af3b"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-selector-discovery-r1-20261107-codex/gate05.json",
+      "bytes": 1431,
+      "workingRawSHA256": "b3a3536f02c7be48ac9357f17a6dd13fea10735a95dd449853a129eb1af9618a"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-selector-discovery-r1-20261107-codex/gate06.json",
+      "bytes": 572,
+      "workingRawSHA256": "ff63558c3d45b3a6b48cd4030e1b78f023f8ad536202df7fec10c4b8ee337950"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-selector-discovery-r1-20261107-codex/gates-complete.json",
+      "bytes": 5579,
+      "workingRawSHA256": "41a793e3e1bc6c3c18d105038df752bdcc197d777a885ab8434ab469b4c47a4e"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-selector-discovery-r1-20261107-codex/probe.py",
+      "bytes": 12880,
+      "workingRawSHA256": "f0ab5f85f24c029eb550db5482832dfe6d0c7cbe74350e7ec5e2560b2e0f1c46"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-selector-discovery-r1-20261107-codex/probe01/actual-commit-inventory.json",
+      "bytes": 21820,
+      "workingRawSHA256": "83806528f1d76513244d42428229844e8eac9ef32476cd341c83712c55ceffe8"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-selector-discovery-r1-20261107-codex/probe01/actual-target-results.json",
+      "bytes": 1373,
+      "workingRawSHA256": "52c37e3f64d10a5ceb0e1c49a5db936c6a9dccab2b35cad46f3aad26fd71bc79"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-selector-discovery-r1-20261107-codex/probe01/actual-working-inventory.json",
+      "bytes": 35428,
+      "workingRawSHA256": "a3d2fa623efd017523c1fa8c3c60ebb6c74125388f1e55e2475512d319c9e3f4"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-selector-discovery-r1-20261107-codex/probe01/inputs.json",
+      "bytes": 41608,
+      "workingRawSHA256": "e6616427adbd07c2411d700b4efda019f43ea2f6ecd09cece4c19c9972bfb612"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-selector-discovery-r1-20261107-codex/probe01/tree-discovery-controls.json",
+      "bytes": 64937,
+      "workingRawSHA256": "117d87c37d580ffa3534de5444755e9a85b76721fbe1f6e7bf179b4fdb7e5a02"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-selector-discovery-r1-20261107-codex/probe01-command.json",
+      "bytes": 1179,
+      "workingRawSHA256": "5892f39e5b5d9726a9d1b57f210cfbbcb06b8303914574d61c49a44ae204a698"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-selector-discovery-r1-20261107-codex/sync-full-state-after.json",
+      "bytes": 477592,
+      "workingRawSHA256": "c8b317b46e90100f2c8551c798e5ceb0fdfa1a6a22f47f9ed4f724be9bbdd908"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-selector-discovery-r1-20261107-codex/sync-full-state-before.json",
+      "bytes": 477592,
+      "workingRawSHA256": "c8b317b46e90100f2c8551c798e5ceb0fdfa1a6a22f47f9ed4f724be9bbdd908"
+    },
+    {
+      "path": "docs/vault/30_Development/History/2026-11-07_FLEET5_B_A7_Selector_Discovery_R1_Codex.md",
+      "bytes": 7158,
+      "workingRawSHA256": "d7f21ee950234ff36fe05d6df9ab468ad5b8a16f20b3450fc98849ec19a64e7c"
+    }
+  ],
+  "manifestExcludesSelf": true,
+  "probeDirectExit": 0,
+  "treeDiscoveryControls": 6,
+  "allExpected": true,
+  "legacyStatus": "REFUSED unchanged",
+  "codeAndTestUnchanged": true,
+  "original19HOLD": true,
+  "runtimeB": 0,
+  "realBindings": null,
+  "oldUntrackedPreservedExcluded": 64
+}

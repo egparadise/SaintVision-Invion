@@ -1,0 +1,597 @@
+{
+  "baseWorldUsedForDiscovery": false,
+  "enumeratedProductionPythonCount": 398,
+  "filesystemFixtureIsGitCommit": null,
+  "pathsDerivedFromEvaluatedTarget": true,
+  "productOrMutantRuntimeExecuted": false,
+  "productionRoots": [
+    "services/control-plane/src",
+    "src",
+    "tools"
+  ],
+  "queryReceipts": [
+    {
+      "argv": [
+        "git",
+        "rev-parse",
+        "--verify",
+        "746789a36091c8601afea23fe176069e2fa7d87b^{commit}"
+      ],
+      "exit": 0,
+      "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrUTF8": "",
+      "stdoutSHA256": "0ed081d5e853d98ba989ffa318c2e7a10ca4b94c1bc80d50f5f3c3d6f747d7e0"
+    },
+    {
+      "argv": [
+        "git",
+        "ls-tree",
+        "-r",
+        "-z",
+        "746789a36091c8601afea23fe176069e2fa7d87b",
+        "--",
+        "services/control-plane/src",
+        "src",
+        "tools"
+      ],
+      "exit": 0,
+      "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrUTF8": "",
+      "stdoutSHA256": "3b6f0b13e39b4c691412bf52d13519676e4ae12c1bf1b6adb3bc5d6b904c5737"
+    },
+    {
+      "argv": [
+        "git",
+        "grep",
+        "-l",
+        "-z",
+        "-E",
+        "NodeDelivery|DeliveryWorker|DeliveryAttempt|DeliveryQueue|node_transport|from[[:space:]].*dispatch|import[[:space:]].*dispatch|\\.deliver\\b",
+        "746789a36091c8601afea23fe176069e2fa7d87b",
+        "--",
+        "services/control-plane/src",
+        "src",
+        "tools"
+      ],
+      "exit": 0,
+      "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrUTF8": "",
+      "stdoutSHA256": "d3d635a5fd4be1368bdca22599126d2c6bef947b01e1d9e03a77d14918bfbf1d"
+    },
+    {
+      "argv": [
+        "git",
+        "cat-file",
+        "blob",
+        "d16c26ce413af0702b47b79b466706a3990cb4fa"
+      ],
+      "exit": 0,
+      "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrUTF8": "",
+      "stdoutSHA256": "7483d65fcb1032aeb05b4d2dd56e09e714cff8ca676de0f80fc3a2f5e447e9af"
+    },
+    {
+      "argv": [
+        "git",
+        "cat-file",
+        "blob",
+        "6ff21a1c820f0832ea9075c5dd83a78426ae22e2"
+      ],
+      "exit": 0,
+      "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrUTF8": "",
+      "stdoutSHA256": "82f029614537eb5bab56934e4b6736fe3dd52ece54b9b9a3996815b131e41de4"
+    },
+    {
+      "argv": [
+        "git",
+        "cat-file",
+        "blob",
+        "dc12fb2066dc5095990aadf070d118936c95690d"
+      ],
+      "exit": 0,
+      "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrUTF8": "",
+      "stdoutSHA256": "796f61fe8404c2c3a8a4be08eca75d98e3c442a30c04077c66b278e7d60c6737"
+    },
+    {
+      "argv": [
+        "git",
+        "cat-file",
+        "blob",
+        "9f72e566b3eccb73c6210643c9b27d507168c58d"
+      ],
+      "exit": 0,
+      "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrUTF8": "",
+      "stdoutSHA256": "3559bbcdf9568f8930654d860b0edd980eca71c835cde3fe7380a69dd56e18f4"
+    },
+    {
+      "argv": [
+        "git",
+        "cat-file",
+        "blob",
+        "4050adbcd1b9ed83daefd58cf310e7fac5c0fd46"
+      ],
+      "exit": 0,
+      "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrUTF8": "",
+      "stdoutSHA256": "6bbdf815554fe1f0157247732ddc4dc3069686685c291ef83add55c8f3e92003"
+    },
+    {
+      "argv": [
+        "git",
+        "cat-file",
+        "blob",
+        "35aa3eca7be47a063b0511e0cbead15423c842dd"
+      ],
+      "exit": 0,
+      "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrUTF8": "",
+      "stdoutSHA256": "e954e1ef8dcae97756a50428af66c9a328e4d362f1aee7d630588431d09b1308"
+    },
+    {
+      "argv": [
+        "git",
+        "cat-file",
+        "blob",
+        "c095886b3df1b5d6e0e9bec8e071019306c8db53"
+      ],
+      "exit": 0,
+      "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrUTF8": "",
+      "stdoutSHA256": "5efd1057f9208cdb29670073bd8ea5e96f98cfbd5a8173f4daa764d3db5db52e"
+    },
+    {
+      "argv": [
+        "git",
+        "cat-file",
+        "blob",
+        "959a6bfb1663036e4bdee29ea981685d6a5d3a5a"
+      ],
+      "exit": 0,
+      "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrUTF8": "",
+      "stdoutSHA256": "900b2b5b3381da451a14a49a2b079b2f9851ea3bc91f30798c9fcde243ceab9a"
+    },
+    {
+      "argv": [
+        "git",
+        "cat-file",
+        "blob",
+        "962ea07b3801d696b563884b9c0dc90cf2e5d502"
+      ],
+      "exit": 0,
+      "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrUTF8": "",
+      "stdoutSHA256": "bae67c856cc8bdae52c1f06c4b6e36302e17ae0dd53a24fc01557cae19a3e226"
+    },
+    {
+      "argv": [
+        "git",
+        "cat-file",
+        "blob",
+        "56d62d6aee56bb7878197244d3c00b929e4d0762"
+      ],
+      "exit": 0,
+      "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrUTF8": "",
+      "stdoutSHA256": "4e43aa43e8dc9b8ab78af0fde78f9e83b83d7bfdc77b7362ad565741f6f94e8a"
+    },
+    {
+      "argv": [
+        "git",
+        "cat-file",
+        "blob",
+        "3239fc3a7ecbdf377dee01c1594ae56cfd9810ac"
+      ],
+      "exit": 0,
+      "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrUTF8": "",
+      "stdoutSHA256": "fe294d648b34d617df94449974fc82fed904639b80b8a5da2c9d34f32606bf8e"
+    },
+    {
+      "argv": [
+        "git",
+        "cat-file",
+        "blob",
+        "1dc2f0b8eb0e80a2f7cbb1e14ed56e81b1e9a2cf"
+      ],
+      "exit": 0,
+      "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrUTF8": "",
+      "stdoutSHA256": "de5f6213b196784c6c4280d31a17fba9fe1669eb466edee14197664b37f2ac6c"
+    },
+    {
+      "argv": [
+        "git",
+        "cat-file",
+        "blob",
+        "c843cd00446c02d1f2b7f94c9eb447f419564e93"
+      ],
+      "exit": 0,
+      "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrUTF8": "",
+      "stdoutSHA256": "3010b2409bb285de960eb322792b1062ed066275307c9bea53a2cc767b65d4e3"
+    },
+    {
+      "argv": [
+        "git",
+        "cat-file",
+        "blob",
+        "742242e299c3bf1fc747bcf160f59f4aa7505a69"
+      ],
+      "exit": 0,
+      "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrUTF8": "",
+      "stdoutSHA256": "7b77a716b4fb56e951fce110d347ac41f16d1d80d4722ba9d1410a1869b351cb"
+    },
+    {
+      "argv": [
+        "git",
+        "cat-file",
+        "blob",
+        "0b3998d6a3d310447c84695345db096d511222cd"
+      ],
+      "exit": 0,
+      "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrUTF8": "",
+      "stdoutSHA256": "32c8fae52eb947605c53801d609e9826c514b53c2392f07f1fb9ff605303449b"
+    },
+    {
+      "argv": [
+        "git",
+        "cat-file",
+        "blob",
+        "78983ff0c2add6c90167af8debd8feb85d7edb5a"
+      ],
+      "exit": 0,
+      "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrUTF8": "",
+      "stdoutSHA256": "e97af6a21a46ebfc2f836a5339005510dcd3dcd257640a4b375bdb52bd3b0bda"
+    },
+    {
+      "argv": [
+        "git",
+        "cat-file",
+        "blob",
+        "1e83a6b6bd7e7db0353f8e56712b2d7bbc599f45"
+      ],
+      "exit": 0,
+      "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrUTF8": "",
+      "stdoutSHA256": "3550db9c20fb7e2118f66f0337ed787dd22a166a6ff8cf1c6e9490f9ae9df6e3"
+    },
+    {
+      "argv": [
+        "git",
+        "cat-file",
+        "blob",
+        "134938f04010178d8f8d6910e2d02ef542bd8d60"
+      ],
+      "exit": 0,
+      "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrUTF8": "",
+      "stdoutSHA256": "3a2e134e04ac36ec81a20280e47e2f9deb9c190c2f5bed5c26e1ad05206210ed"
+    },
+    {
+      "argv": [
+        "git",
+        "cat-file",
+        "blob",
+        "0fe37781a5785cb7c4a45126876610b048f0c039"
+      ],
+      "exit": 0,
+      "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrUTF8": "",
+      "stdoutSHA256": "cd4be84de9a60c03c32daa8e831a527ed9014169e151c7a436383772a5d4ddc0"
+    },
+    {
+      "argv": [
+        "git",
+        "cat-file",
+        "blob",
+        "d8de953f7cd2f69f0e4915efccb24df352e7ea64"
+      ],
+      "exit": 0,
+      "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrUTF8": "",
+      "stdoutSHA256": "2c626540f495499423b707b063a6cab6a53e1be3af8c324f46af88a94ac8f652"
+    },
+    {
+      "argv": [
+        "git",
+        "cat-file",
+        "blob",
+        "5b2c22ea65f6c3eb5092bbd2a7c7e3e625b3821e"
+      ],
+      "exit": 0,
+      "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrUTF8": "",
+      "stdoutSHA256": "b88449375aa8377d1e069e151d297ca9bd964495a4807d7e3eab26b111da6842"
+    },
+    {
+      "argv": [
+        "git",
+        "cat-file",
+        "blob",
+        "c4320994fad46df81fb9fa123c5ed30082c7cf35"
+      ],
+      "exit": 0,
+      "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrUTF8": "",
+      "stdoutSHA256": "2203c2d424ecd7651dcd099b4fd6fb051bd872e919a8bcad44fd2b4043897b2e"
+    },
+    {
+      "argv": [
+        "git",
+        "cat-file",
+        "blob",
+        "45b64b5526650b6d72284a6bc8729d5aaeb4a894"
+      ],
+      "exit": 0,
+      "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrUTF8": "",
+      "stdoutSHA256": "e69fa8ff6c51bd3880f5ec388fe97288a4256169377e17d9d6aa5b7ec2f32c27"
+    },
+    {
+      "argv": [
+        "git",
+        "cat-file",
+        "blob",
+        "532e8b59c0a3f32e53689c69115c1b1954bd9fe5"
+      ],
+      "exit": 0,
+      "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrUTF8": "",
+      "stdoutSHA256": "67388ba4a7ac07156bf70d9286691d1a0dfe1fb76f976cf91f0b1df84dc6743b"
+    },
+    {
+      "argv": [
+        "git",
+        "cat-file",
+        "blob",
+        "5d6eb315d4c87d8fbebbd6e3b13774dd9ca4af36"
+      ],
+      "exit": 0,
+      "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrUTF8": "",
+      "stdoutSHA256": "92296b5f070cd97440889b12b487876cd64240408fe4faa918597dfcc6c7e82c"
+    }
+  ],
+  "requestedRef": "746789a36091c8601afea23fe176069e2fa7d87b",
+  "resolvedTargetCommitOrWorkingHEAD": "746789a36091c8601afea23fe176069e2fa7d87b",
+  "root": "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105",
+  "selectedCount": 25,
+  "selectedInventory": [
+    {
+      "ASTParseOnly": true,
+      "bytes": 22165,
+      "decodedTextSHA256": "7483d65fcb1032aeb05b4d2dd56e09e714cff8ca676de0f80fc3a2f5e447e9af",
+      "gitBlobID": "d16c26ce413af0702b47b79b466706a3990cb4fa",
+      "membership": "TRACKED_IN_TARGET_COMMIT",
+      "path": "services/control-plane/src/inv/build_product_runtime.py",
+      "rawSHA256": "7483d65fcb1032aeb05b4d2dd56e09e714cff8ca676de0f80fc3a2f5e447e9af"
+    },
+    {
+      "ASTParseOnly": true,
+      "bytes": 15823,
+      "decodedTextSHA256": "82f029614537eb5bab56934e4b6736fe3dd52ece54b9b9a3996815b131e41de4",
+      "gitBlobID": "6ff21a1c820f0832ea9075c5dd83a78426ae22e2",
+      "membership": "TRACKED_IN_TARGET_COMMIT",
+      "path": "services/control-plane/src/inv/dispatch.py",
+      "rawSHA256": "82f029614537eb5bab56934e4b6736fe3dd52ece54b9b9a3996815b131e41de4"
+    },
+    {
+      "ASTParseOnly": true,
+      "bytes": 4737,
+      "decodedTextSHA256": "796f61fe8404c2c3a8a4be08eca75d98e3c442a30c04077c66b278e7d60c6737",
+      "gitBlobID": "dc12fb2066dc5095990aadf070d118936c95690d",
+      "membership": "TRACKED_IN_TARGET_COMMIT",
+      "path": "services/control-plane/src/inv/model_remote.py",
+      "rawSHA256": "796f61fe8404c2c3a8a4be08eca75d98e3c442a30c04077c66b278e7d60c6737"
+    },
+    {
+      "ASTParseOnly": true,
+      "bytes": 12319,
+      "decodedTextSHA256": "3559bbcdf9568f8930654d860b0edd980eca71c835cde3fe7380a69dd56e18f4",
+      "gitBlobID": "9f72e566b3eccb73c6210643c9b27d507168c58d",
+      "membership": "TRACKED_IN_TARGET_COMMIT",
+      "path": "services/control-plane/src/inv/node_transport.py",
+      "rawSHA256": "3559bbcdf9568f8930654d860b0edd980eca71c835cde3fe7380a69dd56e18f4"
+    },
+    {
+      "ASTParseOnly": true,
+      "bytes": 2821,
+      "decodedTextSHA256": "6bbdf815554fe1f0157247732ddc4dc3069686685c291ef83add55c8f3e92003",
+      "gitBlobID": "4050adbcd1b9ed83daefd58cf310e7fac5c0fd46",
+      "membership": "TRACKED_IN_TARGET_COMMIT",
+      "path": "services/control-plane/src/inv/observer_worker.py",
+      "rawSHA256": "6bbdf815554fe1f0157247732ddc4dc3069686685c291ef83add55c8f3e92003"
+    },
+    {
+      "ASTParseOnly": true,
+      "bytes": 9784,
+      "decodedTextSHA256": "e954e1ef8dcae97756a50428af66c9a328e4d362f1aee7d630588431d09b1308",
+      "gitBlobID": "35aa3eca7be47a063b0511e0cbead15423c842dd",
+      "membership": "TRACKED_IN_TARGET_COMMIT",
+      "path": "services/control-plane/src/inv/output_ingestion.py",
+      "rawSHA256": "e954e1ef8dcae97756a50428af66c9a328e4d362f1aee7d630588431d09b1308"
+    },
+    {
+      "ASTParseOnly": true,
+      "bytes": 12723,
+      "decodedTextSHA256": "5efd1057f9208cdb29670073bd8ea5e96f98cfbd5a8173f4daa764d3db5db52e",
+      "gitBlobID": "c095886b3df1b5d6e0e9bec8e071019306c8db53",
+      "membership": "TRACKED_IN_TARGET_COMMIT",
+      "path": "services/control-plane/src/inv/remote_git.py",
+      "rawSHA256": "5efd1057f9208cdb29670073bd8ea5e96f98cfbd5a8173f4daa764d3db5db52e"
+    },
+    {
+      "ASTParseOnly": true,
+      "bytes": 16901,
+      "decodedTextSHA256": "900b2b5b3381da451a14a49a2b079b2f9851ea3bc91f30798c9fcde243ceab9a",
+      "gitBlobID": "959a6bfb1663036e4bdee29ea981685d6a5d3a5a",
+      "membership": "TRACKED_IN_TARGET_COMMIT",
+      "path": "services/control-plane/src/inv/result_view.py",
+      "rawSHA256": "900b2b5b3381da451a14a49a2b079b2f9851ea3bc91f30798c9fcde243ceab9a"
+    },
+    {
+      "ASTParseOnly": true,
+      "bytes": 19960,
+      "decodedTextSHA256": "bae67c856cc8bdae52c1f06c4b6e36302e17ae0dd53a24fc01557cae19a3e226",
+      "gitBlobID": "962ea07b3801d696b563884b9c0dc90cf2e5d502",
+      "membership": "TRACKED_IN_TARGET_COMMIT",
+      "path": "services/control-plane/src/inv/storage_check_collect.py",
+      "rawSHA256": "bae67c856cc8bdae52c1f06c4b6e36302e17ae0dd53a24fc01557cae19a3e226"
+    },
+    {
+      "ASTParseOnly": true,
+      "bytes": 10765,
+      "decodedTextSHA256": "4e43aa43e8dc9b8ab78af0fde78f9e83b83d7bfdc77b7362ad565741f6f94e8a",
+      "gitBlobID": "56d62d6aee56bb7878197244d3c00b929e4d0762",
+      "membership": "TRACKED_IN_TARGET_COMMIT",
+      "path": "services/control-plane/src/inv/storage_sampling.py",
+      "rawSHA256": "4e43aa43e8dc9b8ab78af0fde78f9e83b83d7bfdc77b7362ad565741f6f94e8a"
+    },
+    {
+      "ASTParseOnly": true,
+      "bytes": 17862,
+      "decodedTextSHA256": "fe294d648b34d617df94449974fc82fed904639b80b8a5da2c9d34f32606bf8e",
+      "gitBlobID": "3239fc3a7ecbdf377dee01c1594ae56cfd9810ac",
+      "membership": "TRACKED_IN_TARGET_COMMIT",
+      "path": "services/control-plane/src/inv/terminal.py",
+      "rawSHA256": "fe294d648b34d617df94449974fc82fed904639b80b8a5da2c9d34f32606bf8e"
+    },
+    {
+      "ASTParseOnly": true,
+      "bytes": 15889,
+      "decodedTextSHA256": "de5f6213b196784c6c4280d31a17fba9fe1669eb466edee14197664b37f2ac6c",
+      "gitBlobID": "1dc2f0b8eb0e80a2f7cbb1e14ed56e81b1e9a2cf",
+      "membership": "TRACKED_IN_TARGET_COMMIT",
+      "path": "services/control-plane/src/inv/tooling.py",
+      "rawSHA256": "de5f6213b196784c6c4280d31a17fba9fe1669eb466edee14197664b37f2ac6c"
+    },
+    {
+      "ASTParseOnly": true,
+      "bytes": 7594,
+      "decodedTextSHA256": "3010b2409bb285de960eb322792b1062ed066275307c9bea53a2cc767b65d4e3",
+      "gitBlobID": "c843cd00446c02d1f2b7f94c9eb447f419564e93",
+      "membership": "TRACKED_IN_TARGET_COMMIT",
+      "path": "services/control-plane/src/inv/worker.py",
+      "rawSHA256": "3010b2409bb285de960eb322792b1062ed066275307c9bea53a2cc767b65d4e3"
+    },
+    {
+      "ASTParseOnly": true,
+      "bytes": 4125,
+      "decodedTextSHA256": "7b77a716b4fb56e951fce110d347ac41f16d1d80d4722ba9d1410a1869b351cb",
+      "gitBlobID": "742242e299c3bf1fc747bcf160f59f4aa7505a69",
+      "membership": "TRACKED_IN_TARGET_COMMIT",
+      "path": "services/control-plane/src/inv/workspace_config.py",
+      "rawSHA256": "7b77a716b4fb56e951fce110d347ac41f16d1d80d4722ba9d1410a1869b351cb"
+    },
+    {
+      "ASTParseOnly": true,
+      "bytes": 14468,
+      "decodedTextSHA256": "32c8fae52eb947605c53801d609e9826c514b53c2392f07f1fb9ff605303449b",
+      "gitBlobID": "0b3998d6a3d310447c84695345db096d511222cd",
+      "membership": "TRACKED_IN_TARGET_COMMIT",
+      "path": "services/control-plane/src/inv/workspace_resume.py",
+      "rawSHA256": "32c8fae52eb947605c53801d609e9826c514b53c2392f07f1fb9ff605303449b"
+    },
+    {
+      "ASTParseOnly": true,
+      "bytes": 12213,
+      "decodedTextSHA256": "e97af6a21a46ebfc2f836a5339005510dcd3dcd257640a4b375bdb52bd3b0bda",
+      "gitBlobID": "78983ff0c2add6c90167af8debd8feb85d7edb5a",
+      "membership": "TRACKED_IN_TARGET_COMMIT",
+      "path": "src/saintvision/services/eval_execution.py",
+      "rawSHA256": "e97af6a21a46ebfc2f836a5339005510dcd3dcd257640a4b375bdb52bd3b0bda"
+    },
+    {
+      "ASTParseOnly": true,
+      "bytes": 13260,
+      "decodedTextSHA256": "3550db9c20fb7e2118f66f0337ed787dd22a166a6ff8cf1c6e9490f9ae9df6e3",
+      "gitBlobID": "1e83a6b6bd7e7db0353f8e56712b2d7bbc599f45",
+      "membership": "TRACKED_IN_TARGET_COMMIT",
+      "path": "tools/check_remote_workspace.py",
+      "rawSHA256": "3550db9c20fb7e2118f66f0337ed787dd22a166a6ff8cf1c6e9490f9ae9df6e3"
+    },
+    {
+      "ASTParseOnly": true,
+      "bytes": 76378,
+      "decodedTextSHA256": "3a2e134e04ac36ec81a20280e47e2f9deb9c190c2f5bed5c26e1ad05206210ed",
+      "gitBlobID": "134938f04010178d8f8d6910e2d02ef542bd8d60",
+      "membership": "TRACKED_IN_TARGET_COMMIT",
+      "path": "tools/intranet_e2e_smoke.py",
+      "rawSHA256": "3a2e134e04ac36ec81a20280e47e2f9deb9c190c2f5bed5c26e1ad05206210ed"
+    },
+    {
+      "ASTParseOnly": true,
+      "bytes": 11689,
+      "decodedTextSHA256": "cd4be84de9a60c03c32daa8e831a527ed9014169e151c7a436383772a5d4ddc0",
+      "gitBlobID": "0fe37781a5785cb7c4a45126876610b048f0c039",
+      "membership": "TRACKED_IN_TARGET_COMMIT",
+      "path": "tools/lan_execution.py",
+      "rawSHA256": "cd4be84de9a60c03c32daa8e831a527ed9014169e151c7a436383772a5d4ddc0"
+    },
+    {
+      "ASTParseOnly": true,
+      "bytes": 198894,
+      "decodedTextSHA256": "2c626540f495499423b707b063a6cab6a53e1be3af8c324f46af88a94ac8f652",
+      "gitBlobID": "d8de953f7cd2f69f0e4915efccb24df352e7ea64",
+      "membership": "TRACKED_IN_TARGET_COMMIT",
+      "path": "tools/lan_pilot.py",
+      "rawSHA256": "2c626540f495499423b707b063a6cab6a53e1be3af8c324f46af88a94ac8f652"
+    },
+    {
+      "ASTParseOnly": true,
+      "bytes": 2115,
+      "decodedTextSHA256": "b88449375aa8377d1e069e151d297ca9bd964495a4807d7e3eab26b111da6842",
+      "gitBlobID": "5b2c22ea65f6c3eb5092bbd2a7c7e3e625b3821e",
+      "membership": "TRACKED_IN_TARGET_COMMIT",
+      "path": "tools/post_landing_select_run.py",
+      "rawSHA256": "b88449375aa8377d1e069e151d297ca9bd964495a4807d7e3eab26b111da6842"
+    },
+    {
+      "ASTParseOnly": true,
+      "bytes": 14829,
+      "decodedTextSHA256": "2203c2d424ecd7651dcd099b4fd6fb051bd872e919a8bcad44fd2b4043897b2e",
+      "gitBlobID": "c4320994fad46df81fb9fa123c5ed30082c7cf35",
+      "membership": "TRACKED_IN_TARGET_COMMIT",
+      "path": "tools/prepare_server_config.py",
+      "rawSHA256": "2203c2d424ecd7651dcd099b4fd6fb051bd872e919a8bcad44fd2b4043897b2e"
+    },
+    {
+      "ASTParseOnly": true,
+      "bytes": 14741,
+      "decodedTextSHA256": "e69fa8ff6c51bd3880f5ec388fe97288a4256169377e17d9d6aa5b7ec2f32c27",
+      "gitBlobID": "45b64b5526650b6d72284a6bc8729d5aaeb4a894",
+      "membership": "TRACKED_IN_TARGET_COMMIT",
+      "path": "tools/remote_workspace_entry.py",
+      "rawSHA256": "e69fa8ff6c51bd3880f5ec388fe97288a4256169377e17d9d6aa5b7ec2f32c27"
+    },
+    {
+      "ASTParseOnly": true,
+      "bytes": 34190,
+      "decodedTextSHA256": "67388ba4a7ac07156bf70d9286691d1a0dfe1fb76f976cf91f0b1df84dc6743b",
+      "gitBlobID": "532e8b59c0a3f32e53689c69115c1b1954bd9fe5",
+      "membership": "TRACKED_IN_TARGET_COMMIT",
+      "path": "tools/run_ac11_exact_sha_aggregate.py",
+      "rawSHA256": "67388ba4a7ac07156bf70d9286691d1a0dfe1fb76f976cf91f0b1df84dc6743b"
+    },
+    {
+      "ASTParseOnly": true,
+      "bytes": 7618,
+      "decodedTextSHA256": "92296b5f070cd97440889b12b487876cd64240408fe4faa918597dfcc6c7e82c",
+      "gitBlobID": "5d6eb315d4c87d8fbebbd6e3b13774dd9ca4af36",
+      "membership": "TRACKED_IN_TARGET_COMMIT",
+      "path": "tools/run_s04_db_evidence.py",
+      "rawSHA256": "92296b5f070cd97440889b12b487876cd64240408fe4faa918597dfcc6c7e82c"
+    }
+  ],
+  "selector": "NodeDelivery|DeliveryWorker|DeliveryAttempt|DeliveryQueue|node_transport|from[[:space:]].*dispatch|import[[:space:]].*dispatch|\\.deliver\\b",
+  "selectorEngine": "git grep -E (original POSIX ERE, no Python regex translation)",
+  "targetKind": "commit",
+  "workingModel": "No symlinks; read/encoding failures unresolved. Filesystem paths/content/stamps rechecked around selector; not an atomic hostile-filesystem/runtime proof."
+}

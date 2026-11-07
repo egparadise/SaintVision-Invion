@@ -1,0 +1,16 @@
+{
+  "argv": [
+    "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+    "-B",
+    "tools/check_ontology.py"
+  ],
+  "cwd": "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105",
+  "directExit": 0,
+  "endKST": "2026-11-07T11:50:05.871364+09:00",
+  "interpreter": "3.14.7 (tags/v3.14.7:823f032, Aug  5 2026, 10:51:32) [MSC v.1944 64 bit (AMD64)]",
+  "outputEncoding": "UTF8-in-JSON-verbatim",
+  "rawBytes": 163,
+  "rawSHA256": "7cdc12bf64f50ba0964625161638a4c639cf22d786a57f04685bed0718e14042",
+  "rawUTF8": "PASS: RDF parsing, defined terms, TTL/JSON-LD equivalence, 48 task mappings, positive SHACL, 4 rejected invalid fixtures, 4 competency queries, Obsidian mirrors.\r\n",
+  "startKST": "2026-11-07T11:50:02.930727+09:00"
+}

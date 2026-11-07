@@ -1,0 +1,739 @@
+{
+  "RootDecision": "msg_984f62d6c820",
+  "acceptedBaselineDischarges": 0,
+  "acceptedCodeReview": {
+    "OPG-I2": {
+      "id": "OPG-I2",
+      "severity": "INFO",
+      "text": "C2 'removing the guard recreates the foreign-value case' is evidenced by the real BASE RED (no capture, no guard, two reads; foreign-equal case only) rather than by a capture-without-guard mutant run. Static controls missing-type-gate/wrong-connective/widened-* plus reviewer RC02-RC04 cover guard removal/weakening at the AST layer. Acceptable; not an executed-mutant claim."
+    },
+    "OPG-L1": {
+      "actualSourceImpact": "None for 746789a: reviewer P06 runs the selector on the HEAD tree itself (same 25 paths, 24 other blobs equal) and git name-status shows the only non-docs paths are dispatch.py and the test (outside the selector roots); P05 finds exactly one `.deliver` reference in the selector roots. The author's prepublication asserts (tracked == [dispatch], no untracked production) also covered it at WIP time.",
+      "id": "OPG-L1",
+      "minimalFix": "Before any reuse of finite_compatibility on source other than 746789a: derive the path set by running the selector on the evaluated tree (git grep on the target commit or an equivalent regex over its blobs) and compare with base_world(); keep 'modified-unrelated-module' as an injected control and add one tree-discovery control. No product or test change.",
+      "observed": "current_world() reads the current bytes of base_world()'s 25 paths, so the path set passed to evaluate() always equals BASE's. SOURCE_WORLD_PATH_SET_CHANGED is therefore reachable only for a caller-injected synthetic world (control 'modified-unrelated-module'); a new selector-matching file in the evaluated tree (e.g. a second production deliver caller in a new module) would not be discovered by evaluate(current_world()). The claim 'source-set changes reject' holds for injected worlds, not for tree discovery.",
+      "severity": "LOW",
+      "source": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/finite_compatibility.py lines 42-43 (current_world) with evaluate() line 186 (path-set check); blob 7b245536fbbf4f607a5dac0d75a1be4abd70e60c / sha256 e61b538446e0ba0b8b254874fadf9c820a3341a40dbf1ec51b63f95e32a105bf at 746789a",
+      "status": "CARRIED_CONDITION_FOR_REUSE_NONBLOCKING_FOR_746789a"
+    },
+    "commit": "dc18f6681627aca9d3eceb7d5a85dbc97b551b5b",
+    "verdict": "ACCEPT_NARROW_CODE_KEEP_HOLD",
+    "versionedReferences": [
+      {
+        "bytes": 21,
+        "gitBlobID": "bb2789ad98e51258a73e184a7a912ab02c6a83c0",
+        "kind": "reference pin, not a new review or corpus copy",
+        "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-7467-code-review-20261107-claude/.gitattributes",
+        "sha256": "96a83569c84cfe3f57b7efe3dc61c249548d0fca4fed0e538b3587cdc97c95c1"
+      },
+      {
+        "bytes": 6596,
+        "gitBlobID": "1d741638a2eb4edf6da9d438c2c4032fb375e461",
+        "kind": "reference pin, not a new review or corpus copy",
+        "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-7467-code-review-20261107-claude/commands.json",
+        "sha256": "b3d80a192fd6a57fb181d6451650d0375f39a4e064e58c53b2f8847b7757e76c"
+      },
+      {
+        "bytes": 2323,
+        "gitBlobID": "7c653ebdf255ddda47b69d69c81832376d1c880f",
+        "kind": "reference pin, not a new review or corpus copy",
+        "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-7467-code-review-20261107-claude/local-doc-gates-r1.txt",
+        "sha256": "34ff158433f353bed635fa887be450156b7b7b01cee9c8182f03bd828957d3e7"
+      },
+      {
+        "bytes": 2323,
+        "gitBlobID": "f7fc5e58e605f81714bca7465af53c2121cdb9b1",
+        "kind": "reference pin, not a new review or corpus copy",
+        "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-7467-code-review-20261107-claude/local-doc-gates-r2.txt",
+        "sha256": "544473239991c03fd0474f28b90e63fb05534124d2ab5040c7fc03e3aa00f68d"
+      },
+      {
+        "bytes": 20614,
+        "gitBlobID": "f6b76ed15bedc3d4e5304dedfd9832305ed36845",
+        "kind": "reference pin, not a new review or corpus copy",
+        "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-7467-code-review-20261107-claude/review.json",
+        "sha256": "0b86a6b8f38a1b77acd798ada345aebc55a879c2d43af46230b39be4f1fa0282"
+      },
+      {
+        "bytes": 8013,
+        "gitBlobID": "c610e94917469ab8f194f84b6edb44d5f6c6d233",
+        "kind": "reference pin, not a new review or corpus copy",
+        "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-7467-code-review-20261107-claude/reviewer-finite-replay-result.json",
+        "sha256": "25d8785e71ea2c7bd07185757b722b3e17258a1a03da0f06b49fc5242c170e9c"
+      },
+      {
+        "bytes": 716,
+        "gitBlobID": "f9804589db69c0ac3e100634bf8fc3b9e46b6c6d",
+        "kind": "reference pin, not a new review or corpus copy",
+        "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-7467-code-review-20261107-claude/reviewer-finite-replay.log.txt",
+        "sha256": "4e2cf2fa3c6c302352acbe55818895bcb04cec345caefac2a28319fcb28a3851"
+      },
+      {
+        "bytes": 12606,
+        "gitBlobID": "4a19dcd835b6c30dc52a233490a6e8ec05854c4f",
+        "kind": "reference pin, not a new review or corpus copy",
+        "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-7467-code-review-20261107-claude/reviewer-static-probes-result.json",
+        "sha256": "42b05f22c8894e52056e780c98fb9c9bf97df1d784d5d455c2612e4702aeb3b1"
+      },
+      {
+        "bytes": 44,
+        "gitBlobID": "dfa8f2faf188e8d9392a0933b30c5afc7c81e855",
+        "kind": "reference pin, not a new review or corpus copy",
+        "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-7467-code-review-20261107-claude/reviewer-static-probes.log.txt",
+        "sha256": "c0a449843de40097df68d6c2ec17e23de11614463524e3b6c71921e191896680"
+      },
+      {
+        "bytes": 8617,
+        "gitBlobID": "a8dfbde4397a2f4a933318fc6a49335ba8410a8d",
+        "kind": "reference pin, not a new review or corpus copy",
+        "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-7467-code-review-20261107-claude/reviewer_finite_replay.py.txt",
+        "sha256": "e52ec58f436f764ab06a007bd32d0992d16bcfea2cb987e5a008dc443a524b31"
+      },
+      {
+        "bytes": 2975,
+        "gitBlobID": "b650a9daff440cf0f3a82c765c0c36758f4aab8b",
+        "kind": "reference pin, not a new review or corpus copy",
+        "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-7467-code-review-20261107-claude/reviewer_gate_driver.py.txt",
+        "sha256": "9ab1e167a0075a581656d5180c3bc73c776f4c13642ffcdc9b474b8249dc604c"
+      },
+      {
+        "bytes": 26962,
+        "gitBlobID": "89846d3bf76a0cfa90b9bc53cf640c44f4326ed7",
+        "kind": "reference pin, not a new review or corpus copy",
+        "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-7467-code-review-20261107-claude/reviewer_static_probes.py.txt",
+        "sha256": "3d8119295d32c5c50c72f7a03e83266d61651ab1a4ca475f04b1b53284e302d2"
+      },
+      {
+        "bytes": 475723,
+        "gitBlobID": "17fce7009b437fd2cec87a5680df99354f2a847d",
+        "kind": "reference pin, not a new review or corpus copy",
+        "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-7467-code-review-20261107-claude/sync-state-after-r1.json",
+        "sha256": "2a2ec167a75e7dff6fe19d90fa321db0a33343f52d956715ed65bb95e958d504"
+      },
+      {
+        "bytes": 475723,
+        "gitBlobID": "17fce7009b437fd2cec87a5680df99354f2a847d",
+        "kind": "reference pin, not a new review or corpus copy",
+        "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-7467-code-review-20261107-claude/sync-state-after-r2.json",
+        "sha256": "2a2ec167a75e7dff6fe19d90fa321db0a33343f52d956715ed65bb95e958d504"
+      },
+      {
+        "bytes": 475723,
+        "gitBlobID": "17fce7009b437fd2cec87a5680df99354f2a847d",
+        "kind": "reference pin, not a new review or corpus copy",
+        "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-7467-code-review-20261107-claude/sync-state-before-r1.json",
+        "sha256": "2a2ec167a75e7dff6fe19d90fa321db0a33343f52d956715ed65bb95e958d504"
+      },
+      {
+        "bytes": 475723,
+        "gitBlobID": "17fce7009b437fd2cec87a5680df99354f2a847d",
+        "kind": "reference pin, not a new review or corpus copy",
+        "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-7467-code-review-20261107-claude/sync-state-before-r2.json",
+        "sha256": "2a2ec167a75e7dff6fe19d90fa321db0a33343f52d956715ed65bb95e958d504"
+      },
+      {
+        "bytes": 11372,
+        "gitBlobID": "a0b3175fadf11160beb6f9d1ea77a9ddbff0af3a",
+        "kind": "reference pin, not a new review or corpus copy",
+        "path": "docs/vault/30_Development/History/2026-11-07_FLEET5_B_A7_Operation_7467_Code_Review_Claude.md",
+        "sha256": "0b0443c613cc36bd894692faa82048571690273518e1d6c793fb5d08741456ac"
+      }
+    ]
+  },
+  "base": "746789a36091c8601afea23fe176069e2fa7d87b",
+  "branch": "agent/codex/fleet5-b-a7-selector-discovery-r1-20261107",
+  "canonicalDocs": [
+    {
+      "frontmatter": "doc_id: \"INDEX-PROGRESS-001\"\ntitle: \"전체 개발 진행 현황\"\nversion: \"1.0.500\"\nstatus: \"review\"\nauthor: \"Codex\"\nupdated: \"2026-11-07T11:38:47+09:00\"\nsource_of_truth: \"Git\"\nlatest_codex_card: \"B7467actualCODEACCEPT_KEEP_HOLD; OPG-L1future-selector-proofassigned; H126d7actualClaudeCODEctx5cdcverdictpending; fleetincomplete\"",
+      "path": "ROOT_READ_ONLY/docs/vault/00_Index/전체 개발 진행 현황.md",
+      "sha256": "618e7b40f990dd3cda01b74d2e73979906b31f8b4607c5b7be89e21eda5bac18"
+    },
+    {
+      "frontmatter": "doc_id: \"WORKBOARD-CODEX-001\"\ntitle: \"Codex 작업 현황\"\nversion: \"1.0.461\"\nstatus: \"review\"\nauthor: \"Codex\"\nupdated: \"2026-11-07T11:38:47+09:00\"\nsource_of_truth: \"Git\"\nactive_card: \"FLEET5 continued supervision with PORTAL-REFRESH-FLEET-20261106\"\nactive_card_status: \"B7467actualCODEACCEPT_KEEP_HOLD; OPG-L1future-selector-proofassigned; H126d7actualClaudeCODEctx5cdcverdictpending; fleetincomplete\"\nactive_card_next: \"Actual Claude H12 CODE verdict; B author new OPG-L1 proof delivery. Root verifies next results, preserve accepted746/6d7 and actual authority NULL_HOLD; no mailbox polling.\"",
+      "path": "ROOT_READ_ONLY/docs/vault/30_Development/Agent별 작업/Codex 작업 현황.md",
+      "sha256": "cde3650f2287aba4227469ba72961b9aad9ea1af35d8e63715eab04f41574555"
+    },
+    {
+      "frontmatter": "doc_id: \"INDEX-VIRTUAL-COMPUTER-001\"\ntitle: \"2026-09-15 단일 가상 컴퓨터 보강 설계 인덱스\"\nversion: \"1.0.0\"\nstatus: \"accepted\"\nauthor: \"Codex\"\nupdated: \"2026-09-15T11:20:06+09:00\"\nsource_of_truth: \"Git and Obsidian paired update\"\ntags: [\"saintvision\", \"inv\", \"web-desktop\", \"distributed-model\", \"roadmap\"]",
+      "path": "ROOT_READ_ONLY/docs/vault/00_Index/2026-09-15 단일 가상 컴퓨터 보강 설계 인덱스.md",
+      "sha256": "35f2cca047fdb57ff2e2ad28e3847e9a7c0a19d6ace6fb36aa941042e872e9be"
+    },
+    {
+      "frontmatter": "doc_id: \"ROADMAP-VIRTUAL-COMPUTER-001\"\ntitle: \"57.81퍼센트 이후 단일 가상 컴퓨터 보강 로드맵\"\nversion: \"1.0.0\"\nstatus: \"accepted\"\nauthor: \"Codex\"\nupdated: \"2026-09-15T11:20:06+09:00\"\nsource_of_truth: \"Git and Obsidian paired update\"\ntags: [\"saintvision\", \"roadmap\", \"web-desktop\", \"storage-fabric\", \"agents\"]",
+      "path": "ROOT_READ_ONLY/docs/vault/30_Development/57.81퍼센트 이후 단일 가상 컴퓨터 보강 로드맵.md",
+      "sha256": "3a4527ffe53ebea114063692dd3bba826da8c279a93a9800919fff394df1a018"
+    },
+    {
+      "frontmatter": "doc_id: \"GOV-CONTINUOUS-001\"\ntitle: \"Agent 연속 실행과 최종 보고 정책\"\nversion: \"1.1.0\"\nstatus: \"accepted\"\nauthor: \"Codex\"\nupdated: \"2026-09-21T14:33:00+09:00\"\nsource_of_truth: \"Git and Obsidian paired update\"\ntags: [\"saintvision\", \"agents\", \"autonomy\", \"governance\"]",
+      "path": "ROOT_READ_ONLY/docs/vault/40_Governance/Agent 연속 실행과 최종 보고 정책.md",
+      "sha256": "60c6a8d3130491bd4cab730cccc0e236fb038d1c7c816efa333acdc34a30cd8f"
+    },
+    {
+      "frontmatter": "doc_id: \"GUIDE-001\"\ntitle: \"최종 개발 계획 - 모든 개발의 지침\"\nversion: \"1.1.0\"\nstatus: \"baseline\"\nauthor: \"Codex\"\nupdated: \"2026-09-11T17:15:06+09:00\"\ntimezone: \"Asia/Seoul\"\nsource_of_truth: \"Git\"\ntags: [\"saintvision\", \"final-plan\"]\naliases: [\"최종 계발 계회 - 모든 개발의 지침\", \"최종 개발 지침\"]",
+      "path": "ROOT_READ_ONLY/docs/vault/00_Index/최종 개발 계획 - 모든 개발의 지침.md",
+      "sha256": "59223c5dff4b4bb6252c8061aebe975665e6eadf92db3659a3f89951b2cb149f"
+    },
+    {
+      "frontmatter": "doc_id: \"ADR-INDEX-001\"\ntitle: \"설계 충돌 정정 및 ADR\"\nversion: \"1.37.0\"\nstatus: \"baseline\"\nauthor: \"Codex\"\nupdated: \"2026-09-23T03:10:00+09:00\"\ntimezone: \"Asia/Seoul\"\nsource_of_truth: \"Git\"\ntags: [\"saintvision\", \"final-plan\"]",
+      "path": "ROOT_READ_ONLY/docs/vault/40_Governance/설계 충돌 정정 및 ADR.md",
+      "sha256": "771f7714a63af52d7c8aea2424db0b33a2fe96c759c51c81c23144daf7aeaf77"
+    },
+    {
+      "frontmatter": "doc_id: \"GOV-AGENT-001\"\ntitle: \"Agent 역할과 인계 계약\"\nversion: \"1.1.3\"\nstatus: \"baseline\"\nauthor: \"Codex\"\nupdated: \"2026-09-21T18:47:00+09:00\"\ntimezone: \"Asia/Seoul\"\nsource_of_truth: \"Git\"\ntags: [\"saintvision\", \"final-plan\"]",
+      "path": "ROOT_READ_ONLY/docs/vault/40_Governance/Agent 역할과 인계 계약.md",
+      "sha256": "128c054e72f9e001b3b32f914cce544bce5432eddccdbe1212d27180c3200823"
+    },
+    {
+      "frontmatter": "doc_id: \"GOV-GIT-001\"\ntitle: \"Git Build Obsidian 운영 절차\"\nversion: \"1.1.4\"\nstatus: \"baseline\"\nauthor: \"Codex\"\nupdated: \"2026-09-22T19:25:00+09:00\"\ntimezone: \"Asia/Seoul\"\nsource_of_truth: \"Git\"\ntags: [\"saintvision\", \"final-plan\"]",
+      "path": "ROOT_READ_ONLY/docs/vault/40_Governance/Git Build Obsidian 운영 절차.md",
+      "sha256": "fe5e8adc44a14c081ac767265a16434b72e4b3ebfb7719081fa166ad459e59e9"
+    },
+    {
+      "frontmatter": "doc_id: \"GOV-CONTINUITY-001\"\ntitle: \"Agent 지속 개발 운영 규칙\"\nversion: \"1.0.0\"\nstatus: \"review\"\nauthor: \"Codex\"\nupdated: \"2026-09-21T14:05:43+09:00\"\nsource_of_truth: \"Git\"",
+      "path": "ROOT_READ_ONLY/docs/vault/40_Governance/Agent 지속 개발 운영 규칙.md",
+      "sha256": "63839c440ead6dc07300a0e18d5024fb9aadbddf546707156c39af7ee9495c84"
+    },
+    {
+      "frontmatter": null,
+      "path": "AGENTS.md",
+      "sha256": "c12a50a38f81c12a647f9b6f4592a205cd899e76d29190202a6ae73b12c04b27"
+    },
+    {
+      "frontmatter": "name: agent-delivery\ndescription: Every SaintVision task delivery\nversion: 1.1.0",
+      "path": "skills/agent-delivery/SKILL.md",
+      "sha256": "9596c1d4a132c3de90fd99ed2095b8271da7a31532e8487aa6d7d93151ac3830"
+    },
+    {
+      "frontmatter": "name: core-reliability\ndescription: Codex high difficulty reliability work\nversion: 1.0.0",
+      "path": "skills/core-reliability/SKILL.md",
+      "sha256": "4650a371befb5a59cd9f3ce87c2e2dab732aa7e9b89e57885cb67f0e64f0ef76"
+    },
+    {
+      "frontmatter": null,
+      "path": "docs/task-registry.json",
+      "sha256": "7c6b339c7487aae652cc5c5e04f6e933249c83930019e798ec24006794b07644"
+    }
+  ],
+  "dispatch": "ctx_6f0f8253b8a7",
+  "kst": "2026-11-07T11:45:04.958108+09:00",
+  "notRun": [
+    "application/test import or execution",
+    "pytest/Go/compiler/crypto/Node/browser/SSH/Docker/build",
+    "Core/Backend CI",
+    "incident cleanup",
+    "old write-producing proof scripts"
+  ],
+  "old29Helpers": [
+    {
+      "objectID": "3acd5a56c6c8e75f46776b5edfa35041451ef1b9",
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-snapshot-r2-20261107-codex/a7_body.py",
+      "sha256": "d884cd4dacb3d4ed21db135342969507196f40f30df6ce65cf271d70d976e665"
+    },
+    {
+      "objectID": "e51e6ee9cbe9c88bffe584857738882c2527bc9e",
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-snapshot-r2-20261107-codex/a7_build.py",
+      "sha256": "3a89d59473cb7036dbfa3147ca067b8895525fdec576d522eedcc8a499913114"
+    },
+    {
+      "objectID": "70d2e7d62666a3bb0c6b2c92927d1a1f3f3a2ba2",
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-snapshot-r2-20261107-codex/a7_common.py",
+      "sha256": "decb55caf99d02582debe7de23779622a3352779a095fa2ea58cc9715186431b"
+    },
+    {
+      "objectID": "4fda37cabfc6bab5ee960f5921bbfd4da9e5712b",
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-snapshot-r2-20261107-codex/a7_inventory.py",
+      "sha256": "059760377971e433afab3ba207807eedfd5632c1887ef6ba399c1ce39d359787"
+    },
+    {
+      "objectID": "7a1dbb2651d5de3e295fa817666355f0267fd046",
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-snapshot-r2-20261107-codex/a7_record.py",
+      "sha256": "1732947b66d21d67f5bc02e3b26552148fd4912b5e4dd2ff2aaf0af536c310a6"
+    },
+    {
+      "objectID": "47eb547b83770c766d182e5d4cb3d44fe16f122c",
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-snapshot-r2-20261107-codex/analysis_rules.py",
+      "sha256": "c3ceff61cde7c0adc8267590a13ebcec1b56e56e06624058cc8fbd283c8a4244"
+    },
+    {
+      "objectID": "018710f3b0e6e1d04a280834272db972fd1da248",
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-snapshot-r2-20261107-codex/bounded_analysis.py",
+      "sha256": "03d53a9431c326b297ad786e03852edb88e43323e2dc4791761c36e7072730ca"
+    },
+    {
+      "objectID": "6c3621edc98f7263b91d37568ada8497176896e9",
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-snapshot-r2-20261107-codex/call_binding.py",
+      "sha256": "d1bd5ff2e8212555b95c09a4c24669245341897e42e84a732cbcda25bf058f8b"
+    },
+    {
+      "objectID": "ac1dfc8cca1ccd5a3dd263263a6c47c6a484447f",
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-snapshot-r2-20261107-codex/callee_identity.py",
+      "sha256": "8e119d5ff4c3916ac41b2147cc09ccbaf6597ab7ef24df4d56cc169611ca37aa"
+    },
+    {
+      "objectID": "aab6513f5b5bf9e825fe54886f93ac27ac48c532",
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-snapshot-r2-20261107-codex/constructor_graph.py",
+      "sha256": "1ec99021b4d1160bcee15c43032cbe21554625e345b46b19112c2697e670dfa3"
+    },
+    {
+      "objectID": "f10a0bad50d9fa189d4556660294b7389135920a",
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-snapshot-r2-20261107-codex/edge_categories.py",
+      "sha256": "d16ae559ca4b12c36d52a61d183fb2b1d3bdf38e6e8a54d511e4414e72cd18dd"
+    },
+    {
+      "objectID": "f2bd325723328c6e486db48a056a853a9515eb3d",
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-snapshot-r2-20261107-codex/forwarding_discovery.py",
+      "sha256": "05512ea4a76ff4e8814eab8f192f01c0995a8cf91c203c3ca816d9c36d6a1c85"
+    },
+    {
+      "objectID": "6e1bdd46c6661733d618922952fec174721447dc",
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-snapshot-r2-20261107-codex/lexical_bindings.py",
+      "sha256": "6f678154e856c67554b7a569ae54c74fe46d35bf7d197a149272d968f9978edc"
+    },
+    {
+      "objectID": "9acf6fb4879407fca0d5481f8a994274cd8589c6",
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-snapshot-r2-20261107-codex/lifecycle.py",
+      "sha256": "710c6aafa1829d9aecc25b8e591c4f2a8ec01b0927a45cf6e7ba7b13b75977b0"
+    },
+    {
+      "objectID": "cea5731eb2c5e353336e73887a9992545c5666f2",
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-snapshot-r2-20261107-codex/measured_run.py",
+      "sha256": "61f7dcfdb00a873c2423e463b5beee5fa623bbf04c392e7ae9e30cdb297ed62e"
+    },
+    {
+      "objectID": "fe9b04c16e5eecec17ec763f6dcfdc0590d76df6",
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-snapshot-r2-20261107-codex/model.py",
+      "sha256": "f7384016f72b5f6b9d369925a3a6d864012f286351db38d97993a5f95be78acf"
+    },
+    {
+      "objectID": "af2622a0f526cf3c6d393f6a6a6738eb6ac3887d",
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-snapshot-r2-20261107-codex/owner_transfer.py",
+      "sha256": "68623be32888be9cd25023dd0096aefeedffe00dd905784e3de59525b5d84ff7"
+    },
+    {
+      "objectID": "a2f287a8c672e8b6a982e1498998770e8da5d2c9",
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-snapshot-r2-20261107-codex/parameter_flow.py",
+      "sha256": "b72a4e160dbc0f94b82f53ff150098a54b5fd871debcd4e59295fb437c6fa606"
+    },
+    {
+      "objectID": "546d0375d0485662db9da4f9bdeb131a9e972377",
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-snapshot-r2-20261107-codex/pending_contracts.py",
+      "sha256": "9617fbe48b25d23774cd91e83a42572d6b3e8437397e15b4b9f1c38c16804a4f"
+    },
+    {
+      "objectID": "6a2a9ac861c31278caf56739c7c1d8a7c09ae2f0",
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-snapshot-r2-20261107-codex/prepare_r2.py",
+      "sha256": "74c706c4ec33b9f0a9b14d814e5d9f00c71cc02135855e65c321016654826165"
+    },
+    {
+      "objectID": "81d8a4bf01f3d989d304be7c85c138aae0633e0b",
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-snapshot-r2-20261107-codex/r2_final.py",
+      "sha256": "9c2d63cb105e6f6633b7e2dd82ac09a211902d29e80994d59f1868df5cd9df89"
+    },
+    {
+      "objectID": "83ad04cf364816f11bd4d462165572baeec40882",
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-snapshot-r2-20261107-codex/r2_seal.py",
+      "sha256": "0d47b3e2c14a68d1b0250ff706666dca8546b2ab58ffd349de125a17fc531fb3"
+    },
+    {
+      "objectID": "fc9b9aaf0e13c1a465316210a04a490b06350cba",
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-snapshot-r2-20261107-codex/r2_tests.py",
+      "sha256": "a51b71d51bcc0c509135351b13e1dedd6ec81e51f63e7736c0703e8e07807bf5"
+    },
+    {
+      "objectID": "bcebb632826a8b796a63e2c2d4bb09f180a69115",
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-snapshot-r2-20261107-codex/r2_verify.py",
+      "sha256": "b75b531650a79d233f8919b7e13e4261ce11341f3e5d99eaf0458e59d0a9517b"
+    },
+    {
+      "objectID": "44e51ffec7f9fc5c049c595abae1b2edb78f9a83",
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-snapshot-r2-20261107-codex/reflection_audit.py",
+      "sha256": "bd63d00f0e82703ab31c566b3596003a651b285e032649035007f5fc74afa95c"
+    },
+    {
+      "objectID": "30d30e2d796a7fe23e972da4028444a48c3b485c",
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-snapshot-r2-20261107-codex/source_bindings.py",
+      "sha256": "29dd7070de00fabd1cd4c5824227db0689104910922a0ae28634f12a62efe7e9"
+    },
+    {
+      "objectID": "c75032bf120529980d37a16ea5ebeb7f6cc69c6e",
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-snapshot-r2-20261107-codex/t1_provenance.py",
+      "sha256": "b8fd9df42e64c3227e0713bba448e20c1125e0c2e6a5bd524c53410c5194d948"
+    },
+    {
+      "objectID": "eb14aca7f9c63cc1ab0bec6f258bbf3692f7233b",
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-snapshot-r2-20261107-codex/use_sites.py",
+      "sha256": "4a1fbb3f42180bf3d43698121a863fdb1ed2f723394f2a85864a2afc54b647dc"
+    },
+    {
+      "objectID": "be7248a85ace6da41f0307fe1810721b0ae6e6d9",
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-mode-origin-r1-20261107-codex/mode.py",
+      "sha256": "0f17230b6b1aa2c8345cb2e138fbc684a1e76eb2694b089d79dc6bc21d3755d7"
+    }
+  ],
+  "orcaTask": "task_a8fd2969f0b3",
+  "original19HOLD": true,
+  "owner": "Codex",
+  "priorResidualUntrackedPreserveAndExclude": [
+    {
+      "bytes": 4428,
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-mode-origin-r1-20261107-codex/ci-jobs-first.json",
+      "sha256": "82075c3707541925e2e2a32ac048a1d811d30197f4aeb5786b1c0c18c4f5c8c2"
+    },
+    {
+      "bytes": 13113,
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-mode-origin-r1-20261107-codex/ci-run-first.json",
+      "sha256": "df17a2f508a609c209adbe1fc062f27e9b6d30ad934a2244c60acbbf8d858b3d"
+    },
+    {
+      "bytes": 5534,
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-mode-origin-r1-20261107-codex/committed-verification.json",
+      "sha256": "3de63ef2f14a6e1dcef2f7f8a6ea4cd7f2951acaf94501b7601a42e9585ab1fc"
+    },
+    {
+      "bytes": 5341,
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-mode-origin-r1-20261107-codex/publication-receipt.json",
+      "sha256": "dc7ed81294c92425c0fe27a9dda998c7c7502fa935d20d118596d88059e9f6c8"
+    },
+    {
+      "bytes": 1782,
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/actual-code-review-wait-root-decision.json",
+      "sha256": "f24173b15924397fe7947158bd3c4c0006a5efc71ac8892c876955ffec646c65"
+    },
+    {
+      "bytes": 13952297,
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/ci-artifacts/core-evidence-42323639274.zip",
+      "sha256": "581f006663d4f8efc47821d1504eab5e9e52f1ff840a00a0609d01c3ab5b00a7"
+    },
+    {
+      "bytes": 18381,
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/ci-artifacts/core-evidence-analysis.json",
+      "sha256": "2702d91297e451cd88cc6fa2bd1d58268ab55825fc1ce328635bcc7b964c6681"
+    },
+    {
+      "bytes": 1770,
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/ci-artifacts/s01-storage-42323639274.zip",
+      "sha256": "504d3862fa02409cbe078e0718bca0deb5857f99b2c35148c7388fb208c98c1a"
+    },
+    {
+      "bytes": 1379,
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/ci-artifacts/s01-storage-receipt.json",
+      "sha256": "c3fe9e4dc92ccc74d5c9bb9dd9f34a3e19475003bb3fbb2d97a2a37b6c6579a4"
+    },
+    {
+      "bytes": 928,
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/ci-author-incident.json",
+      "sha256": "225b5807142412c87a5f33038e8a808d68b074f894d564564671d7501d6feb0f"
+    },
+    {
+      "bytes": 1842,
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/ci-backend-artifacts-first.json",
+      "sha256": "17424e28084d44ff576e207c167222933fadba8c65bf726cd18870d8c5d1b954"
+    },
+    {
+      "bytes": 8785,
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/ci-backend-final-jobs.json",
+      "sha256": "40b1050c70a59f03ddea26ee5c6ba0e303f6f4f9b1543b497a324a493c63f315"
+    },
+    {
+      "bytes": 1047993,
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/ci-backend312-job-log.json",
+      "sha256": "8938f9facbe611206be20b92fb779ae4716140c6ea70b5796fe3ee180aea729b"
+    },
+    {
+      "bytes": 1041339,
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/ci-backend314-job-log.json",
+      "sha256": "8142deb0f0d453daa797c2b41038e0e914762e76ce9ce7b8b7af96e5ce94ccba"
+    },
+    {
+      "bytes": 910,
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/ci-core-artifacts-first.json",
+      "sha256": "d071e5c41ebb6b368218efaeec4a812e3c93dde31c2625a9fc2bc50189f02437"
+    },
+    {
+      "bytes": 1781,
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/ci-core-final-artifacts.json",
+      "sha256": "e9289df0299bb567f6d4771dfce172cbb6deabb131c784e681210b5216311444"
+    },
+    {
+      "bytes": 12151,
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/ci-core-final-jobs.json",
+      "sha256": "39ae894c3f7c30b51286ceb160f460c83c424f40462c35088aead080a68789f6"
+    },
+    {
+      "bytes": 509926,
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/ci-core-job-log.json",
+      "sha256": "d3d6238d30954ffca60ad3ee319d607c9c22b7b46806034c1376f1461a55b6de"
+    },
+    {
+      "bytes": 5714,
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/ci-docs-final-receipt.json",
+      "sha256": "153dc657c5e3410f530d574fea942672c3fc11bf2794c7865c7c9d197ef7edad"
+    },
+    {
+      "bytes": 2172,
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/ci-final-exact-bindings.json",
+      "sha256": "e2327b9e76d56c697b265809e323db4c502033e9a180e17d900936edc508714b"
+    },
+    {
+      "bytes": 13077,
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/ci-final-run-backend.json",
+      "sha256": "8d1891b35610b5ef045eb44aef1fc166d4abb41f9e8486a69d0c69b019384f13"
+    },
+    {
+      "bytes": 13068,
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/ci-final-run-core.json",
+      "sha256": "cdc46d6333c7de006dd595befb3936030a9a8c1f36477c576758416fc8c27b1b"
+    },
+    {
+      "bytes": 13068,
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/ci-final-run-docs.json",
+      "sha256": "cbcd379324a950e632ed5b9b3b536a40d84e53426bf6c75d8a63577da8f34eea"
+    },
+    {
+      "bytes": 11891,
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/ci-jobs-2026-11-07T01-24-24-331Z-core.json",
+      "sha256": "c8e0f45f7352f360a03eeb4b1d23c66e10fc66cee5213a02dedaa3a5f4d1eeeb"
+    },
+    {
+      "bytes": 8520,
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/ci-jobs-2026-11-07T01-24-24-913Z-backend.json",
+      "sha256": "b2fad9b11138b641abab77f4ff45bdec71668302e7899335f22be1616e544249"
+    },
+    {
+      "bytes": 11940,
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/ci-jobs-2026-11-07T01-26-36-631Z-core.json",
+      "sha256": "d5a2c872e960f395e8b8be033a29a090a1e599c1e3d7e8250378f5bcb6bd215c"
+    },
+    {
+      "bytes": 8520,
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/ci-jobs-2026-11-07T01-26-37-252Z-backend.json",
+      "sha256": "c90243b1b1286d19a79e771523c05cf8a672d2b70de5eae20fb2c2f31d718c29"
+    },
+    {
+      "bytes": 11996,
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/ci-jobs-2026-11-07T01-32-41-934Z-core.json",
+      "sha256": "c081c2ba118c68abe7f14951ba440def5d37cb529c040e79a45b76c9c0f7ac1f"
+    },
+    {
+      "bytes": 8520,
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/ci-jobs-2026-11-07T01-32-42-540Z-backend.json",
+      "sha256": "cba337b85d774d6d809d9e50e5da014b189483e490f3a18588af38c30eccad9f"
+    },
+    {
+      "bytes": 49051,
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/ci-mlflow-job-log.json",
+      "sha256": "c2e9fe2b4f7fba0edbc75d94e50d76eda35f262ba41a7d839eb38e72bdfbe647"
+    },
+    {
+      "bytes": 13074,
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/ci-observation-102318-backend.json",
+      "sha256": "8426ace65cc015f2b7de06fa845218eb8a00a117d10064110730abf53ede5d97"
+    },
+    {
+      "bytes": 13065,
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/ci-observation-102318-core.json",
+      "sha256": "d3f35e7264f87f0a24921e071b6896463c32334b1258323ca5d10d6353c71fcd"
+    },
+    {
+      "bytes": 8387,
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/ci-plugin-jobs-first-backend.json",
+      "sha256": "62c418f3a50207c8700e8987136c28c19401f8bf32fa359f23f400d404c68c37"
+    },
+    {
+      "bytes": 11669,
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/ci-plugin-jobs-first-core.json",
+      "sha256": "6f2d4a0d27ca9083a926675d31a83508c71b1f4e50ed338dcadfb987f392dd4b"
+    },
+    {
+      "bytes": 3526,
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/ci-plugin-jobs-first-docs.json",
+      "sha256": "62ad06f4df3ed4300bd21d61c310c77273a60cae07130c5b05e591e95f3fc1b3"
+    },
+    {
+      "bytes": 42644,
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/ci-review-handoff.json",
+      "sha256": "74d49bdf91902ba1e4a6780533fc84e97f25bb495f403533af52ef5893223d63"
+    },
+    {
+      "bytes": 16989615,
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/ci-review-packet-746789a36091-20261107.zip",
+      "sha256": "6aed7e3406c5a2b1419882e54eee8c28e9398431705e7e5f614d1db0d084f96a"
+    },
+    {
+      "bytes": 11929,
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/ci-review-packet-manifest.json",
+      "sha256": "eeb1955b94f9d1e9618a02beec3aaf2c6ab5c77653e67951e91a8eb63de9470e"
+    },
+    {
+      "bytes": 12230,
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/ci-review-packet-receipt.json",
+      "sha256": "e75572f471246beb77b7fc29866507f1ba16da0f2a57950e955820d06e11ffe3"
+    },
+    {
+      "bytes": 13074,
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/ci-run-observation-104154-backend.json",
+      "sha256": "8426ace65cc015f2b7de06fa845218eb8a00a117d10064110730abf53ede5d97"
+    },
+    {
+      "bytes": 13065,
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/ci-run-observation-104154-core.json",
+      "sha256": "d3f35e7264f87f0a24921e071b6896463c32334b1258323ca5d10d6353c71fcd"
+    },
+    {
+      "bytes": 15945,
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/publication-candidate-tree-audit.json",
+      "sha256": "ea6085b889a10e3e6aded36c52488a3f8b789ee483795cec7bb26ce9a961db6b"
+    },
+    {
+      "bytes": 801,
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/publication-ci-dispatch-backend.json",
+      "sha256": "5d723f475bfb97686f2878a6e848572d51dfe53495640863a26849acfbbba8fd"
+    },
+    {
+      "bytes": 786,
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/publication-ci-dispatch-core.json",
+      "sha256": "dcf2c3db756bde2455b3b32770ecb9fdbe3919f7a455930820a3549ded37e7fc"
+    },
+    {
+      "bytes": 786,
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/publication-ci-dispatch-docs.json",
+      "sha256": "ed0b6ea567e1633dd99606b997ea288dd09e55116a49e83b0a3fe317988f3c98"
+    },
+    {
+      "bytes": 873,
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/publication-ci-dispatch-intents.json",
+      "sha256": "6c5c0ac80b58b017d8a13193e2fab51beed77693bbecf61bb5d8288f83ec4f3c"
+    },
+    {
+      "bytes": 1658,
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/publication-ci-exact-run-bindings.json",
+      "sha256": "8ea8a2a99684451ce00af67505f56ec54b53fb5bd074aef1bd39046ccbe6178c"
+    },
+    {
+      "bytes": 13074,
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/publication-ci-initial-run-backend.json",
+      "sha256": "8426ace65cc015f2b7de06fa845218eb8a00a117d10064110730abf53ede5d97"
+    },
+    {
+      "bytes": 13065,
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/publication-ci-initial-run-core.json",
+      "sha256": "d3f35e7264f87f0a24921e071b6896463c32334b1258323ca5d10d6353c71fcd"
+    },
+    {
+      "bytes": 13068,
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/publication-ci-initial-run-docs.json",
+      "sha256": "cbcd379324a950e632ed5b9b3b536a40d84e53426bf6c75d8a63577da8f34eea"
+    },
+    {
+      "bytes": 388,
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/publication-ci-readback-client-error.json",
+      "sha256": "2f368cc60d041aab51a795a86b0e7dfc38e7859381f9848a05862cd082d3a65a"
+    },
+    {
+      "bytes": 12735,
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/publication-commit-command.json",
+      "sha256": "f9053442f728e1019ae3de1b3fb878e0c891932e230fe4dd715b445a06173477"
+    },
+    {
+      "bytes": 15006,
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/publication-push-receipt.json",
+      "sha256": "d7e963e70ad9087c61908bbddc516bad6b8f8ccd9d8c30d43c462c58d93f9dd7"
+    },
+    {
+      "bytes": 3496,
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/review-original-local-doc-gates.txt",
+      "sha256": "8a74f36b57b55743b89d451a94d4109dc996f0758d4ad4f4c23ff4fffc364c4a"
+    },
+    {
+      "bytes": 3753,
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-snapshot-r1-20261107-codex/ci-jobs-first.json",
+      "sha256": "00e257e66a25014647296b71586441d3abf221d27c484084c2a5c6adba56fffd"
+    },
+    {
+      "bytes": 4422,
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-snapshot-r1-20261107-codex/ci-jobs-observation02.json",
+      "sha256": "ab2e910bcf94e424816cc3039e9f0d320bbbb3d8e58271ec02f729b905a6fe6f"
+    },
+    {
+      "bytes": 13106,
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-snapshot-r1-20261107-codex/ci-run-first.json",
+      "sha256": "304676b72660ce002f52446de97f31662625091a4e35f10add485b0fc9945dc2"
+    },
+    {
+      "bytes": 13109,
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-snapshot-r1-20261107-codex/ci-run-observation02.json",
+      "sha256": "55180a08d22fda9c171512aafac8a1bc3fa46e0a295ae667d8c54d6838393527"
+    },
+    {
+      "bytes": 20032,
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-snapshot-r1-20261107-codex/committed-receipt-verification.json",
+      "sha256": "f5df4da030a259625910f16e04fa6f490fb086d6b275e7a049f215db3b04e121"
+    },
+    {
+      "bytes": 4448,
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-snapshot-r1-20261107-codex/publication-receipt.json",
+      "sha256": "50d1c2ebfe11dc4182303547f35c218ecd5463678592032aeff9d14cd1fae93e"
+    },
+    {
+      "bytes": 4422,
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-snapshot-r2-20261107-codex/ci-jobs-first.json",
+      "sha256": "9320d15ea4ec81dfd5bfa6b18b1fc32bac8d7c93feacdd426cb84102909a39b3"
+    },
+    {
+      "bytes": 13087,
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-snapshot-r2-20261107-codex/ci-run-first.json",
+      "sha256": "51649b5b9bcf1fc3c0c08e16859d56cc545d5bb3c8452ea4a2e1deedaf0e7684"
+    },
+    {
+      "bytes": 21651,
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-snapshot-r2-20261107-codex/committed-receipt-verification.json",
+      "sha256": "5f7ad3a551f4e86f43ab507906a2fbc7a2a91e8b080b85d93f199f683a6f95e2"
+    },
+    {
+      "bytes": 4439,
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-snapshot-r2-20261107-codex/publication-receipt.json",
+      "sha256": "16466fd1140db20d816ccfc087cd87150e43fa59717ecc2c54d2d3bfe1802360"
+    }
+  ],
+  "publishedProofInputs": [
+    {
+      "gitBlobID": "7b245536fbbf4f607a5dac0d75a1be4abd70e60c",
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/finite_compatibility.py",
+      "sha256": "e61b538446e0ba0b8b254874fadf9c820a3341a40dbf1ec51b63f95e32a105bf"
+    },
+    {
+      "gitBlobID": "3a7865ef18f717416f78b89c344538c69d151752",
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/operation_proof.py",
+      "sha256": "d5f68c4a1bff9b3f59055a72c1b3dfca97b1b5af674e08da19a729ab9bb66e49"
+    },
+    {
+      "gitBlobID": "7e5103b1374581b08e93dbe12aedcc74d02458ac",
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/inputs.json",
+      "sha256": "db87e3c6545105cafc93abbe78e53e2de85facada6363bd0b2773a5e4391706b"
+    },
+    {
+      "gitBlobID": "2b8c82df9078a7049d91084a6a147412294d628f",
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/wip02-finite-proof.json",
+      "sha256": "97fa75e072be288ba19c95ae68037c655d96eabd180e0a3c703908a5af72f6db"
+    },
+    {
+      "gitBlobID": "8b402550dad4d628e88312c2b08290f144215f6d",
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/wip02-finite-control-results.json",
+      "sha256": "179f569e99a59bac848b0bc04655249e2897cf3bfbdae98f5fb50c64a70b849b"
+    },
+    {
+      "gitBlobID": "2a680aaf5301a0324daf7dece8d0ae41e26fa455",
+      "path": "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/existing-guard-refusal.json",
+      "sha256": "3f5e6214ca11c7b08f54412f3f351242651bc6b9b4477df0f9512859488c5759"
+    }
+  ],
+  "realBindings": null,
+  "reviewer": "Independent delta review through Root PENDING",
+  "rootHEADAtRead": "11386fc1b1850ed7e402e0214e02d1322c974f4a",
+  "runtimeB": 0,
+  "scope": [
+    "only NEW own Evidence and single own History",
+    "temporary source-data fixtures only under own .work"
+  ],
+  "task": "FLEET5-B-A7-SELECTOR-DISCOVERY-R1-20261107"
+}

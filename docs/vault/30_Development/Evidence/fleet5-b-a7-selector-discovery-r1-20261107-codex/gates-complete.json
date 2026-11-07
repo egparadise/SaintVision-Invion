@@ -1,0 +1,121 @@
+{
+  "allDirectExit0": true,
+  "probeNotRerun": true,
+  "productAndTestUnchanged": true,
+  "receipts": [
+    {
+      "argv": [
+        "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+        "-B",
+        "tools/check_docs.py"
+      ],
+      "cwd": "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105",
+      "directExit": 0,
+      "endKST": "2026-11-07T11:50:02.929851+09:00",
+      "interpreter": "3.14.7 (tags/v3.14.7:823f032, Aug  5 2026, 10:51:32) [MSC v.1944 64 bit (AMD64)]",
+      "outputEncoding": "UTF8-in-JSON-verbatim",
+      "rawBytes": 127,
+      "rawSHA256": "1c8a60541b81e15e16f844674cf8802beed0b1ee2c9e9dd7e3ef863bd5e2ab83",
+      "rawUTF8": "PASS: 24 original hashes, 1267 versioned documents, wiki links, 48 tasks, 12 outcomes, owner/reviewer/skills, dependency DAG.\r\n",
+      "startKST": "2026-11-07T11:49:17.481612+09:00"
+    },
+    {
+      "argv": [
+        "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+        "-B",
+        "tools/check_ontology.py"
+      ],
+      "cwd": "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105",
+      "directExit": 0,
+      "endKST": "2026-11-07T11:50:05.871364+09:00",
+      "interpreter": "3.14.7 (tags/v3.14.7:823f032, Aug  5 2026, 10:51:32) [MSC v.1944 64 bit (AMD64)]",
+      "outputEncoding": "UTF8-in-JSON-verbatim",
+      "rawBytes": 163,
+      "rawSHA256": "7cdc12bf64f50ba0964625161638a4c639cf22d786a57f04685bed0718e14042",
+      "rawUTF8": "PASS: RDF parsing, defined terms, TTL/JSON-LD equivalence, 48 task mappings, positive SHACL, 4 rejected invalid fixtures, 4 competency queries, Obsidian mirrors.\r\n",
+      "startKST": "2026-11-07T11:50:02.930727+09:00"
+    },
+    {
+      "argv": [
+        "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+        "-B",
+        "tools/check_doc_path_citations.py",
+        "--ratchet",
+        "--base-ref",
+        "746789a36091c8601afea23fe176069e2fa7d87b"
+      ],
+      "cwd": "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105",
+      "directExit": 0,
+      "endKST": "2026-11-07T11:50:18.108550+09:00",
+      "interpreter": "3.14.7 (tags/v3.14.7:823f032, Aug  5 2026, 10:51:32) [MSC v.1944 64 bit (AMD64)]",
+      "outputEncoding": "UTF8-in-JSON-verbatim",
+      "rawBytes": 112,
+      "rawSHA256": "389921b50662776ed834a285f70fc44ab61f7d5bdb4c5249c0a73c98113980de",
+      "rawUTF8": "PASS check_doc_path_citations --ratchet: 290 broken citation(s), all in baseline, none stale, floor unchanged.\r\n",
+      "startKST": "2026-11-07T11:50:05.872083+09:00"
+    },
+    {
+      "argv": [
+        "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+        "-B",
+        "tools/check_doc_single_source.py",
+        "--ratchet"
+      ],
+      "cwd": "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105",
+      "directExit": 0,
+      "endKST": "2026-11-07T11:50:19.040849+09:00",
+      "interpreter": "3.14.7 (tags/v3.14.7:823f032, Aug  5 2026, 10:51:32) [MSC v.1944 64 bit (AMD64)]",
+      "outputEncoding": "UTF8-in-JSON-verbatim",
+      "rawBytes": 80,
+      "rawSHA256": "13b5f5afed05999109839be1baec4ef70ea3c71bcb267353e59eba0f2ae3e448",
+      "rawUTF8": "PASS check_doc_single_source --ratchet: 16 pairs, all in baseline, none stale.\r\n",
+      "startKST": "2026-11-07T11:50:18.109206+09:00"
+    },
+    {
+      "CHECKOnly": true,
+      "argv": [
+        "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+        "-B",
+        "tools/sync_obsidian.py",
+        "--check",
+        "--state",
+        "D:\\Project\\SaintVision-Invion\\SaintVisionI-Invion\\.git\\obsidian-sync-state.json",
+        "--conflicts-out",
+        "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105\\docs\\vault\\30_Development\\Evidence\\fleet5-b-a7-selector-discovery-r1-20261107-codex\\sync-check-conflicts.json"
+      ],
+      "concurrentStatePolicy": "Retain actual Root state changes; no author state write/apply/adopt/resolve/export",
+      "cwd": "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105",
+      "directExit": 0,
+      "endKST": "2026-11-07T11:50:57.457774+09:00",
+      "fullStateAfterBytes": 477592,
+      "fullStateAfterSHA256": "c8b317b46e90100f2c8551c798e5ceb0fdfa1a6a22f47f9ed4f724be9bbdd908",
+      "fullStateBeforeBytes": 477592,
+      "fullStateBeforeSHA256": "c8b317b46e90100f2c8551c798e5ceb0fdfa1a6a22f47f9ed4f724be9bbdd908",
+      "interpreter": "3.14.7 (tags/v3.14.7:823f032, Aug  5 2026, 10:51:32) [MSC v.1944 64 bit (AMD64)]",
+      "outputEncoding": "UTF8-in-JSON-verbatim",
+      "rawBytes": 74,
+      "rawSHA256": "108f72b3d9242fd8b92c3d38de389877f15b9c14ef820199072b3b2ee88f4dee",
+      "rawUTF8": "CHECK: 5043 managed files, 2619 pending exports, 0 conflicts. No writes.\r\n",
+      "startKST": "2026-11-07T11:50:19.060561+09:00",
+      "stateBytesEqual": true
+    },
+    {
+      "argv": [
+        "git",
+        "diff",
+        "--check",
+        "746789a36091c8601afea23fe176069e2fa7d87b"
+      ],
+      "cwd": "D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105",
+      "directExit": 0,
+      "endKST": "2026-11-07T11:50:57.969672+09:00",
+      "interpreter": "3.14.7 (tags/v3.14.7:823f032, Aug  5 2026, 10:51:32) [MSC v.1944 64 bit (AMD64)]",
+      "outputEncoding": "UTF8-in-JSON-verbatim",
+      "rawBytes": 0,
+      "rawSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rawUTF8": "",
+      "startKST": "2026-11-07T11:50:57.474116+09:00"
+    }
+  ],
+  "runtimeB": 0
+}
