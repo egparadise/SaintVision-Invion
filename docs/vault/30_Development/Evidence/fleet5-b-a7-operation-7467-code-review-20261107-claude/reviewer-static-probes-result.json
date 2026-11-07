@@ -1,0 +1,464 @@
+{
+ "startedKST": "2026-11-07T11:17:10+09:00",
+ "endedKST": "2026-11-07T11:17:36+09:00",
+ "python": "3.14.7 (tags/v3.14.7:823f032, Aug  5 2026, 10:51:32) [MSC v.1944 64 bit (AMD64)]",
+ "head": "746789a36091c8601afea23fe176069e2fa7d87b",
+ "base": "b3bbdc8d92a39f2f797a7680deb2770d6f705af0",
+ "rows": [
+  {
+   "probe": "P01-identity-delta",
+   "pass": true,
+   "parents": [
+    "746789a36091c8601afea23fe176069e2fa7d87b",
+    "b3bbdc8d92a39f2f797a7680deb2770d6f705af0"
+   ],
+   "nameStatusCounts": {
+    "A": 93,
+    "M": 1
+   },
+   "nonDocs": [
+    "services/control-plane/src/inv/dispatch.py",
+    "tests/core/test_delivery_operation_origin.py"
+   ],
+   "docsDirs": [
+    "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex",
+    "docs/vault/30_Development/History"
+   ],
+   "productBlobSHA256": "82f029614537eb5bab56934e4b6736fe3dd52ece54b9b9a3996815b131e41de4",
+   "testBlobSHA256": "3dacdb63f83ab1d8075ddcbe422d82daad20bd56f643adee0fc7ae97715925d2",
+   "baseDispatchBlobSHA256": "4a33428502279b88e510b5447382814bb115ddf2bff4f88f5bfcbb93f3c1a404",
+   "productBytes": 15823,
+   "testBytes": 9520
+  },
+  {
+   "probe": "P02-whole-module-ast-delta",
+   "pass": true,
+   "topLevelStatements": 16,
+   "differingTopLevelIndex": [
+    15
+   ],
+   "deliveryWorkerIndex": 15,
+   "differingClassMembers": [
+    "once"
+   ],
+   "differingOnceStatementIndex": [
+    5
+   ],
+   "handlersOrelseFinallyEqual": true,
+   "captureEqualsHandBuilt": true,
+   "guardEqualsHandBuilt": true,
+   "forwardOnlyLeftOperandSwapped": true,
+   "tryBodyLines": [
+    [
+     336,
+     336
+    ],
+    [
+     337,
+     338
+    ],
+    [
+     339,
+     344
+    ]
+   ],
+   "handler": [
+    "except Exception as exc:",
+    "    error = exc.code if isinstance(exc, DomainError) else 'SYS-0001'",
+    "    not_sent = isinstance(exc, DomainError) and getattr(exc, 'not_sent', False)"
+   ]
+  },
+  {
+   "probe": "P03-captured-local-and-finish",
+   "pass": true,
+   "operationNameRefs": [
+    [
+     "Store",
+     336
+    ],
+    [
+     "Load",
+     337
+    ],
+    [
+     "Load",
+     337
+    ],
+    [
+     "Load",
+     342
+    ],
+    [
+     "Load",
+     343
+    ]
+   ],
+   "operationAttributeReads": [
+    [
+     336,
+     "attempt.operation"
+    ]
+   ],
+   "nestedScopesInOnce": [],
+   "finishOperationReads": [
+    "not_sent and attempt.operation == 'execute'"
+   ],
+   "deliveryQueueClassUnchanged": true,
+   "note": "Guard raises ValueError (not DomainError) so not_sent=False and finish short-circuits before its own attempt.operation read."
+  },
+  {
+   "probe": "P04-builtin-bindings",
+   "pass": true,
+   "dispatchBindingsOfTypeStrValueError": [],
+   "dispatchStarImports": [],
+   "dispatchDynamicNamespaceNames": [],
+   "moduleOrSetattrStoresNamedTypeStrValueError": [],
+   "unrelatedObjectAttributeStoresNamedType": [
+    [
+     "tests/core/test_buildkit_transport.py",
+     177,
+     "member.type"
+    ],
+    [
+     "tests/core/test_lan_replacement.py",
+     88,
+     "e.type"
+    ],
+    [
+     "tests/test_fleet5_plain_reentry.py",
+     125,
+     "item.type"
+    ],
+    [
+     "tests/test_fleet5_plain_reentry.py",
+     126,
+     "item.type"
+    ],
+    [
+     "tests/test_s11_storage_failure_evidence.py",
+     318,
+     "link.type"
+    ]
+   ],
+   "firstPartyBuiltinsModuleImports": [
+    [
+     "docs/vault/30_Development/Evidence/fleet5-b-contract-rev7-20261106-codex/graph_policy.py",
+     2
+    ],
+    [
+     "docs/vault/30_Development/Evidence/fleet5-b-rev9c-20261106-codex/rev9c_probe_driver.py",
+     2
+    ],
+    [
+     "docs/vault/30_Development/Evidence/fleet5-b-rev9d-20261107-codex/rev9c_probe_driver.py",
+     2
+    ],
+    [
+     "docs/vault/30_Development/Evidence/fleet5-b-rev9d-20261107-codex/rev9d_gap_driver.py",
+     2
+    ],
+    [
+     "docs/vault/30_Development/Evidence/fleet5-b-rev9e-20261107-codex/rev9c_probe_driver.py",
+     2
+    ],
+    [
+     "docs/vault/30_Development/Evidence/fleet5-b-rev9e-20261107-codex/rev9d_gap_driver.py",
+     2
+    ],
+    [
+     "docs/vault/30_Development/Evidence/fleet5-b-rev9e-20261107-codex/rev9e_gap_driver.py",
+     2
+    ],
+    [
+     "docs/vault/30_Development/Evidence/fleet5-b-rev9f-20261107-codex/rev9c_probe_driver.py",
+     2
+    ],
+    [
+     "docs/vault/30_Development/Evidence/fleet5-b-rev9f-20261107-codex/rev9d_gap_driver.py",
+     2
+    ],
+    [
+     "docs/vault/30_Development/Evidence/fleet5-b-rev9f-20261107-codex/rev9e_gap_driver.py",
+     2
+    ],
+    [
+     "docs/vault/30_Development/Evidence/fleet5-b-rev9f-20261107-codex/rev9f_gap_driver.py",
+     7
+    ],
+    [
+     "docs/vault/30_Development/Evidence/fleet5-b-rev9g-20261107-codex/rev9c_probe_driver.py",
+     2
+    ],
+    [
+     "docs/vault/30_Development/Evidence/fleet5-b-rev9g-20261107-codex/rev9d_gap_driver.py",
+     2
+    ],
+    [
+     "docs/vault/30_Development/Evidence/fleet5-b-rev9g-20261107-codex/rev9e_gap_driver.py",
+     2
+    ],
+    [
+     "docs/vault/30_Development/Evidence/fleet5-b-rev9g-20261107-codex/rev9f_gap_driver.py",
+     7
+    ],
+    [
+     "docs/vault/30_Development/Evidence/fleet5-b-rev9g-20261107-codex/rev9g_gap_driver.py",
+     7
+    ]
+   ],
+   "pyFilesParsed": 1439,
+   "parseFailures": [],
+   "scope": "all tracked .py blobs at 746789a (whole repository); premise of genuine builtins under monkeypatch/heap mutation stays explicit"
+  },
+  {
+   "probe": "P05-deliver-reference-census",
+   "pass": true,
+   "selectorRootReferences": [
+    {
+     "path": "services/control-plane/src/inv/dispatch.py",
+     "line": 339,
+     "ctx": "Load",
+     "directCallFunc": true,
+     "expr": "self.delivery.deliver"
+    }
+   ],
+   "referencesOutsideSelectorRoots": 41,
+   "pathsOutsideSelectorRoots": [
+    "docs/vault/30_Development/Evidence/fleet5-b-a7-mode-origin-r1-20261107-codex/mode.py",
+    "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/finite_compatibility.py",
+    "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/operation_proof.py",
+    "docs/vault/30_Development/Evidence/fleet5-b-contract-rev4-20261106-codex/prior-adversarial.py",
+    "tests/core/test_delivery_operation_origin.py",
+    "tests/integration/test_containment.py",
+    "tests/integration/test_dispatch_node.py",
+    "tests/integration/test_node_control.py",
+    "tests/integration/test_node_delivery.py",
+    "tests/integration/test_results.py",
+    "tests/integration/test_shards.py",
+    "tests/integration/test_tool_admission.py",
+    "tests/integration/test_workspace_resume.py",
+    "tests/node_delivery_support.py"
+   ],
+   "note": "Outside services/control-plane/src, src, tools only tests/docs evidence reference .deliver; they are not production callers."
+  },
+  {
+   "probe": "P06-selector-world",
+   "pass": true,
+   "baseSelected": 25,
+   "headSelected": 25,
+   "samePathSet": true,
+   "other24BlobIdsEqual": true,
+   "paths": [
+    "services/control-plane/src/inv/build_product_runtime.py",
+    "services/control-plane/src/inv/dispatch.py",
+    "services/control-plane/src/inv/model_remote.py",
+    "services/control-plane/src/inv/node_transport.py",
+    "services/control-plane/src/inv/observer_worker.py",
+    "services/control-plane/src/inv/output_ingestion.py",
+    "services/control-plane/src/inv/remote_git.py",
+    "services/control-plane/src/inv/result_view.py",
+    "services/control-plane/src/inv/storage_check_collect.py",
+    "services/control-plane/src/inv/storage_sampling.py",
+    "services/control-plane/src/inv/terminal.py",
+    "services/control-plane/src/inv/tooling.py",
+    "services/control-plane/src/inv/worker.py",
+    "services/control-plane/src/inv/workspace_config.py",
+    "services/control-plane/src/inv/workspace_resume.py",
+    "src/saintvision/services/eval_execution.py",
+    "tools/check_remote_workspace.py",
+    "tools/intranet_e2e_smoke.py",
+    "tools/lan_execution.py",
+    "tools/lan_pilot.py",
+    "tools/post_landing_select_run.py",
+    "tools/prepare_server_config.py",
+    "tools/remote_workspace_entry.py",
+    "tools/run_ac11_exact_sha_aggregate.py",
+    "tools/run_s04_db_evidence.py"
+   ],
+   "note": "Discovers paths from the HEAD tree itself; the author current_world() reuses BASE paths, so this closes new-path discovery for 746789a."
+  },
+  {
+   "probe": "P07-attempt-origin",
+   "pass": true,
+   "deliveryAttemptConstructors": [
+    [
+     "services/control-plane/src/inv/dispatch.py",
+     243,
+     "operation"
+    ]
+   ],
+   "acquireOperationStores": [
+    [
+     170,
+     [
+      "cancel",
+      "observe"
+     ]
+    ],
+    [
+     184,
+     [
+      "cancel"
+     ]
+    ],
+    [
+     203,
+     [
+      "execute"
+     ]
+    ]
+   ],
+   "literalDomain": [
+    "cancel",
+    "execute",
+    "observe"
+   ],
+   "deliveryAttemptDecorators": [
+    "dataclass(frozen=True)"
+   ],
+   "deliveryAttemptBodyKinds": [
+    "AnnAssign"
+   ],
+   "note": "Production attempts carry only the three builtin literals in a frozen plain field; the guard is defence in depth and normal mappings are unchanged."
+  },
+  {
+   "probe": "P08-test-static",
+   "pass": true,
+   "testItems": {
+    "test_builtin_domain_is_captured_once_and_forwarded_as_exact_bools": 3,
+    "test_rejected_origin_never_delivers_or_invokes_rich_methods": 14,
+    "test_capture_property_error_uses_existing_handler_and_finish": 1,
+    "test_none_attempt_preserves_reconciliation_and_followup_branches": 4,
+    "test_stopped_finish_preserves_followup_order": 2
+   },
+   "totalItems": 24,
+   "imports": [
+    "inv.containment",
+    "inv.dispatch",
+    "pytest"
+   ],
+   "monkeypatches": [
+    "monkeypatch.setattr(containment, 'ContainmentReconciler', Reconciler)"
+   ],
+   "spyClasses": [
+    "Delivery",
+    "Followup",
+    "Queue",
+    "Reconciler"
+   ],
+   "workerConstruction": [
+    "object.__new__(dispatch.DeliveryWorker)"
+   ],
+   "copiedProductDefinitions": [],
+   "actualOnceCallSites": 1,
+   "invalidCaseIds": [
+    "'none'",
+    "'false'",
+    "'true'",
+    "'zero'",
+    "'one'",
+    "'bytes'",
+    "'empty'",
+    "'wrong-case'",
+    "'foreign-literal'",
+    "'foreign-object'",
+    "'foreign-equal'",
+    "'hostile-foreign'",
+    "'hostile-str-subclass'",
+    "'plain-str-subclass'"
+   ]
+  },
+  {
+   "probe": "P09-immutable-helpers-refusal",
+   "pass": true,
+   "helperCount": 29,
+   "helpersChangedOrMissingAtBase": [],
+   "refusalBlobSHA256": "3f5e6214ca11c7b08f54412f3f351242651bc6b9b4477df0f9512859488c5759",
+   "refusalBytes": 3011
+  },
+  {
+   "probe": "P10-archives-and-raw-wrapper",
+   "pass": true,
+   "wip02": [
+    "ce2e8c8802c4c4b805cd38f5fe49117f472f0b44bb2f1c4adb80759924670fbb",
+    2623087,
+    52,
+    {
+     "raw": [
+      [
+       "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/review-original-local-doc-gates.txt",
+       3496,
+       "8a74f36b57b55743b89d451a94d4109dc996f0758d4ad4f4c23ff4fffc364c4a"
+      ]
+     ],
+     "dispatch": [
+      [
+       "services/control-plane/src/inv/dispatch.py",
+       15823,
+       "82f029614537eb5bab56934e4b6736fe3dd52ece54b9b9a3996815b131e41de4"
+      ]
+     ],
+     "test": [
+      [
+       "tests/core/test_delivery_operation_origin.py",
+       9520,
+       "3dacdb63f83ab1d8075ddcbe422d82daad20bd56f643adee0fc7ae97715925d2"
+      ]
+     ]
+    }
+   ],
+   "ciPacket": [
+    "6aed7e3406c5a2b1419882e54eee8c28e9398431705e7e5f614d1db0d084f96a",
+    16989615,
+    46,
+    {
+     "manifest": [
+      [
+       "docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/ci-review-packet-manifest.json",
+       11929,
+       "eeb1955b94f9d1e9618a02beec3aaf2c6ab5c77653e67951e91a8eb63de9470e"
+      ]
+     ]
+    }
+   ],
+   "standaloneRawPathInGit": false,
+   "wrapperGitBlobSHA256": "5c6d7e0bf13a399e9ec3020885b391d852a0927e006f1539ba4564eb7b311679",
+   "wrapperBytes": 3835,
+   "wrapperKeys": [
+    "artifactEncoding",
+    "originalRawPath",
+    "rawBytes",
+    "rawSHA256",
+    "rawUTF8"
+   ],
+   "wrapperEmbeddedRawSHA256": [
+    "8a74f36b57b55743b89d451a94d4109dc996f0758d4ad4f4c23ff4fffc364c4a"
+   ]
+  },
+  {
+   "probe": "P11-guard-expression-data",
+   "pass": true,
+   "rejected": {
+    "execute": false,
+    "observe": false,
+    "cancel": false,
+    "None": true,
+    "bytes": true,
+    "Execute": true,
+    "empty": true,
+    "hostile": true,
+    "hstr-observe": true,
+    "int1": true,
+    "True": true
+   },
+   "richCallsDuringExactGuard": [],
+   "isinstanceContrastResult": false,
+   "isinstanceContrastCalls": [
+    "str-eq"
+   ],
+   "note": "Reviewer copy of the guard expression on reviewer values only; tuple membership with a str-subclass shows why type() is not str is required."
+  }
+ ],
+ "allPass": true,
+ "productImportedOrExecuted": false
+}

@@ -1,0 +1,236 @@
+{
+ "actual": {
+  "capturedLocalReferenceKinds": {
+   "Load": 4,
+   "Store": 1
+  },
+  "changedOtherPaths": [],
+  "closedGrammarReason": null,
+  "expectedOwnerDerivationSHA256": "c135d36f07fc81143e7e9b95ce56d2b4382bfea4a5d5fdf0a297a5b6c3e5298f",
+  "other24RawBytesEqualRealBASE": true,
+  "ownerDerivationReason": null,
+  "reason": null,
+  "referenceContract": {
+   "directNodeIdentityRequired": true,
+   "forwardCallWitness": {
+    "expressionSHA256": "476fd474759435bc098bef7e35bc2bdc8e58826f015228e59a6ee794db8867cb",
+    "fileSHA256": "82f029614537eb5bab56934e4b6736fe3dd52ece54b9b9a3996815b131e41de4",
+    "function": "inv.dispatch.DeliveryWorker.once",
+    "path": "services/control-plane/src/inv/dispatch.py",
+    "span": [
+     339,
+     12,
+     344,
+     13
+    ]
+   },
+   "projectedForwardAttribute": {
+    "expressionSHA256": "26a4e065c848c1fb80b56f62bc7cae559f203434e03608f75572d2fe7eedf297",
+    "fileSHA256": "82f029614537eb5bab56934e4b6736fe3dd52ece54b9b9a3996815b131e41de4",
+    "function": "inv.dispatch.DeliveryWorker.once",
+    "path": "services/control-plane/src/inv/dispatch.py",
+    "span": [
+     339,
+     12,
+     339,
+     33
+    ]
+   },
+   "reason": null,
+   "references": [
+    {
+     "attributeKind": "Attribute",
+     "attributeSource": {
+      "expressionSHA256": "26a4e065c848c1fb80b56f62bc7cae559f203434e03608f75572d2fe7eedf297",
+      "fileSHA256": "82f029614537eb5bab56934e4b6736fe3dd52ece54b9b9a3996815b131e41de4",
+      "function": "inv.dispatch.DeliveryWorker.once",
+      "path": "services/control-plane/src/inv/dispatch.py",
+      "span": [
+       339,
+       12,
+       339,
+       33
+      ]
+     },
+     "callKind": "Call",
+     "callSource": {
+      "expressionSHA256": "476fd474759435bc098bef7e35bc2bdc8e58826f015228e59a6ee794db8867cb",
+      "fileSHA256": "82f029614537eb5bab56934e4b6736fe3dd52ece54b9b9a3996815b131e41de4",
+      "function": "inv.dispatch.DeliveryWorker.once",
+      "path": "services/control-plane/src/inv/dispatch.py",
+      "span": [
+       339,
+       12,
+       344,
+       13
+      ]
+     },
+     "directCallFunc": true
+    }
+   ],
+   "sameKindWitnessComparison": true
+  },
+  "scopedSourceCount": 25,
+  "sourcePathSetEqual": true,
+  "wholeModuleNormalizedASTEqualsDerivedBASEPlusExactDelta": true
+ },
+ "allExpected": true,
+ "applicationImportedOrExecuted": false,
+ "context": {
+  "head": "746789a36091c8601afea23fe176069e2fa7d87b",
+  "immutableHelpersMatch": true,
+  "refusalHash": true,
+  "testedBytesMatch": true,
+  "workingEqualsHEADBlobs": true,
+  "worldPaths": 25
+ },
+ "emitCalled": false,
+ "endedKST": "2026-11-07T11:19:15+09:00",
+ "gitStatusSHA256": "7c1a8d539da50258d8d9732cc4f4a545cb3d726a0b9caa1025aef4ea5073947e",
+ "gitStatusUnchangedByReplay": true,
+ "legacy": {
+  "audited": 25,
+  "constructorArgumentBindingsValid": true,
+  "errors": [
+   {
+    "error": "DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:INSTANCE:operation",
+    "path": "services/control-plane/src/inv/dispatch.py",
+    "reflection": []
+   }
+  ],
+  "guardCompatibilityClean": false,
+  "modeRuleReason": null,
+  "parsed": 25,
+  "referenceContractReason": null
+ },
+ "python": "3.14.7 (tags/v3.14.7:823f032, Aug  5 2026, 10:51:32) [MSC v.1944 64 bit (AMD64)]",
+ "reviewerControls": [
+  {
+   "changedInputSHA256": {
+    "services/control-plane/src/inv/dispatch.py": "d8afea3d07700684ee6587b49e38f0d92d33d8fa09854ccee9f89e24c262029a"
+   },
+   "closedGrammarReason": "CAPTURE_GUARD_GRAMMAR_CHANGED",
+   "expectationMet": true,
+   "expectedReason": "CAPTURE_GUARD_GRAMMAR_CHANGED",
+   "name": "RC01-capture-and-guard-hoisted-before-try",
+   "ownerReason": null,
+   "reason": "CAPTURE_GUARD_GRAMMAR_CHANGED",
+   "referenceReason": null,
+   "wholeModuleEqual": false,
+   "why": "ValueError would escape once, skipping finish and leaving the lease to time out"
+  },
+  {
+   "changedInputSHA256": {
+    "services/control-plane/src/inv/dispatch.py": "431f4fc16d9b916557c171b6e3cbaf260575bb63d33a8f90259ef1a13d2b2787"
+   },
+   "closedGrammarReason": "CAPTURE_GUARD_GRAMMAR_CHANGED",
+   "expectationMet": true,
+   "expectedReason": "CAPTURE_GUARD_GRAMMAR_CHANGED",
+   "name": "RC02-isinstance-instead-of-exact-type",
+   "ownerReason": null,
+   "reason": "CAPTURE_GUARD_GRAMMAR_CHANGED",
+   "referenceReason": null,
+   "wholeModuleEqual": false,
+   "why": "admits str subclasses whose __eq__ runs in membership"
+  },
+  {
+   "changedInputSHA256": {
+    "services/control-plane/src/inv/dispatch.py": "a596a785b1192a88ed18c3ad1ada52905dd4768d07520349b49a1f0a74c6c4cd"
+   },
+   "closedGrammarReason": "CAPTURE_GUARD_GRAMMAR_CHANGED",
+   "expectationMet": true,
+   "expectedReason": "CAPTURE_GUARD_GRAMMAR_CHANGED",
+   "name": "RC03-operands-reordered",
+   "ownerReason": null,
+   "reason": "CAPTURE_GUARD_GRAMMAR_CHANGED",
+   "referenceReason": null,
+   "wholeModuleEqual": false,
+   "why": "membership (rich __eq__) would run before the exact-type gate"
+  },
+  {
+   "changedInputSHA256": {
+    "services/control-plane/src/inv/dispatch.py": "d53c932cb7760141f4d1b66d6be5fac15b8cd5e5a4add8f4eb82b97102eddc45"
+   },
+   "closedGrammarReason": "CAPTURE_GUARD_GRAMMAR_CHANGED",
+   "expectationMet": true,
+   "expectedReason": "CAPTURE_GUARD_GRAMMAR_CHANGED",
+   "name": "RC04-set-literal-domain",
+   "ownerReason": null,
+   "reason": "CAPTURE_GUARD_GRAMMAR_CHANGED",
+   "referenceReason": null,
+   "wholeModuleEqual": false,
+   "why": "set membership hashes the value first"
+  },
+  {
+   "changedInputSHA256": {
+    "services/control-plane/src/inv/dispatch.py": "d6ee6fef034dd2f4da700f5868c7daf0497ea708b8a06f4f337f9d43a8744f37"
+   },
+   "closedGrammarReason": "CAPTURE_GUARD_GRAMMAR_CHANGED",
+   "expectationMet": true,
+   "expectedReason": "CAPTURE_GUARD_GRAMMAR_CHANGED",
+   "name": "RC05-domainerror-instead-of-valueerror",
+   "ownerReason": null,
+   "reason": "CAPTURE_GUARD_GRAMMAR_CHANGED",
+   "referenceReason": null,
+   "wholeModuleEqual": false,
+   "why": "a DomainError could carry not_sent and reach finish operation re-read"
+  },
+  {
+   "changedInputSHA256": {
+    "services/control-plane/src/inv/dispatch.py": "6505200f91d1b408d77a0d98147ef848270a5f0e44e157c4eba3e240a35156f1"
+   },
+   "closedGrammarReason": null,
+   "expectationMet": true,
+   "expectedReason": "WHOLE_MODULE_DELTA_CHANGED",
+   "name": "RC06-handler-narrowed",
+   "ownerReason": null,
+   "reason": "WHOLE_MODULE_DELTA_CHANGED",
+   "referenceReason": null,
+   "wholeModuleEqual": false,
+   "why": "handler is outside the closed grammar; only whole-module equality catches it"
+  },
+  {
+   "changedInputSHA256": {
+    "services/control-plane/src/inv/dispatch.py": "826f668f874489243e8793ca800765142807946e6a806417f6622c0aa6d42250"
+   },
+   "closedGrammarReason": null,
+   "expectationMet": true,
+   "expectedReason": "WHOLE_MODULE_DELTA_CHANGED",
+   "name": "RC07-finish-short-circuit-removed",
+   "ownerReason": null,
+   "reason": "WHOLE_MODULE_DELTA_CHANGED",
+   "referenceReason": null,
+   "wholeModuleEqual": false,
+   "why": "finish is outside once; whole-module equality must catch it"
+  },
+  {
+   "changedInputSHA256": {
+    "services/control-plane/src/inv/dispatch.py": "2a928f2815848f8a0fdeb6e0c5ae76036363b1b9f345a564332be9acb40d7ae4"
+   },
+   "closedGrammarReason": null,
+   "expectationMet": true,
+   "expectedReason": "WHOLE_MODULE_DELTA_CHANGED",
+   "name": "RC08-decorated-once",
+   "ownerReason": null,
+   "reason": "WHOLE_MODULE_DELTA_CHANGED",
+   "referenceReason": null,
+   "wholeModuleEqual": false,
+   "why": "A7M-I1 decorator case now refused by the new layer itself"
+  },
+  {
+   "changedInputSHA256": {
+    "services/control-plane/src/inv/dispatch.py": "eabfa78d14c467213c6836ebc042e0769218a65c4d190d57f7d6f38484751de8"
+   },
+   "closedGrammarReason": null,
+   "expectationMet": true,
+   "expectedReason": null,
+   "name": "RC09-benign-comment-and-parentheses",
+   "ownerReason": null,
+   "reason": null,
+   "referenceReason": null,
+   "wholeModuleEqual": true,
+   "why": "AST-identical text change must stay accepted (not a textual hash proof)"
+  }
+ ],
+ "startedKST": "2026-11-07T11:18:50+09:00"
+}

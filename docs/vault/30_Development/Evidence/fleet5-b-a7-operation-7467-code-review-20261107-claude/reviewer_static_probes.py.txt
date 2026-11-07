@@ -1,0 +1,415 @@
+"""Independent reviewer static probes for FLEET5-B-A7 operation guard 746789a.
+
+Usage: python -I -B reviewer_static_probes.py.txt <repo-root> <root-workspace> <out.json>
+
+Reads Git objects, committed JSON and archives only. Parses source with ast.
+Never imports, execs or evals application, test or author-proof code.
+"""
+import ast
+import datetime
+import hashlib
+import json
+import re
+import subprocess
+import sys
+import zipfile
+from pathlib import Path
+
+REPO, ROOTWS, OUT = Path(sys.argv[1]), Path(sys.argv[2]), Path(sys.argv[3])
+HEAD = '746789a36091c8601afea23fe176069e2fa7d87b'
+BASE = 'b3bbdc8d92a39f2f797a7680deb2770d6f705af0'
+DC = 'services/control-plane/src/inv/dispatch.py'
+TEST = 'tests/core/test_delivery_operation_origin.py'
+EV = 'docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex/'
+ROOTS = ('services/control-plane/src/', 'src/', 'tools/')
+# Python-regex equivalent of the author's POSIX ERE selector ([[:space:]] -> \s).
+SELECTOR = re.compile(r'NodeDelivery|DeliveryWorker|DeliveryAttempt|DeliveryQueue|node_transport|from\s.*dispatch|import\s.*dispatch|\.deliver\b')
+rows = []
+
+
+def kst():
+    return datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=9))).isoformat(timespec='seconds')
+
+
+def sha(b):
+    return hashlib.sha256(b).hexdigest()
+
+
+def git(*argv):
+    return subprocess.run(['git', *argv], cwd=REPO, check=True, capture_output=True).stdout
+
+
+def row(probe, ok, **facts):
+    rows.append({'probe': probe, 'pass': bool(ok), **facts})
+
+
+def tree_blobs(rev):
+    out = git('ls-tree', '-r', '-z', rev).split(b'\0')
+    res = {}
+    for item in out:
+        if not item:
+            continue
+        meta, path = item.split(b'\t', 1)
+        _mode, kind, oid = meta.split()
+        if kind == b'blob':
+            res[path.decode('utf8')] = oid.decode()
+    return res
+
+
+def cat_batch(oids):
+    proc = subprocess.run(['git', 'cat-file', '--batch'], cwd=REPO, input=''.join(o + '\n' for o in oids).encode(),
+                          capture_output=True, check=True)
+    data, pos, res = proc.stdout, 0, {}
+    for oid in oids:
+        nl = data.index(b'\n', pos)
+        header = data[pos:nl].split()
+        size = int(header[2])
+        res[oid] = data[nl + 1:nl + 1 + size]
+        pos = nl + 1 + size + 1
+    return res
+
+
+def dump(n):
+    return ast.dump(n, include_attributes=False)
+
+
+def once_of(tree):
+    cls = [n for n in tree.body if isinstance(n, ast.ClassDef) and n.name == 'DeliveryWorker']
+    assert len(cls) == 1
+    fn = [n for n in cls[0].body if isinstance(n, ast.FunctionDef) and n.name == 'once']
+    assert len(fn) == 1
+    return cls[0], fn[0]
+
+
+def main():
+    started = kst()
+    head_tree, base_tree = tree_blobs(HEAD), tree_blobs(BASE)
+
+    # P01 identity / parent / delta shape
+    parents = git('rev-list', '--parents', '-n1', HEAD).decode().split()
+    ns = [l.split('\t') for l in git('diff', '--name-status', BASE, HEAD).decode().splitlines()]
+    counts = {}
+    for s, _p in ns:
+        counts[s] = counts.get(s, 0) + 1
+    non_docs = sorted(p for _s, p in ns if not p.startswith('docs/'))
+    want_nd = [DC, TEST]
+    blobs = cat_batch([head_tree[DC], head_tree[TEST], base_tree[DC]])
+    prod, test, base_dc = blobs[head_tree[DC]], blobs[head_tree[TEST]], blobs[base_tree[DC]]
+    docs_prefixes = sorted({p.rsplit('/', 1)[0] for _s, p in ns if p.startswith('docs/')})
+    row('P01-identity-delta', parents == [HEAD, BASE] and counts == {'A': 93, 'M': 1} and non_docs == want_nd
+        and sha(prod) == '82f029614537eb5bab56934e4b6736fe3dd52ece54b9b9a3996815b131e41de4'
+        and sha(test) == '3dacdb63f83ab1d8075ddcbe422d82daad20bd56f643adee0fc7ae97715925d2'
+        and sha(base_dc) == '4a33428502279b88e510b5447382814bb115ddf2bff4f88f5bfcbb93f3c1a404',
+        parents=parents, nameStatusCounts=counts, nonDocs=non_docs, docsDirs=docs_prefixes,
+        productBlobSHA256=sha(prod), testBlobSHA256=sha(test), baseDispatchBlobSHA256=sha(base_dc),
+        productBytes=len(prod), testBytes=len(test))
+
+    # P02 whole-module AST delta, derived by the reviewer's own walk (not the author's expected_module)
+    bt, ht = ast.parse(base_dc, DC), ast.parse(prod, DC)
+    same_top = len(bt.body) == len(ht.body)
+    top_diff = [i for i, (a, b) in enumerate(zip(bt.body, ht.body)) if dump(a) != dump(b)]
+    bcls, bonce = once_of(bt)
+    hcls, honce = once_of(ht)
+    cls_idx = bt.body.index(bcls)
+    member_diff = [n.name if hasattr(n, 'name') else type(n).__name__
+                   for a, n in zip(bcls.body, hcls.body) if dump(a) != dump(n)]
+    stmt_diff = [i for i, (a, b) in enumerate(zip(bonce.body, honce.body)) if dump(a) != dump(b)]
+    btry = [s for s in bonce.body if isinstance(s, ast.Try)]
+    htry = [s for s in honce.body if isinstance(s, ast.Try)]
+    sig_equal = (dump(bonce.args) == dump(honce.args) and bonce.decorator_list == [] and honce.decorator_list == []
+                 and bonce.returns is None and honce.returns is None)
+    try_ok = (len(btry) == len(htry) == 1 and len(btry[0].body) == 1 and len(htry[0].body) == 3
+              and [dump(h) for h in btry[0].handlers] == [dump(h) for h in htry[0].handlers]
+              and btry[0].orelse == htry[0].orelse == [] and btry[0].finalbody == htry[0].finalbody == [])
+    # Build the expected capture / guard nodes by hand (independent of the author's CAPTURE/GUARD strings).
+    N = lambda i, c=ast.Load: ast.Name(id=i, ctx=c())
+    exp_capture = ast.Assign(targets=[N('operation', ast.Store)], value=ast.Attribute(value=N('attempt'), attr='operation', ctx=ast.Load()))
+    exp_guard = ast.If(
+        test=ast.BoolOp(op=ast.Or(), values=[
+            ast.Compare(left=ast.Call(func=N('type'), args=[N('operation')], keywords=[]), ops=[ast.IsNot()], comparators=[N('str')]),
+            ast.Compare(left=N('operation'), ops=[ast.NotIn()],
+                        comparators=[ast.Tuple(elts=[ast.Constant('execute'), ast.Constant('observe'), ast.Constant('cancel')], ctx=ast.Load())])]),
+        body=[ast.Raise(exc=ast.Call(func=N('ValueError'), args=[ast.Constant('Unsupported delivery operation origin')], keywords=[]), cause=None)],
+        orelse=[])
+    cap, grd, fwd = htry[0].body if try_ok else (None, None, None)
+    # Python 3.13+ ast.dump omits empty-list/None defaults; compare via unparse+reparse dumps on both sides.
+    norm = lambda n: dump(ast.parse(ast.unparse(ast.fix_missing_locations(n))).body[0])
+    capture_ok = try_ok and norm(exp_capture) == dump(cap)
+    guard_ok = try_ok and norm(exp_guard) == dump(grd)
+    old_call, new_call = btry[0].body[0].value, fwd.value
+    kw_old = [(k.arg, dump(k.value)) for k in old_call.keywords]
+    kw_new = [(k.arg, dump(k.value)) for k in new_call.keywords]
+    call_rest_equal = dump(old_call.func) == dump(new_call.func) and [dump(a) for a in old_call.args] == [dump(a) for a in new_call.args]
+    left_old = [dump(k.value.left) for k in old_call.keywords]
+    left_new = [dump(k.value.left) for k in new_call.keywords]
+    rest_old = [(dump(k.value.ops[0]), [dump(c) for c in k.value.comparators]) for k in old_call.keywords]
+    rest_new = [(dump(k.value.ops[0]), [dump(c) for c in k.value.comparators]) for k in new_call.keywords]
+    forward_ok = (call_rest_equal and [k for k, _ in kw_old] == [k for k, _ in kw_new] == ['observation_only', 'cancel_only']
+                  and left_old == [dump(ast.Attribute(value=N('attempt'), attr='operation', ctx=ast.Load()))] * 2
+                  and left_new == [dump(N('operation'))] * 2 and rest_old == rest_new
+                  and [ast.unparse(c) for k in new_call.keywords for c in k.value.comparators] == ["'observe'", "'cancel'"])
+    row('P02-whole-module-ast-delta', same_top and top_diff == [cls_idx] and member_diff == ['once'] and sig_equal
+        and stmt_diff == [bonce.body.index(btry[0])] and try_ok and capture_ok and guard_ok and forward_ok,
+        topLevelStatements=len(ht.body), differingTopLevelIndex=top_diff, deliveryWorkerIndex=cls_idx,
+        differingClassMembers=member_diff, differingOnceStatementIndex=stmt_diff, handlersOrelseFinallyEqual=try_ok,
+        captureEqualsHandBuilt=capture_ok, guardEqualsHandBuilt=guard_ok, forwardOnlyLeftOperandSwapped=forward_ok,
+        tryBodyLines=[[s.lineno, s.end_lineno] for s in htry[0].body],
+        handler=ast.unparse(htry[0].handlers[0]).splitlines()[:3])
+
+    # P03 captured-local reference set & attribute reads inside once; finish short-circuit unchanged
+    refs = [(type(n.ctx).__name__, n.lineno) for n in ast.walk(honce) if isinstance(n, ast.Name) and n.id == 'operation']
+    attrs = [(n.lineno, ast.unparse(n)) for n in ast.walk(honce) if isinstance(n, ast.Attribute) and n.attr == 'operation']
+    lambdas = [n.lineno for n in ast.walk(honce) if isinstance(n, (ast.Lambda, ast.FunctionDef, ast.ListComp, ast.GeneratorExp, ast.DictComp, ast.SetComp, ast.NamedExpr))
+               and n is not honce]
+    q = [n for n in ht.body if isinstance(n, ast.ClassDef) and n.name == 'DeliveryQueue'][0]
+    fin = [n for n in q.body if isinstance(n, ast.FunctionDef) and n.name == 'finish'][0]
+    fin_reads = [ast.unparse(n.test) for n in ast.walk(fin) if isinstance(n, ast.If) and 'attempt.operation' in ast.unparse(n.test)]
+    bq = [n for n in bt.body if isinstance(n, ast.ClassDef) and n.name == 'DeliveryQueue'][0]
+    row('P03-captured-local-and-finish', sorted(refs) == sorted([('Store', 336), ('Load', 337), ('Load', 337), ('Load', 342), ('Load', 343)])
+        and attrs == [(336, 'attempt.operation')] and lambdas == [] and fin_reads == ["not_sent and attempt.operation == 'execute'"]
+        and dump(q) == dump(bq),
+        operationNameRefs=refs, operationAttributeReads=attrs, nestedScopesInOnce=lambdas,
+        finishOperationReads=fin_reads, deliveryQueueClassUnchanged=dump(q) == dump(bq),
+        note='Guard raises ValueError (not DomainError) so not_sent=False and finish short-circuits before its own attempt.operation read.')
+
+    # P04 builtin bindings in dispatch.py and any store into a module attribute named type/str/ValueError anywhere first-party
+    names = {'type', 'str', 'ValueError'}
+    binds, star, dyn = [], [], []
+    for n in ast.walk(ht):
+        if isinstance(n, ast.Name) and not isinstance(n.ctx, ast.Load) and n.id in names:
+            binds.append([n.lineno, n.id])
+        if isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)) and n.name in names:
+            binds.append([n.lineno, n.name])
+        if isinstance(n, ast.arg) and n.arg in names:
+            binds.append([n.lineno, n.arg])
+        if isinstance(n, ast.alias):
+            if n.name == '*':
+                star.append(n.lineno if hasattr(n, 'lineno') else None)
+            elif (n.asname or n.name.split('.')[0]) in names:
+                binds.append([getattr(n, 'lineno', None), n.asname or n.name])
+        if isinstance(n, ast.ExceptHandler) and n.name in names:
+            binds.append([n.lineno, n.name])
+        if isinstance(n, (ast.Global, ast.Nonlocal)) and names & set(n.names):
+            binds.append([n.lineno, sorted(names & set(n.names))])
+        if isinstance(n, ast.Name) and n.id in {'globals', 'vars', 'exec', 'eval', '__builtins__', 'builtins', 'setattr', 'locals'}:
+            dyn.append([n.lineno, n.id])
+    py_head = {p: o for p, o in head_tree.items() if p.endswith('.py')}
+    contents = cat_batch(sorted(set(py_head.values())))
+    ext_stores, any_attr_stores, builtins_imports, parse_fail = [], [], [], []
+    for p, o in sorted(py_head.items()):
+        try:
+            t = ast.parse(contents[o], p)
+        except (SyntaxError, ValueError) as exc:
+            parse_fail.append([p, type(exc).__name__])
+            continue
+        # Names bound to a dispatch or builtins module object in this file (import X / import X as Y / from P import dispatch).
+        modnames = {'__builtins__'}
+        for n in ast.walk(t):
+            if isinstance(n, ast.Import):
+                for a in n.names:
+                    if a.name == 'builtins' or a.name.endswith('dispatch'):
+                        modnames.add(a.asname or a.name)
+            if isinstance(n, ast.ImportFrom):
+                for a in n.names:
+                    if a.name in ('dispatch', 'builtins'):
+                        modnames.add(a.asname or a.name)
+                if (n.module or '') == 'builtins':
+                    builtins_imports.append([p, n.lineno])
+                if n.module == 'builtins' or any(a.name == 'builtins' for a in n.names):
+                    pass
+            if isinstance(n, ast.Import) and any(a.name == 'builtins' for a in n.names):
+                builtins_imports.append([p, n.lineno])
+        for n in ast.walk(t):
+            if isinstance(n, ast.Attribute) and not isinstance(n.ctx, ast.Load) and n.attr in names:
+                any_attr_stores.append([p, n.lineno, ast.unparse(n)])
+                if ast.unparse(n.value) in modnames:
+                    ext_stores.append([p, n.lineno, ast.unparse(n)])
+            if isinstance(n, ast.Call) and ast.unparse(n.func) in {'setattr', 'monkeypatch.setattr'} and len(n.args) >= 2 \
+                    and isinstance(n.args[1], ast.Constant) and n.args[1].value in names:
+                ext_stores.append([p, n.lineno, ast.unparse(n)])
+            if isinstance(n, ast.Call) and ast.unparse(n.func) == 'monkeypatch.setattr' and n.args and isinstance(n.args[0], ast.Constant) \
+                    and isinstance(n.args[0].value, str) and n.args[0].value.split('.')[-1] in names:
+                ext_stores.append([p, n.lineno, ast.unparse(n)])
+    row('P04-builtin-bindings', binds == [] and star == [] and dyn == [] and ext_stores == [],
+        dispatchBindingsOfTypeStrValueError=binds, dispatchStarImports=star, dispatchDynamicNamespaceNames=dyn,
+        moduleOrSetattrStoresNamedTypeStrValueError=ext_stores,
+        unrelatedObjectAttributeStoresNamedType=any_attr_stores,
+        firstPartyBuiltinsModuleImports=builtins_imports, pyFilesParsed=len(py_head) - len(parse_fail), parseFailures=parse_fail,
+        scope='all tracked .py blobs at 746789a (whole repository); premise of genuine builtins under monkeypatch/heap mutation stays explicit')
+
+    # P05 '.deliver' reference census over every tracked .py at HEAD (wider than the 25-path selector)
+    census = []
+    for p, o in sorted(py_head.items()):
+        if p in {f[0] for f in parse_fail}:
+            continue
+        t = ast.parse(contents[o], p)
+        parent = {}
+        for n in ast.walk(t):
+            for c in ast.iter_child_nodes(n):
+                parent[id(c)] = n
+        for n in ast.walk(t):
+            if isinstance(n, ast.Attribute) and n.attr == 'deliver':
+                par = parent.get(id(n))
+                census.append({'path': p, 'line': n.lineno, 'ctx': type(n.ctx).__name__,
+                               'directCallFunc': isinstance(par, ast.Call) and par.func is n, 'expr': ast.unparse(n)[:80]})
+            if isinstance(n, ast.Constant) and n.value == 'deliver':
+                census.append({'path': p, 'line': n.lineno, 'ctx': 'StringConstant', 'directCallFunc': False, 'expr': "'deliver'"})
+    in_roots = [c for c in census if c['path'].startswith(ROOTS)]
+    elsewhere = sorted({c['path'] for c in census if not c['path'].startswith(ROOTS)})
+    row('P05-deliver-reference-census', in_roots == [{'path': DC, 'line': 339, 'ctx': 'Load', 'directCallFunc': True, 'expr': 'self.delivery.deliver'}],
+        selectorRootReferences=in_roots, referencesOutsideSelectorRoots=len(census) - len(in_roots),
+        pathsOutsideSelectorRoots=elsewhere,
+        note='Outside services/control-plane/src, src, tools only tests/docs evidence reference .deliver; they are not production callers.')
+
+    # P06 selector reproducibility at BASE and HEAD; 24 other paths byte-equal
+    def selected(tree_map):
+        cand = {p: o for p, o in tree_map.items() if p.endswith('.py') and p.startswith(ROOTS)}
+        data = cat_batch(sorted(set(cand.values())))
+        return {p: o for p, o in cand.items() if SELECTOR.search(data[o].decode('utf-8', 'replace'))}
+    sb, sh = selected(base_tree), selected(head_tree)
+    others_equal = all(sb[p] == sh[p] for p in sb if p != DC) and set(sb) == set(sh)
+    row('P06-selector-world', len(sb) == len(sh) == 25 and others_equal and sb[DC] != sh[DC],
+        baseSelected=len(sb), headSelected=len(sh), samePathSet=set(sb) == set(sh), other24BlobIdsEqual=others_equal,
+        paths=sorted(sh),
+        note='Discovers paths from the HEAD tree itself; the author current_world() reuses BASE paths, so this closes new-path discovery for 746789a.')
+
+    # P07 DeliveryAttempt construction and literal operation origin in acquire
+    ctor = []
+    for p, o in sorted(py_head.items()):
+        if not p.startswith(ROOTS):
+            continue
+        t = ast.parse(contents[o], p)
+        for n in ast.walk(t):
+            if isinstance(n, ast.Call) and ast.unparse(n.func).split('.')[-1] == 'DeliveryAttempt':
+                ctor.append([p, n.lineno, ast.unparse(n.args[5]) if len(n.args) > 5 else None])
+    acq = [n for n in q.body if isinstance(n, ast.FunctionDef) and n.name == 'acquire'][0]
+    stores = []
+    for n in ast.walk(acq):
+        if isinstance(n, ast.Assign) and any(isinstance(t, ast.Name) and t.id == 'operation' for t in n.targets):
+            v = n.value
+            vals = [v.body.value, v.orelse.value] if isinstance(v, ast.IfExp) and all(isinstance(x, ast.Constant) for x in (v.body, v.orelse)) \
+                else [v.value] if isinstance(v, ast.Constant) else ['NONLITERAL:' + ast.unparse(v)]
+            stores.append([n.lineno, vals])
+        if isinstance(n, (ast.AugAssign, ast.AnnAssign, ast.NamedExpr)) and 'operation' in ast.unparse(n.target):
+            stores.append([n.lineno, ['OTHER_STORE']])
+    dc_cls = [n for n in ht.body if isinstance(n, ast.ClassDef) and n.name == 'DeliveryAttempt'][0]
+    deco = [ast.unparse(d) for d in dc_cls.decorator_list]
+    body_kinds = sorted({type(s).__name__ for s in dc_cls.body})
+    domain = sorted({v for _l, vs in stores for v in vs})
+    row('P07-attempt-origin', ctor == [[DC, 243, 'operation']] and domain == ['cancel', 'execute', 'observe'] and deco == ['dataclass(frozen=True)']
+        and body_kinds == ['AnnAssign'] and dc_cls.bases == [],
+        deliveryAttemptConstructors=ctor, acquireOperationStores=stores, literalDomain=domain,
+        deliveryAttemptDecorators=deco, deliveryAttemptBodyKinds=body_kinds,
+        note='Production attempts carry only the three builtin literals in a frozen plain field; the guard is defence in depth and normal mappings are unchanged.')
+
+    # P08 test file static facts (no import / no run)
+    tt = ast.parse(test, TEST)
+    tests = [n for n in tt.body if isinstance(n, ast.FunctionDef) and n.name.startswith('test_')]
+    def items(fn):
+        total = 1
+        for d in fn.decorator_list:
+            if isinstance(d, ast.Call) and ast.unparse(d.func) == 'pytest.mark.parametrize':
+                arg = d.args[1]
+                if isinstance(arg, ast.Name):
+                    target = [s for s in tt.body if isinstance(s, ast.Assign) and isinstance(s.targets[0], ast.Name)
+                              and s.targets[0].id == arg.id][0].value
+                    total *= len(target.elts)
+                else:
+                    total *= len(arg.elts)
+        return total
+    per = {fn.name: items(fn) for fn in tests}
+    imports = sorted({a.name for n in ast.walk(tt) if isinstance(n, ast.Import) for a in n.names})
+    patched = [ast.unparse(n) for n in ast.walk(tt) if isinstance(n, ast.Call) and ast.unparse(n.func) == 'monkeypatch.setattr']
+    # Spy methods (Reconciler.once / Queue.acquire / Followup.once) are collaborator doubles. A copy of the
+    # product method would be a DeliveryWorker class or a module-level once/acquire definition in the test.
+    spy_classes = sorted({c.name for c in ast.walk(tt) if isinstance(c, ast.ClassDef)
+                          and any(isinstance(m, ast.FunctionDef) and m.name in {'once', 'acquire', 'finish', 'deliver'} for m in c.body)})
+    copies = [n.name for n in tt.body if isinstance(n, ast.FunctionDef) and n.name in {'once', 'acquire', 'finish'}] + \
+             [c.name for c in ast.walk(tt) if isinstance(c, ast.ClassDef) and c.name in {'DeliveryWorker', 'DeliveryQueue'}]
+    worker_built = [ast.unparse(n) for n in ast.walk(tt) if isinstance(n, ast.Call) and ast.unparse(n.func) == 'object.__new__']
+    calls_once = sum(1 for n in ast.walk(tt) if isinstance(n, ast.Call) and ast.unparse(n.func) == 'case.worker.once')
+    invalid_ids = [ast.unparse(k.value) for n in ast.walk(tt) if isinstance(n, ast.Call) and ast.unparse(n.func) == 'pytest.param'
+                   for k in n.keywords if k.arg == 'id']
+    row('P08-test-static', sum(per.values()) == 24 and patched == ["monkeypatch.setattr(containment, 'ContainmentReconciler', Reconciler)"]
+        and copies == [] and calls_once == 1 and 'inv.dispatch' in imports and spy_classes == ['Delivery', 'Followup', 'Queue', 'Reconciler']
+        and worker_built == ['object.__new__(dispatch.DeliveryWorker)'],
+        testItems=per, totalItems=sum(per.values()), imports=imports, monkeypatches=patched, spyClasses=spy_classes,
+        workerConstruction=worker_built, copiedProductDefinitions=copies, actualOnceCallSites=calls_once, invalidCaseIds=invalid_ids)
+
+    # P09 immutable legacy helpers / refusal / proof inputs: HEAD blob == BASE blob == recorded sha
+    inputs = json.loads(cat_batch([head_tree[EV + 'inputs.json']])[head_tree[EV + 'inputs.json']])
+    helpers = inputs['immutableHelperInputs']
+    hb = cat_batch(sorted({head_tree[r['path']] for r in helpers}))
+    bad = [r['path'] for r in helpers if r['path'] not in base_tree or head_tree[r['path']] != base_tree[r['path']] or sha(hb[head_tree[r['path']]]) != r['sha256']]
+    refusal = cat_batch([head_tree[EV + 'existing-guard-refusal.json']])[head_tree[EV + 'existing-guard-refusal.json']]
+    row('P09-immutable-helpers-refusal', len(helpers) == 29 and bad == [] and sha(refusal) == '3f5e6214ca11c7b08f54412f3f351242651bc6b9b4477df0f9512859488c5759'
+        and b'DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:INSTANCE:operation' in refusal,
+        helperCount=len(helpers), helpersChangedOrMissingAtBase=bad, refusalBlobSHA256=sha(refusal), refusalBytes=len(refusal))
+
+    # P10 frozen archives: WIP02 (committed) and Root post-CI packet (uncommitted, Root .work)
+    def zip_facts(path, wanted):
+        b = Path(path).read_bytes()
+        with zipfile.ZipFile(path) as z:
+            infos = z.infolist()
+            found = {}
+            for i in infos:
+                for key, suffix in wanted.items():
+                    if i.filename.endswith(suffix):
+                        found.setdefault(key, []).append([i.filename, i.file_size, sha(z.read(i))])
+        return sha(b), len(b), len(infos), found
+    want = {'dispatch': DC, 'test': TEST, 'raw': 'review-original-local-doc-gates.txt'}
+    w2 = zip_facts(REPO / EV / 'fleet5-a7-operation-guard-r1-wip02.zip', want)
+    ci = zip_facts(ROOTWS / '.work/b-operation-7467-ci-review.zip', {**want, 'manifest': 'manifest.json'})
+    w2_ok = (w2[0] == 'ce2e8c8802c4c4b805cd38f5fe49117f472f0b44bb2f1c4adb80759924670fbb' and w2[1] == 2623087 and w2[2] == 52
+             and [e[2] for e in w2[3].get('dispatch', [])] == [sha(prod)] and [e[2] for e in w2[3].get('test', [])] == [sha(test)]
+             and [e[1:] for e in w2[3].get('raw', [])] == [[3496, '8a74f36b57b55743b89d451a94d4109dc996f0758d4ad4f4c23ff4fffc364c4a']])
+    ci_ok = ci[0] == '6aed7e3406c5a2b1419882e54eee8c28e9398431705e7e5f614d1db0d084f96a' and ci[1] == 16989615 and ci[2] == 46
+    wrapper_path = EV + 'review-original-local-doc-gates.raw.json'
+    wrapper = cat_batch([head_tree[wrapper_path]])[head_tree[wrapper_path]]
+    wj = json.loads(wrapper)
+    embedded = [wj['rawUTF8']] if isinstance(wj.get('rawUTF8'), str) else []
+    row('P10-archives-and-raw-wrapper', w2_ok and ci_ok and EV + 'review-original-local-doc-gates.txt' not in head_tree
+        and len(embedded) == 1 and sha(embedded[0].encode('utf8')) == '8a74f36b57b55743b89d451a94d4109dc996f0758d4ad4f4c23ff4fffc364c4a',
+        wip02=[w2[0], w2[1], w2[2], w2[3]], ciPacket=[ci[0], ci[1], ci[2], ci[3]],
+        standaloneRawPathInGit=EV + 'review-original-local-doc-gates.txt' in head_tree,
+        wrapperGitBlobSHA256=sha(wrapper), wrapperBytes=len(wrapper), wrapperKeys=sorted(wj),
+        wrapperEmbeddedRawSHA256=[sha(e.encode('utf8')) for e in embedded])
+
+    # P11 semantic DATA of the guard expression on reviewer values, evaluated by the reviewer's own copy
+    # of the expression (builtin type/str only). This is Python-semantics DATA, not product execution.
+    calls = []
+    class Hostile:
+        def __eq__(s, o): calls.append('eq'); return True
+        def __ne__(s, o): calls.append('ne'); return False
+        def __hash__(s): calls.append('hash'); return 0
+        def __bool__(s): calls.append('bool'); return True
+    class HStr(str):
+        def __eq__(s, o): calls.append('str-eq'); return True
+        __hash__ = str.__hash__
+    def rejected(v):
+        return type(v) is not str or v not in ('execute', 'observe', 'cancel')
+    cases = {'execute': 'execute', 'observe': 'observe', 'cancel': 'cancel', 'None': None, 'bytes': b'observe', 'Execute': 'Execute',
+             'empty': '', 'hostile': Hostile(), 'hstr-observe': HStr('observe'), 'int1': 1, 'True': True}
+    data = {k: rejected(v) for k, v in cases.items()}
+    # Reviewer-only contrast: an isinstance variant admits the subclass and calls its __eq__.
+    calls_iso = []
+    def iso(v):
+        return not isinstance(v, str) or v not in ('execute', 'observe', 'cancel')
+    before = len(calls)
+    iso_res = iso(HStr('observe'))
+    iso_calls = calls[before:]
+    row('P11-guard-expression-data', data == {'execute': False, 'observe': False, 'cancel': False, 'None': True, 'bytes': True, 'Execute': True,
+                                              'empty': True, 'hostile': True, 'hstr-observe': True, 'int1': True, 'True': True}
+        and calls[:before] == [] and iso_calls == ['str-eq'],
+        rejected=data, richCallsDuringExactGuard=calls[:before], isinstanceContrastResult=iso_res, isinstanceContrastCalls=iso_calls,
+        note='Reviewer copy of the guard expression on reviewer values only; tuple membership with a str-subclass shows why type() is not str is required.')
+
+    result = {'startedKST': started, 'endedKST': kst(), 'python': sys.version, 'head': HEAD, 'base': BASE,
+              'rows': rows, 'allPass': all(r['pass'] for r in rows), 'productImportedOrExecuted': False}
+    OUT.write_text(json.dumps(result, indent=1, ensure_ascii=False) + '\n', encoding='utf-8', newline='\n')
+    print(json.dumps({'rows': len(rows), 'allPass': result['allPass'], 'failed': [r['probe'] for r in rows if not r['pass']]}))
+    raise SystemExit(0 if result['allPass'] else 1)
+
+
+if __name__ == '__main__':
+    main()

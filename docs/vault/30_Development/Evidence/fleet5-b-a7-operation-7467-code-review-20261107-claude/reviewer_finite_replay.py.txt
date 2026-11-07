@@ -1,0 +1,131 @@
+"""Reviewer read-only replay of the author's frozen finite_compatibility.evaluate + legacy analyze.
+
+Usage: python -I -B reviewer_finite_replay.py.txt <repo-root> <out.json>
+
+Differs from the author's check_finite_compatibility.main(): it does NOT run the prepublication
+context asserts (git diff vs BASE == [dispatch], no untracked production) because after commit
+746789a the BASE diff also lists the new test and docs; that context is instead checked here
+by the reviewer's own name-status reading. It never calls emit(), never writes into the repo,
+and never imports or executes application/test code: evaluate()/analyze() parse source only.
+All gates of evaluate() (path set, reference contract, closed grammar, whole-module AST,
+other-24 bytes, owner derivation) and the unchanged legacy analyze() are run unmodified.
+"""
+import ast
+import datetime
+import hashlib
+import json
+import subprocess
+import sys
+from pathlib import Path
+
+REPO, OUT = Path(sys.argv[1]), Path(sys.argv[2])
+EV = REPO / 'docs/vault/30_Development/Evidence/fleet5-b-a7-operation-guard-r1-20261107-codex'
+sys.path.insert(0, str(EV))
+import finite_compatibility as c  # author frozen analysis module (AST/Git only)
+
+
+def kst():
+    return datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=9))).isoformat(timespec='seconds')
+
+
+def sha(b):
+    return hashlib.sha256(b).hexdigest()
+
+
+def status():
+    return subprocess.run(['git', 'status', '--porcelain=v1', '-z', '--untracked-files=all'], cwd=REPO,
+                          capture_output=True, check=True).stdout
+
+
+def main():
+    started = kst()
+    st_before = status()
+    head = subprocess.run(['git', 'rev-parse', 'HEAD'], cwd=REPO, capture_output=True, check=True).stdout.decode().strip()
+    world = c.current_world()
+    # Working copy == committed blob for all 25 + test (no CRLF drift), so the replay is on 746789a bytes.
+    blob_equal = all(subprocess.run(['git', 'show', 'HEAD:' + p], cwd=REPO, capture_output=True, check=True).stdout == b
+                     for p, b in world.items())
+    ctx = {'head': head, 'worldPaths': len(world), 'workingEqualsHEADBlobs': blob_equal,
+           'testedBytesMatch': c.tested_bytes_match(world), 'immutableHelpersMatch': c.immutable_helpers_match(),
+           'refusalHash': c.sha((c.E / 'existing-guard-refusal.json').read_bytes()) == c.REFUSAL_HASH}
+    actual = c.evaluate(world)
+    legacy = c.p.analyze()
+    legacy_errors = [{'path': r['path'], 'error': r['error'], 'reflection': r['reflection']['newRelevantHits']}
+                     for r in legacy['auditedScope'] if r['error'] or r['reflection']['newRelevantHits']]
+    cur = world[c.DC].decode('utf8')
+
+    def mut(old, new):
+        assert cur.count(old) == 1, old
+        text = cur.replace(old, new, 1)
+        ast.parse(text)
+        return {c.DC: text.encode()}
+
+    cap = '            operation = attempt.operation\n'
+    grd = ('            if type(operation) is not str or operation not in ("execute", "observe", "cancel"):\n'
+           '                raise ValueError("Unsupported delivery operation origin")\n')
+    outer = ('        operation = attempt.operation\n'
+             '        if type(operation) is not str or operation not in ("execute", "observe", "cancel"):\n'
+             '            raise ValueError("Unsupported delivery operation origin")\n')
+    assert cur.count(cap + grd) == 1 and cur.count('        error, not_sent = None, False\n') == 1
+    hoisted = cur.replace(cap + grd, '', 1).replace('        error, not_sent = None, False\n',
+                                                    outer + '        error, not_sent = None, False\n', 1)
+    ast.parse(hoisted)
+    controls = [
+        ('RC01-capture-and-guard-hoisted-before-try', {c.DC: hoisted.encode()}, 'CAPTURE_GUARD_GRAMMAR_CHANGED',
+         'ValueError would escape once, skipping finish and leaving the lease to time out'),
+        ('RC02-isinstance-instead-of-exact-type', mut('type(operation) is not str', 'not isinstance(operation, str)'),
+         'CAPTURE_GUARD_GRAMMAR_CHANGED', 'admits str subclasses whose __eq__ runs in membership'),
+        ('RC03-operands-reordered', mut('type(operation) is not str or operation not in ("execute", "observe", "cancel")',
+                                        'operation not in ("execute", "observe", "cancel") or type(operation) is not str'),
+         'CAPTURE_GUARD_GRAMMAR_CHANGED', 'membership (rich __eq__) would run before the exact-type gate'),
+        ('RC04-set-literal-domain', mut('("execute", "observe", "cancel")', '{"execute", "observe", "cancel"}'),
+         'CAPTURE_GUARD_GRAMMAR_CHANGED', 'set membership hashes the value first'),
+        ('RC05-domainerror-instead-of-valueerror', mut('raise ValueError("Unsupported', 'raise DomainError("Unsupported'),
+         'CAPTURE_GUARD_GRAMMAR_CHANGED', 'a DomainError could carry not_sent and reach finish operation re-read'),
+        ('RC06-handler-narrowed', mut('        except Exception as exc:\n            error = exc.code',
+                                      '        except ValueError as exc:\n            error = exc.code'),
+         'WHOLE_MODULE_DELTA_CHANGED', 'handler is outside the closed grammar; only whole-module equality catches it'),
+        ('RC07-finish-short-circuit-removed', mut('if not_sent and attempt.operation == "execute":',
+                                                  'if attempt.operation == "execute":'),
+         'WHOLE_MODULE_DELTA_CHANGED', 'finish is outside once; whole-module equality must catch it'),
+        ('RC08-decorated-once', mut('    def once(self, tenant_id, *, command_id=None, control_only=False):',
+                                    '    @staticmethod\n    def once(self, tenant_id, *, command_id=None, control_only=False):'),
+         'WHOLE_MODULE_DELTA_CHANGED', 'A7M-I1 decorator case now refused by the new layer itself'),
+        ('RC09-benign-comment-and-parentheses', mut('                observation_only=(operation == "observe"),\n',
+                                                    '                # reviewer benign comment\n                observation_only=operation == "observe",\n'),
+         None, 'AST-identical text change must stay accepted (not a textual hash proof)'),
+    ]
+    rows = []
+    for name, changes, expected, why in controls:
+        r = c.evaluate({**world, **changes})
+        rows.append({'name': name, 'expectedReason': expected, 'reason': r['reason'], 'expectationMet': r['reason'] == expected,
+                     'why': why, 'changedInputSHA256': {p: sha(b) for p, b in changes.items()},
+                     'closedGrammarReason': r.get('closedGrammarReason'),
+                     'referenceReason': (r.get('referenceContract') or {}).get('reason'),
+                     'wholeModuleEqual': r.get('wholeModuleNormalizedASTEqualsDerivedBASEPlusExactDelta'),
+                     'ownerReason': r.get('ownerDerivationReason')})
+    st_after = status()
+    result = {
+        'startedKST': started, 'endedKST': kst(), 'python': sys.version, 'context': ctx,
+        'actual': {k: v for k, v in actual.items() if k != 'ownerDerivation'},
+        'legacy': {'errors': legacy_errors, 'guardCompatibilityClean': legacy['guardCompatibilityClean'],
+                   'parsed': len(legacy['parsedScope']), 'audited': len(legacy['auditedScope']),
+                   'modeRuleReason': legacy['modeRule']['reason'], 'referenceContractReason': legacy['referenceContract']['reason'],
+                   'constructorArgumentBindingsValid': legacy['constructorArgumentBindingsValid']},
+        'reviewerControls': rows,
+        'gitStatusUnchangedByReplay': st_before == st_after, 'gitStatusSHA256': sha(st_after),
+        'emitCalled': False, 'applicationImportedOrExecuted': False,
+    }
+    ok = (ctx['workingEqualsHEADBlobs'] and ctx['testedBytesMatch'] and ctx['immutableHelpersMatch'] and ctx['refusalHash']
+          and actual['reason'] is None
+          and legacy_errors == [{'path': c.DC, 'error': 'DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:INSTANCE:operation', 'reflection': []}]
+          and legacy['guardCompatibilityClean'] is False and all(r['expectationMet'] for r in rows) and st_before == st_after)
+    result['allExpected'] = ok
+    OUT.write_text(json.dumps(result, indent=1, ensure_ascii=False, sort_keys=True) + '\n', encoding='utf-8', newline='\n')
+    print(json.dumps({'actualReason': actual['reason'], 'legacyErrors': len(legacy_errors),
+                      'controls': [(r['name'], r['reason'], r['expectationMet']) for r in rows], 'allExpected': ok}))
+    raise SystemExit(0 if ok else 1)
+
+
+if __name__ == '__main__':
+    main()
