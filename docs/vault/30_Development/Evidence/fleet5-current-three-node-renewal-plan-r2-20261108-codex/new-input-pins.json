@@ -1,0 +1,44 @@
+[
+  {
+    "source": "f29228ed28c651cb2470b45d9f8d14521e1ce75d",
+    "path": "docs/vault/30_Development/Evidence/fleet5-current-three-node-renewal-plan-review-r1-20261108-claude/review.json",
+    "copy": "r1-actual-review.json",
+    "SHA256": "e5859e6c459188f0245853b91cdec384fddd7c06ef688cad0828417e0a26f58e",
+    "bytes": 16968
+  },
+  {
+    "source": "03f6ea0a2c6cf83074cfa71850892ba4a1873ae5",
+    "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/current-three-node-renewal-plan-actual-claude-r1/root-public-cp-client-validity-r1/receipt.json",
+    "copy": "root-inputs/root-public-cp-client-validity-r1/receipt.json",
+    "SHA256": "daa492713c8a2e2cc7da555fddf680841a878e4b1702e92e746d0bbd70e6a547",
+    "bytes": 932
+  },
+  {
+    "source": "03f6ea0a2c6cf83074cfa71850892ba4a1873ae5",
+    "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/current-three-node-renewal-plan-actual-claude-r1/root-public-cp-client-validity-r1/remote-read-only-public-certificate.py.txt",
+    "copy": "root-inputs/root-public-cp-client-validity-r1/remote-read-only-public-certificate.py.txt",
+    "SHA256": "44dc6f82534184324bf2bd1abedc417a6d5730daee7746f5dd5f47ad2c13b2e6",
+    "bytes": 1371
+  },
+  {
+    "source": "03f6ea0a2c6cf83074cfa71850892ba4a1873ae5",
+    "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/current-three-node-renewal-plan-actual-claude-r1/source-reference-publication-adaptation.json",
+    "copy": "root-inputs/source-reference-publication-adaptation.json",
+    "SHA256": "83a309b223d76b9cf8ab50b319029bf7b88d1d9802490b048af72e812f05f97d",
+    "bytes": 5659
+  },
+  {
+    "source": "03f6ea0a2c6cf83074cfa71850892ba4a1873ae5",
+    "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/current-three-node-renewal-plan-actual-claude-r1/root-current-state.json",
+    "copy": "root-inputs/root-current-state.json",
+    "SHA256": "71999fd1db5aea15bc8ae367d07f8192ce68ca3c2ede7e7580f8495baff18fbf",
+    "bytes": 17825
+  },
+  {
+    "source": "03f6ea0a2c6cf83074cfa71850892ba4a1873ae5",
+    "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/current-three-node-renewal-plan-actual-claude-r1/receipt.json",
+    "copy": "root-inputs/receipt.json",
+    "SHA256": "58f6a2e25d451421b3bb3b143b6604217ce2bff66cceee9f91909f88b97b3c54",
+    "bytes": 9305
+  }
+]

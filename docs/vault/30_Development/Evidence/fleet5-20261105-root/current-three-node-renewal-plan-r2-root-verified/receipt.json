@@ -1,0 +1,42 @@
+{
+  "verifiedAtKST": "2026-11-08T08:24:02+09:00",
+  "planSHA": "b8c839d1daf28677a0587af115cbea496626d5ea",
+  "directBase": "a3c6984fa25c6cf179827e15e4259000e7bd294e",
+  "Root538": "03f6ea0a2c6cf83074cfa71850892ba4a1873ae5",
+  "deliverySHA256": "f2c4ba78c1fe8c2b4d275f25b66dfeae4f0e39bb85c41cd3a60221e815d4d35c",
+  "docsOnlyChanged": 28,
+  "protectedTreesIncludingR1Evidence": 15,
+  "exactSourceFilesAndRangesVerified": 25,
+  "fullSHACitationsCovered": 49,
+  "exactNewRootAndReviewPinsVerified": 6,
+  "sixRecordedMetadataGatesExit0": true,
+  "exactDocs": 42424634771,
+  "all19SuccessJob": 128560174853,
+  "artifactScopes": [
+    {
+      "id": 13595535129,
+      "bytes": 50207444,
+      "officialDigest": "sha256:737f8b4d3c5bdfe1b1f58b308ec6a1572903c0c0e8a11fc7eb12128374d615d7",
+      "actualZIPVerified": false
+    },
+    {
+      "id": 13595201628,
+      "bytes": 1915,
+      "officialDigest": "sha256:becb6824d4ca399d43afde0e64b3c8cf5f58596fbe37fce23d9f6103e5fe50c9",
+      "actualZIPVerified": true
+    }
+  ],
+  "officialLogBytes": 47420,
+  "officialLogSHA256": "e93e679c44a37d304a22fdbba2da8535ad75f545701bc0502e66d0b4d2e1f901",
+  "officialLogRawAndBase64Exact": true,
+  "canonicalStartEndPostCIAndRootCurrentFullBytesMatch": true,
+  "canonicalBytes": 587290,
+  "canonicalSHA256": "a59e836f1e826231ddfee3a3be5bb247dd4a9b018c24a9d809104e9ef2c5b5e4",
+  "authorF1F6ProposalsPendingIndependentDelta": true,
+  "requiredMigrationAndExpiryBranchesProposed": true,
+  "fiveClientSitesEnumerated": true,
+  "cutoffsAndBudgetsNullHOLD": true,
+  "actualIndependentR2Review": false,
+  "actualMigrationRenewalOrRestart": false,
+  "wholeProgramComplete": false
+}

@@ -1,0 +1,9 @@
+{
+  "JSONParseExit": 0,
+  "allProposedRuntimeOutputsNullOrNOTRUN": true,
+  "budgetsAndReleaseUnknownHOLD": true,
+  "requiredMigration": true,
+  "clientSites": 5,
+  "sixAuthorDispositionsPendingActualReview": true,
+  "manifestSHA256": "b4e0d99b349f28593fabb22786c2012627b85eea6ea84387b50ef15b0e72ae7c"
+}

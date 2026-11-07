@@ -1,0 +1,30 @@
+{
+  "docID": "EVIDENCE-FLEET5-CURRENT-THREE-NODE-RENEWAL-PLAN-R2-CODEX",
+  "version": "1.0.0",
+  "taskID": "task_3e413989dcaa",
+  "dispatchID": "ctx_80dec9e2eb1e",
+  "owner": "Original actual Codex author",
+  "base": "a3c6984fa25c6cf179827e15e4259000e7bd294e",
+  "root538": "03f6ea0a2c6cf83074cfa71850892ba4a1873ae5",
+  "actualR1Reviewer": "f29228ed28c651cb2470b45d9f8d14521e1ce75d",
+  "R2IndependentReview": "Actual Claude future Root dispatch, not performed",
+  "scope": "NONEXECUTING R2 correction for F1-F6 only",
+  "atKST": "2026-11-08T07:56:39.382380+09:00",
+  "canonicalBytes": 587290,
+  "canonicalSHA256": "a59e836f1e826231ddfee3a3be5bb247dd4a9b018c24a9d809104e9ef2c5b5e4",
+  "productAndOperatingAuthorization": false,
+  "skills": {
+    "AGENTS.md": "c12a50a38f81c12a647f9b6f4592a205cd899e76d29190202a6ae73b12c04b27",
+    "skills/agent-delivery/SKILL.md": "9596c1d4a132c3de90fd99ed2095b8271da7a31532e8487aa6d7d93151ac3830",
+    "skills/core-reliability/SKILL.md": "4650a371befb5a59cd9f3ce87c2e2dab732aa7e9b89e57885cb67f0e64f0ef76"
+  },
+  "environment": {
+    "platform": "win32",
+    "interpreter": "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+    "python": "3.14.7 (tags/v3.14.7:823f032, Aug  5 2026, 10:51:32) [MSC v.1944 64 bit (AMD64)]",
+    "timezone": "Asia/Seoul"
+  },
+  "branch": "agent/codex/fleet5-current-three-node-renewal-plan-r2-20261108",
+  "historyPath": "docs/vault/30_Development/History/2026-11-08_08-14-12_KST_current_three_node_renewal_plan_R2_Codex.md",
+  "ownBoardVersion": "1.0.500 branch-local proposal; Root publication remains sole authority"
+}

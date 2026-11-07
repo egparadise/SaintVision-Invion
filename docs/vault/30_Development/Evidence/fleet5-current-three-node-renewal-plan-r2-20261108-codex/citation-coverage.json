@@ -1,0 +1,9 @@
+{
+  "allCrossBranchProductCitationsUseFullSHA": true,
+  "references": 49,
+  "sourceFiles": 25,
+  "allReferencedRangesCovered": true,
+  "unmappedReferences": [],
+  "RootOlderProductPathsImported": false,
+  "baselineChanged": false
+}

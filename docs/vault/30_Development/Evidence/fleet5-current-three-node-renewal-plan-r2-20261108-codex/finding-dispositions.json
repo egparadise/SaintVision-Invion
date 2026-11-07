@@ -1,0 +1,119 @@
+{
+  "actualReviewSource": "f29228ed28c651cb2470b45d9f8d14521e1ce75d",
+  "originalVerdictUnchanged": "REQUEST_CHANGES",
+  "R2Author": "Original actual Codex",
+  "R2ActualReviewer": null,
+  "findings": [
+    {
+      "findingId": "PLAN-REVIEW-R1-F1",
+      "severity": "MAJOR",
+      "mandatory": true,
+      "authorDisposition": "R2_CORRECTED_PROPOSAL_PENDING_ACTUAL_DELTA",
+      "section": "F1: deadline fork and bounded release formulas",
+      "manifestSections": [
+        "deadlineFork",
+        "tasks.expiredRecovery"
+      ],
+      "sourcePermalinks": [
+        "https://github.com/egparadise/SaintVision-Invion/blob/1efea494f026e932360c35ae811b6423d874a2e7/services/node-agent/transport/trust.go#L50-L93",
+        "https://github.com/egparadise/SaintVision-Invion/blob/1efea494f026e932360c35ae811b6423d874a2e7/services/node-agent/transport/trust.go#L102-L131",
+        "https://github.com/egparadise/SaintVision-Invion/blob/1efea494f026e932360c35ae811b6423d874a2e7/services/node-agent/cmd/inv-node/main.go#L94-L115",
+        "https://github.com/egparadise/SaintVision-Invion/blob/1efea494f026e932360c35ae811b6423d874a2e7/services/node-agent/cmd/inv-node/main.go#L21-L25",
+        "https://github.com/egparadise/SaintVision-Invion/blob/1efea494f026e932360c35ae811b6423d874a2e7/tools/lan_pilot.py#L1564-L1589",
+        "https://github.com/egparadise/SaintVision-Invion/blob/1efea494f026e932360c35ae811b6423d874a2e7/tools/lan_pilot.py#L2303-L2348",
+        "https://github.com/egparadise/SaintVision-Invion/blob/1efea494f026e932360c35ae811b6423d874a2e7/tools/lan_pki.py#L42-L77"
+      ],
+      "independentClosure": null
+    },
+    {
+      "findingId": "PLAN-REVIEW-R1-F2",
+      "severity": "MAJOR",
+      "mandatory": true,
+      "authorDisposition": "R2_CORRECTED_PROPOSAL_PENDING_ACTUAL_DELTA",
+      "section": "F2: required serving-binary/container migration predecessor",
+      "manifestSections": [
+        "tasks.migration",
+        "phaseIdentityFreezes",
+        "taskDependencies"
+      ],
+      "sourcePermalinks": [
+        "https://github.com/egparadise/SaintVision-Invion/blob/1efea494f026e932360c35ae811b6423d874a2e7/services/node-agent/runtime/peer_floor_linux.go#L36-L102",
+        "https://github.com/egparadise/SaintVision-Invion/blob/1efea494f026e932360c35ae811b6423d874a2e7/services/node-agent/runtime/peer_floor_linux.go#L107-L199",
+        "https://github.com/egparadise/SaintVision-Invion/blob/1efea494f026e932360c35ae811b6423d874a2e7/deploy/lan/Dockerfile.node.remote#L11",
+        "https://github.com/egparadise/SaintVision-Invion/blob/1efea494f026e932360c35ae811b6423d874a2e7/deploy/lan/Dockerfile.node#L2",
+        "https://github.com/egparadise/SaintVision-Invion/blob/1efea494f026e932360c35ae811b6423d874a2e7/deploy/lan/worker_plain_rotation.py#L75-L94",
+        "https://github.com/egparadise/SaintVision-Invion/blob/1efea494f026e932360c35ae811b6423d874a2e7/deploy/lan/worker_plain_rotation.py#L170-L243"
+      ],
+      "independentClosure": null
+    },
+    {
+      "findingId": "PLAN-REVIEW-R1-F3",
+      "severity": "MODERATE",
+      "mandatory": false,
+      "authorDisposition": "R2_CORRECTED_PROPOSAL_PENDING_ACTUAL_DELTA",
+      "section": "F3: exact five-site CP context inventory and switch barrier",
+      "manifestSections": [
+        "clientContexts",
+        "contextSwitchBarrier"
+      ],
+      "sourcePermalinks": [
+        "https://github.com/egparadise/SaintVision-Invion/blob/96afd799d49717fd40e4ddabd538d82accbe1958/services/control-plane/src/inv/observer_worker.py#L42-L81",
+        "https://github.com/egparadise/SaintVision-Invion/blob/96afd799d49717fd40e4ddabd538d82accbe1958/services/control-plane/src/inv/worker.py#L111-L160",
+        "https://github.com/egparadise/SaintVision-Invion/blob/96afd799d49717fd40e4ddabd538d82accbe1958/services/control-plane/src/inv/workspace_config.py#L12-L68",
+        "https://github.com/egparadise/SaintVision-Invion/blob/96afd799d49717fd40e4ddabd538d82accbe1958/services/control-plane/src/inv/build_product_runtime.py#L503-L546",
+        "https://github.com/egparadise/SaintVision-Invion/blob/96afd799d49717fd40e4ddabd538d82accbe1958/services/control-plane/src/inv/storage_check_collect.py#L350-L388",
+        "https://github.com/egparadise/SaintVision-Invion/blob/96afd799d49717fd40e4ddabd538d82accbe1958/services/control-plane/src/inv/app.py#L1340-L1344",
+        "https://github.com/egparadise/SaintVision-Invion/blob/96afd799d49717fd40e4ddabd538d82accbe1958/services/control-plane/src/inv/worker.py#L127-L140",
+        "https://github.com/egparadise/SaintVision-Invion/blob/96afd799d49717fd40e4ddabd538d82accbe1958/services/control-plane/src/inv/app.py#L1381",
+        "https://github.com/egparadise/SaintVision-Invion/blob/96afd799d49717fd40e4ddabd538d82accbe1958/services/control-plane/src/inv/app.py#L1405-L1420",
+        "https://github.com/egparadise/SaintVision-Invion/blob/96afd799d49717fd40e4ddabd538d82accbe1958/services/control-plane/src/inv/node_transport.py#L61-L79"
+      ],
+      "independentClosure": null
+    },
+    {
+      "findingId": "PLAN-REVIEW-R1-F4",
+      "severity": "MINOR",
+      "mandatory": false,
+      "authorDisposition": "NEW_ROOT_EVIDENCE_SUPPLIED_PENDING_ACTUAL_DELTA",
+      "section": "F4: new public CP leaf evidence, limited claim",
+      "manifestSections": [
+        "publicCPClientValidity"
+      ],
+      "sourcePermalinks": [
+        "https://github.com/egparadise/SaintVision-Invion/blob/03f6ea0a2c6cf83074cfa71850892ba4a1873ae5/docs/vault/30_Development/Evidence/fleet5-20261105-root/current-three-node-renewal-plan-actual-claude-r1/root-public-cp-client-validity-r1/receipt.json#L1-L22"
+      ],
+      "independentClosure": null
+    },
+    {
+      "findingId": "PLAN-REVIEW-R1-F5",
+      "severity": "MINOR",
+      "mandatory": false,
+      "authorDisposition": "R2_CORRECTED_PROPOSAL_PENDING_ACTUAL_DELTA",
+      "section": "Finding dispositions and finite handoff",
+      "manifestSections": [
+        "sources.sourcePins",
+        "scope.deployedImageBuildProvenanceAttestation"
+      ],
+      "sourcePermalinks": [
+        "https://github.com/egparadise/SaintVision-Invion/blob/1efea494f026e932360c35ae811b6423d874a2e7/deploy/lan/Dockerfile.node.remote#L11",
+        "https://github.com/egparadise/SaintVision-Invion/blob/1efea494f026e932360c35ae811b6423d874a2e7/deploy/lan/Dockerfile.node#L2"
+      ],
+      "independentClosure": null
+    },
+    {
+      "findingId": "PLAN-REVIEW-R1-F6",
+      "severity": "MINOR",
+      "mandatory": false,
+      "authorDisposition": "R2_CORRECTED_PROPOSAL_PENDING_ACTUAL_DELTA",
+      "section": "F1: deadline fork and bounded release formulas",
+      "manifestSections": [
+        "deadlineFork.caTerminal",
+        "tasks.authorityReplacement"
+      ],
+      "sourcePermalinks": [
+        "https://github.com/egparadise/SaintVision-Invion/blob/1efea494f026e932360c35ae811b6423d874a2e7/tools/lan_pki.py#L42-L77"
+      ],
+      "independentClosure": null
+    }
+  ]
+}

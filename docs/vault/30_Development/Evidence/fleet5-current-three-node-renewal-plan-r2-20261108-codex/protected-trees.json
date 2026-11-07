@@ -1,0 +1,65 @@
+{
+  "base": "a3c6984fa25c6cf179827e15e4259000e7bd294e",
+  "paths": {
+    "apps": {
+      "baseGitObject": "c0150985c59318e2245c8357865a128d7ffaf706",
+      "unchanged": true
+    },
+    "contracts": {
+      "baseGitObject": "b2b24a6d9baf24302f3590f4f30fe851ccb81ef1",
+      "unchanged": true
+    },
+    "packages": {
+      "baseGitObject": "7c445bdbc929f6597c0b39b598f9726032c67ad7",
+      "unchanged": true
+    },
+    "services": {
+      "baseGitObject": "5c9918adc48c76c88b5119f44516bb332924f067",
+      "unchanged": true
+    },
+    "src": {
+      "baseGitObject": "5507dfb820d54a8778c4cf5e3551368f11b6105f",
+      "unchanged": true
+    },
+    "migrations": {
+      "baseGitObject": "b1d35598829437c39dab7f60e9521bf8627e6832",
+      "unchanged": true
+    },
+    "tests": {
+      "baseGitObject": "f0c6e9f537989b71f57b2185fd43c6abbaf4369e",
+      "unchanged": true
+    },
+    "tools": {
+      "baseGitObject": "844b01989774dec695b667b571030cdb558e5cb5",
+      "unchanged": true
+    },
+    "deploy": {
+      "baseGitObject": "40924935653e3c9a83cb4295e72a1463fd8400b3",
+      "unchanged": true
+    },
+    ".github": {
+      "baseGitObject": "f5cb8563418b74a143bf8b142bc9daaac01ed395",
+      "unchanged": true
+    },
+    "skills": {
+      "baseGitObject": "dc117f0b750e4ff029e87b5f7ed53ee2f69862ca",
+      "unchanged": true
+    },
+    "docs/sources": {
+      "baseGitObject": "ace2050db53e98c7e876bee7668c8450095ec74d",
+      "unchanged": true
+    },
+    "docs/task-registry.json": {
+      "baseGitObject": "3d7b5be755d15b5f181b9cbbed33b2a8f4b56e87",
+      "unchanged": true
+    },
+    "docs/source-manifest.json": {
+      "baseGitObject": "6558e0566b5b7c019d20b14b53f7c0f63dae1d49",
+      "unchanged": true
+    },
+    "docs/vault/30_Development/Evidence/fleet5-current-three-node-renewal-plan-r1-20261108-codex": {
+      "baseGitObject": "2749ae3a53d1b979152fb21ce13d148df924fe7e",
+      "unchanged": true
+    }
+  }
+}

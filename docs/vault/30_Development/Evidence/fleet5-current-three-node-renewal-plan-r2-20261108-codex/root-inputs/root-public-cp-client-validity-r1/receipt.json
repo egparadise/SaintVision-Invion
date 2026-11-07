@@ -1,0 +1,22 @@
+{
+  "atKST": "2026-11-08T07:52:28+09:00",
+  "SSHExit": 0,
+  "stderrBytes": 0,
+  "knownHostsUnchanged": true,
+  "remote": {
+    "atUTC": "2026-11-07T22:52:28+00:00",
+    "publicCertificatePath": "/home/saintvision-invion3/saintvision-share/ops-fresh-cpu-1efea-r1-20261107/pki-r1/cp-client-cert.pem",
+    "CPClientDER_SHA256": "48911c5ddf7d12f05b9866feea0f0005c193d76a956274e2510492d0c2f76481",
+    "notBefore": "2026-11-07T07:10:30+00:00",
+    "notAfter": "2026-11-09T07:15:30+00:00",
+    "URI": "spiffe://saintvision.ai/tenant/97968b42-68aa-40ce-af5e-3a33e2fc2205/control-plane/epoch/bcd581be-31b4-4aca-86e6-3ca31b69ed09",
+    "dateValidAtRead": true,
+    "readExactlyPublicCertificate": true,
+    "privateKeyRead": false,
+    "newTLSContextOrHandshakeExecuted": false,
+    "liveActiveClientContextsAttested": false,
+    "fileOrProcessMutation": false
+  },
+  "mainProductOrCryptoExecution": false,
+  "wholeProgramComplete": false
+}

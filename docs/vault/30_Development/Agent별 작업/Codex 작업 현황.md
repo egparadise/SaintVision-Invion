@@ -1,15 +1,19 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.499"
+version: "1.0.500"
 status: "review"
 author: "Codex"
-updated: "2026-11-08T07:50:04+09:00"
+updated: "2026-11-08T08:25:56+09:00"
 source_of_truth: "Git"
 active_card: "FLEET5 continued supervision with PORTAL-REFRESH-FLEET-20261106"
-active_card_status: "ActualClaudeF292PlanREQUEST_CHANGES_F1DeadlineFork_F2RequiredMigration; SourceStaticReviewVerifiedNotRuntime; OriginalCodexR2Ready; NoCurrentRotationMigrationOrRestart"
-active_card_next: "Publish Root538 exact Docs/Obsidian then original actual Codex plan R2 addresses all6 findings; subsequent actual Claude delta. Normal cutoff remains null/HOLD until real frozen budget/predecessors. After16:15:30KST no current Node restart/reboot/migration, separate expired-authority forward recovery bounded by Nodeleaf11-09 and CA11-14; real2approvers/PC1key/PC5safeNode/fullGPUstorage/manual/all5 remain."
+active_card_status: "R2B8c839F1F6AuthorProposalsVerified_ActualClaudeDeltaNext_NotYetIndependentAcceptance; RequiredMigrationAndExpiryBranchesDefined_NoRuntimeRelease"
+active_card_next: "Finish Root539 exact Docs/Obsidian, start one actual Claude F1-F6 bounded delta incl own board/History followup, then finite required implementation for actual time/budget/authority. Epolicy11-08 16:15:30KST; budgets/cutoffs/releases null/HOLD. No restart/reboot/migration after expiry under current authority; separate expired recovery, CA terminal no sameCA. Real2approvers/PC1key/PC5safeNode/fullGPUstorage/manual/all5 remain."
 ---
+
+## 2026-11-08T08:25:56+09:00 R2 F1~F6 제안 검증과 실제 Claude delta 준비
+
+실제원작성자R2 b8c839d1은F1~F6을보완제안으로반영했다. E-B-630-30cutoff/미확정budgetnullHOLD·만료전후분기·필수새Go/image/CID이행의전후freeze·CPclient5곳·Root공개CPleafvalidity·정확49SHA인용/25파일·CAterminal경계를추가했다. Root는직접basea3c698/28docs·15보호tree/R1증거불변·6새입력·정확Docs42424634771/job128560174853전19단계·공식raw47420B로그와587290B canonical시작/끝/postCI/current전체동일을확인했다. 실제작성자와이전검토자의종료·해제뒤단일livingplan1.1.0과고유증거/History27문서를정확Gitbytes로반영하고오래된작성자board는수입하지않았다. 다음은실제ClaudeF1~F6delta이며독립수락/실제이행/갱신/추가재시작/5대완료는아직아니다. 다음첫행동/담당은Root539정확게시뒤실제Claude의한정delta판정이며작성자의수정주장을독립closure로대신하지않는다.
 
 ## 2026-11-08T07:50:04+09:00 갱신계획 실제 Claude 검토와 필수 수정 인계
 

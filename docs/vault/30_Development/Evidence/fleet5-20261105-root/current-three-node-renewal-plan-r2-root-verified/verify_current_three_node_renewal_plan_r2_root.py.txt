@@ -1,0 +1,62 @@
+"""Immutable R2 plan binding. Metadata only, no product/crypto/runtime actions."""
+import base64,concurrent.futures,datetime,hashlib,json,re,subprocess
+from pathlib import Path
+r=Path(__file__).resolve().parents[1];w=r/'.work';worker=r.parent/'fleet5-compute-storage-contract-20261105';rel='docs/vault/30_Development/Evidence/fleet5-current-three-node-renewal-plan-r2-20261108-codex';folder=worker/rel;out=w/'current-three-node-renewal-plan-r2-root-verification';assert not out.exists();out.mkdir()
+raw=(folder/'delivery.json').read_bytes();assert hashlib.sha256(raw).hexdigest()=='f2c4ba78c1fe8c2b4d275f25b66dfeae4f0e39bb85c41cd3a60221e815d4d35c';v=json.loads(raw);sha='b8c839d1daf28677a0587af115cbea496626d5ea';base='a3c6984fa25c6cf179827e15e4259000e7bd294e';rootsha='03f6ea0a2c6cf83074cfa71850892ba4a1873ae5'
+assert v['planSHA']==sha and v['base']==base and v['taskID']=='task_3e413989dcaa' and v['dispatchID']=='ctx_80dec9e2eb1e'
+assert v['planOnly'] and v['currentGenerationsUnknown'] and v['allProposedNewRuntimeOutputsUnbound'] and v['R1EvidenceTreeUnchanged']
+assert all(v[k] is False for k in ['productImplementation','rotationOrCryptoExecution','remoteExecution','sourceAcceptance','wholeProgramComplete'])
+def git(*args):return subprocess.check_output(['git',*args],cwd=r)
+def blob(ref,path):return git('show',ref+':'+path)
+assert git('rev-parse',sha+'^').decode().strip()==base and git('ls-remote','origin','refs/heads/'+v['branch']).decode().split()[0]==sha
+changed=list(filter(None,git('diff','--name-only','-z',base,sha).decode('utf-8').split('\0')));assert changed==v['changedPaths'] and len(changed)==28 and all(x.startswith('docs/vault/30_Development/') for x in changed)
+assert len(v['protectedTrees']['paths'])==15
+for name,item in v['protectedTrees']['paths'].items():assert git('rev-parse',base+':'+name).decode().strip()==git('rev-parse',sha+':'+name).decode().strip()==item['baseGitObject']==item['candidateGitObject']
+assert len(v['sourcePins'])==25 and len(v['rootInputPins'])==6;links=set()
+for item in v['sourcePins']:
+    b=blob(item['source'],item['path']);assert len(b)==item['bytes'] and hashlib.sha256(b).hexdigest()==item['SHA256'];text=b.decode('utf-8');lines=text.splitlines();withends=text.splitlines(keepends=True)
+    if not item['path'].startswith('docs/'):assert b==blob(base,item['path'])==blob(sha,item['path'])
+    for span in item['ranges']:
+        assert span['excerpt'] in ('\n'.join(lines[span['start']-1:span['end']]),''.join(withends[span['start']-1:span['end']]))
+        expected='https://github.com/egparadise/SaintVision-Invion/blob/'+item['source']+'/'+item['path']+'#L'+str(span['start'])+('-L'+str(span['end']) if span['end']!=span['start'] else '')
+        assert span['permalink']==expected;links.add(expected)
+for item in v['rootInputPins']:
+    b=blob(item['source'],item['path']);assert len(b)==item['bytes'] and hashlib.sha256(b).hexdigest()==item['SHA256']
+    assert blob(sha,rel+'/'+item['copy'])==b
+planpath='docs/vault/30_Development/Current three-Node pilot renewal preflight and recovery plan R1.md';plan=blob(sha,planpath);assert b'version: "1.1.0"' in plan
+refs=re.findall(r'https://github\.com/egparadise/SaintVision-Invion/blob/[a-f0-9]{40}/[^\s)#]+#L\d+(?:-L\d+)?',plan.decode('utf-8'));assert len(refs)==49 and set(refs)==links
+coverage=v['citationCoverage'];assert coverage['references']==49 and coverage['sourceFiles']==25 and coverage['allReferencedRangesCovered'] and coverage['unmappedReferences']==[] and coverage['baselineChanged'] is False
+manifestRaw=blob(sha,rel+'/operation-manifest.json');assert hashlib.sha256(manifestRaw).hexdigest()==v['manifestSHA256'];m=json.loads(manifestRaw)
+assert m['executable'] is False and m['operatingAuthorization'] is None and m['independentReviewer'] is None and m['wholeProgramComplete'] is False
+d=v['requiredMigrationAndDeadlineFork'];assert all(d[k] is None for k in ['actualReattestedE','B_NormalSeconds','B_MigrationSeconds','B_RecoveryPolicySeconds','B_RecoveryLeafSeconds','normalCutoff','normalEligibility','migrationCutoff','migrationEligibility','policyExpiredRecoveryCutoff','leafExpiredRecoveryCutoff'])
+assert d['afterPeerExpiry']['currentRestartDockerRestartRebootImageMigrationAllowed'] is False and d['caTerminal']['sameCARenewalOrRecoveryPossible'] is False and d['migrationMustSettleBeforeNormalCutoff']
+assert len(v['fiveContextSites'])==5 and len(v['futureTaskDAG'])==5
+findings=v['authorFindingDispositions'];assert findings['actualReviewSource']=='f29228ed28c651cb2470b45d9f8d14521e1ce75d' and findings['R2ActualReviewer'] is None and len(findings['findings'])==6 and all(x['independentClosure'] is None for x in findings['findings'])
+assert v['newPublicCPClientValidity']['notAfter']=='2026-11-09T07:15:30+00:00' and v['newPublicCPClientValidity']['allFiveActiveContextsAttested'] is False
+assert len(v['localMetadataGates'])==6 and all(x['exit']==0 for x in v['localMetadataGates']) and v['postCISyncCHECK']['exit']==0
+canonical=Path(r'D:\Project\SaintVision-Invion\SaintVisionI-Invion\.git\obsidian-sync-state.json').read_bytes();snapshot=(w/'current-three-node-renewal-plan-r2-canonical-before.raw').read_bytes();digest=hashlib.sha256(canonical).hexdigest();assert canonical==snapshot and len(canonical)==587290 and digest=='a59e836f1e826231ddfee3a3be5bb247dd4a9b018c24a9d809104e9ef2c5b5e4'
+s=v['canonicalState'];assert s['fullBytesEqual'] and s['APPLY'] is False and all(s[k]==len(canonical) for k in ['startBytes','endBytes','postCIBytes']) and all(s[k]==digest for k in ['startSHA256','endSHA256','postCISHA256'])
+gh=r'C:\Program Files\GitHub CLI\gh.exe';rid=42424634771;jobid=128560174853
+paths={'run':f'actions/runs/{rid}','jobs':f'actions/runs/{rid}/jobs?per_page=100','artifacts':f'actions/runs/{rid}/artifacts','job-log':f'actions/jobs/{jobid}/logs'}
+def get(entry):
+    name,path=entry;q=subprocess.run([gh,'api','--allow-escape-sequences','repos/egparadise/SaintVision-Invion/'+path],capture_output=True,timeout=60);assert q.returncode==0,(name,q.returncode)
+    if name!='job-log':(out/(name+'.json')).write_bytes(q.stdout)
+    return name,q.stdout
+with concurrent.futures.ThreadPoolExecutor(max_workers=4) as pool:official=dict(pool.map(get,paths.items()))
+a=json.loads(official['run']);jobs=json.loads(official['jobs']);arts=json.loads(official['artifacts']);assert a['head_sha']==sha and a['head_branch']==v['branch'] and a['display_title']==v['exactDocs']['dispatch']['correlation'] and a['event']=='workflow_dispatch' and a['path']=='.github/workflows/docs.yml' and a['run_attempt']==1 and a['status']=='completed' and a['conclusion']=='success'
+assert jobs['total_count']==len(jobs['jobs'])==1;j=jobs['jobs'][0];assert j['id']==jobid and j['head_sha']==sha and j['run_attempt']==1 and j['status']=='completed' and j['conclusion']=='success' and len(j['steps'])==19 and all(x['conclusion']=='success' for x in j['steps'])
+assert len(arts['artifacts'])==len(v['exactDocs']['artifacts'])==2;artifact_pins=[]
+for art in arts['artifacts']:
+    old=next(x for x in v['exactDocs']['artifacts'] if x['id']==art['id']);assert art['digest']==old['digest'] and not art['expired'] and art['workflow_run']['head_sha']==sha
+    record={'id':art['id'],'bytes':art['size_in_bytes'],'officialDigest':art['digest'],'actualZIPVerified':False}
+    if 'downloadedZIP' in old:
+        path=folder/old['downloadedZIP'];assert path.stat().st_size==art['size_in_bytes'];h=hashlib.sha256()
+        with path.open('rb') as stream:
+            for chunk in iter(lambda:stream.read(1048576),b''):h.update(chunk)
+        assert 'sha256:'+h.hexdigest()==art['digest'];record['actualZIPVerified']=True
+    artifact_pins.append(record)
+log=official['job-log'];old=v['exactDocs']['logs'][0];wrapper=json.loads((folder/old['path']).read_bytes());assert wrapper['encoding']=='base64' and base64.b64decode(wrapper['data'])==log and len(log)==old['bytes']==wrapper['bytes'] and hashlib.sha256(log).hexdigest()==old['SHA256']==wrapper['SHA256']
+for line in old['consoleResultLines']:assert line in log.decode('utf-8-sig')
+(out/'official-job-log-base64.json').write_bytes((folder/old['path']).read_bytes());(out/'delivery.json').write_bytes(raw)
+result={'verifiedAtKST':datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=9))).isoformat(timespec='seconds'),'planSHA':sha,'directBase':base,'Root538':rootsha,'deliverySHA256':hashlib.sha256(raw).hexdigest(),'docsOnlyChanged':28,'protectedTreesIncludingR1Evidence':15,'exactSourceFilesAndRangesVerified':25,'fullSHACitationsCovered':49,'exactNewRootAndReviewPinsVerified':6,'sixRecordedMetadataGatesExit0':True,'exactDocs':rid,'all19SuccessJob':jobid,'artifactScopes':artifact_pins,'officialLogBytes':len(log),'officialLogSHA256':hashlib.sha256(log).hexdigest(),'officialLogRawAndBase64Exact':True,'canonicalStartEndPostCIAndRootCurrentFullBytesMatch':True,'canonicalBytes':len(canonical),'canonicalSHA256':digest,'authorF1F6ProposalsPendingIndependentDelta':True,'requiredMigrationAndExpiryBranchesProposed':True,'fiveClientSitesEnumerated':True,'cutoffsAndBudgetsNullHOLD':True,'actualIndependentR2Review':False,'actualMigrationRenewalOrRestart':False,'wholeProgramComplete':False}
+(out/'receipt.json').write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n',encoding='utf-8');print(json.dumps(result),flush=True)
