@@ -1,6 +1,7 @@
 import React from 'react';
 import type { NodeItem, NodeStatus, RunItem } from '@/contracts/types';
 import { Button } from '@/shared/ui/Button';
+import { CanonicalClusterResources } from './CanonicalClusterResources';
 
 export const NODE_STATUS_CONFIG = {
   active: {
@@ -173,6 +174,11 @@ export const ClusterOverview: React.FC<ClusterOverviewProps> = ({
         )}
       </section>
     );
+  }
+
+  if (nodes.some(node => node.resourceObservation)) {
+    return <CanonicalClusterResources nodes={nodes} runs={runs} nodesState={nodesState}
+      nodeError={nodeError} lastFetchedAt={lastFetchedAt} onRefresh={onRefresh} statusConfig={getClusterNodeStatusConfig} />;
   }
 
   // 3. 텔레메트리 미제공/미관측 노드가 포함된 경우

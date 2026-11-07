@@ -59,11 +59,12 @@ export type NodeStatus =
 export type ProblemDetails = CanonicalProblemDetails;
 
 export interface NodeItem {
+  resourceObservation?: import('./dashboard-resources').DashboardNodeResourceObservation;
   telemetryUnavailable?: boolean;
   id: string; // nod_...
   hostname: string;
   status: NodeStatus;
-  os: 'windows' | 'linux';
+  os: 'windows' | 'linux' | 'unknown';
   cpuCores: number;
   cpuUsagePercent: number;
   memoryTotalBytes: number;

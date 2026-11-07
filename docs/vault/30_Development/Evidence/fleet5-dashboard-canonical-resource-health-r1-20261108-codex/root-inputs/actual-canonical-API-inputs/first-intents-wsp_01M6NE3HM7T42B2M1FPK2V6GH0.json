@@ -1,0 +1,23 @@
+{
+  "projectId": "prj_01M6NDBHVD2DZQ1Q38DCKN1XE3",
+  "workspaceId": "wsp_01M6NE3HM7T42B2M1FPK2V6GH0",
+  "workspaceVersion": 2,
+  "observedAt": "2026-11-07T19:47:42.795833+00:00",
+  "profile": {
+    "nodeId": "nod_01M6TAWG25JTA3F7J7S1EE4N2W",
+    "profileVersion": "cpu-pilot-1efea-r1",
+    "images": [
+      "sha256:ffee58e8dbefc6c0db68810cd1597f8cc589cf01112c434ed7fda8d4af415634"
+    ],
+    "executables": [
+      "/usr/local/bin/python3"
+    ],
+    "maxCpuMillis": 500,
+    "minMemoryBytes": 8388608,
+    "maxMemoryBytes": 67108864,
+    "maxTimeoutSeconds": 30,
+    "terminalAllowed": false
+  },
+  "items": [],
+  "nextCursor": null
+}

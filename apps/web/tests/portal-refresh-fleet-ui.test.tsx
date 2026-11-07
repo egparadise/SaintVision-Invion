@@ -343,7 +343,7 @@ describe('PORTAL-REFRESH-FLEET-20261106: Stable Polling, Honest Gateway & Identi
       });
 
       expect(fetchSpy).toHaveBeenCalledWith(
-        '/healthz',
+        '/gateway-healthz',
         expect.objectContaining({ signal: expect.any(Object) })
       );
       const gatewayContainer = container.querySelector('[title*="Gateway 실시간 RTT"]');
@@ -1280,7 +1280,7 @@ describe('PORTAL-REFRESH-FLEET-20261106: Stable Polling, Honest Gateway & Identi
         const url = String(input);
         seen.push({ url, hasSignal: !!init?.signal, signal: init?.signal ?? undefined });
         const sig = init?.signal;
-        if (url === '/healthz') {
+        if (url === '/gateway-healthz') {
           return Promise.resolve(new Response(JSON.stringify({ status: 'ok' }), { status: 200, headers: { 'content-type': 'application/json' } }));
         }
         if (url.endsWith('/nodes')) {

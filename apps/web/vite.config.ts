@@ -21,6 +21,13 @@ export default defineConfig({
     port: 3000,
     host: '0.0.0.0',
     proxy: {
+      '/gateway-healthz': {
+        target: process.env.VITE_API_PROXY_TARGET || 'http://127.0.0.1:8080',
+        changeOrigin: true,
+        rewrite: () => '/healthz',
+        bypass: (req) => req.url === '/gateway-healthz' && ['GET', 'HEAD'].includes(req.method || '') ? undefined : false,
+        configure: (proxy) => proxy.on('proxyReq', (req) => { req.removeHeader('authorization'); req.removeHeader('cookie'); }),
+      },
       '/v1': {
         target: process.env.VITE_API_PROXY_TARGET || 'http://127.0.0.1:8080',
         changeOrigin: true,
@@ -35,6 +42,13 @@ export default defineConfig({
     port: 3000,
     host: '0.0.0.0',
     proxy: {
+      '/gateway-healthz': {
+        target: process.env.VITE_API_PROXY_TARGET || 'http://127.0.0.1:8080',
+        changeOrigin: true,
+        rewrite: () => '/healthz',
+        bypass: (req) => req.url === '/gateway-healthz' && ['GET', 'HEAD'].includes(req.method || '') ? undefined : false,
+        configure: (proxy) => proxy.on('proxyReq', (req) => { req.removeHeader('authorization'); req.removeHeader('cookie'); }),
+      },
       '/v1': {
         target: process.env.VITE_API_PROXY_TARGET || 'http://127.0.0.1:8080',
         changeOrigin: true,

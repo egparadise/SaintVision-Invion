@@ -93,6 +93,17 @@ jobs:
       - name: Boot actual built frontend under canonical strict CSP
         run: python tools/verify_portal_strict_csp_browser.py
 
+      - name: Replay canonical dashboard resources and genuine dev CP health in browser
+        run: python tools/verify_dashboard_canonical_browser.py
+
+      - name: Upload canonical dashboard browser replay evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: saintvision-dashboard-canonical-browser-evidence
+          path: artifacts/dashboard-canonical-browser/
+          retention-days: 14
+
       - name: Upload strict CSP browser and standalone generation evidence
         if: always()
         uses: actions/upload-artifact@v4
@@ -251,10 +262,26 @@ jobs:
           # 5. Start lightweight Python SSL upstream stub for cp.sv.lan on port 443
           sudo python3 - <<'EOF' > /tmp/portal-ci/mock_upstream.log 2>&1 &
           import http.server, ssl, json, hashlib, base64
+          from pathlib import Path
 
           class Handler(http.server.BaseHTTPRequestHandler):
               def do_GET(self):
-                  if self.path == "/v1/session":
+                  if self.path == "/healthz":
+                      mode_path = Path('/tmp/portal-ci/gateway-health-mode')
+                      mode = mode_path.read_text().strip() if mode_path.exists() else 'healthy'
+                      status, mime, body = {
+                          'healthy': (200, 'application/json', b'{"status":"ok","version":"isolated-cp"}'),
+                          'html': (200, 'text/html', b'<html>upstream fallback</html>'),
+                          'text': (200, 'text/plain', b'OK'),
+                          'error': (503, 'application/json', b'{"status":"unavailable"}'),
+                      }[mode]
+                      if self.headers.get('Authorization') or self.headers.get('Cookie'):
+                          status, mime, body = 500, 'text/plain', b'health credential leak'
+                      self.send_response(status)
+                      self.send_header("Content-Type", mime)
+                      self.end_headers()
+                      self.wfile.write(body)
+                  elif self.path == "/v1/session":
                       self.send_response(200)
                       self.send_header("Content-Type", "application/json")
                       self.end_headers()
@@ -416,6 +443,17 @@ jobs:
           fi
 
           echo "✔ Hosted Portal Container Build & Hardened Runtime Smoke PASSED!"
+
+      - name: Verify genuine CP gateway health through TLS proxy
+        run: python3 tools/verify_gateway_proxy.py
+
+      - name: Upload gateway proxy evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: saintvision-gateway-health-proxy-evidence
+          path: artifacts/gateway-health-proxy/
+          retention-days: 14
 
       - name: Verify Automatic Rollback on Production Swap Failure (R6-H1 & R6-H2)
         env:

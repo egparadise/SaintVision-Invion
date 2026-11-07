@@ -34,7 +34,7 @@ export function observedNode(value: object): NodeItem {
   return {
     id: String(raw.nodeId ?? raw.id ?? ''), hostname: String(raw.hostname ?? raw.nodeId ?? raw.id ?? ''),
     status: mappedStatus,
-    os: os === 'linux' ? 'linux' : 'windows', telemetryUnavailable: !valid || mappedStatus === 'lost',
+    os: os === 'linux' || os === 'windows' ? os : 'unknown', telemetryUnavailable: !valid || mappedStatus === 'lost',
     cpuCores: number('cpuCores'), cpuUsagePercent: number('cpuUsagePercent'),
     memoryTotalBytes: number('memoryTotalBytes'), memoryUsedBytes: number('memoryUsedBytes'),
     storageTotalBytes: number('storageTotalBytes'), storageUsedBytes: number('storageUsedBytes'),

@@ -314,7 +314,7 @@ export const NodeDetail: React.FC<NodeDetailProps> = ({
 
             <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid var(--color-border-subtle)', paddingBottom: '8px' }}>
               <span style={{ color: 'var(--color-text-muted)' }}>CPU 아키텍처 및 물리 코어:</span>
-              <strong>x86_64 ({cpuCoresDisplay})</strong>
+              <strong>{node.os === 'unknown' ? '아키텍처 미관측' : 'x86_64'} ({cpuCoresDisplay})</strong>
             </div>
 
             <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid var(--color-border-subtle)', paddingBottom: '8px' }}>

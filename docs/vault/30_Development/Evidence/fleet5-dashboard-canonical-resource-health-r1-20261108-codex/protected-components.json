@@ -1,0 +1,70 @@
+{
+  "base": "e4e07bfd6b94e57edc64d158e208df01b9319deb",
+  "backendSource": "96afd799d49717fd40e4ddabd538d82accbe1958",
+  "paths": {
+    "contracts": {
+      "baseGitObject": "b2b24a6d9baf24302f3590f4f30fe851ccb81ef1",
+      "byteIdentical": true
+    },
+    "packages": {
+      "baseGitObject": "7c445bdbc929f6597c0b39b598f9726032c67ad7",
+      "byteIdentical": true
+    },
+    "services": {
+      "baseGitObject": "5c9918adc48c76c88b5119f44516bb332924f067",
+      "byteIdentical": true
+    },
+    "migrations": {
+      "baseGitObject": "b1d35598829437c39dab7f60e9521bf8627e6832",
+      "byteIdentical": true
+    },
+    "src": {
+      "baseGitObject": "5507dfb820d54a8778c4cf5e3551368f11b6105f",
+      "byteIdentical": true
+    },
+    "tests": {
+      "baseGitObject": "f0c6e9f537989b71f57b2185fd43c6abbaf4369e",
+      "byteIdentical": true
+    },
+    "apps/studio": {
+      "baseGitObject": "faf648da92d7f63e74e7e1d158deb923d42a6a8c",
+      "byteIdentical": true
+    },
+    "apps/web/package-lock.json": {
+      "baseGitObject": "7cd35bcec966ac001d6481f9712ff06546879222",
+      "byteIdentical": true
+    },
+    "apps/web/package.json": {
+      "baseGitObject": "2bb2f1737b9da0374d88ab3c976c91e1239edf91",
+      "byteIdentical": true
+    },
+    "apps/web/scripts": {
+      "baseGitObject": "21e135515ed379ef2dc142224c1b1b9d5acf4b2d",
+      "byteIdentical": true
+    },
+    "apps/web/src/shared/api/nodeCertificateObservation.ts": {
+      "baseGitObject": "029568a75b56328c8b2d966ecc0111337cc3ee6f",
+      "byteIdentical": true
+    },
+    "apps/web/src/features/auth": {
+      "baseGitObject": "1e7dc0f02f58383df62bbfa98fd20c0421267072",
+      "byteIdentical": true
+    },
+    ".github/workflows/ac11-accessibility-e2e.yml": {
+      "baseGitObject": "2c72288b5fd5f6e83ccdfe0ed08b29de620e938d",
+      "byteIdentical": true
+    },
+    "deploy/intranet/portal/security-headers.conf": {
+      "baseGitObject": "229689ac1bccb4d6c2260774155c9f1a6c22fd61",
+      "byteIdentical": true
+    },
+    "deploy/intranet/portal/Dockerfile": {
+      "baseGitObject": "3e067d96bb25c24ddb953c21f1c490cd2092d648",
+      "byteIdentical": true
+    },
+    "apps/web/src/features/studio/FirstWorkspacePanel.tsx": {
+      "baseGitObject": "1180b3cb9a62e7c7d0d41a19e5d9d19520930171",
+      "byteIdentical": true
+    }
+  }
+}

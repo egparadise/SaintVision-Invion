@@ -27,12 +27,14 @@ import { Login } from '@/features/auth/Login';
 import { clearSessionExpiration, onTokenExpired, performLogout } from '@/features/auth/session';
 import { DeveloperStudio } from '@/features/studio/DeveloperStudio';
 import { NodeItem, RunItem, ApprovalItem, WorkspaceItem, ExecutionResultItem, ProjectItem, ProjectNodeCertificateObservationResponse } from '@/contracts/types';
-import { apiClient, clearAuthToken, isRouteNotFoundError, onUnauthorized } from '@/shared/api/client';
+import { apiClient, clearAuthToken, getAuthToken, isRouteNotFoundError, onUnauthorized } from '@/shared/api/client';
 import type { NodePageResponse } from '@/contracts/node-page-response';
 import type { WorkspaceSummaryResponse } from '@/contracts/project-workspaces-response';
 import { fetchProjects, fetchProjectWorkspaces, createProjectWorkspace } from '@/shared/api/projectObservation';
 import { fetchObservedRuns, fetchObservedApprovals } from '@/shared/api/runApprovalObservation';
 import { observedNode } from '@/shared/api/nodeObservation';
+import { assertDashboardIdentities, joinDashboardResources } from '@/shared/api/dashboardResources';
+import type { DashboardNodeResourceObservation } from '@/contracts/dashboard-resources';
 import { deriveEffectiveClusterTrust, fetchProjectNodeCertificates, isCurrentNodeCertificateObservation, nextNodeCertificateTransition } from '@/shared/api/nodeCertificateObservation';
 import { decideApproval, cancelKernelRun } from '@/shared/api/kernelMutations';
 import { getNodeResourceUsage } from '@/features/desktop/fabricControlApi';
@@ -122,6 +124,7 @@ export const App: React.FC = () => {
   const approvalRequest = useRef(0);
   const workspaceRequest = useRef(0);
   const nodeRequest = useRef(0);
+  const dashboardResources = useRef(new Map<string, DashboardNodeResourceObservation>());
 
   const nodeAppliedRef = useRef(0);
   const runAppliedRef = useRef(0);
@@ -151,6 +154,7 @@ export const App: React.FC = () => {
     workspaceAppliedRef.current = ++workspaceRequest.current;
 
     activeProject.current = '';
+    dashboardResources.current.clear();
 
     setCurrentUser(null);
     setProjectId('');
@@ -228,6 +232,7 @@ export const App: React.FC = () => {
     approvalAppliedRef.current = ++approvalRequest.current;
     workspaceAppliedRef.current = ++workspaceRequest.current;
     activeProject.current = id;
+    dashboardResources.current.clear();
     setRunError(null); setApprovalError(null); setWorkspaceError(null); setNodeError(null);
     setProjectId(id); setRuns([]); setApprovals([]); setWorkspaces([]);
     setNodes([]); setCertificateObservation(null);
@@ -324,6 +329,7 @@ export const App: React.FC = () => {
     const currentSession = sessionRef.current;
     const currentScope = scopeRef.current;
     const request = ++nodeRequest.current;
+    const nodeCredential = getAuthToken();
 
     const controller = new AbortController();
     nodeAbortRef.current = controller;
@@ -338,6 +344,7 @@ export const App: React.FC = () => {
       setNodesState('loading');
       setNodeError(null);
     }
+    let identityPublished = false;
     try {
       let page: NodePageResponse;
       try {
@@ -362,14 +369,32 @@ export const App: React.FC = () => {
         certObs = null;
       }
 
-      clearTimeout(timeoutId);
-      if (sessionRef.current === currentSession && scopeRef.current === currentScope && request > nodeAppliedRef.current) {
+      if (controller.signal.aborted) throw new Error('Node poll aborted');
+      if (getAuthToken() === nodeCredential && sessionRef.current === currentSession && scopeRef.current === currentScope && request > nodeAppliedRef.current) {
+        const identities = page.items.map(observedNode);
+        assertDashboardIdentities(identities);
         nodeAppliedRef.current = request;
-        setNodes(page.items.map(observedNode));
+        dashboardResources.current = new Map(identities.flatMap(node => {
+          const value = dashboardResources.current.get(node.id);
+          return value?.projectId === targetPrj ? [[node.id, value] as const] : [];
+        }));
+        setNodes(identities.map(node => ({ ...node, resourceObservation: {
+          projectId: targetPrj, usage: null, issues: [], error: null,
+          ...(dashboardResources.current.get(node.id)?.projectId === targetPrj ? dashboardResources.current.get(node.id) : {}), loading: true,
+        } })));
         setCertificateObservation(certObs);
         setNodesState('success');
         setLastNodesFetchedAt(new Date());
         setNodeError(null);
+        identityPublished = true;
+        await joinDashboardResources(identities, targetPrj, controller.signal, dashboardResources.current, node => {
+          const timedOut = controller.signal.reason?.message === 'REQUEST_TIMEOUT';
+          if ((!controller.signal.aborted || timedOut) && getAuthToken() === nodeCredential &&
+              sessionRef.current === currentSession && scopeRef.current === currentScope && request === nodeAppliedRef.current) {
+            dashboardResources.current.set(node.id, node.resourceObservation!);
+            setNodes(current => current.map(existing => existing.id === node.id ? node : existing));
+          }
+        });
       }
     } catch (err: any) {
       clearTimeout(timeoutId);
@@ -380,7 +405,8 @@ export const App: React.FC = () => {
       if (controller.signal.aborted && !isTimeout) {
         return;
       }
-      if (sessionRef.current === currentSession && scopeRef.current === currentScope && request > nodeAppliedRef.current) {
+      if (identityPublished) return; // Per-node failures never erase a genuine identity/heartbeat page.
+      if (getAuthToken() === nodeCredential && sessionRef.current === currentSession && scopeRef.current === currentScope && request > nodeAppliedRef.current) {
         nodeAppliedRef.current = request;
         setNodesState('error');
         const msg = isTimeout

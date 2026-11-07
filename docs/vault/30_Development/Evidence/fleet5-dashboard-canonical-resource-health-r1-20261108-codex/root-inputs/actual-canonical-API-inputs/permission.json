@@ -1,0 +1,10 @@
+{
+  "projectId": "prj_01M6NDBHVD2DZQ1Q38DCKN1XE3",
+  "userId": "usr_01M6R449Z62B1H7VE1RMH4GTW9",
+  "roleCode": "owner",
+  "projectStatus": "active",
+  "userStatus": "active",
+  "canRequest": true,
+  "canApprove": true,
+  "canAdminister": true
+}

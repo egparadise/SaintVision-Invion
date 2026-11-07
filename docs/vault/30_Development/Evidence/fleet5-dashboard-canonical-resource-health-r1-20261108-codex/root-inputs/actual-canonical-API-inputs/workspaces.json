@@ -1,0 +1,19 @@
+{
+  "projectId": "prj_01M6NDBHVD2DZQ1Q38DCKN1XE3",
+  "workspaces": [
+    {
+      "workspaceId": "wsp_01M6NE3HM7T42B2M1FPK2V6GH0",
+      "projectId": "prj_01M6NDBHVD2DZQ1Q38DCKN1XE3",
+      "name": "wsp-local-run-check",
+      "status": "ready",
+      "nodeId": null,
+      "toolName": null,
+      "createdAt": "2026-11-05T08:44:45.555684Z",
+      "allowedNext": [
+        "deleting",
+        "suspended"
+      ]
+    }
+  ],
+  "count": 1
+}

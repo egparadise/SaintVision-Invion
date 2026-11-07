@@ -1,0 +1,34 @@
+{
+  "atKST": "2026-11-08T04:53:34+09:00",
+  "taskID": "FLEET5-REAL-DASHBOARD-CANONICAL-RESOURCE-HEALTH-JOIN-R1-20261108",
+  "owner": "Actual Orca Codex original source author",
+  "reviewer": "One actual independent Claude after exact source CI",
+  "Root531SHA": "8cbcc96f845a1a94b998fadd489fd27bb3e0a675",
+  "Root531Docs": 42408179186,
+  "RootSyncedDestinationHashes": 3473,
+  "sourceBase": "e4e07bfd6b94e57edc64d158e208df01b9319deb",
+  "backendRemains": "96afd799d49717fd40e4ddabd538d82accbe1958",
+  "lifecycles": {
+    "author": {
+      "dispatchId": "ctx_02638d160ba6",
+      "taskId": "task_83732e149ebb",
+      "state": "succeeded",
+      "stage": "settled",
+      "liveness": "exited",
+      "terminalState": "released"
+    },
+    "reviewer": {
+      "dispatchId": "ctx_7b1a435f3b4f",
+      "taskId": "task_ce91b9bbce0b",
+      "state": "succeeded",
+      "stage": "settled",
+      "liveness": "exited",
+      "terminalState": "released"
+    }
+  },
+  "canonicalBytesAtDispatch": 551380,
+  "canonicalSHA256AtDispatch": "a0955c3f7a7db43565ddd87eddf26bd4406e41f885d32bcb4d84442e191bff83",
+  "RootApplyDuringTask": "DEFERRED",
+  "codeFix": "NOT_YET_DELIVERED",
+  "wholeProgramComplete": false
+}

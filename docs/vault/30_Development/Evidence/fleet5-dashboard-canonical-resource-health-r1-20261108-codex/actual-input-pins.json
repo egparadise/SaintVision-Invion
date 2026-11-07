@@ -1,0 +1,135 @@
+[
+  {
+    "source": "8cbcc96f845a1a94b998fadd489fd27bb3e0a675",
+    "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/pc3-e4e07-real-deploy-and-dashboard-contract-r1/actual-PC3-start.json",
+    "copy": "root-inputs/actual-PC3-start.json",
+    "bytes": 4147,
+    "SHA256": "17aed4615ae72815a06f23d382697ede20f0a4ab0387f0128188c64104fdf922"
+  },
+  {
+    "source": "8cbcc96f845a1a94b998fadd489fd27bb3e0a675",
+    "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/pc3-e4e07-real-deploy-and-dashboard-contract-r1/actual-browser-resource-prerequisite-failure.json",
+    "copy": "root-inputs/actual-browser-resource-prerequisite-failure.json",
+    "bytes": 1930,
+    "SHA256": "d6d6fdbcba59df9622d7abdb47821791f8d814c451d9889cea5364af90b0acb7"
+  },
+  {
+    "source": "8cbcc96f845a1a94b998fadd489fd27bb3e0a675",
+    "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/pc3-e4e07-real-deploy-and-dashboard-contract-r1/actual-canonical-API-inputs/actual-portal-and-api-healthz.json",
+    "copy": "root-inputs/actual-canonical-API-inputs/actual-portal-and-api-healthz.json",
+    "bytes": 237,
+    "SHA256": "befd16cfa30aa74be194c84f2a62ef91bf1b44a862471a35f46dbc070f72e08c"
+  },
+  {
+    "source": "8cbcc96f845a1a94b998fadd489fd27bb3e0a675",
+    "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/pc3-e4e07-real-deploy-and-dashboard-contract-r1/actual-canonical-API-inputs/capacity.json",
+    "copy": "root-inputs/actual-canonical-API-inputs/capacity.json",
+    "bytes": 1222,
+    "SHA256": "d5a8cfd81743850a7d967aaea5781821c625020a041f377548b470164660d500"
+  },
+  {
+    "source": "8cbcc96f845a1a94b998fadd489fd27bb3e0a675",
+    "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/pc3-e4e07-real-deploy-and-dashboard-contract-r1/actual-canonical-API-inputs/first-intents-wsp_01M6NE3HM7T42B2M1FPK2V6GH0.json",
+    "copy": "root-inputs/actual-canonical-API-inputs/first-intents-wsp_01M6NE3HM7T42B2M1FPK2V6GH0.json",
+    "bytes": 637,
+    "SHA256": "ebbf7f001d6c3f321a9ba7d9dc358df0981725bb717121dbcc5359acf9523948"
+  },
+  {
+    "source": "8cbcc96f845a1a94b998fadd489fd27bb3e0a675",
+    "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/pc3-e4e07-real-deploy-and-dashboard-contract-r1/actual-canonical-API-inputs/nodes.json",
+    "copy": "root-inputs/actual-canonical-API-inputs/nodes.json",
+    "bytes": 467,
+    "SHA256": "7359b4712e4366ee5d652ad22460a51ac27e6ff9123900bb2dc61b78ef5d63e1"
+  },
+  {
+    "source": "8cbcc96f845a1a94b998fadd489fd27bb3e0a675",
+    "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/pc3-e4e07-real-deploy-and-dashboard-contract-r1/actual-canonical-API-inputs/permission.json",
+    "copy": "root-inputs/actual-canonical-API-inputs/permission.json",
+    "bytes": 245,
+    "SHA256": "59a0a3434d41790ac2cb7c8076b99f853c38fc9ab0f4336766eb3fec7c8637ea"
+  },
+  {
+    "source": "8cbcc96f845a1a94b998fadd489fd27bb3e0a675",
+    "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/pc3-e4e07-real-deploy-and-dashboard-contract-r1/actual-canonical-API-inputs/receipt.json",
+    "copy": "root-inputs/actual-canonical-API-inputs/receipt.json",
+    "bytes": 2775,
+    "SHA256": "7296bfdd29c64a6cea5525792211cf9c578c1d189a99e53049ffa1b96a62edb5"
+  },
+  {
+    "source": "8cbcc96f845a1a94b998fadd489fd27bb3e0a675",
+    "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/pc3-e4e07-real-deploy-and-dashboard-contract-r1/actual-canonical-API-inputs/resource-usage-nod_01M6TAWG25JTA3F7J7S1EE4N2W.json",
+    "copy": "root-inputs/actual-canonical-API-inputs/resource-usage-nod_01M6TAWG25JTA3F7J7S1EE4N2W.json",
+    "bytes": 728,
+    "SHA256": "beb15119351a3dde5c5e7e9638d490127f6eb1326402ed3220cbfa9196da68d5"
+  },
+  {
+    "source": "8cbcc96f845a1a94b998fadd489fd27bb3e0a675",
+    "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/pc3-e4e07-real-deploy-and-dashboard-contract-r1/actual-canonical-API-inputs/resource-usage-nod_01M6TGQZ8S3DAFS7TYE8TY1PX2.json",
+    "copy": "root-inputs/actual-canonical-API-inputs/resource-usage-nod_01M6TGQZ8S3DAFS7TYE8TY1PX2.json",
+    "bytes": 728,
+    "SHA256": "e33d0725b85965f669104cc460df1ecf2bb8e5d6da96aa5a5412ac05818c35ac"
+  },
+  {
+    "source": "8cbcc96f845a1a94b998fadd489fd27bb3e0a675",
+    "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/pc3-e4e07-real-deploy-and-dashboard-contract-r1/actual-canonical-API-inputs/resource-usage-nod_01M6TGSXV1J7XWC5D5H7N6EW1D.json",
+    "copy": "root-inputs/actual-canonical-API-inputs/resource-usage-nod_01M6TGSXV1J7XWC5D5H7N6EW1D.json",
+    "bytes": 728,
+    "SHA256": "0de278aac5c8213b84e3e3ca6eb31948e1fbbec69058f0b9cd26092849c93a5f"
+  },
+  {
+    "source": "8cbcc96f845a1a94b998fadd489fd27bb3e0a675",
+    "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/pc3-e4e07-real-deploy-and-dashboard-contract-r1/actual-canonical-API-inputs/session.json",
+    "copy": "root-inputs/actual-canonical-API-inputs/session.json",
+    "bytes": 172,
+    "SHA256": "790bf958851d402d0efba695c13b199d65f304864f247283c2d6a59af761d56e"
+  },
+  {
+    "source": "8cbcc96f845a1a94b998fadd489fd27bb3e0a675",
+    "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/pc3-e4e07-real-deploy-and-dashboard-contract-r1/actual-canonical-API-inputs/workspaces.json",
+    "copy": "root-inputs/actual-canonical-API-inputs/workspaces.json",
+    "bytes": 438,
+    "SHA256": "6d1bb3605e7b2d79e7850687f8a027ac3bc2143c23b7c7e551ea55816b453af8"
+  },
+  {
+    "source": "8cbcc96f845a1a94b998fadd489fd27bb3e0a675",
+    "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/pc3-e4e07-real-deploy-and-dashboard-contract-r1/actual-cutover-reconciled.json",
+    "copy": "root-inputs/actual-cutover-reconciled.json",
+    "bytes": 961,
+    "SHA256": "d8d3f6dff1e3a6421b0c253d1e5337957c66f960ebcff0d087a8f87a87328613"
+  },
+  {
+    "source": "8cbcc96f845a1a94b998fadd489fd27bb3e0a675",
+    "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/pc3-e4e07-real-deploy-and-dashboard-contract-r1/official-artifact-inspection.json",
+    "copy": "root-inputs/official-artifact-inspection.json",
+    "bytes": 1320,
+    "SHA256": "f2f9cd54eb47dcef38a576d825ff46970ad3a765568a3ddc1c5109edac6115f2"
+  },
+  {
+    "source": "8cbcc96f845a1a94b998fadd489fd27bb3e0a675",
+    "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/pc3-e4e07-real-deploy-and-dashboard-contract-r1/owned-SSH-cutover-intent.json",
+    "copy": "root-inputs/owned-SSH-cutover-intent.json",
+    "bytes": 662,
+    "SHA256": "ff0fc4a1bb4db7d9c5d67f661b8f22b8167353ee9d95461414e5562fabe3e6fd"
+  },
+  {
+    "source": "8cbcc96f845a1a94b998fadd489fd27bb3e0a675",
+    "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/pc3-e4e07-real-deploy-and-dashboard-contract-r1/owned-SSH-cutover-result.json",
+    "copy": "root-inputs/owned-SSH-cutover-result.json",
+    "bytes": 3404,
+    "SHA256": "c1d381d0745af04bbee5f86a3727fc4731007774b920d88a82bbe3bd402bb1d4"
+  },
+  {
+    "source": "8cbcc96f845a1a94b998fadd489fd27bb3e0a675",
+    "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/pc3-e4e07-real-deploy-and-dashboard-contract-r1/real-Chrome-strictCSP-before-cutover.json",
+    "copy": "root-inputs/real-Chrome-strictCSP-before-cutover.json",
+    "bytes": 5926,
+    "SHA256": "9c32916416b01b939ff8040cf8e8bf9c9f1c412711a21f575e5637a43f887e50"
+  },
+  {
+    "source": "8cbcc96f845a1a94b998fadd489fd27bb3e0a675",
+    "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/pc3-e4e07-real-deploy-and-dashboard-contract-r1/root-findings-and-next-source-task.json",
+    "copy": "root-inputs/root-findings-and-next-source-task.json",
+    "bytes": 2515,
+    "SHA256": "692f7e15fa4a13be23de803e80817b3df873989f8195c2ff6ae0b4eeec245d39"
+  }
+]

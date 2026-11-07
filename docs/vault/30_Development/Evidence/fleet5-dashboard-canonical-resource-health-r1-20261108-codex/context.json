@@ -1,0 +1,16 @@
+{
+  "docID": "EVIDENCE-FLEET5-DASHBOARD-CANONICAL-RESOURCE-HEALTH-R1-CODEX",
+  "version": "1.0.0",
+  "taskID": "task_e04bfe8c6446",
+  "dispatchID": "ctx_ed6d9229a09a",
+  "owner": "Codex",
+  "base": "e4e07bfd6b94e57edc64d158e208df01b9319deb",
+  "backendSource": "96afd799d49717fd40e4ddabd538d82accbe1958",
+  "branch": "agent/codex/fleet5-dashboard-canonical-resource-health-r1-20261108",
+  "rootManagement": "8cbcc96f845a1a94b998fadd489fd27bb3e0a675",
+  "atKST": "2026-11-08T04:54:39.206961+09:00",
+  "canonicalBytes": 551380,
+  "canonicalSHA256": "a0955c3f7a7db43565ddd87eddf26bd4406e41f885d32bcb4d84442e191bff83",
+  "mainProductExecution": false,
+  "review": "One actual Claude bounded delta after final source/CI/release; Root deploys and verifies real30sec resource/no-blink"
+}

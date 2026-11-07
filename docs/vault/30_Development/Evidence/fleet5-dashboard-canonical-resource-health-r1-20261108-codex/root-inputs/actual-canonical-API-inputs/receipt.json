@@ -1,0 +1,117 @@
+{
+  "atKST": "2026-11-08T04:47:42+09:00",
+  "status": "REAL_OWNER_GET_ONLY_DASHBOARD_CONTRACT_INPUTS_CAPTURED",
+  "backendSource": "96afd799d49717fd40e4ddabd538d82accbe1958",
+  "frontendSource": "e4e07bfd6b94e57edc64d158e208df01b9319deb",
+  "projectId": "prj_01M6NDBHVD2DZQ1Q38DCKN1XE3",
+  "PKCES256": true,
+  "tokenExchangeHTTP": 200,
+  "HTTP": {
+    "session": 200,
+    "permission": 200,
+    "nodes": 200,
+    "capacity": 200,
+    "workspaces": 200
+  },
+  "usage": [
+    {
+      "nodeId": "nod_01M6TAWG25JTA3F7J7S1EE4N2W",
+      "HTTP": 200,
+      "heartbeatAgeSeconds": 1.476311,
+      "resources": [
+        {
+          "kind": "cpu",
+          "unit": "millicores",
+          "capacity": 500,
+          "offered": 500,
+          "reserved": 0,
+          "spare": 500,
+          "measured": true
+        },
+        {
+          "kind": "memory",
+          "unit": "bytes",
+          "capacity": 67108864,
+          "offered": 67108864,
+          "reserved": 0,
+          "spare": 67108864,
+          "measured": true
+        }
+      ]
+    },
+    {
+      "nodeId": "nod_01M6TGQZ8S3DAFS7TYE8TY1PX2",
+      "HTTP": 200,
+      "heartbeatAgeSeconds": 1.91446,
+      "resources": [
+        {
+          "kind": "cpu",
+          "unit": "millicores",
+          "capacity": 500,
+          "offered": 500,
+          "reserved": 0,
+          "spare": 500,
+          "measured": true
+        },
+        {
+          "kind": "memory",
+          "unit": "bytes",
+          "capacity": 67108864,
+          "offered": 67108864,
+          "reserved": 0,
+          "spare": 67108864,
+          "measured": true
+        }
+      ]
+    },
+    {
+      "nodeId": "nod_01M6TGSXV1J7XWC5D5H7N6EW1D",
+      "HTTP": 200,
+      "heartbeatAgeSeconds": 2.447328,
+      "resources": [
+        {
+          "kind": "memory",
+          "unit": "bytes",
+          "capacity": 67108864,
+          "offered": 67108864,
+          "reserved": 0,
+          "spare": 67108864,
+          "measured": true
+        },
+        {
+          "kind": "cpu",
+          "unit": "millicores",
+          "capacity": 500,
+          "offered": 500,
+          "reserved": 0,
+          "spare": 500,
+          "measured": true
+        }
+      ]
+    }
+  ],
+  "canonicalNodeResponseFields": [
+    "lastHeartbeatAt",
+    "nodeId",
+    "status"
+  ],
+  "actualHealth": [
+    {
+      "port": 3100,
+      "HTTP": 200,
+      "contentType": "text/plain",
+      "body": "OK"
+    },
+    {
+      "port": 18080,
+      "HTTP": 200,
+      "contentType": "application/json",
+      "body": "{\"status\":\"ok\",\"version\":\"0.1.0\"}"
+    }
+  ],
+  "allApplicationRequestsGET": true,
+  "dataOrRolesOrRunOrVotesChanged": false,
+  "passwordOrTokensPersisted": false,
+  "explicitExistingPublicChainTLSVerified": true,
+  "wholeProgramComplete": false
+}

@@ -1,0 +1,106 @@
+{
+  "AtKST": "2026-11-08T04:40:23.1373125+09:00",
+  "Source": "e4e07bfd6b94e57edc64d158e208df01b9319deb",
+  "IndependentReview": "20d9bf8622a0f0624a323b92acaeb33cea91fb9e",
+  "RootPredeploymentSHA": "2e5999ac6fe8bb64d083153c38da263985537ec0",
+  "OldOwnedForward": {
+    "PID": 6592,
+    "Name": "ssh.exe",
+    "CreatedUTC": "2026-11-07T16:24:20.6480150Z",
+    "CommandSHA256": "b8b47bce1c6882d0ee417fbf488ff0a85b5cbb5a43b9c77643b4437ee439ac53"
+  },
+  "OldStopped": true,
+  "NewForwardStarted": true,
+  "RollbackUsed": false,
+  "NoMainApplicationStarted": true,
+  "SchemaDowngraded": false,
+  "ActualRunOrVotesCreated": false,
+  "WholeProgramComplete": false,
+  "NewOwnedForward": {
+    "PID": 64240,
+    "Name": "ssh.exe",
+    "CreatedUTC": "2026-11-07T19:40:23.4743790Z",
+    "CommandSHA256": "1b00d8ddd7e060bf11a40d86e322b96eebe8c4f3058cbb35891c751fc8799434"
+  },
+  "NewForwardPID": 64240,
+  "NewForwardStartedAt": "2026-11-08T04:40:23.4743791+09:00",
+  "Status": "EXACT_E4E07_PC3_PORTAL_MAIN3100_CUTOVER_HTTP_VERIFIED",
+  "HTTPArtifactFiles": [
+    {
+      "Path": "assets/icons-DVYUNEhE.js",
+      "HTTP": 200,
+      "SHA256": "94f3f917fa843a4e312937688a83f400ea3d5617d1f1e1f36d6bc643f78ffa9e",
+      "CSPPresent": true
+    },
+    {
+      "Path": "assets/icons-DVYUNEhE.js.map",
+      "HTTP": 200,
+      "SHA256": "bdc634b37b1574e46b91990a227c6ecf862e6364ec9219a524c88741ee294ea3",
+      "CSPPresent": true
+    },
+    {
+      "Path": "assets/index-Dzl2cYez.js",
+      "HTTP": 200,
+      "SHA256": "d67f22a4da1c54d7158ed70765d6815d328684233e268def41c7c33c3ef4a669",
+      "CSPPresent": true
+    },
+    {
+      "Path": "assets/index-Dzl2cYez.js.map",
+      "HTTP": 200,
+      "SHA256": "8ad517d558ed3d9702e75b37cb2042b376da6a11bf7033ae14224bb85da55716",
+      "CSPPresent": true
+    },
+    {
+      "Path": "assets/index-kKrfL4r3.css",
+      "HTTP": 200,
+      "SHA256": "66d8552241923e10b189e3b9372f85205bccbf083a5dc19872d001fd91ad0d26",
+      "CSPPresent": true
+    },
+    {
+      "Path": "assets/query-DtERyQJL.js",
+      "HTTP": 200,
+      "SHA256": "3a24ebe459ff24b83ef333288347529de609b65f1c25d5c5b74f2f8b20e2904d",
+      "CSPPresent": true
+    },
+    {
+      "Path": "assets/query-DtERyQJL.js.map",
+      "HTTP": 200,
+      "SHA256": "d584967ed9a938c701324896050b1db23187d2a79840fe5fac55791a2eafc500",
+      "CSPPresent": true
+    },
+    {
+      "Path": "assets/vendor-CYSfZuHu.js",
+      "HTTP": 200,
+      "SHA256": "d967cddbe86b7822415ceafb696d97dea5a491621955cb4127e0f3f96e5497eb",
+      "CSPPresent": true
+    },
+    {
+      "Path": "assets/vendor-CYSfZuHu.js.map",
+      "HTTP": 200,
+      "SHA256": "037070c1858eff839f466f2431a724493a80f81c8f47484c4c6c21698885d15e",
+      "CSPPresent": true
+    },
+    {
+      "Path": "index.html",
+      "HTTP": 200,
+      "SHA256": "a3dabb59cf001795282b799334353504e1410fdb90f163381b3e5115f3f3f281",
+      "CSPPresent": true
+    },
+    {
+      "Path": "manifest.json",
+      "HTTP": 200,
+      "SHA256": "d4c3c0897d7be95321a37babc97bd922618cf8142dd9103faef1efe700fd343a",
+      "CSPPresent": true
+    },
+    {
+      "Path": "sw.js",
+      "HTTP": 200,
+      "SHA256": "5befc07c048a6a49d7f7ec492fe1c04ae8b40283dcc8387ef4e6b2b92c516dcd",
+      "CSPPresent": true
+    }
+  ],
+  "PublicAuthConfigMatched": true,
+  "HealthHTTP": 200,
+  "ProtectedDBIdPObserverBridgeAndAPIForwardIdentitiesUnchanged": true,
+  "BrowserLoginAndNoBlink": "PENDING_REAL_BROWSER"
+}

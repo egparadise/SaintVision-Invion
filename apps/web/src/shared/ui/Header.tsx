@@ -55,14 +55,14 @@ export const Header: React.FC<HeaderProps> = ({
 
       const start = performance.now();
       try {
-        const res = await fetch('/healthz', { signal: currentController.signal });
+        const res = await fetch('/gateway-healthz', { signal: currentController.signal, cache: 'no-store', credentials: 'omit' });
         const contentType = res.headers.get('content-type') || '';
 
         if (!isMounted || reqId !== reqSeqRef.current) return;
 
-        // Canonical /healthz returns 200 with JSON { status: 'ok', version: ... }
+        // Same-origin /gateway-healthz forwards the CP /healthz, not portal liveness.
         // HTML fallback (200 text/html) or 401/404/500/503 is not health success
-        if (res.ok && contentType.includes('application/json')) {
+        if (res.status === 200 && contentType.split(';')[0].trim().toLowerCase() === 'application/json') {
           let data: any = null;
           try {
             data = await res.json();

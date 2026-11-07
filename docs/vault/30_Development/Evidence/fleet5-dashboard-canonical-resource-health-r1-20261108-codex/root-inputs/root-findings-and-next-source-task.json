@@ -1,0 +1,39 @@
+{
+  "atKST": "2026-11-08T04:50:03+09:00",
+  "taskID": "FLEET5-REAL-DASHBOARD-CANONICAL-RESOURCE-HEALTH-JOIN-R1-20261108",
+  "owner": "Actual Orca Codex original source author; READY_NOT_YET_STARTED",
+  "reviewer": "One actual Claude after source correction and exact CI",
+  "frontendSource": "e4e07bfd6b94e57edc64d158e208df01b9319deb",
+  "backendSource": "96afd799d49717fd40e4ddabd538d82accbe1958",
+  "CR-CSP02": "CLOSED_AT_SOURCE_BY_ACTUAL_CLAUDE20D9_NOT_REOPENED",
+  "actualDeployment": "OFFICIAL_E4E07_PC3_PORT13102_MAIN3100_SSH64240",
+  "browserAuthenticationObservation": "Actual real IdP form reached with normal TLS; subsequent authenticated application body shows real administrator and project + 3/3 online. The driver did not complete its combined callback/resource-badge prerequisite, so full browser acceptance is NOT claimed.",
+  "realResourceUIAcceptance": "HOLD",
+  "noBlinkContinuousWindow": "NOT_REACHED_RESOURCE_BADGE_PREREQUISITE_TIMED_OUT",
+  "findings": [
+    {
+      "id": "DASH-RESOURCE-01",
+      "kind": "actual contract join absent",
+      "cause": "Canonical actual NodePage items contain only nodeId/status/lastHeartbeatAt. observedNode expects flat legacy OS/CPU/memory/GPU/storage fields and marks telemetryUnavailable. ClusterOverview hides all resource cards/status badges if any node unavailable. Actual existing scoped resource-usage API separately returns measured CPU and memory; it is not joined by dashboard.",
+      "required": "Show genuine identity/online heartbeats independently and measured canonical per-resource capacity/offered/reserved/spare with provenance; never synthesize physical OS utilization or GPU/storage zeros, and keep unknown/admission flags fail closed."
+    },
+    {
+      "id": "DASH-HEALTH-02",
+      "kind": "gateway vs portal liveness mismatch",
+      "cause": "Actual portal /healthz returns HTTP200 text/plain OK from Nginx static liveness, but Header expects backend JSON status ok. Actual API18080 /healthz is HTTP200 application/json status ok.",
+      "required": "Bind gateway UI to genuine CP health response through supported dev/production paths; preserve separate portal liveness meaning and fail closed for upstream failure/HTML/text fallback. Do not call static OK a healthy gateway."
+    }
+  ],
+  "offeredPilotTotal": {
+    "cpuMillis": 1500,
+    "memoryBytes": 201326592
+  },
+  "actualObservedPCs": [
+    2,
+    3,
+    4
+  ],
+  "actualRunOrVotesCreated": false,
+  "privateMaterialPersisted": false,
+  "wholeProgramComplete": false
+}
