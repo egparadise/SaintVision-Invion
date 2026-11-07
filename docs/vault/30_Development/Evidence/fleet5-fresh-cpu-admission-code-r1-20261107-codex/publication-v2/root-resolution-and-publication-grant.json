@@ -1,0 +1,45 @@
+{
+  "kind": "ACTUAL_ROOT_BOUNDARY_RESOLUTION_AND_FINITE_PUBLICATION_GRANT",
+  "messageId": "msg_97efddc65fbd",
+  "recordedAtKST": "2026-11-07T13:31:20.011678+09:00",
+  "originalWipManifestSHA256": "c584f14d7bd6cc32fa184891ff3cf6bdbbc7032cdd3fc9a41b9f29ea3f9e8921",
+  "driverPremise": {
+    "source": "trusted operator deployment input",
+    "standardAuthenticationTLS": "ALLOWED_IN_SELECTED_DB_CONNECTION",
+    "approvedFileReferences": "ALLOWED_BY_OPERATOR_PROFILE_NOT_AUTHOR_ACCESS",
+    "selfContainedTargetRequired": [
+      "host",
+      "port",
+      "database",
+      "user"
+    ],
+    "runtimeProfileBindingOwner": "Root",
+    "arbitraryDsnSandboxClaim": false,
+    "ambientDefaultTargetApproved": false,
+    "tlsOrAuthenticationRewrite": false
+  },
+  "allowedChanges": "module/CLI wording plus focused synthetic premise test; own new History/Evidence",
+  "candidateBase": "7033778ad3d2bc284e36f7e29be7597dbb7d9f23",
+  "dependencyAtGrant": {
+    "docs42335285577": "SUCCESS",
+    "backend42335289761": "SUCCESS",
+    "core42335287638": "IN_PROGRESS",
+    "wholeCiAccepted": false,
+    "jointReviewAccepted": false
+  },
+  "publicationGrant": [
+    "required source/docs gates",
+    "explicit allowed-path stage",
+    "normal commit/push/exact readback",
+    "one same-SHA docs/core/backend attempt1"
+  ],
+  "authorProhibitions": [
+    "app/CLI/crypto/pytest/PG/Go/runtime execution on MAIN",
+    "real config/credential/driver-file access",
+    "operational mutation",
+    "whole task worker_done",
+    "source redesign",
+    "self-referential post-CI commit loop"
+  ],
+  "productCiFailureRule": "Preserve actual failure and one targeted ASK before codefix/redispatch"
+}

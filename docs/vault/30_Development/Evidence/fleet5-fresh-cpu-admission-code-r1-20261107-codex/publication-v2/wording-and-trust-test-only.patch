@@ -1,0 +1,71 @@
+--- wip01/services/control-plane/src/inv/fresh_cpu_admission.py
++++ publication-v2/services/control-plane/src/inv/fresh_cpu_admission.py
+@@ -6,0 +7,4 @@
++
++The selected connection and its authentication/TLS profile are trusted operator
++deployment inputs. This library is not a libpq filesystem or DSN sandbox; it
++does not discover credentials, install trust, or authorize a deployment profile.
+--- wip01/tools/fresh_cpu_admission.py
++++ publication-v2/tools/fresh_cpu_admission.py
+@@ -5,2 +5,8 @@
+-No data files, discovery, credentials in argv, subprocesses or Node transport.
+-No exception text, arguments, request body or connection info is ever printed.
++The application discovers/opens no config, request or credential data files.
++Ordinary libpq authentication/TLS (including operator-approved file references)
++is part of that selected connection, not a universal no-file/sandbox guarantee.
++The trusted operator deployment profile must bind host/port/database/user,
++authentication/TLS expectations and approved driver environment/file references;
++ambient service/default target selection is not an approved substitute.
++No credentials in argv, subprocesses or Node transport. No exception text,
++arguments, request body or connection info is ever printed. No TLS/auth rewrite.
+@@ -62,0 +69,2 @@
++        # Trusted operator profile, forwarded intact: no authentication/TLS
++        # parameter rewrite, discovery or claim of libpq filesystem confinement.
+--- wip01/tests/core/test_fresh_cpu_admission_cli.py
++++ publication-v2/tests/core/test_fresh_cpu_admission_cli.py
+@@ -133,0 +134,45 @@
++
++
++def test_trusted_operator_driver_profile_is_forwarded_without_rewrite(
++    cli, request_factory, monkeypatch, capsys,
++):
++    """Synthetic strings only: no libpq connection or credential/TLS file access.
++
++    This checks the adapter's pass-through premise, not trust in arbitrary DSNs
++    or approval of ambient service/default selection for a real operation.
++    """
++    marker = "SYNTHETIC_OPERATOR_CREDENTIAL_MARKER"
++    dsn = ("host=synthetic.invalid port=6543 dbname=synthetic_db user=synthetic_operator "
++           "password=" + marker + " sslmode=verify-full "
++           "sslrootcert=/synthetic/approved-ca.pem sslcert=/synthetic/approved-client.pem "
++           "sslkey=/synthetic/approved-key.pem")
++    driver_environment = {
++        "PGSSLROOTCERT": "/synthetic/operator-profile-ca.pem",
++        "PGPASSFILE": "/synthetic/operator-approved-passfile",
++    }
++    monkeypatch.setenv("SYNTHETIC_SELECTED_OPERATOR_DSN", dsn)
++    for name, value in driver_environment.items():
++        monkeypatch.setenv(name, value)
++    calls = []
++
++    class Connection:
++        def __enter__(self):
++            return self
++
++        def __exit__(self, *args):
++            return False
++
++    def connect(received, **kwargs):
++        assert received == dsn and kwargs == {"autocommit": True}
++        assert all(cli.os.environ[name] == value for name, value in driver_environment.items())
++        calls.append("synthetic-connection-adapter")
++        return Connection()
++
++    monkeypatch.setattr(cli.psycopg, "connect", connect)
++    monkeypatch.setattr(cli, "plan_admission", lambda *a: {"mode": "PLAN", "status": "READY"})
++    stdin(monkeypatch, cli, encoded(request_factory()))
++    assert cli.main(["--dsn-env", "SYNTHETIC_SELECTED_OPERATOR_DSN"]) == 0
++    output = capsys.readouterr()
++    assert calls == ["synthetic-connection-adapter"] and not output.err
++    assert marker not in output.out and "/synthetic/" not in output.out
++    assert all(cli.os.environ[name] == value for name, value in driver_environment.items())

@@ -1,0 +1,193 @@
+{
+  "kind": "STATIC_SOURCE_CHECK_ONLY_NOT_PRODUCT_TEST_EVIDENCE",
+  "recordedAtKST": "2026-11-07T13:22:42.667796+09:00",
+  "exitCode": 0,
+  "astParsedFiles": 4,
+  "utf8LfNewlineWhitespace": "PASS",
+  "trackedDiffCheckExit": 0,
+  "scope": "PASS",
+  "indexEmpty": true,
+  "allFourPreimages": "ABSENT_AT_EXACT_703",
+  "dependencyFilesUnchanged": 16,
+  "plannedTestFunctions": 23,
+  "staticParameterExpansionNotPytestCollection": 69,
+  "plannedPostgresParameterExpansionNotExecution": 25,
+  "tests": [
+    {
+      "path": "tests/core/test_fresh_cpu_admission.py",
+      "function": "test_plan_select_only_and_apply_commits_exact_offline_rows",
+      "staticParameterExpansion": 1,
+      "mandatoryPostgresFixture": true,
+      "execution": "NOT_RUN"
+    },
+    {
+      "path": "tests/core/test_fresh_cpu_admission.py",
+      "function": "test_real_nonoperator_role_cannot_admit",
+      "staticParameterExpansion": 2,
+      "mandatoryPostgresFixture": true,
+      "execution": "NOT_RUN"
+    },
+    {
+      "path": "tests/core/test_fresh_cpu_admission.py",
+      "function": "test_scope_epoch_version_refusals_preserve_every_row",
+      "staticParameterExpansion": 4,
+      "mandatoryPostgresFixture": true,
+      "execution": "NOT_RUN"
+    },
+    {
+      "path": "tests/core/test_fresh_cpu_admission.py",
+      "function": "test_matching_certificate_with_wrong_current_epoch_is_refused",
+      "staticParameterExpansion": 1,
+      "mandatoryPostgresFixture": true,
+      "execution": "NOT_RUN"
+    },
+    {
+      "path": "tests/core/test_fresh_cpu_admission.py",
+      "function": "test_existing_business_link_requires_enabled_active_project",
+      "staticParameterExpansion": 3,
+      "mandatoryPostgresFixture": true,
+      "execution": "NOT_RUN"
+    },
+    {
+      "path": "tests/core/test_fresh_cpu_admission.py",
+      "function": "test_kill_switch_does_not_block_metadata_and_is_not_cleared",
+      "staticParameterExpansion": 1,
+      "mandatoryPostgresFixture": true,
+      "execution": "NOT_RUN"
+    },
+    {
+      "path": "tests/core/test_fresh_cpu_admission.py",
+      "function": "test_existing_identity_or_channel_is_never_repaired",
+      "staticParameterExpansion": 5,
+      "mandatoryPostgresFixture": true,
+      "execution": "NOT_RUN"
+    },
+    {
+      "path": "tests/core/test_fresh_cpu_admission.py",
+      "function": "test_changed_plan_and_outer_transaction_cannot_apply",
+      "staticParameterExpansion": 1,
+      "mandatoryPostgresFixture": true,
+      "execution": "NOT_RUN"
+    },
+    {
+      "path": "tests/core/test_fresh_cpu_admission.py",
+      "function": "test_real_sql_failure_after_channel_audit_rolls_back_all_rows",
+      "staticParameterExpansion": 1,
+      "mandatoryPostgresFixture": true,
+      "execution": "NOT_RUN"
+    },
+    {
+      "path": "tests/core/test_fresh_cpu_admission.py",
+      "function": "test_actual_readback_inconsistency_rolls_back",
+      "staticParameterExpansion": 1,
+      "mandatoryPostgresFixture": true,
+      "execution": "NOT_RUN"
+    },
+    {
+      "path": "tests/core/test_fresh_cpu_admission.py",
+      "function": "test_ready_plan_rechecks_controls_on_apply",
+      "staticParameterExpansion": 1,
+      "mandatoryPostgresFixture": true,
+      "execution": "NOT_RUN"
+    },
+    {
+      "path": "tests/core/test_fresh_cpu_admission.py",
+      "function": "test_unknown_commit_requires_read_only_reconcile_not_retry",
+      "staticParameterExpansion": 1,
+      "mandatoryPostgresFixture": true,
+      "execution": "NOT_RUN"
+    },
+    {
+      "path": "tests/core/test_fresh_cpu_admission.py",
+      "function": "test_concurrent_duplicate_has_one_committed_winner_no_partial",
+      "staticParameterExpansion": 1,
+      "mandatoryPostgresFixture": true,
+      "execution": "NOT_RUN"
+    },
+    {
+      "path": "tests/core/test_fresh_cpu_admission.py",
+      "function": "test_closed_request_types_and_limits_before_any_db",
+      "staticParameterExpansion": 19,
+      "mandatoryPostgresFixture": false,
+      "execution": "NOT_RUN"
+    },
+    {
+      "path": "tests/core/test_fresh_cpu_admission.py",
+      "function": "test_duplicate_keys_ids_nonfinite_oversize_and_noncanonical_base64",
+      "staticParameterExpansion": 1,
+      "mandatoryPostgresFixture": false,
+      "execution": "NOT_RUN"
+    },
+    {
+      "path": "tests/core/test_fresh_cpu_admission.py",
+      "function": "test_missing_tenant_with_matching_public_identity_is_refused",
+      "staticParameterExpansion": 1,
+      "mandatoryPostgresFixture": true,
+      "execution": "NOT_RUN"
+    },
+    {
+      "path": "tests/core/test_fresh_cpu_admission.py",
+      "function": "test_public_certificate_identity_rejections",
+      "staticParameterExpansion": 7,
+      "mandatoryPostgresFixture": false,
+      "execution": "NOT_RUN"
+    },
+    {
+      "path": "tests/core/test_fresh_cpu_admission.py",
+      "function": "test_endpoint_contract_is_unchanged",
+      "staticParameterExpansion": 4,
+      "mandatoryPostgresFixture": false,
+      "execution": "NOT_RUN"
+    },
+    {
+      "path": "tests/core/test_fresh_cpu_admission_cli.py",
+      "function": "test_cli_default_plan_and_explicit_apply_use_real_db",
+      "staticParameterExpansion": 1,
+      "mandatoryPostgresFixture": true,
+      "execution": "NOT_RUN"
+    },
+    {
+      "path": "tests/core/test_fresh_cpu_admission_cli.py",
+      "function": "test_rejected_argv_never_echoes_argument_values",
+      "staticParameterExpansion": 6,
+      "mandatoryPostgresFixture": false,
+      "execution": "NOT_RUN"
+    },
+    {
+      "path": "tests/core/test_fresh_cpu_admission_cli.py",
+      "function": "test_exception_and_request_secrets_never_escape",
+      "staticParameterExpansion": 5,
+      "mandatoryPostgresFixture": false,
+      "execution": "NOT_RUN"
+    },
+    {
+      "path": "tests/core/test_fresh_cpu_admission_cli.py",
+      "function": "test_digest_refused_before_connection_and_input_read_is_bounded",
+      "staticParameterExpansion": 1,
+      "mandatoryPostgresFixture": false,
+      "execution": "NOT_RUN"
+    },
+    {
+      "path": "tests/core/test_fresh_cpu_admission_cli.py",
+      "function": "test_missing_selected_environment_is_closed",
+      "staticParameterExpansion": 1,
+      "mandatoryPostgresFixture": false,
+      "execution": "NOT_RUN"
+    }
+  ],
+  "notRun": [
+    "app imports",
+    "crypto",
+    "pytest",
+    "PostgreSQL",
+    "CLI",
+    "Go",
+    "network/runtime",
+    "required delivery gates",
+    "stage",
+    "commit",
+    "push",
+    "CI",
+    "independent review"
+  ]
+}

@@ -1,0 +1,360 @@
+{
+  "kind": "OWN_NEW_EVIDENCE_RAW_BYTE_PRESERVATION_NOT_OLD_CORPUS_COPY",
+  "zipPath": "docs/vault/30_Development/Evidence/fleet5-fresh-cpu-admission-code-r1-20261107-codex/publication-v2/prepublication-own-raw-records.zip",
+  "bytes": 757310,
+  "sha256": "552eab5d580b45de737d89f4d1a3698622915761947a04e3ec6ce7309dfec3dc",
+  "entries": [
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-fresh-cpu-admission-code-r1-20261107-codex/four-file-wip.patch",
+      "bytes": 45717,
+      "workingRawSHA256": "7d4ffbb2f7634800e2c9feda7bc8f10d52ccbe3a024f978bd9e8c4acca6ee593",
+      "gitLfNormalizedSHA256": "2d312fb3549bbfd12aae62249cda6219f70e9b68e23248750c8a6855cc95fb7a",
+      "rawBytesPreservedInArchive": true
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-fresh-cpu-admission-code-r1-20261107-codex/publication-v2/build-candidate-manifest.py",
+      "bytes": 7306,
+      "workingRawSHA256": "539ee27654eee10edd15cdcba764b67bc488e85c7491d3cf6a81d7258612c080",
+      "gitLfNormalizedSHA256": "539ee27654eee10edd15cdcba764b67bc488e85c7491d3cf6a81d7258612c080",
+      "rawBytesPreservedInArchive": true
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-fresh-cpu-admission-code-r1-20261107-codex/publication-v2/candidate-manifest-v2.json",
+      "bytes": 22978,
+      "workingRawSHA256": "af9e0dec85e6ec0e16265307daff517312928129248debf5d8d439cecc5c6f8c",
+      "gitLfNormalizedSHA256": "4faedebe9a0b53c93ca26a7d588a0a3651b9189f1872de71a25425d50157cbf5",
+      "rawBytesPreservedInArchive": true
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-fresh-cpu-admission-code-r1-20261107-codex/publication-v2/dependency-703-core-before-candidate.stderr.txt",
+      "bytes": 0,
+      "workingRawSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "gitLfNormalizedSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rawBytesPreservedInArchive": true
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-fresh-cpu-admission-code-r1-20261107-codex/publication-v2/dependency-703-core-before-candidate.stdout.json",
+      "bytes": 13060,
+      "workingRawSHA256": "19af706ba1d285ca8d708b414efa8167023a90e9a4c7f6b68becdc2137593c7b",
+      "gitLfNormalizedSHA256": "19af706ba1d285ca8d708b414efa8167023a90e9a4c7f6b68becdc2137593c7b",
+      "rawBytesPreservedInArchive": true
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-fresh-cpu-admission-code-r1-20261107-codex/publication-v2/final-doc-gates/canonical-state-after.json",
+      "bytes": 481556,
+      "workingRawSHA256": "36d948a780874537f051beb203ba5ecc3e4e9326bae78de69e3c06ceb1d74115",
+      "gitLfNormalizedSHA256": "36d948a780874537f051beb203ba5ecc3e4e9326bae78de69e3c06ceb1d74115",
+      "rawBytesPreservedInArchive": true
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-fresh-cpu-admission-code-r1-20261107-codex/publication-v2/final-doc-gates/canonical-state-before.json",
+      "bytes": 481556,
+      "workingRawSHA256": "36d948a780874537f051beb203ba5ecc3e4e9326bae78de69e3c06ceb1d74115",
+      "gitLfNormalizedSHA256": "36d948a780874537f051beb203ba5ecc3e4e9326bae78de69e3c06ceb1d74115",
+      "rawBytesPreservedInArchive": true
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-fresh-cpu-admission-code-r1-20261107-codex/publication-v2/final-doc-gates/canonical-sync-check.stderr.txt",
+      "bytes": 0,
+      "workingRawSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "gitLfNormalizedSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rawBytesPreservedInArchive": true
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-fresh-cpu-admission-code-r1-20261107-codex/publication-v2/final-doc-gates/canonical-sync-check.stdout.txt",
+      "bytes": 74,
+      "workingRawSHA256": "9e5b7fdb35b56c65af65acdcbe0e7e19b61f10fff942a0514651c216625ffe02",
+      "gitLfNormalizedSHA256": "8b7ead021c6ea62fdd4e29ff216f45ee6d6443f6c0b7688c5b8e8505b5146407",
+      "rawBytesPreservedInArchive": true
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-fresh-cpu-admission-code-r1-20261107-codex/publication-v2/final-doc-gates/diff-check.stderr.txt",
+      "bytes": 0,
+      "workingRawSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "gitLfNormalizedSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rawBytesPreservedInArchive": true
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-fresh-cpu-admission-code-r1-20261107-codex/publication-v2/final-doc-gates/diff-check.stdout.txt",
+      "bytes": 0,
+      "workingRawSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "gitLfNormalizedSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rawBytesPreservedInArchive": true
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-fresh-cpu-admission-code-r1-20261107-codex/publication-v2/final-doc-gates/docs.stderr.txt",
+      "bytes": 0,
+      "workingRawSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "gitLfNormalizedSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rawBytesPreservedInArchive": true
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-fresh-cpu-admission-code-r1-20261107-codex/publication-v2/final-doc-gates/docs.stdout.txt",
+      "bytes": 127,
+      "workingRawSHA256": "faacec022aa7931f81b0bfc68eb38fff5d2b11838a7a3ea36d213fc7cb852b33",
+      "gitLfNormalizedSHA256": "91adcc30bd7a32a889a04313363a83dac42e05fd52bbf76217e978a2687c9361",
+      "rawBytesPreservedInArchive": true
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-fresh-cpu-admission-code-r1-20261107-codex/publication-v2/final-doc-gates/path-ratchet.stderr.txt",
+      "bytes": 0,
+      "workingRawSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "gitLfNormalizedSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rawBytesPreservedInArchive": true
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-fresh-cpu-admission-code-r1-20261107-codex/publication-v2/final-doc-gates/path-ratchet.stdout.txt",
+      "bytes": 112,
+      "workingRawSHA256": "389921b50662776ed834a285f70fc44ab61f7d5bdb4c5249c0a73c98113980de",
+      "gitLfNormalizedSHA256": "a560a6b6ab2fd27754fb4b97f5997ebeb9968b3b6d95491420d6a6744eab5a6b",
+      "rawBytesPreservedInArchive": true
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-fresh-cpu-admission-code-r1-20261107-codex/publication-v2/final-doc-gates/results.json",
+      "bytes": 2839,
+      "workingRawSHA256": "cc194c618a0e5144f78c1e3c0cff14dab89e7c44080756dc6b833f92386de083",
+      "gitLfNormalizedSHA256": "c2ad986a732b1550d257f5430d34820eaf583ef02cab23d339ec3bab64c7793d",
+      "rawBytesPreservedInArchive": true
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-fresh-cpu-admission-code-r1-20261107-codex/publication-v2/gates/canonical-state-after-check.json",
+      "bytes": 481556,
+      "workingRawSHA256": "36d948a780874537f051beb203ba5ecc3e4e9326bae78de69e3c06ceb1d74115",
+      "gitLfNormalizedSHA256": "36d948a780874537f051beb203ba5ecc3e4e9326bae78de69e3c06ceb1d74115",
+      "rawBytesPreservedInArchive": true
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-fresh-cpu-admission-code-r1-20261107-codex/publication-v2/gates/canonical-state-before-check.json",
+      "bytes": 481556,
+      "workingRawSHA256": "36d948a780874537f051beb203ba5ecc3e4e9326bae78de69e3c06ceb1d74115",
+      "gitLfNormalizedSHA256": "36d948a780874537f051beb203ba5ecc3e4e9326bae78de69e3c06ceb1d74115",
+      "rawBytesPreservedInArchive": true
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-fresh-cpu-admission-code-r1-20261107-codex/publication-v2/gates/canonical-sync-check.stderr.txt",
+      "bytes": 0,
+      "workingRawSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "gitLfNormalizedSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rawBytesPreservedInArchive": true
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-fresh-cpu-admission-code-r1-20261107-codex/publication-v2/gates/canonical-sync-check.stdout.txt",
+      "bytes": 74,
+      "workingRawSHA256": "9b9a4ee481bfbfd861a04bd2c0b8662ce0ac67cd197a9f6d27c95f01cfbd578d",
+      "gitLfNormalizedSHA256": "8d77974f956431dc60f5622e2ecfb874ae960f5c792f758b7d30610dad4ad2cf",
+      "rawBytesPreservedInArchive": true
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-fresh-cpu-admission-code-r1-20261107-codex/publication-v2/gates/contract-bindings.stderr.txt",
+      "bytes": 0,
+      "workingRawSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "gitLfNormalizedSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rawBytesPreservedInArchive": true
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-fresh-cpu-admission-code-r1-20261107-codex/publication-v2/gates/contract-bindings.stdout.txt",
+      "bytes": 1640,
+      "workingRawSHA256": "7d3493f361d1c522254d1dbd2e0a74b4dc3c54ef90bd9bfdec3a57666d7798ed",
+      "gitLfNormalizedSHA256": "d20a071705a3f6c9c651eadefe41d48f3e045b209a7d547f9adafcaaa9657b2c",
+      "rawBytesPreservedInArchive": true
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-fresh-cpu-admission-code-r1-20261107-codex/publication-v2/gates/diff-check.stderr.txt",
+      "bytes": 0,
+      "workingRawSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "gitLfNormalizedSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rawBytesPreservedInArchive": true
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-fresh-cpu-admission-code-r1-20261107-codex/publication-v2/gates/diff-check.stdout.txt",
+      "bytes": 0,
+      "workingRawSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "gitLfNormalizedSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rawBytesPreservedInArchive": true
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-fresh-cpu-admission-code-r1-20261107-codex/publication-v2/gates/docs.stderr.txt",
+      "bytes": 0,
+      "workingRawSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "gitLfNormalizedSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rawBytesPreservedInArchive": true
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-fresh-cpu-admission-code-r1-20261107-codex/publication-v2/gates/docs.stdout.txt",
+      "bytes": 127,
+      "workingRawSHA256": "faacec022aa7931f81b0bfc68eb38fff5d2b11838a7a3ea36d213fc7cb852b33",
+      "gitLfNormalizedSHA256": "91adcc30bd7a32a889a04313363a83dac42e05fd52bbf76217e978a2687c9361",
+      "rawBytesPreservedInArchive": true
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-fresh-cpu-admission-code-r1-20261107-codex/publication-v2/gates/frontend-integrity.stderr.txt",
+      "bytes": 0,
+      "workingRawSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "gitLfNormalizedSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rawBytesPreservedInArchive": true
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-fresh-cpu-admission-code-r1-20261107-codex/publication-v2/gates/frontend-integrity.stdout.txt",
+      "bytes": 151,
+      "workingRawSHA256": "2a2f0348a4bdc71911a5eac47ef7fd7a1ca4573e71cce914cb6d6dd198392949",
+      "gitLfNormalizedSHA256": "5fcd00e09a33916acc1fbe04d132a92fc9315337073ec61fe392deb7ac613353",
+      "rawBytesPreservedInArchive": true
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-fresh-cpu-admission-code-r1-20261107-codex/publication-v2/gates/ontology-generation.stderr.txt",
+      "bytes": 0,
+      "workingRawSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "gitLfNormalizedSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rawBytesPreservedInArchive": true
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-fresh-cpu-admission-code-r1-20261107-codex/publication-v2/gates/ontology-generation.stdout.txt",
+      "bytes": 71,
+      "workingRawSHA256": "451b3d26c538962997f093bbfb8a5ceabffe134e154c1ff412f57590b076e150",
+      "gitLfNormalizedSHA256": "9d8298b5f2bd5db7b4548a54f9a88ff16463feb7d786c45e502c0900fb1a89e7",
+      "rawBytesPreservedInArchive": true
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-fresh-cpu-admission-code-r1-20261107-codex/publication-v2/gates/ontology.stderr.txt",
+      "bytes": 0,
+      "workingRawSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "gitLfNormalizedSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rawBytesPreservedInArchive": true
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-fresh-cpu-admission-code-r1-20261107-codex/publication-v2/gates/ontology.stdout.txt",
+      "bytes": 163,
+      "workingRawSHA256": "7cdc12bf64f50ba0964625161638a4c639cf22d786a57f04685bed0718e14042",
+      "gitLfNormalizedSHA256": "e7d3aaf1eda371ff7035720c656da1e87c472c90cdc26d7a7e7161fdd4a0246f",
+      "rawBytesPreservedInArchive": true
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-fresh-cpu-admission-code-r1-20261107-codex/publication-v2/gates/path-ratchet.stderr.txt",
+      "bytes": 0,
+      "workingRawSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "gitLfNormalizedSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rawBytesPreservedInArchive": true
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-fresh-cpu-admission-code-r1-20261107-codex/publication-v2/gates/path-ratchet.stdout.txt",
+      "bytes": 112,
+      "workingRawSHA256": "389921b50662776ed834a285f70fc44ab61f7d5bdb4c5249c0a73c98113980de",
+      "gitLfNormalizedSHA256": "a560a6b6ab2fd27754fb4b97f5997ebeb9968b3b6d95491420d6a6744eab5a6b",
+      "rawBytesPreservedInArchive": true
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-fresh-cpu-admission-code-r1-20261107-codex/publication-v2/gates/results.json",
+      "bytes": 10386,
+      "workingRawSHA256": "2b3ddb2d040a5c159e91749a48ff1b118f30200313d3dfc9a5ce51144776c3bd",
+      "gitLfNormalizedSHA256": "307219447fba3feac929719dea554a9dfce7e283ee9d6ab324e256fabf66baab",
+      "rawBytesPreservedInArchive": true
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-fresh-cpu-admission-code-r1-20261107-codex/publication-v2/gates/single-source-ratchet.stderr.txt",
+      "bytes": 0,
+      "workingRawSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "gitLfNormalizedSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rawBytesPreservedInArchive": true
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-fresh-cpu-admission-code-r1-20261107-codex/publication-v2/gates/single-source-ratchet.stdout.txt",
+      "bytes": 80,
+      "workingRawSHA256": "13b5f5afed05999109839be1baec4ef70ea3c71bcb267353e59eba0f2ae3e448",
+      "gitLfNormalizedSHA256": "ef5067403172ab7be30011face3cf89221e099c773e0517cce6158a79345807a",
+      "rawBytesPreservedInArchive": true
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-fresh-cpu-admission-code-r1-20261107-codex/publication-v2/root-resolution-and-publication-grant.json",
+      "bytes": 1723,
+      "workingRawSHA256": "4b41dd55064351471fd1c7b5616a8b544cbb11b6f7872324539ddaa1e4e03396",
+      "gitLfNormalizedSHA256": "0e0de95e154909226acc7fcd969d9393b8cfe57e6066f1e90b7730a0b0c7e4af",
+      "rawBytesPreservedInArchive": true
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-fresh-cpu-admission-code-r1-20261107-codex/publication-v2/run-source-doc-gates.py",
+      "bytes": 3760,
+      "workingRawSHA256": "959d06253fe08a14b753a85a0a4e2dccb4a1ba57510a212fe082acde46453d7d",
+      "gitLfNormalizedSHA256": "959d06253fe08a14b753a85a0a4e2dccb4a1ba57510a212fe082acde46453d7d",
+      "rawBytesPreservedInArchive": true
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-fresh-cpu-admission-code-r1-20261107-codex/publication-v2/staged-diff-attempt01-failure.json",
+      "bytes": 701,
+      "workingRawSHA256": "0f8bec4c4ba3792d28b955b6397ccb618a4eb87badb14a4e154459df0ebefddc",
+      "gitLfNormalizedSHA256": "09b2cd269f9a381c25b223cf5cc04fa9baeec9dccbcc7d81f92ff0cf6f814895",
+      "rawBytesPreservedInArchive": true
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-fresh-cpu-admission-code-r1-20261107-codex/publication-v2/staged-scope.json",
+      "bytes": 8750,
+      "workingRawSHA256": "d92d83d932b155b462860970312ecf5146e3e18b8d1f34ea3c7a1588d6ce9cfd",
+      "gitLfNormalizedSHA256": "ebf8231d8548746b854708d5719b322ab8cf77d5f6e49f12892e264878d5bd7d",
+      "rawBytesPreservedInArchive": true
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-fresh-cpu-admission-code-r1-20261107-codex/publication-v2/wip01-history-original.txt",
+      "bytes": 11163,
+      "workingRawSHA256": "8f567bbad567fef5896ae19e30e827bf7c095ceb667b0bdac19b42619d55eb21",
+      "gitLfNormalizedSHA256": "5351773f0628e8b84b8442dd53ce46e343b37b749f8176300a1013ca0845291b",
+      "rawBytesPreservedInArchive": true
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-fresh-cpu-admission-code-r1-20261107-codex/publication-v2/wording-and-trust-test-only.patch",
+      "bytes": 3656,
+      "workingRawSHA256": "c0fe976a2cad9e9d94b4a78632de75dac14e178553839f197eea51ce6585e2ff",
+      "gitLfNormalizedSHA256": "c0fe976a2cad9e9d94b4a78632de75dac14e178553839f197eea51ce6585e2ff",
+      "rawBytesPreservedInArchive": true
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-fresh-cpu-admission-code-r1-20261107-codex/required-doc-read-bindings.json",
+      "bytes": 7729,
+      "workingRawSHA256": "45a0f09c50d14aac3e01de8494743f3442a774b57ae60d899989700dd4bda462",
+      "gitLfNormalizedSHA256": "80433ced4ef7e29c41babefa5419b659d6e8d423a06be408948ae704499189cd",
+      "rawBytesPreservedInArchive": true
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-fresh-cpu-admission-code-r1-20261107-codex/start-context.json",
+      "bytes": 3294,
+      "workingRawSHA256": "5bd84d0a6b152d0637a252bf630e49a395dcf4ecd4f99040696fb704f1554f61",
+      "gitLfNormalizedSHA256": "204023abed50861ed8f0fcc3ce91b5dc1c27b494fec8a3e527da251cdb78aba6",
+      "rawBytesPreservedInArchive": true
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-fresh-cpu-admission-code-r1-20261107-codex/static-verification-attempt01-failure.json",
+      "bytes": 872,
+      "workingRawSHA256": "3c933829dcfb62b4d7e5f1308a025631e868ec309fc78cc253c3b551194ac26c",
+      "gitLfNormalizedSHA256": "3c933829dcfb62b4d7e5f1308a025631e868ec309fc78cc253c3b551194ac26c",
+      "rawBytesPreservedInArchive": true
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-fresh-cpu-admission-code-r1-20261107-codex/verify-wip-static.py",
+      "bytes": 8488,
+      "workingRawSHA256": "f5d9354fd752f6096160d2583baa290e4da940b4df5ec8bee12c7926e554a058",
+      "gitLfNormalizedSHA256": "f5d9354fd752f6096160d2583baa290e4da940b4df5ec8bee12c7926e554a058",
+      "rawBytesPreservedInArchive": true
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-fresh-cpu-admission-code-r1-20261107-codex/wip-manifest.json",
+      "bytes": 19268,
+      "workingRawSHA256": "c584f14d7bd6cc32fa184891ff3cf6bdbbc7032cdd3fc9a41b9f29ea3f9e8921",
+      "gitLfNormalizedSHA256": "b92821e70b0bee3f02d867d379b50032889c5937355cb3ec73e8cde3d635f191",
+      "rawBytesPreservedInArchive": true
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-fresh-cpu-admission-code-r1-20261107-codex/wip-static-verification.json",
+      "bytes": 6693,
+      "workingRawSHA256": "d754700904920661bdf9a8f0bf4b6a222bfdc5e16971139aa57d66806ada2d3b",
+      "gitLfNormalizedSHA256": "c9c90a02f5db69d24a9ac377325070614682300a6749796a0469abd98392f730",
+      "rawBytesPreservedInArchive": true
+    },
+    {
+      "path": "docs/vault/30_Development/History/2026-11-07_FLEET5_Fresh_CPU_Admission_Code_R1_Codex.md",
+      "bytes": 14624,
+      "workingRawSHA256": "3d4b0a1c49b9f44a4bf571a3f2a2d758fae35ea616859ff6a3c6e81157d07a4a",
+      "gitLfNormalizedSHA256": "66ca56339ac28c14cb13323f520daf2ea0eb5f036d62e9437a2e1ded6982dc9b",
+      "rawBytesPreservedInArchive": true
+    }
+  ],
+  "gitTextRule": "Existing text eol=lf unchanged; published text canonical hashes may differ from Windows working raw; ZIP preserves exact original raw including WIP01 and gate records",
+  "oldH12CorpusIncluded": false
+}

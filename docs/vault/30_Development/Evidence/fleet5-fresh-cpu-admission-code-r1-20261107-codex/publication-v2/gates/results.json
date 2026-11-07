@@ -1,0 +1,246 @@
+{
+  "kind": "ACTUAL_SOURCE_DOC_GATE_EXITS_NOT_PRODUCT_TESTS",
+  "base": "7033778ad3d2bc284e36f7e29be7597dbb7d9f23",
+  "results": [
+    {
+      "name": "docs",
+      "command": [
+        "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+        "-I",
+        "-B",
+        "-X",
+        "utf8",
+        "tools/check_docs.py"
+      ],
+      "startedAtKST": "2026-11-07T13:32:29.102728+09:00",
+      "exitCode": 0,
+      "endedAtKST": "2026-11-07T13:33:11.182673+09:00",
+      "stdout": {
+        "path": "docs/vault/30_Development/Evidence/fleet5-fresh-cpu-admission-code-r1-20261107-codex/publication-v2/gates/docs.stdout.txt",
+        "bytes": 127,
+        "sha256": "faacec022aa7931f81b0bfc68eb38fff5d2b11838a7a3ea36d213fc7cb852b33"
+      },
+      "stderr": {
+        "path": "docs/vault/30_Development/Evidence/fleet5-fresh-cpu-admission-code-r1-20261107-codex/publication-v2/gates/docs.stderr.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "ontology",
+      "command": [
+        "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+        "-I",
+        "-B",
+        "-X",
+        "utf8",
+        "tools/check_ontology.py"
+      ],
+      "startedAtKST": "2026-11-07T13:33:11.192877+09:00",
+      "exitCode": 0,
+      "endedAtKST": "2026-11-07T13:33:14.291231+09:00",
+      "stdout": {
+        "path": "docs/vault/30_Development/Evidence/fleet5-fresh-cpu-admission-code-r1-20261107-codex/publication-v2/gates/ontology.stdout.txt",
+        "bytes": 163,
+        "sha256": "7cdc12bf64f50ba0964625161638a4c639cf22d786a57f04685bed0718e14042"
+      },
+      "stderr": {
+        "path": "docs/vault/30_Development/Evidence/fleet5-fresh-cpu-admission-code-r1-20261107-codex/publication-v2/gates/ontology.stderr.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "ontology-generation",
+      "command": [
+        "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+        "-I",
+        "-B",
+        "-X",
+        "utf8",
+        "tools/check_ontology_generation.py"
+      ],
+      "startedAtKST": "2026-11-07T13:33:14.292620+09:00",
+      "exitCode": 0,
+      "endedAtKST": "2026-11-07T13:33:15.331455+09:00",
+      "stdout": {
+        "path": "docs/vault/30_Development/Evidence/fleet5-fresh-cpu-admission-code-r1-20261107-codex/publication-v2/gates/ontology-generation.stdout.txt",
+        "bytes": 71,
+        "sha256": "451b3d26c538962997f093bbfb8a5ceabffe134e154c1ff412f57590b076e150"
+      },
+      "stderr": {
+        "path": "docs/vault/30_Development/Evidence/fleet5-fresh-cpu-admission-code-r1-20261107-codex/publication-v2/gates/ontology-generation.stderr.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "contract-bindings",
+      "command": [
+        "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+        "-I",
+        "-B",
+        "-X",
+        "utf8",
+        "tools/check_contract_bindings.py"
+      ],
+      "startedAtKST": "2026-11-07T13:33:15.337405+09:00",
+      "exitCode": 0,
+      "endedAtKST": "2026-11-07T13:33:28.091785+09:00",
+      "stdout": {
+        "path": "docs/vault/30_Development/Evidence/fleet5-fresh-cpu-admission-code-r1-20261107-codex/publication-v2/gates/contract-bindings.stdout.txt",
+        "bytes": 1640,
+        "sha256": "7d3493f361d1c522254d1dbd2e0a74b4dc3c54ef90bd9bfdec3a57666d7798ed"
+      },
+      "stderr": {
+        "path": "docs/vault/30_Development/Evidence/fleet5-fresh-cpu-admission-code-r1-20261107-codex/publication-v2/gates/contract-bindings.stderr.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "frontend-integrity",
+      "command": [
+        "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+        "-I",
+        "-B",
+        "-X",
+        "utf8",
+        "tools/check_frontend_integrity.py"
+      ],
+      "startedAtKST": "2026-11-07T13:33:28.093208+09:00",
+      "exitCode": 0,
+      "endedAtKST": "2026-11-07T13:33:29.558924+09:00",
+      "stdout": {
+        "path": "docs/vault/30_Development/Evidence/fleet5-fresh-cpu-admission-code-r1-20261107-codex/publication-v2/gates/frontend-integrity.stdout.txt",
+        "bytes": 151,
+        "sha256": "2a2f0348a4bdc71911a5eac47ef7fd7a1ca4573e71cce914cb6d6dd198392949"
+      },
+      "stderr": {
+        "path": "docs/vault/30_Development/Evidence/fleet5-fresh-cpu-admission-code-r1-20261107-codex/publication-v2/gates/frontend-integrity.stderr.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "path-ratchet",
+      "command": [
+        "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+        "-I",
+        "-B",
+        "-X",
+        "utf8",
+        "tools/check_doc_path_citations.py",
+        "--ratchet",
+        "--base-ref",
+        "7033778ad3d2bc284e36f7e29be7597dbb7d9f23"
+      ],
+      "startedAtKST": "2026-11-07T13:33:29.582404+09:00",
+      "exitCode": 0,
+      "endedAtKST": "2026-11-07T13:33:33.948347+09:00",
+      "stdout": {
+        "path": "docs/vault/30_Development/Evidence/fleet5-fresh-cpu-admission-code-r1-20261107-codex/publication-v2/gates/path-ratchet.stdout.txt",
+        "bytes": 112,
+        "sha256": "389921b50662776ed834a285f70fc44ab61f7d5bdb4c5249c0a73c98113980de"
+      },
+      "stderr": {
+        "path": "docs/vault/30_Development/Evidence/fleet5-fresh-cpu-admission-code-r1-20261107-codex/publication-v2/gates/path-ratchet.stderr.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "single-source-ratchet",
+      "command": [
+        "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+        "-I",
+        "-B",
+        "-X",
+        "utf8",
+        "tools/check_doc_single_source.py",
+        "--ratchet"
+      ],
+      "startedAtKST": "2026-11-07T13:33:33.949856+09:00",
+      "exitCode": 0,
+      "endedAtKST": "2026-11-07T13:33:34.356615+09:00",
+      "stdout": {
+        "path": "docs/vault/30_Development/Evidence/fleet5-fresh-cpu-admission-code-r1-20261107-codex/publication-v2/gates/single-source-ratchet.stdout.txt",
+        "bytes": 80,
+        "sha256": "13b5f5afed05999109839be1baec4ef70ea3c71bcb267353e59eba0f2ae3e448"
+      },
+      "stderr": {
+        "path": "docs/vault/30_Development/Evidence/fleet5-fresh-cpu-admission-code-r1-20261107-codex/publication-v2/gates/single-source-ratchet.stderr.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "canonical-sync-check",
+      "command": [
+        "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+        "-I",
+        "-B",
+        "-X",
+        "utf8",
+        "tools/sync_obsidian.py",
+        "--check",
+        "--state",
+        "D:\\Project\\SaintVision-Invion\\SaintVisionI-Invion\\.git\\obsidian-sync-state.json",
+        "--conflicts-out",
+        "D:\\Project\\SaintVisionI-Invion\\fleet5-k2-d04-l1-r2-20261107\\docs\\vault\\30_Development\\Evidence\\fleet5-fresh-cpu-admission-code-r1-20261107-codex\\publication-v2\\gates\\sync-conflicts.json"
+      ],
+      "startedAtKST": "2026-11-07T13:33:34.360045+09:00",
+      "canonicalFullStateBefore": {
+        "path": "D:\\Project\\SaintVision-Invion\\SaintVisionI-Invion\\.git\\obsidian-sync-state.json",
+        "bytes": 481556,
+        "sha256": "36d948a780874537f051beb203ba5ecc3e4e9326bae78de69e3c06ceb1d74115",
+        "mtimeNs": 1794024557925220300,
+        "capturedAtKST": "2026-11-07T13:33:34.399680+09:00",
+        "copy": "docs/vault/30_Development/Evidence/fleet5-fresh-cpu-admission-code-r1-20261107-codex/publication-v2/gates/canonical-state-before-check.json"
+      },
+      "exitCode": 0,
+      "endedAtKST": "2026-11-07T13:33:47.838846+09:00",
+      "stdout": {
+        "path": "docs/vault/30_Development/Evidence/fleet5-fresh-cpu-admission-code-r1-20261107-codex/publication-v2/gates/canonical-sync-check.stdout.txt",
+        "bytes": 74,
+        "sha256": "9b9a4ee481bfbfd861a04bd2c0b8662ce0ac67cd197a9f6d27c95f01cfbd578d"
+      },
+      "stderr": {
+        "path": "docs/vault/30_Development/Evidence/fleet5-fresh-cpu-admission-code-r1-20261107-codex/publication-v2/gates/canonical-sync-check.stderr.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "canonicalFullStateAfter": {
+        "path": "D:\\Project\\SaintVision-Invion\\SaintVisionI-Invion\\.git\\obsidian-sync-state.json",
+        "bytes": 481556,
+        "sha256": "36d948a780874537f051beb203ba5ecc3e4e9326bae78de69e3c06ceb1d74115",
+        "mtimeNs": 1794024557925220300,
+        "capturedAtKST": "2026-11-07T13:33:47.867678+09:00",
+        "copy": "docs/vault/30_Development/Evidence/fleet5-fresh-cpu-admission-code-r1-20261107-codex/publication-v2/gates/canonical-state-after-check.json"
+      },
+      "stateHashesEqual": true,
+      "stateProvenance": "Exact Root-specified canonical state; CHECK only; Root may write concurrently"
+    },
+    {
+      "name": "diff-check",
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "startedAtKST": "2026-11-07T13:33:47.868210+09:00",
+      "exitCode": 0,
+      "endedAtKST": "2026-11-07T13:33:48.274536+09:00",
+      "stdout": {
+        "path": "docs/vault/30_Development/Evidence/fleet5-fresh-cpu-admission-code-r1-20261107-codex/publication-v2/gates/diff-check.stdout.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "path": "docs/vault/30_Development/Evidence/fleet5-fresh-cpu-admission-code-r1-20261107-codex/publication-v2/gates/diff-check.stderr.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    }
+  ]
+}

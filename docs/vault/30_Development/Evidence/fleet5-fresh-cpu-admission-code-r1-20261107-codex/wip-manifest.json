@@ -1,0 +1,281 @@
+{
+  "kind": "FOUR_NEW_FILES_UNCOMMITTED_WIP_HOLD_NOT_PUBLICATION_OR_RUNTIME_ACCEPTANCE",
+  "card": "FLEET5-FRESH-CPU-ADMISSION-CODE-R1-20261107",
+  "taskId": "task_a95ef3d8ccce",
+  "dispatchId": "ctx_ed23b4a777d0",
+  "base": "7033778ad3d2bc284e36f7e29be7597dbb7d9f23",
+  "branch": "agent/codex/fleet5-fresh-cpu-admission-r1-20261107",
+  "files": [
+    {
+      "path": "services/control-plane/src/inv/fresh_cpu_admission.py",
+      "preimageAt703": "ABSENT",
+      "bytes": 14857,
+      "workingSHA256": "a5eca1244d297e159a1315f7584f477e82c90b9cdb54584f56deaacbdd7de41f",
+      "gitCanonicalSHA256": "a5eca1244d297e159a1315f7584f477e82c90b9cdb54584f56deaacbdd7de41f",
+      "gitBlobSHA1": "04d80f7464d96d9d56fe7dfeebafd5bf88118f31",
+      "lineCount": 340,
+      "ast": "PASS_PARSE_ONLY_NO_IMPORT_OR_EXECUTION"
+    },
+    {
+      "path": "tools/fresh_cpu_admission.py",
+      "preimageAt703": "ABSENT",
+      "bytes": 3081,
+      "workingSHA256": "f1721850e6a2c9f93ee643caeb048bdf58f451bed7b003ce1ea73bc63d301b90",
+      "gitCanonicalSHA256": "f1721850e6a2c9f93ee643caeb048bdf58f451bed7b003ce1ea73bc63d301b90",
+      "gitBlobSHA1": "7319d6ae5711f51baabf44d83f07f61257ba12b7",
+      "lineCount": 80,
+      "ast": "PASS_PARSE_ONLY_NO_IMPORT_OR_EXECUTION"
+    },
+    {
+      "path": "tests/core/test_fresh_cpu_admission.py",
+      "preimageAt703": "ABSENT",
+      "bytes": 20176,
+      "workingSHA256": "882e5ff9757a2372173c8410277929786f99791b3d9a5bf4e010eeda8d1bceaa",
+      "gitCanonicalSHA256": "882e5ff9757a2372173c8410277929786f99791b3d9a5bf4e010eeda8d1bceaa",
+      "gitBlobSHA1": "c44451f30399ca1a41cfa2d3fc8488929d64b8ae",
+      "lineCount": 447,
+      "ast": "PASS_PARSE_ONLY_NO_IMPORT_OR_EXECUTION"
+    },
+    {
+      "path": "tests/core/test_fresh_cpu_admission_cli.py",
+      "preimageAt703": "ABSENT",
+      "bytes": 5275,
+      "workingSHA256": "6e1ddef11ab6d38bb2e8eccc456fcf7fda14456c26f8af13546be485317f8cdf",
+      "gitCanonicalSHA256": "6e1ddef11ab6d38bb2e8eccc456fcf7fda14456c26f8af13546be485317f8cdf",
+      "gitBlobSHA1": "218814320423ae193e0964ddb292cc0d292e85ef",
+      "lineCount": 133,
+      "ast": "PASS_PARSE_ONLY_NO_IMPORT_OR_EXECUTION"
+    }
+  ],
+  "dependencies": [
+    {
+      "path": "services/control-plane/src/inv/dispatch.py",
+      "sha": "7033778ad3d2bc284e36f7e29be7597dbb7d9f23",
+      "canonicalSHA256": "82f029614537eb5bab56934e4b6736fe3dd52ece54b9b9a3996815b131e41de4",
+      "workingSHA256": "82f029614537eb5bab56934e4b6736fe3dd52ece54b9b9a3996815b131e41de4",
+      "unchanged": true
+    },
+    {
+      "path": "tests/core/test_delivery_operation_origin.py",
+      "sha": "7033778ad3d2bc284e36f7e29be7597dbb7d9f23",
+      "canonicalSHA256": "3dacdb63f83ab1d8075ddcbe422d82daad20bd56f643adee0fc7ae97715925d2",
+      "workingSHA256": "3dacdb63f83ab1d8075ddcbe422d82daad20bd56f643adee0fc7ae97715925d2",
+      "unchanged": true
+    },
+    {
+      "path": "services/control-plane/src/inv/errors.py",
+      "sha": "7033778ad3d2bc284e36f7e29be7597dbb7d9f23",
+      "canonicalSHA256": "833eea9d797496c44ef3b3003cf728cfa88d12128dddf60106632609ead3a7bc",
+      "workingSHA256": "833eea9d797496c44ef3b3003cf728cfa88d12128dddf60106632609ead3a7bc",
+      "unchanged": true
+    },
+    {
+      "path": "services/control-plane/src/inv/tooling.py",
+      "sha": "7033778ad3d2bc284e36f7e29be7597dbb7d9f23",
+      "canonicalSHA256": "de5f6213b196784c6c4280d31a17fba9fe1669eb466edee14197664b37f2ac6c",
+      "workingSHA256": "de5f6213b196784c6c4280d31a17fba9fe1669eb466edee14197664b37f2ac6c",
+      "unchanged": true
+    },
+    {
+      "path": "services/control-plane/src/inv/node_channels.py",
+      "sha": "7033778ad3d2bc284e36f7e29be7597dbb7d9f23",
+      "canonicalSHA256": "3fad0bb24beb096522ea3335e3bf45f4e65f2d0d906177ef7e310aca1128502b",
+      "workingSHA256": "3fad0bb24beb096522ea3335e3bf45f4e65f2d0d906177ef7e310aca1128502b",
+      "unchanged": true
+    },
+    {
+      "path": "services/control-plane/src/inv/capacity.py",
+      "sha": "7033778ad3d2bc284e36f7e29be7597dbb7d9f23",
+      "canonicalSHA256": "70cf93fcc99d5f23a946445889d5f6b3ab7bd86a30e7923b74e4df82fc85578d",
+      "workingSHA256": "70cf93fcc99d5f23a946445889d5f6b3ab7bd86a30e7923b74e4df82fc85578d",
+      "unchanged": true
+    },
+    {
+      "path": "services/control-plane/src/inv/migrations/0001_core.sql",
+      "sha": "7033778ad3d2bc284e36f7e29be7597dbb7d9f23",
+      "canonicalSHA256": "708cf74734471961a49d527d1d2b0d6e4441e00ddf6739795492dfcd8f4063e9",
+      "workingSHA256": "708cf74734471961a49d527d1d2b0d6e4441e00ddf6739795492dfcd8f4063e9",
+      "unchanged": true
+    },
+    {
+      "path": "services/control-plane/src/inv/migrations/0005_node_channels.sql",
+      "sha": "7033778ad3d2bc284e36f7e29be7597dbb7d9f23",
+      "canonicalSHA256": "00aa94cb17201b2611da0b3aa177c7b18774637304b91d0a569a8397d6312ad8",
+      "workingSHA256": "00aa94cb17201b2611da0b3aa177c7b18774637304b91d0a569a8397d6312ad8",
+      "unchanged": true
+    },
+    {
+      "path": "services/control-plane/src/inv/migrations/0006_control_api.sql",
+      "sha": "7033778ad3d2bc284e36f7e29be7597dbb7d9f23",
+      "canonicalSHA256": "d9284d26f0e23ffe72fe591a132efc07b7384d459ac3ed988cb1326968df6609",
+      "workingSHA256": "d9284d26f0e23ffe72fe591a132efc07b7384d459ac3ed988cb1326968df6609",
+      "unchanged": true
+    },
+    {
+      "path": "services/control-plane/src/inv/migrations/0019_runtime_role.sql",
+      "sha": "7033778ad3d2bc284e36f7e29be7597dbb7d9f23",
+      "canonicalSHA256": "7eb1d0b9c6608a8eb2e3d69ee7838dd99daa5124eefd53f8fa0ff0a7490be662",
+      "workingSHA256": "7eb1d0b9c6608a8eb2e3d69ee7838dd99daa5124eefd53f8fa0ff0a7490be662",
+      "unchanged": true
+    },
+    {
+      "path": "services/control-plane/src/inv/migrations/0021_business_kernel.sql",
+      "sha": "7033778ad3d2bc284e36f7e29be7597dbb7d9f23",
+      "canonicalSHA256": "494f1e0dc9ead74b964e78b97fae23fa0635b00e7cac238e7a53a43370031fed",
+      "workingSHA256": "494f1e0dc9ead74b964e78b97fae23fa0635b00e7cac238e7a53a43370031fed",
+      "unchanged": true
+    },
+    {
+      "path": "services/control-plane/src/inv/migrations/0022_node_containment.sql",
+      "sha": "7033778ad3d2bc284e36f7e29be7597dbb7d9f23",
+      "canonicalSHA256": "eaee2ad2a2cac146acf2f4f823ad73e5fb34a0b831bdb6d647c5beafbfed6c22",
+      "workingSHA256": "eaee2ad2a2cac146acf2f4f823ad73e5fb34a0b831bdb6d647c5beafbfed6c22",
+      "unchanged": true
+    },
+    {
+      "path": "src/saintvision/db/models/identity.py",
+      "sha": "7033778ad3d2bc284e36f7e29be7597dbb7d9f23",
+      "canonicalSHA256": "698f1f02be02d407f8d02369782f5750daa3e40da1b45daa6a2777c16b28399d",
+      "workingSHA256": "698f1f02be02d407f8d02369782f5750daa3e40da1b45daa6a2777c16b28399d",
+      "unchanged": true
+    },
+    {
+      "path": "tests/conftest.py",
+      "sha": "7033778ad3d2bc284e36f7e29be7597dbb7d9f23",
+      "canonicalSHA256": "7c28304b51fa950aed882cd456968014e3e54c03a677e0992d88e3f130eb0eaf",
+      "workingSHA256": "7c28304b51fa950aed882cd456968014e3e54c03a677e0992d88e3f130eb0eaf",
+      "unchanged": true
+    },
+    {
+      "path": "pyproject.toml",
+      "sha": "7033778ad3d2bc284e36f7e29be7597dbb7d9f23",
+      "canonicalSHA256": "09a6487ecb717afa70c86cfe2682cd70d94ecc08818323f19d8a4b693fbdbf88",
+      "workingSHA256": "09a6487ecb717afa70c86cfe2682cd70d94ecc08818323f19d8a4b693fbdbf88",
+      "unchanged": true
+    },
+    {
+      "path": ".gitattributes",
+      "sha": "7033778ad3d2bc284e36f7e29be7597dbb7d9f23",
+      "canonicalSHA256": "a87993806aca0b645118ed851c665f6247b832d0286b30f97a87058f61b1f6ea",
+      "workingSHA256": "a87993806aca0b645118ed851c665f6247b832d0286b30f97a87058f61b1f6ea",
+      "unchanged": true
+    }
+  ],
+  "statusBeforeManifestWrite": [
+    " M docs/vault/30_Development/History/2026-11-07_FLEET5_K2_H12_Signature_Code_Publication_Codex.md",
+    "?? docs/vault/30_Development/Evidence/fleet5-fresh-cpu-admission-code-r1-20261107-codex/four-file-wip.patch",
+    "?? docs/vault/30_Development/Evidence/fleet5-fresh-cpu-admission-code-r1-20261107-codex/required-doc-read-bindings.json",
+    "?? docs/vault/30_Development/Evidence/fleet5-fresh-cpu-admission-code-r1-20261107-codex/start-context.json",
+    "?? docs/vault/30_Development/Evidence/fleet5-fresh-cpu-admission-code-r1-20261107-codex/static-verification-attempt01-failure.json",
+    "?? docs/vault/30_Development/Evidence/fleet5-fresh-cpu-admission-code-r1-20261107-codex/verify-wip-static.py",
+    "?? docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/post-ci/actual-final-workflows.json",
+    "?? docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/post-ci/actual-root-hosted-case-equivalence.json",
+    "?? docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/post-ci/core-artifact-download.json",
+    "?? docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/post-ci/core-artifact-inspection.json",
+    "?? docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/post-ci/core-artifacts-observation-01.json",
+    "?? docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/post-ci/core-derived-counts-and-log-index.json",
+    "?? docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/post-ci/core-jobs-observation-01.json",
+    "?? docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/post-ci/core-jobs-observation-02.json",
+    "?? docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/post-ci/core-jobs-observation-03.json",
+    "?? docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/post-ci/core-jobs-observation-04.json",
+    "?? docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/post-ci/core-jobs-observation-05.json",
+    "?? docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/post-ci/core-jobs-observation-06.json",
+    "?? docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/post-ci/core-jobs-observation-07.json",
+    "?? docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/post-ci/core-jobs-observation-08.json",
+    "?? docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/post-ci/core-jobs-observation-09.json",
+    "?? docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/post-ci/core-jobs-observation-10.json",
+    "?? docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/post-ci/core-jobs-observation-11.json",
+    "?? docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/post-ci/core-jobs-observation-12.json",
+    "?? docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/post-ci/core-jobs-observation-13.json",
+    "?? docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/post-ci/core-jobs-observation-14.json",
+    "?? docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/post-ci/core-jobs-observation-15.json",
+    "?? docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/post-ci/core-log-zip-download.json",
+    "?? docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/post-ci/core-original-run-logs.zip.raw",
+    "?? docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/post-ci/core-run-observation-01.json",
+    "?? docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/post-ci/core.yml.final-artifacts.json",
+    "?? docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/post-ci/core.yml.final-jobs.json",
+    "?? docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/post-ci/core.yml.final-run.json",
+    "?? docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/post-ci/core.yml.initial-run.json",
+    "?? docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/post-ci/docker-compatibility-original.log.raw",
+    "?? docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/post-ci/docs-artifacts-observation-01.json",
+    "?? docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/post-ci/docs-jobs-observation-01.json",
+    "?? docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/post-ci/docs-original-run-logs.zip.raw",
+    "?? docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/post-ci/docs-plain-job-log-read-failure.json",
+    "?? docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/post-ci/docs-run-log-zip-index.json",
+    "?? docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/post-ci/docs-run-log-zip-receipt.json",
+    "?? docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/post-ci/docs-run-observation-01.json",
+    "?? docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/post-ci/docs.yml.final-artifacts.json",
+    "?? docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/post-ci/docs.yml.final-jobs.json",
+    "?? docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/post-ci/docs.yml.final-run.json",
+    "?? docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/post-ci/docs.yml.initial-run.json",
+    "?? docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/post-ci/h12-code-commit-name-status.raw",
+    "?? docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/post-ci/h12-normal-commit-receipt.json",
+    "?? docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/post-ci/h12-normal-push-receipt.json",
+    "?? docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/post-ci/h12-precommit-staged-check.json",
+    "?? docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/post-ci/immutable-workflow-dispatch-bindings.json",
+    "?? docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/post-ci/initial-artifact-downloads.json",
+    "?? docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/post-ci/post-CI-exact-remote-ref.json",
+    "?? docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/post-ci/post-CI-residual-final.json",
+    "?? docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/post-ci/publication-final-report-6d7ee3d8.json",
+    "?? docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/post-ci/publication-history-post-CI-provenance.json",
+    "?? docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/post-ci/publication-history-post-CI-snapshot.raw",
+    "?? docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/post-ci/published-source-and-normal-git-provenance.json",
+    "?? docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/post-ci/s01-artifact-inspection.json",
+    "?? docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/post-ci/static_ci_artifact_inspector.py.txt",
+    "?? docs/vault/30_Development/History/2026-11-07_FLEET5_Fresh_CPU_Admission_Code_R1_Codex.md",
+    "?? services/control-plane/src/inv/fresh_cpu_admission.py",
+    "?? tests/core/test_fresh_cpu_admission.py",
+    "?? tests/core/test_fresh_cpu_admission_cli.py",
+    "?? tools/fresh_cpu_admission.py"
+  ],
+  "preservedExcludedResidue": {
+    "history": "docs/vault/30_Development/History/2026-11-07_FLEET5_K2_H12_Signature_Code_Publication_Codex.md",
+    "historyCurrentSHA256": "757284a69d9b9e5de38fa6f515d4ec2388bac3bcdcc642d2e61b46239c02306b",
+    "postCiPrefix": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/post-ci/",
+    "frozenPriorReportSHA256": "b944af8919538b295dd162e1f0680580931dfc01589073ddefec693c911a718c",
+    "notStagedNotRecopied": true
+  },
+  "holds": [
+    "Root dependency703 Core/Backend and integration-review disposition pending at grant",
+    "libpq credential/certificate data-file boundary requires Root interpretation",
+    "all product tests/required gates/CI/review NOT_RUN or PENDING",
+    "no publication or live admission grant"
+  ],
+  "artifacts": [
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-fresh-cpu-admission-code-r1-20261107-codex/four-file-wip.patch",
+      "bytes": 45717,
+      "sha256": "7d4ffbb2f7634800e2c9feda7bc8f10d52ccbe3a024f978bd9e8c4acca6ee593"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-fresh-cpu-admission-code-r1-20261107-codex/required-doc-read-bindings.json",
+      "bytes": 7729,
+      "sha256": "45a0f09c50d14aac3e01de8494743f3442a774b57ae60d899989700dd4bda462"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-fresh-cpu-admission-code-r1-20261107-codex/start-context.json",
+      "bytes": 3294,
+      "sha256": "5bd84d0a6b152d0637a252bf630e49a395dcf4ecd4f99040696fb704f1554f61"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-fresh-cpu-admission-code-r1-20261107-codex/static-verification-attempt01-failure.json",
+      "bytes": 872,
+      "sha256": "3c933829dcfb62b4d7e5f1308a025631e868ec309fc78cc253c3b551194ac26c"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-fresh-cpu-admission-code-r1-20261107-codex/verify-wip-static.py",
+      "bytes": 8488,
+      "sha256": "f5d9354fd752f6096160d2583baa290e4da940b4df5ec8bee12c7926e554a058"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-fresh-cpu-admission-code-r1-20261107-codex/wip-static-verification.json",
+      "bytes": 6693,
+      "sha256": "d754700904920661bdf9a8f0bf4b6a222bfdc5e16971139aa57d66806ada2d3b"
+    },
+    {
+      "path": "docs/vault/30_Development/History/2026-11-07_FLEET5_Fresh_CPU_Admission_Code_R1_Codex.md",
+      "bytes": 11163,
+      "sha256": "8f567bbad567fef5896ae19e30e827bf7c095ceb667b0bdac19b42619d55eb21"
+    }
+  ]
+}

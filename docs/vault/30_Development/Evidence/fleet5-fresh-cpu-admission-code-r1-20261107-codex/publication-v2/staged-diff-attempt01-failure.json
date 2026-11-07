@@ -1,0 +1,21 @@
+{
+  "kind": "ACTUAL_PRECOMMIT_STAGED_DIFF_FAILURE",
+  "exitCode": 2,
+  "command": [
+    "git",
+    "diff",
+    "--cached",
+    "--check"
+  ],
+  "commitAttempted": false,
+  "candidateCodeChanged": false,
+  "cause": "Generated unified diff artifact context-only blank lines contain one trailing space",
+  "artifact": "wording-and-trust-test-only.patch",
+  "reportedLines": [
+    11,
+    18,
+    31
+  ],
+  "correction": "Regenerate only the new v2 diff artifact with zero context; preserve frozen WIP01 untouched",
+  "lineEndingObservation": "Git text eol=lf normalizes some Windows-authored Evidence; preserve raw bytes independently and distinguish working and canonical hashes"
+}

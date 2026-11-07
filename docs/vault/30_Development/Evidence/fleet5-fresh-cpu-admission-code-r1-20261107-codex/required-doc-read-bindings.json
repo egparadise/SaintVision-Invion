@@ -1,0 +1,65 @@
+{
+  "kind": "SOURCE_DOC_READ_BINDINGS_NOT_RUNTIME_PROOF",
+  "records": [
+    {
+      "path": "D:\\Project\\SaintVisionI-Invion\\fleet-five-orchestration-20261105\\docs\\vault\\00_Index\\전체 개발 진행 현황.md",
+      "sha256": "be9321d69c2bf725a6fde41528f0b2cbbe7c163a655986cc16c0e71732deba8a",
+      "frontmatter": "doc_id: \"INDEX-PROGRESS-001\"\ntitle: \"전체 개발 진행 현황\"\nversion: \"1.0.503\"\nstatus: \"review\"\nauthor: \"Codex\"\nupdated: \"2026-11-07T13:06:44+09:00\"\nsource_of_truth: \"Git\"\nlatest_codex_card: \"Joint703sourceVerified_DocsPASS_CoreBackendPending; currentOwnerProjectDBMapped; otherApproverMappings1_identityQuestionPending; freshCPUAdmission4FileWIPAuthorized_NoRuntime\""
+    },
+    {
+      "path": "D:\\Project\\SaintVisionI-Invion\\fleet-five-orchestration-20261105\\docs\\vault\\30_Development\\Agent별 작업\\Codex 작업 현황.md",
+      "sha256": "feed1847184f8ef7cdaf7804589f54a6a0af6bcd9b71f0dba4c6b32054053dbb",
+      "frontmatter": "doc_id: \"WORKBOARD-CODEX-001\"\ntitle: \"Codex 작업 현황\"\nversion: \"1.0.464\"\nstatus: \"review\"\nauthor: \"Codex\"\nupdated: \"2026-11-07T13:06:44+09:00\"\nsource_of_truth: \"Git\"\nactive_card: \"FLEET5 continued supervision with PORTAL-REFRESH-FLEET-20261106\"\nactive_card_status: \"Joint703sourceVerified_DocsPASS_CoreBackendPending; currentOwnerProjectDBMapped; otherApproverMappings1_identityQuestionPending; freshCPUAdmission4FileWIPAuthorized_NoRuntime\"\nactive_card_next: \"Root actual703 Core/Backend completion+artifact verification then integrationreview; Codex newfreshCPU4fileWIP. Need actualadditionalapproverID for later2-voterRun, no vote fabrication. No liveadmission before source/CI/review/requestpins.\""
+    },
+    {
+      "path": "D:\\Project\\SaintVisionI-Invion\\fleet-five-orchestration-20261105\\docs\\vault\\00_Index\\2026-09-15 단일 가상 컴퓨터 보강 설계 인덱스.md",
+      "sha256": "35f2cca047fdb57ff2e2ad28e3847e9a7c0a19d6ace6fb36aa941042e872e9be",
+      "frontmatter": "doc_id: \"INDEX-VIRTUAL-COMPUTER-001\"\ntitle: \"2026-09-15 단일 가상 컴퓨터 보강 설계 인덱스\"\nversion: \"1.0.0\"\nstatus: \"accepted\"\nauthor: \"Codex\"\nupdated: \"2026-09-15T11:20:06+09:00\"\nsource_of_truth: \"Git and Obsidian paired update\"\ntags: [\"saintvision\", \"inv\", \"web-desktop\", \"distributed-model\", \"roadmap\"]"
+    },
+    {
+      "path": "D:\\Project\\SaintVisionI-Invion\\fleet-five-orchestration-20261105\\docs\\vault\\30_Development\\57.81퍼센트 이후 단일 가상 컴퓨터 보강 로드맵.md",
+      "sha256": "3a4527ffe53ebea114063692dd3bba826da8c279a93a9800919fff394df1a018",
+      "frontmatter": "doc_id: \"ROADMAP-VIRTUAL-COMPUTER-001\"\ntitle: \"57.81퍼센트 이후 단일 가상 컴퓨터 보강 로드맵\"\nversion: \"1.0.0\"\nstatus: \"accepted\"\nauthor: \"Codex\"\nupdated: \"2026-09-15T11:20:06+09:00\"\nsource_of_truth: \"Git and Obsidian paired update\"\ntags: [\"saintvision\", \"roadmap\", \"web-desktop\", \"storage-fabric\", \"agents\"]"
+    },
+    {
+      "path": "D:\\Project\\SaintVisionI-Invion\\fleet-five-orchestration-20261105\\docs\\vault\\40_Governance\\Agent 연속 실행과 최종 보고 정책.md",
+      "sha256": "60c6a8d3130491bd4cab730cccc0e236fb038d1c7c816efa333acdc34a30cd8f",
+      "frontmatter": "doc_id: \"GOV-CONTINUOUS-001\"\ntitle: \"Agent 연속 실행과 최종 보고 정책\"\nversion: \"1.1.0\"\nstatus: \"accepted\"\nauthor: \"Codex\"\nupdated: \"2026-09-21T14:33:00+09:00\"\nsource_of_truth: \"Git and Obsidian paired update\"\ntags: [\"saintvision\", \"agents\", \"autonomy\", \"governance\"]"
+    },
+    {
+      "path": "D:\\Project\\SaintVisionI-Invion\\fleet-five-orchestration-20261105\\docs\\vault\\00_Index\\최종 개발 계획 - 모든 개발의 지침.md",
+      "sha256": "59223c5dff4b4bb6252c8061aebe975665e6eadf92db3659a3f89951b2cb149f",
+      "frontmatter": "doc_id: \"GUIDE-001\"\ntitle: \"최종 개발 계획 - 모든 개발의 지침\"\nversion: \"1.1.0\"\nstatus: \"baseline\"\nauthor: \"Codex\"\nupdated: \"2026-09-11T17:15:06+09:00\"\ntimezone: \"Asia/Seoul\"\nsource_of_truth: \"Git\"\ntags: [\"saintvision\", \"final-plan\"]\naliases: [\"최종 계발 계회 - 모든 개발의 지침\", \"최종 개발 지침\"]"
+    },
+    {
+      "path": "D:\\Project\\SaintVisionI-Invion\\fleet-five-orchestration-20261105\\docs\\vault\\40_Governance\\설계 충돌 정정 및 ADR.md",
+      "sha256": "771f7714a63af52d7c8aea2424db0b33a2fe96c759c51c81c23144daf7aeaf77",
+      "frontmatter": "doc_id: \"ADR-INDEX-001\"\ntitle: \"설계 충돌 정정 및 ADR\"\nversion: \"1.37.0\"\nstatus: \"baseline\"\nauthor: \"Codex\"\nupdated: \"2026-09-23T03:10:00+09:00\"\ntimezone: \"Asia/Seoul\"\nsource_of_truth: \"Git\"\ntags: [\"saintvision\", \"final-plan\"]"
+    },
+    {
+      "path": "D:\\Project\\SaintVisionI-Invion\\fleet-five-orchestration-20261105\\docs\\vault\\40_Governance\\Agent 역할과 인계 계약.md",
+      "sha256": "128c054e72f9e001b3b32f914cce544bce5432eddccdbe1212d27180c3200823",
+      "frontmatter": "doc_id: \"GOV-AGENT-001\"\ntitle: \"Agent 역할과 인계 계약\"\nversion: \"1.1.3\"\nstatus: \"baseline\"\nauthor: \"Codex\"\nupdated: \"2026-09-21T18:47:00+09:00\"\ntimezone: \"Asia/Seoul\"\nsource_of_truth: \"Git\"\ntags: [\"saintvision\", \"final-plan\"]"
+    },
+    {
+      "path": "D:\\Project\\SaintVisionI-Invion\\fleet-five-orchestration-20261105\\docs\\vault\\40_Governance\\Git Build Obsidian 운영 절차.md",
+      "sha256": "fe5e8adc44a14c081ac767265a16434b72e4b3ebfb7719081fa166ad459e59e9",
+      "frontmatter": "doc_id: \"GOV-GIT-001\"\ntitle: \"Git Build Obsidian 운영 절차\"\nversion: \"1.1.4\"\nstatus: \"baseline\"\nauthor: \"Codex\"\nupdated: \"2026-09-22T19:25:00+09:00\"\ntimezone: \"Asia/Seoul\"\nsource_of_truth: \"Git\"\ntags: [\"saintvision\", \"final-plan\"]"
+    },
+    {
+      "path": "D:\\Project\\SaintVisionI-Invion\\fleet-five-orchestration-20261105\\docs\\vault\\40_Governance\\Agent 지속 개발 운영 규칙.md",
+      "sha256": "63839c440ead6dc07300a0e18d5024fb9aadbddf546707156c39af7ee9495c84",
+      "frontmatter": "doc_id: \"GOV-CONTINUITY-001\"\ntitle: \"Agent 지속 개발 운영 규칙\"\nversion: \"1.0.0\"\nstatus: \"review\"\nauthor: \"Codex\"\nupdated: \"2026-09-21T14:05:43+09:00\"\nsource_of_truth: \"Git\""
+    },
+    {
+      "path": "D:\\Project\\SaintVisionI-Invion\\fleet-five-orchestration-20261105\\docs\\vault\\40_Governance\\검증검사도구_목록.md",
+      "sha256": "8decb9b728ab48b22ff4dbbad36c35650b2990611f5ba13d8336729cec93357f",
+      "frontmatter": "doc_id: \"GOV-VERIFICATION-CHECK-CATALOG-001\"\ntitle: \"검증 검사 도구 목록 — 무엇을·등급(게이트/ratchet/report-only)·어떻게 실행·실패 시 대응\"\nversion: \"1.6.0\"\nstatus: \"active\"\nauthor: \"Codex\"\noriginal_author: \"Claude\"\nreviewer: \"Claude\"\nupdated: \"2026-11-04T15:34:48+09:00\"\nsource_of_truth: \"Git\"\ntags: [\"governance\", \"ci\", \"checks\", \"catalog\", \"onboarding\"]"
+    },
+    {
+      "path": "D:\\Project\\SaintVisionI-Invion\\fleet-five-orchestration-20261105\\docs\\vault\\40_Governance\\검증규칙과_세축_canon.md",
+      "sha256": "74c2cba839ef2bf375a1437311c95fe01e2a373f5a5602b17e861f89728d786d",
+      "frontmatter": "doc_id: \"GOV-VERIFICATION-RULES-AXES-CANON-001\"\ntitle: \"검증 규칙·축 정본 — 6규칙·3축(실물성→정직함→신선도)·6층·축별 도구\"\nversion: \"1.2.1\"\nstatus: \"active\"\nauthor: \"Claude\"\nreviewer: \"Codex\"\nupdated: \"2026-09-22\"\nsource_of_truth: \"Git\"\ntags: [\"governance\", \"verification\", \"rules\", \"axes\", \"canon\"]"
+    }
+  ]
+}

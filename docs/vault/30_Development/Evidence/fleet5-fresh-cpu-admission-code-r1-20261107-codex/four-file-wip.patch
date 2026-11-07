@@ -1,0 +1,1012 @@
+--- /dev/null
++++ b/services/control-plane/src/inv/fresh_cpu_admission.py
+@@ -0,0 +1,340 @@
++"""Operator-only, fresh CPU Node metadata; never enrollment or execution.
++
++Public leaf identity/validity is checked by the existing channel contract. CA
++chain/custody approval remains an external operator prerequisite: this module
++does not install trust or authenticate a certificate issuer. IDs are fresh in
++the selected tenant (the existing composite-PK identity namespace).
++
++Connections must be idle. Each call owns its transaction; APPLY cannot return a
++COMMITTED receipt from a caller's uncommitted savepoint. No retries/upserts are
++provided. A lost commit acknowledgement requires read-only reconciliation.
++"""
++
++import base64
++import binascii
++from dataclasses import dataclass
++import hashlib
++import json
++import re
++from uuid import UUID
++
++from psycopg import errors
++from psycopg.pq import TransactionStatus
++from psycopg.rows import tuple_row
++
++from .errors import DomainError
++from .node_channels import certificate_identity, endpoint_parts, provision_channel
++from .tooling import NodePrincipal
++
++MAX_REQUEST_BYTES = 128 * 1024
++MAX_DER_BYTES = 65536
++CPU_MILLIS = 500
++MEMORY_BYTES = 67108864
++MAX_VERSION = 9007199254740991
++FIELDS = frozenset({
++    "requestVersion", "tenantId", "recoveryEpoch", "projectId", "nodeId",
++    "cpuResourceId", "memoryResourceId", "endpoint", "certificateDERBase64",
++    "expectedTenantControlVersion", "cpuMillis", "memoryBytes",
++})
++# This closed map also constrains CLI errors; exception messages are never output.
++SAFE_ERRORS = {
++    "FRESH-0001": 422, "FRESH-0002": 409, "FRESH-0003": 409,
++    "FRESH-0004": 403, "FRESH-0005": 409, "FRESH-0006": 409,
++    "FRESH-0007": 409, "FRESH-0008": 409, "FRESH-0009": 500,
++    "FRESH-0010": 503, "FRESH-0011": 503, "FRESH-0012": 503,
++    "NODE-0031": 422, "NODE-0032": 403, "NODE-0033": 403,
++    "NODE-0034": 409,
++}
++
++
++def refuse(code):
++    raise DomainError(code, "Fresh CPU metadata admission refused", SAFE_ERRORS[code]) from None
++
++
++def _pairs(pairs):
++    result = {}
++    for key, value in pairs:
++        if key in result:
++            refuse("FRESH-0001")
++        result[key] = value
++    return result
++
++
++def _constant(_):
++    refuse("FRESH-0001")
++
++
++@dataclass(frozen=True)
++class PreparedAdmission:
++    tenant: str
++    epoch: str
++    project: str
++    node: str
++    cpu: str
++    memory: str
++    endpoint: str
++    der: bytes
++    control_version: int
++    fingerprint: str
++    not_after: object
++
++    def plan_body(self):
++        return {
++            "planVersion": 1,
++            "tenantId": self.tenant, "recoveryEpoch": self.epoch,
++            "projectId": self.project, "nodeId": self.node,
++            "cpuResourceId": self.cpu, "memoryResourceId": self.memory,
++            "endpoint": self.endpoint,
++            "certificateSHA256": self.fingerprint,
++            "certificateNotAfter": self.not_after.isoformat(),
++            "expectedTenantControlVersion": self.control_version,
++            "cpuMillis": CPU_MILLIS, "memoryBytes": MEMORY_BYTES,
++            "initialStatus": "offline", "initialChannelVersion": 1,
++            "projectMembershipEnabled": True,
++            "certificateIssuerChainVerified": False,
++            "executionAuthorized": False,
++        }
++
++    def digest(self):
++        return hashlib.sha256(json.dumps(
++            self.plan_body(), sort_keys=True, separators=(",", ":"),
++            ensure_ascii=True, allow_nan=False,
++        ).encode("ascii")).hexdigest()
++
++
++def prepare_request(raw):
++    """Bound/parse/validate public bytes before DB work or held DB locks."""
++    if type(raw) is not bytes or not 0 < len(raw) <= MAX_REQUEST_BYTES:
++        refuse("FRESH-0001")
++    try:
++        body = json.loads(raw.decode("utf-8"), object_pairs_hook=_pairs,
++                          parse_constant=_constant)
++        if type(body) is not dict or set(body) != FIELDS:
++            refuse("FRESH-0001")
++        for key in FIELDS - {"requestVersion", "expectedTenantControlVersion",
++                             "cpuMillis", "memoryBytes"}:
++            if type(body[key]) is not str:
++                refuse("FRESH-0001")
++        for key, expected in (("requestVersion", 1), ("cpuMillis", CPU_MILLIS),
++                              ("memoryBytes", MEMORY_BYTES)):
++            if type(body[key]) is not int or body[key] != expected:
++                refuse("FRESH-0001")
++        version = body["expectedTenantControlVersion"]
++        if type(version) is not int or not 0 <= version <= MAX_VERSION:
++            refuse("FRESH-0001")
++        for key in ("tenantId", "recoveryEpoch"):
++            if str(UUID(body[key])) != body[key]:
++                refuse("FRESH-0001")
++        for key, prefix in (("projectId", "prj"), ("nodeId", "nod"),
++                            ("cpuResourceId", "res"), ("memoryResourceId", "res")):
++            if not re.fullmatch(prefix + r"_[0-9A-HJKMNP-TV-Z]{26}", body[key]):
++                refuse("FRESH-0001")
++        if body["cpuResourceId"] == body["memoryResourceId"]:
++            refuse("FRESH-0001")
++        encoded = body["certificateDERBase64"]
++        if not 0 < len(encoded) <= 4 * ((MAX_DER_BYTES + 2) // 3):
++            refuse("FRESH-0001")
++        der = base64.b64decode(encoded, validate=True)
++        if not 0 < len(der) <= MAX_DER_BYTES or base64.b64encode(der).decode() != encoded:
++            refuse("FRESH-0001")
++    except (ValueError, TypeError, UnicodeError, binascii.Error, RecursionError):
++        refuse("FRESH-0001")
++    endpoint_parts(body["endpoint"])
++    fingerprint, not_after = certificate_identity(
++        der, NodePrincipal(body["tenantId"], body["nodeId"]), body["recoveryEpoch"],
++    )
++    return PreparedAdmission(
++        body["tenantId"], body["recoveryEpoch"], body["projectId"],
++        body["nodeId"], body["cpuResourceId"], body["memoryResourceId"],
++        body["endpoint"], der, version, fingerprint, not_after,
++    )
++
++
++def _idle(conn):
++    if conn.info.transaction_status != TransactionStatus.IDLE:
++        refuse("FRESH-0003")
++
++
++def _operator(cursor):
++    # Identifiers here are source constants, never request table/column names.
++    privileges = cursor.execute("""SELECT count(*)=5 AND
++        coalesce(bool_and(has_table_privilege(current_user,c.oid,'INSERT')),false)
++        AND has_schema_privilege(current_user,'inv','USAGE')
++        FROM pg_catalog.pg_class c JOIN pg_catalog.pg_namespace n ON n.oid=c.relnamespace
++        WHERE n.nspname='inv' AND c.relname IN
++        ('nodes','resources','project_nodes','node_channels','node_channel_audit')""").fetchone()
++    if not privileges or privileges[0] is not True:
++        refuse("FRESH-0004")
++
++
++def _preflight(cursor, item, *, locked):
++    _operator(cursor)
++    cursor.execute("SELECT set_config('inv.tenant_id',%s,true)", (item.tenant,))
++    lock = " FOR SHARE" if locked else ""
++    epoch = cursor.execute(
++        "SELECT epoch FROM inv.control_epoch WHERE singleton" + lock,
++    ).fetchone()
++    if not epoch or str(epoch[0]) != item.epoch:
++        refuse("FRESH-0006")
++    tenant = cursor.execute(
++        "SELECT tenant_id FROM inv.tenants WHERE tenant_id=%s" + lock,
++        (item.tenant,),
++    ).fetchone()
++    project = cursor.execute(
++        "SELECT project_id FROM inv.projects WHERE tenant_id=%s AND project_id=%s" + lock,
++        (item.tenant, item.project),
++    ).fetchone()
++    if not tenant or not project:
++        refuse("FRESH-0005")
++    control = cursor.execute(
++        "SELECT version,kill_switch,updated_at FROM inv.tenant_controls WHERE tenant_id=%s" + lock,
++        (item.tenant,),
++    ).fetchone()
++    if not control or control[0] != item.control_version:
++        refuse("FRESH-0007")
++    business = cursor.execute(
++        "SELECT enabled FROM inv.business_projects WHERE tenant_id=%s AND project_id=%s" + lock,
++        (item.tenant, item.project),
++    ).fetchone()
++    if business:
++        public = cursor.execute(
++            "SELECT status FROM public.projects WHERE tenant_id=%s AND project_id=%s" + lock,
++            (item.tenant, item.project),
++        ).fetchone()
++        if not business[0] or not public or public[0] != "active":
++            refuse("FRESH-0005")
++    collision = cursor.execute("""SELECT
++        EXISTS(SELECT 1 FROM inv.nodes WHERE tenant_id=%s AND node_id=%s),
++        EXISTS(SELECT 1 FROM inv.resources WHERE tenant_id=%s AND resource_id IN (%s,%s)),
++        EXISTS(SELECT 1 FROM inv.project_nodes WHERE tenant_id=%s AND node_id=%s),
++        EXISTS(SELECT 1 FROM inv.node_channels WHERE tenant_id=%s AND node_id=%s),
++        EXISTS(SELECT 1 FROM inv.node_channel_audit WHERE tenant_id=%s AND node_id=%s)""",
++        (item.tenant, item.node, item.tenant, item.cpu, item.memory,
++         item.tenant, item.node, item.tenant, item.node, item.tenant, item.node),
++    ).fetchone()
++    if any(collision):
++        refuse("FRESH-0008")
++    return control
++
++
++def _receipt(item, mode, status):
++    return {"mode": mode, "status": status, "planSha256": item.digest(),
++            "plan": item.plan_body()}
++
++
++def plan_admission(conn, raw):
++    """SELECT-only preflight. READY is an observation, never an apply grant."""
++    item = prepare_request(raw)
++    _idle(conn)
++    try:
++        with conn.transaction(), conn.cursor(row_factory=tuple_row) as cursor:
++            _preflight(cursor, item, locked=False)
++    except DomainError:
++        raise
++    except Exception:
++        refuse("FRESH-0011")
++    return _receipt(item, "PLAN", "READY")
++
++
++def _readback(cursor, item, control):
++    node = cursor.execute("""SELECT status,recovery_epoch FROM inv.nodes
++        WHERE tenant_id=%s AND node_id=%s""", (item.tenant, item.node)).fetchone()
++    resources = cursor.execute("""SELECT resource_id,node_id,kind,capacity,offered
++        FROM inv.resources WHERE tenant_id=%s AND node_id=%s ORDER BY resource_id""",
++        (item.tenant, item.node)).fetchall()
++    expected_resources = sorted([
++        (item.cpu, item.node, "cpu", CPU_MILLIS, CPU_MILLIS),
++        (item.memory, item.node, "memory", MEMORY_BYTES, MEMORY_BYTES),
++    ])
++    memberships = cursor.execute("""SELECT project_id,enabled FROM inv.project_nodes
++        WHERE tenant_id=%s AND node_id=%s""", (item.tenant, item.node)).fetchall()
++    channel = cursor.execute("""SELECT recovery_epoch,version,endpoint,certificate_sha256,
++        certificate_not_after,enabled FROM inv.node_channels WHERE tenant_id=%s AND node_id=%s""",
++        (item.tenant, item.node)).fetchone()
++    audit = cursor.execute("""SELECT version,action,certificate_sha256 FROM inv.node_channel_audit
++        WHERE tenant_id=%s AND node_id=%s""", (item.tenant, item.node)).fetchall()
++    after = cursor.execute("""SELECT version,kill_switch,updated_at FROM inv.tenant_controls
++        WHERE tenant_id=%s""", (item.tenant,)).fetchone()
++    seeded = cursor.execute("""SELECT version FROM inv.node_controls
++        WHERE tenant_id=%s AND node_id=%s""", (item.tenant, item.node)).fetchall()
++    if (not node or node[0] != "offline" or str(node[1]) != item.epoch
++            or resources != expected_resources or memberships != [(item.project, True)]
++            or not channel or str(channel[0]) != item.epoch
++            or channel[1:] != (1, item.endpoint, item.fingerprint, item.not_after, True)
++            or audit != [(1, "provision", item.fingerprint)] or after != control
++            or seeded != [(0,)]):
++        refuse("FRESH-0009")
++
++
++def apply_admission(conn, raw, *, expected_plan_sha256):
++    """Atomic fresh insert; commit acknowledged before returning COMMITTED.
++
++    No retry on collision, serialization failure or uncertain commit. The existing
++    node trigger seeds its own version-0 node_controls row. No existing control,
++    grant, snapshot, probe, lease, Run or approval is changed by this writer.
++    """
++    item = prepare_request(raw)
++    if (type(expected_plan_sha256) is not str
++            or not re.fullmatch(r"[0-9a-f]{64}", expected_plan_sha256)
++            or expected_plan_sha256 != item.digest()):
++        refuse("FRESH-0002")
++    _idle(conn)
++    ready_to_commit = False
++    try:
++        with conn.transaction(), conn.cursor(row_factory=tuple_row) as cursor:
++            control = _preflight(cursor, item, locked=True)
++            cursor.execute("""INSERT INTO inv.nodes(tenant_id,node_id,status,recovery_epoch)
++                VALUES(%s,%s,'offline',%s)""", (item.tenant, item.node, item.epoch))
++            cursor.execute("""INSERT INTO inv.resources
++                (tenant_id,resource_id,node_id,kind,capacity,offered)
++                VALUES(%s,%s,%s,'cpu',%s,%s),(%s,%s,%s,'memory',%s,%s)""",
++                (item.tenant, item.cpu, item.node, CPU_MILLIS, CPU_MILLIS,
++                 item.tenant, item.memory, item.node, MEMORY_BYTES, MEMORY_BYTES))
++            cursor.execute("""INSERT INTO inv.project_nodes(tenant_id,project_id,node_id,enabled)
++                VALUES(%s,%s,%s,true)""", (item.tenant, item.project, item.node))
++            provision_channel(
++                conn, NodePrincipal(item.tenant, item.node), epoch=item.epoch,
++                endpoint=item.endpoint, certificate_der=item.der, expected_version=0,
++            )
++            _readback(cursor, item, control)
++            ready_to_commit = True
++    except DomainError:
++        raise
++    except errors.UniqueViolation:
++        refuse("FRESH-0008")
++    except Exception:
++        # No raw PostgreSQL/driver diagnostics may cross the CLI boundary.
++        refuse("FRESH-0010" if ready_to_commit else "FRESH-0011")
++    result = _receipt(item, "APPLY", "COMMITTED")
++    result["readbackVerifiedBeforeCommit"] = True
++    result["nodeControlSeedVersion"] = 0
++    return result
++
++
++def reconcile_admission(conn, raw):
++    """Read-only exact-row check after an unknown commit; never retries APPLY.
++
++    A match proves present metadata, not which attempt committed it. A mismatch
++    remains HOLD; absence is not permission to apply again. Read-only SELECTs
++    take one repeatable-read snapshot, with no externally held DB transaction.
++    """
++    item = prepare_request(raw)
++    _idle(conn)
++    try:
++        with conn.transaction(), conn.cursor(row_factory=tuple_row) as cursor:
++            cursor.execute("SET TRANSACTION ISOLATION LEVEL REPEATABLE READ, READ ONLY")
++            _operator(cursor)
++            cursor.execute("SELECT set_config('inv.tenant_id',%s,true)", (item.tenant,))
++            epoch = cursor.execute("SELECT epoch FROM inv.control_epoch WHERE singleton").fetchone()
++            if not epoch or str(epoch[0]) != item.epoch:
++                refuse("FRESH-0006")
++            control = cursor.execute("""SELECT version,kill_switch,updated_at
++                FROM inv.tenant_controls WHERE tenant_id=%s""", (item.tenant,)).fetchone()
++            if not control or control[0] != item.control_version:
++                refuse("FRESH-0007")
++            _readback(cursor, item, control)
++    except DomainError:
++        raise
++    except Exception:
++        refuse("FRESH-0011")
++    return _receipt(item, "RECONCILE", "MATCHED_METADATA_REQUIRES_OPERATOR_DISPOSITION")
+--- /dev/null
++++ b/tools/fresh_cpu_admission.py
+@@ -0,0 +1,80 @@
++#!/usr/bin/env python3
++"""Operator metadata CLI: bounded public JSON stdin; PLAN unless explicit APPLY.
++
++Only the explicitly named environment value supplies the operator connection.
++No data files, discovery, credentials in argv, subprocesses or Node transport.
++No exception text, arguments, request body or connection info is ever printed.
++"""
++
++import argparse
++import json
++import os
++from pathlib import Path
++import re
++import sys
++
++import psycopg
++
++sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "services/control-plane/src"))
++from inv.errors import DomainError  # noqa: E402
++from inv.fresh_cpu_admission import (  # noqa: E402
++    MAX_REQUEST_BYTES, SAFE_ERRORS, apply_admission, plan_admission, prepare_request,
++)
++
++
++class SafeParser(argparse.ArgumentParser):
++    def error(self, message):
++        # argparse's default includes rejected argv, which may contain a secret.
++        raise DomainError("FRESH-0001", "Invalid command arguments", 422)
++
++
++def _error(code):
++    if type(code) is not str or code not in SAFE_ERRORS:
++        code = "FRESH-0011"
++    unknown = code == "FRESH-0010"
++    result = {
++        "status": "UNKNOWN_RECONCILE_REQUIRED" if unknown else "REFUSED",
++        "code": code, "httpStatus": SAFE_ERRORS[code],
++        "automaticRetryAllowed": False,
++    }
++    print(json.dumps(result, sort_keys=True), file=sys.stderr)
++    return 3 if unknown else 2
++
++
++def main(argv=None):
++    apply_started = False
++    try:
++        parser = SafeParser(description=__doc__, allow_abbrev=False)
++        parser.add_argument("--apply", action="store_true")
++        parser.add_argument("--expected-plan-sha256")
++        parser.add_argument("--dsn-env", default="SV_FRESH_NODE_OPERATOR_DSN")
++        args = parser.parse_args(argv)
++        if (not re.fullmatch(r"[A-Z][A-Z0-9_]{0,127}", args.dsn_env)
++                or bool(args.expected_plan_sha256) != args.apply
++                or (args.apply and not re.fullmatch(r"[0-9a-f]{64}", args.expected_plan_sha256))):
++            return _error("FRESH-0001")
++        raw = sys.stdin.buffer.read(MAX_REQUEST_BYTES + 1)
++        item = prepare_request(raw)
++        if args.apply and item.digest() != args.expected_plan_sha256:
++            return _error("FRESH-0002")
++        dsn = os.environ.get(args.dsn_env)
++        if not dsn:
++            return _error("FRESH-0012")
++        # The DSN is never added to argv/output or interpolated into diagnostics.
++        with psycopg.connect(dsn, autocommit=True) as conn:
++            if args.apply:
++                apply_started = True
++                result = apply_admission(conn, raw, expected_plan_sha256=args.expected_plan_sha256)
++            else:
++                result = plan_admission(conn, raw)
++        print(json.dumps(result, sort_keys=True, allow_nan=False))
++        return 0
++    except DomainError as error:
++        return _error(error.code)
++    except Exception:
++        # Neither str/repr(error), arbitrary class names nor tracebacks are safe.
++        return _error("FRESH-0010" if apply_started else "FRESH-0011")
++
++
++if __name__ == "__main__":
++    raise SystemExit(main())
+--- /dev/null
++++ b/tests/core/test_fresh_cpu_admission.py
+@@ -0,0 +1,447 @@
++"""Synthetic certs plus real mandatory PostgreSQL admission boundaries.
++
++These tests are NOT executed on the author's main host. The shared migrated /
++owner_engine fixtures allocate a disposable DB, fail on missing CI admin input,
++and audit it at teardown. No extra opt-in skip or live Node transport is used.
++"""
++
++import base64
++from concurrent.futures import ThreadPoolExecutor
++from copy import deepcopy
++from datetime import datetime, timedelta, timezone
++import json
++from threading import Barrier
++from types import SimpleNamespace
++from uuid import uuid4
++
++from cryptography import x509
++from cryptography.hazmat.primitives import serialization
++from cryptography.hazmat.primitives.asymmetric import ed25519
++from cryptography.x509.oid import ExtendedKeyUsageOID, NameOID
++import psycopg
++from psycopg import sql
++from psycopg.rows import dict_row
++import pytest
++
++from inv import fresh_cpu_admission as subject
++from inv.capacity import project_capacity
++from inv.errors import DomainError
++from inv.ids import new_id
++from inv.node_channels import node_uri, provision_channel
++from inv.tooling import NodePrincipal
++
++
++def encoded(body):
++    return json.dumps(body, separators=(",", ":")).encode()
++
++
++@pytest.fixture
++def request_factory():
++    def make(*, tenant=None, epoch=None, project=None, node=None, uri=None,
++             start=None, end=None, ca=False, client_only=False):
++        tenant, epoch = tenant or str(uuid4()), epoch or str(uuid4())
++        node = node or new_id("nod")
++        now = datetime.now(timezone.utc)
++        # Synthetic key exists only during a future test execution; never saved.
++        key = ed25519.Ed25519PrivateKey.generate()
++        name = x509.Name([x509.NameAttribute(NameOID.COMMON_NAME, "synthetic-admission")])
++        certificate = (
++            x509.CertificateBuilder().subject_name(name).issuer_name(name)
++            .public_key(key.public_key()).serial_number(x509.random_serial_number())
++            .not_valid_before(start or now - timedelta(minutes=1))
++            .not_valid_after(end or now + timedelta(hours=1))
++            .add_extension(x509.BasicConstraints(ca=ca, path_length=None), critical=True)
++            .add_extension(x509.SubjectAlternativeName([x509.UniformResourceIdentifier(
++                uri or node_uri(NodePrincipal(tenant, node), epoch),
++            )]), critical=False)
++            .add_extension(x509.ExtendedKeyUsage([
++                ExtendedKeyUsageOID.CLIENT_AUTH if client_only else ExtendedKeyUsageOID.SERVER_AUTH,
++            ]), critical=False).sign(key, algorithm=None)
++        )
++        return {
++            "requestVersion": 1, "tenantId": tenant, "recoveryEpoch": epoch,
++            "projectId": project or new_id("prj"), "nodeId": node,
++            "cpuResourceId": new_id("res"), "memoryResourceId": new_id("res"),
++            "endpoint": "https://cpu.synthetic.invalid:9443",
++            "certificateDERBase64": base64.b64encode(certificate.public_bytes(
++                serialization.Encoding.DER,
++            )).decode(),
++            "expectedTenantControlVersion": 0,
++            "cpuMillis": 500, "memoryBytes": 67108864,
++        }
++    return make
++
++
++@pytest.fixture
++def fresh_db(migrated, owner_engine, request_factory):
++    # Reuse mandatory root fixtures, including real production migrations.
++    params = owner_engine.url.translate_connect_args(username="user", database="dbname")
++    driver_connect = psycopg.connect
++
++    def connect():
++        return driver_connect(**params, autocommit=True)
++
++    tenant, other, project = str(uuid4()), str(uuid4()), new_id("prj")
++    with connect() as conn:
++        conn.execute("""INSERT INTO inv.control_epoch(singleton,epoch) VALUES(true,%s)
++            ON CONFLICT(singleton) DO NOTHING""", (str(uuid4()),))
++        epoch = str(conn.execute("SELECT epoch FROM inv.control_epoch WHERE singleton").fetchone()[0])
++        conn.execute("INSERT INTO inv.tenants(tenant_id,name) VALUES(%s,'synthetic'),(%s,'other')",
++                     (tenant, other))
++        conn.execute("INSERT INTO inv.projects(tenant_id,project_id) VALUES(%s,%s)", (tenant, project))
++    body = request_factory(tenant=tenant, epoch=epoch, project=project)
++    return SimpleNamespace(connect=connect, tenant=tenant, other=other,
++                           project=project, epoch=epoch, body=body)
++
++
++TABLES = ("nodes", "resources", "project_nodes", "node_channels", "node_channel_audit",
++          "node_controls", "node_resource_snapshots", "tenant_controls", "project_grants")
++
++
++def snapshot(db):
++    with db.connect() as conn:
++        return {
++            table: conn.execute(sql.SQL("SELECT to_jsonb(t) FROM inv.{} t WHERE tenant_id=%s "
++                                       "ORDER BY to_jsonb(t)::text").format(sql.Identifier(table)),
++                                (db.tenant,)).fetchall()
++            for table in TABLES
++        }
++
++
++def commit(db, body=None):
++    raw = encoded(db.body if body is None else body)
++    digest = subject.prepare_request(raw).digest()
++    with db.connect() as conn:
++        return subject.apply_admission(conn, raw, expected_plan_sha256=digest)
++
++
++def expect_refusal(db, code, body=None):
++    before = snapshot(db)
++    with pytest.raises(DomainError) as error:
++        commit(db, body)
++    assert error.value.code == code
++    assert snapshot(db) == before
++
++
++@pytest.mark.postgres
++def test_plan_select_only_and_apply_commits_exact_offline_rows(fresh_db):
++    db = fresh_db
++    before = snapshot(db)
++    with db.connect() as conn:
++        # PostgreSQL itself refuses persistent writes in this PLAN transaction.
++        conn.read_only = True
++        plan = subject.plan_admission(conn, encoded(db.body))
++    assert snapshot(db) == before
++    assert plan["mode"] == "PLAN" and plan["status"] == "READY"
++    assert plan["plan"]["certificateIssuerChainVerified"] is False
++    result = commit(db)
++    assert result["status"] == "COMMITTED" and result["planSha256"] == plan["planSha256"]
++    after = snapshot(db)
++    assert after["tenant_controls"] == before["tenant_controls"]
++    assert after["project_grants"] == before["project_grants"]
++    assert [len(after[t]) - len(before[t]) for t in TABLES[:6]] == [1, 2, 1, 1, 1, 1]
++    assert after["node_resource_snapshots"] == []
++    with db.connect() as conn:
++        conn.row_factory = dict_row
++        with conn.transaction():
++            conn.execute("SELECT set_config('inv.tenant_id',%s,true)", (db.tenant,))
++            capacity = project_capacity(conn, db.project, db.epoch)
++        assert capacity["nodes"] == []
++        assert capacity["spareNow"] == {"cpuMillis": 0, "memoryBytes": 0}
++        node = conn.execute("SELECT status FROM inv.nodes WHERE tenant_id=%s AND node_id=%s",
++                            (db.tenant, db.body["nodeId"])).fetchone()
++        assert node["status"] == "offline"
++    with db.connect() as conn:
++        assert subject.reconcile_admission(conn, encoded(db.body))["mode"] == "RECONCILE"
++    expect_refusal(db, "FRESH-0008")  # not an idempotent upsert/resume API
++
++
++@pytest.mark.postgres
++@pytest.mark.parametrize("role", ["inv_kernel", "inv_app"])
++def test_real_nonoperator_role_cannot_admit(fresh_db, role):
++    db = fresh_db
++    before = snapshot(db)
++    with db.connect() as conn:
++        conn.execute(sql.SQL("SET ROLE {}").format(sql.Identifier(role)))
++        with pytest.raises(DomainError) as error:
++            subject.apply_admission(conn, encoded(db.body),
++                                    expected_plan_sha256=subject.prepare_request(encoded(db.body)).digest())
++    assert error.value.code == "FRESH-0004"
++    assert snapshot(db) == before
++
++
++@pytest.mark.postgres
++@pytest.mark.parametrize("case", ["wrong-tenant", "missing-project", "wrong-epoch", "control-version"])
++def test_scope_epoch_version_refusals_preserve_every_row(fresh_db, case):
++    db, body = fresh_db, deepcopy(fresh_db.body)
++    code = "FRESH-0005"
++    if case == "wrong-tenant":
++        # Keep a valid matching certificate: the refusal must be DB scope, not DER.
++        with db.connect() as conn:
++            conn.execute("DELETE FROM inv.projects WHERE tenant_id=%s AND project_id=%s",
++                         (db.tenant, db.project))
++            conn.execute("INSERT INTO inv.projects(tenant_id,project_id) VALUES(%s,%s)",
++                         (db.other, db.project))
++    elif case == "missing-project":
++        body["projectId"] = new_id("prj")
++    elif case == "wrong-epoch":
++        # Replacing only epoch would be an earlier certificate refusal.
++        code = "NODE-0032"
++        body["recoveryEpoch"] = str(uuid4())
++    else:
++        code, body["expectedTenantControlVersion"] = "FRESH-0007", 1
++    expect_refusal(db, code, body)
++
++
++@pytest.mark.postgres
++def test_matching_certificate_with_wrong_current_epoch_is_refused(fresh_db, request_factory):
++    db = fresh_db
++    body = request_factory(tenant=db.tenant, project=db.project, epoch=str(uuid4()))
++    expect_refusal(db, "FRESH-0006", body)
++
++
++@pytest.mark.postgres
++@pytest.mark.parametrize("enabled,status,accepted", [(True, "active", True),
++                                                    (False, "active", False),
++                                                    (True, "archived", False)])
++def test_existing_business_link_requires_enabled_active_project(fresh_db, enabled, status, accepted):
++    db = fresh_db
++    with db.connect() as conn:
++        conn.execute("""INSERT INTO public.tenants(tenant_id,slug,display_name,version)
++            VALUES(%s,%s,'synthetic',1)""", (db.tenant, "admission-" + uuid4().hex))
++        conn.execute("""INSERT INTO public.projects
++            (project_id,tenant_id,code,display_name,status,version) VALUES(%s,%s,%s,'synthetic',%s,1)""",
++                     (db.project, db.tenant, "admission-" + uuid4().hex, status))
++        conn.execute("INSERT INTO inv.business_projects(tenant_id,project_id,enabled) VALUES(%s,%s,%s)",
++                     (db.tenant, db.project, enabled))
++    if accepted:
++        assert commit(db)["status"] == "COMMITTED"
++    else:
++        expect_refusal(db, "FRESH-0005")
++
++
++@pytest.mark.postgres
++def test_kill_switch_does_not_block_metadata_and_is_not_cleared(fresh_db):
++    db = fresh_db
++    with db.connect() as conn:
++        conn.execute("UPDATE inv.tenant_controls SET kill_switch=true,version=7 WHERE tenant_id=%s",
++                     (db.tenant,))
++    db.body["expectedTenantControlVersion"] = 7
++    before = snapshot(db)["tenant_controls"]
++    assert commit(db)["status"] == "COMMITTED"
++    assert snapshot(db)["tenant_controls"] == before
++
++
++@pytest.mark.postgres
++@pytest.mark.parametrize("collision", ["node", "cpu-resource", "memory-resource", "association", "channel"])
++def test_existing_identity_or_channel_is_never_repaired(fresh_db, collision):
++    db, body = fresh_db, fresh_db.body
++    old_node = new_id("nod") if collision.endswith("resource") else body["nodeId"]
++    with db.connect() as conn:
++        with conn.transaction():
++            conn.execute("SELECT set_config('inv.tenant_id',%s,true)", (db.tenant,))
++            conn.execute("""INSERT INTO inv.nodes(tenant_id,node_id,status,recovery_epoch)
++                VALUES(%s,%s,'offline',%s)""", (db.tenant, old_node, db.epoch))
++            if collision.endswith("resource"):
++                resource = body["cpuResourceId" if collision == "cpu-resource" else "memoryResourceId"]
++                conn.execute("""INSERT INTO inv.resources(tenant_id,resource_id,node_id,kind,capacity,offered)
++                    VALUES(%s,%s,%s,'cpu',1,1)""", (db.tenant, resource, old_node))
++            elif collision == "association":
++                conn.execute("INSERT INTO inv.project_nodes(tenant_id,project_id,node_id) VALUES(%s,%s,%s)",
++                             (db.tenant, db.project, old_node))
++            elif collision == "channel":
++                provision_channel(conn, NodePrincipal(db.tenant, old_node), epoch=db.epoch,
++                                  endpoint=body["endpoint"], expected_version=0,
++                                  certificate_der=base64.b64decode(body["certificateDERBase64"]))
++    expect_refusal(db, "FRESH-0008")
++
++
++@pytest.mark.postgres
++def test_changed_plan_and_outer_transaction_cannot_apply(fresh_db):
++    db = fresh_db
++    raw = encoded(db.body)
++    digest = subject.prepare_request(raw).digest()
++    changed = {**db.body, "endpoint": "https://different.synthetic.invalid:9443"}
++    before = snapshot(db)
++    with db.connect() as conn:
++        with pytest.raises(DomainError) as error:
++            subject.apply_admission(conn, encoded(changed), expected_plan_sha256=digest)
++        assert error.value.code == "FRESH-0002"
++        with conn.transaction():
++            conn.execute("SELECT 1")
++            with pytest.raises(DomainError) as error:
++                subject.apply_admission(conn, raw, expected_plan_sha256=digest)
++            assert error.value.code == "FRESH-0003"
++    assert snapshot(db) == before
++
++
++@pytest.mark.postgres
++def test_real_sql_failure_after_channel_audit_rolls_back_all_rows(fresh_db, monkeypatch):
++    db, original = fresh_db, subject.provision_channel
++
++    def fail_after_audit(conn, *args, **kwargs):
++        original(conn, *args, **kwargs)
++        conn.execute("SELECT 1/0")  # actual PostgreSQL transaction-aborting error
++
++    monkeypatch.setattr(subject, "provision_channel", fail_after_audit)
++    expect_refusal(db, "FRESH-0011")
++
++
++@pytest.mark.postgres
++def test_actual_readback_inconsistency_rolls_back(fresh_db, monkeypatch):
++    db, original = fresh_db, subject.provision_channel
++
++    def change_after_audit(conn, node, **kwargs):
++        original(conn, node, **kwargs)
++        conn.execute("""UPDATE inv.resources SET offered=0
++            WHERE tenant_id=%s AND node_id=%s""", (node.tenant_id, node.node_id))
++
++    monkeypatch.setattr(subject, "provision_channel", change_after_audit)
++    expect_refusal(db, "FRESH-0009")
++
++
++@pytest.mark.postgres
++def test_ready_plan_rechecks_controls_on_apply(fresh_db):
++    db = fresh_db
++    with db.connect() as conn:
++        plan = subject.plan_admission(conn, encoded(db.body))
++        conn.execute("""UPDATE inv.tenant_controls SET version=version+1,kill_switch=true
++            WHERE tenant_id=%s""", (db.tenant,))
++    assert plan["status"] == "READY"
++    expect_refusal(db, "FRESH-0007")
++
++
++@pytest.mark.postgres
++def test_unknown_commit_requires_read_only_reconcile_not_retry(fresh_db):
++    db = fresh_db
++
++    class LoseCommitAcknowledgement:
++        """Fault injection after a REAL outer PostgreSQL commit, not a fake DB."""
++        def __init__(self, conn):
++            self.conn, self.depth = conn, 0
++
++        def __getattr__(self, name):
++            return getattr(self.conn, name)
++
++        def transaction(self):
++            inner, owner = self.conn.transaction(), self
++            outer = self.depth == 0
++
++            class Transaction:
++                def __enter__(self):
++                    owner.depth += 1
++                    return inner.__enter__()
++
++                def __exit__(self, typ, value, traceback):
++                    try:
++                        result = inner.__exit__(typ, value, traceback)
++                    finally:
++                        owner.depth -= 1
++                    if outer and typ is None:
++                        raise OSError("synthetic lost commit acknowledgement")
++                    return result
++
++            return Transaction()
++
++    raw = encoded(db.body)
++    with db.connect() as conn:
++        with pytest.raises(DomainError) as error:
++            subject.apply_admission(LoseCommitAcknowledgement(conn), raw,
++                                    expected_plan_sha256=subject.prepare_request(raw).digest())
++        assert error.value.code == "FRESH-0010"
++    # A new connection observes the committed rows. No second APPLY is attempted.
++    assert [len(snapshot(db)[t]) for t in TABLES[:6]] == [1, 2, 1, 1, 1, 1]
++    before = snapshot(db)
++    with db.connect() as conn:
++        conn.read_only = True
++        assert subject.reconcile_admission(conn, raw)["status"] == "MATCHED_METADATA_REQUIRES_OPERATOR_DISPOSITION"
++    assert snapshot(db) == before
++
++
++@pytest.mark.postgres
++def test_concurrent_duplicate_has_one_committed_winner_no_partial(fresh_db, monkeypatch):
++    db, original, barrier = fresh_db, subject._preflight, Barrier(2)
++
++    def both_observe_absence(cursor, item, *, locked):
++        result = original(cursor, item, locked=locked)
++        barrier.wait(timeout=15)
++        return result
++
++    monkeypatch.setattr(subject, "_preflight", both_observe_absence)
++
++    def attempt(_):
++        try:
++            return commit(db)["status"]
++        except DomainError as error:
++            return error.code
++
++    with ThreadPoolExecutor(max_workers=2) as pool:
++        results = list(pool.map(attempt, range(2)))
++    assert sorted(results) == ["COMMITTED", "FRESH-0008"]
++    after = snapshot(db)
++    assert [len(after[t]) for t in TABLES[:6]] == [1, 2, 1, 1, 1, 1]
++
++
++@pytest.mark.parametrize("change", [
++    {"requestVersion": True}, {"requestVersion": 2}, {"cpuMillis": 500.0},
++    {"cpuMillis": True}, {"cpuMillis": 501}, {"memoryBytes": 0},
++    {"expectedTenantControlVersion": False}, {"expectedTenantControlVersion": -1},
++    {"expectedTenantControlVersion": 9007199254740992}, {"expectedTenantControlVersion": 1.0},
++    {"force": True}, {"operator": True}, {"tenantId": "invalid"}, {"projectId": "prj_bad"},
++    {"nodeId": None}, {"cpuResourceId": "res_bad"}, {"endpoint": 4},
++    {"certificateDERBase64": "@@"}, {"certificateDERBase64": "YQ==\n"},
++])
++def test_closed_request_types_and_limits_before_any_db(change, request_factory):
++    body = {**request_factory(), **change}
++    with pytest.raises(DomainError) as error:
++        subject.apply_admission(object(), encoded(body), expected_plan_sha256="0" * 64)
++    assert error.value.code == "FRESH-0001"
++
++
++def test_duplicate_keys_ids_nonfinite_oversize_and_noncanonical_base64(request_factory):
++    body = request_factory()
++    invalid = [
++        b'{"requestVersion":1,"requestVersion":1}', b'{"value":NaN}', b'[]', b'{}', b'\xff',
++        b'{"value":Infinity}', b"[" * 5000, b"x" * (subject.MAX_REQUEST_BYTES + 1),
++        encoded({**body, "memoryResourceId": body["cpuResourceId"]}),
++        encoded({**body, "certificateDERBase64": base64.b64encode(b"x" * 65537).decode()}),
++        encoded({**body, "certificateDERBase64": "YR=="}),  # decodes like YQ==, noncanonical
++    ]
++    for raw in invalid:
++        with pytest.raises(DomainError) as error:
++            subject.prepare_request(raw)
++        assert error.value.code == "FRESH-0001"
++
++
++@pytest.mark.postgres
++def test_missing_tenant_with_matching_public_identity_is_refused(fresh_db, request_factory):
++    db = fresh_db
++    body = request_factory(project=db.project, epoch=db.epoch)
++    expect_refusal(db, "FRESH-0005", body)
++
++
++@pytest.mark.parametrize("case", ["wrong-uri", "wrong-epoch", "expired", "future", "ca", "client", "malformed"])
++def test_public_certificate_identity_rejections(request_factory, case):
++    now = datetime.now(timezone.utc)
++    kwargs = {
++        "wrong-uri": {"uri": "spiffe://synthetic.invalid/wrong"},
++        "wrong-epoch": {"uri": node_uri(NodePrincipal(str(uuid4()), new_id("nod")), str(uuid4()))},
++        "expired": {"start": now - timedelta(hours=2), "end": now - timedelta(hours=1)},
++        "future": {"start": now + timedelta(hours=1), "end": now + timedelta(hours=2)},
++        "ca": {"ca": True}, "client": {"client_only": True}, "malformed": {},
++    }[case]
++    body = request_factory(**kwargs)
++    if case == "malformed":
++        body["certificateDERBase64"] = base64.b64encode(b"not-a-certificate").decode()
++    with pytest.raises(DomainError) as error:
++        subject.apply_admission(object(), encoded(body), expected_plan_sha256="0" * 64)
++    assert error.value.code == "NODE-0032"
++
++
++@pytest.mark.parametrize("endpoint", ["http://synthetic.invalid", "https://u:p@synthetic.invalid",
++                                      "https://synthetic.invalid/path", "https://synthetic.invalid?secret=x"])
++def test_endpoint_contract_is_unchanged(request_factory, endpoint):
++    body = {**request_factory(), "endpoint": endpoint}
++    with pytest.raises(DomainError) as error:
++        subject.prepare_request(encoded(body))
++    assert error.value.code == "NODE-0031"
+--- /dev/null
++++ b/tests/core/test_fresh_cpu_admission_cli.py
+@@ -0,0 +1,133 @@
++"""Bounded public stdin / explicit apply / secret-safe CLI, no subprocesses."""
++
++import importlib.util
++from io import BytesIO
++import json
++from pathlib import Path
++from types import SimpleNamespace
++
++import pytest
++
++from inv.errors import DomainError
++from inv.fresh_cpu_admission import MAX_REQUEST_BYTES, prepare_request
++from test_fresh_cpu_admission import encoded, fresh_db, request_factory, snapshot  # noqa: F401
++
++
++@pytest.fixture
++def cli():
++    path = Path(__file__).resolve().parents[2] / "tools/fresh_cpu_admission.py"
++    spec = importlib.util.spec_from_file_location("fresh_cpu_admission_cli_under_test", path)
++    module = importlib.util.module_from_spec(spec)
++    spec.loader.exec_module(module)
++    return module
++
++
++def stdin(monkeypatch, cli, raw):
++    monkeypatch.setattr(cli.sys, "stdin", SimpleNamespace(buffer=BytesIO(raw)))
++
++
++@pytest.mark.postgres
++def test_cli_default_plan_and_explicit_apply_use_real_db(cli, fresh_db, monkeypatch, capsys):
++    db, secret = fresh_db, "SYNTHETIC_CLI_CONNECTION_MARKER"
++    calls = []
++
++    def connect(dsn, *, autocommit):
++        assert dsn == secret and autocommit is True
++        calls.append("db")
++        return db.connect()
++
++    monkeypatch.setenv("SV_FRESH_NODE_OPERATOR_DSN", secret)
++    monkeypatch.setattr(cli.psycopg, "connect", connect)
++    before = snapshot(db)
++    stdin(monkeypatch, cli, encoded(db.body))
++    assert cli.main([]) == 0
++    output = capsys.readouterr()
++    plan = json.loads(output.out)
++    assert plan["mode"] == "PLAN" and not output.err
++    assert snapshot(db) == before
++    stdin(monkeypatch, cli, encoded(db.body))
++    assert cli.main(["--apply", "--expected-plan-sha256", plan["planSha256"]]) == 0
++    output = capsys.readouterr()
++    assert json.loads(output.out)["status"] == "COMMITTED" and not output.err
++    assert secret not in output.out + output.err
++    assert calls == ["db", "db"]
++
++
++@pytest.mark.parametrize("argv", [
++    ["--dsn", "SYNTHETIC_ARGV_SECRET"], ["--request-file", "SYNTHETIC_ARGV_SECRET"],
++    ["--apply"], ["--expected-plan-sha256", "0" * 64],
++    ["--apply", "--expected-plan-sha256", "SYNTHETIC_ARGV_SECRET"],
++    ["--dsn-env", "invalid=SYNTHETIC_ARGV_SECRET"],
++])
++def test_rejected_argv_never_echoes_argument_values(cli, monkeypatch, capsys, argv):
++    def forbidden(*args, **kwargs):
++        raise AssertionError("must refuse before connect")
++
++    monkeypatch.setattr(cli.psycopg, "connect", forbidden)
++    assert cli.main(argv) == 2
++    output = capsys.readouterr()
++    assert not output.out and "SYNTHETIC_ARGV_SECRET" not in output.err
++    assert json.loads(output.err)["code"] == "FRESH-0001"
++
++
++@pytest.mark.parametrize("stage", ["parse", "connect", "plan", "apply", "forged-domain-code"])
++def test_exception_and_request_secrets_never_escape(cli, request_factory, monkeypatch, capsys, stage):
++    marker = "SYNTHETIC_EXCEPTION_CREDENTIAL_MARKER"
++    body = request_factory()
++    raw = encoded(body) if stage != "parse" else ('{"' + marker + '":NaN}').encode()
++    monkeypatch.setenv("SV_FRESH_NODE_OPERATOR_DSN", marker)
++    stdin(monkeypatch, cli, raw)
++
++    class Connection:
++        def __enter__(self):
++            return self
++
++        def __exit__(self, *args):
++            return False
++
++    def explode(*args, **kwargs):
++        raise RuntimeError(marker)
++
++    monkeypatch.setattr(cli.psycopg, "connect", explode if stage == "connect" else lambda *a, **k: Connection())
++    monkeypatch.setattr(cli, "plan_admission", explode)
++    monkeypatch.setattr(cli, "apply_admission", explode)
++    if stage == "forged-domain-code":
++        def forged(*args, **kwargs):
++            raise DomainError(marker, marker, 500)
++        monkeypatch.setattr(cli, "plan_admission", forged)
++    argv = []
++    if stage == "apply":
++        argv = ["--apply", "--expected-plan-sha256", prepare_request(raw).digest()]
++    assert cli.main(argv) in (2, 3)
++    output = capsys.readouterr()
++    assert not output.out and marker not in output.err and "Traceback" not in output.err
++    result = json.loads(output.err)
++    assert result["automaticRetryAllowed"] is False
++    if stage == "apply":
++        assert result["status"] == "UNKNOWN_RECONCILE_REQUIRED"
++
++
++def test_digest_refused_before_connection_and_input_read_is_bounded(cli, request_factory, monkeypatch, capsys):
++    def forbidden(*args, **kwargs):
++        raise AssertionError("must not connect")
++
++    monkeypatch.setattr(cli.psycopg, "connect", forbidden)
++    stdin(monkeypatch, cli, encoded(request_factory()))
++    assert cli.main(["--apply", "--expected-plan-sha256", "0" * 64]) == 2
++    assert json.loads(capsys.readouterr().err)["code"] == "FRESH-0002"
++
++    class BoundStream:
++        def read(self, count):
++            assert count == MAX_REQUEST_BYTES + 1
++            return b"x" * count
++
++    monkeypatch.setattr(cli.sys, "stdin", SimpleNamespace(buffer=BoundStream()))
++    assert cli.main([]) == 2
++    assert json.loads(capsys.readouterr().err)["code"] == "FRESH-0001"
++
++
++def test_missing_selected_environment_is_closed(cli, request_factory, monkeypatch, capsys):
++    monkeypatch.delenv("SYNTHETIC_MISSING_DSN", raising=False)
++    stdin(monkeypatch, cli, encoded(request_factory()))
++    assert cli.main(["--dsn-env", "SYNTHETIC_MISSING_DSN"]) == 2
++    assert json.loads(capsys.readouterr().err)["code"] == "FRESH-0012"

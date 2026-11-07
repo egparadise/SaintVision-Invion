@@ -1,0 +1,80 @@
+[
+  {
+    "name": "docs",
+    "command": [
+      "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+      "-I",
+      "-B",
+      "-X",
+      "utf8",
+      "tools/check_docs.py"
+    ],
+    "startedAtKST": "2026-11-07T13:36:26.396361+09:00",
+    "exitCode": 0,
+    "stdoutSHA256": "faacec022aa7931f81b0bfc68eb38fff5d2b11838a7a3ea36d213fc7cb852b33",
+    "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "name": "path-ratchet",
+    "command": [
+      "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+      "-I",
+      "-B",
+      "-X",
+      "utf8",
+      "tools/check_doc_path_citations.py",
+      "--ratchet",
+      "--base-ref",
+      "7033778ad3d2bc284e36f7e29be7597dbb7d9f23"
+    ],
+    "startedAtKST": "2026-11-07T13:36:33.910477+09:00",
+    "exitCode": 0,
+    "stdoutSHA256": "389921b50662776ed834a285f70fc44ab61f7d5bdb4c5249c0a73c98113980de",
+    "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "name": "canonical-sync-check",
+    "command": [
+      "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+      "-I",
+      "-B",
+      "-X",
+      "utf8",
+      "tools/sync_obsidian.py",
+      "--check",
+      "--state",
+      "D:\\Project\\SaintVision-Invion\\SaintVisionI-Invion\\.git\\obsidian-sync-state.json",
+      "--conflicts-out",
+      "D:\\Project\\SaintVisionI-Invion\\fleet5-k2-d04-l1-r2-20261107\\docs\\vault\\30_Development\\Evidence\\fleet5-fresh-cpu-admission-code-r1-20261107-codex\\publication-v2\\final-doc-gates\\sync-conflicts.json"
+    ],
+    "startedAtKST": "2026-11-07T13:36:37.830729+09:00",
+    "before": {
+      "path": "D:\\Project\\SaintVision-Invion\\SaintVisionI-Invion\\.git\\obsidian-sync-state.json",
+      "sha256": "36d948a780874537f051beb203ba5ecc3e4e9326bae78de69e3c06ceb1d74115",
+      "bytes": 481556,
+      "mtimeNs": 1794024557925220300
+    },
+    "exitCode": 0,
+    "stdoutSHA256": "9e5b7fdb35b56c65af65acdcbe0e7e19b61f10fff942a0514651c216625ffe02",
+    "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "after": {
+      "path": "D:\\Project\\SaintVision-Invion\\SaintVisionI-Invion\\.git\\obsidian-sync-state.json",
+      "sha256": "36d948a780874537f051beb203ba5ecc3e4e9326bae78de69e3c06ceb1d74115",
+      "bytes": 481556,
+      "mtimeNs": 1794024557925220300
+    },
+    "stateHashesEqual": true
+  },
+  {
+    "name": "diff-check",
+    "command": [
+      "git",
+      "diff",
+      "--check"
+    ],
+    "startedAtKST": "2026-11-07T13:36:50.379888+09:00",
+    "exitCode": 0,
+    "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+]

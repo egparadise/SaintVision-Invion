@@ -1,0 +1,11 @@
+{
+  "kind": "AUTHOR_STATIC_INSPECTION_SCRIPT_FAILURE_NOT_PRODUCT_TEST_RESULT",
+  "command": "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe -I -B docs/vault/30_Development/Evidence/fleet5-fresh-cpu-admission-code-r1-20261107-codex/verify-wip-static.py",
+  "exitCode": 1,
+  "phase": "AST parameter entry counting, before artifact publication",
+  "cause": "ast.literal_eval rejected a source BinOp representing a repeated synthetic string in a parametrize entry",
+  "sourceFact": "All four new source files had already passed standalone ast.parse; no product module, crypto, CLI, PostgreSQL or pytest was executed",
+  "correction": "Count the AST List/Tuple elts directly without evaluating any parameter expression",
+  "productFilesChangedForCorrection": false,
+  "nextAction": "Run the corrected source/data-only verifier once and preserve both actual results"
+}
