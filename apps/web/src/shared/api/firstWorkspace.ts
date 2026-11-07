@@ -129,6 +129,7 @@ export class FirstWorkspaceRequest {
   private prepareBody: string | null = null;
   private prepared: WorkspaceStartPrepareResult | null = null;
   private enqueueBody: string | null = null;
+  private observationGeneration = 0;
   get inputLocked() { return this.prepareBody !== null; }
   constructor(readonly scope: WorkspaceScope, private readonly selected?: { intent: WorkspaceFirstIntent; nodeId: string }) {
     this.scope = { ...scope };
@@ -162,7 +163,7 @@ export class FirstWorkspaceRequest {
   }
   async create(): Promise<ControlRunView> {
     return this.exclusive(async () => {
-      if (this.run) return this.run;
+      if (this.run) return this.readCreatedRun();
       const selected = this.selected;
       const endpoint = selected ? `/v1/projects/${encodeURIComponent(this.scope.projectId)}/workspaces/${selected.intent.workspaceId}/first-intents/${selected.intent.workload.workloadId}/runs` : this.base;
       const raw = await apiClient<ControlRunView | WorkspaceFirstRunCreateResult>(endpoint, {
@@ -179,8 +180,18 @@ export class FirstWorkspaceRequest {
         result = created.run;
       } else result = raw as ControlRunView;
       this.assertCurrent(); assertFirstRun(result, this.scope);
-      this.run = result; return result;
+      this.run = result; return this.readCreatedRun();
     });
+  }
+  private async readCreatedRun(): Promise<ControlRunView> {
+    if (!this.run) throw new Error('실제 생성 Run이 없습니다.');
+    const current = await apiClient<ControlRunDetail>(`${this.base}/${this.run.runId}`);
+    this.assertCurrent(); assertFirstRun(current, this.scope, this.run.runId);
+    if (current.version < this.run.version) throw new Error('이전 생성 응답보다 오래된 Run 관측입니다.');
+    // A creation replay contains the original draft snapshot; GET supplies current state.
+    const { runId, tenantId, projectId, state, version, attempt } = current;
+    this.run = { runId, tenantId, projectId, state, version, attempt };
+    return this.run;
   }
   async prepare(workload: WorkloadSpec, files: InputFile[], stepId: string): Promise<WorkspaceStartPrepareResult> {
     return this.exclusive(async () => {
@@ -256,16 +267,20 @@ export class FirstWorkspaceRequest {
   }
   async observe(): Promise<WorkspaceStartView> {
     this.assertCurrent();
+    const generation = ++this.observationGeneration;
     if (!this.run || !this.prepared) throw new Error('현재 동결 입력이 없습니다.');
     const result = await apiClient<WorkspaceStartView>(`${this.base}/${this.run.runId}/starts/${this.startId}`);
     this.assertCurrent(); await this.validateFrozen(result); this.assertCurrent();
+    if (generation !== this.observationGeneration) throw new Error('이전 상태 조회 응답이므로 반영하지 않습니다.');
     this.run = result.run; return result;
   }
   async recoverFrozen(): Promise<WorkspaceStartView> {
     this.assertCurrent();
+    const generation = ++this.observationGeneration;
     if (!this.run) throw new Error('같은 논리 요청의 Run을 먼저 재확인하세요.');
     const result = await apiClient<WorkspaceStartView>(`${this.base}/${this.run.runId}/starts/${this.startId}`);
     this.assertCurrent(); await this.validateFrozen(result); this.assertCurrent();
+    if (generation !== this.observationGeneration) throw new Error('이전 동결 입력 조회 응답입니다.');
     if (!result.approval) throw new Error('승인 안건이 없습니다.');
     this.prepared = { startId: result.startId, workload: result.workload, run: result.run, approval: result.approval };
     this.run = result.run; return result;

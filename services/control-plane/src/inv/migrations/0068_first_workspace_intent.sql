@@ -5,11 +5,15 @@ DO $$ BEGIN
  END IF;
  IF EXISTS(SELECT 1 FROM pg_roles WHERE rolname='inv_first_workspace_writer'
            AND (rolcanlogin OR rolsuper OR rolbypassrls OR rolcreatedb OR rolcreaterole OR rolinherit))
-    OR EXISTS(SELECT 1 FROM pg_auth_members WHERE roleid='inv_first_workspace_writer'::regrole) THEN
+    OR EXISTS(SELECT 1 FROM pg_auth_members WHERE roleid='inv_first_workspace_writer'::regrole OR member='inv_first_workspace_writer'::regrole)
+    OR EXISTS(SELECT 1 FROM pg_namespace WHERE nspowner='inv_first_workspace_writer'::regrole)
+    OR EXISTS(SELECT 1 FROM pg_class WHERE relowner='inv_first_workspace_writer'::regrole) THEN
   RAISE EXCEPTION 'Dedicated first Workspace writer role is unsafe';
  END IF;
 END $$;
 GRANT USAGE ON SCHEMA inv,public TO inv_first_workspace_writer;
+GRANT SELECT(singleton,epoch) ON inv.control_epoch TO inv_first_workspace_writer;
+GRANT SELECT(tenant_id,kill_switch) ON inv.tenant_controls TO inv_first_workspace_writer;
 GRANT SELECT(tenant_id,project_id,subject_id,enabled,can_request) ON inv.project_grants TO inv_first_workspace_writer;
 GRANT UPDATE(lock_sentinel) ON inv.project_grants TO inv_first_workspace_writer;
 GRANT SELECT(tenant_id,project_id,enabled) ON inv.business_projects TO inv_first_workspace_writer;
@@ -41,6 +45,10 @@ DECLARE
  v_subject text := nullif(current_setting('inv.first_workspace_subject',true),'');
  v_user text; v_status text; v_version bigint; v_resources jsonb; v_arg jsonb;
 BEGIN
+ IF nullif(current_setting('inv.first_workspace_epoch',true),'') IS NULL OR
+ NOT EXISTS(SELECT 1 FROM inv.control_epoch WHERE singleton AND epoch::text=current_setting('inv.first_workspace_epoch',true)) OR
+ NOT coalesce((SELECT NOT kill_switch FROM inv.tenant_controls WHERE tenant_id=v_tenant),false) THEN
+  RAISE EXCEPTION 'Current epoch and tenant admission required' USING ERRCODE='42501'; END IF;
  IF v_tenant IS NULL OR v_subject IS NULL OR v_subject !~ '^oidc:[0-9a-f]{64}$' THEN
   RAISE EXCEPTION 'Verified service context required' USING ERRCODE='42501'; END IF;
  IF NOT coalesce((SELECT enabled AND can_request FROM inv.project_grants WHERE tenant_id=v_tenant AND project_id=p_project AND subject_id=v_subject FOR SHARE),false)
@@ -100,6 +108,10 @@ DECLARE
  v_subject text := nullif(current_setting('inv.first_workspace_subject',true),'');
  v_user text; v_status text; v_workspace_version bigint; v_spec jsonb; v_sha text; v_workload_version bigint;
 BEGIN
+ IF nullif(current_setting('inv.first_workspace_epoch',true),'') IS NULL OR
+ NOT EXISTS(SELECT 1 FROM inv.control_epoch WHERE singleton AND epoch::text=current_setting('inv.first_workspace_epoch',true)) OR
+ NOT coalesce((SELECT NOT kill_switch FROM inv.tenant_controls WHERE tenant_id=v_tenant),false) THEN
+  RAISE EXCEPTION 'Current epoch and tenant admission required' USING ERRCODE='42501'; END IF;
  IF v_tenant IS NULL OR v_subject IS NULL OR v_subject !~ '^oidc:[0-9a-f]{64}$' THEN
   RAISE EXCEPTION 'Verified service context required' USING ERRCODE='42501'; END IF;
  IF NOT coalesce((SELECT enabled AND can_request FROM inv.project_grants WHERE tenant_id=v_tenant AND project_id=p_project AND subject_id=v_subject FOR SHARE),false)

@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "revision": "0067_audit_reader_revoke",
+  "revision": "0068_first_workspace_intent",
   "referenceSource": "1e8baf045c5a554209aaef601ae4883b64da50a7",
   "scope": "Exact catalogue definitions and execute grants; runtime authorization tests remain required",
   "functions": {
@@ -109,6 +109,22 @@
         "inv_app"
       ],
       "kind": "tenant-bound"
+    },
+    "inv.append_first_workspace_intent(text, text, jsonb, text, text, text, bigint)": {
+      "definitionSHA256": "a92b76b6a0f01d5fb63db6b0f3189f630bac271e18c02a6ad52cb56a483b6064",
+      "executeRoles": [
+        "inv_kernel"
+      ],
+      "kind": "tenant-bound",
+      "sourceMigrationSHA256": "8b79f55289661d7590dbe24e60d60d319360e7fcaf35454fe21c722fe11905d3"
+    },
+    "inv.append_first_workspace_run(text, text, text, text, bigint, bigint, text, text)": {
+      "definitionSHA256": "7acaf7b9d1354918e04a6fc944a4419dee0314a177519b40e3591abc80f6fcaa",
+      "executeRoles": [
+        "inv_kernel"
+      ],
+      "kind": "tenant-bound",
+      "sourceMigrationSHA256": "8b79f55289661d7590dbe24e60d60d319360e7fcaf35454fe21c722fe11905d3"
     }
   }
 }

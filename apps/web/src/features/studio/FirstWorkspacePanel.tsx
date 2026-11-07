@@ -24,9 +24,8 @@ function approvalItem(a: NonNullable<WorkspaceStartView['approval']>): ApprovalI
     policyReason: a.policyVersion, requiredApprovals: a.requiredApprovals, expiresAt: a.expiresAt };
 }
 
-/** The business source gap is explicit: a workspace summary is never a WorkloadSpec.
- * Root owns the missing selected-intent read/atomic create serving contract. Until
- * that exact contract is pinned, creation of a business Run stays unavailable.
+/** Only the selected server intent can create a business Run. Workspace summaries
+ * never become WorkloadSpecs; missing readiness/identity stays a prerequisite.
  */
 export function FirstWorkspacePanel(props: FirstWorkspacePanelProps) {
   return <ScopedFirstWorkspacePanel key={firstScopeKey(props.scope)} {...props} />;
@@ -90,7 +89,7 @@ function ScopedFirstWorkspacePanel({ scope, onRunObserved, onNavigateApprovals }
     catch (err) {
       if (live.current === generation && getAuthToken() === credential) {
         // A transport/shape/5xx failure cannot tell whether the server committed.
-        setUncertain(true); setError(err instanceof Error ? err.message : '서버 요청이 거부되었습니다.');
+        setUncertain(true); setResult(null); setError(err instanceof Error ? err.message : '서버 요청이 거부되었습니다.');
       }
     } finally { if (live.current === generation && getAuthToken() === credential) setBusy(false); }
   }

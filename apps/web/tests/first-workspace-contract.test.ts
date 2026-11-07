@@ -123,6 +123,12 @@ describe('first Workspace closed mutations and observed state', () => {
     expect(calls('/runs').map(([, init]) => new Headers(init.headers).get('Idempotency-Key'))).toEqual([first.createKey, first.createKey]);
     expect(sessionStorage.getItem(`saintvision.first-workspace.request:${JSON.stringify([golden.scope.tenantId, golden.scope.subjectId, golden.scope.projectId])}`)).not.toContain('token');
   });
+  it('reads current state after creation replay instead of treating the original draft snapshot as current', async () => {
+    fetchMock.mockResolvedValueOnce(response(golden.run, 201)).mockResolvedValueOnce(response({ ...golden.run, state: 'running', version: 6, attempt: 1, resourceReleasePending: true }));
+    const request = new FirstWorkspaceRequest(golden.scope);
+    expect(await request.create()).toMatchObject({ runId: golden.run.runId, state: 'running', version: 6, attempt: 1 });
+    expect(calls('/runs')).toHaveLength(1);
+  });
   it('does not treat malformed 201 as success or create a different logical Run', async () => {
     const request = new FirstWorkspaceRequest(golden.scope);
     fetchMock.mockResolvedValueOnce(response({ accepted: true }, 201));

@@ -1,0 +1,19 @@
+{
+  "sourceSHA": "414f7144712ed7d9bdd783480b963e6f1df16495",
+  "Frontend": 42361862227,
+  "Core": 42361864309,
+  "Backend": 42361866380,
+  "Docs": 42361868626,
+  "provenFailures": [
+    "Frontend ESLint and portal tsc found the same unused selectedProject after removing legacy dispatch; removed dead variable",
+    "Core migration upgrade rejected new helper definitions as unrecognized and policy revision0067 versus newhead0068; exact source-derived definitions and kernel-only EXECUTE added to existing allowlist; no audit rule relaxed"
+  ],
+  "additionalHardening": [
+    "Read actual Run state after idempotent create replay; never display original draft snapshot as current",
+    "Ignore out-of-order first-start observations",
+    "Invalidate stale displayed results after failure",
+    "SQL helper rechecks verified-service epoch context and current containment; dedicated owner refuses memberships and schema/table ownership"
+  ],
+  "status": "Fresh all4 workflows required on corrected source; first candidate not accepted",
+  "actualOperations": "NOT_RUN"
+}

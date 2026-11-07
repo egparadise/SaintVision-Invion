@@ -387,7 +387,6 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
   const activeDiff = computeDiff(activeFile.path, baseContents[activeFile.path] || '', activeFile.content);
 
   // Selected project & workspace objects (Live run takes precedence over initial runs prop)
-  const selectedProject = projects.find((p) => p.id === selectedProjectId) || projects[0];
   const currentRun = (liveRun && liveRun.id === activeRunId ? liveRun : runs.find((r) => r.id === activeRunId)) || runs[0];
   const boundNode = nodes.find((n) => n.id === (currentRun?.nodeId || selectedNodeId));
   const matchedApproval = approvals.find((a) => a.runId === (currentRun?.id || activeRunId));

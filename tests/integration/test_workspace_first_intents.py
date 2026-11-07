@@ -215,6 +215,7 @@ def test_helper_privileges_rls_and_missing_context_are_real_not_superuser_result
     with psycopg.connect(a.e.runtime) as conn:
         for rollback in (False,True):
             conn.execute("SELECT set_config('inv.first_workspace_subject',%s,true)",(a.jwt.subject("requester"),))
+        conn.execute("SELECT set_config('inv.first_workspace_epoch',%s,true)",(a.e.epoch,))
             conn.rollback() if rollback else conn.commit()
             assert not conn.execute("SELECT nullif(current_setting('inv.first_workspace_subject',true),'')").fetchone()[0]
             conn.rollback()

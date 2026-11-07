@@ -49,6 +49,7 @@ class WorkspaceIntents:
         permission(conn, project, principal.subject_id, "can_request", linked=True)
         # Only called after authenticated route supplied the verified principal.
         conn.execute("SELECT set_config('inv.first_workspace_subject',%s,true)", (principal.subject_id,))
+        conn.execute("SELECT set_config('inv.first_workspace_epoch',%s,true)", (self.db.recovery_epoch,))
 
     def _selected(self, conn, project, workspace):
         validate_contract("WorkspaceId", workspace)
