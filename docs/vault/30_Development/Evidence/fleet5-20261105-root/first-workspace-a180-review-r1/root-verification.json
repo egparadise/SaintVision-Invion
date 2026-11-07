@@ -1,0 +1,30 @@
+{
+  "atKST": "2026-11-07T21:39:37+09:00",
+  "reviewSHA": "a18095e2aff59433b93bdd755a2d050a26c15546",
+  "source": "90578f49ea400958fcdbc1ded3908d624e856f57",
+  "RootInputSHA": "7454c7e2ce77ac4eb3415ccaec1ad0f84b949864",
+  "directParentRemoteExact": true,
+  "onlyFourOwnAddedDocs": true,
+  "RootPinsIndependentlyMatched": 9,
+  "verdict": "CHANGES_REQUIRED_ONE_BOUNDED_TEST_ADEQUACY_DEFECT_KEEP_REAL_DEPLOYMENT_GATES",
+  "mandatoryFinding": "CR-905-01 Medium TEST_ONLY",
+  "mandatoryFindingCount": 1,
+  "productionDefectFoundByReviewer": false,
+  "actualCodeAcceptance": false,
+  "Docs": 42373094088,
+  "DocsJob": 128405062880,
+  "correlation": "fleet5-first-workspace-905-review-r1-claude-70269a2cc0be433db16aa817134c6a06",
+  "manualAttempt1All19Success": true,
+  "reviewerReportedFullBytesEqual": true,
+  "currentFullCanonicalHashMatchesRootStartAndReviewerBothEndpoints": true,
+  "canonicalBytes": 506663,
+  "canonicalSHA256": "100edcbb4ab919810d0a8c45b58c7cef5adcf188349d5375b70b451c480ae0c1",
+  "reviewerLifecycle": {
+    "state": "succeeded",
+    "stage": "settled",
+    "liveness": "exited",
+    "terminalState": "released"
+  },
+  "next": "Same author bounded test-only delta, exact Core/Backend/Docs then one actual Claude delta review; keep SQL/production/definer hashes unchanged",
+  "wholeProgramComplete": false
+}

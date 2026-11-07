@@ -1,15 +1,19 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.479"
+version: "1.0.480"
 status: "review"
 author: "Codex"
-updated: "2026-11-07T21:22:21+09:00"
+updated: "2026-11-07T21:41:54+09:00"
 source_of_truth: "Git"
 active_card: "FLEET5 continued supervision with PORTAL-REFRESH-FLEET-20261106"
-active_card_status: "FirstWorkspace905OneActualClaudeCodeReviewReadyLive_CIAndRoot517CanonicalVerified_ActualDeploymentPending_RootApplyDeferredDuringReviewerWindow"
-active_card_next: "Wait actual Claude ctx_d81ff9be418f/task_78c38a4a863c finite code verdict or question; Root verifies proof and exit/release then protected PC3 deployment after acceptance. No main product execution. Real approval/user Run/PC1/PC5/five-PC gates pending."
+active_card_status: "FirstWorkspaceActualReviewA180ChangesRequiredOneTestOnlyCR90501_ProductionNoDefectFound_ReviewerExitedReleased_AuthorTestFixReady_ActualDeploymentPending"
+active_card_next: "Root latest canonical report after closed Claude window, then actual author ctx200 followup for CR-905-01 test-only on905; exact Core/Backend/Docs then one Claude delta review. Keep SQL/production/definer pins unchanged. Root owns O1-O6; real Run/PC1/PC5/five-PC gates pending."
 ---
+
+## 2026-11-07T21:41:54+09:00 실제 코드 검토의 필수 시험 보완 한 건
+
+실제 Claude 코드 검토는 제품 결함을 발견하지 않았지만, 직접 SQL 거부 시험의 필수 보완 CR-905-01 한 건을 남겼다. 기존 음성 시험은 epoch 문맥을 설정하지 않아 의도한 guard에 도달하지 못했고 intent helper의 직접 CPU/GPU/형식/target 거부 증거가 빠졌다. Root는 원본 판정·정확 Docs·9개 입력 hash와 실제 검토자 종료·해제를 확인했다. SQL/제품/definer pin은 보존하고 원 작성자에게 시험만 보완시킨 뒤 정확 CI와 한 번의 delta 재검토로 확인한다. 아직 코드 최종 수락·배포·실제 Run·5대 인수는 아니다. 원본review.json과출처/CI/상태비교를Root Evidence에동결했다. 아직저자후속Task를시작했다고대신표시하지않는다.
 
 ## 2026-11-07T21:22:21+09:00 실제 Claude 독립 코드 검토 착수
 
