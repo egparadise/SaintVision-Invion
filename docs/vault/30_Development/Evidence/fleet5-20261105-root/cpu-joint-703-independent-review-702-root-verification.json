@@ -1,0 +1,69 @@
+{
+  "atKST": "2026-11-07T13:58:28+09:00",
+  "source": "7033778ad3d2bc284e36f7e29be7597dbb7d9f23",
+  "review": "7023992f3a183b690f35bbf00f38983cbdcbca4c",
+  "directParentExact": true,
+  "remoteExact": true,
+  "onlyOwn7AddedReviewDocs": true,
+  "Docs": 42340533148,
+  "DocsJob": 128307001774,
+  "correlation": "FLEET5-CPU-703-INTEGRATION-REVIEW-DOCS-7023992f3a18-95bf716a4c61",
+  "exactManualDocsAll19Success": true,
+  "verdict": "ACCEPT_JOINT_703_INTEGRATION_CODE_KEEP_ACTUAL_HOLD",
+  "severity": {
+    "mandatoryCurrentScope": 0,
+    "HIGH": 0,
+    "MEDIUM": 0,
+    "LOW": 0,
+    "INFO": 3
+  },
+  "reviewerOwnDATA18ChecksExit0": true,
+  "findings": [
+    {
+      "id": "J703-I1",
+      "severity": "INFO",
+      "mandatory": false,
+      "where": "dispatch.py:284 DeliveryQueue.finish",
+      "text": "finish re-reads attempt.operation only when not_sent is true. Rejected-origin paths always pass not_sent False, so the guard path never reaches it, and the real frozen DeliveryAttempt carries a builtin literal. Pre-existing, unchanged in 703, already acknowledged in the test spy comment. Not an integration defect."
+    },
+    {
+      "id": "J703-I2",
+      "severity": "INFO",
+      "mandatory": false,
+      "where": "dispatch.py:338",
+      "text": "A rejected origin maps to the generic SYS-0001 and stays uncertain with capped retry instead of a dedicated terminal code. It is unreachable from the real acquire (literals only), so this is fail-closed defense-in-depth. A distinct error code could be a FUTURE observability card; not required now."
+    },
+    {
+      "id": "J703-I3",
+      "severity": "INFO",
+      "mandatory": false,
+      "where": "tests/core/test_delivery_operation_origin.py",
+      "text": "The 24 cases exercise the real once with replaced collaborators and make no SQL claim. Real-PG queue behaviour for valid operations is covered only by the existing suites in the hosted Backend/Core lanes at 703, which passed. Root ran the 746 BASE causal RED on its original source; it was not rerun on 703 and is not needed for the integration verdict because the once member is byte-identical to 746."
+    }
+  ],
+  "rootReceiptHashesMatchReviewerAttribution": true,
+  "canonicalGitBlobSHA256": {
+    "docs/vault/30_Development/Evidence/fleet5-cpu-703-integration-review-20261107-claude/.gitattributes": "96a83569c84cfe3f57b7efe3dc61c249548d0fca4fed0e538b3587cdc97c95c1",
+    "docs/vault/30_Development/Evidence/fleet5-cpu-703-integration-review-20261107-claude/integration-data-checks.json": "a75f7e95d1cdaadeb8fef3c62e8f89bfb0e697fb75f01913385a2474ce78586a",
+    "docs/vault/30_Development/Evidence/fleet5-cpu-703-integration-review-20261107-claude/integration_data_checks.py.txt": "046c51d69cea92069e9a84492661e2cebc00cb05e9362ec3f3aac21a7a6dab5d",
+    "docs/vault/30_Development/Evidence/fleet5-cpu-703-integration-review-20261107-claude/local-doc-gates.txt": "4abba325c3d72f40db22eac9b967693a152802a703360e984d9ba8cd421ef590",
+    "docs/vault/30_Development/Evidence/fleet5-cpu-703-integration-review-20261107-claude/review.json": "f44975f412e6831730e2692537d4e809efe14f0ba7d6ca524308975e6155848d",
+    "docs/vault/30_Development/Evidence/fleet5-cpu-703-integration-review-20261107-claude/reviewer_gate_driver.py.txt": "149378eb5af82bdcc31ee747f2f34e0554885e1299a2cb4123d6557355573626",
+    "docs/vault/30_Development/History/2026-11-07_FLEET5_CPU_703_Integration_Review_Claude.md": "6e2c294434291cd7c86a66a21a671d36b4f39ec62ff221dc2bce8fa00b6fb810"
+  },
+  "reviewerLifecycle": {
+    "dispatchId": "ctx_1ba53b566ab1",
+    "taskId": "task_65b33b98a1b9",
+    "runId": "run_e57ecd84a7bc",
+    "state": "succeeded",
+    "stage": "settled",
+    "liveness": "exited",
+    "terminal": "term_8e927ee1-c600-4667-a30c-aa3aa7530d15",
+    "terminalState": "released",
+    "workspace": "d98dc9d3-fe61-4cb2-9776-dff349347a61::D:/Project/SaintVisionI-Invion/fleet5-cpu-703-integration-review-20261107",
+    "waitingOnHuman": "unknown"
+  },
+  "actualAuthority": null,
+  "runtimeOrFivePCAcceptance": false,
+  "wholeProgramComplete": false
+}
