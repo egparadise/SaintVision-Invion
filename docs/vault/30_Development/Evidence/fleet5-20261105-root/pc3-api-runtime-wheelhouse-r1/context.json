@@ -1,0 +1,14 @@
+{
+  "task": "FLEET5-PC3-API-RUNTIME-WHEELHOUSE-R1",
+  "owner": "Root Codex",
+  "baseSHA": "cab11ecc231c45f2f4820fa952a549e7953132cd",
+  "scope": "Public dependencies downloaded on PC3 only; no existing environment mutation",
+  "finalSourceAcceptance": false,
+  "canonicalApply": false,
+  "sourceFileSHA256": {
+    "requirements-core.txt": "a6bbe231c4b68e7a3315b6e46057cfa94915f10006b8cc7f419fe483a66b6ce6",
+    "requirements-backend.txt": "135e7f972b2f0c204ebf6147ad38793472930cec8d2ea0de3e5c641d289d46ae",
+    "services/control-plane/pyproject.toml": "fa2447c6b86308f24a0b2d1d9f17a81c8fdac34acc2b63884bd66d6422727ef7",
+    "pyproject.toml": "09a6487ecb717afa70c86cfe2682cd70d94ecc08818323f19d8a4b693fbdbf88"
+  }
+}

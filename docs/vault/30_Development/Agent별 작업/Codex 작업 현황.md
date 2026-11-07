@@ -1,15 +1,19 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.475"
+version: "1.0.476"
 status: "review"
 author: "Codex"
-updated: "2026-11-07T19:07:30+09:00"
+updated: "2026-11-07T19:18:06+09:00"
 source_of_truth: "Git"
 active_card: "FLEET5 continued supervision with PORTAL-REFRESH-FLEET-20261106"
-active_card_status: "FirstCombinedWorkspace414fFourHostedCIsRunning_BActive_PC3BusinessWheelBuiltNotInstalled; FinalCodeCIReviewDeploy_ActualVotesRunFivePCPending_RootCanonicalApplyDeferred"
+active_card_status: "BFinalCombinedCodeCIActive_PC3BusinessWheelAnd41RuntimeWheelsStagedNotInstalled_FinalCodeReviewDeploymentPending_RootCanonicalApplyDeferred"
 active_card_next: "B Task72ad09258a5c/ctx200 implements exact R1 serving+atomic binding+UI, real restricted-role hosted tests and final Frontend/Core/Backend/Docs; one actual Claude then Root protected deployment. Root must defer canonical APPLY until B full snapshot closes. PC1 local key registration/additional real approver identity remain pending; no fake ready/workload/votes/Run."
 ---
+
+## 2026-11-07T19:18:06+09:00 PC3 실행 의존성 실제 준비
+
+PC3 격리 컨테이너에서 고정 소스의 실행 의존성 41개(19,552,514 bytes)를 실제 내려받아 패키지별 버전·SHA256과 해시 잠금 파일을 기록했다. 직접 명령·SSH·다운로드 exit0, stderr0이며 기존 환경 설치·API 기동·DB 연결은 하지 않았다. 최종 B 코드와 CI·독립 검토 뒤 소스 요구사항과 모든 wheel 해시를 다시 대조해 설치한다. 첫 실행 기능과 실제 승인·Run·5대 인수는 계속 미완료다. Root의 canonical APPLY는 B의 전체 상태 비교가 끝날 때까지 보류한다. 최종 완료 보고를 받으면 같은 소스의 CI를 대조하고 한 실제 Claude 독립 코드 검토를 배정한다.
 
 ## 2026-11-07T19:07:30+09:00 첫통합코드 CI와 실제PC3 업무패키지
 
