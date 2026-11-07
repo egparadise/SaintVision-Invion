@@ -1,0 +1,52 @@
+{
+  "classification": "ACTUAL_CANONICAL_INDEX_BLOB_MATCH_TO_ROOT_TESTED_CURRENT4",
+  "atKST": "2026-11-07T10:33:42.234017+09:00",
+  "allFourMatch": true,
+  "files": [
+    {
+      "path": "services/node-agent/internal/migrationcontext/effect_gate_test.go",
+      "stagedGitBlobOID": "e5ccd0d2a7da672d8947d4f02cb33e6c0bdc7ce3",
+      "stagedCanonicalBytes": 27592,
+      "stagedCanonicalSHA256": "d34eecc2d9b7d5790eec6ebe2b9816b421899228f948fae05fd6920d4d51b50a",
+      "RootTestedSHA256": "d34eecc2d9b7d5790eec6ebe2b9816b421899228f948fae05fd6920d4d51b50a",
+      "WindowsWorkingBytes": 27592,
+      "WindowsWorkingSHA256": "d34eecc2d9b7d5790eec6ebe2b9816b421899228f948fae05fd6920d4d51b50a",
+      "byteEqual": true,
+      "WIP02SnapshotSHA256": "d34eecc2d9b7d5790eec6ebe2b9816b421899228f948fae05fd6920d4d51b50a"
+    },
+    {
+      "path": "services/node-agent/internal/migrationcontext/source_gate_test.go",
+      "stagedGitBlobOID": "fe2b1ec68e6aac39e57dcf4bd50917e5b0bd8a75",
+      "stagedCanonicalBytes": 25737,
+      "stagedCanonicalSHA256": "0ad2989b6f36224352516e17f278b957cc25077f657560975e0ebcb063ff9208",
+      "RootTestedSHA256": "0ad2989b6f36224352516e17f278b957cc25077f657560975e0ebcb063ff9208",
+      "WindowsWorkingBytes": 25737,
+      "WindowsWorkingSHA256": "0ad2989b6f36224352516e17f278b957cc25077f657560975e0ebcb063ff9208",
+      "byteEqual": true,
+      "WIP02SnapshotSHA256": "0ad2989b6f36224352516e17f278b957cc25077f657560975e0ebcb063ff9208"
+    },
+    {
+      "path": "services/node-agent/internal/migrationcontext/h12_signature_internal.go",
+      "stagedGitBlobOID": "6beb6a342d3b7d9f3fcdfd610e03d038e66d5a49",
+      "stagedCanonicalBytes": 2505,
+      "stagedCanonicalSHA256": "f9e3e808d8951c2da6fee4b45364f64bb5c909a33a90c3a6074c99b8cb6e4def",
+      "RootTestedSHA256": "f9e3e808d8951c2da6fee4b45364f64bb5c909a33a90c3a6074c99b8cb6e4def",
+      "WindowsWorkingBytes": 2505,
+      "WindowsWorkingSHA256": "f9e3e808d8951c2da6fee4b45364f64bb5c909a33a90c3a6074c99b8cb6e4def",
+      "byteEqual": true,
+      "WIP02SnapshotSHA256": "f9e3e808d8951c2da6fee4b45364f64bb5c909a33a90c3a6074c99b8cb6e4def"
+    },
+    {
+      "path": "services/node-agent/internal/migrationcontext/h12_signature_test.go",
+      "stagedGitBlobOID": "ec386c7e3530c88a10305efc7f29ba66fcdf245b",
+      "stagedCanonicalBytes": 12939,
+      "stagedCanonicalSHA256": "94f9bd56deaa371125ceba49f5d7a21d30a4bc34575fed4747f693b51d1ce020",
+      "RootTestedSHA256": "94f9bd56deaa371125ceba49f5d7a21d30a4bc34575fed4747f693b51d1ce020",
+      "WindowsWorkingBytes": 12939,
+      "WindowsWorkingSHA256": "94f9bd56deaa371125ceba49f5d7a21d30a4bc34575fed4747f693b51d1ce020",
+      "byteEqual": true,
+      "WIP02SnapshotSHA256": "94f9bd56deaa371125ceba49f5d7a21d30a4bc34575fed4747f693b51d1ce020"
+    }
+  ],
+  "rawArchiveDistinction": "WIP01 immutable raw snapshots retain their original earlier hashes; WIP02 current4/root actual fixed candidate and these Git canonical blobs match exactly; no silent EOL rewrite"
+}

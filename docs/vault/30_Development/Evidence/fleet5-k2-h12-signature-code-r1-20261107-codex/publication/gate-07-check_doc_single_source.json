@@ -1,0 +1,22 @@
+{
+  "id": "gate-07-check_doc_single_source",
+  "argv": [
+    "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+    "-I",
+    "-B",
+    "tools/check_doc_single_source.py",
+    "--ratchet"
+  ],
+  "cwd": "D:/Project/SaintVisionI-Invion/fleet5-k2-d04-l1-r2-20261107",
+  "startedAtKST": "2026-11-07T10:32:03.992123+09:00",
+  "endedAtKST": "2026-11-07T10:32:05.139396+09:00",
+  "elapsedSeconds": 1.147,
+  "directExit": 0,
+  "stdoutRawText": "PASS check_doc_single_source --ratchet: 16 pairs, all in baseline, none stale.\r\n",
+  "stderrRawText": "",
+  "stdoutBytes": 80,
+  "stdoutSHA256": "13b5f5afed05999109839be1baec4ef70ea3c71bcb267353e59eba0f2ae3e448",
+  "stderrBytes": 0,
+  "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "classification": "STATIC_DELIVERY_GATE_NOT_PRODUCT_EXECUTION"
+}

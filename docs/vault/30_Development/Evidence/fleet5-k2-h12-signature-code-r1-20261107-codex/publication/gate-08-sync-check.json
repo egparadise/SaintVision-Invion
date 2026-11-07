@@ -1,0 +1,41 @@
+{
+  "id": "gate-08-sync-check",
+  "argv": [
+    "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+    "-I",
+    "-B",
+    "tools/sync_obsidian.py",
+    "--check",
+    "--state",
+    "D:/Project/SaintVision-Invion/SaintVisionI-Invion/.git/obsidian-sync-state.json",
+    "--conflicts-out",
+    "D:/Project/SaintVisionI-Invion/fleet5-k2-d04-l1-r2-20261107/.work/h12-publication-sync-conflicts.json"
+  ],
+  "cwd": "D:/Project/SaintVisionI-Invion/fleet5-k2-d04-l1-r2-20261107",
+  "startedAtKST": "2026-11-07T10:32:05.156457+09:00",
+  "endedAtKST": "2026-11-07T10:32:29.179336+09:00",
+  "elapsedSeconds": 24.022,
+  "directExit": 0,
+  "stdoutRawText": "CHECK: 4468 managed files, 2017 pending exports, 0 conflicts. No writes.\r\n",
+  "stderrRawText": "",
+  "stdoutBytes": 74,
+  "stdoutSHA256": "737e7d387b9c0075666f30c13752a3f21aba4c70a82dbb5bba787cf8d741fd39",
+  "stderrBytes": 0,
+  "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "before": {
+    "canonicalPath": "D:/Project/SaintVision-Invion/SaintVisionI-Invion/.git/obsidian-sync-state.json",
+    "atKST": "2026-11-07T10:32:05.156209+09:00",
+    "bytes": 474315,
+    "SHA256": "d27ee3a728d0e8ae01c4e23fefd4f1eeb3682a00fd93d61791150febf89711a1",
+    "snapshot": "sync-canonical-state-before.raw"
+  },
+  "after": {
+    "canonicalPath": "D:/Project/SaintVision-Invion/SaintVisionI-Invion/.git/obsidian-sync-state.json",
+    "atKST": "2026-11-07T10:32:29.179089+09:00",
+    "bytes": 474315,
+    "SHA256": "d27ee3a728d0e8ae01c4e23fefd4f1eeb3682a00fd93d61791150febf89711a1",
+    "snapshot": "sync-canonical-state-after.raw"
+  },
+  "fullStateUnchanged": true,
+  "classification": "CHECK_ONLY_NO_APPLY_ADOPT_RESOLVE_OR_STATE_WRITE"
+}

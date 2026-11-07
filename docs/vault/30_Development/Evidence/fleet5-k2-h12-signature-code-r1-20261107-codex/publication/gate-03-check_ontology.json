@@ -1,0 +1,21 @@
+{
+  "id": "gate-03-check_ontology",
+  "argv": [
+    "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+    "-I",
+    "-B",
+    "tools/check_ontology.py"
+  ],
+  "cwd": "D:/Project/SaintVisionI-Invion/fleet5-k2-d04-l1-r2-20261107",
+  "startedAtKST": "2026-11-07T10:31:39.104179+09:00",
+  "endedAtKST": "2026-11-07T10:31:41.058573+09:00",
+  "elapsedSeconds": 1.954,
+  "directExit": 0,
+  "stdoutRawText": "PASS: RDF parsing, defined terms, TTL/JSON-LD equivalence, 48 task mappings, positive SHACL, 4 rejected invalid fixtures, 4 competency queries, Obsidian mirrors.\r\n",
+  "stderrRawText": "",
+  "stdoutBytes": 163,
+  "stdoutSHA256": "7cdc12bf64f50ba0964625161638a4c639cf22d786a57f04685bed0718e14042",
+  "stderrBytes": 0,
+  "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "classification": "STATIC_DELIVERY_GATE_NOT_PRODUCT_EXECUTION"
+}

@@ -1,0 +1,7 @@
+#!/bin/bash
+set +e
+go test -p=1 -count=1 -json -run '^(TestNullPortsAndOpaqueBoundary|TestWellFormedUnregisteredProvidersNeverAuthenticate|TestCopyRejectsCallbacksAndBoundsBeforeEncoding|TestResolvedObjectEffectBoundary|TestRepositoryBoundaryAndZeroEffects|TestWholePackageFullUnderlyingCensus|TestReviewR1CompileValidEffectAndAliasMutants|TestPLR1AActualBuildsThenBoundaryRefuses|TestPLR1BCompiledWriteTargetsAndReasons|TestPLR1CCompiledPointerConversionsAndControls|TestPLR1DCompiledTargetPointerTermsAndControls)$' ./internal/migrationcontext > /job/h12-phase4.stdout 2> /job/h12-phase4.stderr
+rc=$?
+cat /sys/fs/cgroup/memory.peak > /job/h12-phase4-memory-peak.bytes 2>/dev/null
+printf "%s\n" "$rc" > /job/h12-phase4-exit.txt
+exit "$rc"

@@ -1,0 +1,218 @@
+{
+  "gates": [
+    {
+      "id": "gate-01-check_docs",
+      "argv": [
+        "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+        "-I",
+        "-B",
+        "tools/check_docs.py"
+      ],
+      "cwd": "D:/Project/SaintVisionI-Invion/fleet5-k2-d04-l1-r2-20261107",
+      "startedAtKST": "2026-11-07T10:30:30.026023+09:00",
+      "endedAtKST": "2026-11-07T10:31:36.945156+09:00",
+      "elapsedSeconds": 66.918,
+      "directExit": 0,
+      "stdoutRawText": "PASS: 24 original hashes, 1276 versioned documents, wiki links, 48 tasks, 12 outcomes, owner/reviewer/skills, dependency DAG.\r\n",
+      "stderrRawText": "",
+      "stdoutBytes": 127,
+      "stdoutSHA256": "87c1a9746148e6be4fc110f4959847093fc667ed5d9d37b136721985ecc8e7ee",
+      "stderrBytes": 0,
+      "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "classification": "STATIC_DELIVERY_GATE_NOT_PRODUCT_EXECUTION"
+    },
+    {
+      "id": "gate-02-check_ontology_generation",
+      "argv": [
+        "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+        "-I",
+        "-B",
+        "tools/check_ontology_generation.py"
+      ],
+      "cwd": "D:/Project/SaintVisionI-Invion/fleet5-k2-d04-l1-r2-20261107",
+      "startedAtKST": "2026-11-07T10:31:36.947201+09:00",
+      "endedAtKST": "2026-11-07T10:31:39.103159+09:00",
+      "elapsedSeconds": 2.156,
+      "directExit": 0,
+      "stdoutRawText": "PASS: 4 ontology artifacts are graph-equivalent to a fresh generation\r\n",
+      "stderrRawText": "",
+      "stdoutBytes": 71,
+      "stdoutSHA256": "451b3d26c538962997f093bbfb8a5ceabffe134e154c1ff412f57590b076e150",
+      "stderrBytes": 0,
+      "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "classification": "STATIC_DELIVERY_GATE_NOT_PRODUCT_EXECUTION"
+    },
+    {
+      "id": "gate-03-check_ontology",
+      "argv": [
+        "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+        "-I",
+        "-B",
+        "tools/check_ontology.py"
+      ],
+      "cwd": "D:/Project/SaintVisionI-Invion/fleet5-k2-d04-l1-r2-20261107",
+      "startedAtKST": "2026-11-07T10:31:39.104179+09:00",
+      "endedAtKST": "2026-11-07T10:31:41.058573+09:00",
+      "elapsedSeconds": 1.954,
+      "directExit": 0,
+      "stdoutRawText": "PASS: RDF parsing, defined terms, TTL/JSON-LD equivalence, 48 task mappings, positive SHACL, 4 rejected invalid fixtures, 4 competency queries, Obsidian mirrors.\r\n",
+      "stderrRawText": "",
+      "stdoutBytes": 163,
+      "stdoutSHA256": "7cdc12bf64f50ba0964625161638a4c639cf22d786a57f04685bed0718e14042",
+      "stderrBytes": 0,
+      "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "classification": "STATIC_DELIVERY_GATE_NOT_PRODUCT_EXECUTION"
+    },
+    {
+      "id": "gate-04-check_contract_bindings",
+      "argv": [
+        "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+        "-I",
+        "-B",
+        "tools/check_contract_bindings.py"
+      ],
+      "cwd": "D:/Project/SaintVisionI-Invion/fleet5-k2-d04-l1-r2-20261107",
+      "startedAtKST": "2026-11-07T10:31:41.059761+09:00",
+      "endedAtKST": "2026-11-07T10:31:54.945475+09:00",
+      "elapsedSeconds": 13.886,
+      "directExit": 0,
+      "stdoutRawText": "PASS check_contract_bindings: 57 fixtures each referenced by a test; 21 bound kernel response TYPES each have >=1 serving-anchor test (counted PER TYPE, not per anchor SITE: those types occupy 27 anchor sites; a multi-site type counts covered even if only one site is tested -- site-level weight is not decidable here, use tools/check_anchor_weight.py + the mutation harness); 14 replay guards present.\r\n  UNIT NOTE: TYPE count <= SITE count. Multi-site types (per-type coverage can mask an untested site): ApprovalView(2 sites: ['approvals']), BusinessBindingView(2 sites: ['business_handoff']), BusinessEditLockReleaseView(2 sites: ['business_handoff']), BusinessEditLockView(2 sites: ['business_handoff']), ControlRunDetail(3 sites: ['control']), ControlRunView(2 sites: ['control']), EvidenceEnvelope(6 sites: ['build_governance', 'results', 'runs', 'shard_completion', 'storage_commit', 'storage_view']), ModelExecutionManifestObservation(2 sites: ['model_uri_resolver', 'model_view']), NodeExecutionPermit(2 sites: ['node_execution', 'node_transport']), NodeResourceSnapshot(4 sites: ['capacity', 'gpu', 'observation']), WorkspaceCheckoutView(2 sites: ['workspace_recovery']), WorkspaceEnqueueResult(3 sites: ['workspace_api']), WorkspacePrepareResult(2 sites: ['workspace_api']), WorkspaceRestoreView(2 sites: ['workspace_recovery']), WorkspaceStartEnqueueResult(3 sites: ['workspace_start']), WorkspaceStartPrepareResult(2 sites: ['workspace_start'])\r\n  (Reporting sites is not a regression -- the TYPE number never meant 'sites verified'; this makes the counting unit explicit. EvidenceEnvelope-class multi-site anchors are why.)\r\n",
+      "stderrRawText": "",
+      "stdoutBytes": 1640,
+      "stdoutSHA256": "7d3493f361d1c522254d1dbd2e0a74b4dc3c54ef90bd9bfdec3a57666d7798ed",
+      "stderrBytes": 0,
+      "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "classification": "STATIC_DELIVERY_GATE_NOT_PRODUCT_EXECUTION"
+    },
+    {
+      "id": "gate-05-check_frontend_integrity",
+      "argv": [
+        "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+        "-I",
+        "-B",
+        "tools/check_frontend_integrity.py"
+      ],
+      "cwd": "D:/Project/SaintVisionI-Invion/fleet5-k2-d04-l1-r2-20261107",
+      "startedAtKST": "2026-11-07T10:31:54.947000+09:00",
+      "endedAtKST": "2026-11-07T10:31:56.680960+09:00",
+      "elapsedSeconds": 1.734,
+      "directExit": 0,
+      "stdoutRawText": "Scanning 94 frontend production source files under apps/web/src ...\r\n\r\nPASS Frontend Integrity Check: all 9 integrity rules satisfied (0 violations).\r\n",
+      "stderrRawText": "",
+      "stdoutBytes": 151,
+      "stdoutSHA256": "2a2f0348a4bdc71911a5eac47ef7fd7a1ca4573e71cce914cb6d6dd198392949",
+      "stderrBytes": 0,
+      "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "classification": "STATIC_DELIVERY_GATE_NOT_PRODUCT_EXECUTION"
+    },
+    {
+      "id": "gate-06-check_doc_path_citations",
+      "argv": [
+        "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+        "-I",
+        "-B",
+        "tools/check_doc_path_citations.py",
+        "--ratchet",
+        "--base-ref",
+        "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+      ],
+      "cwd": "D:/Project/SaintVisionI-Invion/fleet5-k2-d04-l1-r2-20261107",
+      "startedAtKST": "2026-11-07T10:31:56.682255+09:00",
+      "endedAtKST": "2026-11-07T10:32:03.990994+09:00",
+      "elapsedSeconds": 7.309,
+      "directExit": 0,
+      "stdoutRawText": "PASS check_doc_path_citations --ratchet: 290 broken citation(s), all in baseline, none stale, floor unchanged.\r\n",
+      "stderrRawText": "",
+      "stdoutBytes": 112,
+      "stdoutSHA256": "389921b50662776ed834a285f70fc44ab61f7d5bdb4c5249c0a73c98113980de",
+      "stderrBytes": 0,
+      "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "classification": "STATIC_DELIVERY_GATE_NOT_PRODUCT_EXECUTION"
+    },
+    {
+      "id": "gate-07-check_doc_single_source",
+      "argv": [
+        "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+        "-I",
+        "-B",
+        "tools/check_doc_single_source.py",
+        "--ratchet"
+      ],
+      "cwd": "D:/Project/SaintVisionI-Invion/fleet5-k2-d04-l1-r2-20261107",
+      "startedAtKST": "2026-11-07T10:32:03.992123+09:00",
+      "endedAtKST": "2026-11-07T10:32:05.139396+09:00",
+      "elapsedSeconds": 1.147,
+      "directExit": 0,
+      "stdoutRawText": "PASS check_doc_single_source --ratchet: 16 pairs, all in baseline, none stale.\r\n",
+      "stderrRawText": "",
+      "stdoutBytes": 80,
+      "stdoutSHA256": "13b5f5afed05999109839be1baec4ef70ea3c71bcb267353e59eba0f2ae3e448",
+      "stderrBytes": 0,
+      "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "classification": "STATIC_DELIVERY_GATE_NOT_PRODUCT_EXECUTION"
+    },
+    {
+      "id": "gate-08-sync-check",
+      "argv": [
+        "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+        "-I",
+        "-B",
+        "tools/sync_obsidian.py",
+        "--check",
+        "--state",
+        "D:/Project/SaintVision-Invion/SaintVisionI-Invion/.git/obsidian-sync-state.json",
+        "--conflicts-out",
+        "D:/Project/SaintVisionI-Invion/fleet5-k2-d04-l1-r2-20261107/.work/h12-publication-sync-conflicts.json"
+      ],
+      "cwd": "D:/Project/SaintVisionI-Invion/fleet5-k2-d04-l1-r2-20261107",
+      "startedAtKST": "2026-11-07T10:32:05.156457+09:00",
+      "endedAtKST": "2026-11-07T10:32:29.179336+09:00",
+      "elapsedSeconds": 24.022,
+      "directExit": 0,
+      "stdoutRawText": "CHECK: 4468 managed files, 2017 pending exports, 0 conflicts. No writes.\r\n",
+      "stderrRawText": "",
+      "stdoutBytes": 74,
+      "stdoutSHA256": "737e7d387b9c0075666f30c13752a3f21aba4c70a82dbb5bba787cf8d741fd39",
+      "stderrBytes": 0,
+      "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "before": {
+        "canonicalPath": "D:/Project/SaintVision-Invion/SaintVisionI-Invion/.git/obsidian-sync-state.json",
+        "atKST": "2026-11-07T10:32:05.156209+09:00",
+        "bytes": 474315,
+        "SHA256": "d27ee3a728d0e8ae01c4e23fefd4f1eeb3682a00fd93d61791150febf89711a1",
+        "snapshot": "sync-canonical-state-before.raw"
+      },
+      "after": {
+        "canonicalPath": "D:/Project/SaintVision-Invion/SaintVisionI-Invion/.git/obsidian-sync-state.json",
+        "atKST": "2026-11-07T10:32:29.179089+09:00",
+        "bytes": 474315,
+        "SHA256": "d27ee3a728d0e8ae01c4e23fefd4f1eeb3682a00fd93d61791150febf89711a1",
+        "snapshot": "sync-canonical-state-after.raw"
+      },
+      "fullStateUnchanged": true,
+      "classification": "CHECK_ONLY_NO_APPLY_ADOPT_RESOLVE_OR_STATE_WRITE"
+    },
+    {
+      "id": "gate-09-git-diff-check",
+      "argv": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "cwd": "D:/Project/SaintVisionI-Invion/fleet5-k2-d04-l1-r2-20261107",
+      "startedAtKST": "2026-11-07T10:32:29.192579+09:00",
+      "endedAtKST": "2026-11-07T10:32:30.204103+09:00",
+      "elapsedSeconds": 1.012,
+      "directExit": 0,
+      "stdoutRawText": "",
+      "stderrRawText": "",
+      "stdoutBytes": 0,
+      "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrBytes": 0,
+      "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "classification": "STATIC_DELIVERY_GATE_NOT_PRODUCT_EXECUTION"
+    }
+  ],
+  "actualPython": "3.14.7 (tags/v3.14.7:823f032, Aug  5 2026, 10:51:32) [MSC v.1944 64 bit (AMD64)]",
+  "allActualSoFarZero": true
+}

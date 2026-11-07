@@ -1,0 +1,66 @@
+{
+  "phase": 4,
+  "id": "existing-public-refusal-effect-source-census-plr",
+  "startedAtKST": "2026-11-07T10:09:43+09:00",
+  "endedAtKST": "2026-11-07T10:11:46+09:00",
+  "elapsedSeconds": 122.772,
+  "testCommand": [
+    "go",
+    "test",
+    "-p=1",
+    "-count=1",
+    "-json",
+    "-run",
+    "^(TestNullPortsAndOpaqueBoundary|TestWellFormedUnregisteredProvidersNeverAuthenticate|TestCopyRejectsCallbacksAndBoundsBeforeEncoding|TestResolvedObjectEffectBoundary|TestRepositoryBoundaryAndZeroEffects|TestWholePackageFullUnderlyingCensus|TestReviewR1CompileValidEffectAndAliasMutants|TestPLR1AActualBuildsThenBoundaryRefuses|TestPLR1BCompiledWriteTargetsAndReasons|TestPLR1CCompiledPointerConversionsAndControls|TestPLR1DCompiledTargetPointerTermsAndControls)$",
+    "./internal/migrationcontext"
+  ],
+  "workingDirectory": "/job/repo/services/node-agent",
+  "image": "golang@sha256:8d48e12ec56735e9358640898b9d9b9fcca110612ed8a5567438c0a1baa24e66",
+  "containerID": "b36ae908e2965f1a9760ee344e5ccf0e55a0514a42c6f5b02c95dd2b4e43f8d7",
+  "directExit": 1,
+  "OOMKilled": false,
+  "stateError": "",
+  "cgroupMemoryPeakBytes": 681029632,
+  "memoryBytes": 2147483648,
+  "memorySwapTotalBytes": 2147483648,
+  "extraSwapBytes": 0,
+  "nanoCPUs": 2000000000,
+  "pidsLimit": 128,
+  "nonrootUser": "1000:1000",
+  "network": "none",
+  "readOnlyRoot": true,
+  "onlyOwnJobBind": true,
+  "sourceBeforeAfterUnchanged": true,
+  "sourceFiles": 373,
+  "topLevelPassed": 8,
+  "subtestsPassed": 124,
+  "failEvents": [
+    "TestPLR1BCompiledWriteTargetsAndReasons/slice-root-foreign-pointee",
+    "TestPLR1BCompiledWriteTargetsAndReasons",
+    "TestPLR1CCompiledPointerConversionsAndControls/N6-slice-to-own-array-pointer",
+    "TestPLR1CCompiledPointerConversionsAndControls/S1-slice-local-copy-of-pointee",
+    "TestPLR1CCompiledPointerConversionsAndControls/S2-slice-parameter",
+    "TestPLR1CCompiledPointerConversionsAndControls",
+    "TestPLR1DCompiledTargetPointerTermsAndControls/G4-typeparam-target-slice-to-own-array",
+    "TestPLR1DCompiledTargetPointerTermsAndControls",
+    "github.com/egparadise/SaintVision-Invion/services/node-agent/internal/migrationcontext"
+  ],
+  "skipEvents": [],
+  "JSONParseErrors": [],
+  "lastJSONAction": "fail",
+  "logs": {
+    "h12-phase4.stdout": {
+      "bytes": 265538,
+      "SHA256": "91edb74bda37911e0fe0857f6394d54493db29ca0ed9b430cfe9b0b189559b2b"
+    },
+    "h12-phase4.stderr": {
+      "bytes": 0,
+      "SHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "h12-phase4-container.log": {
+      "bytes": 0,
+      "SHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  },
+  "ownExitedContainerRemoved": true
+}

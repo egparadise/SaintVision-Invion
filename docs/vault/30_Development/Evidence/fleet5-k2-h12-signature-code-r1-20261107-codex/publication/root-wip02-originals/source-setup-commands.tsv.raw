@@ -1,0 +1,25 @@
+init	git init --quiet repo 
+remote	git -C repo remote add origin https://github.com/egparadise/SaintVision-Invion.git 
+sparse-init	git -C repo sparse-checkout init --no-cone 
+sparse-set	git -C repo sparse-checkout set --no-cone /services/node-agent/ /packages/contracts-go/ /contracts/ \*.go go.mod go.sum 
+fetch-base	git -C repo fetch --filter=blob:none --no-tags --depth=1 origin 0bf852a66b2eb01f95da65ebbad0360a04ea6fed 
+checkout-base	git -C repo switch --detach 0bf852a66b2eb01f95da65ebbad0360a04ea6fed 
+fetch-k1	git -C repo fetch --filter=blob:none --no-tags --depth=1 origin eb32b211ab3704935b9431747089ab0715582a74 
+k1-list	git -C repo ls-tree -r --name-only eb32b211ab3704935b9431747089ab0715582a74 -- services/node-agent/migrationverify/ 
+k1-contracts.go	git -C repo show eb32b211ab3704935b9431747089ab0715582a74:services/node-agent/migrationverify/contracts.go 
+k1-current.go	git -C repo show eb32b211ab3704935b9431747089ab0715582a74:services/node-agent/migrationverify/current.go 
+k1-ed25519.go	git -C repo show eb32b211ab3704935b9431747089ab0715582a74:services/node-agent/migrationverify/ed25519.go 
+k1-graph.go	git -C repo show eb32b211ab3704935b9431747089ab0715582a74:services/node-agent/migrationverify/graph.go 
+k1-json.go	git -C repo show eb32b211ab3704935b9431747089ab0715582a74:services/node-agent/migrationverify/json.go 
+k1-native.go	git -C repo show eb32b211ab3704935b9431747089ab0715582a74:services/node-agent/migrationverify/native.go 
+k1-proofs.go	git -C repo show eb32b211ab3704935b9431747089ab0715582a74:services/node-agent/migrationverify/proofs.go 
+k1-recipes.go	git -C repo show eb32b211ab3704935b9431747089ab0715582a74:services/node-agent/migrationverify/recipes.go 
+k1-schemas.go	git -C repo show eb32b211ab3704935b9431747089ab0715582a74:services/node-agent/migrationverify/schemas.go 
+k1-temporal.go	git -C repo show eb32b211ab3704935b9431747089ab0715582a74:services/node-agent/migrationverify/temporal.go 
+k1-trust.go	git -C repo show eb32b211ab3704935b9431747089ab0715582a74:services/node-agent/migrationverify/trust.go 
+k1-verify.go	git -C repo show eb32b211ab3704935b9431747089ab0715582a74:services/node-agent/migrationverify/verify.go 
+go-list-files	git -C repo ls-files -- \*.go :\(glob\)\*\*/go.mod 
+head	git -C repo rev-parse HEAD 
+clean	git -C repo status --porcelain 
+mod-download	go mod download 
+mod-verify	go mod verify 

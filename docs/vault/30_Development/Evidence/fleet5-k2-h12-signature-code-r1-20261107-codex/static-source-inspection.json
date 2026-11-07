@@ -1,0 +1,18 @@
+{
+  "classification": "FORMAT_SCOPE_SOURCE_INSPECTION_ONLY_NOT_COMPILATION_OR_AUTH_PROOF",
+  "atKST": "2026-11-07T09:53:05.622570+09:00",
+  "gofmtWriteExit": 0,
+  "whitespaceExit": 0,
+  "productionFunctionsAdded": 1,
+  "exactNewCryptoCallsites": 3,
+  "globalPureAllowlistUnchanged": true,
+  "guardMechanism": "Actual unadjusted FileSet position + resolved go/types package/object + nearest direct non-wrapper helper context + AST direct-call parent; reject captures, foreign file, //line spoof, nested wrapper; old policy.go PublicKey type assertion preserved",
+  "testSource": "32 planned argument rows;12 new effect-scope source probes plus2 resolver source controls, all NOT_RUN; real compile preconditions in test code",
+  "recordBound": "Explicit2MiB via p02EnvelopeLimit; p02PayloadLimit16MiB not used",
+  "GoCompile": "NOT_RUN",
+  "crypto": "NOT_RUN",
+  "newPublicHooks": 0,
+  "defaultRefusalSource": "UNCHANGED",
+  "K1Census": "13/73 frozen baseline, NOT_RERUN",
+  "actualBindings": "NULL_HOLD"
+}

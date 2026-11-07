@@ -1,0 +1,24 @@
+{
+  "id": "gate-06-check_doc_path_citations",
+  "argv": [
+    "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+    "-I",
+    "-B",
+    "tools/check_doc_path_citations.py",
+    "--ratchet",
+    "--base-ref",
+    "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+  ],
+  "cwd": "D:/Project/SaintVisionI-Invion/fleet5-k2-d04-l1-r2-20261107",
+  "startedAtKST": "2026-11-07T10:31:56.682255+09:00",
+  "endedAtKST": "2026-11-07T10:32:03.990994+09:00",
+  "elapsedSeconds": 7.309,
+  "directExit": 0,
+  "stdoutRawText": "PASS check_doc_path_citations --ratchet: 290 broken citation(s), all in baseline, none stale, floor unchanged.\r\n",
+  "stderrRawText": "",
+  "stdoutBytes": 112,
+  "stdoutSHA256": "389921b50662776ed834a285f70fc44ab61f7d5bdb4c5249c0a73c98113980de",
+  "stderrBytes": 0,
+  "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "classification": "STATIC_DELIVERY_GATE_NOT_PRODUCT_EXECUTION"
+}

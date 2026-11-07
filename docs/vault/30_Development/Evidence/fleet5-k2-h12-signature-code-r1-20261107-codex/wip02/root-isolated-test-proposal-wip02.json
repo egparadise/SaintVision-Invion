@@ -1,0 +1,107 @@
+{
+  "classification": "PROPOSED_NOT_RUN_WIP02_ROOT_ONLY_SAME_FOUR_SERIAL_PHASES",
+  "base": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed",
+  "cwd": "services/node-agent",
+  "image": "golang@sha256:8d48e12ec56735e9358640898b9d9b9fcca110612ed8a5567438c0a1baa24e66",
+  "Go": "1.27.1 linux/amd64",
+  "resources": {
+    "CPU": 2,
+    "memoryBytes": 2147483648,
+    "memoryPlusSwapTotalBytes": 2147483648,
+    "additionalSwap": 0,
+    "pids": 128,
+    "user": "1000:1000",
+    "rootFS": "readonly",
+    "capabilities": "ALL dropped",
+    "noNewPrivileges": true,
+    "networkTests": "none",
+    "sourceCaches": "fresh Root-owned job only"
+  },
+  "phases": [
+    {
+      "id": "math-canonical-ownership-admission",
+      "command": [
+        "go",
+        "test",
+        "-p=1",
+        "-count=1",
+        "-json",
+        "-run",
+        "^TestH12Signature",
+        "./internal/migrationcontext"
+      ]
+    },
+    {
+      "id": "new-exact-object-file-directcall-probes",
+      "command": [
+        "go",
+        "test",
+        "-p=1",
+        "-count=1",
+        "-json",
+        "-run",
+        "^TestH12(ScopedCryptoObjectBoundary|RepositoryResolvedExceptionPosition)$",
+        "./internal/migrationcontext"
+      ]
+    },
+    {
+      "id": "existing-d04-private-consistency",
+      "command": [
+        "go",
+        "test",
+        "-p=1",
+        "-count=1",
+        "-json",
+        "-run",
+        "^TestP02Internal",
+        "./internal/migrationcontext"
+      ]
+    },
+    {
+      "id": "existing-public-refusal-effect-source-census-plr",
+      "command": [
+        "go",
+        "test",
+        "-p=1",
+        "-count=1",
+        "-json",
+        "-run",
+        "^(TestNullPortsAndOpaqueBoundary|TestWellFormedUnregisteredProvidersNeverAuthenticate|TestCopyRejectsCallbacksAndBoundsBeforeEncoding|TestResolvedObjectEffectBoundary|TestRepositoryBoundaryAndZeroEffects|TestWholePackageFullUnderlyingCensus|TestReviewR1CompileValidEffectAndAliasMutants|TestPLR1AActualBuildsThenBoundaryRefuses|TestPLR1BCompiledWriteTargetsAndReasons|TestPLR1CCompiledPointerConversionsAndControls|TestPLR1DCompiledTargetPointerTermsAndControls)$",
+        "./internal/migrationcontext"
+      ]
+    }
+  ],
+  "fixture": "Declared NONSECRET deterministic seed ONLY inside new _test fixture construction; Ed25519 NewKeyFromSeed/Sign/public marshal/oracle Verify only during Root tests, no actual project key/certificate",
+  "independentOracle": "Literal fixed domain+oneNUL+stdlib whole JSON body/signer oracle; does not call target helper or existing signingInput",
+  "plannedNewMathTable": {
+    "rows": 32,
+    "expectedDistinctCompleteInputs": 32,
+    "actual": "NOT_RUN_NEEDS_MEASUREMENT",
+    "trueMathControls": 2,
+    "signatureNegativeRows": 7,
+    "earlyNegativeRows": 23
+  },
+  "counting": "H12_CASE fingerprints exactly rawRecord/DER/expectedHash; collision assertion. Ownership control and oversize admission repeat deterministic table inputs; AllocsPerRun warmup+one measurement is2repeats/0additionalUniqueInputs, logged SHA; guard source probes separate from crypto cases; no A01-A40 promotion",
+  "guardPreconditions": "Real go build of each independent stdlib source probe + real go/types/export resolution BEFORE denial; actual real source package control first; any compile/type/precondition failure is a failure, never semantic kill",
+  "stopOnFirstActualFailure": true,
+  "record": [
+    "Exact source/image/toolchain and full before/after hashes",
+    "Raw command stdout/stderr/direct exit/KST/time/peak/OOM/skips",
+    "Actual case rows and DISTINCT full argument hashes, repeats separate",
+    "Exact returned13fields, zero tuple on failure, no input/output alias",
+    "Original public null/unregistered paths/clock/status remain refusing; old D04 stages/table/census unchanged",
+    "Old signing/keygen/system-root/ambientclock/native/PLR/alias blocks retained; specific new3objects never globalallowed"
+  ],
+  "notGranted": [
+    "Author main Go/crypto compile/test",
+    "Author remote/host/Node/Docker/PG/PKI/clock/OS actions",
+    "Commit/push/CI before actual Root tests and concrete publication grant",
+    "Producer/port/positivefactory/actual trust/current/effects"
+  ],
+  "actualExecution": null,
+  "RootNarrowFixGrant": "msg_0abc80a909cd",
+  "previousWIP01": "PHASE1_2_3_ACTUAL_GREEN_PHASE4_ACTUAL_RED_NOT_FIXED_CANDIDATE_ACCEPTANCE",
+  "requireAllFourFreshActualPhases": true,
+  "realSourceInputs": 371,
+  "frozenSourceAfterOverlay": 373
+}

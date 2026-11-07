@@ -1,0 +1,1069 @@
+{
+  "classification": "EXACT_ROOT_WHITELIST_NO_ADD_A",
+  "RootGrant": "msg_934de461fedc",
+  "atKST": "2026-11-07T10:33:29.321322+09:00",
+  "sourcePaths": {
+    "services/node-agent/internal/migrationcontext/effect_gate_test.go": "d34eecc2d9b7d5790eec6ebe2b9816b421899228f948fae05fd6920d4d51b50a",
+    "services/node-agent/internal/migrationcontext/source_gate_test.go": "0ad2989b6f36224352516e17f278b957cc25077f657560975e0ebcb063ff9208",
+    "services/node-agent/internal/migrationcontext/h12_signature_internal.go": "f9e3e808d8951c2da6fee4b45364f64bb5c909a33a90c3a6074c99b8cb6e4def",
+    "services/node-agent/internal/migrationcontext/h12_signature_test.go": "94f9bd56deaa371125ceba49f5d7a21d30a4bc34575fed4747f693b51d1ce020"
+  },
+  "HistoryPaths": [
+    "docs/vault/30_Development/History/2026-11-07_FLEET5_K2_H12_Signature_Code_Publication_Codex.md",
+    "docs/vault/30_Development/History/2026-11-07_FLEET5_K2_H12_Signature_Code_R1_Codex.md",
+    "docs/vault/30_Development/History/2026-11-07_FLEET5_K2_H12_Signature_Type_Scope_WIP02_Codex.md"
+  ],
+  "EvidencePrefix": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/",
+  "observedWhitelistedEntriesBeforeThisPlan": [
+    {
+      "status": " M",
+      "path": "services/node-agent/internal/migrationcontext/effect_gate_test.go"
+    },
+    {
+      "status": " M",
+      "path": "services/node-agent/internal/migrationcontext/source_gate_test.go"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/.gitattributes"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/complete-four-file.patch"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/effect_gate_test.go.current.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/effect_gate_test.go.preimage.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/h12_signature_internal.go.current.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/h12_signature_test.go.current.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/local-format-diff-receipt.json"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/packet-manifest.json"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/.gitattributes"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/gate-01-check_docs.json"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/gate-02-check_ontology_generation.json"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/gate-03-check_ontology.json"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/gate-04-check_contract_bindings.json"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/gate-05-check_frontend_integrity.json"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/gate-06-check_doc_path_citations.json"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/gate-07-check_doc_single_source.json"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/gate-08-sync-check.json"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/gate-09-git-diff-check.json"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/h12-signature-r2-actual-case-rows.json.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/h12-signature-r2-actual-go-original-index.json.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/h12-signature-r2-actual-go-root-proof.json.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/h12-signature-r2-actual-go-summary.json.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/h12-signature-r2-five-regressions-root-verified.json.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/h12-signature-r2-wip-root-verified.json.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/normal-local-gates.json"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/root-wip02-actual-provenance.json"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/root-wip02-originals/go-image-inspect.log.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/root-wip02-originals/go-image-pull.log.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/root-wip02-originals/go-probe-create.log.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/root-wip02-originals/go-probe-final.json.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/root-wip02-originals/go-probe-initial.json.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/root-wip02-originals/go-probe-inspect.log.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/root-wip02-originals/go-probe-remove.log.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/root-wip02-originals/go-version-probe.log.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/root-wip02-originals/h12-base-source-files.json.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/root-wip02-originals/h12-execution-receipt.json.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/root-wip02-originals/h12-frozen-source-before.json.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/root-wip02-originals/h12-frozen-started.json.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/root-wip02-originals/h12-phase1-argv.json.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/root-wip02-originals/h12-phase1-container.log.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/root-wip02-originals/h12-phase1-create.log.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/root-wip02-originals/h12-phase1-exit.txt.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/root-wip02-originals/h12-phase1-final.json.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/root-wip02-originals/h12-phase1-initial.json.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/root-wip02-originals/h12-phase1-memory-peak.bytes.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/root-wip02-originals/h12-phase1-receipt.json.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/root-wip02-originals/h12-phase1-source-after.json.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/root-wip02-originals/h12-phase1.sh.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/root-wip02-originals/h12-phase1.stderr.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/root-wip02-originals/h12-phase1.stdout.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/root-wip02-originals/h12-phase2-argv.json.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/root-wip02-originals/h12-phase2-container.log.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/root-wip02-originals/h12-phase2-create.log.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/root-wip02-originals/h12-phase2-exit.txt.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/root-wip02-originals/h12-phase2-final.json.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/root-wip02-originals/h12-phase2-initial.json.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/root-wip02-originals/h12-phase2-memory-peak.bytes.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/root-wip02-originals/h12-phase2-receipt.json.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/root-wip02-originals/h12-phase2-source-after.json.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/root-wip02-originals/h12-phase2.sh.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/root-wip02-originals/h12-phase2.stderr.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/root-wip02-originals/h12-phase2.stdout.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/root-wip02-originals/h12-phase3-argv.json.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/root-wip02-originals/h12-phase3-container.log.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/root-wip02-originals/h12-phase3-create.log.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/root-wip02-originals/h12-phase3-exit.txt.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/root-wip02-originals/h12-phase3-final.json.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/root-wip02-originals/h12-phase3-initial.json.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/root-wip02-originals/h12-phase3-memory-peak.bytes.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/root-wip02-originals/h12-phase3-receipt.json.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/root-wip02-originals/h12-phase3-source-after.json.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/root-wip02-originals/h12-phase3.sh.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/root-wip02-originals/h12-phase3.stderr.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/root-wip02-originals/h12-phase3.stdout.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/root-wip02-originals/h12-phase4-argv.json.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/root-wip02-originals/h12-phase4-container.log.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/root-wip02-originals/h12-phase4-create.log.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/root-wip02-originals/h12-phase4-exit.txt.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/root-wip02-originals/h12-phase4-final.json.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/root-wip02-originals/h12-phase4-initial.json.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/root-wip02-originals/h12-phase4-memory-peak.bytes.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/root-wip02-originals/h12-phase4-receipt.json.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/root-wip02-originals/h12-phase4-source-after.json.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/root-wip02-originals/h12-phase4.sh.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/root-wip02-originals/h12-phase4.stderr.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/root-wip02-originals/h12-phase4.stdout.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/root-wip02-originals/h12-root-source-index.json.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/root-wip02-originals/job.json.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/root-wip02-originals/prepare-receipt.json.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/root-wip02-originals/prepare-started.json.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/root-wip02-originals/source-setup-checkout-base.log.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/root-wip02-originals/source-setup-clean.log.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/root-wip02-originals/source-setup-commands.tsv.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/root-wip02-originals/source-setup-container-final.json.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/root-wip02-originals/source-setup-container-initial.json.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/root-wip02-originals/source-setup-create.log.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/root-wip02-originals/source-setup-exits.tsv.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/root-wip02-originals/source-setup-fetch-base.log.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/root-wip02-originals/source-setup-fetch-k1.log.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/root-wip02-originals/source-setup-go-list-files.log.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/root-wip02-originals/source-setup-head.log.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/root-wip02-originals/source-setup-init.log.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/root-wip02-originals/source-setup-k1-contracts.go.log.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/root-wip02-originals/source-setup-k1-current.go.log.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/root-wip02-originals/source-setup-k1-ed25519.go.log.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/root-wip02-originals/source-setup-k1-graph.go.log.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/root-wip02-originals/source-setup-k1-json.go.log.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/root-wip02-originals/source-setup-k1-list.log.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/root-wip02-originals/source-setup-k1-native.go.log.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/root-wip02-originals/source-setup-k1-proofs.go.log.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/root-wip02-originals/source-setup-k1-recipes.go.log.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/root-wip02-originals/source-setup-k1-schemas.go.log.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/root-wip02-originals/source-setup-k1-temporal.go.log.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/root-wip02-originals/source-setup-k1-trust.go.log.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/root-wip02-originals/source-setup-k1-verify.go.log.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/root-wip02-originals/source-setup-memory-peak.bytes.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/root-wip02-originals/source-setup-mod-download.log.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/root-wip02-originals/source-setup-mod-verify.log.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/root-wip02-originals/source-setup-receipt.json.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/root-wip02-originals/source-setup-remote.log.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/root-wip02-originals/source-setup-sparse-init.log.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/root-wip02-originals/source-setup-sparse-set.log.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/root-wip02-originals/source-setup-started.json.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/root-wip02-originals/source-setup.log.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/root-wip02-originals/source-setup.sh.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/sync-canonical-state-after.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/sync-canonical-state-before.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/real-source-dependency-input-plan.json"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/root-isolated-test-proposal.json"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/source_gate_test.go.current.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/source_gate_test.go.preimage.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/start-context.json"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/static-patch-integrity.json"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/static-source-inspection.json"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip-source-manifest.json"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/.gitattributes"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/actual-wip01-failure-and-wip02-scope.json"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/complete-four-file-wip02.patch"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/effect_gate_test.go.base-preimage.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/effect_gate_test.go.current.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/effect_gate_test.go.wip01-preimage.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/h12-signature-actual-case-rows.json.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/h12-signature-actual-go-root-proof.json.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/h12-signature-actual-go-summary.json.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/h12_signature_internal.go.current.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/h12_signature_test.go.current.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/packet-manifest-wip02.json"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/real-source-dependency-input-plan-wip02.json"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-isolated-test-proposal-wip02.json"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-original-index.json.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/go-image-inspect.log.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/go-image-pull.log.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/go-probe-create.log.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/go-probe-final.json.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/go-probe-initial.json.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/go-probe-inspect.log.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/go-probe-remove.log.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/go-version-probe.log.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/h12-base-source-files.json.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/h12-execution-receipt.json.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/h12-frozen-source-before.json.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/h12-frozen-started.json.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/h12-phase1-argv.json.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/h12-phase1-container.log.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/h12-phase1-create.log.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/h12-phase1-exit.txt.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/h12-phase1-final.json.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/h12-phase1-initial.json.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/h12-phase1-memory-peak.bytes.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/h12-phase1-receipt.json.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/h12-phase1-source-after.json.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/h12-phase1.sh.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/h12-phase1.stderr.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/h12-phase1.stdout.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/h12-phase2-argv.json.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/h12-phase2-container.log.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/h12-phase2-create.log.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/h12-phase2-exit.txt.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/h12-phase2-final.json.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/h12-phase2-initial.json.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/h12-phase2-memory-peak.bytes.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/h12-phase2-receipt.json.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/h12-phase2-source-after.json.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/h12-phase2.sh.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/h12-phase2.stderr.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/h12-phase2.stdout.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/h12-phase3-argv.json.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/h12-phase3-container.log.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/h12-phase3-create.log.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/h12-phase3-exit.txt.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/h12-phase3-final.json.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/h12-phase3-initial.json.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/h12-phase3-memory-peak.bytes.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/h12-phase3-receipt.json.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/h12-phase3-source-after.json.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/h12-phase3.sh.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/h12-phase3.stderr.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/h12-phase3.stdout.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/h12-phase4-argv.json.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/h12-phase4-container.log.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/h12-phase4-create.log.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/h12-phase4-exit.txt.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/h12-phase4-final.json.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/h12-phase4-initial.json.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/h12-phase4-memory-peak.bytes.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/h12-phase4-receipt.json.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/h12-phase4-source-after.json.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/h12-phase4.sh.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/h12-phase4.stderr.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/h12-phase4.stdout.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/h12-root-source-index.json.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/job.json.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/prepare-receipt.json.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/prepare-started.json.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/source-setup-checkout-base.log.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/source-setup-clean.log.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/source-setup-commands.tsv.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/source-setup-container-final.json.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/source-setup-container-initial.json.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/source-setup-create.log.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/source-setup-exits.tsv.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/source-setup-fetch-base.log.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/source-setup-fetch-k1.log.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/source-setup-go-list-files.log.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/source-setup-head.log.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/source-setup-init.log.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/source-setup-k1-contracts.go.log.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/source-setup-k1-current.go.log.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/source-setup-k1-ed25519.go.log.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/source-setup-k1-graph.go.log.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/source-setup-k1-json.go.log.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/source-setup-k1-list.log.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/source-setup-k1-native.go.log.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/source-setup-k1-proofs.go.log.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/source-setup-k1-recipes.go.log.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/source-setup-k1-schemas.go.log.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/source-setup-k1-temporal.go.log.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/source-setup-k1-trust.go.log.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/source-setup-k1-verify.go.log.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/source-setup-memory-peak.bytes.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/source-setup-mod-download.log.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/source-setup-mod-verify.log.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/source-setup-receipt.json.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/source-setup-remote.log.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/source-setup-sparse-init.log.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/source-setup-sparse-set.log.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/source-setup-started.json.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/source-setup.log.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/source-setup.sh.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-receipt-provenance.json"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/source_gate_test.go.base-preimage.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/source_gate_test.go.current.raw"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/static-fix-scope-and-format.json"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/wip01-to-wip02-one-file.patch"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/wip02-source-manifest.json"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/History/2026-11-07_FLEET5_K2_H12_Signature_Code_Publication_Codex.md"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/History/2026-11-07_FLEET5_K2_H12_Signature_Code_R1_Codex.md"
+    },
+    {
+      "status": "??",
+      "path": "docs/vault/30_Development/History/2026-11-07_FLEET5_K2_H12_Signature_Type_Scope_WIP02_Codex.md"
+    },
+    {
+      "status": "??",
+      "path": "services/node-agent/internal/migrationcontext/h12_signature_internal.go"
+    },
+    {
+      "status": "??",
+      "path": "services/node-agent/internal/migrationcontext/h12_signature_test.go"
+    }
+  ],
+  "excludedActualResidual": [],
+  "self": "This plan and subsequent stage receipts in same permitted publication prefix are explicitly staged too; manifest self hashes excluded"
+}

@@ -1,0 +1,57 @@
+{
+  "classification": "SYNTAX_FORMAT_WHITESPACE_ONLY_NO_COMPILE_TEST_CRYPTO",
+  "commands": [
+    {
+      "argv": [
+        "C:/Program Files/Go/bin/gofmt.exe",
+        "-l",
+        "services/node-agent/internal/migrationcontext/h12_signature_internal.go",
+        "services/node-agent/internal/migrationcontext/h12_signature_test.go",
+        "services/node-agent/internal/migrationcontext/effect_gate_test.go",
+        "services/node-agent/internal/migrationcontext/source_gate_test.go"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": "",
+      "atKST": "2026-11-07T09:57:27.938300+09:00"
+    },
+    {
+      "argv": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": "",
+      "atKST": "2026-11-07T09:57:29.215623+09:00"
+    }
+  ],
+  "formatterSHA256": "e7252077f308fe8344091a168b24cb56d1366e7d8f5c64c2086ce17d262e3eef",
+  "GoCompile": "NOT_RUN",
+  "crypto": "NOT_RUN",
+  "tests": "NOT_RUN",
+  "DocsGates": "NOT_RUN_WAIT_ROOT_PUBLICATION_GRANT",
+  "sourceCurrent": [
+    {
+      "path": "services/node-agent/internal/migrationcontext/h12_signature_internal.go",
+      "bytes": 2505,
+      "SHA256": "f9e3e808d8951c2da6fee4b45364f64bb5c909a33a90c3a6074c99b8cb6e4def"
+    },
+    {
+      "path": "services/node-agent/internal/migrationcontext/h12_signature_test.go",
+      "bytes": 12939,
+      "SHA256": "94f9bd56deaa371125ceba49f5d7a21d30a4bc34575fed4747f693b51d1ce020"
+    },
+    {
+      "path": "services/node-agent/internal/migrationcontext/effect_gate_test.go",
+      "bytes": 27623,
+      "SHA256": "eaf6ae9a9bb40a68fa92be4a3f2f42b05b1d69218f60497d747b78586fb59fd5"
+    },
+    {
+      "path": "services/node-agent/internal/migrationcontext/source_gate_test.go",
+      "bytes": 25737,
+      "SHA256": "0ad2989b6f36224352516e17f278b957cc25077f657560975e0ebcb063ff9208"
+    }
+  ]
+}

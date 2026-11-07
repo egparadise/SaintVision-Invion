@@ -1,0 +1,731 @@
+diff --git a/services/node-agent/internal/migrationcontext/effect_gate_test.go b/services/node-agent/internal/migrationcontext/effect_gate_test.go
+index cc3258e5a4a9b407a3425c5fa2d5b0ff68897b80..19f2673c2fa4634d79616175080b983a30641772 100644
+--- a/services/node-agent/internal/migrationcontext/effect_gate_test.go
++++ b/services/node-agent/internal/migrationcontext/effect_gate_test.go
+@@ -137,6 +137,94 @@ var pureExternalObjects = map[string]bool{
+ 	k1Import + ".CanonicalJSON": true, k1Import + ".NewVerifier": true, k1Import + ".Verifier.Verify": true,
+ }
+ 
++const h12SignatureSource = "h12_signature_internal.go"
++
++type h12ScopedUses struct {
++	references map[token.Pos]bool
++	calls      map[token.Pos]bool
++}
++
++// This is a position/object/direct-call exception, NOT a package-wide allowance.
++// Unadjusted positions deliberately ignore //line filename impersonation.
++func h12ScopedCryptoUses(checked checkedSource) (h12ScopedUses, error) {
++	allowed := h12ScopedUses{references: map[token.Pos]bool{}, calls: map[token.Pos]bool{}}
++	parents := map[ast.Node]ast.Node{}
++	for _, f := range checked.files {
++		stack := []ast.Node{}
++		ast.Inspect(f, func(n ast.Node) bool {
++			if n == nil {
++				stack = stack[:len(stack)-1]
++				return false
++			}
++			if len(stack) > 0 {
++				parents[n] = stack[len(stack)-1]
++			}
++			stack = append(stack, n)
++			return true
++		})
++	}
++	owner := func(id *ast.Ident) string {
++		for n := ast.Node(id); n != nil; n = parents[n] {
++			if _, ok := n.(*ast.FuncLit); ok {
++				return "" // No nested wrapper/callback exception.
++			}
++			if fn, ok := n.(*ast.FuncDecl); ok {
++				if fn.Recv == nil && checked.info.Defs[fn.Name] == checked.pkg.Scope().Lookup(fn.Name.Name) {
++					return fn.Name.Name
++				}
++				return ""
++			}
++		}
++		return ""
++	}
++	for id, obj := range checked.info.Uses {
++		key := objectID(obj)
++		pos := checked.fset.PositionFor(id.Pos(), false)
++		file := filepath.ToSlash(pos.Filename)
++		if typ, ok := obj.(*types.TypeName); ok && typ.Pkg() != nil && typ.Pkg().Path() == "crypto/ed25519" {
++			sel, selector := parents[id].(*ast.SelectorExpr)
++			assertion, asserted := parents[sel].(*ast.TypeAssertExpr)
++			dataAssertion := selector && sel.Sel == id && asserted && assertion.Type == sel
++			// Preserve the pre-existing reviewed policy.go public-key assertion.
++			oldData := file == "policy.go" && owner(id) == "checkMemberBindings"
++			newData := file == h12SignatureSource && owner(id) == "h12CheckRegistrySignature"
++			if key != "crypto/ed25519.PublicKey" || !dataAssertion || !(oldData || newData) {
++				return allowed, fmt.Errorf("h12 crypto type scope forbidden: %s at %s", key, file)
++			}
++		}
++		switch key {
++		case "crypto/ed25519.Verify", "crypto/x509.ParsePKIXPublicKey", "crypto/x509.MarshalPKIXPublicKey":
++			if _, ok := obj.(*types.Func); !ok || file != h12SignatureSource {
++				return allowed, fmt.Errorf("h12 crypto source path forbidden: %s at %s", key, file)
++			}
++			if owner(id) != "h12CheckRegistrySignature" {
++				return allowed, fmt.Errorf("h12 crypto helper scope forbidden: %s", key)
++			}
++			var expr ast.Node = id
++			if sel, ok := parents[id].(*ast.SelectorExpr); ok && sel.Sel == id {
++				expr = sel
++			}
++			call, ok := parents[expr].(*ast.CallExpr)
++			if !ok || call.Fun != expr {
++				return allowed, fmt.Errorf("h12 crypto non-direct reference forbidden: %s", key)
++			}
++			allowed.references[id.Pos()] = true
++			allowed.calls[call.Pos()] = true
++		}
++	}
++	return allowed, nil
++}
++
++func h12ResolvedVerifyAt(checked checkedSource, allowed h12ScopedUses, line, column int) bool {
++	for id, obj := range checked.info.Uses {
++		p := checked.fset.PositionFor(id.Pos(), false)
++		if filepath.ToSlash(p.Filename) == h12SignatureSource && p.Line == line && p.Column == column && objectID(obj) == "crypto/ed25519.Verify" && allowed.references[id.Pos()] {
++			return true
++		}
++	}
++	return false
++}
++
+ func rejectNativeSources(src map[string][]byte) error {
+ 	native := map[string]bool{".s": true, ".syso": true, ".c": true, ".h": true, ".cc": true, ".cpp": true, ".cxx": true, ".hpp": true, ".m": true, ".mm": true, ".f": true, ".f90": true, ".sx": true, ".o": true, ".a": true, ".obj": true, ".dll": true, ".so": true, ".dylib": true}
+ 	for name := range src {
+@@ -335,6 +423,10 @@ func sourceEffects(src map[string][]byte, checked checkedSource) error {
+ 	if e := rejectNativeSources(src); e != nil {
+ 		return e
+ 	}
++	h12, e := h12ScopedCryptoUses(checked)
++	if e != nil {
++		return e
++	}
+ 	for name, b := range src {
+ 		if strings.HasSuffix(name, ".go") && !strings.HasSuffix(name, "_test.go") {
+ 			for _, tag := range []string{"//go:linkname", "//go:cgo_", "//go:wasmimport", "//go:wasmexport"} {
+@@ -366,7 +458,7 @@ func sourceEffects(src map[string][]byte, checked checkedSource) error {
+ 			}
+ 		}
+ 	}
+-	for _, obj := range checked.info.Uses {
++	for id, obj := range checked.info.Uses {
+ 		if v := foreignPackageVar(obj); v != nil && objectID(v) != "time.UTC" {
+ 			return fmt.Errorf("foreign package variable read forbidden: %s", objectID(v))
+ 		}
+@@ -376,7 +468,7 @@ func sourceEffects(src map[string][]byte, checked checkedSource) error {
+ 				return fmt.Errorf("exported own interface/constraint dispatch forbidden: %s", objectID(f))
+ 			}
+ 		}
+-		if f, ok := obj.(*types.Func); ok && f.Pkg() != nil && f.Pkg().Path() != ownImport && !pureExternalObjects[objectID(f)] {
++		if f, ok := obj.(*types.Func); ok && f.Pkg() != nil && f.Pkg().Path() != ownImport && !pureExternalObjects[objectID(f)] && !h12.references[id.Pos()] {
+ 			return fmt.Errorf("unreviewed function/method object: %s", objectID(f))
+ 		}
+ 	}
+@@ -449,7 +541,7 @@ func sourceEffects(src map[string][]byte, checked checkedSource) error {
+ 				}
+ 				switch x := obj.(type) {
+ 				case *types.Func:
+-					if x.Pkg() == nil || x.Pkg().Path() != ownImport && !pureExternalObjects[objectID(x)] {
++					if x.Pkg() == nil || x.Pkg().Path() != ownImport && !pureExternalObjects[objectID(x)] && !h12.calls[call.Pos()] {
+ 						failure = fmt.Errorf("unreviewed call: %s", objectID(x))
+ 					}
+ 				case *types.Builtin:
+@@ -614,3 +706,100 @@ import text "strings";func probe(){_ = text.Trim("x","x")}`)
+ 		}
+ 	})
+ }
++
++// Compile the stdlib-only source probe with the REAL compiler before crediting
++// a guard denial. This is an isolated mutant fixture, never a replacement/stub
++// for either real repository module or its contracts/export dependencies.
++func h12CompileGuardProbe(t *testing.T, root, name, code string) checkedSource {
++	t.Helper()
++	dir := t.TempDir()
++	module := []byte("module " + ownImport + "\n\ngo 1.23\n")
++	if e := os.WriteFile(filepath.Join(dir, "go.mod"), module, 0600); e != nil {
++		t.Fatal(e)
++	}
++	if e := os.WriteFile(filepath.Join(dir, name), []byte(code), 0600); e != nil {
++		t.Fatal(e)
++	}
++	sourceCommand(t, dir, "go", "build", "-p=1", "-mod=readonly", "-o", filepath.Join(dir, "probe.a"), ".")
++	checked, e := checkSourcePackage(ownImport, map[string][]byte{name: []byte(code)}, exports(t, root), nil)
++	if e != nil {
++		t.Fatal("guard probe must compile AND resolve actual exported types", e)
++	}
++	return checked
++}
++
++func TestH12ScopedCryptoObjectBoundary(t *testing.T) {
++	root := repository(t)
++	original := ownProductionSources(t, root)
++	checked, e := checkSourcePackage(ownImport, original, exports(t, root), nil)
++	if e != nil {
++		t.Fatal(e)
++	}
++	if e = sourceEffects(original, checked); e != nil {
++		t.Fatal("real unchanged-closure control", e)
++	}
++	verify := `package migrationcontext
++import ed "crypto/ed25519"
++func h12CheckRegistrySignature(){_ = ed.Verify([]byte(nil),nil,nil)}
++`
++	cases := []struct {
++		name, file, code, cause string
++		allowed                 bool
++	}{
++		{"same-file-direct-import-alias", h12SignatureSource, verify, "", true},
++		{"foreign-file-direct-call", "h12_foreign.go", verify, "h12 crypto source path", false},
++		{"foreign-file-aliased-PKIX", "h12_foreign.go", `package migrationcontext
++import cert "crypto/x509"
++func h12CheckRegistrySignature(){_,_ = cert.ParsePKIXPublicKey(nil)}
++`, "h12 crypto source path", false},
++		{"line-directive-cannot-impersonate", "h12_foreign.go", "package migrationcontext\nimport ed \"crypto/ed25519\"\n//line h12_signature_internal.go:1\nfunc h12CheckRegistrySignature(){_ = ed.Verify([]byte(nil),nil,nil)}\n", "h12 crypto source path", false},
++		{"function-value-capture", h12SignatureSource, `package migrationcontext
++import ed "crypto/ed25519"
++func h12CheckRegistrySignature(){f:=ed.Verify;_ = f}
++`, "h12 crypto non-direct reference", false},
++		{"noncall-PKIX-reference", h12SignatureSource, `package migrationcontext
++import cert "crypto/x509"
++func h12CheckRegistrySignature(){_ = cert.MarshalPKIXPublicKey}
++`, "h12 crypto non-direct reference", false},
++		{"pass-function-as-argument", h12SignatureSource, `package migrationcontext
++import cert "crypto/x509"
++func consume(_ func([]byte)(any,error)){}
++func h12CheckRegistrySignature(){consume(cert.ParsePKIXPublicKey)}
++`, "h12 crypto non-direct reference", false},
++		{"different-function-wrapper", h12SignatureSource, `package migrationcontext
++import ed "crypto/ed25519"
++func wrapper(){_ = ed.Verify([]byte(nil),nil,nil)}
++`, "h12 crypto helper scope", false},
++		{"nested-function-wrapper", h12SignatureSource, `package migrationcontext
++import ed "crypto/ed25519"
++func h12CheckRegistrySignature(){_ = func(){_ = ed.Verify([]byte(nil),nil,nil)}}
++`, "h12 crypto helper scope", false},
++		{"unapproved-method-value", h12SignatureSource, `package migrationcontext
++import cert "crypto/x509"
++func h12CheckRegistrySignature(c *cert.Certificate){_ = c.Verify}
++`, "crypto/x509.Certificate.Verify", false},
++		{"private-key-type-not-DATA", h12SignatureSource, `package migrationcontext
++import ed "crypto/ed25519"
++func h12CheckRegistrySignature(k ed.PrivateKey){_ = k}
++`, "h12 crypto type scope", false},
++		{"all-three-direct-control", h12SignatureSource, `package migrationcontext
++import ed "crypto/ed25519"
++import cert "crypto/x509"
++func h12CheckRegistrySignature(){p,_:=cert.ParsePKIXPublicKey(nil);k,_:=p.(ed.PublicKey);_,_=cert.MarshalPKIXPublicKey(k);_=ed.Verify(k,nil,nil)}
++`, "", true},
++	}
++	for _, x := range cases {
++		t.Run(x.name, func(t *testing.T) {
++			checked := h12CompileGuardProbe(t, root, x.file, x.code)
++			e := sourceEffects(map[string][]byte{x.file: []byte(x.code)}, checked)
++			if x.allowed {
++				if e != nil {
++					t.Fatal("direct scoped control", e)
++				}
++			} else if e == nil || !strings.Contains(e.Error(), x.cause) {
++				t.Fatal("wrong causal source refusal", x.cause, e)
++			}
++			t.Logf("H12_GUARD_CASE id=%s sourceSHA256=%s compile=pass typed=pass allowed=%t actualCryptoExecuted=false", x.name, hashBytes([]byte(x.file+"\x00"+x.code)), x.allowed)
++		})
++	}
++}
+diff --git a/services/node-agent/internal/migrationcontext/source_gate_test.go b/services/node-agent/internal/migrationcontext/source_gate_test.go
+index a395e5ff9824ddc01c27004f1627dfda2bb56b09..fe2b1ec68e6aac39e57dcf4bd50917e5b0bd8a75 100644
+--- a/services/node-agent/internal/migrationcontext/source_gate_test.go
++++ b/services/node-agent/internal/migrationcontext/source_gate_test.go
+@@ -535,6 +535,14 @@ func TestCensusMutantsAfterSimulatedRawRepin(t *testing.T) {
+ func TestRepositoryBoundaryAndZeroEffects(t *testing.T) {
+ 	root := repository(t)
+ 	requireResolvedEffectBoundary(t, root)
++	h12Checked, h12Err := checkSourcePackage(ownImport, ownProductionSources(t, root), exports(t, root), nil)
++	if h12Err != nil {
++		t.Fatal(h12Err)
++	}
++	h12Uses, h12Err := h12ScopedCryptoUses(h12Checked)
++	if h12Err != nil {
++		t.Fatal(h12Err)
++	}
+ 	listed := strings.Fields(string(sourceCommand(t, root, "git", "ls-files", "--", "*.go", ":(glob)**/go.mod")))
+ 	paths := map[string]bool{}
+ 	modules := []string{}
+@@ -690,7 +698,10 @@ func TestRepositoryBoundaryAndZeroEffects(t *testing.T) {
+ 							t.Fatal("physical clock timer forbidden")
+ 						}
+ 						if id.Name == "ed25519" && sel.Sel.Name != "PublicKey" {
+-							t.Fatal("only public-key type use is granted")
++							pos := fs.PositionFor(sel.Sel.Pos(), false)
++							if p != ownDir+h12SignatureSource || !h12ResolvedVerifyAt(h12Checked, h12Uses, pos.Line, pos.Column) {
++								t.Fatal("only existing public-key DATA or exact resolved H12 direct Verify is granted")
++							}
+ 						}
+ 					}
+ 					switch sel.Sel.Name {
+@@ -724,3 +735,59 @@ func TestRepositoryBoundaryAndZeroEffects(t *testing.T) {
+ 	}
+ 	t.Logf("repo modules=%v; Go files=%d; production imports=%v; test imports=%v; immutable K1 definitions=%v; sole bridge sites=%v", modules, len(ordered), prodImports, testImports, baselineDeclarations, constructors)
+ }
++
++func TestH12RepositoryResolvedExceptionPosition(t *testing.T) {
++	root := repository(t)
++	code := `package migrationcontext
++import ed25519 "crypto/ed25519"
++func h12CheckRegistrySignature(){_ = ed25519.Verify([]byte(nil),nil,nil)}
++`
++	checked := h12CompileGuardProbe(t, root, h12SignatureSource, code)
++	allowed, e := h12ScopedCryptoUses(checked)
++	if e != nil {
++		t.Fatal(e)
++	}
++	found := false
++	for id, obj := range checked.info.Uses {
++		if objectID(obj) != "crypto/ed25519.Verify" {
++			continue
++		}
++		p := checked.fset.PositionFor(id.Pos(), false)
++		if !h12ResolvedVerifyAt(checked, allowed, p.Line, p.Column) {
++			t.Fatal("actual resolved source position refused")
++		}
++		if h12ResolvedVerifyAt(checked, allowed, p.Line, p.Column+1) {
++			t.Fatal("nearby spelling acquired exception")
++		}
++		found = true
++	}
++	if !found {
++		t.Fatal("actual Verify object precondition missing")
++	}
++	// The same spelled selector on a concrete own method is NOT this exception.
++	mimic := `package migrationcontext
++type mimic struct{}
++func(mimic)Verify(_ []byte,_ []byte,_ []byte)bool{return false}
++func h12CheckRegistrySignature(){ed25519:=mimic{};_ = ed25519.Verify(nil,nil,nil)}
++`
++	other := h12CompileGuardProbe(t, root, h12SignatureSource, mimic)
++	empty, e := h12ScopedCryptoUses(other)
++	if e != nil {
++		t.Fatal(e)
++	}
++	seen := false
++	for id := range other.info.Uses {
++		if id.Name != "Verify" {
++			continue
++		}
++		p := other.fset.PositionFor(id.Pos(), false)
++		if h12ResolvedVerifyAt(other, empty, p.Line, p.Column) {
++			t.Fatal("same spelling was mistaken for resolved Ed25519 object")
++		}
++		seen = true
++	}
++	if !seen {
++		t.Fatal("own-method mimic did not typecheck to the targeted selector")
++	}
++	t.Log("H12_REPOSITORY_EXCEPTION real compile/type/object/position controls passed; no crypto executed")
++}
+diff --git a/services/node-agent/internal/migrationcontext/h12_signature_internal.go b/services/node-agent/internal/migrationcontext/h12_signature_internal.go
+new file mode 100644
+index 0000000000000000000000000000000000000000..6beb6a342d3b7d9f3fcdfd610e03d038e66d5a49
+--- /dev/null
++++ b/services/node-agent/internal/migrationcontext/h12_signature_internal.go
+@@ -0,0 +1,56 @@
++package migrationcontext
++
++import (
++	"bytes"
++	"crypto/ed25519"
++	"crypto/x509"
++)
++
++// A true result is mathematical/canonical DATA under the supplied expected-key
++// hypothesis, never installed trust, key quality, authorization or public success.
++// The caller exclusively owns inputs during admission/copy; no concurrent or
++// hostile same-process mutation isolation is claimed. No production port calls it.
++func h12CheckRegistrySignature(rawRecord, publicSPKIDER []byte, independentlyExpectedSPKISHA256 string) (p02SignatureTuple, bool) {
++	// p02EnvelopeLimit is the existing 2 MiB record limit (PayloadLimit is 16 MiB).
++	if len(rawRecord) == 0 || len(rawRecord) > p02EnvelopeLimit || len(publicSPKIDER) == 0 || len(publicSPKIDER) > 4096 || len(independentlyExpectedSPKISHA256) != 64 {
++		return p02SignatureTuple{}, false
++	}
++	for _, c := range independentlyExpectedSPKISHA256 {
++		if !(c >= '0' && c <= '9' || c >= 'a' && c <= 'f') {
++			return p02SignatureTuple{}, false
++		}
++	}
++	raw := copyBytes(rawRecord)
++	der := copyBytes(publicSPKIDER)
++	v, ok := p02Decode(raw, p02EnvelopeLimit, false)
++	if !ok || !p02EnvelopeSchema(v) {
++		return p02SignatureTuple{}, false
++	}
++	e := p02ReadEnvelope(v)
++	if e.body.format != p02Format || e.body.purpose != p02Purpose || e.signer.keySPKISHA256 != independentlyExpectedSPKISHA256 || hashBytes(der) != independentlyExpectedSPKISHA256 {
++		return p02SignatureTuple{}, false
++	}
++	sig, ok := p02Unhex(e.signatureHex)
++	if !ok || len(sig) != 64 {
++		return p02SignatureTuple{}, false
++	}
++	parsed, err := x509.ParsePKIXPublicKey(der)
++	if err != nil {
++		return p02SignatureTuple{}, false
++	}
++	key, ok := parsed.(ed25519.PublicKey)
++	if !ok || len(key) != 32 {
++		return p02SignatureTuple{}, false
++	}
++	canonicalDER, err := x509.MarshalPKIXPublicKey(key)
++	if err != nil || !bytes.Equal(canonicalDER, der) {
++		return p02SignatureTuple{}, false
++	}
++	c := p02Context{envelopeValue: v}
++	message := c.signingInput()
++	if len(message) <= len(p02Domain) || len(message) > p02EnvelopeLimit+len(p02Domain)+1 || !ed25519.Verify(key, message, sig) {
++		return p02SignatureTuple{}, false
++	}
++	b := e.body
++	return p02SignatureTuple{format: b.format, purpose: b.purpose, domain: p02Domain, keySPKI: independentlyExpectedSPKISHA256, capsuleSHA256: b.capsuleSHA256, generation: b.provisioningGeneration, selector: b.selector, scopeSHA256: b.scopeSHA256, requestBindingSHA256: b.requestBindingSHA256, anchorVersion: b.anchorVersion, recordVersion: b.recordVersion, signingInput: message, signature: sig}, true
++}
+diff --git a/services/node-agent/internal/migrationcontext/h12_signature_test.go b/services/node-agent/internal/migrationcontext/h12_signature_test.go
+new file mode 100644
+index 0000000000000000000000000000000000000000..ec386c7e3530c88a10305efc7f29ba66fcdf245b
+--- /dev/null
++++ b/services/node-agent/internal/migrationcontext/h12_signature_test.go
+@@ -0,0 +1,334 @@
++package migrationcontext
++
++import (
++	"bytes"
++	"crypto/ed25519"
++	"crypto/sha256"
++	"crypto/x509"
++	"encoding/hex"
++	"encoding/json"
++	"reflect"
++	"strconv"
++	"strings"
++	"testing"
++)
++
++// PUBLIC NONSECRET TEST VECTOR, not a credential. Crypto executes only when
++// Root runs these tests in the separately authorized isolated Go environment.
++var h12PublicTestSeed = [32]byte{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32}
++
++const h12ExpectedTestDomain = "fleet5/p02/installed-policy-registry/candidate/v2"
++
++type h12TestInput struct {
++	raw, der, signedMessage, sig []byte
++	expected                     string
++	public                       ed25519.PublicKey
++}
++
++func h12JSON(t *testing.T, v any) []byte {
++	t.Helper()
++	b, e := json.Marshal(v)
++	if e != nil {
++		t.Fatal(e)
++	}
++	return b
++}
++func h12Object(t *testing.T, raw []byte) map[string]json.RawMessage {
++	t.Helper()
++	var v map[string]json.RawMessage
++	if e := json.Unmarshal(raw, &v); e != nil {
++		t.Fatal(e)
++	}
++	return v
++}
++func h12String(t *testing.T, v json.RawMessage) string {
++	t.Helper()
++	var s string
++	if e := json.Unmarshal(v, &s); e != nil {
++		t.Fatal(e)
++	}
++	return s
++}
++func h12Integer(t *testing.T, v json.RawMessage) int64 {
++	t.Helper()
++	var n int64
++	if e := json.Unmarshal(v, &n); e != nil {
++		t.Fatal(e)
++	}
++	return n
++}
++
++// Independent signing oracle: stdlib canonical fixture JSON, fixed literal
++// domain + NUL + WHOLE body/signer. Never calls the helper or signingInput().
++func h12OracleMessage(t *testing.T, raw []byte) []byte {
++	t.Helper()
++	env := h12Object(t, raw)
++	wrapper := struct {
++		Body   json.RawMessage `json:"body"`
++		Signer json.RawMessage `json:"signer"`
++	}{env["body"], env["signer"]}
++	out := append([]byte(h12ExpectedTestDomain), 0)
++	return append(out, h12JSON(t, wrapper)...)
++}
++func h12Wire(t *testing.T, body map[string]json.RawMessage, signer string, sig []byte) []byte {
++	t.Helper()
++	return h12JSON(t, map[string]any{"body": body, "signer": map[string]string{"keySPKISHA256": signer}, "signatureHex": hex.EncodeToString(sig)})
++}
++func h12Fixture(t *testing.T, derOverride []byte, differentBody bool, mode string) h12TestInput {
++	t.Helper()
++	key := ed25519.NewKeyFromSeed(h12PublicTestSeed[:])
++	pub := key.Public().(ed25519.PublicKey)
++	der, e := x509.MarshalPKIXPublicKey(pub)
++	if e != nil {
++		t.Fatal(e)
++	}
++	if derOverride != nil {
++		der = copyBytes(derOverride)
++	}
++	expected := hashBytes(der)
++	env := h12Object(t, p02BenignFixture().raw)
++	body := h12Object(t, env["body"])
++	if differentBody {
++		body["selector"] = h12JSON(t, "mathematically-valid-other-policy")
++	}
++	raw := h12Wire(t, body, expected, make([]byte, 64))
++	msg := h12OracleMessage(t, raw)
++	switch mode {
++	case "wrong-domain":
++		msg = append(append([]byte("wrong/fleet5/domain"), 0), msg[len(h12ExpectedTestDomain)+1:]...)
++	case "missing-NUL":
++		msg = append([]byte(h12ExpectedTestDomain), msg[len(h12ExpectedTestDomain)+1:]...)
++	case "hash-only":
++		h := sha256.Sum256(msg)
++		msg = copyBytes(h[:])
++	case "body-only":
++		msg = append(append([]byte(h12ExpectedTestDomain), 0), h12JSON(t, body)...)
++	case "wrong-key":
++		seed := h12PublicTestSeed
++		seed[0] ^= 0x40
++		key = ed25519.NewKeyFromSeed(seed[:])
++	}
++	sig := ed25519.Sign(key, msg)
++	if !ed25519.Verify(key.Public().(ed25519.PublicKey), msg, sig) {
++		t.Fatal("independent signing oracle failed")
++	}
++	raw = h12Wire(t, body, expected, sig)
++	return h12TestInput{raw: raw, der: copyBytes(der), expected: expected, public: copyBytes(pub), signedMessage: copyBytes(msg), sig: copyBytes(sig)}
++}
++func h12Rewire(t *testing.T, f h12TestInput, change func(map[string]json.RawMessage)) h12TestInput {
++	t.Helper()
++	v := h12Object(t, f.raw)
++	change(v)
++	f.raw = h12JSON(t, v)
++	return f
++}
++func h12Fingerprint(f h12TestInput) string {
++	// Exactly the three function arguments; fixture labels/oracles excluded.
++	var b bytes.Buffer
++	for _, v := range [][]byte{f.raw, f.der, []byte(f.expected)} {
++		b.WriteString(strconv.Itoa(len(v)))
++		b.WriteByte(':')
++		b.Write(v)
++	}
++	return hashBytes(b.Bytes())
++}
++func h12TupleHash(v p02SignatureTuple) string {
++	var b bytes.Buffer
++	p02TestFingerprint(reflect.ValueOf(v), &b)
++	return hashBytes(b.Bytes())
++}
++func h12ExpectedTuple(t *testing.T, f h12TestInput) p02SignatureTuple {
++	t.Helper()
++	env := h12Object(t, f.raw)
++	b := h12Object(t, env["body"])
++	sig, e := hex.DecodeString(h12String(t, env["signatureHex"]))
++	if e != nil {
++		t.Fatal(e)
++	}
++	return p02SignatureTuple{format: h12String(t, b["format"]), purpose: h12String(t, b["purpose"]), domain: h12ExpectedTestDomain, keySPKI: f.expected, capsuleSHA256: h12String(t, b["capsuleSHA256"]), generation: h12String(t, b["provisioningGeneration"]), selector: h12String(t, b["selector"]), scopeSHA256: h12String(t, b["scopeSHA256"]), requestBindingSHA256: h12String(t, b["requestBindingSHA256"]), anchorVersion: h12Integer(t, b["anchorVersion"]), recordVersion: h12Integer(t, b["recordVersion"]), signingInput: h12OracleMessage(t, f.raw), signature: sig}
++}
++func h12MathPreconditions(t *testing.T, f h12TestInput) {
++	t.Helper()
++	v, ok := p02Decode(f.raw, p02EnvelopeLimit, false)
++	if !ok || !p02EnvelopeSchema(v) {
++		t.Fatal("math case lacks independently checked canonical/schema preconditions")
++	}
++	signer := h12Object(t, h12Object(t, f.raw)["signer"])
++	if len(f.expected) != 64 || h12String(t, signer["keySPKISHA256"]) != f.expected || hashBytes(f.der) != f.expected {
++		t.Fatal("math case lacks exact earlier DER/key binding")
++	}
++	// The known fixture public key and standard signature oracle establish key
++	// size and the independently signed ORIGINAL message, not target acceptance.
++	if len(f.public) != 32 || len(f.sig) != 64 {
++		t.Fatal("math key/signature length precondition")
++	}
++	canonicalDER, err := x509.MarshalPKIXPublicKey(f.public)
++	if err != nil || !bytes.Equal(canonicalDER, f.der) {
++		t.Fatal("math case lacks independently canonical expected-key DER")
++	}
++}
++
++func TestH12SignatureMathAndCanonicalBoundary(t *testing.T) {
++	base := h12Fixture(t, nil, false, "")
++	cases := []struct {
++		name, layer string
++		in          h12TestInput
++		want        bool
++	}{{"valid-whole-message", "math", base, true}, {"resigned-other-policy-math-only", "math", h12Fixture(t, nil, true, ""), true}}
++	for _, mode := range []string{"wrong-key", "wrong-domain", "missing-NUL", "hash-only", "body-only"} {
++		cases = append(cases, struct {
++			name, layer string
++			in          h12TestInput
++			want        bool
++		}{mode, "math", h12Fixture(t, nil, false, mode), false})
++	}
++	changed := h12Rewire(t, base, func(v map[string]json.RawMessage) {
++		b := h12Object(t, v["body"])
++		b["selector"] = h12JSON(t, "canonical-body-changed-without-resigning")
++		v["body"] = h12JSON(t, b)
++	})
++	cases = append(cases, struct {
++		name, layer string
++		in          h12TestInput
++		want        bool
++	}{"body-changed-without-resign", "math", changed, false})
++	tampered := h12Rewire(t, base, func(v map[string]json.RawMessage) {
++		sig := copyBytes(base.sig)
++		sig[63] ^= 1
++		v["signatureHex"] = h12JSON(t, hex.EncodeToString(sig))
++	})
++	cases = append(cases, struct {
++		name, layer string
++		in          h12TestInput
++		want        bool
++	}{"tampered-signature", "math", tampered, false})
++	add := func(name, layer string, f h12TestInput) {
++		cases = append(cases, struct {
++			name, layer string
++			in          h12TestInput
++			want        bool
++		}{name, layer, f, false})
++	}
++	for _, x := range []struct{ name, hash string }{{"empty-expected", ""}, {"short-expected", strings.Repeat("a", 63)}, {"long-expected", strings.Repeat("a", 65)}, {"uppercase-expected", strings.ToUpper(base.expected)}, {"invalid-expected", strings.Repeat("g", 64)}, {"wrong-expected", strings.Repeat("0", 64)}} {
++		f := base
++		f.expected = x.hash
++		add(x.name, "expected-key", f)
++	}
++	rawHash := base
++	rawHash.expected = hashBytes(base.public)
++	add("raw-key-hash-not-SPKI", "expected-key", rawHash)
++	emptyDER := base
++	emptyDER.der = nil
++	add("empty-DER", "admission", emptyDER)
++	hugeDER := base
++	hugeDER.der = bytes.Repeat([]byte{0}, 4097)
++	add("oversize-DER", "admission", hugeDER)
++	add("malformed-DER-rebound", "DER", h12Fixture(t, []byte{0x30, 0x00}, false, ""))
++	trailing := append(copyBytes(base.der), 0)
++	add("trailing-DER-rebound", "DER", h12Fixture(t, trailing, false, ""))
++	if len(base.der) != 44 || !bytes.Equal(base.der[:12], []byte{0x30, 0x2a, 0x30, 0x05, 0x06, 0x03, 0x2b, 0x65, 0x70, 0x03, 0x21, 0x00}) {
++		t.Fatal("fixture Ed25519 SPKI structural precondition")
++	}
++	wrongAlg := copyBytes(base.der)
++	wrongAlg[8] = 0x6e
++	add("wrong-algorithm-rebound", "DER", h12Fixture(t, wrongAlg, false, ""))
++	nullDER := append([]byte{0x30, 0x2c, 0x30, 0x07, 0x06, 0x03, 0x2b, 0x65, 0x70, 0x05, 0x00, 0x03, 0x21, 0x00}, base.der[12:]...)
++	add("NULL-parameter-DER-rebound", "DER", h12Fixture(t, nullDER, false, ""))
++	alternate := append([]byte{0x30, 0x81, 0x2a}, base.der[2:]...)
++	add("nonminimal-DER-rebound", "DER", h12Fixture(t, alternate, false, ""))
++	for _, n := range []int{63, 65} {
++		f := h12Rewire(t, base, func(v map[string]json.RawMessage) { v["signatureHex"] = h12JSON(t, strings.Repeat("aa", n)) })
++		add("signature-bytes-"+strconv.Itoa(n), "codec/signature-encoding", f)
++	}
++	for _, x := range []struct {
++		name string
++		raw  []byte
++	}{{"empty-record", nil}, {"oversize-record", bytes.Repeat([]byte{' '}, p02EnvelopeLimit+1)}, {"noncanonical-whitespace", append([]byte(" "), base.raw...)}, {"trailing-record", append(copyBytes(base.raw), '\n')}, {"duplicate-field", append([]byte(`{"body":null,`), base.raw[1:]...)}, {"invalid-UTF8", []byte{'{', '"', 0xff, '"', ':', '1', '}'}}, {"depth-bound", []byte(strings.Repeat("[", 70) + "0" + strings.Repeat("]", 70))}} {
++		f := base
++		f.raw = x.raw
++		add(x.name, "admission/codec", f)
++	}
++	seen := map[string]string{}
++	for _, x := range cases {
++		t.Run(x.name, func(t *testing.T) {
++			before := h12Fingerprint(x.in)
++			if prior, ok := seen[before]; ok {
++				t.Fatal("duplicate complete input", prior, x.name)
++			}
++			seen[before] = x.name
++			if x.layer == "math" {
++				h12MathPreconditions(t, x.in)
++				env := h12Object(t, x.in.raw)
++				wireSignature, err := hex.DecodeString(h12String(t, env["signatureHex"]))
++				if err != nil || len(wireSignature) != 64 || ed25519.Verify(x.in.public, h12OracleMessage(t, x.in.raw), wireSignature) != x.want {
++					t.Fatal("independent target-message oracle/precondition differs")
++				}
++			}
++			if x.name == "depth-bound" {
++				if _, ok := p02Decode(x.in.raw, p02EnvelopeLimit, false); ok {
++					t.Fatal("depth case must fail the bounded parser, not merely envelope schema")
++				}
++			}
++			if x.layer == "DER" {
++				v, ok := p02Decode(x.in.raw, p02EnvelopeLimit, false)
++				if !ok || !p02EnvelopeSchema(v) || hashBytes(x.in.der) != x.in.expected {
++					t.Fatal("DER case failed an earlier codec/key precondition")
++				}
++			}
++			got, ok := h12CheckRegistrySignature(x.in.raw, x.in.der, x.in.expected)
++			if ok != x.want {
++				t.Fatal("wrong math/canonical outcome", x.layer, ok)
++			}
++			if ok {
++				if !reflect.DeepEqual(got, h12ExpectedTuple(t, x.in)) {
++					t.Fatal("not exact13field tuple")
++				}
++				if !ed25519.Verify(x.in.public, got.signingInput, got.signature) {
++					t.Fatal("independent full-message signature oracle")
++				}
++			} else if !reflect.DeepEqual(got, p02SignatureTuple{}) {
++				t.Fatal("failure leaked nonzero tuple")
++			}
++			after := h12Fingerprint(x.in)
++			if before != after {
++				t.Fatal("helper mutated supplied arguments")
++			}
++			t.Logf("H12_CASE id=%s layer=%s beforeSHA256=%s afterSHA256=%s math=%t actualAuthority=false", x.name, x.layer, before, after, ok)
++		})
++	}
++	// A separate public call cannot consume this private math result as trust.
++	policy, err := NewService().LoadInstalledPolicy("deployment")
++	if policy != nil {
++		t.Fatal("math issued public policy")
++	}
++	wantCode(t, err, TrustUnknown)
++}
++
++func TestH12SignatureOwnedOutputAndAdmission(t *testing.T) {
++	f := h12Fixture(t, nil, false, "")
++	got, ok := h12CheckRegistrySignature(f.raw, f.der, f.expected)
++	if !ok {
++		t.Fatal("ownership control")
++	}
++	before := h12TupleHash(got)
++	for i := range f.raw {
++		f.raw[i] ^= 0xff
++	}
++	for i := range f.der {
++		f.der[i] ^= 0xff
++	}
++	if h12TupleHash(got) != before {
++		t.Fatal("returned tuple aliases original raw/DER")
++	}
++	// Reuse exactly the table's oversize-record arguments; these repeated
++	// evaluations are NOT additional distinct complete inputs.
++	over := h12Fixture(t, nil, false, "")
++	over.raw = bytes.Repeat([]byte{' '}, p02EnvelopeLimit+1)
++	var result p02SignatureTuple
++	var success bool
++	allocations := testing.AllocsPerRun(1, func() { result, success = h12CheckRegistrySignature(over.raw, over.der, over.expected) })
++	if allocations != 0 || success || !reflect.DeepEqual(result, p02SignatureTuple{}) {
++		t.Fatal("admission copied/parsed oversized record", allocations)
++	}
++	t.Logf("H12_ADMISSION allocations=%g repeatedEvaluations=2 uniqueAdditionalInputs=0 inputSHA256=%s tableCase=oversize-record actualAuthority=false", allocations, h12Fingerprint(over))
++}

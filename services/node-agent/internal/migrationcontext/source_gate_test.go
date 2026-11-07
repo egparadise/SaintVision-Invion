@@ -535,6 +535,14 @@ func TestCensusMutantsAfterSimulatedRawRepin(t *testing.T) {
 func TestRepositoryBoundaryAndZeroEffects(t *testing.T) {
 	root := repository(t)
 	requireResolvedEffectBoundary(t, root)
+	h12Checked, h12Err := checkSourcePackage(ownImport, ownProductionSources(t, root), exports(t, root), nil)
+	if h12Err != nil {
+		t.Fatal(h12Err)
+	}
+	h12Uses, h12Err := h12ScopedCryptoUses(h12Checked)
+	if h12Err != nil {
+		t.Fatal(h12Err)
+	}
 	listed := strings.Fields(string(sourceCommand(t, root, "git", "ls-files", "--", "*.go", ":(glob)**/go.mod")))
 	paths := map[string]bool{}
 	modules := []string{}
@@ -690,7 +698,10 @@ func TestRepositoryBoundaryAndZeroEffects(t *testing.T) {
 							t.Fatal("physical clock timer forbidden")
 						}
 						if id.Name == "ed25519" && sel.Sel.Name != "PublicKey" {
-							t.Fatal("only public-key type use is granted")
+							pos := fs.PositionFor(sel.Sel.Pos(), false)
+							if p != ownDir+h12SignatureSource || !h12ResolvedVerifyAt(h12Checked, h12Uses, pos.Line, pos.Column) {
+								t.Fatal("only existing public-key DATA or exact resolved H12 direct Verify is granted")
+							}
 						}
 					}
 					switch sel.Sel.Name {
@@ -723,4 +734,60 @@ func TestRepositoryBoundaryAndZeroEffects(t *testing.T) {
 		t.Fatalf("unexpected boundary census imports=%v construction=%v baseline=%v", prodImports, constructors, baselineDeclarations)
 	}
 	t.Logf("repo modules=%v; Go files=%d; production imports=%v; test imports=%v; immutable K1 definitions=%v; sole bridge sites=%v", modules, len(ordered), prodImports, testImports, baselineDeclarations, constructors)
+}
+
+func TestH12RepositoryResolvedExceptionPosition(t *testing.T) {
+	root := repository(t)
+	code := `package migrationcontext
+import ed25519 "crypto/ed25519"
+func h12CheckRegistrySignature(){_ = ed25519.Verify([]byte(nil),nil,nil)}
+`
+	checked := h12CompileGuardProbe(t, root, h12SignatureSource, code)
+	allowed, e := h12ScopedCryptoUses(checked)
+	if e != nil {
+		t.Fatal(e)
+	}
+	found := false
+	for id, obj := range checked.info.Uses {
+		if objectID(obj) != "crypto/ed25519.Verify" {
+			continue
+		}
+		p := checked.fset.PositionFor(id.Pos(), false)
+		if !h12ResolvedVerifyAt(checked, allowed, p.Line, p.Column) {
+			t.Fatal("actual resolved source position refused")
+		}
+		if h12ResolvedVerifyAt(checked, allowed, p.Line, p.Column+1) {
+			t.Fatal("nearby spelling acquired exception")
+		}
+		found = true
+	}
+	if !found {
+		t.Fatal("actual Verify object precondition missing")
+	}
+	// The same spelled selector on a concrete own method is NOT this exception.
+	mimic := `package migrationcontext
+type mimic struct{}
+func(mimic)Verify(_ []byte,_ []byte,_ []byte)bool{return false}
+func h12CheckRegistrySignature(){ed25519:=mimic{};_ = ed25519.Verify(nil,nil,nil)}
+`
+	other := h12CompileGuardProbe(t, root, h12SignatureSource, mimic)
+	empty, e := h12ScopedCryptoUses(other)
+	if e != nil {
+		t.Fatal(e)
+	}
+	seen := false
+	for id := range other.info.Uses {
+		if id.Name != "Verify" {
+			continue
+		}
+		p := other.fset.PositionFor(id.Pos(), false)
+		if h12ResolvedVerifyAt(other, empty, p.Line, p.Column) {
+			t.Fatal("same spelling was mistaken for resolved Ed25519 object")
+		}
+		seen = true
+	}
+	if !seen {
+		t.Fatal("own-method mimic did not typecheck to the targeted selector")
+	}
+	t.Log("H12_REPOSITORY_EXCEPTION real compile/type/object/position controls passed; no crypto executed")
 }

@@ -1,0 +1,211 @@
+{
+  "atKST": "2026-11-07T10:13:30+09:00",
+  "base": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed",
+  "codeCommit": null,
+  "packetSHA256": "f320083d6837c315e5900aae85e7be771a3754c70794715ededb40d55a18641c",
+  "manifestSHA256": "924e7ab820f76b2a0888bc11044740537b438f77091fb712e307a4528539aa19",
+  "operator": "Root Codex",
+  "environment": "Actual PC3 official pinned Go1.27.1 linux/amd64; nonroot1000; networknone;2CPU;2GiBmemory+swapTOTAL2GiB;read-onlyroot;ownjobonly",
+  "realGitSourceInputsVerified": 371,
+  "fourFilesOverlayOnly": true,
+  "allFrozenSourceFilesBeforeAfterEqual": true,
+  "frozenSourceFileCount": 373,
+  "phaseResults": [
+    {
+      "phase": 1,
+      "id": "math-canonical-ownership-admission",
+      "startedAtKST": "2026-11-07T10:09:12+09:00",
+      "endedAtKST": "2026-11-07T10:09:40+09:00",
+      "directExit": 0,
+      "elapsedSeconds": 28.366,
+      "topLevelPassed": 2,
+      "subtestsPassed": 32,
+      "cgroupMemoryPeakBytes": 401268736,
+      "OOMKilled": false,
+      "sourceBeforeAfterUnchanged": true,
+      "failEvents": [],
+      "skipEvents": [],
+      "ownExitedContainerRemoved": true,
+      "topLevelFailed": 0,
+      "subtestsFailed": 0,
+      "packageFailEvents": 0
+    },
+    {
+      "phase": 2,
+      "id": "new-exact-object-file-directcall-probes",
+      "startedAtKST": "2026-11-07T10:09:40+09:00",
+      "endedAtKST": "2026-11-07T10:09:42+09:00",
+      "directExit": 0,
+      "elapsedSeconds": 1.463,
+      "topLevelPassed": 2,
+      "subtestsPassed": 12,
+      "cgroupMemoryPeakBytes": 84881408,
+      "OOMKilled": false,
+      "sourceBeforeAfterUnchanged": true,
+      "failEvents": [],
+      "skipEvents": [],
+      "ownExitedContainerRemoved": true,
+      "topLevelFailed": 0,
+      "subtestsFailed": 0,
+      "packageFailEvents": 0
+    },
+    {
+      "phase": 3,
+      "id": "existing-d04-private-consistency",
+      "startedAtKST": "2026-11-07T10:09:42+09:00",
+      "endedAtKST": "2026-11-07T10:09:43+09:00",
+      "directExit": 0,
+      "elapsedSeconds": 1.465,
+      "topLevelPassed": 13,
+      "subtestsPassed": 101,
+      "cgroupMemoryPeakBytes": 161263616,
+      "OOMKilled": false,
+      "sourceBeforeAfterUnchanged": true,
+      "failEvents": [],
+      "skipEvents": [],
+      "ownExitedContainerRemoved": true,
+      "topLevelFailed": 0,
+      "subtestsFailed": 0,
+      "packageFailEvents": 0
+    },
+    {
+      "phase": 4,
+      "id": "existing-public-refusal-effect-source-census-plr",
+      "startedAtKST": "2026-11-07T10:09:43+09:00",
+      "endedAtKST": "2026-11-07T10:11:46+09:00",
+      "directExit": 1,
+      "elapsedSeconds": 122.772,
+      "topLevelPassed": 8,
+      "subtestsPassed": 124,
+      "cgroupMemoryPeakBytes": 681029632,
+      "OOMKilled": false,
+      "sourceBeforeAfterUnchanged": true,
+      "failEvents": [
+        "TestPLR1BCompiledWriteTargetsAndReasons/slice-root-foreign-pointee",
+        "TestPLR1BCompiledWriteTargetsAndReasons",
+        "TestPLR1CCompiledPointerConversionsAndControls/N6-slice-to-own-array-pointer",
+        "TestPLR1CCompiledPointerConversionsAndControls/S1-slice-local-copy-of-pointee",
+        "TestPLR1CCompiledPointerConversionsAndControls/S2-slice-parameter",
+        "TestPLR1CCompiledPointerConversionsAndControls",
+        "TestPLR1DCompiledTargetPointerTermsAndControls/G4-typeparam-target-slice-to-own-array",
+        "TestPLR1DCompiledTargetPointerTermsAndControls",
+        "github.com/egparadise/SaintVision-Invion/services/node-agent/internal/migrationcontext"
+      ],
+      "skipEvents": [],
+      "ownExitedContainerRemoved": true,
+      "topLevelFailed": 3,
+      "subtestsFailed": 5,
+      "packageFailEvents": 1
+    }
+  ],
+  "allFourPhasesActuallyPass": false,
+  "actualTopLevelPassed": 25,
+  "actualSubtestsPassed": 269,
+  "actualTopLevelFailed": 3,
+  "actualSubtestsFailed": 5,
+  "actualPackageFailEvents": 1,
+  "actualFailEvents": 9,
+  "actualSkippedEvents": 0,
+  "H12MathTableRows": 32,
+  "H12DistinctFullArgumentFingerprints": 32,
+  "H12TrueMathControls": 2,
+  "H12LayerCounts": {
+    "math": 9,
+    "expected-key": 7,
+    "admission": 2,
+    "DER": 5,
+    "codec/signature-encoding": 2,
+    "admission/codec": 7
+  },
+  "H12GuardActualCompileTypedRows": 12,
+  "H12GuardDistinctFixtureFingerprints": 12,
+  "H12ResolverCompilerControls": 2,
+  "H12AdmissionMeasurement": [
+    {
+      "allocations": 0.0,
+      "actualOversizeEvaluationRepeats": 2,
+      "additionalUniqueInputs": 0,
+      "inputSHA256": "0da11651d986542a4faf3285d8160ea08b30fa20b4c09d0ef19a96c5cad629d8"
+    }
+  ],
+  "H12AdditionalOwnershipValidInputRepeat": 1,
+  "H12TargetHelperEvaluationsByTableAndInspectedTestFlow": 35,
+  "H12ExtraDistinctInputsFromOwnershipOrAdmission": 0,
+  "P02CausalRows": 92,
+  "P02DistinctFullInputFingerprints": 90,
+  "originalReceiptFiles": 99,
+  "originalIndexSHA256": "84df652b43ff9a8ed8bcfe285b287ea25e9a5fd461da4ec531a2ee410ea5a0aa",
+  "RootTestedSourceFiles": [
+    {
+      "path": "services/node-agent/internal/migrationcontext/effect_gate_test.go",
+      "change": "M",
+      "preimage": {
+        "mode": "100644",
+        "blobOID": "cc3258e5a4a9b407a3425c5fa2d5b0ff68897b80",
+        "SHA256": "871e1b1ca26e6bcdcc4ea7af2e8a290dc7a9b615f201c46aa7bf1102e0af7c04",
+        "bytes": 19751,
+        "raw": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/effect_gate_test.go.preimage.raw"
+      },
+      "current": {
+        "mode": "100644",
+        "blobOID": "19f2673c2fa4634d79616175080b983a30641772",
+        "SHA256": "eaf6ae9a9bb40a68fa92be4a3f2f42b05b1d69218f60497d747b78586fb59fd5",
+        "bytes": 27623,
+        "encoding": "UTF-8 without BOM, LF",
+        "raw": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/effect_gate_test.go.current.raw"
+      }
+    },
+    {
+      "path": "services/node-agent/internal/migrationcontext/source_gate_test.go",
+      "change": "M",
+      "preimage": {
+        "mode": "100644",
+        "blobOID": "a395e5ff9824ddc01c27004f1627dfda2bb56b09",
+        "SHA256": "10c0229040b40d2dd0653979b4761da4e35baab5d519b8d52dbe368928c0c780",
+        "bytes": 23505,
+        "raw": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/source_gate_test.go.preimage.raw"
+      },
+      "current": {
+        "mode": "100644",
+        "blobOID": "fe2b1ec68e6aac39e57dcf4bd50917e5b0bd8a75",
+        "SHA256": "0ad2989b6f36224352516e17f278b957cc25077f657560975e0ebcb063ff9208",
+        "bytes": 25737,
+        "encoding": "UTF-8 without BOM, LF",
+        "raw": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/source_gate_test.go.current.raw"
+      }
+    },
+    {
+      "path": "services/node-agent/internal/migrationcontext/h12_signature_internal.go",
+      "change": "A",
+      "preimage": null,
+      "current": {
+        "mode": "100644",
+        "blobOID": "6beb6a342d3b7d9f3fcdfd610e03d038e66d5a49",
+        "SHA256": "f9e3e808d8951c2da6fee4b45364f64bb5c909a33a90c3a6074c99b8cb6e4def",
+        "bytes": 2505,
+        "encoding": "UTF-8 without BOM, LF",
+        "raw": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/h12_signature_internal.go.current.raw"
+      }
+    },
+    {
+      "path": "services/node-agent/internal/migrationcontext/h12_signature_test.go",
+      "change": "A",
+      "preimage": null,
+      "current": {
+        "mode": "100644",
+        "blobOID": "ec386c7e3530c88a10305efc7f29ba66fcdf245b",
+        "SHA256": "94f9bd56deaa371125ceba49f5d7a21d30a4bc34575fed4747f693b51d1ce020",
+        "bytes": 12939,
+        "encoding": "UTF-8 without BOM, LF",
+        "raw": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/h12_signature_test.go.current.raw"
+      }
+    }
+  ],
+  "independentCODEReview": "PENDING",
+  "productCI": "NOT_RUN",
+  "mathEvidenceAuthenticatesOrInstallsAuthority": false,
+  "actualH1H7Bindings": null,
+  "rawSeven": "UNREGISTERED",
+  "A01A40": "NOT_RUN",
+  "wholeProgramComplete": false
+}

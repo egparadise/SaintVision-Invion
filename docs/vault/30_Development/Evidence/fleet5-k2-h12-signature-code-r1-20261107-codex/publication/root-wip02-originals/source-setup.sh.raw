@@ -1,0 +1,37 @@
+#!/bin/bash
+set -eu
+cd /job
+trap 'cat /sys/fs/cgroup/memory.peak > /job/source-setup-memory-peak.bytes 2>/dev/null || true' EXIT
+run() {
+  local tag="$1"; shift
+  printf '%s\t' "$tag" >> /job/source-setup-commands.tsv
+  printf '%q ' "$@" >> /job/source-setup-commands.tsv
+  printf '\n' >> /job/source-setup-commands.tsv
+  set +e
+  "$@" > "/job/source-setup-${tag}.log" 2>&1
+  local rc=$?
+  set -e
+  printf '%s\t%s\n' "$tag" "$rc" >> /job/source-setup-exits.tsv
+  if [ "$rc" -ne 0 ]; then cat "/job/source-setup-${tag}.log"; exit "$rc"; fi
+  printf 'STEP %s exit=0\n' "$tag"
+}
+run init git init --quiet repo
+run remote git -C repo remote add origin https://github.com/egparadise/SaintVision-Invion.git
+run sparse-init git -C repo sparse-checkout init --no-cone
+run sparse-set git -C repo sparse-checkout set --no-cone '/services/node-agent/' '/packages/contracts-go/' '/contracts/' '*.go' 'go.mod' 'go.sum'
+run fetch-base git -C repo fetch --filter=blob:none --no-tags --depth=1 origin 0bf852a66b2eb01f95da65ebbad0360a04ea6fed
+run checkout-base git -C repo switch --detach 0bf852a66b2eb01f95da65ebbad0360a04ea6fed
+run fetch-k1 git -C repo fetch --filter=blob:none --no-tags --depth=1 origin eb32b211ab3704935b9431747089ab0715582a74
+run k1-list git -C repo ls-tree -r --name-only eb32b211ab3704935b9431747089ab0715582a74 -- services/node-agent/migrationverify/
+while IFS= read -r p; do
+  case "$p" in *_test.go) continue ;; *.go) run "k1-$(basename "$p")" git -C repo show "eb32b211ab3704935b9431747089ab0715582a74:$p" ;; esac
+done < /job/source-setup-k1-list.log
+run go-list-files git -C repo ls-files -- '*.go' ':(glob)**/go.mod'
+while IFS= read -r p; do test -f "/job/repo/$p" || { printf 'Missing source %s\n' "$p"; exit 91; }; done < /job/source-setup-go-list-files.log
+run head git -C repo rev-parse HEAD
+run clean git -C repo status --porcelain
+test ! -s /job/source-setup-clean.log
+cd /job/repo/services/node-agent
+run mod-download go mod download
+run mod-verify go mod verify
+printf 'SOURCE_SETUP_COMPLETE\n'

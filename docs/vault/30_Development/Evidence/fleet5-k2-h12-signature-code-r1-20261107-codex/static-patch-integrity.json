@@ -1,0 +1,15 @@
+{
+  "classification": "STATIC_BYTES_ONLY_NOT_GO_TEST",
+  "parserExit": 0,
+  "parser": "git apply --numstat, no apply",
+  "independentReconstruction": "Python text-hunk reconstruction in memory from real Git preimages",
+  "filesReconstructedExactly": [
+    "services/node-agent/internal/migrationcontext/effect_gate_test.go",
+    "services/node-agent/internal/migrationcontext/source_gate_test.go",
+    "services/node-agent/internal/migrationcontext/h12_signature_internal.go",
+    "services/node-agent/internal/migrationcontext/h12_signature_test.go"
+  ],
+  "GoCompile": "NOT_RUN",
+  "crypto": "NOT_RUN",
+  "semanticMutantKills": null
+}

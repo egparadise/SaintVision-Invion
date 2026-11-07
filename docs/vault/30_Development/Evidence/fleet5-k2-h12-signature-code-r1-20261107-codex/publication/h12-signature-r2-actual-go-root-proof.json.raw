@@ -1,0 +1,303 @@
+{
+  "atKST": "2026-11-07T10:25:28+09:00",
+  "base": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed",
+  "packetSHA256": "f4e1532a97a5b84d177917607dc2947965107ad7faedc78f5b0cdd004aacd018",
+  "manifestSHA256": "306871f5865defad9e79f9d8c6f8a185a9be31de8aad9dbb793de7c2596295b1",
+  "sourceFiles": [
+    {
+      "path": "services/node-agent/internal/migrationcontext/effect_gate_test.go",
+      "change": "M",
+      "preimage": {
+        "mode": "100644",
+        "blobOID": "cc3258e5a4a9b407a3425c5fa2d5b0ff68897b80",
+        "SHA256": "871e1b1ca26e6bcdcc4ea7af2e8a290dc7a9b615f201c46aa7bf1102e0af7c04",
+        "bytes": 19751,
+        "raw": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/effect_gate_test.go.base-preimage.raw"
+      },
+      "current": {
+        "mode": "100644",
+        "blobOID": "e5ccd0d2a7da672d8947d4f02cb33e6c0bdc7ce3",
+        "SHA256": "d34eecc2d9b7d5790eec6ebe2b9816b421899228f948fae05fd6920d4d51b50a",
+        "bytes": 27592,
+        "raw": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/effect_gate_test.go.current.raw"
+      }
+    },
+    {
+      "path": "services/node-agent/internal/migrationcontext/source_gate_test.go",
+      "change": "M",
+      "preimage": {
+        "mode": "100644",
+        "blobOID": "a395e5ff9824ddc01c27004f1627dfda2bb56b09",
+        "SHA256": "10c0229040b40d2dd0653979b4761da4e35baab5d519b8d52dbe368928c0c780",
+        "bytes": 23505,
+        "raw": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/source_gate_test.go.base-preimage.raw"
+      },
+      "current": {
+        "mode": "100644",
+        "blobOID": "fe2b1ec68e6aac39e57dcf4bd50917e5b0bd8a75",
+        "SHA256": "0ad2989b6f36224352516e17f278b957cc25077f657560975e0ebcb063ff9208",
+        "bytes": 25737,
+        "raw": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/source_gate_test.go.current.raw"
+      }
+    },
+    {
+      "path": "services/node-agent/internal/migrationcontext/h12_signature_internal.go",
+      "change": "A",
+      "preimage": null,
+      "current": {
+        "mode": "100644",
+        "blobOID": "6beb6a342d3b7d9f3fcdfd610e03d038e66d5a49",
+        "SHA256": "f9e3e808d8951c2da6fee4b45364f64bb5c909a33a90c3a6074c99b8cb6e4def",
+        "bytes": 2505,
+        "raw": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/h12_signature_internal.go.current.raw"
+      }
+    },
+    {
+      "path": "services/node-agent/internal/migrationcontext/h12_signature_test.go",
+      "change": "A",
+      "preimage": null,
+      "current": {
+        "mode": "100644",
+        "blobOID": "ec386c7e3530c88a10305efc7f29ba66fcdf245b",
+        "SHA256": "94f9bd56deaa371125ceba49f5d7a21d30a4bc34575fed4747f693b51d1ce020",
+        "bytes": 12939,
+        "raw": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/h12_signature_test.go.current.raw"
+      }
+    }
+  ],
+  "realSourceInputCountVerified": 371,
+  "newOverlaidFiles": 4,
+  "frozenSourceCount": 373,
+  "actualPhases": [
+    {
+      "phase": 1,
+      "id": "math-canonical-ownership-admission",
+      "startedAtKST": "2026-11-07T10:22:54+09:00",
+      "endedAtKST": "2026-11-07T10:23:22+09:00",
+      "elapsedSeconds": 28.363,
+      "testCommand": [
+        "go",
+        "test",
+        "-p=1",
+        "-count=1",
+        "-json",
+        "-run",
+        "^TestH12Signature",
+        "./internal/migrationcontext"
+      ],
+      "workingDirectory": "/job/repo/services/node-agent",
+      "image": "golang@sha256:8d48e12ec56735e9358640898b9d9b9fcca110612ed8a5567438c0a1baa24e66",
+      "containerID": "916c46f0f51c4047e9c79c714ca90630d7f642a700cc2dafc03de7958ebabd8f",
+      "directExit": 0,
+      "OOMKilled": false,
+      "stateError": "",
+      "cgroupMemoryPeakBytes": 400941056,
+      "memoryBytes": 2147483648,
+      "memorySwapTotalBytes": 2147483648,
+      "extraSwapBytes": 0,
+      "nanoCPUs": 2000000000,
+      "pidsLimit": 128,
+      "nonrootUser": "1000:1000",
+      "network": "none",
+      "readOnlyRoot": true,
+      "onlyOwnJobBind": true,
+      "sourceBeforeAfterUnchanged": true,
+      "sourceFiles": 373,
+      "topLevelPassed": 2,
+      "subtestsPassed": 32,
+      "failEvents": [],
+      "skipEvents": [],
+      "JSONParseErrors": [],
+      "lastJSONAction": "pass",
+      "logs": {
+        "h12-phase1.stdout": {
+          "bytes": 55440,
+          "SHA256": "828ce2f815a2427e339d9814eab6c341f0ad3e2670b023727945febac9e2408d"
+        },
+        "h12-phase1.stderr": {
+          "bytes": 0,
+          "SHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "h12-phase1-container.log": {
+          "bytes": 0,
+          "SHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      "ownExitedContainerRemoved": true
+    },
+    {
+      "phase": 2,
+      "id": "new-exact-object-file-directcall-probes",
+      "startedAtKST": "2026-11-07T10:23:22+09:00",
+      "endedAtKST": "2026-11-07T10:23:24+09:00",
+      "elapsedSeconds": 1.397,
+      "testCommand": [
+        "go",
+        "test",
+        "-p=1",
+        "-count=1",
+        "-json",
+        "-run",
+        "^TestH12(ScopedCryptoObjectBoundary|RepositoryResolvedExceptionPosition)$",
+        "./internal/migrationcontext"
+      ],
+      "workingDirectory": "/job/repo/services/node-agent",
+      "image": "golang@sha256:8d48e12ec56735e9358640898b9d9b9fcca110612ed8a5567438c0a1baa24e66",
+      "containerID": "ad7e05bf3690abd82161faf6bc738d39a6ecdff78e199ed8fb317934218cd971",
+      "directExit": 0,
+      "OOMKilled": false,
+      "stateError": "",
+      "cgroupMemoryPeakBytes": 86564864,
+      "memoryBytes": 2147483648,
+      "memorySwapTotalBytes": 2147483648,
+      "extraSwapBytes": 0,
+      "nanoCPUs": 2000000000,
+      "pidsLimit": 128,
+      "nonrootUser": "1000:1000",
+      "network": "none",
+      "readOnlyRoot": true,
+      "onlyOwnJobBind": true,
+      "sourceBeforeAfterUnchanged": true,
+      "sourceFiles": 373,
+      "topLevelPassed": 2,
+      "subtestsPassed": 12,
+      "failEvents": [],
+      "skipEvents": [],
+      "JSONParseErrors": [],
+      "lastJSONAction": "pass",
+      "logs": {
+        "h12-phase2.stdout": {
+          "bytes": 22306,
+          "SHA256": "610ad1c175e8f66afabe5a4de5923a0307b46c8fd3b2bc968f7de157c3755b75"
+        },
+        "h12-phase2.stderr": {
+          "bytes": 0,
+          "SHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "h12-phase2-container.log": {
+          "bytes": 0,
+          "SHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      "ownExitedContainerRemoved": true
+    },
+    {
+      "phase": 3,
+      "id": "existing-d04-private-consistency",
+      "startedAtKST": "2026-11-07T10:23:24+09:00",
+      "endedAtKST": "2026-11-07T10:23:25+09:00",
+      "elapsedSeconds": 1.398,
+      "testCommand": [
+        "go",
+        "test",
+        "-p=1",
+        "-count=1",
+        "-json",
+        "-run",
+        "^TestP02Internal",
+        "./internal/migrationcontext"
+      ],
+      "workingDirectory": "/job/repo/services/node-agent",
+      "image": "golang@sha256:8d48e12ec56735e9358640898b9d9b9fcca110612ed8a5567438c0a1baa24e66",
+      "containerID": "5d85aba2567a5c432cef22ca929d67f2ab0ef934d7c3bdaf50e5b065204ca7cc",
+      "directExit": 0,
+      "OOMKilled": false,
+      "stateError": "",
+      "cgroupMemoryPeakBytes": 163282944,
+      "memoryBytes": 2147483648,
+      "memorySwapTotalBytes": 2147483648,
+      "extraSwapBytes": 0,
+      "nanoCPUs": 2000000000,
+      "pidsLimit": 128,
+      "nonrootUser": "1000:1000",
+      "network": "none",
+      "readOnlyRoot": true,
+      "onlyOwnJobBind": true,
+      "sourceBeforeAfterUnchanged": true,
+      "sourceFiles": 373,
+      "topLevelPassed": 13,
+      "subtestsPassed": 101,
+      "failEvents": [],
+      "skipEvents": [],
+      "JSONParseErrors": [],
+      "lastJSONAction": "pass",
+      "logs": {
+        "h12-phase3.stdout": {
+          "bytes": 171438,
+          "SHA256": "8e9b60cb710f4202f09416576563f0e7584b883a1bdfe3eb96a7c87de35f5cc3"
+        },
+        "h12-phase3.stderr": {
+          "bytes": 0,
+          "SHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "h12-phase3-container.log": {
+          "bytes": 0,
+          "SHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      "ownExitedContainerRemoved": true
+    },
+    {
+      "phase": 4,
+      "id": "existing-public-refusal-effect-source-census-plr",
+      "startedAtKST": "2026-11-07T10:23:25+09:00",
+      "endedAtKST": "2026-11-07T10:25:28+09:00",
+      "elapsedSeconds": 122.982,
+      "testCommand": [
+        "go",
+        "test",
+        "-p=1",
+        "-count=1",
+        "-json",
+        "-run",
+        "^(TestNullPortsAndOpaqueBoundary|TestWellFormedUnregisteredProvidersNeverAuthenticate|TestCopyRejectsCallbacksAndBoundsBeforeEncoding|TestResolvedObjectEffectBoundary|TestRepositoryBoundaryAndZeroEffects|TestWholePackageFullUnderlyingCensus|TestReviewR1CompileValidEffectAndAliasMutants|TestPLR1AActualBuildsThenBoundaryRefuses|TestPLR1BCompiledWriteTargetsAndReasons|TestPLR1CCompiledPointerConversionsAndControls|TestPLR1DCompiledTargetPointerTermsAndControls)$",
+        "./internal/migrationcontext"
+      ],
+      "workingDirectory": "/job/repo/services/node-agent",
+      "image": "golang@sha256:8d48e12ec56735e9358640898b9d9b9fcca110612ed8a5567438c0a1baa24e66",
+      "containerID": "cadb65add3fe15a9628d8b3a68c2137c1552d671ce39ed5382b23d5b6adf59a4",
+      "directExit": 0,
+      "OOMKilled": false,
+      "stateError": "",
+      "cgroupMemoryPeakBytes": 679493632,
+      "memoryBytes": 2147483648,
+      "memorySwapTotalBytes": 2147483648,
+      "extraSwapBytes": 0,
+      "nanoCPUs": 2000000000,
+      "pidsLimit": 128,
+      "nonrootUser": "1000:1000",
+      "network": "none",
+      "readOnlyRoot": true,
+      "onlyOwnJobBind": true,
+      "sourceBeforeAfterUnchanged": true,
+      "sourceFiles": 373,
+      "topLevelPassed": 11,
+      "subtestsPassed": 129,
+      "failEvents": [],
+      "skipEvents": [],
+      "JSONParseErrors": [],
+      "lastJSONAction": "pass",
+      "logs": {
+        "h12-phase4.stdout": {
+          "bytes": 263068,
+          "SHA256": "11384d1f054796467f42bf3b094719e9ffbf9505c4a9c0b63fda4b1e5fb4cd26"
+        },
+        "h12-phase4.stderr": {
+          "bytes": 0,
+          "SHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "h12-phase4-container.log": {
+          "bytes": 0,
+          "SHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      "ownExitedContainerRemoved": true
+    }
+  ],
+  "stoppedOnFirstFailure": false,
+  "allFourPhasesActuallyRun": true,
+  "productCI": "NOT_RUN",
+  "codeCommit": null,
+  "actualAuthority": null,
+  "wholeProgramComplete": false
+}

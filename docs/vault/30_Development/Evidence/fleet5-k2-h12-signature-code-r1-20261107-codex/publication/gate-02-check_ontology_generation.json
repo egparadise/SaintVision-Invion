@@ -1,0 +1,21 @@
+{
+  "id": "gate-02-check_ontology_generation",
+  "argv": [
+    "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+    "-I",
+    "-B",
+    "tools/check_ontology_generation.py"
+  ],
+  "cwd": "D:/Project/SaintVisionI-Invion/fleet5-k2-d04-l1-r2-20261107",
+  "startedAtKST": "2026-11-07T10:31:36.947201+09:00",
+  "endedAtKST": "2026-11-07T10:31:39.103159+09:00",
+  "elapsedSeconds": 2.156,
+  "directExit": 0,
+  "stdoutRawText": "PASS: 4 ontology artifacts are graph-equivalent to a fresh generation\r\n",
+  "stderrRawText": "",
+  "stdoutBytes": 71,
+  "stdoutSHA256": "451b3d26c538962997f093bbfb8a5ceabffe134e154c1ff412f57590b076e150",
+  "stderrBytes": 0,
+  "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "classification": "STATIC_DELIVERY_GATE_NOT_PRODUCT_EXECUTION"
+}

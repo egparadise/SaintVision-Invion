@@ -1,0 +1,823 @@
+{
+  "classification": "ACTUAL_ROOT_EXECUTION_WIP01_NOT_AUTHOR_EXECUTION_NOT_WIP02_ACCEPTANCE",
+  "RootReply": "msg_0abc80a909cd",
+  "originalIndexSHA256": "84df652b43ff9a8ed8bcfe285b287ea25e9a5fd461da4ec531a2ee410ea5a0aa",
+  "originalRecords": 99,
+  "atKST": "2026-11-07T10:17:49.133756+09:00",
+  "copies": [
+    {
+      "RootOrigin": "D:/Project/SaintVisionI-Invion/fleet-five-orchestration-20261105/.work/h12-signature-actual-go-originals/go-image-inspect.log",
+      "copy": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/go-image-inspect.log.raw",
+      "name": "go-image-inspect.log",
+      "bytes": 2174,
+      "SHA256": "3bd5d7b07e1b77399441f4f5c9d489e3376e00b333047d2504a78ba34676de7e"
+    },
+    {
+      "RootOrigin": "D:/Project/SaintVisionI-Invion/fleet-five-orchestration-20261105/.work/h12-signature-actual-go-originals/go-image-pull.log",
+      "copy": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/go-image-pull.log.raw",
+      "name": "go-image-pull.log",
+      "bytes": 414,
+      "SHA256": "a395ca2c538352f5465da7e62b4277bdd14d638d92113c72c6725e8198254a31"
+    },
+    {
+      "RootOrigin": "D:/Project/SaintVisionI-Invion/fleet-five-orchestration-20261105/.work/h12-signature-actual-go-originals/go-probe-create.log",
+      "copy": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/go-probe-create.log.raw",
+      "name": "go-probe-create.log",
+      "bytes": 65,
+      "SHA256": "b4d04b6e4c756d45e9784273af1f6b2dbf54c02440fba9361dc7ceea864c0904"
+    },
+    {
+      "RootOrigin": "D:/Project/SaintVisionI-Invion/fleet-five-orchestration-20261105/.work/h12-signature-actual-go-originals/go-probe-final.json",
+      "copy": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/go-probe-final.json.raw",
+      "name": "go-probe-final.json",
+      "bytes": 7153,
+      "SHA256": "500bf557a0dbb33c16019953876f4aa099057415dfd18fd029c1f85f889ecc41"
+    },
+    {
+      "RootOrigin": "D:/Project/SaintVisionI-Invion/fleet-five-orchestration-20261105/.work/h12-signature-actual-go-originals/go-probe-initial.json",
+      "copy": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/go-probe-initial.json.raw",
+      "name": "go-probe-initial.json",
+      "bytes": 6593,
+      "SHA256": "02a61c4d2c98057b9a1cb33b76c5995096bef49108b3c493013c57750ec79f96"
+    },
+    {
+      "RootOrigin": "D:/Project/SaintVisionI-Invion/fleet-five-orchestration-20261105/.work/h12-signature-actual-go-originals/go-probe-inspect.log",
+      "copy": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/go-probe-inspect.log.raw",
+      "name": "go-probe-inspect.log",
+      "bytes": 9253,
+      "SHA256": "bce4fcedd2bcd46ff953f6250e0320712f07a6ce2fb557022dc992283305da11"
+    },
+    {
+      "RootOrigin": "D:/Project/SaintVisionI-Invion/fleet-five-orchestration-20261105/.work/h12-signature-actual-go-originals/go-probe-remove.log",
+      "copy": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/go-probe-remove.log.raw",
+      "name": "go-probe-remove.log",
+      "bytes": 65,
+      "SHA256": "b4d04b6e4c756d45e9784273af1f6b2dbf54c02440fba9361dc7ceea864c0904"
+    },
+    {
+      "RootOrigin": "D:/Project/SaintVisionI-Invion/fleet-five-orchestration-20261105/.work/h12-signature-actual-go-originals/go-version-probe.log",
+      "copy": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/go-version-probe.log.raw",
+      "name": "go-version-probe.log",
+      "bytes": 32,
+      "SHA256": "f554cfdb85411c2bb1d503df3f53dfbad1f753eb8271938833166a5d26a7547c"
+    },
+    {
+      "RootOrigin": "D:/Project/SaintVisionI-Invion/fleet-five-orchestration-20261105/.work/h12-signature-actual-go-originals/h12-base-source-files.json",
+      "copy": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/h12-base-source-files.json.raw",
+      "name": "h12-base-source-files.json",
+      "bytes": 68429,
+      "SHA256": "6dc83b88fabc3cad79c4206253e991b879f008fc9d11852206c6130d1b42a9e9"
+    },
+    {
+      "RootOrigin": "D:/Project/SaintVisionI-Invion/fleet-five-orchestration-20261105/.work/h12-signature-actual-go-originals/h12-execution-receipt.json",
+      "copy": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/h12-execution-receipt.json.raw",
+      "name": "h12-execution-receipt.json",
+      "bytes": 11883,
+      "SHA256": "f05f582e18112754001242224ea25c0d3abd58df25401cf08481cd79dd509d6a"
+    },
+    {
+      "RootOrigin": "D:/Project/SaintVisionI-Invion/fleet-five-orchestration-20261105/.work/h12-signature-actual-go-originals/h12-frozen-source-before.json",
+      "copy": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/h12-frozen-source-before.json.raw",
+      "name": "h12-frozen-source-before.json",
+      "bytes": 68818,
+      "SHA256": "f6717dde83ae128d91391f1cc11efeab650f945557e93158c87f2590253b22d5"
+    },
+    {
+      "RootOrigin": "D:/Project/SaintVisionI-Invion/fleet-five-orchestration-20261105/.work/h12-signature-actual-go-originals/h12-frozen-started.json",
+      "copy": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/h12-frozen-started.json.raw",
+      "name": "h12-frozen-started.json",
+      "bytes": 218,
+      "SHA256": "e6f1643abaa873c1b4d94d04618a5599413a87b27814bc07ebfe426fd79dfab4"
+    },
+    {
+      "RootOrigin": "D:/Project/SaintVisionI-Invion/fleet-five-orchestration-20261105/.work/h12-signature-actual-go-originals/h12-phase1-argv.json",
+      "copy": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/h12-phase1-argv.json.raw",
+      "name": "h12-phase1-argv.json",
+      "bytes": 1946,
+      "SHA256": "5da27639990d3cc843cce67502fe79ccae0b41c6f5cb8d82ea046d838bf8b4c3"
+    },
+    {
+      "RootOrigin": "D:/Project/SaintVisionI-Invion/fleet-five-orchestration-20261105/.work/h12-signature-actual-go-originals/h12-phase1-container.log",
+      "copy": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/h12-phase1-container.log.raw",
+      "name": "h12-phase1-container.log",
+      "bytes": 0,
+      "SHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "RootOrigin": "D:/Project/SaintVisionI-Invion/fleet-five-orchestration-20261105/.work/h12-signature-actual-go-originals/h12-phase1-create.log",
+      "copy": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/h12-phase1-create.log.raw",
+      "name": "h12-phase1-create.log",
+      "bytes": 65,
+      "SHA256": "3a74c799d90ba5fbefa11482a9058b670ae992d2157cb9dbee117bc2f7af895b"
+    },
+    {
+      "RootOrigin": "D:/Project/SaintVisionI-Invion/fleet-five-orchestration-20261105/.work/h12-signature-actual-go-originals/h12-phase1-exit.txt",
+      "copy": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/h12-phase1-exit.txt.raw",
+      "name": "h12-phase1-exit.txt",
+      "bytes": 2,
+      "SHA256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "RootOrigin": "D:/Project/SaintVisionI-Invion/fleet-five-orchestration-20261105/.work/h12-signature-actual-go-originals/h12-phase1-final.json",
+      "copy": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/h12-phase1-final.json.raw",
+      "name": "h12-phase1-final.json",
+      "bytes": 7474,
+      "SHA256": "8cd9ab88fe2c3b4f4ab238ded3be9619ed323f60fba3cea1f2932100b8b1eb6e"
+    },
+    {
+      "RootOrigin": "D:/Project/SaintVisionI-Invion/fleet-five-orchestration-20261105/.work/h12-signature-actual-go-originals/h12-phase1-initial.json",
+      "copy": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/h12-phase1-initial.json.raw",
+      "name": "h12-phase1-initial.json",
+      "bytes": 6913,
+      "SHA256": "23948ee9038dab0e9117c280d0cb3119e379d85fbc72d6432d346e3cfcc6260d"
+    },
+    {
+      "RootOrigin": "D:/Project/SaintVisionI-Invion/fleet-five-orchestration-20261105/.work/h12-signature-actual-go-originals/h12-phase1-memory-peak.bytes",
+      "copy": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/h12-phase1-memory-peak.bytes.raw",
+      "name": "h12-phase1-memory-peak.bytes",
+      "bytes": 10,
+      "SHA256": "b086cb74277edf0ba00b484acc15fe1ee6210d72e0f299ecea0f485ace7830c2"
+    },
+    {
+      "RootOrigin": "D:/Project/SaintVisionI-Invion/fleet-five-orchestration-20261105/.work/h12-signature-actual-go-originals/h12-phase1-receipt.json",
+      "copy": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/h12-phase1-receipt.json.raw",
+      "name": "h12-phase1-receipt.json",
+      "bytes": 1579,
+      "SHA256": "f1f02494acbfe799adc22decd1095bdf0d9d1b53b29b92ad2193b44e182528e7"
+    },
+    {
+      "RootOrigin": "D:/Project/SaintVisionI-Invion/fleet-five-orchestration-20261105/.work/h12-signature-actual-go-originals/h12-phase1-source-after.json",
+      "copy": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/h12-phase1-source-after.json.raw",
+      "name": "h12-phase1-source-after.json",
+      "bytes": 68818,
+      "SHA256": "f6717dde83ae128d91391f1cc11efeab650f945557e93158c87f2590253b22d5"
+    },
+    {
+      "RootOrigin": "D:/Project/SaintVisionI-Invion/fleet-five-orchestration-20261105/.work/h12-signature-actual-go-originals/h12-phase1.sh",
+      "copy": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/h12-phase1.sh.raw",
+      "name": "h12-phase1.sh",
+      "bytes": 294,
+      "SHA256": "9f20dd559e075f5920dd30c16ba3d837f8acbe95d5e146fcdb23d91d8d5ea90a"
+    },
+    {
+      "RootOrigin": "D:/Project/SaintVisionI-Invion/fleet-five-orchestration-20261105/.work/h12-signature-actual-go-originals/h12-phase1.stderr",
+      "copy": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/h12-phase1.stderr.raw",
+      "name": "h12-phase1.stderr",
+      "bytes": 0,
+      "SHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "RootOrigin": "D:/Project/SaintVisionI-Invion/fleet-five-orchestration-20261105/.work/h12-signature-actual-go-originals/h12-phase1.stdout",
+      "copy": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/h12-phase1.stdout.raw",
+      "name": "h12-phase1.stdout",
+      "bytes": 55448,
+      "SHA256": "2bad1b7f2f2a3ab7a22ade2ece00729b68f5f15d9d0af0af3efa64aabebfefe8"
+    },
+    {
+      "RootOrigin": "D:/Project/SaintVisionI-Invion/fleet-five-orchestration-20261105/.work/h12-signature-actual-go-originals/h12-phase2-argv.json",
+      "copy": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/h12-phase2-argv.json.raw",
+      "name": "h12-phase2-argv.json",
+      "bytes": 2002,
+      "SHA256": "3cedd8dcea2c705b1f5420918c9d5b53bcbc2270d33f32da9eb423826090575d"
+    },
+    {
+      "RootOrigin": "D:/Project/SaintVisionI-Invion/fleet-five-orchestration-20261105/.work/h12-signature-actual-go-originals/h12-phase2-container.log",
+      "copy": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/h12-phase2-container.log.raw",
+      "name": "h12-phase2-container.log",
+      "bytes": 0,
+      "SHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "RootOrigin": "D:/Project/SaintVisionI-Invion/fleet-five-orchestration-20261105/.work/h12-signature-actual-go-originals/h12-phase2-create.log",
+      "copy": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/h12-phase2-create.log.raw",
+      "name": "h12-phase2-create.log",
+      "bytes": 65,
+      "SHA256": "ea6bbc3dc15727ed9e4ff568673dfd7ba62dde7e3bba51a17728ed155b30e863"
+    },
+    {
+      "RootOrigin": "D:/Project/SaintVisionI-Invion/fleet-five-orchestration-20261105/.work/h12-signature-actual-go-originals/h12-phase2-exit.txt",
+      "copy": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/h12-phase2-exit.txt.raw",
+      "name": "h12-phase2-exit.txt",
+      "bytes": 2,
+      "SHA256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "RootOrigin": "D:/Project/SaintVisionI-Invion/fleet-five-orchestration-20261105/.work/h12-signature-actual-go-originals/h12-phase2-final.json",
+      "copy": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/h12-phase2-final.json.raw",
+      "name": "h12-phase2-final.json",
+      "bytes": 7474,
+      "SHA256": "e6264c34634534c9254a26982bd7832717c2476831357ff26022067be6a0cdab"
+    },
+    {
+      "RootOrigin": "D:/Project/SaintVisionI-Invion/fleet-five-orchestration-20261105/.work/h12-signature-actual-go-originals/h12-phase2-initial.json",
+      "copy": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/h12-phase2-initial.json.raw",
+      "name": "h12-phase2-initial.json",
+      "bytes": 6913,
+      "SHA256": "fef63dbad5a9094fb1ccf921d3f48fdb122879c6d23c3ba0789fade4c406cd16"
+    },
+    {
+      "RootOrigin": "D:/Project/SaintVisionI-Invion/fleet-five-orchestration-20261105/.work/h12-signature-actual-go-originals/h12-phase2-memory-peak.bytes",
+      "copy": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/h12-phase2-memory-peak.bytes.raw",
+      "name": "h12-phase2-memory-peak.bytes",
+      "bytes": 9,
+      "SHA256": "dbe37290a5324c7e58d368d551f4e80888dc16d8ff5256dc5eaf6c7a54af36a6"
+    },
+    {
+      "RootOrigin": "D:/Project/SaintVisionI-Invion/fleet-five-orchestration-20261105/.work/h12-signature-actual-go-originals/h12-phase2-receipt.json",
+      "copy": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/h12-phase2-receipt.json.raw",
+      "name": "h12-phase2-receipt.json",
+      "bytes": 1638,
+      "SHA256": "92351449f8e969543756839b04bd53661d380f9c9f5a323d7a1748de52029507"
+    },
+    {
+      "RootOrigin": "D:/Project/SaintVisionI-Invion/fleet-five-orchestration-20261105/.work/h12-signature-actual-go-originals/h12-phase2-source-after.json",
+      "copy": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/h12-phase2-source-after.json.raw",
+      "name": "h12-phase2-source-after.json",
+      "bytes": 68818,
+      "SHA256": "f6717dde83ae128d91391f1cc11efeab650f945557e93158c87f2590253b22d5"
+    },
+    {
+      "RootOrigin": "D:/Project/SaintVisionI-Invion/fleet-five-orchestration-20261105/.work/h12-signature-actual-go-originals/h12-phase2.sh",
+      "copy": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/h12-phase2.sh.raw",
+      "name": "h12-phase2.sh",
+      "bytes": 350,
+      "SHA256": "2fcf9ca56174ebc6915fa9275e6ad8ec91ef69260b523e28819a5b4d5f4e579f"
+    },
+    {
+      "RootOrigin": "D:/Project/SaintVisionI-Invion/fleet-five-orchestration-20261105/.work/h12-signature-actual-go-originals/h12-phase2.stderr",
+      "copy": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/h12-phase2.stderr.raw",
+      "name": "h12-phase2.stderr",
+      "bytes": 0,
+      "SHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "RootOrigin": "D:/Project/SaintVisionI-Invion/fleet-five-orchestration-20261105/.work/h12-signature-actual-go-originals/h12-phase2.stdout",
+      "copy": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/h12-phase2.stdout.raw",
+      "name": "h12-phase2.stdout",
+      "bytes": 22306,
+      "SHA256": "6f7091315803fc315ca00c3a2faab912d4a05a85e97d4062641851532af336c3"
+    },
+    {
+      "RootOrigin": "D:/Project/SaintVisionI-Invion/fleet-five-orchestration-20261105/.work/h12-signature-actual-go-originals/h12-phase3-argv.json",
+      "copy": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/h12-phase3-argv.json.raw",
+      "name": "h12-phase3-argv.json",
+      "bytes": 1945,
+      "SHA256": "71377c22e774e028a6971d456f03b7938107ab2125974d925e8bb5c55f5bad8c"
+    },
+    {
+      "RootOrigin": "D:/Project/SaintVisionI-Invion/fleet-five-orchestration-20261105/.work/h12-signature-actual-go-originals/h12-phase3-container.log",
+      "copy": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/h12-phase3-container.log.raw",
+      "name": "h12-phase3-container.log",
+      "bytes": 0,
+      "SHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "RootOrigin": "D:/Project/SaintVisionI-Invion/fleet-five-orchestration-20261105/.work/h12-signature-actual-go-originals/h12-phase3-create.log",
+      "copy": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/h12-phase3-create.log.raw",
+      "name": "h12-phase3-create.log",
+      "bytes": 65,
+      "SHA256": "95d9acb56f3eb2643a2e0fe73d976786e2db431c6e5254f2f181b2d6140311e1"
+    },
+    {
+      "RootOrigin": "D:/Project/SaintVisionI-Invion/fleet-five-orchestration-20261105/.work/h12-signature-actual-go-originals/h12-phase3-exit.txt",
+      "copy": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/h12-phase3-exit.txt.raw",
+      "name": "h12-phase3-exit.txt",
+      "bytes": 2,
+      "SHA256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "RootOrigin": "D:/Project/SaintVisionI-Invion/fleet-five-orchestration-20261105/.work/h12-signature-actual-go-originals/h12-phase3-final.json",
+      "copy": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/h12-phase3-final.json.raw",
+      "name": "h12-phase3-final.json",
+      "bytes": 7473,
+      "SHA256": "cb8a81733df2698813f433a9c46133f440033ac9a0dc9027890ccc5e36a40ee5"
+    },
+    {
+      "RootOrigin": "D:/Project/SaintVisionI-Invion/fleet-five-orchestration-20261105/.work/h12-signature-actual-go-originals/h12-phase3-initial.json",
+      "copy": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/h12-phase3-initial.json.raw",
+      "name": "h12-phase3-initial.json",
+      "bytes": 6913,
+      "SHA256": "6d2027892874d08ae5768c4f5e770f1b5add22fe85c536448ff61a8a26ca7191"
+    },
+    {
+      "RootOrigin": "D:/Project/SaintVisionI-Invion/fleet-five-orchestration-20261105/.work/h12-signature-actual-go-originals/h12-phase3-memory-peak.bytes",
+      "copy": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/h12-phase3-memory-peak.bytes.raw",
+      "name": "h12-phase3-memory-peak.bytes",
+      "bytes": 10,
+      "SHA256": "c97c2fdb557857b7030958067acaf99f8a2f0283d761a937470eda0281e1c3e7"
+    },
+    {
+      "RootOrigin": "D:/Project/SaintVisionI-Invion/fleet-five-orchestration-20261105/.work/h12-signature-actual-go-originals/h12-phase3-receipt.json",
+      "copy": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/h12-phase3-receipt.json.raw",
+      "name": "h12-phase3-receipt.json",
+      "bytes": 1578,
+      "SHA256": "f0b445ccb5fd53c8e1ff5bcbb610eccd4fb8941303d62e165b260cacb5884144"
+    },
+    {
+      "RootOrigin": "D:/Project/SaintVisionI-Invion/fleet-five-orchestration-20261105/.work/h12-signature-actual-go-originals/h12-phase3-source-after.json",
+      "copy": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/h12-phase3-source-after.json.raw",
+      "name": "h12-phase3-source-after.json",
+      "bytes": 68818,
+      "SHA256": "f6717dde83ae128d91391f1cc11efeab650f945557e93158c87f2590253b22d5"
+    },
+    {
+      "RootOrigin": "D:/Project/SaintVisionI-Invion/fleet-five-orchestration-20261105/.work/h12-signature-actual-go-originals/h12-phase3.sh",
+      "copy": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/h12-phase3.sh.raw",
+      "name": "h12-phase3.sh",
+      "bytes": 293,
+      "SHA256": "b65ac265e044ea62bf03eb421728dde50ec9f52d9b35455754bc52735b45d661"
+    },
+    {
+      "RootOrigin": "D:/Project/SaintVisionI-Invion/fleet-five-orchestration-20261105/.work/h12-signature-actual-go-originals/h12-phase3.stderr",
+      "copy": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/h12-phase3.stderr.raw",
+      "name": "h12-phase3.stderr",
+      "bytes": 0,
+      "SHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "RootOrigin": "D:/Project/SaintVisionI-Invion/fleet-five-orchestration-20261105/.work/h12-signature-actual-go-originals/h12-phase3.stdout",
+      "copy": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/h12-phase3.stdout.raw",
+      "name": "h12-phase3.stdout",
+      "bytes": 171441,
+      "SHA256": "0054e1f81e3883915099cdaa0edc262f2a3b3e5790b8f10b11bf4f9982a78a95"
+    },
+    {
+      "RootOrigin": "D:/Project/SaintVisionI-Invion/fleet-five-orchestration-20261105/.work/h12-signature-actual-go-originals/h12-phase4-argv.json",
+      "copy": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/h12-phase4-argv.json.raw",
+      "name": "h12-phase4-argv.json",
+      "bytes": 2392,
+      "SHA256": "66fc66ac4befb6f33f14cc142b9d7c1b8a8206c7422c6623fa07c88100d1808a"
+    },
+    {
+      "RootOrigin": "D:/Project/SaintVisionI-Invion/fleet-five-orchestration-20261105/.work/h12-signature-actual-go-originals/h12-phase4-container.log",
+      "copy": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/h12-phase4-container.log.raw",
+      "name": "h12-phase4-container.log",
+      "bytes": 0,
+      "SHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "RootOrigin": "D:/Project/SaintVisionI-Invion/fleet-five-orchestration-20261105/.work/h12-signature-actual-go-originals/h12-phase4-create.log",
+      "copy": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/h12-phase4-create.log.raw",
+      "name": "h12-phase4-create.log",
+      "bytes": 65,
+      "SHA256": "4edbc3e48fc3abf7de4e721416a582537b74d2376dbe7163e051cfa421cd3ecc"
+    },
+    {
+      "RootOrigin": "D:/Project/SaintVisionI-Invion/fleet-five-orchestration-20261105/.work/h12-signature-actual-go-originals/h12-phase4-exit.txt",
+      "copy": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/h12-phase4-exit.txt.raw",
+      "name": "h12-phase4-exit.txt",
+      "bytes": 2,
+      "SHA256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865"
+    },
+    {
+      "RootOrigin": "D:/Project/SaintVisionI-Invion/fleet-five-orchestration-20261105/.work/h12-signature-actual-go-originals/h12-phase4-final.json",
+      "copy": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/h12-phase4-final.json.raw",
+      "name": "h12-phase4-final.json",
+      "bytes": 7474,
+      "SHA256": "65ae939d38becc6d96fc67203f45c08b94bbc17c4fe4c0035012b7767164bd78"
+    },
+    {
+      "RootOrigin": "D:/Project/SaintVisionI-Invion/fleet-five-orchestration-20261105/.work/h12-signature-actual-go-originals/h12-phase4-initial.json",
+      "copy": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/h12-phase4-initial.json.raw",
+      "name": "h12-phase4-initial.json",
+      "bytes": 6913,
+      "SHA256": "8740a0d2e1b8cfd66f4b1086eb82f62bd5b73b548badbb3ffba666c3536c0f73"
+    },
+    {
+      "RootOrigin": "D:/Project/SaintVisionI-Invion/fleet-five-orchestration-20261105/.work/h12-signature-actual-go-originals/h12-phase4-memory-peak.bytes",
+      "copy": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/h12-phase4-memory-peak.bytes.raw",
+      "name": "h12-phase4-memory-peak.bytes",
+      "bytes": 10,
+      "SHA256": "7ef95ffaee2845b335c1be1a5e095f186fdd1f9edc40e8458ed556ef2e177748"
+    },
+    {
+      "RootOrigin": "D:/Project/SaintVisionI-Invion/fleet-five-orchestration-20261105/.work/h12-signature-actual-go-originals/h12-phase4-receipt.json",
+      "copy": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/h12-phase4-receipt.json.raw",
+      "name": "h12-phase4-receipt.json",
+      "bytes": 2702,
+      "SHA256": "5150a8125e2dea12314e23643881d119c298033115f6f0d0465f1f4c2e47119f"
+    },
+    {
+      "RootOrigin": "D:/Project/SaintVisionI-Invion/fleet-five-orchestration-20261105/.work/h12-signature-actual-go-originals/h12-phase4-source-after.json",
+      "copy": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/h12-phase4-source-after.json.raw",
+      "name": "h12-phase4-source-after.json",
+      "bytes": 68818,
+      "SHA256": "f6717dde83ae128d91391f1cc11efeab650f945557e93158c87f2590253b22d5"
+    },
+    {
+      "RootOrigin": "D:/Project/SaintVisionI-Invion/fleet-five-orchestration-20261105/.work/h12-signature-actual-go-originals/h12-phase4.sh",
+      "copy": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/h12-phase4.sh.raw",
+      "name": "h12-phase4.sh",
+      "bytes": 740,
+      "SHA256": "b8ea4e552292057a1b056ed7a78dbadb3d02fb3eba7354e9f7b4ce6e9db58dd1"
+    },
+    {
+      "RootOrigin": "D:/Project/SaintVisionI-Invion/fleet-five-orchestration-20261105/.work/h12-signature-actual-go-originals/h12-phase4.stderr",
+      "copy": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/h12-phase4.stderr.raw",
+      "name": "h12-phase4.stderr",
+      "bytes": 0,
+      "SHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "RootOrigin": "D:/Project/SaintVisionI-Invion/fleet-five-orchestration-20261105/.work/h12-signature-actual-go-originals/h12-phase4.stdout",
+      "copy": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/h12-phase4.stdout.raw",
+      "name": "h12-phase4.stdout",
+      "bytes": 265538,
+      "SHA256": "91edb74bda37911e0fe0857f6394d54493db29ca0ed9b430cfe9b0b189559b2b"
+    },
+    {
+      "RootOrigin": "D:/Project/SaintVisionI-Invion/fleet-five-orchestration-20261105/.work/h12-signature-actual-go-originals/h12-root-source-index.json",
+      "copy": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/h12-root-source-index.json.raw",
+      "name": "h12-root-source-index.json",
+      "bytes": 120548,
+      "SHA256": "623633242c365dcca9a35b57a6b9b80e0840e886d1f0e1f981df5850b8ac5741"
+    },
+    {
+      "RootOrigin": "D:/Project/SaintVisionI-Invion/fleet-five-orchestration-20261105/.work/h12-signature-actual-go-originals/job.json",
+      "copy": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/job.json.raw",
+      "name": "job.json",
+      "bytes": 842,
+      "SHA256": "ca1440e147545bed951c10d96baaf4fadd9a0dd8d0dacc786cfe3e5ca843f139"
+    },
+    {
+      "RootOrigin": "D:/Project/SaintVisionI-Invion/fleet-five-orchestration-20261105/.work/h12-signature-actual-go-originals/prepare-receipt.json",
+      "copy": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/prepare-receipt.json.raw",
+      "name": "prepare-receipt.json",
+      "bytes": 3933,
+      "SHA256": "2a3f928cf6ebe6c9edfd31dc6fa89bb4e1da3b356855dcedca8b8c9594fe707c"
+    },
+    {
+      "RootOrigin": "D:/Project/SaintVisionI-Invion/fleet-five-orchestration-20261105/.work/h12-signature-actual-go-originals/prepare-started.json",
+      "copy": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/prepare-started.json.raw",
+      "name": "prepare-started.json",
+      "bytes": 124,
+      "SHA256": "48e426d3a9b30628ec7f810d816d7ad7935ea49c2689e59fd0d7efac6b5853b6"
+    },
+    {
+      "RootOrigin": "D:/Project/SaintVisionI-Invion/fleet-five-orchestration-20261105/.work/h12-signature-actual-go-originals/source-setup-checkout-base.log",
+      "copy": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/source-setup-checkout-base.log.raw",
+      "name": "source-setup-checkout-base.log",
+      "bytes": 80,
+      "SHA256": "398654562f17276756ad3ef896640f8d3a5659298f032b0197a6920d94789491"
+    },
+    {
+      "RootOrigin": "D:/Project/SaintVisionI-Invion/fleet-five-orchestration-20261105/.work/h12-signature-actual-go-originals/source-setup-clean.log",
+      "copy": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/source-setup-clean.log.raw",
+      "name": "source-setup-clean.log",
+      "bytes": 0,
+      "SHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "RootOrigin": "D:/Project/SaintVisionI-Invion/fleet-five-orchestration-20261105/.work/h12-signature-actual-go-originals/source-setup-commands.tsv",
+      "copy": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/source-setup-commands.tsv.raw",
+      "name": "source-setup-commands.tsv",
+      "bytes": 2367,
+      "SHA256": "27e8f07aba20716073a116c7b441f735c1a12c81c34a5791be5aed87b4573c22"
+    },
+    {
+      "RootOrigin": "D:/Project/SaintVisionI-Invion/fleet-five-orchestration-20261105/.work/h12-signature-actual-go-originals/source-setup-container-final.json",
+      "copy": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/source-setup-container-final.json.raw",
+      "name": "source-setup-container-final.json",
+      "bytes": 7394,
+      "SHA256": "3688c67cab229880f67479d40cdc4cdf75a143211bf7c2a340f700f9566a6a25"
+    },
+    {
+      "RootOrigin": "D:/Project/SaintVisionI-Invion/fleet-five-orchestration-20261105/.work/h12-signature-actual-go-originals/source-setup-container-initial.json",
+      "copy": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/source-setup-container-initial.json.raw",
+      "name": "source-setup-container-initial.json",
+      "bytes": 6833,
+      "SHA256": "059c8a8a00bff1e76c50aba958921d6b7492a0f0a255af9c6c7e54af256bbd94"
+    },
+    {
+      "RootOrigin": "D:/Project/SaintVisionI-Invion/fleet-five-orchestration-20261105/.work/h12-signature-actual-go-originals/source-setup-create.log",
+      "copy": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/source-setup-create.log.raw",
+      "name": "source-setup-create.log",
+      "bytes": 65,
+      "SHA256": "fa20f0273fa4152a76806f73c41b17111beacb3e3fc1bc6c863ef87ec85e4299"
+    },
+    {
+      "RootOrigin": "D:/Project/SaintVisionI-Invion/fleet-five-orchestration-20261105/.work/h12-signature-actual-go-originals/source-setup-exits.tsv",
+      "copy": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/source-setup-exits.tsv.raw",
+      "name": "source-setup-exits.tsv",
+      "bytes": 337,
+      "SHA256": "2cbc7c3db601f7d43a9620a939636d4959ae954b9822c313f52b5c5fbf450d9b"
+    },
+    {
+      "RootOrigin": "D:/Project/SaintVisionI-Invion/fleet-five-orchestration-20261105/.work/h12-signature-actual-go-originals/source-setup-fetch-base.log",
+      "copy": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/source-setup-fetch-base.log.raw",
+      "name": "source-setup-fetch-base.log",
+      "bytes": 130,
+      "SHA256": "03b64e355e3efcf93caac851bb1d06bd0f38542ae99e708fe3c761444c31e11d"
+    },
+    {
+      "RootOrigin": "D:/Project/SaintVisionI-Invion/fleet-five-orchestration-20261105/.work/h12-signature-actual-go-originals/source-setup-fetch-k1.log",
+      "copy": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/source-setup-fetch-k1.log.raw",
+      "name": "source-setup-fetch-k1.log",
+      "bytes": 130,
+      "SHA256": "ebde9045a488c8f241af20dd0c5f62c90fd74d4e25cffeca8cfe916531503d9b"
+    },
+    {
+      "RootOrigin": "D:/Project/SaintVisionI-Invion/fleet-five-orchestration-20261105/.work/h12-signature-actual-go-originals/source-setup-go-list-files.log",
+      "copy": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/source-setup-go-list-files.log.raw",
+      "name": "source-setup-go-list-files.log",
+      "bytes": 5983,
+      "SHA256": "435a74fd534e3149ae13a894ec1d9a7e8f76ec8f959a373fe4d6d9fe4edb5d24"
+    },
+    {
+      "RootOrigin": "D:/Project/SaintVisionI-Invion/fleet-five-orchestration-20261105/.work/h12-signature-actual-go-originals/source-setup-head.log",
+      "copy": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/source-setup-head.log.raw",
+      "name": "source-setup-head.log",
+      "bytes": 41,
+      "SHA256": "7f0c704bac11ec8bd11317404abaad0e189ab1d8858310c1225c03ab418de6fc"
+    },
+    {
+      "RootOrigin": "D:/Project/SaintVisionI-Invion/fleet-five-orchestration-20261105/.work/h12-signature-actual-go-originals/source-setup-init.log",
+      "copy": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/source-setup-init.log.raw",
+      "name": "source-setup-init.log",
+      "bytes": 0,
+      "SHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "RootOrigin": "D:/Project/SaintVisionI-Invion/fleet-five-orchestration-20261105/.work/h12-signature-actual-go-originals/source-setup-k1-contracts.go.log",
+      "copy": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/source-setup-k1-contracts.go.log.raw",
+      "name": "source-setup-k1-contracts.go.log",
+      "bytes": 4980,
+      "SHA256": "017102092eebf5cdde81616d07b64e4501781c2f4fa956d5895592198bb06967"
+    },
+    {
+      "RootOrigin": "D:/Project/SaintVisionI-Invion/fleet-five-orchestration-20261105/.work/h12-signature-actual-go-originals/source-setup-k1-current.go.log",
+      "copy": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/source-setup-k1-current.go.log.raw",
+      "name": "source-setup-k1-current.go.log",
+      "bytes": 5324,
+      "SHA256": "b8061a064d4578305cea31af3638ea35af2de0228abc9862107262aa44da385b"
+    },
+    {
+      "RootOrigin": "D:/Project/SaintVisionI-Invion/fleet-five-orchestration-20261105/.work/h12-signature-actual-go-originals/source-setup-k1-ed25519.go.log",
+      "copy": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/source-setup-k1-ed25519.go.log.raw",
+      "name": "source-setup-k1-ed25519.go.log",
+      "bytes": 4118,
+      "SHA256": "d557da3806cb65f6c4a73120ea1430751a9354336787cffb5777f62c148f1fc5"
+    },
+    {
+      "RootOrigin": "D:/Project/SaintVisionI-Invion/fleet-five-orchestration-20261105/.work/h12-signature-actual-go-originals/source-setup-k1-graph.go.log",
+      "copy": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/source-setup-k1-graph.go.log.raw",
+      "name": "source-setup-k1-graph.go.log",
+      "bytes": 9880,
+      "SHA256": "81fbd517f0ba5bb4062a2a14cd2972f9ddae89c2d4e4f979cc7d1d2058da238c"
+    },
+    {
+      "RootOrigin": "D:/Project/SaintVisionI-Invion/fleet-five-orchestration-20261105/.work/h12-signature-actual-go-originals/source-setup-k1-json.go.log",
+      "copy": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/source-setup-k1-json.go.log.raw",
+      "name": "source-setup-k1-json.go.log",
+      "bytes": 5504,
+      "SHA256": "c7b4428a71d051848e1c9df302f2f6fbed3f16c0685e9264e37343ed21c683e6"
+    },
+    {
+      "RootOrigin": "D:/Project/SaintVisionI-Invion/fleet-five-orchestration-20261105/.work/h12-signature-actual-go-originals/source-setup-k1-list.log",
+      "copy": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/source-setup-k1-list.log.raw",
+      "name": "source-setup-k1-list.log",
+      "bytes": 9205,
+      "SHA256": "e349c32a5420a9a2a3727c247d39c731ef538245bc0e98fe582a53045d9e6bda"
+    },
+    {
+      "RootOrigin": "D:/Project/SaintVisionI-Invion/fleet-five-orchestration-20261105/.work/h12-signature-actual-go-originals/source-setup-k1-native.go.log",
+      "copy": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/source-setup-k1-native.go.log.raw",
+      "name": "source-setup-k1-native.go.log",
+      "bytes": 5331,
+      "SHA256": "8f08b4ed8f7c4108374e3197cee678841885cc1ed86214c10a2d97a7b9f4e2b0"
+    },
+    {
+      "RootOrigin": "D:/Project/SaintVisionI-Invion/fleet-five-orchestration-20261105/.work/h12-signature-actual-go-originals/source-setup-k1-proofs.go.log",
+      "copy": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/source-setup-k1-proofs.go.log.raw",
+      "name": "source-setup-k1-proofs.go.log",
+      "bytes": 10397,
+      "SHA256": "b6c6efcb7052a1b7091e0a4c460296d83ba890d57f5ceb3436b98738b6a4e4dd"
+    },
+    {
+      "RootOrigin": "D:/Project/SaintVisionI-Invion/fleet-five-orchestration-20261105/.work/h12-signature-actual-go-originals/source-setup-k1-recipes.go.log",
+      "copy": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/source-setup-k1-recipes.go.log.raw",
+      "name": "source-setup-k1-recipes.go.log",
+      "bytes": 10359,
+      "SHA256": "37338bfdb939a107aa4748c1cc62e6eb810d0e5335e75173a1f82878719d8df8"
+    },
+    {
+      "RootOrigin": "D:/Project/SaintVisionI-Invion/fleet-five-orchestration-20261105/.work/h12-signature-actual-go-originals/source-setup-k1-schemas.go.log",
+      "copy": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/source-setup-k1-schemas.go.log.raw",
+      "name": "source-setup-k1-schemas.go.log",
+      "bytes": 5064,
+      "SHA256": "37228c2401e4ea1730446347547a246e5de258d033b2e2714334d4c19958a9ec"
+    },
+    {
+      "RootOrigin": "D:/Project/SaintVisionI-Invion/fleet-five-orchestration-20261105/.work/h12-signature-actual-go-originals/source-setup-k1-temporal.go.log",
+      "copy": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/source-setup-k1-temporal.go.log.raw",
+      "name": "source-setup-k1-temporal.go.log",
+      "bytes": 4076,
+      "SHA256": "759519f626e8454e79219f6368d4befe2b3e734dca1ac80bf1585d60bcbc3eb7"
+    },
+    {
+      "RootOrigin": "D:/Project/SaintVisionI-Invion/fleet-five-orchestration-20261105/.work/h12-signature-actual-go-originals/source-setup-k1-trust.go.log",
+      "copy": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/source-setup-k1-trust.go.log.raw",
+      "name": "source-setup-k1-trust.go.log",
+      "bytes": 10336,
+      "SHA256": "d0e72b6f4d1ab08fe2bece5465c932b084983068a3049d73b69dd28922d07dd7"
+    },
+    {
+      "RootOrigin": "D:/Project/SaintVisionI-Invion/fleet-five-orchestration-20261105/.work/h12-signature-actual-go-originals/source-setup-k1-verify.go.log",
+      "copy": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/source-setup-k1-verify.go.log.raw",
+      "name": "source-setup-k1-verify.go.log",
+      "bytes": 14338,
+      "SHA256": "3834b97335c7af45b1c6ac2ab9eebbca196149e84faaf44dfbbb227a3f113743"
+    },
+    {
+      "RootOrigin": "D:/Project/SaintVisionI-Invion/fleet-five-orchestration-20261105/.work/h12-signature-actual-go-originals/source-setup-memory-peak.bytes",
+      "copy": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/source-setup-memory-peak.bytes.raw",
+      "name": "source-setup-memory-peak.bytes",
+      "bytes": 9,
+      "SHA256": "7c6d81a4915df55f537683fdeaa05fd6d36224fb9afcfb5fb3e28c1f96f248c0"
+    },
+    {
+      "RootOrigin": "D:/Project/SaintVisionI-Invion/fleet-five-orchestration-20261105/.work/h12-signature-actual-go-originals/source-setup-mod-download.log",
+      "copy": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/source-setup-mod-download.log.raw",
+      "name": "source-setup-mod-download.log",
+      "bytes": 0,
+      "SHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "RootOrigin": "D:/Project/SaintVisionI-Invion/fleet-five-orchestration-20261105/.work/h12-signature-actual-go-originals/source-setup-mod-verify.log",
+      "copy": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/source-setup-mod-verify.log.raw",
+      "name": "source-setup-mod-verify.log",
+      "bytes": 21,
+      "SHA256": "b4537ed75f533f993f371954de47e42a793b8e5b0587577de7e27fb3e50696bd"
+    },
+    {
+      "RootOrigin": "D:/Project/SaintVisionI-Invion/fleet-five-orchestration-20261105/.work/h12-signature-actual-go-originals/source-setup-receipt.json",
+      "copy": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/source-setup-receipt.json.raw",
+      "name": "source-setup-receipt.json",
+      "bytes": 2670,
+      "SHA256": "b3843d88876318b0a7c1599a4550a649381d955a8b35e398b470e3abb77bb6a6"
+    },
+    {
+      "RootOrigin": "D:/Project/SaintVisionI-Invion/fleet-five-orchestration-20261105/.work/h12-signature-actual-go-originals/source-setup-remote.log",
+      "copy": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/source-setup-remote.log.raw",
+      "name": "source-setup-remote.log",
+      "bytes": 0,
+      "SHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "RootOrigin": "D:/Project/SaintVisionI-Invion/fleet-five-orchestration-20261105/.work/h12-signature-actual-go-originals/source-setup-sparse-init.log",
+      "copy": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/source-setup-sparse-init.log.raw",
+      "name": "source-setup-sparse-init.log",
+      "bytes": 0,
+      "SHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "RootOrigin": "D:/Project/SaintVisionI-Invion/fleet-five-orchestration-20261105/.work/h12-signature-actual-go-originals/source-setup-sparse-set.log",
+      "copy": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/source-setup-sparse-set.log.raw",
+      "name": "source-setup-sparse-set.log",
+      "bytes": 0,
+      "SHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "RootOrigin": "D:/Project/SaintVisionI-Invion/fleet-five-orchestration-20261105/.work/h12-signature-actual-go-originals/source-setup-started.json",
+      "copy": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/source-setup-started.json.raw",
+      "name": "source-setup-started.json",
+      "bytes": 200,
+      "SHA256": "7d5ef1d6d04bb02b4a91b3da9bb3f3f29cdc40687df26d4e84df1df9fbaea0f0"
+    },
+    {
+      "RootOrigin": "D:/Project/SaintVisionI-Invion/fleet-five-orchestration-20261105/.work/h12-signature-actual-go-originals/source-setup.log",
+      "copy": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/source-setup.log.raw",
+      "name": "source-setup.log",
+      "bytes": 609,
+      "SHA256": "c0b40d53bc85dcc5b97b6191aaf67e7c821dd2a375c0904aed606705d5f41ac0"
+    },
+    {
+      "RootOrigin": "D:/Project/SaintVisionI-Invion/fleet-five-orchestration-20261105/.work/h12-signature-actual-go-originals/source-setup.sh",
+      "copy": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/root-wip01-originals/source-setup.sh.raw",
+      "name": "source-setup.sh",
+      "bytes": 2016,
+      "SHA256": "a9cb41993f3a3cf3837cd599070271f118c766f77a15226a122b8a2e832eae9f"
+    },
+    {
+      "RootOrigin": "D:/Project/SaintVisionI-Invion/fleet-five-orchestration-20261105/.work/h12-signature-actual-go-root-proof.json",
+      "copy": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/h12-signature-actual-go-root-proof.json.raw",
+      "bytes": 12200,
+      "SHA256": "b10f140cbcc1a329b6d427e68fb19b1487e4c04e713dd1fc51f21f5783713cb0"
+    },
+    {
+      "RootOrigin": "D:/Project/SaintVisionI-Invion/fleet-five-orchestration-20261105/.work/h12-signature-actual-go-summary.json",
+      "copy": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/h12-signature-actual-go-summary.json.raw",
+      "bytes": 8209,
+      "SHA256": "175caf272d9b7003347d6888760aa0dfd5d2fabd608764f80dc60ccb576d1c5e"
+    },
+    {
+      "RootOrigin": "D:/Project/SaintVisionI-Invion/fleet-five-orchestration-20261105/.work/h12-signature-actual-case-rows.json",
+      "copy": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/h12-signature-actual-case-rows.json.raw",
+      "bytes": 44387,
+      "SHA256": "0e57f532dfbc39a4e752213ae9ace4e3b9741e7483e2cf04f753e821a8ef9700"
+    }
+  ],
+  "oldWIP01EvidenceAndHistoryHashesPreserved": [
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/.gitattributes",
+      "mode": "100644",
+      "bytes": 28,
+      "SHA256": "13a38ac304a342bc4e214c884b3404b7280edef1834c59ee0d97302fd98d3984"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/complete-four-file.patch",
+      "mode": "100644",
+      "bytes": 31074,
+      "SHA256": "7eab0cfb280287908bb8a06a82f0cb6a2a15e19806316bfdd0a587a7140a92e5"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/effect_gate_test.go.current.raw",
+      "mode": "100644",
+      "bytes": 27623,
+      "SHA256": "eaf6ae9a9bb40a68fa92be4a3f2f42b05b1d69218f60497d747b78586fb59fd5"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/effect_gate_test.go.preimage.raw",
+      "mode": "100644",
+      "bytes": 19751,
+      "SHA256": "871e1b1ca26e6bcdcc4ea7af2e8a290dc7a9b615f201c46aa7bf1102e0af7c04"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/h12_signature_internal.go.current.raw",
+      "mode": "100644",
+      "bytes": 2505,
+      "SHA256": "f9e3e808d8951c2da6fee4b45364f64bb5c909a33a90c3a6074c99b8cb6e4def"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/h12_signature_test.go.current.raw",
+      "mode": "100644",
+      "bytes": 12939,
+      "SHA256": "94f9bd56deaa371125ceba49f5d7a21d30a4bc34575fed4747f693b51d1ce020"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/local-format-diff-receipt.json",
+      "mode": "100644",
+      "bytes": 1862,
+      "SHA256": "04d7811e8753d377fc6879e67b4dccb69ccdaf9fafd8a9157f39e1f89cd77475"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/real-source-dependency-input-plan.json",
+      "mode": "100644",
+      "bytes": 93154,
+      "SHA256": "7438d3c56e06a932c2ef2242d8839963a30d15f47e4ac6b93d88b9ef87171491"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/root-isolated-test-proposal.json",
+      "mode": "100644",
+      "bytes": 4207,
+      "SHA256": "16db973e2e830b66d988809b92fb8967d0ae77b97334d72e108397ecfae7fb14"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/source_gate_test.go.current.raw",
+      "mode": "100644",
+      "bytes": 25737,
+      "SHA256": "0ad2989b6f36224352516e17f278b957cc25077f657560975e0ebcb063ff9208"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/source_gate_test.go.preimage.raw",
+      "mode": "100644",
+      "bytes": 23505,
+      "SHA256": "10c0229040b40d2dd0653979b4761da4e35baab5d519b8d52dbe368928c0c780"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/start-context.json",
+      "mode": "100644",
+      "bytes": 8712,
+      "SHA256": "cbdfd2425d74440f8a15f11339c6aa3be6874e1e4e0d571cff7f85384ce10e9a"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/static-patch-integrity.json",
+      "mode": "100644",
+      "bytes": 637,
+      "SHA256": "8b5c04a4b05b76eacfb505e5e87eed604d1b726ede31c96b7c7e4c1f80ec1a22"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/static-source-inspection.json",
+      "mode": "100644",
+      "bytes": 1005,
+      "SHA256": "5c5c47018d36368cb4936d6f7c09930f6fce658969e661d295a5137803eb0878"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip-source-manifest.json",
+      "mode": "100644",
+      "bytes": 4090,
+      "SHA256": "9742f00f3f3644ce5920d03e2ad80a0ee853f2592947f19b81f3ab7359779263"
+    },
+    {
+      "path": "docs/vault/30_Development/History/2026-11-07_FLEET5_K2_H12_Signature_Code_R1_Codex.md",
+      "mode": "100644",
+      "bytes": 6807,
+      "SHA256": "f7a470c1d5dc7675da5de45c28f80f265604ae61694d06fd7dd2d47a1a8ab693"
+    }
+  ],
+  "oldZIP": {
+    "path": "D:/Project/SaintVisionI-Invion/fleet5-k2-d04-l1-r2-20261107/.work/h12-signature-code-r1-wip.zip",
+    "bytes": 97887,
+    "SHA256": "f320083d6837c315e5900aae85e7be771a3754c70794715ededb40d55a18641c"
+  }
+}

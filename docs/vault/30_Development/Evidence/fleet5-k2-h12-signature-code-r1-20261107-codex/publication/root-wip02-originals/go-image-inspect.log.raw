@@ -1,0 +1,56 @@
+[
+    {
+        "Id": "sha256:8d48e12ec56735e9358640898b9d9b9fcca110612ed8a5567438c0a1baa24e66",
+        "RepoTags": [
+            "golang:1.27.1-bookworm",
+            "golang@sha256:8d48e12ec56735e9358640898b9d9b9fcca110612ed8a5567438c0a1baa24e66"
+        ],
+        "RepoDigests": [
+            "golang@sha256:8d48e12ec56735e9358640898b9d9b9fcca110612ed8a5567438c0a1baa24e66"
+        ],
+        "Comment": "buildkit.dockerfile.v0",
+        "Created": "2026-10-06T03:16:11.730252282Z",
+        "Config": {
+            "Env": [
+                "PATH=/go/bin:/usr/local/go/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+                "GOLANG_VERSION=1.27.1",
+                "GOTOOLCHAIN=local",
+                "GOPATH=/go"
+            ],
+            "Cmd": [
+                "bash"
+            ],
+            "WorkingDir": "/go"
+        },
+        "Architecture": "amd64",
+        "Os": "linux",
+        "Size": 1253428610,
+        "RootFS": {
+            "Type": "layers",
+            "Layers": [
+                "sha256:6439a9e3affca36e4cc323dd241724b62721af4a3f4aa590ced4ae11f8083a4b",
+                "sha256:7345f80a66167d9ae4a3c28d9280aabd743986ec04e5d862d67a5b8e5d886e78",
+                "sha256:1049cbfdfb0acf4035a0996bbbf3e5bfc20fcfef65c3d50f09b16c0607afbb38",
+                "sha256:27b00739cf9ac2ec6abc965028e770ef13e47e56972f2195dde9ee6a682dd5ea",
+                "sha256:625fa9def29bca29945e6ac5ce53d881c6b884fad9dd372180c605b8cfb05bb2",
+                "sha256:c3a075fbcd8a6864bab592896fd205db80c27a4243376df5649f46f07ff55c89",
+                "sha256:5f70bf18a086007016e948b04aed3b82103a36bea41755b6cddfaf10ace3c6ef"
+            ]
+        },
+        "Metadata": {
+            "LastTagTime": "2026-11-07T01:22:29.362148974Z"
+        },
+        "Descriptor": {
+            "mediaType": "application/vnd.oci.image.index.v1+json",
+            "digest": "sha256:8d48e12ec56735e9358640898b9d9b9fcca110612ed8a5567438c0a1baa24e66",
+            "size": 6526
+        },
+        "Identity": {
+            "Pull": [
+                {
+                    "Repository": "docker.io/library/golang"
+                }
+            ]
+        }
+    }
+]

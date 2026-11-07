@@ -1,0 +1,85 @@
+{
+  "classification": "UNPUBLISHED_FROZEN_CODE_WIP_NOT_TESTED_NOT_APPROVED",
+  "task": "task_a95ef3d8ccce",
+  "dispatch": "ctx_ed23b4a777d0",
+  "grant": "msg_7461bcdf99a4",
+  "base": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed",
+  "branch": "agent/codex/fleet5-k2-h12-signature-code-r1-20261107",
+  "files": [
+    {
+      "path": "services/node-agent/internal/migrationcontext/effect_gate_test.go",
+      "change": "M",
+      "preimage": {
+        "mode": "100644",
+        "blobOID": "cc3258e5a4a9b407a3425c5fa2d5b0ff68897b80",
+        "SHA256": "871e1b1ca26e6bcdcc4ea7af2e8a290dc7a9b615f201c46aa7bf1102e0af7c04",
+        "bytes": 19751,
+        "raw": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/effect_gate_test.go.preimage.raw"
+      },
+      "current": {
+        "mode": "100644",
+        "blobOID": "19f2673c2fa4634d79616175080b983a30641772",
+        "SHA256": "eaf6ae9a9bb40a68fa92be4a3f2f42b05b1d69218f60497d747b78586fb59fd5",
+        "bytes": 27623,
+        "encoding": "UTF-8 without BOM, LF",
+        "raw": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/effect_gate_test.go.current.raw"
+      }
+    },
+    {
+      "path": "services/node-agent/internal/migrationcontext/source_gate_test.go",
+      "change": "M",
+      "preimage": {
+        "mode": "100644",
+        "blobOID": "a395e5ff9824ddc01c27004f1627dfda2bb56b09",
+        "SHA256": "10c0229040b40d2dd0653979b4761da4e35baab5d519b8d52dbe368928c0c780",
+        "bytes": 23505,
+        "raw": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/source_gate_test.go.preimage.raw"
+      },
+      "current": {
+        "mode": "100644",
+        "blobOID": "fe2b1ec68e6aac39e57dcf4bd50917e5b0bd8a75",
+        "SHA256": "0ad2989b6f36224352516e17f278b957cc25077f657560975e0ebcb063ff9208",
+        "bytes": 25737,
+        "encoding": "UTF-8 without BOM, LF",
+        "raw": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/source_gate_test.go.current.raw"
+      }
+    },
+    {
+      "path": "services/node-agent/internal/migrationcontext/h12_signature_internal.go",
+      "change": "A",
+      "preimage": null,
+      "current": {
+        "mode": "100644",
+        "blobOID": "6beb6a342d3b7d9f3fcdfd610e03d038e66d5a49",
+        "SHA256": "f9e3e808d8951c2da6fee4b45364f64bb5c909a33a90c3a6074c99b8cb6e4def",
+        "bytes": 2505,
+        "encoding": "UTF-8 without BOM, LF",
+        "raw": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/h12_signature_internal.go.current.raw"
+      }
+    },
+    {
+      "path": "services/node-agent/internal/migrationcontext/h12_signature_test.go",
+      "change": "A",
+      "preimage": null,
+      "current": {
+        "mode": "100644",
+        "blobOID": "ec386c7e3530c88a10305efc7f29ba66fcdf245b",
+        "SHA256": "94f9bd56deaa371125ceba49f5d7a21d30a4bc34575fed4747f693b51d1ce020",
+        "bytes": 12939,
+        "encoding": "UTF-8 without BOM, LF",
+        "raw": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/h12_signature_test.go.current.raw"
+      }
+    }
+  ],
+  "completePatch": {
+    "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/complete-four-file.patch",
+    "SHA256": "7eab0cfb280287908bb8a06a82f0cb6a2a15e19806316bfdd0a587a7140a92e5",
+    "bytes": 31074,
+    "gitApplyNumstatExit": 0,
+    "parserOnlyNoApply": true,
+    "numstat": "192\t3\tservices/node-agent/internal/migrationcontext/effect_gate_test.go\n68\t1\tservices/node-agent/internal/migrationcontext/source_gate_test.go\n56\t0\tservices/node-agent/internal/migrationcontext/h12_signature_internal.go\n334\t0\tservices/node-agent/internal/migrationcontext/h12_signature_test.go\n"
+  },
+  "actualGoCrypto": "NOT_RUN",
+  "publication": "NOT_GRANTED",
+  "freezeRule": "Root verifies preimages and each overlaid current hash before bounded test and hashes after; no author source edits pending actual receipt; matching helper tuple remains private mathematical DATA only"
+}

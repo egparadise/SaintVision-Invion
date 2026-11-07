@@ -1,0 +1,197 @@
+{
+  "atKST": "2026-11-07T10:25:38+09:00",
+  "base": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed",
+  "codeCommit": null,
+  "packetSHA256": "f4e1532a97a5b84d177917607dc2947965107ad7faedc78f5b0cdd004aacd018",
+  "manifestSHA256": "306871f5865defad9e79f9d8c6f8a185a9be31de8aad9dbb793de7c2596295b1",
+  "operator": "Root Codex",
+  "environment": "Actual PC3 official pinned Go1.27.1 linux/amd64; nonroot1000; networknone;2CPU;2GiBmemory+swapTOTAL2GiB;read-onlyroot;ownjobonly",
+  "realGitSourceInputsVerified": 371,
+  "fourFilesOverlayOnly": true,
+  "allFrozenSourceFilesBeforeAfterEqual": true,
+  "frozenSourceFileCount": 373,
+  "phaseResults": [
+    {
+      "phase": 1,
+      "id": "math-canonical-ownership-admission",
+      "startedAtKST": "2026-11-07T10:22:54+09:00",
+      "endedAtKST": "2026-11-07T10:23:22+09:00",
+      "directExit": 0,
+      "elapsedSeconds": 28.363,
+      "topLevelPassed": 2,
+      "subtestsPassed": 32,
+      "cgroupMemoryPeakBytes": 400941056,
+      "OOMKilled": false,
+      "sourceBeforeAfterUnchanged": true,
+      "failEvents": [],
+      "skipEvents": [],
+      "ownExitedContainerRemoved": true,
+      "topLevelFailed": 0,
+      "subtestsFailed": 0,
+      "packageFailEvents": 0
+    },
+    {
+      "phase": 2,
+      "id": "new-exact-object-file-directcall-probes",
+      "startedAtKST": "2026-11-07T10:23:22+09:00",
+      "endedAtKST": "2026-11-07T10:23:24+09:00",
+      "directExit": 0,
+      "elapsedSeconds": 1.397,
+      "topLevelPassed": 2,
+      "subtestsPassed": 12,
+      "cgroupMemoryPeakBytes": 86564864,
+      "OOMKilled": false,
+      "sourceBeforeAfterUnchanged": true,
+      "failEvents": [],
+      "skipEvents": [],
+      "ownExitedContainerRemoved": true,
+      "topLevelFailed": 0,
+      "subtestsFailed": 0,
+      "packageFailEvents": 0
+    },
+    {
+      "phase": 3,
+      "id": "existing-d04-private-consistency",
+      "startedAtKST": "2026-11-07T10:23:24+09:00",
+      "endedAtKST": "2026-11-07T10:23:25+09:00",
+      "directExit": 0,
+      "elapsedSeconds": 1.398,
+      "topLevelPassed": 13,
+      "subtestsPassed": 101,
+      "cgroupMemoryPeakBytes": 163282944,
+      "OOMKilled": false,
+      "sourceBeforeAfterUnchanged": true,
+      "failEvents": [],
+      "skipEvents": [],
+      "ownExitedContainerRemoved": true,
+      "topLevelFailed": 0,
+      "subtestsFailed": 0,
+      "packageFailEvents": 0
+    },
+    {
+      "phase": 4,
+      "id": "existing-public-refusal-effect-source-census-plr",
+      "startedAtKST": "2026-11-07T10:23:25+09:00",
+      "endedAtKST": "2026-11-07T10:25:28+09:00",
+      "directExit": 0,
+      "elapsedSeconds": 122.982,
+      "topLevelPassed": 11,
+      "subtestsPassed": 129,
+      "cgroupMemoryPeakBytes": 679493632,
+      "OOMKilled": false,
+      "sourceBeforeAfterUnchanged": true,
+      "failEvents": [],
+      "skipEvents": [],
+      "ownExitedContainerRemoved": true,
+      "topLevelFailed": 0,
+      "subtestsFailed": 0,
+      "packageFailEvents": 0
+    }
+  ],
+  "allFourPhasesActuallyPass": true,
+  "actualTopLevelPassed": 28,
+  "actualSubtestsPassed": 274,
+  "actualTopLevelFailed": 0,
+  "actualSubtestsFailed": 0,
+  "actualPackageFailEvents": 0,
+  "actualFailEvents": 0,
+  "actualSkippedEvents": 0,
+  "H12MathTableRows": 32,
+  "H12DistinctFullArgumentFingerprints": 32,
+  "H12TrueMathControls": 2,
+  "H12LayerCounts": {
+    "math": 9,
+    "expected-key": 7,
+    "admission": 2,
+    "DER": 5,
+    "codec/signature-encoding": 2,
+    "admission/codec": 7
+  },
+  "H12GuardActualCompileTypedRows": 12,
+  "H12GuardDistinctFixtureFingerprints": 12,
+  "H12ResolverCompilerControls": 2,
+  "H12AdmissionMeasurement": [
+    {
+      "allocations": 0.0,
+      "actualOversizeEvaluationRepeats": 2,
+      "additionalUniqueInputs": 0,
+      "inputSHA256": "0da11651d986542a4faf3285d8160ea08b30fa20b4c09d0ef19a96c5cad629d8"
+    }
+  ],
+  "H12AdditionalOwnershipValidInputRepeat": 1,
+  "H12TargetHelperEvaluationsByTableAndInspectedTestFlow": 35,
+  "H12ExtraDistinctInputsFromOwnershipOrAdmission": 0,
+  "P02CausalRows": 92,
+  "P02DistinctFullInputFingerprints": 90,
+  "originalReceiptFiles": 99,
+  "originalIndexSHA256": "4c6a644cdb1218362d68cb9b44d7e154ca22910dbe0fd45f8aa05813e8e85e1d",
+  "RootTestedSourceFiles": [
+    {
+      "path": "services/node-agent/internal/migrationcontext/effect_gate_test.go",
+      "change": "M",
+      "preimage": {
+        "mode": "100644",
+        "blobOID": "cc3258e5a4a9b407a3425c5fa2d5b0ff68897b80",
+        "SHA256": "871e1b1ca26e6bcdcc4ea7af2e8a290dc7a9b615f201c46aa7bf1102e0af7c04",
+        "bytes": 19751,
+        "raw": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/effect_gate_test.go.base-preimage.raw"
+      },
+      "current": {
+        "mode": "100644",
+        "blobOID": "e5ccd0d2a7da672d8947d4f02cb33e6c0bdc7ce3",
+        "SHA256": "d34eecc2d9b7d5790eec6ebe2b9816b421899228f948fae05fd6920d4d51b50a",
+        "bytes": 27592,
+        "raw": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/effect_gate_test.go.current.raw"
+      }
+    },
+    {
+      "path": "services/node-agent/internal/migrationcontext/source_gate_test.go",
+      "change": "M",
+      "preimage": {
+        "mode": "100644",
+        "blobOID": "a395e5ff9824ddc01c27004f1627dfda2bb56b09",
+        "SHA256": "10c0229040b40d2dd0653979b4761da4e35baab5d519b8d52dbe368928c0c780",
+        "bytes": 23505,
+        "raw": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/source_gate_test.go.base-preimage.raw"
+      },
+      "current": {
+        "mode": "100644",
+        "blobOID": "fe2b1ec68e6aac39e57dcf4bd50917e5b0bd8a75",
+        "SHA256": "0ad2989b6f36224352516e17f278b957cc25077f657560975e0ebcb063ff9208",
+        "bytes": 25737,
+        "raw": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/source_gate_test.go.current.raw"
+      }
+    },
+    {
+      "path": "services/node-agent/internal/migrationcontext/h12_signature_internal.go",
+      "change": "A",
+      "preimage": null,
+      "current": {
+        "mode": "100644",
+        "blobOID": "6beb6a342d3b7d9f3fcdfd610e03d038e66d5a49",
+        "SHA256": "f9e3e808d8951c2da6fee4b45364f64bb5c909a33a90c3a6074c99b8cb6e4def",
+        "bytes": 2505,
+        "raw": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/h12_signature_internal.go.current.raw"
+      }
+    },
+    {
+      "path": "services/node-agent/internal/migrationcontext/h12_signature_test.go",
+      "change": "A",
+      "preimage": null,
+      "current": {
+        "mode": "100644",
+        "blobOID": "ec386c7e3530c88a10305efc7f29ba66fcdf245b",
+        "SHA256": "94f9bd56deaa371125ceba49f5d7a21d30a4bc34575fed4747f693b51d1ce020",
+        "bytes": 12939,
+        "raw": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip02/h12_signature_test.go.current.raw"
+      }
+    }
+  ],
+  "independentCODEReview": "PENDING",
+  "productCI": "NOT_RUN",
+  "mathEvidenceAuthenticatesOrInstallsAuthority": false,
+  "actualH1H7Bindings": null,
+  "rawSeven": "UNREGISTERED",
+  "A01A40": "NOT_RUN",
+  "wholeProgramComplete": false
+}

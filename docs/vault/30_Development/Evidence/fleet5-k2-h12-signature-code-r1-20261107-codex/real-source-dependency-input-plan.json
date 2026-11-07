@@ -1,0 +1,2540 @@
+{
+  "classification": "ROOT_REAL_GIT_SOURCE_CLOSURE_PLAN_NOT_MATERIALIZED_OR_EXECUTED_BY_AUTHOR",
+  "base": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed",
+  "requiredGitObjects": [
+    "0bf852a66b2eb01f95da65ebbad0360a04ea6fed",
+    "eb32b211ab3704935b9431747089ab0715582a74"
+  ],
+  "modules": [
+    "packages/contracts-go/go.mod",
+    "services/node-agent/go.mod"
+  ],
+  "realModulesNoStubs": true,
+  "inputs": [
+    {
+      "path": "contracts/README.md",
+      "mode": "100644",
+      "blobOID": "075ddff5af15fa1b94f0a2a83454fa8ee029b445",
+      "bytes": 1441,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/adapter-conformance-not-observed-response.schema.json",
+      "mode": "100644",
+      "blobOID": "a6715f8f1e1cdddb72520d38cd3447dadf30d713",
+      "bytes": 2165,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/adapter-conformance-recorded-response.schema.json",
+      "mode": "100644",
+      "blobOID": "5b24ecbc92b0fc384f9db7f25cdfe92a0484220c",
+      "bytes": 2884,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/adapter-readiness-response.schema.json",
+      "mode": "100644",
+      "blobOID": "80d8a5618ee670c69e6e7baa15344646a8bd4e0c",
+      "bytes": 3756,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/announcement-request.schema.json",
+      "mode": "100644",
+      "blobOID": "37b135b8539f841ab378b48ab36c106af689f3ce",
+      "bytes": 1571,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/artifact-pin-verification-response.schema.json",
+      "mode": "100644",
+      "blobOID": "6017d7369cc4af644b34fd71730c08ef862090e1",
+      "bytes": 1002,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/conformance-status-recorded-response.schema.json",
+      "mode": "100644",
+      "blobOID": "a0653e37e2604aa5a3713702186b2754aec1a893",
+      "bytes": 5311,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/conformance-status-response.schema.json",
+      "mode": "100644",
+      "blobOID": "37b762470e21692fa680fa7c80ba9f7b2675b50b",
+      "bytes": 3060,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/context-bundle-response.schema.json",
+      "mode": "100644",
+      "blobOID": "2b315576017755337253bb423cf3c9c54736b65c",
+      "bytes": 3995,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/contribution-page-response.schema.json",
+      "mode": "100644",
+      "blobOID": "ea9d5122b68b68daa43a6d04ff59e098a45f49ac",
+      "bytes": 2377,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/contribution-registration-response.schema.json",
+      "mode": "100644",
+      "blobOID": "12ec5f8943d019a8d8b344fd0512d73f916ff3eb",
+      "bytes": 2138,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/contribution-request.schema.json",
+      "mode": "100644",
+      "blobOID": "3273bc5ff696ee53d03eaf9bd4e6c411172fba1f",
+      "bytes": 1051,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/contribution-response.schema.json",
+      "mode": "100644",
+      "blobOID": "035d1b57a7060cc5d807720b2a75204291603740",
+      "bytes": 1453,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/credential-reference.schema.json",
+      "mode": "100644",
+      "blobOID": "7f1c8bbc15a6557584063039e1aed98ff41ad40d",
+      "bytes": 651,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/data-location-page-response.schema.json",
+      "mode": "100644",
+      "blobOID": "7ac563a0c086495049595e385c838d666de0a9e2",
+      "bytes": 2454,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/data-location-response.schema.json",
+      "mode": "100644",
+      "blobOID": "f57b0608c2419b45466d2401258f9aa9132f8dc2",
+      "bytes": 1518,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/discovery-admission-response.schema.json",
+      "mode": "100644",
+      "blobOID": "b5d00aae9f5a0850b00fca2780a86adea00d5e5a",
+      "bytes": 760,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/discovery-announcement-response.schema.json",
+      "mode": "100644",
+      "blobOID": "1e783e48f7be55a39a54f93e9d5220b284bf5d08",
+      "bytes": 502,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/discovery-candidate-response.schema.json",
+      "mode": "100644",
+      "blobOID": "641648b02d5dba9b20d3173a5aca80963ef22ab0",
+      "bytes": 1883,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/discovery-candidates-response.schema.json",
+      "mode": "100644",
+      "blobOID": "b43af2dbc05c5c2e4210f83a370005b480a58678",
+      "bytes": 2662,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/discovery-decline-response.schema.json",
+      "mode": "100644",
+      "blobOID": "14c46d8103141a56bad90301de32c85d69226969",
+      "bytes": 416,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/distributed-plan-placement-response.schema.json",
+      "mode": "100644",
+      "blobOID": "002254bc30067f703b4b7dce0a06cee04886cc98",
+      "bytes": 838,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/distributed-plan-request.schema.json",
+      "mode": "100644",
+      "blobOID": "20aac53ac2b30ba79c3fb4320fb9a18e5f297bd4",
+      "bytes": 1345,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/distributed-plan-response.schema.json",
+      "mode": "100644",
+      "blobOID": "fbfa21f1cc9803c1dcf2ead287fa4cfbc6e187ca",
+      "bytes": 1976,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/eval-run-response.schema.json",
+      "mode": "100644",
+      "blobOID": "8cbeefe4b207de8990cc8765a1ddedd3e6290e02",
+      "bytes": 2049,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/eval-run-start-request.schema.json",
+      "mode": "100644",
+      "blobOID": "cdac100de6bb073ac1381f5680d992ebc2d3ba37",
+      "bytes": 1994,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/execution-readiness-check-response.schema.json",
+      "mode": "100644",
+      "blobOID": "7ab121c5929a2ac37f8626994a91cfc027c4c5af",
+      "bytes": 1662,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/fixtures/approval-challenge-response.json",
+      "mode": "100644",
+      "blobOID": "fe480e4b7e64b257286f4e58b699c757290c60e0",
+      "bytes": 150,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/fixtures/approval-page-response.json",
+      "mode": "100644",
+      "blobOID": "64b916c34993d6a184bba7d2a86bd1306aef061a",
+      "bytes": 511,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/fixtures/approval-review-build-response.json",
+      "mode": "100644",
+      "blobOID": "05475d23e7f4850f41b3f92b34b02ec85cf5ddb5",
+      "bytes": 1043,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/fixtures/approval-review-response.json",
+      "mode": "100644",
+      "blobOID": "3c2c3063668cc03cbfa289333bc29720f9882f85",
+      "bytes": 1167,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/fixtures/artifact-content-response.json",
+      "mode": "100644",
+      "blobOID": "e95dd5d02d7092f3e2213efa3252cabaa89e9d80",
+      "bytes": 409,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/fixtures/artifact-download-metadata.json",
+      "mode": "100644",
+      "blobOID": "fbf352ba02dc1666d5794f36acbf0afd97e33dac",
+      "bytes": 460,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/fixtures/configuration-readiness-response.json",
+      "mode": "100644",
+      "blobOID": "5193a5ff6d54d2122f86f6ba877e618977e0aacd",
+      "bytes": 191,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/fixtures/control-run-detail-response.json",
+      "mode": "100644",
+      "blobOID": "4a949efcadd4d2e6c77e7ec47e99d8ad6c0539a2",
+      "bytes": 250,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/fixtures/control-run-page-response.json",
+      "mode": "100644",
+      "blobOID": "32e7a2ae4fa8182586e93350f31212fe29e5064d",
+      "bytes": 290,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/fixtures/discovery-admission-response.json",
+      "mode": "100644",
+      "blobOID": "b5829d378d9f2ee88234b3608ae7d1dfb0d03125",
+      "bytes": 216,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/fixtures/discovery-announcement-response.json",
+      "mode": "100644",
+      "blobOID": "1fc54626798d6fdb330735db7391392abaea8406",
+      "bytes": 47,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/fixtures/discovery-candidates-response.json",
+      "mode": "100644",
+      "blobOID": "3552da8f85c2dcf4ef52ece9aaf810d02e618a7b",
+      "bytes": 602,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/fixtures/discovery-decline-response.json",
+      "mode": "100644",
+      "blobOID": "a4cc3cedb3801135e544869f7f8635f98106d222",
+      "bytes": 72,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/fixtures/distributed-plan-response.json",
+      "mode": "100644",
+      "blobOID": "d523e90b2ce321c37cc3f53ad215aae9d88559fa",
+      "bytes": 599,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/fixtures/heartbeat-accepted-response.json",
+      "mode": "100644",
+      "blobOID": "a7f9eb743b89881ea8573331d1bf450af9f0141b",
+      "bytes": 84,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/fixtures/member-role-result-response.json",
+      "mode": "100644",
+      "blobOID": "035ffcdf8ad10e9074c71d6b2f36cb8f921bfd69",
+      "bytes": 228,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/fixtures/model-commit-observation-response.json",
+      "mode": "100644",
+      "blobOID": "539ba0443334574d8bd514af855395359ec07f0d",
+      "bytes": 595,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/fixtures/model-execution-manifest-observation.json",
+      "mode": "100644",
+      "blobOID": "135226c1f001cc10fa6532292516a14c89024304",
+      "bytes": 835,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/fixtures/model-retry-prepare-result.json",
+      "mode": "100644",
+      "blobOID": "c33c8db8f9875093933853f919221e4ae303952a",
+      "bytes": 1070,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/fixtures/node-detail-response.json",
+      "mode": "100644",
+      "blobOID": "02a78f9bf5e06e61606f18e8de52daf41bbe4b90",
+      "bytes": 593,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/fixtures/node-enroll-response.json",
+      "mode": "100644",
+      "blobOID": "a7e3e04969fd1bcbf57b3800d6f41c13753ed82f",
+      "bytes": 331,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/fixtures/node-liveness-sweep-response.json",
+      "mode": "100644",
+      "blobOID": "92ab14fce9ce1c829e3e84d97389693825199172",
+      "bytes": 46,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/fixtures/node-page-response.json",
+      "mode": "100644",
+      "blobOID": "46c607866787f1ab021af9b7db7a791cee7b1c3a",
+      "bytes": 405,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/fixtures/node-resource-usage-response.json",
+      "mode": "100644",
+      "blobOID": "b71b0428a022de29c35222c783405630e7203bd8",
+      "bytes": 665,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/fixtures/placement-preview-response.json",
+      "mode": "100644",
+      "blobOID": "cc155fe28bdc775b0eb791a735ff35f7f09e34bc",
+      "bytes": 367,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/fixtures/pool-capacity-response.json",
+      "mode": "100644",
+      "blobOID": "a5a1145d508c6b8d1c4a452ddff0abc76ff57105",
+      "bytes": 945,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/fixtures/pool-created-response.json",
+      "mode": "100644",
+      "blobOID": "45f2a7099ca5c5e241733495d35fcbf86b5c0f2a",
+      "bytes": 63,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/fixtures/pool-list-response.json",
+      "mode": "100644",
+      "blobOID": "1bde3f271251e73427f89e6df462513ee70ac782",
+      "bytes": 204,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/fixtures/pool-member-removal-response.json",
+      "mode": "100644",
+      "blobOID": "adc99901199f290edf17b4903f749237a7aae6dc",
+      "bytes": 95,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/fixtures/pool-member-response.json",
+      "mode": "100644",
+      "blobOID": "7b4aa9c47b7c29193ae806e16014ea5840a02419",
+      "bytes": 94,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/fixtures/problem-details-response.json",
+      "mode": "100644",
+      "blobOID": "2835091785dd42c13f47219857efcef83e504f58",
+      "bytes": 271,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/fixtures/project-create-response.json",
+      "mode": "100644",
+      "blobOID": "46123a567c7b735157ddc140e2780c7c6e63772a",
+      "bytes": 316,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/fixtures/project-list-response.json",
+      "mode": "100644",
+      "blobOID": "5679b5833205784d967282cd8b4f241ef3405fb7",
+      "bytes": 439,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/fixtures/project-member-removal-response.json",
+      "mode": "100644",
+      "blobOID": "50b2416f9b4562d6faad39ffdfe199c28f13e9ea",
+      "bytes": 97,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/fixtures/project-node-certificate-observation-response.json",
+      "mode": "100644",
+      "blobOID": "f308732d6bb5a739eb53fde68a74ca696aa330e0",
+      "bytes": 556,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/fixtures/project-status-response.json",
+      "mode": "100644",
+      "blobOID": "b81858fd63a8b53685eacfd4715aaebe7ed81026",
+      "bytes": 67,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/fixtures/project-workspaces-response.json",
+      "mode": "100644",
+      "blobOID": "9abaa96af493d962c44b448a0e661b296b3f69e1",
+      "bytes": 372,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/fixtures/resource-offer-result-response.json",
+      "mode": "100644",
+      "blobOID": "e8c8a17ed2cefccba2ec7f3b61272d6a40a8212a",
+      "bytes": 509,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/fixtures/run-artifact-list.json",
+      "mode": "100644",
+      "blobOID": "0acd1c5d1042535f1b57ce23fd49ebefbf383430",
+      "bytes": 442,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/fixtures/run-attempt-list.json",
+      "mode": "100644",
+      "blobOID": "ec1dcf513f8d303ed01b3c035056f5f68b86b8ac",
+      "bytes": 493,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/fixtures/run-log-view.json",
+      "mode": "100644",
+      "blobOID": "b3e821e32a2b0817bfa838a799d1a1ab50944429",
+      "bytes": 247,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/fixtures/run-result-view.json",
+      "mode": "100644",
+      "blobOID": "645927ee2a11790a52945a7209b0218593b3983a",
+      "bytes": 1397,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/fixtures/shard-observation-response.json",
+      "mode": "100644",
+      "blobOID": "d0bb0dd96c04fbd08cf015973c323f6e90f400d5",
+      "bytes": 1108,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/fixtures/storage-contribution-registration-response.json",
+      "mode": "100644",
+      "blobOID": "2b7fd7ab1e115e1ace40c482d22efc30201558ec",
+      "bytes": 330,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/fixtures/storage-contributions-response.json",
+      "mode": "100644",
+      "blobOID": "23be5f5824661ade5d03ac9d42a35dfd9594fce6",
+      "bytes": 374,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/fixtures/storage-locations-response.json",
+      "mode": "100644",
+      "blobOID": "d17d4586407964f6884bef0f3a92339d8d6cff26",
+      "bytes": 406,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/fixtures/storage-observation-response.json",
+      "mode": "100644",
+      "blobOID": "4c1248bfe1ce8869b8cf6cb419d1c270a079fa8a",
+      "bytes": 737,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/fixtures/terminal-ticket-input.json",
+      "mode": "100644",
+      "blobOID": "02bd57ea79f0a488918c953495dce65e373e341a",
+      "bytes": 58,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/fixtures/terminal-ticket-result.json",
+      "mode": "100644",
+      "blobOID": "36949242f2316c3be73393fa0d94e7a0feb4f1bf",
+      "bytes": 292,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/fixtures/user-status-response.json",
+      "mode": "100644",
+      "blobOID": "ddd3c7f1a30a214c22be3bfa989f3d3ae83a7b94",
+      "bytes": 63,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/fixtures/workspace-checkout-response.json",
+      "mode": "100644",
+      "blobOID": "9e21dbe52331949c5d6ba1569ff1028b9ff1e742",
+      "bytes": 446,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/fixtures/workspace-create-response.json",
+      "mode": "100644",
+      "blobOID": "5b8b19185f78014bcdd698ef342f119793e606d7",
+      "bytes": 258,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/fixtures/workspace-edit-view-response.json",
+      "mode": "100644",
+      "blobOID": "55259769d8119ef4ff62ad2f1d2b8422958adc48",
+      "bytes": 549,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/fixtures/workspace-execution-readiness-response.json",
+      "mode": "100644",
+      "blobOID": "19cc3d089f151c446be6c7c7c6d92eb501368fca",
+      "bytes": 1036,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/fixtures/workspace-restore-response.json",
+      "mode": "100644",
+      "blobOID": "0a1e84cec33b05ae6548487d44d1036b0db45b8e",
+      "bytes": 318,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/fixtures/workspace-status-response.json",
+      "mode": "100644",
+      "blobOID": "20c61a8eadddef9da9b66fe68863f271a98102d5",
+      "bytes": 120,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/fixtures/workspace-tool-result-response.json",
+      "mode": "100644",
+      "blobOID": "1be20bfe330e05832f050342a97d0959f1e3e84a",
+      "bytes": 525,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/fresh-authentication-step-up-request.schema.json",
+      "mode": "100644",
+      "blobOID": "bc580f328034801b2f95276cbf50085852f303ce",
+      "bytes": 727,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/heartbeat-accepted-response.schema.json",
+      "mode": "100644",
+      "blobOID": "0282f6319dd5ff024bdf25ea5ec6ed6c18402320",
+      "bytes": 512,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/heartbeat-request.schema.json",
+      "mode": "100644",
+      "blobOID": "5416c57a4be0a27a9d5e4016f51468e5b567683c",
+      "bytes": 1134,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/member-role-request.schema.json",
+      "mode": "100644",
+      "blobOID": "ae1325a40247946a60c222db9258e460595488de",
+      "bytes": 657,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/member-role-result-response.schema.json",
+      "mode": "100644",
+      "blobOID": "d41cb0d0a8e3f987a07ccd45f38076ef38480de5",
+      "bytes": 1048,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/model-deployment-request.schema.json",
+      "mode": "100644",
+      "blobOID": "2b99f4eb4e5270a68b4df819cd12f8e864d70b81",
+      "bytes": 1101,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/model-deployment-response.schema.json",
+      "mode": "100644",
+      "blobOID": "c4154e3f5ae94f95152c6e9653c57fdeeb0d6fed",
+      "bytes": 1484,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/model-lineage-trace-response.schema.json",
+      "mode": "100644",
+      "blobOID": "ad7c4c1ae664ef14428ffae879f86e92d7005a4a",
+      "bytes": 6509,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/model-release-request.schema.json",
+      "mode": "100644",
+      "blobOID": "6948851a566748f606320b5ce5e56bda90b8bbb7",
+      "bytes": 1238,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/model-release-response.schema.json",
+      "mode": "100644",
+      "blobOID": "221065d73c478ab38409cbf018e39983afed1be9",
+      "bytes": 1225,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/model-verify-request.schema.json",
+      "mode": "100644",
+      "blobOID": "db37a316ceb63f4fcbacfdc482a0fe8bdeb47c53",
+      "bytes": 677,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/model-verify-response.schema.json",
+      "mode": "100644",
+      "blobOID": "e284f3eede6ead0d7dfc50fc64c16f24c68ab6ff",
+      "bytes": 1514,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/model-version-by-dataset-digest-page-response.schema.json",
+      "mode": "100644",
+      "blobOID": "b16ccd3ffe824d034f46310eb6d2e566719ec825",
+      "bytes": 2621,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/model-version-register-request.schema.json",
+      "mode": "100644",
+      "blobOID": "276b559f15094443545daeaed0e96c45edb234aa",
+      "bytes": 3963,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/model-version-response.schema.json",
+      "mode": "100644",
+      "blobOID": "e5d7b66ebd5a07ae0d761a1a1665a4e965e78195",
+      "bytes": 1574,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/node-detail-response.schema.json",
+      "mode": "100644",
+      "blobOID": "1d046a842d2ad3b94d56a9e862f1b7e0093f06c1",
+      "bytes": 3862,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/node-enroll-request.schema.json",
+      "mode": "100644",
+      "blobOID": "8dd38cecebddb01396cdf7a76b0aded9e874d0b7",
+      "bytes": 3288,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/node-enroll-response.schema.json",
+      "mode": "100644",
+      "blobOID": "06192dff12549cdeb72026dae140db7b8cfd18ea",
+      "bytes": 2012,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/node-liveness-sweep-response.schema.json",
+      "mode": "100644",
+      "blobOID": "496452691584bff5ede3631bad0ac444ab8a4f29",
+      "bytes": 456,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/node-page-response.schema.json",
+      "mode": "100644",
+      "blobOID": "a4a740c86bfe14ff428b36ef86109df08b683c09",
+      "bytes": 2368,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/node-response.schema.json",
+      "mode": "100644",
+      "blobOID": "4ea588195fa592946c79d5e15069e02aab3318b2",
+      "bytes": 1469,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/page-response.schema.json",
+      "mode": "100644",
+      "blobOID": "39393dc35fc1867d783f772e2f74efdc25eae421",
+      "bytes": 553,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/placement-preview-candidate-response.schema.json",
+      "mode": "100644",
+      "blobOID": "6501d61e9f014d770a2efccfe5dbf7758bdf88b6",
+      "bytes": 1208,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/placement-preview-response.schema.json",
+      "mode": "100644",
+      "blobOID": "b1d6c97902a7981832a5a15bd39345f7c8b2503d",
+      "bytes": 2044,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/pool-capacity-node-response.schema.json",
+      "mode": "100644",
+      "blobOID": "b3cb2e172f613f9492d383ca8ab1be320a51fe1b",
+      "bytes": 1340,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/pool-capacity-response.schema.json",
+      "mode": "100644",
+      "blobOID": "1fe0091dff470ba273fdf777ad8a7dd92b8c5004",
+      "bytes": 2898,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/pool-created-response.schema.json",
+      "mode": "100644",
+      "blobOID": "3e4076b85f20bc436b84235264180746ec843ccc",
+      "bytes": 357,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/pool-list-item-response.schema.json",
+      "mode": "100644",
+      "blobOID": "8a7254d254d5e3272176ac8403bcf801fdec7b28",
+      "bytes": 720,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/pool-list-response.schema.json",
+      "mode": "100644",
+      "blobOID": "c100ff650030f45cf888c9489fd834c9243ea672",
+      "bytes": 1304,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/pool-member-removal-response.schema.json",
+      "mode": "100644",
+      "blobOID": "dcb397e5e05d66f5ef6d789cf625b52dbd318476",
+      "bytes": 458,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/pool-member-response.schema.json",
+      "mode": "100644",
+      "blobOID": "c5e9a7c8d418471e808e854ae40c400433f3e17f",
+      "bytes": 469,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/pool-request.schema.json",
+      "mode": "100644",
+      "blobOID": "417d0e21c0605e66218d0ff94a48315a91371d1e",
+      "bytes": 655,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/project-create-request.schema.json",
+      "mode": "100644",
+      "blobOID": "f262a2443c23ee6ef6aefb0e6ef7d13be5d47cc4",
+      "bytes": 704,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/project-create-response.schema.json",
+      "mode": "100644",
+      "blobOID": "28abcd553be6f0f0db2f6dc5afad3bc46d0168e5",
+      "bytes": 1297,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/project-data-location-page-response.schema.json",
+      "mode": "100644",
+      "blobOID": "42431793eeff949b44c9ba299253e5a1832dac30",
+      "bytes": 3085,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/project-data-location-request.schema.json",
+      "mode": "100644",
+      "blobOID": "5820e6cd3270729345695261d7a9ead32bfd2607",
+      "bytes": 3725,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/project-data-location-response.schema.json",
+      "mode": "100644",
+      "blobOID": "25b9ed84ab859e4055070335d6d3f6745aeb09be",
+      "bytes": 2086,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/project-list-item-response.schema.json",
+      "mode": "100644",
+      "blobOID": "fa87119577b7c425c750014d9c284ae423f52313",
+      "bytes": 1566,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/project-list-response.schema.json",
+      "mode": "100644",
+      "blobOID": "8da17f45636d9ed4f617fba96594a78bbc706590",
+      "bytes": 2402,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/project-member-removal-response.schema.json",
+      "mode": "100644",
+      "blobOID": "c5dc049921f3326ab18b3c1d256bed6adc67da16",
+      "bytes": 491,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/project-status-request.schema.json",
+      "mode": "100644",
+      "blobOID": "af7c2c33dceb41fed0ae1c98a34ef59f01418bac",
+      "bytes": 319,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/project-status-response.schema.json",
+      "mode": "100644",
+      "blobOID": "2c02f6761e6dda62228bb074852ab4e0d95b6ed2",
+      "bytes": 436,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/project-workspaces-response.schema.json",
+      "mode": "100644",
+      "blobOID": "4b0711410819ce2da7dbd03a7c9b285d8c8eddea",
+      "bytes": 2337,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/release-acceptance-confirmation-request.schema.json",
+      "mode": "100644",
+      "blobOID": "d947f4e870dcc259ec6b61825bbcd3b04ab0c4af",
+      "bytes": 697,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/release-acceptance-decision-request.schema.json",
+      "mode": "100644",
+      "blobOID": "075d6bb5224d473f05d50de534f995607e78b1b3",
+      "bytes": 3907,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/release-acceptance-evidence-discovery-page-response.schema.json",
+      "mode": "100644",
+      "blobOID": "44b5c21e1e488a3c5945e04f991cf93b9ea35c39",
+      "bytes": 4485,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/release-acceptance-policy-registry-v1.json",
+      "mode": "100644",
+      "blobOID": "f0993dba6b8e396357bde36be70a01eaab2da96e",
+      "bytes": 989,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/release-acceptance-proposal-response.schema.json",
+      "mode": "100644",
+      "blobOID": "e7f1f914a48dae2526c04e088ca89fa24e01b168",
+      "bytes": 2048,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/release-acceptance-proposal-review-page-response.schema.json",
+      "mode": "100644",
+      "blobOID": "0fe0f0df8c9c560c80247fea16139101bc4b1866",
+      "bytes": 5566,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/release-acceptance-proposal-review-response.schema.json",
+      "mode": "100644",
+      "blobOID": "9da9070b1f0bba1c38092df96530064ccda02284",
+      "bytes": 4358,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/release-acceptance-recorded-response.schema.json",
+      "mode": "100644",
+      "blobOID": "591f09824e90e419e2702c6885bf5a90d875cfd9",
+      "bytes": 2499,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/release-acceptance-reference-resolution-response.schema.json",
+      "mode": "100644",
+      "blobOID": "e45e2f4d70e29588719c8808fc8db6b567c71537",
+      "bytes": 4547,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/release-acceptance-response.schema.json",
+      "mode": "100644",
+      "blobOID": "ce9499cec6446f0b2e27cc5230546d042d53f771",
+      "bytes": 2430,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/release-acceptance-target-registry-response.schema.json",
+      "mode": "100644",
+      "blobOID": "58c6cc168d04d1fa23a2778593032aecffe97102",
+      "bytes": 4642,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/release-acceptance-target-registry-v1.json",
+      "mode": "100644",
+      "blobOID": "3da9f53b36961590690606bfe459083c6722a47a",
+      "bytes": 1494,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/release-acceptance-withdrawal-request.schema.json",
+      "mode": "100644",
+      "blobOID": "dc941d6f572d5f83cb2e784428417447c3c6a34f",
+      "bytes": 747,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/release-acceptance-withdrawal-response.schema.json",
+      "mode": "100644",
+      "blobOID": "13277c2493852de5220f74febfeab14c8155ac39",
+      "bytes": 1835,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/release-component-response.schema.json",
+      "mode": "100644",
+      "blobOID": "33b39cf69c3ea5f3f2cb64e3477f290188e09a8b",
+      "bytes": 839,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/release-manifest-detail-response.schema.json",
+      "mode": "100644",
+      "blobOID": "11c8917eed230091b4dadb3834562fb562d57296",
+      "bytes": 8438,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/release-manifest-page-response.schema.json",
+      "mode": "100644",
+      "blobOID": "4ae027cc446f777b89e9ae1726ad3ee44b8bd9f9",
+      "bytes": 6638,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/release-manifest-response.schema.json",
+      "mode": "100644",
+      "blobOID": "f891f080e2d80700300a2e0612ae1fea969cedb5",
+      "bytes": 4910,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/replica-observation-response.schema.json",
+      "mode": "100644",
+      "blobOID": "6d44faad7d8ad416a89a1ff54d3f13322d440078",
+      "bytes": 1986,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/replica-repair-plan-response.schema.json",
+      "mode": "100644",
+      "blobOID": "4e20f66508e6554436ba6548c6c0fb6a72dc7fb7",
+      "bytes": 3515,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/resource-offer-request.schema.json",
+      "mode": "100644",
+      "blobOID": "204f2f3853701645f308272c2f5c5d1ef08ee97c",
+      "bytes": 708,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/resource-offer-result-response.schema.json",
+      "mode": "100644",
+      "blobOID": "71bc0352254a69256cb6a73bd7ca76c625485954",
+      "bytes": 2593,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/retention-pin-request.schema.json",
+      "mode": "100644",
+      "blobOID": "7bd993dc34f8a6cac7d85f5f21943d8453a3a334",
+      "bytes": 721,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/retention-pin-response.schema.json",
+      "mode": "100644",
+      "blobOID": "6040728dee9328da5cadd826b23b159046e12e6d",
+      "bytes": 1391,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/run-record-artifact-page-response.schema.json",
+      "mode": "100644",
+      "blobOID": "34c4f62d63aa665bf18e23214a0084f6c276e3cd",
+      "bytes": 2909,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/run-record-response.schema.json",
+      "mode": "100644",
+      "blobOID": "860261a0b978ddb37c568e4b870c79dc43f0e6c9",
+      "bytes": 2224,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/run-record-seal-request.schema.json",
+      "mode": "100644",
+      "blobOID": "fca524129107b6e31dd6edeaccb39745492bc89a",
+      "bytes": 712,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/user-status-request.schema.json",
+      "mode": "100644",
+      "blobOID": "8259a5897c7e2a164b12e0f761a851aec4a78093",
+      "bytes": 325,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/user-status-response.schema.json",
+      "mode": "100644",
+      "blobOID": "e5fba870bdfafcf55f9a3f097c8264c4f5422ea2",
+      "bytes": 444,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/v1alpha1/core.schema.json",
+      "mode": "100644",
+      "blobOID": "d7df4baf0d27f7340db3a840b7747705d5e1341c",
+      "bytes": 176975,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/workspace-create-request.schema.json",
+      "mode": "100644",
+      "blobOID": "800d36d7d688d8fe0a864fcb7b052da6d8e07fed",
+      "bytes": 321,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/workspace-execution-readiness-response.schema.json",
+      "mode": "100644",
+      "blobOID": "96685cd2d99493d0fcaec8ec9c5f5c79dc3d9e3d",
+      "bytes": 3381,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/workspace-status-request.schema.json",
+      "mode": "100644",
+      "blobOID": "7cdf63e42c483d2cb4e1e1a746760d693323c2b4",
+      "bytes": 351,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/workspace-status-response.schema.json",
+      "mode": "100644",
+      "blobOID": "86c1ec24f7c67b715a88423c54a78c5f7e1d0d6a",
+      "bytes": 889,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/workspace-summary-response.schema.json",
+      "mode": "100644",
+      "blobOID": "ca7cc133e0eff6b36d7cb7ac5c3a4cf32e8fed5b",
+      "bytes": 1459,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/workspace-tool-readiness-response.schema.json",
+      "mode": "100644",
+      "blobOID": "09d5663a9fe8b1d4bb1b0c7487240033ec4fa0d9",
+      "bytes": 991,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/workspace-tool-request.schema.json",
+      "mode": "100644",
+      "blobOID": "df91e00136b64dbac4559d68c02e08df14c280ca",
+      "bytes": 720,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "contracts/workspace-tool-result-response.schema.json",
+      "mode": "100644",
+      "blobOID": "fffb82bf07fcd76bd54ada32c2f98cb26a62993b",
+      "bytes": 2956,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-d04-l1-r2-20261107-codex/source-frozen/p02_evaluate_internal.go",
+      "mode": "100644",
+      "blobOID": "b7606dd63649075ff4713033eacec76de77368ce",
+      "bytes": 25679,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-d04-l1-r2-20261107-codex/source-frozen/p02_signature_table_bound_test.go",
+      "mode": "100644",
+      "blobOID": "b2e67acc3bf16475c561ba5b537f0cf906f36660",
+      "bytes": 2921,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "packages/contracts-go/contracts.go",
+      "mode": "100644",
+      "blobOID": "37f6f4a25e0e88a3648dafb6ee69ccd6c0ef7c12",
+      "bytes": 52383,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "packages/contracts-go/go.mod",
+      "mode": "100644",
+      "blobOID": "a660fe692511853f41147f7dcf05ba6c7570d983",
+      "bytes": 79,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/cmd/inv-discover/main.go",
+      "mode": "100644",
+      "blobOID": "6160170ec90685453f0bf633df1d1d2200650862",
+      "bytes": 2205,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/cmd/inv-node/main.go",
+      "mode": "100644",
+      "blobOID": "a966629ee7db6116535c51baee0f956e2fd384f8",
+      "bytes": 7307,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/cmd/inv-node/peer_floor_args_test.go",
+      "mode": "100644",
+      "blobOID": "e8cb5e3313c664a7bb9da78f19a268889e9acd72",
+      "bytes": 984,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/cmd/inv-supervisor/main_linux.go",
+      "mode": "100644",
+      "blobOID": "fcfcbb6269294dbfbaf170bb5ce72337b9531553",
+      "bytes": 4618,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/cmd/inv-supervisor/main_other.go",
+      "mode": "100644",
+      "blobOID": "7721aaf00ce687cd3b359a4e2c1e947494d1602b",
+      "bytes": 75,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/cmd/inv-supervisor/output_linux.go",
+      "mode": "100644",
+      "blobOID": "1bedd98ca18fbf1f35ca89222a937ea59353411b",
+      "bytes": 1940,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/cmd/inv-supervisor/output_linux_test.go",
+      "mode": "100644",
+      "blobOID": "b7b8aec4607bdbca9e8909bba92cc1e37467fa36",
+      "bytes": 503,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/cmd/inv-supervisor/terminal_linux.go",
+      "mode": "100644",
+      "blobOID": "b01806fa3f8ea96031c83112341e4502296e95f0",
+      "bytes": 7644,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/cmd/inv-supervisor/terminal_linux_test.go",
+      "mode": "100644",
+      "blobOID": "8a8e8c0a247264a5606e35c5483390825632ba0c",
+      "bytes": 2253,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/discovery/announce.go",
+      "mode": "100644",
+      "blobOID": "779930957e1437ac43b87c7f2e3898fedc080d9b",
+      "bytes": 3052,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/discovery/announce_test.go",
+      "mode": "100644",
+      "blobOID": "345b055e5a966ade136ba7c6f64667ef192b16c3",
+      "bytes": 2696,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/go.mod",
+      "mode": "100644",
+      "blobOID": "3d2eb34ae4b23800f71712e7b4c6e4cdae7c01c8",
+      "bytes": 360,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/go.sum",
+      "mode": "100644",
+      "blobOID": "8fee20f8df677b4a94cb6cfdc7ed2e658daacd84",
+      "bytes": 527,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/internal/migrationcontext/boundary_test.go",
+      "mode": "100644",
+      "blobOID": "bb8ce9c86c919aca27d611fdcc45f7d55b9b8bd9",
+      "bytes": 14925,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/internal/migrationcontext/clock.go",
+      "mode": "100644",
+      "blobOID": "af9efbf8af29e19e2633d7ef4fd3a312d77b42ba",
+      "bytes": 3811,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/internal/migrationcontext/crypto_history_test.go",
+      "mode": "100644",
+      "blobOID": "554e1364eb6366c390958054b2bb62d736b772e2",
+      "bytes": 7781,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/internal/migrationcontext/doc.go",
+      "mode": "100644",
+      "blobOID": "5df7c4aa9ac4fc672270762914daed5accf123ef",
+      "bytes": 1478,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/internal/migrationcontext/effect_gate_test.go",
+      "mode": "100644",
+      "blobOID": "cc3258e5a4a9b407a3425c5fa2d5b0ff68897b80",
+      "bytes": 19751,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/internal/migrationcontext/errors.go",
+      "mode": "100644",
+      "blobOID": "f69658086ee839d7d266bad87781c89f27a39469",
+      "bytes": 1217,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/internal/migrationcontext/history.go",
+      "mode": "100644",
+      "blobOID": "22d93b5bfce10f25ce8676c884b055816d2da973",
+      "bytes": 10196,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/internal/migrationcontext/k1_bridge.go",
+      "mode": "100644",
+      "blobOID": "178b1f2d28b5587612e34e909e7a0adc6706d804",
+      "bytes": 3816,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/internal/migrationcontext/p02_bindings_test.go",
+      "mode": "100644",
+      "blobOID": "65983fe89e06da144526463302bf9c672efd8218",
+      "bytes": 15280,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/internal/migrationcontext/p02_canonical_internal.go",
+      "mode": "100644",
+      "blobOID": "dfb4f866f9a14f18199c5371442673d0b7d0c309",
+      "bytes": 10147,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/internal/migrationcontext/p02_codec_internal.go",
+      "mode": "100644",
+      "blobOID": "f03615f7220ef97d1dfeef8ac2cbb92430cfd9b6",
+      "bytes": 8414,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/internal/migrationcontext/p02_codec_test.go",
+      "mode": "100644",
+      "blobOID": "38f06f1eda26ff2e8469b2eac5e8e3644d1a7ece",
+      "bytes": 5972,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/internal/migrationcontext/p02_contract_test.go",
+      "mode": "100644",
+      "blobOID": "690468beea81cfa53c053a531760a74df36bc4d0",
+      "bytes": 11492,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/internal/migrationcontext/p02_effect_test.go",
+      "mode": "100644",
+      "blobOID": "92afdaa4b7ca8980fae86d48b39e6a3480d9ea21",
+      "bytes": 1992,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/internal/migrationcontext/p02_evaluate_internal.go",
+      "mode": "100644",
+      "blobOID": "b7606dd63649075ff4713033eacec76de77368ce",
+      "bytes": 25679,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/internal/migrationcontext/p02_fixture_test.go",
+      "mode": "100644",
+      "blobOID": "f2ec987b4e8327939aaaff5c7388f682643d7a60",
+      "bytes": 75572,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/internal/migrationcontext/p02_inputs_internal.go",
+      "mode": "100644",
+      "blobOID": "80331e40034ae31876e2ec732a59352d0e4e41f2",
+      "bytes": 46398,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/internal/migrationcontext/p02_projection_internal.go",
+      "mode": "100644",
+      "blobOID": "50d87d10f73efdd3fb036f3a8490fadd024fb201",
+      "bytes": 6336,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/internal/migrationcontext/p02_schema_internal.go",
+      "mode": "100644",
+      "blobOID": "605dd32865e70844320e7e695a0af7d7207c45aa",
+      "bytes": 71787,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/internal/migrationcontext/p02_signature_table_bound_test.go",
+      "mode": "100644",
+      "blobOID": "b2e67acc3bf16475c561ba5b537f0cf906f36660",
+      "bytes": 2921,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/internal/migrationcontext/p02_wire_internal.go",
+      "mode": "100644",
+      "blobOID": "8bba79297e2029ffc48a79e6ffa3273263e6657f",
+      "bytes": 29353,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/internal/migrationcontext/pl_r1a_test.go",
+      "mode": "100644",
+      "blobOID": "cefedd2cbc75399ff38746942b45dece9c51dfd9",
+      "bytes": 25086,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/internal/migrationcontext/policy.go",
+      "mode": "100644",
+      "blobOID": "eb906a24e4aa8fc54e7014d9a04668d84854871e",
+      "bytes": 12060,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/internal/migrationcontext/ports.go",
+      "mode": "100644",
+      "blobOID": "a8cc4b7e4492e4a0401f7f9ace7fd55fcf9ec4cb",
+      "bytes": 3505,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/internal/migrationcontext/review_census_test.go",
+      "mode": "100644",
+      "blobOID": "1d81c8c69d7c9a26d7b8c4870622f9f0fb812a7e",
+      "bytes": 3117,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/internal/migrationcontext/review_lows_test.go",
+      "mode": "100644",
+      "blobOID": "c07a0300d3671bb320b2430992e2e82af11955ee",
+      "bytes": 6631,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/internal/migrationcontext/source_gate_test.go",
+      "mode": "100644",
+      "blobOID": "a395e5ff9824ddc01c27004f1627dfda2bb56b09",
+      "bytes": 23505,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/internal/migrationcontext/testdata/synthetic-public-history.json",
+      "mode": "100644",
+      "blobOID": "2a4d3834ed3123cb650f1360006f0e1fa350f940",
+      "bytes": 1842152,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/internal/wire/model_manifest.go",
+      "mode": "100644",
+      "blobOID": "dea081d170bcefca34d83cf976a7e68e278ff720",
+      "bytes": 1436,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/internal/wire/model_manifest_test.go",
+      "mode": "100644",
+      "blobOID": "85e133c8d765180796fee8d4b8f444414b2c0e5e",
+      "bytes": 2622,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/internal/wire/validate.go",
+      "mode": "100644",
+      "blobOID": "08c0dcf2128eee897c3530992a0b72b3aae4b687",
+      "bytes": 3342,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/migrationverify/api_test.go",
+      "mode": "100644",
+      "blobOID": "05bc299286b3f621cb54e82cf944e7377271c47b",
+      "bytes": 4749,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/migrationverify/contracts.go",
+      "mode": "100644",
+      "blobOID": "0d9b213157281fd068a9adc09839e00871f608d6",
+      "bytes": 4980,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/migrationverify/crypto_fixture_test.go",
+      "mode": "100644",
+      "blobOID": "fc68da58785a715130f4a0473ba73c83c9c32e4b",
+      "bytes": 21762,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/migrationverify/current.go",
+      "mode": "100644",
+      "blobOID": "2e87b0927767d83b486a6d21d0959be623552f4f",
+      "bytes": 5324,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/migrationverify/ed25519.go",
+      "mode": "100644",
+      "blobOID": "3b1c83c7a19a905ef46d87f3edd95fe6db0d6247",
+      "bytes": 4118,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/migrationverify/ed25519_test.go",
+      "mode": "100644",
+      "blobOID": "166677c2c7570bbfa0973fba53ccfaeb684d393c",
+      "bytes": 3402,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/migrationverify/graph.go",
+      "mode": "100644",
+      "blobOID": "f0e73328228433537ee5e301f9ead2cf7c8ea066",
+      "bytes": 9880,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/migrationverify/graph_test.go",
+      "mode": "100644",
+      "blobOID": "24d203a5d4a7054cc2f29c135fbe80af12106bfb",
+      "bytes": 2420,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/migrationverify/json.go",
+      "mode": "100644",
+      "blobOID": "f469c414adca15f40a0b1671f5a12fa620ac1f06",
+      "bytes": 5504,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/migrationverify/json_test.go",
+      "mode": "100644",
+      "blobOID": "ca03af84ade6fbdb8fdade77d193b98e03996793",
+      "bytes": 1776,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/migrationverify/native.go",
+      "mode": "100644",
+      "blobOID": "df95d10c6e0cc8a9ccece1fd89902ea56082750f",
+      "bytes": 5331,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/migrationverify/native_history_test.go",
+      "mode": "100644",
+      "blobOID": "1204a6126bb8802b665efe614898d94f0dc10f95",
+      "bytes": 4773,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/migrationverify/proofs.go",
+      "mode": "100644",
+      "blobOID": "88e836695e43dbc762f3301988ab7566dc443362",
+      "bytes": 10397,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/migrationverify/recipes.go",
+      "mode": "100644",
+      "blobOID": "009762055645da0f836ad013faf257ba042abe4b",
+      "bytes": 10359,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/migrationverify/recipes_test.go",
+      "mode": "100644",
+      "blobOID": "4c3873a5c9b258e1737b7433108a799c2eec54b1",
+      "bytes": 3547,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/derived-digest-contract.json",
+      "mode": "100644",
+      "blobOID": "b3714fc76351c9d1e8bccbc6ed1a5d21056e6302",
+      "bytes": 531,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proof-slot-registry.json",
+      "mode": "100644",
+      "blobOID": "f98b5e853103333bc257c732b1e2da819e5c93ce",
+      "bytes": 138128,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/build-provenance.contract.json",
+      "mode": "100644",
+      "blobOID": "207deca482522f9c3d0b83f80e6fc3413a8e4840",
+      "bytes": 1972,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/build-provenance.schema.json",
+      "mode": "100644",
+      "blobOID": "bb9eab754242e4297ecefc3560fdae3bd8866fd2",
+      "bytes": 2286,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/ci-attestation.contract.json",
+      "mode": "100644",
+      "blobOID": "4ac1adee9f36b2de4f3d51095c5dd6d1ac422b46",
+      "bytes": 3312,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/ci-attestation.schema.json",
+      "mode": "100644",
+      "blobOID": "3c0bcefa7da9a94f1a3b0ce7154d10d11c018bae",
+      "bytes": 3399,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/descendant-quiescence.contract.json",
+      "mode": "100644",
+      "blobOID": "1d26c1ef764c7df68243c7dd8549ac864d9cfd62",
+      "bytes": 1756,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/descendant-quiescence.schema.json",
+      "mode": "100644",
+      "blobOID": "d6f87e6e2139fa3622868892d7bac165cce97d3e",
+      "bytes": 2802,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/g2-planning-policy.contract.json",
+      "mode": "100644",
+      "blobOID": "890779650452b21e61d6bc77638497e37dcc4fa5",
+      "bytes": 1658,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/g2-planning-policy.schema.json",
+      "mode": "100644",
+      "blobOID": "3a140c4cc49487b14d97ffb0ee68371655e29216",
+      "bytes": 2327,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/image-distribution.contract.json",
+      "mode": "100644",
+      "blobOID": "1038c21fd9ae294afb6e293e0950b91e90909149",
+      "bytes": 2031,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/image-distribution.schema.json",
+      "mode": "100644",
+      "blobOID": "207e53eeba7d9cc88b505da602dc4c505f045767",
+      "bytes": 2714,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/independent-code-review.contract.json",
+      "mode": "100644",
+      "blobOID": "00e0cdb61d4cbcfda786e074e722e2b1fb2ff1ed",
+      "bytes": 2412,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/independent-code-review.schema.json",
+      "mode": "100644",
+      "blobOID": "5e5abe6aaf81bf052be2b7ec10ae911052c27129",
+      "bytes": 2719,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/independent-plan-review.contract.json",
+      "mode": "100644",
+      "blobOID": "f51f66b9f88cdbacc5e752e1934e7a95629b25a6",
+      "bytes": 1402,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/independent-plan-review.schema.json",
+      "mode": "100644",
+      "blobOID": "b2687b316940b1d0fed6334e05888b38678c2ade",
+      "bytes": 1975,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/index.json",
+      "mode": "100644",
+      "blobOID": "cd8e89c4e505fad1f2e941768db313ffc4f82701",
+      "bytes": 8683,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/inventory-head-readback.contract.json",
+      "mode": "100644",
+      "blobOID": "2a3d3d3de935f8fade300f73c63a9c5741b3650c",
+      "bytes": 3136,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/inventory-head-readback.schema.json",
+      "mode": "100644",
+      "blobOID": "8275717b5b21e841e88aeca553db7ac8642d31f7",
+      "bytes": 3035,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/launch-surface-inventory.contract.json",
+      "mode": "100644",
+      "blobOID": "73ceb35497ba7f64d8ca5de219d34081ef842cb6",
+      "bytes": 1658,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/launch-surface-inventory.schema.json",
+      "mode": "100644",
+      "blobOID": "4d6c786c0785cd58f72b07ed9c4e0d600fd594ad",
+      "bytes": 2673,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/m2-capability.contract.json",
+      "mode": "100644",
+      "blobOID": "806a4fca798432d80a85ebe484c862087e23b2c3",
+      "bytes": 1612,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/m2-capability.schema.json",
+      "mode": "100644",
+      "blobOID": "6bca2c283e752158ccb0c8cc07b7937b63757c61",
+      "bytes": 2286,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/member-progress-evidence.contract.json",
+      "mode": "100644",
+      "blobOID": "eb05c154ea7f1651780be78ae747aad07e452aac",
+      "bytes": 2739,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/member-progress-evidence.schema.json",
+      "mode": "100644",
+      "blobOID": "76c123bf08630bd1f9f51a435bbb078d74a77bdf",
+      "bytes": 4021,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/migration-effect-readback.contract.json",
+      "mode": "100644",
+      "blobOID": "420c022e7404a19cbf7c2e5978b2e6ed12f0b7ca",
+      "bytes": 2840,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/migration-effect-readback.schema.json",
+      "mode": "100644",
+      "blobOID": "5c3477fce00ccf418a066b6c3c9142042bd048c5",
+      "bytes": 4195,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/migration-event-evidence.contract.json",
+      "mode": "100644",
+      "blobOID": "9b79b275e05cf8d26c64433dd7e5c04d9b61e626",
+      "bytes": 2301,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/migration-event-evidence.schema.json",
+      "mode": "100644",
+      "blobOID": "cdd7344bfd36267cf0d9afdbb837d3cbaaa5b8f2",
+      "bytes": 3508,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/native-two-cycle.contract.json",
+      "mode": "100644",
+      "blobOID": "73146bd026c9762c4a5a34aa0e67e9142276c566",
+      "bytes": 1671,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/native-two-cycle.schema.json",
+      "mode": "100644",
+      "blobOID": "fb1ac8056f6fd43304e942a9e64a2242624a2e5c",
+      "bytes": 2349,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/no-overlap.contract.json",
+      "mode": "100644",
+      "blobOID": "38f0891f67d2f50b37a3802a63e4118877053c61",
+      "bytes": 1672,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/no-overlap.schema.json",
+      "mode": "100644",
+      "blobOID": "8b5fc46916e32c468c5728a219f083044238c94b",
+      "bytes": 2758,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/node-floor-v2.contract.json",
+      "mode": "100644",
+      "blobOID": "43d66f23767bd54269760df91f022367b4e71b02",
+      "bytes": 3452,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/node-floor-v2.schema.json",
+      "mode": "100644",
+      "blobOID": "9d44b35cca6fa04574a51284b343e839f37421bc",
+      "bytes": 2234,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/old-new-no-write.contract.json",
+      "mode": "100644",
+      "blobOID": "fb80b2b8a67b5fb5b1d8431435979b1f6cfa4636",
+      "bytes": 1618,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/old-new-no-write.schema.json",
+      "mode": "100644",
+      "blobOID": "2f235d4fea4c18cfa8dca8c5814ddfdf84243172",
+      "bytes": 2265,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/owned-engine-exec.contract.json",
+      "mode": "100644",
+      "blobOID": "c54d70c8ed16e340f44574f352cc7d7e53f9bbeb",
+      "bytes": 2767,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/owned-engine-exec.schema.json",
+      "mode": "100644",
+      "blobOID": "5e72cf63906d18518c88cab6ffd3e5b2e6d04a1c",
+      "bytes": 4022,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/process-quiescence.contract.json",
+      "mode": "100644",
+      "blobOID": "e5fe44288650a5e7dcfaf7b7cb2ec5defa1a937d",
+      "bytes": 2789,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/process-quiescence.schema.json",
+      "mode": "100644",
+      "blobOID": "cdc3c3f040f9ac73d3b527cb6776cea8e433c733",
+      "bytes": 4100,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/protected-tree-equality.contract.json",
+      "mode": "100644",
+      "blobOID": "86b651ded8cac42619c3c535caece0506705945a",
+      "bytes": 2609,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/protected-tree-equality.schema.json",
+      "mode": "100644",
+      "blobOID": "a5866beed2f29e1bcf0c9e210b28122bb243d5bf",
+      "bytes": 3760,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/root-execution-decision.contract.json",
+      "mode": "100644",
+      "blobOID": "70463be983afadf1389e36e2e543492fa5f91962",
+      "bytes": 1712,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/root-execution-decision.schema.json",
+      "mode": "100644",
+      "blobOID": "007370ba6154a80b92fd1de4eda96768f62cae85",
+      "bytes": 2743,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/root-publication-intent.contract.json",
+      "mode": "100644",
+      "blobOID": "69e82874739be5236161d7fca0e657067fee0ae3",
+      "bytes": 1384,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/root-publication-intent.schema.json",
+      "mode": "100644",
+      "blobOID": "178c284a1139d066b37ae6afaad9fa32d10d9938",
+      "bytes": 1964,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/root-restart-restore.contract.json",
+      "mode": "100644",
+      "blobOID": "30977b13f2529790462956bf60a214e47add6053",
+      "bytes": 2766,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/root-restart-restore.schema.json",
+      "mode": "100644",
+      "blobOID": "a6f622feaa7fae87147310afb00b0e6f8590f682",
+      "bytes": 4041,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/root-seal-decision.contract.json",
+      "mode": "100644",
+      "blobOID": "204e9af804ec5431019ec862af18fdb96ec21dc2",
+      "bytes": 2383,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/root-seal-decision.schema.json",
+      "mode": "100644",
+      "blobOID": "e683cb7aaeddd9da2759160588bd6788344c109e",
+      "bytes": 3600,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/runtime-inspection-after.contract.json",
+      "mode": "100644",
+      "blobOID": "151acfec9548f2658494d2a935064b8a308de6e9",
+      "bytes": 2940,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/runtime-inspection-after.schema.json",
+      "mode": "100644",
+      "blobOID": "b44338c2acb0b8ce225814e8164611a9d8d1895d",
+      "bytes": 4257,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/runtime-inspection-before.contract.json",
+      "mode": "100644",
+      "blobOID": "552821b7928c0749fa0e123f9bb7138f23c0147d",
+      "bytes": 2946,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/runtime-inspection-before.schema.json",
+      "mode": "100644",
+      "blobOID": "46fa97c9f74d2a8a28703f01f633972959f30eaf",
+      "bytes": 4260,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/schedule-disabled-readback.contract.json",
+      "mode": "100644",
+      "blobOID": "32db3d24b2325bb324a85bb63bafccc9a8d967d6",
+      "bytes": 1728,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/schedule-disabled-readback.schema.json",
+      "mode": "100644",
+      "blobOID": "16bb1a14e2ecae7325a1d20c65758868d172aae5",
+      "bytes": 2754,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/unchanged-mtls.contract.json",
+      "mode": "100644",
+      "blobOID": "c8ed9f3b5d14c01e669fa331d8f97601cb153110",
+      "bytes": 2736,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/proposed-contracts/unchanged-mtls.schema.json",
+      "mode": "100644",
+      "blobOID": "5d6e4201a03b37bf06c50ab1db352bf644a1ed78",
+      "bytes": 3937,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/recipe-definitions.json",
+      "mode": "100644",
+      "blobOID": "2d336d7feec9b588b7d77b6e73fe9dd015d2ed6f",
+      "bytes": 19687,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/schemas/v2/common.schema.json",
+      "mode": "100644",
+      "blobOID": "8591921f20871af07c8606ffae8d7bb1a7e69666",
+      "bytes": 21464,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/schemas/v2/migration-event.schema.json",
+      "mode": "100644",
+      "blobOID": "60a464a595420f0615db4643019dd16ce52c02a4",
+      "bytes": 65364,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/schemas/v2/migration-journal.schema.json",
+      "mode": "100644",
+      "blobOID": "0bf9f36adc1e7d70b77d2c45af3f531d6b18bb72",
+      "bytes": 18396,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/schemas/v2/operation-lease.schema.json",
+      "mode": "100644",
+      "blobOID": "37588253f2804baebeedf36852201e0f30f49c9a",
+      "bytes": 13027,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/schemas/v2/runtime-inventory.schema.json",
+      "mode": "100644",
+      "blobOID": "33ca256119a20b3fd6368780c1cffd6a8a082f25",
+      "bytes": 78148,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/schemas/v2/successor-plan.schema.json",
+      "mode": "100644",
+      "blobOID": "46720f977116ecae6d7e8ac9172742434a7fcca5",
+      "bytes": 185917,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/schemas/v2/terminal-seal.schema.json",
+      "mode": "100644",
+      "blobOID": "48811c8e5bdc9d54e80ed6b9b9d1e3be12ead860",
+      "bytes": 16725,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/schemas/v3/migration-event.schema.json",
+      "mode": "100644",
+      "blobOID": "0e1f8f19f38103e700d200c7d784e4ce15584ea5",
+      "bytes": 33624,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/schemas/v3/migration-journal.schema.json",
+      "mode": "100644",
+      "blobOID": "8340131f635a9306363853f113c2bfffe1375031",
+      "bytes": 3352,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/schemas/v3/operation-lease.schema.json",
+      "mode": "100644",
+      "blobOID": "7c67b2929f88cb18f0935dab5b9f2b0c94631ed2",
+      "bytes": 1036,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/schemas/v3/runtime-inventory.schema.json",
+      "mode": "100644",
+      "blobOID": "248704b3864f69f1542f1e4bab5001d825511eb5",
+      "bytes": 4900,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/schemas/v3/successor-plan.schema.json",
+      "mode": "100644",
+      "blobOID": "f70d250ac12895f78736ab95ac6985d2784ab998",
+      "bytes": 1034,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/schemas/v3/terminal-seal.schema.json",
+      "mode": "100644",
+      "blobOID": "68fa5fe7ccc2575af52229d5fc3a901440f4428b",
+      "bytes": 348,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/schemas/v4/migration-event.schema.json",
+      "mode": "100644",
+      "blobOID": "e3c1cf91814431354549e1cb0401884f3369afb8",
+      "bytes": 704,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/schemas/v5/api-request.schema.json",
+      "mode": "100644",
+      "blobOID": "0a17e1d9573051ac4ab6153297211e99faf691ba",
+      "bytes": 150514,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/schemas/v5/api-response.schema.json",
+      "mode": "100644",
+      "blobOID": "6fdf1c7ef6dbd03b4ddd583f16964a1dbb90318a",
+      "bytes": 3551,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/schemas/v5/cohort-projection-set.schema.json",
+      "mode": "100644",
+      "blobOID": "ca0570f784df5661a21f4f4a2d9ba7390f226b6d",
+      "bytes": 4560,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/source-pins.json",
+      "mode": "100644",
+      "blobOID": "82f163823349e4917c8b2c1f20446ade18766eee",
+      "bytes": 15150,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/migrationverify/resources/trust-bootstrap-contract.json",
+      "mode": "100644",
+      "blobOID": "b36c97241d5d5619e819d001a9717e25df8cc23f",
+      "bytes": 1510,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/migrationverify/schemas.go",
+      "mode": "100644",
+      "blobOID": "697d7f643a1a263fce1c7110d46fba3c835e3e53",
+      "bytes": 5064,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/migrationverify/schemas_test.go",
+      "mode": "100644",
+      "blobOID": "0303033945169a381b90616b593b606e7fde92c6",
+      "bytes": 1713,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/migrationverify/security_test.go",
+      "mode": "100644",
+      "blobOID": "b52b8e7cbc8a54f14a1402b80894422a57ae2369",
+      "bytes": 16548,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/migrationverify/temporal.go",
+      "mode": "100644",
+      "blobOID": "8820b8f11a8e18922fc11140cfa83af84bf17b63",
+      "bytes": 4076,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/migrationverify/temporal_fixture_test.go",
+      "mode": "100644",
+      "blobOID": "648f73ddab07e916b87caa212fdf440e913f3fc2",
+      "bytes": 3915,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/migrationverify/temporal_security_test.go",
+      "mode": "100644",
+      "blobOID": "d97a85977d61350b37bc37fc5794ad31a4b4028e",
+      "bytes": 12975,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/migrationverify/temporal_test.go",
+      "mode": "100644",
+      "blobOID": "dbd2d8953bce6bcdfa992819dce6441643990324",
+      "bytes": 1620,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/migrationverify/trust.go",
+      "mode": "100644",
+      "blobOID": "0554cd16384573044045fb1ffd1ab81b03790b44",
+      "bytes": 10336,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/migrationverify/vectors_test.go",
+      "mode": "100644",
+      "blobOID": "1123601790d6893bcf44612bd7b209afc0d16c7a",
+      "bytes": 2626,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/migrationverify/verify.go",
+      "mode": "100644",
+      "blobOID": "fa01d55c43637721525e7f2d7b1b691362f8abf2",
+      "bytes": 14338,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/runtime/cleanup_test.go",
+      "mode": "100644",
+      "blobOID": "17cccd1df9c79b6daa815f686ea6090e0bf36387",
+      "bytes": 1922,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/runtime/docker.go",
+      "mode": "100644",
+      "blobOID": "5de7ff0d154a4086fddb94e1be51e694fc45f9cb",
+      "bytes": 16259,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/runtime/docker_linux_test.go",
+      "mode": "100644",
+      "blobOID": "f6a5a30abf9988f02216525981cc460ca952965c",
+      "bytes": 3342,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/runtime/docker_test.go",
+      "mode": "100644",
+      "blobOID": "6c55f5750f811b671c5b660daff4fe18879a61e7",
+      "bytes": 5655,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/runtime/journal.go",
+      "mode": "100644",
+      "blobOID": "970a9d673b9b36b06b0cba4733e45acec469f440",
+      "bytes": 12966,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/runtime/lock_linux.go",
+      "mode": "100644",
+      "blobOID": "5e035789091bc554ddffc095f1865cac279ec96e",
+      "bytes": 524,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/runtime/lock_other.go",
+      "mode": "100644",
+      "blobOID": "7796d7626d221ea919ffadc4fb3db473dbae1b08",
+      "bytes": 177,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/runtime/peer_floor_linux.go",
+      "mode": "100644",
+      "blobOID": "df8600ec30da8f9426f6bc7c18eaeb093aa80cc5",
+      "bytes": 13506,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/runtime/peer_floor_linux_test.go",
+      "mode": "100644",
+      "blobOID": "2bc48d0393c6b62d4cd5910ff4ac998df69212e3",
+      "bytes": 5011,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/runtime/peer_floor_other.go",
+      "mode": "100644",
+      "blobOID": "8cc654497ccdd0656862892bc8cb05362bfcae45",
+      "bytes": 858,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/runtime/permit.go",
+      "mode": "100644",
+      "blobOID": "084b9113190abfaa7e0279a4eb7a4e786bd03dff",
+      "bytes": 5845,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/runtime/permit_test.go",
+      "mode": "100644",
+      "blobOID": "1f45b7b292b43efddcca4db2916839326d271e02",
+      "bytes": 9925,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/runtime/quarantine.go",
+      "mode": "100644",
+      "blobOID": "335d51fb3d9d276597e77a36b663609edc27e685",
+      "bytes": 1624,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/runtime/quarantine_linux_test.go",
+      "mode": "100644",
+      "blobOID": "3898d3e6323438a29abf0ca5e55fb3ece20d1690",
+      "bytes": 4358,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/runtime/runner.go",
+      "mode": "100644",
+      "blobOID": "05d11d79cb1a969612233c5f51135a90bb59f2f4",
+      "bytes": 11713,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/runtime/runner_linux_test.go",
+      "mode": "100644",
+      "blobOID": "c91457eedf9bec00b808f9bdb65e8d4495bc9c48",
+      "bytes": 14063,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/runtime/storage_policy.go",
+      "mode": "100644",
+      "blobOID": "9feaa06a68f0553e1c7087bec0da702b6dd551fb",
+      "bytes": 2562,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/runtime/terminal.go",
+      "mode": "100644",
+      "blobOID": "f2a02cc9b574f9cd18f3d4a5c8f1a1596f825221",
+      "bytes": 4322,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/runtime/terminal_test.go",
+      "mode": "100644",
+      "blobOID": "66407108b1185b2f1919e5ff735c351222392f8b",
+      "bytes": 3007,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/storage/root_linux.go",
+      "mode": "100644",
+      "blobOID": "db210c75dc9ef5f9658cd50913018ea82d24ecdd",
+      "bytes": 4184,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/storage/root_linux_test.go",
+      "mode": "100644",
+      "blobOID": "d34627222cf93566934d2c31354db4f452b450df",
+      "bytes": 1930,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/storage/root_other.go",
+      "mode": "100644",
+      "blobOID": "d248e6e117fc0d0fb54c165b0844fff9593ecc02",
+      "bytes": 445,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/storage/sample.go",
+      "mode": "100644",
+      "blobOID": "d99a2394b18f6537b94538b77fbc06e3bd531b99",
+      "bytes": 6108,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/telemetry/sample_linux.go",
+      "mode": "100644",
+      "blobOID": "99566ad9f4c7513d661c71b8a19579b362b42dd4",
+      "bytes": 2961,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/telemetry/sample_linux_test.go",
+      "mode": "100644",
+      "blobOID": "b4c3c392bcbf55289630919d685fae197cf40fb8",
+      "bytes": 1105,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/telemetry/sample_other.go",
+      "mode": "100644",
+      "blobOID": "92d699ccd82c5c62a330dd3a5d9ad61e09b5cfe5",
+      "bytes": 190,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/tests/probe/main.go",
+      "mode": "100644",
+      "blobOID": "5dd6601e3dcc3526a4b9fa1ea2fcd65a185c1f91",
+      "bytes": 3568,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/transfer/chunks_linux.go",
+      "mode": "100644",
+      "blobOID": "921801a0c4f7670a4e4eefc0ebb49fe9047180e6",
+      "bytes": 2915,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/transfer/chunks_other.go",
+      "mode": "100644",
+      "blobOID": "156a0787ef574410be7cd7a5da3cd848906e313b",
+      "bytes": 520,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/transport/peer_floor.go",
+      "mode": "100644",
+      "blobOID": "c2551c0366cf9d4c74e4b3096937b7d142355646",
+      "bytes": 3564,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/transport/peer_floor_canonical.go",
+      "mode": "100644",
+      "blobOID": "e2ca80ff64ed7b12cbff2199a3cd3431e1ca9f52",
+      "bytes": 1319,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/transport/peer_floor_canonical_test.go",
+      "mode": "100644",
+      "blobOID": "f9ac3bd4bfaafbc804e203989920068cd1bd4cce",
+      "bytes": 3708,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/transport/server.go",
+      "mode": "100644",
+      "blobOID": "b81cc93096032fe63f1e6572aa109939a562e9a2",
+      "bytes": 10103,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/transport/server_test.go",
+      "mode": "100644",
+      "blobOID": "46b820365ecc0fa94191b51a852f5137cbfb9b7e",
+      "bytes": 15753,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/transport/storage.go",
+      "mode": "100644",
+      "blobOID": "6fa6d9c01d47b774198f012069b427f55a0db1e1",
+      "bytes": 3470,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/transport/storage_test.go",
+      "mode": "100644",
+      "blobOID": "8c35debb9eba08d0a65ec98e5ae3aa5813524651",
+      "bytes": 2728,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/transport/trust.go",
+      "mode": "100644",
+      "blobOID": "d18f943daf83460265e0ae03a3b5d111ff810600",
+      "bytes": 5422,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/workspace/files_linux.go",
+      "mode": "100644",
+      "blobOID": "0f9a77d8ff47a4e5a6236f4ace700b3bd4f9abd5",
+      "bytes": 3400,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/workspace/files_linux_test.go",
+      "mode": "100644",
+      "blobOID": "bb2c77fcb1a575eb3f1c05b4e789ae881be6851d",
+      "bytes": 1241,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/workspace/manifest.go",
+      "mode": "100644",
+      "blobOID": "a798651ee29c6d2268e89b46db69a2f9272570c6",
+      "bytes": 3125,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "services/node-agent/workspace/manifest_test.go",
+      "mode": "100644",
+      "blobOID": "e1c60f4fe8f56458c8ee53feeceb3fe6f9576872",
+      "bytes": 2272,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "tests/proofs/fleet5_peer_phase_fixed_guards_test.go",
+      "mode": "100644",
+      "blobOID": "20dff460a66bea7f5e422b17f641e916da9934d9",
+      "bytes": 2472,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    },
+    {
+      "path": "tests/proofs/fleet5_peer_phase_probe_test.go",
+      "mode": "100644",
+      "blobOID": "781323bf338f92ebae845e55302fb3bcd339ea7c",
+      "bytes": 6085,
+      "source": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed"
+    }
+  ],
+  "selection": "ALL tracked Go files across repo/platforms (including tracked inert docs Go consumed by old inventory), both real modules/go.sum, contracts, embedded K1 resources and explicit public synthetic history fixture; real .git metadata required",
+  "overlay": "ONLY four WIP source/test files in wip-source-manifest.json; new own package files must be materialized despite untracked base",
+  "externalDependencies": "Original pinned go.mod/go.sum only; Root may use already authorized public setup/download+verify, then GOPROXY/GOSUMDB off and networknone tests; no dependency/module edits or main installs",
+  "mutantModules": "Test-only stdlib source probes use temporary real go build for compile preconditions, never replacing/stubbing either project module or K1/contracts",
+  "actualSetup": "NOT_RUN_BY_AUTHOR"
+}

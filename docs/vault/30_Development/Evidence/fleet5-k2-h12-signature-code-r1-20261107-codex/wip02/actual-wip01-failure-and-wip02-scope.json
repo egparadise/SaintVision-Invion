@@ -1,0 +1,160 @@
+{
+  "classification": "ROOT_ACTUAL_WIP01_RED_AUTHOR_SOURCE_CAUSE_ONLY_WIP02_NOT_RUN",
+  "RootReply": "msg_0abc80a909cd",
+  "atKST": "2026-11-07T10:17:49.133756+09:00",
+  "originalPacketSHA256": "f320083d6837c315e5900aae85e7be771a3754c70794715ededb40d55a18641c",
+  "phaseResults": [
+    {
+      "phase": 1,
+      "id": "math-canonical-ownership-admission",
+      "startedAtKST": "2026-11-07T10:09:12+09:00",
+      "endedAtKST": "2026-11-07T10:09:40+09:00",
+      "directExit": 0,
+      "elapsedSeconds": 28.366,
+      "topLevelPassed": 2,
+      "subtestsPassed": 32,
+      "cgroupMemoryPeakBytes": 401268736,
+      "OOMKilled": false,
+      "sourceBeforeAfterUnchanged": true,
+      "failEvents": [],
+      "skipEvents": [],
+      "ownExitedContainerRemoved": true,
+      "topLevelFailed": 0,
+      "subtestsFailed": 0,
+      "packageFailEvents": 0
+    },
+    {
+      "phase": 2,
+      "id": "new-exact-object-file-directcall-probes",
+      "startedAtKST": "2026-11-07T10:09:40+09:00",
+      "endedAtKST": "2026-11-07T10:09:42+09:00",
+      "directExit": 0,
+      "elapsedSeconds": 1.463,
+      "topLevelPassed": 2,
+      "subtestsPassed": 12,
+      "cgroupMemoryPeakBytes": 84881408,
+      "OOMKilled": false,
+      "sourceBeforeAfterUnchanged": true,
+      "failEvents": [],
+      "skipEvents": [],
+      "ownExitedContainerRemoved": true,
+      "topLevelFailed": 0,
+      "subtestsFailed": 0,
+      "packageFailEvents": 0
+    },
+    {
+      "phase": 3,
+      "id": "existing-d04-private-consistency",
+      "startedAtKST": "2026-11-07T10:09:42+09:00",
+      "endedAtKST": "2026-11-07T10:09:43+09:00",
+      "directExit": 0,
+      "elapsedSeconds": 1.465,
+      "topLevelPassed": 13,
+      "subtestsPassed": 101,
+      "cgroupMemoryPeakBytes": 161263616,
+      "OOMKilled": false,
+      "sourceBeforeAfterUnchanged": true,
+      "failEvents": [],
+      "skipEvents": [],
+      "ownExitedContainerRemoved": true,
+      "topLevelFailed": 0,
+      "subtestsFailed": 0,
+      "packageFailEvents": 0
+    },
+    {
+      "phase": 4,
+      "id": "existing-public-refusal-effect-source-census-plr",
+      "startedAtKST": "2026-11-07T10:09:43+09:00",
+      "endedAtKST": "2026-11-07T10:11:46+09:00",
+      "directExit": 1,
+      "elapsedSeconds": 122.772,
+      "topLevelPassed": 8,
+      "subtestsPassed": 124,
+      "cgroupMemoryPeakBytes": 681029632,
+      "OOMKilled": false,
+      "sourceBeforeAfterUnchanged": true,
+      "failEvents": [
+        "TestPLR1BCompiledWriteTargetsAndReasons/slice-root-foreign-pointee",
+        "TestPLR1BCompiledWriteTargetsAndReasons",
+        "TestPLR1CCompiledPointerConversionsAndControls/N6-slice-to-own-array-pointer",
+        "TestPLR1CCompiledPointerConversionsAndControls/S1-slice-local-copy-of-pointee",
+        "TestPLR1CCompiledPointerConversionsAndControls/S2-slice-parameter",
+        "TestPLR1CCompiledPointerConversionsAndControls",
+        "TestPLR1DCompiledTargetPointerTermsAndControls/G4-typeparam-target-slice-to-own-array",
+        "TestPLR1DCompiledTargetPointerTermsAndControls",
+        "github.com/egparadise/SaintVision-Invion/services/node-agent/internal/migrationcontext"
+      ],
+      "skipEvents": [],
+      "ownExitedContainerRemoved": true,
+      "topLevelFailed": 3,
+      "subtestsFailed": 5,
+      "packageFailEvents": 1
+    }
+  ],
+  "counts": {
+    "actualTopLevelPassed": 25,
+    "actualSubtestsPassed": 269,
+    "actualTopLevelFailed": 3,
+    "actualSubtestsFailed": 5,
+    "actualPackageFailEvents": 1,
+    "actualFailEvents": 9,
+    "actualSkippedEvents": 0,
+    "H12MathTableRows": 32,
+    "H12DistinctFullArgumentFingerprints": 32,
+    "H12TargetHelperEvaluationsByTableAndInspectedTestFlow": 35,
+    "P02CausalRows": 92,
+    "P02DistinctFullInputFingerprints": 90
+  },
+  "failureInterpretation": "Five leaf failures plus three failed parents plus one package event = nine fail EVENTS; not nine failing leaf cases. All five old fixtures built/typechecked before new overly broad H12 type policy intercepted them. Original positive LIMIT controls remain original declared provenance limits, not crypto authority.",
+  "cases": [
+    {
+      "case": "TestPLR1BCompiledWriteTargetsAndReasons/slice-root-foreign-pointee",
+      "WIP01": "ACTUAL_FAIL_AFTER_BUILD0_TYPECHECK0",
+      "observed": [
+        "pl_r1a_test.go:298: REASON case=slice-root-foreign-pointee build=0 typecheck=0 refused=true reason=h12 crypto type scope forbidden: crypto/ed25519.PrivateKey at pl_probe.go",
+        "pl_r1a_test.go:298: want intended refusal prefixes=[\"foreign pointee write forbidden: crypto/ed25519.PrivateKey\"], got=h12 crypto type scope forbidden: crypto/ed25519.PrivateKey at pl_probe.go"
+      ],
+      "WIP02": "NOT_RUN_NEEDS_SAME_UNCHANGED_CAUSAL_TEST"
+    },
+    {
+      "case": "TestPLR1CCompiledPointerConversionsAndControls/N6-slice-to-own-array-pointer",
+      "WIP01": "ACTUAL_FAIL_AFTER_BUILD0_TYPECHECK0",
+      "observed": [
+        "pl_r1a_test.go:394: REASON case=N6-slice-to-own-array-pointer build=0 typecheck=0 refused=true reason=h12 crypto type scope forbidden: crypto/ed25519.PrivateKey at pl_review_probe.go",
+        "pl_r1a_test.go:394: want intended refusal prefixes=[\"pointee-changing pointer conversion forbidden:\"], got=h12 crypto type scope forbidden: crypto/ed25519.PrivateKey at pl_review_probe.go"
+      ],
+      "WIP02": "NOT_RUN_NEEDS_SAME_UNCHANGED_CAUSAL_TEST"
+    },
+    {
+      "case": "TestPLR1CCompiledPointerConversionsAndControls/S1-slice-local-copy-of-pointee",
+      "WIP01": "ACTUAL_FAIL_AFTER_BUILD0_TYPECHECK0",
+      "observed": [
+        "pl_r1a_test.go:394: REASON case=S1-slice-local-copy-of-pointee build=0 typecheck=0 refused=true reason=h12 crypto type scope forbidden: crypto/ed25519.PrivateKey at pl_review_probe.go",
+        "pl_r1a_test.go:394: positive control refused: h12 crypto type scope forbidden: crypto/ed25519.PrivateKey at pl_review_probe.go"
+      ],
+      "WIP02": "NOT_RUN_NEEDS_SAME_UNCHANGED_CAUSAL_TEST"
+    },
+    {
+      "case": "TestPLR1CCompiledPointerConversionsAndControls/S2-slice-parameter",
+      "WIP01": "ACTUAL_FAIL_AFTER_BUILD0_TYPECHECK0",
+      "observed": [
+        "pl_r1a_test.go:394: REASON case=S2-slice-parameter build=0 typecheck=0 refused=true reason=h12 crypto type scope forbidden: crypto/ed25519.PrivateKey at pl_review_probe.go",
+        "pl_r1a_test.go:394: positive control refused: h12 crypto type scope forbidden: crypto/ed25519.PrivateKey at pl_review_probe.go"
+      ],
+      "WIP02": "NOT_RUN_NEEDS_SAME_UNCHANGED_CAUSAL_TEST"
+    },
+    {
+      "case": "TestPLR1DCompiledTargetPointerTermsAndControls/G4-typeparam-target-slice-to-own-array",
+      "WIP01": "ACTUAL_FAIL_AFTER_BUILD0_TYPECHECK0",
+      "observed": [
+        "pl_r1a_test.go:527: REASON case=G4-typeparam-target-slice-to-own-array build=0 typecheck=0 refused=true reason=h12 crypto type scope forbidden: crypto/ed25519.PrivateKey at pl_review_probe.go",
+        "pl_r1a_test.go:527: want intended refusal prefixes=[\"pointee-changing pointer conversion forbidden:\"], got=h12 crypto type scope forbidden: crypto/ed25519.PrivateKey at pl_review_probe.go"
+      ],
+      "WIP02": "NOT_RUN_NEEDS_SAME_UNCHANGED_CAUSAL_TEST"
+    }
+  ],
+  "fix": "Scope ONLY newly added Ed25519 TypeName block to exact unadjusted h12_signature_internal.go; inside file require PublicKey assertion directly in private helper. Other source retains original foreign-pointee/conversion/DATA guards and LIMIT controls. No test/file/diagnostic-name whitelist; no new corpus.",
+  "fixedCandidateGoCryptoTests": "NOT_RUN",
+  "publication": "NOT_GRANTED",
+  "actualAuthority": null
+}

@@ -1,0 +1,56 @@
+{
+  "phase": 2,
+  "id": "new-exact-object-file-directcall-probes",
+  "startedAtKST": "2026-11-07T10:09:40+09:00",
+  "endedAtKST": "2026-11-07T10:09:42+09:00",
+  "elapsedSeconds": 1.463,
+  "testCommand": [
+    "go",
+    "test",
+    "-p=1",
+    "-count=1",
+    "-json",
+    "-run",
+    "^TestH12(ScopedCryptoObjectBoundary|RepositoryResolvedExceptionPosition)$",
+    "./internal/migrationcontext"
+  ],
+  "workingDirectory": "/job/repo/services/node-agent",
+  "image": "golang@sha256:8d48e12ec56735e9358640898b9d9b9fcca110612ed8a5567438c0a1baa24e66",
+  "containerID": "06b88f7fa7cfa28e1011d8caae29ec079b19229035f9432f2b64f7c73f3c48f7",
+  "directExit": 0,
+  "OOMKilled": false,
+  "stateError": "",
+  "cgroupMemoryPeakBytes": 84881408,
+  "memoryBytes": 2147483648,
+  "memorySwapTotalBytes": 2147483648,
+  "extraSwapBytes": 0,
+  "nanoCPUs": 2000000000,
+  "pidsLimit": 128,
+  "nonrootUser": "1000:1000",
+  "network": "none",
+  "readOnlyRoot": true,
+  "onlyOwnJobBind": true,
+  "sourceBeforeAfterUnchanged": true,
+  "sourceFiles": 373,
+  "topLevelPassed": 2,
+  "subtestsPassed": 12,
+  "failEvents": [],
+  "skipEvents": [],
+  "JSONParseErrors": [],
+  "lastJSONAction": "pass",
+  "logs": {
+    "h12-phase2.stdout": {
+      "bytes": 22306,
+      "SHA256": "6f7091315803fc315ca00c3a2faab912d4a05a85e97d4062641851532af336c3"
+    },
+    "h12-phase2.stderr": {
+      "bytes": 0,
+      "SHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "h12-phase2-container.log": {
+      "bytes": 0,
+      "SHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  },
+  "ownExitedContainerRemoved": true
+}

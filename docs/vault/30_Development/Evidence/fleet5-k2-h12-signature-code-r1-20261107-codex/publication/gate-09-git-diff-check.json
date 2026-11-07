@@ -1,0 +1,20 @@
+{
+  "id": "gate-09-git-diff-check",
+  "argv": [
+    "git",
+    "diff",
+    "--check"
+  ],
+  "cwd": "D:/Project/SaintVisionI-Invion/fleet5-k2-d04-l1-r2-20261107",
+  "startedAtKST": "2026-11-07T10:32:29.192579+09:00",
+  "endedAtKST": "2026-11-07T10:32:30.204103+09:00",
+  "elapsedSeconds": 1.012,
+  "directExit": 0,
+  "stdoutRawText": "",
+  "stderrRawText": "",
+  "stdoutBytes": 0,
+  "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "stderrBytes": 0,
+  "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "classification": "STATIC_DELIVERY_GATE_NOT_PRODUCT_EXECUTION"
+}

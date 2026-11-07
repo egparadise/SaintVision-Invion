@@ -137,6 +137,93 @@ var pureExternalObjects = map[string]bool{
 	k1Import + ".CanonicalJSON": true, k1Import + ".NewVerifier": true, k1Import + ".Verifier.Verify": true,
 }
 
+const h12SignatureSource = "h12_signature_internal.go"
+
+type h12ScopedUses struct {
+	references map[token.Pos]bool
+	calls      map[token.Pos]bool
+}
+
+// This is a position/object/direct-call exception, NOT a package-wide allowance.
+// Unadjusted positions deliberately ignore //line filename impersonation.
+func h12ScopedCryptoUses(checked checkedSource) (h12ScopedUses, error) {
+	allowed := h12ScopedUses{references: map[token.Pos]bool{}, calls: map[token.Pos]bool{}}
+	parents := map[ast.Node]ast.Node{}
+	for _, f := range checked.files {
+		stack := []ast.Node{}
+		ast.Inspect(f, func(n ast.Node) bool {
+			if n == nil {
+				stack = stack[:len(stack)-1]
+				return false
+			}
+			if len(stack) > 0 {
+				parents[n] = stack[len(stack)-1]
+			}
+			stack = append(stack, n)
+			return true
+		})
+	}
+	owner := func(id *ast.Ident) string {
+		for n := ast.Node(id); n != nil; n = parents[n] {
+			if _, ok := n.(*ast.FuncLit); ok {
+				return "" // No nested wrapper/callback exception.
+			}
+			if fn, ok := n.(*ast.FuncDecl); ok {
+				if fn.Recv == nil && checked.info.Defs[fn.Name] == checked.pkg.Scope().Lookup(fn.Name.Name) {
+					return fn.Name.Name
+				}
+				return ""
+			}
+		}
+		return ""
+	}
+	for id, obj := range checked.info.Uses {
+		key := objectID(obj)
+		pos := checked.fset.PositionFor(id.Pos(), false)
+		file := filepath.ToSlash(pos.Filename)
+		// This new type restriction belongs only to the new H12 source. Other
+		// source keeps its pre-existing DATA/pointee/conversion rules and limits.
+		if typ, ok := obj.(*types.TypeName); ok && file == h12SignatureSource && typ.Pkg() != nil && typ.Pkg().Path() == "crypto/ed25519" {
+			sel, selector := parents[id].(*ast.SelectorExpr)
+			assertion, asserted := parents[sel].(*ast.TypeAssertExpr)
+			dataAssertion := selector && sel.Sel == id && asserted && assertion.Type == sel
+			if key != "crypto/ed25519.PublicKey" || !dataAssertion || owner(id) != "h12CheckRegistrySignature" {
+				return allowed, fmt.Errorf("h12 crypto type scope forbidden: %s at %s", key, file)
+			}
+		}
+		switch key {
+		case "crypto/ed25519.Verify", "crypto/x509.ParsePKIXPublicKey", "crypto/x509.MarshalPKIXPublicKey":
+			if _, ok := obj.(*types.Func); !ok || file != h12SignatureSource {
+				return allowed, fmt.Errorf("h12 crypto source path forbidden: %s at %s", key, file)
+			}
+			if owner(id) != "h12CheckRegistrySignature" {
+				return allowed, fmt.Errorf("h12 crypto helper scope forbidden: %s", key)
+			}
+			var expr ast.Node = id
+			if sel, ok := parents[id].(*ast.SelectorExpr); ok && sel.Sel == id {
+				expr = sel
+			}
+			call, ok := parents[expr].(*ast.CallExpr)
+			if !ok || call.Fun != expr {
+				return allowed, fmt.Errorf("h12 crypto non-direct reference forbidden: %s", key)
+			}
+			allowed.references[id.Pos()] = true
+			allowed.calls[call.Pos()] = true
+		}
+	}
+	return allowed, nil
+}
+
+func h12ResolvedVerifyAt(checked checkedSource, allowed h12ScopedUses, line, column int) bool {
+	for id, obj := range checked.info.Uses {
+		p := checked.fset.PositionFor(id.Pos(), false)
+		if filepath.ToSlash(p.Filename) == h12SignatureSource && p.Line == line && p.Column == column && objectID(obj) == "crypto/ed25519.Verify" && allowed.references[id.Pos()] {
+			return true
+		}
+	}
+	return false
+}
+
 func rejectNativeSources(src map[string][]byte) error {
 	native := map[string]bool{".s": true, ".syso": true, ".c": true, ".h": true, ".cc": true, ".cpp": true, ".cxx": true, ".hpp": true, ".m": true, ".mm": true, ".f": true, ".f90": true, ".sx": true, ".o": true, ".a": true, ".obj": true, ".dll": true, ".so": true, ".dylib": true}
 	for name := range src {
@@ -335,6 +422,10 @@ func sourceEffects(src map[string][]byte, checked checkedSource) error {
 	if e := rejectNativeSources(src); e != nil {
 		return e
 	}
+	h12, e := h12ScopedCryptoUses(checked)
+	if e != nil {
+		return e
+	}
 	for name, b := range src {
 		if strings.HasSuffix(name, ".go") && !strings.HasSuffix(name, "_test.go") {
 			for _, tag := range []string{"//go:linkname", "//go:cgo_", "//go:wasmimport", "//go:wasmexport"} {
@@ -366,7 +457,7 @@ func sourceEffects(src map[string][]byte, checked checkedSource) error {
 			}
 		}
 	}
-	for _, obj := range checked.info.Uses {
+	for id, obj := range checked.info.Uses {
 		if v := foreignPackageVar(obj); v != nil && objectID(v) != "time.UTC" {
 			return fmt.Errorf("foreign package variable read forbidden: %s", objectID(v))
 		}
@@ -376,7 +467,7 @@ func sourceEffects(src map[string][]byte, checked checkedSource) error {
 				return fmt.Errorf("exported own interface/constraint dispatch forbidden: %s", objectID(f))
 			}
 		}
-		if f, ok := obj.(*types.Func); ok && f.Pkg() != nil && f.Pkg().Path() != ownImport && !pureExternalObjects[objectID(f)] {
+		if f, ok := obj.(*types.Func); ok && f.Pkg() != nil && f.Pkg().Path() != ownImport && !pureExternalObjects[objectID(f)] && !h12.references[id.Pos()] {
 			return fmt.Errorf("unreviewed function/method object: %s", objectID(f))
 		}
 	}
@@ -449,7 +540,7 @@ func sourceEffects(src map[string][]byte, checked checkedSource) error {
 				}
 				switch x := obj.(type) {
 				case *types.Func:
-					if x.Pkg() == nil || x.Pkg().Path() != ownImport && !pureExternalObjects[objectID(x)] {
+					if x.Pkg() == nil || x.Pkg().Path() != ownImport && !pureExternalObjects[objectID(x)] && !h12.calls[call.Pos()] {
 						failure = fmt.Errorf("unreviewed call: %s", objectID(x))
 					}
 				case *types.Builtin:
@@ -613,4 +704,101 @@ import text "strings";func probe(){_ = text.Trim("x","x")}`)
 			t.Fatal("compiled assembly path escaped")
 		}
 	})
+}
+
+// Compile the stdlib-only source probe with the REAL compiler before crediting
+// a guard denial. This is an isolated mutant fixture, never a replacement/stub
+// for either real repository module or its contracts/export dependencies.
+func h12CompileGuardProbe(t *testing.T, root, name, code string) checkedSource {
+	t.Helper()
+	dir := t.TempDir()
+	module := []byte("module " + ownImport + "\n\ngo 1.23\n")
+	if e := os.WriteFile(filepath.Join(dir, "go.mod"), module, 0600); e != nil {
+		t.Fatal(e)
+	}
+	if e := os.WriteFile(filepath.Join(dir, name), []byte(code), 0600); e != nil {
+		t.Fatal(e)
+	}
+	sourceCommand(t, dir, "go", "build", "-p=1", "-mod=readonly", "-o", filepath.Join(dir, "probe.a"), ".")
+	checked, e := checkSourcePackage(ownImport, map[string][]byte{name: []byte(code)}, exports(t, root), nil)
+	if e != nil {
+		t.Fatal("guard probe must compile AND resolve actual exported types", e)
+	}
+	return checked
+}
+
+func TestH12ScopedCryptoObjectBoundary(t *testing.T) {
+	root := repository(t)
+	original := ownProductionSources(t, root)
+	checked, e := checkSourcePackage(ownImport, original, exports(t, root), nil)
+	if e != nil {
+		t.Fatal(e)
+	}
+	if e = sourceEffects(original, checked); e != nil {
+		t.Fatal("real unchanged-closure control", e)
+	}
+	verify := `package migrationcontext
+import ed "crypto/ed25519"
+func h12CheckRegistrySignature(){_ = ed.Verify([]byte(nil),nil,nil)}
+`
+	cases := []struct {
+		name, file, code, cause string
+		allowed                 bool
+	}{
+		{"same-file-direct-import-alias", h12SignatureSource, verify, "", true},
+		{"foreign-file-direct-call", "h12_foreign.go", verify, "h12 crypto source path", false},
+		{"foreign-file-aliased-PKIX", "h12_foreign.go", `package migrationcontext
+import cert "crypto/x509"
+func h12CheckRegistrySignature(){_,_ = cert.ParsePKIXPublicKey(nil)}
+`, "h12 crypto source path", false},
+		{"line-directive-cannot-impersonate", "h12_foreign.go", "package migrationcontext\nimport ed \"crypto/ed25519\"\n//line h12_signature_internal.go:1\nfunc h12CheckRegistrySignature(){_ = ed.Verify([]byte(nil),nil,nil)}\n", "h12 crypto source path", false},
+		{"function-value-capture", h12SignatureSource, `package migrationcontext
+import ed "crypto/ed25519"
+func h12CheckRegistrySignature(){f:=ed.Verify;_ = f}
+`, "h12 crypto non-direct reference", false},
+		{"noncall-PKIX-reference", h12SignatureSource, `package migrationcontext
+import cert "crypto/x509"
+func h12CheckRegistrySignature(){_ = cert.MarshalPKIXPublicKey}
+`, "h12 crypto non-direct reference", false},
+		{"pass-function-as-argument", h12SignatureSource, `package migrationcontext
+import cert "crypto/x509"
+func consume(_ func([]byte)(any,error)){}
+func h12CheckRegistrySignature(){consume(cert.ParsePKIXPublicKey)}
+`, "h12 crypto non-direct reference", false},
+		{"different-function-wrapper", h12SignatureSource, `package migrationcontext
+import ed "crypto/ed25519"
+func wrapper(){_ = ed.Verify([]byte(nil),nil,nil)}
+`, "h12 crypto helper scope", false},
+		{"nested-function-wrapper", h12SignatureSource, `package migrationcontext
+import ed "crypto/ed25519"
+func h12CheckRegistrySignature(){_ = func(){_ = ed.Verify([]byte(nil),nil,nil)}}
+`, "h12 crypto helper scope", false},
+		{"unapproved-method-value", h12SignatureSource, `package migrationcontext
+import cert "crypto/x509"
+func h12CheckRegistrySignature(c *cert.Certificate){_ = c.Verify}
+`, "crypto/x509.Certificate.Verify", false},
+		{"private-key-type-not-DATA", h12SignatureSource, `package migrationcontext
+import ed "crypto/ed25519"
+func h12CheckRegistrySignature(k ed.PrivateKey){_ = k}
+`, "h12 crypto type scope", false},
+		{"all-three-direct-control", h12SignatureSource, `package migrationcontext
+import ed "crypto/ed25519"
+import cert "crypto/x509"
+func h12CheckRegistrySignature(){p,_:=cert.ParsePKIXPublicKey(nil);k,_:=p.(ed.PublicKey);_,_=cert.MarshalPKIXPublicKey(k);_=ed.Verify(k,nil,nil)}
+`, "", true},
+	}
+	for _, x := range cases {
+		t.Run(x.name, func(t *testing.T) {
+			checked := h12CompileGuardProbe(t, root, x.file, x.code)
+			e := sourceEffects(map[string][]byte{x.file: []byte(x.code)}, checked)
+			if x.allowed {
+				if e != nil {
+					t.Fatal("direct scoped control", e)
+				}
+			} else if e == nil || !strings.Contains(e.Error(), x.cause) {
+				t.Fatal("wrong causal source refusal", x.cause, e)
+			}
+			t.Logf("H12_GUARD_CASE id=%s sourceSHA256=%s compile=pass typed=pass allowed=%t actualCryptoExecuted=false", x.name, hashBytes([]byte(x.file+"\x00"+x.code)), x.allowed)
+		})
+	}
 }

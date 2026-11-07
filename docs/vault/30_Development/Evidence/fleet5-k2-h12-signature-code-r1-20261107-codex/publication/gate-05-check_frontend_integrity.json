@@ -1,0 +1,21 @@
+{
+  "id": "gate-05-check_frontend_integrity",
+  "argv": [
+    "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+    "-I",
+    "-B",
+    "tools/check_frontend_integrity.py"
+  ],
+  "cwd": "D:/Project/SaintVisionI-Invion/fleet5-k2-d04-l1-r2-20261107",
+  "startedAtKST": "2026-11-07T10:31:54.947000+09:00",
+  "endedAtKST": "2026-11-07T10:31:56.680960+09:00",
+  "elapsedSeconds": 1.734,
+  "directExit": 0,
+  "stdoutRawText": "Scanning 94 frontend production source files under apps/web/src ...\r\n\r\nPASS Frontend Integrity Check: all 9 integrity rules satisfied (0 violations).\r\n",
+  "stderrRawText": "",
+  "stdoutBytes": 151,
+  "stdoutSHA256": "2a2f0348a4bdc71911a5eac47ef7fd7a1ca4573e71cce914cb6d6dd198392949",
+  "stderrBytes": 0,
+  "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "classification": "STATIC_DELIVERY_GATE_NOT_PRODUCT_EXECUTION"
+}

@@ -1,0 +1,56 @@
+{
+  "phase": 3,
+  "id": "existing-d04-private-consistency",
+  "startedAtKST": "2026-11-07T10:23:24+09:00",
+  "endedAtKST": "2026-11-07T10:23:25+09:00",
+  "elapsedSeconds": 1.398,
+  "testCommand": [
+    "go",
+    "test",
+    "-p=1",
+    "-count=1",
+    "-json",
+    "-run",
+    "^TestP02Internal",
+    "./internal/migrationcontext"
+  ],
+  "workingDirectory": "/job/repo/services/node-agent",
+  "image": "golang@sha256:8d48e12ec56735e9358640898b9d9b9fcca110612ed8a5567438c0a1baa24e66",
+  "containerID": "5d85aba2567a5c432cef22ca929d67f2ab0ef934d7c3bdaf50e5b065204ca7cc",
+  "directExit": 0,
+  "OOMKilled": false,
+  "stateError": "",
+  "cgroupMemoryPeakBytes": 163282944,
+  "memoryBytes": 2147483648,
+  "memorySwapTotalBytes": 2147483648,
+  "extraSwapBytes": 0,
+  "nanoCPUs": 2000000000,
+  "pidsLimit": 128,
+  "nonrootUser": "1000:1000",
+  "network": "none",
+  "readOnlyRoot": true,
+  "onlyOwnJobBind": true,
+  "sourceBeforeAfterUnchanged": true,
+  "sourceFiles": 373,
+  "topLevelPassed": 13,
+  "subtestsPassed": 101,
+  "failEvents": [],
+  "skipEvents": [],
+  "JSONParseErrors": [],
+  "lastJSONAction": "pass",
+  "logs": {
+    "h12-phase3.stdout": {
+      "bytes": 171438,
+      "SHA256": "8e9b60cb710f4202f09416576563f0e7584b883a1bdfe3eb96a7c87de35f5cc3"
+    },
+    "h12-phase3.stderr": {
+      "bytes": 0,
+      "SHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "h12-phase3-container.log": {
+      "bytes": 0,
+      "SHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  },
+  "ownExitedContainerRemoved": true
+}

@@ -1,0 +1,132 @@
+{
+  "classification": "ROOT_INPUT_PACKET_UNPUBLISHED_WIP_NOT_TESTED",
+  "atKST": "2026-11-07T09:58:32.393232+09:00",
+  "base": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed",
+  "branch": "agent/codex/fleet5-k2-h12-signature-code-r1-20261107",
+  "payloadEntries": [
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/.gitattributes",
+      "mode": "100644",
+      "bytes": 28,
+      "SHA256": "13a38ac304a342bc4e214c884b3404b7280edef1834c59ee0d97302fd98d3984"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/complete-four-file.patch",
+      "mode": "100644",
+      "bytes": 31074,
+      "SHA256": "7eab0cfb280287908bb8a06a82f0cb6a2a15e19806316bfdd0a587a7140a92e5"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/effect_gate_test.go.current.raw",
+      "mode": "100644",
+      "bytes": 27623,
+      "SHA256": "eaf6ae9a9bb40a68fa92be4a3f2f42b05b1d69218f60497d747b78586fb59fd5"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/effect_gate_test.go.preimage.raw",
+      "mode": "100644",
+      "bytes": 19751,
+      "SHA256": "871e1b1ca26e6bcdcc4ea7af2e8a290dc7a9b615f201c46aa7bf1102e0af7c04"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/h12_signature_internal.go.current.raw",
+      "mode": "100644",
+      "bytes": 2505,
+      "SHA256": "f9e3e808d8951c2da6fee4b45364f64bb5c909a33a90c3a6074c99b8cb6e4def"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/h12_signature_test.go.current.raw",
+      "mode": "100644",
+      "bytes": 12939,
+      "SHA256": "94f9bd56deaa371125ceba49f5d7a21d30a4bc34575fed4747f693b51d1ce020"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/local-format-diff-receipt.json",
+      "mode": "100644",
+      "bytes": 1862,
+      "SHA256": "04d7811e8753d377fc6879e67b4dccb69ccdaf9fafd8a9157f39e1f89cd77475"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/real-source-dependency-input-plan.json",
+      "mode": "100644",
+      "bytes": 93154,
+      "SHA256": "7438d3c56e06a932c2ef2242d8839963a30d15f47e4ac6b93d88b9ef87171491"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/root-isolated-test-proposal.json",
+      "mode": "100644",
+      "bytes": 4207,
+      "SHA256": "16db973e2e830b66d988809b92fb8967d0ae77b97334d72e108397ecfae7fb14"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/source_gate_test.go.current.raw",
+      "mode": "100644",
+      "bytes": 25737,
+      "SHA256": "0ad2989b6f36224352516e17f278b957cc25077f657560975e0ebcb063ff9208"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/source_gate_test.go.preimage.raw",
+      "mode": "100644",
+      "bytes": 23505,
+      "SHA256": "10c0229040b40d2dd0653979b4761da4e35baab5d519b8d52dbe368928c0c780"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/start-context.json",
+      "mode": "100644",
+      "bytes": 8712,
+      "SHA256": "cbdfd2425d74440f8a15f11339c6aa3be6874e1e4e0d571cff7f85384ce10e9a"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/static-patch-integrity.json",
+      "mode": "100644",
+      "bytes": 637,
+      "SHA256": "8b5c04a4b05b76eacfb505e5e87eed604d1b726ede31c96b7c7e4c1f80ec1a22"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/static-source-inspection.json",
+      "mode": "100644",
+      "bytes": 1005,
+      "SHA256": "5c5c47018d36368cb4936d6f7c09930f6fce658969e661d295a5137803eb0878"
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/wip-source-manifest.json",
+      "mode": "100644",
+      "bytes": 4090,
+      "SHA256": "9742f00f3f3644ce5920d03e2ad80a0ee853f2592947f19b81f3ab7359779263"
+    },
+    {
+      "path": "docs/vault/30_Development/History/2026-11-07_FLEET5_K2_H12_Signature_Code_R1_Codex.md",
+      "mode": "100644",
+      "bytes": 6807,
+      "SHA256": "f7a470c1d5dc7675da5de45c28f80f265604ae61694d06fd7dd2d47a1a8ab693"
+    },
+    {
+      "path": "services/node-agent/internal/migrationcontext/effect_gate_test.go",
+      "mode": "100644",
+      "bytes": 27623,
+      "SHA256": "eaf6ae9a9bb40a68fa92be4a3f2f42b05b1d69218f60497d747b78586fb59fd5"
+    },
+    {
+      "path": "services/node-agent/internal/migrationcontext/h12_signature_internal.go",
+      "mode": "100644",
+      "bytes": 2505,
+      "SHA256": "f9e3e808d8951c2da6fee4b45364f64bb5c909a33a90c3a6074c99b8cb6e4def"
+    },
+    {
+      "path": "services/node-agent/internal/migrationcontext/h12_signature_test.go",
+      "mode": "100644",
+      "bytes": 12939,
+      "SHA256": "94f9bd56deaa371125ceba49f5d7a21d30a4bc34575fed4747f693b51d1ce020"
+    },
+    {
+      "path": "services/node-agent/internal/migrationcontext/source_gate_test.go",
+      "mode": "100644",
+      "bytes": 25737,
+      "SHA256": "0ad2989b6f36224352516e17f278b957cc25077f657560975e0ebcb063ff9208"
+    }
+  ],
+  "selfExcluded": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/packet-manifest.json",
+  "sourcePolicy": "ONLY four exact source/test paths overlay real Git0bf852; the rest are own unique History/Evidence; no stubs/archive replacement",
+  "execution": "Root-only actual isolated Go phase proposed; no author Go/crypto/test/commit/push/CI",
+  "wholeFleet": "INCOMPLETE"
+}

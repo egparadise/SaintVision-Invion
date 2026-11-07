@@ -1,0 +1,42 @@
+{
+  "classification": "TEXT_HASH_SYNTAX_FORMAT_ONLY_NOT_GO_TEST",
+  "atKST": "2026-11-07T10:19:28.028119+09:00",
+  "RootGrant": "msg_0abc80a909cd",
+  "commands": [
+    {
+      "argv": [
+        "C:/Program Files/Go/bin/gofmt.exe",
+        "-l",
+        "services/node-agent/internal/migrationcontext/effect_gate_test.go"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    }
+  ],
+  "onlyChangedWIP01Source": "services/node-agent/internal/migrationcontext/effect_gate_test.go",
+  "scope": "Only newly added H12 TypeName block; prefix/suffix exact",
+  "otherThreeCurrentHashesUnchanged": {
+    "services/node-agent/internal/migrationcontext/source_gate_test.go": "0ad2989b6f36224352516e17f278b957cc25077f657560975e0ebcb063ff9208",
+    "services/node-agent/internal/migrationcontext/h12_signature_internal.go": "f9e3e808d8951c2da6fee4b45364f64bb5c909a33a90c3a6074c99b8cb6e4def",
+    "services/node-agent/internal/migrationcontext/h12_signature_test.go": "94f9bd56deaa371125ceba49f5d7a21d30a4bc34575fed4747f693b51d1ce020"
+  },
+  "globalPureMapByteExact": true,
+  "originalPLRFileByteExactToBase": {
+    "path": "services/node-agent/internal/migrationcontext/pl_r1a_test.go",
+    "SHA256": "9ea789e33204d3f54612223f053602815dd1493d26e1e888a44a679456a3d292"
+  },
+  "sourceGuardFunctionExceptionAndProbes": "Byte-unchanged WIP01 outside scoped type block",
+  "WIP02CompileCryptoTests": "NOT_RUN",
+  "DocsCommitPushCI": "NOT_RUN_NOT_GRANTED"
+}

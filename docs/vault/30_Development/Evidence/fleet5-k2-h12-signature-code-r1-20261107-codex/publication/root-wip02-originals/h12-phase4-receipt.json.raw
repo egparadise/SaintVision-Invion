@@ -1,0 +1,56 @@
+{
+  "phase": 4,
+  "id": "existing-public-refusal-effect-source-census-plr",
+  "startedAtKST": "2026-11-07T10:23:25+09:00",
+  "endedAtKST": "2026-11-07T10:25:28+09:00",
+  "elapsedSeconds": 122.982,
+  "testCommand": [
+    "go",
+    "test",
+    "-p=1",
+    "-count=1",
+    "-json",
+    "-run",
+    "^(TestNullPortsAndOpaqueBoundary|TestWellFormedUnregisteredProvidersNeverAuthenticate|TestCopyRejectsCallbacksAndBoundsBeforeEncoding|TestResolvedObjectEffectBoundary|TestRepositoryBoundaryAndZeroEffects|TestWholePackageFullUnderlyingCensus|TestReviewR1CompileValidEffectAndAliasMutants|TestPLR1AActualBuildsThenBoundaryRefuses|TestPLR1BCompiledWriteTargetsAndReasons|TestPLR1CCompiledPointerConversionsAndControls|TestPLR1DCompiledTargetPointerTermsAndControls)$",
+    "./internal/migrationcontext"
+  ],
+  "workingDirectory": "/job/repo/services/node-agent",
+  "image": "golang@sha256:8d48e12ec56735e9358640898b9d9b9fcca110612ed8a5567438c0a1baa24e66",
+  "containerID": "cadb65add3fe15a9628d8b3a68c2137c1552d671ce39ed5382b23d5b6adf59a4",
+  "directExit": 0,
+  "OOMKilled": false,
+  "stateError": "",
+  "cgroupMemoryPeakBytes": 679493632,
+  "memoryBytes": 2147483648,
+  "memorySwapTotalBytes": 2147483648,
+  "extraSwapBytes": 0,
+  "nanoCPUs": 2000000000,
+  "pidsLimit": 128,
+  "nonrootUser": "1000:1000",
+  "network": "none",
+  "readOnlyRoot": true,
+  "onlyOwnJobBind": true,
+  "sourceBeforeAfterUnchanged": true,
+  "sourceFiles": 373,
+  "topLevelPassed": 11,
+  "subtestsPassed": 129,
+  "failEvents": [],
+  "skipEvents": [],
+  "JSONParseErrors": [],
+  "lastJSONAction": "pass",
+  "logs": {
+    "h12-phase4.stdout": {
+      "bytes": 263068,
+      "SHA256": "11384d1f054796467f42bf3b094719e9ffbf9505c4a9c0b63fda4b1e5fb4cd26"
+    },
+    "h12-phase4.stderr": {
+      "bytes": 0,
+      "SHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "h12-phase4-container.log": {
+      "bytes": 0,
+      "SHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  },
+  "ownExitedContainerRemoved": true
+}

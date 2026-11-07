@@ -1,0 +1,23 @@
+diff --git a/services/node-agent/internal/migrationcontext/effect_gate_test.go b/services/node-agent/internal/migrationcontext/effect_gate_test.go
+index 19f2673c2fa4634d79616175080b983a30641772..e5ccd0d2a7da672d8947d4f02cb33e6c0bdc7ce3 100644
+--- a/services/node-agent/internal/migrationcontext/effect_gate_test.go
++++ b/services/node-agent/internal/migrationcontext/effect_gate_test.go
+@@ -181,14 +181,13 @@
+ 		key := objectID(obj)
+ 		pos := checked.fset.PositionFor(id.Pos(), false)
+ 		file := filepath.ToSlash(pos.Filename)
+-		if typ, ok := obj.(*types.TypeName); ok && typ.Pkg() != nil && typ.Pkg().Path() == "crypto/ed25519" {
++		// This new type restriction belongs only to the new H12 source. Other
++		// source keeps its pre-existing DATA/pointee/conversion rules and limits.
++		if typ, ok := obj.(*types.TypeName); ok && file == h12SignatureSource && typ.Pkg() != nil && typ.Pkg().Path() == "crypto/ed25519" {
+ 			sel, selector := parents[id].(*ast.SelectorExpr)
+ 			assertion, asserted := parents[sel].(*ast.TypeAssertExpr)
+ 			dataAssertion := selector && sel.Sel == id && asserted && assertion.Type == sel
+-			// Preserve the pre-existing reviewed policy.go public-key assertion.
+-			oldData := file == "policy.go" && owner(id) == "checkMemberBindings"
+-			newData := file == h12SignatureSource && owner(id) == "h12CheckRegistrySignature"
+-			if key != "crypto/ed25519.PublicKey" || !dataAssertion || !(oldData || newData) {
++			if key != "crypto/ed25519.PublicKey" || !dataAssertion || owner(id) != "h12CheckRegistrySignature" {
+ 				return allowed, fmt.Errorf("h12 crypto type scope forbidden: %s at %s", key, file)
+ 			}
+ 		}

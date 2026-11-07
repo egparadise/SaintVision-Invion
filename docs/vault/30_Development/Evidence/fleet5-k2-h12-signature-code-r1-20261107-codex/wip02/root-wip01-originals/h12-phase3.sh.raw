@@ -1,0 +1,7 @@
+#!/bin/bash
+set +e
+go test -p=1 -count=1 -json -run '^TestP02Internal' ./internal/migrationcontext > /job/h12-phase3.stdout 2> /job/h12-phase3.stderr
+rc=$?
+cat /sys/fs/cgroup/memory.peak > /job/h12-phase3-memory-peak.bytes 2>/dev/null
+printf "%s\n" "$rc" > /job/h12-phase3-exit.txt
+exit "$rc"

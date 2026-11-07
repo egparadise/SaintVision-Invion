@@ -1,0 +1,114 @@
+{
+  "docID": "FLEET5-K2-H12-SIGNATURE-CODE-R1-20261107-CODEX",
+  "version": "1.0.0",
+  "atKST": "2026-11-07T09:36:53.563894+09:00",
+  "task": "task_a95ef3d8ccce",
+  "dispatch": "ctx_ed23b4a777d0",
+  "grant": "msg_7461bcdf99a4",
+  "owner": "Codex",
+  "reviewer": "Actual Claude future CODE review via Root pending",
+  "base": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed",
+  "branch": "agent/codex/fleet5-k2-h12-signature-code-r1-20261107",
+  "canonicalRootHEAD": "c23ae5d19773f627b796f860200ba6e6079d62e7",
+  "boards": [
+    {
+      "path": "docs/vault/00_Index/\uc804\uccb4 \uac1c\ubc1c \uc9c4\ud589 \ud604\ud669.md",
+      "SHA256": "ab6c0bf30ca7abcdef2626c76102211cf97448e7fce535b6a141a30ab437d695",
+      "metadata": "doc_id: \"INDEX-PROGRESS-001\"\r\ntitle: \"\uc804\uccb4 \uac1c\ubc1c \uc9c4\ud589 \ud604\ud669\"\r\nversion: \"1.0.493\"\r\nstatus: \"review\"\r\nauthor: \"Codex\"\r\nupdated: \"2026-11-07T09:13:21+09:00\"\r\nsource_of_truth: \"Git\"\r\nlatest_codex_card: \"Bmodeactuale75bconditionalKEEP19/LowL1C1C2->operationguardWIPdb48TESTSNOTRUN; H12R20bf8actualreviewctx2e3PENDING; actualNULLHOLD/fleetincomplete\""
+    },
+    {
+      "path": "docs/vault/30_Development/Agent\ubcc4 \uc791\uc5c5/Codex \uc791\uc5c5 \ud604\ud669.md",
+      "SHA256": "b125aa026bd782169feb24b297d5724e5dd164a384ebc29a6b57d5efff9830c6",
+      "metadata": "doc_id: \"WORKBOARD-CODEX-001\"\r\ntitle: \"Codex \uc791\uc5c5 \ud604\ud669\"\r\nversion: \"1.0.454\"\r\nstatus: \"review\"\r\nauthor: \"Codex\"\r\nupdated: \"2026-11-07T09:13:21+09:00\"\r\nsource_of_truth: \"Git\"\r\nactive_card: \"FLEET5 continued supervision with PORTAL-REFRESH-FLEET-20261106\"\r\nactive_card_status: \"Bmodeactuale75bconditionalKEEP19/LowL1C1C2->operationguardWIPdb48TESTSNOTRUN; H12R20bf8actualreviewctx2e3PENDING; actualNULLHOLD/fleetincomplete\"\r\nactive_card_next: \"B Codex exactonceguard+newunit+staticL1C1/C2 WIPpacket ASTonly; Root boundedisolatedPythonverification on frozenbytes before publication; Claude H12R2actualdeltaverdict; no runtime/fullBgrant\""
+    }
+  ],
+  "acceptedDesignReview": {
+    "source": "381fbbc816cdf6440b827e43dc0099064170d178",
+    "verdict": "CONTRACT_DESIGN_ACCEPT_M1_L1_L2_CLOSED_KEEP_ACTUAL_HOLD",
+    "staticResultSHA256": "d07ed9b66ccbd3c08e513447127792f3d0a0a4eeb6c3f942296b28da6c776ac9",
+    "Docs": 42317786398,
+    "job": 128234602871,
+    "files": [
+      {
+        "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-r2-0bf8-review-20261107-claude/.gitattributes",
+        "OID": "bb2789ad98e51258a73e184a7a912ab02c6a83c0",
+        "SHA256": "96a83569c84cfe3f57b7efe3dc61c249548d0fca4fed0e538b3587cdc97c95c1",
+        "bytes": 21
+      },
+      {
+        "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-r2-0bf8-review-20261107-claude/commands.json",
+        "OID": "69ca60f1344f2ae39e145d12d64d83144c1db52d",
+        "SHA256": "50e351ff7a4deff00dba5d4681c7490ecc5e75d8942c774021f916859a71390d",
+        "bytes": 3548
+      },
+      {
+        "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-r2-0bf8-review-20261107-claude/local-doc-gates.txt",
+        "OID": "7008457d3854275af1811eec4d41d2731b4c4ac0",
+        "SHA256": "bfbb74d4b81b1d49c53baf06fcb0f531994383da1bc8c0432bc3fc27a5311571",
+        "bytes": 4498
+      },
+      {
+        "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-r2-0bf8-review-20261107-claude/review.json",
+        "OID": "2dc9428256fd341822fcbbd6d2173808c109e9cb",
+        "SHA256": "bd81125e82c76969f79a8261e5cb31a0944852366dfc6e165fa47f4ba315005b",
+        "bytes": 14987
+      },
+      {
+        "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-r2-0bf8-review-20261107-claude/reviewer-h12r2-static-result.json",
+        "OID": "8abe2ba872bf464101d04a719f3b25ea33d6ba1a",
+        "SHA256": "d07ed9b66ccbd3c08e513447127792f3d0a0a4eeb6c3f942296b28da6c776ac9",
+        "bytes": 6627
+      },
+      {
+        "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-r2-0bf8-review-20261107-claude/reviewer-h12r2-static.log.txt",
+        "OID": "c551c9651e5a780e269de22c300339cde8068f52",
+        "SHA256": "80595be23db3689d0b7a46c256f25ecadc9d6cb0cf830eca4809321ff4be5fae",
+        "bytes": 6896
+      },
+      {
+        "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-r2-0bf8-review-20261107-claude/reviewer_gate_driver.py.txt",
+        "OID": "c8005864f91f62944448dd2a04551f170c4baba6",
+        "SHA256": "31e408a9800e14d44597463a6f2f274c25620fcf4935fcd3495e6201c762c174",
+        "bytes": 2741
+      },
+      {
+        "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-r2-0bf8-review-20261107-claude/reviewer_h12r2_static_check.py.txt",
+        "OID": "4fd6bb6b168438d07da30c84b6ee40a72fa55232",
+        "SHA256": "e2453041e83072e7dec8c824f0d45f75df1a7154679e4eb82a92ed87e0bf53e4",
+        "bytes": 11521
+      },
+      {
+        "path": "docs/vault/30_Development/History/2026-11-07_FLEET5_K2_H12_R2_0bf8_\ub378\ud0c0\uacc4\uc57d\uac80\ud1a0_Claude.md",
+        "OID": "a46f6bbb09834aa075764d8bd428ce43d7993f64",
+        "SHA256": "4ea7fa57af25b50ff92ad694c2830f57f0fb43bd05701454f462d08809a173be",
+        "bytes": 9718
+      }
+    ]
+  },
+  "N4": "Root resolves deterministic nonsecret test seed ONLY in h12_signature_test.go; exact path+object direct calls; math-only bool; no key-quality claim",
+  "N10N14": [
+    "N10 currentRegistrationSubject (H4_STATUS, R1 text unchanged) still enumerates 'delivery/capsule/grant/registry/record' only. The normative G08 row and the 11-entry currentStatusSubjects list are complete, so a later code grant should cite currentStatusSubjects as the exact G08 enumeration. It should also name the independent current-registration authority (H4_STATUS) as the source of RD subject currency, which the contract implies but does not spell out in the RD origin row.",
+    "N11 The finite TCB binding sentence (contract 22-25) and the bootstrapBindingIdentityVersion join name the provisioner/status/clock identities but not the RD capture/delivery issuer identity, which the RD origin, line 80-81 and G08 make G00-authorized. This fails closed: an issuer the mapping does not name cannot authenticate at G04. The later Root binding choice should list it explicitly. The vector has no RD-issuer member parallel to provisionerSPKISHA256; trustBindingVersion plus the full RD subject (issuerIdentity) comparison at G10 cover it.",
+    "N12 For C05 mapped-authority-grant-not-current, the future fixture must keep the de-authorized authority's identity named in the current mapping (so G01/G04 identity authentication passes) and change only its grant currency. Removing the identity from the mapping would causally fail at G01/G04 instead. AUTHORITY_NOT_CURRENT, like REVOKED, is a detail inside G08's STATUS class (row lists STATUS/TIME/EXPIRED).",
+    "N13 C09 names four other exclusive ends. The time block also lets 'any tighter independently authorized bound' apply. The future fixture should keep any such bound, and any RD or authority-grant status expiry, strictly later too, so ticket.expiresAt is the unique minimum.",
+    "N14 Wording only: the G08 row's 'original key interval and whole current interval bounds remain unchanged' reads best as 'the unchanged bounds must hold'; the byte-equal time block governs. 'destinationRegistryGeneration == installed capsule.generation' means an RD must be re-delivered for each new H1 generation; this fails closed and is for the Root binding choice to confirm."
+  ],
+  "recordBoundClarification": "Grant calls existing p02PayloadLimit 2MiB; actual p02PayloadLimit is16MiB and p02EnvelopeLimit is2MiB. Preserve the explicit2MiB record bound and accepted design using p02EnvelopeLimit; never widen to16MiB.",
+  "scope": "Only four allowed source/test paths + unique History/Evidence; freeze unpublished after syntax/format only",
+  "GoCryptoTests": "NOT_RUN_ON_MAIN_PROHIBITED",
+  "commitPushCI": "NOT_GRANTED_BEFORE_ROOT_ACTUAL_TEST_RECEIPT",
+  "actualBindings": "NULL_HOLD",
+  "A01A40": "NOT_RUN",
+  "wholeFleet": "INCOMPLETE",
+  "skills": {
+    "agent-delivery": "1.1.0",
+    "core-reliability": "1.0.0"
+  },
+  "selectedLaterBindingChoices": {
+    "N10": "currentStatusSubjects11 is exact G08 list; H4_STATUS independent current-registration authority supplies RD subject currency",
+    "N11": "Future G00 binding explicitly includes RD capture/delivery issuer alongside provisioner/status/clock identities",
+    "N12": "Keep mapped identity named; change grant currency only for G08 negative fixture",
+    "N13": "All tighter/RD/authority status expiry bounds strictly later than ticket minimum in future C09",
+    "N14": "RD must be re-delivered for EACH new H1 capsule generation; no automatic resign/delivery here"
+  }
+}
