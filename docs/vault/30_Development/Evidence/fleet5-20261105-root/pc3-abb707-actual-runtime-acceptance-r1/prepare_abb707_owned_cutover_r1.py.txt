@@ -1,0 +1,18 @@
+from pathlib import Path
+r=Path(__file__).resolve().parents[1];w=r/'.work';out=w/'cutover_owned_portal3100_to_abb707_r1.ps1';assert not out.exists()
+p=(w/'cutover_owned_portal3100_to_e4e07_r1.ps1').read_text(encoding='utf-8')
+for a,b in [('portal3100-e4e07-','portal3100-abb707-'),('root530-final-verification','root533-final-verification'),('cspe4e07-actual-claude-r3-root-verification','dashboard-abb707-actual-claude-root-verification-r1'),('pc3-frontende4e07-r1','pc3-frontendabb707-r1'),('pc3-e4e07-anonymous-precutover-r1','pc3-abb707-anonymous-precutover-r1'),('portal3100-browser-defect-rollback-r1.json','portal3100-e4e07-cutover-r1.json'),(".work\\uir3-b48-build-artifact-verification.json",".work\\pc3-frontende4e07-r1\\receipt.json"),('crCsp02SourceFindingClosed','dashboardResourceSourceFindingClosed'),('1131d7dbcbf99c7429ad341c7a5ad19f915a5941bac6555c168ddd91c174ea1f','54fb6609646d7f57991b1ee04de0454117e8e71fd525e5e1f87afb6d052483c0'),('6592','64240'),('2026-11-08T01:24:20.6480158+09:00','2026-11-08T04:40:23.4743791+09:00'),('$oldReceipt.NewOwnedRollbackPID','$oldReceipt.NewForwardPID'),('$oldReceipt.StartedAt','$oldReceipt.NewForwardStartedAt'),('127.0.0.1:3100:127.0.0.1:13101','127.0.0.1:3100:127.0.0.1:13102'),("@('http://127.0.0.1:13101','http://127.0.0.1:3100')","@('http://127.0.0.1:3100')"),('$oldArtifact.builtFileHashes.','$oldArtifact.remote.allDistOriginalHashesExceptPublicAuthConfig.'),('e4e07bfd6b94e57edc64d158e208df01b9319deb','abb7074e3da0d547ac81d3da33dce347d5c656af'),('20d9bf8622a0f0624a323b92acaeb33cea91fb9e','29046535c0bb0e2629286c8c678f563080f30a67'),('Start-OwnedForward 13102','Start-OwnedForward 13103'),('Start-OwnedForward 13101','Start-OwnedForward 13102'),('EXACT_E4E07','EXACT_ABB707'),('OLD_B48_RECOVERY_RESTORED_AFTER_E4E07_CUTOVER_FAILURE','PREVIOUS_E4E07_RECOVERY_RESTORED_AFTER_ABB707_CUTOVER_FAILURE')]:
+    assert a in p,a;p=p.replace(a,b)
+a="$response.StatusCode -ne 200 -or $response.Headers['Content-Security-Policy'] -or (Get-BytesHash"
+b="$response.StatusCode -ne 200 -or -not $response.Headers['Content-Security-Policy'] -or (Get-BytesHash"
+assert a in p;p=p.replace(a,b)
+a=" $health=Read-HTTP 'http://127.0.0.1:3100/healthz'"
+b=""" $gateway=Read-HTTP 'http://127.0.0.1:3100/gateway-healthz'
+ if ($gateway.StatusCode -ne 200 -or $gateway.Headers['Content-Type'] -notlike 'application/json*' -or ($gateway.Content | ConvertFrom-Json).status -ne 'ok' -or $gateway.Headers['Cache-Control'] -notlike '*no-store*') { throw 'Genuine CP gateway health failed' }
+ $result.GatewayHealthHTTP=200
+ $result.GatewayJSONStatus='ok'
+ $result.PortalLivenessSeparate=$true
+"""+a
+assert a in p;p=p.replace(a,b)
+p+='\nexit 0\n'
+out.write_text(p,encoding='utf-8');print(str(out),flush=True)

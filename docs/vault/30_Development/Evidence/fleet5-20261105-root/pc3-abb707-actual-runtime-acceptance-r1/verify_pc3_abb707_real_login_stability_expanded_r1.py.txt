@@ -1,0 +1,61 @@
+"""Real abb707 UI, real approved administrator, bounded frame/mutation proof on PC3."""
+import ast,getpass,hashlib,json,shlex,subprocess
+from pathlib import Path
+r=Path(__file__).resolve().parents[1];w=r/'.work';out=w/'pc3-abb707-real-login-stability-r1';assert not out.exists();out.mkdir()
+cut=json.loads((w/'portal3100-abb707-cutover-r1.json').read_text(encoding='utf-8-sig'));assert cut['Status']=='EXACT_ABB707_PC3_PORTAL_MAIN3100_CUTOVER_HTTP_VERIFIED' and cut['NewForwardPID']==57232 and cut['NewForwardStartedAt']=='2026-11-08T05:57:43.6682041+09:00' and len(cut['HTTPArtifactFiles'])==12 and cut['GatewayJSONStatus']=='ok'
+account=json.loads(Path(r'D:\Project\SaintVisionI-Invion\admin-login-20261106\.work\account-result.json').read_bytes())
+tree=ast.parse((w/'verify_pc3_real_browser_login_observation_r1.py').read_text(encoding='utf-8'))
+remote=next(ast.literal_eval(n.value) for n in tree.body if isinstance(n,ast.Assign) and any(isinstance(t,ast.Name) and t.id=='remote' for t in n.targets))
+for a,b in [('chrome-profile-r1','chrome-profile-abb707-login-r1'),('chrome-r1.stdout.log','chrome-abb707-login-r1.stdout.log'),('chrome-r1.stderr.log','chrome-abb707-login-r1.stderr.log'),('actual-cluster-ui-r1.png','actual-abb707-cluster-ui-r1.png'),('public-browser-r1-receipt.json','public-abb707-browser-r1-receipt.json')]:
+    assert a in remote;remote=remote.replace(a,b)
+remote=remote.replace('responses=[];load_failures=[]','responses=[];load_failures=[];exceptions=[];requests=[]')
+a="responses.append({'origin':u.scheme+'://'+u.netloc,'path':u.path,'status':v['status']})"
+b="responses.append({'origin':u.scheme+'://'+u.netloc,'path':u.path,'status':v['status'],'CSP':next((str(value) for key,value in v.get('headers',{}).items() if key.lower()=='content-security-policy'),None)})"
+assert a in remote;remote=remote.replace(a,b)
+a="  if m.get('method')=='Network.loadingFailed':"
+b="""  if m.get('method')=='Runtime.exceptionThrown':exceptions.append({'text':m['params']['exceptionDetails'].get('text')})
+  if m.get('method')=='Network.requestWillBeSent':
+   v=m['params']['request'];u=urllib.parse.urlsplit(v['url'])
+   if u.hostname in ['127.0.0.1','localhost']:requests.append({'origin':u.scheme+'://'+u.netloc,'path':u.path,'method':v['method']})
+  if m.get('method')=='Network.loadingFailed':"""
+assert a in remote;remote=remote.replace(a,b)
+a=" phase='actual-three-node-visible-stability-window'\n samples=[]"
+frameJS="(()=>{const badges=Array.from(document.querySelectorAll('[data-testid^=node-status-badge-]'));const cards=Array.from(document.querySelectorAll('[data-testid^=node-item-]'));const heartbeat=()=>Object.fromEntries(Array.from(document.querySelectorAll('[data-testid^=node-heartbeat-]')).map(n=>[n.dataset.testid,n.innerText]));const p={start:performance.now(),frames:0,mutations:0,removed:0,frameIssues:[],mutationIssues:[],initialHeartbeats:heartbeat()};window.__svProof=p;const check=(kind)=>{const now=Array.from(document.querySelectorAll('[data-testid^=node-status-badge-]'));const head=document.querySelector('[data-testid=cluster-status-dot]')?.parentElement?.innerText||'';const cpu=document.querySelector('[data-testid=shared-total-cpu] strong')?.innerText||'';const mem=document.querySelector('[data-testid=shared-total-memory] strong')?.innerText||'';const gateway=document.querySelector('[data-testid=gateway-status-dot]')?.parentElement?.innerText||'';const quantities=cards.every(card=>card.querySelector('[data-testid^=node-cpu-] strong')?.innerText==='제공 500m'&&card.querySelector('[data-testid^=node-memory-] strong')?.innerText==='제공 64 MiB');const bad=now.length!==3||!head.includes('3/3')||now.some((n,i)=>n!==badges[i]||!n.innerText.includes('ONLINE'))||cards.some(n=>!n.isConnected)||cpu!=='제공 1500m'||mem!=='제공 192 MiB'||!quantities||!gateway.includes('ms')||!!document.querySelector('[data-testid=cluster-stale-warning]');if(bad&&p[kind+'Issues'].length<30)p[kind+'Issues'].push({ms:performance.now()-p.start,badgeCount:now.length,header:head,cpu,mem,gateway,quantities,sameElements:now.every((n,i)=>n===badges[i])});};const frame=()=>{p.frames++;check('frame');p.raf=requestAnimationFrame(frame);};p.raf=requestAnimationFrame(frame);p.observer=new MutationObserver(records=>{p.mutations++;for(const record of records)for(const removed of record.removedNodes)if([...cards,...badges].some(n=>removed===n||removed.contains(n)))p.removed++;check('mutation');});p.observer.observe(document.querySelector('#root'),{childList:true,subtree:true,characterData:true});return true;})()"
+b=" phase='actual-three-node-visible-stability-window'\n until("+repr("document.querySelector('[data-testid=shared-total-cpu] strong')?.innerText==='제공 1500m' && document.querySelector('[data-testid=shared-total-memory] strong')?.innerText==='제공 192 MiB' && document.querySelector('[data-testid=gateway-status-dot]')?.parentElement?.innerText.includes('ms') && Array.from(document.querySelectorAll('[data-testid^=node-item-]')).length===3")+",25)\n evaluate("+repr(frameJS)+")\n samples=[]"
+assert a in remote;remote=remote.replace(a,b)
+assert 'for n in range(25):' in remote;remote=remote.replace('for n in range(25):','for n in range(60):')
+a=" shot=command('Page.captureScreenshot'"
+b=""" continuous=evaluate("(()=>{const p=window.__svProof;cancelAnimationFrame(p.raf);p.observer.disconnect();return {frames:p.frames,mutations:p.mutations,removedCardsOrBadges:p.removed,elapsedMs:performance.now()-p.start,frameIssues:p.frameIssues,mutationIssues:p.mutationIssues,initialHeartbeats:p.initialHeartbeats,finalHeartbeats:Object.fromEntries(Array.from(document.querySelectorAll('[data-testid^=node-heartbeat-]')).map(n=>[n.dataset.testid,n.innerText]))};})()")
+ assert continuous['frames']>=100 and continuous['elapsedMs']>=30000 and not continuous['frameIssues'] and not continuous['mutationIssues']
+ assert continuous['removedCardsOrBadges']==0 and len(continuous['finalHeartbeats'])==3 and all(continuous['initialHeartbeats'][key]!=value for key,value in continuous['finalHeartbeats'].items())
+ assert not exceptions
+ assert any(x['origin']=='http://127.0.0.1:3100' and x['path']=='/studio' and x['CSP'] and "script-src 'self'" in x['CSP'] and 'unsafe-eval' not in x['CSP'] for x in responses)
+ assert all(x['method']=='GET' for x in requests if x['path'].startswith('/v1/'))
+ o['continuousFrameAndMutationProof']=continuous;o['browserExceptions']=exceptions;o['applicationMutationsSent']=0
+ o['visiblePageText']=evaluate("document.body.innerText.slice(0,18000)")
+ o['visibleNavigationControls']=evaluate("Array.from(document.querySelectorAll('button,a')).map(e=>({tag:e.tagName,text:e.innerText,href:e.getAttribute('href'),testid:e.getAttribute('data-testid')})).filter(e=>e.text).slice(0,80)")
+ o['acceptedSource']='abb7074e3da0d547ac81d3da33dce347d5c656af';o['strictCSPActualDocumentHeaderVerified']=True
+ usage_reads=[x for x in requests if x['path'].endswith('/resource-usage')];assert len(usage_reads)>=18
+ o['actualResourceUsageGETCount']=len(usage_reads);o['liveDateOrWireTimestampModified']=False
+ o['actualCurrentSharedProvided']={'cpuMillis':1500,'memoryBytes':201326592,'perNodeCpuMillis':500,'perNodeMemoryBytes':67108864,'observedNodeCount':3,'physicalFivePCClaim':False}
+ o['actualGatewayHealthyJSONAndVisibleRTT']=True
+
+ shot=command('Page.captureScreenshot'"""
+assert a in remote;remote=remote.replace(a,b)
+remote=remote.replace('stabilitySamples=25,stabilityWindowSeconds=12.5','stabilitySamples=60,stabilityWindowSeconds=30')
+
+oldshot="shot=command('Page.captureScreenshot',{'format':'png','captureBeyondViewport':False})"
+newshot="layout=command('Page.getLayoutMetrics')['cssContentSize'];assert layout['height']<12000;shot=command('Page.captureScreenshot',{'format':'png','captureBeyondViewport':True,'clip':{'x':0,'y':0,'width':layout['width'],'height':layout['height'],'scale':1}})"
+assert oldshot in remote;remote=remote.replace(oldshot,newshot)
+
+(out/'remote-browser-program.py.txt').write_text(remote,encoding='utf-8')
+known=Path(r'D:\Project\SaintVisionI-Invion\fleet5-worker-readiness-20261105\.work\f5-low-closure-26607075f612\known_hosts.f5.pinned');assert hashlib.sha256(known.read_bytes()).hexdigest()=='0dcbf0f4cfc363e4affc30810ad8a9e57bd2c4a31991e2c8285bdae7052ec2d2'
+flags=['-i',r'C:\Users\inviz\.ssh\sv-lan-ed25519','-o','IdentitiesOnly=yes','-o','BatchMode=yes','-o','ConnectTimeout=5','-o','StrictHostKeyChecking=yes','-o','UserKnownHostsFile='+str(known)];host='saintvision-invion3@192.168.45.222'
+password=getpass.getpass('Approved administrator password for actual abb707 PC3 browser (hidden): ')
+wire=json.dumps({'email':account['email'],'project':account['project'],'password':password}).encode();del password
+q=subprocess.run(['ssh','-T',*flags,host,'/home/saintvision-invion3/saintvision-share/ops-fresh-cpu-1efea-r1-20261107/venv/bin/python','-I','-B','-c',shlex.quote(remote)],input=wire,capture_output=True,timeout=170);del wire
+v={'SSHExit':q.returncode,'stderrBytes':len(q.stderr),'remote':json.loads(q.stdout) if q.stdout else None};(out/'receipt.json').write_text(json.dumps(v,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+o=v['remote'];print(json.dumps({'SSHExit':q.returncode,'stderrBytes':len(q.stderr),'status':o.get('status'),'phase':o.get('phase'),'actualAdministratorLogin':o.get('realAdministratorLogin'),'PKCE':o.get('PKCECallbackCompleted'),'visibleNodes':o.get('visibleNodeCount'),'samples':o.get('stabilitySamples'),'continuous':o.get('continuousFrameAndMutationProof'),'ownedBrowserExited':o.get('ownedBrowserExited'),'wholeProgramComplete':False},ensure_ascii=False),flush=True)
+assert q.returncode==0 and o['ownedBrowserExited'] and o['realAdministratorLogin'] and o['strictCSPActualDocumentHeaderVerified']
+q=subprocess.run(['scp','-q',*flags,host+':'+o['screenshotPath'],str(out/'actual-abb707-cluster-ui-r1.png')],capture_output=True,timeout=25);assert q.returncode==0
+assert hashlib.sha256((out/'actual-abb707-cluster-ui-r1.png').read_bytes()).hexdigest()==o['screenshotSHA256']

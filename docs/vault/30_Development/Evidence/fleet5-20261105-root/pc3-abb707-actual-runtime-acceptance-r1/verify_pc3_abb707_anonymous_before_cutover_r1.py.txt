@@ -1,0 +1,6 @@
+from pathlib import Path
+r=Path(__file__).resolve().parents[1]
+p=(r/'.work/verify_pc3_e4e07_anonymous_before_cutover_r1.py').read_text(encoding='utf-8')
+for a,b in [('e4e07bfd6b94e57edc64d158e208df01b9319deb','abb7074e3da0d547ac81d3da33dce347d5c656af'),('e4e07','abb707'),('E4E07','ABB707'),('1131d7dbcbf99c7429ad341c7a5ad19f915a5941bac6555c168ddd91c174ea1f','54fb6609646d7f57991b1ee04de0454117e8e71fd525e5e1f87afb6d052483c0'),('13102','13103'),('index-Dzl2cYez.js','index-DCE-pCmf.js')]:
+    assert a in p,a;p=p.replace(a,b)
+exec(compile(p,str(r/'.work/verify_pc3_abb707_anonymous_expanded_r1.py'),'exec'),{'__file__':str(__file__),'__name__':'__main__'})

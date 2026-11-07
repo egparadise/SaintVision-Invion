@@ -1,0 +1,71 @@
+import base64,datetime,hashlib,json,os,subprocess,sys,time,urllib.request,urllib.parse
+from pathlib import Path
+from websockets.sync.client import connect
+p=json.load(sys.stdin);root=Path('/home/saintvision-invion3/saintvision-share/ops-fresh-cpu-1efea-r1-20261107/browser-real-ui-r1');o={'mainBrowserExecuted':False,'insecureTLSFlagsUsed':False,'ChromeSandboxDisabled':False,'authCredentialsPersistedByDriver':False,'actualRunOrVotesCreated':False,'workspaceReadinessChanged':False,'wholeProgramComplete':False};phase='owned-incognito-browser-launch';proc=None;ws=None;counter=0;responses=[];load_failures=[];exceptions=[]
+def command(method,params=None):
+ global counter
+ counter+=1;ident=counter;ws.send(json.dumps({'id':ident,'method':method,'params':params or {}}));end=time.monotonic()+15
+ while time.monotonic()<end:
+  m=json.loads(ws.recv(timeout=15))
+  if m.get('method')=='Network.responseReceived':
+   v=m['params']['response'];u=urllib.parse.urlsplit(v['url'])
+   if u.hostname in ['127.0.0.1','localhost']:responses.append({'origin':u.scheme+'://'+u.netloc,'path':u.path,'status':v['status'],'CSP':next((str(value) for key,value in v.get('headers',{}).items() if key.lower()=='content-security-policy'),None)})
+  if m.get('method')=='Runtime.exceptionThrown':
+   v=m['params']['exceptionDetails'];exceptions.append({'text':v.get('text'),'description':v.get('exception',{}).get('description','')[:1600]})
+  if m.get('method')=='Network.loadingFailed':load_failures.append({'type':m['params'].get('type'),'error':m['params'].get('errorText')})
+  if m.get('id')==ident:
+   if 'error' in m:raise RuntimeError('CDP command rejected')
+   return m.get('result',{})
+ raise TimeoutError('CDP bounded request')
+def evaluate(expression):
+ v=command('Runtime.evaluate',{'expression':expression,'returnByValue':True,'awaitPromise':True})
+ if 'exceptionDetails' in v:raise RuntimeError('Browser expression failed')
+ return v['result'].get('value')
+def until(expression,timeout=20):
+ end=time.monotonic()+timeout
+ while time.monotonic()<end:
+  v=evaluate(expression)
+  if v:return v
+  time.sleep(.25)
+ raise TimeoutError('Browser phase timed out')
+try:
+ assert os.getuid()==1000;trust=json.loads((root/'public-trust-r2-receipt.json').read_bytes());assert trust['NSSProfileOnlySetupExit']==0
+ profile=root/'chrome-profile-abb707-precutover-r1';assert not profile.exists();env=dict(os.environ);env.update(HOME=str(root/'home'),XDG_CONFIG_HOME=str(root/'home/.config'),XDG_CACHE_HOME=str(root/'home/.cache'));env.pop('DISPLAY',None)
+ args=['/usr/bin/google-chrome','--headless=new','--incognito','--user-data-dir='+str(profile),'--remote-debugging-address=127.0.0.1','--remote-debugging-port=0','--no-first-run','--no-default-browser-check','--disable-background-networking','--disable-component-update','--disable-sync','--disable-extensions','--disable-save-password-bubble','--password-store=basic','--window-size=1638,1000','about:blank']
+ stdout=(root/'chrome-abb707-precutover-r1.stdout.log').open('xb');stderr=(root/'chrome-abb707-precutover-r1.stderr.log').open('xb');proc=subprocess.Popen(args,env=env,stdout=stdout,stderr=stderr);o['ownedChromePID']=proc.pid
+ for attempt in range(60):
+  if (profile/'DevToolsActivePort').is_file():break
+  assert proc.poll() is None;time.sleep(.2)
+ lines=(profile/'DevToolsActivePort').read_text().splitlines();port=int(lines[0]);op=urllib.request.build_opener(urllib.request.ProxyHandler({}))
+ with op.open(f'http://127.0.0.1:{port}/json/list',timeout=3) as q:targets=json.load(q)
+ target=next(t for t in targets if t['type']=='page');ws=connect(target['webSocketDebuggerUrl'],open_timeout=5,max_size=8*1024*1024,proxy=None);command('Page.enable');command('Runtime.enable');command('Network.enable')
+ o['browserVersion']=command('Browser.getVersion')['product']
+ phase='anonymous-runtime-and-network-diagnostics';command('Page.navigate',{'url':'http://127.0.0.1:13103/studio'})
+ for n in range(25):evaluate('document.readyState');time.sleep(.2)
+ body=evaluate("({ready:document.readyState,title:document.title,bodyText:document.body.innerText,html:document.documentElement.outerHTML.slice(0,6000),scripts:Array.from(document.scripts).map(s=>({src:s.src,type:s.type}))})")
+ shot=command('Page.captureScreenshot',{'format':'png','captureBeyondViewport':False});screen=base64.b64decode(shot['data'],validate=True);(root/'abb707-precutover-r1.png').write_bytes(screen)
+ assert '조직 계정으로 로그인' in body['bodyText'] and not exceptions and not load_failures
+ assert any(x['origin']=='http://127.0.0.1:13103' and x['path']=='/studio' and x['status']==200 and x['CSP'] and "script-src 'self'" in x['CSP'] and 'unsafe-eval' not in x['CSP'] for x in responses)
+ assert any(x['path']=='/assets/index-DCE-pCmf.js' and x['status']==200 for x in responses)
+ assert evaluate("document.querySelector('#root').childElementCount")>0
+ assert all(x['status']<400 or (x['path']=='/favicon.svg' and x['status']==404) or (x['path']=='/v1/session' and x['status']==401) for x in responses)
+ o['acceptedSource']='abb7074e3da0d547ac81d3da33dce347d5c656af';o['actualCSPBootVerifiedBeforeMainRouteSwitch']=True
+ o.update(status='ABB707_STRICT_CSP_ACTUAL_PC3_ANONYMOUS_BOOT_VERIFIED',page=body,responses=responses,loadFailures=load_failures,exceptions=exceptions,screenshotSHA256=hashlib.sha256(screen).hexdigest(),passwordOrAuthenticationSubmitted=False)
+except BaseException as e:
+ o.update(status='HOLD_ACTUAL_CHROME_VERIFICATION',phase=phase,errorClass=type(e).__name__,noBlindAuthenticationRetry=True)
+ if ws:
+  try:o['currentPageDiagnostic']=evaluate("({origin:location.origin,path:location.pathname,bodyText:document.body.innerText.slice(0,1800)})")
+  except Exception:pass
+finally:
+ if ws:
+  try:command('Browser.close')
+  except Exception:pass
+  try:ws.close()
+  except Exception:pass
+ if proc:
+  try:proc.wait(timeout=8)
+  except subprocess.TimeoutExpired:proc.terminate();proc.wait(timeout=5)
+  o['ownedBrowserExited']=proc.poll() is not None
+  stdout.close();stderr.close()
+ (root/'abb707-precutover-r1.json').write_text(json.dumps(o,ensure_ascii=False,indent=2)+'\n')
+print(json.dumps(o,ensure_ascii=False));raise SystemExit(0 if o.get('status')=='ABB707_STRICT_CSP_ACTUAL_PC3_ANONYMOUS_BOOT_VERIFIED' else 2)

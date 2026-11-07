@@ -1,0 +1,40 @@
+"""Actual normal-time PC3 login, genuine three-node values and30sec frame/mutation proof."""
+from pathlib import Path
+r=Path(__file__).resolve().parents[1];w=r/'.work'
+p=(w/'verify_pc3_e4e07_real_login_stability_r1.py').read_text(encoding='utf-8')
+for a,b in [('e4e07bfd6b94e57edc64d158e208df01b9319deb','abb7074e3da0d547ac81d3da33dce347d5c656af'),('e4e07','abb707')]:
+    assert a in p;p=p.replace(a,b)
+a="cut=json.loads((w/'portal3100-abb707-cutover-root-reconciled-r1.json').read_bytes());assert cut['actualForward']['PID']==64240 and cut['servedOfficialFilesMatched']==12"
+b="cut=json.loads((w/'portal3100-abb707-cutover-r1.json').read_text(encoding='utf-8-sig'));assert cut['Status']=='EXACT_ABB707_PC3_PORTAL_MAIN3100_CUTOVER_HTTP_VERIFIED' and cut['NewForwardPID']==57232 and cut['NewForwardStartedAt']=='2026-11-08T05:57:43.6682041+09:00' and len(cut['HTTPArtifactFiles'])==12 and cut['GatewayJSONStatus']=='ok'"
+assert a in p;p=p.replace(a,b)
+start=p.index('frameJS=');end=p.index('\nb=" phase=',start)
+frame="""(()=>{const badges=Array.from(document.querySelectorAll('[data-testid^=node-status-badge-]'));const cards=Array.from(document.querySelectorAll('[data-testid^=node-item-]'));const heartbeat=()=>Object.fromEntries(Array.from(document.querySelectorAll('[data-testid^=node-heartbeat-]')).map(n=>[n.dataset.testid,n.innerText]));const p={start:performance.now(),frames:0,mutations:0,removed:0,frameIssues:[],mutationIssues:[],initialHeartbeats:heartbeat()};window.__svProof=p;const check=(kind)=>{const now=Array.from(document.querySelectorAll('[data-testid^=node-status-badge-]'));const head=document.querySelector('[data-testid=cluster-status-dot]')?.parentElement?.innerText||'';const cpu=document.querySelector('[data-testid=shared-total-cpu] strong')?.innerText||'';const mem=document.querySelector('[data-testid=shared-total-memory] strong')?.innerText||'';const gateway=document.querySelector('[data-testid=gateway-status-dot]')?.parentElement?.innerText||'';const quantities=cards.every(card=>card.querySelector('[data-testid^=node-cpu-] strong')?.innerText==='제공 500m'&&card.querySelector('[data-testid^=node-memory-] strong')?.innerText==='제공 64 MiB');const bad=now.length!==3||!head.includes('3/3')||now.some((n,i)=>n!==badges[i]||!n.innerText.includes('ONLINE'))||cards.some(n=>!n.isConnected)||cpu!=='제공 1500m'||mem!=='제공 192 MiB'||!quantities||!gateway.includes('ms')||!!document.querySelector('[data-testid=cluster-stale-warning]');if(bad&&p[kind+'Issues'].length<30)p[kind+'Issues'].push({ms:performance.now()-p.start,badgeCount:now.length,header:head,cpu,mem,gateway,quantities,sameElements:now.every((n,i)=>n===badges[i])});};const frame=()=>{p.frames++;check('frame');p.raf=requestAnimationFrame(frame);};p.raf=requestAnimationFrame(frame);p.observer=new MutationObserver(records=>{p.mutations++;for(const record of records)for(const removed of record.removedNodes)if([...cards,...badges].some(n=>removed===n||removed.contains(n)))p.removed++;check('mutation');});p.observer.observe(document.querySelector('#root'),{childList:true,subtree:true,characterData:true});return true;})()"""
+p=p[:start]+'frameJS='+repr(frame)+p[end:]
+a='b=" phase=\'actual-three-node-visible-stability-window\'\\n evaluate("+repr(frameJS)+")\\n samples=[]"'
+ready="document.querySelector('[data-testid=shared-total-cpu] strong')?.innerText==='제공 1500m' && document.querySelector('[data-testid=shared-total-memory] strong')?.innerText==='제공 192 MiB' && document.querySelector('[data-testid=gateway-status-dot]')?.parentElement?.innerText.includes('ms') && Array.from(document.querySelectorAll('[data-testid^=node-item-]')).length===3"
+b='b=" phase=\'actual-three-node-visible-stability-window\'\\n until("+repr('+repr(ready)+')+",25)\\n evaluate("+repr(frameJS)+")\\n samples=[]"'
+assert a in p;p=p.replace(a,b)
+a="return {frames:p.frames,mutations:p.mutations,elapsedMs:performance.now()-p.start,frameIssues:p.frameIssues,mutationIssues:p.mutationIssues};"
+b="return {frames:p.frames,mutations:p.mutations,removedCardsOrBadges:p.removed,elapsedMs:performance.now()-p.start,frameIssues:p.frameIssues,mutationIssues:p.mutationIssues,initialHeartbeats:p.initialHeartbeats,finalHeartbeats:Object.fromEntries(Array.from(document.querySelectorAll('[data-testid^=node-heartbeat-]')).map(n=>[n.dataset.testid,n.innerText]))};"
+assert a in p;p=p.replace(a,b)
+a=" assert continuous['frames']>=100 and continuous['elapsedMs']>=30000 and not continuous['frameIssues'] and not continuous['mutationIssues']"
+b=a+"\n assert continuous['removedCardsOrBadges']==0 and len(continuous['finalHeartbeats'])==3 and all(continuous['initialHeartbeats'][key]!=value for key,value in continuous['finalHeartbeats'].items())"
+assert a in p;p=p.replace(a,b)
+a=" o['acceptedSource']='abb7074e3da0d547ac81d3da33dce347d5c656af';o['strictCSPActualDocumentHeaderVerified']=True"
+b=a+"""
+ usage_reads=[x for x in requests if x['path'].endswith('/resource-usage')];assert len(usage_reads)>=18
+ o['actualResourceUsageGETCount']=len(usage_reads);o['liveDateOrWireTimestampModified']=False
+ o['actualCurrentSharedProvided']={'cpuMillis':1500,'memoryBytes':201326592,'perNodeCpuMillis':500,'perNodeMemoryBytes':67108864,'observedNodeCount':3,'physicalFivePCClaim':False}
+ o['actualGatewayHealthyJSONAndVisibleRTT']=True
+"""
+assert a in p;p=p.replace(a,b)
+# The original core driver captures a viewport; use a bounded full document for the three real cards.
+anchor="(out/'remote-browser-program.py.txt').write_text(remote,encoding='utf-8')"
+addition="""
+oldshot="shot=command('Page.captureScreenshot',{'format':'png','captureBeyondViewport':False})"
+newshot="layout=command('Page.getLayoutMetrics')['cssContentSize'];assert layout['height']<12000;shot=command('Page.captureScreenshot',{'format':'png','captureBeyondViewport':True,'clip':{'x':0,'y':0,'width':layout['width'],'height':layout['height'],'scale':1}})"
+assert oldshot in remote;remote=remote.replace(oldshot,newshot)
+"""
+assert anchor in p;p=p.replace(anchor,addition+'\n'+anchor)
+(w/'verify_pc3_abb707_real_login_stability_expanded_r1.py.txt').write_text(p,encoding='utf-8')
+exec(compile(p,str(w/'verify_pc3_abb707_real_login_stability_expanded_r1.py.txt'),'exec'),{'__file__':str(__file__),'__name__':'__main__'})

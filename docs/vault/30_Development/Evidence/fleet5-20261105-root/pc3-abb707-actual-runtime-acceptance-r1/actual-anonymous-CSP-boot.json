@@ -1,0 +1,83 @@
+{
+  "SSHExit": 0,
+  "stderrBytes": 191,
+  "remote": {
+    "mainBrowserExecuted": false,
+    "insecureTLSFlagsUsed": false,
+    "ChromeSandboxDisabled": false,
+    "authCredentialsPersistedByDriver": false,
+    "actualRunOrVotesCreated": false,
+    "workspaceReadinessChanged": false,
+    "wholeProgramComplete": false,
+    "ownedChromePID": 685595,
+    "browserVersion": "Chrome/157.0.8103.38",
+    "acceptedSource": "abb7074e3da0d547ac81d3da33dce347d5c656af",
+    "actualCSPBootVerifiedBeforeMainRouteSwitch": true,
+    "status": "ABB707_STRICT_CSP_ACTUAL_PC3_ANONYMOUS_BOOT_VERIFIED",
+    "page": {
+      "ready": "complete",
+      "title": "SaintVision-Invion Portal",
+      "bodyText": "SaintVision 로그인\n\n조직에서 설정한 인증 제공자의 계정으로 로그인하세요.\n\n프로젝트 권한은 서버에서 확인합니다. 새로고침하거나 로그아웃하면 다시 로그인해야 합니다.\n\nredirect_uri의 origin이 현재 웹 애플리케이션과 일치하지 않습니다.\n\n조직 계정으로 로그인",
+      "html": "<html lang=\"ko\" data-theme=\"dark\"><head>\n    <meta charset=\"UTF-8\">\n    <link rel=\"icon\" type=\"image/svg+xml\" href=\"/favicon.svg\">\n    <link rel=\"manifest\" href=\"/manifest.json\">\n    <meta name=\"theme-color\" content=\"#0d1117\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>SaintVision-Invion Portal</title>\n    <script type=\"module\" crossorigin=\"\" src=\"/assets/index-DCE-pCmf.js\"></script>\n    <link rel=\"modulepreload\" crossorigin=\"\" href=\"/assets/vendor-CYSfZuHu.js\">\n    <link rel=\"modulepreload\" crossorigin=\"\" href=\"/assets/query-DtERyQJL.js\">\n    <link rel=\"stylesheet\" crossorigin=\"\" href=\"/assets/index-kKrfL4r3.css\">\n  </head>\n  <body>\n    <div id=\"root\"><section style=\"max-width: 480px; margin: 80px auto; padding: 32px;\"><h1>SaintVision 로그인</h1><p>조직에서 설정한 인증 제공자의 계정으로 로그인하세요.</p><p>프로젝트 권한은 서버에서 확인합니다. 새로고침하거나 로그아웃하면 다시 로그인해야 합니다.</p><p role=\"alert\" data-testid=\"login-error-alert\">redirect_uri의 origin이 현재 웹 애플리케이션과 일치하지 않습니다.</p><button aria-busy=\"false\" style=\"display: inline-flex; align-items: center; justify-content: center; font-weight: 500; border-radius: var(--radius-md); transition: background-color 0.2s, border-color 0.2s, opacity 0.2s; cursor: pointer; opacity: 1; user-select: none; padding: 8px 16px; font-size: 0.875rem; background-color: var(--color-brand-primary-bg, var(--color-brand-primary)); color: var(--color-brand-primary-fg); border: 1px solid transparent;\">조직 계정으로 로그인</button></section></div>\n    <script src=\"/auth-config.js\"></script>\n  \n\n</body></html>",
+      "scripts": [
+        {
+          "src": "http://127.0.0.1:13103/assets/index-DCE-pCmf.js",
+          "type": "module"
+        },
+        {
+          "src": "http://127.0.0.1:13103/auth-config.js",
+          "type": ""
+        }
+      ]
+    },
+    "responses": [
+      {
+        "origin": "http://127.0.0.1:13103",
+        "path": "/studio",
+        "status": 200,
+        "CSP": "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self' data:; connect-src 'self' https://127.0.0.1:8443; frame-ancestors 'none'; object-src 'none'; base-uri 'self'; form-action 'self';"
+      },
+      {
+        "origin": "http://127.0.0.1:13103",
+        "path": "/assets/index-kKrfL4r3.css",
+        "status": 200,
+        "CSP": "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self' data:; connect-src 'self' https://127.0.0.1:8443; frame-ancestors 'none'; object-src 'none'; base-uri 'self'; form-action 'self';"
+      },
+      {
+        "origin": "http://127.0.0.1:13103",
+        "path": "/assets/query-DtERyQJL.js",
+        "status": 200,
+        "CSP": "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self' data:; connect-src 'self' https://127.0.0.1:8443; frame-ancestors 'none'; object-src 'none'; base-uri 'self'; form-action 'self';"
+      },
+      {
+        "origin": "http://127.0.0.1:13103",
+        "path": "/auth-config.js",
+        "status": 200,
+        "CSP": "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self' data:; connect-src 'self' https://127.0.0.1:8443; frame-ancestors 'none'; object-src 'none'; base-uri 'self'; form-action 'self';"
+      },
+      {
+        "origin": "http://127.0.0.1:13103",
+        "path": "/assets/vendor-CYSfZuHu.js",
+        "status": 200,
+        "CSP": "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self' data:; connect-src 'self' https://127.0.0.1:8443; frame-ancestors 'none'; object-src 'none'; base-uri 'self'; form-action 'self';"
+      },
+      {
+        "origin": "http://127.0.0.1:13103",
+        "path": "/assets/index-DCE-pCmf.js",
+        "status": 200,
+        "CSP": "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self' data:; connect-src 'self' https://127.0.0.1:8443; frame-ancestors 'none'; object-src 'none'; base-uri 'self'; form-action 'self';"
+      },
+      {
+        "origin": "http://127.0.0.1:13103",
+        "path": "/favicon.svg",
+        "status": 404,
+        "CSP": "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self' data:; connect-src 'self' https://127.0.0.1:8443; frame-ancestors 'none'; object-src 'none'; base-uri 'self'; form-action 'self';"
+      }
+    ],
+    "loadFailures": [],
+    "exceptions": [],
+    "screenshotSHA256": "9fb6d3d5aca2d1385b4646639795de1ccab2234cc14adfc010c8601232050cbf",
+    "passwordOrAuthenticationSubmitted": false,
+    "ownedBrowserExited": true
+  }
+}

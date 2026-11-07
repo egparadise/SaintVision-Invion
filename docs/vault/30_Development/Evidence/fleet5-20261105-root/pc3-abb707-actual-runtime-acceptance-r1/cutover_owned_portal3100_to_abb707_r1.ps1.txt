@@ -1,0 +1,110 @@
+$ErrorActionPreference='Stop'
+$taskRoot='D:\Project\SaintVisionI-Invion\fleet-five-orchestration-20261105'
+$receipt=Join-Path $taskRoot '.work\portal3100-abb707-cutover-r1.json'
+$intent=Join-Path $taskRoot '.work\portal3100-abb707-cutover-intent-r1.json'
+if ((Test-Path -LiteralPath $receipt) -or (Test-Path -LiteralPath $intent)) { throw 'Cutover already attempted; reconcile exact owned state first' }
+$seal=Get-Content -LiteralPath (Join-Path $taskRoot '.work\root533-final-verification.json') -Raw -Encoding UTF8 | ConvertFrom-Json
+$review=Get-Content -LiteralPath (Join-Path $taskRoot '.work\dashboard-abb707-actual-claude-root-verification-r1\root-verification.json') -Raw -Encoding UTF8 | ConvertFrom-Json
+$stage=Get-Content -LiteralPath (Join-Path $taskRoot '.work\pc3-frontendabb707-r1\receipt.json') -Raw -Encoding UTF8 | ConvertFrom-Json
+$browser=Get-Content -LiteralPath (Join-Path $taskRoot '.work\pc3-abb707-anonymous-precutover-r1\receipt.json') -Raw -Encoding UTF8 | ConvertFrom-Json
+$oldReceipt=Get-Content -LiteralPath (Join-Path $taskRoot '.work\portal3100-e4e07-cutover-r1.json') -Raw -Encoding UTF8 | ConvertFrom-Json
+$oldArtifact=Get-Content -LiteralPath (Join-Path $taskRoot '.work\pc3-frontende4e07-r1\receipt.json') -Raw -Encoding UTF8 | ConvertFrom-Json
+if (-not $seal.exactHeadCorrelationAllJobsSuccess -or $seal.pending -ne 0 -or $seal.conflicts -ne 0 -or -not $seal.trackedAndUntrackedClean) { throw 'Root530 sealed predeployment gate absent' }
+if ($review.remainingMandatoryCodeDefects -ne 0 -or -not $review.dashboardResourceSourceFindingClosed -or $review.reviewerLifecycle.terminalState -ne 'released') { throw 'Actual independent source acceptance absent' }
+if ($stage.SSHExit -ne 0 -or $stage.remote.containerID -ne '54fb6609646d7f57991b1ee04de0454117e8e71fd525e5e1f87afb6d052483c0') { throw 'Exact new PC3 stage absent' }
+if ($browser.SSHExit -ne 0 -or -not $browser.remote.actualCSPBootVerifiedBeforeMainRouteSwitch -or -not $browser.remote.ownedBrowserExited) { throw 'Real PC3 strict CSP boot gate absent' }
+if ($oldReceipt.NewForwardPID -ne 64240 -or $oldReceipt.NewForwardStartedAt -ne '2026-11-08T04:40:23.4743791+09:00') { throw 'Concrete old route provenance absent' }
+$known='D:\Project\SaintVisionI-Invion\fleet5-worker-readiness-20261105\.work\f5-low-closure-26607075f612\known_hosts.f5.pinned'
+if ((Get-FileHash -LiteralPath $known -Algorithm SHA256).Hash.ToLowerInvariant() -ne '0dcbf0f4cfc363e4affc30810ad8a9e57bd2c4a31991e2c8285bdae7052ec2d2') { throw 'SSH host pin changed' }
+function Get-BytesHash([byte[]]$bytes) {
+ $hasher=[Security.Cryptography.SHA256]::Create()
+ try { return [BitConverter]::ToString($hasher.ComputeHash($bytes)).Replace('-','').ToLowerInvariant() } finally { $hasher.Dispose() }
+}
+function Get-Identity([int]$targetPid) {
+ $p=Get-CimInstance Win32_Process -Filter ('ProcessId='+$targetPid)
+ if (-not $p) { throw 'Expected process missing' }
+ return [ordered]@{PID=$targetPid;Name=$p.Name;CreatedUTC=$p.CreationDate.ToUniversalTime().ToString('o');CommandSHA256=(Get-BytesHash ([Text.Encoding]::UTF8.GetBytes($p.CommandLine)))}
+}
+function Assert-Identity($identity) {
+ $actual=Get-Identity $identity.PID
+ if (($actual | ConvertTo-Json -Compress) -cne ($identity | ConvertTo-Json -Compress)) { throw 'Exact owned process identity changed' }
+}
+function Read-HTTP([string]$url) { return Invoke-WebRequest -UseBasicParsing -Uri $url -TimeoutSec 8 }
+$oldProcess=Get-Process -Id 64240 -ErrorAction Stop
+if ($oldProcess.Name -ne 'ssh' -or $oldProcess.StartTime.ToString('o') -ne $oldReceipt.NewForwardStartedAt) { throw 'Old root SSH identity changed' }
+$oldCim=Get-CimInstance Win32_Process -Filter 'ProcessId=64240'
+if ($oldCim.CommandLine -notlike '*-L 127.0.0.1:3100:127.0.0.1:13102 saintvision-invion3@192.168.45.222*') { throw 'Old owned route target changed' }
+$oldIdentity=Get-Identity 64240
+$protected=@(8624,11396,54896,51072 | ForEach-Object { Get-Identity $_ })
+$listeners=@(Get-NetTCPConnection -State Listen | Where-Object { $_.LocalPort -eq 3100 })
+if ($listeners.Count -ne 1 -or $listeners[0].OwningProcess -ne 64240 -or $listeners[0].LocalAddress -ne '127.0.0.1') { throw 'Main3100 owner changed' }
+foreach ($baseUrl in @('http://127.0.0.1:3100')) {
+ $response=Read-HTTP ($baseUrl+'/index.html')
+ if ($response.StatusCode -ne 200 -or -not $response.Headers['Content-Security-Policy'] -or (Get-BytesHash $response.RawContentStream.ToArray()) -ne $oldArtifact.remote.allDistOriginalHashesExceptPublicAuthConfig.'index.html') { throw 'Concrete prior route/rollback is not ready' }
+}
+$result=[ordered]@{AtKST=[DateTimeOffset]::Now.ToString('o');Source='abb7074e3da0d547ac81d3da33dce347d5c656af';IndependentReview='29046535c0bb0e2629286c8c678f563080f30a67';RootPredeploymentSHA=$seal.SHA;OldOwnedForward=$oldIdentity;OldStopped=$false;NewForwardStarted=$false;RollbackUsed=$false;NoMainApplicationStarted=$true;SchemaDowngraded=$false;ActualRunOrVotesCreated=$false;WholeProgramComplete=$false}
+$result | ConvertTo-Json -Depth 8 | Set-Content -LiteralPath $intent -Encoding UTF8
+function Start-OwnedForward([int]$remotePort,[string]$suffix) {
+ $arguments=@('-N','-T','-i','C:\Users\inviz\.ssh\sv-lan-ed25519','-o','IdentitiesOnly=yes','-o','BatchMode=yes','-o','ConnectTimeout=5','-o','StrictHostKeyChecking=yes','-o',('UserKnownHostsFile='+$known),'-o','ExitOnForwardFailure=yes','-o','ServerAliveInterval=5','-o','ServerAliveCountMax=3','-L',('127.0.0.1:3100:127.0.0.1:'+$remotePort),'saintvision-invion3@192.168.45.222')
+ $started=Start-Process -FilePath 'C:\Windows\System32\OpenSSH\ssh.exe' -ArgumentList $arguments -WindowStyle Hidden -PassThru -RedirectStandardError (Join-Path $taskRoot ('.work\portal3100-abb707-'+$suffix+'.stderr.log')) -RedirectStandardOutput (Join-Path $taskRoot ('.work\portal3100-abb707-'+$suffix+'.stdout.log'))
+ Start-Sleep -Seconds 2
+ $started.Refresh()
+ if ($started.HasExited) { throw 'New root SSH forward exited' }
+ $bound=@(Get-NetTCPConnection -State Listen | Where-Object { $_.LocalPort -eq 3100 })
+ if ($bound.Count -ne 1 -or $bound[0].OwningProcess -ne $started.Id -or $bound[0].LocalAddress -ne '127.0.0.1') { throw 'New owned loopback listener differs' }
+ return $started
+}
+$newProcess=$null
+$newIdentity=$null
+try {
+ Assert-Identity $oldIdentity
+ Stop-Process -Id 64240 -ErrorAction Stop
+ $result.OldStopped=$true
+ $newProcess=Start-OwnedForward 13103 'new-r1'
+ $newIdentity=Get-Identity $newProcess.Id
+ $result.NewOwnedForward=$newIdentity
+ $result.NewForwardStarted=$true
+ $result.NewForwardPID=$newProcess.Id
+ $result.NewForwardStartedAt=$newProcess.StartTime.ToString('o')
+ $files=@()
+ foreach ($property in $stage.remote.allDistOriginalHashesExceptPublicAuthConfig.PSObject.Properties) {
+  $response=Read-HTTP ('http://127.0.0.1:3100/'+$property.Name)
+  $actualHash=Get-BytesHash $response.RawContentStream.ToArray()
+  if ($response.StatusCode -ne 200 -or $actualHash -ne $property.Value) { throw 'Served immutable artifact bytes differ' }
+  if (-not $response.Headers['Content-Security-Policy'] -or $response.Headers['Content-Security-Policy'] -like '*unsafe-eval*') { throw 'Strict CSP missing or weakened' }
+  $files+=[ordered]@{Path=$property.Name;HTTP=200;SHA256=$actualHash;CSPPresent=$true}
+ }
+ $auth=Read-HTTP 'http://127.0.0.1:3100/auth-config.js'
+ if ((Get-BytesHash $auth.RawContentStream.ToArray()) -ne (Get-FileHash -LiteralPath (Join-Path $taskRoot '.work\pc3-frontendabb707-r1\auth-config.js') -Algorithm SHA256).Hash.ToLowerInvariant()) { throw 'Public OIDC config differs' }
+ $gateway=Read-HTTP 'http://127.0.0.1:3100/gateway-healthz'
+ if ($gateway.StatusCode -ne 200 -or $gateway.Headers['Content-Type'] -notlike 'application/json*' -or ($gateway.Content | ConvertFrom-Json).status -ne 'ok' -or $gateway.Headers['Cache-Control'] -notlike '*no-store*') { throw 'Genuine CP gateway health failed' }
+ $result.GatewayHealthHTTP=200
+ $result.GatewayJSONStatus='ok'
+ $result.PortalLivenessSeparate=$true
+ $health=Read-HTTP 'http://127.0.0.1:3100/healthz'
+ if ($health.StatusCode -ne 200) { throw 'New API health proxy failed' }
+ foreach ($identity in $protected) { Assert-Identity $identity }
+ $result.Status='EXACT_ABB707_PC3_PORTAL_MAIN3100_CUTOVER_HTTP_VERIFIED'
+ $result.HTTPArtifactFiles=$files
+ $result.PublicAuthConfigMatched=$true
+ $result.HealthHTTP=200
+ $result.ProtectedDBIdPObserverBridgeAndAPIForwardIdentitiesUnchanged=$true
+ $result.BrowserLoginAndNoBlink='PENDING_REAL_BROWSER'
+} catch {
+ $result.CutoverErrorClass=$_.Exception.GetType().Name
+ if ($result.OldStopped) {
+  if ($newProcess -and $newIdentity) { Assert-Identity $newIdentity; Stop-Process -Id $newProcess.Id -ErrorAction Stop }
+  if (@(Get-NetTCPConnection -State Listen -ErrorAction SilentlyContinue | Where-Object { $_.LocalPort -eq 3100 }).Count -ne 0) { throw 'Unknown owner after cutover failure; refusing to kill' }
+  $rollback=Start-OwnedForward 13102 'rollback-r1'
+  $result.RollbackUsed=$true
+  $result.RollbackForwardPID=$rollback.Id
+  $result.RollbackForwardStartedAt=$rollback.StartTime.ToString('o')
+  $result.Status='PREVIOUS_E4E07_RECOVERY_RESTORED_AFTER_ABB707_CUTOVER_FAILURE'
+ }
+ $result | ConvertTo-Json -Depth 8 | Set-Content -LiteralPath $receipt -Encoding UTF8
+ throw
+}
+$result | ConvertTo-Json -Depth 8 | Set-Content -LiteralPath $receipt -Encoding UTF8
+[pscustomobject]@{Status=$result.Status;NewForwardPID=$result.NewForwardPID;NewForwardStartedAt=$result.NewForwardStartedAt;HTTPArtifactFiles=$result.HTTPArtifactFiles.Count;ProtectedIdentitiesUnchanged=$true;RollbackUsed=$result.RollbackUsed;WholeProgramComplete=$false} | ConvertTo-Json
+
+exit 0

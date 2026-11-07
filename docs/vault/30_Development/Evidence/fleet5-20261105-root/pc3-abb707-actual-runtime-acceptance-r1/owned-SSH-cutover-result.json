@@ -1,0 +1,109 @@
+{
+  "AtKST": "2026-11-08T05:57:43.2074850+09:00",
+  "Source": "abb7074e3da0d547ac81d3da33dce347d5c656af",
+  "IndependentReview": "29046535c0bb0e2629286c8c678f563080f30a67",
+  "RootPredeploymentSHA": "fc1c1b06e719d46ba84457beb4055efcb43f0354",
+  "OldOwnedForward": {
+    "PID": 64240,
+    "Name": "ssh.exe",
+    "CreatedUTC": "2026-11-07T19:40:23.4743790Z",
+    "CommandSHA256": "1b00d8ddd7e060bf11a40d86e322b96eebe8c4f3058cbb35891c751fc8799434"
+  },
+  "OldStopped": true,
+  "NewForwardStarted": true,
+  "RollbackUsed": false,
+  "NoMainApplicationStarted": true,
+  "SchemaDowngraded": false,
+  "ActualRunOrVotesCreated": false,
+  "WholeProgramComplete": false,
+  "NewOwnedForward": {
+    "PID": 57232,
+    "Name": "ssh.exe",
+    "CreatedUTC": "2026-11-07T20:57:43.6682040Z",
+    "CommandSHA256": "a9dca5bf2e2ee44704dfb6d16ac74a58e146d0d800674e58c0cb463d0631c711"
+  },
+  "NewForwardPID": 57232,
+  "NewForwardStartedAt": "2026-11-08T05:57:43.6682041+09:00",
+  "GatewayHealthHTTP": 200,
+  "GatewayJSONStatus": "ok",
+  "PortalLivenessSeparate": true,
+  "Status": "EXACT_ABB707_PC3_PORTAL_MAIN3100_CUTOVER_HTTP_VERIFIED",
+  "HTTPArtifactFiles": [
+    {
+      "Path": "assets/icons-DVYUNEhE.js",
+      "HTTP": 200,
+      "SHA256": "94f3f917fa843a4e312937688a83f400ea3d5617d1f1e1f36d6bc643f78ffa9e",
+      "CSPPresent": true
+    },
+    {
+      "Path": "assets/icons-DVYUNEhE.js.map",
+      "HTTP": 200,
+      "SHA256": "bdc634b37b1574e46b91990a227c6ecf862e6364ec9219a524c88741ee294ea3",
+      "CSPPresent": true
+    },
+    {
+      "Path": "assets/index-DCE-pCmf.js",
+      "HTTP": 200,
+      "SHA256": "178012942127f9840d6cf131505a349b15dc9433b743dedde2efec49fe575590",
+      "CSPPresent": true
+    },
+    {
+      "Path": "assets/index-DCE-pCmf.js.map",
+      "HTTP": 200,
+      "SHA256": "30dd18df68c97cab11fab9090f46235b047421b26406d82f7474aca92f7807bb",
+      "CSPPresent": true
+    },
+    {
+      "Path": "assets/index-kKrfL4r3.css",
+      "HTTP": 200,
+      "SHA256": "66d8552241923e10b189e3b9372f85205bccbf083a5dc19872d001fd91ad0d26",
+      "CSPPresent": true
+    },
+    {
+      "Path": "assets/query-DtERyQJL.js",
+      "HTTP": 200,
+      "SHA256": "3a24ebe459ff24b83ef333288347529de609b65f1c25d5c5b74f2f8b20e2904d",
+      "CSPPresent": true
+    },
+    {
+      "Path": "assets/query-DtERyQJL.js.map",
+      "HTTP": 200,
+      "SHA256": "d584967ed9a938c701324896050b1db23187d2a79840fe5fac55791a2eafc500",
+      "CSPPresent": true
+    },
+    {
+      "Path": "assets/vendor-CYSfZuHu.js",
+      "HTTP": 200,
+      "SHA256": "d967cddbe86b7822415ceafb696d97dea5a491621955cb4127e0f3f96e5497eb",
+      "CSPPresent": true
+    },
+    {
+      "Path": "assets/vendor-CYSfZuHu.js.map",
+      "HTTP": 200,
+      "SHA256": "037070c1858eff839f466f2431a724493a80f81c8f47484c4c6c21698885d15e",
+      "CSPPresent": true
+    },
+    {
+      "Path": "index.html",
+      "HTTP": 200,
+      "SHA256": "a14cd3a68ffc19c78932351cc3fd89824dd5bba4110cdcfd75caf940ddf4e1bc",
+      "CSPPresent": true
+    },
+    {
+      "Path": "manifest.json",
+      "HTTP": 200,
+      "SHA256": "d4c3c0897d7be95321a37babc97bd922618cf8142dd9103faef1efe700fd343a",
+      "CSPPresent": true
+    },
+    {
+      "Path": "sw.js",
+      "HTTP": 200,
+      "SHA256": "5befc07c048a6a49d7f7ec492fe1c04ae8b40283dcc8387ef4e6b2b92c516dcd",
+      "CSPPresent": true
+    }
+  ],
+  "PublicAuthConfigMatched": true,
+  "HealthHTTP": 200,
+  "ProtectedDBIdPObserverBridgeAndAPIForwardIdentitiesUnchanged": true,
+  "BrowserLoginAndNoBlink": "PENDING_REAL_BROWSER"
+}

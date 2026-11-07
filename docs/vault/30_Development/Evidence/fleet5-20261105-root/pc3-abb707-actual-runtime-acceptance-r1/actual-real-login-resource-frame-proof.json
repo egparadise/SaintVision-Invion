@@ -1,0 +1,1586 @@
+{
+  "SSHExit": 0,
+  "stderrBytes": 191,
+  "remote": {
+    "mainBrowserExecuted": false,
+    "insecureTLSFlagsUsed": false,
+    "ChromeSandboxDisabled": false,
+    "authCredentialsPersistedByDriver": false,
+    "actualRunOrVotesCreated": false,
+    "workspaceReadinessChanged": false,
+    "wholeProgramComplete": false,
+    "ownedChromePID": 686341,
+    "browserVersion": "Chrome/157.0.8103.38",
+    "realIdPLoginFormReachedWithoutTLSBypass": true,
+    "continuousFrameAndMutationProof": {
+      "frames": 1811,
+      "mutations": 23,
+      "removedCardsOrBadges": 0,
+      "elapsedMs": 30167,
+      "frameIssues": [],
+      "mutationIssues": [],
+      "initialHeartbeats": {
+        "node-heartbeat-nod_01M6TAWG25JTA3F7J7S1EE4N2W": "마지막 하트비트: 오전 6:00:19",
+        "node-heartbeat-nod_01M6TGQZ8S3DAFS7TYE8TY1PX2": "마지막 하트비트: 오전 6:00:19",
+        "node-heartbeat-nod_01M6TGSXV1J7XWC5D5H7N6EW1D": "마지막 하트비트: 오전 6:00:19"
+      },
+      "finalHeartbeats": {
+        "node-heartbeat-nod_01M6TAWG25JTA3F7J7S1EE4N2W": "마지막 하트비트: 오전 6:00:54",
+        "node-heartbeat-nod_01M6TGQZ8S3DAFS7TYE8TY1PX2": "마지막 하트비트: 오전 6:00:54",
+        "node-heartbeat-nod_01M6TGSXV1J7XWC5D5H7N6EW1D": "마지막 하트비트: 오전 6:00:54"
+      }
+    },
+    "browserExceptions": [],
+    "applicationMutationsSent": 0,
+    "visiblePageText": "SaintVision\nINV Portal\n클러스터 개요\n🚀 개발 Studio (통합)\nNodes 인벤토리\n가상 패브릭 (CX-01)\nWorkspaces (S03)\n개발 에디터 (S06)\n자원 배치 (S05)\n분산 복구 (S07)\n보안·감사 (S08)\n자연어 요청 (S09)\n모델 계보 (S10)\n배포 후보 (S11)\n내부망 배포 (S12)\nRuns 실행\n승인 센터\n웹 터미널\nSSO 로그인\n클러스터: 3/3 Node 가동 중\nGateway: 10ms\n👤 egparadise@gmail.com\n프로젝트별 권한\n로그아웃\n🖥️\nWeb Desktop\n☀️ 라이트 모드\n프로젝트 \n프로젝트 선택\nLAN pilot\n분산 Node 클러스터 개요\n\n관측된 노드 (온라인 3/3대, 활성 실행 0건)\n\n자동 갱신 (5초 주기) · 화면 확인: 오전 6:00:56\n새로고침\n\nexecution-kernel 제공량·예약량·여유량의 관측 스냅샷입니다. 물리 장비 전체 용량·OS 실사용률이 아니며 스케줄러 승인이나 실행 허용을 의미하지 않습니다.\n\n공유 CPU 관측 합계\n\n3/3대 현재 관측 · 누락된 값은 합계에 포함하지 않음\n\n제공 1500m\n\n등록 용량 1500m · 예약 0m · 여유 1500m\n\n공유 메모리 관측 합계\n\n3/3대 현재 관측 · 누락된 값은 합계에 포함하지 않음\n\n제공 192 MiB\n\n등록 용량 192 MiB · 예약 0 B · 여유 192 MiB\n\nnod_01M6TAWG25JTA3F7J7S1EE4N2W\n● ONLINE\n\n마지막 하트비트: 오전 6:00:54\n\n자원 관측 확인 중 · 이전 관측 유지\n\n공유 CPU\n제공 500m · 관측됨\n\n등록 용량 500m · 예약 0m · 여유 500m\n\n서버 관측: 2026-11-07T21:00:46.901885+00:00\n\n공유 메모리\n제공 64 MiB · 관측됨\n\n등록 용량 64 MiB · 예약 0 B · 여유 64 MiB\n\n서버 관측: 2026-11-07T21:00:46.901885+00:00\n\nGPU·스토리지: gpu 미관측 / 미공유 (물리 하드웨어 부재를 뜻하지 않음) · storage 미관측 / 미공유 (물리 하드웨어 부재를 뜻하지 않음)\n\nOS·주소·실사용률: 미관측 · 자원 측정과 실행 허용은 별개\n\nnod_01M6TGQZ8S3DAFS7TYE8TY1PX2\n● ONLINE\n\n마지막 하트비트: 오전 6:00:54\n\n자원 관측 확인 중 · 이전 관측 유지\n\n공유 CPU\n제공 500m · 관측됨\n\n등록 용량 500m · 예약 0m · 여유 500m\n\n서버 관측: 2026-11-07T21:00:46.906428+00:00\n\n공유 메모리\n제공 64 MiB · 관측됨\n\n등록 용량 64 MiB · 예약 0 B · 여유 64 MiB\n\n서버 관측: 2026-11-07T21:00:46.906428+00:00\n\nGPU·스토리지: gpu 미관측 / 미공유 (물리 하드웨어 부재를 뜻하지 않음) · storage 미관측 / 미공유 (물리 하드웨어 부재를 뜻하지 않음)\n\nOS·주소·실사용률: 미관측 · 자원 측정과 실행 허용은 별개\n\nnod_01M6TGSXV1J7XWC5D5H7N6EW1D\n● ONLINE\n\n마지막 하트비트: 오전 6:00:54\n\n자원 관측 확인 중 · 이전 관측 유지\n\n공유 CPU\n제공 500m · 관측됨\n\n등록 용량 500m · 예약 0m · 여유 500m\n\n서버 관측: 2026-11-07T21:00:46.924376+00:00\n\n공유 메모리\n제공 64 MiB · 관측됨\n\n등록 용량 64 MiB · 예약 0 B · 여유 64 MiB\n\n서버 관측: 2026-11-07T21:00:46.924376+00:00\n\nGPU·스토리지: gpu 미관측 / 미공유 (물리 하드웨어 부재를 뜻하지 않음) · storage 미관측 / 미공유 (물리 하드웨어 부재를 뜻하지 않음)\n\nOS·주소·실사용률: 미관측 · 자원 측정과 실행 허용은 별개\n\nSaintVision-Invion Intranet Web Portal · Owned by Gemini (Antigravity) · Strict Governance L0~L3",
+    "visibleNavigationControls": [
+      {
+        "tag": "BUTTON",
+        "text": "클러스터 개요",
+        "href": null,
+        "testid": "header-tab-dashboard"
+      },
+      {
+        "tag": "BUTTON",
+        "text": "🚀 개발 Studio (통합)",
+        "href": null,
+        "testid": "header-tab-studio"
+      },
+      {
+        "tag": "BUTTON",
+        "text": "Nodes 인벤토리",
+        "href": null,
+        "testid": "header-tab-nodes"
+      },
+      {
+        "tag": "BUTTON",
+        "text": "가상 패브릭 (CX-01)",
+        "href": null,
+        "testid": "header-tab-fabric"
+      },
+      {
+        "tag": "BUTTON",
+        "text": "Workspaces (S03)",
+        "href": null,
+        "testid": "header-tab-workspaces"
+      },
+      {
+        "tag": "BUTTON",
+        "text": "개발 에디터 (S06)",
+        "href": null,
+        "testid": "header-tab-editor"
+      },
+      {
+        "tag": "BUTTON",
+        "text": "자원 배치 (S05)",
+        "href": null,
+        "testid": "header-tab-placement"
+      },
+      {
+        "tag": "BUTTON",
+        "text": "분산 복구 (S07)",
+        "href": null,
+        "testid": "header-tab-recovery"
+      },
+      {
+        "tag": "BUTTON",
+        "text": "보안·감사 (S08)",
+        "href": null,
+        "testid": "header-tab-admin"
+      },
+      {
+        "tag": "BUTTON",
+        "text": "자연어 요청 (S09)",
+        "href": null,
+        "testid": "header-tab-agent"
+      },
+      {
+        "tag": "BUTTON",
+        "text": "모델 계보 (S10)",
+        "href": null,
+        "testid": "header-tab-mlops"
+      },
+      {
+        "tag": "BUTTON",
+        "text": "배포 후보 (S11)",
+        "href": null,
+        "testid": "header-tab-release"
+      },
+      {
+        "tag": "BUTTON",
+        "text": "내부망 배포 (S12)",
+        "href": null,
+        "testid": "header-tab-deployment"
+      },
+      {
+        "tag": "BUTTON",
+        "text": "Runs 실행",
+        "href": null,
+        "testid": "header-tab-runs"
+      },
+      {
+        "tag": "BUTTON",
+        "text": "승인 센터",
+        "href": null,
+        "testid": "header-tab-approvals"
+      },
+      {
+        "tag": "BUTTON",
+        "text": "웹 터미널",
+        "href": null,
+        "testid": "header-tab-terminal"
+      },
+      {
+        "tag": "BUTTON",
+        "text": "SSO 로그인",
+        "href": null,
+        "testid": "header-tab-login"
+      },
+      {
+        "tag": "BUTTON",
+        "text": "로그아웃",
+        "href": null,
+        "testid": null
+      },
+      {
+        "tag": "BUTTON",
+        "text": "🖥️\nWeb Desktop",
+        "href": null,
+        "testid": null
+      },
+      {
+        "tag": "BUTTON",
+        "text": "☀️ 라이트 모드",
+        "href": null,
+        "testid": null
+      },
+      {
+        "tag": "BUTTON",
+        "text": "새로고침",
+        "href": null,
+        "testid": "cluster-refresh-btn"
+      }
+    ],
+    "acceptedSource": "abb7074e3da0d547ac81d3da33dce347d5c656af",
+    "strictCSPActualDocumentHeaderVerified": true,
+    "actualResourceUsageGETCount": 21,
+    "liveDateOrWireTimestampModified": false,
+    "actualCurrentSharedProvided": {
+      "cpuMillis": 1500,
+      "memoryBytes": 201326592,
+      "perNodeCpuMillis": 500,
+      "perNodeMemoryBytes": 67108864,
+      "observedNodeCount": 3,
+      "physicalFivePCClaim": false
+    },
+    "actualGatewayHealthyJSONAndVisibleRTT": true,
+    "status": "REAL_CHROME_LOGIN_PKCE_AND_THREE_NODE_UI_STABLE_VERIFIED",
+    "atKST": "2026-11-08T06:00:56+09:00",
+    "origin": "http://127.0.0.1:3100",
+    "realAdministratorLogin": true,
+    "PKCECallbackCompleted": true,
+    "projectId": "prj_01M6NDBHVD2DZQ1Q38DCKN1XE3",
+    "samples": [
+      {
+        "at": 1794085226412,
+        "badgeCount": 3,
+        "header": "클러스터: 3/3 Node 가동 중",
+        "loadingNotice": false,
+        "emptyNotice": false,
+        "selectedProject": "prj_01M6NDBHVD2DZQ1Q38DCKN1XE3",
+        "visibleBadges": [
+          {
+            "id": "node-status-badge-nod_01M6TAWG25JTA3F7J7S1EE4N2W",
+            "text": "● ONLINE"
+          },
+          {
+            "id": "node-status-badge-nod_01M6TGQZ8S3DAFS7TYE8TY1PX2",
+            "text": "● ONLINE"
+          },
+          {
+            "id": "node-status-badge-nod_01M6TGSXV1J7XWC5D5H7N6EW1D",
+            "text": "● ONLINE"
+          }
+        ]
+      },
+      {
+        "at": 1794085226915,
+        "badgeCount": 3,
+        "header": "클러스터: 3/3 Node 가동 중",
+        "loadingNotice": false,
+        "emptyNotice": false,
+        "selectedProject": "prj_01M6NDBHVD2DZQ1Q38DCKN1XE3",
+        "visibleBadges": [
+          {
+            "id": "node-status-badge-nod_01M6TAWG25JTA3F7J7S1EE4N2W",
+            "text": "● ONLINE"
+          },
+          {
+            "id": "node-status-badge-nod_01M6TGQZ8S3DAFS7TYE8TY1PX2",
+            "text": "● ONLINE"
+          },
+          {
+            "id": "node-status-badge-nod_01M6TGSXV1J7XWC5D5H7N6EW1D",
+            "text": "● ONLINE"
+          }
+        ]
+      },
+      {
+        "at": 1794085227418,
+        "badgeCount": 3,
+        "header": "클러스터: 3/3 Node 가동 중",
+        "loadingNotice": false,
+        "emptyNotice": false,
+        "selectedProject": "prj_01M6NDBHVD2DZQ1Q38DCKN1XE3",
+        "visibleBadges": [
+          {
+            "id": "node-status-badge-nod_01M6TAWG25JTA3F7J7S1EE4N2W",
+            "text": "● ONLINE"
+          },
+          {
+            "id": "node-status-badge-nod_01M6TGQZ8S3DAFS7TYE8TY1PX2",
+            "text": "● ONLINE"
+          },
+          {
+            "id": "node-status-badge-nod_01M6TGSXV1J7XWC5D5H7N6EW1D",
+            "text": "● ONLINE"
+          }
+        ]
+      },
+      {
+        "at": 1794085227921,
+        "badgeCount": 3,
+        "header": "클러스터: 3/3 Node 가동 중",
+        "loadingNotice": false,
+        "emptyNotice": false,
+        "selectedProject": "prj_01M6NDBHVD2DZQ1Q38DCKN1XE3",
+        "visibleBadges": [
+          {
+            "id": "node-status-badge-nod_01M6TAWG25JTA3F7J7S1EE4N2W",
+            "text": "● ONLINE"
+          },
+          {
+            "id": "node-status-badge-nod_01M6TGQZ8S3DAFS7TYE8TY1PX2",
+            "text": "● ONLINE"
+          },
+          {
+            "id": "node-status-badge-nod_01M6TGSXV1J7XWC5D5H7N6EW1D",
+            "text": "● ONLINE"
+          }
+        ]
+      },
+      {
+        "at": 1794085228424,
+        "badgeCount": 3,
+        "header": "클러스터: 3/3 Node 가동 중",
+        "loadingNotice": false,
+        "emptyNotice": false,
+        "selectedProject": "prj_01M6NDBHVD2DZQ1Q38DCKN1XE3",
+        "visibleBadges": [
+          {
+            "id": "node-status-badge-nod_01M6TAWG25JTA3F7J7S1EE4N2W",
+            "text": "● ONLINE"
+          },
+          {
+            "id": "node-status-badge-nod_01M6TGQZ8S3DAFS7TYE8TY1PX2",
+            "text": "● ONLINE"
+          },
+          {
+            "id": "node-status-badge-nod_01M6TGSXV1J7XWC5D5H7N6EW1D",
+            "text": "● ONLINE"
+          }
+        ]
+      },
+      {
+        "at": 1794085228927,
+        "badgeCount": 3,
+        "header": "클러스터: 3/3 Node 가동 중",
+        "loadingNotice": false,
+        "emptyNotice": false,
+        "selectedProject": "prj_01M6NDBHVD2DZQ1Q38DCKN1XE3",
+        "visibleBadges": [
+          {
+            "id": "node-status-badge-nod_01M6TAWG25JTA3F7J7S1EE4N2W",
+            "text": "● ONLINE"
+          },
+          {
+            "id": "node-status-badge-nod_01M6TGQZ8S3DAFS7TYE8TY1PX2",
+            "text": "● ONLINE"
+          },
+          {
+            "id": "node-status-badge-nod_01M6TGSXV1J7XWC5D5H7N6EW1D",
+            "text": "● ONLINE"
+          }
+        ]
+      },
+      {
+        "at": 1794085229430,
+        "badgeCount": 3,
+        "header": "클러스터: 3/3 Node 가동 중",
+        "loadingNotice": false,
+        "emptyNotice": false,
+        "selectedProject": "prj_01M6NDBHVD2DZQ1Q38DCKN1XE3",
+        "visibleBadges": [
+          {
+            "id": "node-status-badge-nod_01M6TAWG25JTA3F7J7S1EE4N2W",
+            "text": "● ONLINE"
+          },
+          {
+            "id": "node-status-badge-nod_01M6TGQZ8S3DAFS7TYE8TY1PX2",
+            "text": "● ONLINE"
+          },
+          {
+            "id": "node-status-badge-nod_01M6TGSXV1J7XWC5D5H7N6EW1D",
+            "text": "● ONLINE"
+          }
+        ]
+      },
+      {
+        "at": 1794085229933,
+        "badgeCount": 3,
+        "header": "클러스터: 3/3 Node 가동 중",
+        "loadingNotice": false,
+        "emptyNotice": false,
+        "selectedProject": "prj_01M6NDBHVD2DZQ1Q38DCKN1XE3",
+        "visibleBadges": [
+          {
+            "id": "node-status-badge-nod_01M6TAWG25JTA3F7J7S1EE4N2W",
+            "text": "● ONLINE"
+          },
+          {
+            "id": "node-status-badge-nod_01M6TGQZ8S3DAFS7TYE8TY1PX2",
+            "text": "● ONLINE"
+          },
+          {
+            "id": "node-status-badge-nod_01M6TGSXV1J7XWC5D5H7N6EW1D",
+            "text": "● ONLINE"
+          }
+        ]
+      },
+      {
+        "at": 1794085230437,
+        "badgeCount": 3,
+        "header": "클러스터: 3/3 Node 가동 중",
+        "loadingNotice": false,
+        "emptyNotice": false,
+        "selectedProject": "prj_01M6NDBHVD2DZQ1Q38DCKN1XE3",
+        "visibleBadges": [
+          {
+            "id": "node-status-badge-nod_01M6TAWG25JTA3F7J7S1EE4N2W",
+            "text": "● ONLINE"
+          },
+          {
+            "id": "node-status-badge-nod_01M6TGQZ8S3DAFS7TYE8TY1PX2",
+            "text": "● ONLINE"
+          },
+          {
+            "id": "node-status-badge-nod_01M6TGSXV1J7XWC5D5H7N6EW1D",
+            "text": "● ONLINE"
+          }
+        ]
+      },
+      {
+        "at": 1794085230939,
+        "badgeCount": 3,
+        "header": "클러스터: 3/3 Node 가동 중",
+        "loadingNotice": false,
+        "emptyNotice": false,
+        "selectedProject": "prj_01M6NDBHVD2DZQ1Q38DCKN1XE3",
+        "visibleBadges": [
+          {
+            "id": "node-status-badge-nod_01M6TAWG25JTA3F7J7S1EE4N2W",
+            "text": "● ONLINE"
+          },
+          {
+            "id": "node-status-badge-nod_01M6TGQZ8S3DAFS7TYE8TY1PX2",
+            "text": "● ONLINE"
+          },
+          {
+            "id": "node-status-badge-nod_01M6TGSXV1J7XWC5D5H7N6EW1D",
+            "text": "● ONLINE"
+          }
+        ]
+      },
+      {
+        "at": 1794085231439,
+        "badgeCount": 3,
+        "header": "클러스터: 3/3 Node 가동 중",
+        "loadingNotice": false,
+        "emptyNotice": false,
+        "selectedProject": "prj_01M6NDBHVD2DZQ1Q38DCKN1XE3",
+        "visibleBadges": [
+          {
+            "id": "node-status-badge-nod_01M6TAWG25JTA3F7J7S1EE4N2W",
+            "text": "● ONLINE"
+          },
+          {
+            "id": "node-status-badge-nod_01M6TGQZ8S3DAFS7TYE8TY1PX2",
+            "text": "● ONLINE"
+          },
+          {
+            "id": "node-status-badge-nod_01M6TGSXV1J7XWC5D5H7N6EW1D",
+            "text": "● ONLINE"
+          }
+        ]
+      },
+      {
+        "at": 1794085231940,
+        "badgeCount": 3,
+        "header": "클러스터: 3/3 Node 가동 중",
+        "loadingNotice": false,
+        "emptyNotice": false,
+        "selectedProject": "prj_01M6NDBHVD2DZQ1Q38DCKN1XE3",
+        "visibleBadges": [
+          {
+            "id": "node-status-badge-nod_01M6TAWG25JTA3F7J7S1EE4N2W",
+            "text": "● ONLINE"
+          },
+          {
+            "id": "node-status-badge-nod_01M6TGQZ8S3DAFS7TYE8TY1PX2",
+            "text": "● ONLINE"
+          },
+          {
+            "id": "node-status-badge-nod_01M6TGSXV1J7XWC5D5H7N6EW1D",
+            "text": "● ONLINE"
+          }
+        ]
+      },
+      {
+        "at": 1794085232441,
+        "badgeCount": 3,
+        "header": "클러스터: 3/3 Node 가동 중",
+        "loadingNotice": false,
+        "emptyNotice": false,
+        "selectedProject": "prj_01M6NDBHVD2DZQ1Q38DCKN1XE3",
+        "visibleBadges": [
+          {
+            "id": "node-status-badge-nod_01M6TAWG25JTA3F7J7S1EE4N2W",
+            "text": "● ONLINE"
+          },
+          {
+            "id": "node-status-badge-nod_01M6TGQZ8S3DAFS7TYE8TY1PX2",
+            "text": "● ONLINE"
+          },
+          {
+            "id": "node-status-badge-nod_01M6TGSXV1J7XWC5D5H7N6EW1D",
+            "text": "● ONLINE"
+          }
+        ]
+      },
+      {
+        "at": 1794085232942,
+        "badgeCount": 3,
+        "header": "클러스터: 3/3 Node 가동 중",
+        "loadingNotice": false,
+        "emptyNotice": false,
+        "selectedProject": "prj_01M6NDBHVD2DZQ1Q38DCKN1XE3",
+        "visibleBadges": [
+          {
+            "id": "node-status-badge-nod_01M6TAWG25JTA3F7J7S1EE4N2W",
+            "text": "● ONLINE"
+          },
+          {
+            "id": "node-status-badge-nod_01M6TGQZ8S3DAFS7TYE8TY1PX2",
+            "text": "● ONLINE"
+          },
+          {
+            "id": "node-status-badge-nod_01M6TGSXV1J7XWC5D5H7N6EW1D",
+            "text": "● ONLINE"
+          }
+        ]
+      },
+      {
+        "at": 1794085233443,
+        "badgeCount": 3,
+        "header": "클러스터: 3/3 Node 가동 중",
+        "loadingNotice": false,
+        "emptyNotice": false,
+        "selectedProject": "prj_01M6NDBHVD2DZQ1Q38DCKN1XE3",
+        "visibleBadges": [
+          {
+            "id": "node-status-badge-nod_01M6TAWG25JTA3F7J7S1EE4N2W",
+            "text": "● ONLINE"
+          },
+          {
+            "id": "node-status-badge-nod_01M6TGQZ8S3DAFS7TYE8TY1PX2",
+            "text": "● ONLINE"
+          },
+          {
+            "id": "node-status-badge-nod_01M6TGSXV1J7XWC5D5H7N6EW1D",
+            "text": "● ONLINE"
+          }
+        ]
+      },
+      {
+        "at": 1794085233944,
+        "badgeCount": 3,
+        "header": "클러스터: 3/3 Node 가동 중",
+        "loadingNotice": false,
+        "emptyNotice": false,
+        "selectedProject": "prj_01M6NDBHVD2DZQ1Q38DCKN1XE3",
+        "visibleBadges": [
+          {
+            "id": "node-status-badge-nod_01M6TAWG25JTA3F7J7S1EE4N2W",
+            "text": "● ONLINE"
+          },
+          {
+            "id": "node-status-badge-nod_01M6TGQZ8S3DAFS7TYE8TY1PX2",
+            "text": "● ONLINE"
+          },
+          {
+            "id": "node-status-badge-nod_01M6TGSXV1J7XWC5D5H7N6EW1D",
+            "text": "● ONLINE"
+          }
+        ]
+      },
+      {
+        "at": 1794085234445,
+        "badgeCount": 3,
+        "header": "클러스터: 3/3 Node 가동 중",
+        "loadingNotice": false,
+        "emptyNotice": false,
+        "selectedProject": "prj_01M6NDBHVD2DZQ1Q38DCKN1XE3",
+        "visibleBadges": [
+          {
+            "id": "node-status-badge-nod_01M6TAWG25JTA3F7J7S1EE4N2W",
+            "text": "● ONLINE"
+          },
+          {
+            "id": "node-status-badge-nod_01M6TGQZ8S3DAFS7TYE8TY1PX2",
+            "text": "● ONLINE"
+          },
+          {
+            "id": "node-status-badge-nod_01M6TGSXV1J7XWC5D5H7N6EW1D",
+            "text": "● ONLINE"
+          }
+        ]
+      },
+      {
+        "at": 1794085234947,
+        "badgeCount": 3,
+        "header": "클러스터: 3/3 Node 가동 중",
+        "loadingNotice": false,
+        "emptyNotice": false,
+        "selectedProject": "prj_01M6NDBHVD2DZQ1Q38DCKN1XE3",
+        "visibleBadges": [
+          {
+            "id": "node-status-badge-nod_01M6TAWG25JTA3F7J7S1EE4N2W",
+            "text": "● ONLINE"
+          },
+          {
+            "id": "node-status-badge-nod_01M6TGQZ8S3DAFS7TYE8TY1PX2",
+            "text": "● ONLINE"
+          },
+          {
+            "id": "node-status-badge-nod_01M6TGSXV1J7XWC5D5H7N6EW1D",
+            "text": "● ONLINE"
+          }
+        ]
+      },
+      {
+        "at": 1794085235450,
+        "badgeCount": 3,
+        "header": "클러스터: 3/3 Node 가동 중",
+        "loadingNotice": false,
+        "emptyNotice": false,
+        "selectedProject": "prj_01M6NDBHVD2DZQ1Q38DCKN1XE3",
+        "visibleBadges": [
+          {
+            "id": "node-status-badge-nod_01M6TAWG25JTA3F7J7S1EE4N2W",
+            "text": "● ONLINE"
+          },
+          {
+            "id": "node-status-badge-nod_01M6TGQZ8S3DAFS7TYE8TY1PX2",
+            "text": "● ONLINE"
+          },
+          {
+            "id": "node-status-badge-nod_01M6TGSXV1J7XWC5D5H7N6EW1D",
+            "text": "● ONLINE"
+          }
+        ]
+      },
+      {
+        "at": 1794085235953,
+        "badgeCount": 3,
+        "header": "클러스터: 3/3 Node 가동 중",
+        "loadingNotice": false,
+        "emptyNotice": false,
+        "selectedProject": "prj_01M6NDBHVD2DZQ1Q38DCKN1XE3",
+        "visibleBadges": [
+          {
+            "id": "node-status-badge-nod_01M6TAWG25JTA3F7J7S1EE4N2W",
+            "text": "● ONLINE"
+          },
+          {
+            "id": "node-status-badge-nod_01M6TGQZ8S3DAFS7TYE8TY1PX2",
+            "text": "● ONLINE"
+          },
+          {
+            "id": "node-status-badge-nod_01M6TGSXV1J7XWC5D5H7N6EW1D",
+            "text": "● ONLINE"
+          }
+        ]
+      },
+      {
+        "at": 1794085236456,
+        "badgeCount": 3,
+        "header": "클러스터: 3/3 Node 가동 중",
+        "loadingNotice": false,
+        "emptyNotice": false,
+        "selectedProject": "prj_01M6NDBHVD2DZQ1Q38DCKN1XE3",
+        "visibleBadges": [
+          {
+            "id": "node-status-badge-nod_01M6TAWG25JTA3F7J7S1EE4N2W",
+            "text": "● ONLINE"
+          },
+          {
+            "id": "node-status-badge-nod_01M6TGQZ8S3DAFS7TYE8TY1PX2",
+            "text": "● ONLINE"
+          },
+          {
+            "id": "node-status-badge-nod_01M6TGSXV1J7XWC5D5H7N6EW1D",
+            "text": "● ONLINE"
+          }
+        ]
+      },
+      {
+        "at": 1794085236959,
+        "badgeCount": 3,
+        "header": "클러스터: 3/3 Node 가동 중",
+        "loadingNotice": false,
+        "emptyNotice": false,
+        "selectedProject": "prj_01M6NDBHVD2DZQ1Q38DCKN1XE3",
+        "visibleBadges": [
+          {
+            "id": "node-status-badge-nod_01M6TAWG25JTA3F7J7S1EE4N2W",
+            "text": "● ONLINE"
+          },
+          {
+            "id": "node-status-badge-nod_01M6TGQZ8S3DAFS7TYE8TY1PX2",
+            "text": "● ONLINE"
+          },
+          {
+            "id": "node-status-badge-nod_01M6TGSXV1J7XWC5D5H7N6EW1D",
+            "text": "● ONLINE"
+          }
+        ]
+      },
+      {
+        "at": 1794085237462,
+        "badgeCount": 3,
+        "header": "클러스터: 3/3 Node 가동 중",
+        "loadingNotice": false,
+        "emptyNotice": false,
+        "selectedProject": "prj_01M6NDBHVD2DZQ1Q38DCKN1XE3",
+        "visibleBadges": [
+          {
+            "id": "node-status-badge-nod_01M6TAWG25JTA3F7J7S1EE4N2W",
+            "text": "● ONLINE"
+          },
+          {
+            "id": "node-status-badge-nod_01M6TGQZ8S3DAFS7TYE8TY1PX2",
+            "text": "● ONLINE"
+          },
+          {
+            "id": "node-status-badge-nod_01M6TGSXV1J7XWC5D5H7N6EW1D",
+            "text": "● ONLINE"
+          }
+        ]
+      },
+      {
+        "at": 1794085237965,
+        "badgeCount": 3,
+        "header": "클러스터: 3/3 Node 가동 중",
+        "loadingNotice": false,
+        "emptyNotice": false,
+        "selectedProject": "prj_01M6NDBHVD2DZQ1Q38DCKN1XE3",
+        "visibleBadges": [
+          {
+            "id": "node-status-badge-nod_01M6TAWG25JTA3F7J7S1EE4N2W",
+            "text": "● ONLINE"
+          },
+          {
+            "id": "node-status-badge-nod_01M6TGQZ8S3DAFS7TYE8TY1PX2",
+            "text": "● ONLINE"
+          },
+          {
+            "id": "node-status-badge-nod_01M6TGSXV1J7XWC5D5H7N6EW1D",
+            "text": "● ONLINE"
+          }
+        ]
+      },
+      {
+        "at": 1794085238467,
+        "badgeCount": 3,
+        "header": "클러스터: 3/3 Node 가동 중",
+        "loadingNotice": false,
+        "emptyNotice": false,
+        "selectedProject": "prj_01M6NDBHVD2DZQ1Q38DCKN1XE3",
+        "visibleBadges": [
+          {
+            "id": "node-status-badge-nod_01M6TAWG25JTA3F7J7S1EE4N2W",
+            "text": "● ONLINE"
+          },
+          {
+            "id": "node-status-badge-nod_01M6TGQZ8S3DAFS7TYE8TY1PX2",
+            "text": "● ONLINE"
+          },
+          {
+            "id": "node-status-badge-nod_01M6TGSXV1J7XWC5D5H7N6EW1D",
+            "text": "● ONLINE"
+          }
+        ]
+      },
+      {
+        "at": 1794085238970,
+        "badgeCount": 3,
+        "header": "클러스터: 3/3 Node 가동 중",
+        "loadingNotice": false,
+        "emptyNotice": false,
+        "selectedProject": "prj_01M6NDBHVD2DZQ1Q38DCKN1XE3",
+        "visibleBadges": [
+          {
+            "id": "node-status-badge-nod_01M6TAWG25JTA3F7J7S1EE4N2W",
+            "text": "● ONLINE"
+          },
+          {
+            "id": "node-status-badge-nod_01M6TGQZ8S3DAFS7TYE8TY1PX2",
+            "text": "● ONLINE"
+          },
+          {
+            "id": "node-status-badge-nod_01M6TGSXV1J7XWC5D5H7N6EW1D",
+            "text": "● ONLINE"
+          }
+        ]
+      },
+      {
+        "at": 1794085239473,
+        "badgeCount": 3,
+        "header": "클러스터: 3/3 Node 가동 중",
+        "loadingNotice": false,
+        "emptyNotice": false,
+        "selectedProject": "prj_01M6NDBHVD2DZQ1Q38DCKN1XE3",
+        "visibleBadges": [
+          {
+            "id": "node-status-badge-nod_01M6TAWG25JTA3F7J7S1EE4N2W",
+            "text": "● ONLINE"
+          },
+          {
+            "id": "node-status-badge-nod_01M6TGQZ8S3DAFS7TYE8TY1PX2",
+            "text": "● ONLINE"
+          },
+          {
+            "id": "node-status-badge-nod_01M6TGSXV1J7XWC5D5H7N6EW1D",
+            "text": "● ONLINE"
+          }
+        ]
+      },
+      {
+        "at": 1794085239976,
+        "badgeCount": 3,
+        "header": "클러스터: 3/3 Node 가동 중",
+        "loadingNotice": false,
+        "emptyNotice": false,
+        "selectedProject": "prj_01M6NDBHVD2DZQ1Q38DCKN1XE3",
+        "visibleBadges": [
+          {
+            "id": "node-status-badge-nod_01M6TAWG25JTA3F7J7S1EE4N2W",
+            "text": "● ONLINE"
+          },
+          {
+            "id": "node-status-badge-nod_01M6TGQZ8S3DAFS7TYE8TY1PX2",
+            "text": "● ONLINE"
+          },
+          {
+            "id": "node-status-badge-nod_01M6TGSXV1J7XWC5D5H7N6EW1D",
+            "text": "● ONLINE"
+          }
+        ]
+      },
+      {
+        "at": 1794085240479,
+        "badgeCount": 3,
+        "header": "클러스터: 3/3 Node 가동 중",
+        "loadingNotice": false,
+        "emptyNotice": false,
+        "selectedProject": "prj_01M6NDBHVD2DZQ1Q38DCKN1XE3",
+        "visibleBadges": [
+          {
+            "id": "node-status-badge-nod_01M6TAWG25JTA3F7J7S1EE4N2W",
+            "text": "● ONLINE"
+          },
+          {
+            "id": "node-status-badge-nod_01M6TGQZ8S3DAFS7TYE8TY1PX2",
+            "text": "● ONLINE"
+          },
+          {
+            "id": "node-status-badge-nod_01M6TGSXV1J7XWC5D5H7N6EW1D",
+            "text": "● ONLINE"
+          }
+        ]
+      },
+      {
+        "at": 1794085240982,
+        "badgeCount": 3,
+        "header": "클러스터: 3/3 Node 가동 중",
+        "loadingNotice": false,
+        "emptyNotice": false,
+        "selectedProject": "prj_01M6NDBHVD2DZQ1Q38DCKN1XE3",
+        "visibleBadges": [
+          {
+            "id": "node-status-badge-nod_01M6TAWG25JTA3F7J7S1EE4N2W",
+            "text": "● ONLINE"
+          },
+          {
+            "id": "node-status-badge-nod_01M6TGQZ8S3DAFS7TYE8TY1PX2",
+            "text": "● ONLINE"
+          },
+          {
+            "id": "node-status-badge-nod_01M6TGSXV1J7XWC5D5H7N6EW1D",
+            "text": "● ONLINE"
+          }
+        ]
+      },
+      {
+        "at": 1794085241485,
+        "badgeCount": 3,
+        "header": "클러스터: 3/3 Node 가동 중",
+        "loadingNotice": false,
+        "emptyNotice": false,
+        "selectedProject": "prj_01M6NDBHVD2DZQ1Q38DCKN1XE3",
+        "visibleBadges": [
+          {
+            "id": "node-status-badge-nod_01M6TAWG25JTA3F7J7S1EE4N2W",
+            "text": "● ONLINE"
+          },
+          {
+            "id": "node-status-badge-nod_01M6TGQZ8S3DAFS7TYE8TY1PX2",
+            "text": "● ONLINE"
+          },
+          {
+            "id": "node-status-badge-nod_01M6TGSXV1J7XWC5D5H7N6EW1D",
+            "text": "● ONLINE"
+          }
+        ]
+      },
+      {
+        "at": 1794085241987,
+        "badgeCount": 3,
+        "header": "클러스터: 3/3 Node 가동 중",
+        "loadingNotice": false,
+        "emptyNotice": false,
+        "selectedProject": "prj_01M6NDBHVD2DZQ1Q38DCKN1XE3",
+        "visibleBadges": [
+          {
+            "id": "node-status-badge-nod_01M6TAWG25JTA3F7J7S1EE4N2W",
+            "text": "● ONLINE"
+          },
+          {
+            "id": "node-status-badge-nod_01M6TGQZ8S3DAFS7TYE8TY1PX2",
+            "text": "● ONLINE"
+          },
+          {
+            "id": "node-status-badge-nod_01M6TGSXV1J7XWC5D5H7N6EW1D",
+            "text": "● ONLINE"
+          }
+        ]
+      },
+      {
+        "at": 1794085242490,
+        "badgeCount": 3,
+        "header": "클러스터: 3/3 Node 가동 중",
+        "loadingNotice": false,
+        "emptyNotice": false,
+        "selectedProject": "prj_01M6NDBHVD2DZQ1Q38DCKN1XE3",
+        "visibleBadges": [
+          {
+            "id": "node-status-badge-nod_01M6TAWG25JTA3F7J7S1EE4N2W",
+            "text": "● ONLINE"
+          },
+          {
+            "id": "node-status-badge-nod_01M6TGQZ8S3DAFS7TYE8TY1PX2",
+            "text": "● ONLINE"
+          },
+          {
+            "id": "node-status-badge-nod_01M6TGSXV1J7XWC5D5H7N6EW1D",
+            "text": "● ONLINE"
+          }
+        ]
+      },
+      {
+        "at": 1794085242993,
+        "badgeCount": 3,
+        "header": "클러스터: 3/3 Node 가동 중",
+        "loadingNotice": false,
+        "emptyNotice": false,
+        "selectedProject": "prj_01M6NDBHVD2DZQ1Q38DCKN1XE3",
+        "visibleBadges": [
+          {
+            "id": "node-status-badge-nod_01M6TAWG25JTA3F7J7S1EE4N2W",
+            "text": "● ONLINE"
+          },
+          {
+            "id": "node-status-badge-nod_01M6TGQZ8S3DAFS7TYE8TY1PX2",
+            "text": "● ONLINE"
+          },
+          {
+            "id": "node-status-badge-nod_01M6TGSXV1J7XWC5D5H7N6EW1D",
+            "text": "● ONLINE"
+          }
+        ]
+      },
+      {
+        "at": 1794085243496,
+        "badgeCount": 3,
+        "header": "클러스터: 3/3 Node 가동 중",
+        "loadingNotice": false,
+        "emptyNotice": false,
+        "selectedProject": "prj_01M6NDBHVD2DZQ1Q38DCKN1XE3",
+        "visibleBadges": [
+          {
+            "id": "node-status-badge-nod_01M6TAWG25JTA3F7J7S1EE4N2W",
+            "text": "● ONLINE"
+          },
+          {
+            "id": "node-status-badge-nod_01M6TGQZ8S3DAFS7TYE8TY1PX2",
+            "text": "● ONLINE"
+          },
+          {
+            "id": "node-status-badge-nod_01M6TGSXV1J7XWC5D5H7N6EW1D",
+            "text": "● ONLINE"
+          }
+        ]
+      },
+      {
+        "at": 1794085243999,
+        "badgeCount": 3,
+        "header": "클러스터: 3/3 Node 가동 중",
+        "loadingNotice": false,
+        "emptyNotice": false,
+        "selectedProject": "prj_01M6NDBHVD2DZQ1Q38DCKN1XE3",
+        "visibleBadges": [
+          {
+            "id": "node-status-badge-nod_01M6TAWG25JTA3F7J7S1EE4N2W",
+            "text": "● ONLINE"
+          },
+          {
+            "id": "node-status-badge-nod_01M6TGQZ8S3DAFS7TYE8TY1PX2",
+            "text": "● ONLINE"
+          },
+          {
+            "id": "node-status-badge-nod_01M6TGSXV1J7XWC5D5H7N6EW1D",
+            "text": "● ONLINE"
+          }
+        ]
+      },
+      {
+        "at": 1794085244502,
+        "badgeCount": 3,
+        "header": "클러스터: 3/3 Node 가동 중",
+        "loadingNotice": false,
+        "emptyNotice": false,
+        "selectedProject": "prj_01M6NDBHVD2DZQ1Q38DCKN1XE3",
+        "visibleBadges": [
+          {
+            "id": "node-status-badge-nod_01M6TAWG25JTA3F7J7S1EE4N2W",
+            "text": "● ONLINE"
+          },
+          {
+            "id": "node-status-badge-nod_01M6TGQZ8S3DAFS7TYE8TY1PX2",
+            "text": "● ONLINE"
+          },
+          {
+            "id": "node-status-badge-nod_01M6TGSXV1J7XWC5D5H7N6EW1D",
+            "text": "● ONLINE"
+          }
+        ]
+      },
+      {
+        "at": 1794085245005,
+        "badgeCount": 3,
+        "header": "클러스터: 3/3 Node 가동 중",
+        "loadingNotice": false,
+        "emptyNotice": false,
+        "selectedProject": "prj_01M6NDBHVD2DZQ1Q38DCKN1XE3",
+        "visibleBadges": [
+          {
+            "id": "node-status-badge-nod_01M6TAWG25JTA3F7J7S1EE4N2W",
+            "text": "● ONLINE"
+          },
+          {
+            "id": "node-status-badge-nod_01M6TGQZ8S3DAFS7TYE8TY1PX2",
+            "text": "● ONLINE"
+          },
+          {
+            "id": "node-status-badge-nod_01M6TGSXV1J7XWC5D5H7N6EW1D",
+            "text": "● ONLINE"
+          }
+        ]
+      },
+      {
+        "at": 1794085245508,
+        "badgeCount": 3,
+        "header": "클러스터: 3/3 Node 가동 중",
+        "loadingNotice": false,
+        "emptyNotice": false,
+        "selectedProject": "prj_01M6NDBHVD2DZQ1Q38DCKN1XE3",
+        "visibleBadges": [
+          {
+            "id": "node-status-badge-nod_01M6TAWG25JTA3F7J7S1EE4N2W",
+            "text": "● ONLINE"
+          },
+          {
+            "id": "node-status-badge-nod_01M6TGQZ8S3DAFS7TYE8TY1PX2",
+            "text": "● ONLINE"
+          },
+          {
+            "id": "node-status-badge-nod_01M6TGSXV1J7XWC5D5H7N6EW1D",
+            "text": "● ONLINE"
+          }
+        ]
+      },
+      {
+        "at": 1794085246011,
+        "badgeCount": 3,
+        "header": "클러스터: 3/3 Node 가동 중",
+        "loadingNotice": false,
+        "emptyNotice": false,
+        "selectedProject": "prj_01M6NDBHVD2DZQ1Q38DCKN1XE3",
+        "visibleBadges": [
+          {
+            "id": "node-status-badge-nod_01M6TAWG25JTA3F7J7S1EE4N2W",
+            "text": "● ONLINE"
+          },
+          {
+            "id": "node-status-badge-nod_01M6TGQZ8S3DAFS7TYE8TY1PX2",
+            "text": "● ONLINE"
+          },
+          {
+            "id": "node-status-badge-nod_01M6TGSXV1J7XWC5D5H7N6EW1D",
+            "text": "● ONLINE"
+          }
+        ]
+      },
+      {
+        "at": 1794085246515,
+        "badgeCount": 3,
+        "header": "클러스터: 3/3 Node 가동 중",
+        "loadingNotice": false,
+        "emptyNotice": false,
+        "selectedProject": "prj_01M6NDBHVD2DZQ1Q38DCKN1XE3",
+        "visibleBadges": [
+          {
+            "id": "node-status-badge-nod_01M6TAWG25JTA3F7J7S1EE4N2W",
+            "text": "● ONLINE"
+          },
+          {
+            "id": "node-status-badge-nod_01M6TGQZ8S3DAFS7TYE8TY1PX2",
+            "text": "● ONLINE"
+          },
+          {
+            "id": "node-status-badge-nod_01M6TGSXV1J7XWC5D5H7N6EW1D",
+            "text": "● ONLINE"
+          }
+        ]
+      },
+      {
+        "at": 1794085247018,
+        "badgeCount": 3,
+        "header": "클러스터: 3/3 Node 가동 중",
+        "loadingNotice": false,
+        "emptyNotice": false,
+        "selectedProject": "prj_01M6NDBHVD2DZQ1Q38DCKN1XE3",
+        "visibleBadges": [
+          {
+            "id": "node-status-badge-nod_01M6TAWG25JTA3F7J7S1EE4N2W",
+            "text": "● ONLINE"
+          },
+          {
+            "id": "node-status-badge-nod_01M6TGQZ8S3DAFS7TYE8TY1PX2",
+            "text": "● ONLINE"
+          },
+          {
+            "id": "node-status-badge-nod_01M6TGSXV1J7XWC5D5H7N6EW1D",
+            "text": "● ONLINE"
+          }
+        ]
+      },
+      {
+        "at": 1794085247521,
+        "badgeCount": 3,
+        "header": "클러스터: 3/3 Node 가동 중",
+        "loadingNotice": false,
+        "emptyNotice": false,
+        "selectedProject": "prj_01M6NDBHVD2DZQ1Q38DCKN1XE3",
+        "visibleBadges": [
+          {
+            "id": "node-status-badge-nod_01M6TAWG25JTA3F7J7S1EE4N2W",
+            "text": "● ONLINE"
+          },
+          {
+            "id": "node-status-badge-nod_01M6TGQZ8S3DAFS7TYE8TY1PX2",
+            "text": "● ONLINE"
+          },
+          {
+            "id": "node-status-badge-nod_01M6TGSXV1J7XWC5D5H7N6EW1D",
+            "text": "● ONLINE"
+          }
+        ]
+      },
+      {
+        "at": 1794085248024,
+        "badgeCount": 3,
+        "header": "클러스터: 3/3 Node 가동 중",
+        "loadingNotice": false,
+        "emptyNotice": false,
+        "selectedProject": "prj_01M6NDBHVD2DZQ1Q38DCKN1XE3",
+        "visibleBadges": [
+          {
+            "id": "node-status-badge-nod_01M6TAWG25JTA3F7J7S1EE4N2W",
+            "text": "● ONLINE"
+          },
+          {
+            "id": "node-status-badge-nod_01M6TGQZ8S3DAFS7TYE8TY1PX2",
+            "text": "● ONLINE"
+          },
+          {
+            "id": "node-status-badge-nod_01M6TGSXV1J7XWC5D5H7N6EW1D",
+            "text": "● ONLINE"
+          }
+        ]
+      },
+      {
+        "at": 1794085248527,
+        "badgeCount": 3,
+        "header": "클러스터: 3/3 Node 가동 중",
+        "loadingNotice": false,
+        "emptyNotice": false,
+        "selectedProject": "prj_01M6NDBHVD2DZQ1Q38DCKN1XE3",
+        "visibleBadges": [
+          {
+            "id": "node-status-badge-nod_01M6TAWG25JTA3F7J7S1EE4N2W",
+            "text": "● ONLINE"
+          },
+          {
+            "id": "node-status-badge-nod_01M6TGQZ8S3DAFS7TYE8TY1PX2",
+            "text": "● ONLINE"
+          },
+          {
+            "id": "node-status-badge-nod_01M6TGSXV1J7XWC5D5H7N6EW1D",
+            "text": "● ONLINE"
+          }
+        ]
+      },
+      {
+        "at": 1794085249030,
+        "badgeCount": 3,
+        "header": "클러스터: 3/3 Node 가동 중",
+        "loadingNotice": false,
+        "emptyNotice": false,
+        "selectedProject": "prj_01M6NDBHVD2DZQ1Q38DCKN1XE3",
+        "visibleBadges": [
+          {
+            "id": "node-status-badge-nod_01M6TAWG25JTA3F7J7S1EE4N2W",
+            "text": "● ONLINE"
+          },
+          {
+            "id": "node-status-badge-nod_01M6TGQZ8S3DAFS7TYE8TY1PX2",
+            "text": "● ONLINE"
+          },
+          {
+            "id": "node-status-badge-nod_01M6TGSXV1J7XWC5D5H7N6EW1D",
+            "text": "● ONLINE"
+          }
+        ]
+      },
+      {
+        "at": 1794085249533,
+        "badgeCount": 3,
+        "header": "클러스터: 3/3 Node 가동 중",
+        "loadingNotice": false,
+        "emptyNotice": false,
+        "selectedProject": "prj_01M6NDBHVD2DZQ1Q38DCKN1XE3",
+        "visibleBadges": [
+          {
+            "id": "node-status-badge-nod_01M6TAWG25JTA3F7J7S1EE4N2W",
+            "text": "● ONLINE"
+          },
+          {
+            "id": "node-status-badge-nod_01M6TGQZ8S3DAFS7TYE8TY1PX2",
+            "text": "● ONLINE"
+          },
+          {
+            "id": "node-status-badge-nod_01M6TGSXV1J7XWC5D5H7N6EW1D",
+            "text": "● ONLINE"
+          }
+        ]
+      },
+      {
+        "at": 1794085250036,
+        "badgeCount": 3,
+        "header": "클러스터: 3/3 Node 가동 중",
+        "loadingNotice": false,
+        "emptyNotice": false,
+        "selectedProject": "prj_01M6NDBHVD2DZQ1Q38DCKN1XE3",
+        "visibleBadges": [
+          {
+            "id": "node-status-badge-nod_01M6TAWG25JTA3F7J7S1EE4N2W",
+            "text": "● ONLINE"
+          },
+          {
+            "id": "node-status-badge-nod_01M6TGQZ8S3DAFS7TYE8TY1PX2",
+            "text": "● ONLINE"
+          },
+          {
+            "id": "node-status-badge-nod_01M6TGSXV1J7XWC5D5H7N6EW1D",
+            "text": "● ONLINE"
+          }
+        ]
+      },
+      {
+        "at": 1794085250539,
+        "badgeCount": 3,
+        "header": "클러스터: 3/3 Node 가동 중",
+        "loadingNotice": false,
+        "emptyNotice": false,
+        "selectedProject": "prj_01M6NDBHVD2DZQ1Q38DCKN1XE3",
+        "visibleBadges": [
+          {
+            "id": "node-status-badge-nod_01M6TAWG25JTA3F7J7S1EE4N2W",
+            "text": "● ONLINE"
+          },
+          {
+            "id": "node-status-badge-nod_01M6TGQZ8S3DAFS7TYE8TY1PX2",
+            "text": "● ONLINE"
+          },
+          {
+            "id": "node-status-badge-nod_01M6TGSXV1J7XWC5D5H7N6EW1D",
+            "text": "● ONLINE"
+          }
+        ]
+      },
+      {
+        "at": 1794085251042,
+        "badgeCount": 3,
+        "header": "클러스터: 3/3 Node 가동 중",
+        "loadingNotice": false,
+        "emptyNotice": false,
+        "selectedProject": "prj_01M6NDBHVD2DZQ1Q38DCKN1XE3",
+        "visibleBadges": [
+          {
+            "id": "node-status-badge-nod_01M6TAWG25JTA3F7J7S1EE4N2W",
+            "text": "● ONLINE"
+          },
+          {
+            "id": "node-status-badge-nod_01M6TGQZ8S3DAFS7TYE8TY1PX2",
+            "text": "● ONLINE"
+          },
+          {
+            "id": "node-status-badge-nod_01M6TGSXV1J7XWC5D5H7N6EW1D",
+            "text": "● ONLINE"
+          }
+        ]
+      },
+      {
+        "at": 1794085251546,
+        "badgeCount": 3,
+        "header": "클러스터: 3/3 Node 가동 중",
+        "loadingNotice": false,
+        "emptyNotice": false,
+        "selectedProject": "prj_01M6NDBHVD2DZQ1Q38DCKN1XE3",
+        "visibleBadges": [
+          {
+            "id": "node-status-badge-nod_01M6TAWG25JTA3F7J7S1EE4N2W",
+            "text": "● ONLINE"
+          },
+          {
+            "id": "node-status-badge-nod_01M6TGQZ8S3DAFS7TYE8TY1PX2",
+            "text": "● ONLINE"
+          },
+          {
+            "id": "node-status-badge-nod_01M6TGSXV1J7XWC5D5H7N6EW1D",
+            "text": "● ONLINE"
+          }
+        ]
+      },
+      {
+        "at": 1794085252049,
+        "badgeCount": 3,
+        "header": "클러스터: 3/3 Node 가동 중",
+        "loadingNotice": false,
+        "emptyNotice": false,
+        "selectedProject": "prj_01M6NDBHVD2DZQ1Q38DCKN1XE3",
+        "visibleBadges": [
+          {
+            "id": "node-status-badge-nod_01M6TAWG25JTA3F7J7S1EE4N2W",
+            "text": "● ONLINE"
+          },
+          {
+            "id": "node-status-badge-nod_01M6TGQZ8S3DAFS7TYE8TY1PX2",
+            "text": "● ONLINE"
+          },
+          {
+            "id": "node-status-badge-nod_01M6TGSXV1J7XWC5D5H7N6EW1D",
+            "text": "● ONLINE"
+          }
+        ]
+      },
+      {
+        "at": 1794085252552,
+        "badgeCount": 3,
+        "header": "클러스터: 3/3 Node 가동 중",
+        "loadingNotice": false,
+        "emptyNotice": false,
+        "selectedProject": "prj_01M6NDBHVD2DZQ1Q38DCKN1XE3",
+        "visibleBadges": [
+          {
+            "id": "node-status-badge-nod_01M6TAWG25JTA3F7J7S1EE4N2W",
+            "text": "● ONLINE"
+          },
+          {
+            "id": "node-status-badge-nod_01M6TGQZ8S3DAFS7TYE8TY1PX2",
+            "text": "● ONLINE"
+          },
+          {
+            "id": "node-status-badge-nod_01M6TGSXV1J7XWC5D5H7N6EW1D",
+            "text": "● ONLINE"
+          }
+        ]
+      },
+      {
+        "at": 1794085253055,
+        "badgeCount": 3,
+        "header": "클러스터: 3/3 Node 가동 중",
+        "loadingNotice": false,
+        "emptyNotice": false,
+        "selectedProject": "prj_01M6NDBHVD2DZQ1Q38DCKN1XE3",
+        "visibleBadges": [
+          {
+            "id": "node-status-badge-nod_01M6TAWG25JTA3F7J7S1EE4N2W",
+            "text": "● ONLINE"
+          },
+          {
+            "id": "node-status-badge-nod_01M6TGQZ8S3DAFS7TYE8TY1PX2",
+            "text": "● ONLINE"
+          },
+          {
+            "id": "node-status-badge-nod_01M6TGSXV1J7XWC5D5H7N6EW1D",
+            "text": "● ONLINE"
+          }
+        ]
+      },
+      {
+        "at": 1794085253558,
+        "badgeCount": 3,
+        "header": "클러스터: 3/3 Node 가동 중",
+        "loadingNotice": false,
+        "emptyNotice": false,
+        "selectedProject": "prj_01M6NDBHVD2DZQ1Q38DCKN1XE3",
+        "visibleBadges": [
+          {
+            "id": "node-status-badge-nod_01M6TAWG25JTA3F7J7S1EE4N2W",
+            "text": "● ONLINE"
+          },
+          {
+            "id": "node-status-badge-nod_01M6TGQZ8S3DAFS7TYE8TY1PX2",
+            "text": "● ONLINE"
+          },
+          {
+            "id": "node-status-badge-nod_01M6TGSXV1J7XWC5D5H7N6EW1D",
+            "text": "● ONLINE"
+          }
+        ]
+      },
+      {
+        "at": 1794085254061,
+        "badgeCount": 3,
+        "header": "클러스터: 3/3 Node 가동 중",
+        "loadingNotice": false,
+        "emptyNotice": false,
+        "selectedProject": "prj_01M6NDBHVD2DZQ1Q38DCKN1XE3",
+        "visibleBadges": [
+          {
+            "id": "node-status-badge-nod_01M6TAWG25JTA3F7J7S1EE4N2W",
+            "text": "● ONLINE"
+          },
+          {
+            "id": "node-status-badge-nod_01M6TGQZ8S3DAFS7TYE8TY1PX2",
+            "text": "● ONLINE"
+          },
+          {
+            "id": "node-status-badge-nod_01M6TGSXV1J7XWC5D5H7N6EW1D",
+            "text": "● ONLINE"
+          }
+        ]
+      },
+      {
+        "at": 1794085254563,
+        "badgeCount": 3,
+        "header": "클러스터: 3/3 Node 가동 중",
+        "loadingNotice": false,
+        "emptyNotice": false,
+        "selectedProject": "prj_01M6NDBHVD2DZQ1Q38DCKN1XE3",
+        "visibleBadges": [
+          {
+            "id": "node-status-badge-nod_01M6TAWG25JTA3F7J7S1EE4N2W",
+            "text": "● ONLINE"
+          },
+          {
+            "id": "node-status-badge-nod_01M6TGQZ8S3DAFS7TYE8TY1PX2",
+            "text": "● ONLINE"
+          },
+          {
+            "id": "node-status-badge-nod_01M6TGSXV1J7XWC5D5H7N6EW1D",
+            "text": "● ONLINE"
+          }
+        ]
+      },
+      {
+        "at": 1794085255066,
+        "badgeCount": 3,
+        "header": "클러스터: 3/3 Node 가동 중",
+        "loadingNotice": false,
+        "emptyNotice": false,
+        "selectedProject": "prj_01M6NDBHVD2DZQ1Q38DCKN1XE3",
+        "visibleBadges": [
+          {
+            "id": "node-status-badge-nod_01M6TAWG25JTA3F7J7S1EE4N2W",
+            "text": "● ONLINE"
+          },
+          {
+            "id": "node-status-badge-nod_01M6TGQZ8S3DAFS7TYE8TY1PX2",
+            "text": "● ONLINE"
+          },
+          {
+            "id": "node-status-badge-nod_01M6TGSXV1J7XWC5D5H7N6EW1D",
+            "text": "● ONLINE"
+          }
+        ]
+      },
+      {
+        "at": 1794085255569,
+        "badgeCount": 3,
+        "header": "클러스터: 3/3 Node 가동 중",
+        "loadingNotice": false,
+        "emptyNotice": false,
+        "selectedProject": "prj_01M6NDBHVD2DZQ1Q38DCKN1XE3",
+        "visibleBadges": [
+          {
+            "id": "node-status-badge-nod_01M6TAWG25JTA3F7J7S1EE4N2W",
+            "text": "● ONLINE"
+          },
+          {
+            "id": "node-status-badge-nod_01M6TGQZ8S3DAFS7TYE8TY1PX2",
+            "text": "● ONLINE"
+          },
+          {
+            "id": "node-status-badge-nod_01M6TGSXV1J7XWC5D5H7N6EW1D",
+            "text": "● ONLINE"
+          }
+        ]
+      },
+      {
+        "at": 1794085256073,
+        "badgeCount": 3,
+        "header": "클러스터: 3/3 Node 가동 중",
+        "loadingNotice": false,
+        "emptyNotice": false,
+        "selectedProject": "prj_01M6NDBHVD2DZQ1Q38DCKN1XE3",
+        "visibleBadges": [
+          {
+            "id": "node-status-badge-nod_01M6TAWG25JTA3F7J7S1EE4N2W",
+            "text": "● ONLINE"
+          },
+          {
+            "id": "node-status-badge-nod_01M6TGQZ8S3DAFS7TYE8TY1PX2",
+            "text": "● ONLINE"
+          },
+          {
+            "id": "node-status-badge-nod_01M6TGSXV1J7XWC5D5H7N6EW1D",
+            "text": "● ONLINE"
+          }
+        ]
+      }
+    ],
+    "stabilitySamples": 60,
+    "stabilityWindowSeconds": 30,
+    "emptyOrLoadingRegressionObserved": false,
+    "visibleNodeCount": 3,
+    "APIResponses": [
+      {
+        "origin": "http://127.0.0.1:3100",
+        "path": "/v1/projects",
+        "HTTP": 200
+      },
+      {
+        "origin": "http://127.0.0.1:3100",
+        "path": "/v1/projects/prj_01M6NDBHVD2DZQ1Q38DCKN1XE3/approvals",
+        "HTTP": 200
+      },
+      {
+        "origin": "http://127.0.0.1:3100",
+        "path": "/v1/projects/prj_01M6NDBHVD2DZQ1Q38DCKN1XE3/node-certificates",
+        "HTTP": 200
+      },
+      {
+        "origin": "http://127.0.0.1:3100",
+        "path": "/v1/projects/prj_01M6NDBHVD2DZQ1Q38DCKN1XE3/nodes",
+        "HTTP": 200
+      },
+      {
+        "origin": "http://127.0.0.1:3100",
+        "path": "/v1/projects/prj_01M6NDBHVD2DZQ1Q38DCKN1XE3/nodes/nod_01M6TAWG25JTA3F7J7S1EE4N2W/resource-usage",
+        "HTTP": 200
+      },
+      {
+        "origin": "http://127.0.0.1:3100",
+        "path": "/v1/projects/prj_01M6NDBHVD2DZQ1Q38DCKN1XE3/nodes/nod_01M6TGQZ8S3DAFS7TYE8TY1PX2/resource-usage",
+        "HTTP": 200
+      },
+      {
+        "origin": "http://127.0.0.1:3100",
+        "path": "/v1/projects/prj_01M6NDBHVD2DZQ1Q38DCKN1XE3/nodes/nod_01M6TGSXV1J7XWC5D5H7N6EW1D/resource-usage",
+        "HTTP": 200
+      },
+      {
+        "origin": "http://127.0.0.1:3100",
+        "path": "/v1/projects/prj_01M6NDBHVD2DZQ1Q38DCKN1XE3/runs",
+        "HTTP": 200
+      },
+      {
+        "origin": "http://127.0.0.1:3100",
+        "path": "/v1/projects/prj_01M6NDBHVD2DZQ1Q38DCKN1XE3/workspaces",
+        "HTTP": 200
+      },
+      {
+        "origin": "http://127.0.0.1:3100",
+        "path": "/v1/session",
+        "HTTP": 200
+      }
+    ],
+    "networkLoadFailureTypes": [
+      {
+        "type": "Fetch",
+        "error": "net::ERR_ABORTED"
+      },
+      {
+        "type": "Fetch",
+        "error": "net::ERR_ABORTED"
+      },
+      {
+        "type": "Fetch",
+        "error": "net::ERR_ABORTED"
+      },
+      {
+        "type": "Fetch",
+        "error": "net::ERR_ABORTED"
+      }
+    ],
+    "screenshotSHA256": "2ac7675a2091ed858c6fa48a38172e1a04d5783b1da005f8ccaaaf040a4dcc01",
+    "screenshotBytes": 285598,
+    "screenshotPath": "/home/saintvision-invion3/saintvision-share/ops-fresh-cpu-1efea-r1-20261107/browser-real-ui-r1/actual-abb707-cluster-ui-r1.png",
+    "incognito": true,
+    "loginCookiesAndTokensRestrictedToIncognitoMemory": true,
+    "ownedBrowserExited": true
+  }
+}

@@ -1,0 +1,51 @@
+{
+  "atKST": "2026-11-08T06:04:42+09:00",
+  "taskID": "FLEET5-ABB707-ACTUAL-LOGIN-RESOURCE-FRAME-ACCEPTANCE-R1-20261108",
+  "owner": "Root Codex operator",
+  "managementBase": "fc1c1b06e719d46ba84457beb4055efcb43f0354",
+  "acceptedSource": "abb7074e3da0d547ac81d3da33dce347d5c656af",
+  "actualIndependentReview": "29046535c0bb0e2629286c8c678f563080f30a67",
+  "codeAndOperationalDashboardFindings": "DASH-RESOURCE-01_AND_DASH-HEALTH-02_CLOSED_FOR_ACTUAL_THREE_NODE_LIMITED_PILOT",
+  "actualContainer": "54fb6609646d7f57991b1ee04de0454117e8e71fd525e5e1f87afb6d052483c0",
+  "actualMainForwardPID": 57232,
+  "actualMainForwardStartedAt": "2026-11-08T05:57:43.6682041+09:00",
+  "actualObservedPCs": [
+    2,
+    3,
+    4
+  ],
+  "realAdministratorChromePKCE": true,
+  "actualOffered": {
+    "cpuMillis": 1500,
+    "memoryBytes": 201326592,
+    "perNodeCpuMillis": 500,
+    "perNodeMemoryBytes": 67108864,
+    "observedNodeCount": 3,
+    "physicalFivePCClaim": false
+  },
+  "actualFrameObservation": {
+    "frames": 1811,
+    "mutations": 23,
+    "removedCardsOrBadges": 0,
+    "elapsedMs": 30167,
+    "frameIssues": [],
+    "mutationIssues": [],
+    "initialHeartbeats": {
+      "node-heartbeat-nod_01M6TAWG25JTA3F7J7S1EE4N2W": "마지막 하트비트: 오전 6:00:19",
+      "node-heartbeat-nod_01M6TGQZ8S3DAFS7TYE8TY1PX2": "마지막 하트비트: 오전 6:00:19",
+      "node-heartbeat-nod_01M6TGSXV1J7XWC5D5H7N6EW1D": "마지막 하트비트: 오전 6:00:19"
+    },
+    "finalHeartbeats": {
+      "node-heartbeat-nod_01M6TAWG25JTA3F7J7S1EE4N2W": "마지막 하트비트: 오전 6:00:54",
+      "node-heartbeat-nod_01M6TGQZ8S3DAFS7TYE8TY1PX2": "마지막 하트비트: 오전 6:00:54",
+      "node-heartbeat-nod_01M6TGSXV1J7XWC5D5H7N6EW1D": "마지막 하트비트: 오전 6:00:54"
+    }
+  },
+  "actualResourceGETCount": 21,
+  "screenshotSHA256": "2ac7675a2091ed858c6fa48a38172e1a04d5783b1da005f8ccaaaf040a4dcc01",
+  "screenshotLocalDelivery": "D:\\Project\\SaintVisionI-Invion\\deliverables\\2026-11-08\\SaintVision_3PC_실제_연동_확인.png",
+  "appSourceCI1380Passed": true,
+  "actualFirstRunApprovalPreparation": "READY_NOT_YET_CREATED",
+  "actualFivePCOrAllPhysicalResourcesAccepted": false,
+  "wholeProgramComplete": false
+}

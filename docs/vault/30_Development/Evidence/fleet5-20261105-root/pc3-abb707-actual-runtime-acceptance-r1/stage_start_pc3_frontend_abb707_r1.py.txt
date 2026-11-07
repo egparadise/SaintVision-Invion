@@ -1,0 +1,23 @@
+"""Deploy accepted exact abb707 on a new port with the reviewed URI health adapter."""
+from pathlib import Path
+r=Path(__file__).resolve().parents[1]
+p=(r/'.work/stage_start_pc3_frontend_e4e07_r1.py').read_text(encoding='utf-8')
+for a,b in [('root530-final-verification','root533-final-verification'),('cspe4e07-actual-claude-r3-root-verification','dashboard-abb707-actual-claude-root-verification-r1'),("review['crCsp02SourceFindingClosed']","review['dashboardResourceSourceFindingClosed'] and review['dashboardHealthSourceFindingClosed']"),('20d9bf8622a0f0624a323b92acaeb33cea91fb9e','29046535c0bb0e2629286c8c678f563080f30a67'),('cspe4e07-artifact-prestage-r1','dashboard-abb707-artifact-prestage-r1'),('e4e07bfd6b94e57edc64d158e208df01b9319deb','abb7074e3da0d547ac81d3da33dce347d5c656af'),('pc3-frontende4e07-r1','pc3-frontendabb707-r1'),('99e8ed94f4f144d571b9a9a192ba10455af69ab356fdf969e11f9e3dfee7fa5a','2396f6b8898d89dab0d0215ffb97dec167bc2f8245a6a787060cecb4ebc60952'),('portal-e4e07-r1','portal-abb707-r1'),('saintvision-portal-e4e07-bcd581be-r1','saintvision-portal-abb707-bcd581be-r1'),('13102','13103'),(':332E',':332F'),('fleet5-root530','fleet5-root533'),('E4E07','ABB707'),('stage_start_pc3_frontend_e4e07_expanded','stage_start_pc3_frontend_abb707_expanded')]:
+    assert a in p,a;p=p.replace(a,b)
+a="'60233888fc91f861f8bebb0f9a6abddf10165f4a855bc0e67fda9b1c86354994']"
+b="'60233888fc91f861f8bebb0f9a6abddf10165f4a855bc0e67fda9b1c86354994','1131d7dbcbf99c7429ad341c7a5ad19f915a5941bac6555c168ddd91c174ea1f']"
+assert a in p;p=p.replace(a,b)
+anchor="(w/'stage_start_pc3_frontend_abb707_expanded_r1.py.txt').write_text(program,encoding='utf-8')"
+injection='''
+needle="conf=conf.replace('proxy_pass https://control_plane;'"
+assert program.count(needle)==1
+program=program.replace(needle,"assert conf.count('proxy_pass https://control_plane/healthz;')==1\\nconf=conf.replace('proxy_pass https://control_plane/healthz;','proxy_pass http://127.0.0.1:8080/healthz;')\\n"+needle)
+needle="('/healthz',200),('/v1/session',401)"
+assert needle in program;program=program.replace(needle,"('/healthz',200),('/gateway-healthz',200),('/v1/session',401)")
+needle="  if path=='/auth-config.js':"
+assert needle in program
+program=program.replace(needle,"  if path=='/gateway-healthz':assert head.get('Content-Type','').split(';')[0]=='application/json' and json.loads(body)['status']=='ok' and 'no-store' in head['Cache-Control']\\n  if path=='/healthz':assert head.get('Content-Type','').startswith('text/plain') and body==b'OK'\\n"+needle)
+assert 'proxy_pass https://control_plane/healthz;' in program
+'''
+assert anchor in p;p=p.replace(anchor,injection+'\n'+anchor)
+exec(compile(p,str(r/'.work/stage_start_pc3_frontend_abb707_wrapper_expanded_r1.py'),'exec'),{'__file__':str(__file__),'__name__':'__main__'})

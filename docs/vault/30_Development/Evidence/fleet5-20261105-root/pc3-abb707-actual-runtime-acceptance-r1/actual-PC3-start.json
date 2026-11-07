@@ -1,0 +1,118 @@
+{
+  "atKST": "2026-11-08T05:56:32+09:00",
+  "SSHExit": 0,
+  "stderrBytes": 0,
+  "knownHostsUnchanged": true,
+  "remote": {
+    "portalRouteChanged": false,
+    "mainProductExecuted": false,
+    "privateMaterialPresent": false,
+    "actualRunOrVotesCreated": false,
+    "wholeProgramComplete": false,
+    "containerID": "54fb6609646d7f57991b1ee04de0454117e8e71fd525e5e1f87afb6d052483c0",
+    "protectedAPIObserverNodeAndOldFallbackUnchanged": [
+      [
+        "8d62139c2408dff910bbfb3a9b322be56520705a3f3e967ce74563cfe9cd3f28",
+        "true",
+        "0"
+      ],
+      [
+        "b8a2f8f55e524837c4b7db14565ec5f960c4492bc3b9df6972e7f1f153c2aec5",
+        "true",
+        "0"
+      ],
+      [
+        "702fa3fbc43e8deded94e67c6e5299eb4549958e074ba4aeb40c216db29752f7",
+        "true",
+        "0"
+      ],
+      [
+        "60233888fc91f861f8bebb0f9a6abddf10165f4a855bc0e67fda9b1c86354994",
+        "true",
+        "0"
+      ],
+      [
+        "1131d7dbcbf99c7429ad341c7a5ad19f915a5941bac6555c168ddd91c174ea1f",
+        "true",
+        "0"
+      ]
+    ],
+    "Root530PredeploymentCheckpoint": "fc1c1b06e719d46ba84457beb4055efcb43f0354",
+    "actualIndependentReview": "29046535c0bb0e2629286c8c678f563080f30a67",
+    "status": "ACCEPTED_FRONTEND_ABB707_RUNNING_PC3_LOOPBACK_NOT_CUT_OVER",
+    "source": "abb7074e3da0d547ac81d3da33dce347d5c656af",
+    "frontendBuildSource": "abb7074e3da0d547ac81d3da33dce347d5c656af",
+    "frontendUnchangedAtAcceptedSource": true,
+    "imageId": "sha256:4008f65c75fa7eecc4caeb9af5a1a9bc95bdad57100c0cb583f46155e6c4f35d",
+    "imageIndex": "sha256:4008f65c75fa7eecc4caeb9af5a1a9bc95bdad57100c0cb583f46155e6c4f35d",
+    "imageConfigID": "sha256:ee5301c5391cb551548341bb01be64ba1b7cc7c2a37e41a645a39a8ddde38799",
+    "name": "saintvision-portal-abb707-bcd581be-r1",
+    "bind": "PC3 127.0.0.1:13103",
+    "sameHostAPIUpstream": "http://127.0.0.1:8080",
+    "clientTransport": "Main loopback through pinned SSH planned",
+    "HTTPPilotOnly": true,
+    "HTTPSDeploymentClaimed": false,
+    "checks": [
+      {
+        "path": "/studio",
+        "http": 200,
+        "securityHeadersPresent": true
+      },
+      {
+        "path": "/callback",
+        "http": 200,
+        "securityHeadersPresent": true
+      },
+      {
+        "path": "/auth-config.js",
+        "http": 200,
+        "securityHeadersPresent": true
+      },
+      {
+        "path": "/healthz",
+        "http": 200,
+        "securityHeadersPresent": true
+      },
+      {
+        "path": "/gateway-healthz",
+        "http": 200,
+        "securityHeadersPresent": true
+      },
+      {
+        "path": "/v1/session",
+        "http": 401,
+        "securityHeadersPresent": true
+      },
+      {
+        "path": "/assets/does-not-exist.js",
+        "http": 404,
+        "securityHeadersPresent": true
+      }
+    ],
+    "allDistOriginalHashesExceptPublicAuthConfig": {
+      "assets/icons-DVYUNEhE.js": "94f3f917fa843a4e312937688a83f400ea3d5617d1f1e1f36d6bc643f78ffa9e",
+      "assets/icons-DVYUNEhE.js.map": "bdc634b37b1574e46b91990a227c6ecf862e6364ec9219a524c88741ee294ea3",
+      "assets/index-DCE-pCmf.js": "178012942127f9840d6cf131505a349b15dc9433b743dedde2efec49fe575590",
+      "assets/index-DCE-pCmf.js.map": "30dd18df68c97cab11fab9090f46235b047421b26406d82f7474aca92f7807bb",
+      "assets/index-kKrfL4r3.css": "66d8552241923e10b189e3b9372f85205bccbf083a5dc19872d001fd91ad0d26",
+      "assets/query-DtERyQJL.js": "3a24ebe459ff24b83ef333288347529de609b65f1c25d5c5b74f2f8b20e2904d",
+      "assets/query-DtERyQJL.js.map": "d584967ed9a938c701324896050b1db23187d2a79840fe5fac55791a2eafc500",
+      "assets/vendor-CYSfZuHu.js": "d967cddbe86b7822415ceafb696d97dea5a491621955cb4127e0f3f96e5497eb",
+      "assets/vendor-CYSfZuHu.js.map": "037070c1858eff839f466f2431a724493a80f81c8f47484c4c6c21698885d15e",
+      "index.html": "a14cd3a68ffc19c78932351cc3fd89824dd5bba4110cdcfd75caf940ddf4e1bc",
+      "manifest.json": "d4c3c0897d7be95321a37babc97bd922618cf8142dd9103faef1efe700fd343a",
+      "sw.js": "5befc07c048a6a49d7f7ec492fe1c04ae8b40283dcc8387ef4e6b2b92c516dcd"
+    },
+    "callbackQueryAbsentFromLogs": true,
+    "nginxTestExit": 0,
+    "UID": "101:101",
+    "memoryBytes": 134217728,
+    "CPUQuotaMillis": 500,
+    "pidsLimit": 64,
+    "readOnlyRoot": true,
+    "capDropAll": true,
+    "noNewPrivileges": true,
+    "privateMounts": false,
+    "atKST": "2026-11-08T05:56:32+09:00"
+  }
+}

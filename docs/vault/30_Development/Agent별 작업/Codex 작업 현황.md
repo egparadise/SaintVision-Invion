@@ -1,15 +1,19 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.494"
+version: "1.0.495"
 status: "review"
 author: "Codex"
-updated: "2026-11-08T05:54:02+09:00"
+updated: "2026-11-08T06:04:42+09:00"
 source_of_truth: "Git"
 active_card: "FLEET5 continued supervision with PORTAL-REFRESH-FLEET-20261106"
-active_card_status: "ActualClaude290465AcceptsAbb707_Mandatory0_DASHResourceAndHealthClosedAtSource_Originals64Pins2BoardsDocsFullStateVerified_ActualReviewerExitedReleased; PC3ExactDeployRealUIFramesNext"
-active_card_next: "Root completes queued Root533 Docs/Obsidian after review exit, adds URI-bearing /gateway-healthz pilot proxy replacement and deploys exact abb707 artifacts on a new owned PC3 port, preserving e4e07 and b48 recovery. Verify actual login/canonical CPU500m-memory64MiB per node/1500m192MiB total/healthy CP and30s frames. Manual votes/Run/PC1/PC5/GPUstorage/renewal/all5 remain."
+active_card_status: "ActualAbb707Login3NodeResourcesAndHealthyCP_30s1811FramesZeroCardValueLossVerified_ActualSourceDeployDoneForLimitedPilot; GenuineFirstCPUApprovalPreparationNext_ManualPhysicalAll5Pending"
+active_card_next: "Root completes Root534 exact Docs/Obsidian runtime record, then prepares one genuine owner CPU intent/draft/frozen input/approval request with reviewed UI/API; retain authentic two distinct nonrequester gate, do not invent votes or enqueue unapproved. PC1 key/PC5 RAMNode/GPUstorage/manual/renewal/reconnect/all5 remain. Current Main3100 abb707 SSH57232; e4e07/b48 rollback retained."
 ---
+
+## 2026-11-08T06:04:42+09:00 실제 3대 자원·CPhealth·화면 안정성 검증 완료
+
+수락된abb707을PC3새13103/container54fb6609에정확배포하고검토된URIhealthproxy를추가연결했다. 소유가증명된MainSSH64240만57232로전환해3100에서12dist원본hash/publicauth/CSP/실제gatewayJSONok를확인했다. 실제Chrome157/관리자PKCE/정상TLS·sandbox에서3대ONLINE와각500m64MiB/합1500m192MiB·Gateway10ms를확인했다. 실제시계/원본관측시각을변경하지않은30.167초1811frames/23DOM변화에서card/badge제거0·frame/DOM값이탈0,60표본정상·실제usageGET21회·세하트비트갱신을확인하고PNG를육안검증했다. 자원/Gateway2건은3대제한pilot운영범위에서도해소됐다. 첫실행승인/실제Run·PC1/PC5·GPUstorage/5대전체인수는남는다. 다음첫행동/담당은Root534게시뒤실제첫CPU입력/승인안건준비이며허위승인/실행/5대완료를만들지않는다.
 
 ## 2026-11-08T05:54:02+09:00 자원·CPhealth abb707 실제 독립 수락과 실배포 준비
 
