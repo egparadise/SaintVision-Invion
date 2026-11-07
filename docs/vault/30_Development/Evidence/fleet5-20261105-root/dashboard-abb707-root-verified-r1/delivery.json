@@ -1,0 +1,2785 @@
+{
+  "task": "DASH-RESOURCE-01 and DASH-HEALTH-02 bounded integration",
+  "owner": "Codex",
+  "taskID": "task_e04bfe8c6446",
+  "dispatchID": "ctx_ed6d9229a09a",
+  "atKST": "2026-11-08T05:29:36.383278+09:00",
+  "sourceSHA": "abb7074e3da0d547ac81d3da33dce347d5c656af",
+  "branch": "agent/codex/fleet5-dashboard-canonical-resource-health-r1-20261108",
+  "deliveryBase": "e4e07bfd6b94e57edc64d158e208df01b9319deb",
+  "backendSource": "96afd799d49717fd40e4ddabd538d82accbe1958",
+  "rootManagement": "8cbcc96f845a1a94b998fadd489fd27bb3e0a675",
+  "remoteMatches": true,
+  "trackedClean": true,
+  "freshWorkflows": [
+    {
+      "workflow": "frontend",
+      "runID": 42410996328,
+      "sourceSHA": "abb7074e3da0d547ac81d3da33dce347d5c656af",
+      "ref": "agent/codex/fleet5-dashboard-canonical-resource-health-r1-20261108",
+      "correlation": "fleet5-dashboard-resource-health-frontend-9d93e05e0707485f8b351a2f7640951f",
+      "event": "workflow_dispatch",
+      "attempt": 1,
+      "conclusion": "success",
+      "url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/42410996328",
+      "jobs": [
+        {
+          "id": 128518899545,
+          "name": "frontend",
+          "conclusion": "success",
+          "steps": [
+            {
+              "name": "Set up job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 1,
+              "started_at": "2026-11-07T20:25:39Z",
+              "completed_at": "2026-11-07T20:25:40Z"
+            },
+            {
+              "name": "Run actions/checkout@v4",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 2,
+              "started_at": "2026-11-07T20:25:40Z",
+              "completed_at": "2026-11-07T20:25:46Z"
+            },
+            {
+              "name": "Run actions/setup-node@v4",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 3,
+              "started_at": "2026-11-07T20:25:46Z",
+              "completed_at": "2026-11-07T20:25:50Z"
+            },
+            {
+              "name": "Install dependencies",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 4,
+              "started_at": "2026-11-07T20:25:50Z",
+              "completed_at": "2026-11-07T20:25:56Z"
+            },
+            {
+              "name": "Run actions/setup-python@v5",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 5,
+              "started_at": "2026-11-07T20:25:56Z",
+              "completed_at": "2026-11-07T20:25:56Z"
+            },
+            {
+              "name": "Install pinned hosted browser regression harness",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 6,
+              "started_at": "2026-11-07T20:25:56Z",
+              "completed_at": "2026-11-07T20:26:01Z"
+            },
+            {
+              "name": "Boot clean direct vite.js main config in real browser",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 7,
+              "started_at": "2026-11-07T20:26:01Z",
+              "completed_at": "2026-11-07T20:26:11Z"
+            },
+            {
+              "name": "Upload clean direct Vite browser evidence",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 8,
+              "started_at": "2026-11-07T20:26:11Z",
+              "completed_at": "2026-11-07T20:26:12Z"
+            },
+            {
+              "name": "Run ESLint",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 9,
+              "started_at": "2026-11-07T20:26:12Z",
+              "completed_at": "2026-11-07T20:26:18Z"
+            },
+            {
+              "name": "Run Vitest Unit Tests",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 10,
+              "started_at": "2026-11-07T20:26:18Z",
+              "completed_at": "2026-11-07T20:26:54Z"
+            },
+            {
+              "name": "Check generated discovery contract type",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 11,
+              "started_at": "2026-11-07T20:26:54Z",
+              "completed_at": "2026-11-07T20:26:55Z"
+            },
+            {
+              "name": "TypeScript Check & Production Build",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 12,
+              "started_at": "2026-11-07T20:26:55Z",
+              "completed_at": "2026-11-07T20:27:05Z"
+            },
+            {
+              "name": "Boot actual built frontend under canonical strict CSP",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 13,
+              "started_at": "2026-11-07T20:27:05Z",
+              "completed_at": "2026-11-07T20:27:06Z"
+            },
+            {
+              "name": "Replay canonical dashboard resources and genuine dev CP health in browser",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 14,
+              "started_at": "2026-11-07T20:27:06Z",
+              "completed_at": "2026-11-07T20:28:15Z"
+            },
+            {
+              "name": "Upload canonical dashboard browser replay evidence",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 15,
+              "started_at": "2026-11-07T20:28:15Z",
+              "completed_at": "2026-11-07T20:28:16Z"
+            },
+            {
+              "name": "Upload strict CSP browser and standalone generation evidence",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 16,
+              "started_at": "2026-11-07T20:28:16Z",
+              "completed_at": "2026-11-07T20:28:17Z"
+            },
+            {
+              "name": "Upload Web Build Artifact",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 17,
+              "started_at": "2026-11-07T20:28:17Z",
+              "completed_at": "2026-11-07T20:28:18Z"
+            },
+            {
+              "name": "Post Run actions/setup-python@v5",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 32,
+              "started_at": "2026-11-07T20:28:18Z",
+              "completed_at": "2026-11-07T20:28:18Z"
+            },
+            {
+              "name": "Post Run actions/setup-node@v4",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 33,
+              "started_at": "2026-11-07T20:28:18Z",
+              "completed_at": "2026-11-07T20:28:19Z"
+            },
+            {
+              "name": "Post Run actions/checkout@v4",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 34,
+              "started_at": "2026-11-07T20:28:19Z",
+              "completed_at": "2026-11-07T20:28:19Z"
+            },
+            {
+              "name": "Complete job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 35,
+              "started_at": "2026-11-07T20:28:19Z",
+              "completed_at": "2026-11-07T20:28:19Z"
+            }
+          ]
+        },
+        {
+          "id": 128518899739,
+          "name": "Portal Container Build & Hardened Runtime Smoke",
+          "conclusion": "success",
+          "steps": [
+            {
+              "name": "Set up job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 1,
+              "started_at": "2026-11-07T20:25:40Z",
+              "completed_at": "2026-11-07T20:25:40Z"
+            },
+            {
+              "name": "Run actions/checkout@v4",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 2,
+              "started_at": "2026-11-07T20:25:40Z",
+              "completed_at": "2026-11-07T20:25:46Z"
+            },
+            {
+              "name": "Build Portal Docker Image with BuildKit",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 3,
+              "started_at": "2026-11-07T20:25:46Z",
+              "completed_at": "2026-11-07T20:26:42Z"
+            },
+            {
+              "name": "Verify Lane-Internal Built Image Identity (Self-Derived)",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 4,
+              "started_at": "2026-11-07T20:26:42Z",
+              "completed_at": "2026-11-07T20:26:42Z"
+            },
+            {
+              "name": "Produce Portal Release Tarball and Strict Release Evidence (Codex r6 Block 1)",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 5,
+              "started_at": "2026-11-07T20:26:42Z",
+              "completed_at": "2026-11-07T20:26:42Z"
+            },
+            {
+              "name": "Upload Portal Release Artifacts (Tarball & Evidence JSON)",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 6,
+              "started_at": "2026-11-07T20:26:42Z",
+              "completed_at": "2026-11-07T20:26:45Z"
+            },
+            {
+              "name": "Verify Portal Load Release Script (--verify-only)",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 7,
+              "started_at": "2026-11-07T20:26:45Z",
+              "completed_at": "2026-11-07T20:26:45Z"
+            },
+            {
+              "name": "Setup Mock Upstream HTTPS Server and Test PKI",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 8,
+              "started_at": "2026-11-07T20:26:45Z",
+              "completed_at": "2026-11-07T20:26:46Z"
+            },
+            {
+              "name": "Launch Portal Container via portal-up.sh",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 9,
+              "started_at": "2026-11-07T20:26:46Z",
+              "completed_at": "2026-11-07T20:26:49Z"
+            },
+            {
+              "name": "Execute Hardened Runtime Verification via curl",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 10,
+              "started_at": "2026-11-07T20:26:49Z",
+              "completed_at": "2026-11-07T20:26:52Z"
+            },
+            {
+              "name": "Verify genuine CP gateway health through TLS proxy",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 11,
+              "started_at": "2026-11-07T20:26:52Z",
+              "completed_at": "2026-11-07T20:26:52Z"
+            },
+            {
+              "name": "Upload gateway proxy evidence",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 12,
+              "started_at": "2026-11-07T20:26:52Z",
+              "completed_at": "2026-11-07T20:26:53Z"
+            },
+            {
+              "name": "Verify Automatic Rollback on Production Swap Failure (R6-H1 & R6-H2)",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 13,
+              "started_at": "2026-11-07T20:26:53Z",
+              "completed_at": "2026-11-07T20:26:56Z"
+            },
+            {
+              "name": "Teardown Portal Container via portal-down.sh",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 14,
+              "started_at": "2026-11-07T20:26:56Z",
+              "completed_at": "2026-11-07T20:26:56Z"
+            },
+            {
+              "name": "Post Run actions/checkout@v4",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 28,
+              "started_at": "2026-11-07T20:26:56Z",
+              "completed_at": "2026-11-07T20:26:57Z"
+            },
+            {
+              "name": "Complete job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 29,
+              "started_at": "2026-11-07T20:26:57Z",
+              "completed_at": "2026-11-07T20:26:57Z"
+            }
+          ]
+        }
+      ],
+      "artifacts": [
+        {
+          "id": 13589915766,
+          "node_id": "MDg6QXJ0aWZhY3QxMzU4OTkxNTc2Ng==",
+          "name": "saintvision-dashboard-canonical-browser-evidence",
+          "size_in_bytes": 78740,
+          "url": "https://api.github.com/repos/egparadise/SaintVision-Invion/actions/artifacts/13589915766",
+          "archive_download_url": "https://api.github.com/repos/egparadise/SaintVision-Invion/actions/artifacts/13589915766/zip",
+          "expired": false,
+          "digest": "sha256:3f3510934ddc1a83f242f6b786b66f79a0b1612a9c3b22c6422be68543e0557e",
+          "created_at": "2026-11-07T20:28:16Z",
+          "updated_at": "2026-11-07T20:28:16Z",
+          "expires_at": "2026-11-21T20:28:15Z",
+          "workflow_run": {
+            "id": 42410996328,
+            "repository_id": 1362259805,
+            "head_repository_id": 1362259805,
+            "head_branch": "agent/codex/fleet5-dashboard-canonical-resource-health-r1-20261108",
+            "head_sha": "abb7074e3da0d547ac81d3da33dce347d5c656af"
+          },
+          "downloadedZIPVerifiedSHA256": "3f3510934ddc1a83f242f6b786b66f79a0b1612a9c3b22c6422be68543e0557e"
+        },
+        {
+          "id": 13589711985,
+          "node_id": "MDg6QXJ0aWZhY3QxMzU4OTcxMTk4NQ==",
+          "name": "saintvision-gateway-health-proxy-evidence",
+          "size_in_bytes": 1746,
+          "url": "https://api.github.com/repos/egparadise/SaintVision-Invion/actions/artifacts/13589711985",
+          "archive_download_url": "https://api.github.com/repos/egparadise/SaintVision-Invion/actions/artifacts/13589711985/zip",
+          "expired": false,
+          "digest": "sha256:8f1ee9741038cbaa5ebb6d81f39af4e97b0707a88e0e27728b055479b833b5ee",
+          "created_at": "2026-11-07T20:26:53Z",
+          "updated_at": "2026-11-07T20:26:53Z",
+          "expires_at": "2026-11-21T20:26:52Z",
+          "workflow_run": {
+            "id": 42410996328,
+            "repository_id": 1362259805,
+            "head_repository_id": 1362259805,
+            "head_branch": "agent/codex/fleet5-dashboard-canonical-resource-health-r1-20261108",
+            "head_sha": "abb7074e3da0d547ac81d3da33dce347d5c656af"
+          },
+          "downloadedZIPVerifiedSHA256": "8f1ee9741038cbaa5ebb6d81f39af4e97b0707a88e0e27728b055479b833b5ee"
+        },
+        {
+          "id": 13589637552,
+          "node_id": "MDg6QXJ0aWZhY3QxMzU4OTYzNzU1Mg==",
+          "name": "saintvision-portal-strict-csp-evidence",
+          "size_in_bytes": 14926,
+          "url": "https://api.github.com/repos/egparadise/SaintVision-Invion/actions/artifacts/13589637552",
+          "archive_download_url": "https://api.github.com/repos/egparadise/SaintVision-Invion/actions/artifacts/13589637552/zip",
+          "expired": false,
+          "digest": "sha256:d0d5c88700f9df3ae217b9019cdb2605fe314fbba9bb6841a2adc3782026331f",
+          "created_at": "2026-11-07T20:28:17Z",
+          "updated_at": "2026-11-07T20:28:17Z",
+          "expires_at": "2026-11-21T20:28:16Z",
+          "workflow_run": {
+            "id": 42410996328,
+            "repository_id": 1362259805,
+            "head_repository_id": 1362259805,
+            "head_branch": "agent/codex/fleet5-dashboard-canonical-resource-health-r1-20261108",
+            "head_sha": "abb7074e3da0d547ac81d3da33dce347d5c656af"
+          },
+          "downloadedZIPVerifiedSHA256": "d0d5c88700f9df3ae217b9019cdb2605fe314fbba9bb6841a2adc3782026331f"
+        },
+        {
+          "id": 13589572374,
+          "node_id": "MDg6QXJ0aWZhY3QxMzU4OTU3MjM3NA==",
+          "name": "saintvision-direct-vite-startup-evidence",
+          "size_in_bytes": 10728,
+          "url": "https://api.github.com/repos/egparadise/SaintVision-Invion/actions/artifacts/13589572374",
+          "archive_download_url": "https://api.github.com/repos/egparadise/SaintVision-Invion/actions/artifacts/13589572374/zip",
+          "expired": false,
+          "digest": "sha256:18b486165f7797e536fcc6cab6bd5c99a8fd92e55161187ab90c1b19fd56dc2c",
+          "created_at": "2026-11-07T20:26:11Z",
+          "updated_at": "2026-11-07T20:26:11Z",
+          "expires_at": "2026-11-21T20:26:11Z",
+          "workflow_run": {
+            "id": 42410996328,
+            "repository_id": 1362259805,
+            "head_repository_id": 1362259805,
+            "head_branch": "agent/codex/fleet5-dashboard-canonical-resource-health-r1-20261108",
+            "head_sha": "abb7074e3da0d547ac81d3da33dce347d5c656af"
+          },
+          "downloadedZIPVerifiedSHA256": "18b486165f7797e536fcc6cab6bd5c99a8fd92e55161187ab90c1b19fd56dc2c"
+        },
+        {
+          "id": 13589441576,
+          "node_id": "MDg6QXJ0aWZhY3QxMzU4OTQ0MTU3Ng==",
+          "name": "saintvision-portal-release",
+          "size_in_bytes": 25727795,
+          "url": "https://api.github.com/repos/egparadise/SaintVision-Invion/actions/artifacts/13589441576",
+          "archive_download_url": "https://api.github.com/repos/egparadise/SaintVision-Invion/actions/artifacts/13589441576/zip",
+          "expired": false,
+          "digest": "sha256:ba5b09e5775c2bea6ac5e41d76173935e59c79b3772f3e706c7028f27726b8d1",
+          "created_at": "2026-11-07T20:26:44Z",
+          "updated_at": "2026-11-07T20:26:44Z",
+          "expires_at": "2026-11-21T20:26:42Z",
+          "workflow_run": {
+            "id": 42410996328,
+            "repository_id": 1362259805,
+            "head_repository_id": 1362259805,
+            "head_branch": "agent/codex/fleet5-dashboard-canonical-resource-health-r1-20261108",
+            "head_sha": "abb7074e3da0d547ac81d3da33dce347d5c656af"
+          }
+        },
+        {
+          "id": 13589228364,
+          "node_id": "MDg6QXJ0aWZhY3QxMzU4OTIyODM2NA==",
+          "name": "saintvision-web-dist",
+          "size_in_bytes": 991242,
+          "url": "https://api.github.com/repos/egparadise/SaintVision-Invion/actions/artifacts/13589228364",
+          "archive_download_url": "https://api.github.com/repos/egparadise/SaintVision-Invion/actions/artifacts/13589228364/zip",
+          "expired": false,
+          "digest": "sha256:2396f6b8898d89dab0d0215ffb97dec167bc2f8245a6a787060cecb4ebc60952",
+          "created_at": "2026-11-07T20:28:18Z",
+          "updated_at": "2026-11-07T20:28:18Z",
+          "expires_at": "2026-11-21T20:28:17Z",
+          "workflow_run": {
+            "id": 42410996328,
+            "repository_id": 1362259805,
+            "head_repository_id": 1362259805,
+            "head_branch": "agent/codex/fleet5-dashboard-canonical-resource-health-r1-20261108",
+            "head_sha": "abb7074e3da0d547ac81d3da33dce347d5c656af"
+          },
+          "downloadedZIPVerifiedSHA256": "2396f6b8898d89dab0d0215ffb97dec167bc2f8245a6a787060cecb4ebc60952"
+        }
+      ],
+      "vitest": {
+        "filesPassed": 108,
+        "passed": 1380,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "deselected": 0,
+        "rawSummaryLines": [
+          "2026-11-07T20:26:54.1990317Z  Test Files  108 passed (108)",
+          "2026-11-07T20:26:54.1991171Z       Tests  1380 passed (1380)"
+        ],
+        "source": "official job console summary; all collected tests passed"
+      },
+      "hardenedRuntimeSmokeExecuted": true,
+      "imageIdentityConsole": [
+        "2026-11-07T20:26:42.1434697Z echo \"Built Image ID (lane-internal execution consistency check): $IMAGE_ID\"",
+        "2026-11-07T20:26:42.1969608Z Built Image ID (lane-internal execution consistency check): sha256:4008f65c75fa7eecc4caeb9af5a1a9bc95bdad57100c0cb583f46155e6c4f35d",
+        "2026-11-07T20:26:42.2044589Z     \"codeSha\": \"$COMMIT_SHA\",",
+        "2026-11-07T20:26:42.2044801Z     \"imageId\": \"$IMAGE_ID\",",
+        "2026-11-07T20:26:42.2045011Z     \"tarSha256\": \"$TAR_SHA256\",",
+        "2026-11-07T20:26:42.2045235Z     \"buildRunId\": str(\"$RUN_ID\"),",
+        "2026-11-07T20:26:42.7839533Z   \"codeSha\": \"abb7074e3da0d547ac81d3da33dce347d5c656af\",",
+        "2026-11-07T20:26:42.7840136Z   \"imageId\": \"sha256:4008f65c75fa7eecc4caeb9af5a1a9bc95bdad57100c0cb583f46155e6c4f35d\",",
+        "2026-11-07T20:26:42.7840862Z   \"tarSha256\": \"e5183333ac1598e9b73bae7104f8197ee30ea5ceca68cf6f00e321a3adbeec36\",",
+        "2026-11-07T20:26:42.7841381Z   \"buildRunId\": \"42410996328\","
+      ],
+      "portalRelease": {
+        "codeSha": "abb7074e3da0d547ac81d3da33dce347d5c656af",
+        "imageId": "sha256:4008f65c75fa7eecc4caeb9af5a1a9bc95bdad57100c0cb583f46155e6c4f35d",
+        "tarSha256": "e5183333ac1598e9b73bae7104f8197ee30ea5ceca68cf6f00e321a3adbeec36",
+        "buildRunId": "42410996328"
+      },
+      "canonicalDashboardBrowser": {
+        "fixtureOnly": true,
+        "realUserOrHardwareAcceptance": false,
+        "sandbox": true,
+        "sourceSHA": "abb7074e3da0d547ac81d3da33dce347d5c656af",
+        "command": [
+          "/opt/hostedtoolcache/node/22.23.4/x64/bin/node",
+          "node_modules/vite/bin/vite.js",
+          "--config",
+          "vite.config.ts",
+          "--host",
+          "127.0.0.1",
+          "--port",
+          "35527",
+          "--strictPort"
+        ],
+        "recordedReplayClock": "2026-11-07T19:47:41.667651+00:00",
+        "wireTimestampsModified": false,
+        "inputs": {
+          "nodes.json": "7359b4712e4366ee5d652ad22460a51ac27e6ff9123900bb2dc61b78ef5d63e1",
+          "resource-usage-nod_01M6TAWG25JTA3F7J7S1EE4N2W.json": "beb15119351a3dde5c5e7e9638d490127f6eb1326402ed3220cbfa9196da68d5",
+          "resource-usage-nod_01M6TGQZ8S3DAFS7TYE8TY1PX2.json": "e33d0725b85965f669104cc460df1ecf2bb8e5d6da96aa5a5412ac05818c35ac",
+          "resource-usage-nod_01M6TGSXV1J7XWC5D5H7N6EW1D.json": "0de278aac5c8213b84e3e3ca6eb31948e1fbbec69058f0b9cd26092849c93a5f"
+        },
+        "hostedReplayObservationSeconds": 30.001612273999967,
+        "stableDOM": {
+          "removed": 0,
+          "cards": true,
+          "badges": true
+        },
+        "browserVersion": "156.0.8078.79",
+        "passed": true,
+        "partialMemoryRetainedCPU": true,
+        "lastGoodExcludedFromCurrent": true,
+        "CPJSONRequired": true,
+        "ownedChildExitCode": 143,
+        "pageErrors": [],
+        "requestFailures": [],
+        "httpErrors": [
+          {
+            "url": "http://127.0.0.1:35527/v1/projects/prj_01M6NDBHVD2DZQ1Q38DCKN1XE3/nodes/nod_01M6TAWG25JTA3F7J7S1EE4N2W/resource-usage",
+            "status": 503
+          },
+          {
+            "url": "http://127.0.0.1:35527/v1/projects/prj_01M6NDBHVD2DZQ1Q38DCKN1XE3/nodes/nod_01M6TAWG25JTA3F7J7S1EE4N2W/resource-usage",
+            "status": 503
+          },
+          {
+            "url": "http://127.0.0.1:35527/v1/projects/prj_01M6NDBHVD2DZQ1Q38DCKN1XE3/nodes/nod_01M6TAWG25JTA3F7J7S1EE4N2W/resource-usage",
+            "status": 503
+          },
+          {
+            "url": "http://127.0.0.1:35527/v1/projects/prj_01M6NDBHVD2DZQ1Q38DCKN1XE3/nodes/nod_01M6TAWG25JTA3F7J7S1EE4N2W/resource-usage",
+            "status": 503
+          },
+          {
+            "url": "http://127.0.0.1:35527/gateway-healthz",
+            "status": 503
+          },
+          {
+            "url": "http://127.0.0.1:35527/v1/projects/prj_01M6NDBHVD2DZQ1Q38DCKN1XE3/nodes/nod_01M6TAWG25JTA3F7J7S1EE4N2W/resource-usage",
+            "status": 503
+          }
+        ],
+        "fixtureRequests": [
+          {
+            "path": "/healthz",
+            "health": "healthy",
+            "resources": "healthy"
+          },
+          {
+            "path": "/v1/projects/prj_01M6NDBHVD2DZQ1Q38DCKN1XE3/nodes",
+            "health": "healthy",
+            "resources": "healthy"
+          },
+          {
+            "path": "/v1/projects/prj_01M6NDBHVD2DZQ1Q38DCKN1XE3/nodes/nod_01M6TGQZ8S3DAFS7TYE8TY1PX2/resource-usage",
+            "health": "healthy",
+            "resources": "healthy"
+          },
+          {
+            "path": "/v1/projects/prj_01M6NDBHVD2DZQ1Q38DCKN1XE3/nodes/nod_01M6TAWG25JTA3F7J7S1EE4N2W/resource-usage",
+            "health": "healthy",
+            "resources": "healthy"
+          },
+          {
+            "path": "/v1/projects/prj_01M6NDBHVD2DZQ1Q38DCKN1XE3/nodes/nod_01M6TGSXV1J7XWC5D5H7N6EW1D/resource-usage",
+            "health": "healthy",
+            "resources": "healthy"
+          },
+          {
+            "path": "/healthz",
+            "health": "healthy",
+            "resources": "healthy"
+          },
+          {
+            "path": "/v1/projects/prj_01M6NDBHVD2DZQ1Q38DCKN1XE3/nodes",
+            "health": "healthy",
+            "resources": "healthy"
+          },
+          {
+            "path": "/v1/projects/prj_01M6NDBHVD2DZQ1Q38DCKN1XE3/nodes/nod_01M6TAWG25JTA3F7J7S1EE4N2W/resource-usage",
+            "health": "healthy",
+            "resources": "healthy"
+          },
+          {
+            "path": "/v1/projects/prj_01M6NDBHVD2DZQ1Q38DCKN1XE3/nodes/nod_01M6TGQZ8S3DAFS7TYE8TY1PX2/resource-usage",
+            "health": "healthy",
+            "resources": "healthy"
+          },
+          {
+            "path": "/v1/projects/prj_01M6NDBHVD2DZQ1Q38DCKN1XE3/nodes/nod_01M6TGSXV1J7XWC5D5H7N6EW1D/resource-usage",
+            "health": "healthy",
+            "resources": "healthy"
+          },
+          {
+            "path": "/healthz",
+            "health": "healthy",
+            "resources": "healthy"
+          },
+          {
+            "path": "/v1/projects/prj_01M6NDBHVD2DZQ1Q38DCKN1XE3/nodes",
+            "health": "healthy",
+            "resources": "healthy"
+          },
+          {
+            "path": "/v1/projects/prj_01M6NDBHVD2DZQ1Q38DCKN1XE3/nodes/nod_01M6TAWG25JTA3F7J7S1EE4N2W/resource-usage",
+            "health": "healthy",
+            "resources": "healthy"
+          },
+          {
+            "path": "/v1/projects/prj_01M6NDBHVD2DZQ1Q38DCKN1XE3/nodes/nod_01M6TGQZ8S3DAFS7TYE8TY1PX2/resource-usage",
+            "health": "healthy",
+            "resources": "healthy"
+          },
+          {
+            "path": "/v1/projects/prj_01M6NDBHVD2DZQ1Q38DCKN1XE3/nodes/nod_01M6TGSXV1J7XWC5D5H7N6EW1D/resource-usage",
+            "health": "healthy",
+            "resources": "healthy"
+          },
+          {
+            "path": "/healthz",
+            "health": "healthy",
+            "resources": "healthy"
+          },
+          {
+            "path": "/v1/projects/prj_01M6NDBHVD2DZQ1Q38DCKN1XE3/nodes",
+            "health": "healthy",
+            "resources": "healthy"
+          },
+          {
+            "path": "/v1/projects/prj_01M6NDBHVD2DZQ1Q38DCKN1XE3/nodes/nod_01M6TAWG25JTA3F7J7S1EE4N2W/resource-usage",
+            "health": "healthy",
+            "resources": "healthy"
+          },
+          {
+            "path": "/v1/projects/prj_01M6NDBHVD2DZQ1Q38DCKN1XE3/nodes/nod_01M6TGQZ8S3DAFS7TYE8TY1PX2/resource-usage",
+            "health": "healthy",
+            "resources": "healthy"
+          },
+          {
+            "path": "/v1/projects/prj_01M6NDBHVD2DZQ1Q38DCKN1XE3/nodes/nod_01M6TGSXV1J7XWC5D5H7N6EW1D/resource-usage",
+            "health": "healthy",
+            "resources": "healthy"
+          },
+          {
+            "path": "/healthz",
+            "health": "healthy",
+            "resources": "healthy"
+          },
+          {
+            "path": "/v1/projects/prj_01M6NDBHVD2DZQ1Q38DCKN1XE3/nodes",
+            "health": "healthy",
+            "resources": "healthy"
+          },
+          {
+            "path": "/v1/projects/prj_01M6NDBHVD2DZQ1Q38DCKN1XE3/nodes/nod_01M6TAWG25JTA3F7J7S1EE4N2W/resource-usage",
+            "health": "healthy",
+            "resources": "healthy"
+          },
+          {
+            "path": "/v1/projects/prj_01M6NDBHVD2DZQ1Q38DCKN1XE3/nodes/nod_01M6TGQZ8S3DAFS7TYE8TY1PX2/resource-usage",
+            "health": "healthy",
+            "resources": "healthy"
+          },
+          {
+            "path": "/v1/projects/prj_01M6NDBHVD2DZQ1Q38DCKN1XE3/nodes/nod_01M6TGSXV1J7XWC5D5H7N6EW1D/resource-usage",
+            "health": "healthy",
+            "resources": "healthy"
+          },
+          {
+            "path": "/healthz",
+            "health": "healthy",
+            "resources": "healthy"
+          },
+          {
+            "path": "/v1/projects/prj_01M6NDBHVD2DZQ1Q38DCKN1XE3/nodes",
+            "health": "healthy",
+            "resources": "healthy"
+          },
+          {
+            "path": "/v1/projects/prj_01M6NDBHVD2DZQ1Q38DCKN1XE3/nodes/nod_01M6TAWG25JTA3F7J7S1EE4N2W/resource-usage",
+            "health": "healthy",
+            "resources": "healthy"
+          },
+          {
+            "path": "/v1/projects/prj_01M6NDBHVD2DZQ1Q38DCKN1XE3/nodes/nod_01M6TGQZ8S3DAFS7TYE8TY1PX2/resource-usage",
+            "health": "healthy",
+            "resources": "healthy"
+          },
+          {
+            "path": "/v1/projects/prj_01M6NDBHVD2DZQ1Q38DCKN1XE3/nodes/nod_01M6TGSXV1J7XWC5D5H7N6EW1D/resource-usage",
+            "health": "healthy",
+            "resources": "healthy"
+          },
+          {
+            "path": "/healthz",
+            "health": "healthy",
+            "resources": "healthy"
+          },
+          {
+            "path": "/v1/projects/prj_01M6NDBHVD2DZQ1Q38DCKN1XE3/nodes",
+            "health": "healthy",
+            "resources": "healthy"
+          },
+          {
+            "path": "/v1/projects/prj_01M6NDBHVD2DZQ1Q38DCKN1XE3/nodes/nod_01M6TAWG25JTA3F7J7S1EE4N2W/resource-usage",
+            "health": "healthy",
+            "resources": "healthy"
+          },
+          {
+            "path": "/v1/projects/prj_01M6NDBHVD2DZQ1Q38DCKN1XE3/nodes/nod_01M6TGSXV1J7XWC5D5H7N6EW1D/resource-usage",
+            "health": "healthy",
+            "resources": "healthy"
+          },
+          {
+            "path": "/v1/projects/prj_01M6NDBHVD2DZQ1Q38DCKN1XE3/nodes/nod_01M6TGQZ8S3DAFS7TYE8TY1PX2/resource-usage",
+            "health": "healthy",
+            "resources": "healthy"
+          },
+          {
+            "path": "/healthz",
+            "health": "healthy",
+            "resources": "partial"
+          },
+          {
+            "path": "/v1/projects/prj_01M6NDBHVD2DZQ1Q38DCKN1XE3/nodes",
+            "health": "healthy",
+            "resources": "partial"
+          },
+          {
+            "path": "/v1/projects/prj_01M6NDBHVD2DZQ1Q38DCKN1XE3/nodes/nod_01M6TAWG25JTA3F7J7S1EE4N2W/resource-usage",
+            "health": "healthy",
+            "resources": "partial"
+          },
+          {
+            "path": "/v1/projects/prj_01M6NDBHVD2DZQ1Q38DCKN1XE3/nodes/nod_01M6TGQZ8S3DAFS7TYE8TY1PX2/resource-usage",
+            "health": "healthy",
+            "resources": "partial"
+          },
+          {
+            "path": "/v1/projects/prj_01M6NDBHVD2DZQ1Q38DCKN1XE3/nodes/nod_01M6TGSXV1J7XWC5D5H7N6EW1D/resource-usage",
+            "health": "healthy",
+            "resources": "partial"
+          },
+          {
+            "path": "/healthz",
+            "health": "healthy",
+            "resources": "error"
+          },
+          {
+            "path": "/v1/projects/prj_01M6NDBHVD2DZQ1Q38DCKN1XE3/nodes",
+            "health": "healthy",
+            "resources": "error"
+          },
+          {
+            "path": "/v1/projects/prj_01M6NDBHVD2DZQ1Q38DCKN1XE3/nodes/nod_01M6TAWG25JTA3F7J7S1EE4N2W/resource-usage",
+            "health": "healthy",
+            "resources": "error"
+          },
+          {
+            "path": "/v1/projects/prj_01M6NDBHVD2DZQ1Q38DCKN1XE3/nodes/nod_01M6TGQZ8S3DAFS7TYE8TY1PX2/resource-usage",
+            "health": "healthy",
+            "resources": "error"
+          },
+          {
+            "path": "/v1/projects/prj_01M6NDBHVD2DZQ1Q38DCKN1XE3/nodes/nod_01M6TGSXV1J7XWC5D5H7N6EW1D/resource-usage",
+            "health": "healthy",
+            "resources": "error"
+          },
+          {
+            "path": "/healthz",
+            "health": "html",
+            "resources": "error"
+          },
+          {
+            "path": "/v1/projects/prj_01M6NDBHVD2DZQ1Q38DCKN1XE3/nodes",
+            "health": "html",
+            "resources": "error"
+          },
+          {
+            "path": "/v1/projects/prj_01M6NDBHVD2DZQ1Q38DCKN1XE3/nodes/nod_01M6TAWG25JTA3F7J7S1EE4N2W/resource-usage",
+            "health": "html",
+            "resources": "error"
+          },
+          {
+            "path": "/v1/projects/prj_01M6NDBHVD2DZQ1Q38DCKN1XE3/nodes/nod_01M6TGQZ8S3DAFS7TYE8TY1PX2/resource-usage",
+            "health": "html",
+            "resources": "error"
+          },
+          {
+            "path": "/v1/projects/prj_01M6NDBHVD2DZQ1Q38DCKN1XE3/nodes/nod_01M6TGSXV1J7XWC5D5H7N6EW1D/resource-usage",
+            "health": "html",
+            "resources": "error"
+          },
+          {
+            "path": "/healthz",
+            "health": "html",
+            "resources": "error"
+          },
+          {
+            "path": "/v1/projects/prj_01M6NDBHVD2DZQ1Q38DCKN1XE3/nodes",
+            "health": "html",
+            "resources": "error"
+          },
+          {
+            "path": "/v1/projects/prj_01M6NDBHVD2DZQ1Q38DCKN1XE3/nodes/nod_01M6TAWG25JTA3F7J7S1EE4N2W/resource-usage",
+            "health": "html",
+            "resources": "error"
+          },
+          {
+            "path": "/v1/projects/prj_01M6NDBHVD2DZQ1Q38DCKN1XE3/nodes/nod_01M6TGQZ8S3DAFS7TYE8TY1PX2/resource-usage",
+            "health": "html",
+            "resources": "error"
+          },
+          {
+            "path": "/v1/projects/prj_01M6NDBHVD2DZQ1Q38DCKN1XE3/nodes/nod_01M6TGSXV1J7XWC5D5H7N6EW1D/resource-usage",
+            "health": "html",
+            "resources": "error"
+          },
+          {
+            "path": "/healthz",
+            "health": "text",
+            "resources": "error"
+          },
+          {
+            "path": "/v1/projects/prj_01M6NDBHVD2DZQ1Q38DCKN1XE3/nodes",
+            "health": "text",
+            "resources": "error"
+          },
+          {
+            "path": "/v1/projects/prj_01M6NDBHVD2DZQ1Q38DCKN1XE3/nodes/nod_01M6TAWG25JTA3F7J7S1EE4N2W/resource-usage",
+            "health": "text",
+            "resources": "error"
+          },
+          {
+            "path": "/v1/projects/prj_01M6NDBHVD2DZQ1Q38DCKN1XE3/nodes/nod_01M6TGQZ8S3DAFS7TYE8TY1PX2/resource-usage",
+            "health": "text",
+            "resources": "error"
+          },
+          {
+            "path": "/v1/projects/prj_01M6NDBHVD2DZQ1Q38DCKN1XE3/nodes/nod_01M6TGSXV1J7XWC5D5H7N6EW1D/resource-usage",
+            "health": "text",
+            "resources": "error"
+          },
+          {
+            "path": "/healthz",
+            "health": "error",
+            "resources": "error"
+          },
+          {
+            "path": "/v1/projects/prj_01M6NDBHVD2DZQ1Q38DCKN1XE3/nodes",
+            "health": "error",
+            "resources": "error"
+          },
+          {
+            "path": "/v1/projects/prj_01M6NDBHVD2DZQ1Q38DCKN1XE3/nodes/nod_01M6TAWG25JTA3F7J7S1EE4N2W/resource-usage",
+            "health": "error",
+            "resources": "error"
+          },
+          {
+            "path": "/v1/projects/prj_01M6NDBHVD2DZQ1Q38DCKN1XE3/nodes/nod_01M6TGQZ8S3DAFS7TYE8TY1PX2/resource-usage",
+            "health": "error",
+            "resources": "error"
+          },
+          {
+            "path": "/v1/projects/prj_01M6NDBHVD2DZQ1Q38DCKN1XE3/nodes/nod_01M6TGSXV1J7XWC5D5H7N6EW1D/resource-usage",
+            "health": "error",
+            "resources": "error"
+          },
+          {
+            "path": "/healthz",
+            "health": "healthy",
+            "resources": "healthy"
+          },
+          {
+            "path": "/v1/projects/prj_01M6NDBHVD2DZQ1Q38DCKN1XE3/nodes",
+            "health": "healthy",
+            "resources": "healthy"
+          },
+          {
+            "path": "/v1/projects/prj_01M6NDBHVD2DZQ1Q38DCKN1XE3/nodes/nod_01M6TAWG25JTA3F7J7S1EE4N2W/resource-usage",
+            "health": "healthy",
+            "resources": "healthy"
+          },
+          {
+            "path": "/v1/projects/prj_01M6NDBHVD2DZQ1Q38DCKN1XE3/nodes/nod_01M6TGQZ8S3DAFS7TYE8TY1PX2/resource-usage",
+            "health": "healthy",
+            "resources": "healthy"
+          },
+          {
+            "path": "/v1/projects/prj_01M6NDBHVD2DZQ1Q38DCKN1XE3/nodes/nod_01M6TGSXV1J7XWC5D5H7N6EW1D/resource-usage",
+            "health": "healthy",
+            "resources": "healthy"
+          }
+        ]
+      },
+      "gatewayTLSProxy": {
+        "fixtureOnly": true,
+        "realCPAcceptance": false,
+        "TLSVerified": true,
+        "portalLivenessSeparate": true,
+        "rawUpstreamFailuresPreserved": true,
+        "requests": [
+          {
+            "path": "/healthz",
+            "method": "GET",
+            "status": 200,
+            "headers": "HTTP/1.1 200 OK\nServer: nginx\nDate: Sat, 07 Nov 2026 20:26:52 GMT\nContent-Type: text/plain\nContent-Length: 2\nConnection: keep-alive\nStrict-Transport-Security: max-age=31536000; includeSubDomains\nContent-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self' data:; connect-src 'self' https://idp.sv.lan; frame-ancestors 'none'; object-src 'none'; base-uri 'self'; form-action 'self';\nX-Content-Type-Options: nosniff\nX-Frame-Options: DENY\nX-XSS-Protection: 0\nReferrer-Policy: strict-origin-when-cross-origin\nPermissions-Policy: geolocation=(), camera=(), microphone=()\n\n",
+            "body": "OK"
+          },
+          {
+            "path": "/gateway-healthz",
+            "method": "GET",
+            "status": 200,
+            "headers": "HTTP/1.1 200 OK\nServer: nginx\nDate: Sat, 07 Nov 2026 20:26:52 GMT\nContent-Type: application/json\nTransfer-Encoding: chunked\nConnection: keep-alive\nVary: Accept-Encoding\nStrict-Transport-Security: max-age=31536000; includeSubDomains\nContent-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self' data:; connect-src 'self' https://idp.sv.lan; frame-ancestors 'none'; object-src 'none'; base-uri 'self'; form-action 'self';\nX-Content-Type-Options: nosniff\nX-Frame-Options: DENY\nX-XSS-Protection: 0\nReferrer-Policy: strict-origin-when-cross-origin\nPermissions-Policy: geolocation=(), camera=(), microphone=()\nCache-Control: no-store\n\n",
+            "body": "{\"status\":\"ok\",\"version\":\"isolated-cp\"}"
+          },
+          {
+            "path": "/gateway-healthz",
+            "method": "GET",
+            "status": 200,
+            "headers": "HTTP/1.1 200 OK\nServer: nginx\nDate: Sat, 07 Nov 2026 20:26:52 GMT\nContent-Type: text/html\nTransfer-Encoding: chunked\nConnection: keep-alive\nVary: Accept-Encoding\nStrict-Transport-Security: max-age=31536000; includeSubDomains\nContent-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self' data:; connect-src 'self' https://idp.sv.lan; frame-ancestors 'none'; object-src 'none'; base-uri 'self'; form-action 'self';\nX-Content-Type-Options: nosniff\nX-Frame-Options: DENY\nX-XSS-Protection: 0\nReferrer-Policy: strict-origin-when-cross-origin\nPermissions-Policy: geolocation=(), camera=(), microphone=()\nCache-Control: no-store\n\n",
+            "body": "<html>upstream fallback</html>"
+          },
+          {
+            "path": "/gateway-healthz",
+            "method": "GET",
+            "status": 200,
+            "headers": "HTTP/1.1 200 OK\nServer: nginx\nDate: Sat, 07 Nov 2026 20:26:52 GMT\nContent-Type: text/plain\nTransfer-Encoding: chunked\nConnection: keep-alive\nVary: Accept-Encoding\nStrict-Transport-Security: max-age=31536000; includeSubDomains\nContent-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self' data:; connect-src 'self' https://idp.sv.lan; frame-ancestors 'none'; object-src 'none'; base-uri 'self'; form-action 'self';\nX-Content-Type-Options: nosniff\nX-Frame-Options: DENY\nX-XSS-Protection: 0\nReferrer-Policy: strict-origin-when-cross-origin\nPermissions-Policy: geolocation=(), camera=(), microphone=()\nCache-Control: no-store\n\n",
+            "body": "OK"
+          },
+          {
+            "path": "/gateway-healthz",
+            "method": "GET",
+            "status": 503,
+            "headers": "HTTP/1.1 503 Service Unavailable\nServer: nginx\nDate: Sat, 07 Nov 2026 20:26:52 GMT\nContent-Type: application/json\nTransfer-Encoding: chunked\nConnection: keep-alive\nStrict-Transport-Security: max-age=31536000; includeSubDomains\nContent-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self' data:; connect-src 'self' https://idp.sv.lan; frame-ancestors 'none'; object-src 'none'; base-uri 'self'; form-action 'self';\nX-Content-Type-Options: nosniff\nX-Frame-Options: DENY\nX-XSS-Protection: 0\nReferrer-Policy: strict-origin-when-cross-origin\nPermissions-Policy: geolocation=(), camera=(), microphone=()\nCache-Control: no-store\n\n",
+            "body": "{\"status\":\"unavailable\"}"
+          },
+          {
+            "path": "/gateway-healthz?private=value",
+            "method": "GET",
+            "status": 400,
+            "headers": "HTTP/1.1 400 Bad Request\nServer: nginx\nDate: Sat, 07 Nov 2026 20:26:52 GMT\nContent-Type: text/html\nContent-Length: 150\nConnection: close\nStrict-Transport-Security: max-age=31536000; includeSubDomains\nContent-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self' data:; connect-src 'self' https://idp.sv.lan; frame-ancestors 'none'; object-src 'none'; base-uri 'self'; form-action 'self';\nX-Content-Type-Options: nosniff\nX-Frame-Options: DENY\nX-XSS-Protection: 0\nReferrer-Policy: strict-origin-when-cross-origin\nPermissions-Policy: geolocation=(), camera=(), microphone=()\nCache-Control: no-store\n\n",
+            "body": "<html>\n<head><title>400 Bad Request</title></head>\n<body>\n<center><h1>400 Bad Request</h1></center>\n<hr><center>nginx</center>\n</body>\n</html>\n"
+          },
+          {
+            "path": "/gateway-healthz",
+            "method": "POST",
+            "status": 403,
+            "headers": "HTTP/1.1 403 Forbidden\nServer: nginx\nDate: Sat, 07 Nov 2026 20:26:52 GMT\nContent-Type: text/html\nContent-Length: 146\nConnection: keep-alive\nStrict-Transport-Security: max-age=31536000; includeSubDomains\nContent-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self' data:; connect-src 'self' https://idp.sv.lan; frame-ancestors 'none'; object-src 'none'; base-uri 'self'; form-action 'self';\nX-Content-Type-Options: nosniff\nX-Frame-Options: DENY\nX-XSS-Protection: 0\nReferrer-Policy: strict-origin-when-cross-origin\nPermissions-Policy: geolocation=(), camera=(), microphone=()\nCache-Control: no-store\n\n",
+            "body": "<html>\n<head><title>403 Forbidden</title></head>\n<body>\n<center><h1>403 Forbidden</h1></center>\n<hr><center>nginx</center>\n</body>\n</html>\n"
+          }
+        ]
+      },
+      "strictCSPBrowser": {
+        "fixtureOnly": true,
+        "actualPC3BrowserAcceptance": false,
+        "anonymousOnly": true,
+        "sandbox": true,
+        "csp": "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self' data:; connect-src 'self' https://idp.sv.lan; frame-ancestors 'none'; object-src 'none'; base-uri 'self'; form-action 'self';",
+        "securityHeadersSHA256": "1365881a4f7a50e65c41d4083735fc547d8e6103439abe3759227b37a87bc731",
+        "distSHA256": {
+          "assets/icons-DVYUNEhE.js": "94f3f917fa843a4e312937688a83f400ea3d5617d1f1e1f36d6bc643f78ffa9e",
+          "assets/icons-DVYUNEhE.js.map": "bdc634b37b1574e46b91990a227c6ecf862e6364ec9219a524c88741ee294ea3",
+          "assets/index-DCE-pCmf.js": "178012942127f9840d6cf131505a349b15dc9433b743dedde2efec49fe575590",
+          "assets/index-DCE-pCmf.js.map": "30dd18df68c97cab11fab9090f46235b047421b26406d82f7474aca92f7807bb",
+          "assets/index-kKrfL4r3.css": "66d8552241923e10b189e3b9372f85205bccbf083a5dc19872d001fd91ad0d26",
+          "assets/query-DtERyQJL.js": "3a24ebe459ff24b83ef333288347529de609b65f1c25d5c5b74f2f8b20e2904d",
+          "assets/query-DtERyQJL.js.map": "d584967ed9a938c701324896050b1db23187d2a79840fe5fac55791a2eafc500",
+          "assets/vendor-CYSfZuHu.js": "d967cddbe86b7822415ceafb696d97dea5a491621955cb4127e0f3f96e5497eb",
+          "assets/vendor-CYSfZuHu.js.map": "037070c1858eff839f466f2431a724493a80f81c8f47484c4c6c21698885d15e",
+          "auth-config.js": "5b9a14cc56ea56e4ae58359adbc17de4a1ee2d9ca3da04973fb4f144f42a60e1",
+          "index.html": "a14cd3a68ffc19c78932351cc3fd89824dd5bba4110cdcfd75caf940ddf4e1bc",
+          "manifest.json": "d4c3c0897d7be95321a37babc97bd922618cf8142dd9103faef1efe700fd343a",
+          "sw.js": "5befc07c048a6a49d7f7ec492fe1c04ae8b40283dcc8387ef4e6b2b92c516dcd"
+        },
+        "bundledAjvCompilerModules": [],
+        "browserVersion": "156.0.8078.79",
+        "negativeControl": {
+          "functionBlocked": true,
+          "evalBlocked": true
+        },
+        "rootChildren": 1,
+        "knownBase96MissingFavicon": [
+          {
+            "url": "http://127.0.0.1:39123/favicon.svg",
+            "status": 404
+          }
+        ],
+        "bootPassed": true,
+        "pageErrors": [],
+        "requestFailures": [],
+        "responses": [
+          {
+            "url": "http://127.0.0.1:39123/",
+            "status": 200
+          },
+          {
+            "url": "http://127.0.0.1:39123/assets/index-kKrfL4r3.css",
+            "status": 200
+          },
+          {
+            "url": "http://127.0.0.1:39123/assets/query-DtERyQJL.js",
+            "status": 200
+          },
+          {
+            "url": "http://127.0.0.1:39123/auth-config.js",
+            "status": 200
+          },
+          {
+            "url": "http://127.0.0.1:39123/assets/vendor-CYSfZuHu.js",
+            "status": 200
+          },
+          {
+            "url": "http://127.0.0.1:39123/assets/index-DCE-pCmf.js",
+            "status": 200
+          },
+          {
+            "url": "http://127.0.0.1:39123/favicon.svg",
+            "status": 404
+          }
+        ],
+        "requestMethods": [
+          "GET",
+          "GET",
+          "GET",
+          "GET",
+          "GET",
+          "GET",
+          "GET"
+        ],
+        "cspErrors": []
+      },
+      "standaloneValidatorManifest": {
+        "schema": "contracts/v1alpha1/core.schema.json",
+        "ref": "https://saintvision.ai/contracts/v1alpha1/core.schema.json#/$defs/ProjectNodeCertificateObservationResponse",
+        "format": "esm",
+        "selfContained": true,
+        "schemaSHA256": "f8bb8fa801f64d622ebcdc1c4c3383833632ccfb05a740493e3a5cb86e44404f",
+        "generatorSHA256": "eb1b7d2a1f667f9a8616d95b43b54716e3d3a4a7b8744ddacc4a777d8cc44042",
+        "lockSHA256": "1fa82239ec4bb731ef649acfeac84ac4a1dfb2fa5801824502adf053e8892fbd",
+        "ajv": "8.20.0",
+        "ajvFormats": "3.0.1",
+        "esbuild": "0.25.12",
+        "runtimeInputs": [
+          {
+            "path": "node_modules/ajv-formats/dist/formats.js",
+            "SHA256": "b61693a26869970a92cc1fe832c931ccd3afe8b6d66802b19c48306349e84880"
+          }
+        ],
+        "validatorSHA256": "476a803e51aa3f03e7512cfdf246462a63998e8657dc8afc5a622b0652a1d860"
+      },
+      "cleanDirectMainConfigBrowser": {
+        "fixtureOnly": true,
+        "actualPC3BrowserAcceptance": false,
+        "anonymousOnly": true,
+        "npmLifecycleUsed": false,
+        "command": [
+          "/opt/hostedtoolcache/node/22.23.4/x64/bin/node",
+          "node_modules/vite/bin/vite.js",
+          "--config",
+          "vite.config.ts",
+          "--host",
+          "127.0.0.1",
+          "--port",
+          "33253",
+          "--strictPort"
+        ],
+        "cwd": "/home/runner/work/SaintVision-Invion/SaintVision-Invion/apps/web",
+        "mainConfig": "apps/web/vite.config.ts",
+        "mainConfigSHA256": "b625ea575e0523d538f0bdcb0790f98e5c7fe750272e8125a29e1c9502588a42",
+        "missingBefore": {
+          "apps/web/src/contracts/node-certificate-validator.mjs": true,
+          "apps/web/src/contracts/node-certificate-validator.manifest.json": true
+        },
+        "sourceSHA": "abb7074e3da0d547ac81d3da33dce347d5c656af",
+        "sandbox": true,
+        "deletedFiles": [],
+        "ownedChildPID": 2344,
+        "generatedAfter": {
+          "apps/web/src/contracts/node-certificate-validator.mjs": "476a803e51aa3f03e7512cfdf246462a63998e8657dc8afc5a622b0652a1d860",
+          "apps/web/src/contracts/node-certificate-validator.manifest.json": "3d40cbe9fd7d485a547591faaa0cb0b15b206f7982c77bc9e1107905e1e94200"
+        },
+        "manifest": {
+          "schema": "contracts/v1alpha1/core.schema.json",
+          "ref": "https://saintvision.ai/contracts/v1alpha1/core.schema.json#/$defs/ProjectNodeCertificateObservationResponse",
+          "format": "esm",
+          "selfContained": true,
+          "schemaSHA256": "f8bb8fa801f64d622ebcdc1c4c3383833632ccfb05a740493e3a5cb86e44404f",
+          "generatorSHA256": "eb1b7d2a1f667f9a8616d95b43b54716e3d3a4a7b8744ddacc4a777d8cc44042",
+          "lockSHA256": "1fa82239ec4bb731ef649acfeac84ac4a1dfb2fa5801824502adf053e8892fbd",
+          "ajv": "8.20.0",
+          "ajvFormats": "3.0.1",
+          "esbuild": "0.25.12",
+          "runtimeInputs": [
+            {
+              "path": "node_modules/ajv-formats/dist/formats.js",
+              "SHA256": "b61693a26869970a92cc1fe832c931ccd3afe8b6d66802b19c48306349e84880"
+            }
+          ],
+          "validatorSHA256": "476a803e51aa3f03e7512cfdf246462a63998e8657dc8afc5a622b0652a1d860"
+        },
+        "browserVersion": "156.0.8078.79",
+        "rootChildren": 1,
+        "knownBase96MissingFavicon": [],
+        "validatorModuleResponses": [
+          {
+            "url": "http://127.0.0.1:33253/src/contracts/node-certificate-validator.mjs",
+            "status": 200
+          }
+        ],
+        "bootPassed": true,
+        "ownedChildExitCode": 143,
+        "pageErrors": [],
+        "requestFailures": [],
+        "responses": [
+          {
+            "url": "http://127.0.0.1:33253/",
+            "status": 200
+          },
+          {
+            "url": "http://127.0.0.1:33253/auth-config.js",
+            "status": 200
+          },
+          {
+            "url": "http://127.0.0.1:33253/src/main.tsx",
+            "status": 200
+          },
+          {
+            "url": "http://127.0.0.1:33253/@vite/client",
+            "status": 200
+          },
+          {
+            "url": "http://127.0.0.1:33253/@react-refresh",
+            "status": 200
+          },
+          {
+            "url": "http://127.0.0.1:33253/node_modules/vite/dist/client/env.mjs",
+            "status": 200
+          },
+          {
+            "url": "http://127.0.0.1:33253/node_modules/.vite/deps/react_jsx-dev-runtime.js?v=5fe49824",
+            "status": 200
+          },
+          {
+            "url": "http://127.0.0.1:33253/node_modules/.vite/deps/react.js?v=5fe49824",
+            "status": 200
+          },
+          {
+            "url": "http://127.0.0.1:33253/src/index.css",
+            "status": 200
+          },
+          {
+            "url": "http://127.0.0.1:33253/src/app/App.tsx",
+            "status": 200
+          },
+          {
+            "url": "http://127.0.0.1:33253/node_modules/.vite/deps/react-dom_client.js?v=aae54040",
+            "status": 200
+          },
+          {
+            "url": "http://127.0.0.1:33253/src/shared/api/kernelMutations.ts",
+            "status": 200
+          },
+          {
+            "url": "http://127.0.0.1:33253/node_modules/.vite/deps/chunk-SBBO3VZI.js?v=6d51b4d0",
+            "status": 200
+          },
+          {
+            "url": "http://127.0.0.1:33253/src/features/desktop/DesktopShell.tsx",
+            "status": 200
+          },
+          {
+            "url": "http://127.0.0.1:33253/src/shared/api/approvalReview.ts",
+            "status": 200
+          },
+          {
+            "url": "http://127.0.0.1:33253/src/shared/ui/Header.tsx",
+            "status": 200
+          },
+          {
+            "url": "http://127.0.0.1:33253/src/features/dashboard/ClusterOverview.tsx",
+            "status": 200
+          },
+          {
+            "url": "http://127.0.0.1:33253/src/features/nodes/NodeList.tsx",
+            "status": 200
+          },
+          {
+            "url": "http://127.0.0.1:33253/src/features/nodes/NodeDetail.tsx",
+            "status": 200
+          },
+          {
+            "url": "http://127.0.0.1:33253/src/features/workspaces/WorkspaceList.tsx",
+            "status": 200
+          },
+          {
+            "url": "http://127.0.0.1:33253/src/features/workspaces/WorkspaceCreateModal.tsx",
+            "status": 200
+          },
+          {
+            "url": "http://127.0.0.1:33253/src/features/workspaces/ExecutionResultView.tsx",
+            "status": 200
+          },
+          {
+            "url": "http://127.0.0.1:33253/src/features/placement/PlacementSimulator.tsx",
+            "status": 200
+          },
+          {
+            "url": "http://127.0.0.1:33253/src/features/desktop/ResourceExplorer.tsx",
+            "status": 200
+          },
+          {
+            "url": "http://127.0.0.1:33253/src/features/recovery/DistributedRecoveryView.tsx",
+            "status": 200
+          },
+          {
+            "url": "http://127.0.0.1:33253/src/features/editor/MonacoWorkspaceEditor.tsx",
+            "status": 200
+          },
+          {
+            "url": "http://127.0.0.1:33253/src/features/agent/NaturalLanguageRunView.tsx",
+            "status": 200
+          },
+          {
+            "url": "http://127.0.0.1:33253/src/features/admin/AdminSecurityConsole.tsx",
+            "status": 200
+          },
+          {
+            "url": "http://127.0.0.1:33253/src/features/release/ReleaseCandidateView.tsx",
+            "status": 200
+          },
+          {
+            "url": "http://127.0.0.1:33253/src/features/runs/RunList.tsx",
+            "status": 200
+          },
+          {
+            "url": "http://127.0.0.1:33253/src/features/mlops/ModelLineageView.tsx",
+            "status": 200
+          },
+          {
+            "url": "http://127.0.0.1:33253/src/features/approvals/ApprovalCenter.tsx",
+            "status": 200
+          },
+          {
+            "url": "http://127.0.0.1:33253/src/features/deployment/IntranetDeploymentView.tsx",
+            "status": 200
+          },
+          {
+            "url": "http://127.0.0.1:33253/src/features/terminal/WebTerminal.tsx",
+            "status": 200
+          },
+          {
+            "url": "http://127.0.0.1:33253/src/features/runs/RunDetail.tsx",
+            "status": 200
+          },
+          {
+            "url": "http://127.0.0.1:33253/src/features/evidence/EvidenceViewer.tsx",
+            "status": 200
+          },
+          {
+            "url": "http://127.0.0.1:33253/src/shared/api/client.ts",
+            "status": 200
+          },
+          {
+            "url": "http://127.0.0.1:33253/src/shared/api/runApprovalObservation.ts",
+            "status": 200
+          },
+          {
+            "url": "http://127.0.0.1:33253/src/shared/api/projectObservation.ts",
+            "status": 200
+          },
+          {
+            "url": "http://127.0.0.1:33253/src/features/auth/Login.tsx",
+            "status": 200
+          },
+          {
+            "url": "http://127.0.0.1:33253/src/features/auth/session.ts",
+            "status": 200
+          },
+          {
+            "url": "http://127.0.0.1:33253/src/features/studio/DeveloperStudio.tsx",
+            "status": 200
+          },
+          {
+            "url": "http://127.0.0.1:33253/src/shared/api/nodeObservation.ts",
+            "status": 200
+          },
+          {
+            "url": "http://127.0.0.1:33253/src/shared/api/dashboardResources.ts",
+            "status": 200
+          },
+          {
+            "url": "http://127.0.0.1:33253/node_modules/.vite/deps/chunk-6UHQHO32.js?v=6d51b4d0",
+            "status": 200
+          },
+          {
+            "url": "http://127.0.0.1:33253/src/features/desktop/fabricControlApi.ts",
+            "status": 200
+          },
+          {
+            "url": "http://127.0.0.1:33253/src/features/desktop/desktopLayout.ts",
+            "status": 200
+          },
+          {
+            "url": "http://127.0.0.1:33253/src/shared/api/nodeCertificateObservation.ts",
+            "status": 200
+          },
+          {
+            "url": "http://127.0.0.1:33253/src/features/desktop/DesktopWindow.tsx",
+            "status": 200
+          },
+          {
+            "url": "http://127.0.0.1:33253/src/features/desktop/InvFileExplorer.tsx",
+            "status": 200
+          },
+          {
+            "url": "http://127.0.0.1:33253/src/features/desktop/ModelStudioView.tsx",
+            "status": 200
+          },
+          {
+            "url": "http://127.0.0.1:33253/src/shared/ui/Skeleton.tsx",
+            "status": 200
+          },
+          {
+            "url": "http://127.0.0.1:33253/src/features/dashboard/CanonicalClusterResources.tsx",
+            "status": 200
+          },
+          {
+            "url": "http://127.0.0.1:33253/src/shared/ui/Button.tsx",
+            "status": 200
+          },
+          {
+            "url": "http://127.0.0.1:33253/src/shared/ui/EmptyState.tsx",
+            "status": 200
+          },
+          {
+            "url": "http://127.0.0.1:33253/src/features/desktop/TerminalSessionView.tsx",
+            "status": 200
+          },
+          {
+            "url": "http://127.0.0.1:33253/src/shared/ui/ErrorState.tsx",
+            "status": 200
+          },
+          {
+            "url": "http://127.0.0.1:33253/src/shared/ui/useModalA11y.ts",
+            "status": 200
+          },
+          {
+            "url": "http://127.0.0.1:33253/src/features/recovery/recoveryEngine.ts",
+            "status": 200
+          },
+          {
+            "url": "http://127.0.0.1:33253/src/features/placement/ResourceTopologyGraph.tsx",
+            "status": 200
+          },
+          {
+            "url": "http://127.0.0.1:33253/src/features/placement/placementEngine.ts",
+            "status": 200
+          },
+          {
+            "url": "http://127.0.0.1:33253/src/shared/api/storageObservation.ts",
+            "status": 200
+          },
+          {
+            "url": "http://127.0.0.1:33253/src/features/placement/PlacementExplainView.tsx",
+            "status": 200
+          },
+          {
+            "url": "http://127.0.0.1:33253/src/shared/api/workspaceEditObservation.ts",
+            "status": 200
+          },
+          {
+            "url": "http://127.0.0.1:33253/src/features/editor/diffEngine.ts",
+            "status": 200
+          },
+          {
+            "url": "http://127.0.0.1:33253/src/features/editor/sessionRecovery.ts",
+            "status": 200
+          },
+          {
+            "url": "http://127.0.0.1:33253/src/features/editor/DiffViewer.tsx",
+            "status": 200
+          },
+          {
+            "url": "http://127.0.0.1:33253/src/features/editor/GitCommitModal.tsx",
+            "status": 200
+          },
+          {
+            "url": "http://127.0.0.1:33253/src/features/editor/ConflictResolutionModal.tsx",
+            "status": 200
+          },
+          {
+            "url": "http://127.0.0.1:33253/src/features/agent/agentEngine.ts",
+            "status": 200
+          },
+          {
+            "url": "http://127.0.0.1:33253/src/features/admin/securityEngine.ts",
+            "status": 200
+          },
+          {
+            "url": "http://127.0.0.1:33253/src/features/release/releaseEngine.ts",
+            "status": 200
+          },
+          {
+            "url": "http://127.0.0.1:33253/src/shared/api/modelCommitmentObservation.ts",
+            "status": 200
+          },
+          {
+            "url": "http://127.0.0.1:33253/src/features/mlops/mlopsEngine.ts",
+            "status": 200
+          },
+          {
+            "url": "http://127.0.0.1:33253/src/shared/api/adapterObservation.ts",
+            "status": 200
+          },
+          {
+            "url": "http://127.0.0.1:33253/src/shared/api/modelRegistryObservation.ts",
+            "status": 200
+          },
+          {
+            "url": "http://127.0.0.1:33253/src/features/approvals/ApprovalReviewPanel.tsx",
+            "status": 200
+          },
+          {
+            "url": "http://127.0.0.1:33253/src/features/deployment/deploymentEngine.ts",
+            "status": 200
+          },
+          {
+            "url": "http://127.0.0.1:33253/src/shared/api/releaseObservation.ts",
+            "status": 200
+          },
+          {
+            "url": "http://127.0.0.1:33253/src/shared/ui/RiskBadge.tsx",
+            "status": 200
+          },
+          {
+            "url": "http://127.0.0.1:33253/src/shared/realtime/ws-terminal.ts",
+            "status": 200
+          },
+          {
+            "url": "http://127.0.0.1:33253/src/shared/api/runArtifactObservation.ts",
+            "status": 200
+          },
+          {
+            "url": "http://127.0.0.1:33253/src/shared/api/terminalTicket.ts",
+            "status": 200
+          },
+          {
+            "url": "http://127.0.0.1:33253/src/shared/api/runLogObservation.ts",
+            "status": 200
+          },
+          {
+            "url": "http://127.0.0.1:33253/src/shared/api/runAttemptObservation.ts",
+            "status": 200
+          },
+          {
+            "url": "http://127.0.0.1:33253/src/shared/api/shardObservation.ts",
+            "status": 200
+          },
+          {
+            "url": "http://127.0.0.1:33253/src/shared/api/modelRetry.ts",
+            "status": 200
+          },
+          {
+            "url": "http://127.0.0.1:33253/src/features/runs/SealRecordPanel.tsx",
+            "status": 200
+          },
+          {
+            "url": "http://127.0.0.1:33253/src/features/auth/pkce.ts",
+            "status": 200
+          },
+          {
+            "url": "http://127.0.0.1:33253/src/contracts/kernel-observation.ts",
+            "status": 200
+          },
+          {
+            "url": "http://127.0.0.1:33253/src/features/studio/FirstWorkspacePanel.tsx",
+            "status": 200
+          },
+          {
+            "url": "http://127.0.0.1:33253/src/shared/utils/crypto.ts",
+            "status": 200
+          },
+          {
+            "url": "http://127.0.0.1:33253/src/shared/api/fabricObservation.ts",
+            "status": 200
+          },
+          {
+            "url": "http://127.0.0.1:33253/src/shared/utils/dateTime.ts",
+            "status": 200
+          },
+          {
+            "url": "http://127.0.0.1:33253/src/contracts/node-certificate-validator.mjs",
+            "status": 200
+          },
+          {
+            "url": "http://127.0.0.1:33253/src/features/approvals/ApprovalDetail.tsx",
+            "status": 200
+          },
+          {
+            "url": "http://127.0.0.1:33253/src/shared/api/runSealObservation.ts",
+            "status": 200
+          },
+          {
+            "url": "http://127.0.0.1:33253/src/shared/api/firstWorkspace.ts",
+            "status": 200
+          },
+          {
+            "url": "http://127.0.0.1:33253/src/shared/api/workspaceFirstIntent.ts",
+            "status": 200
+          },
+          {
+            "url": "http://127.0.0.1:33253/favicon.svg",
+            "status": 200
+          }
+        ],
+        "requestMethods": [
+          "GET",
+          "GET",
+          "GET",
+          "GET",
+          "GET",
+          "GET",
+          "GET",
+          "GET",
+          "GET",
+          "GET",
+          "GET",
+          "GET",
+          "GET",
+          "GET",
+          "GET",
+          "GET",
+          "GET",
+          "GET",
+          "GET",
+          "GET",
+          "GET",
+          "GET",
+          "GET",
+          "GET",
+          "GET",
+          "GET",
+          "GET",
+          "GET",
+          "GET",
+          "GET",
+          "GET",
+          "GET",
+          "GET",
+          "GET",
+          "GET",
+          "GET",
+          "GET",
+          "GET",
+          "GET",
+          "GET",
+          "GET",
+          "GET",
+          "GET",
+          "GET",
+          "GET",
+          "GET",
+          "GET",
+          "GET",
+          "GET",
+          "GET",
+          "GET",
+          "GET",
+          "GET",
+          "GET",
+          "GET",
+          "GET",
+          "GET",
+          "GET",
+          "GET",
+          "GET",
+          "GET",
+          "GET",
+          "GET",
+          "GET",
+          "GET",
+          "GET",
+          "GET",
+          "GET",
+          "GET",
+          "GET",
+          "GET",
+          "GET",
+          "GET",
+          "GET",
+          "GET",
+          "GET",
+          "GET",
+          "GET",
+          "GET",
+          "GET",
+          "GET",
+          "GET",
+          "GET",
+          "GET",
+          "GET",
+          "GET",
+          "GET",
+          "GET",
+          "GET",
+          "GET",
+          "GET",
+          "GET",
+          "GET",
+          "GET",
+          "GET",
+          "GET",
+          "GET",
+          "GET",
+          "GET",
+          "GET"
+        ]
+      },
+      "directProofBeforeNpmGenerationHooks": true,
+      "distFilesSHA256": {
+        "assets/icons-DVYUNEhE.js": "94f3f917fa843a4e312937688a83f400ea3d5617d1f1e1f36d6bc643f78ffa9e",
+        "assets/icons-DVYUNEhE.js.map": "bdc634b37b1574e46b91990a227c6ecf862e6364ec9219a524c88741ee294ea3",
+        "assets/index-DCE-pCmf.js": "178012942127f9840d6cf131505a349b15dc9433b743dedde2efec49fe575590",
+        "assets/index-DCE-pCmf.js.map": "30dd18df68c97cab11fab9090f46235b047421b26406d82f7474aca92f7807bb",
+        "assets/index-kKrfL4r3.css": "66d8552241923e10b189e3b9372f85205bccbf083a5dc19872d001fd91ad0d26",
+        "assets/query-DtERyQJL.js": "3a24ebe459ff24b83ef333288347529de609b65f1c25d5c5b74f2f8b20e2904d",
+        "assets/query-DtERyQJL.js.map": "d584967ed9a938c701324896050b1db23187d2a79840fe5fac55791a2eafc500",
+        "assets/vendor-CYSfZuHu.js": "d967cddbe86b7822415ceafb696d97dea5a491621955cb4127e0f3f96e5497eb",
+        "assets/vendor-CYSfZuHu.js.map": "037070c1858eff839f466f2431a724493a80f81c8f47484c4c6c21698885d15e",
+        "auth-config.js": "5b9a14cc56ea56e4ae58359adbc17de4a1ee2d9ca3da04973fb4f144f42a60e1",
+        "index.html": "a14cd3a68ffc19c78932351cc3fd89824dd5bba4110cdcfd75caf940ddf4e1bc",
+        "manifest.json": "d4c3c0897d7be95321a37babc97bd922618cf8142dd9103faef1efe700fd343a",
+        "sw.js": "5befc07c048a6a49d7f7ec492fe1c04ae8b40283dcc8387ef4e6b2b92c516dcd"
+      },
+      "targetedOfficialSuiteLines": [
+        "2026-11-07T20:26:29.3591144Z  \u2713 tests/portal-refresh-fleet-ui.test.tsx (46 tests) 1397ms",
+        "2026-11-07T20:26:44.4775147Z  \u2713 tests/dashboard-canonical-resources.test.tsx (25 tests) 327ms",
+        "2026-11-07T20:26:49.6970864Z  \u2713 tests/dashboard-app-join.test.tsx (4 tests) 407ms",
+        "2026-11-07T20:26:50.8939117Z  \u2713 tests/node-certificate-validator-csp.test.ts (15 tests) 3003ms"
+      ]
+    },
+    {
+      "workflow": "docs",
+      "runID": 42410998999,
+      "sourceSHA": "abb7074e3da0d547ac81d3da33dce347d5c656af",
+      "ref": "agent/codex/fleet5-dashboard-canonical-resource-health-r1-20261108",
+      "correlation": "fleet5-dashboard-resource-health-docs-75654fc002894552b95f2db34c1c681a",
+      "event": "workflow_dispatch",
+      "attempt": 1,
+      "conclusion": "success",
+      "url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/42410998999",
+      "jobs": [
+        {
+          "id": 128518908527,
+          "name": "docs",
+          "conclusion": "success",
+          "steps": [
+            {
+              "name": "Set up job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 1,
+              "started_at": "2026-11-07T20:25:41Z",
+              "completed_at": "2026-11-07T20:25:42Z"
+            },
+            {
+              "name": "Run actions/checkout@v4",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 2,
+              "started_at": "2026-11-07T20:25:42Z",
+              "completed_at": "2026-11-07T20:25:46Z"
+            },
+            {
+              "name": "Run actions/setup-python@v5",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 3,
+              "started_at": "2026-11-07T20:25:46Z",
+              "completed_at": "2026-11-07T20:25:46Z"
+            },
+            {
+              "name": "Run python -m pip install -r requirements-docs.txt",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 4,
+              "started_at": "2026-11-07T20:25:46Z",
+              "completed_at": "2026-11-07T20:25:48Z"
+            },
+            {
+              "name": "Run python tools/check_docs.py",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 5,
+              "started_at": "2026-11-07T20:25:48Z",
+              "completed_at": "2026-11-07T20:25:49Z"
+            },
+            {
+              "name": "Repository path citations exist (ratchet; baseline may only shrink)",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 6,
+              "started_at": "2026-11-07T20:25:49Z",
+              "completed_at": "2026-11-07T20:25:51Z"
+            },
+            {
+              "name": "Run python tools/check_contract_bindings.py",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 7,
+              "started_at": "2026-11-07T20:25:51Z",
+              "completed_at": "2026-11-07T20:25:57Z"
+            },
+            {
+              "name": "Run python tools/check_frontend_integrity.py",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 8,
+              "started_at": "2026-11-07T20:25:57Z",
+              "completed_at": "2026-11-07T20:25:58Z"
+            },
+            {
+              "name": "Report fixture producer reachability",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 9,
+              "started_at": "2026-11-07T20:25:58Z",
+              "completed_at": "2026-11-07T20:25:58Z"
+            },
+            {
+              "name": "Report client route coverage (report-only; promote per \uac80\uc99d\uac80\uc0ac\ub3c4\uad6c_\ubaa9\ub85d)",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 10,
+              "started_at": "2026-11-07T20:25:58Z",
+              "completed_at": "2026-11-07T20:25:58Z"
+            },
+            {
+              "name": "Run actions/upload-artifact@v4",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 11,
+              "started_at": "2026-11-07T20:25:58Z",
+              "completed_at": "2026-11-07T20:25:59Z"
+            },
+            {
+              "name": "Run python tools/test_sync.py",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 12,
+              "started_at": "2026-11-07T20:25:59Z",
+              "completed_at": "2026-11-07T20:26:00Z"
+            },
+            {
+              "name": "Run python tools/check_ontology_generation.py",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 13,
+              "started_at": "2026-11-07T20:26:00Z",
+              "completed_at": "2026-11-07T20:26:01Z"
+            },
+            {
+              "name": "Run python tools/check_ontology.py",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 14,
+              "started_at": "2026-11-07T20:26:01Z",
+              "completed_at": "2026-11-07T20:26:03Z"
+            },
+            {
+              "name": "Build documentation bundle",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 15,
+              "started_at": "2026-11-07T20:26:03Z",
+              "completed_at": "2026-11-07T20:26:06Z"
+            },
+            {
+              "name": "Run actions/upload-artifact@v4",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 16,
+              "started_at": "2026-11-07T20:26:06Z",
+              "completed_at": "2026-11-07T20:26:08Z"
+            },
+            {
+              "name": "Post Run actions/setup-python@v5",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 31,
+              "started_at": "2026-11-07T20:26:08Z",
+              "completed_at": "2026-11-07T20:26:08Z"
+            },
+            {
+              "name": "Post Run actions/checkout@v4",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 32,
+              "started_at": "2026-11-07T20:26:08Z",
+              "completed_at": "2026-11-07T20:26:09Z"
+            },
+            {
+              "name": "Complete job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 33,
+              "started_at": "2026-11-07T20:26:09Z",
+              "completed_at": "2026-11-07T20:26:09Z"
+            }
+          ]
+        }
+      ],
+      "artifacts": [
+        {
+          "id": 13589771815,
+          "node_id": "MDg6QXJ0aWZhY3QxMzU4OTc3MTgxNQ==",
+          "name": "saintvision-guidelines",
+          "size_in_bytes": 49254563,
+          "url": "https://api.github.com/repos/egparadise/SaintVision-Invion/actions/artifacts/13589771815",
+          "archive_download_url": "https://api.github.com/repos/egparadise/SaintVision-Invion/actions/artifacts/13589771815/zip",
+          "expired": false,
+          "digest": "sha256:00e59bb372f8cc9759fd9c6f376c51a4fa11ba6b73aa7f3845f2dcf4642191d1",
+          "created_at": "2026-11-07T20:26:08Z",
+          "updated_at": "2026-11-07T20:26:08Z",
+          "expires_at": "2026-12-07T20:26:06Z",
+          "workflow_run": {
+            "id": 42410998999,
+            "repository_id": 1362259805,
+            "head_repository_id": 1362259805,
+            "head_branch": "agent/codex/fleet5-dashboard-canonical-resource-health-r1-20261108",
+            "head_sha": "abb7074e3da0d547ac81d3da33dce347d5c656af"
+          }
+        },
+        {
+          "id": 13589482589,
+          "node_id": "MDg6QXJ0aWZhY3QxMzU4OTQ4MjU4OQ==",
+          "name": "route-coverage-report",
+          "size_in_bytes": 1915,
+          "url": "https://api.github.com/repos/egparadise/SaintVision-Invion/actions/artifacts/13589482589",
+          "archive_download_url": "https://api.github.com/repos/egparadise/SaintVision-Invion/actions/artifacts/13589482589/zip",
+          "expired": false,
+          "digest": "sha256:09261dcaa035b7f92ed94608c2d6d0bbb95ee77b6e3fcb579b5321752d92dece",
+          "created_at": "2026-11-07T20:25:59Z",
+          "updated_at": "2026-11-07T20:25:59Z",
+          "expires_at": "2026-12-07T20:25:59Z",
+          "workflow_run": {
+            "id": 42410998999,
+            "repository_id": 1362259805,
+            "head_repository_id": 1362259805,
+            "head_branch": "agent/codex/fleet5-dashboard-canonical-resource-health-r1-20261108",
+            "head_sha": "abb7074e3da0d547ac81d3da33dce347d5c656af"
+          },
+          "downloadedZIPVerifiedSHA256": "09261dcaa035b7f92ed94608c2d6d0bbb95ee77b6e3fcb579b5321752d92dece"
+        }
+      ]
+    },
+    {
+      "workflow": "ac11-accessibility-e2e",
+      "runID": 42411001237,
+      "sourceSHA": "abb7074e3da0d547ac81d3da33dce347d5c656af",
+      "ref": "agent/codex/fleet5-dashboard-canonical-resource-health-r1-20261108",
+      "correlation": "fleet5-dashboard-resource-health-ac11-accessibility-e2e-c92159c04a534d5c9641d28e3922df4d",
+      "event": "workflow_dispatch",
+      "attempt": 1,
+      "conclusion": "success",
+      "url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/42411001237",
+      "jobs": [
+        {
+          "id": 128518914722,
+          "name": "accessibility-e2e",
+          "conclusion": "success",
+          "steps": [
+            {
+              "name": "Set up job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 1,
+              "started_at": "2026-11-07T20:25:43Z",
+              "completed_at": "2026-11-07T20:25:43Z"
+            },
+            {
+              "name": "Checkout exact source head",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 2,
+              "started_at": "2026-11-07T20:25:44Z",
+              "completed_at": "2026-11-07T20:25:49Z"
+            },
+            {
+              "name": "Run actions/setup-python@v5",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 3,
+              "started_at": "2026-11-07T20:25:49Z",
+              "completed_at": "2026-11-07T20:25:51Z"
+            },
+            {
+              "name": "Run actions/setup-node@v4",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 4,
+              "started_at": "2026-11-07T20:25:51Z",
+              "completed_at": "2026-11-07T20:25:52Z"
+            },
+            {
+              "name": "Install browser lane dependencies",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 5,
+              "started_at": "2026-11-07T20:25:52Z",
+              "completed_at": "2026-11-07T20:26:24Z"
+            },
+            {
+              "name": "Run six browser cases for five canonical journeys",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 6,
+              "started_at": "2026-11-07T20:26:24Z",
+              "completed_at": "2026-11-07T20:27:11Z"
+            },
+            {
+              "name": "Run desktop accessibility invariants in real Chrome",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 7,
+              "started_at": "2026-11-07T20:27:11Z",
+              "completed_at": "2026-11-07T20:27:36Z"
+            },
+            {
+              "name": "Normalize fail-closed AC-11 evidence",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 8,
+              "started_at": "2026-11-07T20:27:36Z",
+              "completed_at": "2026-11-07T20:27:37Z"
+            },
+            {
+              "name": "Validate redacted evidence shape",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 9,
+              "started_at": "2026-11-07T20:27:37Z",
+              "completed_at": "2026-11-07T20:27:37Z"
+            },
+            {
+              "name": "Upload accessibility E2E evidence",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 10,
+              "started_at": "2026-11-07T20:27:37Z",
+              "completed_at": "2026-11-07T20:27:37Z"
+            },
+            {
+              "name": "Post Run actions/setup-node@v4",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 18,
+              "started_at": "2026-11-07T20:27:37Z",
+              "completed_at": "2026-11-07T20:27:38Z"
+            },
+            {
+              "name": "Post Run actions/setup-python@v5",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 19,
+              "started_at": "2026-11-07T20:27:38Z",
+              "completed_at": "2026-11-07T20:27:38Z"
+            },
+            {
+              "name": "Post Checkout exact source head",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 20,
+              "started_at": "2026-11-07T20:27:38Z",
+              "completed_at": "2026-11-07T20:27:38Z"
+            },
+            {
+              "name": "Complete job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 21,
+              "started_at": "2026-11-07T20:27:38Z",
+              "completed_at": "2026-11-07T20:27:38Z"
+            }
+          ]
+        }
+      ],
+      "artifacts": [
+        {
+          "id": 13589207072,
+          "node_id": "MDg6QXJ0aWZhY3QxMzU4OTIwNzA3Mg==",
+          "name": "s11-ac11-accessibility-abb7074e3da0d547ac81d3da33dce347d5c656af",
+          "size_in_bytes": 2212,
+          "url": "https://api.github.com/repos/egparadise/SaintVision-Invion/actions/artifacts/13589207072",
+          "archive_download_url": "https://api.github.com/repos/egparadise/SaintVision-Invion/actions/artifacts/13589207072/zip",
+          "expired": false,
+          "digest": "sha256:6f22b8ff08740331f71dc360b0ced0abd42ad8c071880c0beb0d7d56b1f100e4",
+          "created_at": "2026-11-07T20:27:37Z",
+          "updated_at": "2026-11-07T20:27:37Z",
+          "expires_at": "2026-12-07T20:27:37Z",
+          "workflow_run": {
+            "id": 42411001237,
+            "repository_id": 1362259805,
+            "head_repository_id": 1362259805,
+            "head_branch": "agent/codex/fleet5-dashboard-canonical-resource-health-r1-20261108",
+            "head_sha": "abb7074e3da0d547ac81d3da33dce347d5c656af"
+          },
+          "downloadedZIPVerifiedSHA256": "6f22b8ff08740331f71dc360b0ced0abd42ad8c071880c0beb0d7d56b1f100e4"
+        }
+      ],
+      "actualBrowserCaseCounts": {
+        "exitCode": 0,
+        "tests": {
+          "failure": 0,
+          "error": 0,
+          "skipped": 0,
+          "passed": 6
+        },
+        "unverified": null,
+        "evidence": ".work/ac11-accessibility-browser.json"
+      },
+      "redactedAC11Report": {
+        "schemaVersion": "1.2.0",
+        "runPurpose": "s11-ac11-accessibility-e2e-hosted",
+        "axis": "accessibility-e2e",
+        "sourceRunId": "42411001237",
+        "sourceHeadSha": "abb7074e3da0d547ac81d3da33dce347d5c656af",
+        "checkoutTreeSha": "7797833c1725680a067cb239417f6b5a7c7ec2c9",
+        "cleanCheckout": true,
+        "startedAt": "2026-11-07T20:26:24Z",
+        "finishedAt": "2026-11-07T20:27:37.155269Z",
+        "environment": {
+          "topology": "github-hosted-single-runner",
+          "runnerImage": "ubuntu26-Linux-X64",
+          "browser": "Google Chrome 156.0.8078.79 (Blink engine)",
+          "frontendTransport": "vite-dev-server-with-browser-node-fixture",
+          "credentialsRequired": false,
+          "physicalFiveNodeComparable": false
+        },
+        "targetRef": {
+          "commit": "505a5f4b040badfbe1e703d5cac091ddf1db9620",
+          "path": "docs/vault/30_Development/S11_AC11_accessibility_user_device_target_v1.md",
+          "blob": "737853bbde0bc3da077c37acea132552e55f8eb9",
+          "criteria": {
+            "canonicalJourneyFailureCount": {
+              "operator": "eq",
+              "value": 0
+            },
+            "desktopInvariantFailureCount": {
+              "operator": "eq",
+              "value": 0
+            },
+            "contrastFailureCount": {
+              "operator": "eq",
+              "value": 0
+            },
+            "keyboardFailureCount": {
+              "operator": "eq",
+              "value": 0
+            },
+            "manualAcceptanceMissingCount": {
+              "operator": "eq",
+              "value": 0
+            }
+          }
+        },
+        "verdict": "MEASURED_FAIL",
+        "acceptanceClaim": false,
+        "artifactSha256": null,
+        "artifactStatus": "PENDING_UPLOAD",
+        "artifactUnit": "github-actions-uploaded-zip",
+        "cleanup": {
+          "isolatedBrowserContainerRemoved": true,
+          "producerTempResidueCount": null
+        },
+        "limitation": "hosted automatic measurement; same-SHA user-device keyboard/screen-reader acceptance absent",
+        "payload": {
+          "journeyIds": [
+            "test_actual_browser_quorum_snapshot_and_no_duplicate_vote",
+            "test_actual_browser_stale_run_and_revoked_review_are_rejected",
+            "test_browser_real_catalogue_owner_scope_and_revocation",
+            "test_browser_real_committed_model_and_current_permission",
+            "test_full_studio_login_project_approval_and_logout"
+          ],
+          "browserPhysicalCaseCount": 6,
+          "invariantIds": [
+            "inv01_bidirectionalSwitcher",
+            "inv02_trafficLightControls",
+            "inv03_dynamicZIndex",
+            "inv04_dockIntegration",
+            "inv05_keyboardAltTab",
+            "inv06_modalEscapeDismissal",
+            "inv07_layoutPersistence",
+            "inv08_colorContrastAA",
+            "inv09_honestCapacityMetrics"
+          ],
+          "inputDigests": {
+            "browserProofSha256": "e66d6f15688af755fa83de757738af0dbe160fd3cb9b61763e6f096b313b4366",
+            "caseIdentitiesSha256": "2c9607e9d71244a90f1d6972ff0f34005b39d0f73019bc827b5cbd055a4903e9",
+            "browserJunitSha256": "4d5d95527c83092c286eecbae4ac5853c8d7c932ed2deb11aecb980708867a3a",
+            "desktopInvariantSha256": "6e13c3ca1232a993ef9fe5128044c9353f4745633823e210a34edd84b06bb5bf"
+          },
+          "observations": [
+            {
+              "metric": "canonicalJourneyFailureCount",
+              "n": 5,
+              "successCount": 5,
+              "failureCount": 0,
+              "skipCount": 0,
+              "value": 0,
+              "errorsByClass": {}
+            },
+            {
+              "metric": "desktopInvariantFailureCount",
+              "n": 9,
+              "successCount": 9,
+              "failureCount": 0,
+              "skipCount": 0,
+              "value": 0,
+              "errorsByClass": {}
+            },
+            {
+              "metric": "contrastFailureCount",
+              "n": 3,
+              "successCount": 3,
+              "failureCount": 0,
+              "skipCount": 0,
+              "value": 0,
+              "errorsByClass": {}
+            },
+            {
+              "metric": "keyboardFailureCount",
+              "n": 2,
+              "successCount": 2,
+              "failureCount": 0,
+              "skipCount": 0,
+              "value": 0,
+              "errorsByClass": {}
+            },
+            {
+              "metric": "manualAcceptanceMissingCount",
+              "n": 1,
+              "successCount": 0,
+              "failureCount": 1,
+              "skipCount": 0,
+              "value": 1,
+              "errorsByClass": {
+                "manual-acceptance-not-supplied": 1
+              }
+            }
+          ]
+        },
+        "payloadSha256": "a5ec5f24821de45f62de78d04980bf5fa6865554e348cbaf93841144143fdf73"
+      },
+      "normalizedCriterionCounts": {
+        "tests": 5,
+        "passed": 4,
+        "failures": 1,
+        "errors": 0,
+        "skipped": 0,
+        "reason": "Only manualAcceptanceMissingCount remains1; all automated measurements pass; no real-device acceptance claim"
+      }
+    }
+  ],
+  "dispatchReceipts": [
+    {
+      "workflow": "frontend",
+      "sourceSHA": "abb7074e3da0d547ac81d3da33dce347d5c656af",
+      "ref": "agent/codex/fleet5-dashboard-canonical-resource-health-r1-20261108",
+      "correlation": "fleet5-dashboard-resource-health-frontend-9d93e05e0707485f8b351a2f7640951f",
+      "atUTC": "2026-11-07T20:25:34.734066+00:00",
+      "dispatchExit": 0,
+      "runID": 42410996328
+    },
+    {
+      "workflow": "docs",
+      "sourceSHA": "abb7074e3da0d547ac81d3da33dce347d5c656af",
+      "ref": "agent/codex/fleet5-dashboard-canonical-resource-health-r1-20261108",
+      "correlation": "fleet5-dashboard-resource-health-docs-75654fc002894552b95f2db34c1c681a",
+      "atUTC": "2026-11-07T20:25:36.463392+00:00",
+      "dispatchExit": 0,
+      "runID": 42410998999
+    },
+    {
+      "workflow": "ac11-accessibility-e2e",
+      "sourceSHA": "abb7074e3da0d547ac81d3da33dce347d5c656af",
+      "ref": "agent/codex/fleet5-dashboard-canonical-resource-health-r1-20261108",
+      "correlation": "fleet5-dashboard-resource-health-ac11-accessibility-e2e-c92159c04a534d5c9641d28e3922df4d",
+      "atUTC": "2026-11-07T20:25:38.438370+00:00",
+      "dispatchExit": 0,
+      "runID": 42411001237
+    }
+  ],
+  "changedPaths": [
+    ".github/workflows/frontend.yml",
+    "apps/web/nginx.conf",
+    "apps/web/src/app/App.tsx",
+    "apps/web/src/contracts/dashboard-resources.ts",
+    "apps/web/src/contracts/types.ts",
+    "apps/web/src/features/dashboard/CanonicalClusterResources.tsx",
+    "apps/web/src/features/dashboard/ClusterOverview.tsx",
+    "apps/web/src/features/nodes/NodeDetail.tsx",
+    "apps/web/src/shared/api/dashboardResources.ts",
+    "apps/web/src/shared/api/nodeObservation.ts",
+    "apps/web/src/shared/ui/Header.tsx",
+    "apps/web/tests/browser/dashboard.html",
+    "apps/web/tests/browser/dashboard.tsx",
+    "apps/web/tests/dashboard-app-join.test.tsx",
+    "apps/web/tests/dashboard-canonical-resources.test.tsx",
+    "apps/web/tests/portal-refresh-fleet-ui.test.tsx",
+    "apps/web/vite.config.ts",
+    "deploy/intranet/portal/nginx.conf",
+    "docs/vault/30_Development/Agent\ubcc4 \uc791\uc5c5/Codex \uc791\uc5c5 \ud604\ud669.md",
+    "docs/vault/30_Development/Evidence/fleet5-dashboard-canonical-resource-health-r1-20261108-codex/.gitattributes",
+    "docs/vault/30_Development/Evidence/fleet5-dashboard-canonical-resource-health-r1-20261108-codex/README.md",
+    "docs/vault/30_Development/Evidence/fleet5-dashboard-canonical-resource-health-r1-20261108-codex/actual-input-pins.json",
+    "docs/vault/30_Development/Evidence/fleet5-dashboard-canonical-resource-health-r1-20261108-codex/ci-1dc73940f840-ac11-accessibility-e2e-artifacts.json",
+    "docs/vault/30_Development/Evidence/fleet5-dashboard-canonical-resource-health-r1-20261108-codex/ci-1dc73940f840-ac11-accessibility-e2e-jobs.json",
+    "docs/vault/30_Development/Evidence/fleet5-dashboard-canonical-resource-health-r1-20261108-codex/ci-1dc73940f840-ac11-accessibility-e2e-run.json",
+    "docs/vault/30_Development/Evidence/fleet5-dashboard-canonical-resource-health-r1-20261108-codex/ci-1dc73940f840-docs-artifacts.json",
+    "docs/vault/30_Development/Evidence/fleet5-dashboard-canonical-resource-health-r1-20261108-codex/ci-1dc73940f840-docs-jobs.json",
+    "docs/vault/30_Development/Evidence/fleet5-dashboard-canonical-resource-health-r1-20261108-codex/ci-1dc73940f840-docs-run.json",
+    "docs/vault/30_Development/Evidence/fleet5-dashboard-canonical-resource-health-r1-20261108-codex/ci-1dc73940f840-frontend-artifacts.json",
+    "docs/vault/30_Development/Evidence/fleet5-dashboard-canonical-resource-health-r1-20261108-codex/ci-1dc73940f840-frontend-jobs.json",
+    "docs/vault/30_Development/Evidence/fleet5-dashboard-canonical-resource-health-r1-20261108-codex/ci-1dc73940f840-frontend-run.json",
+    "docs/vault/30_Development/Evidence/fleet5-dashboard-canonical-resource-health-r1-20261108-codex/ci-dispatch-1dc73940f840.json",
+    "docs/vault/30_Development/Evidence/fleet5-dashboard-canonical-resource-health-r1-20261108-codex/ci-receipts.py",
+    "docs/vault/30_Development/Evidence/fleet5-dashboard-canonical-resource-health-r1-20261108-codex/context.json",
+    "docs/vault/30_Development/Evidence/fleet5-dashboard-canonical-resource-health-r1-20261108-codex/corrected-precommit-source-pins.json",
+    "docs/vault/30_Development/Evidence/fleet5-dashboard-canonical-resource-health-r1-20261108-codex/dashboard-canonical-resource-health-author-context-r1.json",
+    "docs/vault/30_Development/Evidence/fleet5-dashboard-canonical-resource-health-r1-20261108-codex/dashboard-canonical-resource-health-author-context-r1.json.raw",
+    "docs/vault/30_Development/Evidence/fleet5-dashboard-canonical-resource-health-r1-20261108-codex/first-candidate-failure.json",
+    "docs/vault/30_Development/Evidence/fleet5-dashboard-canonical-resource-health-r1-20261108-codex/local-gates-final-1dc73940f840.json",
+    "docs/vault/30_Development/Evidence/fleet5-dashboard-canonical-resource-health-r1-20261108-codex/local-gates.json",
+    "docs/vault/30_Development/Evidence/fleet5-dashboard-canonical-resource-health-r1-20261108-codex/local-gates.py",
+    "docs/vault/30_Development/Evidence/fleet5-dashboard-canonical-resource-health-r1-20261108-codex/precommit-source-pins.json",
+    "docs/vault/30_Development/Evidence/fleet5-dashboard-canonical-resource-health-r1-20261108-codex/protected-components.json",
+    "docs/vault/30_Development/Evidence/fleet5-dashboard-canonical-resource-health-r1-20261108-codex/read-pins.json",
+    "docs/vault/30_Development/Evidence/fleet5-dashboard-canonical-resource-health-r1-20261108-codex/root-inputs/actual-PC3-start.json",
+    "docs/vault/30_Development/Evidence/fleet5-dashboard-canonical-resource-health-r1-20261108-codex/root-inputs/actual-browser-resource-prerequisite-failure.json",
+    "docs/vault/30_Development/Evidence/fleet5-dashboard-canonical-resource-health-r1-20261108-codex/root-inputs/actual-canonical-API-inputs/actual-portal-and-api-healthz.json",
+    "docs/vault/30_Development/Evidence/fleet5-dashboard-canonical-resource-health-r1-20261108-codex/root-inputs/actual-canonical-API-inputs/capacity.json",
+    "docs/vault/30_Development/Evidence/fleet5-dashboard-canonical-resource-health-r1-20261108-codex/root-inputs/actual-canonical-API-inputs/first-intents-wsp_01M6NE3HM7T42B2M1FPK2V6GH0.json",
+    "docs/vault/30_Development/Evidence/fleet5-dashboard-canonical-resource-health-r1-20261108-codex/root-inputs/actual-canonical-API-inputs/nodes.json",
+    "docs/vault/30_Development/Evidence/fleet5-dashboard-canonical-resource-health-r1-20261108-codex/root-inputs/actual-canonical-API-inputs/permission.json",
+    "docs/vault/30_Development/Evidence/fleet5-dashboard-canonical-resource-health-r1-20261108-codex/root-inputs/actual-canonical-API-inputs/receipt.json",
+    "docs/vault/30_Development/Evidence/fleet5-dashboard-canonical-resource-health-r1-20261108-codex/root-inputs/actual-canonical-API-inputs/resource-usage-nod_01M6TAWG25JTA3F7J7S1EE4N2W.json",
+    "docs/vault/30_Development/Evidence/fleet5-dashboard-canonical-resource-health-r1-20261108-codex/root-inputs/actual-canonical-API-inputs/resource-usage-nod_01M6TGQZ8S3DAFS7TYE8TY1PX2.json",
+    "docs/vault/30_Development/Evidence/fleet5-dashboard-canonical-resource-health-r1-20261108-codex/root-inputs/actual-canonical-API-inputs/resource-usage-nod_01M6TGSXV1J7XWC5D5H7N6EW1D.json",
+    "docs/vault/30_Development/Evidence/fleet5-dashboard-canonical-resource-health-r1-20261108-codex/root-inputs/actual-canonical-API-inputs/session.json",
+    "docs/vault/30_Development/Evidence/fleet5-dashboard-canonical-resource-health-r1-20261108-codex/root-inputs/actual-canonical-API-inputs/workspaces.json",
+    "docs/vault/30_Development/Evidence/fleet5-dashboard-canonical-resource-health-r1-20261108-codex/root-inputs/actual-cutover-reconciled.json",
+    "docs/vault/30_Development/Evidence/fleet5-dashboard-canonical-resource-health-r1-20261108-codex/root-inputs/official-artifact-inspection.json",
+    "docs/vault/30_Development/Evidence/fleet5-dashboard-canonical-resource-health-r1-20261108-codex/root-inputs/owned-SSH-cutover-intent.json",
+    "docs/vault/30_Development/Evidence/fleet5-dashboard-canonical-resource-health-r1-20261108-codex/root-inputs/owned-SSH-cutover-result.json",
+    "docs/vault/30_Development/Evidence/fleet5-dashboard-canonical-resource-health-r1-20261108-codex/root-inputs/real-Chrome-strictCSP-before-cutover.json",
+    "docs/vault/30_Development/Evidence/fleet5-dashboard-canonical-resource-health-r1-20261108-codex/root-inputs/root-findings-and-next-source-task.json",
+    "docs/vault/30_Development/Evidence/fleet5-dashboard-canonical-resource-health-r1-20261108-codex/root531-final-verification.json",
+    "docs/vault/30_Development/Evidence/fleet5-dashboard-canonical-resource-health-r1-20261108-codex/root531-final-verification.json.raw",
+    "docs/vault/30_Development/Evidence/fleet5-dashboard-canonical-resource-health-r1-20261108-codex/sync-state-after.json",
+    "docs/vault/30_Development/Evidence/fleet5-dashboard-canonical-resource-health-r1-20261108-codex/sync-state-before.json",
+    "docs/vault/30_Development/Evidence/fleet5-dashboard-canonical-resource-health-r1-20261108-codex/sync-state-comparison.json",
+    "docs/vault/30_Development/Evidence/fleet5-dashboard-canonical-resource-health-r1-20261108-codex/sync-state-final-after.json",
+    "docs/vault/30_Development/Evidence/fleet5-dashboard-canonical-resource-health-r1-20261108-codex/sync-state-final-comparison.json",
+    "docs/vault/30_Development/History/2026-11-08_05-40-00_KST_FLEET5_dashboard_canonical_resource_health_Codex.md",
+    "tools/verify_dashboard_canonical_browser.py",
+    "tools/verify_gateway_proxy.py"
+  ],
+  "exactPatchSHA256": "5205a39305e82966333655c11dccc3bbc7e2ba7cb703849f7b1441c242997164",
+  "protectedRecursiveListingSHA256": "fb38e4fce6a4e233ba8553850d8da2de0e9bdd021967675c3464fa0d00423685",
+  "protectedComponents": {
+    "base": "e4e07bfd6b94e57edc64d158e208df01b9319deb",
+    "backendSource": "96afd799d49717fd40e4ddabd538d82accbe1958",
+    "paths": {
+      "contracts": {
+        "baseGitObject": "b2b24a6d9baf24302f3590f4f30fe851ccb81ef1",
+        "byteIdentical": true,
+        "candidateGitObject": "b2b24a6d9baf24302f3590f4f30fe851ccb81ef1"
+      },
+      "packages": {
+        "baseGitObject": "7c445bdbc929f6597c0b39b598f9726032c67ad7",
+        "byteIdentical": true,
+        "candidateGitObject": "7c445bdbc929f6597c0b39b598f9726032c67ad7"
+      },
+      "services": {
+        "baseGitObject": "5c9918adc48c76c88b5119f44516bb332924f067",
+        "byteIdentical": true,
+        "candidateGitObject": "5c9918adc48c76c88b5119f44516bb332924f067"
+      },
+      "migrations": {
+        "baseGitObject": "b1d35598829437c39dab7f60e9521bf8627e6832",
+        "byteIdentical": true,
+        "candidateGitObject": "b1d35598829437c39dab7f60e9521bf8627e6832"
+      },
+      "src": {
+        "baseGitObject": "5507dfb820d54a8778c4cf5e3551368f11b6105f",
+        "byteIdentical": true,
+        "candidateGitObject": "5507dfb820d54a8778c4cf5e3551368f11b6105f"
+      },
+      "tests": {
+        "baseGitObject": "f0c6e9f537989b71f57b2185fd43c6abbaf4369e",
+        "byteIdentical": true,
+        "candidateGitObject": "f0c6e9f537989b71f57b2185fd43c6abbaf4369e"
+      },
+      "apps/studio": {
+        "baseGitObject": "faf648da92d7f63e74e7e1d158deb923d42a6a8c",
+        "byteIdentical": true,
+        "candidateGitObject": "faf648da92d7f63e74e7e1d158deb923d42a6a8c"
+      },
+      "apps/web/package-lock.json": {
+        "baseGitObject": "7cd35bcec966ac001d6481f9712ff06546879222",
+        "byteIdentical": true,
+        "candidateGitObject": "7cd35bcec966ac001d6481f9712ff06546879222"
+      },
+      "apps/web/package.json": {
+        "baseGitObject": "2bb2f1737b9da0374d88ab3c976c91e1239edf91",
+        "byteIdentical": true,
+        "candidateGitObject": "2bb2f1737b9da0374d88ab3c976c91e1239edf91"
+      },
+      "apps/web/scripts": {
+        "baseGitObject": "21e135515ed379ef2dc142224c1b1b9d5acf4b2d",
+        "byteIdentical": true,
+        "candidateGitObject": "21e135515ed379ef2dc142224c1b1b9d5acf4b2d"
+      },
+      "apps/web/src/shared/api/nodeCertificateObservation.ts": {
+        "baseGitObject": "029568a75b56328c8b2d966ecc0111337cc3ee6f",
+        "byteIdentical": true,
+        "candidateGitObject": "029568a75b56328c8b2d966ecc0111337cc3ee6f"
+      },
+      "apps/web/src/features/auth": {
+        "baseGitObject": "1e7dc0f02f58383df62bbfa98fd20c0421267072",
+        "byteIdentical": true,
+        "candidateGitObject": "1e7dc0f02f58383df62bbfa98fd20c0421267072"
+      },
+      ".github/workflows/ac11-accessibility-e2e.yml": {
+        "baseGitObject": "2c72288b5fd5f6e83ccdfe0ed08b29de620e938d",
+        "byteIdentical": true,
+        "candidateGitObject": "2c72288b5fd5f6e83ccdfe0ed08b29de620e938d"
+      },
+      "deploy/intranet/portal/security-headers.conf": {
+        "baseGitObject": "229689ac1bccb4d6c2260774155c9f1a6c22fd61",
+        "byteIdentical": true,
+        "candidateGitObject": "229689ac1bccb4d6c2260774155c9f1a6c22fd61"
+      },
+      "deploy/intranet/portal/Dockerfile": {
+        "baseGitObject": "3e067d96bb25c24ddb953c21f1c490cd2092d648",
+        "byteIdentical": true,
+        "candidateGitObject": "3e067d96bb25c24ddb953c21f1c490cd2092d648"
+      },
+      "apps/web/src/features/studio/FirstWorkspacePanel.tsx": {
+        "baseGitObject": "1180b3cb9a62e7c7d0d41a19e5d9d19520930171",
+        "byteIdentical": true,
+        "candidateGitObject": "1180b3cb9a62e7c7d0d41a19e5d9d19520930171"
+      }
+    }
+  },
+  "semanticValidatorTailSHA256": "d136f8bffdb8d92d9588e82f5298e86c9eb0bc1694a2e2e1ac7abc7a6cff99c7",
+  "semanticTailByteIdenticalTo96_428_cc607_e4e07": true,
+  "SQL0068SHA256": "8b79f55289661d7590dbe24e60d60d319360e7fcaf35454fe21c722fe11905d3",
+  "actualInputPins": [
+    {
+      "source": "8cbcc96f845a1a94b998fadd489fd27bb3e0a675",
+      "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/pc3-e4e07-real-deploy-and-dashboard-contract-r1/actual-PC3-start.json",
+      "copy": "root-inputs/actual-PC3-start.json",
+      "bytes": 4147,
+      "SHA256": "17aed4615ae72815a06f23d382697ede20f0a4ab0387f0128188c64104fdf922"
+    },
+    {
+      "source": "8cbcc96f845a1a94b998fadd489fd27bb3e0a675",
+      "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/pc3-e4e07-real-deploy-and-dashboard-contract-r1/actual-browser-resource-prerequisite-failure.json",
+      "copy": "root-inputs/actual-browser-resource-prerequisite-failure.json",
+      "bytes": 1930,
+      "SHA256": "d6d6fdbcba59df9622d7abdb47821791f8d814c451d9889cea5364af90b0acb7"
+    },
+    {
+      "source": "8cbcc96f845a1a94b998fadd489fd27bb3e0a675",
+      "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/pc3-e4e07-real-deploy-and-dashboard-contract-r1/actual-canonical-API-inputs/actual-portal-and-api-healthz.json",
+      "copy": "root-inputs/actual-canonical-API-inputs/actual-portal-and-api-healthz.json",
+      "bytes": 237,
+      "SHA256": "befd16cfa30aa74be194c84f2a62ef91bf1b44a862471a35f46dbc070f72e08c"
+    },
+    {
+      "source": "8cbcc96f845a1a94b998fadd489fd27bb3e0a675",
+      "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/pc3-e4e07-real-deploy-and-dashboard-contract-r1/actual-canonical-API-inputs/capacity.json",
+      "copy": "root-inputs/actual-canonical-API-inputs/capacity.json",
+      "bytes": 1222,
+      "SHA256": "d5a8cfd81743850a7d967aaea5781821c625020a041f377548b470164660d500"
+    },
+    {
+      "source": "8cbcc96f845a1a94b998fadd489fd27bb3e0a675",
+      "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/pc3-e4e07-real-deploy-and-dashboard-contract-r1/actual-canonical-API-inputs/first-intents-wsp_01M6NE3HM7T42B2M1FPK2V6GH0.json",
+      "copy": "root-inputs/actual-canonical-API-inputs/first-intents-wsp_01M6NE3HM7T42B2M1FPK2V6GH0.json",
+      "bytes": 637,
+      "SHA256": "ebbf7f001d6c3f321a9ba7d9dc358df0981725bb717121dbcc5359acf9523948"
+    },
+    {
+      "source": "8cbcc96f845a1a94b998fadd489fd27bb3e0a675",
+      "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/pc3-e4e07-real-deploy-and-dashboard-contract-r1/actual-canonical-API-inputs/nodes.json",
+      "copy": "root-inputs/actual-canonical-API-inputs/nodes.json",
+      "bytes": 467,
+      "SHA256": "7359b4712e4366ee5d652ad22460a51ac27e6ff9123900bb2dc61b78ef5d63e1"
+    },
+    {
+      "source": "8cbcc96f845a1a94b998fadd489fd27bb3e0a675",
+      "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/pc3-e4e07-real-deploy-and-dashboard-contract-r1/actual-canonical-API-inputs/permission.json",
+      "copy": "root-inputs/actual-canonical-API-inputs/permission.json",
+      "bytes": 245,
+      "SHA256": "59a0a3434d41790ac2cb7c8076b99f853c38fc9ab0f4336766eb3fec7c8637ea"
+    },
+    {
+      "source": "8cbcc96f845a1a94b998fadd489fd27bb3e0a675",
+      "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/pc3-e4e07-real-deploy-and-dashboard-contract-r1/actual-canonical-API-inputs/receipt.json",
+      "copy": "root-inputs/actual-canonical-API-inputs/receipt.json",
+      "bytes": 2775,
+      "SHA256": "7296bfdd29c64a6cea5525792211cf9c578c1d189a99e53049ffa1b96a62edb5"
+    },
+    {
+      "source": "8cbcc96f845a1a94b998fadd489fd27bb3e0a675",
+      "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/pc3-e4e07-real-deploy-and-dashboard-contract-r1/actual-canonical-API-inputs/resource-usage-nod_01M6TAWG25JTA3F7J7S1EE4N2W.json",
+      "copy": "root-inputs/actual-canonical-API-inputs/resource-usage-nod_01M6TAWG25JTA3F7J7S1EE4N2W.json",
+      "bytes": 728,
+      "SHA256": "beb15119351a3dde5c5e7e9638d490127f6eb1326402ed3220cbfa9196da68d5"
+    },
+    {
+      "source": "8cbcc96f845a1a94b998fadd489fd27bb3e0a675",
+      "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/pc3-e4e07-real-deploy-and-dashboard-contract-r1/actual-canonical-API-inputs/resource-usage-nod_01M6TGQZ8S3DAFS7TYE8TY1PX2.json",
+      "copy": "root-inputs/actual-canonical-API-inputs/resource-usage-nod_01M6TGQZ8S3DAFS7TYE8TY1PX2.json",
+      "bytes": 728,
+      "SHA256": "e33d0725b85965f669104cc460df1ecf2bb8e5d6da96aa5a5412ac05818c35ac"
+    },
+    {
+      "source": "8cbcc96f845a1a94b998fadd489fd27bb3e0a675",
+      "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/pc3-e4e07-real-deploy-and-dashboard-contract-r1/actual-canonical-API-inputs/resource-usage-nod_01M6TGSXV1J7XWC5D5H7N6EW1D.json",
+      "copy": "root-inputs/actual-canonical-API-inputs/resource-usage-nod_01M6TGSXV1J7XWC5D5H7N6EW1D.json",
+      "bytes": 728,
+      "SHA256": "0de278aac5c8213b84e3e3ca6eb31948e1fbbec69058f0b9cd26092849c93a5f"
+    },
+    {
+      "source": "8cbcc96f845a1a94b998fadd489fd27bb3e0a675",
+      "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/pc3-e4e07-real-deploy-and-dashboard-contract-r1/actual-canonical-API-inputs/session.json",
+      "copy": "root-inputs/actual-canonical-API-inputs/session.json",
+      "bytes": 172,
+      "SHA256": "790bf958851d402d0efba695c13b199d65f304864f247283c2d6a59af761d56e"
+    },
+    {
+      "source": "8cbcc96f845a1a94b998fadd489fd27bb3e0a675",
+      "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/pc3-e4e07-real-deploy-and-dashboard-contract-r1/actual-canonical-API-inputs/workspaces.json",
+      "copy": "root-inputs/actual-canonical-API-inputs/workspaces.json",
+      "bytes": 438,
+      "SHA256": "6d1bb3605e7b2d79e7850687f8a027ac3bc2143c23b7c7e551ea55816b453af8"
+    },
+    {
+      "source": "8cbcc96f845a1a94b998fadd489fd27bb3e0a675",
+      "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/pc3-e4e07-real-deploy-and-dashboard-contract-r1/actual-cutover-reconciled.json",
+      "copy": "root-inputs/actual-cutover-reconciled.json",
+      "bytes": 961,
+      "SHA256": "d8d3f6dff1e3a6421b0c253d1e5337957c66f960ebcff0d087a8f87a87328613"
+    },
+    {
+      "source": "8cbcc96f845a1a94b998fadd489fd27bb3e0a675",
+      "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/pc3-e4e07-real-deploy-and-dashboard-contract-r1/official-artifact-inspection.json",
+      "copy": "root-inputs/official-artifact-inspection.json",
+      "bytes": 1320,
+      "SHA256": "f2f9cd54eb47dcef38a576d825ff46970ad3a765568a3ddc1c5109edac6115f2"
+    },
+    {
+      "source": "8cbcc96f845a1a94b998fadd489fd27bb3e0a675",
+      "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/pc3-e4e07-real-deploy-and-dashboard-contract-r1/owned-SSH-cutover-intent.json",
+      "copy": "root-inputs/owned-SSH-cutover-intent.json",
+      "bytes": 662,
+      "SHA256": "ff0fc4a1bb4db7d9c5d67f661b8f22b8167353ee9d95461414e5562fabe3e6fd"
+    },
+    {
+      "source": "8cbcc96f845a1a94b998fadd489fd27bb3e0a675",
+      "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/pc3-e4e07-real-deploy-and-dashboard-contract-r1/owned-SSH-cutover-result.json",
+      "copy": "root-inputs/owned-SSH-cutover-result.json",
+      "bytes": 3404,
+      "SHA256": "c1d381d0745af04bbee5f86a3727fc4731007774b920d88a82bbe3bd402bb1d4"
+    },
+    {
+      "source": "8cbcc96f845a1a94b998fadd489fd27bb3e0a675",
+      "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/pc3-e4e07-real-deploy-and-dashboard-contract-r1/real-Chrome-strictCSP-before-cutover.json",
+      "copy": "root-inputs/real-Chrome-strictCSP-before-cutover.json",
+      "bytes": 5926,
+      "SHA256": "9c32916416b01b939ff8040cf8e8bf9c9f1c412711a21f575e5637a43f887e50"
+    },
+    {
+      "source": "8cbcc96f845a1a94b998fadd489fd27bb3e0a675",
+      "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/pc3-e4e07-real-deploy-and-dashboard-contract-r1/root-findings-and-next-source-task.json",
+      "copy": "root-inputs/root-findings-and-next-source-task.json",
+      "bytes": 2515,
+      "SHA256": "692f7e15fa4a13be23de803e80817b3df873989f8195c2ff6ae0b4eeec245d39"
+    }
+  ],
+  "localGates": [
+    {
+      "argv": [
+        "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+        "-B",
+        "tools/check_docs.py"
+      ],
+      "atKST": "2026-11-08T05:28:10.436754+09:00",
+      "exit": 0,
+      "stdout": "PASS: 24 original hashes, 1289 versioned documents, wiki links, 48 tasks, 12 outcomes, owner/reviewer/skills, dependency DAG.\r\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+        "-B",
+        "tools/check_ontology.py"
+      ],
+      "atKST": "2026-11-08T05:28:24.626307+09:00",
+      "exit": 0,
+      "stdout": "PASS: RDF parsing, defined terms, TTL/JSON-LD equivalence, 48 task mappings, positive SHACL, 4 rejected invalid fixtures, 4 competency queries, Obsidian mirrors.\r\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+        "-B",
+        "tools/check_doc_path_citations.py",
+        "--ratchet",
+        "--base-ref",
+        "e4e07bfd6b94e57edc64d158e208df01b9319deb"
+      ],
+      "atKST": "2026-11-08T05:28:27.168548+09:00",
+      "exit": 0,
+      "stdout": "PASS check_doc_path_citations --ratchet: 290 broken citation(s), all in baseline, none stale, floor unchanged.\r\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+        "-B",
+        "tools/check_doc_single_source.py",
+        "--ratchet"
+      ],
+      "atKST": "2026-11-08T05:28:31.048600+09:00",
+      "exit": 0,
+      "stdout": "PASS check_doc_single_source --ratchet: 16 pairs, all in baseline, none stale.\r\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+        "-B",
+        "tools/check_contract_bindings.py"
+      ],
+      "atKST": "2026-11-08T05:28:31.506682+09:00",
+      "exit": 0,
+      "stdout": "PASS check_contract_bindings: 57 fixtures each referenced by a test; 21 bound kernel response TYPES each have >=1 serving-anchor test (counted PER TYPE, not per anchor SITE: those types occupy 27 anchor sites; a multi-site type counts covered even if only one site is tested -- site-level weight is not decidable here, use tools/check_anchor_weight.py + the mutation harness); 14 replay guards present.\r\n  UNIT NOTE: TYPE count <= SITE count. Multi-site types (per-type coverage can mask an untested site): ApprovalView(2 sites: ['approvals']), BusinessBindingView(2 sites: ['business_handoff']), BusinessEditLockReleaseView(2 sites: ['business_handoff']), BusinessEditLockView(2 sites: ['business_handoff']), ControlRunDetail(3 sites: ['control']), ControlRunView(2 sites: ['control']), EvidenceEnvelope(6 sites: ['build_governance', 'results', 'runs', 'shard_completion', 'storage_commit', 'storage_view']), ModelExecutionManifestObservation(2 sites: ['model_uri_resolver', 'model_view']), NodeExecutionPermit(2 sites: ['node_execution', 'node_transport']), NodeResourceSnapshot(4 sites: ['capacity', 'gpu', 'observation']), WorkspaceCheckoutView(2 sites: ['workspace_recovery']), WorkspaceEnqueueResult(3 sites: ['workspace_api']), WorkspaceFirstRunCreateResult(2 sites: ['workspace_intents']), WorkspacePrepareResult(2 sites: ['workspace_api']), WorkspaceRestoreView(2 sites: ['workspace_recovery']), WorkspaceStartEnqueueResult(3 sites: ['workspace_start']), WorkspaceStartPrepareResult(2 sites: ['workspace_start'])\r\n  (Reporting sites is not a regression -- the TYPE number never meant 'sites verified'; this makes the counting unit explicit. EvidenceEnvelope-class multi-site anchors are why.)\r\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+        "-B",
+        "tools/check_frontend_integrity.py"
+      ],
+      "atKST": "2026-11-08T05:28:38.685822+09:00",
+      "exit": 0,
+      "stdout": "Scanning 99 frontend production source files under apps/web/src ...\r\n\r\nPASS Frontend Integrity Check: all 9 integrity rules satisfied (0 violations).\r\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+        "-B",
+        "tools/sync_obsidian.py",
+        "--check"
+      ],
+      "atKST": "2026-11-08T05:28:39.316509+09:00",
+      "exit": 0,
+      "stdout": "CHECK: 5129 managed files, 2678 pending exports, 0 conflicts. No writes.\r\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "atKST": "2026-11-08T05:28:58.161545+09:00",
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    }
+  ],
+  "canonicalState": {
+    "bytes": 551380,
+    "SHA256": "a0955c3f7a7db43565ddd87eddf26bd4406e41f885d32bcb4d84442e191bff83",
+    "startEndPostCIBytesEqual": true,
+    "CHECKOnly": true,
+    "APPLY": false,
+    "postCIFinalCHECKSHA256": "a0955c3f7a7db43565ddd87eddf26bd4406e41f885d32bcb4d84442e191bff83"
+  },
+  "findings": {
+    "DASH-RESOURCE-01": "Implemented canonical scoped identity/resource join, partial current quantities, last-good/error/stale and bounded polling; exact-wire behavioral/App tests and sandboxed HTTP browser replay passed; actual Root redeploy/browser still pending",
+    "DASH-HEALTH-02": "Separate CP JSON health route through dev/preview/Nginx with credential/query restrictions and production TLS verification; hosted real proxy/browser failure cases passed; Root pilot URI adapter/redeploy pending"
+  },
+  "inheritedOnly": {
+    "backendCoreSource": "96afd799d49717fd40e4ddabd538d82accbe1958",
+    "backendCoreRerun": false,
+    "CR_CSP02": "CLOSED inherited",
+    "CR90501": "CLOSED inherited",
+    "backendCoreRuns": [
+      {
+        "id": 42378656486,
+        "head_sha": "96afd799d49717fd40e4ddabd538d82accbe1958",
+        "head_branch": "agent/codex/fleet5-first-workspace-cr90501-tests-r1-20261107",
+        "event": "workflow_dispatch",
+        "run_attempt": 1,
+        "conclusion": "success",
+        "html_url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/42378656486"
+      },
+      {
+        "id": 42374998823,
+        "head_sha": "96afd799d49717fd40e4ddabd538d82accbe1958",
+        "head_branch": "agent/codex/fleet5-first-workspace-cr90501-tests-r1-20261107",
+        "event": "workflow_dispatch",
+        "run_attempt": 1,
+        "conclusion": "success",
+        "html_url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/42374998823"
+      }
+    ]
+  },
+  "firstCandidateFailure": {
+    "sourceSHA": "1dc73940f840284efcaf00b0ab04c1ba8c83ceea",
+    "frontendRun": 42410597855,
+    "attempt": 1,
+    "conclusion": "failure",
+    "noRedispatch": true,
+    "failures": [
+      {
+        "job": 128517680653,
+        "step": "Build Portal Docker Image with BuildKit",
+        "cause": "TS2322 CandidateEvaluation.os excluded newly truthful unknown OS",
+        "correction": "Internal CandidateEvaluation.os now follows NodeItem.os; no placement/admission predicate change"
+      },
+      {
+        "job": 128517680431,
+        "step": "Run Vitest Unit Tests",
+        "cause": "New optional border introduced one extra exact ACC09 token inventory occurrence",
+        "correction": "Removed the new optional decorative border; original inventory and policy assertions unchanged"
+      },
+      {
+        "job": 128517680431,
+        "step": "Run Vitest Unit Tests",
+        "cause": "New isolated auth fixture falsely reported callback on every remount, reauthenticating after logout",
+        "correction": "Fixture consumes its single explicit callback once; logout and late-response assertions retained"
+      }
+    ],
+    "rawVitest": {
+      "files": 108,
+      "filesPassed": 106,
+      "filesFailed": 2,
+      "tests": 1380,
+      "passed": 1378,
+      "failed": 2
+    },
+    "logs": {
+      "ci-1dc73940f840-job-128517680431.log": "8080bba230e942f5e644625e2c5c485d13f628bbe7ec37fc305f2153bf075ca3",
+      "ci-1dc73940f840-job-128517680653.log": "2ec4e005a842a0b38f3a0f021b8a67c7a82bea3cbec208e5db487bdf1941945e"
+    },
+    "builtCSPAndDashboardBrowser": "Not executed after test/build failure; uploaded manifest-only artifact is not browser PASS",
+    "otherFirstCandidateWorkflows": {
+      "Docs": {
+        "id": 42410600125,
+        "conclusion": "success",
+        "steps": 19
+      },
+      "AC11": {
+        "id": 42410602493,
+        "conclusion": "success",
+        "manualDeviceAcceptance": "Still gated; normalized manual missing1"
+      }
+    }
+  },
+  "mainProductExecution": false,
+  "actualOperatorDeployment": false,
+  "actualUserApprovalsRuns": false,
+  "wholeProgramComplete": false,
+  "independentReview": "Pending one actual Claude bounded delta started by Root after this worker settles/exits/releases",
+  "nextOwner": "Root: verify source/CI/artifacts, actual Claude review, then adapt new URI-bearing CP health proxy and redeploy; verify real login/resources/30sec frame-mutation/no-blink",
+  "pilotAdaptation": "In existing Root-owned loopback+SSH adapter additionally replace exact proxy_pass https://control_plane/healthz; with proxy_pass http://127.0.0.1:8080/healthz; and retain existing transport adaptation; canonical source TLS remains verified",
+  "remainingGates": [
+    "real PC3 browser login/resource/no-blink",
+    "same-SHA manual keyboard/screenreader",
+    "two distinct real nonrequester approvers",
+    "genuine requester enqueue/Run/output/audit",
+    "PC1 public key",
+    "PC5 RAM+Node",
+    "GPU/storage/all physical resources/all5",
+    "renewal/reconnect/reboot"
+  ],
+  "holds": "Original19HOLD/discharges0/runtimeB0/A1-A16/H1-H7/H3EA/RDNULL_HOLD/raw7UNREGISTERED/A01-A40NOT_RUN",
+  "publication": "Tracked source/docs published at sourceSHA; postCI receipt/raw artifacts Root-ready untracked to avoid source self-reference",
+  "gitCommits": [
+    {
+      "SHA": "1dc73940f840284efcaf00b0ab04c1ba8c83ceea",
+      "KST": "2026-11-08T05:20:16+09:00",
+      "subject": "fix(web): join canonical resource observations and probe CP health",
+      "commitExit": 0,
+      "pushExit": 0,
+      "hooksDisabled": true
+    },
+    {
+      "SHA": "abb7074e3da0d547ac81d3da33dce347d5c656af",
+      "KST": "2026-11-08T05:25:29+09:00",
+      "subject": "fix(web): retain unknown OS and correct isolated dashboard fixture",
+      "commitExit": 0,
+      "pushExit": 0,
+      "hooksDisabled": true
+    }
+  ],
+  "officialDownloadedLogPins": {
+    "ci-abb7074e3da0-job-128518899545.log": {
+      "bytes": 361410,
+      "SHA256": "4cf80deb59afa6b0a2d9189a3066d52935a0b4c7e15158041eb9344c0d3af869"
+    },
+    "ci-abb7074e3da0-job-128518899739.log": {
+      "bytes": 180276,
+      "SHA256": "ea7bbde59e063c764a908ceb12b3545ff476064ae2e1fecb3d18f4eea8361d60"
+    },
+    "ci-abb7074e3da0-job-128518908527.log": {
+      "bytes": 47537,
+      "SHA256": "8f4a797beb446261baec444d9dbfbe4ebc5cbaebfd78fbfc8869299d88df710d"
+    },
+    "ci-abb7074e3da0-job-128518914722.log": {
+      "bytes": 194406,
+      "SHA256": "a020e473c369851e8befc0c061b91d0d3b43503ec5f7f4bfcb643792acf818cf"
+    }
+  },
+  "testDelta": {
+    "previousAcceptedTests": 1351,
+    "newTests": 29,
+    "currentTotal": 1380,
+    "prior15CSPCasesRetained": true,
+    "existingAssertionsAndTimeoutsUnweakened": true,
+    "scopedExistingTestEdits": "Only two health-path expectations changed from portal /healthz to CP /gateway-healthz; all original assertions retained"
+  },
+  "postCIFinalCHECK": {
+    "atKST": "2026-11-08T05:30:17.544880+09:00",
+    "argv": [
+      "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+      "-B",
+      "tools/sync_obsidian.py",
+      "--check"
+    ],
+    "exit": 0,
+    "stdout": "CHECK: 5149 managed files, 2698 pending exports, 0 conflicts. No writes.\r\n",
+    "stderr": ""
+  },
+  "stepCounts": {
+    "frontend": {
+      "frontend": 21,
+      "Portal Container Build & Hardened Runtime Smoke": 16
+    },
+    "docs": {
+      "docs": 19
+    },
+    "ac11-accessibility-e2e": {
+      "accessibility-e2e": 14
+    }
+  }
+}

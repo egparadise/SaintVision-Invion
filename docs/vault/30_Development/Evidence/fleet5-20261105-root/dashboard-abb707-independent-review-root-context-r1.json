@@ -1,0 +1,73 @@
+{
+  "atKST": "2026-11-08T05:38:02+09:00",
+  "taskID": "FLEET5-DASHBOARD-ABB707-EXACT-PROOF-AND-INDEPENDENT-REVIEW-PREP-20261108",
+  "owner": "Root Codex",
+  "managementBase": "8cbcc96f845a1a94b998fadd489fd27bb3e0a675",
+  "source": "abb7074e3da0d547ac81d3da33dce347d5c656af",
+  "deltaBase": "e4e07bfd6b94e57edc64d158e208df01b9319deb",
+  "officialCI": [
+    {
+      "workflow": "frontend",
+      "runID": 42410996328,
+      "correlation": "fleet5-dashboard-resource-health-frontend-9d93e05e0707485f8b351a2f7640951f",
+      "exactSourceRefPathEventAttempt1": true,
+      "jobs": [
+        {
+          "id": 128518899545,
+          "name": "frontend",
+          "steps": 21,
+          "allSuccess": true
+        },
+        {
+          "id": 128518899739,
+          "name": "Portal Container Build & Hardened Runtime Smoke",
+          "steps": 16,
+          "allSuccess": true
+        }
+      ]
+    },
+    {
+      "workflow": "docs",
+      "runID": 42410998999,
+      "correlation": "fleet5-dashboard-resource-health-docs-75654fc002894552b95f2db34c1c681a",
+      "exactSourceRefPathEventAttempt1": true,
+      "jobs": [
+        {
+          "id": 128518908527,
+          "name": "docs",
+          "steps": 19,
+          "allSuccess": true
+        }
+      ]
+    },
+    {
+      "workflow": "ac11-accessibility-e2e",
+      "runID": 42411001237,
+      "correlation": "fleet5-dashboard-resource-health-ac11-accessibility-e2e-c92159c04a534d5c9641d28e3922df4d",
+      "exactSourceRefPathEventAttempt1": true,
+      "jobs": [
+        {
+          "id": 128518914722,
+          "name": "accessibility-e2e",
+          "steps": 14,
+          "allSuccess": true
+        }
+      ]
+    }
+  ],
+  "officialUnitTests": 1380,
+  "newTests": 29,
+  "officialRecordedWireReplay30s": true,
+  "realUserOrHardwareAcceptanceByReplay": false,
+  "manualAcceptanceMissingCount": 1,
+  "authorLifecycle": {
+    "state": "succeeded",
+    "stage": "settled",
+    "liveness": "exited",
+    "terminalState": "released"
+  },
+  "codeIndependentReview": "READY_ONE_BOUNDED_ACTUAL_CLAUDE",
+  "Root532Publication": "IN_PROGRESS_AFTER_AUTHOR_WINDOW",
+  "actualNewSourceDeployment": "NOT_RUN_CURRENT_USER_ROUTE_REMAINS_E4E07",
+  "wholeProgramComplete": false
+}

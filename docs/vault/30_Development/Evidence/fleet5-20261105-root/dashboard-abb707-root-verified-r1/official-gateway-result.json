@@ -1,0 +1,58 @@
+{
+  "fixtureOnly": true,
+  "realCPAcceptance": false,
+  "TLSVerified": true,
+  "portalLivenessSeparate": true,
+  "rawUpstreamFailuresPreserved": true,
+  "requests": [
+    {
+      "path": "/healthz",
+      "method": "GET",
+      "status": 200,
+      "headers": "HTTP/1.1 200 OK\nServer: nginx\nDate: Sat, 07 Nov 2026 20:26:52 GMT\nContent-Type: text/plain\nContent-Length: 2\nConnection: keep-alive\nStrict-Transport-Security: max-age=31536000; includeSubDomains\nContent-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self' data:; connect-src 'self' https://idp.sv.lan; frame-ancestors 'none'; object-src 'none'; base-uri 'self'; form-action 'self';\nX-Content-Type-Options: nosniff\nX-Frame-Options: DENY\nX-XSS-Protection: 0\nReferrer-Policy: strict-origin-when-cross-origin\nPermissions-Policy: geolocation=(), camera=(), microphone=()\n\n",
+      "body": "OK"
+    },
+    {
+      "path": "/gateway-healthz",
+      "method": "GET",
+      "status": 200,
+      "headers": "HTTP/1.1 200 OK\nServer: nginx\nDate: Sat, 07 Nov 2026 20:26:52 GMT\nContent-Type: application/json\nTransfer-Encoding: chunked\nConnection: keep-alive\nVary: Accept-Encoding\nStrict-Transport-Security: max-age=31536000; includeSubDomains\nContent-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self' data:; connect-src 'self' https://idp.sv.lan; frame-ancestors 'none'; object-src 'none'; base-uri 'self'; form-action 'self';\nX-Content-Type-Options: nosniff\nX-Frame-Options: DENY\nX-XSS-Protection: 0\nReferrer-Policy: strict-origin-when-cross-origin\nPermissions-Policy: geolocation=(), camera=(), microphone=()\nCache-Control: no-store\n\n",
+      "body": "{\"status\":\"ok\",\"version\":\"isolated-cp\"}"
+    },
+    {
+      "path": "/gateway-healthz",
+      "method": "GET",
+      "status": 200,
+      "headers": "HTTP/1.1 200 OK\nServer: nginx\nDate: Sat, 07 Nov 2026 20:26:52 GMT\nContent-Type: text/html\nTransfer-Encoding: chunked\nConnection: keep-alive\nVary: Accept-Encoding\nStrict-Transport-Security: max-age=31536000; includeSubDomains\nContent-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self' data:; connect-src 'self' https://idp.sv.lan; frame-ancestors 'none'; object-src 'none'; base-uri 'self'; form-action 'self';\nX-Content-Type-Options: nosniff\nX-Frame-Options: DENY\nX-XSS-Protection: 0\nReferrer-Policy: strict-origin-when-cross-origin\nPermissions-Policy: geolocation=(), camera=(), microphone=()\nCache-Control: no-store\n\n",
+      "body": "<html>upstream fallback</html>"
+    },
+    {
+      "path": "/gateway-healthz",
+      "method": "GET",
+      "status": 200,
+      "headers": "HTTP/1.1 200 OK\nServer: nginx\nDate: Sat, 07 Nov 2026 20:26:52 GMT\nContent-Type: text/plain\nTransfer-Encoding: chunked\nConnection: keep-alive\nVary: Accept-Encoding\nStrict-Transport-Security: max-age=31536000; includeSubDomains\nContent-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self' data:; connect-src 'self' https://idp.sv.lan; frame-ancestors 'none'; object-src 'none'; base-uri 'self'; form-action 'self';\nX-Content-Type-Options: nosniff\nX-Frame-Options: DENY\nX-XSS-Protection: 0\nReferrer-Policy: strict-origin-when-cross-origin\nPermissions-Policy: geolocation=(), camera=(), microphone=()\nCache-Control: no-store\n\n",
+      "body": "OK"
+    },
+    {
+      "path": "/gateway-healthz",
+      "method": "GET",
+      "status": 503,
+      "headers": "HTTP/1.1 503 Service Unavailable\nServer: nginx\nDate: Sat, 07 Nov 2026 20:26:52 GMT\nContent-Type: application/json\nTransfer-Encoding: chunked\nConnection: keep-alive\nStrict-Transport-Security: max-age=31536000; includeSubDomains\nContent-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self' data:; connect-src 'self' https://idp.sv.lan; frame-ancestors 'none'; object-src 'none'; base-uri 'self'; form-action 'self';\nX-Content-Type-Options: nosniff\nX-Frame-Options: DENY\nX-XSS-Protection: 0\nReferrer-Policy: strict-origin-when-cross-origin\nPermissions-Policy: geolocation=(), camera=(), microphone=()\nCache-Control: no-store\n\n",
+      "body": "{\"status\":\"unavailable\"}"
+    },
+    {
+      "path": "/gateway-healthz?private=value",
+      "method": "GET",
+      "status": 400,
+      "headers": "HTTP/1.1 400 Bad Request\nServer: nginx\nDate: Sat, 07 Nov 2026 20:26:52 GMT\nContent-Type: text/html\nContent-Length: 150\nConnection: close\nStrict-Transport-Security: max-age=31536000; includeSubDomains\nContent-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self' data:; connect-src 'self' https://idp.sv.lan; frame-ancestors 'none'; object-src 'none'; base-uri 'self'; form-action 'self';\nX-Content-Type-Options: nosniff\nX-Frame-Options: DENY\nX-XSS-Protection: 0\nReferrer-Policy: strict-origin-when-cross-origin\nPermissions-Policy: geolocation=(), camera=(), microphone=()\nCache-Control: no-store\n\n",
+      "body": "<html>\n<head><title>400 Bad Request</title></head>\n<body>\n<center><h1>400 Bad Request</h1></center>\n<hr><center>nginx</center>\n</body>\n</html>\n"
+    },
+    {
+      "path": "/gateway-healthz",
+      "method": "POST",
+      "status": 403,
+      "headers": "HTTP/1.1 403 Forbidden\nServer: nginx\nDate: Sat, 07 Nov 2026 20:26:52 GMT\nContent-Type: text/html\nContent-Length: 146\nConnection: keep-alive\nStrict-Transport-Security: max-age=31536000; includeSubDomains\nContent-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self' data:; connect-src 'self' https://idp.sv.lan; frame-ancestors 'none'; object-src 'none'; base-uri 'self'; form-action 'self';\nX-Content-Type-Options: nosniff\nX-Frame-Options: DENY\nX-XSS-Protection: 0\nReferrer-Policy: strict-origin-when-cross-origin\nPermissions-Policy: geolocation=(), camera=(), microphone=()\nCache-Control: no-store\n\n",
+      "body": "<html>\n<head><title>403 Forbidden</title></head>\n<body>\n<center><h1>403 Forbidden</h1></center>\n<hr><center>nginx</center>\n</body>\n</html>\n"
+    }
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "runID": 42410597855,
+  "source": "1dc73940f840284efcaf00b0ab04c1ba8c83ceea",
+  "event": "workflow_dispatch",
+  "path": ".github/workflows/frontend.yml",
+  "ref": "agent/codex/fleet5-dashboard-canonical-resource-health-r1-20261108",
+  "correlation": "fleet5-dashboard-resource-health-frontend-3d633b366d194abab4445e1d24b254a0",
+  "attempt": 1,
+  "actualConclusion": "failure",
+  "officialLogPins": {
+    "128517680431": {
+      "bytes": 381738,
+      "SHA256": "8080bba230e942f5e644625e2c5c485d13f628bbe7ec37fc305f2153bf075ca3",
+      "selectedFailureLines": [
+        "2026-11-07T20:22:31.2369766Z  Test Files  2 failed | 106 passed (108)",
+        "2026-11-07T20:22:31.2370472Z       Tests  2 failed | 1378 passed (1380)"
+      ]
+    },
+    "128517680653": {
+      "bytes": 128604,
+      "SHA256": "2ec4e005a842a0b38f3a0f021b8a67c7a82bea3cbec208e5db487bdf1941945e",
+      "selectedFailureLines": [
+        "2026-11-07T20:21:51.0813737Z #24 12.16 src/features/placement/placementEngine.ts(8,9): error TS2322: Type '{ nodeId: string; hostname: string; os: \"windows\" | \"linux\" | \"unknown\"; hardFilterPassed: boolean; rejectionReasons: string[]; scores: { localityScore: number; headroomScore: number; networkCostScore: number; totalScore: number; } | undefined; }[]' is not assignable to type 'CandidateEvaluation[]'.",
+        "2026-11-07T20:21:51.4346738Z 12.16 src/features/placement/placementEngine.ts(8,9): error TS2322: Type '{ nodeId: string; hostname: string; os: \"windows\" | \"linux\" | \"unknown\"; hardFilterPassed: boolean; rejectionReasons: string[]; scores: { localityScore: number; headroomScore: number; networkCostScore: number; totalScore: number; } | undefined; }[]' is not assignable to type 'CandidateEvaluation[]'."
+      ]
+    }
+  },
+  "noRedispatchByRoot": true,
+  "retainedNotAcceptance": true
+}

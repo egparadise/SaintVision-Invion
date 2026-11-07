@@ -1,0 +1,79 @@
+{
+  "fixtureOnly": true,
+  "actualPC3BrowserAcceptance": false,
+  "anonymousOnly": true,
+  "sandbox": true,
+  "csp": "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self' data:; connect-src 'self' https://idp.sv.lan; frame-ancestors 'none'; object-src 'none'; base-uri 'self'; form-action 'self';",
+  "securityHeadersSHA256": "1365881a4f7a50e65c41d4083735fc547d8e6103439abe3759227b37a87bc731",
+  "distSHA256": {
+    "assets/icons-DVYUNEhE.js": "94f3f917fa843a4e312937688a83f400ea3d5617d1f1e1f36d6bc643f78ffa9e",
+    "assets/icons-DVYUNEhE.js.map": "bdc634b37b1574e46b91990a227c6ecf862e6364ec9219a524c88741ee294ea3",
+    "assets/index-DCE-pCmf.js": "178012942127f9840d6cf131505a349b15dc9433b743dedde2efec49fe575590",
+    "assets/index-DCE-pCmf.js.map": "30dd18df68c97cab11fab9090f46235b047421b26406d82f7474aca92f7807bb",
+    "assets/index-kKrfL4r3.css": "66d8552241923e10b189e3b9372f85205bccbf083a5dc19872d001fd91ad0d26",
+    "assets/query-DtERyQJL.js": "3a24ebe459ff24b83ef333288347529de609b65f1c25d5c5b74f2f8b20e2904d",
+    "assets/query-DtERyQJL.js.map": "d584967ed9a938c701324896050b1db23187d2a79840fe5fac55791a2eafc500",
+    "assets/vendor-CYSfZuHu.js": "d967cddbe86b7822415ceafb696d97dea5a491621955cb4127e0f3f96e5497eb",
+    "assets/vendor-CYSfZuHu.js.map": "037070c1858eff839f466f2431a724493a80f81c8f47484c4c6c21698885d15e",
+    "auth-config.js": "5b9a14cc56ea56e4ae58359adbc17de4a1ee2d9ca3da04973fb4f144f42a60e1",
+    "index.html": "a14cd3a68ffc19c78932351cc3fd89824dd5bba4110cdcfd75caf940ddf4e1bc",
+    "manifest.json": "d4c3c0897d7be95321a37babc97bd922618cf8142dd9103faef1efe700fd343a",
+    "sw.js": "5befc07c048a6a49d7f7ec492fe1c04ae8b40283dcc8387ef4e6b2b92c516dcd"
+  },
+  "bundledAjvCompilerModules": [],
+  "browserVersion": "156.0.8078.79",
+  "negativeControl": {
+    "functionBlocked": true,
+    "evalBlocked": true
+  },
+  "rootChildren": 1,
+  "knownBase96MissingFavicon": [
+    {
+      "url": "http://127.0.0.1:39123/favicon.svg",
+      "status": 404
+    }
+  ],
+  "bootPassed": true,
+  "pageErrors": [],
+  "requestFailures": [],
+  "responses": [
+    {
+      "url": "http://127.0.0.1:39123/",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:39123/assets/index-kKrfL4r3.css",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:39123/assets/query-DtERyQJL.js",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:39123/auth-config.js",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:39123/assets/vendor-CYSfZuHu.js",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:39123/assets/index-DCE-pCmf.js",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:39123/favicon.svg",
+      "status": 404
+    }
+  ],
+  "requestMethods": [
+    "GET",
+    "GET",
+    "GET",
+    "GET",
+    "GET",
+    "GET",
+    "GET"
+  ],
+  "cspErrors": []
+}

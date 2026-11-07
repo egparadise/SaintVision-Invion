@@ -1,0 +1,62 @@
+[
+  {
+    "path": "docs/vault/00_Index/\uc804\uccb4 \uac1c\ubc1c \uc9c4\ud589 \ud604\ud669.md",
+    "blob": "f96901ba49afec02a76c2d391c0f72dd23eaa0e4",
+    "SHA256": "5403d5e4468ef116a93ff6a9272e4ffef38b42c76a7030ffeeda09b9663b3488"
+  },
+  {
+    "path": "docs/vault/30_Development/Agent\ubcc4 \uc791\uc5c5/Codex \uc791\uc5c5 \ud604\ud669.md",
+    "blob": "ef9e04e222544d64117df3d37667004b763d221f",
+    "SHA256": "5dcd60c5cb1f3cc2471a802be98160ea8eba4d2e971d10c6298c3e29f9f60cc0"
+  },
+  {
+    "path": "docs/vault/00_Index/2026-09-15 \ub2e8\uc77c \uac00\uc0c1 \ucef4\ud4e8\ud130 \ubcf4\uac15 \uc124\uacc4 \uc778\ub371\uc2a4.md",
+    "blob": "72db8dd202e42346c10d5340f6f6b42516520a95",
+    "SHA256": "35f2cca047fdb57ff2e2ad28e3847e9a7c0a19d6ace6fb36aa941042e872e9be"
+  },
+  {
+    "path": "docs/vault/30_Development/57.81\ud37c\uc13c\ud2b8 \uc774\ud6c4 \ub2e8\uc77c \uac00\uc0c1 \ucef4\ud4e8\ud130 \ubcf4\uac15 \ub85c\ub4dc\ub9f5.md",
+    "blob": "2861910c711c24065a57313b0d4148122521fb21",
+    "SHA256": "3a4527ffe53ebea114063692dd3bba826da8c279a93a9800919fff394df1a018"
+  },
+  {
+    "path": "docs/vault/40_Governance/Agent \uc5f0\uc18d \uc2e4\ud589\uacfc \ucd5c\uc885 \ubcf4\uace0 \uc815\ucc45.md",
+    "blob": "a9503cb0cc11c077c1528e4775c9458df2b1990d",
+    "SHA256": "60c6a8d3130491bd4cab730cccc0e236fb038d1c7c816efa333acdc34a30cd8f"
+  },
+  {
+    "path": "docs/vault/00_Index/\ucd5c\uc885 \uac1c\ubc1c \uacc4\ud68d - \ubaa8\ub4e0 \uac1c\ubc1c\uc758 \uc9c0\uce68.md",
+    "blob": "41e82e7123c269da74239cadfcf5af7f8007cdfb",
+    "SHA256": "59223c5dff4b4bb6252c8061aebe975665e6eadf92db3659a3f89951b2cb149f"
+  },
+  {
+    "path": "docs/vault/40_Governance/\uc124\uacc4 \ucda9\ub3cc \uc815\uc815 \ubc0f ADR.md",
+    "blob": "9cd5c4a9b7c11a009364099852d6276823e31ab4",
+    "SHA256": "771f7714a63af52d7c8aea2424db0b33a2fe96c759c51c81c23144daf7aeaf77"
+  },
+  {
+    "path": "docs/vault/40_Governance/Agent \uc5ed\ud560\uacfc \uc778\uacc4 \uacc4\uc57d.md",
+    "blob": "e8703c212659c525a6b6eb542e5ee796b4fd889e",
+    "SHA256": "128c054e72f9e001b3b32f914cce544bce5432eddccdbe1212d27180c3200823"
+  },
+  {
+    "path": "docs/vault/40_Governance/Git Build Obsidian \uc6b4\uc601 \uc808\ucc28.md",
+    "blob": "c53059902faf775b882a2303ab6c6efe42ec8462",
+    "SHA256": "fe5e8adc44a14c081ac767265a16434b72e4b3ebfb7719081fa166ad459e59e9"
+  },
+  {
+    "path": "docs/vault/40_Governance/Agent \uc9c0\uc18d \uac1c\ubc1c \uc6b4\uc601 \uaddc\uce59.md",
+    "blob": "4176f640d7e3745c5346c234cd119148cb92c39c",
+    "SHA256": "63839c440ead6dc07300a0e18d5024fb9aadbddf546707156c39af7ee9495c84"
+  },
+  {
+    "path": "docs/task-registry.json",
+    "blob": "3d7b5be755d15b5f181b9cbbed33b2a8f4b56e87",
+    "SHA256": "7c6b339c7487aae652cc5c5e04f6e933249c83930019e798ec24006794b07644"
+  },
+  {
+    "path": "docs/source-manifest.json",
+    "blob": "6558e0566b5b7c019d20b14b53f7c0f63dae1d49",
+    "SHA256": "c774136ae615797afe7c363f04a5c7ea5bbaeacc4237fdba091f42814d30980c"
+  }
+]

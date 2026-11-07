@@ -1,0 +1,417 @@
+{
+  "fixtureOnly": true,
+  "realUserOrHardwareAcceptance": false,
+  "sandbox": true,
+  "sourceSHA": "abb7074e3da0d547ac81d3da33dce347d5c656af",
+  "command": [
+    "/opt/hostedtoolcache/node/22.23.4/x64/bin/node",
+    "node_modules/vite/bin/vite.js",
+    "--config",
+    "vite.config.ts",
+    "--host",
+    "127.0.0.1",
+    "--port",
+    "35527",
+    "--strictPort"
+  ],
+  "recordedReplayClock": "2026-11-07T19:47:41.667651+00:00",
+  "wireTimestampsModified": false,
+  "inputs": {
+    "nodes.json": "7359b4712e4366ee5d652ad22460a51ac27e6ff9123900bb2dc61b78ef5d63e1",
+    "resource-usage-nod_01M6TAWG25JTA3F7J7S1EE4N2W.json": "beb15119351a3dde5c5e7e9638d490127f6eb1326402ed3220cbfa9196da68d5",
+    "resource-usage-nod_01M6TGQZ8S3DAFS7TYE8TY1PX2.json": "e33d0725b85965f669104cc460df1ecf2bb8e5d6da96aa5a5412ac05818c35ac",
+    "resource-usage-nod_01M6TGSXV1J7XWC5D5H7N6EW1D.json": "0de278aac5c8213b84e3e3ca6eb31948e1fbbec69058f0b9cd26092849c93a5f"
+  },
+  "hostedReplayObservationSeconds": 30.001612273999967,
+  "stableDOM": {
+    "removed": 0,
+    "cards": true,
+    "badges": true
+  },
+  "browserVersion": "156.0.8078.79",
+  "passed": true,
+  "partialMemoryRetainedCPU": true,
+  "lastGoodExcludedFromCurrent": true,
+  "CPJSONRequired": true,
+  "ownedChildExitCode": 143,
+  "pageErrors": [],
+  "requestFailures": [],
+  "httpErrors": [
+    {
+      "url": "http://127.0.0.1:35527/v1/projects/prj_01M6NDBHVD2DZQ1Q38DCKN1XE3/nodes/nod_01M6TAWG25JTA3F7J7S1EE4N2W/resource-usage",
+      "status": 503
+    },
+    {
+      "url": "http://127.0.0.1:35527/v1/projects/prj_01M6NDBHVD2DZQ1Q38DCKN1XE3/nodes/nod_01M6TAWG25JTA3F7J7S1EE4N2W/resource-usage",
+      "status": 503
+    },
+    {
+      "url": "http://127.0.0.1:35527/v1/projects/prj_01M6NDBHVD2DZQ1Q38DCKN1XE3/nodes/nod_01M6TAWG25JTA3F7J7S1EE4N2W/resource-usage",
+      "status": 503
+    },
+    {
+      "url": "http://127.0.0.1:35527/v1/projects/prj_01M6NDBHVD2DZQ1Q38DCKN1XE3/nodes/nod_01M6TAWG25JTA3F7J7S1EE4N2W/resource-usage",
+      "status": 503
+    },
+    {
+      "url": "http://127.0.0.1:35527/gateway-healthz",
+      "status": 503
+    },
+    {
+      "url": "http://127.0.0.1:35527/v1/projects/prj_01M6NDBHVD2DZQ1Q38DCKN1XE3/nodes/nod_01M6TAWG25JTA3F7J7S1EE4N2W/resource-usage",
+      "status": 503
+    }
+  ],
+  "fixtureRequests": [
+    {
+      "path": "/healthz",
+      "health": "healthy",
+      "resources": "healthy"
+    },
+    {
+      "path": "/v1/projects/prj_01M6NDBHVD2DZQ1Q38DCKN1XE3/nodes",
+      "health": "healthy",
+      "resources": "healthy"
+    },
+    {
+      "path": "/v1/projects/prj_01M6NDBHVD2DZQ1Q38DCKN1XE3/nodes/nod_01M6TGQZ8S3DAFS7TYE8TY1PX2/resource-usage",
+      "health": "healthy",
+      "resources": "healthy"
+    },
+    {
+      "path": "/v1/projects/prj_01M6NDBHVD2DZQ1Q38DCKN1XE3/nodes/nod_01M6TAWG25JTA3F7J7S1EE4N2W/resource-usage",
+      "health": "healthy",
+      "resources": "healthy"
+    },
+    {
+      "path": "/v1/projects/prj_01M6NDBHVD2DZQ1Q38DCKN1XE3/nodes/nod_01M6TGSXV1J7XWC5D5H7N6EW1D/resource-usage",
+      "health": "healthy",
+      "resources": "healthy"
+    },
+    {
+      "path": "/healthz",
+      "health": "healthy",
+      "resources": "healthy"
+    },
+    {
+      "path": "/v1/projects/prj_01M6NDBHVD2DZQ1Q38DCKN1XE3/nodes",
+      "health": "healthy",
+      "resources": "healthy"
+    },
+    {
+      "path": "/v1/projects/prj_01M6NDBHVD2DZQ1Q38DCKN1XE3/nodes/nod_01M6TAWG25JTA3F7J7S1EE4N2W/resource-usage",
+      "health": "healthy",
+      "resources": "healthy"
+    },
+    {
+      "path": "/v1/projects/prj_01M6NDBHVD2DZQ1Q38DCKN1XE3/nodes/nod_01M6TGQZ8S3DAFS7TYE8TY1PX2/resource-usage",
+      "health": "healthy",
+      "resources": "healthy"
+    },
+    {
+      "path": "/v1/projects/prj_01M6NDBHVD2DZQ1Q38DCKN1XE3/nodes/nod_01M6TGSXV1J7XWC5D5H7N6EW1D/resource-usage",
+      "health": "healthy",
+      "resources": "healthy"
+    },
+    {
+      "path": "/healthz",
+      "health": "healthy",
+      "resources": "healthy"
+    },
+    {
+      "path": "/v1/projects/prj_01M6NDBHVD2DZQ1Q38DCKN1XE3/nodes",
+      "health": "healthy",
+      "resources": "healthy"
+    },
+    {
+      "path": "/v1/projects/prj_01M6NDBHVD2DZQ1Q38DCKN1XE3/nodes/nod_01M6TAWG25JTA3F7J7S1EE4N2W/resource-usage",
+      "health": "healthy",
+      "resources": "healthy"
+    },
+    {
+      "path": "/v1/projects/prj_01M6NDBHVD2DZQ1Q38DCKN1XE3/nodes/nod_01M6TGQZ8S3DAFS7TYE8TY1PX2/resource-usage",
+      "health": "healthy",
+      "resources": "healthy"
+    },
+    {
+      "path": "/v1/projects/prj_01M6NDBHVD2DZQ1Q38DCKN1XE3/nodes/nod_01M6TGSXV1J7XWC5D5H7N6EW1D/resource-usage",
+      "health": "healthy",
+      "resources": "healthy"
+    },
+    {
+      "path": "/healthz",
+      "health": "healthy",
+      "resources": "healthy"
+    },
+    {
+      "path": "/v1/projects/prj_01M6NDBHVD2DZQ1Q38DCKN1XE3/nodes",
+      "health": "healthy",
+      "resources": "healthy"
+    },
+    {
+      "path": "/v1/projects/prj_01M6NDBHVD2DZQ1Q38DCKN1XE3/nodes/nod_01M6TAWG25JTA3F7J7S1EE4N2W/resource-usage",
+      "health": "healthy",
+      "resources": "healthy"
+    },
+    {
+      "path": "/v1/projects/prj_01M6NDBHVD2DZQ1Q38DCKN1XE3/nodes/nod_01M6TGQZ8S3DAFS7TYE8TY1PX2/resource-usage",
+      "health": "healthy",
+      "resources": "healthy"
+    },
+    {
+      "path": "/v1/projects/prj_01M6NDBHVD2DZQ1Q38DCKN1XE3/nodes/nod_01M6TGSXV1J7XWC5D5H7N6EW1D/resource-usage",
+      "health": "healthy",
+      "resources": "healthy"
+    },
+    {
+      "path": "/healthz",
+      "health": "healthy",
+      "resources": "healthy"
+    },
+    {
+      "path": "/v1/projects/prj_01M6NDBHVD2DZQ1Q38DCKN1XE3/nodes",
+      "health": "healthy",
+      "resources": "healthy"
+    },
+    {
+      "path": "/v1/projects/prj_01M6NDBHVD2DZQ1Q38DCKN1XE3/nodes/nod_01M6TAWG25JTA3F7J7S1EE4N2W/resource-usage",
+      "health": "healthy",
+      "resources": "healthy"
+    },
+    {
+      "path": "/v1/projects/prj_01M6NDBHVD2DZQ1Q38DCKN1XE3/nodes/nod_01M6TGQZ8S3DAFS7TYE8TY1PX2/resource-usage",
+      "health": "healthy",
+      "resources": "healthy"
+    },
+    {
+      "path": "/v1/projects/prj_01M6NDBHVD2DZQ1Q38DCKN1XE3/nodes/nod_01M6TGSXV1J7XWC5D5H7N6EW1D/resource-usage",
+      "health": "healthy",
+      "resources": "healthy"
+    },
+    {
+      "path": "/healthz",
+      "health": "healthy",
+      "resources": "healthy"
+    },
+    {
+      "path": "/v1/projects/prj_01M6NDBHVD2DZQ1Q38DCKN1XE3/nodes",
+      "health": "healthy",
+      "resources": "healthy"
+    },
+    {
+      "path": "/v1/projects/prj_01M6NDBHVD2DZQ1Q38DCKN1XE3/nodes/nod_01M6TAWG25JTA3F7J7S1EE4N2W/resource-usage",
+      "health": "healthy",
+      "resources": "healthy"
+    },
+    {
+      "path": "/v1/projects/prj_01M6NDBHVD2DZQ1Q38DCKN1XE3/nodes/nod_01M6TGQZ8S3DAFS7TYE8TY1PX2/resource-usage",
+      "health": "healthy",
+      "resources": "healthy"
+    },
+    {
+      "path": "/v1/projects/prj_01M6NDBHVD2DZQ1Q38DCKN1XE3/nodes/nod_01M6TGSXV1J7XWC5D5H7N6EW1D/resource-usage",
+      "health": "healthy",
+      "resources": "healthy"
+    },
+    {
+      "path": "/healthz",
+      "health": "healthy",
+      "resources": "healthy"
+    },
+    {
+      "path": "/v1/projects/prj_01M6NDBHVD2DZQ1Q38DCKN1XE3/nodes",
+      "health": "healthy",
+      "resources": "healthy"
+    },
+    {
+      "path": "/v1/projects/prj_01M6NDBHVD2DZQ1Q38DCKN1XE3/nodes/nod_01M6TAWG25JTA3F7J7S1EE4N2W/resource-usage",
+      "health": "healthy",
+      "resources": "healthy"
+    },
+    {
+      "path": "/v1/projects/prj_01M6NDBHVD2DZQ1Q38DCKN1XE3/nodes/nod_01M6TGSXV1J7XWC5D5H7N6EW1D/resource-usage",
+      "health": "healthy",
+      "resources": "healthy"
+    },
+    {
+      "path": "/v1/projects/prj_01M6NDBHVD2DZQ1Q38DCKN1XE3/nodes/nod_01M6TGQZ8S3DAFS7TYE8TY1PX2/resource-usage",
+      "health": "healthy",
+      "resources": "healthy"
+    },
+    {
+      "path": "/healthz",
+      "health": "healthy",
+      "resources": "partial"
+    },
+    {
+      "path": "/v1/projects/prj_01M6NDBHVD2DZQ1Q38DCKN1XE3/nodes",
+      "health": "healthy",
+      "resources": "partial"
+    },
+    {
+      "path": "/v1/projects/prj_01M6NDBHVD2DZQ1Q38DCKN1XE3/nodes/nod_01M6TAWG25JTA3F7J7S1EE4N2W/resource-usage",
+      "health": "healthy",
+      "resources": "partial"
+    },
+    {
+      "path": "/v1/projects/prj_01M6NDBHVD2DZQ1Q38DCKN1XE3/nodes/nod_01M6TGQZ8S3DAFS7TYE8TY1PX2/resource-usage",
+      "health": "healthy",
+      "resources": "partial"
+    },
+    {
+      "path": "/v1/projects/prj_01M6NDBHVD2DZQ1Q38DCKN1XE3/nodes/nod_01M6TGSXV1J7XWC5D5H7N6EW1D/resource-usage",
+      "health": "healthy",
+      "resources": "partial"
+    },
+    {
+      "path": "/healthz",
+      "health": "healthy",
+      "resources": "error"
+    },
+    {
+      "path": "/v1/projects/prj_01M6NDBHVD2DZQ1Q38DCKN1XE3/nodes",
+      "health": "healthy",
+      "resources": "error"
+    },
+    {
+      "path": "/v1/projects/prj_01M6NDBHVD2DZQ1Q38DCKN1XE3/nodes/nod_01M6TAWG25JTA3F7J7S1EE4N2W/resource-usage",
+      "health": "healthy",
+      "resources": "error"
+    },
+    {
+      "path": "/v1/projects/prj_01M6NDBHVD2DZQ1Q38DCKN1XE3/nodes/nod_01M6TGQZ8S3DAFS7TYE8TY1PX2/resource-usage",
+      "health": "healthy",
+      "resources": "error"
+    },
+    {
+      "path": "/v1/projects/prj_01M6NDBHVD2DZQ1Q38DCKN1XE3/nodes/nod_01M6TGSXV1J7XWC5D5H7N6EW1D/resource-usage",
+      "health": "healthy",
+      "resources": "error"
+    },
+    {
+      "path": "/healthz",
+      "health": "html",
+      "resources": "error"
+    },
+    {
+      "path": "/v1/projects/prj_01M6NDBHVD2DZQ1Q38DCKN1XE3/nodes",
+      "health": "html",
+      "resources": "error"
+    },
+    {
+      "path": "/v1/projects/prj_01M6NDBHVD2DZQ1Q38DCKN1XE3/nodes/nod_01M6TAWG25JTA3F7J7S1EE4N2W/resource-usage",
+      "health": "html",
+      "resources": "error"
+    },
+    {
+      "path": "/v1/projects/prj_01M6NDBHVD2DZQ1Q38DCKN1XE3/nodes/nod_01M6TGQZ8S3DAFS7TYE8TY1PX2/resource-usage",
+      "health": "html",
+      "resources": "error"
+    },
+    {
+      "path": "/v1/projects/prj_01M6NDBHVD2DZQ1Q38DCKN1XE3/nodes/nod_01M6TGSXV1J7XWC5D5H7N6EW1D/resource-usage",
+      "health": "html",
+      "resources": "error"
+    },
+    {
+      "path": "/healthz",
+      "health": "html",
+      "resources": "error"
+    },
+    {
+      "path": "/v1/projects/prj_01M6NDBHVD2DZQ1Q38DCKN1XE3/nodes",
+      "health": "html",
+      "resources": "error"
+    },
+    {
+      "path": "/v1/projects/prj_01M6NDBHVD2DZQ1Q38DCKN1XE3/nodes/nod_01M6TAWG25JTA3F7J7S1EE4N2W/resource-usage",
+      "health": "html",
+      "resources": "error"
+    },
+    {
+      "path": "/v1/projects/prj_01M6NDBHVD2DZQ1Q38DCKN1XE3/nodes/nod_01M6TGQZ8S3DAFS7TYE8TY1PX2/resource-usage",
+      "health": "html",
+      "resources": "error"
+    },
+    {
+      "path": "/v1/projects/prj_01M6NDBHVD2DZQ1Q38DCKN1XE3/nodes/nod_01M6TGSXV1J7XWC5D5H7N6EW1D/resource-usage",
+      "health": "html",
+      "resources": "error"
+    },
+    {
+      "path": "/healthz",
+      "health": "text",
+      "resources": "error"
+    },
+    {
+      "path": "/v1/projects/prj_01M6NDBHVD2DZQ1Q38DCKN1XE3/nodes",
+      "health": "text",
+      "resources": "error"
+    },
+    {
+      "path": "/v1/projects/prj_01M6NDBHVD2DZQ1Q38DCKN1XE3/nodes/nod_01M6TAWG25JTA3F7J7S1EE4N2W/resource-usage",
+      "health": "text",
+      "resources": "error"
+    },
+    {
+      "path": "/v1/projects/prj_01M6NDBHVD2DZQ1Q38DCKN1XE3/nodes/nod_01M6TGQZ8S3DAFS7TYE8TY1PX2/resource-usage",
+      "health": "text",
+      "resources": "error"
+    },
+    {
+      "path": "/v1/projects/prj_01M6NDBHVD2DZQ1Q38DCKN1XE3/nodes/nod_01M6TGSXV1J7XWC5D5H7N6EW1D/resource-usage",
+      "health": "text",
+      "resources": "error"
+    },
+    {
+      "path": "/healthz",
+      "health": "error",
+      "resources": "error"
+    },
+    {
+      "path": "/v1/projects/prj_01M6NDBHVD2DZQ1Q38DCKN1XE3/nodes",
+      "health": "error",
+      "resources": "error"
+    },
+    {
+      "path": "/v1/projects/prj_01M6NDBHVD2DZQ1Q38DCKN1XE3/nodes/nod_01M6TAWG25JTA3F7J7S1EE4N2W/resource-usage",
+      "health": "error",
+      "resources": "error"
+    },
+    {
+      "path": "/v1/projects/prj_01M6NDBHVD2DZQ1Q38DCKN1XE3/nodes/nod_01M6TGQZ8S3DAFS7TYE8TY1PX2/resource-usage",
+      "health": "error",
+      "resources": "error"
+    },
+    {
+      "path": "/v1/projects/prj_01M6NDBHVD2DZQ1Q38DCKN1XE3/nodes/nod_01M6TGSXV1J7XWC5D5H7N6EW1D/resource-usage",
+      "health": "error",
+      "resources": "error"
+    },
+    {
+      "path": "/healthz",
+      "health": "healthy",
+      "resources": "healthy"
+    },
+    {
+      "path": "/v1/projects/prj_01M6NDBHVD2DZQ1Q38DCKN1XE3/nodes",
+      "health": "healthy",
+      "resources": "healthy"
+    },
+    {
+      "path": "/v1/projects/prj_01M6NDBHVD2DZQ1Q38DCKN1XE3/nodes/nod_01M6TAWG25JTA3F7J7S1EE4N2W/resource-usage",
+      "health": "healthy",
+      "resources": "healthy"
+    },
+    {
+      "path": "/v1/projects/prj_01M6NDBHVD2DZQ1Q38DCKN1XE3/nodes/nod_01M6TGQZ8S3DAFS7TYE8TY1PX2/resource-usage",
+      "health": "healthy",
+      "resources": "healthy"
+    },
+    {
+      "path": "/v1/projects/prj_01M6NDBHVD2DZQ1Q38DCKN1XE3/nodes/nod_01M6TGSXV1J7XWC5D5H7N6EW1D/resource-usage",
+      "health": "healthy",
+      "resources": "healthy"
+    }
+  ]
+}

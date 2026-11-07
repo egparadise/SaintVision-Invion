@@ -1,15 +1,23 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.492"
+version: "1.0.493"
 status: "review"
 author: "Codex"
-updated: "2026-11-08T04:50:03+09:00"
+updated: "2026-11-08T05:38:02+09:00"
 source_of_truth: "Git"
 active_card: "FLEET5 continued supervision with PORTAL-REFRESH-FLEET-20261106"
-active_card_status: "E4e07PC3StrictCSPAnd3100Deployed_ActualAdminBody3Online; ResourceUIAndGatewayHealthContractMismatchConfirmed_ActualSourceFixOwnerReady_FullUIAll5Pending"
-active_card_next: "After Root531 exact Docs/Obsidian publication, actual original Codex author fixes canonical per-node resource-usage join/partial measurement rendering and genuine CP gateway-health wiring from e4e07; preserve security/semantics/polling and all genuine failures. Then exact CI and one bounded actual Claude; Root real browser/frame revalidation. Two genuine votes/Run/PC1/PC5/GPUstorage/renewal/all5 remain."
+active_card_status: "DashboardAbb707ExactOfficialCI1380TestsAnd30sRecordedWireReplayTLSProxyVerified_ActualAuthorExitedReleased_CanonicalUnchanged_ActualClaudeReviewReady_RealDeployAll5Pending"
+active_card_next: "Root seals queued Root532 Docs/Obsidian after source author exit, then one actual Claude bounded e4e07-to-abb707 resource partial-read model/polling/real CP-health review. After acceptance Root adapts new URI-bearing health proxy, stages exact source artifact and verifies actual login/resources/30s frames. Current Main3100 stays e4e07; manual real votes/Run/PC1/PC5/renewal/all5 remain."
 ---
+
+## 2026-11-08T05:38:02+09:00 자원·CPhealth abb707 공식 증거 대조와 실제 검토 준비
+
+자원/CPhealth연결후보abb7074e의정확Frontend42410996328(21+16단계)·Docs42410998999(19)·AC1142411001237(14),공식1380/1380시험·6브라우저사례·6artifactZIP을Root가대조했다. 실제Root531응답19pin과30초고정시각HTTP재생의card/badge제거0·부분관측/lastgood제외·TLSproxy실패보존을확인했다. 이는fixture이며실제PC3인수가아니다. backend/SQL/인증/CSP/validator/lock/기존15CSP회귀·firstintent는불변이다. 이전1dc의1378pass/2fail·TS2322원본실패를공식로그로보존했고작성자의실제종료/해제와canonical551380B완전일치를확인했다. manualMissing1/MEASURED_FAIL은유지하며실제Claude한정검토뒤배포/화면재검증한다. 다음첫행동/담당은Root532게시/동기화뒤단한actualClaude의이번2건delta검토다. 새후보는아직배포/독립수락하지않았다.
+
+## 2026-11-08T04:55:26+09:00 실제 자원·health 보완 원 작성자 후속 전달
+
+Root531의실제배포/응답진단은Git8cbcc96f·Docs42408179186전19단계·Obsidian3473hash/check-apply-check0/pending0/conflict0/clean으로완료했다. 두실제worker종료/해제를대조하고원작성자Codex에게e4e07기준canonical자원부분관측표시와실제CPhealth연결2건만후속전달했다. 실제ctx_ed6d9229a09a/task_e04bfe8c6446/reopened/ready접수를보존했으며구현/CI/독립검토결과는아직없다. 새canonical551380B/SHAa0955c3f7a7db43565ddd87eddf26bd4406e41f885d32bcb4d84442e191bff83기준동안RootAPPLY를보류한다. 기존CR-CSP02/CR90501수락과현재3대제한공유관측을보존하며fullUI/Run/PC1PC5/5대인수미완료를유지한다. 다음첫행동/담당은동일actualCodex의한정2건구현/정확CI이며Root532진행기록의게시/동기화는fullcanonical창종료뒤완료한다.
 
 ## 2026-11-08T04:50:03+09:00 e4e07 실배포와 실제 UI 계약 보완 카드
 

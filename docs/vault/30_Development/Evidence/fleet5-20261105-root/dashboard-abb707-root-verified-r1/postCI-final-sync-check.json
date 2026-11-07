@@ -1,0 +1,12 @@
+{
+  "atKST": "2026-11-08T05:30:17.544880+09:00",
+  "argv": [
+    "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+    "-B",
+    "tools/sync_obsidian.py",
+    "--check"
+  ],
+  "exit": 0,
+  "stdout": "CHECK: 5149 managed files, 2698 pending exports, 0 conflicts. No writes.\r\n",
+  "stderr": ""
+}

@@ -1,6 +1,6 @@
 {
   "schema": "fleet5-root-review-resource-sequence:1",
-  "atKST": "2026-11-08T04:50:03+09:00",
+  "atKST": "2026-11-08T05:38:02+09:00",
   "completedB": {
     "task": "task_d4c4c809ed4e",
     "review": "ac9182c3e3d606ec027c0be2e90e049ff50d54f1",
@@ -15,14 +15,11 @@
   "active": null,
   "pending": [
     {
-      "id": "FLEET5-REAL-DASHBOARD-CANONICAL-RESOURCE-HEALTH-JOIN-R1-20261108",
-      "owner": "actual Orca Codex",
-      "state": "READY_CANONICAL_DASHBOARD_JOIN_AND_REAL_GATEWAY_HEALTH_SOURCE_FIX",
-      "base": "e4e07bfd6b94e57edc64d158e208df01b9319deb",
-      "findings": [
-        "DASH-RESOURCE-01",
-        "DASH-HEALTH-02"
-      ]
+      "id": "DASH-RESOURCE-01_AND_DASH-HEALTH-02_DELTA_REVIEW",
+      "owner": "one actual independent Claude",
+      "state": "READY_AFTER_ROOT532_SEALED_PUBLICATION",
+      "source": "abb7074e3da0d547ac81d3da33dce347d5c656af",
+      "base": "e4e07bfd6b94e57edc64d158e208df01b9319deb"
     }
   ],
   "authorParallelWork": "B frozen b51 awaiting actual delta verdict; H12 accepted6d7 plus read-only five-row audit delivered, Root owns first CPU journey preflight. Optional Low backlog is not a mandatory new scope.",
@@ -33,7 +30,7 @@
     "review": "0e53fc024ca773b7719182e170e5e126aeaf5b95",
     "verdict": "ACCEPT TEST-ONLY; R-L1 CLOSED; no new findings"
   },
-  "nextActualReviewTrigger": "After original source owner fixes only real resource read-model and gateway health integration with exact CI; one bounded actual Claude. No CR-CSP02 reopen or optional full-feature review loop. Actual votes/Run/all5 remain.",
+  "nextActualReviewTrigger": "One actual Claude bounded canonical partial-resource read-model/polling and real CP gateway-health delta review after Root532 exact publication. Inherit sound e4e07/CSP02/CR90501. Then Root exact artifact/pilot URI adapter and actual browser/login/resources/30s frame acceptance; all genuine operating gates remain.",
   "completedIntegration": {
     "task": "task_78064fb4b7ff",
     "dispatch": "ctx_ed7ec73163d6",
@@ -3659,6 +3656,192 @@
       "DASH-HEALTH-02"
     ],
     "nextOwner": "Actual Orca Codex original author, then one bounded actual Claude review; Root exact artifact/browser revalidation",
+    "wholeProgramComplete": false
+  },
+  "dashboardCandidateRootProof": {
+    "atKST": "2026-11-08T05:35:20+09:00",
+    "source": "abb7074e3da0d547ac81d3da33dce347d5c656af",
+    "base": "e4e07bfd6b94e57edc64d158e208df01b9319deb",
+    "unchangedBackendSource": "96afd799d49717fd40e4ddabd538d82accbe1958",
+    "branch": "agent/codex/fleet5-dashboard-canonical-resource-health-r1-20261108",
+    "descendantCommits": 2,
+    "sourcePaths": [
+      ".github/workflows/frontend.yml",
+      "apps/web/nginx.conf",
+      "apps/web/src/app/App.tsx",
+      "apps/web/src/contracts/dashboard-resources.ts",
+      "apps/web/src/contracts/types.ts",
+      "apps/web/src/features/dashboard/CanonicalClusterResources.tsx",
+      "apps/web/src/features/dashboard/ClusterOverview.tsx",
+      "apps/web/src/features/nodes/NodeDetail.tsx",
+      "apps/web/src/shared/api/dashboardResources.ts",
+      "apps/web/src/shared/api/nodeObservation.ts",
+      "apps/web/src/shared/ui/Header.tsx",
+      "apps/web/tests/browser/dashboard.html",
+      "apps/web/tests/browser/dashboard.tsx",
+      "apps/web/tests/dashboard-app-join.test.tsx",
+      "apps/web/tests/dashboard-canonical-resources.test.tsx",
+      "apps/web/tests/portal-refresh-fleet-ui.test.tsx",
+      "apps/web/vite.config.ts",
+      "deploy/intranet/portal/nginx.conf",
+      "tools/verify_dashboard_canonical_browser.py",
+      "tools/verify_gateway_proxy.py"
+    ],
+    "protectedTreesAndAC11PolicyUnchanged": {
+      "contracts": "b2b24a6d9baf24302f3590f4f30fe851ccb81ef1",
+      "packages": "7c445bdbc929f6597c0b39b598f9726032c67ad7",
+      "services": "5c9918adc48c76c88b5119f44516bb332924f067",
+      "migrations": "b1d35598829437c39dab7f60e9521bf8627e6832",
+      "src": "5507dfb820d54a8778c4cf5e3551368f11b6105f",
+      "tests": "f0c6e9f537989b71f57b2185fd43c6abbaf4369e",
+      "apps/studio": "faf648da92d7f63e74e7e1d158deb923d42a6a8c",
+      "apps/web/package-lock.json": "7cd35bcec966ac001d6481f9712ff06546879222",
+      "apps/web/package.json": "2bb2f1737b9da0374d88ab3c976c91e1239edf91",
+      "apps/web/scripts": "21e135515ed379ef2dc142224c1b1b9d5acf4b2d",
+      "apps/web/src/shared/api/nodeCertificateObservation.ts": "029568a75b56328c8b2d966ecc0111337cc3ee6f",
+      "apps/web/src/features/auth": "1e7dc0f02f58383df62bbfa98fd20c0421267072",
+      ".github/workflows/ac11-accessibility-e2e.yml": "2c72288b5fd5f6e83ccdfe0ed08b29de620e938d",
+      "deploy/intranet/portal/security-headers.conf": "229689ac1bccb4d6c2260774155c9f1a6c22fd61",
+      "deploy/intranet/portal/Dockerfile": "3e067d96bb25c24ddb953c21f1c490cd2092d648",
+      "apps/web/src/features/studio/FirstWorkspacePanel.tsx": "1180b3cb9a62e7c7d0d41a19e5d9d19520930171",
+      "tools/collect_ac11_accessibility_e2e.py": "2a550db5fd63f121ae6e512c4e1bdb9f38deb445",
+      "tools/run_real_browser_acceptance.py": "74683e101b38bac66ff4e689c8da09a886330e0c",
+      "tools/verify_portal_strict_csp_browser.py": "6127e8460247816c956e1b34eee56c746cc98776",
+      "tools/verify_vite_direct_launch.py": "73cb31fa7a8cefe24d638147787770d0ddeb2fc8",
+      "apps/web/tests/node-certificate-validator-csp.test.ts": "9b5fb0e0f2f231ef1dca651266be041e8aac06a8",
+      "apps/web/src/shared/api/workspaceFirstIntent.ts": "44d8d4073df2d8594c6058437594165b1f903ee8",
+      "apps/web/tests/first-workspace-panel.test.tsx": "4f0162e09b01d1dff93f441235bd46e83da2d176",
+      "apps/web/tests/browser/vite.config.ts": "0a2e4e8fcb6e6a14c5fd42f7ede3bdc40ddfb9d6"
+    },
+    "semanticTailIdenticalTo428And96": true,
+    "officialFreshCI": [
+      {
+        "workflow": "frontend",
+        "runID": 42410996328,
+        "correlation": "fleet5-dashboard-resource-health-frontend-9d93e05e0707485f8b351a2f7640951f",
+        "exactSourceRefPathEventAttempt1": true,
+        "jobs": [
+          {
+            "id": 128518899545,
+            "name": "frontend",
+            "steps": 21,
+            "allSuccess": true
+          },
+          {
+            "id": 128518899739,
+            "name": "Portal Container Build & Hardened Runtime Smoke",
+            "steps": 16,
+            "allSuccess": true
+          }
+        ]
+      },
+      {
+        "workflow": "docs",
+        "runID": 42410998999,
+        "correlation": "fleet5-dashboard-resource-health-docs-75654fc002894552b95f2db34c1c681a",
+        "exactSourceRefPathEventAttempt1": true,
+        "jobs": [
+          {
+            "id": 128518908527,
+            "name": "docs",
+            "steps": 19,
+            "allSuccess": true
+          }
+        ]
+      },
+      {
+        "workflow": "ac11-accessibility-e2e",
+        "runID": 42411001237,
+        "correlation": "fleet5-dashboard-resource-health-ac11-accessibility-e2e-c92159c04a534d5c9641d28e3922df4d",
+        "exactSourceRefPathEventAttempt1": true,
+        "jobs": [
+          {
+            "id": 128518914722,
+            "name": "accessibility-e2e",
+            "steps": 14,
+            "allSuccess": true
+          }
+        ]
+      }
+    ],
+    "officialArtifactBindings": [
+      {
+        "id": 13589228364,
+        "name": "saintvision-web-dist",
+        "bytes": 991242,
+        "SHA256": "sha256:2396f6b8898d89dab0d0215ffb97dec167bc2f8245a6a787060cecb4ebc60952",
+        "officialMetadataMatchesBytes": true
+      },
+      {
+        "id": 13589637552,
+        "name": "saintvision-portal-strict-csp-evidence",
+        "bytes": 14926,
+        "SHA256": "sha256:d0d5c88700f9df3ae217b9019cdb2605fe314fbba9bb6841a2adc3782026331f",
+        "officialMetadataMatchesBytes": true
+      },
+      {
+        "id": 13589207072,
+        "name": "s11-ac11-accessibility-abb7074e3da0d547ac81d3da33dce347d5c656af",
+        "bytes": 2212,
+        "SHA256": "sha256:6f22b8ff08740331f71dc360b0ced0abd42ad8c071880c0beb0d7d56b1f100e4",
+        "officialMetadataMatchesBytes": true
+      },
+      {
+        "id": 13589572374,
+        "name": "saintvision-direct-vite-startup-evidence",
+        "bytes": 10728,
+        "SHA256": "sha256:18b486165f7797e536fcc6cab6bd5c99a8fd92e55161187ab90c1b19fd56dc2c",
+        "officialMetadataMatchesBytes": true
+      },
+      {
+        "id": 13589915766,
+        "name": "saintvision-dashboard-canonical-browser-evidence",
+        "bytes": 78740,
+        "SHA256": "sha256:3f3510934ddc1a83f242f6b786b66f79a0b1612a9c3b22c6422be68543e0557e",
+        "officialMetadataMatchesBytes": true
+      },
+      {
+        "id": 13589711985,
+        "name": "saintvision-gateway-health-proxy-evidence",
+        "bytes": 1746,
+        "SHA256": "sha256:8f1ee9741038cbaa5ebb6d81f39af4e97b0707a88e0e27728b055479b833b5ee",
+        "officialMetadataMatchesBytes": true
+      }
+    ],
+    "hostedBuiltDistStrictCSPBootAndBytesMatched": true,
+    "generatedESMNoRawRequireModuleExportsEvalFunctionText": true,
+    "officialVitest1380Of1380In108Files": true,
+    "officialDevBrowserCasesPassed6Of6": true,
+    "officialDevCanonicalJourneysPassed5Of5": true,
+    "officialDevInvariantsPassed9Of9": true,
+    "officialDevContrastChecksPassed3Of3": true,
+    "officialDevKeyboardChecksPassed2Of2": true,
+    "normalizedAC11Verdict": "MEASURED_FAIL",
+    "manualAcceptanceMissingCount": 1,
+    "manualAcceptanceGatePreservedNotDischarged": true,
+    "acceptanceClaim": false,
+    "root531ActualInputPins19Matched": true,
+    "officialRecordedCanonicalDashboardReplay30sStableDOM": true,
+    "replayedWireTimestampsUnmodifiedClockExplicit": true,
+    "officialPartialAndLastGoodFailureCasesPassed": true,
+    "officialGatewayTLSProxyAndRawFailureFixturePassed": true,
+    "officialFreshDirectMainConfigProofPassed": true,
+    "firstCandidate1dcFailureRetained": true,
+    "newMeaningfulTests": 29,
+    "pilotURIHealthAdaptationRequired": "In existing Root-owned loopback+SSH adapter additionally replace exact proxy_pass https://control_plane/healthz; with proxy_pass http://127.0.0.1:8080/healthz; and retain existing transport adaptation; canonical source TLS remains verified",
+    "authorCanonicalFullBytesMatched": true,
+    "canonicalBytes": 551380,
+    "canonicalSHA256": "a0955c3f7a7db43565ddd87eddf26bd4406e41f885d32bcb4d84442e191bff83",
+    "authorLocalMetadataGates8Exit0": true,
+    "authorLifecycle": {
+      "state": "succeeded",
+      "stage": "settled",
+      "liveness": "exited",
+      "terminalState": "released"
+    },
+    "sourceIndependentReview": "PENDING_ONE_ACTUAL_BOUNDED_CLAUDE_DELTA_REVIEW",
+    "actualPC3BrowserDeploymentAcceptance": false,
+    "mainProductExecution": false,
     "wholeProgramComplete": false
   }
 }

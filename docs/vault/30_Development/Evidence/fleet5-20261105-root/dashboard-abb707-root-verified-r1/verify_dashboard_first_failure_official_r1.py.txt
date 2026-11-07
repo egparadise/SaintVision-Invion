@@ -1,0 +1,24 @@
+import concurrent.futures,hashlib,json,re,subprocess
+from pathlib import Path
+r=Path(__file__).resolve().parents[1];out=r/'.work/dashboard-abb707-root-verification-r1';assert (out/'root-verification.json').is_file()
+ev=Path(r'D:\Project\SaintVisionI-Invion\fleet5-compute-storage-contract-20261105\docs\vault\30_Development\Evidence\fleet5-dashboard-canonical-resource-health-r1-20261108-codex')
+d=json.loads((ev/'delivery.json').read_bytes());rid=42410597855;gh=r'C:\Program Files\GitHub CLI\gh.exe'
+def get(endpoint):
+    q=subprocess.run([gh,'api','--allow-escape-sequences',endpoint],capture_output=True,timeout=40);assert q.returncode==0;return q.stdout
+run=json.loads(get(f'repos/egparadise/SaintVision-Invion/actions/runs/{rid}'));jobs=json.loads(get(f'repos/egparadise/SaintVision-Invion/actions/runs/{rid}/jobs?per_page=100'))
+assert run['head_sha']=='1dc73940f840284efcaf00b0ab04c1ba8c83ceea' and run['head_branch']==d['branch'] and run['event']=='workflow_dispatch' and run['path']=='.github/workflows/frontend.yml' and run['run_attempt']==1 and run['status']=='completed' and run['conclusion']=='failure'
+assert json.loads((ev/'ci-1dc73940f840-frontend-run.json').read_bytes())['display_title']==run['display_title']
+assert len(jobs['jobs'])==2 and {x['id'] for x in jobs['jobs']}=={128517680431,128517680653} and all(x['conclusion']=='failure' for x in jobs['jobs'])
+logpins={}
+def log(jid):return jid,get(f'repos/egparadise/SaintVision-Invion/actions/jobs/{jid}/logs')
+with concurrent.futures.ThreadPoolExecutor(max_workers=2) as pool:logs=list(pool.map(log,[128517680431,128517680653]))
+for jid,b in logs:
+    name=f'ci-1dc73940f840-job-{jid}.log';assert hashlib.sha256(b).hexdigest()==d['firstCandidateFailure']['logs'][name]
+    plain=re.sub(r'\x1b\[[0-9;]*[A-Za-z]','',b.decode('utf-8','replace'))
+    if jid==128517680431:
+        lines=[x for x in plain.splitlines() if ('Tests ' in x or 'Test Files ' in x) and ('1378 passed' in x or '106 passed' in x)];assert len(lines)==2 and any('1378 passed' in x and '2 failed' in x and '(1380)' in x for x in lines)
+    else:assert 'TS2322' in plain and 'unknown' in plain;lines=[x for x in plain.splitlines() if 'TS2322' in x][:2]
+    logpins[str(jid)]={'bytes':len(b),'SHA256':hashlib.sha256(b).hexdigest(),'selectedFailureLines':lines}
+(out/'first-failure-official-run.json').write_text(json.dumps(run,indent=2)+'\n',encoding='utf-8');(out/'first-failure-official-jobs.json').write_text(json.dumps(jobs,indent=2)+'\n',encoding='utf-8')
+v={'runID':rid,'source':run['head_sha'],'event':run['event'],'path':run['path'],'ref':run['head_branch'],'correlation':run['display_title'],'attempt':1,'actualConclusion':'failure','officialLogPins':logpins,'noRedispatchByRoot':True,'retainedNotAcceptance':True}
+(out/'first-failure-official-proof.json').write_text(json.dumps(v,indent=2)+'\n',encoding='utf-8');print(json.dumps(v),flush=True)

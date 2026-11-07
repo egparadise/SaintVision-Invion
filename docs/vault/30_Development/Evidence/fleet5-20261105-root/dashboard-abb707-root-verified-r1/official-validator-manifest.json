@@ -1,0 +1,19 @@
+{
+  "schema": "contracts/v1alpha1/core.schema.json",
+  "ref": "https://saintvision.ai/contracts/v1alpha1/core.schema.json#/$defs/ProjectNodeCertificateObservationResponse",
+  "format": "esm",
+  "selfContained": true,
+  "schemaSHA256": "f8bb8fa801f64d622ebcdc1c4c3383833632ccfb05a740493e3a5cb86e44404f",
+  "generatorSHA256": "eb1b7d2a1f667f9a8616d95b43b54716e3d3a4a7b8744ddacc4a777d8cc44042",
+  "lockSHA256": "1fa82239ec4bb731ef649acfeac84ac4a1dfb2fa5801824502adf053e8892fbd",
+  "ajv": "8.20.0",
+  "ajvFormats": "3.0.1",
+  "esbuild": "0.25.12",
+  "runtimeInputs": [
+    {
+      "path": "node_modules/ajv-formats/dist/formats.js",
+      "SHA256": "b61693a26869970a92cc1fe832c931ccd3afe8b6d66802b19c48306349e84880"
+    }
+  ],
+  "validatorSHA256": "476a803e51aa3f03e7512cfdf246462a63998e8657dc8afc5a622b0652a1d860"
+}

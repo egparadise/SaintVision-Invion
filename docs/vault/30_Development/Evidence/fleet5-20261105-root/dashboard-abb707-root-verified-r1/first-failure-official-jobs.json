@@ -1,0 +1,357 @@
+{
+  "total_count": 2,
+  "jobs": [
+    {
+      "id": 128517680431,
+      "run_id": 42410597855,
+      "workflow_name": "fleet5-dashboard-resource-health-frontend-3d633b366d194abab4445e1d24b254a0",
+      "head_branch": "agent/codex/fleet5-dashboard-canonical-resource-health-r1-20261108",
+      "run_url": "https://api.github.com/repos/egparadise/SaintVision-Invion/actions/runs/42410597855",
+      "run_attempt": 1,
+      "node_id": "CR_kwDOUTJvXc8AAAAd7EAtLw",
+      "head_sha": "1dc73940f840284efcaf00b0ab04c1ba8c83ceea",
+      "url": "https://api.github.com/repos/egparadise/SaintVision-Invion/actions/jobs/128517680431",
+      "html_url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/42410597855/job/128517680431",
+      "status": "completed",
+      "conclusion": "failure",
+      "created_at": "2026-11-07T20:20:38Z",
+      "started_at": "2026-11-07T20:20:40Z",
+      "completed_at": "2026-11-07T20:22:34Z",
+      "name": "frontend",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2026-11-07T20:20:41Z",
+          "completed_at": "2026-11-07T20:20:42Z"
+        },
+        {
+          "name": "Run actions/checkout@v4",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2026-11-07T20:20:42Z",
+          "completed_at": "2026-11-07T20:20:49Z"
+        },
+        {
+          "name": "Run actions/setup-node@v4",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2026-11-07T20:20:49Z",
+          "completed_at": "2026-11-07T20:20:50Z"
+        },
+        {
+          "name": "Install dependencies",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2026-11-07T20:20:50Z",
+          "completed_at": "2026-11-07T20:21:27Z"
+        },
+        {
+          "name": "Run actions/setup-python@v5",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5,
+          "started_at": "2026-11-07T20:21:27Z",
+          "completed_at": "2026-11-07T20:21:27Z"
+        },
+        {
+          "name": "Install pinned hosted browser regression harness",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6,
+          "started_at": "2026-11-07T20:21:27Z",
+          "completed_at": "2026-11-07T20:21:33Z"
+        },
+        {
+          "name": "Boot clean direct vite.js main config in real browser",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 7,
+          "started_at": "2026-11-07T20:21:33Z",
+          "completed_at": "2026-11-07T20:21:42Z"
+        },
+        {
+          "name": "Upload clean direct Vite browser evidence",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 8,
+          "started_at": "2026-11-07T20:21:42Z",
+          "completed_at": "2026-11-07T20:21:43Z"
+        },
+        {
+          "name": "Run ESLint",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 9,
+          "started_at": "2026-11-07T20:21:43Z",
+          "completed_at": "2026-11-07T20:21:50Z"
+        },
+        {
+          "name": "Run Vitest Unit Tests",
+          "status": "completed",
+          "conclusion": "failure",
+          "number": 10,
+          "started_at": "2026-11-07T20:21:50Z",
+          "completed_at": "2026-11-07T20:22:31Z"
+        },
+        {
+          "name": "Check generated discovery contract type",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 11,
+          "started_at": "2026-11-07T20:22:31Z",
+          "completed_at": "2026-11-07T20:22:31Z"
+        },
+        {
+          "name": "TypeScript Check & Production Build",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 12,
+          "started_at": "2026-11-07T20:22:31Z",
+          "completed_at": "2026-11-07T20:22:31Z"
+        },
+        {
+          "name": "Boot actual built frontend under canonical strict CSP",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 13,
+          "started_at": "2026-11-07T20:22:31Z",
+          "completed_at": "2026-11-07T20:22:31Z"
+        },
+        {
+          "name": "Replay canonical dashboard resources and genuine dev CP health in browser",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 14,
+          "started_at": "2026-11-07T20:22:31Z",
+          "completed_at": "2026-11-07T20:22:31Z"
+        },
+        {
+          "name": "Upload canonical dashboard browser replay evidence",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 15,
+          "started_at": "2026-11-07T20:22:31Z",
+          "completed_at": "2026-11-07T20:22:31Z"
+        },
+        {
+          "name": "Upload strict CSP browser and standalone generation evidence",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 16,
+          "started_at": "2026-11-07T20:22:31Z",
+          "completed_at": "2026-11-07T20:22:32Z"
+        },
+        {
+          "name": "Upload Web Build Artifact",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 17,
+          "started_at": "2026-11-07T20:22:32Z",
+          "completed_at": "2026-11-07T20:22:32Z"
+        },
+        {
+          "name": "Post Run actions/setup-python@v5",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 32,
+          "started_at": "2026-11-07T20:22:32Z",
+          "completed_at": "2026-11-07T20:22:32Z"
+        },
+        {
+          "name": "Post Run actions/setup-node@v4",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 33,
+          "started_at": "2026-11-07T20:22:32Z",
+          "completed_at": "2026-11-07T20:22:32Z"
+        },
+        {
+          "name": "Post Run actions/checkout@v4",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 34,
+          "started_at": "2026-11-07T20:22:32Z",
+          "completed_at": "2026-11-07T20:22:32Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 35,
+          "started_at": "2026-11-07T20:22:32Z",
+          "completed_at": "2026-11-07T20:22:32Z"
+        }
+      ],
+      "check_run_url": "https://api.github.com/repos/egparadise/SaintVision-Invion/check-runs/128517680431",
+      "labels": [
+        "ubuntu-latest"
+      ],
+      "runner_id": 1000020603,
+      "runner_name": "GitHub Actions 1000020603",
+      "runner_group_id": 0,
+      "runner_group_name": "GitHub Actions"
+    },
+    {
+      "id": 128517680653,
+      "run_id": 42410597855,
+      "workflow_name": "fleet5-dashboard-resource-health-frontend-3d633b366d194abab4445e1d24b254a0",
+      "head_branch": "agent/codex/fleet5-dashboard-canonical-resource-health-r1-20261108",
+      "run_url": "https://api.github.com/repos/egparadise/SaintVision-Invion/actions/runs/42410597855",
+      "run_attempt": 1,
+      "node_id": "CR_kwDOUTJvXc8AAAAd7EAuDQ",
+      "head_sha": "1dc73940f840284efcaf00b0ab04c1ba8c83ceea",
+      "url": "https://api.github.com/repos/egparadise/SaintVision-Invion/actions/jobs/128517680653",
+      "html_url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/42410597855/job/128517680653",
+      "status": "completed",
+      "conclusion": "failure",
+      "created_at": "2026-11-07T20:20:38Z",
+      "started_at": "2026-11-07T20:20:40Z",
+      "completed_at": "2026-11-07T20:21:53Z",
+      "name": "Portal Container Build & Hardened Runtime Smoke",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2026-11-07T20:20:41Z",
+          "completed_at": "2026-11-07T20:20:41Z"
+        },
+        {
+          "name": "Run actions/checkout@v4",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2026-11-07T20:20:41Z",
+          "completed_at": "2026-11-07T20:20:48Z"
+        },
+        {
+          "name": "Build Portal Docker Image with BuildKit",
+          "status": "completed",
+          "conclusion": "failure",
+          "number": 3,
+          "started_at": "2026-11-07T20:20:48Z",
+          "completed_at": "2026-11-07T20:21:51Z"
+        },
+        {
+          "name": "Verify Lane-Internal Built Image Identity (Self-Derived)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 4,
+          "started_at": "2026-11-07T20:21:51Z",
+          "completed_at": "2026-11-07T20:21:51Z"
+        },
+        {
+          "name": "Produce Portal Release Tarball and Strict Release Evidence (Codex r6 Block 1)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 5,
+          "started_at": "2026-11-07T20:21:51Z",
+          "completed_at": "2026-11-07T20:21:51Z"
+        },
+        {
+          "name": "Upload Portal Release Artifacts (Tarball & Evidence JSON)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 6,
+          "started_at": "2026-11-07T20:21:51Z",
+          "completed_at": "2026-11-07T20:21:51Z"
+        },
+        {
+          "name": "Verify Portal Load Release Script (--verify-only)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 7,
+          "started_at": "2026-11-07T20:21:51Z",
+          "completed_at": "2026-11-07T20:21:51Z"
+        },
+        {
+          "name": "Setup Mock Upstream HTTPS Server and Test PKI",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 8,
+          "started_at": "2026-11-07T20:21:51Z",
+          "completed_at": "2026-11-07T20:21:51Z"
+        },
+        {
+          "name": "Launch Portal Container via portal-up.sh",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 9,
+          "started_at": "2026-11-07T20:21:51Z",
+          "completed_at": "2026-11-07T20:21:51Z"
+        },
+        {
+          "name": "Execute Hardened Runtime Verification via curl",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 10,
+          "started_at": "2026-11-07T20:21:51Z",
+          "completed_at": "2026-11-07T20:21:51Z"
+        },
+        {
+          "name": "Verify genuine CP gateway health through TLS proxy",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 11,
+          "started_at": "2026-11-07T20:21:51Z",
+          "completed_at": "2026-11-07T20:21:51Z"
+        },
+        {
+          "name": "Upload gateway proxy evidence",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 12,
+          "started_at": "2026-11-07T20:21:51Z",
+          "completed_at": "2026-11-07T20:21:51Z"
+        },
+        {
+          "name": "Verify Automatic Rollback on Production Swap Failure (R6-H1 & R6-H2)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 13,
+          "started_at": "2026-11-07T20:21:51Z",
+          "completed_at": "2026-11-07T20:21:51Z"
+        },
+        {
+          "name": "Teardown Portal Container via portal-down.sh",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 14,
+          "started_at": "2026-11-07T20:21:51Z",
+          "completed_at": "2026-11-07T20:21:51Z"
+        },
+        {
+          "name": "Post Run actions/checkout@v4",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 28,
+          "started_at": "2026-11-07T20:21:51Z",
+          "completed_at": "2026-11-07T20:21:52Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 29,
+          "started_at": "2026-11-07T20:21:52Z",
+          "completed_at": "2026-11-07T20:21:52Z"
+        }
+      ],
+      "check_run_url": "https://api.github.com/repos/egparadise/SaintVision-Invion/check-runs/128517680653",
+      "labels": [
+        "ubuntu-latest"
+      ],
+      "runner_id": 1000020604,
+      "runner_name": "GitHub Actions 1000020604",
+      "runner_group_id": 0,
+      "runner_group_name": "GitHub Actions"
+    }
+  ]
+}

@@ -1,0 +1,46 @@
+"""Metadata-only exact-source/official-artifact binder; no product execution on Main."""
+from pathlib import Path
+r=Path(__file__).resolve().parents[1]
+p=(r/'.work/verify_cspcc607_root_candidate_r1.py').read_text(encoding='utf-8')
+for a,b in [('cc6076254d5b8f54804081a8b1994d76d86cf81a','abb7074e3da0d547ac81d3da33dce347d5c656af'),('428e5fc6b822d33e7e76316f443716b03579efa0','e4e07bfd6b94e57edc64d158e208df01b9319deb'),('cspcc607','dashboard-abb707'),('fleet5-csp02-esm-dev-compat-r1-20261108','fleet5-dashboard-canonical-resource-health-r1-20261108'),('ci-cc6076254d5b','ci-abb7074e3da0'),('local-gates-final-cc6076254d5b','local-gates-final-abb7074e3da0'),('42398681339','42411001237'),('128481507227','128518899545'),('128481522162','128518914722'),('ctx_e508c89f62b7','ctx_ed6d9229a09a'),("'frontend':17","'frontend':21"),("Runtime Smoke':14","Runtime Smoke':16"),('529870','551380'),('43600e1941cb3527e80adc2daac2064c53a44d129094da53869e6f50d46e334e','a0955c3f7a7db43565ddd87eddf26bd4406e41f885d32bcb4d84442e191bff83'),('1351','1380'),('106 passed','108 passed'),('(106\\)','(108\\)'),('In106Files','In108Files')]:
+    assert a in p,a;p=p.replace(a,b)
+a='allowed=';start=p.index(a);end=p.index('protected=',start)
+p=p[:start]+'''allowed={'.github/workflows/frontend.yml','apps/web/nginx.conf','apps/web/src/app/App.tsx','apps/web/src/contracts/dashboard-resources.ts','apps/web/src/contracts/types.ts','apps/web/src/features/dashboard/CanonicalClusterResources.tsx','apps/web/src/features/dashboard/ClusterOverview.tsx','apps/web/src/features/nodes/NodeDetail.tsx','apps/web/src/shared/api/dashboardResources.ts','apps/web/src/shared/api/nodeObservation.ts','apps/web/src/shared/ui/Header.tsx','apps/web/tests/browser/dashboard.html','apps/web/tests/browser/dashboard.tsx','apps/web/tests/dashboard-app-join.test.tsx','apps/web/tests/dashboard-canonical-resources.test.tsx','apps/web/tests/portal-refresh-fleet-ui.test.tsx','apps/web/vite.config.ts','deploy/intranet/portal/nginx.conf','tools/verify_dashboard_canonical_browser.py','tools/verify_gateway_proxy.py'}
+source_paths=[x for x in paths if not x.startswith('docs/vault/')];assert set(source_paths)==allowed
+assert all(x.startswith('docs/vault/30_Development/Evidence/fleet5-dashboard-canonical-resource-health-r1-20261108-codex/') or x in ['docs/vault/30_Development/Agent별 작업/Codex 작업 현황.md','docs/vault/30_Development/History/2026-11-08_05-40-00_KST_FLEET5_dashboard_canonical_resource_health_Codex.md'] for x in paths if x.startswith('docs/'))
+assert hashlib.sha256((ev/'delivery.json').read_bytes()).hexdigest()=='d678419cd533b44703940c3b90fe20eedffb110f6d7de026debfc73a241cb90e'
+assert len(d['actualInputPins'])==19
+for pin in d['actualInputPins']:
+ b=git('show',pin['source']+':'+pin['path']);assert pin['source']=='8cbcc96f845a1a94b998fadd489fd27bb3e0a675' and len(b)==pin['bytes'] and hashlib.sha256(b).hexdigest()==pin['SHA256'];assert b==(ev/pin['copy']).read_bytes()
+'''+p[end:]
+start=p.index('protected=');end=p.index('current=git(',start)
+p=p[:start]+'''protected=list(d['protectedComponents']['paths'])+['tools/collect_ac11_accessibility_e2e.py','tools/run_real_browser_acceptance.py','tools/verify_portal_strict_csp_browser.py','tools/verify_vite_direct_launch.py','apps/web/tests/node-certificate-validator-csp.test.ts','apps/web/src/shared/api/workspaceFirstIntent.ts','apps/web/tests/first-workspace-panel.test.tsx','apps/web/tests/browser/vite.config.ts'];trees={}
+for path in protected:
+ a=git('rev-parse',base+':'+path).decode().strip();b=git('rev-parse',target+':'+path).decode().strip();assert a==b,path;trees[path]=a
+'''+p[end:]
+p=p.replace("names=['saintvision-web-dist','saintvision-portal-strict-csp-evidence','s11-ac11-accessibility-'+target]","names=['saintvision-web-dist','saintvision-portal-strict-csp-evidence','s11-ac11-accessibility-'+target,'saintvision-direct-vite-startup-evidence','saintvision-dashboard-canonical-browser-evidence','saintvision-gateway-health-proxy-evidence']")
+a="  else:\n   for n in z.namelist():\n    if n.endswith('.json'):values['ac11']"
+b="""  elif name in ['saintvision-direct-vite-startup-evidence','saintvision-dashboard-canonical-browser-evidence','saintvision-gateway-health-proxy-evidence']:
+   label={'saintvision-direct-vite-startup-evidence':'direct','saintvision-dashboard-canonical-browser-evidence':'dashboard','saintvision-gateway-health-proxy-evidence':'gateway'}[name]
+   matches=[n for n in z.namelist() if n.endswith('result.json')];assert len(matches)==1;values[label]=json.loads(z.read(matches[0]))
+  else:
+   for n in z.namelist():
+    if n.endswith('.json'):values['ac11']"""
+assert a in p;p=p.replace(a,b)
+start=p.index('gates=json.loads(');end=p.index('for name,v in',start)
+p=p[:start]+'''gates=json.loads((ev/'local-gates-final-abb7074e3da0.json').read_bytes());assert len(gates)==8 and all(x['exit']==0 for x in gates);assert d['postCIFinalCHECK']['exit']==0 and d['canonicalState']['startEndPostCIBytesEqual'] and d['canonicalState']['CHECKOnly'] and not d['canonicalState']['APPLY']
+direct=values['direct'];assert direct['sourceSHA']==target and direct['mainConfigSHA256']==hashlib.sha256(git('show',target+':apps/web/vite.config.ts')).hexdigest();assert direct['bootPassed'] and direct['sandbox'] and direct['fixtureOnly'] and not direct['actualPC3BrowserAcceptance'] and not direct['npmLifecycleUsed'] and all(direct['missingBefore'].values()) and len(direct['missingBefore'])==2 and direct['deletedFiles']==[] and direct['rootChildren']>0 and not direct['pageErrors'] and not direct['requestFailures'];assert direct['manifest']==manifest and direct['validatorModuleResponses'] and all(x['status']==200 for x in direct['validatorModuleResponses'])
+dash=values['dashboard'];assert dash['sourceSHA']==target and dash['fixtureOnly'] and not dash['realUserOrHardwareAcceptance'] and dash['sandbox'] and dash['passed'] and not dash['wireTimestampsModified'];assert dash['hostedReplayObservationSeconds']>=30 and dash['stableDOM']=={'removed':0,'cards':True,'badges':True} and not dash['pageErrors'] and not dash['requestFailures'] and dash['partialMemoryRetainedCPU'] and dash['lastGoodExcludedFromCurrent'] and dash['CPJSONRequired'];assert all(x['status']==503 and (x['url'].endswith('/gateway-healthz') or x['url'].endswith('/nod_01M6TAWG25JTA3F7J7S1EE4N2W/resource-usage')) for x in dash['httpErrors'])
+root_prefix='docs/vault/30_Development/Evidence/fleet5-20261105-root/pc3-e4e07-real-deploy-and-dashboard-contract-r1/actual-canonical-API-inputs/'
+for name,h in dash['inputs'].items():assert hashlib.sha256(git('show','8cbcc96f845a1a94b998fadd489fd27bb3e0a675:'+root_prefix+name)).hexdigest()==h
+gateway=values['gateway'];assert gateway['fixtureOnly'] and not gateway['realCPAcceptance'] and gateway['TLSVerified'] and gateway['portalLivenessSeparate'] and gateway['rawUpstreamFailuresPreserved']
+for n in ['delivery.json','first-candidate-failure.json','local-gates-final-abb7074e3da0.json','postCI-final-sync-check.json','sync-state-final-comparison.json','protected-components.json','actual-input-pins.json','read-pins.json']:(out/n).write_bytes((ev/n).read_bytes())
+for label in ['direct','dashboard','gateway']:(out/('official-'+label+'-result.json')).write_text(json.dumps(values[label],indent=2)+'\\n')
+'''+p[end:]
+p=p.replace("'firstAndSecondGenuineFailuresRetained':True","'root531ActualInputPins19Matched':True,'officialRecordedCanonicalDashboardReplay30sStableDOM':True,'replayedWireTimestampsUnmodifiedClockExplicit':True,'officialPartialAndLastGoodFailureCasesPassed':True,'officialGatewayTLSProxyAndRawFailureFixturePassed':True,'officialFreshDirectMainConfigProofPassed':True,'firstCandidate1dcFailureRetained':True,'newMeaningfulTests':29,'pilotURIHealthAdaptationRequired':d['pilotAdaptation']")
+p=p.replace("'officialVitest1380Of1380In108Files':True","'officialVitest1380Of1380In108Files':True")
+a="assert life['result']['state']=='succeeded' and life['result']['stage']=='settled'"
+b=a+" and life['result']['liveness']=='exited' and life['result']['terminalState']=='released'"
+assert a in p;p=p.replace(a,b)
+(r/'.work/verify_abb707_root_candidate_expanded_r1.py.txt').write_text(p,encoding='utf-8')
+exec(compile(p,str(r/'.work/verify_abb707_root_candidate_expanded_r1.py.txt'),'exec'),{'__file__':str(__file__),'__name__':'__main__'})
