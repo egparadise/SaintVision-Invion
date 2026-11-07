@@ -1,0 +1,22 @@
+{
+  "atKST": "2026-11-07T09:50:28+09:00",
+  "attempt": "Root494 first precommit publication attempt",
+  "actualGate": "git diff --cached --check",
+  "directExit": 2,
+  "cause": "Verbatim generated pytest RED stdout and JUnit contain one E-line with trailing spaces each",
+  "commitPushCIExecuted": false,
+  "actualProductTestsRerun": false,
+  "recovery": "Preserve the exact raw UTF8 text / bytes / SHA inside explicit JSON wrappers; update artifact encoding manifest; rerun affected documentation gates. No product/test change or whitespace-gate bypass.",
+  "changedPackagingOnly": [
+    "b-a7-operation-guard-r1-python-red-tests.xml.raw.json",
+    "b-a7-operation-guard-r1-python-red.stdout.txt.raw.json"
+  ],
+  "secondAttempt": {
+    "actualStop": "Publisher required empty index after gate checks; first attempt had staged Root docs",
+    "directExit": 1,
+    "commitPushCIExecuted": false,
+    "recovery": "Byte-checked exact previously owned staged path set; restored ONLY that index set to HEAD without changing work files, then normal publisher can stage current packaging.",
+    "ownedStagedPathCount": 31,
+    "gitRestoreStagedExit": 0
+  }
+}

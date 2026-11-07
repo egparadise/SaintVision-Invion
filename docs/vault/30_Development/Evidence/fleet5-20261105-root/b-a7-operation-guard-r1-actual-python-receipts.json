@@ -1,0 +1,214 @@
+{
+  "atKST": "2026-11-07T09:49:11+09:00",
+  "phaseReceipts": {
+    "extract": {
+      "atKST": "2026-11-07T09:44:21+09:00",
+      "base": "b3bbdc8d92a39f2f797a7680deb2770d6f705af0",
+      "realGitDerivedTrackedFilesPerTree": 1179,
+      "newTestFilesPerTree": 1,
+      "greenProductSHA256": "82f029614537eb5bab56934e4b6736fe3dd52ece54b9b9a3996815b131e41de4",
+      "redRealBaseProductSHA256": "4a33428502279b88e510b5447382814bb115ddf2bff4f88f5bfcbb93f3c1a404",
+      "testSHA256": "3dacdb63f83ab1d8075ddcbe422d82daad20bd56f643adee0fc7ae97715925d2",
+      "noGitMetadataNoSyntheticCheckout": true,
+      "greenInputSHA256": "6bf7a5e474aa1c7c910f0367479263e2d28615964a54cfe10b4c865adefc09b5",
+      "redInputSHA256": "14bc41373f1a4970d49fb8d443bc3f35952af938b6e0d4c063465a56a1426914",
+      "allTransferHashesReverified": true,
+      "productExecuted": false
+    },
+    "setup": {
+      "phase": "setup",
+      "startedAtKST": "2026-11-07T09:44:28+09:00",
+      "endedAtKST": "2026-11-07T09:44:42+09:00",
+      "base": "b3bbdc8d92a39f2f797a7680deb2770d6f705af0",
+      "containerID": "0791a340269b191ea1ab878c415b2c58b145b74a19974a046377f8ccace89753",
+      "containerName": "sv-root-b-py-45ec174adece-setup",
+      "image": "python@sha256:51dafde81dbdb6ebde285137a295cf18a47ca95234fe388a343719cb97305b3d",
+      "imageID": "sha256:51dafde81dbdb6ebde285137a295cf18a47ca95234fe388a343719cb97305b3d",
+      "directContainerExit": 0,
+      "OOMKilled": false,
+      "stateError": "",
+      "network": "bridge",
+      "inputTreesUnchanged": {
+        "green": true,
+        "red": true
+      },
+      "user": "1000:1000",
+      "memoryBytes": 2147483648,
+      "memorySwapTotalBytes": 2147483648,
+      "extraSwapBytes": 0,
+      "nanoCPUs": 2000000000,
+      "pidsLimit": 128,
+      "readOnlyRoot": true,
+      "onlyOwnJobBind": true,
+      "productExecuted": false,
+      "testCommand": [
+        "python",
+        "-B",
+        "-c",
+        "\nimport hashlib,json,os,subprocess,sys\nfrom pathlib import Path\nj=Path('/job');(j/'home').mkdir(exist_ok=True);(j/'pip-cache').mkdir(exist_ok=True)\ndef run(args,out):\n with (j/out).open('wb') as f:q=subprocess.run(args,stdout=f,stderr=subprocess.STDOUT)\n if q.returncode:raise SystemExit(q.returncode)\nrun([sys.executable,'-VV'],'runtime-version.txt')\nrun([sys.executable,'-m','venv','/job/venv'],'venv-create.txt')\npy='/job/venv/bin/python'\nrun([py,'-m','pip','--disable-pip-version-check','--no-input','download','--index-url','https://pypi.org/simple','--only-binary=:all:','--dest','/job/wheels','-r','requirements-test.txt'],'pip-download.txt')\nrun([py,'-m','pip','--disable-pip-version-check','--no-input','install','--no-index','--find-links','/job/wheels','--only-binary=:all:','--no-compile','-r','requirements-test.txt'],'pip-install.txt')\nrun([py,'-m','pip','freeze','--all'],'pip-freeze.txt')\nrun([py,'-m','pip','check'],'pip-check.txt')\nrows=[{'name':p.name,'bytes':p.stat().st_size,'SHA256':hashlib.sha256(p.read_bytes()).hexdigest()} for p in sorted((j/'wheels').iterdir()) if p.is_file()]\n(j/'wheel-inventory.json').write_text(json.dumps(rows,indent=2)+'\\n')\nprint(json.dumps({'setup':'complete','wheelCount':len(rows),'productImported':False}),flush=True)\n"
+      ],
+      "workingDirectory": "/job/green",
+      "stdoutSHA256": "3c961b0fb6ce7b8ea89f64315e3b5ab5ef7a5f6066398804788ac18a1ac7a44e",
+      "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "businessContainersChanged": false,
+      "hostPackagesInstalled": false
+    },
+    "green": {
+      "phase": "green",
+      "startedAtKST": "2026-11-07T09:44:58+09:00",
+      "endedAtKST": "2026-11-07T09:45:01+09:00",
+      "base": "b3bbdc8d92a39f2f797a7680deb2770d6f705af0",
+      "containerID": "5dc45ace738096c8adea7fbd3a716cc0789cec773af51d586bc87edf81fe87d4",
+      "containerName": "sv-root-b-py-45ec174adece-green",
+      "image": "python@sha256:51dafde81dbdb6ebde285137a295cf18a47ca95234fe388a343719cb97305b3d",
+      "imageID": "sha256:51dafde81dbdb6ebde285137a295cf18a47ca95234fe388a343719cb97305b3d",
+      "directContainerExit": 0,
+      "OOMKilled": false,
+      "stateError": "",
+      "network": "none",
+      "inputTreesUnchanged": {
+        "green": true,
+        "red": true
+      },
+      "user": "1000:1000",
+      "memoryBytes": 2147483648,
+      "memorySwapTotalBytes": 2147483648,
+      "extraSwapBytes": 0,
+      "nanoCPUs": 2000000000,
+      "pidsLimit": 128,
+      "readOnlyRoot": true,
+      "onlyOwnJobBind": true,
+      "productExecuted": true,
+      "testCommand": [
+        "/job/venv/bin/python",
+        "-B",
+        "-m",
+        "pytest",
+        "-q",
+        "tests/core/test_delivery_operation_origin.py",
+        "--junitxml=/job/green-tests.xml",
+        "-o",
+        "cache_dir=/job/pytest-cache-green"
+      ],
+      "workingDirectory": "/job/green",
+      "stdoutSHA256": "14dec3be0edf79aaef55d8512c3082d0a647e83300bfff97c1d82b8ed7f61da5",
+      "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "businessContainersChanged": false,
+      "hostPackagesInstalled": false
+    },
+    "red": {
+      "phase": "red",
+      "startedAtKST": "2026-11-07T09:45:07+09:00",
+      "endedAtKST": "2026-11-07T09:45:09+09:00",
+      "base": "b3bbdc8d92a39f2f797a7680deb2770d6f705af0",
+      "containerID": "c20adcd66b3d2621df2a53cff75462156439dde01cb4512a0a0dbd0ffc6463de",
+      "containerName": "sv-root-b-py-45ec174adece-red",
+      "image": "python@sha256:51dafde81dbdb6ebde285137a295cf18a47ca95234fe388a343719cb97305b3d",
+      "imageID": "sha256:51dafde81dbdb6ebde285137a295cf18a47ca95234fe388a343719cb97305b3d",
+      "directContainerExit": 1,
+      "OOMKilled": false,
+      "stateError": "",
+      "network": "none",
+      "inputTreesUnchanged": {
+        "green": true,
+        "red": true
+      },
+      "user": "1000:1000",
+      "memoryBytes": 2147483648,
+      "memorySwapTotalBytes": 2147483648,
+      "extraSwapBytes": 0,
+      "nanoCPUs": 2000000000,
+      "pidsLimit": 128,
+      "readOnlyRoot": true,
+      "onlyOwnJobBind": true,
+      "productExecuted": true,
+      "testCommand": [
+        "/job/venv/bin/python",
+        "-B",
+        "-m",
+        "pytest",
+        "-q",
+        "tests/core/test_delivery_operation_origin.py::test_rejected_origin_never_delivers_or_invokes_rich_methods[foreign-equal]",
+        "--junitxml=/job/red-tests.xml",
+        "-o",
+        "cache_dir=/job/pytest-cache-red"
+      ],
+      "workingDirectory": "/job/red",
+      "stdoutSHA256": "08a8817587bbf6522c43811638c1e9ba0d3bdead0ee891e01f5d1ad7b60450b7",
+      "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "businessContainersChanged": false,
+      "hostPackagesInstalled": false
+    }
+  },
+  "rawLogs": [
+    {
+      "path": "b-a7-operation-guard-r1-python-setup.stdout.txt",
+      "bytes": 66,
+      "SHA256": "3c961b0fb6ce7b8ea89f64315e3b5ab5ef7a5f6066398804788ac18a1ac7a44e"
+    },
+    {
+      "path": "b-a7-operation-guard-r1-python-setup.stderr.txt",
+      "bytes": 0,
+      "SHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "b-a7-operation-guard-r1-python-green.stdout.txt",
+      "bytes": 99,
+      "SHA256": "14dec3be0edf79aaef55d8512c3082d0a647e83300bfff97c1d82b8ed7f61da5"
+    },
+    {
+      "path": "b-a7-operation-guard-r1-python-green.stderr.txt",
+      "bytes": 0,
+      "SHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "b-a7-operation-guard-r1-python-red.stdout.txt.raw.json",
+      "bytes": 1501,
+      "SHA256": "08a8817587bbf6522c43811638c1e9ba0d3bdead0ee891e01f5d1ad7b60450b7",
+      "artifactEncoding": "JSON-embedded-verbatim-UTF8",
+      "JSONFileSHA256": "9b023535eb5e9ea1fd3c2df8599f97166a50cf88c7ca1352ba3b52e27fb1948f"
+    },
+    {
+      "path": "b-a7-operation-guard-r1-python-red.stderr.txt",
+      "bytes": 0,
+      "SHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "b-a7-operation-guard-r1-python-green-tests.xml",
+      "bytes": 4029,
+      "SHA256": "7448243a76f40808577785714d579ef572a7b80d4d66771d3493168b491cedd6"
+    },
+    {
+      "path": "b-a7-operation-guard-r1-python-red-tests.xml.raw.json",
+      "bytes": 1694,
+      "SHA256": "b7515a5a2700c5e0cc8ba6594ec628663fecbe682331b5b6fa834d44e040fb91",
+      "artifactEncoding": "JSON-embedded-verbatim-UTF8",
+      "JSONFileSHA256": "2872c84da57efb4a3d6a8cabe5fcedadec0275c2c8a2a30c8d58254990d0678d"
+    },
+    {
+      "path": "b-a7-operation-guard-r1-python-runtime-version.txt",
+      "bytes": 57,
+      "SHA256": "57c6ea790e5cf7d4bb2bb57d0deac4424f45807147198044791b226e75db2e72"
+    },
+    {
+      "path": "b-a7-operation-guard-r1-python-pip-freeze.txt",
+      "bytes": 1217,
+      "SHA256": "4bebc0439a397e2dbb088753472e6f3b3d2e1249c0b86ed3e04cc0402a518f0e"
+    },
+    {
+      "path": "b-a7-operation-guard-r1-python-pip-check.txt",
+      "bytes": 30,
+      "SHA256": "9261363b733079a641c2e4cc9bc46ffa1d8336945a87f807b6cf68847dbc9b09"
+    },
+    {
+      "path": "b-a7-operation-guard-r1-python-wheel-inventory.json",
+      "bytes": 11451,
+      "SHA256": "213823871fd7b82e2f151640b8b0ae2b1e8cb791c10c163d98f3960887cc5be6"
+    }
+  ],
+  "exactRemoteInputsReverified": true,
+  "realProductUnitExecutionOnly": true,
+  "actualMemoryPeak": "NOT_MEASURED",
+  "installedVenvFullBeforeAfterInventory": "NOT_MEASURED",
+  "businessContainersChanged": false
+}

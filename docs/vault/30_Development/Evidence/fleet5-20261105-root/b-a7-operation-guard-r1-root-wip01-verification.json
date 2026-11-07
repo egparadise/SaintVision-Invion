@@ -1,0 +1,21 @@
+{
+  "atKST": "2026-11-07T09:36:16+09:00",
+  "base": "b3bbdc8d92a39f2f797a7680deb2770d6f705af0",
+  "packetSHA256": "28c87c268baaf551dde15fcb35f0eb6d3b24b6861e8c1cfcb845fcb6e0a96f37",
+  "packetBytes": 1119013,
+  "verifiedPacketFiles": 36,
+  "all35NonselfManifestInputsVerified": true,
+  "onlyExactGuardProductASTDelta": true,
+  "productSHA256": "82f029614537eb5bab56934e4b6736fe3dd52ece54b9b9a3996815b131e41de4",
+  "testSHA256": "3dacdb63f83ab1d8075ddcbe422d82daad20bd56f643adee0fc7ae97715925d2",
+  "realBaseSourceArchive": "D:\\Project\\SaintVisionI-Invion\\fleet-five-orchestration-20261105\\.work\\b-operation-real-base-source.tar.gz",
+  "realBaseSourceArchiveSHA256": "450dcb74db5898308cfb4eb7c0b297acf11410ab35d1a1cf46e651cca489f765",
+  "realBaseSourceArchiveBytes": 3083090,
+  "RootByteComparedRealBaseGitBlobCount": 1179,
+  "RootMatched25ScopedSourceInputs": true,
+  "sourceTarContainsNoGitMetadataAndIsLabeledGitDerivedNotSyntheticCheckout": true,
+  "actualProductPytest": "NOT_RUN",
+  "legacyGuardRefusal": "PRESERVED_PENDING_EXPLICIT_OWN_PROOF_COMPATIBILITY",
+  "original19HOLD": true,
+  "wholeProgramComplete": false
+}

@@ -1,15 +1,19 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.454"
+version: "1.0.455"
 status: "review"
 author: "Codex"
-updated: "2026-11-07T09:13:21+09:00"
+updated: "2026-11-07T09:49:11+09:00"
 source_of_truth: "Git"
 active_card: "FLEET5 continued supervision with PORTAL-REFRESH-FLEET-20261106"
-active_card_status: "Bmodeactuale75bconditionalKEEP19/LowL1C1C2->operationguardWIPdb48TESTSNOTRUN; H12R20bf8actualreviewctx2e3PENDING; actualNULLHOLD/fleetincomplete"
-active_card_next: "B Codex exactonceguard+newunit+staticL1C1/C2 WIPpacket ASTonly; Root boundedisolatedPythonverification on frozenbytes before publication; Claude H12R2actualdeltaverdict; no runtime/fullBgrant"
+active_card_status: "H12actual381fM1L1L2CLOSED->privateGoWIP7461TESTSNOTRUN; Bactual24GREEN/realBASEcausal1RED->proofonlyWIP02f730; original19HOLD/actualNULL/fleetincomplete"
+active_card_next: "B Codex exacttestedbytes proof-onlyWIP02; K2 Codex fourpathprivateGoWIP; Root immutablepacketverification then boundedactualGo tests/publication/CI/singleCODEreview. Actual5PCacceptance stillblocked."
 ---
+
+## 2026-11-07T09:49:11+09:00 H1/H2 계약 실제 닫힘과 B 전달 경계의 실제 24 GREEN·인과 RED
+
+H12실제381f/Docs42317786398/all19계약검토가M1·L1·L2를닫았고Root가원문·9ownA·해시·실제exit/release를확인했다. 별도msg7461은4개경로의private서명수학WIP만허용하며실Go시험·게시·권한부여는미완료다. B고정WIP01은3번PC/Python3.14.7격리에서실제24시험통과와원래base의인과RED1실패를확인했다. 원래guard거부는보존하고msgf730으로시험된코드불변의유한own-proof보완만지시했다. 단위시험과계약수락을실제5대연동·운영인수·전체완료로바꾸지않는다. 실행KST/직접exit/정확한입력·환경/원문JUnit·stdout·의존성과미측정축/다음담당은Root History/Evidence에보존했다.
 
 ## 2026-11-07T09:13:21+09:00 모드 값 경계의 최소 코드·시험 WIP와 H1/H2 재검토
 

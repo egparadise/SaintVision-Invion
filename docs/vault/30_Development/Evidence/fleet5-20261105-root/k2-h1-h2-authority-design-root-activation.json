@@ -9,7 +9,7 @@
   "productBaseline": "f2c1afb78b589b4b2cbcf3dcd4dc4f3c3f3bc856",
   "proposalSHA256": "85d52cb6313bda9b6d97ce6c1cb3d4c3c6bebf8ef487775fb6c8bc7581ec9479",
   "newBranch": "agent/codex/fleet5-k2-h1-h2-authority-design-20261107",
-  "status": "EXACT_R2_DESIGN_UNDER_ACTUAL_NARROW_DELTA_CONTRACT_REVIEW",
+  "status": "R2_CONTRACT_INDEPENDENTLY_ACCEPTED_THREE_CLOSED_PRIVATE_MATH_WIP_ONLY",
   "scopeFile": "k2-h1-h2-authority-design-root-scope.txt",
   "selectedLogicalPolicies": [
     "independent control-plane/project trust-provisioning boundary, separately authenticated installation/readback",
@@ -32,7 +32,7 @@
   "independentContractReview": "PENDING_FROZEN_CANDIDATE_AND_ACTUAL_REVIEWER_RELEASE",
   "actualA7ReviewUnchanged": "ctx_36ec44cc8ca0",
   "wholeProgramComplete": false,
-  "latestRecordAtKST": "2026-11-07T09:13:21+09:00",
+  "latestRecordAtKST": "2026-11-07T09:49:11+09:00",
   "localCandidate": "382fe3d86c14283dcb549f935205081db8b4eee4",
   "localParent": "1f073c03eb6673ac60806e8fbe008d391bc45864",
   "localOwnAddedDocs": 9,
@@ -47,7 +47,7 @@
   "Docs": 42310548604,
   "rootVerifiedExactDocs": true,
   "actualContractReview": "8141a49bab3d0e7b94028a69d9a767e2abc25272",
-  "codeImplementationGranted": false,
+  "codeImplementationGranted": "SEPARATE_ROOT_FOUR_PATH_WIP_ONLY",
   "actualContractDocs": 42313093780,
   "actualContractVerdict": "REVISION_REQUIRED",
   "requiredFindings": [
@@ -71,8 +71,8 @@
   "R2DesignDocs": 42314572353,
   "R2RootVerification": "k2-h12-r2-design-source-root-verification.json",
   "R2ActualReviewQueue": {
-    "atKST": "2026-11-07T09:13:21+09:00",
-    "status": "ACTUAL_H12_R2_NARROW_DELTA_CONTRACT_REVIEW_STARTED_VERDICT_PENDING",
+    "atKST": "2026-11-07T09:49:11+09:00",
+    "status": "ACTUAL_R2_CONTRACT_ACCEPT_M1_L1_L2_CLOSED_KEEP_ACTUAL_HOLD",
     "target": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed",
     "sourceBranch": "agent/codex/fleet5-k2-h1-h2-authority-design-r2-20261107",
     "sourceDocs": 42314572353,
@@ -85,13 +85,85 @@
     "dependencyDispatch": "ctx_6b18bf1ef5b4",
     "workerStarted": true,
     "dispatch": "ctx_2e3e33bdc879",
-    "independentVerdict": null,
-    "findingsClosure": "M1_L1_L2_CANDIDATE_CORRECTIONS_NOT_YET_INDEPENDENTLY_CLOSED",
+    "independentVerdict": "CONTRACT_DESIGN_ACCEPT_M1_L1_L2_CLOSED_KEEP_ACTUAL_HOLD",
+    "findingsClosure": [
+      {
+        "id": "H12R-M1",
+        "status": "CLOSED"
+      },
+      {
+        "id": "H12R-L1",
+        "status": "CLOSED"
+      },
+      {
+        "id": "H12R-L2",
+        "status": "CLOSED"
+      }
+    ],
     "actualBindings": null,
-    "codeImplementationGranted": false,
+    "codeImplementationGranted": "SEPARATE_ROOT_FINITE_PRIVATE_MATH_WIP_ONLY",
     "wholeProgramComplete": false,
     "predecessorActualReview": "e75b051d8dcd39b24dba4b648d74d7f7adecbd0f",
-    "predecessorFinalLifecycle": "succeeded_settled_exited_released"
+    "predecessorFinalLifecycle": "succeeded_settled_exited_released",
+    "actualReview": "381fbbc816cdf6440b827e43dc0099064170d178",
+    "actualDocs": 42317786398,
+    "actualWorkerDone": "msg_8dbdef822b51",
+    "reviewerFinalLifecycle": {
+      "state": "succeeded",
+      "stage": "settled",
+      "liveness": "exited",
+      "terminalState": "released"
+    },
+    "rootCodeWIP": {
+      "atKST": "2026-11-07T09:49:11+09:00",
+      "ownerTask": "task_a95ef3d8ccce",
+      "ownerDispatch": "ctx_ed23b4a777d0",
+      "card": "FLEET5-K2-H12-SIGNATURE-CODE-R1-20261107",
+      "base": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed",
+      "actualIndependentReview": "381fbbc816cdf6440b827e43dc0099064170d178",
+      "independentVerdict": "CONTRACT_DESIGN_ACCEPT_M1_L1_L2_CLOSED_KEEP_ACTUAL_HOLD",
+      "rootWIPCodeReply": "msg_7461bcdf99a4",
+      "branch": "agent/codex/fleet5-k2-h12-signature-code-r1-20261107",
+      "status": "FOUR_PATH_PRIVATE_SIGNATURE_MATH_WIP_GRANTED_TESTS_PUBLICATION_NOT_RUN",
+      "allowedPaths": [
+        "services/node-agent/internal/migrationcontext/h12_signature_internal.go",
+        "services/node-agent/internal/migrationcontext/h12_signature_test.go",
+        "services/node-agent/internal/migrationcontext/effect_gate_test.go",
+        "services/node-agent/internal/migrationcontext/source_gate_test.go"
+      ],
+      "scopeFile": "k2-h12-signature-code-r1-root-wip-scope.txt",
+      "gofmtOnlyAllowedOnMain": true,
+      "actualGoCompileCryptoUnitTests": "NOT_RUN_PENDING_FROZEN_WIP_ROOT_PC3_ISOLATION",
+      "commitPushCIAllowedAtThisStage": false,
+      "publicSuccessFactoryServiceOrRuntimeAuthorityGranted": false,
+      "actualBindings": null,
+      "wholeProgramComplete": false
+    }
   },
-  "R2SemanticVerdict": null
+  "R2SemanticVerdict": "CONTRACT_DESIGN_ACCEPT_M1_L1_L2_CLOSED_KEEP_ACTUAL_HOLD",
+  "latestCodeWIP": {
+    "atKST": "2026-11-07T09:49:11+09:00",
+    "ownerTask": "task_a95ef3d8ccce",
+    "ownerDispatch": "ctx_ed23b4a777d0",
+    "card": "FLEET5-K2-H12-SIGNATURE-CODE-R1-20261107",
+    "base": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed",
+    "actualIndependentReview": "381fbbc816cdf6440b827e43dc0099064170d178",
+    "independentVerdict": "CONTRACT_DESIGN_ACCEPT_M1_L1_L2_CLOSED_KEEP_ACTUAL_HOLD",
+    "rootWIPCodeReply": "msg_7461bcdf99a4",
+    "branch": "agent/codex/fleet5-k2-h12-signature-code-r1-20261107",
+    "status": "FOUR_PATH_PRIVATE_SIGNATURE_MATH_WIP_GRANTED_TESTS_PUBLICATION_NOT_RUN",
+    "allowedPaths": [
+      "services/node-agent/internal/migrationcontext/h12_signature_internal.go",
+      "services/node-agent/internal/migrationcontext/h12_signature_test.go",
+      "services/node-agent/internal/migrationcontext/effect_gate_test.go",
+      "services/node-agent/internal/migrationcontext/source_gate_test.go"
+    ],
+    "scopeFile": "k2-h12-signature-code-r1-root-wip-scope.txt",
+    "gofmtOnlyAllowedOnMain": true,
+    "actualGoCompileCryptoUnitTests": "NOT_RUN_PENDING_FROZEN_WIP_ROOT_PC3_ISOLATION",
+    "commitPushCIAllowedAtThisStage": false,
+    "publicSuccessFactoryServiceOrRuntimeAuthorityGranted": false,
+    "actualBindings": null,
+    "wholeProgramComplete": false
+  }
 }

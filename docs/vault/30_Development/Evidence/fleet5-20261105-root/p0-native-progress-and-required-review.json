@@ -3,8 +3,8 @@
   "recordedAtKST": "2026-11-06T00:46:51+09:00",
   "rootBase": "2b1753ce59c09037b5e130a7ffe64794d1d45fdf",
   "priorRootCheckpoint": {
-    "SHA": "f1b1e248305418e7348fc2ae0647000f86cec937",
-    "Docs": 42315644984,
+    "SHA": "c23ae5d19773f627b796f860200ba6e6079d62e7",
+    "Docs": 42316970617,
     "exactHeadCorrelationAllJobsSuccess": true,
     "remoteMatches": true,
     "syncExits": [
@@ -12,13 +12,13 @@
       0,
       0
     ],
-    "independentlyMatchedNormalizedDestinationHashes": 3005,
+    "independentlyMatchedNormalizedDestinationHashes": 3009,
     "pending": 0,
     "conflicts": 0,
     "trackedAndUntrackedClean": true,
     "rootDocsOnly": true,
     "wholeProgramComplete": false,
-    "verifiedAtKST": "2026-11-07T09:03:28+09:00"
+    "verifiedAtKST": "2026-11-07T09:15:36+09:00"
   },
   "actualPlanLowReview": {
     "source": "803ad270562b1b75e44d26f9e14b965c714ab519",
@@ -2515,7 +2515,7 @@
     "ownerT1T2T3": "msg_620855c76519",
     "normativeRevisionReply": "msg_0392caf64d5d"
   },
-  "latestRecordAtKST": "2026-11-07T09:13:21+09:00",
+  "latestRecordAtKST": "2026-11-07T09:49:11+09:00",
   "optionalLowTokenTestDelta": {
     "source": "f0af307705b4923ebc3e231db5238af4c70aa389",
     "scope": "two otherwise-valid token payload corrections and JSON validity assertions; runtime unchanged",
@@ -3108,29 +3108,7 @@
     "reviewOnlyPaths": 18
   },
   "BRev7RootDecision": "b-rev7-concrete-root-decision.json",
-  "activeActualReview": {
-    "atKST": "2026-11-07T09:13:21+09:00",
-    "status": "ACTUAL_H12_R2_NARROW_DELTA_CONTRACT_REVIEW_STARTED_VERDICT_PENDING",
-    "target": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed",
-    "sourceBranch": "agent/codex/fleet5-k2-h1-h2-authority-design-r2-20261107",
-    "sourceDocs": 42314572353,
-    "ownerTask": "task_a95ef3d8ccce",
-    "ownerDispatch": "ctx_ed23b4a777d0",
-    "ownerQuestion": "msg_16c9f2a0ec9b",
-    "rootFixGrant": "msg_e41b206771c3",
-    "task": "task_638219a79555",
-    "dependency": "task_696b2783bc0b",
-    "dependencyDispatch": "ctx_6b18bf1ef5b4",
-    "workerStarted": true,
-    "dispatch": "ctx_2e3e33bdc879",
-    "independentVerdict": null,
-    "findingsClosure": "M1_L1_L2_CANDIDATE_CORRECTIONS_NOT_YET_INDEPENDENTLY_CLOSED",
-    "actualBindings": null,
-    "codeImplementationGranted": false,
-    "wholeProgramComplete": false,
-    "predecessorActualReview": "e75b051d8dcd39b24dba4b648d74d7f7adecbd0f",
-    "predecessorFinalLifecycle": "succeeded_settled_exited_released"
-  },
+  "activeActualReview": null,
   "nextReviewRequires": "newimmutableK2Low/Stage2 orB8 pilot/evidence; oneClaudeafteractualrelease",
   "K2LatestImmutableProposalRootObservation": "k2-rev2-root-actual-contract-review-gate.json",
   "K2LatestActualReviewDispatch": {
@@ -3301,7 +3279,7 @@
     "productBaseline": "f2c1afb78b589b4b2cbcf3dcd4dc4f3c3f3bc856",
     "proposalSHA256": "85d52cb6313bda9b6d97ce6c1cb3d4c3c6bebf8ef487775fb6c8bc7581ec9479",
     "newBranch": "agent/codex/fleet5-k2-h1-h2-authority-design-20261107",
-    "status": "EXACT_R2_DESIGN_UNDER_ACTUAL_NARROW_DELTA_CONTRACT_REVIEW",
+    "status": "R2_CONTRACT_INDEPENDENTLY_ACCEPTED_THREE_CLOSED_PRIVATE_MATH_WIP_ONLY",
     "scopeFile": "k2-h1-h2-authority-design-root-scope.txt",
     "selectedLogicalPolicies": [
       "independent control-plane/project trust-provisioning boundary, separately authenticated installation/readback",
@@ -3324,7 +3302,7 @@
     "independentContractReview": "PENDING_FROZEN_CANDIDATE_AND_ACTUAL_REVIEWER_RELEASE",
     "actualA7ReviewUnchanged": "ctx_36ec44cc8ca0",
     "wholeProgramComplete": false,
-    "latestRecordAtKST": "2026-11-07T09:13:21+09:00",
+    "latestRecordAtKST": "2026-11-07T09:49:11+09:00",
     "localCandidate": "382fe3d86c14283dcb549f935205081db8b4eee4",
     "localParent": "1f073c03eb6673ac60806e8fbe008d391bc45864",
     "localOwnAddedDocs": 9,
@@ -3339,7 +3317,7 @@
     "Docs": 42310548604,
     "rootVerifiedExactDocs": true,
     "actualContractReview": "8141a49bab3d0e7b94028a69d9a767e2abc25272",
-    "codeImplementationGranted": false,
+    "codeImplementationGranted": "SEPARATE_ROOT_FOUR_PATH_WIP_ONLY",
     "actualContractDocs": 42313093780,
     "actualContractVerdict": "REVISION_REQUIRED",
     "requiredFindings": [
@@ -3363,8 +3341,8 @@
     "R2DesignDocs": 42314572353,
     "R2RootVerification": "k2-h12-r2-design-source-root-verification.json",
     "R2ActualReviewQueue": {
-      "atKST": "2026-11-07T09:13:21+09:00",
-      "status": "ACTUAL_H12_R2_NARROW_DELTA_CONTRACT_REVIEW_STARTED_VERDICT_PENDING",
+      "atKST": "2026-11-07T09:49:11+09:00",
+      "status": "ACTUAL_R2_CONTRACT_ACCEPT_M1_L1_L2_CLOSED_KEEP_ACTUAL_HOLD",
       "target": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed",
       "sourceBranch": "agent/codex/fleet5-k2-h1-h2-authority-design-r2-20261107",
       "sourceDocs": 42314572353,
@@ -3377,15 +3355,87 @@
       "dependencyDispatch": "ctx_6b18bf1ef5b4",
       "workerStarted": true,
       "dispatch": "ctx_2e3e33bdc879",
-      "independentVerdict": null,
-      "findingsClosure": "M1_L1_L2_CANDIDATE_CORRECTIONS_NOT_YET_INDEPENDENTLY_CLOSED",
+      "independentVerdict": "CONTRACT_DESIGN_ACCEPT_M1_L1_L2_CLOSED_KEEP_ACTUAL_HOLD",
+      "findingsClosure": [
+        {
+          "id": "H12R-M1",
+          "status": "CLOSED"
+        },
+        {
+          "id": "H12R-L1",
+          "status": "CLOSED"
+        },
+        {
+          "id": "H12R-L2",
+          "status": "CLOSED"
+        }
+      ],
       "actualBindings": null,
-      "codeImplementationGranted": false,
+      "codeImplementationGranted": "SEPARATE_ROOT_FINITE_PRIVATE_MATH_WIP_ONLY",
       "wholeProgramComplete": false,
       "predecessorActualReview": "e75b051d8dcd39b24dba4b648d74d7f7adecbd0f",
-      "predecessorFinalLifecycle": "succeeded_settled_exited_released"
+      "predecessorFinalLifecycle": "succeeded_settled_exited_released",
+      "actualReview": "381fbbc816cdf6440b827e43dc0099064170d178",
+      "actualDocs": 42317786398,
+      "actualWorkerDone": "msg_8dbdef822b51",
+      "reviewerFinalLifecycle": {
+        "state": "succeeded",
+        "stage": "settled",
+        "liveness": "exited",
+        "terminalState": "released"
+      },
+      "rootCodeWIP": {
+        "atKST": "2026-11-07T09:49:11+09:00",
+        "ownerTask": "task_a95ef3d8ccce",
+        "ownerDispatch": "ctx_ed23b4a777d0",
+        "card": "FLEET5-K2-H12-SIGNATURE-CODE-R1-20261107",
+        "base": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed",
+        "actualIndependentReview": "381fbbc816cdf6440b827e43dc0099064170d178",
+        "independentVerdict": "CONTRACT_DESIGN_ACCEPT_M1_L1_L2_CLOSED_KEEP_ACTUAL_HOLD",
+        "rootWIPCodeReply": "msg_7461bcdf99a4",
+        "branch": "agent/codex/fleet5-k2-h12-signature-code-r1-20261107",
+        "status": "FOUR_PATH_PRIVATE_SIGNATURE_MATH_WIP_GRANTED_TESTS_PUBLICATION_NOT_RUN",
+        "allowedPaths": [
+          "services/node-agent/internal/migrationcontext/h12_signature_internal.go",
+          "services/node-agent/internal/migrationcontext/h12_signature_test.go",
+          "services/node-agent/internal/migrationcontext/effect_gate_test.go",
+          "services/node-agent/internal/migrationcontext/source_gate_test.go"
+        ],
+        "scopeFile": "k2-h12-signature-code-r1-root-wip-scope.txt",
+        "gofmtOnlyAllowedOnMain": true,
+        "actualGoCompileCryptoUnitTests": "NOT_RUN_PENDING_FROZEN_WIP_ROOT_PC3_ISOLATION",
+        "commitPushCIAllowedAtThisStage": false,
+        "publicSuccessFactoryServiceOrRuntimeAuthorityGranted": false,
+        "actualBindings": null,
+        "wholeProgramComplete": false
+      }
     },
-    "R2SemanticVerdict": null
+    "R2SemanticVerdict": "CONTRACT_DESIGN_ACCEPT_M1_L1_L2_CLOSED_KEEP_ACTUAL_HOLD",
+    "latestCodeWIP": {
+      "atKST": "2026-11-07T09:49:11+09:00",
+      "ownerTask": "task_a95ef3d8ccce",
+      "ownerDispatch": "ctx_ed23b4a777d0",
+      "card": "FLEET5-K2-H12-SIGNATURE-CODE-R1-20261107",
+      "base": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed",
+      "actualIndependentReview": "381fbbc816cdf6440b827e43dc0099064170d178",
+      "independentVerdict": "CONTRACT_DESIGN_ACCEPT_M1_L1_L2_CLOSED_KEEP_ACTUAL_HOLD",
+      "rootWIPCodeReply": "msg_7461bcdf99a4",
+      "branch": "agent/codex/fleet5-k2-h12-signature-code-r1-20261107",
+      "status": "FOUR_PATH_PRIVATE_SIGNATURE_MATH_WIP_GRANTED_TESTS_PUBLICATION_NOT_RUN",
+      "allowedPaths": [
+        "services/node-agent/internal/migrationcontext/h12_signature_internal.go",
+        "services/node-agent/internal/migrationcontext/h12_signature_test.go",
+        "services/node-agent/internal/migrationcontext/effect_gate_test.go",
+        "services/node-agent/internal/migrationcontext/source_gate_test.go"
+      ],
+      "scopeFile": "k2-h12-signature-code-r1-root-wip-scope.txt",
+      "gofmtOnlyAllowedOnMain": true,
+      "actualGoCompileCryptoUnitTests": "NOT_RUN_PENDING_FROZEN_WIP_ROOT_PC3_ISOLATION",
+      "commitPushCIAllowedAtThisStage": false,
+      "publicSuccessFactoryServiceOrRuntimeAuthorityGranted": false,
+      "actualBindings": null,
+      "wholeProgramComplete": false
+    }
   },
   "A7R2ActualReview": "b-a7r2-actual-delta-review-root-verification.json",
   "A7R2L1": "CLOSED_BY_ACTUAL_INDEPENDENT_REVIEW",
@@ -3414,7 +3464,7 @@
   "H1H2PushRecovery": "k2-h12-first-push-readonly-recovery-check.json",
   "BModeSource": "b-a7-mode-origin-source-root-verification.json",
   "BOperationGuardWIP": {
-    "atKST": "2026-11-07T09:13:21+09:00",
+    "atKST": "2026-11-07T09:49:11+09:00",
     "card": "FLEET5-B-A7-OPERATION-GUARD-R1-20261107",
     "ownerTask": "task_a8fd2969f0b3",
     "ownerDispatch": "ctx_6f0f8253b8a7",
@@ -3423,7 +3473,7 @@
     "base": "b3bbdc8d92a39f2f797a7680deb2770d6f705af0",
     "frozenOriginalProduct": "72028cbac903c4415d9979f980a6e0f9948e914f",
     "newBranch": "agent/codex/fleet5-b-a7-operation-guard-r1-20261107",
-    "status": "NARROW_PRODUCT_CODE_AND_TEST_WIP_GRANTED_NO_EXECUTION_OR_PUBLICATION_YET",
+    "status": "EXACT_WIP01_ACTUAL_24_GREEN_AND_CAUSAL_REAL_BASE_RED_VERIFIED_OWN_PROOF_WIP02_PENDING",
     "allowedProductPaths": [
       "services/control-plane/src/inv/dispatch.py",
       "tests/core/test_delivery_operation_origin.py"
@@ -3435,13 +3485,109 @@
       "C2: future causal tests, in addition to the author's list: a rejected value calls finish(error_code='SYS-0001', not_sent=False) with no NodeDelivery.deliver call and no further operation read; a property that raises during capture is mapped by the same handler; removing the guard recreates the foreign-value case. Earlier once effects stay out of scope."
     ],
     "referenceBinding": "Normalize reference Attribute and forwarding Call.func to the SAME current AST node, or reference enclosingCall to witnessCall; exact source path/hash/function/span/expression hash; whole scoped set exactly oneCALL.",
-    "WIPPacket": null,
+    "WIPPacket": {
+      "SHA256": "28c87c268baaf551dde15fcb35f0eb6d3b24b6861e8c1cfcb845fcb6e0a96f37",
+      "bytes": 1119013
+    },
     "productUnitTests": "NOT_RUN_PENDING_FROZEN_WIP_AND_ROOT_ISOLATION",
     "authorMainProductExecutionGranted": false,
     "commitPushCIGrantedAtThisStage": false,
     "rootIsolatedVerificationRequired": true,
     "actualRuntimeB": 0,
     "original19BaselineUnchanged": true,
+    "actualBindings": null,
+    "wholeProgramComplete": false,
+    "actualProductUnit": {
+      "atKST": "2026-11-07T09:46:10+09:00",
+      "base": "b3bbdc8d92a39f2f797a7680deb2770d6f705af0",
+      "WIPPacketSHA256": "28c87c268baaf551dde15fcb35f0eb6d3b24b6861e8c1cfcb845fcb6e0a96f37",
+      "greenProductSHA256": "82f029614537eb5bab56934e4b6736fe3dd52ece54b9b9a3996815b131e41de4",
+      "redRealBaseProductSHA256": "4a33428502279b88e510b5447382814bb115ddf2bff4f88f5bfcbb93f3c1a404",
+      "testSHA256": "3dacdb63f83ab1d8075ddcbe422d82daad20bd56f643adee0fc7ae97715925d2",
+      "sourceKind": "1179 real Git-derived tracked first-party files plus exact WIP test; no Git metadata / no synthetic checkout",
+      "actualInterpreter": "Python 3.14.7 (main, Sep 19 2026, 01:01:59) [GCC 14.2.0]",
+      "image": "python@sha256:51dafde81dbdb6ebde285137a295cf18a47ca95234fe388a343719cb97305b3d",
+      "green": {
+        "tests": 24,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "passed": 24,
+        "directExit": 0,
+        "startedAtKST": "2026-11-07T09:44:58+09:00",
+        "endedAtKST": "2026-11-07T09:45:01+09:00"
+      },
+      "red": {
+        "tests": 1,
+        "failures": 1,
+        "errors": 0,
+        "skipped": 0,
+        "passed": 0,
+        "directExit": 1,
+        "startedAtKST": "2026-11-07T09:45:07+09:00",
+        "endedAtKST": "2026-11-07T09:45:09+09:00",
+        "actualDecisiveAssertion": "Rejected operation reached actual once's delivery call",
+        "actualDeliveryArguments": [
+          [
+            true,
+            false
+          ]
+        ],
+        "earlierImportFixtureAndOnceCallReached": true
+      },
+      "networkNoneForProductTests": true,
+      "realConftestsAndPyprojectPythonpathUsed": true,
+      "noProductExtractionExecutionOrImportStubs": true,
+      "firstPartyInputTreesUnchangedAcrossAllPhases": true,
+      "wheelCount": 68,
+      "publicPinnedRequirementsInstalled": true,
+      "pipCheckExit": 0,
+      "dependencyVenvBeforeAfterContentInventory": "NOT_MEASURED; pinned wheel inventory / real pip freeze retained; first-party input hashes were compared before and after",
+      "resourceLimits": {
+        "CPUs": 2,
+        "memoryGiB": 2,
+        "totalMemorySwapGiB": 2,
+        "extraSwapBytes": 0,
+        "pids": 128,
+        "user": "1000:1000",
+        "readOnlyRoot": true,
+        "onlyOwnJobBind": true
+      },
+      "actualMemoryPeakBytes": null,
+      "OOMKilled": false,
+      "actualSQLNetworkServiceOrNodeDelivery": "NOT_RUN; external collaborators are unit spies; real once is called",
+      "wholeProgramComplete": false,
+      "actualRuntimeB": 0,
+      "original19HOLD": true,
+      "legacyGuardStatus": "UNCHANGED_GUARD_REFUSED_EXACT_NEW_CAPTURE; separate own-proof decision pending"
+    },
+    "rootProofCompatibilityReply": "msg_f730b53fb339",
+    "legacyGuardStatus": "UNCHANGED_REFUSED_EXPECTED_NEW_CAPTURE_NOT_CLEAN",
+    "ownFiniteCompatibilityProof": "AUTHORIZED_NOT_YET_SUBMITTED",
+    "productTestBytesFrozen": true
+  },
+  "H12SignatureWIP": {
+    "atKST": "2026-11-07T09:49:11+09:00",
+    "ownerTask": "task_a95ef3d8ccce",
+    "ownerDispatch": "ctx_ed23b4a777d0",
+    "card": "FLEET5-K2-H12-SIGNATURE-CODE-R1-20261107",
+    "base": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed",
+    "actualIndependentReview": "381fbbc816cdf6440b827e43dc0099064170d178",
+    "independentVerdict": "CONTRACT_DESIGN_ACCEPT_M1_L1_L2_CLOSED_KEEP_ACTUAL_HOLD",
+    "rootWIPCodeReply": "msg_7461bcdf99a4",
+    "branch": "agent/codex/fleet5-k2-h12-signature-code-r1-20261107",
+    "status": "FOUR_PATH_PRIVATE_SIGNATURE_MATH_WIP_GRANTED_TESTS_PUBLICATION_NOT_RUN",
+    "allowedPaths": [
+      "services/node-agent/internal/migrationcontext/h12_signature_internal.go",
+      "services/node-agent/internal/migrationcontext/h12_signature_test.go",
+      "services/node-agent/internal/migrationcontext/effect_gate_test.go",
+      "services/node-agent/internal/migrationcontext/source_gate_test.go"
+    ],
+    "scopeFile": "k2-h12-signature-code-r1-root-wip-scope.txt",
+    "gofmtOnlyAllowedOnMain": true,
+    "actualGoCompileCryptoUnitTests": "NOT_RUN_PENDING_FROZEN_WIP_ROOT_PC3_ISOLATION",
+    "commitPushCIAllowedAtThisStage": false,
+    "publicSuccessFactoryServiceOrRuntimeAuthorityGranted": false,
     "actualBindings": null,
     "wholeProgramComplete": false
   }

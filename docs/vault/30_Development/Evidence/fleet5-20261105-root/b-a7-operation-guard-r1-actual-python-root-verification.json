@@ -1,0 +1,64 @@
+{
+  "atKST": "2026-11-07T09:46:10+09:00",
+  "base": "b3bbdc8d92a39f2f797a7680deb2770d6f705af0",
+  "WIPPacketSHA256": "28c87c268baaf551dde15fcb35f0eb6d3b24b6861e8c1cfcb845fcb6e0a96f37",
+  "greenProductSHA256": "82f029614537eb5bab56934e4b6736fe3dd52ece54b9b9a3996815b131e41de4",
+  "redRealBaseProductSHA256": "4a33428502279b88e510b5447382814bb115ddf2bff4f88f5bfcbb93f3c1a404",
+  "testSHA256": "3dacdb63f83ab1d8075ddcbe422d82daad20bd56f643adee0fc7ae97715925d2",
+  "sourceKind": "1179 real Git-derived tracked first-party files plus exact WIP test; no Git metadata / no synthetic checkout",
+  "actualInterpreter": "Python 3.14.7 (main, Sep 19 2026, 01:01:59) [GCC 14.2.0]",
+  "image": "python@sha256:51dafde81dbdb6ebde285137a295cf18a47ca95234fe388a343719cb97305b3d",
+  "green": {
+    "tests": 24,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "passed": 24,
+    "directExit": 0,
+    "startedAtKST": "2026-11-07T09:44:58+09:00",
+    "endedAtKST": "2026-11-07T09:45:01+09:00"
+  },
+  "red": {
+    "tests": 1,
+    "failures": 1,
+    "errors": 0,
+    "skipped": 0,
+    "passed": 0,
+    "directExit": 1,
+    "startedAtKST": "2026-11-07T09:45:07+09:00",
+    "endedAtKST": "2026-11-07T09:45:09+09:00",
+    "actualDecisiveAssertion": "Rejected operation reached actual once's delivery call",
+    "actualDeliveryArguments": [
+      [
+        true,
+        false
+      ]
+    ],
+    "earlierImportFixtureAndOnceCallReached": true
+  },
+  "networkNoneForProductTests": true,
+  "realConftestsAndPyprojectPythonpathUsed": true,
+  "noProductExtractionExecutionOrImportStubs": true,
+  "firstPartyInputTreesUnchangedAcrossAllPhases": true,
+  "wheelCount": 68,
+  "publicPinnedRequirementsInstalled": true,
+  "pipCheckExit": 0,
+  "dependencyVenvBeforeAfterContentInventory": "NOT_MEASURED; pinned wheel inventory / real pip freeze retained; first-party input hashes were compared before and after",
+  "resourceLimits": {
+    "CPUs": 2,
+    "memoryGiB": 2,
+    "totalMemorySwapGiB": 2,
+    "extraSwapBytes": 0,
+    "pids": 128,
+    "user": "1000:1000",
+    "readOnlyRoot": true,
+    "onlyOwnJobBind": true
+  },
+  "actualMemoryPeakBytes": null,
+  "OOMKilled": false,
+  "actualSQLNetworkServiceOrNodeDelivery": "NOT_RUN; external collaborators are unit spies; real once is called",
+  "wholeProgramComplete": false,
+  "actualRuntimeB": 0,
+  "original19HOLD": true,
+  "legacyGuardStatus": "UNCHANGED_GUARD_REFUSED_EXACT_NEW_CAPTURE; separate own-proof decision pending"
+}

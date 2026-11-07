@@ -1,0 +1,93 @@
+{
+  "classification": "ACTUAL_INDEPENDENT_CLAUDE_H1_H2_R2_NARROW_DELTA_CONTRACT_DESIGN_REVIEW_NOT_CODE_BINDING_CRYPTO_OR_RUNTIME_ACCEPTANCE",
+  "reviewer": "Claude (one reviewer, no helpers, no second reviewer)",
+  "task": "task_638219a79555",
+  "dispatch": "ctx_2e3e33bdc879",
+  "predecessor": "Bmode review task_696b2783bc0b / ctx_6b18bf1ef5b4 state=succeeded stage=settled liveness=exited terminalState=released (Root .work/b-mode-reviewer-before-h12-r2-start.json); this task ready with deps [task_696b2783bc0b] (Root .work/h12-r2-delta-review-ready-before-start.json)",
+  "owner": "Codex task_a95ef3d8ccce / ctx_ed23b4a777d0; pending msg_16c9f2a0ec9b; Root fix grant msg_e41b206771c3",
+  "target": {
+    "commit": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed",
+    "directParent": "382fe3d86c14283dcb549f935205081db8b4eee4",
+    "remoteRef": "refs/heads/agent/codex/fleet5-k2-h1-h2-authority-design-r2-20261107 = 0bf852a6 (git ls-remote)",
+    "delta382fe3": "10 added (9 Evidence + 1 History), 0 modified/deleted, all mode 100644",
+    "productBaseline": "f2c1afb78b589b4b2cbcf3dcd4dc4f3c3f3bc856; git diff f2c1..0bf852a6 outside docs = empty",
+    "pinsRecomputed": {
+      "contract.md": "b02ee1c7a09cf4565fc9e486d63103e29c3f0101ac20f86046a710d14c46a522",
+      "authority-fields.json": "6a8c67a33df3379ad12f4254182bbb33aced74c64fa593dfe44cb367411836e1",
+      "acceptance-cases.json": "35f63a9132c310ddd54845c8ba65e51e3a6faa294255431d896d9872d7f00744",
+      "review-response.json": "b53d6eca30e8f3c247410c20d49d17bc7b1d1a9680cd29a1bf908e47ae1f6893",
+      "R1 next-code-proposal.json (unchanged at 382fe3 and 0bf852)": "f8b3f6d7aabe32e07bdbff56789ea327f544c43b64834035934f8cfe4f0f7fed",
+      "allMatch": true
+    },
+    "publicInputPinsRecomputed": "14/14 from their f2c1 blobs",
+    "provenance8141Recomputed": "11/11 path/OID/bytes/SHA256 equal the 8141a49b tree; authoritative static result OID f23490e93f6004b8aca1524899d242e76db36f55",
+    "manifestRecomputed": "9/9 non-self entries match target blobs (bytes + SHA256)"
+  },
+  "readInputs": [
+    "FIRST: actual R1 review 8141a49b History, review.json (findings/accepted/N1-N9), commands.json, authoritative reviewer-h12-static-result.json (attempt2), gate driver and local-doc-gates.txt, all by git show",
+    "Root .work/h12-r2-design-fix-root-cut.txt, h12-r2-design-source-root-verified.json, h12-r2-delta-contract-review-spec.txt, b-mode-reviewer-before-h12-r2-start.json, h12-r2-delta-review-ready-before-start.json / dispatch json",
+    "Root boards at fleet-five-orchestration HEAD c23ae5d1: Index 1.0.493 (sha256 ab6c0bf3...), Claude board 1.2.130 (sha256 ad4a5fca...); root492-final-verification.json",
+    "R2 History + contract.md, authority-fields.json, acceptance-cases.json, context.json, review-provenance.json, review-response.json, structural-consistency.json, local-gates.json (argv/hash only), publication-manifest.json",
+    "R1 382fe3 contract.md / authority-fields.json / acceptance-cases.json for the exact R1->R2 delta"
+  ],
+  "notRead": "B author working code (not inspected); untracked post-CI receipts (not used as inputs); D04/H1/H2/K1 schemas and Go corpus beyond the R1 accepted reading (not reopened)",
+  "verdict": "CONTRACT_DESIGN_ACCEPT_M1_L1_L2_CLOSED_KEEP_ACTUAL_HOLD",
+  "verdictScope": "Logical contract DESIGN delta only. The three R1 findings are semantically closed; the rest of R1 accepted scope is preserved byte-equal where claimed. This is not acceptance of any actual binding, key, endpoint, registration, crypto execution, code, producer or runtime behaviour, and grants no code. The next mathematical helper stays R1 DATA ONLY (f8b3f6d7...), not granted by this acceptance.",
+  "declarationVsSemantic": "Hash/count/set/byte-equality checks (static script) only show that the declared structure exists and that unaffected parts are unchanged. Closure below is a separate semantic reading: issuer, source, subject, version, current validation and readback are each defined, joined to independent values and not self-validated, and each proposed variant fails at its causal layer with all earlier preconditions passing.",
+  "closures": [
+    {
+      "id": "H12R-M1",
+      "severity": "MEDIUM (R1)",
+      "status": "CLOSED",
+      "issuer": "RD_CAPTURE_DELIVERY is a distinct origin. Its issuer identity is authorized by Root custody under G00_BINDING and is never chosen from the assertion's own contents or inherited from the H1_INSTALL provisioner (contract 79-83; origin row identity/authorizer). C07 RD-specific-issuer-wrong makes the H1 capsule-delivery issuer or the candidate key fail at G04 even with a mathematically valid signature.",
+      "sourceAndSubject": "The original immutable RD assertion binds capture/publication identity, ordering and time, registrationDeliveryID/version, raw registration SHA256 == unchanged capsule.sourceConstants.designRegistrationSHA256 (field exists in sourceConstants), project/purpose/source/contract subject == independently authorized registration policy, and destinationRegistryGeneration == independently installed capsule.generation (12 subjectFields, 4 joins). H2IndependentPolicy.registrationDeliverySubject (origin RD_CAPTURE_DELIVERY) carries every one of those values and states it is distinct from the H1 deliveryID/version; it is not a bare label.",
+      "version": "snapshotVector adds registrationDeliveryID + registrationDeliveryVersion as members 28-29; the H1 deliveryID/deliveryVersion stay separate. G04 checkpoint/current-status rows bind each full immutable RD subject/raw assertion to that pair; equal RD ID/version with different assertion bytes is forbidden equivocation (contract 93-97, 175-178).",
+      "currentValidation": "G08 requires independently authenticated CURRENT nonrevocation of the exact RD subject AND of the RD issuer grant under the current G00 mapping (G08 row; currentStatusSubjects 7 and 11). Not circular: the RD issuer signs only the original assertion; RD subject currency comes from the independent current-registration authority; issuer-grant currency comes only from G00.",
+      "readback": "G10 authenticates the final same full RD subject/raw identity and compares the separate RD pair together with the rest of the 29-member vector (G10 row; RD origin readback).",
+      "causalVariants": "C07 RD-specific-origin-missing / RD-specific-issuer-wrong: G00..G03 pass -> G04 REGISTRATION_ORIGIN. C05 RD-subject-revoked: G00..G07 pass, all other subjects ACTIVE -> G08 REVOKED. C08 RD-version-changed: G00..G09 pass, RV -> RV+1 with the old 27 members equal -> G10 READBACK before the time predicate. Each is a bounded proposed variant under the existing ID, PROPOSED_NOT_RUN, not an actual run."
+    },
+    {
+      "id": "H12R-L1",
+      "severity": "LOW (R1)",
+      "status": "CLOSED",
+      "origin": "G00_BINDING is a distinct origin for the independent Root-bound CURRENT bootstrap mapping identity/version and delivery mechanism. Its value is never learned from provisioner/status/clock/RD authority statements or candidate bytes. bootstrapBindingIdentityVersion moved from H1_INSTALL to G00_BINDING; that is the only changed pre-existing H2 row.",
+      "g08": "The G08 row and currentStatusSubjects explicitly enumerate the provisioner, status, clock and RD capture/delivery authority grants under the independently CURRENT G00 mapping, alongside the H1 delivery, capsule, H2 grant/key, registry, record and RD subjects (11 subjects). authorityCurrencyOrigin: only current G00 decides grant currency; the authorities' own ACTIVE statements cannot supply or override it.",
+      "coherence": "G04 authenticates references and identities, G08 decides currency, G10 repeats current G00 and full subject/vector comparison (trustBindingIdentity/Version are vector members). This matches the R1-accepted G04-authenticity / G08-ACTIVE partition, so a status/checkpoint/version string cannot prove its own authority or freshness.",
+      "causalVariant": "C05 mapped-authority-grant-not-current: G00..G07 identities and signatures authentic, current G00 mapping present and authoritative; the mapping de-authorizes one authority's grant while that authority still signs ACTIVE statements -> G08 AUTHORITY_NOT_CURRENT. Actual G00 binding NULL/HOLD is intentional and not a finding."
+    },
+    {
+      "id": "H12R-L2",
+      "severity": "LOW (R1)",
+      "status": "CLOSED",
+      "case": "C09 is now the late G10 case: requiredEarlierPass G00..G09; the initial [L,U] is strictly inside every bound; at G10 authenticated origin/subject, the full 29-member vector (G00 mapping and RD pair included), same clock mechanism/epoch and the monotonic bracket all pass BEFORE the time predicate; exactly U_final == ticket.expiresAt, with record.validUntil, status.expiresAt, H5.expiresAt and keyNotAfter all strictly later and every lower/age predicate valid. Expected G10_FINAL_READBACK / EXPIRED (ticket.expiresAt only). No 'ticket OR response' disjunction, no G08 credit, no parser/signature/absent-source credit.",
+      "constructible": "Yes, statically. Example shape: ticket.expiresAt = record.issuedAt + 60 s, other ends >= record.issuedAt + 100 s, final U_final - L_final <= 1 s, all ages <= 120 s, initial U < ticket.expiresAt. No crypto/runtime probe needed or run.",
+      "ids": "IDs stay H12-C01..C10, all PROPOSED_NOT_RUN; not A01-A40."
+    }
+  ],
+  "preservedR1Acceptance": [
+    "Five Root choices, installation states, forward-only generation: unchanged in substance (only the RD/G00 paragraphs and N9 sentence added).",
+    "G00..G10 order: stage list equal to R1; table rows G00, G01, G02, G03, G05, G06, G07, G09 byte-equal; G04/G08/G10 changed only by the M1/L1/N2 text.",
+    "Whole time-formula block ('At BOTH initial ...' .. 'wider age.') byte-equal to R1; D04 handoff prefix byte-equal; capsule 26, nested 7 declared groups / 11 entries, tuple 13, token 9 equal to R1.",
+    "Original 5 origin rows and 22 other H2 rows equal to R1; the 27-member vector prefix equal; case rows C01, C02, C03, C04, C06, C10 JSON-equal; C05/C07/C08 changed only in bounded variants (C07 also in its construction text, N7); public refusal TRUST_UNKNOWN_OR_PIN_MISMATCH unchanged.",
+    "Adjacent clarifications checked for contradictions, none found: N1 admission overrun -> private OWNERSHIP before any gate, G02 only typed-node/aggregate snapshot budget; N2 G04 joins assertions to each other and compares grant purpose/scope to H1 only at G05 (C03 preserved); N3 final authenticated clock interval fills p02Inputs.clock, the 9-field token is a projection of the original authenticated snapshot, and H12 still cannot synthesize before/after; N7 C07 wording 'independently provisioned test authorities' plus a present-but-wrong-origin variant; N8 '7 declared nested type groups (11 matrix entries)'; N9 rollback refusal rests on current-status supersession until H6."
+  ],
+  "nonblockingPrecisionNotes": [
+    "N10 currentRegistrationSubject (H4_STATUS, R1 text unchanged) still enumerates 'delivery/capsule/grant/registry/record' only. The normative G08 row and the 11-entry currentStatusSubjects list are complete, so a later code grant should cite currentStatusSubjects as the exact G08 enumeration. It should also name the independent current-registration authority (H4_STATUS) as the source of RD subject currency, which the contract implies but does not spell out in the RD origin row.",
+    "N11 The finite TCB binding sentence (contract 22-25) and the bootstrapBindingIdentityVersion join name the provisioner/status/clock identities but not the RD capture/delivery issuer identity, which the RD origin, line 80-81 and G08 make G00-authorized. This fails closed: an issuer the mapping does not name cannot authenticate at G04. The later Root binding choice should list it explicitly. The vector has no RD-issuer member parallel to provisionerSPKISHA256; trustBindingVersion plus the full RD subject (issuerIdentity) comparison at G10 cover it.",
+    "N12 For C05 mapped-authority-grant-not-current, the future fixture must keep the de-authorized authority's identity named in the current mapping (so G01/G04 identity authentication passes) and change only its grant currency. Removing the identity from the mapping would causally fail at G01/G04 instead. AUTHORITY_NOT_CURRENT, like REVOKED, is a detail inside G08's STATUS class (row lists STATUS/TIME/EXPIRED).",
+    "N13 C09 names four other exclusive ends. The time block also lets 'any tighter independently authorized bound' apply. The future fixture should keep any such bound, and any RD or authority-grant status expiry, strictly later too, so ticket.expiresAt is the unique minimum.",
+    "N14 Wording only: the G08 row's 'original key interval and whole current interval bounds remain unchanged' reads best as 'the unchanged bounds must hold'; the byte-equal time block governs. 'destinationRegistryGeneration == installed capsule.generation' means an RD must be re-delivered for each new H1 generation; this fails closed and is for the Root binding choice to confirm."
+  ],
+  "laterRootCodeGrantInputsNotDesignScope": "N4 (TESTKEY fixture provenance, NEW position-to-file exact-object guards with foreign-file/method/function-value mutants, lowercase 64-hex expected hash, private p02Context literal, cofactorless Verify / key-quality limit) and N10-N14 above are inputs to a LATER separate Root code/binding grant. They are not new mandatory design scope and not crypto implementation. The math helper could only yield necessary DATA/bool, never installed trust or an opaque issuer.",
+  "cryptoOrRuntimeProbeRequested": false,
+  "cryptoOrRuntimeProbeReason": "No new concern needs crypto/runtime proof; all three closures are matrix/table/case logic.",
+  "staticCheck": {
+    "script": "reviewer_h12r2_static_check.py.txt (stdlib, git show blobs, no crypto/Go/network)",
+    "run": "one attempt, exit 0, 2026-11-07T09:16:23.188..09:16:30.145 KST (PowerShell KST)",
+    "result": "reviewer-h12r2-static-result.json (Python-written UTF-8/LF, sha256 d07ed9b66ccbd3c08e513447127792f3d0a0a4eeb6c3f942296b28da6c776ac9)",
+    "log": "reviewer-h12r2-static.log.txt = the same stdout captured by PowerShell redirection (UTF-8 BOM + CRLF), sha256 80595be23db3689d0b7a46c256f25ecadc9d6cb0cf830eca4809321ff4be5fae; stored byte-exact under '* -text'",
+    "nature": "Structural/reference/text facts only. Not authentication, crypto or runtime proof."
+  },
+  "preservedHolds": "All actual H1-H7/H3EA/expectedVerdict custody/RD NULL_HOLD; G00_BINDING and RD_CAPTURE_DELIVERY actual UNBOUND_HOLD; P02 raw7 UNREGISTERED; public TrustUnknown; no InstalledPolicy/History; A01-A40 NOT_RUN; H12-C01..C10 PROPOSED_NOT_RUN; K1 immutable 13 types/73 fields, 28 pins; whole K2 and fleet 100 incomplete.",
+  "next": "Root verifies this review and decides whether and when to issue a separate binding/code grant. That grant would carry N4 and N10-N14 as inputs. No code, binding or follow-on is granted or started by this review."
+}

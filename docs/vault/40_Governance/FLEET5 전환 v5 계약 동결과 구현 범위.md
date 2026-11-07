@@ -1,11 +1,11 @@
 ---
 doc_id: "GOV-FLEET5-BOOTSTRAP-V5-FREEZE-CODE-SCOPE-20261106"
 title: "FLEET5 전환 v5 계약 동결과 구현 범위"
-version: "1.0.37"
+version: "1.0.38"
 status: "active"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-11-07T09:13:21+09:00"
+updated: "2026-11-07T09:49:11+09:00"
 source_of_truth: "Git"
 ---
 
@@ -281,3 +281,8 @@ NEWCore42300147891의exactf2c1/ref/manual/core.yml/attempt1/correlation과두job
 ## H12 R2 실제 한정 delta 검토 시작
 
 실제Bmode검토e75b/Docs42315871269/all19를Root가대조하고검토자실제exit/release·관리cleanHEAD뒤ready task6382/Claude ctx_2e3e33bdc879의0bf8M1/L1/L2계약delta검토를시작했다. 아직의미닫힘판정전이며K2cryptoCODE·actualbinding/등록/positive/runtime인가는여전히미허용이다. 별도B onceguardWIP코드허용을K2암호CODE허용으로혼동하지않는다.
+
+
+## H12 R2 계약 실제 수락 뒤 private 수학 WIP
+
+실제381f/Docs42317786398/all19가M1/L1/L2를닫았다. Root별도msg7461은exact0bf8base/4경로의private서명수학과한정resolvedobject/sourcefile/directcallguard·syntheticfixture시험WIP만허용한다. 실제authoritybinding/publicsuccess/clock/status/currentregistration·positivefactory·배포는아니며actualGo/crypto검증은고정WIP뒤Root격리에서실행한다. N4/N10~N14의선택과미실행축은Rootactivation/scope/Evidence를따른다.

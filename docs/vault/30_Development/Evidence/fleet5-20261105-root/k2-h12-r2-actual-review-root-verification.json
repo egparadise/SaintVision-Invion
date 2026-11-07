@@ -1,0 +1,46 @@
+{
+  "atKST": "2026-11-07T09:29:12+09:00",
+  "target": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed",
+  "actualReview": "381fbbc816cdf6440b827e43dc0099064170d178",
+  "branch": "agent/claude/fleet5-k2-h12-r2-0bf8-review-20261107",
+  "Docs": 42317786398,
+  "job": 128234602871,
+  "correlation": "FLEET5-K2-H12-R2-0BF8-CLAUDE-REVIEW-381fbbc816cd-f8e95978a995",
+  "rootVerifiedExactHeadRefEventPathAttemptAll19StepsSuccess": true,
+  "remoteExact": true,
+  "onlyOwnAddedReviewFiles": 9,
+  "actualWorkerDone": "msg_8dbdef822b51",
+  "verdict": "CONTRACT_DESIGN_ACCEPT_M1_L1_L2_CLOSED_KEEP_ACTUAL_HOLD",
+  "closures": [
+    {
+      "id": "H12R-M1",
+      "status": "CLOSED"
+    },
+    {
+      "id": "H12R-L1",
+      "status": "CLOSED"
+    },
+    {
+      "id": "H12R-L2",
+      "status": "CLOSED"
+    }
+  ],
+  "nonblockingPrecisionNotes": [
+    "N10 currentRegistrationSubject (H4_STATUS, R1 text unchanged) still enumerates 'delivery/capsule/grant/registry/record' only. The normative G08 row and the 11-entry currentStatusSubjects list are complete, so a later code grant should cite currentStatusSubjects as the exact G08 enumeration. It should also name the independent current-registration authority (H4_STATUS) as the source of RD subject currency, which the contract implies but does not spell out in the RD origin row.",
+    "N11 The finite TCB binding sentence (contract 22-25) and the bootstrapBindingIdentityVersion join name the provisioner/status/clock identities but not the RD capture/delivery issuer identity, which the RD origin, line 80-81 and G08 make G00-authorized. This fails closed: an issuer the mapping does not name cannot authenticate at G04. The later Root binding choice should list it explicitly. The vector has no RD-issuer member parallel to provisionerSPKISHA256; trustBindingVersion plus the full RD subject (issuerIdentity) comparison at G10 cover it.",
+    "N12 For C05 mapped-authority-grant-not-current, the future fixture must keep the de-authorized authority's identity named in the current mapping (so G01/G04 identity authentication passes) and change only its grant currency. Removing the identity from the mapping would causally fail at G01/G04 instead. AUTHORITY_NOT_CURRENT, like REVOKED, is a detail inside G08's STATUS class (row lists STATUS/TIME/EXPIRED).",
+    "N13 C09 names four other exclusive ends. The time block also lets 'any tighter independently authorized bound' apply. The future fixture should keep any such bound, and any RD or authority-grant status expiry, strictly later too, so ticket.expiresAt is the unique minimum.",
+    "N14 Wording only: the G08 row's 'original key interval and whole current interval bounds remain unchanged' reads best as 'the unchanged bounds must hold'; the byte-equal time block governs. 'destinationRegistryGeneration == installed capsule.generation' means an RD must be re-delivered for each new H1 generation; this fails closed and is for the Root binding choice to confirm."
+  ],
+  "RootMatchedAuthoritativeStaticResultHash": true,
+  "actualBindings": null,
+  "cryptoOrRuntimeExecuted": false,
+  "codeGrantedByReviewer": false,
+  "actualReviewerLifecycle": {
+    "state": "succeeded",
+    "stage": "settled",
+    "liveness": "exited",
+    "terminalState": "released"
+  },
+  "wholeProgramComplete": false
+}
