@@ -1,0 +1,79 @@
+{
+  "sourceSHA": "8ee1e5222b451935a96b2b74bafaba1667424375",
+  "frontendRun": 42392904251,
+  "attempt": 1,
+  "overall": "failure",
+  "frontendJob": 128464041559,
+  "portalJob": 128464041717,
+  "portalJobConclusion": "success",
+  "docsRun": 42392906680,
+  "docsJob": 128464047877,
+  "docsAll19": "success",
+  "vitest": {
+    "filesPassed": 106,
+    "passed": 1350,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 0,
+    "deselected": 0
+  },
+  "failedStep": "Boot actual built frontend under canonical strict CSP",
+  "cause": "New smoke asserted every response<400; actual anonymous boot passed but base96 absent favicon.svg returned404",
+  "disposition": "Narrow exact absent-icon404 classification in harness only; all other HTTP failures still reject and full raw response remains visible; no icon/product/CSP change, test count/timeout unchanged",
+  "boot": {
+    "browserVersion": "156.0.8078.79",
+    "rootChildren": 1,
+    "pageErrors": [],
+    "cspErrors": [],
+    "negativeControl": {
+      "functionBlocked": true,
+      "evalBlocked": true
+    }
+  },
+  "newExactHeadWorkflowsRequired": [
+    "frontend",
+    "docs"
+  ],
+  "artifacts": [
+    {
+      "id": 13581914112,
+      "node_id": "MDg6QXJ0aWZhY3QxMzU4MTkxNDExMg==",
+      "name": "saintvision-portal-release",
+      "size_in_bytes": 25707034,
+      "url": "https://api.github.com/repos/egparadise/SaintVision-Invion/actions/artifacts/13581914112",
+      "archive_download_url": "https://api.github.com/repos/egparadise/SaintVision-Invion/actions/artifacts/13581914112/zip",
+      "expired": false,
+      "digest": "sha256:1e4d8306de30b51972eafa03b31605e430bf579ae2f23f8bed30b180788b6469",
+      "created_at": "2026-11-07T16:46:57Z",
+      "updated_at": "2026-11-07T16:46:57Z",
+      "expires_at": "2026-11-21T16:46:54Z",
+      "workflow_run": {
+        "id": 42392904251,
+        "repository_id": 1362259805,
+        "head_repository_id": 1362259805,
+        "head_branch": "agent/codex/fleet5-csp-static-validator-r1-20261108",
+        "head_sha": "8ee1e5222b451935a96b2b74bafaba1667424375"
+      }
+    },
+    {
+      "id": 13581269915,
+      "node_id": "MDg6QXJ0aWZhY3QxMzU4MTI2OTkxNQ==",
+      "name": "saintvision-portal-strict-csp-evidence",
+      "size_in_bytes": 5469,
+      "url": "https://api.github.com/repos/egparadise/SaintVision-Invion/actions/artifacts/13581269915",
+      "archive_download_url": "https://api.github.com/repos/egparadise/SaintVision-Invion/actions/artifacts/13581269915/zip",
+      "expired": false,
+      "digest": "sha256:9b446cb8a8bf1c483cd8500d07417453d75c68aca696daa4f11620faabd19929",
+      "created_at": "2026-11-07T16:47:29Z",
+      "updated_at": "2026-11-07T16:47:29Z",
+      "expires_at": "2026-11-21T16:47:28Z",
+      "workflow_run": {
+        "id": 42392904251,
+        "repository_id": 1362259805,
+        "head_repository_id": 1362259805,
+        "head_branch": "agent/codex/fleet5-csp-static-validator-r1-20261108",
+        "head_sha": "8ee1e5222b451935a96b2b74bafaba1667424375"
+      }
+    }
+  ]
+}
