@@ -1,15 +1,19 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.468"
+version: "1.0.469"
 status: "review"
 author: "Codex"
-updated: "2026-11-07T14:53:18+09:00"
+updated: "2026-11-07T15:27:11+09:00"
 source_of_truth: "Git"
 active_card: "FLEET5 continued supervision with PORTAL-REFRESH-FLEET-20261106"
-active_card_status: "FreshAdmission1efeaActual6bdCodeAccepted_FiniteCardDone; M1ExistingOperatorCatalogChecksSatisfied_M2ReconcileOnlyEntryReviewReady; ActualFivePCIncomplete"
-active_card_next: "Root start one actual independent review of frozen reconcile-only operational entry42e89b61 for M2; no new product mode/CI. M1 existing role catalog checks observed, actual profile must still be frozen/rechecked. Then bind actual one-node target/leaf/fence; actual registration/observation/two-voter Run and5PC still incomplete."
+active_card_status: "ReconcileEntryActualEe1Accepted_PC3IsolatedOperatorEnvInstalledHashesVerified_PublicNodePlanFrozen_NotEnrolled; AuthTLSWorkspaceRuntimeBindingsPending_FivePCIncomplete"
+active_card_next: "B source-only exact minimal CPU Node/config recipe on1efea using public planned IDs; Root binds actual auth/profile/CA/client/leaf/signer/image/fence. PC3 wheel/venv ready but no entry/Node/DB admission run. Additional approver identity/two real nonrequester votes still pending for actual Run."
 ---
+
+## 2026-11-07T15:27:11+09:00 실제PC3 전용환경과 신규Node 계획
+
+확인전용진입점은실제ee1facda검토에서필수결함0으로수락됐다. PC3의실제SSH·DockerAPI1.56·공유폴더·후보포트·자원을조회했고새전용가상환경에검증된제품wheel과직접의존성을설치했다. ensurepip누락은기존시스템변경없이공식Python의pipwheel로같은새폴더안에서복구했으며pipcheck와설치library해시가일치한다. 새Node/CPU·memoryID와endpoint는계획값으로만고정했고아직등록하지않았다. 현재CP는workspace설정이없어실제인증·TLS·실행profile구성을이어가야한다. 실제명령·exit·실패원인과복구·원본판정·SHA·CI·미확인·다음담당은Root History/Evidence에보존했다.
 
 ## 2026-11-07T14:53:18+09:00 신규등록CODE수락과 실제운영조건
 

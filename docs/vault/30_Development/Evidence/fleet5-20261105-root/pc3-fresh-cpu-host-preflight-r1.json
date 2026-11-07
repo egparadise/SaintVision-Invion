@@ -1,0 +1,49 @@
+{
+  "atKST": "2026-11-07T15:15:12+09:00",
+  "target": "PC3 saintvision-invion3@192.168.45.222",
+  "SSHExit": 0,
+  "knownHostsSHA256BeforeAndAfter": "0dcbf0f4cfc363e4affc30810ad8a9e57bd2c4a31991e2c8285bdae7052ec2d2",
+  "knownHostsUnchanged": true,
+  "stdoutBytes": 867,
+  "stderrBytes": 0,
+  "remoteWritesInstallStartIdentityReads": false,
+  "actualNodeAdmission": "NOT_RUN",
+  "wholeProgramComplete": false,
+  "observation": {
+    "readOnly": true,
+    "uid": 1000,
+    "hostname": "saintvision-invion3-Precision-3450",
+    "pythonVersion": "3.14.4",
+    "pythonExecutable": "/usr/bin/python3",
+    "pythonExecutableSHA256": "52e0a13e60a981d8c4b6478be2ba5176f69da07948a056bf49cf6f077e30cb41",
+    "cpuCount": 12,
+    "shareExists": true,
+    "shareAvailableBytes": 207862554624,
+    "memoryBytes": {
+      "MemTotal": 15938240512,
+      "MemAvailable": 11392700416
+    },
+    "candidatePortsCurrentlyListening": {
+      "19443": false,
+      "15461": false
+    },
+    "dockerServerExit": 0,
+    "dockerServer": {
+      "Version": "29.9.3",
+      "ApiVersion": "1.56",
+      "Os": "linux",
+      "Arch": "amd64"
+    },
+    "allLabelledNodeInventoryExit": 0,
+    "existingLabelledNodeContainerNames": [],
+    "hostPythonInstalledDistributionVersionsMetadataOnly": {
+      "psycopg": null,
+      "cryptography": "46.0.5",
+      "SQLAlchemy": null,
+      "pydantic": null,
+      "jsonschema": "4.19.2",
+      "PyJWT": "2.10.1",
+      "saintvision-control-plane": null
+    }
+  }
+}

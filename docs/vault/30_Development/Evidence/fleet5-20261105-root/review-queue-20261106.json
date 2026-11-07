@@ -1,6 +1,6 @@
 {
   "schema": "fleet5-root-review-resource-sequence:1",
-  "atKST": "2026-11-07T14:53:18+09:00",
+  "atKST": "2026-11-07T15:27:11+09:00",
   "completedB": {
     "task": "task_d4c4c809ed4e",
     "review": "ac9182c3e3d606ec027c0be2e90e049ff50d54f1",
@@ -13,15 +13,7 @@
     "source": "8874b2dfe0dda9a019bd5f334636668290702e13"
   },
   "active": null,
-  "pending": [
-    {
-      "entrySHA256": "42e89b6173cd9a8ad1cfa6998da30f068d6409e03e803b523bfb7f076576a3aa",
-      "productSource": "1efea494f026e932360c35ae811b6423d874a2e7",
-      "task": "FLEET5-FRESH-CPU-RECONCILE-ENTRY-INDEPENDENT-REVIEW-20261107",
-      "owner": "One actual Claude after this checkpoint",
-      "status": "READY_NOT_DISPATCHED"
-    }
-  ],
+  "pending": [],
   "authorParallelWork": "B frozen b51 awaiting actual delta verdict; H12 accepted6d7 plus read-only five-row audit delivered, Root owns first CPU journey preflight. Optional Low backlog is not a mandatory new scope.",
   "reason": "actuala7e9 and5a3c reviews+CI verified andprecisefixscopesdelivered; do notselfclose source/runtime",
   "genericApprovalMissing": false,
@@ -30,7 +22,7 @@
     "review": "0e53fc024ca773b7719182e170e5e126aeaf5b95",
     "verdict": "ACCEPT TEST-ONLY; R-L1 CLOSED; no new findings"
   },
-  "nextActualReviewTrigger": "Review the Root-owned bounded operational RECONCILE-only invocation required for M2; no product redesign/extra Core Backend CI. Earlier reviewer and code author both proven settled/exited/released. Then freeze actual one-node profile/identity/leaf/request and proceed only within real checks.",
+  "nextActualReviewTrigger": "No further source or optional-Low review loop. Root sends exact accepted1efea and newly frozen public one-node plan to B for finite source-derived runtime config. Then Root binds real auth/CA/Node profile and proceeds to physical admission/observation.",
   "completedIntegration": {
     "task": "task_78064fb4b7ff",
     "dispatch": "ctx_ed7ec73163d6",
@@ -1039,7 +1031,15 @@
     "verdict": "ACCEPT_SELECTOR_DISCOVERY_DELTA_CLOSE_OPG_L1_KEEP_ACTUAL_HOLD",
     "Docs": 42333724088
   },
-  "parallelImplementation": null,
+  "parallelImplementation": {
+    "task": "FLEET5-ONE-CPU-NODE-RUNTIME-PLAN-R1-20261107",
+    "owner": "Codex B ctx_6f0f8253b8a7",
+    "reviewer": "Root Codex actual plan review, not pre-claimed",
+    "status": "READY_FOR_SPECIFIC_SOURCE_DATA_ONLY_FOLLOWUP_AFTER_CHECKPOINT",
+    "source": "1efea494f026e932360c35ae811b6423d874a2e7",
+    "publicPlan": "one-cpu-node-plan-r1.public.json",
+    "scope": "Derive exact minimal fresh CPU Node TLS/launch-key/peer-policy/profile/image/CLI/config templates and current CP workspace admission gap from source, with explicit Root-pending cryptographic/auth fields. No real profile/credential/config/PKI/host/DB access or mutation."
+  },
   "CPUJoinSourceMap": {
     "task": "task_a95ef3d8ccce",
     "dispatch": "ctx_ed23b4a777d0",
@@ -1550,7 +1550,7 @@
     "Root505PreparationRecovery": "Initial exit1 before mutations: lifecycle JSON was correctly saved as full CLI wrapper, preparation incorrectly expected flat result. Read result explicitly; no source/CI/lifecycle operation was retried."
   },
   "RootOperatingDispositions": {
-    "atKST": "2026-11-07T14:53:18+09:00",
+    "atKST": "2026-11-07T15:27:11+09:00",
     "productSource": "1efea494f026e932360c35ae811b6423d874a2e7",
     "actualCodeReview": "6bd81ef0531b4a58438c98618e92d5ad9985c12b",
     "codeVerdict": "ACCEPT_FRESH_CPU_ADMISSION_OPERATOR_CODE_KEEP_ACTUAL_HOLD",
@@ -1562,18 +1562,120 @@
       "newRoleOrGrantRequired": false
     },
     "M2": {
-      "status": "PROPOSED_RECONCILE_ONLY_ENTRY_READY_FOR_ACTUAL_INDEPENDENT_REVIEW; not yet approved/executed",
+      "status": "ACTUAL_INDEPENDENT_REVIEW_ACCEPTED_REVIEWED_INVOCATION_PATH_EXISTS; actual profile/request and execution still pending",
       "entrySHA256": "42e89b6173cd9a8ad1cfa6998da30f068d6409e03e803b523bfb7f076576a3aa",
+      "review": "ee1facda1dbcc3c6eea281be462a74f5d42392b9",
+      "Docs": 42345830540,
+      "verdict": "ACCEPT_RECONCILE_ONLY_ENTRY_AND_M1_PROFILE_CLASS_KEEP_LIVE_HOLD",
       "entryPath": "fresh-cpu-reconcile-entry-r1/operator_reconcile_fresh_cpu.py.txt",
-      "librarySource": "1efea494f026e932360c35ae811b6423d874a2e7",
-      "candidateWheelSHA256": "b329c2f89bb81dcc4b841fca6bf18cd8bfeeed07a657fbab7e6b6e9f4edd8d23",
-      "actualIndependentEntryReview": "READY_NOT_STARTED",
       "actualExecution": "NOT_RUN",
       "noAutomaticApplyOrRetry": true
     },
-    "actualOperatorProfileTargetNodeLeafFence": "NOT_YET_FULLY_BOUND",
+    "actualOperatorProfileTargetNodeLeafFence": "Public planned IDs/host/endpoint and installed interpreter/source pinned; private DB profile, actual CA/client/leaf/signer/Node profile/image/fence and fresh auth not yet fully bound",
     "liveAdmission": "NOT_RUN",
     "runtimeOrPKIGrant": false,
+    "wholeProgramComplete": false,
+    "captureDisposition": "Use exit0 AND exactly one bounded validated stdout JSON and empty stderr as match. All nonzero/interrupted/extra stderr is HOLD; capture raw diagnostics privately in memory only, never forward profile/driver text. Do not assert pinned psycopg logger implementation was verified. Exact LF copied-byte hash and self-contained profile/interpreter/wheel/library checks remain prerequisites.",
+    "preparedOperatorEnvironment": {
+      "status": "PREPARED_NOT_EXECUTED",
+      "directory": "/home/saintvision-invion3/saintvision-share/ops-fresh-cpu-1efea-r1-20261107",
+      "interpreterSHA256": "52e0a13e60a981d8c4b6478be2ba5176f69da07948a056bf49cf6f077e30cb41",
+      "installedLibrarySHA256": "76407ced1411f42a5eddd71c894f541b8691d461d4eb1eaea30f63b8bcf90d2c",
+      "noNodeAppOrDBExecution": true
+    },
+    "publicOneNodePlan": "one-cpu-node-plan-r1.public.json"
+  },
+  "reconcileEntryAcceptance": {
+    "atKST": "2026-11-07T15:14:10+09:00",
+    "source": "1efea494f026e932360c35ae811b6423d874a2e7",
+    "review": "ee1facda1dbcc3c6eea281be462a74f5d42392b9",
+    "RootArtifactSource": "1eb22559b590b5bab421ca4828e8b5b1a15ef954",
+    "directParentExact": true,
+    "remoteExact": true,
+    "onlyOwn7AddedReviewDocs": true,
+    "Docs": 42345830540,
+    "DocsJob": 128323240452,
+    "correlation": "freshcpu-reconcile-entry-review-ee1facda-docs-38448923c7c0",
+    "exactManualDocsAll19Success": true,
+    "verdict": "ACCEPT_RECONCILE_ONLY_ENTRY_AND_M1_PROFILE_CLASS_KEEP_LIVE_HOLD",
+    "mandatoryEntryDefects": 0,
+    "severity": {
+      "HIGH": 0,
+      "MEDIUM": 0,
+      "LOW": 1,
+      "INFO": 7
+    },
+    "entrySHA256": "42e89b6173cd9a8ad1cfa6998da30f068d6409e03e803b523bfb7f076576a3aa",
+    "allSevenRootArtifactBlobPinsMatch": true,
+    "M1": "PROFILE_CLASS_ACCEPTED_FOR_RECONCILE: an existing superuser/BYPASSRLS login role with inv USAGE and the observed SELECT/UPDATE/INSERT set satisfies reconcile's _operator check (INSERT on 5 inv relations + inv USAGE) and lets the RLS-subject readback see rows; tenant isolation remains explicit tenant_id predicates in every reconcile-path SELECT. Root's 14:47:02 KST catalog observation is Root-attributed DATA, not re-executed by the reviewer. The actual private target/auth/TLS/environment/file profile must still be frozen and rechecked immediately before APPLY.",
+    "M2": "REVIEWED_INVOCATION_PATH_EXISTS: entry SHA256 42e89b61... + operational-disposition.txt invocation contract give Root a reviewed, bounded, read-only way to invoke the existing reconcile_admission with the same trusted connection. M2 is discharged at the review level only; actual execution NOT_RUN, host/profile/request/identity/leaf/Node/image/fence NOT_YET_BOUND, pre-run entry/wheel/library/interpreter verification pending.",
+    "findings": [
+      {
+        "id": "FRE-L1",
+        "severity": "LOW",
+        "mandatory": false,
+        "kind": "residual diagnostic channel (optional hardening / operating note)",
+        "where": "operator_reconcile_fresh_cpu.py.txt:15-20,48-50,62-66",
+        "fact": "The handler suppresses exception text only for exceptions that reach it. Two narrow paths can still put driver text on stderr outside the closed JSON: (a) if a second exception (e.g. a second Ctrl-C, or a stderr write error) is raised inside the except block/fail(), Python prints the chained traceback, which includes str() of the original exception, e.g. a libpq connection error naming host/port/user; (b) psycopg's own module logger has warning paths (e.g. failed query-cancel after an interrupt, rollback failure on exit) that, with no logging configured, go to stderr via logging.lastResort. (b) is from the reviewer's knowledge of psycopg 3.x design and was NOT verified against the pinned psycopg 3.3.5 source (no install/download/read of that package in scope). Neither path can carry the password (libpq messages and psycopg connection summaries omit it) or write anything. The accepted vetted CLI has the same property.",
+        "impact": "Possible exposure of profile elements (host/port/user/database) or generic driver text on the operator's own stderr in an interrupt/broken-pipe/lost-connection edge case. No write, no authority, exit code stays nonzero or the process dies, so the outcome is still HOLD.",
+        "disposition": "Optional, not required for this acceptance: Root may (1) capture stderr only to the private isolated-host session and treat any stderr content other than the single closed HOLD JSON as HOLD material not to be published, and/or (2) in a later revision add logging.disable/NullHandler for 'psycopg' and guard fail() itself. Do not open a new optional LOW cycle for it."
+      }
+    ],
+    "info": [
+      {
+        "id": "FRE-I1",
+        "fact": "argv length is checked after the product imports (line 34). No effect on safety: imports read no argv and nothing is echoed."
+      },
+      {
+        "id": "FRE-I2",
+        "fact": "Exit code is the authority: 0 only after a guarded match and a successful stdout write. If an interrupt lands after the success print but before return, stdout carries the match JSON and stderr a HOLD with exit 2. Root should key disposition on exit 0 AND exactly one stdout JSON; any nonzero exit is HOLD regardless of stdout."
+      },
+      {
+        "id": "FRE-I3",
+        "fact": "The entry does not scrub PG* environment variables or libpq default files (pgpass, service, root cert). Parameters absent from the DSN fall back to them (e.g. PGOPTIONS if the DSN has no options, sslmode default prefer). Consistent with the declared not-a-sandbox trust premise (Root msg97ef); the frozen profile must state connect_timeout=5, the options (statement_timeout 15000, lock_timeout 2000, idle_in_transaction_session_timeout 15000), TLS expectation and approved file refs explicitly in the DSN, and the pre-run check must confirm the process environment carries only approved values. The entry does not verify these; it forwards them."
+      },
+      {
+        "id": "FRE-I4",
+        "fact": "FRESH-0009 is reused for the entry's own result-shape guard and the library's readback mismatch; both are HOLD. The guard is unreachable with the pinned library and exists as defense in depth."
+      },
+      {
+        "id": "FRE-I5",
+        "fact": "conn.read_only=True plus the library's READ ONLY REPEATABLE READ transaction are defense in depth; with a superuser role they are not a privilege boundary. The only operations sent are the 12 SELECT/SET TRANSACTION statements; set_config(...,true) is transaction-local."
+      },
+      {
+        "id": "FRE-I6",
+        "fact": "Reconcile requires the role to hold INSERT on 5 inv relations (_operator lines 162-171) even though it only reads; the M1 role class satisfies this. Least privilege is not achieved by a superuser class; no new role/grant work is assigned here."
+      },
+      {
+        "id": "FRE-I7",
+        "fact": "Artifact bytes are LF/ASCII in the Root blob (sha 42e89b61...). The operator must hash the exact copied .py bytes on the isolated host; a CRLF-converting copy would change the SHA and must be refused, not normalised."
+      }
+    ],
+    "RootOperatingCaptureDisposition": "Use exit0 AND exactly one bounded validated stdout JSON and empty stderr as match. All nonzero/interrupted/extra stderr is HOLD; capture raw diagnostics privately in memory only, never forward profile/driver text. Do not assert pinned psycopg logger implementation was verified. Exact LF copied-byte hash and self-contained profile/interpreter/wheel/library checks remain prerequisites.",
+    "canonicalGitBlobSHA256": {
+      "docs/vault/30_Development/Evidence/fleet5-fresh-cpu-reconcile-entry-review-20261107-claude/.gitattributes": "96a83569c84cfe3f57b7efe3dc61c249548d0fca4fed0e538b3587cdc97c95c1",
+      "docs/vault/30_Development/Evidence/fleet5-fresh-cpu-reconcile-entry-review-20261107-claude/entry-ast-probe.json": "8f4faece59b1722898d2c04c7a1dbb0037fbb743122fee69e02952e1e08259eb",
+      "docs/vault/30_Development/Evidence/fleet5-fresh-cpu-reconcile-entry-review-20261107-claude/entry_ast_probe.py.txt": "b270f1ad828be829621e589f971a0a24976d001885830f590dcba6a7d6196ae4",
+      "docs/vault/30_Development/Evidence/fleet5-fresh-cpu-reconcile-entry-review-20261107-claude/local-doc-gates.txt": "fd12fb85917025e3597fae2cf2e538e711975939203efefda54104a560a731d0",
+      "docs/vault/30_Development/Evidence/fleet5-fresh-cpu-reconcile-entry-review-20261107-claude/review.json": "8ccbf49fb413d5cb4371da0d302509188451d740a02d3df71de37fb63c436d04",
+      "docs/vault/30_Development/Evidence/fleet5-fresh-cpu-reconcile-entry-review-20261107-claude/reviewer_gate_driver.py.txt": "a62151e238c8d3d2011b1aa4651bf16ecb87720799fe602883771fe0ea4cc092",
+      "docs/vault/30_Development/History/2026-11-07_FLEET5_Fresh_CPU_Reconcile_Entry_Review_Claude.md": "f76508895546cb004ecca64beeb58ded99a988886421acad5e9ed961371f8adb"
+    },
+    "reviewerLifecycle": {
+      "dispatchId": "ctx_2a0f382b4d2f",
+      "taskId": "task_1d36969e9661",
+      "runId": "run_e57ecd84a7bc",
+      "state": "succeeded",
+      "stage": "settled",
+      "liveness": "exited",
+      "terminal": "term_ebe16289-59fe-448f-9775-f692727525cc",
+      "terminalState": "released",
+      "workspace": "d98dc9d3-fe61-4cb2-9776-dff349347a61::D:/Project/SaintVisionI-Invion/fleet5-fresh-cpu-reconcile-entry-review-20261107",
+      "waitingOnHuman": "unknown"
+    },
+    "actualEntryOrAPPLY": "NOT_RUN",
+    "actualProfileHostRequestIdentityLeafNodeImageFence": "NOT_YET_FULLY_BOUND",
+    "actualAuthority": null,
     "wholeProgramComplete": false
   }
 }

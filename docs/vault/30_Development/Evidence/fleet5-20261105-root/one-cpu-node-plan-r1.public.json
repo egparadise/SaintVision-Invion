@@ -1,0 +1,117 @@
+{
+  "docID": "PLAN-FLEET5-ONE-CPU-NODE-R1-20261107",
+  "version": "1.0.0",
+  "atKST": "2026-11-07T15:24:41+09:00",
+  "owner": "Root Codex",
+  "status": "PLANNED_PUBLIC_OPERATION_PARAMETERS_NOT_APPLY_REQUEST_OR_ENROLLMENT",
+  "source": "1efea494f026e932360c35ae811b6423d874a2e7",
+  "actualCodeReview": "6bd81ef0531b4a58438c98618e92d5ad9985c12b",
+  "actualReconcileEntryReview": "ee1facda1dbcc3c6eea281be462a74f5d42392b9",
+  "tenant": "97968b42-68aa-40ce-af5e-3a33e2fc2205",
+  "project": "prj_01M6NDBHVD2DZQ1Q38DCKN1XE3",
+  "epoch": "bcd581be-31b4-4aca-86e6-3ca31b69ed09",
+  "expectedTenantControlVersion": 0,
+  "newPlannedIDs": {
+    "nodeId": "nod_01M6TAWG25JTA3F7J7S1EE4N2W",
+    "cpuResourceId": "res_01M6TAWG25QSR4HH7XWWJSB0W0",
+    "memoryResourceId": "res_01M6TAWG25ZHS2RG3NHQX4SPEH",
+    "registeredOrReserved": false
+  },
+  "host": {
+    "PC": 3,
+    "address": "192.168.45.222",
+    "SSHUser": "saintvision-invion3",
+    "SSHPort": 22,
+    "strictKnownHostsSHA256": "0dcbf0f4cfc363e4affc30810ad8a9e57bd2c4a31991e2c8285bdae7052ec2d2",
+    "actualReadOnlyInventory": {
+      "readOnly": true,
+      "uid": 1000,
+      "hostname": "saintvision-invion3-Precision-3450",
+      "pythonVersion": "3.14.4",
+      "pythonExecutable": "/usr/bin/python3",
+      "pythonExecutableSHA256": "52e0a13e60a981d8c4b6478be2ba5176f69da07948a056bf49cf6f077e30cb41",
+      "cpuCount": 12,
+      "shareExists": true,
+      "shareAvailableBytes": 207862554624,
+      "memoryBytes": {
+        "MemTotal": 15938240512,
+        "MemAvailable": 11392700416
+      },
+      "candidatePortsCurrentlyListening": {
+        "19443": false,
+        "15461": false
+      },
+      "dockerServerExit": 0,
+      "dockerServer": {
+        "Version": "29.9.3",
+        "ApiVersion": "1.56",
+        "Os": "linux",
+        "Arch": "amd64"
+      },
+      "allLabelledNodeInventoryExit": 0,
+      "existingLabelledNodeContainerNames": [],
+      "hostPythonInstalledDistributionVersionsMetadataOnly": {
+        "psycopg": null,
+        "cryptography": "46.0.5",
+        "SQLAlchemy": null,
+        "pydantic": null,
+        "jsonschema": "4.19.2",
+        "PyJWT": "2.10.1",
+        "saintvision-control-plane": null
+      }
+    },
+    "inventoryAtKST": "2026-11-07T15:15:12+09:00"
+  },
+  "endpoint": {
+    "planned": "https://192.168.45.222:19443",
+    "nodeListenPort": 19443,
+    "proposedOperatorDBTunnelPort": 15461,
+    "portsOnlyObservedFreeNotReserved": true
+  },
+  "configuredContributionOnly": {
+    "cpuMillis": 500,
+    "memoryBytes": 67108864,
+    "GPU": false,
+    "physicalOfferOrFreshSnapshot": false
+  },
+  "ownedNewEnvironment": "/home/saintvision-invion3/saintvision-share/ops-fresh-cpu-1efea-r1-20261107",
+  "verifiedInterpreter": "/home/saintvision-invion3/saintvision-share/ops-fresh-cpu-1efea-r1-20261107/venv/bin/python",
+  "verifiedInterpreterSHA256": "52e0a13e60a981d8c4b6478be2ba5176f69da07948a056bf49cf6f077e30cb41",
+  "wheelSHA256": "b329c2f89bb81dcc4b841fca6bf18cd8bfeeed07a657fbab7e6b6e9f4edd8d23",
+  "librarySHA256": "76407ced1411f42a5eddd71c894f541b8691d461d4eb1eaea30f63b8bcf90d2c",
+  "nodeBinaryCIPath": "/home/saintvision-invion3/saintvision-share/ops-fresh-cpu-1efea-r1-20261107/inv-node.ci",
+  "nodeBinarySHA256": "d0fbeeced59814cfe7cbd06d6fbbdb8871e214460462f5ad1b8c2e4af8d1ac7b",
+  "nodeBinaryExecuted": false,
+  "plannedNewNodeDirectory": "/home/saintvision-invion3/saintvision-share/nodes/nod_01M6TAWG25JTA3F7J7S1EE4N2W",
+  "plannedContainerName": "saintvision-nod_01M6TAWG25JTA3F7J7S1EE4N2W",
+  "plannedStateVolumeName": "sv-nod_01M6TAWG25JTA3F7J7S1EE4N2W-state",
+  "existingNodeDataPolicy": "Preserve every old directory/container/volume/journal/floor/identity. New names are plans; exact collision absence must be rechecked.",
+  "currentCPSettingsShapeOnly": {
+    "identityConfigured": true,
+    "businessConfigured": true,
+    "allowedOriginsConfigured": true,
+    "workspaceConfigured": false,
+    "source": "Root inspected exact known api.json keys only; no business/owner/runtime connection scalars copied"
+  },
+  "publicOIDCConfiguration": {
+    "issuer": "https://127.0.0.1:8443/realms/saintvision",
+    "audience": "sv-api",
+    "clientId": "sv-portal",
+    "freshAuthenticatedSession": "NOT_OBSERVED",
+    "browserSelectedProject": "NOT_OBSERVED"
+  },
+  "pendingRootOnlyBindings": {
+    "operatorDBProfile": "NOT_FROZEN; same exact current CP DB/role class, approved environment/auth/TLS/timeout settings required",
+    "NodeCAAndLeaf": "NOT_CREATED; Root must select explicit issuer/custody and actual public DER",
+    "CPClientCertificate": "NOT_CREATED_OR_BOUND",
+    "launchSignerAndPublicKey": "NOT_CREATED_OR_BOUND",
+    "peerPolicyProfileAndImage": "NEEDS_EXACT_SOURCE_DERIVED_TEMPLATE_THEN_ROOT_REAL_BINDING",
+    "fullAdmissionPublicRequest": "NOT_BUILT; missing actual DER means this plan MUST NOT be passed to PLAN/APPLY",
+    "authenticatedPrincipalAndApprovers": "Fresh actual session plus two real distinct non-requester approvals needed later; additional approver identity pending"
+  },
+  "allowedNextDelegatedScope": "Source/Git/DATA-only exact runtime/PKI/profile/config template and ordered entrypoints from1efea, no real files/credentials/keys/config access, no remote/DB/install/Node operation",
+  "actualAdmission": "NOT_RUN",
+  "actualObserveRunOrFivePCAcceptance": false,
+  "actualAuthority": null,
+  "wholeProgramComplete": false
+}

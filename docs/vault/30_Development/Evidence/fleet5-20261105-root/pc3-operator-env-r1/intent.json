@@ -1,0 +1,57 @@
+{
+  "atKST": "2026-11-07T15:18:28+09:00",
+  "owner": "Root Codex",
+  "authorization": "User requested all-PC setup/completion; sourceCODE and reconcile-only entry have actual independent acceptance. This is finite environment PREPARATION only.",
+  "target": "saintvision-invion3@192.168.45.222",
+  "newOwnedRelativeDirectory": "saintvision-share/ops-fresh-cpu-1efea-r1-20261107",
+  "operations": [
+    "Create only new mode0700 owned directory; refuse collision",
+    "Copy four exact public CI/source artifacts and manifest as mode0600",
+    "Create isolated Python venv; install candidate wheel exact declared direct dependencies with binary wheels only from public PyPI, no global install/compiler/cache",
+    "pip check and metadata/hash readback only"
+  ],
+  "forbidden": [
+    "No existing identity/config/key/certificate reads",
+    "No credential/profile or DB/Node connection",
+    "No entry/app execution; no Node container/image build/start",
+    "No old file/volume/state changes or cleanup"
+  ],
+  "actualAdmission": "NOT_RUN",
+  "wholeProgramComplete": false,
+  "bundleSHA256": "dbb3248c2953b21c8964b5d931838927dc84e071c33272eff99daacbd8ac9659",
+  "sourceBindings": {
+    "source": "1efea494f026e932360c35ae811b6423d874a2e7",
+    "RootArtifactSource": "1eb22559b590b5bab421ca4828e8b5b1a15ef954",
+    "files": {
+      "saintvision_control_plane-0.1.0-py3-none-any.whl": {
+        "bytes": 340135,
+        "sha256": "b329c2f89bb81dcc4b841fca6bf18cd8bfeeed07a657fbab7e6b6e9f4edd8d23"
+      },
+      "inv-node.ci": {
+        "bytes": 13387338,
+        "sha256": "d0fbeeced59814cfe7cbd06d6fbbdb8871e214460462f5ad1b8c2e4af8d1ac7b"
+      },
+      "fresh_cpu_admission.py": {
+        "bytes": 3701,
+        "sha256": "8129ab5acf7061b0bc1834aa1142ae944471b1b177f018c810de34ea9a53fe7d"
+      },
+      "operator_reconcile_fresh_cpu.py": {
+        "bytes": 2942,
+        "sha256": "42e89b6173cd9a8ad1cfa6998da30f068d6409e03e803b523bfb7f076576a3aa"
+      }
+    },
+    "installedLibrarySHA256": "76407ced1411f42a5eddd71c894f541b8691d461d4eb1eaea30f63b8bcf90d2c",
+    "expectedHostPythonSHA256": "52e0a13e60a981d8c4b6478be2ba5176f69da07948a056bf49cf6f077e30cb41",
+    "directPinnedVersions": {
+      "fastapi": "0.141.1",
+      "uvicorn": "0.52.4",
+      "websockets": "17.1",
+      "psycopg": "3.3.5",
+      "jsonschema": "4.26.0",
+      "pydantic": "2.13.5",
+      "cryptography": "50.0.1",
+      "PyJWT": "2.15.1",
+      "saintvision-control-plane": "0.1.0"
+    }
+  }
+}

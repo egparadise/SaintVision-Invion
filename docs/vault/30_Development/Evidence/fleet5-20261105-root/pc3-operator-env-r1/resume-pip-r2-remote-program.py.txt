@@ -1,0 +1,33 @@
+import hashlib,json,os,runpy,subprocess,sys
+from pathlib import Path
+sha=lambda b:hashlib.sha256(b).hexdigest()
+result={'preparationOnly':True,'entryAppOrNodeExecuted':False,'credentialProfileOrDBConnection':False,'oldIdentityStateChanges':False,'actualAdmission':'NOT_RUN','wholeProgramComplete':False};phase='validate-known-cause-owned-venv'
+try:
+ assert os.getuid()==1000
+ share=(Path.home()/'saintvision-share').resolve();root=(share/'ops-fresh-cpu-1efea-r1-20261107').resolve();assert root.is_relative_to(share) and root.is_dir() and (root.stat().st_mode&0o777)==0o700
+ failure=(root/'venv.stdout.txt').read_bytes();assert 'ensurepip is not available' in ' '.join(failure.decode().split());result['originalFailureSHA256Before']=sha(failure)
+ pins=json.loads((root/'source-bindings.json').read_bytes());assert pins['source']=='1efea494f026e932360c35ae811b6423d874a2e7'
+ for name,row in pins['files'].items():assert sha((root/name).read_bytes())==row['sha256']
+ py=root/'venv/bin/python';assert sha(py.read_bytes())==pins['expectedHostPythonSHA256']
+ assert 'include-system-site-packages = false' in (root/'venv/pyvenv.cfg').read_text()
+ payload=sys.stdin.buffer.read(3000001);assert len(payload)==1816632 and sha(payload)=='71138adf1f4ca900cdb7d289c21b7494329f2332b6d85f0e1c42108c0384ed3e'
+ pipwheel=root/'pip-26.2.1-py3-none-any.whl';assert not pipwheel.exists();pipwheel.write_bytes(payload);pipwheel.chmod(0o600)
+ env={'PATH':'/usr/bin:/bin','LANG':'C.UTF-8','PYTHONDONTWRITEBYTECODE':'1','PYTHONNOUSERSITE':'1','PIP_CONFIG_FILE':'/dev/null','TMPDIR':str(root/'tmp')}
+ def run(name,args,timeout):
+  global phase
+  phase=name;q=subprocess.run(args,capture_output=True,timeout=timeout,env=env)
+  (root/(name+'.stdout.txt')).write_bytes(q.stdout);(root/(name+'.stderr.txt')).write_bytes(q.stderr)
+  result.setdefault('stages',[]).append({'stage':name,'exit':q.returncode,'stdoutBytes':len(q.stdout),'stderrBytes':len(q.stderr)});assert q.returncode==0,name
+  return q
+ q=run('r2-prefix-check',[str(py),'-I','-B','-c','import sys,json; print(json.dumps({"prefix":sys.prefix,"base":sys.base_prefix}))'],10);assert Path(json.loads(q.stdout)['prefix']).resolve()==root/'venv'
+ bootstrap='import runpy,sys;sys.path.insert(0,'+repr(str(pipwheel))+');runpy.run_module("pip",run_name="__main__")'
+ run('r2-install-pinned-wheel',[str(py),'-I','-B','-c',bootstrap,'--isolated','--disable-pip-version-check','install','--no-input','--no-cache-dir','--only-binary=:all:','--index-url','https://pypi.org/simple','--report',str(root/'pip-install-report-r2.json'),str(pipwheel),str(root/'saintvision_control_plane-0.1.0-py3-none-any.whl')],150)
+ run('r2-pip-check',[str(py),'-I','-B','-m','pip','--isolated','--disable-pip-version-check','check'],20)
+ code='import importlib.metadata,json,sys; print(json.dumps({"python":sys.version.split()[0],"versions":{d.metadata["Name"]:d.version for d in importlib.metadata.distributions()}}))'
+ q=run('r2-installed-metadata',[str(py),'-I','-B','-c',code],15);installed=json.loads(q.stdout);norm=lambda s:s.lower().replace('_','-');versions={norm(k):v for k,v in installed['versions'].items()}
+ for name,version in pins['directPinnedVersions'].items():assert versions[norm(name)]==version
+ library=root/'venv/lib'/('python'+str(sys.version_info.major)+'.'+str(sys.version_info.minor))/'site-packages/inv/fresh_cpu_admission.py';assert sha(library.read_bytes())==pins['installedLibrarySHA256']
+ assert sha((root/'venv.stdout.txt').read_bytes())==result['originalFailureSHA256Before']
+ result.update(status='PREPARED_NOT_EXECUTED',phase='metadata-and-hash-verified',ownedDirectory=str(root),interpreter=str(py),interpreterSHA256=sha(py.read_bytes()),installedLibrarySHA256=sha(library.read_bytes()),installedDistributions=installed['versions'],pipInstallReportSHA256=sha((root/'pip-install-report-r2.json').read_bytes()),originalFailurePreserved=True,pipBootstrapWheelSHA256=sha(pipwheel.read_bytes()),copiedArtifactsUnchanged=True)
+except BaseException as error:result.update(status='HOLD_PREPARATION_FAILED',phase=phase,errorClass=type(error).__name__,rawDiagnosticSuppressed=True)
+print(json.dumps(result));raise SystemExit(0 if result.get('status')=='PREPARED_NOT_EXECUTED' else 2)

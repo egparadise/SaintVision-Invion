@@ -1,5 +1,5 @@
 {
-  "atKST": "2026-11-07T14:53:18+09:00",
+  "atKST": "2026-11-07T15:27:11+09:00",
   "productSource": "1efea494f026e932360c35ae811b6423d874a2e7",
   "actualCodeReview": "6bd81ef0531b4a58438c98618e92d5ad9985c12b",
   "codeVerdict": "ACCEPT_FRESH_CPU_ADMISSION_OPERATOR_CODE_KEEP_ACTUAL_HOLD",
@@ -11,17 +11,26 @@
     "newRoleOrGrantRequired": false
   },
   "M2": {
-    "status": "PROPOSED_RECONCILE_ONLY_ENTRY_READY_FOR_ACTUAL_INDEPENDENT_REVIEW; not yet approved/executed",
+    "status": "ACTUAL_INDEPENDENT_REVIEW_ACCEPTED_REVIEWED_INVOCATION_PATH_EXISTS; actual profile/request and execution still pending",
     "entrySHA256": "42e89b6173cd9a8ad1cfa6998da30f068d6409e03e803b523bfb7f076576a3aa",
+    "review": "ee1facda1dbcc3c6eea281be462a74f5d42392b9",
+    "Docs": 42345830540,
+    "verdict": "ACCEPT_RECONCILE_ONLY_ENTRY_AND_M1_PROFILE_CLASS_KEEP_LIVE_HOLD",
     "entryPath": "fresh-cpu-reconcile-entry-r1/operator_reconcile_fresh_cpu.py.txt",
-    "librarySource": "1efea494f026e932360c35ae811b6423d874a2e7",
-    "candidateWheelSHA256": "b329c2f89bb81dcc4b841fca6bf18cd8bfeeed07a657fbab7e6b6e9f4edd8d23",
-    "actualIndependentEntryReview": "READY_NOT_STARTED",
     "actualExecution": "NOT_RUN",
     "noAutomaticApplyOrRetry": true
   },
-  "actualOperatorProfileTargetNodeLeafFence": "NOT_YET_FULLY_BOUND",
+  "actualOperatorProfileTargetNodeLeafFence": "Public planned IDs/host/endpoint and installed interpreter/source pinned; private DB profile, actual CA/client/leaf/signer/Node profile/image/fence and fresh auth not yet fully bound",
   "liveAdmission": "NOT_RUN",
   "runtimeOrPKIGrant": false,
-  "wholeProgramComplete": false
+  "wholeProgramComplete": false,
+  "captureDisposition": "Use exit0 AND exactly one bounded validated stdout JSON and empty stderr as match. All nonzero/interrupted/extra stderr is HOLD; capture raw diagnostics privately in memory only, never forward profile/driver text. Do not assert pinned psycopg logger implementation was verified. Exact LF copied-byte hash and self-contained profile/interpreter/wheel/library checks remain prerequisites.",
+  "preparedOperatorEnvironment": {
+    "status": "PREPARED_NOT_EXECUTED",
+    "directory": "/home/saintvision-invion3/saintvision-share/ops-fresh-cpu-1efea-r1-20261107",
+    "interpreterSHA256": "52e0a13e60a981d8c4b6478be2ba5176f69da07948a056bf49cf6f077e30cb41",
+    "installedLibrarySHA256": "76407ced1411f42a5eddd71c894f541b8691d461d4eb1eaea30f63b8bcf90d2c",
+    "noNodeAppOrDBExecution": true
+  },
+  "publicOneNodePlan": "one-cpu-node-plan-r1.public.json"
 }

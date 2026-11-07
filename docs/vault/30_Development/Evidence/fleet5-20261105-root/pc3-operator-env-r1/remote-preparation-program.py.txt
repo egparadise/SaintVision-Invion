@@ -1,0 +1,42 @@
+import hashlib,io,json,os,subprocess,sys,tarfile
+from pathlib import Path
+sha=lambda b:hashlib.sha256(b).hexdigest()
+result={'preparationOnly':True,'actualAdmission':'NOT_RUN','entryAppOrNodeExecuted':False,'credentialProfileOrDBConnection':False,'oldIdentityStateChanges':False,'wholeProgramComplete':False}
+phase='validate-public-input'
+try:
+ assert os.getuid()==1000
+ payload=sys.stdin.buffer.read(25000001);assert len(payload)<=25000000
+ tf=tarfile.open(fileobj=io.BytesIO(payload),mode='r:');members=tf.getmembers();expected={'saintvision_control_plane-0.1.0-py3-none-any.whl','inv-node.ci','fresh_cpu_admission.py','operator_reconcile_fresh_cpu.py','source-bindings.json'}
+ assert len(members)==5 and {m.name for m in members}==expected and all(m.isfile() and m.size<20000000 for m in members)
+ data={m.name:tf.extractfile(m).read() for m in members};pins=json.loads(data['source-bindings.json'])
+ assert pins['source']=='1efea494f026e932360c35ae811b6423d874a2e7'
+ assert sha(Path(sys.executable).read_bytes())==pins['expectedHostPythonSHA256']
+ for name,row in pins['files'].items():assert len(data[name])==row['bytes'] and sha(data[name])==row['sha256']
+ share=(Path.home()/'saintvision-share').resolve();assert share.is_dir() and share.is_relative_to(Path.home().resolve())
+ root=share/'ops-fresh-cpu-1efea-r1-20261107';assert root.resolve().is_relative_to(share) and not root.exists()
+ phase='create-new-owned-environment';root.mkdir(mode=0o700);(root/'tmp').mkdir(mode=0o700)
+ for name,b in data.items():
+  path=root/name;path.write_bytes(b);path.chmod(0o600)
+ result['ownedDirectory']=str(root);result['source']=pins['source'];result['copiedFileHashes']={n:sha((root/n).read_bytes()) for n in data}
+ env={'PATH':'/usr/bin:/bin','LANG':'C.UTF-8','PYTHONDONTWRITEBYTECODE':'1','PYTHONNOUSERSITE':'1','PIP_CONFIG_FILE':'/dev/null','TMPDIR':str(root/'tmp')}
+ def run(name,args,timeout):
+  global phase
+  phase=name;q=subprocess.run(args,capture_output=True,timeout=timeout,env=env)
+  (root/(name+'.stdout.txt')).write_bytes(q.stdout);(root/(name+'.stderr.txt')).write_bytes(q.stderr)
+  result.setdefault('stages',[]).append({'stage':name,'exit':q.returncode,'stdoutBytes':len(q.stdout),'stderrBytes':len(q.stderr)})
+  assert q.returncode==0,name
+  return q
+ run('venv',[sys.executable,'-m','venv',str(root/'venv')],45)
+ py=root/'venv/bin/python'
+ run('install-pinned-wheel',[str(py),'-I','-B','-m','pip','--isolated','--disable-pip-version-check','install','--no-input','--no-cache-dir','--only-binary=:all:','--index-url','https://pypi.org/simple','--report',str(root/'pip-install-report.json'),str(root/'saintvision_control_plane-0.1.0-py3-none-any.whl')],120)
+ run('pip-check',[str(py),'-I','-B','-m','pip','--isolated','--disable-pip-version-check','check'],20)
+ code='import importlib.metadata,json,sys; print(json.dumps({"python":sys.version.split()[0],"versions":{d.metadata["Name"]:d.version for d in importlib.metadata.distributions()}}))'
+ q=run('installed-metadata',[str(py),'-I','-B','-c',code],15);installed=json.loads(q.stdout);norm=lambda x:x.lower().replace('_','-')
+ versions={norm(k):v for k,v in installed['versions'].items()}
+ for name,version in pins['directPinnedVersions'].items():assert versions[norm(name)]==version
+ library=root/'venv/lib'/('python'+str(sys.version_info.major)+'.'+str(sys.version_info.minor))/'site-packages/inv/fresh_cpu_admission.py';assert sha(library.read_bytes())==pins['installedLibrarySHA256']
+ result.update(status='PREPARED_NOT_EXECUTED',interpreter=str(py),interpreterSHA256=sha(py.read_bytes()),installedLibrarySHA256=sha(library.read_bytes()),installedDistributions=installed['versions'],pipInstallReportSHA256=sha((root/'pip-install-report.json').read_bytes()),phase='metadata-and-hash-verification')
+except BaseException as error:
+ result.update(status='HOLD_PREPARATION_FAILED',phase=phase,errorClass=type(error).__name__,rawDiagnosticSuppressed=True)
+print(json.dumps(result))
+raise SystemExit(0 if result.get('status')=='PREPARED_NOT_EXECUTED' else 2)

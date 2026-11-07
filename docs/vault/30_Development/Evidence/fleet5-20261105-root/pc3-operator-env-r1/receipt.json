@@ -1,0 +1,36 @@
+{
+  "atKST": "2026-11-07T15:18:29+09:00",
+  "SSHExit": 2,
+  "knownHostsUnchanged": true,
+  "stderrBytes": 0,
+  "rawDiagnosticsSuppressed": true,
+  "remote": {
+    "preparationOnly": true,
+    "actualAdmission": "NOT_RUN",
+    "entryAppOrNodeExecuted": false,
+    "credentialProfileOrDBConnection": false,
+    "oldIdentityStateChanges": false,
+    "wholeProgramComplete": false,
+    "ownedDirectory": "/home/saintvision-invion3/saintvision-share/ops-fresh-cpu-1efea-r1-20261107",
+    "source": "1efea494f026e932360c35ae811b6423d874a2e7",
+    "copiedFileHashes": {
+      "saintvision_control_plane-0.1.0-py3-none-any.whl": "b329c2f89bb81dcc4b841fca6bf18cd8bfeeed07a657fbab7e6b6e9f4edd8d23",
+      "inv-node.ci": "d0fbeeced59814cfe7cbd06d6fbbdb8871e214460462f5ad1b8c2e4af8d1ac7b",
+      "fresh_cpu_admission.py": "8129ab5acf7061b0bc1834aa1142ae944471b1b177f018c810de34ea9a53fe7d",
+      "operator_reconcile_fresh_cpu.py": "42e89b6173cd9a8ad1cfa6998da30f068d6409e03e803b523bfb7f076576a3aa",
+      "source-bindings.json": "d1081d209d4395a4a19a1740fb78db0f5a95d19a97a6f31cd296d4baf5999d59"
+    },
+    "stages": [
+      {
+        "stage": "venv",
+        "exit": 1,
+        "stdoutBytes": 459,
+        "stderrBytes": 0
+      }
+    ],
+    "status": "HOLD_PREPARATION_FAILED",
+    "phase": "venv",
+    "errorClass": "AssertionError",
+    "rawDiagnosticSuppressed": true
+  }
+}

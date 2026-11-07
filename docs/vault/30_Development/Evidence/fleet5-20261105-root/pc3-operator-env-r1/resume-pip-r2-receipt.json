@@ -1,0 +1,92 @@
+{
+  "atKST": "2026-11-07T15:21:18+09:00",
+  "SSHExit": 0,
+  "knownHostsUnchanged": true,
+  "stderrBytes": 0,
+  "rawDiagnosticsSuppressed": true,
+  "remote": {
+    "preparationOnly": true,
+    "entryAppOrNodeExecuted": false,
+    "credentialProfileOrDBConnection": false,
+    "oldIdentityStateChanges": false,
+    "actualAdmission": "NOT_RUN",
+    "wholeProgramComplete": false,
+    "originalFailureSHA256Before": "887346dc6d6b9707154a03b3d60956362690218eb331dbafe9da2ca2048b9b36",
+    "stages": [
+      {
+        "stage": "r2-prefix-check",
+        "exit": 0,
+        "stdoutBytes": 111,
+        "stderrBytes": 0
+      },
+      {
+        "stage": "r2-install-pinned-wheel",
+        "exit": 0,
+        "stdoutBytes": 10035,
+        "stderrBytes": 0
+      },
+      {
+        "stage": "r2-pip-check",
+        "exit": 0,
+        "stdoutBytes": 30,
+        "stderrBytes": 0
+      },
+      {
+        "stage": "r2-installed-metadata",
+        "exit": 0,
+        "stdoutBytes": 922,
+        "stderrBytes": 0
+      }
+    ],
+    "status": "PREPARED_NOT_EXECUTED",
+    "phase": "metadata-and-hash-verified",
+    "ownedDirectory": "/home/saintvision-invion3/saintvision-share/ops-fresh-cpu-1efea-r1-20261107",
+    "interpreter": "/home/saintvision-invion3/saintvision-share/ops-fresh-cpu-1efea-r1-20261107/venv/bin/python",
+    "interpreterSHA256": "52e0a13e60a981d8c4b6478be2ba5176f69da07948a056bf49cf6f077e30cb41",
+    "installedLibrarySHA256": "76407ced1411f42a5eddd71c894f541b8691d461d4eb1eaea30f63b8bcf90d2c",
+    "installedDistributions": {
+      "webcolors": "25.10.0",
+      "annotated-doc": "0.0.5",
+      "PyJWT": "2.15.1",
+      "cryptography": "50.0.1",
+      "fqdn": "1.6.0",
+      "pydantic": "2.13.5",
+      "typing_extensions": "4.16.0",
+      "isoduration": "20.11.0",
+      "tzdata": "2026.6",
+      "starlette": "1.10.0",
+      "fastapi": "0.141.1",
+      "cffi": "2.1.1",
+      "arrow": "1.4.0",
+      "pycparser": "3.12",
+      "typing-inspection": "0.4.5",
+      "pip": "26.2.1",
+      "attrs": "26.1.0",
+      "annotated-types": "0.8.0",
+      "rpds-py": "2026.9.1",
+      "anyio": "4.16.0",
+      "rfc3339-validator": "0.1.4",
+      "saintvision-control-plane": "0.1.0",
+      "jsonschema-specifications": "2025.9.1",
+      "python-dateutil": "4.0.0",
+      "click": "8.5.1",
+      "jsonschema": "4.26.0",
+      "uri-template": "1.3.0",
+      "six": "1.17.0",
+      "websockets": "17.1",
+      "rfc3987": "1.3.8",
+      "psycopg": "3.3.5",
+      "jsonpointer": "3.10",
+      "idna": "3.20",
+      "referencing": "0.37.0",
+      "uvicorn": "0.52.4",
+      "psycopg-binary": "3.3.5",
+      "h11": "0.16.0",
+      "pydantic_core": "2.46.5"
+    },
+    "pipInstallReportSHA256": "fe0f4dc228f4289dfa74d8bab54aca9ab6f294d83ece0f354ce7853060840b15",
+    "originalFailurePreserved": true,
+    "pipBootstrapWheelSHA256": "71138adf1f4ca900cdb7d289c21b7494329f2332b6d85f0e1c42108c0384ed3e",
+    "copiedArtifactsUnchanged": true
+  }
+}

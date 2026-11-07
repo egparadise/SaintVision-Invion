@@ -1,0 +1,10 @@
+{
+  "atKST": "2026-11-07T15:21:11+09:00",
+  "knownCause": "Ubuntu ensurepip missing, diagnostic wraps not and available onto different lines. No apt/sudo/global changes. Preserve original venv failure and use trusted bundled pip wheel in same exact owned partial venv.",
+  "pipWheelSource": "C:\\Users\\inviz\\AppData\\Local\\Programs\\Python\\Python314\\Lib\\ensurepip\\_bundled\\pip-26.2.1-py3-none-any.whl",
+  "pipWheelSHA256": "71138adf1f4ca900cdb7d289c21b7494329f2332b6d85f0e1c42108c0384ed3e",
+  "pipWheelBytes": 1816632,
+  "candidateSource": "1efea494f026e932360c35ae811b6423d874a2e7",
+  "newProductOrNodeExecution": false,
+  "actualAdmission": "NOT_RUN"
+}

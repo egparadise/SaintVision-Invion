@@ -1,0 +1,8 @@
+{
+  "ensurepipUnavailable": false,
+  "venvPythonExists": true,
+  "venvPythonSHA256": "52e0a13e60a981d8c4b6478be2ba5176f69da07948a056bf49cf6f077e30cb41",
+  "expectedBindingsPresent": true,
+  "venvOnlyDiagnosticNoCredentialsWerePassed": "The virtual environment was not created successfully because ensurepip is not\navailable.  On Debian/Ubuntu systems, you need to install the python3-venv\npackage using the following command.\n\n    apt install python3.14-venv\n\nYou may need to use sudo with that command.  After installing the python3-venv\npackage, recreate your virtual environment.\n\nFailing command: /home/saintvision-invion3/saintvision-share/ops-fresh-cpu-1efea-r1-20261107/venv/bin/python3\n\n",
+  "firstLocalDiagnosticCommand": "SyntaxError1 before SSH due nested PowerShell quoting; corrected by UTF8 script file, no remote execution from that attempt."
+}
