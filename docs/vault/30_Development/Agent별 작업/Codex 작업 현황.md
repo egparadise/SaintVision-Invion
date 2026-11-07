@@ -1,15 +1,19 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.486"
+version: "1.0.487"
 status: "review"
 author: "Codex"
-updated: "2026-11-08T02:08:30+09:00"
+updated: "2026-11-08T02:34:04+09:00"
 source_of_truth: "Git"
 active_card: "FLEET5 continued supervision with PORTAL-REFRESH-FLEET-20261106"
-active_card_status: "CSP428eExactCIBrowserArtifactVerified_ActualClaudeReady; ActualStoragePrivateUID1000AndRealOwnerWorkspaceReadyV2NodeNull_FirstIntents200Empty; OldB48RouteRetained_NewFrontendReviewDeployPending"
-active_card_next: "Root publishes verified immutable428e inputs then starts one actual Claude review; Root-only canonical APPLY pauses during review full-state window. After acceptance Root deploys exact frontend and verifies actual strict-CSP browser/login/no-blink. Genuine workspace ready; no Run/votes yet. PC1/PC5/renewal/all5 remain."
+active_card_status: "ActualClaude4a29ChangesRequired_OneMediumCR-CSP02DevLocalCJSBootRegression; ProductionCSP428eCorrectionSound; ExactBaselineAC11Dispatched_BoundedESMSourceOwnerReady"
+active_card_next: "Actual Orca Codex fixes CR-CSP02 require-free ESM dev/build compatibility, preserves canonical validator/security/old tests and adds hosted dev proof plus exact Frontend+Docs. Root watches exact baseline42396627296, then one actual Claude delta review. OldB48/API96/schema0068/realWorkspaceReadyV2 retained; real Run/5PC gates remain."
 ---
+
+## 2026-11-08T02:34:04+09:00 실제 R1 검토 결과와 CR-CSP02 한정 수정 준비
+
+실제 Claude4a29b57e는428e의배포용strictCSP수정·canonical검증·새회귀·정확favicon예외를타당하다고평가했으나, build전용CommonJS변환때문에기존npmdev경로가부팅되지않는CR-CSP-02(Medium)1건을제시했다. Root가원문/21입력hash·4자기문서만변경·공식Docs42396250008/19단계·canonical527399B불변과실제검토자종료/해제를대조했다. 정적판정을실행성공/실패로꾸미지않고정확428e에서기존AC11dev브라우저확인42396627296을한번dispatch했다. 실제판정과require-freeESM한정수정·개발/배포양쪽브라우저증거가남으며새화면재배포는아직수락하지않는다. 기존b48복구route·새API96·0068·genuineWorkspace ready/version2/NodeNULL을보존한다. 다음첫행동/담당은actualOrcaCodex의dev/build호환require-freeESM수정과동일source호스팅devproof이다.
 
 ## 2026-11-08T02:08:30+09:00 진짜 storage 준비·실제 관리자 Workspace ready 결과
 

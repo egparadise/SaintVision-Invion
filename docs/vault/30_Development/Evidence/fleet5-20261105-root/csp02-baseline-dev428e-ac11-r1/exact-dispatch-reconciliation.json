@@ -1,0 +1,11 @@
+{
+  "atKST": "2026-11-08T02:31:58+09:00",
+  "runID": 42396627296,
+  "exactHeadRefCorrelationPathEventAttempt1": true,
+  "initialImmediateMetadataAssertionFailed": true,
+  "sameRecordedRunReadbackReconciled": true,
+  "redispatched": false,
+  "currentStatus": "in_progress",
+  "currentConclusion": null,
+  "purpose": "Retain expected dev failure evidence; not code/product acceptance"
+}

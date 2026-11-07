@@ -1,6 +1,6 @@
 {
   "schema": "fleet5-root-review-resource-sequence:1",
-  "atKST": "2026-11-08T02:08:30+09:00",
+  "atKST": "2026-11-08T02:34:04+09:00",
   "completedB": {
     "task": "task_d4c4c809ed4e",
     "review": "ac9182c3e3d606ec027c0be2e90e049ff50d54f1",
@@ -15,11 +15,13 @@
   "active": null,
   "pending": [
     {
-      "id": "CR-CSP-01",
-      "state": "SOURCE428E_VERIFIED_READY_ACTUAL_CLAUDE_REVIEW",
+      "id": "CR-CSP-02",
+      "severity": "Medium",
+      "state": "READY_BOUNDED_DEV_ESM_SOURCE_CORRECTION",
+      "owner": "actual Orca Codex author",
       "source": "428e5fc6b822d33e7e76316f443716b03579efa0",
-      "owner": "actual Orca Claude reviewer after Root525 inputs published",
-      "authorExitedReleased": true
+      "actualReview": "4a29b57e6c6ccb75eed50147c00d52d3c8d6ac04",
+      "baselineAC11Run": 42396627296
     }
   ],
   "authorParallelWork": "B frozen b51 awaiting actual delta verdict; H12 accepted6d7 plus read-only five-row audit delivered, Root owns first CPU journey preflight. Optional Low backlog is not a mandatory new scope.",
@@ -30,7 +32,7 @@
     "review": "0e53fc024ca773b7719182e170e5e126aeaf5b95",
     "verdict": "ACCEPT TEST-ONLY; R-L1 CLOSED; no new findings"
   },
-  "nextActualReviewTrigger": "Root publishes immutable verified428e inputs then starts exactly one actual Claude. No optional review loop; CR-CSP-01 actual product boot defect stays open until actual review/deploy/browser proof.",
+  "nextActualReviewTrigger": "Only the CR-CSP02 source/dev proof delta after exact CI; inherit sound R1 production findings. Root supervises one actual Claude at a time; original real operating gates remain.",
   "completedIntegration": {
     "task": "task_78064fb4b7ff",
     "dispatch": "ctx_ed7ec73163d6",
@@ -3246,5 +3248,37 @@
     "firstIntentsHTTP": 200,
     "items": 0,
     "actualRunOrVotesCreated": false
+  },
+  "actualCSPReview": {
+    "atKST": "2026-11-08T02:31:57+09:00",
+    "reviewSource": "4a29b57e6c6ccb75eed50147c00d52d3c8d6ac04",
+    "reviewBase": "86acd9816f3ba397d02a07e90d2e912e414b1bac",
+    "reviewedTarget": "428e5fc6b822d33e7e76316f443716b03579efa0",
+    "actualVerdict": "CHANGES_REQUIRED_ONE_BOUNDED_DEV_ENTRY_POINT_DEFECT_KEEP_REAL_DEPLOYMENT_GATES",
+    "remainingMandatoryCodeDefects": [
+      {
+        "id": "CR-CSP-02",
+        "severity": "Medium",
+        "kind": "dev entry point regression",
+        "evidenceAtReview": "static locked-Vite source, not executed by reviewer"
+      }
+    ],
+    "productionBuildCorrectionSoundPerActualReview": true,
+    "RootInputPinsMatched": 21,
+    "ownFourDocsOnlyDirectParentRemoteExact": true,
+    "Docs": 42396250008,
+    "DocsJob": 128474140394,
+    "exactManualAttempt1All19Success": true,
+    "canonicalFullBytesMatchAtRootVerification": true,
+    "canonicalBytes": 527399,
+    "canonicalSHA256": "d25cf6dce45fc7047884c5705f386527368b6ae44e85ce39b9120b74748a33d7",
+    "reviewerLifecycle": {
+      "state": "succeeded",
+      "stage": "settled",
+      "liveness": "exited",
+      "terminalState": "released"
+    },
+    "actualDeploymentAccepted": false,
+    "wholeProgramComplete": false
   }
 }

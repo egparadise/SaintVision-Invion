@@ -1,0 +1,108 @@
+{
+  "docID": "EVIDENCE-FLEET5-CSP-STATIC-VALIDATOR-REVIEW-R1-20261108-CLAUDE",
+  "version": "1.0.0",
+  "atKST": "2026-11-08T02:21:45+09:00",
+  "task": "CR-CSP-01 canonical static validator correction, independent review R1",
+  "orcaTaskID": "task_9989fc85304e",
+  "orcaDispatchID": "ctx_d94bc625e570",
+  "reviewer": "Claude (actual independent reviewer)",
+  "author": "Codex ctx_3571ec38775b / task_1b0f4d26fa63",
+  "obsidianApplyOwner": "Root",
+  "reviewBranch": "agent/claude/fleet5-csp-static-validator-review-r1-20261108",
+  "deliveryBase": "86acd9816f3ba397d02a07e90d2e912e414b1bac",
+  "targetSource": "428e5fc6b822d33e7e76316f443716b03579efa0",
+  "targetSourceBranch": "agent/codex/fleet5-csp-static-validator-r1-20261108",
+  "targetCommits": [
+    "8ee1e5222b451935a96b2b74bafaba1667424375",
+    "428e5fc6b822d33e7e76316f443716b03579efa0"
+  ],
+  "acceptedBase": "96afd799d49717fd40e4ddabd538d82accbe1958",
+  "rootCheckpoint": "5e516c57da27322946acbcac4295b650b41b8ed2",
+  "rootInputPins": {
+    "method": "git show from the Root checkpoint; SHA-256 of the blob bytes",
+    "csp428e-root-verified-r1": {
+      "author-final-lifecycle.json": "f0b9195cc1638ae99884e341a15f79ba0eb917223b60d41c2d5846c4665aceaa",
+      "delivery.json": "292f399fcd68d8a993b25dba96a8652460996d0f4a81c73f0858509dba767477",
+      "docs-artifacts.json": "be745820dcf6a34405374b5a15096860589f2daf9af4632ee983cfc5cc2c7543",
+      "docs-jobs.json": "3d7aba67b226cfc7829a1f4bbc1669ed278b917c964da30982fef18ceff27785",
+      "docs-run.json": "14124362fa81900c4296ca6e26399501bfe82ab82a8d0206da968a97c789c301",
+      "first-ci-failure.json": "a6efe763dfe5cd9132beeb71e5f1eab25ea627a96eba8c666d5b9c1a3c42fb4b",
+      "frontend-artifacts.json": "eb942874078203d6bd86cc4da663ffc0cbf59e7dee5a7ab9c1d97091d3095384",
+      "frontend-jobs.json": "5ba719f161a46b44240d378704b970ebafb5b71129c5ae831d4cef338dfbe259",
+      "frontend-run.json": "e8a71e4b988191ffd1ec3d57597e138cfbba50c99fc52e27b351e13ec62d291c",
+      "local-gates-final-428e5fc6b822.json": "fae7810937840f07b54b19eb49c918a8335776f38056211686f65323415ae556",
+      "official-browser-result.json": "e985a35cfb7a59a479bbfd31f30032a84003d8c529483346fdaa2bf073a636ac",
+      "official-validator-manifest.json": "823c4efb0b2a9f9d3c8df080fbbf47364f477dea46815ec54cb24a9beb27bd0f",
+      "official-vitest-log-count-proof.json": "7d965f7038e6c8ff9ae540d97aff3440cf5e3fb5164565d867ba1faa1242e562",
+      "postCI-final-sync-check.json": "048a39e4f2b1fcc18ba958951639b8e9e0463b2fad0446f1ebaf69a53d368582",
+      "protected-components.json": "8c5349b743cd9fa462174647dcfc5da21bad09fcac8f7951405c7f87ed0c7bb5",
+      "protected-sql0068.json": "311b483eff5026e927df35cebad2bf9ec49acbee6f77c1ba305db5acf5bd181b",
+      "root-metadata-verifier.py.txt": "e92f66699b26d09a43d0125a9c06d547c023ef3f21c01ff49b5ccf1d00389b8a",
+      "root-verification.json": "e807e22cb79252c1739293982397b9481d47c483d5956b2b822d93c379c87a10",
+      "sync-state-final-comparison.json": "9c77c2c169944304e71934d4b9f9d22573c2d308bdb8a18aa2e51733887331bc"
+    },
+    "actual-browser-csp-defect-recovery-r1": {
+      "mandatory-finding.json": "67b664425e0eef8e7df39847956d79542c40bea2539f681ddff78fd801903839",
+      "actual-strict-csp-eval-diagnostic.json": "a2738df0d706cb2d4c74e6691948ead5033fc281570c51a4d323c26fb2d547cc"
+    }
+  },
+  "verdict": "CHANGES_REQUIRED_ONE_BOUNDED_DEV_ENTRY_POINT_DEFECT_KEEP_REAL_DEPLOYMENT_GATES",
+  "crCsp01State": "PRODUCTION_BUILD_CORRECTION_SOUND_NOT_CLOSED_PENDING_CR_CSP_02",
+  "mandatoryDefects": [
+    {
+      "id": "CR-CSP-02",
+      "severity": "Medium",
+      "kind": "regression of an existing entry point (dev server); production build unaffected",
+      "evidenceKind": "static source reading of the locked Vite 6.4.5 dev server; not executed by the reviewer",
+      "summary": "The browser imports the generated validator as local CommonJS. vite.config.ts only converts it under build.commonjsOptions, which the Vite dev server never applies. Under npm run dev the module is served unconverted, its default import fails at ESM link time, and the App root module never evaluates.",
+      "location": [
+        "apps/web/src/shared/api/nodeCertificateObservation.ts:1 import validate from '@/contracts/node-certificate-validator.cjs'",
+        "apps/web/scripts/node-certificate-validator.mjs (emits standaloneCode CJS: module.exports plus require() of ajv/ajv-formats runtime helpers)",
+        "apps/web/vite.config.ts build.commonjsOptions (build only)"
+      ],
+      "causalChain": [
+        "predev runs validators:generate, so the .cjs exists, then vite starts the dev server.",
+        "main.tsx imports @/app/App, and App.tsx:36 eagerly imports nodeCertificateObservation, which default-imports the .cjs.",
+        "Vite 6.4.5 dep-CkSfqg8D.js:6615 knownJsSrcRE excludes .cjs, so isExplicitImportRequired (40659-40661) appends ?import. The transform middleware condition (37536) serves the file as JavaScript. canSkipImportAnalysis (40653) does not skip it, and no dev plugin converts CommonJS: the commonjs plugin is registered only in resolveBuildPlugins (46300-46307), and the named-import interop (40930-40990) applies only to optimized dependency files.",
+        "The browser receives '\"use strict\";module.exports = validate10; ... require(...)' as an ES module with no default export, so linking the import graph throws a SyntaxError (requested module does not provide an export named default). The React root is never rendered.",
+        "Base 96 boots under dev: there the browser imported the bare packages ajv/ajv-formats, which the dep optimizer pre-bundles, and the dev server sets no CSP. This is a regression introduced by 8ee1e522."
+      ],
+      "impact": [
+        ".github/workflows/ac11-accessibility-e2e.yml:75 starts npm run dev and then run_real_browser_acceptance.py --scenario desktop-ui-invariants, which waits 10 s for a visible header (tools/run_real_browser_acceptance.py:978). The curl readiness probe only fetches index.html, so the step would fail after Vite reports ready. The last runs (42093775632 and two others on 2026-11-05) succeeded, so this is a live evidence lane.",
+        "tools/run_s02_real_api_acceptance.py:185 and tools/run_s04_fe_matrix.py:318 also boot the app through npm run dev.",
+        "The brief requires every dev/build/lint/test/eval entry point to function. The author README line 21 says every dev entry regenerates the validator; generation does happen, but the generated module cannot be served by dev."
+      ],
+      "whyHostedCIDidNotCatchIt": "Frontend 42393304702 covers lint, Vitest (Node, where the CommonJS import resolves), tsc and vite build (where commonjsOptions applies), and the built-dist strict-CSP boot. No workflow that ran at 428e starts the dev server.",
+      "boundedCorrectionRequirement": "The module the browser imports must be valid ESM under both vite dev and vite build, with no module.exports and no require(), while keeping the same canonical draft2020 $ref, strict:false plus full formats, standalone (no runtime compile) output, deterministic manifest and drift check, and the unchanged semantic tail. Note that Ajv standaloneCode with code.esm:true alone still emits require() for runtime and format helpers, so esm:true by itself is not sufficient. One candidate is to bundle the standalone output at generation time into a self-contained ESM file with the already-locked esbuild that Vite uses; the author chooses the method. Adjust the .d.cts declaration and the VM test loader to match.",
+      "requiredRegression": "One meaningful check that the browser-imported module contains no require( or module.exports and is loadable as ESM, plus hosted proof that the dev path boots: an AC11 accessibility e2e workflow_dispatch at the corrected exact SHA, or an equivalent hosted dev-server boot step. Root owns the dispatch decision.",
+      "reviewerConfirmationCommandForRoot": "gh workflow run ac11-accessibility-e2e.yml --ref agent/codex/fleet5-csp-static-validator-r1-20261108 -f correlation_id=<unique>  (expected at 428e: the 'Run desktop accessibility invariants in real Chrome' step fails waiting for header; the private vite log or browser console shows the default-export SyntaxError)"
+    }
+  ],
+  "reviewAreaResults": {
+    "1_generator": "Sound for build and test. It uses the same Ajv2020 strict:false plus addFormats, addSchema of the canonical core schema, and compile of {$ref: $id#/$defs/ProjectNodeCertificateObservationResponse} as the former runtime code. Output and manifest have no timestamps or paths. Manifest pins re-derived from 428e blobs: schemaSHA256 f8bb8fa8...404f, generatorSHA256 5958abf2...1022, lockSHA256 1fa82239...2fbd, all equal to the official manifest. The --check option fails closed on drift of either file. Entry points: build/lint/test/eval are hosted-proven or hook-only; dev is broken at runtime (CR-CSP-02).",
+    "2_semanticTailAndWiring": "The nodeCertificateObservation.ts tail from 'const renewalWindowMillis' to EOF is byte-identical to 96 (SHA-256 d136f8bf...99c7 for both). The diff only removes the three runtime Ajv imports and the compile, and adds one import. No string codegen reaches the browser: built source maps contain no ajv compile/core modules (official-browser-result bundledAjvCompilerModules=[]). The declaration, ESLint global ignore, .gitignore and package hooks are coherent. vite build.commonjsOptions is correct for build only.",
+    "3_regressions": "The 14 new cases are meaningful. A VM context with string codegen disabled, which proves new Function/eval throw, loads the generated output. The cases check fixture acceptance, four RFC3339 format rejections, nodeId pattern and maxItems, 11 semantic rejections through checkedNodeCertificateObservation, project, freshness (+60001/-5001), incomplete and disabled. They also run a temp-dir generator drift cycle: check fails, write matches, check passes, tampered output and manifest fail, and rewrite is deterministic. They do not cover dev serving, which is the gap behind CR-CSP-02.",
+    "4_browserVerifierAndFrontendSteps": "Sound. Headers are parsed from deploy/intranet/portal/security-headers.conf (SHA-256 1365881a...c731, deploy tree unchanged against 96), and the script asserts script-src 'self' without unsafe-eval. A separate probe page proves EvalError for Function and eval before the real app loads. Chrome runs with chromium_sandbox=True and no mocks. Only GET requests are allowed, and JS, CSS and auth-config must all load. Page errors, request failures and CSP console errors must be empty. The favicon exception is narrow: an exact URL origin+'/favicon.svg' with status exactly 404. The base 96 index.html:5 references /favicon.svg, and 96 apps/web/public has no such file. Every other HTTP status >=400 remains fatal. The 8ee1e522 Frontend run 42392904251 failed only at step 11; the 428e run 42393304702 attempt 1 passed all 14 + 17 steps.",
+    "5_evidenceAccuracy": "Root and author claims I checked are accurate. Changed source paths are exactly the 10 listed. The contracts, packages, services, migrations, src, tests, deploy, apps/studio and package-lock tree OIDs are equal at 96 and 428e. No existing test file changed (the only apps/web/tests change is the added file). The official Vitest count is 1350/1350 in 106 files. The author statement that every dev entry 'regenerates' the validator is literally true, but it does not establish that dev works."
+  },
+  "checksActuallyRun": [
+    "git show/diff of 96afd799..8ee1e522..428e5fc6 for every changed source path; parentage verified",
+    "SHA-256 of the nodeCertificateObservation.ts tail at 96 and 428e",
+    "tree OID equality for the protected trees and the package-lock blob between 96 and 428e",
+    "SHA-256 of the schema, generator, lock and security-headers blobs at 428e against the official manifest and browser result",
+    "static read of the installed Vite 6.4.5 dist (same version as the 428e lock) at the lines cited",
+    "static read of the installed ajv 8.20.0 and ajv-formats 3.0.1 dist (same versions as the lock): ajv/dist/standalone/index.js:25-29 switches only the export syntax on code.esm, while ajv-formats/dist/index.js:30 and ajv/dist/compile/index.js:46 emit require() code references in both modes",
+    "gh run view of Frontend 42393304702 (attempt 1, both jobs all success) and 42392904251 (failure only at the strict-CSP boot step); gh run list of AC11 runs",
+    "Root input blob SHA-256 pins from checkpoint 5e516c57",
+    "local docs metadata gates (local-gates.json) and the canonical sync-state full byte comparison (sync-state-comparison.json)"
+  ],
+  "notRunByReviewer": "No Node, npm, Vite, Vitest, tsc, browser, Docker, pytest, DB or product execution on Main. CR-CSP-02 rests on static source evidence and needs hosted confirmation, which Root decides. Hosted CI results are the official runs, not reviewer executions.",
+  "retainedOperatingGates": [
+    "Root actual PC3 strict-CSP deploy plus a real Chrome recheck of anonymous boot, login, no-blink and resources before reactivation",
+    "real approver votes and Run/output/audit",
+    "PC1 key, PC5 RAM/Node, GPU/storage, renewal and reboot-reconnect, five-PC acceptance"
+  ],
+  "preservedStatus": "CR-905-01 remains CLOSED. Original19HOLD/discharges0/runtimeB0/A1-A16/H1-H7/H3EA/RDNULL_HOLD/raw7UNREGISTERED/A01-A40NOT_RUN unchanged.",
+  "nextFirstAction": "Root dispatches CR-CSP-02 to the Codex author lane. After exact-SHA hosted Frontend/Docs and a hosted dev-path boot, one actual Claude reviews that delta only. Root then performs the actual PC3 strict-CSP browser recheck.",
+  "wholeProgramComplete": false
+}

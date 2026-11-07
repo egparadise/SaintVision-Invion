@@ -1,0 +1,30 @@
+{
+  "atKST": "2026-11-08T02:34:04+09:00",
+  "taskID": "FLEET5-CSP02-DEV-ENTRY-CORRECTION-SUPERVISION-20261108",
+  "owner": "Root Codex",
+  "managementBase": "5e516c57da27322946acbcac4295b650b41b8ed2",
+  "actualReviewSHA": "4a29b57e6c6ccb75eed50147c00d52d3c8d6ac04",
+  "reviewedSource": "428e5fc6b822d33e7e76316f443716b03579efa0",
+  "verdict": "CHANGES_REQUIRED_ONE_BOUNDED_DEV_ENTRY_POINT_DEFECT_KEEP_REAL_DEPLOYMENT_GATES",
+  "remainingMandatoryCodeDefects": [
+    {
+      "id": "CR-CSP-02",
+      "severity": "Medium",
+      "kind": "dev entry point regression",
+      "evidenceAtReview": "static locked-Vite source, not executed by reviewer"
+    }
+  ],
+  "reviewerLifecycle": {
+    "state": "succeeded",
+    "stage": "settled",
+    "liveness": "exited",
+    "terminalState": "released"
+  },
+  "baselineAC11Run": 42396627296,
+  "baselineSource": "428e5fc6b822d33e7e76316f443716b03579efa0",
+  "baselineResult": "DISPATCHED_EXACT_SOURCE_RUNTIME_RESULT_PENDING_AT_RECORD",
+  "nextOwner": "Actual Orca Codex author fixes only CR-CSP02 then one bounded actual Claude delta review",
+  "productionDeployment": "NOT_ACCEPTED_NOT_ACTIVATED",
+  "canonicalApply": "Root only, review full-state window ended and reviewer released; safe before next author snapshot window",
+  "wholeProgramComplete": false
+}

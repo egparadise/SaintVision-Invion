@@ -1,0 +1,14 @@
+"""Read the one dispatched baseline. A failed baseline is never product acceptance."""
+import datetime,hashlib,json,re,subprocess
+from pathlib import Path
+r=Path(__file__).resolve().parents[1];out=r/'.work/csp02-baseline-dev428e-ac11-r1';i=json.loads((out/'dispatch-intent.json').read_bytes());rid=i['runID'];GH=r'C:\Program Files\GitHub CLI\gh.exe'
+q=subprocess.run([GH,'run','watch',str(rid),'--repo','egparadise/SaintVision-Invion','--interval','10','--exit-status'],capture_output=True,timeout=2100);watch=q.returncode;(out/'watch.stdout.txt').write_bytes(q.stdout);(out/'watch.stderr.txt').write_bytes(q.stderr)
+data={}
+for name,suffix in [('run',''),('jobs','/jobs?per_page=100')]:
+ q=subprocess.run([GH,'api',f'repos/egparadise/SaintVision-Invion/actions/runs/{rid}'+suffix],capture_output=True,timeout=35);assert q.returncode==0;data[name]=json.loads(q.stdout);(out/('final-'+name+'.json')).write_bytes(q.stdout)
+a=data['run'];jobs=data['jobs'];assert a['id']==rid and a['head_sha']==i['source'] and a['head_branch']==i['branch'] and a['event']=='workflow_dispatch' and a['path']==i['workflow'] and a['run_attempt']==1 and a['display_title']==i['correlation'] and a['status']=='completed';assert jobs['total_count']==len(jobs['jobs'])==1;j=jobs['jobs'][0];assert j['head_sha']==i['source']
+q=subprocess.run([GH,'api','--allow-escape-sequences',f'repos/egparadise/SaintVision-Invion/actions/jobs/{j["id"]}/logs'],capture_output=True,timeout=40);assert q.returncode==0;raw=q.stdout;text=re.sub(r'\x1b\[[0-9;]*[A-Za-z]','',raw.decode('utf8','replace'))
+patterns=['does not provide an export named','module.exports','require is not defined','TimeoutError','waiting for locator','Run desktop accessibility invariants','FAILED '];snippets=[x[:900] for x in text.splitlines() if any(p in x for p in patterns)][-30:]
+failed=[s['name'] for s in j['steps'] if s['conclusion']=='failure'];confirmed=a['conclusion']=='failure' and 'Run desktop accessibility invariants in real Chrome' in failed
+v={'atKST':datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=9))).isoformat(timespec='seconds'),'runID':rid,'source':i['source'],'branch':i['branch'],'correlation':i['correlation'],'workflow':i['workflow'],'attempt':1,'watchExit':watch,'conclusion':a['conclusion'],'jobID':j['id'],'failedSteps':failed,'exactSourceRefPathCorrelationEventAttempt1':True,'actualDevPathFailureConfirmed':confirmed,'exactCJSDefaultImportSyntaxErrorCaptured':any('does not provide an export named' in s for s in snippets),'observedFailureSnippets':snippets,'officialJobLogSHA256':hashlib.sha256(raw).hexdigest(),'officialJobLogBytes':len(raw),'staticReviewCausalChainRemainsSeparateFromRuntimeErrorText':True,'runtimeFailureExpectedNotSuccess':True,'productAcceptance':False,'mainProductExecution':False,'wholeProgramComplete':False}
+(out/'baseline-final-proof.json').write_text(json.dumps(v,indent=2)+'\n');print(json.dumps(v),flush=True)

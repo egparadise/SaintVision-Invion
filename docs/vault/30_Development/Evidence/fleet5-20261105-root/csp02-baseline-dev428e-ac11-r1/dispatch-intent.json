@@ -1,0 +1,14 @@
+{
+  "atKST": "2026-11-08T02:30:19+09:00",
+  "source": "428e5fc6b822d33e7e76316f443716b03579efa0",
+  "branch": "agent/codex/fleet5-csp-static-validator-r1-20261108",
+  "correlation": "fleet5-root-csp02-baseline-dev428e-7179ec272d3b4ae9ad2ed1432ee9b3cd",
+  "workflow": ".github/workflows/ac11-accessibility-e2e.yml",
+  "dispatchExit": 0,
+  "purpose": "Confirm review CR-CSP-02 against unchanged428e dev path; expected failure is evidence, not product success",
+  "expectedFailure": "Vite dev CJS default import/module link boot failure",
+  "sourceIndependentReview": "CHANGES_REQUIRED_CR_CSP_02",
+  "mainProductExecution": false,
+  "wholeProgramComplete": false,
+  "runID": 42396627296
+}
