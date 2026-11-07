@@ -1,11 +1,11 @@
 ---
 doc_id: "GOV-FLEET5-B-BOOTSTRAP-SCOPE-20261106"
 title: "FLEET5 B 병행 역할과 전환 구현 범위 결정"
-version: "1.4.17"
+version: "1.4.18"
 status: "review"
 author: "Codex"
 reviewer: "Claude"
-updated: "2026-11-07T08:47:15+09:00"
+updated: "2026-11-07T09:13:21+09:00"
 source_of_truth: "Git"
 ---
 
@@ -193,3 +193,8 @@ Root는0e66/parent9cea의190ownA·93script/81원문copy/17최종실행전후hash
 ## 모드 출처 조건부 후보 검증과 실제 단일 검토
 
 b3bb/direct9690의57ownA·55hash/14helper/최종11commandbracket/25실제sourcehash/6ASTDATAcontrols·Docs42312934123/all19를Root가대조했다. acceptedBaselineDischarges0/원래19byte불변/조건부genuinedataclass·receiver·field전제를유지하며actualH12reviewerexit/release뒤Claude ctx_6b18bf1ef5b4/task_696b2783bc0b가한정검토에착수했다. captureonce/exactstr제안은DATAONLY이며제품/새13entry/SQLnetworkeffect/runtime/전역권한승격이아니다.
+
+
+## 조건부 모드 출처 수락과 최소 guard CODE WIP
+
+e75b의실제CONDITIONAL_MODE_SOURCE_EVIDENCE_ACCEPT_KEEP_19_HOLD와LowL1/C1C2를Root가검증했다. msg_db48b2c9a36e는exactb3bbbase에서DeliveryWorker.once단일capture/exactbuiltinstr/domainguard·새unit·참조Attribute와Call.func정규화/전체참조집합한정C1만허용한다. 별도고정WIP격리검증전제품시험·게시·CI는미허용이며원래19baseline/actualRuntimeB0/allbindingsNULLHOLD/전역수치는불변이다. SQL/네트워크/Engine효과·새13entry·권한/운영인수가아니다.

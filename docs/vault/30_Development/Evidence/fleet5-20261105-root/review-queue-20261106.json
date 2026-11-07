@@ -1,6 +1,6 @@
 {
   "schema": "fleet5-root-review-resource-sequence:1",
-  "atKST": "2026-11-07T09:00:27+09:00",
+  "atKST": "2026-11-07T09:13:21+09:00",
   "completedB": {
     "task": "task_d4c4c809ed4e",
     "review": "ac9182c3e3d606ec027c0be2e90e049ff50d54f1",
@@ -13,49 +13,30 @@
     "source": "8874b2dfe0dda9a019bd5f334636668290702e13"
   },
   "active": {
-    "atKST": "2026-11-07T08:47:15+09:00",
-    "status": "ACTUAL_B_MODE_ORIGIN_CONDITIONAL_SOURCE_REVIEW_STARTED_VERDICT_PENDING",
-    "target": "b3bbdc8d92a39f2f797a7680deb2770d6f705af0",
-    "sourceDocs": 42312934123,
-    "ownerTask": "task_a8fd2969f0b3",
-    "ownerDispatch": "ctx_6f0f8253b8a7",
-    "ownerQuestion": "msg_5fcc462b63c7",
-    "rootScope": "msg_ec880f3ed724",
-    "task": "task_696b2783bc0b",
-    "dispatch": "ctx_6b18bf1ef5b4",
-    "predecessor": "ctx_8cd16f1141a3",
-    "predecessorFreshLifecycle": "succeeded_settled_exited_released",
+    "atKST": "2026-11-07T09:13:21+09:00",
+    "status": "ACTUAL_H12_R2_NARROW_DELTA_CONTRACT_REVIEW_STARTED_VERDICT_PENDING",
+    "target": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed",
+    "sourceBranch": "agent/codex/fleet5-k2-h1-h2-authority-design-r2-20261107",
+    "sourceDocs": 42314572353,
+    "ownerTask": "task_a95ef3d8ccce",
+    "ownerDispatch": "ctx_ed23b4a777d0",
+    "ownerQuestion": "msg_16c9f2a0ec9b",
+    "rootFixGrant": "msg_e41b206771c3",
+    "task": "task_638219a79555",
+    "dependency": "task_696b2783bc0b",
+    "dependencyDispatch": "ctx_6b18bf1ef5b4",
+    "workerStarted": true,
+    "dispatch": "ctx_2e3e33bdc879",
     "independentVerdict": null,
-    "acceptedBaselineDischarges": 0,
-    "original19HOLD": true,
-    "actualRuntimeB": 0,
-    "futureCode": "CAPTURE_ONCE_EXACT_STR_PROPOSAL_DATA_ONLY_NOT_GRANTED",
-    "wholeProgramComplete": false
+    "findingsClosure": "M1_L1_L2_CANDIDATE_CORRECTIONS_NOT_YET_INDEPENDENTLY_CLOSED",
+    "actualBindings": null,
+    "codeImplementationGranted": false,
+    "wholeProgramComplete": false,
+    "predecessorActualReview": "e75b051d8dcd39b24dba4b648d74d7f7adecbd0f",
+    "predecessorFinalLifecycle": "succeeded_settled_exited_released"
   },
-  "pending": [
-    {
-      "atKST": "2026-11-07T09:00:27+09:00",
-      "status": "FROZEN_R2_DOCS_VERIFIED_DEPENDENT_REVIEW_TASK_QUEUED_NOT_STARTED",
-      "target": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed",
-      "sourceBranch": "agent/codex/fleet5-k2-h1-h2-authority-design-r2-20261107",
-      "sourceDocs": 42314572353,
-      "ownerTask": "task_a95ef3d8ccce",
-      "ownerDispatch": "ctx_ed23b4a777d0",
-      "ownerQuestion": "msg_16c9f2a0ec9b",
-      "rootFixGrant": "msg_e41b206771c3",
-      "task": "task_638219a79555",
-      "dependency": "task_696b2783bc0b",
-      "dependencyDispatch": "ctx_6b18bf1ef5b4",
-      "workerStarted": false,
-      "dispatch": null,
-      "independentVerdict": null,
-      "findingsClosure": "M1_L1_L2_CANDIDATE_CORRECTIONS_NOT_YET_INDEPENDENTLY_CLOSED",
-      "actualBindings": null,
-      "codeImplementationGranted": false,
-      "wholeProgramComplete": false
-    }
-  ],
-  "authorParallelWork": "H12R20bf8 own10docs/pins/Docs verified, queueddependenttask6382 ONLY/no newClaude; owner holds exactsource awaiting actualdeltaverdict. Bmodeb3bb actualconditionalreviewctx6b18 continues.",
+  "pending": [],
+  "authorParallelWork": "B sourceconditionalaccept e75b verified/LowL1+C1C2 carried; exactonePythonfunction+newunit+staticrule WIP grantedmsgdb48, no actualtests/commit/push yet. H12R2 exact0bf8 under actualsingleClaude ctx2e3.",
   "reason": "actuala7e9 and5a3c reviews+CI verified andprecisefixscopesdelivered; do notselfclose source/runtime",
   "genericApprovalMissing": false,
   "completedRL1": {
@@ -778,7 +759,7 @@
     ],
     "reviewerFinalLifecycle": "succeeded_settled_exited_released"
   },
-  "futureDesignReviewTrigger": "Actual Bmode worker_done/verdict plus fresh succeeded_settled_exited_released/custody; then inspect ready task6382 and start ONE H12R2 delta reviewer. No mailpoll or early launch.",
+  "futureDesignReviewTrigger": "Actual H12R2verdict; B CODEreview only after frozenWIP/Rootactualunitverification/pinnedpublication/appropriateCI and freshreviewerexit/release.",
   "completedA7R2": {
     "atKST": "2026-11-07T08:05:16+09:00",
     "status": "ACTUAL_PARTIAL_STATIC_EVIDENCE_ACCEPT_L1_CLOSED_KEEP_HOLD",
@@ -872,5 +853,75 @@
     ],
     "rootDesignFixReply": "msg_e41b206771c3",
     "reviewerFinalLifecycle": "succeeded_settled_exited_released"
+  },
+  "completedBMode": {
+    "atKST": "2026-11-07T09:13:21+09:00",
+    "status": "ACTUAL_CONDITIONAL_MODE_SOURCE_ACCEPT_KEEP_19_HOLD_WITH_CARRIED_LOW_L1",
+    "target": "b3bbdc8d92a39f2f797a7680deb2770d6f705af0",
+    "sourceDocs": 42312934123,
+    "ownerTask": "task_a8fd2969f0b3",
+    "ownerDispatch": "ctx_6f0f8253b8a7",
+    "ownerQuestion": "msg_5fcc462b63c7",
+    "rootScope": "msg_ec880f3ed724",
+    "task": "task_696b2783bc0b",
+    "dispatch": "ctx_6b18bf1ef5b4",
+    "predecessor": "ctx_8cd16f1141a3",
+    "predecessorFreshLifecycle": "succeeded_settled_exited_released",
+    "independentVerdict": "CONDITIONAL_MODE_SOURCE_EVIDENCE_ACCEPT_KEEP_19_HOLD",
+    "acceptedBaselineDischarges": 0,
+    "original19HOLD": true,
+    "actualRuntimeB": 0,
+    "futureCode": "CAPTURE_ONCE_EXACT_STR_PROPOSAL_DATA_ONLY_NOT_GRANTED",
+    "wholeProgramComplete": false,
+    "actualReview": "e75b051d8dcd39b24dba4b648d74d7f7adecbd0f",
+    "actualDocs": 42315871269,
+    "actualWorkerDone": "msg_20532fffc22b",
+    "findings": [
+      {
+        "id": "A7M-L1",
+        "severity": "LOW",
+        "status": "CARRIED_MANDATORY_CONDITION",
+        "source": "mode.py line 119 (card status) and rule() line 43-44",
+        "layer": "auxiliary status predicate, not the 72028 evidence",
+        "validInput": "actual 72028 with tools/lan_pilot.py appended `def _reviewer_second_deliver(delivery, node, permit):\\n    return delivery.deliver(node, permit, observation_only=\"foreign-tag\")` (syntax valid, still 25 parsed, 9 constructors, guards clean)",
+        "observed": "deliverReferences lists both CALLs, but the status remains CONDITIONAL_SOURCE_CANDIDATE_RUNTIME_AND_OWNER_PREMISES_PENDING. Status only requires every reference to be a CALL; rule() requires exactly one deliver call inside once, not one in the universe. A second caller would carry an unconstrained non-bool truthy operand straight into the node_transport.py:280 `or`, which the candidate says originates only at dispatch.py:336.",
+        "actualSourceImpact": "None. On 72028 the universe has exactly one `.deliver` reference, confirmed by the reviewer's independent AST census, and the graph records it. The candidate stays correct, but the predicate does not enforce the completeness fact it relies on.",
+        "minimalFix": "Before any rerun of mode.py on non-72028 source, and in the future code card: require deliverReferences to be exactly one row whose path/span/expressionSHA256 equals the MODE_FORWARD_ARGUMENT_BINDING witness, else UNRESOLVED with a distinct reason (for example DELIVER_REFERENCE_SET_CHANGED). Add one causal control: a second deliver CALL turns UNRESOLVED by that reason and not by an earlier guard. No other change."
+      },
+      {
+        "id": "A7M-I1",
+        "severity": "INFO",
+        "text": "Method-decorator and receiver-field-replacement mutants are refused at card level only by the older full-use-site guard (SYMBOL / WRITE_USE). rule() itself returns CONDITIONAL for them. This is correct fail-closed behaviour and matches the named premise 'genuine bound methods / receivers'. Actual 72028 has no decorators on the relevant methods and no foreign delivery/queue stores. Optional: rule() could assert empty decorator_list. Not required."
+      },
+      {
+        "id": "A7M-I2",
+        "severity": "INFO",
+        "text": "DeliveryQueue.finish:284 keeps its own read `attempt.operation == \"execute\"`, evaluated only when not_sent is truthy. It is outside the 280 target. The proposal's 'capture once / single read' is scoped to the deliver boundary, which is how the History states it. Raising ValueError (not DomainError with not_sent) is what keeps finish from reading a rejected value: not_sent=False short-circuits that comparison."
+      },
+      {
+        "id": "A7M-I3",
+        "severity": "INFO",
+        "text": "The pinned rule() is shaped to today's once text, and on the textual application of the proposal it returns MODE_FORWARDING_CHANGED. An implementing card must re-specify the static mode rule: one capture store immediately before the guard, the exact guard AST, both keywords on the captured local, no other operation store in once, and A7M-L1. Expected, not a defect."
+      },
+      {
+        "id": "A7M-I4",
+        "severity": "INFO",
+        "text": "Path selection, mode value, receiver identity, DB owner and actual permission stay distinct. This card speaks only to mode value provenance and the scoped path selection. The other 10 DB owners and 8 reverse roots are not addressed and remain HOLD. INFO I1/I2/I4/I5/I6 from the actual 1452 review are unchanged."
+      }
+    ],
+    "futureCodeAssessment": {
+      "verdict": "PRECISE_MINIMAL_FUTURE_CONTRACT_DATA_ACCEPT_NOT_GRANTED",
+      "codeTextRevisionRequired": false,
+      "dataEvidence": "The guard expression, evaluated on reviewer values with builtins type/str only, accepts exactly 'execute'/'observe'/'cancel' and rejects 'Execute', '', b'observe', None, 1, a hostile str subclass and a foreign __eq__ object. Zero custom __eq__/__ne__/__hash__/__bool__ calls happen at the guard, because `type(x) is not str` short-circuits `or` with a builtin bool before `in` runs. The accepted values give builtin bool flags and a bool `or` result. This is Python-semantics DATA on reviewer values, not product validation.",
+      "placement": "Textually applied to frozen dispatch.py (sha a6fa3a84..., parse only): the capture and guard are the first two statements of the existing try. The raise is inside the try; the handler `except Exception` maps it to SYS-0001 with not_sent=False, then queue.finish -> 'uncertain' backoff. attempt.operation is read once in the future once [336]. A raising property read is also inside the try.",
+      "whatItRemoves": "Only the foreign/subclass/stateful operation VALUE comparison premise at this one boundary. It does not remove builtin type/str binding, genuine receiver, the property-read call itself, earlier ContainmentReconciler/acquire effects (explicitly not absent or pure), finish:284, or universal callback isolation. No NodeDelivery default/truthiness/or API change and no mode permission.",
+      "carriedConditions": [
+        "C1: the implementing card re-specifies the static mode rule for capture+guard+captured-local forwarding (A7M-I3) and enforces A7M-L1.",
+        "C2: future causal tests, in addition to the author's list: a rejected value calls finish(error_code='SYS-0001', not_sent=False) with no NodeDelivery.deliver call and no further operation read; a property that raises during capture is mapped by the same handler; removing the guard recreates the foreign-value case. Earlier once effects stay out of scope."
+      ],
+      "grant": "None. Not implemented. Product remains 72028; product delta 0."
+    },
+    "reviewerFinalLifecycle": "succeeded_settled_exited_released",
+    "RootNextWIPCodeReply": "msg_db48b2c9a36e"
   }
 }

@@ -3,8 +3,8 @@
   "recordedAtKST": "2026-11-06T00:46:51+09:00",
   "rootBase": "2b1753ce59c09037b5e130a7ffe64794d1d45fdf",
   "priorRootCheckpoint": {
-    "SHA": "a0929c18fc7f00752cfd5d2bae719935bfd366d3",
-    "Docs": 42314260411,
+    "SHA": "f1b1e248305418e7348fc2ae0647000f86cec937",
+    "Docs": 42315644984,
     "exactHeadCorrelationAllJobsSuccess": true,
     "remoteMatches": true,
     "syncExits": [
@@ -12,13 +12,13 @@
       0,
       0
     ],
-    "independentlyMatchedNormalizedDestinationHashes": 3003,
+    "independentlyMatchedNormalizedDestinationHashes": 3005,
     "pending": 0,
     "conflicts": 0,
     "trackedAndUntrackedClean": true,
     "rootDocsOnly": true,
     "wholeProgramComplete": false,
-    "verifiedAtKST": "2026-11-07T08:49:25+09:00"
+    "verifiedAtKST": "2026-11-07T09:03:28+09:00"
   },
   "actualPlanLowReview": {
     "source": "803ad270562b1b75e44d26f9e14b965c714ab519",
@@ -2515,7 +2515,7 @@
     "ownerT1T2T3": "msg_620855c76519",
     "normativeRevisionReply": "msg_0392caf64d5d"
   },
-  "latestRecordAtKST": "2026-11-07T09:00:27+09:00",
+  "latestRecordAtKST": "2026-11-07T09:13:21+09:00",
   "optionalLowTokenTestDelta": {
     "source": "f0af307705b4923ebc3e231db5238af4c70aa389",
     "scope": "two otherwise-valid token payload corrections and JSON validity assertions; runtime unchanged",
@@ -3109,24 +3109,27 @@
   },
   "BRev7RootDecision": "b-rev7-concrete-root-decision.json",
   "activeActualReview": {
-    "atKST": "2026-11-07T08:47:15+09:00",
-    "status": "ACTUAL_B_MODE_ORIGIN_CONDITIONAL_SOURCE_REVIEW_STARTED_VERDICT_PENDING",
-    "target": "b3bbdc8d92a39f2f797a7680deb2770d6f705af0",
-    "sourceDocs": 42312934123,
-    "ownerTask": "task_a8fd2969f0b3",
-    "ownerDispatch": "ctx_6f0f8253b8a7",
-    "ownerQuestion": "msg_5fcc462b63c7",
-    "rootScope": "msg_ec880f3ed724",
-    "task": "task_696b2783bc0b",
-    "dispatch": "ctx_6b18bf1ef5b4",
-    "predecessor": "ctx_8cd16f1141a3",
-    "predecessorFreshLifecycle": "succeeded_settled_exited_released",
+    "atKST": "2026-11-07T09:13:21+09:00",
+    "status": "ACTUAL_H12_R2_NARROW_DELTA_CONTRACT_REVIEW_STARTED_VERDICT_PENDING",
+    "target": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed",
+    "sourceBranch": "agent/codex/fleet5-k2-h1-h2-authority-design-r2-20261107",
+    "sourceDocs": 42314572353,
+    "ownerTask": "task_a95ef3d8ccce",
+    "ownerDispatch": "ctx_ed23b4a777d0",
+    "ownerQuestion": "msg_16c9f2a0ec9b",
+    "rootFixGrant": "msg_e41b206771c3",
+    "task": "task_638219a79555",
+    "dependency": "task_696b2783bc0b",
+    "dependencyDispatch": "ctx_6b18bf1ef5b4",
+    "workerStarted": true,
+    "dispatch": "ctx_2e3e33bdc879",
     "independentVerdict": null,
-    "acceptedBaselineDischarges": 0,
-    "original19HOLD": true,
-    "actualRuntimeB": 0,
-    "futureCode": "CAPTURE_ONCE_EXACT_STR_PROPOSAL_DATA_ONLY_NOT_GRANTED",
-    "wholeProgramComplete": false
+    "findingsClosure": "M1_L1_L2_CANDIDATE_CORRECTIONS_NOT_YET_INDEPENDENTLY_CLOSED",
+    "actualBindings": null,
+    "codeImplementationGranted": false,
+    "wholeProgramComplete": false,
+    "predecessorActualReview": "e75b051d8dcd39b24dba4b648d74d7f7adecbd0f",
+    "predecessorFinalLifecycle": "succeeded_settled_exited_released"
   },
   "nextReviewRequires": "newimmutableK2Low/Stage2 orB8 pilot/evidence; oneClaudeafteractualrelease",
   "K2LatestImmutableProposalRootObservation": "k2-rev2-root-actual-contract-review-gate.json",
@@ -3177,29 +3180,7 @@
   "LowStage2ActualPairReviewGate": "k2a-low-stage2-root-actual-pair-review-gate.json",
   "BRev8SourceAudit": "b-rev8-final-source-root-verification.json",
   "BRev8WholeReviewGate": "b-rev8-root-whole-review-queue-gate.json",
-  "queuedActualReview": [
-    {
-      "atKST": "2026-11-07T09:00:27+09:00",
-      "status": "FROZEN_R2_DOCS_VERIFIED_DEPENDENT_REVIEW_TASK_QUEUED_NOT_STARTED",
-      "target": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed",
-      "sourceBranch": "agent/codex/fleet5-k2-h1-h2-authority-design-r2-20261107",
-      "sourceDocs": 42314572353,
-      "ownerTask": "task_a95ef3d8ccce",
-      "ownerDispatch": "ctx_ed23b4a777d0",
-      "ownerQuestion": "msg_16c9f2a0ec9b",
-      "rootFixGrant": "msg_e41b206771c3",
-      "task": "task_638219a79555",
-      "dependency": "task_696b2783bc0b",
-      "dependencyDispatch": "ctx_6b18bf1ef5b4",
-      "workerStarted": false,
-      "dispatch": null,
-      "independentVerdict": null,
-      "findingsClosure": "M1_L1_L2_CANDIDATE_CORRECTIONS_NOT_YET_INDEPENDENTLY_CLOSED",
-      "actualBindings": null,
-      "codeImplementationGranted": false,
-      "wholeProgramComplete": false
-    }
-  ],
+  "queuedActualReview": [],
   "LowStage2ActualReviewVerification": "k2a-low-stage2-actual-review-root-verification.json",
   "LowStage2ConcreteIntegrationScope": "k2a-low-stage2-combined-root-scope.json",
   "combinedSourceAccepted": false,
@@ -3320,7 +3301,7 @@
     "productBaseline": "f2c1afb78b589b4b2cbcf3dcd4dc4f3c3f3bc856",
     "proposalSHA256": "85d52cb6313bda9b6d97ce6c1cb3d4c3c6bebf8ef487775fb6c8bc7581ec9479",
     "newBranch": "agent/codex/fleet5-k2-h1-h2-authority-design-20261107",
-    "status": "EXACT_R2_DESIGN_DOCS_VERIFIED_DEPENDENT_REVIEW_QUEUED_NOT_STARTED",
+    "status": "EXACT_R2_DESIGN_UNDER_ACTUAL_NARROW_DELTA_CONTRACT_REVIEW",
     "scopeFile": "k2-h1-h2-authority-design-root-scope.txt",
     "selectedLogicalPolicies": [
       "independent control-plane/project trust-provisioning boundary, separately authenticated installation/readback",
@@ -3343,7 +3324,7 @@
     "independentContractReview": "PENDING_FROZEN_CANDIDATE_AND_ACTUAL_REVIEWER_RELEASE",
     "actualA7ReviewUnchanged": "ctx_36ec44cc8ca0",
     "wholeProgramComplete": false,
-    "latestRecordAtKST": "2026-11-07T09:00:27+09:00",
+    "latestRecordAtKST": "2026-11-07T09:13:21+09:00",
     "localCandidate": "382fe3d86c14283dcb549f935205081db8b4eee4",
     "localParent": "1f073c03eb6673ac60806e8fbe008d391bc45864",
     "localOwnAddedDocs": 9,
@@ -3382,8 +3363,8 @@
     "R2DesignDocs": 42314572353,
     "R2RootVerification": "k2-h12-r2-design-source-root-verification.json",
     "R2ActualReviewQueue": {
-      "atKST": "2026-11-07T09:00:27+09:00",
-      "status": "FROZEN_R2_DOCS_VERIFIED_DEPENDENT_REVIEW_TASK_QUEUED_NOT_STARTED",
+      "atKST": "2026-11-07T09:13:21+09:00",
+      "status": "ACTUAL_H12_R2_NARROW_DELTA_CONTRACT_REVIEW_STARTED_VERDICT_PENDING",
       "target": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed",
       "sourceBranch": "agent/codex/fleet5-k2-h1-h2-authority-design-r2-20261107",
       "sourceDocs": 42314572353,
@@ -3394,13 +3375,15 @@
       "task": "task_638219a79555",
       "dependency": "task_696b2783bc0b",
       "dependencyDispatch": "ctx_6b18bf1ef5b4",
-      "workerStarted": false,
-      "dispatch": null,
+      "workerStarted": true,
+      "dispatch": "ctx_2e3e33bdc879",
       "independentVerdict": null,
       "findingsClosure": "M1_L1_L2_CANDIDATE_CORRECTIONS_NOT_YET_INDEPENDENTLY_CLOSED",
       "actualBindings": null,
       "codeImplementationGranted": false,
-      "wholeProgramComplete": false
+      "wholeProgramComplete": false,
+      "predecessorActualReview": "e75b051d8dcd39b24dba4b648d74d7f7adecbd0f",
+      "predecessorFinalLifecycle": "succeeded_settled_exited_released"
     },
     "R2SemanticVerdict": null
   },
@@ -3429,5 +3412,37 @@
     "wholeProgramComplete": false
   },
   "H1H2PushRecovery": "k2-h12-first-push-readonly-recovery-check.json",
-  "BModeSource": "b-a7-mode-origin-source-root-verification.json"
+  "BModeSource": "b-a7-mode-origin-source-root-verification.json",
+  "BOperationGuardWIP": {
+    "atKST": "2026-11-07T09:13:21+09:00",
+    "card": "FLEET5-B-A7-OPERATION-GUARD-R1-20261107",
+    "ownerTask": "task_a8fd2969f0b3",
+    "ownerDispatch": "ctx_6f0f8253b8a7",
+    "answeredQuestion": "msg_5fcc462b63c7",
+    "rootCodeReply": "msg_db48b2c9a36e",
+    "base": "b3bbdc8d92a39f2f797a7680deb2770d6f705af0",
+    "frozenOriginalProduct": "72028cbac903c4415d9979f980a6e0f9948e914f",
+    "newBranch": "agent/codex/fleet5-b-a7-operation-guard-r1-20261107",
+    "status": "NARROW_PRODUCT_CODE_AND_TEST_WIP_GRANTED_NO_EXECUTION_OR_PUBLICATION_YET",
+    "allowedProductPaths": [
+      "services/control-plane/src/inv/dispatch.py",
+      "tests/core/test_delivery_operation_origin.py"
+    ],
+    "allowedProductionFunction": "DeliveryWorker.once only",
+    "scopeFile": "b-a7-operation-guard-r1-root-code-scope.txt",
+    "mandatoryConditions": [
+      "C1: the implementing card re-specifies the static mode rule for capture+guard+captured-local forwarding (A7M-I3) and enforces A7M-L1.",
+      "C2: future causal tests, in addition to the author's list: a rejected value calls finish(error_code='SYS-0001', not_sent=False) with no NodeDelivery.deliver call and no further operation read; a property that raises during capture is mapped by the same handler; removing the guard recreates the foreign-value case. Earlier once effects stay out of scope."
+    ],
+    "referenceBinding": "Normalize reference Attribute and forwarding Call.func to the SAME current AST node, or reference enclosingCall to witnessCall; exact source path/hash/function/span/expression hash; whole scoped set exactly oneCALL.",
+    "WIPPacket": null,
+    "productUnitTests": "NOT_RUN_PENDING_FROZEN_WIP_AND_ROOT_ISOLATION",
+    "authorMainProductExecutionGranted": false,
+    "commitPushCIGrantedAtThisStage": false,
+    "rootIsolatedVerificationRequired": true,
+    "actualRuntimeB": 0,
+    "original19BaselineUnchanged": true,
+    "actualBindings": null,
+    "wholeProgramComplete": false
+  }
 }

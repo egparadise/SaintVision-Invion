@@ -1,0 +1,32 @@
+{
+  "atKST": "2026-11-07T09:13:21+09:00",
+  "card": "FLEET5-B-A7-OPERATION-GUARD-R1-20261107",
+  "ownerTask": "task_a8fd2969f0b3",
+  "ownerDispatch": "ctx_6f0f8253b8a7",
+  "answeredQuestion": "msg_5fcc462b63c7",
+  "rootCodeReply": "msg_db48b2c9a36e",
+  "base": "b3bbdc8d92a39f2f797a7680deb2770d6f705af0",
+  "frozenOriginalProduct": "72028cbac903c4415d9979f980a6e0f9948e914f",
+  "newBranch": "agent/codex/fleet5-b-a7-operation-guard-r1-20261107",
+  "status": "NARROW_PRODUCT_CODE_AND_TEST_WIP_GRANTED_NO_EXECUTION_OR_PUBLICATION_YET",
+  "allowedProductPaths": [
+    "services/control-plane/src/inv/dispatch.py",
+    "tests/core/test_delivery_operation_origin.py"
+  ],
+  "allowedProductionFunction": "DeliveryWorker.once only",
+  "scopeFile": "b-a7-operation-guard-r1-root-code-scope.txt",
+  "mandatoryConditions": [
+    "C1: the implementing card re-specifies the static mode rule for capture+guard+captured-local forwarding (A7M-I3) and enforces A7M-L1.",
+    "C2: future causal tests, in addition to the author's list: a rejected value calls finish(error_code='SYS-0001', not_sent=False) with no NodeDelivery.deliver call and no further operation read; a property that raises during capture is mapped by the same handler; removing the guard recreates the foreign-value case. Earlier once effects stay out of scope."
+  ],
+  "referenceBinding": "Normalize reference Attribute and forwarding Call.func to the SAME current AST node, or reference enclosingCall to witnessCall; exact source path/hash/function/span/expression hash; whole scoped set exactly oneCALL.",
+  "WIPPacket": null,
+  "productUnitTests": "NOT_RUN_PENDING_FROZEN_WIP_AND_ROOT_ISOLATION",
+  "authorMainProductExecutionGranted": false,
+  "commitPushCIGrantedAtThisStage": false,
+  "rootIsolatedVerificationRequired": true,
+  "actualRuntimeB": 0,
+  "original19BaselineUnchanged": true,
+  "actualBindings": null,
+  "wholeProgramComplete": false
+}

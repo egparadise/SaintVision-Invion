@@ -1,0 +1,177 @@
+{
+  "review": "Actual independent Claude NARROW A7 MODE-ORIGIN R1 conditional source-evidence and future-code DATA review",
+  "orca": {
+    "task": "task_696b2783bc0b",
+    "dispatch": "ctx_6b18bf1ef5b4",
+    "reviewerBranch": "agent/claude/fleet5-b-a7-mode-b3bb-review-20261107",
+    "reviewerBase": "b3bbdc8d92a39f2f797a7680deb2770d6f705af0",
+    "precondition": "orca worker-show --dispatch ctx_8cd16f1141a3 (task_ce76beac4d2d) = succeeded / settled / exited / released, and the managed worktree was clean at 8141a49bab3d0e7b94028a69d9a767e2abc25272 before this branch was created. That predecessor and the unrelated K2 H12 8141 review (and Root's R2 design grant msg_e41b206771c3) are outside B mode and are not reopened. No helper or second reviewer."
+  },
+  "owner": {
+    "agent": "Codex",
+    "task": "task_a8fd2969f0b3",
+    "dispatch": "ctx_6f0f8253b8a7",
+    "pendingQuestion": "msg_5fcc462b63c7",
+    "rootGrant": "msg_ec880f3ed724 (Root .work/a7-mode-origin-r1-root-cut.txt; public Root b-a7-mode-origin-r1-root-scope.txt)"
+  },
+  "target": "b3bbdc8d92a39f2f797a7680deb2770d6f705af0",
+  "directParent": "969030dbc7716b9cadf75bd314713005306ed34c",
+  "productSource": "72028cbac903c4415d9979f980a6e0f9948e914f",
+  "readFirst": {
+    "actualR2Review": "Read first, directly from commit 145238898e8c86e1beb091b93efd712c70a6f5ba: History, review.json (INFO I1/I2/I4/I5/I6), commands.json and the 12-row reviewer-a7r2-probes-result.json plus both attempt logs. Attempt 1 exit 1 was the reviewer's own missing-frozen-path precheck bug; the pre-fix driver bytes were not retained. Those 12 historical rows are not new mode coverage and are not counted here.",
+    "root": "fleet-five-orchestration-20261105 HEAD 28356eb2: INDEX-PROGRESS-001 v1.0.491 (>= 490), Claude board v1.2.130. .work/a7-mode-origin-r1-root-cut.txt, b-mode-origin-review-spec.txt, b-mode-source-root-verified.json (08:43:33 KST). Read only.",
+    "author": "History 2026-11-07_FLEET5_B_A7_Mode_Origin_R1_Codex.md; mode.py, controls.py, run.py, prepare.py, inputs.json, mode-origin-graph.json, mode-obligation-auxiliary.json, control-inputs.json, control-results.json, manifest.json, final-source03/final-controls03, docs-final01-1..8, publication-docs (committed blobs only; the four untracked post-CI receipts were not used).",
+    "productSourceRead": "72028 only: NodeDelivery.__init__/deliver (node_transport.py 227-316), NodeChannels.snapshot observation_only reads (node_channels.py 124-148), DeliveryQueue.acquire/finish, DeliveryAttempt, DeliveryWorker.__init__/once (dispatch.py 129-349), worker.py main 111-150, tools/remote_workspace_entry.py setup/child/execute forwarding lines. No delivery/SQL/network/receipt/Engine effect is admitted or executed. K2 author's current R2 working code was not inspected."
+  },
+  "preconditions": {
+    "targetDelta": "git diff --name-status 969030db b3bbdc8d: 57 A, 0 M/D/R, all under Evidence/fleet5-b-a7-mode-origin-r1-20261107-codex/ or the one History. Product delta 72028..b3bb over services/src/tools/apps/packages: 0 paths.",
+    "manifest": "manifest.json sha256 25229c0c571a35352ff66aa9401d08e2c510d21f5ffe1da8bc68092b143a6250. 55 listed files recomputed from committed blobs: 0 mismatches; History hash matches.",
+    "graphAndAuxiliary": "mode-origin-graph.json 18eb75fd3ee6a73edbfae6e4846c7b897402fadec9cd3bb5c2d32155dd49950b, mode-obligation-auxiliary.json 99ae3d9ed4efb67fca79ab46d161e6f2f477511922eb9808fd38d554ebf62e14 (both equal to Root's values).",
+    "reviewOriginals": "All 11 review-* copies are byte-equal to their 1452 Git blobs, with matching objectIDs and sha256.",
+    "immutablePredecessors": "16 inputs.json predecessor entries: sha256 at b3bb and objectID at 9690 all match.",
+    "receipts": "final-source03, final-controls03, docs-final01-1..8, publication-docs: exit 0, producerHashesBefore == After. docs-final01-3 canonical state 5eea4626... before == after. Author peaks 95612928 B (mode.py) / 40759296 B (controls.py), single processes.",
+    "controlInputs": "control-inputs.json: each of the 5 source worlds hashes to its control-results inputSHA256 and compiles; the 6th control is literal DATA.",
+    "note": "Reviewer recomputed at committed bytes. Owner source/controls/docs commands were not rerun. Root's Docs 42312934123 / job 128218520411 verification was relied on, not repeated."
+  },
+  "verdict": "CONDITIONAL_MODE_SOURCE_EVIDENCE_ACCEPT_KEEP_19_HOLD",
+  "verdictScope": "Accepts the finite source graph as an honest, correctly qualified CONDITIONAL candidate for the ONE A7_PURPOSE_PROVENANCE at node_transport.py:280, pinned to product 72028 and author b3bb. It is not an operational discharge: acceptedBaselineDischarges 0, original 19 unchanged, no accepted18, no source inclusion/runtime/admission, no 13th entry, no mode permission from NORMAL/OBSERVATION labels.",
+  "severity": "No HIGH/MEDIUM. One LOW (A7M-L1), carried forward as a mandatory condition; it does not change the pinned 72028 evidence. INFO A7M-I1..I4.",
+  "verifiedClaims": {
+    "literalOrigin": "dispatch.py acquire has exactly three `operation` Assign stores: [170,12,174,13] IfExp of literal \"cancel\"/\"observe\" (the condition compares row[\"operation\"] but the value is a literal), [184,16,184,36] \"cancel\", [203,16,203,37] \"execute\". row['operation'] is never the stored value. No Global/Nonlocal, no tuple/aug/ann stores (those would fail closed in rule()).",
+    "attemptConstruction": "acquire's only non-None return is DeliveryAttempt [243..251]; the five other returns are `return None`. Sixth positional argument is `operation`; DeliveryAttempt is @dataclass(frozen=True) with fields node, project_id, run_id, command_id, token, operation, envelope (annotations NodePrincipal, str x5, dict), no other body, no bases. acquire/once/__init__/finish/deliver: no decorators, not async/generator. The str annotation is not treated as a runtime type.",
+    "consumer": "DeliveryWorker.__init__ [315] is the only store of self.queue/self.delivery in the class; once has one `attempt` store [327], a None branch that returns, and the single deliver call [336..341] inside try with observation_only=attempt.operation == \"observe\", cancel_only=attempt.operation == \"cancel\". There is no field-value validation today.",
+    "callee": "NodeDelivery.deliver(self, node, permit, *, observation_only=False, cancel_only=False); no Store of either flag; snapshot call `observation_only=observation_only or cancel_only`. NodeChannels.snapshot truth-tests with `not observation_only` (124/126/136), so the author's snapshotTruthiness column matches the actual body.",
+    "matrix": "GIVEN genuine dataclasses/generated initializer/returned object/plain field, genuine bound receivers and no unmodelled frame/heap mutation: execute -> (False, False) NORMAL; observe -> (True, False) OBSERVATION; cancel -> (False, True) OBSERVATION. Builtin type/str/bool bindings and receiver identity remain premises. The accepted NORMAL/OBS body matrix is referenced, not touched.",
+    "orSemantics": "The author's DATA keeps `or` operand return: 'tag' and 'cancel-tag' stay str (resultType str), separate from the truthiness column. Nothing is normalized to bool or called runtime validation."
+  },
+  "scopedCompleteness": {
+    "selectorReproducible": "Independent of git grep: Python regex equivalent of the declared PATTERN over all 398 .py blobs in services/control-plane/src, src, tools at 72028 (one git cat-file --batch) selects exactly the author's 25 paths, with the same blob sha256.",
+    "wideSupersetDisclosure": "54 further files (79-file stem superset minus the 25) in those roots mention deliver/dispatch/Delivery/node_transport stems without matching the selector. They are workflow_dispatch/approval_dispatches/execution_deliveries identifiers or prose. The six with a bare `deliver` word (shards.py:380, tracking_reference.py:4, services/tracking.py:1/413, tracking/__init__.py:15, alarm_check.py:8, db/models/tracking.py:8) are docstrings or comments. No omitted relevant source path within the declared selector.",
+    "astCensus": "Over the 25: direct call references NodeDelivery 3, DeliveryWorker 4, DeliveryQueue 1, DeliveryAttempt 1 (equal to the 9 inventory rows); 0 non-call references of the four names (no factory escape, subclass, annotation or base); 1 `.deliver` attribute (dispatch.py [336,12,336,33]); attribute stores to delivery/queue/operation/channels only at dispatch.py:315, node_transport.py:231 and remote_workspace_entry.py:107 (a.delivery); 0 getattr/setattr/delattr/hasattr with those names; 23 import events, recorded with path/module/name/alias.",
+    "forwarding": "worker.py: delivery stored once [122] NodeDelivery(db, NodeTLSClient(**config['tls'])) and forwarded to DeliveryWorker at [142,13,142,74] (Root's starting 133 was wrong; 142 is right). Tool: a.delivery = NodeDelivery(db, a.client) [107] in setup, forwarded at 161 and 172 under the faithful-namespace/no-replacement premise; 145 constructs NodeDelivery inline.",
+    "explicitBound": "The declared universe excludes computed imports/aliases (for example importlib.import_module('inv.dispatch') or a parenthesized multi-line `from inv import (dispatch)`), heap/frame mutation and arbitrary reflection outside the 25 files. scopeBound states this. The reviewer does not demand full Python heap/language completeness."
+  },
+  "ownerControlsAssessment": "Six distinct controls, all through rule() on the four anchor files; the older full-use-site guard is not involved, so no guard refusal is credited as a mode cause. actual-source and benign-leading-comment: CONDITIONAL, with current witnesses recomputed against the shifted source. causal-forwarded-mode-change: MODE_FORWARDING_CHANGED after 2 earlier edges held. dynamic-operation-origin (203 -> row[\"operation\"]): UNRESOLVED_DYNAMIC_OPERATION_ORIGIN after 3 earlier edges. foreign-rebound-attempt-callee: EARLIER_CALLEE_BINDING, labelled EARLIER_BINDING_PRECONDITION and not credited as the later mode cause. truthiness/or DATA: literal builtins with the foreign type UNKNOWN. No stale hash, parser or earlier guard is credited as a later cause; development reruns are not counted.",
+  "reviewerControls": [
+    {
+      "case": "R-domain-literal-change (173 \"observe\" -> \"observed\")",
+      "layer": "RULE",
+      "result": "UNRESOLVED OPERATION_LITERAL_DOMAIN_CHANGED after 4 earlier edges",
+      "expected": true
+    },
+    {
+      "case": "R-sixth-argument-swap (operation -> \"execute\")",
+      "layer": "RULE",
+      "result": "UNRESOLVED ATTEMPT_CONSTRUCTOR_FORWARDING_CHANGED after 4 earlier edges",
+      "expected": true
+    },
+    {
+      "case": "R-cancel-keyword-swap (cancel_only == \"observe\")",
+      "layer": "RULE",
+      "result": "UNRESOLVED MODE_FORWARDING_CHANGED after 3 earlier edges",
+      "expected": true
+    },
+    {
+      "case": "R-decorated-acquire (@_reviewer_wrap)",
+      "layer": "RULE",
+      "result": "CONDITIONAL; the rule does not inspect method decorators",
+      "see": "A7M-I1"
+    },
+    {
+      "case": "A-actual-analyze",
+      "layer": "ANALYZE",
+      "result": "card CONDITIONAL, 25 parsed, 9 constructors, 1 deliver CALL, guard clean"
+    },
+    {
+      "case": "A-second-unconstrained-deliver-caller (tools/lan_pilot.py + `return delivery.deliver(node, permit, observation_only=\"foreign-tag\")`, sha abb17b22...)",
+      "layer": "ANALYZE",
+      "result": "card status still CONDITIONAL_SOURCE_CANDIDATE...; 2 deliver CALL references; guard clean; rule CONDITIONAL",
+      "see": "A7M-L1"
+    },
+    {
+      "case": "A-worker-receiver-replacement (worker.py + `worker.delivery = object()`)",
+      "layer": "ANALYZE",
+      "result": "card UNRESOLVED only through the older guard DYNAMIC_BLOCK:USE_SITE_NOT_ALLOWLISTED:WRITE_USE:worker.delivery; rule itself CONDITIONAL",
+      "see": "A7M-I1"
+    },
+    {
+      "case": "A-decorated-acquire",
+      "layer": "ANALYZE",
+      "result": "card UNRESOLVED only through the older guard SYMBOL:inv.dispatch._reviewer_wrap; rule itself CONDITIONAL",
+      "see": "A7M-I1"
+    },
+    {
+      "case": "P6 current rule on the textual application of the proposed future code (dispatch sha a6fa3a84...)",
+      "layer": "RULE",
+      "result": "UNRESOLVED MODE_FORWARDING_CHANGED (detail operation == 'observe' / 'cancel')",
+      "see": "A7M-I3"
+    }
+  ],
+  "findings": [
+    {
+      "id": "A7M-L1",
+      "severity": "LOW",
+      "status": "CARRIED_MANDATORY_CONDITION",
+      "source": "mode.py line 119 (card status) and rule() line 43-44",
+      "layer": "auxiliary status predicate, not the 72028 evidence",
+      "validInput": "actual 72028 with tools/lan_pilot.py appended `def _reviewer_second_deliver(delivery, node, permit):\\n    return delivery.deliver(node, permit, observation_only=\"foreign-tag\")` (syntax valid, still 25 parsed, 9 constructors, guards clean)",
+      "observed": "deliverReferences lists both CALLs, but the status remains CONDITIONAL_SOURCE_CANDIDATE_RUNTIME_AND_OWNER_PREMISES_PENDING. Status only requires every reference to be a CALL; rule() requires exactly one deliver call inside once, not one in the universe. A second caller would carry an unconstrained non-bool truthy operand straight into the node_transport.py:280 `or`, which the candidate says originates only at dispatch.py:336.",
+      "actualSourceImpact": "None. On 72028 the universe has exactly one `.deliver` reference, confirmed by the reviewer's independent AST census, and the graph records it. The candidate stays correct, but the predicate does not enforce the completeness fact it relies on.",
+      "minimalFix": "Before any rerun of mode.py on non-72028 source, and in the future code card: require deliverReferences to be exactly one row whose path/span/expressionSHA256 equals the MODE_FORWARD_ARGUMENT_BINDING witness, else UNRESOLVED with a distinct reason (for example DELIVER_REFERENCE_SET_CHANGED). Add one causal control: a second deliver CALL turns UNRESOLVED by that reason and not by an earlier guard. No other change."
+    },
+    {
+      "id": "A7M-I1",
+      "severity": "INFO",
+      "text": "Method-decorator and receiver-field-replacement mutants are refused at card level only by the older full-use-site guard (SYMBOL / WRITE_USE). rule() itself returns CONDITIONAL for them. This is correct fail-closed behaviour and matches the named premise 'genuine bound methods / receivers'. Actual 72028 has no decorators on the relevant methods and no foreign delivery/queue stores. Optional: rule() could assert empty decorator_list. Not required."
+    },
+    {
+      "id": "A7M-I2",
+      "severity": "INFO",
+      "text": "DeliveryQueue.finish:284 keeps its own read `attempt.operation == \"execute\"`, evaluated only when not_sent is truthy. It is outside the 280 target. The proposal's 'capture once / single read' is scoped to the deliver boundary, which is how the History states it. Raising ValueError (not DomainError with not_sent) is what keeps finish from reading a rejected value: not_sent=False short-circuits that comparison."
+    },
+    {
+      "id": "A7M-I3",
+      "severity": "INFO",
+      "text": "The pinned rule() is shaped to today's once text, and on the textual application of the proposal it returns MODE_FORWARDING_CHANGED. An implementing card must re-specify the static mode rule: one capture store immediately before the guard, the exact guard AST, both keywords on the captured local, no other operation store in once, and A7M-L1. Expected, not a defect."
+    },
+    {
+      "id": "A7M-I4",
+      "severity": "INFO",
+      "text": "Path selection, mode value, receiver identity, DB owner and actual permission stay distinct. This card speaks only to mode value provenance and the scoped path selection. The other 10 DB owners and 8 reverse roots are not addressed and remain HOLD. INFO I1/I2/I4/I5/I6 from the actual 1452 review are unchanged."
+    }
+  ],
+  "futureCodeAssessment": {
+    "verdict": "PRECISE_MINIMAL_FUTURE_CONTRACT_DATA_ACCEPT_NOT_GRANTED",
+    "codeTextRevisionRequired": false,
+    "dataEvidence": "The guard expression, evaluated on reviewer values with builtins type/str only, accepts exactly 'execute'/'observe'/'cancel' and rejects 'Execute', '', b'observe', None, 1, a hostile str subclass and a foreign __eq__ object. Zero custom __eq__/__ne__/__hash__/__bool__ calls happen at the guard, because `type(x) is not str` short-circuits `or` with a builtin bool before `in` runs. The accepted values give builtin bool flags and a bool `or` result. This is Python-semantics DATA on reviewer values, not product validation.",
+    "placement": "Textually applied to frozen dispatch.py (sha a6fa3a84..., parse only): the capture and guard are the first two statements of the existing try. The raise is inside the try; the handler `except Exception` maps it to SYS-0001 with not_sent=False, then queue.finish -> 'uncertain' backoff. attempt.operation is read once in the future once [336]. A raising property read is also inside the try.",
+    "whatItRemoves": "Only the foreign/subclass/stateful operation VALUE comparison premise at this one boundary. It does not remove builtin type/str binding, genuine receiver, the property-read call itself, earlier ContainmentReconciler/acquire effects (explicitly not absent or pure), finish:284, or universal callback isolation. No NodeDelivery default/truthiness/or API change and no mode permission.",
+    "carriedConditions": [
+      "C1: the implementing card re-specifies the static mode rule for capture+guard+captured-local forwarding (A7M-I3) and enforces A7M-L1.",
+      "C2: future causal tests, in addition to the author's list: a rejected value calls finish(error_code='SYS-0001', not_sent=False) with no NodeDelivery.deliver call and no further operation read; a property that raises during capture is mapped by the same handler; removing the guard recreates the foreign-value case. Earlier once effects stay out of scope."
+    ],
+    "grant": "None. Not implemented. Product remains 72028; product delta 0."
+  },
+  "residualHold": "Candidate status CONDITIONAL_SOURCE_CANDIDATE_RUNTIME_AND_OWNER_PREMISES_PENDING; acceptedBaselineDischarges 0; all 19 original blocksGrant remain (1 NodeDelivery purpose, 10 Database owner, 8 reverse roots); no accepted18. actualRuntimeB 0, all real bindings NULL/HOLD, A1-A16 PENDING, whole fleet incomplete. 12 entries / 19 edges (16 analysis / 3 runtime), 598/757/1071/21/573 outside/218, model/lifecycle/stage/order unchanged (Root verified; the reviewer did not recompute them). A7 is not a 13th entry.",
+  "notRun": [
+    "owner mode.py/controls.py/run.py/docs commands",
+    "old 33/49 corpora, accepted body/R2 guard polish, model/recovery, 523 assembler, 3485 plans, full B suites",
+    "import or execution of any product or mutant module",
+    "PG/DB, network, crypto, Go/Node/browser/OS/host/SSH/Docker/PKI/clock/permission",
+    "Obsidian apply/adopt/resolve/state write or stale export"
+  ],
+  "resources": {
+    "probePeakWorkingSetBytes": 120668160,
+    "probeElapsedSeconds": 46.7,
+    "futureRulePeakWorkingSetBytes": 29687808,
+    "scope": "single serial reviewer processes measured with the owner's measured_run.py; not aggregate, quota or OS enforcement",
+    "availableMemoryMB": [
+      348,
+      305
+    ]
+  },
+  "nextFirstAction": {
+    "owner": "Root",
+    "action": "Record this conditional mode-source evidence acceptance (KEEP 19 HOLD) and answer the author's pending msg_5fcc462b63c7. Decide whether to grant the narrow future code card; if granted, carry A7M-L1 and C1/C2. The reviewer grants nothing and starts no follow-on scope."
+  }
+}

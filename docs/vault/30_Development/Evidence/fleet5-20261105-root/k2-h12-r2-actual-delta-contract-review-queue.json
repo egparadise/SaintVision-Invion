@@ -1,6 +1,6 @@
 {
-  "atKST": "2026-11-07T09:00:27+09:00",
-  "status": "FROZEN_R2_DOCS_VERIFIED_DEPENDENT_REVIEW_TASK_QUEUED_NOT_STARTED",
+  "atKST": "2026-11-07T09:13:21+09:00",
+  "status": "ACTUAL_H12_R2_NARROW_DELTA_CONTRACT_REVIEW_STARTED_VERDICT_PENDING",
   "target": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed",
   "sourceBranch": "agent/codex/fleet5-k2-h1-h2-authority-design-r2-20261107",
   "sourceDocs": 42314572353,
@@ -11,11 +11,13 @@
   "task": "task_638219a79555",
   "dependency": "task_696b2783bc0b",
   "dependencyDispatch": "ctx_6b18bf1ef5b4",
-  "workerStarted": false,
-  "dispatch": null,
+  "workerStarted": true,
+  "dispatch": "ctx_2e3e33bdc879",
   "independentVerdict": null,
   "findingsClosure": "M1_L1_L2_CANDIDATE_CORRECTIONS_NOT_YET_INDEPENDENTLY_CLOSED",
   "actualBindings": null,
   "codeImplementationGranted": false,
-  "wholeProgramComplete": false
+  "wholeProgramComplete": false,
+  "predecessorActualReview": "e75b051d8dcd39b24dba4b648d74d7f7adecbd0f",
+  "predecessorFinalLifecycle": "succeeded_settled_exited_released"
 }

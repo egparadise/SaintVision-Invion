@@ -1,0 +1,78 @@
+{
+  "atKST": "2026-11-07T09:08:12+09:00",
+  "target": "b3bbdc8d92a39f2f797a7680deb2770d6f705af0",
+  "actualReview": "e75b051d8dcd39b24dba4b648d74d7f7adecbd0f",
+  "branch": "agent/claude/fleet5-b-a7-mode-b3bb-review-20261107",
+  "Docs": 42315871269,
+  "job": 128228196870,
+  "correlation": "claude-b-a7-mode-b3bb-review-e75b051d-ctx_6b18bf1ef5b4",
+  "rootVerifiedExactHeadRefEventPathAttemptAll19StepsSuccess": true,
+  "remoteExact": true,
+  "actualOnlyOwnAddedReviewFiles": 13,
+  "actualEvidenceFiles": 12,
+  "actualHistoryFiles": 1,
+  "actualWorkerDone": "msg_20532fffc22b",
+  "verdict": "CONDITIONAL_MODE_SOURCE_EVIDENCE_ACCEPT_KEEP_19_HOLD",
+  "findings": [
+    {
+      "id": "A7M-L1",
+      "severity": "LOW",
+      "status": "CARRIED_MANDATORY_CONDITION",
+      "source": "mode.py line 119 (card status) and rule() line 43-44",
+      "layer": "auxiliary status predicate, not the 72028 evidence",
+      "validInput": "actual 72028 with tools/lan_pilot.py appended `def _reviewer_second_deliver(delivery, node, permit):\\n    return delivery.deliver(node, permit, observation_only=\"foreign-tag\")` (syntax valid, still 25 parsed, 9 constructors, guards clean)",
+      "observed": "deliverReferences lists both CALLs, but the status remains CONDITIONAL_SOURCE_CANDIDATE_RUNTIME_AND_OWNER_PREMISES_PENDING. Status only requires every reference to be a CALL; rule() requires exactly one deliver call inside once, not one in the universe. A second caller would carry an unconstrained non-bool truthy operand straight into the node_transport.py:280 `or`, which the candidate says originates only at dispatch.py:336.",
+      "actualSourceImpact": "None. On 72028 the universe has exactly one `.deliver` reference, confirmed by the reviewer's independent AST census, and the graph records it. The candidate stays correct, but the predicate does not enforce the completeness fact it relies on.",
+      "minimalFix": "Before any rerun of mode.py on non-72028 source, and in the future code card: require deliverReferences to be exactly one row whose path/span/expressionSHA256 equals the MODE_FORWARD_ARGUMENT_BINDING witness, else UNRESOLVED with a distinct reason (for example DELIVER_REFERENCE_SET_CHANGED). Add one causal control: a second deliver CALL turns UNRESOLVED by that reason and not by an earlier guard. No other change."
+    },
+    {
+      "id": "A7M-I1",
+      "severity": "INFO",
+      "text": "Method-decorator and receiver-field-replacement mutants are refused at card level only by the older full-use-site guard (SYMBOL / WRITE_USE). rule() itself returns CONDITIONAL for them. This is correct fail-closed behaviour and matches the named premise 'genuine bound methods / receivers'. Actual 72028 has no decorators on the relevant methods and no foreign delivery/queue stores. Optional: rule() could assert empty decorator_list. Not required."
+    },
+    {
+      "id": "A7M-I2",
+      "severity": "INFO",
+      "text": "DeliveryQueue.finish:284 keeps its own read `attempt.operation == \"execute\"`, evaluated only when not_sent is truthy. It is outside the 280 target. The proposal's 'capture once / single read' is scoped to the deliver boundary, which is how the History states it. Raising ValueError (not DomainError with not_sent) is what keeps finish from reading a rejected value: not_sent=False short-circuits that comparison."
+    },
+    {
+      "id": "A7M-I3",
+      "severity": "INFO",
+      "text": "The pinned rule() is shaped to today's once text, and on the textual application of the proposal it returns MODE_FORWARDING_CHANGED. An implementing card must re-specify the static mode rule: one capture store immediately before the guard, the exact guard AST, both keywords on the captured local, no other operation store in once, and A7M-L1. Expected, not a defect."
+    },
+    {
+      "id": "A7M-I4",
+      "severity": "INFO",
+      "text": "Path selection, mode value, receiver identity, DB owner and actual permission stay distinct. This card speaks only to mode value provenance and the scoped path selection. The other 10 DB owners and 8 reverse roots are not addressed and remain HOLD. INFO I1/I2/I4/I5/I6 from the actual 1452 review are unchanged."
+    }
+  ],
+  "futureCodeAssessment": {
+    "verdict": "PRECISE_MINIMAL_FUTURE_CONTRACT_DATA_ACCEPT_NOT_GRANTED",
+    "codeTextRevisionRequired": false,
+    "dataEvidence": "The guard expression, evaluated on reviewer values with builtins type/str only, accepts exactly 'execute'/'observe'/'cancel' and rejects 'Execute', '', b'observe', None, 1, a hostile str subclass and a foreign __eq__ object. Zero custom __eq__/__ne__/__hash__/__bool__ calls happen at the guard, because `type(x) is not str` short-circuits `or` with a builtin bool before `in` runs. The accepted values give builtin bool flags and a bool `or` result. This is Python-semantics DATA on reviewer values, not product validation.",
+    "placement": "Textually applied to frozen dispatch.py (sha a6fa3a84..., parse only): the capture and guard are the first two statements of the existing try. The raise is inside the try; the handler `except Exception` maps it to SYS-0001 with not_sent=False, then queue.finish -> 'uncertain' backoff. attempt.operation is read once in the future once [336]. A raising property read is also inside the try.",
+    "whatItRemoves": "Only the foreign/subclass/stateful operation VALUE comparison premise at this one boundary. It does not remove builtin type/str binding, genuine receiver, the property-read call itself, earlier ContainmentReconciler/acquire effects (explicitly not absent or pure), finish:284, or universal callback isolation. No NodeDelivery default/truthiness/or API change and no mode permission.",
+    "carriedConditions": [
+      "C1: the implementing card re-specifies the static mode rule for capture+guard+captured-local forwarding (A7M-I3) and enforces A7M-L1.",
+      "C2: future causal tests, in addition to the author's list: a rejected value calls finish(error_code='SYS-0001', not_sent=False) with no NodeDelivery.deliver call and no further operation read; a property that raises during capture is mapped by the same handler; removing the guard recreates the foreign-value case. Earlier once effects stay out of scope."
+    ],
+    "grant": "None. Not implemented. Product remains 72028; product delta 0."
+  },
+  "RootMatchedOriginalProbeAndFutureDataResultHashes": true,
+  "resources": {
+    "probePeakWorkingSetBytes": 120668160,
+    "probeElapsedSeconds": 46.7,
+    "futureRulePeakWorkingSetBytes": 29687808,
+    "scope": "single serial reviewer processes measured with the owner's measured_run.py; not aggregate, quota or OS enforcement",
+    "availableMemoryMB": [
+      348,
+      305
+    ]
+  },
+  "acceptedBaselineDischarges": 0,
+  "original19HOLD": true,
+  "actualRuntimeB": 0,
+  "actualBindings": null,
+  "codeGrantedByReviewer": false,
+  "wholeProgramComplete": false
+}

@@ -1,15 +1,19 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.453"
+version: "1.0.454"
 status: "review"
 author: "Codex"
-updated: "2026-11-07T09:00:27+09:00"
+updated: "2026-11-07T09:13:21+09:00"
 source_of_truth: "Git"
 active_card: "FLEET5 continued supervision with PORTAL-REFRESH-FLEET-20261106"
-active_card_status: "H12R20bf8verified/Docs42314572353/task6382queuedNOTSTARTEDafterBmode696; activeBmode6b18; M1L1L2semanticPENDING/actualNULLHOLD/fleetincomplete"
-active_card_next: "Claude Bmodeb3bb actualverdict then Root exactreview/CI/freshlifecycle/custody; startqueuedreadyH12R2task6382 once; no extra reviewer orCODEgrant before semanticverdict"
+active_card_status: "Bmodeactuale75bconditionalKEEP19/LowL1C1C2->operationguardWIPdb48TESTSNOTRUN; H12R20bf8actualreviewctx2e3PENDING; actualNULLHOLD/fleetincomplete"
+active_card_next: "B Codex exactonceguard+newunit+staticL1C1/C2 WIPpacket ASTonly; Root boundedisolatedPythonverification on frozenbytes before publication; Claude H12R2actualdeltaverdict; no runtime/fullBgrant"
 ---
+
+## 2026-11-07T09:13:21+09:00 모드 값 경계의 최소 코드·시험 WIP와 H1/H2 재검토
+
+실제e75b/Docs42315871269/all19는B모드소스근거를CONDITIONAL_ACCEPT_KEEP_19_HOLD로수락했고LowA7M-L1과C1/C2를다음구현필수조건으로남겼다. Root는실제13추가파일(12Evidence+History)·원문결과hash를대조하고전임자실제종료·해제뒤대기task6382/Claude ctx_2e3e33bdc879의H12R2재검토를시작했다. 같은B작성자에msg_db48b2c9a36e로once의단일capture/exactstr경계·새unit·정적참조집합교정WIP만허용했다. 실제시험/게시/CI/운영인수는후속이며전체·5대완료가아니다. 직접명령/exit/KST/Git/CI/원문결과와전제·미실행축/담당/검토수명은Root History/Evidence에보존했다.
 
 ## 2026-11-07T09:00:27+09:00 H1/H2 R2 고정 증거와 의존 재검토 순서 확정
 
