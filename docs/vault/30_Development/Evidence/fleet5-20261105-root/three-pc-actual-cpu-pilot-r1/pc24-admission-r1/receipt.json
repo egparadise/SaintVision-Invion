@@ -1,0 +1,236 @@
+{
+  "atKST": "2026-11-07T17:10:39+09:00",
+  "status": "PC2_AND_PC4_EACH_SINGLE_APPLY_ACKNOWLEDGED",
+  "receipts": [
+    {
+      "atKST": "2026-11-07T17:10:34+09:00",
+      "PC": "PC2",
+      "mode": "PLAN",
+      "SSHExit": 0,
+      "stderrBytes": 0,
+      "profileValuesEmitted": false,
+      "rawDiagnosticSuppressed": true,
+      "remote": {
+        "mode": "PLAN",
+        "DBPersistentWrites": false,
+        "actualAdmission": "NOT_RUN",
+        "profileOrCredentialValuesEmitted": false,
+        "wholeProgramComplete": false,
+        "CLIExit": 0,
+        "CLIStdoutBytes": 875,
+        "CLIStderrBytes": 0,
+        "status": "READY_ACTUAL_READONLY_PLAN_TARGET_AND_PROFILE_VERIFIED",
+        "phase": "actual-cli-ready-and-zero-writes-readback",
+        "sameNamedServerSystemID": true,
+        "existingOperatorRoleClass": {
+          "rolsuper": true,
+          "rolbypassrls": true,
+          "rolcanlogin": true
+        },
+        "currentEpochMatches": true,
+        "tenantControls": {
+          "version": 0,
+          "kill_switch": false
+        },
+        "selectedBusinessLinkedProjectActive": true,
+        "plannedTargetCountsBefore": {
+          "node": 0,
+          "resources": 0,
+          "project_links": 0,
+          "channels": 0,
+          "audit": 0,
+          "controls": 0
+        },
+        "plannedTargetCountsAfter": {
+          "node": 0,
+          "resources": 0,
+          "project_links": 0,
+          "channels": 0,
+          "audit": 0,
+          "controls": 0
+        },
+        "CLIReadyPlanDigest": "afc7af4aa6e35335b4bcf1cfe047dad58d430989341fc6509116a25d13c3321f",
+        "childEnvironmentNames": [
+          "LANG",
+          "PATH",
+          "PYTHONDONTWRITEBYTECODE",
+          "PYTHONNOUSERSITE",
+          "SV_FRESH_NODE_EXPECTED_PLAN_SHA256",
+          "SV_FRESH_NODE_OPERATOR_DSN"
+        ],
+        "actualUserOIDCOrRunApproval": "NOT_PERFORMED_NOT_SUBSTITUTED_BY_OPERATOR_ROLE",
+        "NodeOrWorkloadExecuted": false
+      }
+    },
+    {
+      "atKST": "2026-11-07T17:10:35+09:00",
+      "PC": "PC2",
+      "mode": "APPLY",
+      "SSHExit": 0,
+      "stderrBytes": 0,
+      "profileValuesEmitted": false,
+      "rawDiagnosticSuppressed": true,
+      "remote": {
+        "mode": "APPLY",
+        "actualAdmission": "COMMITTED_ACKNOWLEDGED",
+        "profileOrCredentialValuesEmitted": false,
+        "NodeOrWorkloadOrUserApprovalExecuted": false,
+        "automaticRetryAllowed": false,
+        "wholeProgramComplete": false,
+        "before": {
+          "node": 0,
+          "resources": 0,
+          "project_links": 0,
+          "channels": 0,
+          "audit": 0,
+          "controls": 0
+        },
+        "CLIExit": 0,
+        "CLIStdoutBytes": 947,
+        "CLIStderrBytes": 0,
+        "status": "COMMITTED_ACK_AND_EXACT_SCOPE_READBACK",
+        "phase": "single-apply-complete",
+        "sameNamedServerSystemID": true,
+        "currentEpochMatches": true,
+        "tenantControlsUnchanged": true,
+        "after": {
+          "node": 1,
+          "resources": 2,
+          "project_links": 1,
+          "channels": 1,
+          "audit": 1,
+          "controls": 1
+        },
+        "nodeStatus": "offline",
+        "channel": {
+          "version": 1,
+          "certificate_sha256": "ec4b6be14dd8be8ec3eaecbf4b58a27cb567449931cf2e3668422f647eaaf415",
+          "endpoint": "https://192.168.45.143:19443",
+          "enabled": true
+        },
+        "snapshotCount": 0,
+        "planDigest": "afc7af4aa6e35335b4bcf1cfe047dad58d430989341fc6509116a25d13c3321f",
+        "applyAttempts": 1,
+        "reconcileAttempts": 0,
+        "operatorRoleNotUserApproval": true
+      }
+    },
+    {
+      "atKST": "2026-11-07T17:10:37+09:00",
+      "PC": "PC4",
+      "mode": "PLAN",
+      "SSHExit": 0,
+      "stderrBytes": 0,
+      "profileValuesEmitted": false,
+      "rawDiagnosticSuppressed": true,
+      "remote": {
+        "mode": "PLAN",
+        "DBPersistentWrites": false,
+        "actualAdmission": "NOT_RUN",
+        "profileOrCredentialValuesEmitted": false,
+        "wholeProgramComplete": false,
+        "CLIExit": 0,
+        "CLIStdoutBytes": 875,
+        "CLIStderrBytes": 0,
+        "status": "READY_ACTUAL_READONLY_PLAN_TARGET_AND_PROFILE_VERIFIED",
+        "phase": "actual-cli-ready-and-zero-writes-readback",
+        "sameNamedServerSystemID": true,
+        "existingOperatorRoleClass": {
+          "rolsuper": true,
+          "rolbypassrls": true,
+          "rolcanlogin": true
+        },
+        "currentEpochMatches": true,
+        "tenantControls": {
+          "version": 0,
+          "kill_switch": false
+        },
+        "selectedBusinessLinkedProjectActive": true,
+        "plannedTargetCountsBefore": {
+          "node": 0,
+          "resources": 0,
+          "project_links": 0,
+          "channels": 0,
+          "audit": 0,
+          "controls": 0
+        },
+        "plannedTargetCountsAfter": {
+          "node": 0,
+          "resources": 0,
+          "project_links": 0,
+          "channels": 0,
+          "audit": 0,
+          "controls": 0
+        },
+        "CLIReadyPlanDigest": "b8fafc2c701fbb47143bccf656c0c6c7bcf1fe18aa4f5abb438d58ea3779dec5",
+        "childEnvironmentNames": [
+          "LANG",
+          "PATH",
+          "PYTHONDONTWRITEBYTECODE",
+          "PYTHONNOUSERSITE",
+          "SV_FRESH_NODE_EXPECTED_PLAN_SHA256",
+          "SV_FRESH_NODE_OPERATOR_DSN"
+        ],
+        "actualUserOIDCOrRunApproval": "NOT_PERFORMED_NOT_SUBSTITUTED_BY_OPERATOR_ROLE",
+        "NodeOrWorkloadExecuted": false
+      }
+    },
+    {
+      "atKST": "2026-11-07T17:10:39+09:00",
+      "PC": "PC4",
+      "mode": "APPLY",
+      "SSHExit": 0,
+      "stderrBytes": 0,
+      "profileValuesEmitted": false,
+      "rawDiagnosticSuppressed": true,
+      "remote": {
+        "mode": "APPLY",
+        "actualAdmission": "COMMITTED_ACKNOWLEDGED",
+        "profileOrCredentialValuesEmitted": false,
+        "NodeOrWorkloadOrUserApprovalExecuted": false,
+        "automaticRetryAllowed": false,
+        "wholeProgramComplete": false,
+        "before": {
+          "node": 0,
+          "resources": 0,
+          "project_links": 0,
+          "channels": 0,
+          "audit": 0,
+          "controls": 0
+        },
+        "CLIExit": 0,
+        "CLIStdoutBytes": 947,
+        "CLIStderrBytes": 0,
+        "status": "COMMITTED_ACK_AND_EXACT_SCOPE_READBACK",
+        "phase": "single-apply-complete",
+        "sameNamedServerSystemID": true,
+        "currentEpochMatches": true,
+        "tenantControlsUnchanged": true,
+        "after": {
+          "node": 1,
+          "resources": 2,
+          "project_links": 1,
+          "channels": 1,
+          "audit": 1,
+          "controls": 1
+        },
+        "nodeStatus": "offline",
+        "channel": {
+          "version": 1,
+          "certificate_sha256": "bc5a3763c7a34f3a5e51315209b0a388ccab5f99b76337ecca3cfe18a6b4c686",
+          "endpoint": "https://192.168.45.210:19443",
+          "enabled": true
+        },
+        "snapshotCount": 0,
+        "planDigest": "b8fafc2c701fbb47143bccf656c0c6c7bcf1fe18aa4f5abb438d58ea3779dec5",
+        "applyAttempts": 1,
+        "reconcileAttempts": 0,
+        "operatorRoleNotUserApproval": true
+      }
+    }
+  ],
+  "knownHostsUnchanged": true,
+  "NodeStart": "NOT_RUN",
+  "allFivePCsComplete": false,
+  "wholeProgramComplete": false
+}

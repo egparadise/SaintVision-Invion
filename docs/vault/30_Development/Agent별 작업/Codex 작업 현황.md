@@ -1,15 +1,19 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.470"
+version: "1.0.471"
 status: "review"
 author: "Codex"
-updated: "2026-11-07T17:02:18+09:00"
+updated: "2026-11-07T17:17:11+09:00"
 source_of_truth: "Git"
 active_card: "FLEET5 continued supervision with PORTAL-REFRESH-FLEET-20261106"
-active_card_status: "PC3FreshNodeSingleApplyAck_Running_ContinuousRealObservation_FreshOwnerProjectAPI200; PC2PC4Onboarding_CPWorkspace_TLSTrustAndRenewal_TwoRealApprovers_ActualRun_FivePCPending"
-active_card_next: "Root checks PC2/PC4 current readiness and performs isolated fresh onboarding. Preserve PC3 journal/PKI, keep observer and pinned SSH forward. Resolve current workspace/TLS trust/renewal and real approval identities before actual user Run; no fake votes or all5 claims."
+active_card_status: "PC2PC3PC4NewNodesRunning_ContinuousFreshRealObservation_FreshOwnerProjectAPI3Nodes200; CPWorkspaceRecipeAndIndependentPilotReviewReady; PC1SSH_PC5Docker_RealApproversRun_FivePCPending"
+active_card_next: "After checkpoint dispatch finite source-only CP workspace/routing recipe to B and one actual Claude independent public deployment-evidence review. Root handles results, current PC1/5 blockers and real workspace/approval/run/renewal; no all5 or browser acceptance claim."
 ---
+
+## 2026-11-07T17:17:11+09:00 실제2·3·4번PC 연속관측과 후속분담
+
+2·3·4번PC가현재프로젝트의새Node로실제연결됐다. 2·4번은각1회APPLY와정확readback후동일검증이미지로시작했고기존Node기록과journal은보존했다. 수동관측없는8초간격표본에서세Node모두online·15초이내fresh·heartbeat/snapshot/probe증가를확인했다. 새관리자PKCE로그인으로프로젝트nodes/capacity/각resource-usage HTTP200과3대·CPU1500m·메모리192MiB시험배정량을확인했다. 이는전체물리자원공유·5대·browser/실제Run완료가아니다. 1번SSH·5번Docker호환성·workspace·기본TLStrust/갱신·실제승인/Run이남는다. 실제명령·exit·원본실패·복구·SHA·CI와미완료다음담당은Root History/Evidence에보존했다.
 
 ## 2026-11-07T17:02:18+09:00 실제3번PC 등록·연속관측·현재관리자API
 

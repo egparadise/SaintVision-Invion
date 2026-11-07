@@ -1,0 +1,51 @@
+import base64,hashlib,json,os,subprocess,sys
+from pathlib import Path
+import psycopg
+from psycopg.rows import dict_row
+phase='validate-root-ready-request-and-profile';attempted=False;ack=False;reconciled=False
+result={'mode':'APPLY','actualAdmission':'NOT_ATTEMPTED','profileOrCredentialValuesEmitted':False,'NodeOrWorkloadOrUserApprovalExecuted':False,'automaticRetryAllowed':False,'wholeProgramComplete':False}
+try:
+ p=json.loads(sys.stdin.buffer.read(65537));plan=p['publicPlan'];ops=Path(p['operatorEnvironment']).resolve();assert Path(sys.prefix).resolve()==ops/'venv'
+ assert hashlib.sha256((ops/'venv/lib/python3.14/site-packages/inv/fresh_cpu_admission.py').read_bytes()).hexdigest()==p['librarySHA256']
+ assert hashlib.sha256((ops/'fresh_cpu_admission.py').read_bytes()).hexdigest()=='8129ab5acf7061b0bc1834aa1142ae944471b1b177f018c810de34ea9a53fe7d'
+ assert hashlib.sha256((ops/'operator_reconcile_fresh_cpu.py').read_bytes()).hexdigest()=='42e89b6173cd9a8ad1cfa6998da30f068d6409e03e803b523bfb7f076576a3aa'
+ raw=base64.b64decode(p['rawRequestBase64'],validate=True);assert hashlib.sha256(raw).hexdigest()==p['requestSHA256'] and raw==(ops/p['requestFileName']).read_bytes()
+ req=json.loads(raw);assert req['nodeId']==plan['newPlannedIDs']['nodeId'] and req['tenantId']==plan['tenant'] and req['projectId']==plan['project'] and req['recoveryEpoch']==plan['epoch']
+ for name in list(os.environ):
+  if name.startswith('PG'):os.environ.pop(name,None)
+ childenv={'PATH':'/usr/bin:/bin','LANG':'C.UTF-8','PYTHONDONTWRITEBYTECODE':'1','PYTHONNOUSERSITE':'1','SV_FRESH_NODE_OPERATOR_DSN':p['privateDSN'],'SV_FRESH_NODE_EXPECTED_PLAN_SHA256':p['planDigest']}
+ phase='same-server-role-current-target-recheck'
+ with psycopg.connect(p['privateDSN'],autocommit=True,row_factory=dict_row) as conn:
+  conn.read_only=True
+  assert conn.execute('SELECT system_identifier::text AS id FROM pg_control_system()').fetchone()['id']==p['expectedServerSystemID']
+  role=conn.execute('SELECT rolsuper,rolbypassrls FROM pg_roles WHERE rolname=current_user').fetchone();assert role['rolsuper'] or role['rolbypassrls']
+  assert str(conn.execute('SELECT epoch FROM inv.control_epoch WHERE singleton').fetchone()['epoch'])==plan['epoch']
+  control=conn.execute('SELECT version,kill_switch,updated_at FROM inv.tenant_controls WHERE tenant_id=%s',(plan['tenant'],)).fetchone();assert control['version']==plan['expectedTenantControlVersion']
+  assert conn.execute("SELECT count(*)=1 AS ok FROM inv.business_projects b JOIN public.projects q ON q.tenant_id=b.tenant_id AND q.project_id=b.project_id WHERE b.tenant_id=%s AND b.project_id=%s AND b.enabled AND q.status='active'",(plan['tenant'],plan['project'])).fetchone()['ok']
+  def counts():return conn.execute("SELECT (SELECT count(*) FROM inv.nodes WHERE tenant_id=%s AND node_id=%s) AS node,(SELECT count(*) FROM inv.resources WHERE tenant_id=%s AND resource_id IN (%s,%s)) AS resources,(SELECT count(*) FROM inv.project_nodes WHERE tenant_id=%s AND node_id=%s) AS project_links,(SELECT count(*) FROM inv.node_channels WHERE tenant_id=%s AND node_id=%s) AS channels,(SELECT count(*) FROM inv.node_channel_audit WHERE tenant_id=%s AND node_id=%s) AS audit,(SELECT count(*) FROM inv.node_controls WHERE tenant_id=%s AND node_id=%s) AS controls",(plan['tenant'],req['nodeId'],plan['tenant'],req['cpuResourceId'],req['memoryResourceId'],plan['tenant'],req['nodeId'],plan['tenant'],req['nodeId'],plan['tenant'],req['nodeId'],plan['tenant'],req['nodeId'])).fetchone()
+  before=counts();assert all(v==0 for v in before.values());result['before']=before
+  phase='single-candidate-cli-apply';attempted=True;result['actualAdmission']='UNKNOWN_UNTIL_ACKNOWLEDGED'
+  q=subprocess.run([str(ops/'venv/bin/python'),'-I','-B',str(ops/'fresh_cpu_admission.py'),'--apply','--expected-plan-sha256',p['planDigest']],input=raw,capture_output=True,timeout=25,env=childenv)
+  result.update(CLIExit=q.returncode,CLIStdoutBytes=len(q.stdout),CLIStderrBytes=len(q.stderr))
+  assert q.returncode==0 and not q.stderr and len(q.stdout)<=16384;receipt=json.loads(q.stdout)
+  assert type(receipt) is dict and receipt['mode']=='APPLY' and receipt['status']=='COMMITTED' and receipt['planSha256']==p['planDigest'] and receipt['readbackVerifiedBeforeCommit'] is True and receipt['nodeControlSeedVersion']==0
+  ack=True;result['actualAdmission']='COMMITTED_ACKNOWLEDGED';phase='external-exact-scope-readback'
+  after=counts();assert after=={'node':1,'resources':2,'project_links':1,'channels':1,'audit':1,'controls':1}
+  assert conn.execute('SELECT version,kill_switch,updated_at FROM inv.tenant_controls WHERE tenant_id=%s',(plan['tenant'],)).fetchone()==control
+  node=conn.execute('SELECT status,recovery_epoch FROM inv.nodes WHERE tenant_id=%s AND node_id=%s',(plan['tenant'],req['nodeId'])).fetchone();assert node['status']=='offline' and str(node['recovery_epoch'])==plan['epoch']
+  channel=conn.execute('SELECT version,certificate_sha256,endpoint,enabled FROM inv.node_channels WHERE tenant_id=%s AND node_id=%s',(plan['tenant'],req['nodeId'])).fetchone();assert channel['version']==1 and channel['enabled'] and channel['endpoint']==req['endpoint']
+  snapshot_count=conn.execute('SELECT count(*) AS n FROM inv.node_resource_snapshots WHERE tenant_id=%s AND node_id=%s',(plan['tenant'],req['nodeId'])).fetchone()['n'];assert snapshot_count==0
+ result.update(status='COMMITTED_ACK_AND_EXACT_SCOPE_READBACK',phase='single-apply-complete',sameNamedServerSystemID=True,currentEpochMatches=True,tenantControlsUnchanged=True,after=after,nodeStatus='offline',channel=channel,snapshotCount=0,planDigest=p['planDigest'],applyAttempts=1,reconcileAttempts=0,operatorRoleNotUserApproval=True)
+except BaseException as error:
+ result.update(status='HOLD_APPLY_OR_READBACK_UNRESOLVED',phase=phase,errorClass=type(error).__name__,rawDiagnosticSuppressed=True,applyAttempts=1 if attempted else 0,reconcileAttempts=0,actualAdmission='COMMITTED_ACK_BUT_READBACK_HOLD' if ack else 'UNKNOWN_RECONCILE_REQUIRED' if attempted else 'NOT_ATTEMPTED')
+ if attempted and not ack:
+  reconciled=True;result['reconcileAttempts']=1
+  try:
+   z=subprocess.run([str(ops/'venv/bin/python'),'-I','-B',str(ops/'operator_reconcile_fresh_cpu.py')],input=raw,capture_output=True,timeout=25,env=childenv)
+   result['readonlyReconcileExit']=z.returncode;result['readonlyReconcileStdoutBytes']=len(z.stdout);result['readonlyReconcileStderrBytes']=len(z.stderr)
+   if z.returncode==0 and not z.stderr and len(z.stdout)<=4096:
+    observed=json.loads(z.stdout);assert observed['mode']=='RECONCILE' and observed['status']=='MATCHED_METADATA_REQUIRES_OPERATOR_DISPOSITION' and observed['planSha256']==p['planDigest']
+    result['readonlyReconcile']='MATCHED_METADATA_REQUIRES_ROOT_DISPOSITION_NO_REAPPLY_OR_AUTO_RESUME'
+   else:result['readonlyReconcile']='HOLD_NO_REAPPLY'
+  except BaseException:result['readonlyReconcile']='HOLD_NO_REAPPLY'
+print(json.dumps(result));raise SystemExit(0 if result.get('status')=='COMMITTED_ACK_AND_EXACT_SCOPE_READBACK' else 2)

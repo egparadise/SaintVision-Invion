@@ -1,0 +1,184 @@
+{
+  "atKST": "2026-11-07T17:14:39+09:00",
+  "status": "REAL_ADMIN_PKCE_THREE_PROJECT_NODES_AND_CAPACITY_VERIFIED",
+  "authorizationCodePKCES256": true,
+  "tokenExchangeHTTP": 200,
+  "sessionHTTP": 200,
+  "ownerPermissionHTTP": 200,
+  "roleCode": "owner",
+  "canAdminister": true,
+  "project": "prj_01M6NDBHVD2DZQ1Q38DCKN1XE3",
+  "nodesHTTP": 200,
+  "capacityHTTP": 200,
+  "currentProjectNodeCount": 3,
+  "nodes": [
+    {
+      "node": {
+        "nodeId": "nod_01M6TAWG25JTA3F7J7S1EE4N2W",
+        "status": "online",
+        "lastHeartbeatAt": "2026-11-07T08:14:36.053635+00:00"
+      },
+      "heartbeatAgeSecondsAtRead": 3.120428,
+      "capacity": {
+        "nodeId": "nod_01M6TAWG25JTA3F7J7S1EE4N2W",
+        "offered": {
+          "cpuMillis": 500,
+          "memoryBytes": 67108864
+        },
+        "spare": {
+          "cpuMillis": 500,
+          "memoryBytes": 67108864
+        },
+        "measured": true
+      },
+      "resourceUsageHTTP": 200,
+      "resourceUsage": {
+        "source": "execution-kernel",
+        "nodeId": "nod_01M6TAWG25JTA3F7J7S1EE4N2W",
+        "stateAsOf": "2026-11-07T08:14:36.053635+00:00",
+        "resources": [
+          {
+            "resourceId": "res_01M6TAWG25QSR4HH7XWWJSB0W0",
+            "kind": "cpu",
+            "unit": "millicores",
+            "capacity": 500,
+            "offered": 500,
+            "reserved": 0,
+            "spare": 500,
+            "measured": true,
+            "observedAt": "2026-11-07T08:14:36.053635+00:00"
+          },
+          {
+            "resourceId": "res_01M6TAWG25ZHS2RG3NHQX4SPEH",
+            "kind": "memory",
+            "unit": "bytes",
+            "capacity": 67108864,
+            "offered": 67108864,
+            "reserved": 0,
+            "spare": 67108864,
+            "measured": true,
+            "observedAt": "2026-11-07T08:14:36.053635+00:00"
+          }
+        ]
+      }
+    },
+    {
+      "node": {
+        "nodeId": "nod_01M6TGQZ8S3DAFS7TYE8TY1PX2",
+        "status": "online",
+        "lastHeartbeatAt": "2026-11-07T08:14:36.061802+00:00"
+      },
+      "heartbeatAgeSecondsAtRead": 3.147609,
+      "capacity": {
+        "nodeId": "nod_01M6TGQZ8S3DAFS7TYE8TY1PX2",
+        "offered": {
+          "cpuMillis": 500,
+          "memoryBytes": 67108864
+        },
+        "spare": {
+          "cpuMillis": 500,
+          "memoryBytes": 67108864
+        },
+        "measured": true
+      },
+      "resourceUsageHTTP": 200,
+      "resourceUsage": {
+        "source": "execution-kernel",
+        "nodeId": "nod_01M6TGQZ8S3DAFS7TYE8TY1PX2",
+        "stateAsOf": "2026-11-07T08:14:36.061802+00:00",
+        "resources": [
+          {
+            "resourceId": "res_01M6TGQZ8SP2BTEHW98HSYSDYP",
+            "kind": "cpu",
+            "unit": "millicores",
+            "capacity": 500,
+            "offered": 500,
+            "reserved": 0,
+            "spare": 500,
+            "measured": true,
+            "observedAt": "2026-11-07T08:14:36.061802+00:00"
+          },
+          {
+            "resourceId": "res_01M6TGQZ8SZ1ZBS309NK8C56XF",
+            "kind": "memory",
+            "unit": "bytes",
+            "capacity": 67108864,
+            "offered": 67108864,
+            "reserved": 0,
+            "spare": 67108864,
+            "measured": true,
+            "observedAt": "2026-11-07T08:14:36.061802+00:00"
+          }
+        ]
+      }
+    },
+    {
+      "node": {
+        "nodeId": "nod_01M6TGSXV1J7XWC5D5H7N6EW1D",
+        "status": "online",
+        "lastHeartbeatAt": "2026-11-07T08:14:36.045941+00:00"
+      },
+      "heartbeatAgeSecondsAtRead": 3.203073,
+      "capacity": {
+        "nodeId": "nod_01M6TGSXV1J7XWC5D5H7N6EW1D",
+        "offered": {
+          "cpuMillis": 500,
+          "memoryBytes": 67108864
+        },
+        "spare": {
+          "cpuMillis": 500,
+          "memoryBytes": 67108864
+        },
+        "measured": true
+      },
+      "resourceUsageHTTP": 200,
+      "resourceUsage": {
+        "source": "execution-kernel",
+        "nodeId": "nod_01M6TGSXV1J7XWC5D5H7N6EW1D",
+        "stateAsOf": "2026-11-07T08:14:36.045941+00:00",
+        "resources": [
+          {
+            "resourceId": "res_01M6TGSXV1DZ02FP8Z8PH2FGDB",
+            "kind": "memory",
+            "unit": "bytes",
+            "capacity": 67108864,
+            "offered": 67108864,
+            "reserved": 0,
+            "spare": 67108864,
+            "measured": true,
+            "observedAt": "2026-11-07T08:14:36.045941+00:00"
+          },
+          {
+            "resourceId": "res_01M6TGSXV1JYVSGXTXBVPFAXKR",
+            "kind": "cpu",
+            "unit": "millicores",
+            "capacity": 500,
+            "offered": 500,
+            "reserved": 0,
+            "spare": 500,
+            "measured": true,
+            "observedAt": "2026-11-07T08:14:36.045941+00:00"
+          }
+        ]
+      }
+    }
+  ],
+  "totalOffered": {
+    "cpuMillis": 1500,
+    "memoryBytes": 201326592
+  },
+  "spareNow": {
+    "cpuMillis": 1500,
+    "memoryBytes": 201326592
+  },
+  "anonymousSessionHTTP": 401,
+  "explicitExistingPublicChainTLSVerified": true,
+  "defaultWindowsTLSVerified": false,
+  "insecureTLSOptionUsed": false,
+  "passwordAndTokensPersisted": false,
+  "browserSelectedProject": "NOT_OBSERVED",
+  "fivePCsComplete": false,
+  "allPhysicalResourcesShared": false,
+  "actualUserWorkloadAndVotes": "NOT_RUN",
+  "wholeProgramComplete": false
+}

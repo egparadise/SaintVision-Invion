@@ -1,0 +1,29 @@
+import base64,hashlib,json,os,stat,sys
+from pathlib import Path
+from cryptography import x509
+from cryptography.hazmat.primitives import serialization
+from cryptography.hazmat.primitives.asymmetric import ed25519
+from cryptography.x509.oid import NameOID
+phase='validate-exact-new-owned-scope';o={'privateKeyEmitted':False,'DBAdmission':'NOT_RUN','NodeStarted':False,'oldIdentityOrStateChanged':False}
+try:
+ p=json.loads(sys.stdin.buffer.read(65537));assert os.getuid()==1000;os.umask(0o077)
+ assert hashlib.sha256(Path(sys.executable).read_bytes()).hexdigest()==p['host']['pythonSHA256']
+ share=(Path.home()/'saintvision-share').resolve();assert share.is_dir() and share.stat().st_uid==1000
+ parent=share/'nodes'
+ if not parent.exists():parent.mkdir(mode=0o700)
+ assert parent.is_dir() and parent.resolve()==parent and parent.stat().st_uid==1000 and not parent.stat().st_mode&0o022
+ nd=parent/p['newPlannedIDs']['nodeId'];ops=share/'ops-cpu-node-1efea-r1-20261107'
+ assert str(nd)==p['plannedNewNodeDirectory'] and str(ops)==p['ownedNewEnvironment'] and not nd.exists() and not ops.exists()
+ phase='create-only-new-names-and-server-key-csr';nd.mkdir(mode=0o700);(nd/'state').mkdir(mode=0o700);ops.mkdir(mode=0o700)
+ def save(path,b,private=False):
+  fd=os.open(path,os.O_WRONLY|os.O_CREAT|os.O_EXCL,0o600 if private else 0o644)
+  with os.fdopen(fd,'wb') as f:f.write(b)
+  st=path.lstat();assert stat.S_ISREG(st.st_mode) and st.st_uid==1000 and not st.st_mode&(0o077 if private else 0o022)
+ key=ed25519.Ed25519PrivateKey.generate();uri='spiffe://saintvision.ai/tenant/'+p['tenant']+'/node/'+p['newPlannedIDs']['nodeId']+'/epoch/'+p['epoch']
+ csr=x509.CertificateSigningRequestBuilder().subject_name(x509.Name([x509.NameAttribute(NameOID.COMMON_NAME,p['newPlannedIDs']['nodeId'])])).add_extension(x509.SubjectAlternativeName([x509.UniformResourceIdentifier(uri)]),critical=False).sign(key,algorithm=None)
+ assert csr.is_signature_valid
+ raw=csr.public_bytes(serialization.Encoding.PEM);save(nd/'node-key.pem',key.private_bytes(serialization.Encoding.PEM,serialization.PrivateFormat.PKCS8,serialization.NoEncryption()),True);save(ops/'node-server.csr.pem',raw)
+ save(ops/'public-plan.json',(json.dumps(p,sort_keys=True)+'\n').encode())
+ o.update(status='NEW_HOST_KEY_AND_PUBLIC_CSR_PREPARED_NOT_ENROLLED',phase=phase,node=p['newPlannedIDs']['nodeId'],nodeDirectory=str(nd),opsDirectory=str(ops),nodeURI=uri,publicCSRPEM=raw.decode(),publicCSR_SHA256=hashlib.sha256(raw).hexdigest(),keyMode='0600 uid1000; never left target host',parentModes='new directories0700',stateInitiallyEmpty=not list((nd/'state').iterdir()))
+except BaseException as error:o.update(status='HOLD_NEW_IDENTITY_PREPARATION',phase=phase,errorClass=type(error).__name__,rawDiagnosticSuppressed=True)
+print(json.dumps(o));raise SystemExit(0 if o.get('status')=='NEW_HOST_KEY_AND_PUBLIC_CSR_PREPARED_NOT_ENROLLED' else 2)

@@ -1,0 +1,12 @@
+import hashlib,json,os,subprocess,sys
+from pathlib import Path
+p=json.loads(sys.stdin.buffer.read(65537));path=Path(p['publicPlan']['ownedNewEnvironment'])/'public-cpu-images-r1.tar';assert path.is_file() and not path.is_symlink() and path.stat().st_uid==1000 and path.stat().st_size==p['bundleBytes'];path.chmod(0o600)
+h=hashlib.sha256()
+with path.open('rb') as f:
+ for b in iter(lambda:f.read(1048576),b''):h.update(b)
+assert h.hexdigest()==p['bundleSHA256']
+q=subprocess.run(['docker','image','load','--input',str(path)],capture_output=True,timeout=60);assert q.returncode==0
+checked=[]
+for ref in p['imageIDs']:
+ q=subprocess.run(['docker','image','inspect',ref],capture_output=True,timeout=10);assert q.returncode==0;v=json.loads(q.stdout)[0];assert v['Id']==ref and v['Config']['Labels']['org.opencontainers.image.revision']=='1efea494f026e932360c35ae811b6423d874a2e7';checked.append(ref)
+print(json.dumps({'status':'EXACT_PRODUCT_IMAGES_LOADED','imageIDs':checked,'bundleSHA256':h.hexdigest(),'tagOverwrite':False,'oldContainerMutation':False}))

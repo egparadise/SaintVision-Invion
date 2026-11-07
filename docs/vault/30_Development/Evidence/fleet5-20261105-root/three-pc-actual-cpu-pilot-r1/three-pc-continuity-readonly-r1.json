@@ -1,0 +1,209 @@
+{
+  "atKST": "2026-11-07T17:13:46+09:00",
+  "status": "THREE_REAL_NODES_CONTINUOUSLY_FRESH_ADVANCING",
+  "DBWrites": false,
+  "manualObserverCalls": 0,
+  "sampleIntervalSeconds": 8,
+  "channels": [
+    {
+      "node_id": "nod_01M6TAWG25JTA3F7J7S1EE4N2W",
+      "version": 1,
+      "endpoint": "https://192.168.45.222:19443"
+    },
+    {
+      "node_id": "nod_01M6TGQZ8S3DAFS7TYE8TY1PX2",
+      "version": 1,
+      "endpoint": "https://192.168.45.143:19443"
+    },
+    {
+      "node_id": "nod_01M6TGSXV1J7XWC5D5H7N6EW1D",
+      "version": 1,
+      "endpoint": "https://192.168.45.210:19443"
+    }
+  ],
+  "firstSample": [
+    {
+      "node_id": "nod_01M6TAWG25JTA3F7J7S1EE4N2W",
+      "status": "online",
+      "heartbeat_at": "2026-11-07 08:13:36.896469+00:00",
+      "heartbeat_age_seconds": 1.665992,
+      "received_at": "2026-11-07 08:13:36.896469+00:00",
+      "snapshot_age_seconds": 1.666108,
+      "channel_version": 1,
+      "consumed_probes": 226,
+      "snapshot": {
+        "nonce": "cb1cad5d0febd3fa98e16f9c859eb61d33cfcbad4bbac3ea19ef63272882f2a0",
+        "nodeId": "nod_01M6TAWG25JTA3F7J7S1EE4N2W",
+        "osType": "linux",
+        "tenantId": "97968b42-68aa-40ce-af5e-3a33e2fc2205",
+        "observedAt": "2026-11-07T08:13:36.719625067Z",
+        "agentVersion": "0.1.0",
+        "sampleMillis": 150,
+        "cpuBusyMillis": 336,
+        "recoveryEpoch": "bcd581be-31b4-4aca-86e6-3ca31b69ed09",
+        "profileVersion": "cpu-pilot-1efea-r1",
+        "cpuCapacityMillis": 12000,
+        "memoryCapacityBytes": 15938240512,
+        "memoryAvailableBytes": 11327180800
+      }
+    },
+    {
+      "node_id": "nod_01M6TGQZ8S3DAFS7TYE8TY1PX2",
+      "status": "online",
+      "heartbeat_at": "2026-11-07 08:13:36.832062+00:00",
+      "heartbeat_age_seconds": 1.730705,
+      "received_at": "2026-11-07 08:13:36.832062+00:00",
+      "snapshot_age_seconds": 1.730707,
+      "channel_version": 1,
+      "consumed_probes": 6,
+      "snapshot": {
+        "nonce": "9f2347ead99d4a1d7a2a98112387a2a348a89d2d21dbd9cbb12727fdf3881aaf",
+        "nodeId": "nod_01M6TGQZ8S3DAFS7TYE8TY1PX2",
+        "osType": "linux",
+        "tenantId": "97968b42-68aa-40ce-af5e-3a33e2fc2205",
+        "observedAt": "2026-11-07T08:13:36.591432916Z",
+        "agentVersion": "0.1.0",
+        "sampleMillis": 150,
+        "cpuBusyMillis": 266,
+        "recoveryEpoch": "bcd581be-31b4-4aca-86e6-3ca31b69ed09",
+        "profileVersion": "cpu-pilot-1efea-r1",
+        "cpuCapacityMillis": 12000,
+        "memoryCapacityBytes": 15938523136,
+        "memoryAvailableBytes": 9085186048
+      }
+    },
+    {
+      "node_id": "nod_01M6TGSXV1J7XWC5D5H7N6EW1D",
+      "status": "online",
+      "heartbeat_at": "2026-11-07 08:13:36.895778+00:00",
+      "heartbeat_age_seconds": 1.667029,
+      "received_at": "2026-11-07 08:13:36.895778+00:00",
+      "snapshot_age_seconds": 1.66703,
+      "channel_version": 1,
+      "consumed_probes": 6,
+      "snapshot": {
+        "nonce": "135dd15288ffd968ba619ad4a298393e5b4519db9dc1096ccd0b730d0c0d0396",
+        "nodeId": "nod_01M6TGSXV1J7XWC5D5H7N6EW1D",
+        "osType": "linux",
+        "tenantId": "97968b42-68aa-40ce-af5e-3a33e2fc2205",
+        "observedAt": "2026-11-07T08:13:36.741742909Z",
+        "agentVersion": "0.1.0",
+        "sampleMillis": 150,
+        "cpuBusyMillis": 0,
+        "recoveryEpoch": "bcd581be-31b4-4aca-86e6-3ca31b69ed09",
+        "profileVersion": "cpu-pilot-1efea-r1",
+        "cpuCapacityMillis": 12000,
+        "memoryCapacityBytes": 16480641024,
+        "memoryAvailableBytes": 11657580544
+      }
+    }
+  ],
+  "secondSample": [
+    {
+      "node_id": "nod_01M6TAWG25JTA3F7J7S1EE4N2W",
+      "status": "online",
+      "heartbeat_at": "2026-11-07 08:13:44.524333+00:00",
+      "heartbeat_age_seconds": 2.041107,
+      "received_at": "2026-11-07 08:13:44.524333+00:00",
+      "snapshot_age_seconds": 2.041114,
+      "channel_version": 1,
+      "consumed_probes": 227,
+      "snapshot": {
+        "nonce": "03d7d049059a2d3d927cece2dd435125c44924bc9532d0e64742f10ca3262c5d",
+        "nodeId": "nod_01M6TAWG25JTA3F7J7S1EE4N2W",
+        "osType": "linux",
+        "tenantId": "97968b42-68aa-40ce-af5e-3a33e2fc2205",
+        "observedAt": "2026-11-07T08:13:44.324913347Z",
+        "agentVersion": "0.1.0",
+        "sampleMillis": 150,
+        "cpuBusyMillis": 400,
+        "recoveryEpoch": "bcd581be-31b4-4aca-86e6-3ca31b69ed09",
+        "profileVersion": "cpu-pilot-1efea-r1",
+        "cpuCapacityMillis": 12000,
+        "memoryCapacityBytes": 15938240512,
+        "memoryAvailableBytes": 11327307776
+      }
+    },
+    {
+      "node_id": "nod_01M6TGQZ8S3DAFS7TYE8TY1PX2",
+      "status": "online",
+      "heartbeat_at": "2026-11-07 08:13:44.468264+00:00",
+      "heartbeat_age_seconds": 2.09724,
+      "received_at": "2026-11-07 08:13:44.468264+00:00",
+      "snapshot_age_seconds": 2.097241,
+      "channel_version": 1,
+      "consumed_probes": 7,
+      "snapshot": {
+        "nonce": "594049b1375dfed962feda7cd0c50e2f2805899df1c590036f45d7944d442151",
+        "nodeId": "nod_01M6TGQZ8S3DAFS7TYE8TY1PX2",
+        "osType": "linux",
+        "tenantId": "97968b42-68aa-40ce-af5e-3a33e2fc2205",
+        "observedAt": "2026-11-07T08:13:44.290051892Z",
+        "agentVersion": "0.1.0",
+        "sampleMillis": 150,
+        "cpuBusyMillis": 269,
+        "recoveryEpoch": "bcd581be-31b4-4aca-86e6-3ca31b69ed09",
+        "profileVersion": "cpu-pilot-1efea-r1",
+        "cpuCapacityMillis": 12000,
+        "memoryCapacityBytes": 15938523136,
+        "memoryAvailableBytes": 9080745984
+      }
+    },
+    {
+      "node_id": "nod_01M6TGSXV1J7XWC5D5H7N6EW1D",
+      "status": "online",
+      "heartbeat_at": "2026-11-07 08:13:44.622770+00:00",
+      "heartbeat_age_seconds": 1.942759,
+      "received_at": "2026-11-07 08:13:44.622770+00:00",
+      "snapshot_age_seconds": 1.94276,
+      "channel_version": 1,
+      "consumed_probes": 7,
+      "snapshot": {
+        "nonce": "62721c88d92a636c1cf3ecd202a1b2457add51a9fd5d24871161eb6e9118b3a0",
+        "nodeId": "nod_01M6TGSXV1J7XWC5D5H7N6EW1D",
+        "osType": "linux",
+        "tenantId": "97968b42-68aa-40ce-af5e-3a33e2fc2205",
+        "observedAt": "2026-11-07T08:13:44.499985322Z",
+        "agentVersion": "0.1.0",
+        "sampleMillis": 151,
+        "cpuBusyMillis": 67,
+        "recoveryEpoch": "bcd581be-31b4-4aca-86e6-3ca31b69ed09",
+        "profileVersion": "cpu-pilot-1efea-r1",
+        "cpuCapacityMillis": 12000,
+        "memoryCapacityBytes": 16480641024,
+        "memoryAvailableBytes": 11657580544
+      }
+    }
+  ],
+  "checks": [
+    {
+      "node": "nod_01M6TAWG25JTA3F7J7S1EE4N2W",
+      "sameNode": true,
+      "online": true,
+      "fresh": true,
+      "advanced": true,
+      "currentChannelVersion": true
+    },
+    {
+      "node": "nod_01M6TGQZ8S3DAFS7TYE8TY1PX2",
+      "sameNode": true,
+      "online": true,
+      "fresh": true,
+      "advanced": true,
+      "currentChannelVersion": true
+    },
+    {
+      "node": "nod_01M6TGSXV1J7XWC5D5H7N6EW1D",
+      "sameNode": true,
+      "online": true,
+      "fresh": true,
+      "advanced": true,
+      "currentChannelVersion": true
+    }
+  ],
+  "tenantControlsUnchanged": true,
+  "currentProjectCPUOnlyPilotNodeCount": 3,
+  "allFivePCsComplete": false,
+  "actualUserWorkloadRun": "NOT_RUN",
+  "wholeProgramComplete": false
+}

@@ -1,0 +1,25 @@
+{
+  "atKST": "2026-11-07T17:12:00+09:00",
+  "PC": "PC2",
+  "stage": "public-trust",
+  "SSHExit": 0,
+  "stderrBytes": 153,
+  "rawDiagnosticSuppressed": true,
+  "remote": {
+    "privateKeysTransferred": false,
+    "oldNodeStateChanged": false,
+    "NodeStarted": false,
+    "status": "PUBLIC_TRUST_INSTALLED_PRIVATE_KEY_MATCHES_STRICT_TLS_CONTEXT_LOADED",
+    "node": "nod_01M6TGQZ8S3DAFS7TYE8TY1PX2",
+    "NodeDER_SHA256": "ec4b6be14dd8be8ec3eaecbf4b58a27cb567449931cf2e3668422f647eaaf415",
+    "newPublicFileHashes": {
+      "node-cert.pem": "6d5d83d5418bc3e04c1d598ffceeaa77d38355b777c0b4c00eafee488893e360",
+      "client-ca.pem": "b8d777ab04c65a44f827fdda9629d54a086e9ff8cc752b90a09023a93341c5a3",
+      "launch-signer.pub": "21baf6f95ff93c3a55b1fc2e01a134b8833d6fdeaac051126c9bed2b86df051b",
+      "peer-policy.json": "f66ab039d1dca445f3fb4cd723d9b7ae237a6d470efce4a17440914972fa467a"
+    },
+    "privateKeyStillLocal": true,
+    "privateKeyMode": "0600 uid1000",
+    "CAAndClientAndLaunchPrivateKeyOnTarget": false
+  }
+}

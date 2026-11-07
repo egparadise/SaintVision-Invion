@@ -1,0 +1,95 @@
+{
+  "atKST": "2026-11-07T17:09:10+09:00",
+  "SSHExit": 0,
+  "stderrBytes": 0,
+  "knownHostsUnchanged": true,
+  "remote": {
+    "privateKeyEmitted": false,
+    "privateKeysCopiedToOtherHosts": false,
+    "DBAdmission": "NOT_RUN",
+    "NodeStarted": false,
+    "wholeProgramComplete": false,
+    "status": "PUBLIC_CSRS_SIGNED_DEDICATED_CA_NO_ENROLLMENT",
+    "phase": "closed-public-admission-request-validated",
+    "results": [
+      {
+        "PC": "PC2",
+        "node": "nod_01M6TGQZ8S3DAFS7TYE8TY1PX2",
+        "NodeDER_SHA256": "ec4b6be14dd8be8ec3eaecbf4b58a27cb567449931cf2e3668422f647eaaf415",
+        "CSR_SHA256": "7b1f16b0c6d2bfe37c5822e273fdd4312c2cf1207d5e16f373f0059318fe0a55",
+        "nodeCertificatePEM": "-----BEGIN CERTIFICATE-----\nMIICMDCCAeKgAwIBAgIUOW2iM+Xc+XudIkrag5QEEV+4RNswBQYDK2VwMCMxITAf\nBgNVBAMMGFNhaW50VmlzaW9uIENQVSBwaWxvdCBDQTAeFw0yNjExMDcwODA0MDla\nFw0yNjExMDkwNzE1MzBaMCkxJzAlBgNVBAMMHm5vZF8wMU02VEdRWjhTM0RBRlM3\nVFlFOFRZMVBYMjAqMAUGAytlcAMhACxzhbhQFGbLZthQV3UYYb/cb+7u0Ot51AYu\neDRiNg/mo4IBIDCCARwwDAYDVR0TAQH/BAIwADAOBgNVHQ8BAf8EBAMCB4AwgaYG\nA1UdEQSBnjCBm4aBknNwaWZmZTovL3NhaW50dmlzaW9uLmFpL3RlbmFudC85Nzk2\nOGI0Mi02OGFhLTQwY2UtYWY1ZS0zYTMzZTJmYzIyMDUvbm9kZS9ub2RfMDFNNlRH\nUVo4UzNEQUZTN1RZRThUWTFQWDIvZXBvY2gvYmNkNTgxYmUtMzFiNC00YWNhLTg2\nZTYtM2NhMzFiNjllZDA5hwTAqC2PMBMGA1UdJQQMMAoGCCsGAQUFBwMBMB0GA1Ud\nDgQWBBQA/41SM4KRjAdWuYXg3wdfXxYynzAfBgNVHSMEGDAWgBTJJmCGoQT31Aw3\nSSTS/QvkFEkMKzAFBgMrZXADQQCdw8FbY4k3w+OrNa9cboOoGNsh2ob/xuDzh17f\nLNJix70FTy7ZFs8DqFEuxwPpm/vMHgV5wx5iu46vuUhA6sgF\n-----END CERTIFICATE-----\n",
+        "publicCA_PEM": "-----BEGIN CERTIFICATE-----\nMIIBbjCCASCgAwIBAgIUB8TDbRheEtIMM9S6SDnJFyjHVEEwBQYDK2VwMCMxITAf\nBgNVBAMMGFNhaW50VmlzaW9uIENQVSBwaWxvdCBDQTAeFw0yNjExMDcwNzEwMzBa\nFw0yNjExMTQwNzE1MzBaMCMxITAfBgNVBAMMGFNhaW50VmlzaW9uIENQVSBwaWxv\ndCBDQTAqMAUGAytlcAMhAK4qDDb18qU5/QPL+7AjoimYxWo6zojpBBl8LrpXPoyT\no2YwZDASBgNVHRMBAf8ECDAGAQH/AgEAMA4GA1UdDwEB/wQEAwIBhjAdBgNVHQ4E\nFgQUySZghqEE99QMN0kk0v0L5BRJDCswHwYDVR0jBBgwFoAUySZghqEE99QMN0kk\n0v0L5BRJDCswBQYDK2VwA0EAguEFbX1UjBBgj4TCT64yW0lgdLq1zFcfTSzEv0om\nJ+Oaa+vkhRmxijbqTUyZNbrCzIGrG5NcE85x6wNWjEctCg==\n-----END CERTIFICATE-----\n",
+        "launchPublicBase64": "OZd7AjKn9WL6X64KPmtlH6Xok9Bk7+eHgto4hkfSm38=",
+        "peerPolicy": {
+          "version": 1,
+          "tenantId": "97968b42-68aa-40ce-af5e-3a33e2fc2205",
+          "nodeId": "nod_01M6TGQZ8S3DAFS7TYE8TY1PX2",
+          "recoveryEpoch": "bcd581be-31b4-4aca-86e6-3ca31b69ed09",
+          "expiresAt": "2026-11-08T07:15:30Z",
+          "clientFingerprints": [
+            "48911c5ddf7d12f05b9866feea0f0005c193d76a956274e2510492d0c2f76481"
+          ]
+        },
+        "peerPolicySHA256": "f66ab039d1dca445f3fb4cd723d9b7ae237a6d470efce4a17440914972fa467a",
+        "publicAdmissionRequest": {
+          "requestVersion": 1,
+          "tenantId": "97968b42-68aa-40ce-af5e-3a33e2fc2205",
+          "recoveryEpoch": "bcd581be-31b4-4aca-86e6-3ca31b69ed09",
+          "projectId": "prj_01M6NDBHVD2DZQ1Q38DCKN1XE3",
+          "nodeId": "nod_01M6TGQZ8S3DAFS7TYE8TY1PX2",
+          "cpuResourceId": "res_01M6TGQZ8SP2BTEHW98HSYSDYP",
+          "memoryResourceId": "res_01M6TGQZ8SZ1ZBS309NK8C56XF",
+          "endpoint": "https://192.168.45.143:19443",
+          "certificateDERBase64": "MIICMDCCAeKgAwIBAgIUOW2iM+Xc+XudIkrag5QEEV+4RNswBQYDK2VwMCMxITAfBgNVBAMMGFNhaW50VmlzaW9uIENQVSBwaWxvdCBDQTAeFw0yNjExMDcwODA0MDlaFw0yNjExMDkwNzE1MzBaMCkxJzAlBgNVBAMMHm5vZF8wMU02VEdRWjhTM0RBRlM3VFlFOFRZMVBYMjAqMAUGAytlcAMhACxzhbhQFGbLZthQV3UYYb/cb+7u0Ot51AYueDRiNg/mo4IBIDCCARwwDAYDVR0TAQH/BAIwADAOBgNVHQ8BAf8EBAMCB4AwgaYGA1UdEQSBnjCBm4aBknNwaWZmZTovL3NhaW50dmlzaW9uLmFpL3RlbmFudC85Nzk2OGI0Mi02OGFhLTQwY2UtYWY1ZS0zYTMzZTJmYzIyMDUvbm9kZS9ub2RfMDFNNlRHUVo4UzNEQUZTN1RZRThUWTFQWDIvZXBvY2gvYmNkNTgxYmUtMzFiNC00YWNhLTg2ZTYtM2NhMzFiNjllZDA5hwTAqC2PMBMGA1UdJQQMMAoGCCsGAQUFBwMBMB0GA1UdDgQWBBQA/41SM4KRjAdWuYXg3wdfXxYynzAfBgNVHSMEGDAWgBTJJmCGoQT31Aw3SSTS/QvkFEkMKzAFBgMrZXADQQCdw8FbY4k3w+OrNa9cboOoGNsh2ob/xuDzh17fLNJix70FTy7ZFs8DqFEuxwPpm/vMHgV5wx5iu46vuUhA6sgF",
+          "expectedTenantControlVersion": 0,
+          "cpuMillis": 500,
+          "memoryBytes": 67108864
+        },
+        "publicAdmissionRequestSHA256": "3135896b5826e8e9e90926ea4237ba2c41d197e9263094f62e2c3a8365a62f31",
+        "admissionPlanDigest": "afc7af4aa6e35335b4bcf1cfe047dad58d430989341fc6509116a25d13c3321f",
+        "nodeCertificateNotAfter": "2026-11-09T07:15:30+00:00",
+        "signatureAndPublicAdmissionPrepareVerified": true
+      },
+      {
+        "PC": "PC4",
+        "node": "nod_01M6TGSXV1J7XWC5D5H7N6EW1D",
+        "NodeDER_SHA256": "bc5a3763c7a34f3a5e51315209b0a388ccab5f99b76337ecca3cfe18a6b4c686",
+        "CSR_SHA256": "98e1910dbfabb9b58a8c3880f0cc7a62574335ecc1c78e7b274fd4522bb7f3e8",
+        "nodeCertificatePEM": "-----BEGIN CERTIFICATE-----\nMIICMDCCAeKgAwIBAgIUdBQ1bxBn8/+eaCe+YfBd9GERq0owBQYDK2VwMCMxITAf\nBgNVBAMMGFNhaW50VmlzaW9uIENQVSBwaWxvdCBDQTAeFw0yNjExMDcwODA0MDla\nFw0yNjExMDkwNzE1MzBaMCkxJzAlBgNVBAMMHm5vZF8wMU02VEdTWFYxSjdYV0M1\nRDVIN042RVcxRDAqMAUGAytlcAMhAIMLDScRQxdEwRFGK31zC80YYc6iv6GXYaw5\ncQITXi96o4IBIDCCARwwDAYDVR0TAQH/BAIwADAOBgNVHQ8BAf8EBAMCB4AwgaYG\nA1UdEQSBnjCBm4aBknNwaWZmZTovL3NhaW50dmlzaW9uLmFpL3RlbmFudC85Nzk2\nOGI0Mi02OGFhLTQwY2UtYWY1ZS0zYTMzZTJmYzIyMDUvbm9kZS9ub2RfMDFNNlRH\nU1hWMUo3WFdDNUQ1SDdONkVXMUQvZXBvY2gvYmNkNTgxYmUtMzFiNC00YWNhLTg2\nZTYtM2NhMzFiNjllZDA5hwTAqC3SMBMGA1UdJQQMMAoGCCsGAQUFBwMBMB0GA1Ud\nDgQWBBS7lJhLZABOJFTbGMBsg34NRfkDvDAfBgNVHSMEGDAWgBTJJmCGoQT31Aw3\nSSTS/QvkFEkMKzAFBgMrZXADQQCrpfGRIf9ZQbLw0mo4xbKvn6pulcX6vfxB+3p9\nbDlyPXSAoro2IP7NaUYVX/fpP98oxDijfkrjGkQw6YCvofcC\n-----END CERTIFICATE-----\n",
+        "publicCA_PEM": "-----BEGIN CERTIFICATE-----\nMIIBbjCCASCgAwIBAgIUB8TDbRheEtIMM9S6SDnJFyjHVEEwBQYDK2VwMCMxITAf\nBgNVBAMMGFNhaW50VmlzaW9uIENQVSBwaWxvdCBDQTAeFw0yNjExMDcwNzEwMzBa\nFw0yNjExMTQwNzE1MzBaMCMxITAfBgNVBAMMGFNhaW50VmlzaW9uIENQVSBwaWxv\ndCBDQTAqMAUGAytlcAMhAK4qDDb18qU5/QPL+7AjoimYxWo6zojpBBl8LrpXPoyT\no2YwZDASBgNVHRMBAf8ECDAGAQH/AgEAMA4GA1UdDwEB/wQEAwIBhjAdBgNVHQ4E\nFgQUySZghqEE99QMN0kk0v0L5BRJDCswHwYDVR0jBBgwFoAUySZghqEE99QMN0kk\n0v0L5BRJDCswBQYDK2VwA0EAguEFbX1UjBBgj4TCT64yW0lgdLq1zFcfTSzEv0om\nJ+Oaa+vkhRmxijbqTUyZNbrCzIGrG5NcE85x6wNWjEctCg==\n-----END CERTIFICATE-----\n",
+        "launchPublicBase64": "OZd7AjKn9WL6X64KPmtlH6Xok9Bk7+eHgto4hkfSm38=",
+        "peerPolicy": {
+          "version": 1,
+          "tenantId": "97968b42-68aa-40ce-af5e-3a33e2fc2205",
+          "nodeId": "nod_01M6TGSXV1J7XWC5D5H7N6EW1D",
+          "recoveryEpoch": "bcd581be-31b4-4aca-86e6-3ca31b69ed09",
+          "expiresAt": "2026-11-08T07:15:30Z",
+          "clientFingerprints": [
+            "48911c5ddf7d12f05b9866feea0f0005c193d76a956274e2510492d0c2f76481"
+          ]
+        },
+        "peerPolicySHA256": "54751b1903acbf69978be206dee13aa98e05c0757f2d929762dfae8b78e45ab8",
+        "publicAdmissionRequest": {
+          "requestVersion": 1,
+          "tenantId": "97968b42-68aa-40ce-af5e-3a33e2fc2205",
+          "recoveryEpoch": "bcd581be-31b4-4aca-86e6-3ca31b69ed09",
+          "projectId": "prj_01M6NDBHVD2DZQ1Q38DCKN1XE3",
+          "nodeId": "nod_01M6TGSXV1J7XWC5D5H7N6EW1D",
+          "cpuResourceId": "res_01M6TGSXV1JYVSGXTXBVPFAXKR",
+          "memoryResourceId": "res_01M6TGSXV1DZ02FP8Z8PH2FGDB",
+          "endpoint": "https://192.168.45.210:19443",
+          "certificateDERBase64": "MIICMDCCAeKgAwIBAgIUdBQ1bxBn8/+eaCe+YfBd9GERq0owBQYDK2VwMCMxITAfBgNVBAMMGFNhaW50VmlzaW9uIENQVSBwaWxvdCBDQTAeFw0yNjExMDcwODA0MDlaFw0yNjExMDkwNzE1MzBaMCkxJzAlBgNVBAMMHm5vZF8wMU02VEdTWFYxSjdYV0M1RDVIN042RVcxRDAqMAUGAytlcAMhAIMLDScRQxdEwRFGK31zC80YYc6iv6GXYaw5cQITXi96o4IBIDCCARwwDAYDVR0TAQH/BAIwADAOBgNVHQ8BAf8EBAMCB4AwgaYGA1UdEQSBnjCBm4aBknNwaWZmZTovL3NhaW50dmlzaW9uLmFpL3RlbmFudC85Nzk2OGI0Mi02OGFhLTQwY2UtYWY1ZS0zYTMzZTJmYzIyMDUvbm9kZS9ub2RfMDFNNlRHU1hWMUo3WFdDNUQ1SDdONkVXMUQvZXBvY2gvYmNkNTgxYmUtMzFiNC00YWNhLTg2ZTYtM2NhMzFiNjllZDA5hwTAqC3SMBMGA1UdJQQMMAoGCCsGAQUFBwMBMB0GA1UdDgQWBBS7lJhLZABOJFTbGMBsg34NRfkDvDAfBgNVHSMEGDAWgBTJJmCGoQT31Aw3SSTS/QvkFEkMKzAFBgMrZXADQQCrpfGRIf9ZQbLw0mo4xbKvn6pulcX6vfxB+3p9bDlyPXSAoro2IP7NaUYVX/fpP98oxDijfkrjGkQw6YCvofcC",
+          "expectedTenantControlVersion": 0,
+          "cpuMillis": 500,
+          "memoryBytes": 67108864
+        },
+        "publicAdmissionRequestSHA256": "19a82bec869c45acb18d853f126710318629e130fafad5b15c2f15e8cb3c121b",
+        "admissionPlanDigest": "b8fafc2c701fbb47143bccf656c0c6c7bcf1fe18aa4f5abb438d58ea3779dec5",
+        "nodeCertificateNotAfter": "2026-11-09T07:15:30+00:00",
+        "signatureAndPublicAdmissionPrepareVerified": true
+      }
+    ],
+    "CA_SHA256": "b8d777ab04c65a44f827fdda9629d54a086e9ff8cc752b90a09023a93341c5a3",
+    "clientDER_SHA256": "48911c5ddf7d12f05b9866feea0f0005c193d76a956274e2510492d0c2f76481"
+  }
+}

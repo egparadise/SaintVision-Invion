@@ -3,8 +3,8 @@
   "recordedAtKST": "2026-11-06T00:46:51+09:00",
   "rootBase": "2b1753ce59c09037b5e130a7ffe64794d1d45fdf",
   "priorRootCheckpoint": {
-    "SHA": "ae211280c5c8ab50b19303450288ba1421af827e",
-    "Docs": 42347156724,
+    "SHA": "ef0f3aafa14e44d2e8540499a7ca732e79319499",
+    "Docs": 42353849147,
     "exactHeadCorrelationAllJobsSuccess": true,
     "remoteMatches": true,
     "syncExits": [
@@ -12,13 +12,13 @@
       0,
       0
     ],
-    "independentlyMatchedNormalizedDestinationHashes": 3110,
+    "independentlyMatchedNormalizedDestinationHashes": 3131,
     "pending": 0,
     "conflicts": 0,
     "trackedAndUntrackedClean": true,
     "rootDocsOnly": true,
     "wholeProgramComplete": false,
-    "verifiedAtKST": "2026-11-07T15:29:31+09:00"
+    "verifiedAtKST": "2026-11-07T17:05:14+09:00"
   },
   "actualPlanLowReview": {
     "source": "803ad270562b1b75e44d26f9e14b965c714ab519",
@@ -2515,7 +2515,7 @@
     "ownerT1T2T3": "msg_620855c76519",
     "normativeRevisionReply": "msg_0392caf64d5d"
   },
-  "latestRecordAtKST": "2026-11-07T17:02:18+09:00",
+  "latestRecordAtKST": "2026-11-07T17:17:11+09:00",
   "optionalLowTokenTestDelta": {
     "source": "f0af307705b4923ebc3e231db5238af4c70aa389",
     "scope": "two otherwise-valid token payload corrections and JSON validity assertions; runtime unchanged",
@@ -7493,5 +7493,944 @@
     "originalRuntimeB": 0,
     "wholeProgramComplete": false,
     "nextOwner": "Root: current PC2/PC4 readiness and isolated fresh onboarding; source-only worker: minimal configured workspace configuration evidence if needed"
+  },
+  "threePCActualPilot": {
+    "atKST": "2026-11-07T17:17:11+09:00",
+    "source": "1efea494f026e932360c35ae811b6423d874a2e7",
+    "owner": "Root Codex",
+    "priorRootCheckpoint": {
+      "SHA": "ef0f3aafa14e44d2e8540499a7ca732e79319499",
+      "Docs": 42353849147,
+      "exactHeadCorrelationAllJobsSuccess": true,
+      "remoteMatches": true,
+      "syncExits": [
+        0,
+        0,
+        0
+      ],
+      "independentlyMatchedNormalizedDestinationHashes": 3131,
+      "pending": 0,
+      "conflicts": 0,
+      "trackedAndUntrackedClean": true,
+      "rootDocsOnly": true,
+      "wholeProgramComplete": false,
+      "verifiedAtKST": "2026-11-07T17:05:14+09:00"
+    },
+    "PC2PC4SingleApply": {
+      "atKST": "2026-11-07T17:10:39+09:00",
+      "status": "PC2_AND_PC4_EACH_SINGLE_APPLY_ACKNOWLEDGED",
+      "receipts": [
+        {
+          "atKST": "2026-11-07T17:10:34+09:00",
+          "PC": "PC2",
+          "mode": "PLAN",
+          "SSHExit": 0,
+          "stderrBytes": 0,
+          "profileValuesEmitted": false,
+          "rawDiagnosticSuppressed": true,
+          "remote": {
+            "mode": "PLAN",
+            "DBPersistentWrites": false,
+            "actualAdmission": "NOT_RUN",
+            "profileOrCredentialValuesEmitted": false,
+            "wholeProgramComplete": false,
+            "CLIExit": 0,
+            "CLIStdoutBytes": 875,
+            "CLIStderrBytes": 0,
+            "status": "READY_ACTUAL_READONLY_PLAN_TARGET_AND_PROFILE_VERIFIED",
+            "phase": "actual-cli-ready-and-zero-writes-readback",
+            "sameNamedServerSystemID": true,
+            "existingOperatorRoleClass": {
+              "rolsuper": true,
+              "rolbypassrls": true,
+              "rolcanlogin": true
+            },
+            "currentEpochMatches": true,
+            "tenantControls": {
+              "version": 0,
+              "kill_switch": false
+            },
+            "selectedBusinessLinkedProjectActive": true,
+            "plannedTargetCountsBefore": {
+              "node": 0,
+              "resources": 0,
+              "project_links": 0,
+              "channels": 0,
+              "audit": 0,
+              "controls": 0
+            },
+            "plannedTargetCountsAfter": {
+              "node": 0,
+              "resources": 0,
+              "project_links": 0,
+              "channels": 0,
+              "audit": 0,
+              "controls": 0
+            },
+            "CLIReadyPlanDigest": "afc7af4aa6e35335b4bcf1cfe047dad58d430989341fc6509116a25d13c3321f",
+            "childEnvironmentNames": [
+              "LANG",
+              "PATH",
+              "PYTHONDONTWRITEBYTECODE",
+              "PYTHONNOUSERSITE",
+              "SV_FRESH_NODE_EXPECTED_PLAN_SHA256",
+              "SV_FRESH_NODE_OPERATOR_DSN"
+            ],
+            "actualUserOIDCOrRunApproval": "NOT_PERFORMED_NOT_SUBSTITUTED_BY_OPERATOR_ROLE",
+            "NodeOrWorkloadExecuted": false
+          }
+        },
+        {
+          "atKST": "2026-11-07T17:10:35+09:00",
+          "PC": "PC2",
+          "mode": "APPLY",
+          "SSHExit": 0,
+          "stderrBytes": 0,
+          "profileValuesEmitted": false,
+          "rawDiagnosticSuppressed": true,
+          "remote": {
+            "mode": "APPLY",
+            "actualAdmission": "COMMITTED_ACKNOWLEDGED",
+            "profileOrCredentialValuesEmitted": false,
+            "NodeOrWorkloadOrUserApprovalExecuted": false,
+            "automaticRetryAllowed": false,
+            "wholeProgramComplete": false,
+            "before": {
+              "node": 0,
+              "resources": 0,
+              "project_links": 0,
+              "channels": 0,
+              "audit": 0,
+              "controls": 0
+            },
+            "CLIExit": 0,
+            "CLIStdoutBytes": 947,
+            "CLIStderrBytes": 0,
+            "status": "COMMITTED_ACK_AND_EXACT_SCOPE_READBACK",
+            "phase": "single-apply-complete",
+            "sameNamedServerSystemID": true,
+            "currentEpochMatches": true,
+            "tenantControlsUnchanged": true,
+            "after": {
+              "node": 1,
+              "resources": 2,
+              "project_links": 1,
+              "channels": 1,
+              "audit": 1,
+              "controls": 1
+            },
+            "nodeStatus": "offline",
+            "channel": {
+              "version": 1,
+              "certificate_sha256": "ec4b6be14dd8be8ec3eaecbf4b58a27cb567449931cf2e3668422f647eaaf415",
+              "endpoint": "https://192.168.45.143:19443",
+              "enabled": true
+            },
+            "snapshotCount": 0,
+            "planDigest": "afc7af4aa6e35335b4bcf1cfe047dad58d430989341fc6509116a25d13c3321f",
+            "applyAttempts": 1,
+            "reconcileAttempts": 0,
+            "operatorRoleNotUserApproval": true
+          }
+        },
+        {
+          "atKST": "2026-11-07T17:10:37+09:00",
+          "PC": "PC4",
+          "mode": "PLAN",
+          "SSHExit": 0,
+          "stderrBytes": 0,
+          "profileValuesEmitted": false,
+          "rawDiagnosticSuppressed": true,
+          "remote": {
+            "mode": "PLAN",
+            "DBPersistentWrites": false,
+            "actualAdmission": "NOT_RUN",
+            "profileOrCredentialValuesEmitted": false,
+            "wholeProgramComplete": false,
+            "CLIExit": 0,
+            "CLIStdoutBytes": 875,
+            "CLIStderrBytes": 0,
+            "status": "READY_ACTUAL_READONLY_PLAN_TARGET_AND_PROFILE_VERIFIED",
+            "phase": "actual-cli-ready-and-zero-writes-readback",
+            "sameNamedServerSystemID": true,
+            "existingOperatorRoleClass": {
+              "rolsuper": true,
+              "rolbypassrls": true,
+              "rolcanlogin": true
+            },
+            "currentEpochMatches": true,
+            "tenantControls": {
+              "version": 0,
+              "kill_switch": false
+            },
+            "selectedBusinessLinkedProjectActive": true,
+            "plannedTargetCountsBefore": {
+              "node": 0,
+              "resources": 0,
+              "project_links": 0,
+              "channels": 0,
+              "audit": 0,
+              "controls": 0
+            },
+            "plannedTargetCountsAfter": {
+              "node": 0,
+              "resources": 0,
+              "project_links": 0,
+              "channels": 0,
+              "audit": 0,
+              "controls": 0
+            },
+            "CLIReadyPlanDigest": "b8fafc2c701fbb47143bccf656c0c6c7bcf1fe18aa4f5abb438d58ea3779dec5",
+            "childEnvironmentNames": [
+              "LANG",
+              "PATH",
+              "PYTHONDONTWRITEBYTECODE",
+              "PYTHONNOUSERSITE",
+              "SV_FRESH_NODE_EXPECTED_PLAN_SHA256",
+              "SV_FRESH_NODE_OPERATOR_DSN"
+            ],
+            "actualUserOIDCOrRunApproval": "NOT_PERFORMED_NOT_SUBSTITUTED_BY_OPERATOR_ROLE",
+            "NodeOrWorkloadExecuted": false
+          }
+        },
+        {
+          "atKST": "2026-11-07T17:10:39+09:00",
+          "PC": "PC4",
+          "mode": "APPLY",
+          "SSHExit": 0,
+          "stderrBytes": 0,
+          "profileValuesEmitted": false,
+          "rawDiagnosticSuppressed": true,
+          "remote": {
+            "mode": "APPLY",
+            "actualAdmission": "COMMITTED_ACKNOWLEDGED",
+            "profileOrCredentialValuesEmitted": false,
+            "NodeOrWorkloadOrUserApprovalExecuted": false,
+            "automaticRetryAllowed": false,
+            "wholeProgramComplete": false,
+            "before": {
+              "node": 0,
+              "resources": 0,
+              "project_links": 0,
+              "channels": 0,
+              "audit": 0,
+              "controls": 0
+            },
+            "CLIExit": 0,
+            "CLIStdoutBytes": 947,
+            "CLIStderrBytes": 0,
+            "status": "COMMITTED_ACK_AND_EXACT_SCOPE_READBACK",
+            "phase": "single-apply-complete",
+            "sameNamedServerSystemID": true,
+            "currentEpochMatches": true,
+            "tenantControlsUnchanged": true,
+            "after": {
+              "node": 1,
+              "resources": 2,
+              "project_links": 1,
+              "channels": 1,
+              "audit": 1,
+              "controls": 1
+            },
+            "nodeStatus": "offline",
+            "channel": {
+              "version": 1,
+              "certificate_sha256": "bc5a3763c7a34f3a5e51315209b0a388ccab5f99b76337ecca3cfe18a6b4c686",
+              "endpoint": "https://192.168.45.210:19443",
+              "enabled": true
+            },
+            "snapshotCount": 0,
+            "planDigest": "b8fafc2c701fbb47143bccf656c0c6c7bcf1fe18aa4f5abb438d58ea3779dec5",
+            "applyAttempts": 1,
+            "reconcileAttempts": 0,
+            "operatorRoleNotUserApproval": true
+          }
+        }
+      ],
+      "knownHostsUnchanged": true,
+      "NodeStart": "NOT_RUN",
+      "allFivePCsComplete": false,
+      "wholeProgramComplete": false
+    },
+    "PC2PC4ExactNewNodeServices": {
+      "atKST": "2026-11-07T17:12:58+09:00",
+      "status": "PC2_AND_PC4_NEW_EXACT_NODE_SERVICES_RUNNING",
+      "results": [
+        {
+          "PC": "PC2",
+          "node": "nod_01M6TGQZ8S3DAFS7TYE8TY1PX2",
+          "trust": {
+            "atKST": "2026-11-07T17:12:50+09:00",
+            "PC": "PC2",
+            "stage": "public-trust",
+            "SSHExit": 0,
+            "stderrBytes": 0,
+            "rawDiagnosticSuppressed": true,
+            "remote": {
+              "status": "PUBLIC_TRUST_INSTALLED_PRIVATE_KEY_MATCHES_STRICT_TLS_CONTEXT_LOADED",
+              "mode": "READONLY_RECONCILE_EXISTING_ACKNOWLEDGED_NEW_FILES",
+              "originalAcknowledgedInstallNotRepeated": true,
+              "publicFilesByteMatch": true,
+              "capturedKnownPublicCertificatePropertyWarningClasses": [
+                "CryptographyDeprecationWarning"
+              ],
+              "NodeDER_SHA256": "ec4b6be14dd8be8ec3eaecbf4b58a27cb567449931cf2e3668422f647eaaf415",
+              "privateKeysTransferred": false,
+              "NodeStarted": false
+            }
+          },
+          "imageLoad": {
+            "atKST": "2026-11-07T17:12:53+09:00",
+            "PC": "PC2",
+            "stage": "image-load",
+            "SSHExit": 0,
+            "stderrBytes": 0,
+            "rawDiagnosticSuppressed": true,
+            "remote": {
+              "status": "EXACT_PRODUCT_IMAGES_LOADED",
+              "imageIDs": [
+                "sha256:de654cd385307ac7147baf6757a480f803361eb5b30d40c7991b272a6889d87f",
+                "sha256:ffee58e8dbefc6c0db68810cd1597f8cc589cf01112c434ed7fda8d4af415634"
+              ],
+              "bundleSHA256": "7f7b9d3b1f9eb44a85753a49d6d6283c1cf2f8d68b9c3f59f2bbdc7019795688",
+              "tagOverwrite": false,
+              "oldContainerMutation": false
+            }
+          },
+          "start": {
+            "atKST": "2026-11-07T17:12:54+09:00",
+            "PC": "PC2",
+            "stage": "node-start",
+            "SSHExit": 0,
+            "stderrBytes": 0,
+            "rawDiagnosticSuppressed": true,
+            "remote": {
+              "scope": "ONE_NEW_NODE_SERVICE_ONLY",
+              "tenantWorkloadOrUserApprovalExecuted": false,
+              "oldNodeStateChanges": false,
+              "privateCAClientSignerOrDBCredentialMounted": false,
+              "wholeProgramComplete": false,
+              "containerId": "fd4bdef2db94c434b740916d50fc0d3e80c5aa49bfe01f45b415f23877e03084",
+              "containerName": "saintvision-nod_01M6TGQZ8S3DAFS7TYE8TY1PX2",
+              "status": "NODE_SERVICE_RUNNING_EXACT_CONFIGURATION_NO_OBSERVATION_YET",
+              "phase": "actual-inspect-matches-scope",
+              "NodeImageID": "sha256:de654cd385307ac7147baf6757a480f803361eb5b30d40c7991b272a6889d87f",
+              "workloadImageID": "sha256:ffee58e8dbefc6c0db68810cd1597f8cc589cf01112c434ed7fda8d4af415634",
+              "user": "1000:1000",
+              "dockerSocketSupplementaryGID": 117,
+              "serviceCPUQuotaNanoCpus": 500000000,
+              "serviceMemoryBytes": 268435456,
+              "pidsLimit": 64,
+              "readOnlyRootFS": true,
+              "capDrop": [
+                "ALL"
+              ],
+              "securityOptions": [
+                "no-new-privileges"
+              ],
+              "stateBind": "/home/saintvision-invion/saintvision-share/nodes/nod_01M6TGQZ8S3DAFS7TYE8TY1PX2/state",
+              "configMountReadOnly": true,
+              "noNamedVolumeCreated": true,
+              "portBindings": {
+                "19443/tcp": [
+                  {
+                    "HostIp": "192.168.45.143",
+                    "HostPort": "19443"
+                  }
+                ]
+              },
+              "restarting": false,
+              "restartCount": 0,
+              "runtimeProfileSHA256": "0b4b1299671fb5df8845755be061e46cb24ab7ab70546235198644fab93c1c9f",
+              "nodeArgv": [
+                "--tenant",
+                "97968b42-68aa-40ce-af5e-3a33e2fc2205",
+                "--node",
+                "nod_01M6TGQZ8S3DAFS7TYE8TY1PX2",
+                "--epoch",
+                "bcd581be-31b4-4aca-86e6-3ca31b69ed09",
+                "--profile",
+                "cpu-pilot-1efea-r1",
+                "--image",
+                "sha256:ffee58e8dbefc6c0db68810cd1597f8cc589cf01112c434ed7fda8d4af415634",
+                "--executable",
+                "/usr/local/bin/python3",
+                "--state",
+                "/state",
+                "--public-key",
+                "/config/launch-signer.pub",
+                "--socket",
+                "/var/run/docker.sock",
+                "--serve",
+                "--listen",
+                "0.0.0.0:19443",
+                "--tls-cert",
+                "/config/node-cert.pem",
+                "--tls-key",
+                "/config/node-key.pem",
+                "--client-ca",
+                "/config/client-ca.pem",
+                "--peer-policy",
+                "/config/peer-policy.json"
+              ],
+              "realMTLSResourceObservation": "NOT_RUN",
+              "actualDBNodeMayStillBeOffline": true
+            }
+          }
+        },
+        {
+          "PC": "PC4",
+          "node": "nod_01M6TGSXV1J7XWC5D5H7N6EW1D",
+          "trust": {
+            "atKST": "2026-11-07T17:12:55+09:00",
+            "PC": "PC4",
+            "stage": "public-trust",
+            "SSHExit": 0,
+            "stderrBytes": 0,
+            "rawDiagnosticSuppressed": true,
+            "remote": {
+              "privateKeysTransferred": false,
+              "oldNodeStateChanged": false,
+              "NodeStarted": false,
+              "status": "PUBLIC_TRUST_INSTALLED_PRIVATE_KEY_MATCHES_STRICT_TLS_CONTEXT_LOADED",
+              "node": "nod_01M6TGSXV1J7XWC5D5H7N6EW1D",
+              "NodeDER_SHA256": "bc5a3763c7a34f3a5e51315209b0a388ccab5f99b76337ecca3cfe18a6b4c686",
+              "newPublicFileHashes": {
+                "node-cert.pem": "cde79d8c5b0dffe16982be314a75af5b66b04ca36fa9b75de46b0e8ddaddb664",
+                "client-ca.pem": "b8d777ab04c65a44f827fdda9629d54a086e9ff8cc752b90a09023a93341c5a3",
+                "launch-signer.pub": "21baf6f95ff93c3a55b1fc2e01a134b8833d6fdeaac051126c9bed2b86df051b",
+                "peer-policy.json": "54751b1903acbf69978be206dee13aa98e05c0757f2d929762dfae8b78e45ab8"
+              },
+              "privateKeyStillLocal": true,
+              "privateKeyMode": "0600 uid1000",
+              "CAAndClientAndLaunchPrivateKeyOnTarget": false
+            }
+          },
+          "imageLoad": {
+            "atKST": "2026-11-07T17:12:56+09:00",
+            "PC": "PC4",
+            "stage": "image-load",
+            "SSHExit": 0,
+            "stderrBytes": 0,
+            "rawDiagnosticSuppressed": true,
+            "remote": {
+              "status": "EXACT_PRODUCT_IMAGES_LOADED",
+              "imageIDs": [
+                "sha256:de654cd385307ac7147baf6757a480f803361eb5b30d40c7991b272a6889d87f",
+                "sha256:ffee58e8dbefc6c0db68810cd1597f8cc589cf01112c434ed7fda8d4af415634"
+              ],
+              "bundleSHA256": "7f7b9d3b1f9eb44a85753a49d6d6283c1cf2f8d68b9c3f59f2bbdc7019795688",
+              "tagOverwrite": false,
+              "oldContainerMutation": false
+            }
+          },
+          "start": {
+            "atKST": "2026-11-07T17:12:58+09:00",
+            "PC": "PC4",
+            "stage": "node-start",
+            "SSHExit": 0,
+            "stderrBytes": 0,
+            "rawDiagnosticSuppressed": true,
+            "remote": {
+              "scope": "ONE_NEW_NODE_SERVICE_ONLY",
+              "tenantWorkloadOrUserApprovalExecuted": false,
+              "oldNodeStateChanges": false,
+              "privateCAClientSignerOrDBCredentialMounted": false,
+              "wholeProgramComplete": false,
+              "containerId": "e74fde5e18c65df59e3f19e4ba988c43ff27a3ff76021412eb71cc79957d489e",
+              "containerName": "saintvision-nod_01M6TGSXV1J7XWC5D5H7N6EW1D",
+              "status": "NODE_SERVICE_RUNNING_EXACT_CONFIGURATION_NO_OBSERVATION_YET",
+              "phase": "actual-inspect-matches-scope",
+              "NodeImageID": "sha256:de654cd385307ac7147baf6757a480f803361eb5b30d40c7991b272a6889d87f",
+              "workloadImageID": "sha256:ffee58e8dbefc6c0db68810cd1597f8cc589cf01112c434ed7fda8d4af415634",
+              "user": "1000:1000",
+              "dockerSocketSupplementaryGID": 984,
+              "serviceCPUQuotaNanoCpus": 500000000,
+              "serviceMemoryBytes": 268435456,
+              "pidsLimit": 64,
+              "readOnlyRootFS": true,
+              "capDrop": [
+                "ALL"
+              ],
+              "securityOptions": [
+                "no-new-privileges"
+              ],
+              "stateBind": "/home/inviz/saintvision-share/nodes/nod_01M6TGSXV1J7XWC5D5H7N6EW1D/state",
+              "configMountReadOnly": true,
+              "noNamedVolumeCreated": true,
+              "portBindings": {
+                "19443/tcp": [
+                  {
+                    "HostIp": "192.168.45.210",
+                    "HostPort": "19443"
+                  }
+                ]
+              },
+              "restarting": false,
+              "restartCount": 0,
+              "runtimeProfileSHA256": "7f7912b16ef0f0fb80a5dbb3c115a6283c3081acb6fcf57b9dcfd20c252e4615",
+              "nodeArgv": [
+                "--tenant",
+                "97968b42-68aa-40ce-af5e-3a33e2fc2205",
+                "--node",
+                "nod_01M6TGSXV1J7XWC5D5H7N6EW1D",
+                "--epoch",
+                "bcd581be-31b4-4aca-86e6-3ca31b69ed09",
+                "--profile",
+                "cpu-pilot-1efea-r1",
+                "--image",
+                "sha256:ffee58e8dbefc6c0db68810cd1597f8cc589cf01112c434ed7fda8d4af415634",
+                "--executable",
+                "/usr/local/bin/python3",
+                "--state",
+                "/state",
+                "--public-key",
+                "/config/launch-signer.pub",
+                "--socket",
+                "/var/run/docker.sock",
+                "--serve",
+                "--listen",
+                "0.0.0.0:19443",
+                "--tls-cert",
+                "/config/node-cert.pem",
+                "--tls-key",
+                "/config/node-key.pem",
+                "--client-ca",
+                "/config/client-ca.pem",
+                "--peer-policy",
+                "/config/peer-policy.json"
+              ],
+              "realMTLSResourceObservation": "NOT_RUN",
+              "actualDBNodeMayStillBeOffline": true
+            }
+          }
+        }
+      ],
+      "knownHostsUnchanged": true,
+      "actualFreshResourceObservation": "NEEDS_SEPARATE_READBACK",
+      "workloadRun": "NOT_RUN",
+      "wholeProgramComplete": false
+    },
+    "threeNodeContinuousReadOnlyProof": {
+      "atKST": "2026-11-07T17:13:46+09:00",
+      "status": "THREE_REAL_NODES_CONTINUOUSLY_FRESH_ADVANCING",
+      "DBWrites": false,
+      "manualObserverCalls": 0,
+      "sampleIntervalSeconds": 8,
+      "channels": [
+        {
+          "node_id": "nod_01M6TAWG25JTA3F7J7S1EE4N2W",
+          "version": 1,
+          "endpoint": "https://192.168.45.222:19443"
+        },
+        {
+          "node_id": "nod_01M6TGQZ8S3DAFS7TYE8TY1PX2",
+          "version": 1,
+          "endpoint": "https://192.168.45.143:19443"
+        },
+        {
+          "node_id": "nod_01M6TGSXV1J7XWC5D5H7N6EW1D",
+          "version": 1,
+          "endpoint": "https://192.168.45.210:19443"
+        }
+      ],
+      "firstSample": [
+        {
+          "node_id": "nod_01M6TAWG25JTA3F7J7S1EE4N2W",
+          "status": "online",
+          "heartbeat_at": "2026-11-07 08:13:36.896469+00:00",
+          "heartbeat_age_seconds": 1.665992,
+          "received_at": "2026-11-07 08:13:36.896469+00:00",
+          "snapshot_age_seconds": 1.666108,
+          "channel_version": 1,
+          "consumed_probes": 226,
+          "snapshot": {
+            "nonce": "cb1cad5d0febd3fa98e16f9c859eb61d33cfcbad4bbac3ea19ef63272882f2a0",
+            "nodeId": "nod_01M6TAWG25JTA3F7J7S1EE4N2W",
+            "osType": "linux",
+            "tenantId": "97968b42-68aa-40ce-af5e-3a33e2fc2205",
+            "observedAt": "2026-11-07T08:13:36.719625067Z",
+            "agentVersion": "0.1.0",
+            "sampleMillis": 150,
+            "cpuBusyMillis": 336,
+            "recoveryEpoch": "bcd581be-31b4-4aca-86e6-3ca31b69ed09",
+            "profileVersion": "cpu-pilot-1efea-r1",
+            "cpuCapacityMillis": 12000,
+            "memoryCapacityBytes": 15938240512,
+            "memoryAvailableBytes": 11327180800
+          }
+        },
+        {
+          "node_id": "nod_01M6TGQZ8S3DAFS7TYE8TY1PX2",
+          "status": "online",
+          "heartbeat_at": "2026-11-07 08:13:36.832062+00:00",
+          "heartbeat_age_seconds": 1.730705,
+          "received_at": "2026-11-07 08:13:36.832062+00:00",
+          "snapshot_age_seconds": 1.730707,
+          "channel_version": 1,
+          "consumed_probes": 6,
+          "snapshot": {
+            "nonce": "9f2347ead99d4a1d7a2a98112387a2a348a89d2d21dbd9cbb12727fdf3881aaf",
+            "nodeId": "nod_01M6TGQZ8S3DAFS7TYE8TY1PX2",
+            "osType": "linux",
+            "tenantId": "97968b42-68aa-40ce-af5e-3a33e2fc2205",
+            "observedAt": "2026-11-07T08:13:36.591432916Z",
+            "agentVersion": "0.1.0",
+            "sampleMillis": 150,
+            "cpuBusyMillis": 266,
+            "recoveryEpoch": "bcd581be-31b4-4aca-86e6-3ca31b69ed09",
+            "profileVersion": "cpu-pilot-1efea-r1",
+            "cpuCapacityMillis": 12000,
+            "memoryCapacityBytes": 15938523136,
+            "memoryAvailableBytes": 9085186048
+          }
+        },
+        {
+          "node_id": "nod_01M6TGSXV1J7XWC5D5H7N6EW1D",
+          "status": "online",
+          "heartbeat_at": "2026-11-07 08:13:36.895778+00:00",
+          "heartbeat_age_seconds": 1.667029,
+          "received_at": "2026-11-07 08:13:36.895778+00:00",
+          "snapshot_age_seconds": 1.66703,
+          "channel_version": 1,
+          "consumed_probes": 6,
+          "snapshot": {
+            "nonce": "135dd15288ffd968ba619ad4a298393e5b4519db9dc1096ccd0b730d0c0d0396",
+            "nodeId": "nod_01M6TGSXV1J7XWC5D5H7N6EW1D",
+            "osType": "linux",
+            "tenantId": "97968b42-68aa-40ce-af5e-3a33e2fc2205",
+            "observedAt": "2026-11-07T08:13:36.741742909Z",
+            "agentVersion": "0.1.0",
+            "sampleMillis": 150,
+            "cpuBusyMillis": 0,
+            "recoveryEpoch": "bcd581be-31b4-4aca-86e6-3ca31b69ed09",
+            "profileVersion": "cpu-pilot-1efea-r1",
+            "cpuCapacityMillis": 12000,
+            "memoryCapacityBytes": 16480641024,
+            "memoryAvailableBytes": 11657580544
+          }
+        }
+      ],
+      "secondSample": [
+        {
+          "node_id": "nod_01M6TAWG25JTA3F7J7S1EE4N2W",
+          "status": "online",
+          "heartbeat_at": "2026-11-07 08:13:44.524333+00:00",
+          "heartbeat_age_seconds": 2.041107,
+          "received_at": "2026-11-07 08:13:44.524333+00:00",
+          "snapshot_age_seconds": 2.041114,
+          "channel_version": 1,
+          "consumed_probes": 227,
+          "snapshot": {
+            "nonce": "03d7d049059a2d3d927cece2dd435125c44924bc9532d0e64742f10ca3262c5d",
+            "nodeId": "nod_01M6TAWG25JTA3F7J7S1EE4N2W",
+            "osType": "linux",
+            "tenantId": "97968b42-68aa-40ce-af5e-3a33e2fc2205",
+            "observedAt": "2026-11-07T08:13:44.324913347Z",
+            "agentVersion": "0.1.0",
+            "sampleMillis": 150,
+            "cpuBusyMillis": 400,
+            "recoveryEpoch": "bcd581be-31b4-4aca-86e6-3ca31b69ed09",
+            "profileVersion": "cpu-pilot-1efea-r1",
+            "cpuCapacityMillis": 12000,
+            "memoryCapacityBytes": 15938240512,
+            "memoryAvailableBytes": 11327307776
+          }
+        },
+        {
+          "node_id": "nod_01M6TGQZ8S3DAFS7TYE8TY1PX2",
+          "status": "online",
+          "heartbeat_at": "2026-11-07 08:13:44.468264+00:00",
+          "heartbeat_age_seconds": 2.09724,
+          "received_at": "2026-11-07 08:13:44.468264+00:00",
+          "snapshot_age_seconds": 2.097241,
+          "channel_version": 1,
+          "consumed_probes": 7,
+          "snapshot": {
+            "nonce": "594049b1375dfed962feda7cd0c50e2f2805899df1c590036f45d7944d442151",
+            "nodeId": "nod_01M6TGQZ8S3DAFS7TYE8TY1PX2",
+            "osType": "linux",
+            "tenantId": "97968b42-68aa-40ce-af5e-3a33e2fc2205",
+            "observedAt": "2026-11-07T08:13:44.290051892Z",
+            "agentVersion": "0.1.0",
+            "sampleMillis": 150,
+            "cpuBusyMillis": 269,
+            "recoveryEpoch": "bcd581be-31b4-4aca-86e6-3ca31b69ed09",
+            "profileVersion": "cpu-pilot-1efea-r1",
+            "cpuCapacityMillis": 12000,
+            "memoryCapacityBytes": 15938523136,
+            "memoryAvailableBytes": 9080745984
+          }
+        },
+        {
+          "node_id": "nod_01M6TGSXV1J7XWC5D5H7N6EW1D",
+          "status": "online",
+          "heartbeat_at": "2026-11-07 08:13:44.622770+00:00",
+          "heartbeat_age_seconds": 1.942759,
+          "received_at": "2026-11-07 08:13:44.622770+00:00",
+          "snapshot_age_seconds": 1.94276,
+          "channel_version": 1,
+          "consumed_probes": 7,
+          "snapshot": {
+            "nonce": "62721c88d92a636c1cf3ecd202a1b2457add51a9fd5d24871161eb6e9118b3a0",
+            "nodeId": "nod_01M6TGSXV1J7XWC5D5H7N6EW1D",
+            "osType": "linux",
+            "tenantId": "97968b42-68aa-40ce-af5e-3a33e2fc2205",
+            "observedAt": "2026-11-07T08:13:44.499985322Z",
+            "agentVersion": "0.1.0",
+            "sampleMillis": 151,
+            "cpuBusyMillis": 67,
+            "recoveryEpoch": "bcd581be-31b4-4aca-86e6-3ca31b69ed09",
+            "profileVersion": "cpu-pilot-1efea-r1",
+            "cpuCapacityMillis": 12000,
+            "memoryCapacityBytes": 16480641024,
+            "memoryAvailableBytes": 11657580544
+          }
+        }
+      ],
+      "checks": [
+        {
+          "node": "nod_01M6TAWG25JTA3F7J7S1EE4N2W",
+          "sameNode": true,
+          "online": true,
+          "fresh": true,
+          "advanced": true,
+          "currentChannelVersion": true
+        },
+        {
+          "node": "nod_01M6TGQZ8S3DAFS7TYE8TY1PX2",
+          "sameNode": true,
+          "online": true,
+          "fresh": true,
+          "advanced": true,
+          "currentChannelVersion": true
+        },
+        {
+          "node": "nod_01M6TGSXV1J7XWC5D5H7N6EW1D",
+          "sameNode": true,
+          "online": true,
+          "fresh": true,
+          "advanced": true,
+          "currentChannelVersion": true
+        }
+      ],
+      "tenantControlsUnchanged": true,
+      "currentProjectCPUOnlyPilotNodeCount": 3,
+      "allFivePCsComplete": false,
+      "actualUserWorkloadRun": "NOT_RUN",
+      "wholeProgramComplete": false
+    },
+    "freshRealAdminProjectAPIs": {
+      "atKST": "2026-11-07T17:14:39+09:00",
+      "status": "REAL_ADMIN_PKCE_THREE_PROJECT_NODES_AND_CAPACITY_VERIFIED",
+      "authorizationCodePKCES256": true,
+      "tokenExchangeHTTP": 200,
+      "sessionHTTP": 200,
+      "ownerPermissionHTTP": 200,
+      "roleCode": "owner",
+      "canAdminister": true,
+      "project": "prj_01M6NDBHVD2DZQ1Q38DCKN1XE3",
+      "nodesHTTP": 200,
+      "capacityHTTP": 200,
+      "currentProjectNodeCount": 3,
+      "nodes": [
+        {
+          "node": {
+            "nodeId": "nod_01M6TAWG25JTA3F7J7S1EE4N2W",
+            "status": "online",
+            "lastHeartbeatAt": "2026-11-07T08:14:36.053635+00:00"
+          },
+          "heartbeatAgeSecondsAtRead": 3.120428,
+          "capacity": {
+            "nodeId": "nod_01M6TAWG25JTA3F7J7S1EE4N2W",
+            "offered": {
+              "cpuMillis": 500,
+              "memoryBytes": 67108864
+            },
+            "spare": {
+              "cpuMillis": 500,
+              "memoryBytes": 67108864
+            },
+            "measured": true
+          },
+          "resourceUsageHTTP": 200,
+          "resourceUsage": {
+            "source": "execution-kernel",
+            "nodeId": "nod_01M6TAWG25JTA3F7J7S1EE4N2W",
+            "stateAsOf": "2026-11-07T08:14:36.053635+00:00",
+            "resources": [
+              {
+                "resourceId": "res_01M6TAWG25QSR4HH7XWWJSB0W0",
+                "kind": "cpu",
+                "unit": "millicores",
+                "capacity": 500,
+                "offered": 500,
+                "reserved": 0,
+                "spare": 500,
+                "measured": true,
+                "observedAt": "2026-11-07T08:14:36.053635+00:00"
+              },
+              {
+                "resourceId": "res_01M6TAWG25ZHS2RG3NHQX4SPEH",
+                "kind": "memory",
+                "unit": "bytes",
+                "capacity": 67108864,
+                "offered": 67108864,
+                "reserved": 0,
+                "spare": 67108864,
+                "measured": true,
+                "observedAt": "2026-11-07T08:14:36.053635+00:00"
+              }
+            ]
+          }
+        },
+        {
+          "node": {
+            "nodeId": "nod_01M6TGQZ8S3DAFS7TYE8TY1PX2",
+            "status": "online",
+            "lastHeartbeatAt": "2026-11-07T08:14:36.061802+00:00"
+          },
+          "heartbeatAgeSecondsAtRead": 3.147609,
+          "capacity": {
+            "nodeId": "nod_01M6TGQZ8S3DAFS7TYE8TY1PX2",
+            "offered": {
+              "cpuMillis": 500,
+              "memoryBytes": 67108864
+            },
+            "spare": {
+              "cpuMillis": 500,
+              "memoryBytes": 67108864
+            },
+            "measured": true
+          },
+          "resourceUsageHTTP": 200,
+          "resourceUsage": {
+            "source": "execution-kernel",
+            "nodeId": "nod_01M6TGQZ8S3DAFS7TYE8TY1PX2",
+            "stateAsOf": "2026-11-07T08:14:36.061802+00:00",
+            "resources": [
+              {
+                "resourceId": "res_01M6TGQZ8SP2BTEHW98HSYSDYP",
+                "kind": "cpu",
+                "unit": "millicores",
+                "capacity": 500,
+                "offered": 500,
+                "reserved": 0,
+                "spare": 500,
+                "measured": true,
+                "observedAt": "2026-11-07T08:14:36.061802+00:00"
+              },
+              {
+                "resourceId": "res_01M6TGQZ8SZ1ZBS309NK8C56XF",
+                "kind": "memory",
+                "unit": "bytes",
+                "capacity": 67108864,
+                "offered": 67108864,
+                "reserved": 0,
+                "spare": 67108864,
+                "measured": true,
+                "observedAt": "2026-11-07T08:14:36.061802+00:00"
+              }
+            ]
+          }
+        },
+        {
+          "node": {
+            "nodeId": "nod_01M6TGSXV1J7XWC5D5H7N6EW1D",
+            "status": "online",
+            "lastHeartbeatAt": "2026-11-07T08:14:36.045941+00:00"
+          },
+          "heartbeatAgeSecondsAtRead": 3.203073,
+          "capacity": {
+            "nodeId": "nod_01M6TGSXV1J7XWC5D5H7N6EW1D",
+            "offered": {
+              "cpuMillis": 500,
+              "memoryBytes": 67108864
+            },
+            "spare": {
+              "cpuMillis": 500,
+              "memoryBytes": 67108864
+            },
+            "measured": true
+          },
+          "resourceUsageHTTP": 200,
+          "resourceUsage": {
+            "source": "execution-kernel",
+            "nodeId": "nod_01M6TGSXV1J7XWC5D5H7N6EW1D",
+            "stateAsOf": "2026-11-07T08:14:36.045941+00:00",
+            "resources": [
+              {
+                "resourceId": "res_01M6TGSXV1DZ02FP8Z8PH2FGDB",
+                "kind": "memory",
+                "unit": "bytes",
+                "capacity": 67108864,
+                "offered": 67108864,
+                "reserved": 0,
+                "spare": 67108864,
+                "measured": true,
+                "observedAt": "2026-11-07T08:14:36.045941+00:00"
+              },
+              {
+                "resourceId": "res_01M6TGSXV1JYVSGXTXBVPFAXKR",
+                "kind": "cpu",
+                "unit": "millicores",
+                "capacity": 500,
+                "offered": 500,
+                "reserved": 0,
+                "spare": 500,
+                "measured": true,
+                "observedAt": "2026-11-07T08:14:36.045941+00:00"
+              }
+            ]
+          }
+        }
+      ],
+      "totalOffered": {
+        "cpuMillis": 1500,
+        "memoryBytes": 201326592
+      },
+      "spareNow": {
+        "cpuMillis": 1500,
+        "memoryBytes": 201326592
+      },
+      "anonymousSessionHTTP": 401,
+      "explicitExistingPublicChainTLSVerified": true,
+      "defaultWindowsTLSVerified": false,
+      "insecureTLSOptionUsed": false,
+      "passwordAndTokensPersisted": false,
+      "browserSelectedProject": "NOT_OBSERVED",
+      "fivePCsComplete": false,
+      "allPhysicalResourcesShared": false,
+      "actualUserWorkloadAndVotes": "NOT_RUN",
+      "wholeProgramComplete": false
+    },
+    "actualCurrentProjectNodeCount": 3,
+    "contributionCPUOnlyPilot": {
+      "perNodeCPUMillis": 500,
+      "perNodeMemoryBytes": 67108864,
+      "totalCPUMillis": 1500,
+      "totalMemoryBytes": 201326592,
+      "allPhysicalResourcesShared": false
+    },
+    "privateKeyCustody": "PC2 and PC4 generated own server keys locally, no private key transfer. Existing dedicated CA signed only public CSRs on PC3. CA/client/launch private keys stayed on PC3 outside Node mounts.",
+    "existingNodeContainerAndJournalPolicy": "All seven previously listed old container records on PC2 and PC4 preserved; new names/state only",
+    "initialFailuresPreserved": [
+      "Read-only probe r1 had local newline escaping syntax error on PC2/4; fixed remote-source AST and r2 read-only succeeded",
+      "PC2 new key preparation initially expected absent nodes parent to exist; read-only proved no new state or key residue, r2 created only exact new0700 parent and reused original frozen IDs",
+      "PC2 public trust install acknowledged strict TLS/key match but returned153stderr bytes; source public-certificate naive-time property deprecation was reproduced/captured. r2 checked existing installed bytes/key/TLS without rewriting/regenerating, used aware property for PC4, then continued."
+    ],
+    "independentOperationalEvidenceReview": "READY_NOT_STARTED; no reviewer claim until actual dispatch and verdict",
+    "nextSourceOnlyTask": "FLEET5-CP-WORKSPACE-DEPLOYMENT-RECIPE-R1-20261107 ready for Codex B; minimal exact source bindings for PC3 workspace API and current portal routing under main-resource constraint, no real credentials/config access",
+    "PC1": "One current pinned SSH attempt exit255; previous failure public-key auth. No current successful SSH/Docker/onboarding proof",
+    "PC5": "Existing Docker API1.41 below selected1.45 and main-host resource restrictions; no Node run or upgrade",
+    "browserSelectedProjectAndFlickerAcceptance": "NOT_OBSERVED; authenticated project backend reads proven only",
+    "CPWorkspaceConfigured": false,
+    "additionalApproverAndTwoActualNonRequesterVotes": "PENDING; do not fabricate identity or relax approval policy",
+    "pilotPolicyExpiry": "2026-11-08T07:15:30Z; renewal/transport restart recovery still pending",
+    "originalBaselineDischarges": 0,
+    "originalRuntimeB": 0,
+    "allFivePCsComplete": false,
+    "actualUserWorkloadRun": "NOT_RUN",
+    "wholeProgramComplete": false
   }
 }

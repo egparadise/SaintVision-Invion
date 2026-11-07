@@ -1,0 +1,45 @@
+import base64,hashlib,io,json,os,ssl,sys,warnings
+from pathlib import Path
+blob=sys.stdin.buffer.read(131073);p=json.loads(blob)
+if p['publicPlan']['host']['PC']=='PC2':
+ from cryptography import x509
+ from cryptography.hazmat.primitives import serialization
+ plan=p['publicPlan'];signed=p['publicSigned'];nd=Path(plan['plannedNewNodeDirectory']);ops=Path(plan['ownedNewEnvironment']);assert os.getuid()==1000 and not list((nd/'state').iterdir()) and not (ops/'public-cpu-images-r1.tar').exists()
+ expected={'node-cert.pem':signed['nodeCertificatePEM'].encode(),'client-ca.pem':signed['publicCA_PEM'].encode(),'launch-signer.pub':base64.b64decode(signed['launchPublicBase64'],validate=True),'peer-policy.json':(json.dumps(signed['peerPolicy'],sort_keys=True,separators=(',',':'))+'\n').encode()}
+ for n,b in expected.items():assert (nd/n).read_bytes()==b
+ st=(nd/'node-key.pem').lstat();assert st.st_uid==1000 and not st.st_mode&0o077
+ cert=x509.load_pem_x509_certificate(expected['node-cert.pem']);ca=x509.load_pem_x509_certificate(expected['client-ca.pem']);cert.verify_directly_issued_by(ca);key=serialization.load_pem_private_key((nd/'node-key.pem').read_bytes(),password=None);assert key.public_key()==cert.public_key()
+ with warnings.catch_warnings(record=True) as seen:
+  warnings.simplefilter('always');unused=cert.not_valid_after
+ kinds=[type(x.message).__name__ for x in seen];assert kinds==['CryptographyDeprecationWarning']
+ ctx=ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER);ctx.minimum_version=ssl.TLSVersion.TLSv1_3;ctx.verify_mode=ssl.CERT_REQUIRED;ctx.verify_flags|=ssl.VERIFY_X509_STRICT;ctx.verify_flags&=~ssl.VERIFY_X509_PARTIAL_CHAIN;ctx.load_verify_locations(cafile=str(nd/'client-ca.pem'));ctx.load_cert_chain(str(nd/'node-cert.pem'),str(nd/'node-key.pem'))
+ print(json.dumps({'status':'PUBLIC_TRUST_INSTALLED_PRIVATE_KEY_MATCHES_STRICT_TLS_CONTEXT_LOADED','mode':'READONLY_RECONCILE_EXISTING_ACKNOWLEDGED_NEW_FILES','originalAcknowledgedInstallNotRepeated':True,'publicFilesByteMatch':True,'capturedKnownPublicCertificatePropertyWarningClasses':kinds,'NodeDER_SHA256':hashlib.sha256(cert.public_bytes(serialization.Encoding.DER)).hexdigest(),'privateKeysTransferred':False,'NodeStarted':False}));raise SystemExit(0)
+sys.stdin=io.TextIOWrapper(io.BytesIO(blob),encoding='utf-8')
+import base64,hashlib,json,os,ssl,stat,sys
+from datetime import datetime,timezone
+from pathlib import Path
+from cryptography import x509
+from cryptography.hazmat.primitives import serialization
+from cryptography.x509.oid import ExtendedKeyUsageOID
+phase='recheck-owned-host-key-and-signed-public-identity';o={'privateKeysTransferred':False,'oldNodeStateChanged':False,'NodeStarted':False}
+try:
+ p=json.loads(sys.stdin.buffer.read(131073));plan=p['publicPlan'];signed=p['publicSigned'];nd=Path(plan['plannedNewNodeDirectory']);ops=Path(plan['ownedNewEnvironment']);assert os.getuid()==1000 and not nd.is_symlink() and nd.stat().st_uid==1000 and nd.stat().st_mode&0o777==0o700
+ st=(nd/'node-key.pem').lstat();assert stat.S_ISREG(st.st_mode) and st.st_uid==1000 and st.st_mode&0o077==0
+ key=serialization.load_pem_private_key((nd/'node-key.pem').read_bytes(),password=None);cert=x509.load_pem_x509_certificate(signed['nodeCertificatePEM'].encode());ca=x509.load_pem_x509_certificate(signed['publicCA_PEM'].encode());cert.verify_directly_issued_by(ca);assert key.public_key()==cert.public_key()
+ assert hashlib.sha256(cert.public_bytes(serialization.Encoding.DER)).hexdigest()==signed['NodeDER_SHA256']
+ uri='spiffe://saintvision.ai/tenant/'+plan['tenant']+'/node/'+plan['newPlannedIDs']['nodeId']+'/epoch/'+plan['epoch'];sans=cert.extensions.get_extension_for_class(x509.SubjectAlternativeName).value
+ assert sans.get_values_for_type(x509.UniformResourceIdentifier)==[uri] and [str(x) for x in sans.get_values_for_type(x509.IPAddress)]==[plan['host']['address']]
+ assert list(cert.extensions.get_extension_for_class(x509.ExtendedKeyUsage).value)==[ExtendedKeyUsageOID.SERVER_AUTH] and (cert.not_valid_after_utc if hasattr(cert,'not_valid_after_utc') else cert.not_valid_after.replace(tzinfo=timezone.utc))>datetime.now(timezone.utc)
+ pub=base64.b64decode(signed['launchPublicBase64'],validate=True);assert len(pub)==32
+ policy=(json.dumps(signed['peerPolicy'],sort_keys=True,separators=(',',':'))+'\n').encode();assert hashlib.sha256(policy).hexdigest()==signed['peerPolicySHA256']
+ assert signed['peerPolicy']['nodeId']==plan['newPlannedIDs']['nodeId'] and signed['peerPolicy']['tenantId']==plan['tenant'] and signed['peerPolicy']['recoveryEpoch']==plan['epoch']
+ phase='write-only-public-certificate-trust-and-policy-new-files'
+ files={'node-cert.pem':signed['nodeCertificatePEM'].encode(),'client-ca.pem':signed['publicCA_PEM'].encode(),'launch-signer.pub':pub,'peer-policy.json':policy}
+ for name,b in files.items():
+  fd=os.open(nd/name,os.O_WRONLY|os.O_CREAT|os.O_EXCL,0o644)
+  with os.fdopen(fd,'wb') as f:f.write(b)
+ ctx=ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER);ctx.minimum_version=ssl.TLSVersion.TLSv1_3;ctx.verify_mode=ssl.CERT_REQUIRED;ctx.verify_flags|=ssl.VERIFY_X509_STRICT;ctx.verify_flags&=~ssl.VERIFY_X509_PARTIAL_CHAIN;ctx.load_verify_locations(cafile=str(nd/'client-ca.pem'));ctx.load_cert_chain(str(nd/'node-cert.pem'),str(nd/'node-key.pem'))
+ assert not (ops/'public-cpu-images-r1.tar').exists()
+ o.update(status='PUBLIC_TRUST_INSTALLED_PRIVATE_KEY_MATCHES_STRICT_TLS_CONTEXT_LOADED',node=plan['newPlannedIDs']['nodeId'],NodeDER_SHA256=signed['NodeDER_SHA256'],newPublicFileHashes={n:hashlib.sha256((nd/n).read_bytes()).hexdigest() for n in files},privateKeyStillLocal=True,privateKeyMode='0600 uid1000',CAAndClientAndLaunchPrivateKeyOnTarget=False)
+except BaseException as e:o.update(status='HOLD_PUBLIC_TRUST_INSTALL',phase=phase,errorClass=type(e).__name__,rawDiagnosticSuppressed=True)
+print(json.dumps(o));raise SystemExit(0 if o.get('status')=='PUBLIC_TRUST_INSTALLED_PRIVATE_KEY_MATCHES_STRICT_TLS_CONTEXT_LOADED' else 2)

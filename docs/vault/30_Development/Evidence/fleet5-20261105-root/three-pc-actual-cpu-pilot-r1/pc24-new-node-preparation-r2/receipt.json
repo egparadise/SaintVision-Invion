@@ -1,0 +1,55 @@
+{
+  "atKST": "2026-11-07T17:08:08+09:00",
+  "knownCause": "Original expected existing nodes parent; read-only proof showed absent and no new residue. Added exact owned0700 parent if absent, no old parent mode changed. PC2 original frozen IDs reused.",
+  "results": [
+    {
+      "PC": "PC2",
+      "SSHExit": 0,
+      "stderrBytes": 0,
+      "rawDiagnosticSuppressed": true,
+      "remote": {
+        "privateKeyEmitted": false,
+        "DBAdmission": "NOT_RUN",
+        "NodeStarted": false,
+        "oldIdentityOrStateChanged": false,
+        "status": "NEW_HOST_KEY_AND_PUBLIC_CSR_PREPARED_NOT_ENROLLED",
+        "phase": "create-only-new-names-and-server-key-csr",
+        "node": "nod_01M6TGQZ8S3DAFS7TYE8TY1PX2",
+        "nodeDirectory": "/home/saintvision-invion/saintvision-share/nodes/nod_01M6TGQZ8S3DAFS7TYE8TY1PX2",
+        "opsDirectory": "/home/saintvision-invion/saintvision-share/ops-cpu-node-1efea-r1-20261107",
+        "nodeURI": "spiffe://saintvision.ai/tenant/97968b42-68aa-40ce-af5e-3a33e2fc2205/node/nod_01M6TGQZ8S3DAFS7TYE8TY1PX2/epoch/bcd581be-31b4-4aca-86e6-3ca31b69ed09",
+        "publicCSRPEM": "-----BEGIN CERTIFICATE REQUEST-----\nMIIBYjCCARQCAQAwKTEnMCUGA1UEAwwebm9kXzAxTTZUR1FaOFMzREFGUzdUWUU4\nVFkxUFgyMCowBQYDK2VwAyEALHOFuFAUZstm2FBXdRhhv9xv7u7Q63nUBi54NGI2\nD+aggbcwgbQGCSqGSIb3DQEJDjGBpjCBozCBoAYDVR0RBIGYMIGVhoGSc3BpZmZl\nOi8vc2FpbnR2aXNpb24uYWkvdGVuYW50Lzk3OTY4YjQyLTY4YWEtNDBjZS1hZjVl\nLTNhMzNlMmZjMjIwNS9ub2RlL25vZF8wMU02VEdRWjhTM0RBRlM3VFlFOFRZMVBY\nMi9lcG9jaC9iY2Q1ODFiZS0zMWI0LTRhY2EtODZlNi0zY2EzMWI2OWVkMDkwBQYD\nK2VwA0EAtGkgA2MUTjZCsybXJJv8GW/UAwgazmw7kBYfOWzZ8BEFS4K0ycyxvy5d\nnjqZAOebG8w2DvBlzbMw5SA8i0ZNAA==\n-----END CERTIFICATE REQUEST-----\n",
+        "publicCSR_SHA256": "7b1f16b0c6d2bfe37c5822e273fdd4312c2cf1207d5e16f373f0059318fe0a55",
+        "keyMode": "0600 uid1000; never left target host",
+        "parentModes": "new directories0700",
+        "stateInitiallyEmpty": true
+      }
+    },
+    {
+      "PC": "PC4",
+      "SSHExit": 0,
+      "stderrBytes": 0,
+      "rawDiagnosticSuppressed": true,
+      "remote": {
+        "privateKeyEmitted": false,
+        "DBAdmission": "NOT_RUN",
+        "NodeStarted": false,
+        "oldIdentityOrStateChanged": false,
+        "status": "NEW_HOST_KEY_AND_PUBLIC_CSR_PREPARED_NOT_ENROLLED",
+        "phase": "create-only-new-names-and-server-key-csr",
+        "node": "nod_01M6TGSXV1J7XWC5D5H7N6EW1D",
+        "nodeDirectory": "/home/inviz/saintvision-share/nodes/nod_01M6TGSXV1J7XWC5D5H7N6EW1D",
+        "opsDirectory": "/home/inviz/saintvision-share/ops-cpu-node-1efea-r1-20261107",
+        "nodeURI": "spiffe://saintvision.ai/tenant/97968b42-68aa-40ce-af5e-3a33e2fc2205/node/nod_01M6TGSXV1J7XWC5D5H7N6EW1D/epoch/bcd581be-31b4-4aca-86e6-3ca31b69ed09",
+        "publicCSRPEM": "-----BEGIN CERTIFICATE REQUEST-----\nMIIBYjCCARQCAQAwKTEnMCUGA1UEAwwebm9kXzAxTTZUR1NYVjFKN1hXQzVENUg3\nTjZFVzFEMCowBQYDK2VwAyEAgwsNJxFDF0TBEUYrfXMLzRhhzqK/oZdhrDlxAhNe\nL3qggbcwgbQGCSqGSIb3DQEJDjGBpjCBozCBoAYDVR0RBIGYMIGVhoGSc3BpZmZl\nOi8vc2FpbnR2aXNpb24uYWkvdGVuYW50Lzk3OTY4YjQyLTY4YWEtNDBjZS1hZjVl\nLTNhMzNlMmZjMjIwNS9ub2RlL25vZF8wMU02VEdTWFYxSjdYV0M1RDVIN042RVcx\nRC9lcG9jaC9iY2Q1ODFiZS0zMWI0LTRhY2EtODZlNi0zY2EzMWI2OWVkMDkwBQYD\nK2VwA0EASU4dQ7pxZNlZleKv24Cyb1tNAaJ08Y0TIZHu+NLzQt9EWlN5ionllT23\nlD07En0vbfJ+J5U81SerCm0X5EJXCQ==\n-----END CERTIFICATE REQUEST-----\n",
+        "publicCSR_SHA256": "98e1910dbfabb9b58a8c3880f0cc7a62574335ecc1c78e7b274fd4522bb7f3e8",
+        "keyMode": "0600 uid1000; never left target host",
+        "parentModes": "new directories0700",
+        "stateInitiallyEmpty": true
+      }
+    }
+  ],
+  "knownHostsUnchanged": true,
+  "certificateSigningAdmissionOrNodeStart": "NOT_RUN",
+  "wholeProgramComplete": false
+}

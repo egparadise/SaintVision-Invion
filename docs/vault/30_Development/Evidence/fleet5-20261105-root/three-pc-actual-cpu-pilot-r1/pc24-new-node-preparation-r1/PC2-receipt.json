@@ -1,0 +1,16 @@
+{
+  "PC": "PC2",
+  "SSHExit": 2,
+  "stderrBytes": 0,
+  "rawDiagnosticSuppressed": true,
+  "remote": {
+    "privateKeyEmitted": false,
+    "DBAdmission": "NOT_RUN",
+    "NodeStarted": false,
+    "oldIdentityOrStateChanged": false,
+    "status": "HOLD_NEW_IDENTITY_PREPARATION",
+    "phase": "validate-exact-new-owned-scope",
+    "errorClass": "AssertionError",
+    "rawDiagnosticSuppressed": true
+  }
+}

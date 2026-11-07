@@ -1,0 +1,118 @@
+{
+  "atKST": "2026-11-07T17:17:11+09:00",
+  "files": [
+    {
+      "path": "pc124-current-readiness-r1.json",
+      "bytes": 763,
+      "SHA256": "c9dbe921443afcc448981e732d062660cfbebbb54049ee8eb3584a7b7e7ab398"
+    },
+    {
+      "path": "pc24-current-readiness-r2.json",
+      "bytes": 3989,
+      "SHA256": "f550472ff55fce9b099c550ed38d7f92d833f595f15385377d234b1f536b40d6"
+    },
+    {
+      "path": "pc24-image-transfer-r1/receipt.json",
+      "bytes": 924,
+      "SHA256": "723725a3790a83277b6ae2d37345c35f39447edbb59f8dce7eaab3a7a67f37e7"
+    },
+    {
+      "path": "pc24-new-node-preparation-r1/PC2-public-plan.json",
+      "bytes": 1402,
+      "SHA256": "a1e52443ccd971b68c703c71deb1bc1ea9beb80adbc4645b44d1f1d5db573d3e"
+    },
+    {
+      "path": "pc24-new-node-preparation-r1/PC2-receipt.json",
+      "bytes": 402,
+      "SHA256": "76c00d7e6de2f7110f19290b04ed69325b66d471f00c266f6982f88bad60e4e8"
+    },
+    {
+      "path": "pc24-new-node-preparation-r1/PC2-scope-readonly-cause.json",
+      "bytes": 767,
+      "SHA256": "1bdc6c453bb1af5086ac46605289c5fc92cc78eed149891b9ef933c16f8912ca"
+    },
+    {
+      "path": "pc24-new-node-preparation-r2/receipt.json",
+      "bytes": 3721,
+      "SHA256": "216012fc0b0a55b9b69082bd84586018a5fdffe150275122c2a5550dbb5c85fe"
+    },
+    {
+      "path": "pc24-new-node-preparation-r2/PC2-public-plan.json",
+      "bytes": 1402,
+      "SHA256": "a1e52443ccd971b68c703c71deb1bc1ea9beb80adbc4645b44d1f1d5db573d3e"
+    },
+    {
+      "path": "pc24-new-node-preparation-r2/PC4-public-plan.json",
+      "bytes": 1363,
+      "SHA256": "7a2a8e8bf2037dd8a0344049613948800566add126fddbfc425d1aafebe689cc"
+    },
+    {
+      "path": "pc24-new-node-preparation-r2/remote-key-csr-program.py.txt",
+      "bytes": 2887,
+      "SHA256": "5c0202f6d814ac6ce7a67cf14e87954c56f2679255987a99b89802bb05a1af35"
+    },
+    {
+      "path": "pc24-pilot-ca-signing-r1/receipt.json",
+      "bytes": 8708,
+      "SHA256": "fd92f15a44803a99c804289d0dea97c17c90222d4701eb17d445b90aacd99fdc"
+    },
+    {
+      "path": "pc24-pilot-ca-signing-r1/remote-signing-program.py.txt",
+      "bytes": 5665,
+      "SHA256": "74e47801c4a150cb3a7fb1e47e4417624b040edde20a75fd3f35bb47627f03fa"
+    },
+    {
+      "path": "pc24-admission-r1/receipt.json",
+      "bytes": 7312,
+      "SHA256": "fc9b4c0a2ef1379543bdf3c62de16836a913389a0caf68cc3b6da7a9b2370091"
+    },
+    {
+      "path": "pc24-admission-r1/plan-remote-program.py.txt",
+      "bytes": 4830,
+      "SHA256": "077b5e831f61bd7b3d66714309a6719ffd4753634321d649c27f944910ea6e0e"
+    },
+    {
+      "path": "pc24-admission-r1/apply-remote-program.py.txt",
+      "bytes": 7017,
+      "SHA256": "3bf386a21b075f426d9c5958d3e59d6ee2a1572b3dc34acf286d251c3a109df6"
+    },
+    {
+      "path": "pc24-node-start-r1/PC2-public-trust-receipt.json",
+      "bytes": 1026,
+      "SHA256": "e355874dea5a9a13de93d176f1ece6b03b1e1d2ba81533d21195aa913335ae7b"
+    },
+    {
+      "path": "pc24-node-start-r2/receipt.json",
+      "bytes": 9758,
+      "SHA256": "38ef758ed2b248403c73891053d36025bddbd9266cc4798c8eeb9b2422e6a1f2"
+    },
+    {
+      "path": "pc24-node-start-r2/public-trust-remote-program.py.txt",
+      "bytes": 5941,
+      "SHA256": "39e44db1fdf79e5b89f5ccae281515fd0160485342e41333b47bbb372b565826"
+    },
+    {
+      "path": "pc24-node-start-r2/image-load-remote-program.py.txt",
+      "bytes": 1053,
+      "SHA256": "af60edfe0db666510ac19cda537513ba824e91dc061dcff99261e39312812375"
+    },
+    {
+      "path": "pc24-node-start-r2/node-start-template-remote-program.py.txt",
+      "bytes": 6343,
+      "SHA256": "e4dbc30260ab61ef162f45a080143a01f886544c7ff1f8ca8add1f12bdc0a08d"
+    },
+    {
+      "path": "three-pc-continuity-readonly-r1.json",
+      "bytes": 7282,
+      "SHA256": "70cfb4da95d21c083f065b28c0450006aadacc237c37d385bc3a33475a492e6e"
+    },
+    {
+      "path": "fresh-admin-three-pc-api-r1.json",
+      "bytes": 5353,
+      "SHA256": "f233850348945229ee373940c1fc551ed9b279542a107f53e172a3c3aed046d4"
+    }
+  ],
+  "privateMaterialOrRawBuildDriverLogsCopied": false,
+  "exportedImageTarCopiedToGit": false,
+  "certificatesAndCSRsArePublicOnly": true
+}

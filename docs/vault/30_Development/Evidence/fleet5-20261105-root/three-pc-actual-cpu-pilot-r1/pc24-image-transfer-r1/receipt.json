@@ -1,0 +1,22 @@
+{
+  "atKST": "2026-11-07T17:05:38+09:00",
+  "status": "PUBLIC_PRODUCT_IMAGE_BUNDLE_DOWNLOADED_AND_HASH_MATCHED",
+  "export": {
+    "status": "EXACT_PUBLIC_IMAGE_BUNDLE_EXPORTED",
+    "path": "/home/saintvision-invion3/saintvision-share/ops-fresh-cpu-1efea-r1-20261107/public-cpu-images-r1.tar",
+    "bytes": 55091200,
+    "SHA256": "7f7b9d3b1f9eb44a85753a49d6d6283c1cf2f8d68b9c3f59f2bbdc7019795688",
+    "imageIDs": [
+      "sha256:de654cd385307ac7147baf6757a480f803361eb5b30d40c7991b272a6889d87f",
+      "sha256:ffee58e8dbefc6c0db68810cd1597f8cc589cf01112c434ed7fda8d4af415634"
+    ],
+    "privateConfigOrKeysIncluded": false,
+    "existingContainerStateChanged": false,
+    "bundleFileMode": "0o600"
+  },
+  "localBytes": 55091200,
+  "localSHA256": "7f7b9d3b1f9eb44a85753a49d6d6283c1cf2f8d68b9c3f59f2bbdc7019795688",
+  "knownHostsUnchanged": true,
+  "destinationLoadOrNodeStart": "NOT_RUN",
+  "allFivePCsComplete": false
+}

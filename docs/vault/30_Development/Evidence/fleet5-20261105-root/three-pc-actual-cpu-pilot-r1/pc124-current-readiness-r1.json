@@ -1,0 +1,34 @@
+{
+  "atKST": "2026-11-07T17:03:18+09:00",
+  "fixedUserConfirmedTargetsOnly": true,
+  "attemptsPerHost": 1,
+  "knownHostsUnchanged": true,
+  "remoteMutations": 0,
+  "results": [
+    {
+      "PC": "PC1",
+      "target": "inviz@192.168.45.13",
+      "SSHExit": 255,
+      "stderrBytes": 62,
+      "writes": false,
+      "rawDiagnosticSuppressed": true
+    },
+    {
+      "PC": "PC2",
+      "target": "saintvision-invion@192.168.45.143",
+      "SSHExit": 1,
+      "stderrBytes": 351,
+      "writes": false,
+      "rawDiagnosticSuppressed": true
+    },
+    {
+      "PC": "PC4",
+      "target": "inviz@192.168.45.210",
+      "SSHExit": 1,
+      "stderrBytes": 351,
+      "writes": false,
+      "rawDiagnosticSuppressed": true
+    }
+  ],
+  "allFivePCsComplete": false
+}

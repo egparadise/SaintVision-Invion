@@ -1,0 +1,29 @@
+{
+  "readOnly": true,
+  "uid": 1000,
+  "pythonHashMatches": true,
+  "home": "/home/saintvision-invion",
+  "share": {
+    "path": "/home/saintvision-invion/saintvision-share",
+    "exists": true,
+    "symlink": false,
+    "resolved": "/home/saintvision-invion/saintvision-share",
+    "uid": 1000,
+    "mode": "0o775"
+  },
+  "nodesParent": {
+    "path": "/home/saintvision-invion/saintvision-share/nodes",
+    "exists": false,
+    "symlink": false
+  },
+  "plannedNode": {
+    "path": "/home/saintvision-invion/saintvision-share/nodes/nod_01M6TGQZ8S3DAFS7TYE8TY1PX2",
+    "exists": false,
+    "symlink": false
+  },
+  "plannedOps": {
+    "path": "/home/saintvision-invion/saintvision-share/ops-cpu-node-1efea-r1-20261107",
+    "exists": false,
+    "symlink": false
+  }
+}

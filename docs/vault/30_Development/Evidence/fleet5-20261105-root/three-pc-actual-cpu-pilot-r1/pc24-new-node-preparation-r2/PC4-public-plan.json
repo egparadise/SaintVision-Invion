@@ -1,0 +1,36 @@
+{
+  "atKST": "2026-11-07T17:08:08+09:00",
+  "source": "1efea494f026e932360c35ae811b6423d874a2e7",
+  "actualCodeReview": "6bd81ef0531b4a58438c98618e92d5ad9985c12b",
+  "actualReconcileEntryReview": "ee1facda1dbcc3c6eea281be462a74f5d42392b9",
+  "tenant": "97968b42-68aa-40ce-af5e-3a33e2fc2205",
+  "project": "prj_01M6NDBHVD2DZQ1Q38DCKN1XE3",
+  "epoch": "bcd581be-31b4-4aca-86e6-3ca31b69ed09",
+  "expectedTenantControlVersion": 0,
+  "newPlannedIDs": {
+    "nodeId": "nod_01M6TGSXV1J7XWC5D5H7N6EW1D",
+    "cpuResourceId": "res_01M6TGSXV1JYVSGXTXBVPFAXKR",
+    "memoryResourceId": "res_01M6TGSXV1DZ02FP8Z8PH2FGDB",
+    "registeredOrReserved": false
+  },
+  "host": {
+    "PC": "PC4",
+    "address": "192.168.45.210",
+    "SSHUser": "inviz",
+    "pythonSHA256": "eb3bbb420e7630b2e59eb7b5c376fc7d034821c7569b08da4b7d52eb15356259"
+  },
+  "endpoint": {
+    "planned": "https://192.168.45.210:19443",
+    "nodeListenPort": 19443
+  },
+  "configuredContributionOnly": {
+    "cpuMillis": 500,
+    "memoryBytes": 67108864,
+    "GPU": false
+  },
+  "ownedNewEnvironment": "/home/inviz/saintvision-share/ops-cpu-node-1efea-r1-20261107",
+  "plannedNewNodeDirectory": "/home/inviz/saintvision-share/nodes/nod_01M6TGSXV1J7XWC5D5H7N6EW1D",
+  "plannedContainerName": "saintvision-nod_01M6TGSXV1J7XWC5D5H7N6EW1D",
+  "status": "PUBLIC_PLAN_NOT_ENROLLED",
+  "wholeProgramComplete": false
+}

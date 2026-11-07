@@ -1,0 +1,34 @@
+import base64,hashlib,json,os,subprocess,sys
+from pathlib import Path
+import psycopg
+from psycopg.rows import dict_row
+phase='validate-private-ephemeral-profile';result={'mode':'PLAN','DBPersistentWrites':False,'actualAdmission':'NOT_RUN','profileOrCredentialValuesEmitted':False,'wholeProgramComplete':False}
+try:
+ p=json.loads(sys.stdin.buffer.read(65537));plan=p['publicPlan'];ops=Path(p['operatorEnvironment']).resolve();assert Path(sys.prefix).resolve()==ops/'venv'
+ assert hashlib.sha256((ops/'venv/lib/python3.14/site-packages/inv/fresh_cpu_admission.py').read_bytes()).hexdigest()==p['librarySHA256']
+ raw=base64.b64decode(p['rawRequestBase64'],validate=True)
+ request_file=ops/p['requestFileName'];assert request_file.parent==ops and not request_file.exists()
+ fd=os.open(request_file,os.O_WRONLY|os.O_CREAT|os.O_EXCL,0o600)
+ with os.fdopen(fd,'wb') as f:f.write(raw)
+ raw=base64.b64decode(p['rawRequestBase64'],validate=True);assert hashlib.sha256(raw).hexdigest()==p['requestSHA256'] and raw==(ops/p['requestFileName']).read_bytes()
+ for name in list(os.environ):
+  if name.startswith('PG'):os.environ.pop(name,None)
+ req=json.loads(raw);assert req['nodeId']==plan['newPlannedIDs']['nodeId'] and req['tenantId']==plan['tenant'] and req['projectId']==plan['project'] and req['recoveryEpoch']==plan['epoch']
+ phase='actual-same-server-role-and-target-readonly-preflight'
+ with psycopg.connect(p['privateDSN'],autocommit=True,row_factory=dict_row) as conn:
+  conn.read_only=True
+  server=conn.execute('SELECT system_identifier::text AS id FROM pg_control_system()').fetchone()['id'];assert server==p['expectedServerSystemID']
+  role=conn.execute('SELECT rolsuper,rolbypassrls,rolcanlogin FROM pg_roles WHERE rolname=current_user').fetchone();assert role['rolsuper'] or role['rolbypassrls']
+  epoch=conn.execute('SELECT epoch FROM inv.control_epoch WHERE singleton').fetchone()['epoch'];assert str(epoch)==plan['epoch']
+  control=conn.execute('SELECT version,kill_switch FROM inv.tenant_controls WHERE tenant_id=%s',(plan['tenant'],)).fetchone();assert control['version']==plan['expectedTenantControlVersion']
+  assert conn.execute("SELECT count(*)=1 AS ok FROM inv.business_projects b JOIN public.projects q ON q.tenant_id=b.tenant_id AND q.project_id=b.project_id WHERE b.tenant_id=%s AND b.project_id=%s AND b.enabled AND q.status='active'",(plan['tenant'],plan['project'])).fetchone()['ok']
+  def counts():return conn.execute("SELECT (SELECT count(*) FROM inv.nodes WHERE tenant_id=%s AND node_id=%s) AS node,(SELECT count(*) FROM inv.resources WHERE tenant_id=%s AND resource_id IN (%s,%s)) AS resources,(SELECT count(*) FROM inv.project_nodes WHERE tenant_id=%s AND node_id=%s) AS project_links,(SELECT count(*) FROM inv.node_channels WHERE tenant_id=%s AND node_id=%s) AS channels,(SELECT count(*) FROM inv.node_channel_audit WHERE tenant_id=%s AND node_id=%s) AS audit,(SELECT count(*) FROM inv.node_controls WHERE tenant_id=%s AND node_id=%s) AS controls",(plan['tenant'],req['nodeId'],plan['tenant'],req['cpuResourceId'],req['memoryResourceId'],plan['tenant'],req['nodeId'],plan['tenant'],req['nodeId'],plan['tenant'],req['nodeId'],plan['tenant'],req['nodeId'])).fetchone()
+  before=counts();assert all(x==0 for x in before.values())
+  childenv={'PATH':'/usr/bin:/bin','LANG':'C.UTF-8','PYTHONDONTWRITEBYTECODE':'1','PYTHONNOUSERSITE':'1','SV_FRESH_NODE_OPERATOR_DSN':p['privateDSN'],'SV_FRESH_NODE_EXPECTED_PLAN_SHA256':p['planDigest']}
+  phase='candidate-cli-plan-only';q=subprocess.run([str(ops/'venv/bin/python'),'-I','-B',str(ops/'fresh_cpu_admission.py')],input=raw,capture_output=True,timeout=25,env=childenv)
+  result['CLIExit']=q.returncode;result['CLIStdoutBytes']=len(q.stdout);result['CLIStderrBytes']=len(q.stderr)
+  assert q.returncode==0 and not q.stderr and len(q.stdout)<=16384;receipt=json.loads(q.stdout);assert type(receipt) is dict and receipt['mode']=='PLAN' and receipt['status']=='READY' and receipt['planSha256']==p['planDigest']
+  after=counts();assert after==before
+ result.update(status='READY_ACTUAL_READONLY_PLAN_TARGET_AND_PROFILE_VERIFIED',phase='actual-cli-ready-and-zero-writes-readback',sameNamedServerSystemID=True,existingOperatorRoleClass=role,currentEpochMatches=True,tenantControls=control,selectedBusinessLinkedProjectActive=True,plannedTargetCountsBefore=before,plannedTargetCountsAfter=after,CLIReadyPlanDigest=receipt['planSha256'],childEnvironmentNames=sorted(childenv),actualUserOIDCOrRunApproval='NOT_PERFORMED_NOT_SUBSTITUTED_BY_OPERATOR_ROLE',NodeOrWorkloadExecuted=False)
+except BaseException as error:result.update(status='HOLD_PLAN_REFUSED_OR_UNKNOWN',phase=phase,errorClass=type(error).__name__,rawDiagnosticSuppressed=True)
+print(json.dumps(result));raise SystemExit(0 if result.get('status')=='READY_ACTUAL_READONLY_PLAN_TARGET_AND_PROFILE_VERIFIED' else 2)

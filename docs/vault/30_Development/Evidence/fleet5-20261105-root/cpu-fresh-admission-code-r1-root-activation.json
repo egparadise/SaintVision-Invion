@@ -1,11 +1,11 @@
 {
-  "atKST": "2026-11-07T17:02:18+09:00",
+  "atKST": "2026-11-07T17:17:11+09:00",
   "task": "FLEET5-FRESH-CPU-ADMISSION-CODE-R1-20261107",
   "parentOrcaTask": "task_a95ef3d8ccce",
   "dispatch": "ctx_ed23b4a777d0",
   "owner": "Codex",
   "futureReviewer": "Actual independent Claude, not yet started",
-  "status": "ACTUAL_SINGLE_APPLY_ACKNOWLEDGED_PC3_NODE_RUNNING_CONTINUOUS_REAL_OBSERVATION_AND_FRESH_OWNER_PROJECT_API_CONFIRMED",
+  "status": "PC2_PC3_PC4_SINGLE_APPLY_ACKNOWLEDGED_EXACT_NEW_NODES_RUNNING_CONTINUOUS_REAL_OBSERVATION_FRESH_OWNER_PROJECT_API200",
   "base": "7033778ad3d2bc284e36f7e29be7597dbb7d9f23",
   "scopeMessage": "msg_e716b2cba047",
   "stdinClarification": "msg_5fa2d17d863e",
@@ -567,5 +567,6 @@
     "registeredOrReserved": false
   },
   "actualAdmission": "COMMITTED_ACKNOWLEDGED_SINGLE_APPLY_NO_RECONCILE_OR_RETRY",
-  "currentPhysicalPilot": "pc3-actual-cpu-pilot-r1-root-activation.json"
+  "currentPhysicalPilot": "three-pc-actual-cpu-pilot-r1-root-activation.json",
+  "actualCurrentProjectNodes": 3
 }

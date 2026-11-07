@@ -1,0 +1,120 @@
+{
+  "atKST": "2026-11-07T17:03:46+09:00",
+  "fixedUserConfirmedTargetsOnly": true,
+  "attemptsPerHost": 1,
+  "knownHostsUnchanged": true,
+  "remoteMutations": 0,
+  "results": [
+    {
+      "PC": "PC2",
+      "target": "saintvision-invion@192.168.45.143",
+      "SSHExit": 0,
+      "stderrBytes": 0,
+      "writes": false,
+      "rawDiagnosticSuppressed": true,
+      "observation": {
+        "readOnly": true,
+        "uid": 1000,
+        "hostname": "saintvision-invion-Precision-3450",
+        "pythonVersion": "3.14.4",
+        "pythonExecutable": "/usr/bin/python3",
+        "pythonExecutableSHA256": "52e0a13e60a981d8c4b6478be2ba5176f69da07948a056bf49cf6f077e30cb41",
+        "cpuCount": 12,
+        "shareExists": true,
+        "shareAvailableBytes": 209088118784,
+        "memoryBytes": {
+          "MemTotal": 15938523136,
+          "MemAvailable": 9131601920
+        },
+        "candidatePortsCurrentlyListening": {
+          "19443": false,
+          "15461": false
+        },
+        "dockerServerExit": 0,
+        "dockerServer": {
+          "Version": "29.1.3",
+          "ApiVersion": "1.52",
+          "Os": "linux",
+          "Arch": "amd64"
+        },
+        "allLabelledNodeInventoryExit": 0,
+        "existingLabelledNodeContainerNames": [
+          "saintvision-nod_01m6jfq4qtr5ew9n8abmm87yfx",
+          "saintvision-nod_01m5xpmgd498eqsv8f5c91qds3",
+          "saintvision-nod_01m54rwcr2sf9yyvr0na871ty9",
+          "saintvision-nod_01m4a1dxa0krvbhxmtww2k67v9",
+          "saintvision-nod_01m3pv6frk6z32y7w3y5rgjnzt",
+          "saintvision-nod_01m3ptp800fsy01xte2e1d9ww6",
+          "saintvision-nod_01m353dar7em8tetzn1fkrnprg"
+        ],
+        "hostPythonInstalledDistributionVersionsMetadataOnly": {
+          "psycopg": null,
+          "cryptography": "46.0.5",
+          "SQLAlchemy": null,
+          "pydantic": null,
+          "jsonschema": "4.19.2",
+          "PyJWT": "2.10.1",
+          "saintvision-control-plane": null
+        },
+        "docker145UnixVersionHTTP": 200,
+        "remoteUTC": "2026-11-07T08:03:46.215021+00:00"
+      }
+    },
+    {
+      "PC": "PC4",
+      "target": "inviz@192.168.45.210",
+      "SSHExit": 0,
+      "stderrBytes": 0,
+      "writes": false,
+      "rawDiagnosticSuppressed": true,
+      "observation": {
+        "readOnly": true,
+        "uid": 1000,
+        "hostname": "inviz-Precision-3450",
+        "pythonVersion": "3.12.3",
+        "pythonExecutable": "/usr/bin/python3",
+        "pythonExecutableSHA256": "eb3bbb420e7630b2e59eb7b5c376fc7d034821c7569b08da4b7d52eb15356259",
+        "cpuCount": 12,
+        "shareExists": true,
+        "shareAvailableBytes": 207920742400,
+        "memoryBytes": {
+          "MemTotal": 16480641024,
+          "MemAvailable": 11689070592
+        },
+        "candidatePortsCurrentlyListening": {
+          "19443": false,
+          "15461": false
+        },
+        "dockerServerExit": 0,
+        "dockerServer": {
+          "Version": "29.8.1",
+          "ApiVersion": "1.56",
+          "Os": "linux",
+          "Arch": "amd64"
+        },
+        "allLabelledNodeInventoryExit": 0,
+        "existingLabelledNodeContainerNames": [
+          "saintvision-nod_01m6jfq4qt9qc9bmyw1tvsht8e",
+          "saintvision-nod_01m5xpmgd4ktw3w0vmadk6wv4n",
+          "saintvision-nod_01m54rwcr2x8bp4ychpt9p4xc2",
+          "saintvision-nod_01m4a1dxa0qvc90829j7nfz7qq",
+          "saintvision-nod_01m3pv6frktj53fqncdt2k2acv",
+          "saintvision-nod_01m3ptp800eemwmdykezz3cwnp",
+          "saintvision-nod_01m355nx3y7x64av1b90n2nkqd"
+        ],
+        "hostPythonInstalledDistributionVersionsMetadataOnly": {
+          "psycopg": null,
+          "cryptography": "41.0.7",
+          "SQLAlchemy": null,
+          "pydantic": null,
+          "jsonschema": "4.10.3",
+          "PyJWT": "2.7.0",
+          "saintvision-control-plane": null
+        },
+        "docker145UnixVersionHTTP": 200,
+        "remoteUTC": "2026-11-07T08:03:46.130471+00:00"
+      }
+    }
+  ],
+  "allFivePCsComplete": false
+}
