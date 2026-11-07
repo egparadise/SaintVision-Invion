@@ -1,15 +1,19 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.462"
+version: "1.0.463"
 status: "review"
 author: "Codex"
-updated: "2026-11-07T12:10:26+09:00"
+updated: "2026-11-07T12:43:31+09:00"
 source_of_truth: "Git"
 active_card: "FLEET5 continued supervision with PORTAL-REFRESH-FLEET-20261106"
-active_card_status: "InitialDirectionAligned_GoldenCPUJourneyAnd5PCAcceptancePending; oneSlidePPTnativeVerified; H126d7CODEACCEPT_KEEP_HOLD; Bselectorb51actualReviewPending"
-active_card_next: "Root currentCP/project/identity/runtime/profile/trust/fence preflight for eligible PC2/3/4 CPU first journey; B actual b51 verdict then integration scope. No optional Low scope expansion or invented completion percent."
+active_card_status: "Selectorb51actualACCEPT; joint6d7plus746CODEactive_CIpending; currentDemoDBnode1_projectLinks0_snapshots0; oldPC2tenantMismatch; CPU_PC3_sourceOnlyMapPending"
+active_card_next: "Root verify exact joint source Docs/Core/Backend then actual integration review; source-only CPU route map and authenticated project binding needed. No old tenant repurpose, no credential output, no optional Low expansion."
 ---
+
+## 2026-11-07T12:43:31+09:00 실제 CP·Node 소속과 CPU 통합 후보
+
+selector 보완 b51의 실제 독립 판정 f489/Docs42333724088가 OPG-L1을 한정 조건으로 닫았고 선택적 INFO를 새 의무 범위로 늘리지 않았다. 수락된6d7과746의 정확한 두 소스 변경만 묶는 새 Codex 통합 후보가 실제 작업 중이다. 현재 CP의 읽기 전용 DB에는 Node레코드1개가 있으나 두 대상 프로젝트 연결0·해당 세대 자원 snapshot0이며, PC2의 기존6개 Node는 현재 CP와 다른 테넌트/세대다. PC3는 실행 중인 해당 라벨 Node0개만 관측해 새 CPU 합류 후보로 정했다. 인증된 API·현재 브라우저 선택·실행 성공은 아직 미확인이다. 설정 연결정보가 worker 도구 stdout에 포함됐다는 보고는 값 없이 기록했고, 해당 worker의 설정 접근을 철회해 소스·정제 자료만 허용했다. 상세 명령·exit·한계·다음 담당은 Root History/Evidence에 보존했다.
 
 ## 2026-11-07T12:10:26+09:00 초기 계획 대비 분석과 한 장 PPT
 

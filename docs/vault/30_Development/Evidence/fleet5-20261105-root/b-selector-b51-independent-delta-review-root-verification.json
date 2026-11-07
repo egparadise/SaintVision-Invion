@@ -1,0 +1,29 @@
+{
+  "atKST": "2026-11-07T12:27:37+09:00",
+  "source": "b51d827e507a35aca3737e31103bd3b3311298a5",
+  "review": "f489e7e9f1be1687ba2f5f1ff7075dd85a6f4656",
+  "remoteExact": true,
+  "directParentExact": true,
+  "onlyOwn12AddedReviewDocs": true,
+  "Docs": 42333724088,
+  "DocsJob": 128285809248,
+  "correlation": "claude-b-selector-b51-review-f489e7e9f1be-ctxcfee4b4aa2e7-20261107",
+  "exactManualDocsAll19Success": true,
+  "verdict": "ACCEPT_SELECTOR_DISCOVERY_DELTA_CLOSE_OPG_L1_KEEP_ACTUAL_HOLD",
+  "canonicalGitBlobSHA256": {
+    "docs/vault/30_Development/Evidence/fleet5-b-selector-b51-review-20261107-claude/.gitattributes": "96a83569c84cfe3f57b7efe3dc61c249548d0fca4fed0e538b3587cdc97c95c1",
+    "docs/vault/30_Development/Evidence/fleet5-b-selector-b51-review-20261107-claude/commands.json": "13ccce8642131ce3c02e128681a614344cbf4f2515222b8d96abc1d8c367b97b",
+    "docs/vault/30_Development/Evidence/fleet5-b-selector-b51-review-20261107-claude/local-doc-gates-r1.txt": "b69299c16c6ee72150ffeabefc66e3390042cae2f2ffab487200ca0351220577",
+    "docs/vault/30_Development/Evidence/fleet5-b-selector-b51-review-20261107-claude/review.json": "6d7282a9255b0e00453d58aa1111325cfd2486704e4eec8af22f214a03ee0332",
+    "docs/vault/30_Development/Evidence/fleet5-b-selector-b51-review-20261107-claude/reviewer-probe-receipts.json": "e2743543733526e9efc1c5ddc1f0729ce8d4d1aca5a75a5db45aeb72e6ea3020",
+    "docs/vault/30_Development/Evidence/fleet5-b-selector-b51-review-20261107-claude/reviewer-probe-result.json": "f983e5be2b2d1438bde54e1a256af14e05c317ad4d652bdd5406c5d43ef4b38a",
+    "docs/vault/30_Development/Evidence/fleet5-b-selector-b51-review-20261107-claude/reviewer-probe.stdout.txt": "518ac7830210093b1ce4009cd2370fbe8078450b874dd59c26ad37ef51f9f110",
+    "docs/vault/30_Development/Evidence/fleet5-b-selector-b51-review-20261107-claude/reviewer_gate_driver.py.txt": "9ab1e167a0075a581656d5180c3bc73c776f4c13642ffcdc9b474b8249dc604c",
+    "docs/vault/30_Development/Evidence/fleet5-b-selector-b51-review-20261107-claude/reviewer_probe.py.txt": "0d85d2e94864355cd165ee576cbbff66023187793ead1d7cbf4ca03e1b397407",
+    "docs/vault/30_Development/Evidence/fleet5-b-selector-b51-review-20261107-claude/sync-state-after-r1.json": "c8f49124aafb90e282ba7032af3ca8c34c5567eabfd045e6bf9d9c22b35f8408",
+    "docs/vault/30_Development/Evidence/fleet5-b-selector-b51-review-20261107-claude/sync-state-before-r1.json": "c8f49124aafb90e282ba7032af3ca8c34c5567eabfd045e6bf9d9c22b35f8408",
+    "docs/vault/30_Development/History/2026-11-07_FLEET5_B_Selector_B51_Review_Claude.md": "82e47e8f7fb1a7651fd5df2fcdd304170fdeca8f60e78020d824141ad5df0cd4"
+  },
+  "actualAuthority": null,
+  "wholeProgramComplete": false
+}

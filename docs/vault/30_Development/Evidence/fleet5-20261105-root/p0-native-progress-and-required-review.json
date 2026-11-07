@@ -3,8 +3,8 @@
   "recordedAtKST": "2026-11-06T00:46:51+09:00",
   "rootBase": "2b1753ce59c09037b5e130a7ffe64794d1d45fdf",
   "priorRootCheckpoint": {
-    "SHA": "11386fc1b1850ed7e402e0214e02d1322c974f4a",
-    "Docs": 42330328885,
+    "SHA": "e5aa25b407f1444ca5e1f7405a024df8a679fa8e",
+    "Docs": 42333046998,
     "exactHeadCorrelationAllJobsSuccess": true,
     "remoteMatches": true,
     "syncExits": [
@@ -12,13 +12,13 @@
       0,
       0
     ],
-    "independentlyMatchedNormalizedDestinationHashes": 3062,
+    "independentlyMatchedNormalizedDestinationHashes": 3069,
     "pending": 0,
     "conflicts": 0,
     "trackedAndUntrackedClean": true,
     "rootDocsOnly": true,
     "wholeProgramComplete": false,
-    "verifiedAtKST": "2026-11-07T11:41:23+09:00"
+    "verifiedAtKST": "2026-11-07T12:15:49+09:00"
   },
   "actualPlanLowReview": {
     "source": "803ad270562b1b75e44d26f9e14b965c714ab519",
@@ -2515,7 +2515,7 @@
     "ownerT1T2T3": "msg_620855c76519",
     "normativeRevisionReply": "msg_0392caf64d5d"
   },
-  "latestRecordAtKST": "2026-11-07T12:10:26+09:00",
+  "latestRecordAtKST": "2026-11-07T12:43:31+09:00",
   "optionalLowTokenTestDelta": {
     "source": "f0af307705b4923ebc3e231db5238af4c70aa389",
     "scope": "two otherwise-valid token payload corrections and JSON validity assertions; runtime unchanged",
@@ -3108,23 +3108,7 @@
     "reviewOnlyPaths": 18
   },
   "BRev7RootDecision": "b-rev7-concrete-root-decision.json",
-  "activeActualReview": {
-    "atKST": "2026-11-07T12:10:26+09:00",
-    "status": "ACTUAL_B_SELECTOR_B51_DELTA_REVIEW_STARTED_VERDICT_PENDING",
-    "target": "b51d827e507a35aca3737e31103bd3b3311298a5",
-    "base": "746789a36091c8601afea23fe176069e2fa7d87b",
-    "task": "task_7c3f0ee2e044",
-    "dispatch": "ctx_cfee4b4aa2e7",
-    "workspace": "d98dc9d3-fe61-4cb2-9776-dff349347a61::D:/Project/SaintVisionI-Invion/fleet5-b-selector-b51-review-20261107",
-    "agent": "claude",
-    "startReceiptState": "ready",
-    "Docs": 42331427974,
-    "DocsAll19Success": true,
-    "authorQuestion": "msg_e6a4751c9bf9",
-    "independentVerdict": null,
-    "actualAuthority": null,
-    "wholeProgramComplete": false
-  },
+  "activeActualReview": null,
   "nextReviewRequires": "newimmutableK2Low/Stage2 orB8 pilot/evidence; oneClaudeafteractualrelease",
   "K2LatestImmutableProposalRootObservation": "k2-rev2-root-actual-contract-review-gate.json",
   "K2LatestActualReviewDispatch": {
@@ -5923,5 +5907,150 @@
     },
     "judgment": "Product direction aligned; prioritize actual single-CPU-Node journey, then five-PC GPU/storage/recovery acceptance; formal registry reconciliation required.",
     "independentWholeProductAcceptance": false
+  },
+  "jointCPUIntegration": {
+    "atKST": "2026-11-07T12:43:31+09:00",
+    "status": "JOINT_CPU_SOURCE_INTEGRATION_ACTUAL_ACTIVITY_OBSERVED_CANDIDATE_NOT_YET_PUBLISHED",
+    "sourceBase": "6d7ee3d85bd0e47eb7b787234c10d5dbfdb3a9e8",
+    "patchSource": "746789a36091c8601afea23fe176069e2fa7d87b",
+    "onlyProductScope": [
+      "services/control-plane/src/inv/dispatch.py",
+      "tests/core/test_delivery_operation_origin.py"
+    ],
+    "preimageOn6d7AndB3bbEquals": "4a33428502279b88e510b5447382814bb115ddf2bff4f88f5bfcbb93f3c1a404",
+    "expectedProductSHA256": "82f029614537eb5bab56934e4b6736fe3dd52ece54b9b9a3996815b131e41de4",
+    "expectedTestSHA256": "3dacdb63f83ab1d8075ddcbe422d82daad20bd56f643adee0fc7ae97715925d2",
+    "task": "task_452680345278",
+    "dispatch": "ctx_2db60366287f",
+    "workspace": "d98dc9d3-fe61-4cb2-9776-dff349347a61::D:/Project/SaintVisionI-Invion/fleet5-cpu-integration-pin-r1-20261107",
+    "initialReceiptState": "outcome_unknown",
+    "actualActivityEvidence": "Root bounded worker-read observed actual own docs gates and r1 full canonical CHECK unchanged, and author asked targeted r2 evidence-encoding recovery msg_a09b217d7a15. No resend/retry/stop/duplicate.",
+    "gateRecovery": "msg_7bc1a98984ce permits preserving originalUTF16rawbytes in new own UTF8base64JSON, own text UTF8 normalization and directbyteIO futuregate capture only; no source/tool/workflow change.",
+    "publishedCandidate": null,
+    "exactJointCI": null,
+    "independentJointReview": null,
+    "runtimeGrant": false,
+    "actualAuthority": null,
+    "wholeProgramComplete": false
+  },
+  "currentCPNodeAffinityReadOnly": {
+    "atKST": "2026-11-07T12:43:31+09:00",
+    "observationsAtKST": {
+      "hostAndLoopback": "2026-11-07T12:28:55+09:00",
+      "routeAndPC3": "2026-11-07T12:31:59+09:00",
+      "namedDBReadOnly": "2026-11-07T12:39:11+09:00"
+    },
+    "owner": "Root Codex",
+    "scope": "Read-only known loopback services, exact named old Node metadata and named current-demo DB SELECT counts. Not authenticatedAPI/browser/lease/execution acceptance.",
+    "currentConfigIdentity": {
+      "tenant": "97968b42-68aa-40ce-af5e-3a33e2fc2205",
+      "epoch": "bcd581be-31b4-4aca-86e6-3ca31b69ed09",
+      "manifestKernelProject": "prj_01M6NC3HEDBR40ZB9TH04GBE00",
+      "manifestPortalProject": "prj_01M6NDBHVD2DZQ1Q38DCKN1XE3",
+      "browserSelectedProject": "NOT_OBSERVED",
+      "projectIDsDistinct": true
+    },
+    "loopbackHealthAndReadinessStatus": [
+      {
+        "url": "http://127.0.0.1:8080/healthz",
+        "status": 200
+      },
+      {
+        "url": "http://127.0.0.1:8080/readyz",
+        "status": 200
+      }
+    ],
+    "correctProjectRouteUnauthenticatedGET": [
+      {
+        "url": "http://127.0.0.1:8080/v1/projects/prj_01M6NC3HEDBR40ZB9TH04GBE00/nodes",
+        "status": 401,
+        "unauthenticatedObservationOnly": true,
+        "authorizationSent": false
+      },
+      {
+        "url": "http://127.0.0.1:8080/v1/projects/prj_01M6NC3HEDBR40ZB9TH04GBE00/capacity",
+        "status": 401,
+        "unauthenticatedObservationOnly": true,
+        "authorizationSent": false
+      }
+    ],
+    "oldUnscopedNodes404": "Wrong-route diagnostic, not authentication or enrollment verdict",
+    "PC2": {
+      "sshExit": 0,
+      "runningMatchingLabelNodeContainers": 6,
+      "containersMatchingKnownCurrentDemoTenantEpoch": 0,
+      "oldR5AndCurrentDemoTenantEpochEqual": false,
+      "oldIdentitiesPortsVolumesPreserved": true
+    },
+    "PC3": {
+      "sshExit": 0,
+      "runningMatchingLabelNodeContainers": 0,
+      "stoppedContainersIdentityFilesAndDBRegistration": "NOT_OBSERVED",
+      "candidateCPUJoinOnly": true
+    },
+    "namedCurrentDemoDB": {
+      "SQLSessionReadOnly": true,
+      "diagnosticRoleBypassesRLS": true,
+      "notApplicationAuthorization": true,
+      "explicitTenantProjectFilters": true,
+      "epochMatchesManifest": true,
+      "currentTenantNodesAllEpochs": 1,
+      "currentTenantEpochNodesByStatus": [
+        {
+          "status": "online",
+          "count": 1
+        }
+      ],
+      "selectedProjectNodeLinks": [],
+      "selectedKernelProjectsPresent": [
+        {
+          "project_id": "prj_01M6NC3HEDBR40ZB9TH04GBE00"
+        },
+        {
+          "project_id": "prj_01M6NDBHVD2DZQ1Q38DCKN1XE3"
+        }
+      ],
+      "currentTenantEpochResourceSnapshotCount": 0
+    },
+    "interpretation": "One Node DB row is not physical enrollment success. Neither selected project has an enabled project-node link in the scoped SELECT, and current tenant/epoch has no resource snapshot. ExistingPC2 Node identities are from other tenant/epoch scopes; do not relabel/migrate them to fabricate UI counts. Need authenticated project mapping and real freshPC3 admission/observation before execution.",
+    "rawReceiptSHA256": {
+      "intent.json": "d7c0525cd6f66566747448cb476dc348ba29bfa71e7904d31fb7914e3203ebdb",
+      "known-config-identity-summary.json": "a4131f2ec7b2724f3c566710d87b7f9497b4eecf7cf5087831f8ce16fb784178",
+      "known-local-containers.json": "2b0a66d23116cd7445d519cf3363ddad7da91586e1c2619b3c85609f022448b0",
+      "loopback-http-get.json": "ba9b59d0e1fb6fa576eab31828da518b68dc45eb695b4321b6bd3c3c82966b74",
+      "loopback-listeners.json": "186d8ff4c09e5951fd3539e03a0751090202890c15d40236fe3dcc7cdf2f999c",
+      "named-current-db-counts-r2.private.json": "e17762402a9534b94d86c621edc76996be03147ed16e315e0e1fcf8a7b5fcedd",
+      "named-current-db-counts.private.json": "ef6123dd21eebdd8aff570afe82658d92a08d8c2c8df40dea4970a420ee3832d",
+      "pc2-node-affinity.json": "8b0b08fbda44f0b1a984dab39e4829a985012fb045f797c8f38ed5648cbc4128",
+      "receipt.private.json": "de2a7850d3c8ffc8a769a61509809bac52b7f38f56dc6421c561f94dbebf8d68",
+      "route-and-pc3-supplement.private.json": "d88b0b6268b4b5cdea6c8281347653591fcd95fe4b86bcdb246bab8b278e5765"
+    },
+    "credentialValuesEmittedOrIncludedInThisEvidence": false,
+    "remoteMutation": false,
+    "SQLWrites": false,
+    "knownHostsUnchanged": true,
+    "actualLeaseOrWorkExecution": false,
+    "fiveNodesAccepted": false,
+    "wholeProgramComplete": false
+  },
+  "CPUJoinWorkerIncident": {
+    "atKST": "2026-11-07T12:43:31+09:00",
+    "status": "AUTHOR_REPORTED_CONFIG_CREDENTIALS_IN_WORKER_TOOL_STDOUT_SOURCE_ONLY_RECOVERY_SENT",
+    "task": "task_a95ef3d8ccce",
+    "dispatch": "ctx_ed23b4a777d0",
+    "escalation": "msg_39b13fbb38b6",
+    "stopNotification": "msg_stop_f3533e4357983586e13ad156",
+    "description": "Author reports an unsafe allowlist of arbitrary manifest business/owner/runtime strings caused connection credentials to reach its tool stdout. No credential values or offending raw transcript are copied here.",
+    "authorReportedNoNetworkCredentialUseRotationDBSSHHTTPTrackedWritesOrCleanup": true,
+    "independentExternalExposureConclusion": "NOT_ESTABLISHED; do not claim external publish or absence beyond available report",
+    "RootFetchedOrReprintedSecretBearingTranscript": false,
+    "RootUserNotifiedWithoutValues": true,
+    "previousConfigReadGrantRevoked": true,
+    "sourceOnlyRecoverySend": "msg_d53239763e59",
+    "permittedResume": "Immutable source plus explicitly Root-sanitized typed observations only; no arbitrary config values, credentials or secret files.",
+    "automaticCredentialRotationOrServiceRestartAssigned": false,
+    "sourceOnlyRouteMapDelivery": "PENDING",
+    "reportContainsCredentialValues": false,
+    "wholeProgramComplete": false
   }
 }

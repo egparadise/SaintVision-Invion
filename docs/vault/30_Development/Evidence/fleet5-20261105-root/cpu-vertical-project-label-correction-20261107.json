@@ -1,0 +1,9 @@
+{
+  "atKST": "2026-11-07T12:43:31+09:00",
+  "originalPrivateReceipt": "route-and-pc3-supplement.private.json",
+  "field": "currentPortalProject",
+  "correction": "Original field is manifest.project, not observed browser selection. manifest.portal_project is a distinct ID. Original bytes retained; public evidence uses separate explicit fields and NOT_OBSERVED browser selection.",
+  "manifestKernelProject": "prj_01M6NC3HEDBR40ZB9TH04GBE00",
+  "manifestPortalProject": "prj_01M6NDBHVD2DZQ1Q38DCKN1XE3",
+  "credentialValues": false
+}

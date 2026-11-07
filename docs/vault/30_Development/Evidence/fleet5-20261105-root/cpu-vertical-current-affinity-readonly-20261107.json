@@ -1,0 +1,100 @@
+{
+  "atKST": "2026-11-07T12:43:31+09:00",
+  "observationsAtKST": {
+    "hostAndLoopback": "2026-11-07T12:28:55+09:00",
+    "routeAndPC3": "2026-11-07T12:31:59+09:00",
+    "namedDBReadOnly": "2026-11-07T12:39:11+09:00"
+  },
+  "owner": "Root Codex",
+  "scope": "Read-only known loopback services, exact named old Node metadata and named current-demo DB SELECT counts. Not authenticatedAPI/browser/lease/execution acceptance.",
+  "currentConfigIdentity": {
+    "tenant": "97968b42-68aa-40ce-af5e-3a33e2fc2205",
+    "epoch": "bcd581be-31b4-4aca-86e6-3ca31b69ed09",
+    "manifestKernelProject": "prj_01M6NC3HEDBR40ZB9TH04GBE00",
+    "manifestPortalProject": "prj_01M6NDBHVD2DZQ1Q38DCKN1XE3",
+    "browserSelectedProject": "NOT_OBSERVED",
+    "projectIDsDistinct": true
+  },
+  "loopbackHealthAndReadinessStatus": [
+    {
+      "url": "http://127.0.0.1:8080/healthz",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:8080/readyz",
+      "status": 200
+    }
+  ],
+  "correctProjectRouteUnauthenticatedGET": [
+    {
+      "url": "http://127.0.0.1:8080/v1/projects/prj_01M6NC3HEDBR40ZB9TH04GBE00/nodes",
+      "status": 401,
+      "unauthenticatedObservationOnly": true,
+      "authorizationSent": false
+    },
+    {
+      "url": "http://127.0.0.1:8080/v1/projects/prj_01M6NC3HEDBR40ZB9TH04GBE00/capacity",
+      "status": 401,
+      "unauthenticatedObservationOnly": true,
+      "authorizationSent": false
+    }
+  ],
+  "oldUnscopedNodes404": "Wrong-route diagnostic, not authentication or enrollment verdict",
+  "PC2": {
+    "sshExit": 0,
+    "runningMatchingLabelNodeContainers": 6,
+    "containersMatchingKnownCurrentDemoTenantEpoch": 0,
+    "oldR5AndCurrentDemoTenantEpochEqual": false,
+    "oldIdentitiesPortsVolumesPreserved": true
+  },
+  "PC3": {
+    "sshExit": 0,
+    "runningMatchingLabelNodeContainers": 0,
+    "stoppedContainersIdentityFilesAndDBRegistration": "NOT_OBSERVED",
+    "candidateCPUJoinOnly": true
+  },
+  "namedCurrentDemoDB": {
+    "SQLSessionReadOnly": true,
+    "diagnosticRoleBypassesRLS": true,
+    "notApplicationAuthorization": true,
+    "explicitTenantProjectFilters": true,
+    "epochMatchesManifest": true,
+    "currentTenantNodesAllEpochs": 1,
+    "currentTenantEpochNodesByStatus": [
+      {
+        "status": "online",
+        "count": 1
+      }
+    ],
+    "selectedProjectNodeLinks": [],
+    "selectedKernelProjectsPresent": [
+      {
+        "project_id": "prj_01M6NC3HEDBR40ZB9TH04GBE00"
+      },
+      {
+        "project_id": "prj_01M6NDBHVD2DZQ1Q38DCKN1XE3"
+      }
+    ],
+    "currentTenantEpochResourceSnapshotCount": 0
+  },
+  "interpretation": "One Node DB row is not physical enrollment success. Neither selected project has an enabled project-node link in the scoped SELECT, and current tenant/epoch has no resource snapshot. ExistingPC2 Node identities are from other tenant/epoch scopes; do not relabel/migrate them to fabricate UI counts. Need authenticated project mapping and real freshPC3 admission/observation before execution.",
+  "rawReceiptSHA256": {
+    "intent.json": "d7c0525cd6f66566747448cb476dc348ba29bfa71e7904d31fb7914e3203ebdb",
+    "known-config-identity-summary.json": "a4131f2ec7b2724f3c566710d87b7f9497b4eecf7cf5087831f8ce16fb784178",
+    "known-local-containers.json": "2b0a66d23116cd7445d519cf3363ddad7da91586e1c2619b3c85609f022448b0",
+    "loopback-http-get.json": "ba9b59d0e1fb6fa576eab31828da518b68dc45eb695b4321b6bd3c3c82966b74",
+    "loopback-listeners.json": "186d8ff4c09e5951fd3539e03a0751090202890c15d40236fe3dcc7cdf2f999c",
+    "named-current-db-counts-r2.private.json": "e17762402a9534b94d86c621edc76996be03147ed16e315e0e1fcf8a7b5fcedd",
+    "named-current-db-counts.private.json": "ef6123dd21eebdd8aff570afe82658d92a08d8c2c8df40dea4970a420ee3832d",
+    "pc2-node-affinity.json": "8b0b08fbda44f0b1a984dab39e4829a985012fb045f797c8f38ed5648cbc4128",
+    "receipt.private.json": "de2a7850d3c8ffc8a769a61509809bac52b7f38f56dc6421c561f94dbebf8d68",
+    "route-and-pc3-supplement.private.json": "d88b0b6268b4b5cdea6c8281347653591fcd95fe4b86bcdb246bab8b278e5765"
+  },
+  "credentialValuesEmittedOrIncludedInThisEvidence": false,
+  "remoteMutation": false,
+  "SQLWrites": false,
+  "knownHostsUnchanged": true,
+  "actualLeaseOrWorkExecution": false,
+  "fiveNodesAccepted": false,
+  "wholeProgramComplete": false
+}

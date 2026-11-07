@@ -1,0 +1,25 @@
+{
+  "atKST": "2026-11-07T12:43:31+09:00",
+  "status": "JOINT_CPU_SOURCE_INTEGRATION_ACTUAL_ACTIVITY_OBSERVED_CANDIDATE_NOT_YET_PUBLISHED",
+  "sourceBase": "6d7ee3d85bd0e47eb7b787234c10d5dbfdb3a9e8",
+  "patchSource": "746789a36091c8601afea23fe176069e2fa7d87b",
+  "onlyProductScope": [
+    "services/control-plane/src/inv/dispatch.py",
+    "tests/core/test_delivery_operation_origin.py"
+  ],
+  "preimageOn6d7AndB3bbEquals": "4a33428502279b88e510b5447382814bb115ddf2bff4f88f5bfcbb93f3c1a404",
+  "expectedProductSHA256": "82f029614537eb5bab56934e4b6736fe3dd52ece54b9b9a3996815b131e41de4",
+  "expectedTestSHA256": "3dacdb63f83ab1d8075ddcbe422d82daad20bd56f643adee0fc7ae97715925d2",
+  "task": "task_452680345278",
+  "dispatch": "ctx_2db60366287f",
+  "workspace": "d98dc9d3-fe61-4cb2-9776-dff349347a61::D:/Project/SaintVisionI-Invion/fleet5-cpu-integration-pin-r1-20261107",
+  "initialReceiptState": "outcome_unknown",
+  "actualActivityEvidence": "Root bounded worker-read observed actual own docs gates and r1 full canonical CHECK unchanged, and author asked targeted r2 evidence-encoding recovery msg_a09b217d7a15. No resend/retry/stop/duplicate.",
+  "gateRecovery": "msg_7bc1a98984ce permits preserving originalUTF16rawbytes in new own UTF8base64JSON, own text UTF8 normalization and directbyteIO futuregate capture only; no source/tool/workflow change.",
+  "publishedCandidate": null,
+  "exactJointCI": null,
+  "independentJointReview": null,
+  "runtimeGrant": false,
+  "actualAuthority": null,
+  "wholeProgramComplete": false
+}

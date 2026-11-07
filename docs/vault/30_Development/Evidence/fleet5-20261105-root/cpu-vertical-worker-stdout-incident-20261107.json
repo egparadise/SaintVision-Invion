@@ -1,0 +1,20 @@
+{
+  "atKST": "2026-11-07T12:43:31+09:00",
+  "status": "AUTHOR_REPORTED_CONFIG_CREDENTIALS_IN_WORKER_TOOL_STDOUT_SOURCE_ONLY_RECOVERY_SENT",
+  "task": "task_a95ef3d8ccce",
+  "dispatch": "ctx_ed23b4a777d0",
+  "escalation": "msg_39b13fbb38b6",
+  "stopNotification": "msg_stop_f3533e4357983586e13ad156",
+  "description": "Author reports an unsafe allowlist of arbitrary manifest business/owner/runtime strings caused connection credentials to reach its tool stdout. No credential values or offending raw transcript are copied here.",
+  "authorReportedNoNetworkCredentialUseRotationDBSSHHTTPTrackedWritesOrCleanup": true,
+  "independentExternalExposureConclusion": "NOT_ESTABLISHED; do not claim external publish or absence beyond available report",
+  "RootFetchedOrReprintedSecretBearingTranscript": false,
+  "RootUserNotifiedWithoutValues": true,
+  "previousConfigReadGrantRevoked": true,
+  "sourceOnlyRecoverySend": "msg_d53239763e59",
+  "permittedResume": "Immutable source plus explicitly Root-sanitized typed observations only; no arbitrary config values, credentials or secret files.",
+  "automaticCredentialRotationOrServiceRestartAssigned": false,
+  "sourceOnlyRouteMapDelivery": "PENDING",
+  "reportContainsCredentialValues": false,
+  "wholeProgramComplete": false
+}
