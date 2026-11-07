@@ -1,0 +1,15 @@
+{
+  "AtKST": "2026-11-08T01:24:23.7767172+09:00",
+  "Status": "RESTORED_PRIOR_B48_PREVIEW_AND_OLD_MAIN_API_AFTER_ACTUAL_BROWSER_CSP_DEFECT",
+  "StoppedExactOwnedNewForwardPID": 61188,
+  "NewOwnedRollbackPID": 6592,
+  "StartedAt": "2026-11-08T01:24:20.6480158+09:00",
+  "Target": "PC3loopback13101 old b48 -> Main old API8080",
+  "OriginalPreviewHeaderBehaviorRestored": true,
+  "NewStrictCSPDeploymentAccepted": false,
+  "NewAPI96LeftRunningForFurtherVerification": true,
+  "NoMainAppStarted": true,
+  "NoSchemaDowngrade": true,
+  "ActualBrowserRetest": "PENDING",
+  "WholeProgramComplete": false
+}

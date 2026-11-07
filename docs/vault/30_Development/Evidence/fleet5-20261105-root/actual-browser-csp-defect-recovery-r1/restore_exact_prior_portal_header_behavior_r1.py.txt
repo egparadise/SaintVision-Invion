@@ -1,0 +1,27 @@
+"""Restore the old loopback preview's no-CSP header behavior on its concrete rollback path."""
+import hashlib,json,shlex,subprocess
+from pathlib import Path
+r=Path(__file__).resolve().parents[1];out=r/'.work/portal-old-preview-header-recovery-r1';assert not out.exists();out.mkdir()
+diag=json.loads((r/'.work/pc3-browser-blank-diagnostic-r2/receipt.json').read_bytes());assert 'unsafe-eval' in diag['remote']['exceptions'][0]['description'] and diag['remote']['passwordOrAuthenticationSubmitted'] is False
+oldconf=(r/'.work/uir3-b48-preview.config.mjs').read_text();assert "headers: { 'Cache-Control': 'no-store' }" in oldconf and 'Content-Security-Policy' not in oldconf
+program=r'''import datetime,hashlib,json,subprocess,urllib.request,urllib.error
+from pathlib import Path
+root=Path('/home/saintvision-invion3/saintvision-share/ops-fresh-cpu-1efea-r1-20261107/portal-b48-rollback-r1');name='saintvision-portal-b48-rollback-r1';cid='60233888fc91f861f8bebb0f9a6abddf10165f4a855bc0e67fda9b1c86354994'
+q=subprocess.run(['docker','container','inspect',cid],capture_output=True,timeout=10);assert q.returncode==0;v=json.loads(q.stdout)[0];assert v['Name']=='/'+name and v['State']['Running'] and v['Config']['Labels']['ai.saintvision.owner']=='fleet5-root523'
+f=root/'security-headers.conf';raw=f.read_bytes();lines=raw.decode().splitlines();selected=[i for i,x in enumerate(lines) if x.startswith('add_header Content-Security-Policy ')];assert len(selected)==1 and 'unsafe-eval' not in lines[selected[0]]
+(root/'security-headers.before-prior-preview-recovery.conf').write_bytes(raw)
+lines[selected[0]]='# Prior loopback Vite preview had no CSP header. Temporary rollback only; new strict-CSP deployment awaits source AOT validator correction.'
+lines.append('add_header Cache-Control "no-store" always;');f.write_bytes(('\n'.join(lines)+'\n').encode())
+q=subprocess.run(['docker','exec',cid,'nginx','-t'],capture_output=True,timeout=10);(root/'prior-preview-recovery-test.stdout.txt').write_bytes(q.stdout);(root/'prior-preview-recovery-test.stderr.txt').write_bytes(q.stderr);assert q.returncode==0
+q=subprocess.run(['docker','exec',cid,'nginx','-s','reload'],capture_output=True,timeout=10);assert q.returncode==0
+op=urllib.request.build_opener(urllib.request.ProxyHandler({}))
+with op.open('http://127.0.0.1:13101/index.html',timeout=5) as response:assert response.status==200 and response.headers.get('Content-Security-Policy') is None and 'no-store' in response.headers.get('Cache-Control','');body=response.read()
+assert body==(root/'dist/index.html').read_bytes()
+try:op.open('http://127.0.0.1:13101/v1/session',timeout=5)
+except urllib.error.HTTPError as error:assert error.code==401
+else:raise AssertionError('anonymous accepted')
+o={'atKST':datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=9))).isoformat(timespec='seconds'),'status':'CONCRETE_OLD_B48_ROLLBACK_RESTORED_PRIOR_PREVIEW_HEADER_BEHAVIOR','containerID':cid,'oldPreviewHadCSP':False,'rollbackHasCSP':False,'unsafeEvalAdded':False,'newStrictCSPSourceConfigChanged':False,'newDeploymentAccepted':False,'oldPreviewCacheNoStore':True,'priorCSPHeaderFileSHA256':hashlib.sha256(raw).hexdigest(),'restoredPriorPreviewHeaderFileSHA256':hashlib.sha256(f.read_bytes()).hexdigest(),'oldIndexHTTP':200,'anonymousSessionHTTP':401,'portalMainRouteChanged':False,'schemaDowngraded':False,'wholeProgramComplete':False};(root/'prior-preview-recovery-receipt.json').write_text(json.dumps(o,indent=2)+'\n');print(json.dumps(o))
+'''
+(out/'remote-program.py.txt').write_text(program,encoding='utf8');known=Path(r'D:\Project\SaintVisionI-Invion\fleet5-worker-readiness-20261105\.work\f5-low-closure-26607075f612\known_hosts.f5.pinned');assert hashlib.sha256(known.read_bytes()).hexdigest()=='0dcbf0f4cfc363e4affc30810ad8a9e57bd2c4a31991e2c8285bdae7052ec2d2'
+q=subprocess.run(['ssh','-T','-i',r'C:\Users\inviz\.ssh\sv-lan-ed25519','-o','IdentitiesOnly=yes','-o','BatchMode=yes','-o','ConnectTimeout=5','-o','StrictHostKeyChecking=yes','-o','UserKnownHostsFile='+str(known),'saintvision-invion3@192.168.45.222','python3','-I','-B','-c',shlex.quote(program)],capture_output=True,timeout=40)
+v={'SSHExit':q.returncode,'stderrBytes':len(q.stderr),'remote':json.loads(q.stdout) if q.stdout else None};(out/'receipt.json').write_text(json.dumps(v,indent=2)+'\n');print(json.dumps(v));assert q.returncode==0 and not q.stderr

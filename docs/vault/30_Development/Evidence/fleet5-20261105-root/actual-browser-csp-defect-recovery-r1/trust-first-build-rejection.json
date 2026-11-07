@@ -1,0 +1,16 @@
+{
+  "SSHExit": 2,
+  "stderrBytes": 0,
+  "remote": {
+    "mainProductExecution": false,
+    "passwordOrTokenInput": false,
+    "browserStarted": false,
+    "systemOrUserGlobalTrustChanged": false,
+    "wholeProgramComplete": false,
+    "status": "HOLD_BROWSER_TRUST_RECONCILE_REQUIRED",
+    "phase": "isolated-tools-build-no-secrets-no-host-install",
+    "errorClass": "AssertionError",
+    "noBlindReplay": true,
+    "atKST": "2026-11-08T01:15:57+09:00"
+  }
+}

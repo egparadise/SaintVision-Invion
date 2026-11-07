@@ -1,6 +1,6 @@
 {
   "schema": "fleet5-root-review-resource-sequence:1",
-  "atKST": "2026-11-08T01:14:46+09:00",
+  "atKST": "2026-11-08T01:28:24+09:00",
   "completedB": {
     "task": "task_d4c4c809ed4e",
     "review": "ac9182c3e3d606ec027c0be2e90e049ff50d54f1",
@@ -13,7 +13,14 @@
     "source": "8874b2dfe0dda9a019bd5f334636668290702e13"
   },
   "active": null,
-  "pending": [],
+  "pending": [
+    {
+      "id": "CR-CSP-01",
+      "state": "READY_SOURCE_FIX",
+      "owner": "actual Orca Codex",
+      "next": "source-only AOT validator correction then actual independent Claude review"
+    }
+  ],
   "authorParallelWork": "B frozen b51 awaiting actual delta verdict; H12 accepted6d7 plus read-only five-row audit delivered, Root owns first CPU journey preflight. Optional Low backlog is not a mandatory new scope.",
   "reason": "actuala7e9 and5a3c reviews+CI verified andprecisefixscopesdelivered; do notselfclose source/runtime",
   "genericApprovalMissing": false,
@@ -22,7 +29,7 @@
     "review": "0e53fc024ca773b7719182e170e5e126aeaf5b95",
     "verdict": "ACCEPT TEST-ONLY; R-L1 CLOSED; no new findings"
   },
-  "nextActualReviewTrigger": "No feature code review pending. Root continues real browser/readiness/Run/five-PC operating gates; actual new code defects only return to owner.",
+  "nextActualReviewTrigger": "Source correction for actual CR-CSP-01, not optional Low/review loop. Root preserves genuine approvals and all original gates.",
   "completedIntegration": {
     "task": "task_78064fb4b7ff",
     "dispatch": "ctx_ed7ec73163d6",
@@ -3205,6 +3212,28 @@
     "GPUStorageAllPhysicalResources": "NOT_ACCEPTED",
     "transportReconnectRebootAndPKIRenewal": "PENDING",
     "originalGates": "19HOLD/discharges0/runtimeB0/A1-A16/H1-H7/H3EA/RDNULL_HOLD/raw7UNREGISTERED/A01-A40NOT_RUN",
+    "wholeProgramComplete": false
+  },
+  "newActualBrowserDefect": {
+    "atKST": "2026-11-08T01:28:24+09:00",
+    "id": "CR-CSP-01",
+    "severity": "High",
+    "state": "OPEN_ACTUAL_PRODUCT_BOOT_DEFECT",
+    "observedEnvironment": "PC3 Chrome/157.0.8103.38 real accepted905 dist/Nginx source strictCSP via exact Main1273100 origin",
+    "source": "96afd799d49717fd40e4ddabd538d82accbe1958",
+    "frontendSource": "90578f49ea400958fcdbc1ded3908d624e856f57",
+    "affectedSource": "apps/web/src/shared/api/nodeCertificateObservation.ts runtime Ajv2020.compile at module load",
+    "evidence": "Actual browser EvalError new Function denied by script-src self; index/assets all200; React root empty; no password/authentication submitted",
+    "requiredCorrection": "Generate canonical schema validator at build time using existing standalone-generation approach; preserve complete schema/format/semantic/freshness validation and strictCSP. No unsafe-eval/CSP disable/schema weakening/hiding failure. Meaningful regression and exact official Frontend/Docs; independent actual review; Root actual strict-CSP browser recheck before reactivation.",
+    "currentUserRoute": "Main1273100 -> Root-owned SSH6592 -> PC3loopback13101 oldb48 -> SSH18081 oldMainAPI8080",
+    "temporaryRecovery": "Restored previous Vite loopback preview no-CSP/CacheControl-no-store behavior only on oldb48 rollback; no unsafe-eval added, source strictCSP unchanged; recovery not new deployment acceptance",
+    "restoredRealChromeLoginPage": true,
+    "oldB48BrowserExceptions": 0,
+    "newAPI96AndSchema0068Preserved": true,
+    "actualOwnerAPI96And3MeasuredPCsRemainEarlierVerified": true,
+    "featureCR90501StillClosed": true,
+    "newDefectIndependentOfOriginalTestOnlyDelta": true,
+    "nextOwner": "Actual Orca Codex source owner then actual Claude independent reviewer; Root owns all secrets/SSH/real operator/browser/APPLY",
     "wholeProgramComplete": false
   }
 }

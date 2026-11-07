@@ -1,0 +1,25 @@
+{
+  "SSHExit": 0,
+  "stderrBytes": 0,
+  "remote": {
+    "mainProductExecution": false,
+    "passwordOrTokenInput": false,
+    "browserStarted": false,
+    "systemOrUserGlobalTrustChanged": false,
+    "wholeProgramComplete": false,
+    "priorBuildFailureBeforeInstallReconciled": true,
+    "buildNetworkCorrection": "BuildKit supported default network; isolated container build only",
+    "status": "DEDICATED_PC3_BROWSER_HOME_NSS_PUBLIC_IDP_TRUST_READY",
+    "ownedDirectory": "/home/saintvision-invion3/saintvision-share/ops-fresh-cpu-1efea-r1-20261107/browser-real-ui-r1",
+    "dedicatedBrowserHOME": "/home/saintvision-invion3/saintvision-share/ops-fresh-cpu-1efea-r1-20261107/browser-real-ui-r1/home",
+    "publicChainSHA256": "1a050480a614359862f55fccb0af6b0d9bb221fa271db17155dfdd7c63e6f545",
+    "toolsImageId": "sha256:439e4c43503c32122dbc3a7ff054e8fbd0dc90f3ec8d063c69721484a0b83af2",
+    "buildExit": 0,
+    "NSSProfileOnlySetupExit": 0,
+    "allTrustFilesOwnerUID1000Mode0600": true,
+    "systemTrustChanged": false,
+    "globalUserTrustChanged": false,
+    "insecureTLSFlagsUsed": false,
+    "atKST": "2026-11-08T01:17:36+09:00"
+  }
+}

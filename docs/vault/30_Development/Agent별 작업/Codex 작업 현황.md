@@ -1,15 +1,19 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.484"
+version: "1.0.485"
 status: "review"
 author: "Codex"
-updated: "2026-11-08T01:14:46+09:00"
+updated: "2026-11-08T01:28:24+09:00"
 source_of_truth: "Git"
 active_card: "FLEET5 continued supervision with PORTAL-REFRESH-FLEET-20261106"
-active_card_status: "96afFeatureCodeAccepted_Actual0068API96Frontend905PC3Cutover3100_RealOwner3MeasuredNodes_BrowserReadyWorkspaceRunFivePCPending"
-active_card_next: "Root verifies actual remote browser login/no-blink and genuine storage readiness, then actual first intent/Run with two genuine distinct nonrequester votes. PC1 key feedback and PC5 RAM/Node, renewal/reconnect/reboot and GPU/storage five-PC acceptance remain. No feature review loop or fake completion."
+active_card_status: "CR-CSP-01HighActualBrowserBootDefect_OpenAOTSourceFixReady; OldB48RouteRestored_RealChromeLoginPagePass; API96Schema0068Preserved_RealRunFivePCPending"
+active_card_next: "Actual Orca Codex fixes canonical AOT validator CSP boot defect with meaningful regression/exact Frontend+Docs; actual Claude reviews after author settled/released. Root alone redeploys and verifies real strict-CSP browser/login/no-blink, genuine storage/Run/approvers/PC1/PC5/renewal gates. Canonical APPLY Root only."
 ---
+
+## 2026-11-08T01:28:24+09:00 実브라우저 CSP 부팅 결함 발견과 기존 화면 복구
+
+작업한 것 → 확인한 것: PC3 실제 Chrome157 검증에서 공식905 화면의 런타임 Ajv.compile이 strictCSP의 script-src self에 차단되어 로그인 전 React root가 비는 실제 High 결함 CR-CSP-01을 발견했다. 정적파일·nginx-health만으로 브라우저 성공을 판단하지 않았다. Root는 새 strictCSP 설정을 유지하고 기존b48 복구경로에 이전 Vite loopback의 no-CSP/CacheControl-no-store 동작을 복원한 뒤, 소유가 증명된 새 SSH61188만 종료하고 SSH6592로127.0.0.1:3100을 기존 화면·기존 API에 되돌렸다. 실제 Chrome 재검증에서 로그인 화면 표시·예외0·소유 브라우저 종료를 확인했다. 새 API96·0068·3대 관측·모든 기존 DB/Node 기록은 보존했다. 다음은 실제 Orca Codex의 빌드 시점 canonical validator 생성 수정과 실제 Claude 검토이며, strictCSP 재배포·실로그인·안정적인 자원 화면 검증 후에만 새 화면을 다시 연결한다. 다음 첫 행동/담당은actualOrcaCodexsourceowner이며Root가실제독립검토·재배포를감독한다. 전체완료는아니다.
 
 ## 2026-11-08T01:14:46+09:00 새 API96·화면905 실배포와 3100 전환
 

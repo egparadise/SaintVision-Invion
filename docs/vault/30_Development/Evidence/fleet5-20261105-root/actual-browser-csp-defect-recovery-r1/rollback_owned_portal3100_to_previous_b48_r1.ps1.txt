@@ -1,0 +1,26 @@
+$ErrorActionPreference='Stop'
+$taskRoot='D:\Project\SaintVisionI-Invion\fleet-five-orchestration-20261105'
+$receipt=Join-Path $taskRoot '.work\portal3100-browser-defect-rollback-r1.json'
+if (Test-Path -LiteralPath $receipt) { throw 'Rollback already recorded; reconcile instead' }
+$cut=Get-Content -LiteralPath (Join-Path $taskRoot '.work\portal3100-cutover-r1.json') -Raw | ConvertFrom-Json
+$sourceProcess=Get-Process -Id $cut.NewForwardPID -ErrorAction Stop
+if ($sourceProcess.Name -ne 'ssh' -or $sourceProcess.StartTime.ToString('o') -ne $cut.NewForwardStartedAt) { throw 'New route process identity changed' }
+$listener=@(Get-NetTCPConnection -State Listen | Where-Object { $_.LocalPort -eq 3100 })
+if ($listener.Count -ne 1 -or $listener[0].OwningProcess -ne $sourceProcess.Id -or $listener[0].LocalAddress -ne '127.0.0.1') { throw 'New route listener differs' }
+$probe=Invoke-WebRequest -UseBasicParsing -Uri 'http://127.0.0.1:13101/index.html' -TimeoutSec 5
+if ($probe.StatusCode -ne 200 -or $probe.Headers['Content-Security-Policy']) { throw 'Prior preview rollback is not ready' }
+$known='D:\Project\SaintVisionI-Invion\fleet5-worker-readiness-20261105\.work\f5-low-closure-26607075f612\known_hosts.f5.pinned'
+if ((Get-FileHash -LiteralPath $known -Algorithm SHA256).Hash.ToLowerInvariant() -ne '0dcbf0f4cfc363e4affc30810ad8a9e57bd2c4a31991e2c8285bdae7052ec2d2') { throw 'Host pin mismatch' }
+Stop-Process -Id $sourceProcess.Id -ErrorAction Stop
+$arguments=@('-N','-T','-i','C:\Users\inviz\.ssh\sv-lan-ed25519','-o','IdentitiesOnly=yes','-o','BatchMode=yes','-o','ConnectTimeout=5','-o','StrictHostKeyChecking=yes','-o',('UserKnownHostsFile='+$known),'-o','ExitOnForwardFailure=yes','-o','ServerAliveInterval=5','-o','ServerAliveCountMax=3','-L','127.0.0.1:3100:127.0.0.1:13101','saintvision-invion3@192.168.45.222')
+$restoreProcess=Start-Process -FilePath 'C:\Windows\System32\OpenSSH\ssh.exe' -ArgumentList $arguments -WindowStyle Hidden -PassThru -RedirectStandardError (Join-Path $taskRoot '.work\portal3100-prior-preview-restore-r1.stderr.log') -RedirectStandardOutput (Join-Path $taskRoot '.work\portal3100-prior-preview-restore-r1.stdout.log')
+Start-Sleep -Seconds 2
+$restoreProcess.Refresh()
+if ($restoreProcess.HasExited) { throw 'Rollback forward exited; reconcile' }
+$bound=@(Get-NetTCPConnection -State Listen | Where-Object { $_.LocalPort -eq 3100 })
+if ($bound.Count -ne 1 -or $bound[0].OwningProcess -ne $restoreProcess.Id -or $bound[0].LocalAddress -ne '127.0.0.1') { throw 'Restored listener ownership mismatch' }
+$page=Invoke-WebRequest -UseBasicParsing -Uri 'http://127.0.0.1:3100/index.html' -TimeoutSec 5
+if ($page.StatusCode -ne 200 -or $page.Headers['Content-Security-Policy'] -or $page.Content -like '*index-CpbRD_HK.js*') { throw 'Restored page differs from concrete prior preview' }
+$result=[pscustomobject]@{AtKST=[DateTimeOffset]::Now.ToString('o');Status='RESTORED_PRIOR_B48_PREVIEW_AND_OLD_MAIN_API_AFTER_ACTUAL_BROWSER_CSP_DEFECT';StoppedExactOwnedNewForwardPID=$sourceProcess.Id;NewOwnedRollbackPID=$restoreProcess.Id;StartedAt=$restoreProcess.StartTime.ToString('o');Target='PC3loopback13101 old b48 -> Main old API8080';OriginalPreviewHeaderBehaviorRestored=$true;NewStrictCSPDeploymentAccepted=$false;NewAPI96LeftRunningForFurtherVerification=$true;NoMainAppStarted=$true;NoSchemaDowngrade=$true;ActualBrowserRetest='PENDING';WholeProgramComplete=$false}
+$result | ConvertTo-Json -Depth 4 | Set-Content -LiteralPath $receipt -Encoding UTF8
+$result | ConvertTo-Json -Depth 4

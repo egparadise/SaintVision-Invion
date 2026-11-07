@@ -1,0 +1,25 @@
+{
+  "SSHExit": 2,
+  "stderrBytes": 191,
+  "remote": {
+    "mainBrowserExecuted": false,
+    "insecureTLSFlagsUsed": false,
+    "ChromeSandboxDisabled": false,
+    "authCredentialsPersistedByDriver": false,
+    "actualRunOrVotesCreated": false,
+    "workspaceReadinessChanged": false,
+    "wholeProgramComplete": false,
+    "ownedChromePID": 656114,
+    "browserVersion": "Chrome/157.0.8103.38",
+    "status": "HOLD_ACTUAL_CHROME_VERIFICATION",
+    "phase": "actual-portal-login-page",
+    "errorClass": "TimeoutError",
+    "noBlindAuthenticationRetry": true,
+    "currentPageDiagnostic": {
+      "origin": "http://127.0.0.1:3100",
+      "path": "/studio",
+      "bodyText": ""
+    },
+    "ownedBrowserExited": true
+  }
+}

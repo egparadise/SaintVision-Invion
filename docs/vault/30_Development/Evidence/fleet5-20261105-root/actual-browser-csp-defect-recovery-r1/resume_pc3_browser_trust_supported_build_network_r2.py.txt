@@ -1,0 +1,20 @@
+import ast,hashlib,json,shlex,subprocess
+from pathlib import Path
+r=Path(__file__).resolve().parents[1];out=r/'.work/pc3-browser-trust-r2';assert not out.exists();out.mkdir();tree=ast.parse((r/'.work/prepare_pc3_private_browser_trust_r1.py').read_text(encoding='utf8'));old=next(ast.literal_eval(x.value) for x in tree.body if isinstance(x,ast.Assign) and any(isinstance(t,ast.Name) and t.id=='remote' for t in x.targets))
+start=old.index(" phase='isolated-tools-build-no-secrets-no-host-install'");end=old.index("except BaseException as e:")
+head='''import base64,datetime,hashlib,json,os,stat,subprocess,sys
+from pathlib import Path
+o={'mainProductExecution':False,'passwordOrTokenInput':False,'browserStarted':False,'systemOrUserGlobalTrustChanged':False,'wholeProgramComplete':False};phase='reconcile-buildkit-network-option-before-install'
+try:
+ p=json.load(sys.stdin);assert os.getuid()==1000;root=Path('/home/saintvision-invion3/saintvision-share/ops-fresh-cpu-1efea-r1-20261107/browser-real-ui-r1');build=root/'nss-build';home=root/'home';nss=home/'.pki/nssdb';ca=root/'public-idp-chain.pem'
+ prior=json.loads((root/'public-trust-receipt.json').read_bytes());assert prior['phase']=='isolated-tools-build-no-secrets-no-host-install' and prior['errorClass']=='AssertionError'
+ diag=(root/'nss-build.stderr.txt').read_text();assert 'network mode "bridge" not supported by buildkit' in diag
+ assert not list(nss.iterdir()) and hashlib.sha256(ca.read_bytes()).hexdigest()==p['SHA256']
+ q=subprocess.run(['docker','image','ls','--filter','reference=saintvision-ops-nss:browser-r1','--format','{{.ID}}'],capture_output=True,timeout=10);assert q.returncode==0 and not q.stdout.strip()
+ o['priorBuildFailureBeforeInstallReconciled']=True;o['buildNetworkCorrection']='BuildKit supported default network; isolated container build only'
+'''
+program=head+old[start:end].replace("'--network','bridge'","'--network','default'")+old[end:];program=program.replace("(root/'public-trust-receipt.json').write_text","(root/'public-trust-r2-receipt.json').write_text")
+(out/'remote-program.py.txt').write_text(program,encoding='utf8');p=json.loads((r/'.work/pc3-browser-trust-r1/receipt.json').read_bytes());assert p['remote']['phase']=='isolated-tools-build-no-secrets-no-host-install';ca=Path(r'C:\Users\inviz\AppData\Local\Temp\claude\D--Project-SaintVisionI-Invion-https-github-com-egparadise-SaintVision-Invion-git\ff17a93b-5eae-4104-8aee-a600379da5e2\scratchpad\runprog\idp-certs\server-chain.pem')
+known=Path(r'D:\Project\SaintVisionI-Invion\fleet5-worker-readiness-20261105\.work\f5-low-closure-26607075f612\known_hosts.f5.pinned');assert hashlib.sha256(known.read_bytes()).hexdigest()=='0dcbf0f4cfc363e4affc30810ad8a9e57bd2c4a31991e2c8285bdae7052ec2d2'
+q=subprocess.run(['ssh','-T','-i',r'C:\Users\inviz\.ssh\sv-lan-ed25519','-o','IdentitiesOnly=yes','-o','BatchMode=yes','-o','ConnectTimeout=5','-o','StrictHostKeyChecking=yes','-o','UserKnownHostsFile='+str(known),'saintvision-invion3@192.168.45.222','python3','-I','-B','-c',shlex.quote(program)],input=json.dumps({'SHA256':hashlib.sha256(ca.read_bytes()).hexdigest()}).encode(),capture_output=True,timeout=160)
+v={'SSHExit':q.returncode,'stderrBytes':len(q.stderr),'remote':json.loads(q.stdout) if q.stdout else None};(out/'receipt.json').write_text(json.dumps(v,indent=2)+'\n');print(json.dumps(v),flush=True);assert q.returncode==0 and not q.stderr

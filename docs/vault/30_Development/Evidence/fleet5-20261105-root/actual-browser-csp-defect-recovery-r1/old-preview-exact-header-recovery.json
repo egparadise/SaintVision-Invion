@@ -1,0 +1,22 @@
+{
+  "SSHExit": 0,
+  "stderrBytes": 0,
+  "remote": {
+    "atKST": "2026-11-08T01:24:18+09:00",
+    "status": "CONCRETE_OLD_B48_ROLLBACK_RESTORED_PRIOR_PREVIEW_HEADER_BEHAVIOR",
+    "containerID": "60233888fc91f861f8bebb0f9a6abddf10165f4a855bc0e67fda9b1c86354994",
+    "oldPreviewHadCSP": false,
+    "rollbackHasCSP": false,
+    "unsafeEvalAdded": false,
+    "newStrictCSPSourceConfigChanged": false,
+    "newDeploymentAccepted": false,
+    "oldPreviewCacheNoStore": true,
+    "priorCSPHeaderFileSHA256": "98345709ad199828eb42a2a257c1781d13e6175d01037d5b7fc708e7636fe79f",
+    "restoredPriorPreviewHeaderFileSHA256": "c963d8ab830f01186331adebad5326325a449198c7accb20393a5c35923cad17",
+    "oldIndexHTTP": 200,
+    "anonymousSessionHTTP": 401,
+    "portalMainRouteChanged": false,
+    "schemaDowngraded": false,
+    "wholeProgramComplete": false
+  }
+}

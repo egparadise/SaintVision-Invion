@@ -1,0 +1,88 @@
+"""Actual Chrome/real IdP/UI verification on PC3; secret transport stdin only."""
+import datetime,getpass,hashlib,json,shlex,subprocess
+from pathlib import Path
+r=Path(__file__).resolve().parents[1];out=r/'.work/pc3-real-browser-r1';assert not out.exists();out.mkdir()
+account=json.loads(Path(r'D:\Project\SaintVisionI-Invion\admin-login-20261106\.work\account-result.json').read_bytes())
+remote=r'''import base64,datetime,hashlib,json,os,subprocess,sys,time,urllib.request,urllib.parse
+from pathlib import Path
+from websockets.sync.client import connect
+p=json.load(sys.stdin);root=Path('/home/saintvision-invion3/saintvision-share/ops-fresh-cpu-1efea-r1-20261107/browser-real-ui-r1');o={'mainBrowserExecuted':False,'insecureTLSFlagsUsed':False,'ChromeSandboxDisabled':False,'authCredentialsPersistedByDriver':False,'actualRunOrVotesCreated':False,'workspaceReadinessChanged':False,'wholeProgramComplete':False};phase='owned-incognito-browser-launch';proc=None;ws=None;counter=0;responses=[];load_failures=[]
+def command(method,params=None):
+ global counter
+ counter+=1;ident=counter;ws.send(json.dumps({'id':ident,'method':method,'params':params or {}}));end=time.monotonic()+15
+ while time.monotonic()<end:
+  m=json.loads(ws.recv(timeout=15))
+  if m.get('method')=='Network.responseReceived':
+   v=m['params']['response'];u=urllib.parse.urlsplit(v['url'])
+   if u.hostname in ['127.0.0.1','localhost']:responses.append({'origin':u.scheme+'://'+u.netloc,'path':u.path,'status':v['status']})
+  if m.get('method')=='Network.loadingFailed':load_failures.append({'type':m['params'].get('type'),'error':m['params'].get('errorText')})
+  if m.get('id')==ident:
+   if 'error' in m:raise RuntimeError('CDP command rejected')
+   return m.get('result',{})
+ raise TimeoutError('CDP bounded request')
+def evaluate(expression):
+ v=command('Runtime.evaluate',{'expression':expression,'returnByValue':True,'awaitPromise':True})
+ if 'exceptionDetails' in v:raise RuntimeError('Browser expression failed')
+ return v['result'].get('value')
+def until(expression,timeout=20):
+ end=time.monotonic()+timeout
+ while time.monotonic()<end:
+  v=evaluate(expression)
+  if v:return v
+  time.sleep(.25)
+ raise TimeoutError('Browser phase timed out')
+try:
+ assert os.getuid()==1000;trust=json.loads((root/'public-trust-r2-receipt.json').read_bytes());assert trust['NSSProfileOnlySetupExit']==0
+ profile=root/'chrome-profile-r1';assert not profile.exists();env=dict(os.environ);env.update(HOME=str(root/'home'),XDG_CONFIG_HOME=str(root/'home/.config'),XDG_CACHE_HOME=str(root/'home/.cache'));env.pop('DISPLAY',None)
+ args=['/usr/bin/google-chrome','--headless=new','--incognito','--user-data-dir='+str(profile),'--remote-debugging-address=127.0.0.1','--remote-debugging-port=0','--no-first-run','--no-default-browser-check','--disable-background-networking','--disable-component-update','--disable-sync','--disable-extensions','--disable-save-password-bubble','--password-store=basic','--window-size=1638,1000','about:blank']
+ stdout=(root/'chrome-r1.stdout.log').open('xb');stderr=(root/'chrome-r1.stderr.log').open('xb');proc=subprocess.Popen(args,env=env,stdout=stdout,stderr=stderr);o['ownedChromePID']=proc.pid
+ for attempt in range(60):
+  if (profile/'DevToolsActivePort').is_file():break
+  assert proc.poll() is None;time.sleep(.2)
+ lines=(profile/'DevToolsActivePort').read_text().splitlines();port=int(lines[0]);op=urllib.request.build_opener(urllib.request.ProxyHandler({}))
+ with op.open(f'http://127.0.0.1:{port}/json/list',timeout=3) as q:targets=json.load(q)
+ target=next(t for t in targets if t['type']=='page');ws=connect(target['webSocketDebuggerUrl'],open_timeout=5,max_size=8*1024*1024,proxy=None);command('Page.enable');command('Runtime.enable');command('Network.enable')
+ o['browserVersion']=command('Browser.getVersion')['product']
+ phase='actual-portal-login-page';command('Page.navigate',{'url':'http://127.0.0.1:3100/studio'});until("Array.from(document.querySelectorAll('button')).some(b=>b.innerText.includes('조직 계정으로 로그인'))")
+ evaluate("Array.from(document.querySelectorAll('button')).find(b=>b.innerText.includes('조직 계정으로 로그인')).click();true")
+ phase='real-HTTPS-IdP-with-profile-public-trust';until("location.origin==='https://127.0.0.1:8443' && !!document.querySelector('#username') && !!document.querySelector('#password')")
+ o['realIdPLoginFormReachedWithoutTLSBypass']=True
+ phase='actual-browser-credential-form-submit'
+ values={'username':p['email'],'password':p.pop('password')}
+ expression="(()=>{const values="+json.dumps(values)+";for(const [id,value] of Object.entries(values)){const el=document.getElementById(id);el.value=value;el.dispatchEvent(new Event('input',{bubbles:true}));}document.querySelector('#kc-form-login').requestSubmit();return true;})()";evaluate(expression);del values,expression
+ phase='actual-PKCE-callback-and-project-load';until("location.origin==='http://127.0.0.1:3100' && !!document.querySelector('[data-testid=project-selector]')",30)
+ project=json.dumps(p['project']);until("Array.from(document.querySelector('[data-testid=project-selector]').options).some(o=>o.value==="+project+")")
+ evaluate("(()=>{const e=document.querySelector('[data-testid=project-selector]');e.value="+project+";e.dispatchEvent(new Event('change',{bubbles:true}));return true;})()")
+ until("document.querySelectorAll('[data-testid^=node-status-badge-]').length===3 && document.querySelector('[data-testid=cluster-status-dot]').parentElement.innerText.includes('3/3')",25)
+ phase='actual-three-node-visible-stability-window'
+ samples=[]
+ for n in range(25):
+  v=evaluate("(()=>({at:Date.now(),badgeCount:document.querySelectorAll('[data-testid^=node-status-badge-]').length,header:document.querySelector('[data-testid=cluster-status-dot]').parentElement.innerText,loadingNotice:document.body.innerText.includes('클러스터 노드 응답 시간 초과'),emptyNotice:document.body.innerText.includes('등록된 노드가 없습니다'),selectedProject:document.querySelector('[data-testid=project-selector]').value,visibleBadges:Array.from(document.querySelectorAll('[data-testid^=node-status-badge-]')).map(x=>({id:x.dataset.testid,text:x.innerText}))}))()")
+  samples.append(v);time.sleep(.5)
+ assert all(x['badgeCount']==3 and '3/3' in x['header'] and not x['loadingNotice'] and not x['emptyNotice'] and x['selectedProject']==p['project'] for x in samples)
+ shot=command('Page.captureScreenshot',{'format':'png','captureBeyondViewport':False});screen=base64.b64decode(shot['data'],validate=True);(root/'actual-cluster-ui-r1.png').write_bytes(screen)
+ paths=sorted({(x['origin'],x['path'],x['status']) for x in responses if x['path'].startswith('/v1/')});assert any(path.endswith('/nodes') and status==200 for origin,path,status in paths)
+ o.update(status='REAL_CHROME_LOGIN_PKCE_AND_THREE_NODE_UI_STABLE_VERIFIED',atKST=datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=9))).isoformat(timespec='seconds'),origin='http://127.0.0.1:3100',realAdministratorLogin=True,PKCECallbackCompleted=True,projectId=p['project'],samples=samples,stabilitySamples=25,stabilityWindowSeconds=12.5,emptyOrLoadingRegressionObserved=False,visibleNodeCount=3,APIResponses=[{'origin':origin,'path':path,'HTTP':status} for origin,path,status in paths],networkLoadFailureTypes=load_failures[-12:],screenshotSHA256=hashlib.sha256(screen).hexdigest(),screenshotBytes=len(screen),screenshotPath=str(root/'actual-cluster-ui-r1.png'),incognito=True,loginCookiesAndTokensRestrictedToIncognitoMemory=True)
+except BaseException as e:
+ o.update(status='HOLD_ACTUAL_CHROME_VERIFICATION',phase=phase,errorClass=type(e).__name__,noBlindAuthenticationRetry=True)
+ if ws:
+  try:o['currentPageDiagnostic']=evaluate("({origin:location.origin,path:location.pathname,bodyText:document.body.innerText.slice(0,1800)})")
+  except Exception:pass
+finally:
+ if ws:
+  try:command('Browser.close')
+  except Exception:pass
+  try:ws.close()
+  except Exception:pass
+ if proc:
+  try:proc.wait(timeout=8)
+  except subprocess.TimeoutExpired:proc.terminate();proc.wait(timeout=5)
+  o['ownedBrowserExited']=proc.poll() is not None
+  stdout.close();stderr.close()
+ (root/'public-browser-r1-receipt.json').write_text(json.dumps(o,ensure_ascii=False,indent=2)+'\n')
+print(json.dumps(o,ensure_ascii=False));raise SystemExit(0 if o.get('status')=='REAL_CHROME_LOGIN_PKCE_AND_THREE_NODE_UI_STABLE_VERIFIED' else 2)
+'''
+(out/'remote-browser-program.py.txt').write_text(remote,encoding='utf8');known=Path(r'D:\Project\SaintVisionI-Invion\fleet5-worker-readiness-20261105\.work\f5-low-closure-26607075f612\known_hosts.f5.pinned');assert hashlib.sha256(known.read_bytes()).hexdigest()=='0dcbf0f4cfc363e4affc30810ad8a9e57bd2c4a31991e2c8285bdae7052ec2d2'
+password=getpass.getpass('Account login password for real PC3 browser (hidden): ');wire=json.dumps({'email':account['email'],'project':account['project'],'password':password}).encode();del password
+q=subprocess.run(['ssh','-T','-i',r'C:\Users\inviz\.ssh\sv-lan-ed25519','-o','IdentitiesOnly=yes','-o','BatchMode=yes','-o','ConnectTimeout=5','-o','StrictHostKeyChecking=yes','-o','UserKnownHostsFile='+str(known),'saintvision-invion3@192.168.45.222','/home/saintvision-invion3/saintvision-share/ops-fresh-cpu-1efea-r1-20261107/venv/bin/python','-I','-B','-c',shlex.quote(remote)],input=wire,capture_output=True,timeout=150);del wire
+v={'SSHExit':q.returncode,'stderrBytes':len(q.stderr),'remote':json.loads(q.stdout) if q.stdout else None};(out/'receipt.json').write_text(json.dumps(v,ensure_ascii=False,indent=2)+'\n',encoding='utf8');print(json.dumps(v,ensure_ascii=False),flush=True);assert q.returncode==0 and not q.stderr
