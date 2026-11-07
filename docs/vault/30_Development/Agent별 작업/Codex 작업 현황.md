@@ -1,15 +1,19 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.495"
+version: "1.0.496"
 status: "review"
 author: "Codex"
-updated: "2026-11-08T06:04:42+09:00"
+updated: "2026-11-08T06:27:40+09:00"
 source_of_truth: "Git"
 active_card: "FLEET5 continued supervision with PORTAL-REFRESH-FLEET-20261106"
-active_card_status: "ActualAbb707Login3NodeResourcesAndHealthyCP_30s1811FramesZeroCardValueLossVerified_ActualSourceDeployDoneForLimitedPilot; GenuineFirstCPUApprovalPreparationNext_ManualPhysicalAll5Pending"
-active_card_next: "Root completes Root534 exact Docs/Obsidian runtime record, then prepares one genuine owner CPU intent/draft/frozen input/approval request with reviewed UI/API; retain authentic two distinct nonrequester gate, do not invent votes or enqueue unapproved. PC1 key/PC5 RAMNode/GPUstorage/manual/renewal/reconnect/all5 remain. Current Main3100 abb707 SSH57232; e4e07/b48 rollback retained."
+active_card_status: "Actual3NodeResourceUIAccepted_GenuineFirstCPUIntentDraftFrozenApprovalPreparedV4Attempt0_InputActionBindingsReadBack_NoActualVotesOrExecution; ApprovalDeadlinePassed_PC1KeyAndPC5NodeFull5Pending"
+active_card_next: "Complete Root535 exact Docs/Obsidian, then continue on genuine approver identity/current signed decisions or PC1 local key enrollment/safe PC5 resource-budget change. Existing approval deadline passed; reconcile original Run/input/idempotent keys and use the supported current-proposal lifecycle without fake votes or automatic duplicate Run. Full GPU/storage/physical5/manual/renewal/reconnect/reboot remain. Current portal abb707 SSH57232; real3-node30s proof retained."
 ---
+
+## 2026-11-08T06:27:40+09:00 실제 첫 CPU Run 준비·durable readback·남은 실조건
+
+실제ownerUI로CPUintent wld_01M6VXKDKQHZR1BYEVTE6H4S9E를1개등록하고기존정의를재사용해Run run_01M6VXSMM9SV8MAB7K4B1YCRX8/입력동결/승인안건apr_01M6VXSPZ0252M2SJ8ZA5E11QE를생성했다. 총3POST각201이며중복intent/Run0·실제표/컨테이너실행/enqueue0이다. Run은awaiting_approval/v4/attempt0,425B입력·123Bcode·actiondigest·PC3/500m64MiB결속을대조했고06:23:46의durableGET으로재확인했다. 실제비요청자2명승인이없어06:24:26안건기한이경과했으며현재enqueue는불가다.06:17:42재점검에서PC1fixedkeySSH255,PC5메모리94.58percent/Node미인수를확인했다. DockerAPI1.41은source최소조건과호환이다. 실제3대화면/자원/30초성공은유지하며5대전체/실제Run인수는미완료다. 다음첫행동/담당은Root535게시와현재전제조건변경시Root의정상계약재개다. 실제승인정보질문은한번제시했으며무응답/시간경과를승인으로대신하지않는다.
 
 ## 2026-11-08T06:04:42+09:00 실제 3대 자원·CPhealth·화면 안정성 검증 완료
 

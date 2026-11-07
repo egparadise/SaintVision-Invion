@@ -1,0 +1,19 @@
+import base64,datetime,hashlib,json
+from pathlib import Path
+r=Path(__file__).resolve().parents[1];w=r/'.work';out=w/'genuine-first-cpu-prepared-root-verification-r2.json';assert not out.exists()
+old=json.loads((w/'genuine-first-cpu-ui-r1/mutation-journal.json').read_bytes());current=json.loads((w/'genuine-first-cpu-ui-r2-resume/mutation-journal.json').read_bytes());receipt=json.loads((w/'genuine-first-cpu-ui-r2-resume/receipt.json').read_bytes());p=json.loads((w/'genuine-first-cpu-ui-r2-resume/planned-request.json').read_bytes())
+o=receipt['remote'];assert receipt['SSHExit']==0 and o['ownedBrowserExited'] and o['priorIntentRegistrationConfirmed'] and o['actualEnqueueSent'] is False and o['actualVotesCreated']==0
+assert len(old['requests'])==1 and len(current['requests'])==len(current['responses'])==2 and all(x['HTTP']==201 for x in current['responses'])
+prepared=o['actualPrepared'];run=prepared['run'];approval=prepared['approval'];work=prepared['workload'];ref=work['workspaceStart'];data=json.loads(current['requests'][1]['body']);archive=base64.b64decode(data['snapshotBase64'],validate=True);decoded=json.loads(archive)
+assert len(archive)==ref['inputSizeBytes'] and hashlib.sha256(archive).hexdigest()==ref['inputSha256']
+files=decoded['files'];assert len(files)==1 and files[0]['path']==p['path'] and files[0]['sha256']==p['contentSHA256']
+content=base64.b64decode(files[0]['dataBase64'],validate=True);assert content==p['content'].encode() and len(content)==files[0]['sizeBytes'] and files[0]['executable'] is False
+canonical=json.dumps(work,sort_keys=True,separators=(',',':'),ensure_ascii=False,allow_nan=False).encode();assert hashlib.sha256(canonical).hexdigest()==approval['actionDigest']
+assert run['runId']=='run_01M6VXSMM9SV8MAB7K4B1YCRX8' and run['state']=='awaiting_approval' and run['version']==approval['runVersion']==4 and run['attempt']==0
+assert approval['approvalId']=='apr_01M6VXSPZ0252M2SJ8ZA5E11QE' and approval['requesterId']==p['requester'] and approval['requiredApprovals']==2 and approval['status']=='pending'
+assert ref['nodeId']=='nod_01M6TAWG25JTA3F7J7S1EE4N2W' and ref['cpuResourceId']=='res_01M6TAWG25QSR4HH7XWWJSB0W0' and ref['memoryResourceId']=='res_01M6TAWG25ZHS2RG3NHQX4SPEH' and ref['stepId']==p['stepId'] and ref['profileVersion']=='cpu-pilot-1efea-r1'
+assert work['resources']['cpuMillis']==500 and work['resources']['memoryBytes']==67108864 and work['resources']['gpuCount']==0 and work['timeoutSeconds']==10
+assert json.loads(current['requests'][0]['body'])=={} and data['expectedVersion']==1 and data['targetNodeId']==ref['nodeId']
+keys=[next(value for key,value in item['headers'].items() if key.lower()=='idempotency-key') for item in old['requests']+current['requests']];assert len(set(keys))==3
+v={'atKST':datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=9))).isoformat(timespec='seconds'),'status':'GENUINE_OWNER_INTENT_DRAFT_FROZEN_APPROVAL_CRYPTO_BINDINGS_MATCHED','source':'abb7074e3da0d547ac81d3da33dce347d5c656af','workloadId':work['workloadId'],'run':run,'startId':prepared['startId'],'approval':{key:approval[key] for key in ['approvalId','requesterId','status','requiredApprovals','runVersion','actionDigest','expiresAt']},'approvalExpiresAtKST':datetime.datetime.fromisoformat(approval['expiresAt']).astimezone(datetime.timezone(datetime.timedelta(hours=9))).isoformat(),'inputArchiveSHA256':ref['inputSha256'],'inputArchiveBytes':len(archive),'inputFileSHA256':p['contentSHA256'],'inputFileBytes':len(content),'runtimeBinding':ref,'exactApplicationPOSTs':3,'duplicateIntentOrRunCreated':False,'originalRegistrationDriverGETCountErrorReconciled':True,'actualVotesCreated':0,'actualEnqueueSent':False,'actualWorkloadExecution':False,'wholeProgramComplete':False}
+out.write_text(json.dumps(v,ensure_ascii=False,indent=2)+'\n',encoding='utf-8');print(json.dumps(v,ensure_ascii=False),flush=True)

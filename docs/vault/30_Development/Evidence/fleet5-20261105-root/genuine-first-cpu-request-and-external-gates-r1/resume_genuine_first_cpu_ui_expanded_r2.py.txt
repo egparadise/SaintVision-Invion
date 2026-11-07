@@ -1,0 +1,106 @@
+"""Root-owned actual UI request: one intent, one draft, one frozen approval; never enqueue/vote."""
+import ast,getpass,hashlib,json,shlex,subprocess,urllib.request
+from pathlib import Path
+r=Path(__file__).resolve().parents[1];w=r/'.work';out=w/'genuine-first-cpu-ui-r2-resume';assert not out.exists()
+seal=json.loads((w/'root534-final-verification.json').read_bytes());assert seal['SHA']=='d23326a6709f5592b2269b005c12f41db47534ed' and seal['syncExits']==[0,0,0] and seal['trackedAndUntrackedClean']
+op=urllib.request.build_opener(urllib.request.ProxyHandler({}))
+with op.open('http://127.0.0.1:3100/index.html',timeout=8) as f:assert hashlib.sha256(f.read()).hexdigest()=='a14cd3a68ffc19c78932351cc3fd89824dd5bba4110cdcfd75caf940ddf4e1bc'
+out.mkdir();account=json.loads(Path(r'D:\Project\SaintVisionI-Invion\admin-login-20261106\.work\account-result.json').read_bytes())
+code='import json\nprint(json.dumps({"job":"saintvision-cpu-pilot-20261108","sum":sum(range(100000))},sort_keys=True),flush=True)\n'
+plan={'source':'abb7074e3da0d547ac81d3da33dce347d5c656af','project':account['project'],'workspace':'wsp_01M6NE3HM7T42B2M1FPK2V6GH0','requester':'oidc:3f79091432574632c62c37f25aaddb37f91e37a5864422525048eb82fe54247c','cpuMillis':500,'memoryBytes':67108864,'timeoutSeconds':10,'image':'sha256:ffee58e8dbefc6c0db68810cd1597f8cc589cf01112c434ed7fda8d4af415634','executable':'/usr/local/bin/python3','path':'src/app.py','content':code,'contentSHA256':hashlib.sha256(code.encode()).hexdigest(),'stepId':'root-cpu-pilot-20261108-r1','objective':'LAN pilot PC3 CPU verification (500m / 64 MiB)','enqueueOrVotesAuthorizedByThisProgram':False,'wholeProgramComplete':False}
+plan['existingIntent']={'workspaceId': 'wsp_01M6NE3HM7T42B2M1FPK2V6GH0', 'workspaceVersion': 2, 'workloadVersion': 1, 'workloadSha256': '060612215774bd7caf472f6f6d2156f8e7783f04c79d8fa32230b71a42c4af6a', 'intentEtag': '"workspace-v2-workload-v1-sha256-060612215774bd7caf472f6f6d2156f8e7783f04c79d8fa32230b71a42c4af6a"', 'workload': {'apiVersion': 'inv.saintvision.ai/v1alpha1', 'kind': 'Workload', 'workloadId': 'wld_01M6VXKDKQHZR1BYEVTE6H4S9E', 'tenantId': '97968b42-68aa-40ce-af5e-3a33e2fc2205', 'projectId': 'prj_01M6NDBHVD2DZQ1Q38DCKN1XE3', 'workspaceId': 'wsp_01M6NE3HM7T42B2M1FPK2V6GH0', 'targetNodeId': 'nod_01M6TAWG25JTA3F7J7S1EE4N2W', 'imageDigest': 'sha256:ffee58e8dbefc6c0db68810cd1597f8cc589cf01112c434ed7fda8d4af415634', 'command': ['/usr/local/bin/python3', '-B', 'src/app.py'], 'resources': {'cpuMillis': 500, 'memoryBytes': 67108864, 'gpuCount': 0, 'minVramBytes': 0}, 'timeoutSeconds': 10}, 'observedAt': '2026-11-07T21:11:01.045180+00:00'}
+(out/'planned-request.json').write_text(json.dumps(plan,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+tree=ast.parse((w/'verify_pc3_real_browser_login_observation_r1.py').read_text(encoding='utf-8'));remote=next(ast.literal_eval(n.value) for n in tree.body if isinstance(n,ast.Assign) and any(isinstance(t,ast.Name) and t.id=='remote' for t in n.targets))
+remote=remote.replace('import base64,datetime,hashlib,json,os,subprocess','import base64,datetime,hashlib,json,os,re,subprocess')
+for a,b in [('chrome-profile-r1','chrome-profile-first-cpu-r2-resume'),('chrome-r1.stdout.log','chrome-first-cpu-r2-resume.stdout.log'),('chrome-r1.stderr.log','chrome-first-cpu-r2-resume.stderr.log'),('public-browser-r1-receipt.json','public-first-cpu-r2-resume-receipt.json')]:assert a in remote;remote=remote.replace(a,b)
+remote=remote.replace('responses=[];load_failures=[]','responses=[];load_failures=[];mutationRequests=[];mutationResponses=[]')
+a="def command(method,params=None):"
+b="""def is_mutation_path(path):
+ prefix='/v1/projects/'+p['project']
+ return path==prefix+'/workspaces/'+p['workspace']+'/first-intents' or bool(re.fullmatch(re.escape(prefix+'/workspaces/'+p['workspace']+'/first-intents/')+r'wld_[0-9A-HJKMNP-TV-Z]{26}/runs',path)) or bool(re.fullmatch(re.escape(prefix+'/runs/')+r'run_[0-9A-HJKMNP-TV-Z]{26}/start/prepare',path))
+def persist():
+ payload={'phase':phase,'planned':{k:v for k,v in p.items() if k not in ['email','password']},'requests':mutationRequests,'responses':mutationResponses,'observation':o}
+ (root/'first-cpu-request-r2-resume-journal.json').write_text(json.dumps(payload,ensure_ascii=False,indent=2)+'\\n')
+def command(method,params=None):"""
+assert a in remote;remote=remote.replace(a,b)
+a="  if m.get('method')=='Network.loadingFailed':"
+b="""  if m.get('method')=='Network.requestWillBeSent':
+   v=m['params']['request'];u=urllib.parse.urlsplit(v['url'])
+   if u.scheme=='http' and u.netloc=='127.0.0.1:3100' and v['method']=='POST':
+    if not is_mutation_path(u.path):raise RuntimeError('Unexpected application mutation; no replay allowed')
+    safe={k:v for k,v in v.get('headers',{}).items() if k.lower() in ['idempotency-key','if-match']}
+    mutationRequests.append({'requestId':m['params']['requestId'],'path':u.path,'method':'POST','headers':safe,'body':v.get('postData')});persist()
+  if m.get('method')=='Network.loadingFailed':"""
+assert a in remote;remote=remote.replace(a,b)
+a="responses.append({'origin':u.scheme+'://'+u.netloc,'path':u.path,'status':v['status']})"
+b=a+"\n   if u.scheme=='http' and u.netloc=='127.0.0.1:3100' and is_mutation_path(u.path) and any(item['requestId']==m['params']['requestId'] for item in mutationRequests):mutationResponses.append({'requestId':m['params']['requestId'],'path':u.path,'HTTP':v['status']});persist()"
+assert a in remote;remote=remote.replace(a,b)
+start=remote.index(" phase='actual-three-node-visible-stability-window'");end=remote.index('except BaseException as e:',start)
+body=r'''
+ o.update(realAdministratorLogin=True,PKCECallbackCompleted=True)
+ phase='actual-CPU-intent-UI-prerequisites';persist()
+ evaluate("document.querySelector('[data-testid=header-tab-studio]').click();true")
+ until("!!document.querySelector('[data-testid=studio-stepper-step-3]')")
+ evaluate("document.querySelector('[data-testid=studio-stepper-step-3]').click();true")
+ until("!!document.querySelector('[data-testid=first-workspace-panel]') && !!document.querySelector('[aria-label=\"Ready Workspace\"]')")
+ workspace=json.dumps(p['workspace'])
+ until("Array.from(document.querySelector('[aria-label=\"Ready Workspace\"]').options).some(o=>o.value==="+workspace+")")
+ evaluate("(()=>{const e=document.querySelector('[aria-label=\"Ready Workspace\"]');e.value="+workspace+";e.dispatchEvent(new Event('change',{bubbles:true}));return true;})()")
+ until("!!document.querySelector('[aria-label=\"현재 CPU intent\"]') && !!document.querySelector('[aria-label=\"허용 이미지\"]')")
+ # The confirmed existing intent is selected below; no registration action is repeated.
+ def choose(label,value):
+  evaluate("(()=>{const e=document.querySelector('[aria-label='+JSON.stringify("+json.dumps(label)+")+']');if(!Array.from(e.options).some(o=>o.value==="+json.dumps(value)+"))throw new Error('Expected allowed option missing');e.value="+json.dumps(value)+";e.dispatchEvent(new Event('change',{bubbles:true}));return true;})()")
+ def fill(label,value,textarea=False):
+  evaluate("(()=>{const e=document.querySelector('[aria-label='+JSON.stringify("+json.dumps(label)+")+']');const proto="+('HTMLTextAreaElement' if textarea else 'HTMLInputElement')+".prototype;Object.getOwnPropertyDescriptor(proto,'value').set.call(e,"+json.dumps(str(value))+");e.dispatchEvent(new Event('input',{bubbles:true}));e.dispatchEvent(new Event('change',{bubbles:true}));return true;})()")
+ def click(text):
+  evaluate("(()=>{const e=Array.from(document.querySelector('[data-testid=first-workspace-panel]').querySelectorAll('button')).find(b=>b.textContent.trim()==="+json.dumps(text)+");if(!e||e.disabled)throw new Error('Reviewed action not enabled');e.click();return true;})()")
+ def bodies():
+  for item in mutationResponses:
+   if 'body' not in item:
+    raw=command('Network.getResponseBody',{'requestId':item['requestId']});text=base64.b64decode(raw['body']).decode() if raw.get('base64Encoded') else raw['body'];assert len(text)<262144;item['body']=json.loads(text)
+  for item in mutationRequests:
+   if item['body'] is None:item['body']=command('Network.getRequestPostData',{'requestId':item['requestId']})['postData']
+   assert any(k.lower()=='idempotency-key' and re.fullmatch('[a-f0-9]{32}',v) for k,v in item['headers'].items())
+  persist()
+
+ phase='select-confirmed-existing-CPU-intent-no-new-registration';persist()
+ choose('현재 CPU intent',p['existingIntent']['workload']['workloadId'])
+ until("!!document.querySelector('[data-testid=first-intent]')")
+ intent=evaluate("JSON.parse(document.querySelector('[data-testid=first-intent]').innerText)")
+ assert intent['intentEtag']==p['existingIntent']['intentEtag'] and intent['workloadSha256']==p['existingIntent']['workloadSha256'] and intent['workload']==p['existingIntent']['workload']
+ fill('입력 파일 경로',p['path']);fill('CPU 입력 내용',p['content'],True);fill('Step ID',p['stepId'])
+ o['actualNewIntent']=intent;o['priorIntentRegistrationConfirmed']=True
+ o['logicalRequestStorage']=evaluate("Object.fromEntries(Object.entries(sessionStorage).filter(([key])=>key.startsWith('saintvision.first-workspace.request:')))")
+ persist()
+ phase='one-real-owner-draft-Run-create';persist();click('Draft Run 생성 / 같은 요청 재확인')
+ until("document.querySelector('[data-testid=first-run-state]')?.innerText.includes('draft')",30);bodies()
+ assert len(mutationRequests)==1 and len(mutationResponses)==1 and mutationResponses[0]['HTTP']==201
+ o['actualDraftRun']=mutationResponses[0]['body']['run'];assert o['actualDraftRun']['state']=='draft' and o['actualDraftRun']['attempt']==0
+ o['actualRunOrVotesCreated']=True;o['votesCreated']=0
+ phase='one-reviewed-input-freeze-and-two-person-approval-request';persist();click('입력 동결·승인 준비 / 같은 요청 재확인')
+ until("!!document.querySelector('[data-testid=first-frozen-action]') && document.querySelector('[data-testid=first-run-state]')?.innerText.includes('awaiting_approval')",30);bodies()
+ assert len(mutationRequests)==2 and len(mutationResponses)==2 and mutationResponses[1]['HTTP']==201
+ prepared=mutationResponses[1]['body'];assert prepared['run']['state']=='awaiting_approval' and prepared['run']['attempt']==0 and prepared['approval']['requiredApprovals']==2 and prepared['approval']['status']=='pending' and prepared['approval']['requesterId']==p['requester'] and prepared['approval']['runVersion']==prepared['run']['version']
+ assert prepared['workload']['workspaceStart']['nodeId']=='nod_01M6TAWG25JTA3F7J7S1EE4N2W' and prepared['workload']['workspaceStart']['stepId']==p['stepId']
+ assert evaluate("Array.from(document.querySelector('[data-testid=first-frozen-action]').querySelectorAll('button')).find(b=>b.textContent.includes('원래 요청자 enqueue')).disabled") is True
+ assert not any('/enqueue' in x['path'] or '/decisions' in x['path'] for x in mutationRequests)
+ assert all(not x['path'].endswith('/first-intents') for x in mutationRequests)
+ screenshot=command('Page.captureScreenshot',{'format':'png','captureBeyondViewport':False});screen=base64.b64decode(screenshot['data'],validate=True);(root/'genuine-first-cpu-approval-r2-resume.png').write_bytes(screen)
+ o.update(status='GENUINE_OWNER_CPU_INTENT_DRAFT_AND_FROZEN_TWO_PERSON_APPROVAL_PREPARED',atKST=datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=9))).isoformat(timespec='seconds'),acceptedSource=p['source'],actualPrepared=prepared,mutationsSent=2,mutationResponsesHTTP=[x['HTTP'] for x in mutationResponses],actualEnqueueSent=False,actualWorkloadExecution=False,actualVotesCreated=0,originalRequesterEnqueueDisabled=True,screenshotSHA256=hashlib.sha256(screen).hexdigest(),screenshotBytes=len(screen),screenshotPath=str(root/'genuine-first-cpu-approval-r2-resume.png'),actualUIObservation=evaluate("document.querySelector('[data-testid=first-workspace-panel]').innerText"))
+ persist()
+'''
+remote=remote[:start]+body+remote[end:]
+remote=remote.replace("o.get('status')=='REAL_CHROME_LOGIN_PKCE_AND_THREE_NODE_UI_STABLE_VERIFIED'","o.get('status')=='GENUINE_OWNER_CPU_INTENT_DRAFT_AND_FROZEN_TWO_PERSON_APPROVAL_PREPARED'")
+remote=remote.replace(" o.update(status='HOLD_ACTUAL_CHROME_VERIFICATION',phase=phase,errorClass=type(e).__name__,noBlindAuthenticationRetry=True)"," o.update(status='HOLD_GENUINE_CPU_REQUEST_RECONCILE_REQUIRED',phase=phase,errorClass=type(e).__name__,noBlindAuthenticationRetry=True,applicationMutationDeliveryMayBeUncertain=bool(mutationRequests));persist()")
+ast.parse(remote);(out/'remote-program.py.txt').write_text(remote,encoding='utf-8')
+known=Path(r'D:\Project\SaintVisionI-Invion\fleet5-worker-readiness-20261105\.work\f5-low-closure-26607075f612\known_hosts.f5.pinned');assert hashlib.sha256(known.read_bytes()).hexdigest()=='0dcbf0f4cfc363e4affc30810ad8a9e57bd2c4a31991e2c8285bdae7052ec2d2'
+flags=['-i',r'C:\Users\inviz\.ssh\sv-lan-ed25519','-o','IdentitiesOnly=yes','-o','BatchMode=yes','-o','ConnectTimeout=5','-o','StrictHostKeyChecking=yes','-o','UserKnownHostsFile='+str(known)];host='saintvision-invion3@192.168.45.222'
+password=getpass.getpass('Approved owner password for one actual CPU request (hidden): ');wire=json.dumps({**plan,'email':account['email'],'password':password}).encode();del password
+q=subprocess.run(['ssh','-T',*flags,host,'/home/saintvision-invion3/saintvision-share/ops-fresh-cpu-1efea-r1-20261107/venv/bin/python','-I','-B','-c',shlex.quote(remote)],input=wire,capture_output=True,timeout=210);del wire
+result={'SSHExit':q.returncode,'stderrBytes':len(q.stderr),'remote':json.loads(q.stdout) if q.stdout else None};(out/'receipt.json').write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+o=result['remote'];print(json.dumps({'SSHExit':q.returncode,'status':o.get('status'),'phase':o.get('phase'),'mutationsSent':o.get('mutationsSent'),'Run':o.get('actualPrepared',{}).get('run'),'approval':{k:v for k,v in o.get('actualPrepared',{}).get('approval',{}).items() if k in ['approvalId','status','requiredApprovals','expiresAt']},'ownedBrowserExited':o.get('ownedBrowserExited'),'wholeProgramComplete':False},ensure_ascii=False),flush=True)
+remote_root='/home/saintvision-invion3/saintvision-share/ops-fresh-cpu-1efea-r1-20261107/browser-real-ui-r1/'
+copy=subprocess.run(['scp','-q',*flags,host+':'+remote_root+'first-cpu-request-r2-resume-journal.json',str(out/'mutation-journal.json')],capture_output=True,timeout=25);assert copy.returncode==0
+assert q.returncode==0 and o['ownedBrowserExited'] and o['mutationsSent']==2
+copy=subprocess.run(['scp','-q',*flags,host+':'+o['screenshotPath'],str(out/'genuine-first-cpu-approval-r2-resume.png')],capture_output=True,timeout=25);assert copy.returncode==0
+assert hashlib.sha256((out/'genuine-first-cpu-approval-r2-resume.png').read_bytes()).hexdigest()==o['screenshotSHA256']

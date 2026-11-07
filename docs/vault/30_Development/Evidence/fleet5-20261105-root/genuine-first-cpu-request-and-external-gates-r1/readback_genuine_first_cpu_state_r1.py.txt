@@ -1,0 +1,23 @@
+"""Fresh owner PKCE GET-only durable readback; never votes, renews or enqueues."""
+import ast
+from pathlib import Path
+r=Path(__file__).resolve().parents[1]
+existing=(r/'.work/verify_new_api96_owner_pkce_r1.py').read_text(encoding='utf-8');ns={'__file__':str(__file__),'__name__':'__readback_setup__'};exec(compile(existing[:existing.index("tail=r'''")],str(__file__)+'-setup','exec'),ns)
+tail=r'''
+    stage='durable-genuine-first-CPU-readback-only'
+    work=Path(r'D:\Project\SaintVisionI-Invion\fleet-five-orchestration-20261105\.work');dest=work/'genuine-first-cpu-readback-r1';assert not dest.exists();dest.mkdir()
+    expected=json.loads((work/'genuine-first-cpu-prepared-root-verification-r2.json').read_bytes());run_id=expected['run']['runId'];prefix='/v1/projects/'+account['project']+'/runs/'+run_id
+    responses={}
+    for name,path in [('run',prefix),('start',prefix+'/starts/'+expected['startId']),('result',prefix+'/result'),('capacity','/v1/projects/'+account['project']+'/capacity')]:
+        try:status,body=api(path)
+        except urllib.error.HTTPError as error:status=error.code;body=json.load(error)
+        if name!='result':assert status==200
+        responses[name]={'HTTP':status,'body':body};(dest/(name+'.json')).write_bytes((json.dumps(responses[name],ensure_ascii=False,indent=2)+'\n').encode())
+    current=responses['start']['body'];assert current['run']['runId']==run_id and current['run']['version']>=4 and current['run']['attempt']==0 and current['approval']['approvalId']==expected['approval']['approvalId'] and current['approval']['requiredApprovals']==2
+    assert current['workload']['workspaceStart']['inputSha256']==expected['inputArchiveSHA256'] and current['workload']['workspaceStart']['nodeId']==expected['runtimeBinding']['nodeId']
+    receipt={'atKST':datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=9))).isoformat(timespec='seconds'),'status':'GENUINE_FIRST_CPU_DURABLE_GET_ONLY_READBACK','tokenExchangeHTTP':token_status,'run':current['run'],'approval':{key:current['approval'][key] for key in ['approvalId','status','requiredApprovals','runVersion','expiresAt']},'frozenFiles':current.get('frozenFiles'),'resultHTTP':responses['result']['HTTP'],'actualVotesOrEnqueueSentByRoot':False,'originalFrozenInputAndNodeMatched':True,'passwordOrTokensPersisted':False,'wholeProgramComplete':False}
+    (dest/'receipt.json').write_bytes((json.dumps(receipt,ensure_ascii=False,indent=2)+'\n').encode());del token,tokens,token_body,query;print(json.dumps(receipt,ensure_ascii=False),flush=True)
+except Exception as e:
+    print(json.dumps({'failedStage':stage,'errorType':type(e).__name__,'detailsSuppressed':True}),flush=True);raise SystemExit(1)
+'''
+program=ns['head']+tail;ast.parse(program);exec(compile(program,str(__file__),'exec'),{'__file__':str(__file__),'__name__':'__main__'})

@@ -1,6 +1,6 @@
 {
   "schema": "fleet5-root-review-resource-sequence:1",
-  "atKST": "2026-11-08T06:04:42+09:00",
+  "atKST": "2026-11-08T06:27:40+09:00",
   "completedB": {
     "task": "task_d4c4c809ed4e",
     "review": "ac9182c3e3d606ec027c0be2e90e049ff50d54f1",
@@ -22,7 +22,7 @@
     "review": "0e53fc024ca773b7719182e170e5e126aeaf5b95",
     "verdict": "ACCEPT TEST-ONLY; R-L1 CLOSED; no new findings"
   },
-  "nextActualReviewTrigger": "No source finding/review pending. Root completes Root534 publication then materializes genuine first CPU intent/draft/input/approval request through reviewed APIs/UI, preserving two genuine distinct nonrequester approval gate; PC1/PC5/manual/all5 operating prerequisites remain.",
+  "nextActualReviewTrigger": "No source correction/review pending. Continue when genuine approver identity/decisions, PC1 enrollment or safe PC5 operating prerequisites change; retain real original request bytes and idempotent keys. No timer-based approval, fake actor, automatic replacement Run or 100percent claim.",
   "completedIntegration": {
     "task": "task_78064fb4b7ff",
     "dispatch": "ctx_ed7ec73163d6",
@@ -3917,5 +3917,68 @@
     "actualFirstRunApprovalPreparation": "READY_NOT_YET_CREATED",
     "actualFivePCOrAllPhysicalResourcesAccepted": false,
     "wholeProgramComplete": false
-  }
+  },
+  "RootGenuineFirstCPURequest": {
+    "atKST": "2026-11-08T06:27:40+09:00",
+    "taskID": "FLEET5-GENUINE-FIRST-CPU-REQUEST-AND-EXTERNAL-GATE-HANDOFF-20261108",
+    "owner": "Root Codex operator",
+    "managementBase": "d23326a6709f5592b2269b005c12f41db47534ed",
+    "acceptedSource": "abb7074e3da0d547ac81d3da33dce347d5c656af",
+    "sourceReview": "29046535c0bb0e2629286c8c678f563080f30a67",
+    "actualThreeNodeResourceAnd30sFrameAcceptance": true,
+    "actualIntent": "wld_01M6VXKDKQHZR1BYEVTE6H4S9E",
+    "actualRun": {
+      "runId": "run_01M6VXSMM9SV8MAB7K4B1YCRX8",
+      "tenantId": "97968b42-68aa-40ce-af5e-3a33e2fc2205",
+      "projectId": "prj_01M6NDBHVD2DZQ1Q38DCKN1XE3",
+      "state": "awaiting_approval",
+      "version": 4,
+      "attempt": 0
+    },
+    "actualStartId": "4383d0d7-518f-4ea7-a8b4-47c65bdc0069",
+    "approval": {
+      "approvalId": "apr_01M6VXSPZ0252M2SJ8ZA5E11QE",
+      "requesterId": "oidc:3f79091432574632c62c37f25aaddb37f91e37a5864422525048eb82fe54247c",
+      "status": "pending",
+      "requiredApprovals": 2,
+      "runVersion": 4,
+      "actionDigest": "07b42c66295c61302ae63b0c50c9a7bd81cd165448129158d69755285b7f5b33",
+      "expiresAt": "2026-11-07T21:24:26.939156+00:00"
+    },
+    "approvalExpiresAtKST": "2026-11-08T06:24:26.939156+09:00",
+    "approvalDeadlinePassedAtThisRecord": true,
+    "enqueueEligible": false,
+    "reason": "Required two genuine distinct nonrequester approvals are absent and current proposal deadline has passed; retain original Run/input/keys, no automatic new proposal, votes or enqueue.",
+    "originalInputSHA256": "eb8ae25efcd061f1b21672fb180f4b7760a0a481e4f8b3c04f73f9072b4aa238",
+    "actualApplicationPOSTs": 3,
+    "duplicateIntentOrRunCreated": false,
+    "actualVotesOrEnqueueSent": false,
+    "actualWorkloadExecution": false,
+    "PC1SSH": "06:17:42 fixed-key exit255 publickey rejected; local enrollment required",
+    "PC5MainMemoryUsedPercent": 94.58,
+    "PC5DockerAPICompatibleWithSourceMinimum": true,
+    "PC5NodeJoined": false,
+    "fullPhysicalGPUStorageFivePCManualRenewalReconnectRebootAcceptance": false,
+    "wholeProgramComplete": false
+  },
+  "externalPrerequisites": [
+    {
+      "id": "REAL_TWO_NONREQUESTER_APPROVERS",
+      "state": "ACTUAL_IDENTITIES_AND_VALID_CURRENT_SIGNED_APPROVALS_REQUIRED",
+      "actualRun": "run_01M6VXSMM9SV8MAB7K4B1YCRX8",
+      "priorProposalExpired": true
+    },
+    {
+      "id": "PC1_SSH_KEY",
+      "state": "FIXED_KEY_AUTH_REJECTED_LOCAL_ENROLLMENT_REQUIRED"
+    },
+    {
+      "id": "PC5_RESOURCE_BUDGET_AND_NODE",
+      "state": "MAIN_MEMORY_PRESSURE_NODE_ADMISSION_AND_RUNTIME_NOT_ACCEPTED"
+    },
+    {
+      "id": "FIVE_PC_FULL_RESOURCES_MANUAL_RENEWAL_RECONNECT",
+      "state": "NOT_ACCEPTED"
+    }
+  ]
 }

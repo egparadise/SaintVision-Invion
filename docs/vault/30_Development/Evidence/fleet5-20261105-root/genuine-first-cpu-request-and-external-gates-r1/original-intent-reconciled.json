@@ -1,0 +1,9 @@
+{
+  "status": "ONE_EXISTING_INTENT_201_CONFIRMED_NO_RUN_OR_PREPARE_SENT",
+  "workloadId": "wld_01M6VXKDKQHZR1BYEVTE6H4S9E",
+  "workloadSha256": "060612215774bd7caf472f6f6d2156f8e7783f04c79d8fa32230b71a42c4af6a",
+  "originalIdempotencyKey": "b517db64cab8c1d763be176a8ec643b2",
+  "originalRequestBodySHA256": "292280c272dc1963228c70a84be0d494a7def7a17c1dc299f9230c839354f9ef",
+  "RootDriverFailureCause": "The response collector also counted the GET first-intents200 at the same path; POST201 and selected intent were real. No product failure and no duplicate registration authorized.",
+  "next": "Select the existing intent and send only one draft creation and one prepare; preserve exact new idempotent keys and request bytes."
+}

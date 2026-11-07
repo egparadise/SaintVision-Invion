@@ -1,0 +1,13 @@
+import datetime,hashlib,json,subprocess
+from pathlib import Path
+r=Path(__file__).resolve().parents[1];out=r/'.work/pc1-pc5-metadata-after-runtime-r1.json';assert not out.exists()
+known=Path(r'D:\Project\SaintVisionI-Invion\fleet5-worker-readiness-20261105\.work\f5-low-closure-26607075f612\known_hosts.f5.pinned');assert hashlib.sha256(known.read_bytes()).hexdigest()=='0dcbf0f4cfc363e4affc30810ad8a9e57bd2c4a31991e2c8285bdae7052ec2d2'
+q=subprocess.run(['ssh','-T','-i',r'C:\Users\inviz\.ssh\sv-lan-ed25519','-o','IdentitiesOnly=yes','-o','BatchMode=yes','-o','ConnectTimeout=5','-o','StrictHostKeyChecking=yes','-o','UserKnownHostsFile='+str(known),'inviz@192.168.45.13','id','-un'],capture_output=True,timeout=12)
+ssh={'host':'192.168.45.13','account':'inviz','command':'id -un','exit':q.returncode,'stdout':q.stdout.decode('utf-8','replace').strip(),'stderr':q.stderr.decode('utf-8','replace').strip(),'singleFixedKeyAttempt':True,'passwordOrKeyGuessing':False}
+ps="$ErrorActionPreference='Stop';$os=Get-CimInstance Win32_OperatingSystem;@{TotalBytes=[long]$os.TotalVisibleMemorySize*1024;FreeBytes=[long]$os.FreePhysicalMemory*1024}|ConvertTo-Json -Compress"
+q=subprocess.run(['powershell','-NoProfile','-NonInteractive','-Command',ps],capture_output=True,timeout=20);assert q.returncode==0
+memory=json.loads(q.stdout);memory['usedPercent']=round((1-memory['FreeBytes']/memory['TotalBytes'])*100,2)
+q=subprocess.run(['docker','version','--format','{{json .Server}}'],capture_output=True,timeout=15)
+docker={'exit':q.returncode,'metadata':json.loads(q.stdout) if q.returncode==0 else None,'stderr':q.stderr.decode('utf-8','replace')[:500]}
+v={'atKST':datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=9))).isoformat(timespec='seconds'),'PC1SSH':ssh,'PC5MainMemory':memory,'PC5DockerMetadataOnly':docker,'mainNodeOrCryptoOrProductExecuted':False,'noOSOrPagefileOrUnrelatedProcessChanged':True,'PC1OrPC5JoinedByThisProbe':False,'wholeProgramComplete':False}
+out.write_text(json.dumps(v,indent=2)+'\n',encoding='utf-8');print(json.dumps(v),flush=True)

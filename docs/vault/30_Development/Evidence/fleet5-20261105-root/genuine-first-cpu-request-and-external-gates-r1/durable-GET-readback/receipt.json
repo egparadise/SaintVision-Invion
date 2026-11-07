@@ -1,0 +1,32 @@
+{
+  "atKST": "2026-11-08T06:23:46+09:00",
+  "status": "GENUINE_FIRST_CPU_DURABLE_GET_ONLY_READBACK",
+  "tokenExchangeHTTP": 200,
+  "run": {
+    "runId": "run_01M6VXSMM9SV8MAB7K4B1YCRX8",
+    "tenantId": "97968b42-68aa-40ce-af5e-3a33e2fc2205",
+    "projectId": "prj_01M6NDBHVD2DZQ1Q38DCKN1XE3",
+    "state": "awaiting_approval",
+    "version": 4,
+    "attempt": 0
+  },
+  "approval": {
+    "approvalId": "apr_01M6VXSPZ0252M2SJ8ZA5E11QE",
+    "status": "pending",
+    "requiredApprovals": 2,
+    "runVersion": 4,
+    "expiresAt": "2026-11-07T21:24:26.939156+00:00"
+  },
+  "frozenFiles": [
+    {
+      "path": "src/app.py",
+      "sizeBytes": 123,
+      "sha256": "ce23e6fd3cb8db61137155ef2746b5bf9a7e33ce18b8d8a6a24cbe345837c64d"
+    }
+  ],
+  "resultHTTP": 200,
+  "actualVotesOrEnqueueSentByRoot": false,
+  "originalFrozenInputAndNodeMatched": true,
+  "passwordOrTokensPersisted": false,
+  "wholeProgramComplete": false
+}

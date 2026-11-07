@@ -1,0 +1,29 @@
+{
+  "SSHExit": 2,
+  "stderrBytes": 192,
+  "remote": {
+    "mainBrowserExecuted": false,
+    "insecureTLSFlagsUsed": false,
+    "ChromeSandboxDisabled": false,
+    "authCredentialsPersistedByDriver": false,
+    "actualRunOrVotesCreated": false,
+    "workspaceReadinessChanged": false,
+    "wholeProgramComplete": false,
+    "ownedChromePID": 687819,
+    "browserVersion": "Chrome/157.0.8103.38",
+    "realIdPLoginFormReachedWithoutTLSBypass": true,
+    "realAdministratorLogin": true,
+    "PKCECallbackCompleted": true,
+    "status": "HOLD_GENUINE_CPU_REQUEST_RECONCILE_REQUIRED",
+    "phase": "one-real-owner-CPU-intent-registration",
+    "errorClass": "AssertionError",
+    "noBlindAuthenticationRetry": true,
+    "applicationMutationDeliveryMayBeUncertain": true,
+    "currentPageDiagnostic": {
+      "origin": "http://127.0.0.1:3100",
+      "path": "/studio",
+      "bodyText": "SaintVision\nINV Portal\n클러스터 개요\n🚀 개발 Studio (통합)\nNodes 인벤토리\n가상 패브릭 (CX-01)\nWorkspaces (S03)\n개발 에디터 (S06)\n자원 배치 (S05)\n분산 복구 (S07)\n보안·감사 (S08)\n자연어 요청 (S09)\n모델 계보 (S10)\n배포 후보 (S11)\n내부망 배포 (S12)\nRuns 실행\n승인 센터\n웹 터미널\nSSO 로그인\n클러스터: 3/3 Node 가동 중\nGateway: 10ms\n👤 egparadise@gmail.com\n프로젝트별 권한\n로그아웃\n🖥️\nWeb Desktop\n☀️ 라이트 모드\n프로젝트 \n프로젝트 선택\nLAN pilot\nSaintVision 통합 개발 Studio\n\n프로젝트 선택 → 자원 배치 분석 → 코드 편집 & 실행 → 실시간 결과 & 영수증 확인의 일관된 개발 주기\n\n✓\n1. 프로젝트 & 워크스페이스\n프로젝트 선택 및 Git 저장소·예산 확인\n✓\n2. 자원 배치 & 노드 검토\n물리량·관측량·가용량 비교 및 배치 사유\n3\n3. 코드 편집 & 실행 설정\nMonaco 에디터, Myers Diff 및 1-클릭 실행\n4\n4. 실행 상태 & 실시간 로그\nANSI 로그 스트림, 즉시 취소 및 영수증 대조\n첫 CPU Workspace 요청\n\n생성은 draft 등록입니다. 준비는 입력 동결과 두 사람 승인 요청입니다. Enqueue 이후에도 실행·완료는 실제 서버 관측으로 확인합니다. Terminal은 이 파일럿에서 사용하지 않습니다.\n\nReady Workspace \n선택\nwsp-local-run-check (wsp_01M6NE3HM7T42B2M1FPK2V6GH0)\nWorkspace 다시 조회\n\n관측 2026-11-07T21:11:00.785277+00:00 · 설정된 실행 대상 nod_01M6TAWG25JTA3F7J7S1EE4N2W · profile cpu-pilot-1efea-r1. Workspace의 물리 배치를 뜻하지 않습니다.\n\n현재 CPU intent \n명시적으로 선택\nwld_01M6VXKDKQHZR1BYEVTE6H4S9E · v1\nCPU intent 등록 (실행·준비 상태 변경 아님)\n작업 목적 허용 이미지 \n선택\nsha256:ffee58e8dbefc6c0db68810cd1597f8cc589cf01112c434ed7fda8d4af415634\n허용 실행 파일 \n선택\n/usr/local/bin/python3\n인자 JSON 배열 CPU millicores 메모리 bytes 제한 seconds \nCPU intent 등록 / 같은 요청 재확인\n{\n  \"workspaceId\": \"wsp_01M6NE3HM7T42B2M1FPK2V6GH0\",\n  \"workspaceVersion\": 2,\n  \"workloadVersion\": 1,\n  \"workloadSha256\": \"060612215774bd7caf472f6f6d2156f8e7783f04c79d8fa32230b71a42c4af6a\",\n  \"intentEtag\": \"\\\"workspace-v2-workload-v1-sha256-060612215774bd7caf472f6f6d2156f8e7783f04c79d8fa32230b71a42c4af6a\\\"\",\n  \"workload\": {\n    \"apiVersion\": \"inv.saintvision.ai/v1alpha1\",\n    \"kind\": \"Workload\",\n    \"workloadId\": \"wld_01M6VXKDKQHZR1BYEVTE6H4S9E\",\n    \"tenantId\": \"97968b42-68aa-40ce-af5e-3a33e2fc2205\",\n    \"projectId\": \"prj_01M6NDBH"
+    },
+    "ownedBrowserExited": true
+  }
+}

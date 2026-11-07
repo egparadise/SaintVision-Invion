@@ -1,0 +1,78 @@
+{
+  "atKST": "2026-11-08T06:17:42+09:00",
+  "PC1SSH": {
+    "host": "192.168.45.13",
+    "account": "inviz",
+    "command": "id -un",
+    "exit": 255,
+    "stdout": "",
+    "stderr": "inviz@192.168.45.13: Permission denied (publickey,password).",
+    "singleFixedKeyAttempt": true,
+    "passwordOrKeyGuessing": false
+  },
+  "PC5MainMemory": {
+    "FreeBytes": 917704704,
+    "TotalBytes": 16935796736,
+    "usedPercent": 94.58
+  },
+  "PC5DockerMetadataOnly": {
+    "exit": 0,
+    "metadata": {
+      "Platform": {
+        "Name": "Docker Desktop 4.16.3 (96739)"
+      },
+      "Components": [
+        {
+          "Name": "Engine",
+          "Version": "20.10.22",
+          "Details": {
+            "ApiVersion": "1.41",
+            "Arch": "amd64",
+            "BuildTime": "Thu Dec 15 22:26:14 2022",
+            "Experimental": "false",
+            "GitCommit": "42c8b31",
+            "GoVersion": "go1.18.9",
+            "KernelVersion": "5.15.167.4-microsoft-standard-WSL2",
+            "MinAPIVersion": "1.12",
+            "Os": "linux"
+          }
+        },
+        {
+          "Name": "containerd",
+          "Version": "1.6.14",
+          "Details": {
+            "GitCommit": "9ba4b250366a5ddde94bb7c9d1def331423aa323"
+          }
+        },
+        {
+          "Name": "runc",
+          "Version": "1.1.4",
+          "Details": {
+            "GitCommit": "v1.1.4-0-g5fd4c4d"
+          }
+        },
+        {
+          "Name": "docker-init",
+          "Version": "0.19.0",
+          "Details": {
+            "GitCommit": "de40ad0"
+          }
+        }
+      ],
+      "Version": "20.10.22",
+      "ApiVersion": "1.41",
+      "MinAPIVersion": "1.12",
+      "GitCommit": "42c8b31",
+      "GoVersion": "go1.18.9",
+      "Os": "linux",
+      "Arch": "amd64",
+      "KernelVersion": "5.15.167.4-microsoft-standard-WSL2",
+      "BuildTime": "2022-12-15T22:26:14.000000000+00:00"
+    },
+    "stderr": ""
+  },
+  "mainNodeOrCryptoOrProductExecuted": false,
+  "noOSOrPagefileOrUnrelatedProcessChanged": true,
+  "PC1OrPC5JoinedByThisProbe": false,
+  "wholeProgramComplete": false
+}

@@ -1,0 +1,117 @@
+{
+  "phase": "one-real-owner-CPU-intent-registration",
+  "planned": {
+    "source": "abb7074e3da0d547ac81d3da33dce347d5c656af",
+    "project": "prj_01M6NDBHVD2DZQ1Q38DCKN1XE3",
+    "workspace": "wsp_01M6NE3HM7T42B2M1FPK2V6GH0",
+    "requester": "oidc:3f79091432574632c62c37f25aaddb37f91e37a5864422525048eb82fe54247c",
+    "cpuMillis": 500,
+    "memoryBytes": 67108864,
+    "timeoutSeconds": 10,
+    "image": "sha256:ffee58e8dbefc6c0db68810cd1597f8cc589cf01112c434ed7fda8d4af415634",
+    "executable": "/usr/local/bin/python3",
+    "path": "src/app.py",
+    "content": "import json\nprint(json.dumps({\"job\":\"saintvision-cpu-pilot-20261108\",\"sum\":sum(range(100000))},sort_keys=True),flush=True)\n",
+    "contentSHA256": "ce23e6fd3cb8db61137155ef2746b5bf9a7e33ce18b8d8a6a24cbe345837c64d",
+    "stepId": "root-cpu-pilot-20261108-r1",
+    "objective": "LAN pilot PC3 CPU verification (500m / 64 MiB)",
+    "enqueueOrVotesAuthorizedByThisProgram": false,
+    "wholeProgramComplete": false
+  },
+  "requests": [
+    {
+      "requestId": "688028.38",
+      "path": "/v1/projects/prj_01M6NDBHVD2DZQ1Q38DCKN1XE3/workspaces/wsp_01M6NE3HM7T42B2M1FPK2V6GH0/first-intents",
+      "method": "POST",
+      "headers": {
+        "idempotency-key": "b517db64cab8c1d763be176a8ec643b2",
+        "if-match": "\"workspace-v2\""
+      },
+      "body": "{\"objective\":\"LAN pilot PC3 CPU verification (500m / 64 MiB)\",\"imageDigest\":\"sha256:ffee58e8dbefc6c0db68810cd1597f8cc589cf01112c434ed7fda8d4af415634\",\"command\":[\"/usr/local/bin/python3\",\"-B\",\"src/app.py\"],\"resources\":{\"cpuMillis\":500,\"memoryBytes\":67108864,\"gpuCount\":0,\"minVramBytes\":0},\"timeoutSeconds\":10}"
+    }
+  ],
+  "responses": [
+    {
+      "requestId": "688028.37",
+      "path": "/v1/projects/prj_01M6NDBHVD2DZQ1Q38DCKN1XE3/workspaces/wsp_01M6NE3HM7T42B2M1FPK2V6GH0/first-intents",
+      "HTTP": 200,
+      "body": {
+        "projectId": "prj_01M6NDBHVD2DZQ1Q38DCKN1XE3",
+        "workspaceId": "wsp_01M6NE3HM7T42B2M1FPK2V6GH0",
+        "workspaceVersion": 2,
+        "observedAt": "2026-11-07T21:11:00.785277+00:00",
+        "profile": {
+          "nodeId": "nod_01M6TAWG25JTA3F7J7S1EE4N2W",
+          "profileVersion": "cpu-pilot-1efea-r1",
+          "images": [
+            "sha256:ffee58e8dbefc6c0db68810cd1597f8cc589cf01112c434ed7fda8d4af415634"
+          ],
+          "executables": [
+            "/usr/local/bin/python3"
+          ],
+          "maxCpuMillis": 500,
+          "minMemoryBytes": 8388608,
+          "maxMemoryBytes": 67108864,
+          "maxTimeoutSeconds": 30,
+          "terminalAllowed": false
+        },
+        "items": [],
+        "nextCursor": null
+      }
+    },
+    {
+      "requestId": "688028.38",
+      "path": "/v1/projects/prj_01M6NDBHVD2DZQ1Q38DCKN1XE3/workspaces/wsp_01M6NE3HM7T42B2M1FPK2V6GH0/first-intents",
+      "HTTP": 201,
+      "body": {
+        "workspaceId": "wsp_01M6NE3HM7T42B2M1FPK2V6GH0",
+        "workspaceVersion": 2,
+        "workloadVersion": 1,
+        "workloadSha256": "060612215774bd7caf472f6f6d2156f8e7783f04c79d8fa32230b71a42c4af6a",
+        "intentEtag": "\"workspace-v2-workload-v1-sha256-060612215774bd7caf472f6f6d2156f8e7783f04c79d8fa32230b71a42c4af6a\"",
+        "workload": {
+          "apiVersion": "inv.saintvision.ai/v1alpha1",
+          "kind": "Workload",
+          "workloadId": "wld_01M6VXKDKQHZR1BYEVTE6H4S9E",
+          "tenantId": "97968b42-68aa-40ce-af5e-3a33e2fc2205",
+          "projectId": "prj_01M6NDBHVD2DZQ1Q38DCKN1XE3",
+          "workspaceId": "wsp_01M6NE3HM7T42B2M1FPK2V6GH0",
+          "targetNodeId": "nod_01M6TAWG25JTA3F7J7S1EE4N2W",
+          "imageDigest": "sha256:ffee58e8dbefc6c0db68810cd1597f8cc589cf01112c434ed7fda8d4af415634",
+          "command": [
+            "/usr/local/bin/python3",
+            "-B",
+            "src/app.py"
+          ],
+          "resources": {
+            "cpuMillis": 500,
+            "memoryBytes": 67108864,
+            "gpuCount": 0,
+            "minVramBytes": 0
+          },
+          "timeoutSeconds": 10
+        },
+        "observedAt": "2026-11-07T21:11:01.045180+00:00"
+      }
+    }
+  ],
+  "observation": {
+    "mainBrowserExecuted": false,
+    "insecureTLSFlagsUsed": false,
+    "ChromeSandboxDisabled": false,
+    "authCredentialsPersistedByDriver": false,
+    "actualRunOrVotesCreated": false,
+    "workspaceReadinessChanged": false,
+    "wholeProgramComplete": false,
+    "ownedChromePID": 687819,
+    "browserVersion": "Chrome/157.0.8103.38",
+    "realIdPLoginFormReachedWithoutTLSBypass": true,
+    "realAdministratorLogin": true,
+    "PKCECallbackCompleted": true,
+    "status": "HOLD_GENUINE_CPU_REQUEST_RECONCILE_REQUIRED",
+    "phase": "one-real-owner-CPU-intent-registration",
+    "errorClass": "AssertionError",
+    "noBlindAuthenticationRetry": true,
+    "applicationMutationDeliveryMayBeUncertain": true
+  }
+}

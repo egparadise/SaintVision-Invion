@@ -1,0 +1,18 @@
+{
+  "source": "abb7074e3da0d547ac81d3da33dce347d5c656af",
+  "project": "prj_01M6NDBHVD2DZQ1Q38DCKN1XE3",
+  "workspace": "wsp_01M6NE3HM7T42B2M1FPK2V6GH0",
+  "requester": "oidc:3f79091432574632c62c37f25aaddb37f91e37a5864422525048eb82fe54247c",
+  "cpuMillis": 500,
+  "memoryBytes": 67108864,
+  "timeoutSeconds": 10,
+  "image": "sha256:ffee58e8dbefc6c0db68810cd1597f8cc589cf01112c434ed7fda8d4af415634",
+  "executable": "/usr/local/bin/python3",
+  "path": "src/app.py",
+  "content": "import json\nprint(json.dumps({\"job\":\"saintvision-cpu-pilot-20261108\",\"sum\":sum(range(100000))},sort_keys=True),flush=True)\n",
+  "contentSHA256": "ce23e6fd3cb8db61137155ef2746b5bf9a7e33ce18b8d8a6a24cbe345837c64d",
+  "stepId": "root-cpu-pilot-20261108-r1",
+  "objective": "LAN pilot PC3 CPU verification (500m / 64 MiB)",
+  "enqueueOrVotesAuthorizedByThisProgram": false,
+  "wholeProgramComplete": false
+}

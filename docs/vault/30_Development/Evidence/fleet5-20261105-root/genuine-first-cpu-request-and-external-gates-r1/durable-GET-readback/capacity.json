@@ -1,0 +1,58 @@
+{
+  "HTTP": 200,
+  "body": {
+    "projectId": "prj_01M6NDBHVD2DZQ1Q38DCKN1XE3",
+    "totalOffered": {
+      "cpuMillis": 1500,
+      "memoryBytes": 201326592
+    },
+    "largestSingleNode": {
+      "cpuMillis": 500,
+      "memoryBytes": 67108864
+    },
+    "spareNow": {
+      "cpuMillis": 1500,
+      "memoryBytes": 201326592
+    },
+    "nodes": [
+      {
+        "nodeId": "nod_01M6TAWG25JTA3F7J7S1EE4N2W",
+        "offered": {
+          "cpuMillis": 500,
+          "memoryBytes": 67108864
+        },
+        "spare": {
+          "cpuMillis": 500,
+          "memoryBytes": 67108864
+        },
+        "measured": true
+      },
+      {
+        "nodeId": "nod_01M6TGQZ8S3DAFS7TYE8TY1PX2",
+        "offered": {
+          "cpuMillis": 500,
+          "memoryBytes": 67108864
+        },
+        "spare": {
+          "cpuMillis": 500,
+          "memoryBytes": 67108864
+        },
+        "measured": true
+      },
+      {
+        "nodeId": "nod_01M6TGSXV1J7XWC5D5H7N6EW1D",
+        "offered": {
+          "cpuMillis": 500,
+          "memoryBytes": 67108864
+        },
+        "spare": {
+          "cpuMillis": 500,
+          "memoryBytes": 67108864
+        },
+        "measured": true
+      }
+    ],
+    "unmeasuredNodes": [],
+    "note": "CPU/memory only; per-dimension maxima are not a joint fit or shared RAM. Snapshot estimates do not reserve capacity."
+  }
+}

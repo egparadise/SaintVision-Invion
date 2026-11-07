@@ -1,0 +1,66 @@
+{
+  "HTTP": 200,
+  "body": {
+    "startId": "4383d0d7-518f-4ea7-a8b4-47c65bdc0069",
+    "workload": {
+      "kind": "Workload",
+      "command": [
+        "/usr/local/bin/python3",
+        "-B",
+        "src/app.py"
+      ],
+      "tenantId": "97968b42-68aa-40ce-af5e-3a33e2fc2205",
+      "projectId": "prj_01M6NDBHVD2DZQ1Q38DCKN1XE3",
+      "resources": {
+        "gpuCount": 0,
+        "cpuMillis": 500,
+        "memoryBytes": 67108864,
+        "minVramBytes": 0
+      },
+      "apiVersion": "inv.saintvision.ai/v1alpha1",
+      "workloadId": "wld_01M6VXKDKQHZR1BYEVTE6H4S9E",
+      "imageDigest": "sha256:ffee58e8dbefc6c0db68810cd1597f8cc589cf01112c434ed7fda8d4af415634",
+      "workspaceId": "wsp_01M6NE3HM7T42B2M1FPK2V6GH0",
+      "targetNodeId": "nod_01M6TAWG25JTA3F7J7S1EE4N2W",
+      "timeoutSeconds": 10,
+      "workspaceStart": {
+        "nodeId": "nod_01M6TAWG25JTA3F7J7S1EE4N2W",
+        "stepId": "root-cpu-pilot-20261108-r1",
+        "startId": "4383d0d7-518f-4ea7-a8b4-47c65bdc0069",
+        "inputSha256": "eb8ae25efcd061f1b21672fb180f4b7760a0a481e4f8b3c04f73f9072b4aa238",
+        "cpuResourceId": "res_01M6TAWG25QSR4HH7XWWJSB0W0",
+        "policyVersion": "operator-cpu-pilot-1efea-r1",
+        "inputSizeBytes": 425,
+        "profileVersion": "cpu-pilot-1efea-r1",
+        "memoryResourceId": "res_01M6TAWG25ZHS2RG3NHQX4SPEH"
+      }
+    },
+    "run": {
+      "runId": "run_01M6VXSMM9SV8MAB7K4B1YCRX8",
+      "tenantId": "97968b42-68aa-40ce-af5e-3a33e2fc2205",
+      "projectId": "prj_01M6NDBHVD2DZQ1Q38DCKN1XE3",
+      "state": "awaiting_approval",
+      "version": 4,
+      "attempt": 0
+    },
+    "approval": {
+      "approvalId": "apr_01M6VXSPZ0252M2SJ8ZA5E11QE",
+      "runId": "run_01M6VXSMM9SV8MAB7K4B1YCRX8",
+      "projectId": "prj_01M6NDBHVD2DZQ1Q38DCKN1XE3",
+      "requesterId": "oidc:3f79091432574632c62c37f25aaddb37f91e37a5864422525048eb82fe54247c",
+      "actionDigest": "07b42c66295c61302ae63b0c50c9a7bd81cd165448129158d69755285b7f5b33",
+      "policyVersion": "operator-cpu-pilot-1efea-r1",
+      "requiredApprovals": 2,
+      "status": "pending",
+      "expiresAt": "2026-11-07T21:24:26.939156+00:00",
+      "runVersion": 4
+    },
+    "frozenFiles": [
+      {
+        "path": "src/app.py",
+        "sizeBytes": 123,
+        "sha256": "ce23e6fd3cb8db61137155ef2746b5bf9a7e33ce18b8d8a6a24cbe345837c64d"
+      }
+    ]
+  }
+}

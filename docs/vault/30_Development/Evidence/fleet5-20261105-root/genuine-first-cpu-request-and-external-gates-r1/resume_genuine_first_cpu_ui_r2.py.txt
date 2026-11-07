@@ -1,0 +1,37 @@
+"""Reconcile the successful intent once; continue only with its existing immutable identity."""
+import hashlib,json
+from pathlib import Path
+r=Path(__file__).resolve().parents[1];w=r/'.work'
+j=json.loads((w/'genuine-first-cpu-ui-r1/mutation-journal.json').read_bytes());assert len(j['requests'])==1 and j['requests'][0]['headers']['idempotency-key']=='b517db64cab8c1d763be176a8ec643b2'
+responses=[x for x in j['responses'] if x['requestId']==j['requests'][0]['requestId']];assert len(responses)==1 and responses[0]['HTTP']==201
+existing=responses[0]['body'];assert existing['workload']['workloadId']=='wld_01M6VXKDKQHZR1BYEVTE6H4S9E' and existing['workloadSha256']=='060612215774bd7caf472f6f6d2156f8e7783f04c79d8fa32230b71a42c4af6a'
+assert not any('/runs' in x['path'] for x in j['requests'])
+rec={'status':'ONE_EXISTING_INTENT_201_CONFIRMED_NO_RUN_OR_PREPARE_SENT','workloadId':existing['workload']['workloadId'],'workloadSha256':existing['workloadSha256'],'originalIdempotencyKey':j['requests'][0]['headers']['idempotency-key'],'originalRequestBodySHA256':hashlib.sha256(j['requests'][0]['body'].encode()).hexdigest(),'RootDriverFailureCause':'The response collector also counted the GET first-intents200 at the same path; POST201 and selected intent were real. No product failure and no duplicate registration authorized.','next':'Select the existing intent and send only one draft creation and one prepare; preserve exact new idempotent keys and request bytes.'}
+(w/'genuine-first-cpu-registration-reconciliation-r2.json').write_text(json.dumps(rec,indent=2)+'\n',encoding='utf-8')
+p=(w/'prepare_genuine_first_cpu_ui_r1.py').read_text(encoding='utf-8')
+for a,b in [('genuine-first-cpu-ui-r1','genuine-first-cpu-ui-r2-resume'),('chrome-profile-first-cpu-r1','chrome-profile-first-cpu-r2-resume'),('chrome-first-cpu-r1','chrome-first-cpu-r2-resume'),('public-first-cpu-r1-receipt','public-first-cpu-r2-resume-receipt'),('first-cpu-request-r1-journal','first-cpu-request-r2-resume-journal'),('genuine-first-cpu-approval-r1','genuine-first-cpu-approval-r2-resume')]:assert a in p,a;p=p.replace(a,b)
+anchor="(out/'planned-request.json').write_text"
+assert anchor in p;p=p.replace(anchor,"plan['existingIntent']="+repr(existing)+'\n'+anchor)
+a="and is_mutation_path(u.path):mutationResponses.append"
+b="and is_mutation_path(u.path) and any(item['requestId']==m['params']['requestId'] for item in mutationRequests):mutationResponses.append"
+assert a in p;p=p.replace(a,b)
+a=' assert evaluate("document.querySelector(\'[aria-label=\\\"현재 CPU intent\\\"]\').options.length") == 1, \'Existing intents present: reconcile instead of creating another\''
+assert a in p;p=p.replace(a,' # The confirmed existing intent is selected below; no registration action is repeated.')
+start=p.index(" fill('작업 목적',p['objective'])");end=p.index(" phase='one-real-owner-draft-Run-create'",start)
+replacement=r'''
+ phase='select-confirmed-existing-CPU-intent-no-new-registration';persist()
+ choose('현재 CPU intent',p['existingIntent']['workload']['workloadId'])
+ until("!!document.querySelector('[data-testid=first-intent]')")
+ intent=evaluate("JSON.parse(document.querySelector('[data-testid=first-intent]').innerText)")
+ assert intent['intentEtag']==p['existingIntent']['intentEtag'] and intent['workloadSha256']==p['existingIntent']['workloadSha256'] and intent['workload']==p['existingIntent']['workload']
+ fill('입력 파일 경로',p['path']);fill('CPU 입력 내용',p['content'],True);fill('Step ID',p['stepId'])
+ o['actualNewIntent']=intent;o['priorIntentRegistrationConfirmed']=True
+ o['logicalRequestStorage']=evaluate("Object.fromEntries(Object.entries(sessionStorage).filter(([key])=>key.startsWith('saintvision.first-workspace.request:')))")
+ persist()
+'''
+p=p[:start]+replacement+p[end:]
+for a,b in [('len(mutationRequests)==2','len(mutationRequests)==1'),('len(mutationResponses)==2','len(mutationResponses)==1'),('mutationResponses[1]','mutationResponses[0]'),('len(mutationRequests)==3','len(mutationRequests)==2'),('len(mutationResponses)==3','len(mutationResponses)==2'),('mutationResponses[2]','mutationResponses[1]'),('mutationsSent=3','mutationsSent=2'),("o['mutationsSent']==3","o['mutationsSent']==2")]:assert a in p,a;p=p.replace(a,b)
+anchor=" assert not any('/enqueue' in x['path'] or '/decisions' in x['path'] for x in mutationRequests)"
+assert anchor in p;p=p.replace(anchor,anchor+"\n assert all(not x['path'].endswith('/first-intents') for x in mutationRequests)")
+(w/'resume_genuine_first_cpu_ui_expanded_r2.py.txt').write_text(p,encoding='utf-8')
+exec(compile(p,str(w/'resume_genuine_first_cpu_ui_expanded_r2.py.txt'),'exec'),{'__file__':str(__file__),'__name__':'__main__'})

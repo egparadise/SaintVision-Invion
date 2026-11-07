@@ -1,0 +1,134 @@
+import base64,datetime,hashlib,json,os,re,subprocess,sys,time,urllib.request,urllib.parse
+from pathlib import Path
+from websockets.sync.client import connect
+p=json.load(sys.stdin);root=Path('/home/saintvision-invion3/saintvision-share/ops-fresh-cpu-1efea-r1-20261107/browser-real-ui-r1');o={'mainBrowserExecuted':False,'insecureTLSFlagsUsed':False,'ChromeSandboxDisabled':False,'authCredentialsPersistedByDriver':False,'actualRunOrVotesCreated':False,'workspaceReadinessChanged':False,'wholeProgramComplete':False};phase='owned-incognito-browser-launch';proc=None;ws=None;counter=0;responses=[];load_failures=[];mutationRequests=[];mutationResponses=[]
+def is_mutation_path(path):
+ prefix='/v1/projects/'+p['project']
+ return path==prefix+'/workspaces/'+p['workspace']+'/first-intents' or bool(re.fullmatch(re.escape(prefix+'/workspaces/'+p['workspace']+'/first-intents/')+r'wld_[0-9A-HJKMNP-TV-Z]{26}/runs',path)) or bool(re.fullmatch(re.escape(prefix+'/runs/')+r'run_[0-9A-HJKMNP-TV-Z]{26}/start/prepare',path))
+def persist():
+ payload={'phase':phase,'planned':{k:v for k,v in p.items() if k not in ['email','password']},'requests':mutationRequests,'responses':mutationResponses,'observation':o}
+ (root/'first-cpu-request-r1-journal.json').write_text(json.dumps(payload,ensure_ascii=False,indent=2)+'\n')
+def command(method,params=None):
+ global counter
+ counter+=1;ident=counter;ws.send(json.dumps({'id':ident,'method':method,'params':params or {}}));end=time.monotonic()+15
+ while time.monotonic()<end:
+  m=json.loads(ws.recv(timeout=15))
+  if m.get('method')=='Network.responseReceived':
+   v=m['params']['response'];u=urllib.parse.urlsplit(v['url'])
+   if u.hostname in ['127.0.0.1','localhost']:responses.append({'origin':u.scheme+'://'+u.netloc,'path':u.path,'status':v['status']})
+   if u.scheme=='http' and u.netloc=='127.0.0.1:3100' and is_mutation_path(u.path):mutationResponses.append({'requestId':m['params']['requestId'],'path':u.path,'HTTP':v['status']});persist()
+  if m.get('method')=='Network.requestWillBeSent':
+   v=m['params']['request'];u=urllib.parse.urlsplit(v['url'])
+   if u.scheme=='http' and u.netloc=='127.0.0.1:3100' and v['method']=='POST':
+    if not is_mutation_path(u.path):raise RuntimeError('Unexpected application mutation; no replay allowed')
+    safe={k:v for k,v in v.get('headers',{}).items() if k.lower() in ['idempotency-key','if-match']}
+    mutationRequests.append({'requestId':m['params']['requestId'],'path':u.path,'method':'POST','headers':safe,'body':v.get('postData')});persist()
+  if m.get('method')=='Network.loadingFailed':load_failures.append({'type':m['params'].get('type'),'error':m['params'].get('errorText')})
+  if m.get('id')==ident:
+   if 'error' in m:raise RuntimeError('CDP command rejected')
+   return m.get('result',{})
+ raise TimeoutError('CDP bounded request')
+def evaluate(expression):
+ v=command('Runtime.evaluate',{'expression':expression,'returnByValue':True,'awaitPromise':True})
+ if 'exceptionDetails' in v:raise RuntimeError('Browser expression failed')
+ return v['result'].get('value')
+def until(expression,timeout=20):
+ end=time.monotonic()+timeout
+ while time.monotonic()<end:
+  v=evaluate(expression)
+  if v:return v
+  time.sleep(.25)
+ raise TimeoutError('Browser phase timed out')
+try:
+ assert os.getuid()==1000;trust=json.loads((root/'public-trust-r2-receipt.json').read_bytes());assert trust['NSSProfileOnlySetupExit']==0
+ profile=root/'chrome-profile-first-cpu-r1';assert not profile.exists();env=dict(os.environ);env.update(HOME=str(root/'home'),XDG_CONFIG_HOME=str(root/'home/.config'),XDG_CACHE_HOME=str(root/'home/.cache'));env.pop('DISPLAY',None)
+ args=['/usr/bin/google-chrome','--headless=new','--incognito','--user-data-dir='+str(profile),'--remote-debugging-address=127.0.0.1','--remote-debugging-port=0','--no-first-run','--no-default-browser-check','--disable-background-networking','--disable-component-update','--disable-sync','--disable-extensions','--disable-save-password-bubble','--password-store=basic','--window-size=1638,1000','about:blank']
+ stdout=(root/'chrome-first-cpu-r1.stdout.log').open('xb');stderr=(root/'chrome-first-cpu-r1.stderr.log').open('xb');proc=subprocess.Popen(args,env=env,stdout=stdout,stderr=stderr);o['ownedChromePID']=proc.pid
+ for attempt in range(60):
+  if (profile/'DevToolsActivePort').is_file():break
+  assert proc.poll() is None;time.sleep(.2)
+ lines=(profile/'DevToolsActivePort').read_text().splitlines();port=int(lines[0]);op=urllib.request.build_opener(urllib.request.ProxyHandler({}))
+ with op.open(f'http://127.0.0.1:{port}/json/list',timeout=3) as q:targets=json.load(q)
+ target=next(t for t in targets if t['type']=='page');ws=connect(target['webSocketDebuggerUrl'],open_timeout=5,max_size=8*1024*1024,proxy=None);command('Page.enable');command('Runtime.enable');command('Network.enable')
+ o['browserVersion']=command('Browser.getVersion')['product']
+ phase='actual-portal-login-page';command('Page.navigate',{'url':'http://127.0.0.1:3100/studio'});until("Array.from(document.querySelectorAll('button')).some(b=>b.innerText.includes('조직 계정으로 로그인'))")
+ evaluate("Array.from(document.querySelectorAll('button')).find(b=>b.innerText.includes('조직 계정으로 로그인')).click();true")
+ phase='real-HTTPS-IdP-with-profile-public-trust';until("location.origin==='https://127.0.0.1:8443' && !!document.querySelector('#username') && !!document.querySelector('#password')")
+ o['realIdPLoginFormReachedWithoutTLSBypass']=True
+ phase='actual-browser-credential-form-submit'
+ values={'username':p['email'],'password':p.pop('password')}
+ expression="(()=>{const values="+json.dumps(values)+";for(const [id,value] of Object.entries(values)){const el=document.getElementById(id);el.value=value;el.dispatchEvent(new Event('input',{bubbles:true}));}document.querySelector('#kc-form-login').requestSubmit();return true;})()";evaluate(expression);del values,expression
+ phase='actual-PKCE-callback-and-project-load';until("location.origin==='http://127.0.0.1:3100' && !!document.querySelector('[data-testid=project-selector]')",30)
+ project=json.dumps(p['project']);until("Array.from(document.querySelector('[data-testid=project-selector]').options).some(o=>o.value==="+project+")")
+ evaluate("(()=>{const e=document.querySelector('[data-testid=project-selector]');e.value="+project+";e.dispatchEvent(new Event('change',{bubbles:true}));return true;})()")
+ until("document.querySelectorAll('[data-testid^=node-status-badge-]').length===3 && document.querySelector('[data-testid=cluster-status-dot]').parentElement.innerText.includes('3/3')",25)
+
+ o.update(realAdministratorLogin=True,PKCECallbackCompleted=True)
+ phase='actual-CPU-intent-UI-prerequisites';persist()
+ evaluate("document.querySelector('[data-testid=header-tab-studio]').click();true")
+ until("!!document.querySelector('[data-testid=studio-stepper-step-3]')")
+ evaluate("document.querySelector('[data-testid=studio-stepper-step-3]').click();true")
+ until("!!document.querySelector('[data-testid=first-workspace-panel]') && !!document.querySelector('[aria-label=\"Ready Workspace\"]')")
+ workspace=json.dumps(p['workspace'])
+ until("Array.from(document.querySelector('[aria-label=\"Ready Workspace\"]').options).some(o=>o.value==="+workspace+")")
+ evaluate("(()=>{const e=document.querySelector('[aria-label=\"Ready Workspace\"]');e.value="+workspace+";e.dispatchEvent(new Event('change',{bubbles:true}));return true;})()")
+ until("!!document.querySelector('[aria-label=\"현재 CPU intent\"]') && !!document.querySelector('[aria-label=\"허용 이미지\"]')")
+ assert evaluate("document.querySelector('[aria-label=\"현재 CPU intent\"]').options.length") == 1, 'Existing intents present: reconcile instead of creating another'
+ def choose(label,value):
+  evaluate("(()=>{const e=document.querySelector('[aria-label='+JSON.stringify("+json.dumps(label)+")+']');if(!Array.from(e.options).some(o=>o.value==="+json.dumps(value)+"))throw new Error('Expected allowed option missing');e.value="+json.dumps(value)+";e.dispatchEvent(new Event('change',{bubbles:true}));return true;})()")
+ def fill(label,value,textarea=False):
+  evaluate("(()=>{const e=document.querySelector('[aria-label='+JSON.stringify("+json.dumps(label)+")+']');const proto="+('HTMLTextAreaElement' if textarea else 'HTMLInputElement')+".prototype;Object.getOwnPropertyDescriptor(proto,'value').set.call(e,"+json.dumps(str(value))+");e.dispatchEvent(new Event('input',{bubbles:true}));e.dispatchEvent(new Event('change',{bubbles:true}));return true;})()")
+ def click(text):
+  evaluate("(()=>{const e=Array.from(document.querySelector('[data-testid=first-workspace-panel]').querySelectorAll('button')).find(b=>b.textContent.trim()==="+json.dumps(text)+");if(!e||e.disabled)throw new Error('Reviewed action not enabled');e.click();return true;})()")
+ def bodies():
+  for item in mutationResponses:
+   if 'body' not in item:
+    raw=command('Network.getResponseBody',{'requestId':item['requestId']});text=base64.b64decode(raw['body']).decode() if raw.get('base64Encoded') else raw['body'];assert len(text)<262144;item['body']=json.loads(text)
+  for item in mutationRequests:
+   if item['body'] is None:item['body']=command('Network.getRequestPostData',{'requestId':item['requestId']})['postData']
+   assert any(k.lower()=='idempotency-key' and re.fullmatch('[a-f0-9]{32}',v) for k,v in item['headers'].items())
+  persist()
+ fill('작업 목적',p['objective']);choose('허용 이미지',p['image']);choose('허용 실행 파일',p['executable'])
+ fill('인자 JSON 배열',json.dumps(['-B',p['path']]));fill('CPU millicores',p['cpuMillis']);fill('메모리 bytes',p['memoryBytes']);fill('제한 seconds',p['timeoutSeconds'])
+ fill('입력 파일 경로',p['path']);fill('CPU 입력 내용',p['content'],True);fill('Step ID',p['stepId'])
+ phase='one-real-owner-CPU-intent-registration';persist();click('CPU intent 등록 / 같은 요청 재확인')
+ until("!!document.querySelector('[data-testid=first-intent]')",30);bodies()
+ assert len(mutationRequests)==1 and len(mutationResponses)==1 and mutationResponses[0]['HTTP']==201
+ intent=evaluate("JSON.parse(document.querySelector('[data-testid=first-intent]').innerText)")
+ assert intent['workload']['workspaceId']==p['workspace'] and intent['workload']['projectId']==p['project'] and intent['workload']['imageDigest']==p['image'] and intent['workload']['command']==[p['executable'],'-B',p['path']]
+ assert intent['workload']['resources']['cpuMillis']==500 and intent['workload']['resources']['memoryBytes']==67108864
+ o['actualNewIntent']=intent
+ o['logicalRequestStorage']=evaluate("Object.fromEntries(Object.entries(sessionStorage).filter(([key])=>key.startsWith('saintvision.first-workspace.request:')))")
+ phase='one-real-owner-draft-Run-create';persist();click('Draft Run 생성 / 같은 요청 재확인')
+ until("document.querySelector('[data-testid=first-run-state]')?.innerText.includes('draft')",30);bodies()
+ assert len(mutationRequests)==2 and len(mutationResponses)==2 and mutationResponses[1]['HTTP']==201
+ o['actualDraftRun']=mutationResponses[1]['body']['run'];assert o['actualDraftRun']['state']=='draft' and o['actualDraftRun']['attempt']==0
+ o['actualRunOrVotesCreated']=True;o['votesCreated']=0
+ phase='one-reviewed-input-freeze-and-two-person-approval-request';persist();click('입력 동결·승인 준비 / 같은 요청 재확인')
+ until("!!document.querySelector('[data-testid=first-frozen-action]') && document.querySelector('[data-testid=first-run-state]')?.innerText.includes('awaiting_approval')",30);bodies()
+ assert len(mutationRequests)==3 and len(mutationResponses)==3 and mutationResponses[2]['HTTP']==201
+ prepared=mutationResponses[2]['body'];assert prepared['run']['state']=='awaiting_approval' and prepared['run']['attempt']==0 and prepared['approval']['requiredApprovals']==2 and prepared['approval']['status']=='pending' and prepared['approval']['requesterId']==p['requester'] and prepared['approval']['runVersion']==prepared['run']['version']
+ assert prepared['workload']['workspaceStart']['nodeId']=='nod_01M6TAWG25JTA3F7J7S1EE4N2W' and prepared['workload']['workspaceStart']['stepId']==p['stepId']
+ assert evaluate("Array.from(document.querySelector('[data-testid=first-frozen-action]').querySelectorAll('button')).find(b=>b.textContent.includes('원래 요청자 enqueue')).disabled") is True
+ assert not any('/enqueue' in x['path'] or '/decisions' in x['path'] for x in mutationRequests)
+ screenshot=command('Page.captureScreenshot',{'format':'png','captureBeyondViewport':False});screen=base64.b64decode(screenshot['data'],validate=True);(root/'genuine-first-cpu-approval-r1.png').write_bytes(screen)
+ o.update(status='GENUINE_OWNER_CPU_INTENT_DRAFT_AND_FROZEN_TWO_PERSON_APPROVAL_PREPARED',atKST=datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=9))).isoformat(timespec='seconds'),acceptedSource=p['source'],actualPrepared=prepared,mutationsSent=3,mutationResponsesHTTP=[x['HTTP'] for x in mutationResponses],actualEnqueueSent=False,actualWorkloadExecution=False,actualVotesCreated=0,originalRequesterEnqueueDisabled=True,screenshotSHA256=hashlib.sha256(screen).hexdigest(),screenshotBytes=len(screen),screenshotPath=str(root/'genuine-first-cpu-approval-r1.png'),actualUIObservation=evaluate("document.querySelector('[data-testid=first-workspace-panel]').innerText"))
+ persist()
+except BaseException as e:
+ o.update(status='HOLD_GENUINE_CPU_REQUEST_RECONCILE_REQUIRED',phase=phase,errorClass=type(e).__name__,noBlindAuthenticationRetry=True,applicationMutationDeliveryMayBeUncertain=bool(mutationRequests));persist()
+ if ws:
+  try:o['currentPageDiagnostic']=evaluate("({origin:location.origin,path:location.pathname,bodyText:document.body.innerText.slice(0,1800)})")
+  except Exception:pass
+finally:
+ if ws:
+  try:command('Browser.close')
+  except Exception:pass
+  try:ws.close()
+  except Exception:pass
+ if proc:
+  try:proc.wait(timeout=8)
+  except subprocess.TimeoutExpired:proc.terminate();proc.wait(timeout=5)
+  o['ownedBrowserExited']=proc.poll() is not None
+  stdout.close();stderr.close()
+ (root/'public-first-cpu-r1-receipt.json').write_text(json.dumps(o,ensure_ascii=False,indent=2)+'\n')
+print(json.dumps(o,ensure_ascii=False));raise SystemExit(0 if o.get('status')=='GENUINE_OWNER_CPU_INTENT_DRAFT_AND_FROZEN_TWO_PERSON_APPROVAL_PREPARED' else 2)
