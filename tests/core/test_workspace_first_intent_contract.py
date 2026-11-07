@@ -3,7 +3,7 @@ from copy import deepcopy
 import json
 from pathlib import Path
 import pytest
-from inv.contracts import validate_contract
+from inv.contracts import catalog, validate_contract
 from inv.errors import DomainError
 from inv.workspace_intents import header_versions
 
@@ -42,8 +42,19 @@ def test_closed_intent_input_cannot_assert_actor_or_tiny_memory(intent):
         with pytest.raises(DomainError):validate_contract("WorkspaceFirstIntentCreateInput",{**data,field:"forged"})
     tiny=deepcopy(data);tiny["resources"]["memoryBytes"]=8388607
     with pytest.raises(DomainError):validate_contract("WorkspaceFirstIntentCreateInput",tiny)
+    nul=deepcopy(data);nul["command"]=["/usr/local/bin/python3", "bad\x00argument"]
+    with pytest.raises(DomainError):validate_contract("WorkspaceFirstIntentCreateInput",nul)
     # The old generic resource contract is not tightened by this pilot-specific DTO.
     validate_contract("ResourceRequest",tiny["resources"])
+
+
+def test_original_generic_resource_root_has_one_matching_alternative():
+    from jsonschema import Draft202012Validator
+    root=Draft202012Validator(catalog())
+    # A nested pilot-resource DTO must not be appended as an overlapping root
+    # oneOf alternative that makes existing canonical ResourceRequest invalid.
+    for memory in (1,8388608,67108864):
+        assert root.is_valid(dict(cpuMillis=1,memoryBytes=memory,gpuCount=0,minVramBytes=0))
 
 
 @pytest.mark.parametrize("value",[None,'"workspace-v01"','W/"workspace-v1"','"workspace-v1", "workspace-v2"','"workspace-v9007199254740992"'])

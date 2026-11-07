@@ -4,8 +4,10 @@ import { createRoot, type Root } from 'react-dom/client';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { webcrypto } from 'node:crypto';
 import { FirstWorkspacePanel } from '../src/features/studio/FirstWorkspacePanel';
+import { DeveloperStudio } from '../src/features/studio/DeveloperStudio';
 import * as client from '../src/shared/api/client';
 import golden from './fixtures/first-workspace-golden.json';
+import { runResultViewFixture } from './fixtures/run-result';
 let root: Root; let host: HTMLDivElement;
 const ready = { workspaceId: golden.workload.workspaceId, projectId: golden.scope.projectId, name: 'Isolated CPU Workspace',
   status: 'ready', nodeId: golden.workload.targetNodeId, toolName: null, createdAt: '2026-11-07T00:00:00Z', allowedNext: ['suspended'] };
@@ -25,6 +27,15 @@ beforeEach(() => {
 });
 afterEach(() => { act(() => root.unmount()); host.remove(); client.clearAuthToken(); vi.restoreAllMocks(); vi.unstubAllGlobals(); });
 describe('first Workspace visible prerequisite and scope guards', () => {
+  it('is reachable from the real Studio stepper with no simulated placement or Run creation', async () => {
+    const api = vi.spyOn(client, 'apiClient').mockResolvedValue({ projectId: golden.scope.projectId, count: 0, workspaces: [] });
+    await act(async () => root.render(<DeveloperStudio project={{ id: golden.scope.projectId, name: 'Isolated project' }} nodes={[]} runs={[]}
+      currentUser={{ id: golden.scope.subjectId, tenantId: golden.scope.tenantId, name: 'Isolated requester', role: 'owner' }} />));
+    await act(async () => (host.querySelector('[data-testid="studio-stepper-step-3"]') as HTMLButtonElement).click());
+    expect(host.querySelector('[data-testid="first-workspace-panel"]')).not.toBeNull();
+    expect(host.querySelector('[data-testid="first-intent-prerequisite"]')).not.toBeNull();
+    expect(api.mock.calls.some(([, options]) => options?.method === 'POST')).toBe(false);
+  });
   it('shows no ready Workspace honestly and cannot create/prepare/enqueue', async () => {
     const api = vi.spyOn(client, 'apiClient').mockResolvedValue({ projectId: golden.scope.projectId, count: 0, workspaces: [] });
     await act(async () => root.render(<FirstWorkspacePanel scope={golden.scope} approvals={[]} />));
@@ -52,6 +63,7 @@ describe('first Workspace visible prerequisite and scope guards', () => {
       if (endpoint.includes('/first-intents?')) return golden.intentPage;
       if (endpoint.endsWith('/first-intents/'+golden.workload.workloadId+'/runs')) return golden.businessCreated;
       if (endpoint.endsWith('/start/prepare')) return golden.prepared;
+      if (endpoint.endsWith('/result')) return { ...runResultViewFixture, runId: golden.run.runId, projectId: golden.scope.projectId, version: 1 };
       if (endpoint.endsWith('/runs/'+golden.run.runId)) return { ...golden.run, resourceReleasePending: false };
       if (endpoint.includes('/starts/')) return golden.view;
       throw new Error('Unexpected isolated route '+endpoint);
@@ -84,6 +96,10 @@ describe('first Workspace visible prerequisite and scope guards', () => {
     expect(buttons().find(b => b.textContent?.startsWith('원래 요청자 enqueue'))?.disabled).toBe(true);
     expect(api.mock.calls.some(([url]) => url.endsWith('/start/enqueue'))).toBe(false);
     expect(observed).toHaveBeenCalledWith(golden.prepared.run);
+    await act(async () => buttons().find(b => b.textContent?.startsWith('현재 승인·Run·결과 조회'))!.click());
+    await untilVisible(() => Boolean(host.querySelector('[role="alert"]')?.textContent?.includes('현재 Run보다 오래되었거나')));
+    expect(host.querySelector('[data-testid="first-run-result"]')).toBeNull();
+    expect(host.querySelector('[data-testid="first-enqueue-accepted"]')).toBeNull();
   });
   it('sends no requests without a current credential', async () => {
     client.clearAuthToken(); const api = vi.spyOn(client, 'apiClient');

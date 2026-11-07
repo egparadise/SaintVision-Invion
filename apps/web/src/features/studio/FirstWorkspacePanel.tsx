@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { ApprovalItem } from '@/contracts/types';
 import type { ControlRunView, RunResultView, WorkspaceStartView } from '../../../../../packages/contracts-ts/src';
-import { apiClient, getAuthToken, onAuthTeardown } from '@/shared/api/client';
+import { ApiError, apiClient, getAuthToken, onAuthTeardown } from '@/shared/api/client';
 import { fetchProjectWorkspaces, type ProjectWorkspace } from '@/shared/api/projectObservation';
 import { approveReviewed } from '@/shared/api/approvalReview';
 import { decideApproval } from '@/shared/api/kernelMutations';
@@ -58,6 +58,7 @@ function ScopedFirstWorkspacePanel({ scope, onRunObserved, onNavigateApprovals }
   const [refresh, setRefresh] = useState(0);
   const live = useRef(0);
   const selection = useRef(0);
+  const resultGeneration = useRef(0);
   const callbacks = useRef(onRunObserved); callbacks.current = onRunObserved;
   const token = getAuthToken();
   const ready = workspaces.filter(w => w.status === 'ready');
@@ -77,7 +78,10 @@ function ScopedFirstWorkspacePanel({ scope, onRunObserved, onNavigateApprovals }
     setPage(null); setIntent(null); intentCreation.current = null;
     if (!credential || !workspaceId || !ready.some(w => w.workspaceId === workspaceId)) return;
     fetchReadyIntents(scope, workspaceId).then(loaded => {
-      if (selection.current === chosen && stillCurrent(generation, credential)) { setPage(loaded); setError(null); }
+      if (selection.current === chosen && stillCurrent(generation, credential)) {
+        setPage(loaded); setCpuMillis(loaded.profile.maxCpuMillis); setMemoryBytes(loaded.profile.maxMemoryBytes);
+        setTimeoutSeconds(loaded.profile.maxTimeoutSeconds); setError(null);
+      }
     }).catch(err => { if (selection.current === chosen && stillCurrent(generation, credential)) setError(err.message); });
   }, [key, workspaceId, workspaces, token]);
 
@@ -88,8 +92,10 @@ function ScopedFirstWorkspacePanel({ scope, onRunObserved, onNavigateApprovals }
     try { request.assertCurrent(); await operation(); }
     catch (err) {
       if (live.current === generation && getAuthToken() === credential) {
-        // A transport/shape/5xx failure cannot tell whether the server committed.
-        setUncertain(true); setResult(null); setError(err instanceof Error ? err.message : '서버 요청이 거부되었습니다.');
+        // Structured final denial is distinct from unknown transport/shape/5xx delivery.
+        const denied = err instanceof ApiError && err.problem.status >= 400 && err.problem.status < 500 && !err.problem.retryable;
+        setUncertain(!denied); setResult(null);
+        setError(err instanceof ApiError ? `[${err.problem.code}] ${err.problem.detail}` : err instanceof Error ? err.message : '서버 요청을 확인하지 못했습니다.');
       }
     } finally { if (live.current === generation && getAuthToken() === credential) setBusy(false); }
   }
@@ -97,13 +103,16 @@ function ScopedFirstWorkspacePanel({ scope, onRunObserved, onNavigateApprovals }
     return live.current === generation && getAuthToken() === credential && credential !== null;
   }
   async function observe() {
+    const observationId = ++resultGeneration.current;
     const generation = live.current; const credential = getAuthToken();
     const observation = await request.observe();
-    if (!stillCurrent(generation, credential)) return;
+    if (!stillCurrent(generation, credential) || observationId !== resultGeneration.current) return;
     setFrozen(observation); setRun(observation.run); callbacks.current?.(observation.run);
     const resultView = await apiClient<RunResultView>(`/v1/projects/${encodeURIComponent(scope.projectId)}/runs/${observation.run.runId}/result`);
-    if (!stillCurrent(generation, credential)) return;
-    if (resultView?.runId !== observation.run.runId) throw new Error('다른 Run의 결과 응답입니다.');
+    if (!stillCurrent(generation, credential) || observationId !== resultGeneration.current) return;
+    if (resultView?.runId !== observation.run.runId || resultView.projectId !== scope.projectId ||
+        resultView.source !== 'execution-kernel' || !Number.isSafeInteger(resultView.version) ||
+        resultView.version < observation.run.version) throw new Error('현재 Run보다 오래되었거나 다른 범위의 결과 응답입니다.');
     setResult(resultView);
   }
   useEffect(() => {
@@ -214,6 +223,6 @@ function ScopedFirstWorkspacePanel({ scope, onRunObserved, onNavigateApprovals }
     </div>}
     {commandId && <p data-testid="first-enqueue-accepted">서버 enqueue 접수 command {commandId}. 실제 실행·완료 증거는 아직 별도 확인이 필요합니다.</p>}
     {result && <div data-testid="first-run-result"><p>서버 결과 관측</p><pre style={{ whiteSpace: 'pre-wrap', overflowWrap: 'anywhere' }}>{JSON.stringify(result, null, 2)}</pre></div>}
-    {error && <p role="alert">{error} 요청 결과가 미확정일 수 있습니다. 같은 요청 재확인은 원래 키와 바이트를 사용합니다. 새 Run으로 대체하지 마세요.</p>}
+    {error && <p role="alert">{error} {uncertain ? '전달 결과가 미확정일 수 있습니다. 같은 요청 재확인은 원래 키와 바이트를 사용합니다. 새 Run으로 대체하지 마세요.' : '현재 요청은 서버에서 거부되었습니다. 실제 전제조건을 확인한 뒤 같은 요청을 재확인하세요.'}</p>}
   </section>;
 }

@@ -1,0 +1,32 @@
+{
+  "tools/definer-policy.json": {
+    "candidate": "a88fd60094339e55da2536e5485eed00b8eaa5ed",
+    "gitBlob": "5d9cd484a9f73eed3cb47433c1ae9788ee4879ea",
+    "SHA256": "7f36629682ce03c2e1c31fd425a04fdb3175c38eae03cdd64f49c006179f32be"
+  },
+  "docs/vault/30_Development/Evidence/s11-security-allowlist-reviewed-source-v1.json": {
+    "candidate": "a88fd60094339e55da2536e5485eed00b8eaa5ed",
+    "gitBlob": "1c119493d14f2f4e9c801ac5c641b3420ac9ab74",
+    "SHA256": "d9869a2c53d1a47f3c4403dde0f7e224e5ae5b719b0d0567761638d60719a415"
+  },
+  "tools/rls-boundary-baseline.json": {
+    "candidate": "a88fd60094339e55da2536e5485eed00b8eaa5ed",
+    "gitBlob": "a6b86004a90c5f2f919e7a75862c3d019eaf4c5d",
+    "SHA256": "b2194c4d9df8cb6404a198b26f7f05774c077191078f8cb7edb334b75295f57c"
+  },
+  "services/control-plane/src/inv/migrations/0068_first_workspace_intent.sql": {
+    "candidate": "a88fd60094339e55da2536e5485eed00b8eaa5ed",
+    "gitBlob": "bc6de991fd6035d4f9e5d15bba2985ac6b940bc2",
+    "SHA256": "8b79f55289661d7590dbe24e60d60d319360e7fcaf35454fe21c722fe11905d3"
+  },
+  "tools/write_ac11_security_allowlist.py": {
+    "candidate": "a88fd60094339e55da2536e5485eed00b8eaa5ed",
+    "gitBlob": "c7bd973063c4cef309688cf784b91206ee72649e",
+    "SHA256": "0815559d2ae01e435cf5e802e5c20c79378fe4b8c0f7e6f7ccdc563e12b91d44"
+  },
+  "migrations/versions/0068_first_workspace_intent.py": {
+    "candidate": "a88fd60094339e55da2536e5485eed00b8eaa5ed",
+    "gitBlob": "ad9801f4e8de59cb3d7525b0a9c24594726f9419",
+    "SHA256": "d22e5d2cad43bbe673e222ff5b0e7d866539fdf982cb2c9bf8404f105cb661b3"
+  }
+}

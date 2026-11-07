@@ -1,7 +1,9 @@
 {
   "schemaVersion": "1.0.0",
-  "verifiedAt": "2026-10-03T17:46:10+09:00",
+  "verifiedAt": "2026-11-07T19:48:57+09:00",
   "definerPolicySignatures": [
+    "inv.append_first_workspace_intent(text, text, jsonb, text, text, text, bigint)",
+    "inv.append_first_workspace_run(text, text, text, text, bigint, bigint, text, text)",
     "public.apply_capability_offer(uuid, character, character, bigint)",
     "public.apply_resource_offer(uuid, character, text, bigint)",
     "public.business_admin_allowed(uuid, text, text)",

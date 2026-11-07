@@ -27,7 +27,7 @@ UTC = dt.timezone.utc
 NOW = dt.datetime(2026, 10, 1, 12, 34, 56, 123456, tzinfo=UTC)
 
 
-def test_0058_downgrade_forward_and_partition_column_propagation(
+def test_current_first_workspace_head_refuses_chain_downgrade(
     owner_engine, database_url, clean_tables, monkeypatch
 ):
     from alembic import command
@@ -37,8 +37,50 @@ def test_0058_downgrade_forward_and_partition_column_propagation(
     config.set_main_option("script_location", "migrations")
     monkeypatch.setenv("INV_DATABASE_URL", database_url)
     monkeypatch.setenv("INV_MIGRATION_DSN", database_url)
-    command.downgrade(config, "0057_release_acceptance_quorum")
-    command.upgrade(config, "head")
+    with owner_engine.begin() as connection:
+        before = connection.execute(text(
+            "SELECT p.oid, pg_get_functiondef(p.oid) FROM pg_proc p "
+            "JOIN pg_namespace n ON n.oid=p.pronamespace WHERE n.nspname='inv' "
+            "AND p.proname IN ('append_first_workspace_intent','append_first_workspace_run') "
+            "ORDER BY p.proname"
+        )).all()
+    assert len(before) == 2
+    with pytest.raises(RuntimeError, match="append-only; apply a forward fix"):
+        command.downgrade(config, "0067_audit_reader_revoke")
+    with owner_engine.begin() as connection:
+        assert connection.execute(text("SELECT version_num FROM alembic_version")).scalar_one() == "0068_first_workspace_intent"
+        assert connection.execute(text(
+            "SELECT p.oid, pg_get_functiondef(p.oid) FROM pg_proc p "
+            "JOIN pg_namespace n ON n.oid=p.pronamespace WHERE n.nspname='inv' "
+            "AND p.proname IN ('append_first_workspace_intent','append_first_workspace_run') "
+            "ORDER BY p.proname"
+        )).all() == before
+
+
+def test_0058_scoped_downgrade_forward_and_partition_column_propagation(
+    owner_engine, database_url, clean_tables, monkeypatch
+):
+    from alembic.config import Config
+    from alembic.migration import MigrationContext
+    from alembic.operations import Operations
+    from alembic.script import ScriptDirectory
+    from saintvision.db.base import Base
+
+    config = Config("alembic.ini")
+    config.set_main_option("script_location", "migrations")
+    revision = ScriptDirectory.from_config(config).get_revision("0058_release_acceptance_resolver").module
+    # The 0068 head refuses all chain downgrades. Retain the real historical
+    # 0058 down/up DDL test without stamping or traversing that append-only head.
+    # One transaction restores every dropped object if either half fails.
+    with owner_engine.begin() as connection:
+        context = MigrationContext.configure(connection, opts={"target_metadata": Base.metadata})
+        with Operations.context(context):
+            revision.downgrade()
+            assert connection.execute(text(
+                "SELECT count(*) FROM information_schema.columns WHERE "
+                "table_name='evidence_envelopes' AND column_name='envelope_sha256'"
+            )).scalar_one() == 0
+            revision.upgrade()
 
     with owner_engine.begin() as connection:
         assert connection.execute(text("SELECT version_num FROM alembic_version")).scalar_one() == (

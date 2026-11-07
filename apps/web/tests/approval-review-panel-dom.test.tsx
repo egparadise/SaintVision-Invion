@@ -6,6 +6,7 @@ import { ApprovalReviewPanel } from '../src/features/approvals/ApprovalReviewPan
 import * as approvalReviewApi from '../src/shared/api/approvalReview';
 import type { ApprovalItem } from '../src/contracts/types';
 import { approvalReviewFixture, buildApprovalReviewFixture } from './fixtures/approval-review';
+import firstWorkspaceGolden from './fixtures/first-workspace-golden.json';
 
 function deferred<T>() {
   let resolve!: (value: T) => void;
@@ -48,6 +49,22 @@ describe('ApprovalReviewPanel Async Effect & State Transition (DOM Harness)', ()
     });
     container.remove();
     vi.restoreAllMocks();
+  });
+
+  it('shows the actual first Workspace frozen input and action before a real reviewer decides', async () => {
+    const frozen = firstWorkspaceGolden.prepared;
+    vi.spyOn(approvalReviewApi, 'fetchApprovalReview').mockResolvedValue({ ...approvalReviewFixture,
+      workload: frozen.workload, approval: frozen.approval } as approvalReviewApi.ApprovalReview);
+    const approve = vi.fn();
+    await act(async () => root.render(<ApprovalReviewPanel approval={{ ...sampleApprovalItem,
+      requestedBy: frozen.approval.requesterId, actionDigest: frozen.approval.actionDigest }}
+      currentUserId="isolated-nonrequester-reviewer" onApprove={approve} onReject={async () => {}} />));
+    const shown = container.querySelector('[data-testid="workspace-first-review-input"]');
+    expect(shown?.textContent).toContain(frozen.workload.workspaceStart.inputSha256);
+    expect(shown?.textContent).toContain(String(frozen.workload.workspaceStart.inputSizeBytes));
+    expect(shown?.textContent).toContain(frozen.approval.actionDigest);
+    expect(shown?.textContent).toContain(frozen.workload.workspaceStart.nodeId);
+    expect(approve).not.toHaveBeenCalled();
   });
 
   it('1. pending state: shows review loading status and keeps approve button disabled', async () => {

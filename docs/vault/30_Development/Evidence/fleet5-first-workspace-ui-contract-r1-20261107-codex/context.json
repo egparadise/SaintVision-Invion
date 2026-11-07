@@ -16,6 +16,8 @@
   "priorUntrackedReceiptsPreserved": true,
   "syncBeforeBytes": 500344,
   "syncBeforeSHA256": "368bc72302840e416fdfe5c9fb01a2f0753e244cd40c055a8a07a5c967d07ab9",
-  "scope": "Frontend first Workspace vertical slice and own Evidence/History only; main source/data/docs checks; hosted execution; no actual operations",
-  "holds": "Original19HOLD/discharges0/runtimeB0/A1-A16/H1-H7/H3EA/RDNULL_HOLD/raw7UNREGISTERED/A01-A40NOT_RUN unchanged"
+  "scope": "Same-task frontend plus Root-frozen bounded backend/closed contracts/generated bindings/append-only0068 and regression tests; no live operations",
+  "holds": "Original19HOLD/discharges0/runtimeB0/A1-A16/H1-H7/H3EA/RDNULL_HOLD/raw7UNREGISTERED/A01-A40NOT_RUN unchanged",
+  "backendBase": "1efea494f026e932360c35ae811b6423d874a2e7",
+  "backendSourceMeaning": "Frozen backend baseline; authorized0068 serving extension is part of final combined source, not claimed unchanged"
 }

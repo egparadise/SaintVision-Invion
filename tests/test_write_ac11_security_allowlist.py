@@ -34,7 +34,7 @@ def test_committed_allowlist_is_exact_generated_output():
     expected = tool.build_allowlist(source, policy, baseline)
     assert tool.render(expected) == tool.DEFAULT_OUTPUT.read_text(encoding="utf-8")
     assert set(expected["definerPolicySignatures"]) == set(policy["functions"])
-    assert len(expected["definerPolicySignatures"]) == 15
+    assert len(expected["definerPolicySignatures"]) == 17
 
 
 def test_sec_vf_001_stays_bound_to_the_browser_lane_not_the_scan_lane():

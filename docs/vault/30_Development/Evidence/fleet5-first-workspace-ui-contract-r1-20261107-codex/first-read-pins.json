@@ -1,0 +1,128 @@
+[
+  {
+    "path": "docs/vault/00_Index/\uc804\uccb4 \uac1c\ubc1c \uc9c4\ud589 \ud604\ud669.md",
+    "ref": "23a6cadef31053a35deae187c6991e48ebd70ff0",
+    "blob": "dfddf57abe0a4d588fb3886f95351efb7eb55633",
+    "SHA256": "f0fc5b731228b7dbf276211629fb269aa7442eef83f30b0e998cb605689f4404",
+    "bytes": 520917,
+    "version": "1.0.511",
+    "docID": "INDEX-PROGRESS-001"
+  },
+  {
+    "path": "docs/vault/30_Development/Agent\ubcc4 \uc791\uc5c5/Codex \uc791\uc5c5 \ud604\ud669.md",
+    "ref": "23a6cadef31053a35deae187c6991e48ebd70ff0",
+    "blob": "ed3b040f7d2edff777096db632c21d6e79c77b2b",
+    "SHA256": "8ac540ba5e5cea210c3270de962e8b704eaaf21f4d0393240af5de377d9a47d0",
+    "bytes": 476525,
+    "version": "1.0.472",
+    "docID": "WORKBOARD-CODEX-001"
+  },
+  {
+    "path": "docs/vault/00_Index/2026-09-15 \ub2e8\uc77c \uac00\uc0c1 \ucef4\ud4e8\ud130 \ubcf4\uac15 \uc124\uacc4 \uc778\ub371\uc2a4.md",
+    "ref": "23a6cadef31053a35deae187c6991e48ebd70ff0",
+    "blob": "72db8dd202e42346c10d5340f6f6b42516520a95",
+    "SHA256": "35f2cca047fdb57ff2e2ad28e3847e9a7c0a19d6ace6fb36aa941042e872e9be",
+    "bytes": 2085,
+    "version": "1.0.0",
+    "docID": "INDEX-VIRTUAL-COMPUTER-001"
+  },
+  {
+    "path": "docs/vault/30_Development/57.81\ud37c\uc13c\ud2b8 \uc774\ud6c4 \ub2e8\uc77c \uac00\uc0c1 \ucef4\ud4e8\ud130 \ubcf4\uac15 \ub85c\ub4dc\ub9f5.md",
+    "ref": "23a6cadef31053a35deae187c6991e48ebd70ff0",
+    "blob": "2861910c711c24065a57313b0d4148122521fb21",
+    "SHA256": "3a4527ffe53ebea114063692dd3bba826da8c279a93a9800919fff394df1a018",
+    "bytes": 7674,
+    "version": "1.0.0",
+    "docID": "ROADMAP-VIRTUAL-COMPUTER-001"
+  },
+  {
+    "path": "docs/vault/40_Governance/Agent \uc5f0\uc18d \uc2e4\ud589\uacfc \ucd5c\uc885 \ubcf4\uace0 \uc815\ucc45.md",
+    "ref": "23a6cadef31053a35deae187c6991e48ebd70ff0",
+    "blob": "a9503cb0cc11c077c1528e4775c9458df2b1990d",
+    "SHA256": "60c6a8d3130491bd4cab730cccc0e236fb038d1c7c816efa333acdc34a30cd8f",
+    "bytes": 7196,
+    "version": "1.1.0",
+    "docID": "GOV-CONTINUOUS-001"
+  },
+  {
+    "path": "docs/vault/00_Index/\ucd5c\uc885 \uac1c\ubc1c \uacc4\ud68d - \ubaa8\ub4e0 \uac1c\ubc1c\uc758 \uc9c0\uce68.md",
+    "ref": "23a6cadef31053a35deae187c6991e48ebd70ff0",
+    "blob": "41e82e7123c269da74239cadfcf5af7f8007cdfb",
+    "SHA256": "59223c5dff4b4bb6252c8061aebe975665e6eadf92db3659a3f89951b2cb149f",
+    "bytes": 6488,
+    "version": "1.1.0",
+    "docID": "GUIDE-001"
+  },
+  {
+    "path": "docs/vault/40_Governance/\uc124\uacc4 \ucda9\ub3cc \uc815\uc815 \ubc0f ADR.md",
+    "ref": "23a6cadef31053a35deae187c6991e48ebd70ff0",
+    "blob": "9cd5c4a9b7c11a009364099852d6276823e31ab4",
+    "SHA256": "771f7714a63af52d7c8aea2424db0b33a2fe96c759c51c81c23144daf7aeaf77",
+    "bytes": 29130,
+    "version": "1.37.0",
+    "docID": "ADR-INDEX-001"
+  },
+  {
+    "path": "docs/vault/40_Governance/Agent \uc5ed\ud560\uacfc \uc778\uacc4 \uacc4\uc57d.md",
+    "ref": "23a6cadef31053a35deae187c6991e48ebd70ff0",
+    "blob": "e8703c212659c525a6b6eb542e5ee796b4fd889e",
+    "SHA256": "128c054e72f9e001b3b32f914cce544bce5432eddccdbe1212d27180c3200823",
+    "bytes": 4619,
+    "version": "1.1.3",
+    "docID": "GOV-AGENT-001"
+  },
+  {
+    "path": "docs/vault/40_Governance/Git Build Obsidian \uc6b4\uc601 \uc808\ucc28.md",
+    "ref": "23a6cadef31053a35deae187c6991e48ebd70ff0",
+    "blob": "c53059902faf775b882a2303ab6c6efe42ec8462",
+    "SHA256": "fe5e8adc44a14c081ac767265a16434b72e4b3ebfb7719081fa166ad459e59e9",
+    "bytes": 8552,
+    "version": "1.1.4",
+    "docID": "GOV-GIT-001"
+  },
+  {
+    "path": "docs/vault/40_Governance/Agent \uc9c0\uc18d \uac1c\ubc1c \uc6b4\uc601 \uaddc\uce59.md",
+    "ref": "23a6cadef31053a35deae187c6991e48ebd70ff0",
+    "blob": "4176f640d7e3745c5346c234cd119148cb92c39c",
+    "SHA256": "63839c440ead6dc07300a0e18d5024fb9aadbddf546707156c39af7ee9495c84",
+    "bytes": 6473,
+    "version": "1.0.0",
+    "docID": "GOV-CONTINUITY-001"
+  },
+  {
+    "path": "AGENTS.md",
+    "ref": "23a6cadef31053a35deae187c6991e48ebd70ff0",
+    "blob": "d8c6cf9160fc01e85733de442f8dd4d7d0276d42",
+    "SHA256": "c12a50a38f81c12a647f9b6f4592a205cd899e76d29190202a6ae73b12c04b27",
+    "bytes": 7086,
+    "version": null,
+    "docID": null
+  },
+  {
+    "path": "skills/agent-delivery/SKILL.md",
+    "ref": "23a6cadef31053a35deae187c6991e48ebd70ff0",
+    "blob": "40cd0f0b960a10a9d972b58bc4ae45786625d1b0",
+    "SHA256": "9596c1d4a132c3de90fd99ed2095b8271da7a31532e8487aa6d7d93151ac3830",
+    "bytes": 1276,
+    "version": "1.1.0",
+    "docID": null
+  },
+  {
+    "path": "skills/core-reliability/SKILL.md",
+    "ref": "23a6cadef31053a35deae187c6991e48ebd70ff0",
+    "blob": "27c5643ce6438b332f9fe0b7ba8d0386cf9cc946",
+    "SHA256": "4650a371befb5a59cd9f3ce87c2e2dab732aa7e9b89e57885cb67f0e64f0ef76",
+    "bytes": 619,
+    "version": "1.0.0",
+    "docID": null
+  },
+  {
+    "path": "docs/task-registry.json",
+    "ref": "23a6cadef31053a35deae187c6991e48ebd70ff0",
+    "blob": "3d7b5be755d15b5f181b9cbbed33b2a8f4b56e87",
+    "SHA256": "7c6b339c7487aae652cc5c5e04f6e933249c83930019e798ec24006794b07644",
+    "bytes": 42011,
+    "version": null,
+    "docID": null
+  }
+]

@@ -1,10 +1,10 @@
 {
-  "atKST": "2026-11-07T19:14:08.885798+09:00",
+  "atKST": "2026-11-07T19:51:17.950599+09:00",
   "deliveryBase": "1efea494f026e932360c35ae811b6423d874a2e7",
   "backendBase": "1efea494f026e932360c35ae811b6423d874a2e7",
   "importedFrontendSource": "b48c2c4492f8aea4b55c33161733a9a6fb9eed8c",
   "frozenRoot": "23a6cadef31053a35deae187c6991e48ebd70ff0",
-  "checkoutHEAD": "9907e14c1882b91dfab8ab3b441563ddba66a57b",
+  "checkoutHEAD": "a88fd60094339e55da2536e5485eed00b8eaa5ed",
   "note": "Working source/data audit; final committed SHA is supplied by publication receipt, not predicted here",
   "imports": [
     {
@@ -116,7 +116,7 @@
     "skills": "dc117f0b750e4ff029e87b5f7ed53ee2f69862ca",
     "docs/sources": "ace2050db53e98c7e876bee7668c8450095ec74d"
   },
-  "changedPythonASTCount": 17,
+  "changedPythonASTCount": 22,
   "changes": [
     {
       "path": "apps/web/nginx.conf",
@@ -127,6 +127,11 @@
       "path": "apps/web/src/app/App.tsx",
       "bytes": 49965,
       "SHA256": "21939698561f9f7f0d5825b33f0aefb1070a20d1fdbf62ff42d6475266cbeaa4"
+    },
+    {
+      "path": "apps/web/src/features/approvals/ApprovalReviewPanel.tsx",
+      "bytes": 4127,
+      "SHA256": "21c721c6c3ea140ae39b4e436f9071e537e7cb48e62c064587b75283a5b39233"
     },
     {
       "path": "apps/web/src/features/auth/session.ts",
@@ -150,8 +155,8 @@
     },
     {
       "path": "apps/web/src/features/studio/FirstWorkspacePanel.tsx",
-      "bytes": 18527,
-      "SHA256": "446a2d587677472f63eafc3577347bdc598e825d07a05ad37e8665bbc7e765a2"
+      "bytes": 19499,
+      "SHA256": "52c631392f4a7b3f6070f73df5508100772e023db2058fc1a57d1b785c7ebc64"
     },
     {
       "path": "apps/web/src/shared/api/firstWorkspace.ts",
@@ -189,6 +194,11 @@
       "SHA256": "54f9e213e1a8fa4a3f17cd11c4ae12bfe48eafcbc2df464ea3a6250d0fc5d361"
     },
     {
+      "path": "apps/web/tests/approval-review-panel-dom.test.tsx",
+      "bytes": 11735,
+      "SHA256": "f2cf7219439122be8105163b4cdd2903514cf209406c883deaa2d4bcf00e6a9a"
+    },
+    {
       "path": "apps/web/tests/approval-review.test.tsx",
       "bytes": 7247,
       "SHA256": "d93e6388b78044a8f8df51f879f84024250177888094a090099b25c67fbecfe1"
@@ -200,8 +210,8 @@
     },
     {
       "path": "apps/web/tests/first-workspace-panel.test.tsx",
-      "bytes": 8723,
-      "SHA256": "e66c64eede0353ca81208a08ab8bee9dbc48d7f65fe425814e9e31828e1e2eef"
+      "bytes": 10340,
+      "SHA256": "6a634cc5e59986d4caabba7e85a6842089c8a03587408159cfa9c46dd4e79e7d"
     },
     {
       "path": "apps/web/tests/fixture-problem-codes-integrity.test.ts",
@@ -230,8 +240,8 @@
     },
     {
       "path": "contracts/v1alpha1/core.schema.json",
-      "bytes": 183358,
-      "SHA256": "0f7bd5f35e5f3747020220e263c465f96c5c92bcad94eb47073d66ac4cba9e87"
+      "bytes": 183295,
+      "SHA256": "f8bb8fa801f64d622ebcdc1c4c3383833632ccfb05a740493e3a5cb86e44404f"
     },
     {
       "path": "migrations/versions/0068_first_workspace_intent.py",
@@ -255,13 +265,13 @@
     },
     {
       "path": "services/control-plane/src/inv/generated/core.schema.json",
-      "bytes": 183358,
-      "SHA256": "0f7bd5f35e5f3747020220e263c465f96c5c92bcad94eb47073d66ac4cba9e87"
+      "bytes": 183295,
+      "SHA256": "f8bb8fa801f64d622ebcdc1c4c3383833632ccfb05a740493e3a5cb86e44404f"
     },
     {
       "path": "services/control-plane/src/inv/generated/models.py",
-      "bytes": 75542,
-      "SHA256": "58b710edd97f317118e66f12959ae0b79b9e90e52ff8ef40ed02420d04b7962d"
+      "bytes": 75468,
+      "SHA256": "efa49fbdb31024fcaf0fae57f909c0131c936c3e3fbd68fac75fa2d38c7f533f"
     },
     {
       "path": "services/control-plane/src/inv/migrations/0068_first_workspace_intent.sql",
@@ -275,8 +285,8 @@
     },
     {
       "path": "services/node-agent/internal/wire/core.schema.json",
-      "bytes": 183358,
-      "SHA256": "0f7bd5f35e5f3747020220e263c465f96c5c92bcad94eb47073d66ac4cba9e87"
+      "bytes": 183295,
+      "SHA256": "f8bb8fa801f64d622ebcdc1c4c3383833632ccfb05a740493e3a5cb86e44404f"
     },
     {
       "path": "tests/core/test_build_policy_resource_budget.py",
@@ -295,8 +305,8 @@
     },
     {
       "path": "tests/core/test_object_store_locator_migration.py",
-      "bytes": 7983,
-      "SHA256": "251cb2ab3ac7b1f013c1c54f36ca4679b8bc2b90f1af21c7465b40a16b9e9fb0"
+      "bytes": 7980,
+      "SHA256": "0f83aea9de669e95106cc289da6e39a68dda16014e09ccb7ba96db9cbde9c9f5"
     },
     {
       "path": "tests/core/test_release_acceptance_resolver.py",
@@ -305,8 +315,8 @@
     },
     {
       "path": "tests/core/test_workspace_first_intent_contract.py",
-      "bytes": 3184,
-      "SHA256": "d7c8d5f9f0c83d3f9afea6a71159b17a856b3a3e8be3cd6eeb643e2d9f06dd33"
+      "bytes": 3823,
+      "SHA256": "454a2f9798c50d26b7388aefaaab0114362a31ec28d1221cdc7bea8c91368226"
     },
     {
       "path": "tests/integration/test_eval_suite_project_scope_real_pg.py",
@@ -320,18 +330,38 @@
     },
     {
       "path": "tests/integration/test_model_version_measurements_real_pg.py",
-      "bytes": 29809,
-      "SHA256": "cdbd583112bf02501ae17d89239f08587f4c885d41fd8e003f3e1ea178f82435"
+      "bytes": 29599,
+      "SHA256": "192286ef3314aac5862f9eee2adbc762615feccc9733c3e30eb489ee6d1f64bf"
     },
     {
       "path": "tests/integration/test_release_acceptance_resolver_real_pg.py",
-      "bytes": 22392,
-      "SHA256": "edaca0bc4c24bdbf1cd70abe6c3acd242274d2a30745466ca4ed1822f4c4144d"
+      "bytes": 24640,
+      "SHA256": "54df586a988caa8cc469ee0225796dd357074eb63158f63384adb1d668f3effc"
+    },
+    {
+      "path": "tests/integration/test_workspace_first_intent_execution.py",
+      "bytes": 4590,
+      "SHA256": "5230a438018e35d4f5035391d96227705c2484f27a8a006f48514f335408c519"
     },
     {
       "path": "tests/integration/test_workspace_first_intents.py",
-      "bytes": 19109,
-      "SHA256": "c6d50556e71821d7446b7f9fe9046d06a69dd25f9883edeb78ea42b93d54d469"
+      "bytes": 19335,
+      "SHA256": "a2bfee095f0e6795a8b5a5bf78d22a68b92a204f7b7a93d8b0742ababeaf6d3d"
+    },
+    {
+      "path": "tests/test_import_ac11_security_scan.py",
+      "bytes": 62280,
+      "SHA256": "27d2299a888d0a920dc1f363e6113d0c5daf110d1c5accb3440dc2369280c552"
+    },
+    {
+      "path": "tests/test_write_ac11_security_allowlist.py",
+      "bytes": 7473,
+      "SHA256": "a97ca3b46b20eca41a78f6ec8c4a890dbc85a38a277977f8c7ee3feefa972586"
+    },
+    {
+      "path": "tools/aggregate_ac11_evidence.py",
+      "bytes": 98891,
+      "SHA256": "e845eebbbdad652f6273673fedf1018f41af48811c30254f0ff482a06158eb18"
     },
     {
       "path": "tools/definer-policy.json",

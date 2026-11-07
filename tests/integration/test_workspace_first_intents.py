@@ -129,12 +129,12 @@ def test_same_key_races_one_atomic_triple_and_original_snapshot_timestamp(intent
     assert counts(a)==tuple(n+v for n,v in zip(before,(1,1,1,1,1)))
 
 
-@pytest.mark.parametrize("change",["suspended-user","suspended-project","disabled-subject","disabled-business","revoked-kernel","role","workspace","workspace-version","version","spec","digest","node","containment"])
+@pytest.mark.parametrize("change",["suspended-user","archived-project","disabled-subject","disabled-business","revoked-kernel","role","workspace","workspace-version","version","spec","digest","node","containment"])
 def test_replay_rechecks_current_authority_and_intent(intents,change):
     a=intents;item=create_intent(a);first=create_run(a,item);assert first.status_code==201,first.text
     with psycopg.connect(a.e.owner) as conn:
         if change=="suspended-user":conn.execute("UPDATE public.users SET status='suspended' WHERE user_id=%s",(a.user,))
-        if change=="suspended-project":conn.execute("UPDATE public.projects SET status='suspended' WHERE project_id=%s",(a.e.project,))
+        if change=="archived-project":conn.execute("UPDATE public.projects SET status='archived' WHERE project_id=%s",(a.e.project,))
         if change=="disabled-subject":conn.execute("UPDATE inv.business_subjects SET enabled=false WHERE subject_id=%s",(a.jwt.subject("requester"),))
         if change=="disabled-business":conn.execute("UPDATE inv.business_projects SET enabled=false WHERE project_id=%s",(a.e.project,))
         if change=="revoked-kernel":conn.execute("UPDATE inv.project_grants SET enabled=false WHERE project_id=%s AND subject_id=%s",(a.e.project,a.jwt.subject("requester")))
@@ -188,7 +188,11 @@ def test_write_failure_rolls_back_kernel_public_mapping_event_and_ledger(intents
         conn.execute("CREATE FUNCTION public.reject_isolated_first_run() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN RAISE EXCEPTION 'isolated write failure'; END $$")
         conn.execute("CREATE TRIGGER reject_isolated_first_run BEFORE INSERT ON inv.business_runs FOR EACH ROW EXECUTE FUNCTION public.reject_isolated_first_run()")
     try:
-        assert create_run(a,item).status_code==500
+        response = create_run(a,item)
+        assert response.status_code == 503, response.text
+        assert response.json()["code"] == "SYS-0001"
+        assert response.json()["detail"] == "Service temporarily unavailable"
+        assert response.json()["retryable"] is False
         assert counts(a)==before
     finally:
         with psycopg.connect(a.e.owner) as conn:

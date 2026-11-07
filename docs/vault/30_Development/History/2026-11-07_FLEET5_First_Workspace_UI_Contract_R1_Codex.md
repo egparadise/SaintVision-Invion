@@ -1,7 +1,7 @@
 ---
 doc_id: "HISTORY-FLEET5-FIRST-WORKSPACE-UI-R1-20261107-CODEX"
 title: "FLEET5 first Workspace UI contract R1"
-version: "1.0.2"
+version: "1.0.4"
 status: "review"
 author: "Codex"
 updated: "2026-11-07"
@@ -18,6 +18,10 @@ Tests use explicitly isolated identities and a cross-language data vector derive
 
 Local source/docs/ontology/path/single-source/sync CHECK evidence, exact candidate SHA/workflow jobs/steps/artifact digests, backend tree identity and final handoff will be added after their actual execution. Full canonical sync-state before/after bytes must match; no APPLY or old-vault export is permitted. Prior untracked publication receipts are preserved.
 
-Next action: Codex B integrates Root's exact bounded API candidate and completes hosted tests/build/docs; Root requests actual independent Claude review and owns protected PC3 API/portal routing, real identities/votes and actual Run execution. Implementation, local checks, CI, independent review and operations are separate acceptance states. Original19HOLD/discharges0/runtimeB0/A1-A16/H1-H7/H3EA/RDNULL_HOLD/raw7UNREGISTERED/A01-A40NOT_RUN remain unchanged. No browser/Run/5PC or whole-program completion is claimed.
+Next action: Codex B completes fresh exact hosted tests/build/docs for the combined candidate; Root requests actual independent Claude review and owns protected PC3 API/portal routing, real identities/votes and actual Run execution. Implementation, local checks, CI, independent review and operations are separate acceptance states. Original19HOLD/discharges0/runtimeB0/A1-A16/H1-H7/H3EA/RDNULL_HOLD/raw7UNREGISTERED/A01-A40NOT_RUN remain unchanged. No browser/Run/5PC or whole-program completion is claimed.
 
 Hosted correction evidence: [first candidate](../Evidence/fleet5-first-workspace-ui-contract-r1-20261107-codex/first-ci-corrections.json), [second candidate](../Evidence/fleet5-first-workspace-ui-contract-r1-20261107-codex/second-ci-corrections.json). The second portal hardened runtime smoke and Docs succeeded, while unit tests and Backend collection failed; no failed candidate is accepted. [Source audit](../Evidence/fleet5-first-workspace-ui-contract-r1-20261107-codex/source-audit.json) verifies the exact eleven b48 imports, all prior migration bytes, prior schema definitions and protected source/deploy/workflow trees. Corrected code needs new exact Frontend/Core/Backend/Docs runs.
+
+[Request/state mapping](../Evidence/fleet5-first-workspace-ui-contract-r1-20261107-codex/request-state-mapping.json) records the complete selected intent to output journey, guards and remaining Root gates. Review now displays the actual frozen first input; final denials and unknown delivery differ. A new isolated Linux integration case creates all workload/Run/mapping records through the production APIs, requires two distinct fixture votes, then actual receipt/output/Evidence and canonical terminal state. The generic ResourceRequest root remains unambiguous and the new non-NUL regex uses cross-language portable hex escaping; [third candidate correction](../Evidence/fleet5-first-workspace-ui-contract-r1-20261107-codex/third-ci-corrections.json) preserves the earlier Core failure. This is still not live browser/user/PC3/five-PC acceptance.
+
+Root message `msg_2d1917021248` authorized exactly the AC11 architecture catalogue delta, not final code acceptance. The four Root-owned files are copied byte for byte into the named public Evidence directory, and the reviewer source/output/pins are mechanically updated while the original fifteen entries, RLS dispositions and browser proof remain unchanged. [Root architecture decision](../Evidence/fleet5-20261105-root/first-workspace-ac11-catalogue-delta-r1/root-architecture-decision.md) explicitly keeps actual Claude code review pending. Both a88 Backend matrices failed fourteen tests despite 9076 passing; the failures and precise fixes remain in the third correction receipt. Historical migration safety assertions remain real PG tests, and a new independent test proves0068 refuses chain downgrade without changing the head/helper definitions.

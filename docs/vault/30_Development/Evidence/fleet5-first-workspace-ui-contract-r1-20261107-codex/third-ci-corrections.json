@@ -1,0 +1,36 @@
+{
+  "sourceSHA": "a88fd60094339e55da2536e5485eed00b8eaa5ed",
+  "Frontend": 42363181935,
+  "FrontendResult": "SUCCESS all jobs; final later changes require new run",
+  "Core": 42363184320,
+  "CoreResult": "FAIL Node schema unavailable in41 Go tests; catalogue compiler rejects new nonportable regex",
+  "schemaCorrection": "New DTO non-NUL command pattern changed from Unicode escape to equivalent portable hex escape supported by Python/ECMA262/Go RE2; no old schema definition or server policy relaxed",
+  "rootCorrection": "Nested WorkspaceFirstResources stays referenced by selected create input, removed as overlapping top-level oneOf alternative; generic ResourceRequest root validity is preserved",
+  "reviewCorrection": "Existing reviewer component displays actual server frozen input SHA/size/target/profile/policy/action/status before any decision",
+  "denialCorrection": "Structured final4xx refusal shown separately from uncertain delivery; no success inferred",
+  "actualOperations": "NOT_RUN",
+  "wholeProgramComplete": false,
+  "Backend": 42363186787,
+  "Backend312": {
+    "failed": 14,
+    "passed": 9076,
+    "skipped": 75,
+    "deselected": 2,
+    "warnings": 2037,
+    "seconds": 1371.84
+  },
+  "Backend314": {
+    "failed": 14,
+    "passed": 9076,
+    "skipped": 75,
+    "deselected": 2,
+    "warnings": 2034,
+    "seconds": 1475.3
+  },
+  "backendCorrections": [
+    "Root msg_2d1917021248 architecture-only exact17 catalogue decision copied verbatim; existing writer regenerated output and exact pins; actual Claude code review remains pending",
+    "Historical0054 guard and0058 down/up DDL run in real scoped Alembic operation context; current0068 whole-chain refusal has independent actual PG test, no stamp or migration rewrite",
+    "Project inactive fixture uses actual archived status; failure-injection asserts existing sanitized SYS-0001/503 plus unchanged five counts"
+  ],
+  "resultFreshness": "Concurrent result responses carry observation generation; result project/source/version must match or exceed latest bound Run before display"
+}

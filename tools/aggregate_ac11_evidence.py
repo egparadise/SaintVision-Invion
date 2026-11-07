@@ -39,8 +39,8 @@ DEFAULT_ALLOWLIST = (
 )
 TARGET_REGISTRY_PATH = "docs/vault/30_Development/Evidence/s11-ac11-target-registry-v0.json"
 TARGET_REGISTRY_BLOB = "d53b11f8b0e32e70911f30c6c73c24d7ed4e104c"
-ALLOWLIST_BLOB = "f55d49e3d95a3e60252297edc79dc9744ab2bbe9"
-ALLOWLIST_CANONICAL_SHA256 = "35e89ed2df22cc237bccfe0a9312d626f21694ff76b4e30290718602826226f5"
+ALLOWLIST_BLOB = "8b7b27001365c8396a1fee111b039f558e3586c1"
+ALLOWLIST_CANONICAL_SHA256 = "282abfbf5e4c4a0a5dfff6a27b65187fdb72342df05d12483e0c18a71eb2a18b"
 SCAN_ALLOWLIST_REPO_PATH = (
     "docs/vault/30_Development/Evidence/s11-security-dependency-sast-allowlist-v1.json"
 )
@@ -89,7 +89,7 @@ PIN_RE = re.compile(r"^([A-Za-z0-9_.-]+)(?:\[[^\]]+\])?==([^\s;]+)$")
 
 DEFINER_FILES = [
     {"path": "tools/check_definer_functions.py", "blob": "5831f8d8806900146add2e5e7b51b934dced3952"},
-    {"path": "tools/definer-policy.json", "blob": "90683af47d3e4485a700a2b052d7b9010b8fe4f5"},
+    {"path": "tools/definer-policy.json", "blob": "5d9cd484a9f73eed3cb47433c1ae9788ee4879ea"},
 ]
 RLS_FILES = [
     {"path": "tools/collect_rls_evidence.py", "blob": "bd14e3d77d57d6d506dc785d376ccb6da4600545"},

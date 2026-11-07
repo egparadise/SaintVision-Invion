@@ -1,0 +1,108 @@
+{
+  "contract": "FLEET5-WS-FIRST-INTENT-CONTRACT-R1",
+  "owner": "Codex B",
+  "managementBase": "23a6cadef31053a35deae187c6991e48ebd70ff0",
+  "deliveryAndBackendBase": "1efea494f026e932360c35ae811b6423d874a2e7",
+  "importedFrontendSource": "b48c2c4492f8aea4b55c33161733a9a6fb9eed8c",
+  "finalCombinedSHA": "Recorded by final exact publication receipt after hosted CI; not predicted inside this source commit",
+  "phases": [
+    {
+      "phase": "read ready context",
+      "method": "GET",
+      "route": "/v1/projects/{project}/workspaces/{workspace}/first-intents?limit=20&after={optional WorkloadId}",
+      "body": null,
+      "headers": [
+        "Bearer memory-only auth"
+      ],
+      "response": "WorkspaceFirstIntentPage",
+      "authority": "Current active business+kernel can_request intersection; actual ready status, NULL logical placement preserved, enabled configured default runtime Node; exact row IDs/spec SHA; no-store actual observedAt; deterministic keyset pages; invalid rows fail rather than disappear"
+    },
+    {
+      "phase": "register bounded CPU metadata if none exists",
+      "method": "POST",
+      "route": "/v1/projects/{project}/workspaces/{workspace}/first-intents",
+      "body": "Closed WorkspaceFirstIntentCreateInput: objective,imageDigest,command,resources,timeoutSeconds",
+      "headers": [
+        "Bearer",
+        "Idempotency-Key",
+        "If-Match quoted workspace-vN"
+      ],
+      "response": "WorkspaceFirstIntent",
+      "authority": "Server generates scoped workloadId/tenant/project/workspace/targetNode. Configured image/executable allowlists and CPU<=500m, memory8388608..67108864B, timeout<=30s; GPU0/terminal absent; shared65536UTF8 reader. No readiness/provisioning/placement/grant is created"
+    },
+    {
+      "phase": "selected-context atomic Run creation",
+      "method": "POST",
+      "route": "/v1/projects/{project}/workspaces/{workspace}/first-intents/{workload}/runs",
+      "body": {},
+      "headers": [
+        "Bearer",
+        "Stable Idempotency-Key across unknown delivery",
+        "If-Match exact server intentEtag"
+      ],
+      "response": "WorkspaceFirstRunCreateResult",
+      "authority": "Current authority/row versions/digest checked before initial write or replay. One restricted transaction appends canonical kernel Run, public draft metadata and immutable mapping plus event/ledger. Dedicated NOLOGIN writer, kernel-only EXECUTE, tenant RLS and verified-subject/epoch GUC. Current Run GET after creation replay prevents stale draft display"
+    },
+    {
+      "phase": "freeze actual user input",
+      "method": "POST",
+      "route": "/v1/projects/{project}/runs/{run}/start/prepare",
+      "body": "Exact WorkspaceStartPrepareInput startId,stepId,workload,expectedVersion,snapshotBase64,targetNodeId",
+      "headers": [
+        "Bearer",
+        "Stable Idempotency-Key with identical frozen request bytes on uncertainty"
+      ],
+      "response": "WorkspaceStartPrepareResult",
+      "authority": "Current draft/attempt0/version, actual business spec, runtime/epoch/policy enforced. Canonical Python-compatible sorted ASCII JSON archive; actual UTF8 file bytes and SHA256; content<=32768, archive<=65536 AND outer UTF8 JSON<=65536 after nested base64/metadata. Actual returned workload/action/input digest and runtime binding checked; no creation/preparation implies execution"
+    },
+    {
+      "phase": "genuine independent approval",
+      "method": "Existing project approval review/challenge/decision",
+      "route": "/v1/projects/{project}/approvals/{approval}/{review|challenge|decision}",
+      "body": "Existing closed challenge {} and decision{decision,nonce,actionDigest}",
+      "headers": [
+        "Bearer",
+        "Stable decision Idempotency-Key"
+      ],
+      "response": "Existing canonical review/challenge/ApprovalView",
+      "authority": "Existing review components show actual frozen input hash/size/node/profile/policy/action/status. Server validates current person/grant linkage and distinct nonrequester identities; no client vote counts. Auth change during nonce wait blocks decision. Production missing approver identity remains a gate; fixtures are isolated only"
+    },
+    {
+      "phase": "requester admission",
+      "method": "POST",
+      "route": "/v1/projects/{project}/runs/{run}/start/enqueue",
+      "body": "Exact WorkspaceStartEnqueueInput{startId,approvalId,expectedVersion}",
+      "headers": [
+        "Bearer",
+        "Stable Idempotency-Key; same body retained after unknown delivery"
+      ],
+      "response": "WorkspaceStartEnqueueResult",
+      "authority": "Original requester only; authoritative approved/current action/version/epoch/nonces/persons checked by existing kernel. Current Node probe/profile/capacity/containment and atomic queue leases remain intact. accepted202 is queue admission, not execution/completion"
+    },
+    {
+      "phase": "actual observations",
+      "method": "GET polling",
+      "route": "/v1/projects/{project}/runs/{run}/starts/{start} and /result, existing Run GET",
+      "body": null,
+      "headers": [
+        "Bearer"
+      ],
+      "response": "WorkspaceStartView,ControlRunDetail,RunResultView",
+      "authority": "Project/session/generation and Run/version bindings guard updates. Show actual server scheduled/running/verifying/terminal state, receipt/output/evidence; no local completion synthesis. Structured final denial stays distinct from unknown delivery. Relative same-origin API; no proxy/service restart, terminal/SSE/GPU/storage expansion"
+    }
+  ],
+  "tests": {
+    "frontend": "Behavioral wire+UI tests and independent cross-language golden; all46 b48 refresh probes kept exact",
+    "postgres": "Production APIs under restricted runtime roles: empty real read, metadata create, atomic triple, replay, same-key races, revocations, stale intent/status/version/digest, tenant/project/epoch/containment, rollback, RLS/owner/EXECUTE/GUC/search_path boundaries",
+    "runtime": "New isolated Linux Node test creates workload/Run/mapping only via production selected-intent APIs, obtains two fixture-identity votes via real challenge/decision routes, then requires canonical succeeded attempt1 + receipt/output/Evidence; never production acceptance"
+  },
+  "outstanding": [
+    "Final exact hosted Frontend all jobs/steps/dist+portal smoke",
+    "Core all required phases and both Backend3.12/3.14 plus MLflow and Docs19 at same finalSHA/manualattempt1",
+    "One actual independent Claude review, Root owned",
+    "Root only migration/deploy/JWKS/runtime/business credentials/roots/provider/signer/TLS/policy/queue/cutover; no worker live operations",
+    "Genuine production identities/two nonrequester votes/actual Run output and five-PC gates"
+  ],
+  "holds": "Original19HOLD/discharges0/runtimeB0/A1-A16/H1-H7/H3EA/RDNULL_HOLD/raw7UNREGISTERED/A01-A40NOT_RUN",
+  "wholeProgramComplete": false
+}

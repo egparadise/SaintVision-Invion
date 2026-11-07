@@ -2241,8 +2241,8 @@ class WorkspaceFirstProfile(BaseModel):
     terminalAllowed: Literal[False]
 
 
-class CommandItem(RootModel[constr(pattern=r'^[^\u0000]+$', min_length=1, max_length=4096)]):
-    root: constr(pattern=r'^[^\u0000]+$', min_length=1, max_length=4096)
+class CommandItem(RootModel[constr(pattern=r'^[^\x00]+$', min_length=1, max_length=4096)]):
+    root: constr(pattern=r'^[^\x00]+$', min_length=1, max_length=4096)
 
 
 class WorkspaceFirstResources(BaseModel):
@@ -2638,7 +2638,6 @@ class INVCore(
         | WorkspaceFirstIntentPage
         | WorkspaceFirstIntentCreateInput
         | WorkspaceFirstRunCreateResult
-        | WorkspaceFirstResources
     ]
 ):
     root: (
@@ -2691,5 +2690,4 @@ class INVCore(
         | WorkspaceFirstIntentPage
         | WorkspaceFirstIntentCreateInput
         | WorkspaceFirstRunCreateResult
-        | WorkspaceFirstResources
     ) = Field(..., title='INVCore')

@@ -1,10 +1,12 @@
 {
   "schemaVersion": "1.0.0",
-  "verifiedAt": "2026-10-03T17:46:10+09:00",
+  "verifiedAt": "2026-11-07T19:48:57+09:00",
   "definerReview": {
-    "policyRevision": "0067_audit_reader_revoke",
-    "reviewDocument": "docs/vault/30_Development/S11_AC11_SEC_DEF_001_allowlist_보안검토_Codex.md",
+    "policyRevision": "0068_first_workspace_intent",
+    "reviewDocument": "docs/vault/30_Development/Evidence/fleet5-20261105-root/first-workspace-ac11-catalogue-delta-r1/root-architecture-decision.md",
     "signatures": [
+      "inv.append_first_workspace_intent(text, text, jsonb, text, text, text, bigint)",
+      "inv.append_first_workspace_run(text, text, text, text, bigint, bigint, text, text)",
       "public.apply_capability_offer(uuid, character, character, bigint)",
       "public.apply_resource_offer(uuid, character, text, bigint)",
       "public.business_admin_allowed(uuid, text, text)",
@@ -68,14 +70,21 @@
     {
       "role": "inv_discovery_issuer",
       "table": "public.tenants",
-      "rules": ["E2", "E3", "E4", "E5"],
+      "rules": [
+        "E2",
+        "E3",
+        "E4",
+        "E5"
+      ],
       "disposition": "false-positive-with-proof",
       "proof": "0045_discovery_machine_credentials grants SELECT(tenant_id) only to validate tenant existence; no slug/display_name projection is granted."
     },
     {
       "role": "inv_discovery_issuer_guard",
       "table": "public.discovery_credential_issue_budgets",
-      "rules": ["E2"],
+      "rules": [
+        "E2"
+      ],
       "disposition": "false-positive-with-proof",
       "proof": "0045 defines a NOLOGIN guard used only by the budget trigger to enforce issuer-wide budgets."
     }

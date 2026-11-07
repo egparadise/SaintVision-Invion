@@ -7637,7 +7637,7 @@
             "type": "string",
             "minLength": 1,
             "maxLength": 4096,
-            "pattern": "^[^\\u0000]+$"
+            "pattern": "^[^\\x00]+$"
           }
         },
         "resources": {
@@ -7860,9 +7860,6 @@
     },
     {
       "$ref": "#/$defs/WorkspaceFirstRunCreateResult"
-    },
-    {
-      "$ref": "#/$defs/WorkspaceFirstResources"
     }
   ]
 }

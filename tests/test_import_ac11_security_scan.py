@@ -1450,7 +1450,7 @@ def test_the_reviewed_security_allowlist_exactly_describes_this_tree():
     reviewed = set(APPROVED_ALLOWLIST["definerPolicySignatures"])
     # The policy maps each signature to its reviewed definition, so its keys are the set.
     declared = set(policy["functions"])
-    assert len(reviewed) == len(declared) == 15
+    assert len(reviewed) == len(declared) == 17
     assert reviewed == declared
 
     workflow = APPROVED_ALLOWLIST["secVf001"]["workflow"]

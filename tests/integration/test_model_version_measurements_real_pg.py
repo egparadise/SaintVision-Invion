@@ -519,9 +519,6 @@ def test_a_reader_of_that_name_with_another_definition_is_refused_on_resume(owne
 
 
 def test_a_downgrade_refuses_while_a_measurement_exists(owner_engine, database_url, migrated, draft, monkeypatch):
-    from alembic import command
-    from alembic.config import Config
-
     record_measurement(owner_engine, tenant_id=draft["tenant_a"], model_version_id=draft["version_id"], sha256=DIGEST)
     # Preconditions stated, so a database left behind by another test cannot
     # turn this into a no-op downgrade that "did not raise".
@@ -529,20 +526,17 @@ def test_a_downgrade_refuses_while_a_measurement_exists(owner_engine, database_u
     with owner_engine.begin() as connection:
         assert connection.exec_driver_sql(M.MEASUREMENT_ROWS).scalar() >= 1
         assert connection.exec_driver_sql(M.COLUMN_SHAPE).fetchall()
-    config = Config("alembic.ini")
-    config.set_main_option("script_location", "migrations")
-    try:
-        with monkeypatch.context() as patch:
-            patch.setenv("INV_DATABASE_URL", database_url)
-            patch.setenv("INV_MIGRATION_DSN", database_url)
-            with pytest.raises(RuntimeError, match="discard"):
-                command.downgrade(config, "0053_eval_suite_project_scope")
-        # PostgreSQL transactional DDL keeps the complete current head when
-        # 0054 refuses; it must not leave the shared test database half-downgraded.
-        assert _recorded(owner_engine) == CURRENT_HEAD
-    finally:
-        with monkeypatch.context() as patch:
-            patch.setenv("INV_DATABASE_URL", database_url)
-            patch.setenv("INV_MIGRATION_DSN", database_url)
-            command.upgrade(config, CURRENT_HEAD)
+    # 0068 is independently irreversible. Exercise 0054's own real PostgreSQL
+    # guard in an Alembic operation context, without falsely stamping the shared
+    # database back to an older revision or bypassing the new head's refusal.
+    from alembic.migration import MigrationContext
+    from alembic.operations import Operations
+    from saintvision.db.base import Base
+
+    with pytest.raises(RuntimeError, match="discard"):
+        with owner_engine.begin() as connection:
+            context = MigrationContext.configure(connection, opts={"target_metadata": Base.metadata})
+            with Operations.context(context):
+                M.downgrade()
+    assert _recorded(owner_engine) == CURRENT_HEAD
     _assert_catalogue_is_whole(owner_engine)

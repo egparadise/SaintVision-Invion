@@ -40,8 +40,18 @@ export function ApprovalReviewPanel(props: ApprovalDetailProps) {
         <dt>Network mode</dt><dd>{review.workload.networkMode}</dd>
         <dt>Cache mode</dt><dd>{review.workload.cacheMode}</dd>
         <dt>Secret use</dt><dd>{review.workload.usesSecrets ? `yes (${review.workload.secretCount})` : 'no (0)'}</dd>
-      </dl> :
-        <pre style={{ whiteSpace: 'pre-wrap', overflowWrap: 'anywhere' }}>{JSON.stringify(review.workload.command, null, 2)}</pre>}
+      </dl> : <>
+        <pre style={{ whiteSpace: 'pre-wrap', overflowWrap: 'anywhere' }}>{JSON.stringify(review.workload.command, null, 2)}</pre>
+        {review.workload.workspaceStart && <dl data-testid="workspace-first-review-input">
+          <dt>첫 Workspace 동결 입력</dt><dd>{review.workload.workspaceStart.startId} / {review.workload.workspaceStart.stepId}</dd>
+          <dt>Input archive SHA-256</dt><dd><code>{review.workload.workspaceStart.inputSha256}</code></dd>
+          <dt>Input archive bytes</dt><dd>{review.workload.workspaceStart.inputSizeBytes}</dd>
+          <dt>동결된 대상 Node / profile</dt><dd>{review.workload.workspaceStart.nodeId} / {review.workload.workspaceStart.profileVersion}</dd>
+          <dt>동결된 정책</dt><dd>{review.workload.workspaceStart.policyVersion}</dd>
+          <dt>Action digest</dt><dd><code>{review.approval.actionDigest}</code></dd>
+          <dt>서버 승인 상태 / 요구 인원</dt><dd>{review.approval.status} / {review.approval.requiredApprovals}</dd>
+        </dl>}
+      </>}
       <p>정책 다이제스트: <code>{review.policyDigest}</code></p>
     </div>}
     <ApprovalDetail {...props} approval={approval} reviewedAction={review ? reviewedAction(review) : undefined} />
