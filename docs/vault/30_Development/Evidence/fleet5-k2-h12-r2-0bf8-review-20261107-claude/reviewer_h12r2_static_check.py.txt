@@ -1,0 +1,156 @@
+"""Reviewer static/reference check for H12 R2 0bf852a6 (stdlib only; reads git blobs; no crypto/Go/network).
+
+Usage: python -I -B reviewer_h12r2_static_check.py <repo-root> <out.json>
+Structural and text facts only. NOT authentication, crypto or runtime proof.
+"""
+import hashlib, json, re, subprocess, sys
+
+REPO, OUT = sys.argv[1], sys.argv[2]
+T = '0bf852a66b2eb01f95da65ebbad0360a04ea6fed'
+B = '382fe3d86c14283dcb549f935205081db8b4eee4'
+RV = '8141a49bab3d0e7b94028a69d9a767e2abc25272'
+F2 = 'f2c1afb78b589b4b2cbcf3dcd4dc4f3c3f3bc856'
+R1 = 'docs/vault/30_Development/Evidence/fleet5-k2-h1-h2-authority-design-20261107-codex/'
+R2 = 'docs/vault/30_Development/Evidence/fleet5-k2-h1-h2-authority-design-r2-20261107-codex/'
+PINS = {'contract.md': 'b02ee1c7a09cf4565fc9e486d63103e29c3f0101ac20f86046a710d14c46a522',
+        'authority-fields.json': '6a8c67a33df3379ad12f4254182bbb33aced74c64fa593dfe44cb367411836e1',
+        'acceptance-cases.json': '35f63a9132c310ddd54845c8ba65e51e3a6faa294255431d896d9872d7f00744',
+        'review-response.json': 'b53d6eca30e8f3c247410c20d49d17bc7b1d1a9680cd29a1bf908e47ae1f6893'}
+NEXT = 'f8b3f6d7aabe32e07bdbff56789ea327f544c43b64834035934f8cfe4f0f7fed'
+
+
+def git(*a):
+    return subprocess.run(['git', '-C', REPO, *a], capture_output=True, check=True).stdout
+
+
+def blob(rev, p):
+    return git('show', f'{rev}:{p}')
+
+
+def sha(b):
+    return hashlib.sha256(b).hexdigest()
+
+
+def j(rev, p):
+    return json.loads(blob(rev, p))
+
+
+out = {'target': T, 'base': B, 'nature': 'STRUCTURAL_REFERENCE_TEXT_FACTS_ONLY_NOT_AUTH_CRYPTO_RUNTIME'}
+out['pins'] = {k: sha(blob(T, R2 + k)) == v for k, v in PINS.items()}
+out['nextCodeR1UnchangedAtTarget'] = sha(blob(T, R1 + 'next-code-proposal.json')) == NEXT == sha(blob(B, R1 + 'next-code-proposal.json'))
+ns = git('diff', '--name-status', '--no-renames', B, T).decode().split('\n')
+ns = [x for x in ns if x]
+out['deltaFromBase'] = {'count': len(ns), 'allAdded': all(x.startswith('A\t') for x in ns),
+                        'allUnderOwnPrefixOrHistory': all(x[2:].startswith(R2) or x[2:] == 'docs/vault/30_Development/History/2026-11-07_FLEET5_K2_H1_H2_Authority_Design_R2_Codex.md' for x in ns)}
+out['productDeltaFromF2c1'] = len([x for x in git('diff', '--name-only', F2, T, '--', ':!docs').decode().split('\n') if x])
+out['modes'] = sorted({l.split()[0] for l in git('ls-tree', '-r', T, R2).decode().split('\n') if l})
+
+a1, a2 = j(B, R1 + 'authority-fields.json'), j(T, R2 + 'authority-fields.json')
+c1, c2 = j(B, R1 + 'acceptance-cases.json'), j(T, R2 + 'acceptance-cases.json')
+k1, k2 = blob(B, R1 + 'contract.md').decode(), blob(T, R2 + 'contract.md').decode()
+
+h2 = [r['field'] for r in a2['H2IndependentPolicy']]
+out['counts'] = {'origins': sorted(a2['origins']), 'H2Slots': len(h2), 'H2Unique': len(set(h2)),
+                 'vector': len(a2['snapshotVector']), 'vectorUnique': len(set(a2['snapshotVector'])),
+                 'capsule': len(a2['H1Capsule']), 'nestedEntries': len(a2['nestedFields']),
+                 'tuple': len(a2['p02SignatureTuple']), 'token': len(a2['p02SnapshotToken'])}
+out['r1ToR2Preserved'] = {
+    'H1Capsule': a1['H1Capsule'] == a2['H1Capsule'], 'nestedFields': a1['nestedFields'] == a2['nestedFields'],
+    'tuple': a1['p02SignatureTuple'] == a2['p02SignatureTuple'], 'token': a1['p02SnapshotToken'] == a2['p02SnapshotToken'],
+    'original5Origins': all(a1['origins'][k] == a2['origins'][k] for k in a1['origins']),
+    'vectorPrefix27': a2['snapshotVector'][:27] == a1['snapshotVector'], 'vectorAdded': a2['snapshotVector'][27:],
+    'h2RowsChanged': sorted(f['field'] for f in a2['H2IndependentPolicy'] if f not in a1['H2IndependentPolicy'])}
+used = set()
+for r in a2['H1Capsule'] + list(a2['nestedFields'].values()) + a2['H2IndependentPolicy']:
+    if 'origin' in r:
+        used.add(r['origin'])
+out['originReferences'] = {'usedNotDefined': sorted(used - set(a2['origins'])), 'definedNotUsed': sorted(set(a2['origins']) - used)}
+
+rd = a2['origins']['RD_CAPTURE_DELIVERY']
+slot = {r['field']: r for r in a2['H2IndependentPolicy']}
+srcConst = a2['nestedFields']['sourceConstants']['fields']
+row = {m.group(1): m.group(2) for m in re.finditer(r'^\| (G\d\d_[A-Z0-9_]+) \| (.*) \|$', k2, re.M)}
+row1 = {m.group(1): m.group(2) for m in re.finditer(r'^\| (G\d\d_[A-Z0-9_]+) \| (.*) \|$', k1, re.M)}
+rds = slot['registrationDeliverySubject']['join']
+out['M1'] = {
+    'rdSubjectFields': rd['subjectFields'],
+    'rdJoins': rd['subjectJoins'],
+    'designRegistrationSHA256InSourceConstants': 'designRegistrationSHA256' in srcConst,
+    'capsuleHasGeneration': any(r.get('field') == 'generation' for r in a2['H1Capsule']),
+    'slotOrigin': slot['registrationDeliverySubject']['origin'],
+    'slotJoinNames': {t: (t in rds) for t in ['issuer', 'capture/publication identity', 'ordering', 'time', 'registrationDeliveryID/version',
+                                             'rawRegistrationSHA256 == capsule.sourceConstants.designRegistrationSHA256',
+                                             'project/purpose/source/contract subject', 'destination registry generation', 'Distinct from H1 capsule deliveryID/version']},
+    'vectorHasRDPair': ['registrationDeliveryID', 'registrationDeliveryVersion'] == a2['snapshotVector'][27:],
+    'vectorStillHasH1Pair': 'deliveryID' in a2['snapshotVector'] and 'deliveryVersion' in a2['snapshotVector'],
+    'statusSubjectsRD': [s for s in a2['currentStatusSubjects'] if 'RD_CAPTURE_DELIVERY' in s],
+    'G04NamesRDIssuer': 'RD_CAPTURE_DELIVERY issuer' in row['G04_AUTHENTICATED_SNAPSHOT'],
+    'G08NamesRDSubjectAndGrant': 'RD_CAPTURE_DELIVERY registration capture/delivery subject' in row['G08_STATUS_TIME'] and 'RD capture-delivery authority GRANTS' in row['G08_STATUS_TIME'],
+    'G10NamesRDPair': 'registrationDeliveryID/version' in row['G10_FINAL_READBACK'],
+    'contractForbidsEqualVersionEquivocation': 'Equal RD ID/version with different assertion bytes is' in k2,
+    'currentRegistrationSubjectJoinUnchangedFromR1': slot['currentRegistrationSubject'] == {r['field']: r for r in a1['H2IndependentPolicy']}['currentRegistrationSubject'],
+    'currentRegistrationSubjectJoinNamesRD': 'RD' in slot['currentRegistrationSubject']['join'] or 'registration capture' in slot['currentRegistrationSubject']['join'],
+    'vectorHasRDIssuerMember': any('RD' in v or 'registrationIssuer' in v for v in a2['snapshotVector'][:27]),
+}
+fin = k2[k2.index('The external bootstrap TCB'):k2.index('G00_BINDING is a distinct')]
+out['L1'] = {
+    'bootstrapSlotOriginR1R2': [{r['field']: r for r in a1['H2IndependentPolicy']}['bootstrapBindingIdentityVersion']['origin'], slot['bootstrapBindingIdentityVersion']['origin']],
+    'bootstrapSlotJoinNamesRDIssuer': 'RD' in slot['bootstrapBindingIdentityVersion']['join'],
+    'finiteTCBBindingListNamesRDIssuer': 'RD' in fin or 'registration capture' in fin,
+    'G00NotFromMapped': 'never learned from provisioner/status/clock/RD authority statements' in a2['origins']['G00_BINDING']['valueOrigin'],
+    'G08NamesFourGrants': all(t in row['G08_STATUS_TIME'] for t in ['provisioner', 'status authority', 'clock authority', 'RD capture-delivery authority GRANTS', 'CURRENT G00_BINDING']),
+    'statusSubjectGrants': [s for s in a2['currentStatusSubjects'] if 'grant under current G00 mapping' in s],
+    'G10NamesCurrentG00': 'current G00 mapping' in row['G10_FINAL_READBACK'],
+    'vectorHasTrustBindingIdVersion': 'trustBindingIdentity' in a2['snapshotVector'] and 'trustBindingVersion' in a2['snapshotVector'],
+    'G08RowDetailClasses': re.findall(r'otherwise ([A-Z/]+)', row['G08_STATUS_TIME']),
+}
+out['tableRowsUnchanged'] = {g: row1.get(g) == row.get(g) for g in sorted(row)}
+def block(k, a, b):
+    return k[k.index(a):k.index(b) + len(b)]
+tb = ('At BOTH initial and final clock intervals', 'wider age.')
+out['timeFormulaBlockByteEqual'] = block(k1, *tb) == block(k2, *tb)
+dh = ('Only after all H1/H2 gates pass', 'nor a History.')
+out['d04HandoffPrefixByteEqual'] = block(k1, *dh) == block(k2, *dh)
+
+A = {c['id']: c for c in c1['cases']}; C = {c['id']: c for c in c2['cases']}
+G = c2['stages']
+def pre(n): return G[:n]
+cs = {}
+cs['ids'] = c2['caseIDs'] == [f'H12-C{i:02d}' for i in range(1, 11)] and sorted(C) == c2['caseIDs']
+cs['allProposedNotRun'] = all(c['status'] == 'PROPOSED_NOT_RUN' for c in C.values())
+cs['stagesEqualR1'] = c1['stages'] == c2['stages']
+cs['unchangedRows'] = sorted(i for i in C if A[i] == C[i])
+cs['changedRows'] = sorted(i for i in C if A[i] != C[i])
+cs['changedKeysByRow'] = {i: sorted(k for k in set(A[i]) | set(C[i]) if A[i].get(k) != C[i].get(k)) for i in cs['changedRows']}
+cs['C05'] = {'earlierIsG00toG07': C['H12-C05']['requiredEarlierPass'] == pre(8), 'target': C['H12-C05']['targetFailure'],
+             'variants': [(v['id'], v['expected']) for v in C['H12-C05']['boundedVariants']]}
+cs['C07'] = {'earlierIsG00toG03': C['H12-C07']['requiredEarlierPass'] == pre(4), 'target': C['H12-C07']['targetFailure'],
+             'variants': [(v['id'], v['expected']) for v in C['H12-C07']['boundedVariants']],
+             'namesRDOrigin': 'RD_CAPTURE_DELIVERY' in C['H12-C07']['constructionAndFullPreconditions']}
+cs['C08'] = {'earlierIsG00toG09': C['H12-C08']['requiredEarlierPass'] == pre(10), 'target': C['H12-C08']['targetFailure'],
+             'variants': [(v['id'], v['expected']) for v in C['H12-C08']['boundedVariants']],
+             'keeps27Equal': 'keep all previous27vector members equal' in C['H12-C08']['boundedVariants'][0]['change']}
+c9 = C['H12-C09']
+cs['C09'] = {'earlierIsG00toG09': c9['requiredEarlierPass'] == pre(10), 'target': c9['targetFailure'], 'expected': c9['expected'],
+             'exclusiveBoundary': c9['exclusiveBoundary'], 'allOtherExclusiveEnds': c9['allOtherExclusiveEnds'],
+             'finalEarlierSubchecks': c9['finalEarlierSubchecks'],
+             'disjunctionPresentInExpectedOrBoundary': bool(re.search(r'\bOR\b|\bor\b', c9['expected'] + c9['exclusiveBoundary'])),
+             'mentionsTighterIndependentBound': 'tighter' in c9['constructionAndFullPreconditions'],
+             'anyOtherCaseTargetsG10Expired': [i for i in C if i != 'H12-C09' and 'EXPIRED' in C[i].get('expected', '') and 'G10' in C[i].get('expected', '')]}
+out['cases'] = cs
+
+prov = j(T, R2 + 'review-provenance.json')
+tree = {l.split('\t')[1]: l.split()[2] for l in git('ls-tree', '-r', RV, 'docs/vault/30_Development/').decode().split('\n') if l and '382f-contract-review' in l or '382f_' in l}
+pv = []
+for f in prov['files']:
+    b = blob(RV, f['path'])
+    pv.append(tree.get(f['path']) == f['OID'] and len(b) == f['bytes'] and sha(b) == f['SHA256'])
+out['provenance8141'] = {'files': len(prov['files']), 'allOIDSizeSHAMatch': all(pv), 'treeFiles': len(tree),
+                         'staticAuthoritativeOID': [f['OID'] for f in prov['files'] if f['path'].endswith('/reviewer-h12-static-result.json')]}
+ctx = j(T, R2 + 'context.json')
+out['publicInputPins'] = {'count': len(ctx['publicInputPins']), 'allMatch': all(sha(blob(p['source'], p['path'])) == p['SHA256'] for p in ctx['publicInputPins'])}
+man = j(T, R2 + 'publication-manifest.json')
+out['manifest'] = {'files': len(man['files']), 'allMatch': all(sha(blob(T, f['path'])) == f['SHA256'] and len(blob(T, f['path'])) == f['bytes'] for f in man['files']),
+                   'listsSelf': any(f['path'].endswith('publication-manifest.json') for f in man['files'])}
+open(OUT, 'w', encoding='utf-8', newline='\n').write(json.dumps(out, indent=1, ensure_ascii=False) + '\n')
+print(json.dumps(out, indent=1, ensure_ascii=False))

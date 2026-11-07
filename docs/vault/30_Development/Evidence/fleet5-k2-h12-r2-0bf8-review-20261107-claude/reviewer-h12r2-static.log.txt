@@ -1,0 +1,266 @@
+﻿{
+ "target": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed",
+ "base": "382fe3d86c14283dcb549f935205081db8b4eee4",
+ "nature": "STRUCTURAL_REFERENCE_TEXT_FACTS_ONLY_NOT_AUTH_CRYPTO_RUNTIME",
+ "pins": {
+  "contract.md": true,
+  "authority-fields.json": true,
+  "acceptance-cases.json": true,
+  "review-response.json": true
+ },
+ "nextCodeR1UnchangedAtTarget": true,
+ "deltaFromBase": {
+  "count": 10,
+  "allAdded": true,
+  "allUnderOwnPrefixOrHistory": true
+ },
+ "productDeltaFromF2c1": 0,
+ "modes": [
+  "100644"
+ ],
+ "counts": {
+  "origins": [
+   "G00_BINDING",
+   "H1_INSTALL",
+   "H1_POLICY",
+   "H2_AUTHZ",
+   "H4_CLOCK",
+   "H4_STATUS",
+   "RD_CAPTURE_DELIVERY"
+  ],
+  "H2Slots": 24,
+  "H2Unique": 24,
+  "vector": 29,
+  "vectorUnique": 29,
+  "capsule": 26,
+  "nestedEntries": 11,
+  "tuple": 13,
+  "token": 9
+ },
+ "r1ToR2Preserved": {
+  "H1Capsule": true,
+  "nestedFields": true,
+  "tuple": true,
+  "token": true,
+  "original5Origins": true,
+  "vectorPrefix27": true,
+  "vectorAdded": [
+   "registrationDeliveryID",
+   "registrationDeliveryVersion"
+  ],
+  "h2RowsChanged": [
+   "bootstrapBindingIdentityVersion",
+   "registrationDeliverySubject"
+  ]
+ },
+ "originReferences": {
+  "usedNotDefined": [],
+  "definedNotUsed": []
+ },
+ "M1": {
+  "rdSubjectFields": [
+   "issuerIdentity",
+   "registrationDeliveryID",
+   "registrationDeliveryVersion",
+   "capturePublicationIdentity",
+   "captureOrdering",
+   "captureTime",
+   "rawRegistrationSHA256",
+   "projectIdentity",
+   "purpose",
+   "sourceSubject",
+   "contractSubject",
+   "destinationRegistryGeneration"
+  ],
+  "rdJoins": [
+   "rawRegistrationSHA256 == capsule.sourceConstants.designRegistrationSHA256",
+   "destinationRegistryGeneration == independent installed capsule.generation",
+   "project/purpose/source/contract subject == independently authorized registration policy",
+   "issuerIdentity == distinct RD issuer authorized by current G00 binding"
+  ],
+  "designRegistrationSHA256InSourceConstants": true,
+  "capsuleHasGeneration": true,
+  "slotOrigin": "RD_CAPTURE_DELIVERY",
+  "slotJoinNames": {
+   "issuer": true,
+   "capture/publication identity": true,
+   "ordering": true,
+   "time": true,
+   "registrationDeliveryID/version": true,
+   "rawRegistrationSHA256 == capsule.sourceConstants.designRegistrationSHA256": true,
+   "project/purpose/source/contract subject": true,
+   "destination registry generation": true,
+   "Distinct from H1 capsule deliveryID/version": true
+  },
+  "vectorHasRDPair": true,
+  "vectorStillHasH1Pair": true,
+  "statusSubjectsRD": [
+   "RD_CAPTURE_DELIVERY registration capture/delivery subject",
+   "RD_CAPTURE_DELIVERY authority grant under current G00 mapping"
+  ],
+  "G04NamesRDIssuer": true,
+  "G08NamesRDSubjectAndGrant": true,
+  "G10NamesRDPair": true,
+  "contractForbidsEqualVersionEquivocation": true,
+  "currentRegistrationSubjectJoinUnchangedFromR1": true,
+  "currentRegistrationSubjectJoinNamesRD": false,
+  "vectorHasRDIssuerMember": false
+ },
+ "L1": {
+  "bootstrapSlotOriginR1R2": [
+   "H1_INSTALL",
+   "G00_BINDING"
+  ],
+  "bootstrapSlotJoinNamesRDIssuer": false,
+  "finiteTCBBindingListNamesRDIssuer": false,
+  "G00NotFromMapped": true,
+  "G08NamesFourGrants": true,
+  "statusSubjectGrants": [
+   "H1 provisioner authority grant under current G00 mapping",
+   "H4 status authority grant under current G00 mapping",
+   "H4 clock authority grant under current G00 mapping",
+   "RD_CAPTURE_DELIVERY authority grant under current G00 mapping"
+  ],
+  "G10NamesCurrentG00": true,
+  "vectorHasTrustBindingIdVersion": true,
+  "G08RowDetailClasses": [
+   "STATUS/TIME/EXPIRED"
+  ]
+ },
+ "tableRowsUnchanged": {
+  "G00_BINDING": true,
+  "G01_ORIGIN_DELIVERY": true,
+  "G02_OWNERSHIP": true,
+  "G03_CAPSULE": true,
+  "G04_AUTHENTICATED_SNAPSHOT": false,
+  "G05_H2_AUTHORIZATION": true,
+  "G06_RECORD_CODEC": true,
+  "G07_SIGNATURE": true,
+  "G08_STATUS_TIME": false,
+  "G09_VERSION_REPLAY": true,
+  "G10_FINAL_READBACK": false
+ },
+ "timeFormulaBlockByteEqual": true,
+ "d04HandoffPrefixByteEqual": true,
+ "cases": {
+  "ids": true,
+  "allProposedNotRun": true,
+  "stagesEqualR1": true,
+  "unchangedRows": [
+   "H12-C01",
+   "H12-C02",
+   "H12-C03",
+   "H12-C04",
+   "H12-C06",
+   "H12-C10"
+  ],
+  "changedRows": [
+   "H12-C05",
+   "H12-C07",
+   "H12-C08",
+   "H12-C09"
+  ],
+  "changedKeysByRow": {
+   "H12-C05": [
+    "boundedVariants"
+   ],
+   "H12-C07": [
+    "boundedVariants",
+    "constructionAndFullPreconditions"
+   ],
+   "H12-C08": [
+    "boundedVariants"
+   ],
+   "H12-C09": [
+    "allOtherExclusiveEnds",
+    "constructionAndFullPreconditions",
+    "exclusiveBoundary",
+    "expected",
+    "finalEarlierSubchecks",
+    "purpose",
+    "requiredEarlierPass",
+    "targetFailure"
+   ]
+  },
+  "C05": {
+   "earlierIsG00toG07": true,
+   "target": [
+    "G08_STATUS_TIME"
+   ],
+   "variants": [
+    [
+     "RD-subject-revoked",
+     "G08_STATUS_TIME / REVOKED"
+    ],
+    [
+     "mapped-authority-grant-not-current",
+     "G08_STATUS_TIME / AUTHORITY_NOT_CURRENT; own statements cannot override G00"
+    ]
+   ]
+  },
+  "C07": {
+   "earlierIsG00toG03": true,
+   "target": [
+    "G04_AUTHENTICATED_SNAPSHOT"
+   ],
+   "variants": [
+    [
+     "RD-specific-origin-missing",
+     "G04_AUTHENTICATED_SNAPSHOT / REGISTRATION_ORIGIN"
+    ],
+    [
+     "RD-specific-issuer-wrong",
+     "G04_AUTHENTICATED_SNAPSHOT / REGISTRATION_ORIGIN"
+    ]
+   ],
+   "namesRDOrigin": true
+  },
+  "C08": {
+   "earlierIsG00toG09": true,
+   "target": [
+    "G10_FINAL_READBACK"
+   ],
+   "variants": [
+    [
+     "RD-version-changed",
+     "G10_FINAL_READBACK / READBACK before final time predicate; no automatic retry"
+    ]
+   ],
+   "keeps27Equal": true
+  },
+  "C09": {
+   "earlierIsG00toG09": true,
+   "target": [
+    "G10_FINAL_READBACK"
+   ],
+   "expected": "G10_FINAL_READBACK / EXPIRED (ticket.expiresAt only)",
+   "exclusiveBoundary": "U_final == ticket.expiresAt",
+   "allOtherExclusiveEnds": "record.validUntil/status.expiresAt/H5.expiresAt/keyNotAfter > U_final",
+   "finalEarlierSubchecks": [
+    "authenticated final origin and exact subject",
+    "full29field vector equality including G00 mapping and registrationDeliveryID/version",
+    "same clock mechanism/epoch and valid monotonic bracket"
+   ],
+   "disjunctionPresentInExpectedOrBoundary": false,
+   "mentionsTighterIndependentBound": false,
+   "anyOtherCaseTargetsG10Expired": []
+  }
+ },
+ "provenance8141": {
+  "files": 11,
+  "allOIDSizeSHAMatch": true,
+  "treeFiles": 11,
+  "staticAuthoritativeOID": [
+   "f23490e93f6004b8aca1524899d242e76db36f55"
+  ]
+ },
+ "publicInputPins": {
+  "count": 14,
+  "allMatch": true
+ },
+ "manifest": {
+  "files": 9,
+  "allMatch": true,
+  "listsSelf": false
+ }
+}
