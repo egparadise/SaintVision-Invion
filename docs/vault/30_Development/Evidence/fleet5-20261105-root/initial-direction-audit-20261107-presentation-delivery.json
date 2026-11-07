@@ -1,0 +1,15 @@
+{
+  "atKST": "2026-11-07T12:04:08+09:00",
+  "finalPath": "D:\\Project\\SaintVisionI-Invion\\deliverables\\2026-11-07\\SaintVision_개발현황_방향점검_1장.pptx",
+  "SHA256": "573f597221445379fc421326e60c5d2b74affa3221cf01a77aaabe1c6a6ffb62",
+  "bytes": 25351,
+  "slides": 1,
+  "editableNativeTables": 1,
+  "speakerNotesIncludeOriginalAndCurrentEvidence": true,
+  "nativePowerPointReadOnlyOpenAndPngRendered": true,
+  "nativePngInspectedByRoot": true,
+  "sourcePptxUnmodifiedDuringPowerPointRendering": true,
+  "structuralAndFontAndLayoutGates": "PASS",
+  "artifactImportRendererLimitation": "Standalone artifact-tool import rendered blank despite native XML; native PowerPoint opened and rendered exact same file correctly. Delivering verified native PPTX, not that blank preview.",
+  "wholeProgramComplete": false
+}

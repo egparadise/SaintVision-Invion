@@ -1,0 +1,216 @@
+{
+  "docID": "FLEET5-INITIAL-PLAN-CRITICAL-PATH-AUDIT-20261107-CODEX",
+  "version": "1.0.0",
+  "atKST": "2026-11-07T12:04:07.338786+09:00",
+  "kind": "READ_ONLY_AUTHOR_CRITICAL_PATH_ANALYSIS_NOT_INDEPENDENT_ACCEPTANCE_OR_INSTALL_GRANT",
+  "taskID": "task_a95ef3d8ccce",
+  "dispatchID": "ctx_ed23b4a777d0",
+  "RootScopeMessage": "msg_966025255ea0",
+  "owner": "Codex; Root owns one-slide PPT and actual integration scope",
+  "initialDirectionVerdict": "Original direction is logical pooling of existing OS resources with isolated Workspace/Tool Gateway. Security code supports it, but current physical first-slice/five-PC delivery is unverified; prioritize one integrated journey and minimal authenticated bindings.",
+  "sourceCatalog": {
+    "initialReadme": {
+      "sourceSHA": "11386fc1b1850ed7e402e0214e02d1322c974f4a",
+      "path": "docs/sources/README.md",
+      "observedFileSHA256": "17f3e871135dd562c9d370733f7d5d2479e4e34612dbee384149f3264bd433f1",
+      "taskID": null
+    },
+    "initialPlan": {
+      "sourceSHA": "11386fc1b1850ed7e402e0214e02d1322c974f4a",
+      "path": "docs/sources/30_Development/개발 플랜.md",
+      "observedFileSHA256": "a87075cca558bdfd5f02dbe219aff9916a30356d78c7a5277be72e416f74da3e",
+      "taskID": null
+    },
+    "RootIndex": {
+      "sourceSHA": "11386fc1b1850ed7e402e0214e02d1322c974f4a",
+      "path": "docs/vault/00_Index/전체 개발 진행 현황.md",
+      "observedFileSHA256": "618e7b40f990dd3cda01b74d2e73979906b31f8b4607c5b7be89e21eda5bac18",
+      "taskID": null,
+      "version": "1.0.500",
+      "temporalNote": "Index500 predates actual review0761 acceptance at11:57; use the actual review for H12 disposition."
+    },
+    "physical": {
+      "sourceSHA": "11386fc1b1850ed7e402e0214e02d1322c974f4a",
+      "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/physical-readiness-refresh-20261107-1033.json",
+      "observedFileSHA256": "9e50197d90e797a5fc4f80a17ff24e6d5a397a8775cc065700b4f7a6acbc9dfd",
+      "taskID": null,
+      "observedAtKST": "2026-11-07T10:33:06+09:00",
+      "taskIDNote": "Task ID is not recorded in the supplied Root snapshot; do not invent one."
+    },
+    "journeyAPI": {
+      "sourceSHA": "6d7ee3d85bd0e47eb7b787234c10d5dbfdb3a9e8",
+      "path": "services/control-plane/src/inv/app.py",
+      "canonicalGitBlobSHA256": "3e3d0d0dc023dee937ac184532b043a26b2af7110887901c937cc6cdbaa2edea",
+      "taskID": "task_a95ef3d8ccce",
+      "lineScope": "512-528,619-644,718-735"
+    },
+    "portal": {
+      "sourceSHA": "6d7ee3d85bd0e47eb7b787234c10d5dbfdb3a9e8",
+      "path": "apps/web/src/app/App.tsx",
+      "canonicalGitBlobSHA256": "3ab33fba9bbfe3827c1e778e44197af440c52324cee610245c926f58a339ef34",
+      "taskID": "task_a95ef3d8ccce",
+      "lineScope": "244-258,281-321"
+    },
+    "observation": {
+      "sourceSHA": "6d7ee3d85bd0e47eb7b787234c10d5dbfdb3a9e8",
+      "path": "services/control-plane/src/inv/observation.py",
+      "canonicalGitBlobSHA256": "b515ceda8b066466cf4cdf5fa88d04803220398c436d29ab7c5fd2793bf5748f",
+      "taskID": "task_a95ef3d8ccce",
+      "lineScope": "117-136"
+    },
+    "dockerClient": {
+      "sourceSHA": "6d7ee3d85bd0e47eb7b787234c10d5dbfdb3a9e8",
+      "path": "services/node-agent/runtime/docker.go",
+      "canonicalGitBlobSHA256": "dce35c9ad17fa12cbbeb9cee0809a413930fa46e2785d86d965153ff4f67e0fb",
+      "taskID": "task_a95ef3d8ccce",
+      "lineScope": "50-99"
+    },
+    "profile": {
+      "sourceSHA": "6d7ee3d85bd0e47eb7b787234c10d5dbfdb3a9e8",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-trusted-producer-contract-20261106-codex/rev2/contract.md",
+      "canonicalGitBlobSHA256": "327975d68b8991ffeb90b0ec481544be07d3df76099266a7e73da1a8fa0cb727",
+      "taskID": "task_a95ef3d8ccce",
+      "lineScope": "397-400"
+    },
+    "ports": {
+      "sourceSHA": "6d7ee3d85bd0e47eb7b787234c10d5dbfdb3a9e8",
+      "path": "services/node-agent/internal/migrationcontext/ports.go",
+      "canonicalGitBlobSHA256": "db7c7e877afc6ee8bbf8ca2e2b6afad3b973a63a624d4bcd6ee2ad5ce649fb95",
+      "taskID": "task_a95ef3d8ccce",
+      "lineScope": "3-16,43-63"
+    },
+    "policy": {
+      "sourceSHA": "6d7ee3d85bd0e47eb7b787234c10d5dbfdb3a9e8",
+      "path": "services/node-agent/internal/migrationcontext/policy.go",
+      "canonicalGitBlobSHA256": "ce6f1b9b1a1835276b248c3dbdb8fa42b68fa79fb5684748ea78694d104bbdd2",
+      "taskID": "task_a95ef3d8ccce",
+      "lineScope": "64-80"
+    },
+    "H12": {
+      "sourceSHA": "6d7ee3d85bd0e47eb7b787234c10d5dbfdb3a9e8",
+      "path": "services/node-agent/internal/migrationcontext/h12_signature_internal.go",
+      "canonicalGitBlobSHA256": "f9e3e808d8951c2da6fee4b45364f64bb5c909a33a90c3a6074c99b8cb6e4def",
+      "taskID": "task_a95ef3d8ccce",
+      "lineScope": "10-56"
+    },
+    "actualReview": {
+      "sourceSHA": "0761de1846d715594b6c7d9db276dff9f5b86bae",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-6d7-code-review-20261107-claude/review.json",
+      "canonicalGitBlobSHA256": "4eff2134a3b8310625610d2811a3255d6c0f8316ea3fd6d075b788a1804168d0",
+      "taskID": "task_7cf5765e1538",
+      "lineScope": null
+    },
+    "actualCI": {
+      "sourceSHA": "6d7ee3d85bd0e47eb7b787234c10d5dbfdb3a9e8",
+      "path": "docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/publication/post-ci/publication-final-report-6d7ee3d8.json",
+      "observedFileSHA256": "b944af8919538b295dd162e1f0680580931dfc01589073ddefec693c911a718c",
+      "taskID": "task_a95ef3d8ccce"
+    }
+  },
+  "rows": [
+    {
+      "initialGoal": "First vertical slice: one registered Node -> resources -> isolated command -> result/audit.",
+      "observedToday": {
+        "fact": "Node/resource APIs, observation polling, Portal reads and run/result/log routes exist in source6d7; Core passed. Root10:33 readiness did not query enrollment/leases/offers; five registered Nodes and the current physical user journey are unverified.",
+        "sourceRefs": [
+          "initialPlan",
+          "journeyAPI",
+          "portal",
+          "observation",
+          "physical",
+          "actualCI"
+        ]
+      },
+      "remainingGap": "One current identity/tenant/epoch/runtime binding and one correlation trail across the existing components; missing acceptance evidence is not absent implementation.",
+      "firstNextStep": {
+        "owner": "Root -> CP/Node integration owner",
+        "action": "Bind one accessible PC2/3/4 CPU Node, confirm registration/current observation and Portal read-only, then separately grant one fenced isolated echo plus stdout/exit/audit capture. Preserve old r5 identities.",
+        "dependency": "Actual current identity/profile/trust/fence preflight; this audit grants no execution."
+      },
+      "blocksFivePCAcceptance": "YES: end-to-end proof missing. Start with one CPU Node instead of waiting for every optional/GPU item."
+    },
+    {
+      "initialGoal": "Five existing heterogeneous PCs contribute without disrupting OS/data; Container is default.",
+      "observedToday": {
+        "fact": "PC1 SSH255/PUBLIC_KEY_DENIED, observed=false. PC2/3/4 SSH+Docker0; APIs1.52/1.56/1.56. PC5 Linux Docker20.10.22/API1.41. Existing client negotiates1.41..1.45; selected K2 profile requires>=1.45.",
+        "sourceRefs": [
+          "initialReadme",
+          "physical",
+          "dockerClient",
+          "profile"
+        ]
+      },
+      "remainingGap": "PC1 access binding unresolved; PC5 below selected profile floor. API1.41 does not prove Docker unusable or all client operations unsupported. No absent-key-file claim.",
+      "firstNextStep": {
+        "owner": "Root/operator + runtime-profile owner",
+        "action": "Resolve PC1 existing principal/public-key authorization; select separately reviewed PC5 API>=1.45 runtime/profile path. Preserve the current floor and verify exact operations before admission.",
+        "dependency": "Concrete access/versioned migration scope; no install/daemon change now. First CPU slice can use PC2/3/4."
+      },
+      "blocksFivePCAcceptance": "YES for all-five readiness; not a blocker for every possible first CPU Node."
+    },
+    {
+      "initialGoal": "Truthful schedulable resource display, then container GPU execution and distributed PoC.",
+      "observedToday": {
+        "fact": "PC2/3/4 host GPU queries0; no container GPU test. Toolkit/runtime commands not found, runc-only runtime names, CDI listings null. Docker/host inventory is not a GPU offer.",
+        "sourceRefs": [
+          "initialReadme",
+          "initialPlan",
+          "physical"
+        ]
+      },
+      "remainingGap": "Container GPU passthrough/isolation and authenticated GPU snapshot/offer unmeasured; this does not prove absent source implementation or broken hardware.",
+      "firstNextStep": {
+        "owner": "Root -> GPU/runtime integration owner",
+        "action": "Keep GPU eligibility UNMEASURED until a separately authorized pinned container probe and observation binding pass. Advance the first slice with measured CPU offers.",
+        "dependency": "Exact image/device/runtime/profile/identity boundaries; toolkit installation would require separate scope."
+      },
+      "blocksFivePCAcceptance": "YES for GPU-inclusive pilot; NO for CPU-only registration/resource/echo proof."
+    },
+    {
+      "initialGoal": "Safe traceable execution/renewal supporting the original user journey.",
+      "observedToday": {
+        "fact": "H12 source6d7 accepted by actual review0761/task7cf, mandatory0, reviewDocs42331288008/all19. No production caller; NewService has null ports and registry/policy authentication still refuses TrustUnknown.",
+        "sourceRefs": [
+          "actualReview",
+          "H12",
+          "ports",
+          "policy",
+          "actualCI"
+        ]
+      },
+      "remainingGap": "New K2 application producer is explicitly unimplemented: independent installed expected-key/capsule authority and registered registry/status/clock/running-source binding. A caller-supplied expected hash plus mathtrue is not trust or user-visible integration.",
+      "firstNextStep": {
+        "owner": "Root for bindings; Codex after bounded K2A grant",
+        "action": "Name authenticated installed-trust/registry/SPKI/scope/version/current-status/clock/running inputs, then grant the smallest read-only acquisition/consumer adapter behind current refusals. Keep K2B effects separate.",
+        "dependency": "H1-H7/H3EA/RD/verdict custody NULL_HOLD. Do not make this new migration path an invented prerequisite of every existing CPU flow."
+      },
+      "blocksFivePCAcceptance": "YES for NEW K2 migration/renewal acceptance. H12 advances a private prerequisite, not observed registration/resource/command/audit completion."
+    },
+    {
+      "initialGoal": "End-to-end gates over independent-service completion or recurring optional review loops.",
+      "observedToday": {
+        "fact": "H12 review has HIGH0/MEDIUM0/mandatory0/optionalLOW1/INFO4. H12C-L1 concerns causal DER-bound test hardening; bounds are correct and reviewer explicitly says not required. Forty runtime cases and five-PC acceptance remain unexecuted/incomplete.",
+        "sourceRefs": [
+          "initialPlan",
+          "actualReview",
+          "RootIndex",
+          "actualCI"
+        ]
+      },
+      "remainingGap": "Missing physical user-journey/operational acceptance evidence; optional DER test improvement is not that blocker.",
+      "firstNextStep": {
+        "owner": "Root, acceptance aggregator",
+        "action": "Backlog nonblocking Low/INFO, freeze accepted source and prioritize the smallest physical vertical slice. Reopen hardening only for a concrete integration change/failure, not another mandatory review loop.",
+        "dependency": "Case-level acceptance and concrete integration scope; preserve historical observations/48 registry states."
+      },
+      "blocksFivePCAcceptance": "NO for optional Low itself; applicable missing operational evidence remains blocking in earlier rows."
+    }
+  ],
+  "recommendation": "Do not convert optional Low into a release blocker. Prioritize existing-implementation physical integration and authenticated input binding; no new percentage, 48-task rewrite, live inference, install, authority or operational acceptance.",
+  "preservation": {
+    "existingResidue": "Unchanged; audit writes only this ignored .work JSON",
+    "trackedOrUntrackedStatusBeforeSHA256": "387082cd77b9177ba3e8899bf4e361b10f5736c82f52a4af4daef27bbb5c2a00",
+    "source4AndPriorReport": "Read only; accepted source and report b944... unchanged",
+    "noNewProductExecution": true
+  }
+}

@@ -1,15 +1,19 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.461"
+version: "1.0.462"
 status: "review"
 author: "Codex"
-updated: "2026-11-07T11:38:47+09:00"
+updated: "2026-11-07T12:10:26+09:00"
 source_of_truth: "Git"
 active_card: "FLEET5 continued supervision with PORTAL-REFRESH-FLEET-20261106"
-active_card_status: "B7467actualCODEACCEPT_KEEP_HOLD; OPG-L1future-selector-proofassigned; H126d7actualClaudeCODEctx5cdcverdictpending; fleetincomplete"
-active_card_next: "Actual Claude H12 CODE verdict; B author new OPG-L1 proof delivery. Root verifies next results, preserve accepted746/6d7 and actual authority NULL_HOLD; no mailbox polling."
+active_card_status: "InitialDirectionAligned_GoldenCPUJourneyAnd5PCAcceptancePending; oneSlidePPTnativeVerified; H126d7CODEACCEPT_KEEP_HOLD; Bselectorb51actualReviewPending"
+active_card_next: "Root currentCP/project/identity/runtime/profile/trust/fence preflight for eligible PC2/3/4 CPU first journey; B actual b51 verdict then integration scope. No optional Low scope expansion or invented completion percent."
 ---
+
+## 2026-11-07T12:10:26+09:00 초기 계획 대비 분석과 한 장 PPT
+
+초기 원문과 현재 증거를 비교한 결과 제품 방향은 부합하나 실제5대·전체 사용자 여정 인수와 현행 집계 정리가 남는다. 한 장 PPT를 작성해 실제 PowerPoint에서 확인했고 초기/현재 출처를 노트에 넣었다. 6d7의 실제 독립 코드 수락0761을 확인했으며 비차단 Low는 백로그로 구분한다. Root는 PC2/3/4 중 적격 CPU 한 대의 현재 합류 조건과 원래 수직 여정을 먼저 확인한다. b51 selector의 실제 delta 검토는 ctx_cfee4b4aa2e7 단일 Claude가 진행하며 실권한·전체5대 인수는 미완료다. [[2026-11-07_초기 개발 방향 대비 현황 점검_Codex|2026-11-07 초기 개발 방향 대비 현황 점검]]에 비교·한계·다음 담당을 기록했다.
 
 ## 2026-11-07T11:38:47+09:00 전달 경계의 실제 코드 수락과 서명 코드 독립 검토
 

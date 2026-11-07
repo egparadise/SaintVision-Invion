@@ -9,7 +9,7 @@
   "productBaseline": "f2c1afb78b589b4b2cbcf3dcd4dc4f3c3f3bc856",
   "proposalSHA256": "85d52cb6313bda9b6d97ce6c1cb3d4c3c6bebf8ef487775fb6c8bc7581ec9479",
   "newBranch": "agent/codex/fleet5-k2-h1-h2-authority-design-20261107",
-  "status": "R2_CONTRACT_ACCEPTED_FIXED_CODE_6D7_CI_PASS_ACTUAL_CODE_REVIEW_STARTED",
+  "status": "R2_CONTRACT_AND_6D7_PRIVATE_MATH_CODE_ACCEPTED_ACTUAL_AUTHORITY_STILL_HOLD",
   "scopeFile": "k2-h1-h2-authority-design-root-scope.txt",
   "selectedLogicalPolicies": [
     "independent control-plane/project trust-provisioning boundary, separately authenticated installation/readback",
@@ -32,7 +32,7 @@
   "independentContractReview": "PENDING_FROZEN_CANDIDATE_AND_ACTUAL_REVIEWER_RELEASE",
   "actualA7ReviewUnchanged": "ctx_36ec44cc8ca0",
   "wholeProgramComplete": false,
-  "latestRecordAtKST": "2026-11-07T11:38:47+09:00",
+  "latestRecordAtKST": "2026-11-07T12:10:26+09:00",
   "localCandidate": "382fe3d86c14283dcb549f935205081db8b4eee4",
   "localParent": "1f073c03eb6673ac60806e8fbe008d391bc45864",
   "localOwnAddedDocs": 9,
@@ -142,7 +142,7 @@
   },
   "R2SemanticVerdict": "CONTRACT_DESIGN_ACCEPT_M1_L1_L2_CLOSED_KEEP_ACTUAL_HOLD",
   "latestCodeWIP": {
-    "atKST": "2026-11-07T11:38:47+09:00",
+    "atKST": "2026-11-07T12:10:26+09:00",
     "ownerTask": "task_a95ef3d8ccce",
     "ownerDispatch": "ctx_ed23b4a777d0",
     "card": "FLEET5-K2-H12-SIGNATURE-CODE-R1-20261107",
@@ -151,7 +151,7 @@
     "independentVerdict": "CONTRACT_DESIGN_ACCEPT_M1_L1_L2_CLOSED_KEEP_ACTUAL_HOLD",
     "rootWIPCodeReply": "msg_7461bcdf99a4",
     "branch": "agent/codex/fleet5-k2-h12-signature-code-r1-20261107",
-    "status": "PUBLISHED_6D7_REQUIRED_CI_PASS_ACTUAL_INDEPENDENT_CODE_REVIEW_STARTED",
+    "status": "PUBLISHED_6D7_ACTUAL_PRIVATE_MATH_SCOPED_GUARD_CODE_ACCEPTED_KEEP_ACTUAL_HOLD",
     "allowedPaths": [
       "services/node-agent/internal/migrationcontext/h12_signature_internal.go",
       "services/node-agent/internal/migrationcontext/h12_signature_test.go",
@@ -970,7 +970,7 @@
       "actualAuthority": null,
       "wholeProgramComplete": false
     },
-    "actualIndependentCODEReview": "ACTUAL_STARTED_VERDICT_PENDING",
+    "actualIndependentCODEReview": "ACCEPT_NARROW_PRIVATE_MATH_AND_SCOPED_GUARD_CODE_KEEP_HOLD",
     "actualCodeReviewQueue": {
       "atKST": "2026-11-07T11:38:47+09:00",
       "status": "ACTUAL_H12_INDEPENDENT_CODE_REVIEW_STARTED_VERDICT_PENDING",
@@ -997,6 +997,35 @@
       "actualAuthority": null,
       "wholeProgramComplete": false
     },
-    "authorAwaitingActualVerdictQuestion": "msg_9e7956d99942"
+    "authorAwaitingActualVerdictQuestion": "msg_9e7956d99942",
+    "actualIndependentCODEReviewEvidence": {
+      "atKST": "2026-11-07T11:57:07+09:00",
+      "source": "6d7ee3d85bd0e47eb7b787234c10d5dbfdb3a9e8",
+      "review": "0761de1846d715594b6c7d9db276dff9f5b86bae",
+      "directParentEqualsSource": true,
+      "remoteExact": true,
+      "onlyOwn8AddedReviewDocs": true,
+      "Docs": 42331288008,
+      "DocsJob": 128278155877,
+      "correlation": "FLEET5-K2-H12-6D7-CLAUDE-CODE-REVIEW-0761de1846d7-1260f22da45c",
+      "exactManualDocsAll19Success": true,
+      "verdict": "ACCEPT_NARROW_PRIVATE_MATH_AND_SCOPED_GUARD_CODE_KEEP_HOLD",
+      "canonicalGitBlobSHA256": {
+        "docs/vault/30_Development/Evidence/fleet5-k2-h12-6d7-code-review-20261107-claude/.gitattributes": "96a83569c84cfe3f57b7efe3dc61c249548d0fca4fed0e538b3587cdc97c95c1",
+        "docs/vault/30_Development/Evidence/fleet5-k2-h12-6d7-code-review-20261107-claude/commands.json": "4b1455f81bf28965d1a8b28bc1ae9511fd33696dfb1962f4dc60730630d160ff",
+        "docs/vault/30_Development/Evidence/fleet5-k2-h12-6d7-code-review-20261107-claude/local-doc-gates.txt": "3e54361839fae17e077641fa8a0dbe9c8103bf6575b6a658c57ec981c8c0f305",
+        "docs/vault/30_Development/Evidence/fleet5-k2-h12-6d7-code-review-20261107-claude/review.json": "4eff2134a3b8310625610d2811a3255d6c0f8316ea3fd6d075b788a1804168d0",
+        "docs/vault/30_Development/Evidence/fleet5-k2-h12-6d7-code-review-20261107-claude/reviewer-h12-6d7-static-result.json": "f7141927b6ec2daf67a4f18ef4f6243f9978078055193945aa55db2074934073",
+        "docs/vault/30_Development/Evidence/fleet5-k2-h12-6d7-code-review-20261107-claude/reviewer_gate_driver.py.txt": "3b28436302fc939dd0aa23b03fdd042117b0c6e115b080836a1e348457d2be8b",
+        "docs/vault/30_Development/Evidence/fleet5-k2-h12-6d7-code-review-20261107-claude/reviewer_h12_6d7_static_check.py.txt": "fdeed378fd01d2103bc81ebbbc561d3cd5fd965d2f94222850b9dcf60f061290",
+        "docs/vault/30_Development/History/2026-11-07_FLEET5_K2_H12_6d7_Code_Review_Claude.md": "7c5c2b2e9b89fad92c51569a7fb4e7334a724bef046eeb0f300fcf3958fff4b3"
+      },
+      "mandatoryFixes": 0,
+      "actualAuthority": null,
+      "wholeProgramComplete": false
+    },
+    "mandatoryCodeFixes": 0,
+    "optionalLow": "H12C-L1 DER admission bounds causal-test gap; correct code, not mandatory for accepted6d7",
+    "nextOwner": "Root current CPU vertical-slice identity/profile/trust/fence preflight; author fixed at question msg_7e9353c0e1f6"
   }
 }

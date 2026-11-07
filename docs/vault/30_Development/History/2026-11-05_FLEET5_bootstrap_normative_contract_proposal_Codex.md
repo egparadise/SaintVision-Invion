@@ -101,3 +101,6 @@ source/build/image/helper/guard/CI/verdict and private preflight evidence exist.
 Future implementation tasks and their red/green seams are proposed in
 `api-ownership-acceptance.json`; none is marked implemented or operationally
 accepted here. Operations remain HOLD.
+
+
+Root501 first docs gate direct exit1: new human-readable wiki links lacked an alias matching the underscored History filename. Original failed log preserved; added the exact report alias and reran normal gates before any commit. No product/source/CI claim or gate relaxation.

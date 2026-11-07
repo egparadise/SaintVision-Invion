@@ -1,0 +1,16 @@
+{
+  "atKST": "2026-11-07T12:04:54+09:00",
+  "source": "b51d827e507a35aca3737e31103bd3b3311298a5",
+  "directBase": "746789a36091c8601afea23fe176069e2fa7d87b",
+  "branch": "agent/codex/fleet5-b-a7-selector-discovery-r1-20261107",
+  "remoteExact": true,
+  "onlyOwn22AddedDocs": true,
+  "acceptedProductAndTestPinsUnchanged": true,
+  "Docs": 42331427974,
+  "DocsJob": 128278594470,
+  "correlation": "codex-b-a7-selector-discovery-b51d827e507a-ctx6f0f8253b8a7-20261107",
+  "exactManualDocsAll19Success": true,
+  "codeReview": "PENDING_ACTUAL_DELTA_REVIEW",
+  "actualAuthority": null,
+  "wholeProgramComplete": false
+}
