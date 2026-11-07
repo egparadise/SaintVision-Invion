@@ -1,0 +1,44 @@
+import datetime,hashlib,json,os,stat,subprocess,sys,tarfile,time,urllib.request,urllib.error
+from pathlib import Path
+p=json.load(sys.stdin);root=Path(p['root']);o={'source':p['source'],'mainProductExecution':False,'realDBOrAPIConnected':False,'credentialsOrPrivateKeysMounted':False,'existingServicesChanged':False,'userFilesChanged':False,'actualRunOrVotesCreated':False,'wholeProgramComplete':False};phase='public-source-and-port-preconditions';cid=None
+try:
+ assert os.getuid()==1000 and root.is_dir() and not root.is_symlink() and hashlib.file_digest((root/'public-source.tar').open('rb'),'sha256').hexdigest()==p['archiveSHA256'];os.umask(0o077)
+ assert not [x for x in Path('/proc/net/tcp').read_text().splitlines()[1:] if x.split()[3]=='0A' and int(x.split()[1].rsplit(':',1)[1],16)==13400]
+ src=root/'source';src.mkdir(mode=0o700)
+ with tarfile.open(root/'public-source.tar') as t:
+  for m in t.getmembers():
+   assert (m.isfile() or m.isdir()) and not m.name.startswith('/') and '..' not in m.name.split('/')
+   assert m.name=='apps' or m.name.startswith(('apps/web','contracts','packages'))
+   f=src/m.name
+   if m.isdir():f.mkdir(parents=True,exist_ok=True,mode=0o700)
+   else:f.parent.mkdir(parents=True,exist_ok=True,mode=0o700);f.write_bytes(t.extractfile(m).read());f.chmod(0o700 if m.mode&0o111 else 0o600)
+ generated=src/'apps/web/src/contracts/node-certificate-validator.mjs';assert not generated.exists();assert (src/'apps/web/src/contracts/node-certificate-validator.d.mts').is_file()
+ q=subprocess.run(['docker','image','inspect','node:24-bookworm-slim'],capture_output=True,timeout=10);assert q.returncode==0;im=json.loads(q.stdout)[0];assert im['Id'].startswith('sha256:01d566e8d94d') and im['Os']=='linux' and im['Architecture']=='amd64';image=im['Id']
+ name='saintvision-direct-vite-cc607-repro-r1';q=subprocess.run(['docker','container','ls','-a','--filter','name=^/'+name+'$','--format','{{.ID}}'],capture_output=True,timeout=10);assert q.returncode==0 and not q.stdout.strip()
+ shell="npm ci --no-audit --no-fund\nci_rc=$?\nif [ \"$ci_rc\" -ne 0 ]; then exit \"$ci_rc\"; fi\nexec node node_modules/vite/bin/vite.js --host 0.0.0.0 --port 13400 --strictPort"
+ phase='isolated-uid1000-npm-install-and-direct-vite'
+ q=subprocess.run(['docker','run','-d','--name',name,'--network','bridge','--publish','127.0.0.1:13400:13400','--user','1000:1000','--cpus','1','--memory','1g','--memory-swap','1g','--pids-limit','256','--read-only','--cap-drop','ALL','--security-opt','no-new-privileges','--tmpfs','/tmp:rw,nosuid,size=512m,mode=1777','--env','HOME=/tmp/sv-home','--env','npm_config_cache=/tmp/npm-cache','--mount',f'type=bind,src={src},dst=/workspace','--workdir','/workspace/apps/web','--label','ai.saintvision.owner=fleet5-root-direct-vite-repro','--entrypoint','sh',image,'-c',shell],capture_output=True,timeout=20);assert q.returncode==0;cid=q.stdout.decode().strip();o['containerID']=cid;op=urllib.request.build_opener(urllib.request.ProxyHandler({}));health=None
+ for attempt in range(120):
+  try:
+   with op.open('http://127.0.0.1:13400/',timeout=1) as response:health=response.status;html=response.read(1024*1024);break
+  except (urllib.error.URLError,TimeoutError,ConnectionResetError):time.sleep(1)
+ assert health==200 and b'id="root"' in html
+ phase='actual-direct-main-config-import-readback'
+ try:
+  with op.open('http://127.0.0.1:13400/src/shared/api/nodeCertificateObservation.ts',timeout=10) as response:module_status=response.status;body=response.read(131072).decode()
+ except urllib.error.HTTPError as error:module_status=error.code;body=error.read(131072).decode()
+ assert module_status==500 and 'Failed to resolve import' in body and '@/contracts/node-certificate-validator.mjs' in body and not generated.exists()
+ q=subprocess.run(['docker','container','inspect',cid],capture_output=True,timeout=10);assert q.returncode==0;v=json.loads(q.stdout)[0];assert v['Name']=='/'+name and v['State']['Running'] and v['Config']['User']=='1000:1000' and v['HostConfig']['ReadonlyRootfs'] and v['HostConfig']['NetworkMode']=='bridge' and len(v['Mounts'])==1 and v['Mounts'][0]['Source']==str(src)
+ assert v['HostConfig']['PortBindings']['13400/tcp']==[{'HostIp':'127.0.0.1','HostPort':'13400'}]
+ logs=subprocess.run(['docker','logs','--tail','100',cid],capture_output=True,timeout=10);(root/'public-npm-vite.stdout.txt').write_bytes(logs.stdout);(root/'public-npm-vite.stderr.txt').write_bytes(logs.stderr)
+ o.update(status='ACTUAL_FRESH_DIRECT_VITE_REPRODUCED_INDEX200_MODULE500_MISSING_GENERATED_ESM',imageId=image,UID='1000:1000',memoryBytes=1073741824,pidsLimit=256,CPUQuotaMillis=1000,bridgeNetwork=True,hostLoopbackOnlyPort=13400,containerListenerAdaptation='0.0.0.0 inside isolated Docker bridge; same direct vite.js argv/main config with no npm lifecycle',readOnlyRoot=True,capDropAll=True,noNewPrivileges=True,publicSourceOnlyMount=True,gitignoredGeneratedFileAbsentBeforeAndAfter=True,indexHTTP=health,moduleHTTP=module_status,failedImport='@/contracts/node-certificate-validator.mjs',missingImportErrorObserved=True,operatorIndexOnlyReadyFalsePositiveConfirmed=True,sourceArchiveSHA256=p['archiveSHA256'],noPasswordOrTokenInput=True)
+except BaseException as e:o.update(status='HOLD_DIRECT_VITE_REPRO_RECONCILE_REQUIRED',phase=phase,errorClass=type(e).__name__,doNotBlindlyReplay=True)
+finally:
+ if cid:
+  q=subprocess.run(['docker','container','inspect',cid],capture_output=True,timeout=10)
+  if q.returncode==0:
+   v=json.loads(q.stdout)[0];assert v['Config']['Labels']['ai.saintvision.owner']=='fleet5-root-direct-vite-repro'
+   stop=subprocess.run(['docker','stop','--time','5',cid],capture_output=True,timeout=15);o['ownedProbeContainerStopExit']=stop.returncode
+   q=subprocess.run(['docker','container','inspect',cid],capture_output=True,timeout=10);assert q.returncode==0;o['ownedProbeContainerStopped']=json.loads(q.stdout)[0]['State']['Running'] is False
+ o['atKST']=datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=9))).isoformat(timespec='seconds');(root/'public-repro-receipt.json').write_text(json.dumps(o,indent=2)+'\n')
+print(json.dumps(o));raise SystemExit(0 if o.get('status')=='ACTUAL_FRESH_DIRECT_VITE_REPRODUCED_INDEX200_MODULE500_MISSING_GENERATED_ESM' and o.get('ownedProbeContainerStopped') else 2)

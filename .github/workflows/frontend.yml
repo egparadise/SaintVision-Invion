@@ -25,6 +25,7 @@ on:
       - 'packages/contracts-ts/**'
       - 'deploy/intranet/portal/**'
       - 'tests/test_intranet_portal_deploy.py'
+      - 'tools/verify_vite_direct_launch.py'
       - '.github/workflows/frontend.yml'
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -51,6 +52,28 @@ jobs:
         working-directory: apps/web
         run: npm ci
 
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install pinned hosted browser regression harness
+        run: |
+          python -m pip install playwright==1.62.0
+          google-chrome --version
+
+      # Must precede every npm generation hook: prove the shipped direct Vite path
+      # prepares a fresh checkout instead of inheriting a generated build output.
+      - name: Boot clean direct vite.js main config in real browser
+        run: python tools/verify_vite_direct_launch.py
+
+      - name: Upload clean direct Vite browser evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: saintvision-direct-vite-startup-evidence
+          path: artifacts/vite-direct-launch/
+          retention-days: 14
+
       - name: Run ESLint
         working-directory: apps/web
         run: npm run lint
@@ -66,15 +89,6 @@ jobs:
       - name: TypeScript Check & Production Build
         working-directory: apps/web
         run: npm run build
-
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-
-      - name: Install pinned hosted browser regression harness
-        run: |
-          python -m pip install playwright==1.62.0
-          google-chrome --version
 
       - name: Boot actual built frontend under canonical strict CSP
         run: python tools/verify_portal_strict_csp_browser.py

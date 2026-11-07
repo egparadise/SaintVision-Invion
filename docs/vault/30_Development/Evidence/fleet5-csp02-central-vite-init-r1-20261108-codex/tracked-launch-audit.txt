@@ -1,0 +1,51 @@
+HEAD:.github/workflows/ac11-accessibility-e2e.yml:75:          npm run dev --prefix apps/web -- --host 127.0.0.1 --port 3005 > "$RAW_DIR/vite-private.log" 2>&1 &
+HEAD:.github/workflows/desktop-browser.yml:50:          npm run build
+HEAD:.github/workflows/frontend.yml:56:        run: npm run lint
+HEAD:.github/workflows/frontend.yml:60:        run: npm run test
+HEAD:.github/workflows/frontend.yml:68:        run: npm run build
+HEAD:apps/web/Dockerfile:12:RUN npm run build
+HEAD:apps/web/package-lock.json:3606:        "vite": "bin/vite.js"
+HEAD:apps/web/package.json:16:    "preeval:check": "npm run validators:generate",
+HEAD:apps/web/package.json:17:    "eval:check": "vitest run tests/agent-eval-runner.test.ts",
+HEAD:apps/web/tests/agent-eval-runner.test.ts:45:  it('verifies committed canonical Evidence JSON against drift (eval:check, F1 & F4)', () => {
+HEAD:deploy/intranet/portal/Dockerfile:24:RUN npm run build
+HEAD:deploy/lan/README.md:618:`deploy/lan/Start-LiveConsole.ps1` starts only services this pilot state has
+HEAD:deploy/lan/README.md:675:`deploy/lan/Register-DesktopShortcut.ps1` registers a current-user desktop icon for
+HEAD:deploy/lan/Register-DesktopShortcut.ps1:4:    # Passed through to Start-LiveConsole.ps1. The tunnel PORT is read from the state;
+HEAD:deploy/lan/Register-DesktopShortcut.ps1:14:$svScript = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot 'Start-LiveConsole.ps1')).Path
+HEAD:deploy/lan/Start-LiveConsole.ps1:31:$svVite = "$svCheckout/apps/web/node_modules/vite/bin/vite.js"
+HEAD:deploy/lan/SvLauncherInput.ps1:3:# Dot-sourced by Start-LiveConsole.ps1 and Register-DesktopShortcut.ps1 so both enforce the
+HEAD:deploy/studio/Register-EnvironmentStartup.ps1:8:$svScript = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot 'Start-Environment.ps1')).Path
+HEAD:deploy/studio/Start-Environment.ps1:20:            & "$svCheckout/deploy/lan/Start-LiveConsole.ps1" -StatePath $StatePath | Out-Null
+HEAD:tests/core/test_launcher_failure_boundaries.py:18:    """Resolve the prerequisites the way Start-LiveConsole.ps1 does.
+HEAD:tests/core/test_launcher_failure_boundaries.py:38:            ROOT / "apps" / "web" / "node_modules" / "vite" / "bin" / "vite.js",
+HEAD:tests/core/test_launcher_failure_boundaries.py:102:         str(ROOT / "deploy/lan/Start-LiveConsole.ps1"), "-StatePath", str(state_dir)],
+HEAD:tests/core/test_launcher_failure_boundaries.py:144:    text = (ROOT / "deploy/lan/Start-LiveConsole.ps1").read_text(encoding="utf-8")
+HEAD:tests/core/test_launcher_failure_boundaries.py:151:    text = (ROOT / "deploy/lan/Start-LiveConsole.ps1").read_text(encoding="utf-8")
+HEAD:tests/core/test_launcher_failure_boundaries.py:161:    text = (ROOT / "deploy/lan/Start-LiveConsole.ps1").read_text(encoding="utf-8")
+HEAD:tests/core/test_launcher_failure_boundaries.py:182:    text = (ROOT / "deploy/lan/Start-LiveConsole.ps1").read_text(encoding="utf-8")
+HEAD:tests/core/test_launcher_failure_boundaries.py:196:    text = (ROOT / "deploy/lan/Register-DesktopShortcut.ps1").read_text(encoding="utf-8")
+HEAD:tests/core/test_launcher_failure_boundaries.py:291:         str(ROOT / "deploy/lan/Start-LiveConsole.ps1"), "-StatePath", str(state_dir)],
+HEAD:tests/core/test_launcher_failure_boundaries.py:341:        ROOT / "deploy/lan/Start-LiveConsole.ps1",
+HEAD:tests/core/test_launcher_failure_boundaries.py:342:        ROOT / "deploy/lan/Register-DesktopShortcut.ps1",
+HEAD:tests/core/test_launcher_failure_boundaries.py:438:         str(ROOT / "deploy/lan/Start-LiveConsole.ps1"), "-StatePath", str(state_dir), *extra],
+HEAD:tests/core/test_launcher_failure_boundaries.py:567:    registrar = (ROOT / "deploy/lan/Register-DesktopShortcut.ps1").read_text(encoding="utf-8")
+HEAD:tests/core/test_launcher_failure_boundaries.py:604:    for name in ("Start-LiveConsole.ps1", "Register-DesktopShortcut.ps1"):
+HEAD:tests/core/test_launcher_failure_boundaries.py:721:         str(ROOT / "deploy/lan/Register-DesktopShortcut.ps1"),
+HEAD:tests/core/test_launcher_failure_boundaries.py:733:    for name in ("Start-LiveConsole.ps1", "Register-DesktopShortcut.ps1"):
+HEAD:tests/core/test_launcher_failure_boundaries.py:866:    text = (ROOT / "deploy/lan/Start-LiveConsole.ps1").read_text(encoding="utf-8")
+HEAD:tests/core/test_launcher_failure_boundaries.py:912:    for path in (ROOT / "deploy/lan/SvLauncherInput.ps1", ROOT / "deploy/lan/Start-LiveConsole.ps1"):
+HEAD:tests/integration/test_approval_browser.py:22:    child = subprocess.Popen([shutil.which('node'), 'node_modules/vite/bin/vite.js', '--config',
+HEAD:tests/test_deploy_intranet_preflight.py:8:4. Prior dist/ output is cleaned before npm run build to guarantee freshness of generated artifacts.
+HEAD:tests/test_deploy_intranet_preflight.py:249:        "npm run build",
+HEAD:tests/test_deploy_intranet_preflight.py:324:    """Negative control: missing dist/index.html after npm run build halts at Step 3 with exit 1."""
+HEAD:tests/test_deploy_intranet_preflight.py:342:        "npm run build",
+HEAD:tests/test_deploy_intranet_preflight.py:358:    """Freshness guarantee: pre-existing dist/ directory is wiped prior to npm run build."""
+HEAD:tests/test_deploy_intranet_preflight.py:379:        "npm run build",
+HEAD:tests/test_deploy_intranet_preflight.py:417:        "npm run build",
+HEAD:tests/test_deploy_intranet_preflight.py:456:        "npm run build",
+HEAD:tests/test_deploy_intranet_preflight.py:496:            "npm run build",
+HEAD:tests/test_deploy_intranet_preflight.py:533:            "npm run build",
+HEAD:tests/test_deploy_intranet_preflight.py:570:        "npm run build",
+HEAD:tools/baselines/doc_path_citations.txt:188:30_Development/History/2026-09-19_Launcher_우선순위5_감사_Codex.md || apps/web/node_modules/vite/bin/vite.js
+HEAD:tools/deploy_intranet.ps1:90:        npm run build

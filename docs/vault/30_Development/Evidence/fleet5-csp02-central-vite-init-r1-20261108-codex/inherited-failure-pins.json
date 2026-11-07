@@ -1,0 +1,20 @@
+[
+  {
+    "source": "cc6076254d5b8f54804081a8b1994d76d86cf81a",
+    "path": "docs/vault/30_Development/Evidence/fleet5-csp02-esm-dev-compat-r1-20261108-codex/baseline-baseline-final-proof.json",
+    "SHA256": "36252158f6af93347b58daa50fee9eb02ca0a5851a7f3cec1c6e9712642d6f9c",
+    "status": "actual failure retained at its original source; not candidate success"
+  },
+  {
+    "source": "cc6076254d5b8f54804081a8b1994d76d86cf81a",
+    "path": "docs/vault/30_Development/Evidence/fleet5-csp02-esm-dev-compat-r1-20261108-codex/first-corrected-source-ci-failure.json",
+    "SHA256": "6d632993b94e8d737a93299b4d26f0ceb9e96543a989cd57bf8a6b82152879c2",
+    "status": "actual failure retained at its original source; not candidate success"
+  },
+  {
+    "source": "cc6076254d5b8f54804081a8b1994d76d86cf81a",
+    "path": "docs/vault/30_Development/Evidence/fleet5-csp02-esm-dev-compat-r1-20261108-codex/second-corrected-source-ac11-measurement.json",
+    "SHA256": "62bc8cd7cca4752e2222299dfc42a50bd7e36a71c38212bc5e822963381fe48d",
+    "status": "actual failure retained at its original source; not candidate success"
+  }
+]

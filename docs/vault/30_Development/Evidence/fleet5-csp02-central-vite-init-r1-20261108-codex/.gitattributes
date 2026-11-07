@@ -1,0 +1,3 @@
+*.raw binary
+sync-state-before.json binary
+sync-state-after.json binary

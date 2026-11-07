@@ -1,0 +1,40 @@
+[
+  {
+    "path": "baseline-public-repro-receipt.json",
+    "SHA256": "70aac4b77869e1e5d982b00904400b0583c23a0773cfa887ade7a698cafde4ad",
+    "rawPath": "baseline-public-repro-receipt.json.raw",
+    "rawSHA256": "70aac4b77869e1e5d982b00904400b0583c23a0773cfa887ade7a698cafde4ad",
+    "rawBytes": 1744
+  },
+  {
+    "path": "r2-review.json",
+    "SHA256": "f528cfdb7721e80beae068bdae4fcc5c59d8318cfa9e747324adea8b289c8766",
+    "rawPath": "r2-review.json.raw",
+    "rawSHA256": "8d400be04826b2f2c2edbe77f438b2b91e54b4c1bf708c2a7da28718e9203192",
+    "rawBytes": 16747
+  },
+  {
+    "path": "r2-root-verification.json",
+    "SHA256": "506df8d447c1cceacdf6e7a7e18dba98107f1460d2aa552cff2ef74c1cc47563",
+    "rawPath": "r2-root-verification.json.raw",
+    "rawSHA256": "506df8d447c1cceacdf6e7a7e18dba98107f1460d2aa552cff2ef74c1cc47563",
+    "rawBytes": 8296
+  },
+  {
+    "path": "root528-public-proof.json",
+    "SHA256": "dc07432fdc73734ce8ce1f8de7e582b32fd1272bd6b1f3e0d8700bbc08e8e69d",
+    "rawPath": "root528-public-proof.json.raw",
+    "rawSHA256": "559b6ac19db75f0cf09d258c353fcc158d5d9cf677a07f9a9eaf5108da4a7659",
+    "rawBytes": 444
+  },
+  {
+    "path": "baseline-remote-repro-program.py.txt",
+    "SHA256": "ae33ccd8ec3cf5a2c32eec3000299bd25ce08938e4eaef460bf4093f6892c01f",
+    "bytes": 6283
+  },
+  {
+    "path": "baseline-root-repro-program.py.txt",
+    "SHA256": "c14d54aaa0b764858becd1a41485ba3618d1a3939e19bda6a7620d71601d570d",
+    "bytes": 8694
+  }
+]

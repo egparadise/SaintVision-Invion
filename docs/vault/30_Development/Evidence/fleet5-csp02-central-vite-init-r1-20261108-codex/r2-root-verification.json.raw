@@ -1,0 +1,65 @@
+{
+  "atKST": "2026-11-08T03:30:08+09:00",
+  "reviewSource": "63f3eeb661c565d864e14c2395f68c6715d109c0",
+  "reviewBase": "4a29b57e6c6ccb75eed50147c00d52d3c8d6ac04",
+  "reviewedTarget": "cc6076254d5b8f54804081a8b1994d76d86cf81a",
+  "actualVerdict": "CHANGES_REQUIRED_CR_CSP02_RESIDUAL_DIRECT_VITE_OPERATOR_LAUNCHER_KEEP_MANUAL_AND_REAL_DEPLOYMENT_GATES",
+  "soundPartsInherited": [
+    "Browser output is self-contained ESM. The generator uses esbuild 0.25.12 (the only esbuild in the unchanged lock, at node_modules/esbuild) with bundle/esm/browser. It fails closed if any bundled input is non-runtime ajv/dist code or any output has an external import, and if the esbuild version differs from the lock. The official manifest lists one runtime input, node_modules/ajv-formats/dist/formats.js.",
+    "Manifest pins re-derived from cc607 blobs: schemaSHA256 f8bb8fa8...404f and lockSHA256 1fa82239...2fbd unchanged, generatorSHA256 eb1b7d2a...4042 equal to the official manifest. The --check option still fails closed on drift of either file, and the drift test checks the format and selfContained flags.",
+    "Under npm run dev, Vite serves the .mjs as known JS (knownJsSrcRE includes m[jt]s) with no imports to resolve. Root's hosted AC11 42398681339 at cc607 passed the dev-server desktop-invariants step (14/14 steps) and the six direct-fixture browser cases.",
+    "The build-only commonjsOptions was removed, and the browser strict-CSP boot still passes (Frontend 42398676174, 14 + 17 steps). The dist source-map audit no longer sees helpers inside the pre-bundled validator file, but the generator's metafile guard covers that file instead.",
+    "Tests: the 14 prior cases are kept, plus one native-ESM boundary case (TypeScript AST rejects require()/module.exports/module['exports'], and native import must yield a default function that validates the fixture). The VM loader is a SourceTextModule in the same strings:false/wasm:false context; linking rejects every specifier, then evaluate and Function/eval negatives run. --execArgv=--experimental-vm-modules affects only Vitest workers, not the browser or CSP. Official count is 1351/1351 in 106 files.",
+    "tests/browser/vite.config.ts runs the same generator with execFileSync before defineConfig. A non-zero exit throws, so the fixture fails closed instead of serving a missing or stale validator.",
+    "The nodeCertificateObservation.ts tail from 'const renewalWindowMillis' to EOF has SHA-256 d136f8bf...99c7 at 96, 428e and cc607. The contracts, packages, services, migrations, src, tests, deploy, apps/studio, package-lock, ac11-accessibility-e2e.yml, collect_ac11_accessibility_e2e.py and run_real_browser_acceptance.py objects equal both 428e and 96. verify_portal_strict_csp_browser.py equals 428e (it was introduced there)."
+  ],
+  "remainingMandatoryCodeDefects": [
+    {
+      "id": "CR-CSP-02 (residual)",
+      "severity": "Medium",
+      "evidenceKind": "static source reading at exact cc607 blobs; not executed by the reviewer (Main execution is prohibited)",
+      "summary": "The repository's own Windows operator launcher starts the main Vite dev server directly, so none of the paths that generate the gitignored validator run. On a freshly installed checkout the validator module does not exist, the import cannot resolve, and the app does not render, yet the launcher's health check reports ready. Base 96 needed no generated file and booted on this path.",
+      "location": [
+        "deploy/lan/Start-LiveConsole.ps1:31 ($svVite = apps/web/node_modules/vite/bin/vite.js), :39-41 (only checks that vite.js exists: 'Install this checkout Python and web dependencies first'), :232 (node vite.js --host 127.0.0.1 --port 3000 --strictPort in apps/web, main vite.config.ts)",
+        "deploy/studio/Start-Environment.ps1:20 (calls Start-LiveConsole), :24-25 (ready when GET :3000 returns 200, which only fetches index.html)",
+        "deploy/lan/Register-DesktopShortcut.ps1:14 (desktop shortcut to Start-LiveConsole; formalized in Card 289)",
+        "apps/web/.gitignore:2 (/src/contracts/node-certificate-validator.mjs is ignored, so never present after checkout)",
+        "apps/web/vite.config.ts (cc607: no generation; only tests/browser/vite.config.ts generates)",
+        "apps/web/package.json (generation only in npm predev/prebuild/prelint/pretest/preeval:check; no install hook)"
+      ],
+      "causalChain": [
+        "A new or updated checkout has no node-certificate-validator.mjs because it is gitignored. npm ci/install runs no generation (there is no install hook, and the author README states none was added).",
+        "Start-LiveConsole (directly, through the Card 289 desktop shortcut, or through Start-Environment) launches node vite.js with the main config. npm lifecycle hooks do not run, and the main vite.config.ts does not generate.",
+        "When the browser requests src/shared/api/nodeCertificateObservation.ts, Vite import analysis cannot resolve '@/contracts/node-certificate-validator.mjs' (the alias points to src/contracts, which holds only the .d.mts), so the module fails with the Failed to resolve import error. App.tsx:36 imports it eagerly from main.tsx, so #root never renders.",
+        "Start-LiveConsole -OpenBrowser and Start-Environment treat HTTP 200 for / as ready, so the operator gets 'SaintVision services ready' while the app cannot boot.",
+        "On a reused checkout where an earlier npm script left a generated file, the direct launch serves that file with no regeneration or drift check, so the served validator may not match the current canonical schema/lock."
+      ],
+      "whyThisIsTheSameFinding": "CR-CSP-02 is a dev entry point that cannot boot the app after 8ee1e522/428e. cc607 states exactly this mechanism ('launched directly by Node/Vite, so npm's predev hook is not run'), but fixed only the test fixture config. This launcher is a shipped, tested operator lane (tests/core/test_launcher_failure_boundaries.py, Card 289 desktop shortcut, Start-Environment startup), not an arbitrary unsupported command. I did not name it in R1, which I record as my own R1 miss.",
+      "reproducibleFailure": [
+        "git worktree add <dir> cc6076254d5b8f54804081a8b1994d76d86cf81a",
+        "cd <dir>/apps/web && npm ci",
+        "node node_modules/vite/bin/vite.js --host 127.0.0.1 --port 3000 --strictPort   (exact Start-LiveConsole argv)",
+        "curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:3000/   -> 200 (what the launcher health check accepts)",
+        "curl -s -w '%{http_code}' http://127.0.0.1:3000/src/shared/api/nodeCertificateObservation.ts   -> 500 with [plugin:vite:import-analysis] Failed to resolve import \"@/contracts/node-certificate-validator.mjs\"",
+        "Chrome at / shows the Vite error overlay and an empty #root. The same steps at 96afd799 render the app. Root may run these public-only steps on PC3 or as a hosted step; Root alone owns that decision and SSH."
+      ],
+      "boundedCorrectionRequirement": "Make every Vite start that uses the main apps/web/vite.config.ts (npm run dev, direct vite.js as in the launcher, vite build) regenerate the same canonical ESM fail-closed before the module graph is served or bundled. One way is the same execFileSync pattern cc607 used for the fixture config, or a config-time plugin hook. Keep the generator, manifest, drift check, CSP, lock and launcher argv unchanged. Add one meaningful regression proving that a direct vite.js start from a checkout with no generated file boots, for example a hosted step that removes the generated files and starts node node_modules/vite/bin/vite.js before a browser load. Alternatively, an equivalent check that the main config itself invokes the generator."
+    }
+  ],
+  "RootInputPinsMatched": 27,
+  "ownFourDocsOnlyDirectParentRemoteExact": true,
+  "Docs": 42401172674,
+  "DocsJob": 128489026105,
+  "exactManualAttempt1All19Success": true,
+  "canonicalFullBytesMatchAtRootVerification": true,
+  "canonicalBytes": 534872,
+  "canonicalSHA256": "031196e13c6b54c0b878aafbe7e1f18934324886dd709b15c404b9a818fba9e2",
+  "reviewerLifecycle": {
+    "state": "succeeded",
+    "stage": "settled",
+    "liveness": "exited",
+    "terminalState": "released"
+  },
+  "actualNewDeploymentAccepted": false,
+  "wholeProgramComplete": false
+}

@@ -1,0 +1,17 @@
+{
+  "docID": "EVIDENCE-FLEET5-CSP02-CENTRAL-VITE-INIT-R1-CODEX",
+  "version": "1.0.0",
+  "task": "CR-CSP-02 residual shipped direct launcher",
+  "taskID": "task_83732e149ebb",
+  "dispatchID": "ctx_02638d160ba6",
+  "owner": "Codex",
+  "base": "cc6076254d5b8f54804081a8b1994d76d86cf81a",
+  "backendSource": "96afd799d49717fd40e4ddabd538d82accbe1958",
+  "branch": "agent/codex/fleet5-csp02-central-vite-init-r1-20261108",
+  "rootManagement": "6c12a9f1c74a5d9f6d4bce139ed6ee0a084f98fe",
+  "atKST": "2026-11-08T03:41:39.385090+09:00",
+  "canonicalBytes": 536738,
+  "canonicalSHA256": "6d699b94160c7a323502e3547ecdec7379e9c3d8238fd0ec1a1de738957cc6cc",
+  "mainProductExecution": false,
+  "review": "Root starts one actual central-config/new-proof Claude delta review inheriting sound R1/R2 after release"
+}

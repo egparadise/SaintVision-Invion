@@ -1,0 +1,156 @@
+{
+  "docID": "EVIDENCE-FLEET5-CSP02-ESM-DELTA-REVIEW-R2-20261108-CLAUDE",
+  "version": "1.0.0",
+  "atKST": "2026-11-08T03:21:08+09:00",
+  "task": "CR-CSP-02 require-free ESM / dev compatibility bounded delta review R2",
+  "orcaTaskID": "task_0d8a27910659",
+  "orcaDispatchID": "ctx_d780255be0ae",
+  "reviewer": "Claude (actual independent reviewer)",
+  "author": "Codex ctx_e508c89f62b7 / task_e18b8724de5b",
+  "obsidianApplyOwner": "Root",
+  "reviewBranch": "agent/claude/fleet5-csp02-esm-delta-review-r2-20261108",
+  "deliveryBase": "4a29b57e6c6ccb75eed50147c00d52d3c8d6ac04",
+  "priorReview": {
+    "head": "4a29b57e6c6ccb75eed50147c00d52d3c8d6ac04",
+    "verdict": "CHANGES_REQUIRED_ONE_BOUNDED_DEV_ENTRY_POINT_DEFECT_KEEP_REAL_DEPLOYMENT_GATES",
+    "rootConfirmedBaseline": "AC11 42396627296 / job 128475294431 at 428e failed: page error '/src/contracts/node-certificate-validator.cjs?import' has no default export, header wait 10000 ms failed (attempt 1, 8 of 14 steps success, re-read by gh run view)"
+  },
+  "targetDelta": {
+    "from": "428e5fc6b822d33e7e76316f443716b03579efa0",
+    "to": "cc6076254d5b8f54804081a8b1994d76d86cf81a",
+    "branch": "agent/codex/fleet5-csp02-esm-dev-compat-r1-20261108",
+    "remoteExact": true,
+    "commits": [
+      "8e3fdbd076c03bd9f0cc9424c9089a19a3640b07 fix(web): bundle canonical validator as self-contained ESM for dev and build",
+      "3bd660b5d45cfcbdb19e4c2bf2d0792c53c60685 test(web): enable ESM VM parser in actual Vitest workers",
+      "cc6076254d5b8f54804081a8b1994d76d86cf81a fix(web): prepare canonical ESM for directly launched browser fixture"
+    ],
+    "linearParentChain": true,
+    "nonDocsPathsChanged": [
+      ".github/workflows/frontend.yml",
+      "apps/web/.gitignore",
+      "apps/web/eslint.config.js",
+      "apps/web/package.json",
+      "apps/web/scripts/node-certificate-validator.mjs",
+      "apps/web/src/contracts/node-certificate-validator.d.cts -> .d.mts",
+      "apps/web/src/shared/api/nodeCertificateObservation.ts",
+      "apps/web/tests/browser/vite.config.ts",
+      "apps/web/tests/node-certificate-validator-csp.test.ts",
+      "apps/web/vite.config.ts"
+    ]
+  },
+  "backendAccepted": "96afd799d49717fd40e4ddabd538d82accbe1958",
+  "rootCheckpoint": "3aff6c63ddac3eb68739494d610337c5885f0cda",
+  "boardsReadAtRootCheckpoint": {
+    "docs/vault/00_Index/\uc804\uccb4 \uac1c\ubc1c \uc9c4\ud589 \ud604\ud669.md": "66b80d2a59f35429dac8f87512fb52d490c1272ce9fc100ee2b1140e62092d99",
+    "docs/vault/30_Development/Agent\ubcc4 \uc791\uc5c5/Claude \uc791\uc5c5 \ud604\ud669.md": "ad4a5fca80686f1edcbaf9a0abda8fbf5aaccfb0a68f1c03a67b8a32de15236b",
+    "scope": "searched for CR-CSP and the Live Console launcher; no entry retires deploy/lan/Start-LiveConsole.ps1"
+  },
+  "rootInputPins": {
+    "method": "git show from Root checkpoint 3aff6c63; SHA-256 of the committed blob bytes",
+    "cspcc607-root-verified-r1": {
+      "ac11-accessibility-e2e-artifacts.json": "c60cf9ff5112c8032ae59b3859b6c2a721242533161482c68d463e4028bd512e",
+      "ac11-accessibility-e2e-jobs.json": "76993721176e4b8f9da43503cb7b24fabb39be8d7c6603dccd563ea46905f9bc",
+      "ac11-accessibility-e2e-run.json": "32e480852cde48724f4313a4efe02563fcb2679791c4eaf7bd4868d55d02dc07",
+      "author-lifecycle.json": "b42219cbdcd7e229924b1a30cbc08cdb24f4a990bef70432862ced56feb4e887",
+      "baseline-baseline-final-proof.json": "36252158f6af93347b58daa50fee9eb02ca0a5851a7f3cec1c6e9712642d6f9c",
+      "delivery.json": "b1be51f128dd54b19d56832e5bdecf61533793c6304dd1456bff83f78efe33d7",
+      "docs-artifacts.json": "808e5b424852725fbef2e353bf7f9f9b3a1d835c3da74f27ec5503e9dd21dd08",
+      "docs-jobs.json": "282c962676d25d0e982d50363bf6950ba3b98c81f5e925023ef36a06b836cef1",
+      "docs-run.json": "1c272f85cf42fff0c3c2d08f8f390442a062b9e90ab716758ca9adfbd57b1e01",
+      "first-corrected-source-ci-failure.json": "6d632993b94e8d737a93299b4d26f0ceb9e96543a989cd57bf8a6b82152879c2",
+      "frontend-artifacts.json": "03f1294280f9139d3076169ad8dc9349776b5e2fa74437b10ca14541bf350a23",
+      "frontend-jobs.json": "448a6329b0aa08a5526e13eaf6f9ee0452983e39f9f157998d0359db3db6946b",
+      "frontend-run.json": "cc0ae9146918312d047a50ea1f094799db5b94b180eac158b903d0ccab24a956",
+      "local-gates-final-cc6076254d5b.json": "ecc178e7ca907e93e2e6fc58d00f9d8422458a315cc8b917413976f7024dc4b6",
+      "official-AC11-junit.xml": "8397285484043d407834df69617b63cd134d3615ff9c9f1062a9da3477e1a049",
+      "official-AC11-report.json": "48cb2389d619540170264359f6a9dd8e466da28c154284447a7b70e8cab04a44",
+      "official-browser-result.json": "e0309a18fba234c563ceec784d37ceae6e1ad7ea7a8ab6ab70bae0af68727a89",
+      "official-log-proof.json": "3686c4cdc98a76d4769dbfe939bf130392f6d0c75dc5329cb7ca7f64600e09be",
+      "official-validator-manifest.json": "3d40cbe9fd7d485a547591faaa0cb0b15b206f7982c77bc9e1107905e1e94200",
+      "postCI-final-sync-check.json": "3d832200f7338b8b743018fb4e104a2de6b3177f15a2dddcd7371ff91373d80a",
+      "protected-components.json": "a9df0b1ad345d6443cd5398fb55e908e86bcf6c74cd16c815f50656df57e5c8b",
+      "root-metadata-verifier.py.txt": "26c66fdcc62d46b62041e72297cec12736d5ef59172a3e53a7d91906bd1125cc",
+      "root-verification.json": "4482625df000bb2765c5bc4a6f9350e40537ef2cff9ed0384ecefc8d0ac62e6d",
+      "second-corrected-source-ac11-measurement.json": "62bc8cd7cca4752e2222299dfc42a50bd7e36a71c38212bc5e822963381fe48d",
+      "sync-state-final-comparison.json": "0a967c4daa600c4ba6b5ba9b5cf62c8f69ba7e36c1710d4ebca43a45a7915e0e"
+    },
+    "csp428e-actual-claude-review-r1": {
+      "review.json": "eb982feca945c13061b20b39c603684a24f88d5be6a723df4daffe6d6dbf9bf0",
+      "root-verification.json": "e8b5503eb2419a3181a3a97dd0af9f1d4f4e3d4b386d625959ebd604b0a2a1d0"
+    },
+    "authorUntrackedPostCIFiles": "not read; not needed for the code finding"
+  },
+  "verdict": "CHANGES_REQUIRED_CR_CSP02_RESIDUAL_DIRECT_VITE_OPERATOR_LAUNCHER_KEEP_MANUAL_AND_REAL_DEPLOYMENT_GATES",
+  "crCsp02Disposition": "NOT_CLOSED: the ESM correction is sound; one remaining dev entry point is unfixed",
+  "inheritedFromR1Unchanged": "production strict-CSP correction, canonical draft2020/$ref/strict:false/full formats, freshness and microsecond tail, strict-CSP hosted verifier, exact favicon-404 classification",
+  "closedPartsOfCrCsp02": [
+    "Browser output is self-contained ESM. The generator uses esbuild 0.25.12 (the only esbuild in the unchanged lock, at node_modules/esbuild) with bundle/esm/browser. It fails closed if any bundled input is non-runtime ajv/dist code or any output has an external import, and if the esbuild version differs from the lock. The official manifest lists one runtime input, node_modules/ajv-formats/dist/formats.js.",
+    "Manifest pins re-derived from cc607 blobs: schemaSHA256 f8bb8fa8...404f and lockSHA256 1fa82239...2fbd unchanged, generatorSHA256 eb1b7d2a...4042 equal to the official manifest. The --check option still fails closed on drift of either file, and the drift test checks the format and selfContained flags.",
+    "Under npm run dev, Vite serves the .mjs as known JS (knownJsSrcRE includes m[jt]s) with no imports to resolve. Root's hosted AC11 42398681339 at cc607 passed the dev-server desktop-invariants step (14/14 steps) and the six direct-fixture browser cases.",
+    "The build-only commonjsOptions was removed, and the browser strict-CSP boot still passes (Frontend 42398676174, 14 + 17 steps). The dist source-map audit no longer sees helpers inside the pre-bundled validator file, but the generator's metafile guard covers that file instead.",
+    "Tests: the 14 prior cases are kept, plus one native-ESM boundary case (TypeScript AST rejects require()/module.exports/module['exports'], and native import must yield a default function that validates the fixture). The VM loader is a SourceTextModule in the same strings:false/wasm:false context; linking rejects every specifier, then evaluate and Function/eval negatives run. --execArgv=--experimental-vm-modules affects only Vitest workers, not the browser or CSP. Official count is 1351/1351 in 106 files.",
+    "tests/browser/vite.config.ts runs the same generator with execFileSync before defineConfig. A non-zero exit throws, so the fixture fails closed instead of serving a missing or stale validator.",
+    "The nodeCertificateObservation.ts tail from 'const renewalWindowMillis' to EOF has SHA-256 d136f8bf...99c7 at 96, 428e and cc607. The contracts, packages, services, migrations, src, tests, deploy, apps/studio, package-lock, ac11-accessibility-e2e.yml, collect_ac11_accessibility_e2e.py and run_real_browser_acceptance.py objects equal both 428e and 96. verify_portal_strict_csp_browser.py equals 428e (it was introduced there)."
+  ],
+  "mandatoryDefects": [
+    {
+      "id": "CR-CSP-02 (residual)",
+      "severity": "Medium",
+      "evidenceKind": "static source reading at exact cc607 blobs; not executed by the reviewer (Main execution is prohibited)",
+      "summary": "The repository's own Windows operator launcher starts the main Vite dev server directly, so none of the paths that generate the gitignored validator run. On a freshly installed checkout the validator module does not exist, the import cannot resolve, and the app does not render, yet the launcher's health check reports ready. Base 96 needed no generated file and booted on this path.",
+      "location": [
+        "deploy/lan/Start-LiveConsole.ps1:31 ($svVite = apps/web/node_modules/vite/bin/vite.js), :39-41 (only checks that vite.js exists: 'Install this checkout Python and web dependencies first'), :232 (node vite.js --host 127.0.0.1 --port 3000 --strictPort in apps/web, main vite.config.ts)",
+        "deploy/studio/Start-Environment.ps1:20 (calls Start-LiveConsole), :24-25 (ready when GET :3000 returns 200, which only fetches index.html)",
+        "deploy/lan/Register-DesktopShortcut.ps1:14 (desktop shortcut to Start-LiveConsole; formalized in Card 289)",
+        "apps/web/.gitignore:2 (/src/contracts/node-certificate-validator.mjs is ignored, so never present after checkout)",
+        "apps/web/vite.config.ts (cc607: no generation; only tests/browser/vite.config.ts generates)",
+        "apps/web/package.json (generation only in npm predev/prebuild/prelint/pretest/preeval:check; no install hook)"
+      ],
+      "causalChain": [
+        "A new or updated checkout has no node-certificate-validator.mjs because it is gitignored. npm ci/install runs no generation (there is no install hook, and the author README states none was added).",
+        "Start-LiveConsole (directly, through the Card 289 desktop shortcut, or through Start-Environment) launches node vite.js with the main config. npm lifecycle hooks do not run, and the main vite.config.ts does not generate.",
+        "When the browser requests src/shared/api/nodeCertificateObservation.ts, Vite import analysis cannot resolve '@/contracts/node-certificate-validator.mjs' (the alias points to src/contracts, which holds only the .d.mts), so the module fails with the Failed to resolve import error. App.tsx:36 imports it eagerly from main.tsx, so #root never renders.",
+        "Start-LiveConsole -OpenBrowser and Start-Environment treat HTTP 200 for / as ready, so the operator gets 'SaintVision services ready' while the app cannot boot.",
+        "On a reused checkout where an earlier npm script left a generated file, the direct launch serves that file with no regeneration or drift check, so the served validator may not match the current canonical schema/lock."
+      ],
+      "whyThisIsTheSameFinding": "CR-CSP-02 is a dev entry point that cannot boot the app after 8ee1e522/428e. cc607 states exactly this mechanism ('launched directly by Node/Vite, so npm's predev hook is not run'), but fixed only the test fixture config. This launcher is a shipped, tested operator lane (tests/core/test_launcher_failure_boundaries.py, Card 289 desktop shortcut, Start-Environment startup), not an arbitrary unsupported command. I did not name it in R1, which I record as my own R1 miss.",
+      "reproducibleFailure": [
+        "git worktree add <dir> cc6076254d5b8f54804081a8b1994d76d86cf81a",
+        "cd <dir>/apps/web && npm ci",
+        "node node_modules/vite/bin/vite.js --host 127.0.0.1 --port 3000 --strictPort   (exact Start-LiveConsole argv)",
+        "curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:3000/   -> 200 (what the launcher health check accepts)",
+        "curl -s -w '%{http_code}' http://127.0.0.1:3000/src/shared/api/nodeCertificateObservation.ts   -> 500 with [plugin:vite:import-analysis] Failed to resolve import \"@/contracts/node-certificate-validator.mjs\"",
+        "Chrome at / shows the Vite error overlay and an empty #root. The same steps at 96afd799 render the app. Root may run these public-only steps on PC3 or as a hosted step; Root alone owns that decision and SSH."
+      ],
+      "boundedCorrectionRequirement": "Make every Vite start that uses the main apps/web/vite.config.ts (npm run dev, direct vite.js as in the launcher, vite build) regenerate the same canonical ESM fail-closed before the module graph is served or bundled. One way is the same execFileSync pattern cc607 used for the fixture config, or a config-time plugin hook. Keep the generator, manifest, drift check, CSP, lock and launcher argv unchanged. Add one meaningful regression proving that a direct vite.js start from a checkout with no generated file boots, for example a hosted step that removes the generated files and starts node node_modules/vite/bin/vite.js before a browser load. Alternatively, an equivalent check that the main config itself invokes the generator."
+    }
+  ],
+  "hostedResultsRootBoundAndReRead": {
+    "frontend": "42398676174 attempt 1 workflow_dispatch at cc607, jobs 128481506876 (14/14) and 128481507227 (17/17) success",
+    "docs": "42398678884 attempt 1 at cc607, job 128481515015 19/19 success",
+    "ac11": "42398681339 attempt 1 at cc607, job 128481522162 14/14 success. The normalized report stays MEASURED_FAIL/acceptanceClaim false, solely manualAcceptanceMissingCount 1 (the same-SHA user-device screen-reader/keyboard manual acceptance is absent). This is retained as an operating gate, not a code defect and not a pass.",
+    "baseline": "AC11 42396627296 at 428e, attempt 1, failure (8/14 steps success), the real failed baseline that confirmed R1",
+    "coverageGap": "No hosted run starts Vite outside npm scripts with the main config, so these runs cannot observe the residual."
+  },
+  "evidenceByteFormatNote": "The author's new .json.raw producer snapshots keep their original CRLF via -text. I treat normalized JSON and raw byte fingerprints as distinct pins. That note concerns docs evidence only and is not a code finding.",
+  "checksActuallyRun": [
+    "git log/diff/show of 428e5fc6..cc6076254d5b and each of the three commits; ls-remote of the target branch",
+    "SHA-256 of the nodeCertificateObservation.ts tail at 96, 428e and cc607, and of the cc607 generator blob against the official manifest",
+    "tree/blob OID equality for the protected trees and named workflow/tool files at 96, 428e and cc607",
+    "package-lock parse at cc607 (esbuild 0.25.12 dev, a single node_modules/esbuild entry)",
+    "git grep at cc607 for direct vite launches across tools, tests, .github and deploy, then source reads of Start-LiveConsole.ps1, Start-Environment.ps1 and Register-DesktopShortcut.ps1",
+    "git show of Root inputs at 3aff6c63 with blob SHA-256 pins; gh run view of the Frontend, Docs, AC11 and baseline runs",
+    "local docs metadata gates (local-gates.json) and full canonical sync-state byte comparison (sync-state-comparison.json)"
+  ],
+  "notRunByReviewer": "No Node, npm, Vite, Vitest, tsc, esbuild, browser, Docker, pytest, DB or product execution on Main. The residual's failure steps are a reproduction recipe and have not been executed. Hosted runs are official evidence, not reviewer executions.",
+  "retainedOperatingGates": [
+    "AC11 same-SHA user-device screen-reader/keyboard manual acceptance (manualAcceptanceMissingCount 1), not discharged",
+    "Root actual PC3 strict-CSP reactivation with real Chrome login/no-blink/resources",
+    "two distinct non-requester votes, Run/output/audit",
+    "PC1 key, PC5 RAM and Node, GPU/storage, all five PCs, renewal/reconnect/reboot"
+  ],
+  "preservedStatus": "CR-905-01 remains CLOSED. Original19HOLD/discharges0/runtimeB0/A1-A16/H1-H7/H3EA/RDNULL_HOLD/raw7UNREGISTERED/A01-A40NOT_RUN unchanged.",
+  "nextFirstAction": "Root dispatches the CR-CSP-02 residual to the Codex author lane. After an exact-SHA Frontend/Docs/AC11 run plus proof of a direct vite.js boot, one actual Claude reviews only that delta. The PC3 redeploy/browser/manual-device gates stay with Root.",
+  "wholeProgramComplete": false
+}
