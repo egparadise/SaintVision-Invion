@@ -1,0 +1,38 @@
+{
+  "atKST": "2026-11-07T19:01:32+09:00",
+  "SSHExit": 0,
+  "stderrBytes": 0,
+  "knownHostsUnchanged": true,
+  "businessSourceUnchangedAtFirstCandidate": "414f7144712ed7d9bdd783480b963e6f1df16495",
+  "sourceArchiveSHA256": "54b44e587ce95ef22dbca1c9ccddd0aa1217f4a60f62ee0abda5570820f5861e",
+  "remote": {
+    "actualAPIStarted": false,
+    "DBConnected": false,
+    "privateMaterialBuildInput": false,
+    "mainProductExecution": false,
+    "finalCombinedCandidateAccepted": false,
+    "wholeProgramComplete": false,
+    "buildExit": 0,
+    "stderrBytes": 0,
+    "status": "BUSINESS_PURE_WHEEL_BUILT_EXACT_SOURCE_NOT_INSTALLED",
+    "source": "1efea494f026e932360c35ae811b6423d874a2e7",
+    "sourceArchiveSHA256": "54b44e587ce95ef22dbca1c9ccddd0aa1217f4a60f62ee0abda5570820f5861e",
+    "buildBaseImageID": "sha256:51dafde81dbdb6ebde285137a295cf18a47ca95234fe388a343719cb97305b3d",
+    "ownedBuildDirectory": "/home/saintvision-invion3/saintvision-share/ops-fresh-cpu-1efea-r1-20261107/build-business-1efea-r1",
+    "wheelPath": "/home/saintvision-invion3/saintvision-share/ops-fresh-cpu-1efea-r1-20261107/build-business-1efea-r1/wheel/saintvision_inv-0.1.0-py3-none-any.whl",
+    "wheelBytes": 450877,
+    "wheelSHA256": "d2497104cd3b4f9f7a0b5e67060eb40ec8895e27fbd311434212cfe8385efcf1",
+    "sourceFilesCheckedUnchanged": 129,
+    "wheelPackageFilesComparedToSource": 128,
+    "allOriginalSourceBytesUnchanged": true,
+    "declaredRuntimeDependencies": [
+      "Requires-Dist: fastapi",
+      "Requires-Dist: pydantic",
+      "Requires-Dist: sqlalchemy",
+      "Requires-Dist: alembic",
+      "Requires-Dist: psycopg[binary]",
+      "Requires-Dist: uvicorn"
+    ],
+    "finalAPIEnvironment": "NOT_CREATED; new CP candidate wheel/final CI/review and exact dependency versions remain pending"
+  }
+}

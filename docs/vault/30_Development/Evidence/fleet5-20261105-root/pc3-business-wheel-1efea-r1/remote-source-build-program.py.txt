@@ -1,0 +1,29 @@
+import hashlib,io,json,os,subprocess,sys,tarfile,zipfile
+from pathlib import Path,PurePosixPath
+phase='validate-new-source-only-build-scope';o={'actualAPIStarted':False,'DBConnected':False,'privateMaterialBuildInput':False,'mainProductExecution':False,'finalCombinedCandidateAccepted':False,'wholeProgramComplete':False}
+try:
+ assert os.getuid()==1000;os.umask(0o077);ops=Path('/home/saintvision-invion3/saintvision-share/ops-fresh-cpu-1efea-r1-20261107');root=ops/'build-business-1efea-r1';assert not root.exists()
+ blob=sys.stdin.buffer.read(25000001);assert len(blob)<=25000000
+ root.mkdir(mode=0o700);src=root/'source';dst=root/'wheel';src.mkdir(mode=0o700);dst.mkdir(mode=0o700)
+ tf=tarfile.open(fileobj=io.BytesIO(blob),mode='r:');members=tf.getmembers()
+ for m in members:
+  p=PurePosixPath(m.name);assert not p.is_absolute() and '..' not in p.parts and (m.name=='pyproject.toml' or m.name=='src' or m.name.startswith('src/')) and (m.isfile() or m.isdir())
+ tf.extractall(src,filter='data')
+ before={str(p.relative_to(src)):hashlib.sha256(p.read_bytes()).hexdigest() for p in src.rglob('*') if p.is_file()}
+ phase='root-owned-isolated-PC3-build-no-runtime-config'
+ image='sha256:51dafde81dbdb6ebde285137a295cf18a47ca95234fe388a343719cb97305b3d'
+ args=['docker','run','--rm','--user','1000:1000','--cpus','1','--memory','512m','--memory-swap','512m','--pids-limit','128','--read-only','--cap-drop','ALL','--security-opt','no-new-privileges','--network','bridge','--tmpfs','/tmp:rw,nosuid,nodev,size=128m,uid=1000,gid=1000','--env','HOME=/tmp','--env','PIP_CONFIG_FILE=/dev/null','--mount','type=bind,src='+str(src)+',dst=/source','--mount','type=bind,src='+str(dst)+',dst=/out','--entrypoint','python',image,'-m','pip','wheel','--no-deps','--no-cache-dir','--disable-pip-version-check','--no-input','--progress-bar','off','--wheel-dir','/out','/source']
+ q=subprocess.run(args,capture_output=True,timeout=180);(root/'build.stdout.txt').write_bytes(q.stdout);(root/'build.stderr.txt').write_bytes(q.stderr);o['buildExit']=q.returncode;o['stderrBytes']=len(q.stderr);assert q.returncode==0
+ wheels=list(dst.glob('saintvision_inv-0.1.0-py3-none-any.whl'));assert len(wheels)==1 and len(list(dst.glob('*.whl')))==1;wheel=wheels[0];data=wheel.read_bytes()
+ with zipfile.ZipFile(io.BytesIO(data)) as z:
+  names=z.namelist();assert 'saintvision/api/app.py' in names and 'saintvision/server.py' in names
+  compared=0
+  for name in names:
+   if name.startswith('saintvision/') and not name.endswith('/'):
+    path=src/'src'/name
+    if path.is_file():assert z.read(name)==path.read_bytes();compared+=1
+  metadata=z.read('saintvision_inv-0.1.0.dist-info/METADATA').decode()
+ assert all(hashlib.sha256((src/p).read_bytes()).hexdigest()==h for p,h in before.items())
+ o.update(status='BUSINESS_PURE_WHEEL_BUILT_EXACT_SOURCE_NOT_INSTALLED',source='1efea494f026e932360c35ae811b6423d874a2e7',sourceArchiveSHA256=hashlib.sha256(blob).hexdigest(),buildBaseImageID=image,ownedBuildDirectory=str(root),wheelPath=str(wheel),wheelBytes=len(data),wheelSHA256=hashlib.sha256(data).hexdigest(),sourceFilesCheckedUnchanged=len(before),wheelPackageFilesComparedToSource=compared,allOriginalSourceBytesUnchanged=True,declaredRuntimeDependencies=[x for x in metadata.splitlines() if x.startswith('Requires-Dist:')],finalAPIEnvironment='NOT_CREATED; new CP candidate wheel/final CI/review and exact dependency versions remain pending')
+except BaseException as error:o.update(status='HOLD_BUSINESS_WHEEL_BUILD',phase=phase,errorClass=type(error).__name__,rawDiagnosticsSuppressed=True)
+print(json.dumps(o));raise SystemExit(0 if o.get('status')=='BUSINESS_PURE_WHEEL_BUILT_EXACT_SOURCE_NOT_INSTALLED' else 2)

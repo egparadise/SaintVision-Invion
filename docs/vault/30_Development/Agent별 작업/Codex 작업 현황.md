@@ -1,15 +1,19 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.474"
+version: "1.0.475"
 status: "review"
 author: "Codex"
-updated: "2026-11-07T18:57:27+09:00"
+updated: "2026-11-07T19:07:30+09:00"
 source_of_truth: "Git"
 active_card: "FLEET5 continued supervision with PORTAL-REFRESH-FLEET-20261106"
-active_card_status: "FirstWorkspaceR1SingleBImplementationActive_PC5LinuxAPI141SourceCompatible; MainMemoryAndActualRuntime_PC1Auth_RealApproversRunFivePCPending_RootCanonicalApplyDeferred"
+active_card_status: "FirstCombinedWorkspace414fFourHostedCIsRunning_BActive_PC3BusinessWheelBuiltNotInstalled; FinalCodeCIReviewDeploy_ActualVotesRunFivePCPending_RootCanonicalApplyDeferred"
 active_card_next: "B Task72ad09258a5c/ctx200 implements exact R1 serving+atomic binding+UI, real restricted-role hosted tests and final Frontend/Core/Backend/Docs; one actual Claude then Root protected deployment. Root must defer canonical APPLY until B full snapshot closes. PC1 local key registration/additional real approver identity remain pending; no fake ready/workload/votes/Run."
 ---
+
+## 2026-11-07T19:07:30+09:00 첫통합코드 CI와 실제PC3 업무패키지
+
+첫실행통합코드414f7144가실제push됐고B가Frontend/Core/Backend/Docs4개hostedCI를시작했다고보고했다. 아직최종성공/독립code수락은아니다. Root는현재후보에서업무컴포넌트소스가고정1efea와동일함을대조하고PC3에서격리Python이미지로부족한businesswheel을빌드했다. 원본129파일불변/패키지128파일일치·SHA d2497104...이며설치/API기동/DB연결은하지않았다. 최종후보와dependency버전을다시대조한후설치·배포한다. B구현/CI와실제승인/Run/5대조건은계속미완료다. Core/Frontend/Backend최종산출물은실제완료보고뒤검증하고그전에다른검토자나실배포를시작하지않는다.
 
 ## 2026-11-07T18:57:27+09:00 5번PC Docker조건 정정
 
