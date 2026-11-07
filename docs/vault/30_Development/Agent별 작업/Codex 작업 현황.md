@@ -1,15 +1,19 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.500"
+version: "1.0.501"
 status: "review"
 author: "Codex"
-updated: "2026-11-08T08:25:56+09:00"
+updated: "2026-11-08T08:45:06+09:00"
 source_of_truth: "Git"
 active_card: "FLEET5 continued supervision with PORTAL-REFRESH-FLEET-20261106"
-active_card_status: "R2B8c839F1F6AuthorProposalsVerified_ActualClaudeDeltaNext_NotYetIndependentAcceptance; RequiredMigrationAndExpiryBranchesDefined_NoRuntimeRelease"
-active_card_next: "Finish Root539 exact Docs/Obsidian, start one actual Claude F1-F6 bounded delta incl own board/History followup, then finite required implementation for actual time/budget/authority. Epolicy11-08 16:15:30KST; budgets/cutoffs/releases null/HOLD. No restart/reboot/migration after expiry under current authority; separate expired recovery, CA terminal no sameCA. Real2approvers/PC1key/PC5safeNode/fullGPUstorage/manual/all5 remain."
+active_card_status: "ActualR2Delta49875ACCEPT_F1F6ClosedPlanOnly_Mandatory0; FinitePolicyExpiredValidLeafContractAndExecutableProofCodeReady_NoOperatingRelease"
+active_card_next: "Publish Root540 exact Docs/Obsidian, start original actual Codex finite expired-current-authority contract plus executable verification code/hosted proofs, default non-serving/no live admission integration. Current policy deadline11-08 16:15:30KST not yet passed at record; normal budgets null/HOLD. Actual source review and Root private preflight/release before migration/renewal; genuine2approvers/PC1key/PC5safeNode/fullGPUstorage/manual/all5 remain."
 ---
+
+## 2026-11-08T08:45:06+09:00 R2 실제 수락과 유한 복구 계약·검증 구현 착수 준비
+
+실제Claude49875a26은R2 b8c839를필수0건으로수락하고F1~F6을CLOSED_AT_PLAN_ONLY로판정했다. Root는23입력/10sourcepin·정확R2/Root539본문일치·freshClaudeboard1.2.131의실제갱신·최종Docs42426182599/job128564847759전19단계·이전headDocs성공보존·593772Bcanonical시작/끝/postCI/current전체동일을대조했다. 최종parent는e9ee65b4이며Root539에서두commit이고두frontmatter미래시각만08:35로고친차이를확인했다. 계획수락은실제source/운영수락이아니다. normalbudget/선행준비미확정이므로현재정책기한전이라는사실을유지하면서별도만료권한복구계약과실행가능검증코드를다음유한구현카드로선택했다. 실제갱신/이행/추가재시작/Run/5대완료는아직없다. 다음첫행동/담당은Root540정확게시뒤원작성자Codex의코드구현이며문서만추가하고구현완료로처리하지않는다.
 
 ## 2026-11-08T08:25:56+09:00 R2 F1~F6 제안 검증과 실제 Claude delta 준비
 

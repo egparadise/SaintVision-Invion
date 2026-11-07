@@ -1,0 +1,18 @@
+{
+  "path": "D:/Project/SaintVision-Invion/SaintVisionI-Invion/.git/obsidian-sync-state.json",
+  "baselineMeaning": "New full canonical baseline given by the Root539 receipt (593772 B / 3f73a3fe...8846). The R2 author's 587290 B / a59e... state predates Root539 APPLY and is expected to differ; it was not copied in.",
+  "beforeAtKST": "2026-11-08T08:28:47+09:00",
+  "beforeBytes": 593772,
+  "beforeSHA256": "3f73a3fe79268490391aefabc6a5f9e1d373e6bc66e62cd257cfb9e849118846",
+  "endAfterLocalGatesBytes": 593772,
+  "endAfterLocalGatesSHA256": "3f73a3fe79268490391aefabc6a5f9e1d373e6bc66e62cd257cfb9e849118846",
+  "fullBytesEqual": true,
+  "comparisonMethod": "full byte comparison (cmp) of a scratch copy taken at review start against the live file after each gate pass; the post-CI comparison is a separate untracked Root-ready receipt to avoid self-reference",
+  "syncCheckOutput": {
+    "initialPass": "CHECK: 3693 managed files, 4 pending exports, 0 conflicts. No writes.",
+    "finalPass": "CHECK: 3694 managed files, 5 pending exports, 0 conflicts. No writes."
+  },
+  "pendingExportsMeaning": "The pending exports are this review's own unapplied board/History/Evidence; Root alone owns APPLY.",
+  "checkOnly": true,
+  "applyPerformed": false
+}

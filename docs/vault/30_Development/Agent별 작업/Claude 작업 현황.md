@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-CLAUDE-001"
 title: "Claude 작업 현황"
-version: "1.2.130"
+version: "1.2.131"
 status: "review"
 author: "Claude"
-updated: "2026-11-05T16:10:01+09:00"
+updated: "2026-11-08T08:35:00+09:00"
 
 
 
@@ -12,6 +12,20 @@ updated: "2026-11-05T16:10:01+09:00"
 
 source_of_truth: "Git"
 ---
+
+## 2026-11-08 FLEET5 현재 3-Node 갱신 계획 실제 Claude 검토 R1·R2 (Claude 직접 기록)
+
+- **R1 (task_f69368c7f664, 07:37 KST)**: 계획 a3c6984f(v1.0.0)와 Root537 관리 사본 a2d79771(인용 렌더링만 변경, 34/34 permalink 역변환 검증)을 정적으로 검토했다. 결론은 REQUEST_CHANGES, 필수 차단 2건이다. 커밋은 f29228ed, Docs 42421987817 19/19 성공. R1에서는 Evidence 4개와 History만 바꾸고 이 보드는 갱신하지 않았다(누락). Root는 이를 정확히 기록했고 대신 작성하지 않았으며, 이번 R2 작업에서 보완한다.
+  - F1 MAJOR: 16:15:30 KST peer-policy 만료 이후 계약이 없었다. 만료 후에는 CP mTLS가 fail-closed되고, Node 시작이 exit 1로 끝나며, 정상 기계도 만료 권한을 거부한다.
+  - F2 MAJOR: 새 Go 바이너리·이미지·CID 이전이 조건이 아니라 필수 선행 작업이다.
+  - F3 MODERATE: NodeTLSClient 생성 지점이 5곳이다.
+  - F4 MINOR: CP-client 만료 증거가 없었다.
+  - F5 MINOR: COPY는 remote:11이다.
+  - F6 MINOR: CA 종단 의미가 빠져 있었다.
+- **R2 delta (task_ed462b9da76f, 08:28 KST 착수)**: 대상 b8c839d1(v1.1.0, base a3c6984f, Root539 사본과 바이트 동일)을 검토했다. 결론은 **ACCEPT_R2_PLAN_DELTA_KEEP_IMPLEMENTATION_AND_OPERATING_GATES**, 필수 0, 신규 필수 0이며 F1~F6는 모두 CLOSED_AT_PLAN_ONLY다. 계획 수준의 종료일 뿐 source/runtime 수락이 아니고 운영도 해제하지 않는다. 확인한 것: 49개 full-SHA permalink를 25개 source map 범위·발췌와 정확히 대조했고, manifest의 budget·cut-off·eligibility·attestation은 모두 null이며, 작성자 자체 종료는 없다. 비차단 LOW 관찰 2건: O1 현재 시각상 정상 분기는 도달이 어렵고 만료 권한 복구 카드가 예상 다음 카드다. O2 복구 budget에 자체 migration을 포함해야 한다.
+- **검증 범위**: 정적 docs 검토만 했다. Go/Docker/crypto/SSH/DB/live는 실행하지 않았다. APPLY false, canonical 쓰기 없음.
+- **다음 첫 행동/담당**: Root가 delta를 검증·게시한 뒤 실제 시각·E·budget으로 분기를 선택한다(예상: Codex에 FLEET5-EXPIRED-CURRENT-AUTHORITY-FORWARD-RECOVERY-CONTRACT-R1 배정, 실제 Claude 검토). 그동안 PC2/PC3/PC4의 회전·재시작·재부팅·이전은 금지한다.
+- **기록**: [[2026-11-08_FLEET5_Current_Three_Node_Renewal_Plan_Review_R1_Claude]] · [[2026-11-08_FLEET5_Current_Three_Node_Renewal_Plan_R2_Delta_Review_Claude]]
 
 ## 2026-11-05 실제087 판정 수신
 
@@ -820,15 +834,15 @@ PR #36 NodeResourceUsage UI 독립 검토 (Claude, 2026-09-22): head 96fa3ec6, �
 
 | 항목 | 현재 기록 |
 |---|---|
-| 마지막 작업 / 착수 카드 | VF-CL-R5 수정(R5-01 cleanup skip 은폐·R5-02 격리 source 누락) + 원격 권한 결속/CAS fixture 독립 검토(8c347b7/e89a415) |
-| 실제 owner / 읽은 진행판 버전 / KST | Claude(테스트/운영 문서 owner·독립 검토) / 보강 로드맵 VF-CL / 2026-09-18 22:45 KST |
-| branch / base SHA / 구현 SHA | agent/claude/vf-cl-cx01 / b5f770a / 71fc9f5(image-lane 마무리) → R3 커밋(아래) |
-| 작업한 것 | R3-01: `is_host_process_init_failure` 플랫폼 게이팅 + loader-stage 전용 allowlist{0xC0000142,0xC0000135}, crash(0xC0000005)·signal(−9) 미재시도(변경명령 중복 방지), describe 5범주. R2-03: `masked_stderr`가 URL·libpq(`password=`)·인용값 3형태 마스킹, 오류 종류 보존. finally: cleanup try/except + JSON write를 finally 마지막 무조건 실행(OSError에도 비밀 없는 evidence 기록). +앞 커밋(71fc9f5): retries 2→1, TimeoutExpired 분류, 선행 host 검사, exit 125 미검증, pytest.skip |
-| 확인한 것 / 명령 / exit code / 실제 환경 | `pytest --noconftest tests/test_docker_diag.py tests/test_check_kernel_docker_hygiene.py tests/test_vf_docker.py` → **24 passed**(실 docker; R5-01 cleanup 6종·R5-02 재현성·타입/동시성 포함). R5-02 회귀 non-vacuous 음성 확인. model 검토는 코드 경로·계약·`channel_monotonic` SQL 대조(실 PG 실행은 사용자 75 passed / Codex 79) |
-| CI / 독립 reviewer / 운영 인수 | 단위 24 passed 실측. reviewer=Codex 일관 수정본(R2·R3·타입·R5) 재검토 대기. model 검토 sound 인계 |
-| 남은 문제 / 차단 이유 / 해소 담당 | 8건 중 6건(business-kernel-role 포함) **미검증** 유지(호스트 압박, 제품 결함 0건). e89a415 CAS는 실 PG로 검증됨; image lane 재판별은 여유 호스트 필요 |
-| 다음 카드 / 첫 행동 / 다음 담당 | 착지 완료(11커밋 b378785). e2908a5 registry 권한 결속 독립 검토 완료(sound), docker 부재 3파일 동작 실측(22 passed/2 skipped, 깔끔 skip·가드 불필요). 남은 것: 3파일 배치/CI 경계(Codex), 여유 호스트 image lane 재판별(사용자/CI) |
-| History / 오류 / Evidence / PR / sync 결과 | **상태 지도(단일 참조)**: [[2026-09-19_Claude영역_검증상태지도]] — 검증완료/미검증(정확히 기록)/외부대기 구분, image lane 6건 재실행 조건·명령 포함. History: `..._VF-CL-R-001_...근본원인과R2수정.md` v1.5.0; `..._model_remote독립검토.md`; `..._원격권한결속과CAS_fixture독립검토.md`; `..._registry권한결속_독립검토.md`. 착지 merge b378785 |
+| 마지막 작업 / 착수 카드 | FLEET5 현재 3-Node 갱신 계획 R2 delta 실제 독립 검토(task_ed462b9da76f); 직전 R1 검토 f29228ed |
+| 실제 owner / 읽은 진행판 버전 / KST | Claude(실제 독립 reviewer; 작성자 Codex task_3e413989dcaa, APPLY는 Root) / Index 1.0.539·Codex 1.0.500·History 1.0.148·Claude 1.2.130→1.2.131 / 2026-11-08 08:28 KST 착수 |
+| branch / base SHA / 구현 SHA | agent/claude/fleet5-current-three-node-renewal-plan-r2-delta-review-20261108 / Root539 2733d3ce / 대상 계획 b8c839d1(base a3c6984f); 구현 없음(docs-only) |
+| 작업한 것 | R2 delta F1~F6 검토, 이 보드·History 1개·고유 Evidence(review/read-pins/local-gates/sync-state-comparison) 작성 |
+| 확인한 것 / 명령 / exit code / 실제 환경 | git show/diff, scratchpad Python으로 49 permalink 대 25 source map 정확 일치·manifest null·자체 종료 없음 확인; 6개 metadata gate exit 0; 정적 검토로 runtime 증명 없음 |
+| CI / 독립 reviewer / 운영 인수 | ACCEPT_R2_PLAN_DELTA_KEEP_IMPLEMENTATION_AND_OPERATING_GATES(F1~F6 CLOSED_AT_PLAN_ONLY); Docs workflow_dispatch 결과는 History/worker_done에 기록; 운영 해제 없음 |
+| 남은 문제 / 차단 이유 / 해소 담당 | 복구·migration·adapter 미구현(Codex), Root live inventory·budget·preflight·release, peer-policy 2026-11-08 16:15:30 KST·leaf 11-09·CA 11-14 경계, 승인자 2명 부재 |
+| 다음 카드 / 첫 행동 / 다음 담당 | Root 분기 선택 → 예상 FLEET5-EXPIRED-CURRENT-AUTHORITY-FORWARD-RECOVERY-CONTRACT-R1(Codex owner, Claude 실제 검토) |
+| History / 오류 / Evidence / PR / sync 결과 | [[2026-11-08_FLEET5_Current_Three_Node_Renewal_Plan_R2_Delta_Review_Claude]]; Evidence fleet5-current-three-node-renewal-plan-r2-delta-review-20261108-claude; R1 보드 미갱신 누락은 이번에 보완; sync CHECK only, APPLY 없음 |
 
 ## Codex 통합 수신 (2026-09-18)
 
