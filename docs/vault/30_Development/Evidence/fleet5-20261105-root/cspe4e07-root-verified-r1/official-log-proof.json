@@ -1,0 +1,29 @@
+{
+  "vitest": {
+    "jobID": 128498256116,
+    "bytes": 359499,
+    "SHA256": "075c9f81c14d62bbc5eb70a6710fd0500ea567d9d25272817f103f5a550c5676",
+    "summaries": [
+      "2026-11-07T19:03:20.6006139Z  Test Files  106 passed (106)",
+      "2026-11-07T19:03:20.6011495Z       Tests  1351 passed (1351)"
+    ],
+    "passedTests": 1351,
+    "totalTests": 1351
+  },
+  "ac11": {
+    "jobID": 128498272539,
+    "bytes": 193294,
+    "SHA256": "14d6b9312aa45d8b2ce43cde66fe04abc40fe265ddc476b1631db8905365b39b",
+    "actualBrowserCaseSummary": {
+      "exitCode": 0,
+      "tests": {
+        "failure": 0,
+        "error": 0,
+        "skipped": 0,
+        "passed": 6
+      },
+      "unverified": null,
+      "evidence": ".work/ac11-accessibility-browser.json"
+    }
+  }
+}

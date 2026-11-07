@@ -1,0 +1,28 @@
+{
+  "atKST": "2026-11-08T04:00:18+09:00",
+  "questionID": "msg_a907e6644b3c",
+  "taskID": "task_83732e149ebb",
+  "dispatchID": "ctx_02638d160ba6",
+  "decision": "APPROVE_ONLY_EXACT_ONE_LINE_EXISTING_UNTILVISIBLE_SYNCHRONIZATION",
+  "basis": "User already authorized continued development and fixes; required positive async completion wait preserves assertions/counts/timeouts and product behavior",
+  "candidateSource": "2c6bbdbe43cc5d2abdb753675d1ecaffac4399fc",
+  "patchSHA256": "736cd6ca263cd5e16cd03575e42720e617bbf9d4963811e1ad5d002641074379",
+  "testAPIAndPanelUnchangedFromCC607": {
+    "apps/web/tests/first-workspace-panel.test.tsx": "6a634cc5e59986d4caabba7e85a6842089c8a03587408159cfa9c46dd4e79e7d",
+    "apps/web/src/shared/api/workspaceFirstIntent.ts": "1f85156af8b55b45a67fa517702f93b9acacd5a4c6c15dae4415f370b112ac88",
+    "apps/web/src/features/studio/FirstWorkspacePanel.tsx": "52c631392f4a7b3f6070f73df5508100772e023db2058fc1a57d1b785c7ebc64"
+  },
+  "gitApplyCheckExit": 0,
+  "officialFailedFrontend": 42403333297,
+  "officialFailedJob": 128495638404,
+  "testCountMustRemain": 1351,
+  "existingHelperTimeoutMs": 2000,
+  "skipOrTimeoutWeakeningAuthorized": false,
+  "otherProductOrTestChangesAuthorizedByThisDecision": false,
+  "preserveOriginalFailure": true,
+  "newRealSourceAndFreshFrontendDocsAC11Required": true,
+  "canonicalBytes": 536738,
+  "canonicalSHA256": "6d699b94160c7a323502e3547ecdec7379e9c3d8238fd0ec1a1de738957cc6cc",
+  "RootAPPLYDuringTask": "DEFERRED",
+  "wholeProgramComplete": false
+}

@@ -1,0 +1,558 @@
+{
+  "fixtureOnly": true,
+  "actualPC3BrowserAcceptance": false,
+  "anonymousOnly": true,
+  "npmLifecycleUsed": false,
+  "command": [
+    "/opt/hostedtoolcache/node/22.23.4/x64/bin/node",
+    "node_modules/vite/bin/vite.js",
+    "--config",
+    "vite.config.ts",
+    "--host",
+    "127.0.0.1",
+    "--port",
+    "42575",
+    "--strictPort"
+  ],
+  "cwd": "/home/runner/work/SaintVision-Invion/SaintVision-Invion/apps/web",
+  "mainConfig": "apps/web/vite.config.ts",
+  "mainConfigSHA256": "6fcc641f4d56c4f89efae2bcefda1833bc9811f0bf236580252940ec8695fecf",
+  "missingBefore": {
+    "apps/web/src/contracts/node-certificate-validator.mjs": true,
+    "apps/web/src/contracts/node-certificate-validator.manifest.json": true
+  },
+  "sourceSHA": "e4e07bfd6b94e57edc64d158e208df01b9319deb",
+  "sandbox": true,
+  "deletedFiles": [],
+  "ownedChildPID": 2558,
+  "generatedAfter": {
+    "apps/web/src/contracts/node-certificate-validator.mjs": "476a803e51aa3f03e7512cfdf246462a63998e8657dc8afc5a622b0652a1d860",
+    "apps/web/src/contracts/node-certificate-validator.manifest.json": "3d40cbe9fd7d485a547591faaa0cb0b15b206f7982c77bc9e1107905e1e94200"
+  },
+  "manifest": {
+    "schema": "contracts/v1alpha1/core.schema.json",
+    "ref": "https://saintvision.ai/contracts/v1alpha1/core.schema.json#/$defs/ProjectNodeCertificateObservationResponse",
+    "format": "esm",
+    "selfContained": true,
+    "schemaSHA256": "f8bb8fa801f64d622ebcdc1c4c3383833632ccfb05a740493e3a5cb86e44404f",
+    "generatorSHA256": "eb1b7d2a1f667f9a8616d95b43b54716e3d3a4a7b8744ddacc4a777d8cc44042",
+    "lockSHA256": "1fa82239ec4bb731ef649acfeac84ac4a1dfb2fa5801824502adf053e8892fbd",
+    "ajv": "8.20.0",
+    "ajvFormats": "3.0.1",
+    "esbuild": "0.25.12",
+    "runtimeInputs": [
+      {
+        "path": "node_modules/ajv-formats/dist/formats.js",
+        "SHA256": "b61693a26869970a92cc1fe832c931ccd3afe8b6d66802b19c48306349e84880"
+      }
+    ],
+    "validatorSHA256": "476a803e51aa3f03e7512cfdf246462a63998e8657dc8afc5a622b0652a1d860"
+  },
+  "browserVersion": "156.0.8078.79",
+  "rootChildren": 1,
+  "knownBase96MissingFavicon": [],
+  "validatorModuleResponses": [
+    {
+      "url": "http://127.0.0.1:42575/src/contracts/node-certificate-validator.mjs",
+      "status": 200
+    }
+  ],
+  "bootPassed": true,
+  "ownedChildExitCode": 143,
+  "pageErrors": [],
+  "requestFailures": [],
+  "responses": [
+    {
+      "url": "http://127.0.0.1:42575/",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:42575/src/main.tsx",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:42575/auth-config.js",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:42575/@react-refresh",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:42575/@vite/client",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:42575/src/app/App.tsx",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:42575/src/index.css",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:42575/node_modules/vite/dist/client/env.mjs",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:42575/src/shared/api/kernelMutations.ts",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:42575/src/shared/api/approvalReview.ts",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:42575/src/features/desktop/DesktopShell.tsx",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:42575/src/features/desktop/ResourceExplorer.tsx",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:42575/src/shared/ui/Header.tsx",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:42575/src/features/dashboard/ClusterOverview.tsx",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:42575/src/features/nodes/NodeList.tsx",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:42575/src/features/nodes/NodeDetail.tsx",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:42575/src/features/workspaces/WorkspaceCreateModal.tsx",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:42575/src/features/workspaces/WorkspaceList.tsx",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:42575/src/features/workspaces/ExecutionResultView.tsx",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:42575/src/features/placement/PlacementSimulator.tsx",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:42575/src/features/editor/MonacoWorkspaceEditor.tsx",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:42575/src/features/recovery/DistributedRecoveryView.tsx",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:42575/src/features/agent/NaturalLanguageRunView.tsx",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:42575/src/features/admin/AdminSecurityConsole.tsx",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:42575/src/features/release/ReleaseCandidateView.tsx",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:42575/src/features/deployment/IntranetDeploymentView.tsx",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:42575/src/features/runs/RunList.tsx",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:42575/src/features/runs/RunDetail.tsx",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:42575/src/features/evidence/EvidenceViewer.tsx",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:42575/src/features/approvals/ApprovalCenter.tsx",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:42575/src/features/terminal/WebTerminal.tsx",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:42575/src/features/auth/Login.tsx",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:42575/src/features/auth/session.ts",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:42575/src/features/mlops/ModelLineageView.tsx",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:42575/src/shared/api/client.ts",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:42575/src/shared/api/projectObservation.ts",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:42575/src/features/studio/DeveloperStudio.tsx",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:42575/src/shared/api/runApprovalObservation.ts",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:42575/src/shared/api/nodeObservation.ts",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:42575/src/shared/api/nodeCertificateObservation.ts",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:42575/src/features/desktop/desktopLayout.ts",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:42575/src/features/desktop/fabricControlApi.ts",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:42575/src/features/desktop/DesktopWindow.tsx",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:42575/node_modules/.vite/deps/react.js?v=bfa14b78",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:42575/node_modules/.vite/deps/react_jsx-dev-runtime.js?v=bfa14b78",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:42575/src/features/desktop/InvFileExplorer.tsx",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:42575/src/features/desktop/ModelStudioView.tsx",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:42575/src/features/desktop/TerminalSessionView.tsx",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:42575/src/shared/ui/Skeleton.tsx",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:42575/src/shared/ui/ErrorState.tsx",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:42575/src/shared/ui/EmptyState.tsx",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:42575/src/shared/ui/Button.tsx",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:42575/src/shared/api/storageObservation.ts",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:42575/src/shared/ui/useModalA11y.ts",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:42575/src/features/placement/placementEngine.ts",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:42575/src/features/placement/ResourceTopologyGraph.tsx",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:42575/src/shared/api/workspaceEditObservation.ts",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:42575/src/features/placement/PlacementExplainView.tsx",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:42575/src/features/editor/diffEngine.ts",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:42575/src/features/editor/sessionRecovery.ts",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:42575/src/features/editor/DiffViewer.tsx",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:42575/src/features/editor/ConflictResolutionModal.tsx",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:42575/src/features/editor/GitCommitModal.tsx",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:42575/src/features/agent/agentEngine.ts",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:42575/src/features/recovery/recoveryEngine.ts",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:42575/src/features/admin/securityEngine.ts",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:42575/node_modules/.vite/deps/react-dom_client.js?v=16506c83",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:42575/src/features/release/releaseEngine.ts",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:42575/src/features/deployment/deploymentEngine.ts",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:42575/src/shared/api/runLogObservation.ts",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:42575/src/shared/api/runArtifactObservation.ts",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:42575/src/shared/api/shardObservation.ts",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:42575/src/shared/api/releaseObservation.ts",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:42575/src/shared/api/runAttemptObservation.ts",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:42575/src/shared/api/modelRetry.ts",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:42575/src/features/approvals/ApprovalReviewPanel.tsx",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:42575/src/shared/ui/RiskBadge.tsx",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:42575/src/shared/realtime/ws-terminal.ts",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:42575/src/shared/api/terminalTicket.ts",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:42575/src/features/auth/pkce.ts",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:42575/src/features/runs/SealRecordPanel.tsx",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:42575/src/shared/api/modelCommitmentObservation.ts",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:42575/src/shared/api/adapterObservation.ts",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:42575/src/shared/api/modelRegistryObservation.ts",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:42575/src/features/mlops/mlopsEngine.ts",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:42575/src/contracts/kernel-observation.ts",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:42575/src/features/studio/FirstWorkspacePanel.tsx",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:42575/src/shared/utils/crypto.ts",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:42575/src/shared/api/fabricObservation.ts",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:42575/node_modules/.vite/deps/chunk-SBBO3VZI.js?v=c95f00b3",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:42575/src/contracts/node-certificate-validator.mjs",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:42575/node_modules/.vite/deps/chunk-6UHQHO32.js?v=c95f00b3",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:42575/src/features/approvals/ApprovalDetail.tsx",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:42575/src/shared/utils/dateTime.ts",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:42575/src/shared/api/runSealObservation.ts",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:42575/src/shared/api/firstWorkspace.ts",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:42575/src/shared/api/workspaceFirstIntent.ts",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:42575/favicon.svg",
+      "status": 200
+    }
+  ],
+  "requestMethods": [
+    "GET",
+    "GET",
+    "GET",
+    "GET",
+    "GET",
+    "GET",
+    "GET",
+    "GET",
+    "GET",
+    "GET",
+    "GET",
+    "GET",
+    "GET",
+    "GET",
+    "GET",
+    "GET",
+    "GET",
+    "GET",
+    "GET",
+    "GET",
+    "GET",
+    "GET",
+    "GET",
+    "GET",
+    "GET",
+    "GET",
+    "GET",
+    "GET",
+    "GET",
+    "GET",
+    "GET",
+    "GET",
+    "GET",
+    "GET",
+    "GET",
+    "GET",
+    "GET",
+    "GET",
+    "GET",
+    "GET",
+    "GET",
+    "GET",
+    "GET",
+    "GET",
+    "GET",
+    "GET",
+    "GET",
+    "GET",
+    "GET",
+    "GET",
+    "GET",
+    "GET",
+    "GET",
+    "GET",
+    "GET",
+    "GET",
+    "GET",
+    "GET",
+    "GET",
+    "GET",
+    "GET",
+    "GET",
+    "GET",
+    "GET",
+    "GET",
+    "GET",
+    "GET",
+    "GET",
+    "GET",
+    "GET",
+    "GET",
+    "GET",
+    "GET",
+    "GET",
+    "GET",
+    "GET",
+    "GET",
+    "GET",
+    "GET",
+    "GET",
+    "GET",
+    "GET",
+    "GET",
+    "GET",
+    "GET",
+    "GET",
+    "GET",
+    "GET",
+    "GET",
+    "GET",
+    "GET",
+    "GET",
+    "GET",
+    "GET",
+    "GET",
+    "GET",
+    "GET",
+    "GET"
+  ]
+}

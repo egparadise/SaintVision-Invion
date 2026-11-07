@@ -1,6 +1,6 @@
 {
   "schema": "fleet5-root-review-resource-sequence:1",
-  "atKST": "2026-11-08T03:35:57+09:00",
+  "atKST": "2026-11-08T04:17:09+09:00",
   "completedB": {
     "task": "task_d4c4c809ed4e",
     "review": "ac9182c3e3d606ec027c0be2e90e049ff50d54f1",
@@ -16,11 +16,11 @@
   "pending": [
     {
       "id": "CR-CSP-02 residual",
-      "severity": "Medium",
-      "state": "ACTUAL_PC3_FRESH_DIRECT_LAUNCH_FAILURE_CONFIRMED_READY_CENTRAL_CONFIG_FIX",
-      "source": "cc6076254d5b8f54804081a8b1994d76d86cf81a",
-      "review": "63f3eeb661c565d864e14c2395f68c6715d109c0",
-      "owner": "actual Orca Codex"
+      "state": "E4E07_CENTRAL_CONFIG_FRESH_DIRECT_PROOF_AND_EXACT_WAIT_VERIFIED_READY_BOUNDED_REVIEW",
+      "source": "e4e07bfd6b94e57edc64d158e208df01b9319deb",
+      "base": "cc6076254d5b8f54804081a8b1994d76d86cf81a",
+      "owner": "one actual Orca Claude delta reviewer",
+      "inherit": "sound R1/R2 ESM/canonical/CSP and prior tests"
     }
   ],
   "authorParallelWork": "B frozen b51 awaiting actual delta verdict; H12 accepted6d7 plus read-only five-row audit delivered, Root owns first CPU journey preflight. Optional Low backlog is not a mandatory new scope.",
@@ -31,7 +31,7 @@
     "review": "0e53fc024ca773b7719182e170e5e126aeaf5b95",
     "verdict": "ACCEPT TEST-ONLY; R-L1 CLOSED; no new findings"
   },
-  "nextActualReviewTrigger": "Only the central main-config/direct-fresh-launch correction delta. Inherit sound R1/R2 ESM/canonical/CSP findings; no optional Low/whole-feature loop.",
+  "nextActualReviewTrigger": "Only central main-config generation, fresh direct browser proof and exact approved one-line UI wait. Inherit sound R1R2; no optional Low/whole-feature loop; manual and actual operating gates remain.",
   "completedIntegration": {
     "task": "task_78064fb4b7ff",
     "dispatch": "ctx_ed7ec73163d6",
@@ -3458,5 +3458,156 @@
       "ownedProbeContainerStopped": true,
       "atKST": "2026-11-08T03:33:02+09:00"
     }
+  },
+  "e4e07CandidateVerification": {
+    "atKST": "2026-11-08T04:14:11+09:00",
+    "source": "e4e07bfd6b94e57edc64d158e208df01b9319deb",
+    "base": "cc6076254d5b8f54804081a8b1994d76d86cf81a",
+    "unchangedBackendSource": "96afd799d49717fd40e4ddabd538d82accbe1958",
+    "branch": "agent/codex/fleet5-csp02-central-vite-init-r1-20261108",
+    "descendantCommits": 2,
+    "sourcePaths": [
+      ".github/workflows/frontend.yml",
+      "apps/web/tests/first-workspace-panel.test.tsx",
+      "apps/web/vite.config.ts",
+      "tools/verify_vite_direct_launch.py"
+    ],
+    "protectedTreesAndAC11PolicyUnchanged": {
+      "contracts": "b2b24a6d9baf24302f3590f4f30fe851ccb81ef1",
+      "packages": "7c445bdbc929f6597c0b39b598f9726032c67ad7",
+      "services": "5c9918adc48c76c88b5119f44516bb332924f067",
+      "migrations": "b1d35598829437c39dab7f60e9521bf8627e6832",
+      "src": "5507dfb820d54a8778c4cf5e3551368f11b6105f",
+      "tests": "f0c6e9f537989b71f57b2185fd43c6abbaf4369e",
+      "deploy": "5a98abd52d78c2dea952b257123bea2f01dffa64",
+      "apps/studio": "faf648da92d7f63e74e7e1d158deb923d42a6a8c",
+      "apps/web/package-lock.json": "7cd35bcec966ac001d6481f9712ff06546879222",
+      ".github/workflows/ac11-accessibility-e2e.yml": "2c72288b5fd5f6e83ccdfe0ed08b29de620e938d",
+      "tools/collect_ac11_accessibility_e2e.py": "2a550db5fd63f121ae6e512c4e1bdb9f38deb445",
+      "tools/run_real_browser_acceptance.py": "74683e101b38bac66ff4e689c8da09a886330e0c",
+      "tools/verify_portal_strict_csp_browser.py": "6127e8460247816c956e1b34eee56c746cc98776",
+      "apps/web/scripts/node-certificate-validator.mjs": "43241a4aa2a9d1712e22b69d1db7062f50963590",
+      "apps/web/src/shared/api/nodeCertificateObservation.ts": "029568a75b56328c8b2d966ecc0111337cc3ee6f",
+      "apps/web/src/shared/api/workspaceFirstIntent.ts": "44d8d4073df2d8594c6058437594165b1f903ee8",
+      "apps/web/src/features/studio/FirstWorkspacePanel.tsx": "1180b3cb9a62e7c7d0d41a19e5d9d19520930171",
+      "apps/web/package.json": "2bb2f1737b9da0374d88ab3c976c91e1239edf91",
+      "apps/web/tests/node-certificate-validator-csp.test.ts": "9b5fb0e0f2f231ef1dca651266be041e8aac06a8",
+      "apps/web/tests/browser/vite.config.ts": "0a2e4e8fcb6e6a14c5fd42f7ede3bdc40ddfb9d6"
+    },
+    "semanticTailIdenticalTo428And96": true,
+    "officialFreshCI": [
+      {
+        "workflow": "frontend",
+        "runID": 42404194858,
+        "correlation": "fleet5-cr-csp02-central-vite-init-frontend-c1ba70e5227647d39a111508619ad6cf",
+        "exactSourceRefPathEventAttempt1": true,
+        "jobs": [
+          {
+            "id": 128498256116,
+            "name": "frontend",
+            "steps": 19,
+            "allSuccess": true
+          },
+          {
+            "id": 128498256297,
+            "name": "Portal Container Build & Hardened Runtime Smoke",
+            "steps": 14,
+            "allSuccess": true
+          }
+        ]
+      },
+      {
+        "workflow": "docs",
+        "runID": 42404197444,
+        "correlation": "fleet5-cr-csp02-central-vite-init-docs-e54a6c3540804a5c89d9854b52af6f24",
+        "exactSourceRefPathEventAttempt1": true,
+        "jobs": [
+          {
+            "id": 128498264471,
+            "name": "docs",
+            "steps": 19,
+            "allSuccess": true
+          }
+        ]
+      },
+      {
+        "workflow": "ac11-accessibility-e2e",
+        "runID": 42404200030,
+        "correlation": "fleet5-cr-csp02-central-vite-init-ac11-accessibility-e2e-21aee812fcf1456c8d93e9c76d99a969",
+        "exactSourceRefPathEventAttempt1": true,
+        "jobs": [
+          {
+            "id": 128498272539,
+            "name": "accessibility-e2e",
+            "steps": 14,
+            "allSuccess": true
+          }
+        ]
+      }
+    ],
+    "officialArtifactBindings": [
+      {
+        "id": 13585849349,
+        "name": "saintvision-web-dist",
+        "bytes": 978139,
+        "SHA256": "sha256:99e8ed94f4f144d571b9a9a192ba10455af69ab356fdf969e11f9e3dfee7fa5a",
+        "officialMetadataMatchesBytes": true
+      },
+      {
+        "id": 13586895367,
+        "name": "saintvision-portal-strict-csp-evidence",
+        "bytes": 14920,
+        "SHA256": "sha256:8b14e65412980a7a67affb17368c33f0c72f0cf16c6b6789c0eb1767e804694e",
+        "officialMetadataMatchesBytes": true
+      },
+      {
+        "id": 13587040142,
+        "name": "s11-ac11-accessibility-e4e07bfd6b94e57edc64d158e208df01b9319deb",
+        "bytes": 2209,
+        "SHA256": "sha256:540effafa93efb2932f2cc37232ec95bea52b6c7b284c1df2c87b568dffee723",
+        "officialMetadataMatchesBytes": true
+      },
+      {
+        "id": 13585719783,
+        "name": "saintvision-direct-vite-startup-evidence",
+        "bytes": 10699,
+        "SHA256": "sha256:197e3bcafa7bc940e7c3ee45f095768a5a8523ecb626916cc59a8fc06099e507",
+        "officialMetadataMatchesBytes": true
+      }
+    ],
+    "hostedBuiltDistStrictCSPBootAndBytesMatched": true,
+    "generatedESMNoRawRequireModuleExportsEvalFunctionText": true,
+    "officialVitest1351Of1351In106Files": true,
+    "officialDevBrowserCasesPassed6Of6": true,
+    "officialDevCanonicalJourneysPassed5Of5": true,
+    "officialDevInvariantsPassed9Of9": true,
+    "officialDevContrastChecksPassed3Of3": true,
+    "officialDevKeyboardChecksPassed2Of2": true,
+    "normalizedAC11Verdict": "MEASURED_FAIL",
+    "manualAcceptanceMissingCount": 1,
+    "manualAcceptanceGatePreservedNotDischarged": true,
+    "acceptanceClaim": false,
+    "approvedOneLineWaitExactlyMatched": true,
+    "prior1350Pass1FailRetained": true,
+    "officialFreshDirectMainConfigBrowserPassed": true,
+    "freshBothGeneratedOutputsAbsentBeforeHooks": true,
+    "directNodeViteNoNpmLifecycle": true,
+    "mainModule200AndRootVisible": true,
+    "generatedCanonicalHashesMatchBuiltProof": true,
+    "allPriorGenuineFailuresRetained": true,
+    "authorCanonicalFullBytesMatched": true,
+    "canonicalBytes": 536738,
+    "canonicalSHA256": "6d699b94160c7a323502e3547ecdec7379e9c3d8238fd0ec1a1de738957cc6cc",
+    "authorLocalMetadataGates8Exit0": true,
+    "authorLifecycle": {
+      "state": "succeeded",
+      "stage": "settled",
+      "liveness": "exited",
+      "terminalState": "released"
+    },
+    "sourceIndependentReview": "PENDING_ONE_ACTUAL_BOUNDED_CLAUDE_DELTA_REVIEW",
+    "actualPC3BrowserDeploymentAcceptance": false,
+    "mainProductExecution": false,
+    "wholeProgramComplete": false
   }
 }

@@ -1,0 +1,1498 @@
+{
+  "base": "cc6076254d5b8f54804081a8b1994d76d86cf81a",
+  "trackedFilesScanned": 1069,
+  "configs": [
+    "apps/web/tests/browser/vite.config.ts",
+    "apps/web/vite.config.ts"
+  ],
+  "matches": [
+    {
+      "path": ".github/workflows/ac11-accessibility-e2e.yml",
+      "line": 48,
+      "text": "          cache: npm",
+      "context": [
+        "        with:",
+        "          node-version: 22",
+        "          cache: npm",
+        "          cache-dependency-path: apps/web/package-lock.json",
+        ""
+      ]
+    },
+    {
+      "path": ".github/workflows/ac11-accessibility-e2e.yml",
+      "line": 55,
+      "text": "          npm ci --ignore-scripts --prefix apps/web",
+      "context": [
+        "          python -m pip install -r requirements-backend.txt playwright==1.62.0",
+        "          python -m playwright install --with-deps chromium",
+        "          npm ci --ignore-scripts --prefix apps/web",
+        "",
+        "      - name: Run six browser cases for five canonical journeys"
+      ]
+    },
+    {
+      "path": ".github/workflows/ac11-accessibility-e2e.yml",
+      "line": 75,
+      "text": "          npm run dev --prefix apps/web -- --host 127.0.0.1 --port 3005 > \"$RAW_DIR/vite-private.log\" 2>&1 &",
+      "context": [
+        "        run: |",
+        "          mkdir -p \"$RAW_DIR\"",
+        "          npm run dev --prefix apps/web -- --host 127.0.0.1 --port 3005 > \"$RAW_DIR/vite-private.log\" 2>&1 &",
+        "          vite_pid=$!",
+        "          cleanup() { kill \"$vite_pid\" 2>/dev/null || true; wait \"$vite_pid\" 2>/dev/null || true; }"
+      ]
+    },
+    {
+      "path": ".github/workflows/ac11-accessibility-e2e.yml",
+      "line": 81,
+      "text": "            if [ \"$attempt\" = 60 ]; then echo 'Vite did not become ready' >&2; exit 1; fi",
+      "context": [
+        "          for attempt in $(seq 1 60); do",
+        "            if curl --fail --silent http://127.0.0.1:3005/ >/dev/null; then break; fi",
+        "            if [ \"$attempt\" = 60 ]; then echo 'Vite did not become ready' >&2; exit 1; fi",
+        "            sleep 1",
+        "          done"
+      ]
+    },
+    {
+      "path": ".github/workflows/ac11-accessibility-e2e.yml",
+      "line": 134,
+      "text": "          assert report['environment']['frontendTransport'] == 'vite-dev-server-with-browser-node-fixture'",
+      "context": [
+        "          assert report['environment']['credentialsRequired'] is False",
+        "          assert report['environment']['physicalFiveNodeComparable'] is False",
+        "          assert report['environment']['frontendTransport'] == 'vite-dev-server-with-browser-node-fixture'",
+        "          assert len(report['payload']['journeyIds']) == 5",
+        "          assert report['payload']['browserPhysicalCaseCount'] == 6"
+      ]
+    },
+    {
+      "path": ".github/workflows/backend.yml",
+      "line": 255,
+      "text": "      # Desktop browser tests execute in desktop-browser.yml with Chromium and Vite.",
+      "context": [
+        "          fi",
+        "",
+        "      # Desktop browser tests execute in desktop-browser.yml with Chromium and Vite.",
+        "      # pyproject defaults deselect docker_host mutations; Core Build runs that lane explicitly.",
+        "      - name: Tests"
+      ]
+    },
+    {
+      "path": ".github/workflows/core.yml",
+      "line": 303,
+      "text": "      # Desktop browser tests execute in desktop-browser.yml with Chromium and Vite.",
+      "context": [
+        "          assert passed == 20, f'Expected 20 passed CX01 cases, got {passed}'",
+        "          PY",
+        "      # Desktop browser tests execute in desktop-browser.yml with Chromium and Vite.",
+        "      # Web-container acceptance belongs to desktop-browser.yml. The two LAN",
+        "      # image-opt-in suites run in the explicit provisioned step above."
+      ]
+    },
+    {
+      "path": ".github/workflows/desktop-browser.yml",
+      "line": 41,
+      "text": "          cache: npm",
+      "context": [
+        "        with:",
+        "          node-version: 22",
+        "          cache: npm",
+        "          cache-dependency-path: apps/web/package-lock.json",
+        "      - run: python -m pip install -r requirements-backend.txt playwright==1.62.0"
+      ]
+    },
+    {
+      "path": ".github/workflows/desktop-browser.yml",
+      "line": 45,
+      "text": "      - run: npm ci --ignore-scripts",
+      "context": [
+        "      - run: python -m pip install -r requirements-backend.txt playwright==1.62.0",
+        "      - run: python -m playwright install --with-deps chromium",
+        "      - run: npm ci --ignore-scripts",
+        "        working-directory: apps/web",
+        "      - name: Build frontend assets and owned proxy test image"
+      ]
+    },
+    {
+      "path": ".github/workflows/desktop-browser.yml",
+      "line": 50,
+      "text": "          npm run build",
+      "context": [
+        "        working-directory: apps/web",
+        "        run: |",
+        "          npm run build",
+        "          mkdir -p ../../.work/web-container-image/dist",
+        "          cp -R dist/. ../../.work/web-container-image/dist/"
+      ]
+    },
+    {
+      "path": ".github/workflows/frontend.yml",
+      "line": 47,
+      "text": "          cache: 'npm'",
+      "context": [
+        "        with:",
+        "          node-version: 22",
+        "          cache: 'npm'",
+        "          cache-dependency-path: apps/web/package-lock.json",
+        ""
+      ]
+    },
+    {
+      "path": ".github/workflows/frontend.yml",
+      "line": 52,
+      "text": "        run: npm ci",
+      "context": [
+        "      - name: Install dependencies",
+        "        working-directory: apps/web",
+        "        run: npm ci",
+        "",
+        "      - name: Run ESLint"
+      ]
+    },
+    {
+      "path": ".github/workflows/frontend.yml",
+      "line": 56,
+      "text": "        run: npm run lint",
+      "context": [
+        "      - name: Run ESLint",
+        "        working-directory: apps/web",
+        "        run: npm run lint",
+        "",
+        "      - name: Run Vitest Unit Tests"
+      ]
+    },
+    {
+      "path": ".github/workflows/frontend.yml",
+      "line": 60,
+      "text": "        run: npm run test",
+      "context": [
+        "      - name: Run Vitest Unit Tests",
+        "        working-directory: apps/web",
+        "        run: npm run test",
+        "",
+        "      - name: Check generated discovery contract type"
+      ]
+    },
+    {
+      "path": ".github/workflows/frontend.yml",
+      "line": 64,
+      "text": "        run: npm run contracts:check",
+      "context": [
+        "      - name: Check generated discovery contract type",
+        "        working-directory: apps/web",
+        "        run: npm run contracts:check",
+        "",
+        "      - name: TypeScript Check & Production Build"
+      ]
+    },
+    {
+      "path": ".github/workflows/frontend.yml",
+      "line": 68,
+      "text": "        run: npm run build",
+      "context": [
+        "      - name: TypeScript Check & Production Build",
+        "        working-directory: apps/web",
+        "        run: npm run build",
+        "",
+        "      - uses: actions/setup-python@v5"
+      ]
+    },
+    {
+      "path": "apps/web/Dockerfile",
+      "line": 8,
+      "text": "RUN npm ci",
+      "context": [
+        "# Copy dependency specifications",
+        "COPY package.json package-lock.json* ./",
+        "RUN npm ci",
+        "",
+        "# Copy source code and build"
+      ]
+    },
+    {
+      "path": "apps/web/Dockerfile",
+      "line": 12,
+      "text": "RUN npm run build",
+      "context": [
+        "# Copy source code and build",
+        "COPY . .",
+        "RUN npm run build",
+        "",
+        "# Stage 2: Serve with Production Nginx"
+      ]
+    },
+    {
+      "path": "apps/web/package.json",
+      "line": 7,
+      "text": "    \"predev\": \"npm run validators:generate\",",
+      "context": [
+        "  \"type\": \"module\",",
+        "  \"scripts\": {",
+        "    \"predev\": \"npm run validators:generate\",",
+        "    \"dev\": \"vite\",",
+        "    \"prebuild\": \"npm run validators:generate\","
+      ]
+    },
+    {
+      "path": "apps/web/package.json",
+      "line": 8,
+      "text": "    \"dev\": \"vite\",",
+      "context": [
+        "  \"scripts\": {",
+        "    \"predev\": \"npm run validators:generate\",",
+        "    \"dev\": \"vite\",",
+        "    \"prebuild\": \"npm run validators:generate\",",
+        "    \"build\": \"tsc -b && vite build\","
+      ]
+    },
+    {
+      "path": "apps/web/package.json",
+      "line": 9,
+      "text": "    \"prebuild\": \"npm run validators:generate\",",
+      "context": [
+        "    \"predev\": \"npm run validators:generate\",",
+        "    \"dev\": \"vite\",",
+        "    \"prebuild\": \"npm run validators:generate\",",
+        "    \"build\": \"tsc -b && vite build\",",
+        "    \"preview\": \"vite preview\","
+      ]
+    },
+    {
+      "path": "apps/web/package.json",
+      "line": 10,
+      "text": "    \"build\": \"tsc -b && vite build\",",
+      "context": [
+        "    \"dev\": \"vite\",",
+        "    \"prebuild\": \"npm run validators:generate\",",
+        "    \"build\": \"tsc -b && vite build\",",
+        "    \"preview\": \"vite preview\",",
+        "    \"prelint\": \"npm run validators:generate\","
+      ]
+    },
+    {
+      "path": "apps/web/package.json",
+      "line": 11,
+      "text": "    \"preview\": \"vite preview\",",
+      "context": [
+        "    \"prebuild\": \"npm run validators:generate\",",
+        "    \"build\": \"tsc -b && vite build\",",
+        "    \"preview\": \"vite preview\",",
+        "    \"prelint\": \"npm run validators:generate\",",
+        "    \"lint\": \"eslint . --max-warnings 0\","
+      ]
+    },
+    {
+      "path": "apps/web/package.json",
+      "line": 12,
+      "text": "    \"prelint\": \"npm run validators:generate\",",
+      "context": [
+        "    \"build\": \"tsc -b && vite build\",",
+        "    \"preview\": \"vite preview\",",
+        "    \"prelint\": \"npm run validators:generate\",",
+        "    \"lint\": \"eslint . --max-warnings 0\",",
+        "    \"pretest\": \"npm run validators:generate\","
+      ]
+    },
+    {
+      "path": "apps/web/package.json",
+      "line": 14,
+      "text": "    \"pretest\": \"npm run validators:generate\",",
+      "context": [
+        "    \"prelint\": \"npm run validators:generate\",",
+        "    \"lint\": \"eslint . --max-warnings 0\",",
+        "    \"pretest\": \"npm run validators:generate\",",
+        "    \"test\": \"vitest run --execArgv=--experimental-vm-modules\",",
+        "    \"preeval:check\": \"npm run validators:generate\","
+      ]
+    },
+    {
+      "path": "apps/web/package.json",
+      "line": 16,
+      "text": "    \"preeval:check\": \"npm run validators:generate\",",
+      "context": [
+        "    \"pretest\": \"npm run validators:generate\",",
+        "    \"test\": \"vitest run --execArgv=--experimental-vm-modules\",",
+        "    \"preeval:check\": \"npm run validators:generate\",",
+        "    \"eval:check\": \"vitest run tests/agent-eval-runner.test.ts\",",
+        "    \"validators:generate\": \"node scripts/node-certificate-validator.mjs --write\","
+      ]
+    },
+    {
+      "path": "apps/web/package.json",
+      "line": 19,
+      "text": "    \"contracts:generate\": \"node scripts/api-response-contracts.mjs --write && npm run validators:generate\",",
+      "context": [
+        "    \"eval:check\": \"vitest run tests/agent-eval-runner.test.ts\",",
+        "    \"validators:generate\": \"node scripts/node-certificate-validator.mjs --write\",",
+        "    \"contracts:generate\": \"node scripts/api-response-contracts.mjs --write && npm run validators:generate\",",
+        "    \"contracts:check\": \"node scripts/api-response-contracts.mjs --check && node scripts/node-certificate-validator.mjs --check\"",
+        "  },"
+      ]
+    },
+    {
+      "path": "apps/web/package.json",
+      "line": 45,
+      "text": "    \"vite\": \"^6.2.0\",",
+      "context": [
+        "    \"typescript\": \"^5.7.3\",",
+        "    \"typescript-eslint\": \"8.72.1\",",
+        "    \"vite\": \"^6.2.0\",",
+        "    \"vitest\": \"4.1.11\"",
+        "  }"
+      ]
+    },
+    {
+      "path": "apps/web/public/manifest.json",
+      "line": 11,
+      "text": "      \"src\": \"/vite.svg\",",
+      "context": [
+        "  \"icons\": [",
+        "    {",
+        "      \"src\": \"/vite.svg\",",
+        "      \"sizes\": \"192x192\",",
+        "      \"type\": \"image/svg+xml\""
+      ]
+    },
+    {
+      "path": "apps/web/public/manifest.json",
+      "line": 16,
+      "text": "      \"src\": \"/vite.svg\",",
+      "context": [
+        "    },",
+        "    {",
+        "      \"src\": \"/vite.svg\",",
+        "      \"sizes\": \"512x512\",",
+        "      \"type\": \"image/svg+xml\""
+      ]
+    },
+    {
+      "path": "apps/web/public/sw.js",
+      "line": 6,
+      "text": "  '/vite.svg'",
+      "context": [
+        "  '/index.html',",
+        "  '/manifest.json',",
+        "  '/vite.svg'",
+        "];",
+        ""
+      ]
+    },
+    {
+      "path": "apps/web/scripts/api-response-contracts.mjs",
+      "line": 108,
+      "text": "  process.stderr.write(`FAIL: stale generated API response type(s): ${drift.join(', ')}. Run npm run contracts:generate.\\n`);",
+      "context": [
+        "if (mode === '--write') process.exit(0);",
+        "if (drift.length) {",
+        "  process.stderr.write(`FAIL: stale generated API response type(s): ${drift.join(', ')}. Run npm run contracts:generate.\\n`);",
+        "  process.exit(1);",
+        "}"
+      ]
+    },
+    {
+      "path": "apps/web/scripts/node-certificate-validator.mjs",
+      "line": 28,
+      "text": "// self-contained ESM without depending on Vite's build-only CommonJS conversion.",
+      "context": [
+        "// esm:true changes exports, but Ajv's format/runtime references still use require.",
+        "// Resolve and bundle those pure helpers HERE, so dev and build consume the same",
+        "// self-contained ESM without depending on Vite's build-only CommonJS conversion.",
+        "const bundled = await build({",
+        "  absWorkingDir: webRoot,"
+      ]
+    },
+    {
+      "path": "apps/web/scripts/node-certificate-validator.mjs",
+      "line": 70,
+      "text": "    throw new Error(`Generated validator drift: ${name}; run npm run validators:generate`);",
+      "context": [
+        "    await writeFile(path, expected);",
+        "  } else if (await readFile(path, 'utf8').catch(() => null) !== expected) {",
+        "    throw new Error(`Generated validator drift: ${name}; run npm run validators:generate`);",
+        "  }",
+        "}"
+      ]
+    },
+    {
+      "path": "apps/web/src/features/editor/MonacoWorkspaceEditor.tsx",
+      "line": 903,
+      "text": "                placeholder={sessionState.status === 'disconnected' ? 'Session disconnected (Restart simulated)...' : 'Type command (e.g., git status, npm test, ls -la)...'}",
+      "context": [
+        "              <input",
+        "                type=\"text\"",
+        "                placeholder={sessionState.status === 'disconnected' ? 'Session disconnected (Restart simulated)...' : 'Type command (e.g., git status, npm test, ls -la)...'}",
+        "                disabled={sessionState.status === 'disconnected'}",
+        "                value={terminalInput}"
+      ]
+    },
+    {
+      "path": "apps/web/src/vite-env.d.ts",
+      "line": 1,
+      "text": "/// <reference types=\"vite/client\" />",
+      "context": [
+        "/// <reference types=\"vite/client\" />"
+      ]
+    },
+    {
+      "path": "apps/web/tests/browser/vite.config.ts",
+      "line": 1,
+      "text": "import { defineConfig } from 'vite';",
+      "context": [
+        "import { defineConfig } from 'vite';",
+        "import react from '@vitejs/plugin-react';",
+        "import path from 'node:path';"
+      ]
+    },
+    {
+      "path": "apps/web/tests/browser/vite.config.ts",
+      "line": 6,
+      "text": "// This fixture is launched directly by Node/Vite, so npm's predev hook is not run.",
+      "context": [
+        "import { execFileSync } from 'node:child_process';",
+        "",
+        "// This fixture is launched directly by Node/Vite, so npm's predev hook is not run.",
+        "// Prepare the SAME canonical ESM before any browser entry graph is linked.",
+        "execFileSync(process.execPath, [path.resolve(__dirname, '../../scripts/node-certificate-validator.mjs'), '--write'],"
+      ]
+    },
+    {
+      "path": "apps/web/tests/editor-session.test.ts",
+      "line": 122,
+      "text": "      const exec2 = mgr.executeCommand('npm test', nonce2);",
+      "context": [
+        "      expect(exec1.entry.seq).toBe(1);",
+        "",
+        "      const exec2 = mgr.executeCommand('npm test', nonce2);",
+        "      expect(exec2.success).toBe(true);",
+        "      expect(exec2.isDuplicate).toBe(false);"
+      ]
+    },
+    {
+      "path": "apps/web/tests/portal-refresh-fleet-ui.test.tsx",
+      "line": 356,
+      "text": "      // When /healthz route is not proxied, Vite or nginx serves the SPA index.html with 200 text/html",
+      "context": [
+        "",
+        "    it('rejects SPA HTML 200 fallback on /healthz as health success (must strictly be application/json)', async () => {",
+        "      // When /healthz route is not proxied, Vite or nginx serves the SPA index.html with 200 text/html",
+        "      vi.spyOn(globalThis, 'fetch').mockResolvedValue(",
+        "        new Response('<!DOCTYPE html><html><body>SPA fallback</body></html>', {"
+      ]
+    },
+    {
+      "path": "apps/web/tests/portal-refresh-fleet-ui.test.tsx",
+      "line": 574,
+      "text": "    it('verifies Vite dev and preview servers proxy /healthz to backend', async () => {",
+      "context": [
+        "",
+        "  describe('8. Reverse-proxy configuration for canonical /healthz', () => {",
+        "    it('verifies Vite dev and preview servers proxy /healthz to backend', async () => {",
+        "      const fs = await import('fs');",
+        "      const path = await import('path');"
+      ]
+    },
+    {
+      "path": "apps/web/tests/portal-refresh-fleet-ui.test.tsx",
+      "line": 577,
+      "text": "      const viteConfigContent = fs.readFileSync(path.resolve(__dirname, '../vite.config.ts'), 'utf-8');",
+      "context": [
+        "      const fs = await import('fs');",
+        "      const path = await import('path');",
+        "      const viteConfigContent = fs.readFileSync(path.resolve(__dirname, '../vite.config.ts'), 'utf-8');",
+        "      expect(viteConfigContent).toContain(\"'/healthz':\");",
+        "      expect(viteConfigContent).toContain('target: process.env.VITE_API_PROXY_TARGET');"
+      ]
+    },
+    {
+      "path": "apps/web/tsconfig.node.json",
+      "line": 23,
+      "text": "  \"include\": [\"vite.config.ts\"]",
+      "context": [
+        "    \"noUncheckedSideEffectImports\": true",
+        "  },",
+        "  \"include\": [\"vite.config.ts\"]",
+        "}"
+      ]
+    },
+    {
+      "path": "apps/web/vite.config.ts",
+      "line": 1,
+      "text": "import { defineConfig } from 'vite';",
+      "context": [
+        "import { defineConfig } from 'vite';",
+        "import react from '@vitejs/plugin-react';",
+        "import path from 'path';"
+      ]
+    },
+    {
+      "path": "apps/web/vite.config.ts",
+      "line": 5,
+      "text": "// https://vite.dev/config/",
+      "context": [
+        "import path from 'path';",
+        "",
+        "// https://vite.dev/config/",
+        "export default defineConfig({",
+        "  plugins: [react()],"
+      ]
+    },
+    {
+      "path": "deploy/intranet/portal/Dockerfile",
+      "line": 20,
+      "text": "RUN npm ci",
+      "context": [
+        "COPY apps/web/package*.json ./apps/web/",
+        "WORKDIR /workspace/apps/web",
+        "RUN npm ci",
+        "",
+        "# Copy web source and build production bundle"
+      ]
+    },
+    {
+      "path": "deploy/intranet/portal/Dockerfile",
+      "line": 24,
+      "text": "RUN npm run build",
+      "context": [
+        "# Copy web source and build production bundle",
+        "COPY apps/web/ ./",
+        "RUN npm run build",
+        "",
+        "# Stage 2: Hardened Non-Root Nginx Runtime"
+      ]
+    },
+    {
+      "path": "deploy/lan/README.md",
+      "line": 618,
+      "text": "`deploy/lan/Start-LiveConsole.ps1` starts only services this pilot state has",
+      "context": [
+        "## Desktop launcher",
+        "",
+        "`deploy/lan/Start-LiveConsole.ps1` starts only services this pilot state has",
+        "already provisioned. It never resets a database, never dispatches work, and never",
+        "prints or logs a secret."
+      ]
+    },
+    {
+      "path": "deploy/lan/README.md",
+      "line": 661,
+      "text": "checkout, the interpreter and the vite entry are all refused with the reason named rather",
+      "context": [
+        "not quote, so `-i \"C:/keys/key with space\"` reaches `ssh` as three arguments and a",
+        "fragment after a space can be read as an option. The key path, the state directory, the",
+        "checkout, the interpreter and the vite entry are all refused with the reason named rather",
+        "than silently mis-serialized. If a path with spaces is ever required, the fix is a quoting",
+        "serializer, not relaxing this rule."
+      ]
+    },
+    {
+      "path": "deploy/lan/README.md",
+      "line": 675,
+      "text": "`deploy/lan/Register-DesktopShortcut.ps1` registers a current-user desktop icon for",
+      "context": [
+        "the page before opening it, and reports a timeout instead of an exception body.",
+        "",
+        "`deploy/lan/Register-DesktopShortcut.ps1` registers a current-user desktop icon for",
+        "that script, carrying the same arguments. It follows the ownership rule",
+        "`Register-EnvironmentStartup.ps1` uses: a shortcut whose description is not this"
+      ]
+    },
+    {
+      "path": "deploy/lan/Register-DesktopShortcut.ps1",
+      "line": 4,
+      "text": "    # Passed through to Start-LiveConsole.ps1. The tunnel PORT is read from the state;",
+      "context": [
+        "    # Default to this checkout's own state directory: no drive letter is assumed.",
+        "    [string]$StatePath = (Join-Path $PSScriptRoot '../../.work/lan-pilot'),",
+        "    # Passed through to Start-LiveConsole.ps1. The tunnel PORT is read from the state;",
+        "    # only the target host and key are operator inputs, and neither is stored in Git.",
+        "    # Both are held to the same grammar the launcher uses (SvLauncherInput.ps1)."
+      ]
+    },
+    {
+      "path": "deploy/lan/Register-DesktopShortcut.ps1",
+      "line": 14,
+      "text": "$svScript = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot 'Start-LiveConsole.ps1')).Path",
+      "context": [
+        "$ErrorActionPreference = 'Stop'",
+        ". (Join-Path $PSScriptRoot 'SvLauncherInput.ps1')",
+        "$svScript = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot 'Start-LiveConsole.ps1')).Path",
+        "$StatePath = (Resolve-Path -LiteralPath $StatePath).Path",
+        "if ($ShortcutName.Contains('\\') -or $ShortcutName.Contains('/') -or $ShortcutName.Contains('\"')) {"
+      ]
+    },
+    {
+      "path": "deploy/lan/Start-LiveConsole.ps1",
+      "line": 31,
+      "text": "$svVite = \"$svCheckout/apps/web/node_modules/vite/bin/vite.js\"",
+      "context": [
+        "$svRepository = Split-Path (Resolve-Path -LiteralPath $svCommon).Path -Parent",
+        "$svPython = Join-Path $svRepository '.venv/Scripts/python.exe'",
+        "$svVite = \"$svCheckout/apps/web/node_modules/vite/bin/vite.js\"",
+        "# Reviewer r2 (High): Windows PowerShell joins an -ArgumentList array with spaces and does",
+        "# not quote, so any of these carrying whitespace would reach the child as several arguments."
+      ]
+    },
+    {
+      "path": "deploy/lan/Start-LiveConsole.ps1",
+      "line": 38,
+      "text": "$null = Assert-SvNativeArgument -Value $svVite -What 'The vite entry path'",
+      "context": [
+        "$null = Assert-SvNativeArgument -Value $StatePath -What 'The pilot state path'",
+        "$null = Assert-SvNativeArgument -Value $svPython -What 'The interpreter path'",
+        "$null = Assert-SvNativeArgument -Value $svVite -What 'The vite entry path'",
+        "if (-not (Test-Path -LiteralPath $svPython) -or -not (Test-Path -LiteralPath $svVite)) {",
+        "    throw 'Install this checkout Python and web dependencies first.'"
+      ]
+    },
+    {
+      "path": "deploy/lan/SvLauncherInput.ps1",
+      "line": 3,
+      "text": "# Dot-sourced by Start-LiveConsole.ps1 and Register-DesktopShortcut.ps1 so both enforce the",
+      "context": [
+        "# Shared input grammar and command-line parsing for the LAN launcher scripts.",
+        "#",
+        "# Dot-sourced by Start-LiveConsole.ps1 and Register-DesktopShortcut.ps1 so both enforce the",
+        "# same rules. Native argument lists are flattened by the Windows runtime, so a target that",
+        "# merely avoids quotes and newlines can still carry option syntax and whitespace and arrive"
+      ]
+    },
+    {
+      "path": "deploy/studio/Register-EnvironmentStartup.ps1",
+      "line": 8,
+      "text": "$svScript = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot 'Start-Environment.ps1')).Path",
+      "context": [
+        ")",
+        "$ErrorActionPreference = 'Stop'",
+        "$svScript = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot 'Start-Environment.ps1')).Path",
+        "$StudioRoot = (Resolve-Path -LiteralPath $StudioRoot).Path",
+        "$StatePath = (Resolve-Path -LiteralPath $StatePath).Path"
+      ]
+    },
+    {
+      "path": "deploy/studio/Start-Environment.ps1",
+      "line": 20,
+      "text": "            & \"$svCheckout/deploy/lan/Start-LiveConsole.ps1\" -StatePath $StatePath | Out-Null",
+      "context": [
+        "    for ($svAttempt = 1; $svAttempt -le 12; $svAttempt++) {",
+        "        try {",
+        "            & \"$svCheckout/deploy/lan/Start-LiveConsole.ps1\" -StatePath $StatePath | Out-Null",
+        "            & \"$svCheckout/deploy/studio/Start-DevStudio.ps1\" -StudioRoot $StudioRoot -NoBrowser | Out-Null",
+        "            $svOverview = Invoke-RestMethod 'http://127.0.0.1:18082/pilot/v1/overview' -TimeoutSec 3"
+      ]
+    },
+    {
+      "path": "tests/core/test_launcher_failure_boundaries.py",
+      "line": 18,
+      "text": "    \"\"\"Resolve the prerequisites the way Start-LiveConsole.ps1 does.",
+      "context": [
+        "",
+        "def _launcher_prerequisites() -> list[str]:",
+        "    \"\"\"Resolve the prerequisites the way Start-LiveConsole.ps1 does.",
+        "",
+        "    The script takes its interpreter from the repository that owns this checkout"
+      ]
+    },
+    {
+      "path": "tests/core/test_launcher_failure_boundaries.py",
+      "line": 38,
+      "text": "            ROOT / \"apps\" / \"web\" / \"node_modules\" / \"vite\" / \"bin\" / \"vite.js\",",
+      "context": [
+        "        for path in (",
+        "            repository / \".venv\" / \"Scripts\" / \"python.exe\",",
+        "            ROOT / \"apps\" / \"web\" / \"node_modules\" / \"vite\" / \"bin\" / \"vite.js\",",
+        "        )",
+        "        if not path.is_file()"
+      ]
+    },
+    {
+      "path": "tests/core/test_launcher_failure_boundaries.py",
+      "line": 102,
+      "text": "         str(ROOT / \"deploy/lan/Start-LiveConsole.ps1\"), \"-StatePath\", str(state_dir)],",
+      "context": [
+        "    result = subprocess.run(",
+        "        [powershell, \"-NoProfile\", \"-ExecutionPolicy\", \"Bypass\", \"-File\",",
+        "         str(ROOT / \"deploy/lan/Start-LiveConsole.ps1\"), \"-StatePath\", str(state_dir)],",
+        "        cwd=ROOT,",
+        "        env=env,"
+      ]
+    },
+    {
+      "path": "tests/core/test_launcher_failure_boundaries.py",
+      "line": 144,
+      "text": "    text = (ROOT / \"deploy/lan/Start-LiveConsole.ps1\").read_text(encoding=\"utf-8\")",
+      "context": [
+        "",
+        "def test_live_console_binds_the_web_listener_to_loopback_only():",
+        "    text = (ROOT / \"deploy/lan/Start-LiveConsole.ps1\").read_text(encoding=\"utf-8\")",
+        "    assert \"'--host','127.0.0.1'\" in text.replace(\" \", \"\")",
+        "    assert \"0.0.0.0\" not in text"
+      ]
+    },
+    {
+      "path": "tests/core/test_launcher_failure_boundaries.py",
+      "line": 151,
+      "text": "    text = (ROOT / \"deploy/lan/Start-LiveConsole.ps1\").read_text(encoding=\"utf-8\")",
+      "context": [
+        "def test_live_console_compares_the_state_by_token_not_substring():",
+        "    \"\"\"Codex r1 F2: the previous version pinned the weak Contains implementation in a string.\"\"\"",
+        "    text = (ROOT / \"deploy/lan/Start-LiveConsole.ps1\").read_text(encoding=\"utf-8\")",
+        "    assert \"Test-SvOwnedByState\" in text",
+        "    assert \".Contains($StatePath)\" not in text"
+      ]
+    },
+    {
+      "path": "tests/core/test_launcher_failure_boundaries.py",
+      "line": 161,
+      "text": "    text = (ROOT / \"deploy/lan/Start-LiveConsole.ps1\").read_text(encoding=\"utf-8\")",
+      "context": [
+        "def test_live_console_only_requires_docker_for_the_local_database_mode():",
+        "    \"\"\"A remote hardened database has no local container; requiring docker made it fail.\"\"\"",
+        "    text = (ROOT / \"deploy/lan/Start-LiveConsole.ps1\").read_text(encoding=\"utf-8\")",
+        "    assert \"managed-local-docker\" in text and \"ssh-tunnel-external\" in text",
+        "    local = text.split(\"if ($svDatabaseMode -eq 'managed-local-docker') {\", 1)[1]"
+      ]
+    },
+    {
+      "path": "tests/core/test_launcher_failure_boundaries.py",
+      "line": 182,
+      "text": "    text = (ROOT / \"deploy/lan/Start-LiveConsole.ps1\").read_text(encoding=\"utf-8\")",
+      "context": [
+        "",
+        "def test_live_console_reads_the_tunnel_port_from_state_and_never_hardcodes_a_target():",
+        "    text = (ROOT / \"deploy/lan/Start-LiveConsole.ps1\").read_text(encoding=\"utf-8\")",
+        "    assert \"[int]::TryParse([string]$svState.dbPort\" in text",
+        "    assert \"-DatabaseTunnelTarget\" in text"
+      ]
+    },
+    {
+      "path": "tests/core/test_launcher_failure_boundaries.py",
+      "line": 196,
+      "text": "    text = (ROOT / \"deploy/lan/Register-DesktopShortcut.ps1\").read_text(encoding=\"utf-8\")",
+      "context": [
+        "",
+        "def test_desktop_shortcut_registrar_owns_its_link_and_embeds_no_tunnel_literal():",
+        "    text = (ROOT / \"deploy/lan/Register-DesktopShortcut.ps1\").read_text(encoding=\"utf-8\")",
+        "    startup = (ROOT / \"deploy/studio/Register-EnvironmentStartup.ps1\").read_text(encoding=\"utf-8\")",
+        "    # Same ownership marker pattern as the existing startup registrar."
+      ]
+    },
+    {
+      "path": "tests/core/test_launcher_failure_boundaries.py",
+      "line": 291,
+      "text": "         str(ROOT / \"deploy/lan/Start-LiveConsole.ps1\"), \"-StatePath\", str(state_dir)],",
+      "context": [
+        "    result = subprocess.run(",
+        "        [powershell, \"-NoProfile\", \"-ExecutionPolicy\", \"Bypass\", \"-File\",",
+        "         str(ROOT / \"deploy/lan/Start-LiveConsole.ps1\"), \"-StatePath\", str(state_dir)],",
+        "        cwd=ROOT, env=env, capture_output=True, text=True, errors=\"replace\", timeout=120,",
+        "    )"
+      ]
+    },
+    {
+      "path": "tests/core/test_launcher_failure_boundaries.py",
+      "line": 341,
+      "text": "        ROOT / \"deploy/lan/Start-LiveConsole.ps1\",",
+      "context": [
+        "    for path in (",
+        "        Path(__file__),",
+        "        ROOT / \"deploy/lan/Start-LiveConsole.ps1\",",
+        "        ROOT / \"deploy/lan/Register-DesktopShortcut.ps1\",",
+        "        ROOT / \"deploy/lan/SvLauncherInput.ps1\","
+      ]
+    },
+    {
+      "path": "tests/core/test_launcher_failure_boundaries.py",
+      "line": 342,
+      "text": "        ROOT / \"deploy/lan/Register-DesktopShortcut.ps1\",",
+      "context": [
+        "        Path(__file__),",
+        "        ROOT / \"deploy/lan/Start-LiveConsole.ps1\",",
+        "        ROOT / \"deploy/lan/Register-DesktopShortcut.ps1\",",
+        "        ROOT / \"deploy/lan/SvLauncherInput.ps1\",",
+        "    ):"
+      ]
+    },
+    {
+      "path": "tests/core/test_launcher_failure_boundaries.py",
+      "line": 438,
+      "text": "         str(ROOT / \"deploy/lan/Start-LiveConsole.ps1\"), \"-StatePath\", str(state_dir), *extra],",
+      "context": [
+        "    return subprocess.run(",
+        "        [_powershell(), \"-NoProfile\", \"-ExecutionPolicy\", \"Bypass\", \"-File\",",
+        "         str(ROOT / \"deploy/lan/Start-LiveConsole.ps1\"), \"-StatePath\", str(state_dir), *extra],",
+        "        cwd=ROOT, env=env, capture_output=True, text=True, errors=\"replace\", timeout=180,",
+        "    )"
+      ]
+    },
+    {
+      "path": "tests/core/test_launcher_failure_boundaries.py",
+      "line": 567,
+      "text": "    registrar = (ROOT / \"deploy/lan/Register-DesktopShortcut.ps1\").read_text(encoding=\"utf-8\")",
+      "context": [
+        "    assert \"ABSENT-ACCEPTED\" in combined, combined",
+        "    # The registrar must route through that rule rather than carrying its own copy.",
+        "    registrar = (ROOT / \"deploy/lan/Register-DesktopShortcut.ps1\").read_text(encoding=\"utf-8\")",
+        "    assert \"Assert-SvOwnedShortcut\" in registrar",
+        "@pytest.mark.skipif(sys.platform != \"win32\", reason=\"PowerShell required\")"
+      ]
+    },
+    {
+      "path": "tests/core/test_launcher_failure_boundaries.py",
+      "line": 604,
+      "text": "    for name in (\"Start-LiveConsole.ps1\", \"Register-DesktopShortcut.ps1\"):",
+      "context": [
+        "        assert \"ACCEPTED \" + label not in combined, combined",
+        "    # Both entry points must route through that one rule, not carry their own copy.",
+        "    for name in (\"Start-LiveConsole.ps1\", \"Register-DesktopShortcut.ps1\"):",
+        "        assert \"Assert-SvKeyPath\" in (ROOT / \"deploy/lan\" / name).read_text(encoding=\"utf-8\")",
+        "def _argv_recorder(tmp_path: Path) -> tuple[Path, Path]:"
+      ]
+    },
+    {
+      "path": "tests/core/test_launcher_failure_boundaries.py",
+      "line": 721,
+      "text": "         str(ROOT / \"deploy/lan/Register-DesktopShortcut.ps1\"),",
+      "context": [
+        "    result = subprocess.run(",
+        "        [_powershell(), \"-NoProfile\", \"-ExecutionPolicy\", \"Bypass\", \"-File\",",
+        "         str(ROOT / \"deploy/lan/Register-DesktopShortcut.ps1\"),",
+        "         \"-StatePath\", str(tmp_path),",
+        "         \"-DatabaseTunnelTarget\", \"operator@192.168.45.143\","
+      ]
+    },
+    {
+      "path": "tests/core/test_launcher_failure_boundaries.py",
+      "line": 733,
+      "text": "    for name in (\"Start-LiveConsole.ps1\", \"Register-DesktopShortcut.ps1\"):",
+      "context": [
+        "    assert \"Registered\" not in combined, combined",
+        "    # Both entry points must reach that rule through the one helper.",
+        "    for name in (\"Start-LiveConsole.ps1\", \"Register-DesktopShortcut.ps1\"):",
+        "        assert \"Assert-SvKeyPath\" in (ROOT / \"deploy/lan\" / name).read_text(encoding=\"utf-8\")",
+        ""
+      ]
+    },
+    {
+      "path": "tests/core/test_launcher_failure_boundaries.py",
+      "line": 866,
+      "text": "    text = (ROOT / \"deploy/lan/Start-LiveConsole.ps1\").read_text(encoding=\"utf-8\")",
+      "context": [
+        "def test_both_tunnel_paths_go_through_the_one_strict_gate():",
+        "    \"\"\"Reuse and post-start must not drift apart again.\"\"\"",
+        "    text = (ROOT / \"deploy/lan/Start-LiveConsole.ps1\").read_text(encoding=\"utf-8\")",
+        "    assert text.count(\"Assert-SvOwnedTunnelListeners\") == 2, text.count(\"Assert-SvOwnedTunnelListeners\")",
+        "    # Both call sites must be refusals, not merely present: changing `if (-not (Assert-...`"
+      ]
+    },
+    {
+      "path": "tests/core/test_launcher_failure_boundaries.py",
+      "line": 912,
+      "text": "    for path in (ROOT / \"deploy/lan/SvLauncherInput.ps1\", ROOT / \"deploy/lan/Start-LiveConsole.ps1\"):",
+      "context": [
+        "    helper_source = (ROOT / \"deploy/lan/SvLauncherInput.ps1\").read_text(encoding=\"utf-8\")",
+        "    assert \"return , $svArguments.ToArray()\" not in helper_source",
+        "    for path in (ROOT / \"deploy/lan/SvLauncherInput.ps1\", ROOT / \"deploy/lan/Start-LiveConsole.ps1\"):",
+        "        text = path.read_text(encoding=\"utf-8\")",
+        "        for line in text.splitlines():"
+      ]
+    },
+    {
+      "path": "tests/integration/test_approval_browser.py",
+      "line": 22,
+      "text": "    child = subprocess.Popen([shutil.which('node'), 'node_modules/vite/bin/vite.js', '--config',",
+      "context": [
+        "def browser_page(api_url, port, *, entry='/tests/browser/approval.html', config=None):",
+        "    import playwright.sync_api as playwright",
+        "    child = subprocess.Popen([shutil.which('node'), 'node_modules/vite/bin/vite.js', '--config',",
+        "        'tests/browser/vite.config.ts', '--port', str(port)], cwd=ROOT/'apps/web',",
+        "        env={**os.environ, 'INV_BROWSER_TEST_API_URL': str(api_url).rstrip('/')},"
+      ]
+    },
+    {
+      "path": "tests/integration/test_approval_browser.py",
+      "line": 23,
+      "text": "        'tests/browser/vite.config.ts', '--port', str(port)], cwd=ROOT/'apps/web',",
+      "context": [
+        "    import playwright.sync_api as playwright",
+        "    child = subprocess.Popen([shutil.which('node'), 'node_modules/vite/bin/vite.js', '--config',",
+        "        'tests/browser/vite.config.ts', '--port', str(port)], cwd=ROOT/'apps/web',",
+        "        env={**os.environ, 'INV_BROWSER_TEST_API_URL': str(api_url).rstrip('/')},",
+        "        stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,"
+      ]
+    },
+    {
+      "path": "tests/integration/test_approval_browser.py",
+      "line": 30,
+      "text": "            assert child.poll() is None, 'Test Vite server exited'",
+      "context": [
+        "        url = f'http://127.0.0.1:{port}{entry}'",
+        "        for _ in range(100):",
+        "            assert child.poll() is None, 'Test Vite server exited'",
+        "            try:",
+        "                if httpx.get(url, timeout=1, trust_env=False).status_code == 200: break"
+      ]
+    },
+    {
+      "path": "tests/integration/test_approval_browser.py",
+      "line": 35,
+      "text": "        else: pytest.fail('Test Vite server unavailable')",
+      "context": [
+        "            except httpx.TransportError: pass",
+        "            time.sleep(.1)",
+        "        else: pytest.fail('Test Vite server unavailable')",
+        "        with playwright.sync_playwright() as p:",
+        "            options = {'headless': True}"
+      ]
+    },
+    {
+      "path": "tests/integration/test_desktop_browser.py",
+      "line": 1,
+      "text": "\"\"\"Actual Edge/Chromium -> Vite proxy -> canonical HTTP factory -> isolated PostgreSQL.",
+      "context": [
+        "\"\"\"Actual Edge/Chromium -> Vite proxy -> canonical HTTP factory -> isolated PostgreSQL.",
+        "Synthetic JWT is injected in memory; no mocked HTTP and no operational SSO claim.",
+        "\"\"\""
+      ]
+    },
+    {
+      "path": "tests/test_collect_ac11_accessibility_e2e.py",
+      "line": 89,
+      "text": "        \"frontendTransport\": \"vite-dev-server-with-browser-node-fixture\",",
+      "context": [
+        "        \"gitCommitSha\": SOURCE,",
+        "        \"browser\": \"Google Chrome 140.0.0.0 (Blink engine)\",",
+        "        \"frontendTransport\": \"vite-dev-server-with-browser-node-fixture\",",
+        "        \"verified\": True,",
+        "        \"summary\": {"
+      ]
+    },
+    {
+      "path": "tests/test_collect_ac11_accessibility_e2e.py",
+      "line": 313,
+      "text": "    assert \"vite-dev-server-with-browser-node-fixture\" in source",
+      "context": [
+        "    assert source.index(\"scope: 'openid profile email'\") < source.index(\"idpAuthorizeUrl: '{frontend_url}/oauth/authorize'\")",
+        "    assert source.index(\"idpTokenUrl: '{frontend_url}/oauth/token'\") < source.index(\"redirectUri: '{frontend_url}/callback'\")",
+        "    assert \"vite-dev-server-with-browser-node-fixture\" in source",
+        "    assert '\"keyboardNavigationPass\": focus_is_trigger' in source",
+        "    assert '\"pass\": contrast_pass' in source"
+      ]
+    },
+    {
+      "path": "tests/test_deploy_intranet_preflight.py",
+      "line": 8,
+      "text": "4. Prior dist/ output is cleaned before npm run build to guarantee freshness of generated artifacts.",
+      "context": [
+        "2. 0-byte or missing certificate files after generation halt at Step 1 with exit 1.",
+        "3. Missing apps/web/dist/index.html halts at Step 3 with exit 1 and never proceeds to Step 4 (Smoke).",
+        "4. Prior dist/ output is cleaned before npm run build to guarantee freshness of generated artifacts.",
+        "5. Non-empty certificates without TLS handshake verification report 'PRESENT & NON-EMPTY' with",
+        "   explicit disclaimer that cryptographic validity & TLS negotiation are unverified."
+      ]
+    },
+    {
+      "path": "tests/test_deploy_intranet_preflight.py",
+      "line": 246,
+      "text": "        \"npm test -- --run\",",
+      "context": [
+        "",
+        "    stubbed_content = orig_content.replace(",
+        "        \"npm test -- --run\",",
+        "        \"Write-Host 'mock vitest pass'; $global:LASTEXITCODE = 0\",",
+        "    ).replace("
+      ]
+    },
+    {
+      "path": "tests/test_deploy_intranet_preflight.py",
+      "line": 249,
+      "text": "        \"npm run build\",",
+      "context": [
+        "        \"Write-Host 'mock vitest pass'; $global:LASTEXITCODE = 0\",",
+        "    ).replace(",
+        "        \"npm run build\",",
+        "        \"New-Item -ItemType Directory -Force dist | Out-Null; Set-Content -Path dist/index.html -Value '<html>fresh</html>'; $global:LASTEXITCODE = 0\",",
+        "    ).replace("
+      ]
+    },
+    {
+      "path": "tests/test_deploy_intranet_preflight.py",
+      "line": 324,
+      "text": "    \"\"\"Negative control: missing dist/index.html after npm run build halts at Step 3 with exit 1.\"\"\"",
+      "context": [
+        "",
+        "def test_missing_build_dist_index_halts_at_step3(tmp_path: Path) -> None:",
+        "    \"\"\"Negative control: missing dist/index.html after npm run build halts at Step 3 with exit 1.\"\"\"",
+        "    tools_dir = tmp_path / \"tools\"",
+        "    certs_dir = tmp_path / \"deploy\" / \"certs\""
+      ]
+    },
+    {
+      "path": "tests/test_deploy_intranet_preflight.py",
+      "line": 339,
+      "text": "        \"npm test -- --run\",",
+      "context": [
+        "",
+        "    stubbed_content = orig_content.replace(",
+        "        \"npm test -- --run\",",
+        "        \"Write-Host 'mock vitest pass'; $global:LASTEXITCODE = 0\",",
+        "    ).replace("
+      ]
+    },
+    {
+      "path": "tests/test_deploy_intranet_preflight.py",
+      "line": 342,
+      "text": "        \"npm run build\",",
+      "context": [
+        "        \"Write-Host 'mock vitest pass'; $global:LASTEXITCODE = 0\",",
+        "    ).replace(",
+        "        \"npm run build\",",
+        "        \"Write-Host 'mock build pass without dist'; $global:LASTEXITCODE = 0\",",
+        "    ).replace("
+      ]
+    },
+    {
+      "path": "tests/test_deploy_intranet_preflight.py",
+      "line": 358,
+      "text": "    \"\"\"Freshness guarantee: pre-existing dist/ directory is wiped prior to npm run build.\"\"\"",
+      "context": [
+        "",
+        "def test_build_cleans_prior_dist_for_freshness(tmp_path: Path) -> None:",
+        "    \"\"\"Freshness guarantee: pre-existing dist/ directory is wiped prior to npm run build.\"\"\"",
+        "    tools_dir = tmp_path / \"tools\"",
+        "    certs_dir = tmp_path / \"deploy\" / \"certs\""
+      ]
+    },
+    {
+      "path": "tests/test_deploy_intranet_preflight.py",
+      "line": 376,
+      "text": "        \"npm test -- --run\",",
+      "context": [
+        "    # Mock build script creates index.html but does not recreate stale_from_prior_run.txt",
+        "    stubbed_content = orig_content.replace(",
+        "        \"npm test -- --run\",",
+        "        \"Write-Host 'mock vitest pass'; $global:LASTEXITCODE = 0\",",
+        "    ).replace("
+      ]
+    },
+    {
+      "path": "tests/test_deploy_intranet_preflight.py",
+      "line": 379,
+      "text": "        \"npm run build\",",
+      "context": [
+        "        \"Write-Host 'mock vitest pass'; $global:LASTEXITCODE = 0\",",
+        "    ).replace(",
+        "        \"npm run build\",",
+        "        \"New-Item -ItemType Directory -Force dist | Out-Null; Set-Content -Path dist/index.html -Value '<html>fresh</html>'; $global:LASTEXITCODE = 0\",",
+        "    ).replace("
+      ]
+    },
+    {
+      "path": "tests/test_deploy_intranet_preflight.py",
+      "line": 414,
+      "text": "        \"npm test -- --run\",",
+      "context": [
+        "",
+        "    stubbed_content = orig_content.replace(",
+        "        \"npm test -- --run\",",
+        "        \"Write-Host 'mock vitest pass'; $global:LASTEXITCODE = 0\",",
+        "    ).replace("
+      ]
+    },
+    {
+      "path": "tests/test_deploy_intranet_preflight.py",
+      "line": 417,
+      "text": "        \"npm run build\",",
+      "context": [
+        "        \"Write-Host 'mock vitest pass'; $global:LASTEXITCODE = 0\",",
+        "    ).replace(",
+        "        \"npm run build\",",
+        "        \"New-Item -ItemType Directory -Force dist | Out-Null; Set-Content -Path dist/index.html -Value '<html>fresh</html>'; $global:LASTEXITCODE = 0\",",
+        "    ).replace("
+      ]
+    },
+    {
+      "path": "tests/test_deploy_intranet_preflight.py",
+      "line": 453,
+      "text": "        \"npm test -- --run\",",
+      "context": [
+        "",
+        "    stubbed_content = orig_content.replace(",
+        "        \"npm test -- --run\",",
+        "        \"Write-Host 'mock vitest pass'; $global:LASTEXITCODE = 0\",",
+        "    ).replace("
+      ]
+    },
+    {
+      "path": "tests/test_deploy_intranet_preflight.py",
+      "line": 456,
+      "text": "        \"npm run build\",",
+      "context": [
+        "        \"Write-Host 'mock vitest pass'; $global:LASTEXITCODE = 0\",",
+        "    ).replace(",
+        "        \"npm run build\",",
+        "        \"New-Item -ItemType Directory -Force dist | Out-Null; Set-Content -Path dist/index.html -Value '<html>fresh</html>'; $global:LASTEXITCODE = 0\",",
+        "    ).replace("
+      ]
+    },
+    {
+      "path": "tests/test_deploy_intranet_preflight.py",
+      "line": 493,
+      "text": "            \"npm test -- --run\",",
+      "context": [
+        "        \"function Get-Command { param($Name) if ($Name -eq 'docker') { return $null } else { Microsoft.PowerShell.Core\\\\Get-Command @PSBoundParameters } }\\n\"",
+        "        + orig_content.replace(",
+        "            \"npm test -- --run\",",
+        "            \"Write-Host 'mock vitest pass'; $global:LASTEXITCODE = 0\",",
+        "        ).replace("
+      ]
+    },
+    {
+      "path": "tests/test_deploy_intranet_preflight.py",
+      "line": 496,
+      "text": "            \"npm run build\",",
+      "context": [
+        "            \"Write-Host 'mock vitest pass'; $global:LASTEXITCODE = 0\",",
+        "        ).replace(",
+        "            \"npm run build\",",
+        "            \"New-Item -ItemType Directory -Force dist | Out-Null; Set-Content -Path dist/index.html -Value '<html>fresh</html>'; $global:LASTEXITCODE = 0\",",
+        "        ).replace("
+      ]
+    },
+    {
+      "path": "tests/test_deploy_intranet_preflight.py",
+      "line": 530,
+      "text": "            \"npm test -- --run\",",
+      "context": [
+        "        \"function Invoke-WebRequest { throw 'Connection refused to 127.0.0.1:8080' }\\n\"",
+        "        + orig_content.replace(",
+        "            \"npm test -- --run\",",
+        "            \"Write-Host 'mock vitest pass'; $global:LASTEXITCODE = 0\",",
+        "        ).replace("
+      ]
+    },
+    {
+      "path": "tests/test_deploy_intranet_preflight.py",
+      "line": 533,
+      "text": "            \"npm run build\",",
+      "context": [
+        "            \"Write-Host 'mock vitest pass'; $global:LASTEXITCODE = 0\",",
+        "        ).replace(",
+        "            \"npm run build\",",
+        "            \"New-Item -ItemType Directory -Force dist | Out-Null; Set-Content -Path dist/index.html -Value '<html>fresh</html>'; $global:LASTEXITCODE = 0\",",
+        "        ).replace("
+      ]
+    },
+    {
+      "path": "tests/test_deploy_intranet_preflight.py",
+      "line": 567,
+      "text": "        \"npm test -- --run\",",
+      "context": [
+        "",
+        "    stubbed_content = orig_content.replace(",
+        "        \"npm test -- --run\",",
+        "        \"Write-Host 'mock vitest pass'; $global:LASTEXITCODE = 0\",",
+        "    ).replace("
+      ]
+    },
+    {
+      "path": "tests/test_deploy_intranet_preflight.py",
+      "line": 570,
+      "text": "        \"npm run build\",",
+      "context": [
+        "        \"Write-Host 'mock vitest pass'; $global:LASTEXITCODE = 0\",",
+        "    ).replace(",
+        "        \"npm run build\",",
+        "        \"New-Item -ItemType Directory -Force dist | Out-Null; Set-Content -Path dist/index.html -Value '<html>fresh</html>'; $global:LASTEXITCODE = 0\",",
+        "    ).replace("
+      ]
+    },
+    {
+      "path": "tools/collect_ac11_accessibility_e2e.py",
+      "line": 339,
+      "text": "    if invariants.get(\"frontendTransport\") != \"vite-dev-server-with-browser-node-fixture\":",
+      "context": [
+        "    if invariants.get(\"browser\") != browser_version:",
+        "        raise AccessibilityEvidenceError(\"declared browser version differs from invariant report\")",
+        "    if invariants.get(\"frontendTransport\") != \"vite-dev-server-with-browser-node-fixture\":",
+        "        raise AccessibilityEvidenceError(\"desktop invariant frontend transport is unsupported\")",
+        "    journey_failures, journey_ids, physical_case_count = _journey_result("
+      ]
+    },
+    {
+      "path": "tools/deploy_intranet.ps1",
+      "line": 75,
+      "text": "        npm test -- --run",
+      "context": [
+        "    Push-Location apps/web",
+        "    try {",
+        "        npm test -- --run",
+        "        if ($LASTEXITCODE -ne 0) { throw \"Unit test suite failed with exit code $LASTEXITCODE\" }",
+        "        Write-Host \"\u2714 Unit tests passed 100% (Zero failures)!\" -ForegroundColor Green"
+      ]
+    },
+    {
+      "path": "tools/deploy_intranet.ps1",
+      "line": 83,
+      "text": "    Write-Host \"`n[3/5] Building Production Assets (Vite + PWA Offline Shell)...\" -ForegroundColor Yellow",
+      "context": [
+        "",
+        "    # Step 3: Build Production Assets with PWA/Offline Shell (with freshness guarantee)",
+        "    Write-Host \"`n[3/5] Building Production Assets (Vite + PWA Offline Shell)...\" -ForegroundColor Yellow",
+        "    Push-Location apps/web",
+        "    try {"
+      ]
+    },
+    {
+      "path": "tools/deploy_intranet.ps1",
+      "line": 90,
+      "text": "        npm run build",
+      "context": [
+        "            Remove-Item -Path \"dist\" -Recurse -Force",
+        "        }",
+        "        npm run build",
+        "        if ($LASTEXITCODE -ne 0) { throw \"Production build failed with exit code $LASTEXITCODE\" }",
+        "    } finally {"
+      ]
+    },
+    {
+      "path": "tools/run_real_browser_acceptance.py",
+      "line": 6,
+      "text": "- Real Dev Server Proxy: Vite 5.x running on 127.0.0.1:<frontend-port> (proxying /v1 to backend)",
+      "context": [
+        "Architecture:",
+        "- Real ASGI Server: Uvicorn 0.52.4 running FastAPI create_app on 127.0.0.1:<backend-port>",
+        "- Real Dev Server Proxy: Vite 5.x running on 127.0.0.1:<frontend-port> (proxying /v1 to backend)",
+        "- Real Browser: Google Chrome (Official Build, Blink engine)",
+        "- Zero Playwright network mocking on /v1: all API calls travel through Vite proxy to actual Uvicorn TCP socket."
+      ]
+    },
+    {
+      "path": "tools/run_real_browser_acceptance.py",
+      "line": 8,
+      "text": "- Zero Playwright network mocking on /v1: all API calls travel through Vite proxy to actual Uvicorn TCP socket.",
+      "context": [
+        "- Real Dev Server Proxy: Vite 5.x running on 127.0.0.1:<frontend-port> (proxying /v1 to backend)",
+        "- Real Browser: Google Chrome (Official Build, Blink engine)",
+        "- Zero Playwright network mocking on /v1: all API calls travel through Vite proxy to actual Uvicorn TCP socket.",
+        "- Endpoint: GET /v1/projects/{project}/runs/{run_id}/artifacts/content?path=src/server.ts",
+        "  executes canonical run_file -> artifact_content_response contract."
+      ]
+    },
+    {
+      "path": "tools/run_real_browser_acceptance.py",
+      "line": 1448,
+      "text": "                    \"frontendTransport\": \"vite-dev-server-with-browser-node-fixture\",",
+      "context": [
+        "                    \"gitCommitSha\": git_sha,",
+        "                    \"browser\": f\"Google Chrome {browser.version} (Blink engine)\",",
+        "                    \"frontendTransport\": \"vite-dev-server-with-browser-node-fixture\",",
+        "                    \"frontendUrl\": frontend_url,",
+        "                    \"backendUrl\": backend_url,"
+      ]
+    },
+    {
+      "path": "tools/run_real_browser_acceptance.py",
+      "line": 1742,
+      "text": "                \"proxy\": \"Vite 5.x on 127.0.0.1:3005\",",
+      "context": [
+        "            {",
+        "                \"server\": \"Uvicorn 0.52.4 (FastAPI create_app) on 127.0.0.1:8080\",",
+        "                \"proxy\": \"Vite 5.x on 127.0.0.1:3005\",",
+        "                \"browser\": \"Google Chrome (Official Build, Blink engine)\",",
+        "                \"timestamp\": time.strftime(\"%Y-%m-%dT%H:%M:%S+09:00\"),"
+      ]
+    },
+    {
+      "path": "tools/run_real_browser_acceptance.py",
+      "line": 1763,
+      "text": "    parser.add_argument(\"--frontend-port\", type=int, default=3005, help=\"Vite frontend dev server port (default: 3005)\")",
+      "context": [
+        "    parser = argparse.ArgumentParser(description=\"Real Browser + Real Uvicorn E2E Acceptance Tool\")",
+        "    parser.add_argument(\"--backend-port\", type=int, default=8080, help=\"Uvicorn backend port (default: 8080)\")",
+        "    parser.add_argument(\"--frontend-port\", type=int, default=3005, help=\"Vite frontend dev server port (default: 3005)\")",
+        "    parser.add_argument(\"--chrome-path\", type=str, default=DEFAULT_CHROME_PATH, help=\"Path to Google Chrome binary\")",
+        "    parser.add_argument(\"--output-dir\", type=str, default=str(REPO_ROOT / \"scratch\"), help=\"Directory for ephemeral evidence output\")"
+      ]
+    },
+    {
+      "path": "tools/run_s02_real_api_acceptance.py",
+      "line": 7,
+      "text": "- Real Dev Server on 127.0.0.1:3005 (Vite proxying /v1 to 8080)",
+      "context": [
+        "- Real Dev IdP (.work/dev/dev_idp.py)",
+        "- Real Control Plane ASGI on 127.0.0.1:8080 (saintvision.server:create_app via uvicorn)",
+        "- Real Dev Server on 127.0.0.1:3005 (Vite proxying /v1 to 8080)",
+        "- Real Browser: Google Chrome (Official Build 153+, Blink engine)",
+        "- All network interactions flow across actual TCP sockets without Playwright route mocks."
+      ]
+    },
+    {
+      "path": "tools/run_s02_real_api_acceptance.py",
+      "line": 184,
+      "text": "    print(f\"[Frontend] Launching Vite dev server on port {port} (proxying /v1 to http://127.0.0.1:{backend_port})...\")",
+      "context": [
+        "        print(f\"[Frontend] Port {port} already active.\")",
+        "        return None",
+        "    print(f\"[Frontend] Launching Vite dev server on port {port} (proxying /v1 to http://127.0.0.1:{backend_port})...\")",
+        "    cmd = [\"npm.cmd\" if os.name == \"nt\" else \"npm\", \"run\", \"dev\", \"--\", \"--port\", str(port), \"--host\", \"127.0.0.1\"]",
+        "    env = os.environ.copy()"
+      ]
+    },
+    {
+      "path": "tools/run_s02_real_api_acceptance.py",
+      "line": 185,
+      "text": "    cmd = [\"npm.cmd\" if os.name == \"nt\" else \"npm\", \"run\", \"dev\", \"--\", \"--port\", str(port), \"--host\", \"127.0.0.1\"]",
+      "context": [
+        "        return None",
+        "    print(f\"[Frontend] Launching Vite dev server on port {port} (proxying /v1 to http://127.0.0.1:{backend_port})...\")",
+        "    cmd = [\"npm.cmd\" if os.name == \"nt\" else \"npm\", \"run\", \"dev\", \"--\", \"--port\", str(port), \"--host\", \"127.0.0.1\"]",
+        "    env = os.environ.copy()",
+        "    env[\"VITE_API_PROXY_TARGET\"] = f\"http://127.0.0.1:{backend_port}\""
+      ]
+    },
+    {
+      "path": "tools/run_s02_real_api_acceptance.py",
+      "line": 197,
+      "text": "            print(f\"\u2714 [Frontend] Vite dev server ready on port {port} (PID: {proc.pid}).\")",
+      "context": [
+        "    for _ in range(60):",
+        "        if is_port_open(port):",
+        "            print(f\"\u2714 [Frontend] Vite dev server ready on port {port} (PID: {proc.pid}).\")",
+        "            return proc",
+        "        time.sleep(0.3)"
+      ]
+    },
+    {
+      "path": "tools/run_s02_real_api_acceptance.py",
+      "line": 232,
+      "text": "    print(f\"\u2022 Frontend (Vite): http://127.0.0.1:{frontend_port}\")",
+      "context": [
+        "    print(f\"\u2022 Git Tip SHA:     {git_sha}\")",
+        "    print(f\"\u2022 Google Chrome:   {chrome_path}\")",
+        "    print(f\"\u2022 Frontend (Vite): http://127.0.0.1:{frontend_port}\")",
+        "    print(f\"\u2022 Backend (ASGI):  http://127.0.0.1:{backend_port}\")",
+        "    print(f\"\u2022 Dev IdP (OIDC):  http://127.0.0.1:{idp_port}\")"
+      ]
+    },
+    {
+      "path": "tools/run_s02_real_api_acceptance.py",
+      "line": 783,
+      "text": "            print(\"[Cleanup] Terminating Frontend Vite subprocess...\")",
+      "context": [
+        "            backend_proc.wait()",
+        "        if frontend_proc:",
+        "            print(\"[Cleanup] Terminating Frontend Vite subprocess...\")",
+        "            frontend_proc.terminate()",
+        "            frontend_proc.wait()"
+      ]
+    },
+    {
+      "path": "tools/run_s02_real_api_acceptance.py",
+      "line": 795,
+      "text": "        help=\"Port of running Vite frontend (default: 3005. Note: non-default ports require registration in Dev IdP redirect allowlist and api.json.allowedOrigins)\",",
+      "context": [
+        "        type=int,",
+        "        default=3005,",
+        "        help=\"Port of running Vite frontend (default: 3005. Note: non-default ports require registration in Dev IdP redirect allowlist and api.json.allowedOrigins)\",",
+        "    )",
+        "    parser.add_argument(\"--backend-port\", type=int, default=8080, help=\"Port for Uvicorn backend\")"
+      ]
+    },
+    {
+      "path": "tools/run_s04_fe_matrix.py",
+      "line": 26,
+      "text": "- Real Dev Server on 127.0.0.1:3005 (Vite proxying /v1 to 8080 via VITE_API_PROXY_TARGET)",
+      "context": [
+        "- Real Dev IdP (.work/dev/dev_idp.py)",
+        "- Real Control Plane ASGI on 127.0.0.1:8080 (saintvision.server:create_app via uvicorn)",
+        "- Real Dev Server on 127.0.0.1:3005 (Vite proxying /v1 to 8080 via VITE_API_PROXY_TARGET)",
+        "- Real PostgreSQL 16 on 127.0.0.1:55432",
+        "- Real Browser: Google Chrome (Official Build 153+, Blink engine)"
+      ]
+    },
+    {
+      "path": "tools/run_s04_fe_matrix.py",
+      "line": 311,
+      "text": "    print(f\"[Frontend] Launching Vite on port {frontend_port} (proxying to backend port {backend_port})...\")",
+      "context": [
+        "        print(f\"[Frontend] Port {frontend_port} already active.\")",
+        "        return None",
+        "    print(f\"[Frontend] Launching Vite on port {frontend_port} (proxying to backend port {backend_port})...\")",
+        "    web_dir = REPO_ROOT / \"apps\" / \"web\"",
+        "    env = os.environ.copy()"
+      ]
+    },
+    {
+      "path": "tools/run_s04_fe_matrix.py",
+      "line": 317,
+      "text": "    npm_cmd = \"npm.cmd\" if os.name == \"nt\" else \"npm\"",
+      "context": [
+        "    env[\"NODE_OPTIONS\"] = \"--max-old-space-size=64\"",
+        "",
+        "    npm_cmd = \"npm.cmd\" if os.name == \"nt\" else \"npm\"",
+        "    cmd = [npm_cmd, \"run\", \"dev\", \"--\", \"--port\", str(frontend_port), \"--host\", \"127.0.0.1\"]",
+        "    proc = subprocess.Popen("
+      ]
+    },
+    {
+      "path": "tools/run_s04_fe_matrix.py",
+      "line": 479,
+      "text": "        print(\"\u2714 Frontend Vite ready\")",
+      "context": [
+        "",
+        "        assert is_port_open(frontend_port), f\"Frontend port {frontend_port} not listening\"",
+        "        print(\"\u2714 Frontend Vite ready\")",
+        "",
+        "        # Load environment credentials for direct verification"
+      ]
+    },
+    {
+      "path": "tools/run_s04_fe_matrix.py",
+      "line": 1589,
+      "text": "            print(\"[Cleanup] Terminating Frontend Vite subprocess tree...\")",
+      "context": [
+        "            kill_proc_tree(backend_proc)",
+        "        if frontend_proc:",
+        "            print(\"[Cleanup] Terminating Frontend Vite subprocess tree...\")",
+        "            kill_proc_tree(frontend_proc)",
+        "        # N1: Process cleanup strictly limited to runner's own PID tree (no blind free_port killing)"
+      ]
+    },
+    {
+      "path": "tools/run_s04_fe_matrix.py",
+      "line": 1597,
+      "text": "    parser.add_argument(\"--frontend-port\", type=int, default=3005, help=\"Port of running Vite frontend\")",
+      "context": [
+        "    parser = argparse.ArgumentParser(description=\"Run S04-FE Matrix Acceptance Suite (Real Chrome & Backend)\")",
+        "    parser.add_argument(\"--chrome-path\", default=DEFAULT_CHROME_PATH, help=\"Path to Google Chrome executable\")",
+        "    parser.add_argument(\"--frontend-port\", type=int, default=3005, help=\"Port of running Vite frontend\")",
+        "    parser.add_argument(\"--backend-port\", type=int, default=8080, help=\"Port for Uvicorn backend\")",
+        "    parser.add_argument(\"--idp-port\", type=int, default=8090, help=\"Port for dev IdP\")"
+      ]
+    },
+    {
+      "path": "tools/verify_desktop_observation_browser.py",
+      "line": 2,
+      "text": "Start apps/web Vite at 127.0.0.1:5187 before running. Creates/removes a temporary harness.",
+      "context": [
+        "\"\"\"Real Chromium UI test with intercepted HTTP fixtures; no live backend/SSO claim.",
+        "Start apps/web Vite at 127.0.0.1:5187 before running. Creates/removes a temporary harness.",
+        "\"\"\"",
+        "import asyncio"
+      ]
+    },
+    {
+      "path": "tools/verify_desktop_observation_browser.py",
+      "line": 93,
+      "text": "            (evidence/'browser.json').write_text(json.dumps({\"environment\":\"local Vite + headless Chromium; intercepted fixture HTTP, not live backend\", \"checks\":checks,\"passed\":len(checks),\"pageErrors\":errors},ensure_ascii=False,indent=2)+'\\n',encoding='utf-8')",
+      "context": [
+        "            evidence = ROOT/'docs/vault/30_Development/Evidence/vf-desktop-integration'",
+        "            evidence.mkdir(parents=True,exist_ok=True)",
+        "            (evidence/'browser.json').write_text(json.dumps({\"environment\":\"local Vite + headless Chromium; intercepted fixture HTTP, not live backend\", \"checks\":checks,\"passed\":len(checks),\"pageErrors\":errors},ensure_ascii=False,indent=2)+'\\n',encoding='utf-8')",
+        "            await browser.close()",
+        "    print(json.dumps({\"passed\":len(checks),\"checks\":checks},ensure_ascii=True))"
+      ]
+    }
+  ]
+}

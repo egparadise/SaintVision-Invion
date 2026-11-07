@@ -1,0 +1,80 @@
+"""Metadata-only Root binding of corrected ESM, hosted dev/build evidence and retained manual gate."""
+import concurrent.futures,datetime,hashlib,json,re,subprocess,xml.etree.ElementTree as ET,zipfile
+from pathlib import Path
+r=Path(__file__).resolve().parents[1];out=r/'.work/cspcc607-root-verification-r1';assert not out.exists() or not list(out.iterdir());out.mkdir(exist_ok=True);ev=Path(r'D:\Project\SaintVisionI-Invion\fleet5-compute-storage-contract-20261105\docs\vault\30_Development\Evidence\fleet5-csp02-esm-dev-compat-r1-20261108-codex');d=json.loads((ev/'delivery.json').read_bytes());base='428e5fc6b822d33e7e76316f443716b03579efa0';backend='96afd799d49717fd40e4ddabd538d82accbe1958';target='cc6076254d5b8f54804081a8b1994d76d86cf81a';branch='agent/codex/fleet5-csp02-esm-dev-compat-r1-20261108';GH=r'C:\Program Files\GitHub CLI\gh.exe'
+def git(*args):
+ q=subprocess.run(['git',*args],cwd=r,capture_output=True,timeout=30);assert q.returncode==0,('git',args,q.returncode);return q.stdout
+assert d['sourceSHA']==target and d['deliveryBase']==base and d['backendSource']==backend and d['branch']==branch;assert git('merge-base',base,target).decode().strip()==base and git('ls-remote','origin','refs/heads/'+branch).decode().split()[0]==target
+git('diff','--check',base,target,'--','.github','apps','contracts','packages','services','src','tests','tools','deploy','migrations')
+# Raw public producer snapshots intentionally retain CRLF under their -text attribute.
+# Keep all default whitespace checks, recognizing only the legitimate CR at EOL.
+git('-c','core.whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol','diff','--check',base,target)
+paths=git('diff','--name-only',base,target).decode('utf8').splitlines();assert paths==d['changedPaths']
+allowed={'.github/workflows/frontend.yml','apps/web/.gitignore','apps/web/eslint.config.js','apps/web/package.json','apps/web/scripts/node-certificate-validator.mjs','apps/web/src/contracts/node-certificate-validator.d.cts','apps/web/src/contracts/node-certificate-validator.d.mts','apps/web/src/shared/api/nodeCertificateObservation.ts','apps/web/tests/browser/vite.config.ts','apps/web/tests/node-certificate-validator-csp.test.ts','apps/web/vite.config.ts'};source_paths=[p for p in paths if not p.startswith('docs/vault/')];assert set(source_paths)<=allowed and len(source_paths)>=10;assert all(p.startswith('docs/vault/30_Development/Evidence/fleet5-csp02-esm-dev-compat-r1-20261108-codex/') or p in ['docs/vault/30_Development/Agent별 작업/Codex 작업 현황.md','docs/vault/30_Development/History/2026-11-08_FLEET5_CR-CSP-02_ESM_dev_Codex.md'] for p in paths if p.startswith('docs/'))
+protected=['contracts','packages','services','migrations','src','tests','deploy','apps/studio','apps/web/package-lock.json','.github/workflows/ac11-accessibility-e2e.yml','tools/collect_ac11_accessibility_e2e.py','tools/run_real_browser_acceptance.py','tools/verify_portal_strict_csp_browser.py'];trees={}
+for p in protected:
+ a=git('rev-parse',base+':'+p).decode().strip();b=git('rev-parse',target+':'+p).decode().strip();assert a==b,p;trees[p]=a
+current=git('show',target+':apps/web/src/shared/api/nodeCertificateObservation.ts');tail=current[current.index(b'const renewalWindowMillis'):]
+for b in [base,backend]:
+ old=git('show',b+':apps/web/src/shared/api/nodeCertificateObservation.ts');assert old[old.index(b'const renewalWindowMillis'):]==tail
+declared=d['freshWorkflows'];assert len(declared)==3
+def query(t):
+ name,rid,suffix=t;q=subprocess.run([GH,'api',f'repos/egparadise/SaintVision-Invion/actions/runs/{rid}'+suffix],capture_output=True,timeout=40);assert q.returncode==0;v=json.loads(q.stdout);label='run' if not suffix else 'jobs' if suffix.startswith('/jobs') else 'artifacts';(out/(name+'-'+label+'.json')).write_bytes(q.stdout);return name,suffix,v
+tasks=[(a['workflow'],a['runID'],s) for a in declared for s in ['', '/jobs?per_page=100','/artifacts?per_page=100']]
+with concurrent.futures.ThreadPoolExecutor(max_workers=3) as pool:result=list(pool.map(query,tasks))
+data={(n,s):v for n,s,v in result};verified=[];artifacts=[]
+for a in declared:
+ name=a['workflow'];run=data[name,''];jobs=data[name,'/jobs?per_page=100'];arts=data[name,'/artifacts?per_page=100'];expected_path='.github/workflows/'+('ac11-accessibility-e2e.yml' if name=='ac11-accessibility-e2e' else name+'.yml')
+ assert run['id']==a['runID'] and run['head_sha']==target and run['head_branch']==branch and run['event']=='workflow_dispatch' and run['path']==expected_path and run['run_attempt']==1 and run['display_title']==a['correlation'] and run['status']=='completed' and run['conclusion']=='success'
+ assert jobs['total_count']==len(jobs['jobs'])==(2 if name=='frontend' else 1)
+ for j in jobs['jobs']:
+  assert j['head_sha']==target and j['status']=='completed' and j['conclusion']=='success' and all(s['conclusion']=='success' for s in j['steps'])
+  assert len(j['steps'])==({'frontend':17,'Portal Container Build & Hardened Runtime Smoke':14}[j['name']] if name=='frontend' else 19 if name=='docs' else 14)
+ assert arts['total_count']==len(arts['artifacts']);artifacts.extend(arts['artifacts']);verified.append({'workflow':name,'runID':run['id'],'correlation':run['display_title'],'exactSourceRefPathEventAttempt1':True,'jobs':[{'id':j['id'],'name':j['name'],'steps':len(j['steps']),'allSuccess':True} for j in jobs['jobs']]})
+files=[];values={}
+names=['saintvision-web-dist','saintvision-portal-strict-csp-evidence','s11-ac11-accessibility-'+target]
+for name in names:
+ a=next(x for x in artifacts if x['name']==name);assert not a['expired'] and a['workflow_run']['head_sha']==target;p=ev/('ci-cc6076254d5b-'+name+'.zip');assert p.stat().st_size==a['size_in_bytes'] and 'sha256:'+hashlib.file_digest(p.open('rb'),'sha256').hexdigest()==a['digest']
+ with zipfile.ZipFile(p) as z:
+  assert len(z.namelist())==len(set(z.namelist())) and all(not n.startswith('/') and '..' not in n.replace('\\','/').split('/') for n in z.namelist())
+  if name=='saintvision-web-dist':values['dist']={n:hashlib.sha256(z.read(n)).hexdigest() for n in z.namelist()}
+  elif name=='saintvision-portal-strict-csp-evidence':
+   for n in z.namelist():
+    if n.endswith('result.json'):values['browser']=json.loads(z.read(n))
+    if n.endswith('node-certificate-validator.manifest.json'):values['manifest']=json.loads(z.read(n))
+    if n.endswith('node-certificate-validator.mjs'):values['validator']=z.read(n)
+  else:
+   for n in z.namelist():
+    if n.endswith('.json'):values['ac11']=json.loads(z.read(n))
+    if n.endswith('.xml'):values['ac11_xml']=z.read(n)
+ files.append({'id':a['id'],'name':name,'bytes':p.stat().st_size,'SHA256':a['digest'],'officialMetadataMatchesBytes':True})
+browser=values['browser'];manifest=values['manifest'];code=values['validator'];ac=values['ac11'];assert browser['distSHA256']==values['dist'] and browser['bootPassed'] and browser['fixtureOnly'] and browser['anonymousOnly'] and browser['sandbox'] and not browser['actualPC3BrowserAcceptance'];assert browser['negativeControl']=={'functionBlocked':True,'evalBlocked':True} and not browser['pageErrors'] and not browser['cspErrors'] and not browser['requestFailures'] and not browser['bundledAjvCompilerModules']
+headers=git('show',target+':deploy/intranet/portal/security-headers.conf');assert hashlib.sha256(headers).hexdigest()==browser['securityHeadersSHA256'] and "script-src 'self';" in browser['csp'] and 'unsafe-eval' not in browser['csp']
+for k,p in [('schemaSHA256','contracts/v1alpha1/core.schema.json'),('generatorSHA256','apps/web/scripts/node-certificate-validator.mjs'),('lockSHA256','apps/web/package-lock.json')]:assert manifest[k]==hashlib.sha256(git('show',target+':'+p)).hexdigest()
+assert manifest['format']=='esm' and manifest['selfContained'] and manifest['validatorSHA256']==hashlib.sha256(code).hexdigest();lock=json.loads(git('show',target+':apps/web/package-lock.json'));assert manifest['esbuild']==lock['packages']['node_modules/esbuild']['version'];assert not re.search(rb'\brequire\s*\(',code) and b'module.exports' not in code and not re.search(rb'\beval\s*\(|\bnew\s+Function\s*\(',code)
+assert manifest==json.loads((ev/'ci-cc6076254d5b-validator-manifest.json').read_bytes())
+assert ac['sourceRunId']=='42398681339' and ac['sourceHeadSha']==target and ac['checkoutTreeSha']==git('rev-parse',target+'^{tree}').decode().strip() and ac['cleanCheckout'] and ac['environment']['credentialsRequired'] is False and ac['environment']['physicalFiveNodeComparable'] is False and ac['verdict']=='MEASURED_FAIL' and ac['acceptanceClaim'] is False
+obs={x['metric']:x for x in ac['payload']['observations']};assert ac['payload']['browserPhysicalCaseCount']==6 and len(ac['payload']['journeyIds'])==5 and len(ac['payload']['invariantIds'])==9
+for name,n in [('canonicalJourneyFailureCount',5),('desktopInvariantFailureCount',9),('contrastFailureCount',3),('keyboardFailureCount',2)]:assert obs[name]['n']==obs[name]['successCount']==n and obs[name]['failureCount']==obs[name]['skipCount']==obs[name]['value']==0
+assert obs['manualAcceptanceMissingCount']['value']==obs['manualAcceptanceMissingCount']['failureCount']==1 and obs['manualAcceptanceMissingCount']['errorsByClass']=={'manual-acceptance-not-supplied':1};xml=ET.fromstring(values['ac11_xml']);assert xml.attrib['tests']=='5' and xml.attrib['failures']=='1'
+logproof={}
+for name,jid in [('vitest',128481507227),('ac11',128481522162)]:
+ q=subprocess.run([GH,'api','--allow-escape-sequences',f'repos/egparadise/SaintVision-Invion/actions/jobs/{jid}/logs'],capture_output=True,timeout=40);assert q.returncode==0;plain=re.sub(r'\x1b\[[0-9;]*[A-Za-z]','',q.stdout.decode('utf8','replace'));proof={'jobID':jid,'bytes':len(q.stdout),'SHA256':hashlib.sha256(q.stdout).hexdigest()}
+ if name=='vitest':
+  lines=[x for x in plain.splitlines() if re.search(r'\bTests\s+1351 passed\s*\(1351\)|Test Files\s+106 passed\s*\(106\)',x)];assert len(lines)==2;proof['summaries']=lines;proof['passedTests']=1351;proof['totalTests']=1351
+ else:
+  cases=[]
+  for line in plain.splitlines():
+   if '"exitCode"' in line and '"tests"' in line:
+    try:v=json.loads(line[line.index('{'):])
+    except (ValueError,KeyError):continue
+    if isinstance(v.get('tests'),dict):cases.append(v)
+  assert len(cases)==1 and cases[0]['exitCode']==0 and cases[0]['tests']=={'failure':0,'error':0,'skipped':0,'passed':6};proof['actualBrowserCaseSummary']=cases[0]
+ logproof[name]=proof
+state=Path(r'D:\Project\SaintVision-Invion\SaintVisionI-Invion\.git\obsidian-sync-state.json').read_bytes();assert len(state)==d['canonicalState']['bytes']==529870 and hashlib.sha256(state).hexdigest()==d['canonicalState']['SHA256']=='43600e1941cb3527e80adc2daac2064c53a44d129094da53869e6f50d46e334e';assert (ev/'sync-state-before.json').read_bytes()==(ev/'sync-state-final-after.json').read_bytes()==(ev/'sync-state-postCI-after.json').read_bytes()==state
+gates=json.loads((ev/'local-gates-final-cc6076254d5b.json').read_bytes());assert len(gates)==8 and all(g['exit']==0 for g in gates) and d['postCIFinalSyncCheck']['exit']==0 and d['postCIFinalSyncCheck']['fullBytesEqual'] and not d['postCIFinalSyncCheck']['apply']
+for n in ['delivery.json','first-corrected-source-ci-failure.json','second-corrected-source-ac11-measurement.json','baseline-baseline-final-proof.json','local-gates-final-cc6076254d5b.json','postCI-final-sync-check.json','sync-state-final-comparison.json','protected-components.json']:(out/n).write_bytes((ev/n).read_bytes())
+for name,v in [('official-browser-result',browser),('official-validator-manifest',manifest),('official-AC11-report',ac),('official-log-proof',logproof)]:(out/(name+'.json')).write_text(json.dumps(v,indent=2)+'\n')
+(out/'official-AC11-junit.xml').write_bytes(values['ac11_xml'])
+q=subprocess.run([r'C:\Users\inviz\AppData\Local\Programs\orca\resources\bin\orca.exe','orchestration','worker-show','--dispatch','ctx_e508c89f62b7','--json'],capture_output=True,timeout=20);assert q.returncode==0;life=json.loads(q.stdout);(out/'author-lifecycle.json').write_bytes(q.stdout);assert life['result']['state']=='succeeded' and life['result']['stage']=='settled'
+v={'atKST':datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=9))).isoformat(timespec='seconds'),'source':target,'base':base,'unchangedBackendSource':backend,'branch':branch,'descendantCommits':int(git('rev-list','--count',base+'..'+target)),'sourcePaths':source_paths,'protectedTreesAndAC11PolicyUnchanged':trees,'semanticTailIdenticalTo428And96':True,'officialFreshCI':verified,'officialArtifactBindings':files,'hostedBuiltDistStrictCSPBootAndBytesMatched':True,'generatedESMNoRawRequireModuleExportsEvalFunctionText':True,'officialVitest1351Of1351In106Files':True,'officialDevBrowserCasesPassed6Of6':True,'officialDevCanonicalJourneysPassed5Of5':True,'officialDevInvariantsPassed9Of9':True,'officialDevContrastChecksPassed3Of3':True,'officialDevKeyboardChecksPassed2Of2':True,'normalizedAC11Verdict':'MEASURED_FAIL','manualAcceptanceMissingCount':1,'manualAcceptanceGatePreservedNotDischarged':True,'acceptanceClaim':False,'firstAndSecondGenuineFailuresRetained':True,'authorCanonicalFullBytesMatched':True,'canonicalBytes':len(state),'canonicalSHA256':hashlib.sha256(state).hexdigest(),'authorLocalMetadataGates8Exit0':True,'authorLifecycle':{k:life['result'][k] for k in ['state','stage','liveness','terminalState']},'sourceIndependentReview':'PENDING_ONE_ACTUAL_BOUNDED_CLAUDE_DELTA_REVIEW','actualPC3BrowserDeploymentAcceptance':False,'mainProductExecution':False,'wholeProgramComplete':False};(out/'root-verification.json').write_text(json.dumps(v,indent=2)+'\n');print(json.dumps(v),flush=True)

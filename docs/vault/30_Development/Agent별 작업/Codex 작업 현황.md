@@ -1,15 +1,23 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.489"
+version: "1.0.490"
 status: "review"
 author: "Codex"
-updated: "2026-11-08T03:35:57+09:00"
+updated: "2026-11-08T04:17:09+09:00"
 source_of_truth: "Git"
 active_card: "FLEET5 continued supervision with PORTAL-REFRESH-FLEET-20261106"
-active_card_status: "CR-CSP02ResidualDirectLauncherActualPC3FreshSourceReproduced_Index200Module500_GeneratedFileMissing_ProbeStopped_CentralMainConfigFixReady"
-active_card_next: "Actual Codex centralizes same-generator fail-closed preparation in main Vite config, audits known launchers once, proves fresh direct vite boot plus exact FrontendDocsAC11. Inherit sound R1R2, then one actual bounded delta review. Existing runtime/readyWorkspace preserved; real browser/Run/manual/5PC gates remain."
+active_card_status: "CentralViteE4e07ExactCIAndFreshDirectBrowserVerified_1351Tests6Cases_ExactOneLineWaitMatched_ActualAuthorExitedReleased_BoundedClaudeReviewReady_ManualRealDeploy5PCPending"
+active_card_next: "Root publishes Root529 exact e4e07 and approval proofs after author exit, then starts one actual Claude central-config/new-direct-proof/approved-wait delta review. Inherit soundR1R2. After acceptance Root deploys exact frontend and verifies actual PC3 strictCSP login/no-blink/resources; manual/real votes/Run/PC1/PC5/renewal/all5 remain."
 ---
+
+## 2026-11-08T04:17:09+09:00 중앙 실행e4e07 검증과 Root529 진행 기록 마무리
+
+중앙Vite설정과정확승인된기존DOM완료대기1행만반영한e4e07bfd의공식Frontend42404194858(19+14단계)·Docs42404197444(19)·AC1142404200030(14),1351/1351시험·6/6브라우저사례를Root가대조했다. 새설치두생성물부재/npmhook없음의directnodevite가실제canonical생성·module200·loginroot1/예외0을보였고같은생성품이strictCSP빌드proof와일치한다. generator/lock/semanticTail/backend/SQL/AC11규칙은유지됐다. 자동journeys5·invariants9·대비3·키보드2는통과했지만manualMissing1/MEASURED_FAIL은유지한다. 실제작성자종료/해제후중앙설정/새proof/승인1행만한정Claude검토하며실제새화면배포/5대인수는아직남는다. 다음첫행동/담당은Root의exactDocs/Obsidian게시후actualClaude한정검토배정이다.
+
+## 2026-11-08T04:00:18+09:00 기존 비동기 완료 대기1행 한정 승인
+
+현재task의정확제안patchSHA736cd6ca의기존untilVisible1행만Root가승인했다. 실제1350pass/1fail·제품/test/API/panel이cc607과동일·기존2초helper·모든assertion/1351case를보존하는비동기완료대기이며다른source/검사완화는승인하지않았다. 원래CI실패를보존하고새source에서Frontend/Docs/AC11을다시검증한다. authorfullstate창동안RootAPPLY는계속보류하며본진행기록게시/동기화는그창종료뒤완료한다. 다음첫행동/담당은동일actualCodexworker의정확patch적용과새head공식검증이며Root는결과수신뒤증거게시를마무리한다.
 
 ## 2026-11-08T03:35:57+09:00 깨끗한 directVite의 index200/module500 실제 재현
 
