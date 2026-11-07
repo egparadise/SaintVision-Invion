@@ -1,0 +1,60 @@
+{
+  "atKST": "2026-11-07T23:27:28+09:00",
+  "SSHExit": 0,
+  "stderrBytes": 0,
+  "knownHostsUnchanged": true,
+  "currentCPDatabaseImage": {
+    "Id": "sha256:75f5a96988cdf694a215073c3e9c001b706b371e2f94df3967f2efdec2787f6b",
+    "RepoDigests": [
+      "postgres@sha256:44c4ee9810eff91f7eab4d822642e01115b1a9eccce4bcbdde7604752d68eac6"
+    ],
+    "Os": "linux",
+    "Architecture": "amd64"
+  },
+  "mainMemoryObservedReadonly": {
+    "atKST": "2026-11-07T23:23:01.2665286+09:00",
+    "totalBytes": 16935796736,
+    "freeBytes": 120573952,
+    "usedPercent": 99.29,
+    "newMainProductExecutionAllowed": false
+  },
+  "remote": {
+    "DBWrites": false,
+    "schemaBackupTaken": false,
+    "migrationApplied": false,
+    "applicationStarted": false,
+    "profileValuesEmitted": false,
+    "privateFilesWritten": false,
+    "wholeProgramComplete": false,
+    "sameNamedClusterAndEpoch": true,
+    "tenantControlsUnchanged": true,
+    "databaseBytes": 21543959,
+    "serverVersionNumber": "160015",
+    "existingOperatorRoleClass": {
+      "rolsuper": true,
+      "rolbypassrls": true,
+      "rolcreaterole": true
+    },
+    "O1SuperuserMigratorAvailable": true,
+    "publicAlembicVersionTablePresent": true,
+    "publicAlembicHeads": [
+      "0067_audit_reader_revoke"
+    ],
+    "migrationMetadataRelations": [],
+    "newWriterRoleAlreadyExists": false,
+    "newHelperSignaturesAlreadyExist": 0,
+    "selectedProjectWorkspaceStatusCounts": [
+      {
+        "status": "provisioning",
+        "count": 1
+      }
+    ],
+    "selectedProjectWorkloadCount": 0,
+    "deliveryQueuePhaseCounts": [],
+    "PC3DiskFreeBytes": 207113752576,
+    "PC3MemAvailableBytes": 11262054400,
+    "cachedOfficialNamedPostgresImages": [],
+    "status": "READONLY_PREDEPLOY_BACKUP_PREREQUISITES_RECORDED",
+    "next": "Choose exact same-major pinned PostgreSQL client and protected new backup path; take/verify backup before any0068 apply after code review acceptance. No backup/migration/ready status is claimed."
+  }
+}

@@ -1,0 +1,92 @@
+[
+  {
+    "module": "tests.integration.test_workspace_first_intents",
+    "name": "test_direct_intent_positive_control_uses_kernel_and_rolls_back",
+    "status": "passed"
+  },
+  {
+    "module": "tests.integration.test_workspace_first_intents",
+    "name": "test_direct_intent_sql_guards_cannot_hide_behind_python_validation[gpu-Bounded CPU resources required]",
+    "status": "passed"
+  },
+  {
+    "module": "tests.integration.test_workspace_first_intents",
+    "name": "test_direct_intent_sql_guards_cannot_hide_behind_python_validation[cpu-CPU resource bounds exceeded]",
+    "status": "passed"
+  },
+  {
+    "module": "tests.integration.test_workspace_first_intents",
+    "name": "test_direct_intent_sql_guards_cannot_hide_behind_python_validation[memory-CPU resource bounds exceeded]",
+    "status": "passed"
+  },
+  {
+    "module": "tests.integration.test_workspace_first_intents",
+    "name": "test_direct_intent_sql_guards_cannot_hide_behind_python_validation[extra-key-Closed canonical CPU metadata required]",
+    "status": "passed"
+  },
+  {
+    "module": "tests.integration.test_workspace_first_intents",
+    "name": "test_direct_intent_sql_guards_cannot_hide_behind_python_validation[sha-Closed canonical CPU metadata required]",
+    "status": "passed"
+  },
+  {
+    "module": "tests.integration.test_workspace_first_intents",
+    "name": "test_direct_intent_sql_guards_cannot_hide_behind_python_validation[canonical-Closed canonical CPU metadata required]",
+    "status": "passed"
+  },
+  {
+    "module": "tests.integration.test_workspace_first_intents",
+    "name": "test_direct_intent_sql_guards_cannot_hide_behind_python_validation[workspace-not-ready-Current selected ready Workspace required]",
+    "status": "passed"
+  },
+  {
+    "module": "tests.integration.test_workspace_first_intents",
+    "name": "test_direct_intent_sql_guards_cannot_hide_behind_python_validation[workspace-version-Current selected ready Workspace required]",
+    "status": "passed"
+  },
+  {
+    "module": "tests.integration.test_workspace_first_intents",
+    "name": "test_direct_intent_sql_guards_cannot_hide_behind_python_validation[target-not-member-Selected target membership differs]",
+    "status": "passed"
+  },
+  {
+    "module": "tests.integration.test_workspace_first_intents",
+    "name": "test_direct_intent_sql_guards_cannot_hide_behind_python_validation[target-disabled-Selected target membership differs]",
+    "status": "passed"
+  },
+  {
+    "module": "tests.integration.test_workspace_first_intents",
+    "name": "test_direct_intent_sql_guards_cannot_hide_behind_python_validation[spec-tenant-Closed canonical CPU metadata required]",
+    "status": "passed"
+  },
+  {
+    "module": "tests.integration.test_workspace_first_intents",
+    "name": "test_direct_run_positive_control_uses_kernel_and_rolls_back_all_three_rows",
+    "status": "passed"
+  },
+  {
+    "module": "tests.integration.test_workspace_first_intents",
+    "name": "test_direct_run_requires_current_selected_intent_without_partial_effects[workspace-version]",
+    "status": "passed"
+  },
+  {
+    "module": "tests.integration.test_workspace_first_intents",
+    "name": "test_direct_run_requires_current_selected_intent_without_partial_effects[workload-version]",
+    "status": "passed"
+  },
+  {
+    "module": "tests.integration.test_workspace_first_intents",
+    "name": "test_direct_run_requires_current_selected_intent_without_partial_effects[sha]",
+    "status": "passed"
+  },
+  {
+    "module": "tests.integration.test_workspace_first_intents",
+    "name": "test_direct_run_requires_current_selected_intent_without_partial_effects[workspace-not-ready]",
+    "status": "passed"
+  },
+  {
+    "module": "tests.integration.test_workspace_first_intents",
+    "name": "test_helper_privileges_rls_and_missing_context_are_real_not_superuser_results",
+    "status": "passed"
+  }
+]

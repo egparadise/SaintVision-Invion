@@ -1,0 +1,39 @@
+import datetime,json,os,shutil,subprocess,sys
+from pathlib import Path
+import psycopg
+from psycopg.rows import dict_row
+phase='readonly-target-identity-head-and-role'
+o={'DBWrites':False,'schemaBackupTaken':False,'migrationApplied':False,'applicationStarted':False,'profileValuesEmitted':False,'privateFilesWritten':False,'wholeProgramComplete':False}
+try:
+ p=json.loads(sys.stdin.buffer.read(65537));ops=Path('/home/saintvision-invion3/saintvision-share/ops-fresh-cpu-1efea-r1-20261107');assert Path(sys.prefix).resolve()==ops/'venv'
+ for key in list(os.environ):
+  if key.startswith('PG'):os.environ.pop(key,None)
+ with psycopg.connect(p['ownerProfile'],autocommit=True,row_factory=dict_row) as c:
+  c.read_only=True
+  assert c.execute('SELECT system_identifier::text AS id FROM pg_control_system()').fetchone()['id']==p['expectedServer']
+  assert str(c.execute('SELECT epoch FROM inv.control_epoch WHERE singleton').fetchone()['epoch'])==p['epoch']
+  controls=c.execute('SELECT version,kill_switch FROM inv.tenant_controls WHERE tenant_id=%s',(p['tenant'],)).fetchone();assert controls=={'version':0,'kill_switch':False}
+  o['sameNamedClusterAndEpoch']=True;o['tenantControlsUnchanged']=True
+  o['databaseBytes']=c.execute('SELECT pg_database_size(current_database()) AS n').fetchone()['n']
+  o['serverVersionNumber']=c.execute("SELECT current_setting('server_version_num') AS version").fetchone()['version']
+  role=c.execute('SELECT rolsuper,rolbypassrls,rolcreaterole FROM pg_roles WHERE rolname=current_user').fetchone();o['existingOperatorRoleClass']=role;o['O1SuperuserMigratorAvailable']=role['rolsuper']
+  alembic=c.execute("SELECT to_regclass('public.alembic_version') IS NOT NULL AS present").fetchone()['present'];o['publicAlembicVersionTablePresent']=alembic
+  if alembic:o['publicAlembicHeads']=[x['version_num'] for x in c.execute('SELECT version_num FROM public.alembic_version ORDER BY version_num').fetchall()]
+  o['migrationMetadataRelations']=c.execute("SELECT n.nspname AS schema,c.relname AS relation FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname IN ('public','inv') AND c.relkind IN ('r','p') AND (c.relname LIKE '%migration%' OR c.relname LIKE '%schema_version%') ORDER BY 1,2").fetchall()
+  o['newWriterRoleAlreadyExists']=c.execute("SELECT EXISTS(SELECT 1 FROM pg_roles WHERE rolname='inv_first_workspace_writer') AS present").fetchone()['present']
+  o['newHelperSignaturesAlreadyExist']=c.execute("SELECT count(*) AS n FROM pg_proc f JOIN pg_namespace n ON n.oid=f.pronamespace WHERE n.nspname='inv' AND f.proname IN ('append_first_workspace_intent','append_first_workspace_run')").fetchone()['n']
+  o['selectedProjectWorkspaceStatusCounts']=c.execute('SELECT status,count(*) AS count FROM public.workspaces WHERE tenant_id=%s AND project_id=%s GROUP BY status ORDER BY status',(p['tenant'],p['project'])).fetchall()
+  o['selectedProjectWorkloadCount']=c.execute('SELECT count(*) AS n FROM public.workloads WHERE tenant_id=%s AND project_id=%s',(p['tenant'],p['project'])).fetchone()['n']
+  o['deliveryQueuePhaseCounts']=c.execute('SELECT phase,count(*) AS count FROM inv.execution_deliveries WHERE tenant_id=%s GROUP BY phase ORDER BY phase',(p['tenant'],)).fetchall()
+ o['PC3DiskFreeBytes']=shutil.disk_usage(ops).free
+ o['PC3MemAvailableBytes']=int(next(x for x in Path('/proc/meminfo').read_text().splitlines() if x.startswith('MemAvailable:')).split()[1])*1024
+ phase='readonly-cached-client-image-inventory'
+ q=subprocess.run(['docker','image','ls','--no-trunc','--format','{{json .}}'],capture_output=True,timeout=10);assert q.returncode==0
+ cached=[]
+ for line in q.stdout.decode().splitlines():
+  x=json.loads(line)
+  if x.get('Repository') in ['postgres','docker.io/library/postgres']:cached.append({'Repository':x['Repository'],'Tag':x['Tag'],'ID':x['ID']})
+ o['cachedOfficialNamedPostgresImages']=cached
+ o.update(status='READONLY_PREDEPLOY_BACKUP_PREREQUISITES_RECORDED',next='Choose exact same-major pinned PostgreSQL client and protected new backup path; take/verify backup before any0068 apply after code review acceptance. No backup/migration/ready status is claimed.')
+except BaseException as error:o.update(status='HOLD_READONLY_PREDEPLOY_BACKUP_INVENTORY',phase=phase,errorClass=type(error).__name__,rawDiagnosticsSuppressed=True)
+print(json.dumps(o));raise SystemExit(0 if o.get('status')=='READONLY_PREDEPLOY_BACKUP_PREREQUISITES_RECORDED' else 2)

@@ -1,15 +1,19 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.481"
+version: "1.0.482"
 status: "review"
 author: "Codex"
-updated: "2026-11-07T21:46:53+09:00"
+updated: "2026-11-07T23:43:44+09:00"
 source_of_truth: "Git"
 active_card: "FLEET5 continued supervision with PORTAL-REFRESH-FLEET-20261106"
-active_card_status: "CR90501TestOnlyAuthorFollowupReadyLive_ProductSQLPinsUnchanged_ExactCIThenOneDeltaReview_ActualDeploymentPending_RootApplyDeferred"
-active_card_next: "Wait actual Codex B ctx_6bed4fe4e6c4/task_82627c80384c test-only delivery on905; verify unchanged SQL/product and exact Core/Backend/Docs then one actual Claude delta review. Root O1-O6 and real approvals/Run/PC1/PC5/five-PC gates remain."
+active_card_status: "CR90501Source96afOfficialCI6JobsDirect18Verified_AuthorExitedReleased_ClaudeDeltaReady_PC3SchemaBackupCreated_ActualDeploymentPending"
+active_card_next: "Root latest report/canonical sync after closed author window then reopen actual Claude ctxd81 for CR90501 delta96af only. Protected production/SQL pins unchanged; backup created/readable, recheck target/head/epoch before0068 apply after code acceptance. Real user approvals/Run/PC1/PC5/five-PC gates pending."
 ---
+
+## 2026-11-07T23:43:44+09:00 시험 수정본 CI·직접18결과와 실제 스키마 백업
+
+보안 시험 전용 후보96afd799의 같은 SHA Core·Backend·Docs 6개 job 성공을 공식 API로 대조했고, Core 원본에서 직접 호출 18결과와9469pass/46skip을 재계산했다. 제품·SQL·보안 pin은 불변이며 작성자는 종료·해제됐다. Root는 별도로 PC3에서0067 스키마 백업835037B를 생성하고 아카이브 목록을 확인했다. 첫 이미지 ID 대조 실패는 OCI index→amd64 manifest→config 연결을 확인해 정정했고 DB에는 변경하지 않았다. 이제 실제 Claude의 한정 재검토로 넘기며 코드 수락·실배포·실제 Run·5대 인수는 아직 미완료다. 현재deltaReviewer는아직미구동이고원본CR-905-01을Root가자기판정으로닫지않았다.
 
 ## 2026-11-07T21:46:53+09:00 CR-905-01 원 작성자 후속 착수
 

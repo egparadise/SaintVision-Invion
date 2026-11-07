@@ -1,0 +1,12 @@
+{
+  "sourceSHA": "96afd799d49717fd40e4ddabd538d82accbe1958",
+  "firstCore": 42374996228,
+  "job": 128410654334,
+  "outcome": "CANCELLED_45_MINUTE_LIMIT",
+  "officialCause": "The job has exceeded the maximum execution time of 45m0s",
+  "noSuccessClaim": true,
+  "sourceTestsSQLWorkflowsChanged": false,
+  "Backend": 42374998823,
+  "Docs": 42375001689,
+  "reason": "One same-source existing Core workflow retry on a new hosted runner; no weaker tests, no workflow edit, no new frontend execution"
+}

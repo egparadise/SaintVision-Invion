@@ -1,0 +1,21 @@
+{
+  "atKST": "2026-11-07T23:32:53+09:00",
+  "SSHExit": 2,
+  "stderrBytes": 0,
+  "knownHostsUnchanged": true,
+  "remote": {
+    "DBWrites": false,
+    "migrationApplied": false,
+    "applicationStarted": false,
+    "passwordEmittedOrInDockerConfigEnv": false,
+    "passwordPersistedOnHost": false,
+    "clusterGlobalsOrDataBackedUp": false,
+    "restoreRehearsalPerformed": false,
+    "wholeProgramComplete": false,
+    "pullExit": 0,
+    "status": "HOLD_SCHEMA_BACKUP_PRE0068",
+    "phase": "pull-exact-current-database-image-on-PC3",
+    "errorClass": "AssertionError",
+    "rawDiagnosticsSuppressed": true
+  }
+}

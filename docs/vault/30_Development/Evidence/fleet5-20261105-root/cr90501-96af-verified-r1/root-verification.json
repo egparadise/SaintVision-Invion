@@ -1,0 +1,61 @@
+{
+  "atKST": "2026-11-07T23:40:48+09:00",
+  "source": "96afd799d49717fd40e4ddabd538d82accbe1958",
+  "base": "90578f49ea400958fcdbc1ded3908d624e856f57",
+  "remoteDirectParentExact": true,
+  "soleExistingFileChanged": "tests/integration/test_workspace_first_intents.py",
+  "allProductionSQLPinsProtectedUnchanged": true,
+  "officialCI": [
+    {
+      "name": "core",
+      "runID": 42378656486,
+      "correlation": "fleet5-cr90501-test-only-core-retry-c67f69d080fc490e99e37a9ed6d7fa35",
+      "attempt": 1,
+      "allJobsSuccess": true,
+      "jobs": 2,
+      "stepsExactlyMatchAuthor": true
+    },
+    {
+      "name": "backend",
+      "runID": 42374998823,
+      "correlation": "fleet5-cr90501-test-only-backend-64365d33172f4fc6b69e6b25566b56ac",
+      "attempt": 1,
+      "allJobsSuccess": true,
+      "jobs": 3,
+      "stepsExactlyMatchAuthor": true
+    },
+    {
+      "name": "docs",
+      "runID": 42375001689,
+      "correlation": "fleet5-cr90501-test-only-docs-84a5daa1ad324fd2b15416d28664bf94",
+      "attempt": 1,
+      "allJobsSuccess": true,
+      "jobs": 1,
+      "stepsExactlyMatchAuthor": true
+    }
+  ],
+  "officialSixJobsSuccess": true,
+  "allArtifactMetadataMatch": true,
+  "coreArchiveDigest": "sha256:c495bcc3b2266dd44f6ac80c1d5b67163bccdc5938e783ac178bab2f7db8ea9e",
+  "coreArchiveBytes": 14056869,
+  "direct18AllExecutedAndRecomputed": true,
+  "authorReportedNegative15Positive2ContextLoop1": true,
+  "Core9469Pass46SkipRecomputed": true,
+  "Backend9109Each": "author-reported, official jobs success verified",
+  "priorCore45MinuteCancellationRetainedNotSuccess": true,
+  "sameSourceCoreRetryRun": 42378656486,
+  "Frontend": "inherited905 unchanged component only, no new-SHA run claimed",
+  "fullCanonicalWindowClosedBytesIdentical": true,
+  "canonicalBytes": 507845,
+  "canonicalSHA256": "5d4beda3a03c1864f03d0f4f12f5d60ce7206a946b51b4d4ef3f8c05681369d3",
+  "authorLifecycle": {
+    "state": "succeeded",
+    "stage": "settled",
+    "liveness": "exited",
+    "terminalState": "released"
+  },
+  "actualClaudeDeltaReview": "PENDING",
+  "CR90501Closed": false,
+  "deploymentAccepted": false,
+  "wholeProgramComplete": false
+}

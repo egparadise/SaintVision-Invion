@@ -1,0 +1,44 @@
+{
+  "atKST": "2026-11-07T23:36:05+09:00",
+  "SSHExit": 0,
+  "remote": {
+    "imageMetadata": {
+      "Id": "sha256:44c4ee9810eff91f7eab4d822642e01115b1a9eccce4bcbdde7604752d68eac6",
+      "RepoDigests": [
+        "postgres@sha256:44c4ee9810eff91f7eab4d822642e01115b1a9eccce4bcbdde7604752d68eac6"
+      ],
+      "Os": "linux",
+      "Architecture": "amd64",
+      "Descriptor": {
+        "mediaType": "application/vnd.oci.image.index.v1+json",
+        "digest": "sha256:44c4ee9810eff91f7eab4d822642e01115b1a9eccce4bcbdde7604752d68eac6",
+        "size": 10301
+      }
+    },
+    "DBWrites": false,
+    "backupRepeated": false,
+    "ownedBackupRootExists": true,
+    "dumpExists": false,
+    "namedBackupContainerExists": false,
+    "manifestInspectExit": 0,
+    "linuxAmd64Descriptors": [
+      {
+        "descriptor": {
+          "mediaType": "application/vnd.oci.image.manifest.v1+json",
+          "digest": "sha256:075f7ba66bc9b3ce7d6b8b635208ff61cd7cf1a67d71ec530eec5d7ae0cbe571",
+          "size": 3054,
+          "platform": {
+            "architecture": "amd64",
+            "os": "linux"
+          }
+        },
+        "schemaV2Config": null,
+        "ociConfig": {
+          "mediaType": "application/vnd.oci.image.config.v1+json",
+          "digest": "sha256:75f5a96988cdf694a215073c3e9c001b706b371e2f94df3967f2efdec2787f6b",
+          "size": 9071
+        }
+      }
+    ]
+  }
+}

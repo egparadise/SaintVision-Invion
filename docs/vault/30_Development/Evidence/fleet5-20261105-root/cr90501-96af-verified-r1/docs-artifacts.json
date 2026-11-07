@@ -1,0 +1,45 @@
+{
+  "total_count": 2,
+  "artifacts": [
+    {
+      "id": 13575780318,
+      "node_id": "MDg6QXJ0aWZhY3QxMzU3NTc4MDMxOA==",
+      "name": "route-coverage-report",
+      "size_in_bytes": 1915,
+      "url": "https://api.github.com/repos/egparadise/SaintVision-Invion/actions/artifacts/13575780318",
+      "archive_download_url": "https://api.github.com/repos/egparadise/SaintVision-Invion/actions/artifacts/13575780318/zip",
+      "expired": false,
+      "digest": "sha256:a640904ca78f87f3aa31881237b3e19e05ff362b6fed024665ea2e7939f8e64f",
+      "created_at": "2026-11-07T13:01:21Z",
+      "updated_at": "2026-11-07T13:01:21Z",
+      "expires_at": "2026-12-07T13:01:21Z",
+      "workflow_run": {
+        "id": 42375001689,
+        "repository_id": 1362259805,
+        "head_repository_id": 1362259805,
+        "head_branch": "agent/codex/fleet5-first-workspace-cr90501-tests-r1-20261107",
+        "head_sha": "96afd799d49717fd40e4ddabd538d82accbe1958"
+      }
+    },
+    {
+      "id": 13574893924,
+      "node_id": "MDg6QXJ0aWZhY3QxMzU3NDg5MzkyNA==",
+      "name": "saintvision-guidelines",
+      "size_in_bytes": 47402959,
+      "url": "https://api.github.com/repos/egparadise/SaintVision-Invion/actions/artifacts/13574893924",
+      "archive_download_url": "https://api.github.com/repos/egparadise/SaintVision-Invion/actions/artifacts/13574893924/zip",
+      "expired": false,
+      "digest": "sha256:67f54802b1ee6d8c3de26de66235e61f17eb884e25a2ba44e19df6e8e816f93f",
+      "created_at": "2026-11-07T13:01:30Z",
+      "updated_at": "2026-11-07T13:01:30Z",
+      "expires_at": "2026-12-07T13:01:27Z",
+      "workflow_run": {
+        "id": 42375001689,
+        "repository_id": 1362259805,
+        "head_repository_id": 1362259805,
+        "head_branch": "agent/codex/fleet5-first-workspace-cr90501-tests-r1-20261107",
+        "head_sha": "96afd799d49717fd40e4ddabd538d82accbe1958"
+      }
+    }
+  ]
+}

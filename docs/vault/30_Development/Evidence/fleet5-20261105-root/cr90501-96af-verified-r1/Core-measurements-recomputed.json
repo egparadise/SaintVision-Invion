@@ -1,0 +1,117 @@
+[
+  {
+    "path": "build-product-runtime-real-pg.xml",
+    "counts": {
+      "passed": 13,
+      "failure": 0,
+      "error": 0,
+      "skipped": 0
+    },
+    "skipReasons": {}
+  },
+  {
+    "path": "business-handoff-tests.xml",
+    "counts": {
+      "passed": 17,
+      "failure": 0,
+      "error": 0,
+      "skipped": 0
+    },
+    "skipReasons": {}
+  },
+  {
+    "path": "containment-tests.xml",
+    "counts": {
+      "passed": 28,
+      "failure": 0,
+      "error": 0,
+      "skipped": 0
+    },
+    "skipReasons": {}
+  },
+  {
+    "path": "core-tests.xml",
+    "counts": {
+      "passed": 9469,
+      "failure": 0,
+      "error": 0,
+      "skipped": 46
+    },
+    "skipReasons": {
+      "PowerShell and csc.exe shim require Windows": 13,
+      "PowerShell parser requires Windows": 2,
+      "PowerShell required": 9,
+      "Actual Windows PowerShell launcher": 10,
+      "Explicit browser smoke integration lane required (INV_BROWSER_SMOKE_INTEGRATION=1)": 1,
+      "Set INV_MLFLOW_LIVE_URI (the run-mlflow lane starts the server)": 3,
+      "run only through tools/placement_benchmark.py": 1,
+      "run only through tools/placement_lock_wait_diagnostic.py": 1,
+      "run only through S11 Storage Failure Hosted Reference opt-in lane": 1,
+      "claude is not installed on this machine": 1,
+      "codex is not installed on this machine": 1,
+      "gemini is not installed on this machine": 1,
+      "antigravity is not installed on this machine": 1,
+      "Intranet CA NSS DB live browser test requires Linux, certutil (libnss3-tools), and Playwright": 1
+    }
+  },
+  {
+    "path": "cx01-recovery-tests.xml",
+    "counts": {
+      "passed": 20,
+      "failure": 0,
+      "error": 0,
+      "skipped": 0
+    },
+    "skipReasons": {}
+  },
+  {
+    "path": "docker-host-tests.xml",
+    "counts": {
+      "passed": 2,
+      "failure": 0,
+      "error": 0,
+      "skipped": 0
+    },
+    "skipReasons": {}
+  },
+  {
+    "path": "lan-installer-tests.xml",
+    "counts": {
+      "passed": 17,
+      "failure": 0,
+      "error": 0,
+      "skipped": 0
+    },
+    "skipReasons": {}
+  },
+  {
+    "path": "lan-pilot-database-real-pg.xml",
+    "counts": {
+      "passed": 2,
+      "failure": 0,
+      "error": 0,
+      "skipped": 0
+    },
+    "skipReasons": {}
+  },
+  {
+    "path": "shard-recovery-tests.xml",
+    "counts": {
+      "passed": 21,
+      "failure": 0,
+      "error": 0,
+      "skipped": 0
+    },
+    "skipReasons": {}
+  },
+  {
+    "path": "workspace-tests.xml",
+    "counts": {
+      "passed": 23,
+      "failure": 0,
+      "error": 0,
+      "skipped": 0
+    },
+    "skipReasons": {}
+  }
+]

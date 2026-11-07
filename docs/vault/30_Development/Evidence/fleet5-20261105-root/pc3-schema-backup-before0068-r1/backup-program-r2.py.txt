@@ -1,0 +1,42 @@
+import datetime,hashlib,json,os,stat,subprocess,sys
+from pathlib import Path
+import psycopg
+from psycopg.conninfo import conninfo_to_dict
+from psycopg.rows import dict_row
+phase='source-target-recheck-before-backup';o={'DBWrites':False,'migrationApplied':False,'applicationStarted':False,'passwordEmittedOrInDockerConfigEnv':False,'passwordPersistedOnHost':False,'clusterGlobalsOrDataBackedUp':False,'restoreRehearsalPerformed':False,'wholeProgramComplete':False}
+try:
+ p=json.loads(sys.stdin.buffer.read(65537));assert os.getuid()==1000;os.umask(0o077)
+ ops=Path('/home/saintvision-invion3/saintvision-share/ops-fresh-cpu-1efea-r1-20261107');assert Path(sys.prefix).resolve()==ops/'venv'
+ for key in list(os.environ):
+  if key.startswith('PG'):os.environ.pop(key,None)
+ with psycopg.connect(p['profile'],autocommit=True,row_factory=dict_row) as c:
+  c.read_only=True;assert c.execute('SELECT system_identifier::text AS id FROM pg_control_system()').fetchone()['id']==p['system']
+  assert [x['version_num'] for x in c.execute('SELECT version_num FROM public.alembic_version').fetchall()]==['0067_audit_reader_revoke']
+  assert str(c.execute('SELECT epoch FROM inv.control_epoch WHERE singleton').fetchone()['epoch'])==p['epoch']
+  assert c.execute('SELECT kill_switch FROM inv.tenant_controls WHERE tenant_id=%s',(p['tenant'],)).fetchone()['kill_switch'] is False
+ root=ops/'schema-backup-before0068-r1';assert root.is_dir() and not root.is_symlink() and root.stat().st_uid==1000;inp=root/'input';dst=root/'backup';assert inp.is_dir() and dst.is_dir() and not (dst/'schema-before0068.dump').exists()
+ d=conninfo_to_dict(p['profile']);assert d['host']=='127.0.0.1' and d['port']=='15461'
+ for value in d.values():assert not any(x in value for x in ['\n','\r','\0'])
+ # Password is never put in the service file, argv, host disk or Docker Config.Env.
+ service='[sv_root_backup_pre0068_r1]\n'+'\n'.join(k+'='+v for k,v in d.items() if k not in ['password','passfile'])+'\n'
+ assert (inp/'service.conf').read_text(encoding='utf-8')==service and stat.S_IMODE((inp/'service.conf').stat().st_mode)==0o600
+ esc=lambda s:s.replace('\\','\\\\').replace(':','\\:')
+ secret=(':'.join(esc(d[k]) for k in ['host','port','dbname','user','password'])+'\n').encode();assert len(secret)<65536;del d,p['profile']
+ phase='reconciled-immutable-index-platform-config-chain'
+ o['imagePreviouslyPulledAndReconciled']=True
+ q=subprocess.run(['docker','image','inspect',p['image']],capture_output=True,timeout=15);assert q.returncode==0;im=json.loads(q.stdout)[0];assert im['Id']=='sha256:44c4ee9810eff91f7eab4d822642e01115b1a9eccce4bcbdde7604752d68eac6' and im['Descriptor']['digest']==im['Id'] and im['Descriptor']['mediaType']=='application/vnd.oci.image.index.v1+json' and p['imageId']=='sha256:75f5a96988cdf694a215073c3e9c001b706b371e2f94df3967f2efdec2787f6b' and p['image'] in im['RepoDigests'] and im['Os']=='linux' and im['Architecture']=='amd64';del im
+ phase='readonly-pg-dump-over-existing-encrypted-forward'
+ script='set -eu\numask 077\ncat > /tmp/pgpass\nexport PGPASSFILE=/tmp/pgpass\nexec pg_dump --dbname=service=sv_root_backup_pre0068_r1 --schema-only --format=custom --no-password --file=/backup/schema-before0068.dump\n'
+ common=['docker','run','--rm','--platform','linux/amd64','--user','1000:1000','--cpus','1','--memory','512m','--memory-swap','512m','--pids-limit','128','--read-only','--cap-drop','ALL','--security-opt','no-new-privileges','--tmpfs','/tmp:rw,nosuid,nodev,size=64m,uid=1000,gid=1000']
+ args=common+['--interactive','--name','sv-schema-backup-pre0068-r1','--network','host','--env','PGSERVICEFILE=/input/service.conf','--mount','type=bind,src='+str(inp)+',dst=/input,readonly','--mount','type=bind,src='+str(dst)+',dst=/backup','--entrypoint','sh',p['image'],'-c',script]
+ q=subprocess.run(args,input=secret,capture_output=True,timeout=180);del secret;o.update(pgDumpExit=q.returncode,pgDumpStderrBytes=len(q.stderr));assert q.returncode==0 and not q.stderr
+ dump=dst/'schema-before0068.dump';assert dump.is_file() and not dump.is_symlink() and dump.stat().st_uid==1000 and 0<dump.stat().st_size<20*1024*1024;os.chmod(dump,0o600)
+ phase='offline-archive-readability-check'
+ args=common+['--name','sv-schema-backup-list-pre0068-r1','--network','none','--mount','type=bind,src='+str(dst)+',dst=/backup,readonly','--entrypoint','pg_restore',p['image'],'--list','/backup/schema-before0068.dump']
+ q=subprocess.run(args,capture_output=True,timeout=30);assert q.returncode==0 and not q.stderr
+ listing=q.stdout.decode();assert 'TABLE public workspaces ' in listing and 'TABLE inv control_epoch ' in listing
+ (root/'archive-list.txt').write_bytes(q.stdout);os.chmod(root/'archive-list.txt',0o600)
+ o.update(status='SCHEMA_BACKUP_ARCHIVE_CREATED_AND_LIST_VERIFIED',backupType='schema-only custom archive',targetAlembicHead='0067_audit_reader_revoke',clientImage=p['image'],sourceCPConfigDigest=p['imageId'],clientReportedIndexId='sha256:44c4ee9810eff91f7eab4d822642e01115b1a9eccce4bcbdde7604752d68eac6',amd64ManifestDigest='sha256:075f7ba66bc9b3ce7d6b8b635208ff61cd7cf1a67d71ec530eec5d7ae0cbe571',contentIdentityReconciled=True,backupPath=str(dump),backupBytes=dump.stat().st_size,backupSHA256=hashlib.sha256(dump.read_bytes()).hexdigest(),archiveListSHA256=hashlib.sha256(q.stdout).hexdigest(),archiveListExit=0,backupMode=oct(stat.S_IMODE(dump.stat().st_mode)),backupOwnerUid=dump.stat().st_uid,restoreScope='Schema archive and source head recorded; globals/data/PITR/actual restore not asserted',next='Before0068 apply recheck target/head/epoch and acceptance; preserve backup and apply only reviewed forward migration')
+ (root/'public-backup-receipt.json').write_text(json.dumps(o,indent=2)+'\n',encoding='utf-8')
+except BaseException as error:o.update(status='HOLD_SCHEMA_BACKUP_PRE0068',phase=phase,errorClass=type(error).__name__,rawDiagnosticsSuppressed=True)
+print(json.dumps(o));raise SystemExit(0 if o.get('status')=='SCHEMA_BACKUP_ARCHIVE_CREATED_AND_LIST_VERIFIED' else 2)

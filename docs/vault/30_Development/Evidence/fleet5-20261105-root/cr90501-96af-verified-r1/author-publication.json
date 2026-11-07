@@ -1,0 +1,2595 @@
+{
+  "docID": "FLEET5-CR90501-TEST-ONLY-PUBLICATION",
+  "version": "1.0.0",
+  "atKST": "2026-11-07T23:34:50.695236+09:00",
+  "taskID": "task_82627c80384c",
+  "branch": "agent/codex/fleet5-first-workspace-cr90501-tests-r1-20261107",
+  "finalSHA": "96afd799d49717fd40e4ddabd538d82accbe1958",
+  "base": "90578f49ea400958fcdbc1ded3908d624e856f57",
+  "owner": "Codex B",
+  "originalActualClaudeReview": "a18095e2aff59433b93bdd755a2d050a26c15546",
+  "CR90501": "TEST_CORRECTION_IMPLEMENTED_AND_HOSTED_CI_VERIFIED; closure awaits Root and one actual Claude DELTA re-review",
+  "changedPaths": [
+    [
+      "A",
+      "docs/vault/30_Development/Evidence/fleet5-first-workspace-cr90501-tests-r1-20261107-codex/case-matrix.json"
+    ],
+    [
+      "A",
+      "docs/vault/30_Development/Evidence/fleet5-first-workspace-cr90501-tests-r1-20261107-codex/ci-receipts.py"
+    ],
+    [
+      "A",
+      "docs/vault/30_Development/Evidence/fleet5-first-workspace-cr90501-tests-r1-20261107-codex/context.json"
+    ],
+    [
+      "A",
+      "docs/vault/30_Development/Evidence/fleet5-first-workspace-cr90501-tests-r1-20261107-codex/local-gates.json"
+    ],
+    [
+      "A",
+      "docs/vault/30_Development/Evidence/fleet5-first-workspace-cr90501-tests-r1-20261107-codex/local-gates.py"
+    ],
+    [
+      "A",
+      "docs/vault/30_Development/Evidence/fleet5-first-workspace-cr90501-tests-r1-20261107-codex/original-claude-review.json"
+    ],
+    [
+      "A",
+      "docs/vault/30_Development/Evidence/fleet5-first-workspace-cr90501-tests-r1-20261107-codex/read-pins.json"
+    ],
+    [
+      "A",
+      "docs/vault/30_Development/Evidence/fleet5-first-workspace-cr90501-tests-r1-20261107-codex/registry-read-pin.json"
+    ],
+    [
+      "A",
+      "docs/vault/30_Development/Evidence/fleet5-first-workspace-cr90501-tests-r1-20261107-codex/scope-proof.json"
+    ],
+    [
+      "A",
+      "docs/vault/30_Development/Evidence/fleet5-first-workspace-cr90501-tests-r1-20261107-codex/scope-proof.py"
+    ],
+    [
+      "A",
+      "docs/vault/30_Development/Evidence/fleet5-first-workspace-cr90501-tests-r1-20261107-codex/sync-state-after.json"
+    ],
+    [
+      "A",
+      "docs/vault/30_Development/Evidence/fleet5-first-workspace-cr90501-tests-r1-20261107-codex/sync-state-before.json"
+    ],
+    [
+      "A",
+      "docs/vault/30_Development/Evidence/fleet5-first-workspace-cr90501-tests-r1-20261107-codex/sync-state-comparison.json"
+    ],
+    [
+      "A",
+      "docs/vault/30_Development/History/2026-11-07_CR90501_Direct_SQL_Guards_Test_Only_R1_Codex.md"
+    ],
+    [
+      "M",
+      "tests/integration/test_workspace_first_intents.py"
+    ]
+  ],
+  "protectedTrees": {
+    "apps": {
+      "base": "af2ae9177f9b1d77e8991a33bf8cf1aebc5d3f41",
+      "final": "af2ae9177f9b1d77e8991a33bf8cf1aebc5d3f41",
+      "byteIdentical": true
+    },
+    "services": {
+      "base": "5c9918adc48c76c88b5119f44516bb332924f067",
+      "final": "5c9918adc48c76c88b5119f44516bb332924f067",
+      "byteIdentical": true
+    },
+    "contracts": {
+      "base": "b2b24a6d9baf24302f3590f4f30fe851ccb81ef1",
+      "final": "b2b24a6d9baf24302f3590f4f30fe851ccb81ef1",
+      "byteIdentical": true
+    },
+    "packages": {
+      "base": "7c445bdbc929f6597c0b39b598f9726032c67ad7",
+      "final": "7c445bdbc929f6597c0b39b598f9726032c67ad7",
+      "byteIdentical": true
+    },
+    "migrations": {
+      "base": "b1d35598829437c39dab7f60e9521bf8627e6832",
+      "final": "b1d35598829437c39dab7f60e9521bf8627e6832",
+      "byteIdentical": true
+    },
+    "tools": {
+      "base": "6085b509e54206c4af78f0bc984204ba22e17cd3",
+      "final": "6085b509e54206c4af78f0bc984204ba22e17cd3",
+      "byteIdentical": true
+    },
+    ".github": {
+      "base": "1fd636d0791458f131f13df3201f362e45155006",
+      "final": "1fd636d0791458f131f13df3201f362e45155006",
+      "byteIdentical": true
+    },
+    "deploy": {
+      "base": "5a98abd52d78c2dea952b257123bea2f01dffa64",
+      "final": "5a98abd52d78c2dea952b257123bea2f01dffa64",
+      "byteIdentical": true
+    },
+    "skills": {
+      "base": "dc117f0b750e4ff029e87b5f7ed53ee2f69862ca",
+      "final": "dc117f0b750e4ff029e87b5f7ed53ee2f69862ca",
+      "byteIdentical": true
+    },
+    "src": {
+      "base": "5507dfb820d54a8778c4cf5e3551368f11b6105f",
+      "final": "5507dfb820d54a8778c4cf5e3551368f11b6105f",
+      "byteIdentical": true
+    },
+    "docs/sources": {
+      "base": "ace2050db53e98c7e876bee7668c8450095ec74d",
+      "final": "ace2050db53e98c7e876bee7668c8450095ec74d",
+      "byteIdentical": true
+    },
+    "docs/task-registry.json": {
+      "base": "3d7b5be755d15b5f181b9cbbed33b2a8f4b56e87",
+      "final": "3d7b5be755d15b5f181b9cbbed33b2a8f4b56e87",
+      "byteIdentical": true
+    }
+  },
+  "SQLSHA256": "8b79f55289661d7590dbe24e60d60d319360e7fcaf35454fe21c722fe11905d3",
+  "productCodeChanged": false,
+  "testDiff": {
+    "path": "test-only-diff-96afd799d497.patch",
+    "bytes": 12873,
+    "SHA256": "8430ff0dad75e25f16d6f33978744a60aea0598186148a6a9be294989635a586"
+  },
+  "caseMatrix": {
+    "commonSetup": "Restricted fixture inv_kernel login, current tenant/epoch/admission explicitly verified, active requester/kernel grant/business links/project role, current ready Workspace version1, valid CPU baseline and enabled target; no Python/API validation of mutated candidate",
+    "negativeCases": [
+      {
+        "helper": "append_first_workspace_intent",
+        "case": "gpu",
+        "sqlstate": "42501",
+        "exception": "psycopg.errors.InsufficientPrivilege",
+        "message": "Bounded CPU resources required",
+        "earlierGuards": "Restricted fixture inv_kernel login, current tenant/epoch/admission explicitly verified, active requester/kernel grant/business links/project role, current ready Workspace version1, valid CPU baseline and enabled target; no Python/API validation of mutated candidate",
+        "specificIsolation": "gpuCount1 only; recomputed canonical and SHA make metadata/hash/command checks pass; resource shape except GPU is valid",
+        "countProof": "Owner-visible global counts of workloads/kernel runs/public runs/business mappings/outbox/idempotency equal before and after; fixture status/membership restored in finally",
+        "mutationSensitivity": "Deleting intended predicate makes SQL return without the required exception (or produce a different error), failing exact type/state/message assertions",
+        "actualMainExecution": false
+      },
+      {
+        "helper": "append_first_workspace_intent",
+        "case": "cpu",
+        "sqlstate": "42501",
+        "exception": "psycopg.errors.InsufficientPrivilege",
+        "message": "CPU resource bounds exceeded",
+        "earlierGuards": "Restricted fixture inv_kernel login, current tenant/epoch/admission explicitly verified, active requester/kernel grant/business links/project role, current ready Workspace version1, valid CPU baseline and enabled target; no Python/API validation of mutated candidate",
+        "specificIsolation": "cpuMillis501 only; recomputed canonical/SHA, positive-integer resource shape and zero GPU pass",
+        "countProof": "Owner-visible global counts of workloads/kernel runs/public runs/business mappings/outbox/idempotency equal before and after; fixture status/membership restored in finally",
+        "mutationSensitivity": "Deleting intended predicate makes SQL return without the required exception (or produce a different error), failing exact type/state/message assertions",
+        "actualMainExecution": false
+      },
+      {
+        "helper": "append_first_workspace_intent",
+        "case": "memory",
+        "sqlstate": "42501",
+        "exception": "psycopg.errors.InsufficientPrivilege",
+        "message": "CPU resource bounds exceeded",
+        "earlierGuards": "Restricted fixture inv_kernel login, current tenant/epoch/admission explicitly verified, active requester/kernel grant/business links/project role, current ready Workspace version1, valid CPU baseline and enabled target; no Python/API validation of mutated candidate",
+        "specificIsolation": "memoryBytes8388607 only; recomputed canonical/SHA, positive-integer resource shape and CPU1/GPU0 pass",
+        "countProof": "Owner-visible global counts of workloads/kernel runs/public runs/business mappings/outbox/idempotency equal before and after; fixture status/membership restored in finally",
+        "mutationSensitivity": "Deleting intended predicate makes SQL return without the required exception (or produce a different error), failing exact type/state/message assertions",
+        "actualMainExecution": false
+      },
+      {
+        "helper": "append_first_workspace_intent",
+        "case": "extra-key",
+        "sqlstate": "42501",
+        "exception": "psycopg.errors.InsufficientPrivilege",
+        "message": "Closed canonical CPU metadata required",
+        "earlierGuards": "Restricted fixture inv_kernel login, current tenant/epoch/admission explicitly verified, active requester/kernel grant/business links/project role, current ready Workspace version1, valid CPU baseline and enabled target; no Python/API validation of mutated candidate",
+        "specificIsolation": "workspaceStart={} only; recomputed canonical/SHA, required fields/identity remain valid",
+        "countProof": "Owner-visible global counts of workloads/kernel runs/public runs/business mappings/outbox/idempotency equal before and after; fixture status/membership restored in finally",
+        "mutationSensitivity": "Deleting intended predicate makes SQL return without the required exception (or produce a different error), failing exact type/state/message assertions",
+        "actualMainExecution": false
+      },
+      {
+        "helper": "append_first_workspace_intent",
+        "case": "sha",
+        "sqlstate": "42501",
+        "exception": "psycopg.errors.InsufficientPrivilege",
+        "message": "Closed canonical CPU metadata required",
+        "earlierGuards": "Restricted fixture inv_kernel login, current tenant/epoch/admission explicitly verified, active requester/kernel grant/business links/project role, current ready Workspace version1, valid CPU baseline and enabled target; no Python/API validation of mutated candidate",
+        "specificIsolation": "Only the supplied lower64 SHA differs; canonical bytes still exactly equal candidate spec",
+        "countProof": "Owner-visible global counts of workloads/kernel runs/public runs/business mappings/outbox/idempotency equal before and after; fixture status/membership restored in finally",
+        "mutationSensitivity": "Deleting intended predicate makes SQL return without the required exception (or produce a different error), failing exact type/state/message assertions",
+        "actualMainExecution": false
+      },
+      {
+        "helper": "append_first_workspace_intent",
+        "case": "canonical",
+        "sqlstate": "42501",
+        "exception": "psycopg.errors.InsufficientPrivilege",
+        "message": "Closed canonical CPU metadata required",
+        "earlierGuards": "Restricted fixture inv_kernel login, current tenant/epoch/admission explicitly verified, active requester/kernel grant/business links/project role, current ready Workspace version1, valid CPU baseline and enabled target; no Python/API validation of mutated candidate",
+        "specificIsolation": "Canonical command differs from spec; SHA recomputed over those changed canonical bytes, isolating canonical/spec equality",
+        "countProof": "Owner-visible global counts of workloads/kernel runs/public runs/business mappings/outbox/idempotency equal before and after; fixture status/membership restored in finally",
+        "mutationSensitivity": "Deleting intended predicate makes SQL return without the required exception (or produce a different error), failing exact type/state/message assertions",
+        "actualMainExecution": false
+      },
+      {
+        "helper": "append_first_workspace_intent",
+        "case": "workspace-not-ready",
+        "sqlstate": "42501",
+        "exception": "psycopg.errors.InsufficientPrivilege",
+        "message": "Current selected ready Workspace required",
+        "earlierGuards": "Restricted fixture inv_kernel login, current tenant/epoch/admission explicitly verified, active requester/kernel grant/business links/project role, current ready Workspace version1, valid CPU baseline and enabled target; no Python/API validation of mutated candidate",
+        "specificIsolation": "Only fixture status changes ready->provisioning; epoch/tenant/subject/permission/requester all pass before selected Workspace check",
+        "countProof": "Owner-visible global counts of workloads/kernel runs/public runs/business mappings/outbox/idempotency equal before and after; fixture status/membership restored in finally",
+        "mutationSensitivity": "Deleting intended predicate makes SQL return without the required exception (or produce a different error), failing exact type/state/message assertions",
+        "actualMainExecution": false
+      },
+      {
+        "helper": "append_first_workspace_intent",
+        "case": "workspace-version",
+        "sqlstate": "42501",
+        "exception": "psycopg.errors.InsufficientPrivilege",
+        "message": "Current selected ready Workspace required",
+        "earlierGuards": "Restricted fixture inv_kernel login, current tenant/epoch/admission explicitly verified, active requester/kernel grant/business links/project role, current ready Workspace version1, valid CPU baseline and enabled target; no Python/API validation of mutated candidate",
+        "specificIsolation": "Only expected Workspace version2 differs from current1; status stays ready",
+        "countProof": "Owner-visible global counts of workloads/kernel runs/public runs/business mappings/outbox/idempotency equal before and after; fixture status/membership restored in finally",
+        "mutationSensitivity": "Deleting intended predicate makes SQL return without the required exception (or produce a different error), failing exact type/state/message assertions",
+        "actualMainExecution": false
+      },
+      {
+        "helper": "append_first_workspace_intent",
+        "case": "target-not-member",
+        "sqlstate": "42501",
+        "exception": "psycopg.errors.InsufficientPrivilege",
+        "message": "Selected target membership differs",
+        "earlierGuards": "Restricted fixture inv_kernel login, current tenant/epoch/admission explicitly verified, active requester/kernel grant/business links/project role, current ready Workspace version1, valid CPU baseline and enabled target; no Python/API validation of mutated candidate",
+        "specificIsolation": "Only targetNodeId changes to a valid isolated NodeId without membership; canonical/SHA, all earlier CPU guards pass, Workspace.node_id remains NULL",
+        "countProof": "Owner-visible global counts of workloads/kernel runs/public runs/business mappings/outbox/idempotency equal before and after; fixture status/membership restored in finally",
+        "mutationSensitivity": "Deleting intended predicate makes SQL return without the required exception (or produce a different error), failing exact type/state/message assertions",
+        "actualMainExecution": false
+      },
+      {
+        "helper": "append_first_workspace_intent",
+        "case": "target-disabled",
+        "sqlstate": "42501",
+        "exception": "psycopg.errors.InsufficientPrivilege",
+        "message": "Selected target membership differs",
+        "earlierGuards": "Restricted fixture inv_kernel login, current tenant/epoch/admission explicitly verified, active requester/kernel grant/business links/project role, current ready Workspace version1, valid CPU baseline and enabled target; no Python/API validation of mutated candidate",
+        "specificIsolation": "Only current target membership enabled flag changes false; spec/canonical/SHA and all earlier guards valid, Workspace.node_id NULL",
+        "countProof": "Owner-visible global counts of workloads/kernel runs/public runs/business mappings/outbox/idempotency equal before and after; fixture status/membership restored in finally",
+        "mutationSensitivity": "Deleting intended predicate makes SQL return without the required exception (or produce a different error), failing exact type/state/message assertions",
+        "actualMainExecution": false
+      },
+      {
+        "helper": "append_first_workspace_intent",
+        "case": "spec-tenant",
+        "sqlstate": "42501",
+        "exception": "psycopg.errors.InsufficientPrivilege",
+        "message": "Closed canonical CPU metadata required",
+        "earlierGuards": "Restricted fixture inv_kernel login, current tenant/epoch/admission explicitly verified, active requester/kernel grant/business links/project role, current ready Workspace version1, valid CPU baseline and enabled target; no Python/API validation of mutated candidate",
+        "specificIsolation": "Only spec.tenantId differs to existing other fixture tenant; GUC tenant/subject/epoch/permissions remain valid for A, canonical/SHA recomputed",
+        "countProof": "Owner-visible global counts of workloads/kernel runs/public runs/business mappings/outbox/idempotency equal before and after; fixture status/membership restored in finally",
+        "mutationSensitivity": "Deleting intended predicate makes SQL return without the required exception (or produce a different error), failing exact type/state/message assertions",
+        "actualMainExecution": false
+      },
+      {
+        "helper": "append_first_workspace_run",
+        "case": "workspace-version",
+        "sqlstate": "42501",
+        "exception": "psycopg.errors.InsufficientPrivilege",
+        "message": "Current selected intent required",
+        "earlierGuards": "Restricted fixture inv_kernel login, current tenant/epoch/admission explicitly verified, active requester/kernel grant/business links/project role, current ready Workspace version1, valid CPU baseline and enabled target; no Python/API validation of mutated candidate; genuine API-created stored workload identity/spec/hash/canonical all match except single named selected-intent property",
+        "specificIsolation": "workspace-version differs alone; version/sha are supplied argument changes, non-ready changes only fixture status",
+        "countProof": "Same six owner-visible counts unchanged, including all three Run/mapping stores and ledger/outbox",
+        "mutationSensitivity": "Removing the intended selected-intent check permits append and fails pytest.raises; no stale context can mask it",
+        "actualMainExecution": false
+      },
+      {
+        "helper": "append_first_workspace_run",
+        "case": "workload-version",
+        "sqlstate": "42501",
+        "exception": "psycopg.errors.InsufficientPrivilege",
+        "message": "Current selected intent required",
+        "earlierGuards": "Restricted fixture inv_kernel login, current tenant/epoch/admission explicitly verified, active requester/kernel grant/business links/project role, current ready Workspace version1, valid CPU baseline and enabled target; no Python/API validation of mutated candidate; genuine API-created stored workload identity/spec/hash/canonical all match except single named selected-intent property",
+        "specificIsolation": "workload-version differs alone; version/sha are supplied argument changes, non-ready changes only fixture status",
+        "countProof": "Same six owner-visible counts unchanged, including all three Run/mapping stores and ledger/outbox",
+        "mutationSensitivity": "Removing the intended selected-intent check permits append and fails pytest.raises; no stale context can mask it",
+        "actualMainExecution": false
+      },
+      {
+        "helper": "append_first_workspace_run",
+        "case": "sha",
+        "sqlstate": "42501",
+        "exception": "psycopg.errors.InsufficientPrivilege",
+        "message": "Current selected intent required",
+        "earlierGuards": "Restricted fixture inv_kernel login, current tenant/epoch/admission explicitly verified, active requester/kernel grant/business links/project role, current ready Workspace version1, valid CPU baseline and enabled target; no Python/API validation of mutated candidate; genuine API-created stored workload identity/spec/hash/canonical all match except single named selected-intent property",
+        "specificIsolation": "sha differs alone; version/sha are supplied argument changes, non-ready changes only fixture status",
+        "countProof": "Same six owner-visible counts unchanged, including all three Run/mapping stores and ledger/outbox",
+        "mutationSensitivity": "Removing the intended selected-intent check permits append and fails pytest.raises; no stale context can mask it",
+        "actualMainExecution": false
+      },
+      {
+        "helper": "append_first_workspace_run",
+        "case": "workspace-not-ready",
+        "sqlstate": "42501",
+        "exception": "psycopg.errors.InsufficientPrivilege",
+        "message": "Current selected intent required",
+        "earlierGuards": "Restricted fixture inv_kernel login, current tenant/epoch/admission explicitly verified, active requester/kernel grant/business links/project role, current ready Workspace version1, valid CPU baseline and enabled target; no Python/API validation of mutated candidate; genuine API-created stored workload identity/spec/hash/canonical all match except single named selected-intent property",
+        "specificIsolation": "workspace-not-ready differs alone; version/sha are supplied argument changes, non-ready changes only fixture status",
+        "countProof": "Same six owner-visible counts unchanged, including all three Run/mapping stores and ledger/outbox",
+        "mutationSensitivity": "Removing the intended selected-intent check permits append and fails pytest.raises; no stale context can mask it",
+        "actualMainExecution": false
+      },
+      {
+        "helper": "append_first_workspace_run",
+        "case": "missing-subject",
+        "sqlstate": "42501",
+        "message": "Verified service context required",
+        "earlierGuards": "Current valid epoch and admitted tenantA explicitly checked, subject GUC empty",
+        "countProof": "Owner global six-table counts unchanged",
+        "JUnit": "three exact guard assertions in retained privilege/context test"
+      },
+      {
+        "helper": "append_first_workspace_run",
+        "case": "cross-tenant",
+        "sqlstate": "42501",
+        "message": "Current project permission required",
+        "earlierGuards": "Other existing fixture tenant has current false kill-switch control row and valid epoch; A subject canonical, but no other-tenant project grant/link for projectA",
+        "countProof": "Owner global six-table counts unchanged",
+        "JUnit": "three exact guard assertions in retained privilege/context test"
+      },
+      {
+        "helper": "append_first_workspace_run",
+        "case": "missing-epoch",
+        "sqlstate": "42501",
+        "message": "Current epoch and tenant admission required",
+        "earlierGuards": "Subject and tenant are otherwise valid; epoch GUC deliberately empty",
+        "countProof": "Owner global six-table counts unchanged",
+        "JUnit": "three exact guard assertions in retained privilege/context test"
+      }
+    ],
+    "positiveControls": [
+      {
+        "name": "test_direct_intent_positive_control_uses_kernel_and_rolls_back",
+        "proof": "Same direct restricted role/context/spec reaches append, reads exact stored spec/SHA/version then force-rollback; all six owner counts return to baseline"
+      },
+      {
+        "name": "test_direct_run_positive_control_uses_kernel_and_rolls_back_all_three_rows",
+        "proof": "Same valid context reads actual draft kernel/public Run and immutable business mapping in transaction then force-rollback; owner workload/Run/mapping/outbox/ledger counts unchanged"
+      }
+    ],
+    "previousTestsRetained": true,
+    "localExecution": "NOT_RUN; AST/data only",
+    "CR90501Status": "IMPLEMENTED_TEST_DELTA_PENDING_HOSTED_CI_AND_ACTUAL_CLAUDE_REVIEW",
+    "SQLUnchanged": true
+  },
+  "workflows": [
+    {
+      "name": "core",
+      "runID": 42378656486,
+      "url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/42378656486",
+      "sourceSHA": "96afd799d49717fd40e4ddabd538d82accbe1958",
+      "ref": "agent/codex/fleet5-first-workspace-cr90501-tests-r1-20261107",
+      "correlation": "fleet5-cr90501-test-only-core-retry-c67f69d080fc490e99e37a9ed6d7fa35",
+      "attempt": 1,
+      "conclusion": "success",
+      "jobs": [
+        {
+          "id": 128421419584,
+          "name": "core",
+          "conclusion": "success",
+          "steps": [
+            {
+              "name": "Set up job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 1,
+              "started_at": "2026-11-07T13:48:46Z",
+              "completed_at": "2026-11-07T13:48:47Z"
+            },
+            {
+              "name": "Run actions/checkout@v4",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 2,
+              "started_at": "2026-11-07T13:48:47Z",
+              "completed_at": "2026-11-07T13:48:54Z"
+            },
+            {
+              "name": "Run actions/setup-python@v5",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 3,
+              "started_at": "2026-11-07T13:48:54Z",
+              "completed_at": "2026-11-07T13:48:55Z"
+            },
+            {
+              "name": "Run actions/setup-go@v5",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 4,
+              "started_at": "2026-11-07T13:48:55Z",
+              "completed_at": "2026-11-07T13:49:02Z"
+            },
+            {
+              "name": "Run actions/setup-node@v4",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 5,
+              "started_at": "2026-11-07T13:49:02Z",
+              "completed_at": "2026-11-07T13:49:03Z"
+            },
+            {
+              "name": "Run python -m pip install -r requirements-test.txt -r requirements-docs.txt",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 6,
+              "started_at": "2026-11-07T13:49:03Z",
+              "completed_at": "2026-11-07T13:49:14Z"
+            },
+            {
+              "name": "FLEET5 early native Go peer-policy lifecycle proof",
+              "status": "completed",
+              "conclusion": "skipped",
+              "number": 7,
+              "started_at": "2026-11-07T13:49:14Z",
+              "completed_at": "2026-11-07T13:49:14Z"
+            },
+            {
+              "name": "Publish FLEET5 native peer-phase proof (including expected baseline failure)",
+              "status": "completed",
+              "conclusion": "skipped",
+              "number": 8,
+              "started_at": "2026-11-07T13:49:14Z",
+              "completed_at": "2026-11-07T13:49:14Z"
+            },
+            {
+              "name": "FLEET5 fixed native Go two-cycle proof",
+              "status": "completed",
+              "conclusion": "skipped",
+              "number": 9,
+              "started_at": "2026-11-07T13:49:14Z",
+              "completed_at": "2026-11-07T13:49:14Z"
+            },
+            {
+              "name": "Publish FLEET5 fixed native proof",
+              "status": "completed",
+              "conclusion": "skipped",
+              "number": 10,
+              "started_at": "2026-11-07T13:49:14Z",
+              "completed_at": "2026-11-07T13:49:14Z"
+            },
+            {
+              "name": "Start digest-pinned product ObjectStore service",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 11,
+              "started_at": "2026-11-07T13:49:14Z",
+              "completed_at": "2026-11-07T13:49:19Z"
+            },
+            {
+              "name": "Create disposable CX01 PostgreSQL",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 12,
+              "started_at": "2026-11-07T13:49:19Z",
+              "completed_at": "2026-11-07T13:49:28Z"
+            },
+            {
+              "name": "Regenerate contracts and detect drift",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 13,
+              "started_at": "2026-11-07T13:49:28Z",
+              "completed_at": "2026-11-07T13:49:31Z"
+            },
+            {
+              "name": "Upgrade each published migration head",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 14,
+              "started_at": "2026-11-07T13:49:31Z",
+              "completed_at": "2026-11-07T13:51:15Z"
+            },
+            {
+              "name": "Test Linux Node concurrency and crash boundaries",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 15,
+              "started_at": "2026-11-07T13:51:15Z",
+              "completed_at": "2026-11-07T13:58:41Z"
+            },
+            {
+              "name": "Build Node and isolated synthetic workload image",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 16,
+              "started_at": "2026-11-07T13:58:41Z",
+              "completed_at": "2026-11-07T13:58:59Z"
+            },
+            {
+              "name": "Verify Docker API negotiation and actual bounded execution",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 17,
+              "started_at": "2026-11-07T13:58:59Z",
+              "completed_at": "2026-11-07T13:59:08Z"
+            },
+            {
+              "name": "Build pinned Python workload image for kernel integration",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 18,
+              "started_at": "2026-11-07T13:59:08Z",
+              "completed_at": "2026-11-07T13:59:21Z"
+            },
+            {
+              "name": "Build owned LAN installer image and provide storage source root",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 19,
+              "started_at": "2026-11-07T13:59:21Z",
+              "completed_at": "2026-11-07T13:59:22Z"
+            },
+            {
+              "name": "Build production API image and require explicit configuration",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 20,
+              "started_at": "2026-11-07T13:59:22Z",
+              "completed_at": "2026-11-07T13:59:47Z"
+            },
+            {
+              "name": "Verify Workspace recovery boundary first",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 21,
+              "started_at": "2026-11-07T13:59:47Z",
+              "completed_at": "2026-11-07T14:00:20Z"
+            },
+            {
+              "name": "Verify containment controls and physical cleanup",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 22,
+              "started_at": "2026-11-07T14:00:20Z",
+              "completed_at": "2026-11-07T14:00:49Z"
+            },
+            {
+              "name": "Verify business handoff against the execution kernel",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 23,
+              "started_at": "2026-11-07T14:00:49Z",
+              "completed_at": "2026-11-07T14:01:17Z"
+            },
+            {
+              "name": "Verify bounded shard replacement on two real Nodes",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 24,
+              "started_at": "2026-11-07T14:01:17Z",
+              "completed_at": "2026-11-07T14:01:46Z"
+            },
+            {
+              "name": "Run provisioned LAN installer acceptance",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 25,
+              "started_at": "2026-11-07T14:01:46Z",
+              "completed_at": "2026-11-07T14:06:14Z"
+            },
+            {
+              "name": "Require executed LAN installer evidence",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 26,
+              "started_at": "2026-11-07T14:06:14Z",
+              "completed_at": "2026-11-07T14:06:14Z"
+            },
+            {
+              "name": "Run owned CX01 recovery drill evidence",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 27,
+              "started_at": "2026-11-07T14:06:14Z",
+              "completed_at": "2026-11-07T14:06:52Z"
+            },
+            {
+              "name": "Require executed CX01 recovery evidence",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 28,
+              "started_at": "2026-11-07T14:06:52Z",
+              "completed_at": "2026-11-07T14:06:52Z"
+            },
+            {
+              "name": "Verify build admission queue fairness on PostgreSQL",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 29,
+              "started_at": "2026-11-07T14:06:52Z",
+              "completed_at": "2026-11-07T14:07:54Z"
+            },
+            {
+              "name": "Require executed build admission queue evidence",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 30,
+              "started_at": "2026-11-07T14:07:54Z",
+              "completed_at": "2026-11-07T14:07:54Z"
+            },
+            {
+              "name": "Verify LAN pilot database scripts with real PostgreSQL",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 31,
+              "started_at": "2026-11-07T14:07:54Z",
+              "completed_at": "2026-11-07T14:08:08Z"
+            },
+            {
+              "name": "Require executed LAN pilot database evidence",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 32,
+              "started_at": "2026-11-07T14:08:08Z",
+              "completed_at": "2026-11-07T14:08:08Z"
+            },
+            {
+              "name": "Run python -m pytest --junitxml=dist/core-tests.xml -o faulthandler_timeout=45 --ignore=tests/integration/test_build_product_runtime_real_pg.py --ignore=tests/integration/test_lan_pilot_database_real_pg.py --ignore=tests/integration/test_desktop_browser.py --ignore=tests/integration/test_approval_browser.py --ignore=tests/integration/test_studio_browser.py --ignore=tests/integration/test_web_container.py --ignore=tests/integration/test_workspace_upgrade.py --ignore=tests/integration/test_lan_storage_install.py --ignore=tests/integration/test_s3_object_store_postgres.py --ignore=tests/integration/test_recovery_drill.py",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 33,
+              "started_at": "2026-11-07T14:08:08Z",
+              "completed_at": "2026-11-07T14:32:34Z"
+            },
+            {
+              "name": "Stop disposable product ObjectStore service",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 34,
+              "started_at": "2026-11-07T14:32:34Z",
+              "completed_at": "2026-11-07T14:32:34Z"
+            },
+            {
+              "name": "Docker host hygiene (explicit lane)",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 35,
+              "started_at": "2026-11-07T14:32:34Z",
+              "completed_at": "2026-11-07T14:32:38Z"
+            },
+            {
+              "name": "Require executed evidence and declared platform skips",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 36,
+              "started_at": "2026-11-07T14:32:38Z",
+              "completed_at": "2026-11-07T14:32:38Z"
+            },
+            {
+              "name": "Collect fixed-SHA S08 build acceptance observations",
+              "status": "completed",
+              "conclusion": "skipped",
+              "number": 37,
+              "started_at": "2026-11-07T14:32:38Z",
+              "completed_at": "2026-11-07T14:32:38Z"
+            },
+            {
+              "name": "Recompute S08 build acceptance verdict from raw artifacts",
+              "status": "completed",
+              "conclusion": "skipped",
+              "number": 38,
+              "started_at": "2026-11-07T14:32:38Z",
+              "completed_at": "2026-11-07T14:32:38Z"
+            },
+            {
+              "name": "Run python -m build services/control-plane --outdir dist",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 39,
+              "started_at": "2026-11-07T14:32:38Z",
+              "completed_at": "2026-11-07T14:32:42Z"
+            },
+            {
+              "name": "Run go test ./...",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 40,
+              "started_at": "2026-11-07T14:32:42Z",
+              "completed_at": "2026-11-07T14:32:42Z"
+            },
+            {
+              "name": "Run npx --yes --package typescript@5.9.3 tsc --noEmit --strict packages/contracts-ts/src/index.ts",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 41,
+              "started_at": "2026-11-07T14:32:42Z",
+              "completed_at": "2026-11-07T14:32:44Z"
+            },
+            {
+              "name": "Cleanup disposable CX01 PostgreSQL",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 42,
+              "started_at": "2026-11-07T14:32:44Z",
+              "completed_at": "2026-11-07T14:32:45Z"
+            },
+            {
+              "name": "Run actions/upload-artifact@v4",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 43,
+              "started_at": "2026-11-07T14:32:45Z",
+              "completed_at": "2026-11-07T14:32:47Z"
+            },
+            {
+              "name": "Post Run actions/setup-node@v4",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 83,
+              "started_at": "2026-11-07T14:32:47Z",
+              "completed_at": "2026-11-07T14:32:47Z"
+            },
+            {
+              "name": "Post Run actions/setup-go@v5",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 84,
+              "started_at": "2026-11-07T14:32:47Z",
+              "completed_at": "2026-11-07T14:32:47Z"
+            },
+            {
+              "name": "Post Run actions/setup-python@v5",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 85,
+              "started_at": "2026-11-07T14:32:47Z",
+              "completed_at": "2026-11-07T14:32:49Z"
+            },
+            {
+              "name": "Post Run actions/checkout@v4",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 86,
+              "started_at": "2026-11-07T14:32:49Z",
+              "completed_at": "2026-11-07T14:32:49Z"
+            },
+            {
+              "name": "Complete job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 87,
+              "started_at": "2026-11-07T14:32:49Z",
+              "completed_at": "2026-11-07T14:32:49Z"
+            }
+          ],
+          "testSummaryLines": [
+            "23 passed, 1 warning in 31.69s",
+            "28 passed, 1 warning in 28.85s",
+            "17 passed, 1 warning in 26.52s",
+            "21 passed in 28.80s",
+            "17 passed in 266.72s (0:04:26)",
+            "20 passed in 37.59s",
+            "assert passed == 20, f'Expected 20 passed CX01 cases, got {passed}'",
+            "13 passed in 60.52s (0:01:00)",
+            "2 passed in 13.54s",
+            "tests/integration/test_workspace_first_intents.py ...................... [ 58%]",
+            "== 9469 passed, 46 skipped, 2 deselected, 2033 warnings in 1461.61s (0:24:21) ==",
+            "======================= 2 passed, 4 deselected in 3.87s ========================"
+          ],
+          "pytestPhaseCounts": [
+            {
+              "passed": 23,
+              "failed": 0,
+              "error": 0,
+              "skipped": 0,
+              "deselected": 0,
+              "warnings": 1
+            },
+            {
+              "passed": 28,
+              "failed": 0,
+              "error": 0,
+              "skipped": 0,
+              "deselected": 0,
+              "warnings": 1
+            },
+            {
+              "passed": 17,
+              "failed": 0,
+              "error": 0,
+              "skipped": 0,
+              "deselected": 0,
+              "warnings": 1
+            },
+            {
+              "passed": 21,
+              "failed": 0,
+              "error": 0,
+              "skipped": 0,
+              "deselected": 0,
+              "warnings": 0
+            },
+            {
+              "passed": 17,
+              "failed": 0,
+              "error": 0,
+              "skipped": 0,
+              "deselected": 0,
+              "warnings": 0
+            },
+            {
+              "passed": 20,
+              "failed": 0,
+              "error": 0,
+              "skipped": 0,
+              "deselected": 0,
+              "warnings": 0
+            },
+            {
+              "passed": 13,
+              "failed": 0,
+              "error": 0,
+              "skipped": 0,
+              "deselected": 0,
+              "warnings": 0
+            },
+            {
+              "passed": 2,
+              "failed": 0,
+              "error": 0,
+              "skipped": 0,
+              "deselected": 0,
+              "warnings": 0
+            },
+            {
+              "passed": 9469,
+              "failed": 0,
+              "error": 0,
+              "skipped": 46,
+              "deselected": 2,
+              "warnings": 2033
+            },
+            {
+              "passed": 2,
+              "failed": 0,
+              "error": 0,
+              "skipped": 0,
+              "deselected": 4,
+              "warnings": 0
+            }
+          ],
+          "actualSkipReasons": {
+            "PowerShell and csc.exe shim require Windows": 13,
+            "PowerShell parser requires Windows": 2,
+            "PowerShell required": 9,
+            "Actual Windows PowerShell launcher": 10,
+            "Explicit browser smoke integration lane required (INV_BROWSER_SMOKE_INTEGRATION=1)": 1,
+            "Set INV_MLFLOW_LIVE_URI (the run-mlflow lane starts the server)": 3,
+            "run only through tools/placement_benchmark.py": 1,
+            "run only through tools/placement_lock_wait_diagnostic.py": 1,
+            "run only through S11 Storage Failure Hosted Reference opt-in lane": 1,
+            "claude is not installed on this machine": 1,
+            "codex is not installed on this machine": 1,
+            "gemini is not installed on this machine": 1,
+            "antigravity is not installed on this machine": 1,
+            "Intranet CA NSS DB live browser test requires Linux, certutil (libnss3-tools), and Playwright": 1
+          },
+          "log": {
+            "path": "ci-96afd799d497-job-128421419584.log",
+            "bytes": 504760,
+            "SHA256": "76f1838c98140b131caa0f3c9c46b2f2162bc8201fea73852986a72978fa8462"
+          }
+        },
+        {
+          "id": 128421419836,
+          "name": "s01-storage-roundtrip",
+          "conclusion": "success",
+          "steps": [
+            {
+              "name": "Set up job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 1,
+              "started_at": "2026-11-07T13:48:46Z",
+              "completed_at": "2026-11-07T13:48:47Z"
+            },
+            {
+              "name": "Initialize containers",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 2,
+              "started_at": "2026-11-07T13:48:47Z",
+              "completed_at": "2026-11-07T13:49:02Z"
+            },
+            {
+              "name": "Run actions/checkout@v4",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 3,
+              "started_at": "2026-11-07T13:49:02Z",
+              "completed_at": "2026-11-07T13:49:06Z"
+            },
+            {
+              "name": "Run actions/setup-python@v5",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 4,
+              "started_at": "2026-11-07T13:49:06Z",
+              "completed_at": "2026-11-07T13:49:07Z"
+            },
+            {
+              "name": "Install pinned product-conformance test dependencies",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 5,
+              "started_at": "2026-11-07T13:49:07Z",
+              "completed_at": "2026-11-07T13:49:18Z"
+            },
+            {
+              "name": "Start disposable MinIO candidate",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 6,
+              "started_at": "2026-11-07T13:49:18Z",
+              "completed_at": "2026-11-07T13:49:25Z"
+            },
+            {
+              "name": "Create disposable S01 Storage test bucket",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 7,
+              "started_at": "2026-11-07T13:49:25Z",
+              "completed_at": "2026-11-07T13:49:26Z"
+            },
+            {
+              "name": "Verify product ObjectStore adapter conformance",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 8,
+              "started_at": "2026-11-07T13:49:26Z",
+              "completed_at": "2026-11-07T13:49:26Z"
+            },
+            {
+              "name": "Verify product S3 persistence and PostgreSQL tenant boundary",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 9,
+              "started_at": "2026-11-07T13:49:26Z",
+              "completed_at": "2026-11-07T13:49:31Z"
+            },
+            {
+              "name": "Verify S01 Storage candidate SHA-256 roundtrip and cleanup",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 10,
+              "started_at": "2026-11-07T13:49:31Z",
+              "completed_at": "2026-11-07T13:49:31Z"
+            },
+            {
+              "name": "Stop disposable S01 Storage service",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 11,
+              "started_at": "2026-11-07T13:49:31Z",
+              "completed_at": "2026-11-07T13:49:31Z"
+            },
+            {
+              "name": "Run actions/upload-artifact@v4",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 12,
+              "started_at": "2026-11-07T13:49:31Z",
+              "completed_at": "2026-11-07T13:49:32Z"
+            },
+            {
+              "name": "Post Run actions/setup-python@v5",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 22,
+              "started_at": "2026-11-07T13:49:32Z",
+              "completed_at": "2026-11-07T13:49:33Z"
+            },
+            {
+              "name": "Post Run actions/checkout@v4",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 23,
+              "started_at": "2026-11-07T13:49:33Z",
+              "completed_at": "2026-11-07T13:49:33Z"
+            },
+            {
+              "name": "Stop containers",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 24,
+              "started_at": "2026-11-07T13:49:33Z",
+              "completed_at": "2026-11-07T13:49:33Z"
+            },
+            {
+              "name": "Complete job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 25,
+              "started_at": "2026-11-07T13:49:33Z",
+              "completed_at": "2026-11-07T13:49:33Z"
+            }
+          ],
+          "testSummaryLines": [
+            "2 passed in 0.09s",
+            "3 passed in 3.92s"
+          ],
+          "pytestPhaseCounts": [
+            {
+              "passed": 2,
+              "failed": 0,
+              "error": 0,
+              "skipped": 0,
+              "deselected": 0,
+              "warnings": 0
+            },
+            {
+              "passed": 3,
+              "failed": 0,
+              "error": 0,
+              "skipped": 0,
+              "deselected": 0,
+              "warnings": 0
+            }
+          ],
+          "actualSkipReasons": {},
+          "log": {
+            "path": "ci-96afd799d497-job-128421419836.log",
+            "bytes": 75564,
+            "SHA256": "9cb19224879c7ba99acc04767af46d8d89daa449299a261c21b92fb6b4afd0c9"
+          }
+        }
+      ],
+      "artifacts": [
+        {
+          "id": 13577378328,
+          "name": "saintvision-core-evidence",
+          "digest": "sha256:c495bcc3b2266dd44f6ac80c1d5b67163bccdc5938e783ac178bab2f7db8ea9e",
+          "bytes": 14056869
+        },
+        {
+          "id": 13576801423,
+          "name": "saintvision-s01-storage-evidence-42378656486",
+          "digest": "sha256:db23991e507e059dd0afd34f8c775c31069841ad386083b55f787ffdcc973231",
+          "bytes": 1770
+        }
+      ]
+    },
+    {
+      "name": "backend",
+      "runID": 42374998823,
+      "url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/42374998823",
+      "sourceSHA": "96afd799d49717fd40e4ddabd538d82accbe1958",
+      "ref": "agent/codex/fleet5-first-workspace-cr90501-tests-r1-20261107",
+      "correlation": "fleet5-cr90501-test-only-backend-64365d33172f4fc6b69e6b25566b56ac",
+      "attempt": 1,
+      "conclusion": "success",
+      "jobs": [
+        {
+          "id": 128410661458,
+          "name": "mlflow-live",
+          "conclusion": "success",
+          "steps": [
+            {
+              "name": "Set up job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 1,
+              "started_at": "2026-11-07T13:01:02Z",
+              "completed_at": "2026-11-07T13:01:02Z"
+            },
+            {
+              "name": "Run actions/checkout@v4",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 2,
+              "started_at": "2026-11-07T13:01:02Z",
+              "completed_at": "2026-11-07T13:01:06Z"
+            },
+            {
+              "name": "Run actions/setup-python@v5",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 3,
+              "started_at": "2026-11-07T13:01:06Z",
+              "completed_at": "2026-11-07T13:01:06Z"
+            },
+            {
+              "name": "Run python -m pip install -r requirements-backend.txt",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 4,
+              "started_at": "2026-11-07T13:01:06Z",
+              "completed_at": "2026-11-07T13:01:18Z"
+            },
+            {
+              "name": "Start the MLflow tracking server",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 5,
+              "started_at": "2026-11-07T13:01:18Z",
+              "completed_at": "2026-11-07T13:01:31Z"
+            },
+            {
+              "name": "Live tracking-sink conformance against the real server",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 6,
+              "started_at": "2026-11-07T13:01:31Z",
+              "completed_at": "2026-11-07T13:01:34Z"
+            },
+            {
+              "name": "Post Run actions/setup-python@v5",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 11,
+              "started_at": "2026-11-07T13:01:34Z",
+              "completed_at": "2026-11-07T13:01:35Z"
+            },
+            {
+              "name": "Post Run actions/checkout@v4",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 12,
+              "started_at": "2026-11-07T13:01:35Z",
+              "completed_at": "2026-11-07T13:01:35Z"
+            },
+            {
+              "name": "Complete job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 13,
+              "started_at": "2026-11-07T13:01:35Z",
+              "completed_at": "2026-11-07T13:01:35Z"
+            }
+          ],
+          "testSummaryLines": [
+            "3 passed in 1.87s"
+          ],
+          "pytestPhaseCounts": [
+            {
+              "passed": 3,
+              "failed": 0,
+              "error": 0,
+              "skipped": 0,
+              "deselected": 0,
+              "warnings": 0
+            }
+          ],
+          "actualSkipReasons": {},
+          "log": {
+            "path": "ci-96afd799d497-job-128410661458.log",
+            "bytes": 48237,
+            "SHA256": "f2fe14bb860eea6f48e607aee41b6f4ad681157544b8791ed4526ece6f25ed33"
+          }
+        },
+        {
+          "id": 128410661766,
+          "name": "backend (3.14)",
+          "conclusion": "success",
+          "steps": [
+            {
+              "name": "Set up job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 1,
+              "started_at": "2026-11-07T13:01:02Z",
+              "completed_at": "2026-11-07T13:01:03Z"
+            },
+            {
+              "name": "Initialize containers",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 2,
+              "started_at": "2026-11-07T13:01:03Z",
+              "completed_at": "2026-11-07T13:01:15Z"
+            },
+            {
+              "name": "Run actions/checkout@v4",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 3,
+              "started_at": "2026-11-07T13:01:15Z",
+              "completed_at": "2026-11-07T13:01:21Z"
+            },
+            {
+              "name": "Run actions/setup-python@v5",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 4,
+              "started_at": "2026-11-07T13:01:21Z",
+              "completed_at": "2026-11-07T13:01:23Z"
+            },
+            {
+              "name": "Run python -m pip install -r requirements-backend.txt -r requirements-docs.txt",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 5,
+              "started_at": "2026-11-07T13:01:23Z",
+              "completed_at": "2026-11-07T13:01:37Z"
+            },
+            {
+              "name": "Exercise the pinned venvless leaf-rotation runtime",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 6,
+              "started_at": "2026-11-07T13:01:37Z",
+              "completed_at": "2026-11-07T13:02:31Z"
+            },
+            {
+              "name": "Kill FLEET5 RS1/SF1 guard mutations",
+              "status": "completed",
+              "conclusion": "skipped",
+              "number": 7,
+              "started_at": "2026-11-07T13:02:31Z",
+              "completed_at": "2026-11-07T13:02:31Z"
+            },
+            {
+              "name": "Publish FLEET5 installed pinned verifier and mutation proof",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 8,
+              "started_at": "2026-11-07T13:02:31Z",
+              "completed_at": "2026-11-07T13:02:33Z"
+            },
+            {
+              "name": "Kill the standalone leaf-runtime guard mutations",
+              "status": "completed",
+              "conclusion": "skipped",
+              "number": 9,
+              "started_at": "2026-11-07T13:02:33Z",
+              "completed_at": "2026-11-07T13:02:33Z"
+            },
+            {
+              "name": "Contract schemas match their models",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 10,
+              "started_at": "2026-11-07T13:02:33Z",
+              "completed_at": "2026-11-07T13:02:33Z"
+            },
+            {
+              "name": "Migration renders offline",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 11,
+              "started_at": "2026-11-07T13:02:33Z",
+              "completed_at": "2026-11-07T13:02:34Z"
+            },
+            {
+              "name": "Migration graph has a single integrated head",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 12,
+              "started_at": "2026-11-07T13:02:34Z",
+              "completed_at": "2026-11-07T13:02:34Z"
+            },
+            {
+              "name": "Migration applies to an empty database",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 13,
+              "started_at": "2026-11-07T13:02:34Z",
+              "completed_at": "2026-11-07T13:02:36Z"
+            },
+            {
+              "name": "The reversible tail reverses",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 14,
+              "started_at": "2026-11-07T13:02:36Z",
+              "completed_at": "2026-11-07T13:02:36Z"
+            },
+            {
+              "name": "Tests",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 15,
+              "started_at": "2026-11-07T13:02:36Z",
+              "completed_at": "2026-11-07T13:23:14Z"
+            },
+            {
+              "name": "Require executed evidence and declared platform skips",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 16,
+              "started_at": "2026-11-07T13:23:14Z",
+              "completed_at": "2026-11-07T13:23:14Z"
+            },
+            {
+              "name": "Post Run actions/setup-python@v5",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 30,
+              "started_at": "2026-11-07T13:23:14Z",
+              "completed_at": "2026-11-07T13:23:16Z"
+            },
+            {
+              "name": "Post Run actions/checkout@v4",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 31,
+              "started_at": "2026-11-07T13:23:16Z",
+              "completed_at": "2026-11-07T13:23:17Z"
+            },
+            {
+              "name": "Stop containers",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 32,
+              "started_at": "2026-11-07T13:23:17Z",
+              "completed_at": "2026-11-07T13:23:17Z"
+            },
+            {
+              "name": "Complete job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 33,
+              "started_at": "2026-11-07T13:23:17Z",
+              "completed_at": "2026-11-07T13:23:17Z"
+            }
+          ],
+          "testSummaryLines": [
+            "9109 passed, 75 skipped, 2 deselected, 2032 warnings in 1232.85s (0:20:32)"
+          ],
+          "pytestPhaseCounts": [
+            {
+              "passed": 9109,
+              "failed": 0,
+              "error": 0,
+              "skipped": 75,
+              "deselected": 2,
+              "warnings": 2032
+            }
+          ],
+          "actualSkipReasons": {
+            "PowerShell and csc.exe shim require Windows": 13,
+            "PowerShell parser requires Windows": 2,
+            "PowerShell required": 9,
+            "Explicit pinned local candidate image required": 3,
+            "Actual Windows PowerShell launcher": 10,
+            "Explicit browser smoke integration lane required (INV_BROWSER_SMOKE_INTEGRATION=1)": 1,
+            "Set INV_MLFLOW_LIVE_URI (the run-mlflow lane starts the server)": 3,
+            "run only through tools/placement_benchmark.py": 1,
+            "run only through tools/placement_lock_wait_diagnostic.py": 1,
+            "CX01_CONTAINER is unset; container identity/ownership cannot be verified": 17,
+            "run only through S11 Storage Failure Hosted Reference opt-in lane": 1,
+            "Explicit candidate image and disposable container DB address required": 8,
+            "claude is not installed on this machine": 1,
+            "codex is not installed on this machine": 1,
+            "gemini is not installed on this machine": 1,
+            "antigravity is not installed on this machine": 1,
+            "docker or local image python:3.12-slim unavailable": 1,
+            "Intranet CA NSS DB live browser test requires Linux, certutil (libnss3-tools), and Playwright": 1
+          },
+          "log": {
+            "path": "ci-96afd799d497-job-128410661766.log",
+            "bytes": 1031878,
+            "SHA256": "fe42769d80cc8b6297660189f43c791b8ae05a6b1fcc611cc018ba1b6e00cacc"
+          }
+        },
+        {
+          "id": 128410661807,
+          "name": "backend (3.12)",
+          "conclusion": "success",
+          "steps": [
+            {
+              "name": "Set up job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 1,
+              "started_at": "2026-11-07T13:01:02Z",
+              "completed_at": "2026-11-07T13:01:02Z"
+            },
+            {
+              "name": "Initialize containers",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 2,
+              "started_at": "2026-11-07T13:01:02Z",
+              "completed_at": "2026-11-07T13:01:15Z"
+            },
+            {
+              "name": "Run actions/checkout@v4",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 3,
+              "started_at": "2026-11-07T13:01:15Z",
+              "completed_at": "2026-11-07T13:01:21Z"
+            },
+            {
+              "name": "Run actions/setup-python@v5",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 4,
+              "started_at": "2026-11-07T13:01:21Z",
+              "completed_at": "2026-11-07T13:01:22Z"
+            },
+            {
+              "name": "Run python -m pip install -r requirements-backend.txt -r requirements-docs.txt",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 5,
+              "started_at": "2026-11-07T13:01:22Z",
+              "completed_at": "2026-11-07T13:01:34Z"
+            },
+            {
+              "name": "Exercise the pinned venvless leaf-rotation runtime",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 6,
+              "started_at": "2026-11-07T13:01:34Z",
+              "completed_at": "2026-11-07T13:02:29Z"
+            },
+            {
+              "name": "Kill FLEET5 RS1/SF1 guard mutations",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 7,
+              "started_at": "2026-11-07T13:02:29Z",
+              "completed_at": "2026-11-07T13:02:42Z"
+            },
+            {
+              "name": "Publish FLEET5 installed pinned verifier and mutation proof",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 8,
+              "started_at": "2026-11-07T13:02:42Z",
+              "completed_at": "2026-11-07T13:02:43Z"
+            },
+            {
+              "name": "Kill the standalone leaf-runtime guard mutations",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 9,
+              "started_at": "2026-11-07T13:02:43Z",
+              "completed_at": "2026-11-07T13:03:13Z"
+            },
+            {
+              "name": "Contract schemas match their models",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 10,
+              "started_at": "2026-11-07T13:03:13Z",
+              "completed_at": "2026-11-07T13:03:13Z"
+            },
+            {
+              "name": "Migration renders offline",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 11,
+              "started_at": "2026-11-07T13:03:13Z",
+              "completed_at": "2026-11-07T13:03:14Z"
+            },
+            {
+              "name": "Migration graph has a single integrated head",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 12,
+              "started_at": "2026-11-07T13:03:14Z",
+              "completed_at": "2026-11-07T13:03:14Z"
+            },
+            {
+              "name": "Migration applies to an empty database",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 13,
+              "started_at": "2026-11-07T13:03:14Z",
+              "completed_at": "2026-11-07T13:03:16Z"
+            },
+            {
+              "name": "The reversible tail reverses",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 14,
+              "started_at": "2026-11-07T13:03:16Z",
+              "completed_at": "2026-11-07T13:03:17Z"
+            },
+            {
+              "name": "Tests",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 15,
+              "started_at": "2026-11-07T13:03:17Z",
+              "completed_at": "2026-11-07T13:27:25Z"
+            },
+            {
+              "name": "Require executed evidence and declared platform skips",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 16,
+              "started_at": "2026-11-07T13:27:25Z",
+              "completed_at": "2026-11-07T13:27:25Z"
+            },
+            {
+              "name": "Post Run actions/setup-python@v5",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 30,
+              "started_at": "2026-11-07T13:27:25Z",
+              "completed_at": "2026-11-07T13:27:26Z"
+            },
+            {
+              "name": "Post Run actions/checkout@v4",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 31,
+              "started_at": "2026-11-07T13:27:26Z",
+              "completed_at": "2026-11-07T13:27:27Z"
+            },
+            {
+              "name": "Stop containers",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 32,
+              "started_at": "2026-11-07T13:27:27Z",
+              "completed_at": "2026-11-07T13:27:27Z"
+            },
+            {
+              "name": "Complete job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 33,
+              "started_at": "2026-11-07T13:27:27Z",
+              "completed_at": "2026-11-07T13:27:27Z"
+            }
+          ],
+          "testSummaryLines": [
+            "9109 passed, 75 skipped, 2 deselected, 2033 warnings in 1443.63s (0:24:03)"
+          ],
+          "pytestPhaseCounts": [
+            {
+              "passed": 9109,
+              "failed": 0,
+              "error": 0,
+              "skipped": 75,
+              "deselected": 2,
+              "warnings": 2033
+            }
+          ],
+          "actualSkipReasons": {
+            "PowerShell and csc.exe shim require Windows": 13,
+            "PowerShell parser requires Windows": 2,
+            "PowerShell required": 9,
+            "Explicit pinned local candidate image required": 3,
+            "Actual Windows PowerShell launcher": 10,
+            "Explicit browser smoke integration lane required (INV_BROWSER_SMOKE_INTEGRATION=1)": 1,
+            "Set INV_MLFLOW_LIVE_URI (the run-mlflow lane starts the server)": 3,
+            "run only through tools/placement_benchmark.py": 1,
+            "run only through tools/placement_lock_wait_diagnostic.py": 1,
+            "CX01_CONTAINER is unset; container identity/ownership cannot be verified": 17,
+            "run only through S11 Storage Failure Hosted Reference opt-in lane": 1,
+            "Explicit candidate image and disposable container DB address required": 8,
+            "claude is not installed on this machine": 1,
+            "codex is not installed on this machine": 1,
+            "gemini is not installed on this machine": 1,
+            "antigravity is not installed on this machine": 1,
+            "docker or local image python:3.12-slim unavailable": 1,
+            "Intranet CA NSS DB live browser test requires Linux, certutil (libnss3-tools), and Playwright": 1
+          },
+          "log": {
+            "path": "ci-96afd799d497-job-128410661807.log",
+            "bytes": 1036972,
+            "SHA256": "e48050a45b5fbab0b29904d3e19f9388dabde137d47e302092e3a544e3f905a8"
+          }
+        }
+      ],
+      "artifacts": [
+        {
+          "id": 13575506866,
+          "name": "fleet5-settled-pinned-3.14-96afd799d49717fd40e4ddabd538d82accbe1958",
+          "digest": "sha256:2ca0d5317699e451d421a7d4dc5cd32ee6443367701f3d5f39b76841718c628b",
+          "bytes": 1765
+        },
+        {
+          "id": 13574898958,
+          "name": "fleet5-settled-pinned-3.12-96afd799d49717fd40e4ddabd538d82accbe1958",
+          "digest": "sha256:f5a6c0e0ab6a10a14e3dfb7b816bed1a7fc18322d3728c190417a7ad264e62e2",
+          "bytes": 6023
+        }
+      ]
+    },
+    {
+      "name": "docs",
+      "runID": 42375001689,
+      "url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/42375001689",
+      "sourceSHA": "96afd799d49717fd40e4ddabd538d82accbe1958",
+      "ref": "agent/codex/fleet5-first-workspace-cr90501-tests-r1-20261107",
+      "correlation": "fleet5-cr90501-test-only-docs-84a5daa1ad324fd2b15416d28664bf94",
+      "attempt": 1,
+      "conclusion": "success",
+      "jobs": [
+        {
+          "id": 128410670827,
+          "name": "docs",
+          "conclusion": "success",
+          "steps": [
+            {
+              "name": "Set up job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 1,
+              "started_at": "2026-11-07T13:01:04Z",
+              "completed_at": "2026-11-07T13:01:05Z"
+            },
+            {
+              "name": "Run actions/checkout@v4",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 2,
+              "started_at": "2026-11-07T13:01:05Z",
+              "completed_at": "2026-11-07T13:01:08Z"
+            },
+            {
+              "name": "Run actions/setup-python@v5",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 3,
+              "started_at": "2026-11-07T13:01:08Z",
+              "completed_at": "2026-11-07T13:01:09Z"
+            },
+            {
+              "name": "Run python -m pip install -r requirements-docs.txt",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 4,
+              "started_at": "2026-11-07T13:01:09Z",
+              "completed_at": "2026-11-07T13:01:11Z"
+            },
+            {
+              "name": "Run python tools/check_docs.py",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 5,
+              "started_at": "2026-11-07T13:01:11Z",
+              "completed_at": "2026-11-07T13:01:12Z"
+            },
+            {
+              "name": "Repository path citations exist (ratchet; baseline may only shrink)",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 6,
+              "started_at": "2026-11-07T13:01:12Z",
+              "completed_at": "2026-11-07T13:01:13Z"
+            },
+            {
+              "name": "Run python tools/check_contract_bindings.py",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 7,
+              "started_at": "2026-11-07T13:01:13Z",
+              "completed_at": "2026-11-07T13:01:20Z"
+            },
+            {
+              "name": "Run python tools/check_frontend_integrity.py",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 8,
+              "started_at": "2026-11-07T13:01:20Z",
+              "completed_at": "2026-11-07T13:01:20Z"
+            },
+            {
+              "name": "Report fixture producer reachability",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 9,
+              "started_at": "2026-11-07T13:01:20Z",
+              "completed_at": "2026-11-07T13:01:20Z"
+            },
+            {
+              "name": "Report client route coverage (report-only; promote per 검증검사도구_목록)",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 10,
+              "started_at": "2026-11-07T13:01:20Z",
+              "completed_at": "2026-11-07T13:01:21Z"
+            },
+            {
+              "name": "Run actions/upload-artifact@v4",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 11,
+              "started_at": "2026-11-07T13:01:21Z",
+              "completed_at": "2026-11-07T13:01:22Z"
+            },
+            {
+              "name": "Run python tools/test_sync.py",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 12,
+              "started_at": "2026-11-07T13:01:22Z",
+              "completed_at": "2026-11-07T13:01:22Z"
+            },
+            {
+              "name": "Run python tools/check_ontology_generation.py",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 13,
+              "started_at": "2026-11-07T13:01:22Z",
+              "completed_at": "2026-11-07T13:01:23Z"
+            },
+            {
+              "name": "Run python tools/check_ontology.py",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 14,
+              "started_at": "2026-11-07T13:01:23Z",
+              "completed_at": "2026-11-07T13:01:25Z"
+            },
+            {
+              "name": "Build documentation bundle",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 15,
+              "started_at": "2026-11-07T13:01:25Z",
+              "completed_at": "2026-11-07T13:01:27Z"
+            },
+            {
+              "name": "Run actions/upload-artifact@v4",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 16,
+              "started_at": "2026-11-07T13:01:27Z",
+              "completed_at": "2026-11-07T13:01:30Z"
+            },
+            {
+              "name": "Post Run actions/setup-python@v5",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 31,
+              "started_at": "2026-11-07T13:01:30Z",
+              "completed_at": "2026-11-07T13:01:31Z"
+            },
+            {
+              "name": "Post Run actions/checkout@v4",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 32,
+              "started_at": "2026-11-07T13:01:31Z",
+              "completed_at": "2026-11-07T13:01:31Z"
+            },
+            {
+              "name": "Complete job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 33,
+              "started_at": "2026-11-07T13:01:31Z",
+              "completed_at": "2026-11-07T13:01:31Z"
+            }
+          ],
+          "testSummaryLines": [],
+          "pytestPhaseCounts": [],
+          "actualSkipReasons": {},
+          "log": {
+            "path": "ci-96afd799d497-job-128410670827.log",
+            "bytes": 47407,
+            "SHA256": "b876498644b239449216a1dd1e93953768fe8fb5e3a6f618e72ba659456e4ecb"
+          }
+        }
+      ],
+      "artifacts": [
+        {
+          "id": 13575780318,
+          "name": "route-coverage-report",
+          "digest": "sha256:a640904ca78f87f3aa31881237b3e19e05ff362b6fed024665ea2e7939f8e64f",
+          "bytes": 1915
+        },
+        {
+          "id": 13574893924,
+          "name": "saintvision-guidelines",
+          "digest": "sha256:67f54802b1ee6d8c3de26de66235e61f17eb884e25a2ba44e19df6e8e816f93f",
+          "bytes": 47402959
+        }
+      ]
+    }
+  ],
+  "coreArchive": {
+    "id": 13577378328,
+    "officialDigest": "sha256:c495bcc3b2266dd44f6ac80c1d5b67163bccdc5938e783ac178bab2f7db8ea9e",
+    "downloadedDigest": "sha256:c495bcc3b2266dd44f6ac80c1d5b67163bccdc5938e783ac178bab2f7db8ea9e",
+    "match": true
+  },
+  "priorNonSuccess": [
+    {
+      "sourceSHA": "96afd799d49717fd40e4ddabd538d82accbe1958",
+      "firstCore": 42374996228,
+      "job": 128410654334,
+      "outcome": "CANCELLED_45_MINUTE_LIMIT",
+      "officialCause": "The job has exceeded the maximum execution time of 45m0s",
+      "noSuccessClaim": true,
+      "sourceTestsSQLWorkflowsChanged": false,
+      "Backend": 42374998823,
+      "Docs": 42375001689,
+      "reason": "One same-source existing Core workflow retry on a new hosted runner; no weaker tests, no workflow edit, no new frontend execution"
+    }
+  ],
+  "priorCoreAnnotations": [
+    {
+      "path": ".github",
+      "blob_href": "https://github.com/egparadise/SaintVision-Invion/blob/96afd799d49717fd40e4ddabd538d82accbe1958/.github",
+      "start_line": 1,
+      "start_column": null,
+      "end_line": 1,
+      "end_column": null,
+      "annotation_level": "failure",
+      "title": "",
+      "message": "The job has exceeded the maximum execution time of 45m0s",
+      "raw_details": ""
+    },
+    {
+      "path": ".github",
+      "blob_href": "https://github.com/egparadise/SaintVision-Invion/blob/96afd799d49717fd40e4ddabd538d82accbe1958/.github",
+      "start_line": 3,
+      "start_column": null,
+      "end_line": 3,
+      "end_column": null,
+      "annotation_level": "warning",
+      "title": "",
+      "message": "Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/setup-go@v5, actions/setup-node@v4, actions/setup-python@v5, actions/upload-artifact@v4. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/",
+      "raw_details": ""
+    },
+    {
+      "path": ".github",
+      "blob_href": "https://github.com/egparadise/SaintVision-Invion/blob/96afd799d49717fd40e4ddabd538d82accbe1958/.github",
+      "start_line": 656,
+      "start_column": null,
+      "end_line": 656,
+      "end_column": null,
+      "annotation_level": "failure",
+      "title": "",
+      "message": "The operation was canceled.",
+      "raw_details": ""
+    },
+    {
+      "path": ".github",
+      "blob_href": "https://github.com/egparadise/SaintVision-Invion/blob/96afd799d49717fd40e4ddabd538d82accbe1958/.github",
+      "start_line": 1,
+      "start_column": null,
+      "end_line": 1,
+      "end_column": null,
+      "annotation_level": "notice",
+      "title": "",
+      "message": "\"The ubuntu-latest label will migrate to Ubuntu 26 beginning October 19, 2026. For more information, see https://github.com/actions/runner-images/issues/14748\"",
+      "raw_details": ""
+    }
+  ],
+  "priorCancelledPartialArtifact": {
+    "run": 42374996228,
+    "job": 128410654334,
+    "conclusion": "CANCELLED_45_MINUTE_LIMIT_NOT_SUCCESS",
+    "artifactID": 13576408172,
+    "officialDigest": "sha256:845333fa24aa49d59885cb66131c2c999f087b677eb87429c67ec1e79e4b1aaf",
+    "rawArchive": "ci-96afd799d497-core-first-42374996228.zip",
+    "partialJUnit": [
+      {
+        "path": "core-tests.xml",
+        "cases": 9515,
+        "failures": 0,
+        "errors": 1,
+        "skipped": 46,
+        "directCases": [
+          {
+            "name": "test_direct_intent_positive_control_uses_kernel_and_rolls_back",
+            "status": "passed"
+          },
+          {
+            "name": "test_direct_intent_sql_guards_cannot_hide_behind_python_validation[gpu-Bounded CPU resources required]",
+            "status": "passed"
+          },
+          {
+            "name": "test_direct_intent_sql_guards_cannot_hide_behind_python_validation[cpu-CPU resource bounds exceeded]",
+            "status": "passed"
+          },
+          {
+            "name": "test_direct_intent_sql_guards_cannot_hide_behind_python_validation[memory-CPU resource bounds exceeded]",
+            "status": "passed"
+          },
+          {
+            "name": "test_direct_intent_sql_guards_cannot_hide_behind_python_validation[extra-key-Closed canonical CPU metadata required]",
+            "status": "passed"
+          },
+          {
+            "name": "test_direct_intent_sql_guards_cannot_hide_behind_python_validation[sha-Closed canonical CPU metadata required]",
+            "status": "passed"
+          },
+          {
+            "name": "test_direct_intent_sql_guards_cannot_hide_behind_python_validation[canonical-Closed canonical CPU metadata required]",
+            "status": "passed"
+          },
+          {
+            "name": "test_direct_intent_sql_guards_cannot_hide_behind_python_validation[workspace-not-ready-Current selected ready Workspace required]",
+            "status": "passed"
+          },
+          {
+            "name": "test_direct_intent_sql_guards_cannot_hide_behind_python_validation[workspace-version-Current selected ready Workspace required]",
+            "status": "passed"
+          },
+          {
+            "name": "test_direct_intent_sql_guards_cannot_hide_behind_python_validation[target-not-member-Selected target membership differs]",
+            "status": "passed"
+          },
+          {
+            "name": "test_direct_intent_sql_guards_cannot_hide_behind_python_validation[target-disabled-Selected target membership differs]",
+            "status": "passed"
+          },
+          {
+            "name": "test_direct_intent_sql_guards_cannot_hide_behind_python_validation[spec-tenant-Closed canonical CPU metadata required]",
+            "status": "passed"
+          },
+          {
+            "name": "test_direct_run_positive_control_uses_kernel_and_rolls_back_all_three_rows",
+            "status": "passed"
+          },
+          {
+            "name": "test_direct_run_requires_current_selected_intent_without_partial_effects[workspace-version]",
+            "status": "passed"
+          },
+          {
+            "name": "test_direct_run_requires_current_selected_intent_without_partial_effects[workload-version]",
+            "status": "passed"
+          },
+          {
+            "name": "test_direct_run_requires_current_selected_intent_without_partial_effects[sha]",
+            "status": "passed"
+          },
+          {
+            "name": "test_direct_run_requires_current_selected_intent_without_partial_effects[workspace-not-ready]",
+            "status": "passed"
+          },
+          {
+            "name": "test_helper_privileges_rls_and_missing_context_are_real_not_superuser_results",
+            "status": "passed"
+          }
+        ]
+      }
+    ]
+  },
+  "priorInterruptedTeardownError": {
+    "module": "tests.test_write_ac11_security_allowlist",
+    "name": "test_audit_reader_grant_and_unconditional_policy_are_removed_without_a_product_caller",
+    "message": "failed on teardown with \"ExceptionGroup: errors while tearing down <Session  exitstatus=<ExitCode.OK: 0> testsfailed=0 testscollected=9515> (2 sub-exceptions)\"",
+    "detail": "onGroup: errors while tearing down <Session  exitstatus=<ExitCode.OK: 0> testsfailed=0 testscollected=9515> (2 sub-exceptions)\n  +-+---------------- 1 ----------------\n    | Traceback (most recent call last):\n    |   File \"/opt/hostedtoolcache/Python/3.12.16/x64/lib/python3.12/site-packages/_pytest/runner.py\", line 568, in teardown_exact\n    |     fin()\n    |   File \"/opt/hostedtoolcache/Python/3.12.16/x64/lib/python3.12/site-packages/_pytest/fixtures.py\", line 1166, in finish\n    |     raise exceptions[0]\n    |   File \"/opt/hostedtoolcache/Python/3.12.16/x64/lib/python3.12/site-packages/_pytest/fixtures.py\", line 1156, in finish\n    |     fin()\n    |   File \"/opt/hostedtoolcache/Python/3.12.16/x64/lib/python3.12/site-packages/_pytest/fixtures.py\", line 1014, in _teardown_yield_fixture\n    |     next(it)\n    |   File \"/home/runner/work/SaintVision-Invion/SaintVision-Invion/tests/conftest.py\", line 104, in database_url\n    |     with psycopg.connect(admin, autocommit=True) as conn:\n    |          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    |   File \"/opt/hostedtoolcache/Python/3.12.16/x64/lib/python3.12/site-packages/psycopg/connection.py\", line 122, in connect\n    |     raise last_ex.with_traceback(None)\n    | psycopg.OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: server closed the connection unexpectedly\n    | \tThis probably means the server terminated abnormally\n    | \tbefore or while processing the request.\n    +---------------- 2 ----------------\n    | Exception Group Traceback (most recent call last):\n    |   File \"/opt/hostedtoolcache/Python/3.12.16/x64/lib/python3.12/site-packages/_pytest/runner.py\", line 568, in teardown_exact\n    |     fin()\n    |   File \"/opt/hostedtoolcache/Python/3.12.16/x64/lib/python3.12/site-packages/_pytest/fixtures.py\", line 1166, in finish\n    |     raise exceptions[0]\n    |   File \"/opt/hostedtoolcache/Python/3.12.16/x64/lib/python3.12/site-packages/_pytest/fixtures.py\", line 1156, in finish\n    |     fin()\n    |   File \"/opt/hostedtoolcache/Python/3.12.16/x64/lib/python3.12/site-packages/_pytest/fixtures.py\", line 1014, in _teardown_yield_fixture\n    |     next(it)\n    |   File \"/home/runner/work/SaintVision-Invion/SaintVision-Invion/tests/integration/conftest.py\", line 139, in postgres\n    |     yield from provision_disposable_database(\n    |   File \"/home/runner/work/SaintVision-Invion/SaintVision-Invion/tests/db_provision.py\", line 53, in provision_disposable_database\n    |     raise ExceptionGroup(\"disposable database teardown failed\", cleanup_errors)\n    | ExceptionGroup: disposable database teardown failed (2 sub-exceptions)\n    +-+---------------- 1 ----------------\n      | Traceback (most recent call last):\n      |   File \"/home/runner/work/SaintVision-Invion/SaintVision-Invion/tests/db_provision.py\", line 40, in provision_disposable_database\n      |     drop_database()\n      |   File \"/home/runner/work/SaintVision-Invion/SaintVision-Invion/tests/integration/conftest.py\", line 129, in drop_database\n      |     conn.execute(sql.SQL(\"DROP DATABASE {} WITH (FORCE)\").format(sql.Identifier(name)))\n      |   File \"/opt/hostedtoolcache/Python/3.12.16/x64/lib/python3.12/site-packages/psycopg/connection.py\", line 300, in execute\n      |     raise ex.with_traceback(None)\n      | psycopg.OperationalError: consuming input failed: server closed the connection unexpectedly\n      | \tThis probably means the server terminated abnormally\n      | \tbefore or while processing the request.\n      +---------------- 2 ----------------\n      | Traceback (most recent call last):\n      |   File \"/home/runner/work/SaintVision-Invion/SaintVision-Invion/tests/db_provision.py\", line 45, in provision_disposable_database\n      |     drop_role()\n      |   File \"/home/runner/work/SaintVision-Invion/SaintVision-Invion/tests/integration/conftest.py\", line 134, in drop_role\n      |     with psycopg.connect(admin, autocommit=True) as conn:\n      |          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n      |   File \"/opt/hostedtoolcache/Python/3.12.16/x64/lib/python3.12/site-packages/psycopg/connection.py\", line 122, in connect\n      |     raise last_ex.with_traceback(None)\n      | psycopg.OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: server closed the connection unexpectedly\n      | \tThis probably means the server terminated abnormally\n      | \tbefore or while processing the request.\n      +------------------------------------"
+  },
+  "junit": [
+    {
+      "path": "build-product-runtime-real-pg.xml",
+      "counts": {
+        "passed": 13,
+        "failure": 0,
+        "error": 0,
+        "skipped": 0
+      },
+      "skipReasons": {},
+      "firstWorkspaceIntentCases": []
+    },
+    {
+      "path": "business-handoff-tests.xml",
+      "counts": {
+        "passed": 17,
+        "failure": 0,
+        "error": 0,
+        "skipped": 0
+      },
+      "skipReasons": {},
+      "firstWorkspaceIntentCases": []
+    },
+    {
+      "path": "containment-tests.xml",
+      "counts": {
+        "passed": 28,
+        "failure": 0,
+        "error": 0,
+        "skipped": 0
+      },
+      "skipReasons": {},
+      "firstWorkspaceIntentCases": []
+    },
+    {
+      "path": "core-tests.xml",
+      "counts": {
+        "passed": 9469,
+        "failure": 0,
+        "error": 0,
+        "skipped": 46
+      },
+      "skipReasons": {
+        "PowerShell and csc.exe shim require Windows": 13,
+        "PowerShell parser requires Windows": 2,
+        "PowerShell required": 9,
+        "Actual Windows PowerShell launcher": 10,
+        "Explicit browser smoke integration lane required (INV_BROWSER_SMOKE_INTEGRATION=1)": 1,
+        "Set INV_MLFLOW_LIVE_URI (the run-mlflow lane starts the server)": 3,
+        "run only through tools/placement_benchmark.py": 1,
+        "run only through tools/placement_lock_wait_diagnostic.py": 1,
+        "run only through S11 Storage Failure Hosted Reference opt-in lane": 1,
+        "claude is not installed on this machine": 1,
+        "codex is not installed on this machine": 1,
+        "gemini is not installed on this machine": 1,
+        "antigravity is not installed on this machine": 1,
+        "Intranet CA NSS DB live browser test requires Linux, certutil (libnss3-tools), and Playwright": 1
+      },
+      "firstWorkspaceIntentCases": [
+        {
+          "module": "tests.integration.test_workspace_first_intents",
+          "name": "test_direct_intent_positive_control_uses_kernel_and_rolls_back",
+          "status": "passed"
+        },
+        {
+          "module": "tests.integration.test_workspace_first_intents",
+          "name": "test_direct_intent_sql_guards_cannot_hide_behind_python_validation[gpu-Bounded CPU resources required]",
+          "status": "passed"
+        },
+        {
+          "module": "tests.integration.test_workspace_first_intents",
+          "name": "test_direct_intent_sql_guards_cannot_hide_behind_python_validation[cpu-CPU resource bounds exceeded]",
+          "status": "passed"
+        },
+        {
+          "module": "tests.integration.test_workspace_first_intents",
+          "name": "test_direct_intent_sql_guards_cannot_hide_behind_python_validation[memory-CPU resource bounds exceeded]",
+          "status": "passed"
+        },
+        {
+          "module": "tests.integration.test_workspace_first_intents",
+          "name": "test_direct_intent_sql_guards_cannot_hide_behind_python_validation[extra-key-Closed canonical CPU metadata required]",
+          "status": "passed"
+        },
+        {
+          "module": "tests.integration.test_workspace_first_intents",
+          "name": "test_direct_intent_sql_guards_cannot_hide_behind_python_validation[sha-Closed canonical CPU metadata required]",
+          "status": "passed"
+        },
+        {
+          "module": "tests.integration.test_workspace_first_intents",
+          "name": "test_direct_intent_sql_guards_cannot_hide_behind_python_validation[canonical-Closed canonical CPU metadata required]",
+          "status": "passed"
+        },
+        {
+          "module": "tests.integration.test_workspace_first_intents",
+          "name": "test_direct_intent_sql_guards_cannot_hide_behind_python_validation[workspace-not-ready-Current selected ready Workspace required]",
+          "status": "passed"
+        },
+        {
+          "module": "tests.integration.test_workspace_first_intents",
+          "name": "test_direct_intent_sql_guards_cannot_hide_behind_python_validation[workspace-version-Current selected ready Workspace required]",
+          "status": "passed"
+        },
+        {
+          "module": "tests.integration.test_workspace_first_intents",
+          "name": "test_direct_intent_sql_guards_cannot_hide_behind_python_validation[target-not-member-Selected target membership differs]",
+          "status": "passed"
+        },
+        {
+          "module": "tests.integration.test_workspace_first_intents",
+          "name": "test_direct_intent_sql_guards_cannot_hide_behind_python_validation[target-disabled-Selected target membership differs]",
+          "status": "passed"
+        },
+        {
+          "module": "tests.integration.test_workspace_first_intents",
+          "name": "test_direct_intent_sql_guards_cannot_hide_behind_python_validation[spec-tenant-Closed canonical CPU metadata required]",
+          "status": "passed"
+        },
+        {
+          "module": "tests.integration.test_workspace_first_intents",
+          "name": "test_direct_run_positive_control_uses_kernel_and_rolls_back_all_three_rows",
+          "status": "passed"
+        },
+        {
+          "module": "tests.integration.test_workspace_first_intents",
+          "name": "test_direct_run_requires_current_selected_intent_without_partial_effects[workspace-version]",
+          "status": "passed"
+        },
+        {
+          "module": "tests.integration.test_workspace_first_intents",
+          "name": "test_direct_run_requires_current_selected_intent_without_partial_effects[workload-version]",
+          "status": "passed"
+        },
+        {
+          "module": "tests.integration.test_workspace_first_intents",
+          "name": "test_direct_run_requires_current_selected_intent_without_partial_effects[sha]",
+          "status": "passed"
+        },
+        {
+          "module": "tests.integration.test_workspace_first_intents",
+          "name": "test_direct_run_requires_current_selected_intent_without_partial_effects[workspace-not-ready]",
+          "status": "passed"
+        },
+        {
+          "module": "tests.integration.test_workspace_first_intents",
+          "name": "test_contract_serving_profile_metadata_and_atomic_run_under_real_runtime_role",
+          "status": "passed"
+        },
+        {
+          "module": "tests.integration.test_workspace_first_intents",
+          "name": "test_same_key_races_one_atomic_triple_and_original_snapshot_timestamp",
+          "status": "passed"
+        },
+        {
+          "module": "tests.integration.test_workspace_first_intents",
+          "name": "test_replay_rechecks_current_authority_and_intent[suspended-user]",
+          "status": "passed"
+        },
+        {
+          "module": "tests.integration.test_workspace_first_intents",
+          "name": "test_replay_rechecks_current_authority_and_intent[archived-project]",
+          "status": "passed"
+        },
+        {
+          "module": "tests.integration.test_workspace_first_intents",
+          "name": "test_replay_rechecks_current_authority_and_intent[disabled-subject]",
+          "status": "passed"
+        },
+        {
+          "module": "tests.integration.test_workspace_first_intents",
+          "name": "test_replay_rechecks_current_authority_and_intent[disabled-business]",
+          "status": "passed"
+        },
+        {
+          "module": "tests.integration.test_workspace_first_intents",
+          "name": "test_replay_rechecks_current_authority_and_intent[revoked-kernel]",
+          "status": "passed"
+        },
+        {
+          "module": "tests.integration.test_workspace_first_intents",
+          "name": "test_replay_rechecks_current_authority_and_intent[role]",
+          "status": "passed"
+        },
+        {
+          "module": "tests.integration.test_workspace_first_intents",
+          "name": "test_replay_rechecks_current_authority_and_intent[workspace]",
+          "status": "passed"
+        },
+        {
+          "module": "tests.integration.test_workspace_first_intents",
+          "name": "test_replay_rechecks_current_authority_and_intent[workspace-version]",
+          "status": "passed"
+        },
+        {
+          "module": "tests.integration.test_workspace_first_intents",
+          "name": "test_replay_rechecks_current_authority_and_intent[version]",
+          "status": "passed"
+        },
+        {
+          "module": "tests.integration.test_workspace_first_intents",
+          "name": "test_replay_rechecks_current_authority_and_intent[spec]",
+          "status": "passed"
+        },
+        {
+          "module": "tests.integration.test_workspace_first_intents",
+          "name": "test_replay_rechecks_current_authority_and_intent[digest]",
+          "status": "passed"
+        },
+        {
+          "module": "tests.integration.test_workspace_first_intents",
+          "name": "test_replay_rechecks_current_authority_and_intent[node]",
+          "status": "passed"
+        },
+        {
+          "module": "tests.integration.test_workspace_first_intents",
+          "name": "test_replay_rechecks_current_authority_and_intent[containment]",
+          "status": "passed"
+        },
+        {
+          "module": "tests.integration.test_workspace_first_intents",
+          "name": "test_exact_strong_etag_required_before_metadata_write[None]",
+          "status": "passed"
+        },
+        {
+          "module": "tests.integration.test_workspace_first_intents",
+          "name": "test_exact_strong_etag_required_before_metadata_write[W/\"workspace-v1\"]",
+          "status": "passed"
+        },
+        {
+          "module": "tests.integration.test_workspace_first_intents",
+          "name": "test_exact_strong_etag_required_before_metadata_write[\"workspace-v01\"]",
+          "status": "passed"
+        },
+        {
+          "module": "tests.integration.test_workspace_first_intents",
+          "name": "test_exact_strong_etag_required_before_metadata_write[workspace-v1]",
+          "status": "passed"
+        },
+        {
+          "module": "tests.integration.test_workspace_first_intents",
+          "name": "test_exact_strong_etag_required_before_metadata_write[\"workspace-v1\", \"workspace-v2\"]",
+          "status": "passed"
+        },
+        {
+          "module": "tests.integration.test_workspace_first_intents",
+          "name": "test_exact_strong_etag_required_before_metadata_write[\"workspace-v9007199254740992\"]",
+          "status": "passed"
+        },
+        {
+          "module": "tests.integration.test_workspace_first_intents",
+          "name": "test_closed_input_profile_and_node_minima[change0]",
+          "status": "passed"
+        },
+        {
+          "module": "tests.integration.test_workspace_first_intents",
+          "name": "test_closed_input_profile_and_node_minima[change1]",
+          "status": "passed"
+        },
+        {
+          "module": "tests.integration.test_workspace_first_intents",
+          "name": "test_closed_input_profile_and_node_minima[change2]",
+          "status": "passed"
+        },
+        {
+          "module": "tests.integration.test_workspace_first_intents",
+          "name": "test_closed_input_profile_and_node_minima[change3]",
+          "status": "passed"
+        },
+        {
+          "module": "tests.integration.test_workspace_first_intents",
+          "name": "test_closed_input_profile_and_node_minima[change4]",
+          "status": "passed"
+        },
+        {
+          "module": "tests.integration.test_workspace_first_intents",
+          "name": "test_closed_input_profile_and_node_minima[change5]",
+          "status": "passed"
+        },
+        {
+          "module": "tests.integration.test_workspace_first_intents",
+          "name": "test_pagination_and_no_silent_invalid_intent_filtering",
+          "status": "passed"
+        },
+        {
+          "module": "tests.integration.test_workspace_first_intents",
+          "name": "test_write_failure_rolls_back_kernel_public_mapping_event_and_ledger",
+          "status": "passed"
+        },
+        {
+          "module": "tests.integration.test_workspace_first_intents",
+          "name": "test_helper_privileges_rls_and_missing_context_are_real_not_superuser_results",
+          "status": "passed"
+        },
+        {
+          "module": "tests.integration.test_workspace_first_intents",
+          "name": "test_cross_project_and_auth_and_http_bounds_are_not_inferred_ready",
+          "status": "passed"
+        },
+        {
+          "module": "tests.integration.test_workspace_first_intents",
+          "name": "test_epoch_change_refuses_initial_and_replay_without_partial_writes",
+          "status": "passed"
+        },
+        {
+          "module": "tests.integration.test_workspace_first_intents",
+          "name": "test_actual_business_role_cannot_call_or_assume_writer",
+          "status": "passed"
+        },
+        {
+          "module": "tests.integration.test_workspace_first_intents",
+          "name": "test_hostile_search_path_cannot_redirect_qualified_helper_writes",
+          "status": "passed"
+        },
+        {
+          "module": "tests.integration.test_workspace_first_intents",
+          "name": "test_create_replay_races_existing_first_prepare_without_new_run_or_state_reset",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "path": "cx01-recovery-tests.xml",
+      "counts": {
+        "passed": 20,
+        "failure": 0,
+        "error": 0,
+        "skipped": 0
+      },
+      "skipReasons": {},
+      "firstWorkspaceIntentCases": []
+    },
+    {
+      "path": "docker-host-tests.xml",
+      "counts": {
+        "passed": 2,
+        "failure": 0,
+        "error": 0,
+        "skipped": 0
+      },
+      "skipReasons": {},
+      "firstWorkspaceIntentCases": []
+    },
+    {
+      "path": "lan-installer-tests.xml",
+      "counts": {
+        "passed": 17,
+        "failure": 0,
+        "error": 0,
+        "skipped": 0
+      },
+      "skipReasons": {},
+      "firstWorkspaceIntentCases": []
+    },
+    {
+      "path": "lan-pilot-database-real-pg.xml",
+      "counts": {
+        "passed": 2,
+        "failure": 0,
+        "error": 0,
+        "skipped": 0
+      },
+      "skipReasons": {},
+      "firstWorkspaceIntentCases": []
+    },
+    {
+      "path": "shard-recovery-tests.xml",
+      "counts": {
+        "passed": 21,
+        "failure": 0,
+        "error": 0,
+        "skipped": 0
+      },
+      "skipReasons": {},
+      "firstWorkspaceIntentCases": []
+    },
+    {
+      "path": "workspace-tests.xml",
+      "counts": {
+        "passed": 23,
+        "failure": 0,
+        "error": 0,
+        "skipped": 0
+      },
+      "skipReasons": {},
+      "firstWorkspaceIntentCases": []
+    }
+  ],
+  "goResults": {
+    "path": "node-unit.jsonl",
+    "terminalTestEvents": {
+      "pass": 696,
+      "fail": 0,
+      "skip": 1
+    },
+    "skippedTests": [
+      {
+        "package": "github.com/egparadise/SaintVision-Invion/services/node-agent/runtime",
+        "test": "TestDockerLiveCompatibility",
+        "reportedOutput": [
+          "=== RUN   TestDockerLiveCompatibility\n",
+          "    docker_linux_test.go:20: real Docker opt-in required\n",
+          "--- SKIP: TestDockerLiveCompatibility (0.00s)\n"
+        ]
+      }
+    ],
+    "note": "Counts include named Go subtests"
+  },
+  "explicitDockerCompatibility": {
+    "path": "docker-compatibility.log",
+    "PASS": true,
+    "optIn": "INV_RUN_DOCKER_COMPAT=1",
+    "SHA256": "50e9af86339d4e1d6cf4410496a7a6dd6f7d354a3ce61ba5a11b437cab90688a",
+    "note": "Separate required lane actually executes the compatibility test that skips without opt-in in Go unit output"
+  },
+  "actualDirectCaseResults": [
+    {
+      "module": "tests.integration.test_workspace_first_intents",
+      "name": "test_direct_intent_positive_control_uses_kernel_and_rolls_back",
+      "status": "passed"
+    },
+    {
+      "module": "tests.integration.test_workspace_first_intents",
+      "name": "test_direct_intent_sql_guards_cannot_hide_behind_python_validation[gpu-Bounded CPU resources required]",
+      "status": "passed"
+    },
+    {
+      "module": "tests.integration.test_workspace_first_intents",
+      "name": "test_direct_intent_sql_guards_cannot_hide_behind_python_validation[cpu-CPU resource bounds exceeded]",
+      "status": "passed"
+    },
+    {
+      "module": "tests.integration.test_workspace_first_intents",
+      "name": "test_direct_intent_sql_guards_cannot_hide_behind_python_validation[memory-CPU resource bounds exceeded]",
+      "status": "passed"
+    },
+    {
+      "module": "tests.integration.test_workspace_first_intents",
+      "name": "test_direct_intent_sql_guards_cannot_hide_behind_python_validation[extra-key-Closed canonical CPU metadata required]",
+      "status": "passed"
+    },
+    {
+      "module": "tests.integration.test_workspace_first_intents",
+      "name": "test_direct_intent_sql_guards_cannot_hide_behind_python_validation[sha-Closed canonical CPU metadata required]",
+      "status": "passed"
+    },
+    {
+      "module": "tests.integration.test_workspace_first_intents",
+      "name": "test_direct_intent_sql_guards_cannot_hide_behind_python_validation[canonical-Closed canonical CPU metadata required]",
+      "status": "passed"
+    },
+    {
+      "module": "tests.integration.test_workspace_first_intents",
+      "name": "test_direct_intent_sql_guards_cannot_hide_behind_python_validation[workspace-not-ready-Current selected ready Workspace required]",
+      "status": "passed"
+    },
+    {
+      "module": "tests.integration.test_workspace_first_intents",
+      "name": "test_direct_intent_sql_guards_cannot_hide_behind_python_validation[workspace-version-Current selected ready Workspace required]",
+      "status": "passed"
+    },
+    {
+      "module": "tests.integration.test_workspace_first_intents",
+      "name": "test_direct_intent_sql_guards_cannot_hide_behind_python_validation[target-not-member-Selected target membership differs]",
+      "status": "passed"
+    },
+    {
+      "module": "tests.integration.test_workspace_first_intents",
+      "name": "test_direct_intent_sql_guards_cannot_hide_behind_python_validation[target-disabled-Selected target membership differs]",
+      "status": "passed"
+    },
+    {
+      "module": "tests.integration.test_workspace_first_intents",
+      "name": "test_direct_intent_sql_guards_cannot_hide_behind_python_validation[spec-tenant-Closed canonical CPU metadata required]",
+      "status": "passed"
+    },
+    {
+      "module": "tests.integration.test_workspace_first_intents",
+      "name": "test_direct_run_positive_control_uses_kernel_and_rolls_back_all_three_rows",
+      "status": "passed"
+    },
+    {
+      "module": "tests.integration.test_workspace_first_intents",
+      "name": "test_direct_run_requires_current_selected_intent_without_partial_effects[workspace-version]",
+      "status": "passed"
+    },
+    {
+      "module": "tests.integration.test_workspace_first_intents",
+      "name": "test_direct_run_requires_current_selected_intent_without_partial_effects[workload-version]",
+      "status": "passed"
+    },
+    {
+      "module": "tests.integration.test_workspace_first_intents",
+      "name": "test_direct_run_requires_current_selected_intent_without_partial_effects[sha]",
+      "status": "passed"
+    },
+    {
+      "module": "tests.integration.test_workspace_first_intents",
+      "name": "test_direct_run_requires_current_selected_intent_without_partial_effects[workspace-not-ready]",
+      "status": "passed"
+    },
+    {
+      "module": "tests.integration.test_workspace_first_intents",
+      "name": "test_helper_privileges_rls_and_missing_context_are_real_not_superuser_results",
+      "status": "passed"
+    }
+  ],
+  "mutationsActuallyExecuted": false,
+  "deselectionReasons": [
+    "Full Core/Backend suites use default not docker_host and deselect the two host cases; both execute in the explicit Core host lane",
+    "Core explicit host lane selects docker_host and deselects four ordinary unit cases that execute in the full suite"
+  ],
+  "unchangedFrontend": {
+    "sourceSHA": "90578f49ea400958fcdbc1ded3908d624e856f57",
+    "runID": 42368189302,
+    "newSHARun": false,
+    "newDispatch": false,
+    "scope": "Unchanged-component evidence only; apps/web tree byte-identical to905",
+    "metadata": "unchanged-905-frontend-official.json"
+  },
+  "localGates": [
+    {
+      "argv": [
+        "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+        "-B",
+        "tools/check_docs.py"
+      ],
+      "atKST": "2026-11-07T21:56:42.540976+09:00",
+      "exit": 0,
+      "stdout": "PASS: 24 original hashes, 1281 versioned documents, wiki links, 48 tasks, 12 outcomes, owner/reviewer/skills, dependency DAG.\r\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+        "-B",
+        "tools/check_ontology.py"
+      ],
+      "atKST": "2026-11-07T21:57:16.514254+09:00",
+      "exit": 0,
+      "stdout": "PASS: RDF parsing, defined terms, TTL/JSON-LD equivalence, 48 task mappings, positive SHACL, 4 rejected invalid fixtures, 4 competency queries, Obsidian mirrors.\r\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+        "-B",
+        "tools/check_doc_path_citations.py",
+        "--ratchet",
+        "--base-ref",
+        "90578f49ea400958fcdbc1ded3908d624e856f57"
+      ],
+      "atKST": "2026-11-07T21:57:19.874105+09:00",
+      "exit": 0,
+      "stdout": "PASS check_doc_path_citations --ratchet: 290 broken citation(s), all in baseline, none stale, floor unchanged.\r\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+        "-B",
+        "tools/check_doc_single_source.py",
+        "--ratchet"
+      ],
+      "atKST": "2026-11-07T21:57:26.605787+09:00",
+      "exit": 0,
+      "stdout": "PASS check_doc_single_source --ratchet: 16 pairs, all in baseline, none stale.\r\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+        "-B",
+        "tools/check_contract_bindings.py"
+      ],
+      "atKST": "2026-11-07T21:57:27.166514+09:00",
+      "exit": 0,
+      "stdout": "PASS check_contract_bindings: 57 fixtures each referenced by a test; 21 bound kernel response TYPES each have >=1 serving-anchor test (counted PER TYPE, not per anchor SITE: those types occupy 27 anchor sites; a multi-site type counts covered even if only one site is tested -- site-level weight is not decidable here, use tools/check_anchor_weight.py + the mutation harness); 14 replay guards present.\r\n  UNIT NOTE: TYPE count <= SITE count. Multi-site types (per-type coverage can mask an untested site): ApprovalView(2 sites: ['approvals']), BusinessBindingView(2 sites: ['business_handoff']), BusinessEditLockReleaseView(2 sites: ['business_handoff']), BusinessEditLockView(2 sites: ['business_handoff']), ControlRunDetail(3 sites: ['control']), ControlRunView(2 sites: ['control']), EvidenceEnvelope(6 sites: ['build_governance', 'results', 'runs', 'shard_completion', 'storage_commit', 'storage_view']), ModelExecutionManifestObservation(2 sites: ['model_uri_resolver', 'model_view']), NodeExecutionPermit(2 sites: ['node_execution', 'node_transport']), NodeResourceSnapshot(4 sites: ['capacity', 'gpu', 'observation']), WorkspaceCheckoutView(2 sites: ['workspace_recovery']), WorkspaceEnqueueResult(3 sites: ['workspace_api']), WorkspaceFirstRunCreateResult(2 sites: ['workspace_intents']), WorkspacePrepareResult(2 sites: ['workspace_api']), WorkspaceRestoreView(2 sites: ['workspace_recovery']), WorkspaceStartEnqueueResult(3 sites: ['workspace_start']), WorkspaceStartPrepareResult(2 sites: ['workspace_start'])\r\n  (Reporting sites is not a regression -- the TYPE number never meant 'sites verified'; this makes the counting unit explicit. EvidenceEnvelope-class multi-site anchors are why.)\r\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+        "-B",
+        "tools/check_frontend_integrity.py"
+      ],
+      "atKST": "2026-11-07T21:57:35.588956+09:00",
+      "exit": 0,
+      "stdout": "Scanning 97 frontend production source files under apps/web/src ...\r\n\r\nPASS Frontend Integrity Check: all 9 integrity rules satisfied (0 violations).\r\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+        "-B",
+        "tools/sync_obsidian.py",
+        "--check"
+      ],
+      "atKST": "2026-11-07T21:57:36.756789+09:00",
+      "exit": 0,
+      "stdout": "CHECK: 4797 managed files, 2346 pending exports, 0 conflicts. No writes.\r\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "atKST": "2026-11-07T21:58:10.324327+09:00",
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    }
+  ],
+  "finalSyncCheck": {
+    "exit": 0,
+    "stdout": "CHECK: 4830 managed files, 2379 pending exports, 0 conflicts. No writes.\r\n",
+    "stderr": ""
+  },
+  "sync": {
+    "beforeBytes": 507845,
+    "afterBytes": 507845,
+    "SHA256": "5d4beda3a03c1864f03d0f4f12f5d60ce7206a946b51b4d4ef3f8c05681369d3",
+    "fullBytesEqual": true,
+    "apply": false
+  },
+  "mainProductExecution": false,
+  "realApprovalsOrRunOrBrowserOrPCOperations": false,
+  "remaining": "Root verifies exact test packet and starts one actual Claude delta re-review; Root alone owns O1-O6 and every actual deployment/identity/readiness/approval/Run/browser/five-PC gate",
+  "preserved": "Original19HOLD/discharges0/runtimeB0/A1-A16/H1-H7/H3EA/RDNULL_HOLD/raw7UNREGISTERED/A01-A40NOT_RUN",
+  "receipt": "Post-CI data receipt for Root publication; not committed into the immutable tested source",
+  "wholeProgramComplete": false
+}

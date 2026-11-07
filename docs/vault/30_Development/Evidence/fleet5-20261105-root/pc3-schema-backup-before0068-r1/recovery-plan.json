@@ -1,0 +1,6 @@
+{
+  "baseProgramSHA256": "d6f257b04664c601c8b7903c734dd07c18482d4b928df57dedccb80d19eb72da",
+  "recovery": "R1 failed before dump; readonly proves no dump/container, immutable index->linux/amd64 manifest->config matches current CP image; explicit platform and no new pull; first dump only",
+  "originalReceiptPreserved": true,
+  "changes": 7
+}
