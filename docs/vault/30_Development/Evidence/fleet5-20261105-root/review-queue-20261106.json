@@ -1,6 +1,6 @@
 {
   "schema": "fleet5-root-review-resource-sequence:1",
-  "atKST": "2026-11-08T06:27:40+09:00",
+  "atKST": "2026-11-08T06:52:37+09:00",
   "completedB": {
     "task": "task_d4c4c809ed4e",
     "review": "ac9182c3e3d606ec027c0be2e90e049ff50d54f1",
@@ -22,7 +22,7 @@
     "review": "0e53fc024ca773b7719182e170e5e126aeaf5b95",
     "verdict": "ACCEPT TEST-ONLY; R-L1 CLOSED; no new findings"
   },
-  "nextActualReviewTrigger": "No source correction/review pending. Continue when genuine approver identity/decisions, PC1 enrollment or safe PC5 operating prerequisites change; retain real original request bytes and idempotent keys. No timer-based approval, fake actor, automatic replacement Run or 100percent claim.",
+  "nextActualReviewTrigger": "Actual 3-Node idle process reconnect complete. No source implementation/review pending. Genuine approver identities/current decisions, PC1 enrollment and safe PC5 prerequisites remain; evaluate remaining renewal window from accepted source without restoring old disabled renewers or resetting floors. Root is sole credential/operator and canonical APPLY owner.",
   "completedIntegration": {
     "task": "task_78064fb4b7ff",
     "dispatch": "ctx_ed7ec73163d6",
@@ -3964,21 +3964,100 @@
   "externalPrerequisites": [
     {
       "id": "REAL_TWO_NONREQUESTER_APPROVERS",
-      "state": "ACTUAL_IDENTITIES_AND_VALID_CURRENT_SIGNED_APPROVALS_REQUIRED",
-      "actualRun": "run_01M6VXSMM9SV8MAB7K4B1YCRX8",
-      "priorProposalExpired": true
+      "state": "GENUINE_IDENTITIES_AND_CURRENT_VALID_PROPOSAL_REQUIRED_PRIOR_PROPOSAL_EXPIRED"
     },
     {
       "id": "PC1_SSH_KEY",
-      "state": "FIXED_KEY_AUTH_REJECTED_LOCAL_ENROLLMENT_REQUIRED"
+      "state": "FIXED_KEY_REJECTED_LOCAL_ENROLLMENT_REQUIRED"
     },
     {
-      "id": "PC5_RESOURCE_BUDGET_AND_NODE",
-      "state": "MAIN_MEMORY_PRESSURE_NODE_ADMISSION_AND_RUNTIME_NOT_ACCEPTED"
+      "id": "PC5_SAFE_BUDGET_AND_NODE",
+      "state": "MEMORY_PRESSURE_NODE_ADMISSION_NOT_ACCEPTED"
     },
     {
-      "id": "FIVE_PC_FULL_RESOURCES_MANUAL_RENEWAL_RECONNECT",
-      "state": "NOT_ACCEPTED"
+      "id": "GPU_STORAGE_FIVE_PC_MANUAL_RENEWAL_OS_REBOOT",
+      "state": "NOT_ACCEPTED",
+      "threeCurrentNodeProcessReconnect": "ACTUALLY_VERIFIED_LIMITED_SCOPE"
     }
-  ]
+  ],
+  "RootOwnedThreeNodeProcessReconnect": {
+    "atKST": "2026-11-08T06:52:37+09:00",
+    "taskID": "FLEET5-THREE-EXACT-OWNED-IDLE-NODE-PROCESS-RECONNECT-20261108",
+    "managementBase": "cc0c56e0d10f85f222bd70e420eacaef7ba29a9b",
+    "owner": "Root Codex operator",
+    "implementationSource": "1efea494f026e932360c35ae811b6423d874a2e7",
+    "UIAcceptedSource": "abb7074e3da0d547ac81d3da33dce347d5c656af",
+    "priorActualUISourceReviewer": "Claude 29046535c0bb0e2629286c8c678f563080f30a67",
+    "newIndependentReviewOfThisOperatingAction": false,
+    "operatingObservationAtKST": "2026-11-08T06:49:35+09:00",
+    "actualThreeNodeProcessRestartAndRecoveryAccepted": true,
+    "nodes": [
+      {
+        "PC": 2,
+        "nodeId": "nod_01M6TGQZ8S3DAFS7TYE8TY1PX2",
+        "containerId": "fd4bdef2db94c434b740916d50fc0d3e80c5aa49bfe01f45b415f23877e03084",
+        "oldPID": 3396744,
+        "newPID": 3498919,
+        "newStartedAt": "2026-11-07T21:39:57.845745085Z",
+        "sameIdentityAndImage": true,
+        "allConfigCertificatePrivateKeyAndStateHashesUnchanged": true,
+        "comparedFileHashes": 8,
+        "actualHeartbeatAt": "2026-11-07T21:49:18.948228+00:00",
+        "observedHeartbeatAgeSeconds": 1.590492,
+        "restartsPerformed": 1,
+        "actualCPUAndMemoryReobserved": true,
+        "physicalOSReboot": false
+      },
+      {
+        "PC": 3,
+        "nodeId": "nod_01M6TAWG25JTA3F7J7S1EE4N2W",
+        "containerId": "702fa3fbc43e8deded94e67c6e5299eb4549958e074ba4aeb40c216db29752f7",
+        "oldPID": 603060,
+        "newPID": 692332,
+        "newStartedAt": "2026-11-07T21:49:20.986639356Z",
+        "sameIdentityAndImage": true,
+        "allConfigCertificatePrivateKeyAndStateHashesUnchanged": true,
+        "comparedFileHashes": 8,
+        "actualHeartbeatAt": "2026-11-07T21:49:25.625447+00:00",
+        "observedHeartbeatAgeSeconds": 2.228973,
+        "restartsPerformed": 1,
+        "actualCPUAndMemoryReobserved": true,
+        "physicalOSReboot": false
+      },
+      {
+        "PC": 4,
+        "nodeId": "nod_01M6TGSXV1J7XWC5D5H7N6EW1D",
+        "containerId": "e74fde5e18c65df59e3f19e4ba988c43ff27a3ff76021412eb71cc79957d489e",
+        "oldPID": 424480,
+        "newPID": 453802,
+        "newStartedAt": "2026-11-07T21:49:28.266847692Z",
+        "sameIdentityAndImage": true,
+        "allConfigCertificatePrivateKeyAndStateHashesUnchanged": true,
+        "comparedFileHashes": 8,
+        "actualHeartbeatAt": "2026-11-07T21:49:32.875491+00:00",
+        "observedHeartbeatAgeSeconds": 2.082764,
+        "restartsPerformed": 1,
+        "actualCPUAndMemoryReobserved": true,
+        "physicalOSReboot": false
+      }
+    ],
+    "finalOffered": {
+      "cpuMillis": 1500,
+      "memoryBytes": 201326592
+    },
+    "sameIdentityKeysCertificatesPoliciesAndStateHashes": true,
+    "PC2FirstRestartSuccessfulDespiteCLIWarning": true,
+    "PC2RestartReplayed": false,
+    "PC3AndPC4RestartedOnceEach": true,
+    "lostPrePasswordHelperStoppedOnlyAfterExactProcessAndNoOutputDirectoryProof": true,
+    "outputWarningAndPreMutationSyntaxErrorPreserved": true,
+    "physicalOSReboot": false,
+    "actualWorkloadExecuted": false,
+    "actualEnqueueOrVotes": false,
+    "MainProductExecution": false,
+    "PC1SSHKeyEnrollmentAndPC5SafeNodeAdmissionStillMissing": true,
+    "genuineTwoNonrequesterApproversAndValidCurrentProposalStillMissing": true,
+    "GPUStorageAllFivePCManualRenewalAndPhysicalOSRebootAcceptance": false,
+    "wholeProgramComplete": false
+  }
 }

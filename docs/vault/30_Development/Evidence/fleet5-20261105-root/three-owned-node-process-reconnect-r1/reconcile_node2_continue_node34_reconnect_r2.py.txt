@@ -1,0 +1,34 @@
+"""No PC2 replay: reconcile completed restart, then continue original untouched PC3/4 once."""
+import ast
+from pathlib import Path
+r=Path(__file__).resolve().parents[1];src=(r/'.work/verify_three_owned_node_process_reconnect_r1.py').read_text(encoding='utf-8');auth_source=(r/'.work/verify_new_api96_owner_pkce_r1.py').read_text(encoding='utf-8');setup=auth_source.split("\ntail=r'''",1)[0];ns={'__file__':str(__file__),'__name__':'__resume_setup__'};exec(compile(setup,str(__file__)+'-setup','exec'),ns)
+tree=ast.parse(src);tail=next(ast.literal_eval(n.value) for n in tree.body if isinstance(n,ast.Assign) and any(isinstance(t,ast.Name) and t.id=='tail' for t in n.targets))
+tail=tail.replace("dest=work/'three-owned-node-process-reconnect-r1'","dest=work/'three-owned-node-process-reconnect-r2-continuation'")
+a="assert len(initial['items'])==3 and all(x['status']=='online' for x in initial['items'])"
+assert a in tail;tail=tail.replace(a,"assert len(initial['items'])==3")
+a="assert q.returncode==0 and q.stdout.decode().strip()==target['CID']"
+b="lines=q.stdout.decode().strip().splitlines();assert q.returncode==0 and lines[-1]==target['CID'] and all(line=='Flag --time has been deprecated, use --timeout instead' for line in lines[:-1]);o['returnedCID']=lines[-1];o['knownCLIWarningLines']=lines[:-1];journal.write_text(json.dumps(o,indent=2)+'\\n')"
+assert a in tail;tail=tail.replace(a,b)
+anchor="    (dest/'remote-program.py.txt').write_text(remote,encoding='utf-8');results=[]"
+injection=r'''
+    pc2=json.loads((work/'three-node-reconnect-preflight-r1/PC2.json').read_bytes());target=pc2['target'];expected=pc2['remote']
+    inspect_program=(work/'three-node-reconnect-preflight-r1/remote-program.py.txt').read_text(encoding='utf-8').replace(" and v['State']['Running']",'')
+    q=subprocess.run(['ssh','-T',*flags,target['host'],'python3','-I','-B','-c',shlex.quote(inspect_program)],input=json.dumps(target).encode(),capture_output=True,timeout=25);assert q.returncode==0 and not q.stderr;actual=json.loads(q.stdout);(dest/'PC2-current-readonly-inspection.json').write_bytes((json.dumps(actual,indent=2)+'\n').encode())
+    q=subprocess.run(['ssh','-T',*flags,target['host'],'cat','/home/saintvision-invion/saintvision-share/ops-node-process-reconnect-20261108-r1/PC2.json'],capture_output=True,timeout=15);assert q.returncode==0 and not q.stderr;journal=json.loads(q.stdout);(dest/'PC2-original-completed-restart-journal.json').write_bytes(q.stdout)
+    assert journal['phase']=='ONE_DOCKER_RESTART_RETURNED' and journal['dockerRestartExit']==0
+    lines=journal['returnedCID'].splitlines();assert lines[-1]==target['CID'] and lines[:-1]==['Flag --time has been deprecated, use --timeout instead']
+    assert actual['CID']==expected['CID'] and actual['Running'] and actual['Pid']!=expected['Pid'] and actual['StartedAt']!=expected['StartedAt'] and actual['labels']==expected['labels'] and not actual['runningOwnedWorkloadContainers']
+    assert sorted(actual['mounts'],key=lambda m:m['Destination'])==sorted(expected['mounts'],key=lambda m:m['Destination'])
+    assert actual['readonlyConfigAndCertificateSHA256']==expected['readonlyConfigAndCertificateSHA256']
+    pc2_observations=[]
+    for n in range(15):
+        _,nodes=api('/v1/projects/'+account['project']+'/nodes');node=next(x for x in nodes['items'] if x['nodeId']==target['nodeId']);_,usage=api('/v1/projects/'+account['project']+'/nodes/'+node['nodeId']+'/resource-usage');age=(datetime.datetime.now(datetime.timezone.utc)-datetime.datetime.fromisoformat(node['lastHeartbeatAt'])).total_seconds();new=datetime.datetime.fromisoformat(node['lastHeartbeatAt'])>datetime.datetime.fromisoformat(actual['StartedAt'].replace('Z','+00:00'));entry={'status':node['status'],'ageSeconds':age,'heartbeatAt':node['lastHeartbeatAt'],'heartbeatNewerThanActualRestart':new,'resourcesMeasured':all(x['measured'] for x in usage['resources'])};pc2_observations.append(entry)
+        if node['status']=='online' and 0<=age<15 and new and entry['resourcesMeasured']:break
+        time.sleep(2)
+    else:raise RuntimeError('PC2 actual CP recovery not verified; no other restart allowed')
+    node2_entry={'PC':2,'nodeId':target['nodeId'],'originalRestartJournal':journal,'actualCurrentInspection':actual,'noSecondRestart':True,'CLIOutputWarningReconciled':True,'actualCPRecovery':pc2_observations};(dest/'PC2-CP-recovery-readonly-reconciled.json').write_bytes((json.dumps(node2_entry,indent=2)+'\n').encode());print(json.dumps({'PC':2,'phase':'ORIGINAL_RESTART_RECONCILED_NO_REPLAY_ONLINE_FRESH_MEASURED','ageSeconds':age}),flush=True)
+    (dest/'remote-program.py.txt').write_text(remote,encoding='utf-8');results=[node2_entry]
+'''
+assert anchor in tail;tail=tail.replace(anchor,injection)
+assert 'for pc in [2,3,4]:' in tail;tail=tail.replace('for pc in [2,3,4]:','for pc in [3,4]:')
+program=ns['head']+tail;ast.parse(program);(r/'.work/reconcile_node2_continue_node34_reconnect_expanded_r2.py.txt').write_text(program,encoding='utf-8');exec(compile(program,str(__file__),'exec'),{'__file__':str(__file__),'__name__':'__main__'})

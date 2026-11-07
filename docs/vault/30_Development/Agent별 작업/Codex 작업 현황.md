@@ -1,15 +1,19 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.496"
+version: "1.0.497"
 status: "review"
 author: "Codex"
-updated: "2026-11-08T06:27:40+09:00"
+updated: "2026-11-08T06:52:37+09:00"
 source_of_truth: "Git"
 active_card: "FLEET5 continued supervision with PORTAL-REFRESH-FLEET-20261106"
-active_card_status: "Actual3NodeResourceUIAccepted_GenuineFirstCPUIntentDraftFrozenApprovalPreparedV4Attempt0_InputActionBindingsReadBack_NoActualVotesOrExecution; ApprovalDeadlinePassed_PC1KeyAndPC5NodeFull5Pending"
-active_card_next: "Complete Root535 exact Docs/Obsidian, then continue on genuine approver identity/current signed decisions or PC1 local key enrollment/safe PC5 resource-budget change. Existing approval deadline passed; reconcile original Run/input/idempotent keys and use the supported current-proposal lifecycle without fake votes or automatic duplicate Run. Full GPU/storage/physical5/manual/renewal/reconnect/reboot remain. Current portal abb707 SSH57232; real3-node30s proof retained."
+active_card_status: "Actual3NodeProcessesRestartedOnceSameCIDIdentityPKIStateAndFreshResources; UI30sAccepted_RunNotExecutedExpiredApproval_PC1PC5FullFivePCPending"
+active_card_next: "Publish Root536 exact Docs and canonical Obsidian, then proceed only with remaining ready work and real prerequisite changes. No source correction/review pending; real 2-nonrequester identity/current approval, PC1 enrollment, safe PC5 Node, full GPU/storage/manual/renewal/physicalOS reboot remain. Existing three Node process reconnect actually verified; original formal hold gates unchanged."
 ---
+
+## 2026-11-08T06:52:37+09:00 실제 3대 Node 프로세스 재시작·같은 신원 복귀 검증
+
+실제2·3·4번의정확한Root소유유휴Node만순차1회씩재시작하고동일NodeID/CID/image·키/인증서/정책/상태hash불변과새PID·재시작이후fresh하트비트/CPU메모리재관측을확인했다. 06:49:35KST최종3ONLINE/미관측0/제공1500m·192MiB다. 2번명령exit0뒤Docker경고stdout을CID와같다고본검증기오류는원래journal·현재상태대조로해결했고2번재시작은반복하지않았다. 3·4번도각1회이며실제작업컨테이너0·OS재부팅0·새등록/키교체/정책floor초기화0이다. 실제Run은미실행이며기한이지난안건대신가짜승인/새Run을만들지않았다. PC1고정키등록/PC5안전예산·Node/진짜2승인자/GPUstorage·5대전체/manual/갱신·OS재부팅인수는남는다. 다음첫행동/담당은Root536정확Docs/Obsidian게시와Root의잔여진행가능카드점검이다. 새운영행위의실행자는Root이며기존Claude소스수락과구별하고이재시작에새독립검토가있었다고쓰지않는다.
 
 ## 2026-11-08T06:27:40+09:00 실제 첫 CPU Run 준비·durable readback·남은 실조건
 

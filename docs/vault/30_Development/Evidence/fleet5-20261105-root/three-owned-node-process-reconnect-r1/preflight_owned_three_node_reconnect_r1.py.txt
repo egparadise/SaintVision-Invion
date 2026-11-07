@@ -1,0 +1,30 @@
+"""Read-only exact-owned-container preflight; no restart or live configuration change."""
+import concurrent.futures,datetime,hashlib,json,shlex,subprocess
+from pathlib import Path
+r=Path(__file__).resolve().parents[1];out=r/'.work/three-node-reconnect-preflight-r1';assert not out.exists();out.mkdir()
+known=Path(r'D:\Project\SaintVisionI-Invion\fleet5-worker-readiness-20261105\.work\f5-low-closure-26607075f612\known_hosts.f5.pinned');assert hashlib.sha256(known.read_bytes()).hexdigest()=='0dcbf0f4cfc363e4affc30810ad8a9e57bd2c4a31991e2c8285bdae7052ec2d2'
+flags=['-i',r'C:\Users\inviz\.ssh\sv-lan-ed25519','-o','IdentitiesOnly=yes','-o','BatchMode=yes','-o','ConnectTimeout=5','-o','StrictHostKeyChecking=yes','-o','UserKnownHostsFile='+str(known)]
+targets=[{'PC':2,'host':'saintvision-invion@192.168.45.143','nodeId':'nod_01M6TGQZ8S3DAFS7TYE8TY1PX2','CID':'fd4bdef2db94c434b740916d50fc0d3e80c5aa49bfe01f45b415f23877e03084'},{'PC':3,'host':'saintvision-invion3@192.168.45.222','nodeId':'nod_01M6TAWG25JTA3F7J7S1EE4N2W','CID':'702fa3fbc43e8deded94e67c6e5299eb4549958e074ba4aeb40c216db29752f7'},{'PC':4,'host':'inviz@192.168.45.210','nodeId':'nod_01M6TGSXV1J7XWC5D5H7N6EW1D','CID':'e74fde5e18c65df59e3f19e4ba988c43ff27a3ff76021412eb71cc79957d489e'}]
+program=r'''import datetime,hashlib,json,os,subprocess,sys
+from pathlib import Path
+p=json.load(sys.stdin);q=subprocess.run(['docker','container','inspect',p['CID']],capture_output=True,timeout=10);assert q.returncode==0;v=json.loads(q.stdout)[0]
+assert v['Id']==p['CID'] and v['State']['Running'] and v['Image']=='sha256:de654cd385307ac7147baf6757a480f803361eb5b30d40c7991b272a6889d87f'
+labels={k:value for k,value in v['Config']['Labels'].items() if k.startswith('ai.saintvision.')}
+q=subprocess.run(['docker','ps','--filter','label=ai.saintvision.node='+p['nodeId'],'--filter','label=ai.saintvision.command','--format','{{.ID}}'],capture_output=True,timeout=10);assert q.returncode==0
+running=q.stdout.decode().splitlines();hashes={};mounts=[]
+for m in v['Mounts']:
+ mounts.append({k:m[k] for k in ['Type','Source','Destination','RW']})
+ if not m['RW']:
+  path=Path(m['Source']);files=[path] if path.is_file() else sorted(f for f in path.rglob('*') if f.is_file()) if path.is_dir() else []
+  assert len(files)<=128
+  for f in files:
+   assert not f.is_symlink() and f.stat().st_size<=1048576;hashes[str(f)]=hashlib.sha256(f.read_bytes()).hexdigest()
+o={'PC':p['PC'],'nodeId':p['nodeId'],'CID':v['Id'],'name':v['Name'],'image':v['Image'],'labels':labels,'Running':v['State']['Running'],'Pid':v['State']['Pid'],'StartedAt':v['State']['StartedAt'],'RestartCount':v['RestartCount'],'mounts':mounts,'readonlyConfigAndCertificateSHA256':hashes,'runningOwnedWorkloadContainers':running,'user':v['Config']['User'],'readonlyRoot':v['HostConfig']['ReadonlyRootfs'],'ownerPreflightOnly':True,'containerRestarted':False,'atKST':datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=9))).isoformat(timespec='seconds')};print(json.dumps(o))
+'''
+(out/'remote-program.py.txt').write_text(program,encoding='utf-8')
+def read(p):
+    q=subprocess.run(['ssh','-T',*flags,p['host'],'python3','-I','-B','-c',shlex.quote(program)],input=json.dumps(p).encode(),capture_output=True,timeout=25)
+    v={'target':p,'SSHExit':q.returncode,'stderrBytes':len(q.stderr),'remote':json.loads(q.stdout) if q.stdout else None};(out/('PC'+str(p['PC'])+'.json')).write_text(json.dumps(v,indent=2)+'\n',encoding='utf-8');assert q.returncode==0 and not q.stderr
+    return v
+with concurrent.futures.ThreadPoolExecutor(max_workers=3) as pool:results=list(pool.map(read,targets))
+summary={'atKST':datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=9))).isoformat(timespec='seconds'),'nodes':[x['remote'] for x in results],'restartsPerformed':0,'mainProductExecuted':False,'wholeProgramComplete':False};(out/'summary.json').write_text(json.dumps(summary,indent=2)+'\n',encoding='utf-8');print(json.dumps(summary),flush=True)

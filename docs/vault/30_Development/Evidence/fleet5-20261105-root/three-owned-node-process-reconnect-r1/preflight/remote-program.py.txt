@@ -1,0 +1,15 @@
+import datetime,hashlib,json,os,subprocess,sys
+from pathlib import Path
+p=json.load(sys.stdin);q=subprocess.run(['docker','container','inspect',p['CID']],capture_output=True,timeout=10);assert q.returncode==0;v=json.loads(q.stdout)[0]
+assert v['Id']==p['CID'] and v['State']['Running'] and v['Image']=='sha256:de654cd385307ac7147baf6757a480f803361eb5b30d40c7991b272a6889d87f'
+labels={k:value for k,value in v['Config']['Labels'].items() if k.startswith('ai.saintvision.')}
+q=subprocess.run(['docker','ps','--filter','label=ai.saintvision.node='+p['nodeId'],'--filter','label=ai.saintvision.command','--format','{{.ID}}'],capture_output=True,timeout=10);assert q.returncode==0
+running=q.stdout.decode().splitlines();hashes={};mounts=[]
+for m in v['Mounts']:
+ mounts.append({k:m[k] for k in ['Type','Source','Destination','RW']})
+ if not m['RW']:
+  path=Path(m['Source']);files=[path] if path.is_file() else sorted(f for f in path.rglob('*') if f.is_file()) if path.is_dir() else []
+  assert len(files)<=128
+  for f in files:
+   assert not f.is_symlink() and f.stat().st_size<=1048576;hashes[str(f)]=hashlib.sha256(f.read_bytes()).hexdigest()
+o={'PC':p['PC'],'nodeId':p['nodeId'],'CID':v['Id'],'name':v['Name'],'image':v['Image'],'labels':labels,'Running':v['State']['Running'],'Pid':v['State']['Pid'],'StartedAt':v['State']['StartedAt'],'RestartCount':v['RestartCount'],'mounts':mounts,'readonlyConfigAndCertificateSHA256':hashes,'runningOwnedWorkloadContainers':running,'user':v['Config']['User'],'readonlyRoot':v['HostConfig']['ReadonlyRootfs'],'ownerPreflightOnly':True,'containerRestarted':False,'atKST':datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=9))).isoformat(timespec='seconds')};print(json.dumps(o))

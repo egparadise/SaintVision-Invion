@@ -1,0 +1,161 @@
+{
+  "atKST": "2026-11-08T06:34:39+09:00",
+  "nodes": [
+    {
+      "PC": 2,
+      "nodeId": "nod_01M6TGQZ8S3DAFS7TYE8TY1PX2",
+      "CID": "fd4bdef2db94c434b740916d50fc0d3e80c5aa49bfe01f45b415f23877e03084",
+      "name": "/saintvision-nod_01M6TGQZ8S3DAFS7TYE8TY1PX2",
+      "image": "sha256:de654cd385307ac7147baf6757a480f803361eb5b30d40c7991b272a6889d87f",
+      "labels": {
+        "ai.saintvision.node": "nod_01M6TGQZ8S3DAFS7TYE8TY1PX2",
+        "ai.saintvision.owner": "root-cpu-1efea-r1"
+      },
+      "Running": true,
+      "Pid": 3396744,
+      "StartedAt": "2026-11-07T08:12:53.900599096Z",
+      "RestartCount": 0,
+      "mounts": [
+        {
+          "Type": "bind",
+          "Source": "/home/saintvision-invion/saintvision-share/nodes/nod_01M6TGQZ8S3DAFS7TYE8TY1PX2/state",
+          "Destination": "/state",
+          "RW": true
+        },
+        {
+          "Type": "bind",
+          "Source": "/var/run/docker.sock",
+          "Destination": "/var/run/docker.sock",
+          "RW": true
+        },
+        {
+          "Type": "bind",
+          "Source": "/home/saintvision-invion/saintvision-share/nodes/nod_01M6TGQZ8S3DAFS7TYE8TY1PX2",
+          "Destination": "/config",
+          "RW": false
+        }
+      ],
+      "readonlyConfigAndCertificateSHA256": {
+        "/home/saintvision-invion/saintvision-share/nodes/nod_01M6TGQZ8S3DAFS7TYE8TY1PX2/client-ca.pem": "b8d777ab04c65a44f827fdda9629d54a086e9ff8cc752b90a09023a93341c5a3",
+        "/home/saintvision-invion/saintvision-share/nodes/nod_01M6TGQZ8S3DAFS7TYE8TY1PX2/launch-signer.pub": "21baf6f95ff93c3a55b1fc2e01a134b8833d6fdeaac051126c9bed2b86df051b",
+        "/home/saintvision-invion/saintvision-share/nodes/nod_01M6TGQZ8S3DAFS7TYE8TY1PX2/node-cert.pem": "6d5d83d5418bc3e04c1d598ffceeaa77d38355b777c0b4c00eafee488893e360",
+        "/home/saintvision-invion/saintvision-share/nodes/nod_01M6TGQZ8S3DAFS7TYE8TY1PX2/node-key.pem": "4130555ab1a643c28ef5d5f2db8db2f19dd0f40e7a3591e770b8bf42fab47934",
+        "/home/saintvision-invion/saintvision-share/nodes/nod_01M6TGQZ8S3DAFS7TYE8TY1PX2/peer-policy.json": "f66ab039d1dca445f3fb4cd723d9b7ae237a6d470efce4a17440914972fa467a",
+        "/home/saintvision-invion/saintvision-share/nodes/nod_01M6TGQZ8S3DAFS7TYE8TY1PX2/state/.lock": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "/home/saintvision-invion/saintvision-share/nodes/nod_01M6TGQZ8S3DAFS7TYE8TY1PX2/state/.peer-policy": "99ea6a21c425cbb1f3d07f192d56bb2211c41d3a05342e7979e9ce84bc7534f9",
+        "/home/saintvision-invion/saintvision-share/nodes/nod_01M6TGQZ8S3DAFS7TYE8TY1PX2/state/identity.json": "5222a57e7f06a8879d532429b7205a3ae606e117c010e4bc020362d77bca6da5"
+      },
+      "runningOwnedWorkloadContainers": [],
+      "user": "1000:1000",
+      "readonlyRoot": true,
+      "ownerPreflightOnly": true,
+      "containerRestarted": false,
+      "atKST": "2026-11-08T06:34:39+09:00"
+    },
+    {
+      "PC": 3,
+      "nodeId": "nod_01M6TAWG25JTA3F7J7S1EE4N2W",
+      "CID": "702fa3fbc43e8deded94e67c6e5299eb4549958e074ba4aeb40c216db29752f7",
+      "name": "/saintvision-nod_01M6TAWG25JTA3F7J7S1EE4N2W",
+      "image": "sha256:de654cd385307ac7147baf6757a480f803361eb5b30d40c7991b272a6889d87f",
+      "labels": {
+        "ai.saintvision.node": "nod_01M6TAWG25JTA3F7J7S1EE4N2W",
+        "ai.saintvision.owner": "root-cpu-1efea-r1"
+      },
+      "Running": true,
+      "Pid": 603060,
+      "StartedAt": "2026-11-07T07:27:15.120567487Z",
+      "RestartCount": 0,
+      "mounts": [
+        {
+          "Type": "bind",
+          "Source": "/home/saintvision-invion3/saintvision-share/nodes/nod_01M6TAWG25JTA3F7J7S1EE4N2W",
+          "Destination": "/config",
+          "RW": false
+        },
+        {
+          "Type": "bind",
+          "Source": "/home/saintvision-invion3/saintvision-share/nodes/nod_01M6TAWG25JTA3F7J7S1EE4N2W/state",
+          "Destination": "/state",
+          "RW": true
+        },
+        {
+          "Type": "bind",
+          "Source": "/var/run/docker.sock",
+          "Destination": "/var/run/docker.sock",
+          "RW": true
+        }
+      ],
+      "readonlyConfigAndCertificateSHA256": {
+        "/home/saintvision-invion3/saintvision-share/nodes/nod_01M6TAWG25JTA3F7J7S1EE4N2W/client-ca.pem": "b8d777ab04c65a44f827fdda9629d54a086e9ff8cc752b90a09023a93341c5a3",
+        "/home/saintvision-invion3/saintvision-share/nodes/nod_01M6TAWG25JTA3F7J7S1EE4N2W/launch-signer.pub": "21baf6f95ff93c3a55b1fc2e01a134b8833d6fdeaac051126c9bed2b86df051b",
+        "/home/saintvision-invion3/saintvision-share/nodes/nod_01M6TAWG25JTA3F7J7S1EE4N2W/node-cert.pem": "f872ee0f4cb536e38feeb22e23f2b51661b10a4ba142864bfe855ed14f44bc3b",
+        "/home/saintvision-invion3/saintvision-share/nodes/nod_01M6TAWG25JTA3F7J7S1EE4N2W/node-key.pem": "e8bd713f40a5353e3edc7c274bb0c5a294ef8dad667e0d9f0fdf6b8f715e6a86",
+        "/home/saintvision-invion3/saintvision-share/nodes/nod_01M6TAWG25JTA3F7J7S1EE4N2W/peer-policy.json": "e1ba25f98623dd8aef049fde58172e21603754ec4ee493085ec01031b1f06ce8",
+        "/home/saintvision-invion3/saintvision-share/nodes/nod_01M6TAWG25JTA3F7J7S1EE4N2W/state/.lock": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "/home/saintvision-invion3/saintvision-share/nodes/nod_01M6TAWG25JTA3F7J7S1EE4N2W/state/.peer-policy": "7cd80791f213d8aec1365052a1acb59703dc4cf797015a80bf9cd922c0903236",
+        "/home/saintvision-invion3/saintvision-share/nodes/nod_01M6TAWG25JTA3F7J7S1EE4N2W/state/identity.json": "3e2eda36597205debe666a136873803576c75504f1d42420b5dff4861dff97d3"
+      },
+      "runningOwnedWorkloadContainers": [],
+      "user": "1000:1000",
+      "readonlyRoot": true,
+      "ownerPreflightOnly": true,
+      "containerRestarted": false,
+      "atKST": "2026-11-08T06:34:39+09:00"
+    },
+    {
+      "PC": 4,
+      "nodeId": "nod_01M6TGSXV1J7XWC5D5H7N6EW1D",
+      "CID": "e74fde5e18c65df59e3f19e4ba988c43ff27a3ff76021412eb71cc79957d489e",
+      "name": "/saintvision-nod_01M6TGSXV1J7XWC5D5H7N6EW1D",
+      "image": "sha256:de654cd385307ac7147baf6757a480f803361eb5b30d40c7991b272a6889d87f",
+      "labels": {
+        "ai.saintvision.node": "nod_01M6TGSXV1J7XWC5D5H7N6EW1D",
+        "ai.saintvision.owner": "root-cpu-1efea-r1"
+      },
+      "Running": true,
+      "Pid": 424480,
+      "StartedAt": "2026-11-07T08:12:57.486428251Z",
+      "RestartCount": 0,
+      "mounts": [
+        {
+          "Type": "bind",
+          "Source": "/home/inviz/saintvision-share/nodes/nod_01M6TGSXV1J7XWC5D5H7N6EW1D",
+          "Destination": "/config",
+          "RW": false
+        },
+        {
+          "Type": "bind",
+          "Source": "/home/inviz/saintvision-share/nodes/nod_01M6TGSXV1J7XWC5D5H7N6EW1D/state",
+          "Destination": "/state",
+          "RW": true
+        },
+        {
+          "Type": "bind",
+          "Source": "/var/run/docker.sock",
+          "Destination": "/var/run/docker.sock",
+          "RW": true
+        }
+      ],
+      "readonlyConfigAndCertificateSHA256": {
+        "/home/inviz/saintvision-share/nodes/nod_01M6TGSXV1J7XWC5D5H7N6EW1D/client-ca.pem": "b8d777ab04c65a44f827fdda9629d54a086e9ff8cc752b90a09023a93341c5a3",
+        "/home/inviz/saintvision-share/nodes/nod_01M6TGSXV1J7XWC5D5H7N6EW1D/launch-signer.pub": "21baf6f95ff93c3a55b1fc2e01a134b8833d6fdeaac051126c9bed2b86df051b",
+        "/home/inviz/saintvision-share/nodes/nod_01M6TGSXV1J7XWC5D5H7N6EW1D/node-cert.pem": "cde79d8c5b0dffe16982be314a75af5b66b04ca36fa9b75de46b0e8ddaddb664",
+        "/home/inviz/saintvision-share/nodes/nod_01M6TGSXV1J7XWC5D5H7N6EW1D/node-key.pem": "a14cd4af181835eff549b90359b70778fd75a26ed067656c1a5f2e5d08936ea4",
+        "/home/inviz/saintvision-share/nodes/nod_01M6TGSXV1J7XWC5D5H7N6EW1D/peer-policy.json": "54751b1903acbf69978be206dee13aa98e05c0757f2d929762dfae8b78e45ab8",
+        "/home/inviz/saintvision-share/nodes/nod_01M6TGSXV1J7XWC5D5H7N6EW1D/state/.lock": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "/home/inviz/saintvision-share/nodes/nod_01M6TGSXV1J7XWC5D5H7N6EW1D/state/.peer-policy": "1ac2b7394ddee3ed11b27db1a8ccccf216011fa60153beedcd5119dcdec15ba5",
+        "/home/inviz/saintvision-share/nodes/nod_01M6TGSXV1J7XWC5D5H7N6EW1D/state/identity.json": "1c8de5287099701e30e11878ee78e7b7848002471f9551738d842cbe515d8dd9"
+      },
+      "runningOwnedWorkloadContainers": [],
+      "user": "1000:1000",
+      "readonlyRoot": true,
+      "ownerPreflightOnly": true,
+      "containerRestarted": false,
+      "atKST": "2026-11-08T06:34:39+09:00"
+    }
+  ],
+  "restartsPerformed": 0,
+  "mainProductExecuted": false,
+  "wholeProgramComplete": false
+}

@@ -1,0 +1,27 @@
+import datetime,hashlib,json,os,subprocess,sys,time
+from pathlib import Path
+p=json.load(sys.stdin);expected=p['remote'];target=p['target'];base=Path.home()/'saintvision-share'/'ops-node-process-reconnect-20261108-r1';base.mkdir(mode=0o700,exist_ok=True);journal=base/('PC'+str(target['PC'])+'.json');assert not journal.exists()
+def inspect():
+ q=subprocess.run(['docker','container','inspect',target['CID']],capture_output=True,timeout=10);assert q.returncode==0;v=json.loads(q.stdout)[0]
+ assert v['Id']==target['CID'] and v['Name']==expected['name'] and v['Image']==expected['image'] and v['Config']['Labels'].get('ai.saintvision.node')==target['nodeId'] and v['Config']['Labels'].get('ai.saintvision.owner')=='root-cpu-1efea-r1'
+ mounts=[{k:m[k] for k in ['Type','Source','Destination','RW']} for m in v['Mounts']];assert sorted(mounts,key=lambda m:m['Destination'])==sorted(expected['mounts'],key=lambda m:m['Destination'])
+ hashes={}
+ for m in mounts:
+  if not m['RW']:
+   path=Path(m['Source']);files=[path] if path.is_file() else sorted(f for f in path.rglob('*') if f.is_file()) if path.is_dir() else [];assert len(files)<=128
+   for f in files:assert not f.is_symlink() and f.stat().st_size<=1048576;hashes[str(f)]=hashlib.sha256(f.read_bytes()).hexdigest()
+ return v,hashes
+def jobs():
+ q=subprocess.run(['docker','ps','--filter','label=ai.saintvision.node='+target['nodeId'],'--filter','label=ai.saintvision.command','--format','{{.ID}}'],capture_output=True,timeout=10);assert q.returncode==0;return q.stdout.decode().splitlines()
+before,before_hash=inspect();assert before['State']['Running'] and before['State']['StartedAt']==expected['StartedAt'] and before['State']['Pid']==expected['Pid'] and jobs()==[]
+assert all(before_hash[name]==value for name,value in expected['readonlyConfigAndCertificateSHA256'].items() if '/state/' not in name)
+o={'PC':target['PC'],'CID':target['CID'],'nodeId':target['nodeId'],'phase':'PREPARED_ONE_RESTART_NOT_YET_SENT','beforePid':before['State']['Pid'],'beforeStartedAt':before['State']['StartedAt'],'beforeConfigAndStateHashes':before_hash,'runningOwnedWorkloadsBefore':[],'OSRebooted':False,'newNodeRegistered':False,'keysPoliciesFloorsRewrittenByRoot':False,'noBlindReplay':True};journal.write_text(json.dumps(o,indent=2)+'\n')
+q=subprocess.run(['docker','container','restart','--time','10',target['CID']],capture_output=True,timeout=30);o.update(phase='ONE_DOCKER_RESTART_RETURNED',dockerRestartExit=q.returncode,returnedCID=q.stdout.decode().strip(),stderrBytes=len(q.stderr));journal.write_text(json.dumps(o,indent=2)+'\n');lines=q.stdout.decode().strip().splitlines();assert q.returncode==0 and lines[-1]==target['CID'] and all(line=='Flag --time has been deprecated, use --timeout instead' for line in lines[:-1]);o['returnedCID']=lines[-1];o['knownCLIWarningLines']=lines[:-1];journal.write_text(json.dumps(o,indent=2)+'\n')
+for n in range(30):
+ after,after_hash=inspect()
+ if after['State']['Running'] and after['State']['Pid']>0 and after['State']['StartedAt']!=before['State']['StartedAt']:break
+ time.sleep(.25)
+else:raise RuntimeError('Owned Node did not restart within bound')
+assert jobs()==[] and after['State']['Pid']!=before['State']['Pid']
+assert all(after_hash[name]==value for name,value in before_hash.items() if '/state/' not in name)
+o.update(phase='SAME_OWNED_CONTAINER_PROCESS_RESTARTED_CONFIG_KEYS_CERTIFICATES_UNCHANGED',afterPid=after['State']['Pid'],afterStartedAt=after['State']['StartedAt'],dockerRestartCountBefore=before['RestartCount'],dockerRestartCountAfter=after['RestartCount'],afterConfigAndStateHashes=after_hash,stateFileHashesUnchanged={name:after_hash.get(name)==value for name,value in before_hash.items() if '/state/' in name},immutableConfigCertificatePrivateKeyHashesUnchanged=True,runningOwnedWorkloadsAfter=[],atKST=datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=9))).isoformat(timespec='seconds'));journal.write_text(json.dumps(o,indent=2)+'\n');print(json.dumps(o))

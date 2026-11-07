@@ -1,0 +1,362 @@
+{
+  "atKST": "2026-11-08T06:49:35+09:00",
+  "status": "THREE_OWNED_NODE_PROCESSES_ROLLING_RESTART_SAME_IDENTITIES_AND_REAL_OBSERVER_RECOVERY_VERIFIED",
+  "PCs": [
+    2,
+    3,
+    4
+  ],
+  "results": [
+    {
+      "PC": 2,
+      "nodeId": "nod_01M6TGQZ8S3DAFS7TYE8TY1PX2",
+      "originalRestartJournal": {
+        "PC": 2,
+        "CID": "fd4bdef2db94c434b740916d50fc0d3e80c5aa49bfe01f45b415f23877e03084",
+        "nodeId": "nod_01M6TGQZ8S3DAFS7TYE8TY1PX2",
+        "phase": "ONE_DOCKER_RESTART_RETURNED",
+        "beforePid": 3396744,
+        "beforeStartedAt": "2026-11-07T08:12:53.900599096Z",
+        "beforeConfigAndStateHashes": {
+          "/home/saintvision-invion/saintvision-share/nodes/nod_01M6TGQZ8S3DAFS7TYE8TY1PX2/client-ca.pem": "b8d777ab04c65a44f827fdda9629d54a086e9ff8cc752b90a09023a93341c5a3",
+          "/home/saintvision-invion/saintvision-share/nodes/nod_01M6TGQZ8S3DAFS7TYE8TY1PX2/launch-signer.pub": "21baf6f95ff93c3a55b1fc2e01a134b8833d6fdeaac051126c9bed2b86df051b",
+          "/home/saintvision-invion/saintvision-share/nodes/nod_01M6TGQZ8S3DAFS7TYE8TY1PX2/node-cert.pem": "6d5d83d5418bc3e04c1d598ffceeaa77d38355b777c0b4c00eafee488893e360",
+          "/home/saintvision-invion/saintvision-share/nodes/nod_01M6TGQZ8S3DAFS7TYE8TY1PX2/node-key.pem": "4130555ab1a643c28ef5d5f2db8db2f19dd0f40e7a3591e770b8bf42fab47934",
+          "/home/saintvision-invion/saintvision-share/nodes/nod_01M6TGQZ8S3DAFS7TYE8TY1PX2/peer-policy.json": "f66ab039d1dca445f3fb4cd723d9b7ae237a6d470efce4a17440914972fa467a",
+          "/home/saintvision-invion/saintvision-share/nodes/nod_01M6TGQZ8S3DAFS7TYE8TY1PX2/state/.lock": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "/home/saintvision-invion/saintvision-share/nodes/nod_01M6TGQZ8S3DAFS7TYE8TY1PX2/state/.peer-policy": "99ea6a21c425cbb1f3d07f192d56bb2211c41d3a05342e7979e9ce84bc7534f9",
+          "/home/saintvision-invion/saintvision-share/nodes/nod_01M6TGQZ8S3DAFS7TYE8TY1PX2/state/identity.json": "5222a57e7f06a8879d532429b7205a3ae606e117c010e4bc020362d77bca6da5"
+        },
+        "runningOwnedWorkloadsBefore": [],
+        "OSRebooted": false,
+        "newNodeRegistered": false,
+        "keysPoliciesFloorsRewrittenByRoot": false,
+        "noBlindReplay": true,
+        "dockerRestartExit": 0,
+        "returnedCID": "Flag --time has been deprecated, use --timeout instead\nfd4bdef2db94c434b740916d50fc0d3e80c5aa49bfe01f45b415f23877e03084",
+        "stderrBytes": 0
+      },
+      "actualCurrentInspection": {
+        "PC": 2,
+        "nodeId": "nod_01M6TGQZ8S3DAFS7TYE8TY1PX2",
+        "CID": "fd4bdef2db94c434b740916d50fc0d3e80c5aa49bfe01f45b415f23877e03084",
+        "name": "/saintvision-nod_01M6TGQZ8S3DAFS7TYE8TY1PX2",
+        "image": "sha256:de654cd385307ac7147baf6757a480f803361eb5b30d40c7991b272a6889d87f",
+        "labels": {
+          "ai.saintvision.node": "nod_01M6TGQZ8S3DAFS7TYE8TY1PX2",
+          "ai.saintvision.owner": "root-cpu-1efea-r1"
+        },
+        "Running": true,
+        "Pid": 3498919,
+        "StartedAt": "2026-11-07T21:39:57.845745085Z",
+        "RestartCount": 0,
+        "mounts": [
+          {
+            "Type": "bind",
+            "Source": "/home/saintvision-invion/saintvision-share/nodes/nod_01M6TGQZ8S3DAFS7TYE8TY1PX2",
+            "Destination": "/config",
+            "RW": false
+          },
+          {
+            "Type": "bind",
+            "Source": "/home/saintvision-invion/saintvision-share/nodes/nod_01M6TGQZ8S3DAFS7TYE8TY1PX2/state",
+            "Destination": "/state",
+            "RW": true
+          },
+          {
+            "Type": "bind",
+            "Source": "/var/run/docker.sock",
+            "Destination": "/var/run/docker.sock",
+            "RW": true
+          }
+        ],
+        "readonlyConfigAndCertificateSHA256": {
+          "/home/saintvision-invion/saintvision-share/nodes/nod_01M6TGQZ8S3DAFS7TYE8TY1PX2/client-ca.pem": "b8d777ab04c65a44f827fdda9629d54a086e9ff8cc752b90a09023a93341c5a3",
+          "/home/saintvision-invion/saintvision-share/nodes/nod_01M6TGQZ8S3DAFS7TYE8TY1PX2/launch-signer.pub": "21baf6f95ff93c3a55b1fc2e01a134b8833d6fdeaac051126c9bed2b86df051b",
+          "/home/saintvision-invion/saintvision-share/nodes/nod_01M6TGQZ8S3DAFS7TYE8TY1PX2/node-cert.pem": "6d5d83d5418bc3e04c1d598ffceeaa77d38355b777c0b4c00eafee488893e360",
+          "/home/saintvision-invion/saintvision-share/nodes/nod_01M6TGQZ8S3DAFS7TYE8TY1PX2/node-key.pem": "4130555ab1a643c28ef5d5f2db8db2f19dd0f40e7a3591e770b8bf42fab47934",
+          "/home/saintvision-invion/saintvision-share/nodes/nod_01M6TGQZ8S3DAFS7TYE8TY1PX2/peer-policy.json": "f66ab039d1dca445f3fb4cd723d9b7ae237a6d470efce4a17440914972fa467a",
+          "/home/saintvision-invion/saintvision-share/nodes/nod_01M6TGQZ8S3DAFS7TYE8TY1PX2/state/.lock": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "/home/saintvision-invion/saintvision-share/nodes/nod_01M6TGQZ8S3DAFS7TYE8TY1PX2/state/.peer-policy": "99ea6a21c425cbb1f3d07f192d56bb2211c41d3a05342e7979e9ce84bc7534f9",
+          "/home/saintvision-invion/saintvision-share/nodes/nod_01M6TGQZ8S3DAFS7TYE8TY1PX2/state/identity.json": "5222a57e7f06a8879d532429b7205a3ae606e117c010e4bc020362d77bca6da5"
+        },
+        "runningOwnedWorkloadContainers": [],
+        "user": "1000:1000",
+        "readonlyRoot": true,
+        "ownerPreflightOnly": true,
+        "containerRestarted": false,
+        "atKST": "2026-11-08T06:49:19+09:00"
+      },
+      "noSecondRestart": true,
+      "CLIOutputWarningReconciled": true,
+      "actualCPRecovery": [
+        {
+          "status": "online",
+          "ageSeconds": 1.590492,
+          "heartbeatAt": "2026-11-07T21:49:18.948228+00:00",
+          "heartbeatNewerThanActualRestart": true,
+          "resourcesMeasured": true
+        }
+      ]
+    },
+    {
+      "PC": 3,
+      "nodeId": "nod_01M6TAWG25JTA3F7J7S1EE4N2W",
+      "restart": {
+        "PC": 3,
+        "CID": "702fa3fbc43e8deded94e67c6e5299eb4549958e074ba4aeb40c216db29752f7",
+        "nodeId": "nod_01M6TAWG25JTA3F7J7S1EE4N2W",
+        "phase": "SAME_OWNED_CONTAINER_PROCESS_RESTARTED_CONFIG_KEYS_CERTIFICATES_UNCHANGED",
+        "beforePid": 603060,
+        "beforeStartedAt": "2026-11-07T07:27:15.120567487Z",
+        "beforeConfigAndStateHashes": {
+          "/home/saintvision-invion3/saintvision-share/nodes/nod_01M6TAWG25JTA3F7J7S1EE4N2W/client-ca.pem": "b8d777ab04c65a44f827fdda9629d54a086e9ff8cc752b90a09023a93341c5a3",
+          "/home/saintvision-invion3/saintvision-share/nodes/nod_01M6TAWG25JTA3F7J7S1EE4N2W/launch-signer.pub": "21baf6f95ff93c3a55b1fc2e01a134b8833d6fdeaac051126c9bed2b86df051b",
+          "/home/saintvision-invion3/saintvision-share/nodes/nod_01M6TAWG25JTA3F7J7S1EE4N2W/node-cert.pem": "f872ee0f4cb536e38feeb22e23f2b51661b10a4ba142864bfe855ed14f44bc3b",
+          "/home/saintvision-invion3/saintvision-share/nodes/nod_01M6TAWG25JTA3F7J7S1EE4N2W/node-key.pem": "e8bd713f40a5353e3edc7c274bb0c5a294ef8dad667e0d9f0fdf6b8f715e6a86",
+          "/home/saintvision-invion3/saintvision-share/nodes/nod_01M6TAWG25JTA3F7J7S1EE4N2W/peer-policy.json": "e1ba25f98623dd8aef049fde58172e21603754ec4ee493085ec01031b1f06ce8",
+          "/home/saintvision-invion3/saintvision-share/nodes/nod_01M6TAWG25JTA3F7J7S1EE4N2W/state/.lock": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "/home/saintvision-invion3/saintvision-share/nodes/nod_01M6TAWG25JTA3F7J7S1EE4N2W/state/.peer-policy": "7cd80791f213d8aec1365052a1acb59703dc4cf797015a80bf9cd922c0903236",
+          "/home/saintvision-invion3/saintvision-share/nodes/nod_01M6TAWG25JTA3F7J7S1EE4N2W/state/identity.json": "3e2eda36597205debe666a136873803576c75504f1d42420b5dff4861dff97d3"
+        },
+        "runningOwnedWorkloadsBefore": [],
+        "OSRebooted": false,
+        "newNodeRegistered": false,
+        "keysPoliciesFloorsRewrittenByRoot": false,
+        "noBlindReplay": true,
+        "dockerRestartExit": 0,
+        "returnedCID": "702fa3fbc43e8deded94e67c6e5299eb4549958e074ba4aeb40c216db29752f7",
+        "stderrBytes": 0,
+        "knownCLIWarningLines": [
+          "Flag --time has been deprecated, use --timeout instead"
+        ],
+        "afterPid": 692332,
+        "afterStartedAt": "2026-11-07T21:49:20.986639356Z",
+        "dockerRestartCountBefore": 0,
+        "dockerRestartCountAfter": 0,
+        "afterConfigAndStateHashes": {
+          "/home/saintvision-invion3/saintvision-share/nodes/nod_01M6TAWG25JTA3F7J7S1EE4N2W/client-ca.pem": "b8d777ab04c65a44f827fdda9629d54a086e9ff8cc752b90a09023a93341c5a3",
+          "/home/saintvision-invion3/saintvision-share/nodes/nod_01M6TAWG25JTA3F7J7S1EE4N2W/launch-signer.pub": "21baf6f95ff93c3a55b1fc2e01a134b8833d6fdeaac051126c9bed2b86df051b",
+          "/home/saintvision-invion3/saintvision-share/nodes/nod_01M6TAWG25JTA3F7J7S1EE4N2W/node-cert.pem": "f872ee0f4cb536e38feeb22e23f2b51661b10a4ba142864bfe855ed14f44bc3b",
+          "/home/saintvision-invion3/saintvision-share/nodes/nod_01M6TAWG25JTA3F7J7S1EE4N2W/node-key.pem": "e8bd713f40a5353e3edc7c274bb0c5a294ef8dad667e0d9f0fdf6b8f715e6a86",
+          "/home/saintvision-invion3/saintvision-share/nodes/nod_01M6TAWG25JTA3F7J7S1EE4N2W/peer-policy.json": "e1ba25f98623dd8aef049fde58172e21603754ec4ee493085ec01031b1f06ce8",
+          "/home/saintvision-invion3/saintvision-share/nodes/nod_01M6TAWG25JTA3F7J7S1EE4N2W/state/.lock": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "/home/saintvision-invion3/saintvision-share/nodes/nod_01M6TAWG25JTA3F7J7S1EE4N2W/state/.peer-policy": "7cd80791f213d8aec1365052a1acb59703dc4cf797015a80bf9cd922c0903236",
+          "/home/saintvision-invion3/saintvision-share/nodes/nod_01M6TAWG25JTA3F7J7S1EE4N2W/state/identity.json": "3e2eda36597205debe666a136873803576c75504f1d42420b5dff4861dff97d3"
+        },
+        "stateFileHashesUnchanged": {
+          "/home/saintvision-invion3/saintvision-share/nodes/nod_01M6TAWG25JTA3F7J7S1EE4N2W/state/.lock": true,
+          "/home/saintvision-invion3/saintvision-share/nodes/nod_01M6TAWG25JTA3F7J7S1EE4N2W/state/.peer-policy": true,
+          "/home/saintvision-invion3/saintvision-share/nodes/nod_01M6TAWG25JTA3F7J7S1EE4N2W/state/identity.json": true
+        },
+        "immutableConfigCertificatePrivateKeyHashesUnchanged": true,
+        "runningOwnedWorkloadsAfter": [],
+        "atKST": "2026-11-08T06:49:21+09:00"
+      },
+      "actualCPRecovery": [
+        {
+          "status": "online",
+          "heartbeatAt": "2026-11-07T21:49:18.925712+00:00",
+          "ageSeconds": 3.202168,
+          "heartbeatNewerThanActualProcessRestart": false,
+          "resourcesMeasured": true,
+          "resourceKinds": [
+            "cpu",
+            "memory"
+          ]
+        },
+        {
+          "status": "online",
+          "heartbeatAt": "2026-11-07T21:49:18.925712+00:00",
+          "ageSeconds": 5.927378,
+          "heartbeatNewerThanActualProcessRestart": false,
+          "resourcesMeasured": true,
+          "resourceKinds": [
+            "cpu",
+            "memory"
+          ]
+        },
+        {
+          "status": "online",
+          "heartbeatAt": "2026-11-07T21:49:25.625447+00:00",
+          "ageSeconds": 2.228973,
+          "heartbeatNewerThanActualProcessRestart": true,
+          "resourcesMeasured": true,
+          "resourceKinds": [
+            "cpu",
+            "memory"
+          ]
+        }
+      ]
+    },
+    {
+      "PC": 4,
+      "nodeId": "nod_01M6TGSXV1J7XWC5D5H7N6EW1D",
+      "restart": {
+        "PC": 4,
+        "CID": "e74fde5e18c65df59e3f19e4ba988c43ff27a3ff76021412eb71cc79957d489e",
+        "nodeId": "nod_01M6TGSXV1J7XWC5D5H7N6EW1D",
+        "phase": "SAME_OWNED_CONTAINER_PROCESS_RESTARTED_CONFIG_KEYS_CERTIFICATES_UNCHANGED",
+        "beforePid": 424480,
+        "beforeStartedAt": "2026-11-07T08:12:57.486428251Z",
+        "beforeConfigAndStateHashes": {
+          "/home/inviz/saintvision-share/nodes/nod_01M6TGSXV1J7XWC5D5H7N6EW1D/client-ca.pem": "b8d777ab04c65a44f827fdda9629d54a086e9ff8cc752b90a09023a93341c5a3",
+          "/home/inviz/saintvision-share/nodes/nod_01M6TGSXV1J7XWC5D5H7N6EW1D/launch-signer.pub": "21baf6f95ff93c3a55b1fc2e01a134b8833d6fdeaac051126c9bed2b86df051b",
+          "/home/inviz/saintvision-share/nodes/nod_01M6TGSXV1J7XWC5D5H7N6EW1D/node-cert.pem": "cde79d8c5b0dffe16982be314a75af5b66b04ca36fa9b75de46b0e8ddaddb664",
+          "/home/inviz/saintvision-share/nodes/nod_01M6TGSXV1J7XWC5D5H7N6EW1D/node-key.pem": "a14cd4af181835eff549b90359b70778fd75a26ed067656c1a5f2e5d08936ea4",
+          "/home/inviz/saintvision-share/nodes/nod_01M6TGSXV1J7XWC5D5H7N6EW1D/peer-policy.json": "54751b1903acbf69978be206dee13aa98e05c0757f2d929762dfae8b78e45ab8",
+          "/home/inviz/saintvision-share/nodes/nod_01M6TGSXV1J7XWC5D5H7N6EW1D/state/.lock": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "/home/inviz/saintvision-share/nodes/nod_01M6TGSXV1J7XWC5D5H7N6EW1D/state/.peer-policy": "1ac2b7394ddee3ed11b27db1a8ccccf216011fa60153beedcd5119dcdec15ba5",
+          "/home/inviz/saintvision-share/nodes/nod_01M6TGSXV1J7XWC5D5H7N6EW1D/state/identity.json": "1c8de5287099701e30e11878ee78e7b7848002471f9551738d842cbe515d8dd9"
+        },
+        "runningOwnedWorkloadsBefore": [],
+        "OSRebooted": false,
+        "newNodeRegistered": false,
+        "keysPoliciesFloorsRewrittenByRoot": false,
+        "noBlindReplay": true,
+        "dockerRestartExit": 0,
+        "returnedCID": "e74fde5e18c65df59e3f19e4ba988c43ff27a3ff76021412eb71cc79957d489e",
+        "stderrBytes": 0,
+        "knownCLIWarningLines": [
+          "Flag --time has been deprecated, use --timeout instead"
+        ],
+        "afterPid": 453802,
+        "afterStartedAt": "2026-11-07T21:49:28.266847692Z",
+        "dockerRestartCountBefore": 0,
+        "dockerRestartCountAfter": 0,
+        "afterConfigAndStateHashes": {
+          "/home/inviz/saintvision-share/nodes/nod_01M6TGSXV1J7XWC5D5H7N6EW1D/client-ca.pem": "b8d777ab04c65a44f827fdda9629d54a086e9ff8cc752b90a09023a93341c5a3",
+          "/home/inviz/saintvision-share/nodes/nod_01M6TGSXV1J7XWC5D5H7N6EW1D/launch-signer.pub": "21baf6f95ff93c3a55b1fc2e01a134b8833d6fdeaac051126c9bed2b86df051b",
+          "/home/inviz/saintvision-share/nodes/nod_01M6TGSXV1J7XWC5D5H7N6EW1D/node-cert.pem": "cde79d8c5b0dffe16982be314a75af5b66b04ca36fa9b75de46b0e8ddaddb664",
+          "/home/inviz/saintvision-share/nodes/nod_01M6TGSXV1J7XWC5D5H7N6EW1D/node-key.pem": "a14cd4af181835eff549b90359b70778fd75a26ed067656c1a5f2e5d08936ea4",
+          "/home/inviz/saintvision-share/nodes/nod_01M6TGSXV1J7XWC5D5H7N6EW1D/peer-policy.json": "54751b1903acbf69978be206dee13aa98e05c0757f2d929762dfae8b78e45ab8",
+          "/home/inviz/saintvision-share/nodes/nod_01M6TGSXV1J7XWC5D5H7N6EW1D/state/.lock": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "/home/inviz/saintvision-share/nodes/nod_01M6TGSXV1J7XWC5D5H7N6EW1D/state/.peer-policy": "1ac2b7394ddee3ed11b27db1a8ccccf216011fa60153beedcd5119dcdec15ba5",
+          "/home/inviz/saintvision-share/nodes/nod_01M6TGSXV1J7XWC5D5H7N6EW1D/state/identity.json": "1c8de5287099701e30e11878ee78e7b7848002471f9551738d842cbe515d8dd9"
+        },
+        "stateFileHashesUnchanged": {
+          "/home/inviz/saintvision-share/nodes/nod_01M6TGSXV1J7XWC5D5H7N6EW1D/state/.lock": true,
+          "/home/inviz/saintvision-share/nodes/nod_01M6TGSXV1J7XWC5D5H7N6EW1D/state/.peer-policy": true,
+          "/home/inviz/saintvision-share/nodes/nod_01M6TGSXV1J7XWC5D5H7N6EW1D/state/identity.json": true
+        },
+        "immutableConfigCertificatePrivateKeyHashesUnchanged": true,
+        "runningOwnedWorkloadsAfter": [],
+        "atKST": "2026-11-08T06:49:28+09:00"
+      },
+      "actualCPRecovery": [
+        {
+          "status": "online",
+          "heartbeatAt": "2026-11-07T21:49:25.612095+00:00",
+          "ageSeconds": 3.752807,
+          "heartbeatNewerThanActualProcessRestart": false,
+          "resourcesMeasured": true,
+          "resourceKinds": [
+            "cpu",
+            "memory"
+          ]
+        },
+        {
+          "status": "online",
+          "heartbeatAt": "2026-11-07T21:49:25.612095+00:00",
+          "ageSeconds": 6.384642,
+          "heartbeatNewerThanActualProcessRestart": false,
+          "resourcesMeasured": true,
+          "resourceKinds": [
+            "cpu",
+            "memory"
+          ]
+        },
+        {
+          "status": "online",
+          "heartbeatAt": "2026-11-07T21:49:32.875491+00:00",
+          "ageSeconds": 2.082764,
+          "heartbeatNewerThanActualProcessRestart": true,
+          "resourcesMeasured": true,
+          "resourceKinds": [
+            "cpu",
+            "memory"
+          ]
+        }
+      ]
+    }
+  ],
+  "finalNodes": {
+    "items": [
+      {
+        "nodeId": "nod_01M6TAWG25JTA3F7J7S1EE4N2W",
+        "status": "online",
+        "lastHeartbeatAt": "2026-11-07T21:49:32.872998+00:00"
+      },
+      {
+        "nodeId": "nod_01M6TGQZ8S3DAFS7TYE8TY1PX2",
+        "status": "online",
+        "lastHeartbeatAt": "2026-11-07T21:49:32.860869+00:00"
+      },
+      {
+        "nodeId": "nod_01M6TGSXV1J7XWC5D5H7N6EW1D",
+        "status": "online",
+        "lastHeartbeatAt": "2026-11-07T21:49:32.875491+00:00"
+      }
+    ]
+  },
+  "finalCapacity": {
+    "projectId": "prj_01M6NDBHVD2DZQ1Q38DCKN1XE3",
+    "totalOffered": {
+      "cpuMillis": 1500,
+      "memoryBytes": 201326592
+    },
+    "largestSingleNode": {
+      "cpuMillis": 500,
+      "memoryBytes": 67108864
+    },
+    "spareNow": {
+      "cpuMillis": 1500,
+      "memoryBytes": 201326592
+    },
+    "nodes": [
+      {
+        "nodeId": "nod_01M6TAWG25JTA3F7J7S1EE4N2W",
+        "offered": {
+          "cpuMillis": 500,
+          "memoryBytes": 67108864
+        },
+        "spare": {
+          "cpuMillis": 500,
+          "memoryBytes": 67108864
+        },
+        "measured": true
+      },
+      {
+        "nodeId": "nod_01M6TGQZ8S3DAFS7TYE8TY1PX2",
+        "offered": {
+          "cpuMillis": 500,
+          "memoryBytes": 67108864
+        },
+        "spare": {
+          "cpuMillis": 500,
+          "memoryBytes": 67108864
+        },
+        "measured": true
+      },
+      {
+        "nodeId": "nod_01M6TGSXV1J7XWC5D5H7N6EW1D",
+        "offered": {
+          "cpuMillis": 500,
+          "memoryBytes": 67108864
+        },
+        "spare": {
+          "cpuMillis": 500,
+          "memoryBytes": 67108864
+        },
+        "measured": true
+      }
+    ],
+    "unmeasuredNodes": [],
+    "note": "CPU/memory only; per-dimension maxima are not a joint fit or shared RAM. Snapshot estimates do not reserve capacity."
+  },
+  "physicalOSRebootClaim": false,
+  "actualUserWorkloadExecuted": false,
+  "mainProductExecution": false,
+  "keysPoliciesFloorsResetByRoot": false,
+  "wholeProgramComplete": false
+}
