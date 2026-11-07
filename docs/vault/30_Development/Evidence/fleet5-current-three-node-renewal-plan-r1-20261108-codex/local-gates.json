@@ -1,0 +1,73 @@
+[
+  {
+    "argv": [
+      "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+      "-B",
+      "tools/check_docs.py"
+    ],
+    "atKST": "2026-11-08T07:09:01.362906+09:00",
+    "exit": 0,
+    "stdout": "PASS: 24 original hashes, 1291 versioned documents, wiki links, 48 tasks, 12 outcomes, owner/reviewer/skills, dependency DAG.\r\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+      "-B",
+      "tools/check_ontology.py"
+    ],
+    "atKST": "2026-11-08T07:09:44.643009+09:00",
+    "exit": 0,
+    "stdout": "PASS: RDF parsing, defined terms, TTL/JSON-LD equivalence, 48 task mappings, positive SHACL, 4 rejected invalid fixtures, 4 competency queries, Obsidian mirrors.\r\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+      "-B",
+      "tools/check_doc_path_citations.py",
+      "--ratchet",
+      "--base-ref",
+      "abb7074e3da0d547ac81d3da33dce347d5c656af"
+    ],
+    "atKST": "2026-11-08T07:09:47.493549+09:00",
+    "exit": 0,
+    "stdout": "PASS check_doc_path_citations --ratchet: 290 broken citation(s), all in baseline, none stale, floor unchanged.\r\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+      "-B",
+      "tools/check_doc_single_source.py",
+      "--ratchet"
+    ],
+    "atKST": "2026-11-08T07:09:54.629652+09:00",
+    "exit": 0,
+    "stdout": "PASS check_doc_single_source --ratchet: 16 pairs, all in baseline, none stale.\r\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+      "-B",
+      "tools/sync_obsidian.py",
+      "--check"
+    ],
+    "atKST": "2026-11-08T07:09:55.022838+09:00",
+    "exit": 0,
+    "stdout": "CHECK: 5175 managed files, 2724 pending exports, 0 conflicts. No writes.\r\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "git",
+      "diff",
+      "--check"
+    ],
+    "atKST": "2026-11-08T07:10:20.889184+09:00",
+    "exit": 0,
+    "stdout": "",
+    "stderr": "warning: in the working copy of 'docs/vault/30_Development/Agent\ubcc4 \uc791\uc5c5/Codex \uc791\uc5c5 \ud604\ud669.md', CRLF will be replaced by LF the next time Git touches it\n"
+  }
+]

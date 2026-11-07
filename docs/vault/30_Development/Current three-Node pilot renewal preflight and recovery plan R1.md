@@ -1,0 +1,147 @@
+---
+doc_id: "PLAN-FLEET5-CURRENT-THREE-NODE-RENEWAL-R1"
+title: "Current three-Node pilot renewal preflight and recovery plan R1"
+version: "1.0.0"
+status: "review"
+author: "Codex"
+updated: "2026-11-08T07:09:01+09:00"
+source_of_truth: "Git"
+---
+
+# Decision and scope
+
+**HOLD: the current three-Node cohort cannot safely use the shipped normal renewal tooling as-is.** This is a nonexecuting plan, not a rotation implementation, operator authorization, certificate issuance or acceptance result. The read contracts and renewal primitives exist, but the signed-floor observer, installer, issuing-chain shape and CP authority binding do not cover this deployed cohort. No private input was inspected, no remote command/API/DB/Docker action was performed, and no new generation, nonce, certificate, receipt or runtime timestamp is supplied.
+
+Task FLEET5-CURRENT-THREE-NODE-RENEWAL-PREFLIGHT-PLAN-R1-20261108, task_8298b23be39f/ctx_cc3c139fd6e0; owner actual Orca Codex author. The independent reviewer must be one actual Claude dispatched later by Root; review has not happened. Branch agent/codex/fleet5-current-three-node-renewal-plan-r1-20261108 starts at exact abb7074e3da0d547ac81d3da33dce347d5c656af. Product, tests, tools, workflows, contracts and policies remain byte-identical to that base. Root536 management66b42d572b9ffe31134e191f57d07ca362f0d1af, Index1.0.536/Codex1.0.497/History1.0.145, is read-only current management. Read doc IDs/versions and hashes are in Evidence read-pins; agent-delivery1.1.0 and the Codex role/continuous governance apply. No older vault is exported.
+
+The sources have distinct meanings: live Node/runtime1efea494f026e932360c35ae811b6423d874a2e7; API96afd799d49717fd40e4ddabd538d82accbe1958/schema0068; accepted UIabb7074e3da0d547ac81d3da33dce347d5c656af. All source anchors below are pinned to the applicable full runtime/API SHA in source-contract-map.json and proved byte-identical at this plan's base. UI acceptance and the Root536 reconnect result are inherited evidence, not renewal tests. `operation-manifest.json` in the unique Evidence directory is the proposed nonexecuting operation record, not a vault page or runnable tool.
+
+## Current cohort and protected services
+
+Tenant97968b42-68aa-40ce-af5e-3a33e2fc2205, epochbcd581be-31b4-4aca-86e6-3ca31b69ed09, projectprj_01M6NDBHVD2DZQ1Q38DCKN1XE3. The frozen public setup and reconnect receipts are copied under this plan's unique Evidence/root-inputs; root-input-pins.json binds each original Root536 blob and copied bytes.
+
+| PC / Root-owned account and address | Node ID | Existing container ID |
+|---|---|---|
+| PC2 saintvision-invion@192.168.45.143 | nod_01M6TGQZ8S3DAFS7TYE8TY1PX2 | fd4bdef2db94c434b740916d50fc0d3e80c5aa49bfe01f45b415f23877e03084 |
+| PC3 saintvision-invion3@192.168.45.222 | nod_01M6TAWG25JTA3F7J7S1EE4N2W | 702fa3fbc43e8deded94e67c6e5299eb4549958e074ba4aeb40c216db29752f7 |
+| PC4 inviz@192.168.45.210 | nod_01M6TGSXV1J7XWC5D5H7N6EW1D | e74fde5e18c65df59e3f19e4ba988c43ff27a3ff76021412eb71cc79957d489e |
+
+Node image de654cd385307ac7147baf6757a480f803361eb5b30d40c7991b272a6889d87f, owner label ai.saintvision.owner=root-cpu-1efea-r1, profile cpu-pilot-1efea-r1, UID1000:1000, RO root, cap-drop ALL, no-new-privileges, LAN19443. Each account's ~/saintvision-share/nodes/NodeID is a read-only /config bind; its child state is the separate RW /state bind. Docker socket remains the existing explicitly bound local socket. Actual argv uses --state /state, /config/node-cert.pem, /config/node-key.pem, /config/client-ca.pem, /config/launch-signer.pub and /config/peer-policy.json. This is not the old /state/journal named-volume profile. Each observed offer is500m/67108864B, GPUfalse; these are limited offers, not physical machine totals.
+
+Protected and excluded from this worker's actions: Main3100 portalabb707 forward SSH57232 to PC3loop13103/container54fb6609646d7f57991b1ee04de0454117e8e71fd525e5e1f87afb6d052483c0; API96 PC3loop8080/container8d62139c2408dff910bbfb3a9b322be56520705a3f3e967ce74563cfe9cd3f28; observerb8a2f8f55e524837c4b7db14565ec5f960c4492bc3b9df6972e7f1f153c2aec5; Main API forward SSH51072, observer DB reverse SSH11396 and validation bridge SSH54896. No stop/reconfiguration/forward/container action is authorized by this document. A future CP TLS-context reload/replacement requires a separate Root-owned protected-service window and exact affected-process plan.
+
+Root536 verified each of the exact three idle Node processes restarted once, same CID/image/identity and all eight config/PKI/state hashes, with fresh CP recovery at06:49:35KST. PC2's successful restart despite a warning was reconciled and must not be replayed. This establishes process reconnect only, not OS reboot, key renewal, floor contents, actual work or admission of PC1/PC5. Historical setup peer version1 and unchanged opaque .peer-policy hashes do not substitute for fresh signed current floor metadata: current P, C and certificate transition generations remain null/unknown.
+
+## Timing from the genuine current setup
+
+| Bound | Current cohort evidence / interpretation |
+|---|---|
+| Peer-policy expiry | 2026-11-08T07:15:30Z = 2026-11-08 16:15:30KST; earliest known authority deadline |
+| Node and shared CP-client leaf expiry | 2026-11-09T07:15:30Z = 2026-11-09 16:15:30KST |
+| Dedicated pilot CA expiry | 2026-11-14T07:15:30Z = 2026-11-14 16:15:30KST |
+| Default48h leaf eligibility start, derived only | 2026-11-07T07:15:30Z = 2026-11-07 16:15:30KST; already in the default normal window |
+| Earliest authorized actual start | null/HOLD until code, hosted CI, separate actual review, Root private preflight and explicit operation release are satisfied |
+
+The two-day UI summary is advisory and covers DB Node-leaf expiry, not peer policy or CP client authority (`services/control-plane/src/inv/node_certificates.py:14`, :30). Normal tooling's default safety window48h is a configurable issuer precondition, not an execution scheduler (`tools/lan_pilot.py:3313`, :4147). Do not import old r5 dates, old renewer schedules or a six-day bootstrap assumption. The policy deadline precedes the leaves by24h. Root must reassess real UTC clocks/current bytes immediately before any future release; no clock change or backdating extends a gate.
+
+Reference normal bounds: Node-signed floor freshness120s, allowed future skew30s, exact safe versions1..9007199254740991, room for P+2/C+1 (`deploy/lan/peer_policy_phase.py:13`). Before each public policy write, remaining authority must be strictly greater than630s and no more than seven days minus30s (:123). The generator accepts leaf lifetime60..518400s, caps issuance at CA notAfter, and validates overlap strictly greater than630s and at most21600s; default14400s is not a selected execution value (`tools/lan_pilot.py:2055`, :2122; `tools/lan_pki.py:42`; `deploy/lan/worker_leaf_rotation.py:72`). Proposed next TTL/overlap/notBefore/notAfter remain null. A future reviewed adapter must preserve or tighten these bounds and validate all earlier old/next leaf/policy deadlines. Its planned completion budget plus safety margin must fit before the earliest current policy/leaf deadline and before the newly frozen overlap expiry. If that cannot be proved, normal rotation stays HOLD; expiry is not permission to clear floors or use legacy offline recovery.
+
+## Existing operation contracts and authority
+
+| Operation | Method/path or entry point | Authentication, input and limitation |
+|---|---|---|
+| Public project observations | GET /v1/projects/{project}/nodes, /node-certificates, /nodes/{node}/resource-usage, /capacity | Existing genuine user session and project grant; same-origin API96 routes, no-store certificate read; no caller-supplied risk/identity assertions. These responses do not expose P/current floor/CA/CP-client state. `services/control-plane/src/inv/app.py:719`; `services/control-plane/src/inv/node_certificates.py:42`. |
+| Existing waiting Run | GET /v1/projects/{project}/runs/run_01M6VXSMM9SV8MAB7K4B1YCRX8 | Same authorized principal/project; read only. Do not create, vote, prepare again or enqueue. API route `services/control-plane/src/inv/app.py:527`. |
+| Technical heartbeat | POST https://each-current-IP:19443/v1/heartbeats, application/json, exact NodeProbeInput {nonce:64-lowercase-hex} | CP mTLS leaf/key, explicit CA, TLS1.3, URI/DER/channel pins and fresh CP challenge; uses existing CP observer, not browser bearer and not a Node renewal API. CP probe creation/acceptance records DB state, so this is an operating observation, not a SELECT-only worker action. `services/control-plane/src/inv/observation.py:16`; `services/control-plane/src/inv/node_transport.py:87`; `services/node-agent/transport/server.go:55`. |
+| Actual signed peer floor | Local inv-node --observe-peer-policy-floor with exclusive flags and independently generated nonce; no HTTP endpoint | Node key signs M2:2 binding real serving PID/executable/cmdline/journal/identity/floor/current DER. CLI does not open/init the journal. Current CPU layout/profile is rejected; no runnable current-cohort command is supplied. `services/node-agent/cmd/inv-node/main.go:55`; `services/node-agent/transport/peer_floor.go:22`; `services/node-agent/runtime/peer_floor_linux.go:107`. |
+| Proposed normal prepare/install/stage/commit/finalize/retire | Existing lan_pilot and worker_leaf_rotation CLI/library primitives; no Idempotency-Key HTTP route | Require exact current authority registry, Node-owned same-key CSR, current signed M2, CA issuer/revocation input, Node install signature and CP commit signature. Normal batch requires exactly every active member. Current-cohort adaptation is missing. `tools/lan_pilot.py:2997`, :3282, :3540, :3619, :1962; `deploy/lan/worker_plain_rotation.py:95`, :191. |
+| Channel commit primitive | Internal operator-owned provision_channel; no browser renewal endpoint | Restricted provisioning actor/connection, exact Node/epoch/endpoint and DER-derived fingerprint, locked expected-version CAS C→C+1 and audit insertion. Runtime reads/locks and cannot provision; fresh_cpu_admission is new admission, not renewal and rejects collisions. `services/control-plane/src/inv/node_channels.py:151`; `services/control-plane/src/inv/fresh_cpu_admission.py:208`. |
+
+Retain each Node private key on its Node; obtain a CSR signed by that same key. Retain the existing CP-client key, CA key/chain identity and launch signer. Do not rotate keys, change CA, enroll a new Node, change epoch, add PC1/PC5, substitute a public key or transfer CP/CA/signer private material into Node mounts. Key compromise/authority replacement/cohort membership changes require separate reviewed recovery, not normal renewal. Root alone checks private handles and permissions later; every private handle in the proposed manifest is null. A human independent source reviewer is not a CA signer or a real Run approver. The cryptographic Node actor and CP actor must provide their distinct real signatures; no unsigned client success, Root-authored Node signature or fabricated person linkage is acceptable. The absent two genuine nonrequester Run approvers remain a separate unmet business gate.
+
+## Concrete missing implementation and smallest next task
+
+1. **Current serving layout/profile and ownership proof.** Go floor observation requires certificate/key in filepath.Dir(state), fixed ca.pem/signer.pub names and one of three lan-* profiles; current /state + /config/client-ca.pem/launch-signer.pub + cpu-pilot-1efea-r1 cannot satisfy it (`services/node-agent/transport/peer_floor.go:26`; `services/node-agent/runtime/peer_floor_linux.go:150`, :169). Executable proof also checks descriptor ownership against journal UID (:78); the current image build copies /inv-node with default root ownership (`deploy/lan/Dockerfile.node.remote:12`). Do not assume a UID1000 process proves executable-owner compatibility: Root must attest the actual descriptor metadata later. Python target validation requires stopped root-user, named state volume and /state/journal paths, and rejects the extra /config mount (`deploy/lan/worker_config.py:239`; `deploy/lan/worker_peer_floor.py:119`). Relabelling, moving journal files, fake argv, symlink mirrors, chmod/chown or enabling an obsolete renewer is not a fix.
+2. **Issuing authority mismatch.** Current public setup has the dedicated single pilot CA (public CA SHA256b8d777ab04c65a44f827fdda9629d54a086e9ff8cc752b90a09023a93341c5a3; Node/client direct issuer verification in Root receipts). Normal preparation requires exactly two CA certificates, root pathLen1 + intermediate pathLen0, and an encrypted external intermediate key/password (`tools/lan_pilot.py:397`, :1585). Do not synthesize an intermediate, repin trust or concatenate the same CA twice. A narrowly reviewed adapter must explicitly validate this exact already accepted single-CA authority and private signing custody, preserving signatures, EKU, SPIFFE, IP, lifetime, revocation and key retention. It must not make the generic two-chain verifier permissive.
+3. **Current authority registry and CP publication.** The current fresh-admission/operator setup is not proof of a settled legacy lan_pilot cohort/journal. Missing current C/P, revocation metadata, same-key CSRs and exact frozen CP/Node current public bytes must be obtained through Root-owned bounded observation; never generate a fake state directory or call init/enroll. Adaptation must bind the exact three existing rows/project/resources and already accepted CA, retain a distinct operation journal and enforce existing provisioning CAS/audit. The API and observer hold SSLContext loaded at construction (`services/control-plane/src/inv/node_transport.py:61`); replacing a CP-client file is not evidence that either live process switched. A reviewed CP-context refresh/replacement and protected-service window are required, covering the genuine observer and every affected CP client, with no portal/DB/SSH-forward side effects.
+
+Proposed next finite implementation card: **FLEET5-CURRENT-CPU-COHORT-RENEWAL-ADAPTER-R1**, owner Codex, independent actual Claude after final code/hosted CI. Deliver an explicit immutable current-cohort authority descriptor and read-only preflight first; extend signed serving proof and worker publication only for the exact UID1000 CPU split-bind profile, validated mount/owner/executable provenance and single pinned pilot CA. Preserve old profile refusal/semantics, M2 canonical bytes and signatures unless an explicit versioned contract change is reviewed; never assert plainServingProcess under an unsupported profile. Reuse C+1 CAS/P+1/P+2/receipt/archive machinery without runtime provisioning privileges. Add bounded CP TLS-context switching and end-to-end uncertain/crash reconciliation. No DB schema or generic policy relaxation is proposed by this plan.
+
+Mandatory hosted proofs before Root execution: actual Go current-profile signed floor and wrong profile/UID/path/executable/journal/nonce controls; actual Linux Docker UID1000 RO/config + RW/state file/atomic visibility, mount alias/link/TOCTOU refusal; exact single-CA positive and wrong/revoked/expired/extra-chain/key mismatch negatives; at least two complete shared-client three-member cycles with independent P/C values, duplicate/replayed/unknown delivery, CAS races, kill points before/after each publication and committed floor; no-rotation abort and irreversible-floor rollback rejection; real CP-client context replacement and stale-context refusal. Preserve security gates, old tests, keys/journals/archives, schema0068/AC11 and business quorum. Exact affected hosted CI/artifacts plus one actual source review are mandatory. If changing Go is necessary, the running image cannot be amended in place; any new image/CID/process migration must itself be separately scoped, reviewed, proven identity/journal-preserving and explicitly released by Root. This plan authorizes neither that migration nor its deployment.
+
+## Nonexecuting Root preflight templates
+
+Only after plan review, Root may select an actual read-only inspection window and inspect private material without exposing it. Templates below are not commands run by this worker. No credential/token/key bytes belong in reports.
+
+```text
+PROPOSED_ROOT_PREFLIGHT_ONLY:
+  assert exact tenant/epoch/project and exactly PC2/PC3/PC4 Node IDs, CIDs,
+         image, owner labels, UID, argv, bind dev/inode/ownership/modes,
+         no concurrent renewal/migration writer or unexplained .next residue
+  read metadata only; do not dump Docker Env or private key contents
+  compare all eight configuration/state hashes with Root536 and explain changes
+  assert no running workload, lease/in-flight dispatch or active receipt obligation
+  GET existing project nodes/certificates/resources/capacity and waiting Run
+  verify Root-only private CA/client/key handles and CSR key continuity locally
+  CURRENT_M2 = unsupported until reviewed current-profile proof exists => HOLD
+  CURRENT_CHANNEL_VERSION = authoritative Root read, not admission-history guess
+  if any output unknown: preserve exact state and return HOLD, no prepare/write/restart
+```
+
+Root's proposed credential-free SQL shape, executed later only in an existing authorized READ ONLY transaction with the genuine tenant context:
+
+```sql
+BEGIN TRANSACTION ISOLATION LEVEL REPEATABLE READ READ ONLY;
+SET LOCAL inv.tenant_id = '97968b42-68aa-40ce-af5e-3a33e2fc2205';
+SELECT tenant_id,node_id,recovery_epoch,version,endpoint,
+       certificate_sha256,certificate_not_after,enabled
+FROM inv.node_channels
+WHERE tenant_id='97968b42-68aa-40ce-af5e-3a33e2fc2205'
+  AND node_id IN ('nod_01M6TGQZ8S3DAFS7TYE8TY1PX2',
+                  'nod_01M6TAWG25JTA3F7J7S1EE4N2W',
+                  'nod_01M6TGSXV1J7XWC5D5H7N6EW1D')
+ORDER BY node_id;
+ROLLBACK;
+```
+
+Verify exactly three rows, current epoch, enabled=true, exact endpoints, expected DER fingerprints and real expiry. Owner-visible workload/lease/audit queries must use existing reviewed serving definitions, not an RLS-hidden false zero. A fresh independent32-byte nonce is created by Root on authorized compute for each proof obligation and bound before delivery; neither this document nor opaque restart hashes can supply the actual floor. M2 verification must bind actual serving PID, start identity, executable descriptor digest, cmdline digest, journal identity/UID, exact floor/policy hash, scope, current valid leaf and signature. No simulated helper, stale nonce, host policy mirror, CPU GET, TLS200 or UI trust summary replaces this proof.
+
+## Conditional future phase sequence, all NOT_RUN
+
+This is the target contract for the missing adapter, not an instruction to invoke legacy tools on current Nodes. Candidate canary order is PC2→PC4→PC3, one Node at a time, to leave the host carrying API/observer/portal until last; all three are members of the same shared-client batch and must pass preflight before the first publication. Root must freeze enough idle time and protected dependencies; a changed member set, job, identity, image or transport cancels release.
+
+| Phase | Required input and transition | Evidence / stop condition |
+|---|---|---|
+| 0 Freeze and preflight | All prerequisites above; actual generations C_i/P_i remain unknown until verified, independent for each Node. No rotation outputs yet. | Persist read-only public evidence and distinct operation ID only after authorization; no guessed generation. Missing proof, remaining lifetime/budget or independent review stops here. |
+| 1 Prepare public batch | Same-key signed CSRs for exactly three members, pinned current CA/client/Node bytes, current unrevoked authority, fresh nonces/M2s and locked CP metadata. Preserve Node/CP/CA/launch keys. | Freeze exact proposal bytes/digests, current and next DERs, P_i+1 overlap and P_i+2 final policies, C_i+1 CAS targets, safe expiry and exact membership. Signed CP proposal, no private key transfer. |
+| 2 Durable install and observe | Before any file changes, write/fsync exact forward-only publication intent and immutable predecessor references. Per Node, validate strict owned regular paths, prepare/verify exact public leaf and overlap policy, publish same-filesystem atomic file replacements in the stable mounted directory. | Writes are per-file atomic, not a multi-file transaction. Journal records partial order; Node daemon/observer may see a new policy immediately. Preserve unknown/stale .next evidence. Require fresh actual post-publication proof and signed install receipt, not process exit/online alone. Node key remains unchanged. |
+| 3 Stage current channel | For each proved Node install, restricted operator CAS C_i→C_i+1 binds its new actual leaf; verify durable audit and exact receipt. | All three current rows must be staged and match before switching shared CP client. Old CP client remains available only within valid overlap/leaf bounds. CP pin mismatch may make a transient probe fail; never fake healthy status or launch work to test it. |
+| 4 Switch CP client and verify | Atomically publish exactly frozen CP leaf retaining CP key; Root uses reviewed context replacement for all affected CP clients in its protected window. | New verified TLS1.3 handshakes with exact new shared client to all three staged Node leaves; stale context/unknown outcome stops further progress. Do not restart DB/portal/SSH forwards. |
+| 5 Finalize each Node | Only exact signed CP commit receipt permits final policy P_i+2, removing old CP fingerprint. Prove actual final floor and original key/identity/journal. | Independent Node signed finalization/attestation and no-overwrite archive per member; no restart is inferred from filename/exit code. Existing normal tools require phase restart; any current-profile reload alternative needs explicit proof/review. No physical OS reboot is involved. |
+| 6 Retire batch and observe | Verify all three unique signed finalization attestations/current C_i+1 and P_i+2, exact CP leaf and public bytes, settled journal/archives and no residue. | Immutable CP-signed retirement archive; only then terminal settled phase. Reobserve heartbeat and measured offered CPU/memory from CP newer than the transition and unchanged project/identity/offers. UI observations are supporting evidence, not quorum/work/whole-fleet acceptance. |
+
+The Node already uses dynamic GetCertificate and reads/validates peer policy during authorization, while CA roots and CP client SSLContext are constructed once (`services/node-agent/transport/trust.go:50`, :133; `services/control-plane/src/inv/node_transport.py:61`). Do not assume every file needs or avoids restart. The future adapter must bind exact process/reload ordering and active certificate use. Existing accepted normal protocol's restart/ack sequence cannot be silently replaced with hot reload. No Node restart in this plan is executed or copied from Root536's prior one-time reconnect proof.
+
+## Atomicity, idempotency and uncertain outcomes
+
+Exact operation/proposal bytes plus stable batch/rotation identity and original input digests govern retries; no fabricated HTTP Idempotency-Key or new operation ID after uncertainty. Verify current phase, journal, Node M2, CP CAS row/audit, exact active file bytes and original receipts before choosing an exact replay. C and P are separate monotone domains: never derive one from the other or assume equal starting values (`deploy/lan/peer_policy_phase.py:87`). Same-version/different-policy-hash and any lower P fail (`services/node-agent/runtime/journal.go:339`); channel writes require the locked expected version and audited C+1 (`services/control-plane/src/inv/node_channels.py:151`).
+
+Future adapter path requirements: owned regular files and nonredirected parent directories, O_NOFOLLOW/descriptor identity checks, exact bounded input lengths and hashes, no foreign/hardlink/symlink substitution, exclusive per-operation lock, no cross-filesystem rename, staging written with restrictive mode then file fsync/atomic rename/parent fsync, no replacement of the mounted directory itself, and no deletion of unknown staging/history. The stable host directory must remain the same bind source so file replacement is actually visible inside /config. Preserve /state journal identity/locks and independent floor, owner UID1000 and existing mount isolation. A successful write must be verified from the actual container view, not a host mirror. Existing atomic helper is a per-file primitive, not an authorization to clear current-cohort residue (`deploy/lan/worker_leaf_rotation.py:466`).
+
+CP CAS may succeed before receipt/file publication or network acknowledgement. Reconcile readback and original signed journal/receipt; do not increment again, restore the DB row or substitute a new certificate. A timed-out restart may already have occurred: reconcile exact CID/PID/start identity/phase before any replay, as Root536's PC2 warning demonstrates. A signed install receipt alone is not all-member finalization; retirement requires each Node's unique final attestation and exact no-overwrite archives. Retain original JSON bytes, encoding and line endings. Missing/expired/partial/unequal/foreign evidence remains HOLD. Legacy recovery commands require a matching historical batch and their own authorization; they are not a generic current-cohort expiry bypass.
+
+## No-rotation abort, irreversible floors and recovery
+
+Before publication intent and before any authority mutation, the rollback choice is **no rotation**: leave active certs/policies/keys, C/P floors, journals, containers and services untouched. Preserve staged public proposals/failed evidence for audit; do not start a scheduler. Even a cleanly prepared batch does not require execution. If this task finishes with blockers, that is the delivered plan outcome.
+
+Once publication intent exists, restoring older leaf/policy bytes is prohibited even if the old leaf has time left (`deploy/lan/worker_plain_rotation.py:264`). Node policy authorization pins the floor before checking policy expiry (`services/node-agent/transport/trust.go:72`): even a denied connection after a bad policy publication can have irreversibly advanced P. An HTTP failure, failed process start or absent receipt cannot prove that no floor advanced. Do not decrement C/P, delete .peer-policy/identity/locks/journals, swap old snapshots into /state, clear revocation/fences or reinitialize the epoch. Runtime antirollback is a protected dependency, not a rollback knob.
+
+Forward recovery first freezes the exact uncertain phase and all remaining authority; Root inspects real current state. A still-valid exact publication may resume only via its reviewed current-profile replay after proving actual bound files/process/floor and CP state, using new observation nonce but original immutable operation/receipt bytes. If authority expired, mismatched keys/member/image/CA, an unknown irreversible floor, missing archive or unprovable partial publication prevents that replay, stop and propose a separately reviewed offline forward-recovery contract with fresh explicit authorization. Do not use old expired certificates, old disabled renewers, force flags or a normal all3 command to regain authority. For this unsupported CPU profile that recovery adapter also does not yet exist. Retain all evidence and protect unaffected services; no automatic emergency renewal or rollback is proposed.
+
+## Delivery, next owner and unchanged gates
+
+Root alone owns canonical APPLY/SSH/credentials/operating actions. Full actual canonical start baseline575395B/SHA256ce2b8d11efab6cc12be57925b0f6504698ec6dbb49ece4ba8a584ef1c4a897b8 is captured and must match end and postCI CHECK bytes. Only source/Git/JSON/hash/docs metadata runs on Main; product/crypto/browser/compiler tests are NOT_RUN here. Metadata docs/ontology/path-citation-ratchet at exact abb707 base/single-source-ratchet/sync CHECK/diff require immediate exit0. Normal scoped commit/push and exact head Docs workflow_dispatch attempt1/unique correlation/all19 steps are the plan delivery evidence; postCI receipt/artifacts remain Root-ready to avoid self-reference. No Frontend/Core/Backend rerun or implementation claim follows from docs CI.
+
+First action/owner after worker release: Root verifies this plan's exact source/Docs/input/state proofs, resumes its canonical publication ownership and dispatches one genuinely separate Claude plan review. Next ready implementation is the bounded current CPU cohort adapter above; Root may gather a separately authorized private read-only preflight, but must not attempt rotation before the missing code, affected hosted CI, actual source review, private prerequisites and explicit operating release. The earliest known live authority deadline remains16:15:30KST on2026-11-08; no schedule or success before it is promised.
+
+The genuine Run run_01M6VXSMM9SV8MAB7K4B1YCRX8 remains awaiting_approval/v4/attempt0. Approval apr_01M6VXSPZ0252M2SJ8ZA5E11QE expired06:24:26KST; two distinct genuine nonrequester approvers are absent. No votes/enqueue/execution/new Run are authorized by renewal. PC1 fixed SSH key rejection, PC5 Main94.58%RAM/unadmitted Node, genuine manual screenreader/full GPU/storage/all5/physical OS reboot and renewal acceptance remain. CR90501 and CR-CSP02 remain CLOSED. Original19HOLD/discharges0/runtimeB0/A1-A16/H1-H7/H3EA/RDNULL_HOLD/raw7UNREGISTERED/A01-A40NOT_RUN; wholeProgramCompletefalse.
