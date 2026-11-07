@@ -1,0 +1,40 @@
+"""Reviewer serial local publication gates + canonical sync CHECK (argv only, shell=False, no apply/state write).
+
+Usage: python -B reviewer_gate_driver.py <base-ref> <out.txt> <scratch-dir>
+For EVERY sync CHECK call records the FULL canonical state file SHA256, byte length, parsed-JSON equality and
+"files" entry count immediately before and after. Stops at the first nonzero exit (immediate exit); later gates
+are then not run. Same shape as the H12 6d7 review driver (0761de18) and 703 review driver (7023992f) the 1efea review driver (6bd81ef0) and the reconcile-entry review driver (ee1facda), with a three-CPU pilot review log prefix; FULL state bytes before/after are also saved to scratch.
+"""
+import datetime, hashlib, json, subprocess, sys
+from pathlib import Path
+ROOT = Path(r'D:\Project\SaintVisionI-Invion\fleet5-fresh-cpu-reconcile-entry-review-20261107')
+ST = Path('D:/Project/SaintVision-Invion/SaintVisionI-Invion/.git/obsidian-sync-state.json')
+BASE = sys.argv[1]; OUT = Path(sys.argv[2]); SCR = Path(sys.argv[3])
+def kst(): return datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=9))).isoformat(timespec='milliseconds')
+def sha(b): return hashlib.sha256(b).hexdigest()
+py = lambda *a: [sys.executable, '-B', *a]
+sync = py('tools/sync_obsidian.py', '--check', '--state', ST.as_posix(), '--conflicts-out', str(SCR / 'tpc-sync-conflicts.json'))
+gates = [py('tools/check_docs.py'), py('tools/check_ontology.py'),
+         py('tools/check_doc_path_citations.py', '--ratchet', '--base-ref', BASE),
+         py('tools/check_doc_single_source.py', '--ratchet'), sync, ['git', 'diff', '--cached', '--check', BASE]]
+lines = ['Reviewer local gates, Windows, ' + sys.executable + ' ' + sys.version.split()[0] + ' -B, PYTHONUTF8=1, cwd=worktree root, serial; tree = ' + BASE[:8] + ' + own staged review History/Evidence only.',
+         'sync_obsidian is CHECK only with the canonical Root state; --conflicts-out goes to reviewer scratch. No apply/adopt/resolve/state write/export. Raw logs: scratch tpc-gate-NN.log, sha256 below.']
+worst = 0
+for i, g in enumerate(gates, 1):
+    if g is sync:
+        b0 = ST.read_bytes(); j0 = json.loads(b0)
+    a = kst(); r = subprocess.run(g, cwd=ROOT, stdout=subprocess.PIPE, stderr=subprocess.STDOUT); b = kst(); worst = max(worst, r.returncode)
+    if g is sync:
+        b1 = ST.read_bytes(); j1 = json.loads(b1)
+        (SCR / f'tpc-sync-state-before-{i:02d}.json').write_bytes(b0); (SCR / f'tpc-sync-state-after-{i:02d}.json').write_bytes(b1)
+    (SCR / f'tpc-gate-{i:02d}.log').write_bytes(r.stdout)
+    shown = ' '.join(['python -B'] * (g[0] == sys.executable) + ['<scratch>/' + Path(x).name if x.startswith(str(SCR)) else x for x in (g[2:] if g[0] == sys.executable else g)])
+    lines.append(f'{i:02d} {a}..{b} exit={r.returncode} logsha={sha(r.stdout)} :: {shown}')
+    if g is sync:
+        lines.append(f'    stateBefore {sha(b0)} len={len(b0)} files={len(j0.get("files", {}))}')
+        lines.append(f'    stateAfter  {sha(b1)} len={len(b1)} files={len(j1.get("files", {}))} byteEqual={b0 == b1} fullJSONEqual={j0 == j1}')
+    lines += ['    ' + t[:300] for t in r.stdout.decode('utf-8', 'replace').strip().splitlines()[-2:]]
+    if r.returncode != 0:
+        lines.append(f'STOPPED after gate {i:02d}; later gates not run'); break
+lines.append(f'worstExit={worst}')
+OUT.write_text('\n'.join(lines) + '\n', encoding='utf-8', newline='\n'); print('\n'.join(lines)); raise SystemExit(worst)

@@ -1,0 +1,623 @@
+{
+ "checks": {
+  "CA": {
+   "CA": true,
+   "SKI": "c9266086a104f7d40c374924d2fd0be414490c2b",
+   "notAfter": "2026-11-14T07:15:30+00:00",
+   "pemSHA256": "b8d777ab04c65a44f827fdda9629d54a086e9ff8cc752b90a09023a93341c5a3",
+   "pemSHA256EqualsPinnedCA_SHA256": true,
+   "sameCAPEMForPC2AndPC4": true,
+   "selfIssued": true,
+   "subjectCN": "SaintVision CPU pilot CA"
+  },
+  "CLI1efeaSHA256": "8129ab5acf7061b0bc1834aa1142ae944471b1b177f018c810de34ea9a53fe7d",
+  "CLIInsertsSysPath": true,
+  "CLIPinMatches1efea": true,
+  "CPClient": {
+   "CPClientURI": "spiffe://saintvision.ai/tenant/97968b42-68aa-40ce-af5e-3a33e2fc2205/control-plane/epoch/bcd581be-31b4-4aca-86e6-3ca31b69ed09",
+   "DER_SHA256": "48911c5ddf7d12f05b9866feea0f0005c193d76a956274e2510492d0c2f76481",
+   "signingReceiptClientDER": true
+  },
+  "api": {
+   "allPhysicalResourcesShared": false,
+   "anonymous": 401,
+   "browserSelectedProject": "NOT_OBSERVED",
+   "count": 3,
+   "maxHeartbeatAgeAtRead": 3.203073,
+   "nodeSetEqualsAdmitted": true,
+   "resourceIDsMatchRequests": {
+    "PC2": true,
+    "PC3": true,
+    "PC4": true
+   },
+   "sumCPU": 1500,
+   "sumMem": 201326592,
+   "totalsMatch": true
+  },
+  "continuity": {
+   "DBWrites": false,
+   "channelsEqualAdmitted": true,
+   "manualObserverCalls": 0,
+   "nodes": {
+    "PC2": {
+     "channelV1": true,
+     "heartbeatAdvanceSeconds": 7.636202,
+     "maxAge": 2.097241,
+     "noncesDistinct": true,
+     "online": true,
+     "physicalSnapshot": {
+      "cpuCapacityMillis": 12000,
+      "memoryCapacityBytes": 15938523136
+     },
+     "probeDelta": 1,
+     "snapshotIdentity": true
+    },
+    "PC3": {
+     "channelV1": true,
+     "heartbeatAdvanceSeconds": 7.627864,
+     "maxAge": 2.041114,
+     "noncesDistinct": true,
+     "online": true,
+     "physicalSnapshot": {
+      "cpuCapacityMillis": 12000,
+      "memoryCapacityBytes": 15938240512
+     },
+     "probeDelta": 1,
+     "snapshotIdentity": true
+    },
+    "PC4": {
+     "channelV1": true,
+     "heartbeatAdvanceSeconds": 7.726992,
+     "maxAge": 1.94276,
+     "noncesDistinct": true,
+     "online": true,
+     "physicalSnapshot": {
+      "cpuCapacityMillis": 12000,
+      "memoryCapacityBytes": 16480641024
+     },
+     "probeDelta": 1,
+     "snapshotIdentity": true
+    }
+   }
+  },
+  "entrySHA256": "42e89b6173cd9a8ad1cfa6998da30f068d6409e03e803b523bfb7f076576a3aa",
+  "imageBundle": {
+   "exportIDsEqualPC3Built": true,
+   "exportSHA256": "7f7b9d3b1f9eb44a85753a49d6d6283c1cf2f8d68b9c3f59f2bbdc7019795688",
+   "loadsMatchBundle": true,
+   "localSHA256Equal": true
+  },
+  "inventories": {
+   "entries": 41,
+   "mismatches": [
+    {
+     "blobBytes": 720,
+     "blobSHA256": "f199a6680367eb23a4ab98fd26f6b6e1389d2dec5477280d90dee9927f07db4a",
+     "crlfReconstructionMatchesPin": true,
+     "ok": false,
+     "path": "pc3-actual-cpu-pilot-r1/pc3-observer-tunnel-r1/start-receipt.json",
+     "pinnedBytes": 735,
+     "pinnedSHA256": "ecd66dcadcbf49fbeb3ed19390fa6bbb6925d358d3c64c198c6c8f0297c8db49"
+    }
+   ],
+   "ok": 40
+  },
+  "launchSigner": {
+   "equalsPC3LaunchPublicSHA256": true,
+   "rawLen": 32,
+   "sha256": "21baf6f95ff93c3a55b1fc2e01a134b8833d6fdeaac051126c9bed2b86df051b",
+   "singleValueForPC2PC4": true
+  },
+  "nodeServices": {
+   "PC2": {
+    "argvNodeMatches": true,
+    "argvSameExceptNode": true,
+    "capDrop": [
+     "ALL"
+    ],
+    "cpu": 500000000,
+    "hostIP": "192.168.45.143",
+    "hostIPMatchesEndpoint": true,
+    "image": "sha256:de654cd385307ac7147baf6757a480f803361eb5b30d40c7991b272a6889d87f",
+    "mem": 268435456,
+    "pids": 64,
+    "ro": true,
+    "sec": [
+     "no-new-privileges"
+    ],
+    "workload": "sha256:ffee58e8dbefc6c0db68810cd1597f8cc589cf01112c434ed7fda8d4af415634"
+   },
+   "PC3": {
+    "argvNodeMatches": true,
+    "argvSameExceptNode": true,
+    "capDrop": [
+     "ALL"
+    ],
+    "cpu": 500000000,
+    "hostIP": "192.168.45.222",
+    "hostIPMatchesEndpoint": true,
+    "image": "sha256:de654cd385307ac7147baf6757a480f803361eb5b30d40c7991b272a6889d87f",
+    "mem": 268435456,
+    "pids": 64,
+    "ro": true,
+    "sec": [
+     "no-new-privileges"
+    ],
+    "workload": "sha256:ffee58e8dbefc6c0db68810cd1597f8cc589cf01112c434ed7fda8d4af415634"
+   },
+   "PC4": {
+    "argvNodeMatches": true,
+    "argvSameExceptNode": true,
+    "capDrop": [
+     "ALL"
+    ],
+    "cpu": 500000000,
+    "hostIP": "192.168.45.210",
+    "hostIPMatchesEndpoint": true,
+    "image": "sha256:de654cd385307ac7147baf6757a480f803361eb5b30d40c7991b272a6889d87f",
+    "mem": 268435456,
+    "pids": 64,
+    "ro": true,
+    "sec": [
+     "no-new-privileges"
+    ],
+    "workload": "sha256:ffee58e8dbefc6c0db68810cd1597f8cc589cf01112c434ed7fda8d4af415634"
+   }
+  },
+  "nodeServicesSameImages": true,
+  "nodes": {
+   "PC2": {
+    "AKIequalsCASKI": true,
+    "APPLYChannelCertMatchesDER": true,
+    "APPLYCounts": [
+     {
+      "audit": 0,
+      "channels": 0,
+      "controls": 0,
+      "node": 0,
+      "project_links": 0,
+      "resources": 0
+     },
+     {
+      "audit": 1,
+      "channels": 1,
+      "controls": 1,
+      "node": 1,
+      "project_links": 1,
+      "resources": 2
+     },
+     1,
+     0,
+     "offline",
+     true
+    ],
+    "BCcritical": true,
+    "CA": false,
+    "CSR": {
+     "alg": "1.3.101.112",
+     "certKeyEqualsCSRKey": true,
+     "sha256Matches": true,
+     "subjectCN": "nod_01M6TGQZ8S3DAFS7TYE8TY1PX2",
+     "uris": [
+      "spiffe://saintvision.ai/tenant/97968b42-68aa-40ce-af5e-3a33e2fc2205/node/nod_01M6TGQZ8S3DAFS7TYE8TY1PX2/epoch/bcd581be-31b4-4aca-86e6-3ca31b69ed09"
+     ]
+    },
+    "DER_SHA256": "ec4b6be14dd8be8ec3eaecbf4b58a27cb567449931cf2e3668422f647eaaf415",
+    "EKU": [
+     "1.3.6.1.5.5.7.3.1"
+    ],
+    "endpoint": "https://192.168.45.143:19443",
+    "identityContract": true,
+    "installedPublicFileHashes": {
+     "client-ca.pem": true,
+     "launch-signer.pub": true,
+     "node-cert.pem": true,
+     "peer-policy.json": true,
+     "source": "r1-ack"
+    },
+    "ips": [
+     "192.168.45.143"
+    ],
+    "issuerCN": "SaintVision CPU pilot CA",
+    "node": "nod_01M6TGQZ8S3DAFS7TYE8TY1PX2",
+    "nodeDERSHA256Pinned": true,
+    "notAfter": "2026-11-09T07:15:30+00:00",
+    "notBefore": "2026-11-07T08:04:09+00:00",
+    "peerPolicy": {
+     "clientFingerprintsEqualCPClient": true,
+     "expiresAt": "2026-11-08T07:15:30Z",
+     "keys": [
+      "clientFingerprints",
+      "expiresAt",
+      "nodeId",
+      "recoveryEpoch",
+      "tenantId",
+      "version"
+     ],
+     "matchesPinned": true,
+     "node": true,
+     "sha256": "f66ab039d1dca445f3fb4cd723d9b7ae237a6d470efce4a17440914972fa467a",
+     "tenantEpoch": true
+    },
+    "planDigestMatchesAPPLY": true,
+    "planDigestMatchesPLAN": true,
+    "planDigestRecomputed": "afc7af4aa6e35335b4bcf1cfe047dad58d430989341fc6509116a25d13c3321f",
+    "requestFixedFields": true,
+    "requestSHA256MatchesPinned": true,
+    "requestSHA256Recomputed": "3135896b5826e8e9e90926ea4237ba2c41d197e9263094f62e2c3a8365a62f31",
+    "sigAlg": "1.3.101.112",
+    "signedPEMEqualsRequestDER": true,
+    "subjectCN": "nod_01M6TGQZ8S3DAFS7TYE8TY1PX2",
+    "uris": [
+     "spiffe://saintvision.ai/tenant/97968b42-68aa-40ce-af5e-3a33e2fc2205/node/nod_01M6TGQZ8S3DAFS7TYE8TY1PX2/epoch/bcd581be-31b4-4aca-86e6-3ca31b69ed09"
+    ]
+   },
+   "PC3": {
+    "AKIequalsCASKI": true,
+    "APPLYChannelCertMatchesDER": true,
+    "APPLYCounts": [
+     {
+      "audit": 0,
+      "channels": 0,
+      "controls": 0,
+      "node": 0,
+      "project_links": 0,
+      "resources": 0
+     },
+     {
+      "audit": 1,
+      "channels": 1,
+      "controls": 1,
+      "node": 1,
+      "project_links": 1,
+      "resources": 2
+     },
+     1,
+     0,
+     "offline",
+     true
+    ],
+    "BCcritical": true,
+    "CA": false,
+    "DER_SHA256": "f146cb95a863afbaa7e809616e745dec97dca947de56420ed70cd2f8d6c7f644",
+    "EKU": [
+     "1.3.6.1.5.5.7.3.1"
+    ],
+    "endpoint": "https://192.168.45.222:19443",
+    "identityContract": true,
+    "ips": [
+     "192.168.45.222"
+    ],
+    "issuerCN": "SaintVision CPU pilot CA",
+    "node": "nod_01M6TAWG25JTA3F7J7S1EE4N2W",
+    "nodeDERSHA256Pinned": true,
+    "notAfter": "2026-11-09T07:15:30+00:00",
+    "notBefore": "2026-11-07T07:10:30+00:00",
+    "peerPolicy": {
+     "expiresAt": "2026-11-08T07:15:30Z",
+     "sha256Pinned": "e1ba25f98623dd8aef049fde58172e21603754ec4ee493085ec01031b1f06ce8",
+     "version": 1
+    },
+    "planDigestMatchesAPPLY": true,
+    "planDigestMatchesPLAN": true,
+    "planDigestRecomputed": "95a6d6b50208e4951687e5465626bdd7fe4f0383d0104671b1e21c42275e70ac",
+    "requestFixedFields": true,
+    "requestSHA256MatchesPinned": true,
+    "requestSHA256Recomputed": "d830d0c82f00e8f4d2e74d881e319f20c61aac472f0cfd69f78a1af55287d59a",
+    "sigAlg": "1.3.101.112",
+    "subjectCN": "nod_01M6TAWG25JTA3F7J7S1EE4N2W",
+    "uris": [
+     "spiffe://saintvision.ai/tenant/97968b42-68aa-40ce-af5e-3a33e2fc2205/node/nod_01M6TAWG25JTA3F7J7S1EE4N2W/epoch/bcd581be-31b4-4aca-86e6-3ca31b69ed09"
+    ]
+   },
+   "PC4": {
+    "AKIequalsCASKI": true,
+    "APPLYChannelCertMatchesDER": true,
+    "APPLYCounts": [
+     {
+      "audit": 0,
+      "channels": 0,
+      "controls": 0,
+      "node": 0,
+      "project_links": 0,
+      "resources": 0
+     },
+     {
+      "audit": 1,
+      "channels": 1,
+      "controls": 1,
+      "node": 1,
+      "project_links": 1,
+      "resources": 2
+     },
+     1,
+     0,
+     "offline",
+     true
+    ],
+    "BCcritical": true,
+    "CA": false,
+    "CSR": {
+     "alg": "1.3.101.112",
+     "certKeyEqualsCSRKey": true,
+     "sha256Matches": true,
+     "subjectCN": "nod_01M6TGSXV1J7XWC5D5H7N6EW1D",
+     "uris": [
+      "spiffe://saintvision.ai/tenant/97968b42-68aa-40ce-af5e-3a33e2fc2205/node/nod_01M6TGSXV1J7XWC5D5H7N6EW1D/epoch/bcd581be-31b4-4aca-86e6-3ca31b69ed09"
+     ]
+    },
+    "DER_SHA256": "bc5a3763c7a34f3a5e51315209b0a388ccab5f99b76337ecca3cfe18a6b4c686",
+    "EKU": [
+     "1.3.6.1.5.5.7.3.1"
+    ],
+    "endpoint": "https://192.168.45.210:19443",
+    "identityContract": true,
+    "installedPublicFileHashes": {
+     "client-ca.pem": true,
+     "launch-signer.pub": true,
+     "node-cert.pem": true,
+     "peer-policy.json": true,
+     "source": "r2"
+    },
+    "ips": [
+     "192.168.45.210"
+    ],
+    "issuerCN": "SaintVision CPU pilot CA",
+    "node": "nod_01M6TGSXV1J7XWC5D5H7N6EW1D",
+    "nodeDERSHA256Pinned": true,
+    "notAfter": "2026-11-09T07:15:30+00:00",
+    "notBefore": "2026-11-07T08:04:09+00:00",
+    "peerPolicy": {
+     "clientFingerprintsEqualCPClient": true,
+     "expiresAt": "2026-11-08T07:15:30Z",
+     "keys": [
+      "clientFingerprints",
+      "expiresAt",
+      "nodeId",
+      "recoveryEpoch",
+      "tenantId",
+      "version"
+     ],
+     "matchesPinned": true,
+     "node": true,
+     "sha256": "54751b1903acbf69978be206dee13aa98e05c0757f2d929762dfae8b78e45ab8",
+     "tenantEpoch": true
+    },
+    "planDigestMatchesAPPLY": true,
+    "planDigestMatchesPLAN": true,
+    "planDigestRecomputed": "b8fafc2c701fbb47143bccf656c0c6c7bcf1fe18aa4f5abb438d58ea3779dec5",
+    "requestFixedFields": true,
+    "requestSHA256MatchesPinned": true,
+    "requestSHA256Recomputed": "19a82bec869c45acb18d853f126710318629e130fafad5b15c2f15e8cb3c121b",
+    "sigAlg": "1.3.101.112",
+    "signedPEMEqualsRequestDER": true,
+    "subjectCN": "nod_01M6TGSXV1J7XWC5D5H7N6EW1D",
+    "uris": [
+     "spiffe://saintvision.ai/tenant/97968b42-68aa-40ce-af5e-3a33e2fc2205/node/nod_01M6TGSXV1J7XWC5D5H7N6EW1D/epoch/bcd581be-31b4-4aca-86e6-3ca31b69ed09"
+    ]
+   }
+  },
+  "planBodyFormulaPresentInLibrary": true,
+  "programs": {
+   "pc24-admission-r1/apply-remote-program.py.txt": {
+    "dockerDestructive": [],
+    "imports": [
+     "base64",
+     "hashlib",
+     "json",
+     "os",
+     "pathlib",
+     "psycopg",
+     "psycopg.rows",
+     "subprocess",
+     "sys"
+    ],
+    "literalIP_192_168_45_222": 0,
+    "pinsCLI8129": true,
+    "pinsEntry42e8": true,
+    "sha256": "3bf386a21b075f426d9c5958d3e59d6ee2a1572b3dc34acf286d251c3a109df6",
+    "sqlWriteVerbs": [],
+    "subprocessArgv0": [
+     "[str(ops / 'venv/bin/python'), '-I', '-B', str(ops / 'fresh_cpu_admission.py'), '--apply', '--expected-plan-sha256', p['",
+     "[str(ops / 'venv/bin/python'), '-I', '-B', str(ops / 'operator_reconcile_fresh_cpu.py')]"
+    ]
+   },
+   "pc24-admission-r1/plan-remote-program.py.txt": {
+    "dockerDestructive": [],
+    "imports": [
+     "base64",
+     "hashlib",
+     "json",
+     "os",
+     "pathlib",
+     "psycopg",
+     "psycopg.rows",
+     "subprocess",
+     "sys"
+    ],
+    "literalIP_192_168_45_222": 0,
+    "pinsCLI8129": false,
+    "pinsEntry42e8": false,
+    "sha256": "077b5e831f61bd7b3d66714309a6719ffd4753634321d649c27f944910ea6e0e",
+    "sqlWriteVerbs": [],
+    "subprocessArgv0": [
+     "[str(ops / 'venv/bin/python'), '-I', '-B', str(ops / 'fresh_cpu_admission.py')]"
+    ]
+   },
+   "pc24-new-node-preparation-r2/remote-key-csr-program.py.txt": {
+    "dockerDestructive": [],
+    "imports": [
+     "base64",
+     "cryptography",
+     "cryptography.hazmat.primitives",
+     "cryptography.hazmat.primitives.asymmetric",
+     "cryptography.x509.oid",
+     "hashlib",
+     "json",
+     "os",
+     "pathlib",
+     "stat",
+     "sys"
+    ],
+    "literalIP_192_168_45_222": 0,
+    "pinsCLI8129": false,
+    "pinsEntry42e8": false,
+    "sha256": "5c0202f6d814ac6ce7a67cf14e87954c56f2679255987a99b89802bb05a1af35",
+    "sqlWriteVerbs": [],
+    "subprocessArgv0": []
+   },
+   "pc24-node-start-r2/image-load-remote-program.py.txt": {
+    "dockerDestructive": [],
+    "imports": [
+     "hashlib",
+     "json",
+     "os",
+     "pathlib",
+     "subprocess",
+     "sys"
+    ],
+    "literalIP_192_168_45_222": 0,
+    "pinsCLI8129": false,
+    "pinsEntry42e8": false,
+    "sha256": "af60edfe0db666510ac19cda537513ba824e91dc061dcff99261e39312812375",
+    "sqlWriteVerbs": [],
+    "subprocessArgv0": [
+     "['docker', 'image', 'load', '--input', str(path)]",
+     "['docker', 'image', 'inspect', ref]"
+    ]
+   },
+   "pc24-node-start-r2/node-start-template-remote-program.py.txt": {
+    "dockerDestructive": [],
+    "imports": [
+     "hashlib",
+     "json",
+     "os",
+     "pathlib",
+     "socket",
+     "stat",
+     "subprocess",
+     "sys",
+     "time"
+    ],
+    "literalIP_192_168_45_222": 2,
+    "pinsCLI8129": false,
+    "pinsEntry42e8": false,
+    "sha256": "e4dbc30260ab61ef162f45a080143a01f886544c7ff1f8ca8add1f12bdc0a08d",
+    "sqlWriteVerbs": [],
+    "subprocessArgv0": [
+     "['docker', 'container', 'inspect', name]",
+     "args",
+     "['docker', 'start', cid]",
+     "['docker', 'inspect', cid]",
+     "['docker', 'image', 'inspect', ref]"
+    ]
+   },
+   "pc24-node-start-r2/public-trust-remote-program.py.txt": {
+    "dockerDestructive": [],
+    "imports": [
+     "base64",
+     "cryptography",
+     "cryptography.hazmat.primitives",
+     "cryptography.x509.oid",
+     "datetime",
+     "hashlib",
+     "io",
+     "json",
+     "os",
+     "pathlib",
+     "ssl",
+     "stat",
+     "sys",
+     "warnings"
+    ],
+    "literalIP_192_168_45_222": 0,
+    "pinsCLI8129": false,
+    "pinsEntry42e8": false,
+    "sha256": "39e44db1fdf79e5b89f5ccae281515fd0160485342e41333b47bbb372b565826",
+    "sqlWriteVerbs": [],
+    "subprocessArgv0": []
+   },
+   "pc24-pilot-ca-signing-r1/remote-signing-program.py.txt": {
+    "dockerDestructive": [],
+    "imports": [
+     "base64",
+     "cryptography",
+     "cryptography.hazmat.primitives",
+     "cryptography.hazmat.primitives.asymmetric",
+     "cryptography.x509.oid",
+     "datetime",
+     "hashlib",
+     "inv.fresh_cpu_admission",
+     "ipaddress",
+     "json",
+     "os",
+     "pathlib",
+     "stat",
+     "sys"
+    ],
+    "literalIP_192_168_45_222": 0,
+    "pinsCLI8129": false,
+    "pinsEntry42e8": false,
+    "sha256": "74e47801c4a150cb3a7fb1e47e4417624b040edde20a75fd3f35bb47627f03fa",
+    "sqlWriteVerbs": [],
+    "subprocessArgv0": []
+   }
+  }
+ },
+ "inputs": {
+  "cliBlobSHA256": "8129ab5acf7061b0bc1834aa1142ae944471b1b177f018c810de34ea9a53fe7d",
+  "files": {
+   "cpu-fresh-admission-code-r1-root-activation.json": "2c6d41a5cc35ba39c4fa3da5c4190bd73d12c13b5ebb39a0b741637f2e1985e0",
+   "cpu-reconcile-entry-ee1-root-verification.json": "2a505db4089319f0a754de2ca3a13734349e67f6e6bb6b4a70de18fab95de1a3",
+   "fresh-cpu-reconcile-entry-r1/operator_reconcile_fresh_cpu.py.txt": "42e89b6173cd9a8ad1cfa6998da30f068d6409e03e803b523bfb7f076576a3aa",
+   "one-cpu-node-plan-r1.public.json": "5b2a70bd9bc8217592f7cd953f18dd3516ecacfd132f6281134fbc718731213a",
+   "pc3-actual-cpu-pilot-r1-root-activation.json": "4065fc76bbd052104850d4af8002296dfd1ca27dfc947e554ea8764cd7c2bbdd",
+   "pc3-actual-cpu-pilot-r1/fresh-admin-pc3-api-r1.json": "519a710c315e63135d0987c6adf4af9c8566453a285d6556b4a2975bc63bd6d6",
+   "pc3-actual-cpu-pilot-r1/idp-trust-readonly-r1.json": "3a6cd4fb7e75eae4e508256c563ef68872843020dcb05db90d690a2f463cd064",
+   "pc3-actual-cpu-pilot-r1/pc3-admission-apply-r1/receipt.json": "0843a013a54ca27c63631374e3af4cb3397a74faeaab60f8242f158dc3f6aa14",
+   "pc3-actual-cpu-pilot-r1/pc3-admission-plan-r1/receipt.json": "1b21410fb663afe1cac87c557f87f41837036a0791990934655d4a4a324c5e74",
+   "pc3-actual-cpu-pilot-r1/pc3-cpu-images-r1/receipt.json": "b4e98d5da3b3f1995470a7d8de2fba78e26c5638766a9d0e6c285804113acd1d",
+   "pc3-actual-cpu-pilot-r1/pc3-cpu-images-r1/workload-r2-receipt.json": "6ec50a767ae789e06326e153273e470ba20bb5c7b6b7adcd061c4804c4f2d35c",
+   "pc3-actual-cpu-pilot-r1/pc3-cpu-pki-r1/receipt.json": "15ac20406291ad5ffe2ed4fdbfca531ff6f9a036301df4bf8a2306d8770530ea",
+   "pc3-actual-cpu-pilot-r1/pc3-docker-minapi-go-readonly-r1.json": "880a60306ff9e0152c6577360703d7b843fdcd086fc5c2fe4fec1f81bc0c3c40",
+   "pc3-actual-cpu-pilot-r1/pc3-node-start-r1/receipt.json": "1b3d1bf9a6504856da8618ba19a7153edaeec05f55efdca5a3ece1ba61a53f97",
+   "pc3-actual-cpu-pilot-r1/pc3-observer-tunnel-r1/start-receipt.json": "f199a6680367eb23a4ab98fd26f6b6e1389d2dec5477280d90dee9927f07db4a",
+   "pc3-actual-cpu-pilot-r1/pc3-one-node-resource-observation-r1/receipt.json": "c38f294c1cb7201dd8f14121a002f643a2929ea43f4d9cde02d05b3fede4275c",
+   "pc3-actual-cpu-pilot-r1/pc3-standard-observer-image-r1/receipt.json": "428ba69dd54bbac89d0e723f7ef2dace8591a4ac73d1af056f5aa94777489eeb",
+   "pc3-actual-cpu-pilot-r1/pc3-standard-observer-image-r1/wheel-name-r2-receipt.json": "b18cdf708ef3ee8c0c1575b98590ff0507cf5e5d464138811d08475ba73fd480",
+   "pc3-actual-cpu-pilot-r1/pc3-standard-observer-start-r1/continuity-readonly-r1.json": "553a7fcc65157a6fb4ee6ca3f22adf1f8820cffd354ff60059dc255d4cd2681b",
+   "pc3-actual-cpu-pilot-r1/pc3-standard-observer-start-r1/diagnosis-readonly.json": "ae950b23aa59bc573a1c824b2c38722193cd217fb2cbe918f6733711bf00a81f",
+   "pc3-actual-cpu-pilot-r1/pc3-standard-observer-start-r1/receipt.json": "12dca075ec5d8d99207e49ca4802da85533a2c7eb62810ebdb09ff467b5908c6",
+   "pc3-actual-cpu-pilot-r1/pc3-standard-observer-start-r1/step-diagnosis-r1.json": "039c7283a0847d19288f3fc508250b3b29dd53800d7e60a8fadb3829b2d47ad2",
+   "pc3-actual-cpu-pilot-r1/public-receipt-inventory.json": "4067d664b79261f03426937399433a0432472a799da1d9fc6ad759d54188fcb5",
+   "pc3-actual-cpu-pilot-r1/runtime-plan-5ba-root-verified.json": "ddf22ee9ba54ab702de374bbf3020e8e1fcede11023f5b5d7e4d775471723823",
+   "pc3-actual-cpu-pilot-r1/standard-observer-scope-preflight-r1.json": "97235d8d6ddacdb2bc904b1041f63fb9c146682c2358929cc228d1dafc4858e2",
+   "three-pc-actual-cpu-pilot-r1-root-activation.json": "f119d097f41e82f89a89fc29913dc8fef317522546cabaed4d8a826d33765cf7",
+   "three-pc-actual-cpu-pilot-r1/fresh-admin-three-pc-api-r1.json": "f233850348945229ee373940c1fc551ed9b279542a107f53e172a3c3aed046d4",
+   "three-pc-actual-cpu-pilot-r1/pc124-current-readiness-r1.json": "c9dbe921443afcc448981e732d062660cfbebbb54049ee8eb3584a7b7e7ab398",
+   "three-pc-actual-cpu-pilot-r1/pc24-admission-r1/apply-remote-program.py.txt": "3bf386a21b075f426d9c5958d3e59d6ee2a1572b3dc34acf286d251c3a109df6",
+   "three-pc-actual-cpu-pilot-r1/pc24-admission-r1/plan-remote-program.py.txt": "077b5e831f61bd7b3d66714309a6719ffd4753634321d649c27f944910ea6e0e",
+   "three-pc-actual-cpu-pilot-r1/pc24-admission-r1/receipt.json": "fc9b4c0a2ef1379543bdf3c62de16836a913389a0caf68cc3b6da7a9b2370091",
+   "three-pc-actual-cpu-pilot-r1/pc24-current-readiness-r2.json": "f550472ff55fce9b099c550ed38d7f92d833f595f15385377d234b1f536b40d6",
+   "three-pc-actual-cpu-pilot-r1/pc24-image-transfer-r1/receipt.json": "723725a3790a83277b6ae2d37345c35f39447edbb59f8dce7eaab3a7a67f37e7",
+   "three-pc-actual-cpu-pilot-r1/pc24-new-node-preparation-r1/PC2-public-plan.json": "a1e52443ccd971b68c703c71deb1bc1ea9beb80adbc4645b44d1f1d5db573d3e",
+   "three-pc-actual-cpu-pilot-r1/pc24-new-node-preparation-r1/PC2-receipt.json": "76c00d7e6de2f7110f19290b04ed69325b66d471f00c266f6982f88bad60e4e8",
+   "three-pc-actual-cpu-pilot-r1/pc24-new-node-preparation-r1/PC2-scope-readonly-cause.json": "1bdc6c453bb1af5086ac46605289c5fc92cc78eed149891b9ef933c16f8912ca",
+   "three-pc-actual-cpu-pilot-r1/pc24-new-node-preparation-r2/PC2-public-plan.json": "a1e52443ccd971b68c703c71deb1bc1ea9beb80adbc4645b44d1f1d5db573d3e",
+   "three-pc-actual-cpu-pilot-r1/pc24-new-node-preparation-r2/PC4-public-plan.json": "7a2a8e8bf2037dd8a0344049613948800566add126fddbfc425d1aafebe689cc",
+   "three-pc-actual-cpu-pilot-r1/pc24-new-node-preparation-r2/receipt.json": "216012fc0b0a55b9b69082bd84586018a5fdffe150275122c2a5550dbb5c85fe",
+   "three-pc-actual-cpu-pilot-r1/pc24-new-node-preparation-r2/remote-key-csr-program.py.txt": "5c0202f6d814ac6ce7a67cf14e87954c56f2679255987a99b89802bb05a1af35",
+   "three-pc-actual-cpu-pilot-r1/pc24-node-start-r1/PC2-public-trust-receipt.json": "e355874dea5a9a13de93d176f1ece6b03b1e1d2ba81533d21195aa913335ae7b",
+   "three-pc-actual-cpu-pilot-r1/pc24-node-start-r2/image-load-remote-program.py.txt": "af60edfe0db666510ac19cda537513ba824e91dc061dcff99261e39312812375",
+   "three-pc-actual-cpu-pilot-r1/pc24-node-start-r2/node-start-template-remote-program.py.txt": "e4dbc30260ab61ef162f45a080143a01f886544c7ff1f8ca8add1f12bdc0a08d",
+   "three-pc-actual-cpu-pilot-r1/pc24-node-start-r2/public-trust-remote-program.py.txt": "39e44db1fdf79e5b89f5ccae281515fd0160485342e41333b47bbb372b565826",
+   "three-pc-actual-cpu-pilot-r1/pc24-node-start-r2/receipt.json": "38ef758ed2b248403c73891053d36025bddbd9266cc4798c8eeb9b2422e6a1f2",
+   "three-pc-actual-cpu-pilot-r1/pc24-pilot-ca-signing-r1/receipt.json": "fd92f15a44803a99c804289d0dea97c17c90222d4701eb17d445b90aacd99fdc",
+   "three-pc-actual-cpu-pilot-r1/pc24-pilot-ca-signing-r1/remote-signing-program.py.txt": "74e47801c4a150cb3a7fb1e47e4417624b040edde20a75fd3f35bb47627f03fa",
+   "three-pc-actual-cpu-pilot-r1/public-evidence-inventory.json": "01ca4cf6368c7723426fa90bd0c892a25a74b0522a45b9f008c58b28364073c6",
+   "three-pc-actual-cpu-pilot-r1/three-pc-continuity-readonly-r1.json": "70cfb4da95d21c083f065b28c0450006aadacc237c37d385bc3a33475a492e6e"
+  },
+  "libraryBlobSHA256": "76407ced1411f42a5eddd71c894f541b8691d461d4eb1eaea30f63b8bcf90d2c"
+ },
+ "probe": "pilot_evidence_probe (bytes/JSON/AST/hashlib only)"
+}

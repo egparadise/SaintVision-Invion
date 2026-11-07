@@ -1,0 +1,225 @@
+"""Reviewer DATA probe for Root510 three-CPU pilot public evidence. Bytes/JSON/AST/hashlib only.
+
+No product import, no cryptography library, no signature verification, no network/DB/SSH/Docker.
+DER is walked by a minimal TLV reader to read public fields only.
+Usage: python -I -B pilot_evidence_probe.py <r510-dir> <cli-1efea-blob> <library-1efea-blob> <out.json>
+"""
+import ast, base64, hashlib, json, os, re, sys
+from datetime import datetime, timezone
+
+ROOT, CLI, LIB, OUT = sys.argv[1:5]
+sha = lambda b: hashlib.sha256(b).hexdigest()
+def J(rel): return json.load(open(os.path.join(ROOT, rel), encoding='utf-8'))
+def B(rel): return open(os.path.join(ROOT, rel), 'rb').read()
+out = {'probe': 'pilot_evidence_probe (bytes/JSON/AST/hashlib only)', 'checks': {}}
+C = out['checks']
+
+# ---------- minimal DER ----------
+def tlv(b, i):
+    t = b[i]; l = b[i + 1]; i += 2
+    if l & 0x80:
+        n = l & 0x7f; l = int.from_bytes(b[i:i + n], 'big'); i += n
+    return t, b[i:i + l], i + l
+def seq(b):
+    r, i = [], 0
+    while i < len(b):
+        t, v, i = tlv(b, i); r.append((t, v))
+    return r
+def oid(v):
+    a = [v[0] // 40, v[0] % 40]; n = 0
+    for x in v[1:]:
+        n = (n << 7) | (x & 0x7f)
+        if not x & 0x80: a.append(n); n = 0
+    return '.'.join(map(str, a))
+def name_cn(v):
+    for _, rdn in seq(v):
+        for _, atv in seq(rdn):
+            p = seq(atv)
+            if oid(p[0][1]) == '2.5.4.3': return p[1][1].decode()
+def gtime(t, v):
+    s = v.decode(); fmt = '%y%m%d%H%M%SZ' if t == 0x17 else '%Y%m%d%H%M%SZ'
+    return datetime.strptime(s, fmt).replace(tzinfo=timezone.utc)
+def spki(v):
+    p = seq(v); alg = oid(seq(p[0][1])[0][1]); return alg, p[1][1][1:]
+def exts(v):
+    r = {}
+    for _, e in seq(v):
+        p = seq(e); o = oid(p[0][1]); crit = len(p) == 3 and p[1][1] == b'\xff'; r[o] = (crit, p[-1][1])
+    return r
+def cert(der):
+    top = seq(seq(der)[0][1]); tbs = seq(top[0][1]); i = 0
+    if tbs[0][0] == 0xa0: i = 1
+    serial, sigalg, issuer, validity, subject, pk = tbs[i:i + 6]
+    ext = {}
+    for t, v in tbs[i + 6:]:
+        if t == 0xa3: ext = exts(seq(v)[0][1])
+    nb, na = [gtime(t, v) for t, v in seq(validity[1])]
+    d = {'issuerCN': name_cn(issuer[1]), 'subjectCN': name_cn(subject[1]), 'notBefore': nb.isoformat(), 'notAfter': na.isoformat(),
+         'tbsSigAlg': oid(seq(sigalg[1])[0][1]), 'outerSigAlg': oid(seq(top[1][1])[0][1])}
+    d['spkiAlg'], d['pub'] = spki(pk[1]); d['extOIDs'] = sorted(ext)
+    if '2.5.29.19' in ext:
+        bc = seq(seq(ext['2.5.29.19'][1])[0][1]) if ext['2.5.29.19'][1] != b'\x30\x00' else []
+        d['basicConstraintsCritical'] = ext['2.5.29.19'][0]; d['CA'] = bool(bc and bc[0][0] == 0x01 and bc[0][1] == b'\xff')
+    if '2.5.29.17' in ext:
+        d['uris'] = [v.decode() for t, v in seq(seq(ext['2.5.29.17'][1])[0][1]) if t == 0x86]
+        d['ips'] = ['.'.join(map(str, v)) for t, v in seq(seq(ext['2.5.29.17'][1])[0][1]) if t == 0x87]
+    if '2.5.29.37' in ext: d['EKU'] = [oid(v) for _, v in seq(seq(ext['2.5.29.37'][1])[0][1])]
+    if '2.5.29.14' in ext: d['SKI'] = seq(ext['2.5.29.14'][1])[0][1].hex()
+    if '2.5.29.35' in ext: d['AKI'] = [v.hex() for t, v in seq(seq(ext['2.5.29.35'][1])[0][1]) if t == 0x80]
+    return d, na
+def csr(der):
+    info = seq(seq(seq(der)[0][1])[0][1]); alg, pub = spki(info[2][1]); uris = []
+    if len(info) > 3:
+        for _, attr in seq(info[3][1]):
+            p = seq(attr)
+            if oid(p[0][1]) == '1.2.840.113549.1.9.14':
+                for _, e in seq(seq(p[1][1])[0][1]):
+                    q = seq(e)
+                    if oid(q[0][1]) == '2.5.29.17': uris = [v.decode() for t, v in seq(seq(q[-1][1])[0][1]) if t == 0x86]
+    return {'subjectCN': name_cn(info[1][1]), 'spkiAlg': alg, 'pub': pub, 'uris': uris}
+pem = lambda s: base64.b64decode(''.join(l for l in s.strip().splitlines() if not l.startswith('-----')))
+
+# ---------- 1 inventories ----------
+inv = []
+for base, rel, key, pk in (('pc3-actual-cpu-pilot-r1', 'pc3-actual-cpu-pilot-r1/public-receipt-inventory.json', 'selectedFiles', 'sourceWorkPath'),
+                           ('three-pc-actual-cpu-pilot-r1', 'three-pc-actual-cpu-pilot-r1/public-evidence-inventory.json', 'files', 'path')):
+    for it in J(rel)[key]:
+        b = B(os.path.join(base, it[pk])); ok = sha(b) == it['SHA256'] and len(b) == it['bytes']
+        e = {'path': base + '/' + it[pk], 'ok': ok}
+        if not ok:
+            crlf = b.replace(b'\n', b'\r\n'); e.update(blobBytes=len(b), blobSHA256=sha(b), pinnedBytes=it['bytes'], pinnedSHA256=it['SHA256'],
+                                                     crlfReconstructionMatchesPin=sha(crlf) == it['SHA256'] and len(crlf) == it['bytes'])
+        inv.append(e)
+C['inventories'] = {'entries': len(inv), 'ok': sum(e['ok'] for e in inv), 'mismatches': [e for e in not_ok] if (not_ok := [e for e in inv if not e['ok']]) else []}
+
+# ---------- 2 identities ----------
+pki3 = J('pc3-actual-cpu-pilot-r1/pc3-cpu-pki-r1/receipt.json')['remote']
+sign = J('three-pc-actual-cpu-pilot-r1/pc24-pilot-ca-signing-r1/receipt.json')['remote']
+prep = {r['PC']: r['remote'] for r in J('three-pc-actual-cpu-pilot-r1/pc24-new-node-preparation-r2/receipt.json')['results']}
+ns = {r['PC']: r for r in J('three-pc-actual-cpu-pilot-r1/pc24-node-start-r2/receipt.json')['results']}
+pc2trust1 = J('three-pc-actual-cpu-pilot-r1/pc24-node-start-r1/PC2-public-trust-receipt.json')['remote']
+apply3 = J('pc3-actual-cpu-pilot-r1/pc3-admission-apply-r1/receipt.json')['remote']
+applies = {r['PC']: r['remote'] for r in J('three-pc-actual-cpu-pilot-r1/pc24-admission-r1/receipt.json')['receipts'] if r['mode'] == 'APPLY'}
+plans = {r['PC']: r['remote'] for r in J('three-pc-actual-cpu-pilot-r1/pc24-admission-r1/receipt.json')['receipts'] if r['mode'] == 'PLAN'}
+applies['PC3'] = apply3
+plans['PC3'] = J('pc3-actual-cpu-pilot-r1/pc3-admission-plan-r1/receipt.json')['remote']
+ca_pem = sign['results'][0]['publicCA_PEM']; ca_der = pem(ca_pem); ca, _ = cert(ca_der)
+C['CA'] = {'pemSHA256': sha(ca_pem.encode()), 'pemSHA256EqualsPinnedCA_SHA256': sha(ca_pem.encode()) == sign['CA_SHA256'] == pki3['publicCA_SHA256'],
+           'subjectCN': ca['subjectCN'], 'selfIssued': ca['issuerCN'] == ca['subjectCN'], 'CA': ca.get('CA'), 'notAfter': ca['notAfter'], 'SKI': ca.get('SKI'),
+           'sameCAPEMForPC2AndPC4': len({r['publicCA_PEM'] for r in sign['results']}) == 1}
+launch = {r['launchPublicBase64'] for r in sign['results']}
+lb = base64.b64decode(next(iter(launch)))
+C['launchSigner'] = {'singleValueForPC2PC4': len(launch) == 1, 'rawLen': len(lb), 'sha256': sha(lb), 'equalsPC3LaunchPublicSHA256': sha(lb) == pki3['launchPublicSHA256']}
+C['CPClient'] = {'DER_SHA256': pki3['CPClientDER_SHA256'], 'signingReceiptClientDER': sign['clientDER_SHA256'] == pki3['CPClientDER_SHA256'], 'CPClientURI': pki3['CPClientURI']}
+
+lib_src = open(LIB, 'rb').read().decode()
+def plan_digest(req, fp, na):
+    body = {'planVersion': 1, 'tenantId': req['tenantId'], 'recoveryEpoch': req['recoveryEpoch'], 'projectId': req['projectId'], 'nodeId': req['nodeId'],
+            'cpuResourceId': req['cpuResourceId'], 'memoryResourceId': req['memoryResourceId'], 'endpoint': req['endpoint'], 'certificateSHA256': fp,
+            'certificateNotAfter': na.isoformat(), 'expectedTenantControlVersion': req['expectedTenantControlVersion'], 'cpuMillis': 500, 'memoryBytes': 67108864,
+            'initialStatus': 'offline', 'initialChannelVersion': 1, 'projectMembershipEnabled': True, 'certificateIssuerChainVerified': False, 'executionAuthorized': False}
+    return sha(json.dumps(body, sort_keys=True, separators=(',', ':'), ensure_ascii=True, allow_nan=False).encode('ascii'))
+C['planBodyFormulaPresentInLibrary'] = all(k in lib_src for k in ('"planVersion": 1', '"initialStatus": "offline"', '"certificateIssuerChainVerified": False', 'separators=(",", ":")'))
+
+nodes = {}
+entries = [('PC3', pki3['publicAdmissionRequest'], None, None, pki3)] + [(r['PC'], r['publicAdmissionRequest'], r, prep[r['PC']], None) for r in sign['results']]
+for pc, req, s, pr, p3 in entries:
+    der = base64.b64decode(req['certificateDERBase64'], validate=True); d, na = cert(der); fp = sha(der)
+    uri = f"spiffe://saintvision.ai/tenant/{req['tenantId']}/node/{req['nodeId']}/epoch/{req['recoveryEpoch']}"
+    host = re.match(r'https://([0-9.]+):19443$', req['endpoint']).group(1)
+    n = {'node': req['nodeId'], 'endpoint': req['endpoint'], 'DER_SHA256': fp, 'subjectCN': d['subjectCN'], 'issuerCN': d['issuerCN'], 'notBefore': d['notBefore'], 'notAfter': d['notAfter'],
+         'uris': d.get('uris'), 'ips': d.get('ips'), 'EKU': d.get('EKU'), 'CA': d.get('CA'), 'BCcritical': d.get('basicConstraintsCritical'), 'sigAlg': d['outerSigAlg'],
+         'AKIequalsCASKI': d.get('AKI') == [ca.get('SKI')]}
+    n['identityContract'] = (d.get('uris') == [uri] and d.get('ips') == [host] and d.get('EKU') == ['1.3.6.1.5.5.7.3.1'] and d.get('CA') is False
+                             and d['subjectCN'] == req['nodeId'] and d['issuerCN'] == ca['subjectCN'] and n['AKIequalsCASKI'])
+    n['requestFixedFields'] = (req['cpuMillis'], req['memoryBytes'], req['expectedTenantControlVersion'], req['requestVersion']) == (500, 67108864, 0, 1)
+    n['planDigestRecomputed'] = plan_digest(req, fp, na)
+    n['planDigestMatchesPLAN'] = n['planDigestRecomputed'] == plans[pc]['CLIReadyPlanDigest']
+    n['planDigestMatchesAPPLY'] = n['planDigestRecomputed'] == applies[pc]['planDigest']
+    n['APPLYChannelCertMatchesDER'] = applies[pc]['channel']['certificate_sha256'] == fp and applies[pc]['channel']['endpoint'] == req['endpoint']
+    n['APPLYCounts'] = (applies[pc]['before'], applies[pc]['after'], applies[pc]['applyAttempts'], applies[pc]['reconcileAttempts'], applies[pc]['nodeStatus'], applies[pc]['tenantControlsUnchanged'])
+    rb = (json.dumps(req, sort_keys=True, separators=(',', ':')) + '\n').encode()
+    n['requestSHA256Recomputed'] = sha(rb)
+    n['requestSHA256MatchesPinned'] = sha(rb) == (s['publicAdmissionRequestSHA256'] if s else p3['publicAdmissionRequestSHA256'])
+    if s:
+        n['signedPEMEqualsRequestDER'] = pem(s['nodeCertificatePEM']) == der
+        n['nodeDERSHA256Pinned'] = s['NodeDER_SHA256'] == fp
+        c = csr(pem(pr['publicCSRPEM'])); n['CSR'] = {'sha256Matches': sha(pr['publicCSRPEM'].encode()) == pr['publicCSR_SHA256'] == s['CSR_SHA256'],
+                                                     'subjectCN': c['subjectCN'], 'uris': c['uris'], 'alg': c['spkiAlg'], 'certKeyEqualsCSRKey': c['pub'] == d['pub']}
+        pol = s['peerPolicy']; pb = (json.dumps(pol, sort_keys=True, separators=(',', ':')) + '\n').encode()
+        n['peerPolicy'] = {'keys': sorted(pol), 'sha256': sha(pb), 'matchesPinned': sha(pb) == s['peerPolicySHA256'], 'node': pol['nodeId'] == req['nodeId'],
+                           'tenantEpoch': (pol['tenantId'], pol['recoveryEpoch']) == (req['tenantId'], req['recoveryEpoch']), 'expiresAt': pol['expiresAt'],
+                           'clientFingerprintsEqualCPClient': pol['clientFingerprints'] == [pki3['CPClientDER_SHA256']]}
+        tr = ns[pc]['trust']['remote']; files = tr.get('newPublicFileHashes') or (pc2trust1['newPublicFileHashes'] if pc == 'PC2' else None)
+        n['installedPublicFileHashes'] = {'node-cert.pem': files['node-cert.pem'] == sha(s['nodeCertificatePEM'].encode()), 'client-ca.pem': files['client-ca.pem'] == sha(ca_pem.encode()),
+                                          'launch-signer.pub': files['launch-signer.pub'] == sha(lb), 'peer-policy.json': files['peer-policy.json'] == sha(pb), 'source': 'r1-ack' if pc == 'PC2' else 'r2'}
+    else:
+        n['nodeDERSHA256Pinned'] = p3['NodeDER_SHA256'] == fp
+        n['peerPolicy'] = {'sha256Pinned': p3['peerPolicySHA256'], 'expiresAt': p3['peerPolicyExpiresAt'], 'version': p3['peerPolicyVersion']}
+    nodes[pc] = n
+C['nodes'] = nodes
+
+# ---------- 3 node services ----------
+st = {'PC3': J('pc3-actual-cpu-pilot-r1/pc3-node-start-r1/receipt.json')['remote']}
+st.update({pc: ns[pc]['start']['remote'] for pc in ('PC2', 'PC4')})
+C['nodeServices'] = {pc: {'image': s['NodeImageID'], 'workload': s['workloadImageID'], 'cpu': s['serviceCPUQuotaNanoCpus'], 'mem': s['serviceMemoryBytes'], 'pids': s['pidsLimit'],
+                          'ro': s['readOnlyRootFS'], 'capDrop': s['capDrop'], 'sec': s['securityOptions'], 'hostIP': s['portBindings']['19443/tcp'][0]['HostIp'],
+                          'hostIPMatchesEndpoint': 'https://' + s['portBindings']['19443/tcp'][0]['HostIp'] + ':19443' == nodes[pc]['endpoint'],
+                          'argvNodeMatches': s['nodeArgv'][s['nodeArgv'].index('--node') + 1] == nodes[pc]['node'],
+                          'argvSameExceptNode': [x for x in s['nodeArgv'] if x != nodes[pc]['node']] == [x for x in st['PC3']['nodeArgv'] if x != nodes['PC3']['node']]} for pc, s in st.items()}
+C['nodeServicesSameImages'] = len({(s['NodeImageID'], s['workloadImageID']) for s in st.values()}) == 1
+loads = [ns[pc]['imageLoad']['remote'] for pc in ('PC2', 'PC4')]
+xfer = J('three-pc-actual-cpu-pilot-r1/pc24-image-transfer-r1/receipt.json')
+C['imageBundle'] = {'exportSHA256': xfer['export']['SHA256'], 'localSHA256Equal': xfer['localSHA256'] == xfer['export']['SHA256'],
+                    'loadsMatchBundle': all(l['bundleSHA256'] == xfer['export']['SHA256'] and l['imageIDs'] == xfer['export']['imageIDs'] for l in loads),
+                    'exportIDsEqualPC3Built': xfer['export']['imageIDs'] == [st['PC3']['NodeImageID'], st['PC3']['workloadImageID']]}
+
+# ---------- 4 continuity and API ----------
+cont = J('three-pc-actual-cpu-pilot-r1/three-pc-continuity-readonly-r1.json'); api = J('three-pc-actual-cpu-pilot-r1/fresh-admin-three-pc-api-r1.json')
+def ts(s): return datetime.fromisoformat(s.replace(' ', 'T'))
+cc = {}
+for a, b in zip(cont['firstSample'], cont['secondSample']):
+    pc = next(k for k, v in nodes.items() if v['node'] == a['node_id'])
+    cc[pc] = {'heartbeatAdvanceSeconds': round((ts(b['heartbeat_at']) - ts(a['heartbeat_at'])).total_seconds(), 6), 'probeDelta': b['consumed_probes'] - a['consumed_probes'],
+              'maxAge': max(a['heartbeat_age_seconds'], b['heartbeat_age_seconds'], a['snapshot_age_seconds'], b['snapshot_age_seconds']),
+              'noncesDistinct': a['snapshot']['nonce'] != b['snapshot']['nonce'], 'snapshotIdentity': all(x['snapshot']['tenantId'] == pki3['tenant'] and x['snapshot']['recoveryEpoch'] == pki3['epoch']
+              and x['snapshot']['nodeId'] == x['node_id'] and x['snapshot']['profileVersion'] == 'cpu-pilot-1efea-r1' for x in (a, b)),
+              'physicalSnapshot': {'cpuCapacityMillis': b['snapshot']['cpuCapacityMillis'], 'memoryCapacityBytes': b['snapshot']['memoryCapacityBytes']},
+              'channelV1': a['channel_version'] == b['channel_version'] == 1, 'online': a['status'] == b['status'] == 'online'}
+C['continuity'] = {'nodes': cc, 'channelsEqualAdmitted': sorted((c['node_id'], c['endpoint']) for c in cont['channels']) == sorted((v['node'], v['endpoint']) for v in nodes.values()),
+                   'manualObserverCalls': cont['manualObserverCalls'], 'DBWrites': cont['DBWrites']}
+apin = {n['node']['nodeId'] for n in api['nodes']}
+res = {}
+for n in api['nodes']:
+    pc = next(k for k, v in nodes.items() if v['node'] == n['node']['nodeId']); req = [r for r in entries if r[0] == pc][0][1]
+    res[pc] = sorted(r['resourceId'] for r in n['resourceUsage']['resources']) == sorted([req['cpuResourceId'], req['memoryResourceId']]) and \
+        all(r['capacity'] == r['offered'] == r['spare'] and r['reserved'] == 0 for r in n['resourceUsage']['resources'])
+C['api'] = {'nodeSetEqualsAdmitted': apin == {v['node'] for v in nodes.values()}, 'count': api['currentProjectNodeCount'], 'resourceIDsMatchRequests': res,
+            'sumCPU': sum(n['capacity']['offered']['cpuMillis'] for n in api['nodes']), 'sumMem': sum(n['capacity']['offered']['memoryBytes'] for n in api['nodes']),
+            'totalsMatch': (api['totalOffered']['cpuMillis'], api['totalOffered']['memoryBytes']) == (1500, 201326592) == (3 * 500, 3 * 67108864),
+            'maxHeartbeatAgeAtRead': max(n['heartbeatAgeSecondsAtRead'] for n in api['nodes']), 'anonymous': api['anonymousSessionHTTP'],
+            'allPhysicalResourcesShared': api['allPhysicalResourcesShared'], 'browserSelectedProject': api['browserSelectedProject']}
+
+# ---------- 5 programs ----------
+cli = open(CLI, 'rb').read()
+progs = {}
+for rel in ['three-pc-actual-cpu-pilot-r1/pc24-admission-r1/plan-remote-program.py.txt', 'three-pc-actual-cpu-pilot-r1/pc24-admission-r1/apply-remote-program.py.txt',
+            'three-pc-actual-cpu-pilot-r1/pc24-new-node-preparation-r2/remote-key-csr-program.py.txt', 'three-pc-actual-cpu-pilot-r1/pc24-pilot-ca-signing-r1/remote-signing-program.py.txt',
+            'three-pc-actual-cpu-pilot-r1/pc24-node-start-r2/public-trust-remote-program.py.txt', 'three-pc-actual-cpu-pilot-r1/pc24-node-start-r2/image-load-remote-program.py.txt',
+            'three-pc-actual-cpu-pilot-r1/pc24-node-start-r2/node-start-template-remote-program.py.txt']:
+    b = B(rel); t = ast.parse(b); s = b.decode()
+    imps = sorted({a.name for n in ast.walk(t) if isinstance(n, ast.Import) for a in n.names} | {n.module for n in ast.walk(t) if isinstance(n, ast.ImportFrom)})
+    sub = [ast.unparse(n.args[0])[:120] for n in ast.walk(t) if isinstance(n, ast.Call) and ast.unparse(n.func) == 'subprocess.run']
+    progs[rel.split('/', 1)[1]] = {'sha256': sha(b), 'imports': imps, 'subprocessArgv0': sub,
+        'sqlWriteVerbs': sorted(set(re.findall(r'\b(INSERT|UPDATE|DELETE|TRUNCATE|DROP|ALTER|GRANT|CREATE)\b', s))),
+        'dockerDestructive': sorted(set(re.findall(r"'(rm|stop|kill|rmi|prune|restart|update)'", s))),
+        'literalIP_192_168_45_222': s.count('192.168.45.222'), 'pinsCLI8129': '8129ab5acf7061b0bc1834aa1142ae944471b1b177f018c810de34ea9a53fe7d' in s,
+        'pinsEntry42e8': '42e89b6173cd9a8ad1cfa6998da30f068d6409e03e803b523bfb7f076576a3aa' in s}
+C['programs'] = progs
+C['CLI1efeaSHA256'] = sha(cli); C['CLIPinMatches1efea'] = sha(cli) == '8129ab5acf7061b0bc1834aa1142ae944471b1b177f018c810de34ea9a53fe7d'
+C['CLIInsertsSysPath'] = b'sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "services/control-plane/src"))' in cli
+C['entrySHA256'] = sha(B('fresh-cpu-reconcile-entry-r1/operator_reconcile_fresh_cpu.py.txt'))
+out['inputs'] = {'cliBlobSHA256': sha(cli), 'libraryBlobSHA256': sha(open(LIB, 'rb').read()),
+                 'files': {os.path.relpath(os.path.join(d, f), ROOT).replace('\\', '/'): sha(open(os.path.join(d, f), 'rb').read()) for d, _, fs in os.walk(ROOT) for f in sorted(fs)}}
+open(OUT, 'w', encoding='utf-8', newline='\n').write(json.dumps(out, indent=1, sort_keys=True, ensure_ascii=True) + '\n')
+print(sha(open(OUT, 'rb').read()))

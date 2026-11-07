@@ -1,0 +1,108 @@
+{
+ "task": "FLEET5-THREE-CPU-PILOT-EVIDENCE-REVIEW-R1-20261107",
+ "orcaTask": "task_682a17fab13c",
+ "dispatch": "ctx_9dcd414de698",
+ "reviewer": "Claude (the only actual reviewer; no helper/subagent/second reviewer)",
+ "author": "Root Codex (all real operations performed by Root)",
+ "kind": "independent review of Root deployment evidence (not self-review, not source implementation)",
+ "previousClaudeDispatch": "ctx_2a0f382b4d2f / task_1d36969e9661 (this reviewer's own prior task; settled state per dispatch, Root .work not read in this task)",
+ "branchCreatedKST": "2026-11-07T17:30:26+09:00",
+ "verdictWrittenKST": "2026-11-07T17:32:13+09:00",
+ "reviewBranch": "agent/claude/fleet5-three-cpu-pilot-review-r1-20261107",
+ "deliveryBase": "1efea494f026e932360c35ae811b6423d874a2e7",
+ "productSource": "1efea494f026e932360c35ae811b6423d874a2e7",
+ "rootEvidenceSource": {
+  "commit": "baaa8ea99919a7fec40f8f853a648f4067d7248d",
+  "branch": "agent/codex/fleet-five-orchestration-20261105",
+  "remoteRefExactAtReview": true,
+  "rootWorktreeHEAD": "baaa8ea99919a7fec40f8f853a648f4067d7248d",
+  "Docs": "42354921494 (per dispatch; not re-inspected)",
+  "github": "https://github.com/egparadise/SaintVision-Invion/tree/baaa8ea99919a7fec40f8f853a648f4067d7248d/docs/vault/30_Development/Evidence/fleet5-20261105-root",
+  "readScope": "three-pc-actual-cpu-pilot-r1-root-activation.json, three-pc-actual-cpu-pilot-r1/** (22), pc3-actual-cpu-pilot-r1-root-activation.json, pc3-actual-cpu-pilot-r1/** (20), cpu-fresh-admission-code-r1-root-activation.json, cpu-reconcile-entry-ee1-root-verification.json, fresh-cpu-reconcile-entry-r1/operator_reconcile_fresh_cpu.py.txt, one-cpu-node-plan-r1.public.json; Root History current section as reported context. 49 files, all read via git show baaa8ea9:<path>; per-file SHA256 in pilot-evidence-probe.json inputs.files.",
+  "crossBranchNote": "Root artifacts are not files in this review tree."
+ },
+ "rootBoardsRead": {"INDEX-PROGRESS-001": "1.0.510", "WORKBOARD-CODEX-001": "1.0.471", "WORKBOARD-CLAUDE-001": "1.2.130", "HISTORY-FLEET5-20261105-START-CODEX": "1.0.119"},
+ "otherSourcePins": {
+  "runtimeRecipePlan": "5ba7cfb795135e1f74c0d3e83e0fea285d3cc987 (present locally; runtime-plan.json deployment/pki/peerPolicyTemplate/runtimeProfileTemplate/nodeArgvTemplate/observation/admission/stopRules read)",
+  "CLI tools/fresh_cpu_admission.py@1efea": "8129ab5acf7061b0bc1834aa1142ae944471b1b177f018c810de34ea9a53fe7d",
+  "library fresh_cpu_admission.py@1efea": "76407ced1411f42a5eddd71c894f541b8691d461d4eb1eaea30f63b8bcf90d2c",
+  "observer services/control-plane/src/inv/observer_worker.py@1efea": "read: LIMIT 6 / >5 refused, mark_offline before+after, ThreadPoolExecutor(5), loop stop.wait(5)",
+  "node_channels.certificate_identity@1efea": "read: single URI SAN == node URI, CA false, serverAuth EKU, validity window; digest uses not_valid_after_utc",
+  "reconcileEntry": "42e89b6173cd9a8ad1cfa6998da30f068d6409e03e803b523bfb7f076576a3aa (ee1facda accepted)",
+  "fetches": "none needed (5ba7cfb7 already present)"
+ },
+ "verdict": "ACCEPT_THREE_NODE_CPU_OBSERVATION_EVIDENCE_KEEP_REMAINING_LIVE_HOLDS",
+ "acceptanceMeaning": "Root may accept THREE current-project CPU Nodes (PC2 nod_01M6TGQZ8S3DAFS7TYE8TY1PX2, PC3 nod_01M6TAWG25JTA3F7J7S1EE4N2W, PC4 nod_01M6TGSXV1J7XWC5D5H7N6EW1D) as an OBSERVATION pilot with an explicit selected contribution of 500m CPU / 64MiB each (1500m / 201326592B total). It is not physical-resource sharing, not workload/Run/output/audit/GPU/storage acceptance, not browser acceptance, not five-PC acceptance and not program completion.",
+ "mandatoryDefects": 0,
+ "severityCounts": {"HIGH": 0, "MEDIUM": 0, "LOW": 4, "INFO": 8},
+ "verifiedChain": {
+  "1_hostsDockerIdentityCustody": [
+   "PC3: Docker 29.9.3 API1.56/Min1.40, actual GET /v1.45/version 200; PC2 API1.52 and PC4 API1.56 each docker145UnixVersionHTTP 200 (pc3-docker-minapi-go-readonly-r1.json, pc24-current-readiness-r2.json). Matches plan acceptance min(serverMax,1.45)>=1.41 by actual 200.",
+   "Leaf identity (reviewer DER walk, all 3): subject CN == nodeId, single URI SAN == spiffe://saintvision.ai/tenant/97968b42-…/node/<node>/epoch/bcd581be-…, single IP SAN == endpoint host (.222/.143/.210), EKU == [serverAuth], basicConstraints CA=false critical, Ed25519, issuer CN 'SaintVision CPU pilot CA', AKI == CA SKI c9266086…; notAfter 2026-11-09T07:15:30Z <= CA notAfter 2026-11-14.",
+   "Same CA for all: CA PEM SHA256 b8d777ab… equals PC3 publicCA_SHA256, signing CA_SHA256 and every installed client-ca.pem hash. Same launch signer: one 32-byte raw key, SHA256 21baf6f9… == PC3 launchPublicSHA256 == installed launch-signer.pub on PC2/PC4. Same CP client: every peer policy clientFingerprints == [48911c5d…] == PC3 CPClientDER_SHA256.",
+   "Key custody/CSR proof (PC2/PC4): CSR PEM SHA256 7b1f16b0…/98e1910d… match prep and signing receipts; CSR CN/URI SAN exact; certificate public key bytes == CSR public key bytes; key generated by remote-key-csr-program on the target (0600 uid1000, never emitted); signing program reads only CA key on PC3 and outputs public material. Signature validity itself was not re-verified (no crypto by reviewer); Root programs call verify_directly_issued_by.",
+   "Peer policy (PC2/PC4): exact 6 keys, version 1, tenant/node/epoch bound, expiresAt 2026-11-08T07:15:30Z (<=7d from signing), SHA256 recomputed f66ab039…/54751b19… == pinned == installed peer-policy.json. PC3 policy body not public (hash e1ba25f9… only, same expiry/version).",
+   "Images/source pins: one bundle 7f7b9d3b… (export == transfer == both loads), image IDs Node de654cd3… / workload ffee58e8… on all three, label revision 1efea494 checked by load program; workload user 65532, entrypoint /inv-supervisor, no volumes.",
+   "Contribution vs physical: offers 500m/64MiB each; snapshots show physical cpuCapacityMillis 12000 and memoryCapacityBytes 15938523136/15938240512/16480641024; API allPhysicalResourcesShared=false. Explicit selected contribution, no claim of full sharing."
+  ],
+  "2_admission": [
+   "Plan digests independently recomputed by the reviewer from each public request + certificate DER using the 1efea plan_body formula: PC3 95a6d6b5…, PC2 afc7af4a…, PC4 b8fafc2c… — each equals the PLAN CLIReadyPlanDigest and the APPLY planDigest.",
+   "Request SHA256 recomputed (sorted compact JSON + newline) == pinned for all 3; fixed fields 500/67108864/controlVersion0/requestVersion1.",
+   "Each APPLY: before all 0, after node1/resources2/project_links1/channels1/audit1/controls1, nodeStatus offline, snapshotCount 0, channel v1 enabled with certificate_sha256 == DER SHA256 and endpoint == request, tenantControlsUnchanged (version, kill_switch, updated_at), applyAttempts 1, reconcileAttempts 0.",
+   "APPLY program pins CLI 8129ab5a… (== 1efea tools/fresh_cpu_admission.py) and entry 42e89b61…, library SHA, same server system_identifier, superuser-or-BYPASSRLS class, epoch, control version, active business-linked project; strips PG* env; reconcile entry only on unacknowledged attempt (not triggered). No SQL write verb in PLAN/APPLY wrapper programs (AST/regex).",
+   "Old identities preserved by construction: no destructive docker verb (rm/stop/kill/rmi/prune/restart/update) and no SQL write verb in any published program; new names only, collision checks before create. The 7 pre-existing labelled containers on each of PC2/PC4 are listed before; no post-start re-inventory is public (FT-I1).",
+   "Role separation: operator admission used the existing superuser/BYPASSRLS operator class (M1); the runtime observer uses a non-super, non-BYPASSRLS inv_kernel member. actualUserOIDCOrRunApproval NOT_PERFORMED; operator admission/observation is not user Run approval.",
+   "Observer scope: source observer_worker reads enabled current-epoch channels LIMIT 6 and refuses >5; actual enabled channels are exactly the 3 admitted (endpoint set equal). The pre-existing unlinked node nod_01M6NC3HEDGYP9ZE6DMPBJM2M9 went online(stale)->offline, which is the Root-authorised standard tenant-specific stale>60s maintenance."
+  ],
+  "3_nodeSandboxAndObserver": [
+   "Node containers (all 3): user 1000:1000 + docker-socket GID, NanoCpus 500000000, Memory=MemorySwap 268435456, pids 64, read-only rootfs, CapDrop ALL, no-new-privileges, bridge network, port 19443 published only on the host LAN IP equal to the leaf IP SAN/endpoint, mounts exactly /config (node dir, RO) + /state (fresh empty 0700, RW) + docker.sock; restartCount 0; argv identical except node id.",
+   "Private-key separation: Node dir holds only its own node-key.pem (0600) plus public files; start program asserts ca-key/cp-client-key/launch-signer-key absent; privateCAClientSignerOrDBCredentialMounted false.",
+   "NodeService 500m/256MiB is the service container limit; offer 500m/64MiB is DB metadata and the runtime profile workload ceiling (max_cpu_millis 500, max_memory_bytes 67108864). The plan states no Node-service hard-quota claim. Not an arithmetic contradiction.",
+   "Observer (PC3): image 79745d9c… built from the verified wheel (library 76407ced…, psycopg 3.3.5, cryptography 50.0.1), entrypoint python -I -B /observer-bootstrap.py (SHA 8cccc5a1…), uid 1000, 250m/256MiB, pids 64, RO rootfs, CapDrop ALL, host network, no docker socket, 5 RO mounts incl. /run/secrets/runtime-dsn, credentialInDockerEnv false. Transport: Root hidden ssh.exe reverse loopback PC3 127.0.0.1:15461 -> CP 127.0.0.1:55461 with pinned known_hosts.",
+   "Cadence: source loop stop.wait(5) plus work; observed heartbeat advance 7.63/7.64/7.73 s per sample pair and consumed_probes +1; PC2/PC4 already had 6 consumed probes ~40 s after start with 0 manual observer calls — consistent with the standing standard loop picking up new channels."
+  ],
+  "4_failuresAndRecovery": [
+   "Retained, not upgraded: PC3 workload image build r1 HOLD (FROM raw image ID; r2 immutable RepoDigest), observer image r1 HOLD (wheel basename; r2), observer start HOLD AssertionError (exact assertion cause NOT established; read-only diagnosis running/restart0/log0, standard once observed1/unavailable0, later pure read-only pair advanced), readiness probe r1 SSH exit1 x2 (remote syntax from newline/CRLF escaping; r2 read-only), PC2 key prep r1 HOLD (absent nodes parent; read-only proof of no residue; r2 created exact 0700 parent and reused frozen IDs, PC2 public plan byte-identical r1==r2), PC2 trust r1 stderr 153B rejected (r2 read-only byte/key/TLS reconcile, no rewrite, warning class captured as CryptographyDeprecationWarning; PC4 uses aware property).",
+   "The known-cause recoveries are operator-script corrections; none requires a product fix."
+  ],
+  "5_rootRuntimeProofs": "Root 17:13:46 read-only pair (8 s, manualObserverCalls 0, DBWrites false): all 3 online, heartbeat/snapshot advanced, probes +1, channel v1, max age 2.10 s < 15 s, nonces distinct, snapshot tenant/epoch/node/profile exact. Root 17:14:39 fresh admin PKCE S256 token/session/owner/nodes/capacity/3 usage HTTP 200, anonymous 401: exactly 3 current-project nodes (set == admitted), resource IDs == requested, capacity=offered=spare, reserved 0, total 1500m/201326592B, max heartbeat age at read 3.20 s. These are ROOT evidence the reviewer checked for internal consistency; they are NOT reviewer runtime probes. Browser selected-project/flicker NOT_OBSERVED; real workload NOT_RUN."
+ },
+ "findings": [
+  {"id": "FT-L1", "severity": "LOW", "mandatory": false, "class": "conditional Root operational obligation (evidence hygiene)",
+   "where": "pc3-actual-cpu-pilot-r1/public-receipt-inventory.json entry pc3-observer-tunnel-r1/start-receipt.json",
+   "fact": "Pinned 735B/ecd66dca… but the committed blob is 720B/f199a668…. Reviewer reconstruction: replacing LF by CRLF in the blob gives exactly 735B/ecd66dca…, so the pin is of the pre-commit CRLF PowerShell file and repository eol=lf normalisation changed the bytes. Content is identical; the other 40 inventory entries match byte-exactly.",
+   "disposition": "Root should note the normalisation (or re-pin the committed LF bytes) in its next checkpoint. Not a tampering indication and not a product defect."},
+  {"id": "FT-L2", "severity": "LOW", "mandatory": false, "class": "conditional Root operational obligation (invocation-byte provenance)",
+   "where": "three-pc-actual-cpu-pilot-r1/pc24-node-start-r2/node-start-template-remote-program.py.txt:24,34",
+   "fact": "The published node-start program is a template containing the PC3 address 192.168.45.222 twice (publish flag and PortBindings assertion). The PC2/PC4 receipts show 192.168.45.143/.210, so the bytes actually executed on PC2/PC4 differ from the published file and are neither published nor hashed. The recorded docker inspect results (asserted by the same program shape) bind the actual configuration.",
+   "disposition": "Root should record the rendering rule (only that address literal substituted) and the SHA256 of each rendered PC2/PC4 program, or publish them. Non-blocking for observation acceptance."},
+  {"id": "FT-L3", "severity": "LOW", "mandatory": false, "class": "conditional Root operational obligation (observer provenance)",
+   "where": "pc3-actual-cpu-pilot-r1/pc3-standard-observer-image-r1/wheel-name-r2-receipt.json",
+   "fact": "The observer runs /observer-bootstrap.py (SHA 8cccc5a1…) built by Dockerfile r2 (260f52d7…); neither file's bytes are public. Source inv.observer_worker.main reads INV_RUNTIME_DSN from the environment, so a bootstrap must read the secret file and enter the standard main. 'Standard observer, no custom poll loop' is therefore Root-attested; the reviewer can confirm only that the observed cadence and probe counts are consistent with the source loop.",
+   "disposition": "Root should publish the bootstrap and Dockerfile r2 bytes (no secret content) or an AST summary pinned to those SHAs before treating the observer image as a reviewed standard deployment beyond this pilot."},
+  {"id": "FT-L4", "severity": "LOW", "mandatory": false, "class": "conditional Root operational obligation (import provenance)",
+   "where": "tools/fresh_cpu_admission.py:24 (1efea, SHA 8129ab5a…) as copied to the operator ops directory",
+   "fact": "The CLI inserts Path(__file__).resolve().parents[1]/'services/control-plane/src' at sys.path[0]. For the copied ops/fresh_cpu_admission.py that is <share>/services/control-plane/src on the PC3 operator host. The wrapper verifies the venv site-packages library SHA, not the module the CLI actually imports; that is the same module only if that share path is absent. The recomputed digests and 1efea-only APPLY receipt fields (readbackVerifiedBeforeCommit, nodeControlSeedVersion) are consistent with the verified library, so no contradiction exists.",
+   "disposition": "Before further CLI use, Root should record read-only absence of <share>/services/control-plane/src (or invoke the library via a pinned entry that adds no path). No product change required for this acceptance."}
+ ],
+ "info": [
+  {"id": "FT-I1", "fact": "image-load receipt fields tagOverwrite:false and oldContainerMutation:false are literal constants, not measurements. Preservation of the 7 old container records per PC2/PC4 is supported by construction (no destructive docker or SQL verbs in any published program; containers reference image IDs), not by a post-start re-inventory."},
+  {"id": "FT-I2", "fact": "PC2/PC4 admission receipts' PC field names the target Node; execution was in the PC3 operator venv (python3.14 site-packages path; Root History 17:10:39 section)."},
+  {"id": "FT-I3", "fact": "The PLAN wrapper does not pin the CLI SHA (APPLY does); PLAN is read-only with a before==after zero-count readback."},
+  {"id": "FT-I4", "fact": "PC3 PKI/admission/start remote programs and PC3 peer-policy body are not public; PC3 evidence is receipts plus the public leaf/request, which the reviewer re-derived (digest/request hash/identity)."},
+  {"id": "FT-I5", "fact": "Each Node container mounts the host docker socket, which is host-root-equivalent by design; the container hardening flags do not confine that authority. Workload isolation was not exercised (NOT_RUN)."},
+  {"id": "FT-I6", "fact": "Signatures (CSR self-signature, leaf/CA, TLS handshakes) were not re-verified by the reviewer; only DER structure, key equality, AKI/SKI linkage and hashes were checked."},
+  {"id": "FT-I7", "fact": "Freshness margins: max snapshot/heartbeat age 2.10 s in the pair and 3.20 s at API read versus the 15 s source threshold; cycle ~7.6 s."},
+  {"id": "FT-I8", "fact": "Default Windows trust failed the IdP TLS (self-signed, verify code 18) while the explicitly trusted existing public chain succeeded with no insecure option; this remains an operational HOLD, not a defect of the pilot evidence."}
+ ],
+ "remainingLiveHolds": ["PC1 current SSH 255 / previous public-key failure", "PC5 Docker API1.41 < selected 1.45 and main-host resource constraint", "current CP API workspace not configured", "additional real non-requester approver identity and two actual distinct votes", "actual Run/output/audit/GPU/storage/five-PC acceptance", "default Windows IdP TLS self-signed while explicit chain works", "pilot peer policy expires 2026-11-08T07:15:30Z; leaves 2026-11-09T07:15:30Z; renewal pending", "tunnel auto-reconnect/reboot/renewal acceptance pending", "browser selected-project/flicker NOT_OBSERVED", "Original19 HOLD, discharges 0, runtime B0, A1-A16 PENDING, H1-H7/H3EA/RD NULL_HOLD, raw7 UNREGISTERED, A01-A40 NOT_RUN"],
+ "notClaimed": ["reviewer live hardware/runtime validation", "physical resource sharing", "workload execution", "five-PC or program completion", "identity/vote creation", "existing source CI as equipment acceptance"],
+ "ownDataChecks": [
+  {"argv": "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe -I -B pilot_evidence_probe.py ../r510 ../in2/cli.py.txt ../in2/lib.py.txt ../p2-out.json (cwd scratch/p2)", "attempt1Exit": 1,
+   "attempt1Note": "reviewer probe bug (DER outer SEQUENCE not unwrapped, ValueError); fixed two lines in the probe only, no input changed",
+   "exit": 0, "probeSHA256": "9bf50a0258e200d4d34bf1d4578d755a9d89864935429d93e6cb244a62ae2609",
+   "inputs": "49 Root510 files (git show baaa8ea9, hashes in output) + 1efea CLI 8129ab5a… + library 76407ced…", "outputSHA256": "b408dbf2103f53270962ee3675d92de665e51ffe081dd115f8971cf7a6f4bf29"}
+ ],
+ "notRun": ["SSH/DB/HTTP/browser/app/crypto/container execution", "product import/CLI/pytest/Go/Core/Backend CI", "signature verification", "reading Root/worker config, manifests, .work, .env, credentials, accounts, JWT, PKI private material, .ssh, docker auth, raw transcripts or credential-incident content"],
+ "authorityGranted": null
+}
