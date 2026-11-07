@@ -1,15 +1,19 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.476"
+version: "1.0.477"
 status: "review"
 author: "Codex"
-updated: "2026-11-07T19:18:06+09:00"
+updated: "2026-11-07T19:50:51+09:00"
 source_of_truth: "Git"
 active_card: "FLEET5 continued supervision with PORTAL-REFRESH-FLEET-20261106"
-active_card_status: "BFinalCombinedCodeCIActive_PC3BusinessWheelAnd41RuntimeWheelsStagedNotInstalled_FinalCodeReviewDeploymentPending_RootCanonicalApplyDeferred"
+active_card_status: "BFirstWorkspaceA88Backend14FailuresBeingFixed_RootAC11ExactTwoSignatureDecisionDelivered_FinalCIReviewDeploymentPending_RootCanonicalApplyDeferred"
 active_card_next: "B Task72ad09258a5c/ctx200 implements exact R1 serving+atomic binding+UI, real restricted-role hosted tests and final Frontend/Core/Backend/Docs; one actual Claude then Root protected deployment. Root must defer canonical APPLY until B full snapshot closes. PC1 local key registration/additional real approver identity remain pending; no fake ready/workload/votes/Run."
 ---
+
+## 2026-11-07T19:50:51+09:00 AC11 목록 변경의 Root 결정과 B 수정 계속
+
+B의 첫 Workspace 후보 a88fd600은 Frontend·Docs 성공과 Backend3.12의 14 실패/9076 성공을 보고했다. 그중 0068의 새 두 보안 함수와 기존15개 AC11 목록 불일치에 대해 Root가 SQL·policy 차이·기존값 불변을 확인하고 정확히17개 목록으로의 기계적 갱신을 결정해 실제 전달했다. RLS 예외·보안 threshold·승인 조건은 보존하며 최종 코드·실측 보안 PASS·Claude 검토는 미수락이다. B가 나머지 오류와 최종 CI를 계속 담당한다. 실제 메시지 msg_2d1917021248로 Root가 reviewer-owned 입력의 한정 변경과 공개 원본 네 파일을 전달했다. 실제 독립 Claude 검토와 운영 인수는 여전히 다음 단계다.
 
 ## 2026-11-07T19:18:06+09:00 PC3 실행 의존성 실제 준비
 

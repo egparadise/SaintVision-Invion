@@ -1,0 +1,19 @@
+{
+  "atKST": "2026-11-07T19:50:51+09:00",
+  "request": "msg_056dcaf7b08e",
+  "delivery": "msg_2d1917021248",
+  "task": "task_72ad09258a5c",
+  "dispatch": "ctx_20044c1f6fae",
+  "decision": "Exact two catalogue signatures only; final CI and actual Claude review pending",
+  "workerReportedCandidate": "a88fd60094339e55da2536e5485eed00b8eaa5ed",
+  "workerReportedCI": {
+    "Frontend": "passed; final IDs/artifacts pending",
+    "Docs": "passed; final IDs/artifacts pending",
+    "BackendPython312": {
+      "failed": 14,
+      "passed": 9076
+    }
+  },
+  "actualIndependentCodeReviewCompleted": false,
+  "wholeProgramComplete": false
+}

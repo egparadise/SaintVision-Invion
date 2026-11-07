@@ -1,0 +1,68 @@
+{
+  "docID": "FLEET5-FIRST-WORKSPACE-AC11-CATALOGUE-R1",
+  "version": "1.0.0",
+  "atKST": "2026-11-07T19:48:57+09:00",
+  "status": "APPROVE_EXACT_CATALOGUE_DELTA_FOR_IMPLEMENTATION_CI_NOT_FINAL_CODE_ACCEPTANCE",
+  "architectureReviewer": "Root Codex; distinct from author B Task72ad09258a5c",
+  "actualIndependentClaudeCodeReview": "PENDING; none claimed by this decision",
+  "managementBase": "f38925403e6cdb6739fca163eb6f59c092899834",
+  "inspectedCandidate": "a88fd60094339e55da2536e5485eed00b8eaa5ed",
+  "productBase": "1efea494f026e932360c35ae811b6423d874a2e7",
+  "sourceQuestion": "msg_056dcaf7b08e",
+  "contractFreeze": "FLEET5-WS-FIRST-INTENT-CONTRACT-R1 v1.0.0",
+  "policyRevision": "0068_first_workspace_intent",
+  "existingSignaturesPreserved": 15,
+  "authorizedTotalSignatures": 17,
+  "addedSignatures": [
+    "inv.append_first_workspace_intent(text, text, jsonb, text, text, text, bigint)",
+    "inv.append_first_workspace_run(text, text, text, text, bigint, bigint, text, text)"
+  ],
+  "candidateDeclaredDefinitions": {
+    "inv.append_first_workspace_intent(text, text, jsonb, text, text, text, bigint)": {
+      "definitionSHA256": "a92b76b6a0f01d5fb63db6b0f3189f630bac271e18c02a6ad52cb56a483b6064",
+      "executeRoles": [
+        "inv_kernel"
+      ],
+      "kind": "tenant-bound",
+      "sourceMigrationSHA256": "8b79f55289661d7590dbe24e60d60d319360e7fcaf35454fe21c722fe11905d3"
+    },
+    "inv.append_first_workspace_run(text, text, text, text, bigint, bigint, text, text)": {
+      "definitionSHA256": "7acaf7b9d1354918e04a6fc944a4419dee0314a177519b40e3591abc80f6fcaa",
+      "executeRoles": [
+        "inv_kernel"
+      ],
+      "kind": "tenant-bound",
+      "sourceMigrationSHA256": "8b79f55289661d7590dbe24e60d60d319360e7fcaf35454fe21c722fe11905d3"
+    }
+  },
+  "candidateDefinitionHashesActuallyMeasuredByRoot": false,
+  "reviewDocument": "docs/vault/30_Development/Evidence/fleet5-20261105-root/first-workspace-ac11-catalogue-delta-r1/root-architecture-decision.md",
+  "authorityBoundary": "Catalogue membership and exact mechanical projection only. Final implementation, live catalogue definitions/grants, restricted-role runtime tests, complete CI and actual Claude review remain required.",
+  "trustedServiceContextBoundary": "Transaction-local subject/tenant/epoch GUCs are trusted SQL service context, not cryptographic end-user proof or protection after SQL service credential compromise.",
+  "requiredSecurityProperties": [
+    "NOLOGIN/NOSUPERUSER/NOBYPASSRLS/NOINHERIT dedicated writer; no role membership or schema/table ownership",
+    "pg_catalog search_path and row_security=on; schema-qualified SQL",
+    "PUBLIC and inv_app EXECUTE revoked; inv_kernel only",
+    "Exact column privileges, FORCE RLS and tenant policies; no new collector RLS exception",
+    "Current epoch/kill switch, active requester/project linkage, selected genuine ready Workspace and current intent/versions/hash rechecked",
+    "Same transaction and required lock order; rollback includes run, business mapping, audit and idempotency state",
+    "Generic Run endpoint, approval quorum, containment, output verification and thresholds unchanged"
+  ],
+  "allowedMechanicalChanges": [
+    "Import this Root decision and reviewed-source-authorized.json verbatim to the corresponding B repository paths",
+    "Update only verifiedAt and definerReview in reviewer-owned source; preserve secVf001 and rlsAcceptedDispositions exactly",
+    "Generate output using existing writer; no hand edited allowlist",
+    "Repin generated allowlist blob/canonical hash and exact changed definer policy blob in aggregate_ac11_evidence.py; preserve all thresholds, critical/high rules and required axes",
+    "Update exact catalogue count test 15 to 17 while retaining set equality and all negative mutation assertions",
+    "If existing sourceDocument/registry/importer pin-chain must rotate, follow existing same-source generation procedure, changing provenance hashes only; no target identity/axis/acceptance semantics change"
+  ],
+  "sourceChangesRequireReReview": [
+    "Any third helper/signature or changed existing15 entry",
+    "New PUBLIC/inv_app/owner runtime privilege, weakened RLS/collector baseline, trust/approval/containment boundary change"
+  ],
+  "boundedCorrectionRule": "B may fix the two bounded helpers/migration inside frozen R1, measuring and repinning exact final definitions/source hashes; this is not blanket acceptance of future code. Record every delta, retain CI failures, and deliver final source/PG proof for actual Claude review before deployment.",
+  "DBWrites": false,
+  "liveSchemaApplied": false,
+  "AC11MeasuredPass": false,
+  "wholeProgramComplete": false
+}
