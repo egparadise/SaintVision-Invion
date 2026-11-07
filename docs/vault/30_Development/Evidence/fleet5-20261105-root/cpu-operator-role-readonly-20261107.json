@@ -1,0 +1,116 @@
+{
+  "atKST": "2026-11-07T14:47:02+09:00",
+  "scope": "Root-only SELECT catalog and exact current tenant/project pre-APPLY role disposition; no product import or admission execution",
+  "tenant": "97968b42-68aa-40ce-af5e-3a33e2fc2205",
+  "project": "prj_01M6NDBHVD2DZQ1Q38DCKN1XE3",
+  "expectedEpoch": "bcd581be-31b4-4aca-86e6-3ca31b69ed09",
+  "actualCredentialOrDSNValuesLogged": false,
+  "existingCredentialSourceOnly": true,
+  "DBWrites": false,
+  "roleOrGrantChanges": false,
+  "actualAPPLY": "NOT_RUN",
+  "wholeProgramComplete": false,
+  "transactionReadOnly": true,
+  "serverAddressLoopbackAndNamedPort": true,
+  "existingOperatorRoleClass": {
+    "rolsuper": true,
+    "rolbypassrls": true,
+    "rolcanlogin": true
+  },
+  "roleBypassesRLS": true,
+  "invSchemaUsage": true,
+  "catalogPrivileges": [
+    {
+      "relation": "inv.control_epoch",
+      "can_select": true,
+      "can_update": true,
+      "can_insert": true
+    },
+    {
+      "relation": "inv.tenants",
+      "can_select": true,
+      "can_update": true,
+      "can_insert": true
+    },
+    {
+      "relation": "inv.projects",
+      "can_select": true,
+      "can_update": true,
+      "can_insert": true
+    },
+    {
+      "relation": "inv.tenant_controls",
+      "can_select": true,
+      "can_update": true,
+      "can_insert": true
+    },
+    {
+      "relation": "inv.business_projects",
+      "can_select": true,
+      "can_update": true,
+      "can_insert": true
+    },
+    {
+      "relation": "public.projects",
+      "can_select": true,
+      "can_update": true,
+      "can_insert": true
+    },
+    {
+      "relation": "inv.nodes",
+      "can_select": true,
+      "can_update": true,
+      "can_insert": true
+    },
+    {
+      "relation": "inv.resources",
+      "can_select": true,
+      "can_update": true,
+      "can_insert": true
+    },
+    {
+      "relation": "inv.project_nodes",
+      "can_select": true,
+      "can_update": true,
+      "can_insert": true
+    },
+    {
+      "relation": "inv.node_channels",
+      "can_select": true,
+      "can_update": true,
+      "can_insert": true
+    },
+    {
+      "relation": "inv.node_channel_audit",
+      "can_select": true,
+      "can_update": true,
+      "can_insert": true
+    },
+    {
+      "relation": "inv.node_controls",
+      "can_select": true,
+      "can_update": true,
+      "can_insert": true
+    }
+  ],
+  "publicProjectsRLS": {
+    "relrowsecurity": true,
+    "relforcerowsecurity": true
+  },
+  "currentEpochMatches": true,
+  "businessProjectActiveVisible": true,
+  "businessLinkEnabled": true,
+  "tenantControlObservation": {
+    "version": 0,
+    "kill_switch": false
+  },
+  "currentNodeProjectSnapshotCounts": {
+    "nodes": 1,
+    "project_links": 0,
+    "epoch_snapshots": 0
+  },
+  "M1ExistingRoleClassAndTargetCatalogChecksSatisfied": true,
+  "L1ApplyAdditionalPrivilegesCatalogObserved": true,
+  "M1Disposition": "Select this already-existing RLS-bypassing operator class for the exact named target; no role/policy/grant changes. Actual eventual profile/connection must match these properties and target again before APPLY.",
+  "directExit": 0
+}

@@ -1,15 +1,19 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.467"
+version: "1.0.468"
 status: "review"
 author: "Codex"
-updated: "2026-11-07T14:23:47+09:00"
+updated: "2026-11-07T14:53:18+09:00"
 source_of_truth: "Git"
 active_card: "FLEET5 continued supervision with PORTAL-REFRESH-FLEET-20261106"
-active_card_status: "FreshCPUAdmission1efeaFourNewFilesThreeCI_70New25PGPASS_RootVerified_IndependentReviewReady; ActualRuntimeFivePCIncomplete"
-active_card_next: "Root start one actual Claude CODE review1efea after verified own three CI/new70cases25actualPG. Preserve raw WIP and original holds. No liveadmission before verdict and pinned operator/certificate/target/profile. Additional approver identity and real two-voter approvals still pending for actual Run."
+active_card_status: "FreshAdmission1efeaActual6bdCodeAccepted_FiniteCardDone; M1ExistingOperatorCatalogChecksSatisfied_M2ReconcileOnlyEntryReviewReady; ActualFivePCIncomplete"
+active_card_next: "Root start one actual independent review of frozen reconcile-only operational entry42e89b61 for M2; no new product mode/CI. M1 existing role catalog checks observed, actual profile must still be frozen/rechecked. Then bind actual one-node target/leaf/fence; actual registration/observation/two-voter Run and5PC still incomplete."
 ---
+
+## 2026-11-07T14:53:18+09:00 신규등록CODE수락과 실제운영조건
+
+신규CPU등록1efea는실제Claude검토6bd81ef0에서코드수락/필수수정0을받았고작성자의한정CODE완료보고를확인했다. 두MEDIUM은Root의실적용전조건이다. 기존DB운영자계정의RLS우회와추가테이블권한은읽기전용실조회로확인했고변경하지않았다. commit불명때재적용하지않는확인전용진입점을고정해독립검토할예정이다. 새70시험중25건은PGfixture사용이며그중1건은DB전인증서거부임을명확히한다. 실제프로필·Node·leaf고정/등록/관측/Run/5대인수는아직미완료다. 실제명령·exit·원본판정·SHA·CI·미확인·후속담당은 Root History/Evidence에 보존했다.
 
 ## 2026-11-07T14:23:47+09:00 신규CPU등록 후보1efea와 실제PG시험
 

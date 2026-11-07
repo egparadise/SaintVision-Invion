@@ -1,0 +1,27 @@
+{
+  "atKST": "2026-11-07T14:53:18+09:00",
+  "productSource": "1efea494f026e932360c35ae811b6423d874a2e7",
+  "actualCodeReview": "6bd81ef0531b4a58438c98618e92d5ad9985c12b",
+  "codeVerdict": "ACCEPT_FRESH_CPU_ADMISSION_OPERATOR_CODE_KEEP_ACTUAL_HOLD",
+  "M1": {
+    "status": "CATALOG_ROLE_AND_EXACT_CURRENT_TARGET_OBSERVED_SATISFIED; actual eventual private profile must be frozen/rechecked",
+    "evidence": "cpu-operator-role-readonly-20261107.json",
+    "readOnly": true,
+    "existingRoleSuperuserAndBYPASSRLS": true,
+    "newRoleOrGrantRequired": false
+  },
+  "M2": {
+    "status": "PROPOSED_RECONCILE_ONLY_ENTRY_READY_FOR_ACTUAL_INDEPENDENT_REVIEW; not yet approved/executed",
+    "entrySHA256": "42e89b6173cd9a8ad1cfa6998da30f068d6409e03e803b523bfb7f076576a3aa",
+    "entryPath": "fresh-cpu-reconcile-entry-r1/operator_reconcile_fresh_cpu.py.txt",
+    "librarySource": "1efea494f026e932360c35ae811b6423d874a2e7",
+    "candidateWheelSHA256": "b329c2f89bb81dcc4b841fca6bf18cd8bfeeed07a657fbab7e6b6e9f4edd8d23",
+    "actualIndependentEntryReview": "READY_NOT_STARTED",
+    "actualExecution": "NOT_RUN",
+    "noAutomaticApplyOrRetry": true
+  },
+  "actualOperatorProfileTargetNodeLeafFence": "NOT_YET_FULLY_BOUND",
+  "liveAdmission": "NOT_RUN",
+  "runtimeOrPKIGrant": false,
+  "wholeProgramComplete": false
+}

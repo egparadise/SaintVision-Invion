@@ -1,0 +1,12 @@
+{
+  "entrySHA256": "42e89b6173cd9a8ad1cfa6998da30f068d6409e03e803b523bfb7f076576a3aa",
+  "entryBytes": 2942,
+  "entryASTParseOnly": true,
+  "singleReconcileCallNoApplyOrPlanWriterImport": true,
+  "candidateWheelSHA256": "b329c2f89bb81dcc4b841fca6bf18cd8bfeeed07a657fbab7e6b6e9f4edd8d23",
+  "source": "1efea494f026e932360c35ae811b6423d874a2e7",
+  "actualExecution": "NOT_RUN",
+  "actualIndependentEntryReview": "PENDING",
+  "actualAuthority": null,
+  "wholeProgramComplete": false
+}

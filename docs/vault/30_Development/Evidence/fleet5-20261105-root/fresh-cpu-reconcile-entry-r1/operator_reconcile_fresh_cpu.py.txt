@@ -1,0 +1,70 @@
+"""Root operational entry, RECONCILE ONLY; run on the frozen isolated host.
+
+Requires the operator's verified candidate wheel and self-contained connection
+profile. This entry is not a DSN/filesystem sandbox and never performs APPLY.
+The public request is bounded stdin; the original plan digest is a fixed named
+environment input. No exception, connection, request, argv or environment value
+is logged. A matched result still requires operator disposition.
+"""
+import json
+import os
+import re
+import sys
+
+
+def fail(code):
+    print(json.dumps({
+        "mode": "RECONCILE", "status": "HOLD", "code": code,
+        "automaticRetryAllowed": False, "operatorDispositionRequired": True,
+    }, sort_keys=True), file=sys.stderr)
+    return 2
+
+
+def main():
+    domain_type = ()
+    safe_codes = {"FRESH-0011"}
+    try:
+        import psycopg
+        from inv.errors import DomainError
+        from inv.fresh_cpu_admission import (
+            MAX_REQUEST_BYTES, SAFE_ERRORS, prepare_request, reconcile_admission,
+        )
+        domain_type = DomainError
+        safe_codes = frozenset(SAFE_ERRORS)
+        if len(sys.argv) != 1:
+            return fail("FRESH-0001")
+        raw = sys.stdin.buffer.read(MAX_REQUEST_BYTES + 1)
+        item = prepare_request(raw)
+        expected = os.environ.get("SV_FRESH_NODE_EXPECTED_PLAN_SHA256")
+        if (type(expected) is not str
+                or not re.fullmatch(r"[0-9a-f]{64}", expected)
+                or item.digest() != expected):
+            return fail("FRESH-0002")
+        dsn = os.environ.get("SV_FRESH_NODE_OPERATOR_DSN")
+        if not dsn:
+            return fail("FRESH-0012")
+        # Forward the pre-frozen auth/TLS/options profile intact, as the vetted
+        # CLI does. Set read-only connection transactions before library use.
+        with psycopg.connect(dsn, autocommit=True) as conn:
+            conn.read_only = True
+            result = reconcile_admission(conn, raw)
+        if (type(result) is not dict or result.get("mode") != "RECONCILE"
+                or result.get("status") != "MATCHED_METADATA_REQUIRES_OPERATOR_DISPOSITION"
+                or result.get("planSha256") != expected):
+            return fail("FRESH-0009")
+        print(json.dumps({
+            "mode": "RECONCILE", "status": result["status"],
+            "planSha256": expected, "readOnly": True,
+            "automaticRetryAllowed": False, "runtimeAuthorityGranted": False,
+            "operatorDispositionRequired": True,
+        }, sort_keys=True))
+        return 0
+    except BaseException as error:
+        # Imports, driver setup, interrupts and unexpected responses all HOLD.
+        # Never stringify an exception or include its class/connection fields.
+        code = getattr(error, "code", None) if isinstance(error, domain_type) else None
+        return fail(code if type(code) is str and code in safe_codes else "FRESH-0011")
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

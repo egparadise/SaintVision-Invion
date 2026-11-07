@@ -1,0 +1,182 @@
+{
+  "task": "FLEET5-FRESH-CPU-ADMISSION-1EFEA-INDEPENDENT-CODE-REVIEW-20261107",
+  "orcaTask": "task_4b48b22863bb",
+  "dispatch": "ctx_5edc24050812",
+  "reviewer": "Claude (one actual reviewer; no helper/subagent/second reviewer)",
+  "author": "Codex",
+  "startedKST": "2026-11-07T14:34:44+09:00",
+  "candidate": "1efea494f026e932360c35ae811b6423d874a2e7",
+  "directParent": "7033778ad3d2bc284e36f7e29be7597dbb7d9f23",
+  "authorBranch": "agent/codex/fleet5-fresh-cpu-admission-r1-20261107",
+  "authorRemoteRefExact": true,
+  "reviewBranch": "agent/claude/fleet5-fresh-cpu-1efea-review-20261107",
+  "predecessor": {
+    "dispatch": "ctx_1ba53b566ab1",
+    "task": "task_65b33b98a1b9",
+    "state": "succeeded/settled/exited/released",
+    "source": "Root .work/fresh-cpu-1efea-review-predecessor-final-show.json sha256 cab184f02fc4985074108a79a004a3fa9dfba7c278000e76e26c5d67a9ba84c9 (read as DATA)"
+  },
+  "base703AcceptanceNotSubstituted": "7023992f / Docs42340533148 accepted base 703 only; this verdict is for the four NEW 1efea files",
+  "rootBoardsRead": {
+    "rootWorktree": "D:/Project/SaintVisionI-Invion/fleet-five-orchestration-20261105",
+    "rootHEAD": "9149c6e79653e58131e6212dcab63a4814bbe43d",
+    "INDEX-PROGRESS-001": "1.0.506 (updated 2026-11-07T14:23:47+09:00)",
+    "WORKBOARD-CODEX-001": "1.0.467",
+    "WORKBOARD-CLAUDE-001": "1.2.130",
+    "HISTORY-FLEET5-20261105-START-CODEX": "1.0.115",
+    "rootVerification": ".work/fresh-admission-1efea-source-ci-root-verified.json sha256 a34b777d4f0d2ffccbc07a29d33b9a82fb6601e940169eaa664e0fff9bda669f, byte-equal to Evidence/fleet5-20261105-root/cpu-fresh-admission-1efea-source-ci-root-verification.json",
+    "rootStepConfirmation": ".work/fresh-admission-1efea-required-step-confirmation.json sha256 9d95ca6b17c7a374b6b34b0cf5c5aafdd0f9f2473f35d4c1a57ed898dac0d289",
+    "rootScope": ".work/fresh-cpu-admission-code-r1-root-scope.txt sha256 7da516ba4ca55f3dd8211ba736f288f23361c6e9f3c3dc9ce26104853c5e13b8",
+    "reviewSpec": ".work/fresh-cpu-1efea-independent-code-review-spec.txt sha256 3e7186926e49381892d53552d0b7eb887b451f7bc59a8bfa553ec24c9903bc30"
+  },
+  "verdict": "ACCEPT_FRESH_CPU_ADMISSION_OPERATOR_CODE_KEEP_ACTUAL_HOLD",
+  "mandatoryCurrentScopeCodeFixes": 0,
+  "severityCounts": {
+    "HIGH": 0,
+    "MEDIUM": 2,
+    "LOW": 4,
+    "INFO": 6
+  },
+  "mediumAreRootPreApplyDispositionsNotCodeDefects": true,
+  "findings": [
+    {
+      "id": "FC1E-M1",
+      "severity": "MEDIUM",
+      "kind": "operational precondition / test-attribution",
+      "where": "services/control-plane/src/inv/fresh_cpu_admission.py:199-209",
+      "fact": "public.projects has FORCE ROW LEVEL SECURITY with policies only TO inv_app (FOR ALL, migrations/versions/0001_s02_baseline.py:470-476) and TO inv_cancel_bridge_owner (FOR SELECT only, migrations/versions/0056_kernel_cancel_audit_bridge.py:99-102). Under PostgreSQL's documented policy matrix SELECT ... FOR SHARE needs both SELECT and UPDATE policy visibility. A non-superuser, non-BYPASSRLS operator role therefore cannot see the business-linked public.projects row and the existing-business-link branch refuses FRESH-0005 deterministically (APPLY always; PLAN too unless it is a member of a SELECT-policy role). Hosted Core CI connects as the postgres superuser (.github/workflows/core.yml:64), which bypasses all RLS, so no test exercises an RLS-subject operator.",
+      "impact": "Fail-closed: no write, no leak. But Root's planned target has an enabled business link, so the tool can only succeed for that target when the privately frozen operator role is superuser or BYPASSRLS (with the needed table grants).",
+      "isolationCheckedByReviewer": "Every tenant-table SQL statement in the module carries an explicit tenant_id predicate/value (review-data-probe.json sqlLiterals), and provision_channel scopes by tenant_id/node_id, so tenant isolation does not depend on RLS when an RLS-bypassing operator is used.",
+      "disposition": "Root pre-APPLY: bind the operator role class in the private profile. A non-bypass operator for a business-linked project needs a later reviewed change (policy/schema work is out of this scope). No current-scope code fix."
+    },
+    {
+      "id": "FC1E-M2",
+      "severity": "MEDIUM",
+      "kind": "operational gap",
+      "where": "tools/fresh_cpu_admission.py:37-47,72-84",
+      "fact": "The CLI maps an ambiguous APPLY outcome to UNKNOWN_RECONCILE_REQUIRED (exit 3, automaticRetryAllowed=false) but offers only PLAN/APPLY. The read-only repeatable-read reconcile_admission exists in the library (fresh_cpu_admission.py:318-344) and is proven after a real commit, but no operator command reaches it. The author's History states this exclusion explicitly ('No CLI reconcile/repair flag ... is introduced').",
+      "impact": "PLAN is not a reconcile substitute: after a commit it returns FRESH-0008, and without one it returns READY. Neither proves the exact rows.",
+      "disposition": "Root, before any actual APPLY: freeze a reviewed way to invoke reconcile_admission with the same trusted connection, or grant a small follow-up CLI mode. Non-blocking for this code acceptance."
+    },
+    {
+      "id": "FC1E-L1",
+      "severity": "LOW",
+      "kind": "preflight completeness",
+      "where": "services/control-plane/src/inv/fresh_cpu_admission.py:162-171,229-240",
+      "fact": "_operator checks only INSERT on 5 tables plus schema USAGE. APPLY additionally needs UPDATE privilege for the six FOR SHARE locks, INSERT on inv.node_controls for the invoker AFTER INSERT trigger (services/control-plane/src/inv/migrations/0022_node_containment.sql:36-45), and RLS visibility. PLAN is unlocked, so a READY plan does not prove these.",
+      "impact": "A READY plan can still be followed by an APPLY FRESH-0011 (rolled back, no write).",
+      "disposition": "Optional: widen the catalog privilege check. Root should treat READY as an observation, as the docstring says."
+    },
+    {
+      "id": "FC1E-L2",
+      "severity": "LOW",
+      "kind": "error classification",
+      "where": "services/control-plane/src/inv/fresh_cpu_admission.py:146-149; services/control-plane/src/inv/node_channels.py:77",
+      "fact": "certificate_identity catches only ValueError/TypeError/ExtensionNotFound. cryptography's x509.DuplicateExtension derives from Exception, so a public DER with a duplicated extension escapes prepare_request as a raw exception. The CLI maps it to FRESH-0011 (503, REFUSED) instead of NODE-0032/FRESH-0001.",
+      "impact": "No write, no leak (CLI prints only the closed code; prepare_request runs before connect). Misclassification only.",
+      "disposition": "Optional: wrap the unchanged helper call in prepare_request and map non-DomainError to FRESH-0001."
+    },
+    {
+      "id": "FC1E-L3",
+      "severity": "LOW",
+      "kind": "operability",
+      "where": "services/control-plane/src/inv/fresh_cpu_admission.py:287-311; tools/fresh_cpu_admission.py:72-84",
+      "fact": "No lock_timeout/statement_timeout, so APPLY can wait indefinitely behind a conflicting row-lock holder. An operator interrupt is a BaseException, which is not mapped: it gets no closed JSON, and during COMMIT the outcome is unknown without exit 3.",
+      "disposition": "Optional: the Root profile may carry options=-c lock_timeout=...; treat any interrupted APPLY as UNKNOWN and reconcile."
+    },
+    {
+      "id": "FC1E-L4",
+      "severity": "LOW",
+      "kind": "test coverage",
+      "where": "tests/core/test_fresh_cpu_admission.py:314-358",
+      "fact": "reconcile_admission is tested only for the positive exact match after a real commit. Its negative paths are code-read only by the reviewer: absence leads to FRESH-0009, control-version drift to FRESH-0007, epoch change to FRESH-0006, and an expired certificate to NODE-0032. Each is fail-closed.",
+      "disposition": "Optional future tests."
+    },
+    {
+      "id": "FC1E-I1",
+      "severity": "INFO",
+      "where": "tests/core/test_fresh_cpu_admission.py:126-156,160-170",
+      "fact": "All PG positive paths run as the CI superuser (see M1). set_config('inv.tenant_id',...,true) placement inside the same outer transaction was verified by reading, not by an RLS-subject test."
+    },
+    {
+      "id": "FC1E-I2",
+      "severity": "INFO",
+      "where": "tests/core/test_fresh_cpu_admission.py:174-193",
+      "fact": "The 'wrong-epoch' case of the scope test is a pre-DB NODE-0032 certificate refusal inside a fresh_db postgres function, and the source comment says so. It is counted among the 25 fixture-based PG cases, but its assertion is certificate-level. The real DB epoch refusal is test_matching_certificate_with_wrong_current_epoch_is_refused (line 197)."
+    },
+    {
+      "id": "FC1E-I3",
+      "severity": "INFO",
+      "where": "tests/core/test_fresh_cpu_admission.py:235-256",
+      "fact": "The 'association' and 'channel' collision cases reuse the target node id, so the inv.nodes EXISTS predicate dominates. The project_nodes, node_channels and audit EXISTS predicates cannot be reached on their own because of the FKs to inv.nodes; they are defense-in-depth that no test proves independently. The resource cases use a different node, so they are independent."
+    },
+    {
+      "id": "FC1E-I4",
+      "severity": "INFO",
+      "where": "services/control-plane/src/inv/migrations/0001_core.sql:18",
+      "fact": "The new offline node receives the schema-default heartbeat_at=clock_timestamp(). Every consumer the reviewer read (capacity, containment, dispatch, leases, tooling, model_commit, model_locality, node_resource_usage, node_channels, build_adapter, gpu) also requires status='online', or a snapshot plus a non-NULL clock_skew_seconds, so the default grants no eligibility. The test at line 148-150 shows project_capacity is empty."
+    },
+    {
+      "id": "FC1E-I5",
+      "severity": "INFO",
+      "where": "services/control-plane/src/inv/fresh_cpu_admission.py:199-209",
+      "fact": "When no business_projects row exists at preflight, nothing is locked, so a concurrent business-link insertion is not serialized. The author explicitly disclaims arbitrary uncoordinated mutators; FK/PK guarantees are unaffected."
+    },
+    {
+      "id": "FC1E-I6",
+      "severity": "INFO",
+      "where": "services/control-plane/src/inv/fresh_cpu_admission.py:335-339",
+      "fact": "Reconcile requires the current tenant-control version to equal the request's version. A later legitimate kill-switch change therefore makes a committed admission reconcile as FRESH-0007 HOLD. This false negative is safe."
+    }
+  ],
+  "verifiedHolds": [
+    "Delta is exactly 56 added paths: 4 new sources/tests and 52 own author docs. No existing product/test/schema/contract/migration/dependency/workflow/Go/node-agent change. All 4 blob SHA256s match the brief (own probe).",
+    "Closed request: exact 12-key set; type(x) is int excludes bool; duplicate keys refused; NaN/Infinity refused via parse_constant; 1e400 parses as float and is refused by the int/str type checks; invalid UTF-8/BOM refused; RecursionError caught; <=128KiB; canonical UUID round-trip; prj/nod/res Crockford regex identical to the schema CHECKs and the NodeId contract; distinct resource ids; canonical base64 round-trip with <=65536 decoded bytes; endpoint and leaf identity via unchanged helpers. All of this runs before any DB work.",
+    "APPLY binds the exact plan digest before _idle/DB. The digest is a pure function of the validated request and fixed profile constants; it is intent binding, not a DB reservation.",
+    "_idle refuses INTRANS/INERROR/UNKNOWN connections, so a caller transaction or savepoint can never be followed by COMMITTED. Tested as FRESH-0003.",
+    "One outer psycopg transaction holds every insert. provision_channel (unchanged, node_channels.py:151-203) opens a nested savepoint, re-takes FOR SHARE on the epoch and FOR UPDATE on the new node/channel rows, and with expected_version=0 creates channel v1 plus the immutable audit row.",
+    "Lock order: FOR SHARE on control_epoch -> tenants -> projects -> tenant_controls -> business_projects -> public.projects. Under READ COMMITTED a committed concurrent kill-switch/version change is re-read (FRESH-0007), and epoch rotation is blocked for the transaction. No contended lock is upgraded, so concurrent admissions introduce no deadlock.",
+    "Collision EXISTS plus PK uniqueness: a concurrent duplicate gets one winner. The loser's UniqueViolation becomes FRESH-0008 with a full rollback (tested with a barrier after both preflights).",
+    "Exact readback before commit: node offline + epoch; exactly two resources with capacity=offered; exactly one enabled membership; channel v1 with epoch/endpoint/fingerprint/notAfter/enabled; exactly one provision audit; tenant_controls version/kill_switch/updated_at unchanged; node_controls exactly [(0,)]. A mismatch is FRESH-0009 with rollback (tested).",
+    "COMMITTED is returned only after the transaction context exits normally (commit acknowledged). A commit-phase failure becomes FRESH-0010, exit 3, UNKNOWN_RECONCILE_REQUIRED, automaticRetryAllowed=false. Tested by fault injection after a real PostgreSQL commit; a new connection sees the rows, and reconcile matches without writes.",
+    "Reconcile: SET TRANSACTION ISOLATION LEVEL REPEATABLE READ, READ ONLY is the first statement after BEGIN, then the operator, epoch and version checks and the exact readback. No write, no retry.",
+    "Privilege check uses the actual catalog. inv_kernel lacks INSERT on project_nodes/node_channels/node_channel_audit (services/control-plane/src/inv/migrations/0019_runtime_role.sql:20,24); inv_app has no inv INSERT. Both are refused FRESH-0004 with all rows preserved (tested).",
+    "The kill switch may stay enabled and is never written (tested). The module contains no UPDATE/DELETE statement, writes no tenant/project/user/grant/control row, and does not import lan_pilot, remote_workspace_entry or any grant module.",
+    "CLI: the DSN comes only from the named env var (regex-constrained name; empty gives FRESH-0012) and is forwarded unchanged with autocommit=True. No file/config/credential discovery: AST shows no open/subprocess/socket, and Path is used only for sys.path. Argparse errors are suppressed. Only closed codes are printed, and unknown DomainError codes become FRESH-0011. No exception text. The digest is refused before connect.",
+    "Trust premise msg_97efddc65fbd is upheld truthfully: the module and CLI docstrings disclaim a libpq sandbox and issuer-chain verification, and the plan carries certificateIssuerChainVerified=false and executionAuthorized=false."
+  ],
+  "testCountsOwnAST": {
+    "functions": 24,
+    "cases": 70,
+    "fixtureBasedPostgresCases": 25,
+    "note": "25 = fresh_db + postgres-marked cases (24 in test_fresh_cpu_admission.py, 1 in the CLI file); one of these asserts a pre-DB refusal (FC1E-I2)"
+  },
+  "ciAttribution": {
+    "reviewerReadOnlyGhApi": "runs 42339493314 (docs), 42339495593 (core), 42339497490 (backend): head 1efea494, author branch, workflow_dispatch, attempt 1, completed/success, display titles equal to the correlation ids",
+    "fromRootReceiptAsDataOnly": "job/step counters, Core 13 separate XML (core-tests 9452 = 9406 pass + 46 skip), 70 new cases PASS, Go 146/550, Docker 1/4 hosted, Backend 9047/75/2 each, MLflow 3, wheel/binary static checks",
+    "reviewerDidNotDownload": "no artifact/log/XML/ZIP download or parse; author local post-CI report not read beyond the brief's hash"
+  },
+  "ownDataChecks": {
+    "probe": "review_data_probe.py.txt sha256 210b064c690b8cf73ab751e95a2a40c351cc8adc37eab14f0c1841b754ddf321",
+    "argv": "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe -I -B -X utf8 docs/vault/30_Development/Evidence/fleet5-fresh-cpu-1efea-review-20261107-claude/review_data_probe.py.txt",
+    "python": "3.14.7",
+    "runs": "2 (before and after the rename to .py.txt), both exit 0, identical output",
+    "output": "review-data-probe.json sha256 c74b6017ee973d3dd784d7e93db2e28f100944a235861f202b4a787017d4dd89",
+    "method": "git show/diff argv + ast.parse of exact blobs; no import or execution of candidate/product code"
+  },
+  "notRun": [
+    "product/app import",
+    "CLI",
+    "crypto",
+    "pytest",
+    "Go/compiler",
+    "Node/browser/runtime",
+    "SSH/Docker/PostgreSQL",
+    "install/PKI/trust/OS/pagefile/process/credential",
+    "new Core/Backend/Frontend CI",
+    "author scripts/collectors/downloaded binaries",
+    "old finite corpus/main",
+    "real profile/DSN/secret/config/manifest/transcript reads"
+  ],
+  "remainsOpen": "Original19 HOLD, acceptedBaselineDischarges 0, runtime B0, A1-A16 PENDING, H1-H7/H3EA/RD NULL_HOLD, raw7 UNREGISTERED, A01-A40 NOT_RUN, whole five-PC and program incomplete. This is not install/deploy/merge/real DB write/CA trust/actual registration/authority approval. Root still needs an actual self-contained profile, a selected current tenant+project+epoch, a new Node+image+leaf+fence/observation, the M1/M2 dispositions, and eventually two distinct non-requester actual Run votes."
+}

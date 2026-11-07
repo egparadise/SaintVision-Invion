@@ -1,6 +1,6 @@
 {
   "schema": "fleet5-root-review-resource-sequence:1",
-  "atKST": "2026-11-07T14:23:47+09:00",
+  "atKST": "2026-11-07T14:53:18+09:00",
   "completedB": {
     "task": "task_d4c4c809ed4e",
     "review": "ac9182c3e3d606ec027c0be2e90e049ff50d54f1",
@@ -15,11 +15,11 @@
   "active": null,
   "pending": [
     {
-      "source": "1efea494f026e932360c35ae811b6423d874a2e7",
-      "base": "7033778ad3d2bc284e36f7e29be7597dbb7d9f23",
-      "task": "FLEET5-FRESH-CPU-ADMISSION-1EFEA-INDEPENDENT-CODE-REVIEW-20261107",
-      "owner": "Actual single Claude to start after this checkpoint",
-      "status": "READY_NOT_YET_DISPATCHED"
+      "entrySHA256": "42e89b6173cd9a8ad1cfa6998da30f068d6409e03e803b523bfb7f076576a3aa",
+      "productSource": "1efea494f026e932360c35ae811b6423d874a2e7",
+      "task": "FLEET5-FRESH-CPU-RECONCILE-ENTRY-INDEPENDENT-REVIEW-20261107",
+      "owner": "One actual Claude after this checkpoint",
+      "status": "READY_NOT_DISPATCHED"
     }
   ],
   "authorParallelWork": "B frozen b51 awaiting actual delta verdict; H12 accepted6d7 plus read-only five-row audit delivered, Root owns first CPU journey preflight. Optional Low backlog is not a mandatory new scope.",
@@ -30,7 +30,7 @@
     "review": "0e53fc024ca773b7719182e170e5e126aeaf5b95",
     "verdict": "ACCEPT TEST-ONLY; R-L1 CLOSED; no new findings"
   },
-  "nextActualReviewTrigger": "Root starts one actual independent Claude review of exact1efea after this checkpoint. Prior reviewer ctx_1ba53b566ab1 is proven succeeded/settled/exited/released. Source and own CI accepted as evidence, not yet CODE or runtime acceptance.",
+  "nextActualReviewTrigger": "Review the Root-owned bounded operational RECONCILE-only invocation required for M2; no product redesign/extra Core Backend CI. Earlier reviewer and code author both proven settled/exited/released. Then freeze actual one-node profile/identity/leaf/request and proceed only within real checks.",
   "completedIntegration": {
     "task": "task_78064fb4b7ff",
     "dispatch": "ctx_ed7ec73163d6",
@@ -1039,14 +1039,21 @@
     "verdict": "ACCEPT_SELECTOR_DISCOVERY_DELTA_CLOSE_OPG_L1_KEEP_ACTUAL_HOLD",
     "Docs": 42333724088
   },
-  "parallelImplementation": {
-    "atKST": "2026-11-07T14:23:47+09:00",
+  "parallelImplementation": null,
+  "CPUJoinSourceMap": {
+    "task": "task_a95ef3d8ccce",
+    "dispatch": "ctx_ed23b4a777d0",
+    "scope": "source-only six-step existing onboarding route map; sanitized Root observations only",
+    "status": "RECOVERY_SENT_DELIVERY_PENDING"
+  },
+  "freshCPUAdmissionWIP": {
+    "atKST": "2026-11-07T14:53:18+09:00",
     "task": "FLEET5-FRESH-CPU-ADMISSION-CODE-R1-20261107",
     "parentOrcaTask": "task_a95ef3d8ccce",
     "dispatch": "ctx_ed23b4a777d0",
     "owner": "Codex",
     "futureReviewer": "Actual independent Claude, not yet started",
-    "status": "PUBLISHED_1EFEA_FOUR_NEW_FILES_OWN_THREE_CI_ROOT_VERIFIED_INDEPENDENT_REVIEW_READY",
+    "status": "FINITE_ADMISSION_CODE_ACTUALLY_ACCEPTED_WORKER_DONE_ROOT_OPERATIONAL_M1_M2_REMAIN",
     "base": "7033778ad3d2bc284e36f7e29be7597dbb7d9f23",
     "scopeMessage": "msg_e716b2cba047",
     "stdinClarification": "msg_5fa2d17d863e",
@@ -1073,7 +1080,7 @@
     "implementation": "PUBLISHED_FOUR_NEW_FILES_NO_EXISTING_703_PRODUCT_EDITS",
     "localProductTests": "NOT_RUN_ON_MAIN",
     "hostedNewCodeCI": "ALL_THREE_EXACT_SOURCE_SUCCESS;70NEWCASE_PASS_INCLUDING25ACTUAL_MANDATORY_PG",
-    "independentCODEReview": "READY_NOT_YET_STARTED_AT_CHECKPOINT",
+    "independentCODEReview": "ACCEPT_FRESH_CPU_ADMISSION_OPERATOR_CODE_KEEP_ACTUAL_HOLD",
     "wholeProgramComplete": false,
     "originalWIP01RootVerification": "cpu-fresh-admission-wip01-root-verification.json",
     "publicationGrantMessage": "msg_97efddc65fbd",
@@ -1308,282 +1315,195 @@
       "actualAuthority": null,
       "runtimeOrFivePCAcceptance": false,
       "wholeProgramComplete": false
-    }
-  },
-  "CPUJoinSourceMap": {
-    "task": "task_a95ef3d8ccce",
-    "dispatch": "ctx_ed23b4a777d0",
-    "scope": "source-only six-step existing onboarding route map; sanitized Root observations only",
-    "status": "RECOVERY_SENT_DELIVERY_PENDING"
-  },
-  "freshCPUAdmissionWIP": {
-    "atKST": "2026-11-07T14:23:47+09:00",
-    "task": "FLEET5-FRESH-CPU-ADMISSION-CODE-R1-20261107",
-    "parentOrcaTask": "task_a95ef3d8ccce",
-    "dispatch": "ctx_ed23b4a777d0",
-    "owner": "Codex",
-    "futureReviewer": "Actual independent Claude, not yet started",
-    "status": "PUBLISHED_1EFEA_FOUR_NEW_FILES_OWN_THREE_CI_ROOT_VERIFIED_INDEPENDENT_REVIEW_READY",
-    "base": "7033778ad3d2bc284e36f7e29be7597dbb7d9f23",
-    "scopeMessage": "msg_e716b2cba047",
-    "stdinClarification": "msg_5fa2d17d863e",
-    "codeScope": [
-      "services/control-plane/src/inv/fresh_cpu_admission.py",
-      "tools/fresh_cpu_admission.py",
-      "tests/core/test_fresh_cpu_admission.py",
-      "tests/core/test_fresh_cpu_admission_cli.py"
-    ],
-    "purpose": "Missing controlled fresh-Node metadata writer: dry plan then exact digest apply; atomic offlineNode+2configuredCPU/memoryresources+projectassociation+existingchannelCAS0/audit, preserve every existing tenant/project/user/grant/control/Node and no public API privilege extension.",
-    "configuredContributionOnly": {
-      "cpuMillis": 500,
-      "memoryBytes": 67108864,
-      "GPU": false,
-      "physicalResourcesMeasured": false
     },
-    "operatorBoundary": "Real pre-existing DB privileges; no request boolean or runtime/JWT escalation. Public certificate identity from actualDER, existing operator/CA provenance boundary explicit.",
-    "CLIInput": "Bounded typed public stdin JSON only; operatorDSN from named env only; no arbitrary config/file reads or credential output.",
-    "actualTargetIDsInGenericCode": false,
-    "newOperationalRequestNodePortImageVolumeCertificateAndPrincipalAuthority": "NOT_BOUND_OR_GRANTED",
-    "publicationDependency": "Concrete WIP01 inspected; Root authorized new candidate commit/push and one exact Docs/Core/Backend as early test candidate. Candidate CI/review and actual operational request remain prerequisites for done/deploy.",
-    "runtimeOrPKIGrant": false,
-    "authorRealConfigCredentialAccess": "DENIED; source and explicitly typed Root observations only",
-    "implementation": "PUBLISHED_FOUR_NEW_FILES_NO_EXISTING_703_PRODUCT_EDITS",
-    "localProductTests": "NOT_RUN_ON_MAIN",
-    "hostedNewCodeCI": "ALL_THREE_EXACT_SOURCE_SUCCESS;70NEWCASE_PASS_INCLUDING25ACTUAL_MANDATORY_PG",
-    "independentCODEReview": "READY_NOT_YET_STARTED_AT_CHECKPOINT",
-    "wholeProgramComplete": false,
-    "originalWIP01RootVerification": "cpu-fresh-admission-wip01-root-verification.json",
-    "publicationGrantMessage": "msg_97efddc65fbd",
-    "baseRequiredThreeCI": "EXACT_703_ALL_SUCCESS_ROOT_VERIFIED",
-    "baseIndependentIntegrationReview": "ACCEPTED_ACTUAL_7023992F_DIRECT_703",
-    "driverBoundary": "Ordinary psycopg/libpq auth/TLS including Root operator-approved file references allowed within selected DB connection. Tool is not a libpq DSN/filesystem sandbox; Root freezes target and driver environment, no silent TLS rewrite. Worker real config/secret access still denied.",
-    "baseReview": "7023992f3a183b690f35bbf00f38983cbdcbca4c",
-    "baseDispositionMessage": "msg_0749172c23bb",
-    "candidate": "1efea494f026e932360c35ae811b6423d874a2e7",
-    "candidateBranch": "agent/codex/fleet5-fresh-cpu-admission-r1-20261107",
-    "actualCandidateVerification": {
-      "atKST": "2026-11-07T14:21:59+09:00",
+    "actualIndependentReview": {
+      "atKST": "2026-11-07T14:45:29+09:00",
       "source": "1efea494f026e932360c35ae811b6423d874a2e7",
-      "base": "7033778ad3d2bc284e36f7e29be7597dbb7d9f23",
-      "branch": "agent/codex/fleet5-fresh-cpu-admission-r1-20261107",
+      "review": "6bd81ef0531b4a58438c98618e92d5ad9985c12b",
+      "directParentExact": true,
       "remoteExact": true,
-      "completeAddedPathCount": 56,
-      "onlyFourNewSourceTestsAnd52OwnDocs": true,
-      "sourceSHA256": {
-        "services/control-plane/src/inv/fresh_cpu_admission.py": "76407ced1411f42a5eddd71c894f541b8691d461d4eb1eaea30f63b8bcf90d2c",
-        "tools/fresh_cpu_admission.py": "8129ab5acf7061b0bc1834aa1142ae944471b1b177f018c810de34ea9a53fe7d",
-        "tests/core/test_fresh_cpu_admission.py": "882e5ff9757a2372173c8410277929786f99791b3d9a5bf4e010eeda8d1bceaa",
-        "tests/core/test_fresh_cpu_admission_cli.py": "cb23b2b15bf7a3a75851f97d07336efeee50830e979591032fe9ee3a8a089f96"
+      "onlyOwn7AddedReviewDocs": true,
+      "Docs": 42343810509,
+      "DocsJob": 128317084381,
+      "correlation": "freshcpu-1efea-review-6bd81ef0-docs-4002a31f9160",
+      "exactManualDocsAll19Success": true,
+      "verdict": "ACCEPT_FRESH_CPU_ADMISSION_OPERATOR_CODE_KEEP_ACTUAL_HOLD",
+      "mandatoryCurrentScopeCodeFixes": 0,
+      "severity": {
+        "HIGH": 0,
+        "MEDIUM": 2,
+        "LOW": 4,
+        "INFO": 6
       },
-      "noExisting703ProductTestContractsMigrationWorkflowChanges": true,
-      "lanes": [
+      "mediumDisposition": "Two Root pre-APPLY prerequisites, not source defects; not yet operationally discharged by this verification",
+      "findings": [
         {
-          "workflow": "docs.yml",
-          "run": 42339493314,
-          "correlation": "freshcpu-1efea494-docs-37e26ae0fb9f",
-          "exactSourceRefEventPathAttempt": true,
-          "conclusion": "success",
-          "jobs": [
-            {
-              "id": 128303801557,
-              "name": "docs",
-              "steps": {
-                "success": 19
-              }
-            }
-          ]
+          "id": "FC1E-M1",
+          "severity": "MEDIUM",
+          "kind": "operational precondition / test-attribution",
+          "where": "services/control-plane/src/inv/fresh_cpu_admission.py:199-209",
+          "fact": "public.projects has FORCE ROW LEVEL SECURITY with policies only TO inv_app (FOR ALL, migrations/versions/0001_s02_baseline.py:470-476) and TO inv_cancel_bridge_owner (FOR SELECT only, migrations/versions/0056_kernel_cancel_audit_bridge.py:99-102). Under PostgreSQL's documented policy matrix SELECT ... FOR SHARE needs both SELECT and UPDATE policy visibility. A non-superuser, non-BYPASSRLS operator role therefore cannot see the business-linked public.projects row and the existing-business-link branch refuses FRESH-0005 deterministically (APPLY always; PLAN too unless it is a member of a SELECT-policy role). Hosted Core CI connects as the postgres superuser (.github/workflows/core.yml:64), which bypasses all RLS, so no test exercises an RLS-subject operator.",
+          "impact": "Fail-closed: no write, no leak. But Root's planned target has an enabled business link, so the tool can only succeed for that target when the privately frozen operator role is superuser or BYPASSRLS (with the needed table grants).",
+          "isolationCheckedByReviewer": "Every tenant-table SQL statement in the module carries an explicit tenant_id predicate/value (review-data-probe.json sqlLiterals), and provision_channel scopes by tenant_id/node_id, so tenant isolation does not depend on RLS when an RLS-bypassing operator is used.",
+          "disposition": "Root pre-APPLY: bind the operator role class in the private profile. A non-bypass operator for a business-linked project needs a later reviewed change (policy/schema work is out of this scope). No current-scope code fix."
         },
         {
-          "workflow": "core.yml",
-          "run": 42339495593,
-          "correlation": "freshcpu-1efea494-core-37e26ae0fb9f",
-          "exactSourceRefEventPathAttempt": true,
-          "conclusion": "success",
-          "jobs": [
-            {
-              "id": 128303806751,
-              "name": "core",
-              "steps": {
-                "success": 42,
-                "skipped": 6
-              }
-            },
-            {
-              "id": 128303806992,
-              "name": "s01-storage-roundtrip",
-              "steps": {
-                "success": 16
-              }
-            }
-          ]
+          "id": "FC1E-M2",
+          "severity": "MEDIUM",
+          "kind": "operational gap",
+          "where": "tools/fresh_cpu_admission.py:37-47,72-84",
+          "fact": "The CLI maps an ambiguous APPLY outcome to UNKNOWN_RECONCILE_REQUIRED (exit 3, automaticRetryAllowed=false) but offers only PLAN/APPLY. The read-only repeatable-read reconcile_admission exists in the library (fresh_cpu_admission.py:318-344) and is proven after a real commit, but no operator command reaches it. The author's History states this exclusion explicitly ('No CLI reconcile/repair flag ... is introduced').",
+          "impact": "PLAN is not a reconcile substitute: after a commit it returns FRESH-0008, and without one it returns READY. Neither proves the exact rows.",
+          "disposition": "Root, before any actual APPLY: freeze a reviewed way to invoke reconcile_admission with the same trusted connection, or grant a small follow-up CLI mode. Non-blocking for this code acceptance."
         },
         {
-          "workflow": "backend.yml",
-          "run": 42339497490,
-          "correlation": "freshcpu-1efea494-backend-37e26ae0fb9f",
-          "exactSourceRefEventPathAttempt": true,
-          "conclusion": "success",
-          "jobs": [
-            {
-              "id": 128303813419,
-              "name": "mlflow-live",
-              "steps": {
-                "success": 9
-              }
-            },
-            {
-              "id": 128303813590,
-              "name": "backend (3.14)",
-              "steps": {
-                "success": 18,
-                "skipped": 2
-              }
-            },
-            {
-              "id": 128303813647,
-              "name": "backend (3.12)",
-              "steps": {
-                "success": 20
-              }
-            }
-          ]
+          "id": "FC1E-L1",
+          "severity": "LOW",
+          "kind": "preflight completeness",
+          "where": "services/control-plane/src/inv/fresh_cpu_admission.py:162-171,229-240",
+          "fact": "_operator checks only INSERT on 5 tables plus schema USAGE. APPLY additionally needs UPDATE privilege for the six FOR SHARE locks, INSERT on inv.node_controls for the invoker AFTER INSERT trigger (services/control-plane/src/inv/migrations/0022_node_containment.sql:36-45), and RLS visibility. PLAN is unlocked, so a READY plan does not prove these.",
+          "impact": "A READY plan can still be followed by an APPLY FRESH-0011 (rolled back, no write).",
+          "disposition": "Optional: widen the catalog privilege check. Root should treat READY as an observation, as the docstring says."
+        },
+        {
+          "id": "FC1E-L2",
+          "severity": "LOW",
+          "kind": "error classification",
+          "where": "services/control-plane/src/inv/fresh_cpu_admission.py:146-149; services/control-plane/src/inv/node_channels.py:77",
+          "fact": "certificate_identity catches only ValueError/TypeError/ExtensionNotFound. cryptography's x509.DuplicateExtension derives from Exception, so a public DER with a duplicated extension escapes prepare_request as a raw exception. The CLI maps it to FRESH-0011 (503, REFUSED) instead of NODE-0032/FRESH-0001.",
+          "impact": "No write, no leak (CLI prints only the closed code; prepare_request runs before connect). Misclassification only.",
+          "disposition": "Optional: wrap the unchanged helper call in prepare_request and map non-DomainError to FRESH-0001."
+        },
+        {
+          "id": "FC1E-L3",
+          "severity": "LOW",
+          "kind": "operability",
+          "where": "services/control-plane/src/inv/fresh_cpu_admission.py:287-311; tools/fresh_cpu_admission.py:72-84",
+          "fact": "No lock_timeout/statement_timeout, so APPLY can wait indefinitely behind a conflicting row-lock holder. An operator interrupt is a BaseException, which is not mapped: it gets no closed JSON, and during COMMIT the outcome is unknown without exit 3.",
+          "disposition": "Optional: the Root profile may carry options=-c lock_timeout=...; treat any interrupted APPLY as UNKNOWN and reconcile."
+        },
+        {
+          "id": "FC1E-L4",
+          "severity": "LOW",
+          "kind": "test coverage",
+          "where": "tests/core/test_fresh_cpu_admission.py:314-358",
+          "fact": "reconcile_admission is tested only for the positive exact match after a real commit. Its negative paths are code-read only by the reviewer: absence leads to FRESH-0009, control-version drift to FRESH-0007, epoch change to FRESH-0006, and an expired certificate to NODE-0032. Each is fail-closed.",
+          "disposition": "Optional future tests."
+        },
+        {
+          "id": "FC1E-I1",
+          "severity": "INFO",
+          "where": "tests/core/test_fresh_cpu_admission.py:126-156,160-170",
+          "fact": "All PG positive paths run as the CI superuser (see M1). set_config('inv.tenant_id',...,true) placement inside the same outer transaction was verified by reading, not by an RLS-subject test."
+        },
+        {
+          "id": "FC1E-I2",
+          "severity": "INFO",
+          "where": "tests/core/test_fresh_cpu_admission.py:174-193",
+          "fact": "The 'wrong-epoch' case of the scope test is a pre-DB NODE-0032 certificate refusal inside a fresh_db postgres function, and the source comment says so. It is counted among the 25 fixture-based PG cases, but its assertion is certificate-level. The real DB epoch refusal is test_matching_certificate_with_wrong_current_epoch_is_refused (line 197)."
+        },
+        {
+          "id": "FC1E-I3",
+          "severity": "INFO",
+          "where": "tests/core/test_fresh_cpu_admission.py:235-256",
+          "fact": "The 'association' and 'channel' collision cases reuse the target node id, so the inv.nodes EXISTS predicate dominates. The project_nodes, node_channels and audit EXISTS predicates cannot be reached on their own because of the FKs to inv.nodes; they are defense-in-depth that no test proves independently. The resource cases use a different node, so they are independent."
+        },
+        {
+          "id": "FC1E-I4",
+          "severity": "INFO",
+          "where": "services/control-plane/src/inv/migrations/0001_core.sql:18",
+          "fact": "The new offline node receives the schema-default heartbeat_at=clock_timestamp(). Every consumer the reviewer read (capacity, containment, dispatch, leases, tooling, model_commit, model_locality, node_resource_usage, node_channels, build_adapter, gpu) also requires status='online', or a snapshot plus a non-NULL clock_skew_seconds, so the default grants no eligibility. The test at line 148-150 shows project_capacity is empty."
+        },
+        {
+          "id": "FC1E-I5",
+          "severity": "INFO",
+          "where": "services/control-plane/src/inv/fresh_cpu_admission.py:199-209",
+          "fact": "When no business_projects row exists at preflight, nothing is locked, so a concurrent business-link insertion is not serialized. The author explicitly disclaims arbitrary uncoordinated mutators; FK/PK guarantees are unaffected."
+        },
+        {
+          "id": "FC1E-I6",
+          "severity": "INFO",
+          "where": "services/control-plane/src/inv/fresh_cpu_admission.py:335-339",
+          "fact": "Reconcile requires the current tenant-control version to equal the request's version. A later legitimate kill-switch change therefore makes a committed admission reconcile as FRESH-0007 HOLD. This false negative is safe."
         }
       ],
-      "allThreeExactCI": true,
-      "authorLocalFinalReportSHA256": "c125c02d2c1c5458e1a8e262b889afc0871bfd4619cd3cbcb3b797280ddb61cb",
-      "all319FiniteLocalInputHashesMatch": true,
-      "artifactVerification": {
-        "twoDownloadedOriginalZIPDigestsFreshOfficialMatch": [
-          13561281150,
-          13560974148
-        ],
-        "otherFourFreshOfficialMetadataOnlyNotDownloaded": true
+      "caseAttributionClarification": "All70 new cases PASS.25 cases use actual fresh_db PostgreSQL fixture; ONE of these asserts before-DB wrong-epoch certificate refusal, not DB-boundary enforcement. Actual matching-certificate wrong-current-DB-epoch test is separate. Do not call25 distinct DB-boundary proofs.",
+      "canonicalGitBlobSHA256": {
+        "docs/vault/30_Development/Evidence/fleet5-fresh-cpu-1efea-review-20261107-claude/.gitattributes": "96a83569c84cfe3f57b7efe3dc61c249548d0fca4fed0e538b3587cdc97c95c1",
+        "docs/vault/30_Development/Evidence/fleet5-fresh-cpu-1efea-review-20261107-claude/local-doc-gates.txt": "7b206691c4e1cb1ebe847f8034a716f153a8b22765513585bd819e63423fd0a8",
+        "docs/vault/30_Development/Evidence/fleet5-fresh-cpu-1efea-review-20261107-claude/review-data-probe.json": "c74b6017ee973d3dd784d7e93db2e28f100944a235861f202b4a787017d4dd89",
+        "docs/vault/30_Development/Evidence/fleet5-fresh-cpu-1efea-review-20261107-claude/review.json": "53f0a7478704d6c84e8793d6fe789fb261944beda9dba7b7008be13a74a0b1c0",
+        "docs/vault/30_Development/Evidence/fleet5-fresh-cpu-1efea-review-20261107-claude/review_data_probe.py.txt": "210b064c690b8cf73ab751e95a2a40c351cc8adc37eab14f0c1841b754ddf321",
+        "docs/vault/30_Development/Evidence/fleet5-fresh-cpu-1efea-review-20261107-claude/reviewer_gate_driver.py.txt": "b43371fc51fd8af504b3040e859548eb8b8343ed0177ddbc6a0bba4d29b6861f",
+        "docs/vault/30_Development/History/2026-11-07_FLEET5_Fresh_CPU_1efea_Review_Claude.md": "c61c051a6b73268327330f959fc4251ffdcc50cc024ae34562e65dc3db771e13"
       },
-      "separate13XMLReportsNotSummed": [
-        {
-          "member": "s01-storage-roundtrip.xml",
-          "cases": 1,
-          "counts": {
-            "passed": 1
-          }
-        },
-        {
-          "member": "s3-product-object-store.xml",
-          "cases": 2,
-          "counts": {
-            "passed": 2
-          }
-        },
-        {
-          "member": "s3-product-postgres.xml",
-          "cases": 3,
-          "counts": {
-            "passed": 3
-          }
-        },
-        {
-          "member": "business-handoff-tests.xml",
-          "cases": 17,
-          "counts": {
-            "passed": 17
-          }
-        },
-        {
-          "member": "build-product-runtime-real-pg.xml",
-          "cases": 13,
-          "counts": {
-            "passed": 13
-          }
-        },
-        {
-          "member": "containment-tests.xml",
-          "cases": 28,
-          "counts": {
-            "passed": 28
-          }
-        },
-        {
-          "member": "core-tests.xml",
-          "cases": 9452,
-          "counts": {
-            "passed": 9406,
-            "skipped": 46
-          }
-        },
-        {
-          "member": "cx01-recovery-tests.xml",
-          "cases": 20,
-          "counts": {
-            "passed": 20
-          }
-        },
-        {
-          "member": "docker-host-tests.xml",
-          "cases": 2,
-          "counts": {
-            "passed": 2
-          }
-        },
-        {
-          "member": "lan-installer-tests.xml",
-          "cases": 17,
-          "counts": {
-            "passed": 17
-          }
-        },
-        {
-          "member": "lan-pilot-database-real-pg.xml",
-          "cases": 2,
-          "counts": {
-            "passed": 2
-          }
-        },
-        {
-          "member": "shard-recovery-tests.xml",
-          "cases": 21,
-          "counts": {
-            "passed": 21
-          }
-        },
-        {
-          "member": "workspace-tests.xml",
-          "cases": 23,
-          "counts": {
-            "passed": 23
-          }
-        }
-      ],
-      "newCaseSourceASTJUnitJoin": {
-        "functions": 24,
-        "cases": 70,
-        "passed": 70,
-        "failure": 0,
-        "error": 0,
-        "skip": 0,
-        "uncollected": 0,
-        "actualMandatoryPGCases": 25,
-        "mandatoryIdentification": "Actual source test fresh_db fixture arguments, shared migrated/owner_engine fixture source read; no private DB or product execution by Root"
+      "automaticPortalPushRun": {
+        "run": 42343800694,
+        "event": "push",
+        "path": ".github/workflows/portal-login-harness.yml",
+        "status": "completed",
+        "conclusion": "success",
+        "reviewerDispatched": false,
+        "notSubstitutedForRequiredCandidateOrReviewCI": true
       },
-      "GoRace": {
-        "topPass": 146,
-        "subPass": 550,
-        "testSkip": 1,
-        "noTestPackageSkip": 3,
-        "fail": 0
+      "reviewerLifecycle": {
+        "dispatchId": "ctx_5edc24050812",
+        "taskId": "task_4b48b22863bb",
+        "runId": "run_e57ecd84a7bc",
+        "state": "succeeded",
+        "stage": "settled",
+        "liveness": "exited",
+        "terminal": "term_e6d06bba-6034-4423-98f5-a5973c85c1c3",
+        "terminalState": "released",
+        "workspace": "d98dc9d3-fe61-4cb2-9776-dff349347a61::D:/Project/SaintVisionI-Invion/fleet5-fresh-cpu-1efea-review-20261107",
+        "waitingOnHuman": "unknown"
       },
-      "requiredDocker": "HOSTED_CI_1TOP4SUBPASS0SKIP_NOT_FIVE_PCS",
-      "BackendEachMatrix": "9047PASS75SKIP2DESELECT0FAIL0ERROR; author-fetched official logs parsed, fresh runner XML gates confirmed; no Backend percase XML claim",
-      "MLflowPass": 3,
-      "wheelNewLibraryExactCandidate": true,
-      "twoGoBinariesRevision1efeaModifiedFalseStaticOnly": true,
-      "originalRawWIPZipPreservedGitLFNotRawHash": true,
-      "WIP01ProductionExecutableASTUnchangedOnlyDriverBoundaryWording": true,
-      "PGTestByteEqualWIP01AndCLIOnlyAppendedTrustedProfileTest": true,
-      "firstRootSourceRead": "Object not yet fetched in Root repository; git fetch of exact published candidate branch exit0, then source/AST reads exit0. No candidate change or CI retry.",
-      "independentCODEReview": "PENDING_ACTUAL_CLAUDE",
-      "localProductExecution": "NOT_RUN",
       "actualAuthority": null,
       "runtimeOrFivePCAcceptance": false,
+      "wholeProgramComplete": false
+    },
+    "RootAcceptanceMessage": "msg_80230f138890",
+    "actualWorkerDoneMessage": "msg_3e9623378559",
+    "finiteCodeCardDelivery": "SUCCEEDED; broaderK2/runtime/physical holds remain",
+    "authorLifecycle": {
+      "dispatchId": "ctx_ed23b4a777d0",
+      "taskId": "task_a95ef3d8ccce",
+      "runId": "run_e57ecd84a7bc",
+      "followUpOf": "ctx_ceecb3824e33",
+      "state": "succeeded",
+      "stage": "settled",
+      "liveness": "exited",
+      "terminal": "term_7458b407-4902-42ad-9554-eb58ea9b7296",
+      "terminalState": "released",
+      "workspace": "d98dc9d3-fe61-4cb2-9776-dff349347a61::D:/Project/SaintVisionI-Invion/fleet5-consecutive-leaf-rotation-20261105",
+      "waitingOnHuman": "unknown"
+    },
+    "caseAttributionClarification": "All70 new cases PASS.25 cases use actual fresh_db PostgreSQL fixture; ONE of these asserts before-DB wrong-epoch certificate refusal, not DB-boundary enforcement. Actual matching-certificate wrong-current-DB-epoch test is separate. Do not call25 distinct DB-boundary proofs.",
+    "RootOperatingDispositions": {
+      "atKST": "2026-11-07T14:53:18+09:00",
+      "productSource": "1efea494f026e932360c35ae811b6423d874a2e7",
+      "actualCodeReview": "6bd81ef0531b4a58438c98618e92d5ad9985c12b",
+      "codeVerdict": "ACCEPT_FRESH_CPU_ADMISSION_OPERATOR_CODE_KEEP_ACTUAL_HOLD",
+      "M1": {
+        "status": "CATALOG_ROLE_AND_EXACT_CURRENT_TARGET_OBSERVED_SATISFIED; actual eventual private profile must be frozen/rechecked",
+        "evidence": "cpu-operator-role-readonly-20261107.json",
+        "readOnly": true,
+        "existingRoleSuperuserAndBYPASSRLS": true,
+        "newRoleOrGrantRequired": false
+      },
+      "M2": {
+        "status": "PROPOSED_RECONCILE_ONLY_ENTRY_READY_FOR_ACTUAL_INDEPENDENT_REVIEW; not yet approved/executed",
+        "entrySHA256": "42e89b6173cd9a8ad1cfa6998da30f068d6409e03e803b523bfb7f076576a3aa",
+        "entryPath": "fresh-cpu-reconcile-entry-r1/operator_reconcile_fresh_cpu.py.txt",
+        "librarySource": "1efea494f026e932360c35ae811b6423d874a2e7",
+        "candidateWheelSHA256": "b329c2f89bb81dcc4b841fca6bf18cd8bfeeed07a657fbab7e6b6e9f4edd8d23",
+        "actualIndependentEntryReview": "READY_NOT_STARTED",
+        "actualExecution": "NOT_RUN",
+        "noAutomaticApplyOrRetry": true
+      },
+      "actualOperatorProfileTargetNodeLeafFence": "NOT_YET_FULLY_BOUND",
+      "liveAdmission": "NOT_RUN",
+      "runtimeOrPKIGrant": false,
       "wholeProgramComplete": false
     }
   },
@@ -1628,5 +1548,32 @@
     "actualAuthority": null,
     "wholeProgramComplete": false,
     "Root505PreparationRecovery": "Initial exit1 before mutations: lifecycle JSON was correctly saved as full CLI wrapper, preparation incorrectly expected flat result. Read result explicitly; no source/CI/lifecycle operation was retried."
+  },
+  "RootOperatingDispositions": {
+    "atKST": "2026-11-07T14:53:18+09:00",
+    "productSource": "1efea494f026e932360c35ae811b6423d874a2e7",
+    "actualCodeReview": "6bd81ef0531b4a58438c98618e92d5ad9985c12b",
+    "codeVerdict": "ACCEPT_FRESH_CPU_ADMISSION_OPERATOR_CODE_KEEP_ACTUAL_HOLD",
+    "M1": {
+      "status": "CATALOG_ROLE_AND_EXACT_CURRENT_TARGET_OBSERVED_SATISFIED; actual eventual private profile must be frozen/rechecked",
+      "evidence": "cpu-operator-role-readonly-20261107.json",
+      "readOnly": true,
+      "existingRoleSuperuserAndBYPASSRLS": true,
+      "newRoleOrGrantRequired": false
+    },
+    "M2": {
+      "status": "PROPOSED_RECONCILE_ONLY_ENTRY_READY_FOR_ACTUAL_INDEPENDENT_REVIEW; not yet approved/executed",
+      "entrySHA256": "42e89b6173cd9a8ad1cfa6998da30f068d6409e03e803b523bfb7f076576a3aa",
+      "entryPath": "fresh-cpu-reconcile-entry-r1/operator_reconcile_fresh_cpu.py.txt",
+      "librarySource": "1efea494f026e932360c35ae811b6423d874a2e7",
+      "candidateWheelSHA256": "b329c2f89bb81dcc4b841fca6bf18cd8bfeeed07a657fbab7e6b6e9f4edd8d23",
+      "actualIndependentEntryReview": "READY_NOT_STARTED",
+      "actualExecution": "NOT_RUN",
+      "noAutomaticApplyOrRetry": true
+    },
+    "actualOperatorProfileTargetNodeLeafFence": "NOT_YET_FULLY_BOUND",
+    "liveAdmission": "NOT_RUN",
+    "runtimeOrPKIGrant": false,
+    "wholeProgramComplete": false
   }
 }
