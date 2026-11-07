@@ -1,0 +1,836 @@
+{
+  "docID": "EVID-FLEET5-ONE-CPU-RUNTIME-SOURCE-BINDINGS-R1-20261107",
+  "version": "1.0.0",
+  "atKST": "2026-11-07T15:50:02+09:00",
+  "sourceTarget": "1efea494f026e932360c35ae811b6423d874a2e7",
+  "deliveryBase": "b51d827e507a35aca3737e31103bd3b3311298a5",
+  "publicRootRef": "ae211280c5c8ab50b19303450288ba1421af827e",
+  "sourceReadMethod": "Immutable Git bytes only; no product import/execution",
+  "bindings": [
+    {
+      "id": "node-cli",
+      "ref": "1efea494f026e932360c35ae811b6423d874a2e7",
+      "path": "services/node-agent/cmd/inv-node/main.go",
+      "gitBlobSHA1": "a966629ee7db6116535c51baee0f956e2fd384f8",
+      "fileSHA256": "3471f3fa13ea9ac4d27fd27ca04747a1adf2348692f846484c39f28755c23a9a",
+      "lineStart": 36,
+      "lineEnd": 141,
+      "lineExcerptSHA256": "477cf8d2f59a4794d93ab85d9bf6cb32432d1d88c80b7cb2bc49fb2c82a99792",
+      "url": "https://github.com/egparadise/SaintVision-Invion/blob/1efea494f026e932360c35ae811b6423d874a2e7/services/node-agent/cmd/inv-node/main.go#L36-L141"
+    },
+    {
+      "id": "node-uri-tls",
+      "ref": "1efea494f026e932360c35ae811b6423d874a2e7",
+      "path": "services/node-agent/transport/trust.go",
+      "gitBlobSHA1": "d18f943daf83460265e0ae03a3b5d111ff810600",
+      "fileSHA256": "3b5dd89f9d6bdeb777d81f822688ece6c04b549080f53e8f7487bf70789b20df",
+      "lineStart": 19,
+      "lineEnd": 154,
+      "lineExcerptSHA256": "d07a402f98d0b2738fceffcc86eb692f594d7afdf2dfc062b4d4285c9e199130",
+      "url": "https://github.com/egparadise/SaintVision-Invion/blob/1efea494f026e932360c35ae811b6423d874a2e7/services/node-agent/transport/trust.go#L19-L154"
+    },
+    {
+      "id": "node-journal",
+      "ref": "1efea494f026e932360c35ae811b6423d874a2e7",
+      "path": "services/node-agent/runtime/journal.go",
+      "gitBlobSHA1": "970a9d673b9b36b06b0cba4733e45acec469f440",
+      "fileSHA256": "0bf50af78984eed047c1fdb2a10e230a8e7eb4669893539d54d05d454097f9b6",
+      "lineStart": 30,
+      "lineEnd": 74,
+      "lineExcerptSHA256": "9b5d786afdc5ec2877d7ddddfef08a2bb800404a80a46d98641a803ad48528f7",
+      "url": "https://github.com/egparadise/SaintVision-Invion/blob/1efea494f026e932360c35ae811b6423d874a2e7/services/node-agent/runtime/journal.go#L30-L74"
+    },
+    {
+      "id": "peer-floor",
+      "ref": "1efea494f026e932360c35ae811b6423d874a2e7",
+      "path": "services/node-agent/runtime/journal.go",
+      "gitBlobSHA1": "970a9d673b9b36b06b0cba4733e45acec469f440",
+      "fileSHA256": "0bf50af78984eed047c1fdb2a10e230a8e7eb4669893539d54d05d454097f9b6",
+      "lineStart": 339,
+      "lineEnd": 391,
+      "lineExcerptSHA256": "dfe6698dbe3740ca630c4c3948a340baf850cf920e0fcc7d1397f9f693e744ef",
+      "url": "https://github.com/egparadise/SaintVision-Invion/blob/1efea494f026e932360c35ae811b6423d874a2e7/services/node-agent/runtime/journal.go#L339-L391"
+    },
+    {
+      "id": "journal-lock",
+      "ref": "1efea494f026e932360c35ae811b6423d874a2e7",
+      "path": "services/node-agent/runtime/lock_linux.go",
+      "gitBlobSHA1": "5e035789091bc554ddffc095f1865cac279ec96e",
+      "fileSHA256": "11dc4f3e4d6c123b8c62e4ea25f29b051b0284008f9089b07cbb54366debbc76",
+      "lineStart": 11,
+      "lineEnd": 21,
+      "lineExcerptSHA256": "419a0acaa2615ca0a9bc07feae1389c8ce329949e620527e6eff8d48fd0d4c27",
+      "url": "https://github.com/egparadise/SaintVision-Invion/blob/1efea494f026e932360c35ae811b6423d874a2e7/services/node-agent/runtime/lock_linux.go#L11-L21"
+    },
+    {
+      "id": "docker-api",
+      "ref": "1efea494f026e932360c35ae811b6423d874a2e7",
+      "path": "services/node-agent/runtime/docker.go",
+      "gitBlobSHA1": "5de7ff0d154a4086fddb94e1be51e694fc45f9cb",
+      "fileSHA256": "dce35c9ad17fa12cbbeb9cee0809a413930fa46e2785d86d965153ff4f67e0fb",
+      "lineStart": 50,
+      "lineEnd": 112,
+      "lineExcerptSHA256": "6f6a93d4b37e64f3276f522a463dd07f5ce0696c776d9f19a158f2003d3a5b7f",
+      "url": "https://github.com/egparadise/SaintVision-Invion/blob/1efea494f026e932360c35ae811b6423d874a2e7/services/node-agent/runtime/docker.go#L50-L112"
+    },
+    {
+      "id": "workload-isolation",
+      "ref": "1efea494f026e932360c35ae811b6423d874a2e7",
+      "path": "services/node-agent/runtime/docker.go",
+      "gitBlobSHA1": "5de7ff0d154a4086fddb94e1be51e694fc45f9cb",
+      "fileSHA256": "dce35c9ad17fa12cbbeb9cee0809a413930fa46e2785d86d965153ff4f67e0fb",
+      "lineStart": 180,
+      "lineEnd": 264,
+      "lineExcerptSHA256": "bee8330f7b35c1fb409c70f2faddaad5d65569de9edc65a1970b8d137e0fc45f",
+      "url": "https://github.com/egparadise/SaintVision-Invion/blob/1efea494f026e932360c35ae811b6423d874a2e7/services/node-agent/runtime/docker.go#L180-L264"
+    },
+    {
+      "id": "permit",
+      "ref": "1efea494f026e932360c35ae811b6423d874a2e7",
+      "path": "services/node-agent/runtime/permit.go",
+      "gitBlobSHA1": "084b9113190abfaa7e0279a4eb7a4e786bd03dff",
+      "fileSHA256": "65483a6e650fb523a06ab8ebe923fcbf916d973e190b1a0def5ee5273cdf171b",
+      "lineStart": 18,
+      "lineEnd": 143,
+      "lineExcerptSHA256": "00b06f48d14741c536a929fce7e607886c8c52b7e6634fbfd7de8212c2b7c352",
+      "url": "https://github.com/egparadise/SaintVision-Invion/blob/1efea494f026e932360c35ae811b6423d874a2e7/services/node-agent/runtime/permit.go#L18-L143"
+    },
+    {
+      "id": "workspace-config",
+      "ref": "1efea494f026e932360c35ae811b6423d874a2e7",
+      "path": "services/control-plane/src/inv/workspace_config.py",
+      "gitBlobSHA1": "742242e299c3bf1fc747bcf160f59f4aa7505a69",
+      "fileSHA256": "7b77a716b4fb56e951fce110d347ac41f16d1d80d4722ba9d1410a1869b351cb",
+      "lineStart": 1,
+      "lineEnd": 93,
+      "lineExcerptSHA256": "7b77a716b4fb56e951fce110d347ac41f16d1d80d4722ba9d1410a1869b351cb",
+      "url": "https://github.com/egparadise/SaintVision-Invion/blob/1efea494f026e932360c35ae811b6423d874a2e7/services/control-plane/src/inv/workspace_config.py#L1-L93"
+    },
+    {
+      "id": "sandbox-profile",
+      "ref": "1efea494f026e932360c35ae811b6423d874a2e7",
+      "path": "services/control-plane/src/inv/sandbox.py",
+      "gitBlobSHA1": "4a94f848a19372b3dade38fcfd39db74f4905070",
+      "fileSHA256": "49db6097d9dce4001f16c246adc9256deaa8fe4d1abcab82263351af55638a0f",
+      "lineStart": 31,
+      "lineEnd": 82,
+      "lineExcerptSHA256": "5babdcd2e6ecf7ea3f91eead2a282281af45ec0f2ba822d3d141e3ff53f7755d",
+      "url": "https://github.com/egparadise/SaintVision-Invion/blob/1efea494f026e932360c35ae811b6423d874a2e7/services/control-plane/src/inv/sandbox.py#L31-L82"
+    },
+    {
+      "id": "compile-launch",
+      "ref": "1efea494f026e932360c35ae811b6423d874a2e7",
+      "path": "services/control-plane/src/inv/sandbox.py",
+      "gitBlobSHA1": "4a94f848a19372b3dade38fcfd39db74f4905070",
+      "fileSHA256": "49db6097d9dce4001f16c246adc9256deaa8fe4d1abcab82263351af55638a0f",
+      "lineStart": 106,
+      "lineEnd": 188,
+      "lineExcerptSHA256": "f23fbb1a4db8af1a75f601141330bc6f4d9382a36d24751cb683f1c5176fe02f",
+      "url": "https://github.com/egparadise/SaintVision-Invion/blob/1efea494f026e932360c35ae811b6423d874a2e7/services/control-plane/src/inv/sandbox.py#L106-L188"
+    },
+    {
+      "id": "node-tls-client",
+      "ref": "1efea494f026e932360c35ae811b6423d874a2e7",
+      "path": "services/control-plane/src/inv/node_transport.py",
+      "gitBlobSHA1": "9f72e566b3eccb73c6210643c9b27d507168c58d",
+      "fileSHA256": "3559bbcdf9568f8930654d860b0edd980eca71c835cde3fe7380a69dd56e18f4",
+      "lineStart": 39,
+      "lineEnd": 101,
+      "lineExcerptSHA256": "7398370e09516dca3b2f22a4a78eb4c0ad00ee5eb9fddb57c29ffc489332c371",
+      "url": "https://github.com/egparadise/SaintVision-Invion/blob/1efea494f026e932360c35ae811b6423d874a2e7/services/control-plane/src/inv/node_transport.py#L39-L101"
+    },
+    {
+      "id": "pinned-channel-request",
+      "ref": "1efea494f026e932360c35ae811b6423d874a2e7",
+      "path": "services/control-plane/src/inv/node_transport.py",
+      "gitBlobSHA1": "9f72e566b3eccb73c6210643c9b27d507168c58d",
+      "fileSHA256": "3559bbcdf9568f8930654d860b0edd980eca71c835cde3fe7380a69dd56e18f4",
+      "lineStart": 150,
+      "lineEnd": 210,
+      "lineExcerptSHA256": "eecd1c711f663e2c6bc6e6c951f45766087cc7fc44cd61f0e7ebd50d226e132b",
+      "url": "https://github.com/egparadise/SaintVision-Invion/blob/1efea494f026e932360c35ae811b6423d874a2e7/services/control-plane/src/inv/node_transport.py#L150-L210"
+    },
+    {
+      "id": "channel-identity",
+      "ref": "1efea494f026e932360c35ae811b6423d874a2e7",
+      "path": "services/control-plane/src/inv/node_channels.py",
+      "gitBlobSHA1": "30902552b9d584dd50182344d4a4140e32e41051",
+      "fileSHA256": "3fad0bb24beb096522ea3335e3bf45f4e65f2d0d906177ef7e310aca1128502b",
+      "lineStart": 21,
+      "lineEnd": 77,
+      "lineExcerptSHA256": "fe3d5859730808aead3fc3c8c2d2fe9078b2ab6d9c12521883046ea7404adba9",
+      "url": "https://github.com/egparadise/SaintVision-Invion/blob/1efea494f026e932360c35ae811b6423d874a2e7/services/control-plane/src/inv/node_channels.py#L21-L77"
+    },
+    {
+      "id": "channel-admission",
+      "ref": "1efea494f026e932360c35ae811b6423d874a2e7",
+      "path": "services/control-plane/src/inv/node_channels.py",
+      "gitBlobSHA1": "30902552b9d584dd50182344d4a4140e32e41051",
+      "fileSHA256": "3fad0bb24beb096522ea3335e3bf45f4e65f2d0d906177ef7e310aca1128502b",
+      "lineStart": 124,
+      "lineEnd": 210,
+      "lineExcerptSHA256": "0f2c152474e5fd85499411a2cfac81fb73e7ecc89398745819739ce867850a33",
+      "url": "https://github.com/egparadise/SaintVision-Invion/blob/1efea494f026e932360c35ae811b6423d874a2e7/services/control-plane/src/inv/node_channels.py#L124-L210"
+    },
+    {
+      "id": "fresh-request",
+      "ref": "1efea494f026e932360c35ae811b6423d874a2e7",
+      "path": "services/control-plane/src/inv/fresh_cpu_admission.py",
+      "gitBlobSHA1": "0223f0a705831f51db00a1b31b50f41ea7064f2a",
+      "fileSHA256": "76407ced1411f42a5eddd71c894f541b8691d461d4eb1eaea30f63b8bcf90d2c",
+      "lineStart": 24,
+      "lineEnd": 154,
+      "lineExcerptSHA256": "af06d7b0a0bda11624ddf4bd14407594e6fa5ff31f323107c8c0140a512d73c2",
+      "url": "https://github.com/egparadise/SaintVision-Invion/blob/1efea494f026e932360c35ae811b6423d874a2e7/services/control-plane/src/inv/fresh_cpu_admission.py#L24-L154"
+    },
+    {
+      "id": "fresh-preflight",
+      "ref": "1efea494f026e932360c35ae811b6423d874a2e7",
+      "path": "services/control-plane/src/inv/fresh_cpu_admission.py",
+      "gitBlobSHA1": "0223f0a705831f51db00a1b31b50f41ea7064f2a",
+      "fileSHA256": "76407ced1411f42a5eddd71c894f541b8691d461d4eb1eaea30f63b8bcf90d2c",
+      "lineStart": 157,
+      "lineEnd": 220,
+      "lineExcerptSHA256": "b021107b68328e6952964cd7f16f44137beb8e44851aa2d206ae73aa01d0bf58",
+      "url": "https://github.com/egparadise/SaintVision-Invion/blob/1efea494f026e932360c35ae811b6423d874a2e7/services/control-plane/src/inv/fresh_cpu_admission.py#L157-L220"
+    },
+    {
+      "id": "fresh-apply-reconcile",
+      "ref": "1efea494f026e932360c35ae811b6423d874a2e7",
+      "path": "services/control-plane/src/inv/fresh_cpu_admission.py",
+      "gitBlobSHA1": "0223f0a705831f51db00a1b31b50f41ea7064f2a",
+      "fileSHA256": "76407ced1411f42a5eddd71c894f541b8691d461d4eb1eaea30f63b8bcf90d2c",
+      "lineStart": 275,
+      "lineEnd": 344,
+      "lineExcerptSHA256": "ef191468f66c4206035b82f229832d1a8aa420494e9d2d67098bfa06af1a6857",
+      "url": "https://github.com/egparadise/SaintVision-Invion/blob/1efea494f026e932360c35ae811b6423d874a2e7/services/control-plane/src/inv/fresh_cpu_admission.py#L275-L344"
+    },
+    {
+      "id": "fresh-cli",
+      "ref": "1efea494f026e932360c35ae811b6423d874a2e7",
+      "path": "tools/fresh_cpu_admission.py",
+      "gitBlobSHA1": "30514103a4bb8bc11559aa18b862589f1fe93188",
+      "fileSHA256": "8129ab5acf7061b0bc1834aa1142ae944471b1b177f018c810de34ea9a53fe7d",
+      "lineStart": 1,
+      "lineEnd": 88,
+      "lineExcerptSHA256": "8129ab5acf7061b0bc1834aa1142ae944471b1b177f018c810de34ea9a53fe7d",
+      "url": "https://github.com/egparadise/SaintVision-Invion/blob/1efea494f026e932360c35ae811b6423d874a2e7/tools/fresh_cpu_admission.py#L1-L88"
+    },
+    {
+      "id": "api-config",
+      "ref": "1efea494f026e932360c35ae811b6423d874a2e7",
+      "path": "services/control-plane/src/inv/app.py",
+      "gitBlobSHA1": "4adbcc5d0fd97eec0c535cf25d85031531c62a02",
+      "fileSHA256": "3e3d0d0dc023dee937ac184532b043a26b2af7110887901c937cc6cdbaa2edea",
+      "lineStart": 1285,
+      "lineEnd": 1429,
+      "lineExcerptSHA256": "3587c4c43d61476c83dd41b22bf376f04d897c85de91ce5f60b469d573cc36dd",
+      "url": "https://github.com/egparadise/SaintVision-Invion/blob/1efea494f026e932360c35ae811b6423d874a2e7/services/control-plane/src/inv/app.py#L1285-L1429"
+    },
+    {
+      "id": "api-workspace-unconfigured",
+      "ref": "1efea494f026e932360c35ae811b6423d874a2e7",
+      "path": "services/control-plane/src/inv/app.py",
+      "gitBlobSHA1": "4adbcc5d0fd97eec0c535cf25d85031531c62a02",
+      "fileSHA256": "3e3d0d0dc023dee937ac184532b043a26b2af7110887901c937cc6cdbaa2edea",
+      "lineStart": 840,
+      "lineEnd": 845,
+      "lineExcerptSHA256": "e7b12c117baebf8cb5438948cda7fcc064f02d61d752350c0e087effbc9159d2",
+      "url": "https://github.com/egparadise/SaintVision-Invion/blob/1efea494f026e932360c35ae811b6423d874a2e7/services/control-plane/src/inv/app.py#L840-L845"
+    },
+    {
+      "id": "api-nodes-capacity",
+      "ref": "1efea494f026e932360c35ae811b6423d874a2e7",
+      "path": "services/control-plane/src/inv/app.py",
+      "gitBlobSHA1": "4adbcc5d0fd97eec0c535cf25d85031531c62a02",
+      "fileSHA256": "3e3d0d0dc023dee937ac184532b043a26b2af7110887901c937cc6cdbaa2edea",
+      "lineStart": 718,
+      "lineEnd": 739,
+      "lineExcerptSHA256": "8c38f6f93626f2b27e58618c2066e52470e479126e4c5fe3bfea5e0b976e6337",
+      "url": "https://github.com/egparadise/SaintVision-Invion/blob/1efea494f026e932360c35ae811b6423d874a2e7/services/control-plane/src/inv/app.py#L718-L739"
+    },
+    {
+      "id": "capacity",
+      "ref": "1efea494f026e932360c35ae811b6423d874a2e7",
+      "path": "services/control-plane/src/inv/capacity.py",
+      "gitBlobSHA1": "b2e0f67713ed34741cc3d979806332885e881549",
+      "fileSHA256": "70cf93fcc99d5f23a946445889d5f6b3ab7bd86a30e7923b74e4df82fc85578d",
+      "lineStart": 10,
+      "lineEnd": 104,
+      "lineExcerptSHA256": "8e0c48aa2afa39c4547b8aee81291bfd79d607dc740392eedb33b951837ae89d",
+      "url": "https://github.com/egparadise/SaintVision-Invion/blob/1efea494f026e932360c35ae811b6423d874a2e7/services/control-plane/src/inv/capacity.py#L10-L104"
+    },
+    {
+      "id": "scoped-observation",
+      "ref": "1efea494f026e932360c35ae811b6423d874a2e7",
+      "path": "services/control-plane/src/inv/observation.py",
+      "gitBlobSHA1": "0bda716a1efaeb81c826d06ec21c874af9f42f22",
+      "fileSHA256": "b515ceda8b066466cf4cdf5fa88d04803220398c436d29ab7c5fd2793bf5748f",
+      "lineStart": 16,
+      "lineEnd": 151,
+      "lineExcerptSHA256": "f4e3e4bcd6520fe05bc6714e3560b9b511190c1c82714e037daa34cb0445232e",
+      "url": "https://github.com/egparadise/SaintVision-Invion/blob/1efea494f026e932360c35ae811b6423d874a2e7/services/control-plane/src/inv/observation.py#L16-L151"
+    },
+    {
+      "id": "observer-scope",
+      "ref": "1efea494f026e932360c35ae811b6423d874a2e7",
+      "path": "services/control-plane/src/inv/observer_worker.py",
+      "gitBlobSHA1": "4050adbcd1b9ed83daefd58cf310e7fac5c0fd46",
+      "fileSHA256": "6bbdf815554fe1f0157247732ddc4dc3069686685c291ef83add55c8f3e92003",
+      "lineStart": 20,
+      "lineEnd": 81,
+      "lineExcerptSHA256": "b7cd06dc6e838b157ab0094a6c22b5e5bbbdc8f81b753f186b94d835e38befcc",
+      "url": "https://github.com/egparadise/SaintVision-Invion/blob/1efea494f026e932360c35ae811b6423d874a2e7/services/control-plane/src/inv/observer_worker.py#L20-L81"
+    },
+    {
+      "id": "observation-response",
+      "ref": "1efea494f026e932360c35ae811b6423d874a2e7",
+      "path": "services/node-agent/transport/server.go",
+      "gitBlobSHA1": "b81cc93096032fe63f1e6572aa109939a562e9a2",
+      "fileSHA256": "c9c98084798eeda52a8f38bebc6a13f5e531deaf3c0016e4295ade19a500b8a2",
+      "lineStart": 218,
+      "lineEnd": 249,
+      "lineExcerptSHA256": "92769d244651f563181f030d0554a4caac60d8cd6f4f4f1d0696b84ec154689b",
+      "url": "https://github.com/egparadise/SaintVision-Invion/blob/1efea494f026e932360c35ae811b6423d874a2e7/services/node-agent/transport/server.go#L218-L249"
+    },
+    {
+      "id": "workspace-runtime",
+      "ref": "1efea494f026e932360c35ae811b6423d874a2e7",
+      "path": "services/control-plane/src/inv/workspace_api.py",
+      "gitBlobSHA1": "c19e595bff7ade5637e102da17013731db0a8132",
+      "fileSHA256": "c0e67146d6a3152426876f86fafa35363ec49c48fedf66e9e6bce4c1394050e2",
+      "lineStart": 31,
+      "lineEnd": 123,
+      "lineExcerptSHA256": "b754b582a91a4ac8fe2f19cab7f9262db36603cb070158eebc6e74b1a06e48e9",
+      "url": "https://github.com/egparadise/SaintVision-Invion/blob/1efea494f026e932360c35ae811b6423d874a2e7/services/control-plane/src/inv/workspace_api.py#L31-L123"
+    },
+    {
+      "id": "workspace-start-prepare",
+      "ref": "1efea494f026e932360c35ae811b6423d874a2e7",
+      "path": "services/control-plane/src/inv/workspace_start.py",
+      "gitBlobSHA1": "f1d5d499b25930c1b00f7e891a9cf0aa81e366fe",
+      "fileSHA256": "53318bfad2f010340157485760a51e16b890fdc9ec00c145df6e409350f69cc5",
+      "lineStart": 118,
+      "lineEnd": 222,
+      "lineExcerptSHA256": "95bace7b952a044489322e24babd84649173081d19ed429842a4f0f892b08259",
+      "url": "https://github.com/egparadise/SaintVision-Invion/blob/1efea494f026e932360c35ae811b6423d874a2e7/services/control-plane/src/inv/workspace_start.py#L118-L222"
+    },
+    {
+      "id": "workspace-start-enqueue",
+      "ref": "1efea494f026e932360c35ae811b6423d874a2e7",
+      "path": "services/control-plane/src/inv/workspace_start.py",
+      "gitBlobSHA1": "f1d5d499b25930c1b00f7e891a9cf0aa81e366fe",
+      "fileSHA256": "53318bfad2f010340157485760a51e16b890fdc9ec00c145df6e409350f69cc5",
+      "lineStart": 255,
+      "lineEnd": 322,
+      "lineExcerptSHA256": "e732a70c9fc6bad2ffa6a2ca030818cde9464bed2dc22afff6582408a3d7b4d9",
+      "url": "https://github.com/egparadise/SaintVision-Invion/blob/1efea494f026e932360c35ae811b6423d874a2e7/services/control-plane/src/inv/workspace_start.py#L255-L322"
+    },
+    {
+      "id": "approval-votes",
+      "ref": "1efea494f026e932360c35ae811b6423d874a2e7",
+      "path": "services/control-plane/src/inv/approvals.py",
+      "gitBlobSHA1": "ae879c6c1b13d892b93e9b593aa7fc2a8a83760e",
+      "fileSHA256": "89a6cd475351409c83f568dc9f3cb514b4c9bff00a88e5e4ce8a25a384c73523",
+      "lineStart": 348,
+      "lineEnd": 455,
+      "lineExcerptSHA256": "8ceaa2bfbc1685de9d952c0e36d09377e42c031bf90041974cb5339b4aef9c0f",
+      "url": "https://github.com/egparadise/SaintVision-Invion/blob/1efea494f026e932360c35ae811b6423d874a2e7/services/control-plane/src/inv/approvals.py#L348-L455"
+    },
+    {
+      "id": "api-approval-routes",
+      "ref": "1efea494f026e932360c35ae811b6423d874a2e7",
+      "path": "services/control-plane/src/inv/app.py",
+      "gitBlobSHA1": "4adbcc5d0fd97eec0c535cf25d85031531c62a02",
+      "fileSHA256": "3e3d0d0dc023dee937ac184532b043a26b2af7110887901c937cc6cdbaa2edea",
+      "lineStart": 807,
+      "lineEnd": 839,
+      "lineExcerptSHA256": "407d8474a814d46f7732c6fd4dfa39b82e53c0af8ffea45f9689e54dcd5fc84c",
+      "url": "https://github.com/egparadise/SaintVision-Invion/blob/1efea494f026e932360c35ae811b6423d874a2e7/services/control-plane/src/inv/app.py#L807-L839"
+    },
+    {
+      "id": "api-first-start-routes",
+      "ref": "1efea494f026e932360c35ae811b6423d874a2e7",
+      "path": "services/control-plane/src/inv/app.py",
+      "gitBlobSHA1": "4adbcc5d0fd97eec0c535cf25d85031531c62a02",
+      "fileSHA256": "3e3d0d0dc023dee937ac184532b043a26b2af7110887901c937cc6cdbaa2edea",
+      "lineStart": 1188,
+      "lineEnd": 1227,
+      "lineExcerptSHA256": "59cba3591a7a8166e4a192a15bc86a2c1f1d4f02d6748299e6de91b2829f495b",
+      "url": "https://github.com/egparadise/SaintVision-Invion/blob/1efea494f026e932360c35ae811b6423d874a2e7/services/control-plane/src/inv/app.py#L1188-L1227"
+    },
+    {
+      "id": "delivery-worker",
+      "ref": "1efea494f026e932360c35ae811b6423d874a2e7",
+      "path": "services/control-plane/src/inv/worker.py",
+      "gitBlobSHA1": "c843cd00446c02d1f2b7f94c9eb447f419564e93",
+      "fileSHA256": "3010b2409bb285de960eb322792b1062ed066275307c9bea53a2cc767b65d4e3",
+      "lineStart": 1,
+      "lineEnd": 185,
+      "lineExcerptSHA256": "3010b2409bb285de960eb322792b1062ed066275307c9bea53a2cc767b65d4e3",
+      "url": "https://github.com/egparadise/SaintVision-Invion/blob/1efea494f026e932360c35ae811b6423d874a2e7/services/control-plane/src/inv/worker.py#L1-L185"
+    },
+    {
+      "id": "entrypoints",
+      "ref": "1efea494f026e932360c35ae811b6423d874a2e7",
+      "path": "services/control-plane/pyproject.toml",
+      "gitBlobSHA1": "35c658329a76add8f36767fd369996740b9e0e71",
+      "fileSHA256": "fa2447c6b86308f24a0b2d1d9f17a81c8fdac34acc2b63884bd66d6422727ef7",
+      "lineStart": 9,
+      "lineEnd": 15,
+      "lineExcerptSHA256": "cad3b596d3c427e6da152aa91a79d504423bbfd79281ce4e5f9e3a8ae86941f9",
+      "url": "https://github.com/egparadise/SaintVision-Invion/blob/1efea494f026e932360c35ae811b6423d874a2e7/services/control-plane/pyproject.toml#L9-L15"
+    },
+    {
+      "id": "private-working-root",
+      "ref": "1efea494f026e932360c35ae811b6423d874a2e7",
+      "path": "services/control-plane/src/inv/workspace_files.py",
+      "gitBlobSHA1": "0f6cba603bd0b1527679e51423d988a4f3e6c05c",
+      "fileSHA256": "bbc84661b234ff8ed58a2c0e65969b46d6426aa9f4f81a96a871cfba985d3e9d",
+      "lineStart": 134,
+      "lineEnd": 177,
+      "lineExcerptSHA256": "1c9374b1c56ed329999a06c164fe6d8736b0a7cd3f4246c6890174661de20752",
+      "url": "https://github.com/egparadise/SaintVision-Invion/blob/1efea494f026e932360c35ae811b6423d874a2e7/services/control-plane/src/inv/workspace_files.py#L134-L177"
+    },
+    {
+      "id": "snapshot-format",
+      "ref": "1efea494f026e932360c35ae811b6423d874a2e7",
+      "path": "services/control-plane/src/inv/workspace_files.py",
+      "gitBlobSHA1": "0f6cba603bd0b1527679e51423d988a4f3e6c05c",
+      "fileSHA256": "bbc84661b234ff8ed58a2c0e65969b46d6426aa9f4f81a96a871cfba985d3e9d",
+      "lineStart": 24,
+      "lineEnd": 129,
+      "lineExcerptSHA256": "f34f074cb0ee0bebcd9153dfe709bd87a934252b48c87160b04b127a5eec94bf",
+      "url": "https://github.com/egparadise/SaintVision-Invion/blob/1efea494f026e932360c35ae811b6423d874a2e7/services/control-plane/src/inv/workspace_files.py#L24-L129"
+    },
+    {
+      "id": "first-input-bounds",
+      "ref": "1efea494f026e932360c35ae811b6423d874a2e7",
+      "path": "services/control-plane/src/inv/workspace_resume.py",
+      "gitBlobSHA1": "0b3998d6a3d310447c84695345db096d511222cd",
+      "fileSHA256": "32c8fae52eb947605c53801d609e9826c514b53c2392f07f1fb9ff605303449b",
+      "lineStart": 21,
+      "lineEnd": 40,
+      "lineExcerptSHA256": "3b2b00c9ee5ca46e6e2093d7376bdc42764f67fe15327b307c3c59efa2f9a1e6",
+      "url": "https://github.com/egparadise/SaintVision-Invion/blob/1efea494f026e932360c35ae811b6423d874a2e7/services/control-plane/src/inv/workspace_resume.py#L21-L40"
+    },
+    {
+      "id": "wire-schema",
+      "ref": "1efea494f026e932360c35ae811b6423d874a2e7",
+      "path": "contracts/v1alpha1/core.schema.json",
+      "gitBlobSHA1": "d7df4baf0d27f7340db3a840b7747705d5e1341c",
+      "fileSHA256": "6c99daf16ade5ac95619dfca1427b8ea511298f3989cbcdc8c807d08572b13ea",
+      "lineStart": 2963,
+      "lineEnd": 3011,
+      "lineExcerptSHA256": "7d4fb3afdddeb98ec4866a62482c4069d2ef8e1b45a0d4f2490d3315a61343c0",
+      "url": "https://github.com/egparadise/SaintVision-Invion/blob/1efea494f026e932360c35ae811b6423d874a2e7/contracts/v1alpha1/core.schema.json#L2963-L3011"
+    }
+  ],
+  "publicRootArtifacts": [
+    {
+      "ref": "ae211280c5c8ab50b19303450288ba1421af827e",
+      "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/one-cpu-node-plan-r1.public.json",
+      "sha256": "5b2a70bd9bc8217592f7cd953f18dd3516ecacfd132f6281134fbc718731213a",
+      "url": "https://github.com/egparadise/SaintVision-Invion/blob/ae211280c5c8ab50b19303450288ba1421af827e/docs/vault/30_Development/Evidence/fleet5-20261105-root/one-cpu-node-plan-r1.public.json"
+    },
+    {
+      "ref": "ae211280c5c8ab50b19303450288ba1421af827e",
+      "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/cpu-reconcile-entry-ee1-root-verification.json",
+      "sha256": "2a505db4089319f0a754de2ca3a13734349e67f6e6bb6b4a70de18fab95de1a3",
+      "url": "https://github.com/egparadise/SaintVision-Invion/blob/ae211280c5c8ab50b19303450288ba1421af827e/docs/vault/30_Development/Evidence/fleet5-20261105-root/cpu-reconcile-entry-ee1-root-verification.json"
+    },
+    {
+      "ref": "ae211280c5c8ab50b19303450288ba1421af827e",
+      "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/cpu-fresh-admission-review-6bd-root-verification.json",
+      "sha256": "1f3f83f8fff47efaec96a2b3def5508d2ccc534deca72ced5d96d8f26e23e920",
+      "url": "https://github.com/egparadise/SaintVision-Invion/blob/ae211280c5c8ab50b19303450288ba1421af827e/docs/vault/30_Development/Evidence/fleet5-20261105-root/cpu-fresh-admission-review-6bd-root-verification.json"
+    },
+    {
+      "ref": "ae211280c5c8ab50b19303450288ba1421af827e",
+      "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/pc3-fresh-cpu-host-preflight-r1.json",
+      "sha256": "28ea2435cab41b9e6165bad5aae8f723895cd12364d2b89d9f72581f07ef6de7",
+      "url": "https://github.com/egparadise/SaintVision-Invion/blob/ae211280c5c8ab50b19303450288ba1421af827e/docs/vault/30_Development/Evidence/fleet5-20261105-root/pc3-fresh-cpu-host-preflight-r1.json"
+    },
+    {
+      "ref": "ae211280c5c8ab50b19303450288ba1421af827e",
+      "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/pc3-operator-env-r1/resume-pip-r2-receipt.json",
+      "sha256": "4f162b07ca09b98dd075cf922a360367ef953fe63b1a80064d1bee7078dfcbb9",
+      "url": "https://github.com/egparadise/SaintVision-Invion/blob/ae211280c5c8ab50b19303450288ba1421af827e/docs/vault/30_Development/Evidence/fleet5-20261105-root/pc3-operator-env-r1/resume-pip-r2-receipt.json"
+    },
+    {
+      "ref": "ae211280c5c8ab50b19303450288ba1421af827e",
+      "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/cpu-fresh-admission-m1-m2-root-operational-disposition.json",
+      "sha256": "bda2885dd13bad8778c70de6365d5b9543ccd7337df997effc24ed3cf2102e67",
+      "url": "https://github.com/egparadise/SaintVision-Invion/blob/ae211280c5c8ab50b19303450288ba1421af827e/docs/vault/30_Development/Evidence/fleet5-20261105-root/cpu-fresh-admission-m1-m2-root-operational-disposition.json"
+    },
+    {
+      "ref": "ae211280c5c8ab50b19303450288ba1421af827e",
+      "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/fresh-cpu-reconcile-entry-r1/operator_reconcile_fresh_cpu.py.txt",
+      "sha256": "42e89b6173cd9a8ad1cfa6998da30f068d6409e03e803b523bfb7f076576a3aa",
+      "url": "https://github.com/egparadise/SaintVision-Invion/blob/ae211280c5c8ab50b19303450288ba1421af827e/docs/vault/30_Development/Evidence/fleet5-20261105-root/fresh-cpu-reconcile-entry-r1/operator_reconcile_fresh_cpu.py.txt"
+    }
+  ],
+  "firstRead": [
+    {
+      "path": "docs/vault/00_Index/전체 개발 진행 현황.md",
+      "docID": "INDEX-PROGRESS-001",
+      "version": "1.0.508",
+      "sha256": "f551ffa718afbfb4b8cdacd069dee51b39d4d8596a37717edac86741a9509021",
+      "readAtKST": "2026-11-07T15:50:02+09:00"
+    },
+    {
+      "path": "docs/vault/30_Development/Agent별 작업/Codex 작업 현황.md",
+      "docID": "WORKBOARD-CODEX-001",
+      "version": "1.0.469",
+      "sha256": "bed2427c8b124a394f811d4ad98c4c44e7f5b73f5ce19278568355394f6b6cb7",
+      "readAtKST": "2026-11-07T15:50:02+09:00"
+    },
+    {
+      "path": "docs/vault/00_Index/2026-09-15 단일 가상 컴퓨터 보강 설계 인덱스.md",
+      "docID": "INDEX-VIRTUAL-COMPUTER-001",
+      "version": "1.0.0",
+      "sha256": "35f2cca047fdb57ff2e2ad28e3847e9a7c0a19d6ace6fb36aa941042e872e9be",
+      "readAtKST": "2026-11-07T15:50:02+09:00"
+    },
+    {
+      "path": "docs/vault/30_Development/57.81퍼센트 이후 단일 가상 컴퓨터 보강 로드맵.md",
+      "docID": "ROADMAP-VIRTUAL-COMPUTER-001",
+      "version": "1.0.0",
+      "sha256": "3a4527ffe53ebea114063692dd3bba826da8c279a93a9800919fff394df1a018",
+      "readAtKST": "2026-11-07T15:50:02+09:00"
+    },
+    {
+      "path": "docs/vault/40_Governance/Agent 연속 실행과 최종 보고 정책.md",
+      "docID": "GOV-CONTINUOUS-001",
+      "version": "1.1.0",
+      "sha256": "60c6a8d3130491bd4cab730cccc0e236fb038d1c7c816efa333acdc34a30cd8f",
+      "readAtKST": "2026-11-07T15:50:02+09:00"
+    },
+    {
+      "path": "docs/vault/00_Index/최종 개발 계획 - 모든 개발의 지침.md",
+      "docID": "GUIDE-001",
+      "version": "1.1.0",
+      "sha256": "59223c5dff4b4bb6252c8061aebe975665e6eadf92db3659a3f89951b2cb149f",
+      "readAtKST": "2026-11-07T15:50:02+09:00"
+    },
+    {
+      "path": "docs/vault/40_Governance/설계 충돌 정정 및 ADR.md",
+      "docID": "ADR-INDEX-001",
+      "version": "1.37.0",
+      "sha256": "771f7714a63af52d7c8aea2424db0b33a2fe96c759c51c81c23144daf7aeaf77",
+      "readAtKST": "2026-11-07T15:50:02+09:00"
+    },
+    {
+      "path": "docs/vault/40_Governance/Agent 역할과 인계 계약.md",
+      "docID": "GOV-AGENT-001",
+      "version": "1.1.3",
+      "sha256": "128c054e72f9e001b3b32f914cce544bce5432eddccdbe1212d27180c3200823",
+      "readAtKST": "2026-11-07T15:50:02+09:00"
+    },
+    {
+      "path": "docs/vault/40_Governance/Git Build Obsidian 운영 절차.md",
+      "docID": "GOV-GIT-001",
+      "version": "1.1.4",
+      "sha256": "fe5e8adc44a14c081ac767265a16434b72e4b3ebfb7719081fa166ad459e59e9",
+      "readAtKST": "2026-11-07T15:50:02+09:00"
+    },
+    {
+      "path": "docs/vault/40_Governance/Agent 지속 개발 운영 규칙.md",
+      "docID": "GOV-CONTINUITY-001",
+      "version": "1.0.0",
+      "sha256": "63839c440ead6dc07300a0e18d5024fb9aadbddf546707156c39af7ee9495c84",
+      "readAtKST": "2026-11-07T15:50:02+09:00"
+    },
+    {
+      "path": "AGENTS.md",
+      "sha256": "c12a50a38f81c12a647f9b6f4592a205cd899e76d29190202a6ae73b12c04b27",
+      "version": "PINNED_BY_HASH",
+      "readAtKST": "2026-11-07T15:50:02+09:00"
+    },
+    {
+      "path": "skills/agent-delivery/SKILL.md",
+      "sha256": "9596c1d4a132c3de90fd99ed2095b8271da7a31532e8487aa6d7d93151ac3830",
+      "version": "1.1.0",
+      "readAtKST": "2026-11-07T15:50:02+09:00"
+    },
+    {
+      "path": "skills/core-reliability/SKILL.md",
+      "sha256": "4650a371befb5a59cd9f3ce87c2e2dab732aa7e9b89e57885cb67f0e64f0ef76",
+      "version": "1.0.0",
+      "readAtKST": "2026-11-07T15:50:02+09:00"
+    },
+    {
+      "path": "docs/task-registry.json",
+      "sha256": "7c6b339c7487aae652cc5c5e04f6e933249c83930019e798ec24006794b07644",
+      "version": "PINNED_BY_HASH",
+      "readAtKST": "2026-11-07T15:50:02+09:00"
+    }
+  ],
+  "contractShapes": {
+    "NodePeerPolicy": {
+      "type": "object",
+      "properties": {
+        "version": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "tenantId": {
+          "$ref": "#/$defs/TenantId"
+        },
+        "nodeId": {
+          "$ref": "#/$defs/NodeId"
+        },
+        "recoveryEpoch": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "expiresAt": {
+          "$ref": "#/$defs/Timestamp"
+        },
+        "clientFingerprints": {
+          "type": "array",
+          "maxItems": 2,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          }
+        }
+      },
+      "required": [
+        "version",
+        "tenantId",
+        "nodeId",
+        "recoveryEpoch",
+        "expiresAt",
+        "clientFingerprints"
+      ],
+      "additionalProperties": false
+    },
+    "ResourceRequest": {
+      "type": "object",
+      "properties": {
+        "cpuMillis": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "memoryBytes": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "gpuCount": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "minVramBytes": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        }
+      },
+      "required": [
+        "cpuMillis",
+        "memoryBytes",
+        "gpuCount",
+        "minVramBytes"
+      ],
+      "additionalProperties": false
+    },
+    "WorkloadSpec": {
+      "type": "object",
+      "properties": {
+        "apiVersion": {
+          "type": "string",
+          "const": "inv.saintvision.ai/v1alpha1"
+        },
+        "kind": {
+          "type": "string",
+          "const": "Workload"
+        },
+        "workloadId": {
+          "$ref": "#/$defs/WorkloadId"
+        },
+        "tenantId": {
+          "$ref": "#/$defs/TenantId"
+        },
+        "projectId": {
+          "$ref": "#/$defs/ProjectId"
+        },
+        "workspaceId": {
+          "$ref": "#/$defs/WorkspaceId"
+        },
+        "resources": {
+          "$ref": "#/$defs/ResourceRequest"
+        },
+        "imageDigest": {
+          "type": "string",
+          "pattern": "^sha256:[0-9a-f]{64}$"
+        },
+        "command": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1
+        },
+        "timeoutSeconds": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "workspaceResume": {
+          "$ref": "#/$defs/WorkspaceResumeRef"
+        },
+        "workspaceStart": {
+          "$ref": "#/$defs/WorkspaceStartRef"
+        },
+        "targetNodeId": {
+          "$ref": "#/$defs/NodeId"
+        },
+        "terminal": {
+          "$ref": "#/$defs/TerminalSpec"
+        },
+        "modelInput": {
+          "$ref": "#/$defs/ModelExecutionRef"
+        }
+      },
+      "required": [
+        "apiVersion",
+        "kind",
+        "workloadId",
+        "tenantId",
+        "projectId",
+        "workspaceId",
+        "resources",
+        "imageDigest",
+        "command",
+        "timeoutSeconds"
+      ],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "not": {
+            "required": [
+              "workspaceResume",
+              "workspaceStart"
+            ]
+          }
+        },
+        {
+          "not": {
+            "required": [
+              "modelInput",
+              "workspaceStart"
+            ]
+          }
+        },
+        {
+          "not": {
+            "required": [
+              "modelInput",
+              "workspaceResume"
+            ]
+          }
+        },
+        {
+          "not": {
+            "required": [
+              "modelInput",
+              "terminal"
+            ]
+          }
+        }
+      ]
+    },
+    "WorkspaceStartPrepareInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "stepId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "workload": {
+          "$ref": "#/$defs/WorkloadSpec"
+        },
+        "expectedVersion": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "startId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "snapshotBase64": {
+          "type": "string",
+          "minLength": 4,
+          "maxLength": 87384
+        },
+        "targetNodeId": {
+          "$ref": "#/$defs/NodeId"
+        }
+      },
+      "required": [
+        "startId",
+        "stepId",
+        "workload",
+        "expectedVersion",
+        "snapshotBase64",
+        "targetNodeId"
+      ]
+    },
+    "WorkspaceStartEnqueueInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "approvalId": {
+          "$ref": "#/$defs/ApprovalId"
+        },
+        "expectedVersion": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "startId": {
+          "type": "string",
+          "format": "uuid"
+        }
+      },
+      "required": [
+        "startId",
+        "approvalId",
+        "expectedVersion"
+      ]
+    },
+    "ApprovalDecisionInput": {
+      "type": "object",
+      "properties": {
+        "decision": {
+          "type": "string",
+          "enum": [
+            "approve",
+            "reject"
+          ]
+        },
+        "nonce": {
+          "$ref": "#/$defs/ApprovalNonce"
+        },
+        "actionDigest": {
+          "$ref": "#/$defs/ActionDigest"
+        }
+      },
+      "required": [
+        "decision",
+        "nonce",
+        "actionDigest"
+      ],
+      "additionalProperties": false
+    }
+  }
+}

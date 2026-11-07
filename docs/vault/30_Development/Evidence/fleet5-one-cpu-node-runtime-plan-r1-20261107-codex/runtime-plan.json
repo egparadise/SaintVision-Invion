@@ -1,0 +1,567 @@
+{
+  "docID": "PLAN-FLEET5-ONE-CPU-NODE-RUNTIME-R1-20261107",
+  "version": "1.0.0",
+  "task": "FLEET5-ONE-CPU-NODE-RUNTIME-PLAN-R1-20261107",
+  "parentTaskID": "task_a8fd2969f0b3",
+  "dispatchID": "ctx_6f0f8253b8a7",
+  "owner": "Codex dispatched architecture/reliability owner",
+  "reviewer": "Root Codex; actual plan review pending",
+  "sourceTarget": "1efea494f026e932360c35ae811b6423d874a2e7",
+  "deliveryBase": "b51d827e507a35aca3737e31103bd3b3311298a5",
+  "publicRootRef": "ae211280c5c8ab50b19303450288ba1421af827e",
+  "branch": "agent/codex/fleet5-one-cpu-node-runtime-plan-r1-20261107",
+  "status": "SOURCE_DERIVED_PLAN_ONLY_ROOT_BINDINGS_PENDING",
+  "scope": "Source/Git/AST/JSON and public DATA only; no private files, product imports/execution, DB, host, PKI, install, runtime or workload operations",
+  "authority": {
+    "actualAuthority": null,
+    "actualAdmission": "NOT_RUN",
+    "nodeExecuted": false,
+    "observation": "NOT_RUN",
+    "run": "NOT_RUN",
+    "independentPlanReview": "PENDING_ROOT",
+    "K2": "NULL_HOLD",
+    "operationalDischarges": 0,
+    "wholeProgramComplete": false
+  },
+  "publicParameters": {
+    "tenantId": "97968b42-68aa-40ce-af5e-3a33e2fc2205",
+    "projectId": "prj_01M6NDBHVD2DZQ1Q38DCKN1XE3",
+    "recoveryEpoch": "bcd581be-31b4-4aca-86e6-3ca31b69ed09",
+    "expectedTenantControlVersion": 0,
+    "nodeId": "nod_01M6TAWG25JTA3F7J7S1EE4N2W",
+    "cpuResourceId": "res_01M6TAWG25QSR4HH7XWWJSB0W0",
+    "memoryResourceId": "res_01M6TAWG25ZHS2RG3NHQX4SPEH",
+    "endpoint": "https://192.168.45.222:19443",
+    "cpuMillis": 500,
+    "memoryBytes": 67108864,
+    "gpuEnabled": false,
+    "registeredOrReserved": false
+  },
+  "preparedEvidence": {
+    "source": "Root public artifacts, not independently observed by this worker",
+    "inventoryAtKST": "2026-11-07T15:15:12+09:00",
+    "operatorEnvironment": "/home/saintvision-invion3/saintvision-share/ops-fresh-cpu-1efea-r1-20261107",
+    "verifiedInterpreter": "/home/saintvision-invion3/saintvision-share/ops-fresh-cpu-1efea-r1-20261107/venv/bin/python",
+    "interpreterSHA256": "52e0a13e60a981d8c4b6478be2ba5176f69da07948a056bf49cf6f077e30cb41",
+    "wheelSHA256": "b329c2f89bb81dcc4b841fca6bf18cd8bfeeed07a657fbab7e6b6e9f4edd8d23",
+    "librarySHA256": "76407ced1411f42a5eddd71c894f541b8691d461d4eb1eaea30f63b8bcf90d2c",
+    "nodeBinary": "/home/saintvision-invion3/saintvision-share/ops-fresh-cpu-1efea-r1-20261107/inv-node.ci",
+    "nodeBinarySHA256": "d0fbeeced59814cfe7cbd06d6fbbdb8871e214460462f5ad1b8c2e4af8d1ac7b",
+    "nodeBinaryExecuted": false,
+    "dockerServer": {
+      "Version": "29.9.3",
+      "ApiVersion": "1.56",
+      "Os": "linux",
+      "Arch": "amd64"
+    },
+    "portsObservedFreeNotReserved": [
+      19443,
+      15461
+    ],
+    "currentCPWorkspaceConfigured": false,
+    "freshAuthenticatedSession": "NOT_OBSERVED",
+    "browserSelectedProject": "NOT_OBSERVED"
+  },
+  "deployment": {
+    "status": "ROOT_PENDING",
+    "minimalProposal": "Run copied verified Linux host binary under Root-approved service identity/supervision with fresh private state. Root binds daemon socket authority before use.",
+    "containerAlternative": "A Node container requires approved Node image/command/user/mounts/port mapping/state ownership; none inferred from workload image or public names.",
+    "plannedNodeDirectory": "/home/saintvision-invion3/saintvision-share/nodes/nod_01M6TAWG25JTA3F7J7S1EE4N2W",
+    "plannedContainerName": "saintvision-nod_01M6TAWG25JTA3F7J7S1EE4N2W",
+    "plannedStateVolumeName": "sv-nod_01M6TAWG25JTA3F7J7S1EE4N2W-state",
+    "namesReserved": false,
+    "preserve": "Never reuse/merge/chown/truncate/delete/migrate old Node directory/container/volume/journal/floor/identity. Recheck exact new names/ports before writes.",
+    "stateRequirements": "Fresh Linux private0700 directory writable only by actual Node identity, new0600 identity/lock/journal files. OpenJournal checks mode/type/identity but not explicit UID equality; dedicated ownership is a Root deployment prerequisite. Sole-Node volume must meet same requirements.",
+    "dockerCompatibility": {
+      "observedMaximum": "1.56",
+      "observedMinimum": null,
+      "clientCap": "1.45",
+      "clientFloor": "1.41",
+      "status": "ROOT_PENDING_MIN_API_VERSION",
+      "acceptance": "Linux; min(serverMax,1.45)>=1.41 and >=serverMin. Maximum1.56 alone is insufficient; no daemon changes inferred."
+    },
+    "socket": "Existing /var/run/docker.sock only in this recipe. Product accepts canonical absolute Unix sockets; alternatives not authorized here. Root binds service permissions, no install/start/tweak."
+  },
+  "pki": {
+    "status": "ROOT_PENDING_NOT_CREATED",
+    "nodeLeaf": {
+      "uri": "spiffe://saintvision.ai/tenant/97968b42-68aa-40ce-af5e-3a33e2fc2205/node/nod_01M6TAWG25JTA3F7J7S1EE4N2W/epoch/bcd581be-31b4-4aca-86e6-3ca31b69ed09",
+      "extendedKeyUsage": "serverAuth",
+      "CA": false,
+      "uriSANCardinality": 1,
+      "endpointIPSubjectAlternativeName": "192.168.45.222",
+      "publicDERBase64": null,
+      "DER_SHA256": null,
+      "notBefore": null,
+      "notAfter": null,
+      "issuerChain": "Explicit Root-approved CA chain independently checked before admission and by CP TLS. Admission certificate_identity does not check issuer chain."
+    },
+    "cpClientLeaf": {
+      "uri": "spiffe://saintvision.ai/tenant/97968b42-68aa-40ce-af5e-3a33e2fc2205/control-plane/epoch/bcd581be-31b4-4aca-86e6-3ca31b69ed09",
+      "extendedKeyUsage": "clientAuth",
+      "CA": false,
+      "uriSANCardinality": 1,
+      "DER_SHA256": null,
+      "trust": "Node explicit CA client verification plus exact URI and current policy allowlist of this CP-client DER hash, distinct from Node DER hash."
+    },
+    "ordinaryTLSKeyAlgorithm": "Matching TLS-compatible certificate/key supported by installed Go/OpenSSL. Ordinary serve has no Ed25519 leaf requirement; optional peer-floor signature path is excluded.",
+    "launchSigner": {
+      "algorithm": "Ed25519",
+      "cpPrivateFormat": "Unencrypted PEM/password=None, regular <=65536bytes, Linux no0077 permission bits",
+      "nodePublicFormat": "Exactly32 raw public-key bytes, not PEM; paired with CP signer",
+      "signatureDomain": "SaintVision.NodePermit.v1 followed by NUL",
+      "privateKeyPath": null,
+      "publicKeyPath": null
+    },
+    "filePolicy": "Node SafeFile Lstat regular <=65536; secret key no0077 bits, nonsecret no0022 write bits on Linux. No claim of parent-path/UID enforcement. Root controls owned paths/custody/substitution.",
+    "renewal": "Node leaf DER/expiry binds channel; renewal needs explicit versioned channel update and matching observations. CP-client renewal needs actual new client DER fingerprint in monotone exact policy bytes/version. Never reset journal floor or silently merge identity/epoch.",
+    "sourceBindings": [
+      "node-uri-tls",
+      "channel-identity",
+      "pinned-channel-request",
+      "peer-floor",
+      "permit"
+    ]
+  },
+  "peerPolicyTemplate": {
+    "status": "ROOT_PENDING_TEMPLATE_NOT_INSTALLABLE",
+    "value": {
+      "version": null,
+      "tenantId": "97968b42-68aa-40ce-af5e-3a33e2fc2205",
+      "nodeId": "nod_01M6TAWG25JTA3F7J7S1EE4N2W",
+      "recoveryEpoch": "bcd581be-31b4-4aca-86e6-3ca31b69ed09",
+      "expiresAt": null,
+      "clientFingerprints": [
+        null
+      ]
+    },
+    "rules": "Closed exact6keys, no schemaVersion. version1..2^53-1; expiry strictly future and <=7days on read; max2 unique lowercase64hex actual CP-client DER fingerprints. Empty list denies all. Freeze exact UTF8 bytes/hash before start. Journal refuses lower version/sameversion different bytes; reread on authorization.",
+    "ordinaryServeRequired": true,
+    "K2ObservePeerPolicyFloorRequired": false,
+    "sourceBindings": [
+      "node-cli",
+      "node-uri-tls",
+      "peer-floor",
+      "wire-schema"
+    ]
+  },
+  "runtimeProfileTemplate": {
+    "status": "ROOT_PENDING_TEMPLATE_NOT_INSTALLABLE",
+    "value": {
+      "version": null,
+      "images": [
+        null
+      ],
+      "executables": [
+        null
+      ],
+      "max_cpu_millis": 500,
+      "max_memory_bytes": 67108864,
+      "max_timeout_seconds": 30,
+      "allow_terminal": false
+    },
+    "required": [
+      "version",
+      "images",
+      "executables"
+    ],
+    "rules": "Root selects version1..200chars, approved local sha256:<64lowerhex> workload image, canonical absolute POSIX executable and allowed argv. CP converts lists to frozensets. Proposed CP ceilings500/64MiB/30s fit configured resources; final binding Root-owned.",
+    "nodeBuiltInCeilings": {
+      "cpuMillis": 1000,
+      "memoryBytes": 536870912,
+      "timeoutSeconds": 30,
+      "minimumMemoryBytes": 8388608
+    },
+    "noNodeCLIQuotaFlags": true,
+    "resourcePolicyBoundary": "DB offered500/64MiB is metadata, not measured capacity/reservation/OS quota. Profile constrains requests; Docker per-workload Memory=MemorySwap/NanoCpus/pids64 enforced after launch verification. No Node-service hard-quota claim.",
+    "imageRequirements": [
+      "Already local inspect.Id matching digest; no declared volumes",
+      "ai.saintvision.supervisor=deadline-v1",
+      "ai.saintvision.output=bounded-streams-v1",
+      "First input additionally ai.saintvision.workspace=snapshot-tmpfs-v1; image entrypoint /inv-supervisor"
+    ],
+    "workloadBoundary": "No inherited socket/state/PKI/host paths: no binds/devices/ports; user65532:65532; networknone; readonly rootfs; private IPC/cgroupns; capdropALL/no-new-privileges; bounded /workspace and /tmp tmpfs. No contribution/writeback/GPU/terminal.",
+    "sourceBindings": [
+      "sandbox-profile",
+      "compile-launch",
+      "permit",
+      "workload-isolation"
+    ]
+  },
+  "nodeArgvTemplate": {
+    "status": "ROOT_PENDING_NOT_EXECUTABLE",
+    "proposedFileNamesOnly": true,
+    "argv": [
+      "/home/saintvision-invion3/saintvision-share/ops-fresh-cpu-1efea-r1-20261107/inv-node.ci",
+      "--tenant",
+      "97968b42-68aa-40ce-af5e-3a33e2fc2205",
+      "--node",
+      "nod_01M6TAWG25JTA3F7J7S1EE4N2W",
+      "--epoch",
+      "bcd581be-31b4-4aca-86e6-3ca31b69ed09",
+      "--profile",
+      "ROOT_PENDING_PROFILE_VERSION",
+      "--image",
+      "ROOT_PENDING_WORKLOAD_IMAGE_DIGEST",
+      "--executable",
+      "ROOT_PENDING_CONTAINER_EXECUTABLE",
+      "--state",
+      "/home/saintvision-invion3/saintvision-share/nodes/nod_01M6TAWG25JTA3F7J7S1EE4N2W/state",
+      "--public-key",
+      "/home/saintvision-invion3/saintvision-share/nodes/nod_01M6TAWG25JTA3F7J7S1EE4N2W/launch-signer.pub",
+      "--socket",
+      "/var/run/docker.sock",
+      "--serve",
+      "--listen",
+      "192.168.45.222:19443",
+      "--tls-cert",
+      "/home/saintvision-invion3/saintvision-share/nodes/nod_01M6TAWG25JTA3F7J7S1EE4N2W/node-cert.pem",
+      "--tls-key",
+      "/home/saintvision-invion3/saintvision-share/nodes/nod_01M6TAWG25JTA3F7J7S1EE4N2W/node-key.pem",
+      "--client-ca",
+      "/home/saintvision-invion3/saintvision-share/nodes/nod_01M6TAWG25JTA3F7J7S1EE4N2W/client-ca.pem",
+      "--peer-policy",
+      "/home/saintvision-invion3/saintvision-share/nodes/nod_01M6TAWG25JTA3F7J7S1EE4N2W/peer-policy.json"
+    ],
+    "pathBinding": "New owned-file design slots, not existing files. Root freezes bytes/path/permissions. Host-binary listen proposed; container namespace requires separate mapping.",
+    "excludedFlags": [
+      "--permit",
+      "--recover",
+      "--objects",
+      "--storage-policy",
+      "--observe-peer-policy-floor",
+      "--peer-floor-nonce",
+      "--peer-floor-serving-pid"
+    ],
+    "sourceBindings": [
+      "node-cli",
+      "node-journal",
+      "journal-lock",
+      "node-uri-tls"
+    ]
+  },
+  "cpWorkspaceTemplate": {
+    "status": "ROOT_PENDING_TEMPLATE_NOT_CONFIG_FILE",
+    "merge": "Add fully bound workspace member to Root trusted config, preserving identity/allowedOrigins/business and exact runtimeDB/epoch; never blindly replace api.json.",
+    "workspace": {
+      "workingRoot": null,
+      "nodeId": "nod_01M6TAWG25JTA3F7J7S1EE4N2W",
+      "resources": {
+        "cpu": "res_01M6TAWG25QSR4HH7XWWJSB0W0",
+        "memory": "res_01M6TAWG25ZHS2RG3NHQX4SPEH"
+      },
+      "profile": {
+        "version": null,
+        "images": [
+          null
+        ],
+        "executables": [
+          null
+        ],
+        "max_cpu_millis": 500,
+        "max_memory_bytes": 67108864,
+        "max_timeout_seconds": 30,
+        "allow_terminal": false
+      },
+      "policyVersion": null,
+      "signingKeyFile": null,
+      "tls": {
+        "ca_file": null,
+        "certificate_file": null,
+        "key_file": null,
+        "timeout": 40
+      }
+    },
+    "minimalScope": "Omit destinations/gitRepositories/snapshotObjectRoot/restoreRoot for firstCPU. workingRoot required: existing private Linux absolute service-owned root with euid/mode/inode/nofollow checks, separate from Node state and no workload bind.",
+    "start": "Configured inv-control-plane invokes inv.app:main/create_configured_app with INV_API_CONFIG, INV_RUNTIME_DSN and exact INV_RECOVERY_EPOCH. Module inv.app:app is not configured factory. Defaults127.0.0.1:8080; retain Root ingress, no new exposure inferred.",
+    "sourceBindings": [
+      "workspace-config",
+      "workspace-runtime",
+      "private-working-root",
+      "api-config",
+      "entrypoints"
+    ]
+  },
+  "workerTemplate": {
+    "status": "ROOT_PENDING_TEMPLATE_NOT_CONFIG_FILE",
+    "value": {
+      "tenantId": "97968b42-68aa-40ce-af5e-3a33e2fc2205",
+      "tls": {
+        "ca_file": null,
+        "certificate_file": null,
+        "key_file": null,
+        "timeout": 40
+      }
+    },
+    "entrypoint": "Verified isolated installed inv-delivery-worker --once after Root binds INV_WORKER_CONFIG/INV_RUNTIME_DSN/INV_RECOVERY_EPOCH; loop only approved supervision",
+    "scope": "Consumes tenant pending queues, not newNode-only. Root inventories eligible queues and approves scope; no buildExecution. API-config/object-provider interplay and any outputRoot require Root binding.",
+    "sourceBindings": [
+      "delivery-worker",
+      "entrypoints"
+    ]
+  },
+  "admission": {
+    "status": "NOT_VALID_REQUEST_DER_MISSING",
+    "requestTemplate": {
+      "requestVersion": 1,
+      "tenantId": "97968b42-68aa-40ce-af5e-3a33e2fc2205",
+      "recoveryEpoch": "bcd581be-31b4-4aca-86e6-3ca31b69ed09",
+      "projectId": "prj_01M6NDBHVD2DZQ1Q38DCKN1XE3",
+      "nodeId": "nod_01M6TAWG25JTA3F7J7S1EE4N2W",
+      "cpuResourceId": "res_01M6TAWG25QSR4HH7XWWJSB0W0",
+      "memoryResourceId": "res_01M6TAWG25ZHS2RG3NHQX4SPEH",
+      "endpoint": "https://192.168.45.222:19443",
+      "certificateDERBase64": null,
+      "expectedTenantControlVersion": 0,
+      "cpuMillis": 500,
+      "memoryBytes": 67108864
+    },
+    "operatorProfile": {
+      "status": "ROOT_PENDING_NOT_FROZEN",
+      "required": "Exact current CP DB/role/auth/TLS with approved environment/service/password/CA-file refs privately frozen; recheck M1 eventual exact target. No grant/create/migration or secret DSN in Git/stdout.",
+      "connect_timeout": 5,
+      "options": "-c statement_timeout=15000 -c lock_timeout=2000 -c idle_in_transaction_session_timeout=15000",
+      "boundary": "Reviewed Root profile contract, not product CLI enforcement; CLI forwards DSN. No sandbox/psycopg logger verification claim."
+    },
+    "plan": {
+      "status": "NOT_RUN",
+      "argv": [
+        "/home/saintvision-invion3/saintvision-share/ops-fresh-cpu-1efea-r1-20261107/venv/bin/python",
+        "-B",
+        "ROOT_BOUND_VERIFIED_COPY_OF_tools/fresh_cpu_admission.py"
+      ],
+      "stdin": "Fully bound actual canonical bounded request; frozen SV_FRESH_NODE_OPERATOR_DSN. Default PLAN readonly transaction.",
+      "expected": "Freeze request bytes/SHA and returned planSha256/full plan/cert expiry/control/IDs. PLAN is not reservation/runtime authority."
+    },
+    "apply": {
+      "status": "NOT_RUN_ROOT_DISPOSITION_REQUIRED",
+      "argv": [
+        "/home/saintvision-invion3/saintvision-share/ops-fresh-cpu-1efea-r1-20261107/venv/bin/python",
+        "-B",
+        "ROOT_BOUND_VERIFIED_COPY_OF_tools/fresh_cpu_admission.py",
+        "--apply",
+        "--expected-plan-sha256",
+        "ROOT_FROZEN_64HEX_PLAN_DIGEST"
+      ],
+      "required": "Same verified CLI/wheel/library/interpreter, actual request/private DSN. Root decides ONE bounded APPLY after PLAN and collisions/epoch/control/expiry rechecks.",
+      "success": "Offline newNode/resources/project link/version1 channel+audit only; no online/fresh capacity/execution/approvals. Existing controls/grants preserved.",
+      "unknown": "FRESH-0010/exit3/interruption/timeout/malformed or extra output/uncertain commit HOLD; no automatic retry or absence-as-permission."
+    },
+    "reconcile": {
+      "status": "NOT_RUN",
+      "entryRef": "ae211280c5c8ab50b19303450288ba1421af827e",
+      "entryPath": "docs/vault/30_Development/Evidence/fleet5-20261105-root/fresh-cpu-reconcile-entry-r1/operator_reconcile_fresh_cpu.py.txt",
+      "entrySHA256": "42e89b6173cd9a8ad1cfa6998da30f068d6409e03e803b523bfb7f076576a3aa",
+      "review": "ee1facda1dbcc3c6eea281be462a74f5d42392b9",
+      "argv": [
+        "/home/saintvision-invion3/saintvision-share/ops-fresh-cpu-1efea-r1-20261107/venv/bin/python",
+        "-B",
+        "ROOT_BOUND_REVIEWED_LF_RECONCILE_COPY"
+      ],
+      "environmentNames": [
+        "SV_FRESH_NODE_OPERATOR_DSN",
+        "SV_FRESH_NODE_EXPECTED_PLAN_SHA256"
+      ],
+      "stdin": "Same frozen request, no entry arguments",
+      "acceptance": "exit0 AND exactly one bounded validated stdoutJSON AND EMPTYstderr; modeRECONCILE/statusMATCHED_METADATA_REQUIRES_OPERATOR_DISPOSITION/planSha256 exact/readOnlytrue/automaticRetryAllowedfalse/runtimeAuthorityGrantedfalse/operatorDispositionRequiredtrue. All nonzero/interrupted/extra stderr HOLD; raw diagnostics privately in memory, never publish profile/driver. Match/absence never authorize retry/runtime."
+    },
+    "sourceBindings": [
+      "fresh-request",
+      "fresh-preflight",
+      "fresh-apply-reconcile",
+      "fresh-cli",
+      "channel-admission"
+    ]
+  },
+  "observation": {
+    "status": "NOT_RUN",
+    "proposedScope": "Root-controlled NodeObservation(db, NodeTLSClient(**bound_tls)).poll_resources(NodePrincipal(tenantId,newNodeId)) after admission/start. Trusted library invocation, no dedicated singleNode CLI flag.",
+    "writes": "Creates nonce challenge and accepted heartbeat/snapshot rows, offline->online on valid response. Later authorized operation, not readonly query.",
+    "auth": "Pinned mTLS chain/hostname/IP/DER hash/sole URI; scope/nonce/epoch/channel, challenge<=10s/skew<=5s/monotone freshness. Ordinary snapshot NOT application-signed; no storage/peer-floor signature.",
+    "caution": "inv-observer-worker --once covers enabled tenant channels/up to5 and marks stale tenantNodes offline; broader scope requires Root disposition.",
+    "routeChecks": [
+      "GET /v1/projects/prj_01M6NDBHVD2DZQ1Q38DCKN1XE3/nodes",
+      "GET /v1/projects/prj_01M6NDBHVD2DZQ1Q38DCKN1XE3/capacity"
+    ],
+    "interpretation": "Fresh actual authenticated principal/current project grant required. Nodes route independent of workspace. Capacity counts online configured offers; fresh enabled channel/current epoch and <=15s heartbeat/snapshot determine measured spare. No actual response/session/browser observed.",
+    "sourceBindings": [
+      "scoped-observation",
+      "observer-scope",
+      "observation-response",
+      "api-nodes-capacity",
+      "capacity"
+    ]
+  },
+  "firstWorkspace": {
+    "status": "NOT_RUN_ROOT_BINDINGS_AND_REAL_APPROVALS_PENDING",
+    "preconditions": "Trusted workspace API, correct ready business intent if mapped, actual requester can_request and two real distinct nonrequester can_approve persons/subjects with fresh sessions; containment permits execution/enabled projectNode/capacity. No fabricated grants/people or clearing containment.",
+    "orderedAPI": [
+      {
+        "step": 1,
+        "method": "POST",
+        "path": "/v1/projects/{project}/runs",
+        "body": {},
+        "note": "Actual auth/project and fresh Idempotency-Key; returned runId/version. Mapped business project needs ready intent through existing product flow first; generic Run alone insufficient."
+      },
+      {
+        "step": 2,
+        "method": "POST",
+        "path": "/v1/projects/{project}/runs/{run_id}/start/prepare",
+        "bodyKeys": [
+          "startId",
+          "stepId",
+          "workload",
+          "expectedVersion",
+          "snapshotBase64",
+          "targetNodeId"
+        ],
+        "note": "Current draft attempt0, actual startUUID/step/workspace/workloadIDs, CPU-only workload/target newNode. Canonical portable workspace-snapshot:1 <=65536bytes/content<=32768 with exact base64; server freezes runtime/hash and L2 two-vote approval. Use returned workload/actionDigest/approval/version."
+      },
+      {
+        "step": 3,
+        "method": "POST",
+        "path": "/v1/projects/{project}/approvals/{approval_id}/challenge",
+        "body": {},
+        "note": "Each real distinct nonrequester independently authenticates/reviews frozen action, requests own fresh nonce."
+      },
+      {
+        "step": 4,
+        "method": "POST",
+        "path": "/v1/projects/{project}/approvals/{approval_id}/decision",
+        "bodyKeys": [
+          "decision",
+          "nonce",
+          "actionDigest"
+        ],
+        "note": "Each actual approver: approve, own nonce/exact returned actionDigest/distinct Idempotency-Key; current grants/expiry/reuse rechecked."
+      },
+      {
+        "step": 5,
+        "method": "POST",
+        "path": "/v1/projects/{project}/runs/{run_id}/start/enqueue",
+        "bodyKeys": [
+          "startId",
+          "approvalId",
+          "expectedVersion"
+        ],
+        "note": "Original requester/current version/approvedIDs; fresh Node/profile observation, atomic approval/leases/queue. Enqueued is not executed."
+      },
+      {
+        "step": 6,
+        "entrypoint": "Root-bound inv-delivery-worker --once or approved supervised loop",
+        "note": "Freeze broader queue scope/signer/channel/TLS/runtime; actual receipt/attempt/output/verification required. No blind retries after unknown."
+      },
+      {
+        "step": 7,
+        "method": "GET",
+        "path": "/v1/projects/{project}/runs/{run_id}/starts/{start_id}",
+        "note": "Use actual Run/status/output verification and terminal state; queue/HTTP200/folder preparation is not execution success."
+      }
+    ],
+    "workloadTemplate": {
+      "apiVersion": "inv.saintvision.ai/v1alpha1",
+      "kind": "Workload",
+      "workloadId": null,
+      "tenantId": "97968b42-68aa-40ce-af5e-3a33e2fc2205",
+      "projectId": "prj_01M6NDBHVD2DZQ1Q38DCKN1XE3",
+      "workspaceId": null,
+      "resources": {
+        "cpuMillis": 500,
+        "memoryBytes": 67108864,
+        "gpuCount": 0,
+        "minVramBytes": 0
+      },
+      "imageDigest": null,
+      "command": [
+        null
+      ],
+      "timeoutSeconds": null,
+      "targetNodeId": "nod_01M6TAWG25JTA3F7J7S1EE4N2W"
+    },
+    "sourceBindings": [
+      "workspace-start-prepare",
+      "workspace-start-enqueue",
+      "workspace-runtime",
+      "approval-votes",
+      "api-approval-routes",
+      "api-first-start-routes",
+      "snapshot-format",
+      "first-input-bounds"
+    ]
+  },
+  "rootPending": [
+    "Exact private operator/runtime DB target/auth/TLS/timeouts/file or environment refs and M1 recheck",
+    "Actual issuer/CA custody, Node leaf/key/IP+URI/validity/DER/hash and CP-client leaf/key/URI/fingerprint",
+    "Actual launch signer Ed25519 PEM/raw32 pair, private custody and paths",
+    "Actual profile version/policyVersion/local workload image/labels/executable/argv/timeout",
+    "Peer-policy exact bytes/version/expiry and CP-client hash distinct from Node-channel hash",
+    "Hostbinary versus container, approved UID/state/daemon socket and any Node image/mounts/port mapping",
+    "Docker MinAPIVersion versus cap1.45; actual Linux image/supervisor/isolation evidence",
+    "Recheck exact names/ports/path collisions immediately before writes, nothing reserved",
+    "API workspace merge/Linux workingRoot and delivery worker queue/TLS/output scope/ingress",
+    "Actual requester/session/project/business intent and additional approver identity; two real nonrequester approvals",
+    "Valid actual request DER, PLAN hash/single APPLY disposition/copied CLI+reconcile paths/hashes",
+    "Actual startup/observations/capacity/firstWorkspace receipts and later fivePC acceptance"
+  ],
+  "stopRules": [
+    "Any missing binding/collision/oldidentity/symlink/substitution/permissions/scope/epoch/control/channel/cert/policy/profile mismatch or expiry HOLD; preserve old state.",
+    "Unknown/malformed/lost admission response HOLD; preserve frozen input/evidence privately. No automatic retry/delete/reset/DBrollback/reidentity. Root reviewed readonly reconcile/disposition.",
+    "Startup writes new journal/identity/floor before later checks; preserve even failed-start new state. Never erase pin. Root may stop only newly created runtime under custody.",
+    "API merge failure preserves prior Root config; Root can restore reviewed prior bytes through established operation while retaining DB/channels/journals/containment. No rollback executed here.",
+    "No automatic workload retry/cleanup/oldNode replacement/storage/GPU/terminal/migration/floor observation/fivePC authority."
+  ],
+  "futureAcceptance": "Root verifies true Linux daemon/resource/isolation/image/supervisor/PKI/channel/policy/current observations and actual firstWorkspace receipts; static proof is not runtime evidence. No product/physical tests run by worker.",
+  "atKST": "2026-11-07T15:50:02+09:00",
+  "orderedRollout": [
+    {
+      "step": 1,
+      "owner": "Root",
+      "action": "Review this plan, freeze product1efea and public inputae211, reverify copied interpreter/wheel/library/Node binary/CLI/reconcile entry hashes; retain every older identity/state."
+    },
+    {
+      "step": 2,
+      "owner": "Root",
+      "action": "Privately bind exact current DB/auth/TLS/timeouts, issuer/custody, Node leaf/key/publicDER and CP-client leaf/key, launch signer pair, workload image/executable/profile/policy, deployment identity and private paths. Recheck Docker MinAPIVersion and approved local image/supervisor before treating runtime as viable."
+    },
+    {
+      "step": 3,
+      "owner": "Root",
+      "action": "Recheck new names/path/ports collision absence, private ownership/permissions/no substitution, exact CA chain/leaf SAN/EKU/validity, peer-policy raw hash/version/expiry and signer match. Freeze complete canonical admission request bytes and exact private DB profile; public plan with null DER must never be submitted."
+    },
+    {
+      "step": 4,
+      "owner": "Root",
+      "action": "Use verified isolated Python and copied exact source CLI for default readonly PLAN; validate returned plan and freeze planSha256. PLAN reserves nothing. Bind current existing target/epoch/control and identity collision checks to eventual single APPLY."
+    },
+    {
+      "step": 5,
+      "owner": "Root",
+      "action": "Decide and perform one bounded explicit APPLY using same request/profile/hash. On any unknown or lost result HOLD and use only reviewed readonly reconciliation/disposition; no automatic retry/rollback/delete. Offline metadata admission is not runtime or execution acceptance."
+    },
+    {
+      "step": 6,
+      "owner": "Root",
+      "action": "Start only fresh ordinary CPU Node using fully bound double-dash argv, approved service supervision/default daemon socket and new private state. Startup can write journal/identity/floor before later checks; retain failed-start state. Do not borrow old volume/container/identity."
+    },
+    {
+      "step": 7,
+      "owner": "Root",
+      "action": "Perform scoped newNode poll_resources with explicit CP TLS; retain authenticated current channel/nonce/epoch observations. Check authenticated nodes/capacity routes with current real project session; stale or unmeasured results are not physical capacity acceptance."
+    },
+    {
+      "step": 8,
+      "owner": "Root",
+      "action": "Merge fully bound workspace runtime into retained trusted API settings and bind delivery worker TLS/output/queue scope. Preserve existing API ingress, DB/epoch, business/identity configuration and containment."
+    },
+    {
+      "step": 9,
+      "owner": "Root and real requester/approvers",
+      "action": "Use current business intent/project grants, actual draft Run and bounded first input, two real distinct nonrequester votes, enqueue then approved worker execution. Gather actual Node receipt/attempt/output verification and terminal state."
+    },
+    {
+      "step": 10,
+      "owner": "Root",
+      "action": "Record actual operational evidence separately; plan delivery, metadata admission, one CPU Run and fivePC program acceptance remain distinct. All remaining program HOLDs and K2 NULL_HOLD persist unless separately discharged."
+    }
+  ]
+}

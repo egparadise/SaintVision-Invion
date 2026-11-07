@@ -1,0 +1,9 @@
+{
+  "atKST": "2026-11-07T15:52:00+09:00",
+  "command": "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe -B docs/vault/30_Development/Evidence/fleet5-one-cpu-node-runtime-plan-r1-20261107-codex/verify-static.py",
+  "exit": 1,
+  "failure": "Static helper decoded app.py UTF8 BOM without stripping it before AST parsing; SyntaxError invalid non-printable character U+FEFF",
+  "correction": "AST decode utf-8-sig while retaining original Git byte hashes; also corrected Var-form flag declaration regex, fixed assignment token and exact excluded peer-floor flag spellings from source",
+  "productFailure": false,
+  "runtimeExecuted": false
+}

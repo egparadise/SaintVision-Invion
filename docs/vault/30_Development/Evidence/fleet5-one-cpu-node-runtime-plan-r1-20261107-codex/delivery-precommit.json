@@ -1,0 +1,49 @@
+{
+  "atKST": "2026-11-07T15:56:16+09:00",
+  "deliveryBase": "b51d827e507a35aca3737e31103bd3b3311298a5",
+  "productSourceTarget": "1efea494f026e932360c35ae811b6423d874a2e7",
+  "docsOnly": true,
+  "stagedFilesBeforeThisReceipt": [
+    "docs/vault/30_Development/Evidence/fleet5-one-cpu-node-runtime-plan-r1-20261107-codex/local-gates.json",
+    "docs/vault/30_Development/Evidence/fleet5-one-cpu-node-runtime-plan-r1-20261107-codex/runtime-plan.json",
+    "docs/vault/30_Development/Evidence/fleet5-one-cpu-node-runtime-plan-r1-20261107-codex/source-bindings.json",
+    "docs/vault/30_Development/Evidence/fleet5-one-cpu-node-runtime-plan-r1-20261107-codex/static-verification-initial-failure.json",
+    "docs/vault/30_Development/Evidence/fleet5-one-cpu-node-runtime-plan-r1-20261107-codex/static-verification.json",
+    "docs/vault/30_Development/Evidence/fleet5-one-cpu-node-runtime-plan-r1-20261107-codex/sync-state-after.json",
+    "docs/vault/30_Development/Evidence/fleet5-one-cpu-node-runtime-plan-r1-20261107-codex/sync-state-before.json",
+    "docs/vault/30_Development/Evidence/fleet5-one-cpu-node-runtime-plan-r1-20261107-codex/sync-state-comparison.json",
+    "docs/vault/30_Development/Evidence/fleet5-one-cpu-node-runtime-plan-r1-20261107-codex/verify-static.py",
+    "docs/vault/30_Development/History/2026-11-07_FLEET5_One_CPU_Node_Runtime_Plan_R1_Codex.md"
+  ],
+  "stagedContentSHA256": {
+    "docs/vault/30_Development/Evidence/fleet5-one-cpu-node-runtime-plan-r1-20261107-codex/local-gates.json": "004dae7113b8ab9bc02b8deb390de965be82603caa36ee38eb78a4e46fb63f59",
+    "docs/vault/30_Development/Evidence/fleet5-one-cpu-node-runtime-plan-r1-20261107-codex/runtime-plan.json": "de2887ede5c6f07d362257584d7475df56d2edd309c36ee16af6d971e6c098f8",
+    "docs/vault/30_Development/Evidence/fleet5-one-cpu-node-runtime-plan-r1-20261107-codex/source-bindings.json": "d174e70dfb9935183a598787b4c7373942b93b68fde3cbfad99a2425191eb690",
+    "docs/vault/30_Development/Evidence/fleet5-one-cpu-node-runtime-plan-r1-20261107-codex/static-verification-initial-failure.json": "a3db2fdae9db1da625cb4c2ef6874e0a385297c211fa9672cbefff8b1cff8b10",
+    "docs/vault/30_Development/Evidence/fleet5-one-cpu-node-runtime-plan-r1-20261107-codex/static-verification.json": "864810063bcc1cb0e828795b28caacf651bc46a56f0e907a554f701ed01d0b23",
+    "docs/vault/30_Development/Evidence/fleet5-one-cpu-node-runtime-plan-r1-20261107-codex/sync-state-after.json": "7680387cbc9a959eb9b0bf6a81dac202a6a45ff3f1f849418aa8df0644d7b82a",
+    "docs/vault/30_Development/Evidence/fleet5-one-cpu-node-runtime-plan-r1-20261107-codex/sync-state-before.json": "d1a193e491349a2024c28528cd9194b896da6cb0c44f18541321fa91fc75456a",
+    "docs/vault/30_Development/Evidence/fleet5-one-cpu-node-runtime-plan-r1-20261107-codex/sync-state-comparison.json": "4b81664cd006c4e55e3efda7a57979ed33d836ceb2660b32efad2cb6738c9ba0",
+    "docs/vault/30_Development/Evidence/fleet5-one-cpu-node-runtime-plan-r1-20261107-codex/verify-static.py": "12389562790d6307134a198b6f090d535f3fab33c098c8734a20f011fec67a54",
+    "docs/vault/30_Development/History/2026-11-07_FLEET5_One_CPU_Node_Runtime_Plan_R1_Codex.md": "f31ad8c09ba09c45da38f611d98f6cd652380131a4ad86a6cc5effe5d84cbe96"
+  },
+  "stagedDiffCheckExit": 0,
+  "staticChecksPassed": 83,
+  "docsOntologyPathRatchetSingleSourceSyncDiffExits": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+  ],
+  "sync": {
+    "pendingExports": 2644,
+    "conflicts": 0,
+    "noWrites": true,
+    "sameCanonicalStateBytes": true
+  },
+  "actualReview": "PENDING_ROOT",
+  "liveAdmissionAndNodeAndObserveRun": "NOT_RUN",
+  "wholeProgramComplete": false
+}

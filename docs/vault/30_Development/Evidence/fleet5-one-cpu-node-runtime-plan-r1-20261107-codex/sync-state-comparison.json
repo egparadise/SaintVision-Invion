@@ -1,0 +1,8 @@
+{
+  "beforeSHA256": "1a79c1f1f9e6545ce4dcd24807bdc15b2f00ddc4c232aea09898670b5ad3f611",
+  "afterSHA256": "1a79c1f1f9e6545ce4dcd24807bdc15b2f00ddc4c232aea09898670b5ad3f611",
+  "sameBytes": true,
+  "observationOnly": true,
+  "concurrentRootChangesNotAttributedToWorker": true,
+  "workerApplyExportAdoptResolveStateWrite": false
+}
