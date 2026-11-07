@@ -1,0 +1,78 @@
+{
+ "docID": "EVIDENCE-FLEET5-20261107-K2-H12-6D7-CODE-REVIEW-CLAUDE",
+ "kind": "independent CODE review (one reviewer, no helper/subagent)",
+ "reviewer": "Claude (Orca task_7cf5765e1538 / dispatch ctx_5cdc22d019b8, terminal term_f44da0a5-1019-46c2-82c6-fcd2b7569bb4)",
+ "author": "Codex task_a95ef3d8ccce / ctx_ed23b4a777d0",
+ "startedKST": "2026-11-07T11:43:14+09:00",
+ "predecessorReview": "task_1e856e06e90a / ctx_fe0931cf5bde succeeded/settled/exited/released (Root .work/h12-6d7-reviewer-predecessor-lifecycle.json)",
+ "target": {
+  "candidate": "6d7ee3d85bd0e47eb7b787234c10d5dbfdb3a9e8",
+  "directBase": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed",
+  "authorBranch": "agent/codex/fleet5-k2-h12-signature-code-r1-20261107 (remote exact 6d7ee3d8)",
+  "reviewBranch": "agent/claude/fleet5-k2-h12-6d7-code-review-20261107 (new, from exact 6d7ee3d8)",
+  "nameStatus": "266 paths = A264 / M2; 4 non-docs; 259 candidate Evidence + 3 own Codex History",
+  "reviewedSources": {
+   "services/node-agent/internal/migrationcontext/h12_signature_internal.go": "NEW f9e3e808d8951c2da6fee4b45364f64bb5c909a33a90c3a6074c99b8cb6e4def",
+   "services/node-agent/internal/migrationcontext/h12_signature_test.go": "NEW 94f9bd56deaa371125ceba49f5d7a21d30a4bc34575fed4747f693b51d1ce020",
+   "services/node-agent/internal/migrationcontext/effect_gate_test.go": "M d34eecc2d9b7d5790eec6ebe2b9816b421899228f948fae05fd6920d4d51b50a",
+   "services/node-agent/internal/migrationcontext/source_gate_test.go": "M 0ad2989b6f36224352516e17f278b957cc25077f657560975e0ebcb063ff9208"
+  },
+  "readUnchangedDependencies": "p02_codec_internal.go (limits/domain/p02Decode/p02Hex), p02_schema_internal.go (p02Schema0/23/24, p02Pattern), p02_wire_internal.go (p02ReadEnvelope/Signer), p02_evaluate_internal.go (p02Context, signingInput, signature stage, p02Unhex), p02_inputs_internal.go (p02SignatureTuple), policy.go (hashBytes/copyBytes), pl_r1a_test.go (unchanged 9ea789e3...)"
+ },
+ "rootBoardsRead": "fleet-five-orchestration-20261105 HEAD 2a9eae0f2ab0c91842fde4fc6c72d188a5ad3fb2 (working tree clean under docs/vault): Index INDEX-PROGRESS-001 1.0.499 sha256 618e7b40...; Codex board 1.0.460 sha256 cde3650f...; Claude board 1.2.130 sha256 ad4a5fca.... Candidate's older boards treated as historical.",
+ "verdict": "ACCEPT_NARROW_PRIVATE_MATH_AND_SCOPED_GUARD_CODE_KEEP_HOLD",
+ "mandatoryFixes": 0,
+ "severityCounts": {"HIGH": 0, "MEDIUM": 0, "LOW": 1, "INFO": 4},
+ "findings": [
+  {
+   "id": "H12C-L1", "severity": "LOW", "mandatory": false,
+   "file": "services/node-agent/internal/migrationcontext/h12_signature_test.go", "lines": "220-225 (helper bound at h12_signature_internal.go:15)", "sourceSHA256": "94f9bd56deaa371125ceba49f5d7a21d30a4bc34575fed4747f693b51d1ce020",
+   "summary": "The DER admission bounds (len==0, len>4096 before copy) are implemented correctly but not causally evidenced by a test.",
+   "detail": "empty-DER and oversize-DER copy `base`, so `expected` stays SHA256(base DER) while the DER changes. A false result is therefore already forced by `hashBytes(der) != expected` (line 30), even without the line-15 DER bounds. Only the record bound has a measured 0-allocation pre-copy proof (AllocsPerRun on over.raw, test line 329). If someone deleted `len(publicSPKIDER) > 4096` from line 15, every current test would still pass; the only effect would be a bounded 4097-byte copy plus hash before rejection.",
+   "suggestedLaterFix": "In a later Root-granted test card, add an oversize DER row whose expected hash and signer are rebound to SHA256(hugeDER), plus an AllocsPerRun==0 measurement on it. This is not required for this narrow code card."
+  },
+  {
+   "id": "H12C-I1", "severity": "INFO", "mandatory": false,
+   "file": "services/node-agent/internal/migrationcontext/h12_signature_internal.go", "lines": "18-22, 33-35, 41-48", "sourceSHA256": "f9e3e808d8951c2da6fee4b45364f64bb5c909a33a90c3a6074c99b8cb6e4def",
+   "summary": "Several helper branches are defense in depth; because the helper returns only a bool, the tests can't attribute a rejection to them.",
+   "detail": "p02Schema24 already fixes signatureHex to exactly 128 lowercase hex (p02Pattern 5), so signature-bytes-63/65 are rejected by the schema before `len(sig) != 64`; the test label 'codec/signature-encoding' says so honestly. The schema also fixes signer.keySPKISHA256 to 64 lowercase nonzero hex, so the uppercase/invalid/short/long/empty expected-hash rows also fail the signer equality. Go's ParsePKIXPublicKey already enforces a 32-byte Ed25519 key, no parameters, minimal DER and no trailing data, so `len(key) != 32` and the MarshalPKIX roundtrip mismatch are probably unreachable with stdlib inputs. I did not execute this; it is manual reasoning. The DER rows do pin their earlier preconditions (decode, schema and hash all hold), so their rejection must come from the parse, type or roundtrip layer. The wrong-algorithm row reaches the concrete-type assertion (X25519 OID). None of this is a defect."
+  },
+  {
+   "id": "H12C-I2", "severity": "INFO", "mandatory": false,
+   "file": "services/node-agent/internal/migrationcontext/effect_gate_test.go", "lines": "211, 543", "sourceSHA256": "d34eecc2d9b7d5790eec6ebe2b9816b421899228f948fae05fd6920d4d51b50a",
+   "summary": "The call exemption is keyed by call.Pos() alone, not by (position, resolved callee).",
+   "detail": "This is safe today. A position is registered only when one of the three exact objects is the direct call.Fun in the H12 file and the H12 helper. Any other reference to those objects fails h12ScopedCryptoUses before the call walk runs. Another CallExpr could share that start position only if it called the result of the allowed call, and Verify returns bool while ParsePKIX/MarshalPKIX return two values, so neither result can be called. This is a hardening note if a future grant ever allows an object that returns a callable."
+  },
+  {
+   "id": "H12C-I3", "severity": "INFO", "mandatory": false,
+   "file": "services/node-agent/internal/migrationcontext/h12_signature_test.go", "lines": "300-304", "sourceSHA256": "94f9bd56deaa371125ceba49f5d7a21d30a4bc34575fed4747f693b51d1ce020",
+   "summary": "The public-refusal assertion is one unconditional call after the table. It shows that no wiring exists; it is not a causal property of the re-signed-other-policy row.",
+   "detail": "This matches the contract: there is no caller, port or factory, and the static check confirms that no other production file names the helper. The ReadHistory, null and unregistered public refusals stay covered by the existing unchanged tests, which Root's phase 4 ran and passed (Root fact). The new files don't assert them again."
+  },
+  {
+   "id": "H12C-I4", "severity": "INFO", "mandatory": false,
+   "file": "services/node-agent/internal/migrationcontext/effect_gate_test.go", "lines": "149-212", "sourceSHA256": "d34eecc2d9b7d5790eec6ebe2b9816b421899228f948fae05fd6920d4d51b50a",
+   "summary": "File identity is the bare unadjusted FileSet name, and owner identity is a package-scope, receiverless FuncDecl name. A dot-import spelling has no fixture.",
+   "detail": "The real-closure control at line 737 runs sourceEffects on the actual sources and must pass. The real Verify/ParsePKIX/Marshal references can only pass if the bare filename matches, so that control is the evidence that the name binding is real. A dot import of crypto/ed25519 calling Verify directly would resolve to the same object, position and direct call, so it is allowed, which is consistent with the contract and not a bypass. A dot-imported `PublicKey` assertion would be refused because it is not a SelectorExpr, which is conservative. The spelled AST check in source_gate (`id.Name == \"ed25519\"`) predates this change. The go/types check is the governing guard, and the new exception there requires the exact resolved object, position and allowed reference (h12ResolvedVerifyAt, line 702)."
+  }
+ ],
+ "assessment": {
+  "fullFourFileDelta": "Only 4 lines were removed across the two guard files: two loop/condition lines were extended with `&& !h12.references[id.Pos()]` / `&& !h12.calls[call.Pos()]`, `for _, obj` became `for id, obj`, and one t.Fatal message was replaced by a position-scoped check. Everything else is additive. The pureExternalObjects block is byte-identical (sha256 64805959..., 786 B) and none of the three new objects is in it. p02_evaluate_internal.go and pl_r1a_test.go are unchanged. h12_signature_internal.go is the only new production file.",
+  "securityContract": "The helper checks the bounds and expected-hash format first, then copies raw and DER, then runs the existing p02Decode(c2=false) with canonical roundtrip and the existing p02EnvelopeSchema/p02ReadEnvelope. After that it checks the exact format, purpose, signer hash and SHA256 of the full DER against the supplied expected hash (the full SPKI, not the raw 32-byte key). Then come p02Unhex to 64 bytes, ParsePKIX, the concrete ed25519.PublicKey with length 32, the MarshalPKIX roundtrip byte-equal to the full DER, the existing p02Context{envelopeValue: v}.signingInput() (fixed p02Domain||NUL||canonical {body,signer}), and finally stdlib ed25519.Verify. There are 9 `return p02SignatureTuple{}, false` exits and 1 success return naming exactly the 13 declared fields. No alternative codec, domain, JSON callback, public caller, port, factory or p02Inputs assembly was added.",
+  "inputOwnership": "raw and DER are copied after the bounds check and before any parse or hash. signingInput is freshly allocated by append, sig is fresh from hex.DecodeString, and the strings come from the decoded value. The ownership test mutates the original raw and DER after the call and checks the tuple fingerprint. No concurrent or hostile isolation is claimed; the doc comment says so.",
+  "oracle": "The test signs with deterministic public NewKeyFromSeed/Sign over a message built by stdlib encoding/json: the literal domain constant, then NUL, then the WHOLE body and signer RawMessages. It never calls the helper or signingInput. The math rows independently re-verify the original message and check the canonical/schema/hash/DER preconditions before checking the result. The expected 13-field tuple is rebuilt from stdlib JSON and the oracle message.",
+  "preconditions": "Math rows: decode, schema, signer hash, DER hash and canonical DER all hold, and only the signed message, key or signature varies. DER rows: decode, schema and hash hold, so rejection must come from the parse, type or roundtrip layer. Depth row: the bounded parser itself must reject. Rows can't share a complete input (fingerprint uniqueness inside the table).",
+  "resolvedGuard": "The new type restriction applies only to `file == h12SignatureSource`, which is the WIP01 fix. The three functions must be *types.Func, in the H12 file, owned by the H12 helper (a nested FuncLit gives no owner), and appear as the direct call.Fun. Positions are unadjusted, so //line directives are ignored. Function values, non-call references, passing as an argument, wrappers, nested literals, foreign files, aliased imports and line-directive impersonation all have compile-valid refusal fixtures. The repository AST exception requires the exact resolved Verify at that line and column in the H12 file. The own-method mimic and column+1 controls are present. No crypto Signer, PrivateKey or Sign permission was broadened: PrivateKey in the H12 file is refused, and Sign/NewKeyFromSeed appear only in the test fixture.",
+  "oldPLRRestoration": "This is a Root fact and I did not re-execute it. WIP01 phase 4 failed 5 leaf, 3 parent and 1 package event because the type block was global; WIP02 restored the original causes and the S1/S2 LIMIT controls (Root .work/h12-signature-r2-five-regressions-root-verified.json), and the hosted race run passed all five. My reading of the source agrees: the PLR probes live in other files, so the scoped block can't reach them.",
+  "provenance": "The four pins match in both the git blob and the worktree, and the wip02/*.current.raw blobs equal the pins. 259 Evidence paths are present and none of them is post-CI. The author final report b944af89... (101998 B) is untracked (`??`) in the author worktree and is not part of the 6d7 tree. Both WIP zip hashes match: f320083d... and f4e1532a...."
+ },
+ "attribution": {
+  "RootUnitExecution": "Root's PC3 isolated pinned Go1.27.1 run of the frozen WIP02: 4 serial phases at 10:22:54–10:25:28 KST, direct exit 0, 28 top / 274 sub tests passing, 0 fail, 0 skip, OOM false, 373 sources unchanged (Root .work/h12-signature-r2-actual-go-summary.json). WIP01's original RED is kept on record as Root fact.",
+  "hostedCI": "Root-verified (.work/h12-6d7-ci-root-verified.json): Docs 42324844830, all 19 steps successful; Core 42324848063 main 42 success + 6 declared optional skips, S01 16 success; primary JUnit 9358 = 9312 pass + 46 skip; Go race 146 top + 550 sub pass; live Docker compatibility 1 top + 4 sub pass on the CI runner. New H12 rows: 32 math + 12 guard; P02 92 rows / 90 unique; 4 artifact digests matched.",
+  "reviewerStatic": "reviewer_h12_6d7_static_check.py.txt run with -I -B: attempt 1 exit 1, caused by two reviewer regex bugs (the computed 'signature-bytes-' name was double-counted, and the allowed-row pattern was wrong); attempt 2 exit 0 with 48 checks. These are git, blob and file structural facts only.",
+  "reviewerManual": "Manual go/types and AST reasoning over the actual source. It is not a compiler proof."
+ },
+ "notRunByReviewer": "Go, compiler, tests, crypto, keygen, signing, X509, the app, Node, browser, full Core, SSH, Docker, PG and process actions. I did not rerun any author or Root gate. I did not re-download CI artifacts or execute binaries.",
+ "remainsOpen": "This pass does NOT close actual H1-H7/H3EA, verdict custody, RD NULL_HOLD, raw7 UNREGISTERED, A01-A40 NOT_RUN, actual Root binding (none), authority (none), public TrustUnknown, K1 13 types/73, 28 pins, or the whole 5-PC program. The original B19 HOLD and runtime B0 are unaffected. The N10-N14 later-binding choices remain FUTURE inputs. Nothing here grants trust, current state, ports, producer, effect, positive factory, register, deploy or merge.",
+ "nextOwner": "Root/Codex aggregator: receive the verdict and decide the next scope. H12C-L1 is optional and goes to a later Root-granted test card."
+}

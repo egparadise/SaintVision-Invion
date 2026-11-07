@@ -1,0 +1,403 @@
+{
+ "tool": "reviewer_h12_6d7_static_check",
+ "head": "6d7ee3d85bd0e47eb7b787234c10d5dbfdb3a9e8",
+ "base": "0bf852a66b2eb01f95da65ebbad0360a04ea6fed",
+ "scope": "read-only git/blob/file structural facts; no Go/compiler/crypto/test/app execution",
+ "failures": [],
+ "checks": 48,
+ "facts": {
+  "headExact": {
+   "ok": true,
+   "detail": null
+  },
+  "directParentIsBase": {
+   "ok": true,
+   "detail": null
+  },
+  "authorRemoteRefExact": {
+   "ok": true,
+   "detail": [
+    "6d7ee3d85bd0e47eb7b787234c10d5dbfdb3a9e8"
+   ]
+  },
+  "nameStatusA264M2": {
+   "ok": true,
+   "detail": {
+    "A": 264,
+    "M": 2
+   }
+  },
+  "onlyFourNonDocsPaths": {
+   "ok": true,
+   "detail": [
+    "services/node-agent/internal/migrationcontext/effect_gate_test.go",
+    "services/node-agent/internal/migrationcontext/h12_signature_internal.go",
+    "services/node-agent/internal/migrationcontext/h12_signature_test.go",
+    "services/node-agent/internal/migrationcontext/source_gate_test.go"
+   ]
+  },
+  "nonEvidenceDocsAreThreeOwnHistory": {
+   "ok": true,
+   "detail": [
+    "docs/vault/30_Development/History/2026-11-07_FLEET5_K2_H12_Signature_Code_Publication_Codex.md",
+    "docs/vault/30_Development/History/2026-11-07_FLEET5_K2_H12_Signature_Code_R1_Codex.md",
+    "docs/vault/30_Development/History/2026-11-07_FLEET5_K2_H12_Signature_Type_Scope_WIP02_Codex.md"
+   ]
+  },
+  "candidateEvidence259AndNoPostCIInTree": {
+   "ok": true,
+   "detail": 259
+  },
+  "fourFilesMode100644": {
+   "ok": true,
+   "detail": {
+    "effect_gate_test.go": "100644",
+    "h12_signature_internal.go": "100644",
+    "h12_signature_test.go": "100644",
+    "source_gate_test.go": "100644"
+   }
+  },
+  "pin:h12_signature_internal.go": {
+   "ok": true,
+   "detail": {
+    "blob": "f9e3e808d8951c2da6fee4b45364f64bb5c909a33a90c3a6074c99b8cb6e4def",
+    "worktree": "f9e3e808d8951c2da6fee4b45364f64bb5c909a33a90c3a6074c99b8cb6e4def",
+    "bytes": 2505
+   }
+  },
+  "wip02CurrentRawEqualsBlob:h12_signature_internal.go": {
+   "ok": true,
+   "detail": null
+  },
+  "pin:h12_signature_test.go": {
+   "ok": true,
+   "detail": {
+    "blob": "94f9bd56deaa371125ceba49f5d7a21d30a4bc34575fed4747f693b51d1ce020",
+    "worktree": "94f9bd56deaa371125ceba49f5d7a21d30a4bc34575fed4747f693b51d1ce020",
+    "bytes": 12939
+   }
+  },
+  "wip02CurrentRawEqualsBlob:h12_signature_test.go": {
+   "ok": true,
+   "detail": null
+  },
+  "pin:effect_gate_test.go": {
+   "ok": true,
+   "detail": {
+    "blob": "d34eecc2d9b7d5790eec6ebe2b9816b421899228f948fae05fd6920d4d51b50a",
+    "worktree": "d34eecc2d9b7d5790eec6ebe2b9816b421899228f948fae05fd6920d4d51b50a",
+    "bytes": 27592
+   }
+  },
+  "wip02CurrentRawEqualsBlob:effect_gate_test.go": {
+   "ok": true,
+   "detail": null
+  },
+  "pin:source_gate_test.go": {
+   "ok": true,
+   "detail": {
+    "blob": "0ad2989b6f36224352516e17f278b957cc25077f657560975e0ebcb063ff9208",
+    "worktree": "0ad2989b6f36224352516e17f278b957cc25077f657560975e0ebcb063ff9208",
+    "bytes": 25737
+   }
+  },
+  "wip02CurrentRawEqualsBlob:source_gate_test.go": {
+   "ok": true,
+   "detail": null
+  },
+  "unchanged:pl_r1a_test.go": {
+   "ok": true,
+   "detail": null
+  },
+  "pureExternalObjectsByteIdentical": {
+   "ok": true,
+   "detail": {
+    "sha256": "648059594079025d5c608ba65c4b84e0bc6ffc3092517846ebe57f0f8dd86a95",
+    "bytes": 786
+   }
+  },
+  "threeNewObjectsNotInPureMap": {
+   "ok": true,
+   "detail": null
+  },
+  "onlyFourRemovedGuardLines": {
+   "ok": true,
+   "detail": [
+    "for _, obj := range checked.info.Uses {",
+    "if f, ok := obj.(*types.Func); ok && f.Pkg() != nil && f.Pkg().Path() != ownImport && !pureExternalObjects[objectID(f)] {",
+    "if x.Pkg() == nil || x.Pkg().Path() != ownImport && !pureExternalObjects[objectID(x)] {",
+    "t.Fatal(\"only public-key type use is granted\")"
+   ]
+  },
+  "onlyNewProductionFileIsHelper": {
+   "ok": true,
+   "detail": [
+    "services/node-agent/internal/migrationcontext/h12_signature_internal.go"
+   ]
+  },
+  "helperImportsExact": {
+   "ok": true,
+   "detail": [
+    "bytes",
+    "crypto/ed25519",
+    "crypto/x509"
+   ]
+  },
+  "boundsAndHexBeforeFirstCopy": {
+   "ok": true,
+   "detail": null
+  },
+  "checkOrder": {
+   "ok": true,
+   "detail": {
+    "p02EnvelopeSchema(v)": 694,
+    "p02ReadEnvelope(v)": 762,
+    "e.signer.keySPKISHA256 != independentlyExpectedSPKISHA256": 847,
+    "hashBytes(der) != independentlyExpectedSPKISHA256": 908,
+    "p02Unhex(e.signatureHex)": 1011,
+    "len(sig) != 64": 1047,
+    "x509.ParsePKIXPublicKey(der)": 1119,
+    "parsed.(ed25519.PublicKey)": 1216,
+    "len(key) != 32": 1254,
+    "x509.MarshalPKIXPublicKey(key)": 1332,
+    "bytes.Equal(canonicalDER, der)": 1382,
+    "p02Context{envelopeValue: v}": 1460,
+    "c.signingInput()": 1501,
+    "ed25519.Verify(key, message, sig)": 1609
+   }
+  },
+  "cryptoSelectorCounts": {
+   "ok": true,
+   "detail": {
+    "ed25519.Verify": 1,
+    "x509.ParsePKIXPublicKey": 1,
+    "x509.MarshalPKIXPublicKey": 1,
+    "ed25519.PublicKey": 1,
+    "ed25519.": 2,
+    "x509.": 2
+   }
+  },
+  "returns9ZeroFalseAnd1Success": {
+   "ok": true,
+   "detail": {
+    "zeroFalse": 9,
+    "success": 1
+   }
+  },
+  "successTupleNames13DeclaredFields": {
+   "ok": true,
+   "detail": [
+    "format",
+    "purpose",
+    "domain",
+    "keySPKI",
+    "capsuleSHA256",
+    "generation",
+    "selector",
+    "scopeSHA256",
+    "requestBindingSHA256",
+    "anchorVersion",
+    "recordVersion",
+    "signingInput",
+    "signature"
+   ]
+  },
+  "helperHasNoCallerInProduction": {
+   "ok": true,
+   "detail": null
+  },
+  "threeObjectsSpelledNowhereElseInProduction": {
+   "ok": true,
+   "detail": []
+  },
+  "limitsEnvelope2MiBPayload16MiB": {
+   "ok": true,
+   "detail": null
+  },
+  "domainLiteralEqualsTestOracle": {
+   "ok": true,
+   "detail": null
+  },
+  "INFO_schemaAlreadyFixesSignatureHex128": {
+   "ok": true,
+   "detail": null
+  },
+  "existingSigningInputIsDomainNULWholeBodySigner": {
+   "ok": true,
+   "detail": null
+  },
+  "evaluateInternalUnchanged": {
+   "ok": true,
+   "detail": null
+  },
+  "tableCensus32_2true_7math_23earlier": {
+   "ok": true,
+   "detail": {
+    "total": 32,
+    "mathTrue": [
+     "valid-whole-message",
+     "resigned-other-policy-math-only"
+    ],
+    "mathFalseModes": [
+     "wrong-key",
+     "wrong-domain",
+     "missing-NUL",
+     "hash-only",
+     "body-only"
+    ],
+    "mathFalseNamed": [
+     "body-changed-without-resign",
+     "tampered-signature"
+    ],
+    "expectedKeyLoop": [
+     "empty-expected",
+     "short-expected",
+     "long-expected",
+     "uppercase-expected",
+     "invalid-expected",
+     "wrong-expected"
+    ],
+    "namedAdds": [
+     "raw-key-hash-not-SPKI",
+     "empty-DER",
+     "oversize-DER",
+     "malformed-DER-rebound",
+     "trailing-DER-rebound",
+     "wrong-algorithm-rebound",
+     "NULL-parameter-DER-rebound",
+     "nonminimal-DER-rebound"
+    ],
+    "signatureBytes": [
+     63,
+     65
+    ],
+    "admissionCodec": [
+     "empty-record",
+     "oversize-record",
+     "noncanonical-whitespace",
+     "trailing-record",
+     "duplicate-field",
+     "invalid-UTF8",
+     "depth-bound"
+    ]
+   }
+  },
+  "singleAllocsPerRunOnOversizeRecordOnly": {
+   "ok": true,
+   "detail": null
+  },
+  "oversizeDERKeepsBaseExpectedHash_L1": {
+   "ok": true,
+   "detail": null
+  },
+  "testUsesNoRandTimeOS": {
+   "ok": true,
+   "detail": null
+  },
+  "signAndSeedOnlyInFixture": {
+   "ok": true,
+   "detail": null
+  },
+  "guardCases12_2allowed10refused": {
+   "ok": true,
+   "detail": [
+    [
+     "same-file-direct-import-alias",
+     "h12SignatureSource"
+    ],
+    [
+     "foreign-file-direct-call",
+     "\"h12_foreign.go\""
+    ],
+    [
+     "foreign-file-aliased-PKIX",
+     "\"h12_foreign.go\""
+    ],
+    [
+     "line-directive-cannot-impersonate",
+     "\"h12_foreign.go\""
+    ],
+    [
+     "function-value-capture",
+     "h12SignatureSource"
+    ],
+    [
+     "noncall-PKIX-reference",
+     "h12SignatureSource"
+    ],
+    [
+     "pass-function-as-argument",
+     "h12SignatureSource"
+    ],
+    [
+     "different-function-wrapper",
+     "h12SignatureSource"
+    ],
+    [
+     "nested-function-wrapper",
+     "h12SignatureSource"
+    ],
+    [
+     "unapproved-method-value",
+     "h12SignatureSource"
+    ],
+    [
+     "private-key-type-not-DATA",
+     "h12SignatureSource"
+    ],
+    [
+     "all-three-direct-control",
+     "h12SignatureSource"
+    ]
+   ]
+  },
+  "typeRestrictionScopedToH12File": {
+   "ok": true,
+   "detail": null
+  },
+  "unadjustedPositions": {
+   "ok": true,
+   "detail": null
+  },
+  "resolverControls2": {
+   "ok": true,
+   "detail": null
+  },
+  "rootInputsSHA256": {
+   "h12-6d7-ci-root-verified.json": "15c3fce5cbcd6f92b095446bce4e73a88087e8d60fcc1687f8a91aa9e05f9e69",
+   "h12-signature-r2-wip-root-verified.json": "7d5567d65fb3447bd50c3694aaef38d27eeefb646b0c83d3424cf4924645c91d",
+   "h12-signature-r2-actual-go-summary.json": "73f5ff69acc30683cb564a6233bf2d1c3766e5d241fa3efa1727a881e8e66f61",
+   "h12-signature-r2-five-regressions-root-verified.json": "a10cdcf684264b9798047c3e078ac2d95604003a2997cac3a9d735284aa4eba4",
+   "h12-signature-code-r1-root-cut.txt": "cb8887049d887a565e7b3b3ba019fa0adc6f40586f1bb226319879a6e27bd943",
+   "h12-signature-r1-actual-failure-root-fix.txt": "55d474eecf036c13426f311f8cec817252366ba69b1a96e26b1ce3d528353a37",
+   "h12-signature-wip02-root-publication-step.txt": "6695fbbe7f53c14428dcf57e3d0c774a306c6732124afb256948353f9820eb06",
+   "h12-6d7-code-review-spec.txt": "8b7520d29d485e731c1573169ab31a8f7f79d3baefe6138bcf607edbb4fdd796",
+   "h12-6d7-reviewer-predecessor-lifecycle.json": "b15d3d1ef5bbb35efca8c7ead8dd178190c9a09f0133d935a2d7ba8d51cb702d",
+   "h12-6d7-code-review-dispatch.json": "31846b88fc5e38931e2acfd1ee261052564b43e213760f9c06d6daccf99591d1",
+   "h12-signature-code-r1-wip.zip": "f320083d6837c315e5900aae85e7be771a3754c70794715ededb40d55a18641c",
+   "h12-signature-r2-code-r1-wip.zip": "f4e1532a97a5b84d177917607dc2947965107ad7faedc78f5b0cdd004aacd018"
+  },
+  "rootCIFacts": {
+   "ok": true,
+   "detail": null
+  },
+  "rootWIP02GoFacts": {
+   "ok": true,
+   "detail": null
+  },
+  "wipZipHashes": {
+   "ok": true,
+   "detail": null
+  },
+  "authorReportLocalHash": {
+   "ok": true,
+   "detail": {
+    "bytes": 101998
+   }
+  },
+  "authorReportUncommittedNotIn6d7Tree": {
+   "ok": true,
+   "detail": null
+  }
+ }
+}

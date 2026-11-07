@@ -1,0 +1,158 @@
+"""Reviewer read-only static facts for H12 signature code candidate 6d7ee3d8 vs direct base 0bf852a6.
+
+Usage: python -I -B reviewer_h12_6d7_static_check.py.txt <repo-worktree> <root-workspace> <author-worktree> <out.json>
+Reads git objects (git show / ls-tree / diff / ls-remote) and plain files only. It never imports, executes,
+compiles or evaluates application code; it does not run Go, crypto, tests or any extracted function.
+Text/regex facts are STRUCTURAL ONLY; they are not a go/types proof and do not replace the Root/CI compiler runs.
+"""
+import hashlib, json, re, subprocess, sys
+from pathlib import Path
+
+REPO, ROOTWS, AUTHOR, OUT = Path(sys.argv[1]), Path(sys.argv[2]), Path(sys.argv[3]), Path(sys.argv[4])
+HEAD = '6d7ee3d85bd0e47eb7b787234c10d5dbfdb3a9e8'
+BASE = '0bf852a66b2eb01f95da65ebbad0360a04ea6fed'
+PKG = 'services/node-agent/internal/migrationcontext/'
+PINS = {'h12_signature_internal.go': 'f9e3e808d8951c2da6fee4b45364f64bb5c909a33a90c3a6074c99b8cb6e4def',
+        'h12_signature_test.go': '94f9bd56deaa371125ceba49f5d7a21d30a4bc34575fed4747f693b51d1ce020',
+        'effect_gate_test.go': 'd34eecc2d9b7d5790eec6ebe2b9816b421899228f948fae05fd6920d4d51b50a',
+        'source_gate_test.go': '0ad2989b6f36224352516e17f278b957cc25077f657560975e0ebcb063ff9208'}
+EVP = 'docs/vault/30_Development/Evidence/fleet5-k2-h12-signature-code-r1-20261107-codex/'
+REPORT = AUTHOR / (EVP + 'publication/post-ci/publication-final-report-6d7ee3d8.json')
+
+def git(*a):
+    return subprocess.run(['git', *a], cwd=REPO, capture_output=True, check=True).stdout
+def blob(rev, p):
+    return git('show', f'{rev}:{p}')
+def sha(b):
+    return hashlib.sha256(b).hexdigest()
+
+facts, failures = {}, []
+def check(name, ok, detail=None):
+    facts[name] = {'ok': bool(ok), 'detail': detail}
+    if not ok:
+        failures.append(name)
+
+# 1. identity / provenance
+check('headExact', git('rev-parse', 'HEAD').decode().strip() == HEAD)
+check('directParentIsBase', git('rev-parse', HEAD + '^').decode().strip() == BASE)
+remote = git('ls-remote', 'origin', 'refs/heads/agent/codex/fleet5-k2-h12-signature-code-r1-20261107').decode().split()
+check('authorRemoteRefExact', remote[:1] == [HEAD], remote[:1])
+ns = [l.split('\t') for l in git('diff', '--name-status', BASE, HEAD).decode().splitlines()]
+counts = {}
+for s, *_ in ns:
+    counts[s] = counts.get(s, 0) + 1
+nondocs = sorted(p for _, p in ns if not p.startswith('docs/'))
+others = sorted(p for _, p in ns if p.startswith('docs/') and not p.startswith(EVP))
+check('nameStatusA264M2', counts == {'A': 264, 'M': 2}, counts)
+check('onlyFourNonDocsPaths', nondocs == sorted(PKG + f for f in PINS), nondocs)
+check('nonEvidenceDocsAreThreeOwnHistory', len(others) == 3 and all(p.startswith('docs/vault/30_Development/History/2026-11-07_FLEET5_K2_H12_Signature_') and p.endswith('_Codex.md') for p in others), others)
+evidence = [p for _, p in ns if p.startswith(EVP)]
+check('candidateEvidence259AndNoPostCIInTree', len(evidence) == 259 and not any('/post-ci/' in p for p in evidence), len(evidence))
+modes = {}
+for line in git('ls-tree', '-r', HEAD, '--', *[PKG + f for f in PINS]).decode().splitlines():
+    meta, path = line.split('\t'); modes[path.rsplit('/', 1)[1]] = meta.split()[0]
+check('fourFilesMode100644', set(modes.values()) == {'100644'} and len(modes) == 4, modes)
+
+# 2. exact source hashes (git blob and current working file)
+src = {}
+for f, pin in PINS.items():
+    b = blob(HEAD, PKG + f); src[f] = b.decode('utf-8')
+    w = (REPO / (PKG + f)).read_bytes()
+    check('pin:' + f, sha(b) == pin and sha(w) == pin, {'blob': sha(b), 'worktree': sha(w), 'bytes': len(b)})
+    check('wip02CurrentRawEqualsBlob:' + f, sha(blob(HEAD, EVP + 'wip02/' + f + '.current.raw')) == pin)
+
+# 3. unchanged neighbours and the global pure map
+for f, pin in {'pl_r1a_test.go': '9ea789e33204d3f54612223f053602815dd1493d26e1e888a44a679456a3d292'}.items():
+    check('unchanged:' + f, sha(blob(HEAD, PKG + f)) == pin and sha(blob(BASE, PKG + f)) == pin)
+def puremap(b):
+    s = b.index(b'var pureExternalObjects = map[string]bool{'); e = b.index(b'\n}\n', s) + 3; return b[s:e]
+pm_base, pm_head = puremap(blob(BASE, PKG + 'effect_gate_test.go')), puremap(blob(HEAD, PKG + 'effect_gate_test.go'))
+check('pureExternalObjectsByteIdentical', pm_base == pm_head, {'sha256': sha(pm_head), 'bytes': len(pm_head)})
+check('threeNewObjectsNotInPureMap', not any(k in pm_head for k in (b'"crypto/ed25519.Verify"', b'"crypto/x509.ParsePKIXPublicKey"', b'"crypto/x509.MarshalPKIXPublicKey"')))
+diff = git('diff', '-U0', BASE, HEAD, '--', PKG + 'effect_gate_test.go', PKG + 'source_gate_test.go').decode()
+removed = [l[1:].strip() for l in diff.splitlines() if l.startswith('-') and not l.startswith('---')]
+check('onlyFourRemovedGuardLines', len(removed) == 4, removed)
+prod_changes = git('diff', '--name-only', BASE, HEAD, '--', PKG + '*.go', ':!' + PKG + '*_test.go').decode().split()
+check('onlyNewProductionFileIsHelper', prod_changes == [PKG + 'h12_signature_internal.go'], prod_changes)
+
+# 4. helper structure (text facts, not type facts)
+h = src['h12_signature_internal.go']
+imports = re.findall(r'^\s*"([^"]+)"\s*$', h.split(')', 1)[0], re.M)
+check('helperImportsExact', imports == ['bytes', 'crypto/ed25519', 'crypto/x509'], imports)
+body = h[h.index('func h12CheckRegistrySignature('):]
+first_if = body.index('if len(rawRecord) == 0 || len(rawRecord) > p02EnvelopeLimit || len(publicSPKIDER) == 0 || len(publicSPKIDER) > 4096 || len(independentlyExpectedSPKISHA256) != 64')
+check('boundsAndHexBeforeFirstCopy', first_if < body.index('for _, c := range independentlyExpectedSPKISHA256') < body.index('raw := copyBytes(rawRecord)') < body.index('der := copyBytes(publicSPKIDER)') < body.index('p02Decode(raw, p02EnvelopeLimit, false)'))
+order = ['p02EnvelopeSchema(v)', 'p02ReadEnvelope(v)', 'e.signer.keySPKISHA256 != independentlyExpectedSPKISHA256', 'hashBytes(der) != independentlyExpectedSPKISHA256', 'p02Unhex(e.signatureHex)', 'len(sig) != 64', 'x509.ParsePKIXPublicKey(der)', 'parsed.(ed25519.PublicKey)', 'len(key) != 32', 'x509.MarshalPKIXPublicKey(key)', 'bytes.Equal(canonicalDER, der)', 'p02Context{envelopeValue: v}', 'c.signingInput()', 'ed25519.Verify(key, message, sig)']
+pos = [body.find(t) for t in order]
+check('checkOrder', all(p >= 0 for p in pos) and pos == sorted(pos), dict(zip(order, pos)))
+sel = {k: len(re.findall(re.escape(k) + r'\b', h)) for k in ('ed25519.Verify', 'x509.ParsePKIXPublicKey', 'x509.MarshalPKIXPublicKey', 'ed25519.PublicKey', 'ed25519.', 'x509.')}
+check('cryptoSelectorCounts', sel == {'ed25519.Verify': 1, 'x509.ParsePKIXPublicKey': 1, 'x509.MarshalPKIXPublicKey': 1, 'ed25519.PublicKey': 1, 'ed25519.': 2, 'x509.': 2}, sel)
+fails = body.count('return p02SignatureTuple{}, false'); succ = len(re.findall(r'return p02SignatureTuple\{format:', body))
+check('returns9ZeroFalseAnd1Success', fails == 9 and succ == 1 and body.count('return ') == 10, {'zeroFalse': fails, 'success': succ})
+tuple_fields = re.findall(r'(\w+):', body[body.index('return p02SignatureTuple{format:'):].split('}, true')[0])
+st = blob(HEAD, PKG + 'p02_inputs_internal.go').decode()
+decl = st[st.index('type p02SignatureTuple struct {'):]; decl = decl[:decl.index('}')]
+decl_fields = re.findall(r'^\s+(\w+)\s', decl, re.M)
+check('successTupleNames13DeclaredFields', len(tuple_fields) == 13 and sorted(tuple_fields) == sorted(decl_fields), tuple_fields)
+check('helperHasNoCallerInProduction', all('h12CheckRegistrySignature' not in blob(HEAD, PKG + p.rsplit('/', 1)[1]).decode()
+      for p in git('ls-tree', '-r', '--name-only', HEAD, '--', PKG).decode().split() if p.endswith('.go') and not p.endswith('_test.go') and not p.endswith('h12_signature_internal.go')))
+other_prod = [p for p in git('ls-tree', '-r', '--name-only', HEAD, '--', PKG).decode().split() if p.endswith('.go') and not p.endswith('_test.go') and not p.endswith('h12_signature_internal.go')]
+hits = [p for p in other_prod if re.search(r'\.(ParsePKIXPublicKey|MarshalPKIXPublicKey)\b|ed25519\.Verify\b', blob(HEAD, p).decode())]
+check('threeObjectsSpelledNowhereElseInProduction', hits == [], hits)
+codec = blob(HEAD, PKG + 'p02_codec_internal.go').decode(); schema = blob(HEAD, PKG + 'p02_schema_internal.go').decode()
+check('limitsEnvelope2MiBPayload16MiB', 'p02EnvelopeLimit       = 2 << 20' in codec and 'p02PayloadLimit        = 16 << 20' in codec)
+check('domainLiteralEqualsTestOracle', 'p02Domain              = "fleet5/p02/installed-policy-registry/candidate/v2"' in codec and 'const h12ExpectedTestDomain = "fleet5/p02/installed-policy-registry/candidate/v2"' in src['h12_signature_test.go'])
+s24 = schema[schema.index('func p02Schema24('):][:400]
+check('INFO_schemaAlreadyFixesSignatureHex128', 'p02Pattern(5, v.text)' in s24 and 'return p02Hex(s, 128, false)' in schema)
+ev = blob(HEAD, PKG + 'p02_evaluate_internal.go').decode()
+si = ev[ev.index('func (c *p02Context) signingInput() []byte {'):][:400]
+check('existingSigningInputIsDomainNULWholeBodySigner', 'p02Field{"body", p02Get(c.envelopeValue, "body")}, p02Field{"signer", p02Get(c.envelopeValue, "signer")}' in si and 'append([]byte(p02Domain), 0)' in si)
+check('evaluateInternalUnchanged', sha(blob(BASE, PKG + 'p02_evaluate_internal.go')) == sha(blob(HEAD, PKG + 'p02_evaluate_internal.go')))
+
+# 5. test-table census (regex over test source; Root/CI logs are the executed census)
+t = src['h12_signature_test.go']
+math_true = re.findall(r'\{"([\w-]+)", "math", [^}]*?, true\}', t)
+modes_l = re.findall(r'"([\w-]+)"', re.search(r'for _, mode := range \[\]string\{([^}]*)\}', t).group(1))
+math_named_false = re.findall(r'\}\{"([\w-]+)", "math", \w+, false\}\)', t)
+exp_keys = re.findall(r'\{"([\w-]+)", (?:""|strings\.[^}]*?|base\.expected[^}]*?)\}', re.search(r'for _, x := range \[\]struct\{ name, hash string \}\{(.*?)\} \{\n', t, re.S).group(1))
+adds = re.findall(r'add\("([\w-]+)",', t)  # attempt2: the computed signature-bytes- name is counted once below, not here
+sigbytes = re.findall(r'add\("signature-bytes-"\+strconv\.Itoa\(n\)', t) and [63, 65]
+codec_l = re.findall(r'\{"([\w-]+)", (?:nil|bytes|append|\[\]byte)', re.search(r'raw  \[\]byte\n\t\}\{(.*?)\} \{\n', t, re.S).group(1))
+census = {'mathTrue': math_true, 'mathFalseModes': modes_l, 'mathFalseNamed': math_named_false, 'expectedKeyLoop': exp_keys, 'namedAdds': adds, 'signatureBytes': sigbytes, 'admissionCodec': codec_l}
+total = len(math_true) + len(modes_l) + len(math_named_false) + len(exp_keys) + len(adds) + len(sigbytes) + len(codec_l)
+check('tableCensus32_2true_7math_23earlier', len(math_true) == 2 and len(modes_l) + len(math_named_false) == 7 and total == 32, {'total': total, **census})
+check('singleAllocsPerRunOnOversizeRecordOnly', t.count('testing.AllocsPerRun(') == 1 and 'AllocsPerRun(1, func() { result, success = h12CheckRegistrySignature(over.raw, over.der, over.expected) })' in t)
+check('oversizeDERKeepsBaseExpectedHash_L1', 'hugeDER := base\n\thugeDER.der = bytes.Repeat([]byte{0}, 4097)' in t)
+check('testUsesNoRandTimeOS', not re.search(r'"(crypto/rand|math/rand|time|os|os/exec|net)"', t.split(')', 1)[0]))
+check('signAndSeedOnlyInFixture', t.count('ed25519.Sign(') == 1 and t.count('ed25519.NewKeyFromSeed(') == 2 and 'ed25519.Sign(' not in h and 'NewKeyFromSeed' not in h)
+e = src['effect_gate_test.go']
+gcases = re.findall(r'\{"([\w-]+)", (h12SignatureSource|"h12_foreign.go"), ', e)
+allowed = re.findall(r', "", true\}', e)  # attempt2: allowed rows end with cause "" and true
+check('guardCases12_2allowed10refused', len(gcases) == 12 and len(allowed) == 2, gcases)
+check('typeRestrictionScopedToH12File', 'if typ, ok := obj.(*types.TypeName); ok && file == h12SignatureSource && typ.Pkg() != nil && typ.Pkg().Path() == "crypto/ed25519" {' in e)
+check('unadjustedPositions', e.count('PositionFor(id.Pos(), false)') == 2 and 'PositionFor(sel.Sel.Pos(), false)' in src['source_gate_test.go'])
+check('resolverControls2', src['source_gate_test.go'].count('h12CompileGuardProbe(t, root, h12SignatureSource,') == 2)
+
+# 6. Root-verified inputs (read, hashed; values taken as Root facts, not re-executed)
+rootfiles = ['h12-6d7-ci-root-verified.json', 'h12-signature-r2-wip-root-verified.json', 'h12-signature-r2-actual-go-summary.json', 'h12-signature-r2-five-regressions-root-verified.json',
+             'h12-signature-code-r1-root-cut.txt', 'h12-signature-r1-actual-failure-root-fix.txt', 'h12-signature-wip02-root-publication-step.txt', 'h12-6d7-code-review-spec.txt',
+             'h12-6d7-reviewer-predecessor-lifecycle.json', 'h12-6d7-code-review-dispatch.json', 'h12-signature-code-r1-wip.zip', 'h12-signature-r2-code-r1-wip.zip']
+facts['rootInputsSHA256'] = {f: sha((ROOTWS / '.work' / f).read_bytes()) for f in rootfiles}
+ci = json.loads((ROOTWS / '.work/h12-6d7-ci-root-verified.json').read_text(encoding='utf-8'))
+check('rootCIFacts', ci['source'] == HEAD and ci['base'] == BASE and ci['Docs'] == 42324844830 and ci['Core'] == 42324848063 and ci['DocsStepsSuccess'] == 19
+      and ci['CorePrimaryJUnit'] == {'tests': 9358, 'failures': 0, 'errors': 0, 'skipped': 46, 'passed': 9312} and ci['newH12ActualRowsWholeInputEqualRoot'] == 32
+      and ci['newH12ActualGuardCompilerRowsEqualRoot'] == 12 and ci['fiveOldCausalLeafCasesPassHostedRace'] is True and ci['actualAuthority'] is None)
+go = json.loads((ROOTWS / '.work/h12-signature-r2-actual-go-summary.json').read_text(encoding='utf-8'))
+check('rootWIP02GoFacts', go['packetSHA256'] == 'f4e1532a97a5b84d177917607dc2947965107ad7faedc78f5b0cdd004aacd018' and go['actualTopLevelPassed'] == 28 and go['actualSubtestsPassed'] == 274
+      and all(p['directExit'] == 0 and not p['OOMKilled'] and p['sourceBeforeAfterUnchanged'] for p in go['phaseResults']))
+check('wipZipHashes', facts['rootInputsSHA256']['h12-signature-code-r1-wip.zip'].startswith('f320083d') and facts['rootInputsSHA256']['h12-signature-r2-code-r1-wip.zip'] == 'f4e1532a97a5b84d177917607dc2947965107ad7faedc78f5b0cdd004aacd018')
+rb = REPORT.read_bytes()
+check('authorReportLocalHash', sha(rb) == 'b944af8919538b295dd162e1f0680580931dfc01589073ddefec693c911a718c', {'bytes': len(rb)})
+st_rep = subprocess.run(['git', 'status', '--porcelain', '--', str(REPORT.relative_to(AUTHOR)).replace('\\', '/')], cwd=AUTHOR, capture_output=True, check=True).stdout.decode()
+check('authorReportUncommittedNotIn6d7Tree', st_rep.startswith('??') and not any('publication-final-report' in p for p in evidence))
+
+result = {'tool': 'reviewer_h12_6d7_static_check', 'head': HEAD, 'base': BASE, 'scope': 'read-only git/blob/file structural facts; no Go/compiler/crypto/test/app execution',
+          'failures': failures, 'checks': len([k for k in facts if k != 'rootInputsSHA256']), 'facts': facts}
+OUT.write_text(json.dumps(result, ensure_ascii=False, indent=1) + '\n', encoding='utf-8', newline='\n')
+print(json.dumps({'checks': result['checks'], 'failures': failures}))
+raise SystemExit(1 if failures else 0)
