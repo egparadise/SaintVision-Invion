@@ -1,0 +1,226 @@
+{
+  "commonSetup": "Restricted fixture inv_kernel login, current tenant/epoch/admission explicitly verified, active requester/kernel grant/business links/project role, current ready Workspace version1, valid CPU baseline and enabled target; no Python/API validation of mutated candidate",
+  "negativeCases": [
+    {
+      "helper": "append_first_workspace_intent",
+      "case": "gpu",
+      "sqlstate": "42501",
+      "exception": "psycopg.errors.InsufficientPrivilege",
+      "message": "Bounded CPU resources required",
+      "earlierGuards": "Restricted fixture inv_kernel login, current tenant/epoch/admission explicitly verified, active requester/kernel grant/business links/project role, current ready Workspace version1, valid CPU baseline and enabled target; no Python/API validation of mutated candidate",
+      "specificIsolation": "gpuCount1 only; recomputed canonical and SHA make metadata/hash/command checks pass; resource shape except GPU is valid",
+      "countProof": "Owner-visible global counts of workloads/kernel runs/public runs/business mappings/outbox/idempotency equal before and after; fixture status/membership restored in finally",
+      "mutationSensitivity": "Deleting intended predicate makes SQL return without the required exception (or produce a different error), failing exact type/state/message assertions",
+      "actualMainExecution": false
+    },
+    {
+      "helper": "append_first_workspace_intent",
+      "case": "cpu",
+      "sqlstate": "42501",
+      "exception": "psycopg.errors.InsufficientPrivilege",
+      "message": "CPU resource bounds exceeded",
+      "earlierGuards": "Restricted fixture inv_kernel login, current tenant/epoch/admission explicitly verified, active requester/kernel grant/business links/project role, current ready Workspace version1, valid CPU baseline and enabled target; no Python/API validation of mutated candidate",
+      "specificIsolation": "cpuMillis501 only; recomputed canonical/SHA, positive-integer resource shape and zero GPU pass",
+      "countProof": "Owner-visible global counts of workloads/kernel runs/public runs/business mappings/outbox/idempotency equal before and after; fixture status/membership restored in finally",
+      "mutationSensitivity": "Deleting intended predicate makes SQL return without the required exception (or produce a different error), failing exact type/state/message assertions",
+      "actualMainExecution": false
+    },
+    {
+      "helper": "append_first_workspace_intent",
+      "case": "memory",
+      "sqlstate": "42501",
+      "exception": "psycopg.errors.InsufficientPrivilege",
+      "message": "CPU resource bounds exceeded",
+      "earlierGuards": "Restricted fixture inv_kernel login, current tenant/epoch/admission explicitly verified, active requester/kernel grant/business links/project role, current ready Workspace version1, valid CPU baseline and enabled target; no Python/API validation of mutated candidate",
+      "specificIsolation": "memoryBytes8388607 only; recomputed canonical/SHA, positive-integer resource shape and CPU1/GPU0 pass",
+      "countProof": "Owner-visible global counts of workloads/kernel runs/public runs/business mappings/outbox/idempotency equal before and after; fixture status/membership restored in finally",
+      "mutationSensitivity": "Deleting intended predicate makes SQL return without the required exception (or produce a different error), failing exact type/state/message assertions",
+      "actualMainExecution": false
+    },
+    {
+      "helper": "append_first_workspace_intent",
+      "case": "extra-key",
+      "sqlstate": "42501",
+      "exception": "psycopg.errors.InsufficientPrivilege",
+      "message": "Closed canonical CPU metadata required",
+      "earlierGuards": "Restricted fixture inv_kernel login, current tenant/epoch/admission explicitly verified, active requester/kernel grant/business links/project role, current ready Workspace version1, valid CPU baseline and enabled target; no Python/API validation of mutated candidate",
+      "specificIsolation": "workspaceStart={} only; recomputed canonical/SHA, required fields/identity remain valid",
+      "countProof": "Owner-visible global counts of workloads/kernel runs/public runs/business mappings/outbox/idempotency equal before and after; fixture status/membership restored in finally",
+      "mutationSensitivity": "Deleting intended predicate makes SQL return without the required exception (or produce a different error), failing exact type/state/message assertions",
+      "actualMainExecution": false
+    },
+    {
+      "helper": "append_first_workspace_intent",
+      "case": "sha",
+      "sqlstate": "42501",
+      "exception": "psycopg.errors.InsufficientPrivilege",
+      "message": "Closed canonical CPU metadata required",
+      "earlierGuards": "Restricted fixture inv_kernel login, current tenant/epoch/admission explicitly verified, active requester/kernel grant/business links/project role, current ready Workspace version1, valid CPU baseline and enabled target; no Python/API validation of mutated candidate",
+      "specificIsolation": "Only the supplied lower64 SHA differs; canonical bytes still exactly equal candidate spec",
+      "countProof": "Owner-visible global counts of workloads/kernel runs/public runs/business mappings/outbox/idempotency equal before and after; fixture status/membership restored in finally",
+      "mutationSensitivity": "Deleting intended predicate makes SQL return without the required exception (or produce a different error), failing exact type/state/message assertions",
+      "actualMainExecution": false
+    },
+    {
+      "helper": "append_first_workspace_intent",
+      "case": "canonical",
+      "sqlstate": "42501",
+      "exception": "psycopg.errors.InsufficientPrivilege",
+      "message": "Closed canonical CPU metadata required",
+      "earlierGuards": "Restricted fixture inv_kernel login, current tenant/epoch/admission explicitly verified, active requester/kernel grant/business links/project role, current ready Workspace version1, valid CPU baseline and enabled target; no Python/API validation of mutated candidate",
+      "specificIsolation": "Canonical command differs from spec; SHA recomputed over those changed canonical bytes, isolating canonical/spec equality",
+      "countProof": "Owner-visible global counts of workloads/kernel runs/public runs/business mappings/outbox/idempotency equal before and after; fixture status/membership restored in finally",
+      "mutationSensitivity": "Deleting intended predicate makes SQL return without the required exception (or produce a different error), failing exact type/state/message assertions",
+      "actualMainExecution": false
+    },
+    {
+      "helper": "append_first_workspace_intent",
+      "case": "workspace-not-ready",
+      "sqlstate": "42501",
+      "exception": "psycopg.errors.InsufficientPrivilege",
+      "message": "Current selected ready Workspace required",
+      "earlierGuards": "Restricted fixture inv_kernel login, current tenant/epoch/admission explicitly verified, active requester/kernel grant/business links/project role, current ready Workspace version1, valid CPU baseline and enabled target; no Python/API validation of mutated candidate",
+      "specificIsolation": "Only fixture status changes ready->provisioning; epoch/tenant/subject/permission/requester all pass before selected Workspace check",
+      "countProof": "Owner-visible global counts of workloads/kernel runs/public runs/business mappings/outbox/idempotency equal before and after; fixture status/membership restored in finally",
+      "mutationSensitivity": "Deleting intended predicate makes SQL return without the required exception (or produce a different error), failing exact type/state/message assertions",
+      "actualMainExecution": false
+    },
+    {
+      "helper": "append_first_workspace_intent",
+      "case": "workspace-version",
+      "sqlstate": "42501",
+      "exception": "psycopg.errors.InsufficientPrivilege",
+      "message": "Current selected ready Workspace required",
+      "earlierGuards": "Restricted fixture inv_kernel login, current tenant/epoch/admission explicitly verified, active requester/kernel grant/business links/project role, current ready Workspace version1, valid CPU baseline and enabled target; no Python/API validation of mutated candidate",
+      "specificIsolation": "Only expected Workspace version2 differs from current1; status stays ready",
+      "countProof": "Owner-visible global counts of workloads/kernel runs/public runs/business mappings/outbox/idempotency equal before and after; fixture status/membership restored in finally",
+      "mutationSensitivity": "Deleting intended predicate makes SQL return without the required exception (or produce a different error), failing exact type/state/message assertions",
+      "actualMainExecution": false
+    },
+    {
+      "helper": "append_first_workspace_intent",
+      "case": "target-not-member",
+      "sqlstate": "42501",
+      "exception": "psycopg.errors.InsufficientPrivilege",
+      "message": "Selected target membership differs",
+      "earlierGuards": "Restricted fixture inv_kernel login, current tenant/epoch/admission explicitly verified, active requester/kernel grant/business links/project role, current ready Workspace version1, valid CPU baseline and enabled target; no Python/API validation of mutated candidate",
+      "specificIsolation": "Only targetNodeId changes to a valid isolated NodeId without membership; canonical/SHA, all earlier CPU guards pass, Workspace.node_id remains NULL",
+      "countProof": "Owner-visible global counts of workloads/kernel runs/public runs/business mappings/outbox/idempotency equal before and after; fixture status/membership restored in finally",
+      "mutationSensitivity": "Deleting intended predicate makes SQL return without the required exception (or produce a different error), failing exact type/state/message assertions",
+      "actualMainExecution": false
+    },
+    {
+      "helper": "append_first_workspace_intent",
+      "case": "target-disabled",
+      "sqlstate": "42501",
+      "exception": "psycopg.errors.InsufficientPrivilege",
+      "message": "Selected target membership differs",
+      "earlierGuards": "Restricted fixture inv_kernel login, current tenant/epoch/admission explicitly verified, active requester/kernel grant/business links/project role, current ready Workspace version1, valid CPU baseline and enabled target; no Python/API validation of mutated candidate",
+      "specificIsolation": "Only current target membership enabled flag changes false; spec/canonical/SHA and all earlier guards valid, Workspace.node_id NULL",
+      "countProof": "Owner-visible global counts of workloads/kernel runs/public runs/business mappings/outbox/idempotency equal before and after; fixture status/membership restored in finally",
+      "mutationSensitivity": "Deleting intended predicate makes SQL return without the required exception (or produce a different error), failing exact type/state/message assertions",
+      "actualMainExecution": false
+    },
+    {
+      "helper": "append_first_workspace_intent",
+      "case": "spec-tenant",
+      "sqlstate": "42501",
+      "exception": "psycopg.errors.InsufficientPrivilege",
+      "message": "Closed canonical CPU metadata required",
+      "earlierGuards": "Restricted fixture inv_kernel login, current tenant/epoch/admission explicitly verified, active requester/kernel grant/business links/project role, current ready Workspace version1, valid CPU baseline and enabled target; no Python/API validation of mutated candidate",
+      "specificIsolation": "Only spec.tenantId differs to existing other fixture tenant; GUC tenant/subject/epoch/permissions remain valid for A, canonical/SHA recomputed",
+      "countProof": "Owner-visible global counts of workloads/kernel runs/public runs/business mappings/outbox/idempotency equal before and after; fixture status/membership restored in finally",
+      "mutationSensitivity": "Deleting intended predicate makes SQL return without the required exception (or produce a different error), failing exact type/state/message assertions",
+      "actualMainExecution": false
+    },
+    {
+      "helper": "append_first_workspace_run",
+      "case": "workspace-version",
+      "sqlstate": "42501",
+      "exception": "psycopg.errors.InsufficientPrivilege",
+      "message": "Current selected intent required",
+      "earlierGuards": "Restricted fixture inv_kernel login, current tenant/epoch/admission explicitly verified, active requester/kernel grant/business links/project role, current ready Workspace version1, valid CPU baseline and enabled target; no Python/API validation of mutated candidate; genuine API-created stored workload identity/spec/hash/canonical all match except single named selected-intent property",
+      "specificIsolation": "workspace-version differs alone; version/sha are supplied argument changes, non-ready changes only fixture status",
+      "countProof": "Same six owner-visible counts unchanged, including all three Run/mapping stores and ledger/outbox",
+      "mutationSensitivity": "Removing the intended selected-intent check permits append and fails pytest.raises; no stale context can mask it",
+      "actualMainExecution": false
+    },
+    {
+      "helper": "append_first_workspace_run",
+      "case": "workload-version",
+      "sqlstate": "42501",
+      "exception": "psycopg.errors.InsufficientPrivilege",
+      "message": "Current selected intent required",
+      "earlierGuards": "Restricted fixture inv_kernel login, current tenant/epoch/admission explicitly verified, active requester/kernel grant/business links/project role, current ready Workspace version1, valid CPU baseline and enabled target; no Python/API validation of mutated candidate; genuine API-created stored workload identity/spec/hash/canonical all match except single named selected-intent property",
+      "specificIsolation": "workload-version differs alone; version/sha are supplied argument changes, non-ready changes only fixture status",
+      "countProof": "Same six owner-visible counts unchanged, including all three Run/mapping stores and ledger/outbox",
+      "mutationSensitivity": "Removing the intended selected-intent check permits append and fails pytest.raises; no stale context can mask it",
+      "actualMainExecution": false
+    },
+    {
+      "helper": "append_first_workspace_run",
+      "case": "sha",
+      "sqlstate": "42501",
+      "exception": "psycopg.errors.InsufficientPrivilege",
+      "message": "Current selected intent required",
+      "earlierGuards": "Restricted fixture inv_kernel login, current tenant/epoch/admission explicitly verified, active requester/kernel grant/business links/project role, current ready Workspace version1, valid CPU baseline and enabled target; no Python/API validation of mutated candidate; genuine API-created stored workload identity/spec/hash/canonical all match except single named selected-intent property",
+      "specificIsolation": "sha differs alone; version/sha are supplied argument changes, non-ready changes only fixture status",
+      "countProof": "Same six owner-visible counts unchanged, including all three Run/mapping stores and ledger/outbox",
+      "mutationSensitivity": "Removing the intended selected-intent check permits append and fails pytest.raises; no stale context can mask it",
+      "actualMainExecution": false
+    },
+    {
+      "helper": "append_first_workspace_run",
+      "case": "workspace-not-ready",
+      "sqlstate": "42501",
+      "exception": "psycopg.errors.InsufficientPrivilege",
+      "message": "Current selected intent required",
+      "earlierGuards": "Restricted fixture inv_kernel login, current tenant/epoch/admission explicitly verified, active requester/kernel grant/business links/project role, current ready Workspace version1, valid CPU baseline and enabled target; no Python/API validation of mutated candidate; genuine API-created stored workload identity/spec/hash/canonical all match except single named selected-intent property",
+      "specificIsolation": "workspace-not-ready differs alone; version/sha are supplied argument changes, non-ready changes only fixture status",
+      "countProof": "Same six owner-visible counts unchanged, including all three Run/mapping stores and ledger/outbox",
+      "mutationSensitivity": "Removing the intended selected-intent check permits append and fails pytest.raises; no stale context can mask it",
+      "actualMainExecution": false
+    },
+    {
+      "helper": "append_first_workspace_run",
+      "case": "missing-subject",
+      "sqlstate": "42501",
+      "message": "Verified service context required",
+      "earlierGuards": "Current valid epoch and admitted tenantA explicitly checked, subject GUC empty",
+      "countProof": "Owner global six-table counts unchanged",
+      "JUnit": "three exact guard assertions in retained privilege/context test"
+    },
+    {
+      "helper": "append_first_workspace_run",
+      "case": "cross-tenant",
+      "sqlstate": "42501",
+      "message": "Current project permission required",
+      "earlierGuards": "Other existing fixture tenant has current false kill-switch control row and valid epoch; A subject canonical, but no other-tenant project grant/link for projectA",
+      "countProof": "Owner global six-table counts unchanged",
+      "JUnit": "three exact guard assertions in retained privilege/context test"
+    },
+    {
+      "helper": "append_first_workspace_run",
+      "case": "missing-epoch",
+      "sqlstate": "42501",
+      "message": "Current epoch and tenant admission required",
+      "earlierGuards": "Subject and tenant are otherwise valid; epoch GUC deliberately empty",
+      "countProof": "Owner global six-table counts unchanged",
+      "JUnit": "three exact guard assertions in retained privilege/context test"
+    }
+  ],
+  "positiveControls": [
+    {
+      "name": "test_direct_intent_positive_control_uses_kernel_and_rolls_back",
+      "proof": "Same direct restricted role/context/spec reaches append, reads exact stored spec/SHA/version then force-rollback; all six owner counts return to baseline"
+    },
+    {
+      "name": "test_direct_run_positive_control_uses_kernel_and_rolls_back_all_three_rows",
+      "proof": "Same valid context reads actual draft kernel/public Run and immutable business mapping in transaction then force-rollback; owner workload/Run/mapping/outbox/ledger counts unchanged"
+    }
+  ],
+  "previousTestsRetained": true,
+  "localExecution": "NOT_RUN; AST/data only",
+  "CR90501Status": "IMPLEMENTED_TEST_DELTA_PENDING_HOSTED_CI_AND_ACTUAL_CLAUDE_REVIEW",
+  "SQLUnchanged": true
+}

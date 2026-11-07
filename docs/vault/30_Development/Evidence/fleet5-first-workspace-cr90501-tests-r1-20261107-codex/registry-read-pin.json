@@ -1,0 +1,7 @@
+{
+  "path": "docs/task-registry.json",
+  "ref": "3f481fa870f409d56030b6fa6db877c6f87e5f45",
+  "bytes": 42011,
+  "SHA256": "7c6b339c7487aae652cc5c5e04f6e933249c83930019e798ec24006794b07644",
+  "assignment": "Explicit Root task CR90501 takes precedence; registry is read-only"
+}

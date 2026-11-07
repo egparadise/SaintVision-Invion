@@ -1,0 +1,55 @@
+{
+  "atKST": "2026-11-07T22:00:06.161906+09:00",
+  "base": "90578f49ea400958fcdbc1ded3908d624e856f57",
+  "checkoutHEAD": "90578f49ea400958fcdbc1ded3908d624e856f57",
+  "scope": "Working candidate; final immutable SHA supplied by hosted publication receipt",
+  "onlyExistingChangedPath": "tests/integration/test_workspace_first_intents.py",
+  "unchangedProtectedTrees": {
+    "apps": "af2ae9177f9b1d77e8991a33bf8cf1aebc5d3f41",
+    "services": "5c9918adc48c76c88b5119f44516bb332924f067",
+    "contracts": "b2b24a6d9baf24302f3590f4f30fe851ccb81ef1",
+    "packages": "7c445bdbc929f6597c0b39b598f9726032c67ad7",
+    "migrations": "b1d35598829437c39dab7f60e9521bf8627e6832",
+    "tools": "6085b509e54206c4af78f0bc984204ba22e17cd3",
+    ".github": "1fd636d0791458f131f13df3201f362e45155006",
+    "deploy": "5a98abd52d78c2dea952b257123bea2f01dffa64",
+    "skills": "dc117f0b750e4ff029e87b5f7ed53ee2f69862ca",
+    "src": "5507dfb820d54a8778c4cf5e3551368f11b6105f",
+    "docs/sources": "ace2050db53e98c7e876bee7668c8450095ec74d"
+  },
+  "SQL": {
+    "path": "services/control-plane/src/inv/migrations/0068_first_workspace_intent.sql",
+    "blob": "bc6de991fd6035d4f9e5d15bba2985ac6b940bc2",
+    "SHA256": "8b79f55289661d7590dbe24e60d60d319360e7fcaf35454fe21c722fe11905d3"
+  },
+  "existingTestsUnchangedExceptRequiredContextLoop": true,
+  "noNewSkipXfail": true,
+  "changedTrackedPaths": [
+    "docs/vault/30_Development/Evidence/fleet5-first-workspace-cr90501-tests-r1-20261107-codex/case-matrix.json",
+    "docs/vault/30_Development/Evidence/fleet5-first-workspace-cr90501-tests-r1-20261107-codex/ci-receipts.py",
+    "docs/vault/30_Development/Evidence/fleet5-first-workspace-cr90501-tests-r1-20261107-codex/context.json",
+    "docs/vault/30_Development/Evidence/fleet5-first-workspace-cr90501-tests-r1-20261107-codex/local-gates.json",
+    "docs/vault/30_Development/Evidence/fleet5-first-workspace-cr90501-tests-r1-20261107-codex/local-gates.py",
+    "docs/vault/30_Development/Evidence/fleet5-first-workspace-cr90501-tests-r1-20261107-codex/original-claude-review.json",
+    "docs/vault/30_Development/Evidence/fleet5-first-workspace-cr90501-tests-r1-20261107-codex/read-pins.json",
+    "docs/vault/30_Development/Evidence/fleet5-first-workspace-cr90501-tests-r1-20261107-codex/registry-read-pin.json",
+    "docs/vault/30_Development/Evidence/fleet5-first-workspace-cr90501-tests-r1-20261107-codex/scope-proof.json",
+    "docs/vault/30_Development/Evidence/fleet5-first-workspace-cr90501-tests-r1-20261107-codex/scope-proof.py",
+    "docs/vault/30_Development/Evidence/fleet5-first-workspace-cr90501-tests-r1-20261107-codex/sync-state-after.json",
+    "docs/vault/30_Development/Evidence/fleet5-first-workspace-cr90501-tests-r1-20261107-codex/sync-state-before.json",
+    "docs/vault/30_Development/Evidence/fleet5-first-workspace-cr90501-tests-r1-20261107-codex/sync-state-comparison.json",
+    "docs/vault/30_Development/History/2026-11-07_CR90501_Direct_SQL_Guards_Test_Only_R1_Codex.md",
+    "tests/integration/test_workspace_first_intents.py"
+  ],
+  "fullCanonicalBytes": 507845,
+  "fullCanonicalSHA256": "5d4beda3a03c1864f03d0f4f12f5d60ce7206a946b51b4d4ef3f8c05681369d3",
+  "fullCanonicalUnchanged": true,
+  "previousFrontend": {
+    "sourceSHA": "90578f49ea400958fcdbc1ded3908d624e856f57",
+    "runID": 42368189302,
+    "scope": "Unchanged-component evidence only, not a new-SHA frontend execution"
+  },
+  "productExecutionOnMain": false,
+  "CR90501": "PENDING_HOSTED_CI_AND_ACTUAL_CLAUDE_DELTA_REVIEW",
+  "wholeProgramComplete": false
+}

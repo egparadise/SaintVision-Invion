@@ -1,0 +1,95 @@
+[
+  {
+    "argv": [
+      "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+      "-B",
+      "tools/check_docs.py"
+    ],
+    "atKST": "2026-11-07T21:56:42.540976+09:00",
+    "exit": 0,
+    "stdout": "PASS: 24 original hashes, 1281 versioned documents, wiki links, 48 tasks, 12 outcomes, owner/reviewer/skills, dependency DAG.\r\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+      "-B",
+      "tools/check_ontology.py"
+    ],
+    "atKST": "2026-11-07T21:57:16.514254+09:00",
+    "exit": 0,
+    "stdout": "PASS: RDF parsing, defined terms, TTL/JSON-LD equivalence, 48 task mappings, positive SHACL, 4 rejected invalid fixtures, 4 competency queries, Obsidian mirrors.\r\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+      "-B",
+      "tools/check_doc_path_citations.py",
+      "--ratchet",
+      "--base-ref",
+      "90578f49ea400958fcdbc1ded3908d624e856f57"
+    ],
+    "atKST": "2026-11-07T21:57:19.874105+09:00",
+    "exit": 0,
+    "stdout": "PASS check_doc_path_citations --ratchet: 290 broken citation(s), all in baseline, none stale, floor unchanged.\r\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+      "-B",
+      "tools/check_doc_single_source.py",
+      "--ratchet"
+    ],
+    "atKST": "2026-11-07T21:57:26.605787+09:00",
+    "exit": 0,
+    "stdout": "PASS check_doc_single_source --ratchet: 16 pairs, all in baseline, none stale.\r\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+      "-B",
+      "tools/check_contract_bindings.py"
+    ],
+    "atKST": "2026-11-07T21:57:27.166514+09:00",
+    "exit": 0,
+    "stdout": "PASS check_contract_bindings: 57 fixtures each referenced by a test; 21 bound kernel response TYPES each have >=1 serving-anchor test (counted PER TYPE, not per anchor SITE: those types occupy 27 anchor sites; a multi-site type counts covered even if only one site is tested -- site-level weight is not decidable here, use tools/check_anchor_weight.py + the mutation harness); 14 replay guards present.\r\n  UNIT NOTE: TYPE count <= SITE count. Multi-site types (per-type coverage can mask an untested site): ApprovalView(2 sites: ['approvals']), BusinessBindingView(2 sites: ['business_handoff']), BusinessEditLockReleaseView(2 sites: ['business_handoff']), BusinessEditLockView(2 sites: ['business_handoff']), ControlRunDetail(3 sites: ['control']), ControlRunView(2 sites: ['control']), EvidenceEnvelope(6 sites: ['build_governance', 'results', 'runs', 'shard_completion', 'storage_commit', 'storage_view']), ModelExecutionManifestObservation(2 sites: ['model_uri_resolver', 'model_view']), NodeExecutionPermit(2 sites: ['node_execution', 'node_transport']), NodeResourceSnapshot(4 sites: ['capacity', 'gpu', 'observation']), WorkspaceCheckoutView(2 sites: ['workspace_recovery']), WorkspaceEnqueueResult(3 sites: ['workspace_api']), WorkspaceFirstRunCreateResult(2 sites: ['workspace_intents']), WorkspacePrepareResult(2 sites: ['workspace_api']), WorkspaceRestoreView(2 sites: ['workspace_recovery']), WorkspaceStartEnqueueResult(3 sites: ['workspace_start']), WorkspaceStartPrepareResult(2 sites: ['workspace_start'])\r\n  (Reporting sites is not a regression -- the TYPE number never meant 'sites verified'; this makes the counting unit explicit. EvidenceEnvelope-class multi-site anchors are why.)\r\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+      "-B",
+      "tools/check_frontend_integrity.py"
+    ],
+    "atKST": "2026-11-07T21:57:35.588956+09:00",
+    "exit": 0,
+    "stdout": "Scanning 97 frontend production source files under apps/web/src ...\r\n\r\nPASS Frontend Integrity Check: all 9 integrity rules satisfied (0 violations).\r\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+      "-B",
+      "tools/sync_obsidian.py",
+      "--check"
+    ],
+    "atKST": "2026-11-07T21:57:36.756789+09:00",
+    "exit": 0,
+    "stdout": "CHECK: 4797 managed files, 2346 pending exports, 0 conflicts. No writes.\r\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "git",
+      "diff",
+      "--check"
+    ],
+    "atKST": "2026-11-07T21:58:10.324327+09:00",
+    "exit": 0,
+    "stdout": "",
+    "stderr": ""
+  }
+]

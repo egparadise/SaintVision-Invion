@@ -1,0 +1,19 @@
+{
+  "task": "FLEET5-FIRST-WORKSPACE-CR90501-TEST-ONLY-R1-20261107",
+  "taskID": "task_82627c80384c",
+  "dispatchID": "ctx_6bed4fe4e6c4",
+  "docID": "EVIDENCE-FLEET5-CR90501-R1-CODEX",
+  "version": "1.0.0",
+  "owner": "Codex B",
+  "reviewer": "Actual Claude delta review pending Root dispatch",
+  "base": "90578f49ea400958fcdbc1ded3908d624e856f57",
+  "branch": "agent/codex/fleet5-first-workspace-cr90501-tests-r1-20261107",
+  "root": "3f481fa870f409d56030b6fa6db877c6f87e5f45",
+  "review": "a18095e2aff59433b93bdd755a2d050a26c15546",
+  "atKST": "2026-11-07T21:46:04.400983+09:00",
+  "canonicalBytes": 507845,
+  "canonicalSHA256": "5d4beda3a03c1864f03d0f4f12f5d60ce7206a946b51b4d4ef3f8c05681369d3",
+  "SQLSHA256": "8b79f55289661d7590dbe24e60d60d319360e7fcaf35454fe21c722fe11905d3",
+  "scope": "Only tests/integration/test_workspace_first_intents.py plus new own Evidence/History; no product edits",
+  "mainProductExecution": false
+}

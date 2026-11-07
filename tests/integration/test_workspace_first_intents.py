@@ -12,6 +12,7 @@ import json
 
 import psycopg
 from psycopg import sql
+from psycopg.types.json import Jsonb
 import pytest
 from fastapi.testclient import TestClient
 from inv.app import create_app
@@ -76,6 +77,168 @@ def counts(a):
     with psycopg.connect(a.e.owner) as conn:
         return tuple(conn.execute(f"SELECT count(*) FROM {table} WHERE tenant_id=%s",(a.e.tenant,)).fetchone()[0]
             for table in ("inv.runs","public.runs","inv.business_runs","inv.outbox","inv.idempotency"))
+
+
+def _owner_direct_counts(a):
+    """Count every tenant as the isolated DB owner, not an RLS-hidden zero."""
+    with psycopg.connect(a.e.owner) as conn:
+        assert conn.info.dbname == a.e.database_name
+        assert conn.info.dbname.startswith("inv_test_")
+        assert conn.execute("SELECT rolsuper OR rolbypassrls FROM pg_roles WHERE rolname=current_user").fetchone()[0]
+        return tuple(conn.execute(f"SELECT count(*) FROM {table}").fetchone()[0]
+            for table in ("public.workloads", "inv.runs", "public.runs", "inv.business_runs", "inv.outbox", "inv.idempotency"))
+
+
+def _direct_context(a, conn, *, tenant, subject, epoch):
+    """Only fixture authority setup; never validate the helper's candidate spec."""
+    assert conn.info.dbname == a.e.database_name
+    assert conn.execute("SELECT current_user").fetchone()[0] == a.e.runtime_role
+    assert conn.execute("SELECT pg_has_role(current_user,'inv_kernel','MEMBER')").fetchone()[0]
+    assert conn.execute("SELECT rolsuper,rolbypassrls FROM pg_roles WHERE rolname=current_user").fetchone() == (False, False)
+    for name, value in (("inv.tenant_id", tenant), ("inv.first_workspace_subject", subject), ("inv.first_workspace_epoch", epoch)):
+        conn.execute("SELECT set_config(%s,%s,true)", (name, value or ""))
+    # Except the deliberately missing-epoch case, prove the first guard passes.
+    if epoch is not None:
+        assert conn.execute("SELECT epoch::text=%s FROM inv.control_epoch WHERE singleton", (epoch,)).fetchone()[0]
+        assert conn.execute("SELECT NOT kill_switch FROM inv.tenant_controls WHERE tenant_id=%s", (tenant,)).fetchone() == (True,)
+
+
+def _valid_direct_context(a, conn):
+    _direct_context(a, conn, tenant=a.e.tenant, subject=a.jwt.subject("requester"), epoch=a.e.epoch)
+
+
+def _direct_spec(a):
+    # Valid baseline shared by the positive and negative controls. No HTTP or
+    # Python contract validator sees the mutated candidate before the SQL call.
+    return dict(apiVersion="inv.saintvision.ai/v1alpha1", kind="Workload", workloadId=new_id("wld"),
+        tenantId=a.e.tenant, projectId=a.e.project, workspaceId=a.workspace_id, targetNodeId=a.e.node,
+        **deepcopy({key: a.input[key] for key in ("imageDigest", "command", "resources", "timeoutSeconds")}))
+
+
+def _different_sha(value):
+    return ("e" if value[0] == "f" else "f") + value[1:]
+
+
+def _append_intent(conn, a, spec, *, sha=None, text=None, version=1):
+    return conn.execute("SELECT inv.append_first_workspace_intent(%s,%s,%s,%s,%s,%s,%s)",
+        (a.e.project, a.workspace_id, Jsonb(spec), sha if sha is not None else digest(spec),
+         text if text is not None else canonical(spec).decode(), a.input["objective"], version))
+
+
+def _append_run(conn, a, item, run_id, *, workspace_version=None, workload_version=None, sha=None):
+    return conn.execute("SELECT inv.append_first_workspace_run(%s,%s,%s,%s,%s,%s,%s,%s)",
+        (a.e.project, a.workspace_id, item["workload"]["workloadId"], run_id,
+         item["workspaceVersion"] if workspace_version is None else workspace_version,
+         item["workloadVersion"] if workload_version is None else workload_version,
+         item["workloadSha256"] if sha is None else sha, canonical(item["workload"]).decode()))
+
+
+def _assert_sql_guard(denied, message):
+    assert denied.value.sqlstate == "42501"
+    assert denied.value.diag.message_primary == message
+
+
+def test_direct_intent_positive_control_uses_kernel_and_rolls_back(intents):
+    a = intents
+    spec = _direct_spec(a)
+    before = _owner_direct_counts(a)
+    with psycopg.connect(a.e.runtime) as conn:
+        with conn.transaction(force_rollback=True):
+            _valid_direct_context(a, conn)
+            _append_intent(conn, a, spec)
+            assert conn.execute("SELECT spec,spec_sha256,version FROM public.workloads WHERE workload_id=%s",
+                (spec["workloadId"],)).fetchone() == (spec, digest(spec), 1)
+    assert _owner_direct_counts(a) == before
+
+
+@pytest.mark.parametrize("case,message", [
+    ("gpu", "Bounded CPU resources required"),
+    ("cpu", "CPU resource bounds exceeded"),
+    ("memory", "CPU resource bounds exceeded"),
+    ("extra-key", "Closed canonical CPU metadata required"),
+    ("sha", "Closed canonical CPU metadata required"),
+    ("canonical", "Closed canonical CPU metadata required"),
+    ("workspace-not-ready", "Current selected ready Workspace required"),
+    ("workspace-version", "Current selected ready Workspace required"),
+    ("target-not-member", "Selected target membership differs"),
+    ("target-disabled", "Selected target membership differs"),
+    ("spec-tenant", "Closed canonical CPU metadata required"),
+])
+def test_direct_intent_sql_guards_cannot_hide_behind_python_validation(intents, case, message):
+    a = intents
+    spec = _direct_spec(a)
+    if case == "gpu": spec["resources"]["gpuCount"] = 1
+    if case == "cpu": spec["resources"]["cpuMillis"] = 501
+    if case == "memory": spec["resources"]["memoryBytes"] = 8388607
+    if case == "extra-key": spec["workspaceStart"] = {}
+    if case == "target-not-member": spec["targetNodeId"] = new_id("nod")
+    if case == "spec-tenant": spec["tenantId"] = a.e.other
+    # Recompute BOTH wires after every shape/resource/target/tenant mutation.
+    # Thus removing that SQL predicate would reach INSERT, not a hash error.
+    text = canonical(spec).decode()
+    sha = digest(spec)
+    if case == "sha": sha = _different_sha(sha)
+    if case == "canonical":
+        other = deepcopy(spec)
+        other["command"][-1] = "src/another.py"
+        text, sha = canonical(other).decode(), digest(other)
+        # SHA matches the changed canonical bytes; only canonical/spec equality fails.
+    with psycopg.connect(a.e.owner) as owner:
+        if case == "workspace-not-ready": owner.execute("UPDATE public.workspaces SET status='provisioning' WHERE workspace_id=%s", (a.workspace_id,))
+        if case == "target-disabled": owner.execute("UPDATE inv.project_nodes SET enabled=false WHERE tenant_id=%s AND project_id=%s AND node_id=%s", (a.e.tenant, a.e.project, a.e.node))
+    before = _owner_direct_counts(a)
+    try:
+        with pytest.raises(psycopg.errors.InsufficientPrivilege) as denied:
+            with psycopg.connect(a.e.runtime) as conn:
+                with conn.transaction(force_rollback=True):
+                    _valid_direct_context(a, conn)
+                    _append_intent(conn, a, spec, sha=sha, text=text, version=2 if case == "workspace-version" else 1)
+        _assert_sql_guard(denied, message)
+        assert _owner_direct_counts(a) == before
+    finally:
+        with psycopg.connect(a.e.owner) as owner:
+            if case == "workspace-not-ready": owner.execute("UPDATE public.workspaces SET status='ready' WHERE workspace_id=%s", (a.workspace_id,))
+            if case == "target-disabled": owner.execute("UPDATE inv.project_nodes SET enabled=true WHERE tenant_id=%s AND project_id=%s AND node_id=%s", (a.e.tenant, a.e.project, a.e.node))
+
+
+def test_direct_run_positive_control_uses_kernel_and_rolls_back_all_three_rows(intents):
+    a = intents
+    item = create_intent(a)
+    run_id = new_id("run")
+    before = _owner_direct_counts(a)
+    with psycopg.connect(a.e.runtime) as conn:
+        with conn.transaction(force_rollback=True):
+            _valid_direct_context(a, conn)
+            _append_run(conn, a, item, run_id)
+            assert conn.execute("SELECT state,version,attempt FROM inv.runs WHERE run_id=%s", (run_id,)).fetchone() == ("draft", 1, 0)
+            assert conn.execute("SELECT workspace_id,workload_id,state FROM public.runs WHERE run_id=%s", (run_id,)).fetchone() == (a.workspace_id, item["workload"]["workloadId"], "draft")
+            assert conn.execute("SELECT project_id,workspace_id FROM inv.business_runs WHERE run_id=%s", (run_id,)).fetchone() == (a.e.project, a.workspace_id)
+    assert _owner_direct_counts(a) == before
+
+
+@pytest.mark.parametrize("case", ["workspace-version", "workload-version", "sha", "workspace-not-ready"])
+def test_direct_run_requires_current_selected_intent_without_partial_effects(intents, case):
+    a = intents
+    item = create_intent(a)
+    with psycopg.connect(a.e.owner) as owner:
+        if case == "workspace-not-ready": owner.execute("UPDATE public.workspaces SET status='provisioning' WHERE workspace_id=%s", (a.workspace_id,))
+    before = _owner_direct_counts(a)
+    try:
+        with pytest.raises(psycopg.errors.InsufficientPrivilege) as denied:
+            with psycopg.connect(a.e.runtime) as conn:
+                with conn.transaction(force_rollback=True):
+                    _valid_direct_context(a, conn)
+                    # Current subject/epoch/admission/roles/mappings and canonical
+                    # spec pass first; exactly one selected-intent check differs.
+                    _append_run(conn, a, item, new_id("run"),
+                        workspace_version=item["workspaceVersion"] + 1 if case == "workspace-version" else None,
+                        workload_version=item["workloadVersion"] + 1 if case == "workload-version" else None,
+                        sha=_different_sha(item["workloadSha256"]) if case == "sha" else None)
+        _assert_sql_guard(denied, "Current selected intent required")
+        assert _owner_direct_counts(a) == before
+    finally:
+        with psycopg.connect(a.e.owner) as owner:
+            if case == "workspace-not-ready": owner.execute("UPDATE public.workspaces SET status='ready' WHERE workspace_id=%s", (a.workspace_id,))
 
 
 def test_contract_serving_profile_metadata_and_atomic_run_under_real_runtime_role(intents):
@@ -211,12 +374,22 @@ def test_helper_privileges_rls_and_missing_context_are_real_not_superuser_result
         assert conn.execute("SELECT bool_and(relrowsecurity AND relforcerowsecurity) FROM pg_class WHERE oid IN ('public.workloads'::regclass,'public.runs'::regclass,'inv.business_runs'::regclass)").fetchone()[0]
         assert all('search_path=pg_catalog' in config and 'row_security=on' in config for (config,) in conn.execute("SELECT proconfig FROM pg_proc WHERE proname IN ('append_first_workspace_run','append_first_workspace_intent')"))
     item=create_intent(a)
-    for subject,tenant in [(None,a.e.tenant),(a.jwt.subject("requester"),a.e.other)]:
-        with psycopg.connect(a.e.runtime) as conn:
-            conn.execute("SELECT set_config('inv.tenant_id',%s,true)",(tenant,))
-            if subject:conn.execute("SELECT set_config('inv.first_workspace_subject',%s,true)",(subject,))
-            with pytest.raises(psycopg.errors.InsufficientPrivilege):
-                conn.execute("SELECT inv.append_first_workspace_run(%s,%s,%s,%s,1,1,%s,%s)",(a.e.project,a.workspace_id,item["workload"]["workloadId"],new_id("run"),item["workloadSha256"],canonical(item["workload"]).decode()))
+    with psycopg.connect(a.e.owner) as owner:
+        # Cross-tenant context MUST pass admission before permission is tested.
+        owner.execute("INSERT INTO inv.tenant_controls(tenant_id,kill_switch) VALUES(%s,false) ON CONFLICT(tenant_id) DO UPDATE SET kill_switch=false", (a.e.other,))
+    for subject,tenant,epoch,message in [
+        (None,a.e.tenant,a.e.epoch,"Verified service context required"),
+        (a.jwt.subject("requester"),a.e.other,a.e.epoch,"Current project permission required"),
+        (a.jwt.subject("requester"),a.e.tenant,None,"Current epoch and tenant admission required"),
+    ]:
+        before = _owner_direct_counts(a)
+        with pytest.raises(psycopg.errors.InsufficientPrivilege) as denied:
+            with psycopg.connect(a.e.runtime) as conn:
+                with conn.transaction(force_rollback=True):
+                    _direct_context(a, conn, tenant=tenant, subject=subject, epoch=epoch)
+                    _append_run(conn, a, item, new_id("run"))
+        _assert_sql_guard(denied, message)
+        assert _owner_direct_counts(a) == before
     # Connection-local context is transaction-local on success and rollback.
     with psycopg.connect(a.e.runtime) as conn:
         for rollback in (False,True):
