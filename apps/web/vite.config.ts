@@ -18,6 +18,24 @@ export default defineConfig({
         target: process.env.VITE_API_PROXY_TARGET || 'http://127.0.0.1:8080',
         changeOrigin: true,
       },
+      '/healthz': {
+        target: process.env.VITE_API_PROXY_TARGET || 'http://127.0.0.1:8080',
+        changeOrigin: true,
+      },
+    },
+  },
+  preview: {
+    port: 3000,
+    host: '0.0.0.0',
+    proxy: {
+      '/v1': {
+        target: process.env.VITE_API_PROXY_TARGET || 'http://127.0.0.1:8080',
+        changeOrigin: true,
+      },
+      '/healthz': {
+        target: process.env.VITE_API_PROXY_TARGET || 'http://127.0.0.1:8080',
+        changeOrigin: true,
+      },
     },
   },
   build: {

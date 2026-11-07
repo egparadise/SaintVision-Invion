@@ -1,0 +1,8 @@
+{
+  "fullBytesEqual": true,
+  "beforeBytes": 500344,
+  "afterBytes": 500344,
+  "beforeSHA256": "368bc72302840e416fdfe5c9fb01a2f0753e244cd40c055a8a07a5c967d07ab9",
+  "afterSHA256": "368bc72302840e416fdfe5c9fb01a2f0753e244cd40c055a8a07a5c967d07ab9",
+  "checkOnly": true
+}

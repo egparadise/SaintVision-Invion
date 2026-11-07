@@ -7455,6 +7455,262 @@
           "$ref": "#/$defs/NodeCertificateTrustSummary"
         }
       }
+    },
+    "WorkspaceFirstProfile": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "nodeId": {
+          "$ref": "#/$defs/NodeId"
+        },
+        "profileVersion": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "images": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 64,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "pattern": "^sha256:[a-f0-9]{64}$"
+          }
+        },
+        "executables": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 64,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 4096
+          }
+        },
+        "maxCpuMillis": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 500
+        },
+        "minMemoryBytes": {
+          "type": "integer",
+          "const": 8388608
+        },
+        "maxMemoryBytes": {
+          "type": "integer",
+          "minimum": 8388608,
+          "maximum": 67108864
+        },
+        "maxTimeoutSeconds": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 30
+        },
+        "terminalAllowed": {
+          "type": "boolean",
+          "const": false
+        }
+      },
+      "required": [
+        "nodeId",
+        "profileVersion",
+        "images",
+        "executables",
+        "maxCpuMillis",
+        "minMemoryBytes",
+        "maxMemoryBytes",
+        "maxTimeoutSeconds",
+        "terminalAllowed"
+      ]
+    },
+    "WorkspaceFirstIntent": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "workspaceId": {
+          "$ref": "#/$defs/WorkspaceId"
+        },
+        "workspaceVersion": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "workloadVersion": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "workloadSha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "intentEtag": {
+          "type": "string",
+          "pattern": "^\"workspace-v[1-9][0-9]*-workload-v[1-9][0-9]*-sha256-[a-f0-9]{64}\"$"
+        },
+        "workload": {
+          "$ref": "#/$defs/WorkloadSpec"
+        },
+        "observedAt": {
+          "$ref": "#/$defs/Timestamp"
+        }
+      },
+      "required": [
+        "workspaceId",
+        "workspaceVersion",
+        "workloadVersion",
+        "workloadSha256",
+        "intentEtag",
+        "workload",
+        "observedAt"
+      ]
+    },
+    "WorkspaceFirstIntentPage": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "projectId": {
+          "$ref": "#/$defs/ProjectId"
+        },
+        "workspaceId": {
+          "$ref": "#/$defs/WorkspaceId"
+        },
+        "workspaceVersion": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "observedAt": {
+          "$ref": "#/$defs/Timestamp"
+        },
+        "profile": {
+          "$ref": "#/$defs/WorkspaceFirstProfile"
+        },
+        "items": {
+          "type": "array",
+          "maxItems": 50,
+          "items": {
+            "$ref": "#/$defs/WorkspaceFirstIntent"
+          }
+        },
+        "nextCursor": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/WorkloadId"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "projectId",
+        "workspaceId",
+        "workspaceVersion",
+        "observedAt",
+        "profile",
+        "items",
+        "nextCursor"
+      ]
+    },
+    "WorkspaceFirstIntentCreateInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "objective": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1000
+        },
+        "imageDigest": {
+          "type": "string",
+          "pattern": "^sha256:[a-f0-9]{64}$"
+        },
+        "command": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 64,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 4096,
+            "pattern": "^[^\\u0000]+$"
+          }
+        },
+        "resources": {
+          "$ref": "#/$defs/WorkspaceFirstResources"
+        },
+        "timeoutSeconds": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 30
+        }
+      },
+      "required": [
+        "objective",
+        "imageDigest",
+        "command",
+        "resources",
+        "timeoutSeconds"
+      ]
+    },
+    "WorkspaceFirstRunCreateResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "run": {
+          "$ref": "#/$defs/ControlRunView"
+        },
+        "intent": {
+          "$ref": "#/$defs/WorkspaceFirstIntent"
+        },
+        "requesterId": {
+          "type": "string",
+          "pattern": "^oidc:[a-f0-9]{64}$"
+        },
+        "observedAt": {
+          "$ref": "#/$defs/Timestamp"
+        }
+      },
+      "required": [
+        "run",
+        "intent",
+        "requesterId",
+        "observedAt"
+      ]
+    },
+    "WorkspaceFirstResources": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "cpuMillis": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 500
+        },
+        "memoryBytes": {
+          "type": "integer",
+          "minimum": 8388608,
+          "maximum": 67108864
+        },
+        "gpuCount": {
+          "type": "integer",
+          "const": 0
+        },
+        "minVramBytes": {
+          "type": "integer",
+          "const": 0
+        }
+      },
+      "required": [
+        "cpuMillis",
+        "memoryBytes",
+        "gpuCount",
+        "minVramBytes"
+      ]
     }
   },
   "oneOf": [
@@ -7589,6 +7845,24 @@
     },
     {
       "$ref": "#/$defs/ModelExecutionManifestObservation"
+    },
+    {
+      "$ref": "#/$defs/WorkspaceFirstProfile"
+    },
+    {
+      "$ref": "#/$defs/WorkspaceFirstIntent"
+    },
+    {
+      "$ref": "#/$defs/WorkspaceFirstIntentPage"
+    },
+    {
+      "$ref": "#/$defs/WorkspaceFirstIntentCreateInput"
+    },
+    {
+      "$ref": "#/$defs/WorkspaceFirstRunCreateResult"
+    },
+    {
+      "$ref": "#/$defs/WorkspaceFirstResources"
     }
   ]
 }

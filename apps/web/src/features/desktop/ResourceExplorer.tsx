@@ -1169,7 +1169,7 @@ export const ResourceExplorer: React.FC<ResourceExplorerProps> = ({
                   <button
                     type="button"
                     data-testid="nodes-retry-btn"
-                    onClick={onRetryNodes}
+                    onClick={() => onRetryNodes?.()}
                     style={{
                       marginTop: '10px',
                       padding: '6px 12px',

@@ -2218,6 +2218,43 @@ class ProjectNodeCertificateObservationResponse(BaseModel):
     trust: NodeCertificateTrustSummary
 
 
+class Image(RootModel[constr(pattern=r'^sha256:[a-f0-9]{64}$')]):
+    root: constr(pattern=r'^sha256:[a-f0-9]{64}$')
+
+
+class Executable(RootModel[constr(min_length=1, max_length=4096)]):
+    root: constr(min_length=1, max_length=4096)
+
+
+class WorkspaceFirstProfile(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    nodeId: NodeId
+    profileVersion: constr(min_length=1, max_length=200)
+    images: list[Image] = Field(..., max_length=64, min_length=1)
+    executables: list[Executable] = Field(..., max_length=64, min_length=1)
+    maxCpuMillis: conint(ge=1, le=500)
+    minMemoryBytes: Literal[8388608]
+    maxMemoryBytes: conint(ge=8388608, le=67108864)
+    maxTimeoutSeconds: conint(ge=1, le=30)
+    terminalAllowed: Literal[False]
+
+
+class CommandItem(RootModel[constr(pattern=r'^[^\u0000]+$', min_length=1, max_length=4096)]):
+    root: constr(pattern=r'^[^\u0000]+$', min_length=1, max_length=4096)
+
+
+class WorkspaceFirstResources(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    cpuMillis: conint(ge=1, le=500)
+    memoryBytes: conint(ge=8388608, le=67108864)
+    gpuCount: Literal[0]
+    minVramBytes: Literal[0]
+
+
 class WorkloadSpec(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
@@ -2501,6 +2538,55 @@ class ApprovalReviewView(BaseModel):
     policyDigest: ActionDigest
 
 
+class WorkspaceFirstIntent(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    workspaceId: WorkspaceId
+    workspaceVersion: conint(ge=1, le=9007199254740991)
+    workloadVersion: conint(ge=1, le=9007199254740991)
+    workloadSha256: constr(pattern=r'^[a-f0-9]{64}$')
+    intentEtag: constr(
+        pattern=r'^"workspace-v[1-9][0-9]*-workload-v[1-9][0-9]*-sha256-[a-f0-9]{64}"$'
+    )
+    workload: WorkloadSpec
+    observedAt: Timestamp
+
+
+class WorkspaceFirstIntentPage(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    projectId: ProjectId
+    workspaceId: WorkspaceId
+    workspaceVersion: conint(ge=1, le=9007199254740991)
+    observedAt: Timestamp
+    profile: WorkspaceFirstProfile
+    items: list[WorkspaceFirstIntent] = Field(..., max_length=50)
+    nextCursor: WorkloadId | None
+
+
+class WorkspaceFirstIntentCreateInput(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    objective: constr(min_length=1, max_length=1000)
+    imageDigest: constr(pattern=r'^sha256:[a-f0-9]{64}$')
+    command: list[CommandItem] = Field(..., max_length=64, min_length=1)
+    resources: WorkspaceFirstResources
+    timeoutSeconds: conint(ge=1, le=30)
+
+
+class WorkspaceFirstRunCreateResult(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    run: ControlRunView
+    intent: WorkspaceFirstIntent
+    requesterId: constr(pattern=r'^oidc:[a-f0-9]{64}$')
+    observedAt: Timestamp
+
+
 class INVCore(
     RootModel[
         NodeRegistration
@@ -2547,6 +2633,12 @@ class INVCore(
         | ModelManifest
         | ModelCommitObservation
         | ModelExecutionManifestObservation
+        | WorkspaceFirstProfile
+        | WorkspaceFirstIntent
+        | WorkspaceFirstIntentPage
+        | WorkspaceFirstIntentCreateInput
+        | WorkspaceFirstRunCreateResult
+        | WorkspaceFirstResources
     ]
 ):
     root: (
@@ -2594,4 +2686,10 @@ class INVCore(
         | ModelManifest
         | ModelCommitObservation
         | ModelExecutionManifestObservation
+        | WorkspaceFirstProfile
+        | WorkspaceFirstIntent
+        | WorkspaceFirstIntentPage
+        | WorkspaceFirstIntentCreateInput
+        | WorkspaceFirstRunCreateResult
+        | WorkspaceFirstResources
     ) = Field(..., title='INVCore')

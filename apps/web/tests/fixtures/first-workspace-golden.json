@@ -1,0 +1,312 @@
+{
+  "provenance": "Isolated test identities only; WorkloadSpec derived from contracts/fixtures/approval-review-response.json; canonical bytes match workspace_files.py canonical ensure_ascii/sort_keys/separators and workspace_start.py input binding; no product module imported or executed",
+  "scope": {
+    "projectId": "prj_01ARZ3NDEKTSV4RRFFQ69G5FAV",
+    "tenantId": "00000000-0000-4000-8000-000000000041",
+    "subjectId": "oidc:fdf3eee76350d409c4a3b221352b5b544154d8ce05049a87b0dc040394f8db66"
+  },
+  "workload": {
+    "apiVersion": "inv.saintvision.ai/v1alpha1",
+    "kind": "Workload",
+    "workloadId": "wld_01ARZ3NDEKTSV4RRFFQ69G5FAV",
+    "tenantId": "00000000-0000-4000-8000-000000000041",
+    "projectId": "prj_01ARZ3NDEKTSV4RRFFQ69G5FAV",
+    "workspaceId": "wsp_01ARZ3NDEKTSV4RRFFQ69G5FAV",
+    "resources": {
+      "cpuMillis": 500,
+      "memoryBytes": 67108864,
+      "gpuCount": 0,
+      "minVramBytes": 0
+    },
+    "imageDigest": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "command": [
+      "/usr/local/bin/python3",
+      "-B",
+      "src/app.py"
+    ],
+    "timeoutSeconds": 30,
+    "targetNodeId": "nod_01ARZ3NDEKTSV4RRFFQ69G5FAV"
+  },
+  "files": [
+    {
+      "path": "src/app.py",
+      "content": "print('\uc548\ub155\ud83d\ude00')\n"
+    }
+  ],
+  "snapshot": {
+    "manifest": {
+      "format": "workspace-snapshot:1",
+      "workspaceId": "wsp_01ARZ3NDEKTSV4RRFFQ69G5FAV",
+      "directories": [
+        "src"
+      ],
+      "files": [
+        {
+          "path": "src/app.py",
+          "executable": false,
+          "sha256": "a811db87cdcba57bbcb5dee3085b12a99af87b21c8931f14100168c1715055fe",
+          "sizeBytes": 20,
+          "dataBase64": "cHJpbnQoJ+yViOuFlfCfmIAnKQo="
+        }
+      ]
+    },
+    "rawUTF8": "{\"directories\":[\"src\"],\"files\":[{\"dataBase64\":\"cHJpbnQoJ+yViOuFlfCfmIAnKQo=\",\"executable\":false,\"path\":\"src/app.py\",\"sha256\":\"a811db87cdcba57bbcb5dee3085b12a99af87b21c8931f14100168c1715055fe\",\"sizeBytes\":20}],\"format\":\"workspace-snapshot:1\",\"workspaceId\":\"wsp_01ARZ3NDEKTSV4RRFFQ69G5FAV\"}",
+    "snapshotBase64": "eyJkaXJlY3RvcmllcyI6WyJzcmMiXSwiZmlsZXMiOlt7ImRhdGFCYXNlNjQiOiJjSEpwYm5Rb0oreVZpT3VGbGZDZm1JQW5LUW89IiwiZXhlY3V0YWJsZSI6ZmFsc2UsInBhdGgiOiJzcmMvYXBwLnB5Iiwic2hhMjU2IjoiYTgxMWRiODdjZGNiYTU3YmJjYjVkZWUzMDg1YjEyYTk5YWY4N2IyMWM4OTMxZjE0MTAwMTY4YzE3MTUwNTVmZSIsInNpemVCeXRlcyI6MjB9XSwiZm9ybWF0Ijoid29ya3NwYWNlLXNuYXBzaG90OjEiLCJ3b3Jrc3BhY2VJZCI6IndzcF8wMUFSWjNOREVLVFNWNFJSRkZRNjlHNUZBViJ9",
+    "sha256": "66acdad94e1ba715f729b1e51d442bf8757ccb8c449db5bacd76b5b3a53af2e2",
+    "sizeBytes": 288,
+    "contentBytes": 20
+  },
+  "run": {
+    "runId": "run_01ARZ3NDEKTSV4RRFFQ69G5FAV",
+    "tenantId": "00000000-0000-4000-8000-000000000041",
+    "projectId": "prj_01ARZ3NDEKTSV4RRFFQ69G5FAV",
+    "state": "draft",
+    "version": 1,
+    "attempt": 0
+  },
+  "prepared": {
+    "startId": "00000000-0000-4000-8000-000000000042",
+    "workload": {
+      "apiVersion": "inv.saintvision.ai/v1alpha1",
+      "kind": "Workload",
+      "workloadId": "wld_01ARZ3NDEKTSV4RRFFQ69G5FAV",
+      "tenantId": "00000000-0000-4000-8000-000000000041",
+      "projectId": "prj_01ARZ3NDEKTSV4RRFFQ69G5FAV",
+      "workspaceId": "wsp_01ARZ3NDEKTSV4RRFFQ69G5FAV",
+      "resources": {
+        "cpuMillis": 500,
+        "memoryBytes": 67108864,
+        "gpuCount": 0,
+        "minVramBytes": 0
+      },
+      "imageDigest": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "command": [
+        "/usr/local/bin/python3",
+        "-B",
+        "src/app.py"
+      ],
+      "timeoutSeconds": 30,
+      "targetNodeId": "nod_01ARZ3NDEKTSV4RRFFQ69G5FAV",
+      "workspaceStart": {
+        "startId": "00000000-0000-4000-8000-000000000042",
+        "stepId": "cpu-step",
+        "inputSha256": "66acdad94e1ba715f729b1e51d442bf8757ccb8c449db5bacd76b5b3a53af2e2",
+        "inputSizeBytes": 288,
+        "nodeId": "nod_01ARZ3NDEKTSV4RRFFQ69G5FAV",
+        "cpuResourceId": "res_01ARZ3NDEKTSV4RRFFQ69G5FAV",
+        "memoryResourceId": "res_01ARZ3NDEKTSV4RRFFQ69G5FAW",
+        "profileVersion": "isolated-cpu-test",
+        "policyVersion": "isolated-policy-test"
+      }
+    },
+    "approval": {
+      "approvalId": "apr_01ARZ3NDEKTSV4RRFFQ69G5FAV",
+      "runId": "run_01ARZ3NDEKTSV4RRFFQ69G5FAV",
+      "projectId": "prj_01ARZ3NDEKTSV4RRFFQ69G5FAV",
+      "requesterId": "oidc:fdf3eee76350d409c4a3b221352b5b544154d8ce05049a87b0dc040394f8db66",
+      "actionDigest": "7315c6bbb097fc9e678b605ffe36762063fe310d44c08b535f7b2e4d6a9737b4",
+      "policyVersion": "isolated-policy-test",
+      "requiredApprovals": 2,
+      "status": "pending",
+      "expiresAt": "2099-01-01T00:00:00Z",
+      "runVersion": 4
+    },
+    "run": {
+      "runId": "run_01ARZ3NDEKTSV4RRFFQ69G5FAV",
+      "tenantId": "00000000-0000-4000-8000-000000000041",
+      "projectId": "prj_01ARZ3NDEKTSV4RRFFQ69G5FAV",
+      "state": "awaiting_approval",
+      "version": 4,
+      "attempt": 0
+    }
+  },
+  "view": {
+    "startId": "00000000-0000-4000-8000-000000000042",
+    "workload": {
+      "apiVersion": "inv.saintvision.ai/v1alpha1",
+      "kind": "Workload",
+      "workloadId": "wld_01ARZ3NDEKTSV4RRFFQ69G5FAV",
+      "tenantId": "00000000-0000-4000-8000-000000000041",
+      "projectId": "prj_01ARZ3NDEKTSV4RRFFQ69G5FAV",
+      "workspaceId": "wsp_01ARZ3NDEKTSV4RRFFQ69G5FAV",
+      "resources": {
+        "cpuMillis": 500,
+        "memoryBytes": 67108864,
+        "gpuCount": 0,
+        "minVramBytes": 0
+      },
+      "imageDigest": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "command": [
+        "/usr/local/bin/python3",
+        "-B",
+        "src/app.py"
+      ],
+      "timeoutSeconds": 30,
+      "targetNodeId": "nod_01ARZ3NDEKTSV4RRFFQ69G5FAV",
+      "workspaceStart": {
+        "startId": "00000000-0000-4000-8000-000000000042",
+        "stepId": "cpu-step",
+        "inputSha256": "66acdad94e1ba715f729b1e51d442bf8757ccb8c449db5bacd76b5b3a53af2e2",
+        "inputSizeBytes": 288,
+        "nodeId": "nod_01ARZ3NDEKTSV4RRFFQ69G5FAV",
+        "cpuResourceId": "res_01ARZ3NDEKTSV4RRFFQ69G5FAV",
+        "memoryResourceId": "res_01ARZ3NDEKTSV4RRFFQ69G5FAW",
+        "profileVersion": "isolated-cpu-test",
+        "policyVersion": "isolated-policy-test"
+      }
+    },
+    "approval": {
+      "approvalId": "apr_01ARZ3NDEKTSV4RRFFQ69G5FAV",
+      "runId": "run_01ARZ3NDEKTSV4RRFFQ69G5FAV",
+      "projectId": "prj_01ARZ3NDEKTSV4RRFFQ69G5FAV",
+      "requesterId": "oidc:fdf3eee76350d409c4a3b221352b5b544154d8ce05049a87b0dc040394f8db66",
+      "actionDigest": "7315c6bbb097fc9e678b605ffe36762063fe310d44c08b535f7b2e4d6a9737b4",
+      "policyVersion": "isolated-policy-test",
+      "requiredApprovals": 2,
+      "status": "pending",
+      "expiresAt": "2099-01-01T00:00:00Z",
+      "runVersion": 4
+    },
+    "run": {
+      "runId": "run_01ARZ3NDEKTSV4RRFFQ69G5FAV",
+      "tenantId": "00000000-0000-4000-8000-000000000041",
+      "projectId": "prj_01ARZ3NDEKTSV4RRFFQ69G5FAV",
+      "state": "awaiting_approval",
+      "version": 4,
+      "attempt": 0
+    },
+    "frozenFiles": [
+      {
+        "path": "src/app.py",
+        "sha256": "a811db87cdcba57bbcb5dee3085b12a99af87b21c8931f14100168c1715055fe",
+        "sizeBytes": 20
+      }
+    ]
+  },
+  "intent": {
+    "workspaceId": "wsp_01ARZ3NDEKTSV4RRFFQ69G5FAV",
+    "workspaceVersion": 1,
+    "workloadVersion": 1,
+    "workloadSha256": "754c23d43c812d39c8f1191ad9c1bb218de01a5269749a9e427e70264214be19",
+    "intentEtag": "\"workspace-v1-workload-v1-sha256-754c23d43c812d39c8f1191ad9c1bb218de01a5269749a9e427e70264214be19\"",
+    "workload": {
+      "apiVersion": "inv.saintvision.ai/v1alpha1",
+      "kind": "Workload",
+      "workloadId": "wld_01ARZ3NDEKTSV4RRFFQ69G5FAV",
+      "tenantId": "00000000-0000-4000-8000-000000000041",
+      "projectId": "prj_01ARZ3NDEKTSV4RRFFQ69G5FAV",
+      "workspaceId": "wsp_01ARZ3NDEKTSV4RRFFQ69G5FAV",
+      "resources": {
+        "cpuMillis": 500,
+        "memoryBytes": 67108864,
+        "gpuCount": 0,
+        "minVramBytes": 0
+      },
+      "imageDigest": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "command": [
+        "/usr/local/bin/python3",
+        "-B",
+        "src/app.py"
+      ],
+      "timeoutSeconds": 30,
+      "targetNodeId": "nod_01ARZ3NDEKTSV4RRFFQ69G5FAV"
+    },
+    "observedAt": "2026-11-07T09:00:00Z"
+  },
+  "intentPage": {
+    "projectId": "prj_01ARZ3NDEKTSV4RRFFQ69G5FAV",
+    "workspaceId": "wsp_01ARZ3NDEKTSV4RRFFQ69G5FAV",
+    "workspaceVersion": 1,
+    "observedAt": "2026-11-07T09:00:00Z",
+    "items": [
+      {
+        "workspaceId": "wsp_01ARZ3NDEKTSV4RRFFQ69G5FAV",
+        "workspaceVersion": 1,
+        "workloadVersion": 1,
+        "workloadSha256": "754c23d43c812d39c8f1191ad9c1bb218de01a5269749a9e427e70264214be19",
+        "intentEtag": "\"workspace-v1-workload-v1-sha256-754c23d43c812d39c8f1191ad9c1bb218de01a5269749a9e427e70264214be19\"",
+        "workload": {
+          "apiVersion": "inv.saintvision.ai/v1alpha1",
+          "kind": "Workload",
+          "workloadId": "wld_01ARZ3NDEKTSV4RRFFQ69G5FAV",
+          "tenantId": "00000000-0000-4000-8000-000000000041",
+          "projectId": "prj_01ARZ3NDEKTSV4RRFFQ69G5FAV",
+          "workspaceId": "wsp_01ARZ3NDEKTSV4RRFFQ69G5FAV",
+          "resources": {
+            "cpuMillis": 500,
+            "memoryBytes": 67108864,
+            "gpuCount": 0,
+            "minVramBytes": 0
+          },
+          "imageDigest": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+          "command": [
+            "/usr/local/bin/python3",
+            "-B",
+            "src/app.py"
+          ],
+          "timeoutSeconds": 30,
+          "targetNodeId": "nod_01ARZ3NDEKTSV4RRFFQ69G5FAV"
+        },
+        "observedAt": "2026-11-07T09:00:00Z"
+      }
+    ],
+    "nextCursor": null,
+    "profile": {
+      "nodeId": "nod_01ARZ3NDEKTSV4RRFFQ69G5FAV",
+      "profileVersion": "isolated-cpu-test",
+      "images": [
+        "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+      ],
+      "executables": [
+        "/usr/local/bin/python3"
+      ],
+      "maxCpuMillis": 500,
+      "minMemoryBytes": 8388608,
+      "maxMemoryBytes": 67108864,
+      "maxTimeoutSeconds": 30,
+      "terminalAllowed": false
+    }
+  },
+  "businessCreated": {
+    "run": {
+      "runId": "run_01ARZ3NDEKTSV4RRFFQ69G5FAV",
+      "tenantId": "00000000-0000-4000-8000-000000000041",
+      "projectId": "prj_01ARZ3NDEKTSV4RRFFQ69G5FAV",
+      "state": "draft",
+      "version": 1,
+      "attempt": 0
+    },
+    "intent": {
+      "workspaceId": "wsp_01ARZ3NDEKTSV4RRFFQ69G5FAV",
+      "workspaceVersion": 1,
+      "workloadVersion": 1,
+      "workloadSha256": "754c23d43c812d39c8f1191ad9c1bb218de01a5269749a9e427e70264214be19",
+      "intentEtag": "\"workspace-v1-workload-v1-sha256-754c23d43c812d39c8f1191ad9c1bb218de01a5269749a9e427e70264214be19\"",
+      "workload": {
+        "apiVersion": "inv.saintvision.ai/v1alpha1",
+        "kind": "Workload",
+        "workloadId": "wld_01ARZ3NDEKTSV4RRFFQ69G5FAV",
+        "tenantId": "00000000-0000-4000-8000-000000000041",
+        "projectId": "prj_01ARZ3NDEKTSV4RRFFQ69G5FAV",
+        "workspaceId": "wsp_01ARZ3NDEKTSV4RRFFQ69G5FAV",
+        "resources": {
+          "cpuMillis": 500,
+          "memoryBytes": 67108864,
+          "gpuCount": 0,
+          "minVramBytes": 0
+        },
+        "imageDigest": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "command": [
+          "/usr/local/bin/python3",
+          "-B",
+          "src/app.py"
+        ],
+        "timeoutSeconds": 30,
+        "targetNodeId": "nod_01ARZ3NDEKTSV4RRFFQ69G5FAV"
+      },
+      "observedAt": "2026-11-07T09:00:00Z"
+    },
+    "requesterId": "oidc:fdf3eee76350d409c4a3b221352b5b544154d8ce05049a87b0dc040394f8db66",
+    "observedAt": "2026-11-07T09:00:00Z"
+  }
+}

@@ -29,9 +29,11 @@ export async function fetchProjects(): Promise<ProjectItem[]> {
     };
   });
 }
-export async function fetchProjectWorkspaces(projectId: string): Promise<ProjectWorkspace[]> {
-  const page = await apiClient<ProjectWorkspacesResponse>(
-    `/v1/projects/${encodeURIComponent(projectId)}/workspaces`);
+export async function fetchProjectWorkspaces(projectId: string, options?: { signal?: AbortSignal }): Promise<ProjectWorkspace[]> {
+  const url = `/v1/projects/${encodeURIComponent(projectId)}/workspaces`;
+  const page = options
+    ? await apiClient<ProjectWorkspacesResponse>(url, options)
+    : await apiClient<ProjectWorkspacesResponse>(url);
   if (page.projectId !== projectId || !Array.isArray(page.workspaces) ||
       page.workspaces.some(w => w.projectId !== projectId || !w.workspaceId)) {
     throw new Error('Workspace 프로젝트 응답 불일치');

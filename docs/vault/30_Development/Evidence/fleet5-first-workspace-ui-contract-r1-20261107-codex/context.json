@@ -1,0 +1,21 @@
+{
+  "task": "FLEET5-FIRST-WORKSPACE-UI-CONTRACT-R1-20261107",
+  "taskID": "task_72ad09258a5c",
+  "dispatchID": "ctx_20044c1f6fae",
+  "owner": "Codex B",
+  "reviewer": "Actual independent Claude pending final code and CI; Root coordinates",
+  "atKST": "2026-11-07T18:12:03.015399+09:00",
+  "deliveryBase": "1efea494f026e932360c35ae811b6423d874a2e7",
+  "backendSource": "1efea494f026e932360c35ae811b6423d874a2e7",
+  "importedFrontendSource": "b48c2c4492f8aea4b55c33161733a9a6fb9eed8c",
+  "acceptedRecipe": "427432220fe245ec90d7f5b5c6c16ca50eb63def",
+  "frozenRoot": "23a6cadef31053a35deae187c6991e48ebd70ff0",
+  "rootBoardVersion": "1.0.511",
+  "codexBoardVersion": "1.0.472",
+  "trackedDirtyBefore": false,
+  "priorUntrackedReceiptsPreserved": true,
+  "syncBeforeBytes": 500344,
+  "syncBeforeSHA256": "368bc72302840e416fdfe5c9fb01a2f0753e244cd40c055a8a07a5c967d07ab9",
+  "scope": "Frontend first Workspace vertical slice and own Evidence/History only; main source/data/docs checks; hosted execution; no actual operations",
+  "holds": "Original19HOLD/discharges0/runtimeB0/A1-A16/H1-H7/H3EA/RDNULL_HOLD/raw7UNREGISTERED/A01-A40NOT_RUN unchanged"
+}

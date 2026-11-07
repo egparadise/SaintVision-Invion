@@ -25,6 +25,7 @@ import { cancelKernelRun } from '@/shared/api/kernelMutations';
 import { evaluatePlacement } from '@/features/placement/placementEngine';
 import { computeDiff, computeSha256 } from '@/features/editor/diffEngine';
 import { downloadAndVerifyArtifact } from '@/shared/api/runArtifactObservation';
+import { FirstWorkspacePanel } from './FirstWorkspacePanel';
 
 export interface DeveloperStudioProps {
   project: ProjectItem;
@@ -113,8 +114,6 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
   const [editorMode, setEditorMode] = useState<'edit' | 'diff' | 'frozen'>('edit');
   const [runObjective, setRunObjective] = useState('SaintVision PACS Core 빌드 및 가속 추론 벤치마크');
   const [riskLevel, setRiskLevel] = useState<'L1' | 'L2' | 'L3'>('L1');
-  const [isExecuting, setIsExecuting] = useState(false);
-  const [dispatchError, setDispatchError] = useState<string | null>(null);
   const [isDownloadingArtifact, setIsDownloadingArtifact] = useState(false);
 
   // Step 4: Active Run, Live Logs, Cancellation, Receipts & Artifacts
@@ -393,80 +392,9 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
   const boundNode = nodes.find((n) => n.id === (currentRun?.nodeId || selectedNodeId));
   const matchedApproval = approvals.find((a) => a.runId === (currentRun?.id || activeRunId));
 
-  // Dispatch Run execution (Codex P1: zero mock run on failure, complete contract binding)
-  const handleDispatchRun = async () => {
-    setDispatchError(null);
-
-    // Preflight Check: verify target node is schedulable and not observation-only
-    const targetNode = nodes.find((n) => n.id === selectedNodeId);
-    if (targetNode?.observationOnly) {
-      const errMsg = `선택된 노드 '${targetNode.hostname} (${targetNode.id})'는 관측 전용 노드로 원격 실행 프로필이 미설치되어 있습니다. 업무 배치가 거부됩니다.`;
-      setDispatchError(errMsg);
-      setLogs((prev) => [
-        ...prev,
-        { timestamp: new Date().toLocaleTimeString(), level: 'ERROR', message: `[Preflight Rejected] ${errMsg}` },
-      ]);
-      return;
-    }
-
-    setIsExecuting(true);
-    const nowIso = new Date().toLocaleTimeString();
-    setLogs((prev) => [
-      ...prev,
-      { timestamp: nowIso, level: 'INFO', message: `[Dispatch] Launching run for project '${selectedProject.name}' on workspace '${selectedWorkspaceId}'...` },
-    ]);
-
-    try {
-      const res = await apiClient<ControlRunView>(`/v1/projects/${selectedProjectId}/runs`, {
-        method: 'POST',
-        body: JSON.stringify({
-          workspaceId: selectedWorkspaceId,
-          objective: runObjective,
-          requestedBy: currentUser?.id,
-          targetNodeId: selectedNodeId || undefined,
-          entrypoint: activeFile.path,
-          files: files.map((f) => ({ path: f.path, content: f.content, size: f.content.length })),
-          resourceRequests: {
-            requiredCores: reqCores,
-            requiredMemoryBytes: reqMemoryGb * 1024 ** 3,
-            requiresGpu,
-          },
-          riskLevel,
-          requiresApproval: riskLevel !== 'L1',
-          policyReason: riskLevel !== 'L1' ? `거버넌스 위험 등급 ${riskLevel} 정책에 따른 사전 승인 요구 (Rule No. 304)` : undefined,
-        }),
-      });
-
-      if (!res || !res.runId) {
-        throw new Error('서버 응답에 유효한 Run ID가 누락되었습니다.');
-      }
-
-      const newRunId = res.runId;
-      setActiveRunId(newRunId);
-      setLiveRun(observedRun(res));
-      onRefreshRuns?.();
-
-      setLogs((prev) => [
-        ...prev,
-        { timestamp: new Date().toLocaleTimeString(), level: 'SUCCESS', message: `[Created] Run '${newRunId}' registered in state '${res.state}'` },
-        { timestamp: new Date().toLocaleTimeString(), level: 'INFO', message: `[Placement] Bound to node '${selectedNodeId || '(자동 할당)'}' (Headroom & Lease verified)` },
-        { timestamp: new Date().toLocaleTimeString(), level: 'INFO', message: `[Runner] Executing '${activeFile.path}' inside 0600 process isolation sandbox...` },
-      ]);
-
-      // Move to Step 4 only on genuine server success!
-      setCurrentStep(4);
-    } catch (err: any) {
-      console.error('Backend run dispatch error:', err);
-      const errMsg = err?.detail || err?.message || '서버 응답 오류로 실행 요청이 실패하였습니다.';
-      setDispatchError(errMsg);
-      setLogs((prev) => [
-        ...prev,
-        { timestamp: new Date().toLocaleTimeString(), level: 'ERROR', message: `[Dispatch Failed] ${errMsg}. 가짜 Run을 생성하지 않고 중단합니다.` },
-      ]);
-      // Codex P1: DO NOT create mockRunId! Do not advance to Step 4!
-    } finally {
-      setIsExecuting(false);
-    }
+  // Open the real first-Workspace protocol. Local editor/placement previews cannot launch a Run.
+  const handleDispatchRun = () => {
+    document.getElementById('first-workspace')?.scrollIntoView?.({ behavior: 'smooth' });
   };
 
   // Result Artifact Download handler
@@ -1687,6 +1615,14 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
       {/* STEP 3: 코드 편집 & 실행 설정 */}
       {currentStep === 3 && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+          {currentUser?.tenantId && <FirstWorkspacePanel
+            key={`${currentUser.tenantId}:${currentUser.id}:${selectedProjectId}`}
+            scope={{ projectId: selectedProjectId, tenantId: currentUser.tenantId, subjectId: currentUser.id }}
+            approvals={approvals}
+            onRunObserved={(wire: ControlRunView) => { setActiveRunId(wire.runId); setLiveRun(observedRun(wire)); onRefreshRuns?.(); }}
+            onNavigateApprovals={() => onNavigateTab?.('approvals')}
+          />}
+          {!currentUser?.tenantId && <p role="alert">첫 Workspace 요청에는 현재 인증된 tenant와 사용자 정보가 필요합니다.</p>}
           <div
             style={{
               padding: '24px',
@@ -1697,7 +1633,7 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
           >
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
               <div>
-                <h2 style={{ fontSize: '1.125rem', fontWeight: 600 }}>Step 3: Studio 코드 편집 & 격리 실행 파라미터</h2>
+                <h2 style={{ fontSize: '1.125rem', fontWeight: 600 }}>Step 3: 로컬 코드·배치 미리보기</h2>
                 <span style={{ fontSize: '0.8125rem', color: 'var(--color-text-muted)' }}>
                   대상 노드: <strong>{selectedNodeId || '(자동 배치)'}</strong> · 워크스페이스: <strong>{selectedWorkspaceId}</strong>
                 </span>
@@ -1898,9 +1834,9 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
                       fontWeight: 600,
                     }}
                   >
-                    <option value="L1">L1 (일반 실행 - 즉시 격리 시작)</option>
-                    <option value="L2">L2 (중간 위험 - 1차 검토자 사전 승인 요구)</option>
-                    <option value="L3">L3 (고위험 - Two-Person Rule 2인 승인 & Diff 필수)</option>
+                    <option value="L1">L1 (로컬 미리보기)</option>
+                    <option value="L2">L2 (로컬 미리보기)</option>
+                    <option value="L3">L3 (로컬 미리보기)</option>
                   </select>
                   {riskLevel !== 'L1' && (
                     <span style={{ fontSize: '0.75rem', color: 'var(--color-status-degraded)', fontWeight: 600 }}>
@@ -1929,28 +1865,10 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
                 <Button
                   variant="primary"
                   onClick={handleDispatchRun}
-                  disabled={
-                    isExecuting ||
-                    isLoadingReadiness ||
-                    projects.find((p) => p.id === selectedProjectId)?.kernelLinked === false ||
-                    !readiness ||
-                    !readiness.executable
-                  }
+                  disabled={!currentUser}
                   style={{ padding: '8px 20px', fontWeight: 600 }}
                 >
-                  {isExecuting
-                    ? '⏳ 실행 등록 중...'
-                    : isLoadingReadiness
-                    ? '⏳ 준비 상태 검증 중...'
-                    : projects.find((p) => p.id === selectedProjectId)?.kernelLinked === false
-                    ? '🔒 실행 보류 (커널 미연결)'
-                    : readinessError
-                    ? '🔒 실행 불가 (검증 실패)'
-                    : readiness && !readiness.executable
-                    ? '🔒 실행 보류 (전제조건 미충족)'
-                    : !readiness
-                    ? '🔒 실행 대기 (검증 미완료)'
-                    : '⚡ 작업 실행 (Dispatch Run)'}
+                  첫 CPU Workspace 요청 설정
                 </Button>
                 <Button
                   variant="secondary"
@@ -1961,28 +1879,6 @@ export const DeveloperStudio: React.FC<DeveloperStudioProps> = ({
                 </Button>
               </div>
             </div>
-
-            {dispatchError && (
-              <div
-                style={{
-                  marginTop: '16px',
-                  padding: '16px',
-                  backgroundColor: 'var(--color-bg-subtle)',
-                  borderRadius: 'var(--radius-md)',
-                  border: '1px solid var(--color-status-offline)',
-                  color: 'var(--color-status-offline)',
-                  fontSize: '0.875rem',
-                }}
-              >
-                <div style={{ fontWeight: 700, marginBottom: '4px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <span>❌ 원격 실행 요청 실패 (Execution Dispatch Failed)</span>
-                </div>
-                <div style={{ color: 'var(--color-text-primary)', marginTop: '4px' }}>{dispatchError}</div>
-                <div style={{ marginTop: '8px', fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>
-                  ※ Codex 원칙: 네트워크 오류 또는 원격 노드 미설치 시 가짜 Run 생성을 금지하고 실제 서버 상태를 보존합니다.
-                </div>
-              </div>
-            )}
 
             <div style={{ display: 'flex', justifyContent: 'space-between', borderTop: '1px solid var(--color-border-subtle)', paddingTop: '16px', marginTop: '20px' }}>
               <Button variant="secondary" onClick={() => setCurrentStep(2)}>

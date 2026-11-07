@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Button } from './Button';
 
 export interface HeaderProps {
   currentTheme: 'light' | 'dark';
   onToggleTheme: () => void;
-  onlineNodesCount?: number;
-  totalNodesCount?: number;
+  onlineNodesCount?: number | null;
+  totalNodesCount?: number | null;
   activeTab: string;
   onSelectTab: (tab: string) => void;
   currentUser?: { id: string; name: string; role: string } | null;
@@ -13,47 +13,89 @@ export interface HeaderProps {
   onSwitchToDesktop?: () => void;
 }
 
+function formatUserDisplayName(name: string): string {
+  if (typeof name === 'string' && name.startsWith('oidc:') && name.length > 16) {
+    return `사용자 (${name.slice(5, 13)}…)`;
+  }
+  return name;
+}
+
+type GatewayState =
+  | { kind: 'unknown' }
+  | { kind: 'healthy'; rttMs: number }
+  | { kind: 'degraded' }
+  | { kind: 'offline' };
+
 export const Header: React.FC<HeaderProps> = ({
   currentTheme,
   onToggleTheme,
-  onlineNodesCount = 5,
-  totalNodesCount = 5,
+  onlineNodesCount = null,
+  totalNodesCount = null,
   activeTab,
   onSelectTab,
   currentUser,
   onLogout,
   onSwitchToDesktop,
 }) => {
-  const [gatewayStatus, setGatewayStatus] = useState<{ online: boolean; rttMs: number | null }>({
-    online: true,
-    rttMs: 8,
-  });
+  const [gatewayStatus, setGatewayStatus] = useState<GatewayState>({ kind: 'unknown' });
+  const reqSeqRef = useRef(0);
 
   useEffect(() => {
     let isMounted = true;
+    let activeAbortController: AbortController | null = null;
+
     const checkGateway = async () => {
+      const reqId = ++reqSeqRef.current;
+
+      activeAbortController = new AbortController();
+      const currentController = activeAbortController;
+      const timeoutId = setTimeout(() => {
+        currentController.abort();
+      }, 4000);
+
       const start = performance.now();
       try {
-        const res = await fetch('/v1/health');
-        const rtt = Math.round(performance.now() - start);
-        if (isMounted) {
-          if (res.ok) {
-            setGatewayStatus({ online: true, rttMs: rtt });
-          } else {
-            setGatewayStatus({ online: false, rttMs: null });
+        const res = await fetch('/healthz', { signal: currentController.signal });
+        const contentType = res.headers.get('content-type') || '';
+
+        if (!isMounted || reqId !== reqSeqRef.current) return;
+
+        // Canonical /healthz returns 200 with JSON { status: 'ok', version: ... }
+        // HTML fallback (200 text/html) or 401/404/500/503 is not health success
+        if (res.ok && contentType.includes('application/json')) {
+          let data: any = null;
+          try {
+            data = await res.json();
+          } catch (jsonErr: any) {
+            if (currentController.signal.aborted) {
+              throw jsonErr;
+            }
+            data = null;
           }
+          const rtt = Math.round(performance.now() - start);
+          if (!isMounted || reqId !== reqSeqRef.current) return;
+          if (data && data.status === 'ok') {
+            setGatewayStatus({ kind: 'healthy', rttMs: rtt });
+          } else {
+            setGatewayStatus({ kind: 'degraded' });
+          }
+        } else {
+          setGatewayStatus({ kind: 'degraded' });
         }
       } catch {
-        if (isMounted) {
-          setGatewayStatus({ online: false, rttMs: null });
-        }
+        if (!isMounted || reqId !== reqSeqRef.current) return;
+        setGatewayStatus({ kind: 'offline' });
+      } finally {
+        clearTimeout(timeoutId);
       }
     };
+
     checkGateway();
     const interval = setInterval(checkGateway, 5000);
     return () => {
       isMounted = false;
       clearInterval(interval);
+      activeAbortController?.abort();
     };
   }, []);
 
@@ -152,16 +194,30 @@ export const Header: React.FC<HeaderProps> = ({
           }}
         >
           <span
+            data-testid="cluster-status-dot"
             style={{
               width: '8px',
               height: '8px',
               borderRadius: '50%',
-              backgroundColor: 'var(--color-status-online)',
+              backgroundColor:
+                onlineNodesCount === null || totalNodesCount === null
+                  ? 'var(--color-status-unknown)'
+                  : onlineNodesCount > 0
+                    ? 'var(--color-status-online)'
+                    : 'var(--color-status-neutral)',
               display: 'inline-block',
             }}
           />
           <span style={{ color: 'var(--color-text-secondary)' }}>
-            클러스터: <strong>{onlineNodesCount}/{totalNodesCount}</strong> Node 가동 중
+            클러스터:{' '}
+            {onlineNodesCount === null || totalNodesCount === null ? (
+              <strong>확인 중...</strong>
+            ) : (
+              <strong>
+                {onlineNodesCount}/{totalNodesCount}
+              </strong>
+            )}{' '}
+            Node 가동 중
           </span>
         </div>
 
@@ -178,16 +234,31 @@ export const Header: React.FC<HeaderProps> = ({
           title="Control Plane Gateway 실시간 RTT 지연시간"
         >
           <span
+            data-testid="gateway-status-dot"
             style={{
               width: '8px',
               height: '8px',
               borderRadius: '50%',
-              backgroundColor: gatewayStatus.online ? 'var(--color-status-online)' : 'var(--color-status-offline)',
+              backgroundColor:
+                gatewayStatus.kind === 'unknown'
+                  ? 'var(--color-status-unknown)'
+                  : gatewayStatus.kind === 'healthy'
+                    ? 'var(--color-status-online)'
+                    : 'var(--color-status-offline)',
               display: 'inline-block',
             }}
           />
           <span style={{ color: 'var(--color-text-secondary)' }}>
-            Gateway: {gatewayStatus.online ? <strong>{gatewayStatus.rttMs ?? 0}ms</strong> : <strong style={{ color: 'var(--color-status-offline)' }}>Offline</strong>}
+            Gateway:{' '}
+            {gatewayStatus.kind === 'unknown' ? (
+              <strong>확인 중...</strong>
+            ) : gatewayStatus.kind === 'healthy' ? (
+              <strong>{gatewayStatus.rttMs}ms</strong>
+            ) : (
+              <strong style={{ color: 'var(--color-status-offline)' }}>
+                {gatewayStatus.kind === 'degraded' ? '비정상 응답' : 'Offline'}
+              </strong>
+            )}
           </span>
         </div>
 
@@ -205,7 +276,7 @@ export const Header: React.FC<HeaderProps> = ({
             }}
           >
             <span style={{ fontWeight: 600, color: 'var(--color-brand-primary)' }}>
-              👤 {currentUser.name}
+              👤 {formatUserDisplayName(currentUser.name)}
             </span>
             <span
               style={{

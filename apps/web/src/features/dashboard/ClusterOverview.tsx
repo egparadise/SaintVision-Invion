@@ -73,8 +73,8 @@ export const ClusterOverview: React.FC<ClusterOverviewProps> = ({
   lastFetchedAt = null,
   onRefresh,
 }) => {
-  // 1. 에러 상태이면서 노드가 0대인 경우: 정상 0대 빈 상태로 둔갑하지 않고 즉시 에러 표출
-  if (nodesState === 'error' && nodes.length === 0) {
+  // 1. 에러 상태이면서 노드가 0대인 경우: 정상 0대 빈 상태로 둔갑하지 않고 즉시 에러 표출 (이전 관측 성공이 없는 경우)
+  if (nodesState === 'error' && nodes.length === 0 && !lastFetchedAt) {
     return (
       <section
         role="alert"
@@ -117,8 +117,11 @@ export const ClusterOverview: React.FC<ClusterOverviewProps> = ({
     );
   }
 
-  // 2. 정상 조회 결과 노드가 0대인 경우 (정상 빈 클러스터)
-  if (nodes.length === 0 && (nodesState === 'success' || nodesState === 'idle')) {
+  // 2. 노드가 0대인 경우 (정상 빈 클러스터, 초기 확인 중, 또는 0대 관측 후 동기화 실패 stale 상태)
+  if (nodes.length === 0) {
+    const isStale = nodesState === 'error' && !!lastFetchedAt;
+    const isInitialPending = !lastFetchedAt && (nodesState === 'idle' || nodesState === 'loading');
+
     return (
       <section
         role="status"
@@ -132,10 +135,34 @@ export const ClusterOverview: React.FC<ClusterOverviewProps> = ({
           margin: '20px 0',
         }}
       >
+        {isStale && (
+          <div
+            role="alert"
+            data-testid="cluster-stale-warning"
+          >
+            ⚠️ [동기화 실패] 클러스터 노드 동기화에 실패했습니다 ({nodeError || '통신 오류'}).
+            현재 표시된 노드 정보는 {lastFetchedAt?.toLocaleTimeString('ko-KR')} 화면 확인 시점 스냅샷입니다.
+          </div>
+        )}
         <h1 style={{ fontSize: '1.25rem', fontWeight: 600 }}>분산 Node 클러스터 개요</h1>
         <p style={{ color: 'var(--color-text-muted)', marginTop: '8px' }}>
-          등록된 노드가 없습니다 (정상 조회 결과: 0대). 관리자 승인을 통해 노드를 온보딩하세요.
+          {isInitialPending
+            ? '클러스터 노드 정보를 확인하고 있습니다...'
+            : isStale
+            ? '이전 관측 시점(스냅샷) 기준 등록된 노드가 없습니다. 최신 정보 동기화가 실패하여 갱신이 지연되고 있습니다.'
+            : '등록된 노드가 없습니다 (정상 조회 결과: 0대). 관리자 승인을 통해 노드를 온보딩하세요.'}
         </p>
+        {isStale && onRefresh && (
+          <div>
+            <button
+              type="button"
+              data-testid="cluster-stale-retry-btn"
+              onClick={() => onRefresh()}
+            >
+              다시 시도
+            </button>
+          </div>
+        )}
         {lastFetchedAt && (
           <div
             data-testid="cluster-freshness-indicator"

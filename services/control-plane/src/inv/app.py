@@ -7,7 +7,7 @@ import time
 from contextlib import asynccontextmanager
 from decimal import Decimal
 from threading import BoundedSemaphore
-from fastapi import FastAPI, Request, Depends, WebSocket, WebSocketDisconnect
+from fastapi import FastAPI, Request, Response, Depends, WebSocket, WebSocketDisconnect
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse, StreamingResponse
 from starlette.concurrency import run_in_threadpool
@@ -147,6 +147,7 @@ class Boundary:
                         b"content-length",
                         b"idempotency-key",
                         b"last-event-id",
+                        b"if-match",
                     }
                     and name in headers
                 ):
@@ -842,6 +843,26 @@ def create_app(
         if workspace is None:
             raise DomainError("SYS-0001", "Workspace admission is not configured", 503)
         return workspace
+
+    from .workspace_intents import WorkspaceIntents
+
+    @api.get("/v1/projects/{project}/workspaces/{workspace_id}/first-intents")
+    def first_intents(project: str, workspace_id: str, response: Response,
+                      after: str | None = None, limit: int = 20, identity=Depends(authenticated)):
+        response.headers["Cache-Control"] = "no-store"
+        return WorkspaceIntents(workspace_service()).list(identity.principal, project, workspace_id, after=after, limit=limit)
+
+    @api.post("/v1/projects/{project}/workspaces/{workspace_id}/first-intents", status_code=201)
+    async def create_first_intent(project: str, workspace_id: str, request: Request, response: Response, identity=Depends(authenticated)):
+        response.headers["Cache-Control"] = "no-store"
+        return await run_in_threadpool(WorkspaceIntents(workspace_service()).create_intent,
+                                      identity.principal, project, workspace_id, await request.json(), key(request), request.headers.get("if-match"))
+
+    @api.post("/v1/projects/{project}/workspaces/{workspace_id}/first-intents/{workload}/runs", status_code=201)
+    async def create_first_intent_run(project: str, workspace_id: str, workload: str, request: Request, response: Response, identity=Depends(authenticated)):
+        response.headers["Cache-Control"] = "no-store"
+        return await run_in_threadpool(WorkspaceIntents(workspace_service()).create_run,
+                                      identity.principal, project, workspace_id, workload, await request.json(), key(request), request.headers.get("if-match"))
 
     terminal_slots = BoundedSemaphore(32)
 

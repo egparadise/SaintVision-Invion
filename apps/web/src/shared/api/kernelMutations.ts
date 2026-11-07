@@ -1,4 +1,4 @@
-import { apiClient, generateTraceId } from './client';
+import { apiClient, generateTraceId, getAuthToken } from './client';
 import type {
   ApprovalChallenge,
   ApprovalDecisionInput,
@@ -30,8 +30,10 @@ interface CachedDecision {
 }
 
 const decisionMutationCache = new Map<string, CachedDecision>();
+let decisionGeneration = 0;
 
 export function _resetKernelMutationCache() {
+  decisionGeneration++;
   cancelMutationCache.clear();
   decisionMutationCache.clear();
 }
@@ -83,6 +85,12 @@ export async function decideApproval(
   decision: 'approve' | 'reject',
   options?: { idempotencyKey?: string }
 ) {
+  const generation = decisionGeneration;
+  const credential = getAuthToken();
+  const assertSession = () => {
+    if (generation !== decisionGeneration || credential !== getAuthToken())
+      throw new Error('승인 도중 인증이 변경되었습니다. 현재 세션에서 다시 검토하세요.');
+  };
   const base = `${scope(intent.projectId)}/approvals/${encodeURIComponent(intent.id)}`;
   const actionDigest = intent.actionDigest;
   if (!actionDigest) throw new Error('승인 내용을 새로고침한 뒤 다시 시도하세요.');
@@ -100,6 +108,7 @@ export async function decideApproval(
     const challenge = await apiClient<ApprovalChallenge>(`${base}/challenge`, {
       method: 'POST', body: JSON.stringify({}),
     });
+    assertSession();
     if (!challenge?.nonce) throw new Error('승인 확인 정보를 받지 못했습니다.');
     idempotencyKey = options?.idempotencyKey || generateTraceId();
     input = { decision, nonce: challenge.nonce, actionDigest };
@@ -107,11 +116,13 @@ export async function decideApproval(
   }
 
   try {
+    assertSession();
     const result = await apiClient<ApprovalView>(`${base}/decision`, {
       method: 'POST',
       body: JSON.stringify(input),
       idempotencyKey,
     });
+    assertSession();
     decisionMutationCache.delete(opKey);
     return result;
   } catch (err) {

@@ -1585,3 +1585,57 @@ export interface ProjectNodeCertificateObservationResponse {
   items: Array<NodeCertificateObservation>;
   trust: NodeCertificateTrustSummary;
 }
+
+export interface WorkspaceFirstProfile {
+  nodeId: NodeId;
+  profileVersion: string;
+  images: Array<string>;
+  executables: Array<string>;
+  maxCpuMillis: number;
+  minMemoryBytes: 8388608;
+  maxMemoryBytes: number;
+  maxTimeoutSeconds: number;
+  terminalAllowed: false;
+}
+
+export interface WorkspaceFirstIntent {
+  workspaceId: WorkspaceId;
+  workspaceVersion: number;
+  workloadVersion: number;
+  workloadSha256: string;
+  intentEtag: string;
+  workload: WorkloadSpec;
+  observedAt: Timestamp;
+}
+
+export interface WorkspaceFirstIntentPage {
+  projectId: ProjectId;
+  workspaceId: WorkspaceId;
+  workspaceVersion: number;
+  observedAt: Timestamp;
+  profile: WorkspaceFirstProfile;
+  items: Array<WorkspaceFirstIntent>;
+  nextCursor: (WorkloadId | null);
+}
+
+export interface WorkspaceFirstIntentCreateInput {
+  objective: string;
+  imageDigest: string;
+  command: Array<string>;
+  resources: WorkspaceFirstResources;
+  timeoutSeconds: number;
+}
+
+export interface WorkspaceFirstRunCreateResult {
+  run: ControlRunView;
+  intent: WorkspaceFirstIntent;
+  requesterId: string;
+  observedAt: Timestamp;
+}
+
+export interface WorkspaceFirstResources {
+  cpuMillis: number;
+  memoryBytes: number;
+  gpuCount: 0;
+  minVramBytes: 0;
+}

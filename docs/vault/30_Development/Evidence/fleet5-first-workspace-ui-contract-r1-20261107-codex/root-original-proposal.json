@@ -1,0 +1,90 @@
+{
+  "status": "PROPOSED_FOR_ROOT_FREEZE_NOT_IMPLEMENTED_OR_LIVE",
+  "taskID": "task_72ad09258a5c",
+  "base": "1efea494f026e932360c35ae811b6423d874a2e7",
+  "owner": "Codex B; Root expanded this task in msg_d0e307b75acc",
+  "causalSourcePins": [
+    "services/control-plane/src/inv/control.py:65-85 generic create only inv.runs",
+    "services/control-plane/src/inv/workspace_start.py:87-117 requires ready matching public intent via business scope",
+    "services/control-plane/src/inv/business_handoff.py:33-56 requires matching inv.business_runs/public.runs/workloads",
+    "services/control-plane/src/inv/migrations/0021_business_kernel.sql:57-86 SELECT-only mapping and public field grants plus lock sentinels",
+    "src/saintvision/services/projects.py:291-303 workspace summary omits intent/version",
+    "src/saintvision/db/models/execution.py:132-224 Workload and Run metadata fields; no workload-create API found in mounted routers/services",
+    "src/saintvision/api/v1/settings.py:310-362 and services/settings.py:417-457 existing administrator workspace status transition; no new ready transition is needed or proposed",
+    "services/control-plane/src/inv/sandbox.py:114-136 existing profile validation; services/control-plane/src/inv/workspace_api.py:31-91 restricted configured CPU runtime/policy"
+  ],
+  "routePrefix": "/v1/projects/{project}/workspaces/{workspace}",
+  "routes": [
+    {
+      "method": "GET",
+      "path": "/v1/projects/{project}/workspaces/{workspace}/first-intents",
+      "query": {"after": "optional canonical WorkloadId, exclusive", "limit": "integer 1..50, default 20"},
+      "response": "WorkspaceFirstIntentPage",
+      "semantics": "Exact selected ready Workspace in enabled linked project; current active business/kernel can_request intersection; tenant-bound workload spec.workspaceId exactly selected workspace; WorkloadId ascending stable keyset pagination, no default/first/latest selection; validate WorkloadSpec, canonical stored SHA, current profile CPU constraints. No rows are created by read. Nonready workspace is refused with actual prerequisite, not silently ready."
+    },
+    {
+      "method": "POST",
+      "path": "/v1/projects/{project}/workspaces/{workspace}/first-intents",
+      "request": "WorkspaceFirstIntentCreateInput",
+      "response": "WorkspaceFirstIntent",
+      "status": 201,
+      "headers": {"Idempotency-Key": "required existing printable bounded key <=200", "If-Match": "required quoted workspace version: \"workspace-v<positive integer>\""},
+      "semantics": "Indispensable metadata creation surface: caller supplies bounded objective/CPU command/image/resources/timeout only; server generates workloadId and supplies tenant/project/workspace/targetNode from selected ready workspace and configured default restricted runtime. Selected workspace.nodeId must equal that runtime node and enabled project-node membership. No user-supplied identity/risk/policy/grant, terminal, resume/start/model reference. compile_launch against existing profile enforces approved image/executable/CPU/memory/timeout; hard pilot ceiling500m/67108864B/30s, GPU0. This records an intent; it does not provision storage, mark ready, create execution or grant rights. Existing administrator status API remains the only existing status path; Root must establish genuine readiness operationally."
+    },
+    {
+      "method": "POST",
+      "path": "/v1/projects/{project}/workspaces/{workspace}/first-intents/{workload}/runs",
+      "request": "EmptyRequest unchanged {}",
+      "response": "WorkspaceFirstRunCreateResult",
+      "status": 201,
+      "headers": {"Idempotency-Key": "required existing bounded key", "If-Match": "required quoted token supplied in selected intent: \"workspace-v<workspaceVersion>-workload-v<workloadVersion>-sha256-<64 lowercase hex>\""},
+      "semantics": "Explicit selected path, current ready Workspace/workload/versions/canonical digest and current business+kernel requester grants checked on initial call AND ledger replay. Atomically append inv.runs + public.runs + immutable inv.business_runs for the same new server RunId, with public requested_by_user_id derived from verified subject's current DB mapping. Server owns draft/attempt0/version1. Replay returns original stored response only after current authorization/intent checks; stale changes fail GRAPH-0003(409), missing/malformed required headers VAL-0003(422). Generic POST project/runs remains unchanged."
+    }
+  ],
+  "closedSchemas": {
+    "WorkspaceFirstIntent": {
+      "additionalProperties": false,
+      "required": ["workspaceId", "workspaceVersion", "workloadVersion", "workloadSha256", "intentEtag", "workload", "observedAt"],
+      "properties": {"workspaceId": "WorkspaceId", "workspaceVersion": "positive safe integer", "workloadVersion": "positive safe integer", "workloadSha256": "SHA256 lowercase64", "intentEtag": "exact quoted version+digest token above", "workload": "unchanged WorkloadSpec, server scoped CPU-only, no start/resume/model/terminal", "observedAt": "server UTC date-time"}
+    },
+    "WorkspaceFirstIntentPage": {
+      "additionalProperties": false,
+      "required": ["projectId", "workspaceId", "workspaceVersion", "observedAt", "profile", "items", "nextCursor"],
+      "properties": {"projectId": "ProjectId", "workspaceId": "WorkspaceId", "workspaceVersion": "positive safe integer", "observedAt": "server UTC date-time", "profile": "WorkspaceFirstProfile", "items": "array0..50 WorkspaceFirstIntent", "nextCursor": "null or WorkloadId"}
+    },
+    "WorkspaceFirstProfile": {
+      "additionalProperties": false,
+      "required": ["nodeId", "profileVersion", "images", "executables", "maxCpuMillis", "maxMemoryBytes", "maxTimeoutSeconds", "terminalAllowed"],
+      "properties": {"nodeId": "NodeId; exact configured default destination only, pilot PC3 when Root binds it", "profileVersion": "string1..200", "images": "sorted unique image SHA256 digests1..64", "executables": "sorted unique container executable allowlist1..64, strings1..4096", "maxCpuMillis": "integer1..500", "maxMemoryBytes": "integer1..67108864", "maxTimeoutSeconds": "integer1..30", "terminalAllowed": "const false"}
+    },
+    "WorkspaceFirstIntentCreateInput": {
+      "additionalProperties": false,
+      "required": ["objective", "imageDigest", "command", "resources", "timeoutSeconds"],
+      "properties": {"objective": "string1..1000", "imageDigest": "sha256:<64 lowercase hex>", "command": "array1..64 of nonempty strings<=4096, no NUL; first is configured executable", "resources": "unchanged ResourceRequest with CPU<=500,memory<=67108864,gpuCount=minVramBytes=0", "timeoutSeconds": "integer1..30"}
+    },
+    "WorkspaceFirstRunCreateResult": {
+      "additionalProperties": false,
+      "required": ["run", "intent", "requesterId", "observedAt"],
+      "properties": {"run": "unchanged ControlRunView draft/version1/attempt0", "intent": "exact server selected WorkspaceFirstIntent", "requesterId": "verified canonical oidc subject string1..200", "observedAt": "server UTC date-time"}
+    }
+  },
+  "transactionAndPrivilegeDesign": {
+    "oneTransaction": "Existing restricted kernel Database.transaction establishes tenant/epoch/containment locks; no second engine/HTTP/saga. Ledger/advisory idempotency lock -> current kernel grant -> business project -> public project -> subject mapping -> active user -> membership -> selected Workspace -> selected Workload locks; maintain same identity-lock sequence as Control.grant/business_auth.permission. Re-read and hold versions/status/spec after lock. New Run has no concurrent existing execution locks. Event/outbox and ledger result commit in this same transaction; any failure rolls back all rows.",
+    "actor": "Trusted authenticated route writes verified subject into transaction-local inv.first_workspace_subject; helper accepts NO actor/user/risk/grant argument and derives current mapped active user. Existing tenant GUC is required and not modified by helper. A SQL-capable inv_kernel credential remains a trusted service boundary, as in existing inv.user_id based functions; it is not a user credential and no browser can set GUCs. Wrong/missing tenant/subject or disabled/unlinked mapping is denied inside helper too.",
+    "migration": "One new append-only Alembic revision after existing0067 plus one corresponding inv SQL resource; never change old migrations. Dedicated inv_first_workspace_writer NOLOGIN NOSUPERUSER NOBYPASSRLS NOCREATEDB NOCREATEROLE NOINHERIT; no runtime granted membership. Own two SECURITY DEFINER functions append_first_workspace_intent and append_first_workspace_run; fixed SET search_path=pg_catalog, fully qualified every object; SET row_security=on. REVOKE ALL EXECUTE FROM PUBLIC and inv_app, GRANT EXECUTE only inv_kernel. No helper/schema/table ownership grants to runtime; no LOGIN or credential creation.",
+    "minimalPrivileges": "Writer USAGE inv/public; column-specific SELECT and UPDATE(lock_sentinel/kernel_lock_sentinel) only on authorization/selected context rows it locks; column-specific INSERT only public.workloads, public.runs, inv.runs, inv.business_runs. No UPDATE/DELETE business content/mapping grants. Existing FORCE RLS stays; add tenant-using/check policies TO writer for public tables (inv tenant policies already apply), never row_security off/BYPASSRLS. inv_kernel gains only SELECT workspace.version/node_id and workload.version needed for source observation; no direct public INSERT/mapping grant. Helpers verify current kernel/business grant intersection, selected scope, workload canonical SHA/versions and draft/mapping invariants and return only permitted records. Python canonical schema/hash/profile checks additionally enforce the serving contract; SQL helper validates closed metadata/CPU/scope/version again before insert.",
+    "directCallBoundary": "inv_app/unrelated roles cannot execute helper or assume writer; functions cannot insert cross-tenant or wrong-workspace mapping, accept raw userId, alter an existing Run/intent or disable RLS. inv_kernel already represents trusted authenticated service authority; direct-call tests require missing/mismatched GUC and stale/wrong context denial as well as privilege checks. No claim that a compromised SQL runtime credential is an authenticated end user."
+  },
+  "regressionProof": [
+    "Hosted real PostgreSQL with login roles restricted to inv_kernel / inv_app, owner used only isolated schema/test-account setup; production HTTP routes perform all intent/run writes under restricted runtime",
+    "Empty generic create unchanged; current selected ready intent list/profile stable keyset ordering and closed schemas/serving anchors/generated types",
+    "No automatic ready transition or fabricated rows in production; provisioning/suspended/deleting, no intent and no business/kernel mapping stay honest blockers",
+    "Metadata rejection for actor/risk/grant/provider/root/terminal extras, invalid image/executable/GPU/CPU/memory/timeout and wrong target/project/tenant",
+    "Concurrent same-key selected creation has one triple of rows and stable response; distinct keys deliberately create distinct logical requests; any insertion/outbox/ledger failure rolls back the entire triple",
+    "Revoked user/project/member/kernel/business/Node membership, changed ready status/workspaceVersion/workloadVersion/spec/digest and containment/epoch fail both initial creation and replay",
+    "Helpers PUBLIC/inv_app EXECUTE denial, no writer membership/login/super/bypass/ownership, FORCE RLS intact, hostile search_path/temp objects, missing subject/tenant and cross-tenant direct-call refusal",
+    "Business-mapped first prepare uses exact actual selected spec then existing real nonrequester challenge/decision/two-person dispatch/enqueue/result boundaries; no server policy relaxation",
+    "Frontend auth/project generations, closed requests/header/keys, stable unknown retries, all3 UTF8/base64 bounds, existing b48 refresh behavior; same finalSHA Frontend/Core/Backend/Docs manualattempt1 on GitHub only"
+  ],
+  "request": "Freeze or correct this exact bounded interface/privilege design before implementation; existing ready status transition is sufficient, but missing workload metadata creation is included as indispensable third route. No live operations or further generic user approval requested."
+}

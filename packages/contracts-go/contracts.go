@@ -1587,3 +1587,57 @@ type ProjectNodeCertificateObservationResponse struct {
     Items []NodeCertificateObservation `json:"items"`
     Trust NodeCertificateTrustSummary `json:"trust"`
 }
+
+type WorkspaceFirstProfile struct {
+    NodeId NodeId `json:"nodeId"`
+    ProfileVersion string `json:"profileVersion"`
+    Images []string `json:"images"`
+    Executables []string `json:"executables"`
+    MaxCpuMillis int64 `json:"maxCpuMillis"`
+    MinMemoryBytes int64 `json:"minMemoryBytes"`
+    MaxMemoryBytes int64 `json:"maxMemoryBytes"`
+    MaxTimeoutSeconds int64 `json:"maxTimeoutSeconds"`
+    TerminalAllowed bool `json:"terminalAllowed"`
+}
+
+type WorkspaceFirstIntent struct {
+    WorkspaceId WorkspaceId `json:"workspaceId"`
+    WorkspaceVersion int64 `json:"workspaceVersion"`
+    WorkloadVersion int64 `json:"workloadVersion"`
+    WorkloadSha256 string `json:"workloadSha256"`
+    IntentEtag string `json:"intentEtag"`
+    Workload WorkloadSpec `json:"workload"`
+    ObservedAt Timestamp `json:"observedAt"`
+}
+
+type WorkspaceFirstIntentPage struct {
+    ProjectId ProjectId `json:"projectId"`
+    WorkspaceId WorkspaceId `json:"workspaceId"`
+    WorkspaceVersion int64 `json:"workspaceVersion"`
+    ObservedAt Timestamp `json:"observedAt"`
+    Profile WorkspaceFirstProfile `json:"profile"`
+    Items []WorkspaceFirstIntent `json:"items"`
+    NextCursor *WorkloadId `json:"nextCursor"`
+}
+
+type WorkspaceFirstIntentCreateInput struct {
+    Objective string `json:"objective"`
+    ImageDigest string `json:"imageDigest"`
+    Command []string `json:"command"`
+    Resources WorkspaceFirstResources `json:"resources"`
+    TimeoutSeconds int64 `json:"timeoutSeconds"`
+}
+
+type WorkspaceFirstRunCreateResult struct {
+    Run ControlRunView `json:"run"`
+    Intent WorkspaceFirstIntent `json:"intent"`
+    RequesterId string `json:"requesterId"`
+    ObservedAt Timestamp `json:"observedAt"`
+}
+
+type WorkspaceFirstResources struct {
+    CpuMillis int64 `json:"cpuMillis"`
+    MemoryBytes int64 `json:"memoryBytes"`
+    GpuCount int64 `json:"gpuCount"`
+    MinVramBytes int64 `json:"minVramBytes"`
+}

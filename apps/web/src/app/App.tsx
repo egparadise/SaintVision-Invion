@@ -123,16 +123,32 @@ export const App: React.FC = () => {
   const workspaceRequest = useRef(0);
   const nodeRequest = useRef(0);
 
+  const nodeAppliedRef = useRef(0);
+  const runAppliedRef = useRef(0);
+  const approvalAppliedRef = useRef(0);
+  const workspaceAppliedRef = useRef(0);
+
+  const nodeAbortRef = useRef<AbortController | null>(null);
+  const runAbortRef = useRef<AbortController | null>(null);
+  const approvalAbortRef = useRef<AbortController | null>(null);
+  const workspaceAbortRef = useRef<AbortController | null>(null);
+
   const resetAuthenticatedState = React.useCallback((errorMessage?: string | null) => {
     clearSessionExpiration();
     clearAuthToken();
     _resetKernelMutationCache();
+
+    nodeAbortRef.current?.abort();
+    runAbortRef.current?.abort();
+    approvalAbortRef.current?.abort();
+    workspaceAbortRef.current?.abort();
+
     sessionRef.current += 1;
     scopeRef.current += 1;
-    runRequest.current += 1;
-    approvalRequest.current += 1;
-    workspaceRequest.current += 1;
-    nodeRequest.current += 1;
+    nodeAppliedRef.current = ++nodeRequest.current;
+    runAppliedRef.current = ++runRequest.current;
+    approvalAppliedRef.current = ++approvalRequest.current;
+    workspaceAppliedRef.current = ++workspaceRequest.current;
 
     activeProject.current = '';
 
@@ -201,11 +217,22 @@ export const App: React.FC = () => {
 
   const selectedProject = projects.find(p => p.id === projectId);
   const chooseProject = (id: string) => {
+    nodeAbortRef.current?.abort();
+    runAbortRef.current?.abort();
+    approvalAbortRef.current?.abort();
+    workspaceAbortRef.current?.abort();
+
     scopeRef.current += 1;
+    nodeAppliedRef.current = ++nodeRequest.current;
+    runAppliedRef.current = ++runRequest.current;
+    approvalAppliedRef.current = ++approvalRequest.current;
+    workspaceAppliedRef.current = ++workspaceRequest.current;
     activeProject.current = id;
     setRunError(null); setApprovalError(null); setWorkspaceError(null); setNodeError(null);
     setProjectId(id); setRuns([]); setApprovals([]); setWorkspaces([]);
     setNodes([]); setCertificateObservation(null);
+    setNodesState('idle'); setRunsState('idle'); setApprovalsState('idle'); setWorkspacesState('idle');
+    setLastNodesFetchedAt(null); setLastRunsFetchedAt(null); setLastApprovalsFetchedAt(null);
     setSelectedNodeId(null); setNodeResourceUsage(null); setNodeResourceUsageState('idle'); setNodeResourceUsageError(null);
     setSelectedRunId(null); setSelectedWorkspaceId(null); setEvidenceRunId(null);
     setStudioWorkspaceId(null); setStudioRunId(null); setStudioNodeId(null); setStudioStep(1);
@@ -278,7 +305,8 @@ export const App: React.FC = () => {
     setActiveTab('studio');
   };
 
-  const fetchNodes = React.useCallback(async () => {
+  const fetchNodes = React.useCallback(async (isBackground: boolean | any = false) => {
+    const isBg = isBackground === true;
     if (!currentUser) {
       setNodesState('idle');
       return;
@@ -288,18 +316,37 @@ export const App: React.FC = () => {
       setNodesState('idle');
       return;
     }
+
+    if (!isBg && nodeAbortRef.current) {
+      nodeAbortRef.current.abort();
+    }
+
     const currentSession = sessionRef.current;
     const currentScope = scopeRef.current;
     const request = ++nodeRequest.current;
-    setNodesState('loading');
-    setNodeError(null);
+
+    const controller = new AbortController();
+    nodeAbortRef.current = controller;
+
+    // Documented finite timeout: 10,000ms (10s)
+    // Ensures hanging/504 requests become explicit error/stale, never indefinite 0 success
+    const timeoutId = setTimeout(() => {
+      controller.abort(new Error('REQUEST_TIMEOUT'));
+    }, 10000);
+
+    if (!isBg) {
+      setNodesState('loading');
+      setNodeError(null);
+    }
     try {
       let page: NodePageResponse;
       try {
-        page = await apiClient<NodePageResponse>(`/v1/projects/${encodeURIComponent(targetPrj)}/nodes`);
+        page = await apiClient<NodePageResponse>(`/v1/projects/${encodeURIComponent(targetPrj)}/nodes`, {
+          signal: controller.signal,
+        });
       } catch (err: any) {
         if (isRouteNotFoundError(err)) {
-          page = await apiClient<NodePageResponse>('/v1/nodes');
+          page = await apiClient<NodePageResponse>('/v1/nodes', { signal: controller.signal });
         } else {
           throw err;
         }
@@ -307,12 +354,17 @@ export const App: React.FC = () => {
 
       let certObs: ProjectNodeCertificateObservationResponse | null = null;
       try {
-        certObs = await fetchProjectNodeCertificates(targetPrj);
-      } catch {
+        certObs = await fetchProjectNodeCertificates(targetPrj, controller.signal);
+      } catch (err: any) {
+        if (controller.signal.aborted) {
+          throw err;
+        }
         certObs = null;
       }
 
-      if (sessionRef.current === currentSession && scopeRef.current === currentScope && request === nodeRequest.current) {
+      clearTimeout(timeoutId);
+      if (sessionRef.current === currentSession && scopeRef.current === currentScope && request > nodeAppliedRef.current) {
+        nodeAppliedRef.current = request;
         setNodes(page.items.map(observedNode));
         setCertificateObservation(certObs);
         setNodesState('success');
@@ -320,90 +372,217 @@ export const App: React.FC = () => {
         setNodeError(null);
       }
     } catch (err: any) {
-      if (sessionRef.current === currentSession && scopeRef.current === currentScope && request === nodeRequest.current) {
-        setNodes([]);
-        setCertificateObservation(null);
-        setNodesState('error');
-        setNodeError(err?.message || '노드 목록을 확인하지 못했습니다.');
+      clearTimeout(timeoutId);
+      const isTimeout = controller.signal.aborted && (
+        controller.signal.reason?.message === 'REQUEST_TIMEOUT' ||
+        controller.signal.reason === 'REQUEST_TIMEOUT'
+      );
+      if (controller.signal.aborted && !isTimeout) {
+        return;
       }
+      if (sessionRef.current === currentSession && scopeRef.current === currentScope && request > nodeAppliedRef.current) {
+        nodeAppliedRef.current = request;
+        setNodesState('error');
+        const msg = isTimeout
+          ? '클러스터 노드 응답 시간 초과 (10s Timeout)'
+          : (err?.message || '노드 목록을 확인하지 못했습니다.');
+        setNodeError(msg);
+      }
+    } finally {
+      clearTimeout(timeoutId);
     }
   }, [currentUser, projectId]);
 
-  const fetchRuns = React.useCallback(async () => {
+  const fetchRuns = React.useCallback(async (isBackground: boolean | any = false) => {
+    const isBg = isBackground === true;
     if (!currentUser || !projectId || activeProject.current !== projectId) return;
+
+    if (!isBg && runAbortRef.current) {
+      runAbortRef.current.abort();
+    }
+
     const currentSession = sessionRef.current;
     const scope = scopeRef.current;
     const request = ++runRequest.current;
-    setRunsState('loading');
+
+    const controller = new AbortController();
+    runAbortRef.current = controller;
+
+    const timeoutId = setTimeout(() => {
+      controller.abort(new Error('REQUEST_TIMEOUT'));
+    }, 10000);
+
+    if (!isBg) {
+      setRunsState('loading');
+      setRunError(null);
+    }
     try {
-      const items = await fetchObservedRuns(projectId);
-      if (sessionRef.current === currentSession && scopeRef.current === scope && request === runRequest.current) {
+      const items = await fetchObservedRuns(projectId, { signal: controller.signal });
+      clearTimeout(timeoutId);
+      if (sessionRef.current === currentSession && scopeRef.current === scope && request > runAppliedRef.current) {
+        runAppliedRef.current = request;
         setRuns(items);
         setRunsState('success');
         setLastRunsFetchedAt(new Date());
         setRunError(null);
       }
     } catch (err: any) {
-      if (sessionRef.current === currentSession && scopeRef.current === scope && request === runRequest.current) {
-        setRuns([]);
+      clearTimeout(timeoutId);
+      const isTimeout = controller.signal.aborted && (
+        controller.signal.reason?.message === 'REQUEST_TIMEOUT' ||
+        controller.signal.reason === 'REQUEST_TIMEOUT'
+      );
+      if (controller.signal.aborted && !isTimeout) {
+        return;
+      }
+      if (sessionRef.current === currentSession && scopeRef.current === scope && request > runAppliedRef.current) {
+        runAppliedRef.current = request;
         setRunsState('error');
         const prob = err?.problem;
-        const msg = prob?.code
+        const msg = isTimeout
+          ? 'Run 목록 응답 시간 초과 (10s Timeout)'
+          : prob?.code
           ? `[${prob.code}] ${prob.detail} (traceId: ${prob.traceId})`
           : (err?.message || 'Run 목록을 확인하지 못했습니다.');
         setRunError(msg);
       }
+    } finally {
+      clearTimeout(timeoutId);
     }
   }, [currentUser, projectId]);
 
-  const fetchApprovals = React.useCallback(async () => {
+  const fetchApprovals = React.useCallback(async (isBackground: boolean | any = false) => {
+    const isBg = isBackground === true;
     if (!currentUser || !projectId || activeProject.current !== projectId) return;
+
+    if (!isBg && approvalAbortRef.current) {
+      approvalAbortRef.current.abort();
+    }
+
     const currentSession = sessionRef.current;
     const scope = scopeRef.current;
     const request = ++approvalRequest.current;
-    setApprovalsState('loading');
+
+    const controller = new AbortController();
+    approvalAbortRef.current = controller;
+
+    const timeoutId = setTimeout(() => {
+      controller.abort(new Error('REQUEST_TIMEOUT'));
+    }, 10000);
+
+    if (!isBg) {
+      setApprovalsState('loading');
+      setApprovalError(null);
+    }
     try {
-      const items = await fetchObservedApprovals(projectId);
-      if (sessionRef.current === currentSession && scopeRef.current === scope && request === approvalRequest.current) {
+      const items = await fetchObservedApprovals(projectId, { signal: controller.signal });
+      clearTimeout(timeoutId);
+      if (sessionRef.current === currentSession && scopeRef.current === scope && request > approvalAppliedRef.current) {
+        approvalAppliedRef.current = request;
         setApprovals(items);
         setApprovalsState('success');
         setLastApprovalsFetchedAt(new Date());
         setApprovalError(null);
       }
     } catch {
-      if (sessionRef.current === currentSession && scopeRef.current === scope && request === approvalRequest.current) {
-        setApprovals([]);
-        setApprovalsState('error');
-        setApprovalError('승인 목록을 확인하지 못했습니다.');
+      clearTimeout(timeoutId);
+      const isTimeout = controller.signal.aborted && (
+        controller.signal.reason?.message === 'REQUEST_TIMEOUT' ||
+        controller.signal.reason === 'REQUEST_TIMEOUT'
+      );
+      if (controller.signal.aborted && !isTimeout) {
+        return;
       }
+      if (sessionRef.current === currentSession && scopeRef.current === scope && request > approvalAppliedRef.current) {
+        approvalAppliedRef.current = request;
+        setApprovalsState('error');
+        const msg = isTimeout
+          ? '승인 목록 응답 시간 초과 (10s Timeout)'
+          : '승인 목록을 확인하지 못했습니다.';
+        setApprovalError(msg);
+      }
+    } finally {
+      clearTimeout(timeoutId);
     }
   }, [currentUser, projectId]);
 
-  const fetchWorkspaces = React.useCallback(async () => {
+  const fetchWorkspaces = React.useCallback(async (isBackground: boolean | any = false) => {
+    const isBg = isBackground === true;
     if (!currentUser || !projectId || activeProject.current !== projectId) {
       setWorkspacesState('idle');
       return;
     }
+
+    if (!isBg && workspaceAbortRef.current) {
+      workspaceAbortRef.current.abort();
+    }
+
     const currentSession = sessionRef.current;
     const scope = scopeRef.current;
     const request = ++workspaceRequest.current;
-    setWorkspacesState('loading');
-    setWorkspaceError(null);
+
+    const controller = new AbortController();
+    workspaceAbortRef.current = controller;
+
+    const timeoutId = setTimeout(() => {
+      controller.abort(new Error('REQUEST_TIMEOUT'));
+    }, 10000);
+
+    if (!isBg) {
+      setWorkspacesState('loading');
+      setWorkspaceError(null);
+    }
     try {
-      const items = await fetchProjectWorkspaces(projectId);
-      if (sessionRef.current === currentSession && scopeRef.current === scope && request === workspaceRequest.current) {
+      const items = await fetchProjectWorkspaces(projectId, { signal: controller.signal });
+      clearTimeout(timeoutId);
+      if (sessionRef.current === currentSession && scopeRef.current === scope && request > workspaceAppliedRef.current) {
+        workspaceAppliedRef.current = request;
         setWorkspaces(items.map(toWorkspaceItem));
         setWorkspacesState('success');
         setWorkspaceError(null);
       }
     } catch (err: any) {
-      if (sessionRef.current === currentSession && scopeRef.current === scope && request === workspaceRequest.current) {
-        setWorkspaces([]);
-        setWorkspacesState('error');
-        setWorkspaceError(err?.message || 'Workspace 목록을 확인하지 못했습니다.');
+      clearTimeout(timeoutId);
+      const isTimeout = controller.signal.aborted && (
+        controller.signal.reason?.message === 'REQUEST_TIMEOUT' ||
+        controller.signal.reason === 'REQUEST_TIMEOUT'
+      );
+      if (controller.signal.aborted && !isTimeout) {
+        return;
       }
+      if (sessionRef.current === currentSession && scopeRef.current === scope && request > workspaceAppliedRef.current) {
+        workspaceAppliedRef.current = request;
+        setWorkspacesState('error');
+        const msg = isTimeout
+          ? 'Workspace 목록 응답 시간 초과 (10s Timeout)'
+          : (err?.message || 'Workspace 목록을 확인하지 못했습니다.');
+        setWorkspaceError(msg);
+      }
+    } finally {
+      clearTimeout(timeoutId);
     }
   }, [currentUser, projectId]);
+
+  const handleManualRetryNodes = React.useCallback(async () => {
+    await fetchNodes(false);
+  }, [fetchNodes]);
+
+  const handleManualRetryRuns = React.useCallback(async () => {
+    await fetchRuns(false);
+  }, [fetchRuns]);
+
+  const handleManualRetryApprovals = React.useCallback(async () => {
+    await fetchApprovals(false);
+  }, [fetchApprovals]);
+
+  useEffect(() => {
+    return () => {
+      nodeAbortRef.current?.abort();
+      runAbortRef.current?.abort();
+      approvalAbortRef.current?.abort();
+      workspaceAbortRef.current?.abort();
+    };
+  }, []);
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
@@ -411,19 +590,19 @@ export const App: React.FC = () => {
 
   // Initial load from live backend endpoints
   useEffect(() => {
-    fetchNodes();
-    fetchRuns();
-    fetchApprovals();
-    fetchWorkspaces();
+    fetchNodes(false);
+    fetchRuns(false);
+    fetchApprovals(false);
+    fetchWorkspaces(false);
   }, [fetchNodes, fetchRuns, fetchApprovals, fetchWorkspaces]);
 
   // Periodic Telemetry Sync (Genuine Server Polling, Zero Synthetic Fluctuations)
   useEffect(() => {
     const interval = setInterval(() => {
-      fetchNodes();
-      fetchRuns();
-      fetchApprovals();
-      fetchWorkspaces();
+      fetchNodes(true);
+      fetchRuns(true);
+      fetchApprovals(true);
+      fetchWorkspaces(true);
     }, 5000);
     return () => clearInterval(interval);
   }, [fetchNodes, fetchRuns, fetchApprovals, fetchWorkspaces]);
@@ -437,6 +616,9 @@ export const App: React.FC = () => {
     const currentScope = scopeRef.current;
     try {
       setActionError(null);
+      if (approvalsState === 'error') {
+        throw new Error('안건 목록이 갱신 실패(stale) 상태이므로 새로고침 후 다시 시도하십시오.');
+      }
       const approval = approvals.find((a) => a.id === approvalId);
       if (!approval || activeProject.current !== approval.projectId) throw new Error('승인 안건을 다시 선택하세요.');
       await approveReviewed(approval, shown);
@@ -461,6 +643,9 @@ export const App: React.FC = () => {
     const currentScope = scopeRef.current;
     try {
       setActionError(null);
+      if (approvalsState === 'error') {
+        throw new Error('안건 목록이 갱신 실패(stale) 상태이므로 새로고침 후 다시 시도하십시오.');
+      }
       const approval = approvals.find((a) => a.id === approvalId);
       if (!approval) throw new Error('승인 요청을 새로고침하세요.');
       await decideApproval(approval, 'reject');
@@ -551,7 +736,7 @@ export const App: React.FC = () => {
         key={`${currentUser.tenantId}:${currentUser.id}:${projectId}`} projectId={projectId}
         tenantId={currentUser.tenantId}
         nodes={nodes} runs={runs} approvals={approvals} workspaces={workspaces}
-        currentReviewerId={currentUser.id} onRefreshNodes={fetchNodes}
+        currentReviewerId={currentUser.id} onRefreshNodes={handleManualRetryNodes}
         onApprove={handleApprove} onReject={handleReject} onChangeUser={() => {}}
         onSwitchToPortalView={() => setDesktop(false)} currentTheme={theme}
         onToggleTheme={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
@@ -566,8 +751,8 @@ export const App: React.FC = () => {
         onSwitchToDesktop={currentUser && projectId ? () => setDesktop(true) : undefined}
         currentTheme={theme}
         onToggleTheme={toggleTheme}
-        onlineNodesCount={nodes.filter((n) => n.status === 'online').length}
-        totalNodesCount={nodes.length}
+        onlineNodesCount={lastNodesFetchedAt ? nodes.filter((n) => n.status === 'online').length : null}
+        totalNodesCount={lastNodesFetchedAt ? nodes.length : null}
         activeTab={activeTab}
         onSelectTab={(tab) => {
           setActiveTab(tab);
@@ -621,7 +806,7 @@ export const App: React.FC = () => {
             nodesState={nodesState}
             nodeError={nodeError}
             lastFetchedAt={lastNodesFetchedAt}
-            onRefresh={fetchNodes}
+            onRefresh={handleManualRetryNodes}
             onNavigate={(tab) => {
               setActiveTab(tab);
               setSelectedNodeId(null);
@@ -649,7 +834,7 @@ export const App: React.FC = () => {
               if (tab === 'runs' && entityId) setSelectedRunId(entityId);
               if (tab === 'nodes' && entityId) setSelectedNodeId(entityId);
             }}
-            onRefreshRuns={fetchRuns}
+            onRefreshRuns={handleManualRetryRuns}
             onApprove={handleApprove}
             onReject={handleReject}
           />
@@ -691,7 +876,7 @@ export const App: React.FC = () => {
                   <span style={{ fontWeight: 600, color: 'var(--color-text-muted)' }}>화면 상태 시뮬레이션:</span>
                   {(
                     [
-                      { key: 'normal', label: '정상 (5대 온라인)' },
+                      { key: 'normal', label: '정상 관측' },
                       { key: 'loading', label: '로딩 중 (Skeleton)' },
                       { key: 'empty', label: '빈 상태 (Empty)' },
                       { key: 'error', label: '오류 (RFC 9457)' },
@@ -767,7 +952,7 @@ export const App: React.FC = () => {
             nodes={nodes}
             nodesState={nodesState}
             nodesError={nodeError}
-            onRetryNodes={fetchNodes}
+            onRetryNodes={handleManualRetryNodes}
             tenantId={currentUser?.tenantId}
             lastFetchedAt={lastNodesFetchedAt}
             onSelectNode={(id) => {
@@ -869,7 +1054,7 @@ export const App: React.FC = () => {
 
         {/* Tab 2.9: Admin Security & Audit Console (S08-FE) */}
         {activeTab === 'admin' && (
-          <AdminSecurityConsole nodes={nodes} onRefreshNodes={fetchNodes} currentUser={currentUser} />
+          <AdminSecurityConsole nodes={nodes} onRefreshNodes={handleManualRetryNodes} currentUser={currentUser} />
         )}
 
         {/* Tab 2.10: Natural Language Requester & Bounded Agent (S09-FE) */}
@@ -905,7 +1090,7 @@ export const App: React.FC = () => {
                 onNavigateApproval={() => setActiveTab('approvals')}
                 onNavigateRun={(id) => setSelectedRunId(id)}
                 onCancelRun={handleCancelRun}
-                onRefreshRun={fetchRuns}
+                onRefreshRun={handleManualRetryRuns}
                 onOpenStudio={(runId) => handleOpenStudio({ step: 4, runId })}
               />
             ) : (
@@ -917,7 +1102,7 @@ export const App: React.FC = () => {
                 runsState={runsState}
                 runError={runError}
                 lastFetchedAt={lastRunsFetchedAt}
-                onRefresh={fetchRuns}
+                onRefresh={handleManualRetryRuns}
               />
             )}
           </div>
@@ -934,7 +1119,7 @@ export const App: React.FC = () => {
             approvalsState={approvalsState}
             approvalError={approvalError}
             lastFetchedAt={lastApprovalsFetchedAt}
-            onRefresh={fetchApprovals}
+            onRefresh={handleManualRetryApprovals}
           />
         )}
 
