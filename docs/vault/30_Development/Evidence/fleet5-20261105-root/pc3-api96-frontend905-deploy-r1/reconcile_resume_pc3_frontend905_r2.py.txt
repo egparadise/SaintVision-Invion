@@ -1,0 +1,25 @@
+"""Reconcile the exact partial public staging; resume before first image load/start."""
+import ast,datetime,hashlib,json,shlex,subprocess
+from pathlib import Path
+r=Path(__file__).resolve().parents[1];w=r/'.work';out=w/'pc3-frontend905-r2';assert not out.exists();out.mkdir()
+old=json.loads((w/'pc3-frontend905-r1/receipt.json').read_bytes());assert old['SSHExit']==2 and old['remote']['phase']=='input-pins' and old['remote']['errorClass']=='PermissionError' and 'containerID' not in old['remote']
+tree=ast.parse((w/'stage_start_pc3_frontend905_r1.py').read_text(encoding='utf8'));remote=next(ast.literal_eval(x.value) for x in tree.body if isinstance(x,ast.Assign) and any(isinstance(t,ast.Name) and t.id=='remote' for t in x.targets))
+begin=remote.index(" dist=root/'dist';dist.mkdir(mode=0o700)");end=remote.index(" phase='official-image-load'")
+replacement=''' phase='reconcile-exact-partial-public-dist'
+ assert not (root/'image-load.stdout.txt').exists() and not (root/'nginx-test.stderr.txt').exists()
+ prior=json.loads((root/'public-receipt.json').read_bytes());assert prior['phase']=='input-pins' and prior['errorClass']=='PermissionError' and 'containerID' not in prior
+ dist=root/'dist';assert dist.is_dir() and not dist.is_symlink()
+ with zipfile.ZipFile(root/'saintvision-web-dist.zip') as z:
+  assert len(z.namelist())==13 and sorted(str(f.relative_to(dist)) for f in dist.rglob('*') if f.is_file())==sorted(z.namelist())
+  for item in z.infolist():
+   f=dist/item.filename;assert not f.is_symlink() and f.read_bytes()==z.read(item) and f.stat().st_uid==1000 and stat.S_IMODE(f.stat().st_mode)==0o444
+ o['partialStagingReconciledBeforeImageLoad']=True;o['originalFailure']='Public auth file was made 0444 before intentional operator override; no image loaded or product started'
+ auth=dist/'auth-config.js';auth.chmod(0o600);auth.write_bytes((root/'auth-config.js').read_bytes());auth.chmod(0o444)
+ for d in [dist,dist/'assets']:d.chmod(0o555)
+'''
+remote=remote[:begin]+replacement+remote[end:];remote=remote.replace("(root/'public-receipt.json').write_text", "(root/'public-resume-r2-receipt.json').write_text")
+(out/'remote-reconcile-resume-program.py.txt').write_text(remote,encoding='utf8')
+pub=w/'pc3-frontend905-r1';p={'root':'/home/saintvision-invion3/saintvision-share/ops-fresh-cpu-1efea-r1-20261107/portal905-r1','source':'96afd799d49717fd40e4ddabd538d82accbe1958','frontendSource':'90578f49ea400958fcdbc1ded3908d624e856f57','imageIndex':'sha256:763c78244f1345d85bc4c5373cf390a3eff2129045f7f4e487aee045dd751fd4','configID':'sha256:a0947d47c26b5f932c3318e9ff87a8ec958b2738713c7e34e6c9dfad464dc0f1','tarSHA256':'af36792572454f4543251e57b46c05ceef45c581e5e8a0b1f8950a87dae558dd','webSHA256':'5045f2ef1f6f120c1ee644168a21979e1f7df3f88241bb49c0397f5b244e2bf0','publicFiles':{n:hashlib.sha256((pub/n).read_bytes()).hexdigest() for n in ['nginx.conf','security-headers.conf','auth-config.js']}}
+known=Path(r'D:\Project\SaintVisionI-Invion\fleet5-worker-readiness-20261105\.work\f5-low-closure-26607075f612\known_hosts.f5.pinned');kh='0dcbf0f4cfc363e4affc30810ad8a9e57bd2c4a31991e2c8285bdae7052ec2d2';assert hashlib.sha256(known.read_bytes()).hexdigest()==kh
+q=subprocess.run(['ssh','-T','-i',r'C:\Users\inviz\.ssh\sv-lan-ed25519','-o','IdentitiesOnly=yes','-o','BatchMode=yes','-o','ConnectTimeout=5','-o','StrictHostKeyChecking=yes','-o','UserKnownHostsFile='+str(known),'saintvision-invion3@192.168.45.222','python3','-I','-B','-c',shlex.quote(remote)],input=json.dumps(p).encode(),capture_output=True,timeout=135)
+receipt={'atKST':datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=9))).isoformat(timespec='seconds'),'SSHExit':q.returncode,'stderrBytes':len(q.stderr),'knownHostsUnchanged':hashlib.sha256(known.read_bytes()).hexdigest()==kh,'remote':json.loads(q.stdout) if q.stdout else None};(out/'receipt.json').write_text(json.dumps(receipt,indent=2)+'\n');print(json.dumps(receipt),flush=True);assert q.returncode==0 and not q.stderr

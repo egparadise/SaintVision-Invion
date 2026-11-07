@@ -1,0 +1,47 @@
+"""Fresh real owner login; validate new PC3 API through the dedicated SSH forward."""
+import ast
+from pathlib import Path
+r=Path(__file__).resolve().parents[1]
+original=Path(r'D:\Project\SaintVisionI-Invion\admin-login-20261106\.work\verify_requested_login.py').read_text(encoding='utf-8')
+head=original[:original.index("    stage='Business session'")]
+head=head.replace('ROOT=Path(__file__).resolve().parents[1]',"ROOT=Path(r'D:\\Project\\SaintVisionI-Invion\\admin-login-20261106')")
+head=head.replace("'http://127.0.0.1:3100/v1/session'","'http://127.0.0.1:18080/v1/session'").replace("'http://127.0.0.1:3100'+path","'http://127.0.0.1:18080'+path")
+head=head.replace("windows_trust=os.environ.get('SV_VERIFY_WINDOWS_TRUST')=='1'","windows_trust=False")
+head=head.replace("assert urllib.parse.urlsplit(action).netloc=='127.0.0.1:8443'","assert (urllib.parse.urlsplit(action).scheme,urllib.parse.urlsplit(action).netloc)==('https','127.0.0.1:8443')")
+head=head.replace('urllib.request.build_opener(urllib.request.HTTPSHandler','urllib.request.build_opener(urllib.request.ProxyHandler({}),urllib.request.HTTPSHandler')
+head=head.replace("stage='anonymous session'","urllib.request.install_opener(urllib.request.build_opener(urllib.request.ProxyHandler({})))\nstage='anonymous session'")
+tail=r'''
+    stage='new-api-real-owner-session-permission-and-three-nodes'
+    ss,session=api('/v1/session');ps,permission=api('/v1/projects/'+account['project']+'/permissions/me')
+    assert permission['userId']==account['businessUserId'] and permission['roleCode']=='owner' and permission['canAdminister'] is True
+    ns,nodes=api('/v1/projects/'+account['project']+'/nodes');cs,capacity=api('/v1/projects/'+account['project']+'/capacity')
+    assert len(nodes['items'])==3 and capacity['totalOffered']=={'cpuMillis':1500,'memoryBytes':201326592}
+    work=Path(r'D:\Project\SaintVisionI-Invion\fleet-five-orchestration-20261105\.work')
+    plan=json.loads((work/'one-cpu-node-plan-r1.public.json').read_bytes());expected={plan['newPlannedIDs']['nodeId']}|{json.loads((work/'pc24-new-node-preparation-r2'/(pc+'-public-plan.json')).read_bytes())['newPlannedIDs']['nodeId'] for pc in ['PC2','PC4']}
+    assert {n['nodeId'] for n in nodes['items']}==expected
+    measured=[]
+    for n in nodes['items']:
+        us,usage=api('/v1/projects/'+account['project']+'/nodes/'+n['nodeId']+'/resource-usage')
+        age=(datetime.datetime.now(datetime.timezone.utc)-datetime.datetime.fromisoformat(n['lastHeartbeatAt'])).total_seconds()
+        assert n['status']=='online' and 0<=age<20 and us==200 and all(x['measured'] for x in usage['resources'])
+        measured.append({'nodeId':n['nodeId'],'status':n['status'],'heartbeatAgeSeconds':age,'resourceUsageHTTP':us,'measuredResources':len(usage['resources'])})
+    stage='actual-business-workspace-list-and-new-scoped-intent-route'
+    ws,workspaces=api('/v1/projects/'+account['project']+'/workspaces');assert workspaces['projectId']==account['project'] and workspaces['count']==len(workspaces['workspaces'])
+    values=[]
+    for item in workspaces['workspaces']:
+        value={k:item[k] for k in ['workspaceId','projectId','status','version','nodeId'] if k in item}
+        path='/v1/projects/'+account['project']+'/workspaces/'+item['workspaceId']+'/first-intents'
+        try:status,result=api(path)
+        except urllib.error.HTTPError as error:
+            status=error.code;result=json.load(error)
+        assert status!=404 and (status==200 if item['status']=='ready' else status in [403,409,503])
+        value.update(firstIntentsHTTP=status,problemCode=result.get('code'),serverPageReturned=status==200);values.append(value)
+    receipt={'atKST':datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=9))).isoformat(timespec='seconds'),'status':'NEW_PC3_API_REAL_OWNER_PKCE_AND_CURRENT_PROJECT_VERIFIED','target':'Main127.0.0.1:18080 SSH to PC3 API127.0.0.1:8080','source':'96afd799d49717fd40e4ddabd538d82accbe1958','PKCES256':True,'tokenExchangeHTTP':token_status,'sessionHTTP':ss,'administratorPermissionHTTP':ps,'roleCode':permission['roleCode'],'canAdminister':permission['canAdminister'],'canRequest':permission['canRequest'],'canApprove':permission['canApprove'],'nodesHTTP':ns,'capacityHTTP':cs,'currentProjectNodes':measured,'totalOffered':capacity['totalOffered'],'workspacesHTTP':ws,'workspaces':values,'anonymousSessionHTTP':anonymous,'explicitExistingPublicChainTLSVerified':True,'insecureTLSUsed':False,'passwordOrTokensPersisted':False,'portalRouteChanged':False,'workspaceReadinessChanged':False,'actualRunOrVotesCreated':False,'wholeProgramComplete':False}
+    dest=work/'api96-fresh-owner-validation-r1.json';assert not dest.exists();dest.write_bytes((json.dumps(receipt,indent=2)+'\n').encode())
+    del token,tokens,token_body,query
+    print(json.dumps(receipt),flush=True)
+except Exception as e:
+    print(json.dumps({'failedStage':stage,'errorType':type(e).__name__,'detailsSuppressed':True}),flush=True);raise SystemExit(1)
+'''
+program=head+tail;ast.parse(program)
+exec(compile(program,str(__file__),'exec'),{'__file__':str(__file__),'__name__':'__main__'})

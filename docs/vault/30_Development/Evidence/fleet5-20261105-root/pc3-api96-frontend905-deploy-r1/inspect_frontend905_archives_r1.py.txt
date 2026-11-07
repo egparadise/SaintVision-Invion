@@ -1,0 +1,15 @@
+import hashlib,json,subprocess,zipfile
+from pathlib import Path
+r=Path(__file__).resolve().parents[1];o=r/'.work/frontend905-artifacts-r1';o.mkdir(exist_ok=True)
+art=json.loads((r/'.work/first-workspace-905-root-verification-r1/frontend-artifacts.json').read_bytes())
+result=[]
+for a in art['artifacts']:
+ p=o/(a['name']+'.zip')
+ if not p.exists():
+  with p.open('xb') as f:q=subprocess.run([r'C:\Program Files\GitHub CLI\gh.exe','api',f'repos/egparadise/SaintVision-Invion/actions/artifacts/{a["id"]}/zip'],stdout=f,stderr=subprocess.PIPE,timeout=90)
+  assert q.returncode==0,('artifact-download',q.returncode)
+ assert p.stat().st_size==a['size_in_bytes'] and hashlib.file_digest(p.open('rb'),'sha256').hexdigest()==a['digest'].removeprefix('sha256:')
+ with zipfile.ZipFile(p) as z:
+  names=z.namelist();assert len(names)==len(set(names));assert all(not n.startswith(('/','\\')) and '..' not in n.replace('\\','/').split('/') for n in names)
+  result.append({'artifactID':a['id'],'source':a['workflow_run']['head_sha'],'file':str(p),'bytes':p.stat().st_size,'SHA256':a['digest'],'entries':len(names),'firstNames':names[:24]})
+(o/'archive-inspection.json').write_text(json.dumps(result,indent=2)+'\n',encoding='utf8');print(json.dumps(result))

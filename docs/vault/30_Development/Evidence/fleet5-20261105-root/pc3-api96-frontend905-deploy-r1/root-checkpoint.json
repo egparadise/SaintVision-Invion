@@ -1,0 +1,46 @@
+{
+  "atKST": "2026-11-08T01:14:46+09:00",
+  "taskID": "FLEET5-PC3-API96-DEPLOY-R1-20261108",
+  "owner": "Root Codex",
+  "managementBase": "a9f911ff50655aa1a9a9dda4cd8b774ec20d5f35",
+  "acceptedSource": "96afd799d49717fd40e4ddabd538d82accbe1958",
+  "actualIndependentAcceptance": "86acd9816f3ba397d02a07e90d2e912e414b1bac",
+  "codeReviewForFeature": "COMPLETE_CR90501_CLOSED",
+  "actualSchemaHead": "0068_first_workspace_intent",
+  "schemaAppliedOnce": true,
+  "publicAPIImageId": "sha256:1426226b8dd7093bf79909886808b83141dcd8f9b677c118b29c4be4a1c9de47",
+  "APIHealthHTTP": 200,
+  "realOwnerPKCEAndPermissionVerified": true,
+  "actualObservedPCs": [
+    2,
+    3,
+    4
+  ],
+  "actualCurrentHeartbeatAgesSeconds": [
+    1.726481,
+    2.17169,
+    2.695554
+  ],
+  "pilotOfferedTotal": {
+    "cpuMillis": 1500,
+    "memoryBytes": 201326592
+  },
+  "portal": "http://127.0.0.1:3100",
+  "actualFrontendBuildSource": "90578f49ea400958fcdbc1ded3908d624e856f57",
+  "frontendUnchangedAtAccepted96Source": true,
+  "frontendImageId": "sha256:763c78244f1345d85bc4c5373cf390a3eff2129045f7f4e487aee045dd751fd4",
+  "concreteRollbackReady": true,
+  "portalRouteChanged": true,
+  "mainOwnedNodePID62240StoppedOnlyAfterPinsAndBothRoutePreflight": true,
+  "newMainAppStarted": false,
+  "mainRAMStillConstrainedFreeBytes": 252862464,
+  "workspaceReadiness": "provisioning; first-intents403/AUTH-0045 correct fail-closed",
+  "browserAuthenticationAndNoBlink": "PENDING",
+  "twoRealDistinctNonrequesterApprovers": "PENDING_USER_IDENTITY_INPUT",
+  "PC1FixedKeyRegistration": "PENDING_USER_LOCAL_FEEDBACK",
+  "PC5NodeAndRAM": "HOLD",
+  "GPUStorageAllPhysicalResources": "NOT_ACCEPTED",
+  "transportReconnectRebootAndPKIRenewal": "PENDING",
+  "originalGates": "19HOLD/discharges0/runtimeB0/A1-A16/H1-H7/H3EA/RDNULL_HOLD/raw7UNREGISTERED/A01-A40NOT_RUN",
+  "wholeProgramComplete": false
+}

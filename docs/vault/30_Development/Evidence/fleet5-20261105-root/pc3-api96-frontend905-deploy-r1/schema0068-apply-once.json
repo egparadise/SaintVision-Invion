@@ -1,0 +1,52 @@
+{
+  "atKST": "2026-11-08T00:40:15+09:00",
+  "SSHExit": 0,
+  "stderrBytes": 0,
+  "knownHostsUnchanged": true,
+  "remote": {
+    "migrationApplied": true,
+    "applicationStarted": false,
+    "ownerCredentialPersisted": false,
+    "ownerCredentialInDockerConfigEnvOrArgv": false,
+    "privateValuesEmitted": false,
+    "wholeProgramComplete": false,
+    "migratorExit": 0,
+    "migratorStderrBytes": 302,
+    "headAfter": [
+      "0068_first_workspace_intent"
+    ],
+    "status": "REVIEWED_0068_APPLIED_ONCE_AND_EXACT17_CATALOGUE_VERIFIED",
+    "source": "96afd799d49717fd40e4ddabd538d82accbe1958",
+    "actualReview": "86acd9816f3ba397d02a07e90d2e912e414b1bac",
+    "headBefore": [
+      "0067_audit_reader_revoke"
+    ],
+    "selectedTenantRowCountsUnchanged": {
+      "public.users": 4,
+      "public.workspaces": 3,
+      "public.workloads": 0,
+      "public.runs": 0,
+      "inv.runs": 3,
+      "inv.business_runs": 0,
+      "inv.nodes": 4,
+      "inv.resources": 7
+    },
+    "old15Problems": 0,
+    "new17Problems": 0,
+    "dedicatedWriterRole": {
+      "nologin": true,
+      "nonsuper": true,
+      "nobypass": true,
+      "noinherit": true,
+      "nocreatedb": true,
+      "nocreaterole": true,
+      "no_memberships": true,
+      "no_schema_owner": true,
+      "no_table_owner": true
+    },
+    "backupSHA256": "aa667615f108f5c1121a534e485e0120a615ecbcd801df4630f58042ee167ce7",
+    "APIOrWorkerStarted": false,
+    "forwardFixOnly": true,
+    "actualRunOrVotesCreated": false
+  }
+}

@@ -1,0 +1,21 @@
+import ast,datetime,hashlib,json,shlex,subprocess
+from pathlib import Path
+r=Path(__file__).resolve().parents[1];out=r/'.work/pc3-portal-rollback-r2';assert not out.exists();out.mkdir();tree=ast.parse((r/'.work/prepare_remote_portal_rollback_r1.py').read_text(encoding='utf8'));old=next(ast.literal_eval(x.value) for x in tree.body if isinstance(x,ast.Assign) and any(isinstance(t,ast.Name) and t.id=='program' for t in x.targets))
+tail=old[old.index("name='saintvision-portal-b48-rollback-r1'"):]
+program='''import datetime,hashlib,json,os,stat,subprocess,sys,zipfile
+from pathlib import Path
+p=json.load(sys.stdin);root=Path(p['root']);dist=root/'dist';src=root.parent/'portal905-r1';assert os.getuid()==1000 and root.is_dir() and hashlib.file_digest((root/'b48.zip').open('rb'),'sha256').hexdigest()==p['digest']
+assert (root/'nginx.conf').read_text()==(src/'nginx.conf').read_text().replace('127.0.0.1:13100','127.0.0.1:13101').replace('http://127.0.0.1:8080','http://127.0.0.1:18081')
+assert (root/'security-headers.conf').read_bytes()==(src/'security-headers.conf').read_bytes()
+with zipfile.ZipFile(root/'b48.zip') as z:
+ assert sorted(str(f.relative_to(dist)) for f in dist.rglob('*') if f.is_file())==sorted(z.namelist())
+ for item in z.infolist():assert (dist/item.filename).read_bytes()==((src/'auth-config.js').read_bytes() if item.filename=='auth-config.js' else z.read(item))
+assert all(stat.S_IMODE((root/n).stat().st_mode)==0o600 for n in ['nginx.conf','security-headers.conf'])
+for n in ['nginx.conf','security-headers.conf']:(root/n).chmod(0o644)
+'''+tail
+program=program.replace("assert q.returncode==0\nq=subprocess.run(['docker','run','-d'", "(root/'nginx-test-r2.stdout.txt').write_bytes(q.stdout);(root/'nginx-test-r2.stderr.txt').write_bytes(q.stderr);assert q.returncode==0\nq=subprocess.run(['docker','run','-d'")
+(out/'remote-reconcile-program.py.txt').write_text(program,encoding='utf8');known=Path(r'D:\Project\SaintVisionI-Invion\fleet5-worker-readiness-20261105\.work\f5-low-closure-26607075f612\known_hosts.f5.pinned');assert hashlib.sha256(known.read_bytes()).hexdigest()=='0dcbf0f4cfc363e4affc30810ad8a9e57bd2c4a31991e2c8285bdae7052ec2d2'
+p={'root':'/home/saintvision-invion3/saintvision-share/ops-fresh-cpu-1efea-r1-20261107/portal-b48-rollback-r1','digest':'7212b4870e3a142b8c44dc2629d5e6643401ae9e1d187d6234ecdf4059fd671d'}
+q=subprocess.run(['ssh','-T','-i',r'C:\Users\inviz\.ssh\sv-lan-ed25519','-o','IdentitiesOnly=yes','-o','BatchMode=yes','-o','ConnectTimeout=5','-o','StrictHostKeyChecking=yes','-o','UserKnownHostsFile='+str(known),'saintvision-invion3@192.168.45.222','python3','-I','-B','-c',shlex.quote(program)],input=json.dumps(p).encode(),capture_output=True,timeout=55)
+(out/'stdout.txt').write_bytes(q.stdout);(out/'stderr.txt').write_bytes(q.stderr);print(json.dumps({'SSHExit':q.returncode,'stderrBytes':len(q.stderr),'remote':json.loads(q.stdout) if q.stdout else None}));assert q.returncode==0 and not q.stderr
+(out/'receipt.json').write_bytes(q.stdout)

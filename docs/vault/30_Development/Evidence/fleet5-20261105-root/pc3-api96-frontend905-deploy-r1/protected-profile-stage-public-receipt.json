@@ -1,0 +1,63 @@
+{
+  "atKST": "2026-11-08T00:33:47+09:00",
+  "SSHExit": 0,
+  "stderrBytes": 0,
+  "publicIdPJWKSHTTPSVerified": true,
+  "insecureTLSUsed": false,
+  "knownHostsUnchanged": true,
+  "remote": {
+    "DBWrites": false,
+    "schemaApplied": false,
+    "applicationStarted": false,
+    "ownerCredentialPersisted": false,
+    "privateValuesEmitted": false,
+    "wholeProgramComplete": false,
+    "selectedWorkspaceStatusCounts": [
+      {
+        "status": "provisioning",
+        "count": 1
+      }
+    ],
+    "selectedWorkloadCount": 0,
+    "status": "PROTECTED_API96_CONFIGURATION_STAGED_NOT_STARTED",
+    "sameNamedClusterEpochHead0067": true,
+    "restrictedRoleClasses": {
+      "runtime": {
+        "nonsuper": true,
+        "nobypass": true,
+        "kernel_member": true,
+        "app_member": false,
+        "no_schema_owner": true,
+        "no_table_owner": true
+      },
+      "business": {
+        "nonsuper": true,
+        "nobypass": true,
+        "kernel_member": false,
+        "app_member": true,
+        "no_schema_owner": true,
+        "no_table_owner": true
+      }
+    },
+    "APIProfileKeys": [
+      "runtimeDsn",
+      "businessDsn",
+      "recoveryEpoch"
+    ],
+    "WorkerProfileKeys": [
+      "runtimeDsn",
+      "recoveryEpoch"
+    ],
+    "privateProfilesMode": "0600",
+    "newRootsMode": "0700",
+    "serviceRoot": "/home/saintvision-invion3/saintvision-share/ops-fresh-cpu-1efea-r1-20261107/workspace-api-96af-r2",
+    "apiConfigSHA256": "ce40c3ded634ac4b381b1ff9f2872573121fc527fc3ddef74ef0ef2041d6ca93",
+    "publicJWKS_SHA256": "660f6f1d72b77f4e0bd0252d8f385a92e4c3ace65f7acb33f65052218ad0c9f9",
+    "publicJWKSExpiresAt": 1794152026,
+    "existingClientAndSignerMatched": true,
+    "CAOrNodePrivateKeyCopied": false,
+    "source": "96afd799d49717fd40e4ddabd538d82accbe1958",
+    "imageId": "sha256:1426226b8dd7093bf79909886808b83141dcd8f9b677c118b29c4be4a1c9de47",
+    "logicalWorkspaceMarkedReady": false
+  }
+}

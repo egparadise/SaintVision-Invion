@@ -1,0 +1,37 @@
+[
+  {
+    "artifactID": 13572229367,
+    "source": "90578f49ea400958fcdbc1ded3908d624e856f57",
+    "file": "D:\\Project\\SaintVisionI-Invion\\fleet-five-orchestration-20261105\\.work\\frontend905-artifacts-r1\\saintvision-web-dist.zip",
+    "bytes": 1148694,
+    "SHA256": "sha256:5045f2ef1f6f120c1ee644168a21979e1f7df3f88241bb49c0397f5b244e2bf0",
+    "entries": 13,
+    "firstNames": [
+      "assets/icons-DVYUNEhE.js",
+      "assets/icons-DVYUNEhE.js.map",
+      "assets/index-CpbRD_HK.js",
+      "assets/index-CpbRD_HK.js.map",
+      "assets/index-kKrfL4r3.css",
+      "assets/query-DtERyQJL.js",
+      "assets/query-DtERyQJL.js.map",
+      "assets/vendor-CYSfZuHu.js",
+      "assets/vendor-CYSfZuHu.js.map",
+      "auth-config.js",
+      "index.html",
+      "manifest.json",
+      "sw.js"
+    ]
+  },
+  {
+    "artifactID": 13572119449,
+    "source": "90578f49ea400958fcdbc1ded3908d624e856f57",
+    "file": "D:\\Project\\SaintVisionI-Invion\\fleet-five-orchestration-20261105\\.work\\frontend905-artifacts-r1\\saintvision-portal-release.zip",
+    "bytes": 26041723,
+    "SHA256": "sha256:4bfc0ee88cbebae8108c1d9f05685fe6a5646a01ee1ea5167424d381e4a8fe99",
+    "entries": 2,
+    "firstNames": [
+      "portal-image.tar",
+      "portal-release-evidence.json"
+    ]
+  }
+]

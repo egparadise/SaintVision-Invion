@@ -1,0 +1,21 @@
+{
+  "AtKST": "2026-11-08T01:12:51.2397944+09:00",
+  "OldOwnedPortalPID": 62240,
+  "OldOwnedCommandHash": "d4fb0145521898c682ae5edf5915b34f201b421e67e3e8f1f1a0348d9ba3aa01",
+  "OldOwnedNodeStopped": true,
+  "NewForwardStarted": true,
+  "RollbackUsed": false,
+  "NoMainApplicationStarted": true,
+  "SchemaDowngraded": false,
+  "WholeProgramComplete": false,
+  "NewForwardPID": 61188,
+  "NewForwardStartedAt": "2026-11-08T01:12:51.2760629+09:00",
+  "Status": "PORTAL3100_CUT_OVER_TO_ACCEPTED_PC3_FRONTEND905_AND_API96",
+  "IndexHTTP": 200,
+  "HealthHTTP": 200,
+  "BrowserAuthenticationAndNoBlink": "PENDING_REAL_BROWSER_VERIFICATION",
+  "MainMemoryAfterCutover": {
+    "FreeBytes": 252862464,
+    "TotalBytes": 16935796736
+  }
+}

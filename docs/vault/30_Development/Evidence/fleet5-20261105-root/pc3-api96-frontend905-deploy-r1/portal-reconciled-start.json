@@ -1,0 +1,86 @@
+{
+  "atKST": "2026-11-08T01:08:23+09:00",
+  "SSHExit": 0,
+  "stderrBytes": 0,
+  "knownHostsUnchanged": true,
+  "remote": {
+    "portalRouteChanged": false,
+    "mainProductExecuted": false,
+    "privateMaterialPresent": false,
+    "actualRunOrVotesCreated": false,
+    "wholeProgramComplete": false,
+    "partialStagingReconciledBeforeImageLoad": true,
+    "originalFailure": "Public auth file was made 0444 before intentional operator override; no image loaded or product started",
+    "containerID": "3cb629676774375ae820171755abd726718b1af0c6760b21f8e7a14ad587d2b2",
+    "status": "ACCEPTED_FRONTEND905_RUNNING_PC3_LOOPBACK_NOT_CUT_OVER",
+    "source": "96afd799d49717fd40e4ddabd538d82accbe1958",
+    "frontendBuildSource": "90578f49ea400958fcdbc1ded3908d624e856f57",
+    "frontendUnchangedAtAcceptedSource": true,
+    "imageId": "sha256:763c78244f1345d85bc4c5373cf390a3eff2129045f7f4e487aee045dd751fd4",
+    "imageIndex": "sha256:763c78244f1345d85bc4c5373cf390a3eff2129045f7f4e487aee045dd751fd4",
+    "imageConfigID": "sha256:a0947d47c26b5f932c3318e9ff87a8ec958b2738713c7e34e6c9dfad464dc0f1",
+    "name": "saintvision-portal905-bcd581be-r1",
+    "bind": "PC3 127.0.0.1:13100",
+    "sameHostAPIUpstream": "http://127.0.0.1:8080",
+    "clientTransport": "Main loopback through pinned SSH planned",
+    "HTTPPilotOnly": true,
+    "HTTPSDeploymentClaimed": false,
+    "checks": [
+      {
+        "path": "/studio",
+        "http": 200,
+        "securityHeadersPresent": true
+      },
+      {
+        "path": "/callback",
+        "http": 200,
+        "securityHeadersPresent": true
+      },
+      {
+        "path": "/auth-config.js",
+        "http": 200,
+        "securityHeadersPresent": true
+      },
+      {
+        "path": "/healthz",
+        "http": 200,
+        "securityHeadersPresent": true
+      },
+      {
+        "path": "/v1/session",
+        "http": 401,
+        "securityHeadersPresent": true
+      },
+      {
+        "path": "/assets/does-not-exist.js",
+        "http": 404,
+        "securityHeadersPresent": true
+      }
+    ],
+    "allDistOriginalHashesExceptPublicAuthConfig": {
+      "assets/icons-DVYUNEhE.js": "94f3f917fa843a4e312937688a83f400ea3d5617d1f1e1f36d6bc643f78ffa9e",
+      "assets/icons-DVYUNEhE.js.map": "bdc634b37b1574e46b91990a227c6ecf862e6364ec9219a524c88741ee294ea3",
+      "assets/index-CpbRD_HK.js": "a8548073eea61c764e01d3adca0895109502b6acba75b834e4f11e1e763d1eb3",
+      "assets/index-CpbRD_HK.js.map": "24f8831f966e13c037a85db5e417dddf12605c74e694e82225a586690ecf9ec5",
+      "assets/index-kKrfL4r3.css": "66d8552241923e10b189e3b9372f85205bccbf083a5dc19872d001fd91ad0d26",
+      "assets/query-DtERyQJL.js": "3a24ebe459ff24b83ef333288347529de609b65f1c25d5c5b74f2f8b20e2904d",
+      "assets/query-DtERyQJL.js.map": "d584967ed9a938c701324896050b1db23187d2a79840fe5fac55791a2eafc500",
+      "assets/vendor-CYSfZuHu.js": "d967cddbe86b7822415ceafb696d97dea5a491621955cb4127e0f3f96e5497eb",
+      "assets/vendor-CYSfZuHu.js.map": "037070c1858eff839f466f2431a724493a80f81c8f47484c4c6c21698885d15e",
+      "index.html": "d0a6043fbdba7182d5194c4aa84bab4e2e4ab436edff24f1e6da0e82035e8657",
+      "manifest.json": "d4c3c0897d7be95321a37babc97bd922618cf8142dd9103faef1efe700fd343a",
+      "sw.js": "5befc07c048a6a49d7f7ec492fe1c04ae8b40283dcc8387ef4e6b2b92c516dcd"
+    },
+    "callbackQueryAbsentFromLogs": true,
+    "nginxTestExit": 0,
+    "UID": "101:101",
+    "memoryBytes": 134217728,
+    "CPUQuotaMillis": 500,
+    "pidsLimit": 64,
+    "readOnlyRoot": true,
+    "capDropAll": true,
+    "noNewPrivileges": true,
+    "privateMounts": false,
+    "atKST": "2026-11-08T01:08:23+09:00"
+  }
+}

@@ -1,0 +1,29 @@
+import ast,datetime,hashlib,json,shlex,subprocess
+from pathlib import Path
+r=Path(__file__).resolve().parents[1];w=r/'.work';out=w/'pc3-portal-rollback-r1';assert not out.exists();out.mkdir()
+zipfile=w/'uir3-b48-frontend-build.zip';digest='7212b4870e3a142b8c44dc2629d5e6643401ae9e1d187d6234ecdf4059fd671d';assert hashlib.file_digest(zipfile.open('rb'),'sha256').hexdigest()==digest
+known=Path(r'D:\Project\SaintVisionI-Invion\fleet5-worker-readiness-20261105\.work\f5-low-closure-26607075f612\known_hosts.f5.pinned');assert hashlib.sha256(known.read_bytes()).hexdigest()=='0dcbf0f4cfc363e4affc30810ad8a9e57bd2c4a31991e2c8285bdae7052ec2d2'
+flags=['-i',r'C:\Users\inviz\.ssh\sv-lan-ed25519','-o','IdentitiesOnly=yes','-o','BatchMode=yes','-o','ConnectTimeout=5','-o','StrictHostKeyChecking=yes','-o','UserKnownHostsFile='+str(known)];host='saintvision-invion3@192.168.45.222';root='/home/saintvision-invion3/saintvision-share/ops-fresh-cpu-1efea-r1-20261107/portal-b48-rollback-r1'
+pre="import json,os,shutil;from pathlib import Path;os.umask(0o077);p=Path("+repr(root)+");p.mkdir(mode=0o700);ports=[int(x.split()[1].rsplit(':',1)[1],16) for x in Path('/proc/net/tcp').read_text().splitlines()[1:] if x.split()[3]=='0A'];assert not set([8443,3100,18081,13101])&set(ports);print(json.dumps({'remotePortsFree':[8443,3100,18081,13101],'certutilAvailable':shutil.which('certutil')}))"
+q=subprocess.run(['ssh','-T',*flags,host,'python3','-I','-B','-c',shlex.quote(pre)],capture_output=True,timeout=15);assert q.returncode==0 and not q.stderr;(out/'remote-ports-before-bridge.json').write_bytes(q.stdout)
+q=subprocess.run(['scp','-q',*flags,str(zipfile),host+':'+root+'/b48.zip'],capture_output=True,timeout=45);assert q.returncode==0
+program=r'''import datetime,hashlib,json,os,stat,subprocess,sys,urllib.request,urllib.error,zipfile
+from pathlib import Path
+p=json.load(sys.stdin);root=Path(p['root']);os.umask(0o077);assert os.getuid()==1000 and root.is_dir() and hashlib.file_digest((root/'b48.zip').open('rb'),'sha256').hexdigest()==p['digest']
+src=root.parent/'portal905-r1';conf=(src/'nginx.conf').read_text();assert '127.0.0.1:13100' in conf and conf.count('http://127.0.0.1:8080')==4
+conf=conf.replace('127.0.0.1:13100','127.0.0.1:13101').replace('http://127.0.0.1:8080','http://127.0.0.1:18081');(root/'nginx.conf').write_text(conf)
+(root/'security-headers.conf').write_bytes((src/'security-headers.conf').read_bytes());dist=root/'dist';dist.mkdir(mode=0o700)
+with zipfile.ZipFile(root/'b48.zip') as z:
+ for item in z.infolist():
+  assert not item.filename.startswith(('/','\\')) and '..' not in item.filename.replace('\\','/').split('/') and item.file_size<8*1024*1024
+  f=dist/item.filename;f.parent.mkdir(parents=True,exist_ok=True,mode=0o755);f.write_bytes((src/'auth-config.js').read_bytes() if item.filename=='auth-config.js' else z.read(item));f.chmod(0o444)
+for f in [dist,dist/'assets']:f.chmod(0o555)
+name='saintvision-portal-b48-rollback-r1';image='sha256:763c78244f1345d85bc4c5373cf390a3eff2129045f7f4e487aee045dd751fd4'
+q=subprocess.run(['docker','container','ls','-a','--filter','name=^/'+name+'$','--format','{{.ID}}'],capture_output=True,timeout=10);assert q.returncode==0 and not q.stdout.strip()
+common=['--network','host','--user','101:101','--cpus','.25','--memory','128m','--memory-swap','128m','--pids-limit','64','--read-only','--cap-drop','ALL','--security-opt','no-new-privileges','--tmpfs','/tmp:rw,nosuid,noexec,size=32m,mode=1777']
+for s,d in [(root/'nginx.conf','/etc/nginx/nginx.conf'),(root/'security-headers.conf','/etc/nginx/security-headers.conf'),(dist,'/usr/share/nginx/html')]:common.extend(['--mount',f'type=bind,src={s},dst={d},readonly'])
+q=subprocess.run(['docker','run','--rm',*common,'--entrypoint','nginx',image,'-t'],capture_output=True,timeout=20);assert q.returncode==0
+q=subprocess.run(['docker','run','-d','--name',name,*common,'--label','ai.saintvision.owner=fleet5-root523','--entrypoint','nginx',image,'-g','daemon off;'],capture_output=True,timeout=20);assert q.returncode==0
+o={'atKST':datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=9))).isoformat(timespec='seconds'),'status':'OLD_B48_STATIC_ROLLBACK_STAGED_PC3_ONLY','containerID':q.stdout.decode().strip(),'oldFrontendSource':'b48c2c4492f8aea4b55c33161733a9a6fb9eed8c','oldFrontendArtifactSHA256':p['digest'],'bind':'PC3 127.0.0.1:13101','oldMainAPIUpstream':'PC3loopback18081 via new pinnedSSH to Mainloopback8080','newNodeOrRunCreated':False,'portalRouteChanged':False,'mainProductExecution':False,'rollbackSchemaDowngrade':False,'wholeProgramComplete':False};(root/'public-receipt.json').write_text(json.dumps(o,indent=2)+'\n');print(json.dumps(o))
+'''
+(out/'remote-program.py.txt').write_text(program,encoding='utf8');q=subprocess.run(['ssh','-T',*flags,host,'python3','-I','-B','-c',shlex.quote(program)],input=json.dumps({'root':root,'digest':digest}).encode(),capture_output=True,timeout=55);assert q.returncode==0 and not q.stderr;(out/'receipt.json').write_bytes(q.stdout);print(q.stdout.decode())

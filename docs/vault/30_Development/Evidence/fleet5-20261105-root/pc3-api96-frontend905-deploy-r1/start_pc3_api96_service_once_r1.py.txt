@@ -1,0 +1,62 @@
+"""Start only the new Root-owned API, with fixed mounts and no owner credentials."""
+import datetime,hashlib,json,shlex,subprocess
+from pathlib import Path
+r=Path(__file__).resolve().parents[1];w=r/'.work';out=w/'pc3-api96-start-r1';assert not out.exists();out.mkdir()
+migration=json.loads((w/'pc3-reviewed0068-apply-r1/receipt.json').read_bytes());assert migration['SSHExit']==0 and migration['remote']['migrationApplied'] and migration['remote']['new17Problems']==0
+stage=json.loads((w/'pc3-api96-protected-config-r1/receipt.json').read_bytes())['remote'];assert stage['status']=='PROTECTED_API96_CONFIGURATION_STAGED_NOT_STARTED'
+payload={'serviceRoot':stage['serviceRoot'],'image':stage['imageId'],'apiConfigSHA256':stage['apiConfigSHA256'],'jwksSHA256':stage['publicJWKS_SHA256'],'source':'96afd799d49717fd40e4ddabd538d82accbe1958'}
+remote=r'''import hashlib,json,os,stat,subprocess,sys,time,urllib.error,urllib.request
+from pathlib import Path
+phase='public-image-import-smoke';o={'applicationStarted':False,'existingServicesChanged':False,'ownerCredentialMountedOrInDockerEnv':False,'DockerSocketMounted':False,'CAOrNodePrivateKeyMounted':False,'realRunOrVotesCreated':False,'wholeProgramComplete':False}
+try:
+ p=json.loads(sys.stdin.buffer.read(8193));assert os.getuid()==1000;os.umask(0o077);ops=Path('/home/saintvision-invion3/saintvision-share/ops-fresh-cpu-1efea-r1-20261107');root=Path(p['serviceRoot']);assert root==ops/'workspace-api-96af-r2';op=root/'api-start-r1';assert not op.exists();op.mkdir(mode=0o700)
+ smoke="import json\ntry:\n import inv.app\n import saintvision.api.app\n import inv.business_surface\n print(json.dumps({'imports':True}))\nexcept BaseException as e:\n print(json.dumps({'imports':False,'errorClass':type(e).__name__,'missingModule':getattr(e,'name',None)}));raise SystemExit(2)\n"
+ q=subprocess.run(['docker','run','--rm','--network','none','--user','1000:1000','--memory','512m','--pids-limit','64','--read-only','--cap-drop','ALL','--security-opt','no-new-privileges','--entrypoint','/opt/sv/venv/bin/python',p['image'],'-I','-B','-c',smoke],capture_output=True,timeout=30);o['publicImportSmokeExit']=q.returncode
+ if q.stdout:o['publicImportSmoke']=json.loads(q.stdout)
+ assert q.returncode==0
+ phase='exact-config-private-file-and-new-port-check'
+ assert hashlib.sha256((root/'config/api.json').read_bytes()).hexdigest()==p['apiConfigSHA256'] and hashlib.sha256((root/'config/public-jwks.json').read_bytes()).hexdigest()==p['jwksSHA256']
+ st=(root/'private/connection-profiles.json').lstat();assert stat.S_ISREG(st.st_mode) and st.st_uid==1000 and stat.S_IMODE(st.st_mode)==0o600
+ def listeners():
+  rows=[]
+  for path in ['/proc/net/tcp','/proc/net/tcp6']:
+   for line in Path(path).read_text().splitlines()[1:]:
+    f=line.split()
+    if f[3]=='0A' and int(f[1].split(':')[-1],16)==8080:rows.append(f[1])
+  return rows
+ assert not listeners(),'Port8080 occupied; no takeover authorized'
+ name='saintvision-api96-bcd581be-r1';q=subprocess.run(['docker','container','inspect',name],capture_output=True,timeout=10);assert q.returncode!=0,'Owned name collision; reconcile only'
+ mounts=[(root/'private/connection-profiles.json','/run/sv-api/connection-profiles.json',True),(root/'config/api.json','/run/sv-api/api.json',True),(root/'config/public-jwks.json','/run/sv-api/public-jwks.json',True)]
+ for f in ['ca-cert.pem','cp-client-cert.pem','cp-client-key.pem','launch-signer-key.pem']:mounts.append((ops/'pki-r1'/f,'/run/sv-api/tls/'+f,True))
+ for f in ['working','objects','restores']:mounts.append((root/f,'/work/'+f,False))
+ args=['docker','run','--detach','--name',name,'--label','saintvision.owner=RootCodex','--label','saintvision.source='+p['source'],'--restart','unless-stopped','--network','host','--user','1000:1000','--cpus','1','--memory','512m','--memory-swap','512m','--pids-limit','128','--read-only','--cap-drop','ALL','--security-opt','no-new-privileges','--tmpfs','/tmp:rw,nosuid,nodev,size=64m,uid=1000,gid=1000']
+ for source,dest,readonly in mounts:args+=['--mount','type=bind,src='+str(source)+',dst='+dest+(',readonly' if readonly else '')]
+ args.append(p['image']);phase='start-new-owned-api-once'
+ q=subprocess.run(args,capture_output=True,timeout=20);assert q.returncode==0;container=q.stdout.decode().strip();assert len(container)==64;o.update(applicationStarted=True,containerId=container,containerName=name)
+ phase='actual-loopback-health-and-anonymous-denial'
+ opener=urllib.request.build_opener(urllib.request.ProxyHandler({}));health=None
+ for attempt in range(25):
+  try:
+   with opener.open('http://127.0.0.1:8080/healthz',timeout=2) as response:health={'http':response.status,'body':response.read(4097).decode()};break
+  except (urllib.error.URLError,TimeoutError):time.sleep(0.4)
+ q=subprocess.run(['docker','container','inspect',container],capture_output=True,timeout=10);assert q.returncode==0;v=json.loads(q.stdout)[0]
+ logs=subprocess.run(['docker','logs','--tail','70',container],capture_output=True,timeout=10);(op/'startup.stdout.txt').write_bytes(logs.stdout);(op/'startup.stderr.txt').write_bytes(logs.stderr)
+ o['containerRunning']=v['State']['Running'];o['restartCount']=v['RestartCount'];o['healthObservation']=health
+ assert health and health['http']==200 and v['State']['Running'] and v['RestartCount']==0
+ try:
+  with opener.open('http://127.0.0.1:8080/v1/session',timeout=3) as response:anonymous=response.status
+ except urllib.error.HTTPError as e:anonymous=e.code
+ assert anonymous==401
+ assert listeners()==['0100007F:1F90']
+ assert v['Image']==p['image'] and v['Config']['User']=='1000:1000' and v['HostConfig']['ReadonlyRootfs'] and v['HostConfig']['NetworkMode']=='host' and v['HostConfig']['Memory']==536870912 and v['HostConfig']['PidsLimit']==128
+ assert not any(s.startswith(('INV_','PGPASSWORD=')) for s in v['Config']['Env']);assert len(v['Mounts'])==10 and all(x['Type']=='bind' for x in v['Mounts'])
+ o.update(status='NEW_PC3_API96_RUNNING_HEALTH200_ANONYMOUS401',source=p['source'],imageId=p['image'],healthHTTP=200,anonymousSessionHTTP=anonymous,bind='127.0.0.1:8080 on PC3 only',UID='1000:1000',CPUQuotaMillis=1000,memoryBytes=536870912,pidsLimit=128,readOnlyRoot=True,capabilitiesDropped=['ALL'],noNewPrivileges=True,exactMounts=[{'source':str(s),'destination':d,'readOnly':ro} for s,d,ro in mounts],DockerConfigEnvHasNoDsn=True,ownerCredentialPresent=False,portalRouteChanged=False,actualAuthenticatedUserRead='PENDING',logicalWorkspaceMarkedReady=False)
+ (op/'public-start-receipt.json').write_text(json.dumps(o,indent=2)+'\n',encoding='utf-8')
+except BaseException as e:o.update(status='HOLD_NEW_API96_START_RECONCILE_REQUIRED',phase=phase,errorClass=type(e).__name__,rawDiagnosticsSuppressed=True,doNotBlindlyRestart=True)
+print(json.dumps(o));raise SystemExit(0 if o.get('status')=='NEW_PC3_API96_RUNNING_HEALTH200_ANONYMOUS401' else 2)
+'''
+(out/'remote-api-start-program.py.txt').write_text(remote,encoding='utf-8');known=Path(r'D:\Project\SaintVisionI-Invion\fleet5-worker-readiness-20261105\.work\f5-low-closure-26607075f612\known_hosts.f5.pinned');kh='0dcbf0f4cfc363e4affc30810ad8a9e57bd2c4a31991e2c8285bdae7052ec2d2';assert hashlib.sha256(known.read_bytes()).hexdigest()==kh
+q=subprocess.run(['ssh','-T','-i',r'C:\Users\inviz\.ssh\sv-lan-ed25519','-o','IdentitiesOnly=yes','-o','BatchMode=yes','-o','ConnectTimeout=5','-o','StrictHostKeyChecking=yes','-o','UserKnownHostsFile='+str(known),'saintvision-invion3@192.168.45.222','python3','-I','-B','-c',shlex.quote(remote)],input=json.dumps(payload).encode(),capture_output=True,timeout=100)
+j={'atKST':datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=9))).isoformat(timespec='seconds'),'SSHExit':q.returncode,'stderrBytes':len(q.stderr),'knownHostsUnchanged':hashlib.sha256(known.read_bytes()).hexdigest()==kh}
+if q.stdout:j['remote']=json.loads(q.stdout)
+(out/'receipt.json').write_text(json.dumps(j,indent=2)+'\n',encoding='utf-8');print(json.dumps(j),flush=True);assert q.returncode==0 and not q.stderr

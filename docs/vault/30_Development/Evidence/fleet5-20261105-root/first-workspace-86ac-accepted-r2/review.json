@@ -1,0 +1,84 @@
+{
+  "docID": "CR90501-FIRST-WORKSPACE-TEST-DELTA-REVIEW-R2-20261107-CLAUDE",
+  "version": "1.0.0",
+  "atKST": "2026-11-07T23:52:29+09:00",
+  "task": "CR90501-FIRST-WORKSPACE-TEST-DELTA-REVIEW-R2-20261107",
+  "orcaTaskID": "task_816b0fa2824f",
+  "orcaDispatchID": "ctx_517cae38b466",
+  "reviewer": "Claude (the only actual independent reviewer; not the author)",
+  "author": "Codex B ctx_6bed4fe4e6c4 / task_82627c80384c (succeeded/settled/exited/released per Root)",
+  "obsidianApplyOwner": "Root only; this reviewer ran sync --check only",
+  "reviewBranch": "agent/claude/fleet5-first-workspace-cr90501-delta-r2-20261107",
+  "deliveryBase": "a18095e2aff59433b93bdd755a2d050a26c15546",
+  "targetSource": "96afd799d49717fd40e4ddabd538d82accbe1958",
+  "targetSourceBranch": "agent/codex/fleet5-first-workspace-cr90501-tests-r1-20261107 (remote head equals 96afd799)",
+  "targetDirectParent": "90578f49ea400958fcdbc1ded3908d624e856f57",
+  "originalImplementationSource": "90578f49ea400958fcdbc1ded3908d624e856f57",
+  "originalReview": "docs/vault/30_Development/Evidence/fleet5-first-workspace-905-review-r1-20261107-claude/review.json @a18095e2 (not modified; byte-identical to Root's first-workspace-a180-review-r1/review.json copy)",
+  "rootCheckpoint": "a2513f2f826898c96cc0b9488ce43842c7c8f76e",
+  "boardsRead": {
+    "progressBoard": "docs/vault/00_Index/전체 개발 진행 현황.md v1.0.521 @a2513f2f",
+    "claudeBoard": "docs/vault/30_Development/Agent별 작업/Claude 작업 현황.md v1.2.130 @a2513f2f"
+  },
+  "rootInputPins": {
+    "pathPrefix": "docs/vault/30_Development/Evidence/fleet5-20261105-root/ (git show a2513f2f)",
+    "cr90501-96af-verified-r1/root-verification.json": {"bytes": 2145, "sha256": "2facc1fa14b080ceef066c3a6a79c57158ec2b9ddb73672aed35a3f8d311a512"},
+    "cr90501-96af-verified-r1/direct18-recomputed.json": {"bytes": 3842, "sha256": "8ec257aa9df0dffd7f62b9d353e5999cea203f66552ead2a4640b2d46513f64b"},
+    "cr90501-96af-verified-r1/case-matrix.json": {"bytes": 18699, "sha256": "140647d5b4684130c61b6e3835af2c31c61674e9c166ed63cfbbadca6900ddcd"},
+    "cr90501-96af-verified-r1/Core-measurements-recomputed.json": {"bytes": 2590, "sha256": "4b0e20d1fa6d14e8c570b78f5d99d1189d5ef74bf22b4f45ae18da72c1c62e35"},
+    "cr90501-96af-verified-r1/core-first-timeout.json": {"bytes": 497, "sha256": "8b4285a8ade7a7e473261bebf5e94a06bcaf51b39a0c33bc93445d844288e7ad"},
+    "first-workspace-a180-review-r1/review.json": {"bytes": 19509, "sha256": "29c9b9e13bf3f957805fe1bbc686a6195704567168708c35c9928a7a9ec1e1a3"},
+    "pc3-schema-backup-before0068-r1/backup-receipt-r2.json": {"bytes": 1820, "sha256": "40edd7ff37fdef1e78c27ebd89c802356d06bf230beb2ef019b887fab57a4c4a", "use": "operating context only; not a code-review gate or reviewer runtime proof"}
+  },
+  "ciArchiveRead": {
+    "path": "D:/Project/SaintVisionI-Invion/fleet5-compute-storage-contract-20261105/docs/vault/30_Development/Evidence/fleet5-first-workspace-cr90501-tests-r1-20261107-codex/ci-96afd799d497-core-evidence.zip",
+    "bytes": 14056869,
+    "sha256": "c495bcc3b2266dd44f6ac80c1d5b67163bccdc5938e783ac178bab2f7db8ea9e",
+    "officialCoreArtifact": 13577378328,
+    "hashValidatedFirst": true,
+    "readAs": "data only (core-tests.xml, node-unit.jsonl via zipfile); nothing extracted or executed"
+  },
+  "verdict": "ACCEPT_FIRST_WORKSPACE_R1_CODE_AND_CR90501_TEST_DELTA_KEEP_REAL_DEPLOYMENT_GATES",
+  "closes": ["CR-905-01"],
+  "inheritsUnchanged": "Original R1 whole-code findings from a18095e2 (no production defect; all six R1 amendments and the AC11 17-signature pin chain satisfied). Product, SQL, schema, frontend, definer/AC11, workflows and dependencies are byte-identical to 905, so they are inherited without a second 86-path review.",
+  "protectedByteVerification": {
+    "method": "git diff --name-status 90578f49 96afd799, git rev-parse 96afd799^, git ls-remote of the author branch",
+    "directParent": "90578f49 (exact)",
+    "soleExistingFileModified": "tests/integration/test_workspace_first_intents.py (+179/-6; the 6 removed lines are exactly the old two-case loop)",
+    "otherChanges": "14 added files, all under the author's new Evidence directory plus one new History page",
+    "sql0068SHA256At96af": "8b79f55289661d7590dbe24e60d60d319360e7fcaf35454fe21c722fe11905d3 (unchanged)"
+  },
+  "closureReasoning": {
+    "1-existingContexts": "The old loop is replaced by three separated direct calls on the restricted runtime connection. _direct_context asserts current_user equals the runtime login, inv_kernel membership and no super/BYPASSRLS. In the missing-subject case (tenant A, valid epoch) the helper asserts that the epoch matches inv.control_epoch and that tenant_controls is NOT killed before the call, then expects exactly 'Verified service context required'. In the cross-tenant case, the owner first upserts a non-killed tenant_controls row for the other tenant and the same admission asserts run under inv.tenant_id=other; the test then expects exactly 'Current project permission required'. Missing epoch expects 'Current epoch and tenant admission required'. Each case asserts sqlstate 42501, the exact message_primary, and owner-counted (superuser/BYPASSRLS, all-tenant) unchanged counts of workloads, inv.runs, public.runs, business_runs, outbox and idempotency. An epoch failure therefore cannot masquerade as either intended denial, and deleting the subject guard would surface the different project-permission message.",
+    "2-intentHelper": "inv.append_first_workspace_intent is now called directly on the runtime role with SQL-supplied Jsonb/sha/canonical, bypassing validate_contract/_validate/HTTP. The positive control (same fixture recipe and valid context) inserts and reads back (spec, digest, version 1) inside force_rollback, and the owner counts are unchanged afterwards. This proves the baseline passes every guard, so each negative differs by exactly one property. 11 intent negatives: gpu1 -> 'Bounded CPU resources required'; cpu501 and memory8388607 -> 'CPU resource bounds exceeded'; extra key workspaceStart, sha mismatch, canonical/spec mismatch (SHA consistent with the changed canonical) and spec tenantId=other -> 'Closed canonical CPU metadata required'; non-ready and stale-version Workspace -> 'Current selected ready Workspace required'; non-member and disabled target -> 'Selected target membership differs'. Shape/resource/target/tenant mutations recompute both canonical text and SHA, so a digest error cannot hide those guards. Owner-side state changes are restored in finally. I confirmed that public.workspaces has no trigger altering version, so the not-ready case changes status alone.",
+    "3-runHelper": "The run positive control uses an intent created through the production API, then direct append_first_workspace_run on the runtime role with valid context. It asserts the inv.runs (draft,1,0), public.runs (workspace, workload, draft) and inv.business_runs (project, workspace) rows inside force_rollback, and unchanged owner counts after. 4 run negatives (workspace version+1, workload version+1, sha mismatch, workspace provisioning) each expect exactly 'Current selected intent required' under otherwise valid context with real canonical bytes. The earlier context guards pass, as the positive control demonstrates, so no unrelated missing context/permission/ID blocks them. The inherited 35 cases are retained unchanged (only the loop hunk changed); no skip/xfail/blanket catch was added (grep). The tenant_controls upsert targets the per-test fresh other-tenant UUID, and owner mutations are restored, so there is no cross-test contamination.",
+    "4-officialXMLAndSensitivity": "All 18 names/statuses in Root direct18-recomputed.json equal the official core-tests.xml (all passed). The module has 52 cases = 35 inherited + 17 new, and Core is 9469 pass / 46 skip = 9452 + 17. Mutation sensitivity is reasoned from setup and assertions, NOT executed: deleting any single intended predicate (gpu, cpu, memory, closed key set, sha, canonical equality, spec tenant, workspace status, workspace version, membership/enabled, run workspace/workload version, run sha, run status) leaves every other guard passing for that case's single mutation. The call then either reaches INSERT (pytest.raises fails with DID NOT RAISE) or fails with a different type/message, so the exact-message and count assertions detect it. Two cases rely on another layer: if the explicit tenant predicate in the project_grants lookup were deleted, the PUBLIC tenant_isolation RLS on inv.* would still refuse with the same message. That is defense in depth for the same property, not a gap. The code matches my original boundedFix items (a), (b) and (c), with a run sha case beyond them. The author did not run SQL mutants and the SQL is unchanged; I do not claim mutation tests ran."
+  },
+  "remainingMandatoryCodeDefects": [],
+  "checksActuallyRun": [
+    {"what": "git cat-file/rev-parse/ls-remote/diff --name-status/--numstat/show of 905, 96af, a180 and a2513f2f; SQL SHA-256 recomputation; grep for skip/xfail/blanket catches; trigger search on public.workspaces in migrations", "exit": 0},
+    {"what": "PowerShell Get-FileHash of the Core archive and canonical sync-state", "exit": 0},
+    {"what": "python -I zipfile/ElementTree/json bounded reads: direct18 vs core-tests.xml, totals, Go node-unit.jsonl", "exit": 0},
+    {"what": "local docs/ontology/path-citation/single-source/sync --check gates", "recordedIn": "local-gates.json in this directory"}
+  ],
+  "notRunByReviewer": "No pytest, SQL mutant, DB, Node/npm, Go, compiler, browser, container, SSH/HTTP login or product import on restricted MAIN. Hosted CI is Root-verified evidence, not my independent runtime test.",
+  "reportedCI": {
+    "rootVerified": "Core 42378656486 (2 jobs, retry correlation fleet5-cr90501-test-only-core-retry-c67f69d080fc490e99e37a9ed6d7fa35), Backend 42374998823 (3 jobs), Docs 42375001689 (19 steps); same 96af SHA, workflow_dispatch attempt 1, 6 jobs success",
+    "reviewerRecomputedFromArchive": "Core 9469 pass / 46 skip / 0 fail; Go 696 pass / 0 fail / 1 opt-in skip (runtime TestDockerLiveCompatibility); direct18 all passed and equal to the XML",
+    "authorReportedOnly": "Backend 9109 per matrix (official job success verified by Root)",
+    "retainedFailure": "First Core 42374996228 was cancelled at 45 minutes with interrupted teardown; it is retained and never counted as success",
+    "frontend": "Frontend 42368189302 is inherited 905 evidence for unchanged components; no new 96af frontend run is claimed"
+  },
+  "rootPreDeployOperationalObligationsRetained": [
+    "O1 Apply 0068 with an actual superuser migrator; no writer memberships",
+    "O2 Schema backup before apply (Root PC3 backup receipt is operating context, not a gate here), forward-fix only, and no-reversible-tail NOT_APPLICABLE is not a PASS",
+    "O3 Control-plane plus web redeploy; no Node code change, but live compatibility with the running 1efea Nodes still needs confirmation",
+    "O4 Restricted DSNs/JWKS/profile/working-object roots/provider/signer/TLS/policy/queue/current business links and a genuinely ready Workspace",
+    "O5 Fail-closed listing of preexisting non-CPU workloads",
+    "O6 Additional real approver, two distinct real non-requester votes, actual Run/output/audit, browser, PC1 SSH, PC5 RAM and Linux VM Node, GPU/storage, renewal/reboot-reconnect and five-PC acceptance; Docker API 1.41 is source-supported, not upgrade-blocked"
+  ],
+  "notIssued": ["migration apply", "deployment", "real approvals or identities", "actual Run/output", "browser acceptance", "five-PC acceptance", "whole-program completion"],
+  "preservedStatus": "Original19HOLD/discharges0/runtimeB0/A1-A16/H1-H7/H3EA/RDNULL_HOLD/raw7UNREGISTERED/A01-A40NOT_RUN unchanged",
+  "nextFirstAction": "Root records CR-905-01 closed and the code-review acceptance, then owns O1-O6 and the live gates; no further Claude code review is pending for this feature.",
+  "wholeProgramComplete": false
+}

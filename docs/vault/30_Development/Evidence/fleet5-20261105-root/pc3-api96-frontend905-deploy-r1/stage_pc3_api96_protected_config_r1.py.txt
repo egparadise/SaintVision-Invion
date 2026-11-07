@@ -1,0 +1,88 @@
+"""Root-only TLS-verified public trust and separate restricted service profiles."""
+import base64,datetime,hashlib,json,shlex,ssl,subprocess,time,urllib.parse,urllib.request
+from pathlib import Path
+import psycopg
+from psycopg.conninfo import conninfo_to_dict,make_conninfo
+from psycopg.rows import dict_row
+r=Path(__file__).resolve().parents[1];w=r/'.work';out=w/'pc3-api96-protected-config-r1';assert not out.exists();out.mkdir()
+image=json.loads((w/'pc3-combined-api96-image-r2/receipt.json').read_bytes())['remote'];assert image['buildExit']==0 and image['workerProfileSeparatedFromBusinessCredential']
+issuer='https://127.0.0.1:8443/realms/saintvision'
+certs=[Path(r'C:\Users\inviz\AppData\Local\Temp\claude\D--Project-SaintVisionI-Invion-https-github-com-egparadise-SaintVision-Invion-git\ff17a93b-5eae-4104-8aee-a600379da5e2\scratchpad\runprog\idp-certs\server-chain.pem'),Path(r'D:\Project\SaintVisionI-Invion\admin-login-20261106\.work\idp-public-ca.cer')]
+cert=next(p for p in certs if p.is_file());data=cert.read_bytes();pem=data.decode() if b'BEGIN CERTIFICATE' in data else ssl.DER_cert_to_PEM_cert(data);ctx=ssl.create_default_context(cadata=pem)
+class NoRedirect(urllib.request.HTTPRedirectHandler):
+ def redirect_request(self,*args,**kwargs):return None
+opener=urllib.request.build_opener(urllib.request.ProxyHandler({}),urllib.request.HTTPSHandler(context=ctx),NoRedirect())
+with opener.open(issuer+'/protocol/openid-connect/certs',timeout=10) as response:
+ assert response.status==200;body=response.read(65537);assert len(body)<=65536
+raw=json.loads(body);keys=[]
+for item in raw['keys']:
+ assert not any(k in item for k in ['d','p','q','dp','dq','qi','oth'])
+ if item.get('use')=='sig' and item.get('alg')=='RS256' and item.get('kty')=='RSA':
+  k={x:item[x] for x in ['kty','kid','use','alg','n','e']};n=int.from_bytes(base64.urlsafe_b64decode(k['n']+'='*((-len(k['n']))%4)),'big');assert 2048<=n.bit_length()<=4096 and 1<=len(k['kid'])<=128;keys.append(k)
+assert 1<=len(keys)<=8 and len({k['kid'] for k in keys})==len(keys)
+bundle={'issuer':issuer,'expiresAt':int(time.time())+86400,'keys':keys};(out/'public-trust-bundle.json').write_text(json.dumps(bundle,indent=2)+'\n',encoding='utf-8')
+prior=json.loads((w/'cpu-vertical-readonly-20261107/receipt.private.json').read_bytes());m=json.loads(Path(prior['configIdentitySummary'][0]['path']).read_bytes());assert m['issuer']==issuer and m['tenant']=='97968b42-68aa-40ce-af5e-3a33e2fc2205'
+q=subprocess.run(['docker','inspect','saintvision-run-demo-e95e22509ae0'],capture_output=True,timeout=10);assert q.returncode==0;x=json.loads(q.stdout)[0];assert x['State']['Running'] and x['HostConfig']['PortBindings']['5432/tcp']==[{'HostIp':'127.0.0.1','HostPort':'55461'}];env=dict(v.split('=',1) for v in x['Config']['Env']);owner_user=env.get('POSTGRES_USER','postgres');pw=env['POSTGRES_PASSWORD'];del env,x,q
+with psycopg.connect(host='127.0.0.1',port=55461,dbname=m['database'],user=owner_user,password=pw,connect_timeout=5,autocommit=True,row_factory=dict_row,options='-c default_transaction_read_only=on -c statement_timeout=3000') as c:system=c.execute('SELECT system_identifier::text AS id FROM pg_control_system()').fetchone()['id']
+common={'host':'127.0.0.1','port':15461,'dbname':m['database'],'connect_timeout':5,'sslmode':'disable','gssencmode':'disable','passfile':'/dev/null','application_name':'sv-api96-r1','options':'-c statement_timeout=15000 -c lock_timeout=2000 -c idle_in_transaction_session_timeout=15000'}
+owner=make_conninfo(**common,user=owner_user,password=pw);del owner_user,pw
+profiles={}
+for key in ['runtime','business']:
+ d=conninfo_to_dict(m[key].replace('postgresql+psycopg://','postgresql://',1));assert d['host'] in ['127.0.0.1','localhost'] and int(d['port'])==55461 and d['dbname']==m['database']
+ if key=='runtime':profiles[key]=make_conninfo(**common,user=d['user'],password=d['password'])
+ else:
+# PUBLIC EVIDENCE REDACTION: dynamic restricted-role URL constructor omitted; no concrete credential value was present. Original operator script remains in ignored .work.
+def target(v):
+ d=conninfo_to_dict(v.replace('postgresql+psycopg://','postgresql://',1))
+ for k in ['user','password','connect_timeout']:d.pop(k,None)
+ return d
+assert target(profiles['runtime'])==target(profiles['business'])
+payload={'ownerProfile':owner,'runtimeDsn':profiles['runtime'],'businessDsn':profiles['business'],'recoveryEpoch':m['epoch'],'tenant':m['tenant'],'project':m['portal_project'],'expectedServer':system,'bundle':bundle,'imageId':image['imageId'],'serviceRoot':image['ownedDirectory']};wire=json.dumps(payload).encode();del payload,profiles,owner,m
+remote=r'''import datetime,hashlib,json,os,stat,sys
+from pathlib import Path
+import psycopg
+from psycopg.rows import dict_row
+from cryptography import x509
+from cryptography.hazmat.primitives import serialization
+phase='readonly-target-and-role-preconditions';o={'DBWrites':False,'schemaApplied':False,'applicationStarted':False,'ownerCredentialPersisted':False,'privateValuesEmitted':False,'wholeProgramComplete':False}
+try:
+ p=json.loads(sys.stdin.buffer.read(65537));assert os.getuid()==1000;os.umask(0o077);ops=Path('/home/saintvision-invion3/saintvision-share/ops-fresh-cpu-1efea-r1-20261107');root=Path(p['serviceRoot']);assert root==ops/'workspace-api-96af-r2' and root.is_dir() and not root.is_symlink()
+ for key in list(os.environ):
+  if key.startswith('PG'):os.environ.pop(key,None)
+ with psycopg.connect(p['ownerProfile'],autocommit=True,row_factory=dict_row) as c:
+  c.read_only=True;assert c.execute('SELECT system_identifier::text AS id FROM pg_control_system()').fetchone()['id']==p['expectedServer'];assert str(c.execute('SELECT epoch FROM inv.control_epoch WHERE singleton').fetchone()['epoch'])==p['recoveryEpoch'];assert [v['version_num'] for v in c.execute('SELECT version_num FROM public.alembic_version').fetchall()]==['0067_audit_reader_revoke']
+  assert c.execute('SELECT version,kill_switch FROM inv.tenant_controls WHERE tenant_id=%s',(p['tenant'],)).fetchone()=={'version':0,'kill_switch':False}
+  assert c.execute('SELECT enabled FROM inv.project_nodes WHERE tenant_id=%s AND project_id=%s AND node_id=%s',(p['tenant'],p['project'],'nod_01M6TAWG25JTA3F7J7S1EE4N2W')).fetchone()['enabled']
+  o['selectedWorkspaceStatusCounts']=c.execute('SELECT status,count(*) AS count FROM public.workspaces WHERE tenant_id=%s AND project_id=%s GROUP BY status ORDER BY status',(p['tenant'],p['project'])).fetchall();o['selectedWorkloadCount']=c.execute('SELECT count(*) AS n FROM public.workloads WHERE tenant_id=%s AND project_id=%s',(p['tenant'],p['project'])).fetchone()['n']
+ del p['ownerProfile']
+ classes={}
+ for name,key in [('runtime','runtimeDsn'),('business','businessDsn')]:
+  with psycopg.connect(p[key].replace('postgresql+psycopg://','postgresql://',1),autocommit=True,row_factory=dict_row) as c:
+   c.read_only=True;v=c.execute("SELECT NOT rolsuper AS nonsuper,NOT rolbypassrls AS nobypass,pg_has_role(current_user,'inv_kernel','MEMBER') AS kernel_member,pg_has_role(current_user,'inv_app','MEMBER') AS app_member,NOT EXISTS(SELECT 1 FROM pg_namespace n WHERE n.nspowner=r.oid AND n.nspname IN ('public','inv')) AS no_schema_owner,NOT EXISTS(SELECT 1 FROM pg_class q JOIN pg_namespace n ON n.oid=q.relnamespace WHERE q.relowner=r.oid AND n.nspname IN ('public','inv')) AS no_table_owner FROM pg_roles r WHERE rolname=current_user").fetchone();assert v['nonsuper'] and v['nobypass'] and v['no_schema_owner'] and v['no_table_owner'];assert (v['kernel_member'] and not v['app_member']) if name=='runtime' else (v['app_member'] and not v['kernel_member']);classes[name]=v
+ phase='existing-client-and-signer-identity-metadata'
+ pk=ops/'pki-r1';ca=pk/'ca-cert.pem';cert=pk/'cp-client-cert.pem';key=pk/'cp-client-key.pem';signer=pk/'launch-signer-key.pem'
+ for f in [key,signer]:
+  st=f.lstat();assert stat.S_ISREG(st.st_mode) and st.st_uid==1000 and stat.S_IMODE(st.st_mode)==0o600
+ leaf=x509.load_pem_x509_certificate(cert.read_bytes());private=serialization.load_pem_private_key(key.read_bytes(),password=None);assert leaf.public_key().public_bytes(serialization.Encoding.DER,serialization.PublicFormat.SubjectPublicKeyInfo)==private.public_key().public_bytes(serialization.Encoding.DER,serialization.PublicFormat.SubjectPublicKeyInfo);del private
+ assert hashlib.sha256(leaf.public_bytes(serialization.Encoding.DER)).hexdigest()=='48911c5ddf7d12f05b9866feea0f0005c193d76a956274e2510492d0c2f76481';assert hashlib.sha256(ca.read_bytes()).hexdigest()=='b8d777ab04c65a44f827fdda9629d54a086e9ff8cc752b90a09023a93341c5a3'
+ sk=serialization.load_pem_private_key(signer.read_bytes(),password=None);assert hashlib.sha256(sk.public_key().public_bytes(serialization.Encoding.Raw,serialization.PublicFormat.Raw)).hexdigest()=='21baf6f95ff93c3a55b1fc2e01a134b8833d6fdeaac051126c9bed2b86df051b';del sk
+ phase='new-owned-service-roots-and-protected-files'
+ for name in ['config','private','working','objects','restores']:
+  f=root/name;assert not f.exists() and not f.is_symlink();f.mkdir(mode=0o700)
+ def write(path,value,mode):
+  b=(json.dumps(value,indent=2)+'\n').encode();fd=os.open(path,os.O_WRONLY|os.O_CREAT|os.O_EXCL,mode)
+  with os.fdopen(fd,'wb') as f:f.write(b)
+ write(root/'private/connection-profiles.json',{k:p[k] for k in ['runtimeDsn','businessDsn','recoveryEpoch']},0o600);write(root/'private/worker-profile.json',{k:p[k] for k in ['runtimeDsn','recoveryEpoch']},0o600)
+ bundle=p['bundle'];assert 300<bundle['expiresAt']-datetime.datetime.now(datetime.timezone.utc).timestamp()<=7*86400;write(root/'config/public-jwks.json',bundle,0o644)
+ tls={'ca_file':'/run/sv-api/tls/ca-cert.pem','certificate_file':'/run/sv-api/tls/cp-client-cert.pem','key_file':'/run/sv-api/tls/cp-client-key.pem','timeout':40}
+ config={'identity':{'tenant_id':p['tenant'],'issuer':bundle['issuer'],'audience':'sv-api','client_ids':['sv-portal'],'jwks_file':'/run/sv-api/public-jwks.json'},'allowedOrigins':['http://127.0.0.1:3100'],'business':True,'workspace':{'workingRoot':'/work/working','nodeId':'nod_01M6TAWG25JTA3F7J7S1EE4N2W','resources':{'cpu':'res_01M6TAWG25QSR4HH7XWWJSB0W0','memory':'res_01M6TAWG25ZHS2RG3NHQX4SPEH'},'profile':{'version':'cpu-pilot-1efea-r1','images':['sha256:ffee58e8dbefc6c0db68810cd1597f8cc589cf01112c434ed7fda8d4af415634'],'executables':['/usr/local/bin/python3'],'max_cpu_millis':500,'max_memory_bytes':67108864,'max_timeout_seconds':30,'allow_terminal':False},'policyVersion':'operator-cpu-pilot-1efea-r1','signingKeyFile':'/run/sv-api/tls/launch-signer-key.pem','tls':tls,'snapshotObjectRoot':'/work/objects','restoreRoot':'/work/restores'}}
+ write(root/'config/api.json',config,0o644);write(root/'config/delivery-worker.json',{'tenantId':p['tenant'],'tls':tls,'outputRoot':'/work/objects'},0o644)
+ o.update(status='PROTECTED_API96_CONFIGURATION_STAGED_NOT_STARTED',sameNamedClusterEpochHead0067=True,restrictedRoleClasses=classes,APIProfileKeys=['runtimeDsn','businessDsn','recoveryEpoch'],WorkerProfileKeys=['runtimeDsn','recoveryEpoch'],privateProfilesMode='0600',newRootsMode='0700',serviceRoot=str(root),apiConfigSHA256=hashlib.sha256((root/'config/api.json').read_bytes()).hexdigest(),publicJWKS_SHA256=hashlib.sha256((root/'config/public-jwks.json').read_bytes()).hexdigest(),publicJWKSExpiresAt=bundle['expiresAt'],existingClientAndSignerMatched=True,CAOrNodePrivateKeyCopied=False,source='96afd799d49717fd40e4ddabd538d82accbe1958',imageId=p['imageId'],logicalWorkspaceMarkedReady=False)
+except BaseException as e:o.update(status='HOLD_PROTECTED_API96_CONFIG',phase=phase,errorClass=type(e).__name__,rawDiagnosticsSuppressed=True)
+print(json.dumps(o));raise SystemExit(0 if o.get('status')=='PROTECTED_API96_CONFIGURATION_STAGED_NOT_STARTED' else 2)
+'''
+(out/'remote-protected-config-program.py.txt').write_text(remote,encoding='utf-8');known=Path(r'D:\Project\SaintVisionI-Invion\fleet5-worker-readiness-20261105\.work\f5-low-closure-26607075f612\known_hosts.f5.pinned');kh='0dcbf0f4cfc363e4affc30810ad8a9e57bd2c4a31991e2c8285bdae7052ec2d2';assert hashlib.sha256(known.read_bytes()).hexdigest()==kh
+q=subprocess.run(['ssh','-T','-i',r'C:\Users\inviz\.ssh\sv-lan-ed25519','-o','IdentitiesOnly=yes','-o','BatchMode=yes','-o','ConnectTimeout=5','-o','StrictHostKeyChecking=yes','-o','UserKnownHostsFile='+str(known),'saintvision-invion3@192.168.45.222','/home/saintvision-invion3/saintvision-share/ops-fresh-cpu-1efea-r1-20261107/venv/bin/python','-I','-B','-c',shlex.quote(remote)],input=wire,capture_output=True,timeout=45);del wire
+j={'atKST':datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=9))).isoformat(timespec='seconds'),'SSHExit':q.returncode,'stderrBytes':len(q.stderr),'publicIdPJWKSHTTPSVerified':True,'insecureTLSUsed':False,'knownHostsUnchanged':hashlib.sha256(known.read_bytes()).hexdigest()==kh}
+if q.stdout:j['remote']=json.loads(q.stdout)
+(out/'receipt.json').write_text(json.dumps(j,indent=2)+'\n',encoding='utf-8');print(json.dumps(j),flush=True);assert q.returncode==0 and not q.stderr

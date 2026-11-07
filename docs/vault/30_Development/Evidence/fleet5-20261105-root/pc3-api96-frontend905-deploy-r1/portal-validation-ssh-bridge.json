@@ -1,0 +1,17 @@
+{
+  "AtKST": "2026-11-08T01:11:50.2816863+09:00",
+  "PID": 54896,
+  "StartedAt": "2026-11-08T01:11:47.1999604+09:00",
+  "LocalForwards": [
+    "127.0.0.1:13100 -> PC3loopback13100",
+    "127.0.0.1:13101 -> PC3loopback13101"
+  ],
+  "RemoteForwards": [
+    "PC3loopback18081 -> Mainloopback8080 old API rollback",
+    "PC3loopback8443 -> Mainloopback8443 real IdP",
+    "PC3loopback3100 -> Mainloopback3100 browser exact origin"
+  ],
+  "MainAppStarted": false,
+  "PortalRouteChanged": false,
+  "Owner": "Root523"
+}

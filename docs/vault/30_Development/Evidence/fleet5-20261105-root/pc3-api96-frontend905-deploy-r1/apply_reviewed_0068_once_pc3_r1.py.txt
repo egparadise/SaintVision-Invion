@@ -1,0 +1,80 @@
+"""Root one-shot forward migration, owner secret only in stdin/child memory."""
+import base64,datetime,hashlib,json,shlex,subprocess,urllib.parse
+from pathlib import Path
+import psycopg
+from psycopg.conninfo import make_conninfo
+from psycopg.rows import dict_row
+r=Path(__file__).resolve().parents[1];w=r/'.work';out=w/'pc3-reviewed0068-apply-r1';assert not out.exists();out.mkdir()
+accept=json.loads((w/'cr90501-86ac-root-acceptance-r2/root-acceptance.json').read_bytes());assert accept['CR90501Closed'] and accept['remainingCodeReviewForThisFeature'] is False
+stage=json.loads((w/'pc3-api96-protected-config-r1/receipt.json').read_bytes());assert stage['SSHExit']==0 and stage['remote']['sameNamedClusterEpochHead0067']
+backup=json.loads((w/'pc3-schema-backup-before0068-r2/receipt.json').read_bytes())['remote'];assert backup['status']=='SCHEMA_BACKUP_ARCHIVE_CREATED_AND_LIST_VERIFIED'
+author=Path(r'D:\Project\SaintVisionI-Invion\fleet5-compute-storage-contract-20261105');source=accept['acceptedSource']
+def git(ref,path):
+ q=subprocess.run(['git','show',ref+':'+path],cwd=author,capture_output=True);assert q.returncode==0;return q.stdout
+tool=git(source,'tools/check_definer_functions.py');old_policy=git('1efea494f026e932360c35ae811b6423d874a2e7','tools/definer-policy.json');new_policy=git(source,'tools/definer-policy.json')
+assert len(json.loads(old_policy)['functions'])==15 and len(json.loads(new_policy)['functions'])==17
+prior=json.loads((w/'cpu-vertical-readonly-20261107/receipt.private.json').read_bytes());m=json.loads(Path(prior['configIdentitySummary'][0]['path']).read_bytes())
+q=subprocess.run(['docker','inspect','saintvision-run-demo-e95e22509ae0'],capture_output=True,timeout=10);assert q.returncode==0;x=json.loads(q.stdout)[0];assert x['State']['Running'] and x['Image']==backup['sourceCPConfigDigest'] and x['HostConfig']['PortBindings']['5432/tcp']==[{'HostIp':'127.0.0.1','HostPort':'55461'}];env=dict(v.split('=',1) for v in x['Config']['Env']);user=env.get('POSTGRES_USER','postgres');pw=env['POSTGRES_PASSWORD'];del env,x,q
+with psycopg.connect(host='127.0.0.1',port=55461,dbname=m['database'],user=user,password=pw,connect_timeout=5,autocommit=True,row_factory=dict_row,options='-c default_transaction_read_only=on -c statement_timeout=3000') as c:system=c.execute('SELECT system_identifier::text AS id FROM pg_control_system()').fetchone()['id']
+common={'host':'127.0.0.1','port':15461,'dbname':m['database'],'user':user,'password':pw,'connect_timeout':5,'sslmode':'disable','gssencmode':'disable','passfile':'/dev/null','application_name':'sv-reviewed0068-root-r1','options':'-c statement_timeout=15000 -c lock_timeout=2000 -c idle_in_transaction_session_timeout=15000'}
+profile=make_conninfo(**common)
+# PUBLIC EVIDENCE REDACTION: dynamic restricted-role URL constructor omitted; no concrete credential value was present. Original operator script remains in ignored .work.
+payload={'ownerProfile':profile,'ownerAlchemy':alchemy,'expectedServer':system,'tenant':m['tenant'],'epoch':m['epoch'],'source':source,'review':accept['reviewSHA'],'serviceRoot':stage['remote']['serviceRoot'],'image':stage['remote']['imageId'],'backupPath':backup['backupPath'],'backupSHA256':backup['backupSHA256'],'toolBase64':base64.b64encode(tool).decode(),'oldPolicyBase64':base64.b64encode(old_policy).decode(),'newPolicyBase64':base64.b64encode(new_policy).decode()};wire=json.dumps(payload).encode();del payload,profile,alchemy,pw,user,common,m
+remote=r'''import base64,datetime,hashlib,importlib.util,json,os,stat,subprocess,sys
+from pathlib import Path
+import psycopg
+from psycopg.rows import dict_row
+phase='readonly-current-target-backup-and-head';o={'migrationApplied':False,'applicationStarted':False,'ownerCredentialPersisted':False,'ownerCredentialInDockerConfigEnvOrArgv':False,'privateValuesEmitted':False,'wholeProgramComplete':False}
+try:
+ p=json.loads(sys.stdin.buffer.read(100001));assert os.getuid()==1000;os.umask(0o077);ops=Path('/home/saintvision-invion3/saintvision-share/ops-fresh-cpu-1efea-r1-20261107');root=Path(p['serviceRoot']);assert root==ops/'workspace-api-96af-r2'
+ for key in list(os.environ):
+  if key.startswith('PG'):os.environ.pop(key,None)
+ backup=Path(p['backupPath']);assert backup.is_relative_to(ops/'schema-backup-before0068-r1') and backup.is_file() and not backup.is_symlink() and stat.S_IMODE(backup.stat().st_mode)==0o600 and hashlib.sha256(backup.read_bytes()).hexdigest()==p['backupSHA256']
+ tables=['public.users','public.workspaces','public.workloads','public.runs','inv.runs','inv.business_runs','inv.nodes','inv.resources']
+ def snapshot():
+  with psycopg.connect(p['ownerProfile'],row_factory=dict_row) as c:
+   c.execute('SET TRANSACTION READ ONLY');assert c.execute('SELECT system_identifier::text AS id FROM pg_control_system()').fetchone()['id']==p['expectedServer'];assert str(c.execute('SELECT epoch FROM inv.control_epoch WHERE singleton').fetchone()['epoch'])==p['epoch'];assert c.execute('SELECT version,kill_switch FROM inv.tenant_controls WHERE tenant_id=%s',(p['tenant'],)).fetchone()=={'version':0,'kill_switch':False};assert c.execute('SELECT rolsuper FROM pg_roles WHERE rolname=current_user').fetchone()['rolsuper']
+   return {'heads':[v['version_num'] for v in c.execute('SELECT version_num FROM public.alembic_version').fetchall()],'counts':{t:c.execute('SELECT count(*) AS n FROM '+t+' WHERE tenant_id=%s',(p['tenant'],)).fetchone()['n'] for t in tables}}
+ before=snapshot();assert before['heads']==['0067_audit_reader_revoke']
+ op=root/'migration0068-r1';assert not op.exists();op.mkdir(mode=0o700)
+ for name,key in [('check_definer_functions.py','toolBase64'),('base-policy.json','oldPolicyBase64'),('target-policy.json','newPolicyBase64')]:
+  data=base64.b64decode(p[key],validate=True);(op/name).write_bytes(data)
+ spec=importlib.util.spec_from_file_location('root_reviewed_definer_audit',op/'check_definer_functions.py');audit=importlib.util.module_from_spec(spec);spec.loader.exec_module(audit);audit.POLICY_PATH=op/'base-policy.json'
+ phase='exact-old15-readonly-catalogue-baseline'
+ old=audit.audit(p['ownerProfile']);assert len(old)==15 and not any(x['problems'] for x in old)
+ (op/'before-catalogue.json').write_text(json.dumps(old,indent=2)+'\n',encoding='utf-8')
+ (op/'intent.json').write_text(json.dumps({'atUTC':datetime.datetime.now(datetime.timezone.utc).isoformat(),'source':p['source'],'actualReview':p['review'],'from':'0067_audit_reader_revoke','to':'0068_first_workspace_intent','backupSHA256':p['backupSHA256'],'beforeCounts':before['counts'],'old15Match':True,'oneShot':True},indent=2)+'\n',encoding='utf-8')
+ code="""import json,os,sys
+phase='owner-input-and-reviewed-alembic-upgrade'
+try:
+ p=json.loads(sys.stdin.buffer.read(32769))
+ for key in list(os.environ):
+  if key.startswith('INV_') or key.startswith('PG'):os.environ.pop(key,None)
+ os.environ['INV_MIGRATION_DSN']=p['ownerAlchemy']
+ from alembic.config import Config
+ from alembic import command
+ command.upgrade(Config('/opt/migration-source/alembic.ini'),'0068_first_workspace_intent')
+ print(json.dumps({'status':'REVIEWED_0068_UPGRADE_RETURNED','exit':0}))
+except BaseException as e:
+ print(json.dumps({'status':'HOLD_REVIEWED_0068_UPGRADE','phase':phase,'errorClass':type(e).__name__,'rawDiagnosticsSuppressed':True}));raise SystemExit(2)
+"""
+ phase='single-forward-apply-reviewed0068'
+ args=['docker','run','--rm','--interactive','--name','sv-reviewed0068-migrator-r1','--network','host','--user','1000:1000','--cpus','1','--memory','512m','--pids-limit','128','--read-only','--cap-drop','ALL','--security-opt','no-new-privileges','--tmpfs','/tmp:rw,nosuid,nodev,size=64m,uid=1000,gid=1000','--entrypoint','/opt/sv/venv/bin/python',p['image'],'-I','-B','-c',code]
+ q=subprocess.run(args,input=json.dumps({'ownerAlchemy':p['ownerAlchemy']}).encode(),capture_output=True,timeout=60)
+ (op/'upgrade.stdout.json').write_bytes(q.stdout);(op/'upgrade.stderr.txt').write_bytes(q.stderr);o.update(migratorExit=q.returncode,migratorStderrBytes=len(q.stderr))
+ after=snapshot();o.update(headAfter=after['heads'],migrationApplied=after['heads']==['0068_first_workspace_intent'])
+ assert q.returncode==0 and o['migrationApplied'];assert after['counts']==before['counts']
+ phase='exact-target17-and-dedicated-owner-postcheck';audit.POLICY_PATH=op/'target-policy.json';new=audit.audit(p['ownerProfile']);assert len(new)==17 and not any(x['problems'] for x in new)
+ with psycopg.connect(p['ownerProfile'],row_factory=dict_row) as c:
+  c.execute('SET TRANSACTION READ ONLY');owner=c.execute("SELECT NOT rolcanlogin AS nologin,NOT rolsuper AS nonsuper,NOT rolbypassrls AS nobypass,NOT rolinherit AS noinherit,NOT rolcreatedb AS nocreatedb,NOT rolcreaterole AS nocreaterole,NOT EXISTS(SELECT 1 FROM pg_auth_members WHERE roleid=r.oid OR member=r.oid) AS no_memberships,NOT EXISTS(SELECT 1 FROM pg_namespace WHERE nspowner=r.oid) AS no_schema_owner,NOT EXISTS(SELECT 1 FROM pg_class WHERE relowner=r.oid) AS no_table_owner FROM pg_roles r WHERE rolname='inv_first_workspace_writer'").fetchone();assert owner and all(owner.values())
+ (op/'after-catalogue.json').write_text(json.dumps(new,indent=2)+'\n',encoding='utf-8')
+ o.update(status='REVIEWED_0068_APPLIED_ONCE_AND_EXACT17_CATALOGUE_VERIFIED',source=p['source'],actualReview=p['review'],headBefore=before['heads'],headAfter=after['heads'],selectedTenantRowCountsUnchanged=after['counts'],old15Problems=0,new17Problems=0,dedicatedWriterRole=owner,backupSHA256=p['backupSHA256'],APIOrWorkerStarted=False,forwardFixOnly=True,actualRunOrVotesCreated=False)
+ (op/'public-apply-receipt.json').write_text(json.dumps(o,indent=2)+'\n',encoding='utf-8')
+except BaseException as e:o.update(status='HOLD_REVIEWED0068_APPLY_OR_RECONCILE_REQUIRED',phase=phase,errorClass=type(e).__name__,rawDiagnosticsSuppressed=True,doNotBlindlyReapply=True)
+print(json.dumps(o));raise SystemExit(0 if o.get('status')=='REVIEWED_0068_APPLIED_ONCE_AND_EXACT17_CATALOGUE_VERIFIED' else 2)
+'''
+(out/'remote-apply-program.py.txt').write_text(remote,encoding='utf-8');known=Path(r'D:\Project\SaintVisionI-Invion\fleet5-worker-readiness-20261105\.work\f5-low-closure-26607075f612\known_hosts.f5.pinned');kh='0dcbf0f4cfc363e4affc30810ad8a9e57bd2c4a31991e2c8285bdae7052ec2d2';assert hashlib.sha256(known.read_bytes()).hexdigest()==kh
+q=subprocess.run(['ssh','-T','-i',r'C:\Users\inviz\.ssh\sv-lan-ed25519','-o','IdentitiesOnly=yes','-o','BatchMode=yes','-o','ConnectTimeout=5','-o','StrictHostKeyChecking=yes','-o','UserKnownHostsFile='+str(known),'saintvision-invion3@192.168.45.222','/home/saintvision-invion3/saintvision-share/ops-fresh-cpu-1efea-r1-20261107/venv/bin/python','-I','-B','-c',shlex.quote(remote)],input=wire,capture_output=True,timeout=100);del wire
+j={'atKST':datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=9))).isoformat(timespec='seconds'),'SSHExit':q.returncode,'stderrBytes':len(q.stderr),'knownHostsUnchanged':hashlib.sha256(known.read_bytes()).hexdigest()==kh}
+if q.stdout:j['remote']=json.loads(q.stdout)
+(out/'receipt.json').write_text(json.dumps(j,indent=2)+'\n',encoding='utf-8');print(json.dumps(j),flush=True);assert q.returncode==0 and not q.stderr

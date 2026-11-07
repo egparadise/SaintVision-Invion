@@ -1,0 +1,61 @@
+$ErrorActionPreference = 'Stop'
+$taskRoot='D:\Project\SaintVisionI-Invion\fleet-five-orchestration-20261105'
+$receipt=Join-Path $taskRoot '.work\portal3100-cutover-r1.json'
+if (Test-Path -LiteralPath $receipt) { throw 'Cutover receipt exists; reconcile first' }
+$pair=Get-Content -LiteralPath (Join-Path $taskRoot '.work\portal-pair-precutover-verification-r1.json') -Raw | ConvertFrom-Json
+if (-not $pair.newPortalAndOldB48RollbackBothReady) { throw 'Concrete preflight/rollback absent' }
+$ownedPortal=Get-CimInstance Win32_Process -Filter 'ProcessId=62240'
+if (-not $ownedPortal -or $ownedPortal.Name -ne 'node.exe' -or $ownedPortal.CreationDate.ToString('yyyy-MM-ddTHH:mm:ss.ffffff') -ne '2026-11-07T03:39:39.685620') { throw 'Old owned portal identity changed' }
+$sha=[Security.Cryptography.SHA256]::Create()
+$commandHash=[BitConverter]::ToString($sha.ComputeHash([Text.Encoding]::UTF8.GetBytes($ownedPortal.CommandLine))).Replace('-','').ToLowerInvariant()
+$sha.Dispose()
+if ($commandHash -ne 'd4fb0145521898c682ae5edf5915b34f201b421e67e3e8f1f1a0348d9ba3aa01') { throw 'Old owned portal command pin changed' }
+$oldListeners=@(Get-NetTCPConnection -State Listen | Where-Object { $_.LocalPort -eq 3100 })
+if ($oldListeners.Count -ne 1 -or $oldListeners[0].LocalAddress -ne '127.0.0.1' -or $oldListeners[0].OwningProcess -ne 62240) { throw '3100 listener ownership differs' }
+$known='D:\Project\SaintVisionI-Invion\fleet5-worker-readiness-20261105\.work\f5-low-closure-26607075f612\known_hosts.f5.pinned'
+if ((Get-FileHash -LiteralPath $known -Algorithm SHA256).Hash.ToLowerInvariant() -ne '0dcbf0f4cfc363e4affc30810ad8a9e57bd2c4a31991e2c8285bdae7052ec2d2') { throw 'Host pin changed' }
+function Start-OwnedPortalForward([int]$remotePort,[string]$suffix) {
+ $arguments=@('-N','-T','-i','C:\Users\inviz\.ssh\sv-lan-ed25519','-o','IdentitiesOnly=yes','-o','BatchMode=yes','-o','ConnectTimeout=5','-o','StrictHostKeyChecking=yes','-o',('UserKnownHostsFile='+$known),'-o','ExitOnForwardFailure=yes','-o','ServerAliveInterval=5','-o','ServerAliveCountMax=3','-L',('127.0.0.1:3100:127.0.0.1:'+$remotePort),'saintvision-invion3@192.168.45.222')
+ $started=Start-Process -FilePath 'C:\Windows\System32\OpenSSH\ssh.exe' -ArgumentList $arguments -WindowStyle Hidden -PassThru -RedirectStandardError (Join-Path $taskRoot ('.work\portal3100-'+$suffix+'.stderr.log')) -RedirectStandardOutput (Join-Path $taskRoot ('.work\portal3100-'+$suffix+'.stdout.log'))
+ Start-Sleep -Seconds 2
+ $started.Refresh()
+ if ($started.HasExited) { throw 'New owned SSH forward exited' }
+ $bound=@(Get-NetTCPConnection -State Listen | Where-Object { $_.LocalPort -eq 3100 })
+ if ($bound.Count -ne 1 -or $bound[0].LocalAddress -ne '127.0.0.1' -or $bound[0].OwningProcess -ne $started.Id) { throw 'New forward listener mismatch' }
+ return $started
+}
+$result=[ordered]@{AtKST=[DateTimeOffset]::Now.ToString('o');OldOwnedPortalPID=62240;OldOwnedCommandHash=$commandHash;OldOwnedNodeStopped=$false;NewForwardStarted=$false;RollbackUsed=$false;NoMainApplicationStarted=$true;SchemaDowngraded=$false;WholeProgramComplete=$false}
+$forwardProcess=$null
+try {
+ Stop-Process -Id 62240 -ErrorAction Stop
+ $result.OldOwnedNodeStopped=$true
+ $forwardProcess=Start-OwnedPortalForward 13100 'new-r1'
+ $result.NewForwardStarted=$true
+ $result.NewForwardPID=$forwardProcess.Id
+ $result.NewForwardStartedAt=$forwardProcess.StartTime.ToString('o')
+ $page=Invoke-WebRequest -UseBasicParsing -Uri 'http://127.0.0.1:3100/index.html' -TimeoutSec 8
+ if ($page.StatusCode -ne 200 -or $page.Content -notlike '*index-CpbRD_HK.js*') { throw 'New portal HTML differs' }
+ $health=Invoke-WebRequest -UseBasicParsing -Uri 'http://127.0.0.1:3100/healthz' -TimeoutSec 8
+ if ($health.StatusCode -ne 200) { throw 'New portal health failed' }
+ $result.Status='PORTAL3100_CUT_OVER_TO_ACCEPTED_PC3_FRONTEND905_AND_API96'
+ $result.IndexHTTP=200
+ $result.HealthHTTP=200
+ $result.BrowserAuthenticationAndNoBlink='PENDING_REAL_BROWSER_VERIFICATION'
+} catch {
+ $result.CutoverErrorClass=$_.Exception.GetType().Name
+ if ($result.OldOwnedNodeStopped) {
+  if ($forwardProcess -and -not $forwardProcess.HasExited) { Stop-Process -Id $forwardProcess.Id -ErrorAction Stop }
+  if (@(Get-NetTCPConnection -State Listen -ErrorAction SilentlyContinue | Where-Object { $_.LocalPort -eq 3100 }).Count -ne 0) { throw '3100 occupied after failure; refusing to kill unknown owner' }
+  $rollbackProcess=Start-OwnedPortalForward 13101 'rollback-r1'
+  $result.RollbackUsed=$true
+  $result.RollbackForwardPID=$rollbackProcess.Id
+  $result.RollbackForwardStartedAt=$rollbackProcess.StartTime.ToString('o')
+  $result.Status='ROLLED_BACK_TO_REMOTE_OLD_B48_AND_OLD_MAIN_API_RECONCILE_REQUIRED'
+ }
+ $result | ConvertTo-Json -Depth 5 | Set-Content -LiteralPath $receipt -Encoding UTF8
+ throw
+}
+$os=Get-CimInstance Win32_OperatingSystem
+$result.MainMemoryAfterCutover=@{TotalBytes=[long]$os.TotalVisibleMemorySize*1024;FreeBytes=[long]$os.FreePhysicalMemory*1024}
+$result | ConvertTo-Json -Depth 5 | Set-Content -LiteralPath $receipt -Encoding UTF8
+$result | ConvertTo-Json -Depth 5

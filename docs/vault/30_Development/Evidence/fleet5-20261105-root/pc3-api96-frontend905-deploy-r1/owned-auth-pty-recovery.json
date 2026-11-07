@@ -1,0 +1,10 @@
+{
+  "AtKST": "2026-11-08T01:03:25.4416403+09:00",
+  "Reason": "PTY session ID unavailable after truncated tool output; exact owned pre-password auth processes stopped",
+  "StoppedPIDs": [
+    59820,
+    60340
+  ],
+  "CredentialPOSTReached": false,
+  "ProductProcessesChanged": false
+}

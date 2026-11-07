@@ -1,0 +1,18 @@
+$ErrorActionPreference = 'Stop'
+$taskRoot = 'D:\Project\SaintVisionI-Invion\fleet-five-orchestration-20261105'
+$receipt = Join-Path $taskRoot '.work\pc3-portal-validation-bridge-r1.json'
+if (Test-Path -LiteralPath $receipt) { throw 'Bridge receipt exists; reconcile before any start' }
+$occupied = @(Get-NetTCPConnection -State Listen -ErrorAction SilentlyContinue | Where-Object { $_.LocalPort -in @(13100,13101) })
+if ($occupied.Count -ne 0) { throw 'Validation ports occupied' }
+$known = 'D:\Project\SaintVisionI-Invion\fleet5-worker-readiness-20261105\.work\f5-low-closure-26607075f612\known_hosts.f5.pinned'
+if ((Get-FileHash -LiteralPath $known -Algorithm SHA256).Hash.ToLowerInvariant() -ne '0dcbf0f4cfc363e4affc30810ad8a9e57bd2c4a31991e2c8285bdae7052ec2d2') { throw 'Known hosts pin mismatch' }
+$bridgeArgs = @('-N','-T','-i','C:\Users\inviz\.ssh\sv-lan-ed25519','-o','IdentitiesOnly=yes','-o','BatchMode=yes','-o','ConnectTimeout=5','-o','StrictHostKeyChecking=yes','-o',('UserKnownHostsFile='+$known),'-o','ExitOnForwardFailure=yes','-o','ServerAliveInterval=5','-o','ServerAliveCountMax=3','-L','127.0.0.1:13100:127.0.0.1:13100','-L','127.0.0.1:13101:127.0.0.1:13101','-R','127.0.0.1:18081:127.0.0.1:8080','-R','127.0.0.1:8443:127.0.0.1:8443','-R','127.0.0.1:3100:127.0.0.1:3100','saintvision-invion3@192.168.45.222')
+$bridgeProcess = Start-Process -FilePath 'C:\Windows\System32\OpenSSH\ssh.exe' -ArgumentList $bridgeArgs -WindowStyle Hidden -PassThru -RedirectStandardError (Join-Path $taskRoot '.work\pc3-portal-validation-bridge-r1.stderr.log') -RedirectStandardOutput (Join-Path $taskRoot '.work\pc3-portal-validation-bridge-r1.stdout.log')
+Start-Sleep -Seconds 2
+$bridgeProcess.Refresh()
+if ($bridgeProcess.HasExited) { throw 'Bridge exited; inspect its fixed stderr before retry' }
+$listeners = @(Get-NetTCPConnection -State Listen -ErrorAction Stop | Where-Object { $_.LocalPort -in @(13100,13101) })
+if ($listeners.Count -ne 2 -or @($listeners | Where-Object { $_.OwningProcess -ne $bridgeProcess.Id -or $_.LocalAddress -ne '127.0.0.1' }).Count -ne 0) { throw 'Bridge listeners do not match owned PID' }
+$result = [pscustomobject]@{AtKST=[DateTimeOffset]::Now.ToString('o');PID=$bridgeProcess.Id;StartedAt=$bridgeProcess.StartTime.ToString('o');LocalForwards=@('127.0.0.1:13100 -> PC3loopback13100','127.0.0.1:13101 -> PC3loopback13101');RemoteForwards=@('PC3loopback18081 -> Mainloopback8080 old API rollback','PC3loopback8443 -> Mainloopback8443 real IdP','PC3loopback3100 -> Mainloopback3100 browser exact origin');MainAppStarted=$false;PortalRouteChanged=$false;Owner='Root523'}
+$result | ConvertTo-Json -Depth 4 | Set-Content -LiteralPath $receipt -Encoding UTF8
+$result | ConvertTo-Json -Depth 4

@@ -1,0 +1,14 @@
+{
+  "atKST": "2026-11-08T00:13:20+09:00",
+  "taskID": "FLEET5-PC3-API96-DEPLOY-R1-20261108",
+  "owner": "Root Codex",
+  "managementBase": "a9f911ff50655aa1a9a9dda4cd8b774ec20d5f35",
+  "acceptedSource": "96afd799d49717fd40e4ddabd538d82accbe1958",
+  "actualReview": "86acd9816f3ba397d02a07e90d2e912e414b1bac",
+  "scope": "New public combined API image and protected PC3 configuration; recheck target/backup and apply only reviewed0068; new API/remote web route only after readiness. Preserve existing Node/observer/old service state. No owner credential in API, fake person/vote/readiness or Main product build.",
+  "mainExecutionRestriction": "All build/crypto/app execution PC3; Main metadata/HTTP/git only until proven safe owned-service cutover",
+  "rolloutRule": "Stage and verify new services before Main owned route switch; schema forward-only, preserve backup and all records",
+  "codeReviewForFeature": "COMPLETE; CR90501 closed",
+  "deploymentStatus": "IN_PROGRESS_NOT_YET_APPLIED",
+  "wholeProgramComplete": false
+}

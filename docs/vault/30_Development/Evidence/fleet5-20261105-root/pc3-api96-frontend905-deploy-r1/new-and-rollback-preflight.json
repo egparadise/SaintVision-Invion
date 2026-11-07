@@ -1,0 +1,21 @@
+{
+  "atKST": "2026-11-08T01:12:48+09:00",
+  "newPortalAndOldB48RollbackBothReady": true,
+  "checks": [
+    {
+      "localPort": 13100,
+      "staticOriginalsExceptPublicAuthConfigMatch": true,
+      "anonymousSessionHTTP": 401,
+      "staticFilesCompared": 12
+    },
+    {
+      "localPort": 13101,
+      "staticOriginalsExceptPublicAuthConfigMatch": true,
+      "anonymousSessionHTTP": 401,
+      "staticFilesCompared": 12
+    }
+  ],
+  "rootOwnedOldNodeOnlyMayStop": 62240,
+  "noMainAppStarted": true,
+  "portalRouteChanged": false
+}

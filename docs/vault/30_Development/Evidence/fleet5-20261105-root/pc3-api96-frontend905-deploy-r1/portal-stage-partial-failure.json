@@ -1,0 +1,18 @@
+{
+  "atKST": "2026-11-08T01:07:39+09:00",
+  "SSHExit": 2,
+  "stderrBytes": 0,
+  "knownHostsUnchanged": true,
+  "remote": {
+    "portalRouteChanged": false,
+    "mainProductExecuted": false,
+    "privateMaterialPresent": false,
+    "actualRunOrVotesCreated": false,
+    "wholeProgramComplete": false,
+    "status": "HOLD_PC3_PORTAL905_RECONCILE_REQUIRED",
+    "phase": "input-pins",
+    "errorClass": "PermissionError",
+    "noBlindReplay": true,
+    "atKST": "2026-11-08T01:07:39+09:00"
+  }
+}

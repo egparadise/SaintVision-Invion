@@ -1,0 +1,21 @@
+{
+  "reason": "Docs guard flags dynamic URL-construction templates too; omit those two lines in public evidence without changing guard or operator code",
+  "programs": [
+    {
+      "program": "apply_reviewed_0068_once_pc3_r1.py",
+      "originalSourceSHA256": "62c48416a800a4218fbd5487227d381ceebf26c24db13bdc82385f5f55d49fa3",
+      "publicCopySHA256": "5288173ac00b06a64048fbb5b1af926a7a32b7a44e5aa5824d8521dd815ffa39",
+      "redactedLines": 1,
+      "concreteCredentialWasPresent": false,
+      "publicCopyExecutable": false
+    },
+    {
+      "program": "stage_pc3_api96_protected_config_r1.py",
+      "originalSourceSHA256": "07b880688e5b306278d2db1fa298ec0800d6d752664a7a529d7bc68d5533ad3b",
+      "publicCopySHA256": "e2beb880eb75f420736dcce216dce022c9a2573613d5470a5a8e1152ae2dfcdb",
+      "redactedLines": 1,
+      "concreteCredentialWasPresent": false,
+      "publicCopyExecutable": false
+    }
+  ]
+}

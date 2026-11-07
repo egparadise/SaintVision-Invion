@@ -1,0 +1,14 @@
+{
+  "atKST": "2026-11-08T01:11:10+09:00",
+  "status": "OLD_B48_STATIC_ROLLBACK_STAGED_PC3_ONLY",
+  "containerID": "60233888fc91f861f8bebb0f9a6abddf10165f4a855bc0e67fda9b1c86354994",
+  "oldFrontendSource": "b48c2c4492f8aea4b55c33161733a9a6fb9eed8c",
+  "oldFrontendArtifactSHA256": "7212b4870e3a142b8c44dc2629d5e6643401ae9e1d187d6234ecdf4059fd671d",
+  "bind": "PC3 127.0.0.1:13101",
+  "oldMainAPIUpstream": "PC3loopback18081 via new pinnedSSH to Mainloopback8080",
+  "newNodeOrRunCreated": false,
+  "portalRouteChanged": false,
+  "mainProductExecution": false,
+  "rollbackSchemaDowngrade": false,
+  "wholeProgramComplete": false
+}

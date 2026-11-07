@@ -1,0 +1,10 @@
+{
+  "AtKST": "2026-11-08T00:55:50.9017552+09:00",
+  "PID": 51072,
+  "ProcessStartedAt": "2026-11-08T00:55:48.1376779+09:00",
+  "LocalBind": "127.0.0.1:18080",
+  "RemoteBind": "PC3 127.0.0.1:8080",
+  "ListenerOwnerMatches": true,
+  "PortalRouteChanged": false,
+  "PasswordInArgv": false
+}

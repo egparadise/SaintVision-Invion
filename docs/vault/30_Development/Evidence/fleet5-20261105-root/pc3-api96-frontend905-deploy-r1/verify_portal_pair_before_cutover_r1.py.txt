@@ -1,0 +1,13 @@
+import datetime,hashlib,json,urllib.request,urllib.error,zipfile
+from pathlib import Path
+r=Path(__file__).resolve().parents[1];op=urllib.request.build_opener(urllib.request.ProxyHandler({}));values=[]
+for port,archive in [(13100,'frontend905-artifacts-r1/saintvision-web-dist.zip'),(13101,'uir3-b48-frontend-build.zip')]:
+ with zipfile.ZipFile(r/'.work'/archive) as z:
+  for name in [n for n in z.namelist() if n!='auth-config.js']:
+   with op.open(f'http://127.0.0.1:{port}/'+name,timeout=8) as response:assert response.status==200;data=response.read(8*1024*1024);assert data==z.read(name)
+ try:op.open(f'http://127.0.0.1:{port}/v1/session',timeout=8)
+ except urllib.error.HTTPError as error:assert error.code==401
+ else:raise AssertionError('anonymous session accepted')
+ values.append({'localPort':port,'staticOriginalsExceptPublicAuthConfigMatch':True,'anonymousSessionHTTP':401,'staticFilesCompared':len(z.namelist())-1})
+v={'atKST':datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=9))).isoformat(timespec='seconds'),'newPortalAndOldB48RollbackBothReady':True,'checks':values,'rootOwnedOldNodeOnlyMayStop':62240,'noMainAppStarted':True,'portalRouteChanged':False}
+(r/'.work/portal-pair-precutover-verification-r1.json').write_text(json.dumps(v,indent=2)+'\n');print(json.dumps(v))

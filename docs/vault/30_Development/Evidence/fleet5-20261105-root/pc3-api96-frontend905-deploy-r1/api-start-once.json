@@ -1,0 +1,99 @@
+{
+  "atKST": "2026-11-08T00:51:30+09:00",
+  "SSHExit": 0,
+  "stderrBytes": 0,
+  "knownHostsUnchanged": true,
+  "remote": {
+    "applicationStarted": true,
+    "existingServicesChanged": false,
+    "ownerCredentialMountedOrInDockerEnv": false,
+    "DockerSocketMounted": false,
+    "CAOrNodePrivateKeyMounted": false,
+    "realRunOrVotesCreated": false,
+    "wholeProgramComplete": false,
+    "publicImportSmokeExit": 0,
+    "publicImportSmoke": {
+      "imports": true
+    },
+    "containerId": "8d62139c2408dff910bbfb3a9b322be56520705a3f3e967ce74563cfe9cd3f28",
+    "containerName": "saintvision-api96-bcd581be-r1",
+    "containerRunning": true,
+    "restartCount": 0,
+    "healthObservation": {
+      "http": 200,
+      "body": "{\"status\":\"ok\",\"version\":\"0.1.0\"}"
+    },
+    "status": "NEW_PC3_API96_RUNNING_HEALTH200_ANONYMOUS401",
+    "source": "96afd799d49717fd40e4ddabd538d82accbe1958",
+    "imageId": "sha256:1426226b8dd7093bf79909886808b83141dcd8f9b677c118b29c4be4a1c9de47",
+    "healthHTTP": 200,
+    "anonymousSessionHTTP": 401,
+    "bind": "127.0.0.1:8080 on PC3 only",
+    "UID": "1000:1000",
+    "CPUQuotaMillis": 1000,
+    "memoryBytes": 536870912,
+    "pidsLimit": 128,
+    "readOnlyRoot": true,
+    "capabilitiesDropped": [
+      "ALL"
+    ],
+    "noNewPrivileges": true,
+    "exactMounts": [
+      {
+        "source": "/home/saintvision-invion3/saintvision-share/ops-fresh-cpu-1efea-r1-20261107/workspace-api-96af-r2/private/connection-profiles.json",
+        "destination": "/run/sv-api/connection-profiles.json",
+        "readOnly": true
+      },
+      {
+        "source": "/home/saintvision-invion3/saintvision-share/ops-fresh-cpu-1efea-r1-20261107/workspace-api-96af-r2/config/api.json",
+        "destination": "/run/sv-api/api.json",
+        "readOnly": true
+      },
+      {
+        "source": "/home/saintvision-invion3/saintvision-share/ops-fresh-cpu-1efea-r1-20261107/workspace-api-96af-r2/config/public-jwks.json",
+        "destination": "/run/sv-api/public-jwks.json",
+        "readOnly": true
+      },
+      {
+        "source": "/home/saintvision-invion3/saintvision-share/ops-fresh-cpu-1efea-r1-20261107/pki-r1/ca-cert.pem",
+        "destination": "/run/sv-api/tls/ca-cert.pem",
+        "readOnly": true
+      },
+      {
+        "source": "/home/saintvision-invion3/saintvision-share/ops-fresh-cpu-1efea-r1-20261107/pki-r1/cp-client-cert.pem",
+        "destination": "/run/sv-api/tls/cp-client-cert.pem",
+        "readOnly": true
+      },
+      {
+        "source": "/home/saintvision-invion3/saintvision-share/ops-fresh-cpu-1efea-r1-20261107/pki-r1/cp-client-key.pem",
+        "destination": "/run/sv-api/tls/cp-client-key.pem",
+        "readOnly": true
+      },
+      {
+        "source": "/home/saintvision-invion3/saintvision-share/ops-fresh-cpu-1efea-r1-20261107/pki-r1/launch-signer-key.pem",
+        "destination": "/run/sv-api/tls/launch-signer-key.pem",
+        "readOnly": true
+      },
+      {
+        "source": "/home/saintvision-invion3/saintvision-share/ops-fresh-cpu-1efea-r1-20261107/workspace-api-96af-r2/working",
+        "destination": "/work/working",
+        "readOnly": false
+      },
+      {
+        "source": "/home/saintvision-invion3/saintvision-share/ops-fresh-cpu-1efea-r1-20261107/workspace-api-96af-r2/objects",
+        "destination": "/work/objects",
+        "readOnly": false
+      },
+      {
+        "source": "/home/saintvision-invion3/saintvision-share/ops-fresh-cpu-1efea-r1-20261107/workspace-api-96af-r2/restores",
+        "destination": "/work/restores",
+        "readOnly": false
+      }
+    ],
+    "DockerConfigEnvHasNoDsn": true,
+    "ownerCredentialPresent": false,
+    "portalRouteChanged": false,
+    "actualAuthenticatedUserRead": "PENDING",
+    "logicalWorkspaceMarkedReady": false
+  }
+}

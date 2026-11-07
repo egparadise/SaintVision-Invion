@@ -1,15 +1,23 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.483"
+version: "1.0.484"
 status: "review"
 author: "Codex"
-updated: "2026-11-07T23:53:12+09:00"
+updated: "2026-11-08T01:14:46+09:00"
 source_of_truth: "Git"
 active_card: "FLEET5 continued supervision with PORTAL-REFRESH-FLEET-20261106"
-active_card_status: "CR90501ActualClaudeDeltaReviewStarted_OriginalVerdictPending_Source96afCI6JobsDirect18AndSchemaBackupVerified_ActualDeploymentPending_RootApplyDeferred"
-active_card_next: "Receive actual Claude ctx_517cae38b466/task_816b0fa2824f delta verdict; verify immutable review/source/Docs and exit-release before code acceptance then Root-only protected migration/API/web deployment. Schema-only backup exists; real approvals/Run/PC1/PC5/five-PC gates remain."
+active_card_status: "96afFeatureCodeAccepted_Actual0068API96Frontend905PC3Cutover3100_RealOwner3MeasuredNodes_BrowserReadyWorkspaceRunFivePCPending"
+active_card_next: "Root verifies actual remote browser login/no-blink and genuine storage readiness, then actual first intent/Run with two genuine distinct nonrequester votes. PC1 key feedback and PC5 RAM/Node, renewal/reconnect/reboot and GPU/storage five-PC acceptance remain. No feature review loop or fake completion."
 ---
+
+## 2026-11-08T01:14:46+09:00 새 API96·화면905 실배포와 3100 전환
+
+작업한 것 → 확인한 것: 독립 수락96af/Claude86ac를 기준으로 Root가 PC3에서 새 API96 이미지와 제한된 runtime/business 설정을 배포하고, 사전 schema backup을 확인한 뒤 검토된0068을 단 한 번 적용했다. 실제 후속 catalogue17/unsafe0·writer NOLOGIN/NOSUPER/NOBYPASS/NOINHERIT/no membership·행수 불변을 확인했다. 새 API는 loopback8080 health200/익명401이며 실제 관리자 PKCE·owner/canAdminister200과 PC2·3·4의 온라인/신선한 측정값을 검증했다. 합계는 CPU1500m·메모리201326592B인 제한 시험 공유량이다. 공식 Frontend905 artifact의12원본 파일 hash를 대조하고, 새 화면과 기존b48 복구 경로를 모두 검증한 뒤 Main의 소유가 증명된 Node62240만 종료하여 127.0.0.1:3100을 PC3 화면·API로 전환했다. 실제 브라우저/깜빡임·Workspace provisioning 해소·두 실제 비요청자 승인·사용자Run·PC1/PC5·GPU/storage/5대 전체 인수는 남는다. 다음 첫 행동/담당은Root의실제원격브라우저·genuineWorkspace준비점검이다. 제품/장비인수와문서게이트를구분하고Original19HOLD등은유지한다.
+
+## 2026-11-08T00:13:20+09:00 코드 수락과 PC3 실제 배포 시작
+
+실제 Claude86acd981이96af의 보안 시험 보완을 수락해 CR-905-01을 닫았고, 이 기능의 코드 검토는 완료됐다. Root가 원본 판정·7개 입력 hash·정확 Docs19단계와 실제 검토자 종료·해제를 대조했다. 이제 Root가 기존 Node·관측·DB 기록을 보존하면서 PC3의 새 API 패키지·설정·0068·화면 배포를 진행한다. 실제 배포·사람의 승인·사용자 Run·5대 전체 인수는 코드 수락과 별개로 계속 검증한다. 현재는착수상태이며아직schema/app/route변경성공을표시하지않는다.
 
 ## 2026-11-07T23:53:12+09:00 실제 Claude CR-905-01 한정 재검토 착수
 

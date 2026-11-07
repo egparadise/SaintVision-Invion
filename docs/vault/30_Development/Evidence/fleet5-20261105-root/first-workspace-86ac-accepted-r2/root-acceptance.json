@@ -1,0 +1,29 @@
+{
+  "atKST": "2026-11-08T00:05:36+09:00",
+  "reviewSHA": "86acd9816f3ba397d02a07e90d2e912e414b1bac",
+  "deliveryBase": "a18095e2aff59433b93bdd755a2d050a26c15546",
+  "acceptedSource": "96afd799d49717fd40e4ddabd538d82accbe1958",
+  "RootInputs": "a2513f2f826898c96cc0b9488ce43842c7c8f76e",
+  "RootPinsMatched": 7,
+  "directParentRemoteOnlyOwnFourDocs": true,
+  "actualVerdict": "ACCEPT_FIRST_WORKSPACE_R1_CODE_AND_CR90501_TEST_DELTA_KEEP_REAL_DEPLOYMENT_GATES",
+  "CR90501Closed": true,
+  "remainingCodeReviewForThisFeature": false,
+  "Docs": 42383923564,
+  "DocsJob": 128437170910,
+  "correlation": "fleet5-cr90501-delta-r2-claude-522e359efa1740a694e44e608b14e153",
+  "manualAttempt1All19Success": true,
+  "reviewerReportedFullBytesEqual": true,
+  "currentCanonicalMatchesBothReviewEndpointsAndRootStart": true,
+  "canonicalBytes": 512234,
+  "canonicalSHA256": "69c715d24811337ad6758ab01fbe08891f206ce3cca62ab20f41c62b84f55b16",
+  "reviewerLifecycle": {
+    "state": "succeeded",
+    "stage": "settled",
+    "liveness": "exited",
+    "terminalState": "released"
+  },
+  "operationalGatesO1O6": "Retained; Root proceeds protected packages/config/schema/API/web/live verification with existing approvals",
+  "migrationOrDeploymentPerformedByReview": false,
+  "wholeProgramComplete": false
+}

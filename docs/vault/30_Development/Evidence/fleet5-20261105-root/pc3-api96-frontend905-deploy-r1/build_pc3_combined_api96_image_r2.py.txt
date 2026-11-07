@@ -1,0 +1,13 @@
+"""Same accepted public packages, with worker restricted-profile separation."""
+import ast,json
+from pathlib import Path
+w=Path(__file__).resolve().parent
+first=json.loads((w/'pc3-combined-api96-image-r1/receipt.json').read_bytes());assert first['SSHExit']==0 and not first['remote']['apiOrMigrationStarted']
+path=w/'build_pc3_combined_api96_image_r1.py';s=path.read_text(encoding='utf-8')
+for old,new in [("out=w/'pc3-combined-api96-image-r1'","out=w/'pc3-combined-api96-image-r2'"),("root=ops/'workspace-api-96af-r1'","root=ops/'workspace-api-96af-r2'")]:
+ assert s.count(old)==1;s=s.replace(old,new,1)
+old="o.update(status='ACCEPTED_COMBINED_API_IMAGE_BUILT_OFFLINE_NOT_STARTED'"
+new="q=subprocess.run(['docker','run','--rm','--network','none','--user','1000:1000','--memory','256m','--pids-limit','64','--read-only','--cap-drop','ALL','--security-opt','no-new-privileges',image,'delivery-once'],capture_output=True,timeout=15);assert q.returncode!=0 and b'worker-profile.json' in q.stderr\n o.update(workerProfileSeparatedFromBusinessCredential=True,status='ACCEPTED_COMBINED_API_IMAGE_BUILT_OFFLINE_NOT_STARTED'"
+assert s.count(old)==1;s=s.replace(old,new,1);tree=ast.parse(s)
+remote=next(n.value.value for n in tree.body if isinstance(n,ast.Assign) and any(isinstance(t,ast.Name) and t.id=='remote' for t in n.targets));ast.parse(remote)
+exec(compile(s,str(path),'exec'),{'__file__':str(path),'__name__':'__main__'})
