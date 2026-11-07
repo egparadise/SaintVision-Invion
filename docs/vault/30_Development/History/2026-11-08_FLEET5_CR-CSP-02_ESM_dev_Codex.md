@@ -19,3 +19,5 @@ source_of_truth: "Git"
 [[30_Development/Evidence/fleet5-csp02-esm-dev-compat-r1-20261108-codex/README]]
 
 첫 수정본8e3fdbd0 Frontend42398028486는1350pass/1fail/0skip으로 VM 회귀1건이 실패했다. SourceTextModule 플래그가 Vitest worker에 전달되지 않은 실제 시험 실행 설정 오류를 보존하고, 공식 --execArgv 전달만 교정한다. ESM 제품 코드·15시험·negative controls·timeout은 불변이며 새 exactSHA에서 Frontend/Docs/AC11 모두 새 실행이 필요하다.
+
+3bd660b5의 Frontend/Docs는 성공했으나 AC11 job 결론과 달리 원본은4pass/2fail, canonical journey1fail을 기록했다. Node/Vite 직접 fixture가 predev 전 App 모듈을 요청하므로 같은 canonical generator를 browser Vite config 시작에 연결한다. 모든 실제 여섯 case/아홉 invariant의 자동실패0을 최종 artifact로 확인하며, manual acceptance 누락1은 정직한 real-device gate로 보존한다. 기존 AC11 workflow/normalizer/assertion/timeout은 변경하지 않는다.
