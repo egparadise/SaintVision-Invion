@@ -1,15 +1,19 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.472"
+version: "1.0.473"
 status: "review"
 author: "Codex"
-updated: "2026-11-07T17:58:51+09:00"
+updated: "2026-11-07T18:48:11+09:00"
 source_of_truth: "Git"
 active_card: "FLEET5 continued supervision with PORTAL-REFRESH-FLEET-20261106"
-active_card_status: "ThreeNodeObservationEvidenceActual7d8Accepted_RootFourOperationalFollowupsVerified_WorkspaceRecipe427Accepted_LiveB48FrontendSeparateFrom1efea; BoundedUIFirstStartRepairReady_PC1AuthUserAction_PC5MemoryDocker_WorkspaceRunFivePCPending"
-active_card_next: "After checkpoint assign B actual bounded first Workspace UI contract implementation preserving accepted11 b48 frontend imports on1efea backend, hosted Frontend/Core/Docs validation then one actual Claude. Root owns protected PC3 API/package/JWKS/roles/roots/policy and route preparation. PC1 local public-key registration status and additional real approver identity remain pending; no synthetic votes or main app execution."
+active_card_status: "FirstWorkspaceServingGapConfirmed_R1ContractFrozen_SingleCodexBFrontendBackendImplementationActive; APIRestrictedRolesAligned_PackageAndProvisioningPending; RootSyncApplyDeferredDuringWorkerSnapshot_PC1Auth_PC5Resources_RealApproversRunFivePCPending"
+active_card_next: "B Task72ad09258a5c/ctx200 implements exact R1 serving+atomic binding+UI, real restricted-role hosted tests and final Frontend/Core/Backend/Docs; one actual Claude then Root protected deployment. Root must defer canonical APPLY until B full snapshot closes. PC1 local key registration/additional real approver identity remain pending; no fake ready/workload/votes/Run."
 ---
+
+## 2026-11-07T18:48:11+09:00 첫Workspace 서버계약 확정과 실제 구현
+
+첫실행의서버연결누락을소스에서확인했다. 범용Run생성은업무Run/Workload/불변mapping을생성하지않아첫Workspace준비를완성할수없었다. 기존B작업한개를frontend+최소backend구현으로확장하고선택Workspace의의도조회/메타데이터생성/원자적Run생성3경로를R1계약으로고정했다. Root는nullable배치·8MiB최소메모리·정확ETag/subject·기존ledger행잠금·최소권한·실제readiness보존6조건을검토했다. PC3읽기전용사전점검은제한된두DB역할분리가정상이고현재Workspace준비중1개/Workload0/업무패키지미설치임을확인했다. 코드/CI/배포/진짜승인·Run/5대인수는진행중이다. B의full canonical snapshot중Root APPLY는보류하고Git/문서CI를분리한다. 보고/동기화미완료는done이아니며명령·exit·고정원문·후속담당을History/Evidence에남겼다.
 
 ## 2026-11-07T17:58:51+09:00 3대관측 독립수락과 실행UI계약 수리 준비
 

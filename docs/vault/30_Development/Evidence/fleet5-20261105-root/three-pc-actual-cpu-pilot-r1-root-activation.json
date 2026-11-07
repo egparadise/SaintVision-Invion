@@ -1,5 +1,5 @@
 {
-  "atKST": "2026-11-07T17:58:51+09:00",
+  "atKST": "2026-11-07T18:48:11+09:00",
   "source": "1efea494f026e932360c35ae811b6423d874a2e7",
   "owner": "Root Codex",
   "priorRootCheckpoint": {
@@ -1323,5 +1323,181 @@
       "knownHostsUnchanged": true
     },
     "request": "One actual local-console public-key registration status requested asynchronously; pending. No password/private-key requested."
+  },
+  "firstWorkspaceServingGap": {
+    "status": "SOURCE_CONFIRMED_IMPLEMENTATION_ACTIVE_CONTRACT_R1_FROZEN",
+    "problem": "Generic Control.create writes only kernel Run; business first start needs immutable same-Run public metadata/mapping and exact current workload, with no prior production creation path",
+    "additionalPrerequisite": "Scoped workload metadata-create missing; existing admin ready-status transition remains; no synthetic ready rows",
+    "contract": {
+      "docID": "FLEET5-WS-FIRST-INTENT-CONTRACT-R1",
+      "version": "1.0.0",
+      "atKST": "2026-11-07T18:40:10+09:00",
+      "status": "ROOT_FROZEN_FOR_SOURCE_IMPLEMENTATION_WITH_REQUIRED_AMENDMENTS_NOT_LIVE_ACCEPTANCE",
+      "owner": "Codex B Task72ad09258a5c frontend+bounded backend",
+      "architectureReviewer": "Root Codex; author/reviewer distinct; final independent code review remains actual Claude",
+      "managementBase": "23a6cadef31053a35deae187c6991e48ebd70ff0",
+      "productBase": "1efea494f026e932360c35ae811b6423d874a2e7",
+      "acceptedFrontendBase": "b48c2c4492f8aea4b55c33161733a9a6fb9eed8c",
+      "originalProposalSHA256": "956501a4a4787dde515c141a60d82ac5f9b6635ef31a9dbfedec0a3c77b26d1f",
+      "originalProposalBytes": 12370,
+      "routes": [
+        {
+          "method": "GET",
+          "path": "/v1/projects/{project}/workspaces/{workspace}/first-intents",
+          "query": {
+            "after": "optional canonical WorkloadId, exclusive",
+            "limit": "integer 1..50, default 20"
+          },
+          "response": "WorkspaceFirstIntentPage",
+          "semantics": "Exact selected ready Workspace in enabled linked project; current active business/kernel can_request intersection; tenant-bound workload spec.workspaceId exactly selected workspace; WorkloadId ascending stable keyset pagination, no default/first/latest selection; validate WorkloadSpec, canonical stored SHA, current profile CPU constraints. No rows are created by read. Nonready workspace is refused with actual prerequisite, not silently ready."
+        },
+        {
+          "method": "POST",
+          "path": "/v1/projects/{project}/workspaces/{workspace}/first-intents",
+          "request": "WorkspaceFirstIntentCreateInput",
+          "response": "WorkspaceFirstIntent",
+          "status": 201,
+          "headers": {
+            "Idempotency-Key": "required existing printable bounded key <=200",
+            "If-Match": "required quoted workspace version: \"workspace-v<positive integer>\""
+          },
+          "semantics": "Indispensable metadata creation surface: caller supplies bounded objective/CPU command/image/resources/timeout only; server generates workloadId and supplies tenant/project/workspace/targetNode from selected ready workspace and configured default restricted runtime. Selected workspace.nodeId must equal that runtime node and enabled project-node membership. No user-supplied identity/risk/policy/grant, terminal, resume/start/model reference. compile_launch against existing profile enforces approved image/executable/CPU/memory/timeout; hard pilot ceiling500m/67108864B/30s, GPU0. This records an intent; it does not provision storage, mark ready, create execution or grant rights. Existing administrator status API remains the only existing status path; Root must establish genuine readiness operationally."
+        },
+        {
+          "method": "POST",
+          "path": "/v1/projects/{project}/workspaces/{workspace}/first-intents/{workload}/runs",
+          "request": "EmptyRequest unchanged {}",
+          "response": "WorkspaceFirstRunCreateResult",
+          "status": 201,
+          "headers": {
+            "Idempotency-Key": "required existing bounded key",
+            "If-Match": "required quoted token supplied in selected intent: \"workspace-v<workspaceVersion>-workload-v<workloadVersion>-sha256-<64 lowercase hex>\""
+          },
+          "semantics": "Explicit selected path, current ready Workspace/workload/versions/canonical digest and current business+kernel requester grants checked on initial call AND ledger replay. Atomically append inv.runs + public.runs + immutable inv.business_runs for the same new server RunId, with public requested_by_user_id derived from verified subject's current DB mapping. Server owns draft/attempt0/version1. Replay returns original stored response only after current authorization/intent checks; stale changes fail GRAPH-0003(409), missing/malformed required headers VAL-0003(422). Generic POST project/runs remains unchanged."
+        }
+      ],
+      "amendments": [
+        {
+          "id": "R1-PLACEMENT",
+          "required": true,
+          "decision": "Keep exact selected Workspace/workload route context. Workspace.node_id NULL is explicitly an unplaced/between-placement logical Workspace in existing execution.py, and existing create/status API does not assign it. Permit NULL only with genuine ready status and an explicitly configured default runtime Node that is enabled in this project; derive targetNodeId from that runtime, preserve NULL and do not claim physical placement. If node_id is nonNULL and differs from that runtime Node, refuse. Do not insert a fake public Node or auto-assign/provision/mark Workspace ready. Existing stored spec targetNodeId, if present, must match; never rewrite a stored spec/hash to add it on read. New intent creation supplies the server target."
+        },
+        {
+          "id": "R1-MEMORY",
+          "required": true,
+          "decision": "Node runtime/permit.go:67 rejects memory below8MiB. Add REQUIRED minMemoryBytes const8388608 to the NEW closed WorkspaceFirstProfile DTO. The new scoped create ResourceRequest memoryBytes must be8388608..67108864 and <= current configured profile; do not change generic ResourceRequest/WorkloadSpec. If configured max memory is below8MiB, expose a configuration prerequisite, not a runnable profile. CPU remains existing positive canonical floor with cap500; do not invent extra CPU floors without exact source evidence."
+        },
+        {
+          "id": "R1-WIRE",
+          "required": true,
+          "decision": "Keep all three proposed paths, selected-context EmptyRequest POST, and proposed response shapes otherwise. WorkloadId already exists as workload.workloadId in unchanged WorkloadSpec; it must equal stored workload_id. Match tenantId/projectId/workspaceId/workloadId and canonical SHA to the row/context, not only JSON schema. requesterId must use exact canonical oidc:[0-9a-f]{64} verified subject in this business-only surface. Versions must be positive safe integers; ETags must be exactly quoted strong proposed forms with canonical base10 versions/no leading zero, no weak/list variants and lowercase64 SHA. Idempotency-Key uses existing ASCII33..126, length1..200 helper. Intent/read GET responses Cache-Control:no-store; observedAt denotes the actual snapshot, and stored original timestamp remains on idempotent replay rather than fabricated freshness."
+        },
+        {
+          "id": "R1-LOCKS",
+          "required": true,
+          "decision": "The current ApprovalStore._ledger uses idempotency INSERT ON CONFLICT plus SELECT FOR UPDATE, not an advisory lock. Preserve existing Database tenant/epoch/containment ordering; current Control.grant/business permission identity sequence before ledger, then selected Workspace/Workload locks/current version+digest checks before deciding initial write OR replay. Trusted helper rechecks must use the same order/reentrant already-held locks. No unrelated global lock refactor. Prove same-key races, status/role/intent changes and first-start concurrency with real restricted-role PG tests and bounded timeouts. All rows/events/ledger response remain one transaction and roll back together."
+        },
+        {
+          "id": "R1-TRUST",
+          "required": true,
+          "decision": "GUC is a trusted service context, not a cryptographically unforgeable end-user identity. Set verified subject transaction-locally only after token validation, and prove no pool leakage on rollback/commit. Do not accept actor/user/risk/grant from request. Keep the explicit compromised SQL service credential boundary honest. Revoke PUBLIC/inv_app helper EXECUTE, grant only kernel; writer NOLOGIN/non-super/non-BYPASSRLS/non-inherited, no runtime membership or schema/table ownership. Fixed pg_catalog search_path, qualified objects, FORCE RLS preserved, minimal exact column privileges and direct-call/hostile search_path/cross-tenant/missing-context tests. No broad grants or live migration/credentials."
+        },
+        {
+          "id": "R1-PREREQUISITES",
+          "required": true,
+          "decision": "Missing workload metadata-create is authorized as the proposed scoped POST, server-owned canonical fields and actual profile validation. Existing admin Workspace lifecycle status transition stays unchanged; actual provisioning/readiness remains Root operations. Reuse shared bounded HTTP reader for all new requests and enforce total UTF8 JSON request<=65536 including nested data. Also enforce declared command/resource bounds and node minima; no silent partial acceptance or invalid row filtering as if no intents. Generic project/runs EmptyRequest behavior, existing approval/quorum/prepare/enqueue/output/containment/policy rules stay unchanged. Exactly one forward Alembic revision after0067 plus corresponding new inv SQL resource only if needed; old migration bytes unchanged."
+        }
+      ],
+      "authorMustProduceRevisedExactSchemaAndRecordAmendmentApplication": true,
+      "noNewUserApprovalNeededForAuthorizedDevelopment": true,
+      "actualRuntimeSchemaOrRoleChangesAuthorizedByThisFreeze": false,
+      "CIAndIndependentReviewStillRequired": true,
+      "actualUserApprovalsRunAndFivePCAcceptance": "PENDING",
+      "wholeProgramComplete": false
+    },
+    "writer": "Codex B same Task72ad09258a5c",
+    "actualAPIOrMigrationDeployed": false
+  },
+  "actualAPIPrerequisites": {
+    "atKST": "2026-11-07T18:42:00+09:00",
+    "SSHExit": 0,
+    "stderrBytes": 0,
+    "knownHostsUnchanged": true,
+    "rawDiagnosticSuppressed": true,
+    "remote": {
+      "DBWrites": false,
+      "profileValuesEmitted": false,
+      "privateFilesWritten": false,
+      "applicationOrWorkerStarted": false,
+      "wholeProgramComplete": false,
+      "existingBusinessWorkspaceStatusCounts": [
+        {
+          "status": "provisioning",
+          "count": 1
+        }
+      ],
+      "existingBusinessWorkloadCount": 0,
+      "status": "READONLY_API_PREREQUISITES_RECORDED_NO_DEPLOYMENT",
+      "sameNamedClusterThroughExistingPinnedTunnel": true,
+      "epochAndTenantControlsMatch": true,
+      "existingSeparateRuntimeRoleClasses": {
+        "runtime": {
+          "nonsuper": true,
+          "nobypass": true,
+          "kernel_member": true,
+          "app_member": false,
+          "no_schema_ownership": true,
+          "no_table_ownership": true
+        },
+        "business": {
+          "nonsuper": true,
+          "nobypass": true,
+          "kernel_member": false,
+          "app_member": true,
+          "no_schema_ownership": true,
+          "no_table_ownership": true
+        }
+      },
+      "protectedTargetProfilesAligned": true,
+      "operatorEnvironmentMetadataOnly": {
+        "saintvision-control-plane": "0.1.0",
+        "saintvision-inv": null,
+        "SQLAlchemy": null,
+        "psycopg": "3.3.5",
+        "fastapi": "0.141.1",
+        "uvicorn": "0.52.4"
+      },
+      "operatorEnvironmentNotFinalAPIEnvironment": true,
+      "candidatePC3LoopbackPortsCurrentlyListening": {
+        "8080": false,
+        "18080": false,
+        "33100": false
+      },
+      "newAPIServiceDirectoryExists": false,
+      "privateSignerAndClientFileMetadataOnly": {
+        "cp-client-key.pem": {
+          "regular": true,
+          "uid": 1000,
+          "mode": "0o600",
+          "contentRead": false
+        },
+        "launch-signer-key.pem": {
+          "regular": true,
+          "uid": 1000,
+          "mode": "0o600",
+          "contentRead": false
+        }
+      },
+      "actualFinalBackendSource": "PENDING_B_TASK_IMPLEMENTATION_CI_REVIEW",
+      "actualReadyWorkspaceOrWorkloadCreated": false
+    }
+  },
+  "canonicalSyncForThisCheckpoint": {
+    "atKST": "2026-11-07T18:48:11+09:00",
+    "canonicalStatePath": "D:\\Project\\SaintVision-Invion\\SaintVisionI-Invion\\.git\\obsidian-sync-state.json",
+    "beforeBytes": 500344,
+    "beforeSHA256": "368bc72302840e416fdfe5c9fb01a2f0753e244cd40c055a8a07a5c967d07ab9",
+    "RootApplyDeferred": true,
+    "reason": "Active B Task full-canonical-state before/after snapshot window must remain unchanged. Root512 may publish Git/Docs CI; canonical APPLY is deferred until that window closes. CHECK only now. Delivery is not reported complete until sync later verifies."
   }
 }

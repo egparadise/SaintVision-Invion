@@ -1,0 +1,41 @@
+import hashlib,importlib.metadata,json,os,stat,sys
+from pathlib import Path
+import psycopg
+from psycopg.rows import dict_row
+phase='read-only-named-profile-class-check';o={'DBWrites':False,'profileValuesEmitted':False,'privateFilesWritten':False,'applicationOrWorkerStarted':False,'wholeProgramComplete':False}
+try:
+ p=json.loads(sys.stdin.buffer.read(65537));ops=Path('/home/saintvision-invion3/saintvision-share/ops-fresh-cpu-1efea-r1-20261107');assert Path(sys.prefix).resolve()==ops/'venv'
+ for key in list(os.environ):
+  if key.startswith('PG'):os.environ.pop(key,None)
+ with psycopg.connect(p['ownerProfile'],autocommit=True,row_factory=dict_row) as c:
+  c.read_only=True;assert c.execute('SELECT system_identifier::text AS id FROM pg_control_system()').fetchone()['id']==p['expectedServer']
+  assert str(c.execute('SELECT epoch FROM inv.control_epoch WHERE singleton').fetchone()['epoch'])==p['epoch']
+  controls=c.execute('SELECT version,kill_switch FROM inv.tenant_controls WHERE tenant_id=%s',(p['tenant'],)).fetchone();assert controls=={'version':0,'kill_switch':False}
+  current=c.execute("SELECT count(*) AS n FROM inv.business_projects b JOIN public.projects q ON q.tenant_id=b.tenant_id AND q.project_id=b.project_id WHERE b.tenant_id=%s AND b.project_id=%s AND b.enabled AND q.status='active'",(p['tenant'],p['project'])).fetchone()['n'];assert current==1
+  o['existingBusinessWorkspaceStatusCounts']=c.execute('SELECT status,count(*) AS count FROM public.workspaces WHERE tenant_id=%s AND project_id=%s GROUP BY status ORDER BY status',(p['tenant'],p['project'])).fetchall()
+  o['existingBusinessWorkloadCount']=c.execute('SELECT count(*) AS count FROM public.workloads WHERE tenant_id=%s AND project_id=%s',(p['tenant'],p['project'])).fetchone()['count']
+ roles={}
+ for name in ['runtime','business']:
+  with psycopg.connect(p[name+'Profile'],autocommit=True,row_factory=dict_row) as c:
+   c.read_only=True;row=c.execute("""SELECT NOT r.rolsuper AS nonsuper,NOT r.rolbypassrls AS nobypass,pg_has_role(current_user,'inv_kernel','MEMBER') AS kernel_member,pg_has_role(current_user,'inv_app','MEMBER') AS app_member,NOT EXISTS(SELECT 1 FROM pg_namespace n WHERE n.nspowner=r.oid AND n.nspname IN ('public','inv')) AS no_schema_ownership,NOT EXISTS(SELECT 1 FROM pg_class q JOIN pg_namespace n ON n.oid=q.relnamespace WHERE q.relowner=r.oid AND n.nspname IN ('public','inv')) AS no_table_ownership FROM pg_roles r WHERE r.rolname=current_user""").fetchone()
+   assert row['nonsuper'] and row['nobypass'] and row['no_schema_ownership'] and row['no_table_ownership']
+   assert (row['kernel_member'] if name=='runtime' else row['app_member'] and not row['kernel_member'])
+   roles[name]=row
+ versions={}
+ for name in ['saintvision-control-plane','saintvision-inv','SQLAlchemy','psycopg','fastapi','uvicorn']:
+  try:versions[name]=importlib.metadata.version(name)
+  except importlib.metadata.PackageNotFoundError:versions[name]=None
+ ports={8080:False,18080:False,33100:False}
+ for path in ['/proc/net/tcp','/proc/net/tcp6']:
+  for line in Path(path).read_text().splitlines()[1:]:
+   fields=line.split()
+   if fields[3]=='0A':
+    n=int(fields[1].split(':')[-1],16)
+    if n in ports:ports[n]=True
+ protected={}
+ for name in ['cp-client-key.pem','launch-signer-key.pem']:
+  st=(ops/'pki-r1'/name).lstat();assert stat.S_ISREG(st.st_mode) and st.st_uid==1000 and not st.st_mode&0o077
+  protected[name]={'regular':True,'uid':st.st_uid,'mode':oct(stat.S_IMODE(st.st_mode)),'contentRead':False}
+ o.update(status='READONLY_API_PREREQUISITES_RECORDED_NO_DEPLOYMENT',sameNamedClusterThroughExistingPinnedTunnel=True,epochAndTenantControlsMatch=True,existingSeparateRuntimeRoleClasses=roles,protectedTargetProfilesAligned=True,operatorEnvironmentMetadataOnly=versions,operatorEnvironmentNotFinalAPIEnvironment=True,candidatePC3LoopbackPortsCurrentlyListening=ports,newAPIServiceDirectoryExists=(ops/'workspace-api-r1').exists(),privateSignerAndClientFileMetadataOnly=protected,actualFinalBackendSource='PENDING_B_TASK_IMPLEMENTATION_CI_REVIEW',actualReadyWorkspaceOrWorkloadCreated=False)
+except BaseException as error:o.update(status='HOLD_API_PREREQUISITES_UNRESOLVED',phase=phase,errorClass=type(error).__name__,rawDiagnosticSuppressed=True)
+print(json.dumps(o));raise SystemExit(0 if o.get('status')=='READONLY_API_PREREQUISITES_RECORDED_NO_DEPLOYMENT' else 2)

@@ -1,0 +1,74 @@
+{
+  "atKST": "2026-11-07T18:42:00+09:00",
+  "SSHExit": 0,
+  "stderrBytes": 0,
+  "knownHostsUnchanged": true,
+  "rawDiagnosticSuppressed": true,
+  "remote": {
+    "DBWrites": false,
+    "profileValuesEmitted": false,
+    "privateFilesWritten": false,
+    "applicationOrWorkerStarted": false,
+    "wholeProgramComplete": false,
+    "existingBusinessWorkspaceStatusCounts": [
+      {
+        "status": "provisioning",
+        "count": 1
+      }
+    ],
+    "existingBusinessWorkloadCount": 0,
+    "status": "READONLY_API_PREREQUISITES_RECORDED_NO_DEPLOYMENT",
+    "sameNamedClusterThroughExistingPinnedTunnel": true,
+    "epochAndTenantControlsMatch": true,
+    "existingSeparateRuntimeRoleClasses": {
+      "runtime": {
+        "nonsuper": true,
+        "nobypass": true,
+        "kernel_member": true,
+        "app_member": false,
+        "no_schema_ownership": true,
+        "no_table_ownership": true
+      },
+      "business": {
+        "nonsuper": true,
+        "nobypass": true,
+        "kernel_member": false,
+        "app_member": true,
+        "no_schema_ownership": true,
+        "no_table_ownership": true
+      }
+    },
+    "protectedTargetProfilesAligned": true,
+    "operatorEnvironmentMetadataOnly": {
+      "saintvision-control-plane": "0.1.0",
+      "saintvision-inv": null,
+      "SQLAlchemy": null,
+      "psycopg": "3.3.5",
+      "fastapi": "0.141.1",
+      "uvicorn": "0.52.4"
+    },
+    "operatorEnvironmentNotFinalAPIEnvironment": true,
+    "candidatePC3LoopbackPortsCurrentlyListening": {
+      "8080": false,
+      "18080": false,
+      "33100": false
+    },
+    "newAPIServiceDirectoryExists": false,
+    "privateSignerAndClientFileMetadataOnly": {
+      "cp-client-key.pem": {
+        "regular": true,
+        "uid": 1000,
+        "mode": "0o600",
+        "contentRead": false
+      },
+      "launch-signer-key.pem": {
+        "regular": true,
+        "uid": 1000,
+        "mode": "0o600",
+        "contentRead": false
+      }
+    },
+    "actualFinalBackendSource": "PENDING_B_TASK_IMPLEMENTATION_CI_REVIEW",
+    "actualReadyWorkspaceOrWorkloadCreated": false
+  }
+}

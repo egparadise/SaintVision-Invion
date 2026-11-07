@@ -1,0 +1,8 @@
+{
+  "atKST": "2026-11-07T18:48:11+09:00",
+  "canonicalStatePath": "D:\\Project\\SaintVision-Invion\\SaintVisionI-Invion\\.git\\obsidian-sync-state.json",
+  "beforeBytes": 500344,
+  "beforeSHA256": "368bc72302840e416fdfe5c9fb01a2f0753e244cd40c055a8a07a5c967d07ab9",
+  "RootApplyDeferred": true,
+  "reason": "Active B Task full-canonical-state before/after snapshot window must remain unchanged. Root512 may publish Git/Docs CI; canonical APPLY is deferred until that window closes. CHECK only now. Delivery is not reported complete until sync later verifies."
+}

@@ -1,0 +1,97 @@
+{
+  "atKST": "2026-11-07T18:48:11+09:00",
+  "records": {
+    "b-first-workspace-ui-contract-r1-dispatch.json": {
+      "ok": false,
+      "result": {
+        "delivery": "reopened",
+        "followUpOf": "ctx_604188e68378",
+        "dispatchId": "ctx_bfd272431b58",
+        "taskId": "task_72ad09258a5c",
+        "runId": "run_e57ecd84a7bc",
+        "state": "failed",
+        "agent": "codex",
+        "terminal": "term_97e3464b79afe3ed38fb0bf2ea0340ad",
+        "workspace": "d98dc9d3-fe61-4cb2-9776-dff349347a61::D:/Project/SaintVisionI-Invion/fleet5-compute-storage-contract-20261105",
+        "failedStage": "agent_readiness",
+        "lastError": "Agent startup blocked: agent-update-prompt",
+        "residualResources": [
+          "terminal term_97e3464b79afe3ed38fb0bf2ea0340ad"
+        ],
+        "next": "This start created a terminal that never ran the Task. Close it with: orca orchestration worker-release --dispatch ctx_bfd272431b58"
+      }
+    },
+    "b-first-workspace-ui-contract-r1-failed-start-final-lifecycle.json": {
+      "ok": true,
+      "result": {
+        "dispatchId": "ctx_bfd272431b58",
+        "taskId": "task_72ad09258a5c",
+        "runId": "run_e57ecd84a7bc",
+        "followUpOf": "ctx_604188e68378",
+        "state": "failed",
+        "stage": "agent_readiness",
+        "liveness": "exited",
+        "terminal": "term_97e3464b79afe3ed38fb0bf2ea0340ad",
+        "terminalState": "released",
+        "workspace": "d98dc9d3-fe61-4cb2-9776-dff349347a61::D:/Project/SaintVisionI-Invion/fleet5-compute-storage-contract-20261105",
+        "attention": [
+          "failure"
+        ],
+        "waitingOnHuman": "unknown",
+        "lastError": "Agent startup blocked: agent-update-prompt"
+      }
+    },
+    "b-first-workspace-ui-contract-r1-update-menu-recovery.json": {
+      "atKST": "2026-11-07T18:09:14+09:00",
+      "task": "task_72ad09258a5c",
+      "failedDispatch": "ctx_bfd272431b58",
+      "failedTaskNeverRan": true,
+      "observedMenu": "Codex0.166.0 ->0.167.0; option3 Skip until next version",
+      "directMenuInputOnly": "3, no Task text or Enter resent",
+      "afterMenu": "Codex0.166.0 Resuming session, empty Ask Codex composer",
+      "appUpdateExecuted": false,
+      "approvalSandboxSettingsChanged": false,
+      "guardedFailedStartReleaseConfirmed": true,
+      "retrySameTaskAndRetryChain": true,
+      "newTaskOrRunCreatedForRecovery": false
+    },
+    "b-first-workspace-ui-contract-r1-retry-r1.json": {
+      "ok": true,
+      "result": {
+        "dispatchId": "ctx_20044c1f6fae",
+        "taskId": "task_72ad09258a5c",
+        "runId": "run_e57ecd84a7bc",
+        "state": "ready",
+        "agent": "codex",
+        "mode": "terminal",
+        "terminal": "term_9e4974ac-2da3-4e66-852c-abb9c9023d8d",
+        "workspace": "d98dc9d3-fe61-4cb2-9776-dff349347a61::D:/Project/SaintVisionI-Invion/fleet5-compute-storage-contract-20261105",
+        "next": "Orca wakes you when workers report; end your turn when you're done."
+      }
+    },
+    "bui-serving-gap-root-r1-reply.json": {
+      "ok": true,
+      "result": {
+        "messageId": "msg_942ba6b45412"
+      }
+    },
+    "bui-serving-gap-scope-extension-r2-send.json": {
+      "ok": true,
+      "result": {
+        "messageId": "msg_d0e307b75acc"
+      }
+    },
+    "bui-first-intent-freeze-r1-reply.json": {
+      "ok": true,
+      "result": {
+        "messageId": "msg_8a5abee88d30",
+        "next": "Finish the rest of your mail."
+      }
+    }
+  },
+  "actualActiveTask": "task_72ad09258a5c",
+  "actualActiveDispatch": "ctx_20044c1f6fae",
+  "implementationScope": "One Codex B writer frontend+minimal backend serving/atomic intent binding, exact Root R1 contract; no separate backend writer",
+  "finalIndependentReviewer": "One actual Claude after final combined code CI; not started",
+  "actualCodeOrCIComplete": false
+}
