@@ -1,6 +1,6 @@
 {
   "schema": "fleet5-root-review-resource-sequence:1",
-  "atKST": "2026-11-07T21:15:29+09:00",
+  "atKST": "2026-11-07T21:22:21+09:00",
   "completedB": {
     "task": "task_d4c4c809ed4e",
     "review": "ac9182c3e3d606ec027c0be2e90e049ff50d54f1",
@@ -12,56 +12,32 @@
     "verdict": "ACCEPT auxiliary delta at design/proposal level, no remaining blocker",
     "source": "8874b2dfe0dda9a019bd5f334636668290702e13"
   },
-  "active": null,
-  "pending": [
-    {
-      "source": "90578f49ea400958fcdbc1ded3908d624e856f57",
-      "owner": "Actual Claude independent code reviewer; not yet dispatched",
-      "scope": "Full bounded first Workspace frontend/backend/migration/AC11 change",
-      "RootVerifiedOfficialCI": [
-        {
-          "name": "frontend",
-          "runID": 42368189302,
-          "correlation": "fleet5-first-workspace-frontend-c7fce8c5cb024fa6846ad8922c6ea76d",
-          "attempt": 1,
-          "jobCount": 2,
-          "allJobsSuccess": true,
-          "stepDispositionMatchesAuthorExactly": true,
-          "officialArtifactCount": 2
-        },
-        {
-          "name": "core",
-          "runID": 42368191648,
-          "correlation": "fleet5-first-workspace-core-7931e102712143dfb7110746bac93c07",
-          "attempt": 1,
-          "jobCount": 2,
-          "allJobsSuccess": true,
-          "stepDispositionMatchesAuthorExactly": true,
-          "officialArtifactCount": 2
-        },
-        {
-          "name": "backend",
-          "runID": 42368193399,
-          "correlation": "fleet5-first-workspace-backend-c557c94f16a74a07b3ea0b1fc7ebe06d",
-          "attempt": 1,
-          "jobCount": 3,
-          "allJobsSuccess": true,
-          "stepDispositionMatchesAuthorExactly": true,
-          "officialArtifactCount": 2
-        },
-        {
-          "name": "docs",
-          "runID": 42368195169,
-          "correlation": "fleet5-first-workspace-docs-1f6a72b74a8a473b8f79878d61f90f17",
-          "attempt": 1,
-          "jobCount": 1,
-          "allJobsSuccess": true,
-          "stepDispositionMatchesAuthorExactly": true,
-          "officialArtifactCount": 2
-        }
-      ]
-    }
-  ],
+  "active": {
+    "atKST": "2026-11-07T21:22:21+09:00",
+    "source": "90578f49ea400958fcdbc1ded3908d624e856f57",
+    "frozenRootEvidence": "7454c7e2ce77ac4eb3415ccaec1ad0f84b949864",
+    "RootDocs": 42371743407,
+    "RootLatestCanonicalSyncExits": [
+      0,
+      0,
+      0
+    ],
+    "RootNormalizedDestinationHashes": 3227,
+    "RootPending": 0,
+    "RootConflicts": 0,
+    "dispatchId": "ctx_d81ff9be418f",
+    "taskId": "task_78c38a4a863c",
+    "terminal": "term_52141ac6-f405-457e-b66a-76908edc0883",
+    "workspace": "d98dc9d3-fe61-4cb2-9776-dff349347a61::D:/Project/SaintVisionI-Invion/fleet5-first-workspace-905-review-20261107",
+    "agent": "actual Claude",
+    "readiness": "ready with live process observed",
+    "reviewVerdict": "PENDING",
+    "scope": "Full bounded R1 source/SQL/RLS/locks/idempotency/selected UI/AC11 provenance review; no main product execution",
+    "predecessorAuthorAndClaudeExitedReleased": true,
+    "RootApplyDeferredDuringNewReviewerWindow": true,
+    "wholeProgramComplete": false
+  },
+  "pending": [],
   "authorParallelWork": "B frozen b51 awaiting actual delta verdict; H12 accepted6d7 plus read-only five-row audit delivered, Root owns first CPU journey preflight. Optional Low backlog is not a mandatory new scope.",
   "reason": "actuala7e9 and5a3c reviews+CI verified andprecisefixscopesdelivered; do notselfclose source/runtime",
   "genericApprovalMissing": false,
@@ -70,7 +46,7 @@
     "review": "0e53fc024ca773b7719182e170e5e126aeaf5b95",
     "verdict": "ACCEPT TEST-ONLY; R-L1 CLOSED; no new findings"
   },
-  "nextActualReviewTrigger": "Complete Root517 exact Docs and latest canonical check/apply/check; then one actual Claude dispatch on source905. No live deploy or acceptance from CI alone.",
+  "nextActualReviewTrigger": "Wait actual Claude finite verdict/worker_done or exact question; then Root verifies final source/Docs and actual exited/released before a next Claude. No live deployment before source acceptance.",
   "completedIntegration": {
     "task": "task_78064fb4b7ff",
     "dispatch": "ctx_ed7ec73163d6",

@@ -1,15 +1,19 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.478"
+version: "1.0.479"
 status: "review"
 author: "Codex"
-updated: "2026-11-07T21:15:29+09:00"
+updated: "2026-11-07T21:22:21+09:00"
 source_of_truth: "Git"
 active_card: "FLEET5 continued supervision with PORTAL-REFRESH-FLEET-20261106"
-active_card_status: "FirstWorkspace905OfficialCI8JobsArtifactsVerified_AuthorExitedReleased_OneActualClaudeReady_RootLatestCanonicalCatchUpThenReview_ActualDeploymentPending"
-active_card_next: "Root latest docs CI and canonical check/apply/check after closed B window; then one actual Claude code review on905. Exact source/8 jobs/artifacts verified; do not deploy before review. PC1 key registration/additional real approver/PC5 memory and real Run/five-PC gates remain pending."
+active_card_status: "FirstWorkspace905OneActualClaudeCodeReviewReadyLive_CIAndRoot517CanonicalVerified_ActualDeploymentPending_RootApplyDeferredDuringReviewerWindow"
+active_card_next: "Wait actual Claude ctx_d81ff9be418f/task_78c38a4a863c finite code verdict or question; Root verifies proof and exit/release then protected PC3 deployment after acceptance. No main product execution. Real approval/user Run/PC1/PC5/five-PC gates pending."
 ---
+
+## 2026-11-07T21:22:21+09:00 실제 Claude 독립 코드 검토 착수
+
+Root517의 정확 Docs42371743407 성공 뒤 최신 Obsidian3227개 문서의 정규화 hash 일치·0 pending/0 conflict·check/apply/check exit0을 확인해 보류 보고를 반영했다. 그후 source905의 실제 Claude 독립 코드 검토를 한 개 구동했고 ready/live를 확인했다. 작성자와 이전 Claude는 종료·해제됐으며 새 검토 판정은 아직 미완료다. 검토 중 Root APPLY는 다시 보류하고 제품/실장비를 바꾸지 않는다. 실제dispatch ctx_d81ff9be418f/task task_78c38a4a863c이며 아직수락/완료판정은없다.
 
 ## 2026-11-07T21:15:29+09:00 첫 Workspace 최종 후보의 공식 CI·원본 대조
 

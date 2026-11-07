@@ -1,0 +1,25 @@
+{
+  "atKST": "2026-11-07T21:22:21+09:00",
+  "source": "90578f49ea400958fcdbc1ded3908d624e856f57",
+  "frozenRootEvidence": "7454c7e2ce77ac4eb3415ccaec1ad0f84b949864",
+  "RootDocs": 42371743407,
+  "RootLatestCanonicalSyncExits": [
+    0,
+    0,
+    0
+  ],
+  "RootNormalizedDestinationHashes": 3227,
+  "RootPending": 0,
+  "RootConflicts": 0,
+  "dispatchId": "ctx_d81ff9be418f",
+  "taskId": "task_78c38a4a863c",
+  "terminal": "term_52141ac6-f405-457e-b66a-76908edc0883",
+  "workspace": "d98dc9d3-fe61-4cb2-9776-dff349347a61::D:/Project/SaintVisionI-Invion/fleet5-first-workspace-905-review-20261107",
+  "agent": "actual Claude",
+  "readiness": "ready with live process observed",
+  "reviewVerdict": "PENDING",
+  "scope": "Full bounded R1 source/SQL/RLS/locks/idempotency/selected UI/AC11 provenance review; no main product execution",
+  "predecessorAuthorAndClaudeExitedReleased": true,
+  "RootApplyDeferredDuringNewReviewerWindow": true,
+  "wholeProgramComplete": false
+}
