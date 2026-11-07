@@ -1,15 +1,19 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.455"
+version: "1.0.456"
 status: "review"
 author: "Codex"
-updated: "2026-11-07T09:49:11+09:00"
+updated: "2026-11-07T09:54:32+09:00"
 source_of_truth: "Git"
 active_card: "FLEET5 continued supervision with PORTAL-REFRESH-FLEET-20261106"
 active_card_status: "H12actual381fM1L1L2CLOSED->privateGoWIP7461TESTSNOTRUN; Bactual24GREEN/realBASEcausal1RED->proofonlyWIP02f730; original19HOLD/actualNULL/fleetincomplete"
 active_card_next: "B Codex exacttestedbytes proof-onlyWIP02; K2 Codex fourpathprivateGoWIP; Root immutablepacketverification then boundedactualGo tests/publication/CI/singleCODEreview. Actual5PCacceptance stillblocked."
 ---
+
+## 2026-11-07T09:54:32+09:00 실제 시험 원문의 공개 artifact 해시 축 대조
+
+B의24GREEN·realbase인과RED원문12artifact를정확Gitblob/JSON내verbatimUTF8로대조했고두wrapper의WindowsCRLF작업파일hash와공개LFGitblobhash를명시분리했다. 제품·시험·원문payload는불변이며재시험은하지않았다. Root494 exactDocs42320846597/all19·sync0/0/0·목적지hash/cleanGit를확인했다. 기존B proof-onlyWIP02/K2 privateGoWIP의다음행동과미실행축은그대로다. 원문12artifact의Gitblob/디코딩검증과Root494최종영수증은RootEvidence에보존했다.
 
 ## 2026-11-07T09:49:11+09:00 H1/H2 계약 실제 닫힘과 B 전달 경계의 실제 24 GREEN·인과 RED
 

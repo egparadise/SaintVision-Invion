@@ -1,0 +1,116 @@
+{
+  "atKST": "2026-11-07T09:54:32+09:00",
+  "auditedRootSHA": "7d4f3a35f7d07ecce05e6991e21fd54b8426f095",
+  "artifactCount": 12,
+  "artifacts": [
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/b-a7-operation-guard-r1-python-setup.stdout.txt",
+      "rawOutputSHA256": "3c961b0fb6ce7b8ea89f64315e3b5ab5ef7a5f6066398804788ac18a1ac7a44e",
+      "rawOutputBytes": 66,
+      "canonicalGitBlobSHA256": "3c961b0fb6ce7b8ea89f64315e3b5ab5ef7a5f6066398804788ac18a1ac7a44e",
+      "rawPayloadPreserved": true
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/b-a7-operation-guard-r1-python-setup.stderr.txt",
+      "rawOutputSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rawOutputBytes": 0,
+      "canonicalGitBlobSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rawPayloadPreserved": true
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/b-a7-operation-guard-r1-python-green.stdout.txt",
+      "rawOutputSHA256": "14dec3be0edf79aaef55d8512c3082d0a647e83300bfff97c1d82b8ed7f61da5",
+      "rawOutputBytes": 99,
+      "canonicalGitBlobSHA256": "14dec3be0edf79aaef55d8512c3082d0a647e83300bfff97c1d82b8ed7f61da5",
+      "rawPayloadPreserved": true
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/b-a7-operation-guard-r1-python-green.stderr.txt",
+      "rawOutputSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rawOutputBytes": 0,
+      "canonicalGitBlobSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rawPayloadPreserved": true
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/b-a7-operation-guard-r1-python-red.stdout.txt.raw.json",
+      "rawOutputSHA256": "08a8817587bbf6522c43811638c1e9ba0d3bdead0ee891e01f5d1ad7b60450b7",
+      "rawOutputBytes": 1501,
+      "canonicalGitBlobSHA256": "f614fec2d1fd2169e0467803d58d2c16b87c9ada7b6232287515e8e2a6030e96",
+      "originalWindowsWorkingCopySHA256": "9b023535eb5e9ea1fd3c2df8599f97166a50cf88c7ca1352ba3b52e27fb1948f",
+      "rawPayloadPreserved": true
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/b-a7-operation-guard-r1-python-red.stderr.txt",
+      "rawOutputSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rawOutputBytes": 0,
+      "canonicalGitBlobSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rawPayloadPreserved": true
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/b-a7-operation-guard-r1-python-green-tests.xml",
+      "rawOutputSHA256": "7448243a76f40808577785714d579ef572a7b80d4d66771d3493168b491cedd6",
+      "rawOutputBytes": 4029,
+      "canonicalGitBlobSHA256": "7448243a76f40808577785714d579ef572a7b80d4d66771d3493168b491cedd6",
+      "rawPayloadPreserved": true
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/b-a7-operation-guard-r1-python-red-tests.xml.raw.json",
+      "rawOutputSHA256": "b7515a5a2700c5e0cc8ba6594ec628663fecbe682331b5b6fa834d44e040fb91",
+      "rawOutputBytes": 1694,
+      "canonicalGitBlobSHA256": "ed0c900c72f5c8a0bb20a950bedbbe05e3bede309cb716445a6c3ef5737a9b58",
+      "originalWindowsWorkingCopySHA256": "2872c84da57efb4a3d6a8cabe5fcedadec0275c2c8a2a30c8d58254990d0678d",
+      "rawPayloadPreserved": true
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/b-a7-operation-guard-r1-python-runtime-version.txt",
+      "rawOutputSHA256": "57c6ea790e5cf7d4bb2bb57d0deac4424f45807147198044791b226e75db2e72",
+      "rawOutputBytes": 57,
+      "canonicalGitBlobSHA256": "57c6ea790e5cf7d4bb2bb57d0deac4424f45807147198044791b226e75db2e72",
+      "rawPayloadPreserved": true
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/b-a7-operation-guard-r1-python-pip-freeze.txt",
+      "rawOutputSHA256": "4bebc0439a397e2dbb088753472e6f3b3d2e1249c0b86ed3e04cc0402a518f0e",
+      "rawOutputBytes": 1217,
+      "canonicalGitBlobSHA256": "4bebc0439a397e2dbb088753472e6f3b3d2e1249c0b86ed3e04cc0402a518f0e",
+      "rawPayloadPreserved": true
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/b-a7-operation-guard-r1-python-pip-check.txt",
+      "rawOutputSHA256": "9261363b733079a641c2e4cc9bc46ffa1d8336945a87f807b6cf68847dbc9b09",
+      "rawOutputBytes": 30,
+      "canonicalGitBlobSHA256": "9261363b733079a641c2e4cc9bc46ffa1d8336945a87f807b6cf68847dbc9b09",
+      "rawPayloadPreserved": true
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/b-a7-operation-guard-r1-python-wheel-inventory.json",
+      "rawOutputSHA256": "213823871fd7b82e2f151640b8b0ae2b1e8cb791c10c163d98f3960887cc5be6",
+      "rawOutputBytes": 11451,
+      "canonicalGitBlobSHA256": "213823871fd7b82e2f151640b8b0ae2b1e8cb791c10c163d98f3960887cc5be6",
+      "rawPayloadPreserved": true
+    }
+  ],
+  "root494FinalCheckpoint": {
+    "SHA": "7d4f3a35f7d07ecce05e6991e21fd54b8426f095",
+    "Docs": 42320846597,
+    "exactHeadCorrelationAllJobsSuccess": true,
+    "remoteMatches": true,
+    "syncExits": [
+      0,
+      0,
+      0
+    ],
+    "independentlyMatchedNormalizedDestinationHashes": 3031,
+    "pending": 0,
+    "conflicts": 0,
+    "trackedAndUntrackedClean": true,
+    "rootDocsOnly": true,
+    "wholeProgramComplete": false,
+    "verifiedAtKST": "2026-11-07T09:54:23+09:00"
+  },
+  "cause": "Two JSON wrapper hashes were initially measured on Windows CRLF working files; published canonical LF Git blobs differ. Preserve that original measurement explicitly and provide exact Git blob hashes for published artifacts. Embedded raw pytest bytes / hashes never changed.",
+  "actualProductOrTestBytesChanged": false,
+  "actualTestsRerun": false,
+  "metadataOnly": true,
+  "wholeProgramComplete": false
+}

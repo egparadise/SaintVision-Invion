@@ -166,7 +166,9 @@
       "bytes": 1501,
       "SHA256": "08a8817587bbf6522c43811638c1e9ba0d3bdead0ee891e01f5d1ad7b60450b7",
       "artifactEncoding": "JSON-embedded-verbatim-UTF8",
-      "JSONFileSHA256": "9b023535eb5e9ea1fd3c2df8599f97166a50cf88c7ca1352ba3b52e27fb1948f"
+      "JSONFileSHA256": "f614fec2d1fd2169e0467803d58d2c16b87c9ada7b6232287515e8e2a6030e96",
+      "originalWindowsWorkingCopyJSONFileSHA256": "9b023535eb5e9ea1fd3c2df8599f97166a50cf88c7ca1352ba3b52e27fb1948f",
+      "JSONFileSHA256Scope": "Exact published canonical Git blob of wrapper; raw embedded text hash remains the original process output SHA256."
     },
     {
       "path": "b-a7-operation-guard-r1-python-red.stderr.txt",
@@ -183,7 +185,9 @@
       "bytes": 1694,
       "SHA256": "b7515a5a2700c5e0cc8ba6594ec628663fecbe682331b5b6fa834d44e040fb91",
       "artifactEncoding": "JSON-embedded-verbatim-UTF8",
-      "JSONFileSHA256": "2872c84da57efb4a3d6a8cabe5fcedadec0275c2c8a2a30c8d58254990d0678d"
+      "JSONFileSHA256": "ed0c900c72f5c8a0bb20a950bedbbe05e3bede309cb716445a6c3ef5737a9b58",
+      "originalWindowsWorkingCopyJSONFileSHA256": "2872c84da57efb4a3d6a8cabe5fcedadec0275c2c8a2a30c8d58254990d0678d",
+      "JSONFileSHA256Scope": "Exact published canonical Git blob of wrapper; raw embedded text hash remains the original process output SHA256."
     },
     {
       "path": "b-a7-operation-guard-r1-python-runtime-version.txt",
@@ -210,5 +214,7 @@
   "realProductUnitExecutionOnly": true,
   "actualMemoryPeak": "NOT_MEASURED",
   "installedVenvFullBeforeAfterInventory": "NOT_MEASURED",
-  "businessContainersChanged": false
+  "businessContainersChanged": false,
+  "publicArtifactHashAuditAtKST": "2026-11-07T09:54:32+09:00",
+  "rawOutputPayloadsMatchExactPublishedGitBlobsOrDecodedWrappers": true
 }
