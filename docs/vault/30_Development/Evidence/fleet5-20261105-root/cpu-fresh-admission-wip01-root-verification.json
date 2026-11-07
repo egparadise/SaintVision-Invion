@@ -1,0 +1,110 @@
+{
+  "atKST": "2026-11-07T13:32:50+09:00",
+  "base": "7033778ad3d2bc284e36f7e29be7597dbb7d9f23",
+  "manifestSHA256": "c584f14d7bd6cc32fa184891ff3cf6bdbbc7032cdd3fc9a41b9f29ea3f9e8921",
+  "originalNewFilePatchSHA256": "7d4ffbb2f7634800e2c9feda7bc8f10d52ccbe3a024f978bd9e8c4acca6ee593",
+  "patchRepresentation": "Original patch has1012CRLF lines; reconstructed added-line source is explicitly converted CRLFtoLF and then all4 byte-count/hash/line-count pins match. Original patch bytes unchanged.",
+  "firstRootVerifierAttempt": "Exit1 was a patch-CRLF/source-LF comparison assumption; not a product or author-manifest failure.",
+  "originalFourSourcesReconstructedFromPatchAndCanonicalHashesMatch": true,
+  "originalFourAbsentAt703": true,
+  "originalFourASTParseOnly": true,
+  "all16DependencyGitBlobsMatch": true,
+  "sourceSnapshots": [
+    {
+      "path": "services/control-plane/src/inv/fresh_cpu_admission.py",
+      "preimageAt703": "ABSENT",
+      "bytes": 14857,
+      "workingSHA256": "a5eca1244d297e159a1315f7584f477e82c90b9cdb54584f56deaacbdd7de41f",
+      "gitCanonicalSHA256": "a5eca1244d297e159a1315f7584f477e82c90b9cdb54584f56deaacbdd7de41f",
+      "gitBlobSHA1": "04d80f7464d96d9d56fe7dfeebafd5bf88118f31",
+      "lineCount": 340,
+      "ast": "PASS_PARSE_ONLY_NO_IMPORT_OR_EXECUTION"
+    },
+    {
+      "path": "tools/fresh_cpu_admission.py",
+      "preimageAt703": "ABSENT",
+      "bytes": 3081,
+      "workingSHA256": "f1721850e6a2c9f93ee643caeb048bdf58f451bed7b003ce1ea73bc63d301b90",
+      "gitCanonicalSHA256": "f1721850e6a2c9f93ee643caeb048bdf58f451bed7b003ce1ea73bc63d301b90",
+      "gitBlobSHA1": "7319d6ae5711f51baabf44d83f07f61257ba12b7",
+      "lineCount": 80,
+      "ast": "PASS_PARSE_ONLY_NO_IMPORT_OR_EXECUTION"
+    },
+    {
+      "path": "tests/core/test_fresh_cpu_admission.py",
+      "preimageAt703": "ABSENT",
+      "bytes": 20176,
+      "workingSHA256": "882e5ff9757a2372173c8410277929786f99791b3d9a5bf4e010eeda8d1bceaa",
+      "gitCanonicalSHA256": "882e5ff9757a2372173c8410277929786f99791b3d9a5bf4e010eeda8d1bceaa",
+      "gitBlobSHA1": "c44451f30399ca1a41cfa2d3fc8488929d64b8ae",
+      "lineCount": 447,
+      "ast": "PASS_PARSE_ONLY_NO_IMPORT_OR_EXECUTION"
+    },
+    {
+      "path": "tests/core/test_fresh_cpu_admission_cli.py",
+      "preimageAt703": "ABSENT",
+      "bytes": 5275,
+      "workingSHA256": "6e1ddef11ab6d38bb2e8eccc456fcf7fda14456c26f8af13546be485317f8cdf",
+      "gitCanonicalSHA256": "6e1ddef11ab6d38bb2e8eccc456fcf7fda14456c26f8af13546be485317f8cdf",
+      "gitBlobSHA1": "218814320423ae193e0964ddb292cc0d292e85ef",
+      "lineCount": 133,
+      "ast": "PASS_PARSE_ONLY_NO_IMPORT_OR_EXECUTION"
+    }
+  ],
+  "snapshotArtifactsCurrentReadback": [
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-fresh-cpu-admission-code-r1-20261107-codex/four-file-wip.patch",
+      "originalSHA256": "7d4ffbb2f7634800e2c9feda7bc8f10d52ccbe3a024f978bd9e8c4acca6ee593",
+      "currentSHA256": "7d4ffbb2f7634800e2c9feda7bc8f10d52ccbe3a024f978bd9e8c4acca6ee593",
+      "currentMatchesSnapshot": true,
+      "historicalMutableHistory": false
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-fresh-cpu-admission-code-r1-20261107-codex/required-doc-read-bindings.json",
+      "originalSHA256": "45a0f09c50d14aac3e01de8494743f3442a774b57ae60d899989700dd4bda462",
+      "currentSHA256": "45a0f09c50d14aac3e01de8494743f3442a774b57ae60d899989700dd4bda462",
+      "currentMatchesSnapshot": true,
+      "historicalMutableHistory": false
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-fresh-cpu-admission-code-r1-20261107-codex/start-context.json",
+      "originalSHA256": "5bd84d0a6b152d0637a252bf630e49a395dcf4ecd4f99040696fb704f1554f61",
+      "currentSHA256": "5bd84d0a6b152d0637a252bf630e49a395dcf4ecd4f99040696fb704f1554f61",
+      "currentMatchesSnapshot": true,
+      "historicalMutableHistory": false
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-fresh-cpu-admission-code-r1-20261107-codex/static-verification-attempt01-failure.json",
+      "originalSHA256": "3c933829dcfb62b4d7e5f1308a025631e868ec309fc78cc253c3b551194ac26c",
+      "currentSHA256": "3c933829dcfb62b4d7e5f1308a025631e868ec309fc78cc253c3b551194ac26c",
+      "currentMatchesSnapshot": true,
+      "historicalMutableHistory": false
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-fresh-cpu-admission-code-r1-20261107-codex/verify-wip-static.py",
+      "originalSHA256": "f5d9354fd752f6096160d2583baa290e4da940b4df5ec8bee12c7926e554a058",
+      "currentSHA256": "f5d9354fd752f6096160d2583baa290e4da940b4df5ec8bee12c7926e554a058",
+      "currentMatchesSnapshot": true,
+      "historicalMutableHistory": false
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-fresh-cpu-admission-code-r1-20261107-codex/wip-static-verification.json",
+      "originalSHA256": "d754700904920661bdf9a8f0bf4b6a222bfdc5e16971139aa57d66806ada2d3b",
+      "currentSHA256": "d754700904920661bdf9a8f0bf4b6a222bfdc5e16971139aa57d66806ada2d3b",
+      "currentMatchesSnapshot": true,
+      "historicalMutableHistory": false
+    },
+    {
+      "path": "docs/vault/30_Development/History/2026-11-07_FLEET5_Fresh_CPU_Admission_Code_R1_Codex.md",
+      "originalSHA256": "8f567bbad567fef5896ae19e30e827bf7c095ceb667b0bdac19b42619d55eb21",
+      "currentSHA256": "0b8ebce7b6056f3ca8227b4262355bbefd821c6e1ba28338af19ba5ff706f4fa",
+      "currentMatchesSnapshot": false,
+      "historicalMutableHistory": true
+    }
+  ],
+  "currentWorkingSourceNotAssumedFrozenAfterAuthorizedDriverWordingChange": true,
+  "coordinatorInspection": "Actual library and CLI read, tests inspected as source; no product/test/driver execution and no independentCODEverdict",
+  "localOrCIProductTests": "NOT_RUN_BY_ROOT",
+  "actualAuthority": null,
+  "wholeProgramComplete": false
+}

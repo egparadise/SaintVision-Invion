@@ -1,0 +1,206 @@
+{
+  "atKST": "2026-11-07T13:39:22+09:00",
+  "source": "7033778ad3d2bc284e36f7e29be7597dbb7d9f23",
+  "base": "6d7ee3d85bd0e47eb7b787234c10d5dbfdb3a9e8",
+  "authorLocalReceiptSHA256": "e62406798669f9329b07b8eeb0ffa25f6856d7a48358419b29983ca16c1a17c1",
+  "all51FiniteInputHashesVerified": true,
+  "lanes": [
+    {
+      "lane": "docs",
+      "run": 42335285577,
+      "correlation": "FLEET5-CPU-INTEGRATION-R1-DOCS-7033778ad3d2-f33034956307",
+      "exactSourceRefEventPathAttemptAndJobs": true,
+      "conclusion": "success",
+      "jobs": [
+        {
+          "id": 128290723992,
+          "name": "docs",
+          "steps": {
+            "success": 19
+          }
+        }
+      ]
+    },
+    {
+      "lane": "core",
+      "run": 42335287638,
+      "correlation": "FLEET5-CPU-INTEGRATION-R1-CORE-7033778ad3d2-73d3d1b3c353",
+      "exactSourceRefEventPathAttemptAndJobs": true,
+      "conclusion": "success",
+      "jobs": [
+        {
+          "id": 128290730407,
+          "name": "s01-storage-roundtrip",
+          "steps": {
+            "success": 16
+          }
+        },
+        {
+          "id": 128290730592,
+          "name": "core",
+          "steps": {
+            "success": 42,
+            "skipped": 6
+          }
+        }
+      ]
+    },
+    {
+      "lane": "backend",
+      "run": 42335289761,
+      "correlation": "FLEET5-CPU-INTEGRATION-R1-BACKEND-7033778ad3d2-34e4fbc3ed4d",
+      "exactSourceRefEventPathAttemptAndJobs": true,
+      "conclusion": "success",
+      "jobs": [
+        {
+          "id": 128290737412,
+          "name": "mlflow-live",
+          "steps": {
+            "success": 9
+          }
+        },
+        {
+          "id": 128290737435,
+          "name": "backend (3.14)",
+          "steps": {
+            "success": 18,
+            "skipped": 2
+          }
+        },
+        {
+          "id": 128290737705,
+          "name": "backend (3.12)",
+          "steps": {
+            "success": 20
+          }
+        }
+      ]
+    }
+  ],
+  "sixOriginalZIPDigestsFreshOfficialMetadataMatch": true,
+  "JUnitReportsSeparateNotSummed": [
+    {
+      "path": "build-product-runtime-real-pg.xml",
+      "tests": 13,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "business-handoff-tests.xml",
+      "tests": 17,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "containment-tests.xml",
+      "tests": 28,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "core-tests.xml",
+      "tests": 9382,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 46
+    },
+    {
+      "path": "cx01-recovery-tests.xml",
+      "tests": 20,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "docker-host-tests.xml",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "lan-installer-tests.xml",
+      "tests": 17,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "lan-pilot-database-real-pg.xml",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "shard-recovery-tests.xml",
+      "tests": 21,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "workspace-tests.xml",
+      "tests": 23,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "s01-storage-roundtrip.xml",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "s3-product-object-store.xml",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "s3-product-postgres.xml",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  ],
+  "originCasesDirectCorePASS": 24,
+  "GoRaceActualJSONL": {
+    "topLevelPass": 146,
+    "subtestPass": 550,
+    "testSkip": 1,
+    "noTestPackageSkip": 3,
+    "fail": 0
+  },
+  "requiredDockerCompatibility": {
+    "topPass": 1,
+    "subPass": 4,
+    "skip": 0,
+    "fail": 0,
+    "executionHost": "HostedCI, not five PCs"
+  },
+  "BackendEachMatrix": {
+    "passed": 8977,
+    "skipped": 75,
+    "deselected": 2,
+    "failures": 0,
+    "errors": 0,
+    "countAttribution": "Author-fetched official logZIP parsed by Root; runner XML validation steps freshly confirmed SUCCESS; no downloaded Backend XML claim"
+  },
+  "MLflowPass": 3,
+  "wheelDispatchExactAcceptedBlob": true,
+  "twoGoBinaryMetadataRevision703ModifiedFalseStaticOnly": true,
+  "entireNodeTreeUnchanged6d7": true,
+  "firstRootVerifierFailure": "Exit1: Root guessed nonexistent top-level node directory; corrected to actual services/node-agent and exact base tree equality. No product defect or CI rerun.",
+  "independentIntegrationVerdict": "PENDING_ACTUAL_CLAUDE",
+  "localProductExecution": "NOT_RUN",
+  "actualAuthority": null,
+  "wholeProgramComplete": false
+}

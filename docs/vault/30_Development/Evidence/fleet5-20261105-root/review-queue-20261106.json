@@ -1,6 +1,6 @@
 {
   "schema": "fleet5-root-review-resource-sequence:1",
-  "atKST": "2026-11-07T13:06:44+09:00",
+  "atKST": "2026-11-07T13:42:51+09:00",
   "completedB": {
     "task": "task_d4c4c809ed4e",
     "review": "ac9182c3e3d606ec027c0be2e90e049ff50d54f1",
@@ -13,7 +13,14 @@
     "source": "8874b2dfe0dda9a019bd5f334636668290702e13"
   },
   "active": null,
-  "pending": [],
+  "pending": [
+    {
+      "source": "7033778ad3d2bc284e36f7e29be7597dbb7d9f23",
+      "task": "FLEET5-CPU-703-INDEPENDENT-INTEGRATION-REVIEW-20261107",
+      "owner": "Actual Claude to start after this checkpoint",
+      "status": "READY_NOT_YET_DISPATCHED"
+    }
+  ],
   "authorParallelWork": "B frozen b51 awaiting actual delta verdict; H12 accepted6d7 plus read-only five-row audit delivered, Root owns first CPU journey preflight. Optional Low backlog is not a mandatory new scope.",
   "reason": "actuala7e9 and5a3c reviews+CI verified andprecisefixscopesdelivered; do notselfclose source/runtime",
   "genericApprovalMissing": false,
@@ -22,7 +29,7 @@
     "review": "0e53fc024ca773b7719182e170e5e126aeaf5b95",
     "verdict": "ACCEPT TEST-ONLY; R-L1 CLOSED; no new findings"
   },
-  "nextActualReviewTrigger": "Actual703 required3CI/artifactdelivery then independentintegrationreview; newadmissionWIP remains unpublished until Rootdependencydisposition. No optionalLowexpansion.",
+  "nextActualReviewTrigger": "Start exactly one actual Claude integration delta review on703 after this checkpoint. Predecessor ctx_cfee4b4aa2e7 was freshly observed succeeded/settled/exited/released. No optional-Low expansion.",
   "completedIntegration": {
     "task": "task_78064fb4b7ff",
     "dispatch": "ctx_ed7ec73163d6",
@@ -1032,8 +1039,8 @@
     "Docs": 42333724088
   },
   "parallelImplementation": {
-    "atKST": "2026-11-07T13:06:44+09:00",
-    "status": "PUBLISHED_703_SOURCE_PINS_ROOT_VERIFIED_DOCS_PASS_CORE_BACKEND_PENDING",
+    "atKST": "2026-11-07T13:42:51+09:00",
+    "status": "PUBLISHED_703_REQUIRED_THREE_CI_AND_ARTIFACTS_ROOT_VERIFIED_INDEPENDENT_INTEGRATION_REVIEW_NEXT",
     "sourceBase": "6d7ee3d85bd0e47eb7b787234c10d5dbfdb3a9e8",
     "patchSource": "746789a36091c8601afea23fe176069e2fa7d87b",
     "onlyProductScope": [
@@ -1050,8 +1057,8 @@
     "actualActivityEvidence": "Root bounded worker-read observed actual own docs gates and r1 full canonical CHECK unchanged, and author asked targeted r2 evidence-encoding recovery msg_a09b217d7a15. No resend/retry/stop/duplicate.",
     "gateRecovery": "msg_7bc1a98984ce permits preserving originalUTF16rawbytes in new own UTF8base64JSON, own text UTF8 normalization and directbyteIO futuregate capture only; no source/tool/workflow change.",
     "publishedCandidate": "7033778ad3d2bc284e36f7e29be7597dbb7d9f23",
-    "exactJointCI": "DOCS_SUCCESS_CORE_BACKEND_IN_PROGRESS",
-    "independentJointReview": "PENDING",
+    "exactJointCI": "DOCS_CORE_BACKEND_EXACT_SUCCESS",
+    "independentJointReview": "PENDING_ACTUAL_CLAUDE_NOT_YET_STARTED_AT_CHECKPOINT",
     "runtimeGrant": false,
     "actualAuthority": null,
     "wholeProgramComplete": false,
@@ -1078,95 +1085,209 @@
       "wholeProgramComplete": false
     },
     "actualCIProgress": {
-      "atKST": "2026-11-07T13:04:02+09:00",
+      "atKST": "2026-11-07T13:39:22+09:00",
       "source": "7033778ad3d2bc284e36f7e29be7597dbb7d9f23",
-      "branch": "agent/codex/fleet5-cpu-integration-pin-r1-20261107",
-      "lanes": {
-        "docs": {
+      "base": "6d7ee3d85bd0e47eb7b787234c10d5dbfdb3a9e8",
+      "authorLocalReceiptSHA256": "e62406798669f9329b07b8eeb0ffa25f6856d7a48358419b29983ca16c1a17c1",
+      "all51FiniteInputHashesVerified": true,
+      "lanes": [
+        {
+          "lane": "docs",
           "run": 42335285577,
           "correlation": "FLEET5-CPU-INTEGRATION-R1-DOCS-7033778ad3d2-f33034956307",
-          "status": "completed",
+          "exactSourceRefEventPathAttemptAndJobs": true,
           "conclusion": "success",
-          "exactHeadRefEventPathAttempt": true,
           "jobs": [
             {
               "id": 128290723992,
               "name": "docs",
-              "status": "completed",
-              "conclusion": "success",
-              "steps": 19,
-              "successfulSteps": 19,
-              "conditionalSkippedSteps": 0
+              "steps": {
+                "success": 19
+              }
             }
           ]
         },
-        "core": {
+        {
+          "lane": "core",
           "run": 42335287638,
           "correlation": "FLEET5-CPU-INTEGRATION-R1-CORE-7033778ad3d2-73d3d1b3c353",
-          "status": "in_progress",
-          "conclusion": null,
-          "exactHeadRefEventPathAttempt": true,
+          "exactSourceRefEventPathAttemptAndJobs": true,
+          "conclusion": "success",
           "jobs": [
             {
               "id": 128290730407,
               "name": "s01-storage-roundtrip",
-              "status": "completed",
-              "conclusion": "success",
-              "steps": 16,
-              "successfulSteps": 16,
-              "conditionalSkippedSteps": 0
+              "steps": {
+                "success": 16
+              }
             },
             {
               "id": 128290730592,
               "name": "core",
-              "status": "in_progress",
-              "conclusion": null,
-              "steps": 47,
-              "successfulSteps": 28,
-              "conditionalSkippedSteps": 4
+              "steps": {
+                "success": 42,
+                "skipped": 6
+              }
             }
           ]
         },
-        "backend": {
+        {
+          "lane": "backend",
           "run": 42335289761,
           "correlation": "FLEET5-CPU-INTEGRATION-R1-BACKEND-7033778ad3d2-34e4fbc3ed4d",
-          "status": "in_progress",
-          "conclusion": null,
-          "exactHeadRefEventPathAttempt": true,
+          "exactSourceRefEventPathAttemptAndJobs": true,
+          "conclusion": "success",
           "jobs": [
             {
               "id": 128290737412,
               "name": "mlflow-live",
-              "status": "completed",
-              "conclusion": "success",
-              "steps": 9,
-              "successfulSteps": 9,
-              "conditionalSkippedSteps": 0
+              "steps": {
+                "success": 9
+              }
             },
             {
               "id": 128290737435,
               "name": "backend (3.14)",
-              "status": "in_progress",
-              "conclusion": null,
-              "steps": 19,
-              "successfulSteps": 12,
-              "conditionalSkippedSteps": 2
+              "steps": {
+                "success": 18,
+                "skipped": 2
+              }
             },
             {
               "id": 128290737705,
               "name": "backend (3.12)",
-              "status": "completed",
-              "conclusion": "success",
-              "steps": 20,
-              "successfulSteps": 20,
-              "conditionalSkippedSteps": 0
+              "steps": {
+                "success": 20
+              }
             }
           ]
         }
+      ],
+      "sixOriginalZIPDigestsFreshOfficialMetadataMatch": true,
+      "JUnitReportsSeparateNotSummed": [
+        {
+          "path": "build-product-runtime-real-pg.xml",
+          "tests": 13,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "path": "business-handoff-tests.xml",
+          "tests": 17,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "path": "containment-tests.xml",
+          "tests": 28,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "path": "core-tests.xml",
+          "tests": 9382,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 46
+        },
+        {
+          "path": "cx01-recovery-tests.xml",
+          "tests": 20,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "path": "docker-host-tests.xml",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "path": "lan-installer-tests.xml",
+          "tests": 17,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "path": "lan-pilot-database-real-pg.xml",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "path": "shard-recovery-tests.xml",
+          "tests": 21,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "path": "workspace-tests.xml",
+          "tests": 23,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "path": "s01-storage-roundtrip.xml",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "path": "s3-product-object-store.xml",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "path": "s3-product-postgres.xml",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        }
+      ],
+      "originCasesDirectCorePASS": 24,
+      "GoRaceActualJSONL": {
+        "topLevelPass": 146,
+        "subtestPass": 550,
+        "testSkip": 1,
+        "noTestPackageSkip": 3,
+        "fail": 0
       },
-      "allThreeCompletedSuccess": false,
-      "artifactOrCaseCountsVerified": false,
-      "independentIntegrationReview": "PENDING",
+      "requiredDockerCompatibility": {
+        "topPass": 1,
+        "subPass": 4,
+        "skip": 0,
+        "fail": 0,
+        "executionHost": "HostedCI, not five PCs"
+      },
+      "BackendEachMatrix": {
+        "passed": 8977,
+        "skipped": 75,
+        "deselected": 2,
+        "failures": 0,
+        "errors": 0,
+        "countAttribution": "Author-fetched official logZIP parsed by Root; runner XML validation steps freshly confirmed SUCCESS; no downloaded Backend XML claim"
+      },
+      "MLflowPass": 3,
+      "wheelDispatchExactAcceptedBlob": true,
+      "twoGoBinaryMetadataRevision703ModifiedFalseStaticOnly": true,
+      "entireNodeTreeUnchanged6d7": true,
+      "firstRootVerifierFailure": "Exit1: Root guessed nonexistent top-level node directory; corrected to actual services/node-agent and exact base tree equality. No product defect or CI rerun.",
+      "independentIntegrationVerdict": "PENDING_ACTUAL_CLAUDE",
+      "localProductExecution": "NOT_RUN",
+      "actualAuthority": null,
       "wholeProgramComplete": false
     }
   },
@@ -1177,13 +1298,13 @@
     "status": "RECOVERY_SENT_DELIVERY_PENDING"
   },
   "freshCPUAdmissionWIP": {
-    "atKST": "2026-11-07T13:06:44+09:00",
+    "atKST": "2026-11-07T13:42:51+09:00",
     "task": "FLEET5-FRESH-CPU-ADMISSION-CODE-R1-20261107",
     "parentOrcaTask": "task_a95ef3d8ccce",
     "dispatch": "ctx_ed23b4a777d0",
     "owner": "Codex",
     "futureReviewer": "Actual independent Claude, not yet started",
-    "status": "CONCRETE_FOUR_NEW_FILE_OPERATOR_ADMISSION_WIP_AUTHORIZED_DELIVERY_PENDING",
+    "status": "ORIGINAL_WIP01_ROOT_SOURCE_VERIFIED_NORMAL_CANDIDATE_PUBLICATION_AND_THREE_CI_AUTHORIZED",
     "base": "7033778ad3d2bc284e36f7e29be7597dbb7d9f23",
     "scopeMessage": "msg_e716b2cba047",
     "stdinClarification": "msg_5fa2d17d863e",
@@ -1204,13 +1325,18 @@
     "CLIInput": "Bounded typed public stdin JSON only; operatorDSN from named env only; no arbitrary config/file reads or credential output.",
     "actualTargetIDsInGenericCode": false,
     "newOperationalRequestNodePortImageVolumeCertificateAndPrincipalAuthority": "NOT_BOUND_OR_GRANTED",
-    "publicationDependency": "Root actual703 fullCI/dependency disposition plus concreteWIP; no commit/push/CI/realDB by author yet.",
+    "publicationDependency": "Concrete WIP01 inspected; Root authorized new candidate commit/push and one exact Docs/Core/Backend as early test candidate. Candidate CI/review and actual operational request remain prerequisites for done/deploy.",
     "runtimeOrPKIGrant": false,
     "authorRealConfigCredentialAccess": "DENIED; source and explicitly typed Root observations only",
-    "implementation": "PENDING",
+    "implementation": "WIP01_SOURCE_VERIFIED_ONLY; authorized wording/test update may advance live files; original manifest/patch preserved",
     "localProductTests": "NOT_RUN",
-    "hostedNewCodeCI": "NOT_STARTED",
+    "hostedNewCodeCI": "AWAIT_ACTUAL_CANDIDATE",
     "independentCODEReview": "NOT_STARTED",
-    "wholeProgramComplete": false
+    "wholeProgramComplete": false,
+    "originalWIP01RootVerification": "cpu-fresh-admission-wip01-root-verification.json",
+    "publicationGrantMessage": "msg_97efddc65fbd",
+    "baseRequiredThreeCI": "EXACT_703_ALL_SUCCESS_ROOT_VERIFIED",
+    "baseIndependentIntegrationReview": "PENDING_ACTUAL_CLAUDE",
+    "driverBoundary": "Ordinary psycopg/libpq auth/TLS including Root operator-approved file references allowed within selected DB connection. Tool is not a libpq DSN/filesystem sandbox; Root freezes target and driver environment, no silent TLS rewrite. Worker real config/secret access still denied."
   }
 }

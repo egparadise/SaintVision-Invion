@@ -1,15 +1,19 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.464"
+version: "1.0.465"
 status: "review"
 author: "Codex"
-updated: "2026-11-07T13:06:44+09:00"
+updated: "2026-11-07T13:42:51+09:00"
 source_of_truth: "Git"
 active_card: "FLEET5 continued supervision with PORTAL-REFRESH-FLEET-20261106"
-active_card_status: "Joint703sourceVerified_DocsPASS_CoreBackendPending; currentOwnerProjectDBMapped; otherApproverMappings1_identityQuestionPending; freshCPUAdmission4FileWIPAuthorized_NoRuntime"
-active_card_next: "Root actual703 Core/Backend completion+artifact verification then integrationreview; Codex newfreshCPU4fileWIP. Need actualadditionalapproverID for later2-voterRun, no vote fabrication. No liveadmission before source/CI/review/requestpins."
+active_card_status: "Joint703ThreeCIArtifactsVerified_IndependentIntegrationReviewReady; FreshAdmissionWIP01RootSourceVerified_CandidatePublicationCIauthorized_NoRuntime"
+active_card_next: "Root start one actual Claude integration review703; Codex publish/test freshCPU admission candidate. Additional approver identity remains pending for later actual two-voter Run; no live admission before candidate CI/review and pinned operational request."
 ---
+
+## 2026-11-07T13:42:51+09:00 통합703의 세 CI와 신규CPU등록 후보
+
+통합703의 Docs·Core·Backend를 같은 소스/브랜치/attempt1로 확인했고 원본6개ZIP의 공식digest와51개입력hash를 대조했다. Core9336성공·46skip, 전달경계24case성공, Backend각8977성공·75skip·2deselect이며 실패/오류는0이다. 이는 hosted CI이고5대 실장비 인수는 아니다. 신규CPU등록4파일의 원래WIP01·16의존소스를 소스/AST 수준에서 확인했으며, 운영자가 지정한 libpq 인증·TLS 경계를 명확히 해 후보게시와3개CI를 허용했다. 실제독립통합검토는 다음 작업이며 신규등록코드시험·실장비등록·관측·Run은 미완료다. 명령·exit·실행환경·Evidence·후속 담당은 Root History에 기록했다.
 
 ## 2026-11-07T13:06:44+09:00 실제 owner·project 대조와 신규 CPU 등록 코드
 
