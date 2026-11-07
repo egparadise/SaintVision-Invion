@@ -1,0 +1,20 @@
+{
+ "rows": [
+  {
+   "case": "P6-current-rule-on-proposed-future-code",
+   "detail": {
+    "cancel_only": "operation == 'cancel'",
+    "observation_only": "operation == 'observe'"
+   },
+   "edgesBeforeVerdict": [
+    "SIGNATURES_AND_DEFAULTS",
+    "CONDITIONAL_RECEIVER_FIELD_STORES",
+    "MODE_FORWARD_ARGUMENT_BINDING"
+   ],
+   "futureDispatchSHA256": "a6fa3a84e1794f63af8d9f08da811c9f146957042353d0e841a88547fa4d8831",
+   "meaning": "the pinned rule is shaped to the current once text; an implementing card must re-specify the static rule for capture+guard+captured-local forwarding",
+   "reason": "MODE_FORWARDING_CHANGED",
+   "status": "UNRESOLVED"
+  }
+ ]
+}
