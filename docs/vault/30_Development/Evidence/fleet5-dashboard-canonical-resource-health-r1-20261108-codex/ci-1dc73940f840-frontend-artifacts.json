@@ -1,0 +1,45 @@
+{
+  "total_count": 2,
+  "artifacts": [
+    {
+      "id": 13589206507,
+      "node_id": "MDg6QXJ0aWZhY3QxMzU4OTIwNjUwNw==",
+      "name": "saintvision-portal-strict-csp-evidence",
+      "size_in_bytes": 5532,
+      "url": "https://api.github.com/repos/egparadise/SaintVision-Invion/actions/artifacts/13589206507",
+      "archive_download_url": "https://api.github.com/repos/egparadise/SaintVision-Invion/actions/artifacts/13589206507/zip",
+      "expired": false,
+      "digest": "sha256:7bbd7224b555d9fb2ba3db6dbd501232599ca6691dc5f21566692d63d97cef10",
+      "created_at": "2026-11-07T20:22:32Z",
+      "updated_at": "2026-11-07T20:22:32Z",
+      "expires_at": "2026-11-21T20:22:31Z",
+      "workflow_run": {
+        "id": 42410597855,
+        "repository_id": 1362259805,
+        "head_repository_id": 1362259805,
+        "head_branch": "agent/codex/fleet5-dashboard-canonical-resource-health-r1-20261108",
+        "head_sha": "1dc73940f840284efcaf00b0ab04c1ba8c83ceea"
+      }
+    },
+    {
+      "id": 13588959049,
+      "node_id": "MDg6QXJ0aWZhY3QxMzU4ODk1OTA0OQ==",
+      "name": "saintvision-direct-vite-startup-evidence",
+      "size_in_bytes": 10737,
+      "url": "https://api.github.com/repos/egparadise/SaintVision-Invion/actions/artifacts/13588959049",
+      "archive_download_url": "https://api.github.com/repos/egparadise/SaintVision-Invion/actions/artifacts/13588959049/zip",
+      "expired": false,
+      "digest": "sha256:e6f8a638df02e1ca3b4d14c1337f26239fcd0f73e85ef0c597441e219c5b5748",
+      "created_at": "2026-11-07T20:21:43Z",
+      "updated_at": "2026-11-07T20:21:43Z",
+      "expires_at": "2026-11-21T20:21:42Z",
+      "workflow_run": {
+        "id": 42410597855,
+        "repository_id": 1362259805,
+        "head_repository_id": 1362259805,
+        "head_branch": "agent/codex/fleet5-dashboard-canonical-resource-health-r1-20261108",
+        "head_sha": "1dc73940f840284efcaf00b0ab04c1ba8c83ceea"
+      }
+    }
+  ]
+}

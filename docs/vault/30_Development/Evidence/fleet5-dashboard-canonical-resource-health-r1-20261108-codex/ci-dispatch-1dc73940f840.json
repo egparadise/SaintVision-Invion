@@ -1,0 +1,29 @@
+[
+  {
+    "workflow": "frontend",
+    "sourceSHA": "1dc73940f840284efcaf00b0ab04c1ba8c83ceea",
+    "ref": "agent/codex/fleet5-dashboard-canonical-resource-health-r1-20261108",
+    "correlation": "fleet5-dashboard-resource-health-frontend-3d633b366d194abab4445e1d24b254a0",
+    "atUTC": "2026-11-07T20:20:35.724256+00:00",
+    "dispatchExit": 0,
+    "runID": 42410597855
+  },
+  {
+    "workflow": "docs",
+    "sourceSHA": "1dc73940f840284efcaf00b0ab04c1ba8c83ceea",
+    "ref": "agent/codex/fleet5-dashboard-canonical-resource-health-r1-20261108",
+    "correlation": "fleet5-dashboard-resource-health-docs-39784a1f6244466f86ee4fe601639316",
+    "atUTC": "2026-11-07T20:20:37.678735+00:00",
+    "dispatchExit": 0,
+    "runID": 42410600125
+  },
+  {
+    "workflow": "ac11-accessibility-e2e",
+    "sourceSHA": "1dc73940f840284efcaf00b0ab04c1ba8c83ceea",
+    "ref": "agent/codex/fleet5-dashboard-canonical-resource-health-r1-20261108",
+    "correlation": "fleet5-dashboard-resource-health-ac11-accessibility-e2e-6ad61e0b14a64dca973b370ff7e168dd",
+    "atUTC": "2026-11-07T20:20:39.411912+00:00",
+    "dispatchExit": 0,
+    "runID": 42410602493
+  }
+]

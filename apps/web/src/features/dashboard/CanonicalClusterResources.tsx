@@ -13,7 +13,7 @@ export function sharedQuantity(value: number, kind: string): string {
   return `${value} devices`;
 }
 
-const panel = { padding: 20, backgroundColor: 'var(--color-bg-surface)', border: '1px solid var(--color-border-subtle)', borderRadius: 12 };
+const panel = { padding: 20, backgroundColor: 'var(--color-bg-surface)', borderRadius: 12 };
 const dimensions = [{ kind: 'cpu', unit: 'millicores', label: '공유 CPU' }, { kind: 'memory', unit: 'bytes', label: '공유 메모리' }];
 
 /** Allocation observations never become physical utilization or scheduler admission. */

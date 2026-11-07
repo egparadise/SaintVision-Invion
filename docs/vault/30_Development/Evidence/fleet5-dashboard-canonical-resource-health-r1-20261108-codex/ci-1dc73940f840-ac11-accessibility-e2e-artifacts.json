@@ -1,0 +1,25 @@
+{
+  "total_count": 1,
+  "artifacts": [
+    {
+      "id": 13588908190,
+      "node_id": "MDg6QXJ0aWZhY3QxMzU4ODkwODE5MA==",
+      "name": "s11-ac11-accessibility-1dc73940f840284efcaf00b0ab04c1ba8c83ceea",
+      "size_in_bytes": 2210,
+      "url": "https://api.github.com/repos/egparadise/SaintVision-Invion/actions/artifacts/13588908190",
+      "archive_download_url": "https://api.github.com/repos/egparadise/SaintVision-Invion/actions/artifacts/13588908190/zip",
+      "expired": false,
+      "digest": "sha256:d0c378736e13c046855d62ed47751da8e434a77aa20b8569744878f0af12b454",
+      "created_at": "2026-11-07T20:23:31Z",
+      "updated_at": "2026-11-07T20:23:31Z",
+      "expires_at": "2026-12-07T20:23:30Z",
+      "workflow_run": {
+        "id": 42410602493,
+        "repository_id": 1362259805,
+        "head_repository_id": 1362259805,
+        "head_branch": "agent/codex/fleet5-dashboard-canonical-resource-health-r1-20261108",
+        "head_sha": "1dc73940f840284efcaf00b0ab04c1ba8c83ceea"
+      }
+    }
+  ]
+}

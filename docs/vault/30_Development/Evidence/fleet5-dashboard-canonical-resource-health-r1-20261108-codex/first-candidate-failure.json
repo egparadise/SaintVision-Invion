@@ -1,0 +1,52 @@
+{
+  "sourceSHA": "1dc73940f840284efcaf00b0ab04c1ba8c83ceea",
+  "frontendRun": 42410597855,
+  "attempt": 1,
+  "conclusion": "failure",
+  "noRedispatch": true,
+  "failures": [
+    {
+      "job": 128517680653,
+      "step": "Build Portal Docker Image with BuildKit",
+      "cause": "TS2322 CandidateEvaluation.os excluded newly truthful unknown OS",
+      "correction": "Internal CandidateEvaluation.os now follows NodeItem.os; no placement/admission predicate change"
+    },
+    {
+      "job": 128517680431,
+      "step": "Run Vitest Unit Tests",
+      "cause": "New optional border introduced one extra exact ACC09 token inventory occurrence",
+      "correction": "Removed the new optional decorative border; original inventory and policy assertions unchanged"
+    },
+    {
+      "job": 128517680431,
+      "step": "Run Vitest Unit Tests",
+      "cause": "New isolated auth fixture falsely reported callback on every remount, reauthenticating after logout",
+      "correction": "Fixture consumes its single explicit callback once; logout and late-response assertions retained"
+    }
+  ],
+  "rawVitest": {
+    "files": 108,
+    "filesPassed": 106,
+    "filesFailed": 2,
+    "tests": 1380,
+    "passed": 1378,
+    "failed": 2
+  },
+  "logs": {
+    "ci-1dc73940f840-job-128517680431.log": "8080bba230e942f5e644625e2c5c485d13f628bbe7ec37fc305f2153bf075ca3",
+    "ci-1dc73940f840-job-128517680653.log": "2ec4e005a842a0b38f3a0f021b8a67c7a82bea3cbec208e5db487bdf1941945e"
+  },
+  "builtCSPAndDashboardBrowser": "Not executed after test/build failure; uploaded manifest-only artifact is not browser PASS",
+  "otherFirstCandidateWorkflows": {
+    "Docs": {
+      "id": 42410600125,
+      "conclusion": "success",
+      "steps": 19
+    },
+    "AC11": {
+      "id": 42410602493,
+      "conclusion": "success",
+      "manualDeviceAcceptance": "Still gated; normalized manual missing1"
+    }
+  }
+}

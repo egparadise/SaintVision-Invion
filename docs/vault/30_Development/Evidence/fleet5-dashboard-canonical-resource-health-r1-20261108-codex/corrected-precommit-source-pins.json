@@ -1,0 +1,22 @@
+{
+  ".github/workflows/frontend.yml": "a5df971efeb38ca23f99f7ae21669f82ca33cf8fbf5bd3718af99b70ca66000c",
+  "apps/web/nginx.conf": "821f679a9b84865b0a3cb94d81515387935e611237f80ca2c2dc5dc329a6b750",
+  "apps/web/src/app/App.tsx": "d655ac6408bdd3d35d9db574d264a51eab1bdb486e49607186179b271d43efee",
+  "apps/web/src/contracts/dashboard-resources.ts": "f8f4136e9017a0a5f10b67e9382087468eef5a1a778f2fc01aa28b31bde341f3",
+  "apps/web/src/contracts/types.ts": "6e85eedd9fb37106aa202d9171c4f5dbfe5577c59eb240b03eb082657360a53b",
+  "apps/web/src/features/dashboard/CanonicalClusterResources.tsx": "523528c6281f755cbb33a14dcc7e2d1467fae133a3e3c94dbb16315effa76586",
+  "apps/web/src/features/dashboard/ClusterOverview.tsx": "2d9843ee381f271a7339bc95400c932b2891ded5bc769b40391f19d8b5cbe605",
+  "apps/web/src/features/nodes/NodeDetail.tsx": "8eb8be1182434ed731436e5ea45d8d66fb5a4e963919300e56f2467eba06cfc3",
+  "apps/web/src/shared/api/dashboardResources.ts": "1bc38bd76213acdec628606a531e6997d946de1c5dc306d765328b5a256af4c0",
+  "apps/web/src/shared/api/nodeObservation.ts": "8d212bcbf4172b37fcb52c66f9b8679c4291bf339b47ee4df5159bc2a98dfe6e",
+  "apps/web/src/shared/ui/Header.tsx": "5c94fa426dbc34bfbbef22387451058a8c1428e2498b4d663134a77fae080e84",
+  "apps/web/tests/browser/dashboard.html": "5d4d5ec486f77aab6eb9c169d232bf68a6de6e0a3120e195bf073dfe8c015331",
+  "apps/web/tests/browser/dashboard.tsx": "c1f1b393235a87c4c8e2aa7fc2b6d4cb0ee49c06518aff49765ad019b4e045f3",
+  "apps/web/tests/dashboard-app-join.test.tsx": "ac255e2cb764bd44c3ccf33e2522e0eec7cf1278b5f535d730685518d49a10a0",
+  "apps/web/tests/dashboard-canonical-resources.test.tsx": "b1092128ae7ac354fab378912546024e82919c8224365fcb08e0b0fedceb9ac8",
+  "apps/web/tests/portal-refresh-fleet-ui.test.tsx": "9bff7968ce82b9256b4fc5ac581428fc782d963f39a63e41ec6e1d2f63739b15",
+  "apps/web/vite.config.ts": "b625ea575e0523d538f0bdcb0790f98e5c7fe750272e8125a29e1c9502588a42",
+  "deploy/intranet/portal/nginx.conf": "aec79f0cac341e46c43c77adb7f8c26f77e016932f5f33db2b2b6582322f1b97",
+  "tools/verify_dashboard_canonical_browser.py": "09819af56356d561ce2edd27dfa41476c3a319ffb856e8206421f0d8dfb8b9a0",
+  "tools/verify_gateway_proxy.py": "3b177b940ed64932dfc1438c59f12b6ccf2a643af42207b1445bc83746149f13"
+}

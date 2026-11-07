@@ -289,7 +289,7 @@ export interface PlacementRequirement {
 export interface CandidateEvaluation {
   nodeId: string;
   hostname: string;
-  os: 'windows' | 'linux';
+  os: NodeItem['os'];
   hardFilterPassed: boolean;
   rejectionReasons: string[];
   scores?: {

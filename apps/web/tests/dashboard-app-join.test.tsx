@@ -26,7 +26,7 @@ beforeEach(() => {
   localStorage.clear(); sessionStorage.clear(); client.setAuthToken('isolated-dashboard-session');
   host = document.createElement('div'); document.body.appendChild(host); root = createRoot(host);
   mode = 'good'; calls = []; pending = [];
-  vi.spyOn(session, 'hasLoginCallback').mockReturnValue(true);
+  vi.spyOn(session, 'hasLoginCallback').mockReturnValueOnce(true).mockReturnValue(false);
   vi.spyOn(session, 'completeLogin').mockResolvedValue({ token: 'isolated-dashboard-session', expiresAt: Math.floor(Date.now() / 1000) + 1800,
     user: { id: 'isolated-dashboard-subject', name: 'Isolated observer', role: 'developer', tenantId: 'isolated-dashboard-tenant' } });
   vi.spyOn(session, 'commitSession').mockImplementation(() => {});
