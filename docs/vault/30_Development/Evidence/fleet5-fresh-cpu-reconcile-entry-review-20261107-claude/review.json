@@ -1,0 +1,106 @@
+{
+ "task": "FLEET5-FRESH-CPU-RECONCILE-ENTRY-INDEPENDENT-REVIEW-20261107",
+ "orcaTask": "task_1d36969e9661",
+ "dispatch": "ctx_2a0f382b4d2f",
+ "reviewer": "Claude (one actual reviewer; no helper/subagent/second reviewer)",
+ "author": "Root (Codex aggregator), Root-owned operational artifact",
+ "startedKST": "not captured before branch creation (dispatch read shortly before); first captured KST is branchCreatedKST",
+ "branchCreatedKST": "2026-11-07T15:05:00+09:00",
+ "reviewBranch": "agent/claude/fleet5-fresh-cpu-reconcile-entry-review-20261107",
+ "reviewBase": "1efea494f026e932360c35ae811b6423d874a2e7",
+ "rootArtifactSource": {
+  "commit": "1eb22559b590b5bab421ca4828e8b5b1a15ef954",
+  "branch": "agent/codex/fleet-five-orchestration-20261105",
+  "remoteRefExactAtReview": true,
+  "rootWorktreeHEAD": "1eb22559b590b5bab421ca4828e8b5b1a15ef954",
+  "github": "https://github.com/egparadise/SaintVision-Invion/tree/1eb22559b590b5bab421ca4828e8b5b1a15ef954/docs/vault/30_Development/Evidence/fleet5-20261105-root",
+  "crossBranchNote": "Root artifacts are NOT files in the 1efea review tree; they were read with git show 1eb22559:<path>.",
+  "artifacts": {
+   "fresh-cpu-reconcile-entry-r1/operator_reconcile_fresh_cpu.py.txt": {"blob": "f0f79d0eac17576283d8b7df2156c170818c4697", "bytes": 2942, "sha256": "42e89b6173cd9a8ad1cfa6998da30f068d6409e03e803b523bfb7f076576a3aa", "matchesDispatch": true, "LFonly": true, "ascii": true},
+   "fresh-cpu-reconcile-entry-r1/operational-disposition.txt": {"blob": "afbd4020722ed22e8303af123c18c96bf21735b9", "bytes": 5332},
+   "fresh-cpu-reconcile-entry-r1/source-pins.json": {"blob": "afabe2daa1650864832d813769b7cf36246a58ba", "bytes": 482},
+   "cpu-fresh-admission-m1-m2-root-operational-disposition.json": {"blob": "19f9afa7b387f01041817665080f5f97525ecabc", "bytes": 1309},
+   "cpu-operator-role-readonly-20261107.json": {"blob": "f20b539570b469c37093cdeba45797707be0f30d", "bytes": 3092, "readAsRootAttributedDATAOnly": true, "notReexecuted": true},
+   "cpu-fresh-admission-review-6bd-original-verdict.json": {"blob": "31a8e1c3c82beb9e0cdd3c33960b11b348d00699", "bytes": 17095},
+   "cpu-fresh-admission-review-6bd-root-verification.json": {"blob": "f0f3e28b48db42b06afb2e80a727daaa0b27d11a", "bytes": 11332}
+  }
+ },
+ "acceptedProductSource": {
+  "commit": "1efea494f026e932360c35ae811b6423d874a2e7",
+  "library": "services/control-plane/src/inv/fresh_cpu_admission.py",
+  "librarySHA256": "76407ced1411f42a5eddd71c894f541b8691d461d4eb1eaea30f63b8bcf90d2c",
+  "librarySHA256MatchesDispatch": true,
+  "candidateWheelSHA256": "b329c2f89bb81dcc4b841fca6bf18cd8bfeeed07a657fbab7e6b6e9f4edd8d23",
+  "wheelNotDownloadedOrInspected": true,
+  "inheritedCodeAcceptance": "review 6bd81ef0531b4a58438c98618e92d5ad9985c12b / Docs 42343810509 (Root-verified). Used only as the accepted-library premise; this verdict is for the NEW Root entry + documented contract."
+ },
+ "rootBoardsRead": {
+  "rootWorktree": "D:/Project/SaintVisionI-Invion/fleet-five-orchestration-20261105",
+  "rootHEAD": "1eb22559b590b5bab421ca4828e8b5b1a15ef954",
+  "INDEX-PROGRESS-001": "1.0.507 (updated 2026-11-07T14:53:18+09:00)",
+  "WORKBOARD-CODEX-001": "1.0.468 (updated 2026-11-07T14:53:18+09:00)",
+  "WORKBOARD-CLAUDE-001": "1.2.130 (updated 2026-11-05T16:10:01+09:00)",
+  "HISTORY-FLEET5-20261105-START-CODEX": "1.0.116",
+  "root507FinalVerification": ".work/root507-final-verification.json sha256 eec018cf62c57902b3168d980f3e4645646d0416d6733a156c1995c2f551051d (SHA 1eb22559, Docs 42344667364, read as DATA)",
+  "reviewSpec": ".work/fresh-cpu-reconcile-entry-independent-review-spec.txt sha256 252ee861790a56711b82c67cf48edc5655bb1fa356f1a295238d1a6b41fb3d12",
+  "rootWorkCopyOfEntryByteEqualToCommittedBlob": true,
+  "candidate1efeaOldBoards": "historical only"
+ },
+ "predecessors": {
+  "previousReview": {"dispatch": "ctx_5edc24050812", "task": "task_4b48b22863bb", "state": "succeeded/settled/exited/released", "source": "Root .work/fresh-cpu-reconcile-entry-review-predecessor-final-show.json sha256 489e940d837c2fafbc665f4e93ed3c8bb131be1f1440980a9e5f51fd11b93575"},
+  "author": {"dispatch": "ctx_ed23b4a777d0", "task": "task_a95ef3d8ccce", "state": "succeeded/settled/exited/released", "source": "Root .work/fresh-admission-author-final-lifecycle.json sha256 ced685ef46e8d11882a04776a1a8526b5e37d05e39930afb867c0143599f268a; guarded release .work/fresh-admission-author-guarded-release.json sha256 e81a5e1b75a2a5f95d293c61e8ba8f45bf0e9710c1d5d483141c77885fa7bca1"},
+  "noPredecessorReuse": true
+ },
+ "verdict": "ACCEPT_RECONCILE_ONLY_ENTRY_AND_M1_PROFILE_CLASS_KEEP_LIVE_HOLD",
+ "mandatoryEntryDefects": 0,
+ "severityCounts": {"HIGH": 0, "MEDIUM": 0, "LOW": 1, "INFO": 7},
+ "FC1E-M2Disposition": "REVIEWED_INVOCATION_PATH_EXISTS: entry SHA256 42e89b61... + operational-disposition.txt invocation contract give Root a reviewed, bounded, read-only way to invoke the existing reconcile_admission with the same trusted connection. M2 is discharged at the review level only; actual execution NOT_RUN, host/profile/request/identity/leaf/Node/image/fence NOT_YET_BOUND, pre-run entry/wheel/library/interpreter verification pending.",
+ "FC1E-M1Disposition": "PROFILE_CLASS_ACCEPTED_FOR_RECONCILE: an existing superuser/BYPASSRLS login role with inv USAGE and the observed SELECT/UPDATE/INSERT set satisfies reconcile's _operator check (INSERT on 5 inv relations + inv USAGE) and lets the RLS-subject readback see rows; tenant isolation remains explicit tenant_id predicates in every reconcile-path SELECT. Root's 14:47:02 KST catalog observation is Root-attributed DATA, not re-executed by the reviewer. The actual private target/auth/TLS/environment/file profile must still be frozen and rechecked immediately before APPLY.",
+ "verifiedEntryProperties": [
+  {"id": "E1", "lines": "operator_reconcile_fresh_cpu.py.txt:27-33", "fact": "Only imports: json, os, re, sys, psycopg, inv.errors.DomainError, inv.fresh_cpu_admission.{MAX_REQUEST_BYTES, SAFE_ERRORS, prepare_request, reconcile_admission}. No apply_admission/plan_admission, no subprocess/open/Path/glob/logging/traceback/argparse, no execute/cursor/commit (AST probe). Product imports are inside the try, so an import/driver failure HOLDs."},
+  {"id": "E2", "lines": "34-35", "fact": "len(sys.argv) != 1 -> HOLD FRESH-0001. argv is never read beyond its length and never echoed. (Check runs after imports; harmless, see I1.)"},
+  {"id": "E3", "lines": "36-37", "fact": "stdin.buffer.read(MAX_REQUEST_BYTES+1) then prepare_request(raw): >MAX, empty, non-bytes, malformed JSON/UTF-8, non-canonical ids/base64 and endpoint/leaf identity refuse with closed codes before any connect. MAX_REQUEST_BYTES = 128*1024 from the same library."},
+  {"id": "E4", "lines": "38-42", "fact": "Expected digest comes only from fixed name SV_FRESH_NODE_EXPECTED_PLAN_SHA256, must be type str, fullmatch [0-9a-f]{64} and equal item.digest() (same digest function the PLAN/APPLY CLI uses), else HOLD FRESH-0002, all before connect."},
+  {"id": "E5", "lines": "43-45", "fact": "DSN only from fixed name SV_FRESH_NODE_OPERATOR_DSN; empty/absent -> HOLD FRESH-0012. No dsn-env indirection (narrower than the vetted CLI's --dsn-env)."},
+  {"id": "E6", "lines": "48-50", "fact": "psycopg.connect(dsn, autocommit=True) forwards the DSN intact (same as vetted CLI tools/fresh_cpu_admission.py:72); conn.read_only = True is set while the connection is IDLE, then exactly one reconcile_admission(conn, raw). The library (fresh_cpu_admission.py:325-344) re-prepares the same bytes, requires IDLE (_idle), opens its own transaction, first statement SET TRANSACTION ISOLATION LEVEL REPEATABLE READ, READ ONLY, then SELECT-only checks: _operator privilege catalog, set_config(tenant,local), epoch, tenant_controls version, _readback exact offline rows. All 12 reconcile-path SQL literals are SELECT/SET TRANSACTION (AST probe). This exact composition (autocommit=True connection + read_only=True + reconcile) is the one the CI positive real-commit/ack-loss test used (tests/core/test_fresh_cpu_admission.py:82,355-358)."},
+  {"id": "E7", "lines": "51-54", "fact": "Explicit guard: result must be dict with mode RECONCILE, status MATCHED_METADATA_REQUIRES_OPERATOR_DISPOSITION and planSha256 == expected, else HOLD FRESH-0009."},
+  {"id": "E8", "lines": "55-61", "fact": "Success output is a closed, bounded JSON: mode, status, planSha256 (the operator-supplied expected value), readOnly, automaticRetryAllowed=false, runtimeAuthorityGranted=false, operatorDispositionRequired=true. No plan body, ids, DSN, request or exception content. Exit 0."},
+  {"id": "E9", "lines": "15-20,62-66", "fact": "except BaseException (imports, driver, KeyboardInterrupt, SystemExit, unexpected) -> fail(code) prints only a closed HOLD JSON to stderr, exit 2. code is taken only from a DomainError instance and only if in SAFE_ERRORS; otherwise FRESH-0011. Before the library import domain_type=() so isinstance is always False. No str()/repr()/class name/traceback: 'str' occurs only as a type object in type(...) is str comparisons (lines 39,66)."},
+  {"id": "E10", "fact": "No APPLY/PLAN path, no writer/DDL/grant, no file discovery, subprocess, Node effect, retry loop or resume. Every expected failure (mismatch/absence -> FRESH-0009, control-version change -> FRESH-0007, epoch change -> FRESH-0006, expired/invalid leaf -> NODE-003x at prepare_request, privilege -> FRESH-0004, non-idle -> FRESH-0003, driver/timeout/interrupt -> FRESH-0011) is HOLD exit 2."},
+  {"id": "E11", "fact": "Contract consistency: operational-disposition.txt states the entry is not a DSN/filesystem sandbox, does not rewrite auth/TLS/options, a match proves present offline metadata only (not which attempt/actor committed, not future eligibility), absence is not retry permission, PLAN is not a reconcile substitute, no Node online->offline rollback to force a match, reconcile must precede later online observation. This matches library docstring lines 319-324 and _readback lines 264-270 (offline status, channel v1, single provision audit, node_controls [(0,)], unchanged tenant_controls)."},
+  {"id": "E12", "fact": "Invocation contract python -I -B <owned .py> with no args: -I implies -E/-s/-P (Python >=3.11), so the script directory and PYTHON* variables do not steer imports; inv must resolve to the verified installed wheel. The entry adds no sys.path entry (unlike the in-repo CLI)."}
+ ],
+ "findings": [
+  {"id": "FRE-L1", "severity": "LOW", "mandatory": false, "kind": "residual diagnostic channel (optional hardening / operating note)",
+   "where": "operator_reconcile_fresh_cpu.py.txt:15-20,48-50,62-66",
+   "fact": "The handler suppresses exception text only for exceptions that reach it. Two narrow paths can still put driver text on stderr outside the closed JSON: (a) if a second exception (e.g. a second Ctrl-C, or a stderr write error) is raised inside the except block/fail(), Python prints the chained traceback, which includes str() of the original exception, e.g. a libpq connection error naming host/port/user; (b) psycopg's own module logger has warning paths (e.g. failed query-cancel after an interrupt, rollback failure on exit) that, with no logging configured, go to stderr via logging.lastResort. (b) is from the reviewer's knowledge of psycopg 3.x design and was NOT verified against the pinned psycopg 3.3.5 source (no install/download/read of that package in scope). Neither path can carry the password (libpq messages and psycopg connection summaries omit it) or write anything. The accepted vetted CLI has the same property.",
+   "impact": "Possible exposure of profile elements (host/port/user/database) or generic driver text on the operator's own stderr in an interrupt/broken-pipe/lost-connection edge case. No write, no authority, exit code stays nonzero or the process dies, so the outcome is still HOLD.",
+   "disposition": "Optional, not required for this acceptance: Root may (1) capture stderr only to the private isolated-host session and treat any stderr content other than the single closed HOLD JSON as HOLD material not to be published, and/or (2) in a later revision add logging.disable/NullHandler for 'psycopg' and guard fail() itself. Do not open a new optional LOW cycle for it."}
+ ],
+ "info": [
+  {"id": "FRE-I1", "fact": "argv length is checked after the product imports (line 34). No effect on safety: imports read no argv and nothing is echoed."},
+  {"id": "FRE-I2", "fact": "Exit code is the authority: 0 only after a guarded match and a successful stdout write. If an interrupt lands after the success print but before return, stdout carries the match JSON and stderr a HOLD with exit 2. Root should key disposition on exit 0 AND exactly one stdout JSON; any nonzero exit is HOLD regardless of stdout."},
+  {"id": "FRE-I3", "fact": "The entry does not scrub PG* environment variables or libpq default files (pgpass, service, root cert). Parameters absent from the DSN fall back to them (e.g. PGOPTIONS if the DSN has no options, sslmode default prefer). Consistent with the declared not-a-sandbox trust premise (Root msg97ef); the frozen profile must state connect_timeout=5, the options (statement_timeout 15000, lock_timeout 2000, idle_in_transaction_session_timeout 15000), TLS expectation and approved file refs explicitly in the DSN, and the pre-run check must confirm the process environment carries only approved values. The entry does not verify these; it forwards them."},
+  {"id": "FRE-I4", "fact": "FRESH-0009 is reused for the entry's own result-shape guard and the library's readback mismatch; both are HOLD. The guard is unreachable with the pinned library and exists as defense in depth."},
+  {"id": "FRE-I5", "fact": "conn.read_only=True plus the library's READ ONLY REPEATABLE READ transaction are defense in depth; with a superuser role they are not a privilege boundary. The only operations sent are the 12 SELECT/SET TRANSACTION statements; set_config(...,true) is transaction-local."},
+  {"id": "FRE-I6", "fact": "Reconcile requires the role to hold INSERT on 5 inv relations (_operator lines 162-171) even though it only reads; the M1 role class satisfies this. Least privilege is not achieved by a superuser class; no new role/grant work is assigned here."},
+  {"id": "FRE-I7", "fact": "Artifact bytes are LF/ASCII in the Root blob (sha 42e89b61...). The operator must hash the exact copied .py bytes on the isolated host; a CRLF-converting copy would change the SHA and must be refused, not normalised."}
+ ],
+ "testAttribution": {
+  "positiveRealCommitAckLossReconcile": "executed in hosted CI (Core 42339495593 at 1efea494, Root-verified); not re-run by the reviewer",
+  "negativeReconcilePaths": "code-read only (FC1E-L4 retained); not fully executed",
+  "wrongEpochFixtureCase": "the 25 fresh_db fixture cases include one wrong-epoch case whose assertion is a pre-DB certificate refusal; the separate matching-certificate wrong-current-DB-epoch case proves the real DB epoch refusal (FC1E-I2)",
+  "entryItself": "NOT executed anywhere; no test exists for the entry; no new test or DB proof invented"
+ },
+ "ownDataChecks": [
+  {"argv": "git show 1eb22559b590b5bab421ca4828e8b5b1a15ef954:<root artifact paths> / git ls-tree -l", "exit": 0, "note": "blob ids, sizes, sha256 above"},
+  {"argv": "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe -I -B entry_ast_probe.py ../in/entry.py.txt ../in/library.py.txt ../probe-out.json (cwd scratch/probe)", "exit": 0,
+   "probeSHA256": "b270f1ad828be829621e589f971a0a24976d001885830f590dcba6a7d6196ae4",
+   "inputSHA256": {"entry": "42e89b6173cd9a8ad1cfa6998da30f068d6409e03e803b523bfb7f076576a3aa", "library": "76407ced1411f42a5eddd71c894f541b8691d461d4eb1eaea30f63b8bcf90d2c"},
+   "outputSHA256": "8f4faece59b1722898d2c04c7a1dbb0037fbb743122fee69e02952e1e08259eb",
+   "note": "ast.parse only; copied in as entry-ast-probe.json"}
+ ],
+ "notRun": ["entry execution (even with fakes/mocks)", "product/CLI/app import", "crypto", "pytest", "Go/compiler", "Node/browser/runtime", "SSH/Docker/PG", "install/PKI/OS/pagefile/process/credentials", "new Core/Backend/Frontend CI", "artifact/wheel/log downloads", "old proof/corpus/author helpers", "DB observation re-execution", "reads of real configuration/env/account/manifest/key/cert/connection/profile/incident transcripts", "secret rotation/log delete/cleanup"],
+ "remainsOpen": "Original19 HOLD, acceptedBaselineDischarges 0, runtime B0, A1-A16 PENDING, H1-H7/H3EA/RD NULL_HOLD, raw7 UNREGISTERED, A01-A40 NOT_RUN, full five-PC and program incomplete. Actual isolated host NOT_YET_FROZEN; private profile/request/identity/leaf/Node/image/fence not bound; entry/wheel/library/interpreter pre-run verification pending; actual APPLY/RECONCILE NOT_RUN. An additional existing approver identity and two actual distinct non-requester Run votes are still needed later; none fabricated here.",
+ "authorityGranted": null
+}

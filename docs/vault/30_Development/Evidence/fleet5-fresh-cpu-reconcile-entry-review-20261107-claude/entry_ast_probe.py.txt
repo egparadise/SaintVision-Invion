@@ -1,0 +1,85 @@
+"""Reviewer DATA probe: AST/bytes only. Never imports, compiles-to-run or executes the inputs.
+
+Usage: python -I -B entry_ast_probe.py <entry.py.txt> <library.py> <out.json>
+Inputs are git blobs extracted by the reviewer (Root 1eb22559 entry; product 1efea494 library).
+"""
+import ast, hashlib, json, re, sys
+
+entry_path, lib_path, out_path = sys.argv[1:4]
+eb = open(entry_path, 'rb').read(); lb = open(lib_path, 'rb').read()
+et = ast.parse(eb, filename='entry'); lt = ast.parse(lb, filename='library')
+
+def names(tree, kind):
+    return sorted({n.id for n in ast.walk(tree) if isinstance(n, ast.Name)} if kind == 'name'
+                  else {n.attr for n in ast.walk(tree) if isinstance(n, ast.Attribute)})
+
+def call_targets(tree):
+    out = []
+    for n in ast.walk(tree):
+        if isinstance(n, ast.Call):
+            out.append(ast.unparse(n.func))
+    return sorted(out)
+
+imports = []
+for n in ast.walk(et):
+    if isinstance(n, ast.Import):
+        imports += [a.name for a in n.names]
+    elif isinstance(n, ast.ImportFrom):
+        imports += [f'{n.module}.{a.name}' for a in n.names]
+strings = sorted({n.value for n in ast.walk(et) if isinstance(n, ast.Constant) and isinstance(n.value, str)})
+calls = call_targets(et)
+handlers = [(h.lineno, ast.unparse(h.type) if h.type else None) for n in ast.walk(et)
+            if isinstance(n, ast.Try) for h in n.handlers]
+main = next(n for n in et.body if isinstance(n, ast.FunctionDef) and n.name == 'main')
+try_node = next(n for n in main.body if isinstance(n, ast.Try))
+top_main = [type(n).__name__ for n in main.body]
+# statement order inside the try body (line, first token)
+order = [(s.lineno, ast.unparse(s).splitlines()[0][:90]) for s in try_node.body]
+with_nodes = [n for n in ast.walk(et) if isinstance(n, ast.With)]
+with_body = [ast.unparse(s) for w in with_nodes for s in w.body]
+forbidden = ['apply_admission', 'plan_admission', 'subprocess', 'open', 'eval', 'exec', 'system', 'popen',
+             'Path', 'glob', 'listdir', 'walk', 'logging', 'traceback', 'repr', 'str', 'format_exc', 'argparse',
+             'commit', 'execute', 'cursor', 'getenv', 'environ.items', 'putenv']
+present = {f: (f in names(et, 'name') or f in names(et, 'attr') or any(c.endswith(f) for c in calls)) for f in forbidden}
+env_reads = [ast.unparse(n) for n in ast.walk(et) if isinstance(n, ast.Call) and ast.unparse(n.func) == 'os.environ.get']
+prints = [ast.unparse(n)[:200] for n in ast.walk(et) if isinstance(n, ast.Call) and ast.unparse(n.func) == 'print']
+
+fn = {n.name: n for n in lt.body if isinstance(n, ast.FunctionDef)}
+rec = fn['reconcile_admission']; rb = fn['_readback']; op = fn['_operator']
+def sql_of(f):
+    return [re.sub(r'\s+', ' ', n.value).strip()[:160] for n in ast.walk(f)
+            if isinstance(n, ast.Constant) and isinstance(n.value, str) and re.match(r'\s*(SELECT|SET|INSERT|UPDATE|DELETE|WITH)', n.value)]
+rec_sql = sql_of(rec) + sql_of(rb) + sql_of(op)
+consts = {}
+for n in lt.body:
+    if isinstance(n, ast.Assign) and len(n.targets) == 1 and isinstance(n.targets[0], ast.Name) and n.targets[0].id in ('MAX_REQUEST_BYTES',):
+        consts[n.targets[0].id] = ast.unparse(n.value)
+safe_errors = next(ast.literal_eval(n.value) for n in lt.body if isinstance(n, ast.Assign)
+                   and getattr(n.targets[0], 'id', None) == 'SAFE_ERRORS')
+
+result = {
+    'probe': 'entry_ast_probe (ast.parse only; no import/compile-to-run/exec of inputs)',
+    'inputs': {
+        'entry': {'sha256': hashlib.sha256(eb).hexdigest(), 'bytes': len(eb), 'crlf': b'\r\n' in eb, 'nonAscii': any(c > 127 for c in eb)},
+        'library': {'sha256': hashlib.sha256(lb).hexdigest(), 'bytes': len(lb)},
+    },
+    'entry': {
+        'topLevel': [type(n).__name__ + (':' + n.name if hasattr(n, 'name') else '') for n in et.body],
+        'imports': imports, 'mainBodyKinds': top_main, 'tryBodyOrder': order,
+        'exceptHandlers': handlers, 'withBlocks': len(with_nodes), 'withBody': with_body,
+        'calls': calls, 'envReads': env_reads, 'prints': prints, 'stringConstants': strings,
+        'forbiddenIdentifierPresent': present,
+        'reconcileCallCount': sum(c == 'reconcile_admission' for c in calls),
+        'connectCallCount': sum(c == 'psycopg.connect' for c in calls),
+    },
+    'library': {
+        'reconcileLines': [rec.lineno, rec.end_lineno], 'readbackLines': [rb.lineno, rb.end_lineno],
+        'operatorLines': [op.lineno, op.end_lineno],
+        'reconcileCalls': call_targets(rec), 'reconcilePathSQL': rec_sql,
+        'reconcilePathSQLAllReadOnlyClass': all(s.startswith(('SELECT', 'SET TRANSACTION')) for s in rec_sql),
+        'MAX_REQUEST_BYTES': consts.get('MAX_REQUEST_BYTES'), 'SAFE_ERRORS_keys': sorted(safe_errors),
+        'functions': sorted(fn),
+    },
+}
+open(out_path, 'w', encoding='utf-8', newline='\n').write(json.dumps(result, indent=1, ensure_ascii=True) + '\n')
+print(hashlib.sha256(open(out_path, 'rb').read()).hexdigest())

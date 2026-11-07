@@ -1,0 +1,292 @@
+{
+ "probe": "entry_ast_probe (ast.parse only; no import/compile-to-run/exec of inputs)",
+ "inputs": {
+  "entry": {
+   "sha256": "42e89b6173cd9a8ad1cfa6998da30f068d6409e03e803b523bfb7f076576a3aa",
+   "bytes": 2942,
+   "crlf": false,
+   "nonAscii": false
+  },
+  "library": {
+   "sha256": "76407ced1411f42a5eddd71c894f541b8691d461d4eb1eaea30f63b8bcf90d2c",
+   "bytes": 15096
+  }
+ },
+ "entry": {
+  "topLevel": [
+   "Expr",
+   "Import",
+   "Import",
+   "Import",
+   "Import",
+   "FunctionDef:fail",
+   "FunctionDef:main",
+   "If"
+  ],
+  "imports": [
+   "json",
+   "os",
+   "re",
+   "sys",
+   "psycopg",
+   "inv.errors.DomainError",
+   "inv.fresh_cpu_admission.MAX_REQUEST_BYTES",
+   "inv.fresh_cpu_admission.SAFE_ERRORS",
+   "inv.fresh_cpu_admission.prepare_request",
+   "inv.fresh_cpu_admission.reconcile_admission"
+  ],
+  "mainBodyKinds": [
+   "Assign",
+   "Assign",
+   "Try"
+  ],
+  "tryBodyOrder": [
+   [
+    27,
+    "import psycopg"
+   ],
+   [
+    28,
+    "from inv.errors import DomainError"
+   ],
+   [
+    29,
+    "from inv.fresh_cpu_admission import MAX_REQUEST_BYTES, SAFE_ERRORS, prepare_request, recon"
+   ],
+   [
+    32,
+    "domain_type = DomainError"
+   ],
+   [
+    33,
+    "safe_codes = frozenset(SAFE_ERRORS)"
+   ],
+   [
+    34,
+    "if len(sys.argv) != 1:"
+   ],
+   [
+    36,
+    "raw = sys.stdin.buffer.read(MAX_REQUEST_BYTES + 1)"
+   ],
+   [
+    37,
+    "item = prepare_request(raw)"
+   ],
+   [
+    38,
+    "expected = os.environ.get('SV_FRESH_NODE_EXPECTED_PLAN_SHA256')"
+   ],
+   [
+    39,
+    "if type(expected) is not str or not re.fullmatch('[0-9a-f]{64}', expected) or item.digest("
+   ],
+   [
+    43,
+    "dsn = os.environ.get('SV_FRESH_NODE_OPERATOR_DSN')"
+   ],
+   [
+    44,
+    "if not dsn:"
+   ],
+   [
+    48,
+    "with psycopg.connect(dsn, autocommit=True) as conn:"
+   ],
+   [
+    51,
+    "if type(result) is not dict or result.get('mode') != 'RECONCILE' or result.get('status') !"
+   ],
+   [
+    55,
+    "print(json.dumps({'mode': 'RECONCILE', 'status': result['status'], 'planSha256': expected,"
+   ],
+   [
+    61,
+    "return 0"
+   ]
+  ],
+  "exceptHandlers": [
+   [
+    62,
+    "BaseException"
+   ]
+  ],
+  "withBlocks": 1,
+  "withBody": [
+   "conn.read_only = True",
+   "result = reconcile_admission(conn, raw)"
+  ],
+  "calls": [
+   "SystemExit",
+   "fail",
+   "fail",
+   "fail",
+   "fail",
+   "fail",
+   "frozenset",
+   "getattr",
+   "isinstance",
+   "item.digest",
+   "json.dumps",
+   "json.dumps",
+   "len",
+   "main",
+   "os.environ.get",
+   "os.environ.get",
+   "prepare_request",
+   "print",
+   "print",
+   "psycopg.connect",
+   "re.fullmatch",
+   "reconcile_admission",
+   "result.get",
+   "result.get",
+   "result.get",
+   "sys.stdin.buffer.read",
+   "type",
+   "type",
+   "type"
+  ],
+  "envReads": [
+   "os.environ.get('SV_FRESH_NODE_EXPECTED_PLAN_SHA256')",
+   "os.environ.get('SV_FRESH_NODE_OPERATOR_DSN')"
+  ],
+  "prints": [
+   "print(json.dumps({'mode': 'RECONCILE', 'status': 'HOLD', 'code': code, 'automaticRetryAllowed': False, 'operatorDispositionRequired': True}, sort_keys=True), file=sys.stderr)",
+   "print(json.dumps({'mode': 'RECONCILE', 'status': result['status'], 'planSha256': expected, 'readOnly': True, 'automaticRetryAllowed': False, 'runtimeAuthorityGranted': False, 'operatorDispositionRequi"
+  ],
+  "stringConstants": [
+   "FRESH-0001",
+   "FRESH-0002",
+   "FRESH-0009",
+   "FRESH-0011",
+   "FRESH-0012",
+   "HOLD",
+   "MATCHED_METADATA_REQUIRES_OPERATOR_DISPOSITION",
+   "RECONCILE",
+   "Root operational entry, RECONCILE ONLY; run on the frozen isolated host.\n\nRequires the operator's verified candidate wheel and self-contained connection\nprofile. This entry is not a DSN/filesystem sandbox and never performs APPLY.\nThe public request is bounded stdin; the original plan digest is a fixed named\nenvironment input. No exception, connection, request, argv or environment value\nis logged. A matched result still requires operator disposition.\n",
+   "SV_FRESH_NODE_EXPECTED_PLAN_SHA256",
+   "SV_FRESH_NODE_OPERATOR_DSN",
+   "[0-9a-f]{64}",
+   "__main__",
+   "automaticRetryAllowed",
+   "code",
+   "mode",
+   "operatorDispositionRequired",
+   "planSha256",
+   "readOnly",
+   "runtimeAuthorityGranted",
+   "status"
+  ],
+  "forbiddenIdentifierPresent": {
+   "apply_admission": false,
+   "plan_admission": false,
+   "subprocess": false,
+   "open": false,
+   "eval": false,
+   "exec": false,
+   "system": false,
+   "popen": false,
+   "Path": false,
+   "glob": false,
+   "listdir": false,
+   "walk": false,
+   "logging": false,
+   "traceback": false,
+   "repr": false,
+   "str": true,
+   "format_exc": false,
+   "argparse": false,
+   "commit": false,
+   "execute": false,
+   "cursor": false,
+   "getenv": false,
+   "environ.items": false,
+   "putenv": false
+  },
+  "reconcileCallCount": 1,
+  "connectCallCount": 1
+ },
+ "library": {
+  "reconcileLines": [
+   318,
+   344
+  ],
+  "readbackLines": [
+   243,
+   270
+  ],
+  "operatorLines": [
+   162,
+   171
+  ],
+  "reconcileCalls": [
+   "_idle",
+   "_operator",
+   "_readback",
+   "_receipt",
+   "conn.cursor",
+   "conn.transaction",
+   "cursor.execute",
+   "cursor.execute",
+   "cursor.execute",
+   "cursor.execute",
+   "cursor.execute('SELECT epoch FROM inv.control_epoch WHERE singleton').fetchone",
+   "cursor.execute('SELECT version,kill_switch,updated_at\\n                FROM inv.tenant_controls WHERE tenant_id=%s', (item.tenant,)).fetchone",
+   "prepare_request",
+   "refuse",
+   "refuse",
+   "refuse",
+   "str"
+  ],
+  "reconcilePathSQL": [
+   "SET TRANSACTION ISOLATION LEVEL REPEATABLE READ, READ ONLY",
+   "SELECT set_config('inv.tenant_id',%s,true)",
+   "SELECT epoch FROM inv.control_epoch WHERE singleton",
+   "SELECT version,kill_switch,updated_at FROM inv.tenant_controls WHERE tenant_id=%s",
+   "SELECT status,recovery_epoch FROM inv.nodes WHERE tenant_id=%s AND node_id=%s",
+   "SELECT resource_id,node_id,kind,capacity,offered FROM inv.resources WHERE tenant_id=%s AND node_id=%s ORDER BY resource_id",
+   "SELECT project_id,enabled FROM inv.project_nodes WHERE tenant_id=%s AND node_id=%s",
+   "SELECT recovery_epoch,version,endpoint,certificate_sha256, certificate_not_after,enabled FROM inv.node_channels WHERE tenant_id=%s AND node_id=%s",
+   "SELECT version,action,certificate_sha256 FROM inv.node_channel_audit WHERE tenant_id=%s AND node_id=%s",
+   "SELECT version,kill_switch,updated_at FROM inv.tenant_controls WHERE tenant_id=%s",
+   "SELECT version FROM inv.node_controls WHERE tenant_id=%s AND node_id=%s",
+   "SELECT count(*)=5 AND coalesce(bool_and(has_table_privilege(current_user,c.oid,'INSERT')),false) AND has_schema_privilege(current_user,'inv','USAGE') FROM pg_ca"
+  ],
+  "reconcilePathSQLAllReadOnlyClass": true,
+  "MAX_REQUEST_BYTES": "128 * 1024",
+  "SAFE_ERRORS_keys": [
+   "FRESH-0001",
+   "FRESH-0002",
+   "FRESH-0003",
+   "FRESH-0004",
+   "FRESH-0005",
+   "FRESH-0006",
+   "FRESH-0007",
+   "FRESH-0008",
+   "FRESH-0009",
+   "FRESH-0010",
+   "FRESH-0011",
+   "FRESH-0012",
+   "NODE-0031",
+   "NODE-0032",
+   "NODE-0033",
+   "NODE-0034"
+  ],
+  "functions": [
+   "_constant",
+   "_idle",
+   "_operator",
+   "_pairs",
+   "_preflight",
+   "_readback",
+   "_receipt",
+   "apply_admission",
+   "plan_admission",
+   "prepare_request",
+   "reconcile_admission",
+   "refuse"
+  ]
+ }
+}
