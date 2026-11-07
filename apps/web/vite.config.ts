@@ -39,6 +39,8 @@ export default defineConfig({
     },
   },
   build: {
+    // Standalone Ajv output is local CommonJS; only its pure format/runtime helpers are bundled.
+    commonjsOptions: { include: [/node_modules/, /node-certificate-validator\.cjs$/] },
     target: 'esnext',
     outDir: 'dist',
     sourcemap: true,

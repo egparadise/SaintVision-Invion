@@ -67,6 +67,29 @@ jobs:
         working-directory: apps/web
         run: npm run build
 
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install pinned hosted browser regression harness
+        run: |
+          python -m pip install playwright==1.62.0
+          google-chrome --version
+
+      - name: Boot actual built frontend under canonical strict CSP
+        run: python tools/verify_portal_strict_csp_browser.py
+
+      - name: Upload strict CSP browser and standalone generation evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: saintvision-portal-strict-csp-evidence
+          path: |
+            artifacts/portal-strict-csp/
+            apps/web/src/contracts/node-certificate-validator.cjs
+            apps/web/src/contracts/node-certificate-validator.manifest.json
+          retention-days: 14
+
       - name: Upload Web Build Artifact
         uses: actions/upload-artifact@v4
         with:

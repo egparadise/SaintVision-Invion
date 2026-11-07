@@ -4,7 +4,7 @@ import globals from 'globals'
 import tseslint from 'typescript-eslint'
 
 export default defineConfig([
-  globalIgnores(['dist/**', 'coverage/**']),
+  globalIgnores(['dist/**', 'coverage/**', 'src/contracts/node-certificate-validator.cjs']),
   {
     files: ['**/*.{js,mjs,cjs}'],
     extends: [js.configs.recommended],

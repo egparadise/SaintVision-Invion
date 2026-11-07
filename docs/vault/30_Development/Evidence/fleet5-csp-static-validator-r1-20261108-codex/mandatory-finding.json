@@ -1,0 +1,22 @@
+{
+  "atKST": "2026-11-08T01:28:24+09:00",
+  "id": "CR-CSP-01",
+  "severity": "High",
+  "state": "OPEN_ACTUAL_PRODUCT_BOOT_DEFECT",
+  "observedEnvironment": "PC3 Chrome/157.0.8103.38 real accepted905 dist/Nginx source strictCSP via exact Main1273100 origin",
+  "source": "96afd799d49717fd40e4ddabd538d82accbe1958",
+  "frontendSource": "90578f49ea400958fcdbc1ded3908d624e856f57",
+  "affectedSource": "apps/web/src/shared/api/nodeCertificateObservation.ts runtime Ajv2020.compile at module load",
+  "evidence": "Actual browser EvalError new Function denied by script-src self; index/assets all200; React root empty; no password/authentication submitted",
+  "requiredCorrection": "Generate canonical schema validator at build time using existing standalone-generation approach; preserve complete schema/format/semantic/freshness validation and strictCSP. No unsafe-eval/CSP disable/schema weakening/hiding failure. Meaningful regression and exact official Frontend/Docs; independent actual review; Root actual strict-CSP browser recheck before reactivation.",
+  "currentUserRoute": "Main1273100 -> Root-owned SSH6592 -> PC3loopback13101 oldb48 -> SSH18081 oldMainAPI8080",
+  "temporaryRecovery": "Restored previous Vite loopback preview no-CSP/CacheControl-no-store behavior only on oldb48 rollback; no unsafe-eval added, source strictCSP unchanged; recovery not new deployment acceptance",
+  "restoredRealChromeLoginPage": true,
+  "oldB48BrowserExceptions": 0,
+  "newAPI96AndSchema0068Preserved": true,
+  "actualOwnerAPI96And3MeasuredPCsRemainEarlierVerified": true,
+  "featureCR90501StillClosed": true,
+  "newDefectIndependentOfOriginalTestOnlyDelta": true,
+  "nextOwner": "Actual Orca Codex source owner then actual Claude independent reviewer; Root owns all secrets/SSH/real operator/browser/APPLY",
+  "wholeProgramComplete": false
+}

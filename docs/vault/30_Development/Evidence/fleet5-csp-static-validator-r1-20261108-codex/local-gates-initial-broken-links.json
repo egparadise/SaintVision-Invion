@@ -1,0 +1,13 @@
+[
+  {
+    "argv": [
+      "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+      "-B",
+      "tools/check_docs.py"
+    ],
+    "atKST": "2026-11-08T01:42:13.619906+09:00",
+    "exit": 1,
+    "stdout": "",
+    "stderr": "Traceback (most recent call last):\r\n  File \"D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105\\tools\\check_docs.py\", line 157, in <module>\r\n    validate()\r\n    ~~~~~~~~^^\r\n  File \"D:\\Project\\SaintVisionI-Invion\\fleet5-compute-storage-contract-20261105\\tools\\check_docs.py\", line 152, in validate\r\n    raise ValueError('\\n'.join(errors))\r\nValueError: Broken wiki link 30_Development\\Agent\ubcc4 \uc791\uc5c5\\Codex \uc791\uc5c5 \ud604\ud669.md \u2192 FLEET5 CR-CSP-01 canonical static validator correction\r\nBroken wiki link 30_Development\\Agent\ubcc4 \uc791\uc5c5\\Codex \uc791\uc5c5 \ud604\ud669.md \u2192 FLEET5 CR-CSP-01 static validator Codex\r\nBroken wiki link 30_Development\\History\\2026-11-08_FLEET5_CR-CSP-01_static_validator_Codex.md \u2192 FLEET5 CR-CSP-01 canonical static validator correction\r\n"
+  }
+]

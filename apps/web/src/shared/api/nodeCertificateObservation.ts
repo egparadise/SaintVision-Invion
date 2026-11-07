@@ -1,15 +1,7 @@
-import Ajv2020 from 'ajv/dist/2020.js';
-import addFormats from 'ajv-formats';
-import schema from '../../../../../contracts/v1alpha1/core.schema.json';
+import validate from '@/contracts/node-certificate-validator.cjs';
 import type { ProjectNodeCertificateObservationResponse, NodeCertificateTrustSummary } from '@/contracts/node-certificate-observation';
 import { apiClient } from './client';
 
-const ajv = new Ajv2020({ strict: false });
-addFormats(ajv);
-ajv.addSchema(schema);
-const validate = ajv.compile<ProjectNodeCertificateObservationResponse>({
-  $ref: `${schema.$id}#/$defs/ProjectNodeCertificateObservationResponse`,
-});
 const renewalWindowMillis = 2 * 86400 * 1000;
 
 function timestampMicros(value: string): bigint {

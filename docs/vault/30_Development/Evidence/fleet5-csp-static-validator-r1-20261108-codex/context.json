@@ -1,0 +1,16 @@
+{
+  "docID": "EVIDENCE-FLEET5-CSP-STATIC-VALIDATOR-R1-CODEX",
+  "version": "1.0.0",
+  "task": "CR-CSP-01",
+  "taskID": "task_1b0f4d26fa63",
+  "dispatchID": "ctx_3571ec38775b",
+  "owner": "Codex",
+  "base": "96afd799d49717fd40e4ddabd538d82accbe1958",
+  "branch": "agent/codex/fleet5-csp-static-validator-r1-20261108",
+  "rootManagement": "76c06dc8f9e93250e6045383891e266c6aa2a747",
+  "atKST": "2026-11-08T01:33:52.681343+09:00",
+  "canonicalBytes": 522559,
+  "canonicalSHA256": "ef2014e871fd3a1a38a5a0df46cf84193d00e08cbbf8fb5a784660d266173b26",
+  "mainProductExecution": false,
+  "review": "Root starts one actual Claude after delivery"
+}

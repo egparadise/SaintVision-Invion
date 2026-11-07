@@ -4,14 +4,20 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
+    "predev": "npm run validators:generate",
     "dev": "vite",
+    "prebuild": "npm run validators:generate",
     "build": "tsc -b && vite build",
     "preview": "vite preview",
+    "prelint": "npm run validators:generate",
     "lint": "eslint . --max-warnings 0",
+    "pretest": "npm run validators:generate",
     "test": "vitest run",
+    "preeval:check": "npm run validators:generate",
     "eval:check": "vitest run tests/agent-eval-runner.test.ts",
-    "contracts:generate": "node scripts/api-response-contracts.mjs --write",
-    "contracts:check": "node scripts/api-response-contracts.mjs --check"
+    "validators:generate": "node scripts/node-certificate-validator.mjs --write",
+    "contracts:generate": "node scripts/api-response-contracts.mjs --write && npm run validators:generate",
+    "contracts:check": "node scripts/api-response-contracts.mjs --check && node scripts/node-certificate-validator.mjs --check"
   },
   "dependencies": {
     "@tanstack/react-query": "^5.66.0",

@@ -1,0 +1,79 @@
+{
+  "SSHExit": 0,
+  "stderrBytes": 191,
+  "remote": {
+    "mainBrowserExecuted": false,
+    "insecureTLSFlagsUsed": false,
+    "ChromeSandboxDisabled": false,
+    "authCredentialsPersistedByDriver": false,
+    "actualRunOrVotesCreated": false,
+    "workspaceReadinessChanged": false,
+    "wholeProgramComplete": false,
+    "ownedChromePID": 656586,
+    "browserVersion": "Chrome/157.0.8103.38",
+    "status": "ANONYMOUS_CHROME_DIAGNOSTIC_COMPLETED",
+    "page": {
+      "ready": "complete",
+      "title": "SaintVision-Invion Portal",
+      "bodyText": "",
+      "html": "<html lang=\"ko\" data-theme=\"dark\"><head>\n    <meta charset=\"UTF-8\">\n    <link rel=\"icon\" type=\"image/svg+xml\" href=\"/favicon.svg\">\n    <link rel=\"manifest\" href=\"/manifest.json\">\n    <meta name=\"theme-color\" content=\"#0d1117\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>SaintVision-Invion Portal</title>\n    <script type=\"module\" crossorigin=\"\" src=\"/assets/index-CpbRD_HK.js\"></script>\n    <link rel=\"modulepreload\" crossorigin=\"\" href=\"/assets/vendor-CYSfZuHu.js\">\n    <link rel=\"modulepreload\" crossorigin=\"\" href=\"/assets/query-DtERyQJL.js\">\n    <link rel=\"stylesheet\" crossorigin=\"\" href=\"/assets/index-kKrfL4r3.css\">\n  </head>\n  <body>\n    <div id=\"root\"></div>\n    <script src=\"/auth-config.js\"></script>\n  \n\n</body></html>",
+      "scripts": [
+        {
+          "src": "http://127.0.0.1:3100/assets/index-CpbRD_HK.js",
+          "type": "module"
+        },
+        {
+          "src": "http://127.0.0.1:3100/auth-config.js",
+          "type": ""
+        }
+      ]
+    },
+    "responses": [
+      {
+        "origin": "http://127.0.0.1:3100",
+        "path": "/studio",
+        "status": 200
+      },
+      {
+        "origin": "http://127.0.0.1:3100",
+        "path": "/assets/index-kKrfL4r3.css",
+        "status": 200
+      },
+      {
+        "origin": "http://127.0.0.1:3100",
+        "path": "/assets/query-DtERyQJL.js",
+        "status": 200
+      },
+      {
+        "origin": "http://127.0.0.1:3100",
+        "path": "/auth-config.js",
+        "status": 200
+      },
+      {
+        "origin": "http://127.0.0.1:3100",
+        "path": "/assets/vendor-CYSfZuHu.js",
+        "status": 200
+      },
+      {
+        "origin": "http://127.0.0.1:3100",
+        "path": "/assets/index-CpbRD_HK.js",
+        "status": 200
+      },
+      {
+        "origin": "http://127.0.0.1:3100",
+        "path": "/favicon.svg",
+        "status": 404
+      }
+    ],
+    "loadFailures": [],
+    "exceptions": [
+      {
+        "text": "Uncaught",
+        "description": "EvalError: Evaluating a string as JavaScript violates the following Content Security Policy directive because 'unsafe-eval' is not an allowed source of script: script-src 'self'\".\n\n    at new Function (<anonymous>)\n    at m (http://127.0.0.1:3100/assets/index-CpbRD_HK.js:193:27495)\n    at m.h (http://127.0.0.1:3100/assets/index-CpbRD_HK.js:193:28671)\n    at m.g (http://127.0.0.1:3100/assets/index-CpbRD_HK.js:193:28551)\n    at Object.code (http://127.0.0.1:3100/assets/index-CpbRD_HK.js:193:62108)\n    at _ (http://127.0.0.1:3100/assets/index-CpbRD_HK.js:193:24116)\n    at http://127.0.0.1:3100/assets/index-CpbRD_HK.js:193:19063\n    at W.code (http://127.0.0.1:3100/assets/index-CpbRD_HK.js:190:926)\n    at W.block (http://127.0.0.1:3100/assets/index-CpbRD_HK.js:190:2856)\n    at V (http://127.0.0.1:3100/assets/index-CpbRD_HK.js:193:19053)"
+      }
+    ],
+    "screenshotSHA256": "977acbc70b3fe487b3b210680827c72dd0d63633dd5485e8ca9186807e6bd0b2",
+    "passwordOrAuthenticationSubmitted": false,
+    "ownedBrowserExited": true
+  }
+}

@@ -1,0 +1,76 @@
+{
+  "base": "96afd799d49717fd40e4ddabd538d82accbe1958",
+  "paths": {
+    "contracts": {
+      "baseObject": "b2b24a6d9baf24302f3590f4f30fe851ccb81ef1",
+      "workingDiffBytes": 0,
+      "unchanged": true
+    },
+    "packages/contracts-ts": {
+      "baseObject": "64ea838d246aa6295035816f441a092680a55f3a",
+      "workingDiffBytes": 0,
+      "unchanged": true
+    },
+    "services": {
+      "baseObject": "5c9918adc48c76c88b5119f44516bb332924f067",
+      "workingDiffBytes": 0,
+      "unchanged": true
+    },
+    "migrations": {
+      "baseObject": "b1d35598829437c39dab7f60e9521bf8627e6832",
+      "workingDiffBytes": 0,
+      "unchanged": true
+    },
+    "deploy/intranet/portal": {
+      "baseObject": "1bda2b73f42a9912d8d4dd5f455d0ef13eed4a0c",
+      "workingDiffBytes": 0,
+      "unchanged": true
+    },
+    "tests/integration/test_workspace_first_intents.py": {
+      "baseObject": "53f0832a334a706e6508938f0432d790cb388aa4",
+      "workingDiffBytes": 0,
+      "unchanged": true
+    },
+    "apps/web/package-lock.json": {
+      "baseObject": "7cd35bcec966ac001d6481f9712ff06546879222",
+      "workingDiffBytes": 0,
+      "unchanged": true
+    },
+    "src": {
+      "baseObject": "5507dfb820d54a8778c4cf5e3551368f11b6105f",
+      "workingDiffBytes": 0,
+      "unchanged": true,
+      "recursiveObjectListingSHA256": "86e19681bfb3d04ef77e02874a25576425da70cfb3ae1c4e75467291bf3383ed"
+    },
+    "apps/studio": {
+      "baseObject": "faf648da92d7f63e74e7e1d158deb923d42a6a8c",
+      "workingDiffBytes": 0,
+      "unchanged": true,
+      "recursiveObjectListingSHA256": "4cf789dd7e5e8b6cdc327d831b748bccdbbc2c856f83a9fa3ff6150451d39ada"
+    },
+    "packages": {
+      "baseObject": "7c445bdbc929f6597c0b39b598f9726032c67ad7",
+      "workingDiffBytes": 0,
+      "unchanged": true,
+      "recursiveObjectListingSHA256": "41dcd7faf0419b692e3993ae8ae6e91f8035e66b49a64353399ad5bb5e768547"
+    },
+    "tests": {
+      "baseObject": "f0c6e9f537989b71f57b2185fd43c6abbaf4369e",
+      "workingDiffBytes": 0,
+      "unchanged": true,
+      "recursiveObjectListingSHA256": "a5ec579a238bb16c5e8ecdd0f55b677e16aacdb46afbc28a8c1c5196401e6210"
+    },
+    "deploy": {
+      "baseObject": "5a98abd52d78c2dea952b257123bea2f01dffa64",
+      "workingDiffBytes": 0,
+      "unchanged": true,
+      "recursiveObjectListingSHA256": "1215e22b181c1990163a18d09195cc988d3321d73d167189301fa9127e6d0e7f"
+    }
+  },
+  "freshBackendOrCoreClaim": false,
+  "priorFrontendEvidence": "42368189302 is old905/96 evidence only; candidate requires new Frontend CI",
+  "schema0068": {
+    "path": "migrations/versions/0068_first_workspace_intent.py",
+    "SHA256": "d22e5d2cad43bbe673e222ff5b0e7d866539fdf982cb2c9bf8404f105cb661b3"
+  }
+}

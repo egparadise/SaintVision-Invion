@@ -11,6 +11,11 @@ active_card_status: "Physical PC map corrected; actual PC4 read-only share and f
 active_card_next: "Integrate reviewed source revisions with both current-tooling bindings, regenerate exact new archive/verified-finalized classifier, run all8CI; complete PC1keyDocker/PC3group/PC5runtime then real5Node acceptance"
 ---
 
+## 2026-11-08T01:42:11+09:00 CR-CSP-01 실제 strict-CSP 부팅 결함 수정
+
+작업한 것 → 확인한 것: accepted96 새 branch에서 canonical standalone 생성·문자열 코드 생성 금지 회귀·실제 dist strict-CSP hosted 부팅 gate를 구현했다. Main 제품 실행 없이 source/docs 검사와 exact Frontend/Docs CI를 수집한다. 최신 공통 관리 정본은 Root524/76c06dc8이며 이 branch 전체 vault를 export하지 않는다. 다음 첫 행동/담당은 Root의 exact artifact 대조와 actual Claude 독립 검토이며, 수락 뒤 Root만 PC3 실제 배포·브라우저·승인·Run·5PC를 검증한다. 최종 증거는 [[30_Development/Evidence/fleet5-csp-static-validator-r1-20261108-codex/README]] 및 [[2026-11-08_FLEET5_CR-CSP-01_static_validator_Codex]]에 연결한다.
+
+
 ## 2026-11-05 물리 PC 재대조·실제 준비·완료 판정
 
 작업한 것: 사용자 장비 정보를 직접 SSH와 대조해 legacy슬롯과 물리PC 번호를 바로잡고, PC4 전용 폴더/ACL과 실제 read-only 컨테이너 probe를 완료했다. 새 Node mTLS issuer도 별도 생성·서명/암호화/CRL/Windows ACL을 검증했고 leaf0으로 유지한다. 확인한 것: R4174와 DB864의 최종 Core는 실제 SUCCESS다. S18b source는 실제 Claude b852 수락/3Low이며 최종보강과 통합8lane은 남는다. 다음 첫 행동/담당: source owner의 Low closure, 통합 후보/새 archive, 실제 장비 인증/설정 후5대 검증을 root가 감독한다. 전체100%는 아직 아니며 원래48-task/VF-CL 상태를 유지한다. [[2026-11-05_기존5대_오케스트레이션_착수_Codex]]
