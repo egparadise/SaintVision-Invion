@@ -1,0 +1,131 @@
+{
+  "docID": "EVIDENCE-FLEET5-CSP02-CENTRAL-VITE-DELTA-REVIEW-R3-20261108-CLAUDE",
+  "version": "1.0.0",
+  "atKST": "2026-11-08T04:26:35+09:00",
+  "task": "CR-CSP-02 central main-Vite startup correction bounded delta review R3",
+  "orcaTaskID": "task_ce91b9bbce0b",
+  "orcaDispatchID": "ctx_7b1a435f3b4f",
+  "reviewer": "Claude (actual independent reviewer)",
+  "author": "Codex ctx_02638d160ba6 / task_83732e149ebb",
+  "obsidianApplyOwner": "Root",
+  "reviewBranch": "agent/claude/fleet5-csp02-central-vite-delta-review-r3-20261108",
+  "deliveryBase": "63f3eeb661c565d864e14c2395f68c6715d109c0",
+  "priorReview": {
+    "head": "63f3eeb661c565d864e14c2395f68c6715d109c0",
+    "verdict": "CHANGES_REQUIRED_CR_CSP02_RESIDUAL_DIRECT_VITE_OPERATOR_LAUNCHER_KEEP_MANUAL_AND_REAL_DEPLOYMENT_GATES",
+    "onlyResidual": "deploy/lan/Start-LiveConsole.ps1:31/232 starts node vite.js with the main config, bypassing npm hooks (also reached via the Card 289 desktop shortcut and Start-Environment.ps1:20)"
+  },
+  "targetDelta": {
+    "from": "cc6076254d5b8f54804081a8b1994d76d86cf81a",
+    "to": "e4e07bfd6b94e57edc64d158e208df01b9319deb",
+    "branch": "agent/codex/fleet5-csp02-central-vite-init-r1-20261108",
+    "remoteExact": true,
+    "commits": [
+      "2c6bbdbe43cc5d2abdb753675d1ecaffac4399fc fix(web): initialize canonical validator for every main Vite entry",
+      "e4e07bfd6b94e57edc64d158e208df01b9319deb test(web): await validated intent DOM before required assertion"
+    ],
+    "nonDocsPathsChanged": [
+      "apps/web/vite.config.ts (+7)",
+      "tools/verify_vite_direct_launch.py (new, 127)",
+      ".github/workflows/frontend.yml (+23/-9)",
+      "apps/web/tests/first-workspace-panel.test.tsx (+1)"
+    ]
+  },
+  "backendAccepted": "96afd799d49717fd40e4ddabd538d82accbe1958",
+  "rootCheckpoint": "a5e8bd98141e6f81887c8dca9956da525fe99d33",
+  "boardsReadAtRootCheckpoint": {
+    "docs/vault/00_Index/전체 개발 진행 현황.md": "8204c379c102d639194bd127a3348a55900fb879c145b25b358021d81eca365a",
+    "docs/vault/30_Development/Agent별 작업/Claude 작업 현황.md": "ad4a5fca80686f1edcbaf9a0abda8fbf5aaccfb0a68f1c03a67b8a32de15236b"
+  },
+  "rootInputPins": {
+    "method": "git show from Root checkpoint a5e8bd98; SHA-256 of the committed blob bytes",
+    "cspe4e07-root-verified-r1": {
+      "ac11-accessibility-e2e-artifacts.json": "c71abada3e08f2dec321361d62819c7d6e844613e112cce9231184b6412f7720",
+      "ac11-accessibility-e2e-jobs.json": "d69d007d19c88f002d92c890ecc1eaaa40927a99f2fbd6b8877c677bd773cc97",
+      "ac11-accessibility-e2e-run.json": "c350447c19739cbd76b9402c3b6e76511bbb2193182d340a28c14272d2e62217",
+      "author-lifecycle.json": "15e9246c0b797f6881cba8f527be8cc74180add3266d23bd21c519194eb77946",
+      "bounded-test-wait-approval.json": "5e61b0d85f0094c6d5d45ee6f7cd51bb600f2e6ab65d72e567f1dfb9cfd5114e",
+      "delivery.json": "3f38ce1a31c94f45d884ddf4847a752991d1fc2d1991ff38a52eb23499557047",
+      "docs-artifacts.json": "a38058f02f985e460807ee660cd87a201683530f51a20113923c240e730f2052",
+      "docs-jobs.json": "9e02fc028f58b3944c68ba3468c051c1c96a73d5e1a8308b4680ec09d3713f6a",
+      "docs-run.json": "c69bcce0bd161430240cff26599a19ca84c2e292b616b0872142bb69e0c77a2d",
+      "first-candidate-ci-failure-and-bounded-question.json": "d8d88e0c0fa97bba3646feab501be9935e018eb1f75ca336804ba33ac64b8c1d",
+      "frontend-artifacts.json": "a03e270c0f1b678aac1e710fa01e0ae84a62682367b3bd347f603071e5c303bc",
+      "frontend-jobs.json": "bf8e8abc7d664bbd93037ec9c24c55ee6c75e96229fc994b7b8af72e27c1dd71",
+      "frontend-run.json": "9aba573b0ac03e8ad6f518f37f027d8267dded2a64a30b0b3cfd81f7c8d96ed6",
+      "local-gates-final-e4e07bfd6b94.json": "3bbc38a79b13e14c3f312d14ae8d95acbf375367ea3b18cae3bc6f0e10f514b5",
+      "official-AC11-junit.xml": "8397285484043d407834df69617b63cd134d3615ff9c9f1062a9da3477e1a049",
+      "official-AC11-report.json": "e89bed074ac54eee9013946c0310e252f3493cde682a4ca748327f265faac851",
+      "official-browser-result.json": "f527e935bd92fa319b01498c6636a671b5d8cf843acf680b58c65b2e0be13242",
+      "official-clean-direct-result.json": "a503d974a6239a08e6d6fdbf1a65448f363ece94aeb2d768ab0f68748fa57950",
+      "official-log-proof.json": "9d27b3843c45668cf3232981e82bbec6de430fb1920ad26fdf437ff389d4bb27",
+      "official-validator-manifest.json": "3d40cbe9fd7d485a547591faaa0cb0b15b206f7982c77bc9e1107905e1e94200",
+      "postCI-final-sync-check.json": "5d800ad13159d2c8c317fc75f440dc369333bf402f23db95215a7f58cf381d11",
+      "protected-components.json": "bb8b3942ebc3875bfbdab03a41ca8f0d700562489bfd539c0ac31e47a10c74b0",
+      "root-verification.json": "d8994b8100795b3e941c8f4e98a46ce201baba35bb947764dfd6f28c1aa47eb3",
+      "sync-state-final-comparison.json": "0ae446941e35f413d2dcefcc1237fe8cd327481d58f1809adc560a4368de4ae4",
+      "tracked-launch-audit.json": "a209ec9985328db1020781ab61c42e14345b529bbba0fb77d53a928f846037fc",
+      "verify_cspcc607_root_candidate_r1.py.txt": "26c66fdcc62d46b62041e72297cec12736d5ef59172a3e53a7d91906bd1125cc",
+      "verify_cspe4e07_root_candidate_r1.py.txt": "73d5981aca7b5c03dfc0d56144e0e6fad82d638ab1f95e70ef8cd5b0b22c9e89"
+    },
+    "cspcc607-actual-claude-r2": {
+      "review.json": "8d400be04826b2f2c2edbe77f438b2b91e54b4c1bf708c2a7da28718e9203192",
+      "root-verification.json": "506df8d447c1cceacdf6e7a7e18dba98107f1460d2aa552cff2ef74c1cc47563",
+      "Docs-run.json": "bdac8cceeddbde1062164b1a54ae964bd8fdbb2a534e66d523ad51406d3e8ca4",
+      "Docs-jobs.json": "0073d1cbf0825330d1b966c4f45714e7eca24a4718305e6618be9bc42bf8c927",
+      "reviewer-lifecycle.json": "ee57440ff656a819e41e499675222d3726c42d630455665ab553b0c04696e262"
+    },
+    "pc3-clean-direct-vite-cc607-repro-r1": {
+      "public-repro-receipt.json": "70aac4b77869e1e5d982b00904400b0583c23a0773cfa887ade7a698cafde4ad",
+      "remote-repro-program.py.txt": "ae33ccd8ec3cf5a2c32eec3000299bd25ce08938e4eaef460bf4093f6892c01f",
+      "root-repro-program.py.txt": "c14d54aaa0b764858becd1a41485ba3618d1a3939e19bda6a7620d71601d570d"
+    },
+    "one-line-async-wait-decision-r3": {
+      "actual-orca-reply.json": "58b1d9b6542b7b1127a61631fa58c30334eea58b3afa5b96ade34e099432127c",
+      "exact-authorized-scope.txt": "847c672f032e7dfad98de8240636380e0035a94b2ca6a33e2e2436166b195463",
+      "root-scope-decision.json": "183789167b27d3dd74601816a93d31b852b129041af344b37554ada283c47961"
+    },
+    "authorUntrackedPostCIFilesAndZIPs": "not read; Root already bound the ZIP bytes"
+  },
+  "verdict": "ACCEPT_CR_CSP02_CENTRAL_VITE_DELTA_KEEP_MANUAL_AND_REAL_DEPLOYMENT_GATES",
+  "mandatoryDefects": 0,
+  "crCsp02Disposition": "CLOSED_AT_SOURCE: my R2 residual (direct vite.js main-config launch) is closed; real PC3 redeploy and browser checks remain Root operating gates",
+  "inheritedFromR1R2Unchanged": "self-contained esbuild ESM, canonical draft2020/$ref/strict:false/full formats, semantic and microsecond tail, 15 meaningful native and VM tests, test-worker-only parser flag, fail-closed fixture config, strict-CSP verifier, favicon classification, unchanged lock/backend/contracts",
+  "pathResults": {
+    "1_viteConfig": "apps/web/vite.config.ts runs execFileSync(process.execPath, [<config dir>/scripts/node-certificate-validator.mjs, '--write'], {cwd: <config dir>, stdio: 'inherit'}) at module top level, before defineConfig. Vite evaluates this config before it creates the dev server, build or preview, and Vitest uses it too (apps/web has no vitest config). Every main-config start therefore runs the same reviewed generator, including the launcher's node vite.js (no --config; Vite auto-loads vite.config.ts from cwd apps/web) and the npm dev/build/test callers. A non-zero generator exit throws during config load, so Vite exits before it listens; the launcher then gets no listener rather than a ready-but-broken page. The output bytes are identical to the npm-hook output (same generator, same deterministic content). Only these 7 lines changed. The generator, scripts, src, tests/browser, the CSP test, package.json, package-lock, deploy (including Start-LiveConsole.ps1), contracts, packages, services, migrations, src, tests and apps/studio object IDs all equal cc607. The nodeCertificateObservation.ts tail is inherited byte-identical through cc607 (apps/web/src tree unchanged).",
+    "2_directLaunchProof": "tools/verify_vite_direct_launch.py requires hosted Linux, a clean tracked tree, both outputs untracked and both absent before it starts, and deletes nothing (deletedFiles []). It starts the actual node node_modules/vite/bin/vite.js --config vite.config.ts on a fresh loopback port with --strictPort in a new session, with no npm. After transport readiness it requires that both outputs now exist and that the child is still alive. It checks the manifest format esm and selfContained, and checks the schema, lock, generator and validator hashes against the files on disk. Then real sandboxed Chrome must show the login heading and button with a non-empty #root, and the validator module must return 200. Page errors, request failures, non-GET methods, and any HTTP error other than an exact /favicon.svg 404 fail the run. It signals only its own process group and waits. Causal coverage: because nothing else generates before this step, the outputs it observes can only come from the main config. On cc607 the same script would fail at 'Config did not generate both outputs before readiness', matching Root's PC3 reproduction of cc607 (index 200, module 500, generated ESM absent before and after). The official result binds e4e07, mainConfigSHA256 6fcc641f...fecf (equal to the e4e07 blob), mjs 476a803e...1d860, manifest 3d40cbe9...00e7, rootChildren 1, validator module 200, no page or request errors, and owned child exit 143.",
+    "3_frontendWorkflow": "The existing Python 3.12 and pinned Playwright 1.62.0 setup moved before lint. The direct proof and its always() upload run right after npm ci, which runs no generation (package.json has no install/prepare hooks), and before the npm lint/test/build hooks. The tools path trigger was added; the strict-CSP boot step and all other steps are unchanged. Frontend 42404194858 job 128498256116 lists steps 1-8 setup, install, python, harness, direct boot, upload, then lint, Vitest, contract check, build, strict-CSP boot and uploads: 19/19 success. The Portal job 128498256297 is 14/14.",
+    "4_testWait": "first-workspace-panel.test.tsx at e4e07 is the cc607 blob (SHA-256 6a634cc5...7e7d, equal to Root's pinned cc607 value) plus exactly one inserted line, await untilVisible(() => host.querySelector('[aria-label=\"현재 CPU intent\"]') !== null), before the unchanged intentSelect not-null assertion. The authored patch file hashes to 736cd6ca...4379, equal to the Root-approved proposal. The existing helper keeps its 2000 ms deadline and asserts at the end, so a missing select still fails. FirstWorkspacePanel.tsx renders that select only after the async load effect (lines 76-82) sets the page, so a positive DOM wait is a correct synchronization and does not weaken the test. Panel and API blobs are equal to cc607. The original failure, 2c6bbdbe Frontend 42403333297 attempt 1 (1350 pass / 1 fail), is retained. Like Root, I treat the scheduling-race explanation as a hypothesis and do not claim it disproves a production defect."
+  },
+  "hostedResultsReRead": {
+    "frontend": "42404194858 attempt 1 workflow_dispatch at e4e07, jobs 128498256116 (19/19) and 128498256297 (14/14) success; Root-bound official count 1351/1351 tests in 106 files",
+    "docs": "42404197444 attempt 1 at e4e07, job 128498264471 19/19 success",
+    "ac11": "42404200030 attempt 1 at e4e07, job 128498272539 14/14 success. The normalized report stays MEASURED_FAIL/acceptanceClaim false, solely manualAcceptanceMissingCount 1. That is an operating gate, not a pass and not a code defect.",
+    "firstCandidateFailure": "42403333297 at 2c6bbdbe, attempt 1, failure (retained)"
+  },
+  "retainedGenuineFailures": [
+    "428e CommonJS default-export failure (AC11 42396627296)",
+    "8e3fdbd VM worker flag failure (Frontend 42398028486)",
+    "3bd660b fixture generation 4/6 measurement (AC11 42398323596)",
+    "cc607 actual direct-launch module 500 (Root PC3 reproduction)",
+    "2c6bbdbe 1350/1 (Frontend 42403333297)"
+  ],
+  "checksActuallyRun": [
+    "git log/diff/show of cc6076254d5b..e4e07bfd6b94 and each commit; ls-remote of the target branch",
+    "object ID equality at cc607 vs e4e07 for the protected trees, generator, launcher, fixture, CSP test, package.json, lock and AC11/strict-CSP tools",
+    "SHA-256 of the cc607 and e4e07 test blobs, the panel/API blobs, the authored patch file and the e4e07 vite.config.ts, compared with Root pins and the official direct result",
+    "source read of tools/verify_vite_direct_launch.py, the frontend.yml diff and the FirstWorkspacePanel.tsx async load",
+    "git show of Root inputs at a5e8bd98 with blob SHA-256 pins; gh run view of the Frontend (with step list), Docs, AC11 and first-candidate runs",
+    "local docs metadata gates (local-gates.json) and full canonical sync-state byte comparison (sync-state-comparison.json)"
+  ],
+  "notRunByReviewer": "No Node, npm, Vite, Vitest, tsc, esbuild, browser, Docker, pytest, DB or product execution on Main. Hosted runs and the PC3 reproduction are official or Root evidence, not reviewer executions.",
+  "retainedOperatingGates": [
+    "Root deploys the exact e4e07 artifact on PC3 with strict CSP and runs a real Chrome check of login, no-blink and resources",
+    "AC11 same-SHA user-device keyboard/screen-reader manual acceptance (manualAcceptanceMissingCount 1)",
+    "two distinct genuine non-requester votes, Run/output/audit",
+    "PC1 key, PC5 RAM and Node, GPU/storage, all five PCs, renewal/reconnect/reboot"
+  ],
+  "preservedStatus": "oldb48 recovery route Main1273100 kept. Accepted API 96/schema 0068/observer/three limited Nodes and the private Workspace ready/version 2/node NULL unchanged. CR-905-01 remains CLOSED. Original19HOLD/discharges0/runtimeB0/A1-A16/H1-H7/H3EA/RDNULL_HOLD/raw7UNREGISTERED/A01-A40NOT_RUN unchanged.",
+  "nextFirstAction": "Root verifies the originals, then deploys the accepted exact e4e07 artifact and tests it in a real PC3 browser; the manual-device and real deployment gates stay with Root.",
+  "wholeProgramComplete": false
+}
