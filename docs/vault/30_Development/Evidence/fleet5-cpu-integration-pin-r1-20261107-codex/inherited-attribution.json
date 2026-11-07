@@ -1,0 +1,46 @@
+[
+  {
+    "rootReceipt": "D:\\Project\\SaintVisionI-Invion\\fleet-five-orchestration-20261105\\.work\\b-operation-7467-ci-root-verified.json",
+    "sha256": "6a73341d620a23d41b2f4182f5db3a8b980de700128f03b127cbdb47f3b825db",
+    "source": "746789a36091c8601afea23fe176069e2fa7d87b",
+    "review": null,
+    "verdict": null,
+    "Docs": 42323636412,
+    "Core": 42323639274,
+    "Backend": 42323642052,
+    "executionAttribution": "Root and hosted CI; not this integration execution"
+  },
+  {
+    "rootReceipt": "D:\\Project\\SaintVisionI-Invion\\fleet-five-orchestration-20261105\\.work\\b-operation-7467-code-review-root-verified.json",
+    "sha256": "133e443386ec35f678d99d2a21b8d9f913c5f483e2001a2de2082a5d7eccd2d8",
+    "source": "746789a36091c8601afea23fe176069e2fa7d87b",
+    "review": "dc18f6681627aca9d3eceb7d5a85dbc97b551b5b",
+    "verdict": "ACCEPT_NARROW_CODE_KEEP_HOLD",
+    "Docs": 42329333553,
+    "Core": null,
+    "Backend": null,
+    "executionAttribution": "Root and hosted CI; not this integration execution"
+  },
+  {
+    "rootReceipt": "D:\\Project\\SaintVisionI-Invion\\fleet-five-orchestration-20261105\\.work\\h12-6d7-ci-root-verified.json",
+    "sha256": "15c3fce5cbcd6f92b095446bce4e73a88087e8d60fcc1687f8a91aa9e05f9e69",
+    "source": "6d7ee3d85bd0e47eb7b787234c10d5dbfdb3a9e8",
+    "review": null,
+    "verdict": null,
+    "Docs": 42324844830,
+    "Core": 42324848063,
+    "Backend": null,
+    "executionAttribution": "Root and hosted CI; not this integration execution"
+  },
+  {
+    "rootReceipt": "D:\\Project\\SaintVisionI-Invion\\fleet-five-orchestration-20261105\\.work\\h12-6d7-code-review-root-verified.json",
+    "sha256": "9062539f46267c89d1f5a30f3cb1deb370d6eaabc84bd938ac7bb34354bac329",
+    "source": "6d7ee3d85bd0e47eb7b787234c10d5dbfdb3a9e8",
+    "review": "0761de1846d715594b6c7d9db276dff9f5b86bae",
+    "verdict": "ACCEPT_NARROW_PRIVATE_MATH_AND_SCOPED_GUARD_CODE_KEEP_HOLD",
+    "Docs": 42331288008,
+    "Core": null,
+    "Backend": null,
+    "executionAttribution": "Root and hosted CI; not this integration execution"
+  }
+]

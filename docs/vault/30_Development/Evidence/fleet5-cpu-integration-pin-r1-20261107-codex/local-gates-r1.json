@@ -1,0 +1,46 @@
+﻿[
+    {
+        "startKST":  "2026-11-07T12:35:34.5633476+09:00",
+        "command":  "python tools/check_docs.py",
+        "endKST":  "2026-11-07T12:36:02.6137052+09:00",
+        "log":  "gate-docs-r1.txt",
+        "exit":  0
+    },
+    {
+        "startKST":  "2026-11-07T12:36:02.7663571+09:00",
+        "command":  "python tools/check_ontology.py",
+        "endKST":  "2026-11-07T12:36:05.5759758+09:00",
+        "log":  "gate-ontology-r1.txt",
+        "exit":  0
+    },
+    {
+        "startKST":  "2026-11-07T12:36:05.5780973+09:00",
+        "command":  "python tools/check_doc_path_citations.py --ratchet --base-ref 6d7ee3d85bd0e47eb7b787234c10d5dbfdb3a9e8",
+        "endKST":  "2026-11-07T12:36:13.4598216+09:00",
+        "log":  "gate-path-r1.txt",
+        "exit":  0
+    },
+    {
+        "startKST":  "2026-11-07T12:36:13.4608218+09:00",
+        "command":  "python tools/check_doc_single_source.py --ratchet",
+        "endKST":  "2026-11-07T12:36:13.9435222+09:00",
+        "log":  "gate-single-source-r1.txt",
+        "exit":  0
+    },
+    {
+        "startKST":  "2026-11-07T12:36:13.9831634+09:00",
+        "fullStateBefore":  "sync-state-before-r1.json",
+        "fullStateAfter":  "sync-state-after-r1.json",
+        "command":  "python tools/sync_obsidian.py --check --state D:/Project/SaintVision-Invion/SaintVisionI-Invion/.git/obsidian-sync-state.json --conflicts-out docs/vault/30_Development/Evidence/fleet5-cpu-integration-pin-r1-20261107-codex/sync-conflicts-r1.json",
+        "exit":  0,
+        "endKST":  "2026-11-07T12:36:27.8534711+09:00",
+        "log":  "gate-sync-r1.txt"
+    },
+    {
+        "startKST":  "2026-11-07T12:36:27.8558264+09:00",
+        "command":  "git diff --check",
+        "endKST":  "2026-11-07T12:36:28.0196836+09:00",
+        "log":  "gate-diff-r1.txt",
+        "exit":  0
+    }
+]

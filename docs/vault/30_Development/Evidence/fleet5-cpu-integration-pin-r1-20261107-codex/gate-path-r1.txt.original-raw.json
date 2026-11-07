@@ -1,0 +1,8 @@
+{
+  "originalPath": "docs/vault/30_Development/Evidence/fleet5-cpu-integration-pin-r1-20261107-codex/gate-path-r1.txt",
+  "originalBytes": 226,
+  "originalSHA256": "3df0c66852a23cc5f42cbfb2569970e2157935937e8ae3d33a5a019ab296087f",
+  "originalEncoding": "UTF16LE BOM",
+  "originalRawBytesBase64": "//5QAEEAUwBTACAAYwBoAGUAYwBrAF8AZABvAGMAXwBwAGEAdABoAF8AYwBpAHQAYQB0AGkAbwBuAHMAIAAtAC0AcgBhAHQAYwBoAGUAdAA6ACAAMgA5ADAAIABiAHIAbwBrAGUAbgAgAGMAaQB0AGEAdABpAG8AbgAoAHMAKQAsACAAYQBsAGwAIABpAG4AIABiAGEAcwBlAGwAaQBuAGUALAAgAG4AbwBuAGUAIABzAHQAYQBsAGUALAAgAGYAbABvAG8AcgAgAHUAbgBjAGgAYQBuAGcAZQBkAC4ADQAKAA==",
+  "preservation": "verbatim byte archive before UTF8 rendering; no trim, gate relaxation, or execution change"
+}

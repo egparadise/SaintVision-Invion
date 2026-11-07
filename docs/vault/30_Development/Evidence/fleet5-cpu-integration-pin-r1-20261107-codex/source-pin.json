@@ -1,0 +1,31 @@
+{
+  "atKST": "2026-11-07T12:34:34+09:00",
+  "base": "6d7ee3d85bd0e47eb7b787234c10d5dbfdb3a9e8",
+  "acceptedSource": "746789a36091c8601afea23fe176069e2fa7d87b",
+  "materialization": "subprocess git show bytes -> Path.write_bytes; no merge/cherry-pick or adaptation",
+  "files": [
+    {
+      "path": "services/control-plane/src/inv/dispatch.py",
+      "bytes": 15823,
+      "sha256": "82f029614537eb5bab56934e4b6736fe3dd52ece54b9b9a3996815b131e41de4",
+      "gitBlob": "6ff21a1c820f0832ea9075c5dd83a78426ae22e2",
+      "workingCanonicalMatches": true
+    },
+    {
+      "path": "tests/core/test_delivery_operation_origin.py",
+      "bytes": 9520,
+      "sha256": "3dacdb63f83ab1d8075ddcbe422d82daad20bd56f643adee0fc7ae97715925d2",
+      "gitBlob": "8592dbd811f4c78b1237a0f93a672b06fe35060f",
+      "workingCanonicalMatches": true
+    }
+  ],
+  "trackedDiffBeforeStage": [
+    "M\tservices/control-plane/src/inv/dispatch.py"
+  ],
+  "nonDocsCompleteDiffExpected": [
+    "M\tservices/control-plane/src/inv/dispatch.py",
+    "A\ttests/core/test_delivery_operation_origin.py"
+  ],
+  "allOtherTrackedPathsUnchangedFrom6d7": true,
+  "nodeAgentTree": "d3de3a19d4dd541a9d4b5d9e6fd25ae88951e702"
+}

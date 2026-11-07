@@ -1,0 +1,8 @@
+{
+  "originalPath": "docs/vault/30_Development/Evidence/fleet5-cpu-integration-pin-r1-20261107-codex/gate-sync-r1.txt",
+  "originalBytes": 150,
+  "originalSHA256": "ee35ea0de58a60d6f4d3ad617e6d1bb5d751135cf5bb8a63642b3ef418b0eec5",
+  "originalEncoding": "UTF16LE BOM",
+  "originalRawBytesBase64": "//5DAEgARQBDAEsAOgAgADQANAA4ADYAIABtAGEAbgBhAGcAZQBkACAAZgBpAGwAZQBzACwAIAAyADAAMwA1ACAAcABlAG4AZABpAG4AZwAgAGUAeABwAG8AcgB0AHMALAAgADAAIABjAG8AbgBmAGwAaQBjAHQAcwAuACAATgBvACAAdwByAGkAdABlAHMALgANAAoA",
+  "preservation": "verbatim byte archive before UTF8 rendering; no trim, gate relaxation, or execution change"
+}

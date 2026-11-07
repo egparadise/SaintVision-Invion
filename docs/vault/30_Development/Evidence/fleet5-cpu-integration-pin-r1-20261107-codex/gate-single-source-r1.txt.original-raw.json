@@ -1,0 +1,8 @@
+{
+  "originalPath": "docs/vault/30_Development/Evidence/fleet5-cpu-integration-pin-r1-20261107-codex/gate-single-source-r1.txt",
+  "originalBytes": 162,
+  "originalSHA256": "e09b3205db8a6fb21809aee296bdb48d219d84d9a6a2ff92ae8cef1b948f9fe9",
+  "originalEncoding": "UTF16LE BOM",
+  "originalRawBytesBase64": "//5QAEEAUwBTACAAYwBoAGUAYwBrAF8AZABvAGMAXwBzAGkAbgBnAGwAZQBfAHMAbwB1AHIAYwBlACAALQAtAHIAYQB0AGMAaABlAHQAOgAgADEANgAgAHAAYQBpAHIAcwAsACAAYQBsAGwAIABpAG4AIABiAGEAcwBlAGwAaQBuAGUALAAgAG4AbwBuAGUAIABzAHQAYQBsAGUALgANAAoA",
+  "preservation": "verbatim byte archive before UTF8 rendering; no trim, gate relaxation, or execution change"
+}

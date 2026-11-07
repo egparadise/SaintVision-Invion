@@ -1,0 +1,12 @@
+{
+  "beforeSHA256": "c8f49124aafb90e282ba7032af3ca8c34c5567eabfd045e6bf9d9c22b35f8408",
+  "afterSHA256": "c8f49124aafb90e282ba7032af3ca8c34c5567eabfd045e6bf9d9c22b35f8408",
+  "byteEqual": true,
+  "fullJSONEqual": true,
+  "beforeFiles": 3079,
+  "afterFiles": 3079,
+  "changedFileEntries": [],
+  "checkOnly": true,
+  "stateWriteOrExport": false,
+  "result": "4486 managed /2035 pending /0 conflicts; pending is not an export or operational acceptance"
+}

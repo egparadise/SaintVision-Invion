@@ -1,0 +1,54 @@
+{
+  "atKST": "2026-11-07T12:38:21.272457+09:00",
+  "stage": "final check_docs r2 stopped before any later gate/stage/commit/push/dispatch",
+  "observedToolExit": 1,
+  "directPythonGateExit": "UNKNOWN: PowerShell ErrorActionPreference Stop terminated at native stderr before immediate capture",
+  "observedError": "python.exe : Traceback (most recent call last):; RemoteException NativeCommandError",
+  "gateDocsR2LogBytes": 0,
+  "staticEncodingFailures": [
+    {
+      "path": "gate-docs-r1.txt",
+      "bytes": 256,
+      "sha256": "0370cddc2c61c4c91c74d86fd16642ec13b5475ea48b2b5bcc3739ddb8589bcf",
+      "first4Hex": "fffe5000",
+      "error": "'utf-8' codec can't decode byte 0xff in position 0: invalid start byte",
+      "utf16Text": "PASS: 24 original hashes, 1277 versioned documents, wiki links, 48 tasks, 12 outcomes, owner/reviewer/skills, dependency DAG.\r\n"
+    },
+    {
+      "path": "gate-ontology-r1.txt",
+      "bytes": 328,
+      "sha256": "816b17f7320f72d2fc017b990a7c62ceef2048fe53b5731be2d7f4df1f0d5f80",
+      "first4Hex": "fffe5000",
+      "error": "'utf-8' codec can't decode byte 0xff in position 0: invalid start byte",
+      "utf16Text": "PASS: RDF parsing, defined terms, TTL/JSON-LD equivalence, 48 task mappings, positive SHACL, 4 rejected invalid fixtures, 4 competency queries, Obsidian mirrors.\r\n"
+    },
+    {
+      "path": "gate-path-r1.txt",
+      "bytes": 226,
+      "sha256": "3df0c66852a23cc5f42cbfb2569970e2157935937e8ae3d33a5a019ab296087f",
+      "first4Hex": "fffe5000",
+      "error": "'utf-8' codec can't decode byte 0xff in position 0: invalid start byte",
+      "utf16Text": "PASS check_doc_path_citations --ratchet: 290 broken citation(s), all in baseline, none stale, floor unchanged.\r\n"
+    },
+    {
+      "path": "gate-single-source-r1.txt",
+      "bytes": 162,
+      "sha256": "e09b3205db8a6fb21809aee296bdb48d219d84d9a6a2ff92ae8cef1b948f9fe9",
+      "first4Hex": "fffe5000",
+      "error": "'utf-8' codec can't decode byte 0xff in position 0: invalid start byte",
+      "utf16Text": "PASS check_doc_single_source --ratchet: 16 pairs, all in baseline, none stale.\r\n"
+    },
+    {
+      "path": "gate-sync-r1.txt",
+      "bytes": 150,
+      "sha256": "ee35ea0de58a60d6f4d3ad617e6d1bb5d751135cf5bb8a63642b3ef418b0eec5",
+      "first4Hex": "fffe4300",
+      "error": "'utf-8' codec can't decode byte 0xff in position 0: invalid start byte",
+      "utf16Text": "CHECK: 4486 managed files, 2035 pending exports, 0 conflicts. No writes.\r\n"
+    }
+  ],
+  "inference": "r1 redirected native logs are UTF16LE with BOM; check_docs reads .txt as UTF8 and reports unreadable documents. Full gate traceback was not captured, so cause is inferred from checker read policy and exact bytes, not claimed as captured.",
+  "productBytesChanged": false,
+  "publication": "NOT_STARTED",
+  "nextOwner": "Root targeted cause/own-evidence representation response needed"
+}

@@ -1,0 +1,76 @@
+{
+  "atKST": "2026-11-07T12:41:08.334438+09:00",
+  "approvalMessage": "msg_7bc1a98984ce (Root reply to msg_a09b217d7a15)",
+  "preciseResult": "six r1 logs: five UTF16LE+BOM and one empty diff log; no false sixth BOM claim",
+  "files": [
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-cpu-integration-pin-r1-20261107-codex/gate-diff-r1.txt",
+      "rawRepresentationPath": "docs/vault/30_Development/Evidence/fleet5-cpu-integration-pin-r1-20261107-codex/gate-diff-r1.txt.original-raw.json",
+      "originalRawBytes": 0,
+      "originalRawSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "originalEncoding": "EMPTY (0 bytes, no BOM)",
+      "normalizedWorkingUTF8Bytes": 0,
+      "normalizedWorkingUTF8SHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "normalizedCanonicalGitBlob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+      "decodedTextAndNewlinesPreserved": true
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-cpu-integration-pin-r1-20261107-codex/gate-docs-r1.txt",
+      "rawRepresentationPath": "docs/vault/30_Development/Evidence/fleet5-cpu-integration-pin-r1-20261107-codex/gate-docs-r1.txt.original-raw.json",
+      "originalRawBytes": 256,
+      "originalRawSHA256": "0370cddc2c61c4c91c74d86fd16642ec13b5475ea48b2b5bcc3739ddb8589bcf",
+      "originalEncoding": "UTF16LE BOM",
+      "normalizedWorkingUTF8Bytes": 127,
+      "normalizedWorkingUTF8SHA256": "01ce688d31f40a8bd1062701a7b194c8b0089d663796b5438b7b6637e3e7cb54",
+      "normalizedCanonicalGitBlob": "52825d4497098db7aecd95e05f7c2ca3c0b45f9b",
+      "decodedTextAndNewlinesPreserved": true
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-cpu-integration-pin-r1-20261107-codex/gate-ontology-r1.txt",
+      "rawRepresentationPath": "docs/vault/30_Development/Evidence/fleet5-cpu-integration-pin-r1-20261107-codex/gate-ontology-r1.txt.original-raw.json",
+      "originalRawBytes": 328,
+      "originalRawSHA256": "816b17f7320f72d2fc017b990a7c62ceef2048fe53b5731be2d7f4df1f0d5f80",
+      "originalEncoding": "UTF16LE BOM",
+      "normalizedWorkingUTF8Bytes": 163,
+      "normalizedWorkingUTF8SHA256": "7cdc12bf64f50ba0964625161638a4c639cf22d786a57f04685bed0718e14042",
+      "normalizedCanonicalGitBlob": "dbc1b9977b8920149d1d3df83b70633c53d34867",
+      "decodedTextAndNewlinesPreserved": true
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-cpu-integration-pin-r1-20261107-codex/gate-path-r1.txt",
+      "rawRepresentationPath": "docs/vault/30_Development/Evidence/fleet5-cpu-integration-pin-r1-20261107-codex/gate-path-r1.txt.original-raw.json",
+      "originalRawBytes": 226,
+      "originalRawSHA256": "3df0c66852a23cc5f42cbfb2569970e2157935937e8ae3d33a5a019ab296087f",
+      "originalEncoding": "UTF16LE BOM",
+      "normalizedWorkingUTF8Bytes": 112,
+      "normalizedWorkingUTF8SHA256": "389921b50662776ed834a285f70fc44ab61f7d5bdb4c5249c0a73c98113980de",
+      "normalizedCanonicalGitBlob": "66f393ed182dfe45eff63efdf24b26831b8032be",
+      "decodedTextAndNewlinesPreserved": true
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-cpu-integration-pin-r1-20261107-codex/gate-single-source-r1.txt",
+      "rawRepresentationPath": "docs/vault/30_Development/Evidence/fleet5-cpu-integration-pin-r1-20261107-codex/gate-single-source-r1.txt.original-raw.json",
+      "originalRawBytes": 162,
+      "originalRawSHA256": "e09b3205db8a6fb21809aee296bdb48d219d84d9a6a2ff92ae8cef1b948f9fe9",
+      "originalEncoding": "UTF16LE BOM",
+      "normalizedWorkingUTF8Bytes": 80,
+      "normalizedWorkingUTF8SHA256": "13b5f5afed05999109839be1baec4ef70ea3c71bcb267353e59eba0f2ae3e448",
+      "normalizedCanonicalGitBlob": "9473689212cb05ad39fa94b5a8b9c9255b476a07",
+      "decodedTextAndNewlinesPreserved": true
+    },
+    {
+      "path": "docs/vault/30_Development/Evidence/fleet5-cpu-integration-pin-r1-20261107-codex/gate-sync-r1.txt",
+      "rawRepresentationPath": "docs/vault/30_Development/Evidence/fleet5-cpu-integration-pin-r1-20261107-codex/gate-sync-r1.txt.original-raw.json",
+      "originalRawBytes": 150,
+      "originalRawSHA256": "ee35ea0de58a60d6f4d3ad617e6d1bb5d751135cf5bb8a63642b3ef418b0eec5",
+      "originalEncoding": "UTF16LE BOM",
+      "normalizedWorkingUTF8Bytes": 74,
+      "normalizedWorkingUTF8SHA256": "c53f5d411c8d252385669e48abd33ee0188ffafb86bda2dfb40c1a986056bf94",
+      "normalizedCanonicalGitBlob": "1eca3ea2633e3c682dec35c6080e10e0e670dea5",
+      "decodedTextAndNewlinesPreserved": true
+    }
+  ],
+  "r1DirectExit0Evidence": "six original checks executed by this worker in this worktree; preserved original receipts and decoded console content",
+  "r2StoppedEvidence": "tool exit1; child Python exit UNKNOWN; empty r2 log unchanged; original stop receipt remains unchanged; encoding cause remains inference until successful safe final gate",
+  "productUnchanged": true
+}

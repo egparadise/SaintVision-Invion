@@ -1,0 +1,118 @@
+[
+  {
+    "command": [
+      "C:\\Users\\inviz\\AppData\\Local\\Programs\\Python\\Python310\\python.exe",
+      "tools/check_docs.py"
+    ],
+    "cwd": "D:\\Project\\SaintVisionI-Invion\\fleet5-cpu-integration-pin-r1-20261107",
+    "interpreter": "C:\\Users\\inviz\\AppData\\Local\\Programs\\Python\\Python310\\python.exe",
+    "startKST": "2026-11-07T12:41:08.455152+09:00",
+    "endKST": "2026-11-07T12:41:12.726985+09:00",
+    "directReturnCode": 0,
+    "stdout": "gate-docs-r3.stdout.txt",
+    "stdoutSHA256": "01ce688d31f40a8bd1062701a7b194c8b0089d663796b5438b7b6637e3e7cb54",
+    "stderr": "gate-docs-r3.stderr.txt",
+    "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "capture": "subprocess PIPE bytes; no PowerShell redirection/transcoding"
+  },
+  {
+    "command": [
+      "C:\\Users\\inviz\\AppData\\Local\\Programs\\Python\\Python310\\python.exe",
+      "tools/check_ontology.py"
+    ],
+    "cwd": "D:\\Project\\SaintVisionI-Invion\\fleet5-cpu-integration-pin-r1-20261107",
+    "interpreter": "C:\\Users\\inviz\\AppData\\Local\\Programs\\Python\\Python310\\python.exe",
+    "startKST": "2026-11-07T12:41:12.741490+09:00",
+    "endKST": "2026-11-07T12:41:14.925106+09:00",
+    "directReturnCode": 0,
+    "stdout": "gate-ontology-r3.stdout.txt",
+    "stdoutSHA256": "7cdc12bf64f50ba0964625161638a4c639cf22d786a57f04685bed0718e14042",
+    "stderr": "gate-ontology-r3.stderr.txt",
+    "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "capture": "subprocess PIPE bytes; no PowerShell redirection/transcoding"
+  },
+  {
+    "command": [
+      "C:\\Users\\inviz\\AppData\\Local\\Programs\\Python\\Python310\\python.exe",
+      "tools/check_doc_path_citations.py",
+      "--ratchet",
+      "--base-ref",
+      "6d7ee3d85bd0e47eb7b787234c10d5dbfdb3a9e8"
+    ],
+    "cwd": "D:\\Project\\SaintVisionI-Invion\\fleet5-cpu-integration-pin-r1-20261107",
+    "interpreter": "C:\\Users\\inviz\\AppData\\Local\\Programs\\Python\\Python310\\python.exe",
+    "startKST": "2026-11-07T12:41:14.927108+09:00",
+    "endKST": "2026-11-07T12:41:19.880013+09:00",
+    "directReturnCode": 0,
+    "stdout": "gate-path-r3.stdout.txt",
+    "stdoutSHA256": "389921b50662776ed834a285f70fc44ab61f7d5bdb4c5249c0a73c98113980de",
+    "stderr": "gate-path-r3.stderr.txt",
+    "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "capture": "subprocess PIPE bytes; no PowerShell redirection/transcoding"
+  },
+  {
+    "command": [
+      "C:\\Users\\inviz\\AppData\\Local\\Programs\\Python\\Python310\\python.exe",
+      "tools/check_doc_single_source.py",
+      "--ratchet"
+    ],
+    "cwd": "D:\\Project\\SaintVisionI-Invion\\fleet5-cpu-integration-pin-r1-20261107",
+    "interpreter": "C:\\Users\\inviz\\AppData\\Local\\Programs\\Python\\Python310\\python.exe",
+    "startKST": "2026-11-07T12:41:19.906127+09:00",
+    "endKST": "2026-11-07T12:41:20.298113+09:00",
+    "directReturnCode": 0,
+    "stdout": "gate-single-source-r3.stdout.txt",
+    "stdoutSHA256": "13b5f5afed05999109839be1baec4ef70ea3c71bcb267353e59eba0f2ae3e448",
+    "stderr": "gate-single-source-r3.stderr.txt",
+    "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "capture": "subprocess PIPE bytes; no PowerShell redirection/transcoding"
+  },
+  {
+    "command": [
+      "C:\\Users\\inviz\\AppData\\Local\\Programs\\Python\\Python310\\python.exe",
+      "tools/sync_obsidian.py",
+      "--check",
+      "--state",
+      "D:\\Project\\SaintVision-Invion\\SaintVisionI-Invion\\.git\\obsidian-sync-state.json",
+      "--conflicts-out",
+      "D:\\Project\\SaintVisionI-Invion\\fleet5-cpu-integration-pin-r1-20261107\\docs\\vault\\30_Development\\Evidence\\fleet5-cpu-integration-pin-r1-20261107-codex\\sync-conflicts-r3.json"
+    ],
+    "cwd": "D:\\Project\\SaintVisionI-Invion\\fleet5-cpu-integration-pin-r1-20261107",
+    "interpreter": "C:\\Users\\inviz\\AppData\\Local\\Programs\\Python\\Python310\\python.exe",
+    "startKST": "2026-11-07T12:41:20.320807+09:00",
+    "endKST": "2026-11-07T12:41:30.264888+09:00",
+    "directReturnCode": 0,
+    "stdout": "gate-sync-r3.stdout.txt",
+    "stdoutSHA256": "ad02f4558ed1a682b472aaadabeab89ed6b3cebe8edd2e280ba0aeb2d756a07c",
+    "stderr": "gate-sync-r3.stderr.txt",
+    "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "capture": "subprocess PIPE bytes; no PowerShell redirection/transcoding",
+    "canonicalState": {
+      "beforeFile": "sync-state-before-r3.json",
+      "afterFile": "sync-state-after-r3.json",
+      "beforeSHA256": "c8f49124aafb90e282ba7032af3ca8c34c5567eabfd045e6bf9d9c22b35f8408",
+      "afterSHA256": "c8f49124aafb90e282ba7032af3ca8c34c5567eabfd045e6bf9d9c22b35f8408",
+      "byteEqual": true,
+      "fullJSONEqual": true,
+      "changedFileEntries": [],
+      "noWritesOrExport": true
+    }
+  },
+  {
+    "command": [
+      "git",
+      "diff",
+      "--check"
+    ],
+    "cwd": "D:\\Project\\SaintVisionI-Invion\\fleet5-cpu-integration-pin-r1-20261107",
+    "interpreter": null,
+    "startKST": "2026-11-07T12:41:30.273598+09:00",
+    "endKST": "2026-11-07T12:41:30.543247+09:00",
+    "directReturnCode": 0,
+    "stdout": "gate-diff-r3.stdout.txt",
+    "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderr": "gate-diff-r3.stderr.txt",
+    "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "capture": "subprocess PIPE bytes; no PowerShell redirection/transcoding"
+  }
+]

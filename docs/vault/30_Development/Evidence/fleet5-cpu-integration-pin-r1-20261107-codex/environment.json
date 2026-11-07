@@ -1,0 +1,11 @@
+{
+  "gateInterpreter": "C:\\Users\\inviz\\AppData\\Local\\Programs\\Python\\Python310\\python.exe",
+  "version": "3.10.11 (tags/v3.10.11:7d4cc5a, Apr  5 2023, 00:38:17) [MSC v.1929 64 bit (AMD64)]",
+  "rdflib": "7.1.4",
+  "pyshacl": "0.30.1",
+  "platform": "Windows MAIN host; source/static/docs only",
+  "gitStatusBeforeFinalGates": " M services/control-plane/src/inv/dispatch.py\n?? docs/vault/30_Development/Evidence/fleet5-cpu-integration-pin-r1-20261107-codex/\n?? docs/vault/30_Development/History/2026-11-07_FLEET5_CPU_Integration_Pin_R1_Codex.md\n?? tests/core/test_delivery_operation_origin.py\n",
+  "testExecution": "NOT_RUN",
+  "artifactLogEncoding": "PowerShell native redirected gate stdout/stderr; preserved raw bytes (.txt); JSON receipts UTF8 with optional BOM",
+  "syncCheckScope": "Canonical state only CHECK; candidate pending exports intentionally not applied"
+}

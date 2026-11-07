@@ -333,11 +333,14 @@ class DeliveryWorker:
             return outcome if outcome != "idle" else parent if parent != "idle" else reconciled
         error, not_sent = None, False
         try:
+            operation = attempt.operation
+            if type(operation) is not str or operation not in ("execute", "observe", "cancel"):
+                raise ValueError("Unsupported delivery operation origin")
             self.delivery.deliver(
                 attempt.node,
                 attempt.envelope,
-                observation_only=attempt.operation == "observe",
-                cancel_only=attempt.operation == "cancel",
+                observation_only=(operation == "observe"),
+                cancel_only=(operation == "cancel"),
             )
         except Exception as exc:
             error = exc.code if isinstance(exc, DomainError) else "SYS-0001"
