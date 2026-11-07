@@ -1,0 +1,40 @@
+{
+  "atKST": "2026-11-08T05:41:16+09:00",
+  "taskID": "FLEET5-DASHBOARD-ABB707-BOUNDED-ACTUAL-CLAUDE-REVIEW-R1-20261108",
+  "owner": "Actual independent Orca Claude",
+  "coordinator": "Root Codex",
+  "Root532SHA": "ff7e21d075b1b032ea6db0374b0ad51c9621c24b",
+  "Root532Docs": 42412057344,
+  "RootSyncedDestinationHashes": 3514,
+  "reviewTarget": "abb7074e3da0d547ac81d3da33dce347d5c656af",
+  "deltaBase": "e4e07bfd6b94e57edc64d158e208df01b9319deb",
+  "inheritedReview": "20d9bf8622a0f0624a323b92acaeb33cea91fb9e",
+  "lifecycles": {
+    "author": {
+      "dispatchId": "ctx_ed6d9229a09a",
+      "taskId": "task_e04bfe8c6446",
+      "state": "succeeded",
+      "stage": "settled",
+      "liveness": "exited",
+      "terminalState": "released"
+    },
+    "reviewer": {
+      "dispatchId": "ctx_7b1a435f3b4f",
+      "taskId": "task_ce91b9bbce0b",
+      "state": "succeeded",
+      "stage": "settled",
+      "liveness": "exited",
+      "terminalState": "released"
+    }
+  },
+  "canonicalBytesAtDispatch": 559099,
+  "canonicalSHA256AtDispatch": "1433f2a90cbe4333ec4d9f1df050b24a6a581bc8efbd8ae983b3e9f9e11afcca",
+  "RootApplyDuringReview": "DEFERRED",
+  "actualVerdict": "NOT_RECEIVED",
+  "wholeProgramComplete": false,
+  "actualDispatch": "ctx_3a1660628584",
+  "actualTask": "task_0e409ca1e4bb",
+  "actualStartReceipt": "reopened/ready",
+  "recordedAtKST": "2026-11-08T05:42:36+09:00",
+  "Root533Publication": "QUEUED_AFTER_REVIEW_FULL_STATE_WINDOW"
+}

@@ -1,15 +1,23 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.493"
+version: "1.0.494"
 status: "review"
 author: "Codex"
-updated: "2026-11-08T05:38:02+09:00"
+updated: "2026-11-08T05:54:02+09:00"
 source_of_truth: "Git"
 active_card: "FLEET5 continued supervision with PORTAL-REFRESH-FLEET-20261106"
-active_card_status: "DashboardAbb707ExactOfficialCI1380TestsAnd30sRecordedWireReplayTLSProxyVerified_ActualAuthorExitedReleased_CanonicalUnchanged_ActualClaudeReviewReady_RealDeployAll5Pending"
-active_card_next: "Root seals queued Root532 Docs/Obsidian after source author exit, then one actual Claude bounded e4e07-to-abb707 resource partial-read model/polling/real CP-health review. After acceptance Root adapts new URI-bearing health proxy, stages exact source artifact and verifies actual login/resources/30s frames. Current Main3100 stays e4e07; manual real votes/Run/PC1/PC5/renewal/all5 remain."
+active_card_status: "ActualClaude290465AcceptsAbb707_Mandatory0_DASHResourceAndHealthClosedAtSource_Originals64Pins2BoardsDocsFullStateVerified_ActualReviewerExitedReleased; PC3ExactDeployRealUIFramesNext"
+active_card_next: "Root completes queued Root533 Docs/Obsidian after review exit, adds URI-bearing /gateway-healthz pilot proxy replacement and deploys exact abb707 artifacts on a new owned PC3 port, preserving e4e07 and b48 recovery. Verify actual login/canonical CPU500m-memory64MiB per node/1500m192MiB total/healthy CP and30s frames. Manual votes/Run/PC1/PC5/GPUstorage/renewal/all5 remain."
 ---
+
+## 2026-11-08T05:54:02+09:00 자원·CPhealth abb707 실제 독립 수락과 실배포 준비
+
+실제Claude29046535가abb707의canonical자원부분관측/동시성·신선도와실제CPhealth연결을필수결함0으로수락해DASH-RESOURCE-01/DASH-HEALTH-02를source에서닫았다. Root는directparent20d9·자기문서4개·remoteexact·입력64개/진행판2개hash·정확Docs42412852388/job128524513019/19단계·canonical559099B완전일치와실제검토자종료/해제를대조했다. delivery의GitLF121334B와작업본CRLF124119B는정확변환hash로화해됐다. 다음은Root가새URIhealthproxy를운영adapter에추가해정확abbartifact를PC3에배포하고실제로그인/500m64MiB각3대·합1500m192MiB/30초frames를확인한다. manual/실제승인Run/PC1PC5/GPUstorage/5대인수는남는다. 다음첫행동/담당은Root533게시/동기화뒤Root의실제PC3새포트배포다. 운영인수는아직미완료로유지한다.
+
+## 2026-11-08T05:42:36+09:00 abb707 실제 Claude 자원·CPhealth 한정 검토 접수
+
+Root532는Gitff7e21d0·정확Docs42412057344전19단계·Obsidian3514hash/check-apply-check0/pending0/conflict0/clean05:39:52KST까지완료했다. abb707공식portalZIP/image/tar의전체OCIblob과13dist도대조했으나로드/배포는하지않았다. 작성자와이전실제검토자의종료/해제를확인한뒤같은Claude에게e4e07→abb707의canonical부분자원/동시성·신선도·실제CPhealth20경로만독립검토로전달했다. 실제ctx_3a1660628584/task_0e409ca1e4bb/reopened/ready접수는확인했고판정은미수신이다. 새canonical559099B/SHA1433f2a90cbe4333ec4d9f1df050b24a6a581bc8efbd8ae983b3e9f9e11afcca창동안RootAPPLY를보류한다. 실제재배포/화면/Run/5대인수는남는다. 다음첫행동/담당은actualClaude의판정원문수신과Root의대조다. Root533게시/동기화는검토fullstate창종료뒤완료하며수신/수락을대신완료처리하지않는다.
 
 ## 2026-11-08T05:38:02+09:00 자원·CPhealth abb707 공식 증거 대조와 실제 검토 준비
 

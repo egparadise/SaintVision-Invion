@@ -1,0 +1,29 @@
+{
+  "atKST": "2026-11-08T05:38:49+09:00",
+  "status": "PUBLIC_CANDIDATE_ARTIFACTS_INSPECTED_NOT_LOADED_OR_DEPLOYED",
+  "source": "abb7074e3da0d547ac81d3da33dce347d5c656af",
+  "Frontend": 42410996328,
+  "webArtifactID": 13589228364,
+  "webZIPBytes": 991242,
+  "webZIPSHA256": "sha256:2396f6b8898d89dab0d0215ffb97dec167bc2f8245a6a787060cecb4ebc60952",
+  "portalArtifactID": 13589441576,
+  "portalZIPBytes": 25727795,
+  "portalZIPSHA256": "sha256:ba5b09e5775c2bea6ac5e41d76173935e59c79b3772f3e706c7028f27726b8d1",
+  "releaseEvidence": {
+    "schemaVersion": "1.0.0",
+    "codeSha": "abb7074e3da0d547ac81d3da33dce347d5c656af",
+    "imageId": "sha256:4008f65c75fa7eecc4caeb9af5a1a9bc95bdad57100c0cb583f46155e6c4f35d",
+    "tarSha256": "e5183333ac1598e9b73bae7104f8197ee30ea5ceca68cf6f00e321a3adbeec36",
+    "buildRunId": "42410996328",
+    "buildTimestamp": "2026-11-07T20:26:42Z"
+  },
+  "explicitOCIIndexToLegacyConfigID": "sha256:ee5301c5391cb551548341bb01be64ba1b7cc7c2a37e41a645a39a8ddde38799",
+  "tarBytes": 25802752,
+  "allOCIBlobHashesMatched": true,
+  "dist13HashesMatchedHostedBrowserEvidence": true,
+  "imageLoaded": false,
+  "applicationStarted": false,
+  "sourceIndependentReview": "PENDING_ACTUAL_CLAUDE",
+  "actualDeploymentPermittedByThisReceipt": false,
+  "wholeProgramComplete": false
+}

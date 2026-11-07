@@ -1,0 +1,26 @@
+{
+  "atKST": "2026-11-08T05:54:02+09:00",
+  "taskID": "FLEET5-DASHBOARD-ABB707-ACTUAL-ACCEPT-AND-PC3-DEPLOY-20261108",
+  "owner": "Root Codex",
+  "managementBase": "ff7e21d075b1b032ea6db0374b0ad51c9621c24b",
+  "source": "abb7074e3da0d547ac81d3da33dce347d5c656af",
+  "actualIndependentReview": "29046535c0bb0e2629286c8c678f563080f30a67",
+  "actualVerdict": "ACCEPT_DASH_RESOURCE_AND_GATEWAY_HEALTH_DELTA_KEEP_REAL_DEPLOYMENT_AND_MANUAL_GATES",
+  "sourceFindings": [
+    "DASH-RESOURCE-01_CLOSED_AT_SOURCE",
+    "DASH-HEALTH-02_CLOSED_AT_SOURCE"
+  ],
+  "RootInputPinsMatched": 64,
+  "RootBoardPinsMatched": 2,
+  "actualReviewDocs": 42412852388,
+  "reviewerLifecycle": {
+    "state": "succeeded",
+    "stage": "settled",
+    "liveness": "exited",
+    "terminalState": "released"
+  },
+  "canonicalFullBytesMatchedBeforeRootApply": true,
+  "Root533Publication": "IN_PROGRESS_AFTER_REVIEW_WINDOW",
+  "actualNewSourceDeployment": "NOT_RUN_CURRENT_USER_ROUTE_REMAINS_E4E07",
+  "wholeProgramComplete": false
+}

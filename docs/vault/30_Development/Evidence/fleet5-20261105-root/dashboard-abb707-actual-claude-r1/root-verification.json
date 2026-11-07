@@ -1,0 +1,31 @@
+{
+  "atKST": "2026-11-08T05:52:10+09:00",
+  "reviewSource": "29046535c0bb0e2629286c8c678f563080f30a67",
+  "reviewBase": "20d9bf8622a0f0624a323b92acaeb33cea91fb9e",
+  "reviewedTarget": "abb7074e3da0d547ac81d3da33dce347d5c656af",
+  "actualVerdict": "ACCEPT_DASH_RESOURCE_AND_GATEWAY_HEALTH_DELTA_KEEP_REAL_DEPLOYMENT_AND_MANUAL_GATES",
+  "remainingMandatoryCodeDefects": 0,
+  "dashboardResourceSourceFindingClosed": true,
+  "dashboardHealthSourceFindingClosed": true,
+  "priorCSP02AndCR90501RemainClosed": true,
+  "deliveryLFCRLFBytesReconciled": true,
+  "RootInputPinsMatched": 64,
+  "RootBoardPinsMatched": 2,
+  "ownFourDocsOnlyDirectParentRemoteExact": true,
+  "Docs": 42412852388,
+  "DocsJob": 128524513019,
+  "exactManualAttempt1All19Success": true,
+  "sixLocalMetadataGatesExit0": true,
+  "canonicalFullBytesMatchAtRootVerification": true,
+  "canonicalBytes": 559099,
+  "canonicalSHA256": "1433f2a90cbe4333ec4d9f1df050b24a6a581bc8efbd8ae983b3e9f9e11afcca",
+  "reviewerLifecycle": {
+    "state": "succeeded",
+    "stage": "settled",
+    "liveness": "exited",
+    "terminalState": "released"
+  },
+  "actualDeploymentAccepted": false,
+  "manualAcceptanceMissingCount": 1,
+  "wholeProgramComplete": false
+}

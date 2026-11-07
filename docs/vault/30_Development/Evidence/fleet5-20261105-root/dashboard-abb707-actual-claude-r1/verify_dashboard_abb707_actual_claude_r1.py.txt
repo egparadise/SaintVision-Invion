@@ -1,0 +1,19 @@
+"""Reuse the proven immutable review/CI/fullstate binder with new exact metadata."""
+from pathlib import Path
+r=Path(__file__).resolve().parents[1]
+p=(r/'.work/verify_cspe4e07_actual_claude_r3.py').read_text(encoding='utf-8')
+for a,b in [('cspe4e07-actual-claude-r3-root-verification','dashboard-abb707-actual-claude-root-verification-r1'),('20d9bf8622a0f0624a323b92acaeb33cea91fb9e','29046535c0bb0e2629286c8c678f563080f30a67'),('63f3eeb661c565d864e14c2395f68c6715d109c0','20d9bf8622a0f0624a323b92acaeb33cea91fb9e'),('e4e07bfd6b94e57edc64d158e208df01b9319deb','abb7074e3da0d547ac81d3da33dce347d5c656af'),('cc6076254d5b8f54804081a8b1994d76d86cf81a','e4e07bfd6b94e57edc64d158e208df01b9319deb'),('a5e8bd98141e6f81887c8dca9956da525fe99d33','ff7e21d075b1b032ea6db0374b0ad51c9621c24b'),('agent/claude/fleet5-csp02-central-vite-delta-review-r3-20261108','agent/claude/fleet5-dashboard-resource-health-delta-review-r1-20261108'),('fleet5-csp02-central-vite-delta-review-r3-20261108-claude','fleet5-dashboard-resource-health-delta-review-r1-20261108-claude'),('2026-11-08_FLEET5_CR-CSP-02_Central_Vite_Delta_Review_R3_Claude.md','2026-11-08_FLEET5_Dashboard_Resource_Health_Delta_Review_R1_Claude.md'),('ctx_7b1a435f3b4f','ctx_3a1660628584'),('task_ce91b9bbce0b','task_0e409ca1e4bb'),('ACCEPT_CR_CSP02_CENTRAL_VITE_DELTA_KEEP_MANUAL_AND_REAL_DEPLOYMENT_GATES','ACCEPT_DASH_RESOURCE_AND_GATEWAY_HEALTH_DELTA_KEEP_REAL_DEPLOYMENT_AND_MANUAL_GATES'),('count==38','count==64'),('42406525619','42412852388'),('128505317216','128524513019'),('fleet5-csp02-central-vite-delta-review-r3-claude-docs-1f77bdb2183c4f69b1eed0acb77fb0d6','fleet5-dashboard-resource-health-delta-review-claude-docs-bf5ebc1bbf7b48a6881392ff45aec70c'),('cspe4e07-review-r3-canonical-before.raw','dashboard-abb707-review-canonical-before-r1.raw'),('542132','559099'),('3b0a0767ec583f116ba71000477f0aa197b4d64b6fe5285ef31d55f39cffba5d','1433f2a90cbe4333ec4d9f1df050b24a6a581bc8efbd8ae983b3e9f9e11afcca')]:
+    assert a in p,a;p=p.replace(a,b)
+a="assert review['crCsp02Disposition'].startswith('CLOSED_AT_SOURCE') and review['wholeProgramComplete'] is False"
+b="assert all(review['findingDispositions'][name].startswith('CLOSED_AT_SOURCE') for name in ['DASH-RESOURCE-01','DASH-HEALTH-02']) and review['wholeProgramComplete'] is False"
+assert a in p;p=p.replace(a,b)
+a="assert len(review['boardsReadAtRootCheckpoint'])==2"
+b=a+"""
+lf=git('show',rootSHA+':docs/vault/30_Development/Evidence/fleet5-20261105-root/dashboard-abb707-root-verified-r1/delivery.json')
+assert len(lf)==121334 and hashlib.sha256(lf).hexdigest()=='c9c2d89198f614a633df7dfe447344588e061ecc35522d7b43f0ea0280a54918'
+assert len(lf.replace(b'\\n',b'\\r\\n'))==124119 and hashlib.sha256(lf.replace(b'\\n',b'\\r\\n')).hexdigest()=='d678419cd533b44703940c3b90fe20eedffb110f6d7de026debfc73a241cb90e'
+"""
+assert a in p;p=p.replace(a,b)
+p=p.replace("'crCsp02SourceFindingClosed':True","'dashboardResourceSourceFindingClosed':True,'dashboardHealthSourceFindingClosed':True,'priorCSP02AndCR90501RemainClosed':True,'deliveryLFCRLFBytesReconciled':True")
+(r/'.work/verify_dashboard_abb707_actual_claude_expanded_r1.py.txt').write_text(p,encoding='utf-8')
+exec(compile(p,str(r/'.work/verify_dashboard_abb707_actual_claude_expanded_r1.py.txt'),'exec'),{'__file__':str(__file__),'__name__':'__main__'})

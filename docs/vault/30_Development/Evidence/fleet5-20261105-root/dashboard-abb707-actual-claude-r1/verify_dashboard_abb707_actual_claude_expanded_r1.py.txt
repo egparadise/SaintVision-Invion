@@ -1,0 +1,63 @@
+import datetime,hashlib,json,subprocess
+from pathlib import Path
+r=Path(__file__).resolve().parents[1];w=r/'.work';out=w/'dashboard-abb707-actual-claude-root-verification-r1'
+if out.exists():
+    assert set(p.name for p in out.iterdir())=={'review.json','local-gates.json','sync-state-comparison.json','Docs-run.json','Docs-jobs.json','reviewer-lifecycle.json'}
+    previous=json.loads((out/'reviewer-lifecycle.json').read_bytes())['result']
+    assert previous['state']=='succeeded' and previous['stage']=='settled' and previous['terminalState']=='reclaimable'
+    (w/'cspe4e07-r3-initial-lifecycle-not-yet-auto-released.json').write_bytes((out/'reviewer-lifecycle.json').read_bytes())
+else:out.mkdir()
+reviewer=Path(r'D:\Project\SaintVisionI-Invion\fleet5-first-workspace-905-review-20261107')
+source='29046535c0bb0e2629286c8c678f563080f30a67';base='20d9bf8622a0f0624a323b92acaeb33cea91fb9e';target='abb7074e3da0d547ac81d3da33dce347d5c656af';rootSHA='ff7e21d075b1b032ea6db0374b0ad51c9621c24b';branch='agent/claude/fleet5-dashboard-resource-health-delta-review-r1-20261108'
+prefix='docs/vault/30_Development/Evidence/fleet5-dashboard-resource-health-delta-review-r1-20261108-claude/'
+def git(*args):
+    q=subprocess.run(['git',*args],cwd=r,capture_output=True,timeout=30);assert q.returncode==0,('git',q.returncode,q.stderr[:300]);return q.stdout
+assert git('rev-parse',source+'^').decode().strip()==base
+assert git('ls-remote','origin','refs/heads/'+branch).decode().split()[0]==source
+paths=git('diff','--name-only',base,source).decode('utf-8').splitlines()
+assert len(paths)==4 and all(p.startswith(prefix) or p=='docs/vault/30_Development/History/2026-11-08_FLEET5_Dashboard_Resource_Health_Delta_Review_R1_Claude.md' for p in paths)
+for n in ['review.json','local-gates.json','sync-state-comparison.json']:
+    b=git('show',source+':'+prefix+n);working=(reviewer/prefix/n).read_bytes()
+    assert b.replace(b'\r\n',b'\n')==working.replace(b'\r\n',b'\n') and json.loads(b)==json.loads(working)
+    (out/n).write_bytes(b)
+review=json.loads((out/'review.json').read_bytes())
+assert review['targetDelta']['to']==target and review['targetDelta']['from']=='e4e07bfd6b94e57edc64d158e208df01b9319deb'
+assert review['deliveryBase']==base and review['rootCheckpoint']==rootSHA
+assert review['orcaDispatchID']=='ctx_3a1660628584' and review['orcaTaskID']=='task_0e409ca1e4bb'
+assert review['verdict']=='ACCEPT_DASH_RESOURCE_AND_GATEWAY_HEALTH_DELTA_KEEP_REAL_DEPLOYMENT_AND_MANUAL_GATES' and review['mandatoryDefects']==0
+assert all(review['findingDispositions'][name].startswith('CLOSED_AT_SOURCE') for name in ['DASH-RESOURCE-01','DASH-HEALTH-02']) and review['wholeProgramComplete'] is False
+count=0
+for folder,pins in review['rootInputPins'].items():
+    if not isinstance(pins,dict):continue
+    for n,h in pins.items():
+        b=git('show',rootSHA+':docs/vault/30_Development/Evidence/fleet5-20261105-root/'+folder+'/'+n)
+        assert hashlib.sha256(b).hexdigest()==h,(folder,n);count+=1
+assert count==64,count
+for p,h in review['boardsReadAtRootCheckpoint'].items():assert hashlib.sha256(git('show',rootSHA+':'+p)).hexdigest()==h
+assert len(review['boardsReadAtRootCheckpoint'])==2
+lf=git('show',rootSHA+':docs/vault/30_Development/Evidence/fleet5-20261105-root/dashboard-abb707-root-verified-r1/delivery.json')
+assert len(lf)==121334 and hashlib.sha256(lf).hexdigest()=='c9c2d89198f614a633df7dfe447344588e061ecc35522d7b43f0ea0280a54918'
+assert len(lf.replace(b'\n',b'\r\n'))==124119 and hashlib.sha256(lf.replace(b'\n',b'\r\n')).hexdigest()=='d678419cd533b44703940c3b90fe20eedffb110f6d7de026debfc73a241cb90e'
+
+gates=json.loads((out/'local-gates.json').read_bytes());assert len(gates)==6 and all(g['exit']==0 for g in gates)
+GH=r'C:\Program Files\GitHub CLI\gh.exe';rid=42412852388;data={}
+for n,suffix in [('run',''),('jobs','/jobs?per_page=100')]:
+    saved=out/('Docs-'+n+'.json')
+    if not saved.exists():
+        q=subprocess.run([GH,'api',f'repos/egparadise/SaintVision-Invion/actions/runs/{rid}'+suffix],capture_output=True,timeout=40);assert q.returncode==0;saved.write_bytes(q.stdout)
+    data[n]=json.loads(saved.read_bytes())
+a=data['run'];b=data['jobs']
+assert a['head_sha']==source and a['head_branch']==branch and a['event']=='workflow_dispatch' and a['path']=='.github/workflows/docs.yml' and a['run_attempt']==1
+assert a['display_title']=='fleet5-dashboard-resource-health-delta-review-claude-docs-bf5ebc1bbf7b48a6881392ff45aec70c' and a['status']=='completed' and a['conclusion']=='success'
+assert b['total_count']==len(b['jobs'])==1
+j=b['jobs'][0];assert j['id']==128524513019 and j['head_sha']==source and j['status']=='completed' and j['conclusion']=='success' and len(j['steps'])==19 and all(s['conclusion']=='success' for s in j['steps'])
+state=Path(r'D:\Project\SaintVision-Invion\SaintVisionI-Invion\.git\obsidian-sync-state.json').read_bytes()
+comparison=json.loads((out/'sync-state-comparison.json').read_bytes())
+assert state==(w/'dashboard-abb707-review-canonical-before-r1.raw').read_bytes()
+assert comparison['fullBytesEqual'] and comparison['checkOnly'] and comparison['beforeBytes']==comparison['afterLocalGatesBytes']==len(state)==559099
+assert comparison['beforeSHA256']==comparison['afterLocalGatesSHA256']==hashlib.sha256(state).hexdigest()=='1433f2a90cbe4333ec4d9f1df050b24a6a581bc8efbd8ae983b3e9f9e11afcca'
+q=subprocess.run([r'C:\Users\inviz\AppData\Local\Programs\orca\resources\bin\orca.exe','orchestration','worker-show','--dispatch','ctx_3a1660628584','--json'],capture_output=True,timeout=25);assert q.returncode==0
+(out/'reviewer-lifecycle.json').write_bytes(q.stdout);life=json.loads(q.stdout)['result']
+assert {k:life[k] for k in ['state','stage','liveness','terminalState']}=={'state':'succeeded','stage':'settled','liveness':'exited','terminalState':'released'},life
+v={'atKST':datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=9))).isoformat(timespec='seconds'),'reviewSource':source,'reviewBase':base,'reviewedTarget':target,'actualVerdict':review['verdict'],'remainingMandatoryCodeDefects':0,'dashboardResourceSourceFindingClosed':True,'dashboardHealthSourceFindingClosed':True,'priorCSP02AndCR90501RemainClosed':True,'deliveryLFCRLFBytesReconciled':True,'RootInputPinsMatched':count,'RootBoardPinsMatched':2,'ownFourDocsOnlyDirectParentRemoteExact':True,'Docs':rid,'DocsJob':j['id'],'exactManualAttempt1All19Success':True,'sixLocalMetadataGatesExit0':True,'canonicalFullBytesMatchAtRootVerification':True,'canonicalBytes':len(state),'canonicalSHA256':hashlib.sha256(state).hexdigest(),'reviewerLifecycle':{k:life[k] for k in ['state','stage','liveness','terminalState']},'actualDeploymentAccepted':False,'manualAcceptanceMissingCount':1,'wholeProgramComplete':False}
+(out/'root-verification.json').write_text(json.dumps(v,indent=2)+'\n',encoding='utf-8');print(json.dumps(v),flush=True)
