@@ -1,7 +1,7 @@
 ---
 doc_id: "HISTORY-FLEET5-FIRST-WORKSPACE-UI-R1-20261107-CODEX"
 title: "FLEET5 first Workspace UI contract R1"
-version: "1.0.4"
+version: "1.0.5"
 status: "review"
 author: "Codex"
 updated: "2026-11-07"
@@ -25,3 +25,5 @@ Hosted correction evidence: [first candidate](../Evidence/fleet5-first-workspace
 [Request/state mapping](../Evidence/fleet5-first-workspace-ui-contract-r1-20261107-codex/request-state-mapping.json) records the complete selected intent to output journey, guards and remaining Root gates. Review now displays the actual frozen first input; final denials and unknown delivery differ. A new isolated Linux integration case creates all workload/Run/mapping records through the production APIs, requires two distinct fixture votes, then actual receipt/output/Evidence and canonical terminal state. The generic ResourceRequest root remains unambiguous and the new non-NUL regex uses cross-language portable hex escaping; [third candidate correction](../Evidence/fleet5-first-workspace-ui-contract-r1-20261107-codex/third-ci-corrections.json) preserves the earlier Core failure. This is still not live browser/user/PC3/five-PC acceptance.
 
 Root message `msg_2d1917021248` authorized exactly the AC11 architecture catalogue delta, not final code acceptance. The four Root-owned files are copied byte for byte into the named public Evidence directory, and the reviewer source/output/pins are mechanically updated while the original fifteen entries, RLS dispositions and browser proof remain unchanged. [Root architecture decision](../Evidence/fleet5-20261105-root/first-workspace-ac11-catalogue-delta-r1/root-architecture-decision.md) explicitly keeps actual Claude code review pending. Both a88 Backend matrices failed fourteen tests despite 9076 passing; the failures and precise fixes remain in the third correction receipt. Historical migration safety assertions remain real PG tests, and a new independent test proves0068 refuses chain downgrade without changing the head/helper definitions.
+
+The84ce candidate Frontend passed1336 tests/105 files and both required jobs, and Docs passed all19 steps. Backend3.14 failed79 catalogue/provenance cases with9013 passes,75 skips and2 deselections; new selected-intent PG/rollback and scoped migration cases passed. [Fourth correction](../Evidence/fleet5-first-workspace-ui-contract-r1-20261107-codex/fourth-ci-corrections.json) retains the failures and Root-authorized exact17 cardinality and same-source registry/importer/scan-allowlist pin chain. Registry provenance is committed first, then its actual ancestor SHA is pinned by importers; all target criteria, required axes, statuses, scanner findings and thresholds remain unchanged. No implementation/CI acceptance is inferred from a failed candidate.

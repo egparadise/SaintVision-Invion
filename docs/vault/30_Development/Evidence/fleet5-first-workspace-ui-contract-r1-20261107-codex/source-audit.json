@@ -1,10 +1,10 @@
 {
-  "atKST": "2026-11-07T19:51:17.950599+09:00",
+  "atKST": "2026-11-07T20:23:45.154521+09:00",
   "deliveryBase": "1efea494f026e932360c35ae811b6423d874a2e7",
   "backendBase": "1efea494f026e932360c35ae811b6423d874a2e7",
   "importedFrontendSource": "b48c2c4492f8aea4b55c33161733a9a6fb9eed8c",
   "frozenRoot": "23a6cadef31053a35deae187c6991e48ebd70ff0",
-  "checkoutHEAD": "a88fd60094339e55da2536e5485eed00b8eaa5ed",
+  "checkoutHEAD": "ab9c66fa2cc57835dd08672b8bc07011b748ac0b",
   "note": "Working source/data audit; final committed SHA is supplied by publication receipt, not predicted here",
   "imports": [
     {
@@ -116,7 +116,7 @@
     "skills": "dc117f0b750e4ff029e87b5f7ed53ee2f69862ca",
     "docs/sources": "ace2050db53e98c7e876bee7668c8450095ec74d"
   },
-  "changedPythonASTCount": 22,
+  "changedPythonASTCount": 27,
   "changes": [
     {
       "path": "apps/web/nginx.conf",
@@ -349,6 +349,11 @@
       "SHA256": "a2bfee095f0e6795a8b5a5bf78d22a68b92a204f7b7a93d8b0742ababeaf6d3d"
     },
     {
+      "path": "tests/test_import_ac11_accessibility_evidence.py",
+      "bytes": 17865,
+      "SHA256": "6ec4ee7ee6ad485d60d2c857d2cbcfbad181419436b36c60aefa8140884bbaad"
+    },
+    {
       "path": "tests/test_import_ac11_security_scan.py",
       "bytes": 62280,
       "SHA256": "27d2299a888d0a920dc1f363e6113d0c5daf110d1c5accb3440dc2369280c552"
@@ -361,12 +366,32 @@
     {
       "path": "tools/aggregate_ac11_evidence.py",
       "bytes": 98891,
-      "SHA256": "e845eebbbdad652f6273673fedf1018f41af48811c30254f0ff482a06158eb18"
+      "SHA256": "4435396c997254aba6fa1b405eaf3782f44d6d5bf8fed0a51a5289e99c199e88"
     },
     {
       "path": "tools/definer-policy.json",
       "bytes": 5235,
       "SHA256": "bd8ee78e0bd1d6f731d9823e3c7ef22170c32c3e50c9ca78ee030ba52b810123"
+    },
+    {
+      "path": "tools/import_ac11_accessibility_evidence.py",
+      "bytes": 27632,
+      "SHA256": "b216630196a885ec47639dde2d211a988c82aeb2746e0480b8c583dbce6f96e8"
+    },
+    {
+      "path": "tools/import_ac11_composite_long_soak.py",
+      "bytes": 29054,
+      "SHA256": "a7625e3cc9a9cd09949b6cb49a980fc7f782c09c75d465e9968fbfe5e99941b5"
+    },
+    {
+      "path": "tools/import_ac11_migration_rehearsal.py",
+      "bytes": 19749,
+      "SHA256": "04f801da659d6b6ba9bb3c828cb03fc4112f5932b6b27b6530e1e4424e451a09"
+    },
+    {
+      "path": "tools/import_ac11_security_scan.py",
+      "bytes": 52053,
+      "SHA256": "a56371e2236add31fc4e091ec8483a286eda147d593e2be2a8d6d4bba6db463f"
     }
   ],
   "fullCanonicalSyncBytes": 500344,

@@ -1,0 +1,9 @@
+{
+  "exit": 0,
+  "check": "AST literals and raw Git-blob data only; no product/tool/test imports",
+  "registryAnchor": "ab9c66fa2cc57835dd08672b8bc07011b748ac0b",
+  "registryBlob": "e29596dfe052b95c2ff59ee2f6d771f42b86d9f9",
+  "securityImporterBlob": "50799b777563443c90d8d8f52990b52b0df79db5",
+  "scanAllowlistBlob": "77e02158cd7f1e2588a3bb638fe7202264899a70",
+  "finalCodeReview": "PENDING_ACTUAL_CLAUDE"
+}

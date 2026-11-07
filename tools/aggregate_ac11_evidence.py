@@ -44,7 +44,7 @@ ALLOWLIST_CANONICAL_SHA256 = "282abfbf5e4c4a0a5dfff6a27b65187fdb72342df05d12483e
 SCAN_ALLOWLIST_REPO_PATH = (
     "docs/vault/30_Development/Evidence/s11-security-dependency-sast-allowlist-v1.json"
 )
-SCAN_ALLOWLIST_BLOB = "b5b4265e935cd1db04fef8ada795d0df1377bd09"
+SCAN_ALLOWLIST_BLOB = "77e02158cd7f1e2588a3bb638fe7202264899a70"
 #: The importer that may write this axis's envelopes, pinned by path here and by blob in
 #: the reviewed allowlist above (#313 F-R3).
 SECURITY_IMPORTER_REPO_PATH = "tools/import_ac11_security_scan.py"

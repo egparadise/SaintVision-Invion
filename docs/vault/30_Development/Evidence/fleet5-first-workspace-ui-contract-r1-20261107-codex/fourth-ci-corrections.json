@@ -1,0 +1,43 @@
+{
+  "sourceSHA": "84cebed45424f79aa8e60905c96f13f6e27464fb",
+  "Frontend": 42365886672,
+  "FrontendResult": "SUCCESS12+14steps,105files1336tests,64contract+7panel+46importedrefresh",
+  "Docs": 42365893154,
+  "DocsResult": "SUCCESS19steps",
+  "Backend": 42365891139,
+  "Backend314": {
+    "failed": 79,
+    "passed": 9013,
+    "skipped": 75,
+    "deselected": 2,
+    "warnings": 2033,
+    "seconds": 1386.88
+  },
+  "RootAuthorization": "msg_2d1917021248 provenance-only chain rotation",
+  "cause": "Two count checks in AC11 evaluator/validator still15, registry sourceDocument still old allowlist; all79 failures are catalogue admission/provenance cascade",
+  "correction": "Exact17 approved signature cardinality; security target sourceDocument actual84ce allowlist; commit registry then pin concrete ancestor in importers and mechanically rotate security importer/scan-allowlist pins",
+  "productSourceChanges": false,
+  "review": "PENDING_ACTUAL_CLAUDE",
+  "liveAcceptance": false,
+  "registryAnchor": "ab9c66fa2cc57835dd08672b8bc07011b748ac0b",
+  "registryBlob": "e29596dfe052b95c2ff59ee2f6d771f42b86d9f9",
+  "securityImporterBlob": "50799b777563443c90d8d8f52990b52b0df79db5",
+  "scanAllowlistBlob": "77e02158cd7f1e2588a3bb638fe7202264899a70",
+  "changedImporterPaths": [
+    "tools/import_ac11_accessibility_evidence.py",
+    "tools/import_ac11_composite_long_soak.py",
+    "tools/import_ac11_migration_rehearsal.py",
+    "tools/import_ac11_security_scan.py",
+    "tests/test_import_ac11_accessibility_evidence.py"
+  ],
+  "allTargetIDsAxesCriteriaEnvironmentsStatusesAndThresholdsPreserved": true,
+  "existingWriterCollectorBaselineAndOld15DefinerEntriesUnchanged": true,
+  "Backend312": {
+    "failed": 79,
+    "passed": 9013,
+    "skipped": 75,
+    "deselected": 2,
+    "warnings": 2035,
+    "seconds": 1383.25
+  }
+}
