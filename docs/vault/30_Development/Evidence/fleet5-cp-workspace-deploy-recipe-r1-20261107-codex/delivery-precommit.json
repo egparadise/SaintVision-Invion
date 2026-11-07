@@ -1,0 +1,43 @@
+{
+  "atKST": "2026-11-07T17:40:26+09:00",
+  "deliveryBase": "5ba7cfb795135e1f74c0d3e83e0fea285d3cc987",
+  "productSource": "1efea494f026e932360c35ae811b6423d874a2e7",
+  "rootPublicRef": "baaa8ea99919a7fec40f8f853a648f4067d7248d",
+  "docsOnly": true,
+  "stagedFilesBeforeThisReceipt": [
+    "docs/vault/30_Development/Evidence/fleet5-cp-workspace-deploy-recipe-r1-20261107-codex/context.json",
+    "docs/vault/30_Development/Evidence/fleet5-cp-workspace-deploy-recipe-r1-20261107-codex/local-gates.json",
+    "docs/vault/30_Development/Evidence/fleet5-cp-workspace-deploy-recipe-r1-20261107-codex/recipe.md",
+    "docs/vault/30_Development/Evidence/fleet5-cp-workspace-deploy-recipe-r1-20261107-codex/source-bindings.json",
+    "docs/vault/30_Development/Evidence/fleet5-cp-workspace-deploy-recipe-r1-20261107-codex/static-verification.json",
+    "docs/vault/30_Development/Evidence/fleet5-cp-workspace-deploy-recipe-r1-20261107-codex/sync-state-after.json",
+    "docs/vault/30_Development/Evidence/fleet5-cp-workspace-deploy-recipe-r1-20261107-codex/sync-state-before.json",
+    "docs/vault/30_Development/Evidence/fleet5-cp-workspace-deploy-recipe-r1-20261107-codex/sync-state-comparison.json",
+    "docs/vault/30_Development/Evidence/fleet5-cp-workspace-deploy-recipe-r1-20261107-codex/typed-examples.json",
+    "docs/vault/30_Development/Evidence/fleet5-cp-workspace-deploy-recipe-r1-20261107-codex/verify-static.py",
+    "docs/vault/30_Development/History/2026-11-07_FLEET5_CP_Workspace_Deployment_Recipe_R1_Codex.md"
+  ],
+  "stagedDiffExit": 0,
+  "staticChecks": 107,
+  "sourcePins": 48,
+  "publicInputs": 4,
+  "publicInventoryFilesVerified": 22,
+  "sixLocalGateExits": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+  ],
+  "sync": {
+    "pendingExports": 2665,
+    "conflicts": 0,
+    "noWrites": true,
+    "fullBeforeAfterSHA256": "99d9a77a918440cc9a1f67c57ed3eba158df0a470a841da07f0b2b37af9f5d8e",
+    "identicalFullBytes": true
+  },
+  "actualReview": "PENDING_ROOT",
+  "actualOperationsDelegatedOrRun": false,
+  "wholeProgramComplete": false
+}

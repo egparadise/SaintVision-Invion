@@ -1,0 +1,1087 @@
+{
+  "atKST": "2026-11-07T17:28:39+09:00",
+  "productSource": "1efea494f026e932360c35ae811b6423d874a2e7",
+  "deliveryBase": "5ba7cfb795135e1f74c0d3e83e0fea285d3cc987",
+  "rootPublicRef": "baaa8ea99919a7fec40f8f853a648f4067d7248d",
+  "pins": [
+    {
+      "id": "api-config",
+      "ref": "1efea494f026e932360c35ae811b6423d874a2e7",
+      "path": "services/control-plane/src/inv/app.py",
+      "gitBlobSHA1": "4adbcc5d0fd97eec0c535cf25d85031531c62a02",
+      "fileSHA256": "3e3d0d0dc023dee937ac184532b043a26b2af7110887901c937cc6cdbaa2edea",
+      "startLine": 1285,
+      "endLine": 1332,
+      "excerpt": "def create_configured_app():\n    \"\"\"Production factory: explicit operator configuration, never seeded demo data.\"\"\"\n    try:\n        settings = strict_object(trusted_file(os.environ[\"INV_API_CONFIG\"]))\n        if (\n            not {\"identity\"}\n            <= settings.keys()\n            <= {\n                \"identity\",\n                \"allowedOrigins\",\n                \"workspace\",\n                \"business\",\n                \"modelRegistryPolicy\",\n                \"modelVerifier\",\n                \"placementShortCommit\",\n                \"configurationReadiness\",\n                \"buildCapsuleProviderId\",\n                \"buildPlanAuthority\",\n                \"storageSample\",\n            }\n        ):\n            raise ValueError()\n        identity = AccessTokens(**settings[\"identity\"])\n        registry_policy = None\n        if \"modelRegistryPolicy\" in settings:\n            from .model_registry_config import configured_registry_policy\n\n            registry_policy = configured_registry_policy(settings[\"modelRegistryPolicy\"])\n        database = Database(\n            os.environ[\"INV_RUNTIME_DSN\"],\n            recovery_epoch=os.environ[\"INV_RECOVERY_EPOCH\"],\n            registry_binding_policy=registry_policy,\n            placement_short_commit=settings.get(\"placementShortCommit\", False),\n        )\n        workspace = None\n        if \"workspace\" in settings:\n            from .workspace_config import configured_workspace\n\n            workspace = configured_workspace(database, identity.tenant_id, settings[\"workspace\"])\n        business = None\n        denial_engine = None\n        if \"business\" in settings:\n            if settings[\"business\"] is not True:\n                raise ValueError()\n            from .business_surface import configured_business\n\n            business = configured_business(database, identity)\n            denial_engine = getattr(business.state, \"denial_engine\", None)\n",
+      "excerptSHA256": "3b5bba87f3f2c01f3d2a2b67a52e9b4600b11f0fd24b076d1f879976acc13522",
+      "url": "https://github.com/egparadise/SaintVision-Invion/blob/1efea494f026e932360c35ae811b6423d874a2e7/services/control-plane/src/inv/app.py#L1285-L1332"
+    },
+    {
+      "id": "api-start",
+      "ref": "1efea494f026e932360c35ae811b6423d874a2e7",
+      "path": "services/control-plane/src/inv/app.py",
+      "gitBlobSHA1": "4adbcc5d0fd97eec0c535cf25d85031531c62a02",
+      "fileSHA256": "3e3d0d0dc023dee937ac184532b043a26b2af7110887901c937cc6cdbaa2edea",
+      "startLine": 1421,
+      "endLine": 1436,
+      "excerpt": "def main():\n    import uvicorn\n\n    uvicorn.run(\n        create_configured_app(),\n        host=\"127.0.0.1\",\n        port=8080,\n        proxy_headers=False,\n        access_log=False,\n        limit_concurrency=64,\n        ws=\"websockets\",\n        ws_max_size=8192,\n        ws_max_queue=1,\n        ws_per_message_deflate=False,\n        timeout_keep_alive=5,\n        h11_max_incomplete_event_size=32768,\n",
+      "excerptSHA256": "e3ea37060fbc38c61ffab581983e838f002bd6fda72f36232d703a4b1886b412",
+      "url": "https://github.com/egparadise/SaintVision-Invion/blob/1efea494f026e932360c35ae811b6423d874a2e7/services/control-plane/src/inv/app.py#L1421-L1436"
+    },
+    {
+      "id": "api-create",
+      "ref": "1efea494f026e932360c35ae811b6423d874a2e7",
+      "path": "services/control-plane/src/inv/app.py",
+      "gitBlobSHA1": "4adbcc5d0fd97eec0c535cf25d85031531c62a02",
+      "fileSHA256": "3e3d0d0dc023dee937ac184532b043a26b2af7110887901c937cc6cdbaa2edea",
+      "startLine": 521,
+      "endLine": 524,
+      "excerpt": "    @api.post(\"/v1/projects/{project}/runs\", status_code=201)\n    async def create(project: str, request: Request, identity=Depends(authenticated)):\n        validate_contract(\"EmptyRequest\", await request.json())\n        return await run_in_threadpool(control.create, identity.principal, project, key(request))\n",
+      "excerptSHA256": "a1c60900db66720b092155bcd5d35271c998722c8789bd7ecac7f24f4df8cb90",
+      "url": "https://github.com/egparadise/SaintVision-Invion/blob/1efea494f026e932360c35ae811b6423d874a2e7/services/control-plane/src/inv/app.py#L521-L524"
+    },
+    {
+      "id": "api-idempotency",
+      "ref": "1efea494f026e932360c35ae811b6423d874a2e7",
+      "path": "services/control-plane/src/inv/app.py",
+      "gitBlobSHA1": "4adbcc5d0fd97eec0c535cf25d85031531c62a02",
+      "fileSHA256": "3e3d0d0dc023dee937ac184532b043a26b2af7110887901c937cc6cdbaa2edea",
+      "startLine": 341,
+      "endLine": 345,
+      "excerpt": "    def key(request):\n        value = request.headers.get(\"idempotency-key\")\n        if not value or len(value) > 200 or any(ord(c) < 33 or ord(c) > 126 for c in value):\n            raise DomainError(\"VAL-0003\", \"Idempotency-Key required\", 422)\n        return value\n",
+      "excerptSHA256": "3213586fc83989daf92b73d856a79d14f3fce0224f883251791b67a0fcc3cb7a",
+      "url": "https://github.com/egparadise/SaintVision-Invion/blob/1efea494f026e932360c35ae811b6423d874a2e7/services/control-plane/src/inv/app.py#L341-L345"
+    },
+    {
+      "id": "api-first-start",
+      "ref": "1efea494f026e932360c35ae811b6423d874a2e7",
+      "path": "services/control-plane/src/inv/app.py",
+      "gitBlobSHA1": "4adbcc5d0fd97eec0c535cf25d85031531c62a02",
+      "fileSHA256": "3e3d0d0dc023dee937ac184532b043a26b2af7110887901c937cc6cdbaa2edea",
+      "startLine": 1188,
+      "endLine": 1218,
+      "excerpt": "    @api.post(\"/v1/projects/{project}/runs/{run_id}/start/prepare\", status_code=201)\n    async def prepare_first_workspace(\n        project: str, run_id: str, request: Request, identity=Depends(authenticated)\n    ):\n        return await run_in_threadpool(\n            first_workspace_service().prepare,\n            identity.principal,\n            project,\n            run_id,\n            await request.json(),\n            key(request),\n        )\n\n    @api.post(\"/v1/projects/{project}/runs/{run_id}/start/enqueue\", status_code=202)\n    async def enqueue_first_workspace(\n        project: str, run_id: str, request: Request, identity=Depends(authenticated)\n    ):\n        return await run_in_threadpool(\n            first_workspace_service().enqueue,\n            identity.principal,\n            project,\n            run_id,\n            await request.json(),\n            key(request),\n        )\n\n    @api.get(\"/v1/projects/{project}/runs/{run_id}/starts/{start_id}\")\n    def first_workspace_status(\n        project: str, run_id: str, start_id: str, identity=Depends(authenticated)\n    ):\n        return first_workspace_service().get(identity.principal, project, run_id, start_id)\n",
+      "excerptSHA256": "114d949849fbae7857c14d3343b26eb146cfb901a41a7cd5ad122a18d990f1b3",
+      "url": "https://github.com/egparadise/SaintVision-Invion/blob/1efea494f026e932360c35ae811b6423d874a2e7/services/control-plane/src/inv/app.py#L1188-L1218"
+    },
+    {
+      "id": "api-origin-body",
+      "ref": "1efea494f026e932360c35ae811b6423d874a2e7",
+      "path": "services/control-plane/src/inv/app.py",
+      "gitBlobSHA1": "4adbcc5d0fd97eec0c535cf25d85031531c62a02",
+      "fileSHA256": "3e3d0d0dc023dee937ac184532b043a26b2af7110887901c937cc6cdbaa2edea",
+      "startLine": 148,
+      "endLine": 184,
+      "excerpt": "                        b\"idempotency-key\",\n                        b\"last-event-id\",\n                    }\n                    and name in headers\n                ):\n                    raise DomainError(\"VAL-0003\", \"Ambiguous request headers\", 400)\n                headers[name] = value\n            if b\"origin\" in headers and headers[b\"origin\"].decode(\"latin1\") not in self.origins:\n                raise DomainError(\"AUTH-0051\", \"Browser origin rejected\", 403)\n            if (\n                scope[\"path\"].startswith(\"/v1/\")\n                and b\"access_token\" in scope.get(\"query_string\", b\"\").lower()\n            ):\n                raise DomainError(\"AUTH-0050\", \"Use the Authorization header\", 401)\n            chunks, length = [], 0\n\n            async def read_body():\n                nonlocal length\n                while True:\n                    message = await receive()\n                    if message[\"type\"] != \"http.request\":\n                        raise DomainError(\"VAL-0003\", \"Request interrupted\", 400)\n                    chunk = message.get(\"body\", b\"\")\n                    length += len(chunk)\n                    if length > 65536:\n                        raise DomainError(\"VAL-0003\", \"Request exceeds limit\", 413)\n                    chunks.append(chunk)\n                    if not message.get(\"more_body\", False):\n                        return\n\n            await asyncio.wait_for(read_body(), 5)\n            body = b\"\".join(chunks)\n            if scope[\"method\"] in {\"POST\", \"PUT\", \"PATCH\"}:\n                if (\n                    headers.get(b\"content-type\") != b\"application/json\"\n                    or b\"content-encoding\" in headers\n                ):\n",
+      "excerptSHA256": "21ad98a3609de7dc468602a29683740f1b576c4a19a30ed0e4b56cc5955b48af",
+      "url": "https://github.com/egparadise/SaintVision-Invion/blob/1efea494f026e932360c35ae811b6423d874a2e7/services/control-plane/src/inv/app.py#L148-L184"
+    },
+    {
+      "id": "api-output-registry",
+      "ref": "1efea494f026e932360c35ae811b6423d874a2e7",
+      "path": "services/control-plane/src/inv/app.py",
+      "gitBlobSHA1": "4adbcc5d0fd97eec0c535cf25d85031531c62a02",
+      "fileSHA256": "3e3d0d0dc023dee937ac184532b043a26b2af7110887901c937cc6cdbaa2edea",
+      "startLine": 208,
+      "endLine": 226,
+      "excerpt": "def _configured_object_stores(workspace, remote=None):\n    \"\"\"Build the read registry from the same Local root used for recovery.\"\"\"\n\n    from .object_store import LocalObjectStore, ObjectStoreRegistry, registered_provider\n\n    providers = []\n    recovery = getattr(workspace, \"recovery\", None) if workspace is not None else None\n    snapshots = getattr(recovery, \"snapshots\", None)\n    if snapshots is not None:\n        local = registered_provider(snapshots.provider)\n        if not isinstance(local, LocalObjectStore):\n            raise ValueError(\"Workspace recovery must use the bounded Local provider\")\n        providers.append(local)\n    if remote is not None:\n        providers.append(remote)\n    registry = ObjectStoreRegistry(providers)\n    if snapshots is not None:\n        snapshots.object_stores = registry\n    return registry\n",
+      "excerptSHA256": "90ffa90733548912dc6d05bde0e8159ebdc5fc45bb462102df4723dbdc74e71f",
+      "url": "https://github.com/egparadise/SaintVision-Invion/blob/1efea494f026e932360c35ae811b6423d874a2e7/services/control-plane/src/inv/app.py#L208-L226"
+    },
+    {
+      "id": "api-events",
+      "ref": "1efea494f026e932360c35ae811b6423d874a2e7",
+      "path": "services/control-plane/src/inv/app.py",
+      "gitBlobSHA1": "4adbcc5d0fd97eec0c535cf25d85031531c62a02",
+      "fileSHA256": "3e3d0d0dc023dee937ac184532b043a26b2af7110887901c937cc6cdbaa2edea",
+      "startLine": 1244,
+      "endLine": 1277,
+      "excerpt": "    @api.get(\"/v1/projects/{project}/runs/{run_id}/events\")\n    async def events(project: str, run_id: str, request: Request, identity=Depends(authenticated)):\n        cursor = request.headers.get(\"last-event-id\")\n        await run_in_threadpool(control.events, identity.principal, project, run_id, cursor)\n        bearer = request.headers[\"authorization\"][7:]\n\n        async def stream():\n            current, deadline = cursor, time.monotonic() + 25\n            while time.monotonic() < deadline:\n                try:\n                    fresh = await run_in_threadpool(tokens.verify, bearer)\n                    if fresh.principal != identity.principal:\n                        return\n                    pending = await run_in_threadpool(\n                        control.events, fresh.principal, project, run_id, current\n                    )\n                except Exception:\n                    yield 'event: inv.stream.closed\\ndata: {\"reason\":\"authorization-or-service-unavailable\"}\\n\\n'\n                    return\n                for item in pending:\n                    current = item[\"id\"]\n                    yield \"id: \" + current + \"\\nevent: inv.event\\ndata: \" + json.dumps(\n                        item, separators=(\",\", \":\")\n                    ) + \"\\n\\n\"\n                if len(pending) < 200:\n                    yield \": keepalive\\n\\n\"\n                    await asyncio.sleep(1)\n            yield \": reconnect\\n\\n\"\n\n        return StreamingResponse(\n            stream(),\n            media_type=\"text/event-stream\",\n            headers={\"Cache-Control\": \"no-store\", \"X-Accel-Buffering\": \"no\"},\n        )\n",
+      "excerptSHA256": "208d7b44f2cc1bb3451afce77ffa8d45c5986ec27d89d1cc76455a42b255b29d",
+      "url": "https://github.com/egparadise/SaintVision-Invion/blob/1efea494f026e932360c35ae811b6423d874a2e7/services/control-plane/src/inv/app.py#L1244-L1277"
+    },
+    {
+      "id": "api-terminal",
+      "ref": "1efea494f026e932360c35ae811b6423d874a2e7",
+      "path": "services/control-plane/src/inv/app.py",
+      "gitBlobSHA1": "4adbcc5d0fd97eec0c535cf25d85031531c62a02",
+      "fileSHA256": "3e3d0d0dc023dee937ac184532b043a26b2af7110887901c937cc6cdbaa2edea",
+      "startLine": 903,
+      "endLine": 947,
+      "excerpt": "    @api.post(\"/v1/workspaces/{workspace_id}/terminal-tickets\", status_code=201)\n    async def terminal_ticket(workspace_id: str, request: Request, identity=Depends(authenticated)):\n        from .terminal import TerminalService\n\n        data = await request.json()\n        return await run_in_threadpool(\n            TerminalService(workspace_service(), allowed_origins).issue,\n            identity,\n            workspace_id,\n            data,\n            request.headers.get(\"origin\", \"\"),\n        )\n\n    @api.websocket(\"/v1/workspaces/{workspace_id}/terminals/{session_id}\")\n    async def terminal_socket(websocket: WebSocket, workspace_id: str, session_id: str):\n        from .terminal import TerminalService, TerminalText\n        import secrets\n\n        origin = websocket.headers.get(\"origin\", \"\")\n        if (\n            origin not in allowed_origins\n            or websocket.scope.get(\"query_string\")\n            or websocket.headers.get(\"sec-websocket-protocol\") != \"inv-terminal-v1\"\n            or len([h for h in websocket.scope[\"headers\"] if h[0] == b\"origin\"]) != 1\n            or len([h for h in websocket.scope[\"headers\"] if h[0] == b\"sec-websocket-protocol\"])\n            != 1\n            or sum(len(k) + len(v) for k, v in websocket.scope[\"headers\"]) > 32768\n        ):\n            await websocket.close(code=4403)\n            return\n        if not terminal_slots.acquire(blocking=False):\n            await websocket.close(code=4429)\n            return\n        attachment = None\n        service = None\n        try:\n            service = TerminalService(workspace_service(), allowed_origins)\n            await websocket.accept(subprotocol=\"inv-terminal-v1\")\n            first = await asyncio.wait_for(websocket.receive_text(), timeout=5)\n            if len(first) > 200:\n                raise DomainError(\"AUTH-0070\", \"Terminal authentication frame exceeds bound\", 403)\n            auth = strict_object(first)\n            if not isinstance(auth, dict) or set(auth) != {\"ticket\"}:\n                raise DomainError(\"AUTH-0070\", \"Single-use terminal ticket required\", 403)\n            validate_contract(\"TerminalTicketAuthFrame\", auth)\n",
+      "excerptSHA256": "303f52ff024da5dbeea3cd193df38621867ead2cd5a2421d13d5789818feae5e",
+      "url": "https://github.com/egparadise/SaintVision-Invion/blob/1efea494f026e932360c35ae811b6423d874a2e7/services/control-plane/src/inv/app.py#L903-L947"
+    },
+    {
+      "id": "offline-jwks",
+      "ref": "1efea494f026e932360c35ae811b6423d874a2e7",
+      "path": "services/control-plane/src/inv/identity.py",
+      "gitBlobSHA1": "428e16bb2e27c8abdc62f390adfb3f0085356076",
+      "fileSHA256": "5974f0a2f0c4111868d75c9705cd87bb164a63176bc46bf9ee4663521b6a7c7b",
+      "startLine": 117,
+      "endLine": 161,
+      "excerpt": "class AccessTokens:\n    def __init__(self, *, tenant_id, issuer, audience, client_ids, jwks_file):\n        self.tenant_id = str(UUID(tenant_id))\n        if (\n            not isinstance(issuer, str)\n            or not issuer.startswith(\"https://\")\n            or not audience\n            or not client_ids\n        ):\n            raise ValueError(\"Explicit issuer, audience and clients required\")\n        self.issuer, self.audience = issuer, audience\n        self.client_ids = frozenset(client_ids)\n        self.jwks_file = Path(jwks_file)\n        self._keys()  # Refuse startup with incomplete trust; no dev fallback.\n\n    def _keys(self):\n        bundle = strict_object(trusted_file(self.jwks_file))\n        now = time.time()\n        if (\n            set(bundle) != {\"issuer\", \"expiresAt\", \"keys\"}\n            or bundle[\"issuer\"] != self.issuer\n            or type(bundle[\"expiresAt\"]) is not int\n            or not now < bundle[\"expiresAt\"] <= now + 7 * 86400\n        ):\n            raise ValueError(\"trust bundle expired or scoped incorrectly\")\n        if not isinstance(bundle[\"keys\"], list) or not 1 <= len(bundle[\"keys\"]) <= 8:\n            raise ValueError(\"bounded trusted signing keys required\")\n        keys = {}\n        for value in bundle[\"keys\"]:\n            if (\n                not isinstance(value, dict)\n                or value.get(\"kty\") != \"RSA\"\n                or value.get(\"alg\") != \"RS256\"\n                or value.get(\"use\") != \"sig\"\n                or \"d\" in value\n            ):\n                raise ValueError(\"RS256 public signing key required\")\n            kid = value.get(\"kid\")\n            if not isinstance(kid, str) or not 1 <= len(kid) <= 128 or kid in keys:\n                raise ValueError(\"unique key ID required\")\n            key = jwt.PyJWK.from_dict(value, algorithm=\"RS256\").key\n            if not isinstance(key, RSAPublicKey) or not 2048 <= key.key_size <= 4096:\n                raise ValueError(\"RSA key size rejected\")\n            keys[kid] = key\n        return keys\n",
+      "excerptSHA256": "f5345f006c1e28fd85976072875089d28921abe1414bbf1077eec3c95f62d6d1",
+      "url": "https://github.com/egparadise/SaintVision-Invion/blob/1efea494f026e932360c35ae811b6423d874a2e7/services/control-plane/src/inv/identity.py#L117-L161"
+    },
+    {
+      "id": "offline-token",
+      "ref": "1efea494f026e932360c35ae811b6423d874a2e7",
+      "path": "services/control-plane/src/inv/identity.py",
+      "gitBlobSHA1": "428e16bb2e27c8abdc62f390adfb3f0085356076",
+      "fileSHA256": "5974f0a2f0c4111868d75c9705cd87bb164a63176bc46bf9ee4663521b6a7c7b",
+      "startLine": 187,
+      "endLine": 225,
+      "excerpt": "            claims = jwt.decode(\n                token,\n                self._keys()[header[\"kid\"]],\n                algorithms=[\"RS256\"],\n                issuer=self.issuer,\n                audience=self.audience,\n                options={\n                    \"require\": [\"iss\", \"aud\", \"sub\", \"iat\", \"exp\", \"jti\", \"client_id\"],\n                    \"strict_aud\": True,\n                },\n            )\n            if claims != untrusted or any(\n                type(claims[k]) is not int for k in [\"iat\", \"exp\"]\n            ):\n                raise ValueError()\n            if \"nbf\" in claims and type(claims[\"nbf\"]) is not int:\n                raise ValueError()\n            if (\n                not 0 < claims[\"exp\"] - claims[\"iat\"] <= 3600\n                or claims[\"client_id\"] not in self.client_ids\n            ):\n                raise ValueError()\n            if any(\n                not isinstance(claims[k], str) or not 1 <= len(claims[k]) <= 200\n                for k in [\"sub\", \"jti\"]\n            ):\n                raise ValueError()\n            scope = claims.get(\"scope\")\n            if not isinstance(scope, str) or \"inv.api\" not in scope.split(\" \"):\n                raise ValueError()\n            auth_time, amr = _fresh_auth_claims(claims)\n            return Identity(\n                Principal(self.tenant_id, public_subject(self.issuer, claims[\"sub\"])),\n                claims[\"exp\"],\n                auth_time,\n                amr,\n                self.issuer,\n                claims[\"client_id\"],\n            )\n",
+      "excerptSHA256": "10528c68e16fbc5340c49fbe98c0f8c4dc5e08eeaf0f0ce5d6be1c0824afc07e",
+      "url": "https://github.com/egparadise/SaintVision-Invion/blob/1efea494f026e932360c35ae811b6423d874a2e7/services/control-plane/src/inv/identity.py#L187-L225"
+    },
+    {
+      "id": "business-role",
+      "ref": "1efea494f026e932360c35ae811b6423d874a2e7",
+      "path": "services/control-plane/src/inv/business_surface.py",
+      "gitBlobSHA1": "f49b23345de455898bc11ee36d8dea5411569f4a",
+      "fileSHA256": "4ba95eaf967a303d56316157325f08318cd0886e44694b0121fc2216a052e8fd",
+      "startLine": 35,
+      "endLine": 93,
+      "excerpt": "def configured_business(database, tokens):\n    import os\n    from sqlalchemy import create_engine, text\n    from psycopg.conninfo import conninfo_to_dict\n    from saintvision.api.app import create_app\n    from saintvision.config import Settings\n    from saintvision.db.session import make_session_factory\n    from saintvision.identity.oidc import OidcPrincipalVerifier\n\n    business_dsn = os.environ[\"INV_BUSINESS_DSN\"]\n    def target(dsn):\n        values = conninfo_to_dict(dsn.replace(\"postgresql+psycopg://\", \"postgresql://\", 1))\n        # Connection timeout is transport behaviour, not database identity.\n        for name in (\"user\", \"password\", \"connect_timeout\"):\n            values.pop(name, None)\n        values.setdefault(\"port\", \"5432\")\n        if not values.get(\"host\") or not values.get(\"dbname\"):\n            raise ValueError(\"Explicit database host and name required\")\n        return values\n    if target(business_dsn) != target(database._dsn):\n        raise ValueError(\"Business and execution database targets differ\")\n    engine = create_engine(business_dsn, pool_pre_ping=True)\n    try:\n        with engine.connect() as conn:\n            row = conn.execute(text(\"\"\"SELECT current_database(),\n              NOT rolsuper AND NOT rolbypassrls AND pg_has_role(current_user,'inv_app','MEMBER')\n              AND NOT pg_has_role(current_user,'inv_kernel','MEMBER')\n              AND NOT EXISTS(SELECT 1 FROM pg_namespace n WHERE n.nspowner=r.oid\n                             AND n.nspname IN ('public','inv'))\n              AND NOT EXISTS(SELECT 1 FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace\n                             WHERE c.relowner=r.oid AND n.nspname IN ('public','inv')) AS restricted\n              FROM pg_roles r WHERE rolname=current_user\"\"\")).one()\n            if not row.restricted:\n                raise ValueError(\"Separate restricted business role required\")\n        with database.transaction(tokens.tenant_id) as conn:\n            if conn.execute(\"SELECT current_database() AS name\").fetchone()[\"name\"] != row[0]:\n                raise ValueError(\"Business and execution must use the same database\")\n        # The business release route reads the kernel's commitment observation\n        # back over HTTP, and in this topology the kernel is this same process\n        # behind BusinessDispatch. Without this binding kernel_base_url stays\n        # None and that route answers 503 in every deployment, however the\n        # development helper Settings.from_env() is configured. PORT is the same\n        # value the server binds, so the self URL is read rather than guessed;\n        # INV_KERNEL_BASE_URL overrides it for a split deployment.\n        kernel_base_url = os.environ.get(\"INV_KERNEL_BASE_URL\") or (\n            f\"http://127.0.0.1:{os.environ.get('PORT', '8080')}\"\n        )\n        business = create_app(engine=engine,\n            settings=Settings(database_url=\"configured\", kernel_base_url=kernel_base_url),\n            verifier=OidcPrincipalVerifier(tokens, make_session_factory(engine)))\n        business.router.add_event_handler(\"shutdown\", engine.dispose)\n        # Card 266: the kernel's own handlers write no audit row, and the shared\n        # denial recorder needs an engine with the ``inv_app`` role to write\n        # ``public.audit_events``. This is the only engine in this process with\n        # that role, so a kernel denial is recorded through it rather than through\n        # a second connection of its own. Exposed on the app's state so the return\n        # type -- and every existing caller -- stays as it was.\n        business.state.denial_engine = engine\n        return business\n",
+      "excerptSHA256": "c1631531a2854a4e6190a45b8fe293e31f30dbb40315fa8c407fa1a34b762d7f",
+      "url": "https://github.com/egparadise/SaintVision-Invion/blob/1efea494f026e932360c35ae811b6423d874a2e7/services/control-plane/src/inv/business_surface.py#L35-L93"
+    },
+    {
+      "id": "business-routing",
+      "ref": "1efea494f026e932360c35ae811b6423d874a2e7",
+      "path": "services/control-plane/src/inv/business_surface.py",
+      "gitBlobSHA1": "f49b23345de455898bc11ee36d8dea5411569f4a",
+      "fileSHA256": "4ba95eaf967a303d56316157325f08318cd0886e44694b0121fc2216a052e8fd",
+      "startLine": 9,
+      "endLine": 32,
+      "excerpt": "class BusinessDispatch:\n    def __init__(self, app, business):\n        self.app, self.business = app, business\n        from saintvision.api.v1 import projects, settings, adapters, readiness, storage\n        # Read the three declared routers, not FastAPI's lazily included wrapper\n        # routes. Keep all deeper execution routes on the kernel application.\n        self.routes = [r for module in (projects, settings, adapters) for r in module.router.routes]\n        # Run result paths belong to the execution kernel, including first Runs\n        # which have no public.runs row. Only workspace readiness is business CRUD.\n        self.routes += [r for r in readiness.router.routes if r.path.startswith(\"/v1/workspaces/\")]\n        # Explicit read-only catalogue exposure. Registration/activation/revoke\n        # require their own reviewed mutation authorization boundary.\n        self.routes += [r for r in storage.router.routes if r.methods == {\"GET\"}]\n\n    async def __call__(self, scope, receive, send):\n        if scope[\"type\"] == \"http\" and any(r.matches(scope)[0] == Match.FULL for r in self.routes):\n            # FastAPI installs its own app reference for dependencies. Restore it\n            # when returning so middleware does not retain the other role's app.\n            original = scope.get(\"app\")\n            try:\n                return await self.business(scope, receive, send)\n            finally:\n                scope[\"app\"] = original\n        return await self.app(scope, receive, send)\n",
+      "excerptSHA256": "b62cfa6b7e6eaa7afa3999c8fc0ee90c82bb770e4c9e3845d6e4974eb78ae12a",
+      "url": "https://github.com/egparadise/SaintVision-Invion/blob/1efea494f026e932360c35ae811b6423d874a2e7/services/control-plane/src/inv/business_surface.py#L9-L32"
+    },
+    {
+      "id": "business-identity",
+      "ref": "1efea494f026e932360c35ae811b6423d874a2e7",
+      "path": "src/saintvision/identity/oidc.py",
+      "gitBlobSHA1": "85c36d7db225d03aa5bfbe2098faa110468f9e95",
+      "fileSHA256": "e2e9ce1a50baf64d690586501b2a29b54ecb8d6f2e816dda4e2f3e4d40f1b6b1",
+      "startLine": 101,
+      "endLine": 135,
+      "excerpt": "    def __init__(self, tokens: TokenVerifier, session_factory) -> None:\n        self._tokens = tokens\n        self._session_factory = session_factory\n\n    def verify(self, credential: str) -> Principal:\n        from inv.errors import DomainError\n        try:\n            identity = self._tokens.verify(credential)\n        except DomainError:\n            raise InvError(AUTH_INVALID_CREDENTIAL, \"credential is not recognised\",\n                           public=False, status=401) from None\n        subject = identity.principal.subject_id\n        tenant_id = uuid.UUID(identity.principal.tenant_id)\n\n        from ..db.session import tenant_scope\n\n        with self._session_factory() as session:\n            with session.begin():\n                with tenant_scope(session, tenant_id):\n                    return principal_for_subject(\n                        session,\n                        tenant_id=tenant_id,\n                        subject=subject,\n                        verified_fresh_auth_claims=True,\n                        auth_time=getattr(identity, \"auth_time\", None),\n                        amr=frozenset(getattr(identity, \"amr\", ())),\n                        # Handed over, never re-derived: these are the issuer and client\n                        # the signature was already checked against, and the token's own\n                        # expiry. Read with getattr so a verifier stub that predates them\n                        # yields None -- which the acceptance boundary refuses -- rather\n                        # than raising here and turning a refusal into a 500.\n                        verified_token_issuer=getattr(identity, \"issuer\", None),\n                        verified_token_client_id=getattr(identity, \"client_id\", None),\n                        verified_token_expires_at=getattr(identity, \"expires_at\", None),\n                    )\n",
+      "excerptSHA256": "3291b7e0e721722b5bccb43cbb0f0b290cdf7f5a2adb503cbbb7266645d87223",
+      "url": "https://github.com/egparadise/SaintVision-Invion/blob/1efea494f026e932360c35ae811b6423d874a2e7/src/saintvision/identity/oidc.py#L101-L135"
+    },
+    {
+      "id": "business-subject",
+      "ref": "1efea494f026e932360c35ae811b6423d874a2e7",
+      "path": "src/saintvision/identity/oidc.py",
+      "gitBlobSHA1": "85c36d7db225d03aa5bfbe2098faa110468f9e95",
+      "fileSHA256": "e2e9ce1a50baf64d690586501b2a29b54ecb8d6f2e816dda4e2f3e4d40f1b6b1",
+      "startLine": 167,
+      "endLine": 185,
+      "excerpt": "    user = session.scalars(\n        select(User).where(\n            User.tenant_id == tenant_id, User.external_subject == subject\n        )\n    ).one_or_none()\n    if user is None:\n        raise InvError(\n            AUTH_INVALID_CREDENTIAL,\n            \"credential is not recognised\",\n            extra={\"reason\": \"no account is linked to this subject\"},\n            public=False,\n            status=401,\n        )\n    if user.status != \"active\":\n        # A suspended account with a live token is exactly the case suspension\n        # exists for, and the token stays valid until it expires.\n        raise InvError(\n            AUTH_INVALID_CREDENTIAL,\n            \"credential is not recognised\",\n",
+      "excerptSHA256": "559bb7050df5e0db070de88dfe889a283db419506e5a0b3efd5746dfd1ed4e3d",
+      "url": "https://github.com/egparadise/SaintVision-Invion/blob/1efea494f026e932360c35ae811b6423d874a2e7/src/saintvision/identity/oidc.py#L167-L185"
+    },
+    {
+      "id": "runtime-role",
+      "ref": "1efea494f026e932360c35ae811b6423d874a2e7",
+      "path": "services/control-plane/src/inv/db.py",
+      "gitBlobSHA1": "2e37b85eb96231e561bc08bf84a1673f9120f80e",
+      "fileSHA256": "38e0d679b442433fd0b775e98411d78dfff2b7d114bbc3c2a52d3a886726022d",
+      "startLine": 174,
+      "endLine": 218,
+      "excerpt": "    @contextmanager\n    def transaction(self, tenant_id: str, *, containment_write=False):\n        tenant = str(UUID(tenant_id))\n        phase_token = _statement_phase.set(\"transaction-pre-placement-lock\")\n        committed = False\n        try:\n            with psycopg.connect(self._dsn, row_factory=dict_row) as conn:\n                # READ COMMITTED is essential: each post-lock statement sees fresh sums.\n                conn.execute(\"SET TRANSACTION ISOLATION LEVEL READ COMMITTED\")\n                role = conn.execute(\"\"\"SELECT r.rolsuper, r.rolbypassrls,\n                    r.oid = n.nspowner AS owns_schema\n                    FROM pg_roles r JOIN pg_namespace n ON n.nspname='inv'\n                    WHERE r.rolname = current_user\"\"\").fetchone()\n                if not role or any(role.values()):\n                    raise DomainError(\n                        \"AUTH-0020\",\n                        \"Runtime must use a non-owner role without RLS bypass\",\n                        500,\n                    )\n                conn.execute(\"SELECT set_config('inv.tenant_id', %s, true)\", (tenant,))\n                conn.execute(\"SET LOCAL lock_timeout = '500ms'\")\n                conn.execute(\"SET LOCAL statement_timeout = '2s'\")\n                observed_conn = (\n                    _ObservedConnection(conn, self.statement_observer)\n                    if self.statement_observer is not None\n                    else conn\n                )\n                epoch = observed_conn.execute(\n                    \"SELECT epoch FROM inv.control_epoch WHERE singleton FOR SHARE\"\n                ).fetchone()\n                if not epoch or str(epoch[\"epoch\"]) != self.recovery_epoch:\n                    raise DomainError(\n                        \"LEASE-0004\", \"Recovery epoch requires operator reconciliation\", 503\n                    )\n                try:\n                    # Tenant barrier precedes every Run/Node/grant lock. Containment\n                    # writers acquire exclusive access directly, never upgrade SHARE.\n                    # No network I/O may run inside this transaction.\n                    gate = observed_conn.execute(\n                        \"SELECT tenant_id FROM inv.tenant_controls WHERE tenant_id=%s FOR \"\n                        + (\"UPDATE\" if containment_write else \"SHARE\"),\n                        (tenant,),\n                    ).fetchone()\n                    if not gate:\n                        raise DomainError(\"AUTH-0060\", \"Tenant containment control unavailable\", 503)\n",
+      "excerptSHA256": "2d89764a8ff342254007013f9906a0a6cc774010663e7c8afe5a5d698eeebc66",
+      "url": "https://github.com/egparadise/SaintVision-Invion/blob/1efea494f026e932360c35ae811b6423d874a2e7/services/control-plane/src/inv/db.py#L174-L218"
+    },
+    {
+      "id": "workspace-config",
+      "ref": "1efea494f026e932360c35ae811b6423d874a2e7",
+      "path": "services/control-plane/src/inv/workspace_config.py",
+      "gitBlobSHA1": "742242e299c3bf1fc747bcf160f59f4aa7505a69",
+      "fileSHA256": "7b77a716b4fb56e951fce110d347ac41f16d1d80d4722ba9d1410a1869b351cb",
+      "startLine": 13,
+      "endLine": 66,
+      "excerpt": "def configured_workspace(database, tenant, settings):\n    settings = dict(settings)\n    destinations = settings.pop(\"destinations\", [])\n    git_repositories = settings.pop(\"gitRepositories\", [])\n    snapshot_object_root = settings.pop(\"snapshotObjectRoot\", None)\n    restore_root = settings.pop(\"restoreRoot\", None)\n    if (snapshot_object_root is None) != (restore_root is None):\n        raise ValueError(\"Snapshot object and restore roots must be configured together\")\n    if not isinstance(git_repositories, list) or len(git_repositories) > 16:\n        raise ValueError(\"At most sixteen explicit Git repositories are allowed\")\n    if not isinstance(destinations, list) or len(destinations) > 4:\n        raise ValueError(\"At most five trusted Workspace Nodes including the default are allowed\")\n    if set(settings) != {\n        \"workingRoot\",\n        \"nodeId\",\n        \"resources\",\n        \"profile\",\n        \"policyVersion\",\n        \"signingKeyFile\",\n        \"tls\",\n    }:\n        raise ValueError(\"Explicit restricted Workspace configuration required\")\n    profile = dict(settings[\"profile\"])\n    profile[\"images\"] = frozenset(profile[\"images\"])\n    profile[\"executables\"] = frozenset(profile[\"executables\"])\n    signing_key = load_pem_private_key(\n        Path(private_key(settings[\"signingKeyFile\"])).read_bytes(),\n        password=None,\n    )\n    if not isinstance(signing_key, Ed25519PrivateKey):\n        raise ValueError(\"Ed25519 queue signing key required\")\n    result = WorkspaceAPI(\n        database,\n        WorkingGenerations(settings[\"workingRoot\"]),\n        RestrictedWorkspaceRuntime(\n            database,\n            profile=SandboxProfile(**profile),\n            node=NodePrincipal(tenant, settings[\"nodeId\"]),\n            resources=settings[\"resources\"],\n            signing_key=signing_key,\n            policy_version=settings[\"policyVersion\"],\n            client=NodeTLSClient(**settings[\"tls\"]),\n        ),\n    )\n    result.recovery = None\n    if snapshot_object_root is not None:\n        from .object_store import LocalObjects\n        from .snapshots import SnapshotStore\n        from .workspace_recovery import WorkspaceRecovery\n\n        result.recovery = WorkspaceRecovery(\n            SnapshotStore(database, LocalObjects(snapshot_object_root)),\n            RestoreGenerations(restore_root),\n        )\n",
+      "excerptSHA256": "961cdbff634e2875f110afe01ea88475940fe7e91b6ec2fa330c1199b7007d4a",
+      "url": "https://github.com/egparadise/SaintVision-Invion/blob/1efea494f026e932360c35ae811b6423d874a2e7/services/control-plane/src/inv/workspace_config.py#L13-L66"
+    },
+    {
+      "id": "workspace-runtime",
+      "ref": "1efea494f026e932360c35ae811b6423d874a2e7",
+      "path": "services/control-plane/src/inv/workspace_api.py",
+      "gitBlobSHA1": "c19e595bff7ade5637e102da17013731db0a8132",
+      "fileSHA256": "c0e67146d6a3152426876f86fafa35363ec49c48fedf66e9e6bce4c1394050e2",
+      "startLine": 31,
+      "endLine": 91,
+      "excerpt": "class RestrictedWorkspaceRuntime:\n    \"\"\"Operator-approved L2 profile, two distinct votes, one pinned Linux Node.\n\n    The profile is an operator trust assertion about the installed restricted agent.\n    A fresh nonce/mTLS probe confirms its identity/epoch/profile; it does not certify\n    arbitrary OS/GPU/BuildKit capabilities. Node runtime enforces the launch again.\n    \"\"\"\n\n    def __init__(self, database, *, profile, node, resources, signing_key, policy_version, client):\n        if set(resources) != {\"cpu\", \"memory\"} or not policy_version:\n            raise ValueError(\"Explicit CPU/memory allocation and policy version required\")\n        for resource in resources.values():\n            validate_contract(\"ResourceId\", resource)\n        if len(set(resources.values())) != 2:\n            raise ValueError(\"Distinct CPU and memory resources required\")\n        self.db, self.profile, self.node = database, profile, node\n        self.resources, self.signing_key = dict(resources), signing_key\n        self.policy_version, self.client = policy_version, client\n        self.destinations = {}\n\n    def for_workload(self, workload):\n        target = workload.get(\"targetNodeId\", self.node.node_id)\n        if target == self.node.node_id:\n            return self\n        destination = self.destinations.get(target)\n        if destination is None or destination.node.tenant_id != self.node.tenant_id:\n            raise DomainError(\"AUTH-0030\", \"Target Node is not configured for this Workspace\", 403)\n        return destination\n\n    def policy(self, principal, workload, *, for_approval=False):\n        if (\n            principal.tenant_id != self.node.tenant_id\n            or workload[\"tenantId\"] != principal.tenant_id\n        ):\n            raise DomainError(\"AUTH-0011\", \"Configured Workspace tenant differs\", 403)\n        intent = deepcopy(workload)\n        intent.pop(\"workspaceResume\", None)\n        intent.pop(\"workspaceStart\", None)\n        if intent.pop(\"terminal\", None) is not None and (\n            not self.profile.allow_terminal\n            or sum(name in workload for name in (\"workspaceResume\", \"workspaceStart\")) != 1\n        ):\n            raise DomainError(\"SANDBOX-0002\", \"Explicit frozen terminal policy required\", 403)\n        compile_launch(intent, self.profile)\n        now = datetime.now(timezone.utc)\n        return CurrentPolicy(\n            self.policy_version,\n            now,\n            {\n                \"decisionId\": str(uuid4()),\n                \"tenantId\": principal.tenant_id,\n                \"projectId\": workload[\"projectId\"],\n                \"subjectId\": principal.subject_id,\n                \"effect\": \"require_approval\",\n                \"riskLevel\": \"L2\",\n                \"actionDigest\": action_digest(workload),\n                \"expiresAt\": (now + timedelta(seconds=600 if for_approval else 30)).isoformat(),\n                \"requiredApprovals\": 2,\n                \"approvedBy\": [],\n            },\n        )\n",
+      "excerptSHA256": "108b68232e6120d63838905e57763e0d913cf9d6a1b0d320021403a9c893253e",
+      "url": "https://github.com/egparadise/SaintVision-Invion/blob/1efea494f026e932360c35ae811b6423d874a2e7/services/control-plane/src/inv/workspace_api.py#L31-L91"
+    },
+    {
+      "id": "sandbox-profile",
+      "ref": "1efea494f026e932360c35ae811b6423d874a2e7",
+      "path": "services/control-plane/src/inv/sandbox.py",
+      "gitBlobSHA1": "4a94f848a19372b3dade38fcfd39db74f4905070",
+      "fileSHA256": "49db6097d9dce4001f16c246adc9256deaa8fe4d1abcab82263351af55638a0f",
+      "startLine": 31,
+      "endLine": 77,
+      "excerpt": "\n@dataclass(frozen=True)\nclass SandboxProfile:\n    version: str\n    images: frozenset[str]\n    executables: frozenset[str]\n    max_cpu_millis: int = 1000\n    max_memory_bytes: int = 536870912\n    max_timeout_seconds: int = 30\n    allow_terminal: bool = False\n\n    def __post_init__(self):\n        if type(self.allow_terminal) is not bool:\n            raise ValueError(\"Explicit terminal policy flag required\")\n        if not isinstance(self.version, str) or not 1 <= len(self.version) <= 200:\n            raise ValueError(\"Versioned sandbox configuration required\")\n        if (\n            type(self.images) is not frozenset\n            or type(self.executables) is not frozenset\n            or not self.images\n            or not self.executables\n        ):\n            raise ValueError(\"Immutable nonempty sandbox allowlists required\")\n        if any(\n            not isinstance(image, str) or re.fullmatch(r\"sha256:[0-9a-f]{64}\", image) is None\n            for image in self.images\n        ):\n            raise ValueError(\"Pinned image digests required\")\n        if any(\n            not isinstance(exe, str)\n            or not exe.startswith(\"/\")\n            or str(PurePosixPath(exe)) != exe\n            or any(part in {\".\", \"..\", \"\"} for part in exe.split(\"/\")[1:])\n            or \"\\\\\" in exe\n            or \"\\x00\" in exe\n            for exe in self.executables\n        ):\n            raise ValueError(\"Canonical absolute container executable paths required\")\n        if any(\n            type(n) is not int or not 1 <= n <= 9007199254740991\n            for n in [\n                self.max_cpu_millis,\n                self.max_memory_bytes,\n                self.max_timeout_seconds,\n            ]\n        ):\n            raise ValueError(\"Positive sandbox limits required\")\n",
+      "excerptSHA256": "ee7f298a5006331e65e664eb47ddc56cbe687e79263df1a831c0028b04946e49",
+      "url": "https://github.com/egparadise/SaintVision-Invion/blob/1efea494f026e932360c35ae811b6423d874a2e7/services/control-plane/src/inv/sandbox.py#L31-L77"
+    },
+    {
+      "id": "workspace-private-root",
+      "ref": "1efea494f026e932360c35ae811b6423d874a2e7",
+      "path": "services/control-plane/src/inv/workspace_files.py",
+      "gitBlobSHA1": "0f6cba603bd0b1527679e51423d988a4f3e6c05c",
+      "fileSHA256": "bbc84661b234ff8ed58a2c0e65969b46d6426aa9f4f81a96a871cfba985d3e9d",
+      "startLine": 134,
+      "endLine": 177,
+      "excerpt": "class PrivateTree:\n    def __init__(self, root):\n        if sys.platform != \"linux\":\n            raise DomainError(\"STORE-0001\", \"Workspace handle provider requires Linux\", 503)\n        self.root = Path(root)\n        if not self.root.is_absolute():\n            raise ValueError(\"Explicit private Workspace root required\")\n        fd = self._open()\n        try:\n            info = os.fstat(fd)\n            self.identity = info.st_dev, info.st_ino\n        finally:\n            os.close(fd)\n\n    def _open(self):\n        fd = os.open(self.root, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW)\n        try:\n            self.check(os.fstat(fd), directory=True)\n            return fd\n        except BaseException:\n            os.close(fd)\n            raise\n\n    @staticmethod\n    def check(info, *, directory=False, device=None):\n        if (\n            not (stat.S_ISDIR(info.st_mode) if directory else stat.S_ISREG(info.st_mode))\n            or info.st_uid != os.geteuid()\n            or info.st_mode & 0o7077\n            or (not directory and info.st_nlink != 1)\n            or (device is not None and info.st_dev != device)\n        ):\n            raise DomainError(\"SEC-0021\", \"Unsafe Workspace handle\", 403)\n\n    @contextmanager\n    def locked(self):\n        import fcntl\n\n        fd = self._open()\n        try:\n            info = os.fstat(fd)\n            if (info.st_dev, info.st_ino) != self.identity:\n                raise DomainError(\"SEC-0021\", \"Workspace root identity changed\", 403)\n            fcntl.flock(fd, fcntl.LOCK_EX)\n",
+      "excerptSHA256": "1c9374b1c56ed329999a06c164fe6d8736b0a7cd3f4246c6890174661de20752",
+      "url": "https://github.com/egparadise/SaintVision-Invion/blob/1efea494f026e932360c35ae811b6423d874a2e7/services/control-plane/src/inv/workspace_files.py#L134-L177"
+    },
+    {
+      "id": "object-private-root",
+      "ref": "1efea494f026e932360c35ae811b6423d874a2e7",
+      "path": "services/control-plane/src/inv/object_store.py",
+      "gitBlobSHA1": "faee8078553844d2e58ace9828d2e4597811faac",
+      "fileSHA256": "1993835b87455aa806f0cc7b0c33fbbc3cce4bf68124a180d25c1c1963da1c2d",
+      "startLine": 94,
+      "endLine": 135,
+      "excerpt": "class LocalObjects:\n    def __init__(self, root):\n        if sys.platform != \"linux\":\n            raise DomainError(\"STORE-0001\", \"Local provider requires Linux handle checks\", 503)\n        self.root = Path(root)\n        if not self.root.is_absolute():\n            raise ValueError(\"Explicit absolute object directory required\")\n        fd = self._open()\n        try:\n            try:\n                info = os.fstat(fd)\n            except OSError as error:\n                raise _local_provider_unavailable(error) from error\n            self.identity = (info.st_dev, info.st_ino)\n        finally:\n            active_error = sys.exc_info()[0] is not None\n            try:\n                os.close(fd)\n            except OSError as error:\n                if not active_error:\n                    raise _local_provider_unavailable(error) from error\n\n    def _open(self):\n        try:\n            fd = os.open(self.root, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW)\n        except OSError as error:\n            raise _local_provider_unavailable(error) from error\n        try:\n            info = os.fstat(fd)\n        except OSError as error:\n            try:\n                os.close(fd)\n            except OSError:\n                # Preserve the first provider failure; neither host detail is public.\n                pass\n            raise _local_provider_unavailable(error) from error\n        if info.st_uid != os.geteuid() or info.st_mode & 0o077:\n            try:\n                os.close(fd)\n            except OSError:\n                pass\n            raise DomainError(\"STORE-0001\", \"Private service-owned directory required\", 503)\n",
+      "excerptSHA256": "d2edb6b756c9a2da54c7fa5a201d68014612314ef2279a206de2f05d8cd62dc5",
+      "url": "https://github.com/egparadise/SaintVision-Invion/blob/1efea494f026e932360c35ae811b6423d874a2e7/services/control-plane/src/inv/object_store.py#L94-L135"
+    },
+    {
+      "id": "worker-provider",
+      "ref": "1efea494f026e932360c35ae811b6423d874a2e7",
+      "path": "services/control-plane/src/inv/worker.py",
+      "gitBlobSHA1": "c843cd00446c02d1f2b7f94c9eb447f419564e93",
+      "fileSHA256": "3010b2409bb285de960eb322792b1062ed066275307c9bea53a2cc767b65d4e3",
+      "startLine": 78,
+      "endLine": 108,
+      "excerpt": "def _output_provider(config):\n    \"\"\"Select exactly one legacy-local or canonical API-configured provider.\"\"\"\n\n    from .object_store import LocalObjects\n\n    local = LocalObjects(config[\"outputRoot\"]) if config.get(\"outputRoot\") else None\n    api_config_path = os.environ.get(\"INV_API_CONFIG\")\n    if not api_config_path:\n        return local\n    api_settings = strict_object(trusted_file(api_config_path))\n    readiness = api_settings.get(\"configurationReadiness\")\n    from .configuration_readiness import configured_s01_readiness\n\n    # Validate the same strict nested surface even when this worker ultimately\n    # remains on the rollout-compatible Local provider.\n    configured_s01_readiness(readiness)\n    remote = None\n    if isinstance(readiness, dict) and \"objectStore\" in readiness:\n        from .object_store_config import (\n            configured_object_store,\n            parse_object_store_configuration,\n            unresolved_object_store,\n        )\n\n        parsed = parse_object_store_configuration(readiness[\"objectStore\"])\n        if unresolved_object_store(parsed):\n            raise ValueError(\"ObjectStore configuration is not ready\")\n        remote = configured_object_store(parsed)\n    if local is not None and remote is not None:\n        raise ValueError(\"Duplicate legacy and objectStore providers\")\n    return remote or local\n",
+      "excerptSHA256": "61772bf2426ae1cdba9196b7d255874e03135130a6ba00673281eb3075615115",
+      "url": "https://github.com/egparadise/SaintVision-Invion/blob/1efea494f026e932360c35ae811b6423d874a2e7/services/control-plane/src/inv/worker.py#L78-L108"
+    },
+    {
+      "id": "worker-start",
+      "ref": "1efea494f026e932360c35ae811b6423d874a2e7",
+      "path": "services/control-plane/src/inv/worker.py",
+      "gitBlobSHA1": "c843cd00446c02d1f2b7f94c9eb447f419564e93",
+      "fileSHA256": "3010b2409bb285de960eb322792b1062ed066275307c9bea53a2cc767b65d4e3",
+      "startLine": 111,
+      "endLine": 146,
+      "excerpt": "def main():\n    parser = argparse.ArgumentParser(description=__doc__)\n    parser.add_argument(\"--once\", action=\"store_true\")\n    args = parser.parse_args()\n    try:\n        config = validated_worker_configuration(trusted_file(os.environ[\"INV_WORKER_CONFIG\"]))\n        tenant = config[\"tenantId\"]\n        db = Database(\n            os.environ[\"INV_RUNTIME_DSN\"],\n            recovery_epoch=os.environ[\"INV_RECOVERY_EPOCH\"],\n        )\n        delivery = NodeDelivery(db, NodeTLSClient(**config[\"tls\"]))\n        output_provider = _output_provider(config)\n        # Migrations and tenant/epoch privileges are checked before serving work.\n        with db.transaction(tenant) as conn:\n            conn.execute(\"SELECT command_id FROM inv.execution_deliveries LIMIT 0\")\n        build_runtime = None\n        if os.environ.get(PRODUCT_ENABLE_SETTING) == PRODUCT_ENABLE_VALUE:\n            from .build_product_runtime import configured_tenant_product_runtime\n\n            if \"buildExecution\" not in config:\n                raise ValueError(\"Build execution configuration unavailable\")\n            build_runtime = configured_tenant_product_runtime(\n                db,\n                tenant,\n                config[\"buildExecution\"],\n                tls=config[\"tls\"],\n                environment=os.environ,\n            )\n    except Exception:\n        raise SystemExit(\"Explicit delivery worker configuration unavailable\") from None\n    worker = DeliveryWorker(db, delivery, output_provider=output_provider)\n    if args.once:\n        try:\n            if build_runtime is not None:\n                build_runtime.once(tenant)\n",
+      "excerptSHA256": "0cd6df3fd4095a3b4535dffcfa4b7f8d1f0e314e30a42207881c00be5d32cb12",
+      "url": "https://github.com/egparadise/SaintVision-Invion/blob/1efea494f026e932360c35ae811b6423d874a2e7/services/control-plane/src/inv/worker.py#L111-L146"
+    },
+    {
+      "id": "output-provider-required",
+      "ref": "1efea494f026e932360c35ae811b6423d874a2e7",
+      "path": "services/control-plane/src/inv/output_ingestion.py",
+      "gitBlobSHA1": "35aa3eca7be47a063b0511e0cbead15423c842dd",
+      "fileSHA256": "e954e1ef8dcae97756a50428af66c9a328e4d362f1aee7d630588431d09b1308",
+      "startLine": 102,
+      "endLine": 152,
+      "excerpt": "            if (\n                not receipt[\"processStarted\"]\n                or receipt[\"exitCode\"] != 0\n                or receipt[\"reason\"] != \"exited\"\n                or job[\"attempts\"] >= 3\n            ):\n                RunStore(self.db)._transition(conn, tenant, run, \"failed\", run[\"version\"])\n                conn.execute(\n                    \"UPDATE inv.output_ingestions SET finished=true,token=NULL WHERE command_id=%s\",\n                    (command,),\n                )\n                event(\n                    conn,\n                    tenant,\n                    run[\"run_id\"],\n                    \"inv.execution.failed\",\n                    {\n                        \"commandId\": command,\n                        \"reason\": (\n                            \"physical_failure\"\n                            if job[\"attempts\"] < 3\n                            else \"output_retries_exhausted\"\n                        ),\n                    },\n                )\n                return \"failed\"\n            if self.provider is None:\n                return \"idle\"\n            token = str(uuid4())\n            conn.execute(\n                \"UPDATE inv.output_ingestions SET attempts=attempts+1,token=%s,next_attempt_at=clock_timestamp()+interval '30 seconds' WHERE command_id=%s\",\n                (token, command),\n            )\n            execution = ResultStore._execution(conn, run, command)\n            delivery = conn.execute(\n                \"SELECT envelope FROM inv.execution_deliveries WHERE command_id=%s\", (command,)\n            ).fetchone()\n            launch = (\n                strict_json(base64.b64decode(delivery[\"envelope\"][\"payload\"]))[\"launch\"]\n                if delivery\n                else {}\n            )\n        error = None\n        try:\n            data = output_bytes(receipt)\n            oid = str(uuid5(NAMESPACE_URL, \"inv.output:\" + tenant + \":\" + command))\n            store = SnapshotStore(self.db, self.provider)\n            store.begin(tenant, run[\"project_id\"], oid, receipt[\"output\"][\"sha256\"], len(data))\n            if store.status(tenant, run[\"project_id\"], oid)[\"state\"] == \"uploading\":\n                store.put_part(tenant, run[\"project_id\"], oid, 0, data)\n            store.finalize(tenant, run[\"project_id\"], oid)\n",
+      "excerptSHA256": "d377239c74cee17ff506bfa68be4d7c1bdde29ffe3732162a066026759a454da",
+      "url": "https://github.com/egparadise/SaintVision-Invion/blob/1efea494f026e932360c35ae811b6423d874a2e7/services/control-plane/src/inv/output_ingestion.py#L102-L152"
+    },
+    {
+      "id": "result-commit",
+      "ref": "1efea494f026e932360c35ae811b6423d874a2e7",
+      "path": "services/control-plane/src/inv/output_ingestion.py",
+      "gitBlobSHA1": "35aa3eca7be47a063b0511e0cbead15423c842dd",
+      "fileSHA256": "e954e1ef8dcae97756a50428af66c9a328e4d362f1aee7d630588431d09b1308",
+      "startLine": 168,
+      "endLine": 194,
+      "excerpt": "            evidence = {\n                \"evidenceId\": evidence_id(command),\n                \"tenantId\": tenant,\n                \"runId\": run[\"run_id\"],\n                \"traceId\": hashlib.sha256((\"inv.trace:\" + command).encode()).hexdigest()[:32],\n                \"timestamp\": candidate[\"recorded_at\"].isoformat(),\n                \"actorId\": \"node-output-verifier:v1\",\n                \"action\": \"verify-process-output\",\n                \"policyDecisionId\": execution[\"policy_decision_id\"],\n                \"inputSha256\": execution[\"action_digest\"],\n                \"outputSha256\": receipt[\"output\"][\"sha256\"],\n                \"result\": \"succeeded\",\n            }\n            results = ResultStore(self.db, self.provider)\n            results.prepare(\n                tenant,\n                run[\"project_id\"],\n                run[\"run_id\"],\n                command,\n                oid,\n                evidence,\n                proofs=execution[\"proofs\"],\n                receipt_bound=True,\n            )\n            results.complete(\n                tenant, run[\"project_id\"], run[\"run_id\"], command, expected_version=run[\"version\"]\n            )\n",
+      "excerptSHA256": "5831713023685d4f299b453e955fb44caf567ab8c5f5168a075c0d387b67696b",
+      "url": "https://github.com/egparadise/SaintVision-Invion/blob/1efea494f026e932360c35ae811b6423d874a2e7/services/control-plane/src/inv/output_ingestion.py#L168-L194"
+    },
+    {
+      "id": "first-start-binding",
+      "ref": "1efea494f026e932360c35ae811b6423d874a2e7",
+      "path": "services/control-plane/src/inv/workspace_start.py",
+      "gitBlobSHA1": "f1d5d499b25930c1b00f7e891a9cf0aa81e366fe",
+      "fileSHA256": "53318bfad2f010340157485760a51e16b890fdc9ec00c145df6e409350f69cc5",
+      "startLine": 87,
+      "endLine": 174,
+      "excerpt": "    def _scope(\n        self,\n        conn,\n        principal,\n        project,\n        run_id,\n        workload,\n        *,\n        required=\"can_request\",\n        current_intent=True,\n    ):\n        run = lock_run(conn, run_id, project)\n        self.control.grant(conn, principal, project, required)\n        linked = conn.execute(\n            \"SELECT 1 FROM inv.business_projects WHERE project_id=%s\", (project,)\n        ).fetchone()\n        if linked:\n            # Business service owns creation of public metadata and the mapping.\n            # Both authorities must agree; a missing mapping is never a fallback.\n            run, _, current = business_scope(conn, self.db, principal, project, run_id, required)\n            intent = deepcopy(workload)\n            intent.pop(\"workspaceStart\", None)\n            if current_intent and (\n                current[\"status\"] != \"ready\"\n                or current[\"workspace_id\"] != intent[\"workspaceId\"]\n                or current[\"spec\"] != intent\n                or current[\"spec_sha256\"] != digest(intent)\n            ):\n                raise DomainError(\"AUTH-0045\", \"Current business Workspace intent required\", 403)\n        return run, bool(linked)\n\n    def prepare(self, principal, project, run_id, data, key):\n        validate_contract(\"RunId\", run_id)\n        validate_contract(\"WorkspaceStartPrepareInput\", data)\n        workload = deepcopy(data[\"workload\"])\n        if (\n            workload[\"tenantId\"] != principal.tenant_id\n            or workload[\"projectId\"] != project\n            or \"workspaceResume\" in workload\n            or \"workspaceStart\" in workload\n            or data[\"targetNodeId\"] != self.runtime.node.node_id\n            or workload.get(\"targetNodeId\", data[\"targetNodeId\"]) != data[\"targetNodeId\"]\n        ):\n            raise DomainError(\"AUTH-0011\", \"First Workspace intent scope differs\", 403)\n        start_id = identity(data[\"startId\"])\n        try:\n            raw = base64.b64decode(data[\"snapshotBase64\"], validate=True)\n            if base64.b64encode(raw).decode() != data[\"snapshotBase64\"]:\n                raise ValueError()\n        except ValueError:\n            raise DomainError(\"VAL-0003\", \"Canonical base64 input required\", 422) from None\n        bounded_snapshot(raw, workload[\"workspaceId\"])\n        payload = {\"runId\": run_id, **data}\n        # Ledger stores a request digest, not uploaded bytes or untrusted logs.\n        with self.db.transaction(principal.tenant_id) as conn:\n            prior = self.ledger._ledger(\n                conn, principal, project, \"workspace.start.prepare\", key, payload\n            )\n            run, linked = self._scope(conn, principal, project, run_id, workload)\n            if prior is not None:\n                validate_contract(\"WorkspaceStartPrepareResult\", prior)\n                return prior\n            require_execution(conn)\n            independent_run(conn, run_id)\n            self.workspace._node_membership(conn, project)\n            if (\n                run[\"state\"] != \"draft\"\n                or run[\"attempt\"] != 0\n                or run[\"version\"] != data[\"expectedVersion\"]\n            ):\n                raise DomainError(\"GRAPH-0003\", \"First execution requires current draft Run\")\n            if conn.execute(\n                \"SELECT 1 FROM inv.resource_leases WHERE run_id=%s AND released_at IS NULL\",\n                (run_id,),\n            ).fetchone():\n                raise DomainError(\"LEASE-0003\", \"First execution cannot inherit reservations\")\n            if conn.execute(\n                \"SELECT 1 FROM inv.workspace_starts WHERE start_id=%s\", (start_id,)\n            ).fetchone():\n                raise DomainError(\"IDEM-0001\", \"First input identity is already used\")\n            workload[\"workspaceStart\"] = dict(\n                startId=start_id,\n                stepId=data[\"stepId\"],\n                inputSha256=hashlib.sha256(raw).hexdigest(),\n                inputSizeBytes=len(raw),\n                **self._runtime_binding(),\n            )\n            policy = self.runtime.policy(principal, workload, for_approval=True)\n",
+      "excerptSHA256": "2cde8278fa39b6faf31c43fbe20bb5c631890a03eb87ca248342a4f24d7b2bec",
+      "url": "https://github.com/egparadise/SaintVision-Invion/blob/1efea494f026e932360c35ae811b6423d874a2e7/services/control-plane/src/inv/workspace_start.py#L87-L174"
+    },
+    {
+      "id": "first-start-enqueue",
+      "ref": "1efea494f026e932360c35ae811b6423d874a2e7",
+      "path": "services/control-plane/src/inv/workspace_start.py",
+      "gitBlobSHA1": "f1d5d499b25930c1b00f7e891a9cf0aa81e366fe",
+      "fileSHA256": "53318bfad2f010340157485760a51e16b890fdc9ec00c145df6e409350f69cc5",
+      "startLine": 274,
+      "endLine": 322,
+      "excerpt": "    def enqueue(self, principal, project, run_id, data, key):\n        validate_contract(\"RunId\", run_id)\n        validate_contract(\"WorkspaceStartEnqueueInput\", data)\n        with self.db.transaction(principal.tenant_id) as conn:\n            prior, frozen, _, _ = self._preflight(conn, principal, project, run_id, data, key)\n            if prior is not None:\n                validate_contract(\"WorkspaceStartEnqueueResult\", prior)\n                return prior\n            self.workspace._node_membership(conn, project)\n        capabilities = self.runtime.observe()\n        policy = self.runtime.policy(principal, frozen[\"workload\"])\n        with self.db.transaction(principal.tenant_id) as conn:\n            prior, frozen, run, linked = self._preflight(\n                conn, principal, project, run_id, data, key\n            )\n            if prior is not None:\n                validate_contract(\"WorkspaceStartEnqueueResult\", prior)\n                return prior\n            if run[\"version\"] != data[\"expectedVersion\"] or run[\"state\"] != \"awaiting_approval\":\n                raise DomainError(\"GRAPH-0003\", \"Current approved Run version required\")\n            approval = conn.execute(\n                \"SELECT run_id FROM inv.approval_requests WHERE approval_id=%s FOR SHARE\",\n                (data[\"approvalId\"],),\n            ).fetchone()\n            if not approval or approval[\"run_id\"] != run_id:\n                raise DomainError(\"AUTH-0011\", \"Approval Run differs\", 403)\n            bound = BoundDatabase(self.db, principal.tenant_id, conn)\n            bound.business_handoff = linked\n            bound.workspace_admission = True\n            command = ApprovalStore(bound).dispatch(\n                principal,\n                project,\n                data[\"approvalId\"],\n                frozen[\"workload\"],\n                key=\"workspace-start:\" + data[\"startId\"],\n            )\n            WorkspaceResume(bound, self.workspace.working).enqueue(\n                self.runtime.node,\n                command,\n                frozen[\"workload\"],\n                self.runtime.allocations(frozen[\"workload\"]),\n                self.runtime.profile,\n                policy=policy,\n                runtime=capabilities,\n                signing_key=self.runtime.signing_key,\n                key=\"workspace-start:\" + data[\"startId\"],\n            )\n            self.workspace._node_membership(conn, project, lock=True)\n            result = dict(\n",
+      "excerptSHA256": "3f638466026f965cb6ad07ff99388e2568f5b12e0e1fa1f71f067eada6391fd9",
+      "url": "https://github.com/egparadise/SaintVision-Invion/blob/1efea494f026e932360c35ae811b6423d874a2e7/services/control-plane/src/inv/workspace_start.py#L274-L322"
+    },
+    {
+      "id": "two-votes",
+      "ref": "1efea494f026e932360c35ae811b6423d874a2e7",
+      "path": "services/control-plane/src/inv/approvals.py",
+      "gitBlobSHA1": "ae879c6c1b13d892b93e9b593aa7fc2a8a83760e",
+      "fileSHA256": "89a6cd475351409c83f568dc9f3cb514b4c9bff00a88e5e4ce8a25a384c73523",
+      "startLine": 348,
+      "endLine": 447,
+      "excerpt": "    def challenge(self, principal, project_id, approval_id):\n        with self.db.transaction(principal.tenant_id) as conn:\n            run, row = self._locked(conn, approval_id, project_id)\n            self._grant(conn, project_id, principal.subject_id, \"can_approve\")\n            self._current(conn, run, row, {\"pending\"})\n            if (\n                row[\"requester_id\"] == principal.subject_id\n                or conn.execute(\n                    \"SELECT 1 FROM inv.approval_votes WHERE approval_id=%s AND actor_id=%s\",\n                    (approval_id, principal.subject_id),\n                ).fetchone()\n            ):\n                raise DomainError(\"AUTH-0033\", \"A distinct approver is required\", 403)\n            nonce = secrets.token_urlsafe(32)\n            nonce_hash = hashlib.sha256(nonce.encode()).hexdigest()\n            result = conn.execute(\n                \"\"\"INSERT INTO inv.approval_nonces(tenant_id,approval_id,actor_id,nonce_hash,expires_at)\n                VALUES(%s,%s,%s,%s,least(%s,clock_timestamp()+interval '30 seconds'))\n                ON CONFLICT(tenant_id,approval_id,actor_id) DO UPDATE SET nonce_hash=excluded.nonce_hash,expires_at=excluded.expires_at,consumed_at=NULL\n                RETURNING expires_at\"\"\",\n                (\n                    principal.tenant_id,\n                    approval_id,\n                    principal.subject_id,\n                    nonce_hash,\n                    row[\"expires_at\"],\n                ),\n            ).fetchone()\n            response = {\n                \"approvalId\": approval_id,\n                \"nonce\": nonce,\n                \"expiresAt\": result[\"expires_at\"].isoformat(),\n            }\n            validate_contract(\"ApprovalChallenge\", response)\n            return response\n\n    def decide(self, principal, project_id, approval_id, decision, nonce, *, action_digest, key):\n        validate_contract(\n            \"ApprovalDecisionInput\",\n            {\"decision\": decision, \"nonce\": nonce, \"actionDigest\": action_digest},\n        )\n        nonce_hash = hashlib.sha256(nonce.encode()).hexdigest()\n        payload = {\n            \"approval\": approval_id,\n            \"decision\": decision,\n            \"nonceHash\": nonce_hash,\n            \"actionDigest\": action_digest,\n        }\n        with self.db.transaction(principal.tenant_id) as conn:\n            prior = self._ledger(conn, principal, project_id, \"approval.decide\", key, payload)\n            run, row = self._locked(conn, approval_id, project_id)\n            self._grant(conn, project_id, principal.subject_id, \"can_approve\")\n            if prior is not None:\n                validate_contract(\"ApprovalView\", prior)\n                return prior\n            self._current(conn, run, row, {\"pending\"})\n            if decision == \"approve\":\n                self._review_snapshot(conn, row)\n            if principal.subject_id == row[\"requester_id\"] or action_digest != row[\"action_digest\"]:\n                raise DomainError(\"AUTH-0033\", \"Approval actor or action digest is invalid\", 403)\n            if conn.execute(\n                \"SELECT 1 FROM inv.approval_votes WHERE approval_id=%s AND actor_id=%s\",\n                (approval_id, principal.subject_id),\n            ).fetchone():\n                raise DomainError(\"AUTH-0033\", \"Actor has already decided\", 403)\n            challenge = conn.execute(\n                \"\"\"SELECT *,expires_at>clock_timestamp() AS fresh FROM inv.approval_nonces\n                WHERE approval_id=%s AND actor_id=%s FOR UPDATE\"\"\",\n                (approval_id, principal.subject_id),\n            ).fetchone()\n            if (\n                not challenge\n                or not challenge[\"fresh\"]\n                or challenge[\"consumed_at\"] is not None\n                or not hmac.compare_digest(challenge[\"nonce_hash\"], nonce_hash)\n            ):\n                raise DomainError(\"AUTH-0034\", \"Approval challenge is invalid or expired\", 403)\n            conn.execute(\n                \"UPDATE inv.approval_nonces SET consumed_at=clock_timestamp() WHERE approval_id=%s AND actor_id=%s\",\n                (approval_id, principal.subject_id),\n            )\n            conn.execute(\n                \"INSERT INTO inv.approval_votes(tenant_id,approval_id,actor_id,decision,nonce_hash) VALUES(%s,%s,%s,%s,%s)\",\n                (\n                    principal.tenant_id,\n                    approval_id,\n                    principal.subject_id,\n                    decision,\n                    nonce_hash,\n                ),\n            )\n            votes = conn.execute(\n                \"SELECT count(*) AS count FROM inv.approval_votes WHERE approval_id=%s AND decision='approve'\",\n                (approval_id,),\n            ).fetchone()[\"count\"]\n            status = (\n                \"rejected\"\n                if decision == \"reject\"\n                else (\"approved\" if votes >= row[\"required_approvals\"] else \"pending\")\n            )\n",
+      "excerptSHA256": "a61fcc0695386c34b77cfbb6c7b19ea751a73f503133250b71f379318d70458d",
+      "url": "https://github.com/egparadise/SaintVision-Invion/blob/1efea494f026e932360c35ae811b6423d874a2e7/services/control-plane/src/inv/approvals.py#L348-L447"
+    },
+    {
+      "id": "cp-tls",
+      "ref": "1efea494f026e932360c35ae811b6423d874a2e7",
+      "path": "services/control-plane/src/inv/node_transport.py",
+      "gitBlobSHA1": "9f72e566b3eccb73c6210643c9b27d507168c58d",
+      "fileSHA256": "3559bbcdf9568f8930654d860b0edd980eca71c835cde3fe7380a69dd56e18f4",
+      "startLine": 39,
+      "endLine": 80,
+      "excerpt": "def private_key(path):\n    p = Path(path)\n    info = p.lstat()\n    if (\n        not stat.S_ISREG(info.st_mode)\n        or (os.name != \"nt\" and info.st_mode & 0o077)\n        or info.st_size > 65536\n    ):\n        raise ValueError()\n    return str(p)\n\n\nclass OneConnection(http.client.HTTPSConnection):\n    _connected_once = False\n\n    def connect(self):\n        if self._connected_once:\n            raise OSError(\"automatic reconnect prohibited\")\n        self._connected_once = True\n        super().connect()\n\n\nclass NodeTLSClient:\n    def __init__(self, *, ca_file, certificate_file, key_file, timeout=40):\n        if type(timeout) not in (int, float) or not 0.1 <= timeout <= 40:\n            raise DomainError(\"NODE-0031\", \"Invalid Node transport timeout\", 422)\n        try:\n            # Build explicit trust without SSLKEYLOGFILE/system trust side effects.\n            self.context = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)\n            self.context.load_verify_locations(cafile=str(ca_file))\n            self.context.minimum_version = ssl.TLSVersion.TLSv1_3\n            self.context.verify_flags |= ssl.VERIFY_X509_STRICT\n            self.context.verify_flags &= ~ssl.VERIFY_X509_PARTIAL_CHAIN\n            self.context.load_cert_chain(str(certificate_file), private_key(key_file))\n        except (OSError, ValueError, ssl.SSLError):\n            raise DomainError(\n                \"NODE-0031\", \"Explicit Node TLS credentials unavailable\", 503\n            ) from None\n        self.timeout = timeout\n\n    def exchange(self, channel, permit, *, observation_only=False, cancel_only=False):\n        path = (\n",
+      "excerptSHA256": "7c9611ea060cec7c9913f35012e8478157108dc3409a94da4c35eb7158662d50",
+      "url": "https://github.com/egparadise/SaintVision-Invion/blob/1efea494f026e932360c35ae811b6423d874a2e7/services/control-plane/src/inv/node_transport.py#L39-L80"
+    },
+    {
+      "id": "node-key",
+      "ref": "1efea494f026e932360c35ae811b6423d874a2e7",
+      "path": "services/node-agent/cmd/inv-node/main.go",
+      "gitBlobSHA1": "a966629ee7db6116535c51baee0f956e2fd384f8",
+      "fileSHA256": "3471f3fa13ea9ac4d27fd27ca04747a1adf2348692f846484c39f28755c23a9a",
+      "startLine": 72,
+      "endLine": 108,
+      "excerpt": "\tconfig.MaxCPU = 1000\n\tconfig.MaxMemory = 512 * 1024 * 1024\n\tconfig.MaxTimeout = 30 * time.Second\n\tif state == \"\" || config.NodeID == \"\" || config.TenantID == \"\" || config.Epoch == \"\" || config.Profile == \"\" || config.Image == \"\" || config.Executable == \"\" {\n\t\treturn fmt.Errorf(\"NODE-0005: explicit local configuration required\")\n\t}\n\tpublic, err := transport.SafeFile(key, false)\n\tif err != nil || len(public) != ed25519.PublicKeySize {\n\t\treturn fmt.Errorf(\"NODE-0005: pinned public key unavailable\")\n\t}\n\tconfig.PublicKey = ed25519.PublicKey(public)\n\tjournal, err := node.OpenJournal(state, config)\n\tif err != nil {\n\t\treturn err\n\t}\n\tdefer journal.Close()\n\tengine, err := node.NewDocker(socket)\n\tif err != nil {\n\t\treturn err\n\t}\n\trunner := node.New(config, journal, engine)\n\tctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)\n\tdefer cancel()\n\tif serve {\n\t\tvar objects *transfer.Source\n\t\tif objectRoot != \"\" {\n\t\t\tobjects, err = transfer.Open(objectRoot)\n\t\t\tif err != nil {\n\t\t\t\treturn fmt.Errorf(\"NODE-0043: object directory unavailable\")\n\t\t\t}\n\t\t\tdefer objects.Close()\n\t\t}\n\t\tauthority, err := transport.NewAuthority(config, clientCA, peerPolicy, journal.PinPeerPolicy)\n\t\tif err != nil {\n\t\t\treturn err\n\t\t}\n\t\ttlsConfig, err := authority.TLS(tlsCert, tlsKey)\n",
+      "excerptSHA256": "211df2238d1a2800f1e8ffe9f0ff76a57e7c0f4eddfa07cf678e7bda92478bfe",
+      "url": "https://github.com/egparadise/SaintVision-Invion/blob/1efea494f026e932360c35ae811b6423d874a2e7/services/node-agent/cmd/inv-node/main.go#L72-L108"
+    },
+    {
+      "id": "node-tls-policy",
+      "ref": "1efea494f026e932360c35ae811b6423d874a2e7",
+      "path": "services/node-agent/transport/trust.go",
+      "gitBlobSHA1": "d18f943daf83460265e0ae03a3b5d111ff810600",
+      "fileSHA256": "3b5dd89f9d6bdeb777d81f822688ece6c04b549080f53e8f7487bf70789b20df",
+      "startLine": 67,
+      "endLine": 153,
+      "excerpt": "func (a *Authority) policy() (contracts.NodePeerPolicy, error) {\n\ta.mutex.Lock()\n\tdefer a.mutex.Unlock()\n\tvar policy contracts.NodePeerPolicy\n\traw, err := SafeFile(a.policyPath, false)\n\tif err != nil {\n\t\treturn policy, err\n\t}\n\tif err = wire.Validate(\"NodePeerPolicy\", raw); err != nil {\n\t\treturn policy, err\n\t}\n\tif err = json.Unmarshal(raw, &policy); err != nil {\n\t\treturn policy, err\n\t}\n\tif string(policy.TenantId) != a.config.TenantID || string(policy.NodeId) != a.config.NodeID || policy.RecoveryEpoch != a.config.Epoch {\n\t\treturn policy, errors.New(\"NODE-0041: peer policy scope differs\")\n\t}\n\thash := sha256.Sum256(raw)\n\tif err = a.pin(policy.Version, hex.EncodeToString(hash[:])); err != nil {\n\t\treturn policy, err\n\t}\n\texpiry, err := time.Parse(time.RFC3339Nano, string(policy.ExpiresAt))\n\tnow := time.Now()\n\tif err != nil || !expiry.After(now) || expiry.After(now.Add(7*24*time.Hour)) {\n\t\treturn policy, errors.New(\"NODE-0041: peer policy expired or unbounded\")\n\t}\n\treturn policy, nil\n}\nfunc hasUsage(cert *x509.Certificate, usage x509.ExtKeyUsage) bool {\n\tfor _, actual := range cert.ExtKeyUsage {\n\t\tif actual == usage {\n\t\t\treturn true\n\t\t}\n\t}\n\treturn false\n}\nfunc (a *Authority) Authorize(state *tls.ConnectionState) error {\n\tif state == nil || state.Version < tls.VersionTLS13 || len(state.VerifiedChains) == 0 || len(state.PeerCertificates) == 0 {\n\t\treturn errors.New(\"NODE-0043: mTLS required\")\n\t}\n\tpolicy, err := a.policy()\n\tif err != nil {\n\t\treturn err\n\t}\n\tcert := state.PeerCertificates[0]\n\tintermediate := x509.NewCertPool()\n\tfor _, c := range state.PeerCertificates[1:] {\n\t\tintermediate.AddCert(c)\n\t}\n\t_, err = cert.Verify(x509.VerifyOptions{Roots: a.roots, Intermediates: intermediate, KeyUsages: []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth}, CurrentTime: time.Now()})\n\tif err != nil || cert.IsCA || !hasUsage(cert, x509.ExtKeyUsageClientAuth) || len(cert.URIs) != 1 || cert.URIs[0].String() != ControlIdentity(a.config.TenantID, a.config.Epoch) {\n\t\treturn errors.New(\"NODE-0043: Control Plane certificate rejected\")\n\t}\n\thash := sha256.Sum256(cert.Raw)\n\tfingerprint := hex.EncodeToString(hash[:])\n\tfor _, allowed := range policy.ClientFingerprints {\n\t\tif allowed == fingerprint {\n\t\t\treturn nil\n\t\t}\n\t}\n\treturn errors.New(\"NODE-0043: Control Plane certificate is not enabled\")\n}\nfunc (a *Authority) TLS(certPath, keyPath string) (*tls.Config, error) {\n\tget := func(*tls.ClientHelloInfo) (*tls.Certificate, error) {\n\t\tcertPEM, err := SafeFile(certPath, false)\n\t\tif err != nil {\n\t\t\treturn nil, err\n\t\t}\n\t\tkeyPEM, err := SafeFile(keyPath, true)\n\t\tif err != nil {\n\t\t\treturn nil, err\n\t\t}\n\t\tpair, err := tls.X509KeyPair(certPEM, keyPEM)\n\t\tif err != nil || len(pair.Certificate) == 0 {\n\t\t\treturn nil, errors.New(\"NODE-0042: TLS key pair rejected\")\n\t\t}\n\t\tleaf, err := x509.ParseCertificate(pair.Certificate[0])\n\t\tnow := time.Now()\n\t\tif err != nil || leaf.IsCA || !hasUsage(leaf, x509.ExtKeyUsageServerAuth) || len(leaf.URIs) != 1 || leaf.URIs[0].String() != Identity(a.config.TenantID, a.config.NodeID, a.config.Epoch) || now.Before(leaf.NotBefore) || !now.Before(leaf.NotAfter) {\n\t\t\treturn nil, errors.New(\"NODE-0042: Node server identity rejected\")\n\t\t}\n\t\treturn &pair, nil\n\t}\n\tif _, err := get(nil); err != nil {\n\t\treturn nil, err\n\t}\n\treturn &tls.Config{MinVersion: tls.VersionTLS13, ClientAuth: tls.RequireAndVerifyClientCert, ClientCAs: a.roots, GetCertificate: get, SessionTicketsDisabled: true, NextProtos: []string{\"http/1.1\"}, VerifyConnection: func(s tls.ConnectionState) error { return a.Authorize(&s) }}, nil\n",
+      "excerptSHA256": "eee1d7618467303f53295e121f5131942b069b2f357f9999dfe766ee367825a2",
+      "url": "https://github.com/egparadise/SaintVision-Invion/blob/1efea494f026e932360c35ae811b6423d874a2e7/services/node-agent/transport/trust.go#L67-L153"
+    },
+    {
+      "id": "vite-proxy",
+      "ref": "1efea494f026e932360c35ae811b6423d874a2e7",
+      "path": "apps/web/vite.config.ts",
+      "gitBlobSHA1": "ee576d9b7ce3a36355cf3d01e85997a4c78b102f",
+      "fileSHA256": "fe179b97576f5bf50f01b71f370fcd51d2e451d91a1c1fa895c6097084eef51a",
+      "startLine": 6,
+      "endLine": 22,
+      "excerpt": "export default defineConfig({\n  plugins: [react()],\n  resolve: {\n    alias: {\n      '@': path.resolve(__dirname, './src'),\n    },\n  },\n  server: {\n    port: 3000,\n    host: '0.0.0.0',\n    proxy: {\n      '/v1': {\n        target: process.env.VITE_API_PROXY_TARGET || 'http://127.0.0.1:8080',\n        changeOrigin: true,\n      },\n    },\n  },\n",
+      "excerptSHA256": "4e8199cce5bb815f13d3c76d06bc872e3883a3de87e884355647df1db19de495",
+      "url": "https://github.com/egparadise/SaintVision-Invion/blob/1efea494f026e932360c35ae811b6423d874a2e7/apps/web/vite.config.ts#L6-L22"
+    },
+    {
+      "id": "web-scripts",
+      "ref": "1efea494f026e932360c35ae811b6423d874a2e7",
+      "path": "apps/web/package.json",
+      "gitBlobSHA1": "cd17797c53be54a5967f6d53599734d7f8be4f77",
+      "fileSHA256": "8c67a806bac2ca73d434bab3ee29df21f915bfddbed335c1313b4383e4abf9e7",
+      "startLine": 6,
+      "endLine": 15,
+      "excerpt": "  \"scripts\": {\n    \"dev\": \"vite\",\n    \"build\": \"tsc -b && vite build\",\n    \"preview\": \"vite preview\",\n    \"lint\": \"eslint . --max-warnings 0\",\n    \"test\": \"vitest run\",\n    \"eval:check\": \"vitest run tests/agent-eval-runner.test.ts\",\n    \"contracts:generate\": \"node scripts/api-response-contracts.mjs --write\",\n    \"contracts:check\": \"node scripts/api-response-contracts.mjs --check\"\n  },\n",
+      "excerptSHA256": "9a01ec00fb2b368aa2daa72c5960d1a38b083f5516353ff42ba52f53226c71de",
+      "url": "https://github.com/egparadise/SaintVision-Invion/blob/1efea494f026e932360c35ae811b6423d874a2e7/apps/web/package.json#L6-L15"
+    },
+    {
+      "id": "web-api",
+      "ref": "1efea494f026e932360c35ae811b6423d874a2e7",
+      "path": "apps/web/src/shared/api/client.ts",
+      "gitBlobSHA1": "23d40210f6a0b548b5e27fa3866c848ba7ec076b",
+      "fileSHA256": "7eb126455a47a0a70c61c63224056f008652e3f04227afcb10dd1e8dfc7666be",
+      "startLine": 183,
+      "endLine": 205,
+      "excerpt": "export async function apiClient<T>(endpoint: string, options: RequestOptions = {}): Promise<T> {\n  const traceId = options.traceId && /^[0-9a-f]{32}$/.test(options.traceId)\n    ? options.traceId\n    : generateTraceId();\n  const spanId = generateSpanId();\n  const traceparent = `00-${traceId}-${spanId}-01`;\n\n  const headers = new Headers(options.headers || {});\n  headers.set('traceparent', traceparent);\n  if (!headers.has('Content-Type') && !(options.body instanceof FormData)) {\n    headers.set('Content-Type', 'application/json');\n  }\n  if (inMemoryAuthToken && !headers.has('Authorization')) {\n    headers.set('Authorization', `Bearer ${inMemoryAuthToken}`);\n  }\n  if (options.idempotencyKey && !headers.has('Idempotency-Key')) {\n    headers.set('Idempotency-Key', options.idempotencyKey);\n  }\n\n  const response = await fetch(endpoint, {\n    ...options,\n    headers,\n  });\n",
+      "excerptSHA256": "b94a1d24b7d2533370b39370383e4134c0ee6e65508bf191975e898d6c6f4ff3",
+      "url": "https://github.com/egparadise/SaintVision-Invion/blob/1efea494f026e932360c35ae811b6423d874a2e7/apps/web/src/shared/api/client.ts#L183-L205"
+    },
+    {
+      "id": "web-dispatch",
+      "ref": "1efea494f026e932360c35ae811b6423d874a2e7",
+      "path": "apps/web/src/features/studio/DeveloperStudio.tsx",
+      "gitBlobSHA1": "60970704f523e810c1e8527ab01875883142fe8b",
+      "fileSHA256": "3a58989fea646051adad15f5ab710f4513c63a1952bc2658b20c3961121ab08e",
+      "startLine": 396,
+      "endLine": 457,
+      "excerpt": "  // Dispatch Run execution (Codex P1: zero mock run on failure, complete contract binding)\n  const handleDispatchRun = async () => {\n    setDispatchError(null);\n\n    // Preflight Check: verify target node is schedulable and not observation-only\n    const targetNode = nodes.find((n) => n.id === selectedNodeId);\n    if (targetNode?.observationOnly) {\n      const errMsg = `선택된 노드 '${targetNode.hostname} (${targetNode.id})'는 관측 전용 노드로 원격 실행 프로필이 미설치되어 있습니다. 업무 배치가 거부됩니다.`;\n      setDispatchError(errMsg);\n      setLogs((prev) => [\n        ...prev,\n        { timestamp: new Date().toLocaleTimeString(), level: 'ERROR', message: `[Preflight Rejected] ${errMsg}` },\n      ]);\n      return;\n    }\n\n    setIsExecuting(true);\n    const nowIso = new Date().toLocaleTimeString();\n    setLogs((prev) => [\n      ...prev,\n      { timestamp: nowIso, level: 'INFO', message: `[Dispatch] Launching run for project '${selectedProject.name}' on workspace '${selectedWorkspaceId}'...` },\n    ]);\n\n    try {\n      const res = await apiClient<ControlRunView>(`/v1/projects/${selectedProjectId}/runs`, {\n        method: 'POST',\n        body: JSON.stringify({\n          workspaceId: selectedWorkspaceId,\n          objective: runObjective,\n          requestedBy: currentUser?.id,\n          targetNodeId: selectedNodeId || undefined,\n          entrypoint: activeFile.path,\n          files: files.map((f) => ({ path: f.path, content: f.content, size: f.content.length })),\n          resourceRequests: {\n            requiredCores: reqCores,\n            requiredMemoryBytes: reqMemoryGb * 1024 ** 3,\n            requiresGpu,\n          },\n          riskLevel,\n          requiresApproval: riskLevel !== 'L1',\n          policyReason: riskLevel !== 'L1' ? `거버넌스 위험 등급 ${riskLevel} 정책에 따른 사전 승인 요구 (Rule No. 304)` : undefined,\n        }),\n      });\n\n      if (!res || !res.runId) {\n        throw new Error('서버 응답에 유효한 Run ID가 누락되었습니다.');\n      }\n\n      const newRunId = res.runId;\n      setActiveRunId(newRunId);\n      setLiveRun(observedRun(res));\n      onRefreshRuns?.();\n\n      setLogs((prev) => [\n        ...prev,\n        { timestamp: new Date().toLocaleTimeString(), level: 'SUCCESS', message: `[Created] Run '${newRunId}' registered in state '${res.state}'` },\n        { timestamp: new Date().toLocaleTimeString(), level: 'INFO', message: `[Placement] Bound to node '${selectedNodeId || '(자동 할당)'}' (Headroom & Lease verified)` },\n        { timestamp: new Date().toLocaleTimeString(), level: 'INFO', message: `[Runner] Executing '${activeFile.path}' inside 0600 process isolation sandbox...` },\n      ]);\n\n      // Move to Step 4 only on genuine server success!\n      setCurrentStep(4);\n",
+      "excerptSHA256": "a3bcc85091726c7beb15a919e82627ee9782ce24bbb67324c448075bf122cef9",
+      "url": "https://github.com/egparadise/SaintVision-Invion/blob/1efea494f026e932360c35ae811b6423d874a2e7/apps/web/src/features/studio/DeveloperStudio.tsx#L396-L457"
+    },
+    {
+      "id": "web-run-poll",
+      "ref": "1efea494f026e932360c35ae811b6423d874a2e7",
+      "path": "apps/web/src/features/studio/DeveloperStudio.tsx",
+      "gitBlobSHA1": "60970704f523e810c1e8527ab01875883142fe8b",
+      "fileSHA256": "3a58989fea646051adad15f5ab710f4513c63a1952bc2658b20c3961121ab08e",
+      "startLine": 243,
+      "endLine": 275,
+      "excerpt": "  // Manual & Polling Active Run Refresh\n  const refreshActiveRun = async () => {\n    if (!activeRunId) return;\n    const prjId = selectedProjectId;\n    try {\n      const data = await apiClient<ControlRunDetail>(`/v1/projects/${prjId}/runs/${activeRunId}`);\n      if (data && data.runId) {\n        setLiveRun(observedRun(data));\n      }\n    } catch (err) {\n      console.warn('Failed to refresh active run:', err);\n    }\n  };\n\n  // Active Run live polling effect (ADR-040/041/044)\n  useEffect(() => {\n    if (!activeRunId) return;\n    let mounted = true;\n    const prjId = selectedProjectId;\n\n    const poll = async () => {\n      try {\n        const data = await apiClient<ControlRunDetail>(`/v1/projects/${prjId}/runs/${activeRunId}`);\n        if (mounted && data && data.runId) {\n          setLiveRun(observedRun(data));\n        }\n      } catch (err) {\n        console.warn('Active run poll failed:', err);\n      }\n    };\n\n    poll();\n\n",
+      "excerptSHA256": "9688b9600adde27d33409b698fab7008a93fcec36efd44697d4d856c6129b7c5",
+      "url": "https://github.com/egparadise/SaintVision-Invion/blob/1efea494f026e932360c35ae811b6423d874a2e7/apps/web/src/features/studio/DeveloperStudio.tsx#L243-L275"
+    },
+    {
+      "id": "web-auth",
+      "ref": "1efea494f026e932360c35ae811b6423d874a2e7",
+      "path": "apps/web/src/features/auth/session.ts",
+      "gitBlobSHA1": "2dddd39221868d4a667a482c0da7c1bd5bab50ba",
+      "fileSHA256": "6479d0159f27159a3a79de2fca8ebb4cc6c891161c4f8b4f7b9f670cf11a3a10",
+      "startLine": 142,
+      "endLine": 179,
+      "excerpt": "export function authConfig(): ResolvedOidcConfig {\n  const raw = (window as unknown as { __SAINTVISION_CONFIG__?: Partial<OidcConfig> }).__SAINTVISION_CONFIG__;\n  if (!raw || typeof raw !== 'object') {\n    throw new Error('인증 서버와 클라이언트 설정이 필요합니다.');\n  }\n\n  if (typeof raw.clientId !== 'string' || !raw.clientId.trim()) {\n    throw new Error('클라이언트 ID(clientId) 설정이 필요합니다.');\n  }\n  const clientId = raw.clientId.trim();\n\n  let issuer: string | undefined;\n  if (typeof raw.issuer === 'string' && raw.issuer.trim()) {\n    issuer = cleanIssuerUrl(raw.issuer);\n  }\n\n  let idpAuthorizeUrl: string;\n  let idpTokenUrl: string;\n  let idpLogoutUrl: string | undefined;\n\n  if (issuer) {\n    const issuerUrl = new URL(issuer);\n    idpAuthorizeUrl = raw.idpAuthorizeUrl ? endpoint(raw.idpAuthorizeUrl, '인가 엔드포인트 URL') : `${issuer}/protocol/openid-connect/auth`;\n    idpTokenUrl = raw.idpTokenUrl ? endpoint(raw.idpTokenUrl, '토큰 엔드포인트 URL') : `${issuer}/protocol/openid-connect/token`;\n    idpLogoutUrl = raw.idpLogoutUrl ? endpoint(raw.idpLogoutUrl, '로그아웃 엔드포인트 URL') : `${issuer}/protocol/openid-connect/logout`;\n\n    const authUrl = new URL(idpAuthorizeUrl);\n    const tokenUrl = new URL(idpTokenUrl);\n    if (authUrl.origin !== issuerUrl.origin || !isSubpathOf(authUrl.pathname, issuerUrl.pathname)) {\n      throw new Error('인가 엔드포인트의 origin 또는 경로가 issuer와 일치하지 않습니다.');\n    }\n    if (tokenUrl.origin !== issuerUrl.origin || !isSubpathOf(tokenUrl.pathname, issuerUrl.pathname)) {\n      throw new Error('토큰 엔드포인트의 origin 또는 경로가 issuer와 일치하지 않습니다.');\n    }\n    if (idpLogoutUrl) {\n      const logoutUrl = new URL(idpLogoutUrl);\n      if (logoutUrl.origin !== issuerUrl.origin || !isSubpathOf(logoutUrl.pathname, issuerUrl.pathname)) {\n        throw new Error('로그아웃 엔드포인트의 origin 또는 경로가 issuer와 일치하지 않습니다.');\n",
+      "excerptSHA256": "556196c40717a02d96706b22e56bafbfa65e2af07d38e5588ca0599ca2c430d2",
+      "url": "https://github.com/egparadise/SaintVision-Invion/blob/1efea494f026e932360c35ae811b6423d874a2e7/apps/web/src/features/auth/session.ts#L142-L179"
+    },
+    {
+      "id": "web-ws",
+      "ref": "1efea494f026e932360c35ae811b6423d874a2e7",
+      "path": "apps/web/src/features/terminal/WebTerminal.tsx",
+      "gitBlobSHA1": "898fad253787284195d3b7d39ccf2e00d6a26079",
+      "fileSHA256": "19e07b23f4ade75d0bb7047229d3a062e3ace003474b942a479b7c77aab0f2e9",
+      "startLine": 125,
+      "endLine": 158,
+      "excerpt": "    if (disableAutoConnect) return;\n    let active = true;\n    const wsProtocol = typeof window !== 'undefined' && window.location.protocol === 'https:' ? 'wss:' : 'ws:';\n    const wsHost = typeof window !== 'undefined' && window.location.port === '3000' ? '127.0.0.1:8080' : (typeof window !== 'undefined' ? window.location.host : '127.0.0.1:8080');\n\n    const initTerminal = async () => {\n      // Security Invariant: PTY ticket is an authorized execution credential.\n      // If there is no real authorized commandId, do NOT request a ticket at all (zero network calls).\n      if (!isAuthorizedCommandId(commandId)) {\n        setConnectionStatus('disconnected');\n        setLastError(null);\n        setTerminalOutput((prev) => [\n          ...prev,\n          '⚠️ [승인 실행 필요]: 유효한 승인 명령 신원(commandId)이 지정되지 않았습니다.',\n          '보안 정책: 백엔드 티켓 발급 요청(POST /terminal-tickets) 및 WebSocket 연결을 수행하지 않고 중단했습니다.',\n          '상위 파이프라인에서 승인된 실행(Approved Execution)을 선택하십시오. (위조 식별자 합성 방지)',\n        ]);\n        return;\n      }\n\n      try {\n        setConnectionStatus('connecting');\n        setLastError(null);\n        setTerminalOutput((prev) => [\n          ...prev,\n          `[인계] 제어 평면(/v1/workspaces/${workspaceId}/terminal-tickets)에서 30초 일회용 PTY 티켓 발급 요청 중...`,\n        ]);\n        // Canonical TerminalTicketInput: strictly requires authorized commandId\n        const ticketData = await issueTerminalTicket(workspaceId, { commandId });\n        if (!active) return;\n        setActiveSessionId(ticketData.sessionId);\n\n        const handshake = terminalTicketHandshake(ticketData);\n        const finalWsUrl = `${wsProtocol}//${wsHost}${handshake.websocketPath}`;\n",
+      "excerptSHA256": "ac6889edd6c48092e9bc8054acecfb6f2ccfc1efc7eb8b0aae82f8f8f64d81ed",
+      "url": "https://github.com/egparadise/SaintVision-Invion/blob/1efea494f026e932360c35ae811b6423d874a2e7/apps/web/src/features/terminal/WebTerminal.tsx#L125-L158"
+    },
+    {
+      "id": "web-sse",
+      "ref": "1efea494f026e932360c35ae811b6423d874a2e7",
+      "path": "apps/web/src/shared/realtime/sse-client.ts",
+      "gitBlobSHA1": "18f8444e360352eb1052d85d8c955c6b627f5b63",
+      "fileSHA256": "60572c709e9d182ae7e00d057a0a2d4eccb01559b756e646062d102f0590f92e",
+      "startLine": 93,
+      "endLine": 110,
+      "excerpt": "  private async connect(): Promise<void> {\n    if (this.isClosed) return;\n\n    this.abortController = new AbortController();\n\n    const headers: Record<string, string> = {\n      Accept: 'text/event-stream',\n    };\n    if (this.lastEventId) {\n      headers['Last-Event-ID'] = this.lastEventId;\n    }\n\n    try {\n      const response = await fetch(this.url, {\n        headers,\n        signal: this.abortController.signal,\n      });\n\n",
+      "excerptSHA256": "32e6762f2b42c2ec736172d29b82efbaa38c1a74b65eaf6f0669e133f0788abe",
+      "url": "https://github.com/egparadise/SaintVision-Invion/blob/1efea494f026e932360c35ae811b6423d874a2e7/apps/web/src/shared/realtime/sse-client.ts#L93-L110"
+    },
+    {
+      "id": "nginx-routes",
+      "ref": "1efea494f026e932360c35ae811b6423d874a2e7",
+      "path": "deploy/intranet/portal/nginx.conf",
+      "gitBlobSHA1": "fdd8d6119f6a480d3b7a2106e6b270ec33db3f24",
+      "fileSHA256": "4cb3f8e20312a25d70a64008804025f065df106252c93f4c33ebd4cfa302a2c6",
+      "startLine": 164,
+      "endLine": 225,
+      "excerpt": "        # SSE Streaming Endpoints: Buffering disabled, long read timeout\n        location ~ ^/v1/projects/[^/]+/runs/[^/]+/events {\n            proxy_pass https://control_plane;\n            proxy_ssl_verify on;\n            proxy_ssl_trusted_certificate /etc/nginx/certs/ca-bundle.crt;\n            proxy_ssl_name cp.sv.lan;\n            proxy_ssl_server_name on;\n            proxy_http_version 1.1;\n            proxy_set_header Connection '';\n            proxy_set_header Host cp.sv.lan;\n            proxy_buffering off;\n            proxy_cache off;\n            chunked_transfer_encoding off;\n            proxy_read_timeout 24h;\n            include /etc/nginx/security-headers.conf;\n        }\n\n        # WebSocket Terminal Endpoints: HTTP/1.1 Upgrade\n        location /v1/terminal/ws {\n            proxy_pass https://control_plane;\n            proxy_ssl_verify on;\n            proxy_ssl_trusted_certificate /etc/nginx/certs/ca-bundle.crt;\n            proxy_ssl_name cp.sv.lan;\n            proxy_ssl_server_name on;\n            proxy_http_version 1.1;\n            proxy_set_header Host cp.sv.lan;\n            proxy_set_header Upgrade $http_upgrade;\n            proxy_set_header Connection $connection_upgrade;\n            proxy_read_timeout 3600s;\n            include /etc/nginx/security-headers.conf;\n        }\n\n        location ~ ^/v1/workspaces/[^/]+/terminals/ {\n            proxy_pass https://control_plane;\n            proxy_ssl_verify on;\n            proxy_ssl_trusted_certificate /etc/nginx/certs/ca-bundle.crt;\n            proxy_ssl_name cp.sv.lan;\n            proxy_ssl_server_name on;\n            proxy_http_version 1.1;\n            proxy_set_header Host cp.sv.lan;\n            proxy_set_header Upgrade $http_upgrade;\n            proxy_set_header Connection $connection_upgrade;\n            proxy_read_timeout 3600s;\n            include /etc/nginx/security-headers.conf;\n        }\n\n        # REST API Gateway Reverse Proxy: /v1/ forwarded to upstream Control Plane\n        # Connection \"\" enables upstream HTTP/1.1 keepalive connection pooling\n        location /v1/ {\n            proxy_pass https://control_plane;\n            proxy_ssl_verify on;\n            proxy_ssl_trusted_certificate /etc/nginx/certs/ca-bundle.crt;\n            proxy_ssl_name cp.sv.lan;\n            proxy_ssl_server_name on;\n            proxy_http_version 1.1;\n            proxy_set_header Connection \"\";\n            proxy_set_header Host cp.sv.lan;\n            proxy_set_header X-Real-IP $remote_addr;\n            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;\n            proxy_set_header X-Forwarded-Proto https;\n            proxy_cache off;\n            include /etc/nginx/security-headers.conf;\n",
+      "excerptSHA256": "b4096816b9b56fd06a19348fb28e7739f75d7c9c85dd4f2e1bdd191c880aa059",
+      "url": "https://github.com/egparadise/SaintVision-Invion/blob/1efea494f026e932360c35ae811b6423d874a2e7/deploy/intranet/portal/nginx.conf#L164-L225"
+    },
+    {
+      "id": "nginx-upstream",
+      "ref": "1efea494f026e932360c35ae811b6423d874a2e7",
+      "path": "deploy/intranet/portal/conf.d/upstream.conf",
+      "gitBlobSHA1": "118267b25f6c8b0043963e8440ba93687254c814",
+      "fileSHA256": "508bf353bd46e1f3d4b0f2f6089ef4d6995fe444a2ca2111d5feedd9303e3f28",
+      "startLine": 1,
+      "endLine": 7,
+      "excerpt": "# Upstream Control Plane Configuration (Card 156)\n# Configured via PORTAL_UPSTREAM_CP_HOST in portal-up.sh\n# In production, portal-up.sh generates this file with the active Control Plane upstream.\nupstream control_plane {\n    server cp.sv.lan:443;\n    keepalive 32;\n}\n",
+      "excerptSHA256": "508bf353bd46e1f3d4b0f2f6089ef4d6995fe444a2ca2111d5feedd9303e3f28",
+      "url": "https://github.com/egparadise/SaintVision-Invion/blob/1efea494f026e932360c35ae811b6423d874a2e7/deploy/intranet/portal/conf.d/upstream.conf#L1-L7"
+    },
+    {
+      "id": "cp-wheel",
+      "ref": "1efea494f026e932360c35ae811b6423d874a2e7",
+      "path": "services/control-plane/pyproject.toml",
+      "gitBlobSHA1": "35c658329a76add8f36767fd369996740b9e0e71",
+      "fileSHA256": "fa2447c6b86308f24a0b2d1d9f17a81c8fdac34acc2b63884bd66d6422727ef7",
+      "startLine": 5,
+      "endLine": 21,
+      "excerpt": "[project]\nname = \"saintvision-control-plane\"\nversion = \"0.1.0\"\ndescription = \"Deterministic INV contracts and reliability core\"\nrequires-python = \">=3.12\"\ndependencies = [\"fastapi==0.141.1\", \"uvicorn==0.52.4\", \"websockets==17.1\", \"psycopg[binary]==3.3.5\", \"jsonschema[format]==4.26.0\", \"pydantic==2.13.5\", \"cryptography==50.0.1\", \"PyJWT==2.15.1\"]\n\n[project.scripts]\ninv-control-plane = \"inv.app:main\"\ninv-delivery-worker = \"inv.worker:main\"\ninv-observer-worker = \"inv.observer_worker:main\"\n\n[tool.setuptools.packages.find]\nwhere = [\"src\"]\n\n[tool.setuptools.package-data]\ninv = [\"generated/*.json\", \"migrations/*.sql\"]\n",
+      "excerptSHA256": "012b4f33552fab2580f05696161a6e30510b5542b619f8494877cb3ad680b87a",
+      "url": "https://github.com/egparadise/SaintVision-Invion/blob/1efea494f026e932360c35ae811b6423d874a2e7/services/control-plane/pyproject.toml#L5-L21"
+    },
+    {
+      "id": "business-wheel",
+      "ref": "1efea494f026e932360c35ae811b6423d874a2e7",
+      "path": "pyproject.toml",
+      "gitBlobSHA1": "491580880d12c2e8af9107ba4220ca4be31af698",
+      "fileSHA256": "09a6487ecb717afa70c86cfe2682cd70d94ecc08818323f19d8a4b693fbdbf88",
+      "startLine": 5,
+      "endLine": 20,
+      "excerpt": "[project]\nname = \"saintvision-inv\"\nversion = \"0.1.0\"\ndescription = \"Saint Vision INV Control Plane\"\nrequires-python = \">=3.11\"\ndependencies = [\n    \"fastapi\",\n    \"pydantic\",\n    \"sqlalchemy\",\n    \"alembic\",\n    \"psycopg[binary]\",\n    \"uvicorn\",\n]\n\n[tool.setuptools.packages.find]\nwhere = [\"src\"]\n",
+      "excerptSHA256": "f8c6980968c2664809df5d335dd84fdce469cb34e1b6df2371eeb4eae8a39d9a",
+      "url": "https://github.com/egparadise/SaintVision-Invion/blob/1efea494f026e932360c35ae811b6423d874a2e7/pyproject.toml#L5-L20"
+    },
+    {
+      "id": "combined-deploy",
+      "ref": "1efea494f026e932360c35ae811b6423d874a2e7",
+      "path": "deploy/Dockerfile.backend",
+      "gitBlobSHA1": "b3f9d710aa5d26280cff5532b95734efdb0ccfb2",
+      "fileSHA256": "19d588a5b2e4856bc0d89ee0af12973908fcfa8647f9720abd2bcdc8ef25ea1d",
+      "startLine": 16,
+      "endLine": 32,
+      "excerpt": "# Copy application source and database configuration\nCOPY pyproject.toml .\nCOPY alembic.ini .\nCOPY migrations/ migrations/\nCOPY src/ src/\nCOPY services/control-plane/src/ services/control-plane/src/\nCOPY tools/ tools/\n\nENV PYTHONPATH=/app/src:/app/services/control-plane/src\nENV PORT=8080\n\nUSER 65532:65532\n\nEXPOSE 8080\n\n# Run production unified FastAPI control plane server\nCMD [\"uvicorn\", \"saintvision.server:create_app\", \"--factory\", \"--no-proxy-headers\", \"--no-access-log\", \"--limit-concurrency\", \"64\", \"--ws\", \"websockets\", \"--ws-max-size\", \"8192\", \"--ws-max-queue\", \"1\", \"--ws-per-message-deflate\", \"false\", \"--host\", \"0.0.0.0\", \"--port\", \"8080\"]\n",
+      "excerptSHA256": "a9f696f3764e90c6943e6266a4cd0a4ee4c29b43d0ace490ea6e946df08d203f",
+      "url": "https://github.com/egparadise/SaintVision-Invion/blob/1efea494f026e932360c35ae811b6423d874a2e7/deploy/Dockerfile.backend#L16-L32"
+    },
+    {
+      "id": "server-alias",
+      "ref": "1efea494f026e932360c35ae811b6423d874a2e7",
+      "path": "src/saintvision/server.py",
+      "gitBlobSHA1": "160429ec08c260dae40cf4862757974b0fc69a77",
+      "fileSHA256": "b0ab25d476ff09ce4b819aee12fee18163b9f5acd801e48748bb444103fb312c",
+      "startLine": 1,
+      "endLine": 6,
+      "excerpt": "\"\"\"Production entrypoint. Demo fixtures live in saintvision.demo_server explicitly.\"\"\"\nfrom inv.app import create_configured_app\n\n\ndef create_app():\n    return create_configured_app()\n",
+      "excerptSHA256": "b0ab25d476ff09ce4b819aee12fee18163b9f5acd801e48748bb444103fb312c",
+      "url": "https://github.com/egparadise/SaintVision-Invion/blob/1efea494f026e932360c35ae811b6423d874a2e7/src/saintvision/server.py#L1-L6"
+    },
+    {
+      "id": "snapshot-bounds",
+      "ref": "1efea494f026e932360c35ae811b6423d874a2e7",
+      "path": "services/control-plane/src/inv/workspace_resume.py",
+      "gitBlobSHA1": "0b3998d6a3d310447c84695345db096d511222cd",
+      "fileSHA256": "32c8fae52eb947605c53801d609e9826c514b53c2392f07f1fb9ff605303449b",
+      "startLine": 21,
+      "endLine": 40,
+      "excerpt": "MAX_RESUME_BYTES = 65536\nMAX_RESUME_CONTENT = 32768\nMAX_WORKSPACE_ATTEMPTS = 3\n\n\ndef independent_run(conn, run_id):\n    if conn.execute(\n        \"SELECT 1 FROM inv.shard_commands WHERE run_id=%s UNION ALL SELECT 1 FROM inv.shard_parents WHERE run_id=%s LIMIT 1\",\n        (run_id, run_id),\n    ).fetchone():\n        raise DomainError(\"GRAPH-0005\", \"Shard recovery requires a coordinated new shard plan\")\n\n\ndef bounded_snapshot(raw, workspace_id):\n    if len(raw) > MAX_RESUME_BYTES:\n        raise DomainError(\"STORE-0020\", \"Resume manifest exceeds 64 KiB\", 422)\n    manifest, content = decode_snapshot(raw, workspace_id)\n    if sum(len(v) for v in content.values()) > MAX_RESUME_CONTENT:\n        raise DomainError(\"STORE-0020\", \"Resume file content exceeds 32 KiB\", 422)\n    return manifest\n",
+      "excerptSHA256": "3b2b00c9ee5ca46e6e2093d7376bdc42764f67fe15327b307c3c59efa2f9a1e6",
+      "url": "https://github.com/egparadise/SaintVision-Invion/blob/1efea494f026e932360c35ae811b6423d874a2e7/services/control-plane/src/inv/workspace_resume.py#L21-L40"
+    },
+    {
+      "id": "containment-gate",
+      "ref": "1efea494f026e932360c35ae811b6423d874a2e7",
+      "path": "services/control-plane/src/inv/containment.py",
+      "gitBlobSHA1": "05db59c76071d5aa6c10fcf0066a2b9bc006b385",
+      "fileSHA256": "a0d7055d5f3e5485d82ea3876f9885bb6f0c2e8d5d0e7fd11a846ec86edf425e",
+      "startLine": 15,
+      "endLine": 18,
+      "excerpt": "def require_execution(conn):\n    gate = conn.execute(\"SELECT kill_switch FROM inv.tenant_controls\").fetchone()\n    if not gate or gate[\"kill_switch\"]:\n        raise DomainError(\"AUTH-0061\", \"Tenant execution is stopped by its operator\", 409)\n",
+      "excerptSHA256": "9053044ded5ffc40519b36a73f6a49b6398e60379318300ce4587405647b1842",
+      "url": "https://github.com/egparadise/SaintVision-Invion/blob/1efea494f026e932360c35ae811b6423d874a2e7/services/control-plane/src/inv/containment.py#L15-L18"
+    },
+    {
+      "id": "web-ticket",
+      "ref": "1efea494f026e932360c35ae811b6423d874a2e7",
+      "path": "apps/web/src/shared/api/terminalTicket.ts",
+      "gitBlobSHA1": "90e33582350a6554372b8c74d9586fd034b15ba9",
+      "fileSHA256": "0bfdf7c5f4affb630a94a2f56ef0d9c797aa8aa16227deb8d353357da6d2e590",
+      "startLine": 40,
+      "endLine": 70,
+      "excerpt": "  const expectedPath = `/v1/workspaces/${encodeURIComponent(workspaceId)}/terminals/${body.sessionId}`;\n  if (body.websocketPath !== expectedPath) {\n    throw new Error('TerminalTicketResult websocketPath does not match its workspace and session');\n  }\n\n  return body as unknown as TerminalTicketResult;\n}\n\n/**\n * Build the server-defined handshake without putting the one-time ticket in a\n * URL, where browser history, proxies, or access logs could retain it.\n */\nexport function terminalTicketHandshake(ticket: TerminalTicketResult) {\n  const authFrame: TerminalTicketAuthFrame = { ticket: ticket.ticket };\n  return {\n    websocketPath: ticket.websocketPath,\n    subprotocol: 'inv-terminal-v1' as const,\n    authFrame,\n    firstFrame: JSON.stringify(authFrame),\n  };\n}\n\nexport async function issueTerminalTicket(\n  workspaceId: string,\n  input: TerminalTicketInput,\n): Promise<TerminalTicketResult> {\n  if (!workspaceId) throw new Error('TerminalTicket workspaceId is required');\n  const response = await apiClient<unknown>(\n    `/v1/workspaces/${encodeURIComponent(workspaceId)}/terminal-tickets`,\n    { method: 'POST', body: JSON.stringify(input) },\n  );\n",
+      "excerptSHA256": "a4b9cbf414032aa982a361b6ffd2e98804cfe201bde9495d2f80527ebb34a7a9",
+      "url": "https://github.com/egparadise/SaintVision-Invion/blob/1efea494f026e932360c35ae811b6423d874a2e7/apps/web/src/shared/api/terminalTicket.ts#L40-L70"
+    }
+  ],
+  "publicInputs": [
+    {
+      "ref": "baaa8ea99919a7fec40f8f853a648f4067d7248d",
+      "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/three-pc-actual-cpu-pilot-r1-root-activation.json",
+      "bytes": 34600,
+      "sha256": "f119d097f41e82f89a89fc29913dc8fef317522546cabaed4d8a826d33765cf7"
+    },
+    {
+      "ref": "baaa8ea99919a7fec40f8f853a648f4067d7248d",
+      "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/three-pc-actual-cpu-pilot-r1/public-evidence-inventory.json",
+      "bytes": 4130,
+      "sha256": "01ca4cf6368c7723426fa90bd0c892a25a74b0522a45b9f008c58b28364073c6"
+    },
+    {
+      "ref": "baaa8ea99919a7fec40f8f853a648f4067d7248d",
+      "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/pc3-actual-cpu-pilot-r1-root-activation.json",
+      "bytes": 11767,
+      "sha256": "4065fc76bbd052104850d4af8002296dfd1ca27dfc947e554ea8764cd7c2bbdd"
+    },
+    {
+      "ref": "baaa8ea99919a7fec40f8f853a648f4067d7248d",
+      "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/one-cpu-node-plan-r1.public.json",
+      "bytes": 5373,
+      "sha256": "5b2a70bd9bc8217592f7cd953f18dd3516ecacfd132f6281134fbc718731213a"
+    }
+  ],
+  "publicInventoryVerified": [
+    {
+      "ref": "baaa8ea99919a7fec40f8f853a648f4067d7248d",
+      "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/three-pc-actual-cpu-pilot-r1/pc124-current-readiness-r1.json",
+      "bytes": 763,
+      "sha256": "c9dbe921443afcc448981e732d062660cfbebbb54049ee8eb3584a7b7e7ab398"
+    },
+    {
+      "ref": "baaa8ea99919a7fec40f8f853a648f4067d7248d",
+      "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/three-pc-actual-cpu-pilot-r1/pc24-current-readiness-r2.json",
+      "bytes": 3989,
+      "sha256": "f550472ff55fce9b099c550ed38d7f92d833f595f15385377d234b1f536b40d6"
+    },
+    {
+      "ref": "baaa8ea99919a7fec40f8f853a648f4067d7248d",
+      "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/three-pc-actual-cpu-pilot-r1/pc24-image-transfer-r1/receipt.json",
+      "bytes": 924,
+      "sha256": "723725a3790a83277b6ae2d37345c35f39447edbb59f8dce7eaab3a7a67f37e7"
+    },
+    {
+      "ref": "baaa8ea99919a7fec40f8f853a648f4067d7248d",
+      "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/three-pc-actual-cpu-pilot-r1/pc24-new-node-preparation-r1/PC2-public-plan.json",
+      "bytes": 1402,
+      "sha256": "a1e52443ccd971b68c703c71deb1bc1ea9beb80adbc4645b44d1f1d5db573d3e"
+    },
+    {
+      "ref": "baaa8ea99919a7fec40f8f853a648f4067d7248d",
+      "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/three-pc-actual-cpu-pilot-r1/pc24-new-node-preparation-r1/PC2-receipt.json",
+      "bytes": 402,
+      "sha256": "76c00d7e6de2f7110f19290b04ed69325b66d471f00c266f6982f88bad60e4e8"
+    },
+    {
+      "ref": "baaa8ea99919a7fec40f8f853a648f4067d7248d",
+      "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/three-pc-actual-cpu-pilot-r1/pc24-new-node-preparation-r1/PC2-scope-readonly-cause.json",
+      "bytes": 767,
+      "sha256": "1bdc6c453bb1af5086ac46605289c5fc92cc78eed149891b9ef933c16f8912ca"
+    },
+    {
+      "ref": "baaa8ea99919a7fec40f8f853a648f4067d7248d",
+      "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/three-pc-actual-cpu-pilot-r1/pc24-new-node-preparation-r2/receipt.json",
+      "bytes": 3721,
+      "sha256": "216012fc0b0a55b9b69082bd84586018a5fdffe150275122c2a5550dbb5c85fe"
+    },
+    {
+      "ref": "baaa8ea99919a7fec40f8f853a648f4067d7248d",
+      "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/three-pc-actual-cpu-pilot-r1/pc24-new-node-preparation-r2/PC2-public-plan.json",
+      "bytes": 1402,
+      "sha256": "a1e52443ccd971b68c703c71deb1bc1ea9beb80adbc4645b44d1f1d5db573d3e"
+    },
+    {
+      "ref": "baaa8ea99919a7fec40f8f853a648f4067d7248d",
+      "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/three-pc-actual-cpu-pilot-r1/pc24-new-node-preparation-r2/PC4-public-plan.json",
+      "bytes": 1363,
+      "sha256": "7a2a8e8bf2037dd8a0344049613948800566add126fddbfc425d1aafebe689cc"
+    },
+    {
+      "ref": "baaa8ea99919a7fec40f8f853a648f4067d7248d",
+      "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/three-pc-actual-cpu-pilot-r1/pc24-new-node-preparation-r2/remote-key-csr-program.py.txt",
+      "bytes": 2887,
+      "sha256": "5c0202f6d814ac6ce7a67cf14e87954c56f2679255987a99b89802bb05a1af35"
+    },
+    {
+      "ref": "baaa8ea99919a7fec40f8f853a648f4067d7248d",
+      "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/three-pc-actual-cpu-pilot-r1/pc24-pilot-ca-signing-r1/receipt.json",
+      "bytes": 8708,
+      "sha256": "fd92f15a44803a99c804289d0dea97c17c90222d4701eb17d445b90aacd99fdc"
+    },
+    {
+      "ref": "baaa8ea99919a7fec40f8f853a648f4067d7248d",
+      "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/three-pc-actual-cpu-pilot-r1/pc24-pilot-ca-signing-r1/remote-signing-program.py.txt",
+      "bytes": 5665,
+      "sha256": "74e47801c4a150cb3a7fb1e47e4417624b040edde20a75fd3f35bb47627f03fa"
+    },
+    {
+      "ref": "baaa8ea99919a7fec40f8f853a648f4067d7248d",
+      "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/three-pc-actual-cpu-pilot-r1/pc24-admission-r1/receipt.json",
+      "bytes": 7312,
+      "sha256": "fc9b4c0a2ef1379543bdf3c62de16836a913389a0caf68cc3b6da7a9b2370091"
+    },
+    {
+      "ref": "baaa8ea99919a7fec40f8f853a648f4067d7248d",
+      "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/three-pc-actual-cpu-pilot-r1/pc24-admission-r1/plan-remote-program.py.txt",
+      "bytes": 4830,
+      "sha256": "077b5e831f61bd7b3d66714309a6719ffd4753634321d649c27f944910ea6e0e"
+    },
+    {
+      "ref": "baaa8ea99919a7fec40f8f853a648f4067d7248d",
+      "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/three-pc-actual-cpu-pilot-r1/pc24-admission-r1/apply-remote-program.py.txt",
+      "bytes": 7017,
+      "sha256": "3bf386a21b075f426d9c5958d3e59d6ee2a1572b3dc34acf286d251c3a109df6"
+    },
+    {
+      "ref": "baaa8ea99919a7fec40f8f853a648f4067d7248d",
+      "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/three-pc-actual-cpu-pilot-r1/pc24-node-start-r1/PC2-public-trust-receipt.json",
+      "bytes": 1026,
+      "sha256": "e355874dea5a9a13de93d176f1ece6b03b1e1d2ba81533d21195aa913335ae7b"
+    },
+    {
+      "ref": "baaa8ea99919a7fec40f8f853a648f4067d7248d",
+      "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/three-pc-actual-cpu-pilot-r1/pc24-node-start-r2/receipt.json",
+      "bytes": 9758,
+      "sha256": "38ef758ed2b248403c73891053d36025bddbd9266cc4798c8eeb9b2422e6a1f2"
+    },
+    {
+      "ref": "baaa8ea99919a7fec40f8f853a648f4067d7248d",
+      "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/three-pc-actual-cpu-pilot-r1/pc24-node-start-r2/public-trust-remote-program.py.txt",
+      "bytes": 5941,
+      "sha256": "39e44db1fdf79e5b89f5ccae281515fd0160485342e41333b47bbb372b565826"
+    },
+    {
+      "ref": "baaa8ea99919a7fec40f8f853a648f4067d7248d",
+      "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/three-pc-actual-cpu-pilot-r1/pc24-node-start-r2/image-load-remote-program.py.txt",
+      "bytes": 1053,
+      "sha256": "af60edfe0db666510ac19cda537513ba824e91dc061dcff99261e39312812375"
+    },
+    {
+      "ref": "baaa8ea99919a7fec40f8f853a648f4067d7248d",
+      "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/three-pc-actual-cpu-pilot-r1/pc24-node-start-r2/node-start-template-remote-program.py.txt",
+      "bytes": 6343,
+      "sha256": "e4dbc30260ab61ef162f45a080143a01f886544c7ff1f8ca8add1f12bdc0a08d"
+    },
+    {
+      "ref": "baaa8ea99919a7fec40f8f853a648f4067d7248d",
+      "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/three-pc-actual-cpu-pilot-r1/three-pc-continuity-readonly-r1.json",
+      "bytes": 7282,
+      "sha256": "70cfb4da95d21c083f065b28c0450006aadacc237c37d385bc3a33475a492e6e"
+    },
+    {
+      "ref": "baaa8ea99919a7fec40f8f853a648f4067d7248d",
+      "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/three-pc-actual-cpu-pilot-r1/fresh-admin-three-pc-api-r1.json",
+      "bytes": 5353,
+      "sha256": "f233850348945229ee373940c1fc551ed9b279542a107f53e172a3c3aed046d4"
+    }
+  ],
+  "firstRead": [
+    {
+      "ref": "baaa8ea99919a7fec40f8f853a648f4067d7248d",
+      "path": "docs/vault/00_Index/전체 개발 진행 현황.md",
+      "docID": "INDEX-PROGRESS-001",
+      "version": "1.0.510",
+      "sha256": "22649afc1f648df9a360d947eae7f08bee53f42ce2bd46df12215620ca4835ad",
+      "readAtKST": "2026-11-07T17:28:39+09:00"
+    },
+    {
+      "ref": "baaa8ea99919a7fec40f8f853a648f4067d7248d",
+      "path": "docs/vault/30_Development/Agent별 작업/Codex 작업 현황.md",
+      "docID": "WORKBOARD-CODEX-001",
+      "version": "1.0.471",
+      "sha256": "8e3418894b8fc6fdcfdbb34e7756b55302ed6c257049f076127c57f3ef5d912c",
+      "readAtKST": "2026-11-07T17:28:39+09:00"
+    },
+    {
+      "ref": "baaa8ea99919a7fec40f8f853a648f4067d7248d",
+      "path": "docs/vault/00_Index/2026-09-15 단일 가상 컴퓨터 보강 설계 인덱스.md",
+      "docID": "INDEX-VIRTUAL-COMPUTER-001",
+      "version": "1.0.0",
+      "sha256": "35f2cca047fdb57ff2e2ad28e3847e9a7c0a19d6ace6fb36aa941042e872e9be",
+      "readAtKST": "2026-11-07T17:28:39+09:00"
+    },
+    {
+      "ref": "baaa8ea99919a7fec40f8f853a648f4067d7248d",
+      "path": "docs/vault/30_Development/57.81퍼센트 이후 단일 가상 컴퓨터 보강 로드맵.md",
+      "docID": "ROADMAP-VIRTUAL-COMPUTER-001",
+      "version": "1.0.0",
+      "sha256": "3a4527ffe53ebea114063692dd3bba826da8c279a93a9800919fff394df1a018",
+      "readAtKST": "2026-11-07T17:28:39+09:00"
+    },
+    {
+      "ref": "baaa8ea99919a7fec40f8f853a648f4067d7248d",
+      "path": "docs/vault/40_Governance/Agent 연속 실행과 최종 보고 정책.md",
+      "docID": "GOV-CONTINUOUS-001",
+      "version": "1.1.0",
+      "sha256": "60c6a8d3130491bd4cab730cccc0e236fb038d1c7c816efa333acdc34a30cd8f",
+      "readAtKST": "2026-11-07T17:28:39+09:00"
+    },
+    {
+      "ref": "baaa8ea99919a7fec40f8f853a648f4067d7248d",
+      "path": "docs/vault/00_Index/최종 개발 계획 - 모든 개발의 지침.md",
+      "docID": "GUIDE-001",
+      "version": "1.1.0",
+      "sha256": "59223c5dff4b4bb6252c8061aebe975665e6eadf92db3659a3f89951b2cb149f",
+      "readAtKST": "2026-11-07T17:28:39+09:00"
+    },
+    {
+      "ref": "baaa8ea99919a7fec40f8f853a648f4067d7248d",
+      "path": "docs/vault/40_Governance/설계 충돌 정정 및 ADR.md",
+      "docID": "ADR-INDEX-001",
+      "version": "1.37.0",
+      "sha256": "771f7714a63af52d7c8aea2424db0b33a2fe96c759c51c81c23144daf7aeaf77",
+      "readAtKST": "2026-11-07T17:28:39+09:00"
+    },
+    {
+      "ref": "baaa8ea99919a7fec40f8f853a648f4067d7248d",
+      "path": "docs/vault/40_Governance/Agent 역할과 인계 계약.md",
+      "docID": "GOV-AGENT-001",
+      "version": "1.1.3",
+      "sha256": "128c054e72f9e001b3b32f914cce544bce5432eddccdbe1212d27180c3200823",
+      "readAtKST": "2026-11-07T17:28:39+09:00"
+    },
+    {
+      "ref": "baaa8ea99919a7fec40f8f853a648f4067d7248d",
+      "path": "docs/vault/40_Governance/Git Build Obsidian 운영 절차.md",
+      "docID": "GOV-GIT-001",
+      "version": "1.1.4",
+      "sha256": "fe5e8adc44a14c081ac767265a16434b72e4b3ebfb7719081fa166ad459e59e9",
+      "readAtKST": "2026-11-07T17:28:39+09:00"
+    },
+    {
+      "ref": "baaa8ea99919a7fec40f8f853a648f4067d7248d",
+      "path": "docs/vault/40_Governance/Agent 지속 개발 운영 규칙.md",
+      "docID": "GOV-CONTINUITY-001",
+      "version": "1.0.0",
+      "sha256": "63839c440ead6dc07300a0e18d5024fb9aadbddf546707156c39af7ee9495c84",
+      "readAtKST": "2026-11-07T17:28:39+09:00"
+    },
+    {
+      "ref": "5ba7cfb795135e1f74c0d3e83e0fea285d3cc987",
+      "path": "AGENTS.md",
+      "sha256": "c12a50a38f81c12a647f9b6f4592a205cd899e76d29190202a6ae73b12c04b27",
+      "readAtKST": "2026-11-07T17:28:39+09:00"
+    },
+    {
+      "ref": "5ba7cfb795135e1f74c0d3e83e0fea285d3cc987",
+      "path": "skills/agent-delivery/SKILL.md",
+      "sha256": "9596c1d4a132c3de90fd99ed2095b8271da7a31532e8487aa6d7d93151ac3830",
+      "readAtKST": "2026-11-07T17:28:39+09:00"
+    },
+    {
+      "ref": "5ba7cfb795135e1f74c0d3e83e0fea285d3cc987",
+      "path": "skills/core-reliability/SKILL.md",
+      "sha256": "4650a371befb5a59cd9f3ce87c2e2dab732aa7e9b89e57885cb67f0e64f0ef76",
+      "readAtKST": "2026-11-07T17:28:39+09:00"
+    },
+    {
+      "ref": "5ba7cfb795135e1f74c0d3e83e0fea285d3cc987",
+      "path": "docs/task-registry.json",
+      "sha256": "7c6b339c7487aae652cc5c5e04f6e933249c83930019e798ec24006794b07644",
+      "readAtKST": "2026-11-07T17:28:39+09:00"
+    }
+  ],
+  "wireSchema": {
+    "path": "contracts/v1alpha1/core.schema.json",
+    "ref": "1efea494f026e932360c35ae811b6423d874a2e7",
+    "sha256": "6c99daf16ade5ac95619dfca1427b8ea511298f3989cbcdc8c807d08572b13ea",
+    "gitBlobSHA1": "d7df4baf0d27f7340db3a840b7747705d5e1341c",
+    "shapes": {
+      "EmptyRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {}
+      },
+      "WorkspaceStartPrepareInput": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "stepId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "workload": {
+            "$ref": "#/$defs/WorkloadSpec"
+          },
+          "expectedVersion": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9007199254740991
+          },
+          "startId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "snapshotBase64": {
+            "type": "string",
+            "minLength": 4,
+            "maxLength": 87384
+          },
+          "targetNodeId": {
+            "$ref": "#/$defs/NodeId"
+          }
+        },
+        "required": [
+          "startId",
+          "stepId",
+          "workload",
+          "expectedVersion",
+          "snapshotBase64",
+          "targetNodeId"
+        ]
+      },
+      "WorkspaceStartEnqueueInput": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "approvalId": {
+            "$ref": "#/$defs/ApprovalId"
+          },
+          "expectedVersion": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9007199254740991
+          },
+          "startId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "startId",
+          "approvalId",
+          "expectedVersion"
+        ]
+      },
+      "WorkloadSpec": {
+        "type": "object",
+        "properties": {
+          "apiVersion": {
+            "type": "string",
+            "const": "inv.saintvision.ai/v1alpha1"
+          },
+          "kind": {
+            "type": "string",
+            "const": "Workload"
+          },
+          "workloadId": {
+            "$ref": "#/$defs/WorkloadId"
+          },
+          "tenantId": {
+            "$ref": "#/$defs/TenantId"
+          },
+          "projectId": {
+            "$ref": "#/$defs/ProjectId"
+          },
+          "workspaceId": {
+            "$ref": "#/$defs/WorkspaceId"
+          },
+          "resources": {
+            "$ref": "#/$defs/ResourceRequest"
+          },
+          "imageDigest": {
+            "type": "string",
+            "pattern": "^sha256:[0-9a-f]{64}$"
+          },
+          "command": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "minItems": 1
+          },
+          "timeoutSeconds": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9007199254740991
+          },
+          "workspaceResume": {
+            "$ref": "#/$defs/WorkspaceResumeRef"
+          },
+          "workspaceStart": {
+            "$ref": "#/$defs/WorkspaceStartRef"
+          },
+          "targetNodeId": {
+            "$ref": "#/$defs/NodeId"
+          },
+          "terminal": {
+            "$ref": "#/$defs/TerminalSpec"
+          },
+          "modelInput": {
+            "$ref": "#/$defs/ModelExecutionRef"
+          }
+        },
+        "required": [
+          "apiVersion",
+          "kind",
+          "workloadId",
+          "tenantId",
+          "projectId",
+          "workspaceId",
+          "resources",
+          "imageDigest",
+          "command",
+          "timeoutSeconds"
+        ],
+        "additionalProperties": false,
+        "allOf": [
+          {
+            "not": {
+              "required": [
+                "workspaceResume",
+                "workspaceStart"
+              ]
+            }
+          },
+          {
+            "not": {
+              "required": [
+                "modelInput",
+                "workspaceStart"
+              ]
+            }
+          },
+          {
+            "not": {
+              "required": [
+                "modelInput",
+                "workspaceResume"
+              ]
+            }
+          },
+          {
+            "not": {
+              "required": [
+                "modelInput",
+                "terminal"
+              ]
+            }
+          }
+        ]
+      },
+      "ResourceRequest": {
+        "type": "object",
+        "properties": {
+          "cpuMillis": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9007199254740991
+          },
+          "memoryBytes": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9007199254740991
+          },
+          "gpuCount": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "minVramBytes": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          }
+        },
+        "required": [
+          "cpuMillis",
+          "memoryBytes",
+          "gpuCount",
+          "minVramBytes"
+        ],
+        "additionalProperties": false
+      },
+      "ApprovalDecisionInput": {
+        "type": "object",
+        "properties": {
+          "decision": {
+            "type": "string",
+            "enum": [
+              "approve",
+              "reject"
+            ]
+          },
+          "nonce": {
+            "$ref": "#/$defs/ApprovalNonce"
+          },
+          "actionDigest": {
+            "$ref": "#/$defs/ActionDigest"
+          }
+        },
+        "required": [
+          "decision",
+          "nonce",
+          "actionDigest"
+        ],
+        "additionalProperties": false
+      }
+    }
+  }
+}

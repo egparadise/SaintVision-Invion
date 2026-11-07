@@ -1,0 +1,36 @@
+{
+  "task": "FLEET5-CP-WORKSPACE-DEPLOYMENT-RECIPE-R1-20261107",
+  "taskID": "task_81d7e3dcdf88",
+  "dispatchID": "ctx_604188e68378",
+  "atKST": "2026-11-07T17:28:39+09:00",
+  "owner": "Codex B",
+  "reviewer": "Root; actual review pending",
+  "productSource": "1efea494f026e932360c35ae811b6423d874a2e7",
+  "deliveryBase": "5ba7cfb795135e1f74c0d3e83e0fea285d3cc987",
+  "branch": "agent/codex/fleet5-cp-workspace-deploy-recipe-r1-20261107",
+  "rootRef": "baaa8ea99919a7fec40f8f853a648f4067d7248d",
+  "previousPlanAcceptedAsSourceOnly": "5ba7cfb795135e1f74c0d3e83e0fea285d3cc987",
+  "rootObservation": {
+    "atKST": "2026-11-07T17:17:11+09:00",
+    "nodeCount": 3,
+    "contribution": {
+      "perNodeCPUMillis": 500,
+      "perNodeMemoryBytes": 67108864,
+      "totalCPUMillis": 1500,
+      "totalMemoryBytes": 201326592,
+      "allPhysicalResourcesShared": false
+    },
+    "freshAdmin": "REAL_ADMIN_PKCE_THREE_PROJECT_NODES_AND_CAPACITY_VERIFIED",
+    "nodesHTTP": 200,
+    "capacityHTTP": 200,
+    "workspaceConfigured": false,
+    "actualUserRun": "NOT_RUN",
+    "policyExpiry": "2026-11-08T07:15:30Z; renewal/transport restart recovery still pending",
+    "browser": "NOT_OBSERVED; authenticated project backend reads proven only"
+  },
+  "currentWorkerOperation": "STATIC_ONLY_NO_LIVE_OPERATIONS",
+  "originalStatuses": "19HOLD/discharges0/runtimeB0/A1-A16/H1-H7/H3EA/RDNULL_HOLD/raw7/A01-A40 unchanged",
+  "initialToolCorrection": "Quoted PowerShell revision suffix after unquoted brace parsing error; object was present, no fetch or product issue",
+  "trackedBaseWasClean": true,
+  "priorUntrackedReceiptsPreserved": true
+}

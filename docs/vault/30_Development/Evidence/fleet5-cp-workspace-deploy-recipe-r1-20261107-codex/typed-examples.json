@@ -1,0 +1,149 @@
+{
+  "status": "TYPED_SOURCE_EXAMPLES_NOT_RUNNABLE_CONFIG",
+  "placeholderPolicy": "Every /ROOT_ONLY_UNBOUND path is an absolute POSIX lexical placeholder, never an existing file, credential or permission claim; Root alone substitutes approved protected files. No secret value is requested or supplied.",
+  "apiConfig": {
+    "identity": {
+      "tenant_id": "97968b42-68aa-40ce-af5e-3a33e2fc2205",
+      "issuer": "https://127.0.0.1:8443/realms/saintvision",
+      "audience": "sv-api",
+      "client_ids": [
+        "sv-portal"
+      ],
+      "jwks_file": "/ROOT_ONLY_UNBOUND/public/oidc-trust-bundle.json"
+    },
+    "allowedOrigins": [
+      "http://127.0.0.1:3100"
+    ],
+    "business": true,
+    "workspace": {
+      "workingRoot": "/ROOT_ONLY_UNBOUND/workspace-api/working",
+      "nodeId": "nod_01M6TAWG25JTA3F7J7S1EE4N2W",
+      "resources": {
+        "cpu": "res_01M6TAWG25QSR4HH7XWWJSB0W0",
+        "memory": "res_01M6TAWG25ZHS2RG3NHQX4SPEH"
+      },
+      "profile": {
+        "version": "cpu-pilot-1efea-r1",
+        "images": [
+          "sha256:ffee58e8dbefc6c0db68810cd1597f8cc589cf01112c434ed7fda8d4af415634"
+        ],
+        "executables": [
+          "/usr/local/bin/python3"
+        ],
+        "max_cpu_millis": 500,
+        "max_memory_bytes": 67108864,
+        "max_timeout_seconds": 30,
+        "allow_terminal": false
+      },
+      "policyVersion": "ROOT_ONLY_UNBOUND_EXISTING_FROZEN_WORKSPACE_POLICY_VERSION",
+      "signingKeyFile": "/ROOT_ONLY_UNBOUND/pki-r1/launch-signer-private.pem",
+      "tls": {
+        "ca_file": "/ROOT_ONLY_UNBOUND/pki-r1/ca-cert.pem",
+        "certificate_file": "/ROOT_ONLY_UNBOUND/pki-r1/cp-client-cert.pem",
+        "key_file": "/ROOT_ONLY_UNBOUND/pki-r1/cp-client-key.pem",
+        "timeout": 40
+      },
+      "snapshotObjectRoot": "/ROOT_ONLY_UNBOUND/workspace-api/objects",
+      "restoreRoot": "/ROOT_ONLY_UNBOUND/workspace-api/restores"
+    }
+  },
+  "allowedOriginDisposition": "http://127.0.0.1:3100 is a proposed exact browser origin for the typed example, not an observation of the current browser. Root must preserve/bind the actual origin, including hostname/scheme/port; allowedOrigins is an Origin filter, not a cross-origin proxy or CORS enablement.",
+  "apiEnvironment": {
+    "INV_API_CONFIG": "/ROOT_ONLY_UNBOUND/workspace-api/api.json",
+    "INV_RUNTIME_DSN": "ROOT_ONLY_UNBOUND_EXISTING_RESTRICTED_KERNEL_DSN_FROM_PROTECTED_FILE",
+    "INV_BUSINESS_DSN": "ROOT_ONLY_UNBOUND_EXISTING_RESTRICTED_BUSINESS_SQLALCHEMY_URL_FROM_PROTECTED_FILE",
+    "INV_RECOVERY_EPOCH": "bcd581be-31b4-4aca-86e6-3ca31b69ed09",
+    "INV_KERNEL_BASE_URL": "http://127.0.0.1:8080"
+  },
+  "protectedFileBindings": {
+    "INV_RUNTIME_DSN": "/ROOT_ONLY_UNBOUND/protected/existing-runtime-dsn",
+    "INV_BUSINESS_DSN": "/ROOT_ONLY_UNBOUND/protected/existing-business-dsn"
+  },
+  "secretLoadingContract": "Source reads DSNs from process environment, not *_FILE variables or DSN CLI flags. Root-owned protected-file loader must create the exact child environment privately; do not put values in argv, Docker env inspection, Git, stdout or logs. No owner/superuser/operator-admission DSN may be substituted.",
+  "apiStartup": {
+    "argv": [
+      "/home/saintvision-invion3/saintvision-share/ops-fresh-cpu-1efea-r1-20261107/venv/bin/inv-control-plane"
+    ],
+    "bind": "127.0.0.1:8080 on PC3 only",
+    "sourceEntrypoint": "inv.app:main -> create_configured_app",
+    "fixedMainPort": 8080,
+    "alternativeFactory": "inv.app:create_configured_app via uvicorn --factory; src/saintvision/server.py:create_app delegates to same factory. Use installed uvicorn CLI only after Root binds its exact flags/port/self-URL. Never inv.app:app (unconfigured module-level app).",
+    "notRun": true,
+    "entrypointBindIsFixedAndIgnoresPORT": true
+  },
+  "deliveryWorkerConfig": {
+    "tenantId": "97968b42-68aa-40ce-af5e-3a33e2fc2205",
+    "tls": {
+      "ca_file": "/ROOT_ONLY_UNBOUND/pki-r1/ca-cert.pem",
+      "certificate_file": "/ROOT_ONLY_UNBOUND/pki-r1/cp-client-cert.pem",
+      "key_file": "/ROOT_ONLY_UNBOUND/pki-r1/cp-client-key.pem",
+      "timeout": 40
+    },
+    "outputRoot": "/ROOT_ONLY_UNBOUND/workspace-api/objects"
+  },
+  "workerEnvironment": {
+    "INV_WORKER_CONFIG": "/ROOT_ONLY_UNBOUND/workspace-api/delivery-worker.json",
+    "INV_RUNTIME_DSN": "ROOT_ONLY_UNBOUND_EXISTING_RESTRICTED_KERNEL_DSN_FROM_PROTECTED_FILE",
+    "INV_RECOVERY_EPOCH": "bcd581be-31b4-4aca-86e6-3ca31b69ed09"
+  },
+  "workerStartup": {
+    "argv": [
+      "/home/saintvision-invion3/saintvision-share/ops-fresh-cpu-1efea-r1-20261107/venv/bin/inv-delivery-worker",
+      "--once"
+    ],
+    "scope": "Tenant queue/containment/output reconciliation, not PC3-only or one-run-only CLI; Root must inventory/authorize affected pending work before invocation. One --once is not completion; actual receipt/output may require approved subsequent iterations.",
+    "optionalBuildExecution": "OMITTED_AND_DISABLED",
+    "notRun": true
+  },
+  "publicJWKSContract": {
+    "outerRequiredAndOnlyKeys": [
+      "issuer",
+      "expiresAt",
+      "keys"
+    ],
+    "issuerTypeAndValue": {
+      "type": "string",
+      "value": "https://127.0.0.1:8443/realms/saintvision"
+    },
+    "expiresAt": {
+      "type": "integer",
+      "constraint": "now < expiresAt <= now+7*86400; actual Root-approved expiry unbound"
+    },
+    "keys": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 8,
+      "each": "Actual copied PUBLIC RSA JWK; kty=RSA/alg=RS256/use=sig, unique nonempty kid<=128, RSA2048..4096; private d prohibited. PyJWT parses public n/e. Inner JWK is not source-enforced as a closed object."
+    },
+    "rawKeycloakJWKSFileAccepted": false,
+    "requiresIssuerHTTPSFetchOnPC3": false,
+    "actualJWKSOrTokenReadOrCryptoValidationHere": false
+  },
+  "rootOnlyRouteProposal": {
+    "status": "NOT_APPLIED_RUNNING_3100_LAUNCHER_AND_UPSTREAM_UNBOUND",
+    "pc3API": "127.0.0.1:8080",
+    "mainLoopbackForwardProposal": "127.0.0.1:18080 -> PC3 127.0.0.1:8080 over separately Root-owned pinned SSH transport",
+    "VITE_API_PROXY_TARGET": "http://127.0.0.1:18080",
+    "preserveBrowserOriginAndSSO": true,
+    "requiresNewOrReconfiguredMainProxyProcess": true,
+    "mainOperationPermittedByThisRecipe": false,
+    "wsFlagInFixedViteSource": "ABSENT; no WebSocket proxy acceptance claimed",
+    "terminalForThisPilot": "DISABLED_allow_terminal_false",
+    "noFrontendRuntimeAPIBaseKnob": true
+  },
+  "boundedRequiredChange": {
+    "status": "SOURCE_DEFECT_PROVEN_STATIC_NOT_IMPLEMENTED",
+    "surface": "apps/web/src/features/studio/DeveloperStudio.tsx handleDispatchRun and one typed first-Workspace orchestration helper",
+    "problem": "Current POST /runs payload is nonempty and has no Idempotency-Key; kernel accepts EmptyRequest only and requires key. No /start/prepare or /start/enqueue call exists anywhere in fixed frontend src. Returned draft metadata cannot prove executing.",
+    "oneBoundedFix": "Wire the existing first-Workspace protocol end to end: create {} with stable Idempotency-Key, use real IDs/current version and ready business intent, freeze canonical bounded CPU-only input through /start/prepare, display actual two-person approval state, original requester /start/enqueue after genuine distinct votes, and show only receipt/terminal/output observations as execution. Never add browser requestedBy/policy/grant authority or relax backend validation.",
+    "followupValidation": [
+      "Typed create payload/key and bounded snapshot schema",
+      "Current requester/version/Node/profile/resource binding",
+      "Two real distinct nonrequester approvals and exact returned actionDigest/nonce",
+      "Atomic enqueue and duplicate/idempotency/error handling",
+      "No simulated runner/placement success before actual receipt",
+      "Actual authenticated browser, Run, output and denial audit checks after deployment"
+    ],
+    "rootDecision": "Assign this bounded UI repair and an allowed portal cutover window; build away from restricted main host and deploy only under Root authorization. No implementation or generic approval wait in this task."
+  }
+}
