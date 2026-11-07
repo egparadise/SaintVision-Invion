@@ -12,7 +12,7 @@
     "prelint": "npm run validators:generate",
     "lint": "eslint . --max-warnings 0",
     "pretest": "npm run validators:generate",
-    "test": "node --experimental-vm-modules node_modules/vitest/vitest.mjs run",
+    "test": "vitest run --execArgv=--experimental-vm-modules",
     "preeval:check": "npm run validators:generate",
     "eval:check": "vitest run tests/agent-eval-runner.test.ts",
     "validators:generate": "node scripts/node-certificate-validator.mjs --write",

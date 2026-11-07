@@ -17,3 +17,5 @@ source_of_truth: "Git"
 다음 첫 행동/담당: Root가 published exact source·Frontend/Docs/AC11 결과·dist/manifest/hash를 대조하고 실제 Claude 한 명에게 bounded delta review를 시작한다. 수락 뒤 Root만 PC3 strict-CSP 재배포·실로그인·no-blink/resources/API 및 진짜 승인·Run/output/all5를 검증한다. 코드/CI/문서 성공으로 실제 운영 수락을 대신하지 않는다. Root만 canonical APPLY를 수행하며 이 오래된 전체 vault는 export하지 않는다.
 
 [[30_Development/Evidence/fleet5-csp02-esm-dev-compat-r1-20261108-codex/README]]
+
+첫 수정본8e3fdbd0 Frontend42398028486는1350pass/1fail/0skip으로 VM 회귀1건이 실패했다. SourceTextModule 플래그가 Vitest worker에 전달되지 않은 실제 시험 실행 설정 오류를 보존하고, 공식 --execArgv 전달만 교정한다. ESM 제품 코드·15시험·negative controls·timeout은 불변이며 새 exactSHA에서 Frontend/Docs/AC11 모두 새 실행이 필요하다.
