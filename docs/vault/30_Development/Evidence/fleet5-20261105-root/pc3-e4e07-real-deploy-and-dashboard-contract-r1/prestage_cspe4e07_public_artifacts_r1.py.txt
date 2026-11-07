@@ -1,0 +1,11 @@
+"""Inspect the accepted e4e07 public official artifacts; no remote execution."""
+import json
+from pathlib import Path
+r=Path(__file__).resolve().parents[1]
+v=json.loads((r/'.work/cspe4e07-actual-claude-r3-root-verification/root-verification.json').read_bytes())
+assert v['crCsp02SourceFindingClosed'] and v['remainingMandatoryCodeDefects']==0 and v['reviewedTarget']=='e4e07bfd6b94e57edc64d158e208df01b9319deb'
+program=(r/'.work/prestage_csp428e_public_artifacts_r1.py').read_text(encoding='utf-8')
+for a,b in [('csp428e','cspe4e07'),('428e5fc6b822d33e7e76316f443716b03579efa0','e4e07bfd6b94e57edc64d158e208df01b9319deb'),('ci-428e5fc6b822','ci-e4e07bfd6b94'),('fleet5-csp-static-validator-r1-20261108-codex','fleet5-csp02-central-vite-init-r1-20261108-codex'),('42393304702','42404194858'),('PENDING_ACTUAL_CLAUDE','ACCEPTED_ACTUAL_CLAUDE_20d9bf86_MANDATORY0')]:
+    assert a in program;program=program.replace(a,b)
+assert 'csp428e' not in program and '428e5fc6' not in program
+exec(compile(program,str(r/'.work/prestage_cspe4e07_public_artifacts_generated_r1.py'),'exec'),{'__file__':str(__file__),'__name__':'__main__'})

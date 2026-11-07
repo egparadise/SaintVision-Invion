@@ -1,0 +1,42 @@
+"""Root real-owner GET-only diagnostics; persist public response bodies, no credentials."""
+import ast
+from pathlib import Path
+r=Path(__file__).resolve().parents[1]
+existing=(r/'.work/verify_new_api96_owner_pkce_r1.py').read_text(encoding='utf-8')
+setup=existing[:existing.index("tail=r'''")]
+namespace={'__file__':str(__file__),'__name__':'__capture_setup__'}
+exec(compile(setup,str(__file__)+'-head-setup','exec'),namespace)
+tail=r'''
+    stage='actual-dashboard-real-owner-get-only-contract-diagnostic'
+    work=Path(r'D:\Project\SaintVisionI-Invion\fleet-five-orchestration-20261105\.work');dest=work/'actual-dashboard-contract-inputs-r1';assert not dest.exists();dest.mkdir()
+    def save(name,data):
+        (dest/name).write_bytes((json.dumps(data,ensure_ascii=False,indent=2)+'\n').encode())
+    statuses={};bodies={}
+    for name,path in [('session','/v1/session'),('permission','/v1/projects/'+account['project']+'/permissions/me'),('nodes','/v1/projects/'+account['project']+'/nodes'),('capacity','/v1/projects/'+account['project']+'/capacity'),('workspaces','/v1/projects/'+account['project']+'/workspaces')]:
+        status,body=api(path);assert status==200;statuses[name]=status;bodies[name]=body;save(name+'.json',body)
+    assert bodies['permission']['canAdminister'] and bodies['permission']['roleCode']=='owner'
+    assert len(bodies['nodes']['items'])==3
+    usage=[]
+    for n in bodies['nodes']['items']:
+        status,body=api('/v1/projects/'+account['project']+'/nodes/'+n['nodeId']+'/resource-usage');assert status==200
+        age=(datetime.datetime.now(datetime.timezone.utc)-datetime.datetime.fromisoformat(n['lastHeartbeatAt'])).total_seconds()
+        assert n['status']=='online' and 0<=age<20
+        save('resource-usage-'+n['nodeId']+'.json',body)
+        usage.append({'nodeId':n['nodeId'],'HTTP':status,'heartbeatAgeSeconds':age,'resources':[{'kind':x['kind'],'unit':x['unit'],'capacity':x['capacity'],'offered':x['offered'],'reserved':x['reserved'],'spare':x['spare'],'measured':x['measured']} for x in body['resources']]})
+    for workspace in bodies['workspaces']['workspaces']:
+        if workspace['status']=='ready':
+            status,body=api('/v1/projects/'+account['project']+'/workspaces/'+workspace['workspaceId']+'/first-intents');assert status==200;save('first-intents-'+workspace['workspaceId']+'.json',body)
+    health=[]
+    for port in [3100,18080]:
+        with urllib.request.urlopen('http://127.0.0.1:'+str(port)+'/healthz',timeout=8) as response:
+            data=response.read(65536);health.append({'port':port,'HTTP':response.status,'contentType':response.headers.get('Content-Type'),'body':data.decode('utf-8')})
+    save('actual-portal-and-api-healthz.json',health)
+    receipt={'atKST':datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=9))).isoformat(timespec='seconds'),'status':'REAL_OWNER_GET_ONLY_DASHBOARD_CONTRACT_INPUTS_CAPTURED','backendSource':'96afd799d49717fd40e4ddabd538d82accbe1958','frontendSource':'e4e07bfd6b94e57edc64d158e208df01b9319deb','projectId':account['project'],'PKCES256':True,'tokenExchangeHTTP':token_status,'HTTP':statuses,'usage':usage,'canonicalNodeResponseFields':sorted(bodies['nodes']['items'][0]),'actualHealth':health,'allApplicationRequestsGET':True,'dataOrRolesOrRunOrVotesChanged':False,'passwordOrTokensPersisted':False,'explicitExistingPublicChainTLSVerified':True,'wholeProgramComplete':False}
+    save('receipt.json',receipt)
+    del token,tokens,token_body,query
+    print(json.dumps(receipt,ensure_ascii=False),flush=True)
+except Exception as e:
+    print(json.dumps({'failedStage':stage,'errorType':type(e).__name__,'detailsSuppressed':True}),flush=True);raise SystemExit(1)
+'''
+program=namespace['head']+tail;ast.parse(program)
+exec(compile(program,str(__file__),'exec'),{'__file__':str(__file__),'__name__':'__main__'})

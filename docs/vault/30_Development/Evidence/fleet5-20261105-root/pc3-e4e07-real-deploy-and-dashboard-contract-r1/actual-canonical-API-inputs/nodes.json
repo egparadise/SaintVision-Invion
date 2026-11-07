@@ -1,0 +1,19 @@
+{
+  "items": [
+    {
+      "nodeId": "nod_01M6TAWG25JTA3F7J7S1EE4N2W",
+      "status": "online",
+      "lastHeartbeatAt": "2026-11-07T19:47:39.667651+00:00"
+    },
+    {
+      "nodeId": "nod_01M6TGQZ8S3DAFS7TYE8TY1PX2",
+      "status": "online",
+      "lastHeartbeatAt": "2026-11-07T19:47:39.668530+00:00"
+    },
+    {
+      "nodeId": "nod_01M6TGSXV1J7XWC5D5H7N6EW1D",
+      "status": "online",
+      "lastHeartbeatAt": "2026-11-07T19:47:39.664631+00:00"
+    }
+  ]
+}

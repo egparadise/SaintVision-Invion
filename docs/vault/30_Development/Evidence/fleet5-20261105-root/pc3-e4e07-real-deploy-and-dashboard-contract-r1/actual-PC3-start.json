@@ -1,0 +1,108 @@
+{
+  "atKST": "2026-11-08T04:37:00+09:00",
+  "SSHExit": 0,
+  "stderrBytes": 0,
+  "knownHostsUnchanged": true,
+  "remote": {
+    "portalRouteChanged": false,
+    "mainProductExecuted": false,
+    "privateMaterialPresent": false,
+    "actualRunOrVotesCreated": false,
+    "wholeProgramComplete": false,
+    "containerID": "1131d7dbcbf99c7429ad341c7a5ad19f915a5941bac6555c168ddd91c174ea1f",
+    "protectedAPIObserverNodeAndOldFallbackUnchanged": [
+      [
+        "8d62139c2408dff910bbfb3a9b322be56520705a3f3e967ce74563cfe9cd3f28",
+        "true",
+        "0"
+      ],
+      [
+        "b8a2f8f55e524837c4b7db14565ec5f960c4492bc3b9df6972e7f1f153c2aec5",
+        "true",
+        "0"
+      ],
+      [
+        "702fa3fbc43e8deded94e67c6e5299eb4549958e074ba4aeb40c216db29752f7",
+        "true",
+        "0"
+      ],
+      [
+        "60233888fc91f861f8bebb0f9a6abddf10165f4a855bc0e67fda9b1c86354994",
+        "true",
+        "0"
+      ]
+    ],
+    "Root530PredeploymentCheckpoint": "2e5999ac6fe8bb64d083153c38da263985537ec0",
+    "actualIndependentReview": "20d9bf8622a0f0624a323b92acaeb33cea91fb9e",
+    "status": "ACCEPTED_FRONTEND_E4E07_RUNNING_PC3_LOOPBACK_NOT_CUT_OVER",
+    "source": "e4e07bfd6b94e57edc64d158e208df01b9319deb",
+    "frontendBuildSource": "e4e07bfd6b94e57edc64d158e208df01b9319deb",
+    "frontendUnchangedAtAcceptedSource": true,
+    "imageId": "sha256:aa070f4a8d5e43f521c510ce96b0304ecac1be665cc6170dc15cf02de0a1f13c",
+    "imageIndex": "sha256:aa070f4a8d5e43f521c510ce96b0304ecac1be665cc6170dc15cf02de0a1f13c",
+    "imageConfigID": "sha256:8ebee654a473246eb4ad393b6cdcbe52337e4002dbc1cb51e1fed29fd74e2aba",
+    "name": "saintvision-portal-e4e07-bcd581be-r1",
+    "bind": "PC3 127.0.0.1:13102",
+    "sameHostAPIUpstream": "http://127.0.0.1:8080",
+    "clientTransport": "Main loopback through pinned SSH planned",
+    "HTTPPilotOnly": true,
+    "HTTPSDeploymentClaimed": false,
+    "checks": [
+      {
+        "path": "/studio",
+        "http": 200,
+        "securityHeadersPresent": true
+      },
+      {
+        "path": "/callback",
+        "http": 200,
+        "securityHeadersPresent": true
+      },
+      {
+        "path": "/auth-config.js",
+        "http": 200,
+        "securityHeadersPresent": true
+      },
+      {
+        "path": "/healthz",
+        "http": 200,
+        "securityHeadersPresent": true
+      },
+      {
+        "path": "/v1/session",
+        "http": 401,
+        "securityHeadersPresent": true
+      },
+      {
+        "path": "/assets/does-not-exist.js",
+        "http": 404,
+        "securityHeadersPresent": true
+      }
+    ],
+    "allDistOriginalHashesExceptPublicAuthConfig": {
+      "assets/icons-DVYUNEhE.js": "94f3f917fa843a4e312937688a83f400ea3d5617d1f1e1f36d6bc643f78ffa9e",
+      "assets/icons-DVYUNEhE.js.map": "bdc634b37b1574e46b91990a227c6ecf862e6364ec9219a524c88741ee294ea3",
+      "assets/index-Dzl2cYez.js": "d67f22a4da1c54d7158ed70765d6815d328684233e268def41c7c33c3ef4a669",
+      "assets/index-Dzl2cYez.js.map": "8ad517d558ed3d9702e75b37cb2042b376da6a11bf7033ae14224bb85da55716",
+      "assets/index-kKrfL4r3.css": "66d8552241923e10b189e3b9372f85205bccbf083a5dc19872d001fd91ad0d26",
+      "assets/query-DtERyQJL.js": "3a24ebe459ff24b83ef333288347529de609b65f1c25d5c5b74f2f8b20e2904d",
+      "assets/query-DtERyQJL.js.map": "d584967ed9a938c701324896050b1db23187d2a79840fe5fac55791a2eafc500",
+      "assets/vendor-CYSfZuHu.js": "d967cddbe86b7822415ceafb696d97dea5a491621955cb4127e0f3f96e5497eb",
+      "assets/vendor-CYSfZuHu.js.map": "037070c1858eff839f466f2431a724493a80f81c8f47484c4c6c21698885d15e",
+      "index.html": "a3dabb59cf001795282b799334353504e1410fdb90f163381b3e5115f3f3f281",
+      "manifest.json": "d4c3c0897d7be95321a37babc97bd922618cf8142dd9103faef1efe700fd343a",
+      "sw.js": "5befc07c048a6a49d7f7ec492fe1c04ae8b40283dcc8387ef4e6b2b92c516dcd"
+    },
+    "callbackQueryAbsentFromLogs": true,
+    "nginxTestExit": 0,
+    "UID": "101:101",
+    "memoryBytes": 134217728,
+    "CPUQuotaMillis": 500,
+    "pidsLimit": 64,
+    "readOnlyRoot": true,
+    "capDropAll": true,
+    "noNewPrivileges": true,
+    "privateMounts": false,
+    "atKST": "2026-11-08T04:37:00+09:00"
+  }
+}

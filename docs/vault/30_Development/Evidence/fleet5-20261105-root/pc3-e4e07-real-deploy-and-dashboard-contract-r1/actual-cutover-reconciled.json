@@ -1,0 +1,18 @@
+{
+  "atKST": "2026-11-08T04:41:59+09:00",
+  "status": "ACTUAL_CUTOVER_SUCCESS_RECONCILED_AFTER_PARENT_PS_EXIT_CHECK_ERROR",
+  "source": "e4e07bfd6b94e57edc64d158e208df01b9319deb",
+  "actualIndependentReview": "20d9bf8622a0f0624a323b92acaeb33cea91fb9e",
+  "actualForward": {
+    "ListenerVerified": true,
+    "PID": 64240,
+    "CreatedUTC": "2026-11-07T19:40:23.4743790Z"
+  },
+  "servedOfficialFilesMatched": 12,
+  "strictCSPPreserved": true,
+  "parentWrapperExitWasOne": true,
+  "reason": "Invoking a PowerShell script containing no native command leaves LASTEXITCODE null; the parent null-ne-zero check threw AFTER the actual script saved success. Reconciled exact PID/start/command/listener and every official file without rerunning cutover. Earlier UTF8 parse failure occurred before any intent or mutation; Encoding UTF8 corrected before one actual cutover.",
+  "cutoverRepeated": false,
+  "mainApplicationStarted": false,
+  "wholeProgramComplete": false
+}

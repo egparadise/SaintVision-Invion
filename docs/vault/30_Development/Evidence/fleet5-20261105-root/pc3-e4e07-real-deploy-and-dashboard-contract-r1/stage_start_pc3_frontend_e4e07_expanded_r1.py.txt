@@ -1,0 +1,104 @@
+"""Deploy the exact accepted hosted frontend with explicit loopback pilot wiring."""
+import datetime,hashlib,json,re,shlex,subprocess,tarfile,zipfile
+from pathlib import Path
+r=Path(__file__).resolve().parents[1];w=r/'.work';out=w/'pc3-frontende4e07-r1';assert not out.exists();out.mkdir()
+source='e4e07bfd6b94e57edc64d158e208df01b9319deb';frontend=source
+def git(path):
+ q=subprocess.run(['git','show',source+':'+path],capture_output=True,cwd=r);assert q.returncode==0;return q.stdout.decode()
+assert subprocess.check_output(['git','diff',frontend,source,'--','apps/web','deploy/intranet/portal'],cwd=r)==b''
+a=w/'cspe4e07-artifact-prestage-r1';tar=a/'portal-image.tar';web=a/'saintvision-web-dist.zip'
+with zipfile.ZipFile(a/'saintvision-portal-release.zip') as z:evidence=json.loads(z.read('portal-release-evidence.json'))
+assert evidence['codeSha']==frontend and hashlib.file_digest(tar.open('rb'),'sha256').hexdigest()==evidence['tarSha256']
+assert hashlib.file_digest(web.open('rb'),'sha256').hexdigest()=='99e8ed94f4f144d571b9a9a192ba10455af69ab356fdf969e11f9e3dfee7fa5a'
+with tarfile.open(tar) as t:
+ index=json.load(t.extractfile('index.json'));assert index['manifests'][0]['digest']==evidence['imageId']
+ manifest=json.load(t.extractfile('manifest.json'));assert len(manifest)==1;config=manifest[0]['Config'];assert hashlib.sha256(t.extractfile(config).read()).hexdigest()==config.split('/')[-1];config_id='sha256:'+config.split('/')[-1]
+ for m in t.getmembers():
+  if m.isfile() and m.name.startswith('blobs/sha256/'):assert hashlib.file_digest(t.extractfile(m),'sha256').hexdigest()==m.name.rsplit('/',1)[-1]
+conf=git('deploy/intranet/portal/nginx.conf');original_conf=conf
+start=conf.index('    # HTTP Server (Port 80)');end=conf.index('    # HTTPS Server (Port 443)');conf=conf[:start]+conf[end:]
+assert conf.count('listen 443 ssl;')==1 and conf.count('listen [::]:443 ssl;')==1
+conf=conf.replace('listen 443 ssl;','listen 127.0.0.1:13102;').replace('        listen [::]:443 ssl;\n','').replace('server_name portal.sv.lan;','server_name 127.0.0.1 localhost;').replace('worker_processes auto;','worker_processes 1;')
+conf=conf.replace('    include /etc/nginx/conf.d/upstream.conf;','    # Operator pilot: same-host loopback upstream, encrypted SSH client transport.')
+conf=re.sub(r'^\s*(?:ssl_[a-z_]+|proxy_ssl_[a-z_]+)\s+[^\n]+;\n','',conf,flags=re.M)
+assert conf.count('proxy_pass https://control_plane;')==4
+conf=conf.replace('proxy_pass https://control_plane;','proxy_pass http://127.0.0.1:8080;').replace('proxy_set_header Host cp.sv.lan;','proxy_set_header Host $http_host;').replace('proxy_set_header X-Forwarded-Proto https;','proxy_set_header X-Forwarded-Proto $scheme;')
+assert 'ssl_verify off' not in conf and 'listen 80;' not in conf and 'listen 443' not in conf and 'proxy_ssl_' not in conf and 'privacy' in conf and 'access_log off;' in conf
+headers=git('deploy/intranet/portal/security-headers.conf');assert headers.count('connect-src \'self\' https://idp.sv.lan;')==1
+headers=headers.replace("connect-src 'self' https://idp.sv.lan;","connect-src 'self' https://127.0.0.1:8443;")
+bundle=json.loads((w/'pc3-api96-protected-config-r1/public-trust-bundle.json').read_bytes());assert bundle['issuer']=='https://127.0.0.1:8443/realms/saintvision'
+auth='// Operator-owned public loopback pilot OIDC configuration. No private material.\nwindow.__SAINTVISION_CONFIG__ = '+json.dumps({'issuer':bundle['issuer'],'clientId':'sv-portal','scope':'openid inv.api','redirectUri':'http://127.0.0.1:3100/callback','jwks':{'keys':bundle['keys']}},indent=2)+';\n'
+for name,value in [('nginx.conf',conf),('security-headers.conf',headers),('auth-config.js',auth)]: (out/name).write_text(value,encoding='utf8',newline='\n')
+root='/home/saintvision-invion3/saintvision-share/ops-fresh-cpu-1efea-r1-20261107/portal-e4e07-r1'
+known=Path(r'D:\Project\SaintVisionI-Invion\fleet5-worker-readiness-20261105\.work\f5-low-closure-26607075f612\known_hosts.f5.pinned');kh='0dcbf0f4cfc363e4affc30810ad8a9e57bd2c4a31991e2c8285bdae7052ec2d2';assert hashlib.sha256(known.read_bytes()).hexdigest()==kh
+flags=['-i',r'C:\Users\inviz\.ssh\sv-lan-ed25519','-o','IdentitiesOnly=yes','-o','BatchMode=yes','-o','ConnectTimeout=5','-o','StrictHostKeyChecking=yes','-o','UserKnownHostsFile='+str(known)];host='saintvision-invion3@192.168.45.222'
+q=subprocess.run(['ssh','-T',*flags,host,'python3','-I','-B','-c',shlex.quote("import os;from pathlib import Path;os.umask(0o077);p=Path("+repr(root)+");assert p.parent.is_dir();p.mkdir(mode=0o700)")],capture_output=True,timeout=15);assert q.returncode==0 and not q.stderr
+for p in [tar,web,out/'nginx.conf',out/'security-headers.conf',out/'auth-config.js']:
+ q=subprocess.run(['scp','-q',*flags,str(p),host+':'+root+'/'+p.name],capture_output=True,timeout=90);assert q.returncode==0,('public-transfer',p.name,q.returncode)
+payload={'root':root,'source':source,'frontendSource':frontend,'imageIndex':evidence['imageId'],'configID':config_id,'tarSHA256':evidence['tarSha256'],'webSHA256':'99e8ed94f4f144d571b9a9a192ba10455af69ab356fdf969e11f9e3dfee7fa5a','publicFiles':{p.name:hashlib.sha256(p.read_bytes()).hexdigest() for p in [out/'nginx.conf',out/'security-headers.conf',out/'auth-config.js']}}
+remote=r'''import datetime,hashlib,json,os,stat,subprocess,sys,time,urllib.request,urllib.error,zipfile
+from pathlib import Path
+o={'portalRouteChanged':False,'mainProductExecuted':False,'privateMaterialPresent':False,'actualRunOrVotesCreated':False,'wholeProgramComplete':False};phase='input-pins'
+try:
+ p=json.load(sys.stdin);os.umask(0o077);root=Path(p['root']);assert os.getuid()==1000 and root.is_dir() and not root.is_symlink();assert stat.S_IMODE(root.stat().st_mode)==0o700
+ for name,digest in {'portal-image.tar':p['tarSHA256'],'saintvision-web-dist.zip':p['webSHA256'],**p['publicFiles']}.items():assert hashlib.file_digest((root/name).open('rb'),'sha256').hexdigest()==digest
+ for n in p['publicFiles']:(root/n).chmod(0o444)
+ protected_ids=['8d62139c2408dff910bbfb3a9b322be56520705a3f3e967ce74563cfe9cd3f28','b8a2f8f55e524837c4b7db14565ec5f960c4492bc3b9df6972e7f1f153c2aec5','702fa3fbc43e8deded94e67c6e5299eb4549958e074ba4aeb40c216db29752f7','60233888fc91f861f8bebb0f9a6abddf10165f4a855bc0e67fda9b1c86354994']
+ def protected_state():
+  result=[]
+  for ident in protected_ids:
+   q=subprocess.run(['docker','container','inspect','--format','{{.Id}} {{.State.Running}} {{.RestartCount}}',ident],capture_output=True,timeout=10);assert q.returncode==0
+   parts=q.stdout.decode().strip().split();assert parts[0]==ident and parts[1]=='true';result.append(parts)
+  return result
+ protected_before=protected_state()
+ assert not [x for x in Path('/proc/net/tcp').read_text().splitlines()[1:] if x.split()[3]=='0A' and x.split()[1].endswith(':332E')]
+ dist=root/'dist';dist.mkdir(mode=0o700)
+ with zipfile.ZipFile(root/'saintvision-web-dist.zip') as z:
+  names=z.namelist();assert len(names)==13 and len(names)==len(set(names))
+  for item in z.infolist():
+   assert not item.filename.startswith(('/','\\')) and '..' not in item.filename.replace('\\','/').split('/') and item.file_size<8*1024*1024
+   dest=dist/item.filename;dest.parent.mkdir(parents=True,exist_ok=True,mode=0o755);dest.write_bytes((root/'auth-config.js').read_bytes() if item.filename=='auth-config.js' else z.read(item));dest.chmod(0o444)
+ for d in [dist,dist/'assets']:d.chmod(0o555)
+ phase='official-image-load'
+ q=subprocess.run(['docker','load','-i',str(root/'portal-image.tar')],capture_output=True,timeout=70);(root/'image-load.stdout.txt').write_bytes(q.stdout);(root/'image-load.stderr.txt').write_bytes(q.stderr);assert q.returncode==0
+ q=subprocess.run(['docker','image','inspect',p['imageIndex']],capture_output=True,timeout=10);assert q.returncode==0;image=json.loads(q.stdout)[0];assert image['Id'] in [p['imageIndex'],p['configID']] and image['Os']=='linux' and image['Architecture']=='amd64';image_id=image['Id']
+ name='saintvision-portal-e4e07-bcd581be-r1'
+ q=subprocess.run(['docker','container','ls','-a','--filter','name=^/'+name+'$','--format','{{.ID}}'],capture_output=True,timeout=10);assert q.returncode==0 and not q.stdout.strip()
+ listeners=lambda:[x.split()[1] for x in Path('/proc/net/tcp').read_text().splitlines()[1:] if x.split()[3]=='0A' and x.split()[1].endswith(':332E')]
+ assert listeners()==[]
+ common=['--network','host','--user','101:101','--cpus','0.5','--memory','128m','--memory-swap','128m','--pids-limit','64','--read-only','--cap-drop','ALL','--security-opt','no-new-privileges','--tmpfs','/tmp:rw,nosuid,noexec,size=32m,mode=1777']
+ mounts=[(root/'nginx.conf','/etc/nginx/nginx.conf'),(root/'security-headers.conf','/etc/nginx/security-headers.conf'),(dist,'/usr/share/nginx/html')]
+ for src,dst in mounts:common.extend(['--mount',f'type=bind,src={src},dst={dst},readonly'])
+ phase='restricted-nginx-configuration-test'
+ q=subprocess.run(['docker','run','--rm',*common,'--entrypoint','nginx',image_id,'-t'],capture_output=True,timeout=20);(root/'nginx-test.stdout.txt').write_bytes(q.stdout);(root/'nginx-test.stderr.txt').write_bytes(q.stderr);assert q.returncode==0
+ phase='start-once-new-remote-portal'
+ q=subprocess.run(['docker','run','-d','--name',name,'--restart','unless-stopped',*common,'--label','ai.saintvision.owner=fleet5-root530','--label','ai.saintvision.source='+p['source'],'--entrypoint','nginx',image_id,'-g','daemon off;'],capture_output=True,timeout=20);assert q.returncode==0;cid=q.stdout.decode().strip();o['containerID']=cid
+ op=urllib.request.build_opener(urllib.request.ProxyHandler({}));base='http://127.0.0.1:13102';checks=[]
+ for attempt in range(20):
+  try:
+   with op.open(base+'/index.html',timeout=2) as response:html=response.read();break
+  except urllib.error.URLError:time.sleep(.25)
+ assert html==(dist/'index.html').read_bytes()
+ for path,status in [('/studio',200),('/callback?code=PUBLIC_LOG_REDACTION_SENTINEL',200),('/auth-config.js',200),('/healthz',200),('/v1/session',401),('/assets/does-not-exist.js',404)]:
+  try:
+   with op.open(base+path,timeout=3) as response:actual=response.status;head=dict(response.headers);body=response.read(2*1024*1024)
+  except urllib.error.HTTPError as error:actual=error.code;head=dict(error.headers);body=error.read(4096)
+  assert actual==status,(path,actual);assert head.get('X-Content-Type-Options')=='nosniff' and head.get('X-Frame-Options')=='DENY';assert 'https://127.0.0.1:8443' in head['Content-Security-Policy']
+  if path=='/auth-config.js':assert body==(root/'auth-config.js').read_bytes() and 'no-store' in head['Cache-Control']
+  checks.append({'path':path.split('?')[0],'http':actual,'securityHeadersPresent':True})
+ logs=subprocess.run(['docker','logs',cid],capture_output=True,timeout=10);assert b'PUBLIC_LOG_REDACTION_SENTINEL' not in logs.stdout+logs.stderr
+ q=subprocess.run(['docker','container','inspect',cid],capture_output=True,timeout=10);assert q.returncode==0;v=json.loads(q.stdout)[0];assert v['State']['Running'] and v['RestartCount']==0 and v['Config']['User']=='101:101' and len(v['Mounts'])==3 and all(not x['RW'] for x in v['Mounts']) and v['HostConfig']['ReadonlyRootfs']
+ assert listeners()==['0100007F:332E']
+ assert protected_state()==protected_before
+ o['protectedAPIObserverNodeAndOldFallbackUnchanged']=protected_before
+ o['Root530PredeploymentCheckpoint']='2e5999ac6fe8bb64d083153c38da263985537ec0'
+ o['actualIndependentReview']='20d9bf8622a0f0624a323b92acaeb33cea91fb9e'
+ o.update(status='ACCEPTED_FRONTEND_E4E07_RUNNING_PC3_LOOPBACK_NOT_CUT_OVER',source=p['source'],frontendBuildSource=p['frontendSource'],frontendUnchangedAtAcceptedSource=True,imageId=image_id,imageIndex=p['imageIndex'],imageConfigID=p['configID'],name=name,bind='PC3 127.0.0.1:13102',sameHostAPIUpstream='http://127.0.0.1:8080',clientTransport='Main loopback through pinned SSH planned',HTTPPilotOnly=True,HTTPSDeploymentClaimed=False,checks=checks,allDistOriginalHashesExceptPublicAuthConfig={str(f.relative_to(dist)):hashlib.sha256(f.read_bytes()).hexdigest() for f in sorted(dist.rglob('*')) if f.is_file() and f.name!='auth-config.js'},callbackQueryAbsentFromLogs=True,nginxTestExit=0,UID='101:101',memoryBytes=134217728,CPUQuotaMillis=500,pidsLimit=64,readOnlyRoot=True,capDropAll=True,noNewPrivileges=True,privateMounts=False)
+except BaseException as e:o.update(status='HOLD_PC3_PORTAL_E4E07_RECONCILE_REQUIRED',phase=phase,errorClass=type(e).__name__,noBlindReplay=True)
+o['atKST']=datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=9))).isoformat(timespec='seconds')
+(root/'public-receipt.json').write_text(json.dumps(o,indent=2)+'\n');print(json.dumps(o));raise SystemExit(0 if o.get('status')=='ACCEPTED_FRONTEND_E4E07_RUNNING_PC3_LOOPBACK_NOT_CUT_OVER' else 2)
+'''
+(out/'remote-portal-program.py.txt').write_text(remote,encoding='utf8')
+q=subprocess.run(['ssh','-T',*flags,host,'python3','-I','-B','-c',shlex.quote(remote)],input=json.dumps(payload).encode(),capture_output=True,timeout=135)
+receipt={'atKST':datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=9))).isoformat(timespec='seconds'),'SSHExit':q.returncode,'stderrBytes':len(q.stderr),'knownHostsUnchanged':hashlib.sha256(known.read_bytes()).hexdigest()==kh,'remote':json.loads(q.stdout) if q.stdout else None}
+(out/'receipt.json').write_text(json.dumps(receipt,indent=2)+'\n');print(json.dumps(receipt),flush=True);assert q.returncode==0 and not q.stderr

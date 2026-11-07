@@ -1,0 +1,44 @@
+"""Root deploys the exact accepted e4e07 public frontend on a new PC3 port."""
+import hashlib,json,subprocess
+from pathlib import Path
+r=Path(__file__).resolve().parents[1];w=r/'.work'
+seal=json.loads((w/'root530-final-verification.json').read_bytes())
+assert seal['syncExits']==[0,0,0] and seal['trackedAndUntrackedClean'] and seal['exactHeadCorrelationAllJobsSuccess'] and seal['pending']==seal['conflicts']==0
+assert subprocess.check_output(['git','rev-parse','HEAD'],cwd=r).decode().strip()==seal['SHA']
+assert not subprocess.check_output(['git','status','--porcelain','-z'],cwd=r)
+review=json.loads((w/'cspe4e07-actual-claude-r3-root-verification/root-verification.json').read_bytes())
+assert review['remainingMandatoryCodeDefects']==0 and review['crCsp02SourceFindingClosed'] and review['reviewSource']=='20d9bf8622a0f0624a323b92acaeb33cea91fb9e'
+artifact=json.loads((w/'cspe4e07-artifact-prestage-r1/receipt.json').read_bytes())
+assert artifact['source']=='e4e07bfd6b94e57edc64d158e208df01b9319deb' and artifact['allOCIBlobHashesMatched'] and artifact['dist13HashesMatchedHostedBrowserEvidence']
+program=(w/'stage_start_pc3_frontend905_r1.py').read_text(encoding='utf-8')
+for a,b in [
+    ("source='96afd799d49717fd40e4ddabd538d82accbe1958';frontend='90578f49ea400958fcdbc1ded3908d624e856f57'","source='e4e07bfd6b94e57edc64d158e208df01b9319deb';frontend=source"),
+    ('pc3-frontend905-r1','pc3-frontende4e07-r1'),('frontend905-artifacts-r1','cspe4e07-artifact-prestage-r1'),
+    ('5045f2ef1f6f120c1ee644168a21979e1f7df3f88241bb49c0397f5b244e2bf0','99e8ed94f4f144d571b9a9a192ba10455af69ab356fdf969e11f9e3dfee7fa5a'),
+    ('portal905-r1','portal-e4e07-r1'),('saintvision-portal905-bcd581be-r1','saintvision-portal-e4e07-bcd581be-r1'),
+    ('13100','13102'),(':332C',':332E'),('fleet5-root523','fleet5-root530'),
+    ('HOLD_PC3_PORTAL905_RECONCILE_REQUIRED','HOLD_PC3_PORTAL_E4E07_RECONCILE_REQUIRED'),
+    ('ACCEPTED_FRONTEND905_RUNNING_PC3_LOOPBACK_NOT_CUT_OVER','ACCEPTED_FRONTEND_E4E07_RUNNING_PC3_LOOPBACK_NOT_CUT_OVER')]:
+    assert a in program,a;program=program.replace(a,b)
+old="dest.write_bytes(z.read(item));dest.chmod(0o444)\n (dist/'auth-config.js').write_bytes((root/'auth-config.js').read_bytes());(dist/'auth-config.js').chmod(0o444)"
+new="dest.write_bytes((root/'auth-config.js').read_bytes() if item.filename=='auth-config.js' else z.read(item));dest.chmod(0o444)"
+assert old in program;program=program.replace(old,new)
+old=" dist=root/'dist';dist.mkdir(mode=0o700)"
+new=""" for n in p['publicFiles']:(root/n).chmod(0o444)
+ protected_ids=['8d62139c2408dff910bbfb3a9b322be56520705a3f3e967ce74563cfe9cd3f28','b8a2f8f55e524837c4b7db14565ec5f960c4492bc3b9df6972e7f1f153c2aec5','702fa3fbc43e8deded94e67c6e5299eb4549958e074ba4aeb40c216db29752f7','60233888fc91f861f8bebb0f9a6abddf10165f4a855bc0e67fda9b1c86354994']
+ def protected_state():
+  result=[]
+  for ident in protected_ids:
+   q=subprocess.run(['docker','container','inspect','--format','{{.Id}} {{.State.Running}} {{.RestartCount}}',ident],capture_output=True,timeout=10);assert q.returncode==0
+   parts=q.stdout.decode().strip().split();assert parts[0]==ident and parts[1]=='true';result.append(parts)
+  return result
+ protected_before=protected_state()
+ assert not [x for x in Path('/proc/net/tcp').read_text().splitlines()[1:] if x.split()[3]=='0A' and x.split()[1].endswith(':332E')]
+ dist=root/'dist';dist.mkdir(mode=0o700)"""
+assert old in program;program=program.replace(old,new)
+old=" assert listeners()==['0100007F:332E']"
+new=old+"\n assert protected_state()==protected_before\n o['protectedAPIObserverNodeAndOldFallbackUnchanged']=protected_before\n o['Root530PredeploymentCheckpoint']='"+seal['SHA']+"'\n o['actualIndependentReview']='20d9bf8622a0f0624a323b92acaeb33cea91fb9e'"
+assert old in program;program=program.replace(old,new)
+assert '90578f49' not in program and '13100' not in program
+(w/'stage_start_pc3_frontend_e4e07_expanded_r1.py.txt').write_text(program,encoding='utf-8')
+exec(compile(program,str(w/'stage_start_pc3_frontend_e4e07_expanded_r1.py.txt'),'exec'),{'__file__':str(__file__),'__name__':'__main__'})

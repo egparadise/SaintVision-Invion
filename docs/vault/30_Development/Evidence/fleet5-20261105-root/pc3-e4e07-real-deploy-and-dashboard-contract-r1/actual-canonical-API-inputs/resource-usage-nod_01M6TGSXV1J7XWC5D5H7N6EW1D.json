@@ -1,0 +1,29 @@
+{
+  "source": "execution-kernel",
+  "nodeId": "nod_01M6TGSXV1J7XWC5D5H7N6EW1D",
+  "stateAsOf": "2026-11-07T19:47:39.664631+00:00",
+  "resources": [
+    {
+      "resourceId": "res_01M6TGSXV1DZ02FP8Z8PH2FGDB",
+      "kind": "memory",
+      "unit": "bytes",
+      "capacity": 67108864,
+      "offered": 67108864,
+      "reserved": 0,
+      "spare": 67108864,
+      "measured": true,
+      "observedAt": "2026-11-07T19:47:39.664631+00:00"
+    },
+    {
+      "resourceId": "res_01M6TGSXV1JYVSGXTXBVPFAXKR",
+      "kind": "cpu",
+      "unit": "millicores",
+      "capacity": 500,
+      "offered": 500,
+      "reserved": 0,
+      "spare": 500,
+      "measured": true,
+      "observedAt": "2026-11-07T19:47:39.664631+00:00"
+    }
+  ]
+}

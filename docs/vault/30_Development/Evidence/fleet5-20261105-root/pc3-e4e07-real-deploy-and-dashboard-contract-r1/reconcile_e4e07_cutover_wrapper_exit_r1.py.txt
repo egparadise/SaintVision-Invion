@@ -1,0 +1,16 @@
+import datetime,hashlib,json,subprocess,urllib.request
+from pathlib import Path
+r=Path(__file__).resolve().parents[1];w=r/'.work';out=w/'portal3100-e4e07-cutover-root-reconciled-r1.json';assert not out.exists()
+c=json.loads((w/'portal3100-e4e07-cutover-r1.json').read_text(encoding='utf-8-sig'))
+assert c['Status']=='EXACT_E4E07_PC3_PORTAL_MAIN3100_CUTOVER_HTTP_VERIFIED' and c['NewForwardPID']==64240 and c['NewForwardStartedAt']=='2026-11-08T04:40:23.4743791+09:00' and not c['RollbackUsed']
+code="$ErrorActionPreference='Stop';$p=Get-CimInstance Win32_Process -Filter 'ProcessId=64240';if (-not $p -or $p.Name -ne 'ssh.exe') {throw 'Owned SSH missing'};$l=@(Get-NetTCPConnection -State Listen | Where-Object {$_.LocalPort -eq 3100});if ($l.Count -ne 1 -or $l[0].LocalAddress -ne '127.0.0.1' -or $l[0].OwningProcess -ne 64240) {throw 'Owned listener differs'};@{PID=$p.ProcessId;CreatedUTC=$p.CreationDate.ToUniversalTime().ToString('o');Command=$p.CommandLine;ListenerVerified=$true}|ConvertTo-Json -Compress"
+q=subprocess.run(['powershell','-NoProfile','-NonInteractive','-Command',code],capture_output=True,timeout=20);assert q.returncode==0
+identity=json.loads(q.stdout);assert identity['CreatedUTC']==c['NewOwnedForward']['CreatedUTC'] and hashlib.sha256(identity.pop('Command').encode()).hexdigest()==c['NewOwnedForward']['CommandSHA256']
+op=urllib.request.build_opener(urllib.request.ProxyHandler({}));checked=[]
+for item in c['HTTPArtifactFiles']:
+    with op.open('http://127.0.0.1:3100/'+item['Path'],timeout=8) as response:
+        assert response.status==200 and hashlib.sha256(response.read()).hexdigest()==item['SHA256']
+        assert response.headers.get('Content-Security-Policy') and 'unsafe-eval' not in response.headers['Content-Security-Policy'];checked.append(item['Path'])
+assert len(checked)==12
+v={'atKST':datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=9))).isoformat(timespec='seconds'),'status':'ACTUAL_CUTOVER_SUCCESS_RECONCILED_AFTER_PARENT_PS_EXIT_CHECK_ERROR','source':c['Source'],'actualIndependentReview':c['IndependentReview'],'actualForward':identity,'servedOfficialFilesMatched':12,'strictCSPPreserved':True,'parentWrapperExitWasOne':True,'reason':'Invoking a PowerShell script containing no native command leaves LASTEXITCODE null; the parent null-ne-zero check threw AFTER the actual script saved success. Reconciled exact PID/start/command/listener and every official file without rerunning cutover. Earlier UTF8 parse failure occurred before any intent or mutation; Encoding UTF8 corrected before one actual cutover.','cutoverRepeated':False,'mainApplicationStarted':False,'wholeProgramComplete':False}
+out.write_text(json.dumps(v,indent=2)+'\n',encoding='utf-8');print(json.dumps(v),flush=True)

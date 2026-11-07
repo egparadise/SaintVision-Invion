@@ -1,15 +1,19 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.491"
+version: "1.0.492"
 status: "review"
 author: "Codex"
-updated: "2026-11-08T04:34:48+09:00"
+updated: "2026-11-08T04:50:03+09:00"
 source_of_truth: "Git"
 active_card: "FLEET5 continued supervision with PORTAL-REFRESH-FLEET-20261106"
-active_card_status: "ActualClaude20d9AcceptsE4e07_Mandatory0_CR-CSP02ClosedAtSource; OriginalReviewAnd38Pins2BoardsDocs19FullCanonicalVerified_ActualReviewerExitedReleased; ExactPC3DeploymentBrowserNext"
-active_card_next: "Root completes queued Root530 exact Docs/Obsidian publication now actual review window ended, then stages and deploys official exact e4e07 frontend on owned PC3 loopback port with oldb48 rollback retained; actual strictCSP/login/resources/no-blink verification and guarded owned SSH route switch. Manual real votes/Run/PC1/PC5/GPUstorage/renewal/all5 remain."
+active_card_status: "E4e07PC3StrictCSPAnd3100Deployed_ActualAdminBody3Online; ResourceUIAndGatewayHealthContractMismatchConfirmed_ActualSourceFixOwnerReady_FullUIAll5Pending"
+active_card_next: "After Root531 exact Docs/Obsidian publication, actual original Codex author fixes canonical per-node resource-usage join/partial measurement rendering and genuine CP gateway-health wiring from e4e07; preserve security/semantics/polling and all genuine failures. Then exact CI and one bounded actual Claude; Root real browser/frame revalidation. Two genuine votes/Run/PC1/PC5/GPUstorage/renewal/all5 remain."
 ---
+
+## 2026-11-08T04:50:03+09:00 e4e07 실배포와 실제 UI 계약 보완 카드
+
+수락된e4e07공식image/dist를PC3전용13102에배포하고실제Chrome157의strictCSP로그인화면/오류0을확인한뒤Main3100의소유SSH6592만64240으로전환했다. 12원본filehash와publicOIDC설정·CSP·기존API/observer/Node/복구경로불변을검증했다. 실제브라우저관리자로그인후3/3온라인body는확인됐지만자원미관측3대/Gateway비정상이라연속프레임검증의배지전제가시간초과됐다. 새관리자GET진단으로NodePage가정상3필드이고별도usage는CPU500m/메모리64MiB씩measured임을확인했다. legacyflatmetrics미연결과NginxtextOK 대GatewayJSON불일치2건을실제수정카드로정하고원작성자에게배정한다. fullUI/실제Run/5대인수는미완료다. 다음첫행동/담당은Root531게시뒤실제원작성자Codex의한정2건구현이다. CR-CSP02source수락은유지하고자원/health운영검증을새로성공으로꾸미지않는다.
 
 ## 2026-11-08T04:34:48+09:00 중앙 실행e4e07 실제 독립 수락과 PC3 배포 준비
 

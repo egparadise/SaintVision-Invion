@@ -1,0 +1,26 @@
+{
+  "SSHExit": 2,
+  "stderrBytes": 191,
+  "remote": {
+    "mainBrowserExecuted": false,
+    "insecureTLSFlagsUsed": false,
+    "ChromeSandboxDisabled": false,
+    "authCredentialsPersistedByDriver": false,
+    "actualRunOrVotesCreated": false,
+    "workspaceReadinessChanged": false,
+    "wholeProgramComplete": false,
+    "ownedChromePID": 677837,
+    "browserVersion": "Chrome/157.0.8103.38",
+    "realIdPLoginFormReachedWithoutTLSBypass": true,
+    "status": "HOLD_ACTUAL_CHROME_VERIFICATION",
+    "phase": "actual-PKCE-callback-and-project-load",
+    "errorClass": "TimeoutError",
+    "noBlindAuthenticationRetry": true,
+    "currentPageDiagnostic": {
+      "origin": "http://127.0.0.1:3100",
+      "path": "/studio",
+      "bodyText": "SaintVision\nINV Portal\n클러스터 개요\n🚀 개발 Studio (통합)\nNodes 인벤토리\n가상 패브릭 (CX-01)\nWorkspaces (S03)\n개발 에디터 (S06)\n자원 배치 (S05)\n분산 복구 (S07)\n보안·감사 (S08)\n자연어 요청 (S09)\n모델 계보 (S10)\n배포 후보 (S11)\n내부망 배포 (S12)\nRuns 실행\n승인 센터\n웹 터미널\nSSO 로그인\n클러스터: 3/3 Node 가동 중\nGateway: 비정상 응답\n👤 egparadise@gmail.com\n프로젝트별 권한\n로그아웃\n🖥️\nWeb Desktop\n☀️ 라이트 모드\n프로젝트 \n프로젝트 선택\nLAN pilot\n분산 Node 클러스터 개요\n🔄 클러스터 자동 갱신 (5초 주기) · 화면 확인: 오전 4:44:15\n새로고침\nnod_01M6TAWG25JTA3F7J7S1EE4N2W — 자원 미관측마지막 하트비트: 오전 4:44:12\nnod_01M6TGQZ8S3DAFS7TYE8TY1PX2 — 자원 미관측마지막 하트비트: 오전 4:44:12\nnod_01M6TGSXV1J7XWC5D5H7N6EW1D — 자원 미관측마지막 하트비트: 오전 4:44:12\n\n표시된 노드 3대 · 활성 실행 0건\n\nSaintVision-Invion Intranet Web Portal · Owned by Gemini (Antigravity) · Strict Governance L0~L3"
+    },
+    "ownedBrowserExited": true
+  }
+}

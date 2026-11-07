@@ -1,0 +1,29 @@
+import hashlib,json,shlex,subprocess
+from pathlib import Path
+r=Path(__file__).resolve().parents[1];w=r/'.work';out=w/'pc3-e4e07-anonymous-precutover-r1';assert not out.exists();out.mkdir()
+stage=json.loads((w/'pc3-frontende4e07-r1/receipt.json').read_bytes());assert stage['SSHExit']==0 and stage['remote']['containerID']=='1131d7dbcbf99c7429ad341c7a5ad19f915a5941bac6555c168ddd91c174ea1f'
+program=(w/'pc3-browser-blank-diagnostic-r2/remote-program.py.txt').read_text(encoding='utf-8')
+for a,b in [('chrome-profile-r2-anonymous','chrome-profile-e4e07-precutover-r1'),('chrome-r2.stdout.log','chrome-e4e07-precutover-r1.stdout.log'),('chrome-r2.stderr.log','chrome-e4e07-precutover-r1.stderr.log'),('anonymous-blank-diagnostic-r2.png','e4e07-precutover-r1.png'),('anonymous-browser-diagnostic-r2.json','e4e07-precutover-r1.json'),('http://127.0.0.1:3100/studio','http://127.0.0.1:13102/studio')]:
+    assert a in program;program=program.replace(a,b)
+a="responses.append({'origin':u.scheme+'://'+u.netloc,'path':u.path,'status':v['status']})"
+b="responses.append({'origin':u.scheme+'://'+u.netloc,'path':u.path,'status':v['status'],'CSP':next((str(value) for key,value in v.get('headers',{}).items() if key.lower()=='content-security-policy'),None)})"
+assert a in program;program=program.replace(a,b)
+a=" o.update(status='ANONYMOUS_CHROME_DIAGNOSTIC_COMPLETED'"
+b=""" assert '조직 계정으로 로그인' in body['bodyText'] and not exceptions and not load_failures
+ assert any(x['origin']=='http://127.0.0.1:13102' and x['path']=='/studio' and x['status']==200 and x['CSP'] and \"script-src 'self'\" in x['CSP'] and 'unsafe-eval' not in x['CSP'] for x in responses)
+ assert any(x['path']=='/assets/index-Dzl2cYez.js' and x['status']==200 for x in responses)
+ assert evaluate("document.querySelector('#root').childElementCount")>0
+ assert all(x['status']<400 or (x['path']=='/favicon.svg' and x['status']==404) or (x['path']=='/v1/session' and x['status']==401) for x in responses)
+ o['acceptedSource']='e4e07bfd6b94e57edc64d158e208df01b9319deb';o['actualCSPBootVerifiedBeforeMainRouteSwitch']=True
+ o.update(status='E4E07_STRICT_CSP_ACTUAL_PC3_ANONYMOUS_BOOT_VERIFIED'"""
+assert a in program;program=program.replace(a,b)
+program=program.replace("o.get('status')=='ANONYMOUS_CHROME_DIAGNOSTIC_COMPLETED'","o.get('status')=='E4E07_STRICT_CSP_ACTUAL_PC3_ANONYMOUS_BOOT_VERIFIED'")
+(out/'remote-program.py.txt').write_text(program,encoding='utf-8')
+known=Path(r'D:\Project\SaintVisionI-Invion\fleet5-worker-readiness-20261105\.work\f5-low-closure-26607075f612\known_hosts.f5.pinned');assert hashlib.sha256(known.read_bytes()).hexdigest()=='0dcbf0f4cfc363e4affc30810ad8a9e57bd2c4a31991e2c8285bdae7052ec2d2'
+flags=['-i',r'C:\Users\inviz\.ssh\sv-lan-ed25519','-o','IdentitiesOnly=yes','-o','BatchMode=yes','-o','ConnectTimeout=5','-o','StrictHostKeyChecking=yes','-o','UserKnownHostsFile='+str(known)];host='saintvision-invion3@192.168.45.222'
+q=subprocess.run(['ssh','-T',*flags,host,'/home/saintvision-invion3/saintvision-share/ops-fresh-cpu-1efea-r1-20261107/venv/bin/python','-I','-B','-c',shlex.quote(program)],input=b'{}',capture_output=True,timeout=65)
+v={'SSHExit':q.returncode,'stderrBytes':len(q.stderr),'remote':json.loads(q.stdout) if q.stdout else None};(out/'receipt.json').write_text(json.dumps(v,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+print(json.dumps({'SSHExit':q.returncode,'stderrBytes':len(q.stderr),'status':v['remote']['status'],'exceptions':v['remote'].get('exceptions'),'ownedBrowserExited':v['remote']['ownedBrowserExited']},ensure_ascii=False),flush=True)
+assert q.returncode==0 and v['remote']['ownedBrowserExited'] and v['remote']['actualCSPBootVerifiedBeforeMainRouteSwitch']
+q=subprocess.run(['scp','-q',*flags,host+':/home/saintvision-invion3/saintvision-share/ops-fresh-cpu-1efea-r1-20261107/browser-real-ui-r1/e4e07-precutover-r1.png',str(out/'e4e07-precutover-r1.png')],capture_output=True,timeout=25);assert q.returncode==0
+assert hashlib.sha256((out/'e4e07-precutover-r1.png').read_bytes()).hexdigest()==v['remote']['screenshotSHA256']

@@ -1,0 +1,19 @@
+{
+  "AtKST": "2026-11-08T04:40:23.1373125+09:00",
+  "Source": "e4e07bfd6b94e57edc64d158e208df01b9319deb",
+  "IndependentReview": "20d9bf8622a0f0624a323b92acaeb33cea91fb9e",
+  "RootPredeploymentSHA": "2e5999ac6fe8bb64d083153c38da263985537ec0",
+  "OldOwnedForward": {
+    "PID": 6592,
+    "Name": "ssh.exe",
+    "CreatedUTC": "2026-11-07T16:24:20.6480150Z",
+    "CommandSHA256": "b8b47bce1c6882d0ee417fbf488ff0a85b5cbb5a43b9c77643b4437ee439ac53"
+  },
+  "OldStopped": false,
+  "NewForwardStarted": false,
+  "RollbackUsed": false,
+  "NoMainApplicationStarted": true,
+  "SchemaDowngraded": false,
+  "ActualRunOrVotesCreated": false,
+  "WholeProgramComplete": false
+}
