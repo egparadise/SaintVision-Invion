@@ -1,0 +1,22 @@
+{
+  "atKST": "2026-11-07T12:59:11+09:00",
+  "source": "7033778ad3d2bc284e36f7e29be7597dbb7d9f23",
+  "base": "6d7ee3d85bd0e47eb7b787234c10d5dbfdb3a9e8",
+  "remoteExact": true,
+  "branch": "agent/codex/fleet5-cpu-integration-pin-r1-20261107",
+  "completeChangedPathCount": 46,
+  "onlyTwoAcceptedProductTestBlobsAndOwnDocs": true,
+  "acceptedSourceSHA256": {
+    "services/control-plane/src/inv/dispatch.py": "82f029614537eb5bab56934e4b6736fe3dd52ece54b9b9a3996815b131e41de4",
+    "tests/core/test_delivery_operation_origin.py": "3dacdb63f83ab1d8075ddcbe422d82daad20bd56f643adee0fc7ae97715925d2"
+  },
+  "allOther6d7ProductTestsModulesK1K2Unchanged": true,
+  "Docs": 42335285577,
+  "Core": 42335287638,
+  "Backend": 42335289761,
+  "CIStatus": "Docs observedSUCCESS; Core/Backend not yet accepted by Root",
+  "independentIntegrationReview": "PENDING",
+  "runtimeGrant": false,
+  "actualAuthority": null,
+  "wholeProgramComplete": false
+}

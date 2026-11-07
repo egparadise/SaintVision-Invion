@@ -1,15 +1,19 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.463"
+version: "1.0.464"
 status: "review"
 author: "Codex"
-updated: "2026-11-07T12:43:31+09:00"
+updated: "2026-11-07T13:06:44+09:00"
 source_of_truth: "Git"
 active_card: "FLEET5 continued supervision with PORTAL-REFRESH-FLEET-20261106"
-active_card_status: "Selectorb51actualACCEPT; joint6d7plus746CODEactive_CIpending; currentDemoDBnode1_projectLinks0_snapshots0; oldPC2tenantMismatch; CPU_PC3_sourceOnlyMapPending"
-active_card_next: "Root verify exact joint source Docs/Core/Backend then actual integration review; source-only CPU route map and authenticated project binding needed. No old tenant repurpose, no credential output, no optional Low expansion."
+active_card_status: "Joint703sourceVerified_DocsPASS_CoreBackendPending; currentOwnerProjectDBMapped; otherApproverMappings1_identityQuestionPending; freshCPUAdmission4FileWIPAuthorized_NoRuntime"
+active_card_next: "Root actual703 Core/Backend completion+artifact verification then integrationreview; Codex newfreshCPU4fileWIP. Need actualadditionalapproverID for later2-voterRun, no vote fabrication. No liveadmission before source/CI/review/requestpins."
 ---
+
+## 2026-11-07T13:06:44+09:00 실제 owner·project 대조와 신규 CPU 등록 코드
+
+현재 계정의 실제 DB 권한을 읽기 전용으로 대조해 활성 owner·동일 사업/커널 프로젝트를 계획 대상으로 정했다. 다른 유효 승인자 매핑은1개여서 두 비요청자 Run 승인 인수는 아직 충족하지 않았다. 통합703은 정확히 수락된2소스와own문서만 포함하며Docs19단계성공·Core/Backend진행중이다. 기존 초기화가tenant중지상태를바꾸고안전한project-node등록진입점이없어, 기존행을보존하는운영자전용freshCPU등록4파일코드WIP를배정했다. 소스전용경로지도는실제납품됐고설정·자격정보접근금지는유지한다. 실제Node등록·관측·실행·5대인수는아직수행하지않았다. 명령·exit·SHA·CI·분리된 미확인/다음 담당은 Root History/Evidence에 보존했다.
 
 ## 2026-11-07T12:43:31+09:00 실제 CP·Node 소속과 CPU 통합 후보
 

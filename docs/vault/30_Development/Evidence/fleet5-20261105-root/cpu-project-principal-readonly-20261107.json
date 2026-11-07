@@ -1,0 +1,45 @@
+{
+  "atKST": "2026-11-07T12:57:03+09:00",
+  "scope": "Read-only diagnostic planning target from configured account-result, explicit tenant/user/project; not fresh OIDC/API/browser verification",
+  "tenant": "97968b42-68aa-40ce-af5e-3a33e2fc2205",
+  "chosenProjectForPlan": "prj_01M6NDBHVD2DZQ1Q38DCKN1XE3",
+  "chosenBusinessUserId": "usr_01M6R449Z62B1H7VE1RMH4GTW9",
+  "currentBrowserSelection": "NOT_OBSERVED",
+  "freshOIDCTokenOrAuthorization": "NOT_OBSERVED",
+  "credentialOrEmailValuesIncluded": false,
+  "DBWrites": false,
+  "wholeProgramComplete": false,
+  "SQLSessionReadOnly": true,
+  "businessProject": {
+    "project_id": "prj_01M6NDBHVD2DZQ1Q38DCKN1XE3",
+    "tenant_id": "97968b42-68aa-40ce-af5e-3a33e2fc2205",
+    "status": "active"
+  },
+  "businessUser": {
+    "user_id": "usr_01M6R449Z62B1H7VE1RMH4GTW9",
+    "tenant_id": "97968b42-68aa-40ce-af5e-3a33e2fc2205",
+    "status": "active"
+  },
+  "projectMember": {
+    "role_code": "owner"
+  },
+  "businessProjectLink": {
+    "enabled": true
+  },
+  "issuerQualifiedSubjectMappings": [
+    {
+      "subject_id": "oidc:3f79091432574632c62c37f25aaddb37f91e37a5864422525048eb82fe54247c",
+      "enabled": true
+    }
+  ],
+  "kernelGrants": [
+    {
+      "subject_id": "oidc:3f79091432574632c62c37f25aaddb37f91e37a5864422525048eb82fe54247c",
+      "can_request": true,
+      "can_approve": true,
+      "enabled": true
+    }
+  ],
+  "otherDistinctEnabledApproverMappings": 1,
+  "directExit": 0
+}

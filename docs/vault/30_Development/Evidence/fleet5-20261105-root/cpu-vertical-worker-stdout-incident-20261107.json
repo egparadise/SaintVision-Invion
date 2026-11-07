@@ -1,5 +1,5 @@
 {
-  "atKST": "2026-11-07T12:43:31+09:00",
+  "atKST": "2026-11-07T13:06:44+09:00",
   "status": "AUTHOR_REPORTED_CONFIG_CREDENTIALS_IN_WORKER_TOOL_STDOUT_SOURCE_ONLY_RECOVERY_SENT",
   "task": "task_a95ef3d8ccce",
   "dispatch": "ctx_ed23b4a777d0",
@@ -14,7 +14,13 @@
   "sourceOnlyRecoverySend": "msg_d53239763e59",
   "permittedResume": "Immutable source plus explicitly Root-sanitized typed observations only; no arbitrary config values, credentials or secret files.",
   "automaticCredentialRotationOrServiceRestartAssigned": false,
-  "sourceOnlyRouteMapDelivery": "PENDING",
+  "sourceOnlyRouteMapDelivery": {
+    "path": "cpu-one-node-join-route-r1-author-analysis.json",
+    "bytes": 23251,
+    "SHA256": "cdcfc72d212262eaddf697625f8f3d056d7bcbd98e18b5c50594edb8e3f2e371",
+    "status": "DELIVERED_SOURCE_ONLY_AS_AUTHOR_REPORTED"
+  },
   "reportContainsCredentialValues": false,
-  "wholeProgramComplete": false
+  "wholeProgramComplete": false,
+  "followonScope": "Four-new-file operator admission CODE WIP, no real config/credential/PKI/network/DB access by author"
 }

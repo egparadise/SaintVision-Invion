@@ -1,0 +1,21 @@
+{
+  "atKST": "2026-11-07T13:06:44+09:00",
+  "status": "READ_ONLY_DB_PLANNING_TARGET_CHOSEN_FRESH_AUTH_AND_BROWSER_NOT_OBSERVED",
+  "tenant": "97968b42-68aa-40ce-af5e-3a33e2fc2205",
+  "project": "prj_01M6NDBHVD2DZQ1Q38DCKN1XE3",
+  "businessUserId": "usr_01M6R449Z62B1H7VE1RMH4GTW9",
+  "subjectId": "oidc:3f79091432574632c62c37f25aaddb37f91e37a5864422525048eb82fe54247c",
+  "role": "owner",
+  "businessUserProjectActive": true,
+  "businessAndKernelLinksEnabled": true,
+  "kernelCanRequest": true,
+  "kernelCanApprove": true,
+  "freshOIDCTokenVerified": false,
+  "currentBrowserSelection": "NOT_OBSERVED",
+  "otherDistinctEnabledApproverMappings": 1,
+  "twoDistinctNonRequesterRunApprovals": "NOT_SATISFIED_OR_PERFORMED",
+  "userQuestion": "Async request for existing additional approver account ID/login, no password, not another progress-permission request; code and metadata admission work continue.",
+  "DBWrites": false,
+  "noCredentialOrEmailValues": true,
+  "wholeProgramComplete": false
+}

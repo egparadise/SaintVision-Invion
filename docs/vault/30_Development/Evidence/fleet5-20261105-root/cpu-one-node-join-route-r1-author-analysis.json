@@ -1,0 +1,484 @@
+{
+  "docID": "FLEET5-CPU-ONE-NODE-JOIN-ROUTE-R1-20261107-CODEX",
+  "version": "1.0.0",
+  "atKST": "2026-11-07T12:47:46.226246+09:00",
+  "kind": "SOURCE_ONLY_AUTHOR_INTEGRATION_MAP_NOT_EXECUTION_OR_INDEPENDENT_ACCEPTANCE",
+  "taskID": "task_a95ef3d8ccce",
+  "dispatchID": "ctx_ed23b4a777d0",
+  "scopeMessages": [
+    "msg_d9e3479fefca",
+    "msg_d53239763e59",
+    "msg_6621a05159a9"
+  ],
+  "sourceSHA": "6d7ee3d85bd0e47eb7b787234c10d5dbfdb3a9e8",
+  "operationalJointSourceSHA": null,
+  "allowedRootObservationRefs": {
+    "receipt.private.json": {
+      "path": "D:/Project/SaintVisionI-Invion/fleet-five-orchestration-20261105/.work/cpu-vertical-readonly-20261107/receipt.private.json",
+      "SHA256": "de2a7850d3c8ffc8a769a61509809bac52b7f38f56dc6421c561f94dbebf8d68"
+    },
+    "route-and-pc3-supplement.private.json": {
+      "path": "D:/Project/SaintVisionI-Invion/fleet-five-orchestration-20261105/.work/cpu-vertical-readonly-20261107/route-and-pc3-supplement.private.json",
+      "SHA256": "d88b0b6268b4b5cdea6c8281347653591fcd95fe4b86bcdb246bab8b278e5765"
+    },
+    "named-current-db-counts-r2.private.json": {
+      "path": "D:/Project/SaintVisionI-Invion/fleet-five-orchestration-20261105/.work/cpu-vertical-readonly-20261107/named-current-db-counts-r2.private.json",
+      "SHA256": "e17762402a9534b94d86c621edc76996be03147ed16e315e0e1fcf8a7b5fcedd"
+    }
+  },
+  "observedTypedBindings": {
+    "tenantID": "97968b42-68aa-40ce-af5e-3a33e2fc2205",
+    "manifestEpoch": "bcd581be-31b4-4aca-86e6-3ca31b69ed09",
+    "manifestProject": "prj_01M6NC3HEDBR40ZB9TH04GBE00",
+    "manifestPortalProject": "prj_01M6NDBHVD2DZQ1Q38DCKN1XE3",
+    "supplementCurrentPortalProjectActuallyMeansManifestProject": true,
+    "currentBrowserProject": null,
+    "chosenProject": null,
+    "DBControlEpochEqualsManifest": true,
+    "selectedInvProjectsPresent": 2,
+    "currentTenantNodeRows": 1,
+    "currentEpochOnlineNodeRows": 1,
+    "projectNodesForManifestProject": 0,
+    "projectNodesForManifestPortalProject": 0,
+    "currentTenantEpochResourceSnapshots": 0,
+    "diagnosticReadOnly": true,
+    "diagnosticRoleBypassesRLS": true,
+    "diagnosticRoleIsRuntimeAuthority": false,
+    "authenticatedAPINodeCount": null,
+    "authenticatedAPIOfferCount": null,
+    "candidatePhysicalPC": "PC3",
+    "candidateSSHExitRootObserved": 0,
+    "candidateRunningMatchingNodeContainers": 0,
+    "candidateStoppedContainersIdentitiesFilesOrDBRowsKnown": false,
+    "RootUnauthenticatedScopedNodesCapacityStatus": 401,
+    "wrongUnscopedNodes404IsEnrollmentEvidence": false
+  },
+  "unknownRequiredBindings": {
+    "actualRunningCPSourceSHA": null,
+    "verifiedRequesterSubjectID": null,
+    "businessUserID": null,
+    "effectiveKernelGrant": null,
+    "currentPublicMembership": null,
+    "approverSubjectIDs": null,
+    "newNodeID": null,
+    "newCPUResourceID": null,
+    "newMemoryResourceID": null,
+    "newChannelEndpoint": null,
+    "newVolumeID": null,
+    "newJournalIdentity": null,
+    "issuerCAAuthority": null,
+    "CPClientCertificatePin": null,
+    "NodeCertificatePin": null,
+    "launchSignerPublicKeyPin": null,
+    "peerPolicyVersionAndHash": null,
+    "agentImageDigest": null,
+    "workloadImageDigest": null,
+    "runtimeProfileVersion": null,
+    "workspaceAdmissionConfigured": null,
+    "outputProviderConfigured": null,
+    "containmentExecutionAllowed": null,
+    "controlledProjectAssociationWriter": null
+  },
+  "sourceCatalog": {
+    "auth": {
+      "file": "services/control-plane/src/inv/identity.py",
+      "lines": "41-48,117-130,163-225",
+      "blobBytesSHA256": "5974f0a2f0c4111868d75c9705cd87bb164a63176bc46bf9ee4663521b6a7c7b"
+    },
+    "routes": {
+      "file": "services/control-plane/src/inv/app.py",
+      "lines": "323-345,376-406,512-528,619-644,718-739,799-839,1188-1218",
+      "blobBytesSHA256": "3e3d0d0dc023dee937ac184532b043a26b2af7110887901c937cc6cdbaa2edea"
+    },
+    "grant": {
+      "file": "services/control-plane/src/inv/control.py",
+      "lines": "20-79,245-268",
+      "blobBytesSHA256": "85bdc50771615fc5ec49f639e1fb3e16f2a7eaa719c8f92630598ac37c03a550"
+    },
+    "businessAuth": {
+      "file": "services/control-plane/src/inv/business_auth.py",
+      "lines": "1-52",
+      "blobBytesSHA256": "d0ec2fd23edaba1de27573048e23a530e89158c59da68e70cf8ba5243771b6b0"
+    },
+    "businessSurface": {
+      "file": "services/control-plane/src/inv/business_surface.py",
+      "lines": "9-32,35-85",
+      "blobBytesSHA256": "4ba95eaf967a303d56316157325f08318cd0886e44694b0121fc2216a052e8fd"
+    },
+    "projectCRUD": {
+      "file": "src/saintvision/api/v1/projects.py",
+      "lines": "1-16,42-47",
+      "blobBytesSHA256": "1fa50dbb2e8292b8227918415a396986124549dab602399471508c8a06d4e92e"
+    },
+    "publicNodeCRUD": {
+      "file": "src/saintvision/api/v1/nodes.py",
+      "lines": "49-124",
+      "blobBytesSHA256": "a7ea2a0918be13eb2dfa9d083fcfa059d445a73e7d14df1cdb2f581b5880347a"
+    },
+    "channels": {
+      "file": "services/control-plane/src/inv/node_channels.py",
+      "lines": "124-202",
+      "blobBytesSHA256": "3fad0bb24beb096522ea3335e3bf45f4e65f2d0d906177ef7e310aca1128502b"
+    },
+    "lanBootstrap": {
+      "file": "tools/lan_pilot.py",
+      "lines": "915-943,1301-1352",
+      "blobBytesSHA256": "2c626540f495499423b707b063a6cab6a53e1be3af8c324f46af88a94ac8f652"
+    },
+    "agentWrapper": {
+      "file": "deploy/lan/start-node.sh",
+      "lines": "20-59",
+      "blobBytesSHA256": "4b4acb641510a7b2e283f61ffd11cbd16bacb6e40aff8fe486a9c1af11ebeeb0"
+    },
+    "agentCLI": {
+      "file": "services/node-agent/cmd/inv-node/main.go",
+      "lines": "36-57,72-105,141",
+      "blobBytesSHA256": "3471f3fa13ea9ac4d27fd27ca04747a1adf2348692f846484c39f28755c23a9a"
+    },
+    "observation": {
+      "file": "services/control-plane/src/inv/observation.py",
+      "lines": "16-109,117-136",
+      "blobBytesSHA256": "b515ceda8b066466cf4cdf5fa88d04803220398c436d29ab7c5fd2793bf5748f"
+    },
+    "transport": {
+      "file": "services/control-plane/src/inv/node_transport.py",
+      "lines": "77-93,140-225,227-300",
+      "blobBytesSHA256": "3559bbcdf9568f8930654d860b0edd980eca71c835cde3fe7380a69dd56e18f4"
+    },
+    "workspaceConfig": {
+      "file": "services/control-plane/src/inv/workspace_config.py",
+      "lines": "13-55",
+      "blobBytesSHA256": "7b77a716b4fb56e951fce110d347ac41f16d1d80d4722ba9d1410a1869b351cb"
+    },
+    "workspace": {
+      "file": "services/control-plane/src/inv/workspace_api.py",
+      "lines": "31-48,60-89,119-146",
+      "blobBytesSHA256": "c0e67146d6a3152426876f86fafa35363ec49c48fedf66e9e6bce4c1394050e2"
+    },
+    "start": {
+      "file": "services/control-plane/src/inv/workspace_start.py",
+      "lines": "78-130,255-326",
+      "blobBytesSHA256": "53318bfad2f010340157485760a51e16b890fdc9ec00c145df6e409350f69cc5"
+    },
+    "handoff": {
+      "file": "services/control-plane/src/inv/business_handoff.py",
+      "lines": "23-105",
+      "blobBytesSHA256": "76d4049a656b7a7fcead36bc8d0b8b7645e159a9225122a603d13fee1adf4df4"
+    },
+    "containment": {
+      "file": "services/control-plane/src/inv/containment.py",
+      "lines": "1-45",
+      "blobBytesSHA256": "a0d7055d5f3e5485d82ea3876f9885bb6f0c2e8d5d0e7fd11a846ec86edf425e"
+    },
+    "dispatch": {
+      "file": "services/control-plane/src/inv/dispatch.py",
+      "lines": "59-109,129-169,323-348",
+      "blobBytesSHA256": "4a33428502279b88e510b5447382814bb115ddf2bff4f88f5bfcbb93f3c1a404"
+    },
+    "workerCLI": {
+      "file": "services/control-plane/src/inv/worker.py",
+      "lines": "111-123",
+      "blobBytesSHA256": "3010b2409bb285de960eb322792b1062ed066275307c9bea53a2cc767b65d4e3"
+    },
+    "permit": {
+      "file": "services/node-agent/runtime/permit.go",
+      "lines": "48-100",
+      "blobBytesSHA256": "65483a6e650fb523a06ab8ebe923fcbf916d973e190b1a0def5ee5273cdf171b"
+    },
+    "docker": {
+      "file": "services/node-agent/runtime/docker.go",
+      "lines": "50-99,215-263",
+      "blobBytesSHA256": "dce35c9ad17fa12cbbeb9cee0809a413930fa46e2785d86d965153ff4f67e0fb"
+    },
+    "firstHarness": {
+      "file": "tests/integration/test_workspace_start.py",
+      "lines": "1-5,82-166,172-191,243-274,526-603",
+      "blobBytesSHA256": "927a96862fef5bfa87110b80d94c7e6684b0cc75ec2d5665e97523d7172b0e74"
+    },
+    "approvalHarness": {
+      "file": "tests/integration/test_workspace_api.py",
+      "lines": "218-235",
+      "blobBytesSHA256": "070ac8d82c157dc3a52f7bbc93b7cc45633eeba1d20930b2481ac9f181c221b3"
+    },
+    "remoteHarness": {
+      "file": "tools/remote_workspace_entry.py",
+      "lines": "1-5,66-104",
+      "blobBytesSHA256": "e69fa8ff6c51bd3880f5ec388fe97288a4256169377e17d9d6aa5b7ec2f32c27"
+    },
+    "nullRegistry": {
+      "file": "services/node-agent/internal/migrationcontext/ports.go",
+      "lines": "43-63",
+      "blobBytesSHA256": "db7c7e877afc6ee8bbf8ca2e2b6afad3b973a63a624d4bcd6ee2ad5ce649fb95"
+    },
+    "nullPolicy": {
+      "file": "services/node-agent/internal/migrationcontext/policy.go",
+      "lines": "64-80",
+      "blobBytesSHA256": "ce6f1b9b1a1835276b248c3dbdb8fa42b68fa79fb5684748ea78694d104bbdd2"
+    }
+  },
+  "steps": [
+    {
+      "step": 1,
+      "name": "Bind real principal and ONE project before mutation",
+      "existingEntry": [
+        "GET /v1/session",
+        "GET /v1/projects",
+        "GET /v1/projects/{project}/nodes",
+        "GET /v1/projects/{project}/capacity"
+      ],
+      "sourceRefs": [
+        "auth",
+        "routes",
+        "grant",
+        "businessAuth",
+        "businessSurface",
+        "projectCRUD"
+      ],
+      "requiredRole": "Verified inv.api access under configured issuer/audience/client; current inv.project_grants. For linked business project, enabled inv.business_subjects -> active public.users + public.project_members; requester role owner/maintainer/operator plus kernel can_request. JWT role names alone never grant access.",
+      "prerequisite": "Root must select projectA or projectB from actual browser/business/kernel membership; both are real inv.projects rows, neither automatically maps to the other. BusinessDispatch may route /v1/projects to business CRUD; list visibility is not kernel execution permission. Same database target and separate restricted business/kernel roles must be proven without emitting connection data.",
+      "expectedEvidence": [
+        "Authenticated subjectId/tenantId and chosen projectId",
+        "Current kernel/business grant join and actual browser selection",
+        "Scoped API node/capacity response and source/image binding"
+      ],
+      "rejectOrRollback": "401 is no authenticated measurement; 403 AUTH-0030 or missing mapping stays HOLD. No copying grants, joining the pre-existing Node or changing another tenant to make counts."
+    },
+    {
+      "step": 2,
+      "name": "Admit a BRAND-NEW PC3 identity/channel and controlled project association",
+      "existingEntry": [
+        "Operator-only provision_channel(conn,newNode,epoch,endpoint,certificate_der,expected_version=0)",
+        "tools.lan_pilot.enroll source pattern; NOT an instruction to run it",
+        {
+          "cli": "inv-node",
+          "modeFlag": "--serve",
+          "requiredFlags": [
+            "--tenant",
+            "--node",
+            "--epoch",
+            "--profile",
+            "--image",
+            "--executable",
+            "--state",
+            "--public-key",
+            "--listen",
+            "--tls-cert",
+            "--tls-key",
+            "--client-ca",
+            "--peer-policy"
+          ],
+          "actualValues": "NULL_UNTIL_ROOT_GRANT"
+        }
+      ],
+      "sourceRefs": [
+        "channels",
+        "lanBootstrap",
+        "agentCLI",
+        "agentWrapper",
+        "publicNodeCRUD",
+        "businessSurface",
+        "remoteHarness"
+      ],
+      "requiredRole": "Trusted operator/issuer and operator DB connection; ordinary inv_kernel runtime cannot enroll channels. Node mTLS identity/CA/client certificate and peer-policy pins are distinct from user OIDC and launch signer.",
+      "prerequisite": "Fresh Node ID/endpoint/owned volume/journal and CA/permit-key/profile/image bindings are all null until Root selects them; stopped containers/files/DB collisions remain unknown. New inv.nodes/resource/project_nodes rows must be scoped to chosen tenant/project/epoch. No production project_nodes write route found in selected source: only isolated remoteHarness.setup/test provisioning writes were located; Root must name an audited controlled operator entry before writes.",
+      "expectedEvidence": [
+        "New identity and certificate/public-pin hashes, channel CAS/audit row",
+        "Exact new CPU+memory resource IDs and chosen project association",
+        "Owned container/volume collision absence and running source/image/argv readback"
+      ],
+      "rejectOrRollback": "No HTTP enrollment shortcut: public /v1/nodes bootstrap-token CRUD is not routed by current BusinessDispatch and does not replace kernel channel admission. Do not run lan_pilot.init/provision_observation_node on this existing tenant: it changes the tenant kill switch. Stock start-node.sh is lan-observe-v1 with /inv-node allowed executable, not a ready Python executor. Preserve every pre-existing identity/volume; no reuse/reset or automatic deletion."
+    },
+    {
+      "step": 3,
+      "name": "Observe current authenticated CPU resources and show the chosen project",
+      "existingEntry": [
+        "NodeObservation.poll_resources(newNode)",
+        "NodeTLSClient probe /v1/heartbeats and resource_snapshot /v1/snapshots",
+        "GET /v1/projects/{project}/nodes",
+        "GET /v1/projects/{project}/nodes/{node}/resource-usage",
+        "GET /v1/projects/{project}/capacity"
+      ],
+      "sourceRefs": [
+        "observation",
+        "transport",
+        "channels",
+        "routes",
+        "grant"
+      ],
+      "requiredRole": "Trusted CP-to-Node mTLS channel plus scoped authenticated project reader.",
+      "prerequisite": "Channel/current epoch and identity match, clock within existing 5-second bounds, unused challenge no older than10seconds. Project association and resource IDs enabled; actual selected browser project matches. This observation is MUTATING: begin inserts nonce; accept updates heartbeat and snapshots. It needs an explicit Root effect grant.",
+      "expectedEvidence": [
+        "Nonce/current channel version and fresh NodeResourceSnapshot",
+        "DB receivedAt/observedAt/epoch/profile and bounded CPU/memory offer",
+        "Same project Node/usage/capacity shown without treating host inventory as an offer"
+      ],
+      "rejectOrRollback": "Scope/clock/nonce/replay/channel mismatch -> NODE-0050/0051/0033. Source12:39 has snapshots0 and links0; online DB row is not fresh physical proof. Do not synthesize online status or reuse old observations."
+    },
+    {
+      "step": 4,
+      "name": "Create one draft and freeze first-workspace input under the current policy",
+      "existingEntry": [
+        "POST /v1/projects/{project}/runs",
+        "POST /v1/projects/{project}/runs/{run}/start/prepare",
+        "WorkspaceStart.prepare -> _scope -> RestrictedWorkspaceRuntime.policy"
+      ],
+      "sourceRefs": [
+        "routes",
+        "grant",
+        "workspaceConfig",
+        "workspace",
+        "start",
+        "handoff",
+        "firstHarness"
+      ],
+      "requiredRole": "Current requester can_request; business-linked Run also needs matching public Run/Workspace/workload mapping and membership. Operator-preconfigured Workspace runtime/launch signer and pinned Node; browser supplies intent only.",
+      "prerequisite": "Workspace admission currently configured is unknown. Bind exact source, allowed workload image/executable, profile/policy versions, CPU/memory resources, bounded immutable snapshot and allowed working/object roots before writes. Same project ID must agree across public and inv rows; no arbitrary A-to-B translation or fallback.",
+      "expectedEvidence": [
+        "Idempotent draft Run ID/version/attempt0",
+        "Canonical input hash/bytes and startId/targetNodeId/runtime/resource bindings",
+        "L2 approval request/actionDigest for frozen input; no physical execution yet"
+      ],
+      "rejectOrRollback": "Unconfigured workspace503, AUTH-0011/0045 or profile mismatch refuse. No host-folder write before grant. Only a bounded CPU workload within actual CLI limits; prepare failures remain transactionally rolled back while evidence is preserved."
+    },
+    {
+      "step": 5,
+      "name": "Two real approvals, atomic enqueue, then ONE targeted delivery",
+      "existingEntry": [
+        "POST /v1/projects/{project}/approvals/{id}/challenge",
+        "POST /v1/projects/{project}/approvals/{id}/decision",
+        "POST /v1/projects/{project}/runs/{run}/start/enqueue",
+        "DeliveryWorker.once(boundTenant,command_id=boundCommandId)"
+      ],
+      "sourceRefs": [
+        "routes",
+        "approvalHarness",
+        "workspace",
+        "start",
+        "dispatch",
+        "workerCLI",
+        "permit",
+        "docker",
+        "containment"
+      ],
+      "requiredRole": "Two distinct non-requester current approvers: can_approve and, if business-linked, owner/approver membership. Runtime uses restricted DB role, CP mTLS and independently pinned launch signer; no diagnostic RLS-bypass role.",
+      "prerequisite": "Actual containment allows execution; fresh runtime.observe occurs outside held DB locks, followed by authority/versions rechecks. Approval consumption, CPU/memory leases, monotone fences, signed permit and durable queue commit atomically. Root must bind command-specific delivery/output scope.",
+      "expectedEvidence": [
+        "Two current distinct votes and fixed actionDigest",
+        "Accepted queue with exact Run/start/command/claim/lease fence IDs",
+        "One Node execution attempt with actual Docker quota/isolation readback"
+      ],
+      "rejectOrRollback": "Before enqueue failure: no consumed approval/lease/queue partial state. Unknown transmission: observe/cancel the SAME command, never issue another start. worker --once CLI has no command selector and may process unrelated tenant work; use the existing command_id-limited function under a scoped grant, not an invented flag or unfiltered tenant worker."
+    },
+    {
+      "step": 6,
+      "name": "Bind physical stop, stdout/exit/artifact and audit before success or release",
+      "existingEntry": [
+        "GET /v1/projects/{project}/runs/{run}",
+        "GET /v1/projects/{project}/runs/{run}/starts/{startId}",
+        "GET /v1/projects/{project}/runs/{run}/result",
+        "GET /v1/projects/{project}/runs/{run}/logs",
+        "GET /v1/projects/{project}/runs/{run}/artifacts",
+        "GET /v1/projects/{project}/runs/{run}/events",
+        "NodeDelivery receipt observation and DeliveryWorker/output ingestion"
+      ],
+      "sourceRefs": [
+        "routes",
+        "dispatch",
+        "transport",
+        "firstHarness",
+        "handoff"
+      ],
+      "requiredRole": "Current scoped project reader; authenticated Node stop/result channel and durable output provider.",
+      "prerequisite": "Result/receipt matches current tenant/Node/epoch/channel/Run/command/attempt/fences/input hash. Output store and audit/event linkage are configured and independently read back; all IDs currently null.",
+      "expectedEvidence": [
+        "Exactly one completed attempt and actual authenticated stopped receipt",
+        "Expected sentinel stdout, stderr, exit code, artifact hash and committed result",
+        "Same correlation/Run sequence through grants, policy, votes, leases, queue, Node receipt and audit; verified resources released once"
+      ],
+      "rejectOrRollback": "No success from HTTP202, container exit alone, host label or missing output. Hold leases/edit locks until authenticated physical stop; reconcile uncertain output by observation without execution replay. Never clear journal/floors, delete volumes/Nodes, restart an old image or clean unrelated work."
+    }
+  ],
+  "enforcedResourceBoundary": {
+    "sourceRefs": [
+      "agentCLI",
+      "permit",
+      "docker",
+      "agentWrapper"
+    ],
+    "standardCLIWorkloadMaxCPU_millis": 1000,
+    "standardCLIWorkloadMaxMemory_bytes": 536870912,
+    "standardCLIWorkloadMaxTimeout_seconds": 30,
+    "CLIHasMaxLimitOverrideFlags": false,
+    "candidateDocument2CPU2GiBIsEnforced": false,
+    "sampleLaunchForLaterRootSelection": {
+      "cpuMillis": 500,
+      "memoryBytes": 67108864,
+      "timeoutSeconds": 5,
+      "pidsLimit": 64,
+      "GPURequests": 0,
+      "isApproved": false
+    },
+    "perWorkloadEnforcement": [
+      "Sandbox compile/policy and signed launch values",
+      "permit.Verify rejects wrong image/executable/profile and excess resource requests",
+      "Docker HostConfig NanoCpus=cpuMillis*1000000; Memory=MemorySwap=memoryBytes; PidsLimit64",
+      "Actual inspect must match read-only root/nonroot65532/networknone/capdropALL/noNewPrivileges/privateIPC+cgroup; host Binds and device/port mounts absent"
+    ],
+    "agentWrapperEnvelopeOnly": {
+      "cpu": 0.5,
+      "memoryBytes": 268435456,
+      "pids": 128,
+      "note": "start-node.sh caps the agent, not sibling workload containers or an entire host resource offer. Its observe profile is not CPU-workspace admission."
+    }
+  },
+  "freshCPUvsK2": {
+    "ordinaryFreshCPUTrust": [
+      "Current verified user OIDC + DB grants",
+      "Operator-enrolled mTLS Node/channel/peer-policy floor",
+      "Independent Ed25519 launch-permit pin + current leases/epoch/claim journal",
+      "Operator-pinned ordinary Workspace profile/image/resource mapping"
+    ],
+    "selectedOrdinaryCallgraph": [
+      "WorkspaceStart -> RestrictedWorkspaceRuntime.observe/policy -> atomic queue",
+      "DeliveryWorker -> NodeDelivery/NodeTLSClient -> inv-node runtime Verify/journal/Docker"
+    ],
+    "K2ImportsFoundInSelectedCPUEntries": false,
+    "H12AcceptanceInstallsRegistryTrust": false,
+    "K2MigrationGate": {
+      "sourceFile": "services/node-agent/internal/migrationcontext/policy.go",
+      "lines": "68-80",
+      "function": "LoadInstalledPolicy",
+      "refusal": "TrustUnknown; ports.go53 null service and58 authenticateRegistry always refuses",
+      "bindingState": "NULL_HOLD",
+      "bypassPermitted": false
+    },
+    "combinedComputeStorage": "NOT_SELECTED; omit optional storage-policy/mounts. Existing storage sampler trust and any K2 migration/registry path need separate actual source and authority bindings; do not infer that every fresh CPU operation must wait for optional/K2 cards."
+  },
+  "minimalExistingHarness": {
+    "primary": "tests/integration/test_workspace_start.py::test_first_attempt_executes_frozen_program_with_real_evidence",
+    "businessJoin": "tests/integration/test_workspace_start.py::test_business_first_run_uses_current_public_identity_and_real_kernel",
+    "reuse": "Existing prepare/approve/enqueue/DeliveryWorker/NodeTLSClient/result functions; pin one source/image/identity/command and retain case evidence. No new generic framework.",
+    "isCurrentCPRunnableUnchanged": false,
+    "reasons": [
+      "Fixtures generate isolated JWT/CA/database and synthetic principals; not actual user authentication proof",
+      "remote_workspace_entry.initialize/setup creates fixture DB role/epoch/projects/memberships; MUST NOT run against current demo DB",
+      "No production current-project Node-association mutation entry located; operator admission boundary is an unresolved integration gate, not a fabricated REST endpoint"
+    ]
+  },
+  "firstNextRootScope": {
+    "owner": "Root",
+    "status": "READ_ONLY_CURRENT_PRINCIPAL_PROJECT_AND_CONTROLLED_ADMISSION_SELECTION_REQUIRED",
+    "action": "Resolve actual project/principal/grants and select a controlled fresh-Node association/profile entry, pin the real joint source and images, then issue separate narrowly bounded mutation/execution grants. Never attach the pre-existing DB Node merely to populate the UI."
+  },
+  "preservation": {
+    "trackedOrUntrackedResidueBeforeSHA256": "387082cd77b9177ba3e8899bf4e361b10f5736c82f52a4af4daef27bbb5c2a00",
+    "oldTenantsNodesDBsVolumesAndAllAcceptedEvidence": "UNCHANGED",
+    "runprogPrivateConfigReadGrant": "REVOKED_NOT_USED_IN_RECOVERY",
+    "credentialsAndRawToolOutputsIncluded": false,
+    "networkDBHTTPSSHAppRuntimeOperationsByThisRecovery": "NONE_AUTHOR_REPORTED",
+    "operationalGrant": false,
+    "independentAcceptance": false,
+    "wholeProgramDone": false,
+    "optionalH12CL1": "BACKLOG_NONBLOCKING"
+  }
+}

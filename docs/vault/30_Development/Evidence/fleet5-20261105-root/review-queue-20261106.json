@@ -1,6 +1,6 @@
 {
   "schema": "fleet5-root-review-resource-sequence:1",
-  "atKST": "2026-11-07T12:43:31+09:00",
+  "atKST": "2026-11-07T13:06:44+09:00",
   "completedB": {
     "task": "task_d4c4c809ed4e",
     "review": "ac9182c3e3d606ec027c0be2e90e049ff50d54f1",
@@ -22,7 +22,7 @@
     "review": "0e53fc024ca773b7719182e170e5e126aeaf5b95",
     "verdict": "ACCEPT TEST-ONLY; R-L1 CLOSED; no new findings"
   },
-  "nextActualReviewTrigger": "Exactjointcandidate+Docs/Core/Backend then one actual integration review. No new optionalLow/proof scope expansion or mailbox polling.",
+  "nextActualReviewTrigger": "Actual703 required3CI/artifactdelivery then independentintegrationreview; newadmissionWIP remains unpublished until Rootdependencydisposition. No optionalLowexpansion.",
   "completedIntegration": {
     "task": "task_78064fb4b7ff",
     "dispatch": "ctx_ed7ec73163d6",
@@ -1032,8 +1032,8 @@
     "Docs": 42333724088
   },
   "parallelImplementation": {
-    "atKST": "2026-11-07T12:43:31+09:00",
-    "status": "JOINT_CPU_SOURCE_INTEGRATION_ACTUAL_ACTIVITY_OBSERVED_CANDIDATE_NOT_YET_PUBLISHED",
+    "atKST": "2026-11-07T13:06:44+09:00",
+    "status": "PUBLISHED_703_SOURCE_PINS_ROOT_VERIFIED_DOCS_PASS_CORE_BACKEND_PENDING",
     "sourceBase": "6d7ee3d85bd0e47eb7b787234c10d5dbfdb3a9e8",
     "patchSource": "746789a36091c8601afea23fe176069e2fa7d87b",
     "onlyProductScope": [
@@ -1049,17 +1049,168 @@
     "initialReceiptState": "outcome_unknown",
     "actualActivityEvidence": "Root bounded worker-read observed actual own docs gates and r1 full canonical CHECK unchanged, and author asked targeted r2 evidence-encoding recovery msg_a09b217d7a15. No resend/retry/stop/duplicate.",
     "gateRecovery": "msg_7bc1a98984ce permits preserving originalUTF16rawbytes in new own UTF8base64JSON, own text UTF8 normalization and directbyteIO futuregate capture only; no source/tool/workflow change.",
-    "publishedCandidate": null,
-    "exactJointCI": null,
-    "independentJointReview": null,
+    "publishedCandidate": "7033778ad3d2bc284e36f7e29be7597dbb7d9f23",
+    "exactJointCI": "DOCS_SUCCESS_CORE_BACKEND_IN_PROGRESS",
+    "independentJointReview": "PENDING",
     "runtimeGrant": false,
     "actualAuthority": null,
-    "wholeProgramComplete": false
+    "wholeProgramComplete": false,
+    "actualSourceVerification": {
+      "atKST": "2026-11-07T12:59:11+09:00",
+      "source": "7033778ad3d2bc284e36f7e29be7597dbb7d9f23",
+      "base": "6d7ee3d85bd0e47eb7b787234c10d5dbfdb3a9e8",
+      "remoteExact": true,
+      "branch": "agent/codex/fleet5-cpu-integration-pin-r1-20261107",
+      "completeChangedPathCount": 46,
+      "onlyTwoAcceptedProductTestBlobsAndOwnDocs": true,
+      "acceptedSourceSHA256": {
+        "services/control-plane/src/inv/dispatch.py": "82f029614537eb5bab56934e4b6736fe3dd52ece54b9b9a3996815b131e41de4",
+        "tests/core/test_delivery_operation_origin.py": "3dacdb63f83ab1d8075ddcbe422d82daad20bd56f643adee0fc7ae97715925d2"
+      },
+      "allOther6d7ProductTestsModulesK1K2Unchanged": true,
+      "Docs": 42335285577,
+      "Core": 42335287638,
+      "Backend": 42335289761,
+      "CIStatus": "Docs observedSUCCESS; Core/Backend not yet accepted by Root",
+      "independentIntegrationReview": "PENDING",
+      "runtimeGrant": false,
+      "actualAuthority": null,
+      "wholeProgramComplete": false
+    },
+    "actualCIProgress": {
+      "atKST": "2026-11-07T13:04:02+09:00",
+      "source": "7033778ad3d2bc284e36f7e29be7597dbb7d9f23",
+      "branch": "agent/codex/fleet5-cpu-integration-pin-r1-20261107",
+      "lanes": {
+        "docs": {
+          "run": 42335285577,
+          "correlation": "FLEET5-CPU-INTEGRATION-R1-DOCS-7033778ad3d2-f33034956307",
+          "status": "completed",
+          "conclusion": "success",
+          "exactHeadRefEventPathAttempt": true,
+          "jobs": [
+            {
+              "id": 128290723992,
+              "name": "docs",
+              "status": "completed",
+              "conclusion": "success",
+              "steps": 19,
+              "successfulSteps": 19,
+              "conditionalSkippedSteps": 0
+            }
+          ]
+        },
+        "core": {
+          "run": 42335287638,
+          "correlation": "FLEET5-CPU-INTEGRATION-R1-CORE-7033778ad3d2-73d3d1b3c353",
+          "status": "in_progress",
+          "conclusion": null,
+          "exactHeadRefEventPathAttempt": true,
+          "jobs": [
+            {
+              "id": 128290730407,
+              "name": "s01-storage-roundtrip",
+              "status": "completed",
+              "conclusion": "success",
+              "steps": 16,
+              "successfulSteps": 16,
+              "conditionalSkippedSteps": 0
+            },
+            {
+              "id": 128290730592,
+              "name": "core",
+              "status": "in_progress",
+              "conclusion": null,
+              "steps": 47,
+              "successfulSteps": 28,
+              "conditionalSkippedSteps": 4
+            }
+          ]
+        },
+        "backend": {
+          "run": 42335289761,
+          "correlation": "FLEET5-CPU-INTEGRATION-R1-BACKEND-7033778ad3d2-34e4fbc3ed4d",
+          "status": "in_progress",
+          "conclusion": null,
+          "exactHeadRefEventPathAttempt": true,
+          "jobs": [
+            {
+              "id": 128290737412,
+              "name": "mlflow-live",
+              "status": "completed",
+              "conclusion": "success",
+              "steps": 9,
+              "successfulSteps": 9,
+              "conditionalSkippedSteps": 0
+            },
+            {
+              "id": 128290737435,
+              "name": "backend (3.14)",
+              "status": "in_progress",
+              "conclusion": null,
+              "steps": 19,
+              "successfulSteps": 12,
+              "conditionalSkippedSteps": 2
+            },
+            {
+              "id": 128290737705,
+              "name": "backend (3.12)",
+              "status": "completed",
+              "conclusion": "success",
+              "steps": 20,
+              "successfulSteps": 20,
+              "conditionalSkippedSteps": 0
+            }
+          ]
+        }
+      },
+      "allThreeCompletedSuccess": false,
+      "artifactOrCaseCountsVerified": false,
+      "independentIntegrationReview": "PENDING",
+      "wholeProgramComplete": false
+    }
   },
   "CPUJoinSourceMap": {
     "task": "task_a95ef3d8ccce",
     "dispatch": "ctx_ed23b4a777d0",
     "scope": "source-only six-step existing onboarding route map; sanitized Root observations only",
     "status": "RECOVERY_SENT_DELIVERY_PENDING"
+  },
+  "freshCPUAdmissionWIP": {
+    "atKST": "2026-11-07T13:06:44+09:00",
+    "task": "FLEET5-FRESH-CPU-ADMISSION-CODE-R1-20261107",
+    "parentOrcaTask": "task_a95ef3d8ccce",
+    "dispatch": "ctx_ed23b4a777d0",
+    "owner": "Codex",
+    "futureReviewer": "Actual independent Claude, not yet started",
+    "status": "CONCRETE_FOUR_NEW_FILE_OPERATOR_ADMISSION_WIP_AUTHORIZED_DELIVERY_PENDING",
+    "base": "7033778ad3d2bc284e36f7e29be7597dbb7d9f23",
+    "scopeMessage": "msg_e716b2cba047",
+    "stdinClarification": "msg_5fa2d17d863e",
+    "codeScope": [
+      "services/control-plane/src/inv/fresh_cpu_admission.py",
+      "tools/fresh_cpu_admission.py",
+      "tests/core/test_fresh_cpu_admission.py",
+      "tests/core/test_fresh_cpu_admission_cli.py"
+    ],
+    "purpose": "Missing controlled fresh-Node metadata writer: dry plan then exact digest apply; atomic offlineNode+2configuredCPU/memoryresources+projectassociation+existingchannelCAS0/audit, preserve every existing tenant/project/user/grant/control/Node and no public API privilege extension.",
+    "configuredContributionOnly": {
+      "cpuMillis": 500,
+      "memoryBytes": 67108864,
+      "GPU": false,
+      "physicalResourcesMeasured": false
+    },
+    "operatorBoundary": "Real pre-existing DB privileges; no request boolean or runtime/JWT escalation. Public certificate identity from actualDER, existing operator/CA provenance boundary explicit.",
+    "CLIInput": "Bounded typed public stdin JSON only; operatorDSN from named env only; no arbitrary config/file reads or credential output.",
+    "actualTargetIDsInGenericCode": false,
+    "newOperationalRequestNodePortImageVolumeCertificateAndPrincipalAuthority": "NOT_BOUND_OR_GRANTED",
+    "publicationDependency": "Root actual703 fullCI/dependency disposition plus concreteWIP; no commit/push/CI/realDB by author yet.",
+    "runtimeOrPKIGrant": false,
+    "authorRealConfigCredentialAccess": "DENIED; source and explicitly typed Root observations only",
+    "implementation": "PENDING",
+    "localProductTests": "NOT_RUN",
+    "hostedNewCodeCI": "NOT_STARTED",
+    "independentCODEReview": "NOT_STARTED",
+    "wholeProgramComplete": false
   }
 }

@@ -3,8 +3,8 @@
   "recordedAtKST": "2026-11-06T00:46:51+09:00",
   "rootBase": "2b1753ce59c09037b5e130a7ffe64794d1d45fdf",
   "priorRootCheckpoint": {
-    "SHA": "e5aa25b407f1444ca5e1f7405a024df8a679fa8e",
-    "Docs": 42333046998,
+    "SHA": "831d9e4fd891a4b003ed9c61db34a538e3f7f1a2",
+    "Docs": 42335357132,
     "exactHeadCorrelationAllJobsSuccess": true,
     "remoteMatches": true,
     "syncExits": [
@@ -12,13 +12,13 @@
       0,
       0
     ],
-    "independentlyMatchedNormalizedDestinationHashes": 3069,
+    "independentlyMatchedNormalizedDestinationHashes": 3077,
     "pending": 0,
     "conflicts": 0,
     "trackedAndUntrackedClean": true,
     "rootDocsOnly": true,
     "wholeProgramComplete": false,
-    "verifiedAtKST": "2026-11-07T12:15:49+09:00"
+    "verifiedAtKST": "2026-11-07T12:46:08+09:00"
   },
   "actualPlanLowReview": {
     "source": "803ad270562b1b75e44d26f9e14b965c714ab519",
@@ -2515,7 +2515,7 @@
     "ownerT1T2T3": "msg_620855c76519",
     "normativeRevisionReply": "msg_0392caf64d5d"
   },
-  "latestRecordAtKST": "2026-11-07T12:43:31+09:00",
+  "latestRecordAtKST": "2026-11-07T13:06:44+09:00",
   "optionalLowTokenTestDelta": {
     "source": "f0af307705b4923ebc3e231db5238af4c70aa389",
     "scope": "two otherwise-valid token payload corrections and JSON validity assertions; runtime unchanged",
@@ -5909,8 +5909,8 @@
     "independentWholeProductAcceptance": false
   },
   "jointCPUIntegration": {
-    "atKST": "2026-11-07T12:43:31+09:00",
-    "status": "JOINT_CPU_SOURCE_INTEGRATION_ACTUAL_ACTIVITY_OBSERVED_CANDIDATE_NOT_YET_PUBLISHED",
+    "atKST": "2026-11-07T13:06:44+09:00",
+    "status": "PUBLISHED_703_SOURCE_PINS_ROOT_VERIFIED_DOCS_PASS_CORE_BACKEND_PENDING",
     "sourceBase": "6d7ee3d85bd0e47eb7b787234c10d5dbfdb3a9e8",
     "patchSource": "746789a36091c8601afea23fe176069e2fa7d87b",
     "onlyProductScope": [
@@ -5926,12 +5926,126 @@
     "initialReceiptState": "outcome_unknown",
     "actualActivityEvidence": "Root bounded worker-read observed actual own docs gates and r1 full canonical CHECK unchanged, and author asked targeted r2 evidence-encoding recovery msg_a09b217d7a15. No resend/retry/stop/duplicate.",
     "gateRecovery": "msg_7bc1a98984ce permits preserving originalUTF16rawbytes in new own UTF8base64JSON, own text UTF8 normalization and directbyteIO futuregate capture only; no source/tool/workflow change.",
-    "publishedCandidate": null,
-    "exactJointCI": null,
-    "independentJointReview": null,
+    "publishedCandidate": "7033778ad3d2bc284e36f7e29be7597dbb7d9f23",
+    "exactJointCI": "DOCS_SUCCESS_CORE_BACKEND_IN_PROGRESS",
+    "independentJointReview": "PENDING",
     "runtimeGrant": false,
     "actualAuthority": null,
-    "wholeProgramComplete": false
+    "wholeProgramComplete": false,
+    "actualSourceVerification": {
+      "atKST": "2026-11-07T12:59:11+09:00",
+      "source": "7033778ad3d2bc284e36f7e29be7597dbb7d9f23",
+      "base": "6d7ee3d85bd0e47eb7b787234c10d5dbfdb3a9e8",
+      "remoteExact": true,
+      "branch": "agent/codex/fleet5-cpu-integration-pin-r1-20261107",
+      "completeChangedPathCount": 46,
+      "onlyTwoAcceptedProductTestBlobsAndOwnDocs": true,
+      "acceptedSourceSHA256": {
+        "services/control-plane/src/inv/dispatch.py": "82f029614537eb5bab56934e4b6736fe3dd52ece54b9b9a3996815b131e41de4",
+        "tests/core/test_delivery_operation_origin.py": "3dacdb63f83ab1d8075ddcbe422d82daad20bd56f643adee0fc7ae97715925d2"
+      },
+      "allOther6d7ProductTestsModulesK1K2Unchanged": true,
+      "Docs": 42335285577,
+      "Core": 42335287638,
+      "Backend": 42335289761,
+      "CIStatus": "Docs observedSUCCESS; Core/Backend not yet accepted by Root",
+      "independentIntegrationReview": "PENDING",
+      "runtimeGrant": false,
+      "actualAuthority": null,
+      "wholeProgramComplete": false
+    },
+    "actualCIProgress": {
+      "atKST": "2026-11-07T13:04:02+09:00",
+      "source": "7033778ad3d2bc284e36f7e29be7597dbb7d9f23",
+      "branch": "agent/codex/fleet5-cpu-integration-pin-r1-20261107",
+      "lanes": {
+        "docs": {
+          "run": 42335285577,
+          "correlation": "FLEET5-CPU-INTEGRATION-R1-DOCS-7033778ad3d2-f33034956307",
+          "status": "completed",
+          "conclusion": "success",
+          "exactHeadRefEventPathAttempt": true,
+          "jobs": [
+            {
+              "id": 128290723992,
+              "name": "docs",
+              "status": "completed",
+              "conclusion": "success",
+              "steps": 19,
+              "successfulSteps": 19,
+              "conditionalSkippedSteps": 0
+            }
+          ]
+        },
+        "core": {
+          "run": 42335287638,
+          "correlation": "FLEET5-CPU-INTEGRATION-R1-CORE-7033778ad3d2-73d3d1b3c353",
+          "status": "in_progress",
+          "conclusion": null,
+          "exactHeadRefEventPathAttempt": true,
+          "jobs": [
+            {
+              "id": 128290730407,
+              "name": "s01-storage-roundtrip",
+              "status": "completed",
+              "conclusion": "success",
+              "steps": 16,
+              "successfulSteps": 16,
+              "conditionalSkippedSteps": 0
+            },
+            {
+              "id": 128290730592,
+              "name": "core",
+              "status": "in_progress",
+              "conclusion": null,
+              "steps": 47,
+              "successfulSteps": 28,
+              "conditionalSkippedSteps": 4
+            }
+          ]
+        },
+        "backend": {
+          "run": 42335289761,
+          "correlation": "FLEET5-CPU-INTEGRATION-R1-BACKEND-7033778ad3d2-34e4fbc3ed4d",
+          "status": "in_progress",
+          "conclusion": null,
+          "exactHeadRefEventPathAttempt": true,
+          "jobs": [
+            {
+              "id": 128290737412,
+              "name": "mlflow-live",
+              "status": "completed",
+              "conclusion": "success",
+              "steps": 9,
+              "successfulSteps": 9,
+              "conditionalSkippedSteps": 0
+            },
+            {
+              "id": 128290737435,
+              "name": "backend (3.14)",
+              "status": "in_progress",
+              "conclusion": null,
+              "steps": 19,
+              "successfulSteps": 12,
+              "conditionalSkippedSteps": 2
+            },
+            {
+              "id": 128290737705,
+              "name": "backend (3.12)",
+              "status": "completed",
+              "conclusion": "success",
+              "steps": 20,
+              "successfulSteps": 20,
+              "conditionalSkippedSteps": 0
+            }
+          ]
+        }
+      },
+      "allThreeCompletedSuccess": false,
+      "artifactOrCaseCountsVerified": false,
+      "independentIntegrationReview": "PENDING",
+      "wholeProgramComplete": false
+    }
   },
   "currentCPNodeAffinityReadOnly": {
     "atKST": "2026-11-07T12:43:31+09:00",
@@ -6034,7 +6148,7 @@
     "wholeProgramComplete": false
   },
   "CPUJoinWorkerIncident": {
-    "atKST": "2026-11-07T12:43:31+09:00",
+    "atKST": "2026-11-07T13:06:44+09:00",
     "status": "AUTHOR_REPORTED_CONFIG_CREDENTIALS_IN_WORKER_TOOL_STDOUT_SOURCE_ONLY_RECOVERY_SENT",
     "task": "task_a95ef3d8ccce",
     "dispatch": "ctx_ed23b4a777d0",
@@ -6049,8 +6163,77 @@
     "sourceOnlyRecoverySend": "msg_d53239763e59",
     "permittedResume": "Immutable source plus explicitly Root-sanitized typed observations only; no arbitrary config values, credentials or secret files.",
     "automaticCredentialRotationOrServiceRestartAssigned": false,
-    "sourceOnlyRouteMapDelivery": "PENDING",
+    "sourceOnlyRouteMapDelivery": {
+      "path": "cpu-one-node-join-route-r1-author-analysis.json",
+      "bytes": 23251,
+      "SHA256": "cdcfc72d212262eaddf697625f8f3d056d7bcbd98e18b5c50594edb8e3f2e371",
+      "status": "DELIVERED_SOURCE_ONLY_AS_AUTHOR_REPORTED"
+    },
     "reportContainsCredentialValues": false,
+    "wholeProgramComplete": false,
+    "followonScope": "Four-new-file operator admission CODE WIP, no real config/credential/PKI/network/DB access by author"
+  },
+  "CPUJoinRouteMap": {
+    "path": "cpu-one-node-join-route-r1-author-analysis.json",
+    "sha256": "cdcfc72d212262eaddf697625f8f3d056d7bcbd98e18b5c50594edb8e3f2e371",
+    "authorAnalysisNotIndependentAcceptance": true
+  },
+  "freshCPUAdmissionWIP": {
+    "atKST": "2026-11-07T13:06:44+09:00",
+    "task": "FLEET5-FRESH-CPU-ADMISSION-CODE-R1-20261107",
+    "parentOrcaTask": "task_a95ef3d8ccce",
+    "dispatch": "ctx_ed23b4a777d0",
+    "owner": "Codex",
+    "futureReviewer": "Actual independent Claude, not yet started",
+    "status": "CONCRETE_FOUR_NEW_FILE_OPERATOR_ADMISSION_WIP_AUTHORIZED_DELIVERY_PENDING",
+    "base": "7033778ad3d2bc284e36f7e29be7597dbb7d9f23",
+    "scopeMessage": "msg_e716b2cba047",
+    "stdinClarification": "msg_5fa2d17d863e",
+    "codeScope": [
+      "services/control-plane/src/inv/fresh_cpu_admission.py",
+      "tools/fresh_cpu_admission.py",
+      "tests/core/test_fresh_cpu_admission.py",
+      "tests/core/test_fresh_cpu_admission_cli.py"
+    ],
+    "purpose": "Missing controlled fresh-Node metadata writer: dry plan then exact digest apply; atomic offlineNode+2configuredCPU/memoryresources+projectassociation+existingchannelCAS0/audit, preserve every existing tenant/project/user/grant/control/Node and no public API privilege extension.",
+    "configuredContributionOnly": {
+      "cpuMillis": 500,
+      "memoryBytes": 67108864,
+      "GPU": false,
+      "physicalResourcesMeasured": false
+    },
+    "operatorBoundary": "Real pre-existing DB privileges; no request boolean or runtime/JWT escalation. Public certificate identity from actualDER, existing operator/CA provenance boundary explicit.",
+    "CLIInput": "Bounded typed public stdin JSON only; operatorDSN from named env only; no arbitrary config/file reads or credential output.",
+    "actualTargetIDsInGenericCode": false,
+    "newOperationalRequestNodePortImageVolumeCertificateAndPrincipalAuthority": "NOT_BOUND_OR_GRANTED",
+    "publicationDependency": "Root actual703 fullCI/dependency disposition plus concreteWIP; no commit/push/CI/realDB by author yet.",
+    "runtimeOrPKIGrant": false,
+    "authorRealConfigCredentialAccess": "DENIED; source and explicitly typed Root observations only",
+    "implementation": "PENDING",
+    "localProductTests": "NOT_RUN",
+    "hostedNewCodeCI": "NOT_STARTED",
+    "independentCODEReview": "NOT_STARTED",
+    "wholeProgramComplete": false
+  },
+  "currentProjectPrincipalReadOnly": {
+    "atKST": "2026-11-07T13:06:44+09:00",
+    "status": "READ_ONLY_DB_PLANNING_TARGET_CHOSEN_FRESH_AUTH_AND_BROWSER_NOT_OBSERVED",
+    "tenant": "97968b42-68aa-40ce-af5e-3a33e2fc2205",
+    "project": "prj_01M6NDBHVD2DZQ1Q38DCKN1XE3",
+    "businessUserId": "usr_01M6R449Z62B1H7VE1RMH4GTW9",
+    "subjectId": "oidc:3f79091432574632c62c37f25aaddb37f91e37a5864422525048eb82fe54247c",
+    "role": "owner",
+    "businessUserProjectActive": true,
+    "businessAndKernelLinksEnabled": true,
+    "kernelCanRequest": true,
+    "kernelCanApprove": true,
+    "freshOIDCTokenVerified": false,
+    "currentBrowserSelection": "NOT_OBSERVED",
+    "otherDistinctEnabledApproverMappings": 1,
+    "twoDistinctNonRequesterRunApprovals": "NOT_SATISFIED_OR_PERFORMED",
+    "userQuestion": "Async request for existing additional approver account ID/login, no password, not another progress-permission request; code and metadata admission work continue.",
+    "DBWrites": false,
+    "noCredentialOrEmailValues": true,
     "wholeProgramComplete": false
   }
 }
