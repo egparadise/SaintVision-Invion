@@ -1,0 +1,103 @@
+{
+  "verifiedAtKST": "2026-11-08T07:48:06+09:00",
+  "actualReviewSHA": "f29228ed28c651cb2470b45d9f8d14521e1ce75d",
+  "directBase": "29046535c0bb0e2629286c8c678f563080f30a67",
+  "Root537": "a2d7977196363955de0cdc9dd1a412e1c5297199",
+  "originalPlan": "a3c6984fa25c6cf179827e15e4259000e7bd294e",
+  "onlyOwnReviewFilesChanged": 5,
+  "exactInputPinsVerified": 14,
+  "exactSourceBlobPinsVerified": 22,
+  "RootCitationOnlyAdaptation34ReversedAndOriginalBytesMatched": true,
+  "unchangedPlanImportsVerified": 26,
+  "recordedSixLocalGatesPassedTwice": true,
+  "exactReviewDocs": 42421987817,
+  "all19SuccessJob": 128552186947,
+  "correlation": "fleet5-claude-renewal-plan-review-r1-a98d23cab63f444ba3d74a7abade8c8b",
+  "canonicalReviewerStartEndAndRootPostCIActualFullBytesMatch": true,
+  "canonicalBytes": 584102,
+  "canonicalSHA256": "9bcb66e67518a57aede1276f4b083c28840d3ae83f5a3c4296b1e33f355fed9a",
+  "verdict": "REQUEST_CHANGES",
+  "mandatoryBlockers": 2,
+  "findings": [
+    {
+      "id": "PLAN-REVIEW-R1-F1",
+      "severity": "MAJOR",
+      "mandatory": true,
+      "title": "No contract for the near-certain passing of the 16:15:30 KST peer-policy deadline; the selected next card cannot run after it",
+      "evidence": [
+        "1efea494f026e932360c35ae811b6423d874a2e7 trust.go:62-64 NewAuthority fails if policy() fails; :85 pins the floor, then :89-91 rejects an expired policy (NODE-0041)",
+        "1efea494f026e932360c35ae811b6423d874a2e7 trust.go:103-107 Authorize re-reads policy() on every handshake (VerifyConnection), so after expiry every CP mTLS connection to the Node is refused",
+        "1efea494f026e932360c35ae811b6423d874a2e7 main.go:104-107 and :21-22 a NewAuthority error ends run() and exits 1, so after expiry no Node process can start (restart, Docker restart, host reboot, image migration or the restart step of the normal protocol)",
+        "1efea494f026e932360c35ae811b6423d874a2e7 trust.go:144 after leaf notAfter 2026-11-09 07:15:30Z the Node's own server certificate is rejected as well",
+        "1efea494f026e932360c35ae811b6423d874a2e7 peer_policy_phase.py:119 'separate offline recovery required'; lan_pilot.py:1584 'normal recovery is blocked'; lan_pilot.py:2305",
+        "Root input receipts: peerPolicyExpiresAt 2026-11-08T07:15:30Z for PC2/PC3/PC4"
+      ],
+      "problem": "The plan names 16:15:30 KST as the earliest deadline and promises no schedule, which is honest. But the card it proposes (code, Linux CI, independent review, Root private preflight, migration (F2) and release) cannot realistically finish in the ~8.6 h left at review time, and the machinery it reuses then refuses to start. The plan does not state the deterministic post-expiry state: CP heartbeat, snapshot and delivery fail closed; a Node that exits or is restarted cannot come back; an M2 floor needs a live serving PID. It does not tell Root not to restart or reboot these Nodes after expiry, and it does not choose the next card for that state. Its recovery section covers expiry only during an in-flight operation.",
+      "requiredChange": "Add an explicit deadline fork. (a) A release cut-off: the latest time the normal adapter may start, equal to policy expiry minus the frozen completion budget, the 630 s minimum and the 30 s skew. (b) The post-expiry HOLD state: CP-unreachable and not healthy, not a Node fault; no Node restart/reboot/migration; floors, journals and keys untouched; dashboards show stale, never fabricated health. (c) The post-expiry next card: an expired-current-authority forward-recovery contract owned by Codex (high-difficulty security/recovery), reviewed by Claude, bounded by leaf expiry 2026-11-09 16:15:30 KST and CA expiry 2026-11-14 16:15:30 KST. Do not reuse the normal adapter for it unchanged."
+    },
+    {
+      "id": "PLAN-REVIEW-R1-F2",
+      "severity": "MAJOR",
+      "mandatory": true,
+      "title": "A new serving binary and container migration is unavoidable, but the plan treats it as conditional and its preflight freezes the current image/CIDs",
+      "evidence": [
+        "1efea494f026e932360c35ae811b6423d874a2e7 peer_floor_linux.go:78 the observer requires os.SameFile(/proc/<pid>/exe, /proc/self/exe): the M2 CLI must be the exact binary serving",
+        "1efea494f026e932360c35ae811b6423d874a2e7 peer_floor_linux.go:150-188 that binary hard-codes the Dir(state) layout and the three lan-* profiles; :82 requires executable Uid == journal UID",
+        "1efea494f026e932360c35ae811b6423d874a2e7 Dockerfile.node:2 and Dockerfile.node.remote:11 both COPY /inv-node without --chown (root-owned in scratch), while the cohort runs UID1000",
+        "1efea494f026e932360c35ae811b6423d874a2e7 worker_plain_rotation.py:87,92,178,236 reject any serving-executable change during install, final, renewal or finalization",
+        "Plan line 64 forbids relabelling, fake argv, journal moves and chmod/chown; plan line 111 says a changed image cancels release; plan line 70 says 'If changing Go is necessary'"
+      ],
+      "problem": "The deployed binary rejects the current argv, profile and ownership, and only the serving binary can produce M2. So under the plan's own prohibitions, no signed current floor exists without a new Go binary, and therefore a new image and container (new CID). That makes the migration a mandatory predecessor, not a conditional one. It must settle and be re-observed before the batch's pre-floor, because executable changes are rejected mid-operation. Since a Node cannot start on an expired policy, the migration itself is also deadline-bound (F1). The Phase 0/1 freeze on exact CIDs/image contradicts this sequence.",
+      "requiredChange": "State the migration as a required, separately reviewed predecessor card. It must preserve identity, journal, keys, floors and mounts, and run while authority is valid or under the F1 expired-authority contract. Define how the frozen identity moves from the old CIDs/image to the new ones without being an 'identity change', and require the renewal pre-floor to be taken on the migrated executable."
+    },
+    {
+      "id": "PLAN-REVIEW-R1-F3",
+      "severity": "MODERATE",
+      "mandatory": false,
+      "title": "The CP client-context inventory is incomplete: five NodeTLSClient construction sites, not just 'API and observer'",
+      "evidence": [
+        "96afd799d49717fd40e4ddabd538d82accbe1958 observer_worker.py:58; worker.py:122 (NodeDelivery, the execution delivery path); workspace_config.py:54 via app.py:1342-1344; build_product_runtime.py:537 via app.py:1381 and worker.py:129-133; storage_check_collect.py:381; node_transport.py:61-72 builds SSLContext once per instance"
+      ],
+      "problem": "The plan's language 'every affected CP client' states the intent, but its concrete statement names only the API and observer. A delivery worker or workspace runtime still holding the old context after the Phase 4 switch, or after P+2 drops the old fingerprint, would fail closed on the next real Run.",
+      "requiredChange": "The revised plan or next card must enumerate all five sites, have Root attest which run in the current deployment, and include each one in the switch (or prove it absent) with stale-context refusal tests."
+    },
+    {
+      "id": "PLAN-REVIEW-R1-F4",
+      "severity": "MINOR",
+      "mandatory": false,
+      "title": "CP-client leaf expiry is stated as known but is not evidenced by the pinned inputs",
+      "evidence": [
+        "operation-manifest nodeAndCPClientLeavesNotAfter 2026-11-09T07:15:30Z; root-input receipts carry only CPClientDER_SHA256 48911c5d...6481 and no CP-client notAfter; Node notAfter and CA expiry are evidenced"
+      ],
+      "requiredChange": "Label the CP-client leaf expiry Root-attested/unverified, and have Root preflight read the actual DER validity of 48911c5d...."
+    },
+    {
+      "id": "PLAN-REVIEW-R1-F5",
+      "severity": "MINOR",
+      "mandatory": false,
+      "title": "Citation precision",
+      "evidence": [
+        "Dockerfile.node.remote:12 is ENTRYPOINT; the ownership-relevant COPY is :11. Dockerfile.node:2 has the same root ownership, and the build recipe of image de654cd3 is not pinned (the conclusion holds either way, and the plan already requires Root attestation)",
+        "4 of 34 citations fall outside the source-contract-map ranges (listed in sourceVerification); the claims are true"
+      ],
+      "requiredChange": "Correct the line, and extend the map ranges or note it."
+    },
+    {
+      "id": "PLAN-REVIEW-R1-F6",
+      "severity": "MINOR",
+      "mandatory": false,
+      "title": "CA expiry is listed but its terminal meaning is not",
+      "evidence": [
+        "1efea494f026e932360c35ae811b6423d874a2e7 lan_pki.py issue() and the generator cap leaf notAfter at CA notAfter"
+      ],
+      "requiredChange": "State that after 2026-11-14 16:15:30 KST no same-CA renewal or recovery is possible; it would be authority replacement, which is out of scope."
+    }
+  ],
+  "reviewScope": "Actual separate Claude static source and plan review; no independent product/crypto/Linux runtime execution",
+  "authorAndReviewerDistinct": true,
+  "ownClaudeBoardUpdatedInThisReview": false,
+  "boardFollowupRequiredAtNextActualReviewerTask": true,
+  "actualRenewal": false,
+  "actualMigrationOrRestart": false,
+  "wholeProgramComplete": false
+}

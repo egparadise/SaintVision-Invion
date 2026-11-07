@@ -1,15 +1,23 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.361"
+version: "1.0.500"
 status: "review"
 author: "Codex"
-updated: "2026-11-05T18:48:52+09:00"
+updated: "2026-11-08T08:14:12+09:00"
 source_of_truth: "Git"
-active_card: "FLEET5-20261105 five physical node orchestration"
-active_card_status: "Physical PC map corrected; actual PC4 read-only share and fresh issuer prepared; source2 fixes delivered; successor Low closure/integration and hardware prerequisites remain"
-active_card_next: "Integrate reviewed source revisions with both current-tooling bindings, regenerate exact new archive/verified-finalized classifier, run all8CI; complete PC1keyDocker/PC3group/PC5runtime then real5Node acceptance"
+active_card: "FLEET5-CURRENT-THREE-NODE-RENEWAL-PLAN-R2-20261108"
+active_card_status: "R2 nonexecuting F1-F6 author corrections; exact Docs delivery; actual Claude delta pending; no operating release"
+active_card_next: "Root verifies exact R2/pins/canonical evidence and actual Claude delta, then required migration+normal implementation with known cutoffs or distinct expired-authority contract; no current restart after expiry"
 ---
+
+## 2026-11-08T08:14:12+09:00 current three-Node renewal R2
+
+- Branch-local board version1.0.500 follows read-only Root538/Codex499; Root must integrate only this delta, not export this older board body. Owner original Codex, task task_3e413989dcaa/ctx_80dec9e2eb1e, base a3c6984fa25c6cf179827e15e4259000e7bd294e, new R2 branch and Evidence.
+- Completed author correction for all F1-F6 in the single living plan v1.1.0 and new proposed manifest; all budgets/release/current P/C/new runtime outputs remain null/NOT_RUN/HOLD. Mandatory serving migration is a predecessor to fresh normal pre-floor, with distinct expired-authority and CA-terminal forks. No product/remote/crypto actions or canonical APPLY.
+- Plan [[Current three-Node pilot renewal preflight and recovery plan R1]]; History [[2026-11-08_08-14-12_KST_current_three_node_renewal_plan_R2_Codex]]. Exact commands/exits, source/input/disposition/citation pins, Docs/head/correlation/all19 and full587290B state comparison are in Evidence/fleet5-current-three-node-renewal-plan-r2-20261108-codex.
+- Next owner Root verifies/publishes R2 and obtains actual Claude delta before assigning real required implementation appropriate to time/authority/budget. No self-certified review/operating acceptance; all original gates unchanged.
+
 
 ## 2026-11-08T03:48:26+09:00 CR-CSP-02 중앙 Vite 초기화
 

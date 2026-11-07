@@ -1,0 +1,20 @@
+{
+  "productOrOperatingAction": false,
+  "errors": [
+    {
+      "action": "Large single PowerShell document write",
+      "result": "Windows CreateProcess error206 command length; no file change",
+      "resolution": "Small document metadata writes and native file patches"
+    },
+    {
+      "action": "Combined delete/add same plan patch",
+      "result": "Patch multiple-operation target rejection; no file change",
+      "resolution": "Edit same living path without duplicate operation"
+    },
+    {
+      "action": "Long shell-embedded JSON metadata builder",
+      "result": "Automatic review blocked command by policy; no operating/product action executed",
+      "resolution": "Direct native file patch of nonexecuting public JSON, no shell script execution"
+    }
+  ]
+}

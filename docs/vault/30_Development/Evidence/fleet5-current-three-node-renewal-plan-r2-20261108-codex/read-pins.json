@@ -1,0 +1,93 @@
+[
+  {
+    "source": "03f6ea0a2c6cf83074cfa71850892ba4a1873ae5",
+    "path": "docs/vault/00_Index/\uc804\uccb4 \uac1c\ubc1c \uc9c4\ud589 \ud604\ud669.md",
+    "SHA256": "737a70bcd1439e038a7a12cb1ce845fd2c1290c1ba197a55aa954b47561ff6ff",
+    "bytes": 521090,
+    "frontmatter": "---\ndoc_id: \"INDEX-PROGRESS-001\"\ntitle: \"\uc804\uccb4 \uac1c\ubc1c \uc9c4\ud589 \ud604\ud669\"\nversion: \"1.0.538\"\nstatus: \"review\"\nauthor: \"Codex\"\nupdated: \"2026-11-08T07:50:04+09:00\"\nsource_of_truth: \"Git\"\nlatest_codex_card: \"ActualClaudeF292RenewalPlanREQUEST_CHANGES_MandatoryDeadlineForkAndRequiredServingMigration; OriginalCodexR2Next_CPClient5SitesAndCPLeafEvidence; NoRotationMigrationRestartOrAll5Acceptance\"\n---"
+  },
+  {
+    "source": "03f6ea0a2c6cf83074cfa71850892ba4a1873ae5",
+    "path": "docs/vault/30_Development/Agent\ubcc4 \uc791\uc5c5/Codex \uc791\uc5c5 \ud604\ud669.md",
+    "SHA256": "fce04d615dbf1acebc9657fe22b057aeae9a7e0027e93b149ccb8ccb7ccb1f13",
+    "bytes": 507833,
+    "frontmatter": "---\ndoc_id: \"WORKBOARD-CODEX-001\"\ntitle: \"Codex \uc791\uc5c5 \ud604\ud669\"\nversion: \"1.0.499\"\nstatus: \"review\"\nauthor: \"Codex\"\nupdated: \"2026-11-08T07:50:04+09:00\"\nsource_of_truth: \"Git\"\nactive_card: \"FLEET5 continued supervision with PORTAL-REFRESH-FLEET-20261106\"\nactive_card_status: \"ActualClaudeF292PlanREQUEST_CHANGES_F1DeadlineFork_F2RequiredMigration; SourceStaticReviewVerifiedNotRuntime; OriginalCodexR2Ready; NoCurrentRotationMigrationOrRestart\"\nactive_card_next: \"Publish Root538 exact Docs/Obsidian then original actual Codex plan R2 addresses all6 findings; subsequent actual Claude delta. Normal cutoff remains null/HOLD until real frozen budget/predecessors. After16:15:30KST no current Node restart/reboot/migration, separate expired-authority forward recovery bounded by Nodeleaf11-09 and CA11-14; real2approvers/PC1key/PC5safeNode/fullGPUstorage/manual/all5 remain.\"\n---"
+  },
+  {
+    "source": "03f6ea0a2c6cf83074cfa71850892ba4a1873ae5",
+    "path": "docs/vault/00_Index/2026-09-15 \ub2e8\uc77c \uac00\uc0c1 \ucef4\ud4e8\ud130 \ubcf4\uac15 \uc124\uacc4 \uc778\ub371\uc2a4.md",
+    "SHA256": "35f2cca047fdb57ff2e2ad28e3847e9a7c0a19d6ace6fb36aa941042e872e9be",
+    "bytes": 2085,
+    "frontmatter": "---\ndoc_id: \"INDEX-VIRTUAL-COMPUTER-001\"\ntitle: \"2026-09-15 \ub2e8\uc77c \uac00\uc0c1 \ucef4\ud4e8\ud130 \ubcf4\uac15 \uc124\uacc4 \uc778\ub371\uc2a4\"\nversion: \"1.0.0\"\nstatus: \"accepted\"\nauthor: \"Codex\"\nupdated: \"2026-09-15T11:20:06+09:00\"\nsource_of_truth: \"Git and Obsidian paired update\"\ntags: [\"saintvision\", \"inv\", \"web-desktop\", \"distributed-model\", \"roadmap\"]\n---"
+  },
+  {
+    "source": "03f6ea0a2c6cf83074cfa71850892ba4a1873ae5",
+    "path": "docs/vault/30_Development/57.81\ud37c\uc13c\ud2b8 \uc774\ud6c4 \ub2e8\uc77c \uac00\uc0c1 \ucef4\ud4e8\ud130 \ubcf4\uac15 \ub85c\ub4dc\ub9f5.md",
+    "SHA256": "3a4527ffe53ebea114063692dd3bba826da8c279a93a9800919fff394df1a018",
+    "bytes": 7674,
+    "frontmatter": "---\ndoc_id: \"ROADMAP-VIRTUAL-COMPUTER-001\"\ntitle: \"57.81\ud37c\uc13c\ud2b8 \uc774\ud6c4 \ub2e8\uc77c \uac00\uc0c1 \ucef4\ud4e8\ud130 \ubcf4\uac15 \ub85c\ub4dc\ub9f5\"\nversion: \"1.0.0\"\nstatus: \"accepted\"\nauthor: \"Codex\"\nupdated: \"2026-09-15T11:20:06+09:00\"\nsource_of_truth: \"Git and Obsidian paired update\"\ntags: [\"saintvision\", \"roadmap\", \"web-desktop\", \"storage-fabric\", \"agents\"]\n---"
+  },
+  {
+    "source": "03f6ea0a2c6cf83074cfa71850892ba4a1873ae5",
+    "path": "docs/vault/40_Governance/Agent \uc5f0\uc18d \uc2e4\ud589\uacfc \ucd5c\uc885 \ubcf4\uace0 \uc815\ucc45.md",
+    "SHA256": "60c6a8d3130491bd4cab730cccc0e236fb038d1c7c816efa333acdc34a30cd8f",
+    "bytes": 7196,
+    "frontmatter": "---\ndoc_id: \"GOV-CONTINUOUS-001\"\ntitle: \"Agent \uc5f0\uc18d \uc2e4\ud589\uacfc \ucd5c\uc885 \ubcf4\uace0 \uc815\ucc45\"\nversion: \"1.1.0\"\nstatus: \"accepted\"\nauthor: \"Codex\"\nupdated: \"2026-09-21T14:33:00+09:00\"\nsource_of_truth: \"Git and Obsidian paired update\"\ntags: [\"saintvision\", \"agents\", \"autonomy\", \"governance\"]\n---"
+  },
+  {
+    "source": "03f6ea0a2c6cf83074cfa71850892ba4a1873ae5",
+    "path": "docs/vault/00_Index/\ucd5c\uc885 \uac1c\ubc1c \uacc4\ud68d - \ubaa8\ub4e0 \uac1c\ubc1c\uc758 \uc9c0\uce68.md",
+    "SHA256": "59223c5dff4b4bb6252c8061aebe975665e6eadf92db3659a3f89951b2cb149f",
+    "bytes": 6488,
+    "frontmatter": "---\ndoc_id: \"GUIDE-001\"\ntitle: \"\ucd5c\uc885 \uac1c\ubc1c \uacc4\ud68d - \ubaa8\ub4e0 \uac1c\ubc1c\uc758 \uc9c0\uce68\"\nversion: \"1.1.0\"\nstatus: \"baseline\"\nauthor: \"Codex\"\nupdated: \"2026-09-11T17:15:06+09:00\"\ntimezone: \"Asia/Seoul\"\nsource_of_truth: \"Git\"\ntags: [\"saintvision\", \"final-plan\"]\naliases: [\"\ucd5c\uc885 \uacc4\ubc1c \uacc4\ud68c - \ubaa8\ub4e0 \uac1c\ubc1c\uc758 \uc9c0\uce68\", \"\ucd5c\uc885 \uac1c\ubc1c \uc9c0\uce68\"]\n---"
+  },
+  {
+    "source": "03f6ea0a2c6cf83074cfa71850892ba4a1873ae5",
+    "path": "docs/vault/40_Governance/\uc124\uacc4 \ucda9\ub3cc \uc815\uc815 \ubc0f ADR.md",
+    "SHA256": "771f7714a63af52d7c8aea2424db0b33a2fe96c759c51c81c23144daf7aeaf77",
+    "bytes": 29130,
+    "frontmatter": "---\ndoc_id: \"ADR-INDEX-001\"\ntitle: \"\uc124\uacc4 \ucda9\ub3cc \uc815\uc815 \ubc0f ADR\"\nversion: \"1.37.0\"\nstatus: \"baseline\"\nauthor: \"Codex\"\nupdated: \"2026-09-23T03:10:00+09:00\"\ntimezone: \"Asia/Seoul\"\nsource_of_truth: \"Git\"\ntags: [\"saintvision\", \"final-plan\"]\n---"
+  },
+  {
+    "source": "03f6ea0a2c6cf83074cfa71850892ba4a1873ae5",
+    "path": "docs/vault/40_Governance/Agent \uc5ed\ud560\uacfc \uc778\uacc4 \uacc4\uc57d.md",
+    "SHA256": "128c054e72f9e001b3b32f914cce544bce5432eddccdbe1212d27180c3200823",
+    "bytes": 4619,
+    "frontmatter": "---\ndoc_id: \"GOV-AGENT-001\"\ntitle: \"Agent \uc5ed\ud560\uacfc \uc778\uacc4 \uacc4\uc57d\"\nversion: \"1.1.3\"\nstatus: \"baseline\"\nauthor: \"Codex\"\nupdated: \"2026-09-21T18:47:00+09:00\"\ntimezone: \"Asia/Seoul\"\nsource_of_truth: \"Git\"\ntags: [\"saintvision\", \"final-plan\"]\n---"
+  },
+  {
+    "source": "03f6ea0a2c6cf83074cfa71850892ba4a1873ae5",
+    "path": "docs/vault/40_Governance/Git Build Obsidian \uc6b4\uc601 \uc808\ucc28.md",
+    "SHA256": "fe5e8adc44a14c081ac767265a16434b72e4b3ebfb7719081fa166ad459e59e9",
+    "bytes": 8552,
+    "frontmatter": "---\ndoc_id: \"GOV-GIT-001\"\ntitle: \"Git Build Obsidian \uc6b4\uc601 \uc808\ucc28\"\nversion: \"1.1.4\"\nstatus: \"baseline\"\nauthor: \"Codex\"\nupdated: \"2026-09-22T19:25:00+09:00\"\ntimezone: \"Asia/Seoul\"\nsource_of_truth: \"Git\"\ntags: [\"saintvision\", \"final-plan\"]\n---"
+  },
+  {
+    "source": "03f6ea0a2c6cf83074cfa71850892ba4a1873ae5",
+    "path": "docs/vault/40_Governance/Agent \uc9c0\uc18d \uac1c\ubc1c \uc6b4\uc601 \uaddc\uce59.md",
+    "SHA256": "63839c440ead6dc07300a0e18d5024fb9aadbddf546707156c39af7ee9495c84",
+    "bytes": 6473,
+    "frontmatter": "---\ndoc_id: \"GOV-CONTINUITY-001\"\ntitle: \"Agent \uc9c0\uc18d \uac1c\ubc1c \uc6b4\uc601 \uaddc\uce59\"\nversion: \"1.0.0\"\nstatus: \"review\"\nauthor: \"Codex\"\nupdated: \"2026-09-21T14:05:43+09:00\"\nsource_of_truth: \"Git\"\n---"
+  },
+  {
+    "source": "03f6ea0a2c6cf83074cfa71850892ba4a1873ae5",
+    "path": "docs/task-registry.json",
+    "SHA256": "7c6b339c7487aae652cc5c5e04f6e933249c83930019e798ec24006794b07644",
+    "bytes": 42011,
+    "frontmatter": ""
+  },
+  {
+    "source": "03f6ea0a2c6cf83074cfa71850892ba4a1873ae5",
+    "path": "docs/source-manifest.json",
+    "SHA256": "c774136ae615797afe7c363f04a5c7ea5bbaeacc4237fdba091f42814d30980c",
+    "bytes": 7509,
+    "frontmatter": ""
+  },
+  {
+    "source": "03f6ea0a2c6cf83074cfa71850892ba4a1873ae5",
+    "path": "docs/vault/30_Development/History/2026-11-05_\uae30\uc8745\ub300_\uc624\ucf00\uc2a4\ud2b8\ub808\uc774\uc158_\ucc29\uc218_Codex.md",
+    "SHA256": "445d426aa68b55caac15aa25f59b9573fe1ff81b0ac32baadcb9f274dbcf39d3",
+    "bytes": 784391,
+    "frontmatter": "---\ndoc_id: \"HISTORY-FLEET5-20261105-START-CODEX\"\ntitle: \"2026-11-05 \uae30\uc8745\ub300 \uc624\ucf00\uc2a4\ud2b8\ub808\uc774\uc158 \ucc29\uc218\"\nversion: \"1.0.147\"\nstatus: \"review\"\nauthor: \"Codex\"\nreviewer: \"Claude\"\nupdated: \"2026-11-08T07:50:04+09:00\"\nsource_of_truth: \"Git\"\n---"
+  }
+]
