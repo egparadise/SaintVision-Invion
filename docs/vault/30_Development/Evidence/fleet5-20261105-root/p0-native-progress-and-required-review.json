@@ -3,8 +3,8 @@
   "recordedAtKST": "2026-11-06T00:46:51+09:00",
   "rootBase": "2b1753ce59c09037b5e130a7ffe64794d1d45fdf",
   "priorRootCheckpoint": {
-    "SHA": "a8323fc836026cfccd087d196c9cab7b3a115664",
-    "Docs": 42323465590,
+    "SHA": "e3986b395c5def81c9d2372799e1c572b4418d9d",
+    "Docs": 42324534431,
     "exactHeadCorrelationAllJobsSuccess": true,
     "remoteMatches": true,
     "syncExits": [
@@ -12,13 +12,13 @@
       0,
       0
     ],
-    "independentlyMatchedNormalizedDestinationHashes": 3043,
+    "independentlyMatchedNormalizedDestinationHashes": 3050,
     "pending": 0,
     "conflicts": 0,
     "trackedAndUntrackedClean": true,
     "rootDocsOnly": true,
     "wholeProgramComplete": false,
-    "verifiedAtKST": "2026-11-07T10:21:32+09:00"
+    "verifiedAtKST": "2026-11-07T10:33:31+09:00"
   },
   "actualPlanLowReview": {
     "source": "803ad270562b1b75e44d26f9e14b965c714ab519",
@@ -2515,7 +2515,7 @@
     "ownerT1T2T3": "msg_620855c76519",
     "normativeRevisionReply": "msg_0392caf64d5d"
   },
-  "latestRecordAtKST": "2026-11-07T10:29:55+09:00",
+  "latestRecordAtKST": "2026-11-07T10:35:12+09:00",
   "optionalLowTokenTestDelta": {
     "source": "f0af307705b4923ebc3e231db5238af4c70aa389",
     "scope": "two otherwise-valid token payload corrections and JSON validity assertions; runtime unchanged",
@@ -5088,5 +5088,176 @@
     "candidateCommit": null,
     "actualHostedCI": null,
     "actualIndependentCODEReview": "PENDING"
-  }
+  },
+  "latestPhysicalReadOnlyAudit": {
+    "atKST": "2026-11-07T10:33:06+09:00",
+    "initialReadOnlyAttemptAtKST": "2026-11-07T10:31:47+09:00",
+    "targets": [
+      {
+        "pc": "PC1",
+        "sshExit": 255,
+        "observed": false,
+        "reusedInitialCapture": true,
+        "refusal": "SSH_PUBLIC_KEY_DENIED"
+      },
+      {
+        "pc": "PC2",
+        "sshExit": 0,
+        "observed": true,
+        "reusedInitialCapture": true,
+        "cpuLogical": 12,
+        "memoryBytes": 15938523136,
+        "share": {
+          "exists": true,
+          "read": true,
+          "write": true
+        },
+        "dockerExit": 0,
+        "dockerDenied": false,
+        "dockerMissing": false,
+        "hostGPUQueryExit": 0,
+        "gpuEvidenceScope": "HOST query only; no containerGPU test",
+        "nvidiaToolkitCommandPresent": false,
+        "nvidiaRuntimeCommandPresent": false,
+        "cdiSpecNames": {
+          "/etc/cdi": null,
+          "/var/run/cdi": null
+        },
+        "dockerVersion": "29.1.3",
+        "dockerAPI": "1.52",
+        "dockerMinAPI": "1.44",
+        "dockerAPIAtLeast1_45": true,
+        "dockerRuntimeNames": [
+          "io.containerd.runc.v2",
+          "runc"
+        ],
+        "dockerRuntimeNamesExit": 0
+      },
+      {
+        "pc": "PC3",
+        "sshExit": 0,
+        "observed": true,
+        "reusedInitialCapture": false,
+        "cpuLogical": 12,
+        "memoryBytes": 15938240512,
+        "share": {
+          "exists": true,
+          "read": true,
+          "write": true
+        },
+        "dockerExit": 0,
+        "dockerDenied": false,
+        "dockerMissing": false,
+        "hostGPUQueryExit": 0,
+        "gpuEvidenceScope": "HOST query only; no containerGPU test",
+        "nvidiaToolkitCommandPresent": false,
+        "nvidiaRuntimeCommandPresent": false,
+        "cdiSpecNames": {
+          "/etc/cdi": null,
+          "/var/run/cdi": null
+        },
+        "dockerVersion": "29.9.3",
+        "dockerAPI": "1.56",
+        "dockerMinAPI": "1.40",
+        "dockerAPIAtLeast1_45": true,
+        "dockerRuntimeNames": [
+          "io.containerd.runc.v2",
+          "runc"
+        ],
+        "dockerRuntimeNamesExit": 0
+      },
+      {
+        "pc": "PC4",
+        "sshExit": 0,
+        "observed": true,
+        "reusedInitialCapture": false,
+        "cpuLogical": 12,
+        "memoryBytes": 16480641024,
+        "share": {
+          "exists": true,
+          "read": true,
+          "write": true
+        },
+        "dockerExit": 0,
+        "dockerDenied": false,
+        "dockerMissing": false,
+        "hostGPUQueryExit": 0,
+        "gpuEvidenceScope": "HOST query only; no containerGPU test",
+        "nvidiaToolkitCommandPresent": false,
+        "nvidiaRuntimeCommandPresent": false,
+        "cdiSpecNames": {
+          "/etc/cdi": null,
+          "/var/run/cdi": null
+        },
+        "dockerVersion": "29.8.1",
+        "dockerAPI": "1.56",
+        "dockerMinAPI": "1.40",
+        "dockerAPIAtLeast1_45": true,
+        "dockerRuntimeNames": [
+          "io.containerd.runc.v2",
+          "runc"
+        ],
+        "dockerRuntimeNamesExit": 0
+      },
+      {
+        "pc": "PC5",
+        "dockerExit": 0,
+        "nodeRegistration": "NOT_QUERIED_BY_DOCKER_VERSION_CHECK",
+        "dockerVersion": "20.10.22",
+        "dockerAPI": "1.41",
+        "dockerMinAPI": "1.12",
+        "daemonOS": "linux",
+        "dockerAPIAtLeast1_45": false
+      }
+    ],
+    "operations": [
+      {
+        "pc": "PC1",
+        "kind": "REUSE_FIRST_ATTEMPT_CAPTURE_NO_SSH_RETRY",
+        "directExit": 255
+      },
+      {
+        "pc": "PC2",
+        "kind": "REUSE_FIRST_ATTEMPT_CAPTURE_NO_SSH_RETRY",
+        "directExit": 0
+      },
+      {
+        "pc": "PC2",
+        "kind": "BOUNDED_RUNTIME_NAMES_ONLY_SUPPLEMENT_AFTER_INITIAL_INFO_TRUNCATION",
+        "startedAtKST": "2026-11-07T10:33:04+09:00",
+        "endedAtKST": "2026-11-07T10:33:04+09:00",
+        "directExit": 0
+      },
+      {
+        "pc": "PC3",
+        "kind": "FIRST_FULL_READONLY_CAPTURE",
+        "startedAtKST": "2026-11-07T10:33:04+09:00",
+        "endedAtKST": "2026-11-07T10:33:05+09:00",
+        "directExit": 0
+      },
+      {
+        "pc": "PC4",
+        "kind": "FIRST_FULL_READONLY_CAPTURE",
+        "startedAtKST": "2026-11-07T10:33:05+09:00",
+        "endedAtKST": "2026-11-07T10:33:05+09:00",
+        "directExit": 0
+      },
+      {
+        "pc": "PC5",
+        "kind": "LOCAL_DOCKER_VERSION_READONLY",
+        "startedAtKST": "2026-11-07T10:33:05+09:00",
+        "endedAtKST": "2026-11-07T10:33:06+09:00",
+        "directExit": 0
+      }
+    ],
+    "knownHostsUnchanged": true,
+    "remoteMutation": false,
+    "hostOrDaemonMutation": false,
+    "nodeEnrollmentLeasesOrOffers": "NOT_QUERIED_OR_INFERRED_FROM_HOST_READINESS",
+    "fiveNodesRegistered": "NOT_VERIFIED",
+    "fiveResourceOffersVerified": false,
+    "initialAuditCorrection": "Initial helper truncated large Docker Runtimes JSON at6000characters then local JSONDecodeError after PC2; preserved both initial PC1/PC2 captures, no PC1 auth retry. Runtime-name-only bounded supplement for PC2 plus first full PC3/4 audit completed. All commands read-only.",
+    "wholeProgramComplete": false
+  },
+  "latestPhysicalReadOnlyAuditEvidence": "physical-readiness-refresh-20261107-1033.json"
 }

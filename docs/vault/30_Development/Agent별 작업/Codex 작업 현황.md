@@ -1,15 +1,19 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.458"
+version: "1.0.459"
 status: "review"
 author: "Codex"
-updated: "2026-11-07T10:29:55+09:00"
+updated: "2026-11-07T10:35:12+09:00"
 source_of_truth: "Git"
 active_card: "FLEET5 continued supervision with PORTAL-REFRESH-FLEET-20261106"
 active_card_status: "H12fixedWIP02NEWactual4phasePASS28top274sub/5oldregressionsrestored->publish934DocsCorepending; BpublishDocsCoreBackendpending; actualCODEreviewpending/NULL_HOLD/fleetincomplete"
 active_card_next: "K2 Codex exact4testedGitblobs normalcommit/push/ONEexactDocsCore; B Codex exactPythoncandidatepublication/ONEexactDocsCoreBackend; Root actualimmutableCI receipts then singleindependentCODEreview, no authority/runtimegrant."
 ---
+
+## 2026-11-07T10:35:12+09:00 5대 장비의 새 읽기 전용 준비 실측
+
+10:33KST새읽기전용실측에서PC2~4의SSH·Docker·host공유폴더접근은성공했다. PC1은기존namedkey공개키인증거부이고PC2~4는hostGPU조회만성공했으며NVIDIA toolkit/runtime명령·Docker nvidia runtime·CDI spec은확인되지않았다. PC5는실제Docker20.10.22/API1.41로요구1.45미만이다. 호스트준비관측을5Node등록/자원offer/lease/운영인수로승격하지않으며두구현의고정게시·원격CI·독립CODE검토는별도로계속한다. 원문stdout/직접exit/시각·명령과부분측정회복은History/Evidence에보존했다. 두작성자의다음고정CI결과가도착하면Root가실제독립CODE검토를배정한다. 기존PC1키설정질문을반복하거나새승인문제로바꾸지않는다.
 
 ## 2026-11-07T10:29:55+09:00 고정 서명 수정본의 새 실제 4단계 통과와 정상 게시 배정
 
