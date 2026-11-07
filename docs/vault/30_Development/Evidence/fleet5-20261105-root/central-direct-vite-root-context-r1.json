@@ -1,0 +1,19 @@
+{
+  "atKST": "2026-11-08T03:30:10+09:00",
+  "taskID": "FLEET5-CSP02-CENTRAL-DIRECT-VITE-LAUNCHER-20261108",
+  "owner": "Root Codex",
+  "managementBase": "3aff6c63ddac3eb68739494d610337c5885f0cda",
+  "reviewSource": "63f3eeb661c565d864e14c2395f68c6715d109c0",
+  "reviewedSource": "cc6076254d5b8f54804081a8b1994d76d86cf81a",
+  "scope": "Confirm shipped direct-Vite launcher from clean public source on PC3 isolated bounded dev container, then one central main-config generation fix and direct launcher proof; preserve all sound ESM/CSP findings and operating gates. No real credentials/DB/Node/Run/votes in probe.",
+  "status": "ACTUAL_CLEAN_DIRECT_VITE_INDEX200_MODULE500_REPRODUCED_READY_CENTRAL_FIX",
+  "wholeProgramComplete": false,
+  "lastVerifiedAtKST": "2026-11-08T03:35:57+09:00",
+  "actualProbeAtKST": "2026-11-08T03:33:02+09:00",
+  "actualIndexHTTP": 200,
+  "actualRequiredModuleHTTP": 500,
+  "generatedESMAbsent": true,
+  "ownedProbeContainerStopped": true,
+  "sourceCandidate": "cc6076254d5b8f54804081a8b1994d76d86cf81a",
+  "nextOwner": "Actual Orca Codex adds central main-config same-generator preparation, audits known main/fixture launchers once, and proves fresh direct vite boot in hosted CI"
+}

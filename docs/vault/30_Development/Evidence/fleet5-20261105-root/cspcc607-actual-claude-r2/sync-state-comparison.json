@@ -1,0 +1,14 @@
+{
+  "path": "D:/Project/SaintVision-Invion/SaintVisionI-Invion/.git/obsidian-sync-state.json",
+  "baselineMeaning": "New review baseline is the current state after Root527 APPLY. The author's historical 529870 B state is the author's own task proof and is expected to differ.",
+  "beforeAtKST": "2026-11-08T03:16:47+09:00",
+  "beforeBytes": 534872,
+  "beforeSHA256": "031196e13c6b54c0b878aafbe7e1f18934324886dd709b15c404b9a818fba9e2",
+  "afterLocalGatesBytes": 534872,
+  "afterLocalGatesSHA256": "031196e13c6b54c0b878aafbe7e1f18934324886dd709b15c404b9a818fba9e2",
+  "fullBytesEqual": true,
+  "comparisonMethod": "full byte comparison (cmp) of a scratch copy taken at review start against the live file after all gates; repeated after the final gate pass and after Docs CI",
+  "syncCheckOutput": "CHECK: 4614 managed files, 2163 pending exports, 0 conflicts. No writes.",
+  "pendingExportsMeaning": "This review branch descends from the 905/96 lineage, which is older than Root's vault; the pending exports are not applied. Root alone owns APPLY, and no old vault was exported, adopted or reset.",
+  "checkOnly": true
+}

@@ -1,6 +1,6 @@
 {
   "schema": "fleet5-root-review-resource-sequence:1",
-  "atKST": "2026-11-08T03:10:29+09:00",
+  "atKST": "2026-11-08T03:35:57+09:00",
   "completedB": {
     "task": "task_d4c4c809ed4e",
     "review": "ac9182c3e3d606ec027c0be2e90e049ff50d54f1",
@@ -15,12 +15,12 @@
   "active": null,
   "pending": [
     {
-      "id": "CR-CSP-02",
-      "state": "CC607_EXACT_CI_AND_ESM_DEV_PROOF_VERIFIED_READY_BOUNDED_REVIEW",
+      "id": "CR-CSP-02 residual",
+      "severity": "Medium",
+      "state": "ACTUAL_PC3_FRESH_DIRECT_LAUNCH_FAILURE_CONFIRMED_READY_CENTRAL_CONFIG_FIX",
       "source": "cc6076254d5b8f54804081a8b1994d76d86cf81a",
-      "base": "428e5fc6b822d33e7e76316f443716b03579efa0",
-      "owner": "one actual Orca Claude delta reviewer",
-      "inheritedSoundR1": "4a29b57e6c6ccb75eed50147c00d52d3c8d6ac04"
+      "review": "63f3eeb661c565d864e14c2395f68c6715d109c0",
+      "owner": "actual Orca Codex"
     }
   ],
   "authorParallelWork": "B frozen b51 awaiting actual delta verdict; H12 accepted6d7 plus read-only five-row audit delivered, Root owns first CPU journey preflight. Optional Low backlog is not a mandatory new scope.",
@@ -31,7 +31,7 @@
     "review": "0e53fc024ca773b7719182e170e5e126aeaf5b95",
     "verdict": "ACCEPT TEST-ONLY; R-L1 CLOSED; no new findings"
   },
-  "nextActualReviewTrigger": "One bounded CR-CSP02 ESM/dev delta review inheriting soundR1. Preserve manual gate1 and real operation gates; no optional Low/whole-feature review loop.",
+  "nextActualReviewTrigger": "Only the central main-config/direct-fresh-launch correction delta. Inherit sound R1/R2 ESM/canonical/CSP findings; no optional Low/whole-feature loop.",
   "completedIntegration": {
     "task": "task_78064fb4b7ff",
     "dispatch": "ctx_ed7ec73163d6",
@@ -3415,5 +3415,48 @@
     "actualPC3BrowserDeploymentAcceptance": false,
     "mainProductExecution": false,
     "wholeProgramComplete": false
+  },
+  "actualR2Review": "CHANGES_REQUIRED_CR_CSP02_RESIDUAL_DIRECT_VITE_OPERATOR_LAUNCHER_KEEP_MANUAL_AND_REAL_DEPLOYMENT_GATES",
+  "actualFreshDirectLauncherProbe": {
+    "atKST": "2026-11-08T03:33:02+09:00",
+    "SSHExit": 0,
+    "stderrBytes": 0,
+    "publicArchiveBytes": 5089280,
+    "publicArchiveSHA256": "b62dbe1b9dcb9cbb08fc651b61a5123f794fd21cb51ed8e8e651d99800e7fcc8",
+    "remote": {
+      "source": "cc6076254d5b8f54804081a8b1994d76d86cf81a",
+      "mainProductExecution": false,
+      "realDBOrAPIConnected": false,
+      "credentialsOrPrivateKeysMounted": false,
+      "existingServicesChanged": false,
+      "userFilesChanged": false,
+      "actualRunOrVotesCreated": false,
+      "wholeProgramComplete": false,
+      "containerID": "f20ac8a777a2048883aff86b5081469f8f938b3cf70f9986cf7e9f076c139f4e",
+      "status": "ACTUAL_FRESH_DIRECT_VITE_REPRODUCED_INDEX200_MODULE500_MISSING_GENERATED_ESM",
+      "imageId": "sha256:01d566e8d94d8c619591d78652babfccd3c6992a3dffa9ed5ab39e11cf6c70e9",
+      "UID": "1000:1000",
+      "memoryBytes": 1073741824,
+      "pidsLimit": 256,
+      "CPUQuotaMillis": 1000,
+      "bridgeNetwork": true,
+      "hostLoopbackOnlyPort": 13400,
+      "containerListenerAdaptation": "0.0.0.0 inside isolated Docker bridge; same direct vite.js argv/main config with no npm lifecycle",
+      "readOnlyRoot": true,
+      "capDropAll": true,
+      "noNewPrivileges": true,
+      "publicSourceOnlyMount": true,
+      "gitignoredGeneratedFileAbsentBeforeAndAfter": true,
+      "indexHTTP": 200,
+      "moduleHTTP": 500,
+      "failedImport": "@/contracts/node-certificate-validator.mjs",
+      "missingImportErrorObserved": true,
+      "operatorIndexOnlyReadyFalsePositiveConfirmed": true,
+      "sourceArchiveSHA256": "b62dbe1b9dcb9cbb08fc651b61a5123f794fd21cb51ed8e8e651d99800e7fcc8",
+      "noPasswordOrTokenInput": true,
+      "ownedProbeContainerStopExit": 0,
+      "ownedProbeContainerStopped": true,
+      "atKST": "2026-11-08T03:33:02+09:00"
+    }
   }
 }

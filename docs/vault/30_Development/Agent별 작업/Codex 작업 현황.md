@@ -1,15 +1,23 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.488"
+version: "1.0.489"
 status: "review"
 author: "Codex"
-updated: "2026-11-08T03:10:29+09:00"
+updated: "2026-11-08T03:35:57+09:00"
 source_of_truth: "Git"
 active_card: "FLEET5 continued supervision with PORTAL-REFRESH-FLEET-20261106"
-active_card_status: "CSP02cc607ExactCIAndDevESMProofVerified_1351Tests6Cases9InvariantsPass_ManualGate1Held_ActualBoundedClaudeDeltaReady_NoNewFrontendActivation"
-active_card_next: "Root publishes immutablecc607 proof then starts exactly one actual Claude bounded delta review inheriting soundR1; defer RootAPPLY during review snapshot window. After acceptance deploy exact frontend to PC3 and verify actual strictCSP login/no-blink/resources. Manual acceptance/real votes/Run/PC1/PC5/renewal/all5 remain."
+active_card_status: "CR-CSP02ResidualDirectLauncherActualPC3FreshSourceReproduced_Index200Module500_GeneratedFileMissing_ProbeStopped_CentralMainConfigFixReady"
+active_card_next: "Actual Codex centralizes same-generator fail-closed preparation in main Vite config, audits known launchers once, proves fresh direct vite boot plus exact FrontendDocsAC11. Inherit sound R1R2, then one actual bounded delta review. Existing runtime/readyWorkspace preserved; real browser/Run/manual/5PC gates remain."
 ---
+
+## 2026-11-08T03:35:57+09:00 깨끗한 directVite의 index200/module500 실제 재현
+
+출하된직접Vite실행의잔여CR-CSP02를Root가PC3새publiccheckout에서실제로재현했다. npmci후npmhook없이mainconfig를쓰는directnodevite에서index200/필수모듈500·generatedESM부재/Failedtoresolveimport를확인했다. 이로써표지HTTP200만으로실제화면준비를판정할수없음을확인했고UID1000/CPU1/1GiB/ROroot/noCaps/noCredentials/bridge/hostloopback전용확인컨테이너f20ac8a7는정확소유대조후종료했다. 기존서비스·API/DB·Node·사용자/Run/투표는변경하지않았다. 중앙mainViteconfig의fail-closed생성과fresh-direct-launch회귀만원owner에게배정하며기존타당한ESM/CSP검증은상속한다. 다음첫행동/담당은actualCodexowner의중앙config한정보완과fresh-direct브라우저proof다.
+
+## 2026-11-08T03:30:10+09:00 출하된 directVite 실행 경로 재현과 중앙 보완 준비
+
+실제Claude63f3eeb6는ESM생성·15회귀·workerflag·fixture준비·기존CSP검증을타당하다고평가했으나,출하된Windows바로가기/StartLiveConsole의직접Vite실행은생성hook을거치지않는같은CR-CSP02잔여Medium1건을지적했다. Root가원문·27입력hash·정확Docs42401172674/19단계·534872Bcanonical불변·실제검토자종료/해제를대조했다. Root는PC3의격리된공개source만으로새설치직접실행을재현한후mainViteconfig에서모든해당시작경로에같은생성을보장하는중앙한정수정을배정한다. 실제새화면인수/5대전체완료는아직아니다. 다음첫행동/담당은Root의PC3publicsource격리재현이며실제source수정은원Codexowner다.
 
 ## 2026-11-08T03:10:29+09:00 ESM dev 후보1351시험·6브라우저사례 검증과 한정 재검토 준비
 
