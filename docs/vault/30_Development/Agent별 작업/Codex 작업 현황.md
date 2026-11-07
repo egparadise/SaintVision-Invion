@@ -1,15 +1,19 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.473"
+version: "1.0.474"
 status: "review"
 author: "Codex"
-updated: "2026-11-07T18:48:11+09:00"
+updated: "2026-11-07T18:57:27+09:00"
 source_of_truth: "Git"
 active_card: "FLEET5 continued supervision with PORTAL-REFRESH-FLEET-20261106"
-active_card_status: "FirstWorkspaceServingGapConfirmed_R1ContractFrozen_SingleCodexBFrontendBackendImplementationActive; APIRestrictedRolesAligned_PackageAndProvisioningPending; RootSyncApplyDeferredDuringWorkerSnapshot_PC1Auth_PC5Resources_RealApproversRunFivePCPending"
+active_card_status: "FirstWorkspaceR1SingleBImplementationActive_PC5LinuxAPI141SourceCompatible; MainMemoryAndActualRuntime_PC1Auth_RealApproversRunFivePCPending_RootCanonicalApplyDeferred"
 active_card_next: "B Task72ad09258a5c/ctx200 implements exact R1 serving+atomic binding+UI, real restricted-role hosted tests and final Frontend/Core/Backend/Docs; one actual Claude then Root protected deployment. Root must defer canonical APPLY until B full snapshot closes. PC1 local key registration/additional real approver identity remain pending; no fake ready/workload/votes/Run."
 ---
+
+## 2026-11-07T18:57:27+09:00 5번PC Docker조건 정정
+
+5번PC의Docker API1.41을필수업그레이드조건으로본이전운영판단을정정했다. 고정1efea소스는Linux API최소1.41·client최대1.45협상이며old-supported1.41기존case가있다. 실제5번daemon은20.10.22/OSlinux/amd64/max1.41/min1.12라소스메타데이터조건을충족한다. 실제Go협상·Node·sandbox실행은금지된main에서실행하지않았고메모리98.22percent/안전한기동·인증·등록·관측조건은남는다. B의첫Workspace backend+frontend구현은R1계약으로계속되며Root Obsidian APPLY는worker snapshot종료까지보류한다. 소스지원확인은실제Node/sandbox시험이나연결완료가아니며원본증거와구분했다.
 
 ## 2026-11-07T18:48:11+09:00 첫Workspace 서버계약 확정과 실제 구현
 

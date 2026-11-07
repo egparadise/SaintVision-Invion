@@ -1,6 +1,6 @@
 {
   "schema": "fleet5-root-review-resource-sequence:1",
-  "atKST": "2026-11-07T18:48:11+09:00",
+  "atKST": "2026-11-07T18:57:27+09:00",
   "completedB": {
     "task": "task_d4c4c809ed4e",
     "review": "ac9182c3e3d606ec027c0be2e90e049ff50d54f1",
@@ -3007,5 +3007,50 @@
       "waitingOnHuman": "unknown"
     },
     "wholeProgramComplete": false
-  }
+  },
+  "PC5CurrentDockerCompatibilityCorrection": {
+    "atKST": "2026-11-07T18:52:55+09:00",
+    "scope": "READONLY_FIXED_SOURCE_AND_CURRENT_DOCKER_SERVER_VERSION",
+    "mainPC": 5,
+    "actualServer": {
+      "Version": "20.10.22",
+      "ApiVersion": "1.41",
+      "MinAPIVersion": "1.12",
+      "Os": "linux",
+      "Arch": "amd64"
+    },
+    "acceptedSource": "1efea494f026e932360c35ae811b6423d874a2e7",
+    "sourcePins": [
+      {
+        "path": "services/node-agent/runtime/docker.go",
+        "source": "1efea494f026e932360c35ae811b6423d874a2e7",
+        "SHA256": "dce35c9ad17fa12cbbeb9cee0809a413930fa46e2785d86d965153ff4f67e0fb"
+      },
+      {
+        "path": "services/node-agent/runtime/docker_test.go",
+        "source": "1efea494f026e932360c35ae811b6423d874a2e7",
+        "SHA256": "d6f97b2495c70f787c7d7ae525fe8a9ae373beb54027478e1bcf77982acf89a6"
+      }
+    ],
+    "sourcePolicy": {
+      "clientCeiling": "1.45",
+      "requiredLinuxFloor": "1.41",
+      "selection": "min(server maximum,client ceiling), must be >=1.41 and >=daemon minimum"
+    },
+    "sourceMetadataCompatible": true,
+    "expectedNegotiatedVersion": "1.41",
+    "actualGoNegotiationOrNodeExecution": "NOT_RUN_ON_RESTRICTED_MAIN",
+    "priorRootAssessmentCorrection": "API1.41 alone is NOT a Docker upgrade requirement for accepted1efea. Previous selected1.45 cap was incorrectly treated as minimum. Frozen old reports preserved; current correction supersedes only that operator assumption.",
+    "remainingActualPC5Gates": [
+      "Memory headroom/current main execution restriction",
+      "Controlled exact Linux Node/sandbox/transport/PKI/identity/admission and real observations",
+      "No claim of whole Windows physical resources from Linux VM observations"
+    ],
+    "runtimeIsolationOrSourcePolicyWeakened": false,
+    "DockerOrOSSettingsChanged": false,
+    "NodeStartedOrRegistered": false,
+    "wholeProgramComplete": false
+  },
+  "PC5CurrentRemainingGate": "Main memory/resource restriction and actual Linux Node/PKI/transport/sandbox/admission/observations remain. Accepted1efea supports actual Linux API1.41; Docker upgrade is not required by source floor. Old frozen reports preserve earlier mistaken cap-as-floor assessment.",
+  "wholeProgramComplete": false
 }
