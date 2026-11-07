@@ -1,0 +1,217 @@
+{
+  "docID": "EVIDENCE-FLEET5-CURRENT-THREE-NODE-RENEWAL-PLAN-R2-DELTA-REVIEW-20261108-CLAUDE-READ-PINS",
+  "version": "1.0.0",
+  "meaning": "Exact Git blobs this reviewer read. SHA256 is of the committed blob bytes (git show).",
+  "reviewInputs": [
+    {
+      "source": "b8c839d1daf28677a0587af115cbea496626d5ea",
+      "path": "docs/vault/30_Development/Current three-Node pilot renewal preflight and recovery plan R1.md",
+      "bytes": 39704,
+      "SHA256": "e6db9b3ab7a1ab3b3ac23e7b6e83bc539dbe413bfc636c54a71aaa742e1379c4",
+      "version": "1.1.0"
+    },
+    {
+      "source": "2733d3ce92bba47a94d9414d965a9a0d12d916d1",
+      "path": "docs/vault/30_Development/Current three-Node pilot renewal preflight and recovery plan R1.md",
+      "bytes": 39704,
+      "SHA256": "e6db9b3ab7a1ab3b3ac23e7b6e83bc539dbe413bfc636c54a71aaa742e1379c4",
+      "version": "1.1.0"
+    },
+    {
+      "source": "b8c839d1daf28677a0587af115cbea496626d5ea",
+      "path": "docs/vault/30_Development/Evidence/fleet5-current-three-node-renewal-plan-r2-20261108-codex/operation-manifest.json",
+      "bytes": 16786,
+      "SHA256": "b4e0d99b349f28593fabb22786c2012627b85eea6ea84387b50ef15b0e72ae7c"
+    },
+    {
+      "source": "b8c839d1daf28677a0587af115cbea496626d5ea",
+      "path": "docs/vault/30_Development/Evidence/fleet5-current-three-node-renewal-plan-r2-20261108-codex/finding-dispositions.json",
+      "bytes": 6955,
+      "SHA256": "9118446092f2f536b2a9b5ffb47a2a06e4184d8e7dd0e27380846faf9c96f188"
+    },
+    {
+      "source": "b8c839d1daf28677a0587af115cbea496626d5ea",
+      "path": "docs/vault/30_Development/Evidence/fleet5-current-three-node-renewal-plan-r2-20261108-codex/source-contract-map.json",
+      "bytes": 134270,
+      "SHA256": "53118a08c6e7d3640d4cc2c1664ad494f5e7fb5cb23ce999b764b71691246a3a"
+    },
+    {
+      "source": "b8c839d1daf28677a0587af115cbea496626d5ea",
+      "path": "docs/vault/30_Development/Evidence/fleet5-current-three-node-renewal-plan-r2-20261108-codex/citation-coverage.json",
+      "bytes": 232,
+      "SHA256": "38d941b05f1934ddceb33e250abc363ed3dd4226f154a983dee51302011ce411"
+    },
+    {
+      "source": "b8c839d1daf28677a0587af115cbea496626d5ea",
+      "path": "docs/vault/30_Development/Evidence/fleet5-current-three-node-renewal-plan-r2-20261108-codex/r1-actual-review.json",
+      "bytes": 16968,
+      "SHA256": "e5859e6c459188f0245853b91cdec384fddd7c06ef688cad0828417e0a26f58e"
+    },
+    {
+      "source": "b8c839d1daf28677a0587af115cbea496626d5ea",
+      "path": "docs/vault/30_Development/Evidence/fleet5-current-three-node-renewal-plan-r2-20261108-codex/new-input-pins.json",
+      "bytes": 2317,
+      "SHA256": "842bf72577063c116c6a44ce7e230f9159e08587463b064061c9205d5f7dfe6c"
+    },
+    {
+      "source": "b8c839d1daf28677a0587af115cbea496626d5ea",
+      "path": "docs/vault/30_Development/Evidence/fleet5-current-three-node-renewal-plan-r2-20261108-codex/read-pins.json",
+      "bytes": 8223,
+      "SHA256": "bbc3eed125696465852682e7ad7fd464d169534d91816b5681c2c668c3f48115"
+    },
+    {
+      "source": "b8c839d1daf28677a0587af115cbea496626d5ea",
+      "path": "docs/vault/30_Development/Evidence/fleet5-current-three-node-renewal-plan-r2-20261108-codex/context.json",
+      "bytes": 1599,
+      "SHA256": "1b511c05680d52fdf4bdfb04a03b19e87ea402850b38c4399ba7af53b8e9e732"
+    },
+    {
+      "source": "b8c839d1daf28677a0587af115cbea496626d5ea",
+      "path": "docs/vault/30_Development/Evidence/fleet5-current-three-node-renewal-plan-r2-20261108-codex/root-inputs/root-public-cp-client-validity-r1/receipt.json",
+      "bytes": 932,
+      "SHA256": "daa492713c8a2e2cc7da555fddf680841a878e4b1702e92e746d0bbd70e6a547"
+    },
+    {
+      "source": "b8c839d1daf28677a0587af115cbea496626d5ea",
+      "path": "docs/vault/30_Development/Evidence/fleet5-current-three-node-renewal-plan-r2-20261108-codex/root-inputs/root-public-cp-client-validity-r1/remote-read-only-public-certificate.py.txt",
+      "bytes": 1371,
+      "SHA256": "44dc6f82534184324bf2bd1abedc417a6d5730daee7746f5dd5f47ad2c13b2e6"
+    },
+    {
+      "source": "03f6ea0a2c6cf83074cfa71850892ba4a1873ae5",
+      "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/current-three-node-renewal-plan-actual-claude-r1/root-public-cp-client-validity-r1/receipt.json",
+      "bytes": 932,
+      "SHA256": "daa492713c8a2e2cc7da555fddf680841a878e4b1702e92e746d0bbd70e6a547"
+    },
+    {
+      "source": "03f6ea0a2c6cf83074cfa71850892ba4a1873ae5",
+      "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/current-three-node-renewal-plan-actual-claude-r1/root-public-cp-client-validity-r1/remote-read-only-public-certificate.py.txt",
+      "bytes": 1371,
+      "SHA256": "44dc6f82534184324bf2bd1abedc417a6d5730daee7746f5dd5f47ad2c13b2e6"
+    },
+    {
+      "source": "f29228ed28c651cb2470b45d9f8d14521e1ce75d",
+      "path": "docs/vault/30_Development/Evidence/fleet5-current-three-node-renewal-plan-review-r1-20261108-claude/review.json",
+      "bytes": 16968,
+      "SHA256": "e5859e6c459188f0245853b91cdec384fddd7c06ef688cad0828417e0a26f58e"
+    },
+    {
+      "source": "f29228ed28c651cb2470b45d9f8d14521e1ce75d",
+      "path": "docs/vault/30_Development/History/2026-11-08_FLEET5_Current_Three_Node_Renewal_Plan_Review_R1_Claude.md",
+      "bytes": 8438,
+      "SHA256": "7aa9df18932e7d2c7a8257022f5e1210ae83a89e06e1454dd00ecc94edca37d4",
+      "version": "1.0.0"
+    },
+    {
+      "source": "2733d3ce92bba47a94d9414d965a9a0d12d916d1",
+      "path": "docs/vault/30_Development/History/2026-11-08_FLEET5_Current_Three_Node_Renewal_Plan_Review_R1_Claude.md",
+      "bytes": 11207,
+      "SHA256": "218155bf98b502e1d8f4ca57b006ccee7b47c2d59ece01d8e9ebcdbb09429abb",
+      "version": "1.0.1"
+    },
+    {
+      "source": "2733d3ce92bba47a94d9414d965a9a0d12d916d1",
+      "path": "docs/vault/00_Index/전체 개발 진행 현황.md",
+      "bytes": 520986,
+      "SHA256": "69662790e4c4047c8030bcb757ddef4941c12b2a7d2d5a1c7f891c2bdddb5d51",
+      "version": "1.0.539"
+    },
+    {
+      "source": "2733d3ce92bba47a94d9414d965a9a0d12d916d1",
+      "path": "docs/vault/30_Development/Agent별 작업/Codex 작업 현황.md",
+      "bytes": 508866,
+      "SHA256": "679849d161ba82ae4e642a0e7f2d681642e284d02cbcdd91d5c3a190729b1e37",
+      "version": "1.0.500"
+    },
+    {
+      "source": "2733d3ce92bba47a94d9414d965a9a0d12d916d1",
+      "path": "docs/vault/30_Development/History/2026-11-05_기존5대_오케스트레이션_착수_Codex.md",
+      "bytes": 789839,
+      "SHA256": "4c253ae2c108c13aa50981eb3f968f486f836c0575425af7332a60b74a189e31",
+      "version": "1.0.148"
+    },
+    {
+      "source": "2733d3ce92bba47a94d9414d965a9a0d12d916d1",
+      "path": "docs/vault/30_Development/Agent별 작업/Claude 작업 현황.md",
+      "bytes": 645029,
+      "SHA256": "ad4a5fca80686f1edcbaf9a0abda8fbf5aaccfb0a68f1c03a67b8a32de15236b",
+      "version": "1.2.130"
+    },
+    {
+      "source": "2733d3ce92bba47a94d9414d965a9a0d12d916d1",
+      "path": "AGENTS.md",
+      "bytes": 7086,
+      "SHA256": "c12a50a38f81c12a647f9b6f4592a205cd899e76d29190202a6ae73b12c04b27"
+    },
+    {
+      "source": "2733d3ce92bba47a94d9414d965a9a0d12d916d1",
+      "path": "skills/agent-delivery/SKILL.md",
+      "bytes": 1276,
+      "SHA256": "9596c1d4a132c3de90fd99ed2095b8271da7a31532e8487aa6d7d93151ac3830",
+      "version": "1.1.0"
+    }
+  ],
+  "sourceBlobsRead": [
+    {
+      "source": "96afd799d49717fd40e4ddabd538d82accbe1958",
+      "path": "services/control-plane/src/inv/observer_worker.py",
+      "bytes": 2821,
+      "SHA256": "6bbdf815554fe1f0157247732ddc4dc3069686685c291ef83add55c8f3e92003"
+    },
+    {
+      "source": "96afd799d49717fd40e4ddabd538d82accbe1958",
+      "path": "services/control-plane/src/inv/worker.py",
+      "bytes": 7594,
+      "SHA256": "3010b2409bb285de960eb322792b1062ed066275307c9bea53a2cc767b65d4e3"
+    },
+    {
+      "source": "96afd799d49717fd40e4ddabd538d82accbe1958",
+      "path": "services/control-plane/src/inv/workspace_config.py",
+      "bytes": 4125,
+      "SHA256": "7b77a716b4fb56e951fce110d347ac41f16d1d80d4722ba9d1410a1869b351cb"
+    },
+    {
+      "source": "96afd799d49717fd40e4ddabd538d82accbe1958",
+      "path": "services/control-plane/src/inv/build_product_runtime.py",
+      "bytes": 22165,
+      "SHA256": "7483d65fcb1032aeb05b4d2dd56e09e714cff8ca676de0f80fc3a2f5e447e9af"
+    },
+    {
+      "source": "96afd799d49717fd40e4ddabd538d82accbe1958",
+      "path": "services/control-plane/src/inv/storage_check_collect.py",
+      "bytes": 19960,
+      "SHA256": "bae67c856cc8bdae52c1f06c4b6e36302e17ae0dd53a24fc01557cae19a3e226"
+    },
+    {
+      "source": "96afd799d49717fd40e4ddabd538d82accbe1958",
+      "path": "services/control-plane/src/inv/app.py",
+      "bytes": 59660,
+      "SHA256": "a5aa847ae287fc870031b4abefb7fb06bafe60482828198da3878f8a381ab5a3"
+    },
+    {
+      "source": "96afd799d49717fd40e4ddabd538d82accbe1958",
+      "path": "services/control-plane/src/inv/node_transport.py",
+      "bytes": 12319,
+      "SHA256": "3559bbcdf9568f8930654d860b0edd980eca71c835cde3fe7380a69dd56e18f4"
+    },
+    {
+      "source": "1efea494f026e932360c35ae811b6423d874a2e7",
+      "path": "services/node-agent/transport/server.go",
+      "bytes": 10103,
+      "SHA256": "c9c98084798eeda52a8f38bebc6a13f5e531deaf3c0016e4295ade19a500b8a2"
+    },
+    {
+      "source": "1efea494f026e932360c35ae811b6423d874a2e7",
+      "path": "services/node-agent/transport/trust.go",
+      "bytes": 5422,
+      "SHA256": "3b5dd89f9d6bdeb777d81f822688ece6c04b549080f53e8f7487bf70789b20df"
+    },
+    {
+      "source": "1efea494f026e932360c35ae811b6423d874a2e7",
+      "path": "services/node-agent/cmd/inv-node/main.go",
+      "bytes": 7307,
+      "SHA256": "3471f3fa13ea9ac4d27fd27ca04747a1adf2348692f846484c39f28755c23a9a"
+    }
+  ],
+  "mechanicallyVerifiedSourceMap": "All 49 Markdown permalinks in the R2 plan were resolved against their exact blobs and the 25-entry R2 source-contract-map (SHA/bytes/ranges/excerpts); see review.json"
+}
