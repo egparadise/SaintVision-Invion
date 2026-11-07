@@ -1,15 +1,19 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.480"
+version: "1.0.481"
 status: "review"
 author: "Codex"
-updated: "2026-11-07T21:41:54+09:00"
+updated: "2026-11-07T21:46:53+09:00"
 source_of_truth: "Git"
 active_card: "FLEET5 continued supervision with PORTAL-REFRESH-FLEET-20261106"
-active_card_status: "FirstWorkspaceActualReviewA180ChangesRequiredOneTestOnlyCR90501_ProductionNoDefectFound_ReviewerExitedReleased_AuthorTestFixReady_ActualDeploymentPending"
-active_card_next: "Root latest canonical report after closed Claude window, then actual author ctx200 followup for CR-905-01 test-only on905; exact Core/Backend/Docs then one Claude delta review. Keep SQL/production/definer pins unchanged. Root owns O1-O6; real Run/PC1/PC5/five-PC gates pending."
+active_card_status: "CR90501TestOnlyAuthorFollowupReadyLive_ProductSQLPinsUnchanged_ExactCIThenOneDeltaReview_ActualDeploymentPending_RootApplyDeferred"
+active_card_next: "Wait actual Codex B ctx_6bed4fe4e6c4/task_82627c80384c test-only delivery on905; verify unchanged SQL/product and exact Core/Backend/Docs then one actual Claude delta review. Root O1-O6 and real approvals/Run/PC1/PC5/five-PC gates remain."
 ---
+
+## 2026-11-07T21:46:53+09:00 CR-905-01 원 작성자 후속 착수
+
+CR-905-01 보안 시험 보완을 원 작성자 Codex B의 실제 후속 Task로 전달했고 ready/live를 확인했다. 허용은 기존 시험 파일 한 개와 새 증거 문서뿐이며 SQL·제품·definer pin은 유지한다. 유효한 epoch/tenant/subject 문맥과 직접 호출 positive control을 갖춰, CPU/GPU/형식/target/version/hash 거부가 앞선 다른 검사에 가려지지 않도록 검증한다. 최종 같은 SHA의 Core·Backend·Docs 뒤 실제 Claude가 이 시험 차이만 재검토한다. actualdispatch ctx_6bed4fe4e6c4/task task_82627c80384c; 현재구현/최종CI/재검토수락은아직없다.
 
 ## 2026-11-07T21:41:54+09:00 실제 코드 검토의 필수 시험 보완 한 건
 

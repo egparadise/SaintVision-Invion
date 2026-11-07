@@ -1,0 +1,29 @@
+{
+  "atKST": "2026-11-07T21:46:53+09:00",
+  "baseSource": "90578f49ea400958fcdbc1ded3908d624e856f57",
+  "actualReview": "a18095e2aff59433b93bdd755a2d050a26c15546",
+  "finding": "CR-905-01 Medium TEST_ONLY",
+  "RootCheckpoint": "3f481fa870f409d56030b6fa6db877c6f87e5f45",
+  "RootDocs": 42373689279,
+  "RootSyncExits": [
+    0,
+    0,
+    0
+  ],
+  "RootNormalizedHashes": 3234,
+  "RootPending": 0,
+  "RootConflicts": 0,
+  "dispatchId": "ctx_6bed4fe4e6c4",
+  "taskId": "task_82627c80384c",
+  "terminal": "term_93443e1bb313d9370dcf27eb8c9ce270",
+  "workspace": "d98dc9d3-fe61-4cb2-9776-dff349347a61::D:/Project/SaintVisionI-Invion/fleet5-compute-storage-contract-20261105",
+  "followUpOf": "ctx_20044c1f6fae",
+  "agent": "actual Codex B same author",
+  "readiness": "ready/live observed",
+  "scope": "Only tests/integration/test_workspace_first_intents.py plus new own Evidence/History; production/SQL/schema/definer pins unchanged",
+  "requiredCI": "Exact final Core/Backend both matrices/Docs then one actual Claude delta review",
+  "testFixImplementedOrAccepted": false,
+  "actualIndependentDeltaReview": "NOT_STARTED",
+  "RootApplyDeferredForAuthorFullStateWindow": true,
+  "wholeProgramComplete": false
+}
