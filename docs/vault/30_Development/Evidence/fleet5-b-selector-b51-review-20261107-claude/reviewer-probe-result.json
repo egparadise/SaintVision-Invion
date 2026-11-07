@@ -1,0 +1,384 @@
+{
+  "P01_publishedHashes": {
+    "deltaOutsideOwnScope": [],
+    "deltaStatusCounts": {
+      "A": 22
+    },
+    "manifestAllEqual": true,
+    "manifestMismatches": [],
+    "manifestRows": 20,
+    "parent": "746789a36091c8601afea23fe176069e2fa7d87b",
+    "producerEqual": true,
+    "producerSHA256Committed": {
+      "collector.py": "1ec06ad14750f2277241bdb1997508b8f5f57687ac96e4248a08075425e69ac5",
+      "probe.py": "f0ab5f85f24c029eb550db5482832dfe6d0c7cbe74350e7ec5e2560b2e0f1c46"
+    },
+    "producerSHA256Recorded": {
+      "collector.py": "1ec06ad14750f2277241bdb1997508b8f5f57687ac96e4248a08075425e69ac5",
+      "probe.py": "f0ab5f85f24c029eb550db5482832dfe6d0c7cbe74350e7ec5e2560b2e0f1c46"
+    }
+  },
+  "P02_commit746Independent": {
+    "authorEnumeratedCount": 398,
+    "authorEnumeratedEqual": true,
+    "authorSelectedPathsEqual": true,
+    "blobRows": [
+      {
+        "authorOID": "d16c26ce413af0702b47b79b466706a3990cb4fa",
+        "authorRawSHA256": "7483d65fcb1032aeb05b4d2dd56e09e714cff8ca676de0f80fc3a2f5e447e9af",
+        "equal": true,
+        "oid": "d16c26ce413af0702b47b79b466706a3990cb4fa",
+        "path": "services/control-plane/src/inv/build_product_runtime.py",
+        "rawSHA256": "7483d65fcb1032aeb05b4d2dd56e09e714cff8ca676de0f80fc3a2f5e447e9af"
+      },
+      {
+        "authorOID": "6ff21a1c820f0832ea9075c5dd83a78426ae22e2",
+        "authorRawSHA256": "82f029614537eb5bab56934e4b6736fe3dd52ece54b9b9a3996815b131e41de4",
+        "equal": true,
+        "oid": "6ff21a1c820f0832ea9075c5dd83a78426ae22e2",
+        "path": "services/control-plane/src/inv/dispatch.py",
+        "rawSHA256": "82f029614537eb5bab56934e4b6736fe3dd52ece54b9b9a3996815b131e41de4"
+      },
+      {
+        "authorOID": "dc12fb2066dc5095990aadf070d118936c95690d",
+        "authorRawSHA256": "796f61fe8404c2c3a8a4be08eca75d98e3c442a30c04077c66b278e7d60c6737",
+        "equal": true,
+        "oid": "dc12fb2066dc5095990aadf070d118936c95690d",
+        "path": "services/control-plane/src/inv/model_remote.py",
+        "rawSHA256": "796f61fe8404c2c3a8a4be08eca75d98e3c442a30c04077c66b278e7d60c6737"
+      },
+      {
+        "authorOID": "9f72e566b3eccb73c6210643c9b27d507168c58d",
+        "authorRawSHA256": "3559bbcdf9568f8930654d860b0edd980eca71c835cde3fe7380a69dd56e18f4",
+        "equal": true,
+        "oid": "9f72e566b3eccb73c6210643c9b27d507168c58d",
+        "path": "services/control-plane/src/inv/node_transport.py",
+        "rawSHA256": "3559bbcdf9568f8930654d860b0edd980eca71c835cde3fe7380a69dd56e18f4"
+      },
+      {
+        "authorOID": "4050adbcd1b9ed83daefd58cf310e7fac5c0fd46",
+        "authorRawSHA256": "6bbdf815554fe1f0157247732ddc4dc3069686685c291ef83add55c8f3e92003",
+        "equal": true,
+        "oid": "4050adbcd1b9ed83daefd58cf310e7fac5c0fd46",
+        "path": "services/control-plane/src/inv/observer_worker.py",
+        "rawSHA256": "6bbdf815554fe1f0157247732ddc4dc3069686685c291ef83add55c8f3e92003"
+      },
+      {
+        "authorOID": "35aa3eca7be47a063b0511e0cbead15423c842dd",
+        "authorRawSHA256": "e954e1ef8dcae97756a50428af66c9a328e4d362f1aee7d630588431d09b1308",
+        "equal": true,
+        "oid": "35aa3eca7be47a063b0511e0cbead15423c842dd",
+        "path": "services/control-plane/src/inv/output_ingestion.py",
+        "rawSHA256": "e954e1ef8dcae97756a50428af66c9a328e4d362f1aee7d630588431d09b1308"
+      },
+      {
+        "authorOID": "c095886b3df1b5d6e0e9bec8e071019306c8db53",
+        "authorRawSHA256": "5efd1057f9208cdb29670073bd8ea5e96f98cfbd5a8173f4daa764d3db5db52e",
+        "equal": true,
+        "oid": "c095886b3df1b5d6e0e9bec8e071019306c8db53",
+        "path": "services/control-plane/src/inv/remote_git.py",
+        "rawSHA256": "5efd1057f9208cdb29670073bd8ea5e96f98cfbd5a8173f4daa764d3db5db52e"
+      },
+      {
+        "authorOID": "959a6bfb1663036e4bdee29ea981685d6a5d3a5a",
+        "authorRawSHA256": "900b2b5b3381da451a14a49a2b079b2f9851ea3bc91f30798c9fcde243ceab9a",
+        "equal": true,
+        "oid": "959a6bfb1663036e4bdee29ea981685d6a5d3a5a",
+        "path": "services/control-plane/src/inv/result_view.py",
+        "rawSHA256": "900b2b5b3381da451a14a49a2b079b2f9851ea3bc91f30798c9fcde243ceab9a"
+      },
+      {
+        "authorOID": "962ea07b3801d696b563884b9c0dc90cf2e5d502",
+        "authorRawSHA256": "bae67c856cc8bdae52c1f06c4b6e36302e17ae0dd53a24fc01557cae19a3e226",
+        "equal": true,
+        "oid": "962ea07b3801d696b563884b9c0dc90cf2e5d502",
+        "path": "services/control-plane/src/inv/storage_check_collect.py",
+        "rawSHA256": "bae67c856cc8bdae52c1f06c4b6e36302e17ae0dd53a24fc01557cae19a3e226"
+      },
+      {
+        "authorOID": "56d62d6aee56bb7878197244d3c00b929e4d0762",
+        "authorRawSHA256": "4e43aa43e8dc9b8ab78af0fde78f9e83b83d7bfdc77b7362ad565741f6f94e8a",
+        "equal": true,
+        "oid": "56d62d6aee56bb7878197244d3c00b929e4d0762",
+        "path": "services/control-plane/src/inv/storage_sampling.py",
+        "rawSHA256": "4e43aa43e8dc9b8ab78af0fde78f9e83b83d7bfdc77b7362ad565741f6f94e8a"
+      },
+      {
+        "authorOID": "3239fc3a7ecbdf377dee01c1594ae56cfd9810ac",
+        "authorRawSHA256": "fe294d648b34d617df94449974fc82fed904639b80b8a5da2c9d34f32606bf8e",
+        "equal": true,
+        "oid": "3239fc3a7ecbdf377dee01c1594ae56cfd9810ac",
+        "path": "services/control-plane/src/inv/terminal.py",
+        "rawSHA256": "fe294d648b34d617df94449974fc82fed904639b80b8a5da2c9d34f32606bf8e"
+      },
+      {
+        "authorOID": "1dc2f0b8eb0e80a2f7cbb1e14ed56e81b1e9a2cf",
+        "authorRawSHA256": "de5f6213b196784c6c4280d31a17fba9fe1669eb466edee14197664b37f2ac6c",
+        "equal": true,
+        "oid": "1dc2f0b8eb0e80a2f7cbb1e14ed56e81b1e9a2cf",
+        "path": "services/control-plane/src/inv/tooling.py",
+        "rawSHA256": "de5f6213b196784c6c4280d31a17fba9fe1669eb466edee14197664b37f2ac6c"
+      },
+      {
+        "authorOID": "c843cd00446c02d1f2b7f94c9eb447f419564e93",
+        "authorRawSHA256": "3010b2409bb285de960eb322792b1062ed066275307c9bea53a2cc767b65d4e3",
+        "equal": true,
+        "oid": "c843cd00446c02d1f2b7f94c9eb447f419564e93",
+        "path": "services/control-plane/src/inv/worker.py",
+        "rawSHA256": "3010b2409bb285de960eb322792b1062ed066275307c9bea53a2cc767b65d4e3"
+      },
+      {
+        "authorOID": "742242e299c3bf1fc747bcf160f59f4aa7505a69",
+        "authorRawSHA256": "7b77a716b4fb56e951fce110d347ac41f16d1d80d4722ba9d1410a1869b351cb",
+        "equal": true,
+        "oid": "742242e299c3bf1fc747bcf160f59f4aa7505a69",
+        "path": "services/control-plane/src/inv/workspace_config.py",
+        "rawSHA256": "7b77a716b4fb56e951fce110d347ac41f16d1d80d4722ba9d1410a1869b351cb"
+      },
+      {
+        "authorOID": "0b3998d6a3d310447c84695345db096d511222cd",
+        "authorRawSHA256": "32c8fae52eb947605c53801d609e9826c514b53c2392f07f1fb9ff605303449b",
+        "equal": true,
+        "oid": "0b3998d6a3d310447c84695345db096d511222cd",
+        "path": "services/control-plane/src/inv/workspace_resume.py",
+        "rawSHA256": "32c8fae52eb947605c53801d609e9826c514b53c2392f07f1fb9ff605303449b"
+      },
+      {
+        "authorOID": "78983ff0c2add6c90167af8debd8feb85d7edb5a",
+        "authorRawSHA256": "e97af6a21a46ebfc2f836a5339005510dcd3dcd257640a4b375bdb52bd3b0bda",
+        "equal": true,
+        "oid": "78983ff0c2add6c90167af8debd8feb85d7edb5a",
+        "path": "src/saintvision/services/eval_execution.py",
+        "rawSHA256": "e97af6a21a46ebfc2f836a5339005510dcd3dcd257640a4b375bdb52bd3b0bda"
+      },
+      {
+        "authorOID": "1e83a6b6bd7e7db0353f8e56712b2d7bbc599f45",
+        "authorRawSHA256": "3550db9c20fb7e2118f66f0337ed787dd22a166a6ff8cf1c6e9490f9ae9df6e3",
+        "equal": true,
+        "oid": "1e83a6b6bd7e7db0353f8e56712b2d7bbc599f45",
+        "path": "tools/check_remote_workspace.py",
+        "rawSHA256": "3550db9c20fb7e2118f66f0337ed787dd22a166a6ff8cf1c6e9490f9ae9df6e3"
+      },
+      {
+        "authorOID": "134938f04010178d8f8d6910e2d02ef542bd8d60",
+        "authorRawSHA256": "3a2e134e04ac36ec81a20280e47e2f9deb9c190c2f5bed5c26e1ad05206210ed",
+        "equal": true,
+        "oid": "134938f04010178d8f8d6910e2d02ef542bd8d60",
+        "path": "tools/intranet_e2e_smoke.py",
+        "rawSHA256": "3a2e134e04ac36ec81a20280e47e2f9deb9c190c2f5bed5c26e1ad05206210ed"
+      },
+      {
+        "authorOID": "0fe37781a5785cb7c4a45126876610b048f0c039",
+        "authorRawSHA256": "cd4be84de9a60c03c32daa8e831a527ed9014169e151c7a436383772a5d4ddc0",
+        "equal": true,
+        "oid": "0fe37781a5785cb7c4a45126876610b048f0c039",
+        "path": "tools/lan_execution.py",
+        "rawSHA256": "cd4be84de9a60c03c32daa8e831a527ed9014169e151c7a436383772a5d4ddc0"
+      },
+      {
+        "authorOID": "d8de953f7cd2f69f0e4915efccb24df352e7ea64",
+        "authorRawSHA256": "2c626540f495499423b707b063a6cab6a53e1be3af8c324f46af88a94ac8f652",
+        "equal": true,
+        "oid": "d8de953f7cd2f69f0e4915efccb24df352e7ea64",
+        "path": "tools/lan_pilot.py",
+        "rawSHA256": "2c626540f495499423b707b063a6cab6a53e1be3af8c324f46af88a94ac8f652"
+      },
+      {
+        "authorOID": "5b2c22ea65f6c3eb5092bbd2a7c7e3e625b3821e",
+        "authorRawSHA256": "b88449375aa8377d1e069e151d297ca9bd964495a4807d7e3eab26b111da6842",
+        "equal": true,
+        "oid": "5b2c22ea65f6c3eb5092bbd2a7c7e3e625b3821e",
+        "path": "tools/post_landing_select_run.py",
+        "rawSHA256": "b88449375aa8377d1e069e151d297ca9bd964495a4807d7e3eab26b111da6842"
+      },
+      {
+        "authorOID": "c4320994fad46df81fb9fa123c5ed30082c7cf35",
+        "authorRawSHA256": "2203c2d424ecd7651dcd099b4fd6fb051bd872e919a8bcad44fd2b4043897b2e",
+        "equal": true,
+        "oid": "c4320994fad46df81fb9fa123c5ed30082c7cf35",
+        "path": "tools/prepare_server_config.py",
+        "rawSHA256": "2203c2d424ecd7651dcd099b4fd6fb051bd872e919a8bcad44fd2b4043897b2e"
+      },
+      {
+        "authorOID": "45b64b5526650b6d72284a6bc8729d5aaeb4a894",
+        "authorRawSHA256": "e69fa8ff6c51bd3880f5ec388fe97288a4256169377e17d9d6aa5b7ec2f32c27",
+        "equal": true,
+        "oid": "45b64b5526650b6d72284a6bc8729d5aaeb4a894",
+        "path": "tools/remote_workspace_entry.py",
+        "rawSHA256": "e69fa8ff6c51bd3880f5ec388fe97288a4256169377e17d9d6aa5b7ec2f32c27"
+      },
+      {
+        "authorOID": "532e8b59c0a3f32e53689c69115c1b1954bd9fe5",
+        "authorRawSHA256": "67388ba4a7ac07156bf70d9286691d1a0dfe1fb76f976cf91f0b1df84dc6743b",
+        "equal": true,
+        "oid": "532e8b59c0a3f32e53689c69115c1b1954bd9fe5",
+        "path": "tools/run_ac11_exact_sha_aggregate.py",
+        "rawSHA256": "67388ba4a7ac07156bf70d9286691d1a0dfe1fb76f976cf91f0b1df84dc6743b"
+      },
+      {
+        "authorOID": "5d6eb315d4c87d8fbebbd6e3b13774dd9ca4af36",
+        "authorRawSHA256": "92296b5f070cd97440889b12b487876cd64240408fe4faa918597dfcc6c7e82c",
+        "equal": true,
+        "oid": "5d6eb315d4c87d8fbebbd6e3b13774dd9ca4af36",
+        "path": "tools/run_s04_db_evidence.py",
+        "rawSHA256": "92296b5f070cd97440889b12b487876cd64240408fe4faa918597dfcc6c7e82c"
+      }
+    ],
+    "blobRowsAllEqualAuthor": true,
+    "codingCookieTreePy": [],
+    "commit": "746789a36091c8601afea23fe176069e2fa7d87b",
+    "enginesAgree": true,
+    "gitGrepSelectedCount": 25,
+    "historicalBaseSelectedCount": 25,
+    "nonUTF8TreePy": [],
+    "pathSetEqualHistoricalBase": true,
+    "pythonReSelectedCount": 25,
+    "selectedUnparsable": [],
+    "treePyCount": 398,
+    "treePyModes": [
+      "100644"
+    ]
+  },
+  "P03_reviewWorktreePhysical": {
+    "HEAD": "b51d827e507a35aca3737e31103bd3b3311298a5",
+    "ignoredPyUnderRoots": [],
+    "physicalPyCount": 398,
+    "physicalSelectedCount": 25,
+    "physicalSetEqualsCommitTree": true,
+    "rootsDiffBaseToHEAD": [],
+    "selectedBytesEqualCommitBlobs": true,
+    "symlinksUnderRoots": [],
+    "untrackedPyUnderRoots": [],
+    "worktree": "D:\\Project\\SaintVisionI-Invion\\fleet5-b-selector-b51-review-20261107"
+  },
+  "P04_collectorFixtureControls": [
+    {
+      "commit": "6698278f1189ed2a9ee6f47ddd3bbff520f6da37",
+      "enumerated": 28,
+      "expected": null,
+      "extra": null,
+      "finitePredicateRan": true,
+      "met": true,
+      "missing": null,
+      "name": "C01-commit-exact25-plus-nonmatching",
+      "reason": null,
+      "refResolvedOnce": true,
+      "resolved": "6698278f1189ed2a9ee6f47ddd3bbff520f6da37",
+      "selected": 25
+    },
+    {
+      "commit": "ae046189b8854f00ca462cae31d79041467c897d",
+      "enumerated": 29,
+      "expected": "SOURCE_WORLD_PATH_SET_CHANGED",
+      "extra": [
+        "src/inv_fixture/second_deliver.py"
+      ],
+      "finitePredicateRan": false,
+      "met": true,
+      "missing": [],
+      "name": "C02-commit-new-matching-module",
+      "reason": "SOURCE_WORLD_PATH_SET_CHANGED",
+      "refResolvedOnce": true,
+      "resolved": "ae046189b8854f00ca462cae31d79041467c897d",
+      "selected": 26
+    },
+    {
+      "commit": "e50349c6a5a8281bcb5c31b84e58e2cec8ff8d92",
+      "enumerated": 27,
+      "expected": "SOURCE_WORLD_PATH_SET_CHANGED",
+      "extra": [],
+      "finitePredicateRan": false,
+      "met": true,
+      "missing": [
+        "services/control-plane/src/inv/worker.py"
+      ],
+      "name": "C03-commit-missing-selected-module",
+      "reason": "SOURCE_WORLD_PATH_SET_CHANGED",
+      "refResolvedOnce": true,
+      "resolved": "e50349c6a5a8281bcb5c31b84e58e2cec8ff8d92",
+      "selected": 24
+    },
+    {
+      "commit": "e98d03c8f0ac05993e6569d9942e7fb2c784489a",
+      "detail": "{'path': 'tools/linked_deliver.py', 'mode': '120000', 'type': 'blob'}",
+      "expected": "UNSUPPORTED_GIT_TREE_ENTRY",
+      "met": true,
+      "name": "C04-commit-symlink-py-entry",
+      "reason": "UNSUPPORTED_GIT_TREE_ENTRY"
+    },
+    {
+      "commit": "82a52605bfee0e3a74cb6806da5bf4fc534a2817",
+      "enumerated": 29,
+      "expected": "SOURCE_WORLD_PATH_SET_CHANGED",
+      "extra": [
+        "tools/é_deliver.py"
+      ],
+      "finitePredicateRan": false,
+      "met": true,
+      "missing": [],
+      "name": "C05-commit-nonascii-matching-path",
+      "reason": "SOURCE_WORLD_PATH_SET_CHANGED",
+      "refResolvedOnce": true,
+      "resolved": "82a52605bfee0e3a74cb6806da5bf4fc534a2817",
+      "selected": 26
+    },
+    {
+      "commit": "adcd12c1573f216b0f00857a10972c7b87d4b7c1",
+      "enumerated": 28,
+      "expected": null,
+      "extra": null,
+      "finitePredicateRan": true,
+      "met": true,
+      "missing": null,
+      "name": "C06-commit-matching-non-py-not-selected",
+      "reason": null,
+      "refResolvedOnce": true,
+      "resolved": "adcd12c1573f216b0f00857a10972c7b87d4b7c1",
+      "selected": 25
+    },
+    {
+      "commit": "0f714a9b1bfce8f2aedbb56d4152bd8c4d46c9cd",
+      "detail": "{'path': 'tools/bad_enc.py', 'error': \"'utf-8' codec can't decode byte 0xff in position 14: invalid start byte\"}",
+      "expected": "SOURCE_ENCODING_UNRESOLVED",
+      "met": true,
+      "name": "C07-commit-selected-bad-encoding",
+      "reason": "SOURCE_ENCODING_UNRESOLVED"
+    },
+    {
+      "checkIgnore": ".gitignore:1:tools/ignored_*.py\ttools/ignored_deliver.py",
+      "commit": "3a396eb59f078f83534c92cdc05652e89563bbb0",
+      "enumerated": 30,
+      "expected": "SOURCE_WORLD_PATH_SET_CHANGED",
+      "extra": [
+        "tools/ignored_deliver.py",
+        "tools/untracked_deliver.py"
+      ],
+      "membership": {
+        "tools/check_remote_workspace.py": "TRACKED_IN_INDEX",
+        "tools/ignored_deliver.py": "UNTRACKED_INCLUDING_IGNORED",
+        "tools/intranet_e2e_smoke.py": "TRACKED_IN_INDEX",
+        "tools/lan_execution.py": "TRACKED_IN_INDEX",
+        "tools/lan_pilot.py": "TRACKED_IN_INDEX",
+        "tools/post_landing_select_run.py": "TRACKED_IN_INDEX",
+        "tools/prepare_server_config.py": "TRACKED_IN_INDEX",
+        "tools/remote_workspace_entry.py": "TRACKED_IN_INDEX",
+        "tools/run_ac11_exact_sha_aggregate.py": "TRACKED_IN_INDEX",
+        "tools/run_s04_db_evidence.py": "TRACKED_IN_INDEX",
+        "tools/untracked_deliver.py": "UNTRACKED_INCLUDING_IGNORED"
+      },
+      "met": true,
+      "name": "W01-working-untracked-and-ignored",
+      "reason": "SOURCE_WORLD_PATH_SET_CHANGED",
+      "selected": 27
+    }
+  ],
+  "allFixtureExpectationsMet": true,
+  "base": "746789a36091c8601afea23fe176069e2fa7d87b",
+  "endKST": "2026-11-07T12:14:16.641051+09:00",
+  "interpreter": "3.14.7 (tags/v3.14.7:823f032, Aug  5 2026, 10:51:32) [MSC v.1944 64 bit (AMD64)]",
+  "productOrTestExecuted": false,
+  "productRepoRefsOrIndexMutated": false,
+  "receiptsCount": 924,
+  "reviewSHA": "b51d827e507a35aca3737e31103bd3b3311298a5",
+  "startKST": "2026-11-07T12:11:51.654966+09:00"
+}

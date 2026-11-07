@@ -1,0 +1,64 @@
+"""Reviewer serial local docs gates + canonical Obsidian sync CHECK (argv only, shell=False).
+
+Usage: python -B reviewer_gate_driver.py.txt <repo-root> <base-ref> <out.txt> <scratch-dir> <label>
+
+Each gate's exit is recorded immediately; the driver stops at the first nonzero gate.
+sync_obsidian runs with --check only against the canonical Root state; the FULL state file is
+copied before and after that CHECK into <scratch-dir> (no apply/adopt/resolve/state write).
+"""
+import datetime
+import hashlib
+import shutil
+import subprocess
+import sys
+from pathlib import Path
+
+ROOT, BASE, OUT, SCR, LABEL = Path(sys.argv[1]), sys.argv[2], Path(sys.argv[3]), Path(sys.argv[4]), sys.argv[5]
+ST = Path('D:/Project/SaintVision-Invion/SaintVisionI-Invion/.git/obsidian-sync-state.json')
+
+
+def kst():
+    return datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=9))).strftime('%Y-%m-%dT%H:%M:%S+09:00')
+
+
+def sha(b):
+    return hashlib.sha256(b).hexdigest()
+
+
+py = [sys.executable, '-B']
+sync = py + ['tools/sync_obsidian.py', '--check', '--state', ST.as_posix(), '--conflicts-out', str(SCR / f'sync-conflicts-{LABEL}.json')]
+gates = [
+    ('check_docs', py + ['tools/check_docs.py']),
+    ('check_ontology', py + ['tools/check_ontology.py']),
+    ('path_citations_ratchet', py + ['tools/check_doc_path_citations.py', '--ratchet', '--base-ref', BASE]),
+    ('single_source_ratchet', py + ['tools/check_doc_single_source.py', '--ratchet']),
+    ('sync_check', sync),
+    ('git_diff_check_cached', ['git', 'diff', '--cached', '--check']),
+]
+lines = [f'Reviewer local gates [{LABEL}], Windows, {sys.executable} {sys.version.split()[0]} -B, PYTHONUTF8 from caller, cwd=worktree root, base-ref {BASE}.',
+         'sync_obsidian is CHECK only with the canonical Root state; full state copied before/after; --conflicts-out to reviewer scratch.']
+worst = 0
+for name, argv in gates:
+    before = None
+    if name == 'sync_check':
+        b = ST.read_bytes()
+        (SCR / f'sync-state-before-{LABEL}.json').write_bytes(b)
+        before = (sha(b), len(b))
+    a = kst()
+    r = subprocess.run(argv, cwd=ROOT, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    e = kst()
+    rc = r.returncode
+    shown = ' '.join('<scratch>/' + Path(x).name if x.startswith(str(SCR)) else ('python' if x == sys.executable else x) for x in argv)
+    lines.append(f'{a}..{e} exit={rc} logsha={sha(r.stdout)} :: {shown}')
+    if before is not None:
+        b2 = ST.read_bytes()
+        (SCR / f'sync-state-after-{LABEL}.json').write_bytes(b2)
+        lines.append(f'    stateBefore {before[0]} ({before[1]} B) stateAfter {sha(b2)} ({len(b2)} B) equal={before[0] == sha(b2)}')
+    lines += ['    ' + t[:300] for t in r.stdout.decode('utf-8', 'replace').strip().splitlines()[-3:]]
+    if rc != 0:
+        worst = rc
+        lines.append(f'STOP: {name} exit {rc}')
+        break
+OUT.write_text('\n'.join(lines) + '\n', encoding='utf-8', newline='\n')
+print('\n'.join(lines))
+raise SystemExit(worst)

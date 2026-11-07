@@ -1,0 +1,28 @@
+{
+  "environment": "Windows 11 Pro, Git Bash + PowerShell, git 2.47.0.windows.1. Probe and gates: D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe 3.14.7 -B with PYTHONUTF8=1. cwd = worktree D:/Project/SaintVisionI-Invion/fleet5-b-selector-b51-review-20261107. KST from PowerShell / Python fixed +09:00. Serial only; free physical memory 438496 KB at about 12:16 KST. No installs, no OS/pagefile/process/service changes.",
+  "provenance": [
+    {"argv": "git rev-parse HEAD HEAD^ ; git status -sb", "result": "b51d827e507a35aca3737e31103bd3b3311298a5 / 746789a36091c8601afea23fe176069e2fa7d87b / clean"},
+    {"argv": "git switch -c agent/claude/fleet5-b-selector-b51-review-20261107 b51d827e507a35aca3737e31103bd3b3311298a5", "result": "new branch at b51d827e (no reset/rebase/force)"},
+    {"argv": "git fetch origin agent/codex/fleet5-b-a7-selector-discovery-r1-20261107 ; git ls-remote origin refs/heads/agent/codex/fleet5-b-a7-selector-discovery-r1-20261107", "result": "b51d827e507a35aca3737e31103bd3b3311298a5"},
+    {"argv": "git diff --name-status 746789a3 b51d827e", "result": "22 A, all under the author's own Evidence prefix plus one History"},
+    {"argv": "read-only Root fleet-five-orchestration-20261105 (HEAD 11386fc1): Index 1.0.500, Codex board 1.0.461, Claude board 1.2.130; .work records hashed in review.json", "result": "read only"},
+    {"argv": "git show dc18f6681627aca9d3eceb7d5a85dbc97b551b5b:docs/vault/30_Development/Evidence/fleet5-b-a7-operation-7467-code-review-20261107-claude/review.json", "result": "verdict ACCEPT_NARROW_CODE_KEEP_HOLD; OPG-L1 and OPG-I2 read"},
+    {"argv": "gh run view 42331427974 -R egparadise/SaintVision-Invion --json databaseId,headSha,headBranch,event,status,conclusion,attempt,workflowName,displayTitle ; --json jobs", "result": "Documentation Build, workflow_dispatch, attempt 1, head b51d827e, completed/success, job 128278594470 19 steps success. Read only."},
+    {"argv": "python -B -I -c <os.walk + os.path.isjunction over the three roots>", "kst": "2026-11-07T12:16", "exit": 0, "result": "dirs 18 junctions []"}
+  ],
+  "reviewerRuns": [
+    {"name": "reviewer bounded DATA probe", "argv": "PYTHONUTF8=1 .venv python -B .work/fleet5-b-selector-b51-review-20261107-claude/reviewer_probe.py", "kst": "2026-11-07T12:11:51..12:14:16", "exit": 0,
+     "driver": "reviewer_probe.py.txt sha256 0d85d2e94864355cd165ee576cbbff66023187793ead1d7cbf4ca03e1b397407 (byte-identical copy of the executed .work file)",
+     "result": "reviewer-probe-result.json sha256 f983e5be2b2d1438bde54e1a256af14e05c317ad4d652bdd5406c5d43ef4b38a; P01-P03 + C01-C07 + W01 all expected",
+     "receipts": "reviewer-probe-receipts.json sha256 e2743543733526e9efc1c5ddc1f0729ce8d4d1aca5a75a5db45aeb72e6ea3020",
+     "stdout": "reviewer-probe.stdout.txt sha256 518ac7830210093b1ce4009cd2370fbe8078450b874dd59c26ad37ef51f9f110",
+     "attempts": "one"},
+    {"name": "local gates r1", "argv": "PYTHONUTF8=1 .venv python -B reviewer_gate_driver.py.txt <worktree> b51d827e507a35aca3737e31103bd3b3311298a5 <scratch>/gates/local-doc-gates-r1.txt <scratch>/gates r1", "kst": "2026-11-07T12:19:16..12:20:37", "exit": 0,
+     "driver": "reviewer_gate_driver.py.txt sha256 9ab1e167a0075a581656d5180c3bc73c776f4c13642ffcdc9b474b8249dc604c (unchanged copy of the dc18f668 reviewer gate driver)",
+     "result": "check_docs 0, check_ontology 0, path-citations --ratchet --base-ref b51d827e 0, single-source --ratchet 0, sync_obsidian --check 0 (canonical state c8f49124aafb90e282ba7032af3ca8c34c5567eabfd045e6bf9d9c22b35f8408 / 478797 B before == after; 4993 managed, 2569 pending exports, 0 conflicts, no writes), git diff --cached --check 0",
+     "files": "local-doc-gates-r1.txt sha256 b69299c16c6ee72150ffeabefc66e3390042cae2f2ffab487200ca0351220577, sync-state-before-r1.json and sync-state-after-r1.json (full canonical state copies)",
+     "tree": "b51d827e + own History/Evidence staged at that time (before this file and the r1 artifacts were added)"},
+    {"name": "local gates r2", "note": "Final round on the complete staged tree including this file and the r1 artifacts. Its log and state copies stay in the reviewer's .work and are reported in worker_done, so this commit does not gate its own log. Hosted Docs CI on the review commit is the exact-tree gate."}
+  ],
+  "notRun": "pytest; product/test/application import or execution; author probe.main() and old write-producing scripts; old corpora; Go/Node/browser/compiler/crypto; Core/Backend/Frontend dispatch for this review; PG/network/SSH/Docker/PKI/host; Obsidian apply/adopt/resolve/state write or export; incident cleanup; reviewer peak memory (NOT_MEASURED)"
+}

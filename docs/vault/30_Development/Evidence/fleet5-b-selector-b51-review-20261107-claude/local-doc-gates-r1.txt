@@ -1,0 +1,14 @@
+Reviewer local gates [r1], Windows, D:\Project\SaintVisionI-Invion\.venv\Scripts\python.exe 3.14.7 -B, PYTHONUTF8 from caller, cwd=worktree root, base-ref b51d827e507a35aca3737e31103bd3b3311298a5.
+sync_obsidian is CHECK only with the canonical Root state; full state copied before/after; --conflicts-out to reviewer scratch.
+2026-11-07T12:19:16+09:00..2026-11-07T12:19:56+09:00 exit=0 logsha=9ba3bbad8caa4f57eb4a3405bf872dc5906118d11c39c6b39df9b3512860a6ed :: python -B tools/check_docs.py
+    PASS: 24 original hashes, 1268 versioned documents, wiki links, 48 tasks, 12 outcomes, owner/reviewer/skills, dependency DAG.
+2026-11-07T12:19:56+09:00..2026-11-07T12:20:00+09:00 exit=0 logsha=7cdc12bf64f50ba0964625161638a4c639cf22d786a57f04685bed0718e14042 :: python -B tools/check_ontology.py
+    PASS: RDF parsing, defined terms, TTL/JSON-LD equivalence, 48 task mappings, positive SHACL, 4 rejected invalid fixtures, 4 competency queries, Obsidian mirrors.
+2026-11-07T12:20:00+09:00..2026-11-07T12:20:07+09:00 exit=0 logsha=389921b50662776ed834a285f70fc44ab61f7d5bdb4c5249c0a73c98113980de :: python -B tools/check_doc_path_citations.py --ratchet --base-ref b51d827e507a35aca3737e31103bd3b3311298a5
+    PASS check_doc_path_citations --ratchet: 290 broken citation(s), all in baseline, none stale, floor unchanged.
+2026-11-07T12:20:07+09:00..2026-11-07T12:20:07+09:00 exit=0 logsha=13b5f5afed05999109839be1baec4ef70ea3c71bcb267353e59eba0f2ae3e448 :: python -B tools/check_doc_single_source.py --ratchet
+    PASS check_doc_single_source --ratchet: 16 pairs, all in baseline, none stale.
+2026-11-07T12:20:07+09:00..2026-11-07T12:20:36+09:00 exit=0 logsha=2a7d82c79b829f323d7643bb0ec1aaba650ec3f320ee7d045a09b0f2eb31ec04 :: python -B tools/sync_obsidian.py --check --state D:/Project/SaintVision-Invion/SaintVisionI-Invion/.git/obsidian-sync-state.json --conflicts-out <scratch>/sync-conflicts-r1.json
+    stateBefore c8f49124aafb90e282ba7032af3ca8c34c5567eabfd045e6bf9d9c22b35f8408 (478797 B) stateAfter c8f49124aafb90e282ba7032af3ca8c34c5567eabfd045e6bf9d9c22b35f8408 (478797 B) equal=True
+    CHECK: 4993 managed files, 2569 pending exports, 0 conflicts. No writes.
+2026-11-07T12:20:36+09:00..2026-11-07T12:20:37+09:00 exit=0 logsha=e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 :: git diff --cached --check

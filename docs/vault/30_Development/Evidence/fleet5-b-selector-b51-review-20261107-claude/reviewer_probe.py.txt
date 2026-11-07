@@ -1,0 +1,253 @@
+"""Claude independent bounded DATA probe for b51d827e selector discovery.
+
+No product/test import or execution. Reads Git objects / physical bytes of the
+review worktree, and exercises the author's collector.collect() entrypoint only
+against disposable fixture repositories under this script's own .work folder.
+Fixture repos are built with Git plumbing (no hooks, no product refs).
+"""
+import ast
+import datetime
+import hashlib
+import json
+import os
+from pathlib import Path
+import re
+import subprocess
+import sys
+
+OUT = Path(__file__).resolve().parent
+R = next(p for p in OUT.parents if (p / 'AGENTS.md').exists())
+REVIEW = 'b51d827e507a35aca3737e31103bd3b3311298a5'
+BASE = '746789a36091c8601afea23fe176069e2fa7d87b'
+HIST = 'b3bbdc8d92a39f2f797a7680deb2770d6f705af0'
+EV = 'docs/vault/30_Development/Evidence/fleet5-b-a7-selector-discovery-r1-20261107-codex'
+ROOTS = ('services/control-plane/src', 'src', 'tools')
+PATTERN = r'NodeDelivery|DeliveryWorker|DeliveryAttempt|DeliveryQueue|node_transport|from[[:space:]].*dispatch|import[[:space:]].*dispatch|\.deliver\b'
+# Independent engine: same ERE translated to Python re, applied per LF line.
+PYRE = re.compile(rb'NodeDelivery|DeliveryWorker|DeliveryAttempt|DeliveryQueue|node_transport|from[ \t\r\f\v].*dispatch|import[ \t\r\f\v].*dispatch|\.deliver\b')
+RECEIPTS = []
+KST = datetime.timezone(datetime.timedelta(hours=9))
+FIXENV = ['-c', 'core.autocrlf=false', '-c', 'core.hooksPath=__none__']
+
+
+def sha(b):
+    return hashlib.sha256(b).hexdigest()
+
+
+def git(*argv, cwd=R, ok=(0,), stdin=None):
+    full = ['git', *argv]
+    r = subprocess.run(full, cwd=cwd, input=stdin, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    RECEIPTS.append({'argv': full, 'cwd': str(cwd), 'exit': r.returncode, 'stdoutSHA256': sha(r.stdout),
+                     'stderr': r.stderr.decode('utf8', 'replace')[:300]})
+    assert r.returncode in ok, RECEIPTS[-1]
+    return r.stdout
+
+
+def emit(name, value):
+    p = OUT / name
+    assert not p.exists(), name
+    p.write_bytes((json.dumps(value, ensure_ascii=False, sort_keys=True, indent=2) + '\n').encode())
+
+
+def pymatch(raw):
+    return any(PYRE.search(line) for line in raw.split(b'\n'))
+
+
+def p01_published_hashes():
+    man = json.loads(git('show', f'{REVIEW}:{EV}/manifest.json'))
+    rows = []
+    for f in man['files']:
+        path = f['path']
+        raw = git('show', f'{REVIEW}:{path}')
+        rows.append({'path': path, 'manifestSHA256': f.get('workingRawSHA256'), 'committedSHA256': sha(raw),
+                     'bytes': f.get('bytes'), 'committedBytes': len(raw), 'equal': f.get('workingRawSHA256') == sha(raw) and f.get('bytes') == len(raw)})
+    cmd = json.loads(git('show', f'{REVIEW}:{EV}/probe01-command.json'))
+    prod = {n: sha(git('show', f'{REVIEW}:{EV}/{n}')) for n in ('collector.py', 'probe.py')}
+    added = git('diff', '--name-status', '-z', BASE, REVIEW).decode().split('\0')
+    pairs = [(added[i], added[i + 1]) for i in range(0, len(added) - 1, 2)]
+    return {'manifestRows': len(rows), 'manifestAllEqual': all(r['equal'] for r in rows),
+            'manifestMismatches': [r for r in rows if not r['equal']],
+            'producerSHA256Recorded': cmd['producerSHA256'], 'producerSHA256Committed': prod,
+            'producerEqual': cmd['producerSHA256'] == prod,
+            'parent': git('rev-parse', REVIEW + '^').decode().strip(),
+            'deltaStatusCounts': {s: sum(1 for x, _ in pairs if x == s) for s in sorted({x for x, _ in pairs})},
+            'deltaOutsideOwnScope': [p for _, p in pairs if not (p.startswith(EV + '/') or p == 'docs/vault/30_Development/History/2026-11-07_FLEET5_B_A7_Selector_Discovery_R1_Codex.md')]}
+
+
+def tree_py(commit):
+    out = git('ls-tree', '-r', '-z', '--full-tree', commit, '--', *ROOTS)
+    rows = {}
+    for item in out.split(b'\0'):
+        if not item:
+            continue
+        head, path = item.split(b'\t', 1)
+        path = path.decode()
+        if path.endswith('.py'):
+            mode, typ, oid = head.decode().split()
+            rows[path] = (mode, typ, oid)
+    return rows
+
+
+def p02_commit(author_inv):
+    rows = tree_py(BASE)
+    modes = sorted({m for m, _, _ in rows.values()})
+    blobs = {p: git('cat-file', 'blob', oid) for p, (_, _, oid) in rows.items()}
+    py_selected = sorted(p for p, b in blobs.items() if pymatch(b))
+    grep = git('grep', '-l', '-z', '-E', PATTERN, BASE, '--', *ROOTS, ok=(0, 1))
+    git_selected = sorted(x[len(BASE) + 1:] for x in grep.decode().split('\0') if x.endswith('.py'))
+    hist = git('grep', '-l', '-z', '-E', PATTERN, HIST, '--', *ROOTS, ok=(0, 1))
+    hist_selected = sorted(x[len(HIST) + 1:] for x in hist.decode().split('\0') if x.endswith('.py'))
+    a = {x['path']: x for x in author_inv['selectedInventory']}
+    blob_rows = [{'path': p, 'oid': rows[p][2], 'rawSHA256': sha(blobs[p]),
+                  'authorOID': a.get(p, {}).get('gitBlobID'), 'authorRawSHA256': a.get(p, {}).get('rawSHA256'),
+                  'equal': a.get(p, {}).get('gitBlobID') == rows[p][2] and a.get(p, {}).get('rawSHA256') == sha(blobs[p])}
+                 for p in git_selected]
+    nonutf8, cookies, unparsable = [], [], []
+    for p, b in blobs.items():
+        try:
+            t = b.decode('utf-8-sig')
+        except UnicodeDecodeError:
+            nonutf8.append(p)
+            continue
+        first2 = t.split('\n')[:2]
+        if any(re.match(r'^[ \t\f]*#.*?coding[:=][ \t]*([-\w.]+)', ln) for ln in first2):
+            cookies.append(p)
+        if p in git_selected:
+            try:
+                ast.parse(t, p)
+            except SyntaxError:
+                unparsable.append(p)
+    return {'commit': BASE, 'treePyCount': len(rows), 'treePyModes': modes,
+            'gitGrepSelectedCount': len(git_selected), 'pythonReSelectedCount': len(py_selected),
+            'enginesAgree': git_selected == py_selected,
+            'historicalBaseSelectedCount': len(hist_selected), 'pathSetEqualHistoricalBase': git_selected == hist_selected,
+            'authorSelectedPathsEqual': sorted(a) == git_selected, 'authorEnumeratedCount': author_inv['enumeratedProductionPythonCount'],
+            'authorEnumeratedEqual': author_inv['enumeratedProductionPythonCount'] == len(rows),
+            'blobRowsAllEqualAuthor': all(r['equal'] for r in blob_rows), 'blobRows': blob_rows,
+            'nonUTF8TreePy': nonutf8, 'codingCookieTreePy': cookies, 'selectedUnparsable': unparsable}, blobs
+
+
+def p03_working(blobs):
+    phys = []
+    symlinks = []
+    for root in ROOTS:
+        for dp, dns, fns in os.walk(R / root, followlinks=False):
+            for n in list(dns) + fns:
+                if os.path.islink(os.path.join(dp, n)):
+                    symlinks.append(os.path.relpath(os.path.join(dp, n), R).replace('\\', '/'))
+            for fn in fns:
+                if fn.endswith('.py'):
+                    phys.append(os.path.relpath(os.path.join(dp, fn), R).replace('\\', '/'))
+    phys.sort()
+    data = {p: (R / p).read_bytes() for p in phys}
+    selected = sorted(p for p, b in data.items() if pymatch(b))
+    others = [x for x in git('ls-files', '--others', '-z', '--', *ROOTS).decode().split('\0') if x.endswith('.py')]
+    ignored = [x for x in git('ls-files', '--others', '--ignored', '--exclude-standard', '-z', '--', *ROOTS).decode().split('\0') if x.endswith('.py')]
+    head = git('rev-parse', 'HEAD').decode().strip()
+    rootdiff = git('diff', '--name-only', BASE, head, '--', *ROOTS).decode().split()
+    return {'worktree': str(R), 'HEAD': head, 'rootsDiffBaseToHEAD': rootdiff, 'physicalPyCount': len(phys),
+            'physicalSelectedCount': len(selected), 'untrackedPyUnderRoots': others, 'ignoredPyUnderRoots': ignored,
+            'symlinksUnderRoots': symlinks,
+            'physicalSetEqualsCommitTree': set(phys) == set(blobs),
+            'selectedBytesEqualCommitBlobs': all(data[p] == blobs.get(p) for p in selected)}
+
+
+def write(path, raw):
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_bytes(raw)
+
+
+def make_repo(name, files, symlinks=()):
+    """Disposable repo via plumbing: blobs + index + tree + commit. No hooks."""
+    repo = OUT / 'fixtures' / name
+    repo.mkdir(parents=True)
+    git(*FIXENV, 'init', '-q', '-b', 'main', cwd=repo)
+    for rel, raw in files.items():
+        write(repo / rel, raw)
+        oid = git(*FIXENV, 'hash-object', '-w', '--', rel, cwd=repo).decode().strip()
+        git(*FIXENV, 'update-index', '--add', '--cacheinfo', f'100644,{oid},{rel}', cwd=repo)
+    for rel, target in symlinks:
+        oid = git(*FIXENV, 'hash-object', '-w', '--stdin', cwd=repo, stdin=target).decode().strip()
+        git(*FIXENV, 'update-index', '--add', '--cacheinfo', f'120000,{oid},{rel}', cwd=repo)
+    tree = git(*FIXENV, 'write-tree', cwd=repo).decode().strip()
+    commit = git(*FIXENV, '-c', 'user.name=fixture', '-c', 'user.email=fixture@fixture.invalid',
+                 'commit-tree', tree, '-m', name, cwd=repo).decode().strip()
+    git(*FIXENV, 'update-ref', 'refs/heads/main', commit, cwd=repo)
+    return repo, commit
+
+
+def p04_fixtures(blobs, selected):
+    sys.path.insert(0, str(R / EV))
+    import collector  # author's code under review; imports stdlib only
+    import probe  # module import only; main() is not called
+    world25 = {p: blobs[p] for p in selected}
+    second = b'def fixture_second(delivery, node, permit):\n    return delivery.deliver(node, permit)\n'
+    # Every fixture keeps one placeholder per root so all three roots exist in the tree.
+    keep = {f'{r}/__fixture_keep__.py': b'VALUE = 1\n' for r in ROOTS}
+    cases = [
+        ('C01-commit-exact25-plus-nonmatching', {**world25, **keep}, (), None, 'commit'),
+        ('C02-commit-new-matching-module', {**world25, **keep, 'src/inv_fixture/second_deliver.py': second}, (), 'SOURCE_WORLD_PATH_SET_CHANGED', 'commit'),
+        ('C03-commit-missing-selected-module', {**{k: v for k, v in world25.items() if k != probe.finite.p.WK}, **keep}, (), 'SOURCE_WORLD_PATH_SET_CHANGED', 'commit'),
+        ('C04-commit-symlink-py-entry', {**world25, **keep}, (('tools/linked_deliver.py', b'remote_workspace_entry.py'),), 'UNSUPPORTED_GIT_TREE_ENTRY', 'commit'),
+        ('C05-commit-nonascii-matching-path', {**world25, **keep, 'tools/é_deliver.py': second}, (), 'SOURCE_WORLD_PATH_SET_CHANGED', 'commit'),
+        ('C06-commit-matching-non-py-not-selected', {**world25, **keep, 'tools/notes_deliver.txt': second}, (), None, 'commit'),
+        ('C07-commit-selected-bad-encoding', {**world25, **keep, 'tools/bad_enc.py': b'# x.deliver()\n\xff\n'}, (), 'SOURCE_ENCODING_UNRESOLVED', 'commit'),
+    ]
+    rows = []
+    for name, files, links, expected, kind in cases:
+        repo, commit = make_repo(name, files, links)
+        try:
+            world, report = collector.collect(repo, 'commit', 'main')
+            res = probe.evaluate_discovered(world)
+            reason = res['reason']
+            argvs = [r['argv'] for r in report['queryReceipts']]
+            rows.append({'name': name, 'commit': commit, 'reason': reason, 'expected': expected,
+                         'met': reason == expected, 'enumerated': report['enumeratedProductionPythonCount'],
+                         'selected': report['selectedCount'], 'extra': res.get('extraPaths'), 'missing': res.get('missingPaths'),
+                         'finitePredicateRan': res['existingFinitePredicateRan'],
+                         'refResolvedOnce': sum(1 for a in argvs if a[1] == 'rev-parse') == 1 and all(
+                             commit in ' '.join(a) for a in argvs[1:3]),
+                         'resolved': report['resolvedTargetCommitOrWorkingHEAD']})
+        except collector.Unresolved as exc:
+            rows.append({'name': name, 'commit': commit, 'reason': exc.reason, 'expected': expected,
+                         'met': exc.reason == expected, 'detail': str(exc.detail)[:300]})
+    # Working mode inside a real Git repo: tracked 25 + untracked + ignored matching modules.
+    repo, commit = make_repo('W01-working-untracked-and-ignored', {**world25, **keep, '.gitignore': b'tools/ignored_*.py\n'})
+    write(repo / 'tools/untracked_deliver.py', second)
+    write(repo / 'tools/ignored_deliver.py', second)
+    ign = git('check-ignore', '-v', 'tools/ignored_deliver.py', cwd=repo, ok=(0, 1)).decode().strip()
+    world, report = collector.collect(repo, 'working')
+    res = probe.evaluate_discovered(world)
+    mem = {x['path']: x['membership'] for x in report['selectedInventory'] if x['path'].startswith('tools/')}
+    rows.append({'name': 'W01-working-untracked-and-ignored', 'commit': commit, 'checkIgnore': ign,
+                 'reason': res['reason'], 'expected': 'SOURCE_WORLD_PATH_SET_CHANGED',
+                 'met': res['reason'] == 'SOURCE_WORLD_PATH_SET_CHANGED' and res['extraPaths'] == ['tools/ignored_deliver.py', 'tools/untracked_deliver.py'],
+                 'extra': res['extraPaths'], 'membership': mem, 'enumerated': report['enumeratedProductionPythonCount'],
+                 'selected': report['selectedCount']})
+    return rows
+
+
+def main():
+    start = datetime.datetime.now(KST).isoformat()
+    assert git('rev-parse', 'HEAD').decode().strip() == REVIEW
+    author_inv = json.loads(git('show', f'{REVIEW}:{EV}/probe01/actual-commit-inventory.json'))
+    p01 = p01_published_hashes()
+    p02, blobs = p02_commit(author_inv)
+    selected = [r['path'] for r in p02['blobRows']]
+    p03 = p03_working(blobs)
+    p04 = p04_fixtures(blobs, selected)
+    result = {'reviewSHA': REVIEW, 'base': BASE, 'startKST': start, 'endKST': datetime.datetime.now(KST).isoformat(),
+              'interpreter': sys.version, 'P01_publishedHashes': p01, 'P02_commit746Independent': p02,
+              'P03_reviewWorktreePhysical': p03, 'P04_collectorFixtureControls': p04,
+              'allFixtureExpectationsMet': all(r['met'] for r in p04),
+              'productOrTestExecuted': False, 'productRepoRefsOrIndexMutated': False, 'receiptsCount': len(RECEIPTS)}
+    emit('reviewer-probe-result.json', result)
+    emit('reviewer-probe-receipts.json', RECEIPTS)
+    print(json.dumps({'manifestAllEqual': p01['manifestAllEqual'], 'producerEqual': p01['producerEqual'],
+                      'treePy': p02['treePyCount'], 'selected': p02['gitGrepSelectedCount'], 'enginesAgree': p02['enginesAgree'],
+                      'authorEqual': p02['authorSelectedPathsEqual'] and p02['blobRowsAllEqualAuthor'],
+                      'physical': p03['physicalPyCount'], 'fixtures': [(r['name'], r['reason'], r['met']) for r in p04]}, ensure_ascii=False))
+
+
+if __name__ == '__main__':
+    main()
