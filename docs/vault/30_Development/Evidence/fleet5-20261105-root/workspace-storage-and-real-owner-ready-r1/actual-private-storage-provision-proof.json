@@ -1,0 +1,91 @@
+{
+  "atKST": "2026-11-08T02:05:26+09:00",
+  "SSHExit": 0,
+  "stderrBytes": 0,
+  "remote": {
+    "actualAPIContainerIdentityAndRestrictedMountsMatched": true,
+    "priorInterpreterMismatchReconciledBeforeWrites": {
+      "basePython": {
+        "executable": "/usr/local/bin/python",
+        "invAvailable": false,
+        "probeFiles": {
+          "working": [],
+          "objects": [],
+          "restores": []
+        }
+      },
+      "configuredAPIVenv": {
+        "executable": "/opt/sv/venv/bin/python",
+        "invAvailable": true,
+        "probeFiles": {
+          "working": [],
+          "objects": [],
+          "restores": []
+        }
+      }
+    },
+    "containerID": "8d62139c2408dff910bbfb3a9b322be56520705a3f3e967ce74563cfe9cd3f28",
+    "execExit": 0,
+    "execStderrBytes": 0,
+    "result": {
+      "atKST": "2026-11-08T02:05:26+09:00",
+      "status": "ACTUAL_API_UID1000_PRIVATE_STORAGE_PROVISIONED_AND_VERIFIED",
+      "containerUID": 1000,
+      "roots": [
+        {
+          "name": "working",
+          "containerPath": "/work/working",
+          "sourceHandleClass": "WorkingGenerations",
+          "UID": 1000,
+          "mode": "0o700",
+          "device": 66307,
+          "inode": 12327330,
+          "existingEntriesPreserved": 0,
+          "probeBytes": 177,
+          "exclusiveNofollowWriteFsyncReadback": true,
+          "exactOwnedProbeUnlinkedAfterInodeCheck": true,
+          "directoryFsync": true,
+          "freeBytes": 205903028224
+        },
+        {
+          "name": "objects",
+          "containerPath": "/work/objects",
+          "sourceHandleClass": "PrivateTree",
+          "UID": 1000,
+          "mode": "0o700",
+          "device": 66307,
+          "inode": 12327331,
+          "existingEntriesPreserved": 0,
+          "probeBytes": 177,
+          "exclusiveNofollowWriteFsyncReadback": true,
+          "exactOwnedProbeUnlinkedAfterInodeCheck": true,
+          "directoryFsync": true,
+          "freeBytes": 205903028224
+        },
+        {
+          "name": "restores",
+          "containerPath": "/work/restores",
+          "sourceHandleClass": "RestoreGenerations",
+          "UID": 1000,
+          "mode": "0o700",
+          "device": 66307,
+          "inode": 12327332,
+          "existingEntriesPreserved": 0,
+          "probeBytes": 177,
+          "exclusiveNofollowWriteFsyncReadback": true,
+          "exactOwnedProbeUnlinkedAfterInodeCheck": true,
+          "directoryFsync": true,
+          "freeBytes": 205903028224
+        }
+      ],
+      "probePersisted": false,
+      "userFilesChanged": false,
+      "DBWrites": false,
+      "workspaceStatusChanged": false,
+      "nodePlacementChanged": false,
+      "actualRunOrVotesCreated": false,
+      "allPhysicalStorageShared": false,
+      "wholeProgramComplete": false
+    }
+  }
+}

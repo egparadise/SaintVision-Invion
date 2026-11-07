@@ -1,0 +1,10 @@
+{
+  "schema": "contracts/v1alpha1/core.schema.json",
+  "ref": "https://saintvision.ai/contracts/v1alpha1/core.schema.json#/$defs/ProjectNodeCertificateObservationResponse",
+  "schemaSHA256": "f8bb8fa801f64d622ebcdc1c4c3383833632ccfb05a740493e3a5cb86e44404f",
+  "generatorSHA256": "5958abf2b43c3dad42b69774bd78ed571244668a9eb2e953f8c47079366f1022",
+  "lockSHA256": "1fa82239ec4bb731ef649acfeac84ac4a1dfb2fa5801824502adf053e8892fbd",
+  "ajv": "8.20.0",
+  "ajvFormats": "3.0.1",
+  "validatorSHA256": "7d9b4d1236432261f60d07f52dfc7a1a1d4ae1be6bdf6595b5a57fc1dce7e61f"
+}

@@ -1,0 +1,36 @@
+"""Root-owned bounded probe inside the actual restricted API container."""
+import datetime,hashlib,json,shlex,subprocess
+from pathlib import Path
+r=Path(__file__).resolve().parents[1];out=r/'.work/pc3-workspace-storage-proof-r1';assert not out.exists();out.mkdir()
+inner=r'''import datetime,hashlib,json,os,stat,uuid
+from inv.workspace_files import PrivateTree,WorkingGenerations,RestoreGenerations
+assert os.geteuid()==1000
+values=[]
+for name,path,kind in [('working','/work/working',WorkingGenerations),('objects','/work/objects',PrivateTree),('restores','/work/restores',RestoreGenerations)]:
+ tree=kind(path)
+ with tree.locked() as rootfd:
+  st=os.fstat(rootfd);assert stat.S_ISDIR(st.st_mode) and st.st_uid==1000 and stat.S_IMODE(st.st_mode)==0o700
+  names=sorted(os.listdir(rootfd));probe='.operator-storage-probe-'+uuid.uuid4().hex;payload=b'SaintVision controlled private storage readiness '+os.urandom(128);fd=os.open(probe,os.O_RDWR|os.O_CREAT|os.O_EXCL|os.O_NOFOLLOW|os.O_CLOEXEC,0o600,dir_fd=rootfd)
+  try:
+   info=os.fstat(fd);assert stat.S_ISREG(info.st_mode) and info.st_uid==1000 and info.st_nlink==1 and stat.S_IMODE(info.st_mode)==0o600 and info.st_dev==st.st_dev
+   assert os.write(fd,payload)==len(payload);os.fsync(fd);os.lseek(fd,0,os.SEEK_SET);assert os.read(fd,len(payload)+1)==payload
+   current=os.stat(probe,dir_fd=rootfd,follow_symlinks=False);assert current.st_ino==info.st_ino and current.st_dev==info.st_dev
+   os.unlink(probe,dir_fd=rootfd);os.fsync(rootfd)
+  finally:os.close(fd)
+  assert sorted(os.listdir(rootfd))==names
+  fs=os.statvfs(rootfd);free=fs.f_bavail*fs.f_frsize;assert free>=100*1024*1024
+  values.append({'name':name,'containerPath':path,'sourceHandleClass':kind.__name__,'UID':st.st_uid,'mode':oct(stat.S_IMODE(st.st_mode)),'device':st.st_dev,'inode':st.st_ino,'existingEntriesPreserved':len(names),'probeBytes':len(payload),'exclusiveNofollowWriteFsyncReadback':True,'exactOwnedProbeUnlinkedAfterInodeCheck':True,'directoryFsync':True,'freeBytes':free})
+print(json.dumps({'atKST':datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=9))).isoformat(timespec='seconds'),'status':'ACTUAL_API_UID1000_PRIVATE_STORAGE_PROVISIONED_AND_VERIFIED','containerUID':os.geteuid(),'roots':values,'probePersisted':False,'userFilesChanged':False,'DBWrites':False,'workspaceStatusChanged':False,'nodePlacementChanged':False,'actualRunOrVotesCreated':False,'allPhysicalStorageShared':False,'wholeProgramComplete':False}))
+'''
+outer=r'''import json,subprocess,sys
+p=json.load(sys.stdin);cid='8d62139c2408dff910bbfb3a9b322be56520705a3f3e967ce74563cfe9cd3f28'
+q=subprocess.run(['docker','container','inspect',cid],capture_output=True,timeout=10);assert q.returncode==0;v=json.loads(q.stdout)[0]
+assert v['Name']=='/saintvision-api96-bcd581be-r1' and v['Image']=='sha256:1426226b8dd7093bf79909886808b83141dcd8f9b677c118b29c4be4a1c9de47' and v['State']['Running'] and v['RestartCount']==0 and v['Config']['User']=='1000:1000' and v['HostConfig']['ReadonlyRootfs'] and v['HostConfig']['NetworkMode']=='host' and len(v['Mounts'])==10
+mounts={x['Destination']:x for x in v['Mounts']}
+for n in ['working','objects','restores']:assert mounts['/work/'+n]['RW'] and mounts['/work/'+n]['Source']=='/home/saintvision-invion3/saintvision-share/ops-fresh-cpu-1efea-r1-20261107/workspace-api-96af-r2/'+n
+q=subprocess.run(['docker','exec','-i','--user','1000:1000',cid,'python','-I','-B','-'],input=p['program'].encode(),capture_output=True,timeout=20)
+o={'actualAPIContainerIdentityAndRestrictedMountsMatched':True,'containerID':cid,'execExit':q.returncode,'execStderrBytes':len(q.stderr),'result':json.loads(q.stdout) if q.stdout else None};print(json.dumps(o));raise SystemExit(0 if q.returncode==0 and not q.stderr else 2)
+'''
+(out/'inner-storage-program.py.txt').write_text(inner);(out/'remote-program.py.txt').write_text(outer);known=Path(r'D:\Project\SaintVisionI-Invion\fleet5-worker-readiness-20261105\.work\f5-low-closure-26607075f612\known_hosts.f5.pinned');assert hashlib.sha256(known.read_bytes()).hexdigest()=='0dcbf0f4cfc363e4affc30810ad8a9e57bd2c4a31991e2c8285bdae7052ec2d2'
+q=subprocess.run(['ssh','-T','-i',r'C:\Users\inviz\.ssh\sv-lan-ed25519','-o','IdentitiesOnly=yes','-o','BatchMode=yes','-o','ConnectTimeout=5','-o','StrictHostKeyChecking=yes','-o','UserKnownHostsFile='+str(known),'saintvision-invion3@192.168.45.222','python3','-I','-B','-c',shlex.quote(outer)],input=json.dumps({'program':inner}).encode(),capture_output=True,timeout=45)
+v={'atKST':datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=9))).isoformat(timespec='seconds'),'SSHExit':q.returncode,'stderrBytes':len(q.stderr),'remote':json.loads(q.stdout) if q.stdout else None};(out/'receipt.json').write_text(json.dumps(v,indent=2)+'\n');print(json.dumps(v));assert q.returncode==0 and not q.stderr

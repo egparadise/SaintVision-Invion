@@ -1,6 +1,6 @@
 {
   "schema": "fleet5-root-review-resource-sequence:1",
-  "atKST": "2026-11-08T01:28:24+09:00",
+  "atKST": "2026-11-08T02:08:30+09:00",
   "completedB": {
     "task": "task_d4c4c809ed4e",
     "review": "ac9182c3e3d606ec027c0be2e90e049ff50d54f1",
@@ -16,9 +16,10 @@
   "pending": [
     {
       "id": "CR-CSP-01",
-      "state": "READY_SOURCE_FIX",
-      "owner": "actual Orca Codex",
-      "next": "source-only AOT validator correction then actual independent Claude review"
+      "state": "SOURCE428E_VERIFIED_READY_ACTUAL_CLAUDE_REVIEW",
+      "source": "428e5fc6b822d33e7e76316f443716b03579efa0",
+      "owner": "actual Orca Claude reviewer after Root525 inputs published",
+      "authorExitedReleased": true
     }
   ],
   "authorParallelWork": "B frozen b51 awaiting actual delta verdict; H12 accepted6d7 plus read-only five-row audit delivered, Root owns first CPU journey preflight. Optional Low backlog is not a mandatory new scope.",
@@ -29,7 +30,7 @@
     "review": "0e53fc024ca773b7719182e170e5e126aeaf5b95",
     "verdict": "ACCEPT TEST-ONLY; R-L1 CLOSED; no new findings"
   },
-  "nextActualReviewTrigger": "Source correction for actual CR-CSP-01, not optional Low/review loop. Root preserves genuine approvals and all original gates.",
+  "nextActualReviewTrigger": "Root publishes immutable verified428e inputs then starts exactly one actual Claude. No optional review loop; CR-CSP-01 actual product boot defect stays open until actual review/deploy/browser proof.",
   "completedIntegration": {
     "task": "task_78064fb4b7ff",
     "dispatch": "ctx_ed7ec73163d6",
@@ -3235,5 +3236,15 @@
     "newDefectIndependentOfOriginalTestOnlyDelta": true,
     "nextOwner": "Actual Orca Codex source owner then actual Claude independent reviewer; Root owns all secrets/SSH/real operator/browser/APPLY",
     "wholeProgramComplete": false
+  },
+  "actualWorkspaceReadiness": {
+    "atKST": "2026-11-08T02:06:24+09:00",
+    "status": "ready",
+    "workspaceVersion": 2,
+    "nodeId": null,
+    "actualStorageProof": true,
+    "firstIntentsHTTP": 200,
+    "items": 0,
+    "actualRunOrVotesCreated": false
   }
 }

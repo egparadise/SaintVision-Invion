@@ -1,0 +1,12 @@
+{
+  "atKST": "2026-11-08T02:04:32+09:00",
+  "SSHExit": 2,
+  "stderrBytes": 0,
+  "remote": {
+    "actualAPIContainerIdentityAndRestrictedMountsMatched": true,
+    "containerID": "8d62139c2408dff910bbfb3a9b322be56520705a3f3e967ce74563cfe9cd3f28",
+    "execExit": 1,
+    "execStderrBytes": 116,
+    "result": null
+  }
+}

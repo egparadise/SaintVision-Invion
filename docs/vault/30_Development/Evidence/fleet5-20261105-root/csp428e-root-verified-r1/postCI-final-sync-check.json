@@ -1,0 +1,9 @@
+{
+  "command": "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe -B tools/sync_obsidian.py --check",
+  "exit": 0,
+  "atKST": "2026-11-08T01:55:26.020813+09:00",
+  "bytes": 522559,
+  "SHA256": "ef2014e871fd3a1a38a5a0df46cf84193d00e08cbbf8fb5a784660d266173b26",
+  "fullBytesEqual": true,
+  "apply": false
+}

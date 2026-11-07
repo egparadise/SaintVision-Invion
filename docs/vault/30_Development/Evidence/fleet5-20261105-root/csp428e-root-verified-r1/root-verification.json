@@ -1,0 +1,115 @@
+{
+  "atKST": "2026-11-08T01:59:35+09:00",
+  "source": "428e5fc6b822d33e7e76316f443716b03579efa0",
+  "base": "96afd799d49717fd40e4ddabd538d82accbe1958",
+  "branch": "agent/codex/fleet5-csp-static-validator-r1-20261108",
+  "descendantCommitCount": 2,
+  "sourcePaths": [
+    ".github/workflows/frontend.yml",
+    "apps/web/.gitignore",
+    "apps/web/eslint.config.js",
+    "apps/web/package.json",
+    "apps/web/scripts/node-certificate-validator.mjs",
+    "apps/web/src/contracts/node-certificate-validator.d.cts",
+    "apps/web/src/shared/api/nodeCertificateObservation.ts",
+    "apps/web/tests/node-certificate-validator-csp.test.ts",
+    "apps/web/vite.config.ts",
+    "tools/verify_portal_strict_csp_browser.py"
+  ],
+  "protectedTreesByteIdentical": {
+    "contracts": "b2b24a6d9baf24302f3590f4f30fe851ccb81ef1",
+    "packages": "7c445bdbc929f6597c0b39b598f9726032c67ad7",
+    "services": "5c9918adc48c76c88b5119f44516bb332924f067",
+    "migrations": "b1d35598829437c39dab7f60e9521bf8627e6832",
+    "src": "5507dfb820d54a8778c4cf5e3551368f11b6105f",
+    "tests": "f0c6e9f537989b71f57b2185fd43c6abbaf4369e",
+    "deploy": "5a98abd52d78c2dea952b257123bea2f01dffa64",
+    "apps/studio": "faf648da92d7f63e74e7e1d158deb923d42a6a8c",
+    "apps/web/package-lock.json": "7cd35bcec966ac001d6481f9712ff06546879222"
+  },
+  "semanticValidatorTailByteIdentical": true,
+  "officialFreshCI": [
+    {
+      "workflow": "frontend",
+      "runID": 42393304702,
+      "correlation": "fleet5-cr-csp01-static-validator-frontend-b7a7f258253f412387ab73c9ef9fb0da",
+      "exactHeadRefPathEventAttempt1": true,
+      "jobs": [
+        {
+          "id": 128465245115,
+          "name": "Portal Container Build & Hardened Runtime Smoke",
+          "steps": 14,
+          "allSuccess": true
+        },
+        {
+          "id": 128465245318,
+          "name": "frontend",
+          "steps": 17,
+          "allSuccess": true
+        }
+      ]
+    },
+    {
+      "workflow": "docs",
+      "runID": 42393307021,
+      "correlation": "fleet5-cr-csp01-static-validator-docs-335e1d3eaccf4985a56b2c0c5dc5d3f0",
+      "exactHeadRefPathEventAttempt1": true,
+      "jobs": [
+        {
+          "id": 128465251222,
+          "name": "docs",
+          "steps": 19,
+          "allSuccess": true
+        }
+      ]
+    }
+  ],
+  "officialArtifactBindings": [
+    {
+      "id": 13582985008,
+      "name": "saintvision-web-dist",
+      "bytes": 981384,
+      "SHA256": "sha256:6024b832257f345cb4fc14ed6f87afb122816f7fdc080804d4fcefa15bedce77",
+      "officialMetadataMatchedLocalBytes": true
+    },
+    {
+      "id": 13582124566,
+      "name": "saintvision-portal-strict-csp-evidence",
+      "bytes": 13506,
+      "SHA256": "sha256:43888ccad369a22ee36761e8bf9001f58af2a2bb9699510540ba86b62c89c0cb",
+      "officialMetadataMatchedLocalBytes": true
+    }
+  ],
+  "hostedBrowserActualBuiltDistBytesMatched": true,
+  "hostedAnonymousStrictCSPBootPassed": true,
+  "negativeEvalAndFunctionControlsBlocked": true,
+  "hostedBrowserVersion": "156.0.8078.79",
+  "knownMissingFavicon404Preserved": [
+    {
+      "url": "http://127.0.0.1:36857/favicon.svg",
+      "status": 404
+    }
+  ],
+  "sourceGeneratorSchemaLockAndGeneratedOutputHashesMatched": true,
+  "canonicalStateFullBytesMatch": true,
+  "canonicalStateBytes": 522559,
+  "canonicalStateSHA256": "ef2014e871fd3a1a38a5a0df46cf84193d00e08cbbf8fb5a784660d266173b26",
+  "authorLocalMetadataGates8Exit0": true,
+  "authorPostCISyncCheckExit0NoApply": true,
+  "authorReportsVitest1350Passed0Fail0Skip": true,
+  "mainProductExecution": false,
+  "actualPC3BrowserAcceptance": false,
+  "sourceIndependentReview": "PENDING_ACTUAL_CLAUDE",
+  "CR90501RemainsClosed": true,
+  "CR_CSP_01": "SOURCE_CANDIDATE_PENDING_REVIEW_AND_REAL_DEPLOYMENT",
+  "wholeProgramComplete": false,
+  "officialVitest1350PassedOf1350": true,
+  "officialVitest106PassedOf106Files": true,
+  "officialVitestJobLogHash": "4f8a5e2fd78a74cdbfa74a6c02648d3de883f02209c5f3d3caed96339a69d08a",
+  "authorLifecycle": {
+    "state": "succeeded",
+    "stage": "settled",
+    "liveness": "exited",
+    "terminalState": "released"
+  }
+}

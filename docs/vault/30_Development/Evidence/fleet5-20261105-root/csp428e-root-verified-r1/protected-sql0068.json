@@ -1,0 +1,6 @@
+{
+  "path": "services/control-plane/src/inv/migrations/0068_first_workspace_intent.sql",
+  "SHA256": "8b79f55289661d7590dbe24e60d60d319360e7fcaf35454fe21c722fe11905d3",
+  "baseBlob": "bc6de991fd6035d4f9e5d15bba2985ac6b940bc2",
+  "candidateBlob": "bc6de991fd6035d4f9e5d15bba2985ac6b940bc2"
+}

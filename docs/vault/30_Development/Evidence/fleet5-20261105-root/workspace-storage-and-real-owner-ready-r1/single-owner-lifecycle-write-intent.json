@@ -1,0 +1,15 @@
+{
+  "atKST": "2026-11-08T02:06:23+09:00",
+  "taskID": "FLEET5-CSP428E-REVIEW-AND-GENUINE-WORKSPACE-PREP-20261108",
+  "endpoint": "PUT /v1/workspaces/wsp_01M6NE3HM7T42B2M1FPK2V6GH0/status",
+  "idempotencyKey": "root525-workspace-storage-ready-20261108-r1",
+  "requestBody": {
+    "status": "ready"
+  },
+  "previousStatus": "provisioning",
+  "nodeId": null,
+  "genuineStorageProofAtKST": "2026-11-08T02:05:26+09:00",
+  "actualRole": "owner",
+  "singleWritePlanned": true,
+  "passwordOrTokensPersisted": false
+}

@@ -1,0 +1,52 @@
+{
+  "atKST": "2026-11-08T02:06:24+09:00",
+  "status": "REAL_OWNER_WORKSPACE_READY_AFTER_ACTUAL_PRIVATE_STORAGE_PROOF",
+  "source": "96afd799d49717fd40e4ddabd538d82accbe1958",
+  "PKCES256": true,
+  "tokenExchangeHTTP": 200,
+  "actualOwnerPermissionHTTP": 200,
+  "workspaceId": "wsp_01M6NE3HM7T42B2M1FPK2V6GH0",
+  "projectId": "prj_01M6NDBHVD2DZQ1Q38DCKN1XE3",
+  "beforeStatus": "provisioning",
+  "afterStatus": "ready",
+  "PUTStatusHTTP": 200,
+  "statusResponse": {
+    "workspaceId": "wsp_01M6NE3HM7T42B2M1FPK2V6GH0",
+    "status": "ready",
+    "allowedNext": [
+      "deleting",
+      "suspended"
+    ]
+  },
+  "idempotencyKey": "root525-workspace-storage-ready-20261108-r1",
+  "singleLifecycleWriteAcknowledged": true,
+  "logicalNodeIdRemainsNull": true,
+  "firstIntentsHTTP": 200,
+  "workspaceVersion": 2,
+  "firstIntentCount": 0,
+  "CPUProfile": {
+    "nodeId": "nod_01M6TAWG25JTA3F7J7S1EE4N2W",
+    "profileVersion": "cpu-pilot-1efea-r1",
+    "images": [
+      "sha256:ffee58e8dbefc6c0db68810cd1597f8cc589cf01112c434ed7fda8d4af415634"
+    ],
+    "executables": [
+      "/usr/local/bin/python3"
+    ],
+    "maxCpuMillis": 500,
+    "minMemoryBytes": 8388608,
+    "maxMemoryBytes": 67108864,
+    "maxTimeoutSeconds": 30,
+    "terminalAllowed": false
+  },
+  "observedAt": "2026-11-07T17:06:25.228981+00:00",
+  "genuinePrivateStorageProofAtKST": "2026-11-08T02:05:26+09:00",
+  "actualCurrentObservedNodeCount": 3,
+  "passwordOrTokensPersisted": false,
+  "nodePlacementChanged": false,
+  "kernelGrantsChanged": false,
+  "actualRunOrVotesCreated": false,
+  "allStorageOrFivePCComplete": false,
+  "portalRouteChanged": false,
+  "wholeProgramComplete": false
+}

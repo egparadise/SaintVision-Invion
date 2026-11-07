@@ -1,0 +1,1096 @@
+{
+  "task": "CR-CSP-01",
+  "owner": "Codex",
+  "atKST": "2026-11-08T01:53:56.377490+09:00",
+  "sourceSHA": "428e5fc6b822d33e7e76316f443716b03579efa0",
+  "branch": "agent/codex/fleet5-csp-static-validator-r1-20261108",
+  "deliveryBase": "96afd799d49717fd40e4ddabd538d82accbe1958",
+  "backendSource": "96afd799d49717fd40e4ddabd538d82accbe1958",
+  "remoteMatches": true,
+  "trackedClean": true,
+  "freshWorkflows": [
+    {
+      "workflow": "frontend",
+      "runID": 42393304702,
+      "sourceSHA": "428e5fc6b822d33e7e76316f443716b03579efa0",
+      "ref": "agent/codex/fleet5-csp-static-validator-r1-20261108",
+      "correlation": "fleet5-cr-csp01-static-validator-frontend-b7a7f258253f412387ab73c9ef9fb0da",
+      "event": "workflow_dispatch",
+      "attempt": 1,
+      "conclusion": "success",
+      "url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/42393304702",
+      "jobs": [
+        {
+          "id": 128465245115,
+          "name": "Portal Container Build & Hardened Runtime Smoke",
+          "conclusion": "success",
+          "steps": [
+            {
+              "name": "Set up job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 1,
+              "started_at": "2026-11-07T16:50:32Z",
+              "completed_at": "2026-11-07T16:50:33Z"
+            },
+            {
+              "name": "Run actions/checkout@v4",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 2,
+              "started_at": "2026-11-07T16:50:33Z",
+              "completed_at": "2026-11-07T16:50:39Z"
+            },
+            {
+              "name": "Build Portal Docker Image with BuildKit",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 3,
+              "started_at": "2026-11-07T16:50:39Z",
+              "completed_at": "2026-11-07T16:51:34Z"
+            },
+            {
+              "name": "Verify Lane-Internal Built Image Identity (Self-Derived)",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 4,
+              "started_at": "2026-11-07T16:51:34Z",
+              "completed_at": "2026-11-07T16:51:34Z"
+            },
+            {
+              "name": "Produce Portal Release Tarball and Strict Release Evidence (Codex r6 Block 1)",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 5,
+              "started_at": "2026-11-07T16:51:34Z",
+              "completed_at": "2026-11-07T16:51:35Z"
+            },
+            {
+              "name": "Upload Portal Release Artifacts (Tarball & Evidence JSON)",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 6,
+              "started_at": "2026-11-07T16:51:35Z",
+              "completed_at": "2026-11-07T16:51:37Z"
+            },
+            {
+              "name": "Verify Portal Load Release Script (--verify-only)",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 7,
+              "started_at": "2026-11-07T16:51:37Z",
+              "completed_at": "2026-11-07T16:51:38Z"
+            },
+            {
+              "name": "Setup Mock Upstream HTTPS Server and Test PKI",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 8,
+              "started_at": "2026-11-07T16:51:38Z",
+              "completed_at": "2026-11-07T16:51:39Z"
+            },
+            {
+              "name": "Launch Portal Container via portal-up.sh",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 9,
+              "started_at": "2026-11-07T16:51:39Z",
+              "completed_at": "2026-11-07T16:51:42Z"
+            },
+            {
+              "name": "Execute Hardened Runtime Verification via curl",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 10,
+              "started_at": "2026-11-07T16:51:42Z",
+              "completed_at": "2026-11-07T16:51:45Z"
+            },
+            {
+              "name": "Verify Automatic Rollback on Production Swap Failure (R6-H1 & R6-H2)",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 11,
+              "started_at": "2026-11-07T16:51:45Z",
+              "completed_at": "2026-11-07T16:51:48Z"
+            },
+            {
+              "name": "Teardown Portal Container via portal-down.sh",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 12,
+              "started_at": "2026-11-07T16:51:48Z",
+              "completed_at": "2026-11-07T16:51:48Z"
+            },
+            {
+              "name": "Post Run actions/checkout@v4",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 24,
+              "started_at": "2026-11-07T16:51:48Z",
+              "completed_at": "2026-11-07T16:51:49Z"
+            },
+            {
+              "name": "Complete job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 25,
+              "started_at": "2026-11-07T16:51:49Z",
+              "completed_at": "2026-11-07T16:51:49Z"
+            }
+          ]
+        },
+        {
+          "id": 128465245318,
+          "name": "frontend",
+          "conclusion": "success",
+          "steps": [
+            {
+              "name": "Set up job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 1,
+              "started_at": "2026-11-07T16:50:32Z",
+              "completed_at": "2026-11-07T16:50:33Z"
+            },
+            {
+              "name": "Run actions/checkout@v4",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 2,
+              "started_at": "2026-11-07T16:50:33Z",
+              "completed_at": "2026-11-07T16:50:39Z"
+            },
+            {
+              "name": "Run actions/setup-node@v4",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 3,
+              "started_at": "2026-11-07T16:50:39Z",
+              "completed_at": "2026-11-07T16:50:39Z"
+            },
+            {
+              "name": "Install dependencies",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 4,
+              "started_at": "2026-11-07T16:50:39Z",
+              "completed_at": "2026-11-07T16:51:20Z"
+            },
+            {
+              "name": "Run ESLint",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 5,
+              "started_at": "2026-11-07T16:51:20Z",
+              "completed_at": "2026-11-07T16:51:27Z"
+            },
+            {
+              "name": "Run Vitest Unit Tests",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 6,
+              "started_at": "2026-11-07T16:51:27Z",
+              "completed_at": "2026-11-07T16:52:13Z"
+            },
+            {
+              "name": "Check generated discovery contract type",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 7,
+              "started_at": "2026-11-07T16:52:13Z",
+              "completed_at": "2026-11-07T16:52:14Z"
+            },
+            {
+              "name": "TypeScript Check & Production Build",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 8,
+              "started_at": "2026-11-07T16:52:14Z",
+              "completed_at": "2026-11-07T16:52:27Z"
+            },
+            {
+              "name": "Run actions/setup-python@v5",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 9,
+              "started_at": "2026-11-07T16:52:27Z",
+              "completed_at": "2026-11-07T16:52:27Z"
+            },
+            {
+              "name": "Install pinned hosted browser regression harness",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 10,
+              "started_at": "2026-11-07T16:52:27Z",
+              "completed_at": "2026-11-07T16:52:32Z"
+            },
+            {
+              "name": "Boot actual built frontend under canonical strict CSP",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 11,
+              "started_at": "2026-11-07T16:52:32Z",
+              "completed_at": "2026-11-07T16:52:42Z"
+            },
+            {
+              "name": "Upload strict CSP browser and standalone generation evidence",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 12,
+              "started_at": "2026-11-07T16:52:42Z",
+              "completed_at": "2026-11-07T16:52:43Z"
+            },
+            {
+              "name": "Upload Web Build Artifact",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 13,
+              "started_at": "2026-11-07T16:52:43Z",
+              "completed_at": "2026-11-07T16:52:43Z"
+            },
+            {
+              "name": "Post Run actions/setup-python@v5",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 24,
+              "started_at": "2026-11-07T16:52:43Z",
+              "completed_at": "2026-11-07T16:52:44Z"
+            },
+            {
+              "name": "Post Run actions/setup-node@v4",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 25,
+              "started_at": "2026-11-07T16:52:44Z",
+              "completed_at": "2026-11-07T16:52:45Z"
+            },
+            {
+              "name": "Post Run actions/checkout@v4",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 26,
+              "started_at": "2026-11-07T16:52:45Z",
+              "completed_at": "2026-11-07T16:52:45Z"
+            },
+            {
+              "name": "Complete job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 27,
+              "started_at": "2026-11-07T16:52:45Z",
+              "completed_at": "2026-11-07T16:52:45Z"
+            }
+          ]
+        }
+      ],
+      "artifacts": [
+        {
+          "id": 13582985008,
+          "node_id": "MDg6QXJ0aWZhY3QxMzU4Mjk4NTAwOA==",
+          "name": "saintvision-web-dist",
+          "size_in_bytes": 981384,
+          "url": "https://api.github.com/repos/egparadise/SaintVision-Invion/actions/artifacts/13582985008",
+          "archive_download_url": "https://api.github.com/repos/egparadise/SaintVision-Invion/actions/artifacts/13582985008/zip",
+          "expired": false,
+          "digest": "sha256:6024b832257f345cb4fc14ed6f87afb122816f7fdc080804d4fcefa15bedce77",
+          "created_at": "2026-11-07T16:52:43Z",
+          "updated_at": "2026-11-07T16:52:43Z",
+          "expires_at": "2026-11-21T16:52:43Z",
+          "workflow_run": {
+            "id": 42393304702,
+            "repository_id": 1362259805,
+            "head_repository_id": 1362259805,
+            "head_branch": "agent/codex/fleet5-csp-static-validator-r1-20261108",
+            "head_sha": "428e5fc6b822d33e7e76316f443716b03579efa0"
+          },
+          "downloadedZIPVerifiedSHA256": "6024b832257f345cb4fc14ed6f87afb122816f7fdc080804d4fcefa15bedce77"
+        },
+        {
+          "id": 13582199194,
+          "node_id": "MDg6QXJ0aWZhY3QxMzU4MjE5OTE5NA==",
+          "name": "saintvision-portal-release",
+          "size_in_bytes": 25708725,
+          "url": "https://api.github.com/repos/egparadise/SaintVision-Invion/actions/artifacts/13582199194",
+          "archive_download_url": "https://api.github.com/repos/egparadise/SaintVision-Invion/actions/artifacts/13582199194/zip",
+          "expired": false,
+          "digest": "sha256:b058908a973912c90a4e1964be445e7a00203a92640ee0a505725f79bbae13aa",
+          "created_at": "2026-11-07T16:51:37Z",
+          "updated_at": "2026-11-07T16:51:37Z",
+          "expires_at": "2026-11-21T16:51:35Z",
+          "workflow_run": {
+            "id": 42393304702,
+            "repository_id": 1362259805,
+            "head_repository_id": 1362259805,
+            "head_branch": "agent/codex/fleet5-csp-static-validator-r1-20261108",
+            "head_sha": "428e5fc6b822d33e7e76316f443716b03579efa0"
+          }
+        },
+        {
+          "id": 13582124566,
+          "node_id": "MDg6QXJ0aWZhY3QxMzU4MjEyNDU2Ng==",
+          "name": "saintvision-portal-strict-csp-evidence",
+          "size_in_bytes": 13506,
+          "url": "https://api.github.com/repos/egparadise/SaintVision-Invion/actions/artifacts/13582124566",
+          "archive_download_url": "https://api.github.com/repos/egparadise/SaintVision-Invion/actions/artifacts/13582124566/zip",
+          "expired": false,
+          "digest": "sha256:43888ccad369a22ee36761e8bf9001f58af2a2bb9699510540ba86b62c89c0cb",
+          "created_at": "2026-11-07T16:52:42Z",
+          "updated_at": "2026-11-07T16:52:42Z",
+          "expires_at": "2026-11-21T16:52:42Z",
+          "workflow_run": {
+            "id": 42393304702,
+            "repository_id": 1362259805,
+            "head_repository_id": 1362259805,
+            "head_branch": "agent/codex/fleet5-csp-static-validator-r1-20261108",
+            "head_sha": "428e5fc6b822d33e7e76316f443716b03579efa0"
+          },
+          "downloadedZIPVerifiedSHA256": "43888ccad369a22ee36761e8bf9001f58af2a2bb9699510540ba86b62c89c0cb"
+        }
+      ],
+      "hardenedRuntimeSmokeExecuted": true,
+      "imageIdentityConsole": [
+        "2026-11-07T16:51:34.7576086Z echo \"Built Image ID (lane-internal execution consistency check): $IMAGE_ID\"",
+        "2026-11-07T16:51:34.8108292Z Built Image ID (lane-internal execution consistency check): sha256:b89b8d970a90248e0aca2210e83b9fbc43907f346dee2d60141d1286f18cc9ff",
+        "2026-11-07T16:51:34.8183146Z     \"codeSha\": \"$COMMIT_SHA\",",
+        "2026-11-07T16:51:34.8183366Z     \"imageId\": \"$IMAGE_ID\",",
+        "2026-11-07T16:51:34.8183584Z     \"tarSha256\": \"$TAR_SHA256\",",
+        "2026-11-07T16:51:34.8183815Z     \"buildRunId\": str(\"$RUN_ID\"),",
+        "2026-11-07T16:51:35.3300051Z   \"codeSha\": \"428e5fc6b822d33e7e76316f443716b03579efa0\",",
+        "2026-11-07T16:51:35.3300553Z   \"imageId\": \"sha256:b89b8d970a90248e0aca2210e83b9fbc43907f346dee2d60141d1286f18cc9ff\",",
+        "2026-11-07T16:51:35.3301024Z   \"tarSha256\": \"9d42ef6d1a386ec2f3463391145db8e1cc20d50adf9c3c8b9eb2f9d397ffa8ee\",",
+        "2026-11-07T16:51:35.3301361Z   \"buildRunId\": \"42393304702\","
+      ],
+      "portalRelease": {
+        "codeSha": "428e5fc6b822d33e7e76316f443716b03579efa0",
+        "imageId": "sha256:b89b8d970a90248e0aca2210e83b9fbc43907f346dee2d60141d1286f18cc9ff",
+        "tarSha256": "9d42ef6d1a386ec2f3463391145db8e1cc20d50adf9c3c8b9eb2f9d397ffa8ee",
+        "buildRunId": "42393304702"
+      },
+      "vitest": {
+        "filesPassed": 106,
+        "passed": 1350,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "deselected": 0,
+        "rawSummaryLines": [
+          "2026-11-07T16:52:13.5996352Z  Test Files  106 passed (106)",
+          "2026-11-07T16:52:13.6005234Z       Tests  1350 passed (1350)"
+        ],
+        "source": "official job console summary; all collected tests passed"
+      },
+      "distFilesSHA256": {
+        "assets/icons-DVYUNEhE.js": "94f3f917fa843a4e312937688a83f400ea3d5617d1f1e1f36d6bc643f78ffa9e",
+        "assets/index-k9rLh9jc.js": "d78823c1079f8660c7f063d22ce6072a7363ce6fb6c4409b62f24e6a6c91d75d",
+        "assets/icons-DVYUNEhE.js.map": "bdc634b37b1574e46b91990a227c6ecf862e6364ec9219a524c88741ee294ea3",
+        "assets/index-k9rLh9jc.js.map": "608c540320e7eb096ca429f2581c95c3d96550d82728a01b05512ead6369aa0a",
+        "assets/index-kKrfL4r3.css": "66d8552241923e10b189e3b9372f85205bccbf083a5dc19872d001fd91ad0d26",
+        "assets/query-DtERyQJL.js": "3a24ebe459ff24b83ef333288347529de609b65f1c25d5c5b74f2f8b20e2904d",
+        "assets/query-DtERyQJL.js.map": "d584967ed9a938c701324896050b1db23187d2a79840fe5fac55791a2eafc500",
+        "assets/vendor-CYSfZuHu.js": "d967cddbe86b7822415ceafb696d97dea5a491621955cb4127e0f3f96e5497eb",
+        "assets/vendor-CYSfZuHu.js.map": "037070c1858eff839f466f2431a724493a80f81c8f47484c4c6c21698885d15e",
+        "auth-config.js": "5b9a14cc56ea56e4ae58359adbc17de4a1ee2d9ca3da04973fb4f144f42a60e1",
+        "index.html": "52c980df3861134647ec3a5d6678d71211c50cd1f8db652c624e11a1b273e0bb",
+        "manifest.json": "d4c3c0897d7be95321a37babc97bd922618cf8142dd9103faef1efe700fd343a",
+        "sw.js": "5befc07c048a6a49d7f7ec492fe1c04ae8b40283dcc8387ef4e6b2b92c516dcd"
+      },
+      "strictCSPBrowser": {
+        "fixtureOnly": true,
+        "actualPC3BrowserAcceptance": false,
+        "anonymousOnly": true,
+        "sandbox": true,
+        "csp": "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self' data:; connect-src 'self' https://idp.sv.lan; frame-ancestors 'none'; object-src 'none'; base-uri 'self'; form-action 'self';",
+        "securityHeadersSHA256": "1365881a4f7a50e65c41d4083735fc547d8e6103439abe3759227b37a87bc731",
+        "distSHA256": {
+          "assets/icons-DVYUNEhE.js": "94f3f917fa843a4e312937688a83f400ea3d5617d1f1e1f36d6bc643f78ffa9e",
+          "assets/icons-DVYUNEhE.js.map": "bdc634b37b1574e46b91990a227c6ecf862e6364ec9219a524c88741ee294ea3",
+          "assets/index-k9rLh9jc.js": "d78823c1079f8660c7f063d22ce6072a7363ce6fb6c4409b62f24e6a6c91d75d",
+          "assets/index-k9rLh9jc.js.map": "608c540320e7eb096ca429f2581c95c3d96550d82728a01b05512ead6369aa0a",
+          "assets/index-kKrfL4r3.css": "66d8552241923e10b189e3b9372f85205bccbf083a5dc19872d001fd91ad0d26",
+          "assets/query-DtERyQJL.js": "3a24ebe459ff24b83ef333288347529de609b65f1c25d5c5b74f2f8b20e2904d",
+          "assets/query-DtERyQJL.js.map": "d584967ed9a938c701324896050b1db23187d2a79840fe5fac55791a2eafc500",
+          "assets/vendor-CYSfZuHu.js": "d967cddbe86b7822415ceafb696d97dea5a491621955cb4127e0f3f96e5497eb",
+          "assets/vendor-CYSfZuHu.js.map": "037070c1858eff839f466f2431a724493a80f81c8f47484c4c6c21698885d15e",
+          "auth-config.js": "5b9a14cc56ea56e4ae58359adbc17de4a1ee2d9ca3da04973fb4f144f42a60e1",
+          "index.html": "52c980df3861134647ec3a5d6678d71211c50cd1f8db652c624e11a1b273e0bb",
+          "manifest.json": "d4c3c0897d7be95321a37babc97bd922618cf8142dd9103faef1efe700fd343a",
+          "sw.js": "5befc07c048a6a49d7f7ec492fe1c04ae8b40283dcc8387ef4e6b2b92c516dcd"
+        },
+        "bundledAjvCompilerModules": [],
+        "browserVersion": "156.0.8078.79",
+        "negativeControl": {
+          "functionBlocked": true,
+          "evalBlocked": true
+        },
+        "rootChildren": 1,
+        "knownBase96MissingFavicon": [
+          {
+            "url": "http://127.0.0.1:36857/favicon.svg",
+            "status": 404
+          }
+        ],
+        "bootPassed": true,
+        "pageErrors": [],
+        "requestFailures": [],
+        "responses": [
+          {
+            "url": "http://127.0.0.1:36857/",
+            "status": 200
+          },
+          {
+            "url": "http://127.0.0.1:36857/assets/index-kKrfL4r3.css",
+            "status": 200
+          },
+          {
+            "url": "http://127.0.0.1:36857/assets/vendor-CYSfZuHu.js",
+            "status": 200
+          },
+          {
+            "url": "http://127.0.0.1:36857/auth-config.js",
+            "status": 200
+          },
+          {
+            "url": "http://127.0.0.1:36857/assets/query-DtERyQJL.js",
+            "status": 200
+          },
+          {
+            "url": "http://127.0.0.1:36857/assets/index-k9rLh9jc.js",
+            "status": 200
+          },
+          {
+            "url": "http://127.0.0.1:36857/favicon.svg",
+            "status": 404
+          }
+        ],
+        "requestMethods": [
+          "GET",
+          "GET",
+          "GET",
+          "GET",
+          "GET",
+          "GET",
+          "GET"
+        ],
+        "cspErrors": []
+      },
+      "standaloneValidatorManifest": {
+        "schema": "contracts/v1alpha1/core.schema.json",
+        "ref": "https://saintvision.ai/contracts/v1alpha1/core.schema.json#/$defs/ProjectNodeCertificateObservationResponse",
+        "schemaSHA256": "f8bb8fa801f64d622ebcdc1c4c3383833632ccfb05a740493e3a5cb86e44404f",
+        "generatorSHA256": "5958abf2b43c3dad42b69774bd78ed571244668a9eb2e953f8c47079366f1022",
+        "lockSHA256": "1fa82239ec4bb731ef649acfeac84ac4a1dfb2fa5801824502adf053e8892fbd",
+        "ajv": "8.20.0",
+        "ajvFormats": "3.0.1",
+        "validatorSHA256": "7d9b4d1236432261f60d07f52dfc7a1a1d4ae1be6bdf6595b5a57fc1dce7e61f"
+      }
+    },
+    {
+      "workflow": "docs",
+      "runID": 42393307021,
+      "sourceSHA": "428e5fc6b822d33e7e76316f443716b03579efa0",
+      "ref": "agent/codex/fleet5-csp-static-validator-r1-20261108",
+      "correlation": "fleet5-cr-csp01-static-validator-docs-335e1d3eaccf4985a56b2c0c5dc5d3f0",
+      "event": "workflow_dispatch",
+      "attempt": 1,
+      "conclusion": "success",
+      "url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/42393307021",
+      "jobs": [
+        {
+          "id": 128465251222,
+          "name": "docs",
+          "conclusion": "success",
+          "steps": [
+            {
+              "name": "Set up job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 1,
+              "started_at": "2026-11-07T16:50:33Z",
+              "completed_at": "2026-11-07T16:50:34Z"
+            },
+            {
+              "name": "Run actions/checkout@v4",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 2,
+              "started_at": "2026-11-07T16:50:34Z",
+              "completed_at": "2026-11-07T16:50:37Z"
+            },
+            {
+              "name": "Run actions/setup-python@v5",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 3,
+              "started_at": "2026-11-07T16:50:37Z",
+              "completed_at": "2026-11-07T16:50:39Z"
+            },
+            {
+              "name": "Run python -m pip install -r requirements-docs.txt",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 4,
+              "started_at": "2026-11-07T16:50:39Z",
+              "completed_at": "2026-11-07T16:50:41Z"
+            },
+            {
+              "name": "Run python tools/check_docs.py",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 5,
+              "started_at": "2026-11-07T16:50:41Z",
+              "completed_at": "2026-11-07T16:50:42Z"
+            },
+            {
+              "name": "Repository path citations exist (ratchet; baseline may only shrink)",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 6,
+              "started_at": "2026-11-07T16:50:42Z",
+              "completed_at": "2026-11-07T16:50:42Z"
+            },
+            {
+              "name": "Run python tools/check_contract_bindings.py",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 7,
+              "started_at": "2026-11-07T16:50:42Z",
+              "completed_at": "2026-11-07T16:50:46Z"
+            },
+            {
+              "name": "Run python tools/check_frontend_integrity.py",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 8,
+              "started_at": "2026-11-07T16:50:46Z",
+              "completed_at": "2026-11-07T16:50:47Z"
+            },
+            {
+              "name": "Report fixture producer reachability",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 9,
+              "started_at": "2026-11-07T16:50:47Z",
+              "completed_at": "2026-11-07T16:50:47Z"
+            },
+            {
+              "name": "Report client route coverage (report-only; promote per \uac80\uc99d\uac80\uc0ac\ub3c4\uad6c_\ubaa9\ub85d)",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 10,
+              "started_at": "2026-11-07T16:50:47Z",
+              "completed_at": "2026-11-07T16:50:47Z"
+            },
+            {
+              "name": "Run actions/upload-artifact@v4",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 11,
+              "started_at": "2026-11-07T16:50:47Z",
+              "completed_at": "2026-11-07T16:50:48Z"
+            },
+            {
+              "name": "Run python tools/test_sync.py",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 12,
+              "started_at": "2026-11-07T16:50:48Z",
+              "completed_at": "2026-11-07T16:50:49Z"
+            },
+            {
+              "name": "Run python tools/check_ontology_generation.py",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 13,
+              "started_at": "2026-11-07T16:50:49Z",
+              "completed_at": "2026-11-07T16:50:49Z"
+            },
+            {
+              "name": "Run python tools/check_ontology.py",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 14,
+              "started_at": "2026-11-07T16:50:49Z",
+              "completed_at": "2026-11-07T16:50:50Z"
+            },
+            {
+              "name": "Build documentation bundle",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 15,
+              "started_at": "2026-11-07T16:50:50Z",
+              "completed_at": "2026-11-07T16:50:52Z"
+            },
+            {
+              "name": "Run actions/upload-artifact@v4",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 16,
+              "started_at": "2026-11-07T16:50:52Z",
+              "completed_at": "2026-11-07T16:50:54Z"
+            },
+            {
+              "name": "Post Run actions/setup-python@v5",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 31,
+              "started_at": "2026-11-07T16:50:54Z",
+              "completed_at": "2026-11-07T16:50:54Z"
+            },
+            {
+              "name": "Post Run actions/checkout@v4",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 32,
+              "started_at": "2026-11-07T16:50:54Z",
+              "completed_at": "2026-11-07T16:50:54Z"
+            },
+            {
+              "name": "Complete job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 33,
+              "started_at": "2026-11-07T16:50:54Z",
+              "completed_at": "2026-11-07T16:50:54Z"
+            }
+          ]
+        }
+      ],
+      "artifacts": [
+        {
+          "id": 13582407311,
+          "node_id": "MDg6QXJ0aWZhY3QxMzU4MjQwNzMxMQ==",
+          "name": "saintvision-guidelines",
+          "size_in_bytes": 47787412,
+          "url": "https://api.github.com/repos/egparadise/SaintVision-Invion/actions/artifacts/13582407311",
+          "archive_download_url": "https://api.github.com/repos/egparadise/SaintVision-Invion/actions/artifacts/13582407311/zip",
+          "expired": false,
+          "digest": "sha256:a128aed87ced514034ecd1a6139daa6ddcee2a0aad33ecb854e2e9078e2e0db3",
+          "created_at": "2026-11-07T16:50:54Z",
+          "updated_at": "2026-11-07T16:50:54Z",
+          "expires_at": "2026-12-07T16:50:52Z",
+          "workflow_run": {
+            "id": 42393307021,
+            "repository_id": 1362259805,
+            "head_repository_id": 1362259805,
+            "head_branch": "agent/codex/fleet5-csp-static-validator-r1-20261108",
+            "head_sha": "428e5fc6b822d33e7e76316f443716b03579efa0"
+          }
+        },
+        {
+          "id": 13582382576,
+          "node_id": "MDg6QXJ0aWZhY3QxMzU4MjM4MjU3Ng==",
+          "name": "route-coverage-report",
+          "size_in_bytes": 1915,
+          "url": "https://api.github.com/repos/egparadise/SaintVision-Invion/actions/artifacts/13582382576",
+          "archive_download_url": "https://api.github.com/repos/egparadise/SaintVision-Invion/actions/artifacts/13582382576/zip",
+          "expired": false,
+          "digest": "sha256:a74d6383c25edf5cbf27f4f2c38e9bc1fcc8a001391904336850d9329264c3b1",
+          "created_at": "2026-11-07T16:50:48Z",
+          "updated_at": "2026-11-07T16:50:48Z",
+          "expires_at": "2026-12-07T16:50:47Z",
+          "workflow_run": {
+            "id": 42393307021,
+            "repository_id": 1362259805,
+            "head_repository_id": 1362259805,
+            "head_branch": "agent/codex/fleet5-csp-static-validator-r1-20261108",
+            "head_sha": "428e5fc6b822d33e7e76316f443716b03579efa0"
+          },
+          "downloadedZIPVerifiedSHA256": "a74d6383c25edf5cbf27f4f2c38e9bc1fcc8a001391904336850d9329264c3b1"
+        }
+      ]
+    }
+  ],
+  "changedPaths": [
+    ".github/workflows/frontend.yml",
+    "apps/web/.gitignore",
+    "apps/web/eslint.config.js",
+    "apps/web/package.json",
+    "apps/web/scripts/node-certificate-validator.mjs",
+    "apps/web/src/contracts/node-certificate-validator.d.cts",
+    "apps/web/src/shared/api/nodeCertificateObservation.ts",
+    "apps/web/tests/node-certificate-validator-csp.test.ts",
+    "apps/web/vite.config.ts",
+    "docs/vault/30_Development/Agent\ubcc4 \uc791\uc5c5/Codex \uc791\uc5c5 \ud604\ud669.md",
+    "docs/vault/30_Development/Evidence/fleet5-csp-static-validator-r1-20261108-codex/README.md",
+    "docs/vault/30_Development/Evidence/fleet5-csp-static-validator-r1-20261108-codex/actual-strict-csp-eval-diagnostic.json",
+    "docs/vault/30_Development/Evidence/fleet5-csp-static-validator-r1-20261108-codex/ci-receipts.py",
+    "docs/vault/30_Development/Evidence/fleet5-csp-static-validator-r1-20261108-codex/context.json",
+    "docs/vault/30_Development/Evidence/fleet5-csp-static-validator-r1-20261108-codex/first-ci-failure.json",
+    "docs/vault/30_Development/Evidence/fleet5-csp-static-validator-r1-20261108-codex/local-gates-initial-broken-links.json",
+    "docs/vault/30_Development/Evidence/fleet5-csp-static-validator-r1-20261108-codex/local-gates.json",
+    "docs/vault/30_Development/Evidence/fleet5-csp-static-validator-r1-20261108-codex/local-gates.py",
+    "docs/vault/30_Development/Evidence/fleet5-csp-static-validator-r1-20261108-codex/mandatory-finding.json",
+    "docs/vault/30_Development/Evidence/fleet5-csp-static-validator-r1-20261108-codex/protected-components.json",
+    "docs/vault/30_Development/Evidence/fleet5-csp-static-validator-r1-20261108-codex/protected-sql0068.json",
+    "docs/vault/30_Development/Evidence/fleet5-csp-static-validator-r1-20261108-codex/read-pins.json",
+    "docs/vault/30_Development/Evidence/fleet5-csp-static-validator-r1-20261108-codex/root524-public-proof.json",
+    "docs/vault/30_Development/Evidence/fleet5-csp-static-validator-r1-20261108-codex/sync-state-after.json",
+    "docs/vault/30_Development/Evidence/fleet5-csp-static-validator-r1-20261108-codex/sync-state-before.json",
+    "docs/vault/30_Development/Evidence/fleet5-csp-static-validator-r1-20261108-codex/sync-state-comparison.json",
+    "docs/vault/30_Development/History/2026-11-08_FLEET5_CR-CSP-01_static_validator_Codex.md",
+    "tools/verify_portal_strict_csp_browser.py"
+  ],
+  "patchSHA256": "33b3cd544c8bde855b0c609960f8a6a0b3871b169b808c6efdb98c2871160bca",
+  "protectedRecursiveListingSHA256": "99894e84be79d78c01bffac822c2d4b519953f1bb6a00dbdd641958e0eedee8b",
+  "protectedComponents": {
+    "contracts": {
+      "baseObject": "b2b24a6d9baf24302f3590f4f30fe851ccb81ef1",
+      "workingDiffBytes": 0,
+      "unchanged": true
+    },
+    "packages/contracts-ts": {
+      "baseObject": "64ea838d246aa6295035816f441a092680a55f3a",
+      "workingDiffBytes": 0,
+      "unchanged": true
+    },
+    "services": {
+      "baseObject": "5c9918adc48c76c88b5119f44516bb332924f067",
+      "workingDiffBytes": 0,
+      "unchanged": true
+    },
+    "migrations": {
+      "baseObject": "b1d35598829437c39dab7f60e9521bf8627e6832",
+      "workingDiffBytes": 0,
+      "unchanged": true
+    },
+    "deploy/intranet/portal": {
+      "baseObject": "1bda2b73f42a9912d8d4dd5f455d0ef13eed4a0c",
+      "workingDiffBytes": 0,
+      "unchanged": true
+    },
+    "tests/integration/test_workspace_first_intents.py": {
+      "baseObject": "53f0832a334a706e6508938f0432d790cb388aa4",
+      "workingDiffBytes": 0,
+      "unchanged": true
+    },
+    "apps/web/package-lock.json": {
+      "baseObject": "7cd35bcec966ac001d6481f9712ff06546879222",
+      "workingDiffBytes": 0,
+      "unchanged": true
+    },
+    "src": {
+      "baseObject": "5507dfb820d54a8778c4cf5e3551368f11b6105f",
+      "workingDiffBytes": 0,
+      "unchanged": true,
+      "recursiveObjectListingSHA256": "86e19681bfb3d04ef77e02874a25576425da70cfb3ae1c4e75467291bf3383ed"
+    },
+    "apps/studio": {
+      "baseObject": "faf648da92d7f63e74e7e1d158deb923d42a6a8c",
+      "workingDiffBytes": 0,
+      "unchanged": true,
+      "recursiveObjectListingSHA256": "4cf789dd7e5e8b6cdc327d831b748bccdbbc2c856f83a9fa3ff6150451d39ada"
+    },
+    "packages": {
+      "baseObject": "7c445bdbc929f6597c0b39b598f9726032c67ad7",
+      "workingDiffBytes": 0,
+      "unchanged": true,
+      "recursiveObjectListingSHA256": "41dcd7faf0419b692e3993ae8ae6e91f8035e66b49a64353399ad5bb5e768547"
+    },
+    "tests": {
+      "baseObject": "f0c6e9f537989b71f57b2185fd43c6abbaf4369e",
+      "workingDiffBytes": 0,
+      "unchanged": true,
+      "recursiveObjectListingSHA256": "a5ec579a238bb16c5e8ecdd0f55b677e16aacdb46afbc28a8c1c5196401e6210"
+    },
+    "deploy": {
+      "baseObject": "5a98abd52d78c2dea952b257123bea2f01dffa64",
+      "workingDiffBytes": 0,
+      "unchanged": true,
+      "recursiveObjectListingSHA256": "1215e22b181c1990163a18d09195cc988d3321d73d167189301fa9127e6d0e7f"
+    }
+  },
+  "SQL0068SHA256": "8b79f55289661d7590dbe24e60d60d319360e7fcaf35454fe21c722fe11905d3",
+  "semanticValidatorTailByteIdentical": true,
+  "inheritedOnly": {
+    "backendCoreSource": "96afd799d49717fd40e4ddabd538d82accbe1958",
+    "frontend905": "42368189302 is historical evidence only, not a new-head run",
+    "backendOrCoreRerun": false,
+    "backendCoreRuns": [
+      {
+        "id": 42378656486,
+        "name": "fleet5-cr90501-test-only-core-retry-c67f69d080fc490e99e37a9ed6d7fa35",
+        "head_sha": "96afd799d49717fd40e4ddabd538d82accbe1958",
+        "head_branch": "agent/codex/fleet5-first-workspace-cr90501-tests-r1-20261107",
+        "event": "workflow_dispatch",
+        "run_attempt": 1,
+        "conclusion": "success",
+        "html_url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/42378656486"
+      },
+      {
+        "id": 42374998823,
+        "name": "fleet5-cr90501-test-only-backend-64365d33172f4fc6b69e6b25566b56ac",
+        "head_sha": "96afd799d49717fd40e4ddabd538d82accbe1958",
+        "head_branch": "agent/codex/fleet5-first-workspace-cr90501-tests-r1-20261107",
+        "event": "workflow_dispatch",
+        "run_attempt": 1,
+        "conclusion": "success",
+        "html_url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/42374998823"
+      }
+    ]
+  },
+  "canonicalState": {
+    "bytes": 522559,
+    "SHA256": "ef2014e871fd3a1a38a5a0df46cf84193d00e08cbbf8fb5a784660d266173b26",
+    "fullBytesEqual": true,
+    "checkOnly": true,
+    "apply": false
+  },
+  "localGates": [
+    {
+      "argv": [
+        "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+        "-B",
+        "tools/check_docs.py"
+      ],
+      "atKST": "2026-11-08T01:50:53.865687+09:00",
+      "exit": 0,
+      "stdout": "PASS: 24 original hashes, 1283 versioned documents, wiki links, 48 tasks, 12 outcomes, owner/reviewer/skills, dependency DAG.\r\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+        "-B",
+        "tools/check_ontology.py"
+      ],
+      "atKST": "2026-11-08T01:51:08.417360+09:00",
+      "exit": 0,
+      "stdout": "PASS: RDF parsing, defined terms, TTL/JSON-LD equivalence, 48 task mappings, positive SHACL, 4 rejected invalid fixtures, 4 competency queries, Obsidian mirrors.\r\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+        "-B",
+        "tools/check_doc_path_citations.py",
+        "--ratchet",
+        "--base-ref",
+        "96afd799d49717fd40e4ddabd538d82accbe1958"
+      ],
+      "atKST": "2026-11-08T01:51:10.709648+09:00",
+      "exit": 0,
+      "stdout": "PASS check_doc_path_citations --ratchet: 290 broken citation(s), all in baseline, none stale, floor unchanged.\r\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+        "-B",
+        "tools/check_doc_single_source.py",
+        "--ratchet"
+      ],
+      "atKST": "2026-11-08T01:51:15.820778+09:00",
+      "exit": 0,
+      "stdout": "PASS check_doc_single_source --ratchet: 16 pairs, all in baseline, none stale.\r\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+        "-B",
+        "tools/check_contract_bindings.py"
+      ],
+      "atKST": "2026-11-08T01:51:16.290034+09:00",
+      "exit": 0,
+      "stdout": "PASS check_contract_bindings: 57 fixtures each referenced by a test; 21 bound kernel response TYPES each have >=1 serving-anchor test (counted PER TYPE, not per anchor SITE: those types occupy 27 anchor sites; a multi-site type counts covered even if only one site is tested -- site-level weight is not decidable here, use tools/check_anchor_weight.py + the mutation harness); 14 replay guards present.\r\n  UNIT NOTE: TYPE count <= SITE count. Multi-site types (per-type coverage can mask an untested site): ApprovalView(2 sites: ['approvals']), BusinessBindingView(2 sites: ['business_handoff']), BusinessEditLockReleaseView(2 sites: ['business_handoff']), BusinessEditLockView(2 sites: ['business_handoff']), ControlRunDetail(3 sites: ['control']), ControlRunView(2 sites: ['control']), EvidenceEnvelope(6 sites: ['build_governance', 'results', 'runs', 'shard_completion', 'storage_commit', 'storage_view']), ModelExecutionManifestObservation(2 sites: ['model_uri_resolver', 'model_view']), NodeExecutionPermit(2 sites: ['node_execution', 'node_transport']), NodeResourceSnapshot(4 sites: ['capacity', 'gpu', 'observation']), WorkspaceCheckoutView(2 sites: ['workspace_recovery']), WorkspaceEnqueueResult(3 sites: ['workspace_api']), WorkspaceFirstRunCreateResult(2 sites: ['workspace_intents']), WorkspacePrepareResult(2 sites: ['workspace_api']), WorkspaceRestoreView(2 sites: ['workspace_recovery']), WorkspaceStartEnqueueResult(3 sites: ['workspace_start']), WorkspaceStartPrepareResult(2 sites: ['workspace_start'])\r\n  (Reporting sites is not a regression -- the TYPE number never meant 'sites verified'; this makes the counting unit explicit. EvidenceEnvelope-class multi-site anchors are why.)\r\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+        "-B",
+        "tools/check_frontend_integrity.py"
+      ],
+      "atKST": "2026-11-08T01:51:23.641692+09:00",
+      "exit": 0,
+      "stdout": "Scanning 97 frontend production source files under apps/web/src ...\r\n\r\nPASS Frontend Integrity Check: all 9 integrity rules satisfied (0 violations).\r\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe",
+        "-B",
+        "tools/sync_obsidian.py",
+        "--check"
+      ],
+      "atKST": "2026-11-08T01:51:24.478931+09:00",
+      "exit": 0,
+      "stdout": "CHECK: 4872 managed files, 2421 pending exports, 0 conflicts. No writes.\r\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "atKST": "2026-11-08T01:51:46.950787+09:00",
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    }
+  ],
+  "firstFailure": {
+    "sourceSHA": "8ee1e5222b451935a96b2b74bafaba1667424375",
+    "frontendRun": 42392904251,
+    "attempt": 1,
+    "overall": "failure",
+    "frontendJob": 128464041559,
+    "portalJob": 128464041717,
+    "portalJobConclusion": "success",
+    "docsRun": 42392906680,
+    "docsJob": 128464047877,
+    "docsAll19": "success",
+    "vitest": {
+      "filesPassed": 106,
+      "passed": 1350,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "deselected": 0
+    },
+    "failedStep": "Boot actual built frontend under canonical strict CSP",
+    "cause": "New smoke asserted every response<400; actual anonymous boot passed but base96 absent favicon.svg returned404",
+    "disposition": "Narrow exact absent-icon404 classification in harness only; all other HTTP failures still reject and full raw response remains visible; no icon/product/CSP change, test count/timeout unchanged",
+    "boot": {
+      "browserVersion": "156.0.8078.79",
+      "rootChildren": 1,
+      "pageErrors": [],
+      "cspErrors": [],
+      "negativeControl": {
+        "functionBlocked": true,
+        "evalBlocked": true
+      }
+    },
+    "newExactHeadWorkflowsRequired": [
+      "frontend",
+      "docs"
+    ],
+    "artifacts": [
+      {
+        "id": 13581914112,
+        "node_id": "MDg6QXJ0aWZhY3QxMzU4MTkxNDExMg==",
+        "name": "saintvision-portal-release",
+        "size_in_bytes": 25707034,
+        "url": "https://api.github.com/repos/egparadise/SaintVision-Invion/actions/artifacts/13581914112",
+        "archive_download_url": "https://api.github.com/repos/egparadise/SaintVision-Invion/actions/artifacts/13581914112/zip",
+        "expired": false,
+        "digest": "sha256:1e4d8306de30b51972eafa03b31605e430bf579ae2f23f8bed30b180788b6469",
+        "created_at": "2026-11-07T16:46:57Z",
+        "updated_at": "2026-11-07T16:46:57Z",
+        "expires_at": "2026-11-21T16:46:54Z",
+        "workflow_run": {
+          "id": 42392904251,
+          "repository_id": 1362259805,
+          "head_repository_id": 1362259805,
+          "head_branch": "agent/codex/fleet5-csp-static-validator-r1-20261108",
+          "head_sha": "8ee1e5222b451935a96b2b74bafaba1667424375"
+        }
+      },
+      {
+        "id": 13581269915,
+        "node_id": "MDg6QXJ0aWZhY3QxMzU4MTI2OTkxNQ==",
+        "name": "saintvision-portal-strict-csp-evidence",
+        "size_in_bytes": 5469,
+        "url": "https://api.github.com/repos/egparadise/SaintVision-Invion/actions/artifacts/13581269915",
+        "archive_download_url": "https://api.github.com/repos/egparadise/SaintVision-Invion/actions/artifacts/13581269915/zip",
+        "expired": false,
+        "digest": "sha256:9b446cb8a8bf1c483cd8500d07417453d75c68aca696daa4f11620faabd19929",
+        "created_at": "2026-11-07T16:47:29Z",
+        "updated_at": "2026-11-07T16:47:29Z",
+        "expires_at": "2026-11-21T16:47:28Z",
+        "workflow_run": {
+          "id": 42392904251,
+          "repository_id": 1362259805,
+          "head_repository_id": 1362259805,
+          "head_branch": "agent/codex/fleet5-csp-static-validator-r1-20261108",
+          "head_sha": "8ee1e5222b451935a96b2b74bafaba1667424375"
+        }
+      }
+    ]
+  },
+  "mainProductExecution": false,
+  "actualPC3BrowserAcceptance": false,
+  "actualUsersVotesRuns": false,
+  "independentReview": "Pending one actual Claude started by Root after this worker settles/exits/releases",
+  "nextOwner": "Root: verify exact artifacts, actual Claude review, then controlled same-CSP PC3 deployment/browser/API check",
+  "remainingGates": [
+    "actual PC3 strict-CSP browser/login/no-blink/resource verification",
+    "two real distinct nonrequester approvers",
+    "requester enqueue and genuine Run/output",
+    "all5/GPU/storage/renewal/reconnect/reboot"
+  ],
+  "holds": "Original19HOLD/discharges0/runtimeB0/A1-A16/H1-H7/H3EA/RDNULL_HOLD/raw7UNREGISTERED/A01-A40NOT_RUN",
+  "receiptPublication": "Post-CI data is untracked and Root-ready; tracked source/docs are published at sourceSHA; no self-referential final-SHA commit claim",
+  "postCIFinalSyncCheck": {
+    "command": "D:/Project/SaintVisionI-Invion/.venv/Scripts/python.exe -B tools/sync_obsidian.py --check",
+    "exit": 0,
+    "atKST": "2026-11-08T01:55:26.020813+09:00",
+    "bytes": 522559,
+    "SHA256": "ef2014e871fd3a1a38a5a0df46cf84193d00e08cbbf8fb5a784660d266173b26",
+    "fullBytesEqual": true,
+    "apply": false,
+    "managedFiles": 4889,
+    "pendingExports": 2438,
+    "conflicts": 0,
+    "noWrites": true,
+    "interpretation": "Older source branch view only; Root integrates own delta, never exports this old whole vault"
+  },
+  "dispatchReceipts": [
+    {
+      "workflow": "frontend",
+      "sourceSHA": "428e5fc6b822d33e7e76316f443716b03579efa0",
+      "ref": "agent/codex/fleet5-csp-static-validator-r1-20261108",
+      "correlation": "fleet5-cr-csp01-static-validator-frontend-b7a7f258253f412387ab73c9ef9fb0da",
+      "atUTC": "2026-11-07T16:50:26.673401+00:00",
+      "dispatchExit": 0,
+      "runID": 42393304702
+    },
+    {
+      "workflow": "docs",
+      "sourceSHA": "428e5fc6b822d33e7e76316f443716b03579efa0",
+      "ref": "agent/codex/fleet5-csp-static-validator-r1-20261108",
+      "correlation": "fleet5-cr-csp01-static-validator-docs-335e1d3eaccf4985a56b2c0c5dc5d3f0",
+      "atUTC": "2026-11-07T16:50:28.503559+00:00",
+      "dispatchExit": 0,
+      "runID": 42393307021
+    }
+  ],
+  "gitOperations": [
+    {
+      "sourceSHA": "8ee1e5222b451935a96b2b74bafaba1667424375",
+      "commitKST": "2026-11-08T01:45:19+09:00",
+      "subject": "fix(web): generate canonical Node certificate validator before browser boot",
+      "commitExit": 0,
+      "pushExit": 0,
+      "hooksDisabledForMainResourceRestriction": true
+    },
+    {
+      "sourceSHA": "428e5fc6b822d33e7e76316f443716b03579efa0",
+      "commitKST": "2026-11-08T01:50:17+09:00",
+      "subject": "test(web): record prior missing icon separately from strict CSP boot failures",
+      "commitExit": 0,
+      "pushExit": 0,
+      "hooksDisabledForMainResourceRestriction": true
+    }
+  ],
+  "newRegressionCases": {
+    "count": 14,
+    "vmForbiddenStringGenerationAndCanonicalFormatChecks": 1,
+    "wireSemanticMalformedCases": 11,
+    "projectFreshnessIncompleteDisabledCases": 1,
+    "determinismAndDriftCase": 1,
+    "existingTestsUnchanged": true,
+    "skipsAdded": 0,
+    "timeOrCountWeakening": false
+  },
+  "rootReadyReceiptFiles": [
+    "delivery.json",
+    "publication-receipt.py",
+    "source-diff-428e5fc6b822.patch",
+    "local-gates-final-428e5fc6b822.json",
+    "postCI-final-sync-check.json",
+    "sync-state-postCI-after.json",
+    "inherited-source96-ci.json"
+  ]
+}

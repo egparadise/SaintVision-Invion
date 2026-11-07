@@ -1,0 +1,15 @@
+{
+  "officialJobID": 128465245318,
+  "source": "428e5fc6b822d33e7e76316f443716b03579efa0",
+  "logBytes": 350112,
+  "logSHA256": "4f8a5e2fd78a74cdbfa74a6c02648d3de883f02209c5f3d3caed96339a69d08a",
+  "officialVitestTestsSummary": "2026-11-07T16:52:13.6005234Z       Tests  1350 passed (1350)",
+  "officialVitestFilesSummary": "2026-11-07T16:52:13.5996352Z  Test Files  106 passed (106)",
+  "passedTests": 1350,
+  "totalTests": 1350,
+  "passedFiles": 106,
+  "totalFiles": 106,
+  "zeroFailedOrSkippedFromEqualTotals": true,
+  "rawEscapesAllowedOnlyForCapturedBuffer": true,
+  "terminalEscapesRemovedBeforeSummary": true
+}
