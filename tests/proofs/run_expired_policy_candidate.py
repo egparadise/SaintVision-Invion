@@ -114,7 +114,7 @@ def main():
                 args=proof_args(f,auth,node)
                 if cycle==1:
                     failure('default-deny-entry',item['cid'],['/custody-proof'],'RECOVERY_HOLD_UNBOUND')
-                    failure('wrong-uid',item['cid'],args,'RECOVERY_HOLD_FILE_METADATA',extra=('--user','0:0'))
+                    failure('wrong-uid',item['cid'],args,'RECOVERY_HOLD_UID',extra=('--user','0:0'))
                     failure('wrong-helper-digest',item['cid'],args[:-1]+['0'*64],'RECOVERY_HELPER_PROVENANCE')
                     request_path=item['paths']['trust']/'request.json'
                     bad=r.parse(requests[node]); bad['authorization']['signature']='0'*128
@@ -125,6 +125,19 @@ def main():
                     write(floor_path,r.canonical({'Version':999,'Hash':'0'*64}))
                     failure('authenticated-journal-floor-mismatch',item['cid'],args,'RECOVERY_AUTHENTICATED_FLOOR')
                     write(floor_path,floor_original)
+                    # Real expired certificates signed by this isolated CA,
+                    # retaining the same public key: no fake parser or clock.
+                    from recovery_candidate_fixture import certificate
+                    cert_path=item['paths']['config']/'node-cert.pem'; cert_original=cert_path.read_bytes()
+                    expired=certificate(public[node],f.ca_key,f.ca,uri=f'spiffe://saintvision.ai/tenant/{f.tenant}/node/{node}/epoch/{f.epoch}',ip=f.trust.nodes[node].ip,expiry=-1)
+                    write(cert_path,expired.public_bytes(serialization.Encoding.PEM))
+                    failure('real-expired-node-leaf',item['cid'],args,'RECOVERY_TERMINAL_LEAF_EXPIRED')
+                    write(cert_path,cert_original)
+                    ca_path=item['paths']['config']/'client-ca.pem'; ca_original=ca_path.read_bytes()
+                    expired_ca=certificate(f.ca_key.public_key(),f.ca_key,None,ca_cert=True,expiry=-1)
+                    write(ca_path,expired_ca.public_bytes(serialization.Encoding.PEM))
+                    failure('real-expired-ca',item['cid'],args,'RECOVERY_TERMINAL_CA_EXPIRED')
+                    write(ca_path,ca_original)
                     mount_args=['docker','run','--rm','--network=none','--user','1000:1000','--read-only','--cap-drop=ALL','--security-opt','no-new-privileges']
                     for kind,path in item['paths'].items():
                         mount_args+=['--mount',f'type=bind,src={path},dst=/{kind}'+(',readonly' if kind in {'config','trust','state'} else '')]
@@ -135,6 +148,17 @@ def main():
                 processes[node]=process; response=line(process)
                 assert response['kind']=='nonserving-custody-proof', response
                 proofs[node]=response['proof']
+                # The unchanged ordinary M2 verifier rejects the actual Go
+                # candidate output; this proof can never stand in for live M2.
+                sys.path.insert(0,str(ROOT/'deploy/lan'))
+                import peer_policy_phase
+                candidate_body,_=r.verify(response['proof'],r.PROOF,public[node])
+                try:
+                    peer_policy_phase.verify_floor(candidate_body,f.certs[node].public_bytes(serialization.Encoding.PEM),{'tenantId':f.tenant,'nodeId':node,'epoch':f.epoch})
+                except ValueError as error:
+                    assert str(error)=='Actual Node floor observation shape differs'
+                else:
+                    raise AssertionError('non-serving candidate accepted as ordinary live M2')
                 failure('exclusive-journal-lock-held',item['cid'],args,'RECOVERY_HOLD_EXCLUSIVE_CUSTODY')
             ledger.prepare(env,requests,proofs)
             acks=r.checkpoint_requests(env,requests,proofs,f.trust,f.authorizer)

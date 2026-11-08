@@ -93,6 +93,17 @@ def test_revocation_and_role_key_reuse():
     refused('RECOVERY_ROLE_SEPARATION',lambda:r.leafs(replace(f.trust,operator=f.trust.authorizer),int(time.time())))
 
 
+@pytest.mark.parametrize('defect,code',[('uri','RECOVERY_SCOPE'),('ip','RECOVERY_IP'),('eku','RECOVERY_EKU'),('algorithm','RECOVERY_ALGORITHM')])
+def test_single_ca_exact_leaf_constraints(defect,code):
+    f=Fixture(); n=next(iter(f.node_keys)); public=f.node_keys[n].public_key()
+    if defect=='algorithm':
+        from cryptography.hazmat.primitives.asymmetric import ec
+        public=ec.generate_private_key(ec.SECP256R1()).public_key()
+    cert=fixture_module.certificate(public,f.ca_key,f.ca,uri='spiffe://foreign/scope' if defect=='uri' else f'spiffe://saintvision.ai/tenant/{f.tenant}/node/{n}/epoch/{f.epoch}',ip=None if defect=='eku' else '172.30.99.99' if defect=='ip' else f.trust.nodes[n].ip)
+    nodes=dict(f.trust.nodes); nodes[n]=replace(nodes[n],certificate_der=cert.public_bytes(serialization.Encoding.DER))
+    refused(code,lambda:r.leafs(replace(f.trust,nodes=nodes),int(time.time())))
+
+
 def test_signed_proof_binding_not_live_or_other_binary():
     f=Fixture(); body,env=f.authorization(); requests,proofs=f.reference_proofs(body,env)
     r.verify_proofs(env,requests,proofs,f.trust)
@@ -101,6 +112,9 @@ def test_signed_proof_binding_not_live_or_other_binary():
     refused('RECOVERY_NOT_LIVE_M2',lambda:r.verify_proofs(env,requests,proofs,f.trust))
     proof['serving']=False; proof['helperSHA256']='0'*64; proofs[node]=r.sign(proof,r.PROOF,f.node_keys[node])
     refused('RECOVERY_PROOF_BINDING',lambda:r.verify_proofs(env,requests,proofs,f.trust))
+    proof['helperSHA256']=f.trust.helper_sha256; proof['counter']=True
+    proofs[node]=r.sign(proof,r.PROOF,f.node_keys[node])
+    refused('RECOVERY_PROOF_SHAPE',lambda:r.verify_proofs(env,requests,proofs,f.trust))
 
 
 def test_reference_atomic_cas_uncertain_retry_and_counter(tmp_path):

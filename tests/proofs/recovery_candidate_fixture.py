@@ -45,7 +45,7 @@ class Fixture:
         now = int(time.time())
         if members is None:
             members = [dict(nodeId=n,ip=b.ip,nodeFingerprint=r.sha(b.certificate_der),priorC=self.c[i],targetC=self.c[i]+1,priorP=self.p[i],targetP=self.p[i]+1,floorSHA256='b'*64,identitySHA256='c'*64,policySHA256='d'*64,configDigest='e'*64,previousCheckpoint=self.prior[n],priorPolicyExpiresAt=now-60) for i,(n,b) in enumerate(sorted(self.trust.nodes.items()))]
-        body = dict(schema='sv-expired-policy-authorization:1',role='recovery-authorizer',operation=secrets.token_hex(16),nonce=secrets.token_hex(32),counter=counter,issuedAt=now,deadline=now+90,candidateBudgetSeconds=10,productionBudgetSeconds=None,scenario='never-started',tenantId=self.tenant,epoch=self.epoch,members=members,caFingerprint=r.sha(self.trust.ca_der),cpDER=base64.b64encode(self.trust.cp_der).decode(),cpFingerprint=r.sha(self.trust.cp_der),contexts=self.contexts,contextGeneration=counter,revokedFingerprints=[],publicationAllowed=False)
+        body = dict(schema='sv-expired-policy-authorization:1',role='recovery-authorizer',operation=secrets.token_hex(16),nonce=secrets.token_hex(32),counter=counter,issuedAt=now,deadline=now+90,candidateBudgetSeconds=60,productionBudgetSeconds=None,scenario='never-started',tenantId=self.tenant,epoch=self.epoch,members=members,caFingerprint=r.sha(self.trust.ca_der),cpDER=base64.b64encode(self.trust.cp_der).decode(),cpFingerprint=r.sha(self.trust.cp_der),contexts=self.contexts,contextGeneration=counter,revokedFingerprints=[],publicationAllowed=False)
         body.update(changes)
         return body,r.sign(body,r.AUTH,self.authorizer)
 
