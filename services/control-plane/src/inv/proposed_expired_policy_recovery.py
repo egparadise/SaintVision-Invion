@@ -211,12 +211,12 @@ def verify_contexts(contexts, generation, expected_digest):
         closed(item, {'site', 'state', 'instances', 'basis'}, "RECOVERY_HOLD_CONTEXT_INVENTORY")
         require(type(item['site']) is str and item['site'] in SITES and item['site'] not in seen and item['basis'] == 'trusted-operator-inventory-not-hardware', "RECOVERY_HOLD_CONTEXT_INVENTORY")
         seen.add(item['site'])
-        require(type(item['instances']) is list and item['state'] in {'present', 'absent'}, "RECOVERY_HOLD_CONTEXT_INVENTORY")
+        require(type(item['instances']) is list and type(item['state']) is str and item['state'] in {'present', 'absent'}, "RECOVERY_HOLD_CONTEXT_INVENTORY")
         require(bool(item['instances']) == (item['state'] == 'present'), "RECOVERY_HOLD_CONTEXT_INVENTORY")
         ids = set()
         for instance in item['instances']:
             closed(instance, {'id', 'generation', 'credentialFingerprint'}, "RECOVERY_HOLD_CONTEXT_INVENTORY")
-            require(type(instance['id']) is str and instance['id'] and instance['id'] not in ids and instance['generation'] == generation and type(instance['credentialFingerprint']) is str and HEX.fullmatch(instance['credentialFingerprint']), "RECOVERY_HOLD_STALE_CONTEXT")
+            require(type(instance['id']) is str and instance['id'] and instance['id'] not in ids and number(instance['generation'],1) and instance['generation'] == generation and type(instance['credentialFingerprint']) is str and HEX.fullmatch(instance['credentialFingerprint']), "RECOVERY_HOLD_STALE_CONTEXT")
             ids.add(instance['id'])
 
 
@@ -265,6 +265,7 @@ def verify_proofs(auth_envelope, requests, proofs, trust):
         require(number(operator['issuedAt']) and -30 <= now-operator['issuedAt'] <= 120 and operator['deadline'] == auth['deadline'], "RECOVERY_CHALLENGE_EXPIRED")
         proof, _ = verify(proofs[node], PROOF, certificates[node].public_key())
         closed(proof, PROOF_KEYS, "RECOVERY_PROOF_SHAPE")
+        require(all(number(proof[k]) for k in ['counter','lockDevice','lockInode','observedAt','deadline','priorP','priorC']), 'RECOVERY_PROOF_SHAPE')
         require(proof['schema'] == 'sv-expired-policy-nonserving-proof:1' and proof['serving'] is False and proof['servingPID'] is None and proof['assurance'] == 'operator-custody-and-file-lock-not-hardware' and proof['activationAllowed'] is False and proof['lockHeldAtSigning'] is True, "RECOVERY_NOT_LIVE_M2")
         expected = {'operation':auth['operation'],'nonce':auth['nonce'],'counter':auth['counter'],'tenantId':trust.tenant,'epoch':trust.epoch,'nodeId':node,'proposalDigest':sha(raw),'requestDigest':sha(requests[node]),'operatorDigest':sha(opraw),'helperSHA256':trust.helper_sha256,'deadline':auth['deadline']}
         expected.update({k:operator[k] for k in ['containerId','imageId','lockDevice','lockInode']})
@@ -345,10 +346,12 @@ class CandidateLedger:
             require(record['schema'] == 'sv-expired-policy-record:1' and record['proof'] == proofs[node] and record['requestDigest'] == sha(requests[node]), "RECOVERY_REPLAY_MISMATCH")
             ack, _ = verify(acknowledgements[node],ACK,self.trust.authorizer)
             closed(ack,ACK_KEYS,"RECOVERY_CHECKPOINT_AUTHORIZATION")
+            require(number(ack['counter'],1) and number(ack['deadline']), 'RECOVERY_CHECKPOINT_AUTHORIZATION')
             expected_ack = {'schema':'sv-expired-policy-checkpoint-request:1','role':'recovery-authorizer','operation':auth['operation'],'proposalDigest':sha(raw),'proofDigest':sha(canonical(proofs[node])),'batchProofDigest':batch,'counter':auth['counter'],'deadline':auth['deadline']}
             require(ack == expected_ack, "RECOVERY_CHECKPOINT_AUTHORIZATION")
             cp, _ = verify(record['checkpoint'],CHECKPOINT,certificates[node].public_key())
             closed(cp,CHECKPOINT_KEYS,"RECOVERY_CHECKPOINT_SHAPE")
+            require(number(cp['counter'],1) and number(cp['checkpointAt']) and cp['lockHeldThroughCheckpoint'] is True and cp['activationAllowed'] is False, 'RECOVERY_CHECKPOINT_SHAPE')
             expected = {'schema':'sv-expired-policy-candidate-checkpoint:1','operation':auth['operation'],'counter':auth['counter'],'requestDigest':sha(requests[node]),'proofDigest':sha(canonical(proofs[node])),'ackDigest':sha(canonical(acknowledgements[node])),'batchProofDigest':batch,'previousCheckpoint':m['previousCheckpoint'],'nodeId':node,'tenantId':self.trust.tenant,'epoch':self.trust.epoch,'lockHeldThroughCheckpoint':True,'activationAllowed':False}
             require(all(cp[k] == v for k,v in expected.items()) and number(cp['checkpointAt']) and auth['issuedAt']-30 <= cp['checkpointAt'] < auth['deadline'], "RECOVERY_CHECKPOINT_BINDING")
         receipt = canonical({'schema':'sv-expired-policy-reference-result:1','operation':auth['operation'],'proposalDigest':sha(raw),'phase':'CANDIDATE_COMMITTED','activationAllowed':False,'liveIntegration':'HOLD_INTEGRATION_NOT_BOUND','recordsDigest':sha(canonical(records))})

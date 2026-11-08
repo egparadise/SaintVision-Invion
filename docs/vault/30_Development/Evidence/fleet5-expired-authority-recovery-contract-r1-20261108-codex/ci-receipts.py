@@ -18,8 +18,9 @@ def write(name, value):
 if sys.argv[1] == 'dispatch':
     sha = run(['git','rev-parse','HEAD']).decode().strip()
     assert sha == run(['git','ls-remote','origin','refs/heads/'+BRANCH]).decode().split()[0]
-    records = []
-    for workflow in ['core','backend','docs']:
+    records = json.loads((HERE/('ci-dispatch-'+sha[:12]+'.json')).read_text()) if (HERE/('ci-dispatch-'+sha[:12]+'.json')).exists() else []
+    for workflow in (sys.argv[2:] or ['core','backend','docs']):
+        assert workflow in {'core','backend','docs'} and not any(r['workflow']==workflow for r in records), 'No duplicate or ambiguous dispatch'
         correlation = 'fleet5-expired-authority-recovery-contract-r1-'+workflow+'-'+uuid.uuid4().hex
         entry = dict(workflow=workflow, sourceSHA=sha, ref=BRANCH, correlation=correlation,
                      atUTC=datetime.datetime.now(datetime.timezone.utc).isoformat(), dispatchExit=None)

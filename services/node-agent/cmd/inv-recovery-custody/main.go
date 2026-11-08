@@ -35,6 +35,7 @@ func run() error {
 		if name != "--candidate-custody-proof-only" { i++ }
 	}
 	if fs.Parse(os.Args[1:]) != nil || !candidate || fs.NArg() != 0 || len(seen) != 9 || request != "/trust/request.json" { return proof.Refusal("RECOVERY_HOLD_UNBOUND") }
+	if os.Geteuid() != 1000 { return proof.Refusal("RECOVERY_HOLD_UID") }
 	raw, err := proof.ReadRequest(request); if err != nil { return err }
 	b.ConfigRoot, b.StateRoot, b.CustodyRoot, b.TrustRoot = "/config", "/state", "/custody", "/trust"
 	return proof.Run(raw,b,os.Stdin,os.Stdout)

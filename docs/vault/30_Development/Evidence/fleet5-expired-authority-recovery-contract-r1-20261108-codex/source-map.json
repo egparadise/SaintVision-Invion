@@ -1,57 +1,68 @@
 [
   {
     "path": ".github/workflows/core.yml",
-    "bytes": 32907,
-    "SHA256": "268c0c818bd2d1cb036ca80d54a4906864f8d361ef18da29cc2739981681c8e5"
+    "bytes": 32329,
+    "SHA256": "24d861bda1483ca786c1fec4e109c3878c0e3f4a734ca11b42ee3269d1e5371c",
+    "hashBasis": "Git text blob LF normalization; working tree bytes may be CRLF"
   },
   {
     "path": "contracts/proposed/expired-policy-custody-v1.schema.json",
-    "bytes": 15536,
-    "SHA256": "aa01a5ead327e96f44ec1562950a820c38604efc7c9d900919489c4c0d2f6b76"
+    "bytes": 14894,
+    "SHA256": "bd72c85f28be4edc8289653827bcbfb9b8e1ecf21808520a37638fc9c53564af",
+    "hashBasis": "Git text blob LF normalization; working tree bytes may be CRLF"
   },
   {
     "path": "services/control-plane/src/inv/proposed_expired_policy_recovery.py",
-    "bytes": 26560,
-    "SHA256": "2ff8f4b1d760178bd0a5b62053fced26beac794a7020a6b7b80b37ef964df07a"
+    "bytes": 26677,
+    "SHA256": "062f60105c72cd7b21990cd2c89acec03b2003216ab8f38eb319e33ac0556ebf",
+    "hashBasis": "Git text blob LF normalization; working tree bytes may be CRLF"
   },
   {
     "path": "tests/core/test_proposed_expired_policy_recovery.py",
-    "bytes": 9699,
-    "SHA256": "c126cb7adebcafb2f7eac3e96e3f70636ed71eae58b0b2ee393a5e5576977673"
+    "bytes": 10824,
+    "SHA256": "bfb277f272328f01084f629ed73e0493eb76b5f539f2a1c46802f7699d7ed41e",
+    "hashBasis": "Git text blob LF normalization; working tree bytes may be CRLF"
   },
   {
     "path": "tests/proofs/recovery_candidate_fixture.py",
-    "bytes": 7292,
-    "SHA256": "9dffd9987f9214f22464861d5fb84585c5c43e1501fff4cb3c1e8243fe28c6ec"
+    "bytes": 7218,
+    "SHA256": "7f0ddb1cea422f69101f912754a1beb94548cbda499d92951700f074b01f9abd",
+    "hashBasis": "Git text blob LF normalization; working tree bytes may be CRLF"
   },
   {
     "path": "tests/proofs/recovery_fixture_key.go",
-    "bytes": 1300,
-    "SHA256": "0ab34d4f03f6ebf9aa2dcca9e34e1578b4585dc0a8fa4724d717761ec495ca6a"
+    "bytes": 1273,
+    "SHA256": "f8d24e63a975ff42436c3f1cfdb1fc05fe92cf726d0cf37272cf59defdb7b0a6",
+    "hashBasis": "Git text blob LF normalization; working tree bytes may be CRLF"
   },
   {
     "path": "tests/proofs/run_expired_policy_candidate.py",
-    "bytes": 15127,
-    "SHA256": "9af066fa625a54f3b74f2622471564c087482a1c8ca94a25b3fbdfcfe6c7f5e1"
+    "bytes": 16888,
+    "SHA256": "311bec242bd5cf34eaa6ae00669ae7f8ba9486c691f28b656013cff1f6ef2c4b",
+    "hashBasis": "Git text blob LF normalization; working tree bytes may be CRLF"
   },
   {
     "path": "services/node-agent/recoverycandidate/custody_linux.go",
-    "bytes": 21008,
-    "SHA256": "209544a37062a5ff9ff90a48c799d550157d2e0ae718d99bc6c713eb0179545d"
+    "bytes": 21306,
+    "SHA256": "f2950144ef26879a764589b2aed99fcfa12f07cd98b89cca9740d43ec2746676",
+    "hashBasis": "Git text blob LF normalization; working tree bytes may be CRLF"
   },
   {
     "path": "services/node-agent/recoverycandidate/wire.go",
-    "bytes": 9246,
-    "SHA256": "f32132f5036a0c3ee99fe748bff9e4ff0017819d41accf986cf0109353dec665"
+    "bytes": 9078,
+    "SHA256": "277273e39a90476b8f2d0a69943591917cdfeb2ec78b6d3af8c9ab34605b1e81",
+    "hashBasis": "Git text blob LF normalization; working tree bytes may be CRLF"
   },
   {
     "path": "services/node-agent/recoverycandidate/wire_test.go",
     "bytes": 1623,
-    "SHA256": "7ca6b30e901c4235bd1e84f5913639b9775aa0ae24ebe24220bad09b413b4e3e"
+    "SHA256": "7ca6b30e901c4235bd1e84f5913639b9775aa0ae24ebe24220bad09b413b4e3e",
+    "hashBasis": "Git text blob LF normalization; working tree bytes may be CRLF"
   },
   {
     "path": "services/node-agent/cmd/inv-recovery-custody/main.go",
-    "bytes": 2367,
-    "SHA256": "affa8bd7e15283a95694140fbebc41439cb41d6217e47af2424f66637259fc2a"
+    "bytes": 2390,
+    "SHA256": "2a678f1f025199940ce3cd4ad10f7d763ec467d0f530fd44548a9d7eae7cb7cc",
+    "hashBasis": "Git text blob LF normalization; working tree bytes may be CRLF"
   }
 ]
