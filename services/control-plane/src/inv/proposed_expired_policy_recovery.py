@@ -330,6 +330,7 @@ class CandidateLedger:
                     for m in auth['members']:
                         require(db.execute('SELECT c,p FROM nodes WHERE node=?',(m['nodeId'],)).fetchone() == (m['priorC'],m['priorP']), "RECOVERY_CAS_CONFLICT")
                     require(db.execute('SELECT 1 FROM operations WHERE nonce=?',(auth['nonce'],)).fetchone() is None, 'RECOVERY_REPLAY_MISMATCH')
+                    require(db.execute("SELECT 1 FROM operations WHERE phase='PREPARED'").fetchone() is None, 'RECOVERY_HOLD_PENDING_OPERATION')
                     db.execute('INSERT INTO operations VALUES(?,?,?,?,?,?,NULL)',(auth['operation'],auth['nonce'],sha(raw),auth['counter'],'PREPARED',batch))
                 db.commit()
             except Exception:

@@ -2,10 +2,11 @@
   "base": "b8c839d1daf28677a0587af115cbea496626d5ea",
   "existingTrackedChanged": [
     ".github/workflows/core.yml",
+    ".github/workflows/backend.yml",
     "docs/vault/30_Development/Agent\ubcc4 \uc791\uc5c5/Codex \uc791\uc5c5 \ud604\ud669.md"
   ],
-  "otherExistingTrackedFilesUnchanged": 6641,
-  "protectedGitBlobIndexSHA256": "318967044ddf4324ed56a2b16582c1b84519a4daafd8bbeae014efcb3b0a284c",
+  "otherExistingTrackedFilesUnchanged": 6640,
+  "protectedGitBlobIndexSHA256": "85c0fef16b7c424105a36ecdf4837c19c55fcbe6dbddd4136908688001519ba8",
   "componentTrees": {
     "apps": "c0150985c59318e2245c8357865a128d7ffaf706",
     "packages": "7c445bdbc929f6597c0b39b598f9726032c67ad7",

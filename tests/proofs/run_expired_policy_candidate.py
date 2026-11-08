@@ -180,6 +180,29 @@ def main():
         # Host-held actual journal lock and foreign residue are independently
         # enforced by the executable, not mocked filesystem results.
         node=next(iter(nodes)); item=nodes[node]; args=proof_args(f,auth,node)
+        # A changed request cannot reuse a completed Node counter, even with
+        # valid new role signatures and the correct latest checkpoint chain.
+        import copy
+        reused_members=copy.deepcopy(auth['members'])
+        for member in reused_members:
+            member['previousCheckpoint']=f.prior[member['nodeId']]
+        reused,reused_env=f.authorization(counter=1,members=reused_members)
+        st=(item['paths']['state']/'.lock').stat()
+        changed_request=f.request(reused,reused_env,node,(st.st_dev,st.st_ino),image_id,item['cid'])
+        write(item['paths']['trust']/'request.json',changed_request)
+        failure('changed-request-completed-counter-reuse',item['cid'],proof_args(f,reused,node),'RECOVERY_COUNTER_REUSE')
+        # Even an explicitly pinned TLS key cannot become the dedicated recovery
+        # authorizer role. Only public role material is mounted into the Node.
+        original_authorizer=f.authorizer
+        f.authorizer=f.cp_key
+        aliased,aliased_env=f.authorization(counter=1,members=reused_members)
+        write(item['paths']['trust']/'authorizer.pub',f.authorizer.public_key().public_bytes_raw())
+        write(item['paths']['trust']/'request.json',f.request(aliased,aliased_env,node,(st.st_dev,st.st_ino),image_id,item['cid']))
+        failure('tls-key-cannot-authorize-recovery',item['cid'],proof_args(f,aliased,node),'RECOVERY_ROLE_SEPARATION')
+        f.authorizer=original_authorizer
+        write(item['paths']['trust']/'authorizer.pub',f.authorizer.public_key().public_bytes_raw())
+        # Restore exactly the original immutable request for historical replay.
+        write(item['paths']['trust']/'request.json',requests[node])
         with (item['paths']['state']/'.lock').open('rb') as held:
             fcntl.flock(held,fcntl.LOCK_EX|fcntl.LOCK_NB)
             failure('host-held-same-inode-lock',item['cid'],args,'RECOVERY_HOLD_EXCLUSIVE_CUSTODY')
