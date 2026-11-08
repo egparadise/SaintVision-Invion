@@ -13,14 +13,14 @@
   },
   {
     "path": "services/control-plane/src/inv/proposed_expired_policy_recovery.py",
-    "bytes": 26677,
-    "SHA256": "062f60105c72cd7b21990cd2c89acec03b2003216ab8f38eb319e33ac0556ebf",
+    "bytes": 26822,
+    "SHA256": "27c5ee695ef519a7e92f15cd1d8b02135c4151849a629b3cb15469c52daffdd3",
     "hashBasis": "Git text blob LF normalization; working tree bytes may be CRLF"
   },
   {
     "path": "tests/core/test_proposed_expired_policy_recovery.py",
-    "bytes": 10824,
-    "SHA256": "bfb277f272328f01084f629ed73e0493eb76b5f539f2a1c46802f7699d7ed41e",
+    "bytes": 11105,
+    "SHA256": "7523be175d6e9ec0befc72b8b0b9fd2cf010ac23508b26bc0f39b0db405297ab",
     "hashBasis": "Git text blob LF normalization; working tree bytes may be CRLF"
   },
   {
@@ -37,14 +37,14 @@
   },
   {
     "path": "tests/proofs/run_expired_policy_candidate.py",
-    "bytes": 16888,
-    "SHA256": "311bec242bd5cf34eaa6ae00669ae7f8ba9486c691f28b656013cff1f6ef2c4b",
+    "bytes": 18589,
+    "SHA256": "561e4655ddbaaac44ee82bab8b2786930dde687d12b5bd235445108623280773",
     "hashBasis": "Git text blob LF normalization; working tree bytes may be CRLF"
   },
   {
     "path": "services/node-agent/recoverycandidate/custody_linux.go",
-    "bytes": 21306,
-    "SHA256": "f2950144ef26879a764589b2aed99fcfa12f07cd98b89cca9740d43ec2746676",
+    "bytes": 21533,
+    "SHA256": "f487f9e736efc1d40163e82c02058d8b975a3ec565f5cf23880def784c80afe3",
     "hashBasis": "Git text blob LF normalization; working tree bytes may be CRLF"
   },
   {
@@ -63,6 +63,12 @@
     "path": "services/node-agent/cmd/inv-recovery-custody/main.go",
     "bytes": 2390,
     "SHA256": "2a678f1f025199940ce3cd4ad10f7d763ec467d0f530fd44548a9d7eae7cb7cc",
+    "hashBasis": "Git text blob LF normalization; working tree bytes may be CRLF"
+  },
+  {
+    "path": ".github/workflows/backend.yml",
+    "bytes": 21990,
+    "SHA256": "31bc7f6513b63c2dc3f32947197bc0d6b64bf268002de925f8d524595ff7f5eb",
     "hashBasis": "Git text blob LF normalization; working tree bytes may be CRLF"
   }
 ]

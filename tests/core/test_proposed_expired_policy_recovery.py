@@ -162,6 +162,9 @@ def test_partial_record_and_replayed_nonce_are_not_success(tmp_path):
     refused('RECOVERY_MEMBERS',lambda:ledger.commit_reference(env,req,proof,acks,records))
     other,other_env=f.authorization(counter=2,nonce=body['nonce']); req2,proof2=f.reference_proofs(other,other_env)
     refused('RECOVERY_REPLAY_MISMATCH',lambda:ledger.prepare(other_env,req2,proof2))
+    other,other_env=f.authorization(counter=2); req2,proof2=f.reference_proofs(other,other_env)
+    refused('RECOVERY_HOLD_PENDING_OPERATION',lambda:ledger.prepare(other_env,req2,proof2))
+    assert ledger.reconcile(body['operation'],r.sha(r.canonical(body)))['phase']=='PREPARED'
 
 
 def test_proposed_schema_closed_shapes_and_actual_signed_payloads():

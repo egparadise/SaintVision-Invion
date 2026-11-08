@@ -344,6 +344,15 @@ jobs:
           )
           PY
 
+      - name: Publish exact Backend test and skip distribution
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-test-distribution-${{ matrix.python-version }}-${{ github.sha }}
+          path: backend-tests.xml
+          if-no-files-found: error
+          retention-days: 30
+
   # Opt-in live lane (S10-BE stage 2): the real MLflow tracking server in a
   # container, the real sink, the real conformance suite. Costs a runner and a
   # container pull, so it runs only with the ``run-mlflow`` label (or on

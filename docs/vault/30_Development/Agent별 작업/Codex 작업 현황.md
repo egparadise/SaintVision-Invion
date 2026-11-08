@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.502"
+version: "1.0.503"
 status: "review"
 author: "Codex"
-updated: "2026-11-08T09:14:58+09:00"
+updated: "2026-11-08T09:31:32+09:00"
 source_of_truth: "Git"
 active_card: "FLEET5-EXPIRED-CURRENT-AUTHORITY-FORWARD-RECOVERY-CONTRACT-R1"
 active_card_status: "Executable proposed candidate, actual hosted proofs and separate source review; live activation HOLD"
@@ -16,6 +16,7 @@ active_card_next: "Root binds exact candidate evidence then actual Claude source
 - Branch-local Codex502 follows read-only Root540/Codex501; integrate only this delta. Original actual Codex task task_cc9b52d7dd35/ctx_e55b82334c37, exactb8base, new own source branch. Real proposed code/Go/Linux/crypto proof delivery, not plan-only acceptance.
 - Implemented non-serving retained-key producer and CP verifier/reference CAS/checkpoint ledger, typed terminal expiry/partial-integration HOLD, all5context binding. Existing live admission/M2/Run/keys/floors remain untouched. [[Proposed expired-policy non-serving custody candidate ADR R1]] and [[2026-11-08_expired_policy_executable_candidate_R1_Codex]] link own Evidence.
 - Verification: Main source/data/docs gates only; exact hosted Core/Backend3.12+3.14/Docs and candidate realDocker results must be bound in final own postCI receipt before worker_done. Every failure stays distinct. Canonical full596372B start/end/postCI comparison CHECK only. No remote/live/production crypto action or APPLY.
+- Actual intermediate proof: dad956b12ed45829c14d73fd91817c902791ef17/Core42429675780 produced two3member Go/LinuxDocker retained-key candidate cycles and35 refusal controls, activationfalse; first ec2/Core42429230722 wrongUID ordering failure is retained. Final exact-source Core/Backend/Docs receipts remain required; these intermediate results are not final-head CI.
 - Next owner Root verifies delivery and obtains actual separate Claude code/security review before real adapters/migration/release. No self-acceptance or whole-program completion; original HOLD unchanged.
 
 

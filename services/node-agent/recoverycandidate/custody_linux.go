@@ -143,6 +143,7 @@ func Run(request []byte, binding Binding, input io.Reader, out io.Writer) error 
 	cpDER, err := base64.StdEncoding.Strict().DecodeString(Text(auth,"cpDER")); if err != nil { return refuse("RECOVERY_LEAF") }
 	now := Clock()
 	if err := ValidateLeaves(caDER,cpDER,nodeDER,binding.Tenant,binding.Epoch,binding.Node,Text(member,"ip"),now); err != nil { return err }
+	for _, der := range [][]byte{caDER,cpDER} { cert, _ := x509.ParseCertificate(der); pub := cert.PublicKey.(ed25519.PublicKey); if bytes.Equal(cpPub,pub) || bytes.Equal(opPub,pub) { return refuse("RECOVERY_ROLE_SEPARATION") } }
 	if Hash(caDER) != Text(auth,"caFingerprint") || Hash(cpDER) != Text(auth,"cpFingerprint") || Hash(nodeDER) != Text(member,"nodeFingerprint") { return refuse("RECOVERY_CERTIFICATE_PIN") }
 	for _, fp := range Array(auth,"revokedFingerprints") { if fp == Hash(caDER) || fp == Hash(cpDER) || fp == Hash(nodeDER) { return refuse("RECOVERY_REVOKED") } }
 	op, opRaw, err := Verify(Object(r,"operator"),OperatorDomain,opPub); if err != nil { return err }
