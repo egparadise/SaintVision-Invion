@@ -1,0 +1,10 @@
+{
+  "MainProductExecution": false,
+  "metadataOnlyCorrections": [
+    "Temporary mistyped new-directory unused.txt removed immediately; no prior file modified",
+    "One source read used cp949 on core.yml and exited1 before write; corrected explicit UTF8",
+    "Unicode source path in PowerShell stdin became question marks; write failed without changing board; corrected filesystem glob",
+    "Glob matched Codex VF board first; only own accidental changes restored to exact initially clean base and section moved to primary Codex board",
+    "Nonexistent contracts/core metadata tree path rejected by git; corrected to contracts/v1alpha1"
+  ]
+}

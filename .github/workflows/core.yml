@@ -102,6 +102,24 @@ jobs:
         with:
           node-version: '22'
       - run: python -m pip install -r requirements-test.txt -r requirements-docs.txt
+      - name: Build isolated non-serving expired-policy candidate
+        working-directory: services/node-agent
+        run: |
+          mkdir -p "$GITHUB_WORKSPACE/dist/expired-policy-binaries"
+          CGO_ENABLED=0 go build -trimpath -o "$GITHUB_WORKSPACE/dist/expired-policy-binaries/custody-proof" ./cmd/inv-recovery-custody
+          CGO_ENABLED=0 go build -trimpath -o "$GITHUB_WORKSPACE/dist/expired-policy-binaries/fixture-key" ../../tests/proofs/recovery_fixture_key.go
+          go test -race -v ./recoverycandidate
+      - name: Prove isolated expired-policy candidate with actual Linux Docker and retained keys
+        timeout-minutes: 6
+        run: sudo env GITHUB_ACTIONS=true GITHUB_SHA="$GITHUB_SHA" "$(which python)" -B tests/proofs/run_expired_policy_candidate.py
+      - name: Publish isolated candidate proof including failures
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: fleet5-expired-policy-candidate-${{ github.sha }}
+          path: dist/expired-policy-candidate/
+          if-no-files-found: error
+          retention-days: 30
       - name: FLEET5 early native Go peer-policy lifecycle proof
         if: github.event_name == 'workflow_dispatch' && inputs.run_fleet5_peer_phase_proof
         timeout-minutes: 5

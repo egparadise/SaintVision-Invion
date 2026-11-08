@@ -1,0 +1,21 @@
+{
+  "docID": "EVIDENCE-FLEET5-EXPIRED-AUTHORITY-RECOVERY-CONTRACT-R1-CODEX",
+  "version": "1.0.0",
+  "taskID": "task_cc9b52d7dd35",
+  "dispatchID": "ctx_e55b82334c37",
+  "base": "b8c839d1daf28677a0587af115cbea496626d5ea",
+  "root540": "982e06042bfd44f784b199f0adc6892f86d05cad",
+  "acceptedPlanReview": "49875a2634cac611c3b722c241536728f8f29c64",
+  "owner": "Original actual Codex",
+  "independentReviewer": "Actual Claude future Root dispatch after final code/CI; not performed",
+  "scope": "Isolated policy-expired/leaf-still-valid executable candidate and proofs, default non-serving/no live integration",
+  "atKST": "2026-11-08T08:51:27.711454+09:00",
+  "canonicalBytes": 596372,
+  "canonicalSHA256": "9df862940fe05a26600af0188e926d5fce665ce8c1ecafac806dbb3d263a20e1",
+  "environment": {
+    "platform": "win32",
+    "python": "3.14.7 (tags/v3.14.7:823f032, Aug  5 2026, 10:51:32) [MSC v.1944 64 bit (AMD64)]",
+    "interpreter": "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe",
+    "MainProductExecution": false
+  }
+}
