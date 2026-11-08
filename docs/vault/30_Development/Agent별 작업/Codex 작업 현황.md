@@ -1,15 +1,19 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.501"
+version: "1.0.502"
 status: "review"
 author: "Codex"
-updated: "2026-11-08T08:45:06+09:00"
+updated: "2026-11-08T10:55:32+09:00"
 source_of_truth: "Git"
 active_card: "FLEET5 continued supervision with PORTAL-REFRESH-FLEET-20261106"
-active_card_status: "ActualR2Delta49875ACCEPT_F1F6ClosedPlanOnly_Mandatory0; FinitePolicyExpiredValidLeafContractAndExecutableProofCodeReady_NoOperatingRelease"
-active_card_next: "Publish Root540 exact Docs/Obsidian, start original actual Codex finite expired-current-authority contract plus executable verification code/hosted proofs, default non-serving/no live admission integration. Current policy deadline11-08 16:15:30KST not yet passed at record; normal budgets null/HOLD. Actual source review and Root private preflight/release before migration/renewal; genuine2approvers/PC1key/PC5safeNode/fullGPUstorage/manual/all5 remain."
+active_card_status: "D476RecoveryCandidateCodeAndExactHostedProofVerified_SourceSecurityReviewPending; NoLiveAdmissionMigrationPublicationBRpolicyRelease"
+active_card_next: "Finish Root541 exact Docs/Obsidian then one actual Claude source/security review of proposed schema/Go custody/CP verifier-CAS/real negative proof/CI changes. Product tests ran only hosted; actual production integrations/migration/context barrier/B_Rpolicy/release HOLD. PolicyE11-08 16:15:30KST, leafL11-09, CAA11-14; original real2approvers/PC1key/PC5safeNode/GPUstorage/manual/full5 remain."
 ---
+
+## 2026-11-08T10:55:32+09:00 d476 복구 검증 코드와 실제 호스팅 증거 대조
+
+실제Codex가별도만료정책복구contractv1/ADR1.0.1·Go custodyproducer·CPPython검증/referenceCAS·Linuxproof를d47630d7후보로구현했다. Root는4sourcecommit/38경로/기존변경은2workflow+자기board뿐·13sourcepin/기존제품·SQL0068불변·정확Core42431918918/Backend42431943920/Docs42431921203의모든job·step와공식9artifact/실제4ZIP/14JUnit을대조했다. Core9511pass/46skip/2deselect,Backend각9151/75skip/2deselect,Go700pass/1명시skip와별도Docker실행성공,후보42pass/0skip·실제3member2cycle/37Docker제어를확인했고중복artifact시험수는합치지않는다. 실제운영DB/CAS·이행·발행·5clientcontext/B_Rpolicy는HOLD다. 실제작성자종료·해제후문서24개와공개검증증거만반영하며source/보안수락은다음실제Claude검토다. 전체5대/실제Run완료가아니다. 다음첫행동/담당은Root541정확게시뒤실제Claude보안source검토이며작성자CI성공을독립source수락으로대체하지않는다. 실제postCI자기board/Historyaddendum은공개증거로보존하고오래된자기board전체를정본위에덮지않았다.
 
 ## 2026-11-08T08:45:06+09:00 R2 실제 수락과 유한 복구 계약·검증 구현 착수 준비
 

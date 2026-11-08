@@ -1,0 +1,89 @@
+"""Bind source/official CI/ZIP/XML/log metadata, never import or run product/crypto."""
+import base64,collections,concurrent.futures,datetime,hashlib,json,re,subprocess,xml.etree.ElementTree as ET,zipfile
+from pathlib import Path
+r=Path(__file__).resolve().parents[1];w=r/'.work';worker=r.parent/'fleet5-compute-storage-contract-20261105';rel='docs/vault/30_Development/Evidence/fleet5-expired-authority-recovery-contract-r1-20261108-codex';folder=worker/rel;out=w/'recovery-candidate-d476-root-verification';assert not out.exists();out.mkdir()
+raw=(folder/'delivery.json').read_bytes();v=json.loads(raw);sha='d47630d730278aa9e49b15a63cd221696da8dc00';base='b8c839d1daf28677a0587af115cbea496626d5ea';branch='agent/codex/fleet5-expired-authority-recovery-contract-r1-20261108'
+assert v['sourceSHA']==sha and v['base']==base and v['branch']==branch and v['task']=='task_cc9b52d7dd35' and v['dispatch']=='ctx_e55b82334c37'
+assert all(v[k] is False for k in ['MainProductOrCryptoExecution','SSHOrLiveActions','canonicalApply','wholeProgramComplete','activationAllowed'])
+def git(*args):return subprocess.check_output(['git',*args],cwd=r)
+def blob(ref,path):return git('show',ref+':'+path)
+commits=git('rev-list','--reverse',base+'..'+sha).decode().splitlines();assert len(commits)==4 and commits[-1]==sha and git('ls-remote','origin','refs/heads/'+branch).decode().split()[0]==sha
+changed=list(filter(None,git('diff','--name-only','-z',base,sha).decode('utf-8').split('\0')));assert changed==v['sourceProof']['changedPaths']
+modified=list(filter(None,git('diff','--name-only','--diff-filter=M','-z',base,sha).decode('utf-8').split('\0')));assert sorted(modified)==sorted(v['sourceProof']['oldFilesChanged'])==sorted(['.github/workflows/core.yml','.github/workflows/backend.yml','docs/vault/30_Development/Agent별 작업/Codex 작업 현황.md'])
+assert not git('diff','--name-only','--diff-filter=DR','-z',base,sha)
+for name,digest in v['sourceProof']['protectedTrees'].items():assert git('rev-parse',base+':'+name).decode().strip()==git('rev-parse',sha+':'+name).decode().strip()==digest
+sourceMap=json.loads(blob(sha,rel+'/source-map.json'));assert len(sourceMap)==13
+for p in sourceMap:
+    b=blob(sha,p['path']);assert len(b)==p['bytes'] and hashlib.sha256(b).hexdigest()==p['SHA256']
+sqls=[p for p in git('ls-tree','-r','--name-only',sha,'services/control-plane/src/inv/migrations').decode().splitlines() if '/0068_' in p];assert len(sqls)==1
+assert hashlib.sha256(blob(sha,sqls[0])).hexdigest()==v['sourceProof']['sql0068SHA256']==v['inheritedProductionSource']['SQL0068SHA256']
+assert all(x['exit']==0 for x in v['localGates']) and len(v['localGates'])==8
+canon=Path(r'D:\Project\SaintVision-Invion\SaintVisionI-Invion\.git\obsidian-sync-state.json').read_bytes();assert canon==(w/'expired-authority-contract-code-canonical-before-r1.raw').read_bytes();digest=hashlib.sha256(canon).hexdigest();assert len(canon)==596372 and digest=='9df862940fe05a26600af0188e926d5fce665ce8c1ecafac806dbb3d263a20e1'
+assert v['canonical']['fullBytesEqual'] and v['canonical']['lastFullByteCheckEqual'] and v['canonical']['beforeBytes']==v['canonical']['afterBytes']==len(canon) and v['canonical']['beforeSHA256']==v['canonical']['afterSHA256']==digest
+gh=r'C:\Program Files\GitHub CLI\gh.exe';requests=[]
+for lane in v['lanes']:
+    for kind,suffix in [('run',''),('jobs','/jobs?per_page=100'),('artifacts','/artifacts')]:requests.append((lane['workflow']+'-'+kind,'actions/runs/'+str(lane['runID'])+suffix))
+for lane in v['lanes']:
+    for j in lane['jobs']:requests.append(('job-'+str(j['id']),'actions/jobs/'+str(j['id'])+'/logs'))
+def fetch(item):
+    name,path=item;q=subprocess.run([gh,'api','--allow-escape-sequences','repos/egparadise/SaintVision-Invion/'+path],capture_output=True,timeout=90);assert q.returncode==0,(name,q.returncode)
+    if not name.startswith('job-'):(out/(name+'.json')).write_bytes(q.stdout)
+    return name,q.stdout
+with concurrent.futures.ThreadPoolExecutor(max_workers=4) as pool:official=dict(pool.map(fetch,requests))
+allArts={};stepSummary=[];coreLog=None
+for lane in v['lanes']:
+    a=json.loads(official[lane['workflow']+'-run']);jobs=json.loads(official[lane['workflow']+'-jobs']);arts=json.loads(official[lane['workflow']+'-artifacts'])
+    assert a['head_sha']==sha and a['head_branch']==branch and a['display_title']==lane['correlation'] and a['event']=='workflow_dispatch' and a['run_attempt']==1 and a['path']==lane['workflowPath'] and a['status']=='completed' and a['conclusion']=='success'
+    assert jobs['total_count']==len(jobs['jobs'])==len(lane['jobs'])
+    for job in jobs['jobs']:
+        old=next(x for x in lane['jobs'] if x['id']==job['id']);assert job['head_sha']==sha and job['run_attempt']==1 and job['status']=='completed' and job['conclusion']=='success'
+        assert len(job['steps'])==old['stepCount'] and [(s['name'],s['conclusion']) for s in job['steps']]==[(s['name'],s['conclusion']) for s in old['steps']]
+        assert all(s['conclusion'] in ['success','skipped'] for s in job['steps']);stepSummary.append({'workflow':lane['workflow'],'job':job['id'],'steps':len(job['steps']),'success':sum(s['conclusion']=='success' for s in job['steps']),'skipped':[s['name'] for s in job['steps'] if s['conclusion']=='skipped']})
+        wrapperRaw=(folder/old['publicLog']).read_bytes();wrapper=json.loads(wrapperRaw);log=base64.b64decode(wrapper.get('data',wrapper.get('dataBase64','')));assert log==official['job-'+str(job['id'])] and len(log)==wrapper['bytes'] and hashlib.sha256(log).hexdigest()==wrapper['SHA256']
+        (out/('job-'+str(job['id'])+'-base64.json')).write_bytes(wrapperRaw)
+        for line in old['summaryLines']:assert line in log.decode('utf-8-sig')
+        if job['id']==128582562798:coreLog=log
+    for art in arts['artifacts']:allArts[art['id']]=art
+assert len(allArts)==len(v['artifacts'])==9
+downloads=[];artifactScopes=[]
+for a in v['artifacts']:
+    officialArt=allArts[a['id']];assert officialArt['digest']==a['officialDigest'] and officialArt['size_in_bytes']==a['officialSize'] and not officialArt['expired'] and officialArt['workflow_run']['head_sha']==sha and officialArt['workflow_run']['id']==a['runID']
+    actual='downloadBytes' in a
+    artifactScopes.append({'id':a['id'],'bytes':a['officialSize'],'officialDigest':a['officialDigest'],'actualZIPToVerify':actual})
+    if actual:downloads.append(a)
+assert len(downloads)==4
+def download(a):
+    path=out/('artifact-'+str(a['id'])+'.zip')
+    with path.open('wb') as stream:q=subprocess.run([gh,'api','--allow-escape-sequences','repos/egparadise/SaintVision-Invion/actions/artifacts/'+str(a['id'])+'/zip'],stdout=stream,stderr=subprocess.PIPE,timeout=120)
+    assert q.returncode==0;h=hashlib.sha256()
+    with path.open('rb') as stream:
+        for chunk in iter(lambda:stream.read(1048576),b''):h.update(chunk)
+    assert path.stat().st_size==a['officialSize']==a['downloadBytes'] and h.hexdigest()==a['downloadSHA256'] and 'sha256:'+h.hexdigest()==a['officialDigest']
+    with zipfile.ZipFile(path) as archive:assert archive.namelist()==a['entryNames']
+    return a['id'],path
+with concurrent.futures.ThreadPoolExecutor(max_workers=4) as pool:zips=dict(pool.map(download,downloads))
+xmlRows=[]
+for report in v['reports']:
+    with zipfile.ZipFile(zips[report['artifactID']]) as archive:rawXML=archive.read(report['entry'])
+    xml=ET.fromstring(rawXML);cases=xml.findall('.//testcase');counts={'cases':len(cases),'skipped':sum(c.find('skipped') is not None for c in cases),'failed':sum(c.find('failure') is not None for c in cases),'errors':sum(c.find('error') is not None for c in cases)};counts['passed']=counts['cases']-counts['skipped']-counts['failed']-counts['errors']
+    assert all(counts[k]==report[k] for k in counts);xmlRows.append({'artifact':report['artifactID'],'entry':report['entry'],'SHA256':hashlib.sha256(rawXML).hexdigest(),**counts})
+with zipfile.ZipFile(zips[13598410236]) as archive:proof=json.loads(archive.read('result.json'))
+assert proof['sourceSHA']==sha and proof['candidateOnly'] and proof['activationAllowed'] is False and len(proof['cycles'])==2 and len(proof['negativeControls'])==37
+assert proof==v['candidateProof']
+for c in proof['cycles']:assert c['memberCount']==c['actualGoNodeSignatures']==c['actualDurableNodeCheckpoints']==c['referenceCASAuditRows']==3 and c['receipt']['activationAllowed'] is False and c['receipt']['liveIntegration']=='HOLD_INTEGRATION_NOT_BOUND'
+assert all(b==a+1 for key in ['P','C'] for a,b in zip(proof['cycles'][0][key],proof['cycles'][1][key]))
+with zipfile.ZipFile(zips[13599277355]) as archive:binary=archive.read('expired-policy-binaries/custody-proof');assert binary[:4]==b'\x7fELF' and hashlib.sha256(binary).hexdigest()==proof['helperSHA256']
+events=[]
+for line in coreLog.decode('utf-8-sig').splitlines():
+    i=line.find(chr(123))
+    if i<0:continue
+    try:event=json.loads(line[i:])
+    except json.JSONDecodeError:continue
+    if isinstance(event,dict) and 'Test' in event and event.get('Action') in ['pass','fail','skip']:events.append(event)
+go=collections.Counter(x['Action'] for x in events);assert go=={'pass':700,'skip':1}
+assert [x['Test'] for x in events if x['Action']=='skip']==['TestDockerLiveCompatibility']
+for name in v['goTests']['candidatePassed']:assert any(x['Test']==name and x['Action']=='pass' for x in events)
+addendumRaw=(folder/v['postCIBoardHistoryAddendum']).read_bytes();addendum=json.loads(addendumRaw);assert addendum['sourceSHA']==sha
+(out/'postCI-board-history-handoff.json').write_bytes(addendumRaw);(out/'delivery.json').write_bytes(raw)
+result={'verifiedAtKST':datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=9))).isoformat(timespec='seconds'),'candidateSHA':sha,'base':base,'sourceCommitCount':4,'deliveryBytes':len(raw),'deliverySHA256':hashlib.sha256(raw).hexdigest(),'changedPaths':len(changed),'onlyExistingFilesChanged':modified,'exactSourceMapPins':13,'oldProductionSourceAndSQL0068Preserved':True,'eightRecordedMetadataGatesExit0':True,'lanes':[{'workflow':x['workflow'],'run':x['runID']} for x in v['lanes']],'allJobsActualStepsBound':stepSummary,'artifactScopes':artifactScopes,'actualZIPsVerified':4,'actualXMLReportsBound':xmlRows,'GoPass':go['pass'],'GoSkip':go['skip'],'declaredDockerSkipSeparateOptInActualStepSuccess':True,'candidateCycles':2,'membersEach':3,'realDockerNegativeControls':37,'candidateHelperELFAndSHA256Bound':True,'proofScope':'Isolated candidate fixture with real hosted Go/crypto/Linux Docker and reference CAS; not production migration/publication/DB/context barrier','P1toP7':proof['P1toP7'],'canonicalStartEndPostCIAndRootCurrentFullMatch':True,'canonicalBytes':len(canon),'canonicalSHA256':digest,'actualIndependentSourceReview':False,'activationAllowed':False,'wholeProgramComplete':False}
+(out/'receipt.json').write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n',encoding='utf-8');(out/'candidate-proof.json').write_text(json.dumps(proof,ensure_ascii=False,indent=2)+'\n',encoding='utf-8');print(json.dumps({k:z for k,z in result.items() if k not in ['actualXMLReportsBound','allJobsActualStepsBound','P1toP7','artifactScopes']}),flush=True)

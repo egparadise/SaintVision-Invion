@@ -1,0 +1,307 @@
+{
+  "verifiedAtKST": "2026-11-08T10:53:08+09:00",
+  "candidateSHA": "d47630d730278aa9e49b15a63cd221696da8dc00",
+  "base": "b8c839d1daf28677a0587af115cbea496626d5ea",
+  "sourceCommitCount": 4,
+  "deliveryBytes": 437007,
+  "deliverySHA256": "cd7d2462c0648f8b3dfe31949a3755bc27f9a7930d80f71cfc94ee429b73ffff",
+  "changedPaths": 38,
+  "onlyExistingFilesChanged": [
+    ".github/workflows/backend.yml",
+    ".github/workflows/core.yml",
+    "docs/vault/30_Development/Agent별 작업/Codex 작업 현황.md"
+  ],
+  "exactSourceMapPins": 13,
+  "oldProductionSourceAndSQL0068Preserved": true,
+  "eightRecordedMetadataGatesExit0": true,
+  "lanes": [
+    {
+      "workflow": "core",
+      "run": 42431918918
+    },
+    {
+      "workflow": "docs",
+      "run": 42431921203
+    },
+    {
+      "workflow": "backend",
+      "run": 42431943920
+    }
+  ],
+  "allJobsActualStepsBound": [
+    {
+      "workflow": "core",
+      "job": 128582562798,
+      "steps": 52,
+      "success": 46,
+      "skipped": [
+        "FLEET5 early native Go peer-policy lifecycle proof",
+        "Publish FLEET5 native peer-phase proof (including expected baseline failure)",
+        "FLEET5 fixed native Go two-cycle proof",
+        "Publish FLEET5 fixed native proof",
+        "Collect fixed-SHA S08 build acceptance observations",
+        "Recompute S08 build acceptance verdict from raw artifacts"
+      ]
+    },
+    {
+      "workflow": "core",
+      "job": 128582562899,
+      "steps": 16,
+      "success": 16,
+      "skipped": []
+    },
+    {
+      "workflow": "docs",
+      "job": 128582491924,
+      "steps": 19,
+      "success": 19,
+      "skipped": []
+    },
+    {
+      "workflow": "backend",
+      "job": 128582563685,
+      "steps": 21,
+      "success": 19,
+      "skipped": [
+        "Kill FLEET5 RS1/SF1 guard mutations",
+        "Kill the standalone leaf-runtime guard mutations"
+      ]
+    },
+    {
+      "workflow": "backend",
+      "job": 128582563929,
+      "steps": 9,
+      "success": 9,
+      "skipped": []
+    },
+    {
+      "workflow": "backend",
+      "job": 128582563954,
+      "steps": 21,
+      "success": 21,
+      "skipped": []
+    }
+  ],
+  "artifactScopes": [
+    {
+      "id": 13599277355,
+      "bytes": 21637626,
+      "officialDigest": "sha256:b7ee6c43b2b2f6c57c98d5bb0e8692f0e7f9165ecfe071d12178759cf76a0e17",
+      "actualZIPToVerify": true
+    },
+    {
+      "id": 13598410236,
+      "bytes": 3711,
+      "officialDigest": "sha256:af81c2ad4c8fd1663c1474ac5db4d642d0b05e59b1018d376fdeae6bea6ebf62",
+      "actualZIPToVerify": true
+    },
+    {
+      "id": 13597862130,
+      "bytes": 1769,
+      "officialDigest": "sha256:c48f6d5939468175676b03a4d4c37f2fae78a4f4ddaba71f797707a4c080eaf9",
+      "actualZIPToVerify": false
+    },
+    {
+      "id": 13598360507,
+      "bytes": 1915,
+      "officialDigest": "sha256:0cb5390c781acc6b5023216537ce6e145cd78e134a4397f84584b38543f888b4",
+      "actualZIPToVerify": false
+    },
+    {
+      "id": 13597389939,
+      "bytes": 50650110,
+      "officialDigest": "sha256:491f4529ba2e65d70c2dbeeab9ebbc2c29b243a66e77d3f600458f1730bbd9c6",
+      "actualZIPToVerify": false
+    },
+    {
+      "id": 13598511739,
+      "bytes": 168466,
+      "officialDigest": "sha256:9d291e20a0cea9f3a0b4440fd93d2a46bf6318eb8c88888c40a69f7ead5b3836",
+      "actualZIPToVerify": true
+    },
+    {
+      "id": 13598379014,
+      "bytes": 168818,
+      "officialDigest": "sha256:bdf3feca0dfc86cc5c6aef3c69f4568ae961030af6274356a4923d961981b212",
+      "actualZIPToVerify": true
+    },
+    {
+      "id": 13598061427,
+      "bytes": 1766,
+      "officialDigest": "sha256:ef2c49530461fb27d5eb839c2817d9d48c059e8829923316694d49853d87c66f",
+      "actualZIPToVerify": false
+    },
+    {
+      "id": 13597857329,
+      "bytes": 6023,
+      "officialDigest": "sha256:d38a025b258d9eeaa6a79392b4613a7b019963e07b18e67cc257dfc330a03a7a",
+      "actualZIPToVerify": false
+    }
+  ],
+  "actualZIPsVerified": 4,
+  "actualXMLReportsBound": [
+    {
+      "artifact": 13599277355,
+      "entry": "build-product-runtime-real-pg.xml",
+      "SHA256": "2dc5f18e2eded296137104beac0087e950eedd02ced320f31a1e93d04d4ecb50",
+      "cases": 13,
+      "skipped": 0,
+      "failed": 0,
+      "errors": 0,
+      "passed": 13
+    },
+    {
+      "artifact": 13599277355,
+      "entry": "business-handoff-tests.xml",
+      "SHA256": "978f00d2def8409062e8a5ef34dd5d9bc752b6c977a19d1e3664f7841257fdbd",
+      "cases": 17,
+      "skipped": 0,
+      "failed": 0,
+      "errors": 0,
+      "passed": 17
+    },
+    {
+      "artifact": 13599277355,
+      "entry": "containment-tests.xml",
+      "SHA256": "75b885b48c2f264586a887092efc4cda97507b59398212c971d4f78e143b00b8",
+      "cases": 28,
+      "skipped": 0,
+      "failed": 0,
+      "errors": 0,
+      "passed": 28
+    },
+    {
+      "artifact": 13599277355,
+      "entry": "core-tests.xml",
+      "SHA256": "b0c29f63ab64f9c0ba63453f8be20ae4515410f3cba1eb656b1fefe84662a731",
+      "cases": 9557,
+      "skipped": 46,
+      "failed": 0,
+      "errors": 0,
+      "passed": 9511
+    },
+    {
+      "artifact": 13599277355,
+      "entry": "cx01-recovery-tests.xml",
+      "SHA256": "2a97f9221fa50080fac710f4129653e5f98aadbe8e2b6d05172f91b8ae48558a",
+      "cases": 20,
+      "skipped": 0,
+      "failed": 0,
+      "errors": 0,
+      "passed": 20
+    },
+    {
+      "artifact": 13599277355,
+      "entry": "docker-host-tests.xml",
+      "SHA256": "bf3c5de05ad796381c90cfbc5a7feb16a0826cc05013df0dfbf00d7fb3a73b40",
+      "cases": 2,
+      "skipped": 0,
+      "failed": 0,
+      "errors": 0,
+      "passed": 2
+    },
+    {
+      "artifact": 13599277355,
+      "entry": "expired-policy-candidate/verifier-tests.xml",
+      "SHA256": "d326025c7fbf3eeb020eb0c949887c8b072843383fe24caace108fdc51baa47c",
+      "cases": 42,
+      "skipped": 0,
+      "failed": 0,
+      "errors": 0,
+      "passed": 42
+    },
+    {
+      "artifact": 13599277355,
+      "entry": "lan-installer-tests.xml",
+      "SHA256": "59caaec690c5db88a44e2ea437cd58aed5b522ef7b4c2827b81d816cbd495006",
+      "cases": 17,
+      "skipped": 0,
+      "failed": 0,
+      "errors": 0,
+      "passed": 17
+    },
+    {
+      "artifact": 13599277355,
+      "entry": "lan-pilot-database-real-pg.xml",
+      "SHA256": "154ad23c83449c24fb1a121c26614f1d5b46c4c275f71f4602381833ec3c5ea5",
+      "cases": 2,
+      "skipped": 0,
+      "failed": 0,
+      "errors": 0,
+      "passed": 2
+    },
+    {
+      "artifact": 13599277355,
+      "entry": "shard-recovery-tests.xml",
+      "SHA256": "2853283c908122da6a6f1f9ebd13fd56d54a02a633a6d580ee8cd427787dcd22",
+      "cases": 21,
+      "skipped": 0,
+      "failed": 0,
+      "errors": 0,
+      "passed": 21
+    },
+    {
+      "artifact": 13599277355,
+      "entry": "workspace-tests.xml",
+      "SHA256": "22ea14cfb0b2676691e0f4f623d22c38194bf5ca7dfb184d3380c207d105826e",
+      "cases": 23,
+      "skipped": 0,
+      "failed": 0,
+      "errors": 0,
+      "passed": 23
+    },
+    {
+      "artifact": 13598410236,
+      "entry": "verifier-tests.xml",
+      "SHA256": "d326025c7fbf3eeb020eb0c949887c8b072843383fe24caace108fdc51baa47c",
+      "cases": 42,
+      "skipped": 0,
+      "failed": 0,
+      "errors": 0,
+      "passed": 42
+    },
+    {
+      "artifact": 13598511739,
+      "entry": "backend-tests.xml",
+      "SHA256": "eb1028d14566227341e29243f98cd86e7e7ba38897546514191dfc28ad488740",
+      "cases": 9226,
+      "skipped": 75,
+      "failed": 0,
+      "errors": 0,
+      "passed": 9151
+    },
+    {
+      "artifact": 13598379014,
+      "entry": "backend-tests.xml",
+      "SHA256": "8aa4459daa853ed0842037bd0681850818611a91a404f9c76ac8c2982930df53",
+      "cases": 9226,
+      "skipped": 75,
+      "failed": 0,
+      "errors": 0,
+      "passed": 9151
+    }
+  ],
+  "GoPass": 700,
+  "GoSkip": 1,
+  "declaredDockerSkipSeparateOptInActualStepSuccess": true,
+  "candidateCycles": 2,
+  "membersEach": 3,
+  "realDockerNegativeControls": 37,
+  "candidateHelperELFAndSHA256Bound": true,
+  "proofScope": "Isolated candidate fixture with real hosted Go/crypto/Linux Docker and reference CAS; not production migration/publication/DB/context barrier",
+  "P1toP7": {
+    "P1": "candidate-only isolated signatures/locks/schema; current-profile serving M2 NOT_RUN",
+    "P2": "actual Linux UID1000 ROconfig/RWstate/checkpoint links; production publication NOT_RUN",
+    "P3": "singleCA valid leaf/public constraints tested, production private reattestation NOT_RUN",
+    "P4": "two real three-member candidate cycles; normal/live migration cycles NOT_RUN",
+    "P5": "reference CAS/unknown retry tested; production DB/transport NOT_RUN",
+    "P6": "all five context inventory gate tested; actual deployed instance inventory/switch NOT_RUN",
+    "P7": "review/release/migration budget/B_Rpolicy/live recovery NOT_RUN"
+  },
+  "canonicalStartEndPostCIAndRootCurrentFullMatch": true,
+  "canonicalBytes": 596372,
+  "canonicalSHA256": "9df862940fe05a26600af0188e926d5fce665ce8c1ecafac806dbb3d263a20e1",
+  "actualIndependentSourceReview": false,
+  "activationAllowed": false,
+  "wholeProgramComplete": false
+}

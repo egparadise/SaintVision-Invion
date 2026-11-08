@@ -1,0 +1,275 @@
+{
+  "schema": "sv-expired-policy-hosted-proof:1",
+  "sourceSHA": "d47630d730278aa9e49b15a63cd221696da8dc00",
+  "candidateOnly": true,
+  "activationAllowed": false,
+  "cycles": [
+    {
+      "cycle": 1,
+      "memberCount": 3,
+      "actualGoNodeSignatures": 3,
+      "actualDurableNodeCheckpoints": 3,
+      "referenceCASAuditRows": 3,
+      "P": [
+        5,
+        14,
+        30
+      ],
+      "C": [
+        9,
+        22,
+        43
+      ],
+      "receipt": {
+        "activationAllowed": false,
+        "liveIntegration": "HOLD_INTEGRATION_NOT_BOUND",
+        "operation": "db775e12b47353670d5518b631d72acd",
+        "phase": "CANDIDATE_COMMITTED",
+        "proposalDigest": "606cce33040901866554c1ea859b53c70038666ed56f26de7491061a2997c2f2",
+        "recordsDigest": "5d81879fbbb56076f67f3a7e2cc056a9e46ee0ae6b907b004ea2bf3ab632732e",
+        "schema": "sv-expired-policy-reference-result:1"
+      },
+      "durableRecordHashes": {
+        "candidate_node_0": "7459ca0ce954fd2c7c48410bf1d885ca7d283099300dc5c750bb2f057856b444",
+        "candidate_node_1": "34629e373b0585dbcec988ca909b7b770978d749c1210d07ad1e74f83e6a4e3a",
+        "candidate_node_2": "ce0a1523e4025a4d21ea5e4c3d337b198bdc8bb718abee0db710d081c6d05e28"
+      },
+      "freshContexts": "all five sites explicitly absent in isolated fixture; production unknown"
+    },
+    {
+      "cycle": 2,
+      "memberCount": 3,
+      "actualGoNodeSignatures": 3,
+      "actualDurableNodeCheckpoints": 3,
+      "referenceCASAuditRows": 3,
+      "P": [
+        6,
+        15,
+        31
+      ],
+      "C": [
+        10,
+        23,
+        44
+      ],
+      "receipt": {
+        "activationAllowed": false,
+        "liveIntegration": "HOLD_INTEGRATION_NOT_BOUND",
+        "operation": "07d88e7c7476d0fdbdb0c38ff8208da2",
+        "phase": "CANDIDATE_COMMITTED",
+        "proposalDigest": "f333d1ef631e363e81d69f022c94af4e777b0f2979e89d7398d548726cb84ba0",
+        "recordsDigest": "de31c8f74d8364f18313ad2057287c9e98bd395ccf5302b965d8f8d7c7f17a19",
+        "schema": "sv-expired-policy-reference-result:1"
+      },
+      "durableRecordHashes": {
+        "candidate_node_0": "95347c6c5d55a45a30d40350b0f199114839f813b73c06dfd2e8a43a40ea2b49",
+        "candidate_node_1": "e77715a27aa1f7b6b9249666e8adcf8b8edd872c1a0ca93e39c5e340a10c7f2b",
+        "candidate_node_2": "c8647e85cafc0376e2f95e43e1b7e816a4f5bf242320232d2c7840119a94b49a"
+      },
+      "freshContexts": "all five sites explicitly absent in isolated fixture; production unknown"
+    }
+  ],
+  "negativeControls": [
+    {
+      "name": "default-deny-entry",
+      "exit": 1,
+      "typedError": "RECOVERY_HOLD_UNBOUND"
+    },
+    {
+      "name": "wrong-uid",
+      "exit": 1,
+      "typedError": "RECOVERY_HOLD_UID"
+    },
+    {
+      "name": "wrong-helper-digest",
+      "exit": 1,
+      "typedError": "RECOVERY_HELPER_PROVENANCE"
+    },
+    {
+      "name": "bad-authorization-signature",
+      "exit": 1,
+      "typedError": "RECOVERY_SIGNATURE"
+    },
+    {
+      "name": "authenticated-journal-floor-mismatch",
+      "exit": 1,
+      "typedError": "RECOVERY_AUTHENTICATED_FLOOR"
+    },
+    {
+      "name": "real-expired-node-leaf",
+      "exit": 1,
+      "typedError": "RECOVERY_TERMINAL_LEAF_EXPIRED"
+    },
+    {
+      "name": "real-expired-ca",
+      "exit": 1,
+      "typedError": "RECOVERY_TERMINAL_CA_EXPIRED"
+    },
+    {
+      "name": "read-only-state-mount",
+      "exit": 1,
+      "typedError": "RECOVERY_HOLD_MOUNT_UID_MODE"
+    },
+    {
+      "name": "exclusive-journal-lock-held",
+      "exit": 1,
+      "typedError": "RECOVERY_HOLD_EXCLUSIVE_CUSTODY"
+    },
+    {
+      "name": "default-deny-entry",
+      "exit": 1,
+      "typedError": "RECOVERY_HOLD_UNBOUND"
+    },
+    {
+      "name": "wrong-uid",
+      "exit": 1,
+      "typedError": "RECOVERY_HOLD_UID"
+    },
+    {
+      "name": "wrong-helper-digest",
+      "exit": 1,
+      "typedError": "RECOVERY_HELPER_PROVENANCE"
+    },
+    {
+      "name": "bad-authorization-signature",
+      "exit": 1,
+      "typedError": "RECOVERY_SIGNATURE"
+    },
+    {
+      "name": "authenticated-journal-floor-mismatch",
+      "exit": 1,
+      "typedError": "RECOVERY_AUTHENTICATED_FLOOR"
+    },
+    {
+      "name": "real-expired-node-leaf",
+      "exit": 1,
+      "typedError": "RECOVERY_TERMINAL_LEAF_EXPIRED"
+    },
+    {
+      "name": "real-expired-ca",
+      "exit": 1,
+      "typedError": "RECOVERY_TERMINAL_CA_EXPIRED"
+    },
+    {
+      "name": "read-only-state-mount",
+      "exit": 1,
+      "typedError": "RECOVERY_HOLD_MOUNT_UID_MODE"
+    },
+    {
+      "name": "exclusive-journal-lock-held",
+      "exit": 1,
+      "typedError": "RECOVERY_HOLD_EXCLUSIVE_CUSTODY"
+    },
+    {
+      "name": "default-deny-entry",
+      "exit": 1,
+      "typedError": "RECOVERY_HOLD_UNBOUND"
+    },
+    {
+      "name": "wrong-uid",
+      "exit": 1,
+      "typedError": "RECOVERY_HOLD_UID"
+    },
+    {
+      "name": "wrong-helper-digest",
+      "exit": 1,
+      "typedError": "RECOVERY_HELPER_PROVENANCE"
+    },
+    {
+      "name": "bad-authorization-signature",
+      "exit": 1,
+      "typedError": "RECOVERY_SIGNATURE"
+    },
+    {
+      "name": "authenticated-journal-floor-mismatch",
+      "exit": 1,
+      "typedError": "RECOVERY_AUTHENTICATED_FLOOR"
+    },
+    {
+      "name": "real-expired-node-leaf",
+      "exit": 1,
+      "typedError": "RECOVERY_TERMINAL_LEAF_EXPIRED"
+    },
+    {
+      "name": "real-expired-ca",
+      "exit": 1,
+      "typedError": "RECOVERY_TERMINAL_CA_EXPIRED"
+    },
+    {
+      "name": "read-only-state-mount",
+      "exit": 1,
+      "typedError": "RECOVERY_HOLD_MOUNT_UID_MODE"
+    },
+    {
+      "name": "exclusive-journal-lock-held",
+      "exit": 1,
+      "typedError": "RECOVERY_HOLD_EXCLUSIVE_CUSTODY"
+    },
+    {
+      "name": "exclusive-journal-lock-held",
+      "exit": 1,
+      "typedError": "RECOVERY_HOLD_EXCLUSIVE_CUSTODY"
+    },
+    {
+      "name": "exclusive-journal-lock-held",
+      "exit": 1,
+      "typedError": "RECOVERY_HOLD_EXCLUSIVE_CUSTODY"
+    },
+    {
+      "name": "exclusive-journal-lock-held",
+      "exit": 1,
+      "typedError": "RECOVERY_HOLD_EXCLUSIVE_CUSTODY"
+    },
+    {
+      "name": "changed-request-completed-counter-reuse",
+      "exit": 1,
+      "typedError": "RECOVERY_COUNTER_REUSE"
+    },
+    {
+      "name": "tls-key-cannot-authorize-recovery",
+      "exit": 1,
+      "typedError": "RECOVERY_ROLE_SEPARATION"
+    },
+    {
+      "name": "host-held-same-inode-lock",
+      "exit": 1,
+      "typedError": "RECOVERY_HOLD_EXCLUSIVE_CUSTODY"
+    },
+    {
+      "name": "partial-write-foreign-residue",
+      "exit": 1,
+      "typedError": "RECOVERY_HOLD_FOREIGN_RESIDUE"
+    },
+    {
+      "name": "symlink-config",
+      "exit": 1,
+      "typedError": "RECOVERY_HOLD_FILE"
+    },
+    {
+      "name": "hardlink-config",
+      "exit": 1,
+      "typedError": "RECOVERY_HOLD_FILE_METADATA"
+    },
+    {
+      "name": "unknown-journal-residue",
+      "exit": 1,
+      "typedError": "RECOVERY_HOLD_ACTIVE_OR_UNKNOWN_JOURNAL"
+    }
+  ],
+  "productionIntegration": "NOT_RUN",
+  "productionBudgets": null,
+  "imageId": "363b9d3e99e50732f300e5c8b178ac826a0a931c0824de5de362b91d75eebe43",
+  "helperSHA256": "6903b333bab1794ece6ad1dc4c5b97c5727f6879b5c3d9d7022bb88476afee2a",
+  "runner": "GitHub ubuntu-latest Linux; root fixture supervisor; UID1000 child containers; no network/capabilities/privileges",
+  "realCrypto": "Ed25519 retained Node keys, separate CA/TLS/recovery/operator actors",
+  "status": "CANDIDATE_COMPONENT_PROOF_PASSED_KEEP_INTEGRATION_HOLD",
+  "P1toP7": {
+    "P1": "candidate-only isolated signatures/locks/schema; current-profile serving M2 NOT_RUN",
+    "P2": "actual Linux UID1000 ROconfig/RWstate/checkpoint links; production publication NOT_RUN",
+    "P3": "singleCA valid leaf/public constraints tested, production private reattestation NOT_RUN",
+    "P4": "two real three-member candidate cycles; normal/live migration cycles NOT_RUN",
+    "P5": "reference CAS/unknown retry tested; production DB/transport NOT_RUN",
+    "P6": "all five context inventory gate tested; actual deployed instance inventory/switch NOT_RUN",
+    "P7": "review/release/migration budget/B_Rpolicy/live recovery NOT_RUN"
+  }
+}

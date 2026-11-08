@@ -1,0 +1,22 @@
+{
+  "atKST": "2026-11-08T10:45:05+09:00",
+  "sourceSHA": "d47630d730278aa9e49b15a63cd221696da8dc00",
+  "owner": "Original actual Codex",
+  "actualIndependentReviewer": "PENDING actual Claude Root dispatch after author exit/release",
+  "publicationOwner": "Root sole canonical APPLY owner",
+  "ownTrackedBoard": {
+    "path": "docs/vault/30_Development/Agent\ubcc4 \uc791\uc5c5/Codex \uc791\uc5c5 \ud604\ud669.md",
+    "docID": "WORKBOARD-CODEX-001",
+    "version": "1.0.504",
+    "finalCurrentCardStatus": "AUTHOR_CODE_AND_EXACT_CI_DELIVERED_PROPOSED_SOURCE_REVIEW_PENDING",
+    "finalVerification": "Core42431918918 both jobs success:9511passed46skipped2deselected; Go700passed1declared skip with actual separate Docker compatibility opt-in success; Backend42431943920 both matrices9151passed75skipped2deselected and MLflow3passed; Docs42431921203 all19success; candidate42passed0skip plus2three-member cycles37Docker controls",
+    "nextActionOwner": "Root binds final pins and obtains one actual separate Claude source/security review; all production adapters/B_Rpolicy/preflight/release remain HOLD"
+  },
+  "ownTrackedHistory": {
+    "path": "docs/vault/30_Development/History/2026-11-08_expired_policy_executable_candidate_R1_Codex.md",
+    "docID": "HISTORY-20261108-EXPIRED-POLICY-CANDIDATE-CODEX-R1",
+    "version": "1.0.0",
+    "postCIOutcome": "Exact final-source code candidate and hosted delivery complete; no Main product/crypto or live SSH/API/DB/browser/service action; no canonical APPLY; full596372B state unchanged"
+  },
+  "instruction": "Apply only this current-card/History addendum during Root publication; never export this older whole vault or overwrite latest Root management body"
+}

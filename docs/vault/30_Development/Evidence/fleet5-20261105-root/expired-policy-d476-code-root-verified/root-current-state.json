@@ -1,0 +1,187 @@
+{
+  "atKST": "2026-11-08T10:55:32+09:00",
+  "taskID": "FLEET5-EXPIRED-POLICY-CODE-D476-ROOT-VERIFY-AND-ACTUAL-SECURITY-REVIEW-PREP-20261108",
+  "owner": "Root Codex coordinator",
+  "managementBase": "982e06042bfd44f784b199f0adc6892f86d05cad",
+  "candidateSource": "d47630d730278aa9e49b15a63cd221696da8dc00",
+  "sourceBase": "b8c839d1daf28677a0587af115cbea496626d5ea",
+  "sourceCommitCount": 4,
+  "actualAuthorDispatch": "ctx_e55b82334c37",
+  "actualAuthorTask": "task_cc9b52d7dd35",
+  "authorAndPriorReviewerActuallyExitedReleased": true,
+  "contract": "proposed expired-policy custody wire1, ADR1.0.1; default non-serving/activationfalse",
+  "changedSourcePaths": 38,
+  "sourceMapExactPins": 13,
+  "oldProductionFilesAndSQL0068Preserved": true,
+  "officialFinalCI": {
+    "Core": 42431918918,
+    "Backend": 42431943920,
+    "Docs": 42431921203
+  },
+  "Core": "9511 passed/46 skipped/2 deselected",
+  "BackendEach312314": "9151 passed/75 skipped/2 deselected; scopes not summed",
+  "Go": "700 actual pass/1 explicit Docker opt-in skip; separate real Docker compatibility step success",
+  "focusedCandidate": "42 pass/0 skip; XML duplicated across2artifacts is one execution",
+  "candidateFixture": "2 actual three-member candidate cycles/37 Docker controls; reference CAS, no production DB/context/migration",
+  "actualZIPsVerified": 4,
+  "officialArtifactsBound": 9,
+  "actualJUnitReportsBound": 14,
+  "privateRedactedLogScope": "Official raw size/SHA and public redacted size/SHA independently bound; public bytes intentionally differ, no raw credentials published",
+  "canonical596372BytesStartEndPostCICurrentEqual": true,
+  "sourceIndependentSecurityReview": "PENDING_ONE_ACTUAL_CLAUDE",
+  "activationAllowed": false,
+  "productionIntegrationMigrationPublicationFiveContextBarrierBRpolicyRelease": "HOLD/NOT_RUN",
+  "RootMetadataVerifierCorrections": [
+    "r1 treated public redacted CI log as identical raw and stopped before accepting that metadata; r2 validates raw/public separate hashes and declared redaction.",
+    "r2 looked for Go test JSON in console and stopped; actual node-unit.jsonl inside verified Core ZIP is the precise source; r3 parses700pass/1skip there. No product/gates/source changed; successful official metadata/ZIP reads cached and rehashed."
+  ],
+  "nextActionOwner": "Root541 exact Docs/Obsidian then one actual Claude source/security review of schema, Go producer, CP verifier/reference CAS, tests, workflow additions and candidate-only boundaries; no live release.",
+  "imports": [
+    {
+      "source": "d47630d730278aa9e49b15a63cd221696da8dc00",
+      "path": "docs/vault/30_Development/Evidence/fleet5-expired-authority-recovery-contract-r1-20261108-codex/.gitattributes",
+      "bytes": 38,
+      "SHA256": "0420344ee4c3a78126364b7063f81a2f738e7dd30d1460d0e8dc29f1449979cd"
+    },
+    {
+      "source": "d47630d730278aa9e49b15a63cd221696da8dc00",
+      "path": "docs/vault/30_Development/Evidence/fleet5-expired-authority-recovery-contract-r1-20261108-codex/README.md",
+      "bytes": 2127,
+      "SHA256": "23f947f6c009c3fe815b04cf95caf94f10ef19675a538b5207202620df4495f7"
+    },
+    {
+      "source": "d47630d730278aa9e49b15a63cd221696da8dc00",
+      "path": "docs/vault/30_Development/Evidence/fleet5-expired-authority-recovery-contract-r1-20261108-codex/accepted-review-pin.json",
+      "bytes": 270,
+      "SHA256": "e286dadb6f5bb02aafbd8156729aa4877ea47310d4ef504f52acc2829ebbf99a"
+    },
+    {
+      "source": "d47630d730278aa9e49b15a63cd221696da8dc00",
+      "path": "docs/vault/30_Development/Evidence/fleet5-expired-authority-recovery-contract-r1-20261108-codex/actual-accepted-r2-review.json",
+      "bytes": 13266,
+      "SHA256": "688558e3da2eafaf164883d07bcdacf4924d9b39082d61f5955248810eebf8b9"
+    },
+    {
+      "source": "d47630d730278aa9e49b15a63cd221696da8dc00",
+      "path": "docs/vault/30_Development/Evidence/fleet5-expired-authority-recovery-contract-r1-20261108-codex/authoring-corrections.json",
+      "bytes": 647,
+      "SHA256": "5677416f0171b4fcf801f3bc113dcf10ea558a268e47035f4945ceafedfdd086"
+    },
+    {
+      "source": "d47630d730278aa9e49b15a63cd221696da8dc00",
+      "path": "docs/vault/30_Development/Evidence/fleet5-expired-authority-recovery-contract-r1-20261108-codex/ci-receipts.py",
+      "bytes": 3589,
+      "SHA256": "f3e5aee5cc989a998c3f25ec2548f2afa5edcd5e6483fd476b4b2f08b70181f3"
+    },
+    {
+      "source": "d47630d730278aa9e49b15a63cd221696da8dc00",
+      "path": "docs/vault/30_Development/Evidence/fleet5-expired-authority-recovery-contract-r1-20261108-codex/context.json",
+      "bytes": 1038,
+      "SHA256": "18948264b6a659ce7b2766d38171913f6395ea9a680eac87218b80a5e721b00c"
+    },
+    {
+      "source": "d47630d730278aa9e49b15a63cd221696da8dc00",
+      "path": "docs/vault/30_Development/Evidence/fleet5-expired-authority-recovery-contract-r1-20261108-codex/failure-ec2a9d2bf20f.json",
+      "bytes": 1001,
+      "SHA256": "e7b203d7ced8425df94ef7cbb8a603fdb53eff35690e90dacc4490230fb139ad"
+    },
+    {
+      "source": "d47630d730278aa9e49b15a63cd221696da8dc00",
+      "path": "docs/vault/30_Development/Evidence/fleet5-expired-authority-recovery-contract-r1-20261108-codex/hook-handling.json",
+      "bytes": 289,
+      "SHA256": "eefbb64e0f633db5bfc6463b4c0ebfa3c3f4e96a070c00106f1deb664563dc44"
+    },
+    {
+      "source": "d47630d730278aa9e49b15a63cd221696da8dc00",
+      "path": "docs/vault/30_Development/Evidence/fleet5-expired-authority-recovery-contract-r1-20261108-codex/initial-source-status.json",
+      "bytes": 56430,
+      "SHA256": "e9ff6acf1b03485ec98de1bad79dee816eb234ffd4aed6de882a3317c575d001"
+    },
+    {
+      "source": "d47630d730278aa9e49b15a63cd221696da8dc00",
+      "path": "docs/vault/30_Development/Evidence/fleet5-expired-authority-recovery-contract-r1-20261108-codex/local-gates-5275a3fb0eff.json",
+      "bytes": 5653,
+      "SHA256": "5d1d55c41b2c3fb37bf970bab70acef6dffa1d45403105cd6074dd28034fb6c5"
+    },
+    {
+      "source": "d47630d730278aa9e49b15a63cd221696da8dc00",
+      "path": "docs/vault/30_Development/Evidence/fleet5-expired-authority-recovery-contract-r1-20261108-codex/local-gates-dad956b12ed4.json",
+      "bytes": 5774,
+      "SHA256": "3634e57e444f4b04136ffaf3083847dbcde88fd8048222f23fdb7b9a2e8717f2"
+    },
+    {
+      "source": "d47630d730278aa9e49b15a63cd221696da8dc00",
+      "path": "docs/vault/30_Development/Evidence/fleet5-expired-authority-recovery-contract-r1-20261108-codex/local-gates-ec2a9d2bf20f.json",
+      "bytes": 4730,
+      "SHA256": "ee44aa77b373de07b15b36614aa600f72e8c5ad800f0f7334d72f37b42a542af"
+    },
+    {
+      "source": "d47630d730278aa9e49b15a63cd221696da8dc00",
+      "path": "docs/vault/30_Development/Evidence/fleet5-expired-authority-recovery-contract-r1-20261108-codex/local-gates.json",
+      "bytes": 5817,
+      "SHA256": "a0c4733c60ae53b74e00833f90e572c44d09963bcdfaac1bc7daca532f0004f5"
+    },
+    {
+      "source": "d47630d730278aa9e49b15a63cd221696da8dc00",
+      "path": "docs/vault/30_Development/Evidence/fleet5-expired-authority-recovery-contract-r1-20261108-codex/metadata-gates.py",
+      "bytes": 2273,
+      "SHA256": "60dd66adafe2c0f719456cb59b3a2afba79eefe4435ef916d892c30f09586b78"
+    },
+    {
+      "source": "d47630d730278aa9e49b15a63cd221696da8dc00",
+      "path": "docs/vault/30_Development/Evidence/fleet5-expired-authority-recovery-contract-r1-20261108-codex/protected-source.json",
+      "bytes": 919,
+      "SHA256": "a4e310c70a0c6513b70a14619a1d18b58aff063338f379181220c6735825ecd0"
+    },
+    {
+      "source": "d47630d730278aa9e49b15a63cd221696da8dc00",
+      "path": "docs/vault/30_Development/Evidence/fleet5-expired-authority-recovery-contract-r1-20261108-codex/read-pins.json",
+      "bytes": 8239,
+      "SHA256": "76cd3bb634669e0bac30734b312ac82890ed1140aaaf1f0e1ced8e7c6aa9d710"
+    },
+    {
+      "source": "d47630d730278aa9e49b15a63cd221696da8dc00",
+      "path": "docs/vault/30_Development/Evidence/fleet5-expired-authority-recovery-contract-r1-20261108-codex/source-audit-scope-corrections.json",
+      "bytes": 1021,
+      "SHA256": "31d36c837e4983234575d6a8a68c67455579d1875c98b8289f230865b591d408"
+    },
+    {
+      "source": "d47630d730278aa9e49b15a63cd221696da8dc00",
+      "path": "docs/vault/30_Development/Evidence/fleet5-expired-authority-recovery-contract-r1-20261108-codex/source-map.json",
+      "bytes": 3324,
+      "SHA256": "e62d8cbcbe8a75d1788e39467a8e3c27e7722d98d51506cfc0d273f095df4cf2"
+    },
+    {
+      "source": "d47630d730278aa9e49b15a63cd221696da8dc00",
+      "path": "docs/vault/30_Development/Evidence/fleet5-expired-authority-recovery-contract-r1-20261108-codex/sync-state-after.json",
+      "bytes": 596372,
+      "SHA256": "9df862940fe05a26600af0188e926d5fce665ce8c1ecafac806dbb3d263a20e1"
+    },
+    {
+      "source": "d47630d730278aa9e49b15a63cd221696da8dc00",
+      "path": "docs/vault/30_Development/Evidence/fleet5-expired-authority-recovery-contract-r1-20261108-codex/sync-state-before.json",
+      "bytes": 596372,
+      "SHA256": "9df862940fe05a26600af0188e926d5fce665ce8c1ecafac806dbb3d263a20e1"
+    },
+    {
+      "source": "d47630d730278aa9e49b15a63cd221696da8dc00",
+      "path": "docs/vault/30_Development/Evidence/fleet5-expired-authority-recovery-contract-r1-20261108-codex/sync-state-comparison.json",
+      "bytes": 278,
+      "SHA256": "b265ce76b31974f95d9f354a00eed886430d52551db44a2b45933b3860ec7cd7"
+    },
+    {
+      "source": "d47630d730278aa9e49b15a63cd221696da8dc00",
+      "path": "docs/vault/30_Development/History/2026-11-08_expired_policy_executable_candidate_R1_Codex.md",
+      "bytes": 4423,
+      "SHA256": "7c7940fb6e91fbd61ba8ddb973e1d06b7cee5e411b6dfe14500c005cb35d68b1"
+    },
+    {
+      "source": "d47630d730278aa9e49b15a63cd221696da8dc00",
+      "path": "docs/vault/40_Governance/Proposed expired-policy non-serving custody candidate ADR R1.md",
+      "bytes": 14524,
+      "SHA256": "a10c9ac2601db7cc83bf466e1b092e0ca364a9a92357c60767625eb19e09d539"
+    }
+  ],
+  "actualMigrationRenewalRestartOrUserRunExecution": false,
+  "wholeProgramComplete": false
+}

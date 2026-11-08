@@ -1,0 +1,21 @@
+from pathlib import Path
+r=Path(__file__).resolve().parents[1];p=(r/'.work/verify_recovery_candidate_d476_root.py').read_text(encoding='utf-8')
+p=p.replace('recovery-candidate-d476-root-verification','recovery-candidate-d476-root-verification-r3')
+a="wrapperRaw=(folder/old['publicLog']).read_bytes();wrapper=json.loads(wrapperRaw);log=base64.b64decode(wrapper.get('data',wrapper.get('dataBase64','')));assert log==official['job-'+str(job['id'])] and len(log)==wrapper['bytes'] and hashlib.sha256(log).hexdigest()==wrapper['SHA256']"
+b="wrapperRaw=(folder/old['publicLog']).read_bytes();wrapper=json.loads(wrapperRaw);log=base64.b64decode(wrapper['data']);officialRaw=official['job-'+str(job['id'])];assert len(officialRaw)==wrapper['officialRawBytes'] and hashlib.sha256(officialRaw).hexdigest()==wrapper['officialRawSHA256'];assert len(log)==wrapper['publicBytes'] and hashlib.sha256(log).hexdigest()==wrapper['publicSHA256'];assert wrapper['redacted'] is True"
+assert a in p;p=p.replace(a,b)
+a="name,path=item;q=subprocess.run([gh,'api','--allow-escape-sequences','repos/egparadise/SaintVision-Invion/'+path],capture_output=True,timeout=90);assert q.returncode==0,(name,q.returncode)\n    if not name.startswith('job-'):(out/(name+'.json')).write_bytes(q.stdout)\n    return name,q.stdout"
+b="""name,path=item;cached=w/'recovery-candidate-d476-root-verification-r2'/(name+'.json')
+    if cached.is_file():data=cached.read_bytes()
+    else:
+        q=subprocess.run([gh,'api','--allow-escape-sequences','repos/egparadise/SaintVision-Invion/'+path],capture_output=True,timeout=90);assert q.returncode==0,(name,q.returncode);data=q.stdout
+    if not name.startswith('job-'):(out/(name+'.json')).write_bytes(data)
+    return name,data"""
+assert a in p;p=p.replace(a,b)
+a="path=out/('artifact-'+str(a['id'])+'.zip')\n    with path.open('wb') as stream:q=subprocess.run([gh,'api','--allow-escape-sequences','repos/egparadise/SaintVision-Invion/actions/artifacts/'+str(a['id'])+'/zip'],stdout=stream,stderr=subprocess.PIPE,timeout=120)\n    assert q.returncode==0;h=hashlib.sha256()"
+b="path=w/'recovery-candidate-d476-root-verification-r2'/('artifact-'+str(a['id'])+'.zip');assert path.is_file();h=hashlib.sha256()"
+assert a in p;p=p.replace(a,b)
+a="for line in coreLog.decode('utf-8-sig').splitlines():"
+b="with zipfile.ZipFile(zips[13599277355]) as archive:goRaw=archive.read('node-unit.jsonl')\nfor line in goRaw.decode('utf-8-sig').splitlines():"
+assert a in p;p=p.replace(a,b)
+exec(compile(p,str(__file__),'exec'),{'__file__':str(__file__),'__name__':'__main__'})

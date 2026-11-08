@@ -1,0 +1,10 @@
+{
+  "reason": "Main product/compiler execution forbidden; hooks not executed; source/data/docs gates run explicitly; hosted workflows own actual compute",
+  "commitInvocation": [
+    "git",
+    "-c",
+    "core.hooksPath=NUL",
+    "commit"
+  ],
+  "noGlobalHookConfigurationChanged": true
+}
