@@ -105,13 +105,15 @@ jobs:
       - name: Build isolated non-serving expired-policy candidate
         working-directory: services/node-agent
         run: |
-          mkdir -p "$GITHUB_WORKSPACE/dist/expired-policy-binaries"
+          mkdir -p "$GITHUB_WORKSPACE/dist/expired-policy-binaries" "$GITHUB_WORKSPACE/dist/expired-policy-candidate"
           CGO_ENABLED=0 go build -trimpath -o "$GITHUB_WORKSPACE/dist/expired-policy-binaries/custody-proof" ./cmd/inv-recovery-custody
           CGO_ENABLED=0 go build -trimpath -o "$GITHUB_WORKSPACE/dist/expired-policy-binaries/fixture-key" ../../tests/proofs/recovery_fixture_key.go
           go test -race -v ./recoverycandidate
       - name: Prove isolated expired-policy candidate with actual Linux Docker and retained keys
         timeout-minutes: 6
         run: sudo env GITHUB_ACTIONS=true GITHUB_SHA="$GITHUB_SHA" "$(which python)" -B tests/proofs/run_expired_policy_candidate.py
+      - name: Verify isolated candidate strict parser, authority and durable scope
+        run: python -m pytest -q --strict-markers tests/core/test_proposed_expired_policy_recovery.py --junitxml=dist/expired-policy-candidate/verifier-tests.xml
       - name: Publish isolated candidate proof including failures
         if: always()
         uses: actions/upload-artifact@v4

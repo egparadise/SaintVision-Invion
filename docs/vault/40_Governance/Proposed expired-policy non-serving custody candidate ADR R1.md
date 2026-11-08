@@ -1,10 +1,10 @@
 ---
 doc_id: "ADR-PROPOSED-EXPIRED-POLICY-CUSTODY-R1"
 title: "Proposed expired-policy non-serving custody candidate ADR R1"
-version: "1.0.0"
+version: "1.0.1"
 status: "review"
 author: "Codex"
-updated: "2026-11-08T09:14:26+09:00"
+updated: "2026-11-08T09:52:28+09:00"
 source_of_truth: "Git"
 ---
 
@@ -34,7 +34,7 @@ Go runs only UID1000 with fixed /config and /trust read-only and /state and /cus
 
 The producer checks actual public policy bytes/scope/version/expiry and floor hash against the independently authorized proposal, matching retained key and same pinned CA. Single-CA validity, signature, Ed25519, EKU, SPIFFE tenant/epoch/Node URI, Node IP, time bounds and revocation constraints remain strict. This does not relax the [generic normal trust path](https://github.com/egparadise/SaintVision-Invion/blob/96afd799d49717fd40e4ddabd538d82accbe1958/services/control-plane/src/inv/node_transport.py#L1-L130).
 
-Never-started recovery can reach a candidate checkpoint. Partial serving migration and partial normal publication are explicitly recognized but return RECOVERY_HOLD_PARTIAL_RECONCILIATION_NOT_BOUND before any proof write. Their real multi-file migration/publication inventory and forward reconciliation adapters are not implemented. Candidate checkpoint partial writes use a different namespace: .next is created exclusive, fsynced, linked without replacement, directory fsynced, and only the just-created temporary file is removed. A crash residue, foreign file, chain gap or conflicting immutable checkpoint is HOLD, never deleted/reinitialized by the component. Recovery of an actual in-flight production publication is not claimed by the candidate's own checkpoint reconciliation.
+Never-started recovery can reach a candidate checkpoint. Partial serving migration and partial normal publication are explicitly recognized but return RECOVERY_HOLD_PARTIAL_RECONCILIATION_NOT_BOUND before any proof write. Their real multi-file migration/publication inventory and forward reconciliation adapters are not implemented. Every signed historical proof/checkpoint must also bind the current tenant, epoch and Node, even when a retained key was used in another scope. The reference ledger durably pins immutable tenant/epoch, exact cohort/certificates and authorizer/operator authority; a foreign or older unscoped ledger is HOLD without adopt/reset. Bootstrap exposes readiness only after all initial rows exist. Fractional policy expiry is compared conservatively against the current second boundary, never truncated to admit an unexpired policy. Candidate checkpoint partial writes use a different namespace: .next is created exclusive, fsynced, linked without replacement, directory fsynced, and only the just-created temporary file is removed. A crash residue, foreign file, chain gap or conflicting immutable checkpoint is HOLD, never deleted/reinitialized by the component. Recovery of an actual in-flight production publication is not claimed by the candidate's own checkpoint reconciliation.
 
 ## Candidate state machine and uncertain delivery
 

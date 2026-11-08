@@ -1,0 +1,20 @@
+{
+  "atKST": "2026-11-08T09:52:28+09:00",
+  "sourceBefore": "5275a3fb0eff679ac859777020bb3630fb5120e1",
+  "productionDefect": false,
+  "candidatePreAcceptance": true,
+  "findings": [
+    {
+      "id": "CANDIDATE-HISTORY-SCOPE",
+      "cause": "Retained-key signed history lacked explicit original tenant/epoch/Node binding",
+      "correction": "Bind every proof/checkpoint to current original scope; real signed filesystem control and one-property foreign tenant/epoch/Node cases"
+    },
+    {
+      "id": "CANDIDATE-LEDGER-SCOPE",
+      "cause": "Reference CAS file bound Node IDs/C/P but not immutable authority/tenant/epoch/cohort",
+      "correction": "Durable scope digest and last bootstrap-readiness marker; fully valid foreign cryptographic scope denied before transaction; older unscoped candidate ledger typed HOLD, no reset/adopt"
+    }
+  ],
+  "additional": "Conservative full timestamp policy expiry; early hosted focused verifier JUnit; wire contract unchanged; ADR1.0.1",
+  "MainProductExecution": false
+}

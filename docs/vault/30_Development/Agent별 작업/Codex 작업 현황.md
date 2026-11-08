@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.503"
+version: "1.0.504"
 status: "review"
 author: "Codex"
-updated: "2026-11-08T09:31:32+09:00"
+updated: "2026-11-08T09:52:28+09:00"
 source_of_truth: "Git"
 active_card: "FLEET5-EXPIRED-CURRENT-AUTHORITY-FORWARD-RECOVERY-CONTRACT-R1"
 active_card_status: "Executable proposed candidate, actual hosted proofs and separate source review; live activation HOLD"
@@ -17,6 +17,7 @@ active_card_next: "Root binds exact candidate evidence then actual Claude source
 - Implemented non-serving retained-key producer and CP verifier/reference CAS/checkpoint ledger, typed terminal expiry/partial-integration HOLD, all5context binding. Existing live admission/M2/Run/keys/floors remain untouched. [[Proposed expired-policy non-serving custody candidate ADR R1]] and [[2026-11-08_expired_policy_executable_candidate_R1_Codex]] link own Evidence.
 - Verification: Main source/data/docs gates only; exact hosted Core/Backend3.12+3.14/Docs and candidate realDocker results must be bound in final own postCI receipt before worker_done. Every failure stays distinct. Canonical full596372B start/end/postCI comparison CHECK only. No remote/live/production crypto action or APPLY.
 - Actual intermediate proof: dad956b12ed45829c14d73fd91817c902791ef17/Core42429675780 produced two3member Go/LinuxDocker retained-key candidate cycles and35 refusal controls, activationfalse; first ec2/Core42429230722 wrongUID ordering failure is retained. Final exact-source Core/Backend/Docs receipts remain required; these intermediate results are not final-head CI.
+- Final candidate scope audit adds durable ledger authority binding and signed-history tenant/epoch/Node refusal with genuine positive controls; actual separate source review remains pending. Fresh exact-head CI is mandatory; no earlier suite is claimed for changed code.
 - Next owner Root verifies delivery and obtains actual separate Claude code/security review before real adapters/migration/release. No self-acceptance or whole-program completion; original HOLD unchanged.
 
 

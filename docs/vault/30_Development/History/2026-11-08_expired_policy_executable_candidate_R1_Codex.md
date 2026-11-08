@@ -4,7 +4,7 @@ title: "2026-11-08 expired policy executable candidate R1 Codex"
 version: "1.0.0"
 status: "review"
 author: "Codex"
-updated: "2026-11-08T09:31:32+09:00"
+updated: "2026-11-08T09:52:28+09:00"
 source_of_truth: "Git"
 ---
 
@@ -21,3 +21,7 @@ Implemented custody remains operator-attested plus exclusive journal lock, not p
 Initial ec2a9d2bf20ff1edfe46e7b2881df00f938ced81 Core42429230722 compiled and passed3 Go race cases but the Docker wrongUID test expected a later metadata refusal: capdropALL UID0 failed file-open first. Corrected CLI now returns explicit UID refusal before reading request. The failure artifact13597176017/digestab364fabe5c100cf16724b9ba459a586d627aed38bfb53128cae6d264d1f0f92 and official log bytes are retained; no success is relabelled. Intermediate dad956b12ed45829c14d73fd91817c902791ef17 Core42429675780 candidate artifact13597037207/digeste99ca1c9f82e6c1e4d05dfc3e8aafeed85f809051232d488f5a8368053c1dad9 proves2 real3member candidate cycles/6 Node signatures/6 durable checkpoints/35 actual Docker refusal controls. This does not prove an integrated renewal or all of that Core run.
 
 Final bounded additions close the component-owned pending-operation ambiguity and cross-role key reuse, and exercise actual Go completed-counter rejection. All previous controls/assertions remain. Final head must have its own fresh Core/Both Backend matrices/Docs; intermediate proof is inherited only until exact receipts establish final proof. Protocol/schema/ADR remain proposed v1.
+
+## 2026-11-08T09:52:28+09:00 final candidate scope audit correction
+
+Before source acceptance, author static audit found that candidate signed history needed explicit tenant/epoch/Node checks and the reference ledger needed a durable authority/cohort scope anchor. Corrected both without changing serving/M2 or production DB. New real Go signature/filesystem positive-control and3 foreign-scope negatives plus a complete-valid-foreign-authority CP verifier test must pass on the next exact head. A typed HOLD rejects older unscoped candidate ledgers; no adopt/reset path. Conservative fractional-expiry comparison and an early focused verifier JUnit report retain strict time bounds and make the new negative cases observable before long existing suites. Intermediate5275 proof passed2candidate cycles/37 Docker controls and exact Docs19, but its full suites and any supersession are kept distinct; only fresh final-head CI can establish delivery.

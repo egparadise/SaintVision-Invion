@@ -1,8 +1,8 @@
 [
   {
     "path": ".github/workflows/core.yml",
-    "bytes": 32329,
-    "SHA256": "24d861bda1483ca786c1fec4e109c3878c0e3f4a734ca11b42ee3269d1e5371c",
+    "bytes": 32624,
+    "SHA256": "ba14b714fafcd354282691054fde491b84fe2a24dd69dd013499ed2670c65fa8",
     "hashBasis": "Git text blob LF normalization; working tree bytes may be CRLF"
   },
   {
@@ -13,14 +13,14 @@
   },
   {
     "path": "services/control-plane/src/inv/proposed_expired_policy_recovery.py",
-    "bytes": 26822,
-    "SHA256": "27c5ee695ef519a7e92f15cd1d8b02135c4151849a629b3cb15469c52daffdd3",
+    "bytes": 28209,
+    "SHA256": "dcadcaacb49ac7fbea7b998a1307971d70b0eb857269489b97bae61386246ced",
     "hashBasis": "Git text blob LF normalization; working tree bytes may be CRLF"
   },
   {
     "path": "tests/core/test_proposed_expired_policy_recovery.py",
-    "bytes": 11105,
-    "SHA256": "7523be175d6e9ec0befc72b8b0b9fd2cf010ac23508b26bc0f39b0db405297ab",
+    "bytes": 12319,
+    "SHA256": "e94a399547e62c9c5ee02ce12911d39411a8e3937530cf107e7e5ead24fb7d83",
     "hashBasis": "Git text blob LF normalization; working tree bytes may be CRLF"
   },
   {
@@ -43,8 +43,8 @@
   },
   {
     "path": "services/node-agent/recoverycandidate/custody_linux.go",
-    "bytes": 21533,
-    "SHA256": "f487f9e736efc1d40163e82c02058d8b975a3ec565f5cf23880def784c80afe3",
+    "bytes": 21809,
+    "SHA256": "c51449fce73eed126422fd1e23da5160c9bfc211529dcc06793ba7c245653356",
     "hashBasis": "Git text blob LF normalization; working tree bytes may be CRLF"
   },
   {
@@ -69,6 +69,12 @@
     "path": ".github/workflows/backend.yml",
     "bytes": 21990,
     "SHA256": "31bc7f6513b63c2dc3f32947197bc0d6b64bf268002de925f8d524595ff7f5eb",
+    "hashBasis": "Git text blob LF normalization; working tree bytes may be CRLF"
+  },
+  {
+    "path": "services/node-agent/recoverycandidate/custody_linux_test.go",
+    "bytes": 2644,
+    "SHA256": "7a7347cfd3d77bb4246d8bc6a145a96834b073b696acdbc3d90b9574874d77bb",
     "hashBasis": "Git text blob LF normalization; working tree bytes may be CRLF"
   }
 ]
