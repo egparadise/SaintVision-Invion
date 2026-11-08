@@ -1,0 +1,18 @@
+{
+  "path": "D:/Project/SaintVision-Invion/SaintVisionI-Invion/.git/obsidian-sync-state.json",
+  "baselineMeaning": "Full canonical baseline given by the D476 review brief (605116 B / 293ccbac...636e).",
+  "beforeAtKST": "2026-11-08T10:59:27+09:00",
+  "beforeBytes": 605116,
+  "beforeSHA256": "293ccbacf9cc6124932116c273a45ade369e5f8737bbbd74eb9f858629e7636e",
+  "endAfterLocalGatesBytes": 605116,
+  "endAfterLocalGatesSHA256": "293ccbacf9cc6124932116c273a45ade369e5f8737bbbd74eb9f858629e7636e",
+  "fullBytesEqual": true,
+  "comparisonMethod": "full byte comparison (cmp) of a scratch copy taken at review start against the live file after each gate pass; the post-CI comparison is a separate untracked Root-ready receipt to avoid self-reference",
+  "syncCheckOutput": {
+    "firstPass": "CHECK: 3755 managed files, 4 pending exports, 0 conflicts. No writes.",
+    "finalPass": "recorded in local-gates.json (final pass)"
+  },
+  "pendingExportsMeaning": "The pending exports are this review's own unapplied board/History/Evidence; Root alone owns APPLY.",
+  "checkOnly": true,
+  "applyPerformed": false
+}

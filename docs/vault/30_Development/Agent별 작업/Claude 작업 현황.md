@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-CLAUDE-001"
 title: "Claude 작업 현황"
-version: "1.2.131"
+version: "1.2.132"
 status: "review"
 author: "Claude"
-updated: "2026-11-08T08:35:00+09:00"
+updated: "2026-11-08T11:12:30+09:00"
 
 
 
@@ -12,6 +12,30 @@ updated: "2026-11-08T08:35:00+09:00"
 
 source_of_truth: "Git"
 ---
+
+## 2026-11-08 FLEET5 만료 정책 d476 후보 실제 source·보안 검토 R1 (Claude 직접 기록)
+
+- **작업 (task_d0227890bfe9 / ctx_21e17eefef82, 10:59 KST 착수)**: Codex 후보 d47630d7(base b8c839d1, 커밋 4개, 경로 38개, source-map 13/13 일치)을 Root541 94f5b3da 기준으로 검토했다. 불변 Git 객체만 정적으로 읽었다. 대상은 구현 전부(Go wire/custody/command, Python 검증기·참조 ledger), 테스트·hosted harness, 제안 schema·ADR, workflow diff 2개다.
+- **결론**: **ACCEPT_SOURCE_CANDIDATE_ONLY_KEEP_INTEGRATION_AND_OPERATING_GATES**, 필수 차단 0건. source 후보만 수락하며 통합·adapter·DB·게시·migration·release·운영은 해제하지 않는다. P1~P7은 NOT_RUN이다.
+- **건전하다고 확인한 것**:
+  - 두 언어의 엄격한 canonical wire와 5개 서명 domain, 역할 키 분리
+  - 실제 journal `.lock` flock 배타 점유(unchanged inv-node와 같은 inode)
+  - 정책 만료·leaf 유효 상태만 수락하고, CA·leaf 만료는 typed 종단 거부
+  - P=floor+1, C+1 CAS와 audit
+  - history chain·scope 검사
+  - partial·residue는 HOLD
+  - 일반 M2 검증기가 후보 proof를 거부
+  - activate 거부
+- **비차단 발견 (작성자에게 인계)**:
+  - F1 LOW: Go Verify가 대문자 서명 hex를 허용한다. ADR·Python은 소문자만 허용한다.
+  - F2 LOW: Node proof·checkpoint에 authorizer·operator 키 hash 바인딩이 없다.
+  - F3 LOW: 경로 기반 open이라 openat·RESOLVE_BENEATH 처리가 없다.
+  - F4 LOW: dev/ino가 int64 safe-integer 한계를 가진다.
+  - F5 INFO: fixture launch-signer가 operator 키와 같다.
+  - F6 INFO: 만료된 PREPARED에 abort 전이가 없다.
+- **검증 범위**: 정적 검토만 했고 Go/pytest/Docker/crypto/SSH/DB/live는 실행하지 않았다. runtime 결과는 Root가 보고한 hosted 증거다(Core 42431918918, Backend 42431943920, Docs 42431921203; gh run view로 id·attempt·head·step·skip 일치 확인). APPLY false.
+- **다음 첫 행동/담당**: Root가 판정을 검증·게시한다. 다음 통합 카드에서 Codex가 F1~F4를 반영하고 Claude가 실제 검토한다. 그때까지 현재 권한으로 Node 재시작·재부팅·migration은 금지한다.
+- **기록**: [[2026-11-08_FLEET5_Expired_Policy_D476_Source_Security_Review_R1_Claude]]
 
 ## 2026-11-08 FLEET5 현재 3-Node 갱신 계획 실제 Claude 검토 R1·R2 (Claude 직접 기록)
 
@@ -834,15 +858,15 @@ PR #36 NodeResourceUsage UI 독립 검토 (Claude, 2026-09-22): head 96fa3ec6, �
 
 | 항목 | 현재 기록 |
 |---|---|
-| 마지막 작업 / 착수 카드 | FLEET5 현재 3-Node 갱신 계획 R2 delta 실제 독립 검토(task_ed462b9da76f); 직전 R1 검토 f29228ed |
-| 실제 owner / 읽은 진행판 버전 / KST | Claude(실제 독립 reviewer; 작성자 Codex task_3e413989dcaa, APPLY는 Root) / Index 1.0.539·Codex 1.0.500·History 1.0.148·Claude 1.2.130→1.2.131 / 2026-11-08 08:28 KST 착수 |
-| branch / base SHA / 구현 SHA | agent/claude/fleet5-current-three-node-renewal-plan-r2-delta-review-20261108 / Root539 2733d3ce / 대상 계획 b8c839d1(base a3c6984f); 구현 없음(docs-only) |
-| 작업한 것 | R2 delta F1~F6 검토, 이 보드·History 1개·고유 Evidence(review/read-pins/local-gates/sync-state-comparison) 작성 |
-| 확인한 것 / 명령 / exit code / 실제 환경 | git show/diff, scratchpad Python으로 49 permalink 대 25 source map 정확 일치·manifest null·자체 종료 없음 확인; 6개 metadata gate exit 0; 정적 검토로 runtime 증명 없음 |
-| CI / 독립 reviewer / 운영 인수 | ACCEPT_R2_PLAN_DELTA_KEEP_IMPLEMENTATION_AND_OPERATING_GATES(F1~F6 CLOSED_AT_PLAN_ONLY); Docs workflow_dispatch 결과는 History/worker_done에 기록; 운영 해제 없음 |
-| 남은 문제 / 차단 이유 / 해소 담당 | 복구·migration·adapter 미구현(Codex), Root live inventory·budget·preflight·release, peer-policy 2026-11-08 16:15:30 KST·leaf 11-09·CA 11-14 경계, 승인자 2명 부재 |
-| 다음 카드 / 첫 행동 / 다음 담당 | Root 분기 선택 → 예상 FLEET5-EXPIRED-CURRENT-AUTHORITY-FORWARD-RECOVERY-CONTRACT-R1(Codex owner, Claude 실제 검토) |
-| History / 오류 / Evidence / PR / sync 결과 | [[2026-11-08_FLEET5_Current_Three_Node_Renewal_Plan_R2_Delta_Review_Claude]]; Evidence fleet5-current-three-node-renewal-plan-r2-delta-review-20261108-claude; R1 보드 미갱신 누락은 이번에 보완; sync CHECK only, APPLY 없음 |
+| 마지막 작업 / 착수 카드 | FLEET5 만료 정책 d476 후보 실제 source·보안 검토 R1(task_d0227890bfe9); 직전 R2 delta 검토 49875a26 |
+| 실제 owner / 읽은 진행판 버전 / KST | Claude(실제 독립 reviewer; 작성자 Codex task_cc9b52d7dd35, APPLY는 Root) / Index 1.0.541·Codex 1.0.502·History 1.0.150·Claude 1.2.131→1.2.132 / 2026-11-08 10:59 KST 착수 |
+| branch / base SHA / 구현 SHA | agent/claude/fleet5-expired-policy-candidate-source-review-r1-20261108 / Root541 94f5b3da / 검토 대상 후보 d47630d7(base b8c839d1); 이 작업의 구현 없음(docs-only) |
+| 작업한 것 | d476 후보 source·보안 정적 검토, 이 보드·History 1개·고유 Evidence(review/read-pins/local-gates/sync-state-comparison) 작성 |
+| 확인한 것 / 명령 / exit code / 실제 환경 | git show/diff/grep으로 불변 객체만 읽음, source-map 13/13 일치, 38 경로 중 기존 3개만 수정; gh run view로 hosted run 메타 일치 확인; 6개 metadata gate exit 0; runtime은 Root hosted 증거 |
+| CI / 독립 reviewer / 운영 인수 | ACCEPT_SOURCE_CANDIDATE_ONLY_KEEP_INTEGRATION_AND_OPERATING_GATES(필수 0, LOW 4·INFO 2); Docs workflow_dispatch 결과는 History/worker_done에 기록; 운영 해제 없음 |
+| 남은 문제 / 차단 이유 / 해소 담당 | F1~F4 통합 카드 반영(Codex), P1~P7 NOT_RUN, B_Rpolicy/B_Rleaf null, Root live inventory·preflight·release, peer-policy 2026-11-08 16:15:30 KST·leaf 11-09·CA 11-14 경계 |
+| 다음 카드 / 첫 행동 / 다음 담당 | Root 판정 게시 → Codex 제한 serving migration·현재 profile M2 producer·만료 정책 custody/forward-publication adapter 통합 카드(Claude 실제 검토) |
+| History / 오류 / Evidence / PR / sync 결과 | [[2026-11-08_FLEET5_Expired_Policy_D476_Source_Security_Review_R1_Claude]]; Evidence fleet5-expired-policy-d476-source-review-r1-20261108-claude; 오류 없음; sync CHECK only, APPLY 없음 |
 
 ## Codex 통합 수신 (2026-09-18)
 

@@ -1,0 +1,21 @@
+{
+  "untracked": true,
+  "meaning": "Root-ready post-CI receipt kept outside Git to avoid self-reference",
+  "task": "task_d0227890bfe9",
+  "dispatch": "ctx_21e17eefef82",
+  "atKST": "2026-11-08T11:14:34+09:00",
+  "reviewCommit": "fc9025c6a7c42ba58974f179b80b5099b4ec8244",
+  "base": "94f5b3da807ed64bf6a0234300c27139d02a3a7a",
+  "docsRun": 42437607536,
+  "docsJob": 128599724912,
+  "event": "workflow_dispatch",
+  "attempt": 1,
+  "steps": "19/19 success",
+  "correlation": "fleet5-d476-source-review-r1-claude-7bef57aca1204d239c03d06fb730803b",
+  "canonicalPostCIBytes": 605116,
+  "canonicalPostCISHA256": "293ccbacf9cc6124932116c273a45ade369e5f8737bbbd74eb9f858629e7636e",
+  "canonicalEqualStartEndPostCI": true,
+  "applyPerformed": false,
+  "verdict": "ACCEPT_SOURCE_CANDIDATE_ONLY_KEEP_INTEGRATION_AND_OPERATING_GATES",
+  "mandatoryBlockers": 0
+}

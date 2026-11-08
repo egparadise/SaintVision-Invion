@@ -1,15 +1,19 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.502"
+version: "1.0.503"
 status: "review"
 author: "Codex"
-updated: "2026-11-08T10:55:32+09:00"
+updated: "2026-11-08T11:20:49+09:00"
 source_of_truth: "Git"
 active_card: "FLEET5 continued supervision with PORTAL-REFRESH-FLEET-20261106"
-active_card_status: "D476RecoveryCandidateCodeAndExactHostedProofVerified_SourceSecurityReviewPending; NoLiveAdmissionMigrationPublicationBRpolicyRelease"
-active_card_next: "Finish Root541 exact Docs/Obsidian then one actual Claude source/security review of proposed schema/Go custody/CP verifier-CAS/real negative proof/CI changes. Product tests ran only hosted; actual production integrations/migration/context barrier/B_Rpolicy/release HOLD. PolicyE11-08 16:15:30KST, leafL11-09, CAA11-14; original real2approvers/PC1key/PC5safeNode/GPUstorage/manual/full5 remain."
+active_card_status: "D476SourceCandidateActuallyAcceptedByClaudeFC902_Mandatory0; IntegrationF1F4HardeningAndReadonlyPreflightCodeReady_ProductionGatesHold"
+active_card_next: "Publish Root542 exact Docs/Obsidian then original Codex F1-F4 code hardening plus read-only current-cohort authority collector/guards, distinct fixtureF5 and expired PREPAREDF6 boundary. Actual source review before Root private read-only preflight; production publisher/CAS/context/migration and B_Rpolicy/release remain HOLD. Original2approvers/PC1key/PC5safeNode/GPUstorage/manual/full5 remain."
 ---
+
+## 2026-11-08T11:20:49+09:00 복구 후보 실제 source/security 수락과 통합 선행 코드
+
+실제Claude fc9025c6이d476후보source/security를필수0건으로수락했다. strictwire/5서명domain·role분리·기존journal.lock동일inodeflock/custodylock·정책만료/leafvalid거부경계·P=floor+1/C+1·scopehistory·partialHOLD·schema/activate의live거부·workflow추가전용을확인했다. Root는actual6문서/freshClaudeboard1.2.132/32입력pin·정확Docs42437607536/job128599724912전19단계·605116Bcanonical전체동일과실제postCI851Breceipt를대조했다. 후보수락은운영통합수락이아니다. F1~F4의LOW보강과F5fixture역할분리/F6expiredPREPARED경계를다음코드작업으로인계하고읽기전용실장비사전점검도구를구현한다. 실제갱신/이행/추가재시작/5대완료는아직아니다. 다음첫행동/담당은Root542게시뒤원작성자Codex의구현이다. 후보source수락을production/5대완료로바꾸지않고실제Claudeboard도당사자가작성한fresh판만반영했다.
 
 ## 2026-11-08T10:55:32+09:00 d476 복구 검증 코드와 실제 호스팅 증거 대조
 

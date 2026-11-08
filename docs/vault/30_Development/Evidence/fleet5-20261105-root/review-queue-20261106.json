@@ -1,6 +1,6 @@
 {
   "schema": "fleet5-root-review-resource-sequence:1",
-  "atKST": "2026-11-08T10:55:32+09:00",
+  "atKST": "2026-11-08T11:20:49+09:00",
   "completedB": {
     "task": "task_d4c4c809ed4e",
     "review": "ac9182c3e3d606ec027c0be2e90e049ff50d54f1",
@@ -15,10 +15,17 @@
   "active": null,
   "pending": [
     {
-      "kind": "ONE_ACTUAL_CLAUDE_SOURCE_SECURITY_REVIEW",
-      "target": "d47630d730278aa9e49b15a63cd221696da8dc00",
-      "state": "READY_AFTER_ROOT541_PUBLICATION",
-      "scope": "proposed contract/Go custody/Python verifier-referenceCAS/negative harness/CI preserved/default integration HOLD"
+      "kind": "ORIGINAL_CODEX_INTEGRATION_READINESS_HARDENING_AND_READONLY_PREFLIGHT_CODE",
+      "id": "FLEET5-EXPIRED-POLICY-INTEGRATION-HARDENING-AND-READONLY-PREFLIGHT-R1",
+      "sourceBase": "d47630d730278aa9e49b15a63cd221696da8dc00",
+      "state": "READY_AFTER_ROOT542_PUBLICATION",
+      "sourceFindings": [
+        "D476-SRC-R1-F1",
+        "D476-SRC-R1-F2",
+        "D476-SRC-R1-F3",
+        "D476-SRC-R1-F4"
+      ],
+      "productionActivation": false
     }
   ],
   "authorParallelWork": "B frozen b51 awaiting actual delta verdict; H12 accepted6d7 plus read-only five-row audit delivered, Root owns first CPU journey preflight. Optional Low backlog is not a mandatory new scope.",
@@ -29,7 +36,7 @@
     "review": "0e53fc024ca773b7719182e170e5e126aeaf5b95",
     "verdict": "ACCEPT TEST-ONLY; R-L1 CLOSED; no new findings"
   },
-  "nextActualReviewTrigger": "After Root541 publication dispatch exactly one actual Claude source/security review. Source implementation/contract acceptance pending, no production migration/publication/admission or B_Rpolicy/release. Preserve all first source failures and original full5/approval/manual gates.",
+  "nextActualReviewTrigger": "After Root542 publication assign original Codex finite F1-F4 hardening/read-only preflight code and real hosted tests; then actual Claude source review. Candidate source accepted, production migration/publication/context/B_Rpolicy still HOLD, no additional broad plan-only loop.",
   "completedIntegration": {
     "task": "task_78064fb4b7ff",
     "dispatch": "ctx_ed7ec73163d6",
@@ -4989,6 +4996,148 @@
       }
     ],
     "actualMigrationRenewalRestartOrUserRunExecution": false,
+    "wholeProgramComplete": false
+  },
+  "RootActualD476SourceAcceptance": {
+    "atKST": "2026-11-08T11:20:49+09:00",
+    "taskID": "FLEET5-D476-ACTUAL-SOURCE-ACCEPTANCE-AND-INTEGRATION-PREFLIGHT-20261108",
+    "owner": "Root Codex coordinator",
+    "managementBase": "94f5b3da807ed64bf6a0234300c27139d02a3a7a",
+    "acceptedSourceCandidate": "d47630d730278aa9e49b15a63cd221696da8dc00",
+    "actualIndependentReview": "fc9025c6a7c42ba58974f179b80b5099b4ec8244",
+    "actualReviewerDispatch": "ctx_21e17eefef82",
+    "actualReviewerTask": "task_d0227890bfe9",
+    "verdict": "ACCEPT_SOURCE_CANDIDATE_ONLY_KEEP_INTEGRATION_AND_OPERATING_GATES",
+    "mandatoryBlockers": 0,
+    "findings": [
+      {
+        "id": "D476-SRC-R1-F1",
+        "severity": "LOW",
+        "mandatory": false,
+        "summary": "Go Verify accepts uppercase signature hex; the ADR and the Python verifier require lowercase [0-9a-f]{128}.",
+        "evidence": [
+          "https://github.com/egparadise/SaintVision-Invion/blob/d47630d730278aa9e49b15a63cd221696da8dc00/services/node-agent/recoverycandidate/wire.go#L121-L126",
+          "https://github.com/egparadise/SaintVision-Invion/blob/d47630d730278aa9e49b15a63cd221696da8dc00/services/control-plane/src/inv/proposed_expired_policy_recovery.py#L128-L131"
+        ],
+        "impact": "Envelope-encoding divergence only; the signed payload and key are unchanged. Where the outer request bytes are hashed (requestDigest) an uppercased variant changes the digest and fails closed (replay/CP mismatch -> HOLD). No acceptance path widens.",
+        "fixRequest": "Before integration, check the signature string against ^[0-9a-f]{128}$ in Go before hex.DecodeString, and add a cross-language uppercase-signature refusal test."
+      },
+      {
+        "id": "D476-SRC-R1-F2",
+        "severity": "LOW",
+        "mandatory": false,
+        "summary": "Node-side proof/checkpoint/history do not bind the authorizer or operator public-key hashes; the Node trusts them from argv pins plus the /trust mount.",
+        "evidence": [
+          "https://github.com/egparadise/SaintVision-Invion/blob/d47630d730278aa9e49b15a63cd221696da8dc00/services/node-agent/recoverycandidate/custody_linux.go#L67-L90",
+          "https://github.com/egparadise/SaintVision-Invion/blob/d47630d730278aa9e49b15a63cd221696da8dc00/services/node-agent/recoverycandidate/custody_linux.go#L180",
+          "https://github.com/egparadise/SaintVision-Invion/blob/d47630d730278aa9e49b15a63cd221696da8dc00/services/node-agent/recoverycandidate/custody_linux.go#L195"
+        ],
+        "impact": "The CP verifier and ledger scope digest pin the authority, so a record produced under foreign pins cannot commit; on the Node it can only occupy a counter slot and HOLD later operations (availability, not integrity). Authority provenance still rests on the operator's argv.",
+        "fixRequest": "In the integration card, add authorizerSHA256 and operatorSHA256 to the proof and checkpoint bodies, and check them in ownHistory against the current binding."
+      },
+      {
+        "id": "D476-SRC-R1-F3",
+        "severity": "LOW",
+        "mandatory": false,
+        "summary": "Files are opened by absolute path with O_NOFOLLOW on the final component only, not openat relative to verified root dirfds.",
+        "evidence": [
+          "https://github.com/egparadise/SaintVision-Invion/blob/d47630d730278aa9e49b15a63cd221696da8dc00/services/node-agent/recoverycandidate/custody_linux.go#L27-L45",
+          "https://github.com/egparadise/SaintVision-Invion/blob/d47630d730278aa9e49b15a63cd221696da8dc00/services/node-agent/recoverycandidate/custody_linux.go#L91-L106"
+        ],
+        "impact": "A same-UID actor able to swap a parent directory between checks could redirect an open. The fixed container bind mounts and RO/RW flag checks mitigate this, and the ADR already states it as a P2 assumption.",
+        "fixRequest": "In the P2 restricted adapter, use root dirfds + openat(O_NOFOLLOW) (or openat2 RESOLVE_BENEATH|RESOLVE_NO_SYMLINKS) and fstat-compare the root dirfds."
+      },
+      {
+        "id": "D476-SRC-R1-F4",
+        "severity": "LOW",
+        "mandatory": false,
+        "summary": "lockDevice/lockInode are converted from uint64 to int64 and must be canonical safe integers (<=2^53-1).",
+        "evidence": [
+          "https://github.com/egparadise/SaintVision-Invion/blob/d47630d730278aa9e49b15a63cd221696da8dc00/services/node-agent/recoverycandidate/custody_linux.go#L180",
+          "https://github.com/egparadise/SaintVision-Invion/blob/d47630d730278aa9e49b15a63cd221696da8dc00/services/node-agent/recoverycandidate/wire.go#L54-L58"
+        ],
+        "impact": "On a filesystem with 64-bit inode/device numbers above 2^53 the helper refuses RECOVERY_WIRE_NUMBER (fail-closed HOLD, not acceptance). This is a portability limit for P2, not a security defect.",
+        "fixRequest": "Encode dev/ino as decimal strings, or record the target filesystem's inode range in P2."
+      },
+      {
+        "id": "D476-SRC-R1-F5",
+        "severity": "INFO",
+        "mandatory": false,
+        "summary": "The fixture writes launch-signer.pub as the operator public key.",
+        "evidence": [
+          "https://github.com/egparadise/SaintVision-Invion/blob/d47630d730278aa9e49b15a63cd221696da8dc00/tests/proofs/run_expired_policy_candidate.py#L89"
+        ],
+        "impact": "Fixture realism only: the helper does not use launch-signer.pub as trust, but the hash is part of configDigest. Production launch-signer and operator roles must stay distinct.",
+        "fixRequest": "Use a distinct fixture key, or document the alias in the harness."
+      },
+      {
+        "id": "D476-SRC-R1-F6",
+        "severity": "INFO",
+        "mandatory": false,
+        "summary": "A PREPARED operation whose 120 s challenge has expired can never commit; reconcile is read-only and there is no abort or expire transition.",
+        "evidence": [
+          "https://github.com/egparadise/SaintVision-Invion/blob/d47630d730278aa9e49b15a63cd221696da8dc00/services/control-plane/src/inv/proposed_expired_policy_recovery.py"
+        ],
+        "impact": "Correct fail-closed HOLD by design (no stale-authority upgrade), but the next operation is blocked by 'one PREPARED at a time'. The integration card needs an authenticated abort/supersede transition with audit.",
+        "fixRequest": "Define a signed ABORTED transition for a deadline-expired PREPARED operation in the production DB adapter (P5)."
+      }
+    ],
+    "reviewedCandidateOnlyNotProduction": true,
+    "actualOwnClaudeBoard": "1.2.132",
+    "actualReviewDocs": 42437607536,
+    "all19SuccessJob": 128599724912,
+    "exactInputPins": {
+      "boardRules": 6,
+      "candidateBlobs": 17,
+      "RootEvidence": 6,
+      "unchangedServing": 3
+    },
+    "actualPostCIReceipt851B_SHA256": "e7d4f7e738490831e0660544af29cb9b8e503704cdeb2923bc43b9749e1634c3",
+    "fullCanonical605116BytesStartEndPostCICurrentMatched": true,
+    "actualAuthorReviewerExitedReleased": true,
+    "selectedNextCard": "FLEET5-EXPIRED-POLICY-INTEGRATION-HARDENING-AND-READONLY-PREFLIGHT-R1",
+    "nextScope": "Close F1-F4 before production integration, distinct fixture actors F5 and explicit expired PREPARED boundary F6; implement read-only current-cohort authority preflight collector/schema/guards with no private bytes or live mutation. Production publisher/CAS/context/migration activation stays separate.",
+    "nextActionOwner": "Root542 exact Docs/Obsidian then original actual Codex integration-readiness code/hosted proof; actual Claude source review then Root scoped read-only preflight, followed by remaining bounded migration/publication adapters.",
+    "actualProductionActivationMigrationRenewalRestartRun": false,
+    "B_Rpolicy": "null/HOLD",
+    "imports": [
+      {
+        "source": "fc9025c6a7c42ba58974f179b80b5099b4ec8244",
+        "path": "docs/vault/30_Development/Agent별 작업/Claude 작업 현황.md",
+        "bytes": 649242,
+        "SHA256": "b83a3d53c9bdfffae9cd0a7a6f3780824015e243894183029db976711c7f2480"
+      },
+      {
+        "source": "fc9025c6a7c42ba58974f179b80b5099b4ec8244",
+        "path": "docs/vault/30_Development/Evidence/fleet5-expired-policy-d476-source-review-r1-20261108-claude/local-gates.json",
+        "bytes": 1853,
+        "SHA256": "82e620c99b817ead9d96efa53c4ec445cc7d1f3f3ed0a462425bdc216aa18178"
+      },
+      {
+        "source": "fc9025c6a7c42ba58974f179b80b5099b4ec8244",
+        "path": "docs/vault/30_Development/Evidence/fleet5-expired-policy-d476-source-review-r1-20261108-claude/read-pins.json",
+        "bytes": 9162,
+        "SHA256": "7761ba80c58ab1577458c4832728918a4899587676215536bc565e23ff9cfdee"
+      },
+      {
+        "source": "fc9025c6a7c42ba58974f179b80b5099b4ec8244",
+        "path": "docs/vault/30_Development/Evidence/fleet5-expired-policy-d476-source-review-r1-20261108-claude/review.json",
+        "bytes": 21930,
+        "SHA256": "0600a201eb07aae78803be7adef9e10ebb8c819146003b7bcd454860712a2cff"
+      },
+      {
+        "source": "fc9025c6a7c42ba58974f179b80b5099b4ec8244",
+        "path": "docs/vault/30_Development/Evidence/fleet5-expired-policy-d476-source-review-r1-20261108-claude/sync-state-comparison.json",
+        "bytes": 1105,
+        "SHA256": "1c383e1fd9eee44dc800c9db5390b6d8cfbd3705da6915abf006ed62553b0aeb"
+      },
+      {
+        "source": "fc9025c6a7c42ba58974f179b80b5099b4ec8244",
+        "path": "docs/vault/30_Development/History/2026-11-08_FLEET5_Expired_Policy_D476_Source_Security_Review_R1_Claude.md",
+        "bytes": 15220,
+        "SHA256": "32d3a231b1c860a1c582b1aaa713e77b5f28a466855cecf2a1d90eb1acf90949"
+      }
+    ],
     "wholeProgramComplete": false
   }
 }
