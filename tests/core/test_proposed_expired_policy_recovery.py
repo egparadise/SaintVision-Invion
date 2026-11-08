@@ -182,3 +182,21 @@ def test_proposed_schema_closed_shapes_and_actual_signed_payloads():
         validator.validate(r.verify(proofs[node],r.PROOF,f.node_keys[node].public_key())[0])
     body['unexpected']=True
     assert list(validator.iter_errors(body))
+
+
+def test_existing_reference_ledger_cannot_be_rebound_to_other_authority(tmp_path):
+    first=Fixture(); body,env=first.authorization(); req,proof=first.reference_proofs(body,env)
+    path=tmp_path/'reference.sqlite'
+    ledger=r.CandidateLedger.create_reference(path,first.trust,{m['nodeId']:(m['priorC'],m['priorP']) for m in body['members']})
+    # Same Node names and initial C/P, fully valid new tenant/epoch/keys/proofs.
+    # The existing durable ledger must still refuse the foreign scope.
+    foreign=Fixture(); other,other_env=foreign.authorization(); req2,proof2=foreign.reference_proofs(other,other_env)
+    r.verify_proofs(other_env,req2,proof2,foreign.trust)
+    rebound=r.CandidateLedger(path,foreign.trust)
+    refused('RECOVERY_HOLD_LEDGER_SCOPE',lambda:rebound.prepare(other_env,req2,proof2))
+    with ledger.connect() as db:
+        assert db.execute('SELECT COUNT(*) FROM operations').fetchone()[0]==0
+        assert db.execute('SELECT COUNT(*) FROM audit').fetchone()[0]==0
+    # Positive control on the same untouched ledger, with otherwise identical
+    # Node names/C/P, proves the refusal was not setup/table/EXECUTE failure.
+    assert ledger.prepare(env,req,proof)['phase']=='PREPARED'

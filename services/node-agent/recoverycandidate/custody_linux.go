@@ -64,7 +64,7 @@ func signedLine(out io.Writer, value map[string]any) error {
 	_, err = fmt.Fprintln(out, string(raw)); return err
 }
 
-func ownHistory(root string, pub ed25519.PublicKey) ([]string, map[string]any, error) {
+func ownHistory(root string, pub ed25519.PublicKey, binding Binding) ([]string, map[string]any, error) {
 	entries, err := os.ReadDir(root); if err != nil { return nil, nil, refuse("RECOVERY_HOLD_HISTORY") }
 	names := []string{}
 	for _, entry := range entries {
@@ -81,6 +81,7 @@ func ownHistory(root string, pub ed25519.PublicKey) ([]string, map[string]any, e
 		checkpoint, _, err := Verify(Object(record, "checkpoint"), CheckpointDomain, pub)
 		if proofErr != nil || Text(proof,"schema") != "sv-expired-policy-nonserving-proof:1" || Text(checkpoint,"proofDigest") != Hash(proofRaw) || Text(proof,"requestDigest") != Text(record,"requestDigest") { return nil,nil,refuse("RECOVERY_HOLD_HISTORY") }
 		if err != nil || Number(checkpoint, "counter") != int64(i+1) || Text(checkpoint, "previousCheckpoint") != previous || Text(checkpoint, "requestDigest") != Text(record, "requestDigest") { return nil, nil, refuse("RECOVERY_HOLD_HISTORY") }
+		for _, body := range []map[string]any{proof,checkpoint} { if Text(body,"tenantId") != binding.Tenant || Text(body,"epoch") != binding.Epoch || Text(body,"nodeId") != binding.Node { return nil,nil,refuse("RECOVERY_HOLD_HISTORY_SCOPE") } }
 		if name != fmt.Sprintf("%08d-%s.json", i+1, Text(checkpoint, "operation")) { return nil, nil, refuse("RECOVERY_HOLD_HISTORY") }
 		previous = Hash(raw); last = record
 	}
@@ -151,7 +152,7 @@ func Run(request []byte, binding Binding, input io.Reader, out io.Writer) error 
 	if !Closed(op,"schema","role","proposalDigest","nodeId","containerId","imageId","helperSHA256","UID","lockDevice","lockInode","contextsDigest","issuedAt","deadline") || Text(op,"schema") != "sv-expired-policy-operator:1" || Text(op,"role") != "operator-custody-not-hardware" || Text(op,"proposalDigest") != Hash(authRaw) || Text(op,"nodeId") != binding.Node || Number(op,"deadline") != Number(auth,"deadline") || Number(op,"UID") != 1000 || Number(op,"lockDevice") != int64(lockStat.Dev) || Number(op,"lockInode") != int64(lockStat.Ino) || Text(op,"contextsDigest") != Hash(contextsRaw) || !hex64.MatchString(Text(op,"containerId")) || !hex64.MatchString(Text(op,"imageId")) { return refuse("RECOVERY_OPERATOR_BINDING") }
 	exeInfo, statErr := os.Stat("/proc/self/exe"); if statErr != nil || !exeInfo.Mode().IsRegular() || exeInfo.Sys().(*syscall.Stat_t).Uid != 1000 || exeInfo.Mode().Perm()&0022 != 0 { return refuse("RECOVERY_HELPER_PROVENANCE") }
 	exe, err := os.ReadFile("/proc/self/exe"); if err != nil || len(exe)>128*1024*1024 || Hash(exe) != binding.HelperHash || Text(op,"helperSHA256") != binding.HelperHash { return refuse("RECOVERY_HELPER_PROVENANCE") }
-	names, last, err := ownHistory(binding.CustodyRoot,key.Public().(ed25519.PublicKey)); if err != nil { return err }
+	names, last, err := ownHistory(binding.CustodyRoot,key.Public().(ed25519.PublicKey),binding); if err != nil { return err }
 	name := fmt.Sprintf("%08d-%s.json",Number(auth,"counter"),Text(auth,"operation"))
 	for _, existing := range names {
 		if existing == name {
@@ -171,7 +172,7 @@ func Run(request []byte, binding Binding, input io.Reader, out io.Writer) error 
 	floor, err := ParseJournal(floorRaw); if err != nil || !Closed(floor,"Version","Hash") || Number(floor,"Version") != Number(member,"priorP") || Text(floor,"Hash") != Hash(public["peer-policy.json"]) || Hash(floorRaw) != Text(member,"floorSHA256") || Hash(identityRaw) != Text(member,"identitySHA256") { return refuse("RECOVERY_AUTHENTICATED_FLOOR") }
 	policy, err := ParseJournal(public["peer-policy.json"])
 	if err != nil || !Closed(policy,"version","tenantId","nodeId","recoveryEpoch","expiresAt","clientFingerprints") || Number(policy,"version") != Number(member,"priorP") || Text(policy,"tenantId") != binding.Tenant || Text(policy,"nodeId") != binding.Node || Text(policy,"recoveryEpoch") != binding.Epoch || len(Array(policy,"clientFingerprints")) != 1 || Array(policy,"clientFingerprints")[0] != Hash(cpDER) { return refuse("RECOVERY_POLICY_BINDING") }
-	expiry, err := time.Parse(time.RFC3339Nano,Text(policy,"expiresAt")); if err != nil || expiry.Unix() > now || expiry.Unix() != Number(member,"priorPolicyExpiresAt") { return refuse("RECOVERY_POLICY_NOT_EXPIRED") }
+	expiry, err := time.Parse(time.RFC3339Nano,Text(policy,"expiresAt")); if err != nil || expiry.After(time.Unix(now,0)) || expiry.Unix() != Number(member,"priorPolicyExpiresAt") { return refuse("RECOVERY_POLICY_NOT_EXPIRED") }
 	config := map[string]any{}; for name, raw := range public { config[name] = Hash(raw) }; configRaw, _ := Canonical(config)
 	if Hash(public["peer-policy.json"]) != Text(member,"policySHA256") || Hash(configRaw) != Text(member,"configDigest") { return refuse("RECOVERY_CONFIG_BINDING") }
 	// The directory mounts are fixed by the operator; verify the locked inode is still published.

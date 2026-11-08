@@ -291,6 +291,16 @@ class CandidateLedger:
     def __init__(self, path, trust):
         self.path, self.trust = Path(path), trust
 
+    def scope_digest(self):
+        # Immutable authority/cohort binding. Context generations are validated
+        # per operation and never substitute for this durable ledger scope.
+        return sha(canonical({'tenantId':self.trust.tenant,'epoch':self.trust.epoch,
+            'ca':sha(self.trust.ca_der),'cp':sha(self.trust.cp_der),
+            'authorizer':sha(self.trust.authorizer.public_bytes_raw()),
+            'operator':sha(self.trust.operator.public_bytes_raw()),
+            'nodes':[{ 'nodeId':node,'ip':binding.ip,'certificate':sha(binding.certificate_der)}
+                     for node,binding in sorted(self.trust.nodes.items())]}))
+
     @classmethod
     def create_reference(cls, path, trust, initial):
         path = Path(path)
@@ -298,11 +308,16 @@ class CandidateLedger:
         fd = os.open(path, os.O_CREAT|os.O_EXCL|os.O_WRONLY|os.O_NOFOLLOW, 0o600)
         os.close(fd)
         ledger = cls(path, trust)
-        with ledger.connect() as db:
+        with sqlite3.connect(path, isolation_level=None) as db:
+            db.execute('PRAGMA synchronous=FULL')
+            db.execute('CREATE TABLE metadata(name TEXT PRIMARY KEY,value TEXT NOT NULL)')
             db.executescript('CREATE TABLE nodes(node TEXT PRIMARY KEY,c INTEGER NOT NULL,p INTEGER NOT NULL); CREATE TABLE operations(op TEXT PRIMARY KEY,nonce TEXT UNIQUE NOT NULL,digest TEXT NOT NULL,counter INTEGER UNIQUE NOT NULL,phase TEXT NOT NULL,batch TEXT NOT NULL,receipt BLOB); CREATE TABLE audit(op TEXT NOT NULL,node TEXT NOT NULL,c INTEGER NOT NULL,p INTEGER NOT NULL,digest TEXT NOT NULL,PRIMARY KEY(op,node));')
             for node,(c,p) in initial.items():
                 require(number(c,1) and number(p,1), "RECOVERY_GENERATIONS")
                 db.execute('INSERT INTO nodes VALUES(?,?,?)',(node,c,p))
+            # Publish readiness only after every initial row is durable. A
+            # concurrent opener during bootstrap sees a typed scope HOLD.
+            db.execute('INSERT INTO metadata VALUES(?,?)',('scope',ledger.scope_digest()))
         return ledger
 
     def connect(self):
@@ -312,6 +327,12 @@ class CandidateLedger:
         after = self.path.lstat()
         require((st.st_dev,st.st_ino,st.st_mode,st.st_uid,st.st_nlink) == (after.st_dev,after.st_ino,after.st_mode,after.st_uid,after.st_nlink), "RECOVERY_HOLD_LEDGER_CUSTODY")
         db.execute('PRAGMA synchronous=FULL')
+        try:
+            scope=db.execute("SELECT name,value FROM metadata").fetchall()
+        except sqlite3.DatabaseError:
+            db.close(); raise Refusal('RECOVERY_HOLD_LEDGER_SCOPE') from None
+        if scope != [('scope',self.scope_digest())]:
+            db.close(); raise Refusal('RECOVERY_HOLD_LEDGER_SCOPE')
         return db
 
     def prepare(self, envelope, requests, proofs):
