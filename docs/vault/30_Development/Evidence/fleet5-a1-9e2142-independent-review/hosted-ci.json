@@ -1,0 +1,89 @@
+{
+ "candidateSha": "9e2142a9ec5067fb9ee7ee43609f34ea113b754f",
+ "observedAtKST": "2026-11-19T05:35:28.583239+09:00",
+ "mode": "read-only gh run view",
+ "allExactSha": true,
+ "allSuccess": true,
+ "logObservations": [
+  "Core core job ran tests/core/test_a1_writer_fence.py with 3 dots; core pytest 9440 passed, 46 skipped",
+  "Backend 3.12 and 3.14 Tests: 9082 passed, 75 skipped each"
+ ],
+ "runs": [
+  {
+   "workflow": "Backend Build",
+   "runId": 44383727603,
+   "headSha": "9e2142a9ec5067fb9ee7ee43609f34ea113b754f",
+   "headBranch": "agent/codex/fleet5-runtime-a1-986a845b",
+   "event": "workflow_dispatch",
+   "status": "completed",
+   "conclusion": "success",
+   "url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/44383727603",
+   "jobs": [
+    {
+     "name": "backend (3.12)",
+     "conclusion": "success"
+    },
+    {
+     "name": "backend (3.14)",
+     "conclusion": "success"
+    },
+    {
+     "name": "mlflow-live",
+     "conclusion": "success"
+    }
+   ]
+  },
+  {
+   "workflow": "Core Build",
+   "runId": 44383720924,
+   "headSha": "9e2142a9ec5067fb9ee7ee43609f34ea113b754f",
+   "headBranch": "agent/codex/fleet5-runtime-a1-986a845b",
+   "event": "workflow_dispatch",
+   "status": "completed",
+   "conclusion": "success",
+   "url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/44383720924",
+   "jobs": [
+    {
+     "name": "core",
+     "conclusion": "success"
+    },
+    {
+     "name": "s01-storage-roundtrip",
+     "conclusion": "success"
+    }
+   ]
+  },
+  {
+   "workflow": "Documentation Build",
+   "runId": 44383714514,
+   "headSha": "9e2142a9ec5067fb9ee7ee43609f34ea113b754f",
+   "headBranch": "agent/codex/fleet5-runtime-a1-986a845b",
+   "event": "workflow_dispatch",
+   "status": "completed",
+   "conclusion": "success",
+   "url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/44383714514",
+   "jobs": [
+    {
+     "name": "docs",
+     "conclusion": "success"
+    }
+   ]
+  },
+  {
+   "workflow": "Portal Login Journey Harness",
+   "runId": 44383714007,
+   "headSha": "9e2142a9ec5067fb9ee7ee43609f34ea113b754f",
+   "headBranch": "agent/codex/fleet5-runtime-a1-986a845b",
+   "event": "push",
+   "status": "completed",
+   "conclusion": "success",
+   "url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/44383714007",
+   "jobs": [
+    {
+     "name": "portal-login-harness",
+     "conclusion": "success"
+    }
+   ]
+  }
+ ]
+}

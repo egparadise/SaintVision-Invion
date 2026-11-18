@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-CLAUDE-001"
 title: "Claude 작업 현황"
-version: "1.2.139"
+version: "1.2.140"
 status: "review"
 author: "Claude"
-updated: "2026-11-19T04:39:27+09:00"
+updated: "2026-11-19T05:36:00+09:00"
 
 
 
@@ -12,6 +12,32 @@ updated: "2026-11-19T04:39:27+09:00"
 
 source_of_truth: "Git"
 ---
+
+## 2026-11-19 FLEET5 A1 writer-transfer replay 독립 검토 9e2142a9 (Claude 직접 기록)
+
+- **작업** (task_0a3ed5ea2132 / ctx_e8ffe48b7c9e): Codex task_a5a7ea66e8f6이 055254c1 위에 만든 `9e2142a9`(agent/codex/fleet5-runtime-a1-986a845b)를 정확한 SHA의 격리 detached worktree에서 검토했다. Codex 브랜치는 바꾸지 않았다. 기록은 `agent/claude/fleet5-a1-9e2142-review`에 있다.
+- **판정**: 수락한다. 범위는 로컬 HOLD-only writer-fence prerequisite다. 차단 결함은 없다.
+  - receipt와 fence 변경은 한 `BEGIN IMMEDIATE` 트랜잭션에서 함께 commit된다. replay는 현재 fence와 receipt의 세대·직전 소유자가 정확히 일치할 때만 일어난다.
+  - 세대가 단조 증가하므로 A→B→A→B 순환이나 자기 이전 뒤에도 오래된 재시도는 거부된다.
+  - 구버전 ledger에서는 직전 소유자를 추정하지 않는다. 거부된 호출은 schema 생성까지 rollback한다.
+- **탐침**: 일회용 fixture로 Python 3.14.7/SQLite 3.50.4와 3.10.11/3.40.1에서 각 45건, 합계 90/90을 통과했다.
+  - lost-ack replay, 충돌·stale 재시도, 순환, 구버전 ledger, mixed-version을 확인했다.
+  - commit 전 crash 3종(raw writer, receipt 직전 transfer, RESERVED 보유 프로세스 강제 종료)은 모두 rollback 뒤 정상 재시도됐다.
+  - 동시 요청은 thread 8개와 process 8개로 시험했다. 동일 요청은 모두 같은 세대를 받았고, 경쟁 요청은 하나만 이겼다.
+  - inspection은 hot journal과 lock 상황에서도 HOLD였고 ledger를 바꾸지 않았다.
+- **확인**:
+  - 로컬: 정확한 SHA에서 505 passed(Codex 수치와 일치), fence test 3 passed, check_docs PASS.
+  - hosted: Backend 44383727603(3.12/3.14 각 9082 passed), Core 44383720924(fence test 3건 포함 9440 passed), Docs 44383714514, Portal 44383714007이 모두 정확한 SHA에서 success다.
+- **비차단 지적**:
+  1. Codex의 505 주장은 문장으로만 남아 있다. committed local-gates.json은 700b9480 실행 기록이다.
+  2. 5초 넘게 lock을 기다리면 `sqlite3.OperationalError`가 난다. commit은 없으므로 재시도해도 안전하지만, 테스트로 다루지 않았다.
+  3. receipt는 인증되지 않는다. fence 행과 신뢰 경계가 같다.
+  4. 990978 검토의 CLI exit 2와 `python -I` 지적이 그대로 남아 있다.
+- **하지 않은 것**: fleet 연결, 배포, 활성화, PR, push, vault export, Codex 브랜치 변경
+- **다음 첫 행동/담당**:
+  - Root(coordinator): 통합, 게시, canonical export, 운영 custody 통합
+  - Codex: signer ceremony ledger, fleet-wide writer enforcement, 지적 1·2 처리
+  - [[2026-11-19_FLEET5_A1_9e2142_Independent_Review]]
 
 ## 2026-11-19 FLEET5 interrupted A1 standalone inspection 독립 재검토 990978075d9f (Claude 직접 기록)
 

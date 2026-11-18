@@ -1,0 +1,60 @@
+{
+ "candidateSha": "9e2142a9ec5067fb9ee7ee43609f34ea113b754f",
+ "checkout": "isolated detached worktree, then review branch with docs-only additions",
+ "python": "3.14.7 (probes also 3.10.11)",
+ "pathsRelativeTo": "Claude session scratchpad",
+ "gates": [
+  {
+   "command": "git rev-parse HEAD",
+   "kst": "2026-11-19T05:34:53.176558+09:00",
+   "exit": 0,
+   "tail": [
+    "9e2142a9ec5067fb9ee7ee43609f34ea113b754f"
+   ]
+  },
+  {
+   "command": "python -m pytest -q -p no:cacheprovider tests/test_intranet_pki.py tests/core/test_a1_writer_fence.py tests/core/test_fleet5_authority_replacement_r2.py tests/core/test_serving_anchors.py tests/test_route_coverage.py tests/test_lan_leaf_rotation.py",
+   "kst": "2026-11-19T05:34:53.224139+09:00",
+   "exit": 0,
+   "tail": [
+    "........................................................................ [ 85%]",
+    "........................................................................ [ 99%]",
+    ".                                                                        [100%]",
+    "505 passed in 18.05s"
+   ]
+  },
+  {
+   "command": "python -m pytest -q -p no:cacheprovider tests/core/test_a1_writer_fence.py",
+   "kst": "2026-11-19T05:35:12.476613+09:00",
+   "exit": 0,
+   "tail": [
+    "...                                                                      [100%]",
+    "3 passed in 1.58s"
+   ]
+  },
+  {
+   "command": "python -I probe9e21/probe.py wt9e21",
+   "kst": "2026-11-19T05:35:15.096617+09:00",
+   "exit": 0,
+   "tail": [
+    "python 3.14.7 sqlite 3.50.4: 45/45 probes passed; see probe-result.json"
+   ]
+  },
+  {
+   "command": "python3.10 -I probe9e21/probe.py wt9e21",
+   "kst": "2026-11-19T05:35:19.520947+09:00",
+   "exit": 0,
+   "tail": [
+    "python 3.10.11 sqlite 3.40.1: 45/45 probes passed; see probe-result.json"
+   ]
+  },
+  {
+   "command": "python tools/check_docs.py",
+   "kst": "2026-11-19T05:36:31.538676+09:00",
+   "exit": 0,
+   "tail": [
+    "PASS: 24 original hashes, 1284 versioned documents, wiki links, 48 tasks, 12 outcomes, owner/reviewer/skills, dependency DAG."
+   ]
+  }
+ ]
+}

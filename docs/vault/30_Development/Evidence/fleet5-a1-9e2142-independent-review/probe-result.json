@@ -1,0 +1,473 @@
+{
+ "candidateSha": "9e2142a9ec5067fb9ee7ee43609f34ea113b754f",
+ "runs": [
+  {
+   "sha": "9e2142a9ec5067fb9ee7ee43609f34ea113b754f",
+   "python": "3.14.7",
+   "sqlite": "3.50.4",
+   "passed": 45,
+   "total": 45,
+   "results": [
+    {
+     "probe": "atomic.initial",
+     "ok": true,
+     "detail": "([('p', 'a', 1)], [(1, None, None, None, 1)])"
+    },
+    {
+     "probe": "atomic.second",
+     "ok": true,
+     "detail": "([('q', 'b', 2)], [(1, 'p', 'a', 1, 2)])"
+    },
+    {
+     "probe": "crash.midtxn.rolledback",
+     "ok": true,
+     "detail": "(44, [('q', 'b', 2)], [(1, 'p', 'a', 1, 2)])"
+    },
+    {
+     "probe": "crash.midtxn.retry_after",
+     "ok": true,
+     "detail": ""
+    },
+    {
+     "probe": "crash.prereceipt.hot_journal_inspect_hold",
+     "ok": true,
+     "detail": "(45, True, 'HOLD_CUSTODY_UNRESOLVED')"
+    },
+    {
+     "probe": "crash.prereceipt.rolledback",
+     "ok": true,
+     "detail": "([('p', 'a', 1)], [(1, None, None, None, 1)])"
+    },
+    {
+     "probe": "crash.prereceipt.retry_transfers",
+     "ok": true,
+     "detail": ""
+    },
+    {
+     "probe": "crash.prereceipt.replay",
+     "ok": true,
+     "detail": ""
+    },
+    {
+     "probe": "lostack.replay",
+     "ok": true,
+     "detail": ""
+    },
+    {
+     "probe": "lostack.replay_twice_no_change",
+     "ok": true,
+     "detail": ""
+    },
+    {
+     "probe": "conflict.same_prev_other_token",
+     "ok": true,
+     "detail": ""
+    },
+    {
+     "probe": "conflict.same_prev_other_plan",
+     "ok": true,
+     "detail": ""
+    },
+    {
+     "probe": "conflict.wrong_prev_plan",
+     "ok": true,
+     "detail": ""
+    },
+    {
+     "probe": "conflict.wrong_prev_token",
+     "ok": true,
+     "detail": ""
+    },
+    {
+     "probe": "conflict.initial_retry_after_second",
+     "ok": true,
+     "detail": ""
+    },
+    {
+     "probe": "conflict.initial_retry_other",
+     "ok": true,
+     "detail": ""
+    },
+    {
+     "probe": "state.unchanged_after_conflicts",
+     "ok": true,
+     "detail": "([('q', 'b', 2)], [(1, 'p', 'a', 1, 2)])"
+    },
+    {
+     "probe": "cycle.generations",
+     "ok": true,
+     "detail": ""
+    },
+    {
+     "probe": "cycle.stale_rejected",
+     "ok": true,
+     "detail": ""
+    },
+    {
+     "probe": "cycle.current_replay_ok",
+     "ok": true,
+     "detail": ""
+    },
+    {
+     "probe": "cycle.aba_old_gen_prev",
+     "ok": true,
+     "detail": ""
+    },
+    {
+     "probe": "cycle.state",
+     "ok": true,
+     "detail": "([('q', 'b', 4)], [(1, 'p', 'a', 3, 4)])"
+    },
+    {
+     "probe": "cycle.self_transfer_gen5",
+     "ok": true,
+     "detail": ""
+    },
+    {
+     "probe": "cycle.self_stale_retry_rejected",
+     "ok": true,
+     "detail": ""
+    },
+    {
+     "probe": "cycle.self_current_replay",
+     "ok": true,
+     "detail": ""
+    },
+    {
+     "probe": "legacy.no_infer_initial_retry",
+     "ok": true,
+     "detail": ""
+    },
+    {
+     "probe": "legacy.current_owner_transfer",
+     "ok": true,
+     "detail": ""
+    },
+    {
+     "probe": "legacy.replay_after_upgrade",
+     "ok": true,
+     "detail": ""
+    },
+    {
+     "probe": "legacy.lost_ack_unprovable_rejected",
+     "ok": true,
+     "detail": ""
+    },
+    {
+     "probe": "legacy.reject_leaves_fence_and_rolls_back_schema",
+     "ok": true,
+     "detail": "([('q', 'b', 2)], None)"
+    },
+    {
+     "probe": "mixed.stale_receipt_no_replay_old",
+     "ok": true,
+     "detail": ""
+    },
+    {
+     "probe": "mixed.no_replay_new",
+     "ok": true,
+     "detail": ""
+    },
+    {
+     "probe": "mixed.current_owner_continues",
+     "ok": true,
+     "detail": ""
+    },
+    {
+     "probe": "thr.identical_all_same",
+     "ok": true,
+     "detail": "[Writer(plan_digest='q', token='b', generation=2), Writer(plan_digest='q', token='b', generation=2)]"
+    },
+    {
+     "probe": "thr.competing_one_winner",
+     "ok": true,
+     "detail": "[None, None, None, Writer(plan_digest='r', token='t3', generation=3), None, None, None, None]"
+    },
+    {
+     "probe": "proc.mixed_one_token_wins_identicals_replay",
+     "ok": true,
+     "detail": "('b', [('b', 'OK b 2', ''), ('b', 'OK b 2', ''), ('b', 'OK b 2', ''), ('b', 'OK b 2', ''), ('b', 'OK b 2', ''), ('b', 'OK b 2', ''), ('x', 'REJECT', ''), ('y', 'REJECT', '')])"
+    },
+    {
+     "probe": "kill.inspect_while_locked_hold",
+     "ok": true,
+     "detail": "HOLD_CUSTODY_UNRESOLVED"
+    },
+    {
+     "probe": "kill.rolled_back",
+     "ok": true,
+     "detail": "([('p', 'a', 1)], [(1, None, None, None, 1)])"
+    },
+    {
+     "probe": "kill.retry_after",
+     "ok": true,
+     "detail": ""
+    },
+    {
+     "probe": "hold.empty_ledger",
+     "ok": true,
+     "detail": ""
+    },
+    {
+     "probe": "hold.values",
+     "ok": true,
+     "detail": "['HOLD_WRITER_FENCE', 'HOLD_WRITER_FENCE', 'HOLD_CUSTODY_UNRESOLVED', 'HOLD_WRITER_FENCE', 'HOLD_WRITER_FENCE']"
+    },
+    {
+     "probe": "hold.legacy_no_schema_write",
+     "ok": true,
+     "detail": ""
+    },
+    {
+     "probe": "hold.cli",
+     "ok": true,
+     "detail": "[(2, 'HOLD_CUSTODY_UNRESOLVED', ''), (2, 'HOLD_WRITER_FENCE', ''), (2, 'HOLD_WRITER_FENCE', ''), (2, 'HOLD_WRITER_FENCE', ''), (2, 'HOLD_WRITER_FENCE', '')]"
+    },
+    {
+     "probe": "surface.public_callables",
+     "ok": true,
+     "detail": "['Writer', 'initialize', 'interrupted_a1_hold', 'transfer']"
+    },
+    {
+     "probe": "surface.no_network_or_exec",
+     "ok": true,
+     "detail": ""
+    }
+   ]
+  },
+  {
+   "sha": "9e2142a9ec5067fb9ee7ee43609f34ea113b754f",
+   "python": "3.10.11",
+   "sqlite": "3.40.1",
+   "passed": 45,
+   "total": 45,
+   "results": [
+    {
+     "probe": "atomic.initial",
+     "ok": true,
+     "detail": "([('p', 'a', 1)], [(1, None, None, None, 1)])"
+    },
+    {
+     "probe": "atomic.second",
+     "ok": true,
+     "detail": "([('q', 'b', 2)], [(1, 'p', 'a', 1, 2)])"
+    },
+    {
+     "probe": "crash.midtxn.rolledback",
+     "ok": true,
+     "detail": "(44, [('q', 'b', 2)], [(1, 'p', 'a', 1, 2)])"
+    },
+    {
+     "probe": "crash.midtxn.retry_after",
+     "ok": true,
+     "detail": ""
+    },
+    {
+     "probe": "crash.prereceipt.hot_journal_inspect_hold",
+     "ok": true,
+     "detail": "(45, True, 'HOLD_CUSTODY_UNRESOLVED')"
+    },
+    {
+     "probe": "crash.prereceipt.rolledback",
+     "ok": true,
+     "detail": "([('p', 'a', 1)], [(1, None, None, None, 1)])"
+    },
+    {
+     "probe": "crash.prereceipt.retry_transfers",
+     "ok": true,
+     "detail": ""
+    },
+    {
+     "probe": "crash.prereceipt.replay",
+     "ok": true,
+     "detail": ""
+    },
+    {
+     "probe": "lostack.replay",
+     "ok": true,
+     "detail": ""
+    },
+    {
+     "probe": "lostack.replay_twice_no_change",
+     "ok": true,
+     "detail": ""
+    },
+    {
+     "probe": "conflict.same_prev_other_token",
+     "ok": true,
+     "detail": ""
+    },
+    {
+     "probe": "conflict.same_prev_other_plan",
+     "ok": true,
+     "detail": ""
+    },
+    {
+     "probe": "conflict.wrong_prev_plan",
+     "ok": true,
+     "detail": ""
+    },
+    {
+     "probe": "conflict.wrong_prev_token",
+     "ok": true,
+     "detail": ""
+    },
+    {
+     "probe": "conflict.initial_retry_after_second",
+     "ok": true,
+     "detail": ""
+    },
+    {
+     "probe": "conflict.initial_retry_other",
+     "ok": true,
+     "detail": ""
+    },
+    {
+     "probe": "state.unchanged_after_conflicts",
+     "ok": true,
+     "detail": "([('q', 'b', 2)], [(1, 'p', 'a', 1, 2)])"
+    },
+    {
+     "probe": "cycle.generations",
+     "ok": true,
+     "detail": ""
+    },
+    {
+     "probe": "cycle.stale_rejected",
+     "ok": true,
+     "detail": ""
+    },
+    {
+     "probe": "cycle.current_replay_ok",
+     "ok": true,
+     "detail": ""
+    },
+    {
+     "probe": "cycle.aba_old_gen_prev",
+     "ok": true,
+     "detail": ""
+    },
+    {
+     "probe": "cycle.state",
+     "ok": true,
+     "detail": "([('q', 'b', 4)], [(1, 'p', 'a', 3, 4)])"
+    },
+    {
+     "probe": "cycle.self_transfer_gen5",
+     "ok": true,
+     "detail": ""
+    },
+    {
+     "probe": "cycle.self_stale_retry_rejected",
+     "ok": true,
+     "detail": ""
+    },
+    {
+     "probe": "cycle.self_current_replay",
+     "ok": true,
+     "detail": ""
+    },
+    {
+     "probe": "legacy.no_infer_initial_retry",
+     "ok": true,
+     "detail": ""
+    },
+    {
+     "probe": "legacy.current_owner_transfer",
+     "ok": true,
+     "detail": ""
+    },
+    {
+     "probe": "legacy.replay_after_upgrade",
+     "ok": true,
+     "detail": ""
+    },
+    {
+     "probe": "legacy.lost_ack_unprovable_rejected",
+     "ok": true,
+     "detail": ""
+    },
+    {
+     "probe": "legacy.reject_leaves_fence_and_rolls_back_schema",
+     "ok": true,
+     "detail": "([('q', 'b', 2)], None)"
+    },
+    {
+     "probe": "mixed.stale_receipt_no_replay_old",
+     "ok": true,
+     "detail": ""
+    },
+    {
+     "probe": "mixed.no_replay_new",
+     "ok": true,
+     "detail": ""
+    },
+    {
+     "probe": "mixed.current_owner_continues",
+     "ok": true,
+     "detail": ""
+    },
+    {
+     "probe": "thr.identical_all_same",
+     "ok": true,
+     "detail": "[Writer(plan_digest='q', token='b', generation=2), Writer(plan_digest='q', token='b', generation=2)]"
+    },
+    {
+     "probe": "thr.competing_one_winner",
+     "ok": true,
+     "detail": "[None, None, Writer(plan_digest='r', token='t2', generation=3), None, None, None, None, None]"
+    },
+    {
+     "probe": "proc.mixed_one_token_wins_identicals_replay",
+     "ok": true,
+     "detail": "('b', [('b', 'OK b 2', ''), ('b', 'OK b 2', ''), ('b', 'OK b 2', ''), ('b', 'OK b 2', ''), ('b', 'OK b 2', ''), ('b', 'OK b 2', ''), ('x', 'REJECT', ''), ('y', 'REJECT', '')])"
+    },
+    {
+     "probe": "kill.inspect_while_locked_hold",
+     "ok": true,
+     "detail": "HOLD_CUSTODY_UNRESOLVED"
+    },
+    {
+     "probe": "kill.rolled_back",
+     "ok": true,
+     "detail": "([('p', 'a', 1)], [(1, None, None, None, 1)])"
+    },
+    {
+     "probe": "kill.retry_after",
+     "ok": true,
+     "detail": ""
+    },
+    {
+     "probe": "hold.empty_ledger",
+     "ok": true,
+     "detail": ""
+    },
+    {
+     "probe": "hold.values",
+     "ok": true,
+     "detail": "['HOLD_WRITER_FENCE', 'HOLD_WRITER_FENCE', 'HOLD_CUSTODY_UNRESOLVED', 'HOLD_WRITER_FENCE', 'HOLD_WRITER_FENCE']"
+    },
+    {
+     "probe": "hold.legacy_no_schema_write",
+     "ok": true,
+     "detail": ""
+    },
+    {
+     "probe": "hold.cli",
+     "ok": true,
+     "detail": "[(2, 'HOLD_CUSTODY_UNRESOLVED', ''), (2, 'HOLD_WRITER_FENCE', ''), (2, 'HOLD_WRITER_FENCE', ''), (2, 'HOLD_WRITER_FENCE', ''), (2, 'HOLD_WRITER_FENCE', '')]"
+    },
+    {
+     "probe": "surface.public_callables",
+     "ok": true,
+     "detail": "['Writer', 'initialize', 'interrupted_a1_hold', 'transfer']"
+    },
+    {
+     "probe": "surface.no_network_or_exec",
+     "ok": true,
+     "detail": ""
+    }
+   ]
+  }
+ ]
+}
