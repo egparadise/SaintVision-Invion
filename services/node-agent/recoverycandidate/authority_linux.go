@@ -9,8 +9,26 @@ import (
     "os"
     "strconv"
     "strings"
+    "runtime"
+    "unsafe"
     "syscall"
 )
+
+// The standalone helper supports Linux amd64 and arm64 with openat2 (5.6+).
+// Unsupported architectures and kernels fail closed; no insecure fallback.
+// Both supported Linux syscall ABIs assign openat2 number 437.
+func openConfined(dir int, name string, flags int) (int,error) {
+    if runtime.GOARCH!="amd64" && runtime.GOARCH!="arm64" { return -1,syscall.ENOSYS }
+    path,err:=syscall.BytePtrFromString(name)
+    if err!=nil {return -1,err}
+    const noCrossMount=0x01
+    const noSymlinks=0x04
+    const beneath=0x08
+    how:=struct{ Flags,Mode,Resolve uint64 }{uint64(flags|syscall.O_CLOEXEC),0,noCrossMount|noSymlinks|beneath}
+    fd,_,errno:=syscall.Syscall6(437,uintptr(dir),uintptr(unsafe.Pointer(path)),uintptr(unsafe.Pointer(&how)),unsafe.Sizeof(how),0,0)
+    if errno!=0 {return -1,errno}
+    return int(fd),nil
+}
 
 // mountID reads kernel metadata for an already held FD. It never resolves
 // /proc/self/fd/N to obtain filesystem authority.
@@ -34,7 +52,7 @@ func checkProvisionedAuthority(binding Binding, members []any) error {
     root, err := syscall.Open("/", syscall.O_DIRECTORY|syscall.O_RDONLY|syscall.O_CLOEXEC, 0)
     if err != nil { return hold }
     defer syscall.Close(root)
-    fd, err := syscall.Openat(root, "recovery-authority.json", syscall.O_RDONLY|syscall.O_NOFOLLOW|syscall.O_NONBLOCK|syscall.O_CLOEXEC, 0)
+    fd, err := openConfined(root, "recovery-authority.json", syscall.O_RDONLY|syscall.O_NOFOLLOW|syscall.O_NONBLOCK)
     if err != nil { return hold }
     file := os.NewFile(uintptr(fd), "recovery-authority.json")
     defer file.Close()

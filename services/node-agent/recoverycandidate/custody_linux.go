@@ -41,7 +41,7 @@ func readRegular(root *os.File, path string, empty bool) ([]byte, *syscall.Stat_
 
 func openChild(root *os.File, name string, flags int) (int,error) {
     if name == "." || name == ".." || filepath.Base(name) != name { return -1,refuse("RECOVERY_HOLD_FILE") }
-    fd,err := syscall.Openat(int(root.Fd()),name, flags|syscall.O_NOFOLLOW|syscall.O_NONBLOCK|syscall.O_CLOEXEC,0)
+    fd,err := openConfined(int(root.Fd()),name,flags|syscall.O_NOFOLLOW|syscall.O_NONBLOCK)
     if err != nil { return -1,err }
     a,ok := mountID(int(root.Fd()))
     b,valid := mountID(fd)
@@ -136,10 +136,27 @@ func durableRecord(root *os.File, name string, raw []byte) error {
     f:=os.NewFile(uintptr(fd),"unpublished-checkpoint")
     defer f.Close()
     if n,err:=f.Write(raw); err!=nil || n!=len(raw) || f.Sync()!=nil { return refuse("RECOVERY_HOLD_PARTIAL_CHECKPOINT") }
-    src,_:=syscall.BytePtrFromString(fmt.Sprintf("/proc/self/fd/%d",fd))
+    // Verify a real procfs and hold this process's fd directory. openat2
+    // excludes all nested mounts and links below that procfs root.
+    proc,err:=syscall.Open("/proc",syscall.O_DIRECTORY|syscall.O_NOFOLLOW|syscall.O_RDONLY|syscall.O_CLOEXEC,0)
+    if err!=nil {return refuse("RECOVERY_HOLD_PARTIAL_CHECKPOINT")}
+    defer syscall.Close(proc)
+    var fs syscall.Statfs_t
+    if syscall.Fstatfs(proc,&fs)!=nil || fs.Type!=0x9fa0 {return refuse("RECOVERY_HOLD_PARTIAL_CHECKPOINT")}
+    refs,err:=openConfined(proc,fmt.Sprintf("%d/fd",os.Getpid()),syscall.O_DIRECTORY|syscall.O_RDONLY)
+    if err!=nil {return refuse("RECOVERY_HOLD_PARTIAL_CHECKPOINT")}
+    defer syscall.Close(refs)
+    source:=fmt.Sprint(fd)
+    check,err:=syscall.Openat(refs,source,syscall.O_RDONLY|syscall.O_CLOEXEC,0)
+    if err!=nil {return refuse("RECOVERY_HOLD_PARTIAL_CHECKPOINT")}
+    defer syscall.Close(check)
+    var expected,observed syscall.Stat_t
+    if syscall.Fstat(check,&observed)!=nil || syscall.Fstat(fd,&expected)!=nil || expected.Dev!=observed.Dev ||
+        expected.Ino!=observed.Ino || observed.Nlink!=0 {return refuse("RECOVERY_HOLD_PARTIAL_CHECKPOINT")}
+    src,_:=syscall.BytePtrFromString(source)
     dst,err:=syscall.BytePtrFromString(name)
     if err!=nil || filepath.Base(name)!=name { return refuse("RECOVERY_HOLD_CHECKPOINT_CONFLICT") }
-    _,_,errno:=syscall.Syscall6(syscall.SYS_LINKAT,uintptr(dirfd),uintptr(unsafe.Pointer(src)),uintptr(dirfd),uintptr(unsafe.Pointer(dst)),0x400,0)
+    _,_,errno:=syscall.Syscall6(syscall.SYS_LINKAT,uintptr(refs),uintptr(unsafe.Pointer(src)),uintptr(dirfd),uintptr(unsafe.Pointer(dst)),0x400,0)
     if errno!=0 { return refuse("RECOVERY_HOLD_CHECKPOINT_CONFLICT") }
     if root.Sync()!=nil { return refuse("RECOVERY_HOLD_PARTIAL_CHECKPOINT") }
     return nil

@@ -63,8 +63,7 @@ def scope(d):
             p=PurePosixPath(member[key])
             require(p.is_absolute() and len(p.parts)>1 and p.parts[0]=="/" and ".." not in p.parts and str(p)==member[key], "DESCRIPTOR_PATH")
         require(member["config"] != member["state"], "DESCRIPTOR_PATH")
-    for k in ("cid",):
-        require(len({m[k] for m in d["nodes"].values()})==3,"DESCRIPTOR_MEMBERS")
+    require(len({m["cid"] for m in d["nodes"].values()})==3,"DESCRIPTOR_MEMBERS")
     return d
 
 

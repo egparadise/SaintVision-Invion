@@ -4,6 +4,9 @@ import os
 import stat
 import subprocess
 import sys
+sys.dont_write_bytecode=True
+import posixpath
+import re
 from contextlib import ExitStack
 from datetime import datetime, timezone
 from common import Hold, decode, digest, now, report, require, scope
@@ -58,6 +61,38 @@ def inspect(cid,label):
     return dict(zip(fields,map(json.loads,lines)))
 
 
+def mount_rows(pid):
+    # mountinfo exposes the live filesystem root of a bind, including a
+    # directory rename after container creation. Docker's Source is historical.
+    with open(f"/proc/{pid}/mountinfo","rb") as stream:
+        raw=stream.read(2**20+1)
+    require(len(raw)<=2**20,"MOUNT_TABLE_LIMIT")
+    def unescape(value):
+        return re.sub(rb"\\([0-7]{3})",lambda m:bytes([int(m[1],8)]),value).decode()
+    rows=[]
+    for line in raw.splitlines():
+        fields=line.split(b" - ",1)[0].split()
+        require(len(fields)>=6,"MOUNT_TABLE_UNKNOWN")
+        rows.append((fields[0].decode(),fields[2].decode(),unescape(fields[3]),
+                     unescape(fields[4]),fields[5].decode().split(",")))
+    return rows
+
+
+def bind_identity(root,path,destination,pid):
+    host=[row for row in mount_rows(os.getpid()) if row[0]==mount(root)]
+    target=[row for row in mount_rows(pid) if row[3]==destination]
+    require(len(host)==len(target)==1,"BIND_INODE_SCOPE_UNKNOWN")
+    host,target=host[0],target[0]
+    device=os.fstat(root).st_dev
+    require(host[1]==target[1]==f"{os.major(device)}:{os.minor(device)}" and
+            posixpath.commonpath((path,host[3]))==host[3],"BIND_DEVICE_UNKNOWN")
+    relative=posixpath.relpath(path,host[3])
+    expected=posixpath.normpath(posixpath.join(host[2],relative))
+    require(target[2]==expected and ("ro" if destination=="/config" else "rw") in target[4],
+            "BIND_SOURCE_CHANGED")
+    return dict(hostMountId=host[0],containerMountId=target[0],device=target[1])
+
+
 def cert_expired(value):
     return datetime.fromisoformat(value)<=datetime.now(timezone.utc)
 
@@ -102,7 +137,7 @@ def gather(d,node,out):
         require(not os.path.samestat(os.fstat(roots["state"]),os.fstat(roots["config"])),"DIRECTORY_ALIAS")
         held={}
         for kind,root in roots.items():
-            facts["directories"][kind]=dict(path=member[kind],bindRW=mounts["/"+kind]["RW"],**metadata(os.fstat(root)))
+            facts["directories"][kind]=dict(**bind_identity(root,member[kind],"/"+kind,initial["pid"]),path=member[kind],bindRW=mounts["/"+kind]["RW"],**metadata(os.fstat(root)))
             for name in (*PUBLIC[kind], ("node-key.pem" if kind=="config" else ".lock")):
                 public=name in PUBLIC[kind]
                 flags=FLAGS if public else os.O_PATH|os.O_NOFOLLOW|os.O_CLOEXEC
@@ -141,6 +176,8 @@ def gather(d,node,out):
         facts["policy"]={"P":policy["version"],"expiresAt":policy["expiresAt"],"cpDER":d["cpDER"]}
         require(process_security(initial["pid"])==facts["processSecurity"] and inspect(member["cid"],d["ownerLabel"])==initial,"CONTAINER_CHANGED")
         for kind,root in roots.items():
+            binding=bind_identity(root,member[kind],"/"+kind,initial["pid"])
+            require(all(facts["directories"][kind][k]==v for k,v in binding.items()),"BIND_SOURCE_CHANGED")
             check=directory(member[kind],stack)
             require(os.path.samestat(os.fstat(root),os.fstat(check)) and mount(root)==mount(check),"DIRECTORY_CHANGED")
         for (kind,name),(fd,before) in held.items():

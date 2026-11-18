@@ -39,3 +39,15 @@ func TestHistoryRefusesSignedForeignScopeWithSameRetainedKey(t *testing.T) {
         if ErrorCode(err) != "RECOVERY_HOLD_HISTORY_SCOPE" { t.Fatalf("foreign history was not refused by scope: %v",err) }
     }
 }
+
+func TestHistoricalV1NamespaceRemainsOnHold(t *testing.T) {
+    root:=t.TempDir()
+    const name="00000001-0123456789abcdef0123456789abcdef.json"
+    archived:=[]byte(`{"checkpoint":{},"proof":{},"requestDigest":"archived","schema":"sv-expired-policy-record:1"}`)
+    if err:=os.WriteFile(filepath.Join(root,name),archived,0600); err!=nil { t.Fatal(err) }
+    held,err:=os.Open(root); if err!=nil { t.Fatal(err) }; defer held.Close()
+    _,_,err=ownHistory(held,nil,Binding{})
+    if ErrorCode(err)!="RECOVERY_HOLD_HISTORY" { t.Fatalf("unsupported record: %v",err) }
+    after,err:=os.ReadFile(filepath.Join(root,name))
+    if err!=nil || string(after)!=string(archived) { t.Fatal("archived record modified") }
+}

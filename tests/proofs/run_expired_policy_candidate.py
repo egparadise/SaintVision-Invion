@@ -88,6 +88,25 @@ def collect_fixture_nodes(f,image_id,nodes):
         after=snapshot()
         assert obs['observationComplete'] and not obs['recoveryReady'] and before==after
         assert 'sha256' not in obs['facts']['files']['node-key.pem']
+        # Docker keeps the original mounted inode when the host source name is
+        # replaced. The collector must detect that before reporting file facts.
+        original=paths['config']
+        retained=original.with_name('config-retained-for-fixture')
+        original.rename(retained)
+        try:
+            original.mkdir(mode=0o700)
+            os.chown(original,1000,1000)
+            result=subprocess.run([sys.executable,'-B',str(ROOT/'tools/recovery_preflight/node.py')],
+                                  input=json.dumps(dict(descriptor=descriptor,node=node)).encode(),
+                                  capture_output=True,timeout=15)
+            declined=json.loads(result.stdout)
+            assert result.returncode==2 and 'BIND_SOURCE_CHANGED' in declined['holds'],declined['holds']
+            assert not declined['observationComplete'] and not list(original.iterdir())
+        finally:
+            original.rmdir()
+            retained.rename(original)
+        assert before==snapshot()
+        REPORT['negativeControls'].append(dict(name='host-bind-parent-replaced',exit=result.returncode,typedError='BIND_SOURCE_CHANGED'))
         observations.append(dict(observation=obs,changedFiles=sum(before.get(k)!=after.get(k) for k in before.keys()|after.keys())))
     REPORT['readOnlyNodeObservations']=observations
 
@@ -103,6 +122,7 @@ def main():
     (build/'Dockerfile').write_text('FROM scratch\nCOPY --chown=1000:1000 custody-proof /custody-proof\nCOPY --chown=1000:1000 fixture-key /fixture-key\nUSER 1000:1000\nENTRYPOINT ["/fixture-key","--isolated-fixture-hold"]\n')
     command(['docker','build','--network=none','--pull=false','-t',image,str(build)])
     image_id=command(['docker','image','inspect','--format','{{.Id}}',image]).decode().strip().removeprefix('sha256:')
+    bootstrap_image_id=image_id
     REPORT.update(imageId=image_id,helperSHA256=r.sha((build/'custody-proof').read_bytes()),runner='GitHub ubuntu-latest Linux; root fixture supervisor; UID1000 child containers; no network/capabilities/privileges',realCrypto='Ed25519 retained Node keys, separate CA/TLS/recovery/operator actors')
     with tempfile.TemporaryDirectory(prefix='sv-expired-policy-fixture-') as temp:
         scope=Path(temp); nodes={}; public={}
@@ -130,6 +150,11 @@ def main():
         for node,item in nodes.items():
             paths=item['paths']
             for name,raw in {'node-cert.pem':f.certs[node].public_bytes(serialization.Encoding.PEM),'client-ca.pem':f.ca.public_bytes(serialization.Encoding.PEM),'launch-signer.pub':f.launch_signer.public_key().public_bytes_raw()}.items(): write(paths['config']/name,raw)
+            launch=(paths['config']/'launch-signer.pub').read_bytes()
+            assert launch==f.launch_signer.public_key().public_bytes_raw()
+            other_roles=[f.authorizer.public_key(),f.operator.public_key(),f.ca_key.public_key(),f.cp_key.public_key(),*public.values()]
+            assert launch not in [key.public_bytes_raw() for key in other_roles]
+            REPORT['launchSignerSHA256']=r.sha(launch)
             for name,key in [('authorizer.pub',f.authorizer),('operator.pub',f.operator)]: write(paths['trust']/name,key.public_key().public_bytes_raw())
             write(paths['state']/'identity.json',r.canonical({'Tenant':f.tenant,'Node':node,'Epoch':f.epoch}))
             for folder in ['state','custody']: write(paths[folder]/'.lock',b'')
@@ -220,6 +245,16 @@ def main():
                         alias_args+=['--mount',f'type=bind,src={path},dst=/{kind}'+(',readonly' if kind in {'config','trust'} else '')]
                     # An additional bind of the identical regular file has matching
                     # dev/ino/bytes but a different mount ID under the config root.
+                    # Both the absent image file and a caller-selected bind of
+                    # the exact expected public bytes must fail on empty history.
+                    for label,other_args,source_image in [
+                        ('absent-image-authority',[],bootstrap_image_id),
+                        ('overmounted-authority',['--mount',f'type=bind,src={anchor},dst=/recovery-authority.json,readonly'],image_id)
+                    ]:
+                        check=subprocess.run([*alias_args,*other_args,'--entrypoint','/custody-proof','sha256:'+source_image,*args[1:]],capture_output=True,timeout=15)
+                        assert check.returncode==1 and json.loads(check.stdout)['error']=='RECOVERY_HOLD_AUTHORITY_BINDING'
+                        assert not list(item['paths']['custody'].glob('*.json'))
+                        REPORT['negativeControls'].append(dict(name=label,exit=check.returncode,typedError='RECOVERY_HOLD_AUTHORITY_BINDING'))
                     alias_args+=['--mount',f'type=bind,src={item["paths"]["config"]}/launch-signer.pub,dst=/config/launch-signer.pub,readonly']
                     alias=subprocess.run([*alias_args,'--entrypoint','/custody-proof',image,*args[1:]],capture_output=True,timeout=15)
                     assert alias.returncode==1 and json.loads(alias.stdout)['error']=='RECOVERY_HOLD_FILE'
