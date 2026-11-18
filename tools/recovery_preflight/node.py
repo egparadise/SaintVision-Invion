@@ -58,7 +58,13 @@ def inspect(cid,label):
                            "--format",fmt,cid],stdout=subprocess.PIPE,stderr=subprocess.DEVNULL,timeout=4,check=True)
     lines=result.stdout.splitlines()
     require(len(lines)==len(fields) and len(result.stdout)<=65536,"CONTAINER_METADATA_UNKNOWN")
-    return dict(zip(fields,map(json.loads,lines)))
+    observed=dict(zip(fields,map(json.loads,lines)))
+    # Engine mount iteration order is unspecified. Compare every field of every
+    # mount by its unique destination across the two independent inspections.
+    mounts=observed["mounts"]
+    require(len({m["Destination"] for m in mounts})==len(mounts),"CONTAINER_MOUNT_UNKNOWN")
+    observed["mounts"]=sorted(mounts,key=lambda mount:mount["Destination"])
+    return observed
 
 
 def mount_rows(pid):
@@ -174,7 +180,12 @@ def gather(d,node,out):
                 floor=={"Hash":digest(raw["peer-policy.json"]),"Version":policy["version"]},"POLICY_FLOOR_UNKNOWN")
         require(len(raw["launch-signer.pub"])==32,"LAUNCH_SIGNER_UNKNOWN")
         facts["policy"]={"P":policy["version"],"expiresAt":policy["expiresAt"],"cpDER":d["cpDER"]}
-        require(process_security(initial["pid"])==facts["processSecurity"] and inspect(member["cid"],d["ownerLabel"])==initial,"CONTAINER_CHANGED")
+        require(process_security(initial["pid"])==facts["processSecurity"],"PROCESS_SECURITY_CHANGED")
+        final=inspect(member["cid"],d["ownerLabel"])
+        changed=[key for key in initial if final[key]!=initial[key]]
+        if changed:
+            facts["changedContainerFields"]=changed
+            raise Hold("CONTAINER_CHANGED")
         for kind,root in roots.items():
             binding=bind_identity(root,member[kind],"/"+kind,initial["pid"])
             require(all(facts["directories"][kind][k]==v for k,v in binding.items()),"BIND_SOURCE_CHANGED")
