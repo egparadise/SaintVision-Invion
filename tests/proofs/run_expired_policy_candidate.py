@@ -82,9 +82,28 @@ def collect_fixture_nodes(f,image_id,nodes):
                     None if p.name=='node-key.pem' else r.sha(p.read_bytes()))
                     for k in ('config','state') for p in paths[k].iterdir()}
         before=snapshot()
-        result=command([sys.executable,'-B',str(ROOT/'tools/recovery_preflight/node.py')],
-                       input=json.dumps(dict(descriptor=descriptor,node=node)).encode())
-        obs=json.loads(result)
+        attempt=subprocess.run([sys.executable,'-B',str(ROOT/'tools/recovery_preflight/node.py')],
+                               input=json.dumps(dict(descriptor=descriptor,node=node)).encode(),
+                               capture_output=True,timeout=15)
+        obs=json.loads(attempt.stdout)
+        if attempt.returncode:
+            # Only public fixture paths and typed reasons. No Env or raw Docker inspect.
+            sys.path.insert(0,str(ROOT/'tools/recovery_preflight'))
+            import node as collector
+            from contextlib import ExitStack
+            cid=descriptor['nodes'][node]['cid']
+            pid=collector.inspect(cid,'sv.fixture')['pid']
+            diag={'holds':obs['holds'],'exit':attempt.returncode,'mounts':{}}
+            REPORT['nodeCollectorRefusal']=diag
+            with ExitStack() as stack:
+                for kind in ('config','state'):
+                    folder=str(paths[kind])
+                    root=collector.directory(folder,stack)
+                    mid=collector.mount(root)
+                    diag['mounts'][kind]={'host': [r for r in collector.mount_rows(os.getpid()) if r[0]==mid],
+                                          'container':[r for r in collector.mount_rows(pid) if r[3]=='/'+kind],
+                                          'expectedSource':folder}
+            raise AssertionError('read-only Node collector refused: '+','.join(obs['holds']))
         after=snapshot()
         assert obs['observationComplete'] and not obs['recoveryReady'] and before==after
         assert 'sha256' not in obs['facts']['files']['node-key.pem']
