@@ -23,7 +23,12 @@ def join(d, observations):
             sources[key]=item
             out["holds"].extend(item["holds"])
             require(item["observationComplete"] is True,"INCOMPLETE_SOURCE")
-        rows=sources["control-plane",None]["facts"]["channels"]
+        cp=sources["control-plane",None]["facts"]
+        if cp.get("operationOutcome")=="PREPARED":
+            deadline=datetime.fromisoformat(cp["operationDeadline"])
+            out["holds"].append("EXPIRED_PREPARED_REQUIRES_FORWARD_RECONCILIATION"
+                                if deadline<=datetime.now(timezone.utc) else "PENDING_OPERATION")
+        rows=cp["channels"]
         require(set(rows)==set(d["nodes"]),"CHANNEL_COHORT_UNKNOWN")
         members={}
         for node,member in d["nodes"].items():

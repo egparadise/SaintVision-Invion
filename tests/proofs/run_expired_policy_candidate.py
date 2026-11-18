@@ -215,6 +215,16 @@ def main():
                     mount_args=['docker','run','--rm','--network=none','--user','1000:1000','--read-only','--cap-drop=ALL','--security-opt','no-new-privileges']
                     for kind,path in item['paths'].items():
                         mount_args+=['--mount',f'type=bind,src={path},dst=/{kind}'+(',readonly' if kind in {'config','trust','state'} else '')]
+                    alias_args=['docker','run','--rm','--network=none','--user','1000:1000','--read-only','--cap-drop=ALL','--security-opt','no-new-privileges']
+                    for kind,path in item['paths'].items():
+                        alias_args+=['--mount',f'type=bind,src={path},dst=/{kind}'+(',readonly' if kind in {'config','trust'} else '')]
+                    # An additional bind of the identical regular file has matching
+                    # dev/ino/bytes but a different mount ID under the config root.
+                    alias_args+=['--mount',f'type=bind,src={item["paths"]["config"]}/launch-signer.pub,dst=/config/launch-signer.pub,readonly']
+                    alias=subprocess.run([*alias_args,'--entrypoint','/custody-proof',image,*args[1:]],capture_output=True,timeout=15)
+                    assert alias.returncode==1 and json.loads(alias.stdout)['error']=='RECOVERY_HOLD_FILE'
+                    assert not list(item['paths']['custody'].glob('*.json'))
+                    REPORT['negativeControls'].append(dict(name='identical-inode-file-mount-alias',exit=alias.returncode,typedError='RECOVERY_HOLD_FILE'))
                     wrong_mount=subprocess.run([*mount_args,'--entrypoint','/custody-proof',image,*args[1:]],capture_output=True,timeout=15)
                     assert wrong_mount.returncode==1 and json.loads(wrong_mount.stdout)['error']=='RECOVERY_HOLD_MOUNT_UID_MODE'
                     REPORT['negativeControls'].append({'name':'read-only-state-mount','exit':1,'typedError':'RECOVERY_HOLD_MOUNT_UID_MODE'})

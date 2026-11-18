@@ -1,6 +1,7 @@
 """PC3 operator collector. The caller supplies a pinned session on stdin."""
 import sys
 import json
+from datetime import datetime, timezone
 from common import Hold, SCHEMA, decode, now, report, require, scope
 
 TABLES = ("project_nodes","nodes","resources","node_channels","node_channel_audit",
@@ -26,10 +27,10 @@ def observe(db,d,out):
         require(c.fetchall()==[(SCHEMA,)],"DATABASE_REVISION_UNKNOWN")
         c.execute("""SELECT c.relname,c.relrowsecurity,c.relforcerowsecurity,
                      pg_get_userbyid(c.relowner)=current_user,p.polname,p.polpermissive,
-                     p.polcmd,p.polroles::text,pg_get_expr(p.polqual,p.polrelid)
+                     p.polcmd::text,p.polroles::text,pg_get_expr(p.polqual,p.polrelid)
                      FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace
                      LEFT JOIN pg_policy p ON p.polrelid=c.oid
-                     WHERE n.nspname='inv' AND c.relname=ANY(%s)""",(list(TABLES),))
+                     WHERE n.nspname='inv' AND row_security_active(c.oid) AND c.relname=ANY(%s)""",(list(TABLES),))
         policies=c.fetchall()
         require(len(policies)==len(TABLES) and {r[0] for r in policies}==set(TABLES)
                 and all(row[1:8]==(True,True,False,"tenant_isolation",True,"*","{0}") and
@@ -51,7 +52,11 @@ def observe(db,d,out):
             require(enabled and action=="provision" and der==auditder,"CHANNEL_AUDIT_UNKNOWN")
             channels[node]=dict(C=version,leafDER=der,expiresAt=expiry.isoformat(),auditedAt=at.isoformat())
         require(sorted(channels)==members,"CHANNEL_VISIBILITY_UNKNOWN")
+        if any(datetime.fromisoformat(row["expiresAt"])<=datetime.now(timezone.utc) for row in channels.values()):
+            out["holds"].append("CHANNEL_LEAF_EXPIRED")
         out["facts"]["channels"]=channels
+        out["facts"]["operationOutcome"]="UNKNOWN"
+        out["holds"].append("OPERATION_OUTCOME_UNKNOWN")
         c.execute("""SELECT node_id,resource_id,kind,capacity,offered FROM inv.resources
                      WHERE tenant_id=%s AND node_id=ANY(%s) ORDER BY node_id,resource_id LIMIT 1025""",(tenant,members))
         resources=c.fetchall()
