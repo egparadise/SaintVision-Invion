@@ -1,0 +1,41 @@
+{
+  "rows": [
+    {
+      "nodeID": "nod_00000000000000000000000PC2",
+      "status": "ACTIVE",
+      "publicKeySHA256": "2f8957506a888a9dbfb0ae38a1f32750f0c9f8ca9d0ad3cc19d71eaf8147957f",
+      "channelCertificateSHA256": "d9b4399213ff1b48ae1c4412ad70d833c1afb1892b4c6cc716745b35417cb3e2"
+    },
+    {
+      "nodeID": "nod_00000000000000000000000PC3",
+      "status": "ACTIVE",
+      "publicKeySHA256": "a8e91140b3625ab665bae18c3c6e42d09a820b9a06d858183cda92731d7ddb1b",
+      "channelCertificateSHA256": "15ba49ba5caf8c9b54c78e827acaebeb2e66854c4af32201f3b42b5ef0c320b7"
+    },
+    {
+      "nodeID": "nod_00000000000000000000000PC4",
+      "status": "ACTIVE",
+      "publicKeySHA256": "2282ad95323526e18ee5a9723f386b41277d09ca6ede98e759f7b870c496a362",
+      "channelCertificateSHA256": "a725279e008afdd5f7b6b3f17862ea34fb6b945efbdcc0be39a59d82dffb170f"
+    },
+    {
+      "nodeID": "nod_0000000000000000000000RTR1",
+      "status": "RETIRED",
+      "publicKeySHA256": "680bb59a7bb24b0bc6af7af2c489fc77c65f8a1397fb3d5dbefd6ccdeafa29f7",
+      "channelCertificateSHA256": "33c954aa18f25afcdd07926014744dc8706c53495a0ad0bccddcca969772cb31"
+    },
+    {
+      "nodeID": "nod_0000000000000000000000RTR2",
+      "status": "DISABLED",
+      "publicKeySHA256": "7426a4b6d6f99d598f0d91c22add61cc2b37655d3dd1d69140ce1e9fc9090114",
+      "channelCertificateSHA256": "02bf2adb1aef5fc466722c3ebd7bc7ded61aa4b2a607bb3c6001eb6333f62d15"
+    }
+  ],
+  "rotationKeys": [
+    "2f8957506a888a9dbfb0ae38a1f32750f0c9f8ca9d0ad3cc19d71eaf8147957f",
+    "a8e91140b3625ab665bae18c3c6e42d09a820b9a06d858183cda92731d7ddb1b",
+    "2282ad95323526e18ee5a9723f386b41277d09ca6ede98e759f7b870c496a362"
+  ],
+  "csrDER": "MIGoMFwCAQAwKTEnMCUGA1UEAwwebm9kXzAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwUEMxMCowBQYDK2VwAyEAxsyOCvg/uBkNEI0RnpgEUXdHSSv9dKSmLCxL/AE5zeegADAFBgMrZXADQQAo83irwEGD+ESStVIm3F7niu+H+GmavW2XykO2J3rWw/DddBggOsIJGKfchlUEu86oFMVZ6pRIJRcnHItWLwcN",
+  "manifest": "897febd05bbefc6012f5d1bb0eee69c4a91d29dd449867e45cdb41fdb4fedb2e"
+}

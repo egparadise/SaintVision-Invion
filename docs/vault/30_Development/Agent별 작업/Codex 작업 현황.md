@@ -2534,3 +2534,4 @@ AOA-05 follow-up: the old 18 setup errors had two distinct causes: unset CX01_CO
 - Claude r3 조건부 승인 N5/N6 경계: 정본 hosted run `36379743674`는 느슨한 0009 판정이 있던 `abe8435a` 산출물이고, `b2b4db3c`의 N2/N3 강화는 PG-free만 검증돼 release 전 lane 재실행이 필요하다. importer는 `gh api`로 취득한 zip/run/artifact JSON의 상호 결속을 검사하지만 metadata 출처를 인증하지 않으므로, canonical repository 조회 명령·artifact id `10952510591`·일관된 입력 위조 한계를 History와 docstring에 고정했다.
 
 E1 PC1 reservation prerequisite on unified 433ea326, disposable PostgreSQL verified. Independent review pending. Operational HOLD pending shared authority. [[2026-11-19_FLEET5_E1_PC1_Reservation]]
+E1 follow-up task_3cfbc21d5762 checks all-history uniqueness, A7, tenant RLS, atomic audit/replay and unchanged membership. No assigned production migration. [[2026-11-19_FLEET5_E1_PC1_Reservation]]
