@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.507"
+version: "1.0.508"
 status: "review"
 author: "Codex"
-updated: "2026-11-19T03:20:59.2202313+09:00"
+updated: "2026-11-19T04:02:17+09:00"
 source_of_truth: "Git"
 active_card: "FLEET5 continued supervision with PORTAL-REFRESH-FLEET-20261106"
 active_card_status: "MainTransportAutoReconnectVerified6.561s_LogonRegistered_RebootNotRun; PC234SSHAndSystemdAndNodeRestartPolicyVerified_PC1Still255; CodeRetryAndWholePercentAuditReady_CAterminalNoLiveRecovery"
@@ -12,7 +12,7 @@ active_card_next: "Seal Root544 exact Docs and canonical sync; capture new fulls
 ---
 
 
-Interrupted A1 remains on HOLD. Codex implemented the local writer fence prerequisite. Claude review and Root integration are pending. [[2026-11-19_FLEET5_A1_Runtime_Fence]]
+Interrupted A1 remains on HOLD. Codex restored the card150 pilot CLI and moved HOLD inspection to a standalone command. Claude re-review follows exact-SHA Core and Backend CI. [[2026-11-19_FLEET5_A1_Runtime_Fence]]
 
 Codex 독립 검토에서 37660421의 R2 custody 차단 사유를 종결했다. 격리 테스트 560건 통과. 운영 인수와 런타임 통합은 Root 담당. [[2026-11-19_FLEET5_376604_Independent_Review]]
 

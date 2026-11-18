@@ -43,14 +43,33 @@ def test_interrupted_a1_fence(tmp_path, monkeypatch):
     assert fence.interrupted_a1_hold(path, winners[0]) == "HOLD_WRITER_FENCE"
 
 
-def test_pilot_entry_point_reports_hold_without_creating_state(tmp_path):
+def test_inspection_entry_point_reports_hold(tmp_path, monkeypatch):
     expected = tmp_path / "expected.json"
     expected.write_text(json.dumps({"holderPlanDigest": "plan", "token": "first", "generation": 1}))
     state = tmp_path / "absent"
-    result = subprocess.run(
-        [sys.executable, "tools/lan_pilot.py", "--state", str(state), "inspect-interrupted-a1",
-         "--expected-writer", str(expected)], capture_output=True, text=True, check=False,
-    )
+    def inspect():
+        return subprocess.run(
+            [sys.executable, "deploy/lan/inspect_interrupted_a1.py", "--state", str(state),
+             "--expected-writer", str(expected)], capture_output=True, text=True, check=False,
+        )
+
+    result = inspect()
     assert result.returncode == 2, result.stderr
     assert result.stdout.strip() == "HOLD_WRITER_FENCE"
     assert not state.exists()
+
+    monkeypatch.syspath_prepend(str(Path(__file__).resolve().parents[2] / "deploy" / "lan"))
+    fence = import_module("a1_writer_fence")
+    state.mkdir()
+    ledger = state / "a1-writer.sqlite3"
+    fence.initialize(ledger)
+    fence.transfer(ledger, None, "plan", "first")
+    before = ledger.read_bytes()
+    result = inspect()
+    assert result.returncode == 2, result.stderr
+    assert result.stdout.strip() == "HOLD_CUSTODY_UNRESOLVED"
+    assert ledger.read_bytes() == before
+    expected.write_text("{}")
+    result = inspect()
+    assert result.returncode == 2
+    assert result.stdout.strip() == "HOLD_WRITER_FENCE"
