@@ -255,7 +255,8 @@ def test_provisioned_reader_path_in_private_mount_namespace(request):
             ("etc-owner-not-root",regular(trusted,etcOwner=NOBODY),"descriptor-owner-mode"),
             ("etc-group-writable",regular(trusted,etcMode=0o775),"descriptor-owner-mode"),
             ("file-symlink",dict(kind="symlink",content=trusted),"descriptor-open:ELOOP"),
-            ("directory-symlink",dict(kind="dir-symlink",content=trusted),"descriptor-open:ELOOP"),
+            # O_DIRECTORY|O_NOFOLLOW on a symlink: Linux refuses the link inode itself as ENOTDIR.
+            ("directory-symlink",dict(kind="dir-symlink",content=trusted),"descriptor-open:ENOTDIR"),
             ("file-hardlink",dict(kind="hardlink",content=trusted),"descriptor-type-links-size"),
             ("file-empty",regular(""),"descriptor-type-links-size"),
             ("file-oversize",regular(trusted+" "*(65537-len(trusted))),"descriptor-type-links-size"),
