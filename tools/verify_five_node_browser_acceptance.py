@@ -159,14 +159,50 @@ def start_fixture_portal_server(
             status = 200
             content_type = "application/json"
 
-            if scenario == "unauthenticated" and "/nodes" in path:
+            if path in ("/", "/index.html", "/dashboard"):
+                if scenario == "unauthenticated":
+                    status = 200
+                    content_type = "text/html; charset=utf-8"
+                    body = """<!DOCTYPE html><html><body>
+                    <form data-testid="login-form"><input type="password" name="password"/></form>
+                    </body></html>"""
+                else:
+                    cards_html = "".join([
+                        f"""
+                        <div data-testid="node-item-{nid}">
+                            <span data-testid="node-status-badge-{nid}">● ONLINE</span>
+                            <span data-testid="node-cpu-{nid}">제공 500m</span>
+                            <span data-testid="node-memory-{nid}">제공 64 MiB</span>
+                            <span data-testid="node-heartbeat-{nid}">{t0_iso}</span>
+                        </div>
+                        """
+                        for nid in returned_nodes
+                    ])
+                    stale_banner = '<div data-testid="cluster-stale-warning">통신 지연 경고</div>' if scenario == "transient-error" else ""
+                    content_type = "text/html; charset=utf-8"
+                    status = 200
+                    body = f"""<!DOCTYPE html>
+                    <html>
+                    <head><title>SaintVision Portal Fixture</title></head>
+                    <body>
+                      <div id="root">
+                        <header>
+                          <div>Gateway: 12ms (정상)</div>
+                          {stale_banner}
+                        </header>
+                        <main data-testid="canonical-cluster-resources">
+                          {cards_html}
+                        </main>
+                      </div>
+                    </body>
+                    </html>"""
+            elif scenario == "unauthenticated" and "/nodes" in path:
                 self.send_response(401)
                 self.send_header("Content-Type", "application/json")
                 self.end_headers()
                 self.wfile.write(json.dumps({"error": "Unauthorized"}).encode("utf-8"))
                 return
-
-            if path == "/healthz" or path == "/gateway-healthz":
+            elif path == "/healthz" or path == "/gateway-healthz":
                 if scenario == "transient-error":
                     status = 503
                     body = json.dumps({"status": "unavailable", "detail": "simulated gateway degradation"})
