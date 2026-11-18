@@ -1,34 +1,63 @@
 from pathlib import Path
 
+import pytest
+import yaml
+
 
 ROOT = Path(__file__).resolve().parents[1]
 WORKFLOW = ROOT / ".github" / "workflows" / "core.yml"
 
+CORE_EVIDENCE_ARTIFACT = "saintvision-core-evidence"
+UPLOAD_ACTION = "actions/upload-artifact@v4"
 
-def test_core_workflow_owns_one_explicit_cx01_container_lifecycle():
-    text = WORKFLOW.read_text(encoding="utf-8")
-    core_job = text[text.index("  core:") : text.index("  s01-storage-roundtrip:")]
 
-    assert "services:\n      postgres:" not in core_job
-    create = text.index("name: Create disposable CX01 PostgreSQL")
-    migrations = text.index("name: Upgrade each published migration head")
-    cleanup = text.index("name: Cleanup disposable CX01 PostgreSQL")
-    # Earlier opt-in diagnostic artifacts do not own the CX01 lifecycle. Bind the
-    # assertion to the core job's own CX01 evidence upload step, so neither an
-    # earlier diagnostic upload nor an unrelated later upload can satisfy it.
-    core_start = text.index("  core:")
-    core_end = text.index("  s01-storage-roundtrip:")
-    assert text.count("name: saintvision-core-evidence") == 1
-    evidence = text.index("name: saintvision-core-evidence")
-    upload = text.rindex("uses: actions/upload-artifact@v4", 0, evidence)
-    next_step = text.find("\n      - ", upload, core_end)
-    upload_step = text[upload : core_end if next_step == -1 else next_step]
-    assert "\n      - " not in text[upload:evidence]
-    assert "\n        if: always()\n" in upload_step
-    assert "\n          path: dist/\n" in upload_step
-    assert core_start < create < migrations < cleanup < upload < evidence < core_end
+def _core_steps(text):
+    workflow = yaml.safe_load(text)
+    jobs = workflow["jobs"]
+    return jobs, jobs["core"]["steps"]
 
-    create_step = text[create:migrations]
+
+def _named_step(steps, name):
+    matches = [index for index, step in enumerate(steps) if step.get("name") == name]
+    assert len(matches) == 1, f"expected exactly one core step named {name!r}: {matches}"
+    return matches[0]
+
+
+def assert_core_cx01_lifecycle(text):
+    """Bind the CX01 lifecycle to the parsed core job, not to raw YAML substrings.
+
+    A substring search accepted a commented-out ``name:`` and a suffixed artifact
+    name (PR 412 independent review). Parse ``jobs.core.steps`` instead and require
+    exactly one upload step whose ``with.name`` equals the core evidence artifact.
+    """
+    jobs, steps = _core_steps(text)
+    core = jobs["core"]
+    assert "services" not in core
+
+    # Across every job, exactly one step publishes the exact core evidence name;
+    # earlier opt-in diagnostic uploads and later unrelated uploads cannot satisfy it.
+    owners = [
+        (job_name, index)
+        for job_name, job in jobs.items()
+        for index, step in enumerate(job.get("steps") or [])
+        if isinstance(step.get("with"), dict)
+        and step["with"].get("name") == CORE_EVIDENCE_ARTIFACT
+    ]
+    assert len(owners) == 1, f"core evidence artifact owners: {owners}"
+    owner_job, upload = owners[0]
+    assert owner_job == "core"
+
+    upload_step = steps[upload]
+    assert upload_step.get("uses") == UPLOAD_ACTION
+    assert upload_step.get("if") == "always()"
+    assert upload_step["with"].get("path") == "dist/"
+
+    create = _named_step(steps, "Create disposable CX01 PostgreSQL")
+    migrations = _named_step(steps, "Upgrade each published migration head")
+    cleanup = _named_step(steps, "Cleanup disposable CX01 PostgreSQL")
+    assert create < migrations < cleanup < upload
+
+    create_step = steps[create]["run"]
     assert 'cx01_owner="${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"' in create_step
     assert '--label "ai.saintvision.kernel-test=$cx01_owner"' in create_step
     assert '--label "ai.saintvision.cx01=$cx01_owner"' in create_step
@@ -45,13 +74,82 @@ def test_core_workflow_owns_one_explicit_cx01_container_lifecycle():
     assert '"$CX01_CONTAINER")' in text
     assert 'echo "INV_CONTAINER_TEST_DB_HOST=$cx01_ip" >> "$GITHUB_ENV"' in text
 
-    cleanup_step = text[cleanup:upload]
-    assert "if: always()" in cleanup_step
-    assert 'cx01_id="$(cat .work/cx01-container-id)"' in cleanup_step
-    assert 'test "$actual_owner" = "$cx01_owner"' in cleanup_step
-    assert 'test "$actual_name" = "$expected_name"' in cleanup_step
-    assert 'docker rm -f -v "$cx01_id"' in cleanup_step
-    assert "if docker inspect \"$cx01_id\"" in cleanup_step
+    cleanup_step = steps[cleanup]
+    assert cleanup_step.get("if") == "always()"
+    cleanup_run = cleanup_step["run"]
+    assert 'cx01_id="$(cat .work/cx01-container-id)"' in cleanup_run
+    assert 'test "$actual_owner" = "$cx01_owner"' in cleanup_run
+    assert 'test "$actual_name" = "$expected_name"' in cleanup_run
+    assert 'docker rm -f -v "$cx01_id"' in cleanup_run
+    assert "if docker inspect \"$cx01_id\"" in cleanup_run
+
+
+def test_core_workflow_owns_one_explicit_cx01_container_lifecycle():
+    assert_core_cx01_lifecycle(WORKFLOW.read_text(encoding="utf-8"))
+
+
+_NL = chr(10)
+_EVIDENCE_UPLOAD_LINES = (
+    "      - uses: actions/upload-artifact@v4",
+    "        if: always()",
+    "        with:",
+    "          name: saintvision-core-evidence",
+    "          path: dist/",
+)
+_EVIDENCE_UPLOAD_BLOCK = _NL.join(_EVIDENCE_UPLOAD_LINES) + _NL
+
+
+def _upload_block(**replace):
+    """The published core evidence upload with selected lines replaced or dropped."""
+    lines = []
+    for index, line in enumerate(_EVIDENCE_UPLOAD_LINES):
+        line = replace.get(f"line{index}", line)
+        if line is not None:
+            lines.append(line)
+    return _NL.join(lines) + _NL
+
+
+def _mutate(text, old, new):
+    assert text.count(old) == 1, f"mutation anchor must be unique: {old!r}"
+    return text.replace(old, new)
+
+
+# Each fixture loses the required core evidence identity. The first two were
+# accepted by the earlier raw-substring guard (PR 412 independent review of d35f28f5).
+_IDENTITY_MUTATIONS = {
+    "commented_out_name": _upload_block(line3="          # name: saintvision-core-evidence"),
+    "suffixed_name": _upload_block(line3="          name: saintvision-core-evidence-wrong"),
+    "renamed": _upload_block(line3="          name: saintvision-core-results"),
+    "duplicated": _EVIDENCE_UPLOAD_BLOCK + _EVIDENCE_UPLOAD_BLOCK,
+    "other_action": _upload_block(line0="      - uses: actions/upload-artifact@v3"),
+    "conditional_dropped": _upload_block(line1=None),
+    "other_path": _upload_block(line4="          path: dist/core/"),
+}
+
+
+def test_core_workflow_mutation_anchor_matches_the_published_upload():
+    text = WORKFLOW.read_text(encoding="utf-8")
+    assert text.count(_EVIDENCE_UPLOAD_BLOCK) == 1
+
+
+@pytest.mark.parametrize("mutation", sorted(_IDENTITY_MUTATIONS))
+def test_cx01_guard_rejects_lost_core_evidence_identity(mutation):
+    text = WORKFLOW.read_text(encoding="utf-8")
+    mutated = _mutate(text, _EVIDENCE_UPLOAD_BLOCK, _IDENTITY_MUTATIONS[mutation])
+    yaml.safe_load(mutated)  # every fixture stays valid YAML
+    with pytest.raises(AssertionError):
+        assert_core_cx01_lifecycle(mutated)
+
+
+def test_cx01_guard_rejects_upload_moved_before_cleanup():
+    text = WORKFLOW.read_text(encoding="utf-8")
+    cleanup = text.index("      - name: Cleanup disposable CX01 PostgreSQL" + _NL)
+    assert cleanup < text.index(_EVIDENCE_UPLOAD_BLOCK)
+    removed = _mutate(text, _EVIDENCE_UPLOAD_BLOCK, "")
+    mutated = removed[:cleanup] + _EVIDENCE_UPLOAD_BLOCK + removed[cleanup:]
+    yaml.safe_load(mutated)
+    with pytest.raises(AssertionError):
+        assert_core_cx01_lifecycle(mutated)
 
 
 def test_core_skip_ratchet_no_longer_accepts_unset_cx01_identity():
