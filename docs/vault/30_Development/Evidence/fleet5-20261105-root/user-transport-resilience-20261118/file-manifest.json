@@ -1,0 +1,84 @@
+{
+  "files": [
+    {
+      "path": "events.jsonl",
+      "bytes": 506,
+      "SHA256": "f89666527d1c012f64e33e4e785e47d02fbc330e175df3805273061147bd2459"
+    },
+    {
+      "path": "fleet-PC1.json",
+      "bytes": 141,
+      "SHA256": "e4818de97e97d3d4f62da2d368c04ed55bc4201dddf139259ac60eee448c2e9c"
+    },
+    {
+      "path": "fleet-PC2.json",
+      "bytes": 2552,
+      "SHA256": "5e30dfa7fba30455b749ba96db5f4e17180967e19b891225409f54c8db30705a"
+    },
+    {
+      "path": "fleet-PC3.json",
+      "bytes": 2556,
+      "SHA256": "1b09d72386e4951ea3db4c2ee4442cf3e7641e1d7c841815185624a30a82ed84"
+    },
+    {
+      "path": "fleet-PC4.json",
+      "bytes": 2512,
+      "SHA256": "f8a6dd7eca0319719ffc2e03bb8a3f2d0bdf58c3f7f3b6c1c99340534578732e"
+    },
+    {
+      "path": "fleet-receipt.json",
+      "bytes": 9033,
+      "SHA256": "80b8255442a5a0719336e26a5ab01135de38ac12bd0fd02cf1bf26ced6c6863e"
+    },
+    {
+      "path": "fleet-remote-readonly.py.txt",
+      "bytes": 3172,
+      "SHA256": "6e84c90511e0b488f20d1a22502ea6f6769fb2680e476195cbe55c90928179d8"
+    },
+    {
+      "path": "inspect_fleet_startup_20261118.py.txt",
+      "bytes": 5317,
+      "SHA256": "b9a694b1cdf5804a76b448cc4ab88ca574f8c9e72b04a3e4fdd06650c9b95560"
+    },
+    {
+      "path": "installation.json",
+      "bytes": 825,
+      "SHA256": "7f6934bfebd58d6dfeaea8432006da32db93dde0a3c88db9b248831fbdf6608c"
+    },
+    {
+      "path": "Keep-SaintVisionTransport.ps1.txt",
+      "bytes": 4858,
+      "SHA256": "ca07421e1a2b5cef6b3da6b9c4b6525f889366e8abdc49166571c7209af16601"
+    },
+    {
+      "path": "reconnect-verification.json",
+      "bytes": 1195,
+      "SHA256": "f1dab283aa849bda6659e3c788fc8de383131c69c43ce5701a3d12adaecec923"
+    },
+    {
+      "path": "root-operation-receipt.json",
+      "bytes": 4101,
+      "SHA256": "7891ba3ccf30d2e537a2d6c53ffcb7efba354a2bf0f537385fbd3fade540421b"
+    },
+    {
+      "path": "stack-receipt.json",
+      "bytes": 4165,
+      "SHA256": "c9bbd09c3efc5e50c81226874502893662f066b33bbc9190c776703fbfcb37d6"
+    },
+    {
+      "path": "stack-remote-readonly.py.txt",
+      "bytes": 1245,
+      "SHA256": "19b882d89cfe1cd3a69a854ed152dd078a95d2561c27517149842152b716f6d5"
+    },
+    {
+      "path": "state.json",
+      "bytes": 614,
+      "SHA256": "7066c7053ec128c6bdbe3cd737aab101254513e6d85a686f2dd6ceedd5075e0c"
+    },
+    {
+      "path": "verify_user_transport_reconnect_20261118.ps1.txt",
+      "bytes": 5104,
+      "SHA256": "2703223c3cc184d44c8f5d9583b282b1c930ae47d23d875acef1613ae26373a3"
+    }
+  ]
+}

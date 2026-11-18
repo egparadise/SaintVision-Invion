@@ -1,0 +1,95 @@
+$ErrorActionPreference = 'Stop'
+$baseDirectory = Split-Path -Parent $MyInvocation.MyCommand.Path
+$knownHosts = Join-Path $baseDirectory 'known_hosts.pinned'
+$expectedKnownHosts = '0dcbf0f4cfc363e4affc30810ad8a9e57bd2c4a31991e2c8285bdae7052ec2d2'
+$privateKeyPath = 'C:\Users\inviz\.ssh\sv-lan-ed25519'
+$sshExecutable = 'C:\WINDOWS\System32\OpenSSH\ssh.exe'
+$target = 'saintvision-invion3@192.168.45.222'
+$statePath = Join-Path $baseDirectory 'state.json'
+$eventPath = Join-Path $baseDirectory 'events.jsonl'
+$mutexName = 'Local\SaintVision_UserTransport_v1_inviz'
+$mutex = New-Object System.Threading.Mutex($false, $mutexName)
+$ownsMutex = $false
+
+function Write-TransportState([string]$phase, $child) {
+    $value = [ordered]@{
+        observedAtKST = (Get-Date).ToString('o')
+        phase = $phase
+        supervisorPID = $PID
+        supervisorStartedAt = (Get-Process -Id $PID).StartTime.ToString('o')
+        sshPID = if ($null -ne $child) { $child.Id } else { $null }
+        sshStartedAt = if ($null -ne $child) { $child.StartTime.ToString('o') } else { $null }
+        target = $target
+        forwards = @('127.0.0.1:3100 -> PC3:13103', '127.0.0.1:18080 -> PC3:8080')
+        scope = 'SSH transport only; not authentication, DB or Node authority acceptance'
+        noNodeMutation = $true
+    }
+    $temporary = Join-Path $baseDirectory ('state.' + $PID + '.tmp')
+    $value | ConvertTo-Json -Depth 5 | Set-Content -LiteralPath $temporary -Encoding UTF8
+    Move-Item -LiteralPath $temporary -Destination $statePath -Force
+}
+
+function Write-TransportEvent([string]$phase, $detail) {
+    if ((Test-Path -LiteralPath $eventPath) -and (Get-Item -LiteralPath $eventPath).Length -gt 2097152) {
+        $previous = Join-Path $baseDirectory 'events.previous.jsonl'
+        Move-Item -LiteralPath $eventPath -Destination $previous -Force
+    }
+    [ordered]@{ atKST=(Get-Date).ToString('o'); phase=$phase; detail=$detail } |
+        ConvertTo-Json -Depth 4 -Compress | Add-Content -LiteralPath $eventPath -Encoding UTF8
+}
+
+try {
+    try { $ownsMutex = $mutex.WaitOne(0) } catch [System.Threading.AbandonedMutexException] { $ownsMutex = $true }
+    if (-not $ownsMutex) { exit 0 }
+    Write-TransportEvent 'SUPERVISOR_STARTED' @{ PID=$PID }
+    while ($true) {
+        try {
+            if ((Get-FileHash -LiteralPath $knownHosts -Algorithm SHA256).Hash.ToLowerInvariant() -ne $expectedKnownHosts) {
+                Write-TransportState 'HOLD_HOST_PIN_CHANGED' $null
+                Write-TransportEvent 'HOLD_HOST_PIN_CHANGED' $null
+                Start-Sleep -Seconds 30
+                continue
+            }
+            if (-not (Test-Path -LiteralPath $privateKeyPath -PathType Leaf)) {
+                Write-TransportState 'HOLD_KEY_UNAVAILABLE' $null
+                Start-Sleep -Seconds 30
+                continue
+            }
+            $occupied = @(Get-NetTCPConnection -State Listen -ErrorAction SilentlyContinue |
+                Where-Object { $_.LocalPort -in @(3100,18080) })
+            if ($occupied.Count -ne 0) {
+                Write-TransportState 'HOLD_LOCAL_PORT_OCCUPIED' $null
+                Write-TransportEvent 'HOLD_LOCAL_PORT_OCCUPIED' @($occupied | Select-Object LocalPort,OwningProcess)
+                Start-Sleep -Seconds 15
+                continue
+            }
+            $sshArguments = @(
+                '-N','-T','-i',$privateKeyPath,
+                '-o','IdentitiesOnly=yes','-o','BatchMode=yes',
+                '-o','ConnectionAttempts=1','-o','ConnectTimeout=5',
+                '-o','StrictHostKeyChecking=yes','-o',('UserKnownHostsFile=' + $knownHosts),
+                '-o','ExitOnForwardFailure=yes','-o','ServerAliveInterval=15',
+                '-o','ServerAliveCountMax=3','-o','TCPKeepAlive=yes',
+                '-L','127.0.0.1:3100:127.0.0.1:13103',
+                '-L','127.0.0.1:18080:127.0.0.1:8080',
+                $target
+            )
+            $errorFile = Join-Path $baseDirectory 'ssh-last-error.log'
+            $child = Start-Process -FilePath $sshExecutable -ArgumentList $sshArguments -PassThru -WindowStyle Hidden -RedirectStandardError $errorFile
+            Write-TransportState 'SSH_PROCESS_STARTED' $child
+            Write-TransportEvent 'SSH_PROCESS_STARTED' @{ PID=$child.Id; startedAt=$child.StartTime.ToString('o') }
+            $child.WaitForExit()
+            $code = $child.ExitCode
+            Write-TransportState 'SSH_EXITED_RECONNECTING' $null
+            Write-TransportEvent 'SSH_EXITED_RECONNECTING' @{ exitCode=$code }
+            Start-Sleep -Seconds 5
+        } catch {
+            Write-TransportState 'ERROR_RETRYING' $null
+            Write-TransportEvent 'ERROR_RETRYING' @{ errorType=$_.Exception.GetType().FullName }
+            Start-Sleep -Seconds 10
+        }
+    }
+} finally {
+    if ($ownsMutex) { $mutex.ReleaseMutex() }
+    $mutex.Dispose()
+}

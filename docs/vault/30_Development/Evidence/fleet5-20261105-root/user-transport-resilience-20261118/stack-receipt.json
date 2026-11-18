@@ -1,0 +1,140 @@
+{
+  "atKST": "2026-11-18T20:39:34+09:00",
+  "MainPriorDB": {
+    "inspectExit": 1,
+    "metadata": null,
+    "noEnvironmentOrPrivateContentEmitted": true
+  },
+  "PC3SSHExit": 0,
+  "PC3stderrBytes": 0,
+  "PC3": {
+    "components": [
+      {
+        "component": "API96",
+        "inspectExit": 0,
+        "CID": "8d62139c2408dff910bbfb3a9b322be56520705a3f3e967ce74563cfe9cd3f28",
+        "name": "/saintvision-api96-bcd581be-r1",
+        "image": "sha256:1426226b8dd7093bf79909886808b83141dcd8f9b677c118b29c4be4a1c9de47",
+        "running": true,
+        "status": "running",
+        "restartPolicy": "unless-stopped",
+        "mounts": [
+          {
+            "destination": "/work/objects",
+            "readWrite": true
+          },
+          {
+            "destination": "/work/restores",
+            "readWrite": true
+          },
+          {
+            "destination": "/work/working",
+            "readWrite": true
+          },
+          {
+            "destination": "/run/sv-api/api.json",
+            "readWrite": false
+          },
+          {
+            "destination": "/run/sv-api/connection-profiles.json",
+            "readWrite": false
+          },
+          {
+            "destination": "/run/sv-api/public-jwks.json",
+            "readWrite": false
+          },
+          {
+            "destination": "/run/sv-api/tls/ca-cert.pem",
+            "readWrite": false
+          },
+          {
+            "destination": "/run/sv-api/tls/cp-client-cert.pem",
+            "readWrite": false
+          },
+          {
+            "destination": "/run/sv-api/tls/cp-client-key.pem",
+            "readWrite": false
+          },
+          {
+            "destination": "/run/sv-api/tls/launch-signer-key.pem",
+            "readWrite": false
+          }
+        ]
+      },
+      {
+        "component": "PortalABB",
+        "inspectExit": 0,
+        "CID": "54fb6609646d7f57991b1ee04de0454117e8e71fd525e5e1f87afb6d052483c0",
+        "name": "/saintvision-portal-abb707-bcd581be-r1",
+        "image": "sha256:4008f65c75fa7eecc4caeb9af5a1a9bc95bdad57100c0cb583f46155e6c4f35d",
+        "running": true,
+        "status": "running",
+        "restartPolicy": "unless-stopped",
+        "mounts": [
+          {
+            "destination": "/etc/nginx/nginx.conf",
+            "readWrite": false
+          },
+          {
+            "destination": "/etc/nginx/security-headers.conf",
+            "readWrite": false
+          },
+          {
+            "destination": "/usr/share/nginx/html",
+            "readWrite": false
+          }
+        ]
+      },
+      {
+        "component": "Observer",
+        "inspectExit": 0,
+        "CID": "b8a2f8f55e524837c4b7db14565ec5f960c4492bc3b9df6972e7f1f153c2aec5",
+        "name": "/saintvision-observer-97968b42-bcd581be-r1",
+        "image": "sha256:79745d9caadd9680cfa0176a1a16b3cec44875b38d7278e9694cf4c1fdea6241",
+        "running": true,
+        "status": "running",
+        "restartPolicy": "unless-stopped",
+        "mounts": [
+          {
+            "destination": "/config/observer.json",
+            "readWrite": false
+          },
+          {
+            "destination": "/tls/ca-cert.pem",
+            "readWrite": false
+          },
+          {
+            "destination": "/tls/cp-client-cert.pem",
+            "readWrite": false
+          },
+          {
+            "destination": "/tls/cp-client-key.pem",
+            "readWrite": false
+          },
+          {
+            "destination": "/run/secrets/runtime-dsn",
+            "readWrite": false
+          }
+        ]
+      }
+    ],
+    "liveness": [
+      {
+        "component": "API",
+        "HTTPCode": "200",
+        "exit": 0,
+        "meaning": "Liveness only, not Node trust or database acceptance"
+      },
+      {
+        "component": "Portal",
+        "HTTPCode": "200",
+        "exit": 0,
+        "meaning": "Liveness only, not Node trust or database acceptance"
+      }
+    ],
+    "mutation": false
+  },
+  "noServiceStartStopOrReconfigure": true,
+  "noPrivateDataRead": true,
+  "wholeProgramComplete": false
+}

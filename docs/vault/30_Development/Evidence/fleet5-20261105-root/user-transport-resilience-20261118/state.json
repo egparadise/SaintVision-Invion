@@ -1,0 +1,15 @@
+﻿{
+    "observedAtKST":  "2026-11-18T20:49:26.3188882+09:00",
+    "phase":  "SSH_PROCESS_STARTED",
+    "supervisorPID":  32576,
+    "supervisorStartedAt":  "2026-11-18T20:44:50.6345501+09:00",
+    "sshPID":  32712,
+    "sshStartedAt":  "2026-11-18T20:49:26.3169805+09:00",
+    "target":  "saintvision-invion3@192.168.45.222",
+    "forwards":  [
+                     "127.0.0.1:3100 -\u003e PC3:13103",
+                     "127.0.0.1:18080 -\u003e PC3:8080"
+                 ],
+    "scope":  "SSH transport only; not authentication, DB or Node authority acceptance",
+    "noNodeMutation":  true
+}

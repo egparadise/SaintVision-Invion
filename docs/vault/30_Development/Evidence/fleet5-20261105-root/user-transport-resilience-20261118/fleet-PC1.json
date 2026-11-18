@@ -1,0 +1,8 @@
+{
+  "PC": 1,
+  "host": "inviz@192.168.45.13",
+  "SSHExit": 255,
+  "stderrBytes": 62,
+  "publicKeyRejected": true,
+  "remote": null
+}

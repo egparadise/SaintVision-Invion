@@ -1,0 +1,40 @@
+import datetime,grp,json,os,pwd,shutil,socket,subprocess,sys
+from pathlib import Path
+p=json.load(sys.stdin)
+def command(args,timeout=6):
+ try:
+  q=subprocess.run(args,capture_output=True,timeout=timeout);return {'exit':q.returncode,'stdout':q.stdout.decode('utf-8','replace').strip(),'stderrBytes':len(q.stderr)}
+ except (OSError,subprocess.TimeoutExpired) as e:return {'exit':None,'errorClass':type(e).__name__}
+o={'PC':p['PC'],'atUTC':datetime.datetime.now(datetime.timezone.utc).isoformat(timespec='seconds'),'hostname':socket.gethostname(),'user':pwd.getpwuid(os.getuid()).pw_name,'UID':os.getuid(),'dockerGroupActive':any(grp.getgrgid(g).gr_name=='docker' for g in os.getgroups()),'noMutation':True,'privateFilesRead':False,'CPUCountObserved':os.cpu_count()}
+mem={}
+for line in Path('/proc/meminfo').read_text().splitlines():
+ key=line.split(':',1)[0]
+ if key in ['MemTotal','MemAvailable']:mem[key+'KiB']=int(line.split()[1])
+o['physicalMemoryObserved']=mem
+share=Path.home()/'saintvision-share';o['shareDirectoryExists']=share.is_dir()
+if share.is_dir():
+ d=shutil.disk_usage(share);o['shareFilesystemObservedBytes']={'total':d.total,'free':d.free,'meaning':'Observation only; not an authorized offered resource limit'}
+o['dockerCLIAvailable']=shutil.which('docker') is not None
+o['systemd']={}
+for service in ['ssh','docker']:
+ o['systemd'][service]={}
+ for action in ['is-active','is-enabled']:
+  q=command(['systemctl',action,service]);o['systemd'][service][action]={'exit':q['exit'],'state':q.get('stdout'),'errorClass':q.get('errorClass')}
+if o['dockerCLIAvailable']:
+ q=command(['docker','version','--format','{{json .Server}}']);o['dockerServerQuery']={'exit':q['exit'],'stderrBytes':q.get('stderrBytes'),'errorClass':q.get('errorClass')}
+ if q['exit']==0:
+  v=json.loads(q['stdout']);o['dockerServerQuery'].update({k:v.get(k) for k in ['Version','ApiVersion','MinAPIVersion','Os','Arch']})
+ ids=[p['CID']] if p['CID'] else []
+ if p['PC']==1:
+  q=command(['docker','container','ls','-aq','--filter','label=ai.saintvision.owner']);o['ownedNodeListExit']=q['exit']
+  if q['exit']==0:ids=q['stdout'].splitlines();assert len(ids)<=16
+ o['selectedProductContainers']=[]
+ for cid in ids:
+  q=command(['docker','container','inspect',cid]);row={'requestedCID':cid,'exit':q['exit'],'stderrBytes':q.get('stderrBytes')}
+  if q['exit']==0:
+   v=json.loads(q['stdout'])[0];row.update(CID=v['Id'],name=v['Name'],image=v['Image'],running=v['State']['Running'],startedAt=v['State']['StartedAt'],restartPolicy=v['HostConfig']['RestartPolicy']['Name'],ownerLabels={k:value for k,value in v['Config'].get('Labels',{}).items() if k.startswith('ai.saintvision.')})
+  o['selectedProductContainers'].append(row)
+if shutil.which('nvidia-smi'):
+ q=command(['nvidia-smi','--query-gpu=name,memory.total,driver_version','--format=csv,noheader,nounits'],timeout=5);o['GPUObservation']={'exit':q['exit'],'deviceMetadata':q.get('stdout') if q['exit']==0 else None,'meaning':'Observation only; no GPU grant/admission/workload'}
+else:o['GPUObservation']={'toolAvailable':False}
+o['secureNodeAcceptance']='NOT_PROVEN_CA_TERMINAL';print(json.dumps(o))

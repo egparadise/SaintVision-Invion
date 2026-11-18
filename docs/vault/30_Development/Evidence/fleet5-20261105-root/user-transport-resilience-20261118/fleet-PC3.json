@@ -1,0 +1,88 @@
+{
+  "PC": 3,
+  "host": "saintvision-invion3@192.168.45.222",
+  "SSHExit": 0,
+  "stderrBytes": 0,
+  "publicKeyRejected": false,
+  "remote": {
+    "PC": 3,
+    "atUTC": "2026-11-18T11:51:10+00:00",
+    "hostname": "saintvision-invion3-Precision-3450",
+    "user": "saintvision-invion3",
+    "UID": 1000,
+    "dockerGroupActive": true,
+    "noMutation": true,
+    "privateFilesRead": false,
+    "CPUCountObserved": 12,
+    "physicalMemoryObserved": {
+      "MemTotalKiB": 15564688,
+      "MemAvailableKiB": 11019696
+    },
+    "shareDirectoryExists": true,
+    "shareFilesystemObservedBytes": {
+      "total": 249792131072,
+      "free": 204955820032,
+      "meaning": "Observation only; not an authorized offered resource limit"
+    },
+    "dockerCLIAvailable": true,
+    "systemd": {
+      "ssh": {
+        "is-active": {
+          "exit": 0,
+          "state": "active",
+          "errorClass": null
+        },
+        "is-enabled": {
+          "exit": 0,
+          "state": "enabled",
+          "errorClass": null
+        }
+      },
+      "docker": {
+        "is-active": {
+          "exit": 0,
+          "state": "active",
+          "errorClass": null
+        },
+        "is-enabled": {
+          "exit": 0,
+          "state": "enabled",
+          "errorClass": null
+        }
+      }
+    },
+    "dockerServerQuery": {
+      "exit": 0,
+      "stderrBytes": 0,
+      "errorClass": null,
+      "Version": "29.9.3",
+      "ApiVersion": "1.56",
+      "MinAPIVersion": "1.40",
+      "Os": "linux",
+      "Arch": "amd64"
+    },
+    "selectedProductContainers": [
+      {
+        "requestedCID": "702fa3fbc43e8deded94e67c6e5299eb4549958e074ba4aeb40c216db29752f7",
+        "exit": 0,
+        "stderrBytes": 0,
+        "CID": "702fa3fbc43e8deded94e67c6e5299eb4549958e074ba4aeb40c216db29752f7",
+        "name": "/saintvision-nod_01M6TAWG25JTA3F7J7S1EE4N2W",
+        "image": "sha256:de654cd385307ac7147baf6757a480f803361eb5b30d40c7991b272a6889d87f",
+        "running": true,
+        "startedAt": "2026-11-07T21:49:20.986639356Z",
+        "restartPolicy": "unless-stopped",
+        "ownerLabels": {
+          "ai.saintvision.node": "nod_01M6TAWG25JTA3F7J7S1EE4N2W",
+          "ai.saintvision.owner": "root-cpu-1efea-r1"
+        }
+      }
+    ],
+    "GPUObservation": {
+      "exit": 0,
+      "deviceMetadata": "NVIDIA T600, 4096, 595.91.07",
+      "meaning": "Observation only; no GPU grant/admission/workload"
+    },
+    "secureNodeAcceptance": "NOT_PROVEN_CA_TERMINAL"
+  }
+}

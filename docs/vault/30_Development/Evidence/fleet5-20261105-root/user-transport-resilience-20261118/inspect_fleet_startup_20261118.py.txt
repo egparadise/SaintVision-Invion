@@ -1,0 +1,58 @@
+import concurrent.futures,datetime,hashlib,json,shlex,subprocess
+from pathlib import Path
+r=Path(__file__).resolve().parents[1];out=r/'.work/fleet-startup-20261118';assert not out.exists();out.mkdir()
+known=Path(r'D:\Project\SaintVisionI-Invion\operations\user-transport-20261118\known_hosts.pinned');raw=known.read_bytes();assert hashlib.sha256(raw).hexdigest()=='0dcbf0f4cfc363e4affc30810ad8a9e57bd2c4a31991e2c8285bdae7052ec2d2'
+targets=[(1,'inviz@192.168.45.13',None),(2,'saintvision-invion@192.168.45.143','fd4bdef2db94c434b740916d50fc0d3e80c5aa49bfe01f45b415f23877e03084'),(3,'saintvision-invion3@192.168.45.222','702fa3fbc43e8deded94e67c6e5299eb4549958e074ba4aeb40c216db29752f7'),(4,'inviz@192.168.45.210','e74fde5e18c65df59e3f19e4ba988c43ff27a3ff76021412eb71cc79957d489e')]
+program=r'''import datetime,grp,json,os,pwd,shutil,socket,subprocess,sys
+from pathlib import Path
+p=json.load(sys.stdin)
+def command(args,timeout=6):
+ try:
+  q=subprocess.run(args,capture_output=True,timeout=timeout);return {'exit':q.returncode,'stdout':q.stdout.decode('utf-8','replace').strip(),'stderrBytes':len(q.stderr)}
+ except (OSError,subprocess.TimeoutExpired) as e:return {'exit':None,'errorClass':type(e).__name__}
+o={'PC':p['PC'],'atUTC':datetime.datetime.now(datetime.timezone.utc).isoformat(timespec='seconds'),'hostname':socket.gethostname(),'user':pwd.getpwuid(os.getuid()).pw_name,'UID':os.getuid(),'dockerGroupActive':any(grp.getgrgid(g).gr_name=='docker' for g in os.getgroups()),'noMutation':True,'privateFilesRead':False,'CPUCountObserved':os.cpu_count()}
+mem={}
+for line in Path('/proc/meminfo').read_text().splitlines():
+ key=line.split(':',1)[0]
+ if key in ['MemTotal','MemAvailable']:mem[key+'KiB']=int(line.split()[1])
+o['physicalMemoryObserved']=mem
+share=Path.home()/'saintvision-share';o['shareDirectoryExists']=share.is_dir()
+if share.is_dir():
+ d=shutil.disk_usage(share);o['shareFilesystemObservedBytes']={'total':d.total,'free':d.free,'meaning':'Observation only; not an authorized offered resource limit'}
+o['dockerCLIAvailable']=shutil.which('docker') is not None
+o['systemd']={}
+for service in ['ssh','docker']:
+ o['systemd'][service]={}
+ for action in ['is-active','is-enabled']:
+  q=command(['systemctl',action,service]);o['systemd'][service][action]={'exit':q['exit'],'state':q.get('stdout'),'errorClass':q.get('errorClass')}
+if o['dockerCLIAvailable']:
+ q=command(['docker','version','--format','{{json .Server}}']);o['dockerServerQuery']={'exit':q['exit'],'stderrBytes':q.get('stderrBytes'),'errorClass':q.get('errorClass')}
+ if q['exit']==0:
+  v=json.loads(q['stdout']);o['dockerServerQuery'].update({k:v.get(k) for k in ['Version','ApiVersion','MinAPIVersion','Os','Arch']})
+ ids=[p['CID']] if p['CID'] else []
+ if p['PC']==1:
+  q=command(['docker','container','ls','-aq','--filter','label=ai.saintvision.owner']);o['ownedNodeListExit']=q['exit']
+  if q['exit']==0:ids=q['stdout'].splitlines();assert len(ids)<=16
+ o['selectedProductContainers']=[]
+ for cid in ids:
+  q=command(['docker','container','inspect',cid]);row={'requestedCID':cid,'exit':q['exit'],'stderrBytes':q.get('stderrBytes')}
+  if q['exit']==0:
+   v=json.loads(q['stdout'])[0];row.update(CID=v['Id'],name=v['Name'],image=v['Image'],running=v['State']['Running'],startedAt=v['State']['StartedAt'],restartPolicy=v['HostConfig']['RestartPolicy']['Name'],ownerLabels={k:value for k,value in v['Config'].get('Labels',{}).items() if k.startswith('ai.saintvision.')})
+  o['selectedProductContainers'].append(row)
+if shutil.which('nvidia-smi'):
+ q=command(['nvidia-smi','--query-gpu=name,memory.total,driver_version','--format=csv,noheader,nounits'],timeout=5);o['GPUObservation']={'exit':q['exit'],'deviceMetadata':q.get('stdout') if q['exit']==0 else None,'meaning':'Observation only; no GPU grant/admission/workload'}
+else:o['GPUObservation']={'toolAvailable':False}
+o['secureNodeAcceptance']='NOT_PROVEN_CA_TERMINAL';print(json.dumps(o))
+'''
+(out/'remote-readonly.py.txt').write_text(program,encoding='utf-8')
+def inspect(t):
+ pc,host,cid=t
+ try:
+  q=subprocess.run(['ssh','-T','-i',r'C:\Users\inviz\.ssh\sv-lan-ed25519','-o','IdentitiesOnly=yes','-o','BatchMode=yes','-o','ConnectionAttempts=1','-o','ConnectTimeout=5','-o','StrictHostKeyChecking=yes','-o','UserKnownHostsFile='+str(known),host,'python3','-I','-B','-c',shlex.quote(program)],input=json.dumps({'PC':pc,'CID':cid}).encode(),capture_output=True,timeout=55)
+  row={'PC':pc,'host':host,'SSHExit':q.returncode,'stderrBytes':len(q.stderr),'publicKeyRejected':'Permission denied' in q.stderr.decode('utf-8','replace'),'remote':json.loads(q.stdout) if q.returncode==0 else None}
+ except subprocess.TimeoutExpired:row={'PC':pc,'host':host,'SSHExit':None,'errorClass':'TimeoutExpired'}
+ (out/('PC'+str(pc)+'.json')).write_text(json.dumps(row,indent=2)+'\n',encoding='utf-8');return row
+with concurrent.futures.ThreadPoolExecutor(max_workers=4) as pool:rows=list(pool.map(inspect,targets))
+assert known.read_bytes()==raw
+receipt={'atKST':datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=9))).isoformat(timespec='seconds'),'nodes':rows,'knownHostsUnchanged':True,'nodeOrCertificateOrDBOrServiceMutation':False,'wholeFiveAccepted':False}
+(out/'receipt.json').write_text(json.dumps(receipt,indent=2)+'\n',encoding='utf-8');print(json.dumps(receipt),flush=True)

@@ -1,0 +1,28 @@
+﻿{
+    "test":  "Exact-owned SSH child interruption and automatic reconnect",
+    "startedAtKST":  "2026-11-18T20:49:20.9096232+09:00",
+    "recoveredAtKST":  "2026-11-18T20:49:27.4702909+09:00",
+    "observedRecoverySeconds":  6.561,
+    "supervisorPID":  32576,
+    "priorSSHChildPID":  23164,
+    "replacementSSHChildPID":  32712,
+    "exactProcessIdentityCheckedBeforeStop":  true,
+    "supervisorUnchanged":  true,
+    "loopbackListenersOwnedByReplacement":  true,
+    "HTTP":  [
+                 {
+                     "url":  "http://127.0.0.1:3100/healthz",
+                     "status":  200,
+                     "body":  "OK"
+                 },
+                 {
+                     "url":  "http://127.0.0.1:18080/healthz",
+                     "status":  200,
+                     "body":  "{\"status\":\"ok\",\"version\":\"0.1.0\"}"
+                 }
+             ],
+    "startupMode":  "Current-user logon; actual reboot/logon test NOT_RUN",
+    "scope":  "Transport recovery only; API healthz is liveness, not DB/auth or trusted Node readiness",
+    "nodeOrCertificateOrDatabaseMutation":  false,
+    "fullFivePCConnectivityAccepted":  false
+}

@@ -1,15 +1,19 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.504"
+version: "1.0.505"
 status: "review"
 author: "Codex"
-updated: "2026-11-18T20:33:43+09:00"
+updated: "2026-11-18T20:53:13+09:00"
 source_of_truth: "Git"
 active_card: "FLEET5 continued supervision with PORTAL-REFRESH-FLEET-20261106"
-active_card_status: "Nov18OriginalTaskFailed_ResumeSameTaskNoReset; CAterminalActualRead_NoLiveRecovery; HistoricalCodeMaturityAround72AndFormalCard4.17Separate_CurrentWholePercentAuditPending"
-active_card_next: "Finish Root543 exact Docs/Obsidian; retry originalTask_a5be5caa3c69 with retry-ofctx_ac834214080c in fresh isolated Orca workspace/setupskip and immediate updated Nov18 CAterminal/canonical instructions. One actual Claude audits existing48 rubric plus separate expandedVF denominator. Preserve old releaseunknown/evidence; no sameCA renewal or automatic restart/deploy."
+active_card_status: "MainTransportAutoReconnectVerified6.561s_LogonRegistered_RebootNotRun; PC234SSHAndSystemdAndNodeRestartPolicyVerified_PC1Still255; CodeRetryAndWholePercentAuditReady_CAterminalNoLiveRecovery"
+active_card_next: "Seal Root544 exact Docs and canonical sync; capture new fullstate baseline; actual sameTask retry fresh isolated Orca workspace with temporalCAterminal correction; actual Claude independently audits percent, initialplan and operator transport. Await PC1 nonsecret auth diagnosis. No sameCA bypass or DB reset."
 ---
+
+## 2026-11-18T20:53:13+09:00 사용자 상시 연결 요청·통로 복구 실측
+
+11-18사용자상시연결요청에Main경량SSH통로(3100→PC3:13103,18080→PC3:8080)를pinnedhost/keepalive15초×3/5초재접속/단일mutex/현재사용자로그인자동시작으로복구했다. 정확한소유PID·생성시각·부모·명령·loopback포트를확인한SSH자식만한번종료해6.561초뒤새자식과두HTTP200복구를실측했다. 실제재부팅/로그인시험은미실행이며DB/auth/Node정상인수와구별한다. 2·3·4번SSH·Docker그룹·공유폴더·ssh/docker서비스active/enabled·기존Nodeunless-stopped를확인했다. PC1은사용자등록완료응답뒤에도key255였고공개키일치는확인하여비밀없는계정/IP/권한/지문진단만요청했다. MainDBdaemon불가/원래CA·CPleaf만료/PC5Node미인수는남아있으며동일CA우회나Node변경은없다. 기존48개과거성숙도71.35~72.40퍼센트와정식카드4.17퍼센트를구분하고현재전체는독립감사예정이다. 작성자RootCodex이며독립검토는아직미수행이다. 다음담당은Root동일Taskretry와actualClaude최신진행률/운영감사다.
 
 ## 2026-11-18T20:33:43+09:00 11-18 실제 재개·중단 상태·완료율 감사
 

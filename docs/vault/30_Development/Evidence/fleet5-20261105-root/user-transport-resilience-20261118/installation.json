@@ -1,0 +1,16 @@
+﻿{
+    "installedAtKST":  "2026-11-18T20:44:50.6454532+09:00",
+    "supervisorPath":  "D:\\Project\\SaintVisionI-Invion\\operations\\user-transport-20261118\\Keep-SaintVisionTransport.ps1",
+    "supervisorSHA256":  "ca07421e1a2b5cef6b3da6b9c4b6525f889366e8abdc49166571c7209af16601",
+    "processID":  32576,
+    "startupKey":  "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Run",
+    "startupValue":  "SaintVision_UserTransport_v1",
+    "startupMode":  "Current-user logon; not a headless system service",
+    "launchMode":  "Hidden WMI child, detached from the current tool terminal",
+    "hostPinVerified":  true,
+    "SSHKeepaliveSeconds":  15,
+    "SSHMissedKeepalives":  3,
+    "reconnectDelaySeconds":  5,
+    "nodeOrCertificateOrDatabaseMutation":  false,
+    "wholeProgramComplete":  false
+}

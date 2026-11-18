@@ -1,0 +1,66 @@
+$ErrorActionPreference = 'Stop'
+$transportDirectory = 'D:\Project\SaintVisionI-Invion\operations\user-transport-20261118'
+$statePath = Join-Path $transportDirectory 'state.json'
+$state = Get-Content -LiteralPath $statePath -Raw -Encoding UTF8 | ConvertFrom-Json
+$supervisor = Get-CimInstance Win32_Process -Filter ('ProcessId = ' + $state.supervisorPID)
+$child = Get-CimInstance Win32_Process -Filter ('ProcessId = ' + $state.sshPID)
+if ($null -eq $supervisor -or $null -eq $child) { throw 'Owned process missing; no stop performed' }
+if ($supervisor.ExecutablePath -ine 'C:\WINDOWS\System32\WindowsPowerShell\v1.0\powershell.exe') { throw 'Supervisor executable changed' }
+if (-not $supervisor.CommandLine.Contains((Join-Path $transportDirectory 'Keep-SaintVisionTransport.ps1'))) { throw 'Supervisor command changed' }
+if ($child.ParentProcessId -ne $supervisor.ProcessId -or $child.ExecutablePath -ine 'C:\WINDOWS\System32\OpenSSH\ssh.exe') { throw 'Child custody changed' }
+foreach ($requiredArgument in @(('UserKnownHostsFile=' + (Join-Path $transportDirectory 'known_hosts.pinned')), '127.0.0.1:3100:127.0.0.1:13103','127.0.0.1:18080:127.0.0.1:8080','saintvision-invion3@192.168.45.222')) {
+    if (-not $child.CommandLine.Contains($requiredArgument)) { throw 'Child command changed' }
+}
+$oldProcess = Get-Process -Id $state.sshPID
+if ($oldProcess.StartTime.ToString('o') -ne $state.sshStartedAt) { throw 'Child start identity changed' }
+$listeners = @(Get-NetTCPConnection -State Listen | Where-Object { $_.LocalPort -in @(3100,18080) })
+if ($listeners.Count -ne 2 -or @($listeners | Where-Object { $_.OwningProcess -ne $child.ProcessId -or $_.LocalAddress -ne '127.0.0.1' }).Count -ne 0) { throw 'Listener ownership changed' }
+foreach ($url in @('http://127.0.0.1:3100/healthz','http://127.0.0.1:18080/healthz')) {
+    $before = Invoke-WebRequest -UseBasicParsing -Uri $url -TimeoutSec 5
+    if ([int]$before.StatusCode -ne 200) { throw 'Pre-test health failed' }
+}
+$startedAt = Get-Date
+$oldChildID = [int]$child.ProcessId
+# Stop ONLY the exact owned transport child, after executable, parent, start and argument checks.
+$oldProcess.Kill()
+$recovered = $false
+$attempts = @()
+for ($attempt = 0; $attempt -lt 20; $attempt++) {
+    Start-Sleep -Seconds 1
+    try {
+        $current = Get-Content -LiteralPath $statePath -Raw -Encoding UTF8 | ConvertFrom-Json
+        if ($current.supervisorPID -ne $state.supervisorPID -or -not $current.sshPID -or $current.sshPID -eq $oldChildID) { continue }
+        $newChild = Get-CimInstance Win32_Process -Filter ('ProcessId = ' + $current.sshPID)
+        if ($null -eq $newChild -or $newChild.ParentProcessId -ne $supervisor.ProcessId -or $newChild.ExecutablePath -ine $child.ExecutablePath -or $newChild.CommandLine -cne $child.CommandLine) { throw 'Replacement child ownership differs' }
+        $newListeners = @(Get-NetTCPConnection -State Listen | Where-Object { $_.LocalPort -in @(3100,18080) })
+        if ($newListeners.Count -ne 2 -or @($newListeners | Where-Object { $_.OwningProcess -ne $current.sshPID -or $_.LocalAddress -ne '127.0.0.1' }).Count -ne 0) { continue }
+        $health = @()
+        foreach ($url in @('http://127.0.0.1:3100/healthz','http://127.0.0.1:18080/healthz')) {
+            $response = Invoke-WebRequest -UseBasicParsing -Uri $url -TimeoutSec 3
+            $health += [ordered]@{ url=$url; status=[int]$response.StatusCode; body=$response.Content }
+        }
+        if (@($health | Where-Object { $_.status -ne 200 }).Count -ne 0) { continue }
+        $recoveredAt = Get-Date
+        $receipt = [ordered]@{
+            test='Exact-owned SSH child interruption and automatic reconnect'
+            startedAtKST=$startedAt.ToString('o'); recoveredAtKST=$recoveredAt.ToString('o')
+            observedRecoverySeconds=[math]::Round(($recoveredAt-$startedAt).TotalSeconds,3)
+            supervisorPID=$state.supervisorPID; priorSSHChildPID=$oldChildID; replacementSSHChildPID=$current.sshPID
+            exactProcessIdentityCheckedBeforeStop=$true; supervisorUnchanged=$true; loopbackListenersOwnedByReplacement=$true
+            HTTP=$health; startupMode='Current-user logon; actual reboot/logon test NOT_RUN'
+            scope='Transport recovery only; API healthz is liveness, not DB/auth or trusted Node readiness'
+            nodeOrCertificateOrDatabaseMutation=$false; fullFivePCConnectivityAccepted=$false
+        }
+        $receipt | ConvertTo-Json -Depth 7 | Set-Content -LiteralPath (Join-Path $transportDirectory 'reconnect-verification.json') -Encoding UTF8
+        $receipt | ConvertTo-Json -Depth 7
+        $recovered = $true
+        break
+    } catch {
+        $attempts += [ordered]@{ attempt=$attempt; errorType=$_.Exception.GetType().FullName }
+    }
+}
+if (-not $recovered) {
+    [ordered]@{ atKST=(Get-Date).ToString('o'); recovered=$false; priorChild=$oldChildID; attempts=$attempts } | ConvertTo-Json -Depth 5 | Set-Content -LiteralPath (Join-Path $transportDirectory 'reconnect-verification-failure.json') -Encoding UTF8
+    throw 'No proven transport recovery within finite observation window'
+}
+exit 0

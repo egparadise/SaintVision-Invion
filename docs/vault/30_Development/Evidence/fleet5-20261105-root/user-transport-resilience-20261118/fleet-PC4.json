@@ -1,0 +1,88 @@
+{
+  "PC": 4,
+  "host": "inviz@192.168.45.210",
+  "SSHExit": 0,
+  "stderrBytes": 0,
+  "publicKeyRejected": false,
+  "remote": {
+    "PC": 4,
+    "atUTC": "2026-11-18T11:51:10+00:00",
+    "hostname": "inviz-Precision-3450",
+    "user": "inviz",
+    "UID": 1000,
+    "dockerGroupActive": true,
+    "noMutation": true,
+    "privateFilesRead": false,
+    "CPUCountObserved": 12,
+    "physicalMemoryObserved": {
+      "MemTotalKiB": 16094376,
+      "MemAvailableKiB": 11354344
+    },
+    "shareDirectoryExists": true,
+    "shareFilesystemObservedBytes": {
+      "total": 249792131072,
+      "free": 207553945600,
+      "meaning": "Observation only; not an authorized offered resource limit"
+    },
+    "dockerCLIAvailable": true,
+    "systemd": {
+      "ssh": {
+        "is-active": {
+          "exit": 0,
+          "state": "active",
+          "errorClass": null
+        },
+        "is-enabled": {
+          "exit": 0,
+          "state": "enabled",
+          "errorClass": null
+        }
+      },
+      "docker": {
+        "is-active": {
+          "exit": 0,
+          "state": "active",
+          "errorClass": null
+        },
+        "is-enabled": {
+          "exit": 0,
+          "state": "enabled",
+          "errorClass": null
+        }
+      }
+    },
+    "dockerServerQuery": {
+      "exit": 0,
+      "stderrBytes": 0,
+      "errorClass": null,
+      "Version": "29.8.1",
+      "ApiVersion": "1.56",
+      "MinAPIVersion": "1.40",
+      "Os": "linux",
+      "Arch": "amd64"
+    },
+    "selectedProductContainers": [
+      {
+        "requestedCID": "e74fde5e18c65df59e3f19e4ba988c43ff27a3ff76021412eb71cc79957d489e",
+        "exit": 0,
+        "stderrBytes": 0,
+        "CID": "e74fde5e18c65df59e3f19e4ba988c43ff27a3ff76021412eb71cc79957d489e",
+        "name": "/saintvision-nod_01M6TGSXV1J7XWC5D5H7N6EW1D",
+        "image": "sha256:de654cd385307ac7147baf6757a480f803361eb5b30d40c7991b272a6889d87f",
+        "running": true,
+        "startedAt": "2026-11-07T21:49:28.266847692Z",
+        "restartPolicy": "unless-stopped",
+        "ownerLabels": {
+          "ai.saintvision.node": "nod_01M6TGSXV1J7XWC5D5H7N6EW1D",
+          "ai.saintvision.owner": "root-cpu-1efea-r1"
+        }
+      }
+    ],
+    "GPUObservation": {
+      "exit": 0,
+      "deviceMetadata": "NVIDIA T600, 4096, 550.120",
+      "meaning": "Observation only; no GPU grant/admission/workload"
+    },
+    "secureNodeAcceptance": "NOT_PROVEN_CA_TERMINAL"
+  }
+}

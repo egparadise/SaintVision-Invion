@@ -1,0 +1,72 @@
+{
+  "atKST": "2026-11-18T20:53:13+09:00",
+  "taskID": "FLEET5-USER-TRANSPORT-RESILIENCE-AND-STARTUP-READONLY-20261118",
+  "owner": "Root Codex operator",
+  "independentReview": "NOT_YET_REVIEWED; pending actual Claude audit",
+  "managementBase": "d4b7b02a1939037f3a4a2cce4a0a4a460e9b54e7",
+  "transportRuntimePath": "D:\\Project\\SaintVisionI-Invion\\operations\\user-transport-20261118",
+  "MainTransportInstalled": true,
+  "processScope": "Only lightweight current-user SSH transport, no Main product runtime/compiler/crypto",
+  "startupMode": "HKCU Run/current-user logon only; not a headless service; reboot/logon acceptance NOT_RUN",
+  "hostPinSHA256": "0dcbf0f4cfc363e4affc30810ad8a9e57bd2c4a31991e2c8285bdae7052ec2d2",
+  "ports": {
+    "3100": "Main loopback to PC3 loopback13103",
+    "18080": "Main loopback to PC3 loopback8080"
+  },
+  "keepaliveSeconds": 15,
+  "missedKeepalives": 3,
+  "reconnectDelaySeconds": 5,
+  "actualReconnect": {
+    "test": "Exact-owned SSH child interruption and automatic reconnect",
+    "startedAtKST": "2026-11-18T20:49:20.9096232+09:00",
+    "recoveredAtKST": "2026-11-18T20:49:27.4702909+09:00",
+    "observedRecoverySeconds": 6.561,
+    "supervisorPID": 32576,
+    "priorSSHChildPID": 23164,
+    "replacementSSHChildPID": 32712,
+    "exactProcessIdentityCheckedBeforeStop": true,
+    "supervisorUnchanged": true,
+    "loopbackListenersOwnedByReplacement": true,
+    "HTTP": [
+      {
+        "url": "http://127.0.0.1:3100/healthz",
+        "status": 200,
+        "body": "OK"
+      },
+      {
+        "url": "http://127.0.0.1:18080/healthz",
+        "status": 200,
+        "body": "{\"status\":\"ok\",\"version\":\"0.1.0\"}"
+      }
+    ],
+    "startupMode": "Current-user logon; actual reboot/logon test NOT_RUN",
+    "scope": "Transport recovery only; API healthz is liveness, not DB/auth or trusted Node readiness",
+    "nodeOrCertificateOrDatabaseMutation": false,
+    "fullFivePCConnectivityAccepted": false
+  },
+  "firstVerificationFailure": "PowerShell comma/concatenation precedence caused identity guard refusal BEFORE stop; parentheses corrected; first failure preserved here, no blind stop or repeated installation",
+  "duplicateProtection": "Current-user named mutex; unexpected occupied ports held without process kill; no broad process discovery/stop in supervisor",
+  "PC234": {
+    "SSH": "success at20:51KST",
+    "sshAndDockerSystemd": "all active and enabled",
+    "exactPriorNodeContainers": "all running, all unless-stopped",
+    "shareDirectories": "all exist",
+    "observedCPUThreadsPerPC": 12,
+    "GPUObserved": "NVIDIA T600/4096MiB on each; metadata only, NOT GPU scheduling/admission",
+    "physicalResourcesAreNotGrantedResourceLimits": true
+  },
+  "PC1": "User reported public key installed; retry at20:51 stillpublickey255. Registration script public key exactly matches current .pub. Requested nonsecret account/IP/stat/key fingerprints to diagnose; no credential guesses.",
+  "PC5": "Main client transport restored; Node not admitted; prior DB Docker daemon unavailable and latest DB state not yet recovered",
+  "PC3Components": "API96/PortalABB/observer still running with unless-stopped; healthz200 is liveness only",
+  "authority": "Original CA expired11-14, CP leaf expired11-09; CA_TERMINAL. No sameCA renewal, expired trust bypass, Node restart/migration or authority reset performed. Separately reviewed replacement/recommissioning still needed.",
+  "formalAcceptedCardCompletionPercent": 4.17,
+  "historicalOriginal48CodeMaturityPercent": [
+    71.35,
+    72.4
+  ],
+  "historicalScoreDate": "2026-11-04",
+  "currentWholeExpandedSolutionPercent": "UNCONFIRMED_PENDING_INDEPENDENT_AUDIT",
+  "nextAction": "Seal Root544 Docs+Obsidian. Retry same failed codeTask in fresh isolated Orca workspace with Nov18 CAterminal/canonical correction; one actual Claude audits rubric/initialplan/current readiness and this operator transport. No full5 or product completion claim.",
+  "noNodeCertificateDatabaseMutation": true,
+  "wholeProgramComplete": false
+}

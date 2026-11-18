@@ -1,0 +1,11 @@
+import json,subprocess
+items=[]
+for name,cid in [('API96','8d62139c2408dff910bbfb3a9b322be56520705a3f3e967ce74563cfe9cd3f28'),('PortalABB','54fb6609646d7f57991b1ee04de0454117e8e71fd525e5e1f87afb6d052483c0'),('Observer','b8a2f8f55e524837c4b7db14565ec5f960c4492bc3b9df6972e7f1f153c2aec5')]:
+ q=subprocess.run(['docker','container','inspect',cid],capture_output=True,timeout=8);a={'component':name,'inspectExit':q.returncode}
+ if q.returncode==0:
+  v=json.loads(q.stdout)[0];a.update(CID=v['Id'],name=v['Name'],image=v['Image'],running=v['State']['Running'],status=v['State']['Status'],restartPolicy=v['HostConfig']['RestartPolicy']['Name'],mounts=[{'destination':m['Destination'],'readWrite':m['RW']} for m in v['Mounts']])
+ items.append(a)
+http=[]
+for name,url in [('API','http://127.0.0.1:8080/healthz'),('Portal','http://127.0.0.1:13103/healthz')]:
+ q=subprocess.run(['curl','--silent','--show-error','--max-time','3','--output','/dev/null','--write-out','%{http_code}',url],capture_output=True,timeout=5);http.append({'component':name,'HTTPCode':q.stdout.decode().strip(),'exit':q.returncode,'meaning':'Liveness only, not Node trust or database acceptance'})
+print(json.dumps({'components':items,'liveness':http,'mutation':False}))
