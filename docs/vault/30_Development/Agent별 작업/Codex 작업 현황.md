@@ -1,15 +1,17 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.506"
+version: "1.0.507"
 status: "review"
 author: "Codex"
-updated: "2026-11-18T21:07:57+09:00"
+updated: "2026-11-19T01:48:33+09:00"
 source_of_truth: "Git"
 active_card: "FLEET5-EXPIRED-POLICY-INTEGRATION-HARDENING-AND-READONLY-PREFLIGHT-R1"
-active_card_status: "Candidate and collectors implemented. Final hosted verification pending."
-active_card_next: "Complete fixture proofs and hand off for independent review."
+active_card_status: "Independent source review accepted. Stacked integration pending."
+active_card_next: "Root verifies stacked PR CI and separately promotes prerequisite chain."
 ---
+
+Fleet5 source-only integration of abe0c971 against prerequisite 15384c36. Independent source review accepted. Root owns promotion to integration/all-agents-unified. P1–P7 NOT_RUN, activation off. [[2026-11-19_FLEET5_Stacked_Source_Integration_Codex]]
 
 ## Fleet5 recovery preflight on 2026-11-18
 
