@@ -1,0 +1,17 @@
+{
+  "sourceSHA": "ec2a9d2bf20ff1edfe46e7b2881df00f938ced81",
+  "Core": 42429230722,
+  "job": 128574189530,
+  "failedStep": "Prove isolated expired-policy candidate with actual Linux Docker and retained keys",
+  "cause": "WrongUID process refused at read-only private mount open before requested metadata guard; actual RECOVERY_HOLD_FILE vs expected METADATA. No unauthorized proof/write occurred.",
+  "correction": "Explicit UID1000 CLI check before request read; typed RECOVERY_HOLD_UID. Preserve all refusal assertions and add actual terminal certificate/M2 controls, bounded custody wait.",
+  "GoCompileAnd3RaceUnitTests": "success",
+  "candidateCycles": 0,
+  "candidateArtifact": 13597176017,
+  "candidateDigest": "sha256:ab364fabe5c100cf16724b9ba459a586d627aed38bfb53128cae6d264d1f0f92",
+  "Docs": 42429235072,
+  "DocsOutcome": "success for ec2 only; not corrected source",
+  "Backend": 42429232725,
+  "BackendAtRecord": "still executing; preserve final later",
+  "MainProductExecution": false
+}

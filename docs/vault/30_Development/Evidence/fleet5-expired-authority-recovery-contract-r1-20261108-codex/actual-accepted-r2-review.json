@@ -1,0 +1,141 @@
+{
+  "docID": "EVIDENCE-FLEET5-CURRENT-THREE-NODE-RENEWAL-PLAN-R2-DELTA-REVIEW-20261108-CLAUDE",
+  "version": "1.0.0",
+  "atKST": "2026-11-08T08:28:47+09:00",
+  "task": "FLEET5-CURRENT-THREE-NODE-RENEWAL-PLAN-R2-ACTUAL-CLAUDE-DELTA-20261108",
+  "orcaTaskID": "task_ed462b9da76f",
+  "orcaDispatchID": "ctx_ba1258a6cbe3",
+  "reviewer": "Claude (the same actual independent reviewer as R1 f29228ed)",
+  "author": "Codex ctx_80dec9e2eb1e / task_3e413989dcaa (exited/released)",
+  "authorReviewerDistinct": true,
+  "obsidianApplyOwner": "Root (sole canonical APPLY/SSH/credential/operator owner; APPLY frozen until this reviewer exits)",
+  "reviewBranch": "agent/claude/fleet5-current-three-node-renewal-plan-r2-delta-review-20261108",
+  "deliveryBase": "2733d3ce92bba47a94d9414d965a9a0d12d916d1",
+  "deliveryBaseMeaning": "Root539 management head, used so this reviewer's own Claude board is updated from the current shared state. Prior review f29228ed is an immutable input, not the base.",
+  "priorActualReview": {
+    "commit": "f29228ed28c651cb2470b45d9f8d14521e1ce75d",
+    "verdict": "REQUEST_CHANGES",
+    "mandatoryBlockers": 2,
+    "r2CopyOfReviewJsonBlobIdentical": true,
+    "root538HistoryCopy": "v1.0.1 at Root539 verified as citation rendering only: 17 permalinks reversed to the original backticked citations (correct path/line/SHA) leave only version, updated and the Root538 publication note"
+  },
+  "target": {
+    "commit": "b8c839d1daf28677a0587af115cbea496626d5ea",
+    "directBase": "a3c6984fa25c6cf179827e15e4259000e7bd294e",
+    "branch": "agent/codex/fleet5-current-three-node-renewal-plan-r2-20261108",
+    "remoteExact": true,
+    "docID": "PLAN-FLEET5-CURRENT-THREE-NODE-RENEWAL-R1",
+    "version": "1.1.0",
+    "planBytes": 39704,
+    "filesChanged": 28,
+    "scope": "plan page, Codex board, one Codex History page and the unique R2 Evidence directory; R1 Evidence directory unchanged",
+    "root539ManagementCopyByteIdentical": true,
+    "operationManifestSHA256": "b4e0d99b349f28593fabb22786c2012627b85eea6ea84387b50ef15b0e72ae7c",
+    "planSHA256": "e6db9b3ab7a1ab3b3ac23e7b6e83bc539dbe413bfc636c54a71aaa742e1379c4"
+  },
+  "rootEvidenceAsGiven": {
+    "authorDocsRun": "42424634771",
+    "authorDocsJob": "128560174853",
+    "authorCorrelation": "fleet5-current-three-node-renewal-plan-r2-docs-6f6d7a7f4e774f069bf363f62f17da26",
+    "routeArtifact": "13595201628",
+    "guidelinesArtifactMetadataOnly": "13595535129",
+    "root539Docs": "42425261890",
+    "note": "Recorded as given by the coordinator brief; not re-downloaded or re-executed by this reviewer (no new gap)."
+  },
+  "mechanicalChecks": {
+    "permalinkDefinitions": 49,
+    "labelsUsedEqualDefined": true,
+    "referenceUsesInText": 57,
+    "permalinksResolvedToExactBlob": 49,
+    "permalinkRangesInsideFile": 49,
+    "permalinksInsideMappedRanges": 49,
+    "sourceContractMapEntries": 25,
+    "mappedRanges": 49,
+    "mapSHAAndBytesExact": 25,
+    "mapExcerptMismatches": 0,
+    "backtickedRelativeProductPaths": 0,
+    "manifestNulls": "actualReattestedE, all four budgets B_N/B_M/B_Rpolicy/B_Rleaf, all four cut-offs, normal/migration eligibility, every task implementation/CI/review/preflight/release, every clientContexts attestation/absence/instances/binding/acknowledgement and independentF4Closure are null",
+    "findingDispositions": "6 entries, author dispositions R2_CORRECTED_PROPOSAL_PENDING_ACTUAL_DELTA or NEW_ROOT_EVIDENCE_SUPPLIED_PENDING_ACTUAL_DELTA, independentClosure null for all: no author self-closure",
+    "secretScan": "no PEM private key or token literal in the R2 Evidence tree",
+    "rootPublicCPClientValidityCopies": "receipt.json and remote-read-only-public-certificate.py.txt blob-identical to Root538 03f6ea0a"
+  },
+  "verdict": "ACCEPT_R2_PLAN_DELTA_KEEP_IMPLEMENTATION_AND_OPERATING_GATES",
+  "mandatoryBlockers": 0,
+  "newMandatoryFindings": 0,
+  "findingDispositions": [
+    {
+      "id": "PLAN-REVIEW-R1-F1",
+      "severity": "MAJOR",
+      "status": "CLOSED_AT_PLAN_ONLY",
+      "basis": "Release formulas T_cutN = E - B_N - 630 - 30 and T_cutM = E - (B_M + B_N) - 630 - 30, with migration settling strictly before T_cutN. Every budget, actual E, cut-off and eligibility is null/HOLD, and B_N is defined as a frozen upper bound, not an estimate. 48 h eligibility is explicitly not release. The post-expiry state is deterministic and holds even if nothing started: CP handshakes and requests fail closed (verified against trust.go and the server.go per-request Authorize), startup exits 1, and no restart/reboot/migration is allowed under unchanged authority. The UI is honest stale/unreachable and CP /healthz is not Node health. With no serving PID there is no ordinary M2. The policy-expired branch (T_cutRpolicy = L - B_Rpolicy - 660 s) and the expired-leaf branch (T_cutRleaf = A - B_Rleaf - 660 s) are separate, owned by Codex, reviewed by Claude, NOT_IMPLEMENTED, and may not reuse the normal adapter unchanged. CA terminal refusal is included.",
+      "notAccepted": "No recovery protocol, proof version or budget exists; this is plan-level closure only"
+    },
+    {
+      "id": "PLAN-REVIEW-R1-F2",
+      "severity": "MAJOR",
+      "status": "CLOSED_AT_PLAN_ONLY",
+      "basis": "The new Go binary, image and CID are a mandatory predecessor (FLEET5-CURRENT-CPU-SERVING-BINARY-CONTAINER-MIGRATION-R1). NodeID, keys, journal, floors and mounts are preserved. Freeze phases are M0 (pre-migration), M1 (old->new provenance), M2 (handoff under its own contract), M3 (all-three settlement), N0 (fresh pre-floor on the NEW serving binary) and N1+ (no drift mid-batch). Release is either under valid authority before T_cutM, with the normal adapter and B_N already ready, or under the distinct expired contract. The old CID/image is historical pre-migration evidence, not a universal frozen identity. The plan also states that source recipes are not deployed-image attestation.",
+      "notAccepted": "Migration evidence version, handoff/fencing protocol and implementation are null"
+    },
+    {
+      "id": "PLAN-REVIEW-R1-F3",
+      "severity": "MODERATE",
+      "status": "CLOSED_AT_PLAN_ONLY",
+      "basis": "All five constructor sites (observer_worker:58, worker:122, workspace_config:54, build_product_runtime:537, storage_check_collect:381). Caller and lifetime claims were checked against API 96afd799: observer main --once/loop; the worker main NodeDelivery plus the optional build runtime; the app.py:1342-1344 workspace and app.py:1405-1420 storage composition; and app.py:1381 is only an import. Each site needs a Root present-or-absent attestation (all null), cached-object acknowledgement, a future/CLI launch guard, an all-context barrier before P+2 and stale-context refusal (P5). The plan explicitly says constructor count does not imply live instances.",
+      "notAccepted": "No live inventory exists; switch stays HOLD until Root proves it"
+    },
+    {
+      "id": "PLAN-REVIEW-R1-F4",
+      "severity": "MINOR",
+      "status": "CLOSED_AT_PLAN_ONLY",
+      "basis": "Root538 PC3 public cp-client-cert.pem read at 07:52:28 KST (03f6ea0a): DER 48911c5d...6481, notBefore 2026-11-07T07:10:30Z, notAfter 2026-11-09T07:15:30Z, dateValidAtRead true and the expected CP URI. The program reads only the public certificate (asserts regular file, UID 1000, exact fingerprint and URI), reads no private key and opens no context or handshake. The plan limits the claim: no active-use attestation for any of the five sites. The R1 F4 finding stays historically correct for a3c698.",
+      "notAccepted": "Not proof that any live client context uses this leaf"
+    },
+    {
+      "id": "PLAN-REVIEW-R1-F5",
+      "severity": "MINOR",
+      "status": "CLOSED_AT_PLAN_ONLY",
+      "basis": "COPY lines now cite Dockerfile.node.remote:11 and Dockerfile.node:2. All 49 full-SHA permalinks resolve to exact blobs inside the 25-entry map (49 ranges, excerpts exact), so nothing is out of range. Deployed-image provenance remains a future Root attestation and is not inferred from source.",
+      "notAccepted": "de654cd3 build provenance still unattested"
+    },
+    {
+      "id": "PLAN-REVIEW-R1-F6",
+      "severity": "MINOR",
+      "status": "CLOSED_AT_PLAN_ONLY",
+      "basis": "At now >= A (2026-11-14 16:15:30 KST), or with insufficient same-CA budget, same-CA renewal/recovery is impossible. Authority replacement is a distinct workflow outside scope needing new trust authorization, and legacy init/reset/repin is never allowed.",
+      "notAccepted": "Authority-replacement workflow not designed (out of scope)"
+    }
+  ],
+  "nonBlockingObservations": [
+    {
+      "id": "R2-DELTA-O1",
+      "severity": "LOW",
+      "text": "Practical branch selection. At review time (about 08:30-08:50 KST) none of the migration code, adapter code, CI, review, frozen B_M/B_N or Root preflight exists. The plan's own rule requires the normal adapter and B_N to be ready before migration release. So the valid-authority branch is very unlikely to be reachable before E_policy 16:15:30 KST, and Root should expect to select FLEET5-EXPIRED-CURRENT-AUTHORITY-FORWARD-RECOVERY-CONTRACT-R1 as the next finite implementation card. The plan correctly leaves that choice to Root with real time; this is guidance, not a defect."
+    },
+    {
+      "id": "R2-DELTA-O2",
+      "severity": "LOW",
+      "text": "In the expired branch, B_Rpolicy and B_Rleaf must explicitly include that contract's own migration component, which the DAG places under the contract, and its settlement/readback. Otherwise T_cutRpolicy/T_cutRleaf would under-reserve. Carry this into the recovery card's acceptance criteria."
+    }
+  ],
+  "inheritedSoundR1Checks": "HOLD; same key/ID/membership; independent C/P and antirollback; floor pinned before expiry check; single CA vs two-chain without relaxation; per-file atomicity; CAS/audit; Node dynamic leaf/policy vs once-built CP context; timing table. R2 changed none of these semantics.",
+  "nextImplementationCardRequirements": [
+    "Root selects the branch from real time, reattested E, frozen budgets and readiness; R2 acceptance releases nothing.",
+    "Expected now: FLEET5-EXPIRED-CURRENT-AUTHORITY-FORWARD-RECOVERY-CONTRACT-R1 (Codex owner, high-difficulty security/recovery, actual Claude review after exact code and hosted proof). It must be finite and cover never-started, partial-migration and partial-normal states. It needs a versioned quiescent/no-serving custody evidence schema and an authorization protocol, authenticated preserved floor bounds, P strictly above the pinned floor, independent C+1 CAS/audit and Node-owned signatures. Its own migration component sits inside B_Rpolicy (O2), and it must complete before L or take the separately released expired-leaf branch before A.",
+    "If the valid-authority branch is still provably reachable: FLEET5-CURRENT-CPU-SERVING-BINARY-CONTAINER-MIGRATION-R1, then FLEET5-CURRENT-CPU-COHORT-RENEWAL-ADAPTER-R1, both implemented/reviewed with frozen B_M/B_N before any migration release.",
+    "Each card: P1-P7 proof groups; actual Go and real Linux Docker hosted proof; two complete three-member cycles; negative cases; the five-site context barrier; affected CI; one actual independent source review; Root private preflight and an explicit operating release. No identity/journal/floor reset and no new image without a settled migration."
+  ],
+  "checksActuallyRun": [
+    "git rev-parse/diff/show of the target, base, Root539, Root538 and f29228ed",
+    "scratchpad Python: 49-permalink resolution against exact blobs and the 25-entry source map (SHA/bytes/ranges/excerpts), label consistency, relative-path scan; manifest null walk; finding-disposition read; Root538 copy blob comparison; reverse diff of the Root538 copy of my R1 History",
+    "static reads of server.go, observer_worker.py, worker.py, app.py, storage_check_collect.py and build_product_runtime.py at exact SHAs",
+    "six local metadata gates at base 2733d3ce (local-gates.json)",
+    "full-byte canonical comparisons (sync-state-comparison.json)"
+  ],
+  "notRunByReviewer": "No Go, compiler, Node, npm, pytest, browser, product, crypto, CA, SSH, API, DB, Docker or live action. This is a static docs review; no runtime, Go, Linux or crypto proof is claimed.",
+  "applyPerformed": false,
+  "canonicalWritten": false,
+  "preservedStatus": "Live Node runtime 1efea494, API 96afd799/schema0068, UI abb7074e. Historical 3-Node 500m/64MiB (1500m/192MiB total), UI 30.167 s/1811 frames/0 loss and the Root536 process reconnect at 06:49:35 KST are not current health, PKI, OS reboot or real work. Run run_01M6VXSMM9SV8MAB7K4B1YCRX8 awaiting_approval/v4/attempt0; apr_01M6VXSPZ0252M2SJ8ZA5E11QE expired 06:24:26 KST; two genuine non-requester approvers absent; no votes/enqueue/new Run. PC1 key 255, PC5 RAM 94.58%/unadmitted, GPU/storage, manual, full 5 and reboot remain open. Original19HOLD/discharges0/runtimeB0/A1-A16/H1-H7/H3EA/RDNULL_HOLD/raw7UNREGISTERED/A01-A40NOT_RUN unchanged.",
+  "nextFirstAction": "Root verifies and publishes this delta, then selects the real branch (expected: dispatch Codex for FLEET5-EXPIRED-CURRENT-AUTHORITY-FORWARD-RECOVERY-CONTRACT-R1). No rotation, restart, reboot or migration of PC2/PC3/PC4 meanwhile.",
+  "wholeProgramComplete": false
+}

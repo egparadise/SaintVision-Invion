@@ -1,0 +1,382 @@
+"""Hosted-only REAL Linux/Docker/Go/retained-key candidate proof, never live recovery.
+
+All private fixture keys remain in a disposable directory excluded from artifacts.
+Node keys are generated inside their own mount; CP receives public CSR only.
+"""
+from dataclasses import replace
+import base64
+import fcntl
+import json
+import os
+from pathlib import Path
+import selectors
+import shutil
+import subprocess
+import sys
+import tempfile
+import time
+import uuid
+
+ROOT=Path(__file__).resolve().parents[2]
+sys.path.insert(0,str(ROOT/'services/control-plane/src'))
+from inv import proposed_expired_policy_recovery as r
+from recovery_candidate_fixture import Fixture
+from cryptography import x509
+from cryptography.hazmat.primitives import serialization
+
+OUT=ROOT/'dist/expired-policy-candidate'
+REPORT={'schema':'sv-expired-policy-hosted-proof:1','sourceSHA':os.environ.get('GITHUB_SHA'),'candidateOnly':True,'activationAllowed':False,'cycles':[],'negativeControls':[],'productionIntegration':'NOT_RUN','productionBudgets':None}
+CONTAINERS=[]
+
+
+def command(args,**kwargs):
+    result=subprocess.run(args,capture_output=True,timeout=90,**kwargs)
+    if result.returncode:
+        raise RuntimeError(f'owned fixture command failed: {args[0:3]} exit={result.returncode} {result.stderr.decode()[-1500:]}')
+    return result.stdout
+
+
+def write(path,raw):
+    path.write_bytes(raw); path.chmod(0o600); os.chown(path,1000,1000)
+
+
+def line(process):
+    selector=selectors.DefaultSelector(); selector.register(process.stdout,selectors.EVENT_READ)
+    if not selector.select(20):
+        raise RuntimeError('actual Go output deadline')
+    raw=process.stdout.readline()
+    if not raw:
+        raise RuntimeError('actual Go process closed before proof: '+process.stderr.read().decode()[-500:])
+    return json.loads(raw)
+
+
+def proof_args(f,auth,node):
+    return ['/custody-proof','--candidate-custody-proof-only','--request','/trust/request.json','--node',node,'--tenant',f.tenant,'--epoch',f.epoch,'--members-digest',r.sha(r.canonical(auth['members'])),'--authorizer-sha256',r.sha(f.authorizer.public_key().public_bytes_raw()),'--operator-sha256',r.sha(f.operator.public_key().public_bytes_raw()),'--helper-sha256',f.trust.helper_sha256]
+
+
+def failure(name,cid,args,expected,extra=()):
+    result=subprocess.run(['docker','exec',*extra,cid,*args],capture_output=True,timeout=15)
+    payload=json.loads(result.stdout)
+    assert result.returncode==1 and payload=={'error':expected,'activationAllowed':False}, (name,result.returncode,payload)
+    REPORT['negativeControls'].append({'name':name,'exit':result.returncode,'typedError':expected})
+
+
+def collect_fixture_nodes(f,image_id,nodes):
+    descriptor=dict(schema='sv-readonly-cohort:1',sourceSHA=os.environ['GITHUB_SHA'],tenant=f.tenant,
+                    epoch=f.epoch,project='prj_'+'0'*26,caDER=r.sha(f.trust.ca_der),cpDER=r.sha(f.trust.cp_der),
+                    databaseRole='fixture_reader',ownerLabel='sv.fixture',ownerValue='readonly',maxAgeSeconds=120,nodes={})
+    for node,item in nodes.items():
+        paths=item['paths']
+        cid=command(['docker','run','-d','--network=none','--user','1000:1000','--read-only',
+                     '--cap-drop=ALL','--security-opt','no-new-privileges','--label','sv.fixture=readonly',
+                     '--mount',f'type=bind,src={paths["config"]},dst=/config,readonly',
+                     '--mount',f'type=bind,src={paths["state"]},dst=/state','sha256:'+image_id]).decode().strip()
+        CONTAINERS.append(cid)
+        descriptor['nodes'][node]=dict(cid=cid,image=image_id,config=str(paths['config']),state=str(paths['state']),
+                                       argv=['/fixture-key','--isolated-fixture-hold'])
+    observations=[]
+    for node,item in nodes.items():
+        paths=item['paths']
+        def snapshot():
+            return {str(p.relative_to(paths[k])):(p.stat().st_ino,p.stat().st_ctime_ns,
+                    None if p.name=='node-key.pem' else r.sha(p.read_bytes()))
+                    for k in ('config','state') for p in paths[k].iterdir()}
+        before=snapshot()
+        attempt=subprocess.run([sys.executable,'-B',str(ROOT/'tools/recovery_preflight/node.py')],
+                               input=json.dumps(dict(descriptor=descriptor,node=node)).encode(),
+                               capture_output=True,timeout=15)
+        obs=json.loads(attempt.stdout)
+        if attempt.returncode:
+            # Only public fixture paths and typed reasons. No Env or raw Docker inspect.
+            sys.path.insert(0,str(ROOT/'tools/recovery_preflight'))
+            import node as collector
+            from contextlib import ExitStack
+            cid=descriptor['nodes'][node]['cid']
+            pid=collector.inspect(cid,'sv.fixture')['pid']
+            diag={'holds':obs['holds'],'fields':obs['facts'].get('changedContainerFields',[]),'exit':attempt.returncode,'mounts':{}}
+            REPORT['nodeCollectorRefusal']=diag
+            with ExitStack() as stack:
+                for kind in ('config','state'):
+                    folder=str(paths[kind])
+                    root=collector.directory(folder,stack)
+                    mid=collector.mount(root)
+                    diag['mounts'][kind]={'host': [r for r in collector.mount_rows(os.getpid()) if r[0]==mid],
+                                          'container':[r for r in collector.mount_rows(pid) if r[3]=='/'+kind],
+                                          'expectedSource':folder}
+            raise AssertionError('read-only Node collector refused: '+','.join(obs['holds']))
+        after=snapshot()
+        assert obs['observationComplete'] and not obs['recoveryReady'] and before==after
+        assert 'sha256' not in obs['facts']['files']['node-key.pem']
+        # Docker keeps the original mounted inode when the host source name is
+        # replaced. The collector must detect that before reporting file facts.
+        original=paths['config']
+        retained=original.with_name('config-retained-for-fixture')
+        original.rename(retained)
+        try:
+            original.mkdir(mode=0o700)
+            os.chown(original,1000,1000)
+            result=subprocess.run([sys.executable,'-B',str(ROOT/'tools/recovery_preflight/node.py')],
+                                  input=json.dumps(dict(descriptor=descriptor,node=node)).encode(),
+                                  capture_output=True,timeout=15)
+            declined=json.loads(result.stdout)
+            assert result.returncode==2 and 'BIND_SOURCE_CHANGED' in declined['holds'],declined['holds']
+            assert not declined['observationComplete'] and not list(original.iterdir())
+        finally:
+            original.rmdir()
+            retained.rename(original)
+        assert before==snapshot()
+        REPORT['negativeControls'].append(dict(name='host-bind-parent-replaced',exit=result.returncode,typedError='BIND_SOURCE_CHANGED'))
+        observations.append(dict(observation=obs,changedFiles=sum(before.get(k)!=after.get(k) for k in before.keys()|after.keys())))
+    REPORT['readOnlyNodeObservations']=observations
+
+
+def main():
+    assert sys.platform=='linux' and os.environ.get('GITHUB_ACTIONS')=='true' and os.geteuid()==0, 'hosted owned fixture only'
+    OUT.mkdir(parents=True,exist_ok=True)
+    binaries=ROOT/'dist/expired-policy-binaries'
+    image='sv-expired-policy-candidate:'+os.environ['GITHUB_SHA']
+    build=Path(tempfile.mkdtemp(prefix='sv-recovery-build-'))
+    shutil.copyfile(binaries/'custody-proof',build/'custody-proof'); shutil.copyfile(binaries/'fixture-key',build/'fixture-key')
+    for p in build.iterdir(): p.chmod(0o555)
+    (build/'Dockerfile').write_text('FROM scratch\nCOPY --chown=1000:1000 custody-proof /custody-proof\nCOPY --chown=1000:1000 fixture-key /fixture-key\nUSER 1000:1000\nENTRYPOINT ["/fixture-key","--isolated-fixture-hold"]\n')
+    command(['docker','build','--network=none','--pull=false','-t',image,str(build)])
+    image_id=command(['docker','image','inspect','--format','{{.Id}}',image]).decode().strip().removeprefix('sha256:')
+    bootstrap_image=image+"-bootstrap"
+    command(["docker","image","tag",image,bootstrap_image])
+    REPORT.update(imageId=image_id,helperSHA256=r.sha((build/'custody-proof').read_bytes()),runner='GitHub ubuntu-latest Linux; root fixture supervisor; UID1000 child containers; no network/capabilities/privileges',realCrypto='Ed25519 retained Node keys, separate CA/TLS/recovery/operator actors')
+    with tempfile.TemporaryDirectory(prefix='sv-expired-policy-fixture-') as temp:
+        scope=Path(temp); nodes={}; public={}
+        # Bootstrap isolated Node keys locally in each Node mount, not at CP.
+        for i in range(3):
+            node=f'nod_{i:026d}'; base=scope/node; base.mkdir(mode=0o755)
+            paths={k:base/k for k in ['config','state','custody','trust']}
+            for p in paths.values(): p.mkdir(mode=0o700); os.chown(p,1000,1000)
+            output=command(['docker','run','--rm','--network=none','--user','1000:1000','--read-only','--cap-drop=ALL','--security-opt','no-new-privileges','--mount',f'type=bind,src={paths["config"]},dst=/config', '--entrypoint','/fixture-key',image,'--isolated-fixture-keygen'])
+            csr=x509.load_der_x509_csr(base64.b64decode(json.loads(output)['csr']))
+            assert csr.is_signature_valid
+            public[node]=csr.public_key(); nodes[node]={'paths':paths}
+        f=Fixture(public,tenant=str(uuid.uuid4()),epoch=str(uuid.uuid4())); f.trust=replace(f.trust,helper_sha256=REPORT['helperSHA256'])
+        authority = dict(schema='sv-recovery-fixture-authority:1',tenant=f.tenant,epoch=f.epoch,
+                         nodes={n:r.sha(b.certificate_der) for n,b in f.trust.nodes.items()},
+                         **r.authority_hashes(f.trust))
+        anchor = build/'recovery-authority.json'
+        anchor.write_bytes(r.canonical(authority))
+        anchor.chmod(0o444)
+        with (build/'Dockerfile').open('a') as definition:
+            definition.write('COPY --chown=0:0 recovery-authority.json /recovery-authority.json\n')
+        command(['docker','build','--network=none','--pull=false','-t',image,str(build)])
+        image_id=command(['docker','image','inspect','--format','{{.Id}}',image]).decode().strip().removeprefix('sha256:')
+        REPORT.update(imageId=image_id,authorityBindingSHA256=r.sha(anchor.read_bytes()))
+        for node,item in nodes.items():
+            paths=item['paths']
+            for name,raw in {'node-cert.pem':f.certs[node].public_bytes(serialization.Encoding.PEM),'client-ca.pem':f.ca.public_bytes(serialization.Encoding.PEM),'launch-signer.pub':f.launch_signer.public_key().public_bytes_raw()}.items(): write(paths['config']/name,raw)
+            launch=(paths['config']/'launch-signer.pub').read_bytes()
+            assert launch==f.launch_signer.public_key().public_bytes_raw()
+            other_roles=[f.authorizer.public_key(),f.operator.public_key(),f.ca_key.public_key(),f.cp_key.public_key(),*public.values()]
+            assert launch not in [key.public_bytes_raw() for key in other_roles]
+            REPORT['launchSignerSHA256']=r.sha(launch)
+            for name,key in [('authorizer.pub',f.authorizer),('operator.pub',f.operator)]: write(paths['trust']/name,key.public_key().public_bytes_raw())
+            write(paths['state']/'identity.json',r.canonical({'Tenant':f.tenant,'Node':node,'Epoch':f.epoch}))
+            for folder in ['state','custody']: write(paths[folder]/'.lock',b'')
+            args=['docker','run','-d','--network=none','--user','1000:1000','--read-only','--cap-drop=ALL','--security-opt','no-new-privileges','--pids-limit','32','--memory','128m']
+            for kind,path in paths.items(): args+=['--mount',f'type=bind,src={path},dst=/{kind}'+(',readonly' if kind in {'config','trust'} else '')]
+            cid=command([*args,image]).decode().strip(); CONTAINERS.append(cid); item['cid']=cid
+        ledger=r.CandidateLedger.create_reference(scope/'reference.sqlite',f.trust,{n:(f.c[i],f.p[i]) for i,n in enumerate(sorted(nodes))})
+        for cycle in [1,2]:
+            # Cycle 2 advances ONLY the isolated fixture's public policy/floor
+            # inputs after the previous reference CAS, NOT a production adapter.
+            members=[]
+            for i,(node,item) in enumerate(sorted(nodes.items())):
+                paths=item['paths']; expiry=int(time.time())-60
+                policy=r.canonical({'version':f.p[i],'tenantId':f.tenant,'nodeId':node,'recoveryEpoch':f.epoch,'expiresAt':time.strftime('%Y-%m-%dT%H:%M:%SZ',time.gmtime(expiry)),'clientFingerprints':[r.sha(f.trust.cp_der)]})
+                write(paths['config']/'peer-policy.json',policy)
+                write(paths['state']/'.peer-policy',r.canonical({'Version':f.p[i],'Hash':r.sha(policy)}))
+                config={name:r.sha((paths['config']/name).read_bytes()) for name in ['node-cert.pem','client-ca.pem','launch-signer.pub','peer-policy.json']}
+                members.append(dict(nodeId=node,ip=f.trust.nodes[node].ip,nodeFingerprint=r.sha(f.trust.nodes[node].certificate_der),priorC=f.c[i],targetC=f.c[i]+1,priorP=f.p[i],targetP=f.p[i]+1,floorSHA256=r.sha((paths['state']/'.peer-policy').read_bytes()),identitySHA256=r.sha((paths['state']/'identity.json').read_bytes()),policySHA256=r.sha(policy),configDigest=r.sha(r.canonical(config)),previousCheckpoint=f.prior[node],priorPolicyExpiresAt=expiry))
+            if cycle==1:
+                collect_fixture_nodes(f,image_id,nodes)
+            auth,env=f.authorization(cycle,members); requests={}; proofs={}; processes={}; records={}
+            originals={n:{p.name:r.sha(p.read_bytes()) for p in x['paths']['state'].iterdir()} for n,x in nodes.items()}
+            for node,item in nodes.items():
+                st=(item['paths']['state']/'.lock').stat()
+                requests[node]=f.request(auth,env,node,(st.st_dev,st.st_ino),image_id,item['cid'])
+                write(item['paths']['trust']/'request.json',requests[node])
+                args=proof_args(f,auth,node)
+                if cycle==1:
+                    failure('default-deny-entry',item['cid'],['/custody-proof'],'RECOVERY_HOLD_UNBOUND')
+                    failure('wrong-uid',item['cid'],args,'RECOVERY_HOLD_UID',extra=('--user','0:0'))
+                    failure('wrong-helper-digest',item['cid'],args[:-1]+['0'*64],'RECOVERY_HELPER_PROVENANCE')
+                    request_path=item['paths']['trust']/'request.json'
+                    bad=r.parse(requests[node]); bad['authorization']['signature']='0'*128
+                    write(request_path,r.canonical(bad))
+                    failure('bad-authorization-signature',item['cid'],args,'RECOVERY_SIGNATURE')
+                    write(request_path,requests[node])
+                    original=r.parse(requests[node])
+                    sig=original['authorization']['signature']
+                    for label,variant in [('uppercase',sig.upper()),('odd',sig[:-1]),('whitespace',' '+sig)]:
+                        assert variant != sig
+                        bad=r.parse(requests[node])
+                        bad['authorization']['signature']=variant
+                        try: r.verify(bad['authorization'],r.AUTH,f.trust.authorizer)
+                        except r.Refusal as err: assert err.code=='RECOVERY_SIGNATURE'
+                        else: raise AssertionError('Python accepted '+label)
+                        write(request_path,r.canonical(bad))
+                        failure('signature-encoding-'+label,item['cid'],args,'RECOVERY_SIGNATURE')
+                    # Replace both presented role keys, pins and signatures in the
+                    # very first slot. Only the provisioned image binding differs.
+                    from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
+                    before={p.name:p.read_bytes() for p in item['paths']['custody'].iterdir()}
+                    original_roles=(f.authorizer,f.operator)
+                    try:
+                        f.authorizer,f.operator=Ed25519PrivateKey.generate(),Ed25519PrivateKey.generate()
+                        foreign_env=r.sign(auth,r.AUTH,f.authorizer)
+                        for role in ('authorizer','operator'):
+                            write(item['paths']['trust']/(role+'.pub'),getattr(f,role).public_key().public_bytes_raw())
+                        write(request_path,f.request(auth,foreign_env,node,(st.st_dev,st.st_ino),image_id,item['cid']))
+                        failure('foreign-first-slot-authority',item['cid'],proof_args(f,auth,node),'RECOVERY_HOLD_AUTHORITY_BINDING')
+                        assert before=={p.name:p.read_bytes() for p in item['paths']['custody'].iterdir()}
+                    finally:
+                        f.authorizer,f.operator=original_roles
+                        for role in ('authorizer','operator'):
+                            write(item['paths']['trust']/(role+'.pub'),getattr(f,role).public_key().public_bytes_raw())
+                        write(request_path,requests[node])
+                    floor_path=item['paths']['state']/'.peer-policy'; floor_original=floor_path.read_bytes()
+                    write(floor_path,r.canonical({'Version':999,'Hash':'0'*64}))
+                    failure('authenticated-journal-floor-mismatch',item['cid'],args,'RECOVERY_AUTHENTICATED_FLOOR')
+                    write(floor_path,floor_original)
+                    # Real expired certificates signed by this isolated CA,
+                    # retaining the same public key: no fake parser or clock.
+                    from recovery_candidate_fixture import certificate
+                    cert_path=item['paths']['config']/'node-cert.pem'; cert_original=cert_path.read_bytes()
+                    expired=certificate(public[node],f.ca_key,f.ca,uri=f'spiffe://saintvision.ai/tenant/{f.tenant}/node/{node}/epoch/{f.epoch}',ip=f.trust.nodes[node].ip,expiry=-1)
+                    write(cert_path,expired.public_bytes(serialization.Encoding.PEM))
+                    failure('real-expired-node-leaf',item['cid'],args,'RECOVERY_TERMINAL_LEAF_EXPIRED')
+                    write(cert_path,cert_original)
+                    ca_path=item['paths']['config']/'client-ca.pem'; ca_original=ca_path.read_bytes()
+                    expired_ca=certificate(f.ca_key.public_key(),f.ca_key,None,ca_cert=True,expiry=-1)
+                    write(ca_path,expired_ca.public_bytes(serialization.Encoding.PEM))
+                    failure('real-expired-ca',item['cid'],args,'RECOVERY_TERMINAL_CA_EXPIRED')
+                    write(ca_path,ca_original)
+                    mount_args=['docker','run','--rm','--network=none','--user','1000:1000','--read-only','--cap-drop=ALL','--security-opt','no-new-privileges']
+                    for kind,path in item['paths'].items():
+                        mount_args+=['--mount',f'type=bind,src={path},dst=/{kind}'+(',readonly' if kind in {'config','trust','state'} else '')]
+                    alias_args=['docker','run','--rm','--network=none','--user','1000:1000','--read-only','--cap-drop=ALL','--security-opt','no-new-privileges']
+                    for kind,path in item['paths'].items():
+                        alias_args+=['--mount',f'type=bind,src={path},dst=/{kind}'+(',readonly' if kind in {'config','trust'} else '')]
+                    # An additional bind of the identical regular file has matching
+                    # dev/ino/bytes but a different mount ID under the config root.
+                    # Both the absent image file and a caller-selected bind of
+                    # the exact expected public bytes must fail on empty history.
+                    for label,other_args,source_image in [
+                        ('absent-image-authority',[],bootstrap_image),
+                        ('overmounted-authority',['--mount',f'type=bind,src={anchor},dst=/recovery-authority.json,readonly'],image)
+                    ]:
+                        # Keep both immutable image references and invoke the helper
+                        # through the same UID1000 exec path as the positive control.
+                        cid=command([*alias_args,'-d','--pull=never',*other_args,source_image]).decode().strip()
+                        CONTAINERS.append(cid)
+                        failure(label,cid,args,'RECOVERY_HOLD_AUTHORITY_BINDING')
+                        assert not list(item['paths']['custody'].glob('*.json'))
+                    alias_args+=['--mount',f'type=bind,src={item["paths"]["config"]}/launch-signer.pub,dst=/config/launch-signer.pub,readonly']
+                    alias=subprocess.run([*alias_args,'--entrypoint','/custody-proof',image,*args[1:]],capture_output=True,timeout=15)
+                    assert alias.returncode==1 and json.loads(alias.stdout)['error']=='RECOVERY_HOLD_FILE'
+                    assert not list(item['paths']['custody'].glob('*.json'))
+                    REPORT['negativeControls'].append(dict(name='identical-inode-file-mount-alias',exit=alias.returncode,typedError='RECOVERY_HOLD_FILE'))
+                    wrong_mount=subprocess.run([*mount_args,'--entrypoint','/custody-proof',image,*args[1:]],capture_output=True,timeout=15)
+                    assert wrong_mount.returncode==1 and json.loads(wrong_mount.stdout)['error']=='RECOVERY_HOLD_MOUNT_UID_MODE'
+                    REPORT['negativeControls'].append({'name':'read-only-state-mount','exit':1,'typedError':'RECOVERY_HOLD_MOUNT_UID_MODE'})
+                process=subprocess.Popen(['docker','exec','-i',item['cid'],*args],stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
+                processes[node]=process; response=line(process)
+                assert response['kind']=='nonserving-custody-proof', response
+                proofs[node]=response['proof']
+                # The unchanged ordinary M2 verifier rejects the actual Go
+                # candidate output; this proof can never stand in for live M2.
+                sys.path.insert(0,str(ROOT/'deploy/lan'))
+                import peer_policy_phase
+                candidate_body,_=r.verify(response['proof'],r.PROOF,public[node])
+                try:
+                    peer_policy_phase.verify_floor(candidate_body,f.certs[node].public_bytes(serialization.Encoding.PEM),{'tenantId':f.tenant,'nodeId':node,'epoch':f.epoch})
+                except ValueError as error:
+                    assert str(error)=='Actual Node floor observation shape differs'
+                else:
+                    raise AssertionError('non-serving candidate accepted as ordinary live M2')
+                failure('exclusive-journal-lock-held',item['cid'],args,'RECOVERY_HOLD_EXCLUSIVE_CUSTODY')
+            ledger.prepare(env,requests,proofs)
+            acks=r.checkpoint_requests(env,requests,proofs,f.trust,f.authorizer)
+            for node,process in processes.items():
+                process.stdin.write(r.canonical(acks[node])+b'\n'); process.stdin.flush(); process.stdin.close()
+                result=line(process); assert process.wait(15)==0 and result['kind']=='candidate-checkpoint-complete-lock-released-after-return',result
+                records[node]=result['record']
+            receipt=ledger.commit_reference(env,requests,proofs,acks,records)
+            assert ledger.commit_reference(env,requests,proofs,acks,records)==receipt
+            for node,item in nodes.items():
+                assert originals[node]=={p.name:r.sha(p.read_bytes()) for p in item['paths']['state'].iterdir()},'candidate mutated original journal'
+                name=f'{cycle:08d}-{auth["operation"]}.json'
+                raw=(item['paths']['custody']/name).read_bytes(); assert raw==r.canonical(records[node])
+                f.prior[node]=r.sha(raw)
+                replay=json.loads(command(['docker','exec',item['cid'],*proof_args(f,auth,node)]))
+                assert replay=={'kind':'completed-candidate-checkpoint-replay','record':records[node]}
+                f.c[sorted(nodes).index(node)]+=1; f.p[sorted(nodes).index(node)]+=1
+            REPORT['cycles'].append({'cycle':cycle,'memberCount':3,'actualGoNodeSignatures':3,'actualDurableNodeCheckpoints':3,'referenceCASAuditRows':3,'P':list(f.p),'C':list(f.c),'receipt':receipt,'durableRecordHashes':dict(f.prior),'freshContexts':'all five sites explicitly absent in isolated fixture; production unknown'})
+        # Host-held actual journal lock and foreign residue are independently
+        # enforced by the executable, not mocked filesystem results.
+        node=next(iter(nodes)); item=nodes[node]; args=proof_args(f,auth,node)
+        # A changed request cannot reuse a completed Node counter, even with
+        # valid new role signatures and the correct latest checkpoint chain.
+        import copy
+        reused_members=copy.deepcopy(auth['members'])
+        for member in reused_members:
+            member['previousCheckpoint']=f.prior[member['nodeId']]
+        reused,reused_env=f.authorization(counter=1,members=reused_members)
+        st=(item['paths']['state']/'.lock').stat()
+        changed_request=f.request(reused,reused_env,node,(st.st_dev,st.st_ino),image_id,item['cid'])
+        write(item['paths']['trust']/'request.json',changed_request)
+        failure('changed-request-completed-counter-reuse',item['cid'],proof_args(f,reused,node),'RECOVERY_COUNTER_REUSE')
+        # Even an explicitly pinned TLS key cannot become the dedicated recovery
+        # authorizer role. Only public role material is mounted into the Node.
+        original_authorizer=f.authorizer
+        f.authorizer=f.cp_key
+        aliased,aliased_env=f.authorization(counter=1,members=reused_members)
+        write(item['paths']['trust']/'authorizer.pub',f.authorizer.public_key().public_bytes_raw())
+        write(item['paths']['trust']/'request.json',f.request(aliased,aliased_env,node,(st.st_dev,st.st_ino),image_id,item['cid']))
+        failure('tls-key-cannot-authorize-recovery',item['cid'],proof_args(f,aliased,node),'RECOVERY_ROLE_SEPARATION')
+        f.authorizer=original_authorizer
+        write(item['paths']['trust']/'authorizer.pub',f.authorizer.public_key().public_bytes_raw())
+        # Restore exactly the original immutable request for historical replay.
+        write(item['paths']['trust']/'request.json',requests[node])
+        with (item['paths']['state']/'.lock').open('rb') as held:
+            fcntl.flock(held,fcntl.LOCK_EX|fcntl.LOCK_NB)
+            failure('host-held-same-inode-lock',item['cid'],args,'RECOVERY_HOLD_EXCLUSIVE_CUSTODY')
+        write(item['paths']['custody']/'partial.next',b'partial')
+        failure('partial-write-foreign-residue',item['cid'],args,'RECOVERY_HOLD_FOREIGN_RESIDUE')
+        (item['paths']['custody']/'partial.next').unlink() # exact owned fixture file
+        policy=item['paths']['config']/'peer-policy.json'; original=policy.read_bytes()
+        policy.unlink(); policy.symlink_to('/trust/request.json')
+        failure('symlink-config',item['cid'],args,'RECOVERY_HOLD_FILE')
+        policy.unlink(); write(policy,original)
+        policy.unlink(); os.link(item['paths']['config']/'node-cert.pem',policy)
+        failure('hardlink-config',item['cid'],args,'RECOVERY_HOLD_FILE_METADATA')
+        policy.unlink(); write(policy,original)
+        write(item['paths']['state']/'foreign-job.json',b'{}')
+        failure('unknown-journal-residue',item['cid'],args,'RECOVERY_HOLD_ACTIVE_OR_UNKNOWN_JOURNAL')
+        (item['paths']['state']/'foreign-job.json').unlink()
+        with ledger.connect() as db:
+            assert db.execute('SELECT COUNT(*) FROM audit').fetchone()[0]==6
+        try: ledger.activate()
+        except r.Refusal as error: assert error.code=='RECOVERY_HOLD_INTEGRATION_NOT_BOUND'
+        else: raise AssertionError('candidate enabled activation')
+        REPORT['status']='CANDIDATE_COMPONENT_PROOF_PASSED_KEEP_INTEGRATION_HOLD'
+        REPORT['P1toP7']={'P1':'candidate-only isolated signatures/locks/schema; current-profile serving M2 NOT_RUN','P2':'actual Linux UID1000 ROconfig/RWstate/checkpoint links; production publication NOT_RUN','P3':'singleCA valid leaf/public constraints tested, production private reattestation NOT_RUN','P4':'two real three-member candidate cycles; normal/live migration cycles NOT_RUN','P5':'reference CAS/unknown retry tested; production DB/transport NOT_RUN','P6':'all five context inventory gate tested; actual deployed instance inventory/switch NOT_RUN','P7':'review/release/migration budget/B_Rpolicy/live recovery NOT_RUN'}
+
+
+if __name__=='__main__':
+    try:
+        main()
+    except BaseException as error:
+        REPORT['status']='FAILED'; REPORT['failureType']=type(error).__name__; REPORT['failure']=str(error)
+        raise
+    finally:
+        for cid in CONTAINERS:
+            subprocess.run(['docker','rm','-f',cid],capture_output=True,timeout=30)
+        OUT.mkdir(parents=True,exist_ok=True)
+        (OUT/'result.json').write_text(json.dumps(REPORT,indent=2)+'\n')

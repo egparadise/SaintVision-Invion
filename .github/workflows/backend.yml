@@ -195,6 +195,21 @@ jobs:
 
       # Desktop browser tests execute in desktop-browser.yml with Chromium and Vite.
       # pyproject defaults deselect docker_host mutations; Core Build runs that lane explicitly.
+      - name: Prove read-only cohort observation on disposable PostgreSQL
+        env:
+          SV_PREFLIGHT_PG_RECEIPT: '1'
+        run: |
+          mkdir -p dist/recovery-readonly-pg
+          python -m pytest -q --strict-markers tests/integration/test_recovery_cohort_preflight.py --junitxml=dist/recovery-readonly-pg/fixture.xml
+          test -s dist/recovery-readonly-pg/observations.json
+      - name: Publish cohort database observations
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: fleet5-readonly-pg-${{ matrix.python-version }}-${{ github.sha }}
+          path: dist/recovery-readonly-pg/
+          if-no-files-found: error
+          retention-days: 30
       - name: Tests
         # -p no:randomly keeps ordering deterministic; the suite fails if any
         # PostgreSQL-marked test is skipped, so a missing database cannot pass
@@ -284,6 +299,15 @@ jobs:
               f'backend skip distribution drifted: expected={expected_skips}, actual={actual_skips}'
           )
           PY
+
+      - name: Publish exact Backend test and skip distribution
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-test-distribution-${{ matrix.python-version }}-${{ github.sha }}
+          path: backend-tests.xml
+          if-no-files-found: error
+          retention-days: 30
 
   # Opt-in live lane (S10-BE stage 2): the real MLflow tracking server in a
   # container, the real sink, the real conformance suite. Costs a runner and a

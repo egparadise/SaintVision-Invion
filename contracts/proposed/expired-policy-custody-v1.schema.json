@@ -1,0 +1,642 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:saintvision:proposed:expired-policy-custody:1",
+  "title": "PROPOSED non-serving expired-policy candidate v1",
+  "description": "Isolated candidate; all activation prohibited. Canonical ASCII integer wire and signature domains have additional executable checks. Partial scenarios parse but always HOLD until reviewed adapters.",
+  "$defs": {
+    "auth": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "caFingerprint",
+        "candidateBudgetSeconds",
+        "contextGeneration",
+        "contexts",
+        "counter",
+        "cpDER",
+        "cpFingerprint",
+        "deadline",
+        "epoch",
+        "issuedAt",
+        "members",
+        "nonce",
+        "operation",
+        "productionBudgetSeconds",
+        "publicationAllowed",
+        "revokedFingerprints",
+        "role",
+        "scenario",
+        "schema",
+        "tenantId"
+      ],
+      "properties": {
+        "caFingerprint": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "candidateBudgetSeconds": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "contextGeneration": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "contexts": {
+          "type": "array",
+          "minItems": 5,
+          "maxItems": 5,
+          "items": {
+            "$ref": "#/$defs/context"
+          }
+        },
+        "counter": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "cpDER": {
+          "type": "string"
+        },
+        "cpFingerprint": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "deadline": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "epoch": {
+          "type": "string"
+        },
+        "issuedAt": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "members": {
+          "type": "array",
+          "minItems": 3,
+          "maxItems": 3,
+          "items": {
+            "$ref": "#/$defs/member"
+          }
+        },
+        "nonce": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "operation": {
+          "type": "string"
+        },
+        "productionBudgetSeconds": {
+          "type": "null"
+        },
+        "publicationAllowed": {
+          "const": false
+        },
+        "revokedFingerprints": {
+          "type": "array",
+          "maxItems": 128,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          }
+        },
+        "role": {
+          "type": "string"
+        },
+        "scenario": {
+          "enum": [
+            "never-started",
+            "partial-migration",
+            "partial-publication"
+          ]
+        },
+        "schema": {
+          "const": "sv-expired-policy-authorization:1"
+        },
+        "tenantId": {
+          "type": "string"
+        }
+      }
+    },
+    "member": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "configDigest",
+        "floorSHA256",
+        "identitySHA256",
+        "ip",
+        "nodeFingerprint",
+        "nodeId",
+        "policySHA256",
+        "previousCheckpoint",
+        "priorC",
+        "priorP",
+        "priorPolicyExpiresAt",
+        "targetC",
+        "targetP"
+      ],
+      "properties": {
+        "configDigest": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "floorSHA256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "identitySHA256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "ip": {
+          "type": "string"
+        },
+        "nodeFingerprint": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "nodeId": {
+          "type": "string"
+        },
+        "policySHA256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "previousCheckpoint": {
+          "type": "string",
+          "pattern": "^([0-9a-f]{64})?$"
+        },
+        "priorC": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "priorP": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "priorPolicyExpiresAt": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "targetC": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "targetP": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        }
+      }
+    },
+    "operator": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "UID",
+        "containerId",
+        "contextsDigest",
+        "deadline",
+        "helperSHA256",
+        "imageId",
+        "issuedAt",
+        "lockDevice",
+        "lockInode",
+        "nodeId",
+        "proposalDigest",
+        "role",
+        "schema"
+      ],
+      "properties": {
+        "UID": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "containerId": {
+          "type": "string"
+        },
+        "contextsDigest": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "deadline": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "helperSHA256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "imageId": {
+          "type": "string"
+        },
+        "issuedAt": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "lockDevice": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "lockInode": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "nodeId": {
+          "type": "string"
+        },
+        "proposalDigest": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "role": {
+          "type": "string"
+        },
+        "schema": {
+          "const": "sv-expired-policy-operator:1"
+        }
+      }
+    },
+    "proof": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "activationAllowed",
+        "assurance",
+        "configDigest",
+        "containerId",
+        "counter",
+        "deadline",
+        "epoch",
+        "floorSHA256",
+        "helperSHA256",
+        "identitySHA256",
+        "imageId",
+        "lockDevice",
+        "lockHeldAtSigning",
+        "lockInode",
+        "nodeId",
+        "nonce",
+        "observedAt",
+        "operation",
+        "operatorDigest",
+        "previousCheckpoint",
+        "priorC",
+        "priorP",
+        "proposalDigest",
+        "requestDigest",
+        "schema",
+        "serving",
+        "servingPID",
+        "tenantId"
+      ],
+      "properties": {
+        "activationAllowed": {
+          "const": false
+        },
+        "assurance": {
+          "type": "string"
+        },
+        "configDigest": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "containerId": {
+          "type": "string"
+        },
+        "counter": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "deadline": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "epoch": {
+          "type": "string"
+        },
+        "floorSHA256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "helperSHA256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "identitySHA256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "imageId": {
+          "type": "string"
+        },
+        "lockDevice": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "lockHeldAtSigning": {
+          "const": true
+        },
+        "lockInode": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "nodeId": {
+          "type": "string"
+        },
+        "nonce": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "observedAt": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "operation": {
+          "type": "string"
+        },
+        "operatorDigest": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "previousCheckpoint": {
+          "type": "string",
+          "pattern": "^([0-9a-f]{64})?$"
+        },
+        "priorC": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "priorP": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "proposalDigest": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "requestDigest": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "schema": {
+          "const": "sv-expired-policy-nonserving-proof:1"
+        },
+        "serving": {
+          "const": false
+        },
+        "servingPID": {
+          "type": "null"
+        },
+        "tenantId": {
+          "type": "string"
+        }
+      }
+    },
+    "ack": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "batchProofDigest",
+        "counter",
+        "deadline",
+        "operation",
+        "proofDigest",
+        "proposalDigest",
+        "role",
+        "schema"
+      ],
+      "properties": {
+        "batchProofDigest": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "counter": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "deadline": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "operation": {
+          "type": "string"
+        },
+        "proofDigest": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "proposalDigest": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "role": {
+          "type": "string"
+        },
+        "schema": {
+          "const": "sv-expired-policy-checkpoint-request:1"
+        }
+      }
+    },
+    "checkpoint": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "ackDigest",
+        "activationAllowed",
+        "batchProofDigest",
+        "checkpointAt",
+        "counter",
+        "epoch",
+        "lockHeldThroughCheckpoint",
+        "nodeId",
+        "operation",
+        "previousCheckpoint",
+        "proofDigest",
+        "requestDigest",
+        "schema",
+        "tenantId"
+      ],
+      "properties": {
+        "ackDigest": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "activationAllowed": {
+          "const": false
+        },
+        "batchProofDigest": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "checkpointAt": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "counter": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "epoch": {
+          "type": "string"
+        },
+        "lockHeldThroughCheckpoint": {
+          "const": true
+        },
+        "nodeId": {
+          "type": "string"
+        },
+        "operation": {
+          "type": "string"
+        },
+        "previousCheckpoint": {
+          "type": "string",
+          "pattern": "^([0-9a-f]{64})?$"
+        },
+        "proofDigest": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "requestDigest": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "schema": {
+          "const": "sv-expired-policy-candidate-checkpoint:1"
+        },
+        "tenantId": {
+          "type": "string"
+        }
+      }
+    },
+    "context": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "site",
+        "state",
+        "instances",
+        "basis"
+      ],
+      "properties": {
+        "site": {
+          "enum": [
+            "observer_worker.py:58",
+            "worker.py:122",
+            "workspace_config.py:54",
+            "build_product_runtime.py:537",
+            "storage_check_collect.py:381"
+          ]
+        },
+        "state": {
+          "enum": [
+            "present",
+            "absent"
+          ]
+        },
+        "instances": {
+          "type": "array",
+          "maxItems": 128,
+          "items": {
+            "$ref": "#/$defs/instance"
+          }
+        },
+        "basis": {
+          "const": "trusted-operator-inventory-not-hardware"
+        }
+      }
+    },
+    "instance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "generation",
+        "credentialFingerprint"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "generation": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "credentialFingerprint": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      }
+    },
+    "envelope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "payload",
+        "signature"
+      ],
+      "properties": {
+        "payload": {
+          "type": "string",
+          "maxLength": 87384,
+          "pattern": "^[A-Za-z0-9+/]+={0,2}$"
+        },
+        "signature": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{128}$"
+        }
+      }
+    }
+  },
+  "oneOf": [
+    {
+      "$ref": "#/$defs/auth"
+    },
+    {
+      "$ref": "#/$defs/operator"
+    },
+    {
+      "$ref": "#/$defs/proof"
+    },
+    {
+      "$ref": "#/$defs/ack"
+    },
+    {
+      "$ref": "#/$defs/checkpoint"
+    },
+    {
+      "$ref": "#/$defs/envelope"
+    }
+  ]
+}
