@@ -1,0 +1,102 @@
+{
+  "candidate": "e2f0cac3df21c333bbc03f80e683d2ac7eaad2c9",
+  "checked": "read-only via gh run view and job logs",
+  "runs": [
+    {
+      "databaseId": 44403224741,
+      "workflowName": "Portal Login Journey Harness",
+      "event": "push",
+      "headSha": "e2f0cac3df21c333bbc03f80e683d2ac7eaad2c9",
+      "headBranch": "agent/codex/fleet5-runtime-a1-986a845b",
+      "status": "completed",
+      "conclusion": "success",
+      "createdAt": "2026-11-18T21:36:30Z",
+      "updatedAt": "2026-11-18T21:44:10Z",
+      "url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/44403224741",
+      "jobs": [
+        {
+          "name": "portal-login-harness",
+          "conclusion": "success",
+          "databaseId": 135151499257
+        }
+      ]
+    },
+    {
+      "databaseId": 44403269220,
+      "workflowName": "Core Build",
+      "event": "workflow_dispatch",
+      "headSha": "e2f0cac3df21c333bbc03f80e683d2ac7eaad2c9",
+      "headBranch": "agent/codex/fleet5-runtime-a1-986a845b",
+      "status": "completed",
+      "conclusion": "success",
+      "createdAt": "2026-11-18T21:36:46Z",
+      "updatedAt": "2026-11-18T22:07:07Z",
+      "url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/44403269220",
+      "jobs": [
+        {
+          "name": "core",
+          "conclusion": "success",
+          "databaseId": 135151662175
+        },
+        {
+          "name": "s01-storage-roundtrip",
+          "conclusion": "success",
+          "databaseId": 135151662709
+        }
+      ]
+    },
+    {
+      "databaseId": 44403277164,
+      "workflowName": "Backend Build",
+      "event": "workflow_dispatch",
+      "headSha": "e2f0cac3df21c333bbc03f80e683d2ac7eaad2c9",
+      "headBranch": "agent/codex/fleet5-runtime-a1-986a845b",
+      "status": "completed",
+      "conclusion": "success",
+      "createdAt": "2026-11-18T21:36:48Z",
+      "updatedAt": "2026-11-18T22:02:25Z",
+      "url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/44403277164",
+      "jobs": [
+        {
+          "name": "backend (3.14)",
+          "conclusion": "success",
+          "databaseId": 135151691299
+        },
+        {
+          "name": "backend (3.12)",
+          "conclusion": "success",
+          "databaseId": 135151691477
+        },
+        {
+          "name": "mlflow-live",
+          "conclusion": "success",
+          "databaseId": 135151692390
+        }
+      ]
+    },
+    {
+      "databaseId": 44403290191,
+      "workflowName": "Documentation Build",
+      "event": "workflow_dispatch",
+      "headSha": "e2f0cac3df21c333bbc03f80e683d2ac7eaad2c9",
+      "headBranch": "agent/codex/fleet5-runtime-a1-986a845b",
+      "status": "completed",
+      "conclusion": "success",
+      "createdAt": "2026-11-18T21:36:53Z",
+      "updatedAt": "2026-11-18T21:37:32Z",
+      "url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/44403290191",
+      "jobs": [
+        {
+          "name": "docs",
+          "conclusion": "success",
+          "databaseId": 135151735597
+        }
+      ]
+    }
+  ],
+  "log_extracts": {
+    "core 135151662175": "tests/core/test_a1_ceremony_ledger.py ........... (11); 9451 passed, 46 skipped, 2 deselected (f4af7bb8: 9443)",
+    "backend (3.14) 135151691299": "9093 passed, 75 skipped, 2 deselected (f4af7bb8: 9085)",
+    "backend (3.12) 135151691477": "9093 passed, 75 skipped, 2 deselected (f4af7bb8: 9085)"
+  }
+}

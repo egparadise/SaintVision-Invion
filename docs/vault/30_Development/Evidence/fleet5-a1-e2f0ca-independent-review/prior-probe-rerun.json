@@ -1,0 +1,53 @@
+{
+  "script": "Evidence/fleet5-a1-f4af7b-independent-review/probe_ceremony_ledger.py (unchanged, from bdf737d8)",
+  "candidate": "e2f0cac3df21c333bbc03f80e683d2ac7eaad2c9",
+  "python": "3.14.7",
+  "sqlite": "3.50.4",
+  "passed": 18,
+  "total": 25,
+  "changed": [
+    {
+      "probe": "check-and-insert holds the write lock against a concurrent transfer",
+      "area": "atomic",
+      "detail_at_e2f0": "AssertionError: ",
+      "classification": "probe artifact: its trace hook waits for 'INSERT INTO ceremony_event', e2f0 issues 'INSERT OR IGNORE'. Re-proved with an updated hook in probe_ceremony_conflict.py (stale area)."
+    },
+    {
+      "probe": "leaf before CA key is rejected and leaves nothing",
+      "area": "missing",
+      "detail_at_e2f0": "AssertionError: ",
+      "classification": "intended change: the leaf-before-CA observation is now journaled in ceremony_conflict (finding 1 fix)."
+    },
+    {
+      "probe": "plan with unrecorded planned leaf cannot complete",
+      "area": "missing",
+      "detail_at_e2f0": "ValueError: Unreviewed or invalid R2 ceremony plan",
+      "classification": "intended change: the altered plan is refused up front as unreviewed (finding 2 fix)."
+    },
+    {
+      "probe": "malformed inputs are rejected before any write",
+      "area": "missing",
+      "detail_at_e2f0": "AssertionError: expected TypeError, got ValueError: Invalid subject",
+      "classification": "intended change: a non-string subject now raises ValueError('Invalid subject') instead of TypeError."
+    },
+    {
+      "probe": "a rejected conflicting observation does not poison later readback",
+      "area": "conflict",
+      "detail_at_e2f0": "ValueError: Incomplete or conflicting ceremony evidence",
+      "classification": "finding 1 fixed: the probe asserted the defect; readback is now rejected as conflicting."
+    },
+    {
+      "probe": "expected fingerprints are not bound by plan_digest (first writer pins)",
+      "area": "conflict",
+      "detail_at_e2f0": "ValueError: Unreviewed or invalid R2 ceremony plan",
+      "classification": "finding 2 fixed: the mutated document is refused as unreviewed before any write."
+    },
+    {
+      "probe": "transfer away then fresh epoch: old events never satisfy the new plan",
+      "area": "ownership",
+      "detail_at_e2f0": "ValueError: Unreviewed or invalid R2 ceremony plan",
+      "classification": "intended change: a fresh-epoch plan has a new plan_digest, so the reviewed-output pin refuses it."
+    }
+  ],
+  "regressions": 0
+}

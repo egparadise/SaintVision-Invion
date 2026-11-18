@@ -1,0 +1,959 @@
+{
+  "candidate": "e2f0cac3df21c333bbc03f80e683d2ac7eaad2c9",
+  "baseline": "bdf737d8fe128a76c0519b8c20f9ebc5597bcc56",
+  "usage": "python -I probe_ceremony_conflict.py <candidate_root> <bdf737d8_root> <out.json>",
+  "passed": 44,
+  "total": 44,
+  "runs": [
+    {
+      "candidate": "e2f0cac3df21c333bbc03f80e683d2ac7eaad2c9",
+      "baseline": "bdf737d8fe128a76c0519b8c20f9ebc5597bcc56",
+      "python": "3.14.7",
+      "sqlite": "3.50.4",
+      "platform": "Windows-11-10.0.26300-SP0",
+      "passed": 22,
+      "total": 22,
+      "results": [
+        {
+          "area": "conflict",
+          "probe": "each conflict kind is journaled once, keeps events unchanged and poisons readback",
+          "ok": true,
+          "detail": {
+            "second-ca-key": {
+              "record": "ValueError: Conflicting ceremony event",
+              "conflict_rows": 1,
+              "readback_after_complete": "ValueError: Incomplete or conflicting ceremony evidence"
+            },
+            "same-ca-key-new-id (lost-ack retry)": {
+              "record": "ValueError: Conflicting ceremony event",
+              "conflict_rows": 1,
+              "readback_after_complete": "ValueError: Incomplete or conflicting ceremony evidence"
+            },
+            "event-id-reuse": {
+              "record": "ValueError: Conflicting ceremony event",
+              "conflict_rows": 1,
+              "readback_after_complete": "ValueError: Incomplete or conflicting ceremony evidence"
+            },
+            "foreign-subject": {
+              "record": "ValueError: Conflicting ceremony event",
+              "conflict_rows": 1,
+              "readback_after_complete": "ValueError: Incomplete or conflicting ceremony evidence"
+            },
+            "wrong-leaf": {
+              "record": "ValueError: Conflicting ceremony event",
+              "conflict_rows": 1,
+              "readback_after_complete": "ValueError: Incomplete or conflicting ceremony evidence"
+            },
+            "ca-key-as-leaf": {
+              "record": "ValueError: Conflicting ceremony event",
+              "conflict_rows": 1,
+              "readback_after_complete": "ValueError: Incomplete or conflicting ceremony evidence"
+            },
+            "same-subject-new-id": {
+              "record": "ValueError: Conflicting ceremony event",
+              "conflict_rows": 1,
+              "readback_after_complete": "ValueError: Incomplete or conflicting ceremony evidence"
+            },
+            "leaf-before-ca": {
+              "record": "ValueError: Conflicting ceremony event",
+              "conflict_rows": 1,
+              "readback_after_complete": "ValueError: Incomplete or conflicting ceremony evidence"
+            }
+          },
+          "seconds": 1.8
+        },
+        {
+          "area": "conflict",
+          "probe": "committed conflict survives process exit and is seen by a fresh interpreter",
+          "ok": true,
+          "detail": {
+            "child": "REJECTED Conflicting ceremony event",
+            "fresh_readback": "Incomplete or conflicting ceremony evidence",
+            "rows": 1
+          },
+          "seconds": 1.201
+        },
+        {
+          "area": "conflict",
+          "probe": "crash before the conflict COMMIT surfaces no rejection and leaves nothing; retry journals it",
+          "ok": true,
+          "detail": {
+            "child_exit": 75,
+            "hot_journal_left": true,
+            "readback_before_retry": "complete",
+            "retry": "ValueError: Conflicting ceremony event",
+            "readback_after_retry": "ValueError: Incomplete or conflicting ceremony evidence"
+          },
+          "seconds": 0.737
+        },
+        {
+          "area": "conflict",
+          "probe": "commit blocked past busy timeout raises OperationalError and journals nothing",
+          "ok": true,
+          "detail": {
+            "blocked": "OperationalError: database is locked",
+            "waited_s": 5.6,
+            "after_release_retry": "journaled 1 conflict"
+          },
+          "seconds": 5.735
+        },
+        {
+          "area": "conflict",
+          "probe": "8 processes: 6 identical CA events and 2 conflicting IDs -> 1 event, 2 conflicts",
+          "ok": true,
+          "detail": {
+            "ok": 6,
+            "rejected": 2,
+            "events": 1,
+            "conflicts": 2,
+            "readback_after_complete": "ValueError: Incomplete or conflicting ceremony evidence"
+          },
+          "seconds": 1.364
+        },
+        {
+          "area": "conflict",
+          "probe": "8 threads with the same conflict -> one conflict row, all rejected",
+          "ok": true,
+          "detail": "8/8 rejected as Conflicting; 1 conflict row",
+          "seconds": 0.264
+        },
+        {
+          "area": "conflict",
+          "probe": "readback snapshot holds while a concurrent conflict waits to commit",
+          "ok": true,
+          "detail": {
+            "order": [
+              "readback-done",
+              "conflict-done"
+            ],
+            "writer_blocked_during_snapshot": true,
+            "later_readback": "ValueError: Incomplete or conflicting ceremony evidence"
+          },
+          "seconds": 1.289
+        },
+        {
+          "area": "stale",
+          "probe": "in-flight conflict record holds the write lock against a transfer",
+          "ok": true,
+          "detail": {
+            "order": [
+              "conflict-done",
+              "transfer-done"
+            ],
+            "post_transfer": "ValueError: Writer fence changed"
+          },
+          "seconds": 1.204
+        },
+        {
+          "area": "stale",
+          "probe": "after transfer away a stale writer can neither record nor journal a conflict",
+          "ok": true,
+          "detail": {
+            "sign:nod_00000000000000000000000PC2": "ValueError: Writer fence changed",
+            "key-2": "ValueError: Writer fence changed",
+            "f": "ValueError: Writer fence changed",
+            "key": "ValueError: Writer fence changed",
+            "readback": "ValueError: Writer fence changed",
+            "inspection_stale": "HOLD_WRITER_FENCE"
+          },
+          "seconds": 0.134
+        },
+        {
+          "area": "stale",
+          "probe": "stale or wrong fence plans are rejected before any write",
+          "ok": true,
+          "detail": {
+            "older-generation": {
+              "record": "ValueError: Unreviewed or invalid R2 ceremony plan",
+              "readback": "ValueError: Unreviewed or invalid R2 ceremony plan"
+            },
+            "wrong-token": {
+              "record": "ValueError: Unreviewed or invalid R2 ceremony plan",
+              "readback": "ValueError: Unreviewed or invalid R2 ceremony plan"
+            },
+            "bool-generation": {
+              "record": "ValueError: Unreviewed or invalid R2 ceremony plan",
+              "readback": "ValueError: Unreviewed or invalid R2 ceremony plan"
+            }
+          },
+          "seconds": 0.174
+        },
+        {
+          "area": "plan",
+          "probe": "every A1 output mutation is rejected by record and readback with no write",
+          "ok": true,
+          "detail": {
+            "mutations": 19,
+            "all_rejected_no_write": true,
+            "also_rejected_by_validate_plan": 19,
+            "detail": {
+              "newAuthority.certificateDER": {
+                "pin_rejects": true,
+                "validate_plan": [
+                  "AR-CERT-ROOT"
+                ]
+              },
+              "newAuthority.caCertificateSHA256": {
+                "pin_rejects": true,
+                "validate_plan": [
+                  "AR-ANCHOR-MISMATCH",
+                  "AR-CERT-ROOT"
+                ]
+              },
+              "newAuthority.caPublicKeySHA256": {
+                "pin_rejects": true,
+                "validate_plan": [
+                  "AR-CERT-ROOT"
+                ]
+              },
+              "controlPlaneClient.leafDER": {
+                "pin_rejects": true,
+                "validate_plan": [
+                  "AR-CERT-LEAF"
+                ]
+              },
+              "controlPlaneClient.plannedLeafSHA256": {
+                "pin_rejects": true,
+                "validate_plan": [
+                  "AR-CERT-LEAF",
+                  "AR-MANIFEST"
+                ]
+              },
+              "trustTransition.stagedAnchorBundle": {
+                "pin_rejects": true,
+                "validate_plan": [
+                  "AR-SCHEMA"
+                ]
+              },
+              "trustTransition.finalAnchorBundle": {
+                "pin_rejects": true,
+                "validate_plan": [
+                  "AR-SCHEMA"
+                ]
+              },
+              "PC2.leafDER": {
+                "pin_rejects": true,
+                "validate_plan": [
+                  "AR-CERT-LEAF"
+                ]
+              },
+              "PC2.plannedLeafSHA256": {
+                "pin_rejects": true,
+                "validate_plan": [
+                  "AR-CERT-LEAF",
+                  "AR-MANIFEST"
+                ]
+              },
+              "PC2.plannedPolicy": {
+                "pin_rejects": true,
+                "validate_plan": [
+                  "AR-SCHEMA"
+                ]
+              },
+              "PC3.leafDER": {
+                "pin_rejects": true,
+                "validate_plan": [
+                  "AR-CERT-LEAF"
+                ]
+              },
+              "PC3.plannedLeafSHA256": {
+                "pin_rejects": true,
+                "validate_plan": [
+                  "AR-CERT-LEAF",
+                  "AR-MANIFEST"
+                ]
+              },
+              "PC3.plannedPolicy": {
+                "pin_rejects": true,
+                "validate_plan": [
+                  "AR-SCHEMA"
+                ]
+              },
+              "PC4.leafDER": {
+                "pin_rejects": true,
+                "validate_plan": [
+                  "AR-CERT-LEAF"
+                ]
+              },
+              "PC4.plannedLeafSHA256": {
+                "pin_rejects": true,
+                "validate_plan": [
+                  "AR-CERT-LEAF",
+                  "AR-MANIFEST"
+                ]
+              },
+              "PC4.plannedPolicy": {
+                "pin_rejects": true,
+                "validate_plan": [
+                  "AR-SCHEMA"
+                ]
+              },
+              "PC1.leafDER": {
+                "pin_rejects": true,
+                "validate_plan": [
+                  "AR-CERT-LEAF"
+                ]
+              },
+              "PC1.plannedLeafSHA256": {
+                "pin_rejects": true,
+                "validate_plan": [
+                  "AR-CERT-LEAF",
+                  "AR-MANIFEST"
+                ]
+              },
+              "PC1.plannedPolicy": {
+                "pin_rejects": true,
+                "validate_plan": [
+                  "AR-SCHEMA"
+                ]
+              }
+            }
+          },
+          "seconds": 1.288
+        },
+        {
+          "area": "plan",
+          "probe": "mutated CA key document can no longer pin first; the reviewed document still records",
+          "ok": true,
+          "detail": {
+            "mutated_first": "ValueError: Unreviewed or invalid R2 ceremony plan",
+            "reviewed_then": "complete readback"
+          },
+          "seconds": 0.168
+        },
+        {
+          "area": "plan",
+          "probe": "pre-ceremony input, manifest and structure alterations are rejected",
+          "ok": true,
+          "detail": {
+            "planID": {
+              "record": "ValueError: Unreviewed or invalid R2 ceremony plan",
+              "readback": "ValueError: Unreviewed or invalid R2 ceremony plan"
+            },
+            "member-address": {
+              "record": "ValueError: Unreviewed or invalid R2 ceremony plan",
+              "readback": "ValueError: Unreviewed or invalid R2 ceremony plan"
+            },
+            "manifest-none": {
+              "record": "ValueError: Unreviewed or invalid R2 ceremony plan",
+              "readback": "ValueError: Unreviewed or invalid R2 ceremony plan"
+            },
+            "manifest-digest": {
+              "record": "ValueError: Unreviewed or invalid R2 ceremony plan",
+              "readback": "ValueError: Unreviewed or invalid R2 ceremony plan"
+            },
+            "duplicate-member": {
+              "record": "ValueError: Unreviewed or invalid R2 ceremony plan",
+              "readback": "ValueError: Unreviewed or invalid R2 ceremony plan"
+            },
+            "secret-marker": {
+              "record": "ValueError: Unreviewed or invalid R2 ceremony plan",
+              "readback": "ValueError: Unreviewed or invalid R2 ceremony plan"
+            }
+          },
+          "seconds": 0.404
+        },
+        {
+          "area": "plan",
+          "probe": "malformed observation inputs are refused before any write and never journaled",
+          "ok": true,
+          "detail": {
+            "upper-hex": "ValueError: Missing or invalid fingerprint",
+            "short": "ValueError: Missing or invalid fingerprint",
+            "none-fp": "ValueError: Missing or invalid fingerprint",
+            "int-subject": "ValueError: Invalid subject",
+            "blank-id": "ValueError: Missing event identity",
+            "none-id": "ValueError: Missing event identity"
+          },
+          "seconds": 0.133
+        },
+        {
+          "area": "plan",
+          "probe": "checkpoint fields outside the pin do not change the expected set",
+          "ok": true,
+          "detail": {
+            "validate_plan": [],
+            "evaluate": [
+              "AR-RECOVERY-MISMATCH"
+            ],
+            "ledger": "accepted; readback equals the reviewed ceremonyLog"
+          },
+          "seconds": 0.187
+        },
+        {
+          "area": "plan",
+          "probe": "only the reviewed p02 fixture is accepted; every other positive fixture is refused",
+          "ok": true,
+          "detail": {
+            "accepted": [
+              "p02-a1-durable-resume-anchor-stage.json"
+            ],
+            "refused": 49
+          },
+          "seconds": 0.03
+        },
+        {
+          "area": "compat",
+          "probe": "R2 evaluate() verdicts are identical at bdf737d8 and e2f0cac3 for every contract JSON",
+          "ok": true,
+          "detail": {
+            "documents": 117,
+            "evaluate_clean": 51,
+            "rejected": 66,
+            "differences": 0,
+            "sha256_of_verdicts": "fefd82803062e9d1f6492f454e59f7eb6ab374fd58e89a5ae94982272ec0b717"
+          },
+          "seconds": 2.794
+        },
+        {
+          "area": "compat",
+          "probe": "legacy f4af7bb8 ledger is refused for record and readback without being modified",
+          "ok": true,
+          "detail": {
+            "legacy_readback_at_f4af7bb8": "complete",
+            "record_identical": "ValueError: Legacy or incomplete ledger requires independent reconciliation",
+            "record_conflict": "ValueError: Legacy or incomplete ledger requires independent reconciliation",
+            "readback": "OperationalError: no such table: ceremony_conflict",
+            "inspection": "HOLD_CUSTODY_UNRESOLVED"
+          },
+          "seconds": 0.671
+        },
+        {
+          "area": "compat",
+          "probe": "conflict-only table set is also refused as incomplete",
+          "ok": true,
+          "detail": {
+            "record": "ValueError: Legacy or incomplete ledger requires independent reconciliation",
+            "readback": "OperationalError: no such table: ceremony_event"
+          },
+          "seconds": 0.087
+        },
+        {
+          "area": "compat",
+          "probe": "fence and pilot code are byte-identical to the reviewed blobs",
+          "ok": true,
+          "detail": {
+            "deploy/lan/a1_writer_fence.py": [
+              "31baea614a4ad6b1926081abbda910cace8f78e4",
+              "31baea614a4ad6b1926081abbda910cace8f78e4"
+            ],
+            "tools/lan_pilot.py": [
+              "35c2668690b0681ab87da86099400e83f39d098b",
+              "35c2668690b0681ab87da86099400e83f39d098b"
+            ]
+          },
+          "seconds": 0.181
+        },
+        {
+          "area": "hold",
+          "probe": "inspection stays HOLD with complete, conflicting and stale evidence",
+          "ok": true,
+          "detail": {
+            "complete": "HOLD_CUSTODY_UNRESOLVED",
+            "with_conflict": "HOLD_CUSTODY_UNRESOLVED",
+            "stale_owner": "HOLD_WRITER_FENCE"
+          },
+          "seconds": 0.176
+        },
+        {
+          "area": "hold",
+          "probe": "no runtime consumer, network, subprocess or signing surface",
+          "ok": true,
+          "detail": {
+            "imports": [
+              "from contextlib import closing, contextmanager",
+              "from pathlib import Path",
+              "from tools.check_fleet5_authority_replacement_r2 import ceremony_outputs, digest, plan_digest, validate_plan",
+              "import re",
+              "import sqlite3"
+            ],
+            "code_references": [
+              "tests/core/test_a1_ceremony_ledger.py"
+            ],
+            "validate_plan_references": [
+              "tools/a1_ceremony_ledger.py",
+              "tools/check_fleet5_authority_replacement_r2.py"
+            ],
+            "lan_pilot_mentions_ceremony": false
+          },
+          "seconds": 1.836
+        }
+      ]
+    },
+    {
+      "candidate": "e2f0cac3df21c333bbc03f80e683d2ac7eaad2c9",
+      "baseline": "bdf737d8fe128a76c0519b8c20f9ebc5597bcc56",
+      "python": "3.10.11",
+      "sqlite": "3.40.1",
+      "platform": "Windows-10-10.0.26300-SP0",
+      "passed": 22,
+      "total": 22,
+      "results": [
+        {
+          "area": "conflict",
+          "probe": "each conflict kind is journaled once, keeps events unchanged and poisons readback",
+          "ok": true,
+          "detail": {
+            "second-ca-key": {
+              "record": "ValueError: Conflicting ceremony event",
+              "conflict_rows": 1,
+              "readback_after_complete": "ValueError: Incomplete or conflicting ceremony evidence"
+            },
+            "same-ca-key-new-id (lost-ack retry)": {
+              "record": "ValueError: Conflicting ceremony event",
+              "conflict_rows": 1,
+              "readback_after_complete": "ValueError: Incomplete or conflicting ceremony evidence"
+            },
+            "event-id-reuse": {
+              "record": "ValueError: Conflicting ceremony event",
+              "conflict_rows": 1,
+              "readback_after_complete": "ValueError: Incomplete or conflicting ceremony evidence"
+            },
+            "foreign-subject": {
+              "record": "ValueError: Conflicting ceremony event",
+              "conflict_rows": 1,
+              "readback_after_complete": "ValueError: Incomplete or conflicting ceremony evidence"
+            },
+            "wrong-leaf": {
+              "record": "ValueError: Conflicting ceremony event",
+              "conflict_rows": 1,
+              "readback_after_complete": "ValueError: Incomplete or conflicting ceremony evidence"
+            },
+            "ca-key-as-leaf": {
+              "record": "ValueError: Conflicting ceremony event",
+              "conflict_rows": 1,
+              "readback_after_complete": "ValueError: Incomplete or conflicting ceremony evidence"
+            },
+            "same-subject-new-id": {
+              "record": "ValueError: Conflicting ceremony event",
+              "conflict_rows": 1,
+              "readback_after_complete": "ValueError: Incomplete or conflicting ceremony evidence"
+            },
+            "leaf-before-ca": {
+              "record": "ValueError: Conflicting ceremony event",
+              "conflict_rows": 1,
+              "readback_after_complete": "ValueError: Incomplete or conflicting ceremony evidence"
+            }
+          },
+          "seconds": 1.848
+        },
+        {
+          "area": "conflict",
+          "probe": "committed conflict survives process exit and is seen by a fresh interpreter",
+          "ok": true,
+          "detail": {
+            "child": "REJECTED Conflicting ceremony event",
+            "fresh_readback": "Incomplete or conflicting ceremony evidence",
+            "rows": 1
+          },
+          "seconds": 1.18
+        },
+        {
+          "area": "conflict",
+          "probe": "crash before the conflict COMMIT surfaces no rejection and leaves nothing; retry journals it",
+          "ok": true,
+          "detail": {
+            "child_exit": 75,
+            "hot_journal_left": true,
+            "readback_before_retry": "complete",
+            "retry": "ValueError: Conflicting ceremony event",
+            "readback_after_retry": "ValueError: Incomplete or conflicting ceremony evidence"
+          },
+          "seconds": 0.782
+        },
+        {
+          "area": "conflict",
+          "probe": "commit blocked past busy timeout raises OperationalError and journals nothing",
+          "ok": true,
+          "detail": {
+            "blocked": "OperationalError: database is locked",
+            "waited_s": 5.5,
+            "after_release_retry": "journaled 1 conflict"
+          },
+          "seconds": 5.671
+        },
+        {
+          "area": "conflict",
+          "probe": "8 processes: 6 identical CA events and 2 conflicting IDs -> 1 event, 2 conflicts",
+          "ok": true,
+          "detail": {
+            "ok": 6,
+            "rejected": 2,
+            "events": 1,
+            "conflicts": 2,
+            "readback_after_complete": "ValueError: Incomplete or conflicting ceremony evidence"
+          },
+          "seconds": 1.202
+        },
+        {
+          "area": "conflict",
+          "probe": "8 threads with the same conflict -> one conflict row, all rejected",
+          "ok": true,
+          "detail": "8/8 rejected as Conflicting; 1 conflict row",
+          "seconds": 0.306
+        },
+        {
+          "area": "conflict",
+          "probe": "readback snapshot holds while a concurrent conflict waits to commit",
+          "ok": true,
+          "detail": {
+            "order": [
+              "readback-done",
+              "conflict-done"
+            ],
+            "writer_blocked_during_snapshot": true,
+            "later_readback": "ValueError: Incomplete or conflicting ceremony evidence"
+          },
+          "seconds": 1.353
+        },
+        {
+          "area": "stale",
+          "probe": "in-flight conflict record holds the write lock against a transfer",
+          "ok": true,
+          "detail": {
+            "order": [
+              "conflict-done",
+              "transfer-done"
+            ],
+            "post_transfer": "ValueError: Writer fence changed"
+          },
+          "seconds": 1.215
+        },
+        {
+          "area": "stale",
+          "probe": "after transfer away a stale writer can neither record nor journal a conflict",
+          "ok": true,
+          "detail": {
+            "sign:nod_00000000000000000000000PC2": "ValueError: Writer fence changed",
+            "key-2": "ValueError: Writer fence changed",
+            "f": "ValueError: Writer fence changed",
+            "key": "ValueError: Writer fence changed",
+            "readback": "ValueError: Writer fence changed",
+            "inspection_stale": "HOLD_WRITER_FENCE"
+          },
+          "seconds": 0.189
+        },
+        {
+          "area": "stale",
+          "probe": "stale or wrong fence plans are rejected before any write",
+          "ok": true,
+          "detail": {
+            "older-generation": {
+              "record": "ValueError: Unreviewed or invalid R2 ceremony plan",
+              "readback": "ValueError: Unreviewed or invalid R2 ceremony plan"
+            },
+            "wrong-token": {
+              "record": "ValueError: Unreviewed or invalid R2 ceremony plan",
+              "readback": "ValueError: Unreviewed or invalid R2 ceremony plan"
+            },
+            "bool-generation": {
+              "record": "ValueError: Unreviewed or invalid R2 ceremony plan",
+              "readback": "ValueError: Unreviewed or invalid R2 ceremony plan"
+            }
+          },
+          "seconds": 0.279
+        },
+        {
+          "area": "plan",
+          "probe": "every A1 output mutation is rejected by record and readback with no write",
+          "ok": true,
+          "detail": {
+            "mutations": 19,
+            "all_rejected_no_write": true,
+            "also_rejected_by_validate_plan": 19,
+            "detail": {
+              "newAuthority.certificateDER": {
+                "pin_rejects": true,
+                "validate_plan": [
+                  "AR-CERT-ROOT"
+                ]
+              },
+              "newAuthority.caCertificateSHA256": {
+                "pin_rejects": true,
+                "validate_plan": [
+                  "AR-ANCHOR-MISMATCH",
+                  "AR-CERT-ROOT"
+                ]
+              },
+              "newAuthority.caPublicKeySHA256": {
+                "pin_rejects": true,
+                "validate_plan": [
+                  "AR-CERT-ROOT"
+                ]
+              },
+              "controlPlaneClient.leafDER": {
+                "pin_rejects": true,
+                "validate_plan": [
+                  "AR-CERT-LEAF"
+                ]
+              },
+              "controlPlaneClient.plannedLeafSHA256": {
+                "pin_rejects": true,
+                "validate_plan": [
+                  "AR-CERT-LEAF",
+                  "AR-MANIFEST"
+                ]
+              },
+              "trustTransition.stagedAnchorBundle": {
+                "pin_rejects": true,
+                "validate_plan": [
+                  "AR-SCHEMA"
+                ]
+              },
+              "trustTransition.finalAnchorBundle": {
+                "pin_rejects": true,
+                "validate_plan": [
+                  "AR-SCHEMA"
+                ]
+              },
+              "PC2.leafDER": {
+                "pin_rejects": true,
+                "validate_plan": [
+                  "AR-CERT-LEAF"
+                ]
+              },
+              "PC2.plannedLeafSHA256": {
+                "pin_rejects": true,
+                "validate_plan": [
+                  "AR-CERT-LEAF",
+                  "AR-MANIFEST"
+                ]
+              },
+              "PC2.plannedPolicy": {
+                "pin_rejects": true,
+                "validate_plan": [
+                  "AR-SCHEMA"
+                ]
+              },
+              "PC3.leafDER": {
+                "pin_rejects": true,
+                "validate_plan": [
+                  "AR-CERT-LEAF"
+                ]
+              },
+              "PC3.plannedLeafSHA256": {
+                "pin_rejects": true,
+                "validate_plan": [
+                  "AR-CERT-LEAF",
+                  "AR-MANIFEST"
+                ]
+              },
+              "PC3.plannedPolicy": {
+                "pin_rejects": true,
+                "validate_plan": [
+                  "AR-SCHEMA"
+                ]
+              },
+              "PC4.leafDER": {
+                "pin_rejects": true,
+                "validate_plan": [
+                  "AR-CERT-LEAF"
+                ]
+              },
+              "PC4.plannedLeafSHA256": {
+                "pin_rejects": true,
+                "validate_plan": [
+                  "AR-CERT-LEAF",
+                  "AR-MANIFEST"
+                ]
+              },
+              "PC4.plannedPolicy": {
+                "pin_rejects": true,
+                "validate_plan": [
+                  "AR-SCHEMA"
+                ]
+              },
+              "PC1.leafDER": {
+                "pin_rejects": true,
+                "validate_plan": [
+                  "AR-CERT-LEAF"
+                ]
+              },
+              "PC1.plannedLeafSHA256": {
+                "pin_rejects": true,
+                "validate_plan": [
+                  "AR-CERT-LEAF",
+                  "AR-MANIFEST"
+                ]
+              },
+              "PC1.plannedPolicy": {
+                "pin_rejects": true,
+                "validate_plan": [
+                  "AR-SCHEMA"
+                ]
+              }
+            }
+          },
+          "seconds": 1.976
+        },
+        {
+          "area": "plan",
+          "probe": "mutated CA key document can no longer pin first; the reviewed document still records",
+          "ok": true,
+          "detail": {
+            "mutated_first": "ValueError: Unreviewed or invalid R2 ceremony plan",
+            "reviewed_then": "complete readback"
+          },
+          "seconds": 0.233
+        },
+        {
+          "area": "plan",
+          "probe": "pre-ceremony input, manifest and structure alterations are rejected",
+          "ok": true,
+          "detail": {
+            "planID": {
+              "record": "ValueError: Unreviewed or invalid R2 ceremony plan",
+              "readback": "ValueError: Unreviewed or invalid R2 ceremony plan"
+            },
+            "member-address": {
+              "record": "ValueError: Unreviewed or invalid R2 ceremony plan",
+              "readback": "ValueError: Unreviewed or invalid R2 ceremony plan"
+            },
+            "manifest-none": {
+              "record": "ValueError: Unreviewed or invalid R2 ceremony plan",
+              "readback": "ValueError: Unreviewed or invalid R2 ceremony plan"
+            },
+            "manifest-digest": {
+              "record": "ValueError: Unreviewed or invalid R2 ceremony plan",
+              "readback": "ValueError: Unreviewed or invalid R2 ceremony plan"
+            },
+            "duplicate-member": {
+              "record": "ValueError: Unreviewed or invalid R2 ceremony plan",
+              "readback": "ValueError: Unreviewed or invalid R2 ceremony plan"
+            },
+            "secret-marker": {
+              "record": "ValueError: Unreviewed or invalid R2 ceremony plan",
+              "readback": "ValueError: Unreviewed or invalid R2 ceremony plan"
+            }
+          },
+          "seconds": 0.597
+        },
+        {
+          "area": "plan",
+          "probe": "malformed observation inputs are refused before any write and never journaled",
+          "ok": true,
+          "detail": {
+            "upper-hex": "ValueError: Missing or invalid fingerprint",
+            "short": "ValueError: Missing or invalid fingerprint",
+            "none-fp": "ValueError: Missing or invalid fingerprint",
+            "int-subject": "ValueError: Invalid subject",
+            "blank-id": "ValueError: Missing event identity",
+            "none-id": "ValueError: Missing event identity"
+          },
+          "seconds": 0.17
+        },
+        {
+          "area": "plan",
+          "probe": "checkpoint fields outside the pin do not change the expected set",
+          "ok": true,
+          "detail": {
+            "validate_plan": [],
+            "evaluate": [
+              "AR-RECOVERY-MISMATCH"
+            ],
+            "ledger": "accepted; readback equals the reviewed ceremonyLog"
+          },
+          "seconds": 0.252
+        },
+        {
+          "area": "plan",
+          "probe": "only the reviewed p02 fixture is accepted; every other positive fixture is refused",
+          "ok": true,
+          "detail": {
+            "accepted": [
+              "p02-a1-durable-resume-anchor-stage.json"
+            ],
+            "refused": 49
+          },
+          "seconds": 0.031
+        },
+        {
+          "area": "compat",
+          "probe": "R2 evaluate() verdicts are identical at bdf737d8 and e2f0cac3 for every contract JSON",
+          "ok": true,
+          "detail": {
+            "documents": 117,
+            "evaluate_clean": 51,
+            "rejected": 66,
+            "differences": 0,
+            "sha256_of_verdicts": "fefd82803062e9d1f6492f454e59f7eb6ab374fd58e89a5ae94982272ec0b717"
+          },
+          "seconds": 2.93
+        },
+        {
+          "area": "compat",
+          "probe": "legacy f4af7bb8 ledger is refused for record and readback without being modified",
+          "ok": true,
+          "detail": {
+            "legacy_readback_at_f4af7bb8": "complete",
+            "record_identical": "ValueError: Legacy or incomplete ledger requires independent reconciliation",
+            "record_conflict": "ValueError: Legacy or incomplete ledger requires independent reconciliation",
+            "readback": "OperationalError: no such table: ceremony_conflict",
+            "inspection": "HOLD_CUSTODY_UNRESOLVED"
+          },
+          "seconds": 0.681
+        },
+        {
+          "area": "compat",
+          "probe": "conflict-only table set is also refused as incomplete",
+          "ok": true,
+          "detail": {
+            "record": "ValueError: Legacy or incomplete ledger requires independent reconciliation",
+            "readback": "OperationalError: no such table: ceremony_event"
+          },
+          "seconds": 0.124
+        },
+        {
+          "area": "compat",
+          "probe": "fence and pilot code are byte-identical to the reviewed blobs",
+          "ok": true,
+          "detail": {
+            "deploy/lan/a1_writer_fence.py": [
+              "31baea614a4ad6b1926081abbda910cace8f78e4",
+              "31baea614a4ad6b1926081abbda910cace8f78e4"
+            ],
+            "tools/lan_pilot.py": [
+              "35c2668690b0681ab87da86099400e83f39d098b",
+              "35c2668690b0681ab87da86099400e83f39d098b"
+            ]
+          },
+          "seconds": 0.198
+        },
+        {
+          "area": "hold",
+          "probe": "inspection stays HOLD with complete, conflicting and stale evidence",
+          "ok": true,
+          "detail": {
+            "complete": "HOLD_CUSTODY_UNRESOLVED",
+            "with_conflict": "HOLD_CUSTODY_UNRESOLVED",
+            "stale_owner": "HOLD_WRITER_FENCE"
+          },
+          "seconds": 0.271
+        },
+        {
+          "area": "hold",
+          "probe": "no runtime consumer, network, subprocess or signing surface",
+          "ok": true,
+          "detail": {
+            "imports": [
+              "from contextlib import closing, contextmanager",
+              "from pathlib import Path",
+              "from tools.check_fleet5_authority_replacement_r2 import ceremony_outputs, digest, plan_digest, validate_plan",
+              "import re",
+              "import sqlite3"
+            ],
+            "code_references": [
+              "tests/core/test_a1_ceremony_ledger.py"
+            ],
+            "validate_plan_references": [
+              "tools/a1_ceremony_ledger.py",
+              "tools/check_fleet5_authority_replacement_r2.py"
+            ],
+            "lan_pilot_mentions_ceremony": false
+          },
+          "seconds": 1.837
+        }
+      ]
+    }
+  ]
+}

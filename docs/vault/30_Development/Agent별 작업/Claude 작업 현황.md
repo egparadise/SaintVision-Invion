@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-CLAUDE-001"
 title: "Claude 작업 현황"
-version: "1.2.141"
+version: "1.2.142"
 status: "review"
 author: "Claude"
-updated: "2026-11-19T06:30:00+09:00"
+updated: "2026-11-19T07:25:00+09:00"
 
 
 
@@ -12,6 +12,38 @@ updated: "2026-11-19T06:30:00+09:00"
 
 source_of_truth: "Git"
 ---
+
+## 2026-11-19 FLEET5 A1 durable conflict·reviewed-output pin 독립 검토 e2f0cac3 (Claude 직접 기록)
+
+- **작업** (task_ea3cdc342a33 / ctx_351cea98c7b7): Codex task_3b5339418900이 bdf737d8 위에 만든 `e2f0cac3`(agent/codex/fleet5-runtime-a1-986a845b)을 정확한 SHA의 격리 worktree에서 bdf737d8 지적과 대조해 검토했다. Codex 브랜치는 바꾸지 않았다. 기록은 `agent/claude/fleet5-a1-e2f0ca-review`에 있다.
+- **판정**: HOLD-only synthetic 범위로 수락한다. 이 범위의 차단 결함은 없다. readback은 아직 복구 판단의 R2 `ceremonyLog`로 쓰면 안 된다.
+  - 지적 1: (a) 거부된 관측 영속화와 (b) 충돌이 있으면 readback 거부는 해결됐다. (c) zero-key·partial 표현은 남아 있다.
+  - 지적 2: 이 범위에서 해결됐다. record와 readback 모두 reviewed p02 출력 pin과 `validate_plan`을 요구한다.
+- **탐침**: `probe_ceremony_conflict.py`로 Python 3.14.7/SQLite 3.50.4와 3.10.11/3.40.1에서 각 22건, 합계 44/44를 통과했다.
+  - 충돌 지속: 충돌 8종이 각각 1행으로만 기록됐다. 재시도해도 행이 늘지 않았고, 완료 뒤에도 readback이 거부됐다.
+  - 재시작: commit 뒤 종료한 경우 새 interpreter도 충돌을 봤다. COMMIT 직전 종료한 경우 거부가 보고되지 않았고 아무것도 남지 않았으며, 재시도로 기록됐다.
+  - busy timeout: `OperationalError`가 났고 충돌은 기록되지 않았다.
+  - 동시성: process 8개와 thread 8개로 시험했다. snapshot 동안 충돌 commit은 대기했다.
+  - stale writer: transfer 뒤에는 기록도 충돌 기록도 불가였고 파일 hash가 그대로였다.
+  - 변조 plan: 19개 출력 변조 전부와 manifest·planID·주소·중복·secret 변조가 쓰기 전에 거부됐다.
+  - 기존 evidence: `evaluate()` 판정이 117개 문서에서 bdf737d8과 동일했다. f4af7bb8 ledger는 수정 없이 reconciliation 요구로 거부됐다.
+  - HOLD: inspection은 계속 HOLD였다.
+  - 이전 탐침 재실행: 18/25를 통과했다. 바뀐 7건은 모두 의도된 수정이거나 trace hook 문자열 차이다.
+- **확인**:
+  - 로컬: 정확한 SHA에서 7파일 세트 516 passed(Codex 수치와 일치), ledger test 11 passed, 3.10에서 ledger·fence 14 passed, R2 checker 113건, 생성기 `--check`, check_docs PASS.
+  - hosted: Core 44403269220(ledger 11건 포함 9451 passed), Backend 44403277164(3.12/3.14 각 9093 passed), Docs 44403290191, Portal 44403224741이 모두 정확한 SHA에서 success다.
+- **지적**:
+  1. zero-key·partial 로그 표현과 거부를 HOLD 코드로 매핑하는 규칙이 아직 없다(지적 1c).
+  2. pin이 공개 fixture 하나에 고정돼 있다. 실제 plan에는 Root가 통제하는 reviewed-plan 출처가 필요하다.
+  3. 새 ID로 한 lost-ack 재시도나 CA보다 먼저 온 leaf가 기록되면 해당 epoch는 영구 HOLD가 되고, 해제할 경로가 없다. 안정된 ID, CA 우선 순서, reconciliation 절차가 필요하다.
+  4. commit이 busy로 막히면 충돌이 기록되지 않고 `OperationalError`가 난다. 오류 타입이 섞여 있으나 모두 fail-closed다.
+  5. Codex gate 파일에 SHA가 없고 BOM과 절대 경로가 있다.
+- **하지 않은 것**: 실제 key·signer 사용, fleet 연결, 배포, 활성화, merge, PR, push, vault export, Codex 브랜치 변경
+- **다음 첫 행동/담당**:
+  - Codex: 지적 1·3, 인증된 signer ceremony ledger, fleet-wide writer enforcement
+  - Root(coordinator): custody, reviewed-plan 출처, 통합, canonical export
+  - Claude: 지적 1·3 반영 뒤 또는 소비자 연결 전에 재검토
+  - [[2026-11-19_FLEET5_A1_e2f0ca_Independent_Review]]
 
 ## 2026-11-19 FLEET5 A1 synthetic ceremony ledger 독립 검토 f4af7bb8 (Claude 직접 기록)
 

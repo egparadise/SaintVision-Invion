@@ -1,0 +1,113 @@
+{
+  "candidate": "e2f0cac3df21c333bbc03f80e683d2ac7eaad2c9",
+  "worktree": "isolated, clean at candidate",
+  "gates": [
+    {
+      "argv": [
+        "<venv-py3.14>",
+        "-m",
+        "pytest",
+        "-q",
+        "-p",
+        "no:cacheprovider",
+        "tests/core/test_a1_ceremony_ledger.py",
+        "tests/core/test_a1_writer_fence.py",
+        "tests/core/test_fleet5_authority_replacement_r2.py",
+        "tests/core/test_serving_anchors.py",
+        "tests/test_route_coverage.py",
+        "tests/test_lan_leaf_rotation.py",
+        "tests/test_intranet_pki.py"
+      ],
+      "cwd": "<candidate worktree>",
+      "kst": "2026-11-19T07:15:26+09:00",
+      "exit": 0,
+      "tail": [
+        "........................................................................ [ 97%]",
+        "............                                                             [100%]",
+        "516 passed in 30.29s"
+      ]
+    },
+    {
+      "argv": [
+        "<venv-py3.14>",
+        "-m",
+        "pytest",
+        "-q",
+        "-p",
+        "no:cacheprovider",
+        "-v",
+        "tests/core/test_a1_ceremony_ledger.py"
+      ],
+      "cwd": "<candidate worktree>",
+      "kst": "2026-11-19T07:15:59+09:00",
+      "exit": 0,
+      "tail": [
+        "============================= test session starts =============================",
+        "platform win32 -- Python 3.14.7, pytest-9.1.1, pluggy-1.6.0",
+        "rootdir: <scratch>",
+        "configfile: pyproject.toml",
+        "plugins: anyio-4.15.1, typeguard-4.6.0",
+        "collected 11 items",
+        "",
+        "tests\\core\\test_a1_ceremony_ledger.py ...........                        [100%]",
+        "",
+        "============================= 11 passed in 6.21s =============================="
+      ]
+    },
+    {
+      "argv": [
+        "py",
+        "-3.10",
+        "-m",
+        "pytest",
+        "-q",
+        "-p",
+        "no:cacheprovider",
+        "tests/core/test_a1_ceremony_ledger.py",
+        "tests/core/test_a1_writer_fence.py"
+      ],
+      "cwd": "<candidate worktree>",
+      "kst": "2026-11-19T07:16:07+09:00",
+      "exit": 0,
+      "tail": [
+        "..............                                                           [100%]",
+        "14 passed in 7.96s"
+      ]
+    },
+    {
+      "argv": [
+        "<venv-py3.14>",
+        "tools/check_fleet5_authority_replacement_r2.py"
+      ],
+      "cwd": "<candidate worktree>",
+      "kst": "2026-11-19T07:16:17+09:00",
+      "exit": 0,
+      "tail": [
+        "PASS fleet5 authority replacement R2: 113 documents matched their expected verdicts"
+      ]
+    },
+    {
+      "argv": [
+        "<venv-py3.14>",
+        "tools/generate_fleet5_authority_replacement_r2_fixtures.py",
+        "--check"
+      ],
+      "cwd": "<candidate worktree>",
+      "kst": "2026-11-19T07:16:18+09:00",
+      "exit": 0,
+      "tail": []
+    },
+    {
+      "argv": [
+        "<venv-py3.14>",
+        "tools/check_docs.py"
+      ],
+      "cwd": "<candidate worktree>",
+      "kst": "2026-11-19T07:20:09+09:00",
+      "exit": 0,
+      "tail": [
+        "PASS: 24 original hashes, 1286 versioned documents, wiki links, 48 tasks, 12 outcomes, owner/reviewer/skills, dependency DAG."
+      ]
+    }
+  ]
+}
