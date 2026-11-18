@@ -13,8 +13,20 @@ def test_core_workflow_owns_one_explicit_cx01_container_lifecycle():
     create = text.index("name: Create disposable CX01 PostgreSQL")
     migrations = text.index("name: Upgrade each published migration head")
     cleanup = text.index("name: Cleanup disposable CX01 PostgreSQL")
-    upload = text.index("uses: actions/upload-artifact@v4")
-    assert create < migrations < cleanup < upload
+    # Earlier opt-in diagnostic artifacts do not own the CX01 lifecycle. Bind the
+    # assertion to the core job's own CX01 evidence upload step, so neither an
+    # earlier diagnostic upload nor an unrelated later upload can satisfy it.
+    core_start = text.index("  core:")
+    core_end = text.index("  s01-storage-roundtrip:")
+    assert text.count("name: saintvision-core-evidence") == 1
+    evidence = text.index("name: saintvision-core-evidence")
+    upload = text.rindex("uses: actions/upload-artifact@v4", 0, evidence)
+    next_step = text.find("\n      - ", upload, core_end)
+    upload_step = text[upload : core_end if next_step == -1 else next_step]
+    assert "\n      - " not in text[upload:evidence]
+    assert "\n        if: always()\n" in upload_step
+    assert "\n          path: dist/\n" in upload_step
+    assert core_start < create < migrations < cleanup < upload < evidence < core_end
 
     create_step = text[create:migrations]
     assert 'cx01_owner="${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"' in create_step
