@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-CLAUDE-001"
 title: "Claude 작업 현황"
-version: "1.2.132"
+version: "1.2.133"
 status: "review"
 author: "Claude"
-updated: "2026-11-08T11:12:30+09:00"
+updated: "2026-11-18T21:40:00+09:00"
 
 
 
@@ -12,6 +12,31 @@ updated: "2026-11-08T11:12:30+09:00"
 
 source_of_truth: "Git"
 ---
+
+## 2026-11-18 FLEET5 현재 완성도·초기계획 독립 감사 (Claude 직접 기록)
+
+- **작업** (task_121355869af1 / ctx_a23798cf4e04, 20:59 KST 착수): Root544 `d81d40f8` 기준으로 감사했다. Git 객체, 문서, Root Evidence만 정적으로 읽었고 기존 CI는 gh API로 조회만 했다.
+- **원래 48 task**:
+  - 정식 완료 카드: **4.17%**(2/48).
+  - 11-04 기록: 71.35% / 72.40%.
+  - **11-18 감사 확정 하한: 3,475/4,800 = 72.40%**. 착지 integration `59f0a3c2`에서 hosted 13/13이 성공했다. 행에서 다시 계산했고 결속 경로 88/88이 있다.
+  - 미통합 고정 사슬 `d47630d7`: 72.40~72.92%. 미해결은 S12-BE 하나(50~75)다.
+  - 지금의 구조적 최대치: 76.04%. 선행 S01-BE/ST가 막혀 있고 운영 인수가 없기 때문이다.
+- **확장 범위**: 카드 16개 중 운영 인수 0, outcome 0/7이다. 분모와 가중치가 없어서 단일 %를 낼 수 없다.
+- **Root 통로 판정**: 대화형 통로로는 건전하다. 상시 연결로는 M1~M4가 닫힐 때까지 수락하지 않는다. 필수 4, LOW 6, INFO 4건이다.
+  - 가장 중요한 필수 항목: catch 안에서 예외가 나면 supervisor가 종료된다. 감시자와 headless 시작이 없다. state.json은 health 신호가 아니다. Run 명령줄 증거가 없다.
+  - 이 통로는 IdP와 DB bridge를 다루지 않는다.
+- **최상위 발견**:
+  - 수락된 d476은 유효한 같은 CA를 전제한다. 그런데 CA는 11-14에, CP leaf는 11-09에 만료됐다. 그래서 현재 fleet를 복구할 수 없다.
+  - authority 교체 workflow는 renewal plan의 범위 밖이고, 그 카드가 아직 없다.
+  - Main Docker가 꺼져 있다. CP DB와 IdP에 listener가 없다. 마지막 백업은 schema-only다.
+- **다음 첫 행동과 담당**:
+  1. Root: FLEET5-MAIN-DB-IDP-DURABILITY-R1(읽기 관측 → 데이터와 globals 백업 → 복원 예행).
+  2. Codex: ready 카드 FLEET5-AUTHORITY-REPLACEMENT-AND-ADVANCE-RENEWAL-R1. 검토는 Claude가 실제로 한다.
+  3. Root: 통로 M1~M4 수정.
+  4. 사용자: PC1 진단 정보, 실제 승인자 2명, U1~U6 결정.
+- **하지 않은 것**: 제품, SSH, DB 실행. task 상태와 rubric 변경. APPLY.
+- **기록**: [[2026-11-18 FLEET5 현재 완성도와 초기계획 독립 감사 Claude]], [[2026-11-18_FLEET5_Completion_InitialPlan_Audit_Claude]]
 
 ## 2026-11-08 FLEET5 만료 정책 d476 후보 실제 source·보안 검토 R1 (Claude 직접 기록)
 

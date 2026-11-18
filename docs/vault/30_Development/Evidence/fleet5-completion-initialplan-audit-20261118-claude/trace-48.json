@@ -1,0 +1,2133 @@
+{
+ "docID": "EVIDENCE-FLEET5-COMPLETION-AUDIT-TRACE48-20261118-CLAUDE",
+ "version": "1.0.0",
+ "atKST": "2026-11-18",
+ "sources": {
+  "registry": [
+   "docs/task-registry.json",
+   "3d7b5be755d15b5f181b9cbbed33b2a8f4b56e87"
+  ],
+  "rescore": [
+   "PROGRESS-RESCORE-20260928-CLAUDE v1.21.1 (base 03e17c31)",
+   "6985fa6706b2c35ed8ef3d15b61fa2a0450e8e45"
+  ]
+ },
+ "trees": {
+  "C_landed_until_1104_1208KST": "6fc0428b49f28379cb4da17830d92256b55c2eb2",
+  "Z_train78_landed_1104_1208KST": "03e17c31cf535008d39534aaa80d3ae274bd75cc",
+  "integrationTip_now": "59f0a3c2ff41ba1ae99a38515a2cdc65b2144067",
+  "fixedChain_unmerged": [
+   "1efea494f026e932360c35ae811b6423d874a2e7",
+   "96afd799d49717fd40e4ddabd538d82accbe1958",
+   "abb7074e3da0d547ac81d3da33dce347d5c656af",
+   "d47630d730278aa9e49b15a63cd221696da8dc00"
+  ],
+  "originMain_stale": "f9be6b61c9970d7feeb0d43fafb3c0704b8d31de"
+ },
+ "method": [
+  "Rows, owners, statuses from registry v1.0.1 at the integration tip (blob identical at d47630d7 and Root544).",
+  "Per-row scores: rescore §3 table re-parsed (sums to 3400 at 95a59b24), plus the three later documented moves S11-BE (v1.5), S12-FE (v1.9), S08-BE (v1.15). Recomputed C=3425 and Z=3475 from rows.",
+  "Z 03e17c31 is an ancestor of the integration tip 59f0a3c2; 59f0a3c2 has 13/13 hosted runs success (8 post-landing-verify). v1.21.1 left the landed column un-rescored because the first landing push failed; that condition is now closed, so 3475 is a landed value.",
+  "Each of the 88 cited binding paths was checked with git ls-tree at 59f0a3c2 and d47630d7: all present (one abbreviated inv/sandbox.py resolved under services/control-plane/src/inv).",
+  "No row was re-audited at case level; untouched rows carry forward the v1.21 judgment. Only S12-BE has a material row-scoped delta on the unmerged chain, kept as an unresolved range.",
+  "Test, commit, PR and file counts are not weights. No operational evidence after 11-04 meets the 100 condition (prerequisites + required operational acceptance)."
+ ],
+ "arithmetic": {
+  "denominator": 4800,
+  "rubric": "48 equal rows, 0/25/50/75/100 (rescore §1-1, unchanged)",
+  "baseline_0918": [
+   2800,
+   58.33
+  ],
+  "train_95a59b24": [
+   3400,
+   70.83
+  ],
+  "landed_C_6fc0428b": [
+   3425,
+   71.35
+  ],
+  "Z_03e17c31": [
+   3475,
+   72.4
+  ],
+  "confirmedLowerBound_landed_59f0a3c2": [
+   3475,
+   72.4
+  ],
+  "fixedChain_d47630d7_range": [
+   [
+    3475,
+    72.4
+   ],
+   [
+    3500,
+    72.92
+   ]
+  ],
+  "structuralCeilingNow": [
+   3650,
+   76.04
+  ],
+  "scoreDistributionLanded": {
+   "50": 7,
+   "75": 39,
+   "100": 2
+  },
+  "formalRegistry": {
+   "version": "1.0.1",
+   "counts": {
+    "done": 2,
+    "blocked": 4,
+    "planned": 42
+   },
+   "donePercent": 4.17,
+   "outcomesPlanned": 12
+  }
+ },
+ "rows": [
+  {
+   "taskId": "S01-FE",
+   "sprint": "S01",
+   "area": "Frontend",
+   "owner": "Gemini",
+   "reviewer": "Codex",
+   "registryStatus_v1_0_1": "done",
+   "outcome": "OUT-01",
+   "scope": "사용자 여정·디자인 토큰·화면 상태 명세",
+   "baseline_0918": 75,
+   "train_95a59b24_sec3": 100,
+   "landed_C_6fc0428b": 100,
+   "Z_03e17c31_v1_21": 100,
+   "proposedLanded_59f0a3c2": 100,
+   "proposedFixedChain_d47630d7": {
+    "low": 100,
+    "high": 100,
+    "unresolved": false
+   },
+   "rowMove": null,
+   "closureCommit": "b0313282963294fa7e69d4d9a36f0983365ab120",
+   "bindingPaths": {},
+   "bindingPresentBothTrees": null,
+   "hostedProof": "tree-level only (rescore §2: Backend 36424405419, Core 36424410039, Frontend 36424414288 @95a59b24); landed tip 59f0a3c2 13/13 runs success incl. 8 post-landing-verify",
+   "opsEvidenceAfter1104": null,
+   "missingStage": "none (formally done)",
+   "externalDeps": "—",
+   "ceilingNow": 100,
+   "confidence": "high",
+   "date": "2026-11-18",
+   "nextOwner": "none"
+  },
+  {
+   "taskId": "S01-BE",
+   "sprint": "S01",
+   "area": "Backend",
+   "owner": "Codex",
+   "reviewer": "Claude",
+   "registryStatus_v1_0_1": "blocked",
+   "outcome": "OUT-01",
+   "scope": "저장소·계약·개발 환경·권한 경계",
+   "baseline_0918": 75,
+   "train_95a59b24_sec3": 75,
+   "landed_C_6fc0428b": 75,
+   "Z_03e17c31_v1_21": 75,
+   "proposedLanded_59f0a3c2": 75,
+   "proposedFixedChain_d47630d7": {
+    "low": 75,
+    "high": 75,
+    "unresolved": false
+   },
+   "rowMove": null,
+   "closureCommit": null,
+   "bindingPaths": {},
+   "bindingPresentBothTrees": null,
+   "hostedProof": "tree-level only (rescore §2: Backend 36424405419, Core 36424410039, Frontend 36424414288 @95a59b24); landed tip 59f0a3c2 13/13 runs success incl. 8 post-landing-verify",
+   "opsEvidenceAfter1104": null,
+   "missingStage": "사용자 결정 U2·U3·U4 | 100 also blocked by: required operational acceptance absent",
+   "externalDeps": "사용자 결정",
+   "ceilingNow": "100 only after user decisions",
+   "confidence": "high",
+   "date": "2026-11-18",
+   "nextOwner": "user decisions U1-U6"
+  },
+  {
+   "taskId": "S01-DB",
+   "sprint": "S01",
+   "area": "DB",
+   "owner": "Codex",
+   "reviewer": "Claude",
+   "registryStatus_v1_0_1": "done",
+   "outcome": "OUT-01",
+   "scope": "ERD·ID·상태·마이그레이션 순서",
+   "baseline_0918": 75,
+   "train_95a59b24_sec3": 100,
+   "landed_C_6fc0428b": 100,
+   "Z_03e17c31_v1_21": 100,
+   "proposedLanded_59f0a3c2": 100,
+   "proposedFixedChain_d47630d7": {
+    "low": 100,
+    "high": 100,
+    "unresolved": false
+   },
+   "rowMove": null,
+   "closureCommit": "8b20d3e6691c6695230079a31fdf38bb387c7088",
+   "bindingPaths": {},
+   "bindingPresentBothTrees": null,
+   "hostedProof": "tree-level only (rescore §2: Backend 36424405419, Core 36424410039, Frontend 36424414288 @95a59b24); landed tip 59f0a3c2 13/13 runs success incl. 8 post-landing-verify",
+   "opsEvidenceAfter1104": null,
+   "missingStage": "none (formally done)",
+   "externalDeps": "—",
+   "ceilingNow": 100,
+   "confidence": "high",
+   "date": "2026-11-18",
+   "nextOwner": "none"
+  },
+  {
+   "taskId": "S01-ST",
+   "sprint": "S01",
+   "area": "Storage",
+   "owner": "Codex",
+   "reviewer": "Claude",
+   "registryStatus_v1_0_1": "blocked",
+   "outcome": "OUT-01",
+   "scope": "URI·보존·제품 검증·장비 인벤토리",
+   "baseline_0918": 50,
+   "train_95a59b24_sec3": 75,
+   "landed_C_6fc0428b": 75,
+   "Z_03e17c31_v1_21": 75,
+   "proposedLanded_59f0a3c2": 75,
+   "proposedFixedChain_d47630d7": {
+    "low": 75,
+    "high": 75,
+    "unresolved": false
+   },
+   "rowMove": null,
+   "closureCommit": null,
+   "bindingPaths": {
+    "tests/test_s01_readiness_preflight.py": {
+     "presentAt59f0a3c2": true,
+     "presentAtd47630d7": true,
+     "resolved": "tests/test_s01_readiness_preflight.py"
+    },
+    "tests/core/test_storage_roundtrip_verifier.py": {
+     "presentAt59f0a3c2": true,
+     "presentAtd47630d7": true,
+     "resolved": "tests/core/test_storage_roundtrip_verifier.py"
+    }
+   },
+   "bindingPresentBothTrees": true,
+   "hostedProof": "tree-level only (rescore §2: Backend 36424405419, Core 36424410039, Frontend 36424414288 @95a59b24); landed tip 59f0a3c2 13/13 runs success incl. 8 post-landing-verify",
+   "opsEvidenceAfter1104": null,
+   "missingStage": "사용자 결정 U1·U5·U6와 storage 제품 값 — 이것이 100을 막는 잔여이고 75의 근거와는 별개다 | 100 also blocked by: required operational acceptance absent",
+   "externalDeps": "G-20, 사용자 결정",
+   "ceilingNow": "100 only after user decisions",
+   "confidence": "high",
+   "date": "2026-11-18",
+   "nextOwner": "user decisions U1-U6"
+  },
+  {
+   "taskId": "S02-FE",
+   "sprint": "S02",
+   "area": "Frontend",
+   "owner": "Gemini",
+   "reviewer": "Codex",
+   "registryStatus_v1_0_1": "blocked",
+   "outcome": "OUT-02",
+   "scope": "로그인·Node 목록·상세·오류 상태",
+   "baseline_0918": 50,
+   "train_95a59b24_sec3": 75,
+   "landed_C_6fc0428b": 75,
+   "Z_03e17c31_v1_21": 75,
+   "proposedLanded_59f0a3c2": 75,
+   "proposedFixedChain_d47630d7": {
+    "low": 75,
+    "high": 75,
+    "unresolved": false
+   },
+   "rowMove": null,
+   "closureCommit": null,
+   "bindingPaths": {
+    "apps/web/tests/auth-session.test.ts": {
+     "presentAt59f0a3c2": true,
+     "presentAtd47630d7": true,
+     "resolved": "apps/web/tests/auth-session.test.ts"
+    },
+    "node-journey.test.ts": {
+     "presentAt59f0a3c2": true,
+     "presentAtd47630d7": true,
+     "resolved": "apps/web/tests/node-journey.test.ts"
+    }
+   },
+   "bindingPresentBothTrees": true,
+   "hostedProof": "tree-level only (rescore §2: Backend 36424405419, Core 36424410039, Frontend 36424414288 @95a59b24); landed tip 59f0a3c2 13/13 runs success incl. 8 post-landing-verify",
+   "opsEvidenceAfter1104": "abb707 real administrator Chrome PKCE login and 21 resource GETs (11-08); IdP on Main:8443 not listening 11-18 20:25",
+   "missingStage": "실 IdP 로그인 여정 | 100 also blocked by: prerequisite chain open (S01-BE/S01-ST blocked on user decisions; every later sprint depends on all four rows of the previous sprint); required operational acceptance absent",
+   "externalDeps": "G-15, G-18",
+   "ceilingNow": 75,
+   "confidence": "high",
+   "date": "2026-11-18",
+   "nextOwner": "Root operator + user for operational acceptance; row owner Gemini for any code gap"
+  },
+  {
+   "taskId": "S02-BE",
+   "sprint": "S02",
+   "area": "Backend",
+   "owner": "Claude",
+   "reviewer": "Codex",
+   "registryStatus_v1_0_1": "planned",
+   "outcome": "OUT-02",
+   "scope": "OIDC·mTLS 등록·Heartbeat",
+   "baseline_0918": 75,
+   "train_95a59b24_sec3": 75,
+   "landed_C_6fc0428b": 75,
+   "Z_03e17c31_v1_21": 75,
+   "proposedLanded_59f0a3c2": 75,
+   "proposedFixedChain_d47630d7": {
+    "low": 75,
+    "high": 75,
+    "unresolved": false
+   },
+   "rowMove": null,
+   "closureCommit": null,
+   "bindingPaths": {
+    "tests/test_node_auth.py": {
+     "presentAt59f0a3c2": true,
+     "presentAtd47630d7": true,
+     "resolved": "tests/test_node_auth.py"
+    },
+    "test_node_auth_commit.py": {
+     "presentAt59f0a3c2": true,
+     "presentAtd47630d7": true,
+     "resolved": "tests/test_node_auth_commit.py"
+    },
+    "core/test_terminal_ticket_authority.py": {
+     "presentAt59f0a3c2": true,
+     "presentAtd47630d7": true,
+     "resolved": "tests/core/test_terminal_ticket_authority.py"
+    }
+   },
+   "bindingPresentBothTrees": true,
+   "hostedProof": "tree-level only (rescore §2: Backend 36424405419, Core 36424410039, Frontend 36424414288 @95a59b24); landed tip 59f0a3c2 13/13 runs success incl. 8 post-landing-verify",
+   "opsEvidenceAfter1104": "three Linux Nodes admitted under pilot CA pki-r1 (11-07); CP leaf expired 11-09, CA expired 11-14 -> CA_TERMINAL",
+   "missingStage": "실 issuer·JWKS·client id, 운영 CA·client cert | 100 also blocked by: prerequisite chain open (S01-BE/S01-ST blocked on user decisions; every later sprint depends on all four rows of the previous sprint); required operational acceptance absent",
+   "externalDeps": "G-15, G-17",
+   "ceilingNow": 75,
+   "confidence": "high",
+   "date": "2026-11-18",
+   "nextOwner": "Root operator + user for operational acceptance; row owner Claude for any code gap"
+  },
+  {
+   "taskId": "S02-DB",
+   "sprint": "S02",
+   "area": "DB",
+   "owner": "Claude",
+   "reviewer": "Codex",
+   "registryStatus_v1_0_1": "blocked",
+   "outcome": "OUT-02",
+   "scope": "User·Node·Capability·Snapshot",
+   "baseline_0918": 75,
+   "train_95a59b24_sec3": 75,
+   "landed_C_6fc0428b": 75,
+   "Z_03e17c31_v1_21": 75,
+   "proposedLanded_59f0a3c2": 75,
+   "proposedFixedChain_d47630d7": {
+    "low": 75,
+    "high": 75,
+    "unresolved": false
+   },
+   "rowMove": null,
+   "closureCommit": null,
+   "bindingPaths": {
+    "tests/core/test_node_output.py": {
+     "presentAt59f0a3c2": true,
+     "presentAtd47630d7": true,
+     "resolved": "tests/core/test_node_output.py"
+    },
+    "tests/core/test_node_chunk.py": {
+     "presentAt59f0a3c2": true,
+     "presentAtd47630d7": true,
+     "resolved": "tests/core/test_node_chunk.py"
+    }
+   },
+   "bindingPresentBothTrees": true,
+   "hostedProof": "tree-level only (rescore §2: Backend 36424405419, Core 36424410039, Frontend 36424414288 @95a59b24); landed tip 59f0a3c2 13/13 runs success incl. 8 post-landing-verify",
+   "opsEvidenceAfter1104": "same three Node rows; trust now terminal",
+   "missingStage": "실 등록 흐름의 인증 실패 기록 인수 | 100 also blocked by: prerequisite chain open (S01-BE/S01-ST blocked on user decisions; every later sprint depends on all four rows of the previous sprint); required operational acceptance absent",
+   "externalDeps": "G-15",
+   "ceilingNow": 75,
+   "confidence": "high",
+   "date": "2026-11-18",
+   "nextOwner": "Root operator + user for operational acceptance; row owner Claude for any code gap"
+  },
+  {
+   "taskId": "S02-ST",
+   "sprint": "S02",
+   "area": "Storage",
+   "owner": "Claude",
+   "reviewer": "Codex",
+   "registryStatus_v1_0_1": "planned",
+   "outcome": "OUT-02",
+   "scope": "제공 폴더·DataLocation 카탈로그",
+   "baseline_0918": 50,
+   "train_95a59b24_sec3": 75,
+   "landed_C_6fc0428b": 75,
+   "Z_03e17c31_v1_21": 75,
+   "proposedLanded_59f0a3c2": 75,
+   "proposedFixedChain_d47630d7": {
+    "low": 75,
+    "high": 75,
+    "unresolved": false
+   },
+   "rowMove": null,
+   "closureCommit": null,
+   "bindingPaths": {
+    "tests/core/test_storage_list_response_contract.py": {
+     "presentAt59f0a3c2": true,
+     "presentAtd47630d7": true,
+     "resolved": "tests/core/test_storage_list_response_contract.py"
+    }
+   },
+   "bindingPresentBothTrees": true,
+   "hostedProof": "tree-level only (rescore §2: Backend 36424405419, Core 36424410039, Frontend 36424414288 @95a59b24); landed tip 59f0a3c2 13/13 runs success incl. 8 post-landing-verify",
+   "opsEvidenceAfter1104": null,
+   "missingStage": "실 API·브라우저 여정·인증 실패 기록 | 100 also blocked by: prerequisite chain open (S01-BE/S01-ST blocked on user decisions; every later sprint depends on all four rows of the previous sprint); required operational acceptance absent",
+   "externalDeps": "G-20",
+   "ceilingNow": 75,
+   "confidence": "high",
+   "date": "2026-11-18",
+   "nextOwner": "Root operator + user for operational acceptance; row owner Claude for any code gap"
+  },
+  {
+   "taskId": "S03-FE",
+   "sprint": "S03",
+   "area": "Frontend",
+   "owner": "Gemini",
+   "reviewer": "Codex",
+   "registryStatus_v1_0_1": "planned",
+   "outcome": "OUT-03",
+   "scope": "Project·Workspace 생성과 실행 결과",
+   "baseline_0918": 50,
+   "train_95a59b24_sec3": 75,
+   "landed_C_6fc0428b": 75,
+   "Z_03e17c31_v1_21": 75,
+   "proposedLanded_59f0a3c2": 75,
+   "proposedFixedChain_d47630d7": {
+    "low": 75,
+    "high": 75,
+    "unresolved": false
+   },
+   "rowMove": null,
+   "closureCommit": null,
+   "bindingPaths": {
+    "apps/web/tests/workspace-execution.test.ts": {
+     "presentAt59f0a3c2": true,
+     "presentAtd47630d7": true,
+     "resolved": "apps/web/tests/workspace-execution.test.ts"
+    },
+    "workspace-list-5state-contract.test.tsx": {
+     "presentAt59f0a3c2": true,
+     "presentAtd47630d7": true,
+     "resolved": "apps/web/tests/workspace-list-5state-contract.test.tsx"
+    }
+   },
+   "bindingPresentBothTrees": true,
+   "hostedProof": "tree-level only (rescore §2: Backend 36424405419, Core 36424410039, Frontend 36424414288 @95a59b24); landed tip 59f0a3c2 13/13 runs success incl. 8 post-landing-verify",
+   "opsEvidenceAfter1104": "FirstWorkspacePanel deployed in abb707; no executed result to show",
+   "missingStage": "실행 결과·증거 ID 화면 인수 | 100 also blocked by: prerequisite chain open (S01-BE/S01-ST blocked on user decisions; every later sprint depends on all four rows of the previous sprint); required operational acceptance absent",
+   "externalDeps": "G-19",
+   "ceilingNow": 75,
+   "confidence": "high",
+   "date": "2026-11-18",
+   "nextOwner": "Root operator + user for operational acceptance; row owner Gemini for any code gap"
+  },
+  {
+   "taskId": "S03-BE",
+   "sprint": "S03",
+   "area": "Backend",
+   "owner": "Codex",
+   "reviewer": "Claude",
+   "registryStatus_v1_0_1": "planned",
+   "outcome": "OUT-03",
+   "scope": "Sandbox·Tool Gateway·기본 정책",
+   "baseline_0918": 75,
+   "train_95a59b24_sec3": 75,
+   "landed_C_6fc0428b": 75,
+   "Z_03e17c31_v1_21": 75,
+   "proposedLanded_59f0a3c2": 75,
+   "proposedFixedChain_d47630d7": {
+    "low": 75,
+    "high": 75,
+    "unresolved": false
+   },
+   "rowMove": null,
+   "closureCommit": null,
+   "bindingPaths": {
+    "tests/core/test_sandbox_contracts.py": {
+     "presentAt59f0a3c2": true,
+     "presentAtd47630d7": true,
+     "resolved": "tests/core/test_sandbox_contracts.py"
+    },
+    "integration/test_tool_admission.py": {
+     "presentAt59f0a3c2": true,
+     "presentAtd47630d7": true,
+     "resolved": "tests/integration/test_tool_admission.py"
+    }
+   },
+   "bindingPresentBothTrees": true,
+   "hostedProof": "tree-level only (rescore §2: Backend 36424405419, Core 36424410039, Frontend 36424414288 @95a59b24); landed tip 59f0a3c2 13/13 runs success incl. 8 post-landing-verify",
+   "opsEvidenceAfter1104": "first-workspace intent route deployed (API96, schema 0068); kill switch / no workload executed",
+   "missingStage": "실 5노드 허용·거부 로그 인수 | 100 also blocked by: prerequisite chain open (S01-BE/S01-ST blocked on user decisions; every later sprint depends on all four rows of the previous sprint); required operational acceptance absent",
+   "externalDeps": "G-19, G-24",
+   "ceilingNow": 75,
+   "confidence": "high",
+   "date": "2026-11-18",
+   "nextOwner": "Root operator + user for operational acceptance; row owner Codex for any code gap"
+  },
+  {
+   "taskId": "S03-DB",
+   "sprint": "S03",
+   "area": "DB",
+   "owner": "Claude",
+   "reviewer": "Codex",
+   "registryStatus_v1_0_1": "planned",
+   "outcome": "OUT-03",
+   "scope": "Workspace·Workload·Run·Evidence",
+   "baseline_0918": 75,
+   "train_95a59b24_sec3": 75,
+   "landed_C_6fc0428b": 75,
+   "Z_03e17c31_v1_21": 75,
+   "proposedLanded_59f0a3c2": 75,
+   "proposedFixedChain_d47630d7": {
+    "low": 75,
+    "high": 75,
+    "unresolved": false
+   },
+   "rowMove": null,
+   "closureCommit": null,
+   "bindingPaths": {
+    "tests/core/test_evidence_envelope_serving.py": {
+     "presentAt59f0a3c2": true,
+     "presentAtd47630d7": true,
+     "resolved": "tests/core/test_evidence_envelope_serving.py"
+    },
+    "core/test_run_record_artifacts_route.py": {
+     "presentAt59f0a3c2": true,
+     "presentAtd47630d7": true,
+     "resolved": "tests/core/test_run_record_artifacts_route.py"
+    }
+   },
+   "bindingPresentBothTrees": true,
+   "hostedProof": "tree-level only (rescore §2: Backend 36424405419, Core 36424410039, Frontend 36424414288 @95a59b24); landed tip 59f0a3c2 13/13 runs success incl. 8 post-landing-verify",
+   "opsEvidenceAfter1104": "workspace intent + run_01M6VXSMM9SV8MAB7K4B1YCRX8 recorded, awaiting_approval, never executed",
+   "missingStage": "exit code·증거 ID 운영 인수 | 100 also blocked by: prerequisite chain open (S01-BE/S01-ST blocked on user decisions; every later sprint depends on all four rows of the previous sprint); required operational acceptance absent",
+   "externalDeps": "—",
+   "ceilingNow": 75,
+   "confidence": "high",
+   "date": "2026-11-18",
+   "nextOwner": "Root operator + user for operational acceptance; row owner Claude for any code gap"
+  },
+  {
+   "taskId": "S03-ST",
+   "sprint": "S03",
+   "area": "Storage",
+   "owner": "Claude",
+   "reviewer": "Codex",
+   "registryStatus_v1_0_1": "planned",
+   "outcome": "OUT-03",
+   "scope": "볼륨·Artifact 기본 전송",
+   "baseline_0918": 50,
+   "train_95a59b24_sec3": 50,
+   "landed_C_6fc0428b": 50,
+   "Z_03e17c31_v1_21": 50,
+   "proposedLanded_59f0a3c2": 50,
+   "proposedFixedChain_d47630d7": {
+    "low": 50,
+    "high": 50,
+    "unresolved": false
+   },
+   "rowMove": null,
+   "closureCommit": null,
+   "bindingPaths": {
+    "tests/core/test_artifact_content_contract.py": {
+     "presentAt59f0a3c2": true,
+     "presentAtd47630d7": true,
+     "resolved": "tests/core/test_artifact_content_contract.py"
+    }
+   },
+   "bindingPresentBothTrees": true,
+   "hostedProof": "tree-level only (rescore §2: Backend 36424405419, Core 36424410039, Frontend 36424414288 @95a59b24); landed tip 59f0a3c2 13/13 runs success incl. 8 post-landing-verify",
+   "opsEvidenceAfter1104": null,
+   "missingStage": "실 Node→CP 전송·볼륨 마운트 | 100 also blocked by: prerequisite chain open (S01-BE/S01-ST blocked on user decisions; every later sprint depends on all four rows of the previous sprint); required operational acceptance absent",
+   "externalDeps": "G-24",
+   "ceilingNow": 75,
+   "confidence": "high",
+   "date": "2026-11-18",
+   "nextOwner": "Root operator + user for operational acceptance; row owner Claude for any code gap"
+  },
+  {
+   "taskId": "S04-FE",
+   "sprint": "S04",
+   "area": "Frontend",
+   "owner": "Gemini",
+   "reviewer": "Codex",
+   "registryStatus_v1_0_1": "planned",
+   "outcome": "OUT-04",
+   "scope": "승인 화면·Run SSE 타임라인",
+   "baseline_0918": 50,
+   "train_95a59b24_sec3": 75,
+   "landed_C_6fc0428b": 75,
+   "Z_03e17c31_v1_21": 75,
+   "proposedLanded_59f0a3c2": 75,
+   "proposedFixedChain_d47630d7": {
+    "low": 75,
+    "high": 75,
+    "unresolved": false
+   },
+   "rowMove": null,
+   "closureCommit": null,
+   "bindingPaths": {
+    "apps/web/tests/approval-review.test.tsx": {
+     "presentAt59f0a3c2": true,
+     "presentAtd47630d7": true,
+     "resolved": "apps/web/tests/approval-review.test.tsx"
+    },
+    "approval-timeline.test.ts": {
+     "presentAt59f0a3c2": true,
+     "presentAtd47630d7": true,
+     "resolved": "apps/web/tests/approval-timeline.test.ts"
+    }
+   },
+   "bindingPresentBothTrees": true,
+   "hostedProof": "tree-level only (rescore §2: Backend 36424405419, Core 36424410039, Frontend 36424414288 @95a59b24); landed tip 59f0a3c2 13/13 runs success incl. 8 post-landing-verify",
+   "opsEvidenceAfter1104": "same approval visible; no completed approve/cancel journey",
+   "missingStage": "만료·취소·재전송 통합 인수 | 100 also blocked by: prerequisite chain open (S01-BE/S01-ST blocked on user decisions; every later sprint depends on all four rows of the previous sprint); required operational acceptance absent",
+   "externalDeps": "—",
+   "ceilingNow": 75,
+   "confidence": "high",
+   "date": "2026-11-18",
+   "nextOwner": "Root operator + user for operational acceptance; row owner Gemini for any code gap"
+  },
+  {
+   "taskId": "S04-BE",
+   "sprint": "S04",
+   "area": "Backend",
+   "owner": "Codex",
+   "reviewer": "Claude",
+   "registryStatus_v1_0_1": "planned",
+   "outcome": "OUT-04",
+   "scope": "취소·timeout·승인 digest·재연결",
+   "baseline_0918": 75,
+   "train_95a59b24_sec3": 75,
+   "landed_C_6fc0428b": 75,
+   "Z_03e17c31_v1_21": 75,
+   "proposedLanded_59f0a3c2": 75,
+   "proposedFixedChain_d47630d7": {
+    "low": 75,
+    "high": 75,
+    "unresolved": false
+   },
+   "rowMove": null,
+   "closureCommit": null,
+   "bindingPaths": {
+    "tests/core/test_approval_contracts.py": {
+     "presentAt59f0a3c2": true,
+     "presentAtd47630d7": true,
+     "resolved": "tests/core/test_approval_contracts.py"
+    },
+    "core/test_approval_review_response_contract.py": {
+     "presentAt59f0a3c2": true,
+     "presentAtd47630d7": true,
+     "resolved": "tests/core/test_approval_review_response_contract.py"
+    }
+   },
+   "bindingPresentBothTrees": true,
+   "hostedProof": "tree-level only (rescore §2: Backend 36424405419, Core 36424410039, Frontend 36424414288 @95a59b24); landed tip 59f0a3c2 13/13 runs success incl. 8 post-landing-verify",
+   "opsEvidenceAfter1104": "approval apr_01M6VXSPZ0252M2SJ8ZA5E11QE 0/2 genuine approvers, expired 11-08 06:24 KST, enqueueEligible=false",
+   "missingStage": "실 브라우저 여정 인수 | 100 also blocked by: prerequisite chain open (S01-BE/S01-ST blocked on user decisions; every later sprint depends on all four rows of the previous sprint); required operational acceptance absent",
+   "externalDeps": "G-23",
+   "ceilingNow": 75,
+   "confidence": "high",
+   "date": "2026-11-18",
+   "nextOwner": "Root operator + user for operational acceptance; row owner Codex for any code gap"
+  },
+  {
+   "taskId": "S04-DB",
+   "sprint": "S04",
+   "area": "DB",
+   "owner": "Codex",
+   "reviewer": "Claude",
+   "registryStatus_v1_0_1": "planned",
+   "outcome": "OUT-04",
+   "scope": "허용 상태 전이·outbox·idempotency",
+   "baseline_0918": 75,
+   "train_95a59b24_sec3": 75,
+   "landed_C_6fc0428b": 75,
+   "Z_03e17c31_v1_21": 75,
+   "proposedLanded_59f0a3c2": 75,
+   "proposedFixedChain_d47630d7": {
+    "low": 75,
+    "high": 75,
+    "unresolved": false
+   },
+   "rowMove": null,
+   "closureCommit": null,
+   "bindingPaths": {
+    "services/control-plane/src/inv/output_ingestion.py": {
+     "presentAt59f0a3c2": true,
+     "presentAtd47630d7": true,
+     "resolved": "services/control-plane/src/inv/output_ingestion.py"
+    },
+    "services/control-plane/src/inv/result_view.py": {
+     "presentAt59f0a3c2": true,
+     "presentAtd47630d7": true,
+     "resolved": "services/control-plane/src/inv/result_view.py"
+    },
+    "tools/check_contract_bindings.py": {
+     "presentAt59f0a3c2": true,
+     "presentAtd47630d7": true,
+     "resolved": "tools/check_contract_bindings.py"
+    }
+   },
+   "bindingPresentBothTrees": true,
+   "hostedProof": "tree-level only (rescore §2: Backend 36424405419, Core 36424410039, Frontend 36424414288 @95a59b24); landed tip 59f0a3c2 13/13 runs success incl. 8 post-landing-verify",
+   "opsEvidenceAfter1104": null,
+   "missingStage": "중복 요청·재전송 운영 인수 | 100 also blocked by: prerequisite chain open (S01-BE/S01-ST blocked on user decisions; every later sprint depends on all four rows of the previous sprint); required operational acceptance absent",
+   "externalDeps": "—",
+   "ceilingNow": 75,
+   "confidence": "high",
+   "date": "2026-11-18",
+   "nextOwner": "Root operator + user for operational acceptance; row owner Codex for any code gap"
+  },
+  {
+   "taskId": "S04-ST",
+   "sprint": "S04",
+   "area": "Storage",
+   "owner": "Codex",
+   "reviewer": "Claude",
+   "registryStatus_v1_0_1": "planned",
+   "outcome": "OUT-04",
+   "scope": "전송 재개·실제 checksum 검증",
+   "baseline_0918": 75,
+   "train_95a59b24_sec3": 75,
+   "landed_C_6fc0428b": 75,
+   "Z_03e17c31_v1_21": 75,
+   "proposedLanded_59f0a3c2": 75,
+   "proposedFixedChain_d47630d7": {
+    "low": 75,
+    "high": 75,
+    "unresolved": false
+   },
+   "rowMove": null,
+   "closureCommit": null,
+   "bindingPaths": {
+    "tests/integration/test_output_ingestion.py": {
+     "presentAt59f0a3c2": true,
+     "presentAtd47630d7": true,
+     "resolved": "tests/integration/test_output_ingestion.py"
+    }
+   },
+   "bindingPresentBothTrees": true,
+   "hostedProof": "tree-level only (rescore §2: Backend 36424405419, Core 36424410039, Frontend 36424414288 @95a59b24); landed tip 59f0a3c2 13/13 runs success incl. 8 post-landing-verify",
+   "opsEvidenceAfter1104": null,
+   "missingStage": "제품 S3 multipart·최대 50GiB·원격 전송 검증 | 100 also blocked by: prerequisite chain open (S01-BE/S01-ST blocked on user decisions; every later sprint depends on all four rows of the previous sprint); required operational acceptance absent",
+   "externalDeps": "G-24",
+   "ceilingNow": 75,
+   "confidence": "high",
+   "date": "2026-11-18",
+   "nextOwner": "Root operator + user for operational acceptance; row owner Codex for any code gap"
+  },
+  {
+   "taskId": "S05-FE",
+   "sprint": "S05",
+   "area": "Frontend",
+   "owner": "Gemini",
+   "reviewer": "Codex",
+   "registryStatus_v1_0_1": "planned",
+   "outcome": "OUT-05",
+   "scope": "자원 그래프·후보 제외·Explain",
+   "baseline_0918": 50,
+   "train_95a59b24_sec3": 75,
+   "landed_C_6fc0428b": 75,
+   "Z_03e17c31_v1_21": 75,
+   "proposedLanded_59f0a3c2": 75,
+   "proposedFixedChain_d47630d7": {
+    "low": 75,
+    "high": 75,
+    "unresolved": false
+   },
+   "rowMove": null,
+   "closureCommit": null,
+   "bindingPaths": {
+    "apps/web/tests/placement-explain.test.ts": {
+     "presentAt59f0a3c2": true,
+     "presentAtd47630d7": true,
+     "resolved": "apps/web/tests/placement-explain.test.ts"
+    },
+    "placement-simulator.test.tsx": {
+     "presentAt59f0a3c2": true,
+     "presentAtd47630d7": true,
+     "resolved": "apps/web/tests/placement-simulator.test.tsx"
+    }
+   },
+   "bindingPresentBothTrees": true,
+   "hostedProof": "tree-level only (rescore §2: Backend 36424405419, Core 36424410039, Frontend 36424414288 @95a59b24); landed tip 59f0a3c2 13/13 runs success incl. 8 post-landing-verify",
+   "opsEvidenceAfter1104": "canonical dashboard resources (abb707) showed the measured limits, not hardware totals",
+   "missingStage": "물리 5노드 Explain 인수 | 100 also blocked by: prerequisite chain open (S01-BE/S01-ST blocked on user decisions; every later sprint depends on all four rows of the previous sprint); required operational acceptance absent",
+   "externalDeps": "G-19",
+   "ceilingNow": 75,
+   "confidence": "high",
+   "date": "2026-11-18",
+   "nextOwner": "Root operator + user for operational acceptance; row owner Gemini for any code gap"
+  },
+  {
+   "taskId": "S05-BE",
+   "sprint": "S05",
+   "area": "Backend",
+   "owner": "Codex",
+   "reviewer": "Claude",
+   "registryStatus_v1_0_1": "planned",
+   "outcome": "OUT-05",
+   "scope": "Hard filter·가중 score·Node 재검증",
+   "baseline_0918": 75,
+   "train_95a59b24_sec3": 75,
+   "landed_C_6fc0428b": 75,
+   "Z_03e17c31_v1_21": 75,
+   "proposedLanded_59f0a3c2": 75,
+   "proposedFixedChain_d47630d7": {
+    "low": 75,
+    "high": 75,
+    "unresolved": false
+   },
+   "rowMove": null,
+   "closureCommit": null,
+   "bindingPaths": {
+    "tests/integration/test_placement.py": {
+     "presentAt59f0a3c2": true,
+     "presentAtd47630d7": true,
+     "resolved": "tests/integration/test_placement.py"
+    },
+    "tests/core/test_pool_placement_response_contract.py": {
+     "presentAt59f0a3c2": true,
+     "presentAtd47630d7": true,
+     "resolved": "tests/core/test_pool_placement_response_contract.py"
+    }
+   },
+   "bindingPresentBothTrees": true,
+   "hostedProof": "tree-level only (rescore §2: Backend 36424405419, Core 36424410039, Frontend 36424414288 @95a59b24); landed tip 59f0a3c2 13/13 runs success incl. 8 post-landing-verify",
+   "opsEvidenceAfter1104": "capacity readback: 3 Nodes x 500m/64MiB measured, total 1500m/192MiB, GPU not offered",
+   "missingStage": "물리 5노드 AC-05 placement load SLO = `NOT_OBSERVED` | 100 also blocked by: prerequisite chain open (S01-BE/S01-ST blocked on user decisions; every later sprint depends on all four rows of the previous sprint); required operational acceptance absent",
+   "externalDeps": "G-19",
+   "ceilingNow": 75,
+   "confidence": "high",
+   "date": "2026-11-18",
+   "nextOwner": "Root operator + user for operational acceptance; row owner Codex for any code gap"
+  },
+  {
+   "taskId": "S05-DB",
+   "sprint": "S05",
+   "area": "DB",
+   "owner": "Codex",
+   "reviewer": "Claude",
+   "registryStatus_v1_0_1": "planned",
+   "outcome": "OUT-05",
+   "scope": "Lease 잠금·Fencing·Allocation",
+   "baseline_0918": 75,
+   "train_95a59b24_sec3": 75,
+   "landed_C_6fc0428b": 75,
+   "Z_03e17c31_v1_21": 75,
+   "proposedLanded_59f0a3c2": 75,
+   "proposedFixedChain_d47630d7": {
+    "low": 75,
+    "high": 75,
+    "unresolved": false
+   },
+   "rowMove": null,
+   "closureCommit": null,
+   "bindingPaths": {
+    "tests/core/test_placement_lock_budget.py": {
+     "presentAt59f0a3c2": true,
+     "presentAtd47630d7": true,
+     "resolved": "tests/core/test_placement_lock_budget.py"
+    },
+    "integration/test_lock_wait_real_pg.py": {
+     "presentAt59f0a3c2": true,
+     "presentAtd47630d7": true,
+     "resolved": "tests/integration/test_lock_wait_real_pg.py"
+    }
+   },
+   "bindingPresentBothTrees": true,
+   "hostedProof": "tree-level only (rescore §2: Backend 36424405419, Core 36424410039, Frontend 36424414288 @95a59b24); landed tip 59f0a3c2 13/13 runs success incl. 8 post-landing-verify",
+   "opsEvidenceAfter1104": null,
+   "missingStage": "경합 시험의 물리 5노드 분모 | 100 also blocked by: prerequisite chain open (S01-BE/S01-ST blocked on user decisions; every later sprint depends on all four rows of the previous sprint); required operational acceptance absent",
+   "externalDeps": "G-19",
+   "ceilingNow": 75,
+   "confidence": "high",
+   "date": "2026-11-18",
+   "nextOwner": "Root operator + user for operational acceptance; row owner Codex for any code gap"
+  },
+  {
+   "taskId": "S05-ST",
+   "sprint": "S05",
+   "area": "Storage",
+   "owner": "Codex",
+   "reviewer": "Claude",
+   "registryStatus_v1_0_1": "planned",
+   "outcome": "OUT-05",
+   "scope": "지역성·전송 비용·권한 확인",
+   "baseline_0918": 50,
+   "train_95a59b24_sec3": 50,
+   "landed_C_6fc0428b": 50,
+   "Z_03e17c31_v1_21": 50,
+   "proposedLanded_59f0a3c2": 50,
+   "proposedFixedChain_d47630d7": {
+    "low": 50,
+    "high": 50,
+    "unresolved": false
+   },
+   "rowMove": null,
+   "closureCommit": null,
+   "bindingPaths": {
+    "tests/integration/test_model_locality.py": {
+     "presentAt59f0a3c2": true,
+     "presentAtd47630d7": true,
+     "resolved": "tests/integration/test_model_locality.py"
+    }
+   },
+   "bindingPresentBothTrees": true,
+   "hostedProof": "tree-level only (rescore §2: Backend 36424405419, Core 36424410039, Frontend 36424414288 @95a59b24); landed tip 59f0a3c2 13/13 runs success incl. 8 post-landing-verify",
+   "opsEvidenceAfter1104": null,
+   "missingStage": "실 장비 지역성 인수 | 100 also blocked by: prerequisite chain open (S01-BE/S01-ST blocked on user decisions; every later sprint depends on all four rows of the previous sprint); required operational acceptance absent",
+   "externalDeps": "G-19, G-24",
+   "ceilingNow": 75,
+   "confidence": "high",
+   "date": "2026-11-18",
+   "nextOwner": "Root operator + user for operational acceptance; row owner Codex for any code gap"
+  },
+  {
+   "taskId": "S06-FE",
+   "sprint": "S06",
+   "area": "Frontend",
+   "owner": "Gemini",
+   "reviewer": "Codex",
+   "registryStatus_v1_0_1": "planned",
+   "outcome": "OUT-06",
+   "scope": "Monaco·xterm·diff·session UX",
+   "baseline_0918": 50,
+   "train_95a59b24_sec3": 75,
+   "landed_C_6fc0428b": 75,
+   "Z_03e17c31_v1_21": 75,
+   "proposedLanded_59f0a3c2": 75,
+   "proposedFixedChain_d47630d7": {
+    "low": 75,
+    "high": 75,
+    "unresolved": false
+   },
+   "rowMove": null,
+   "closureCommit": null,
+   "bindingPaths": {
+    "apps/web/tests/monaco-workspace-editor-wiring.test.tsx": {
+     "presentAt59f0a3c2": true,
+     "presentAtd47630d7": true,
+     "resolved": "apps/web/tests/monaco-workspace-editor-wiring.test.tsx"
+    },
+    "ws-terminal.test.ts": {
+     "presentAt59f0a3c2": true,
+     "presentAtd47630d7": true,
+     "resolved": "apps/web/tests/ws-terminal.test.ts"
+    }
+   },
+   "bindingPresentBothTrees": true,
+   "hostedProof": "tree-level only (rescore §2: Backend 36424405419, Core 36424410039, Frontend 36424414288 @95a59b24); landed tip 59f0a3c2 13/13 runs success incl. 8 post-landing-verify",
+   "opsEvidenceAfter1104": null,
+   "missingStage": "실 5노드 remote PTY = `UNMEASURED`(S06-FE matrix PTY-04) | 100 also blocked by: prerequisite chain open (S01-BE/S01-ST blocked on user decisions; every later sprint depends on all four rows of the previous sprint); required operational acceptance absent",
+   "externalDeps": "G-19, G-24",
+   "ceilingNow": 75,
+   "confidence": "high",
+   "date": "2026-11-18",
+   "nextOwner": "Root operator + user for operational acceptance; row owner Gemini for any code gap"
+  },
+  {
+   "taskId": "S06-BE",
+   "sprint": "S06",
+   "area": "Backend",
+   "owner": "Codex",
+   "reviewer": "Claude",
+   "registryStatus_v1_0_1": "planned",
+   "outcome": "OUT-06",
+   "scope": "Git·PTY·checkpoint·resume",
+   "baseline_0918": 75,
+   "train_95a59b24_sec3": 75,
+   "landed_C_6fc0428b": 75,
+   "Z_03e17c31_v1_21": 75,
+   "proposedLanded_59f0a3c2": 75,
+   "proposedFixedChain_d47630d7": {
+    "low": 75,
+    "high": 75,
+    "unresolved": false
+   },
+   "rowMove": null,
+   "closureCommit": null,
+   "bindingPaths": {
+    "tests/core/test_workspace_resume_contract.py": {
+     "presentAt59f0a3c2": true,
+     "presentAtd47630d7": true,
+     "resolved": "tests/core/test_workspace_resume_contract.py"
+    },
+    "integration/test_resume_input_readiness.py": {
+     "presentAt59f0a3c2": true,
+     "presentAtd47630d7": true,
+     "resolved": "tests/integration/test_resume_input_readiness.py"
+    }
+   },
+   "bindingPresentBothTrees": true,
+   "hostedProof": "tree-level only (rescore §2: Backend 36424405419, Core 36424410039, Frontend 36424414288 @95a59b24); landed tip 59f0a3c2 13/13 runs success incl. 8 post-landing-verify",
+   "opsEvidenceAfter1104": null,
+   "missingStage": "실 WS/PTY·restart·restore 인수 | 100 also blocked by: prerequisite chain open (S01-BE/S01-ST blocked on user decisions; every later sprint depends on all four rows of the previous sprint); required operational acceptance absent",
+   "externalDeps": "G-19, G-24",
+   "ceilingNow": 75,
+   "confidence": "high",
+   "date": "2026-11-18",
+   "nextOwner": "Root operator + user for operational acceptance; row owner Codex for any code gap"
+  },
+  {
+   "taskId": "S06-DB",
+   "sprint": "S06",
+   "area": "DB",
+   "owner": "Codex",
+   "reviewer": "Claude",
+   "registryStatus_v1_0_1": "planned",
+   "outcome": "OUT-06",
+   "scope": "RunAttempt·Step·Checkpoint·session",
+   "baseline_0918": 75,
+   "train_95a59b24_sec3": 75,
+   "landed_C_6fc0428b": 75,
+   "Z_03e17c31_v1_21": 75,
+   "proposedLanded_59f0a3c2": 75,
+   "proposedFixedChain_d47630d7": {
+    "low": 75,
+    "high": 75,
+    "unresolved": false
+   },
+   "rowMove": null,
+   "closureCommit": null,
+   "bindingPaths": {
+    "tests/core/test_run_attempt_contract.py": {
+     "presentAt59f0a3c2": true,
+     "presentAtd47630d7": true,
+     "resolved": "tests/core/test_run_attempt_contract.py"
+    }
+   },
+   "bindingPresentBothTrees": true,
+   "hostedProof": "tree-level only (rescore §2: Backend 36424405419, Core 36424410039, Frontend 36424414288 @95a59b24); landed tip 59f0a3c2 13/13 runs success incl. 8 post-landing-verify",
+   "opsEvidenceAfter1104": null,
+   "missingStage": "restore 운영 인수 | 100 also blocked by: prerequisite chain open (S01-BE/S01-ST blocked on user decisions; every later sprint depends on all four rows of the previous sprint); required operational acceptance absent",
+   "externalDeps": "—",
+   "ceilingNow": 75,
+   "confidence": "high",
+   "date": "2026-11-18",
+   "nextOwner": "Root operator + user for operational acceptance; row owner Codex for any code gap"
+  },
+  {
+   "taskId": "S06-ST",
+   "sprint": "S06",
+   "area": "Storage",
+   "owner": "Codex",
+   "reviewer": "Claude",
+   "registryStatus_v1_0_1": "planned",
+   "outcome": "OUT-06",
+   "scope": "persistent snapshot·복원 경로",
+   "baseline_0918": 75,
+   "train_95a59b24_sec3": 75,
+   "landed_C_6fc0428b": 75,
+   "Z_03e17c31_v1_21": 75,
+   "proposedLanded_59f0a3c2": 75,
+   "proposedFixedChain_d47630d7": {
+    "low": 75,
+    "high": 75,
+    "unresolved": false
+   },
+   "rowMove": null,
+   "closureCommit": null,
+   "bindingPaths": {
+    "tests/integration/test_workspace_resume.py": {
+     "presentAt59f0a3c2": true,
+     "presentAtd47630d7": true,
+     "resolved": "tests/integration/test_workspace_resume.py"
+    },
+    "integration/test_snapshots.py": {
+     "presentAt59f0a3c2": true,
+     "presentAtd47630d7": true,
+     "resolved": "tests/integration/test_snapshots.py"
+    }
+   },
+   "bindingPresentBothTrees": true,
+   "hostedProof": "tree-level only (rescore §2: Backend 36424405419, Core 36424410039, Frontend 36424414288 @95a59b24); landed tip 59f0a3c2 13/13 runs success incl. 8 post-landing-verify",
+   "opsEvidenceAfter1104": null,
+   "missingStage": "원격 대체 Node·대용량 복원 인수 | 100 also blocked by: prerequisite chain open (S01-BE/S01-ST blocked on user decisions; every later sprint depends on all four rows of the previous sprint); required operational acceptance absent",
+   "externalDeps": "G-19",
+   "ceilingNow": 75,
+   "confidence": "high",
+   "date": "2026-11-18",
+   "nextOwner": "Root operator + user for operational acceptance; row owner Codex for any code gap"
+  },
+  {
+   "taskId": "S07-FE",
+   "sprint": "S07",
+   "area": "Frontend",
+   "owner": "Gemini",
+   "reviewer": "Codex",
+   "registryStatus_v1_0_1": "planned",
+   "outcome": "OUT-07",
+   "scope": "offline·recovering·stale 상태 UI",
+   "baseline_0918": 50,
+   "train_95a59b24_sec3": 75,
+   "landed_C_6fc0428b": 75,
+   "Z_03e17c31_v1_21": 75,
+   "proposedLanded_59f0a3c2": 75,
+   "proposedFixedChain_d47630d7": {
+    "low": 75,
+    "high": 75,
+    "unresolved": false
+   },
+   "rowMove": null,
+   "closureCommit": null,
+   "bindingPaths": {
+    "apps/web/tests/node-status-lost-unknown-guard.test.tsx": {
+     "presentAt59f0a3c2": true,
+     "presentAtd47630d7": true,
+     "resolved": "apps/web/tests/node-status-lost-unknown-guard.test.tsx"
+    },
+    "distributed-recovery.test.ts": {
+     "presentAt59f0a3c2": true,
+     "presentAtd47630d7": true,
+     "resolved": "apps/web/tests/distributed-recovery.test.ts"
+    }
+   },
+   "bindingPresentBothTrees": true,
+   "hostedProof": "tree-level only (rescore §2: Backend 36424405419, Core 36424410039, Frontend 36424414288 @95a59b24); landed tip 59f0a3c2 13/13 runs success incl. 8 post-landing-verify",
+   "opsEvidenceAfter1104": null,
+   "missingStage": "물리 Node 중단 인수 | 100 also blocked by: prerequisite chain open (S01-BE/S01-ST blocked on user decisions; every later sprint depends on all four rows of the previous sprint); required operational acceptance absent",
+   "externalDeps": "G-19",
+   "ceilingNow": 75,
+   "confidence": "high",
+   "date": "2026-11-18",
+   "nextOwner": "Root operator + user for operational acceptance; row owner Gemini for any code gap"
+  },
+  {
+   "taskId": "S07-BE",
+   "sprint": "S07",
+   "area": "Backend",
+   "owner": "Codex",
+   "reviewer": "Claude",
+   "registryStatus_v1_0_1": "planned",
+   "outcome": "OUT-07",
+   "scope": "drain·재스케줄·reconciliation",
+   "baseline_0918": 75,
+   "train_95a59b24_sec3": 75,
+   "landed_C_6fc0428b": 75,
+   "Z_03e17c31_v1_21": 75,
+   "proposedLanded_59f0a3c2": 75,
+   "proposedFixedChain_d47630d7": {
+    "low": 75,
+    "high": 75,
+    "unresolved": false
+   },
+   "rowMove": null,
+   "closureCommit": null,
+   "bindingPaths": {
+    "tests/integration/test_containment.py": {
+     "presentAt59f0a3c2": true,
+     "presentAtd47630d7": true,
+     "resolved": "tests/integration/test_containment.py"
+    },
+    "core/test_s07_recovery_measurement.py": {
+     "presentAt59f0a3c2": true,
+     "presentAtd47630d7": true,
+     "resolved": "tests/core/test_s07_recovery_measurement.py"
+    }
+   },
+   "bindingPresentBothTrees": true,
+   "hostedProof": "tree-level only (rescore §2: Backend 36424405419, Core 36424410039, Frontend 36424414288 @95a59b24); landed tip 59f0a3c2 13/13 runs success incl. 8 post-landing-verify",
+   "opsEvidenceAfter1104": null,
+   "missingStage": "물리 5노드 failure detection/recovery SLO = `NOT_OBSERVED` | 100 also blocked by: prerequisite chain open (S01-BE/S01-ST blocked on user decisions; every later sprint depends on all four rows of the previous sprint); required operational acceptance absent",
+   "externalDeps": "G-19, G-24",
+   "ceilingNow": 75,
+   "confidence": "high",
+   "date": "2026-11-18",
+   "nextOwner": "Root operator + user for operational acceptance; row owner Codex for any code gap"
+  },
+  {
+   "taskId": "S07-DB",
+   "sprint": "S07",
+   "area": "DB",
+   "owner": "Codex",
+   "reviewer": "Claude",
+   "registryStatus_v1_0_1": "planned",
+   "outcome": "OUT-07",
+   "scope": "갱신/반납/Offer 경합·복구 기록",
+   "baseline_0918": 75,
+   "train_95a59b24_sec3": 75,
+   "landed_C_6fc0428b": 75,
+   "Z_03e17c31_v1_21": 75,
+   "proposedLanded_59f0a3c2": 75,
+   "proposedFixedChain_d47630d7": {
+    "low": 75,
+    "high": 75,
+    "unresolved": false
+   },
+   "rowMove": null,
+   "closureCommit": null,
+   "bindingPaths": {
+    "tests/core/test_recovery_verdict.py": {
+     "presentAt59f0a3c2": true,
+     "presentAtd47630d7": true,
+     "resolved": "tests/core/test_recovery_verdict.py"
+    },
+    "core/test_recovery_capability.py": {
+     "presentAt59f0a3c2": true,
+     "presentAtd47630d7": true,
+     "resolved": "tests/core/test_recovery_capability.py"
+    }
+   },
+   "bindingPresentBothTrees": true,
+   "hostedProof": "tree-level only (rescore §2: Backend 36424405419, Core 36424410039, Frontend 36424414288 @95a59b24); landed tip 59f0a3c2 13/13 runs success incl. 8 post-landing-verify",
+   "opsEvidenceAfter1104": null,
+   "missingStage": "late result·cache 경합 물리 인수 | 100 also blocked by: prerequisite chain open (S01-BE/S01-ST blocked on user decisions; every later sprint depends on all four rows of the previous sprint); required operational acceptance absent",
+   "externalDeps": "G-19",
+   "ceilingNow": 75,
+   "confidence": "high",
+   "date": "2026-11-18",
+   "nextOwner": "Root operator + user for operational acceptance; row owner Codex for any code gap"
+  },
+  {
+   "taskId": "S07-ST",
+   "sprint": "S07",
+   "area": "Storage",
+   "owner": "Codex",
+   "reviewer": "Claude",
+   "registryStatus_v1_0_1": "planned",
+   "outcome": "OUT-07",
+   "scope": "복제·cache pin·quota",
+   "baseline_0918": 50,
+   "train_95a59b24_sec3": 50,
+   "landed_C_6fc0428b": 50,
+   "Z_03e17c31_v1_21": 50,
+   "proposedLanded_59f0a3c2": 50,
+   "proposedFixedChain_d47630d7": {
+    "low": 50,
+    "high": 50,
+    "unresolved": false
+   },
+   "rowMove": null,
+   "closureCommit": null,
+   "bindingPaths": {
+    "tests/integration/test_replica_observation_api.py": {
+     "presentAt59f0a3c2": true,
+     "presentAtd47630d7": true,
+     "resolved": "tests/integration/test_replica_observation_api.py"
+    }
+   },
+   "bindingPresentBothTrees": true,
+   "hostedProof": "tree-level only (rescore §2: Backend 36424405419, Core 36424410039, Frontend 36424414288 @95a59b24); landed tip 59f0a3c2 13/13 runs success incl. 8 post-landing-verify",
+   "opsEvidenceAfter1104": null,
+   "missingStage": "실 failure-domain bytes | 100 also blocked by: prerequisite chain open (S01-BE/S01-ST blocked on user decisions; every later sprint depends on all four rows of the previous sprint); required operational acceptance absent",
+   "externalDeps": "G-21, G-24",
+   "ceilingNow": 75,
+   "confidence": "high",
+   "date": "2026-11-18",
+   "nextOwner": "Root operator + user for operational acceptance; row owner Codex for any code gap"
+  },
+  {
+   "taskId": "S08-FE",
+   "sprint": "S08",
+   "area": "Frontend",
+   "owner": "Gemini",
+   "reviewer": "Codex",
+   "registryStatus_v1_0_1": "planned",
+   "outcome": "OUT-08",
+   "scope": "감사·격리·관리 화면",
+   "baseline_0918": 50,
+   "train_95a59b24_sec3": 75,
+   "landed_C_6fc0428b": 75,
+   "Z_03e17c31_v1_21": 75,
+   "proposedLanded_59f0a3c2": 75,
+   "proposedFixedChain_d47630d7": {
+    "low": 75,
+    "high": 75,
+    "unresolved": false
+   },
+   "rowMove": null,
+   "closureCommit": null,
+   "bindingPaths": {
+    "apps/web/tests/admin-security.test.ts": {
+     "presentAt59f0a3c2": true,
+     "presentAtd47630d7": true,
+     "resolved": "apps/web/tests/admin-security.test.ts"
+    },
+    "write-actions-integrity-wiring.test.tsx": {
+     "presentAt59f0a3c2": true,
+     "presentAtd47630d7": true,
+     "resolved": "apps/web/tests/write-actions-integrity-wiring.test.tsx"
+    }
+   },
+   "bindingPresentBothTrees": true,
+   "hostedProof": "tree-level only (rescore §2: Backend 36424405419, Core 36424410039, Frontend 36424414288 @95a59b24); landed tip 59f0a3c2 13/13 runs success incl. 8 post-landing-verify",
+   "opsEvidenceAfter1104": null,
+   "missingStage": "보안 시나리오 인수 | 100 also blocked by: prerequisite chain open (S01-BE/S01-ST blocked on user decisions; every later sprint depends on all four rows of the previous sprint); required operational acceptance absent",
+   "externalDeps": "—",
+   "ceilingNow": 75,
+   "confidence": "high",
+   "date": "2026-11-18",
+   "nextOwner": "Root operator + user for operational acceptance; row owner Gemini for any code gap"
+  },
+  {
+   "taskId": "S08-BE",
+   "sprint": "S08",
+   "area": "Backend",
+   "owner": "Codex",
+   "reviewer": "Claude",
+   "registryStatus_v1_0_1": "planned",
+   "outcome": "OUT-08",
+   "scope": "ROOF·kill switch·BuildKit·단일 GPU",
+   "baseline_0918": 50,
+   "train_95a59b24_sec3": 50,
+   "landed_C_6fc0428b": 50,
+   "Z_03e17c31_v1_21": 75,
+   "proposedLanded_59f0a3c2": 75,
+   "proposedFixedChain_d47630d7": {
+    "low": 75,
+    "high": 75,
+    "unresolved": false
+   },
+   "rowMove": {
+    "from": 50,
+    "to": 75,
+    "firstTree": "T train35 (inside Z)",
+    "section": "§4-12-2 (v1.15)",
+    "binding": "tests/integration/test_build_product_runtime_real_pg.py",
+    "hosted": "Core 37072629027 @ 4e148ae4, 13/13 cases re-derived"
+   },
+   "closureCommit": null,
+   "bindingPaths": {
+    "inv/sandbox.py": {
+     "presentAt59f0a3c2": true,
+     "presentAtd47630d7": true,
+     "resolved": "services/control-plane/src/inv/sandbox.py"
+    },
+    "tests/core/test_s08_be_kill_switch_execution_gate.py": {
+     "presentAt59f0a3c2": true,
+     "presentAtd47630d7": true,
+     "resolved": "tests/core/test_s08_be_kill_switch_execution_gate.py"
+    },
+    "tests/integration/test_build_product_runtime_real_pg.py": {
+     "presentAt59f0a3c2": true,
+     "presentAtd47630d7": true,
+     "resolved": "tests/integration/test_build_product_runtime_real_pg.py"
+    }
+   },
+   "bindingPresentBothTrees": true,
+   "hostedProof": "Core 37072629027 @ 4e148ae4, 13/13 cases re-derived",
+   "opsEvidenceAfter1104": null,
+   "missingStage": "구현(ROOF·BuildKit·합성 GPU 실행), 단일 GPU 실장비 인수, security 축 allowlist report | 100 also blocked by: prerequisite chain open (S01-BE/S01-ST blocked on user decisions; every later sprint depends on all four rows of the previous sprint); required operational acceptance absent",
+   "externalDeps": "G-19",
+   "ceilingNow": 75,
+   "confidence": "high",
+   "date": "2026-11-18",
+   "nextOwner": "Root operator + user for operational acceptance; row owner Codex for any code gap"
+  },
+  {
+   "taskId": "S08-DB",
+   "sprint": "S08",
+   "area": "DB",
+   "owner": "Codex",
+   "reviewer": "Claude",
+   "registryStatus_v1_0_1": "planned",
+   "outcome": "OUT-08",
+   "scope": "RLS·감사 immutable·보존",
+   "baseline_0918": 75,
+   "train_95a59b24_sec3": 75,
+   "landed_C_6fc0428b": 75,
+   "Z_03e17c31_v1_21": 75,
+   "proposedLanded_59f0a3c2": 75,
+   "proposedFixedChain_d47630d7": {
+    "low": 75,
+    "high": 75,
+    "unresolved": false
+   },
+   "rowMove": null,
+   "closureCommit": null,
+   "bindingPaths": {
+    "tests/core/test_canonical_denial_audit.py": {
+     "presentAt59f0a3c2": true,
+     "presentAtd47630d7": true,
+     "resolved": "tests/core/test_canonical_denial_audit.py"
+    },
+    "core/test_definer_audit_cli.py": {
+     "presentAt59f0a3c2": true,
+     "presentAtd47630d7": true,
+     "resolved": "tests/core/test_definer_audit_cli.py"
+    },
+    "core/test_audit_action.py": {
+     "presentAt59f0a3c2": true,
+     "presentAtd47630d7": true,
+     "resolved": "tests/core/test_audit_action.py"
+    }
+   },
+   "bindingPresentBothTrees": true,
+   "hostedProof": "tree-level only (rescore §2: Backend 36424405419, Core 36424410039, Frontend 36424414288 @95a59b24); landed tip 59f0a3c2 13/13 runs success incl. 8 post-landing-verify",
+   "opsEvidenceAfter1104": null,
+   "missingStage": "보존 정책 운영 인수 | 100 also blocked by: prerequisite chain open (S01-BE/S01-ST blocked on user decisions; every later sprint depends on all four rows of the previous sprint); required operational acceptance absent",
+   "externalDeps": "—",
+   "ceilingNow": 75,
+   "confidence": "high",
+   "date": "2026-11-18",
+   "nextOwner": "Root operator + user for operational acceptance; row owner Codex for any code gap"
+  },
+  {
+   "taskId": "S08-ST",
+   "sprint": "S08",
+   "area": "Storage",
+   "owner": "Codex",
+   "reviewer": "Claude",
+   "registryStatus_v1_0_1": "planned",
+   "outcome": "OUT-08",
+   "scope": "GC·secret provider·backup",
+   "baseline_0918": 50,
+   "train_95a59b24_sec3": 50,
+   "landed_C_6fc0428b": 50,
+   "Z_03e17c31_v1_21": 50,
+   "proposedLanded_59f0a3c2": 50,
+   "proposedFixedChain_d47630d7": {
+    "low": 50,
+    "high": 50,
+    "unresolved": false
+   },
+   "rowMove": null,
+   "closureCommit": null,
+   "bindingPaths": {
+    "tests/test_backup_verification_integrity.py": {
+     "presentAt59f0a3c2": true,
+     "presentAtd47630d7": true,
+     "resolved": "tests/test_backup_verification_integrity.py"
+    }
+   },
+   "bindingPresentBothTrees": true,
+   "hostedProof": "tree-level only (rescore §2: Backend 36424405419, Core 36424410039, Frontend 36424414288 @95a59b24); landed tip 59f0a3c2 13/13 runs success incl. 8 post-landing-verify",
+   "opsEvidenceAfter1104": null,
+   "missingStage": "verified off-site backup 선언·실 bytes | 100 also blocked by: prerequisite chain open (S01-BE/S01-ST blocked on user decisions; every later sprint depends on all four rows of the previous sprint); required operational acceptance absent",
+   "externalDeps": "G-21",
+   "ceilingNow": 75,
+   "confidence": "high",
+   "date": "2026-11-18",
+   "nextOwner": "Root operator + user for operational acceptance; row owner Codex for any code gap"
+  },
+  {
+   "taskId": "S09-FE",
+   "sprint": "S09",
+   "area": "Frontend",
+   "owner": "Gemini",
+   "reviewer": "Codex",
+   "registryStatus_v1_0_1": "planned",
+   "outcome": "OUT-09",
+   "scope": "자연어 요청·예산·diff 검토",
+   "baseline_0918": 25,
+   "train_95a59b24_sec3": 75,
+   "landed_C_6fc0428b": 75,
+   "Z_03e17c31_v1_21": 75,
+   "proposedLanded_59f0a3c2": 75,
+   "proposedFixedChain_d47630d7": {
+    "low": 75,
+    "high": 75,
+    "unresolved": false
+   },
+   "rowMove": null,
+   "closureCommit": null,
+   "bindingPaths": {
+    "apps/web/tests/natural-language-run-view.test.tsx": {
+     "presentAt59f0a3c2": true,
+     "presentAtd47630d7": true,
+     "resolved": "apps/web/tests/natural-language-run-view.test.tsx"
+    },
+    "agent-eval-runner.test.ts": {
+     "presentAt59f0a3c2": true,
+     "presentAtd47630d7": true,
+     "resolved": "apps/web/tests/agent-eval-runner.test.ts"
+    },
+    "agent-bounded-loop.test.ts": {
+     "presentAt59f0a3c2": true,
+     "presentAtd47630d7": true,
+     "resolved": "apps/web/tests/agent-bounded-loop.test.ts"
+    }
+   },
+   "bindingPresentBothTrees": true,
+   "hostedProof": "tree-level only (rescore §2: Backend 36424405419, Core 36424410039, Frontend 36424414288 @95a59b24); landed tip 59f0a3c2 13/13 runs success incl. 8 post-landing-verify",
+   "opsEvidenceAfter1104": null,
+   "missingStage": "golden eval 분류별 성적 인수 | 100 also blocked by: prerequisite chain open (S01-BE/S01-ST blocked on user decisions; every later sprint depends on all four rows of the previous sprint); required operational acceptance absent",
+   "externalDeps": "G-26",
+   "ceilingNow": 75,
+   "confidence": "high",
+   "date": "2026-11-18",
+   "nextOwner": "Root operator + user for operational acceptance; row owner Gemini for any code gap"
+  },
+  {
+   "taskId": "S09-BE",
+   "sprint": "S09",
+   "area": "Backend",
+   "owner": "Codex",
+   "reviewer": "Claude",
+   "registryStatus_v1_0_1": "planned",
+   "outcome": "OUT-09",
+   "scope": "Prompt·Context·Skill·bounded repair",
+   "baseline_0918": 25,
+   "train_95a59b24_sec3": 75,
+   "landed_C_6fc0428b": 75,
+   "Z_03e17c31_v1_21": 75,
+   "proposedLanded_59f0a3c2": 75,
+   "proposedFixedChain_d47630d7": {
+    "low": 75,
+    "high": 75,
+    "unresolved": false
+   },
+   "rowMove": null,
+   "closureCommit": null,
+   "bindingPaths": {
+    "tests/core/test_context_bundle_route.py": {
+     "presentAt59f0a3c2": true,
+     "presentAtd47630d7": true,
+     "resolved": "tests/core/test_context_bundle_route.py"
+    },
+    "integration/test_context_bundle_real_pg.py": {
+     "presentAt59f0a3c2": true,
+     "presentAtd47630d7": true,
+     "resolved": "tests/integration/test_context_bundle_real_pg.py"
+    }
+   },
+   "bindingPresentBothTrees": true,
+   "hostedProof": "tree-level only (rescore §2: Backend 36424405419, Core 36424410039, Frontend 36424414288 @95a59b24); landed tip 59f0a3c2 13/13 runs success incl. 8 post-landing-verify",
+   "opsEvidenceAfter1104": null,
+   "missingStage": "실 모델·도구 실행 환경의 금지 행동 시험 | 100 also blocked by: prerequisite chain open (S01-BE/S01-ST blocked on user decisions; every later sprint depends on all four rows of the previous sprint); required operational acceptance absent",
+   "externalDeps": "G-26",
+   "ceilingNow": 75,
+   "confidence": "high",
+   "date": "2026-11-18",
+   "nextOwner": "Root operator + user for operational acceptance; row owner Codex for any code gap"
+  },
+  {
+   "taskId": "S09-DB",
+   "sprint": "S09",
+   "area": "DB",
+   "owner": "Claude",
+   "reviewer": "Codex",
+   "registryStatus_v1_0_1": "planned",
+   "outcome": "OUT-09",
+   "scope": "불변 Context/RunRecord·eval",
+   "baseline_0918": 75,
+   "train_95a59b24_sec3": 75,
+   "landed_C_6fc0428b": 75,
+   "Z_03e17c31_v1_21": 75,
+   "proposedLanded_59f0a3c2": 75,
+   "proposedFixedChain_d47630d7": {
+    "low": 75,
+    "high": 75,
+    "unresolved": false
+   },
+   "rowMove": null,
+   "closureCommit": null,
+   "bindingPaths": {
+    "tests/core/test_eval_run_route.py": {
+     "presentAt59f0a3c2": true,
+     "presentAtd47630d7": true,
+     "resolved": "tests/core/test_eval_run_route.py"
+    },
+    "core/test_eval_suite_project_scope_migration.py": {
+     "presentAt59f0a3c2": true,
+     "presentAtd47630d7": true,
+     "resolved": "tests/core/test_eval_suite_project_scope_migration.py"
+    },
+    "integration/test_eval_run_real_pg.py": {
+     "presentAt59f0a3c2": true,
+     "presentAtd47630d7": true,
+     "resolved": "tests/integration/test_eval_run_real_pg.py"
+    }
+   },
+   "bindingPresentBothTrees": true,
+   "hostedProof": "tree-level only (rescore §2: Backend 36424405419, Core 36424410039, Frontend 36424414288 @95a59b24); landed tip 59f0a3c2 13/13 runs success incl. 8 post-landing-verify",
+   "opsEvidenceAfter1104": null,
+   "missingStage": "eval 성적의 운영 판정 기준(카드 106) | 100 also blocked by: prerequisite chain open (S01-BE/S01-ST blocked on user decisions; every later sprint depends on all four rows of the previous sprint); required operational acceptance absent",
+   "externalDeps": "G-26",
+   "ceilingNow": 75,
+   "confidence": "high",
+   "date": "2026-11-18",
+   "nextOwner": "Root operator + user for operational acceptance; row owner Claude for any code gap"
+  },
+  {
+   "taskId": "S09-ST",
+   "sprint": "S09",
+   "area": "Storage",
+   "owner": "Claude",
+   "reviewer": "Codex",
+   "registryStatus_v1_0_1": "planned",
+   "outcome": "OUT-09",
+   "scope": "diff·테스트·trace Artifact 연결",
+   "baseline_0918": 50,
+   "train_95a59b24_sec3": 75,
+   "landed_C_6fc0428b": 75,
+   "Z_03e17c31_v1_21": 75,
+   "proposedLanded_59f0a3c2": 75,
+   "proposedFixedChain_d47630d7": {
+    "low": 75,
+    "high": 75,
+    "unresolved": false
+   },
+   "rowMove": null,
+   "closureCommit": null,
+   "bindingPaths": {
+    "tests/test_context_eval.py": {
+     "presentAt59f0a3c2": true,
+     "presentAtd47630d7": true,
+     "resolved": "tests/test_context_eval.py"
+    }
+   },
+   "bindingPresentBothTrees": true,
+   "hostedProof": "tree-level only (rescore §2: Backend 36424405419, Core 36424410039, Frontend 36424414288 @95a59b24); landed tip 59f0a3c2 13/13 runs success incl. 8 post-landing-verify",
+   "opsEvidenceAfter1104": null,
+   "missingStage": "golden eval·분류별 성적 운영 인수 | 100 also blocked by: prerequisite chain open (S01-BE/S01-ST blocked on user decisions; every later sprint depends on all four rows of the previous sprint); required operational acceptance absent",
+   "externalDeps": "G-24, G-26",
+   "ceilingNow": 75,
+   "confidence": "high",
+   "date": "2026-11-18",
+   "nextOwner": "Root operator + user for operational acceptance; row owner Claude for any code gap"
+  },
+  {
+   "taskId": "S10-FE",
+   "sprint": "S10",
+   "area": "Frontend",
+   "owner": "Gemini",
+   "reviewer": "Codex",
+   "registryStatus_v1_0_1": "planned",
+   "outcome": "OUT-10",
+   "scope": "AI 도구·실험·모델·배포 화면",
+   "baseline_0918": 25,
+   "train_95a59b24_sec3": 75,
+   "landed_C_6fc0428b": 75,
+   "Z_03e17c31_v1_21": 75,
+   "proposedLanded_59f0a3c2": 75,
+   "proposedFixedChain_d47630d7": {
+    "low": 75,
+    "high": 75,
+    "unresolved": false
+   },
+   "rowMove": null,
+   "closureCommit": null,
+   "bindingPaths": {
+    "apps/web/tests/model-lineage.test.ts": {
+     "presentAt59f0a3c2": true,
+     "presentAtd47630d7": true,
+     "resolved": "apps/web/tests/model-lineage.test.ts"
+    },
+    "model-studio-dom.test.tsx": {
+     "presentAt59f0a3c2": true,
+     "presentAtd47630d7": true,
+     "resolved": "apps/web/tests/model-studio-dom.test.tsx"
+    }
+   },
+   "bindingPresentBothTrees": true,
+   "hostedProof": "tree-level only (rescore §2: Backend 36424405419, Core 36424410039, Frontend 36424414288 @95a59b24); landed tip 59f0a3c2 13/13 runs success incl. 8 post-landing-verify",
+   "opsEvidenceAfter1104": null,
+   "missingStage": "실 provider conformance 표시 | 100 also blocked by: prerequisite chain open (S01-BE/S01-ST blocked on user decisions; every later sprint depends on all four rows of the previous sprint); required operational acceptance absent",
+   "externalDeps": "G-25",
+   "ceilingNow": 75,
+   "confidence": "high",
+   "date": "2026-11-18",
+   "nextOwner": "Root operator + user for operational acceptance; row owner Gemini for any code gap"
+  },
+  {
+   "taskId": "S10-BE",
+   "sprint": "S10",
+   "area": "Backend",
+   "owner": "Claude",
+   "reviewer": "Codex",
+   "registryStatus_v1_0_1": "planned",
+   "outcome": "OUT-10",
+   "scope": "두 Provider adapter·MLflow·승인 배포",
+   "baseline_0918": 50,
+   "train_95a59b24_sec3": 75,
+   "landed_C_6fc0428b": 75,
+   "Z_03e17c31_v1_21": 75,
+   "proposedLanded_59f0a3c2": 75,
+   "proposedFixedChain_d47630d7": {
+    "low": 75,
+    "high": 75,
+    "unresolved": false
+   },
+   "rowMove": null,
+   "closureCommit": null,
+   "bindingPaths": {
+    "tests/core/test_adapters_route.py": {
+     "presentAt59f0a3c2": true,
+     "presentAtd47630d7": true,
+     "resolved": "tests/core/test_adapters_route.py"
+    },
+    "core/test_conformance_status_route.py": {
+     "presentAt59f0a3c2": true,
+     "presentAtd47630d7": true,
+     "resolved": "tests/core/test_conformance_status_route.py"
+    },
+    "core/test_conformance_checklist_ratchet.py": {
+     "presentAt59f0a3c2": true,
+     "presentAtd47630d7": true,
+     "resolved": "tests/core/test_conformance_checklist_ratchet.py"
+    }
+   },
+   "bindingPresentBothTrees": true,
+   "hostedProof": "tree-level only (rescore §2: Backend 36424405419, Core 36424410039, Frontend 36424414288 @95a59b24); landed tip 59f0a3c2 13/13 runs success incl. 8 post-landing-verify",
+   "opsEvidenceAfter1104": null,
+   "missingStage": "실 Provider adapter·실 로그인 계정 CLI 인수 | 100 also blocked by: prerequisite chain open (S01-BE/S01-ST blocked on user decisions; every later sprint depends on all four rows of the previous sprint); required operational acceptance absent",
+   "externalDeps": "G-25",
+   "ceilingNow": 75,
+   "confidence": "high",
+   "date": "2026-11-18",
+   "nextOwner": "Root operator + user for operational acceptance; row owner Claude for any code gap"
+  },
+  {
+   "taskId": "S10-DB",
+   "sprint": "S10",
+   "area": "DB",
+   "owner": "Claude",
+   "reviewer": "Codex",
+   "registryStatus_v1_0_1": "planned",
+   "outcome": "OUT-10",
+   "scope": "Dataset/commit/image/model lineage",
+   "baseline_0918": 75,
+   "train_95a59b24_sec3": 75,
+   "landed_C_6fc0428b": 75,
+   "Z_03e17c31_v1_21": 75,
+   "proposedLanded_59f0a3c2": 75,
+   "proposedFixedChain_d47630d7": {
+    "low": 75,
+    "high": 75,
+    "unresolved": false
+   },
+   "rowMove": null,
+   "closureCommit": null,
+   "bindingPaths": {
+    "tests/core/test_lineage_query_routes.py": {
+     "presentAt59f0a3c2": true,
+     "presentAtd47630d7": true,
+     "resolved": "tests/core/test_lineage_query_routes.py"
+    },
+    "core/test_dataset_digest_index_migration.py": {
+     "presentAt59f0a3c2": true,
+     "presentAtd47630d7": true,
+     "resolved": "tests/core/test_dataset_digest_index_migration.py"
+    }
+   },
+   "bindingPresentBothTrees": true,
+   "hostedProof": "tree-level only (rescore §2: Backend 36424405419, Core 36424410039, Frontend 36424414288 @95a59b24); landed tip 59f0a3c2 13/13 runs success incl. 8 post-landing-verify",
+   "opsEvidenceAfter1104": null,
+   "missingStage": "배포 digest 운영 인수(카드 106) | 100 also blocked by: prerequisite chain open (S01-BE/S01-ST blocked on user decisions; every later sprint depends on all four rows of the previous sprint); required operational acceptance absent",
+   "externalDeps": "—",
+   "ceilingNow": 75,
+   "confidence": "high",
+   "date": "2026-11-18",
+   "nextOwner": "Root operator + user for operational acceptance; row owner Claude for any code gap"
+  },
+  {
+   "taskId": "S10-ST",
+   "sprint": "S10",
+   "area": "Storage",
+   "owner": "Claude",
+   "reviewer": "Codex",
+   "registryStatus_v1_0_1": "planned",
+   "outcome": "OUT-10",
+   "scope": "Model immutable version·보존 pin",
+   "baseline_0918": 50,
+   "train_95a59b24_sec3": 75,
+   "landed_C_6fc0428b": 75,
+   "Z_03e17c31_v1_21": 75,
+   "proposedLanded_59f0a3c2": 75,
+   "proposedFixedChain_d47630d7": {
+    "low": 75,
+    "high": 75,
+    "unresolved": false
+   },
+   "rowMove": null,
+   "closureCommit": null,
+   "bindingPaths": {
+    "tests/core/test_model_retention_pin_route.py": {
+     "presentAt59f0a3c2": true,
+     "presentAtd47630d7": true,
+     "resolved": "tests/core/test_model_retention_pin_route.py"
+    },
+    "core/test_model_verify_route.py": {
+     "presentAt59f0a3c2": true,
+     "presentAtd47630d7": true,
+     "resolved": "tests/core/test_model_verify_route.py"
+    }
+   },
+   "bindingPresentBothTrees": true,
+   "hostedProof": "tree-level only (rescore §2: Backend 36424405419, Core 36424410039, Frontend 36424414288 @95a59b24); landed tip 59f0a3c2 13/13 runs success incl. 8 post-landing-verify",
+   "opsEvidenceAfter1104": null,
+   "missingStage": "보존 pin·측정의 운영 판정 기준(카드 106) | 100 also blocked by: prerequisite chain open (S01-BE/S01-ST blocked on user decisions; every later sprint depends on all four rows of the previous sprint); required operational acceptance absent",
+   "externalDeps": "—",
+   "ceilingNow": 75,
+   "confidence": "high",
+   "date": "2026-11-18",
+   "nextOwner": "Root operator + user for operational acceptance; row owner Claude for any code gap"
+  },
+  {
+   "taskId": "S11-FE",
+   "sprint": "S11",
+   "area": "Frontend",
+   "owner": "Gemini",
+   "reviewer": "Codex",
+   "registryStatus_v1_0_1": "planned",
+   "outcome": "OUT-11",
+   "scope": "접근성·시각 회귀·배포 후보",
+   "baseline_0918": 25,
+   "train_95a59b24_sec3": 75,
+   "landed_C_6fc0428b": 75,
+   "Z_03e17c31_v1_21": 75,
+   "proposedLanded_59f0a3c2": 75,
+   "proposedFixedChain_d47630d7": {
+    "low": 75,
+    "high": 75,
+    "unresolved": false
+   },
+   "rowMove": null,
+   "closureCommit": null,
+   "bindingPaths": {
+    "apps/web/tests/accessibility-status-and-guards.test.tsx": {
+     "presentAt59f0a3c2": true,
+     "presentAtd47630d7": true,
+     "resolved": "apps/web/tests/accessibility-status-and-guards.test.tsx"
+    },
+    "s11-defect-fixes.test.tsx": {
+     "presentAt59f0a3c2": true,
+     "presentAtd47630d7": true,
+     "resolved": "apps/web/tests/s11-defect-fixes.test.tsx"
+    }
+   },
+   "bindingPresentBothTrees": true,
+   "hostedProof": "tree-level only (rescore §2: Backend 36424405419, Core 36424410039, Frontend 36424414288 @95a59b24); landed tip 59f0a3c2 13/13 runs success incl. 8 post-landing-verify",
+   "opsEvidenceAfter1104": null,
+   "missingStage": "물리 Node 브라우저 인수 | 100 also blocked by: prerequisite chain open (S01-BE/S01-ST blocked on user decisions; every later sprint depends on all four rows of the previous sprint); required operational acceptance absent",
+   "externalDeps": "G-19, G-23",
+   "ceilingNow": 75,
+   "confidence": "high",
+   "date": "2026-11-18",
+   "nextOwner": "Root operator + user for operational acceptance; row owner Gemini for any code gap"
+  },
+  {
+   "taskId": "S11-BE",
+   "sprint": "S11",
+   "area": "Backend",
+   "owner": "Codex",
+   "reviewer": "Claude",
+   "registryStatus_v1_0_1": "planned",
+   "outcome": "OUT-11",
+   "scope": "장시간·부하·security·rollback",
+   "baseline_0918": 50,
+   "train_95a59b24_sec3": 50,
+   "landed_C_6fc0428b": 75,
+   "Z_03e17c31_v1_21": 75,
+   "proposedLanded_59f0a3c2": 75,
+   "proposedFixedChain_d47630d7": {
+    "low": 75,
+    "high": 75,
+    "unresolved": false
+   },
+   "rowMove": {
+    "from": 50,
+    "to": 75,
+    "firstTree": "b91ab72f (A, landed in C 6fc0428b)",
+    "section": "§4-2-2 (v1.5)",
+    "binding": "tests/test_import_ac11_composite_long_soak.py",
+    "hosted": "Backend 36436343934 @ b91ab72f (3.12/3.14 success)"
+   },
+   "closureCommit": null,
+   "bindingPaths": {
+    "tests/test_import_ac11_composite_long_soak.py": {
+     "presentAt59f0a3c2": true,
+     "presentAtd47630d7": true,
+     "resolved": "tests/test_import_ac11_composite_long_soak.py"
+    }
+   },
+   "bindingPresentBothTrees": true,
+   "hostedProof": "Backend 36436343934 @ b91ab72f (3.12/3.14 success)",
+   "opsEvidenceAfter1104": null,
+   "missingStage": "long-soak `NOT_REGISTERED`(이 tree), 8개 필수 축 전부 `NOT_OBSERVED` | 100 also blocked by: prerequisite chain open (S01-BE/S01-ST blocked on user decisions; every later sprint depends on all four rows of the previous sprint); required operational acceptance absent",
+   "externalDeps": "G-19, G-24",
+   "ceilingNow": 75,
+   "confidence": "high",
+   "date": "2026-11-18",
+   "nextOwner": "Root operator + user for operational acceptance; row owner Codex for any code gap"
+  },
+  {
+   "taskId": "S11-DB",
+   "sprint": "S11",
+   "area": "DB",
+   "owner": "Codex",
+   "reviewer": "Claude",
+   "registryStatus_v1_0_1": "planned",
+   "outcome": "OUT-11",
+   "scope": "migration·restore·SLO 집계",
+   "baseline_0918": 75,
+   "train_95a59b24_sec3": 75,
+   "landed_C_6fc0428b": 75,
+   "Z_03e17c31_v1_21": 75,
+   "proposedLanded_59f0a3c2": 75,
+   "proposedFixedChain_d47630d7": {
+    "low": 75,
+    "high": 75,
+    "unresolved": false
+   },
+   "rowMove": null,
+   "closureCommit": null,
+   "bindingPaths": {
+    "tests/test_ac11_migration_rehearsal.py": {
+     "presentAt59f0a3c2": true,
+     "presentAtd47630d7": true,
+     "resolved": "tests/test_ac11_migration_rehearsal.py"
+    },
+    "test_aggregate_ac11_evidence.py": {
+     "presentAt59f0a3c2": true,
+     "presentAtd47630d7": true,
+     "resolved": "tests/test_aggregate_ac11_evidence.py"
+    }
+   },
+   "bindingPresentBothTrees": true,
+   "hostedProof": "tree-level only (rescore §2: Backend 36424405419, Core 36424410039, Frontend 36424414288 @95a59b24); landed tip 59f0a3c2 13/13 runs success incl. 8 post-landing-verify",
+   "opsEvidenceAfter1104": null,
+   "missingStage": "실 PITR 복구·운영 RPO/RTO | 100 also blocked by: prerequisite chain open (S01-BE/S01-ST blocked on user decisions; every later sprint depends on all four rows of the previous sprint); required operational acceptance absent",
+   "externalDeps": "G-22",
+   "ceilingNow": 75,
+   "confidence": "high",
+   "date": "2026-11-18",
+   "nextOwner": "Root operator + user for operational acceptance; row owner Codex for any code gap"
+  },
+  {
+   "taskId": "S11-ST",
+   "sprint": "S11",
+   "area": "Storage",
+   "owner": "Codex",
+   "reviewer": "Claude",
+   "registryStatus_v1_0_1": "planned",
+   "outcome": "OUT-11",
+   "scope": "손상·용량·backup 장애 시험",
+   "baseline_0918": 50,
+   "train_95a59b24_sec3": 75,
+   "landed_C_6fc0428b": 75,
+   "Z_03e17c31_v1_21": 75,
+   "proposedLanded_59f0a3c2": 75,
+   "proposedFixedChain_d47630d7": {
+    "low": 75,
+    "high": 75,
+    "unresolved": false
+   },
+   "rowMove": null,
+   "closureCommit": null,
+   "bindingPaths": {
+    "tests/test_s11_storage_failure_evidence.py": {
+     "presentAt59f0a3c2": true,
+     "presentAtd47630d7": true,
+     "resolved": "tests/test_s11_storage_failure_evidence.py"
+    },
+    "integration/test_s11_storage_failure_hosted.py": {
+     "presentAt59f0a3c2": true,
+     "presentAtd47630d7": true,
+     "resolved": "tests/integration/test_s11_storage_failure_hosted.py"
+    }
+   },
+   "bindingPresentBothTrees": true,
+   "hostedProof": "tree-level only (rescore §2: Backend 36424405419, Core 36424410039, Frontend 36424414288 @95a59b24); landed tip 59f0a3c2 13/13 runs success incl. 8 post-landing-verify",
+   "opsEvidenceAfter1104": null,
+   "missingStage": "물리 storage soak 24시간 실행 | 100 also blocked by: prerequisite chain open (S01-BE/S01-ST blocked on user decisions; every later sprint depends on all four rows of the previous sprint); required operational acceptance absent",
+   "externalDeps": "G-19, G-21",
+   "ceilingNow": 75,
+   "confidence": "high",
+   "date": "2026-11-18",
+   "nextOwner": "Root operator + user for operational acceptance; row owner Codex for any code gap"
+  },
+  {
+   "taskId": "S12-FE",
+   "sprint": "S12",
+   "area": "Frontend",
+   "owner": "Gemini",
+   "reviewer": "Codex",
+   "registryStatus_v1_0_1": "planned",
+   "outcome": "OUT-12",
+   "scope": "내부망 HTTPS 웹 배포·교육",
+   "baseline_0918": 25,
+   "train_95a59b24_sec3": 50,
+   "landed_C_6fc0428b": 50,
+   "Z_03e17c31_v1_21": 75,
+   "proposedLanded_59f0a3c2": 75,
+   "proposedFixedChain_d47630d7": {
+    "low": 75,
+    "high": 75,
+    "unresolved": false
+   },
+   "rowMove": {
+    "from": 50,
+    "to": 75,
+    "firstTree": "I train9 9fc2029f (inside Z)",
+    "section": "§4-6-3 (v1.9)",
+    "binding": "apps/web/tests/s12-release-manifest-server-binding.test.tsx",
+    "hosted": "rescore v1.9 §4-6-1-1 run table"
+   },
+   "closureCommit": null,
+   "bindingPaths": {
+    "apps/web/tests/s12-defect-fixes.test.tsx": {
+     "presentAt59f0a3c2": true,
+     "presentAtd47630d7": true,
+     "resolved": "apps/web/tests/s12-defect-fixes.test.tsx"
+    },
+    "release-candidate.test.ts": {
+     "presentAt59f0a3c2": true,
+     "presentAtd47630d7": true,
+     "resolved": "apps/web/tests/release-candidate.test.ts"
+    },
+    "apps/web/tests/s12-release-manifest-server-binding.test.tsx": {
+     "presentAt59f0a3c2": true,
+     "presentAtd47630d7": true,
+     "resolved": "apps/web/tests/s12-release-manifest-server-binding.test.tsx"
+    }
+   },
+   "bindingPresentBothTrees": true,
+   "hostedProof": "rescore v1.9 §4-6-1-1 run table",
+   "opsEvidenceAfter1104": "portal abb707 served on PC3:13103 via Main:3100; liveness 200 on 11-18 (liveness only)",
+   "missingStage": "Release manifest·사용자 인수·웹 smoke | 100 also blocked by: prerequisite chain open (S01-BE/S01-ST blocked on user decisions; every later sprint depends on all four rows of the previous sprint); required operational acceptance absent",
+   "externalDeps": "G-18, G-23",
+   "ceilingNow": 75,
+   "confidence": "high",
+   "date": "2026-11-18",
+   "nextOwner": "Root operator + user for operational acceptance; row owner Gemini for any code gap"
+  },
+  {
+   "taskId": "S12-BE",
+   "sprint": "S12",
+   "area": "Backend",
+   "owner": "Codex",
+   "reviewer": "Claude",
+   "registryStatus_v1_0_1": "planned",
+   "outcome": "OUT-12",
+   "scope": "설치·upgrade·rollback·운영 인계",
+   "baseline_0918": 50,
+   "train_95a59b24_sec3": 50,
+   "landed_C_6fc0428b": 50,
+   "Z_03e17c31_v1_21": 50,
+   "proposedLanded_59f0a3c2": 50,
+   "proposedFixedChain_d47630d7": {
+    "low": 50,
+    "high": 75,
+    "unresolved": true,
+    "why": "Unmerged chain 59f0a3c2..d47630d7 adds install/upgrade/rollback-scope code and tests (deploy/lan worker_plain_rotation.py, worker_peer_floor.py, worker_leaf_rotation.py, tests/core/test_lan_workspace_upgrade.py, tests/test_fleet5_setup_packet.py, tests/test_lan_leaf_rotation*.py). A task-specific 75 binding review at an integrated tree has not been done, so no points are assigned."
+   },
+   "rowMove": null,
+   "closureCommit": null,
+   "bindingPaths": {
+    "tests/core/test_lan_migration_plan.py": {
+     "presentAt59f0a3c2": true,
+     "presentAtd47630d7": true,
+     "resolved": "tests/core/test_lan_migration_plan.py"
+    },
+    "core/test_lan_execution.py": {
+     "presentAt59f0a3c2": true,
+     "presentAtd47630d7": true,
+     "resolved": "tests/core/test_lan_execution.py"
+    }
+   },
+   "bindingPresentBothTrees": true,
+   "hostedProof": "tree-level only (rescore §2: Backend 36424405419, Core 36424410039, Frontend 36424414288 @95a59b24); landed tip 59f0a3c2 13/13 runs success incl. 8 post-landing-verify",
+   "opsEvidenceAfter1104": "owned PC3 cutovers with concrete old-UI rollback artefact (11-08); one cert-preserving switch 19.203 s (11-04)",
+   "missingStage": "실 설치·upgrade·rollback 운영 인계 | 100 also blocked by: prerequisite chain open (S01-BE/S01-ST blocked on user decisions; every later sprint depends on all four rows of the previous sprint); required operational acceptance absent",
+   "externalDeps": "G-18, G-23",
+   "ceilingNow": 75,
+   "confidence": "medium",
+   "date": "2026-11-18",
+   "nextOwner": "Codex (row binding review at integrated tree) then Claude review"
+  },
+  {
+   "taskId": "S12-DB",
+   "sprint": "S12",
+   "area": "DB",
+   "owner": "Claude",
+   "reviewer": "Codex",
+   "registryStatus_v1_0_1": "planned",
+   "outcome": "OUT-12",
+   "scope": "복원·권한·운영 인수",
+   "baseline_0918": 50,
+   "train_95a59b24_sec3": 50,
+   "landed_C_6fc0428b": 50,
+   "Z_03e17c31_v1_21": 50,
+   "proposedLanded_59f0a3c2": 50,
+   "proposedFixedChain_d47630d7": {
+    "low": 50,
+    "high": 50,
+    "unresolved": false
+   },
+   "rowMove": null,
+   "closureCommit": null,
+   "bindingPaths": {
+    "tests/integration/test_recovery_drill.py": {
+     "presentAt59f0a3c2": true,
+     "presentAtd47630d7": true,
+     "resolved": "tests/integration/test_recovery_drill.py"
+    },
+    "test_pitr_boundary.py": {
+     "presentAt59f0a3c2": true,
+     "presentAtd47630d7": true,
+     "resolved": "tests/test_pitr_boundary.py"
+    }
+   },
+   "bindingPresentBothTrees": true,
+   "hostedProof": "tree-level only (rescore §2: Backend 36424405419, Core 36424410039, Frontend 36424414288 @95a59b24); landed tip 59f0a3c2 13/13 runs success incl. 8 post-landing-verify",
+   "opsEvidenceAfter1104": "schema-only pg_dump before 0068 (835037 B); no data/globals backup, no restore rehearsal",
+   "missingStage": "운영 PITR 적용·복원 인수 | 100 also blocked by: prerequisite chain open (S01-BE/S01-ST blocked on user decisions; every later sprint depends on all four rows of the previous sprint); required operational acceptance absent",
+   "externalDeps": "G-22",
+   "ceilingNow": 75,
+   "confidence": "high",
+   "date": "2026-11-18",
+   "nextOwner": "Root operator + user for operational acceptance; row owner Claude for any code gap"
+  },
+  {
+   "taskId": "S12-ST",
+   "sprint": "S12",
+   "area": "Storage",
+   "owner": "Claude",
+   "reviewer": "Codex",
+   "registryStatus_v1_0_1": "planned",
+   "outcome": "OUT-12",
+   "scope": "운영 점검·제공 폴더·복구 훈련",
+   "baseline_0918": 50,
+   "train_95a59b24_sec3": 50,
+   "landed_C_6fc0428b": 50,
+   "Z_03e17c31_v1_21": 50,
+   "proposedLanded_59f0a3c2": 50,
+   "proposedFixedChain_d47630d7": {
+    "low": 50,
+    "high": 50,
+    "unresolved": false
+   },
+   "rowMove": null,
+   "closureCommit": null,
+   "bindingPaths": {
+    "tests/test_recovery_drill_prerequisites.py": {
+     "presentAt59f0a3c2": true,
+     "presentAtd47630d7": true,
+     "resolved": "tests/test_recovery_drill_prerequisites.py"
+    }
+   },
+   "bindingPresentBothTrees": true,
+   "hostedProof": "tree-level only (rescore §2: Backend 36424405419, Core 36424410039, Frontend 36424414288 @95a59b24); landed tip 59f0a3c2 13/13 runs success incl. 8 post-landing-verify",
+   "opsEvidenceAfter1104": null,
+   "missingStage": "제공 폴더 실값·복구 훈련 운영 인수 | 100 also blocked by: prerequisite chain open (S01-BE/S01-ST blocked on user decisions; every later sprint depends on all four rows of the previous sprint); required operational acceptance absent",
+   "externalDeps": "G-20, G-22",
+   "ceilingNow": 75,
+   "confidence": "high",
+   "date": "2026-11-18",
+   "nextOwner": "Root operator + user for operational acceptance; row owner Claude for any code gap"
+  }
+ ]
+}

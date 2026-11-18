@@ -1,0 +1,28 @@
+"""Run doc publication gates by argv list (no shell). Writes a JSON ledger. Usage: python gate_driver.py <repo> <venv-python> <base-ref> <out.json> <canonical-state> <start-copy>"""
+import datetime, hashlib, json, subprocess, sys
+from pathlib import Path
+repo, py, base, out, canon, startcopy = sys.argv[1:7]
+KST = datetime.timezone(datetime.timedelta(hours=9))
+env = dict(__import__('os').environ, PYTHONUTF8='1', PYTHONIOENCODING='utf-8')
+gates = [
+    [py, '-B', 'tools/check_docs.py'],
+    [py, '-B', 'tools/check_ontology.py'],
+    [py, '-B', 'tools/check_doc_path_citations.py', '--ratchet', '--base-ref', base],
+    [py, '-B', 'tools/check_doc_single_source.py', '--ratchet'],
+    [py, '-B', 'tools/sync_obsidian.py', '--check'],
+    ['git', 'diff', '--cached', '--check'],
+]
+rows = []
+for g in gates:
+    at = datetime.datetime.now(KST).isoformat(timespec='seconds')
+    q = subprocess.run(g, cwd=repo, capture_output=True, env=env)
+    rows.append({'argv': ['venv-python' if a == py else a for a in g], 'atKST': at, 'exit': q.returncode,
+                 'stdoutTail': q.stdout.decode('utf-8', 'replace')[-600:], 'stderrTail': q.stderr.decode('utf-8', 'replace')[-600:]})
+    if q.returncode != 0:
+        break
+c = Path(canon).read_bytes(); s = Path(startcopy).read_bytes()
+res = {'gates': rows, 'allExit0': all(r['exit'] == 0 for r in rows) and len(rows) == len(gates),
+       'canonical': {'path': canon, 'bytes': len(c), 'sha256': hashlib.sha256(c).hexdigest(), 'fullBytesEqualToStartCopy': c == s,
+                     'atKST': datetime.datetime.now(KST).isoformat(timespec='seconds')}}
+Path(out).write_text(json.dumps(res, ensure_ascii=False, indent=1) + '\n', 'utf-8', newline='\n')
+print(json.dumps({'allExit0': res['allExit0'], 'exits': [r['exit'] for r in rows], 'canonical': res['canonical']}))

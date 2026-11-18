@@ -1,0 +1,65 @@
+{
+ "docID": "EVIDENCE-FLEET5-COMPLETION-INITIALPLAN-AUDIT-20261118-CLAUDE",
+ "version": "1.0.0",
+ "task": "FLEET5-CURRENT-COMPLETION-AND-INITIALPLAN-AUDIT-20261118",
+ "orcaTaskID": "task_121355869af1",
+ "orcaDispatchID": "ctx_a23798cf4e04",
+ "auditor": "Claude (independent auditor; author of this audit only; not author of the Root operator script or of the product code)",
+ "branch": "agent/claude/fleet5-completion-initialplan-audit-20261118",
+ "base": "d81d40f824538a4ef553cc8ae4aa75f7c012e325 (Root544, Docs 44298774163 success)",
+ "startedAtKST": "2026-11-18T20:59:22+09:00",
+ "readVersions": {
+  "INDEX-PROGRESS-001": "1.0.544",
+  "WORKBOARD-CLAUDE-001": "1.2.132",
+  "INDEX-VIRTUAL-COMPUTER-001": "1.0.0",
+  "ROADMAP-VIRTUAL-COMPUTER-001": "1.0.0",
+  "GUIDE-001": "1.1.0",
+  "ADR-INDEX-001": "1.37.0",
+  "GOV-AGENT-001": "1.1.3",
+  "GOV-GIT-001": "1.1.4",
+  "GOV-CONTINUOUS-001": "1.1.0",
+  "GOV-CONTINUITY-001": "1.0.0",
+  "agent-delivery": "1.1.0",
+  "service-integration": "1.0.0",
+  "task-registry": "1.0.1",
+  "vf-task-registry": "1.0.2",
+  "vf-cl-task-registry": "1.6.6",
+  "PROGRESS-RESCORE-20260928-CLAUDE": "1.21.1 (updated 2026-11-04T13:26:09+09:00, base 03e17c31)",
+  "ADR-PROPOSED-EXPIRED-POLICY-CUSTODY-R1": "1.0.1",
+  "PLAN-FLEET5-CURRENT-THREE-NODE-RENEWAL-R1": "1.1.0"
+ },
+ "original48": {
+  "formalAcceptedCards": {"done": 2, "blocked": 4, "planned": 42, "total": 48, "percent": 4.17, "doneRows": ["S01-FE (b0313282)", "S01-DB (8b20d3e6)"], "note": "Registry 1.0.0 -> 1.0.1 (ad0132b3, 2026-10-28) demoted 18 review rows and 2 in_progress rows to planned/blocked by the dependency rule, not by regression."},
+  "historicalLastScore": {"date": "2026-11-04", "landedC": [3425, 4800, 71.35], "candidateZ": [3475, 4800, 72.40]},
+  "freshAudit": {
+   "date": "2026-11-18",
+   "confirmedLowerBound": {"tree": "59f0a3c2 (integration/all-agents-unified, contains Z 03e17c31; 13/13 hosted runs success)", "points": 3475, "denominator": 4800, "percent": 72.40},
+   "unmergedFixedChainRange": {"tree": "d47630d7 (contains 1efea494, 96afd799, abb7074e; not merged to integration)", "low": [3475, 72.40], "high": [3500, 72.92], "unresolvedRows": ["S12-BE 50..75"]},
+   "structuralCeilingNow": {"points": 3650, "percent": 76.04, "why": "46 non-done rows cannot reach 100 while S01-BE/S01-ST are blocked on user decisions U1-U6 and required operational acceptance is absent"},
+   "distribution": {"50": 7, "75": 39, "100": 2},
+   "method": "existing rubric only; rows recomputed; see trace-48.json"
+  }
+ },
+ "expanded": {
+  "cardsListed": 16,
+  "cardsMachineRegistered": 10,
+  "cardsOperationallyAccepted": 0,
+  "outcomesAccepted": "0/7",
+  "singlePercentCalculable": false,
+  "status": "code largely implemented for VF-CX-02..04 and VF-CL-01..05 (CI-verified, reviewed); VF-CX-01 partial; VF-CX-05 blocked; VF-GM self-reported only; nothing operationally accepted",
+  "see": "expanded-vf-matrix.json"
+ },
+ "transport": {"verdict": "SOUND_AS_A_CURRENT_USER_INTERACTIVE_TRANSPORT_NOT_ACCEPTABLE_AS_PERSISTENT_CONNECTION_UNTIL_M1_M4", "mandatory": 4, "low": 6, "info": 4, "see": "transport-verdict.json", "implementationOwner": "Root"},
+ "connections": {"reachableLinux": "3 of 4", "nodesTrusted": 0, "authority": "CA_TERMINAL", "mainDB": "Docker daemon unavailable", "idp": "Main:8443 no listener at 20:25 KST", "fivePCHealthy": false, "see": "connection-table.json"},
+ "topFinding": "The only accepted recovery source (d47630d7) applies while the same CA and leaves are still valid (ADR R1 line 17). The CA expired 2026-11-14 and the CP leaf 2026-11-09, so it cannot recover the current fleet. The living renewal plan states that for now >= CA expiry an authority-replacement workflow is required and is outside its scope. No reviewed card for it exists.",
+ "nextReadyCard": {
+  "id": "FLEET5-AUTHORITY-REPLACEMENT-AND-ADVANCE-RENEWAL-R1",
+  "owner": "Codex",
+  "reviewer": "Claude (actual)",
+  "parallelPrecondition": {"id": "FLEET5-MAIN-DB-IDP-DURABILITY-R1", "owner": "Root operator", "pass": "Main Docker daemon and CP DB/IdP observed read-only; full data+globals dump with SHA-256; disposable restore with row counts; no write before backup"},
+  "pass": ["reviewed contract and non-serving code at an exact SHA", "hosted Core/Backend/Docs success at that SHA", "negative tests: expired CA refused, no same-CA renewal, old leaf not reusable, no reset of DB/journal floors", "actual Claude review accept", "Root live: PC2-PC4 admitted under the new authority with fresh capacity readback", "unattended renewal job renews before expiry in a short-lifetime rehearsal"],
+  "unknowns": ["keep or retire old NodeIDs (Codex contract decision)", "IdP and DB data state until Main Docker is observed", "PC1 key cause"]
+ },
+ "notDone": ["no formal task status changed", "no product code edited", "no APPLY/export", "no reboot, SSH, DB or live action by the auditor"],
+ "files": ["trace-48.json", "expanded-vf-matrix.json", "transport-verdict.json", "connection-table.json", "binding-check.json", "read-sources.json", "binding_check.py.txt", "build_audit.py.txt", "build_transport_and_connections.py.txt"]
+}

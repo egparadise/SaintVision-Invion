@@ -1,0 +1,234 @@
+"""FLEET5 completion / initial-plan audit generator (Claude, 2026-11-18).
+
+Metadata-only: reads Git blobs, committed docs and committed Root Evidence JSON; never runs product code.
+Writes the 48-row trace, expanded VF matrix, transport verdict, connection table and summary JSON.
+Arithmetic is recomputed from the rows; nothing is typed in as a total.
+Usage: python -I build_audit.py <repo-root> <out-dir> <binding-check.json>
+"""
+import json, re, subprocess, sys, hashlib
+from pathlib import Path
+
+ROOT = Path(sys.argv[1]); OUT = Path(sys.argv[2]); BIND = json.loads(Path(sys.argv[3]).read_text('utf-8'))
+OUT.mkdir(parents=True, exist_ok=True)
+RESCORE = ROOT / 'docs/vault/30_Development/2026-09-28 48 task 진행률 재채점.md'
+REG = json.loads((ROOT / 'docs/task-registry.json').read_text('utf-8'))
+AT = '2026-11-18'
+INTEG = '59f0a3c2ff41ba1ae99a38515a2cdc65b2144067'
+CHAIN = 'd47630d730278aa9e49b15a63cd221696da8dc00'
+Z = '03e17c31cf535008d39534aaa80d3ae274bd75cc'
+C = '6fc0428b49f28379cb4da17830d92256b55c2eb2'
+T95 = '95a59b24'
+
+def blob(ref, path):
+    return subprocess.run(['git', '-C', str(ROOT), 'rev-parse', f'{ref}:{path}'], capture_output=True, text=True).stdout.strip()
+
+# --- parse the rescore §3 table (latest full per-row table) -------------------------------------
+lines = RESCORE.read_text('utf-8').split('\n')
+start = [i for i, l in enumerate(lines) if l.startswith('| task | owner | 09-18 baseline')][0]
+sec3 = {}
+for l in lines[start + 2:]:
+    if not l.startswith('| '):
+        break
+    c = [x.strip() for x in l.strip('|').split('|')]
+    sec3[c[0].strip('*')] = {'baseline0918': int(c[2]), 'train95a5': int(c[3].strip('*')),
+                             'remaining': re.sub(r'\*\*', '', c[6]), 'external': c[7]}
+assert len(sec3) == 48
+
+# Row moves recorded later in the same document (v1.5, v1.9, v1.15), each with its own binding.
+MOVES = {
+    'S11-BE': {'from': 50, 'to': 75, 'firstTree': 'b91ab72f (A, landed in C 6fc0428b)', 'section': '§4-2-2 (v1.5)',
+               'binding': 'tests/test_import_ac11_composite_long_soak.py', 'hosted': 'Backend 36436343934 @ b91ab72f (3.12/3.14 success)'},
+    'S12-FE': {'from': 50, 'to': 75, 'firstTree': 'I train9 9fc2029f (inside Z)', 'section': '§4-6-3 (v1.9)',
+               'binding': 'apps/web/tests/s12-release-manifest-server-binding.test.tsx', 'hosted': 'rescore v1.9 §4-6-1-1 run table'},
+    'S08-BE': {'from': 50, 'to': 75, 'firstTree': 'T train35 (inside Z)', 'section': '§4-12-2 (v1.15)',
+               'binding': 'tests/integration/test_build_product_runtime_real_pg.py', 'hosted': 'Core 37072629027 @ 4e148ae4, 13/13 cases re-derived'},
+}
+# Rows the C column already contains (S11-BE) vs. rows that first appear in Z.
+IN_C = {'S11-BE'}
+
+# FLEET5 runtime/ops evidence after 2026-11-04 that touches a row. None of it is acceptance.
+OPS = {
+    'S02-BE': 'three Linux Nodes admitted under pilot CA pki-r1 (11-07); CP leaf expired 11-09, CA expired 11-14 -> CA_TERMINAL',
+    'S02-DB': 'same three Node rows; trust now terminal',
+    'S02-FE': 'abb707 real administrator Chrome PKCE login and 21 resource GETs (11-08); IdP on Main:8443 not listening 11-18 20:25',
+    'S03-BE': 'first-workspace intent route deployed (API96, schema 0068); kill switch / no workload executed',
+    'S03-DB': 'workspace intent + run_01M6VXSMM9SV8MAB7K4B1YCRX8 recorded, awaiting_approval, never executed',
+    'S03-FE': 'FirstWorkspacePanel deployed in abb707; no executed result to show',
+    'S04-BE': 'approval apr_01M6VXSPZ0252M2SJ8ZA5E11QE 0/2 genuine approvers, expired 11-08 06:24 KST, enqueueEligible=false',
+    'S04-FE': 'same approval visible; no completed approve/cancel journey',
+    'S05-BE': 'capacity readback: 3 Nodes x 500m/64MiB measured, total 1500m/192MiB, GPU not offered',
+    'S05-FE': 'canonical dashboard resources (abb707) showed the measured limits, not hardware totals',
+    'S12-BE': 'owned PC3 cutovers with concrete old-UI rollback artefact (11-08); one cert-preserving switch 19.203 s (11-04)',
+    'S12-FE': 'portal abb707 served on PC3:13103 via Main:3100; liveness 200 on 11-18 (liveness only)',
+    'S12-DB': 'schema-only pg_dump before 0068 (835037 B); no data/globals backup, no restore rehearsal',
+}
+
+# Only one 50-point row has a material, row-scoped code delta on the unmerged fixed chain.
+RANGE = {'S12-BE': {'low': 50, 'high': 75,
+                    'why': 'Unmerged chain 59f0a3c2..d47630d7 adds install/upgrade/rollback-scope code and tests '
+                           '(deploy/lan worker_plain_rotation.py, worker_peer_floor.py, worker_leaf_rotation.py, '
+                           'tests/core/test_lan_workspace_upgrade.py, tests/test_fleet5_setup_packet.py, '
+                           'tests/test_lan_leaf_rotation*.py). A task-specific 75 binding review at an integrated tree '
+                           'has not been done, so no points are assigned.'}}
+
+tasks = {t['task_id']: t for t in REG['tasks']}
+outcome = {o['id']: o for o in REG['outcomes']}
+rows = []
+for tid, t in tasks.items():
+    s = sec3[tid]
+    m = MOVES.get(tid)
+    c_score = (m['to'] if (m and tid in IN_C) else s['train95a5'])
+    z_score = (m['to'] if m else s['train95a5'])
+    cur = z_score                       # carry-forward to the landed integration tip; see method
+    rng = RANGE.get(tid)
+    paths = BIND['rows'][tid]['paths']
+    present = all(v['INTEG_59f0a3c2'] and v['CHAIN_d47630d7'] for v in paths.values())
+    if tid in ('S01-FE', 'S01-DB'):
+        missing = 'none (formally done)'
+        closure = {'S01-FE': 'b0313282963294fa7e69d4d9a36f0983365ab120', 'S01-DB': '8b20d3e6691c6695230079a31fdf38bb387c7088'}[tid]
+    else:
+        closure = None
+        cap = []
+        if tid not in ('S01-BE', 'S01-ST'):
+            cap.append('prerequisite chain open (S01-BE/S01-ST blocked on user decisions; every later sprint depends on all four rows of the previous sprint)')
+        cap.append('required operational acceptance absent')
+        missing = s['remaining'] + ' | 100 also blocked by: ' + '; '.join(cap)
+    rows.append({
+        'taskId': tid, 'sprint': t['sprint'], 'area': t['area'], 'owner': t['owner'], 'reviewer': t['reviewer'],
+        'registryStatus_v1_0_1': t['status'], 'outcome': t['outcome_ids'][0], 'scope': t['scope'],
+        'baseline_0918': s['baseline0918'], 'train_95a59b24_sec3': s['train95a5'],
+        'landed_C_6fc0428b': c_score, 'Z_03e17c31_v1_21': z_score,
+        'proposedLanded_59f0a3c2': cur,
+        'proposedFixedChain_d47630d7': {'low': rng['low'], 'high': rng['high'], 'unresolved': True, 'why': rng['why']} if rng else {'low': cur, 'high': cur, 'unresolved': False},
+        'rowMove': m,
+        'closureCommit': closure,
+        'bindingPaths': {p: {'presentAt59f0a3c2': v['INTEG_59f0a3c2'], 'presentAtd47630d7': v['CHAIN_d47630d7'], 'resolved': v['resolved']} for p, v in paths.items()},
+        'bindingPresentBothTrees': present if paths else None,
+        'hostedProof': (m['hosted'] if m else 'tree-level only (rescore §2: Backend 36424405419, Core 36424410039, Frontend 36424414288 @95a59b24); landed tip 59f0a3c2 13/13 runs success incl. 8 post-landing-verify'),
+        'opsEvidenceAfter1104': OPS.get(tid),
+        'missingStage': missing, 'externalDeps': s['external'],
+        'ceilingNow': 100 if tid in ('S01-FE', 'S01-DB') else 75 if tid not in ('S01-BE', 'S01-ST') else '100 only after user decisions',
+        'confidence': 'medium' if rng else 'high',
+        'date': AT,
+        'nextOwner': ('Codex (row binding review at integrated tree) then Claude review' if rng else
+                      'none' if tid in ('S01-FE', 'S01-DB') else
+                      'user decisions U1-U6' if tid in ('S01-BE', 'S01-ST') else
+                      'Root operator + user for operational acceptance; row owner ' + t['owner'] + ' for any code gap'),
+    })
+
+def total(key):
+    return sum(r[key] for r in rows)
+low = sum(r['proposedFixedChain_d47630d7']['low'] for r in rows)
+high = sum(r['proposedFixedChain_d47630d7']['high'] for r in rows)
+ceiling = sum((r['ceilingNow'] if isinstance(r['ceilingNow'], int) else 75) for r in rows)
+hist = {k: [r[k] for r in rows].count for k in ()}
+dist = {}
+for r in rows:
+    dist[r['proposedLanded_59f0a3c2']] = dist.get(r['proposedLanded_59f0a3c2'], 0) + 1
+status = {}
+for r in rows:
+    status[r['registryStatus_v1_0_1']] = status.get(r['registryStatus_v1_0_1'], 0) + 1
+pct = lambda x: round(100 * x / 4800, 2)
+arith = {
+    'denominator': 4800, 'rubric': '48 equal rows, 0/25/50/75/100 (rescore §1-1, unchanged)',
+    'baseline_0918': [total('baseline_0918'), pct(total('baseline_0918'))],
+    'train_95a59b24': [total('train_95a59b24_sec3'), pct(total('train_95a59b24_sec3'))],
+    'landed_C_6fc0428b': [total('landed_C_6fc0428b'), pct(total('landed_C_6fc0428b'))],
+    'Z_03e17c31': [total('Z_03e17c31_v1_21'), pct(total('Z_03e17c31_v1_21'))],
+    'confirmedLowerBound_landed_59f0a3c2': [total('proposedLanded_59f0a3c2'), pct(total('proposedLanded_59f0a3c2'))],
+    'fixedChain_d47630d7_range': [[low, pct(low)], [high, pct(high)]],
+    'structuralCeilingNow': [ceiling, pct(ceiling)],
+    'scoreDistributionLanded': dict(sorted(dist.items())),
+    'formalRegistry': {'version': REG['version'], 'counts': status, 'donePercent': round(100 * status.get('done', 0) / 48, 2),
+                       'outcomesPlanned': sum(1 for o in REG['outcomes'] if o['status'] == 'planned')},
+}
+assert arith['baseline_0918'][0] == 2800 and arith['train_95a59b24'][0] == 3400
+assert arith['landed_C_6fc0428b'][0] == 3425 and arith['Z_03e17c31'][0] == 3475
+trace = {
+    'docID': 'EVIDENCE-FLEET5-COMPLETION-AUDIT-TRACE48-20261118-CLAUDE', 'version': '1.0.0', 'atKST': AT,
+    'sources': {'registry': ['docs/task-registry.json', blob(INTEG, 'docs/task-registry.json')],
+                'rescore': ['PROGRESS-RESCORE-20260928-CLAUDE v1.21.1 (base 03e17c31)', blob('HEAD', 'docs/vault/30_Development/2026-09-28 48 task 진행률 재채점.md')]},
+    'trees': {'C_landed_until_1104_1208KST': C, 'Z_train78_landed_1104_1208KST': Z, 'integrationTip_now': INTEG,
+              'fixedChain_unmerged': ['1efea494f026e932360c35ae811b6423d874a2e7', '96afd799d49717fd40e4ddabd538d82accbe1958',
+                                      'abb7074e3da0d547ac81d3da33dce347d5c656af', CHAIN],
+              'originMain_stale': 'f9be6b61c9970d7feeb0d43fafb3c0704b8d31de'},
+    'method': [
+        'Rows, owners, statuses from registry v1.0.1 at the integration tip (blob identical at d47630d7 and Root544).',
+        'Per-row scores: rescore §3 table re-parsed (sums to 3400 at 95a59b24), plus the three later documented moves '
+        'S11-BE (v1.5), S12-FE (v1.9), S08-BE (v1.15). Recomputed C=3425 and Z=3475 from rows.',
+        'Z 03e17c31 is an ancestor of the integration tip 59f0a3c2; 59f0a3c2 has 13/13 hosted runs success (8 post-landing-verify). '
+        'v1.21.1 left the landed column un-rescored because the first landing push failed; that condition is now closed, so 3475 is a landed value.',
+        'Each of the 88 cited binding paths was checked with git ls-tree at 59f0a3c2 and d47630d7: all present (one abbreviated inv/sandbox.py resolved under services/control-plane/src/inv).',
+        'No row was re-audited at case level; untouched rows carry forward the v1.21 judgment. Only S12-BE has a material row-scoped delta on the unmerged chain, kept as an unresolved range.',
+        'Test, commit, PR and file counts are not weights. No operational evidence after 11-04 meets the 100 condition (prerequisites + required operational acceptance).',
+    ],
+    'arithmetic': arith,
+    'rows': rows,
+}
+(OUT / 'trace-48.json').write_text(json.dumps(trace, ensure_ascii=False, indent=1) + '\n', 'utf-8', newline='\n')
+
+# --- expanded VF scope -----------------------------------------------------------------------------
+vfcx = json.loads(subprocess.run(['git', '-C', str(ROOT), 'show', f'{CHAIN}:docs/vf-task-registry.json'], capture_output=True).stdout)
+vfcl = json.loads(subprocess.run(['git', '-C', str(ROOT), 'show', f'{CHAIN}:docs/vf-cl-task-registry.json'], capture_output=True).stdout)
+flags = ['implemented', 'locallyVerified', 'ciVerified', 'independentlyReviewed', 'operationallyAccepted']
+cards = []
+for reg, track in ((vfcx, 'VF-CX'), (vfcl, 'VF-CL')):
+    for c in reg['cards']:
+        cards.append({'id': c['id'], 'track': track, 'title': c['title'], 'owner': c['owner'], 'reviewer': c['reviewer'],
+                      'state': c['state'], **{f: c.get(f) for f in flags}, 'blockers': c.get('blockers', []),
+                      'source': f'docs/{"vf-task-registry.json" if track == "VF-CX" else "vf-cl-task-registry.json"}@{reg["version"]}'})
+GM = [('VF-GM-01', 'Web Desktop Shell and navigation', 'responsive/accessibility tests'),
+      ('VF-GM-02', 'My Computer / Resource Explorer', 'logical total + physical topology'),
+      ('VF-GM-03', 'File Explorer and inv:// UX', 'upload/version/error/partial failure E2E'),
+      ('VF-GM-04', 'Model Studio and shard/replica state', 'import/repair/run journey E2E'),
+      ('VF-GM-05', 'Terminal/IDE/PowerShell/Bash session UX', 'reconnect/expiry/permission E2E'),
+      ('VF-GM-06', 'External HTTPS, browser matrix, rollback', 'real-browser acceptance report')]
+for i, title, ev in GM:
+    cards.append({'id': i, 'track': 'VF-GM', 'title': title, 'owner': 'Gemini', 'reviewer': 'Codex', 'state': 'self-reported approved (Gemini board)',
+                  'implemented': 'self-reported', 'locallyVerified': 'self-reported', 'ciVerified': None, 'independentlyReviewed': None,
+                  'operationallyAccepted': False, 'blockers': ['no machine registry', 'roadmap pass evidence "' + ev + '" not independently accepted'],
+                  'source': 'roadmap card table + Gemini board (no registry file)'})
+outcomes = [
+    ('VF-01', 'one canonical secure control plane', 'real DB, OIDC, RLS, route coverage, denial tests',
+     'VF-CX-01 implemented=partial; API96 single deployed app on PC3 with real OIDC login 11-08',
+     'IdP Main:8443 and CP DB Main:55461 not listening 11-18; VF-CX-01 partial'),
+    ('VF-02', 'Web Desktop single-PC experience', 'external browser E2E, accessibility, session restore',
+     'abb707 portal deployed; real admin PKCE login and resource frames 11-08',
+     'AC-11 accessibility MEASURED_FAIL (manualAcceptanceMissingCount 1); session-restore acceptance absent; login currently down with IdP'),
+    ('VF-03', 'unified inv:// namespace', 'create/read/version/checksum/recovery tests',
+     'VF-CL-01/02 implemented, CI-verified, reviewed', 'operationallyAccepted=false; no live inv:// round trip on the fleet'),
+    ('VF-04', 'ModelManifest and shard/replica management', 'import, hash, pin, repair, GC tests',
+     'VF-CX-02 and VF-CL-03 implemented, CI-verified, reviewed', 'no live model import/repair on real Nodes'),
+    ('VF-05', 'locality-aware distributed execution', 'explainable placement and real per-runtime execution',
+     'VF-CX-03/04 implemented; capacity API measured 3 x 500m/64MiB', 'zero real workload executed (run awaiting approval, expired)'),
+    ('VF-06', 'five real PC acceptance', 'Node loss/rejoin, storage, GPU, terminal, recovery evidence',
+     '3 Linux Nodes once admitted (11-07) under a 7-day pilot CA', 'VF-CX-05 blocked; CA_TERMINAL; PC1 SSH key rejected; Main not a Node; GPU not offered'),
+    ('VF-07', 'Cell/Federation readiness', 'scale test, catalog boundary, policy split design',
+     'roadmap marks it Later', 'no card, no registry, no evidence'),
+]
+vf = {
+    'docID': 'EVIDENCE-FLEET5-COMPLETION-AUDIT-VF-MATRIX-20261118-CLAUDE', 'version': '1.0.0', 'atKST': AT,
+    'anchors': {'roadmap': 'ROADMAP-VIRTUAL-COMPUTER-001 v1.0.0 (Outcome table, Agent card tables)',
+                'designIndex': 'INDEX-VIRTUAL-COMPUTER-001 v1.0.0 (진행률 해석: separate denominator, not mixed into 4800)'},
+    'cardCountNote': 'The roadmap lists 16 cards (5 VF-CX, 5 VF-CL, 6 VF-GM), not 15. Only VF-CX and VF-CL have machine registries (acceptanceDenominator 5 each, acceptedCards 0 each).',
+    'cards': cards,
+    'outcomes': [{'id': o[0], 'intent': o[1], 'passEvidence': o[2], 'acceptedCodeOrRuntime': o[3], 'missingAcceptance': o[4], 'accepted': False} for o in outcomes],
+    'counts': {'cardsListed': len(cards), 'machineRegistered': sum(1 for c in cards if c['track'] != 'VF-GM'),
+               'implementedTrue': sum(1 for c in cards if c['implemented'] is True), 'implementedPartial': sum(1 for c in cards if c['implemented'] == 'partial'),
+               'ciVerifiedTrue': sum(1 for c in cards if c['ciVerified'] is True), 'operationallyAccepted': sum(1 for c in cards if c['operationallyAccepted'] is True),
+               'outcomesAccepted': 0, 'outcomes': len(outcomes)},
+    'singlePercentCalculable': False,
+    'whyNot': ['design index: the new scope gets its own denominator only after cards and acceptance evidence are registered',
+               'no weights or rubric exist for VF cards or outcomes; any percent would be invented',
+               'VF-GM has no registry; VF-07 has no card',
+               'operational acceptance is 0 of 16 cards and 0 of 7 outcomes, so the only accepted-ratio that exists is 0'],
+    'finiteConditionsTo100': [
+        'register VF-GM cards in a machine registry with the roadmap pass evidence and an independent reviewer',
+        'fix the expanded denominator (cards + outcomes, equal weight or explicit weights) in a reviewed ADR before scoring',
+        'restore DB + IdP durability and a new valid authority, then re-admit Nodes',
+        'execute the first genuine approved workload, inv:// round trip and model import on real Nodes',
+        'five-PC acceptance (VF-06) incl. Node loss/rejoin, storage, GPU offer, terminal, recovery',
+        'VF-07 card and scale/boundary evidence, or an explicit ADR moving it out of the 100 scope'],
+}
+(OUT / 'expanded-vf-matrix.json').write_text(json.dumps(vf, ensure_ascii=False, indent=1) + '\n', 'utf-8', newline='\n')
+print(json.dumps({'arith': arith, 'vfCounts': vf['counts']}, ensure_ascii=False))

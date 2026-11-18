@@ -1,0 +1,103 @@
+"""Writes transport-verdict.json and connection-table.json (Claude audit, 2026-11-18). Static review only.
+Usage: python -I build_transport_and_connections.py <out-dir>"""
+import json, sys
+from pathlib import Path
+OUT = Path(sys.argv[1])
+E = 'docs/vault/30_Development/Evidence/fleet5-20261105-root/user-transport-resilience-20261118'
+transport = {
+    'docID': 'EVIDENCE-FLEET5-USER-TRANSPORT-REVIEW-20261118-CLAUDE', 'version': '1.0.0', 'atKST': '2026-11-18',
+    'reviewer': 'Claude (independent; not the author of the Root operator script)', 'author': 'Root Codex operator',
+    'target': {'script': E + '/Keep-SaintVisionTransport.ps1.txt', 'scriptSHA256': 'ca07421e1a2b5cef6b3da6b9c4b6525f889366e8abdc49166571c7209af16601',
+               'scriptSHA256MatchesInstallation': True,
+               'verifier': E + '/verify_user_transport_reconnect_20261118.ps1.txt',
+               'manifestCheck': '16/16 files match file-manifest.json: 3 by raw bytes, 13 after LF->CRLF conversion (manifest hashed CRLF bytes; Git stores LF)'},
+    'scope': 'Static read of the committed script, verifier and receipts. No PowerShell, SSH, reboot, logon, process or network action by the reviewer. '
+             'The 6.561 s reconnect is Root operator evidence; its arithmetic (20:49:27.4702909 - 20:49:20.9096232 = 6.5607 s) and the event order '
+             '(SSH_EXITED 20:49:20.934 -> SSH_PROCESS_STARTED 20:49:26.351, 5 s sleep) are internally consistent.',
+    'verdict': 'SOUND_AS_A_CURRENT_USER_INTERACTIVE_TRANSPORT_NOT_ACCEPTABLE_AS_PERSISTENT_CONNECTION_UNTIL_M1_M4',
+    'verifiedSound': [
+        'host key pinned twice: SHA-256 of known_hosts.pinned checked before every start, plus StrictHostKeyChecking=yes with UserKnownHostsFile',
+        'BatchMode=yes, IdentitiesOnly=yes, ConnectTimeout=5, ConnectionAttempts=1: no password prompt or agent key fallback',
+        'both forward ends bound to 127.0.0.1 (Main 3100/18080 -> PC3 loopback 13103/8080); no LAN exposure',
+        'ExitOnForwardFailure=yes plus ServerAliveInterval 15 x 3 makes a dead tunnel exit within about 45 s',
+        'occupied-port HOLD never kills a foreign process; abandoned-mutex case handled',
+        'state written through temp file + Move-Item; event log rotated at 2 MiB x 2',
+        'no credential, token or DSN in state.json/events.jsonl; scope string disclaims auth/DB/Node acceptance',
+        'verifier killed only the exact owned child after checking executable, parent, command line, start time and listener ownership; first verifier failure was preserved',
+    ],
+    'findings': [
+        {'id': 'M1', 'class': 'MANDATORY', 'title': 'catch block can throw and end the supervisor',
+         'detail': 'Write-TransportState/Write-TransportEvent run inside catch. If they throw (Move-Item onto state.json while a reader holds it without delete sharing, disk full, ACL), '
+                   'the exception leaves while($true), runs finally and the process exits. Nothing restarts it until the next interactive logon.',
+         'fix': 'guard every state/event write with its own try/catch; never throw from catch; retry the replace; keep an outer loop.'},
+        {'id': 'M2', 'class': 'MANDATORY', 'title': 'no supervision of the supervisor; no headless or reboot start',
+         'detail': 'HKCU Run starts it only at interactive logon. A crash, kill, logoff or reboot without logon leaves no transport. '
+                   'Reboot/logon test is NOT_RUN (Root states this). Earlier S4U task registration failed with 0x80070005.',
+         'fix': 'choose and record one mechanism with restart-on-failure (Task Scheduler at logon + restart policy + periodic watchdog, or a service), then run a real logoff/logon and reboot test.'},
+        {'id': 'M3', 'class': 'MANDATORY', 'title': 'state.json is not a health signal',
+         'detail': 'state is written only on transitions. SSH_PROCESS_STARTED stays unchanged when the supervisor is dead, when ssh is up but the PC3 service is down, or when forwards fail per connection. '
+                   'There is no heartbeat time, no end-to-end probe and no alert.',
+         'fix': 'redacted status collector: supervisor PID+StartTime liveness, listener ownership, fresh HTTP probe with observedAt, freshness limit, alert after N failures.'},
+        {'id': 'M4', 'class': 'MANDATORY', 'title': 'startup command not evidenced',
+         'detail': 'installation.json names the HKCU Run key and value name but not the value data (command line) or its hash, so the startup path to the pinned script cannot be checked.',
+         'fix': 'record the exact Run value data and its SHA-256 (no secrets in it) and check it in the status collector.'},
+        {'id': 'L1', 'class': 'LOW', 'title': 'least privilege of the tunnel key',
+         'detail': 'the always-on tunnel uses the same sv-lan-ed25519 key used for shell SSH to PC1-PC4; no authorized_keys restriction is evidenced.',
+         'fix': 'dedicated tunnel key on PC3 with restrict,port-forwarding,permitopen="127.0.0.1:13103",permitopen="127.0.0.1:8080" and a no-shell command.'},
+        {'id': 'L2', 'class': 'LOW', 'title': 'ssh configuration not isolated',
+         'detail': 'no -F none; user/system ssh_config can add options not set on the command line. GlobalKnownHostsFile is not pinned or disabled.',
+         'fix': 'add -F none and pin or disable the global known-hosts file (check the exact value accepted by the installed OpenSSH).'},
+        {'id': 'L3', 'class': 'LOW', 'title': 'exit code lost', 'detail': 'events.jsonl records exitCode null for the observed exit; Start-Process -PassThru objects lose ExitCode unless the handle is cached.',
+         'fix': 'read $child.Handle right after Start-Process.'},
+        {'id': 'L4', 'class': 'LOW', 'title': 'orphan ssh child', 'detail': 'the child is not in a job object; if the supervisor dies the ssh child keeps the ports unsupervised and a new supervisor waits in HOLD_LOCAL_PORT_OCCUPIED.',
+         'fix': 'job object with kill-on-close, or detect an own orphan by exact command line.'},
+        {'id': 'L5', 'class': 'LOW', 'title': 'fixed retry, no backoff or escalation', 'detail': 'permanent errors retry every 5-15 s forever; HOLD_KEY_UNAVAILABLE writes state but no event.',
+         'fix': 'bounded backoff, an event for every HOLD, and an alert threshold.'},
+        {'id': 'L6', 'class': 'LOW', 'title': 'session-local mutex', 'detail': 'Local\\ mutex is per logon session; a second session can start a second supervisor; only the port guard prevents double binding.',
+         'fix': 'Global\\ name or record that single-session use is assumed.'},
+        {'id': 'I1', 'class': 'INFO', 'title': 'UTF-8 BOM', 'detail': 'PowerShell 5.1 -Encoding UTF8 writes a BOM; state.json and line 1 of events.jsonl start with it, so strict JSON/JSONL readers fail.'},
+        {'id': 'I2', 'class': 'INFO', 'title': 'transport covers only portal and API',
+         'detail': 'the real IdP (Main:8443, reverse-forwarded to PC3:8443) and the CP DB (Main:55461, reverse-forwarded from PC3:15461) are outside this supervisor; '
+                   'Root observed no listener on 55461/8443 at 20:25 KST and the Main Docker daemon unavailable. Login and DB-backed API calls cannot work through this transport alone.'},
+        {'id': 'I3', 'class': 'INFO', 'title': 'local exposure', 'detail': 'any local process on Main can reach the PC3 API and portal through 127.0.0.1; API authentication still applies.'},
+        {'id': 'I4', 'class': 'INFO', 'title': 'healthz is liveness', 'detail': 'HTTP 200 /healthz proves process liveness only (Root states this correctly).'},
+    ],
+    'counts': {'MANDATORY': 4, 'LOW': 6, 'INFO': 4},
+    'claimsCheckedAsHonest': ['startupMode states reboot/logon NOT_RUN', 'scope disclaims DB/auth/Node acceptance', 'fullFivePCConnectivityAccepted false', 'wholeProgramComplete false'],
+    'implementationOwner': 'Root (operator script owner). Claude did not edit the script.',
+}
+(OUT / 'transport-verdict.json').write_text(json.dumps(transport, ensure_ascii=False, indent=1) + '\n', 'utf-8', newline='\n')
+
+conn = {
+    'docID': 'EVIDENCE-FLEET5-CONNECTION-TABLE-20261118-CLAUDE', 'version': '1.0.0', 'atKST': '2026-11-18',
+    'source': 'Root receipts only (fleet-receipt 20:51:10, stack-receipt 20:39:34, root-current-state 20:33:43, reconnect-verification 20:49:27). The reviewer made no SSH, API, DB or service contact.',
+    'hosts': [
+        {'host': 'PC1 inviz@192.168.45.13', 'SSH': 'exit 255 publickey rejected at 20:51 (user reported key installed; .pub matches)', 'docker': 'UNOBSERVED', 'node': 'none admitted',
+         'trust': 'n/a', 'offered': 'none', 'next': 'user: non-secret account/IP/authorized_keys mode/fingerprint diagnosis'},
+        {'host': 'PC2 saintvision-invion@192.168.45.143', 'SSH': 'exit 0', 'docker': 'ssh+docker active/enabled, Docker 29.1.3 API 1.52',
+         'node': 'nod_01M6TGQZ8S3DAFS7TYE8TY1PX2 running, unless-stopped, started 11-07T21:39:57Z', 'trust': 'NOT_PROVEN_CA_TERMINAL',
+         'offered': '500m / 64 MiB (capacity readback 11-08); GPU T600 4096 MiB observed as metadata only, not offered'},
+        {'host': 'PC3 saintvision-invion3@192.168.45.222', 'SSH': 'exit 0', 'docker': 'ssh+docker active/enabled',
+         'node': 'nod_01M6TAWG25JTA3F7J7S1EE4N2W running, unless-stopped, started 11-07T21:49:20Z', 'trust': 'NOT_PROVEN_CA_TERMINAL (CA notAfter 11-14 07:15:30Z, CP leaf 11-09 07:15:30Z)',
+         'offered': '500m / 64 MiB; GPU metadata only',
+         'services': 'API96, portal abb707, observer running unless-stopped; /healthz 200 = liveness only; CP DB and IdP are not on PC3'},
+        {'host': 'PC4 inviz@192.168.45.210', 'SSH': 'exit 0', 'docker': 'ssh+docker active/enabled',
+         'node': 'nod_01M6TGSXV1J7XWC5D5H7N6EW1D running, unless-stopped, started 11-07T21:49:28Z', 'trust': 'NOT_PROVEN_CA_TERMINAL', 'offered': '500m / 64 MiB; GPU metadata only'},
+        {'host': 'Main (CP, Windows)', 'SSH': 'client only', 'docker': 'daemon unavailable (MainPriorDB inspectExit 1)',
+         'node': 'not admitted (VF-CX-05 blocker text cites Docker API 1.41 and no WSL Ubuntu; Root 11-08 reading says the API met the source minimum; either way no Node joined)', 'trust': 'CA_TERMINAL',
+         'transport': 'user transport 3100/18080 restored, HKCU Run registered, reboot/logon NOT_RUN',
+         'services': 'CP DB (loopback 55461) and real IdP (loopback 8443) had no listener at 20:25 KST'},
+    ],
+    'aggregate': {'reachableLinux': '3 of 4', 'nodesRunning': 3, 'nodesTrusted': 0, 'offeredTotal': '1500m CPU / 192 MiB RAM / 0 GPU (historical 11-08 readback; not current trusted capacity)',
+                  'hardwareObserved': '3 x 12 threads, 14.8-15.3 GiB RAM, T600 4096 MiB each: metadata, not pooled, not offered', 'fivePCHealthy': False},
+    'persistentEndStateMap': [
+        {'layer': 'Linux process persistence', 'now': 'docker+ssh enabled, Node containers unless-stopped on PC2-4', 'gap': 'restart after reboot under expired trust exits (policy fails closed); PC1 unreachable', 'owner': 'Root/user', 'evidence': 'real reboot of one Linux PC after new authority, container + Node re-handshake readback'},
+        {'layer': 'transport auto-supervisor', 'now': 'current-user Run key, 6.561 s child reconnect proven', 'gap': 'M1-M4; IdP/DB bridges not covered', 'owner': 'Root', 'evidence': 'crash/kill/logoff/reboot tests with receipts'},
+        {'layer': 'DB/IdP durability and latest data', 'now': 'Main Docker daemon off; last backup is schema-only (11-07, no data/globals, no restore rehearsal)', 'gap': 'latest data unpreserved, single host', 'owner': 'Root (operator) / Claude (runbook, restore drill tooling)', 'evidence': 'data+globals dump SHA, disposable restore with row counts, documented placement'},
+        {'layer': 'authority replacement and advance renewal', 'now': 'CA_TERMINAL; accepted d476 only covers expired policy under a still-valid CA/leaf', 'gap': 'no reviewed authority-replacement workflow (renewal plan: now>=A is outside its scope); 7-day CA / 2-day leaf lifetimes', 'owner': 'Codex (contract+code), Claude (review)', 'evidence': 'reviewed contract, hosted proofs, real re-admission, renewal ahead of expiry by an unattended job'},
+        {'layer': 'fresh health, alert, redacted status', 'now': 'per-run Root receipts only', 'gap': 'no continuous freshness/alerting', 'owner': 'Claude (read-only collector) + Root (deployment)', 'evidence': 'collector tests + hosted CI + live redacted status with observedAt'},
+        {'layer': 'real power/network recovery', 'now': 'NOT_RUN', 'gap': 'no reboot, cable or Wi-Fi loss test', 'owner': 'Root + user', 'evidence': 'timed receipts per host'},
+    ],
+}
+(OUT / 'connection-table.json').write_text(json.dumps(conn, ensure_ascii=False, indent=1) + '\n', 'utf-8', newline='\n')
+print('ok')

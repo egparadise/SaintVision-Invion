@@ -1,0 +1,103 @@
+{
+ "docID": "EVIDENCE-FLEET5-CONNECTION-TABLE-20261118-CLAUDE",
+ "version": "1.0.0",
+ "atKST": "2026-11-18",
+ "source": "Root receipts only (fleet-receipt 20:51:10, stack-receipt 20:39:34, root-current-state 20:33:43, reconnect-verification 20:49:27). The reviewer made no SSH, API, DB or service contact.",
+ "hosts": [
+  {
+   "host": "PC1 inviz@192.168.45.13",
+   "SSH": "exit 255 publickey rejected at 20:51 (user reported key installed; .pub matches)",
+   "docker": "UNOBSERVED",
+   "node": "none admitted",
+   "trust": "n/a",
+   "offered": "none",
+   "next": "user: non-secret account/IP/authorized_keys mode/fingerprint diagnosis"
+  },
+  {
+   "host": "PC2 saintvision-invion@192.168.45.143",
+   "SSH": "exit 0",
+   "docker": "ssh+docker active/enabled, Docker 29.1.3 API 1.52",
+   "node": "nod_01M6TGQZ8S3DAFS7TYE8TY1PX2 running, unless-stopped, started 11-07T21:39:57Z",
+   "trust": "NOT_PROVEN_CA_TERMINAL",
+   "offered": "500m / 64 MiB (capacity readback 11-08); GPU T600 4096 MiB observed as metadata only, not offered"
+  },
+  {
+   "host": "PC3 saintvision-invion3@192.168.45.222",
+   "SSH": "exit 0",
+   "docker": "ssh+docker active/enabled",
+   "node": "nod_01M6TAWG25JTA3F7J7S1EE4N2W running, unless-stopped, started 11-07T21:49:20Z",
+   "trust": "NOT_PROVEN_CA_TERMINAL (CA notAfter 11-14 07:15:30Z, CP leaf 11-09 07:15:30Z)",
+   "offered": "500m / 64 MiB; GPU metadata only",
+   "services": "API96, portal abb707, observer running unless-stopped; /healthz 200 = liveness only; CP DB and IdP are not on PC3"
+  },
+  {
+   "host": "PC4 inviz@192.168.45.210",
+   "SSH": "exit 0",
+   "docker": "ssh+docker active/enabled",
+   "node": "nod_01M6TGSXV1J7XWC5D5H7N6EW1D running, unless-stopped, started 11-07T21:49:28Z",
+   "trust": "NOT_PROVEN_CA_TERMINAL",
+   "offered": "500m / 64 MiB; GPU metadata only"
+  },
+  {
+   "host": "Main (CP, Windows)",
+   "SSH": "client only",
+   "docker": "daemon unavailable (MainPriorDB inspectExit 1)",
+   "node": "not admitted (VF-CX-05 blocker text cites Docker API 1.41 and no WSL Ubuntu; Root 11-08 reading says the API met the source minimum; either way no Node joined)",
+   "trust": "CA_TERMINAL",
+   "transport": "user transport 3100/18080 restored, HKCU Run registered, reboot/logon NOT_RUN",
+   "services": "CP DB (loopback 55461) and real IdP (loopback 8443) had no listener at 20:25 KST"
+  }
+ ],
+ "aggregate": {
+  "reachableLinux": "3 of 4",
+  "nodesRunning": 3,
+  "nodesTrusted": 0,
+  "offeredTotal": "1500m CPU / 192 MiB RAM / 0 GPU (historical 11-08 readback; not current trusted capacity)",
+  "hardwareObserved": "3 x 12 threads, 14.8-15.3 GiB RAM, T600 4096 MiB each: metadata, not pooled, not offered",
+  "fivePCHealthy": false
+ },
+ "persistentEndStateMap": [
+  {
+   "layer": "Linux process persistence",
+   "now": "docker+ssh enabled, Node containers unless-stopped on PC2-4",
+   "gap": "restart after reboot under expired trust exits (policy fails closed); PC1 unreachable",
+   "owner": "Root/user",
+   "evidence": "real reboot of one Linux PC after new authority, container + Node re-handshake readback"
+  },
+  {
+   "layer": "transport auto-supervisor",
+   "now": "current-user Run key, 6.561 s child reconnect proven",
+   "gap": "M1-M4; IdP/DB bridges not covered",
+   "owner": "Root",
+   "evidence": "crash/kill/logoff/reboot tests with receipts"
+  },
+  {
+   "layer": "DB/IdP durability and latest data",
+   "now": "Main Docker daemon off; last backup is schema-only (11-07, no data/globals, no restore rehearsal)",
+   "gap": "latest data unpreserved, single host",
+   "owner": "Root (operator) / Claude (runbook, restore drill tooling)",
+   "evidence": "data+globals dump SHA, disposable restore with row counts, documented placement"
+  },
+  {
+   "layer": "authority replacement and advance renewal",
+   "now": "CA_TERMINAL; accepted d476 only covers expired policy under a still-valid CA/leaf",
+   "gap": "no reviewed authority-replacement workflow (renewal plan: now>=A is outside its scope); 7-day CA / 2-day leaf lifetimes",
+   "owner": "Codex (contract+code), Claude (review)",
+   "evidence": "reviewed contract, hosted proofs, real re-admission, renewal ahead of expiry by an unattended job"
+  },
+  {
+   "layer": "fresh health, alert, redacted status",
+   "now": "per-run Root receipts only",
+   "gap": "no continuous freshness/alerting",
+   "owner": "Claude (read-only collector) + Root (deployment)",
+   "evidence": "collector tests + hosted CI + live redacted status with observedAt"
+  },
+  {
+   "layer": "real power/network recovery",
+   "now": "NOT_RUN",
+   "gap": "no reboot, cable or Wi-Fi loss test",
+   "owner": "Root + user",
+   "evidence": "timed receipts per host"
+  }
+ ]
+}

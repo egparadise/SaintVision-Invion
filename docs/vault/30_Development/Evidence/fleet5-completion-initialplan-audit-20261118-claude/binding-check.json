@@ -1,0 +1,824 @@
+{
+ "rows": {
+  "S01-FE": {
+   "baseline0918": 75,
+   "train95a5": 100,
+   "paths": {}
+  },
+  "S01-BE": {
+   "baseline0918": 75,
+   "train95a5": 75,
+   "paths": {}
+  },
+  "S01-DB": {
+   "baseline0918": 75,
+   "train95a5": 100,
+   "paths": {}
+  },
+  "S01-ST": {
+   "baseline0918": 50,
+   "train95a5": 75,
+   "paths": {
+    "tests/test_s01_readiness_preflight.py": {
+     "Z_03e17c31": true,
+     "INTEG_59f0a3c2": true,
+     "CHAIN_d47630d7": true,
+     "resolved": "tests/test_s01_readiness_preflight.py"
+    },
+    "tests/core/test_storage_roundtrip_verifier.py": {
+     "Z_03e17c31": true,
+     "INTEG_59f0a3c2": true,
+     "CHAIN_d47630d7": true,
+     "resolved": "tests/core/test_storage_roundtrip_verifier.py"
+    }
+   }
+  },
+  "S02-FE": {
+   "baseline0918": 50,
+   "train95a5": 75,
+   "paths": {
+    "apps/web/tests/auth-session.test.ts": {
+     "Z_03e17c31": true,
+     "INTEG_59f0a3c2": true,
+     "CHAIN_d47630d7": true,
+     "resolved": "apps/web/tests/auth-session.test.ts"
+    },
+    "node-journey.test.ts": {
+     "Z_03e17c31": true,
+     "INTEG_59f0a3c2": true,
+     "CHAIN_d47630d7": true,
+     "resolved": "apps/web/tests/node-journey.test.ts"
+    }
+   }
+  },
+  "S02-BE": {
+   "baseline0918": 75,
+   "train95a5": 75,
+   "paths": {
+    "tests/test_node_auth.py": {
+     "Z_03e17c31": true,
+     "INTEG_59f0a3c2": true,
+     "CHAIN_d47630d7": true,
+     "resolved": "tests/test_node_auth.py"
+    },
+    "test_node_auth_commit.py": {
+     "Z_03e17c31": true,
+     "INTEG_59f0a3c2": true,
+     "CHAIN_d47630d7": true,
+     "resolved": "tests/test_node_auth_commit.py"
+    },
+    "core/test_terminal_ticket_authority.py": {
+     "Z_03e17c31": true,
+     "INTEG_59f0a3c2": true,
+     "CHAIN_d47630d7": true,
+     "resolved": "tests/core/test_terminal_ticket_authority.py"
+    }
+   }
+  },
+  "S02-DB": {
+   "baseline0918": 75,
+   "train95a5": 75,
+   "paths": {
+    "tests/core/test_node_output.py": {
+     "Z_03e17c31": true,
+     "INTEG_59f0a3c2": true,
+     "CHAIN_d47630d7": true,
+     "resolved": "tests/core/test_node_output.py"
+    },
+    "tests/core/test_node_chunk.py": {
+     "Z_03e17c31": true,
+     "INTEG_59f0a3c2": true,
+     "CHAIN_d47630d7": true,
+     "resolved": "tests/core/test_node_chunk.py"
+    }
+   }
+  },
+  "S02-ST": {
+   "baseline0918": 50,
+   "train95a5": 75,
+   "paths": {
+    "tests/core/test_storage_list_response_contract.py": {
+     "Z_03e17c31": true,
+     "INTEG_59f0a3c2": true,
+     "CHAIN_d47630d7": true,
+     "resolved": "tests/core/test_storage_list_response_contract.py"
+    }
+   }
+  },
+  "S03-FE": {
+   "baseline0918": 50,
+   "train95a5": 75,
+   "paths": {
+    "apps/web/tests/workspace-execution.test.ts": {
+     "Z_03e17c31": true,
+     "INTEG_59f0a3c2": true,
+     "CHAIN_d47630d7": true,
+     "resolved": "apps/web/tests/workspace-execution.test.ts"
+    },
+    "workspace-list-5state-contract.test.tsx": {
+     "Z_03e17c31": true,
+     "INTEG_59f0a3c2": true,
+     "CHAIN_d47630d7": true,
+     "resolved": "apps/web/tests/workspace-list-5state-contract.test.tsx"
+    }
+   }
+  },
+  "S03-BE": {
+   "baseline0918": 75,
+   "train95a5": 75,
+   "paths": {
+    "tests/core/test_sandbox_contracts.py": {
+     "Z_03e17c31": true,
+     "INTEG_59f0a3c2": true,
+     "CHAIN_d47630d7": true,
+     "resolved": "tests/core/test_sandbox_contracts.py"
+    },
+    "integration/test_tool_admission.py": {
+     "Z_03e17c31": true,
+     "INTEG_59f0a3c2": true,
+     "CHAIN_d47630d7": true,
+     "resolved": "tests/integration/test_tool_admission.py"
+    }
+   }
+  },
+  "S03-DB": {
+   "baseline0918": 75,
+   "train95a5": 75,
+   "paths": {
+    "tests/core/test_evidence_envelope_serving.py": {
+     "Z_03e17c31": true,
+     "INTEG_59f0a3c2": true,
+     "CHAIN_d47630d7": true,
+     "resolved": "tests/core/test_evidence_envelope_serving.py"
+    },
+    "core/test_run_record_artifacts_route.py": {
+     "Z_03e17c31": true,
+     "INTEG_59f0a3c2": true,
+     "CHAIN_d47630d7": true,
+     "resolved": "tests/core/test_run_record_artifacts_route.py"
+    }
+   }
+  },
+  "S03-ST": {
+   "baseline0918": 50,
+   "train95a5": 50,
+   "paths": {
+    "tests/core/test_artifact_content_contract.py": {
+     "Z_03e17c31": true,
+     "INTEG_59f0a3c2": true,
+     "CHAIN_d47630d7": true,
+     "resolved": "tests/core/test_artifact_content_contract.py"
+    }
+   }
+  },
+  "S04-FE": {
+   "baseline0918": 50,
+   "train95a5": 75,
+   "paths": {
+    "apps/web/tests/approval-review.test.tsx": {
+     "Z_03e17c31": true,
+     "INTEG_59f0a3c2": true,
+     "CHAIN_d47630d7": true,
+     "resolved": "apps/web/tests/approval-review.test.tsx"
+    },
+    "approval-timeline.test.ts": {
+     "Z_03e17c31": true,
+     "INTEG_59f0a3c2": true,
+     "CHAIN_d47630d7": true,
+     "resolved": "apps/web/tests/approval-timeline.test.ts"
+    }
+   }
+  },
+  "S04-BE": {
+   "baseline0918": 75,
+   "train95a5": 75,
+   "paths": {
+    "tests/core/test_approval_contracts.py": {
+     "Z_03e17c31": true,
+     "INTEG_59f0a3c2": true,
+     "CHAIN_d47630d7": true,
+     "resolved": "tests/core/test_approval_contracts.py"
+    },
+    "core/test_approval_review_response_contract.py": {
+     "Z_03e17c31": true,
+     "INTEG_59f0a3c2": true,
+     "CHAIN_d47630d7": true,
+     "resolved": "tests/core/test_approval_review_response_contract.py"
+    }
+   }
+  },
+  "S04-DB": {
+   "baseline0918": 75,
+   "train95a5": 75,
+   "paths": {
+    "services/control-plane/src/inv/output_ingestion.py": {
+     "Z_03e17c31": true,
+     "INTEG_59f0a3c2": true,
+     "CHAIN_d47630d7": true,
+     "resolved": "services/control-plane/src/inv/output_ingestion.py"
+    },
+    "services/control-plane/src/inv/result_view.py": {
+     "Z_03e17c31": true,
+     "INTEG_59f0a3c2": true,
+     "CHAIN_d47630d7": true,
+     "resolved": "services/control-plane/src/inv/result_view.py"
+    },
+    "tools/check_contract_bindings.py": {
+     "Z_03e17c31": true,
+     "INTEG_59f0a3c2": true,
+     "CHAIN_d47630d7": true,
+     "resolved": "tools/check_contract_bindings.py"
+    }
+   }
+  },
+  "S04-ST": {
+   "baseline0918": 75,
+   "train95a5": 75,
+   "paths": {
+    "tests/integration/test_output_ingestion.py": {
+     "Z_03e17c31": true,
+     "INTEG_59f0a3c2": true,
+     "CHAIN_d47630d7": true,
+     "resolved": "tests/integration/test_output_ingestion.py"
+    }
+   }
+  },
+  "S05-FE": {
+   "baseline0918": 50,
+   "train95a5": 75,
+   "paths": {
+    "apps/web/tests/placement-explain.test.ts": {
+     "Z_03e17c31": true,
+     "INTEG_59f0a3c2": true,
+     "CHAIN_d47630d7": true,
+     "resolved": "apps/web/tests/placement-explain.test.ts"
+    },
+    "placement-simulator.test.tsx": {
+     "Z_03e17c31": true,
+     "INTEG_59f0a3c2": true,
+     "CHAIN_d47630d7": true,
+     "resolved": "apps/web/tests/placement-simulator.test.tsx"
+    }
+   }
+  },
+  "S05-BE": {
+   "baseline0918": 75,
+   "train95a5": 75,
+   "paths": {
+    "tests/integration/test_placement.py": {
+     "Z_03e17c31": true,
+     "INTEG_59f0a3c2": true,
+     "CHAIN_d47630d7": true,
+     "resolved": "tests/integration/test_placement.py"
+    },
+    "tests/core/test_pool_placement_response_contract.py": {
+     "Z_03e17c31": true,
+     "INTEG_59f0a3c2": true,
+     "CHAIN_d47630d7": true,
+     "resolved": "tests/core/test_pool_placement_response_contract.py"
+    }
+   }
+  },
+  "S05-DB": {
+   "baseline0918": 75,
+   "train95a5": 75,
+   "paths": {
+    "tests/core/test_placement_lock_budget.py": {
+     "Z_03e17c31": true,
+     "INTEG_59f0a3c2": true,
+     "CHAIN_d47630d7": true,
+     "resolved": "tests/core/test_placement_lock_budget.py"
+    },
+    "integration/test_lock_wait_real_pg.py": {
+     "Z_03e17c31": true,
+     "INTEG_59f0a3c2": true,
+     "CHAIN_d47630d7": true,
+     "resolved": "tests/integration/test_lock_wait_real_pg.py"
+    }
+   }
+  },
+  "S05-ST": {
+   "baseline0918": 50,
+   "train95a5": 50,
+   "paths": {
+    "tests/integration/test_model_locality.py": {
+     "Z_03e17c31": true,
+     "INTEG_59f0a3c2": true,
+     "CHAIN_d47630d7": true,
+     "resolved": "tests/integration/test_model_locality.py"
+    }
+   }
+  },
+  "S06-FE": {
+   "baseline0918": 50,
+   "train95a5": 75,
+   "paths": {
+    "apps/web/tests/monaco-workspace-editor-wiring.test.tsx": {
+     "Z_03e17c31": true,
+     "INTEG_59f0a3c2": true,
+     "CHAIN_d47630d7": true,
+     "resolved": "apps/web/tests/monaco-workspace-editor-wiring.test.tsx"
+    },
+    "ws-terminal.test.ts": {
+     "Z_03e17c31": true,
+     "INTEG_59f0a3c2": true,
+     "CHAIN_d47630d7": true,
+     "resolved": "apps/web/tests/ws-terminal.test.ts"
+    }
+   }
+  },
+  "S06-BE": {
+   "baseline0918": 75,
+   "train95a5": 75,
+   "paths": {
+    "tests/core/test_workspace_resume_contract.py": {
+     "Z_03e17c31": true,
+     "INTEG_59f0a3c2": true,
+     "CHAIN_d47630d7": true,
+     "resolved": "tests/core/test_workspace_resume_contract.py"
+    },
+    "integration/test_resume_input_readiness.py": {
+     "Z_03e17c31": true,
+     "INTEG_59f0a3c2": true,
+     "CHAIN_d47630d7": true,
+     "resolved": "tests/integration/test_resume_input_readiness.py"
+    }
+   }
+  },
+  "S06-DB": {
+   "baseline0918": 75,
+   "train95a5": 75,
+   "paths": {
+    "tests/core/test_run_attempt_contract.py": {
+     "Z_03e17c31": true,
+     "INTEG_59f0a3c2": true,
+     "CHAIN_d47630d7": true,
+     "resolved": "tests/core/test_run_attempt_contract.py"
+    }
+   }
+  },
+  "S06-ST": {
+   "baseline0918": 75,
+   "train95a5": 75,
+   "paths": {
+    "tests/integration/test_workspace_resume.py": {
+     "Z_03e17c31": true,
+     "INTEG_59f0a3c2": true,
+     "CHAIN_d47630d7": true,
+     "resolved": "tests/integration/test_workspace_resume.py"
+    },
+    "integration/test_snapshots.py": {
+     "Z_03e17c31": true,
+     "INTEG_59f0a3c2": true,
+     "CHAIN_d47630d7": true,
+     "resolved": "tests/integration/test_snapshots.py"
+    }
+   }
+  },
+  "S07-FE": {
+   "baseline0918": 50,
+   "train95a5": 75,
+   "paths": {
+    "apps/web/tests/node-status-lost-unknown-guard.test.tsx": {
+     "Z_03e17c31": true,
+     "INTEG_59f0a3c2": true,
+     "CHAIN_d47630d7": true,
+     "resolved": "apps/web/tests/node-status-lost-unknown-guard.test.tsx"
+    },
+    "distributed-recovery.test.ts": {
+     "Z_03e17c31": true,
+     "INTEG_59f0a3c2": true,
+     "CHAIN_d47630d7": true,
+     "resolved": "apps/web/tests/distributed-recovery.test.ts"
+    }
+   }
+  },
+  "S07-BE": {
+   "baseline0918": 75,
+   "train95a5": 75,
+   "paths": {
+    "tests/integration/test_containment.py": {
+     "Z_03e17c31": true,
+     "INTEG_59f0a3c2": true,
+     "CHAIN_d47630d7": true,
+     "resolved": "tests/integration/test_containment.py"
+    },
+    "core/test_s07_recovery_measurement.py": {
+     "Z_03e17c31": true,
+     "INTEG_59f0a3c2": true,
+     "CHAIN_d47630d7": true,
+     "resolved": "tests/core/test_s07_recovery_measurement.py"
+    }
+   }
+  },
+  "S07-DB": {
+   "baseline0918": 75,
+   "train95a5": 75,
+   "paths": {
+    "tests/core/test_recovery_verdict.py": {
+     "Z_03e17c31": true,
+     "INTEG_59f0a3c2": true,
+     "CHAIN_d47630d7": true,
+     "resolved": "tests/core/test_recovery_verdict.py"
+    },
+    "core/test_recovery_capability.py": {
+     "Z_03e17c31": true,
+     "INTEG_59f0a3c2": true,
+     "CHAIN_d47630d7": true,
+     "resolved": "tests/core/test_recovery_capability.py"
+    }
+   }
+  },
+  "S07-ST": {
+   "baseline0918": 50,
+   "train95a5": 50,
+   "paths": {
+    "tests/integration/test_replica_observation_api.py": {
+     "Z_03e17c31": true,
+     "INTEG_59f0a3c2": true,
+     "CHAIN_d47630d7": true,
+     "resolved": "tests/integration/test_replica_observation_api.py"
+    }
+   }
+  },
+  "S08-FE": {
+   "baseline0918": 50,
+   "train95a5": 75,
+   "paths": {
+    "apps/web/tests/admin-security.test.ts": {
+     "Z_03e17c31": true,
+     "INTEG_59f0a3c2": true,
+     "CHAIN_d47630d7": true,
+     "resolved": "apps/web/tests/admin-security.test.ts"
+    },
+    "write-actions-integrity-wiring.test.tsx": {
+     "Z_03e17c31": true,
+     "INTEG_59f0a3c2": true,
+     "CHAIN_d47630d7": true,
+     "resolved": "apps/web/tests/write-actions-integrity-wiring.test.tsx"
+    }
+   }
+  },
+  "S08-BE": {
+   "baseline0918": 50,
+   "train95a5": 50,
+   "paths": {
+    "inv/sandbox.py": {
+     "Z_03e17c31": true,
+     "INTEG_59f0a3c2": true,
+     "CHAIN_d47630d7": true,
+     "resolved": "services/control-plane/src/inv/sandbox.py"
+    },
+    "tests/core/test_s08_be_kill_switch_execution_gate.py": {
+     "Z_03e17c31": true,
+     "INTEG_59f0a3c2": true,
+     "CHAIN_d47630d7": true,
+     "resolved": "tests/core/test_s08_be_kill_switch_execution_gate.py"
+    },
+    "tests/integration/test_build_product_runtime_real_pg.py": {
+     "Z_03e17c31": true,
+     "INTEG_59f0a3c2": true,
+     "CHAIN_d47630d7": true,
+     "resolved": "tests/integration/test_build_product_runtime_real_pg.py"
+    }
+   }
+  },
+  "S08-DB": {
+   "baseline0918": 75,
+   "train95a5": 75,
+   "paths": {
+    "tests/core/test_canonical_denial_audit.py": {
+     "Z_03e17c31": true,
+     "INTEG_59f0a3c2": true,
+     "CHAIN_d47630d7": true,
+     "resolved": "tests/core/test_canonical_denial_audit.py"
+    },
+    "core/test_definer_audit_cli.py": {
+     "Z_03e17c31": true,
+     "INTEG_59f0a3c2": true,
+     "CHAIN_d47630d7": true,
+     "resolved": "tests/core/test_definer_audit_cli.py"
+    },
+    "core/test_audit_action.py": {
+     "Z_03e17c31": true,
+     "INTEG_59f0a3c2": true,
+     "CHAIN_d47630d7": true,
+     "resolved": "tests/core/test_audit_action.py"
+    }
+   }
+  },
+  "S08-ST": {
+   "baseline0918": 50,
+   "train95a5": 50,
+   "paths": {
+    "tests/test_backup_verification_integrity.py": {
+     "Z_03e17c31": true,
+     "INTEG_59f0a3c2": true,
+     "CHAIN_d47630d7": true,
+     "resolved": "tests/test_backup_verification_integrity.py"
+    }
+   }
+  },
+  "S09-FE": {
+   "baseline0918": 25,
+   "train95a5": 75,
+   "paths": {
+    "apps/web/tests/natural-language-run-view.test.tsx": {
+     "Z_03e17c31": true,
+     "INTEG_59f0a3c2": true,
+     "CHAIN_d47630d7": true,
+     "resolved": "apps/web/tests/natural-language-run-view.test.tsx"
+    },
+    "agent-eval-runner.test.ts": {
+     "Z_03e17c31": true,
+     "INTEG_59f0a3c2": true,
+     "CHAIN_d47630d7": true,
+     "resolved": "apps/web/tests/agent-eval-runner.test.ts"
+    },
+    "agent-bounded-loop.test.ts": {
+     "Z_03e17c31": true,
+     "INTEG_59f0a3c2": true,
+     "CHAIN_d47630d7": true,
+     "resolved": "apps/web/tests/agent-bounded-loop.test.ts"
+    }
+   }
+  },
+  "S09-BE": {
+   "baseline0918": 25,
+   "train95a5": 75,
+   "paths": {
+    "tests/core/test_context_bundle_route.py": {
+     "Z_03e17c31": true,
+     "INTEG_59f0a3c2": true,
+     "CHAIN_d47630d7": true,
+     "resolved": "tests/core/test_context_bundle_route.py"
+    },
+    "integration/test_context_bundle_real_pg.py": {
+     "Z_03e17c31": true,
+     "INTEG_59f0a3c2": true,
+     "CHAIN_d47630d7": true,
+     "resolved": "tests/integration/test_context_bundle_real_pg.py"
+    }
+   }
+  },
+  "S09-DB": {
+   "baseline0918": 75,
+   "train95a5": 75,
+   "paths": {
+    "tests/core/test_eval_run_route.py": {
+     "Z_03e17c31": true,
+     "INTEG_59f0a3c2": true,
+     "CHAIN_d47630d7": true,
+     "resolved": "tests/core/test_eval_run_route.py"
+    },
+    "core/test_eval_suite_project_scope_migration.py": {
+     "Z_03e17c31": true,
+     "INTEG_59f0a3c2": true,
+     "CHAIN_d47630d7": true,
+     "resolved": "tests/core/test_eval_suite_project_scope_migration.py"
+    },
+    "integration/test_eval_run_real_pg.py": {
+     "Z_03e17c31": true,
+     "INTEG_59f0a3c2": true,
+     "CHAIN_d47630d7": true,
+     "resolved": "tests/integration/test_eval_run_real_pg.py"
+    }
+   }
+  },
+  "S09-ST": {
+   "baseline0918": 50,
+   "train95a5": 75,
+   "paths": {
+    "tests/test_context_eval.py": {
+     "Z_03e17c31": true,
+     "INTEG_59f0a3c2": true,
+     "CHAIN_d47630d7": true,
+     "resolved": "tests/test_context_eval.py"
+    }
+   }
+  },
+  "S10-FE": {
+   "baseline0918": 25,
+   "train95a5": 75,
+   "paths": {
+    "apps/web/tests/model-lineage.test.ts": {
+     "Z_03e17c31": true,
+     "INTEG_59f0a3c2": true,
+     "CHAIN_d47630d7": true,
+     "resolved": "apps/web/tests/model-lineage.test.ts"
+    },
+    "model-studio-dom.test.tsx": {
+     "Z_03e17c31": true,
+     "INTEG_59f0a3c2": true,
+     "CHAIN_d47630d7": true,
+     "resolved": "apps/web/tests/model-studio-dom.test.tsx"
+    }
+   }
+  },
+  "S10-BE": {
+   "baseline0918": 50,
+   "train95a5": 75,
+   "paths": {
+    "tests/core/test_adapters_route.py": {
+     "Z_03e17c31": true,
+     "INTEG_59f0a3c2": true,
+     "CHAIN_d47630d7": true,
+     "resolved": "tests/core/test_adapters_route.py"
+    },
+    "core/test_conformance_status_route.py": {
+     "Z_03e17c31": true,
+     "INTEG_59f0a3c2": true,
+     "CHAIN_d47630d7": true,
+     "resolved": "tests/core/test_conformance_status_route.py"
+    },
+    "core/test_conformance_checklist_ratchet.py": {
+     "Z_03e17c31": true,
+     "INTEG_59f0a3c2": true,
+     "CHAIN_d47630d7": true,
+     "resolved": "tests/core/test_conformance_checklist_ratchet.py"
+    }
+   }
+  },
+  "S10-DB": {
+   "baseline0918": 75,
+   "train95a5": 75,
+   "paths": {
+    "tests/core/test_lineage_query_routes.py": {
+     "Z_03e17c31": true,
+     "INTEG_59f0a3c2": true,
+     "CHAIN_d47630d7": true,
+     "resolved": "tests/core/test_lineage_query_routes.py"
+    },
+    "core/test_dataset_digest_index_migration.py": {
+     "Z_03e17c31": true,
+     "INTEG_59f0a3c2": true,
+     "CHAIN_d47630d7": true,
+     "resolved": "tests/core/test_dataset_digest_index_migration.py"
+    }
+   }
+  },
+  "S10-ST": {
+   "baseline0918": 50,
+   "train95a5": 75,
+   "paths": {
+    "tests/core/test_model_retention_pin_route.py": {
+     "Z_03e17c31": true,
+     "INTEG_59f0a3c2": true,
+     "CHAIN_d47630d7": true,
+     "resolved": "tests/core/test_model_retention_pin_route.py"
+    },
+    "core/test_model_verify_route.py": {
+     "Z_03e17c31": true,
+     "INTEG_59f0a3c2": true,
+     "CHAIN_d47630d7": true,
+     "resolved": "tests/core/test_model_verify_route.py"
+    }
+   }
+  },
+  "S11-FE": {
+   "baseline0918": 25,
+   "train95a5": 75,
+   "paths": {
+    "apps/web/tests/accessibility-status-and-guards.test.tsx": {
+     "Z_03e17c31": true,
+     "INTEG_59f0a3c2": true,
+     "CHAIN_d47630d7": true,
+     "resolved": "apps/web/tests/accessibility-status-and-guards.test.tsx"
+    },
+    "s11-defect-fixes.test.tsx": {
+     "Z_03e17c31": true,
+     "INTEG_59f0a3c2": true,
+     "CHAIN_d47630d7": true,
+     "resolved": "apps/web/tests/s11-defect-fixes.test.tsx"
+    }
+   }
+  },
+  "S11-BE": {
+   "baseline0918": 50,
+   "train95a5": 50,
+   "paths": {
+    "tests/test_import_ac11_composite_long_soak.py": {
+     "Z_03e17c31": true,
+     "INTEG_59f0a3c2": true,
+     "CHAIN_d47630d7": true,
+     "resolved": "tests/test_import_ac11_composite_long_soak.py"
+    }
+   }
+  },
+  "S11-DB": {
+   "baseline0918": 75,
+   "train95a5": 75,
+   "paths": {
+    "tests/test_ac11_migration_rehearsal.py": {
+     "Z_03e17c31": true,
+     "INTEG_59f0a3c2": true,
+     "CHAIN_d47630d7": true,
+     "resolved": "tests/test_ac11_migration_rehearsal.py"
+    },
+    "test_aggregate_ac11_evidence.py": {
+     "Z_03e17c31": true,
+     "INTEG_59f0a3c2": true,
+     "CHAIN_d47630d7": true,
+     "resolved": "tests/test_aggregate_ac11_evidence.py"
+    }
+   }
+  },
+  "S11-ST": {
+   "baseline0918": 50,
+   "train95a5": 75,
+   "paths": {
+    "tests/test_s11_storage_failure_evidence.py": {
+     "Z_03e17c31": true,
+     "INTEG_59f0a3c2": true,
+     "CHAIN_d47630d7": true,
+     "resolved": "tests/test_s11_storage_failure_evidence.py"
+    },
+    "integration/test_s11_storage_failure_hosted.py": {
+     "Z_03e17c31": true,
+     "INTEG_59f0a3c2": true,
+     "CHAIN_d47630d7": true,
+     "resolved": "tests/integration/test_s11_storage_failure_hosted.py"
+    }
+   }
+  },
+  "S12-FE": {
+   "baseline0918": 25,
+   "train95a5": 50,
+   "paths": {
+    "apps/web/tests/s12-defect-fixes.test.tsx": {
+     "Z_03e17c31": true,
+     "INTEG_59f0a3c2": true,
+     "CHAIN_d47630d7": true,
+     "resolved": "apps/web/tests/s12-defect-fixes.test.tsx"
+    },
+    "release-candidate.test.ts": {
+     "Z_03e17c31": true,
+     "INTEG_59f0a3c2": true,
+     "CHAIN_d47630d7": true,
+     "resolved": "apps/web/tests/release-candidate.test.ts"
+    },
+    "apps/web/tests/s12-release-manifest-server-binding.test.tsx": {
+     "Z_03e17c31": true,
+     "INTEG_59f0a3c2": true,
+     "CHAIN_d47630d7": true,
+     "resolved": "apps/web/tests/s12-release-manifest-server-binding.test.tsx"
+    }
+   }
+  },
+  "S12-BE": {
+   "baseline0918": 50,
+   "train95a5": 50,
+   "paths": {
+    "tests/core/test_lan_migration_plan.py": {
+     "Z_03e17c31": true,
+     "INTEG_59f0a3c2": true,
+     "CHAIN_d47630d7": true,
+     "resolved": "tests/core/test_lan_migration_plan.py"
+    },
+    "core/test_lan_execution.py": {
+     "Z_03e17c31": true,
+     "INTEG_59f0a3c2": true,
+     "CHAIN_d47630d7": true,
+     "resolved": "tests/core/test_lan_execution.py"
+    }
+   }
+  },
+  "S12-DB": {
+   "baseline0918": 50,
+   "train95a5": 50,
+   "paths": {
+    "tests/integration/test_recovery_drill.py": {
+     "Z_03e17c31": true,
+     "INTEG_59f0a3c2": true,
+     "CHAIN_d47630d7": true,
+     "resolved": "tests/integration/test_recovery_drill.py"
+    },
+    "test_pitr_boundary.py": {
+     "Z_03e17c31": true,
+     "INTEG_59f0a3c2": true,
+     "CHAIN_d47630d7": true,
+     "resolved": "tests/test_pitr_boundary.py"
+    }
+   }
+  },
+  "S12-ST": {
+   "baseline0918": 50,
+   "train95a5": 50,
+   "paths": {
+    "tests/test_recovery_drill_prerequisites.py": {
+     "Z_03e17c31": true,
+     "INTEG_59f0a3c2": true,
+     "CHAIN_d47630d7": true,
+     "resolved": "tests/test_recovery_drill_prerequisites.py"
+    }
+   }
+  }
+ },
+ "pathCount": 88,
+ "missingAtIntegOrChain": [],
+ "rowsWithoutCodePath": [
+  "S01-FE",
+  "S01-BE",
+  "S01-DB"
+ ]
+}

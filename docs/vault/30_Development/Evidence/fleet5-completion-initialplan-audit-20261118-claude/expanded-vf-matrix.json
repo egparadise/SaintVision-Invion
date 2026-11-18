@@ -1,0 +1,359 @@
+{
+ "docID": "EVIDENCE-FLEET5-COMPLETION-AUDIT-VF-MATRIX-20261118-CLAUDE",
+ "version": "1.0.0",
+ "atKST": "2026-11-18",
+ "anchors": {
+  "roadmap": "ROADMAP-VIRTUAL-COMPUTER-001 v1.0.0 (Outcome table, Agent card tables)",
+  "designIndex": "INDEX-VIRTUAL-COMPUTER-001 v1.0.0 (진행률 해석: separate denominator, not mixed into 4800)"
+ },
+ "cardCountNote": "The roadmap lists 16 cards (5 VF-CX, 5 VF-CL, 6 VF-GM), not 15. Only VF-CX and VF-CL have machine registries (acceptanceDenominator 5 each, acceptedCards 0 each).",
+ "cards": [
+  {
+   "id": "VF-CX-01",
+   "track": "VF-CX",
+   "title": "Canonical configured control app",
+   "owner": "Codex",
+   "reviewer": "Claude",
+   "state": "review",
+   "implemented": "partial",
+   "locallyVerified": "partial",
+   "ciVerified": true,
+   "independentlyReviewed": true,
+   "operationallyAccepted": false,
+   "blockers": [],
+   "source": "docs/vf-task-registry.json@1.0.2"
+  },
+  {
+   "id": "VF-CX-02",
+   "track": "VF-CX",
+   "title": "ModelManifest, shard/replica hash commit and fences",
+   "owner": "Codex",
+   "reviewer": "Claude",
+   "state": "review",
+   "implemented": true,
+   "locallyVerified": true,
+   "ciVerified": true,
+   "independentlyReviewed": true,
+   "operationallyAccepted": false,
+   "blockers": [],
+   "source": "docs/vf-task-registry.json@1.0.2"
+  },
+  {
+   "id": "VF-CX-03",
+   "track": "VF-CX",
+   "title": "Measured locality and execution placement",
+   "owner": "Codex",
+   "reviewer": "Claude",
+   "state": "review",
+   "implemented": true,
+   "locallyVerified": true,
+   "ciVerified": true,
+   "independentlyReviewed": true,
+   "operationallyAccepted": false,
+   "blockers": [],
+   "source": "docs/vf-task-registry.json@1.0.2"
+  },
+  {
+   "id": "VF-CX-04",
+   "track": "VF-CX",
+   "title": "Runtime admission and multi-node recovery",
+   "owner": "Codex",
+   "reviewer": "Claude",
+   "state": "review",
+   "implemented": true,
+   "locallyVerified": true,
+   "ciVerified": true,
+   "independentlyReviewed": true,
+   "operationallyAccepted": false,
+   "blockers": [],
+   "source": "docs/vf-task-registry.json@1.0.2"
+  },
+  {
+   "id": "VF-CX-05",
+   "track": "VF-CX",
+   "title": "Five physical Node acceptance",
+   "owner": "Codex",
+   "reviewer": "Claude",
+   "state": "blocked",
+   "implemented": false,
+   "locallyVerified": false,
+   "ciVerified": false,
+   "independentlyReviewed": false,
+   "operationallyAccepted": false,
+   "blockers": [
+    "five-node-topology-incomplete-three-of-five-provisioned",
+    "cp-colocated-windows-node-docker-api-1.41-below-1.45-and-no-wsl-ubuntu",
+    "operational-migration-backup-review-required",
+    "W2-W4-acceptance-unverified",
+    "independent-review-pending"
+   ],
+   "source": "docs/vf-task-registry.json@1.0.2"
+  },
+  {
+   "id": "VF-CL-01",
+   "track": "VF-CL",
+   "title": "Storage catalogue/API and DataLocation reuse",
+   "owner": "Claude",
+   "reviewer": "Codex",
+   "state": "review",
+   "implemented": true,
+   "locallyVerified": true,
+   "ciVerified": true,
+   "independentlyReviewed": true,
+   "operationallyAccepted": false,
+   "blockers": [],
+   "source": "docs/vf-cl-task-registry.json@1.6.6"
+  },
+  {
+   "id": "VF-CL-02",
+   "track": "VF-CL",
+   "title": "inv:// resolver and model shard/replica resolution",
+   "owner": "Claude",
+   "reviewer": "Codex",
+   "state": "review",
+   "implemented": true,
+   "locallyVerified": true,
+   "ciVerified": true,
+   "independentlyReviewed": true,
+   "operationallyAccepted": false,
+   "blockers": [],
+   "source": "docs/vf-cl-task-registry.json@1.6.6"
+  },
+  {
+   "id": "VF-CL-03",
+   "track": "VF-CL",
+   "title": "Model registry, lineage and import adapter",
+   "owner": "Claude",
+   "reviewer": "Codex",
+   "state": "review",
+   "implemented": true,
+   "locallyVerified": true,
+   "ciVerified": true,
+   "independentlyReviewed": true,
+   "operationallyAccepted": false,
+   "blockers": [],
+   "source": "docs/vf-cl-task-registry.json@1.6.6"
+  },
+  {
+   "id": "VF-CL-04",
+   "track": "VF-CL",
+   "title": "Replica repair, backup/PITR, metrics and runbook",
+   "owner": "Claude",
+   "reviewer": "Codex",
+   "state": "review",
+   "implemented": true,
+   "locallyVerified": true,
+   "ciVerified": true,
+   "independentlyReviewed": true,
+   "operationallyAccepted": false,
+   "blockers": [],
+   "source": "docs/vf-cl-task-registry.json@1.6.6"
+  },
+  {
+   "id": "VF-CL-05",
+   "track": "VF-CL",
+   "title": "Independent review of Codex/Gemini outputs",
+   "owner": "Claude",
+   "reviewer": "Codex",
+   "state": "review",
+   "implemented": true,
+   "locallyVerified": true,
+   "ciVerified": false,
+   "independentlyReviewed": true,
+   "operationallyAccepted": false,
+   "blockers": [],
+   "source": "docs/vf-cl-task-registry.json@1.6.6"
+  },
+  {
+   "id": "VF-GM-01",
+   "track": "VF-GM",
+   "title": "Web Desktop Shell and navigation",
+   "owner": "Gemini",
+   "reviewer": "Codex",
+   "state": "self-reported approved (Gemini board)",
+   "implemented": "self-reported",
+   "locallyVerified": "self-reported",
+   "ciVerified": null,
+   "independentlyReviewed": null,
+   "operationallyAccepted": false,
+   "blockers": [
+    "no machine registry",
+    "roadmap pass evidence \"responsive/accessibility tests\" not independently accepted"
+   ],
+   "source": "roadmap card table + Gemini board (no registry file)"
+  },
+  {
+   "id": "VF-GM-02",
+   "track": "VF-GM",
+   "title": "My Computer / Resource Explorer",
+   "owner": "Gemini",
+   "reviewer": "Codex",
+   "state": "self-reported approved (Gemini board)",
+   "implemented": "self-reported",
+   "locallyVerified": "self-reported",
+   "ciVerified": null,
+   "independentlyReviewed": null,
+   "operationallyAccepted": false,
+   "blockers": [
+    "no machine registry",
+    "roadmap pass evidence \"logical total + physical topology\" not independently accepted"
+   ],
+   "source": "roadmap card table + Gemini board (no registry file)"
+  },
+  {
+   "id": "VF-GM-03",
+   "track": "VF-GM",
+   "title": "File Explorer and inv:// UX",
+   "owner": "Gemini",
+   "reviewer": "Codex",
+   "state": "self-reported approved (Gemini board)",
+   "implemented": "self-reported",
+   "locallyVerified": "self-reported",
+   "ciVerified": null,
+   "independentlyReviewed": null,
+   "operationallyAccepted": false,
+   "blockers": [
+    "no machine registry",
+    "roadmap pass evidence \"upload/version/error/partial failure E2E\" not independently accepted"
+   ],
+   "source": "roadmap card table + Gemini board (no registry file)"
+  },
+  {
+   "id": "VF-GM-04",
+   "track": "VF-GM",
+   "title": "Model Studio and shard/replica state",
+   "owner": "Gemini",
+   "reviewer": "Codex",
+   "state": "self-reported approved (Gemini board)",
+   "implemented": "self-reported",
+   "locallyVerified": "self-reported",
+   "ciVerified": null,
+   "independentlyReviewed": null,
+   "operationallyAccepted": false,
+   "blockers": [
+    "no machine registry",
+    "roadmap pass evidence \"import/repair/run journey E2E\" not independently accepted"
+   ],
+   "source": "roadmap card table + Gemini board (no registry file)"
+  },
+  {
+   "id": "VF-GM-05",
+   "track": "VF-GM",
+   "title": "Terminal/IDE/PowerShell/Bash session UX",
+   "owner": "Gemini",
+   "reviewer": "Codex",
+   "state": "self-reported approved (Gemini board)",
+   "implemented": "self-reported",
+   "locallyVerified": "self-reported",
+   "ciVerified": null,
+   "independentlyReviewed": null,
+   "operationallyAccepted": false,
+   "blockers": [
+    "no machine registry",
+    "roadmap pass evidence \"reconnect/expiry/permission E2E\" not independently accepted"
+   ],
+   "source": "roadmap card table + Gemini board (no registry file)"
+  },
+  {
+   "id": "VF-GM-06",
+   "track": "VF-GM",
+   "title": "External HTTPS, browser matrix, rollback",
+   "owner": "Gemini",
+   "reviewer": "Codex",
+   "state": "self-reported approved (Gemini board)",
+   "implemented": "self-reported",
+   "locallyVerified": "self-reported",
+   "ciVerified": null,
+   "independentlyReviewed": null,
+   "operationallyAccepted": false,
+   "blockers": [
+    "no machine registry",
+    "roadmap pass evidence \"real-browser acceptance report\" not independently accepted"
+   ],
+   "source": "roadmap card table + Gemini board (no registry file)"
+  }
+ ],
+ "outcomes": [
+  {
+   "id": "VF-01",
+   "intent": "one canonical secure control plane",
+   "passEvidence": "real DB, OIDC, RLS, route coverage, denial tests",
+   "acceptedCodeOrRuntime": "VF-CX-01 implemented=partial; API96 single deployed app on PC3 with real OIDC login 11-08",
+   "missingAcceptance": "IdP Main:8443 and CP DB Main:55461 not listening 11-18; VF-CX-01 partial",
+   "accepted": false
+  },
+  {
+   "id": "VF-02",
+   "intent": "Web Desktop single-PC experience",
+   "passEvidence": "external browser E2E, accessibility, session restore",
+   "acceptedCodeOrRuntime": "abb707 portal deployed; real admin PKCE login and resource frames 11-08",
+   "missingAcceptance": "AC-11 accessibility MEASURED_FAIL (manualAcceptanceMissingCount 1); session-restore acceptance absent; login currently down with IdP",
+   "accepted": false
+  },
+  {
+   "id": "VF-03",
+   "intent": "unified inv:// namespace",
+   "passEvidence": "create/read/version/checksum/recovery tests",
+   "acceptedCodeOrRuntime": "VF-CL-01/02 implemented, CI-verified, reviewed",
+   "missingAcceptance": "operationallyAccepted=false; no live inv:// round trip on the fleet",
+   "accepted": false
+  },
+  {
+   "id": "VF-04",
+   "intent": "ModelManifest and shard/replica management",
+   "passEvidence": "import, hash, pin, repair, GC tests",
+   "acceptedCodeOrRuntime": "VF-CX-02 and VF-CL-03 implemented, CI-verified, reviewed",
+   "missingAcceptance": "no live model import/repair on real Nodes",
+   "accepted": false
+  },
+  {
+   "id": "VF-05",
+   "intent": "locality-aware distributed execution",
+   "passEvidence": "explainable placement and real per-runtime execution",
+   "acceptedCodeOrRuntime": "VF-CX-03/04 implemented; capacity API measured 3 x 500m/64MiB",
+   "missingAcceptance": "zero real workload executed (run awaiting approval, expired)",
+   "accepted": false
+  },
+  {
+   "id": "VF-06",
+   "intent": "five real PC acceptance",
+   "passEvidence": "Node loss/rejoin, storage, GPU, terminal, recovery evidence",
+   "acceptedCodeOrRuntime": "3 Linux Nodes once admitted (11-07) under a 7-day pilot CA",
+   "missingAcceptance": "VF-CX-05 blocked; CA_TERMINAL; PC1 SSH key rejected; Main not a Node; GPU not offered",
+   "accepted": false
+  },
+  {
+   "id": "VF-07",
+   "intent": "Cell/Federation readiness",
+   "passEvidence": "scale test, catalog boundary, policy split design",
+   "acceptedCodeOrRuntime": "roadmap marks it Later",
+   "missingAcceptance": "no card, no registry, no evidence",
+   "accepted": false
+  }
+ ],
+ "counts": {
+  "cardsListed": 16,
+  "machineRegistered": 10,
+  "implementedTrue": 8,
+  "implementedPartial": 1,
+  "ciVerifiedTrue": 8,
+  "operationallyAccepted": 0,
+  "outcomesAccepted": 0,
+  "outcomes": 7
+ },
+ "singlePercentCalculable": false,
+ "whyNot": [
+  "design index: the new scope gets its own denominator only after cards and acceptance evidence are registered",
+  "no weights or rubric exist for VF cards or outcomes; any percent would be invented",
+  "VF-GM has no registry; VF-07 has no card",
+  "operational acceptance is 0 of 16 cards and 0 of 7 outcomes, so the only accepted-ratio that exists is 0"
+ ],
+ "finiteConditionsTo100": [
+  "register VF-GM cards in a machine registry with the roadmap pass evidence and an independent reviewer",
+  "fix the expanded denominator (cards + outcomes, equal weight or explicit weights) in a reviewed ADR before scoring",
+  "restore DB + IdP durability and a new valid authority, then re-admit Nodes",
+  "execute the first genuine approved workload, inv:// round trip and model import on real Nodes",
+  "five-PC acceptance (VF-06) incl. Node loss/rejoin, storage, GPU offer, terminal, recovery",
+  "VF-07 card and scale/boundary evidence, or an explicit ADR moving it out of the 100 scope"
+ ]
+}

@@ -1,0 +1,41 @@
+"""Audit helper: re-derive the rescore §3 per-row binding paths and check presence at fixed trees (git metadata only)."""
+import re,subprocess,json,sys
+DOC='docs/vault/30_Development/2026-09-28 48 task 진행률 재채점.md'
+TREES={'Z_03e17c31':'03e17c31cf535008d39534aaa80d3ae274bd75cc','INTEG_59f0a3c2':'59f0a3c2ff41ba1ae99a38515a2cdc65b2144067','CHAIN_d47630d7':'d47630d730278aa9e49b15a63cd221696da8dc00'}
+lines=open(DOC,encoding='utf-8').read().split('\n')
+start=[i for i,l in enumerate(lines) if l.startswith('| task | owner | 09-18 baseline')][0]
+rows={}
+for l in lines[start+2:]:
+    if not l.startswith('| '): break
+    c=[x.strip() for x in l.strip('|').split('|')]
+    tid=c[0].strip('*')
+    rows[tid]={'owner':c[1],'baseline0918':int(c[2]),'train95a5':int(c[3].strip('*')),'binding':c[5],'remaining':c[6],'external':c[7]}
+assert len(rows)==48,len(rows)
+EXTRA={'S11-BE':['tests/test_import_ac11_composite_long_soak.py'],'S12-FE':['apps/web/tests/s12-release-manifest-server-binding.test.tsx'],'S08-BE':['tests/integration/test_build_product_runtime_real_pg.py']}
+def ls(tree):
+    return set(subprocess.run(['git','ls-tree','-r','--name-only',tree],capture_output=True,text=True,encoding='utf-8').stdout.split('\n'))
+files={k:ls(v) for k,v in TREES.items()}
+def resolve(tok,allf):
+    tok=tok.split(':')[0]
+    cands=[tok,'services/control-plane/src/'+tok,'tests/'+tok,'apps/web/tests/'+tok,'tests/core/'+tok,'tests/integration/'+tok]
+    for c in cands:
+        if c in allf: return c
+    return None
+out={}
+for tid,r in rows.items():
+    toks=re.findall(r'`([^`]+\.(?:py|ts|tsx|md))`',r['binding'])
+    toks=[t for t in toks if not t.endswith('.md')]
+    # also unquoted 'core/test_x.py' tokens after a middle dot
+    toks+=re.findall(r'(?<![`/\w])((?:core|integration)/test_[\w]+\.py)',r['binding'])
+    toks=list(dict.fromkeys(toks+EXTRA.get(tid,[])))
+    res={}
+    for t in toks:
+        res[t]={k:(resolve(t,f) is not None) for k,f in files.items()}
+        res[t]['resolved']=resolve(t,files['INTEG_59f0a3c2']) or resolve(t,files['CHAIN_d47630d7'])
+    out[tid]={'baseline0918':r['baseline0918'],'train95a5':r['train95a5'],'paths':res}
+tot=sum(len(v['paths']) for v in out.values())
+miss=[(t,p) for t,v in out.items() for p,x in v['paths'].items() if not (x['INTEG_59f0a3c2'] and x['CHAIN_d47630d7'])]
+nobind=[t for t,v in out.items() if not v['paths']]
+json.dump({'rows':out,'pathCount':tot,'missingAtIntegOrChain':miss,'rowsWithoutCodePath':nobind},open(sys.argv[1],'w',encoding='utf-8',newline='\n'),ensure_ascii=False,indent=1)
+print('paths',tot,'missing',miss,'nobind',nobind)
+print('sum95a5',sum(v['train95a5'] for v in out.values()))

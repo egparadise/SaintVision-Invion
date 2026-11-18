@@ -1,0 +1,280 @@
+{
+ "docID": "EVIDENCE-FLEET5-COMPLETION-AUDIT-READ-SOURCES-20261118-CLAUDE",
+ "version": "1.0.0",
+ "environment": {
+  "host": "Main Windows 11 Pro 10.0.26300",
+  "shell": "Git Bash + PowerShell 5.1",
+  "python": "3.10.11 (metadata scripts only)",
+  "worktree": "fleet5-completion-audit-20261118",
+  "branch": "agent/claude/fleet5-completion-initialplan-audit-20261118",
+  "base": "d81d40f824538a4ef553cc8ae4aa75f7c012e325 (Root544)"
+ },
+ "notExecuted": "No Go/compiler/Node/npm/pytest/browser/product/crypto/Docker, no SSH/live API/DB/service action, no private keys/credentials/env dumps, no sudo/OS change, no subagents, no APPLY/export.",
+ "sources": [
+  {
+   "path": "AGENTS.md",
+   "gitBlobAtRoot544": "d8c6cf9160fc01e85733de442f8dd4d7d0276d42"
+  },
+  {
+   "path": "CLAUDE.md",
+   "gitBlobAtRoot544": "a4723a110294126b680540c4d5072a1504fa8cff"
+  },
+  {
+   "path": "docs/vault/00_Index/전체 개발 진행 현황.md",
+   "gitBlobAtRoot544": "59a4106fac94cfe1d2484ded63698ee22bf80a1f"
+  },
+  {
+   "path": "docs/vault/30_Development/Agent별 작업/Claude 작업 현황.md",
+   "gitBlobAtRoot544": "a30d20a07cce802ec987dd4237e8f9d8b5e4a265"
+  },
+  {
+   "path": "docs/vault/00_Index/2026-09-15 단일 가상 컴퓨터 보강 설계 인덱스.md",
+   "gitBlobAtRoot544": "72db8dd202e42346c10d5340f6f6b42516520a95"
+  },
+  {
+   "path": "docs/vault/30_Development/57.81퍼센트 이후 단일 가상 컴퓨터 보강 로드맵.md",
+   "gitBlobAtRoot544": "2861910c711c24065a57313b0d4148122521fb21"
+  },
+  {
+   "path": "docs/vault/00_Index/최종 개발 계획 - 모든 개발의 지침.md",
+   "gitBlobAtRoot544": "41e82e7123c269da74239cadfcf5af7f8007cdfb"
+  },
+  {
+   "path": "docs/vault/40_Governance/설계 충돌 정정 및 ADR.md",
+   "gitBlobAtRoot544": "9cd5c4a9b7c11a009364099852d6276823e31ab4"
+  },
+  {
+   "path": "docs/vault/40_Governance/Agent 역할과 인계 계약.md",
+   "gitBlobAtRoot544": "e8703c212659c525a6b6eb542e5ee796b4fd889e"
+  },
+  {
+   "path": "docs/vault/40_Governance/Git Build Obsidian 운영 절차.md",
+   "gitBlobAtRoot544": "c53059902faf775b882a2303ab6c6efe42ec8462"
+  },
+  {
+   "path": "docs/vault/40_Governance/Agent 연속 실행과 최종 보고 정책.md",
+   "gitBlobAtRoot544": "a9503cb0cc11c077c1528e4775c9458df2b1990d"
+  },
+  {
+   "path": "docs/vault/40_Governance/Agent 지속 개발 운영 규칙.md",
+   "gitBlobAtRoot544": "4176f640d7e3745c5346c234cd119148cb92c39c"
+  },
+  {
+   "path": "skills/agent-delivery/SKILL.md",
+   "gitBlobAtRoot544": "40cd0f0b960a10a9d972b58bc4ae45786625d1b0"
+  },
+  {
+   "path": "skills/service-integration/SKILL.md",
+   "gitBlobAtRoot544": "77844102a4ec0c20662b5a4063fd840751988818"
+  },
+  {
+   "path": "docs/task-registry.json",
+   "gitBlobAtRoot544": "3d7b5be755d15b5f181b9cbbed33b2a8f4b56e87"
+  },
+  {
+   "path": "docs/vf-task-registry.json",
+   "gitBlobAtRoot544": "7145a5d98199508acbacfbd55013e9da0a9ef5e5"
+  },
+  {
+   "path": "docs/vf-cl-task-registry.json",
+   "gitBlobAtRoot544": "4ce274f18692df9987988a4d467b5fb5b5dc0193"
+  },
+  {
+   "path": "docs/vault/30_Development/2026-09-28 48 task 진행률 재채점.md",
+   "gitBlobAtRoot544": "6985fa6706b2c35ed8ef3d15b61fa2a0450e8e45"
+  },
+  {
+   "path": "docs/vault/40_Governance/Proposed expired-policy non-serving custody candidate ADR R1.md",
+   "gitBlobAtRoot544": "f0d42db1dfe28bfcd5db20ba8a19d744accdba27"
+  },
+  {
+   "path": "docs/vault/30_Development/Current three-Node pilot renewal preflight and recovery plan R1.md",
+   "gitBlobAtRoot544": "5bfcda7ad9c206e4f077ff6718ae3d763333bed0"
+  },
+  {
+   "path": "tools/check_docs.py",
+   "gitBlobAtRoot544": "5a279e6d45c2a44b882ac4784beb26a5935ecf96"
+  },
+  {
+   "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/user-transport-resilience-20261118/Keep-SaintVisionTransport.ps1.txt",
+   "gitBlobAtRoot544": "225cae862d9a9924a7801aa34150b987056fb1f0"
+  },
+  {
+   "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/user-transport-resilience-20261118/verify_user_transport_reconnect_20261118.ps1.txt",
+   "gitBlobAtRoot544": "c9a08639de4ada7ed661629b893aa9c73dc4af68"
+  },
+  {
+   "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/user-transport-resilience-20261118/installation.json",
+   "gitBlobAtRoot544": "fb2f278671b5e3e60f035b8b2a2355dee520c1fb"
+  },
+  {
+   "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/user-transport-resilience-20261118/state.json",
+   "gitBlobAtRoot544": "31bdf99150e631b9fc6fb820d708859cdbe97550"
+  },
+  {
+   "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/user-transport-resilience-20261118/events.jsonl",
+   "gitBlobAtRoot544": "f5a022cb254dc81b460c64274bfa2c3baed4362c"
+  },
+  {
+   "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/user-transport-resilience-20261118/reconnect-verification.json",
+   "gitBlobAtRoot544": "282956209546c006e87dc4f3f2836d8d45b2a6ba"
+  },
+  {
+   "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/user-transport-resilience-20261118/root-operation-receipt.json",
+   "gitBlobAtRoot544": "ef67a1b48ca1eda3dd000bdd2ec0e0e0a32219d1"
+  },
+  {
+   "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/user-transport-resilience-20261118/file-manifest.json",
+   "gitBlobAtRoot544": "ece8130229be51c7567d0558ec7f5b5403fa1160"
+  },
+  {
+   "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/user-transport-resilience-20261118/stack-receipt.json",
+   "gitBlobAtRoot544": "3321f97436816772d68ede478b29c0a7dd3f3b38"
+  },
+  {
+   "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/user-transport-resilience-20261118/stack-remote-readonly.py.txt",
+   "gitBlobAtRoot544": "42863a4bf4dafdd7f15d523577353cbcbe902ad0"
+  },
+  {
+   "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/user-transport-resilience-20261118/fleet-receipt.json",
+   "gitBlobAtRoot544": "11c4d7f96c9ebfc1e1d50e4db57696ce1ca31ef5"
+  },
+  {
+   "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/user-transport-resilience-20261118/fleet-PC1.json",
+   "gitBlobAtRoot544": "719b2714f12c3e3958738c4fa91b9a8cdf4d1bf7"
+  },
+  {
+   "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/user-transport-resilience-20261118/fleet-PC2.json",
+   "gitBlobAtRoot544": "ecda08b70e2b1a46f8a5b0f3da5905adde514196"
+  },
+  {
+   "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/user-transport-resilience-20261118/fleet-PC3.json",
+   "gitBlobAtRoot544": "051353b77d7c65fb0711701ee5bbd412b4725250"
+  },
+  {
+   "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/user-transport-resilience-20261118/fleet-PC4.json",
+   "gitBlobAtRoot544": "bbd69f8a6a4abe4dd2869e75f3cbbbac4a0fad08"
+  },
+  {
+   "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/user-transport-resilience-20261118/inspect_fleet_startup_20261118.py.txt",
+   "gitBlobAtRoot544": "1d2fa4074c36031d92070e728ceabfcec57db0b4"
+  },
+  {
+   "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/resume-20261118-and-completion-audit/receipt.json",
+   "gitBlobAtRoot544": "6f79895fade8bb923c87004ea80006437fdab19a"
+  },
+  {
+   "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/resume-20261118-and-completion-audit/root-current-state.json",
+   "gitBlobAtRoot544": "39834f65367f0c4d05829bafb567ba6d705c6c6a"
+  },
+  {
+   "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/resume-20261118-and-completion-audit/current-main-os-metadata.json",
+   "gitBlobAtRoot544": "9aefd271fa2f35223fa6aed3d52a20b683638d0b"
+  },
+  {
+   "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/resume-20261118-and-completion-audit/PC1.json",
+   "gitBlobAtRoot544": "100b1b7f6b886e216bc5e8239c7a6ad226de2092"
+  },
+  {
+   "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/resume-20261118-and-completion-audit/PC3.json",
+   "gitBlobAtRoot544": "682699918f67490958970016faf47ac04eb1233e"
+  },
+  {
+   "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/resume-20261118-and-completion-audit/failed-worker-full-state.json",
+   "gitBlobAtRoot544": "e9352d5bea00ddc57f8ff126f8004b5109e53020"
+  },
+  {
+   "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/genuine-first-cpu-request-and-external-gates-r1/durable-GET-readback/capacity.json",
+   "gitBlobAtRoot544": "936758b766578754e74d3624290a3a3c6a584d2c"
+  },
+  {
+   "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/genuine-first-cpu-request-and-external-gates-r1/root-final-current-state.json",
+   "gitBlobAtRoot544": "e8e08370e6981d137ccd4e7ea4935f437f5cb529"
+  },
+  {
+   "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/expired-policy-d476-code-root-verified/root-current-state.json",
+   "gitBlobAtRoot544": "03bae0dd47f68d269b049b8e6c69e045d8980b0a"
+  },
+  {
+   "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/expired-policy-d476-actual-source-review/review.json",
+   "gitBlobAtRoot544": "8d1acbe29c0abe06cb607c35a1690ae0e5ae22a4"
+  },
+  {
+   "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/expired-policy-d476-actual-source-review/local-gates.json",
+   "gitBlobAtRoot544": "7b2ff15a8451c59c1ef330cc466c460cc7ea4e0e"
+  },
+  {
+   "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/pc3-schema-backup-before0068-r1/readiness.json",
+   "gitBlobAtRoot544": "ca31569a78ae820b561e8d8b8901fbe744f63386"
+  },
+  {
+   "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/pc3-schema-backup-before0068-r1/backup-receipt-r2.json",
+   "gitBlobAtRoot544": "f87a3d42e6cadf1e86d2c6ed4242185d59617234"
+  },
+  {
+   "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/pc3-actual-cpu-pilot-r1/pc3-observer-tunnel-r1/start-receipt.json",
+   "gitBlobAtRoot544": "ea1a07df81a42c30ec7ca8f45c170cdc521c4ae1"
+  },
+  {
+   "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/pc3-api96-frontend905-deploy-r1/portal-validation-ssh-bridge.json",
+   "gitBlobAtRoot544": "5e161748149543d27162d9c423ff281bb8cb6525"
+  },
+  {
+   "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/pc3-abb707-actual-runtime-acceptance-r1/root-runtime-verification.json",
+   "gitBlobAtRoot544": "2c2587a448e7a43350719ebdbcbc848b94c6becf"
+  },
+  {
+   "path": "docs/vault/30_Development/Evidence/fleet5-20261105-root/first-workspace-86ac-accepted-r2/root-acceptance.json",
+   "gitBlobAtRoot544": "d2aa94947f7681671cfd494c8a84161a6671e7bd"
+  }
+ ],
+ "commands": [
+  {
+   "what": "git rev-parse/log/merge-base/diff/ls-tree/show/cat-file on pinned SHAs (03e17c31, 59f0a3c2, 1efea494, 96afd799, abb7074e, d47630d7, fc9025c6, f9be6b61, b0313282, 8b20d3e6, ad0132b3)",
+   "exit": 0
+  },
+  {
+   "what": "git ls-remote origin main / integration/all-agents-unified / d476 branch at 2026-11-18T21:03:55+09:00",
+   "exit": 0,
+   "result": {
+    "main": "f9be6b61",
+    "integration": "59f0a3c2",
+    "d476Branch": "d47630d7"
+   }
+  },
+  {
+   "what": "gh api actions/runs?head_sha=59f0a3c2...",
+   "exit": 0,
+   "result": "13 runs, 13 success (8 post-landing-verify, AC-11 aggregate, migration rehearsal, train80 S12, receipt correction, portal harness)"
+  },
+  {
+   "what": "gh api actions/runs/{42431918918,42431943920,42431921203,44298774163}",
+   "exit": 0,
+   "result": "all completed/success at d47630d7 (3) and d81d40f8 (Root544 Docs)"
+  },
+  {
+   "what": "gh api actions/runs?head_sha for 1efea494 / 96afd799 / abb7074e",
+   "exit": 0,
+   "result": "1efea494 backend/core/docs success; 96afd799 core attempt cancelled then retry success, docs/backend success; abb7074e frontend/docs/ac11-a11y success (web-only delta, no Core/Backend at that SHA; d476 Core/Backend cover the chain)"
+  },
+  {
+   "what": "python -I binding_check.py (git ls-tree only)",
+   "exit": 0,
+   "result": "88/88 binding paths present at 59f0a3c2 and d47630d7; first run had 1 false negative (inv/sandbox.py abbreviation), resolver corrected and rerun; preserved here"
+  },
+  {
+   "what": "python -I build_audit.py / build_transport_and_connections.py",
+   "exit": 0
+  },
+  {
+   "what": "manifest hash check of user-transport-resilience-20261118 (python hashlib)",
+   "exit": 0,
+   "result": "16/16 match (3 raw, 13 after CRLF conversion)"
+  },
+  {
+   "what": "PowerShell Get-FileHash of canonical sync state at start 2026-11-18T21:00:14+09:00",
+   "exit": 0,
+   "result": "612806 B bfe8ee721d6f6653df5bd88f219a762beb95e4e96e27032e8a5b96df0a8b0538 (matches brief)"
+  }
+ ]
+}
