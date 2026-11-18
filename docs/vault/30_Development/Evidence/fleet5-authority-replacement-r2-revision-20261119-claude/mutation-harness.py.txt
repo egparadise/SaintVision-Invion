@@ -1,0 +1,78 @@
+"""Single-fault mutation harness for the R2 revision guards (scratch, not committed)."""
+import hashlib
+import json
+import os
+import subprocess
+import sys
+from pathlib import Path
+
+root = Path(sys.argv[1])
+target = root / "tools/check_fleet5_authority_replacement_r2.py"
+original = target.read_bytes()
+before = hashlib.sha256(original).hexdigest()
+
+MUTANTS = {
+    "F4-fence-gate-removed": ('    if not fence_held(doc):  # before any custody', '    if False:  # before any custody'),
+    "F4-fence-holder-not-compared": ('or fence["holderPlanDigest"] != plan_digest(doc):', ':'),
+    "F4-fence-generation-not-compared": ('    if fence["generation"] != plan["generation"]:', '    if False:'),
+    "F4-fence-read-age-unbounded": ('    return read <= at and (at - read).total_seconds() <= window(doc, "observationFreshnessSeconds")',
+                                    '    return True'),
+    "F4-unrecorded-key-accepted": ('    if new["certificateDER"] is None or new["caPublicKeySHA256"] is None:', '    if False:'),
+    "F4-zero-ca-keys-accepted": ('    if log["caKeysCreated"] != 1:', '    if log["caKeysCreated"] > 1:'),
+    "F4-executor-fence-removed": ('    if not fence_held(doc):  # defence in depth', '    if False:  # defence in depth'),
+    "F4-executor-row-dup-allowed": ('        if row is not None:  # never a second row', '        if False:  # never a second row'),
+    "F3-challenge-age-unbounded": ('    if age < 0 or age > window(doc, "challengeLifetimeSeconds"):', '    if False:'),
+    "F3-consumed-nonce-accepted": ('    if serving is None or serving["challengeNonce"] in doc["checkpoint"]["consumedChallengeNonces"]:',
+                                   '    if serving is None:'),
+    "F3-executor-does-not-consume": ('        cp["consumedChallengeNonces"].append(cp["readback"]["serving"]["challengeNonce"])  # one use',
+                                     '        pass'),
+    "F3-live-inventory-freshness-ignored": ('''    if live["source"] != "CP_PROCESS_REGISTRY" or not ctx.fresh(live["observedAt"], live["receivedAt"],
+                                                                 live["challengeNonce"]):''',
+                                            '''    if live["source"] != "CP_PROCESS_REGISTRY":'''),
+    "F3-live-inventory-churn-ignored": ('    if {pid: (p["site"], p["kind"]) for pid, p in ctx.live.items()} != planned:', '    if False:'),
+    "F3-unplanned-readback-ignored": ('    if any(planned.get(pid, (None,))[0] != p["site"] for pid, p in ctx.procs.items()):', '    if False:'),
+    "F3-instance-not-compared": ('or proc["instanceID"] != live["instanceID"]', ''),
+    "F3-receipt-before-issuance-accepted": ('        return (self.issued <= received <= self.at', '        return (received <= self.at'),
+    "F3-responder-skew-ignored": ('''                and abs((observed - received).total_seconds()) <= self.skew)''', '''                )'''),
+    "F3-window-cap-ignored": ('''budgets[k] is not None and budgets[k] > cap''', '''budgets[k] is not None and False'''),
+    "ID-exact-key-not-required": ('''        return sum(e == {"manifestDigest": self.manifest_digest, "opID": op_id} for e in entries)''',
+                                  '''        return sum(e["opID"] == op_id for e in entries)'''),
+    "F5-policy-start-ignored": ('''        if p is not None and (at < _ts(p["notBefore"])  # relied upon''', '''        if p is not None and (False  # relied upon'''),
+    "F5-complete-validity-ignored": ('''        return ("HOLD_VALIDITY_LAPSED" if validity_lapsed(doc, ctx.at) else "COMPLETE"), None, *none''',
+                                     '''        return "COMPLETE", None, *none'''),
+    "F5-handoff-validity-ignored": ('''    if validity_lapsed(doc, when):
+        raise ValueError''', '''    if False:
+        raise ValueError'''),
+    "F5-prior-leaves-unbudgeted": ('''            if cert is None or end > cert.not_valid_after_utc:''', '''            if False:'''),
+    "F5-installed-policy-unbudgeted": ('''            if value is None or end > _ts(value):''', '''            if False:'''),
+    "F5-dependency-readback-not-required": ('''           or ctx.rows[m["nodeID"]]["installedPolicyNotAfter"] is None
+''', ''),
+    "F5-committed-policy-validity-ignored": ('''                and row["installedPolicyNotAfter"] == post["installedPolicyNotAfter"]):''', '''):'''),
+    "F5-overlap-evidence-not-required": ('''    if tt["cutover"] == "DUAL_ANCHOR_OVERLAP" and tt["overlapRuntimeEvidenceRef"] is None:''', '''    if False:'''),
+    "ID-op-id-from-r2-inputs": ('''    return "op_" + digest({"planDigest": plan_digest_value, **body})[:24]''',
+                                '''    return "op_" + digest({"planDigest": plan_digest_value, **{k: body[k] for k in ("phase", "kind", "target")}})[:24]'''),
+    "ID-foreign-manifest-audit-accepted": ('''        if any(e["opID"] == op_id and e["manifestDigest"] != self.manifest_digest for e in entries):
+            return None''', '''        if False:
+            return None'''),
+}
+
+env = dict(os.environ, PYTHONUTF8="1")
+results = {}
+try:
+    text = original.decode("utf-8")
+    for name, (old, new) in MUTANTS.items():
+        assert text.count(old) == 1, (name, text.count(old))
+        target.write_bytes(text.replace(old, new).encode("utf-8"))
+        proc = subprocess.run([sys.executable, "-m", "pytest", "-q", "-x", "-p", "no:cacheprovider",
+                               "tests/core/test_fleet5_authority_replacement_r2.py"],
+                              cwd=root, env=env, capture_output=True, text=True)
+        last = [line for line in proc.stdout.splitlines() if line.strip()][-1]
+        results[name] = {"exit": proc.returncode, "killed": proc.returncode != 0, "summary": last}
+        print(f"{name}: exit={proc.returncode} {'KILLED' if proc.returncode else 'SURVIVED'} | {last}", flush=True)
+finally:
+    target.write_bytes(original)
+after = hashlib.sha256(target.read_bytes()).hexdigest()
+out = {"checkerSHA256Before": before, "checkerSHA256After": after, "mutants": results,
+       "killed": sum(r["killed"] for r in results.values()), "total": len(results)}
+Path(sys.argv[2]).write_text(json.dumps(out, indent=1) + "\n", "utf-8")
+print(f"killed {out['killed']}/{out['total']}; checker restored: {before == after}")

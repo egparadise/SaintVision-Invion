@@ -1,0 +1,148 @@
+{
+ "schema": "claude-local-gates:1",
+ "task": "task_f0b055d0a9ae",
+ "dispatch": "ctx_1a8f915dd262",
+ "environment": {
+  "os": "Windows 11",
+  "python": "3.10.11",
+  "PYTHONUTF8": "1"
+ },
+ "headAtRun": "7174b3eea6b0c142305a549207f7d124b6478c61",
+ "workingTreeAtRun": [
+  " M \"docs/vault/30_Development/Agent별 작업/Claude 작업 현황.md\"",
+  " M \"docs/vault/40_Governance/Proposed FLEET5 authority replacement and advance-renewal contract R2.md\"",
+  "?? docs/vault/30_Development/Evidence/fleet5-authority-replacement-r2-revision-20261119-claude/",
+  "?? docs/vault/30_Development/History/2026-11-19_FLEET5_Authority_Replacement_R2_Revision_Claude.md"
+ ],
+ "gates": [
+  {
+   "command": "python tools/check_docs.py",
+   "exitCode": 0,
+   "startedKST": "2026-11-19T01:49:51+09:00",
+   "endedKST": "2026-11-19T01:50:10+09:00",
+   "outputTail": [
+    "PASS: 24 original hashes, 1279 versioned documents, wiki links, 48 tasks, 12 outcomes, owner/reviewer/skills, dependency DAG."
+   ]
+  },
+  {
+   "command": "python tools/check_doc_path_citations.py --ratchet --base-ref 9a9bc90c3d7b3c2aa1889d8de0d5906fac7e5412",
+   "exitCode": 0,
+   "startedKST": "2026-11-19T01:50:10+09:00",
+   "endedKST": "2026-11-19T01:50:17+09:00",
+   "outputTail": [
+    "PASS check_doc_path_citations --ratchet: 290 broken citation(s), all in baseline, none stale, floor unchanged."
+   ]
+  },
+  {
+   "command": "python tools/check_contract_bindings.py",
+   "exitCode": 0,
+   "startedKST": "2026-11-19T01:50:17+09:00",
+   "endedKST": "2026-11-19T01:50:26+09:00",
+   "outputTail": [
+    "PASS check_contract_bindings: 57 fixtures each referenced by a test; 21 bound kernel response TYPES each have >=1 serving-anchor test (counted PER TYPE, not per anchor SITE: those types occupy 27 anchor sites; a multi-site type counts covered even if only one site is tested -- site-level weight is not decidable here, use tools/check_anchor_weight.py + the mutation harness); 14 replay guards present.",
+    "  UNIT NOTE: TYPE count <= SITE count. Multi-site types (per-type coverage can mask an untested site): ApprovalView(2 sites: ['approvals']), BusinessBindingView(2 sites: ['business_handoff']), BusinessEditLockReleaseView(2 sites: ['business_handoff']), BusinessEditLockView(2 sites: ['business_handoff']), ControlRunDetail(3 sites: ['control']), ControlRunView(2 sites: ['control']), EvidenceEnvelope(6 sites: ['build_governance', 'results', 'runs', 'shard_completion', 'storage_commit', 'storage_view']), ModelExecutionManifestObservation(2 sites: ['model_uri_resolver', 'model_view']), NodeExecutionPermit(2 sites: ['node_execution', 'node_transport']), NodeResourceSnapshot(4 sites: ['capacity', 'gpu', 'observation']), WorkspaceCheckoutView(2 sites: ['workspace_recovery']), WorkspaceEnqueueResult(3 sites: ['workspace_api']), WorkspacePrepareResult(2 sites: ['workspace_api']), WorkspaceRestoreView(2 sites: ['workspace_recovery']), WorkspaceStartEnqueueResult(3 sites: ['workspace_start']), WorkspaceStartPrepareResult(2 sites: ['workspace_start'])",
+    "  (Reporting sites is not a regression -- the TYPE number never meant 'sites verified'; this makes the counting unit explicit. EvidenceEnvelope-class multi-site anchors are why.)"
+   ]
+  },
+  {
+   "command": "python tools/check_frontend_integrity.py",
+   "exitCode": 0,
+   "startedKST": "2026-11-19T01:50:26+09:00",
+   "endedKST": "2026-11-19T01:50:27+09:00",
+   "outputTail": [
+    "Scanning 94 frontend production source files under apps/web/src ...",
+    "PASS Frontend Integrity Check: all 9 integrity rules satisfied (0 violations)."
+   ]
+  },
+  {
+   "command": "python tools/test_sync.py",
+   "exitCode": 0,
+   "startedKST": "2026-11-19T01:50:27+09:00",
+   "endedKST": "2026-11-19T01:50:31+09:00",
+   "outputTail": [
+    "----------------------------------------------------------------------",
+    "Ran 14 tests in 4.268s",
+    "OK"
+   ]
+  },
+  {
+   "command": "python tools/check_ontology_generation.py",
+   "exitCode": 0,
+   "startedKST": "2026-11-19T01:50:31+09:00",
+   "endedKST": "2026-11-19T01:50:33+09:00",
+   "outputTail": [
+    "PASS: 4 ontology artifacts are graph-equivalent to a fresh generation"
+   ]
+  },
+  {
+   "command": "python tools/check_ontology.py",
+   "exitCode": 0,
+   "startedKST": "2026-11-19T01:50:33+09:00",
+   "endedKST": "2026-11-19T01:50:35+09:00",
+   "outputTail": [
+    "PASS: RDF parsing, defined terms, TTL/JSON-LD equivalence, 48 task mappings, positive SHACL, 4 rejected invalid fixtures, 4 competency queries, Obsidian mirrors."
+   ]
+  },
+  {
+   "command": "python tools/check_doc_single_source.py --ratchet",
+   "exitCode": 0,
+   "startedKST": "2026-11-19T01:50:35+09:00",
+   "endedKST": "2026-11-19T01:50:35+09:00",
+   "outputTail": [
+    "PASS check_doc_single_source --ratchet: 16 pairs, all in baseline, none stale."
+   ]
+  },
+  {
+   "command": "python tools/sync_obsidian.py --check",
+   "exitCode": 0,
+   "startedKST": "2026-11-19T01:50:35+09:00",
+   "endedKST": "2026-11-19T01:50:49+09:00",
+   "outputTail": [
+    "CHECK: 3807 managed files, 13 pending exports, 0 conflicts. No writes."
+   ]
+  },
+  {
+   "command": "python tools/check_fleet5_authority_replacement.py",
+   "exitCode": 0,
+   "startedKST": "2026-11-19T01:50:49+09:00",
+   "endedKST": "2026-11-19T01:50:50+09:00",
+   "outputTail": [
+    "PASS fleet5 authority replacement: 45 documents matched their expected verdicts"
+   ]
+  },
+  {
+   "command": "python tools/generate_fleet5_authority_replacement_fixtures.py --check",
+   "exitCode": 0,
+   "startedKST": "2026-11-19T01:50:50+09:00",
+   "endedKST": "2026-11-19T01:50:50+09:00",
+   "outputTail": []
+  },
+  {
+   "command": "python tools/check_fleet5_authority_replacement_r2.py",
+   "exitCode": 0,
+   "startedKST": "2026-11-19T01:50:50+09:00",
+   "endedKST": "2026-11-19T01:50:52+09:00",
+   "outputTail": [
+    "PASS fleet5 authority replacement R2: 111 documents matched their expected verdicts"
+   ]
+  },
+  {
+   "command": "python tools/generate_fleet5_authority_replacement_r2_fixtures.py --check",
+   "exitCode": 0,
+   "startedKST": "2026-11-19T01:50:52+09:00",
+   "endedKST": "2026-11-19T01:50:53+09:00",
+   "outputTail": []
+  },
+  {
+   "command": "python -m pytest tests/core/test_fleet5_authority_replacement_r2.py tests/core/test_fleet5_authority_replacement_proposal.py -q -p no:cacheprovider",
+   "exitCode": 0,
+   "startedKST": "2026-11-19T01:50:53+09:00",
+   "endedKST": "2026-11-19T01:51:01+09:00",
+   "outputTail": [
+    "........................................................................ [ 98%]",
+    "........                                                                 [100%]",
+    "512 passed in 7.58s"
+   ]
+  }
+ ]
+}

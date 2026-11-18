@@ -1,0 +1,153 @@
+{
+ "checkerSHA256Before": "18f386ff3d2142d76948e0b4b51e8f948bbbd841785aeecee7a9ef8ab2cddad9",
+ "checkerSHA256After": "18f386ff3d2142d76948e0b4b51e8f948bbbd841785aeecee7a9ef8ab2cddad9",
+ "mutants": {
+  "F4-fence-gate-removed": {
+   "exit": 1,
+   "killed": true,
+   "summary": "1 failed, 2 passed in 2.66s"
+  },
+  "F4-fence-holder-not-compared": {
+   "exit": 1,
+   "killed": true,
+   "summary": "1 failed, 2 passed in 2.75s"
+  },
+  "F4-fence-generation-not-compared": {
+   "exit": 1,
+   "killed": true,
+   "summary": "1 failed, 2 passed in 2.70s"
+  },
+  "F4-fence-read-age-unbounded": {
+   "exit": 1,
+   "killed": true,
+   "summary": "1 failed, 285 passed in 7.03s"
+  },
+  "F4-unrecorded-key-accepted": {
+   "exit": 1,
+   "killed": true,
+   "summary": "1 failed, 305 passed in 7.16s"
+  },
+  "F4-zero-ca-keys-accepted": {
+   "exit": 1,
+   "killed": true,
+   "summary": "1 failed, 306 passed in 7.34s"
+  },
+  "F4-executor-fence-removed": {
+   "exit": 1,
+   "killed": true,
+   "summary": "1 failed, 301 passed in 7.22s"
+  },
+  "F4-executor-row-dup-allowed": {
+   "exit": 1,
+   "killed": true,
+   "summary": "1 failed, 145 passed in 5.46s"
+  },
+  "F3-challenge-age-unbounded": {
+   "exit": 1,
+   "killed": true,
+   "summary": "1 failed, 2 passed in 2.69s"
+  },
+  "F3-consumed-nonce-accepted": {
+   "exit": 1,
+   "killed": true,
+   "summary": "1 failed, 2 passed in 2.72s"
+  },
+  "F3-executor-does-not-consume": {
+   "exit": 1,
+   "killed": true,
+   "summary": "1 failed, 231 passed in 6.41s"
+  },
+  "F3-live-inventory-freshness-ignored": {
+   "exit": 1,
+   "killed": true,
+   "summary": "1 failed, 210 passed in 6.01s"
+  },
+  "F3-live-inventory-churn-ignored": {
+   "exit": 1,
+   "killed": true,
+   "summary": "1 failed, 232 passed in 6.27s"
+  },
+  "F3-unplanned-readback-ignored": {
+   "exit": 1,
+   "killed": true,
+   "summary": "1 failed, 247 passed in 6.35s"
+  },
+  "F3-instance-not-compared": {
+   "exit": 1,
+   "killed": true,
+   "summary": "1 failed, 253 passed in 6.50s"
+  },
+  "F3-receipt-before-issuance-accepted": {
+   "exit": 1,
+   "killed": true,
+   "summary": "1 failed, 207 passed in 6.04s"
+  },
+  "F3-responder-skew-ignored": {
+   "exit": 1,
+   "killed": true,
+   "summary": "1 failed, 215 passed in 6.06s"
+  },
+  "F3-window-cap-ignored": {
+   "exit": 1,
+   "killed": true,
+   "summary": "1 failed, 2 passed in 2.67s"
+  },
+  "ID-exact-key-not-required": {
+   "exit": 0,
+   "killed": false,
+   "summary": "357 passed in 7.37s"
+  },
+  "F5-policy-start-ignored": {
+   "exit": 1,
+   "killed": true,
+   "summary": "1 failed, 2 passed in 2.20s"
+  },
+  "F5-complete-validity-ignored": {
+   "exit": 1,
+   "killed": true,
+   "summary": "1 failed, 2 passed in 2.17s"
+  },
+  "F5-handoff-validity-ignored": {
+   "exit": 1,
+   "killed": true,
+   "summary": "1 failed, 342 passed in 6.63s"
+  },
+  "F5-prior-leaves-unbudgeted": {
+   "exit": 1,
+   "killed": true,
+   "summary": "1 failed, 343 passed in 6.71s"
+  },
+  "F5-installed-policy-unbudgeted": {
+   "exit": 1,
+   "killed": true,
+   "summary": "1 failed, 2 passed in 2.16s"
+  },
+  "F5-dependency-readback-not-required": {
+   "exit": 1,
+   "killed": true,
+   "summary": "1 failed, 346 passed in 6.93s"
+  },
+  "F5-committed-policy-validity-ignored": {
+   "exit": 1,
+   "killed": true,
+   "summary": "1 failed, 348 passed in 7.05s"
+  },
+  "F5-overlap-evidence-not-required": {
+   "exit": 1,
+   "killed": true,
+   "summary": "1 failed, 2 passed in 2.22s"
+  },
+  "ID-op-id-from-r2-inputs": {
+   "exit": 1,
+   "killed": true,
+   "summary": "1 failed, 1 passed in 1.11s"
+  },
+  "ID-foreign-manifest-audit-accepted": {
+   "exit": 1,
+   "killed": true,
+   "summary": "1 failed, 318 passed in 6.65s"
+  }
+ },
+ "killed": 28,
+ "total": 29
+}

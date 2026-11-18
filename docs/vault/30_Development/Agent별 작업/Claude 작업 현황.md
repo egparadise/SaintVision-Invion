@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-CLAUDE-001"
 title: "Claude 작업 현황"
-version: "1.2.136"
+version: "1.2.137"
 status: "review"
 author: "Claude"
-updated: "2026-11-19T02:30:00+09:00"
+updated: "2026-11-19T01:49:19+09:00"
 
 
 
@@ -12,6 +12,32 @@ updated: "2026-11-19T02:30:00+09:00"
 
 source_of_truth: "Git"
 ---
+
+## 2026-11-19 FLEET5 authority 교체 계약 R2 2차 개정: Codex R2 검토 지적 대응 (Claude 직접 기록)
+
+- **작업** (task_f0b055d0a9ae / ctx_1a8f915dd262): R2 evidence head `9a9bc90c`(후보 `14ddc8e9` 포함) 기준으로 별도 worktree에서 했다. 브랜치는 `egparadise/fleet5-authority-replacement-r3-20261119`다.
+  - Codex R2 검토 보고서 전문을 먼저 읽었다. 보고서는 검토자 worktree에 있고 sha256은 `a2de6b54…d6fec7a8`다. 복사하지 않았다.
+  - 판 버전은 1.2.137로 올렸다. 통합은 Root가 한다.
+- **수정** (검토가 준 순서대로, 각 commit에 격리 fixture 회귀 테스트를 포함했다):
+  - `17f6b3a3` writer fence: A1 중단 뒤에는 custody·ceremony·abandon·resume·COMPLETE를 판정하기 전에 live fence를 먼저 본다(token·holder plan·monotonic generation·fresh readAt). 로그 부재, CA key 수 ≠ 1, plan에 기록되지 않은 key는 HOLD_CUSTODY_UNRESOLVED다. executor 모델도 fence 없이는 서명하지 않는다.
+  - `7d7356c0` serving: challenge 발급 경과를 제한하고, CP 수신 시각과 skew를 확인하며, challenge는 1회만 쓴다. 권위 live inventory가 동결 inventory와 다르면 HOLD_PROCESS_INVENTORY_CHANGED다. 시간 창은 측정값이고 계약 상한 아래에 있어야 한다.
+  - `fbc26157` 행 표현: `rowPresent`를 제거했다. 부재는 생략으로만 표현한다. 두 번째 행은 만들지 않는다.
+  - `3bc2f47e` 유효기간: 정책 시작 시각, COMPLETE 시점의 유효성(HOLD_VALIDITY_LAPSED), handoff 시점 재검사, advance renewal의 이전 leaf와 설치된 이전 정책 예산, DUAL overlap의 runtime 증거 요구를 추가했다.
+  - `afa538c0`·`7174b3ee` 식별자: opID는 operation 본문 digest다. audit와 journal은 `{manifestDigest, opID}`로 쓴다. 다른 manifest의 같은 opID는 CONFLICT다.
+- **확인**: 
+  - R2 checker 111개 문서가 기대 판정과 일치했고, generator drift는 0이다. pytest는 R2 357건과 R1 155건을 합쳐 512 passed다.
+  - 이 개정의 guard를 하나씩 제거한 mutant 29개 중 28개를 kill했다. 나머지 1개는 schema 때문에 동치인 mutant로 기록했다. checker hash는 실행 전후가 같다.
+  - 로컬 게이트 14개가 모두 exit 0이다.
+  - hosted Docs·Core·Backend는 최종 SHA에서 dispatch했다(`hosted-ci.json`, 인계 시점 snapshot). R2 후보 `14ddc8e9`의 Core·Backend는 그 뒤 success로 끝났다.
+  - 증거 폴더는 `Evidence/fleet5-authority-replacement-r2-revision-20261119-claude/`다.
+- **하지 않은 것**:
+  - live 자격증명·SSH·DB·Docker·키 접근, 등록, 활성화, canonical sync apply, cutover
+  - 검토자 worktree, Codex custody·preflight 파일, R1 산출물 변경
+  - 이 개정의 독립 검토. 아직 수행되지 않았다.
+- **다음 첫 행동/담당**:
+  - Codex: 보고된 정확한 SHA에서 독립 검토한다.
+  - Root: DB 복구, custody·signer 판정, fence·예산·창 측정, PC1, 운영 수락을 맡는다.
+  - runtime owner: 남은 공백 10건을 별도 card로 맡는다. 상세는 [[2026-11-19_FLEET5_Authority_Replacement_R2_Revision_Claude]].
 
 ## 2026-11-19 FLEET5 authority 교체 계약 R2 개정: R1 독립 검토 HIGH 5건 대응 (Claude 직접 기록)
 
