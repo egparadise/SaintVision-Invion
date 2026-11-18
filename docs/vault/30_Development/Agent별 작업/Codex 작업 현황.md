@@ -1,14 +1,14 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.504"
+version: "1.0.506"
 status: "review"
 author: "Codex"
-updated: "2026-11-08T09:52:28+09:00"
+updated: "2026-11-18T21:07:57+09:00"
 source_of_truth: "Git"
-active_card: "FLEET5-EXPIRED-CURRENT-AUTHORITY-FORWARD-RECOVERY-CONTRACT-R1"
-active_card_status: "Executable proposed candidate, actual hosted proofs and separate source review; live activation HOLD"
-active_card_next: "Root binds exact candidate evidence then actual Claude source/security review; production adapters/migration/B_Rpolicy remain HOLD"
+active_card: "FLEET5-EXPIRED-POLICY-INTEGRATION-HARDENING-AND-READONLY-PREFLIGHT-R1"
+active_card_status: "Implementation in progress. Hosted proof pending."
+active_card_next: "Complete fixture proofs and hand off for independent review."
 ---
 
 ## 2026-11-08T09:14:58+09:00 expired-policy executable candidate R1

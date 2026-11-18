@@ -1,0 +1,27 @@
+{
+  "task": "FLEET5-EXPIRED-POLICY-INTEGRATION-HARDENING-AND-READONLY-PREFLIGHT-R1",
+  "dispatch": "ctx_b501ed32376a",
+  "owner": "Codex",
+  "reviewer": "Claude pending independent review",
+  "base": "d47630d730278aa9e49b15a63cd221696da8dc00",
+  "branch": "agent/codex/fleet5-recovery-integration-readiness-resume-20261118",
+  "atKST": "2026-11-18T21:07:45+09:00",
+  "scope": "Candidate hardening and read-only preflight",
+  "management": "d81d40f824538a4ef553cc8ae4aa75f7c012e325",
+  "reviewOfBase": "fc9025c6a7c42ba58974f179b80b5099b4ec8244",
+  "canonicalBytes": 612806,
+  "canonicalSHA256": "bfe8ee721d6f6653df5bd88f219a762beb95e4e96e27032e8a5b96df0a8b0538",
+  "authority": "CA_TERMINAL",
+  "activationAllowed": false,
+  "verifiedDocVersions": {
+    "INDEX-PROGRESS-001": "1.0.544",
+    "WORKBOARD-CODEX-001": "1.0.505",
+    "WORKBOARD-CLAUDE-001": "1.2.132",
+    "GUIDE-001": "1.1.0",
+    "ADR-INDEX-001": "1.37.0",
+    "GOV-CONTINUOUS-001": "1.1.0",
+    "GOV-GIT-001": "1.1.4",
+    "GOV-AGENT-001": "1.1.3",
+    "GOV-CONTINUITY-001": "1.0.0"
+  }
+}

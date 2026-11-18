@@ -25,11 +25,12 @@ def certificate(key, ca_key, ca, uri=None, ip=None, ca_cert=False, expiry=3600):
 
 
 class Fixture:
-    def __init__(self, node_public=None):
-        self.tenant = 'candidate-'+secrets.token_hex(8)
-        self.epoch = 'epoch-'+secrets.token_hex(8)
+    def __init__(self, node_public=None, tenant=None, epoch=None):
+        self.tenant = tenant or 'candidate-'+secrets.token_hex(8)
+        self.epoch = epoch or 'epoch-'+secrets.token_hex(8)
         self.ca_key = Ed25519PrivateKey.generate()
         self.ca = certificate(self.ca_key.public_key(),self.ca_key,None,ca_cert=True,expiry=7200)
+        self.launch_signer = Ed25519PrivateKey.generate()
         self.cp_key = Ed25519PrivateKey.generate()
         self.cp = certificate(self.cp_key.public_key(),self.ca_key,self.ca,uri=f'spiffe://saintvision.ai/tenant/{self.tenant}/control-plane/epoch/{self.epoch}')
         self.authorizer = Ed25519PrivateKey.generate(); self.operator = Ed25519PrivateKey.generate()
@@ -60,7 +61,7 @@ class Fixture:
         proofs = {}
         for m in auth['members']:
             n = m['nodeId']; request = r.parse(requests[n]); op,opraw = r.verify(request['operator'],r.OPERATOR,self.trust.operator)
-            body = dict(schema='sv-expired-policy-nonserving-proof:1',assurance='operator-custody-and-file-lock-not-hardware',serving=False,servingPID=None,operation=auth['operation'],nonce=auth['nonce'],counter=auth['counter'],tenantId=self.tenant,epoch=self.epoch,nodeId=n,proposalDigest=r.sha(r.canonical(auth)),requestDigest=r.sha(requests[n]),operatorDigest=r.sha(opraw),helperSHA256=self.trust.helper_sha256,containerId=op['containerId'],imageId=op['imageId'],lockDevice=op['lockDevice'],lockInode=op['lockInode'],lockHeldAtSigning=True,observedAt=int(time.time()),deadline=auth['deadline'],activationAllowed=False)
+            body = dict(**r.authority_hashes(self.trust),schema='sv-expired-policy-nonserving-proof:2',assurance='operator-custody-and-file-lock-not-hardware',serving=False,servingPID=None,operation=auth['operation'],nonce=auth['nonce'],counter=auth['counter'],tenantId=self.tenant,epoch=self.epoch,nodeId=n,proposalDigest=r.sha(r.canonical(auth)),requestDigest=r.sha(requests[n]),operatorDigest=r.sha(opraw),helperSHA256=self.trust.helper_sha256,containerId=op['containerId'],imageId=op['imageId'],lockDevice=op['lockDevice'],lockInode=op['lockInode'],lockHeldAtSigning=True,observedAt=int(time.time()),deadline=auth['deadline'],activationAllowed=False)
             body.update({k:m[k] for k in ['priorC','priorP','floorSHA256','identitySHA256','configDigest','previousCheckpoint']})
             proofs[n] = r.sign(body,r.PROOF,self.node_keys[n])
         return requests,proofs
@@ -69,6 +70,6 @@ class Fixture:
         records = {}
         for m in auth['members']:
             n=m['nodeId']; ack,_=r.verify(acks[n],r.ACK,self.trust.authorizer)
-            cp=dict(schema='sv-expired-policy-candidate-checkpoint:1',operation=auth['operation'],counter=auth['counter'],requestDigest=r.sha(requests[n]),proofDigest=r.sha(r.canonical(proofs[n])),ackDigest=r.sha(r.canonical(acks[n])),batchProofDigest=ack['batchProofDigest'],previousCheckpoint=m['previousCheckpoint'],nodeId=n,tenantId=self.tenant,epoch=self.epoch,checkpointAt=int(time.time()),lockHeldThroughCheckpoint=True,activationAllowed=False)
-            records[n]=dict(schema='sv-expired-policy-record:1',requestDigest=r.sha(requests[n]),proof=proofs[n],checkpoint=r.sign(cp,r.CHECKPOINT,self.node_keys[n]))
+            cp=dict(**r.authority_hashes(self.trust),schema='sv-expired-policy-candidate-checkpoint:2',operation=auth['operation'],counter=auth['counter'],requestDigest=r.sha(requests[n]),proofDigest=r.sha(r.canonical(proofs[n])),ackDigest=r.sha(r.canonical(acks[n])),batchProofDigest=ack['batchProofDigest'],previousCheckpoint=m['previousCheckpoint'],nodeId=n,tenantId=self.tenant,epoch=self.epoch,checkpointAt=int(time.time()),lockHeldThroughCheckpoint=True,activationAllowed=False)
+            records[n]=dict(schema='sv-expired-policy-record:2',requestDigest=r.sha(requests[n]),proof=proofs[n],checkpoint=r.sign(cp,r.CHECKPOINT,self.node_keys[n]))
         return records

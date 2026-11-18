@@ -15,6 +15,7 @@ import subprocess
 import sys
 import tempfile
 import time
+import uuid
 
 ROOT=Path(__file__).resolve().parents[2]
 sys.path.insert(0,str(ROOT/'services/control-plane/src'))
@@ -60,6 +61,37 @@ def failure(name,cid,args,expected,extra=()):
     REPORT['negativeControls'].append({'name':name,'exit':result.returncode,'typedError':expected})
 
 
+def collect_fixture_nodes(f,image_id,nodes):
+    descriptor=dict(schema='sv-readonly-cohort:1',sourceSHA=os.environ['GITHUB_SHA'],tenant=f.tenant,
+                    epoch=f.epoch,project='prj_'+'0'*26,caDER=r.sha(f.trust.ca_der),cpDER=r.sha(f.trust.cp_der),
+                    databaseRole='fixture_reader',ownerLabel='sv.fixture',ownerValue='readonly',maxAgeSeconds=120,nodes={})
+    for node,item in nodes.items():
+        paths=item['paths']
+        cid=command(['docker','run','-d','--network=none','--user','1000:1000','--read-only',
+                     '--cap-drop=ALL','--security-opt','no-new-privileges','--label','sv.fixture=readonly',
+                     '--mount',f'type=bind,src={paths["config"]},dst=/config,readonly',
+                     '--mount',f'type=bind,src={paths["state"]},dst=/state','sha256:'+image_id]).decode().strip()
+        CONTAINERS.append(cid)
+        descriptor['nodes'][node]=dict(cid=cid,image=image_id,config=str(paths['config']),state=str(paths['state']),
+                                       argv=['/fixture-key','--isolated-fixture-hold'])
+    observations=[]
+    for node,item in nodes.items():
+        paths=item['paths']
+        def snapshot():
+            return {str(p.relative_to(paths[k])):(p.stat().st_ino,p.stat().st_ctime_ns,
+                    None if p.name=='node-key.pem' else r.sha(p.read_bytes()))
+                    for k in ('config','state') for p in paths[k].iterdir()}
+        before=snapshot()
+        result=command([sys.executable,'-B',str(ROOT/'tools/recovery_preflight/node.py')],
+                       input=json.dumps(dict(descriptor=descriptor,node=node)).encode())
+        obs=json.loads(result)
+        after=snapshot()
+        assert obs['observationComplete'] and not obs['recoveryReady'] and before==after
+        assert 'sha256' not in obs['facts']['files']['node-key.pem']
+        observations.append(dict(observation=obs,changedFiles=sum(before.get(k)!=after.get(k) for k in before.keys()|after.keys())))
+    REPORT['readOnlyNodeObservations']=observations
+
+
 def main():
     assert sys.platform=='linux' and os.environ.get('GITHUB_ACTIONS')=='true' and os.geteuid()==0, 'hosted owned fixture only'
     OUT.mkdir(parents=True,exist_ok=True)
@@ -76,17 +108,28 @@ def main():
         scope=Path(temp); nodes={}; public={}
         # Bootstrap isolated Node keys locally in each Node mount, not at CP.
         for i in range(3):
-            node=f'candidate_node_{i}'; base=scope/node; base.mkdir(mode=0o755)
+            node=f'nod_{i:026d}'; base=scope/node; base.mkdir(mode=0o755)
             paths={k:base/k for k in ['config','state','custody','trust']}
             for p in paths.values(): p.mkdir(mode=0o700); os.chown(p,1000,1000)
             output=command(['docker','run','--rm','--network=none','--user','1000:1000','--read-only','--cap-drop=ALL','--security-opt','no-new-privileges','--mount',f'type=bind,src={paths["config"]},dst=/config', '--entrypoint','/fixture-key',image,'--isolated-fixture-keygen'])
             csr=x509.load_der_x509_csr(base64.b64decode(json.loads(output)['csr']))
             assert csr.is_signature_valid
             public[node]=csr.public_key(); nodes[node]={'paths':paths}
-        f=Fixture(public); f.trust=replace(f.trust,helper_sha256=REPORT['helperSHA256'])
+        f=Fixture(public,tenant=str(uuid.uuid4()),epoch=str(uuid.uuid4())); f.trust=replace(f.trust,helper_sha256=REPORT['helperSHA256'])
+        authority = dict(schema='sv-recovery-fixture-authority:1',tenant=f.tenant,epoch=f.epoch,
+                         nodes={n:r.sha(b.certificate_der) for n,b in f.trust.nodes.items()},
+                         **r.authority_hashes(f.trust))
+        anchor = build/'recovery-authority.json'
+        anchor.write_bytes(r.canonical(authority))
+        anchor.chmod(0o444)
+        with (build/'Dockerfile').open('a') as definition:
+            definition.write('COPY --chown=0:0 recovery-authority.json /recovery-authority.json\n')
+        command(['docker','build','--network=none','--pull=false','-t',image,str(build)])
+        image_id=command(['docker','image','inspect','--format','{{.Id}}',image]).decode().strip().removeprefix('sha256:')
+        REPORT.update(imageId=image_id,authorityBindingSHA256=r.sha(anchor.read_bytes()))
         for node,item in nodes.items():
             paths=item['paths']
-            for name,raw in {'node-cert.pem':f.certs[node].public_bytes(serialization.Encoding.PEM),'client-ca.pem':f.ca.public_bytes(serialization.Encoding.PEM),'launch-signer.pub':f.operator.public_key().public_bytes_raw()}.items(): write(paths['config']/name,raw)
+            for name,raw in {'node-cert.pem':f.certs[node].public_bytes(serialization.Encoding.PEM),'client-ca.pem':f.ca.public_bytes(serialization.Encoding.PEM),'launch-signer.pub':f.launch_signer.public_key().public_bytes_raw()}.items(): write(paths['config']/name,raw)
             for name,key in [('authorizer.pub',f.authorizer),('operator.pub',f.operator)]: write(paths['trust']/name,key.public_key().public_bytes_raw())
             write(paths['state']/'identity.json',r.canonical({'Tenant':f.tenant,'Node':node,'Epoch':f.epoch}))
             for folder in ['state','custody']: write(paths[folder]/'.lock',b'')
@@ -105,6 +148,8 @@ def main():
                 write(paths['state']/'.peer-policy',r.canonical({'Version':f.p[i],'Hash':r.sha(policy)}))
                 config={name:r.sha((paths['config']/name).read_bytes()) for name in ['node-cert.pem','client-ca.pem','launch-signer.pub','peer-policy.json']}
                 members.append(dict(nodeId=node,ip=f.trust.nodes[node].ip,nodeFingerprint=r.sha(f.trust.nodes[node].certificate_der),priorC=f.c[i],targetC=f.c[i]+1,priorP=f.p[i],targetP=f.p[i]+1,floorSHA256=r.sha((paths['state']/'.peer-policy').read_bytes()),identitySHA256=r.sha((paths['state']/'identity.json').read_bytes()),policySHA256=r.sha(policy),configDigest=r.sha(r.canonical(config)),previousCheckpoint=f.prior[node],priorPolicyExpiresAt=expiry))
+            if cycle==1:
+                collect_fixture_nodes(f,image_id,nodes)
             auth,env=f.authorization(cycle,members); requests={}; proofs={}; processes={}; records={}
             originals={n:{p.name:r.sha(p.read_bytes()) for p in x['paths']['state'].iterdir()} for n,x in nodes.items()}
             for node,item in nodes.items():
@@ -121,6 +166,35 @@ def main():
                     write(request_path,r.canonical(bad))
                     failure('bad-authorization-signature',item['cid'],args,'RECOVERY_SIGNATURE')
                     write(request_path,requests[node])
+                    original=r.parse(requests[node])
+                    sig=original['authorization']['signature']
+                    for label,variant in [('uppercase',sig.upper()),('odd',sig[:-1]),('whitespace',' '+sig)]:
+                        assert variant != sig
+                        bad=r.parse(requests[node])
+                        bad['authorization']['signature']=variant
+                        try: r.verify(bad['authorization'],r.AUTH,f.trust.authorizer)
+                        except r.Refusal as err: assert err.code=='RECOVERY_SIGNATURE'
+                        else: raise AssertionError('Python accepted '+label)
+                        write(request_path,r.canonical(bad))
+                        failure('signature-encoding-'+label,item['cid'],args,'RECOVERY_SIGNATURE')
+                    # Replace both presented role keys, pins and signatures in the
+                    # very first slot. Only the provisioned image binding differs.
+                    from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
+                    before={p.name:p.read_bytes() for p in item['paths']['custody'].iterdir()}
+                    original_roles=(f.authorizer,f.operator)
+                    try:
+                        f.authorizer,f.operator=Ed25519PrivateKey.generate(),Ed25519PrivateKey.generate()
+                        foreign_env=r.sign(auth,r.AUTH,f.authorizer)
+                        for role in ('authorizer','operator'):
+                            write(item['paths']['trust']/(role+'.pub'),getattr(f,role).public_key().public_bytes_raw())
+                        write(request_path,f.request(auth,foreign_env,node,(st.st_dev,st.st_ino),image_id,item['cid']))
+                        failure('foreign-first-slot-authority',item['cid'],proof_args(f,auth,node),'RECOVERY_HOLD_AUTHORITY_BINDING')
+                        assert before=={p.name:p.read_bytes() for p in item['paths']['custody'].iterdir()}
+                    finally:
+                        f.authorizer,f.operator=original_roles
+                        for role in ('authorizer','operator'):
+                            write(item['paths']['trust']/(role+'.pub'),getattr(f,role).public_key().public_bytes_raw())
+                        write(request_path,requests[node])
                     floor_path=item['paths']['state']/'.peer-policy'; floor_original=floor_path.read_bytes()
                     write(floor_path,r.canonical({'Version':999,'Hash':'0'*64}))
                     failure('authenticated-journal-floor-mismatch',item['cid'],args,'RECOVERY_AUTHENTICATED_FLOOR')
