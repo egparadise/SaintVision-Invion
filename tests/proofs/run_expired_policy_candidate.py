@@ -141,7 +141,8 @@ def main():
     (build/'Dockerfile').write_text('FROM scratch\nCOPY --chown=1000:1000 custody-proof /custody-proof\nCOPY --chown=1000:1000 fixture-key /fixture-key\nUSER 1000:1000\nENTRYPOINT ["/fixture-key","--isolated-fixture-hold"]\n')
     command(['docker','build','--network=none','--pull=false','-t',image,str(build)])
     image_id=command(['docker','image','inspect','--format','{{.Id}}',image]).decode().strip().removeprefix('sha256:')
-    bootstrap_image_id=image_id
+    bootstrap_image=image+"-bootstrap"
+    command(["docker","image","tag",image,bootstrap_image])
     REPORT.update(imageId=image_id,helperSHA256=r.sha((build/'custody-proof').read_bytes()),runner='GitHub ubuntu-latest Linux; root fixture supervisor; UID1000 child containers; no network/capabilities/privileges',realCrypto='Ed25519 retained Node keys, separate CA/TLS/recovery/operator actors')
     with tempfile.TemporaryDirectory(prefix='sv-expired-policy-fixture-') as temp:
         scope=Path(temp); nodes={}; public={}
@@ -267,13 +268,15 @@ def main():
                     # Both the absent image file and a caller-selected bind of
                     # the exact expected public bytes must fail on empty history.
                     for label,other_args,source_image in [
-                        ('absent-image-authority',[],bootstrap_image_id),
-                        ('overmounted-authority',['--mount',f'type=bind,src={anchor},dst=/recovery-authority.json,readonly'],image_id)
+                        ('absent-image-authority',[],bootstrap_image),
+                        ('overmounted-authority',['--mount',f'type=bind,src={anchor},dst=/recovery-authority.json,readonly'],image)
                     ]:
-                        check=subprocess.run([*alias_args,*other_args,'--entrypoint','/custody-proof','sha256:'+source_image,*args[1:]],capture_output=True,timeout=15)
-                        assert check.returncode==1 and json.loads(check.stdout)['error']=='RECOVERY_HOLD_AUTHORITY_BINDING'
+                        # Keep both immutable image references and invoke the helper
+                        # through the same UID1000 exec path as the positive control.
+                        cid=command([*alias_args,'-d','--pull=never',*other_args,source_image]).decode().strip()
+                        CONTAINERS.append(cid)
+                        failure(label,cid,args,'RECOVERY_HOLD_AUTHORITY_BINDING')
                         assert not list(item['paths']['custody'].glob('*.json'))
-                        REPORT['negativeControls'].append(dict(name=label,exit=check.returncode,typedError='RECOVERY_HOLD_AUTHORITY_BINDING'))
                     alias_args+=['--mount',f'type=bind,src={item["paths"]["config"]}/launch-signer.pub,dst=/config/launch-signer.pub,readonly']
                     alias=subprocess.run([*alias_args,'--entrypoint','/custody-proof',image,*args[1:]],capture_output=True,timeout=15)
                     assert alias.returncode==1 and json.loads(alias.stdout)['error']=='RECOVERY_HOLD_FILE'
