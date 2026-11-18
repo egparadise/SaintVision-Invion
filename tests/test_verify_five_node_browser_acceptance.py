@@ -354,3 +354,136 @@ def test_runner_captures_card_loss_during_polling():
     assert "Card loss detected" in report["diagnostic"]
     assert report["details"]["stableDOM"] is False
     assert report["realUserOrHardwareAcceptance"] is False
+
+
+def test_runner_rejects_duplicate_node_ids_before_browser_execution():
+    duplicate_nodes = [
+        FIXTURE_FIVE_NODE_IDS[0],
+        FIXTURE_FIVE_NODE_IDS[1],
+        FIXTURE_FIVE_NODE_IDS[2],
+        FIXTURE_FIVE_NODE_IDS[3],
+        FIXTURE_FIVE_NODE_IDS[0],  # duplicate PC1
+    ]
+    runner = FiveNodeAcceptanceRunner(
+        expected_nodes=duplicate_nodes,
+        project_id=FIXTURE_PROJECT_ID,
+        portal_url="http://127.0.0.1:8080",
+        skip_socket_probe=True,
+    )
+    report = runner.run()
+
+    assert report["status"] == "PREREQUISITES_MISSING"
+    assert "Duplicate node IDs" in report["diagnostic"]
+    assert report["realUserOrHardwareAcceptance"] is False
+
+
+def test_runner_distinguishes_typed_missing_pc1_and_pc5_enrollment_outcome():
+    page_mock = MagicMock()
+    page_mock.url = "http://127.0.0.1:8080/dashboard"
+
+    # PC1 and PC5 are missing; only PC2, PC3, PC4 observed
+    observed = set(FIXTURE_FIVE_NODE_IDS[1:4])
+    def locator_mock(selector):
+        loc = MagicMock()
+        for nid in observed:
+            if f"node-item-{nid}" in selector:
+                loc.count.return_value = 1
+                return loc
+            if f"node-status-badge-{nid}" in selector:
+                loc.count.return_value = 1
+                loc.inner_text.return_value = "● ONLINE"
+                return loc
+            if f"node-cpu-{nid}" in selector:
+                loc.count.return_value = 1
+                loc.inner_text.return_value = "제공 500m"
+                return loc
+            if f"node-memory-{nid}" in selector:
+                loc.count.return_value = 1
+                loc.inner_text.return_value = "제공 64 MiB"
+                return loc
+            if f"node-heartbeat-{nid}" in selector:
+                loc.count.return_value = 1
+                loc.inner_text.return_value = "오후 9:00:00"
+                return loc
+        loc.count.return_value = 0
+        return loc
+
+    page_mock.locator.side_effect = locator_mock
+
+    with patch("playwright.sync_api.sync_playwright", return_value=_setup_mock_playwright(page_mock)):
+        runner = FiveNodeAcceptanceRunner(
+            expected_nodes=FIXTURE_FIVE_NODE_IDS,
+            project_id=FIXTURE_PROJECT_ID,
+            portal_url="http://127.0.0.1:8080",
+            skip_socket_probe=True,
+        )
+        report = runner.run()
+
+    assert report["status"] == "INCOMPLETE_FLEET"
+    assert report["details"]["observedCount"] == 3
+    assert report["details"]["expectedCount"] == 5
+    expected_missing = sorted([FIXTURE_FIVE_NODE_IDS[0], FIXTURE_FIVE_NODE_IDS[4]])
+    assert report["details"]["missingNodes"] == expected_missing
+    assert FIXTURE_FIVE_NODE_IDS[0] in report["details"]["missingNodes"]
+    assert FIXTURE_FIVE_NODE_IDS[4] in report["details"]["missingNodes"]
+    assert report["realUserOrHardwareAcceptance"] is False
+
+
+def test_runner_fails_when_heartbeat_is_stale_preventing_acceptance():
+    page_mock = MagicMock()
+    page_mock.url = "http://127.0.0.1:8080/dashboard"
+
+    # All 5 nodes present, but PC5 has stale heartbeat (10 minutes old ISO)
+    def locator_mock(selector):
+        loc = MagicMock()
+        if any(login_kw in selector for login_kw in ('login-form', 'password')):
+            loc.count.return_value = 0
+            return loc
+        if any(f"node-item-{nid}" in selector for nid in FIXTURE_FIVE_NODE_IDS):
+            loc.count.return_value = 1
+            return loc
+        if any(f"node-status-badge-{nid}" in selector for nid in FIXTURE_FIVE_NODE_IDS):
+            loc.count.return_value = 1
+            loc.inner_text.return_value = "● ONLINE"
+            return loc
+        if any(f"node-cpu-{nid}" in selector for nid in FIXTURE_FIVE_NODE_IDS):
+            loc.count.return_value = 1
+            loc.inner_text.return_value = "제공 500m"
+            return loc
+        if any(f"node-memory-{nid}" in selector for nid in FIXTURE_FIVE_NODE_IDS):
+            loc.count.return_value = 1
+            loc.inner_text.return_value = "제공 64 MiB"
+            return loc
+        # For PC5, return an old timestamp (>600s ago)
+        if f"node-heartbeat-{FIXTURE_FIVE_NODE_IDS[4]}" in selector:
+            loc.count.return_value = 1
+            loc.inner_text.return_value = "2020-01-01T00:00:00Z"
+            return loc
+        if any(f"node-heartbeat-{nid}" in selector for nid in FIXTURE_FIVE_NODE_IDS):
+            loc.count.return_value = 1
+            loc.inner_text.return_value = "오후 9:00:00"
+            return loc
+        if 'node-item-' in selector:
+            loc.count.return_value = 5
+            return loc
+        loc.count.return_value = 0
+        loc.inner_text.return_value = "Gateway: 12ms"
+        return loc
+
+    page_mock.locator.side_effect = locator_mock
+    page_mock.evaluate.return_value = {"initialCards": 5, "removedNodes": 0, "removedDetails": []}
+
+    with patch("playwright.sync_api.sync_playwright", return_value=_setup_mock_playwright(page_mock)):
+        runner = FiveNodeAcceptanceRunner(
+            expected_nodes=FIXTURE_FIVE_NODE_IDS,
+            project_id=FIXTURE_PROJECT_ID,
+            portal_url="http://127.0.0.1:8080",
+            poll_duration_seconds=0.1,
+            skip_socket_probe=True,
+        )
+        report = runner.run()
+
+    assert report["status"] == "FAIL"
+    assert "Stale or unobserved heartbeat detected" in report["diagnostic"]
+    assert FIXTURE_FIVE_NODE_IDS[4] in report["details"]["staleNodes"]
+    assert report["realUserOrHardwareAcceptance"] is False

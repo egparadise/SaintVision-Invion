@@ -115,8 +115,10 @@ def evaluate_heartbeat_freshness(
     max_age_seconds: float = 60.0,
 ) -> Dict[str, Any]:
     """Check whether a node's heartbeat timestamp is recent, valid, or missing."""
-    if not heartbeat_str or "Heartbeat Absent" in heartbeat_str:
-        return {"fresh": False, "reason": "Heartbeat Absent", "ageSeconds": None}
+    if not heartbeat_str or "Heartbeat Absent" in heartbeat_str or "미관측" in heartbeat_str:
+        return {"fresh": False, "reason": "Heartbeat Absent or unobserved (미관측)", "ageSeconds": None}
+    if "stale" in heartbeat_str.lower():
+        return {"fresh": False, "reason": "Heartbeat marked stale", "ageSeconds": None}
     try:
         # ISO timestamp or locale string
         dt = datetime.fromisoformat(heartbeat_str.replace("Z", "+00:00"))
@@ -127,7 +129,7 @@ def evaluate_heartbeat_freshness(
             return {"fresh": False, "reason": f"Heartbeat stale ({age:.1f}s > {max_age_seconds}s)", "ageSeconds": age}
         return {"fresh": True, "reason": "Fresh", "ageSeconds": round(age, 2)}
     except Exception:
-        # If UI renders formatted time e.g. "오후 9:47:39", accept presence if present
+        # If UI renders formatted time e.g. "오후 9:47:39" without stale/absent indicators
         return {"fresh": True, "reason": "Observed in DOM", "ageSeconds": None}
 
 
@@ -379,11 +381,16 @@ class FiveNodeAcceptanceRunner:
                             mem_loc = page.locator(f'[data-testid="node-memory-{nid}"]')
                             hb_loc = page.locator(f'[data-testid="node-heartbeat-{nid}"]')
 
+                            hb_text = hb_loc.inner_text() if hb_loc.count() > 0 else "미관측 (Heartbeat Absent)"
+                            freshness = evaluate_heartbeat_freshness(hb_text, now_ts=time.time())
+
                             node_resources_map[nid] = {
                                 "status": status_text,
                                 "cpu": cpu_loc.inner_text() if cpu_loc.count() > 0 else "미관측",
                                 "memory": mem_loc.inner_text() if mem_loc.count() > 0 else "미관측",
-                                "heartbeat": hb_loc.inner_text() if hb_loc.count() > 0 else "미관측",
+                                "heartbeat": hb_text,
+                                "heartbeatFresh": freshness["fresh"],
+                                "heartbeatReason": freshness["reason"],
                             }
 
                     # Check for incomplete fleet (less than 5 physical nodes)
@@ -466,7 +473,28 @@ class FiveNodeAcceptanceRunner:
                             },
                         )
 
-                    # All 5 nodes verified stable without card loss
+                    # 6. Check for stale or unobserved heartbeats across the fleet
+                    stale_nodes = [
+                        nid for nid, res in node_resources_map.items()
+                        if not res.get("heartbeatFresh", False)
+                    ]
+                    if stale_nodes:
+                        return self._build_report(
+                            status="FAIL",
+                            diagnostic=(
+                                f"Stale or unobserved heartbeat detected for node(s): {stale_nodes}. "
+                                "Five-node acceptance requires all five physical nodes to report fresh telemetry."
+                            ),
+                            details={
+                                "staleNodes": stale_nodes,
+                                "nodeResources": node_resources_map,
+                                "stableDOM": stable_dom,
+                                "cardLoss": card_loss_details,
+                                "pageErrors": page_errors,
+                            },
+                        )
+
+                    # All 5 nodes verified stable without card loss and with fresh telemetry
                     return self._build_report(
                         status="PASS",
                         diagnostic="All five physical nodes verified with stable DOM across polling cycles.",
