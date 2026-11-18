@@ -1,0 +1,47 @@
+[
+  {
+    "name": "H1-original-Python-PowerShell-shape",
+    "observedAtKST": "2026-11-04T17:58:36.144136+09:00",
+    "exit": 2,
+    "expectedExit": 2,
+    "executableName": "python.exe",
+    "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSHA256": "9bdf29f1a82d06029c06a2a041b8390968f99fabd02054590a88500fc403ec95",
+    "liveOperationExecuted": false
+  },
+  {
+    "name": "H1-correct-PowerShell-shape",
+    "observedAtKST": "2026-11-04T17:58:36.365261+09:00",
+    "exit": 0,
+    "expectedExit": 0,
+    "executableName": "powershell.exe",
+    "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "liveOperationExecuted": false
+  },
+  {
+    "name": "actual-canonical-full-argv-PlanOnly-attended-cycle-config.private.json",
+    "exit": 0,
+    "argv0": "powershell.exe",
+    "mode": "ContextOnly -PlanOnly",
+    "WmiLaunchExecuted": false,
+    "liveOperationExecuted": false
+  },
+  {
+    "name": "actual-canonical-full-argv-PlanOnly-scheduled-config-proposed-only.private.json",
+    "exit": 0,
+    "argv0": "powershell.exe",
+    "mode": "ContextOnly -PlanOnly",
+    "WmiLaunchExecuted": false,
+    "liveOperationExecuted": false
+  },
+  {
+    "name": "actual-corrected-ContextOnly",
+    "observedAtKST": "2026-11-04T17:58:40.321191+09:00",
+    "exit": 0,
+    "runId": "20261104T085330Z-5babae638fde",
+    "stdoutSHA256": "fd79e4b00c91f6608c3b8b83f5db3655e05761147335fd2753ae3eee1f0f9b07",
+    "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "liveOperationExecuted": false
+  }
+]

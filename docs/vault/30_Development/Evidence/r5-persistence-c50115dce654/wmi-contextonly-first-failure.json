@@ -1,0 +1,10 @@
+{
+  "observedAtKST": "2026-11-04T17:24:15.616436+09:00",
+  "technicalRelease": "msg_d72c52706139",
+  "operation": "ContextOnly",
+  "exit": 1,
+  "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "stderrSHA256": "5d8d57d22c266ab3b545f5c7cb628117d7d7e657507e4e1d2a8752147014825b",
+  "cycleExecuted": false,
+  "transitionExecuted": false
+}

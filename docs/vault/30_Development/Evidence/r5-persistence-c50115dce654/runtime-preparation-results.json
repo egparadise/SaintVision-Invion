@@ -1,0 +1,78 @@
+[
+  {
+    "id": "node-1-create-new-runtime-staging",
+    "startedAtKST": "2026-11-04T17:00:18.977669+09:00",
+    "commandSourceSHA256": "c981dc09dc8eaf5ff7a1596771cb679cad43024cc913abefa119998ceba4c7e6",
+    "technicalRelease": "msg_c6fa3bda6ff3",
+    "exit": 0,
+    "finishedAtKST": "2026-11-04T17:00:19.249155+09:00",
+    "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "id": "node-1-transfer-reviewed-runtime-public-inputs",
+    "startedAtKST": "2026-11-04T17:00:19.250157+09:00",
+    "commandSourceSHA256": "c981dc09dc8eaf5ff7a1596771cb679cad43024cc913abefa119998ceba4c7e6",
+    "technicalRelease": "msg_c6fa3bda6ff3",
+    "exit": 0,
+    "finishedAtKST": "2026-11-04T17:00:19.945808+09:00",
+    "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "id": "node-1-install-and-preflight-new-r5-runtime",
+    "startedAtKST": "2026-11-04T17:00:19.946719+09:00",
+    "commandSourceSHA256": "c981dc09dc8eaf5ff7a1596771cb679cad43024cc913abefa119998ceba4c7e6",
+    "technicalRelease": "msg_c6fa3bda6ff3",
+    "exit": 0,
+    "finishedAtKST": "2026-11-04T17:00:21.491359+09:00",
+    "stdoutSHA256": "b45dea2bac5cbe1346566606194fb92cc9885d0ee763a94e4befd18d7e3fae86",
+    "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "actualWorkerPreflight": {
+      "compatible": true,
+      "pythonVersion": "3.14.4",
+      "cryptographyVersion": "50.0.1",
+      "utcCertificateAPI": true
+    },
+    "bashPinned": true,
+    "nodeIdentityChanged": false
+  },
+  {
+    "id": "node-2-create-new-runtime-staging",
+    "startedAtKST": "2026-11-04T17:00:21.498881+09:00",
+    "commandSourceSHA256": "c981dc09dc8eaf5ff7a1596771cb679cad43024cc913abefa119998ceba4c7e6",
+    "technicalRelease": "msg_c6fa3bda6ff3",
+    "exit": 0,
+    "finishedAtKST": "2026-11-04T17:00:21.825241+09:00",
+    "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "id": "node-2-transfer-reviewed-runtime-public-inputs",
+    "startedAtKST": "2026-11-04T17:00:21.825868+09:00",
+    "commandSourceSHA256": "c981dc09dc8eaf5ff7a1596771cb679cad43024cc913abefa119998ceba4c7e6",
+    "technicalRelease": "msg_c6fa3bda6ff3",
+    "exit": 0,
+    "finishedAtKST": "2026-11-04T17:00:22.190756+09:00",
+    "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "id": "node-2-install-and-preflight-new-r5-runtime",
+    "startedAtKST": "2026-11-04T17:00:22.191881+09:00",
+    "commandSourceSHA256": "c981dc09dc8eaf5ff7a1596771cb679cad43024cc913abefa119998ceba4c7e6",
+    "technicalRelease": "msg_c6fa3bda6ff3",
+    "exit": 0,
+    "finishedAtKST": "2026-11-04T17:00:23.350178+09:00",
+    "stdoutSHA256": "13dfbcbfdfd97feef69bbce185ca350656773d87d6243465c45e12cd3afdfbd1",
+    "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "actualWorkerPreflight": {
+      "compatible": true,
+      "pythonVersion": "3.12.3",
+      "cryptographyVersion": "50.0.1",
+      "utcCertificateAPI": true
+    },
+    "bashPinned": true,
+    "nodeIdentityChanged": false
+  }
+]

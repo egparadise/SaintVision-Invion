@@ -1,0 +1,46 @@
+{
+  "attended-cycle-config.private.json": {
+    "argv": [
+      "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+      "-NoProfile",
+      "-NonInteractive",
+      "-File",
+      "D:\\Project\\SaintVisionI-Invion\\supervision-codex-20261104\\.work\\r5-packet-fix-5babae638fde\\Invoke-R5WmiContext.private.ps1",
+      "-PlanPath",
+      "D:\\Project\\SaintVisionI-Invion\\supervision-codex-20261104\\.work\\r5-packet-fix-5babae638fde\\transition-context-plan.private.json",
+      "-ExpectedPlanSHA256",
+      "5fda707021193777ceef0a6e3a1d594d7c617fdb88ad0127cbe0c2d872a40b1e",
+      "-Operation",
+      "Transition",
+      "-RunId",
+      "20261104T090000Z-5babae638fde"
+    ],
+    "workingDirectory": "D:\\Project\\SaintVisionI-Invion\\supervision-codex-20261104\\.work\\r5-reviewed-source-03e17c31",
+    "executableSHA256": "60c9b29843624dd8af6b6a7b26147753be6aeef65098b9a503cc50850afe410f",
+    "inputPinCount": 104,
+    "descriptionOnly": true,
+    "operationExecuted": false
+  },
+  "scheduled-config-proposed-only.private.json": {
+    "argv": [
+      "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+      "-NoProfile",
+      "-NonInteractive",
+      "-File",
+      "D:\\Project\\SaintVisionI-Invion\\supervision-codex-20261104\\.work\\r5-packet-fix-5babae638fde\\Invoke-R5WmiContext.private.ps1",
+      "-PlanPath",
+      "D:\\Project\\SaintVisionI-Invion\\supervision-codex-20261104\\.work\\r5-packet-fix-5babae638fde\\transition-context-plan.private.json",
+      "-ExpectedPlanSHA256",
+      "5fda707021193777ceef0a6e3a1d594d7c617fdb88ad0127cbe0c2d872a40b1e",
+      "-Operation",
+      "ScheduledTransition",
+      "-RunId",
+      "20261104T090000Z-5babae638fde"
+    ],
+    "workingDirectory": "D:\\Project\\SaintVisionI-Invion\\supervision-codex-20261104\\.work\\r5-reviewed-source-03e17c31",
+    "executableSHA256": "60c9b29843624dd8af6b6a7b26147753be6aeef65098b9a503cc50850afe410f",
+    "inputPinCount": 104,
+    "descriptionOnly": true,
+    "operationExecuted": false
+  }
+}

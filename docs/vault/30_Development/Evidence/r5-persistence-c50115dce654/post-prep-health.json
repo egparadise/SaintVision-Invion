@@ -1,0 +1,26 @@
+{
+  "observedAtKST": "2026-11-04T17:05:45.823140+09:00",
+  "exit": 0,
+  "overviewHTTP": 200,
+  "webHTTP": 200,
+  "actualOnlineFresh": 2,
+  "runs": 0,
+  "offers": 0,
+  "killSwitch": true,
+  "userWorkloadSubmission": false,
+  "stateBytesPreserved": true,
+  "windowOnlyExit": 0,
+  "window": {
+    "schemaVersion": "saintvision-leaf-renewal-window:1",
+    "observedAt": "2026-11-04T08:05:45.748381Z",
+    "earliestNotAfter": "2026-11-10T05:15:35Z",
+    "renewAt": "2026-11-08T05:15:35Z",
+    "expired": false,
+    "inWindow": false,
+    "certificateCount": 3,
+    "nodeCertificateCount": 2,
+    "leafSetSHA256": "572e42758450effd9cb1be3a386b6fb21aa3911f2480a7a12a7f3c0d21e48a9d"
+  },
+  "serviceSwitchExecuted": false,
+  "certificateTransitionExecuted": false
+}

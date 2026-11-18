@@ -1,5 +1,5 @@
 {
- "version": "1.6.5",
+ "version": "1.6.6",
  "source": "ROADMAP-VIRTUAL-COMPUTER-001@1.0.0",
  "track": "VF-CL",
  "owner": "Claude",
@@ -177,15 +177,15 @@
      ]
     }
    ],
-   "ciVerifiedNote": "Run 41792498330 explicitly dispatched .github/workflows/s12-acceptance-evidence.yml at exact landed head fd1530d9b46e6b90a708daa59b4394599684309a on refs/heads/integration/all-agents-unified. Its unprivileged producer ran tools/collect_s12_acceptance_evidence.py and shape-checked the S12 evidence bundle, then the dispatch-only OIDC job created the authoritative VF-CL-04 receipt, signed it through GitHub artifact attestation, and verified the Sigstore identity, workflow, branch, head SHA, and exact receipt bytes. Codex root and Claude independently downloaded the receipt and bundle and re-ran tools/verify_vf_cl_ci_attestation.py with the same exact expectations; each returned VERIFIED. Claude's negative expected-head ad0132b35d7216552bbe929730562819af15e3bd was refused with exit 2. This proves the card's hosted CI derivation only. It does not grant operational acceptance or change the 48-task score.",
+   "ciVerifiedNote": "Run 41811861496 explicitly dispatched .github/workflows/s12-acceptance-evidence.yml at exact landed head 59f0a3c2ff41ba1ae99a38515a2cdc65b2144067 on refs/heads/integration/all-agents-unified. The unprivileged producer ran tools/collect_s12_acceptance_evidence.py and tools/check_s12_acceptance_shape.py to derive and shape-check the S12 bundle; its dispatch-only OIDC job created and signed the authoritative receipt through GitHub artifact attestation. Codex root downloaded the receipt and bundle and independently verified signature, repository, workflow, branch, head SHA and exact receipt bytes with tools/verify_vf_cl_ci_attestation.py, returning VERIFIED/exit0. Claude independently downloaded both fresh artifacts, matched their ZIP digests to the API and receipt, verified with the exact landed-source verifier, and confirmed that old head fd1530d9, wrong ref/workflow/repository and an appended receipt byte were all refused with exit2. Claude's receipt, bundle and verification bytes match root's copies. The artifact expiry in ciVerifiedAttestation bounds this CI claim. This proves hosted CI derivation only and does not grant operational acceptance or change the 48-task score.",
    "ciVerifiedAttestation": {
-    "runId": "41792498330",
-    "headSha": "fd1530d9b46e6b90a708daa59b4394599684309a",
+    "runId": "41811861496",
+    "headSha": "59f0a3c2ff41ba1ae99a38515a2cdc65b2144067",
     "headRef": "refs/heads/integration/all-agents-unified",
     "evidenceArtifact": {
-     "id": "13304081651",
-     "digest": "sha256:87bcbda1e0a98e5869bbca1719ab2b34557d0012bfa8a354b3dfa1b1e878b4a3",
-     "expiresAt": "2026-12-04T07:29:03Z"
+     "id": "13312408285",
+     "digest": "sha256:e4959ab8bfe5c67b51513da1836f9f35adec96c9dc4279d9346fe49458c82fcd",
+     "expiresAt": "2026-12-04T10:06:19Z"
     },
     "receipt": "docs/vf-cl-ci-receipts/VF-CL-04.json",
     "bundle": "docs/vf-cl-ci-attestations/VF-CL-04.bundle.json"

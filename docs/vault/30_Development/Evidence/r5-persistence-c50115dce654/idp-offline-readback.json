@@ -1,0 +1,15 @@
+{
+  "observedAtKST": "2026-11-04T17:02:34.373254+09:00",
+  "exit": 0,
+  "actualNewProfileConstructed": true,
+  "wrongIssuerRefused": true,
+  "expiredPolicyRefused": true,
+  "targetProfileSHA256": "3a3ab0717feaf1a781d26fc635d574c015dd615ee9adf9973bb4e0f56d4225ba",
+  "targetBundleSHA256": "f50a221d410aca0804e235d9c2256b9c3d541121d346b4b530fb2f6b8b55f530",
+  "originalInputsUnchanged": 5,
+  "verifiedBackups": 5,
+  "tokenMinted": false,
+  "freshTokenAcceptance": false,
+  "browserAcceptance": false,
+  "serviceSwitched": false
+}

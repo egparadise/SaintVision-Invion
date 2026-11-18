@@ -1,0 +1,13 @@
+{
+  "technicalRelease": "msg_c6fa3bda6ff3",
+  "observedAtKST": "2026-11-04T17:02:38.003030+09:00",
+  "planSHA256": "c3f6553cc48d48cc853196333ffff2b2bfc4a05b6f93ebd2f9be750d8b927415",
+  "exit": 1,
+  "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "stderrSHA256": "87728268ce5bf6d7cb2ea37b1df8420777b3571ca7bc580a91c79b5090b06910",
+  "demandStartExecuted": false,
+  "lane": "blocked-registration",
+  "retried": false,
+  "elevationAttempted": false,
+  "fallbackUsed": false
+}

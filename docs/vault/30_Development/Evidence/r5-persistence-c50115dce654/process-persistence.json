@@ -1,0 +1,136 @@
+{
+  "observedAtKST": "2026-11-04T16:52:45.5007835+09:00",
+  "functionalSamePIDSourceOwnerListenersAccepted": true,
+  "relaunchExecuted": false,
+  "exit": 0,
+  "runtimePairs": [
+    {
+      "parentPid": 40748,
+      "childPid": 30180,
+      "name": "conhost.exe",
+      "sameCommandAsParent": false
+    },
+    {
+      "parentPid": 40748,
+      "childPid": 52720,
+      "name": "python.exe",
+      "sameCommandAsParent": true
+    },
+    {
+      "parentPid": 34380,
+      "childPid": 44588,
+      "name": "conhost.exe",
+      "sameCommandAsParent": false
+    },
+    {
+      "parentPid": 34380,
+      "childPid": 33812,
+      "name": "python.exe",
+      "sameCommandAsParent": true
+    },
+    {
+      "parentPid": 3756,
+      "childPid": 43412,
+      "name": "conhost.exe",
+      "sameCommandAsParent": false
+    },
+    {
+      "parentPid": 3756,
+      "childPid": 54216,
+      "name": "python.exe",
+      "sameCommandAsParent": true
+    }
+  ],
+  "priorControllerAbsent": true,
+  "processes": [
+    {
+      "role": "observer",
+      "pid": 34380,
+      "parentPid": 33976,
+      "sessionId": 1,
+      "createdAtUTC": "2026-11-04T07:20:17.5634950+00:00",
+      "ownerMatched": true,
+      "exactPriorCommandLineMatched": true,
+      "exeSHA256": "9b7bffc26240463c965a2a2a5fada1d8e741c21c25cd2e977728c339b82d9977",
+      "creationPredatesPriorWorkerDoneLowerBound": true
+    },
+    {
+      "role": "serve",
+      "pid": 40748,
+      "parentPid": 33976,
+      "sessionId": 1,
+      "createdAtUTC": "2026-11-04T07:20:17.0509160+00:00",
+      "ownerMatched": true,
+      "exactPriorCommandLineMatched": true,
+      "exeSHA256": "9b7bffc26240463c965a2a2a5fada1d8e741c21c25cd2e977728c339b82d9977",
+      "creationPredatesPriorWorkerDoneLowerBound": true
+    },
+    {
+      "role": "console",
+      "pid": 54216,
+      "parentPid": 3756,
+      "sessionId": 1,
+      "createdAtUTC": "2026-11-04T07:20:18.1789790+00:00",
+      "ownerMatched": true,
+      "exactPriorCommandLineMatched": true,
+      "exeSHA256": "4942b86a6597e5aee0128daa00050ed79bc21f6e709a78eb19cbfeb0c2f39ac9",
+      "creationPredatesPriorWorkerDoneLowerBound": true
+    },
+    {
+      "role": "web",
+      "pid": 25608,
+      "parentPid": 33976,
+      "sessionId": 1,
+      "createdAtUTC": "2026-11-04T07:20:18.6740140+00:00",
+      "ownerMatched": true,
+      "exactPriorCommandLineMatched": true,
+      "exeSHA256": "93d6b1a22733fb035b19649041c0574b1a890df75ebce9d5e6e1bbe35d12b4a8",
+      "creationPredatesPriorWorkerDoneLowerBound": true
+    },
+    {
+      "role": "ssh",
+      "pid": 15408,
+      "parentPid": 33976,
+      "sessionId": 1,
+      "createdAtUTC": "2026-11-04T07:20:13.9273770+00:00",
+      "ownerMatched": true,
+      "exactPriorCommandLineMatched": true,
+      "exeSHA256": "98d447730047f5df91373e852d057928a921c3d1e89938700ab656ba84b19dc8",
+      "creationPredatesPriorWorkerDoneLowerBound": true
+    }
+  ],
+  "literalAllRoleJobGateReevaluated": false,
+  "taskId": "task_c50115dce654",
+  "helperAbsent": true,
+  "terminal": "term_6a916231e43b4f5acc65d986dde2726a",
+  "listeners": [
+    {
+      "port": 55448,
+      "pid": 15408,
+      "loopback": true,
+      "wildcard": false
+    },
+    {
+      "port": 18105,
+      "pid": 52720,
+      "loopback": false,
+      "wildcard": false
+    },
+    {
+      "port": 18082,
+      "pid": 54216,
+      "loopback": true,
+      "wildcard": false
+    },
+    {
+      "port": 3000,
+      "pid": 25608,
+      "loopback": true,
+      "wildcard": false
+    }
+  ],
+  "priorWorkerDoneMessage": "msg_22ee1c05cc1d",
+  "priorWorkerDoneLowerBoundUTC": "2026-11-04T07:48:17Z",
+  "priorWorkerDoneUpperBoundUTC": "2026-11-04T07:50:30Z",
+  "exactPriorWorkerDoneTimestampRecorded": false
+}

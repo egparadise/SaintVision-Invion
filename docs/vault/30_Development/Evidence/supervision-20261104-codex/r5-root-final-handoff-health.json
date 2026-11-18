@@ -1,0 +1,38 @@
+{
+  "schemaVersion": "supervision-r5-root-corroboration:1",
+  "startedAt": "2026-11-04T11:58:01.509002+00:00",
+  "observedAt": "2026-11-04T11:58:02.073040+00:00",
+  "executor": "Codex root",
+  "bootstrapSource": "03e17c31cf535008d39534aaa80d3ae274bd75cc",
+  "scope": "Two-node read-only development observation; not five-node or operational acceptance",
+  "source": "live-postgresql-mtls",
+  "overviewHttpStatus": 200,
+  "webHttpStatus": 200,
+  "generatedAt": "2026-11-04T11:58:01.931499+00:00",
+  "nodeCount": 2,
+  "onlineFreshCount": 2,
+  "sameMembersAcrossSamples": true,
+  "allSnapshotsAdvanced": true,
+  "runCount": 0,
+  "resourceOfferCount": 0,
+  "killSwitch": true,
+  "userWorkloadSubmission": false,
+  "publicNodeCertificateCount": 2,
+  "allPublicLeavesDateValid": true,
+  "earliestPublicExpiry": "2026-11-10T05:15:35+00:00",
+  "renewalWindowStartsAt": "2026-11-08T05:15:35+00:00",
+  "operationallyAccepted": false,
+  "limits": "Root directly read the local live projection and public certificate dates; remote CSR/issuer/mTLS setup is attributed to the worker execution evidence, not independently repeated here.",
+  "readbackPassed": true,
+  "comparisonSamples": {
+    "firstGeneratedAt": "2026-11-04T11:57:41.252916+00:00",
+    "secondGeneratedAt": "2026-11-04T11:58:01.931499+00:00",
+    "sourceIntervalSeconds": 20.678583,
+    "firstSavedInputSHA256": "7719572ef59e1a676b6a67e42ad59bde23ef04f3b8547d9b78062771876db5d7",
+    "firstSnapshotTimes": [
+      "2026-11-04T11:57:36.712671+00:00",
+      "2026-11-04T11:57:36.721253+00:00"
+    ],
+    "comparisonMethod": "Saved first overview; actual20second delay; second overview; same members and advancing snapshots compared. Top-level processing times cover only the second phase."
+  }
+}

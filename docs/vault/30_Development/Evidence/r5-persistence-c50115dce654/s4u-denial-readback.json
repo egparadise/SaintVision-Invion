@@ -1,0 +1,12 @@
+{
+  "taskVisible": false,
+  "fallbackUsed": false,
+  "queryErrorId": "CmdletizationQuery_NotFound_TaskName,Get-ScheduledTask",
+  "observedAtKST": "2026-11-04T17:03:33.6234978+09:00",
+  "elevationAttempted": false,
+  "intentExists": false,
+  "retries": 0,
+  "receiptExists": false,
+  "demandStartExecuted": false,
+  "taskAbsentConfirmedByNotFound": true
+}

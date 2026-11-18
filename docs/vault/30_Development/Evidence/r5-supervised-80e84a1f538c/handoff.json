@@ -1,0 +1,668 @@
+{
+  "schemaVersion": "r5-supervised-public-handoff:1",
+  "taskId": "task_80e84a1f538c",
+  "priorTaskId": "task_288670efba3d",
+  "dispatchId": "ctx_e11d21466b5f",
+  "recordedAtKST": "2026-11-04T20:38:49.549894+09:00",
+  "owner": "Codex",
+  "reviewer": "Claude",
+  "scope": "Sanitized evidence and History publication only; no new operational probes or metadata mutation",
+  "reportBranch": "agent/codex/r5-evidence-80e84a1f538c",
+  "reportBaseSHA": "13fbf849f480422e0f7bdf6e4dc0d64e89943972",
+  "functionalSourceSHA": "59f0a3c2ff41ba1ae99a38515a2cdc65b2144067",
+  "pilotRuntimeSourceSHA": "03e17c31cf535008d39534aaa80d3ae274bd75cc",
+  "executorSourceSHA": "b5b8ca68398517f6227a81caac02654a848c8b1d",
+  "documentVersions": {
+    "INDEX-PROGRESS-001": "1.0.376",
+    "WORKBOARD-CODEX-001": "1.0.338",
+    "INDEX-VIRTUAL-COMPUTER-001": "1.0.0",
+    "ROADMAP-VIRTUAL-COMPUTER-001": "1.0.0",
+    "GOV-CONTINUOUS-001": "1.1.0",
+    "GUIDE-001": "1.1.0",
+    "ADR-INDEX-001": "1.37.0",
+    "GOV-AGENT-001": "1.1.3",
+    "GOV-GIT-001": "1.1.4"
+  },
+  "sharedProgressRead": {
+    "docId": "INDEX-PROGRESS-001",
+    "version": "1.0.391",
+    "sha256": "9a6db2f37cffc6e8c52c915ddf332b86ee3ec1540729ee5d4e034ca20367c5a0",
+    "newerThanLocal": true,
+    "noExportFromOldBranch": true
+  },
+  "sourceReview": {
+    "status": "SOURCE_ACCEPTED",
+    "reviewer": "Claude",
+    "commit": "c24c29ee81fc9124f344ff1cfd1bc6d8086c94b0",
+    "metadataReview": "active, reported by coordinator; no invented final verdict"
+  },
+  "privateInputInventory": [
+    {
+      "relativePrivateName": "pilot_guard.py",
+      "sha256": "acf8b4f6ed1e57afd4d8f1b9efa543c7139b6436f714ed42b22c78441695fc95",
+      "contentsPublished": false
+    },
+    {
+      "relativePrivateName": "pilot-config.private.json",
+      "sha256": "ca684b45ad47cd680a4bebbbc720fd38b9b8a42018c557e5cd29bed939800a0e",
+      "contentsPublished": false
+    },
+    {
+      "relativePrivateName": "disabled-automation-cli-plans.private.json",
+      "sha256": "c1b9e14f35631e5e214a911c9226190cc35183dd7718b62bcd4952b73f045a77",
+      "contentsPublished": false
+    },
+    {
+      "relativePrivateName": "materialize_disabled_edits.py",
+      "sha256": "8085df9ec80ad3d5443eee4eee1772f991bcdae038acba3b5459d271569471c3",
+      "contentsPublished": false
+    },
+    {
+      "relativePrivateName": "packet-wait720/wmi-cycle-manifest.json",
+      "sha256": "4f1f1ea89a698a14346b48abe9d445735df41c2b36fca5603080b55ca81350eb",
+      "contentsPublished": false
+    },
+    {
+      "relativePrivateName": "transition-duration-review-contract.private.json",
+      "sha256": "e557f909fc5ceff592977cf20f16c45d94d80794e3404c5a8bdfa90f1199a48f",
+      "contentsPublished": false
+    },
+    {
+      "relativePrivateName": "direct-transition-duration-test.plan.private.json",
+      "sha256": "643baaecf8e87823656bb86a8a303732e4541fc6e35cf03749d020d1792b3488",
+      "contentsPublished": false
+    },
+    {
+      "relativePrivateName": "observer-recovery-review-contract.private.json",
+      "sha256": "4b66684734da0b011ea04fb8e30671f747c7848a6bfc0bf4f0e7d2c849a0e5d1",
+      "contentsPublished": false
+    },
+    {
+      "relativePrivateName": "release-parameters.actual.json",
+      "sha256": "d46ddd2ae54b02760ff881686fff3ad151df42ed3a056db066ea07f3d39d75e6",
+      "contentsPublished": false
+    },
+    {
+      "relativePrivateName": "final-ci-receipt.actual.json",
+      "sha256": "2d9ca236ea2b0d313b31d683f97d5cede8745d596f5aba0b57828e0a7a04fb1d",
+      "contentsPublished": false
+    },
+    {
+      "relativePrivateName": "duration-state/20261104T104550Z-a906a2b3fc0a.result.json",
+      "sha256": "cc168aa7c16b5637f78345467e33dddd4adf2630e9c54c3b7de69a10a6f5e904",
+      "contentsPublished": false
+    }
+  ],
+  "preservedBaseline": {
+    "originalNineInputManifestSHA256": "993febe8658c807fd08597c2b520c1ad1d3952583152b34c424b80fbeea99957",
+    "executionNineInputManifestSHA256": "4f1f1ea89a698a14346b48abe9d445735df41c2b36fca5603080b55ca81350eb",
+    "preActivationBundleSHA256": "19feedad374d8be1bfe56c39b8a295d88890e983d99ae7a434864c002ae572df",
+    "oldPlanningStatements": "historical preparation snapshots; not current authority"
+  },
+  "localValidation": {
+    "command": "pinned Python -I -B -m pytest <preserved-private-packet>/test_pilot_guard.py <preserved-private-packet>/test_wait720_packet.py -q --basetemp=<isolated-private-test-state> --junitxml=<private-junit>",
+    "operatingSystem": "Windows",
+    "runtime": "CPython 3.14.7",
+    "pytest": "9.1.1",
+    "passed": 62,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 0,
+    "deselected": 0,
+    "exit": 0,
+    "junitSHA256": "88b435eed4ff2125664dcea39b53bc907e8294badfc79790526dfc8464f5fbc2",
+    "validationReceiptSHA256": "3b0126d319490e622d334f4c699b6b607403c7d4fe522471a22b8476f5fe04c0",
+    "independentlyRerunBy": "Codex root, reported62/exit0",
+    "host310PassIsSeparate": true,
+    "negativeEvidence": [
+      {
+        "artifact": "M1b-reproduced-failure.xml",
+        "exit": 1,
+        "failed": 3,
+        "classification": "expected reproduction of real persistence defect",
+        "sha256": "e6f7c1f68cc461f1219c172d5507cda8d18b0c49c779c77f22d5c0748516cbf5"
+      },
+      {
+        "artifact": "isolated-guards.M1b-postmeasurement-empty-assumption-failure.xml",
+        "exit": 1,
+        "passed": 58,
+        "failed": 1,
+        "classification": "obsolete empty receipt namespace assertion corrected to before/after inventory equality; no receipts deleted",
+        "sha256": "6945db1088c6e20ed1b1688c076b9409a7cffba5c029abea0a4a38578b5ae247"
+      }
+    ]
+  },
+  "transition": {
+    "executor": "Codex worker",
+    "releaseMessage": "msg_2e6f7840251e",
+    "independentPlanReview": "Claude43907495",
+    "runId": "20261104T104550Z-a906a2b3fc0a",
+    "executedExactlyOnce": true,
+    "controllerExit": 0,
+    "childReceiptExit": 0,
+    "elapsedSeconds": 19.20299999997951,
+    "empiricalCriterionSeconds": 360,
+    "configuredWatchdogSeconds": 720,
+    "canonicalGateSeconds": 900,
+    "worstCaseBoundProven": false,
+    "baselineKST": "2026-11-04T20:12:35+09:00",
+    "finalKST": "2026-11-04T20:13:22+09:00",
+    "sourceRuntime": "CPython3.14.7",
+    "measurementDriver": "CPython3.10.11",
+    "jobFreeChild": true,
+    "callerJobMembershipWasTrue": true,
+    "expectedOwnerAndInteractiveSession": true,
+    "materialAndEffectiveKeysUnchanged": true,
+    "serviceIdentitiesPreserved": true,
+    "observerReplacedAndOwned": true,
+    "advancingTicks": 2,
+    "freshActualNodes": 2,
+    "http": [
+      200,
+      200
+    ],
+    "runs": 0,
+    "offers": 0,
+    "killSwitch": true,
+    "workloadSubmission": false,
+    "primaryLauncherSucceeded": true,
+    "observerRecoveryExecuted": false,
+    "helperAndControllerLaterAbsent": true,
+    "PlanOnlyReceiptInventoriesUnchanged": true,
+    "rootIndependentReadback": "reported PASS with advancing20-second samples; no new probe in publication task"
+  },
+  "rootActivation": {
+    "executor": "Codex root",
+    "reportedAndReceiptVerified": true,
+    "observedAtKST": "2026-11-04T20:30:35+09:00",
+    "ciReceiptSHA256": "2d9ca236ea2b0d313b31d683f97d5cede8745d596f5aba0b57828e0a7a04fb1d",
+    "releaseParametersSHA256": "d46ddd2ae54b02760ff881686fff3ad151df42ed3a056db066ea07f3d39d75e6",
+    "allThreePreviouslyDisabledPromptAndPrecheckEqual": true,
+    "slots": [
+      {
+        "slot": "primary",
+        "id": "286d975e-75e2-4e54-b1fb-2805f7d68959",
+        "enabled": true,
+        "nextUTC": "2026-11-08T05:20:00Z",
+        "nextKST": "2026-11-08T14:20:00+09:00",
+        "configSHA256": "ca684b45ad47cd680a4bebbbc720fd38b9b8a42018c557e5cd29bed939800a0e",
+        "parametersSHA256": "d46ddd2ae54b02760ff881686fff3ad151df42ed3a056db066ea07f3d39d75e6",
+        "observedAt": "2026-11-04T11:30:35.077655+00:00",
+        "scope": "current-user Orca supervised development pilot",
+        "nativeOneOff": false,
+        "year2026SlotGuard": true,
+        "sharedAtMostOnceClaim": true,
+        "cycleRunNowInvoked": false
+      },
+      {
+        "slot": "fallback1",
+        "id": "a3a9e396-3b48-4aaa-8b73-f8377670f968",
+        "enabled": true,
+        "nextUTC": "2026-11-09T03:15:00Z",
+        "nextKST": "2026-11-09T12:15:00+09:00",
+        "configSHA256": "ca684b45ad47cd680a4bebbbc720fd38b9b8a42018c557e5cd29bed939800a0e",
+        "parametersSHA256": "d46ddd2ae54b02760ff881686fff3ad151df42ed3a056db066ea07f3d39d75e6",
+        "observedAt": "2026-11-04T11:30:35.865157+00:00",
+        "scope": "current-user Orca supervised development pilot",
+        "nativeOneOff": false,
+        "year2026SlotGuard": true,
+        "sharedAtMostOnceClaim": true,
+        "cycleRunNowInvoked": false
+      },
+      {
+        "slot": "fallback2",
+        "id": "3e08faa1-4e85-4877-8b13-5645178b41b8",
+        "enabled": true,
+        "nextUTC": "2026-11-09T23:00:00Z",
+        "nextKST": "2026-11-10T08:00:00+09:00",
+        "configSHA256": "ca684b45ad47cd680a4bebbbc720fd38b9b8a42018c557e5cd29bed939800a0e",
+        "parametersSHA256": "d46ddd2ae54b02760ff881686fff3ad151df42ed3a056db066ea07f3d39d75e6",
+        "observedAt": "2026-11-04T11:30:36.669036+00:00",
+        "scope": "current-user Orca supervised development pilot",
+        "nativeOneOff": false,
+        "year2026SlotGuard": true,
+        "sharedAtMostOnceClaim": true,
+        "cycleRunNowInvoked": false
+      }
+    ],
+    "prechecks": [
+      {
+        "slot": "primary",
+        "exit": 20,
+        "reason": "outside-2026-slot",
+        "attempted": false,
+        "claimTaken": false
+      },
+      {
+        "slot": "fallback1",
+        "exit": 20,
+        "reason": "outside-2026-slot",
+        "attempted": false,
+        "claimTaken": false
+      },
+      {
+        "slot": "fallback2",
+        "exit": 20,
+        "reason": "outside-2026-slot",
+        "attempted": false,
+        "claimTaken": false
+      }
+    ],
+    "productionFacts": {
+      "packetValid": true,
+      "releaseValid": true,
+      "ownerMatched": true,
+      "sessionId": 1,
+      "interactive": true,
+      "sourceValid": true,
+      "membersMatched": true,
+      "onlineFresh": 2,
+      "killSwitch": true,
+      "workloadSubmission": false,
+      "runs": 0,
+      "offers": 0,
+      "earlierRealCycle": false,
+      "unknownCompletion": false
+    },
+    "publicLeaves": 3,
+    "window": {
+      "schemaVersion": "saintvision-leaf-renewal-window:1",
+      "observedAt": "2026-11-04T11:29:40.394282Z",
+      "earliestNotAfter": "2026-11-10T05:15:35Z",
+      "renewAt": "2026-11-08T05:15:35Z",
+      "expired": false,
+      "inWindow": false,
+      "certificateCount": 3,
+      "nodeCertificateCount": 2,
+      "leafSetSHA256": "572e42758450effd9cb1be3a386b6fb21aa3911f2480a7a12a7f3c0d21e48a9d"
+    },
+    "entryInvoked": false,
+    "CycleInvoked": false,
+    "claimExists": false,
+    "workerMetadataMutation": false,
+    "receiptInventory": [
+      {
+        "basename": "r5-final-binding-receipt.json",
+        "executor": "Codex root",
+        "sha256": "bcbc96054ce85f724d03b86cc50a48ebccf972c65fb8a2f597d6cd60c2037e62",
+        "rawContentsPublished": false
+      },
+      {
+        "basename": "r5-final-disabled-readback.json",
+        "executor": "Codex root",
+        "sha256": "80d4e420461ec1f1cb038ace59b577e98ea5cdfd2ea1726bd614c421c72a4938",
+        "rawContentsPublished": false
+      },
+      {
+        "basename": "r5-final-readonly-precheck.json",
+        "executor": "Codex root",
+        "sha256": "5471a7de0e4c542f2333a5bf84efcf09ac8d732ec093b9c37c3b1a8f78edfa52",
+        "rawContentsPublished": false
+      },
+      {
+        "basename": "r5-enabled-readback.json",
+        "executor": "Codex root",
+        "sha256": "1c8f8e2eecd434421986af4fdebd574436d9f41a8d088715d1ed011e86a82481",
+        "rawContentsPublished": false
+      }
+    ]
+  },
+  "scheduling": {
+    "timezone": "Asia/Seoul",
+    "cronIsAnnual": true,
+    "nativeOneOff": false,
+    "COUNT1IgnoredInInstalledPureReplay": true,
+    "exact2026SlotGuards": true,
+    "graceMinutes": 10,
+    "sharedAtomicAtMostOnceClaim": true,
+    "afterAnyAttempt": "disable all three; preserve claim/results/unknown; no retry/reclaim",
+    "whenAllSlotsMissed": "root disables after final grace and assesses preserved state",
+    "requirements": [
+      "Orca open",
+      "PC awake",
+      "expected current user interactive",
+      "normal clock window",
+      "at least four hours of valid material remaining",
+      "zero workloads and killSwitch true"
+    ]
+  },
+  "canonicalCI": {
+    "sourceSHA": "59f0a3c2ff41ba1ae99a38515a2cdc65b2144067",
+    "ref": "refs/heads/integration/all-agents-unified",
+    "laneCount": 8,
+    "requiredJobCount": 12,
+    "checks": [
+      {
+        "id": 41811322547,
+        "name": "accessibilityE2e",
+        "workflowPath": ".github/workflows/ac11-accessibility-e2e.yml",
+        "ref": "refs/heads/integration/all-agents-unified",
+        "headSha": "59f0a3c2ff41ba1ae99a38515a2cdc65b2144067",
+        "status": "completed",
+        "conclusion": "success",
+        "requiredJobs": [
+          {
+            "id": 126511011023,
+            "name": "accessibility-e2e",
+            "status": "completed",
+            "conclusion": "success",
+            "runId": 41811322547
+          }
+        ]
+      },
+      {
+        "id": 41811262312,
+        "name": "backend",
+        "workflowPath": ".github/workflows/backend.yml",
+        "ref": "refs/heads/integration/all-agents-unified",
+        "headSha": "59f0a3c2ff41ba1ae99a38515a2cdc65b2144067",
+        "status": "completed",
+        "conclusion": "success",
+        "requiredJobs": [
+          {
+            "id": 126510812950,
+            "name": "mlflow-live",
+            "status": "completed",
+            "conclusion": "success",
+            "runId": 41811262312
+          },
+          {
+            "id": 126510815944,
+            "name": "backend (3.12)",
+            "status": "completed",
+            "conclusion": "success",
+            "runId": 41811262312
+          },
+          {
+            "id": 126510817569,
+            "name": "backend (3.14)",
+            "status": "completed",
+            "conclusion": "success",
+            "runId": 41811262312
+          }
+        ]
+      },
+      {
+        "id": 41811272283,
+        "name": "core",
+        "workflowPath": ".github/workflows/core.yml",
+        "ref": "refs/heads/integration/all-agents-unified",
+        "headSha": "59f0a3c2ff41ba1ae99a38515a2cdc65b2144067",
+        "status": "completed",
+        "conclusion": "success",
+        "requiredJobs": [
+          {
+            "id": 126510842913,
+            "name": "core",
+            "status": "completed",
+            "conclusion": "success",
+            "runId": 41811272283
+          },
+          {
+            "id": 126510843255,
+            "name": "s01-storage-roundtrip",
+            "status": "completed",
+            "conclusion": "success",
+            "runId": 41811272283
+          }
+        ]
+      },
+      {
+        "id": 41811287897,
+        "name": "desktopBrowser",
+        "workflowPath": ".github/workflows/desktop-browser.yml",
+        "ref": "refs/heads/integration/all-agents-unified",
+        "headSha": "59f0a3c2ff41ba1ae99a38515a2cdc65b2144067",
+        "status": "completed",
+        "conclusion": "success",
+        "requiredJobs": [
+          {
+            "id": 126510896087,
+            "name": "desktop-browser",
+            "status": "completed",
+            "conclusion": "success",
+            "runId": 41811287897
+          }
+        ]
+      },
+      {
+        "id": 41811299576,
+        "name": "docs",
+        "workflowPath": ".github/workflows/docs.yml",
+        "ref": "refs/heads/integration/all-agents-unified",
+        "headSha": "59f0a3c2ff41ba1ae99a38515a2cdc65b2144067",
+        "status": "completed",
+        "conclusion": "success",
+        "requiredJobs": [
+          {
+            "id": 126510937065,
+            "name": "docs",
+            "status": "completed",
+            "conclusion": "success",
+            "runId": 41811299576
+          }
+        ]
+      },
+      {
+        "id": 41811280240,
+        "name": "frontend",
+        "workflowPath": ".github/workflows/frontend.yml",
+        "ref": "refs/heads/integration/all-agents-unified",
+        "headSha": "59f0a3c2ff41ba1ae99a38515a2cdc65b2144067",
+        "status": "completed",
+        "conclusion": "success",
+        "requiredJobs": [
+          {
+            "id": 126510872873,
+            "name": "Portal Container Build & Hardened Runtime Smoke",
+            "status": "completed",
+            "conclusion": "success",
+            "runId": 41811280240
+          },
+          {
+            "id": 126510873130,
+            "name": "frontend",
+            "status": "completed",
+            "conclusion": "success",
+            "runId": 41811280240
+          }
+        ]
+      },
+      {
+        "id": 41811307215,
+        "name": "portalLoginHarness",
+        "workflowPath": ".github/workflows/portal-login-harness.yml",
+        "ref": "refs/heads/integration/all-agents-unified",
+        "headSha": "59f0a3c2ff41ba1ae99a38515a2cdc65b2144067",
+        "status": "completed",
+        "conclusion": "success",
+        "requiredJobs": [
+          {
+            "id": 126510967446,
+            "name": "portal-login-harness",
+            "status": "completed",
+            "conclusion": "success",
+            "runId": 41811307215
+          }
+        ]
+      },
+      {
+        "id": 41811315911,
+        "name": "securityCriticalHigh",
+        "workflowPath": ".github/workflows/ac11-security-scan.yml",
+        "ref": "refs/heads/integration/all-agents-unified",
+        "headSha": "59f0a3c2ff41ba1ae99a38515a2cdc65b2144067",
+        "status": "completed",
+        "conclusion": "success",
+        "requiredJobs": [
+          {
+            "id": 126510990173,
+            "name": "security-critical-high",
+            "status": "completed",
+            "conclusion": "success",
+            "runId": 41811315911
+          }
+        ]
+      }
+    ],
+    "executor": "reported from root actual CI receipt; not a rerun by publication worker"
+  },
+  "limits": {
+    "S4UOSDeniedCode": "0x80070005",
+    "S4UReopened": false,
+    "S4UAccepted": false,
+    "unattendedAcceptance": false,
+    "productionAcceptance": false,
+    "fiveNodeAcceptance": false,
+    "physicalAndOpsAndAccessibilityAcceptanceIncomplete": true
+  },
+  "original48TaskCount": {
+    "done": 2,
+    "blocked": 4,
+    "planned": 42,
+    "ready": 0
+  },
+  "publication": {
+    "privateBindingsKeysTokensDSNsRawPromptsPublished": false,
+    "codeConfigMetadataEdits": false,
+    "privateClonesAndNodeModulesPreserved": true,
+    "sharedIndexBoardsRegistryEdits": false,
+    "ObsidianApply": false,
+    "publicFiles": [
+      "History/2026-11-04_r5_supervised_handoff_80e84a1f538c_Codex.md",
+      "Evidence/r5-supervised-80e84a1f538c/handoff.json"
+    ],
+    "hostedDocsCI": "will be bound to the published evidence commit by external run receipt, separate from functional-source59f CI"
+  },
+  "nextOwner": "Codex root: enabled-metadata independent review, final report/Obsidian aggregation and actual future guarded outcome; this worker performs no further live action",
+  "localPublicationVerification": {
+    "runtime": "Windows CPython3.14.7",
+    "runtimeBinarySHA256": "9b7bffc26240463c965a2a2a5fada1d8e741c21c25cd2e977728c339b82d9977",
+    "input": "report working tree based on13fbf849 plus exactly two new public evidence files; no source modifications",
+    "exactNativeArgvAndLogsRetainedPrivately": true,
+    "checks": [
+      {
+        "command": [
+          "<preserved-source03-CPython3.14.7>",
+          "-B",
+          "tools/check_docs.py"
+        ],
+        "startedAtKST": "2026-11-04T20:39:40.389176+09:00",
+        "endedAtKST": "2026-11-04T20:39:56.619392+09:00",
+        "exit": 0,
+        "stdoutSHA256": "559daa61c7e7f558967415359d0cc0cfae7f234bbef76fa812532d98747c51b6",
+        "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "command": [
+          "<preserved-source03-CPython3.14.7>",
+          "-B",
+          "tools/check_doc_path_citations.py",
+          "--ratchet",
+          "--base-ref",
+          "13fbf849f480422e0f7bdf6e4dc0d64e89943972"
+        ],
+        "startedAtKST": "2026-11-04T20:39:56.619879+09:00",
+        "endedAtKST": "2026-11-04T20:40:02.609143+09:00",
+        "exit": 0,
+        "stdoutSHA256": "389921b50662776ed834a285f70fc44ab61f7d5bdb4c5249c0a73c98113980de",
+        "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "command": [
+          "<preserved-source03-CPython3.14.7>",
+          "-B",
+          "tools/check_contract_bindings.py"
+        ],
+        "startedAtKST": "2026-11-04T20:40:02.609473+09:00",
+        "endedAtKST": "2026-11-04T20:40:14.289961+09:00",
+        "exit": 0,
+        "stdoutSHA256": "6f5f0bb507613c8a90dc28022e3ddb77bfc38cfe668de16f0a0d6d1a9ceef7af",
+        "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "command": [
+          "<preserved-source03-CPython3.14.7>",
+          "-B",
+          "tools/check_frontend_integrity.py"
+        ],
+        "startedAtKST": "2026-11-04T20:40:14.290274+09:00",
+        "endedAtKST": "2026-11-04T20:40:15.259908+09:00",
+        "exit": 0,
+        "stdoutSHA256": "769254233fe75f1cedc61839aff1e87bfbc1376ec37bf2c8fca93115d8847aef",
+        "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "command": [
+          "<preserved-source03-CPython3.14.7>",
+          "-B",
+          "tools/test_sync.py"
+        ],
+        "startedAtKST": "2026-11-04T20:39:40.384669+09:00",
+        "endedAtKST": "2026-11-04T20:39:45.647308+09:00",
+        "exit": 0,
+        "stdoutSHA256": "e530b3d0bd63d091db2faa96b0d9a864249f520b143d9e3124df04abe4b00823",
+        "stderrSHA256": "c31ca447575011b7b4f80cfd3e4d4d13372b14d28f8684e706c339ecc8d03d0e"
+      },
+      {
+        "command": [
+          "<preserved-source03-CPython3.14.7>",
+          "-B",
+          "tools/check_ontology_generation.py"
+        ],
+        "startedAtKST": "2026-11-04T20:39:45.647830+09:00",
+        "endedAtKST": "2026-11-04T20:39:47.344847+09:00",
+        "exit": 0,
+        "stdoutSHA256": "451b3d26c538962997f093bbfb8a5ceabffe134e154c1ff412f57590b076e150",
+        "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "command": [
+          "<preserved-source03-CPython3.14.7>",
+          "-B",
+          "tools/check_ontology.py"
+        ],
+        "startedAtKST": "2026-11-04T20:39:47.345205+09:00",
+        "endedAtKST": "2026-11-04T20:39:49.988882+09:00",
+        "exit": 0,
+        "stdoutSHA256": "7cdc12bf64f50ba0964625161638a4c639cf22d786a57f04685bed0718e14042",
+        "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "command": [
+          "<preserved-source03-CPython3.14.7>",
+          "-B",
+          "tools/build_docs.py"
+        ],
+        "startedAtKST": "2026-11-04T20:39:49.989221+09:00",
+        "endedAtKST": "2026-11-04T20:39:56.499939+09:00",
+        "exit": 0,
+        "stdoutSHA256": "372dea63f9726b40d477944b23cf69c3b54a21fbf44df4dbeaaaa4358740ba04",
+        "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "command": [
+          "<preserved-source03-CPython3.14.7>",
+          "-B",
+          "tools/sync_obsidian.py",
+          "--check"
+        ],
+        "startedAtKST": "2026-11-04T20:39:40.405068+09:00",
+        "endedAtKST": "2026-11-04T20:39:56.567420+09:00",
+        "exit": 0,
+        "stdoutSHA256": "099c1412b324bf9a274a5c1d3daab66079ece356ea2c4520944dd8f333b6b452",
+        "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    ],
+    "readOnlySharedSync": {
+      "managed": 2190,
+      "pendingExports": 19,
+      "conflicts": 0,
+      "writes": 0,
+      "exit": 0
+    },
+    "documentationBundleBytes": 11972597,
+    "documentationOnly": true,
+    "publicationSnapshotMayBeRecheckedAfterRecordUpdate": true
+  }
+}

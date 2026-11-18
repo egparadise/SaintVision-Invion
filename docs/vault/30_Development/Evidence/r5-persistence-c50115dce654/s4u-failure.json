@@ -1,0 +1,17 @@
+{
+  "exit": 1,
+  "diagnostic": "Register-ScheduledTask: Access is denied",
+  "category": "PermissionDenied",
+  "exception": "CimException",
+  "fullyQualifiedErrorId": "HRESULT 0x80070005,Register-ScheduledTask",
+  "reviewedRegistrarLine": 24,
+  "OSBoundary": true,
+  "userApprovalMissing": false,
+  "taskAbsentByReadback": true,
+  "intentAbsent": true,
+  "receiptAbsent": true,
+  "noDemandStart": true,
+  "noRetry": true,
+  "noElevation": true,
+  "noFallback": true
+}

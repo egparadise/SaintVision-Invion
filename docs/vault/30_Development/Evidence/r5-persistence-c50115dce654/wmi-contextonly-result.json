@@ -1,0 +1,34 @@
+{
+  "observedAtKST": "2026-11-04T17:26:24.683330+09:00",
+  "technicalRelease": "msg_d72c52706139",
+  "operation": "ContextOnly",
+  "runId": "20261104T082522Z-c50115dce654",
+  "exit": 0,
+  "stdoutSHA256": "efe02795f0140aa71ecda6fe136f2bf187bb5792ac0fd932cf8b6328d4757323",
+  "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "cycleExecuted": false,
+  "transitionExecuted": false,
+  "firstFailedInputVersionsPreserved": 9,
+  "actualReceipt": {
+    "exit": 0,
+    "runId": "20261104T082522Z-c50115dce654",
+    "context": {
+      "pid": 45540,
+      "sessionId": 1,
+      "ownerMatched": true,
+      "userInteractive": true,
+      "jobQuerySucceeded": true,
+      "inJob": false,
+      "windowStation": "WinSta0",
+      "desktop": "Default"
+    },
+    "certificateTaskCreated": false,
+    "cycleExecuted": false,
+    "planSHA256": "ed37d5b8270cf7bf46af6749ef5b691a1afdd596d551a7f220ee06d8726bda82",
+    "unattendedRenewalAccepted": false,
+    "observedAt": "2026-11-04T08:26:24.2378612+00:00",
+    "transitionExecuted": false,
+    "schemaVersion": "r5-wmi-context-result:1",
+    "operation": "ContextOnly"
+  }
+}

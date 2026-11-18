@@ -1,0 +1,16 @@
+{
+  "schemaVersion": "supervision-train-landing-readback:1",
+  "executor": "Codex root",
+  "observedAt": "2026-11-04T10:15:07.774169+00:00",
+  "sourceSha": "59f0a3c2ff41ba1ae99a38515a2cdc65b2144067",
+  "previousSha": "fd1530d9b46e6b90a708daa59b4394599684309a",
+  "scriptSHA256": "2da6ef1aa7e5330d39094011c837c4e74a675cf0680ca0e50fd27f69260b1366",
+  "scriptExitCode": 0,
+  "pushMode": "normal-fast-forward-no-force",
+  "remoteReadback": "59f0a3c2ff41ba1ae99a38515a2cdc65b2144067",
+  "priorFullPrelandingVerdict": "FAIL",
+  "correctionVerification": "exact 3-file delta, 244 tests, crypto verification and independent review",
+  "prelandingDocsRunId": "41810435583",
+  "postlandingVerification": "separate mandatory eight lanes",
+  "scope": "Git delivery only; no operational acceptance"
+}

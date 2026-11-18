@@ -1,0 +1,22 @@
+{
+  "exit": 0,
+  "runId": "20261104T085330Z-5babae638fde",
+  "context": {
+    "pid": 41708,
+    "sessionId": 1,
+    "ownerMatched": true,
+    "userInteractive": true,
+    "jobQuerySucceeded": true,
+    "inJob": false,
+    "windowStation": "WinSta0",
+    "desktop": "Default"
+  },
+  "certificateTaskCreated": false,
+  "cycleExecuted": false,
+  "planSHA256": "5fda707021193777ceef0a6e3a1d594d7c617fdb88ad0127cbe0c2d872a40b1e",
+  "unattendedRenewalAccepted": false,
+  "observedAt": "2026-11-04T08:58:39.8985190+00:00",
+  "transitionExecuted": false,
+  "schemaVersion": "r5-wmi-context-result:1",
+  "operation": "ContextOnly"
+}

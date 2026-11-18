@@ -1,0 +1,12 @@
+{
+  "exit": 0,
+  "transitionInvoked": false,
+  "observedAtKST": "2026-11-04T17:09:36.7899975+09:00",
+  "proposedGuardWouldRejectThisCaller": true,
+  "sessionId": 1,
+  "currentProcessInJob": true,
+  "observerStopAttempted": false,
+  "userInteractive": true,
+  "currentTokenAdministrator": false,
+  "querySucceeded": true
+}
