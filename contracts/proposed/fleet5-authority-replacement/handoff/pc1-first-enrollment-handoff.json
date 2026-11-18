@@ -1,0 +1,109 @@
+{
+  "schema": "fleet5-authority-replacement-enrollment-handoff:1",
+  "fixture": true,
+  "activation": "NOT_AUTHORIZED",
+  "sourcePlan": "fixtures/positive/p05-complete.json",
+  "sourcePlanSHA256": "ff954c8c1dadff149dbbaaef60940dca75242bf39f836b004bbd3537cb90458e",
+  "newIdentity": {
+    "pc": "PC1",
+    "nodeID": "nod_00000000000000000000000PC1",
+    "spiffeURI": "spiffe://saintvision.ai/tenant/00000000-0000-4000-8000-0000000000a1/node/nod_00000000000000000000000PC1/epoch/00000000-0000-4000-8000-0000000000e1",
+    "epoch": "00000000-0000-4000-8000-0000000000e1",
+    "nodePublicKeySHA256": "1e120de7b83a5578f51fd2c50c546a9199258e4d6d5f5231d9ee176627ef2ff2",
+    "leafCertificateSHA256": "e2827e9124e9f05bd9bce4bbe9ba432d4c5d8719a9336d2d9d886d95ab271a32",
+    "channelVersion": 1,
+    "policyVersion": 1
+  },
+  "publicCAEvidence": {
+    "caCertificateSHA256": "ad7d65cb995550a61aee7c1b55a2c39c93d1668c587e279e116acdcd0300a580",
+    "caPublicKeySHA256": "3836728d09b21eb5e0a78abeac36afc1170adaa2ba00484a418056888b137298",
+    "subjectCommonName": "SaintVision FLEET5 authority 2026-11 R1",
+    "notBefore": "2026-11-18T12:00:00Z",
+    "notAfter": "2027-11-18T12:00:00Z",
+    "anchorBundle": [
+      "ad7d65cb995550a61aee7c1b55a2c39c93d1668c587e279e116acdcd0300a580"
+    ],
+    "trustDecisionRef": "fixture:decision/new-trust",
+    "excludedTerminalCACertificateSHA256": "382aedb023745829f06b2b02518a8982d464ee718903ffa5a20500a05e743989"
+  },
+  "verifier": {
+    "tool": "tools/five_node_lab_preflight.py",
+    "consumes": [
+      "nodeId",
+      "ip",
+      "certificateSHA256 (leaf DER, compared with inv.node_channels)",
+      "hostId",
+      "failureDomainId",
+      "coLocatedWithControlPlane",
+      "revision"
+    ],
+    "doesNotCheck": [
+      "issuer chain to publicCAEvidence.caCertificateSHA256 (established only by the A6 CP contexts and Node anchor bundles)",
+      "SPIFFE URI / epoch inside the leaf",
+      "terminal CA absence from anchor bundles"
+    ]
+  },
+  "fiveNodeInventory": {
+    "schemaVersion": "1.0.0",
+    "controlPlaneHostId": "host-cp",
+    "nodes": [
+      {
+        "nodeId": "nod_00000000000000000000000PC2",
+        "ip": "10.0.0.2",
+        "certificateSHA256": "5af24a3f175cd8499f4da0c6df941fd918a8962a2e80cb19116f093b4b5d2463",
+        "profile": "lan-workspace-v1",
+        "hostId": "host-pc2",
+        "failureDomainId": "fd-pc2",
+        "coLocatedWithControlPlane": false,
+        "measurementEligible": {
+          "s05": true,
+          "s07": true
+        },
+        "exclusionReason": null
+      },
+      {
+        "nodeId": "nod_00000000000000000000000PC3",
+        "ip": "10.0.0.3",
+        "certificateSHA256": "15717ac730b31ffa0ee532f292c6aa1f4c0d66f225f41d083930c2a9e54eeae2",
+        "profile": "lan-workspace-v1",
+        "hostId": "host-pc3",
+        "failureDomainId": "fd-pc3",
+        "coLocatedWithControlPlane": false,
+        "measurementEligible": {
+          "s05": true,
+          "s07": true
+        },
+        "exclusionReason": null
+      },
+      {
+        "nodeId": "nod_00000000000000000000000PC4",
+        "ip": "10.0.0.4",
+        "certificateSHA256": "93df50606cf7929f087377e441ab670f01110901beac851d351298b5df1a14fe",
+        "profile": "lan-workspace-v1",
+        "hostId": "host-pc4",
+        "failureDomainId": "fd-pc4",
+        "coLocatedWithControlPlane": false,
+        "measurementEligible": {
+          "s05": true,
+          "s07": true
+        },
+        "exclusionReason": null
+      },
+      {
+        "nodeId": "nod_00000000000000000000000PC1",
+        "ip": "10.0.0.1",
+        "certificateSHA256": "e2827e9124e9f05bd9bce4bbe9ba432d4c5d8719a9336d2d9d886d95ab271a32",
+        "profile": "lan-workspace-v1",
+        "hostId": "host-pc1",
+        "failureDomainId": "fd-pc1",
+        "coLocatedWithControlPlane": false,
+        "measurementEligible": {
+          "s05": true,
+          "s07": true
+        },
+        "exclusionReason": null
+      }
+    ],
+    "revision": "sha256:6e578420f90809856d057c58adf8be18b5076ced97c5f3f2a6a9017f5fd4c853"
+  }
+}

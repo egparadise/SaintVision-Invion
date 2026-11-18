@@ -1,0 +1,204 @@
+{
+  "schema": "fleet5-authority-replacement-plan:1",
+  "planID": "ARP-20261118-p09-durable-cas-undone-hold",
+  "status": "PROPOSED",
+  "activation": "NOT_AUTHORIZED",
+  "fixture": true,
+  "observedAt": "2026-11-18T12:00:00Z",
+  "tenantID": "00000000-0000-4000-8000-0000000000a1",
+  "projectID": "prj_000000000000000000000000P1",
+  "preservedEpoch": {
+    "epoch": "00000000-0000-4000-8000-0000000000e1",
+    "source": "DB_READBACK",
+    "readbackSHA256": "71f6ae4f2bd7bf6f9bb7afafdb95cd09bef91d07af12944203c3c3d9ec04008d"
+  },
+  "terminalAuthority": {
+    "caCertificateSHA256": "382aedb023745829f06b2b02518a8982d464ee718903ffa5a20500a05e743989",
+    "caPublicKeySHA256": "e34db3286017e7950c5a4758bb79120a4247e9aec6ed7f5a02e74a1383c04b35",
+    "subjectCommonName": "SaintVision LAN pilot CA",
+    "notAfter": "2026-11-14T07:15:30Z",
+    "state": "CA_TERMINAL",
+    "usage": "REFERENCE_ONLY"
+  },
+  "newAuthority": {
+    "caCertificateSHA256": "ad7d65cb995550a61aee7c1b55a2c39c93d1668c587e279e116acdcd0300a580",
+    "caPublicKeySHA256": "3836728d09b21eb5e0a78abeac36afc1170adaa2ba00484a418056888b137298",
+    "subjectCommonName": "SaintVision FLEET5 authority 2026-11 R1",
+    "keyAlgorithm": "Ed25519",
+    "keyGeneratedFresh": true,
+    "crossSignedByTerminal": false,
+    "pathLength": 0,
+    "notBefore": "2026-11-18T12:00:00Z",
+    "notAfter": "2027-11-18T12:00:00Z",
+    "custody": {
+      "holder": "ROOT_OFFLINE_OPERATOR",
+      "privateMaterialInRepository": false,
+      "custodyEvidenceRef": "fixture:custody/new-ca"
+    },
+    "trustAuthorization": {
+      "decisionRef": "fixture:decision/new-trust",
+      "authorizedBy": "fixture-root-operator"
+    },
+    "anchorBundle": [
+      "ad7d65cb995550a61aee7c1b55a2c39c93d1668c587e279e116acdcd0300a580"
+    ]
+  },
+  "advanceRenewal": {
+    "caLifetimeSeconds": 31536000,
+    "caSuccessorLeadSeconds": 2592000,
+    "caWarningLeadSeconds": 3888000,
+    "leafLifetimeSeconds": 518400,
+    "leafRenewalLeadSeconds": 259200,
+    "policyLifetimeSeconds": 172800,
+    "policyRenewalLeadSeconds": 86400,
+    "overlapSeconds": 14400,
+    "normalBudgetSeconds": 7200,
+    "caSuccessorBudgetSeconds": 86400,
+    "safetySeconds": 630,
+    "clockSkewSeconds": 30
+  },
+  "controlPlaneClient": {
+    "spiffeURI": "spiffe://saintvision.ai/tenant/00000000-0000-4000-8000-0000000000a1/control-plane/epoch/00000000-0000-4000-8000-0000000000e1",
+    "keyContinuity": "RETAINED",
+    "publicKeySHA256": "20108ad5ce278b93840d02a450cde349b3fcaaadd2ed86e80e484837df793bce",
+    "priorPublicKeySHA256": "20108ad5ce278b93840d02a450cde349b3fcaaadd2ed86e80e484837df793bce",
+    "plannedLeafSHA256": "4b51853b7342d737678942364d17157347489903971a43ed417222610c0440a4",
+    "contextSites": [
+      "observer_worker",
+      "delivery_worker",
+      "workspace_runtime",
+      "build_product_runtime",
+      "storage_check_collector"
+    ]
+  },
+  "roleKeys": [
+    {
+      "role": "LAUNCH_SIGNER",
+      "publicKeySHA256": "5dd16620e67286898117dc53ec487563c0676c089ede93801aabb7428d49e708",
+      "disposition": "RETAINED",
+      "custodyEvidenceRef": "fixture:custody/launch-signer"
+    }
+  ],
+  "members": [
+    {
+      "pc": "PC2",
+      "kind": "ROTATION",
+      "nodeID": "nod_00000000000000000000000PC2",
+      "account": "saintvision-invion",
+      "address": "10.0.0.2",
+      "spiffeURI": "spiffe://saintvision.ai/tenant/00000000-0000-4000-8000-0000000000a1/node/nod_00000000000000000000000PC2/epoch/00000000-0000-4000-8000-0000000000e1",
+      "nodePublicKeySHA256": "6b56a36216235e78bf14a24b16bba3a3025783ebbe69bcfcb9f2e934be09d767",
+      "priorNodePublicKeySHA256": "6b56a36216235e78bf14a24b16bba3a3025783ebbe69bcfcb9f2e934be09d767",
+      "plannedLeafSHA256": "5af24a3f175cd8499f4da0c6df941fd918a8962a2e80cb19116f093b4b5d2463",
+      "counters": {
+        "channelVersionBefore": 1,
+        "channelVersionAfter": 2,
+        "policyFloorBefore": 2,
+        "policyVersionAfter": 3
+      }
+    },
+    {
+      "pc": "PC3",
+      "kind": "ROTATION",
+      "nodeID": "nod_00000000000000000000000PC3",
+      "account": "saintvision-invion3",
+      "address": "10.0.0.3",
+      "spiffeURI": "spiffe://saintvision.ai/tenant/00000000-0000-4000-8000-0000000000a1/node/nod_00000000000000000000000PC3/epoch/00000000-0000-4000-8000-0000000000e1",
+      "nodePublicKeySHA256": "2c883f26ec616823b839d9f58ab8f4379c2df92c6b982b3a78678473327cd30b",
+      "priorNodePublicKeySHA256": "2c883f26ec616823b839d9f58ab8f4379c2df92c6b982b3a78678473327cd30b",
+      "plannedLeafSHA256": "15717ac730b31ffa0ee532f292c6aa1f4c0d66f225f41d083930c2a9e54eeae2",
+      "counters": {
+        "channelVersionBefore": 1,
+        "channelVersionAfter": 2,
+        "policyFloorBefore": 2,
+        "policyVersionAfter": 3
+      }
+    },
+    {
+      "pc": "PC4",
+      "kind": "ROTATION",
+      "nodeID": "nod_00000000000000000000000PC4",
+      "account": "inviz",
+      "address": "10.0.0.4",
+      "spiffeURI": "spiffe://saintvision.ai/tenant/00000000-0000-4000-8000-0000000000a1/node/nod_00000000000000000000000PC4/epoch/00000000-0000-4000-8000-0000000000e1",
+      "nodePublicKeySHA256": "e3769955873306ee0017f4d1a3482bd7d2b5db1e07dd6514444a632c60b37b43",
+      "priorNodePublicKeySHA256": "e3769955873306ee0017f4d1a3482bd7d2b5db1e07dd6514444a632c60b37b43",
+      "plannedLeafSHA256": "93df50606cf7929f087377e441ab670f01110901beac851d351298b5df1a14fe",
+      "counters": {
+        "channelVersionBefore": 3,
+        "channelVersionAfter": 4,
+        "policyFloorBefore": 5,
+        "policyVersionAfter": 6
+      }
+    },
+    {
+      "pc": "PC1",
+      "kind": "NEW_ENROLLMENT",
+      "nodeID": "nod_00000000000000000000000PC1",
+      "account": "inviz",
+      "address": "10.0.0.1",
+      "spiffeURI": "spiffe://saintvision.ai/tenant/00000000-0000-4000-8000-0000000000a1/node/nod_00000000000000000000000PC1/epoch/00000000-0000-4000-8000-0000000000e1",
+      "nodePublicKeySHA256": "1e120de7b83a5578f51fd2c50c546a9199258e4d6d5f5231d9ee176627ef2ff2",
+      "priorNodePublicKeySHA256": null,
+      "plannedLeafSHA256": "e2827e9124e9f05bd9bce4bbe9ba432d4c5d8719a9336d2d9d886d95ab271a32",
+      "counters": {
+        "channelVersionBefore": 0,
+        "channelVersionAfter": 1,
+        "policyFloorBefore": 0,
+        "policyVersionAfter": 1
+      }
+    }
+  ],
+  "existingNodeRows": {
+    "source": "DB_READBACK",
+    "nodeIDs": [
+      "nod_00000000000000000000000PC2",
+      "nod_00000000000000000000000PC3",
+      "nod_00000000000000000000000PC4",
+      "nod_0000000000000000000000RTR1",
+      "nod_0000000000000000000000RTR2"
+    ],
+    "publicKeySHA256s": [
+      "6b56a36216235e78bf14a24b16bba3a3025783ebbe69bcfcb9f2e934be09d767",
+      "2c883f26ec616823b839d9f58ab8f4379c2df92c6b982b3a78678473327cd30b",
+      "e3769955873306ee0017f4d1a3482bd7d2b5db1e07dd6514444a632c60b37b43",
+      "fa44f1ba704861a8ddcec29874855c659e81ad4f2513ef45761cb6aa9f54e4aa",
+      "db8bce16f425b80955f698eaeb1d35b1bdfa7909c0d1b3c77e09e49dc54fe48a"
+    ]
+  },
+  "checkpoint": {
+    "lastDurablePhase": "A4_CHANNEL_CAS",
+    "inFlightPhase": null,
+    "inFlightOutcome": null,
+    "readback": {
+      "dbAvailable": true,
+      "epoch": "00000000-0000-4000-8000-0000000000e1",
+      "custodyState": "NEW_KEY_PRESENT_MATCHES_PLAN",
+      "members": [
+        {
+          "nodeID": "nod_00000000000000000000000PC2",
+          "rowPresent": true,
+          "channelVersion": 2,
+          "channelCertificateSHA256": "5af24a3f175cd8499f4da0c6df941fd918a8962a2e80cb19116f093b4b5d2463",
+          "policyFloor": 2
+        },
+        {
+          "nodeID": "nod_00000000000000000000000PC3",
+          "rowPresent": true,
+          "channelVersion": 1,
+          "channelCertificateSHA256": "1b0e7deb6fdeb786d4c3cc22779873a88a390e4c1248946caefb0932d8f2c73a",
+          "policyFloor": 2
+        },
+        {
+          "nodeID": "nod_00000000000000000000000PC4",
+          "rowPresent": true,
+          "channelVersion": 4,
+          "channelCertificateSHA256": "93df50606cf7929f087377e441ab670f01110901beac851d351298b5df1a14fe",
+          "policyFloor": 5
+        }
+      ]
+    },
+    "expectedRecoveryAction": "HOLD_FOREIGN_WRITER",
+    "expectedResumePhase": null
+  }
+}

@@ -1,0 +1,342 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://saintvision.ai/contracts/proposed/fleet5-authority-replacement-v1.schema.json",
+  "title": "PROPOSED FLEET5 authority replacement and advance-renewal plan v1",
+  "description": "PROPOSED, NOT_IMPLEMENTED. Shape of one authority-replacement plan for a CA_TERMINAL cohort. Structural rules live here; cross-field invariants (identity uniqueness, counter monotonicity, epoch preservation, advance-renewal budget, recovery decision) live in tools/check_fleet5_authority_replacement.py. Passing this schema alone never authorizes an operation.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "planID",
+    "status",
+    "activation",
+    "observedAt",
+    "tenantID",
+    "projectID",
+    "preservedEpoch",
+    "terminalAuthority",
+    "newAuthority",
+    "advanceRenewal",
+    "controlPlaneClient",
+    "roleKeys",
+    "members",
+    "existingNodeRows",
+    "checkpoint"
+  ],
+  "properties": {
+    "schema": {"const": "fleet5-authority-replacement-plan:1"},
+    "planID": {"type": "string", "pattern": "^ARP-[0-9]{8}-[a-z0-9-]{1,40}$"},
+    "status": {
+      "description": "HOLD: at least one genuine input is unknown (null). PROPOSED: every input is filled and every invariant holds; still not an operating release.",
+      "enum": ["HOLD", "PROPOSED"]
+    },
+    "activation": {
+      "description": "This document can never carry an operating release. Release is a separate Root decision outside this contract.",
+      "const": "NOT_AUTHORIZED"
+    },
+    "fixture": {
+      "description": "true for synthetic fixtures. Synthetic fixtures must not be read as fleet evidence.",
+      "type": "boolean"
+    },
+    "observedAt": {"$ref": "#/$defs/timestamp"},
+    "tenantID": {"$ref": "#/$defs/uuid"},
+    "projectID": {"type": "string", "pattern": "^prj_[0-9A-HJKMNP-TV-Z]{26}$"},
+    "preservedEpoch": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["epoch", "source", "readbackSHA256"],
+      "properties": {
+        "epoch": {"$ref": "#/$defs/uuid"},
+        "source": {
+          "description": "DB_READBACK: read from inv.control_epoch by a Root read-only transaction. HISTORICAL_EVIDENCE: copied from an older receipt; allowed only while status is HOLD.",
+          "enum": ["DB_READBACK", "HISTORICAL_EVIDENCE"]
+        },
+        "readbackSHA256": {"$ref": "#/$defs/nullableSha256"}
+      }
+    },
+    "terminalAuthority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["caCertificateSHA256", "caPublicKeySHA256", "subjectCommonName", "notAfter", "state", "usage"],
+      "properties": {
+        "caCertificateSHA256": {"$ref": "#/$defs/sha256"},
+        "caPublicKeySHA256": {"$ref": "#/$defs/nullableSha256"},
+        "subjectCommonName": {"type": ["string", "null"], "minLength": 1, "maxLength": 128},
+        "notAfter": {"$ref": "#/$defs/timestamp"},
+        "state": {"const": "CA_TERMINAL"},
+        "usage": {
+          "description": "The expired CA is a historical reference only: never an anchor, issuer, chain member or cross-signer.",
+          "const": "REFERENCE_ONLY"
+        }
+      }
+    },
+    "newAuthority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "caCertificateSHA256",
+        "caPublicKeySHA256",
+        "subjectCommonName",
+        "keyAlgorithm",
+        "keyGeneratedFresh",
+        "crossSignedByTerminal",
+        "pathLength",
+        "notBefore",
+        "notAfter",
+        "custody",
+        "trustAuthorization",
+        "anchorBundle"
+      ],
+      "properties": {
+        "caCertificateSHA256": {"$ref": "#/$defs/nullableSha256"},
+        "caPublicKeySHA256": {"$ref": "#/$defs/nullableSha256"},
+        "subjectCommonName": {"type": "string", "minLength": 1, "maxLength": 128},
+        "keyAlgorithm": {"const": "Ed25519"},
+        "keyGeneratedFresh": {"const": true},
+        "crossSignedByTerminal": {"const": false},
+        "pathLength": {"const": 0},
+        "notBefore": {"$ref": "#/$defs/nullableTimestamp"},
+        "notAfter": {"$ref": "#/$defs/nullableTimestamp"},
+        "custody": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["holder", "privateMaterialInRepository", "custodyEvidenceRef"],
+          "properties": {
+            "holder": {"const": "ROOT_OFFLINE_OPERATOR"},
+            "privateMaterialInRepository": {"const": false},
+            "custodyEvidenceRef": {"type": ["string", "null"], "maxLength": 300}
+          }
+        },
+        "trustAuthorization": {
+          "description": "The human/Root decision that admits a new trust root. null decisionRef means not yet authorized (HOLD).",
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["decisionRef", "authorizedBy"],
+          "properties": {
+            "decisionRef": {"type": ["string", "null"], "maxLength": 300},
+            "authorizedBy": {"type": ["string", "null"], "maxLength": 120}
+          }
+        },
+        "anchorBundle": {
+          "description": "Exact CA certificate SHA-256 set every member and every CP context must trust after A2. Never contains the terminal CA.",
+          "type": "array",
+          "maxItems": 2,
+          "uniqueItems": true,
+          "items": {"$ref": "#/$defs/sha256"}
+        }
+      }
+    },
+    "advanceRenewal": {
+      "description": "Seconds. Formulas are evaluated by the checker. null means not yet frozen and forces HOLD.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "caLifetimeSeconds",
+        "caSuccessorLeadSeconds",
+        "caWarningLeadSeconds",
+        "leafLifetimeSeconds",
+        "leafRenewalLeadSeconds",
+        "policyLifetimeSeconds",
+        "policyRenewalLeadSeconds",
+        "overlapSeconds",
+        "normalBudgetSeconds",
+        "caSuccessorBudgetSeconds",
+        "safetySeconds",
+        "clockSkewSeconds"
+      ],
+      "properties": {
+        "caLifetimeSeconds": {"$ref": "#/$defs/nullablePositiveSeconds"},
+        "caSuccessorLeadSeconds": {"$ref": "#/$defs/nullablePositiveSeconds"},
+        "caWarningLeadSeconds": {"$ref": "#/$defs/nullablePositiveSeconds"},
+        "leafLifetimeSeconds": {"$ref": "#/$defs/nullablePositiveSeconds"},
+        "leafRenewalLeadSeconds": {"$ref": "#/$defs/nullablePositiveSeconds"},
+        "policyLifetimeSeconds": {"$ref": "#/$defs/nullablePositiveSeconds"},
+        "policyRenewalLeadSeconds": {"$ref": "#/$defs/nullablePositiveSeconds"},
+        "overlapSeconds": {"$ref": "#/$defs/nullablePositiveSeconds"},
+        "normalBudgetSeconds": {"$ref": "#/$defs/nullablePositiveSeconds"},
+        "caSuccessorBudgetSeconds": {"$ref": "#/$defs/nullablePositiveSeconds"},
+        "safetySeconds": {"const": 630},
+        "clockSkewSeconds": {"const": 30}
+      }
+    },
+    "controlPlaneClient": {
+      "description": "The shared CP mTLS client identity. It is re-issued under the new CA with the SAME epoch URI; every present CP context site switches at A6.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["spiffeURI", "keyContinuity", "publicKeySHA256", "priorPublicKeySHA256", "plannedLeafSHA256", "contextSites"],
+      "properties": {
+        "spiffeURI": {"type": "string", "maxLength": 240},
+        "keyContinuity": {"enum": ["RETAINED", "FRESH"]},
+        "publicKeySHA256": {"$ref": "#/$defs/nullableSha256"},
+        "priorPublicKeySHA256": {"$ref": "#/$defs/nullableSha256"},
+        "plannedLeafSHA256": {"$ref": "#/$defs/nullableSha256"},
+        "contextSites": {
+          "type": "array",
+          "minItems": 5,
+          "maxItems": 5,
+          "uniqueItems": true,
+          "items": {"enum": ["observer_worker", "delivery_worker", "workspace_runtime", "build_product_runtime", "storage_check_collector"]}
+        }
+      }
+    },
+    "roleKeys": {
+      "description": "Non-CA role keys (launch signer, policy signer). RETAINED requires custody evidence from the separate retained-key custody card; REPLACED means a fresh key under the new trust decision.",
+      "type": "array",
+      "maxItems": 4,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["role", "publicKeySHA256", "disposition", "custodyEvidenceRef"],
+        "properties": {
+          "role": {"enum": ["LAUNCH_SIGNER", "POLICY_SIGNER"]},
+          "publicKeySHA256": {"$ref": "#/$defs/nullableSha256"},
+          "disposition": {"enum": ["RETAINED", "REPLACED"]},
+          "custodyEvidenceRef": {"type": ["string", "null"], "maxLength": 300}
+        }
+      }
+    },
+    "members": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 5,
+      "items": {"$ref": "#/$defs/member"}
+    },
+    "existingNodeRows": {
+      "description": "Every inv.nodes row of this tenant at readback, including disabled/retired rows. A NEW_ENROLLMENT identity must not appear here; a ROTATION identity must.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source", "nodeIDs", "publicKeySHA256s"],
+      "properties": {
+        "source": {"enum": ["DB_READBACK", "HISTORICAL_EVIDENCE"]},
+        "nodeIDs": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/$defs/nodeID"}},
+        "publicKeySHA256s": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/$defs/sha256"}}
+      }
+    },
+    "checkpoint": {"$ref": "#/$defs/checkpoint"}
+  },
+  "$defs": {
+    "uuid": {"type": "string", "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"},
+    "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "nullableSha256": {"type": ["string", "null"], "pattern": "^[0-9a-f]{64}$"},
+    "timestamp": {"type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$"},
+    "nullableTimestamp": {"type": ["string", "null"], "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$"},
+    "nullablePositiveSeconds": {"type": ["integer", "null"], "minimum": 1, "maximum": 94608000},
+    "nodeID": {"type": "string", "pattern": "^nod_[0-9A-HJKMNP-TV-Z]{26}$"},
+    "counter": {"type": ["integer", "null"], "minimum": 0, "maximum": 9007199254740991},
+    "phase": {
+      "enum": [
+        "A0_PREFLIGHT_READBACK",
+        "A1_NEW_TRUST_AUTHORIZED",
+        "A2_ANCHOR_STAGED",
+        "A3_ROTATION_LEAVES_ISSUED",
+        "A4_CHANNEL_CAS",
+        "A5_POLICY_PUBLISHED",
+        "A6_CP_CONTEXT_SWITCH",
+        "A7_ROTATION_SETTLED",
+        "E1_ENROLLMENT_AUTHORIZED",
+        "E2_ENROLLMENT_ADMITTED",
+        "E3_ENROLLMENT_SETTLED"
+      ]
+    },
+    "member": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "pc",
+        "kind",
+        "nodeID",
+        "account",
+        "address",
+        "spiffeURI",
+        "nodePublicKeySHA256",
+        "priorNodePublicKeySHA256",
+        "plannedLeafSHA256",
+        "counters"
+      ],
+      "properties": {
+        "pc": {"enum": ["PC1", "PC2", "PC3", "PC4", "PC5"]},
+        "kind": {
+          "description": "ROTATION keeps an existing DB identity (same NodeID, same Node key, same epoch) and moves it to the new CA. NEW_ENROLLMENT mints one new identity that has never existed in this tenant.",
+          "enum": ["ROTATION", "NEW_ENROLLMENT"]
+        },
+        "nodeID": {
+          "description": "null only for a NEW_ENROLLMENT whose identity is not minted yet (forces HOLD).",
+          "oneOf": [{"$ref": "#/$defs/nodeID"}, {"type": "null"}]
+        },
+        "account": {"type": "string", "pattern": "^[a-z_][a-z0-9_-]{0,31}$"},
+        "address": {"type": "string", "pattern": "^(25[0-5]|2[0-4][0-9]|1?[0-9]?[0-9])(\\.(25[0-5]|2[0-4][0-9]|1?[0-9]?[0-9])){3}$"},
+        "spiffeURI": {"type": ["string", "null"], "maxLength": 240},
+        "nodePublicKeySHA256": {"$ref": "#/$defs/nullableSha256"},
+        "priorNodePublicKeySHA256": {"$ref": "#/$defs/nullableSha256"},
+        "plannedLeafSHA256": {"$ref": "#/$defs/nullableSha256"},
+        "counters": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["channelVersionBefore", "channelVersionAfter", "policyFloorBefore", "policyVersionAfter"],
+          "properties": {
+            "channelVersionBefore": {"$ref": "#/$defs/counter"},
+            "channelVersionAfter": {"$ref": "#/$defs/counter"},
+            "policyFloorBefore": {"$ref": "#/$defs/counter"},
+            "policyVersionAfter": {"$ref": "#/$defs/counter"}
+          }
+        }
+      }
+    },
+    "checkpoint": {
+      "description": "Durable journal position plus the Root read-only readback taken after an interruption. The checker recomputes the only permitted recovery action and compares it with expectedRecoveryAction.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["lastDurablePhase", "inFlightPhase", "inFlightOutcome", "readback", "expectedRecoveryAction"],
+      "properties": {
+        "lastDurablePhase": {"oneOf": [{"$ref": "#/$defs/phase"}, {"type": "null"}]},
+        "inFlightPhase": {"oneOf": [{"$ref": "#/$defs/phase"}, {"type": "null"}]},
+        "inFlightOutcome": {"enum": ["UNKNOWN", "FAILED_BEFORE_MUTATION", null]},
+        "readback": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["dbAvailable", "epoch", "custodyState", "members"],
+          "properties": {
+            "dbAvailable": {"type": "boolean"},
+            "epoch": {"oneOf": [{"$ref": "#/$defs/uuid"}, {"type": "null"}]},
+            "custodyState": {
+              "description": "Result of the separate retained-key/new-key custody readback (owned by the Codex custody/preflight card, consumed here).",
+              "enum": ["NOT_READ", "NO_NEW_KEY", "NEW_KEY_PRESENT_MATCHES_PLAN", "NEW_KEY_PRESENT_MISMATCH", "UNKNOWN"]
+            },
+            "members": {
+              "type": "array",
+              "maxItems": 5,
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["nodeID", "rowPresent", "channelVersion", "channelCertificateSHA256", "policyFloor"],
+                "properties": {
+                  "nodeID": {"$ref": "#/$defs/nodeID"},
+                  "rowPresent": {"type": "boolean"},
+                  "channelVersion": {"$ref": "#/$defs/counter"},
+                  "channelCertificateSHA256": {"$ref": "#/$defs/nullableSha256"},
+                  "policyFloor": {"$ref": "#/$defs/counter"}
+                }
+              }
+            }
+          }
+        },
+        "expectedRecoveryAction": {
+          "enum": [
+            "NOT_STARTED",
+            "ABANDON_BEFORE_NEW_TRUST",
+            "RESUME_FORWARD",
+            "COMPLETE",
+            "HOLD_DB_READBACK_REQUIRED",
+            "HOLD_EPOCH_DIVERGED",
+            "HOLD_CUSTODY_UNRESOLVED",
+            "HOLD_FOREIGN_WRITER",
+            "HOLD_POLICY_ABOVE_PLAN",
+            "HOLD_ENROLLMENT_BEFORE_ROTATION_SETTLED",
+            "HOLD_UNPLANNED_ROW"
+          ]
+        },
+        "expectedResumePhase": {"oneOf": [{"$ref": "#/$defs/phase"}, {"type": "null"}]}
+      }
+    }
+  }
+}

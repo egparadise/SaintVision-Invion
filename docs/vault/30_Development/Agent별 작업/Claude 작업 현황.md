@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-CLAUDE-001"
 title: "Claude 작업 현황"
-version: "1.2.132"
+version: "1.2.134"
 status: "review"
 author: "Claude"
-updated: "2026-11-08T11:12:30+09:00"
+updated: "2026-11-18T22:10:00+09:00"
 
 
 
@@ -12,6 +12,35 @@ updated: "2026-11-08T11:12:30+09:00"
 
 source_of_truth: "Git"
 ---
+
+## 2026-11-18 FLEET5 authority 교체·사전 갱신 계약 R1 제안 (Claude 직접 기록)
+
+- **작업** (task_bbffe750d781 / ctx_578424c46777, 21:35 KST 착수): Root544 `d81d40f8` 기준이다. 브랜치는 `egparadise/fleet5-authority-replacement-20261118`다. 판 버전 1.2.133은 병렬 감사 브랜치 b26531ae가 쓰므로 이 판은 1.2.134로 올렸다. 통합은 Root가 한다.
+- **산출물**: 제안 계약 [[Proposed FLEET5 authority replacement and advance-renewal contract R1]]을 추가했다. 기계 검사 가능한 부분은 다음과 같다.
+  - schema: `contracts/proposed/fleet5-authority-replacement/`
+  - checker와 복구 판정: `tools/check_fleet5_authority_replacement.py`
+  - drift를 막는 fixture 생성기
+  - 실제 Nov18 HOLD instance 1개, 수락 fixture 14개(PC1 첫 등록 `p14` 포함), 거부 fixture 30개
+  - PC1 첫 등록 운영자 handoff: 새 신원, 공개 CA 증거, `five_node_lab_preflight`가 수락하는 inventory를 담는다. 이 검증기는 발급 사슬을 검사하지 않는다는 점을 명시했다.
+  - 만료 경계 시험과 phase별 중단·재개 sweep. pytest 155건이다.
+  - pytest 게이트: `tests/core/test_fleet5_authority_replacement_proposal.py`. Core와 Backend가 수집하므로 workflow는 바꾸지 않았다.
+- **계약 요지**:
+  - 새 Ed25519 CA는 새로 만든 키를 쓴다. 기존 CA와 인증서·키·CN이 모두 달라야 한다. 만료 CA는 참조 전용이며 anchor·cross-sign·chain으로 쓰지 않는다.
+  - ROTATION(PC2/3/4)은 같은 NodeID·키·epoch URI를 유지하고, 채널은 C+1, 정책은 P=floor+1로만 올린다.
+  - NEW_ENROLLMENT(PC1)는 기존 행·키와 겹치지 않는 새 신원 하나를 만들고 C·P를 0→1로 시작한다. PC1은 A7(교체 정착) 뒤에만 시작한다.
+  - 계정 이름 `inviz`가 PC1과 PC4에서 같아도 신원이 아니다.
+  - 복구 판정은 11개 행동으로 정한다. 종단 CA로의 rollback은 표현할 수 없다.
+  - 사전 갱신은 successor CA lead ≥ leaf 수명 + B_CA + overlap + 660초다. 7일 CA는 거부된다.
+- **확인**: 로컬 게이트의 명령·exit code·KST는 `Evidence/fleet5-authority-replacement-r1-20261118-claude/local-gates.json`에, hosted CI는 같은 폴더의 `hosted-ci.json`에 있다. 상세는 [[2026-11-18_FLEET5_Authority_Replacement_Contract_R1_Claude]].
+- **하지 않은 것**:
+  - live 자격증명·SSH·DB·Docker·키·인증서 접근, canonical sync apply, 운영 활성화
+  - Codex custody·preflight 파일 변경
+  - 독립 보안 검토. 아직 수행되지 않았다.
+- **다음 첫 행동/담당**:
+  1. Codex가 독립 보안 검토를 한다.
+  2. Codex custody·preflight 카드가 typed 입력을 제공한다.
+  3. Root가 DB를 복구해 readback하고, PC1을 비밀 없이 진단한다.
+  4. 그 뒤 작성자가 instance를 PROPOSED로 개정한다.
 
 ## 2026-11-08 FLEET5 만료 정책 d476 후보 실제 source·보안 검토 R1 (Claude 직접 기록)
 

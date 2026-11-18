@@ -1,0 +1,172 @@
+{
+  "schema": "fleet5-authority-replacement-plan:1",
+  "planID": "ARP-20261118-fleet5-nov18-ca-terminal",
+  "status": "HOLD",
+  "activation": "NOT_AUTHORIZED",
+  "fixture": false,
+  "observedAt": "2026-11-18T11:53:13Z",
+  "tenantID": "97968b42-68aa-40ce-af5e-3a33e2fc2205",
+  "projectID": "prj_01M6NDBHVD2DZQ1Q38DCKN1XE3",
+  "preservedEpoch": {
+    "epoch": "bcd581be-31b4-4aca-86e6-3ca31b69ed09",
+    "source": "HISTORICAL_EVIDENCE",
+    "readbackSHA256": null
+  },
+  "terminalAuthority": {
+    "caCertificateSHA256": "b8d777ab04c65a44f827fdda9629d54a086e9ff8cc752b90a09023a93341c5a3",
+    "caPublicKeySHA256": null,
+    "subjectCommonName": null,
+    "notAfter": "2026-11-14T07:15:30Z",
+    "state": "CA_TERMINAL",
+    "usage": "REFERENCE_ONLY"
+  },
+  "newAuthority": {
+    "caCertificateSHA256": null,
+    "caPublicKeySHA256": null,
+    "subjectCommonName": "SaintVision FLEET5 authority 2026-11 R1",
+    "keyAlgorithm": "Ed25519",
+    "keyGeneratedFresh": true,
+    "crossSignedByTerminal": false,
+    "pathLength": 0,
+    "notBefore": null,
+    "notAfter": null,
+    "custody": {
+      "holder": "ROOT_OFFLINE_OPERATOR",
+      "privateMaterialInRepository": false,
+      "custodyEvidenceRef": null
+    },
+    "trustAuthorization": {
+      "decisionRef": null,
+      "authorizedBy": null
+    },
+    "anchorBundle": []
+  },
+  "advanceRenewal": {
+    "caLifetimeSeconds": 31536000,
+    "caSuccessorLeadSeconds": 2592000,
+    "caWarningLeadSeconds": 3888000,
+    "leafLifetimeSeconds": 518400,
+    "leafRenewalLeadSeconds": 259200,
+    "policyLifetimeSeconds": 172800,
+    "policyRenewalLeadSeconds": 86400,
+    "overlapSeconds": 14400,
+    "normalBudgetSeconds": null,
+    "caSuccessorBudgetSeconds": null,
+    "safetySeconds": 630,
+    "clockSkewSeconds": 30
+  },
+  "controlPlaneClient": {
+    "spiffeURI": "spiffe://saintvision.ai/tenant/97968b42-68aa-40ce-af5e-3a33e2fc2205/control-plane/epoch/bcd581be-31b4-4aca-86e6-3ca31b69ed09",
+    "keyContinuity": "RETAINED",
+    "publicKeySHA256": null,
+    "priorPublicKeySHA256": null,
+    "plannedLeafSHA256": null,
+    "contextSites": [
+      "observer_worker",
+      "delivery_worker",
+      "workspace_runtime",
+      "build_product_runtime",
+      "storage_check_collector"
+    ]
+  },
+  "roleKeys": [
+    {
+      "role": "LAUNCH_SIGNER",
+      "publicKeySHA256": null,
+      "disposition": "RETAINED",
+      "custodyEvidenceRef": null
+    }
+  ],
+  "members": [
+    {
+      "pc": "PC2",
+      "kind": "ROTATION",
+      "nodeID": "nod_01M6TGQZ8S3DAFS7TYE8TY1PX2",
+      "account": "saintvision-invion",
+      "address": "192.168.45.143",
+      "spiffeURI": "spiffe://saintvision.ai/tenant/97968b42-68aa-40ce-af5e-3a33e2fc2205/node/nod_01M6TGQZ8S3DAFS7TYE8TY1PX2/epoch/bcd581be-31b4-4aca-86e6-3ca31b69ed09",
+      "nodePublicKeySHA256": null,
+      "priorNodePublicKeySHA256": null,
+      "plannedLeafSHA256": null,
+      "counters": {
+        "channelVersionBefore": null,
+        "channelVersionAfter": null,
+        "policyFloorBefore": null,
+        "policyVersionAfter": null
+      }
+    },
+    {
+      "pc": "PC3",
+      "kind": "ROTATION",
+      "nodeID": "nod_01M6TAWG25JTA3F7J7S1EE4N2W",
+      "account": "saintvision-invion3",
+      "address": "192.168.45.222",
+      "spiffeURI": "spiffe://saintvision.ai/tenant/97968b42-68aa-40ce-af5e-3a33e2fc2205/node/nod_01M6TAWG25JTA3F7J7S1EE4N2W/epoch/bcd581be-31b4-4aca-86e6-3ca31b69ed09",
+      "nodePublicKeySHA256": null,
+      "priorNodePublicKeySHA256": null,
+      "plannedLeafSHA256": null,
+      "counters": {
+        "channelVersionBefore": null,
+        "channelVersionAfter": null,
+        "policyFloorBefore": null,
+        "policyVersionAfter": null
+      }
+    },
+    {
+      "pc": "PC4",
+      "kind": "ROTATION",
+      "nodeID": "nod_01M6TGSXV1J7XWC5D5H7N6EW1D",
+      "account": "inviz",
+      "address": "192.168.45.210",
+      "spiffeURI": "spiffe://saintvision.ai/tenant/97968b42-68aa-40ce-af5e-3a33e2fc2205/node/nod_01M6TGSXV1J7XWC5D5H7N6EW1D/epoch/bcd581be-31b4-4aca-86e6-3ca31b69ed09",
+      "nodePublicKeySHA256": null,
+      "priorNodePublicKeySHA256": null,
+      "plannedLeafSHA256": null,
+      "counters": {
+        "channelVersionBefore": null,
+        "channelVersionAfter": null,
+        "policyFloorBefore": null,
+        "policyVersionAfter": null
+      }
+    },
+    {
+      "pc": "PC1",
+      "kind": "NEW_ENROLLMENT",
+      "nodeID": null,
+      "account": "inviz",
+      "address": "192.168.45.13",
+      "spiffeURI": null,
+      "nodePublicKeySHA256": null,
+      "priorNodePublicKeySHA256": null,
+      "plannedLeafSHA256": null,
+      "counters": {
+        "channelVersionBefore": 0,
+        "channelVersionAfter": 1,
+        "policyFloorBefore": 0,
+        "policyVersionAfter": 1
+      }
+    }
+  ],
+  "existingNodeRows": {
+    "source": "HISTORICAL_EVIDENCE",
+    "nodeIDs": [
+      "nod_01M6TGQZ8S3DAFS7TYE8TY1PX2",
+      "nod_01M6TAWG25JTA3F7J7S1EE4N2W",
+      "nod_01M6TGSXV1J7XWC5D5H7N6EW1D"
+    ],
+    "publicKeySHA256s": []
+  },
+  "checkpoint": {
+    "lastDurablePhase": null,
+    "inFlightPhase": null,
+    "inFlightOutcome": null,
+    "readback": {
+      "dbAvailable": false,
+      "epoch": null,
+      "custodyState": "NOT_READ",
+      "members": []
+    },
+    "expectedRecoveryAction": "NOT_STARTED",
+    "expectedResumePhase": null
+  }
+}

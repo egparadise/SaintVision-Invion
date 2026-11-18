@@ -1,0 +1,131 @@
+{
+  "schema": "claude-local-gates:1",
+  "task": "task_bbffe750d781",
+  "environment": {
+    "os": "Windows 11",
+    "python": "3.10.11",
+    "PYTHONUTF8": "1"
+  },
+  "headAtRun": "d81d40f824538a4ef553cc8ae4aa75f7c012e325",
+  "workingTreeAtRun": "dirty: uncommitted candidate files of this task on base d81d40f8 (corrected by hand; the driver git-status decode failed on cp949 and wrongly printed clean)",
+  "gates": [
+    {
+      "command": "python tools/check_docs.py",
+      "exitCode": 0,
+      "startedKST": "2026-11-18T22:01:48+09:00",
+      "endedKST": "2026-11-18T22:08:50+09:00",
+      "outputTail": [
+        "PASS: 24 original hashes, 1276 versioned documents, wiki links, 48 tasks, 12 outcomes, owner/reviewer/skills, dependency DAG."
+      ]
+    },
+    {
+      "command": "python tools/check_doc_path_citations.py --ratchet --base-ref d81d40f824538a4ef553cc8ae4aa75f7c012e325",
+      "exitCode": 0,
+      "startedKST": "2026-11-18T22:08:50+09:00",
+      "endedKST": "2026-11-18T22:10:34+09:00",
+      "outputTail": [
+        "PASS check_doc_path_citations --ratchet: 290 broken citation(s), all in baseline, none stale, floor unchanged."
+      ]
+    },
+    {
+      "command": "python tools/check_contract_bindings.py",
+      "exitCode": 0,
+      "startedKST": "2026-11-18T22:10:34+09:00",
+      "endedKST": "2026-11-18T22:11:27+09:00",
+      "outputTail": [
+        "PASS check_contract_bindings: 57 fixtures each referenced by a test; 21 bound kernel response TYPES each have >=1 serving-anchor test (counted PER TYPE, not per anchor SITE: those types occupy 27 anchor sites; a multi-site type counts covered even if only one site is tested -- site-level weight is not decidable here, use tools/check_anchor_weight.py + the mutation harness); 14 replay guards present.",
+        "  UNIT NOTE: TYPE count <= SITE count. Multi-site types (per-type coverage can mask an untested site): ApprovalView(2 sites: ['approvals']), BusinessBindingView(2 sites: ['business_handoff']), BusinessEditLockReleaseView(2 sites: ['business_handoff']), BusinessEditLockView(2 sites: ['business_handoff']), ControlRunDetail(3 sites: ['control']), ControlRunView(2 sites: ['control']), EvidenceEnvelope(6 sites: ['build_governance', 'results', 'runs', 'shard_completion', 'storage_commit', 'storage_view']), ModelExecutionManifestObservation(2 sites: ['model_uri_resolver', 'model_view']), NodeExecutionPermit(2 sites: ['node_execution', 'node_transport']), NodeResourceSnapshot(4 sites: ['capacity', 'gpu', 'observation']), WorkspaceCheckoutView(2 sites: ['workspace_recovery']), WorkspaceEnqueueResult(3 sites: ['workspace_api']), WorkspacePrepareResult(2 sites: ['workspace_api']), WorkspaceRestoreView(2 sites: ['workspace_recovery']), WorkspaceStartEnqueueResult(3 sites: ['workspace_start']), WorkspaceStartPrepareResult(2 sites: ['workspace_start'])",
+        "  (Reporting sites is not a regression -- the TYPE number never meant 'sites verified'; this makes the counting unit explicit. EvidenceEnvelope-class multi-site anchors are why.)"
+      ]
+    },
+    {
+      "command": "python tools/check_frontend_integrity.py",
+      "exitCode": 0,
+      "startedKST": "2026-11-18T22:11:27+09:00",
+      "endedKST": "2026-11-18T22:11:33+09:00",
+      "outputTail": [
+        "Scanning 94 frontend production source files under apps/web/src ...",
+        "",
+        "PASS Frontend Integrity Check: all 9 integrity rules satisfied (0 violations)."
+      ]
+    },
+    {
+      "command": "python tools/test_sync.py",
+      "exitCode": 0,
+      "startedKST": "2026-11-18T22:11:33+09:00",
+      "endedKST": "2026-11-18T22:11:41+09:00",
+      "outputTail": [
+        "----------------------------------------------------------------------",
+        "Ran 14 tests in 7.105s",
+        "",
+        "OK"
+      ]
+    },
+    {
+      "command": "python tools/check_ontology_generation.py",
+      "exitCode": 0,
+      "startedKST": "2026-11-18T22:11:41+09:00",
+      "endedKST": "2026-11-18T22:11:45+09:00",
+      "outputTail": [
+        "PASS: 4 ontology artifacts are graph-equivalent to a fresh generation"
+      ]
+    },
+    {
+      "command": "python tools/check_ontology.py",
+      "exitCode": 0,
+      "startedKST": "2026-11-18T22:11:45+09:00",
+      "endedKST": "2026-11-18T22:11:48+09:00",
+      "outputTail": [
+        "PASS: RDF parsing, defined terms, TTL/JSON-LD equivalence, 48 task mappings, positive SHACL, 4 rejected invalid fixtures, 4 competency queries, Obsidian mirrors."
+      ]
+    },
+    {
+      "command": "python tools/check_doc_single_source.py --ratchet",
+      "exitCode": 0,
+      "startedKST": "2026-11-18T22:11:48+09:00",
+      "endedKST": "2026-11-18T22:11:54+09:00",
+      "outputTail": [
+        "PASS check_doc_single_source --ratchet: 16 pairs, all in baseline, none stale."
+      ]
+    },
+    {
+      "command": "python tools/sync_obsidian.py --check",
+      "exitCode": 0,
+      "startedKST": "2026-11-18T22:11:54+09:00",
+      "endedKST": "2026-11-18T22:12:58+09:00",
+      "outputTail": [
+        "CHECK: 3797 managed files, 3 pending exports, 0 conflicts. No writes."
+      ]
+    },
+    {
+      "command": "python tools/check_fleet5_authority_replacement.py",
+      "exitCode": 0,
+      "startedKST": "2026-11-18T22:12:58+09:00",
+      "endedKST": "2026-11-18T22:13:00+09:00",
+      "outputTail": [
+        "PASS fleet5 authority replacement: 45 documents matched their expected verdicts"
+      ]
+    },
+    {
+      "command": "python tools/generate_fleet5_authority_replacement_fixtures.py --check",
+      "exitCode": 0,
+      "startedKST": "2026-11-18T22:13:00+09:00",
+      "endedKST": "2026-11-18T22:13:01+09:00",
+      "outputTail": []
+    },
+    {
+      "command": "python -m pytest -q -p no:cacheprovider tests/core/test_fleet5_authority_replacement_proposal.py",
+      "exitCode": 0,
+      "startedKST": "2026-11-18T22:13:01+09:00",
+      "endedKST": "2026-11-18T22:13:04+09:00",
+      "outputTail": [
+        "........................................................................ [ 46%]",
+        "........................................................................ [ 92%]",
+        "...........                                                              [100%]",
+        "155 passed in 1.62s"
+      ]
+    }
+  ],
+  "allZero": true,
+  "gateCount": 12
+}

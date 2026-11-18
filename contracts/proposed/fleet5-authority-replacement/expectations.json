@@ -1,0 +1,308 @@
+{
+  "schema": "fleet5-authority-replacement-expectations:1",
+  "status": "PROPOSED_NOT_IMPLEMENTED",
+  "generator": "tools/generate_fleet5_authority_replacement_fixtures.py",
+  "checker": "tools/check_fleet5_authority_replacement.py",
+  "documents": [
+    {
+      "path": "instances/fleet5-nov18-ca-terminal-hold.json",
+      "codes": [],
+      "why": "Real Nov18 fleet plan from Root544 evidence; HOLD with every unknown null."
+    },
+    {
+      "path": "fixtures/positive/p01-proposed-not-started.json",
+      "codes": [],
+      "why": "Complete PROPOSED plan: 3 rotations + PC1 enrollment, nothing started."
+    },
+    {
+      "path": "fixtures/positive/p02-a4-partial-cas-resume.json",
+      "codes": [],
+      "why": "CAS applied on PC2 only, outcome UNKNOWN; resume A4 with the same expected versions."
+    },
+    {
+      "path": "fixtures/positive/p03-a1-unknown-no-key-abandon.json",
+      "codes": [],
+      "why": "New-CA generation interrupted; custody readback proves no new key exists, so abandoning is safe."
+    },
+    {
+      "path": "fixtures/positive/p04-e2-enrollment-resume.json",
+      "codes": [],
+      "why": "Rotation settled; PC1 admission outcome UNKNOWN but DB shows the planned row/leaf; resume E2."
+    },
+    {
+      "path": "fixtures/positive/p05-complete.json",
+      "codes": [],
+      "why": "Every phase durable, every counter at its planned value."
+    },
+    {
+      "path": "fixtures/positive/p06-db-unavailable-hold.json",
+      "codes": [],
+      "why": "Interrupted after A5 while the DB cannot be read: HOLD, no blind replay."
+    },
+    {
+      "path": "fixtures/positive/p07-custody-mismatch-hold.json",
+      "codes": [],
+      "why": "New CA key in custody differs from the plan after A2: HOLD."
+    },
+    {
+      "path": "fixtures/positive/p08-rotation-only-complete.json",
+      "codes": [],
+      "why": "Rotation cohort completes without any enrollment: the two tracks are separable."
+    },
+    {
+      "path": "fixtures/positive/p09-durable-cas-undone-hold.json",
+      "codes": [],
+      "why": "Journal says A4 durable but PC3 is back at its old version (restore/foreign writer): HOLD."
+    },
+    {
+      "path": "fixtures/positive/p10-enrollment-before-rotation-hold.json",
+      "codes": [],
+      "why": "A PC1 row exists while rotation is only at A5: ordering violation, HOLD."
+    },
+    {
+      "path": "fixtures/positive/p11-epoch-diverged-hold.json",
+      "codes": [],
+      "why": "DB control epoch differs from the preserved epoch: HOLD, never adopt it."
+    },
+    {
+      "path": "fixtures/positive/p12-floor-above-plan-hold.json",
+      "codes": [],
+      "why": "PC2 floor is above the planned P: a foreign policy publication, HOLD."
+    },
+    {
+      "path": "fixtures/positive/p13-unplanned-row-hold.json",
+      "codes": [],
+      "why": "A Node row that is neither planned nor pre-existing appeared: HOLD."
+    },
+    {
+      "path": "fixtures/positive/p14-pc1-first-enrollment-ready.json",
+      "codes": [],
+      "why": "Concrete PC1 first enrollment: rotation settled, no PC1 row yet, fresh unique identity; next is E1."
+    },
+    {
+      "path": "fixtures/rejection/r01-terminal-ca-reused.json",
+      "codes": [
+        "AR-TERMINAL-REUSE"
+      ],
+      "why": "New CA certificate is the expired CA."
+    },
+    {
+      "path": "fixtures/rejection/r02-terminal-key-reissued.json",
+      "codes": [
+        "AR-TERMINAL-REUSE"
+      ],
+      "why": "New CA re-uses the expired CA key (same-CA renewal in disguise)."
+    },
+    {
+      "path": "fixtures/rejection/r03-terminal-subject-reused.json",
+      "codes": [
+        "AR-TERMINAL-REUSE"
+      ],
+      "why": "New CA subject equals the expired CA subject."
+    },
+    {
+      "path": "fixtures/rejection/r04-terminal-in-anchor-bundle.json",
+      "codes": [
+        "AR-TERMINAL-ANCHOR"
+      ],
+      "why": "Expired CA kept as a trust anchor."
+    },
+    {
+      "path": "fixtures/rejection/r05-cross-signed-by-terminal.json",
+      "codes": [
+        "AR-SCHEMA"
+      ],
+      "why": "New CA chained to the expired CA."
+    },
+    {
+      "path": "fixtures/rejection/r06-epoch-replaced.json",
+      "codes": [
+        "AR-EPOCH-SPIFFE"
+      ],
+      "why": "A rotation leaf would carry a new epoch."
+    },
+    {
+      "path": "fixtures/rejection/r07-channel-counter-reset.json",
+      "codes": [
+        "AR-CHANNEL-NONMONOTONE"
+      ],
+      "why": "Channel version reset instead of C+1."
+    },
+    {
+      "path": "fixtures/rejection/r08-policy-not-above-floor.json",
+      "codes": [
+        "AR-POLICY-NONMONOTONE"
+      ],
+      "why": "New policy version equals the authenticated floor."
+    },
+    {
+      "path": "fixtures/rejection/r09-pc1-copies-pc4-identity.json",
+      "codes": [
+        "AR-ENROLLMENT-REUSES-IDENTITY",
+        "AR-IDENTITY-COLLISION"
+      ],
+      "why": "PC1 re-uses PC4's NodeID (copied share directory)."
+    },
+    {
+      "path": "fixtures/rejection/r10-pc1-reuses-retired-row.json",
+      "codes": [
+        "AR-ENROLLMENT-REUSES-IDENTITY"
+      ],
+      "why": "PC1 revives a retired/disabled NodeID."
+    },
+    {
+      "path": "fixtures/rejection/r11-pc1-reuses-existing-key.json",
+      "codes": [
+        "AR-ENROLLMENT-REUSES-IDENTITY"
+      ],
+      "why": "PC1 enrolls with a key already bound to another row."
+    },
+    {
+      "path": "fixtures/rejection/r12-rotation-key-changed.json",
+      "codes": [
+        "AR-ROTATION-KEY-CHANGED"
+      ],
+      "why": "Rotation silently swaps the Node key."
+    },
+    {
+      "path": "fixtures/rejection/r13-rotation-of-unknown-identity.json",
+      "codes": [
+        "AR-ROTATION-UNKNOWN-IDENTITY"
+      ],
+      "why": "ROTATION for an identity absent from the DB is an enrollment in disguise."
+    },
+    {
+      "path": "fixtures/rejection/r14-enrollment-counter-nonzero.json",
+      "codes": [
+        "AR-ENROLLMENT-COUNTER"
+      ],
+      "why": "New enrollment does not start from an empty channel."
+    },
+    {
+      "path": "fixtures/rejection/r15-proposed-with-unknown-budget.json",
+      "codes": [
+        "AR-HOLD-REQUIRED"
+      ],
+      "why": "PROPOSED while a budget is unknown; must be HOLD."
+    },
+    {
+      "path": "fixtures/rejection/r16-proposed-with-historical-epoch.json",
+      "codes": [
+        "AR-HOLD-REQUIRED"
+      ],
+      "why": "PROPOSED from a historical epoch, not a DB readback."
+    },
+    {
+      "path": "fixtures/rejection/r17-successor-lead-too-short.json",
+      "codes": [
+        "AR-RENEWAL-BUDGET"
+      ],
+      "why": "Successor CA lead shorter than one leaf lifetime + budgets."
+    },
+    {
+      "path": "fixtures/rejection/r18-seven-day-ca-repeats-failure.json",
+      "codes": [
+        "AR-RENEWAL-BUDGET"
+      ],
+      "why": "Seven-day CA (the Nov 14 failure shape) cannot hold an advance window."
+    },
+    {
+      "path": "fixtures/rejection/r19-leaf-lead-below-budget.json",
+      "codes": [
+        "AR-RENEWAL-BUDGET"
+      ],
+      "why": "Leaf renewal lead below budget + overlap + 660s."
+    },
+    {
+      "path": "fixtures/rejection/r20-terminal-not-yet-expired.json",
+      "codes": [
+        "AR-TERMINAL-NOT-EXPIRED"
+      ],
+      "why": "Old CA still valid: this contract is not the applicable branch."
+    },
+    {
+      "path": "fixtures/rejection/r21-activation-released.json",
+      "codes": [
+        "AR-SCHEMA"
+      ],
+      "why": "A proposal document cannot carry an operating release."
+    },
+    {
+      "path": "fixtures/rejection/r22-private-material-embedded.json",
+      "codes": [
+        "AR-SECRET-MATERIAL"
+      ],
+      "why": "Private key material embedded in the plan."
+    },
+    {
+      "path": "fixtures/rejection/r23-resume-over-undone-cas.json",
+      "codes": [
+        "AR-RECOVERY-MISMATCH"
+      ],
+      "why": "Declares RESUME where readback proves a foreign writer."
+    },
+    {
+      "path": "fixtures/rejection/r24-enrollment-mixed-into-rotation.json",
+      "codes": [
+        "AR-RECOVERY-MISMATCH"
+      ],
+      "why": "Declares RESUME although PC1 was admitted before rotation settled."
+    },
+    {
+      "path": "fixtures/rejection/r25-resume-over-floor-reset.json",
+      "codes": [
+        "AR-RECOVERY-MISMATCH"
+      ],
+      "why": "Declares RESUME although PC3's floor went below its preserved value."
+    },
+    {
+      "path": "fixtures/rejection/r26-checkpoint-skips-phase.json",
+      "codes": [
+        "AR-CHECKPOINT-ORDER"
+      ],
+      "why": "In-flight phase skips A3."
+    },
+    {
+      "path": "fixtures/rejection/r27-rollback-to-terminal.json",
+      "codes": [
+        "AR-SCHEMA"
+      ],
+      "why": "Rollback to the expired authority is not a representable action."
+    },
+    {
+      "path": "fixtures/rejection/r28-shared-planned-leaf.json",
+      "codes": [
+        "AR-PLANNED-LEAF-REUSE"
+      ],
+      "why": "Two members planned onto one leaf certificate."
+    },
+    {
+      "path": "fixtures/rejection/r29-hold-plan-already-mutating.json",
+      "codes": [
+        "AR-CHECKPOINT-ORDER"
+      ],
+      "why": "A HOLD plan (unknown inputs) claims new trust was already created."
+    },
+    {
+      "path": "fixtures/rejection/r30-pc1-first-policy-skips-version.json",
+      "codes": [
+        "AR-ENROLLMENT-COUNTER"
+      ],
+      "why": "PC1 first enrollment must start at P=1, not skip ahead."
+    }
+  ],
+  "handoffs": [
+    {
+      "path": "handoff/pc1-first-enrollment-handoff.json",
+      "sourcePlan": "fixtures/positive/p05-complete.json",
+      "hosts": {
+        "PC1": "host-pc1",
+        "PC2": "host-pc2",
+        "PC3": "host-pc3",
+        "PC4": "host-pc4"
+      },
+      "controlPlaneHostId": "host-cp",
+      "why": "PC1 first-enrollment operator handoff: new identity, public CA evidence, five-node inventory."
+    }
+  ]
+}
