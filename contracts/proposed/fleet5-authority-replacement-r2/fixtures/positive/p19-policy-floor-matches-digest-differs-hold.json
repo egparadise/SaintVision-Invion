@@ -51,6 +51,7 @@
  "trustTransition": {
   "cutover": "TERMINAL_SINGLETON",
   "overlap": null,
+  "overlapRuntimeEvidenceRef": null,
   "quiesceEvidenceRef": null,
   "targetGeneration": 2,
   "stagedAnchorBundle": [
@@ -334,7 +335,7 @@
  },
  "operationManifest": {
   "planDigest": "587eca09e5b90917796729a956f0afee28ff3df0d642824395440d9b60065b37",
-  "digest": "2e959d83f7fb535532dda4f4d33496a799d5ee5d2c2c0b4a045a6aac2c29f4a4",
+  "digest": "865243a79ff8ab6951c4682e5463de2800be685277bd6251e394235d576761a5",
   "operationCount": 26
  },
  "checkpoint": {
@@ -353,7 +354,7 @@
     "holderPlanDigest": "587eca09e5b90917796729a956f0afee28ff3df0d642824395440d9b60065b37",
     "readAt": "2026-11-18T13:59:30Z"
    },
-   "journalManifestDigest": "2e959d83f7fb535532dda4f4d33496a799d5ee5d2c2c0b4a045a6aac2c29f4a4",
+   "journalManifestDigest": "865243a79ff8ab6951c4682e5463de2800be685277bd6251e394235d576761a5",
    "ceremonyLog": {
     "caKeysCreated": 1,
     "signed": [
@@ -390,6 +391,7 @@
      ],
      "policyFloor": 2,
      "installedPolicyDigest": "1edf078d8b0045b3bf7b57394e36c486b4a5cff7cc3264b5821c3a03f279de8b",
+     "installedPolicyNotAfter": "2026-11-20T06:00:00Z",
      "policyJournalOpIDs": [],
      "installedLeafSHA256": "b2ed795a6a875d095c59ebfff631c3511d10e189448c2fcb3eee0d510e9d5cc0",
      "stagedAnchorDigest": "74ff0c7aad69a27e5a334d1d78cde59e29375b8a6ee3c33fe26aee72d6103f81",
@@ -407,6 +409,7 @@
      ],
      "policyFloor": 2,
      "installedPolicyDigest": "337643bf0099b8574d42461802cc808ca4fde84ad1117be1e5c7281256734921",
+     "installedPolicyNotAfter": "2026-11-20T06:00:00Z",
      "policyJournalOpIDs": [],
      "installedLeafSHA256": "1d4f0a321a46a39bdda5c5b6e35591542783ed425b646821cb8163512561cf93",
      "stagedAnchorDigest": "74ff0c7aad69a27e5a334d1d78cde59e29375b8a6ee3c33fe26aee72d6103f81",
@@ -424,6 +427,7 @@
      ],
      "policyFloor": 6,
      "installedPolicyDigest": "956789119c427091f9ec31f4a70ce293a3f6e42a189a764ca6e5cefbf4f73220",
+     "installedPolicyNotAfter": "2026-11-20T06:00:00Z",
      "policyJournalOpIDs": [
       "op_2be8369a8c5013e452630c9c"
      ],

@@ -54,6 +54,7 @@
    "startsAt": "2026-11-18T12:00:00Z",
    "mustEndBy": "2026-11-19T06:00:00Z"
   },
+  "overlapRuntimeEvidenceRef": "fixture:runtime/dual-anchor-reload-retire-interrupt",
   "quiesceEvidenceRef": null,
   "targetGeneration": 2,
   "stagedAnchorBundle": [
@@ -298,7 +299,7 @@
  },
  "operationManifest": {
   "planDigest": "52b24930cd3807104059fb59add10a01ddad3d3a4744eb05d7085d9a92759621",
-  "digest": "dacbb943ce445973eb59c01b41db41ac92a6aab6c14fbc79be494c2e865932e3",
+  "digest": "d8cdd9e54ddd4f7fdadca517c6a81e5bdd06c26bdce5feb8c8690c77a93a55e6",
   "operationCount": 30
  },
  "checkpoint": {
@@ -317,7 +318,7 @@
     "holderPlanDigest": "52b24930cd3807104059fb59add10a01ddad3d3a4744eb05d7085d9a92759621",
     "readAt": "2026-11-18T13:59:30Z"
    },
-   "journalManifestDigest": "dacbb943ce445973eb59c01b41db41ac92a6aab6c14fbc79be494c2e865932e3",
+   "journalManifestDigest": "d8cdd9e54ddd4f7fdadca517c6a81e5bdd06c26bdce5feb8c8690c77a93a55e6",
    "ceremonyLog": {
     "caKeysCreated": 1,
     "signed": [
@@ -350,6 +351,7 @@
      ],
      "policyFloor": 2,
      "installedPolicyDigest": "1edf078d8b0045b3bf7b57394e36c486b4a5cff7cc3264b5821c3a03f279de8b",
+     "installedPolicyNotAfter": "2026-11-20T06:00:00Z",
      "policyJournalOpIDs": [],
      "installedLeafSHA256": "b2ed795a6a875d095c59ebfff631c3511d10e189448c2fcb3eee0d510e9d5cc0",
      "stagedAnchorDigest": "0d14081ed3f47d66946130702cab06dac1f5c7481b870f52ac7989955daa6ee2",
@@ -365,6 +367,7 @@
      "channelAuditOpIDs": [],
      "policyFloor": 2,
      "installedPolicyDigest": "337643bf0099b8574d42461802cc808ca4fde84ad1117be1e5c7281256734921",
+     "installedPolicyNotAfter": "2026-11-20T06:00:00Z",
      "policyJournalOpIDs": [],
      "installedLeafSHA256": "1d4f0a321a46a39bdda5c5b6e35591542783ed425b646821cb8163512561cf93",
      "stagedAnchorDigest": "0d14081ed3f47d66946130702cab06dac1f5c7481b870f52ac7989955daa6ee2",
@@ -380,6 +383,7 @@
      "channelAuditOpIDs": [],
      "policyFloor": 5,
      "installedPolicyDigest": "99adecec28daf1e212bc95b5b7ccf6fbf4b9f41d27a56ff7ea22ca4d5a75035a",
+     "installedPolicyNotAfter": "2026-11-20T06:00:00Z",
      "policyJournalOpIDs": [],
      "installedLeafSHA256": "6dc786f0238020f69e7328b35e27b2bf79645a4125162f77ab46f9c39669a98e",
      "stagedAnchorDigest": "0d14081ed3f47d66946130702cab06dac1f5c7481b870f52ac7989955daa6ee2",

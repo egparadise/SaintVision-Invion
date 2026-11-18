@@ -413,7 +413,8 @@ def expected_manifest(doc: dict) -> dict | None:
         c = m["counters"]
         op("A5_POLICY_PUBLISHED", "POLICY_PUBLISH", m["nodeID"],
            {"policyFloor": c["policyFloorBefore"], "installedPolicyDigest": m["priorPolicyDigest"]},
-           {"policyFloor": c["policyVersionAfter"], "installedPolicyDigest": m["plannedPolicy"]["digest"]})
+           {"policyFloor": c["policyVersionAfter"], "installedPolicyDigest": m["plannedPolicy"]["digest"],
+            "installedPolicyNotAfter": m["plannedPolicy"]["notAfter"]})
     for p in cp["processInventory"]:
         op("A6_CP_CONTEXT_SWITCH", "CP_CONTEXT_SWITCH", p["processID"],
            {"clientLeafSHA256": prior_leaf_sha(cp), "loadedAnchorDigest": prior_d},
@@ -443,7 +444,8 @@ def expected_manifest(doc: dict) -> dict | None:
            endpoint=m["endpoint"])
         op("E4_ENROLLMENT_POLICY_PUBLISHED", "POLICY_PUBLISH", m["nodeID"],
            {"policyFloor": 0, "installedPolicyDigest": None},
-           {"policyFloor": 1, "installedPolicyDigest": m["plannedPolicy"]["digest"]})
+           {"policyFloor": 1, "installedPolicyDigest": m["plannedPolicy"]["digest"],
+            "installedPolicyNotAfter": m["plannedPolicy"]["notAfter"]})
         op("E5_ENROLLMENT_SETTLED", "SETTLE", m["nodeID"], {},
            {"peerLeafSHA256": m["plannedLeafSHA256"], "anchorDigest": final_d,
             "policyDigest": m["plannedPolicy"]["digest"]})
@@ -483,6 +485,8 @@ def _nulls(doc: dict) -> list[str]:
     tt = doc["trustTransition"]
     if tt["cutover"] == "DUAL_ANCHOR_OVERLAP" and tt["overlap"] is None:
         missing.append("trustTransition.overlap")
+    if tt["cutover"] == "DUAL_ANCHOR_OVERLAP" and tt["overlapRuntimeEvidenceRef"] is None:
+        missing.append("trustTransition.overlapRuntimeEvidenceRef")  # reload, retirement, timing, interruption
     if tt["cutover"] == "QUIESCED" and tt["quiesceEvidenceRef"] is None:
         missing.append("trustTransition.quiesceEvidenceRef")
     missing += [f"advanceRenewal.{k}" for k, v in doc["advanceRenewal"].items() if v is None]
@@ -581,6 +585,8 @@ def _authority_errors(doc: dict) -> list[str]:
             errors.add("AR-MODE")
         if tt["cutover"] != "TERMINAL_SINGLETON" or tt["overlap"] is not None:
             errors.add("AR-MODE")
+        if tt["overlapRuntimeEvidenceRef"] is not None:
+            errors.add("AR-MODE")
         if _ts(prior["notAfter"]) > observed:
             errors.add("AR-TERMINAL-NOT-EXPIRED")
     else:
@@ -592,7 +598,7 @@ def _authority_errors(doc: dict) -> list[str]:
         lead = r["caSuccessorLeadSeconds"]
         if remaining <= 0 or (lead is not None and remaining < lead):
             errors.add("AR-ADVANCE-WINDOW")  # expired or started too late: not an advance renewal
-        if tt["cutover"] == "QUIESCED" and tt["overlap"] is not None:
+        if tt["cutover"] == "QUIESCED" and (tt["overlap"] is not None or tt["overlapRuntimeEvidenceRef"] is not None):
             errors.add("AR-MODE")
         overlap = tt["overlap"]
         if tt["cutover"] == "DUAL_ANCHOR_OVERLAP" and overlap is not None:
@@ -955,7 +961,8 @@ def op_state(doc: dict, op: dict, ctx: _Context | None = None) -> str:
             return ABOVE_PLAN
         if floor == pre["policyFloor"] and installed == pre["installedPolicyDigest"] and journal == 0:
             return PENDING
-        if floor == post["policyFloor"] and installed == post["installedPolicyDigest"] and journal == 1:
+        if (floor == post["policyFloor"] and installed == post["installedPolicyDigest"] and journal == 1
+                and row["installedPolicyNotAfter"] == post["installedPolicyNotAfter"]):
             return COMMITTED
         return CONFLICT
     if kind in ("CP_CONTEXT_SWITCH", "CP_ANCHOR_RETIRE"):
@@ -1042,7 +1049,8 @@ def deadline_insufficient(doc: dict, resume_phase: str) -> bool:
         return True
     for m in doc["members"]:
         p = m["plannedPolicy"]
-        if p is not None and (_ts(p["notAfter"]) - end).total_seconds() < r["policyRenewalLeadSeconds"]:
+        if p is not None and (at < _ts(p["notBefore"])  # relied upon from publication, which may be now
+                              or (_ts(p["notAfter"]) - end).total_seconds() < r["policyRenewalLeadSeconds"]):
             return True
     if doc["mode"] == "ADVANCE_RENEWAL" and INDEX[resume_phase] <= A7:
         if end > _ts(doc["priorAuthority"]["notAfter"]):
@@ -1050,7 +1058,40 @@ def deadline_insufficient(doc: dict, resume_phase: str) -> bool:
         overlap = doc["trustTransition"]["overlap"]
         if dual(doc) and overlap is not None and end > _ts(overlap["mustEndBy"]):
             return True
+        # Still-serving prior leaves (Nodes and the CP client) must outlive the remaining work.
+        for holder in [m for m in doc["members"] if m["kind"] == "ROTATION"] + [doc["controlPlaneClient"]]:
+            cert = load_certificate(holder["priorLeafDER"])
+            if cert is None or end > cert.not_valid_after_utc:
+                return True
+        # The installed prior policy, known only by digest in the plan, is judged on its validity readback.
+        rows = {row["nodeID"]: row for row in doc["checkpoint"]["readback"]["members"]}
+        for m in _on_prior_policy(doc, rows, resume_phase):
+            value = rows[m["nodeID"]]["installedPolicyNotAfter"]
+            if value is None or end > _ts(value):
+                return True
     return False
+
+
+def _on_prior_policy(doc: dict, rows: dict, resume_phase: str) -> list[dict]:
+    """ADVANCE_RENEWAL rotation members still relying on their installed prior policy."""
+    if doc["mode"] != "ADVANCE_RENEWAL" or INDEX[resume_phase] > INDEX["A5_POLICY_PUBLISHED"]:
+        return []
+    return [m for m in doc["members"] if m["kind"] == "ROTATION" and m["nodeID"] in rows
+            and rows[m["nodeID"]]["installedPolicyDigest"] == m["priorPolicyDigest"]]
+
+
+def validity_lapsed(doc: dict, at: datetime) -> bool:
+    """True when a credential or policy the settled cohort relies on is outside its validity at ``at``:
+    not yet valid, or within the safety + skew margin of its end (the new CA, every leaf, every policy)."""
+    r = doc["advanceRenewal"]
+    margin = timedelta(seconds=r["safetySeconds"] + r["clockSkewSeconds"])
+    new = doc["newAuthority"]
+    windows = [(new["notBefore"], new["notAfter"]),
+               (new["leafValidity"]["notBefore"], new["leafValidity"]["notAfter"])]
+    for m in doc["members"]:
+        p = m["plannedPolicy"] or {"notBefore": None, "notAfter": None}
+        windows.append((p["notBefore"], p["notAfter"]))
+    return any(nb is None or na is None or at < _ts(nb) or at + margin >= _ts(na) for nb, na in windows)
 
 
 def fence_held(doc: dict) -> bool:
@@ -1180,8 +1221,13 @@ def recovery_action(doc: dict) -> tuple[str, str | None, list[str], list[str]]:
             return hold, None, *none
         if position in ("flight", "next"):
             (apply if state == PENDING else ack).append(op["opID"])
-    if resume is None:
-        return "COMPLETE", None, *none
+    if resume is None:  # settled: judge validity at the final observation, never from the journal alone
+        return ("HOLD_VALIDITY_LAPSED" if validity_lapsed(doc, ctx.at) else "COMPLETE"), None, *none
+    if any(not ctx.fresh(ctx.rows[m["nodeID"]]["nodeObservedAt"], ctx.rows[m["nodeID"]]["nodeReceivedAt"],
+                         ctx.rows[m["nodeID"]]["nodeChallengeNonce"])
+           or ctx.rows[m["nodeID"]]["installedPolicyNotAfter"] is None
+           for m in _on_prior_policy(doc, ctx.rows, resume)):
+        return "HOLD_SERVING_EVIDENCE_INCOMPLETE", None, *none  # a dependency in use without validity readback
     if deadline_insufficient(doc, resume):
         return "HOLD_DEADLINE_INSUFFICIENT", None, *none
     return "RESUME_FORWARD", resume, apply, ack
@@ -1211,7 +1257,8 @@ def apply_op(doc: dict, op: dict) -> bool:
         row.update(channelVersion=post["channelVersion"], channelCertificateSHA256=post["channelCertificateSHA256"])
         row["channelAuditOpIDs"] = row["channelAuditOpIDs"] + [op["opID"]]
     elif kind == "POLICY_PUBLISH":
-        row.update(policyFloor=post["policyFloor"], installedPolicyDigest=post["installedPolicyDigest"], **stamp)
+        row.update(policyFloor=post["policyFloor"], installedPolicyDigest=post["installedPolicyDigest"],
+                   installedPolicyNotAfter=post["installedPolicyNotAfter"], **stamp)
         row["policyJournalOpIDs"] = row["policyJournalOpIDs"] + [op["opID"]]
     elif kind in ("CP_CONTEXT_SWITCH", "CP_ANCHOR_RETIRE"):
         proc = next(p for p in rb["serving"]["processes"] if p["processID"] == target)
@@ -1227,7 +1274,8 @@ def apply_op(doc: dict, op: dict) -> bool:
         rb["members"].append({
             "nodeID": target, "reservationDigest": post["reservationDigest"],
             "channelVersion": 0, "channelCertificateSHA256": None, "channelAuditOpIDs": [],
-            "policyFloor": 0, "installedPolicyDigest": None, "policyJournalOpIDs": [],
+            "policyFloor": 0, "installedPolicyDigest": None, "installedPolicyNotAfter": None,
+            "policyJournalOpIDs": [],
             "installedLeafSHA256": member["plannedLeafSHA256"],
             "stagedAnchorDigest": anchor_digest(doc["trustTransition"]["finalAnchorBundle"]), **stamp})
     elif kind == "SETTLE":
@@ -1353,10 +1401,11 @@ VERIFIER = "tools/five_node_lab_preflight.py"
 
 
 def enrollment_handoff(doc: dict, source_rel: str, source_bytes: bytes, *, hosts: dict[str, str],
-                       control_plane_host: str) -> dict:
+                       control_plane_host: str, at: str | None = None) -> dict:
     """Operator handoff after a settled enrollment (R2: scoped as four-member migration evidence).
 
-    Refuses unless the plan is internally consistent and recovery_action is COMPLETE.
+    Refuses unless the plan is internally consistent, recovery_action is COMPLETE, and every credential
+    and policy is still valid at the handoff time ``at`` (default: the settled observation, resumeAt).
     """
     from tools.five_node_lab_preflight import (
         FIVE_NODE_INVENTORY_SCHEMA_VERSION,
@@ -1370,6 +1419,15 @@ def enrollment_handoff(doc: dict, source_rel: str, source_bytes: bytes, *, hosts
         raise ValueError(f"plan rejected: {codes}")
     if recovery_action(doc)[0] != "COMPLETE":
         raise ValueError("handoff requires a COMPLETE (settled) plan")
+    settled = _ts(doc["checkpoint"]["resumeAt"])
+    when = settled if at is None else _ts(at)
+    if when < settled:
+        raise ValueError("a handoff cannot predate the settled observation")
+    if validity_lapsed(doc, when):
+        raise ValueError("a credential or policy is outside its validity at handoff time")
+    r = doc["advanceRenewal"]
+    lv = doc["newAuthority"]["leafValidity"]
+    policy_end = min(_ts(m["plannedPolicy"]["notAfter"]) for m in doc["members"])
     enrolled = [m for m in doc["members"] if m["kind"] == "NEW_ENROLLMENT"]
     if len(enrolled) != 1:
         raise ValueError("handoff covers exactly one new enrollment")
@@ -1433,6 +1491,14 @@ def enrollment_handoff(doc: dict, source_rel: str, source_bytes: bytes, *, hosts
             "trustDecisionRef": new["trustAuthorization"]["decisionRef"],
             "excludedPriorCACertificateSHA256": doc["priorAuthority"]["caCertificateSHA256"],
             "operationManifestDigest": doc["operationManifest"]["digest"],
+        },
+        "validity": {
+            "evaluatedAt": _iso(when),
+            "validUntil": _iso(min(_ts(new["notAfter"]), _ts(lv["notAfter"]), policy_end)),
+            "renewalDueBy": _iso(min(_ts(new["notAfter"]) - timedelta(seconds=r["caWarningLeadSeconds"]),
+                                     _ts(lv["notAfter"]) - timedelta(seconds=r["leafRenewalLeadSeconds"]),
+                                     policy_end - timedelta(seconds=r["policyRenewalLeadSeconds"]))),
+            "consumer": "re-check validity at use; this handoff proves validity only at evaluatedAt",
         },
         "verifier": {
             "tool": VERIFIER,

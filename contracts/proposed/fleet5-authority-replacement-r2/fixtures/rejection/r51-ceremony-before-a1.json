@@ -51,6 +51,7 @@
  "trustTransition": {
   "cutover": "TERMINAL_SINGLETON",
   "overlap": null,
+  "overlapRuntimeEvidenceRef": null,
   "quiesceEvidenceRef": null,
   "targetGeneration": 2,
   "stagedAnchorBundle": [
@@ -334,7 +335,7 @@
  },
  "operationManifest": {
   "planDigest": "43c6e5b6099e831b57dc3144ad4993d6887b1ea1ae03260964a277d28efa2384",
-  "digest": "7d3ac73f8155d42bd0f2bef09ce1a27419f9231824615b8f5b12a35cd39c4669",
+  "digest": "325da67bf702984a8f94e5b31a0427f783bc10eef7b0804704925508d72d0788",
   "operationCount": 26
  },
  "checkpoint": {

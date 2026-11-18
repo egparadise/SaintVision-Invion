@@ -51,6 +51,7 @@
  "trustTransition": {
   "cutover": "TERMINAL_SINGLETON",
   "overlap": null,
+  "overlapRuntimeEvidenceRef": null,
   "quiesceEvidenceRef": null,
   "targetGeneration": 2,
   "stagedAnchorBundle": [
@@ -334,7 +335,7 @@
  },
  "operationManifest": {
   "planDigest": "2698a35310898fcd8d888d83506886a98d43c5f99af14ebdf984d66050cca3b5",
-  "digest": "3f25ce223653f7c7fb510eb1f7337ddc23e420c1f5b053379c04118b39ab4fac",
+  "digest": "ce1f18bfb22c174ccd223f3b533c153ba921793aab6e31d3b895b25f1f699935",
   "operationCount": 26
  },
  "checkpoint": {
@@ -353,7 +354,7 @@
     "holderPlanDigest": "2698a35310898fcd8d888d83506886a98d43c5f99af14ebdf984d66050cca3b5",
     "readAt": "2026-11-18T13:59:30Z"
    },
-   "journalManifestDigest": "3f25ce223653f7c7fb510eb1f7337ddc23e420c1f5b053379c04118b39ab4fac",
+   "journalManifestDigest": "ce1f18bfb22c174ccd223f3b533c153ba921793aab6e31d3b895b25f1f699935",
    "ceremonyLog": {
     "caKeysCreated": 1,
     "signed": [
@@ -390,6 +391,7 @@
      ],
      "policyFloor": 3,
      "installedPolicyDigest": "daf7b6e6ed57ba4aa57e48d8f77d2caa70c5ea189a6a7b3e2b135f85faa607aa",
+     "installedPolicyNotAfter": "2026-11-20T12:00:00Z",
      "policyJournalOpIDs": [
       "op_dc01af2fdb61146c393eab1b"
      ],
@@ -409,6 +411,7 @@
      ],
      "policyFloor": 3,
      "installedPolicyDigest": "8e07717072508d38b6584add0a646319161703d32da500a50e5fe30c6d3191a7",
+     "installedPolicyNotAfter": "2026-11-20T12:00:00Z",
      "policyJournalOpIDs": [
       "op_0077d0ee25e831be29fd7766"
      ],
@@ -428,6 +431,7 @@
      ],
      "policyFloor": 6,
      "installedPolicyDigest": "e5cdcc28582ec6360eb3b89a24055fd70453af47cbc5f77c3a3e4906aaf72ec0",
+     "installedPolicyNotAfter": "2026-11-20T12:00:00Z",
      "policyJournalOpIDs": [
       "op_3e4aef58db34ec8d13a28153"
      ],
@@ -445,6 +449,7 @@
      "channelAuditOpIDs": [],
      "policyFloor": 0,
      "installedPolicyDigest": null,
+     "installedPolicyNotAfter": null,
      "policyJournalOpIDs": [],
      "installedLeafSHA256": "3be50dc4c06ddbfe7ce6dda36bb8d12ea0d37b1c7c8b766b3ac5157ede7694d6",
      "stagedAnchorDigest": "74ff0c7aad69a27e5a334d1d78cde59e29375b8a6ee3c33fe26aee72d6103f81",

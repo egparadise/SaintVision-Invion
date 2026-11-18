@@ -157,6 +157,7 @@ INVENTORY = [
 ]
 NONCE = "fixture-challenge-0001"
 FENCE_GENERATION = 7
+PRIOR_POLICY_NOT_AFTER = "2026-11-20T06:00:00Z"  # readback validity of each installed prior policy
 FRESHNESS, HEARTBEAT, CHALLENGE = 120, 15, 300  # fixture "measured" serving windows (= the contract caps)
 
 
@@ -266,6 +267,8 @@ def proposal(name: str, *, mode: str = "TERMINAL_REPLACEMENT", enroll: bool = Tr
             "cutover": cutover,
             "overlap": ({"startsAt": "2026-11-18T12:00:00Z", "mustEndBy": "2026-11-19T06:00:00Z"}
                         if cutover == "DUAL_ANCHOR_OVERLAP" else None),
+            "overlapRuntimeEvidenceRef": ("fixture:runtime/dual-anchor-reload-retire-interrupt"
+                                          if cutover == "DUAL_ANCHOR_OVERLAP" else None),
             "quiesceEvidenceRef": "fixture:quiesce/window" if cutover == "QUIESCED" else None,
             "targetGeneration": 2, "stagedAnchorBundle": None, "finalAnchorBundle": None,
         },
@@ -379,6 +382,7 @@ def initial_readback(doc: dict, resume_at: str) -> dict:
              "channelVersion": m["counters"]["channelVersionBefore"],
              "channelCertificateSHA256": checker.prior_leaf_sha(m), "channelAuditOpIDs": [],
              "policyFloor": m["counters"]["policyFloorBefore"], "installedPolicyDigest": m["priorPolicyDigest"],
+             "installedPolicyNotAfter": PRIOR_POLICY_NOT_AFTER,
              "policyJournalOpIDs": [], "installedLeafSHA256": checker.prior_leaf_sha(m),
              "stagedAnchorDigest": prior_d, "nodeObservedAt": observed, "nodeReceivedAt": observed,
              "nodeChallengeNonce": NONCE}
@@ -559,7 +563,7 @@ def positives() -> dict[str, tuple[str, dict]]:
         doc["checkpoint"]["readback"]["members"].append({
             "nodeID": member(doc, "PC1")["nodeID"], "reservationDigest": h("foreign-reservation"),
             "channelVersion": 0, "channelCertificateSHA256": None, "channelAuditOpIDs": [], "policyFloor": 0,
-            "installedPolicyDigest": None, "policyJournalOpIDs": [], "installedLeafSHA256": None,
+            "installedPolicyDigest": None, "installedPolicyNotAfter": None, "policyJournalOpIDs": [], "installedLeafSHA256": None,
             "stagedAnchorDigest": None, "nodeObservedAt": None, "nodeReceivedAt": None, "nodeChallengeNonce": None})
     hold("p17-foreign-row-reservation-hold",
          "F1: a PC1 row exists but was created under another reservation: HOLD, never adopt it.", A["E1"],
@@ -703,6 +707,22 @@ def positives() -> dict[str, tuple[str, dict]]:
          "F3: every answer is recent but the challenge itself was issued beyond its lifetime: HOLD.", A["A3"],
          "HOLD_SERVING_EVIDENCE_INCOMPLETE", mutate=lambda d: d["checkpoint"]["readback"]["serving"].update(
              challengeIssuedAt=_iso(_ts(RESUME) - timedelta(seconds=CHALLENGE + 1))))
+
+    # Review R2 finding 5: validity where it is relied upon, at settlement and after a pause.
+    hold("p46-complete-after-pause-policy-lapsed-hold",
+         "F5: every phase durable and fresh evidence, but observed after the planned policies lapsed: no COMPLETE.",
+         A["A7"], "HOLD_VALIDITY_LAPSED", resume_at="2026-11-20T12:00:00Z", enroll=False)
+
+    def policy_not_yet_valid(doc):
+        for m in doc["members"]:
+            m["plannedPolicy"]["notBefore"] = "2026-11-18T15:00:00Z"
+    hold("p47-policy-not-yet-valid-hold",
+         "F5: A5 would publish policies that are not yet valid at resume time: HOLD.", A["A4"],
+         "HOLD_DEADLINE_INSUFFICIENT", mutate=policy_not_yet_valid)
+    hold("p48-advance-installed-policy-expires-hold",
+         "F5: advance renewal; PC3's installed prior policy (validity readback) lapses before A5 can replace it.",
+         A["A3"], "HOLD_DEADLINE_INSUFFICIENT", flight=A["A4"],
+         mutate=lambda d: row(d, "PC3").update(installedPolicyNotAfter="2026-11-18T14:20:00Z"), **adv)
     return out
 
 
@@ -937,6 +957,15 @@ def rejections() -> dict[str, tuple[str, list[str], dict]]:
     d = prop("r59-serving-window-above-cap"); d["measuredBudgets"]["observationFreshnessSeconds"] = 600
     add("r59-serving-window-above-cap", "F3: a measured freshness window wider than the 120 s contract cap.",
         ["AR-SERVING-WINDOW"], d)
+    d = prop("r60-dual-overlap-without-runtime-evidence", mode="ADVANCE_RENEWAL", enroll=False)
+    d["trustTransition"]["overlapRuntimeEvidenceRef"] = None
+    add("r60-dual-overlap-without-runtime-evidence",
+        "F5: dual-anchor overlap is conditional: without reload/retirement/timing/interruption evidence it is HOLD.",
+        ["AR-HOLD-REQUIRED"], d)
+    d = prop("r61-terminal-with-overlap-runtime-evidence")
+    d["trustTransition"]["overlapRuntimeEvidenceRef"] = "fixture:runtime/dual-anchor-reload-retire-interrupt"
+    add("r61-terminal-with-overlap-runtime-evidence", "F5: a terminal replacement carries no overlap evidence.",
+        ["AR-MODE"], d)
     return out
 
 
@@ -1013,7 +1042,8 @@ def current_instance() -> dict:
                         "custodyEvidenceRef": None},
             "trustAuthorization": {"decisionRef": None, "authorizedBy": None},
         },
-        "trustTransition": {"cutover": "TERMINAL_SINGLETON", "overlap": None, "quiesceEvidenceRef": None,
+        "trustTransition": {"cutover": "TERMINAL_SINGLETON", "overlap": None, "overlapRuntimeEvidenceRef": None,
+                            "quiesceEvidenceRef": None,
                             "targetGeneration": 1, "stagedAnchorBundle": None, "finalAnchorBundle": None},
         "advanceRenewal": {
             "caLifetimeSeconds": 31536000, "caSuccessorLeadSeconds": 2592000, "caWarningLeadSeconds": 3888000,

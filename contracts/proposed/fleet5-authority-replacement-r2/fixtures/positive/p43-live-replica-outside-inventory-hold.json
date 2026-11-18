@@ -51,6 +51,7 @@
  "trustTransition": {
   "cutover": "TERMINAL_SINGLETON",
   "overlap": null,
+  "overlapRuntimeEvidenceRef": null,
   "quiesceEvidenceRef": null,
   "targetGeneration": 2,
   "stagedAnchorBundle": [
@@ -294,7 +295,7 @@
  },
  "operationManifest": {
   "planDigest": "7cfc833182d1b1769029e01e3d5129d4546c970d51e08f94991152f2188c8424",
-  "digest": "949eaa8f4f417ad3ae2020ace161cf86ed7914bff6abdbdbbfb004aa1fd8e679",
+  "digest": "f9db7196a7424c00046db4ddf95789a08d14045bd025ddba11f85211324a475e",
   "operationCount": 21
  },
  "checkpoint": {
@@ -313,7 +314,7 @@
     "holderPlanDigest": "7cfc833182d1b1769029e01e3d5129d4546c970d51e08f94991152f2188c8424",
     "readAt": "2026-11-18T13:59:30Z"
    },
-   "journalManifestDigest": "949eaa8f4f417ad3ae2020ace161cf86ed7914bff6abdbdbbfb004aa1fd8e679",
+   "journalManifestDigest": "f9db7196a7424c00046db4ddf95789a08d14045bd025ddba11f85211324a475e",
    "ceremonyLog": {
     "caKeysCreated": 1,
     "signed": [
@@ -346,6 +347,7 @@
      ],
      "policyFloor": 3,
      "installedPolicyDigest": "daf7b6e6ed57ba4aa57e48d8f77d2caa70c5ea189a6a7b3e2b135f85faa607aa",
+     "installedPolicyNotAfter": "2026-11-20T12:00:00Z",
      "policyJournalOpIDs": [
       "op_c75179f843623c224d80e6ab"
      ],
@@ -365,6 +367,7 @@
      ],
      "policyFloor": 3,
      "installedPolicyDigest": "8e07717072508d38b6584add0a646319161703d32da500a50e5fe30c6d3191a7",
+     "installedPolicyNotAfter": "2026-11-20T12:00:00Z",
      "policyJournalOpIDs": [
       "op_cddb87cf73f3959896ffbeff"
      ],
@@ -384,6 +387,7 @@
      ],
      "policyFloor": 6,
      "installedPolicyDigest": "e5cdcc28582ec6360eb3b89a24055fd70453af47cbc5f77c3a3e4906aaf72ec0",
+     "installedPolicyNotAfter": "2026-11-20T12:00:00Z",
      "policyJournalOpIDs": [
       "op_2aa4e5e31157b9ede5b40e63"
      ],

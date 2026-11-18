@@ -54,6 +54,7 @@
    "startsAt": "2026-11-18T12:00:00Z",
    "mustEndBy": "2026-11-19T06:00:00Z"
   },
+  "overlapRuntimeEvidenceRef": "fixture:runtime/dual-anchor-reload-retire-interrupt",
   "quiesceEvidenceRef": null,
   "targetGeneration": 2,
   "stagedAnchorBundle": null,

@@ -235,6 +235,21 @@
    "why": "F3: every answer is recent but the challenge itself was issued beyond its lifetime: HOLD."
   },
   {
+   "path": "fixtures/positive/p46-complete-after-pause-policy-lapsed-hold.json",
+   "codes": [],
+   "why": "F5: every phase durable and fresh evidence, but observed after the planned policies lapsed: no COMPLETE."
+  },
+  {
+   "path": "fixtures/positive/p47-policy-not-yet-valid-hold.json",
+   "codes": [],
+   "why": "F5: A5 would publish policies that are not yet valid at resume time: HOLD."
+  },
+  {
+   "path": "fixtures/positive/p48-advance-installed-policy-expires-hold.json",
+   "codes": [],
+   "why": "F5: advance renewal; PC3's installed prior policy (validity readback) lapses before A5 can replace it."
+  },
+  {
    "path": "fixtures/rejection/r01-new-ca-is-prior.json",
    "codes": [
     "AR-PRIOR-REUSE"
@@ -651,6 +666,20 @@
     "AR-SERVING-WINDOW"
    ],
    "why": "F3: a measured freshness window wider than the 120 s contract cap."
+  },
+  {
+   "path": "fixtures/rejection/r60-dual-overlap-without-runtime-evidence.json",
+   "codes": [
+    "AR-HOLD-REQUIRED"
+   ],
+   "why": "F5: dual-anchor overlap is conditional: without reload/retirement/timing/interruption evidence it is HOLD."
+  },
+  {
+   "path": "fixtures/rejection/r61-terminal-with-overlap-runtime-evidence.json",
+   "codes": [
+    "AR-MODE"
+   ],
+   "why": "F5: a terminal replacement carries no overlap evidence."
   }
  ],
  "handoffs": [

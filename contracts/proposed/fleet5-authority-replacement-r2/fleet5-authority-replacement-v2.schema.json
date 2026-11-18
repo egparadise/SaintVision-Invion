@@ -106,7 +106,8 @@
     "trustTransition": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["cutover", "overlap", "quiesceEvidenceRef", "targetGeneration", "stagedAnchorBundle", "finalAnchorBundle"],
+      "required": ["cutover", "overlap", "overlapRuntimeEvidenceRef", "quiesceEvidenceRef", "targetGeneration",
+                   "stagedAnchorBundle", "finalAnchorBundle"],
       "properties": {
         "cutover": {"enum": ["TERMINAL_SINGLETON", "DUAL_ANCHOR_OVERLAP", "QUIESCED"]},
         "overlap": {
@@ -124,7 +125,8 @@
             }
           ]
         },
-        "quiesceEvidenceRef": {"type": ["string", "null"], "maxLength": 300},
+        "overlapRuntimeEvidenceRef": {"description": "DUAL_ANCHOR_OVERLAP is a conditional design: required (else HOLD) is independently verified runtime evidence of anchor reload, retirement, timing and interruption behaviour. null otherwise.", "type": ["string", "null"], "maxLength": 300},
+        "quiesceEvidenceRef": {"description": "QUIESCED only: its own runtime proof of quiescence.", "type": ["string", "null"], "maxLength": 300},
         "targetGeneration": {"type": "integer", "minimum": 1, "maximum": 9007199254740991},
         "stagedAnchorBundle": {"$ref": "#/$defs/nullableBundle"},
         "finalAnchorBundle": {"$ref": "#/$defs/nullableBundle"}
@@ -432,7 +434,7 @@
       "additionalProperties": false,
       "required": [
         "nodeID", "reservationDigest", "channelVersion", "channelCertificateSHA256", "channelAuditOpIDs",
-        "policyFloor", "installedPolicyDigest", "policyJournalOpIDs", "installedLeafSHA256", "stagedAnchorDigest",
+        "policyFloor", "installedPolicyDigest", "installedPolicyNotAfter", "policyJournalOpIDs", "installedLeafSHA256", "stagedAnchorDigest",
         "nodeObservedAt", "nodeReceivedAt", "nodeChallengeNonce"
       ],
       "properties": {
@@ -443,6 +445,7 @@
         "channelAuditOpIDs": {"type": "array", "maxItems": 16, "items": {"type": "string", "pattern": "^op_[0-9a-f]{24}$"}},
         "policyFloor": {"$ref": "#/$defs/counter"},
         "installedPolicyDigest": {"$ref": "#/$defs/nullableSha256"},
+        "installedPolicyNotAfter": {"description": "Signed-policy validity readback of the installed policy (a dependency in use).", "$ref": "#/$defs/observation"},
         "policyJournalOpIDs": {"type": "array", "maxItems": 16, "items": {"type": "string", "pattern": "^op_[0-9a-f]{24}$"}},
         "installedLeafSHA256": {"$ref": "#/$defs/nullableSha256"},
         "stagedAnchorDigest": {"$ref": "#/$defs/nullableSha256"},
@@ -623,7 +626,7 @@
             "HOLD_ENROLLMENT_BEFORE_ROTATION_SETTLED", "HOLD_UNPLANNED_ROW", "HOLD_WRITER_FENCE",
             "HOLD_MANIFEST_MISMATCH", "HOLD_DUPLICATE_EVIDENCE", "HOLD_ANCHOR_STAGING_UNVERIFIED",
             "HOLD_SERVING_EVIDENCE_INCOMPLETE", "HOLD_DEADLINE_INSUFFICIENT", "HOLD_RESERVATION_MISMATCH",
-            "HOLD_PROCESS_INVENTORY_CHANGED"
+            "HOLD_PROCESS_INVENTORY_CHANGED", "HOLD_VALIDITY_LAPSED"
           ]
         },
         "expectedResumePhase": {"oneOf": [{"$ref": "#/$defs/phase"}, {"type": "null"}]},

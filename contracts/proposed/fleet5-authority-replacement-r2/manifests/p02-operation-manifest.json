@@ -3,7 +3,7 @@
  "sourcePlan": "fixtures/positive/p02-a1-durable-resume-anchor-stage.json",
  "manifest": {
   "planDigest": "46f09c297913b575f94512b20f51e8935f176b92584174e92e125d84891bdedc",
-  "digest": "b1a950baeac43703564e3b4383529dfd829ab1c8ec9118224a229a56b3b8379e",
+  "digest": "adfe1b45bee6148a9b83350ef51b6a1f2470e4691381138f8e554ddcbbe1426c",
   "operations": [
    {
     "opID": "op_05021c48f1db4a99e7a35a2e",
@@ -160,7 +160,8 @@
     },
     "post": {
      "policyFloor": 3,
-     "installedPolicyDigest": "daf7b6e6ed57ba4aa57e48d8f77d2caa70c5ea189a6a7b3e2b135f85faa607aa"
+     "installedPolicyDigest": "daf7b6e6ed57ba4aa57e48d8f77d2caa70c5ea189a6a7b3e2b135f85faa607aa",
+     "installedPolicyNotAfter": "2026-11-20T12:00:00Z"
     }
    },
    {
@@ -177,7 +178,8 @@
     },
     "post": {
      "policyFloor": 3,
-     "installedPolicyDigest": "8e07717072508d38b6584add0a646319161703d32da500a50e5fe30c6d3191a7"
+     "installedPolicyDigest": "8e07717072508d38b6584add0a646319161703d32da500a50e5fe30c6d3191a7",
+     "installedPolicyNotAfter": "2026-11-20T12:00:00Z"
     }
    },
    {
@@ -194,7 +196,8 @@
     },
     "post": {
      "policyFloor": 6,
-     "installedPolicyDigest": "e5cdcc28582ec6360eb3b89a24055fd70453af47cbc5f77c3a3e4906aaf72ec0"
+     "installedPolicyDigest": "e5cdcc28582ec6360eb3b89a24055fd70453af47cbc5f77c3a3e4906aaf72ec0",
+     "installedPolicyNotAfter": "2026-11-20T12:00:00Z"
     }
    },
    {
@@ -412,7 +415,8 @@
     },
     "post": {
      "policyFloor": 1,
-     "installedPolicyDigest": "ff156cbeec328e674bf695595f2ccb2923d45079d6a347443d9c339d2eaa2943"
+     "installedPolicyDigest": "ff156cbeec328e674bf695595f2ccb2923d45079d6a347443d9c339d2eaa2943",
+     "installedPolicyNotAfter": "2026-11-20T12:00:00Z"
     }
    },
    {

@@ -904,6 +904,135 @@ def test_f5_advance_must_start_with_the_successor_lead_remaining(prior_not_after
     assert (checker.evaluate(doc, SCHEMA) == []) is ok
 
 
+# ---------------------------------------------------------------- review R2 finding 5: validity where relied upon
+
+
+POLICY_END = checker._ts("2026-11-20T12:00:00Z")  # every planned policy's notAfter in the fixtures
+MARGIN = timedelta(seconds=660)  # safety 630 s + clock skew 30 s
+
+
+def _settled_at(at) -> dict:
+    return gen.at_state(base("t-settled", enroll=False), A["A7"], resume_at=checker._iso(at))
+
+
+@pytest.mark.parametrize("delta, want", [(-1, "COMPLETE"), (0, "HOLD_VALIDITY_LAPSED")])
+def test_r2f5_complete_is_judged_on_validity_at_the_final_observation(delta, want):
+    """R2 returned COMPLETE from the journal before evaluating credential or policy validity."""
+    doc = _settled_at(POLICY_END - MARGIN + timedelta(seconds=delta))
+    assert action(doc) == want
+
+
+@pytest.mark.parametrize("field, value", [
+    ("newAuthority.notBefore", "2026-11-18T14:00:01Z"),
+    ("newAuthority.notAfter", "2026-11-18T14:11:00Z"),
+    ("newAuthority.leafValidity.notBefore", "2026-11-18T14:00:01Z"),
+    ("newAuthority.leafValidity.notAfter", "2026-11-18T14:11:00Z"),
+    ("PC3.plannedPolicy.notBefore", "2026-11-18T14:00:01Z"),
+    ("PC3.plannedPolicy.notAfter", "2026-11-18T14:11:00Z"),
+])
+def test_r2f5_each_settled_dependency_is_checked_independently(field, value):
+    doc = _settled_at(_AT)
+    assert checker.validity_lapsed(doc, _AT) is False
+    head, *path, last = field.split(".")
+    target = gen.member(doc, head) if head.startswith("PC") else doc[head]
+    for part in path:
+        target = target[part]
+    target[last] = value
+    assert checker.validity_lapsed(doc, _AT) is True
+
+
+def test_r2f5_a_policy_must_be_valid_when_it_is_published():
+    """R2 checked policy end times only."""
+    doc = state(A["A4"])
+    assert checker.deadline_insufficient(doc, A["A5"]) is False
+    gen.member(doc, "PC4")["plannedPolicy"]["notBefore"] = "2026-11-18T14:00:01Z"
+    assert checker.deadline_insufficient(doc, A["A5"]) is True
+    assert action(doc) == "HOLD_DEADLINE_INSUFFICIENT"
+
+
+def test_r2f5_handoff_rechecks_validity_at_handoff_time():
+    raw = (checker.CONTRACT_DIR / gen.HANDOFF_SOURCE).read_bytes()
+    doc = json.loads(raw)
+    kw = {"hosts": gen.HANDOFF_HOSTS, "control_plane_host": gen.HANDOFF_CP_HOST}
+    handoff = checker.enrollment_handoff(doc, gen.HANDOFF_SOURCE, raw, **kw)
+    assert handoff["validity"]["evaluatedAt"] == doc["checkpoint"]["resumeAt"]
+    assert handoff["validity"]["validUntil"] == "2026-11-20T12:00:00Z"
+    late = checker._iso(POLICY_END - MARGIN)  # after a pause: the same settled plan, handed off later
+    with pytest.raises(ValueError, match="validity"):
+        checker.enrollment_handoff(doc, gen.HANDOFF_SOURCE, raw, at=late, **kw)
+    ok = checker._iso(POLICY_END - MARGIN - timedelta(seconds=1))
+    assert checker.enrollment_handoff(doc, gen.HANDOFF_SOURCE, raw, at=ok, **kw)["validity"]["evaluatedAt"] == ok
+    with pytest.raises(ValueError, match="predate"):
+        checker.enrollment_handoff(doc, gen.HANDOFF_SOURCE, raw, at="2026-11-18T13:59:59Z", **kw)
+
+
+def _advance(last=A["A3"], flight=A["A4"], *, prior_leaf_not_after=None, holder="PC4"):
+    doc = gen.proposal("t-adv-dep", **ADV)
+    if prior_leaf_not_after is not None:  # re-issue one still-serving prior leaf with an earlier end
+        (ca_key, ca_cert), world = gen.prior_ca(doc)
+        if holder == "cp":
+            cp = doc["controlPlaneClient"]
+            cp["priorLeafDER"] = gen.b64(gen.der(gen.make_leaf(
+                ca_key, ca_cert, gen.key("cp-client").public_key(), cp["spiffeURI"], None, client=True,
+                not_before=world["leafNotBefore"], not_after=prior_leaf_not_after, label="prior-cp-leaf-short")))
+        else:
+            m = gen.member(doc, holder)
+            m["priorLeafDER"] = gen.b64(gen.der(gen.make_leaf(
+                ca_key, ca_cert, gen.key(f"{holder}-node").public_key(), m["spiffeURI"], m["address"],
+                not_before=world["leafNotBefore"], not_after=prior_leaf_not_after, label="prior-leaf-short")))
+            next(r for r in doc["existingNodeRows"]["rows"] if r["nodeID"] == m["nodeID"])[
+                "channelCertificateSHA256"] = checker.prior_leaf_sha(m)
+        doc = gen.seal(doc)
+    return gen.at_state(gen.a1_durable(gen.ceremony(doc)), last, flight)
+
+
+@pytest.mark.parametrize("holder", ["PC2", "PC4", "cp"])
+def test_r2f5_advance_renewal_budgets_still_serving_prior_leaves(holder):
+    """R2 budgeted the prior CA but not the prior leaves still serving until the rotation settles."""
+    assert action(_advance()) == "RESUME_FORWARD"
+    short = _advance(prior_leaf_not_after="2026-11-18T14:30:00Z", holder=holder)
+    assert checker.evaluate(short, SCHEMA) == ["AR-RECOVERY-MISMATCH"]  # consistent plan, different decision
+    assert action(short) == "HOLD_DEADLINE_INSUFFICIENT"
+
+
+def test_r2f5_advance_renewal_needs_validity_readback_of_the_installed_prior_policy():
+    doc = _advance()
+    gen.row(doc, "PC2")["installedPolicyNotAfter"] = None
+    assert action(doc) == "HOLD_SERVING_EVIDENCE_INCOMPLETE"
+    doc = _advance()
+    gen.row(doc, "PC2")["installedPolicyNotAfter"] = "2026-11-18T14:30:00Z"
+    assert action(doc) == "HOLD_DEADLINE_INSUFFICIENT"
+    doc = _advance()
+    gen.row(doc, "PC2")["nodeChallengeNonce"] = "fixture-challenge-other"  # validity read under no challenge
+    # Never a resume. The staging gate holds the stale row first; the dependency rule repeats it on its own.
+    assert action(doc) == "HOLD_ANCHOR_STAGING_UNVERIFIED"
+
+
+def test_r2f5_a_replaced_prior_policy_is_no_longer_a_dependency():
+    doc = gen.at_state(base("t-adv-after", **ADV), A["A5"])
+    for r in doc["checkpoint"]["readback"]["members"]:
+        assert r["installedPolicyNotAfter"] == "2026-11-20T12:00:00Z"  # the planned policy, read back
+    assert action(doc) == "RESUME_FORWARD"
+
+
+def test_r2f5_a_committed_publication_reads_back_the_planned_policy_validity():
+    doc = state(A["A5"])
+    gen.row(doc, "PC3")["installedPolicyNotAfter"] = "2026-11-21T12:00:00Z"
+    assert action(doc) == "HOLD_FOREIGN_WRITER"
+
+
+@pytest.mark.parametrize("mode, cutover, value, code", [
+    ("ADVANCE_RENEWAL", "DUAL_ANCHOR_OVERLAP", None, "AR-HOLD-REQUIRED"),
+    ("ADVANCE_RENEWAL", "QUIESCED", "fixture:runtime/x", "AR-MODE"),
+    ("TERMINAL_REPLACEMENT", None, "fixture:runtime/x", "AR-MODE"),
+])
+def test_r2f5_dual_overlap_is_conditional_on_independent_runtime_evidence(mode, cutover, value, code):
+    doc = gen.proposal("t-overlap", mode=mode, enroll=False, cutover=cutover)
+    assert checker.evaluate(doc, SCHEMA) == []
+    doc["trustTransition"]["overlapRuntimeEvidenceRef"] = value
+    assert checker.evaluate(doc, SCHEMA) == [code]
+
+
 # ---------------------------------------------------------------- handoff (medium finding 6)
 
 

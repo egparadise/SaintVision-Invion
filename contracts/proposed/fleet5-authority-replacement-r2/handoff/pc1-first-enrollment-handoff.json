@@ -3,7 +3,7 @@
  "fixture": true,
  "activation": "NOT_AUTHORIZED",
  "sourcePlan": "fixtures/positive/p05-complete.json",
- "sourcePlanSHA256": "c3ecc738427a70726adc12ef52e4ce25c0b47279e2c00f05ede92ca4fd7acc28",
+ "sourcePlanSHA256": "4da2f75f50e9897c2ddab3cb93cab199b3f6d2b8126348e466a158bafcc87fdc",
  "acceptance": {
   "scope": "FOUR_MEMBER_MIGRATION",
   "members": [
@@ -41,7 +41,13 @@
   ],
   "trustDecisionRef": "fixture:decision/new-trust",
   "excludedPriorCACertificateSHA256": "8de8c2603c7661b7bbf739ef5d3c4671af4acd66bd30c627a47c9a301301fd37",
-  "operationManifestDigest": "e30c503c2be7fea49f26f8c5d681503b6a0094a0a289a6ba19369d146744c60b"
+  "operationManifestDigest": "8329a82e34c01d2b9e47b489076bd6d99b4a5ff92736aed020b83ed5c8418701"
+ },
+ "validity": {
+  "evaluatedAt": "2026-11-18T14:00:00Z",
+  "validUntil": "2026-11-20T12:00:00Z",
+  "renewalDueBy": "2026-11-19T12:00:00Z",
+  "consumer": "re-check validity at use; this handoff proves validity only at evaluatedAt"
  },
  "verifier": {
   "tool": "tools/five_node_lab_preflight.py",

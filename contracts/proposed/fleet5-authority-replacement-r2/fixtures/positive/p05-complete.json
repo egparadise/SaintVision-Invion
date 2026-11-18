@@ -51,6 +51,7 @@
  "trustTransition": {
   "cutover": "TERMINAL_SINGLETON",
   "overlap": null,
+  "overlapRuntimeEvidenceRef": null,
   "quiesceEvidenceRef": null,
   "targetGeneration": 2,
   "stagedAnchorBundle": [
@@ -334,7 +335,7 @@
  },
  "operationManifest": {
   "planDigest": "f95f72a32f621e347beb9a8ac2e17c206751dd963514d2af80f45caf4b9f3636",
-  "digest": "e30c503c2be7fea49f26f8c5d681503b6a0094a0a289a6ba19369d146744c60b",
+  "digest": "8329a82e34c01d2b9e47b489076bd6d99b4a5ff92736aed020b83ed5c8418701",
   "operationCount": 26
  },
  "checkpoint": {
@@ -353,7 +354,7 @@
     "holderPlanDigest": "f95f72a32f621e347beb9a8ac2e17c206751dd963514d2af80f45caf4b9f3636",
     "readAt": "2026-11-18T13:59:30Z"
    },
-   "journalManifestDigest": "e30c503c2be7fea49f26f8c5d681503b6a0094a0a289a6ba19369d146744c60b",
+   "journalManifestDigest": "8329a82e34c01d2b9e47b489076bd6d99b4a5ff92736aed020b83ed5c8418701",
    "ceremonyLog": {
     "caKeysCreated": 1,
     "signed": [
@@ -390,6 +391,7 @@
      ],
      "policyFloor": 3,
      "installedPolicyDigest": "daf7b6e6ed57ba4aa57e48d8f77d2caa70c5ea189a6a7b3e2b135f85faa607aa",
+     "installedPolicyNotAfter": "2026-11-20T12:00:00Z",
      "policyJournalOpIDs": [
       "op_2503d98edd6dd722e5a49fd0"
      ],
@@ -409,6 +411,7 @@
      ],
      "policyFloor": 3,
      "installedPolicyDigest": "8e07717072508d38b6584add0a646319161703d32da500a50e5fe30c6d3191a7",
+     "installedPolicyNotAfter": "2026-11-20T12:00:00Z",
      "policyJournalOpIDs": [
       "op_e75df2bb91b725336c9c1dca"
      ],
@@ -428,6 +431,7 @@
      ],
      "policyFloor": 6,
      "installedPolicyDigest": "e5cdcc28582ec6360eb3b89a24055fd70453af47cbc5f77c3a3e4906aaf72ec0",
+     "installedPolicyNotAfter": "2026-11-20T12:00:00Z",
      "policyJournalOpIDs": [
       "op_e9cff1b6056d81de1758fffe"
      ],
@@ -447,6 +451,7 @@
      ],
      "policyFloor": 1,
      "installedPolicyDigest": "ff156cbeec328e674bf695595f2ccb2923d45079d6a347443d9c339d2eaa2943",
+     "installedPolicyNotAfter": "2026-11-20T12:00:00Z",
      "policyJournalOpIDs": [
       "op_3bd0adb2cf2e4eba0589c952"
      ],

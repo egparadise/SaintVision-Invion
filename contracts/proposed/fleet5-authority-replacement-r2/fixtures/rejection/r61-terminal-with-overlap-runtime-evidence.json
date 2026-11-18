@@ -1,0 +1,339 @@
+{
+ "schema": "fleet5-authority-replacement-plan:2",
+ "revision": "R2",
+ "planID": "ARP-20261119-r61-terminal-with-overlap-runtime-eviden",
+ "status": "PROPOSED",
+ "activation": "NOT_AUTHORIZED",
+ "fixture": true,
+ "mode": "TERMINAL_REPLACEMENT",
+ "observedAt": "2026-11-18T12:00:00Z",
+ "tenantID": "00000000-0000-4000-8000-0000000000a1",
+ "projectID": "prj_000000000000000000000000P1",
+ "preservedEpoch": {
+  "epoch": "00000000-0000-4000-8000-0000000000e1",
+  "source": "DB_READBACK",
+  "readbackSHA256": "71f6ae4f2bd7bf6f9bb7afafdb95cd09bef91d07af12944203c3c3d9ec04008d"
+ },
+ "priorAuthority": {
+  "certificateDER": "MIIBSDCB+6ADAgECAhAA00KIcFvXV2+A/irT4O7zMAUGAytlcDAjMSEwHwYDVQQDDBhTYWludFZpc2lvbiBMQU4gcGlsb3QgQ0EwHhcNMjYxMTA3MDcxNTMwWhcNMjYxMTE0MDcxNTMwWjAjMSEwHwYDVQQDDBhTYWludFZpc2lvbiBMQU4gcGlsb3QgQ0EwKjAFBgMrZXADIQAhSfDazZkotKAoDckUjbtqsluSpkYXFjzgWSRD7MuhSqNFMEMwEgYDVR0TAQH/BAgwBgEB/wIBADAOBgNVHQ8BAf8EBAMCAQYwHQYDVR0OBBYEFOKEVUTWuIc47Ta/7xq0p+HUfaXrMAUGAytlcANBAHqXk/gQv3cpgEzLXaYJQf7WjYe3ARcMAaU+KWSTqzsavdy98q836oYzXOSdK4AsyFCztLcYm3bW4Kx1kI8Z/A8=",
+  "caCertificateSHA256": "8de8c2603c7661b7bbf739ef5d3c4671af4acd66bd30c627a47c9a301301fd37",
+  "caPublicKeySHA256": "5d7a698295adb2a2ea7bcc24a578ff81c4e7fabf76c593a3e34eec1916d3cc60",
+  "subjectCommonName": "SaintVision LAN pilot CA",
+  "notAfter": "2026-11-14T07:15:30Z",
+  "state": "CA_TERMINAL",
+  "usage": "REFERENCE_ONLY"
+ },
+ "newAuthority": {
+  "certificateDER": null,
+  "caCertificateSHA256": null,
+  "caPublicKeySHA256": null,
+  "subjectCommonName": "SaintVision FLEET5 authority 2026-11 R2",
+  "keyAlgorithm": "Ed25519",
+  "keyGeneratedFresh": true,
+  "crossSignedByPrior": false,
+  "pathLength": 0,
+  "notBefore": "2026-11-18T12:00:00Z",
+  "notAfter": "2027-11-18T12:00:00Z",
+  "leafValidity": {
+   "notBefore": "2026-11-18T12:00:00Z",
+   "notAfter": "2026-11-24T12:00:00Z"
+  },
+  "custody": {
+   "holder": "ROOT_OFFLINE_OPERATOR",
+   "privateMaterialInRepository": false,
+   "custodyEvidenceRef": "fixture:custody/new-ca"
+  },
+  "trustAuthorization": {
+   "decisionRef": "fixture:decision/new-trust",
+   "authorizedBy": "fixture-root-operator"
+  }
+ },
+ "trustTransition": {
+  "cutover": "TERMINAL_SINGLETON",
+  "overlap": null,
+  "overlapRuntimeEvidenceRef": "fixture:runtime/dual-anchor-reload-retire-interrupt",
+  "quiesceEvidenceRef": null,
+  "targetGeneration": 2,
+  "stagedAnchorBundle": null,
+  "finalAnchorBundle": null
+ },
+ "advanceRenewal": {
+  "caLifetimeSeconds": 31536000,
+  "caSuccessorLeadSeconds": 2592000,
+  "caWarningLeadSeconds": 3888000,
+  "leafLifetimeSeconds": 518400,
+  "leafRenewalLeadSeconds": 259200,
+  "policyLifetimeSeconds": 172800,
+  "policyRenewalLeadSeconds": 86400,
+  "overlapSeconds": 14400,
+  "normalBudgetSeconds": 7200,
+  "caSuccessorBudgetSeconds": 86400,
+  "safetySeconds": 630,
+  "clockSkewSeconds": 30
+ },
+ "measuredBudgets": {
+  "source": "MEASURED",
+  "evidenceRef": "fixture:budget/measured",
+  "phaseSeconds": {
+   "A0_PREFLIGHT_READBACK": 600,
+   "A1_NEW_TRUST_AUTHORIZED": 600,
+   "A2_ANCHOR_STAGED": 600,
+   "A3_ROTATION_LEAVES_INSTALLED": 600,
+   "A4_CHANNEL_CAS": 600,
+   "A5_POLICY_PUBLISHED": 600,
+   "A6_CP_CONTEXT_SWITCH": 600,
+   "A7_ROTATION_SETTLED": 600,
+   "E1_ENROLLMENT_RESERVED": 600,
+   "E2_ENROLLMENT_ROW_ADMITTED": 600,
+   "E3_ENROLLMENT_CHANNEL_PROVISIONED": 600,
+   "E4_ENROLLMENT_POLICY_PUBLISHED": 600,
+   "E5_ENROLLMENT_SETTLED": 600
+  },
+  "observationFreshnessSeconds": 120,
+  "heartbeatFreshnessSeconds": 15,
+  "challengeLifetimeSeconds": 300
+ },
+ "servingBinaryMigration": {
+  "status": "REVIEWED",
+  "reviewRef": "fixture:review/node-binary-migration"
+ },
+ "writerFence": {
+  "token": "fence:fixture-arp-r2",
+  "generation": 7
+ },
+ "placement": {
+  "controlPlaneHostPC": "PC3",
+  "excludedPCs": [
+   "PC5"
+  ]
+ },
+ "controlPlaneClient": {
+  "spiffeURI": "spiffe://saintvision.ai/tenant/00000000-0000-4000-8000-0000000000a1/control-plane/epoch/00000000-0000-4000-8000-0000000000e1",
+  "keyContinuity": "RETAINED",
+  "publicKeySHA256": "d21caccb84feb87d083177c58ed041a352c5c7460da9cce20a6020b9ce7a3ed7",
+  "csrDER": "MIGXMEsCAQAwGDEWMBQGA1UEAwwNY29udHJvbC1wbGFuZTAqMAUGAytlcAMhAMn2GZfe/FCT22g9IL9rMiiUH0Kof82ZY2QSap9t3zqooAAwBQYDK2VwA0EAAZwKhYcPp2s+mdHa42f9x13l2cvywsXu5MiEyWkdI+TWJty3nyJMGRFPrTirxVgGJ2mz3xaZVHquJoShglKmDg==",
+  "priorLeafDER": "MIICCDCCAbqgAwIBAgIQAJT2+uWpAXSI8qIQQe0lczAFBgMrZXAwIzEhMB8GA1UEAwwYU2FpbnRWaXNpb24gTEFOIHBpbG90IENBMB4XDTI2MTEwODA3MTUzMFoXDTI2MTExNDA3MTUzMFowJDEiMCAGA1UEAwwZU2FpbnRWaXNpb24gY29udHJvbCBwbGFuZTAqMAUGAytlcAMhAMn2GZfe/FCT22g9IL9rMiiUH0Kof82ZY2QSap9t3zqoo4IBATCB/jAMBgNVHRMBAf8EAjAAMA4GA1UdDwEB/wQEAwIHgDATBgNVHSUEDDAKBggrBgEFBQcDAjAdBgNVHQ4EFgQU938zObnmXXgrDjQ+pttO45UmCIMwHwYDVR0jBBgwFoAU4oRVRNa4hzjtNr/vGrSn4dR9peswgYgGA1UdEQSBgDB+hnxzcGlmZmU6Ly9zYWludHZpc2lvbi5haS90ZW5hbnQvMDAwMDAwMDAtMDAwMC00MDAwLTgwMDAtMDAwMDAwMDAwMGExL2NvbnRyb2wtcGxhbmUvZXBvY2gvMDAwMDAwMDAtMDAwMC00MDAwLTgwMDAtMDAwMDAwMDAwMGUxMAUGAytlcANBAHVzqe23XXKDjtSJPXOcXOLJyjF3gjPvh9L/ftVoHStRgIybsrYci2Rv2AHcBOAmjmr2tznMbTKnvvFm1dLmiAE=",
+  "leafDER": null,
+  "plannedLeafSHA256": null,
+  "contextSites": [
+   "observer_worker",
+   "delivery_worker",
+   "workspace_runtime",
+   "build_product_runtime",
+   "storage_check_collector"
+  ],
+  "processInventory": [
+   {
+    "site": "observer_worker",
+    "processID": "observer-1",
+    "kind": "SERVICE"
+   },
+   {
+    "site": "delivery_worker",
+    "processID": "delivery-1",
+    "kind": "SERVICE"
+   },
+   {
+    "site": "delivery_worker",
+    "processID": "delivery-2",
+    "kind": "SERVICE"
+   },
+   {
+    "site": "workspace_runtime",
+    "processID": "workspace-1",
+    "kind": "SERVICE"
+   },
+   {
+    "site": "build_product_runtime",
+    "processID": "build-product-1",
+    "kind": "SERVICE"
+   },
+   {
+    "site": "storage_check_collector",
+    "processID": "storage-check-cli",
+    "kind": "INVOKED_CLIENT"
+   }
+  ]
+ },
+ "roleKeys": [
+  {
+   "role": "LAUNCH_SIGNER",
+   "publicKeySHA256": "5dd16620e67286898117dc53ec487563c0676c089ede93801aabb7428d49e708",
+   "disposition": "RETAINED",
+   "continuity": {
+    "verifiedBy": "fixture-custody-card",
+    "scope": "LAUNCH_SIGNATURES",
+    "custodyEvidenceRef": "fixture:custody/launch-signer",
+    "compromiseDecision": "AFFIRMED_NOT_COMPROMISED",
+    "decisionRef": "fixture:decision/launch-signer-not-compromised"
+   }
+  }
+ ],
+ "members": [
+  {
+   "pc": "PC2",
+   "kind": "ROTATION",
+   "nodeID": "nod_00000000000000000000000PC2",
+   "account": "saintvision-invion",
+   "address": "10.0.0.2",
+   "endpoint": "https://10.0.0.2:7443",
+   "spiffeURI": "spiffe://saintvision.ai/tenant/00000000-0000-4000-8000-0000000000a1/node/nod_00000000000000000000000PC2/epoch/00000000-0000-4000-8000-0000000000e1",
+   "nodePublicKeySHA256": "2f8957506a888a9dbfb0ae38a1f32750f0c9f8ca9d0ad3cc19d71eaf8147957f",
+   "csrDER": "MIGoMFwCAQAwKTEnMCUGA1UEAwwebm9kXzAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwUEMyMCowBQYDK2VwAyEAO/WpPuikCibXi74OtTlthtVoSOhHddy1+xYyB3zkovmgADAFBgMrZXADQQBZTFimO/iCMtqg7vzq9rHtoBrJBCq+sBceSFKD3+RWppWtHWjpjvah8FKnpzfQFgwrqX/mCtFENQ8bp3SfP40N",
+   "priorLeafDER": "MIICIjCCAdSgAwIBAgIQAPX3WvJLYFbecUL2exSobzAFBgMrZXAwIzEhMB8GA1UEAwwYU2FpbnRWaXNpb24gTEFOIHBpbG90IENBMB4XDTI2MTEwODA3MTUzMFoXDTI2MTExNDA3MTUzMFowHzEdMBsGA1UEAwwUU2FpbnRWaXNpb24gTEFOIHBlZXIwKjAFBgMrZXADIQA79ak+6KQKJteLvg61OW2G1WhI6Ed13LX7FjIHfOSi+aOCASAwggEcMAwGA1UdEwEB/wQCMAAwDgYDVR0PAQH/BAQDAgeAMBMGA1UdJQQMMAoGCCsGAQUFBwMBMB0GA1UdDgQWBBTCHQLlYpNn1XHs77AMTuxy95hGEzAfBgNVHSMEGDAWgBTihFVE1riHOO02v+8atKfh1H2l6zCBpgYDVR0RBIGeMIGbhoGSc3BpZmZlOi8vc2FpbnR2aXNpb24uYWkvdGVuYW50LzAwMDAwMDAwLTAwMDAtNDAwMC04MDAwLTAwMDAwMDAwMDBhMS9ub2RlL25vZF8wMDAwMDAwMDAwMDAwMDAwMDAwMDAwMFBDMi9lcG9jaC8wMDAwMDAwMC0wMDAwLTQwMDAtODAwMC0wMDAwMDAwMDAwZTGHBAoAAAIwBQYDK2VwA0EAZTZAiUNoCYtSuAKP5oMOgIfj2Exmei8YWEEYlfLc/u1K/TEHDjCCsTq7emPhKke5s2YVo/bVk0mVjsxawAuEBQ==",
+   "priorPolicyDigest": "1edf078d8b0045b3bf7b57394e36c486b4a5cff7cc3264b5821c3a03f279de8b",
+   "leafDER": null,
+   "plannedLeafSHA256": null,
+   "plannedPolicy": null,
+   "counters": {
+    "channelVersionBefore": 1,
+    "channelVersionAfter": 2,
+    "policyFloorBefore": 2,
+    "policyVersionAfter": 3
+   },
+   "reservation": null
+  },
+  {
+   "pc": "PC3",
+   "kind": "ROTATION",
+   "nodeID": "nod_00000000000000000000000PC3",
+   "account": "saintvision-invion3",
+   "address": "10.0.0.3",
+   "endpoint": "https://10.0.0.3:7443",
+   "spiffeURI": "spiffe://saintvision.ai/tenant/00000000-0000-4000-8000-0000000000a1/node/nod_00000000000000000000000PC3/epoch/00000000-0000-4000-8000-0000000000e1",
+   "nodePublicKeySHA256": "a8e91140b3625ab665bae18c3c6e42d09a820b9a06d858183cda92731d7ddb1b",
+   "csrDER": "MIGoMFwCAQAwKTEnMCUGA1UEAwwebm9kXzAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwUEMzMCowBQYDK2VwAyEA7bOigsnqf8cSbIOrs0sXpdEpfG3LopaIIofaIVV/PFegADAFBgMrZXADQQD4MUF6CSxGmY3U0YynMS83MJSrLrerelDpZFuWWSlosdenvvc3w2l4DPLRdFSlTacLERkmZL2BxPFv/olLSxUF",
+   "priorLeafDER": "MIICIjCCAdSgAwIBAgIQAPJ7zGyxxTQsBsbdS1d5dzAFBgMrZXAwIzEhMB8GA1UEAwwYU2FpbnRWaXNpb24gTEFOIHBpbG90IENBMB4XDTI2MTEwODA3MTUzMFoXDTI2MTExNDA3MTUzMFowHzEdMBsGA1UEAwwUU2FpbnRWaXNpb24gTEFOIHBlZXIwKjAFBgMrZXADIQDts6KCyep/xxJsg6uzSxel0Sl8bcuilogih9ohVX88V6OCASAwggEcMAwGA1UdEwEB/wQCMAAwDgYDVR0PAQH/BAQDAgeAMBMGA1UdJQQMMAoGCCsGAQUFBwMBMB0GA1UdDgQWBBSZhzcIx2VTvyJVw88X1NCkGSv9IjAfBgNVHSMEGDAWgBTihFVE1riHOO02v+8atKfh1H2l6zCBpgYDVR0RBIGeMIGbhoGSc3BpZmZlOi8vc2FpbnR2aXNpb24uYWkvdGVuYW50LzAwMDAwMDAwLTAwMDAtNDAwMC04MDAwLTAwMDAwMDAwMDBhMS9ub2RlL25vZF8wMDAwMDAwMDAwMDAwMDAwMDAwMDAwMFBDMy9lcG9jaC8wMDAwMDAwMC0wMDAwLTQwMDAtODAwMC0wMDAwMDAwMDAwZTGHBAoAAAMwBQYDK2VwA0EAZQVyvzM0nz1TnFnxF2r9fAb4qPcZvzT83kNmNtOxe2tB+CRzzX0hXDYnOePeO5zH1O4SURgv0tS1qqECgmISDQ==",
+   "priorPolicyDigest": "337643bf0099b8574d42461802cc808ca4fde84ad1117be1e5c7281256734921",
+   "leafDER": null,
+   "plannedLeafSHA256": null,
+   "plannedPolicy": null,
+   "counters": {
+    "channelVersionBefore": 1,
+    "channelVersionAfter": 2,
+    "policyFloorBefore": 2,
+    "policyVersionAfter": 3
+   },
+   "reservation": null
+  },
+  {
+   "pc": "PC4",
+   "kind": "ROTATION",
+   "nodeID": "nod_00000000000000000000000PC4",
+   "account": "inviz",
+   "address": "10.0.0.4",
+   "endpoint": "https://10.0.0.4:7443",
+   "spiffeURI": "spiffe://saintvision.ai/tenant/00000000-0000-4000-8000-0000000000a1/node/nod_00000000000000000000000PC4/epoch/00000000-0000-4000-8000-0000000000e1",
+   "nodePublicKeySHA256": "2282ad95323526e18ee5a9723f386b41277d09ca6ede98e759f7b870c496a362",
+   "csrDER": "MIGoMFwCAQAwKTEnMCUGA1UEAwwebm9kXzAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwUEM0MCowBQYDK2VwAyEAx987/phP+dgpLi5/utPOfQVikvVPlONd14Jlj8fhuz2gADAFBgMrZXADQQC5IHuIvZa5kUTzb0SaUeHMer1xDC83N3d+OAQcCWqyJktw8qL6MWzkQkZjR4wM1jZJbEZKfeKiufRHGFzR3BcF",
+   "priorLeafDER": "MIICITCCAdOgAwIBAgIPEfLQh9Npo0pu2eH6ofF1MAUGAytlcDAjMSEwHwYDVQQDDBhTYWludFZpc2lvbiBMQU4gcGlsb3QgQ0EwHhcNMjYxMTA4MDcxNTMwWhcNMjYxMTE0MDcxNTMwWjAfMR0wGwYDVQQDDBRTYWludFZpc2lvbiBMQU4gcGVlcjAqMAUGAytlcAMhAMffO/6YT/nYKS4uf7rTzn0FYpL1T5TjXdeCZY/H4bs9o4IBIDCCARwwDAYDVR0TAQH/BAIwADAOBgNVHQ8BAf8EBAMCB4AwEwYDVR0lBAwwCgYIKwYBBQUHAwEwHQYDVR0OBBYEFC6qIHlmRs5UrOHX/rURvAgmB8h2MB8GA1UdIwQYMBaAFOKEVUTWuIc47Ta/7xq0p+HUfaXrMIGmBgNVHREEgZ4wgZuGgZJzcGlmZmU6Ly9zYWludHZpc2lvbi5haS90ZW5hbnQvMDAwMDAwMDAtMDAwMC00MDAwLTgwMDAtMDAwMDAwMDAwMGExL25vZGUvbm9kXzAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwUEM0L2Vwb2NoLzAwMDAwMDAwLTAwMDAtNDAwMC04MDAwLTAwMDAwMDAwMDBlMYcECgAABDAFBgMrZXADQQDKlxOP4H3CH4iJ2s1gvShO8yMKPohq9bRUgCLz4uZwejZw9nuorNs6NCJhEtFGEUbRB2YPg7YVsgrSwG2kCxwM",
+   "priorPolicyDigest": "99adecec28daf1e212bc95b5b7ccf6fbf4b9f41d27a56ff7ea22ca4d5a75035a",
+   "leafDER": null,
+   "plannedLeafSHA256": null,
+   "plannedPolicy": null,
+   "counters": {
+    "channelVersionBefore": 3,
+    "channelVersionAfter": 4,
+    "policyFloorBefore": 5,
+    "policyVersionAfter": 6
+   },
+   "reservation": null
+  },
+  {
+   "pc": "PC1",
+   "kind": "NEW_ENROLLMENT",
+   "nodeID": "nod_00000000000000000000000PC1",
+   "account": "inviz",
+   "address": "10.0.0.1",
+   "endpoint": "https://10.0.0.1:7443",
+   "spiffeURI": "spiffe://saintvision.ai/tenant/00000000-0000-4000-8000-0000000000a1/node/nod_00000000000000000000000PC1/epoch/00000000-0000-4000-8000-0000000000e1",
+   "nodePublicKeySHA256": "2bb5160bc0f106fb82a8717426a4fc37ff6afe49cfab7bf6e9ee089d30542520",
+   "csrDER": "MIGoMFwCAQAwKTEnMCUGA1UEAwwebm9kXzAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwUEMxMCowBQYDK2VwAyEAxsyOCvg/uBkNEI0RnpgEUXdHSSv9dKSmLCxL/AE5zeegADAFBgMrZXADQQAo83irwEGD+ESStVIm3F7niu+H+GmavW2XykO2J3rWw/DddBggOsIJGKfchlUEu86oFMVZ6pRIJRcnHItWLwcN",
+   "priorLeafDER": null,
+   "priorPolicyDigest": null,
+   "leafDER": null,
+   "plannedLeafSHA256": null,
+   "plannedPolicy": null,
+   "counters": {
+    "channelVersionBefore": 0,
+    "channelVersionAfter": 1,
+    "policyFloorBefore": 0,
+    "policyVersionAfter": 1
+   },
+   "reservation": {
+    "tenantID": "00000000-0000-4000-8000-0000000000a1",
+    "epoch": "00000000-0000-4000-8000-0000000000e1",
+    "pc": "PC1",
+    "nodeID": "nod_00000000000000000000000PC1",
+    "csrSHA256": "8fb485a6bf8d3c774c04b122a45b811b158f1c1e08146bfc898a306c16d842d7",
+    "planDigest": "fd5c1019969f4eeb2210b7066c3ee358e42d4d17d403da9983fe00dbc1279762",
+    "fenceToken": "fence:fixture-arp-r2",
+    "rowsReadbackSHA256": "5091dd3e3200648bf983c23a869ddc0065590e64bcc4b6b8478804a87c2a7479",
+    "nodeStateEmpty": {
+     "verified": true,
+     "evidenceRef": "fixture:node-state/pc1-empty"
+    }
+   }
+  }
+ ],
+ "existingNodeRows": {
+  "source": "DB_READBACK",
+  "includesRetired": true,
+  "readbackSHA256": "5091dd3e3200648bf983c23a869ddc0065590e64bcc4b6b8478804a87c2a7479",
+  "rows": [
+   {
+    "nodeID": "nod_00000000000000000000000PC2",
+    "status": "ACTIVE",
+    "publicKeySHA256": "2f8957506a888a9dbfb0ae38a1f32750f0c9f8ca9d0ad3cc19d71eaf8147957f",
+    "channelCertificateSHA256": "d9b4399213ff1b48ae1c4412ad70d833c1afb1892b4c6cc716745b35417cb3e2"
+   },
+   {
+    "nodeID": "nod_00000000000000000000000PC3",
+    "status": "ACTIVE",
+    "publicKeySHA256": "a8e91140b3625ab665bae18c3c6e42d09a820b9a06d858183cda92731d7ddb1b",
+    "channelCertificateSHA256": "15ba49ba5caf8c9b54c78e827acaebeb2e66854c4af32201f3b42b5ef0c320b7"
+   },
+   {
+    "nodeID": "nod_00000000000000000000000PC4",
+    "status": "ACTIVE",
+    "publicKeySHA256": "2282ad95323526e18ee5a9723f386b41277d09ca6ede98e759f7b870c496a362",
+    "channelCertificateSHA256": "a725279e008afdd5f7b6b3f17862ea34fb6b945efbdcc0be39a59d82dffb170f"
+   },
+   {
+    "nodeID": "nod_0000000000000000000000RTR1",
+    "status": "RETIRED",
+    "publicKeySHA256": "680bb59a7bb24b0bc6af7af2c489fc77c65f8a1397fb3d5dbefd6ccdeafa29f7",
+    "channelCertificateSHA256": "33c954aa18f25afcdd07926014744dc8706c53495a0ad0bccddcca969772cb31"
+   },
+   {
+    "nodeID": "nod_0000000000000000000000RTR2",
+    "status": "DISABLED",
+    "publicKeySHA256": "7426a4b6d6f99d598f0d91c22add61cc2b37655d3dd1d69140ce1e9fc9090114",
+    "channelCertificateSHA256": "02bf2adb1aef5fc466722c3ebd7bc7ded61aa4b2a607bb3c6001eb6333f62d15"
+   }
+  ]
+ },
+ "operationManifest": null,
+ "checkpoint": {
+  "lastDurablePhase": null,
+  "inFlightPhase": null,
+  "inFlightOutcome": null,
+  "resumeAt": "2026-11-18T12:00:00Z",
+  "consumedChallengeNonces": [],
+  "readback": {
+   "dbAvailable": true,
+   "epoch": "00000000-0000-4000-8000-0000000000e1",
+   "custodyState": "NOT_READ",
+   "writerFence": null,
+   "journalManifestDigest": null,
+   "ceremonyLog": null,
+   "members": [],
+   "reservations": [],
+   "serving": null
+  },
+  "expectedRecoveryAction": "NOT_STARTED",
+  "expectedResumePhase": null,
+  "expectedApply": [],
+  "expectedAcknowledge": []
+ }
+}

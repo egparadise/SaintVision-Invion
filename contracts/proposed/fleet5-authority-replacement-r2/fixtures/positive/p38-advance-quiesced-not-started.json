@@ -51,6 +51,7 @@
  "trustTransition": {
   "cutover": "QUIESCED",
   "overlap": null,
+  "overlapRuntimeEvidenceRef": null,
   "quiesceEvidenceRef": "fixture:quiesce/window",
   "targetGeneration": 2,
   "stagedAnchorBundle": null,
