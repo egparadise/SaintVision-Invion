@@ -202,6 +202,7 @@ jobs:
           mkdir -p dist/recovery-readonly-pg
           python -m pytest -q --strict-markers tests/integration/test_recovery_cohort_preflight.py --junitxml=dist/recovery-readonly-pg/fixture.xml
           test -s dist/recovery-readonly-pg/observations.json
+          test -s dist/recovery-readonly-pg/provisioned-reader.json
       - name: Publish cohort database observations
         if: always()
         uses: actions/upload-artifact@v4
