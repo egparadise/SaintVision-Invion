@@ -844,6 +844,18 @@ def test_r2id_an_op_id_under_another_manifest_is_never_acknowledged(journal, pos
     assert action(doc) == "HOLD_FOREIGN_WRITER"
 
 
+@pytest.mark.parametrize("journal", ["channelAudit", "policyJournal"])
+def test_r2id_our_op_id_audited_under_another_manifest_blocks_even_at_the_preimage(journal):
+    """The row is still at its exact preimage, but this opID was already audited under a different
+    manifest: applying would double-use one idempotency identity, so it is a foreign writer."""
+    phase = A["A4"] if journal == "channelAudit" else A["A5"]
+    doc = state(checker.PHASES[checker.INDEX[phase] - 1], phase)
+    op = gen.op_of(doc, phase, "PC3")
+    assert op["opID"] in checker.recovery_action(doc)[2]
+    gen.row(doc, "PC3")[journal] = [{"manifestDigest": gen.h("other-manifest"), "opID": op["opID"]}]
+    assert action(doc) == "HOLD_FOREIGN_WRITER"
+
+
 def test_r2id_audit_history_of_other_operations_is_not_confused_with_ours():
     doc = state(A["A3"], A["A4"])
     gen.row(doc, "PC3")["channelAudit"] = [{"manifestDigest": gen.h("earlier-plan"), "opID": "op_" + "a" * 24}]
