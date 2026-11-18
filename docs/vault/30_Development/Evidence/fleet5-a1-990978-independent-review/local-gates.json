@@ -1,0 +1,70 @@
+{
+ "candidateSha": "990978075d9fe53fe9c1c8f11b3bdf0e4d4f64e3",
+ "checkout": "isolated detached worktree, then review branch with docs-only additions",
+ "python": "3.14.7 (probes also 3.10.11)",
+ "pathsRelativeTo": "Claude session scratchpad",
+ "gates": [
+  {
+   "command": "python probes\\pin_check.py wt9909 990978075d9fe53fe9c1c8f11b3bdf0e4d4f64e3",
+   "kst": "2026-11-19T04:41:08.174078+09:00",
+   "exit": 0,
+   "tail": [
+    "OK tools/intranet_pki.py ef10834d2ffa ef10834d2ffa",
+    "OK tools/lan_pilot.py 35c2668690b0 35c2668690b0",
+    "OK deploy/lan/prepare-pilot-database.sh 0a5572cb6206 0a5572cb6206",
+    "OK deploy/lan/verify-pilot-database.sh 8af8372f3122 8af8372f3122",
+    "OK deploy/lan/Dockerfile.node.remote 9139956d1102 9139956d1102",
+    "card150 evidence and test unchanged vs 986a845b: True"
+   ]
+  },
+  {
+   "command": "python -m pytest -q -p no:cacheprovider tests/test_intranet_pki.py tests/core/test_a1_writer_fence.py tests/core/test_fleet5_authority_replacement_r2.py tests/core/test_serving_anchors.py tests/test_route_coverage.py tests/test_lan_leaf_rotation.py",
+   "kst": "2026-11-19T04:41:09.004654+09:00",
+   "exit": 0,
+   "tail": [
+    "........................................................................ [ 42%]",
+    "........................................................................ [ 57%]",
+    "........................................................................ [ 71%]",
+    "........................................................................ [ 85%]",
+    "........................................................................ [100%]",
+    "504 passed in 17.48s"
+   ]
+  },
+  {
+   "command": "python probes\\probe_cli.py wt9909 python python3.10",
+   "kst": "2026-11-19T04:41:27.879673+09:00",
+   "exit": 0,
+   "tail": [
+    "74 / 74",
+    "{\"probe\": \"py3.14.7 empty ledger re-initialize\", \"ok\": true, \"observed\": \"FileExistsError\"}",
+    "{\"probe\": \"py3.14.7 python -I\", \"ok\": true, \"rc\": 1, \"stdout\": \"\", \"stderr_tail\": \"spect_interrupted_a1.py\\\", line 6, in <module>\\n    from a1_writer_fence import Writer, interrupted_a1_hold\\nModuleNotFoundError: No module named 'a1_writer_fence'\"}",
+    "{\"probe\": \"py3.10.11 empty ledger re-initialize\", \"ok\": true, \"observed\": \"FileExistsError\"}",
+    "{\"probe\": \"py3.10.11 python -I\", \"ok\": true, \"rc\": 1, \"stdout\": \"\", \"stderr_tail\": \"spect_interrupted_a1.py\\\", line 6, in <module>\\n    from a1_writer_fence import Writer, interrupted_a1_hold\\nModuleNotFoundError: No module named 'a1_writer_fence'\"}"
+   ]
+  },
+  {
+   "command": "python tools/check_docs.py",
+   "kst": "2026-11-19T04:41:57.871887+09:00",
+   "exit": 0,
+   "tail": [
+    "PASS: 24 original hashes, 1283 versioned documents, wiki links, 48 tasks, 12 outcomes, owner/reviewer/skills, dependency DAG."
+   ]
+  },
+  {
+   "command": "python tools/check_doc_single_source.py --ratchet",
+   "kst": "2026-11-19T04:42:00.372550+09:00",
+   "exit": 0,
+   "tail": [
+    "PASS check_doc_single_source --ratchet: 16 pairs, all in baseline, none stale."
+   ]
+  },
+  {
+   "command": "python tools/sync_obsidian.py --check",
+   "kst": "2026-11-19T04:42:00.839333+09:00",
+   "exit": 0,
+   "tail": [
+    "CHECK: 3823 managed files, 31 pending exports, 0 conflicts. No writes."
+   ]
+  }
+ ]
+}

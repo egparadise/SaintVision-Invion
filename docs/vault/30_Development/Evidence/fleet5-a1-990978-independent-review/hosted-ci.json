@@ -1,0 +1,80 @@
+{
+ "candidateSha": "990978075d9fe53fe9c1c8f11b3bdf0e4d4f64e3",
+ "observedAtKST": "2026-11-19T04:40:12.5911099+09:00",
+ "mode": "read-only gh run view",
+ "runs": [
+  {
+   "conclusion": "success",
+   "event": "workflow_dispatch",
+   "headBranch": "agent/codex/fleet5-runtime-a1-986a845b",
+   "headSha": "990978075d9fe53fe9c1c8f11b3bdf0e4d4f64e3",
+   "jobs": [
+    {
+     "conclusion": "success",
+     "name": "mlflow-live"
+    },
+    {
+     "conclusion": "success",
+     "name": "backend (3.14)"
+    },
+    {
+     "conclusion": "success",
+     "name": "backend (3.12)"
+    }
+   ],
+   "runId": 44376440429,
+   "status": "completed",
+   "url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/44376440429",
+   "workflow": "Backend Build"
+  },
+  {
+   "conclusion": "success",
+   "event": "workflow_dispatch",
+   "headBranch": "agent/codex/fleet5-runtime-a1-986a845b",
+   "headSha": "990978075d9fe53fe9c1c8f11b3bdf0e4d4f64e3",
+   "jobs": [
+    {
+     "conclusion": "success",
+     "name": "s01-storage-roundtrip"
+    },
+    {
+     "conclusion": "success",
+     "name": "core"
+    }
+   ],
+   "runId": 44376434506,
+   "status": "completed",
+   "url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/44376434506",
+   "workflow": "Core Build"
+  },
+  {
+   "conclusion": "success",
+   "event": "push",
+   "headBranch": "agent/codex/fleet5-runtime-a1-986a845b",
+   "headSha": "990978075d9fe53fe9c1c8f11b3bdf0e4d4f64e3",
+   "jobs": [
+    {
+     "conclusion": "success",
+     "name": "portal-login-harness"
+    }
+   ],
+   "runId": 44376433707,
+   "status": "completed",
+   "url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/44376433707",
+   "workflow": "Portal Login Journey Harness"
+  }
+ ],
+ "notRun": [
+  {
+   "workflow": "Documentation Build",
+   "reason": "workflow_dispatch only on this branch; not dispatched at this SHA"
+  }
+ ],
+ "coreJunit": {
+  "tests": 9485,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 46,
+  "card150Case": "tests.test_intranet_pki::test_public_pilot_evidence_is_redacted_and_bound_to_the_tooling passed"
+ }
+}

@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-CLAUDE-001"
 title: "Claude 작업 현황"
-version: "1.2.138"
+version: "1.2.139"
 status: "review"
 author: "Claude"
-updated: "2026-11-19T02:39:01+09:00"
+updated: "2026-11-19T04:39:27+09:00"
 
 
 
@@ -12,6 +12,25 @@ updated: "2026-11-19T02:39:01+09:00"
 
 source_of_truth: "Git"
 ---
+
+## 2026-11-19 FLEET5 interrupted A1 standalone inspection 독립 재검토 990978075d9f (Claude 직접 기록)
+
+- **작업** (task_dfb422639644 / ctx_13d37d696789): msg_353a0df9eb55의 700b9480 차단 지적 이후 Codex가 만든 `990978075d9f`(agent/codex/fleet5-runtime-a1-986a845b)를 정확한 SHA의 격리 detached worktree에서 다시 검토했다. Codex 브랜치는 바꾸지 않았다. 기록은 `agent/claude/fleet5-a1-990978-review`에 있다.
+- **판정**: 수락한다. 범위는 HOLD-only prerequisite다. 차단 지적은 해소됐다.
+  - `tools/lan_pilot.py`는 blob 35c26686으로 복귀했다. card150 evidence의 다섯 pin이 모두 HEAD와 같다. evidence JSON과 tests/test_intranet_pki.py는 986a845b와 같다.
+  - standalone CLI 탐침은 Python 3.14.7과 3.10.11에서 74/74를 통과했다. 탐침은 일회용 fixture와 무관한 cwd에서 돌렸다. 모든 HOLD는 exit 2였고, 21회 검사 뒤에도 ledger는 바이트 단위로 그대로였다. 잘못된 writer 입력 16종은 모두 HOLD_WRITER_FENCE였다. lock이 걸린 ledger와 손상된 ledger도 HOLD였다.
+- **확인**:
+  - 로컬: 정확한 SHA에서 504 passed(card150 test 포함), check_docs PASS. 명령별 기록은 local-gates.json에 있다.
+  - hosted: Backend 44376440429(3.12/3.14 각 9081 passed), Core 44376434506(junit 9485, 0 failures, card150 case passed), Portal 44376433707이 모두 success다. Docs는 이 SHA에서 dispatch되지 않았다.
+- **비차단 지적**:
+  1. Codex History의 local gates 주장과 달리, committed local-gates.json은 700b9480 시점의 실행 기록이다.
+  2. 사용 오류도 exit 2로 끝나므로 reason은 stdout으로 판별해야 한다.
+  3. `python -I`로 실행하면 import 실패로 exit 1이 된다. fail-closed다.
+- **하지 않은 것**: fleet 연결, 배포, 활성화, PR, vault export, Codex 브랜치 push
+- **다음 첫 행동/담당**:
+  - Root(coordinator): 통합과 게시를 맡는다. 필요하면 Docs CI를 dispatch한다.
+  - Codex: signer ceremony ledger, fleet 전체 fence, idempotent transfer 계약을 맡고, 지적 1을 정정한다.
+  - 상세는 [[2026-11-19_FLEET5_A1_990978_Independent_Review]].
 
 ## 2026-11-19 FLEET5 authority 교체 계약 R2 3차 개정: ab22 독립 검토 high 지적 대응 (Claude 직접 기록)
 

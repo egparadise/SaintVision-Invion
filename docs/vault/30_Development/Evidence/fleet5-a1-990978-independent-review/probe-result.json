@@ -1,0 +1,514 @@
+{
+ "passed": 74,
+ "total": 74,
+ "results": [
+  {
+   "probe": "py3.14.7 missing state dir",
+   "ok": true,
+   "rc": 2,
+   "stdout": "HOLD_WRITER_FENCE",
+   "stderr_tail": ""
+  },
+  {
+   "probe": "py3.14.7 missing state not created",
+   "ok": true
+  },
+  {
+   "probe": "py3.14.7 initialized but no owner",
+   "ok": true,
+   "rc": 2,
+   "stdout": "HOLD_WRITER_FENCE",
+   "stderr_tail": ""
+  },
+  {
+   "probe": "py3.14.7 matching owner",
+   "ok": true,
+   "rc": 2,
+   "stdout": "HOLD_CUSTODY_UNRESOLVED",
+   "stderr_tail": ""
+  },
+  {
+   "probe": "py3.14.7 21 inspections leave state dir byte-identical, no sidecars",
+   "ok": true,
+   "files": [
+    "a1-writer.sqlite3"
+   ]
+  },
+  {
+   "probe": "py3.14.7 expected wrong token",
+   "ok": true,
+   "rc": 2,
+   "stdout": "HOLD_WRITER_FENCE",
+   "stderr_tail": ""
+  },
+  {
+   "probe": "py3.14.7 expected wrong plan",
+   "ok": true,
+   "rc": 2,
+   "stdout": "HOLD_WRITER_FENCE",
+   "stderr_tail": ""
+  },
+  {
+   "probe": "py3.14.7 expected wrong generation",
+   "ok": true,
+   "rc": 2,
+   "stdout": "HOLD_WRITER_FENCE",
+   "stderr_tail": ""
+  },
+  {
+   "probe": "py3.14.7 expected generation as string",
+   "ok": true,
+   "rc": 2,
+   "stdout": "HOLD_WRITER_FENCE",
+   "stderr_tail": ""
+  },
+  {
+   "probe": "py3.14.7 expected generation bool",
+   "ok": true,
+   "rc": 2,
+   "stdout": "HOLD_WRITER_FENCE",
+   "stderr_tail": ""
+  },
+  {
+   "probe": "py3.14.7 expected generation float",
+   "ok": true,
+   "rc": 2,
+   "stdout": "HOLD_WRITER_FENCE",
+   "stderr_tail": ""
+  },
+  {
+   "probe": "py3.14.7 expected generation zero",
+   "ok": true,
+   "rc": 2,
+   "stdout": "HOLD_WRITER_FENCE",
+   "stderr_tail": ""
+  },
+  {
+   "probe": "py3.14.7 expected empty token",
+   "ok": true,
+   "rc": 2,
+   "stdout": "HOLD_WRITER_FENCE",
+   "stderr_tail": ""
+  },
+  {
+   "probe": "py3.14.7 expected token null",
+   "ok": true,
+   "rc": 2,
+   "stdout": "HOLD_WRITER_FENCE",
+   "stderr_tail": ""
+  },
+  {
+   "probe": "py3.14.7 expected missing key",
+   "ok": true,
+   "rc": 2,
+   "stdout": "HOLD_WRITER_FENCE",
+   "stderr_tail": ""
+  },
+  {
+   "probe": "py3.14.7 expected empty object",
+   "ok": true,
+   "rc": 2,
+   "stdout": "HOLD_WRITER_FENCE",
+   "stderr_tail": ""
+  },
+  {
+   "probe": "py3.14.7 expected list",
+   "ok": true,
+   "rc": 2,
+   "stdout": "HOLD_WRITER_FENCE",
+   "stderr_tail": ""
+  },
+  {
+   "probe": "py3.14.7 expected string",
+   "ok": true,
+   "rc": 2,
+   "stdout": "HOLD_WRITER_FENCE",
+   "stderr_tail": ""
+  },
+  {
+   "probe": "py3.14.7 expected number",
+   "ok": true,
+   "rc": 2,
+   "stdout": "HOLD_WRITER_FENCE",
+   "stderr_tail": ""
+  },
+  {
+   "probe": "py3.14.7 expected invalid json",
+   "ok": true,
+   "rc": 2,
+   "stdout": "HOLD_WRITER_FENCE",
+   "stderr_tail": ""
+  },
+  {
+   "probe": "py3.14.7 expected non-utf8",
+   "ok": true,
+   "rc": 2,
+   "stdout": "HOLD_WRITER_FENCE",
+   "stderr_tail": ""
+  },
+  {
+   "probe": "py3.14.7 expected empty file",
+   "ok": true,
+   "rc": 2,
+   "stdout": "HOLD_WRITER_FENCE",
+   "stderr_tail": ""
+  },
+  {
+   "probe": "py3.14.7 expected file missing",
+   "ok": true,
+   "rc": 2,
+   "stdout": "HOLD_WRITER_FENCE",
+   "stderr_tail": ""
+  },
+  {
+   "probe": "py3.14.7 expected path is a directory",
+   "ok": true,
+   "rc": 2,
+   "stdout": "HOLD_WRITER_FENCE",
+   "stderr_tail": ""
+  },
+  {
+   "probe": "py3.14.7 stale gen1 after transfer",
+   "ok": true,
+   "rc": 2,
+   "stdout": "HOLD_WRITER_FENCE",
+   "stderr_tail": ""
+  },
+  {
+   "probe": "py3.14.7 current gen2",
+   "ok": true,
+   "rc": 2,
+   "stdout": "HOLD_CUSTODY_UNRESOLVED",
+   "stderr_tail": ""
+  },
+  {
+   "probe": "py3.14.7 exclusive lock held",
+   "ok": true,
+   "rc": 2,
+   "stdout": "HOLD_WRITER_FENCE",
+   "stderr_tail": ""
+  },
+  {
+   "probe": "py3.14.7 after lock released",
+   "ok": true,
+   "rc": 2,
+   "stdout": "HOLD_CUSTODY_UNRESOLVED",
+   "stderr_tail": ""
+  },
+  {
+   "probe": "py3.14.7 empty ledger",
+   "ok": true,
+   "rc": 2,
+   "stdout": "HOLD_WRITER_FENCE",
+   "stderr_tail": ""
+  },
+  {
+   "probe": "py3.14.7 empty ledger re-initialize",
+   "ok": true,
+   "observed": "FileExistsError"
+  },
+  {
+   "probe": "py3.14.7 corrupt ledger",
+   "ok": true,
+   "rc": 2,
+   "stdout": "HOLD_WRITER_FENCE",
+   "stderr_tail": ""
+  },
+  {
+   "probe": "py3.14.7 ledger path is dir",
+   "ok": true,
+   "rc": 2,
+   "stdout": "HOLD_WRITER_FENCE",
+   "stderr_tail": ""
+  },
+  {
+   "probe": "py3.14.7 state is a file",
+   "ok": true,
+   "rc": 2,
+   "stdout": "HOLD_WRITER_FENCE",
+   "stderr_tail": ""
+  },
+  {
+   "probe": "py3.14.7 forged schema text generation",
+   "ok": true,
+   "rc": 2,
+   "stdout": "HOLD_WRITER_FENCE",
+   "stderr_tail": ""
+  },
+  {
+   "probe": "py3.14.7 missing --state",
+   "ok": true,
+   "rc": 2,
+   "stdout": "",
+   "stderr_tail": ""
+  },
+  {
+   "probe": "py3.14.7 missing --expected-writer",
+   "ok": true,
+   "rc": 2,
+   "stdout": "",
+   "stderr_tail": ""
+  },
+  {
+   "probe": "py3.14.7 python -I",
+   "ok": true,
+   "rc": 1,
+   "stdout": "",
+   "stderr_tail": "spect_interrupted_a1.py\", line 6, in <module>\n    from a1_writer_fence import Writer, interrupted_a1_hold\nModuleNotFoundError: No module named 'a1_writer_fence'"
+  },
+  {
+   "probe": "py3.10.11 missing state dir",
+   "ok": true,
+   "rc": 2,
+   "stdout": "HOLD_WRITER_FENCE",
+   "stderr_tail": ""
+  },
+  {
+   "probe": "py3.10.11 missing state not created",
+   "ok": true
+  },
+  {
+   "probe": "py3.10.11 initialized but no owner",
+   "ok": true,
+   "rc": 2,
+   "stdout": "HOLD_WRITER_FENCE",
+   "stderr_tail": ""
+  },
+  {
+   "probe": "py3.10.11 matching owner",
+   "ok": true,
+   "rc": 2,
+   "stdout": "HOLD_CUSTODY_UNRESOLVED",
+   "stderr_tail": ""
+  },
+  {
+   "probe": "py3.10.11 21 inspections leave state dir byte-identical, no sidecars",
+   "ok": true,
+   "files": [
+    "a1-writer.sqlite3"
+   ]
+  },
+  {
+   "probe": "py3.10.11 expected wrong token",
+   "ok": true,
+   "rc": 2,
+   "stdout": "HOLD_WRITER_FENCE",
+   "stderr_tail": ""
+  },
+  {
+   "probe": "py3.10.11 expected wrong plan",
+   "ok": true,
+   "rc": 2,
+   "stdout": "HOLD_WRITER_FENCE",
+   "stderr_tail": ""
+  },
+  {
+   "probe": "py3.10.11 expected wrong generation",
+   "ok": true,
+   "rc": 2,
+   "stdout": "HOLD_WRITER_FENCE",
+   "stderr_tail": ""
+  },
+  {
+   "probe": "py3.10.11 expected generation as string",
+   "ok": true,
+   "rc": 2,
+   "stdout": "HOLD_WRITER_FENCE",
+   "stderr_tail": ""
+  },
+  {
+   "probe": "py3.10.11 expected generation bool",
+   "ok": true,
+   "rc": 2,
+   "stdout": "HOLD_WRITER_FENCE",
+   "stderr_tail": ""
+  },
+  {
+   "probe": "py3.10.11 expected generation float",
+   "ok": true,
+   "rc": 2,
+   "stdout": "HOLD_WRITER_FENCE",
+   "stderr_tail": ""
+  },
+  {
+   "probe": "py3.10.11 expected generation zero",
+   "ok": true,
+   "rc": 2,
+   "stdout": "HOLD_WRITER_FENCE",
+   "stderr_tail": ""
+  },
+  {
+   "probe": "py3.10.11 expected empty token",
+   "ok": true,
+   "rc": 2,
+   "stdout": "HOLD_WRITER_FENCE",
+   "stderr_tail": ""
+  },
+  {
+   "probe": "py3.10.11 expected token null",
+   "ok": true,
+   "rc": 2,
+   "stdout": "HOLD_WRITER_FENCE",
+   "stderr_tail": ""
+  },
+  {
+   "probe": "py3.10.11 expected missing key",
+   "ok": true,
+   "rc": 2,
+   "stdout": "HOLD_WRITER_FENCE",
+   "stderr_tail": ""
+  },
+  {
+   "probe": "py3.10.11 expected empty object",
+   "ok": true,
+   "rc": 2,
+   "stdout": "HOLD_WRITER_FENCE",
+   "stderr_tail": ""
+  },
+  {
+   "probe": "py3.10.11 expected list",
+   "ok": true,
+   "rc": 2,
+   "stdout": "HOLD_WRITER_FENCE",
+   "stderr_tail": ""
+  },
+  {
+   "probe": "py3.10.11 expected string",
+   "ok": true,
+   "rc": 2,
+   "stdout": "HOLD_WRITER_FENCE",
+   "stderr_tail": ""
+  },
+  {
+   "probe": "py3.10.11 expected number",
+   "ok": true,
+   "rc": 2,
+   "stdout": "HOLD_WRITER_FENCE",
+   "stderr_tail": ""
+  },
+  {
+   "probe": "py3.10.11 expected invalid json",
+   "ok": true,
+   "rc": 2,
+   "stdout": "HOLD_WRITER_FENCE",
+   "stderr_tail": ""
+  },
+  {
+   "probe": "py3.10.11 expected non-utf8",
+   "ok": true,
+   "rc": 2,
+   "stdout": "HOLD_WRITER_FENCE",
+   "stderr_tail": ""
+  },
+  {
+   "probe": "py3.10.11 expected empty file",
+   "ok": true,
+   "rc": 2,
+   "stdout": "HOLD_WRITER_FENCE",
+   "stderr_tail": ""
+  },
+  {
+   "probe": "py3.10.11 expected file missing",
+   "ok": true,
+   "rc": 2,
+   "stdout": "HOLD_WRITER_FENCE",
+   "stderr_tail": ""
+  },
+  {
+   "probe": "py3.10.11 expected path is a directory",
+   "ok": true,
+   "rc": 2,
+   "stdout": "HOLD_WRITER_FENCE",
+   "stderr_tail": ""
+  },
+  {
+   "probe": "py3.10.11 stale gen1 after transfer",
+   "ok": true,
+   "rc": 2,
+   "stdout": "HOLD_WRITER_FENCE",
+   "stderr_tail": ""
+  },
+  {
+   "probe": "py3.10.11 current gen2",
+   "ok": true,
+   "rc": 2,
+   "stdout": "HOLD_CUSTODY_UNRESOLVED",
+   "stderr_tail": ""
+  },
+  {
+   "probe": "py3.10.11 exclusive lock held",
+   "ok": true,
+   "rc": 2,
+   "stdout": "HOLD_WRITER_FENCE",
+   "stderr_tail": ""
+  },
+  {
+   "probe": "py3.10.11 after lock released",
+   "ok": true,
+   "rc": 2,
+   "stdout": "HOLD_CUSTODY_UNRESOLVED",
+   "stderr_tail": ""
+  },
+  {
+   "probe": "py3.10.11 empty ledger",
+   "ok": true,
+   "rc": 2,
+   "stdout": "HOLD_WRITER_FENCE",
+   "stderr_tail": ""
+  },
+  {
+   "probe": "py3.10.11 empty ledger re-initialize",
+   "ok": true,
+   "observed": "FileExistsError"
+  },
+  {
+   "probe": "py3.10.11 corrupt ledger",
+   "ok": true,
+   "rc": 2,
+   "stdout": "HOLD_WRITER_FENCE",
+   "stderr_tail": ""
+  },
+  {
+   "probe": "py3.10.11 ledger path is dir",
+   "ok": true,
+   "rc": 2,
+   "stdout": "HOLD_WRITER_FENCE",
+   "stderr_tail": ""
+  },
+  {
+   "probe": "py3.10.11 state is a file",
+   "ok": true,
+   "rc": 2,
+   "stdout": "HOLD_WRITER_FENCE",
+   "stderr_tail": ""
+  },
+  {
+   "probe": "py3.10.11 forged schema text generation",
+   "ok": true,
+   "rc": 2,
+   "stdout": "HOLD_WRITER_FENCE",
+   "stderr_tail": ""
+  },
+  {
+   "probe": "py3.10.11 missing --state",
+   "ok": true,
+   "rc": 2,
+   "stdout": "",
+   "stderr_tail": ""
+  },
+  {
+   "probe": "py3.10.11 missing --expected-writer",
+   "ok": true,
+   "rc": 2,
+   "stdout": "",
+   "stderr_tail": ""
+  },
+  {
+   "probe": "py3.10.11 python -I",
+   "ok": true,
+   "rc": 1,
+   "stdout": "",
+   "stderr_tail": "spect_interrupted_a1.py\", line 6, in <module>\n    from a1_writer_fence import Writer, interrupted_a1_hold\nModuleNotFoundError: No module named 'a1_writer_fence'"
+  }
+ ]
+}
