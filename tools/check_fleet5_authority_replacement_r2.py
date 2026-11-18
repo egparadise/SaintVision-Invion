@@ -362,16 +362,20 @@ def reservation_digest(member: dict) -> str | None:
     return None if member["reservation"] is None else digest(member["reservation"])
 
 
+def ceremony_outputs(doc: dict) -> dict[str, Any]:
+    """Every A1 output field the plan records, keyed by its path (None = not recorded)."""
+    new, cp, tt = doc["newAuthority"], doc["controlPlaneClient"], doc["trustTransition"]
+    out = {f"newAuthority.{k}": new[k] for k in ("certificateDER", "caCertificateSHA256", "caPublicKeySHA256")}
+    out.update({f"controlPlaneClient.{k}": cp[k] for k in ("leafDER", "plannedLeafSHA256")})
+    out.update({f"trustTransition.{k}": tt[k] for k in ("stagedAnchorBundle", "finalAnchorBundle")})
+    for m in doc["members"]:
+        out.update({f"{m['pc']}.{k}": m[k] for k in ("leafDER", "plannedLeafSHA256", "plannedPolicy")})
+    return out
+
+
 def ceremony_missing(doc: dict) -> list[str]:
     """A1 outputs that must exist once A1 is durable."""
-    new, cp, tt = doc["newAuthority"], doc["controlPlaneClient"], doc["trustTransition"]
-    missing = [f"newAuthority.{k}" for k in ("certificateDER", "caCertificateSHA256", "caPublicKeySHA256")
-               if new[k] is None]
-    missing += [f"controlPlaneClient.{k}" for k in ("leafDER", "plannedLeafSHA256") if cp[k] is None]
-    missing += [f"trustTransition.{k}" for k in ("stagedAnchorBundle", "finalAnchorBundle") if tt[k] is None]
-    for m in doc["members"]:
-        missing += [f"{m['pc']}.{k}" for k in ("leafDER", "plannedLeafSHA256", "plannedPolicy") if m[k] is None]
-    return missing
+    return [path for path, value in ceremony_outputs(doc).items() if value is None]
 
 
 def ceremony_present(doc: dict) -> bool:
@@ -1143,6 +1147,23 @@ def _a1_custody_hold(doc: dict) -> str | None:
     return _ceremony_log_hold(doc, durable_a1=False)
 
 
+def _a1_no_key_hold(doc: dict) -> str | None:
+    """A1 in flight and custody reports no new key. Abandonment is safe only when every other witness
+    agrees that nothing was created or signed: the fence proves who may write, never what was issued.
+
+    Coherent: the ceremony log is read back with zero CA keys and zero signed leaves, and the plan
+    records no A1 output. Anything else (no log, a logged key or issuance, a recorded output) means the
+    custody observation contradicts the evidence, so the plan holds instead of discarding trust."""
+    log = doc["checkpoint"]["readback"]["ceremonyLog"]
+    if log is None:
+        return "HOLD_CUSTODY_UNRESOLVED"  # no log: whether a key was created or a leaf signed is unknown
+    if log["caKeysCreated"] != 0 or log["signed"]:
+        return "HOLD_CUSTODY_UNRESOLVED"  # the log records a key or an issuance that custody does not hold
+    if any(value is not None for value in ceremony_outputs(doc).values()):
+        return "HOLD_CUSTODY_UNRESOLVED"  # the plan recorded a ceremony output: a key existed at some point
+    return None
+
+
 def _ceremony_log_hold(doc: dict, durable_a1: bool) -> str | None:
     log = doc["checkpoint"]["readback"]["ceremonyLog"]
     if log is None:
@@ -1186,7 +1207,8 @@ def recovery_action(doc: dict) -> tuple[str, str | None, list[str], list[str]]:
     custody = rb["custodyState"]
     if li < A1:  # A1 in flight
         if outcome in ("FAILED_BEFORE_MUTATION", "UNKNOWN") and custody == "NO_NEW_KEY":
-            return "ABANDON_BEFORE_NEW_TRUST", None, *none
+            # Reconcile custody with the signing log and the plan before abandoning (ab22 review, high).
+            return (_a1_no_key_hold(doc) or "ABANDON_BEFORE_NEW_TRUST"), None, *none
         if custody != "NEW_KEY_PRESENT_MATCHES_PLAN":
             return "HOLD_CUSTODY_UNRESOLVED", None, *none
     elif custody != "NEW_KEY_PRESENT_MATCHES_PLAN":

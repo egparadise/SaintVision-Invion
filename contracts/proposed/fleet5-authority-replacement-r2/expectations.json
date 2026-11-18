@@ -22,7 +22,7 @@
   {
    "path": "fixtures/positive/p03-a1-unknown-no-key-abandon.json",
    "codes": [],
-   "why": "Ceremony interrupted; custody proves no new key exists: abandon is safe."
+   "why": "Ceremony interrupted; custody, a zero-key/zero-signature log and the plan all agree no key exists: abandon."
   },
   {
    "path": "fixtures/positive/p04-a4-partial-cas-ack-and-apply.json",
@@ -253,6 +253,11 @@
    "path": "fixtures/positive/p49-audit-under-other-manifest-hold.json",
    "codes": [],
    "why": "F4: PC2 shows the planned CAS postimage, but its audit row carries this opID under another manifest: HOLD."
+  },
+  {
+   "path": "fixtures/positive/p50-a1-interrupted-no-key-contradicted-by-log-hold.json",
+   "codes": [],
+   "why": "Ceremony interrupted under a held fence; custody reports no key, but the log shows the CA key and two signed leaves and the plan records the outputs: HOLD, never abandon."
   },
   {
    "path": "fixtures/rejection/r01-new-ca-is-prior.json",
@@ -685,6 +690,13 @@
     "AR-MODE"
    ],
    "why": "F5: a terminal replacement carries no overlap evidence."
+  },
+  {
+   "path": "fixtures/rejection/r62-abandon-claimed-on-contradicted-custody.json",
+   "codes": [
+    "AR-RECOVERY-MISMATCH"
+   ],
+   "why": "ab22 review: a plan that expects abandonment while the ceremony log records a key and signed leaves."
   }
  ],
  "handoffs": [

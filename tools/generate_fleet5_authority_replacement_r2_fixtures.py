@@ -210,6 +210,22 @@ def enrollment_member(doc: dict) -> dict:
     return m
 
 
+def no_key_log() -> dict:
+    """A ceremony log read back with nothing created and nothing signed: the only log that agrees with NO_NEW_KEY."""
+    return {"caKeysCreated": 0, "signed": []}
+
+
+def no_key_contradicted(name: str) -> dict:
+    """ab22 review (high): A1 interrupted under a held fence; custody reports NO_NEW_KEY, but the log shows the
+    planned CA key and two signed leaves and the plan records the ceremony outputs."""
+    d = ceremony_done(name)
+    rb = initial_readback(d, RESUME)
+    rb["ceremonyLog"]["signed"] = rb["ceremonyLog"]["signed"][:2]
+    rb["custodyState"] = "NO_NEW_KEY"
+    d["checkpoint"] = checkpoint(A["A0"], A["A1"], "UNKNOWN", RESUME, rb)
+    return d
+
+
 def empty_readback(db: bool = True, epoch: str | None = EPOCH, custody: str = "NOT_READ") -> dict:
     return {"dbAvailable": db, "epoch": epoch, "custodyState": custody, "writerFence": None,
             "journalManifestDigest": None, "ceremonyLog": None, "members": [], "reservations": [], "serving": None}
@@ -501,8 +517,10 @@ def positives() -> dict[str, tuple[str, dict]]:
     d = proposal("p03-a1-unknown-no-key-abandon")
     rb = empty_readback(custody="NO_NEW_KEY")
     rb["writerFence"] = live_fence(d, RESUME)
+    rb["ceremonyLog"] = no_key_log()
     d["checkpoint"] = checkpoint(A["A0"], A["A1"], "UNKNOWN", RESUME, rb)
-    add("p03-a1-unknown-no-key-abandon", "Ceremony interrupted; custody proves no new key exists: abandon is safe.",
+    add("p03-a1-unknown-no-key-abandon",
+        "Ceremony interrupted; custody, a zero-key/zero-signature log and the plan all agree no key exists: abandon.",
         expect(d, "ABANDON_BEFORE_NEW_TRUST"))
 
     resume("p04-a4-partial-cas-ack-and-apply",
@@ -731,6 +749,12 @@ def positives() -> dict[str, tuple[str, dict]]:
     hold("p49-audit-under-other-manifest-hold",
          "F4: PC2 shows the planned CAS postimage, but its audit row carries this opID under another manifest: HOLD.",
          A["A3"], "HOLD_FOREIGN_WRITER", flight=A["A4"], landed=on(ids("PC2")), mutate=foreign_manifest_audit)
+
+    # ab22 independent review (high): custody alone never authorizes abandonment.
+    add("p50-a1-interrupted-no-key-contradicted-by-log-hold",
+        "Ceremony interrupted under a held fence; custody reports no key, but the log shows the CA key and two "
+        "signed leaves and the plan records the outputs: HOLD, never abandon.",
+        expect(no_key_contradicted("p50-a1-interrupted-no-key-contradicted-by-log-hold"), "HOLD_CUSTODY_UNRESOLVED"))
     return out
 
 
@@ -974,6 +998,10 @@ def rejections() -> dict[str, tuple[str, list[str], dict]]:
     d["trustTransition"]["overlapRuntimeEvidenceRef"] = "fixture:runtime/dual-anchor-reload-retire-interrupt"
     add("r61-terminal-with-overlap-runtime-evidence", "F5: a terminal replacement carries no overlap evidence.",
         ["AR-MODE"], d)
+    d = expect(no_key_contradicted("r62-abandon-claimed-on-contradicted-custody"), "ABANDON_BEFORE_NEW_TRUST")
+    add("r62-abandon-claimed-on-contradicted-custody",
+        "ab22 review: a plan that expects abandonment while the ceremony log records a key and signed leaves.",
+        ["AR-RECOVERY-MISMATCH"], d)
     return out
 
 

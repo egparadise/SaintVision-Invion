@@ -705,15 +705,37 @@ def test_f4_manifest_sample_is_the_frozen_manifest_of_its_source():
     assert cas["pre"]["channelCertificateSHA256"] and cas["post"]["channelCertificateSHA256"]
 
 
-def _a1_in_flight(name: str = "t-a1", *, key: bool = True, outputs: bool = True, signed: int = 2) -> dict:
-    """A1 (the ceremony) interrupted: journal at A0, A1 in flight with an UNKNOWN outcome."""
+def _a1_in_flight(name: str = "t-a1", *, outputs: bool = True, signed: int = 2) -> dict:
+    """A1 (the ceremony) interrupted with the planned key in custody: journal at A0, A1 in flight, UNKNOWN."""
     doc = base(name) if outputs else gen.proposal(name)
     rb = gen.initial_readback(doc, gen.RESUME)
     rb["ceremonyLog"]["signed"] = rb["ceremonyLog"]["signed"][:signed]
-    if not key:
-        rb["custodyState"] = "NO_NEW_KEY"
     doc["checkpoint"] = gen.checkpoint(A["A0"], A["A1"], "UNKNOWN", gen.RESUME, rb)
     return doc
+
+
+def _a1_no_key(name: str = "t-a1-no-key", *, outcome: str = "UNKNOWN") -> dict:
+    """A1 interrupted with coherent no-key evidence (as p03): custody NO_NEW_KEY, a log read back with zero
+    CA keys and zero signed leaves, and a plan that records no ceremony output. The fence is held."""
+    doc = gen.proposal(name)
+    rb = gen.empty_readback(custody="NO_NEW_KEY")
+    rb["writerFence"] = gen.live_fence(doc, gen.RESUME)
+    rb["ceremonyLog"] = gen.no_key_log()
+    doc["checkpoint"] = gen.checkpoint(A["A0"], A["A1"], outcome, gen.RESUME, rb)
+    return doc
+
+
+def _expecting(doc: dict, action_name: str) -> dict:
+    return gen.expect(copy.deepcopy(doc), action_name)
+
+
+# Interrupted-A1 evidence states and the decision each takes under a held fence.
+A1_CUSTODY = {
+    "key-present": (lambda: _a1_in_flight(), "RESUME_FORWARD"),
+    "no-key": (lambda: _a1_no_key(), "ABANDON_BEFORE_NEW_TRUST"),
+    # ab22 review: the shape the earlier regression used for "no-key" is contradictory evidence.
+    "no-key-contradicted": (lambda: gen.no_key_contradicted("t-a1-contradicted"), "HOLD_CUSTODY_UNRESOLVED"),
+}
 
 
 _AT = checker._ts(gen.RESUME)
@@ -729,12 +751,17 @@ FENCE_FAULTS = {
 }
 
 
-@pytest.mark.parametrize("key", [True, False], ids=["key-present", "no-key"])
+@pytest.mark.parametrize("custody", A1_CUSTODY)
 @pytest.mark.parametrize("fault", FENCE_FAULTS)
-def test_r2f4_interrupted_a1_decides_nothing_outside_the_live_fence(fault, key):
-    """Review R2 finding 4 (high): A1 RESUME was returned before the live fence was compared."""
-    doc = _a1_in_flight(key=key)
-    assert action(doc) == ("RESUME_FORWARD" if key else "ABANDON_BEFORE_NEW_TRUST")
+def test_r2f4_interrupted_a1_decides_nothing_outside_the_live_fence(fault, custody):
+    """Review R2 finding 4 (high): A1 RESUME was returned before the live fence was compared.
+
+    ab22 review (high): the earlier "no-key" variant kept a log with one CA key and two signed leaves and
+    expected ABANDON under the held fence. That is contradictory evidence and now expects HOLD; the
+    coherent no-key state is the one that abandons. A lost fence holds all three."""
+    make, held = A1_CUSTODY[custody]
+    doc = make()
+    assert action(doc) == held
     rb = doc["checkpoint"]["readback"]
     rb["writerFence"] = FENCE_FAULTS[fault](rb["writerFence"])
     assert checker.recovery_action(doc) == ("HOLD_WRITER_FENCE", None, [], [])
@@ -789,6 +816,103 @@ def test_r2f4_an_unrecorded_key_in_custody_never_matches_the_plan():
     doc = _a1_in_flight(outputs=False, signed=0)
     assert doc["newAuthority"]["caPublicKeySHA256"] is None
     assert action(doc) == "HOLD_CUSTODY_UNRESOLVED"
+
+
+# ---------------------------------------------------------------- ab22 review: custody vs signing log
+
+
+def _signed_entry(subject: str = "PC2") -> dict:
+    return {"subject": subject, "leafSHA256": gen.h(f"unplanned-leaf-{subject}")}
+
+
+NO_KEY_LOG_CONTRADICTIONS = {
+    "log-absent": lambda rb: rb.update(ceremonyLog=None),
+    "log-one-key": lambda rb: rb.update(ceremonyLog={"caKeysCreated": 1, "signed": []}),
+    "log-two-keys": lambda rb: rb.update(ceremonyLog={"caKeysCreated": 2, "signed": []}),
+    "log-signed-without-key": lambda rb: rb.update(ceremonyLog={"caKeysCreated": 0, "signed": [_signed_entry()]}),
+    "log-cp-leaf-signed": lambda rb: rb.update(ceremonyLog={"caKeysCreated": 0,
+                                                            "signed": [_signed_entry("control-plane")]}),
+    "log-key-and-signed": lambda rb: rb.update(ceremonyLog={"caKeysCreated": 1,
+                                                            "signed": [_signed_entry(), _signed_entry("PC4")]}),
+}
+
+
+@pytest.mark.parametrize("outcome", ["UNKNOWN", "FAILED_BEFORE_MUTATION"])
+def test_ab22_coherent_no_key_evidence_abandons_at_both_boundaries(outcome):
+    """Consistent outcome: custody, a zero-key/zero-signature log and an output-free plan agree."""
+    doc = _a1_no_key(outcome=outcome)
+    assert checker.recovery_action(doc) == ("ABANDON_BEFORE_NEW_TRUST", None, [], [])
+    assert checker.evaluate(_expecting(doc, "ABANDON_BEFORE_NEW_TRUST"), SCHEMA) == []
+    assert checker.evaluate(_expecting(doc, "HOLD_CUSTODY_UNRESOLVED"), SCHEMA) == ["AR-RECOVERY-MISMATCH"]
+    with pytest.raises(ValueError):  # abandonment is never a resume: nothing is signed or applied
+        checker.execute_resume(doc)
+
+
+def test_ab22_p03_is_the_coherent_no_key_state():
+    doc = load("fixtures/positive/p03-a1-unknown-no-key-abandon.json")
+    assert doc["checkpoint"]["readback"]["ceremonyLog"] == {"caKeysCreated": 0, "signed": []}
+    assert all(v is None for v in checker.ceremony_outputs(doc).values())
+    assert checker.recovery_action(doc) == ("ABANDON_BEFORE_NEW_TRUST", None, [], [])
+
+
+@pytest.mark.parametrize("outcome", ["UNKNOWN", "FAILED_BEFORE_MUTATION"])
+@pytest.mark.parametrize("contradiction", NO_KEY_LOG_CONTRADICTIONS)
+def test_ab22_no_key_contradicted_by_the_signing_log_holds_at_both_boundaries(contradiction, outcome):
+    """ab22 review (high): custody NO_NEW_KEY never authorizes abandonment while the recorded signing log
+    is absent or shows a CA key or any signed leaf. The fence is held throughout."""
+    doc = _a1_no_key(outcome=outcome)
+    NO_KEY_LOG_CONTRADICTIONS[contradiction](doc["checkpoint"]["readback"])
+    assert checker.fence_held(doc)
+    assert checker.recovery_action(doc) == ("HOLD_CUSTODY_UNRESOLVED", None, [], [])
+    assert checker.evaluate(_expecting(doc, "HOLD_CUSTODY_UNRESOLVED"), SCHEMA) == []
+    assert checker.evaluate(_expecting(doc, "ABANDON_BEFORE_NEW_TRUST"), SCHEMA) == ["AR-RECOVERY-MISMATCH"]
+    with pytest.raises(ValueError):
+        checker.execute_resume(doc)
+
+
+def _set_output(doc: dict, path: str, value) -> None:
+    owner, field = path.split(".", 1)
+    target = doc[owner] if owner in doc else next(m for m in doc["members"] if m["pc"] == owner)
+    target[field] = copy.deepcopy(value)
+
+
+@pytest.mark.parametrize("path", sorted(checker.ceremony_outputs(gen.proposal("t-paths"))))
+def test_ab22_no_key_contradicted_by_any_recorded_ceremony_output_holds(path):
+    """Each A1 output the plan records means a key existed, so custody NO_NEW_KEY contradicts the plan."""
+    doc = _a1_no_key()
+    _set_output(doc, path, checker.ceremony_outputs(base("t-a1-no-key"))[path])
+    assert checker.ceremony_outputs(doc)[path] is not None
+    assert checker.recovery_action(doc) == ("HOLD_CUSTODY_UNRESOLVED", None, [], [])
+
+
+def test_ab22_reviewed_contradiction_is_hold_and_a_claimed_abandon_is_rejected():
+    """The exact reviewed state: held fence, NO_NEW_KEY, log with the CA key and two signed leaves, outputs
+    recorded. The corpus carries it as p50 (HOLD) and r62 (claimed ABANDON → AR-RECOVERY-MISMATCH)."""
+    doc = gen.no_key_contradicted("t-reviewed")
+    rb = doc["checkpoint"]["readback"]
+    assert checker.fence_held(doc) and rb["custodyState"] == "NO_NEW_KEY"
+    assert rb["ceremonyLog"]["caKeysCreated"] == 1 and len(rb["ceremonyLog"]["signed"]) == 2
+    assert checker.recovery_action(doc) == ("HOLD_CUSTODY_UNRESOLVED", None, [], [])
+    p50 = load("fixtures/positive/p50-a1-interrupted-no-key-contradicted-by-log-hold.json")
+    r62 = load("fixtures/rejection/r62-abandon-claimed-on-contradicted-custody.json")
+    assert checker.evaluate(p50, SCHEMA) == []
+    assert checker.evaluate(r62, SCHEMA) == ["AR-RECOVERY-MISMATCH"]
+    for fixture in (p50, r62):  # same custody evidence; the fence digest differs only by plan name
+        frb = fixture["checkpoint"]["readback"]
+        assert checker.fence_held(fixture)
+        assert (frb["custodyState"], frb["ceremonyLog"]) == (rb["custodyState"], rb["ceremonyLog"])
+    log_free = copy.deepcopy(doc)  # the log alone agreeing is not enough while the plan records outputs
+    log_free["checkpoint"]["readback"]["ceremonyLog"] = gen.no_key_log()
+    assert checker.recovery_action(log_free) == ("HOLD_CUSTODY_UNRESOLVED", None, [], [])
+    assert checker.evaluate(_expecting(log_free, "HOLD_CUSTODY_UNRESOLVED"), SCHEMA) == []
+
+
+@pytest.mark.parametrize("custody", ["NOT_READ", "UNKNOWN", "NEW_KEY_PRESENT_MISMATCH"])
+def test_ab22_a_coherent_empty_log_never_abandons_without_no_key_custody(custody):
+    """Consistent outcome the other way: an empty log is not a custody observation of its own."""
+    doc = _a1_no_key()
+    doc["checkpoint"]["readback"]["custodyState"] = custody
+    assert checker.recovery_action(doc) == ("HOLD_CUSTODY_UNRESOLVED", None, [], [])
 
 
 def test_f4_a1_resume_is_deterministic_re_signing():

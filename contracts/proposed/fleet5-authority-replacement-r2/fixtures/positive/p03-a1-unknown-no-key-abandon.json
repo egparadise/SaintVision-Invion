@@ -331,7 +331,10 @@
     "readAt": "2026-11-18T13:59:30Z"
    },
    "journalManifestDigest": null,
-   "ceremonyLog": null,
+   "ceremonyLog": {
+    "caKeysCreated": 0,
+    "signed": []
+   },
    "members": [],
    "reservations": [],
    "serving": null
