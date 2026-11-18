@@ -1,0 +1,588 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://saintvision.ai/contracts/proposed/fleet5-authority-replacement-v2.schema.json",
+  "title": "PROPOSED FLEET5 authority replacement and advance-renewal plan v2 (R2)",
+  "description": "PROPOSED, NOT_IMPLEMENTED. R2 of the authority-replacement plan. Structural rules live here; certificate/CSR verification, identity binding, the operation manifest, the recovery decision and deadline checks live in tools/check_fleet5_authority_replacement_r2.py. DER values are PUBLIC certificates and CSRs only. Passing this schema alone never authorizes an operation.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema", "revision", "planID", "status", "activation", "mode", "observedAt", "tenantID", "projectID",
+    "preservedEpoch", "priorAuthority", "newAuthority", "trustTransition", "advanceRenewal", "measuredBudgets",
+    "servingBinaryMigration", "writerFence", "placement", "controlPlaneClient", "roleKeys", "members",
+    "existingNodeRows", "operationManifest", "checkpoint"
+  ],
+  "properties": {
+    "schema": {"const": "fleet5-authority-replacement-plan:2"},
+    "revision": {"const": "R2"},
+    "planID": {"type": "string", "pattern": "^ARP-[0-9]{8}-[a-z0-9-]{1,40}$"},
+    "status": {
+      "description": "HOLD: at least one genuine pre-ceremony input is unknown (null). PROPOSED: every input is filled and every invariant holds; still not an operating release.",
+      "enum": ["HOLD", "PROPOSED"]
+    },
+    "activation": {"const": "NOT_AUTHORIZED"},
+    "fixture": {"type": "boolean"},
+    "mode": {
+      "description": "TERMINAL_REPLACEMENT: the prior CA has expired; new independent trust, singleton anchor. ADVANCE_RENEWAL: the prior CA is still valid; a successor is introduced by bounded dual-anchor overlap or a quiesced cutover and the prior CA is retired.",
+      "enum": ["TERMINAL_REPLACEMENT", "ADVANCE_RENEWAL"]
+    },
+    "observedAt": {"$ref": "#/$defs/timestamp"},
+    "tenantID": {"$ref": "#/$defs/uuid"},
+    "projectID": {"type": "string", "pattern": "^prj_[0-9A-HJKMNP-TV-Z]{26}$"},
+    "preservedEpoch": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["epoch", "source", "readbackSHA256"],
+      "properties": {
+        "epoch": {"$ref": "#/$defs/uuid"},
+        "source": {"enum": ["DB_READBACK", "HISTORICAL_EVIDENCE"]},
+        "readbackSHA256": {"$ref": "#/$defs/nullableSha256"}
+      }
+    },
+    "priorAuthority": {
+      "description": "The CA the cohort trusts today. CA_TERMINAL/REFERENCE_ONLY in TERMINAL_REPLACEMENT; CA_CURRENT/OVERLAP_ANCHOR_UNTIL_RETIRED in ADVANCE_RENEWAL. certificateDER is the public certificate used to authenticate prior leaves.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["certificateDER", "caCertificateSHA256", "caPublicKeySHA256", "subjectCommonName", "notAfter", "state", "usage"],
+      "properties": {
+        "certificateDER": {"$ref": "#/$defs/nullableDer"},
+        "caCertificateSHA256": {"$ref": "#/$defs/sha256"},
+        "caPublicKeySHA256": {"$ref": "#/$defs/nullableSha256"},
+        "subjectCommonName": {"type": ["string", "null"], "minLength": 1, "maxLength": 128},
+        "notAfter": {"$ref": "#/$defs/timestamp"},
+        "state": {"enum": ["CA_TERMINAL", "CA_CURRENT"]},
+        "usage": {"enum": ["REFERENCE_ONLY", "OVERLAP_ANCHOR_UNTIL_RETIRED"]}
+      }
+    },
+    "newAuthority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "certificateDER", "caCertificateSHA256", "caPublicKeySHA256", "subjectCommonName", "keyAlgorithm",
+        "keyGeneratedFresh", "crossSignedByPrior", "pathLength", "notBefore", "notAfter", "leafValidity",
+        "custody", "trustAuthorization"
+      ],
+      "properties": {
+        "certificateDER": {"description": "A1 ceremony output: the public self-signed root.", "$ref": "#/$defs/nullableDer"},
+        "caCertificateSHA256": {"$ref": "#/$defs/nullableSha256"},
+        "caPublicKeySHA256": {"$ref": "#/$defs/nullableSha256"},
+        "subjectCommonName": {"type": "string", "minLength": 1, "maxLength": 128},
+        "keyAlgorithm": {"const": "Ed25519"},
+        "keyGeneratedFresh": {"const": true},
+        "crossSignedByPrior": {"const": false},
+        "pathLength": {"const": 0},
+        "notBefore": {"$ref": "#/$defs/nullableTimestamp"},
+        "notAfter": {"$ref": "#/$defs/nullableTimestamp"},
+        "leafValidity": {
+          "description": "Exact validity every leaf issued in the A1 ceremony carries.",
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["notBefore", "notAfter"],
+          "properties": {
+            "notBefore": {"$ref": "#/$defs/nullableTimestamp"},
+            "notAfter": {"$ref": "#/$defs/nullableTimestamp"}
+          }
+        },
+        "custody": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["holder", "privateMaterialInRepository", "custodyEvidenceRef"],
+          "properties": {
+            "holder": {"const": "ROOT_OFFLINE_OPERATOR"},
+            "privateMaterialInRepository": {"const": false},
+            "custodyEvidenceRef": {"type": ["string", "null"], "maxLength": 300}
+          }
+        },
+        "trustAuthorization": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["decisionRef", "authorizedBy"],
+          "properties": {
+            "decisionRef": {"type": ["string", "null"], "maxLength": 300},
+            "authorizedBy": {"type": ["string", "null"], "maxLength": 120}
+          }
+        }
+      }
+    },
+    "trustTransition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["cutover", "overlap", "quiesceEvidenceRef", "targetGeneration", "stagedAnchorBundle", "finalAnchorBundle"],
+      "properties": {
+        "cutover": {"enum": ["TERMINAL_SINGLETON", "DUAL_ANCHOR_OVERLAP", "QUIESCED"]},
+        "overlap": {
+          "description": "DUAL_ANCHOR_OVERLAP only: the bounded window in which both CAs are anchors.",
+          "oneOf": [
+            {"type": "null"},
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["startsAt", "mustEndBy"],
+              "properties": {
+                "startsAt": {"$ref": "#/$defs/timestamp"},
+                "mustEndBy": {"$ref": "#/$defs/timestamp"}
+              }
+            }
+          ]
+        },
+        "quiesceEvidenceRef": {"type": ["string", "null"], "maxLength": 300},
+        "targetGeneration": {"type": "integer", "minimum": 1, "maximum": 9007199254740991},
+        "stagedAnchorBundle": {"$ref": "#/$defs/nullableBundle"},
+        "finalAnchorBundle": {"$ref": "#/$defs/nullableBundle"}
+      }
+    },
+    "advanceRenewal": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "caLifetimeSeconds", "caSuccessorLeadSeconds", "caWarningLeadSeconds", "leafLifetimeSeconds",
+        "leafRenewalLeadSeconds", "policyLifetimeSeconds", "policyRenewalLeadSeconds", "overlapSeconds",
+        "normalBudgetSeconds", "caSuccessorBudgetSeconds", "safetySeconds", "clockSkewSeconds"
+      ],
+      "properties": {
+        "caLifetimeSeconds": {"$ref": "#/$defs/nullablePositiveSeconds"},
+        "caSuccessorLeadSeconds": {"$ref": "#/$defs/nullablePositiveSeconds"},
+        "caWarningLeadSeconds": {"$ref": "#/$defs/nullablePositiveSeconds"},
+        "leafLifetimeSeconds": {"$ref": "#/$defs/nullablePositiveSeconds"},
+        "leafRenewalLeadSeconds": {"$ref": "#/$defs/nullablePositiveSeconds"},
+        "policyLifetimeSeconds": {"$ref": "#/$defs/nullablePositiveSeconds"},
+        "policyRenewalLeadSeconds": {"$ref": "#/$defs/nullablePositiveSeconds"},
+        "overlapSeconds": {"$ref": "#/$defs/nullablePositiveSeconds"},
+        "normalBudgetSeconds": {"$ref": "#/$defs/nullablePositiveSeconds"},
+        "caSuccessorBudgetSeconds": {"$ref": "#/$defs/nullablePositiveSeconds"},
+        "safetySeconds": {"const": 630},
+        "clockSkewSeconds": {"const": 30}
+      }
+    },
+    "measuredBudgets": {
+      "description": "Measured wall-clock seconds per phase. Remaining work at resumeAt is the sum from the resume phase to the final phase.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source", "evidenceRef", "phaseSeconds"],
+      "properties": {
+        "source": {"enum": ["MEASURED", "UNKNOWN"]},
+        "evidenceRef": {"type": ["string", "null"], "maxLength": 300},
+        "phaseSeconds": {
+          "type": "object",
+          "additionalProperties": false,
+          "propertyNames": {"$ref": "#/$defs/phase"},
+          "patternProperties": {"^[AE][0-9]_": {"$ref": "#/$defs/nullablePositiveSeconds"}}
+        }
+      }
+    },
+    "servingBinaryMigration": {
+      "description": "The separately reviewed Node serving-binary/container migration that can reload anchors. Serving under the new trust is gated on it.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "reviewRef"],
+      "properties": {
+        "status": {"enum": ["REVIEWED", "NOT_REVIEWED"]},
+        "reviewRef": {"type": ["string", "null"], "maxLength": 300}
+      }
+    },
+    "writerFence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["token"],
+      "properties": {"token": {"type": ["string", "null"], "pattern": "^fence:[0-9a-z-]{4,64}$"}}
+    },
+    "placement": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["controlPlaneHostPC", "excludedPCs"],
+      "properties": {
+        "controlPlaneHostPC": {"oneOf": [{"$ref": "#/$defs/pc"}, {"type": "null"}]},
+        "excludedPCs": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/$defs/pc"}}
+      }
+    },
+    "controlPlaneClient": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "spiffeURI", "keyContinuity", "publicKeySHA256", "csrDER", "priorLeafDER", "leafDER", "plannedLeafSHA256",
+        "contextSites", "processInventory"
+      ],
+      "properties": {
+        "spiffeURI": {"type": "string", "maxLength": 240},
+        "keyContinuity": {"enum": ["RETAINED", "FRESH"]},
+        "publicKeySHA256": {"$ref": "#/$defs/nullableSha256"},
+        "csrDER": {"$ref": "#/$defs/nullableDer"},
+        "priorLeafDER": {"$ref": "#/$defs/nullableDer"},
+        "leafDER": {"$ref": "#/$defs/nullableDer"},
+        "plannedLeafSHA256": {"$ref": "#/$defs/nullableSha256"},
+        "contextSites": {
+          "type": "array", "minItems": 5, "maxItems": 5, "uniqueItems": true,
+          "items": {"$ref": "#/$defs/site"}
+        },
+        "processInventory": {
+          "description": "Every process or separately invoked client that constructs a NodeTLSClient, including replicas. Each needs its own trust readback.",
+          "oneOf": [
+            {"type": "null"},
+            {
+              "type": "array", "minItems": 5, "maxItems": 32,
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["site", "processID", "kind"],
+                "properties": {
+                  "site": {"$ref": "#/$defs/site"},
+                  "processID": {"$ref": "#/$defs/processID"},
+                  "kind": {"enum": ["SERVICE", "INVOKED_CLIENT"]}
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "roleKeys": {
+      "type": "array",
+      "maxItems": 4,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["role", "publicKeySHA256", "disposition", "continuity"],
+        "properties": {
+          "role": {"enum": ["LAUNCH_SIGNER", "POLICY_SIGNER"]},
+          "publicKeySHA256": {"$ref": "#/$defs/nullableSha256"},
+          "disposition": {"enum": ["RETAINED", "REPLACED"]},
+          "continuity": {
+            "description": "RETAINED only: independently verified continuity, scope and custody plus an affirmative Root compromise decision.",
+            "oneOf": [
+              {"type": "null"},
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["verifiedBy", "scope", "custodyEvidenceRef", "compromiseDecision", "decisionRef"],
+                "properties": {
+                  "verifiedBy": {"type": ["string", "null"], "maxLength": 120},
+                  "scope": {"enum": ["LAUNCH_SIGNATURES", "POLICY_SIGNATURES", null]},
+                  "custodyEvidenceRef": {"type": ["string", "null"], "maxLength": 300},
+                  "compromiseDecision": {"enum": ["AFFIRMED_NOT_COMPROMISED", "UNDETERMINED", "COMPROMISED"]},
+                  "decisionRef": {"type": ["string", "null"], "maxLength": 300}
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    "members": {"type": "array", "minItems": 1, "maxItems": 5, "items": {"$ref": "#/$defs/member"}},
+    "existingNodeRows": {
+      "description": "Authenticated tuples of every inv.nodes row of this tenant at readback, including disabled and retired rows.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source", "includesRetired", "readbackSHA256", "rows"],
+      "properties": {
+        "source": {"enum": ["DB_READBACK", "HISTORICAL_EVIDENCE"]},
+        "includesRetired": {"type": ["boolean", "null"]},
+        "readbackSHA256": {"$ref": "#/$defs/nullableSha256"},
+        "rows": {
+          "type": "array",
+          "maxItems": 64,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["nodeID", "status", "publicKeySHA256", "channelCertificateSHA256"],
+            "properties": {
+              "nodeID": {"$ref": "#/$defs/nodeID"},
+              "status": {"enum": ["ACTIVE", "DISABLED", "RETIRED"]},
+              "publicKeySHA256": {"$ref": "#/$defs/nullableSha256"},
+              "channelCertificateSHA256": {"$ref": "#/$defs/nullableSha256"}
+            }
+          }
+        }
+      }
+    },
+    "operationManifest": {
+      "description": "Frozen at A1 and pinned by digest in the plan and in the durable journal. The operations (exact pre/post image, expected version, endpoint, epoch, operation identity per member) are the deterministic function expected_manifest() of the frozen plan and its A1 ceremony outputs; any change to either changes the digest. null before A1 is durable.",
+      "oneOf": [
+        {"type": "null"},
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["planDigest", "digest", "operationCount"],
+          "properties": {
+            "planDigest": {"$ref": "#/$defs/sha256"},
+            "digest": {"$ref": "#/$defs/sha256"},
+            "operationCount": {"type": "integer", "minimum": 1, "maximum": 128}
+          }
+        }
+      ]
+    },
+    "checkpoint": {"$ref": "#/$defs/checkpoint"}
+  },
+  "$defs": {
+    "uuid": {"type": "string", "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"},
+    "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "nullableSha256": {"type": ["string", "null"], "pattern": "^[0-9a-f]{64}$"},
+    "nullableDer": {"type": ["string", "null"], "pattern": "^[A-Za-z0-9+/]+={0,2}$", "maxLength": 4096},
+    "nullableBundle": {
+      "oneOf": [
+        {"type": "null"},
+        {"type": "array", "minItems": 1, "maxItems": 2, "uniqueItems": true, "items": {"$ref": "#/$defs/sha256"}}
+      ]
+    },
+    "timestamp": {"type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$"},
+    "nullableTimestamp": {"type": ["string", "null"], "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$"},
+    "nullablePositiveSeconds": {"type": ["integer", "null"], "minimum": 1, "maximum": 94608000},
+    "nodeID": {"type": "string", "pattern": "^nod_[0-9A-HJKMNP-TV-Z]{26}$"},
+    "processID": {"type": "string", "pattern": "^[a-z][a-z0-9-]{1,47}$"},
+    "pc": {"enum": ["PC1", "PC2", "PC3", "PC4", "PC5"]},
+    "site": {"enum": ["observer_worker", "delivery_worker", "workspace_runtime", "build_product_runtime", "storage_check_collector"]},
+    "endpoint": {"type": "string", "pattern": "^https://[0-9.]{7,15}:[0-9]{1,5}$"},
+    "counter": {"type": ["integer", "null"], "minimum": 0, "maximum": 9007199254740991},
+    "phase": {
+      "enum": [
+        "A0_PREFLIGHT_READBACK", "A1_NEW_TRUST_AUTHORIZED", "A2_ANCHOR_STAGED", "A3_ROTATION_LEAVES_INSTALLED",
+        "A4_CHANNEL_CAS", "A5_POLICY_PUBLISHED", "A6_CP_CONTEXT_SWITCH", "A7_ROTATION_SETTLED",
+        "E1_ENROLLMENT_RESERVED", "E2_ENROLLMENT_ROW_ADMITTED", "E3_ENROLLMENT_CHANNEL_PROVISIONED",
+        "E4_ENROLLMENT_POLICY_PUBLISHED", "E5_ENROLLMENT_SETTLED"
+      ]
+    },
+    "reservation": {
+      "description": "NEW_ENROLLMENT only: the fenced first-admission reservation recorded at E1 before any row exists.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["tenantID", "epoch", "pc", "nodeID", "csrSHA256", "planDigest", "fenceToken", "rowsReadbackSHA256", "nodeStateEmpty"],
+      "properties": {
+        "tenantID": {"oneOf": [{"$ref": "#/$defs/uuid"}, {"type": "null"}]},
+        "epoch": {"oneOf": [{"$ref": "#/$defs/uuid"}, {"type": "null"}]},
+        "pc": {"$ref": "#/$defs/pc"},
+        "nodeID": {"oneOf": [{"$ref": "#/$defs/nodeID"}, {"type": "null"}]},
+        "csrSHA256": {"$ref": "#/$defs/nullableSha256"},
+        "planDigest": {"$ref": "#/$defs/nullableSha256"},
+        "fenceToken": {"type": ["string", "null"], "maxLength": 80},
+        "rowsReadbackSHA256": {"$ref": "#/$defs/nullableSha256"},
+        "nodeStateEmpty": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["verified", "evidenceRef"],
+          "properties": {
+            "verified": {"type": ["boolean", "null"]},
+            "evidenceRef": {"type": ["string", "null"], "maxLength": 300}
+          }
+        }
+      }
+    },
+    "member": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "pc", "kind", "nodeID", "account", "address", "endpoint", "spiffeURI", "nodePublicKeySHA256", "csrDER",
+        "priorLeafDER", "priorPolicyDigest", "leafDER", "plannedLeafSHA256", "plannedPolicy", "counters", "reservation"
+      ],
+      "properties": {
+        "pc": {"$ref": "#/$defs/pc"},
+        "kind": {"enum": ["ROTATION", "NEW_ENROLLMENT"]},
+        "nodeID": {"oneOf": [{"$ref": "#/$defs/nodeID"}, {"type": "null"}]},
+        "account": {"type": "string", "pattern": "^[a-z_][a-z0-9_-]{0,31}$"},
+        "address": {"type": "string", "pattern": "^(25[0-5]|2[0-4][0-9]|1?[0-9]?[0-9])(\\.(25[0-5]|2[0-4][0-9]|1?[0-9]?[0-9])){3}$"},
+        "endpoint": {"oneOf": [{"$ref": "#/$defs/endpoint"}, {"type": "null"}]},
+        "spiffeURI": {"type": ["string", "null"], "maxLength": 240},
+        "nodePublicKeySHA256": {"$ref": "#/$defs/nullableSha256"},
+        "csrDER": {"description": "Node-signed CSR (subject CN = NodeID): proof of possession of the Node key.", "$ref": "#/$defs/nullableDer"},
+        "priorLeafDER": {"description": "ROTATION only: the currently pinned leaf, signed by the prior CA.", "$ref": "#/$defs/nullableDer"},
+        "priorPolicyDigest": {"$ref": "#/$defs/nullableSha256"},
+        "leafDER": {"description": "A1 ceremony output: the new-root leaf for this member.", "$ref": "#/$defs/nullableDer"},
+        "plannedLeafSHA256": {"$ref": "#/$defs/nullableSha256"},
+        "plannedPolicy": {
+          "oneOf": [
+            {"type": "null"},
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["digest", "notBefore", "notAfter"],
+              "properties": {
+                "digest": {"$ref": "#/$defs/sha256"},
+                "notBefore": {"$ref": "#/$defs/timestamp"},
+                "notAfter": {"$ref": "#/$defs/timestamp"}
+              }
+            }
+          ]
+        },
+        "counters": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["channelVersionBefore", "channelVersionAfter", "policyFloorBefore", "policyVersionAfter"],
+          "properties": {
+            "channelVersionBefore": {"$ref": "#/$defs/counter"},
+            "channelVersionAfter": {"$ref": "#/$defs/counter"},
+            "policyFloorBefore": {"$ref": "#/$defs/counter"},
+            "policyVersionAfter": {"$ref": "#/$defs/counter"}
+          }
+        },
+        "reservation": {"oneOf": [{"$ref": "#/$defs/reservation"}, {"type": "null"}]}
+      }
+    },
+    "observation": {
+      "type": ["string", "null"], "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$"
+    },
+    "readbackRow": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "nodeID", "rowPresent", "reservationDigest", "channelVersion", "channelCertificateSHA256", "channelAuditOpIDs",
+        "policyFloor", "installedPolicyDigest", "policyJournalOpIDs", "installedLeafSHA256", "stagedAnchorDigest",
+        "nodeObservedAt", "nodeChallengeNonce"
+      ],
+      "properties": {
+        "nodeID": {"$ref": "#/$defs/nodeID"},
+        "rowPresent": {"type": "boolean"},
+        "reservationDigest": {"$ref": "#/$defs/nullableSha256"},
+        "channelVersion": {"$ref": "#/$defs/counter"},
+        "channelCertificateSHA256": {"$ref": "#/$defs/nullableSha256"},
+        "channelAuditOpIDs": {"type": "array", "maxItems": 16, "items": {"type": "string", "pattern": "^op_[0-9a-f]{24}$"}},
+        "policyFloor": {"$ref": "#/$defs/counter"},
+        "installedPolicyDigest": {"$ref": "#/$defs/nullableSha256"},
+        "policyJournalOpIDs": {"type": "array", "maxItems": 16, "items": {"type": "string", "pattern": "^op_[0-9a-f]{24}$"}},
+        "installedLeafSHA256": {"$ref": "#/$defs/nullableSha256"},
+        "stagedAnchorDigest": {"$ref": "#/$defs/nullableSha256"},
+        "nodeObservedAt": {"$ref": "#/$defs/observation"},
+        "nodeChallengeNonce": {"type": ["string", "null"], "maxLength": 80}
+      }
+    },
+    "checkpoint": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "lastDurablePhase", "inFlightPhase", "inFlightOutcome", "resumeAt", "readback", "expectedRecoveryAction",
+        "expectedResumePhase", "expectedApply", "expectedAcknowledge"
+      ],
+      "properties": {
+        "lastDurablePhase": {"oneOf": [{"$ref": "#/$defs/phase"}, {"type": "null"}]},
+        "inFlightPhase": {"oneOf": [{"$ref": "#/$defs/phase"}, {"type": "null"}]},
+        "inFlightOutcome": {"enum": ["UNKNOWN", "FAILED_BEFORE_MUTATION", null]},
+        "resumeAt": {"$ref": "#/$defs/timestamp"},
+        "readback": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["dbAvailable", "epoch", "custodyState", "writerFence", "journalManifestDigest", "ceremonyLog",
+                       "members", "reservations", "serving"],
+          "properties": {
+            "dbAvailable": {"type": "boolean"},
+            "epoch": {"oneOf": [{"$ref": "#/$defs/uuid"}, {"type": "null"}]},
+            "custodyState": {"enum": ["NOT_READ", "NO_NEW_KEY", "NEW_KEY_PRESENT_MATCHES_PLAN", "NEW_KEY_PRESENT_MISMATCH", "UNKNOWN"]},
+            "writerFence": {
+              "oneOf": [
+                {"type": "null"},
+                {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": ["token", "holderPlanDigest"],
+                  "properties": {
+                    "token": {"type": ["string", "null"], "maxLength": 80},
+                    "holderPlanDigest": {"$ref": "#/$defs/nullableSha256"}
+                  }
+                }
+              ]
+            },
+            "journalManifestDigest": {"$ref": "#/$defs/nullableSha256"},
+            "ceremonyLog": {
+              "oneOf": [
+                {"type": "null"},
+                {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": ["caKeysCreated", "signed"],
+                  "properties": {
+                    "caKeysCreated": {"type": "integer", "minimum": 0, "maximum": 16},
+                    "signed": {
+                      "type": "array", "maxItems": 32,
+                      "items": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "required": ["subject", "leafSHA256"],
+                        "properties": {
+                          "subject": {"type": "string", "maxLength": 64},
+                          "leafSHA256": {"$ref": "#/$defs/sha256"}
+                        }
+                      }
+                    }
+                  }
+                }
+              ]
+            },
+            "members": {"type": "array", "maxItems": 16, "items": {"$ref": "#/$defs/readbackRow"}},
+            "reservations": {
+              "type": "array", "maxItems": 8,
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["nodeID", "reservationDigest", "fenceToken"],
+                "properties": {
+                  "nodeID": {"$ref": "#/$defs/nodeID"},
+                  "reservationDigest": {"$ref": "#/$defs/sha256"},
+                  "fenceToken": {"type": ["string", "null"], "maxLength": 80}
+                }
+              }
+            },
+            "serving": {
+              "oneOf": [
+                {"type": "null"},
+                {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": ["challengeNonce", "challengeIssuedAt", "processes", "handshakes"],
+                  "properties": {
+                    "challengeNonce": {"type": "string", "minLength": 8, "maxLength": 80},
+                    "challengeIssuedAt": {"$ref": "#/$defs/timestamp"},
+                    "processes": {
+                      "type": "array", "maxItems": 32,
+                      "items": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "required": ["site", "processID", "trustGeneration", "loadedAnchorDigest", "clientLeafSHA256",
+                                     "observedAt", "challengeNonce"],
+                        "properties": {
+                          "site": {"$ref": "#/$defs/site"},
+                          "processID": {"$ref": "#/$defs/processID"},
+                          "trustGeneration": {"type": "integer", "minimum": 0},
+                          "loadedAnchorDigest": {"$ref": "#/$defs/sha256"},
+                          "clientLeafSHA256": {"$ref": "#/$defs/nullableSha256"},
+                          "observedAt": {"$ref": "#/$defs/timestamp"},
+                          "challengeNonce": {"type": "string", "maxLength": 80}
+                        }
+                      }
+                    },
+                    "handshakes": {
+                      "type": "array", "maxItems": 16,
+                      "items": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "required": ["nodeID", "observedAt", "challengeNonce", "peerLeafSHA256", "anchorDigest",
+                                     "cpClientURI", "heartbeatAt", "policyDigest"],
+                        "properties": {
+                          "nodeID": {"$ref": "#/$defs/nodeID"},
+                          "observedAt": {"$ref": "#/$defs/timestamp"},
+                          "challengeNonce": {"type": "string", "maxLength": 80},
+                          "peerLeafSHA256": {"$ref": "#/$defs/sha256"},
+                          "anchorDigest": {"$ref": "#/$defs/sha256"},
+                          "cpClientURI": {"type": "string", "maxLength": 240},
+                          "heartbeatAt": {"$ref": "#/$defs/timestamp"},
+                          "policyDigest": {"$ref": "#/$defs/nullableSha256"}
+                        }
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "expectedRecoveryAction": {
+          "description": "ROLLBACK_TO_TERMINAL_CA is deliberately not representable.",
+          "enum": [
+            "NOT_STARTED", "ABANDON_BEFORE_NEW_TRUST", "RESUME_FORWARD", "COMPLETE", "HOLD_DB_READBACK_REQUIRED",
+            "HOLD_EPOCH_DIVERGED", "HOLD_CUSTODY_UNRESOLVED", "HOLD_FOREIGN_WRITER", "HOLD_POLICY_ABOVE_PLAN",
+            "HOLD_ENROLLMENT_BEFORE_ROTATION_SETTLED", "HOLD_UNPLANNED_ROW", "HOLD_WRITER_FENCE",
+            "HOLD_MANIFEST_MISMATCH", "HOLD_DUPLICATE_EVIDENCE", "HOLD_ANCHOR_STAGING_UNVERIFIED",
+            "HOLD_SERVING_EVIDENCE_INCOMPLETE", "HOLD_DEADLINE_INSUFFICIENT", "HOLD_RESERVATION_MISMATCH"
+          ]
+        },
+        "expectedResumePhase": {"oneOf": [{"$ref": "#/$defs/phase"}, {"type": "null"}]},
+        "expectedApply": {"type": "array", "maxItems": 64, "items": {"type": "string", "pattern": "^op_[0-9a-f]{24}$"}},
+        "expectedAcknowledge": {"type": "array", "maxItems": 64, "items": {"type": "string", "pattern": "^op_[0-9a-f]{24}$"}}
+      }
+    }
+  }
+}

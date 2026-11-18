@@ -1,0 +1,253 @@
+{
+ "schema": "claude-local-gates:1",
+ "task": "task_150a776816d0",
+ "environment": {
+  "os": "Windows 11",
+  "python": "3.10.11",
+  "PYTHONUTF8": "1"
+ },
+ "headAtRun": "bb6e028d179495f547921cc2afa57681a68db95b",
+ "workingTreeAtRun": [
+  "M \"docs/vault/30_Development/Agent별 작업/Claude 작업 현황.md\"",
+  "?? contracts/proposed/fleet5-authority-replacement-r2/expectations.json",
+  "?? contracts/proposed/fleet5-authority-replacement-r2/fixtures/positive/p01-proposed-not-started.json",
+  "?? contracts/proposed/fleet5-authority-replacement-r2/fixtures/positive/p02-a1-durable-resume-anchor-stage.json",
+  "?? contracts/proposed/fleet5-authority-replacement-r2/fixtures/positive/p03-a1-unknown-no-key-abandon.json",
+  "?? contracts/proposed/fleet5-authority-replacement-r2/fixtures/positive/p04-a4-partial-cas-ack-and-apply.json",
+  "?? contracts/proposed/fleet5-authority-replacement-r2/fixtures/positive/p05-complete.json",
+  "?? contracts/proposed/fleet5-authority-replacement-r2/fixtures/positive/p06-db-unavailable-hold.json",
+  "?? contracts/proposed/fleet5-authority-replacement-r2/fixtures/positive/p07-custody-mismatch-hold.json",
+  "?? contracts/proposed/fleet5-authority-replacement-r2/fixtures/positive/p08-rotation-only-complete.json",
+  "?? contracts/proposed/fleet5-authority-replacement-r2/fixtures/positive/p09-durable-cas-undone-hold.json",
+  "?? contracts/proposed/fleet5-authority-replacement-r2/fixtures/positive/p10-enrollment-before-rotation-hold.json",
+  "?? contracts/proposed/fleet5-authority-replacement-r2/fixtures/positive/p11-epoch-diverged-hold.json",
+  "?? contracts/proposed/fleet5-authority-replacement-r2/fixtures/positive/p12-floor-above-plan-hold.json",
+  "?? contracts/proposed/fleet5-authority-replacement-r2/fixtures/positive/p13-unplanned-row-hold.json",
+  "?? contracts/proposed/fleet5-authority-replacement-r2/fixtures/positive/p14-pc1-first-enrollment-ready.json",
+  "?? contracts/proposed/fleet5-authority-replacement-r2/fixtures/positive/p15-e2-row-landed-acknowledge.json",
+  "?? contracts/proposed/fleet5-authority-replacement-r2/fixtures/positive/p16-e3-channel-missing-apply.json",
+  "?? contracts/proposed/fleet5-authority-replacement-r2/fixtures/positive/p17-foreign-row-reservation-hold.json",
+  "?? contracts/proposed/fleet5-authority-replacement-r2/fixtures/positive/p18-cas-old-fingerprint-differs-hold.json",
+  "?? contracts/proposed/fleet5-authority-replacement-r2/fixtures/positive/p19-policy-floor-matches-digest-differs-hold.json",
+  "?? contracts/proposed/fleet5-authority-replacement-r2/fixtures/positive/p20-cas-postimage-without-audit-hold.json",
+  "?? contracts/proposed/fleet5-authority-replacement-r2/fixtures/positive/p21-writer-fence-lost-hold.json",
+  "?? contracts/proposed/fleet5-authority-replacement-r2/fixtures/positive/p22-journal-manifest-mismatch-hold.json",
+  "?? contracts/proposed/fleet5-authority-replacement-r2/fixtures/positive/p23-a1-in-flight-key-present-resume.json",
+  "?? contracts/proposed/fleet5-authority-replacement-r2/fixtures/positive/p24-second-ca-key-hold.json",
+  "?? contracts/proposed/fleet5-authority-replacement-r2/fixtures/positive/p25-extra-leaf-signed-hold.json",
+  "?? contracts/proposed/fleet5-authority-replacement-r2/fixtures/positive/p26-duplicate-readback-row-hold.json",
+  "?? contracts/proposed/fleet5-authority-replacement-r2/fixtures/positive/p27-a3-without-verified-staging-hold.json",
+  "?? contracts/proposed/fleet5-authority-replacement-r2/fixtures/positive/p28-settled-journal-missing-process-evidence-hold.json",
+  "?? contracts/proposed/fleet5-authority-replacement-r2/fixtures/positive/p29-stale-handshake-hold.json",
+  "?? contracts/proposed/fleet5-authority-replacement-r2/fixtures/positive/p30-a6-rolling-switch-resume.json",
+  "?? contracts/proposed/fleet5-authority-replacement-r2/fixtures/positive/p31-a7-awaiting-fresh-handshakes-resume.json",
+  "?? contracts/proposed/fleet5-authority-replacement-r2/fixtures/positive/p32-paused-policy-expiry-hold.json",
+  "?? contracts/proposed/fleet5-authority-replacement-r2/fixtures/positive/p33-successor-not-yet-valid-hold.json",
+  "?? contracts/proposed/fleet5-authority-replacement-r2/fixtures/positive/p34-advance-dual-not-started.json",
+  "?? contracts/proposed/fleet5-authority-replacement-r2/fixtures/positive/p35-advance-dual-a4-resume.json",
+  "?? contracts/proposed/fleet5-authority-replacement-r2/fixtures/positive/p36-advance-dual-complete-retired.json",
+  "?? contracts/proposed/fleet5-authority-replacement-r2/fixtures/positive/p37-advance-overlap-elapsed-hold.json",
+  "?? contracts/proposed/fleet5-authority-replacement-r2/fixtures/positive/p38-advance-quiesced-not-started.json",
+  "?? contracts/proposed/fleet5-authority-replacement-r2/fixtures/positive/p39-advance-a7-partial-retire-resume.json",
+  "?? contracts/proposed/fleet5-authority-replacement-r2/fixtures/rejection/r01-new-ca-is-prior.json",
+  "?? contracts/proposed/fleet5-authority-replacement-r2/fixtures/rejection/r02-new-ca-key-is-prior.json",
+  "?? contracts/proposed/fleet5-authority-replacement-r2/fixtures/rejection/r03-new-ca-subject-reused.json",
+  "?? contracts/proposed/fleet5-authority-replacement-r2/fixtures/rejection/r04-terminal-in-anchor-bundle.json",
+  "?? contracts/proposed/fleet5-authority-replacement-r2/fixtures/rejection/r05-cross-signed-by-prior.json",
+  "?? contracts/proposed/fleet5-authority-replacement-r2/fixtures/rejection/r06-epoch-replaced.json",
+  "?? contracts/proposed/fleet5-authority-replacement-r2/fixtures/rejection/r07-channel-counter-reset.json",
+  "?? contracts/proposed/fleet5-authority-replacement-r2/fixtures/rejection/r08-policy-not-above-floor.json",
+  "?? contracts/proposed/fleet5-authority-replacement-r2/fixtures/rejection/r09-pc1-copies-pc4-identity.json",
+  "?? contracts/proposed/fleet5-authority-replacement-r2/fixtures/rejection/r10-pc1-reuses-retired-row.json",
+  "?? contracts/proposed/fleet5-authority-replacement-r2/fixtures/rejection/r11-pc1-reuses-existing-key.json",
+  "?? contracts/proposed/fleet5-authority-replacement-r2/fixtures/rejection/r12-rotation-key-changed.json",
+  "?? contracts/proposed/fleet5-authority-replacement-r2/fixtures/rejection/r13-rotation-of-unknown-identity.json",
+  "?? contracts/proposed/fleet5-authority-replacement-r2/fixtures/rejection/r14-enrollment-counter-nonzero.json",
+  "?? contracts/proposed/fleet5-authority-replacement-r2/fixtures/rejection/r15-proposed-with-unknown-budget.json",
+  "?? contracts/proposed/fleet5-authority-replacement-r2/fixtures/rejection/r16-proposed-with-historical-epoch.json",
+  "?? contracts/proposed/fleet5-authority-replacement-r2/fixtures/rejection/r17-successor-lead-too-short.json",
+  "?? contracts/proposed/fleet5-authority-replacement-r2/fixtures/rejection/r18-seven-day-ca-repeats-failure.json",
+  "?? contracts/proposed/fleet5-authority-replacement-r2/fixtures/rejection/r19-leaf-lead-below-budget.json",
+  "?? contracts/proposed/fleet5-authority-replacement-r2/fixtures/rejection/r20-terminal-not-yet-expired.json",
+  "?? contracts/proposed/fleet5-authority-replacement-r2/fixtures/rejection/r21-activation-released.json",
+  "?? contracts/proposed/fleet5-authority-replacement-r2/fixtures/rejection/r22-private-material-embedded.json",
+  "?? contracts/proposed/fleet5-authority-replacement-r2/fixtures/rejection/r23-resume-over-undone-cas.json",
+  "?? contracts/proposed/fleet5-authority-replacement-r2/fixtures/rejection/r24-rollback-to-terminal.json",
+  "?? contracts/proposed/fleet5-authority-replacement-r2/fixtures/rejection/r25-shared-planned-leaf.json",
+  "?? contracts/proposed/fleet5-authority-replacement-r2/fixtures/rejection/r26-leaf-from-impostor-root.json",
+  "?? contracts/proposed/fleet5-authority-replacement-r2/fixtures/rejection/r27-leaf-uri-other-node.json",
+  "?? contracts/proposed/fleet5-authority-replacement-r2/fixtures/rejection/r28-leaf-client-eku.json",
+  "?? contracts/proposed/fleet5-authority-replacement-r2/fixtures/rejection/r29-leaf-ip-san-differs.json",
+  "?? contracts/proposed/fleet5-authority-replacement-r2/fixtures/rejection/r30-leaf-validity-not-planned.json",
+  "?? contracts/proposed/fleet5-authority-replacement-r2/fixtures/rejection/r31-csr-signature-tampered.json",
+  "?? contracts/proposed/fleet5-authority-replacement-r2/fixtures/rejection/r32-csr-subject-not-node.json",
+  "?? contracts/proposed/fleet5-authority-replacement-r2/fixtures/rejection/r33-prior-leaf-forged.json",
+  "?? contracts/proposed/fleet5-authority-replacement-r2/fixtures/rejection/r34-prior-leaf-not-row-tuple.json",
+  "?? contracts/proposed/fleet5-authority-replacement-r2/fixtures/rejection/r35-role-key-equals-cp-key.json",
+  "?? contracts/proposed/fleet5-authority-replacement-r2/fixtures/rejection/r36-role-key-equals-new-ca-key.json",
+  "?? contracts/proposed/fleet5-authority-replacement-r2/fixtures/rejection/r37-retained-signer-compromised.json",
+  "?? contracts/proposed/fleet5-authority-replacement-r2/fixtures/rejection/r38-retained-cp-key-changed.json",
+  "?? contracts/proposed/fleet5-authority-replacement-r2/fixtures/rejection/r39-root-not-a-ca.json",
+  "?? contracts/proposed/fleet5-authority-replacement-r2/fixtures/rejection/r40-retained-signer-wrong-scope.json",
+  "?? contracts/proposed/fleet5-authority-replacement-r2/fixtures/rejection/r41-reservation-plan-digest-stale.json",
+  "?? contracts/proposed/fleet5-authority-replacement-r2/fixtures/rejection/r42-reservation-node-state-not-empty.json",
+  "?? contracts/proposed/fleet5-authority-replacement-r2/fixtures/rejection/r43-rows-readback-excludes-retired.json",
+  "?? contracts/proposed/fleet5-authority-replacement-r2/fixtures/rejection/r44-reservation-csr-mismatch.json",
+  "?? contracts/proposed/fleet5-authority-replacement-r2/fixtures/rejection/r45-process-inventory-missing-site.json",
+  "?? contracts/proposed/fleet5-authority-replacement-r2/fixtures/rejection/r46-complete-declared-over-stale-evidence.json",
+  "?? contracts/proposed/fleet5-authority-replacement-r2/fixtures/rejection/r47-serving-binary-not-reviewed.json",
+  "?? contracts/proposed/fleet5-authority-replacement-r2/fixtures/rejection/r48-manifest-digest-altered.json",
+  "?? contracts/proposed/fleet5-authority-replacement-r2/fixtures/rejection/r49-ceremony-missing-after-a1.json",
+  "?? contracts/proposed/fleet5-authority-replacement-r2/fixtures/rejection/r50-apply-declared-for-committed-op.json",
+  "?? contracts/proposed/fleet5-authority-replacement-r2/fixtures/rejection/r51-ceremony-before-a1.json",
+  "?? contracts/proposed/fleet5-authority-replacement-r2/fixtures/rejection/r52-terminal-mode-with-dual-bundle.json",
+  "?? contracts/proposed/fleet5-authority-replacement-r2/fixtures/rejection/r53-advance-mode-prior-expired.json",
+  "?? contracts/proposed/fleet5-authority-replacement-r2/fixtures/rejection/r54-advance-overlap-exceeds-lead.json",
+  "?? contracts/proposed/fleet5-authority-replacement-r2/fixtures/rejection/r55-advance-started-too-late.json",
+  "?? contracts/proposed/fleet5-authority-replacement-r2/fixtures/rejection/r56-resume-declared-over-expiry.json",
+  "?? contracts/proposed/fleet5-authority-replacement-r2/fixtures/rejection/r57-quiesced-without-evidence.json",
+  "?? contracts/proposed/fleet5-authority-replacement-r2/fixtures/rejection/r58-terminal-mode-with-overlap.json",
+  "?? contracts/proposed/fleet5-authority-replacement-r2/fleet5-authority-replacement-v2.schema.json",
+  "?? contracts/proposed/fleet5-authority-replacement-r2/handoff/pc1-first-enrollment-handoff.json",
+  "?? contracts/proposed/fleet5-authority-replacement-r2/instances/fleet5-nov18-ca-terminal-hold-r2.json",
+  "?? contracts/proposed/fleet5-authority-replacement-r2/manifests/p02-operation-manifest.json",
+  "?? docs/vault/30_Development/History/2026-11-19_FLEET5_Authority_Replacement_Contract_R2_Claude.md",
+  "?? \"docs/vault/40_Governance/Proposed FLEET5 authority replacement and advance-renewal contract R2.md\"",
+  "?? tests/core/test_fleet5_authority_replacement_r2.py",
+  "?? tools/check_fleet5_authority_replacement_r2.py",
+  "?? tools/generate_fleet5_authority_replacement_r2_fixtures.py"
+ ],
+ "gates": [
+  {
+   "command": "python tools/check_docs.py",
+   "exitCode": 0,
+   "startedKST": "2026-11-19T00:58:36+09:00",
+   "endedKST": "2026-11-19T00:59:01+09:00",
+   "outputTail": [
+    "PASS: 24 original hashes, 1278 versioned documents, wiki links, 48 tasks, 12 outcomes, owner/reviewer/skills, dependency DAG."
+   ]
+  },
+  {
+   "command": "python tools/check_doc_path_citations.py --ratchet --base-ref bb6e028d179495f547921cc2afa57681a68db95b",
+   "exitCode": 0,
+   "startedKST": "2026-11-19T00:59:01+09:00",
+   "endedKST": "2026-11-19T00:59:13+09:00",
+   "outputTail": [
+    "PASS check_doc_path_citations --ratchet: 290 broken citation(s), all in baseline, none stale, floor unchanged."
+   ]
+  },
+  {
+   "command": "python tools/check_contract_bindings.py",
+   "exitCode": 0,
+   "startedKST": "2026-11-19T00:59:13+09:00",
+   "endedKST": "2026-11-19T00:59:23+09:00",
+   "outputTail": [
+    "PASS check_contract_bindings: 57 fixtures each referenced by a test; 21 bound kernel response TYPES each have >=1 serving-anchor test (counted PER TYPE, not per anchor SITE: those types occupy 27 anchor sites; a multi-site type counts covered even if only one site is tested -- site-level weight is not decidable here, use tools/check_anchor_weight.py + the mutation harness); 14 replay guards present.",
+    "  UNIT NOTE: TYPE count <= SITE count. Multi-site types (per-type coverage can mask an untested site): ApprovalView(2 sites: ['approvals']), BusinessBindingView(2 sites: ['business_handoff']), BusinessEditLockReleaseView(2 sites: ['business_handoff']), BusinessEditLockView(2 sites: ['business_handoff']), ControlRunDetail(3 sites: ['control']), ControlRunView(2 sites: ['control']), EvidenceEnvelope(6 sites: ['build_governance', 'results', 'runs', 'shard_completion', 'storage_commit', 'storage_view']), ModelExecutionManifestObservation(2 sites: ['model_uri_resolver', 'model_view']), NodeExecutionPermit(2 sites: ['node_execution', 'node_transport']), NodeResourceSnapshot(4 sites: ['capacity', 'gpu', 'observation']), WorkspaceCheckoutView(2 sites: ['workspace_recovery']), WorkspaceEnqueueResult(3 sites: ['workspace_api']), WorkspacePrepareResult(2 sites: ['workspace_api']), WorkspaceRestoreView(2 sites: ['workspace_recovery']), WorkspaceStartEnqueueResult(3 sites: ['workspace_start']), WorkspaceStartPrepareResult(2 sites: ['workspace_start'])",
+    "  (Reporting sites is not a regression -- the TYPE number never meant 'sites verified'; this makes the counting unit explicit. EvidenceEnvelope-class multi-site anchors are why.)"
+   ]
+  },
+  {
+   "command": "python tools/check_frontend_integrity.py",
+   "exitCode": 0,
+   "startedKST": "2026-11-19T00:59:23+09:00",
+   "endedKST": "2026-11-19T00:59:24+09:00",
+   "outputTail": [
+    "Scanning 94 frontend production source files under apps/web/src ...",
+    "PASS Frontend Integrity Check: all 9 integrity rules satisfied (0 violations)."
+   ]
+  },
+  {
+   "command": "python tools/test_sync.py",
+   "exitCode": 0,
+   "startedKST": "2026-11-19T00:59:24+09:00",
+   "endedKST": "2026-11-19T00:59:31+09:00",
+   "outputTail": [
+    ".",
+    "----------------------------------------------------------------------",
+    "Ran 14 tests in 6.855s",
+    "OK"
+   ]
+  },
+  {
+   "command": "python tools/check_ontology_generation.py",
+   "exitCode": 0,
+   "startedKST": "2026-11-19T00:59:31+09:00",
+   "endedKST": "2026-11-19T00:59:33+09:00",
+   "outputTail": [
+    "PASS: 4 ontology artifacts are graph-equivalent to a fresh generation"
+   ]
+  },
+  {
+   "command": "python tools/check_ontology.py",
+   "exitCode": 0,
+   "startedKST": "2026-11-19T00:59:33+09:00",
+   "endedKST": "2026-11-19T00:59:35+09:00",
+   "outputTail": [
+    "PASS: RDF parsing, defined terms, TTL/JSON-LD equivalence, 48 task mappings, positive SHACL, 4 rejected invalid fixtures, 4 competency queries, Obsidian mirrors."
+   ]
+  },
+  {
+   "command": "python tools/check_doc_single_source.py --ratchet",
+   "exitCode": 0,
+   "startedKST": "2026-11-19T00:59:35+09:00",
+   "endedKST": "2026-11-19T00:59:36+09:00",
+   "outputTail": [
+    "PASS check_doc_single_source --ratchet: 16 pairs, all in baseline, none stale."
+   ]
+  },
+  {
+   "command": "python tools/sync_obsidian.py --check",
+   "exitCode": 0,
+   "startedKST": "2026-11-19T00:59:36+09:00",
+   "endedKST": "2026-11-19T01:00:10+09:00",
+   "outputTail": [
+    "CHECK: 3801 managed files, 7 pending exports, 0 conflicts. No writes."
+   ]
+  },
+  {
+   "command": "python tools/check_fleet5_authority_replacement.py",
+   "exitCode": 0,
+   "startedKST": "2026-11-19T01:00:10+09:00",
+   "endedKST": "2026-11-19T01:00:11+09:00",
+   "outputTail": [
+    "PASS fleet5 authority replacement: 45 documents matched their expected verdicts"
+   ]
+  },
+  {
+   "command": "python tools/generate_fleet5_authority_replacement_fixtures.py --check",
+   "exitCode": 0,
+   "startedKST": "2026-11-19T01:00:11+09:00",
+   "endedKST": "2026-11-19T01:00:12+09:00",
+   "outputTail": []
+  },
+  {
+   "command": "python tools/check_fleet5_authority_replacement_r2.py",
+   "exitCode": 0,
+   "startedKST": "2026-11-19T01:00:12+09:00",
+   "endedKST": "2026-11-19T01:00:13+09:00",
+   "outputTail": [
+    "PASS fleet5 authority replacement R2: 98 documents matched their expected verdicts"
+   ]
+  },
+  {
+   "command": "python tools/generate_fleet5_authority_replacement_r2_fixtures.py --check",
+   "exitCode": 0,
+   "startedKST": "2026-11-19T01:00:13+09:00",
+   "endedKST": "2026-11-19T01:00:14+09:00",
+   "outputTail": []
+  },
+  {
+   "command": "python -m pytest tests/core/test_fleet5_authority_replacement_r2.py tests/core/test_fleet5_authority_replacement_proposal.py -q -p no:cacheprovider",
+   "exitCode": 0,
+   "startedKST": "2026-11-19T01:00:14+09:00",
+   "endedKST": "2026-11-19T01:00:22+09:00",
+   "outputTail": [
+    "........................................................................ [ 75%]",
+    "........................................................................ [ 94%]",
+    "...................                                                      [100%]",
+    "379 passed in 6.41s"
+   ]
+  }
+ ]
+}

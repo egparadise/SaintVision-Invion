@@ -1,0 +1,489 @@
+{
+ "schema": "fleet5-authority-replacement-plan:2",
+ "revision": "R2",
+ "planID": "ARP-20261119-p29-stale-handshake-hold",
+ "status": "PROPOSED",
+ "activation": "NOT_AUTHORIZED",
+ "fixture": true,
+ "mode": "TERMINAL_REPLACEMENT",
+ "observedAt": "2026-11-18T12:00:00Z",
+ "tenantID": "00000000-0000-4000-8000-0000000000a1",
+ "projectID": "prj_000000000000000000000000P1",
+ "preservedEpoch": {
+  "epoch": "00000000-0000-4000-8000-0000000000e1",
+  "source": "DB_READBACK",
+  "readbackSHA256": "71f6ae4f2bd7bf6f9bb7afafdb95cd09bef91d07af12944203c3c3d9ec04008d"
+ },
+ "priorAuthority": {
+  "certificateDER": "MIIBSDCB+6ADAgECAhAA00KIcFvXV2+A/irT4O7zMAUGAytlcDAjMSEwHwYDVQQDDBhTYWludFZpc2lvbiBMQU4gcGlsb3QgQ0EwHhcNMjYxMTA3MDcxNTMwWhcNMjYxMTE0MDcxNTMwWjAjMSEwHwYDVQQDDBhTYWludFZpc2lvbiBMQU4gcGlsb3QgQ0EwKjAFBgMrZXADIQAhSfDazZkotKAoDckUjbtqsluSpkYXFjzgWSRD7MuhSqNFMEMwEgYDVR0TAQH/BAgwBgEB/wIBADAOBgNVHQ8BAf8EBAMCAQYwHQYDVR0OBBYEFOKEVUTWuIc47Ta/7xq0p+HUfaXrMAUGAytlcANBAHqXk/gQv3cpgEzLXaYJQf7WjYe3ARcMAaU+KWSTqzsavdy98q836oYzXOSdK4AsyFCztLcYm3bW4Kx1kI8Z/A8=",
+  "caCertificateSHA256": "8de8c2603c7661b7bbf739ef5d3c4671af4acd66bd30c627a47c9a301301fd37",
+  "caPublicKeySHA256": "5d7a698295adb2a2ea7bcc24a578ff81c4e7fabf76c593a3e34eec1916d3cc60",
+  "subjectCommonName": "SaintVision LAN pilot CA",
+  "notAfter": "2026-11-14T07:15:30Z",
+  "state": "CA_TERMINAL",
+  "usage": "REFERENCE_ONLY"
+ },
+ "newAuthority": {
+  "certificateDER": "MIIBZzCCARmgAwIBAgIQALXgH+YSn+gbSf+mp7yp3TAFBgMrZXAwMjEwMC4GA1UEAwwnU2FpbnRWaXNpb24gRkxFRVQ1IGF1dGhvcml0eSAyMDI2LTExIFIyMB4XDTI2MTExODEyMDAwMFoXDTI3MTExODEyMDAwMFowMjEwMC4GA1UEAwwnU2FpbnRWaXNpb24gRkxFRVQ1IGF1dGhvcml0eSAyMDI2LTExIFIyMCowBQYDK2VwAyEA14u4+/kX56HB13RywRgmbqxBK7ZqF+QYDF0ghU7kR8+jRTBDMBIGA1UdEwEB/wQIMAYBAf8CAQAwDgYDVR0PAQH/BAQDAgEGMB0GA1UdDgQWBBT4fipe30j8/Te1G91Y+8WlXN18ijAFBgMrZXADQQD1mDKQ/E6PfFGGeNDOVLaM4D58FG8EjgzKQUvUkzv3/0/InklTgG1onfqn9PZj2D85Q69BzNarido3TYWMFnYB",
+  "caCertificateSHA256": "6d4166faece423f2cd02d55c73cb305f84fad4c2744b0a0ea50e0a1fa5ce18b9",
+  "caPublicKeySHA256": "033f41b847c4415696a439c6fbf31c8a50ff722bd89386331030c9fb367a9889",
+  "subjectCommonName": "SaintVision FLEET5 authority 2026-11 R2",
+  "keyAlgorithm": "Ed25519",
+  "keyGeneratedFresh": true,
+  "crossSignedByPrior": false,
+  "pathLength": 0,
+  "notBefore": "2026-11-18T12:00:00Z",
+  "notAfter": "2027-11-18T12:00:00Z",
+  "leafValidity": {
+   "notBefore": "2026-11-18T12:00:00Z",
+   "notAfter": "2026-11-24T12:00:00Z"
+  },
+  "custody": {
+   "holder": "ROOT_OFFLINE_OPERATOR",
+   "privateMaterialInRepository": false,
+   "custodyEvidenceRef": "fixture:custody/new-ca"
+  },
+  "trustAuthorization": {
+   "decisionRef": "fixture:decision/new-trust",
+   "authorizedBy": "fixture-root-operator"
+  }
+ },
+ "trustTransition": {
+  "cutover": "TERMINAL_SINGLETON",
+  "overlap": null,
+  "quiesceEvidenceRef": null,
+  "targetGeneration": 2,
+  "stagedAnchorBundle": [
+   "6d4166faece423f2cd02d55c73cb305f84fad4c2744b0a0ea50e0a1fa5ce18b9"
+  ],
+  "finalAnchorBundle": [
+   "6d4166faece423f2cd02d55c73cb305f84fad4c2744b0a0ea50e0a1fa5ce18b9"
+  ]
+ },
+ "advanceRenewal": {
+  "caLifetimeSeconds": 31536000,
+  "caSuccessorLeadSeconds": 2592000,
+  "caWarningLeadSeconds": 3888000,
+  "leafLifetimeSeconds": 518400,
+  "leafRenewalLeadSeconds": 259200,
+  "policyLifetimeSeconds": 172800,
+  "policyRenewalLeadSeconds": 86400,
+  "overlapSeconds": 14400,
+  "normalBudgetSeconds": 7200,
+  "caSuccessorBudgetSeconds": 86400,
+  "safetySeconds": 630,
+  "clockSkewSeconds": 30
+ },
+ "measuredBudgets": {
+  "source": "MEASURED",
+  "evidenceRef": "fixture:budget/measured",
+  "phaseSeconds": {
+   "A0_PREFLIGHT_READBACK": 600,
+   "A1_NEW_TRUST_AUTHORIZED": 600,
+   "A2_ANCHOR_STAGED": 600,
+   "A3_ROTATION_LEAVES_INSTALLED": 600,
+   "A4_CHANNEL_CAS": 600,
+   "A5_POLICY_PUBLISHED": 600,
+   "A6_CP_CONTEXT_SWITCH": 600,
+   "A7_ROTATION_SETTLED": 600,
+   "E1_ENROLLMENT_RESERVED": 600,
+   "E2_ENROLLMENT_ROW_ADMITTED": 600,
+   "E3_ENROLLMENT_CHANNEL_PROVISIONED": 600,
+   "E4_ENROLLMENT_POLICY_PUBLISHED": 600,
+   "E5_ENROLLMENT_SETTLED": 600
+  }
+ },
+ "servingBinaryMigration": {
+  "status": "REVIEWED",
+  "reviewRef": "fixture:review/node-binary-migration"
+ },
+ "writerFence": {
+  "token": "fence:fixture-arp-r2"
+ },
+ "placement": {
+  "controlPlaneHostPC": "PC3",
+  "excludedPCs": [
+   "PC5"
+  ]
+ },
+ "controlPlaneClient": {
+  "spiffeURI": "spiffe://saintvision.ai/tenant/00000000-0000-4000-8000-0000000000a1/control-plane/epoch/00000000-0000-4000-8000-0000000000e1",
+  "keyContinuity": "RETAINED",
+  "publicKeySHA256": "d21caccb84feb87d083177c58ed041a352c5c7460da9cce20a6020b9ce7a3ed7",
+  "csrDER": "MIGXMEsCAQAwGDEWMBQGA1UEAwwNY29udHJvbC1wbGFuZTAqMAUGAytlcAMhAMn2GZfe/FCT22g9IL9rMiiUH0Kof82ZY2QSap9t3zqooAAwBQYDK2VwA0EAAZwKhYcPp2s+mdHa42f9x13l2cvywsXu5MiEyWkdI+TWJty3nyJMGRFPrTirxVgGJ2mz3xaZVHquJoShglKmDg==",
+  "priorLeafDER": "MIICCDCCAbqgAwIBAgIQAJT2+uWpAXSI8qIQQe0lczAFBgMrZXAwIzEhMB8GA1UEAwwYU2FpbnRWaXNpb24gTEFOIHBpbG90IENBMB4XDTI2MTEwODA3MTUzMFoXDTI2MTExNDA3MTUzMFowJDEiMCAGA1UEAwwZU2FpbnRWaXNpb24gY29udHJvbCBwbGFuZTAqMAUGAytlcAMhAMn2GZfe/FCT22g9IL9rMiiUH0Kof82ZY2QSap9t3zqoo4IBATCB/jAMBgNVHRMBAf8EAjAAMA4GA1UdDwEB/wQEAwIHgDATBgNVHSUEDDAKBggrBgEFBQcDAjAdBgNVHQ4EFgQU938zObnmXXgrDjQ+pttO45UmCIMwHwYDVR0jBBgwFoAU4oRVRNa4hzjtNr/vGrSn4dR9peswgYgGA1UdEQSBgDB+hnxzcGlmZmU6Ly9zYWludHZpc2lvbi5haS90ZW5hbnQvMDAwMDAwMDAtMDAwMC00MDAwLTgwMDAtMDAwMDAwMDAwMGExL2NvbnRyb2wtcGxhbmUvZXBvY2gvMDAwMDAwMDAtMDAwMC00MDAwLTgwMDAtMDAwMDAwMDAwMGUxMAUGAytlcANBAHVzqe23XXKDjtSJPXOcXOLJyjF3gjPvh9L/ftVoHStRgIybsrYci2Rv2AHcBOAmjmr2tznMbTKnvvFm1dLmiAE=",
+  "leafDER": "MIICFjCCAcigAwIBAgIPXnlz+1oH2RebrclrIkFvMAUGAytlcDAyMTAwLgYDVQQDDCdTYWludFZpc2lvbiBGTEVFVDUgYXV0aG9yaXR5IDIwMjYtMTEgUjIwHhcNMjYxMTE4MTIwMDAwWhcNMjYxMTI0MTIwMDAwWjAkMSIwIAYDVQQDDBlTYWludFZpc2lvbiBjb250cm9sIHBsYW5lMCowBQYDK2VwAyEAyfYZl978UJPbaD0gv2syKJQfQqh/zZljZBJqn23fOqijggEBMIH+MAwGA1UdEwEB/wQCMAAwDgYDVR0PAQH/BAQDAgeAMBMGA1UdJQQMMAoGCCsGAQUFBwMCMB0GA1UdDgQWBBT3fzM5ueZdeCsOND6m207jlSYIgzAfBgNVHSMEGDAWgBT4fipe30j8/Te1G91Y+8WlXN18ijCBiAYDVR0RBIGAMH6GfHNwaWZmZTovL3NhaW50dmlzaW9uLmFpL3RlbmFudC8wMDAwMDAwMC0wMDAwLTQwMDAtODAwMC0wMDAwMDAwMDAwYTEvY29udHJvbC1wbGFuZS9lcG9jaC8wMDAwMDAwMC0wMDAwLTQwMDAtODAwMC0wMDAwMDAwMDAwZTEwBQYDK2VwA0EAB/tN2YfX9pRyovkdavZiat7HI6vZHTAC95WptWY4VrvUD+NPOdTodIh0qsa31cklYAa7VYlNQsvw3DDjN8/lCw==",
+  "plannedLeafSHA256": "d0e948b0d16a3a5ab1ca26252bd5e461966e008fd13b41a7d63296d2d612b684",
+  "contextSites": [
+   "observer_worker",
+   "delivery_worker",
+   "workspace_runtime",
+   "build_product_runtime",
+   "storage_check_collector"
+  ],
+  "processInventory": [
+   {
+    "site": "observer_worker",
+    "processID": "observer-1",
+    "kind": "SERVICE"
+   },
+   {
+    "site": "delivery_worker",
+    "processID": "delivery-1",
+    "kind": "SERVICE"
+   },
+   {
+    "site": "delivery_worker",
+    "processID": "delivery-2",
+    "kind": "SERVICE"
+   },
+   {
+    "site": "workspace_runtime",
+    "processID": "workspace-1",
+    "kind": "SERVICE"
+   },
+   {
+    "site": "build_product_runtime",
+    "processID": "build-product-1",
+    "kind": "SERVICE"
+   },
+   {
+    "site": "storage_check_collector",
+    "processID": "storage-check-cli",
+    "kind": "INVOKED_CLIENT"
+   }
+  ]
+ },
+ "roleKeys": [
+  {
+   "role": "LAUNCH_SIGNER",
+   "publicKeySHA256": "5dd16620e67286898117dc53ec487563c0676c089ede93801aabb7428d49e708",
+   "disposition": "RETAINED",
+   "continuity": {
+    "verifiedBy": "fixture-custody-card",
+    "scope": "LAUNCH_SIGNATURES",
+    "custodyEvidenceRef": "fixture:custody/launch-signer",
+    "compromiseDecision": "AFFIRMED_NOT_COMPROMISED",
+    "decisionRef": "fixture:decision/launch-signer-not-compromised"
+   }
+  }
+ ],
+ "members": [
+  {
+   "pc": "PC2",
+   "kind": "ROTATION",
+   "nodeID": "nod_00000000000000000000000PC2",
+   "account": "saintvision-invion",
+   "address": "10.0.0.2",
+   "endpoint": "https://10.0.0.2:7443",
+   "spiffeURI": "spiffe://saintvision.ai/tenant/00000000-0000-4000-8000-0000000000a1/node/nod_00000000000000000000000PC2/epoch/00000000-0000-4000-8000-0000000000e1",
+   "nodePublicKeySHA256": "2f8957506a888a9dbfb0ae38a1f32750f0c9f8ca9d0ad3cc19d71eaf8147957f",
+   "csrDER": "MIGoMFwCAQAwKTEnMCUGA1UEAwwebm9kXzAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwUEMyMCowBQYDK2VwAyEAO/WpPuikCibXi74OtTlthtVoSOhHddy1+xYyB3zkovmgADAFBgMrZXADQQBZTFimO/iCMtqg7vzq9rHtoBrJBCq+sBceSFKD3+RWppWtHWjpjvah8FKnpzfQFgwrqX/mCtFENQ8bp3SfP40N",
+   "priorLeafDER": "MIICIjCCAdSgAwIBAgIQAPX3WvJLYFbecUL2exSobzAFBgMrZXAwIzEhMB8GA1UEAwwYU2FpbnRWaXNpb24gTEFOIHBpbG90IENBMB4XDTI2MTEwODA3MTUzMFoXDTI2MTExNDA3MTUzMFowHzEdMBsGA1UEAwwUU2FpbnRWaXNpb24gTEFOIHBlZXIwKjAFBgMrZXADIQA79ak+6KQKJteLvg61OW2G1WhI6Ed13LX7FjIHfOSi+aOCASAwggEcMAwGA1UdEwEB/wQCMAAwDgYDVR0PAQH/BAQDAgeAMBMGA1UdJQQMMAoGCCsGAQUFBwMBMB0GA1UdDgQWBBTCHQLlYpNn1XHs77AMTuxy95hGEzAfBgNVHSMEGDAWgBTihFVE1riHOO02v+8atKfh1H2l6zCBpgYDVR0RBIGeMIGbhoGSc3BpZmZlOi8vc2FpbnR2aXNpb24uYWkvdGVuYW50LzAwMDAwMDAwLTAwMDAtNDAwMC04MDAwLTAwMDAwMDAwMDBhMS9ub2RlL25vZF8wMDAwMDAwMDAwMDAwMDAwMDAwMDAwMFBDMi9lcG9jaC8wMDAwMDAwMC0wMDAwLTQwMDAtODAwMC0wMDAwMDAwMDAwZTGHBAoAAAIwBQYDK2VwA0EAZTZAiUNoCYtSuAKP5oMOgIfj2Exmei8YWEEYlfLc/u1K/TEHDjCCsTq7emPhKke5s2YVo/bVk0mVjsxawAuEBQ==",
+   "priorPolicyDigest": "1edf078d8b0045b3bf7b57394e36c486b4a5cff7cc3264b5821c3a03f279de8b",
+   "leafDER": "MIICMDCCAeKgAwIBAgIPQNsNh05c4snT2i38mZJVMAUGAytlcDAyMTAwLgYDVQQDDCdTYWludFZpc2lvbiBGTEVFVDUgYXV0aG9yaXR5IDIwMjYtMTEgUjIwHhcNMjYxMTE4MTIwMDAwWhcNMjYxMTI0MTIwMDAwWjAfMR0wGwYDVQQDDBRTYWludFZpc2lvbiBMQU4gcGVlcjAqMAUGAytlcAMhADv1qT7opAom14u+DrU5bYbVaEjoR3XctfsWMgd85KL5o4IBIDCCARwwDAYDVR0TAQH/BAIwADAOBgNVHQ8BAf8EBAMCB4AwEwYDVR0lBAwwCgYIKwYBBQUHAwEwHQYDVR0OBBYEFMIdAuVik2fVcezvsAxO7HL3mEYTMB8GA1UdIwQYMBaAFPh+Kl7fSPz9N7Ub3Vj7xaVc3XyKMIGmBgNVHREEgZ4wgZuGgZJzcGlmZmU6Ly9zYWludHZpc2lvbi5haS90ZW5hbnQvMDAwMDAwMDAtMDAwMC00MDAwLTgwMDAtMDAwMDAwMDAwMGExL25vZGUvbm9kXzAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwUEMyL2Vwb2NoLzAwMDAwMDAwLTAwMDAtNDAwMC04MDAwLTAwMDAwMDAwMDBlMYcECgAAAjAFBgMrZXADQQBkUyUaBIEsiudtJJWhxxYzlINCysd/qICZtGRFVv7HZwcTU0SeYWLx3bsgaTNyPxtZhXkUFSghJN9DvV6HA+MM",
+   "plannedLeafSHA256": "b2ed795a6a875d095c59ebfff631c3511d10e189448c2fcb3eee0d510e9d5cc0",
+   "plannedPolicy": {
+    "digest": "daf7b6e6ed57ba4aa57e48d8f77d2caa70c5ea189a6a7b3e2b135f85faa607aa",
+    "notBefore": "2026-11-18T12:00:00Z",
+    "notAfter": "2026-11-20T12:00:00Z"
+   },
+   "counters": {
+    "channelVersionBefore": 1,
+    "channelVersionAfter": 2,
+    "policyFloorBefore": 2,
+    "policyVersionAfter": 3
+   },
+   "reservation": null
+  },
+  {
+   "pc": "PC3",
+   "kind": "ROTATION",
+   "nodeID": "nod_00000000000000000000000PC3",
+   "account": "saintvision-invion3",
+   "address": "10.0.0.3",
+   "endpoint": "https://10.0.0.3:7443",
+   "spiffeURI": "spiffe://saintvision.ai/tenant/00000000-0000-4000-8000-0000000000a1/node/nod_00000000000000000000000PC3/epoch/00000000-0000-4000-8000-0000000000e1",
+   "nodePublicKeySHA256": "a8e91140b3625ab665bae18c3c6e42d09a820b9a06d858183cda92731d7ddb1b",
+   "csrDER": "MIGoMFwCAQAwKTEnMCUGA1UEAwwebm9kXzAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwUEMzMCowBQYDK2VwAyEA7bOigsnqf8cSbIOrs0sXpdEpfG3LopaIIofaIVV/PFegADAFBgMrZXADQQD4MUF6CSxGmY3U0YynMS83MJSrLrerelDpZFuWWSlosdenvvc3w2l4DPLRdFSlTacLERkmZL2BxPFv/olLSxUF",
+   "priorLeafDER": "MIICIjCCAdSgAwIBAgIQAPJ7zGyxxTQsBsbdS1d5dzAFBgMrZXAwIzEhMB8GA1UEAwwYU2FpbnRWaXNpb24gTEFOIHBpbG90IENBMB4XDTI2MTEwODA3MTUzMFoXDTI2MTExNDA3MTUzMFowHzEdMBsGA1UEAwwUU2FpbnRWaXNpb24gTEFOIHBlZXIwKjAFBgMrZXADIQDts6KCyep/xxJsg6uzSxel0Sl8bcuilogih9ohVX88V6OCASAwggEcMAwGA1UdEwEB/wQCMAAwDgYDVR0PAQH/BAQDAgeAMBMGA1UdJQQMMAoGCCsGAQUFBwMBMB0GA1UdDgQWBBSZhzcIx2VTvyJVw88X1NCkGSv9IjAfBgNVHSMEGDAWgBTihFVE1riHOO02v+8atKfh1H2l6zCBpgYDVR0RBIGeMIGbhoGSc3BpZmZlOi8vc2FpbnR2aXNpb24uYWkvdGVuYW50LzAwMDAwMDAwLTAwMDAtNDAwMC04MDAwLTAwMDAwMDAwMDBhMS9ub2RlL25vZF8wMDAwMDAwMDAwMDAwMDAwMDAwMDAwMFBDMy9lcG9jaC8wMDAwMDAwMC0wMDAwLTQwMDAtODAwMC0wMDAwMDAwMDAwZTGHBAoAAAMwBQYDK2VwA0EAZQVyvzM0nz1TnFnxF2r9fAb4qPcZvzT83kNmNtOxe2tB+CRzzX0hXDYnOePeO5zH1O4SURgv0tS1qqECgmISDQ==",
+   "priorPolicyDigest": "337643bf0099b8574d42461802cc808ca4fde84ad1117be1e5c7281256734921",
+   "leafDER": "MIICMDCCAeKgAwIBAgIPE4QfpKTe/+5/owOH4WOnMAUGAytlcDAyMTAwLgYDVQQDDCdTYWludFZpc2lvbiBGTEVFVDUgYXV0aG9yaXR5IDIwMjYtMTEgUjIwHhcNMjYxMTE4MTIwMDAwWhcNMjYxMTI0MTIwMDAwWjAfMR0wGwYDVQQDDBRTYWludFZpc2lvbiBMQU4gcGVlcjAqMAUGAytlcAMhAO2zooLJ6n/HEmyDq7NLF6XRKXxty6KWiCKH2iFVfzxXo4IBIDCCARwwDAYDVR0TAQH/BAIwADAOBgNVHQ8BAf8EBAMCB4AwEwYDVR0lBAwwCgYIKwYBBQUHAwEwHQYDVR0OBBYEFJmHNwjHZVO/IlXDzxfU0KQZK/0iMB8GA1UdIwQYMBaAFPh+Kl7fSPz9N7Ub3Vj7xaVc3XyKMIGmBgNVHREEgZ4wgZuGgZJzcGlmZmU6Ly9zYWludHZpc2lvbi5haS90ZW5hbnQvMDAwMDAwMDAtMDAwMC00MDAwLTgwMDAtMDAwMDAwMDAwMGExL25vZGUvbm9kXzAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwUEMzL2Vwb2NoLzAwMDAwMDAwLTAwMDAtNDAwMC04MDAwLTAwMDAwMDAwMDBlMYcECgAAAzAFBgMrZXADQQDbuIt2aQZmLNnrgIrmZDAGFxkG9h03DoaFmYpuBzQL5ty99d3vRbNMB6974zGhRdb3ks1rWplUjYdEoJbhKMMF",
+   "plannedLeafSHA256": "1d4f0a321a46a39bdda5c5b6e35591542783ed425b646821cb8163512561cf93",
+   "plannedPolicy": {
+    "digest": "8e07717072508d38b6584add0a646319161703d32da500a50e5fe30c6d3191a7",
+    "notBefore": "2026-11-18T12:00:00Z",
+    "notAfter": "2026-11-20T12:00:00Z"
+   },
+   "counters": {
+    "channelVersionBefore": 1,
+    "channelVersionAfter": 2,
+    "policyFloorBefore": 2,
+    "policyVersionAfter": 3
+   },
+   "reservation": null
+  },
+  {
+   "pc": "PC4",
+   "kind": "ROTATION",
+   "nodeID": "nod_00000000000000000000000PC4",
+   "account": "inviz",
+   "address": "10.0.0.4",
+   "endpoint": "https://10.0.0.4:7443",
+   "spiffeURI": "spiffe://saintvision.ai/tenant/00000000-0000-4000-8000-0000000000a1/node/nod_00000000000000000000000PC4/epoch/00000000-0000-4000-8000-0000000000e1",
+   "nodePublicKeySHA256": "2282ad95323526e18ee5a9723f386b41277d09ca6ede98e759f7b870c496a362",
+   "csrDER": "MIGoMFwCAQAwKTEnMCUGA1UEAwwebm9kXzAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwUEM0MCowBQYDK2VwAyEAx987/phP+dgpLi5/utPOfQVikvVPlONd14Jlj8fhuz2gADAFBgMrZXADQQC5IHuIvZa5kUTzb0SaUeHMer1xDC83N3d+OAQcCWqyJktw8qL6MWzkQkZjR4wM1jZJbEZKfeKiufRHGFzR3BcF",
+   "priorLeafDER": "MIICITCCAdOgAwIBAgIPEfLQh9Npo0pu2eH6ofF1MAUGAytlcDAjMSEwHwYDVQQDDBhTYWludFZpc2lvbiBMQU4gcGlsb3QgQ0EwHhcNMjYxMTA4MDcxNTMwWhcNMjYxMTE0MDcxNTMwWjAfMR0wGwYDVQQDDBRTYWludFZpc2lvbiBMQU4gcGVlcjAqMAUGAytlcAMhAMffO/6YT/nYKS4uf7rTzn0FYpL1T5TjXdeCZY/H4bs9o4IBIDCCARwwDAYDVR0TAQH/BAIwADAOBgNVHQ8BAf8EBAMCB4AwEwYDVR0lBAwwCgYIKwYBBQUHAwEwHQYDVR0OBBYEFC6qIHlmRs5UrOHX/rURvAgmB8h2MB8GA1UdIwQYMBaAFOKEVUTWuIc47Ta/7xq0p+HUfaXrMIGmBgNVHREEgZ4wgZuGgZJzcGlmZmU6Ly9zYWludHZpc2lvbi5haS90ZW5hbnQvMDAwMDAwMDAtMDAwMC00MDAwLTgwMDAtMDAwMDAwMDAwMGExL25vZGUvbm9kXzAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwUEM0L2Vwb2NoLzAwMDAwMDAwLTAwMDAtNDAwMC04MDAwLTAwMDAwMDAwMDBlMYcECgAABDAFBgMrZXADQQDKlxOP4H3CH4iJ2s1gvShO8yMKPohq9bRUgCLz4uZwejZw9nuorNs6NCJhEtFGEUbRB2YPg7YVsgrSwG2kCxwM",
+   "priorPolicyDigest": "99adecec28daf1e212bc95b5b7ccf6fbf4b9f41d27a56ff7ea22ca4d5a75035a",
+   "leafDER": "MIICMDCCAeKgAwIBAgIPKSoSUGkLXWNH/qsUCDBJMAUGAytlcDAyMTAwLgYDVQQDDCdTYWludFZpc2lvbiBGTEVFVDUgYXV0aG9yaXR5IDIwMjYtMTEgUjIwHhcNMjYxMTE4MTIwMDAwWhcNMjYxMTI0MTIwMDAwWjAfMR0wGwYDVQQDDBRTYWludFZpc2lvbiBMQU4gcGVlcjAqMAUGAytlcAMhAMffO/6YT/nYKS4uf7rTzn0FYpL1T5TjXdeCZY/H4bs9o4IBIDCCARwwDAYDVR0TAQH/BAIwADAOBgNVHQ8BAf8EBAMCB4AwEwYDVR0lBAwwCgYIKwYBBQUHAwEwHQYDVR0OBBYEFC6qIHlmRs5UrOHX/rURvAgmB8h2MB8GA1UdIwQYMBaAFPh+Kl7fSPz9N7Ub3Vj7xaVc3XyKMIGmBgNVHREEgZ4wgZuGgZJzcGlmZmU6Ly9zYWludHZpc2lvbi5haS90ZW5hbnQvMDAwMDAwMDAtMDAwMC00MDAwLTgwMDAtMDAwMDAwMDAwMGExL25vZGUvbm9kXzAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwUEM0L2Vwb2NoLzAwMDAwMDAwLTAwMDAtNDAwMC04MDAwLTAwMDAwMDAwMDBlMYcECgAABDAFBgMrZXADQQDbH1hCT3f7ruj0Za73Ke63YGeBWz9/wH0SB46YgRVaAXC7wn3GtYA3BFWtQ1zE6SZT8jbDGQPJzwBnJPTBbhoM",
+   "plannedLeafSHA256": "6dc786f0238020f69e7328b35e27b2bf79645a4125162f77ab46f9c39669a98e",
+   "plannedPolicy": {
+    "digest": "e5cdcc28582ec6360eb3b89a24055fd70453af47cbc5f77c3a3e4906aaf72ec0",
+    "notBefore": "2026-11-18T12:00:00Z",
+    "notAfter": "2026-11-20T12:00:00Z"
+   },
+   "counters": {
+    "channelVersionBefore": 3,
+    "channelVersionAfter": 4,
+    "policyFloorBefore": 5,
+    "policyVersionAfter": 6
+   },
+   "reservation": null
+  }
+ ],
+ "existingNodeRows": {
+  "source": "DB_READBACK",
+  "includesRetired": true,
+  "readbackSHA256": "5091dd3e3200648bf983c23a869ddc0065590e64bcc4b6b8478804a87c2a7479",
+  "rows": [
+   {
+    "nodeID": "nod_00000000000000000000000PC2",
+    "status": "ACTIVE",
+    "publicKeySHA256": "2f8957506a888a9dbfb0ae38a1f32750f0c9f8ca9d0ad3cc19d71eaf8147957f",
+    "channelCertificateSHA256": "d9b4399213ff1b48ae1c4412ad70d833c1afb1892b4c6cc716745b35417cb3e2"
+   },
+   {
+    "nodeID": "nod_00000000000000000000000PC3",
+    "status": "ACTIVE",
+    "publicKeySHA256": "a8e91140b3625ab665bae18c3c6e42d09a820b9a06d858183cda92731d7ddb1b",
+    "channelCertificateSHA256": "15ba49ba5caf8c9b54c78e827acaebeb2e66854c4af32201f3b42b5ef0c320b7"
+   },
+   {
+    "nodeID": "nod_00000000000000000000000PC4",
+    "status": "ACTIVE",
+    "publicKeySHA256": "2282ad95323526e18ee5a9723f386b41277d09ca6ede98e759f7b870c496a362",
+    "channelCertificateSHA256": "a725279e008afdd5f7b6b3f17862ea34fb6b945efbdcc0be39a59d82dffb170f"
+   },
+   {
+    "nodeID": "nod_0000000000000000000000RTR1",
+    "status": "RETIRED",
+    "publicKeySHA256": "680bb59a7bb24b0bc6af7af2c489fc77c65f8a1397fb3d5dbefd6ccdeafa29f7",
+    "channelCertificateSHA256": "33c954aa18f25afcdd07926014744dc8706c53495a0ad0bccddcca969772cb31"
+   },
+   {
+    "nodeID": "nod_0000000000000000000000RTR2",
+    "status": "DISABLED",
+    "publicKeySHA256": "7426a4b6d6f99d598f0d91c22add61cc2b37655d3dd1d69140ce1e9fc9090114",
+    "channelCertificateSHA256": "02bf2adb1aef5fc466722c3ebd7bc7ded61aa4b2a607bb3c6001eb6333f62d15"
+   }
+  ]
+ },
+ "operationManifest": {
+  "planDigest": "997cc2d0beb5390ce7fbb3f2d7e5b7cd7b8359f39fadacd98b32988e7cb16c82",
+  "digest": "b4052f8718bbe8402a7d41a6727823b38f54115f5f2e984de9700ba597308bb7",
+  "operationCount": 21
+ },
+ "checkpoint": {
+  "lastDurablePhase": "A7_ROTATION_SETTLED",
+  "inFlightPhase": null,
+  "inFlightOutcome": null,
+  "resumeAt": "2026-11-18T14:00:00Z",
+  "readback": {
+   "dbAvailable": true,
+   "epoch": "00000000-0000-4000-8000-0000000000e1",
+   "custodyState": "NEW_KEY_PRESENT_MATCHES_PLAN",
+   "writerFence": {
+    "token": "fence:fixture-arp-r2",
+    "holderPlanDigest": "997cc2d0beb5390ce7fbb3f2d7e5b7cd7b8359f39fadacd98b32988e7cb16c82"
+   },
+   "journalManifestDigest": "b4052f8718bbe8402a7d41a6727823b38f54115f5f2e984de9700ba597308bb7",
+   "ceremonyLog": {
+    "caKeysCreated": 1,
+    "signed": [
+     {
+      "subject": "nod_00000000000000000000000PC2",
+      "leafSHA256": "b2ed795a6a875d095c59ebfff631c3511d10e189448c2fcb3eee0d510e9d5cc0"
+     },
+     {
+      "subject": "nod_00000000000000000000000PC3",
+      "leafSHA256": "1d4f0a321a46a39bdda5c5b6e35591542783ed425b646821cb8163512561cf93"
+     },
+     {
+      "subject": "nod_00000000000000000000000PC4",
+      "leafSHA256": "6dc786f0238020f69e7328b35e27b2bf79645a4125162f77ab46f9c39669a98e"
+     },
+     {
+      "subject": "control-plane",
+      "leafSHA256": "d0e948b0d16a3a5ab1ca26252bd5e461966e008fd13b41a7d63296d2d612b684"
+     }
+    ]
+   },
+   "members": [
+    {
+     "nodeID": "nod_00000000000000000000000PC2",
+     "rowPresent": true,
+     "reservationDigest": null,
+     "channelVersion": 2,
+     "channelCertificateSHA256": "b2ed795a6a875d095c59ebfff631c3511d10e189448c2fcb3eee0d510e9d5cc0",
+     "channelAuditOpIDs": [
+      "op_64b538f8f0198e12e7793000"
+     ],
+     "policyFloor": 3,
+     "installedPolicyDigest": "daf7b6e6ed57ba4aa57e48d8f77d2caa70c5ea189a6a7b3e2b135f85faa607aa",
+     "policyJournalOpIDs": [
+      "op_5a15501247b39e0f5aa82bd5"
+     ],
+     "installedLeafSHA256": "b2ed795a6a875d095c59ebfff631c3511d10e189448c2fcb3eee0d510e9d5cc0",
+     "stagedAnchorDigest": "74ff0c7aad69a27e5a334d1d78cde59e29375b8a6ee3c33fe26aee72d6103f81",
+     "nodeObservedAt": "2026-11-18T13:59:30Z",
+     "nodeChallengeNonce": "fixture-challenge-0001"
+    },
+    {
+     "nodeID": "nod_00000000000000000000000PC3",
+     "rowPresent": true,
+     "reservationDigest": null,
+     "channelVersion": 2,
+     "channelCertificateSHA256": "1d4f0a321a46a39bdda5c5b6e35591542783ed425b646821cb8163512561cf93",
+     "channelAuditOpIDs": [
+      "op_132b8c21be805112180c334f"
+     ],
+     "policyFloor": 3,
+     "installedPolicyDigest": "8e07717072508d38b6584add0a646319161703d32da500a50e5fe30c6d3191a7",
+     "policyJournalOpIDs": [
+      "op_3b69b32d12495eff0a714250"
+     ],
+     "installedLeafSHA256": "1d4f0a321a46a39bdda5c5b6e35591542783ed425b646821cb8163512561cf93",
+     "stagedAnchorDigest": "74ff0c7aad69a27e5a334d1d78cde59e29375b8a6ee3c33fe26aee72d6103f81",
+     "nodeObservedAt": "2026-11-18T13:59:30Z",
+     "nodeChallengeNonce": "fixture-challenge-0001"
+    },
+    {
+     "nodeID": "nod_00000000000000000000000PC4",
+     "rowPresent": true,
+     "reservationDigest": null,
+     "channelVersion": 4,
+     "channelCertificateSHA256": "6dc786f0238020f69e7328b35e27b2bf79645a4125162f77ab46f9c39669a98e",
+     "channelAuditOpIDs": [
+      "op_3646899d5aecb4596dc8d541"
+     ],
+     "policyFloor": 6,
+     "installedPolicyDigest": "e5cdcc28582ec6360eb3b89a24055fd70453af47cbc5f77c3a3e4906aaf72ec0",
+     "policyJournalOpIDs": [
+      "op_a6b9196c39408ea3fafa74c8"
+     ],
+     "installedLeafSHA256": "6dc786f0238020f69e7328b35e27b2bf79645a4125162f77ab46f9c39669a98e",
+     "stagedAnchorDigest": "74ff0c7aad69a27e5a334d1d78cde59e29375b8a6ee3c33fe26aee72d6103f81",
+     "nodeObservedAt": "2026-11-18T13:59:30Z",
+     "nodeChallengeNonce": "fixture-challenge-0001"
+    }
+   ],
+   "reservations": [],
+   "serving": {
+    "challengeNonce": "fixture-challenge-0001",
+    "challengeIssuedAt": "2026-11-18T13:59:00Z",
+    "processes": [
+     {
+      "site": "observer_worker",
+      "processID": "observer-1",
+      "trustGeneration": 2,
+      "loadedAnchorDigest": "74ff0c7aad69a27e5a334d1d78cde59e29375b8a6ee3c33fe26aee72d6103f81",
+      "clientLeafSHA256": "d0e948b0d16a3a5ab1ca26252bd5e461966e008fd13b41a7d63296d2d612b684",
+      "observedAt": "2026-11-18T13:59:30Z",
+      "challengeNonce": "fixture-challenge-0001"
+     },
+     {
+      "site": "delivery_worker",
+      "processID": "delivery-1",
+      "trustGeneration": 2,
+      "loadedAnchorDigest": "74ff0c7aad69a27e5a334d1d78cde59e29375b8a6ee3c33fe26aee72d6103f81",
+      "clientLeafSHA256": "d0e948b0d16a3a5ab1ca26252bd5e461966e008fd13b41a7d63296d2d612b684",
+      "observedAt": "2026-11-18T13:59:30Z",
+      "challengeNonce": "fixture-challenge-0001"
+     },
+     {
+      "site": "delivery_worker",
+      "processID": "delivery-2",
+      "trustGeneration": 2,
+      "loadedAnchorDigest": "74ff0c7aad69a27e5a334d1d78cde59e29375b8a6ee3c33fe26aee72d6103f81",
+      "clientLeafSHA256": "d0e948b0d16a3a5ab1ca26252bd5e461966e008fd13b41a7d63296d2d612b684",
+      "observedAt": "2026-11-18T13:59:30Z",
+      "challengeNonce": "fixture-challenge-0001"
+     },
+     {
+      "site": "workspace_runtime",
+      "processID": "workspace-1",
+      "trustGeneration": 2,
+      "loadedAnchorDigest": "74ff0c7aad69a27e5a334d1d78cde59e29375b8a6ee3c33fe26aee72d6103f81",
+      "clientLeafSHA256": "d0e948b0d16a3a5ab1ca26252bd5e461966e008fd13b41a7d63296d2d612b684",
+      "observedAt": "2026-11-18T13:59:30Z",
+      "challengeNonce": "fixture-challenge-0001"
+     },
+     {
+      "site": "build_product_runtime",
+      "processID": "build-product-1",
+      "trustGeneration": 2,
+      "loadedAnchorDigest": "74ff0c7aad69a27e5a334d1d78cde59e29375b8a6ee3c33fe26aee72d6103f81",
+      "clientLeafSHA256": "d0e948b0d16a3a5ab1ca26252bd5e461966e008fd13b41a7d63296d2d612b684",
+      "observedAt": "2026-11-18T13:59:30Z",
+      "challengeNonce": "fixture-challenge-0001"
+     },
+     {
+      "site": "storage_check_collector",
+      "processID": "storage-check-cli",
+      "trustGeneration": 2,
+      "loadedAnchorDigest": "74ff0c7aad69a27e5a334d1d78cde59e29375b8a6ee3c33fe26aee72d6103f81",
+      "clientLeafSHA256": "d0e948b0d16a3a5ab1ca26252bd5e461966e008fd13b41a7d63296d2d612b684",
+      "observedAt": "2026-11-18T13:59:30Z",
+      "challengeNonce": "fixture-challenge-0001"
+     }
+    ],
+    "handshakes": [
+     {
+      "nodeID": "nod_00000000000000000000000PC2",
+      "observedAt": "2026-11-18T13:57:59Z",
+      "challengeNonce": "fixture-challenge-0001",
+      "peerLeafSHA256": "b2ed795a6a875d095c59ebfff631c3511d10e189448c2fcb3eee0d510e9d5cc0",
+      "anchorDigest": "74ff0c7aad69a27e5a334d1d78cde59e29375b8a6ee3c33fe26aee72d6103f81",
+      "cpClientURI": "spiffe://saintvision.ai/tenant/00000000-0000-4000-8000-0000000000a1/control-plane/epoch/00000000-0000-4000-8000-0000000000e1",
+      "heartbeatAt": "2026-11-18T13:59:55Z",
+      "policyDigest": "daf7b6e6ed57ba4aa57e48d8f77d2caa70c5ea189a6a7b3e2b135f85faa607aa"
+     },
+     {
+      "nodeID": "nod_00000000000000000000000PC3",
+      "observedAt": "2026-11-18T13:59:30Z",
+      "challengeNonce": "fixture-challenge-0001",
+      "peerLeafSHA256": "1d4f0a321a46a39bdda5c5b6e35591542783ed425b646821cb8163512561cf93",
+      "anchorDigest": "74ff0c7aad69a27e5a334d1d78cde59e29375b8a6ee3c33fe26aee72d6103f81",
+      "cpClientURI": "spiffe://saintvision.ai/tenant/00000000-0000-4000-8000-0000000000a1/control-plane/epoch/00000000-0000-4000-8000-0000000000e1",
+      "heartbeatAt": "2026-11-18T13:59:55Z",
+      "policyDigest": "8e07717072508d38b6584add0a646319161703d32da500a50e5fe30c6d3191a7"
+     },
+     {
+      "nodeID": "nod_00000000000000000000000PC4",
+      "observedAt": "2026-11-18T13:59:30Z",
+      "challengeNonce": "fixture-challenge-0001",
+      "peerLeafSHA256": "6dc786f0238020f69e7328b35e27b2bf79645a4125162f77ab46f9c39669a98e",
+      "anchorDigest": "74ff0c7aad69a27e5a334d1d78cde59e29375b8a6ee3c33fe26aee72d6103f81",
+      "cpClientURI": "spiffe://saintvision.ai/tenant/00000000-0000-4000-8000-0000000000a1/control-plane/epoch/00000000-0000-4000-8000-0000000000e1",
+      "heartbeatAt": "2026-11-18T13:59:55Z",
+      "policyDigest": "e5cdcc28582ec6360eb3b89a24055fd70453af47cbc5f77c3a3e4906aaf72ec0"
+     }
+    ]
+   }
+  },
+  "expectedRecoveryAction": "HOLD_SERVING_EVIDENCE_INCOMPLETE",
+  "expectedResumePhase": null,
+  "expectedApply": [],
+  "expectedAcknowledge": []
+ }
+}

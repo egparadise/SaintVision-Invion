@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-CLAUDE-001"
 title: "Claude 작업 현황"
-version: "1.2.134"
+version: "1.2.136"
 status: "review"
 author: "Claude"
-updated: "2026-11-18T22:10:00+09:00"
+updated: "2026-11-19T02:30:00+09:00"
 
 
 
@@ -12,6 +12,57 @@ updated: "2026-11-18T22:10:00+09:00"
 
 source_of_truth: "Git"
 ---
+
+## 2026-11-19 FLEET5 authority 교체 계약 R2 개정: R1 독립 검토 HIGH 5건 대응 (Claude 직접 기록)
+
+- **작업** (task_150a776816d0 / ctx_2e57edccd6db, 지시 msg_69075d54887a): R1 evidence head `bb6e028d` 기준 격리 브랜치 `egparadise/fleet5-authority-replacement-r2-20261119`에서 했다.
+  - Codex R1 검토 보고서 전문을 먼저 읽었다. 보고서는 검토자 worktree에 있고 sha256은 `5c88dcf3…2d829`다. 이 브랜치로 복사하지 않았다.
+  - 판 버전 1.2.135는 다른 worktree가 쓰므로 이 판은 1.2.136으로 올렸다. 통합은 Root가 한다.
+- **산출물**: [[Proposed FLEET5 authority replacement and advance-renewal contract R2]]를 추가했다. D1–D6이 검토 지적 1–6을 닫는다. 기계 검사 가능한 부분은 다음과 같다.
+  - schema·checker·복구 판정·참조 executor 모델·drift 생성기: `contracts/proposed/fleet5-authority-replacement-r2/`, `tools/*_r2*.py`
+  - 실제 HOLD instance 1개
+  - 수락 fixture 39개. 복구 행동 18개를 모두 쓴다.
+  - 거부 fixture 58개. 거부 code는 30개다.
+  - handoff 1개와 전체 operation manifest 1개
+  - pytest 게이트 `tests/core/test_fleet5_authority_replacement_r2.py` 224건
+  - R1 산출물은 바꾸지 않았다. R1 155건도 그대로 통과한다.
+- **핵심 변경**:
+  - **F1 첫 등록**: fence가 걸린 reservation이 tenant·epoch·PC·NodeID·CSR·plan·fence·rows readback에 묶인다. 등록 단계는 E1 예약 → E2 행 → E3 채널 → E4 정책 → E5 정착으로 나눴다.
+  - **F2 신원·권한**: 실제 공개 DER로 다음을 검증한다.
+    - CSR 소유 증명
+    - 이전 CA가 서명한 prior leaf와 DB tuple의 일치
+    - 정확한 새 root로 이어지는 chain, URI·IP SAN, EKU, 유효기간
+    - 역할 키의 쌍별 분리
+    - 보존 signer에 대한 Root의 '비손상' 판정
+  - **F3 serving 증거**: 5개 site의 process 전부(INVOKED_CLIENT 포함)와 member 전부에 대해, fresh challenge와 새 pin 아래의 handshake·heartbeat를 요구한다. 중복 증거는 합치지 않고 HOLD한다. A3는 A2 staging이 검증된 뒤에만 진행한다.
+  - **F4 재시도**: 불변 operation manifest와 writer fence를 둔다. 각 operation을 정확한 preimage면 적용하고, 정확한 postimage와 audit 1건이면 인정하고, 그 밖에는 HOLD한다. 두 번째 실행의 변경이 0임을 executor 모델로 증명했다.
+  - **F5 만료·사전 갱신**: 재개 시점(`resumeAt`)에 측정 예산으로 남은 유효기간을 검사한다. ADVANCE_RENEWAL은 overlap 상한과 retirement 증명을 갖춘 dual-anchor 방식이거나 QUIESCED 방식이다.
+  - **F6 handoff**: 범위를 FOUR_MEMBER_MIGRATION으로 한정한다. 5대 준비는 NOT_ESTABLISHED이고, CP는 PC3에 co-located이며 PC5는 제외한다.
+- **확인**:
+  - R2 checker는 98개 문서가 기대 판정과 일치했다. generator `--check` drift는 0이다.
+  - pytest는 R2와 R1을 합쳐 379 passed다.
+  - 단일 결함 mutant 23개를 모두 kill했다. checker hash는 복원 전후가 같다.
+  - 로컬 게이트 전체와 hosted CI는 `Evidence/fleet5-authority-replacement-r2-20261119-claude/`에 있다. 상세는 [[2026-11-19_FLEET5_Authority_Replacement_Contract_R2_Claude]].
+- **하지 않은 것**:
+  - live 자격증명·SSH·DB·Docker·키 접근, 등록, 활성화, canonical sync apply, 운영 cutover
+  - Codex custody·preflight 파일과 검토자 worktree 변경
+  - R2 독립 보안 검토. 아직 수행되지 않았다.
+- **남은 runtime 공백 (10건, 계약 문서 참조)**:
+  - fenced admission이 없다.
+  - CAS가 preimage를 비교하지 않고, audit에 opID가 없다.
+  - trusted root 검증이 없다.
+  - policy readback이 없다.
+  - process별 trust readback이 없다.
+  - challenge mTLS 도구가 없다.
+  - Node anchor reload가 없다.
+  - 측정 예산이 없다.
+  - 결정적 ceremony 도구가 없다.
+  - 실제 executor가 없다.
+- **다음 첫 행동/담당**:
+  1. Codex가 R2를 독립 보안 검토한다.
+  2. runtime 공백을 구현 카드로 나눈다. 담당은 Root가 배정한다.
+  3. Root가 DB를 readback하고, signer 판정과 예산 측정을 하고, PC1을 진단한다.
+  4. 그 뒤 작성자가 실제 instance를 PROPOSED로 개정한다.
 
 ## 2026-11-18 FLEET5 authority 교체·사전 갱신 계약 R1 제안 (Claude 직접 기록)
 

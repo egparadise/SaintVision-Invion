@@ -1,0 +1,290 @@
+{
+ "schema": "fleet5-authority-replacement-plan:2",
+ "revision": "R2",
+ "planID": "ARP-20261119-fleet5-nov18-ca-terminal-r2",
+ "status": "HOLD",
+ "activation": "NOT_AUTHORIZED",
+ "fixture": false,
+ "mode": "TERMINAL_REPLACEMENT",
+ "observedAt": "2026-11-18T11:53:13Z",
+ "tenantID": "97968b42-68aa-40ce-af5e-3a33e2fc2205",
+ "projectID": "prj_01M6NDBHVD2DZQ1Q38DCKN1XE3",
+ "preservedEpoch": {
+  "epoch": "bcd581be-31b4-4aca-86e6-3ca31b69ed09",
+  "source": "HISTORICAL_EVIDENCE",
+  "readbackSHA256": null
+ },
+ "priorAuthority": {
+  "certificateDER": null,
+  "caCertificateSHA256": "b8d777ab04c65a44f827fdda9629d54a086e9ff8cc752b90a09023a93341c5a3",
+  "caPublicKeySHA256": null,
+  "subjectCommonName": null,
+  "notAfter": "2026-11-14T07:15:30Z",
+  "state": "CA_TERMINAL",
+  "usage": "REFERENCE_ONLY"
+ },
+ "newAuthority": {
+  "certificateDER": null,
+  "caCertificateSHA256": null,
+  "caPublicKeySHA256": null,
+  "subjectCommonName": "SaintVision FLEET5 authority 2026-11 R2",
+  "keyAlgorithm": "Ed25519",
+  "keyGeneratedFresh": true,
+  "crossSignedByPrior": false,
+  "pathLength": 0,
+  "notBefore": null,
+  "notAfter": null,
+  "leafValidity": {
+   "notBefore": null,
+   "notAfter": null
+  },
+  "custody": {
+   "holder": "ROOT_OFFLINE_OPERATOR",
+   "privateMaterialInRepository": false,
+   "custodyEvidenceRef": null
+  },
+  "trustAuthorization": {
+   "decisionRef": null,
+   "authorizedBy": null
+  }
+ },
+ "trustTransition": {
+  "cutover": "TERMINAL_SINGLETON",
+  "overlap": null,
+  "quiesceEvidenceRef": null,
+  "targetGeneration": 1,
+  "stagedAnchorBundle": null,
+  "finalAnchorBundle": null
+ },
+ "advanceRenewal": {
+  "caLifetimeSeconds": 31536000,
+  "caSuccessorLeadSeconds": 2592000,
+  "caWarningLeadSeconds": 3888000,
+  "leafLifetimeSeconds": 518400,
+  "leafRenewalLeadSeconds": 259200,
+  "policyLifetimeSeconds": 172800,
+  "policyRenewalLeadSeconds": 86400,
+  "overlapSeconds": 14400,
+  "normalBudgetSeconds": null,
+  "caSuccessorBudgetSeconds": null,
+  "safetySeconds": 630,
+  "clockSkewSeconds": 30
+ },
+ "measuredBudgets": {
+  "source": "UNKNOWN",
+  "evidenceRef": null,
+  "phaseSeconds": {
+   "A0_PREFLIGHT_READBACK": null,
+   "A1_NEW_TRUST_AUTHORIZED": null,
+   "A2_ANCHOR_STAGED": null,
+   "A3_ROTATION_LEAVES_INSTALLED": null,
+   "A4_CHANNEL_CAS": null,
+   "A5_POLICY_PUBLISHED": null,
+   "A6_CP_CONTEXT_SWITCH": null,
+   "A7_ROTATION_SETTLED": null,
+   "E1_ENROLLMENT_RESERVED": null,
+   "E2_ENROLLMENT_ROW_ADMITTED": null,
+   "E3_ENROLLMENT_CHANNEL_PROVISIONED": null,
+   "E4_ENROLLMENT_POLICY_PUBLISHED": null,
+   "E5_ENROLLMENT_SETTLED": null
+  }
+ },
+ "servingBinaryMigration": {
+  "status": "NOT_REVIEWED",
+  "reviewRef": null
+ },
+ "writerFence": {
+  "token": null
+ },
+ "placement": {
+  "controlPlaneHostPC": "PC3",
+  "excludedPCs": [
+   "PC5"
+  ]
+ },
+ "controlPlaneClient": {
+  "spiffeURI": "spiffe://saintvision.ai/tenant/97968b42-68aa-40ce-af5e-3a33e2fc2205/control-plane/epoch/bcd581be-31b4-4aca-86e6-3ca31b69ed09",
+  "keyContinuity": "RETAINED",
+  "publicKeySHA256": null,
+  "csrDER": null,
+  "priorLeafDER": null,
+  "leafDER": null,
+  "plannedLeafSHA256": null,
+  "contextSites": [
+   "observer_worker",
+   "delivery_worker",
+   "workspace_runtime",
+   "build_product_runtime",
+   "storage_check_collector"
+  ],
+  "processInventory": null
+ },
+ "roleKeys": [
+  {
+   "role": "LAUNCH_SIGNER",
+   "publicKeySHA256": null,
+   "disposition": "RETAINED",
+   "continuity": {
+    "verifiedBy": null,
+    "scope": "LAUNCH_SIGNATURES",
+    "custodyEvidenceRef": null,
+    "compromiseDecision": "UNDETERMINED",
+    "decisionRef": null
+   }
+  }
+ ],
+ "members": [
+  {
+   "pc": "PC2",
+   "kind": "ROTATION",
+   "nodeID": "nod_01M6TGQZ8S3DAFS7TYE8TY1PX2",
+   "account": "saintvision-invion",
+   "address": "192.168.45.143",
+   "endpoint": null,
+   "spiffeURI": "spiffe://saintvision.ai/tenant/97968b42-68aa-40ce-af5e-3a33e2fc2205/node/nod_01M6TGQZ8S3DAFS7TYE8TY1PX2/epoch/bcd581be-31b4-4aca-86e6-3ca31b69ed09",
+   "nodePublicKeySHA256": null,
+   "csrDER": null,
+   "priorLeafDER": null,
+   "priorPolicyDigest": null,
+   "leafDER": null,
+   "plannedLeafSHA256": null,
+   "plannedPolicy": null,
+   "counters": {
+    "channelVersionBefore": null,
+    "channelVersionAfter": null,
+    "policyFloorBefore": null,
+    "policyVersionAfter": null
+   },
+   "reservation": null
+  },
+  {
+   "pc": "PC3",
+   "kind": "ROTATION",
+   "nodeID": "nod_01M6TAWG25JTA3F7J7S1EE4N2W",
+   "account": "saintvision-invion3",
+   "address": "192.168.45.222",
+   "endpoint": null,
+   "spiffeURI": "spiffe://saintvision.ai/tenant/97968b42-68aa-40ce-af5e-3a33e2fc2205/node/nod_01M6TAWG25JTA3F7J7S1EE4N2W/epoch/bcd581be-31b4-4aca-86e6-3ca31b69ed09",
+   "nodePublicKeySHA256": null,
+   "csrDER": null,
+   "priorLeafDER": null,
+   "priorPolicyDigest": null,
+   "leafDER": null,
+   "plannedLeafSHA256": null,
+   "plannedPolicy": null,
+   "counters": {
+    "channelVersionBefore": null,
+    "channelVersionAfter": null,
+    "policyFloorBefore": null,
+    "policyVersionAfter": null
+   },
+   "reservation": null
+  },
+  {
+   "pc": "PC4",
+   "kind": "ROTATION",
+   "nodeID": "nod_01M6TGSXV1J7XWC5D5H7N6EW1D",
+   "account": "inviz",
+   "address": "192.168.45.210",
+   "endpoint": null,
+   "spiffeURI": "spiffe://saintvision.ai/tenant/97968b42-68aa-40ce-af5e-3a33e2fc2205/node/nod_01M6TGSXV1J7XWC5D5H7N6EW1D/epoch/bcd581be-31b4-4aca-86e6-3ca31b69ed09",
+   "nodePublicKeySHA256": null,
+   "csrDER": null,
+   "priorLeafDER": null,
+   "priorPolicyDigest": null,
+   "leafDER": null,
+   "plannedLeafSHA256": null,
+   "plannedPolicy": null,
+   "counters": {
+    "channelVersionBefore": null,
+    "channelVersionAfter": null,
+    "policyFloorBefore": null,
+    "policyVersionAfter": null
+   },
+   "reservation": null
+  },
+  {
+   "pc": "PC1",
+   "kind": "NEW_ENROLLMENT",
+   "nodeID": null,
+   "account": "inviz",
+   "address": "192.168.45.13",
+   "endpoint": null,
+   "spiffeURI": null,
+   "nodePublicKeySHA256": null,
+   "csrDER": null,
+   "priorLeafDER": null,
+   "priorPolicyDigest": null,
+   "leafDER": null,
+   "plannedLeafSHA256": null,
+   "plannedPolicy": null,
+   "counters": {
+    "channelVersionBefore": 0,
+    "channelVersionAfter": 1,
+    "policyFloorBefore": 0,
+    "policyVersionAfter": 1
+   },
+   "reservation": {
+    "tenantID": "97968b42-68aa-40ce-af5e-3a33e2fc2205",
+    "epoch": "bcd581be-31b4-4aca-86e6-3ca31b69ed09",
+    "pc": "PC1",
+    "nodeID": null,
+    "csrSHA256": null,
+    "planDigest": null,
+    "fenceToken": null,
+    "rowsReadbackSHA256": null,
+    "nodeStateEmpty": {
+     "verified": null,
+     "evidenceRef": null
+    }
+   }
+  }
+ ],
+ "existingNodeRows": {
+  "source": "HISTORICAL_EVIDENCE",
+  "includesRetired": null,
+  "readbackSHA256": null,
+  "rows": [
+   {
+    "nodeID": "nod_01M6TGQZ8S3DAFS7TYE8TY1PX2",
+    "status": "ACTIVE",
+    "publicKeySHA256": null,
+    "channelCertificateSHA256": null
+   },
+   {
+    "nodeID": "nod_01M6TAWG25JTA3F7J7S1EE4N2W",
+    "status": "ACTIVE",
+    "publicKeySHA256": null,
+    "channelCertificateSHA256": null
+   },
+   {
+    "nodeID": "nod_01M6TGSXV1J7XWC5D5H7N6EW1D",
+    "status": "ACTIVE",
+    "publicKeySHA256": null,
+    "channelCertificateSHA256": null
+   }
+  ]
+ },
+ "operationManifest": null,
+ "checkpoint": {
+  "lastDurablePhase": null,
+  "inFlightPhase": null,
+  "inFlightOutcome": null,
+  "resumeAt": "2026-11-18T11:53:13Z",
+  "readback": {
+   "dbAvailable": false,
+   "epoch": null,
+   "custodyState": "NOT_READ",
+   "writerFence": null,
+   "journalManifestDigest": null,
+   "ceremonyLog": null,
+   "members": [],
+   "reservations": [],
+   "serving": null
+  },
+  "expectedRecoveryAction": "NOT_STARTED",
+  "expectedResumePhase": null,
+  "expectedApply": [],
+  "expectedAcknowledge": []
+ }
+}

@@ -1,0 +1,667 @@
+"""Gate for the PROPOSED FLEET5 authority-replacement contract R2.
+
+Offline only: JSON documents, public DER certificates/CSRs built from publicly
+derivable fixture keys, the schema and pure functions. Nothing here touches a
+database, a real key, a network or a process.
+
+Sections map to the five HIGH findings of the R1 independent review:
+F1 first admission, F2 identity/authority, F3 serving evidence, F4 retry after a
+committed effect, F5 expiry during a pause and advance renewal.
+"""
+
+from __future__ import annotations
+
+import base64
+import copy
+from datetime import timedelta
+import hashlib
+import json
+
+from cryptography.hazmat.primitives.serialization import load_der_private_key
+from cryptography.x509.oid import ExtendedKeyUsageOID
+from jsonschema import Draft202012Validator
+import pytest
+
+from tools import check_fleet5_authority_replacement_r2 as checker
+from tools import generate_fleet5_authority_replacement_r2_fixtures as gen
+
+SCHEMA = json.loads(checker.SCHEMA_PATH.read_text("utf-8"))
+EXPECTATIONS = json.loads(checker.EXPECTATIONS_PATH.read_text("utf-8"))["documents"]
+REAL_IDS = (
+    "97968b42-68aa-40ce-af5e-3a33e2fc2205",
+    "bcd581be-31b4-4aca-86e6-3ca31b69ed09",
+    "nod_01M6TGQZ8S3DAFS7TYE8TY1PX2",
+    "nod_01M6TAWG25JTA3F7J7S1EE4N2W",
+    "nod_01M6TGSXV1J7XWC5D5H7N6EW1D",
+    "b8d777ab04c65a44f827fdda9629d54a086e9ff8cc752b90a09023a93341c5a3",
+)
+A = gen.A
+
+
+def load(rel: str) -> dict:
+    return json.loads((checker.CONTRACT_DIR / rel).read_text("utf-8"))
+
+
+def base(name: str = "t-base", **kw) -> dict:
+    return gen.ceremony_done(name, **kw)
+
+
+def state(last, flight=None, *, landed=lambda op: False, resume_at=gen.RESUME, **kw) -> dict:
+    return gen.at_state(base(**kw), last, flight, landed=landed, resume_at=resume_at)
+
+
+def action(doc: dict) -> str:
+    return checker.recovery_action(doc)[0]
+
+
+# ---------------------------------------------------------------- corpus integrity
+
+
+def test_schema_is_valid_draft_2020_12():
+    Draft202012Validator.check_schema(SCHEMA)
+
+
+def test_committed_files_match_generator():
+    assert gen.main(["--check"]) == 0
+
+
+def test_every_document_matches_expected_verdict():
+    assert checker.check_all() == []
+    assert checker.main([]) == 0
+
+
+@pytest.mark.parametrize("entry", EXPECTATIONS, ids=[e["path"] for e in EXPECTATIONS])
+def test_document_verdict(entry):
+    assert checker.evaluate(load(entry["path"]), SCHEMA) == sorted(entry["codes"])
+
+
+def test_every_recovery_action_and_rejection_code_is_exercised():
+    actions = {load(e["path"])["checkpoint"]["expectedRecoveryAction"] for e in EXPECTATIONS if not e["codes"]}
+    assert actions == set(SCHEMA["$defs"]["checkpoint"]["properties"]["expectedRecoveryAction"]["enum"])
+    codes = {c for e in EXPECTATIONS for c in e["codes"]}
+    assert codes >= {
+        "AR-SCHEMA", "AR-SECRET-MATERIAL", "AR-PRIOR-REUSE", "AR-TERMINAL-ANCHOR", "AR-TERMINAL-NOT-EXPIRED",
+        "AR-EPOCH-SPIFFE", "AR-CHANNEL-NONMONOTONE", "AR-POLICY-NONMONOTONE", "AR-ENROLLMENT-REUSES-IDENTITY",
+        "AR-IDENTITY-COLLISION", "AR-ROTATION-KEY-CHANGED", "AR-ROTATION-UNKNOWN-IDENTITY", "AR-ENROLLMENT-COUNTER",
+        "AR-HOLD-REQUIRED", "AR-RENEWAL-BUDGET", "AR-RECOVERY-MISMATCH", "AR-CHECKPOINT-ORDER",
+        "AR-PLANNED-LEAF-REUSE", "AR-CERT-ROOT", "AR-CERT-LEAF", "AR-CSR-POP", "AR-PRIOR-BINDING",
+        "AR-ROLE-SEPARATION", "AR-ROLE-CONTINUITY", "AR-ENROLLMENT-RESERVATION", "AR-PROCESS-INVENTORY",
+        "AR-MANIFEST", "AR-CEREMONY-INCOMPLETE", "AR-ADVANCE-WINDOW", "AR-MODE",
+    }
+
+
+@pytest.mark.parametrize("rel, path", [
+    ("fixtures/rejection/r05-cross-signed-by-prior.json", ["newAuthority", "crossSignedByPrior"]),
+    ("fixtures/rejection/r21-activation-released.json", ["activation"]),
+    ("fixtures/rejection/r24-rollback-to-terminal.json", ["checkpoint", "expectedRecoveryAction"]),
+])
+def test_schema_rejections_fail_on_the_mutated_field(rel, path):
+    errors = list(Draft202012Validator(SCHEMA).iter_errors(load(rel)))
+    assert [list(e.absolute_path) for e in errors] == [path]
+
+
+def _der_fields(value):
+    if isinstance(value, dict):
+        for k, v in value.items():
+            if k.endswith("DER") and isinstance(v, str):
+                yield v
+            else:
+                yield from _der_fields(v)
+    elif isinstance(value, list):
+        for item in value:
+            yield from _der_fields(item)
+
+
+def test_fixtures_carry_public_pki_only_and_no_fleet_values():
+    seen = 0
+    for entry in EXPECTATIONS:
+        if not entry["path"].startswith("fixtures/"):
+            continue
+        text = (checker.CONTRACT_DIR / entry["path"]).read_text("utf-8")
+        assert not any(v in text for v in REAL_IDS), entry["path"]
+        doc = json.loads(text)
+        assert doc["fixture"] is True
+        for value in _der_fields(doc):
+            seen += 1
+            with pytest.raises(ValueError):
+                load_der_private_key(base64.b64decode(value), password=None)
+    assert seen > 500
+
+
+def test_real_instance_is_hold_and_cannot_be_promoted():
+    doc = load("instances/fleet5-nov18-ca-terminal-hold-r2.json")
+    assert doc["status"] == "HOLD" and doc["fixture"] is False and doc["activation"] == "NOT_AUTHORIZED"
+    assert checker.recovery_action(doc) == ("NOT_STARTED", None, [], [])
+    promoted = copy.deepcopy(doc)
+    promoted["status"] = "PROPOSED"
+    assert "AR-HOLD-REQUIRED" in checker.evaluate(promoted, SCHEMA)
+    missing = set(checker._nulls(doc))
+    assert {"preservedEpoch", "existingNodeRows", "priorAuthority.certificateDER", "measuredBudgets",
+            "servingBinaryMigration", "writerFence.token", "controlPlaneClient.processInventory",
+            "roleKeys[0].continuity", "PC1.nodeID", "PC1.csrDER", "PC2.priorLeafDER",
+            "PC2.counters.channelVersionBefore"} <= missing
+    assert doc["placement"] == {"controlPlaneHostPC": "PC3", "excludedPCs": ["PC5"]}
+
+
+def test_r1_contract_is_preserved_alongside_r2():
+    from tools import check_fleet5_authority_replacement as r1
+
+    assert r1.check_all() == []
+    assert r1.CONTRACT_DIR != checker.CONTRACT_DIR
+
+
+# ---------------------------------------------------------------- F1 first admission
+
+
+def test_f1_row_without_channel_during_e2_is_a_journaled_resume_not_a_foreign_writer():
+    """R1 returned HOLD_FOREIGN_WRITER for a present row without C=1 even during E2."""
+    doc = state(A["E1"], A["E2"], landed=lambda op: True)
+    row = gen.row(doc, "PC1")
+    assert row["rowPresent"] and row["channelVersion"] == 0
+    rd = checker.reservation_digest(gen.member(doc, "PC1"))
+    admit = gen.op_of(doc, A["E2"], "PC1")["opID"]
+    assert checker.recovery_action(doc) == ("RESUME_FORWARD", A["E2"], [], [admit])
+    assert row["reservationDigest"] == rd
+
+
+@pytest.mark.parametrize("flight", checker.ENROLLMENT_PHASES)
+@pytest.mark.parametrize("landed", [False, True])
+def test_f1_every_enrollment_boundary_has_a_distinct_decision(flight, landed):
+    last = checker.PHASES[checker.INDEX[flight] - 1]
+    doc = state(last, flight, landed=lambda op: landed)
+    act, phase, apply, ack = checker.recovery_action(doc)
+    ops = [op["opID"] for op in gen.manifest_ops(doc) if op["phase"] == flight]
+    assert (act, phase) == ("RESUME_FORWARD", flight)
+    assert (ack, apply) == ((ops, []) if landed else ([], ops))
+
+
+@pytest.mark.parametrize("mutate, hold", [
+    (lambda d: d["checkpoint"]["readback"]["reservations"][0].update(reservationDigest=gen.h("other")),
+     "HOLD_RESERVATION_MISMATCH"),
+    (lambda d: d["checkpoint"]["readback"]["reservations"][0].update(fenceToken="fence:other-plan"),
+     "HOLD_RESERVATION_MISMATCH"),
+    (lambda d: gen.row(d, "PC1").update(reservationDigest=None), "HOLD_RESERVATION_MISMATCH"),
+    (lambda d: gen.row(d, "PC1").update(channelVersion=1, channelCertificateSHA256=gen.h("foreign-leaf")),
+     "HOLD_FOREIGN_WRITER"),
+])
+def test_f1_admission_substeps_hold_on_foreign_effects(mutate, hold):
+    doc = state(A["E2"], A["E3"])
+    mutate(doc)
+    assert action(doc) == hold
+
+
+@pytest.mark.parametrize("field, value", [
+    ("tenantID", "00000000-0000-4000-8000-0000000000ff"),
+    ("epoch", gen.OTHER_EPOCH),
+    ("nodeID", gen.nid("0PC9")),
+    ("csrSHA256", gen.h("x")),
+    ("planDigest", gen.h("x")),
+    ("fenceToken", "fence:other"),
+    ("rowsReadbackSHA256", gen.h("x")),
+])
+def test_f1_reservation_binds_every_field(field, value):
+    doc = gen.proposal("t-res")
+    gen.member(doc, "PC1")["reservation"][field] = value
+    assert "AR-ENROLLMENT-RESERVATION" in checker.evaluate(doc, SCHEMA)
+
+
+def test_f1_shared_account_or_inventory_ip_is_no_ownership_evidence():
+    doc = gen.proposal("t-acct")
+    pc1, pc4 = gen.member(doc, "PC1"), gen.member(doc, "PC4")
+    assert pc1["account"] == pc4["account"]
+    assert checker.evaluate(doc, SCHEMA) == []
+    # Ownership comes only from the Node-signed CSR: PC1 cannot present PC4's key.
+    pc1["csrDER"] = gen.make_csr("PC4-node", pc1["nodeID"])
+    assert {"AR-CSR-POP"} <= set(checker.evaluate(gen.seal(doc), SCHEMA))
+
+
+# ---------------------------------------------------------------- F2 identity and authority
+
+
+@pytest.mark.parametrize("override", [
+    {"signer": ("impostor-ca", gen.NEW_CN)},
+    {"uri": gen.node_uri(gen.TENANT, gen.nid("0PC4"), gen.EPOCH)},
+    {"uri": gen.node_uri(gen.TENANT, gen.nid("0PC3"), gen.OTHER_EPOCH)},
+    {"eku": ExtendedKeyUsageOID.CLIENT_AUTH},
+    {"ips": []},
+    {"ips": ["10.0.0.3", "10.0.0.33"]},
+    {"notAfter": "2026-11-24T12:00:01Z"},
+], ids=["impostor-root", "other-node-uri", "other-epoch-uri", "client-eku", "no-ip-san", "extra-ip-san",
+        "validity-not-planned"])
+def test_f2_leaf_must_chain_to_the_exact_root_with_the_exact_profile(override):
+    doc = gen.a1_durable(gen.ceremony(gen.proposal("t-leaf"), leaf_overrides={"PC3": override}))
+    assert checker.evaluate(doc, SCHEMA) == ["AR-CERT-LEAF"]
+
+
+def test_f2_a_leaf_for_a_different_key_than_the_csr_is_rejected():
+    doc = base("t-key")
+    gen.member(doc, "PC2")["leafDER"] = gen.member(doc, "PC3")["leafDER"]
+    assert "AR-CERT-LEAF" in checker.evaluate(doc, SCHEMA)
+
+
+def test_f2_hashes_alone_no_longer_pass():
+    """R1 accepted label hashes; R2 requires parseable public DER for every pin."""
+    doc = base("t-hash")
+    gen.member(doc, "PC2")["leafDER"] = None
+    assert "AR-CERT-LEAF" in checker.evaluate(doc, SCHEMA)
+
+
+@pytest.mark.parametrize("pc", ["PC2", "PC3", "PC4"])
+def test_f2_prior_tuple_must_match_the_db_row_exactly(pc):
+    doc = gen.proposal("t-tuple")
+    row = next(r for r in doc["existingNodeRows"]["rows"] if r["nodeID"] == gen.member(doc, pc)["nodeID"])
+    row["publicKeySHA256"] = gen.spki("someone-else")
+    assert checker.evaluate(doc, SCHEMA) == ["AR-PRIOR-BINDING"]
+
+
+@pytest.mark.parametrize("status", ["DISABLED", "RETIRED"])
+def test_f2_rotation_requires_an_active_row(status):
+    doc = gen.proposal("t-status")
+    next(r for r in doc["existingNodeRows"]["rows"] if r["nodeID"] == gen.NODE["PC2"])["status"] = status
+    assert checker.evaluate(doc, SCHEMA) == ["AR-ROTATION-UNKNOWN-IDENTITY"]
+
+
+def test_f2_prior_ca_certificate_must_match_its_recorded_identity():
+    doc = gen.proposal("t-prior")
+    doc["priorAuthority"]["subjectCommonName"] = "Someone else"
+    assert "AR-PRIOR-BINDING" in checker.evaluate(doc, SCHEMA)
+
+
+OWNERS = ["prior-ca", "new-ca", "cp", "role", "node"]
+
+
+def _set_key(doc, owner, value):
+    if owner == "prior-ca":
+        doc["priorAuthority"]["caPublicKeySHA256"] = value
+    elif owner == "new-ca":
+        doc["newAuthority"]["caPublicKeySHA256"] = value
+    elif owner == "cp":
+        doc["controlPlaneClient"]["publicKeySHA256"] = value
+    elif owner == "role":
+        doc["roleKeys"][0]["publicKeySHA256"] = value
+    else:
+        gen.member(doc, "PC2")["nodePublicKeySHA256"] = value
+
+
+@pytest.mark.parametrize("a, b", [(a, b) for i, a in enumerate(OWNERS) for b in OWNERS[i + 1:]])
+def test_f2_role_keys_are_pairwise_separated(a, b):
+    doc = gen.proposal("t-sep")
+    shared = gen.h(f"shared-{a}-{b}")
+    _set_key(doc, a, shared)
+    _set_key(doc, b, shared)
+    assert "AR-ROLE-SEPARATION" in checker.evaluate(doc, SCHEMA)
+
+
+@pytest.mark.parametrize("decision, code", [
+    ("UNDETERMINED", "AR-HOLD-REQUIRED"),
+    ("COMPROMISED", "AR-ROLE-CONTINUITY"),
+])
+def test_f2_retained_signer_needs_an_affirmative_compromise_decision(decision, code):
+    doc = gen.proposal("t-signer")
+    doc["roleKeys"][0]["continuity"]["compromiseDecision"] = decision
+    assert checker.evaluate(doc, SCHEMA) == [code]
+
+
+def test_f2_replaced_signer_carries_no_continuity_claim():
+    doc = gen.proposal("t-replaced")
+    doc["roleKeys"][0]["disposition"] = "REPLACED"
+    assert checker.evaluate(doc, SCHEMA) == ["AR-ROLE-CONTINUITY"]
+    doc["roleKeys"][0]["continuity"] = None
+    assert checker.evaluate(doc, SCHEMA) == []
+
+
+def test_f2_fresh_cp_key_must_differ_from_the_prior_cp_key():
+    doc = gen.proposal("t-cp-fresh")
+    doc["controlPlaneClient"]["keyContinuity"] = "FRESH"
+    assert "AR-FRESH-KEY-REUSED" in checker.evaluate(gen.seal(doc), SCHEMA)
+
+
+# ---------------------------------------------------------------- F3 serving evidence
+
+
+@pytest.mark.parametrize("process", [p["processID"] for p in gen.INVENTORY])
+def test_f3_every_inventoried_process_needs_its_own_fresh_readback(process):
+    doc = state(A["A7"], enroll=False)
+    assert action(doc) == "COMPLETE"
+    procs = doc["checkpoint"]["readback"]["serving"]["processes"]
+    procs[:] = [p for p in procs if p["processID"] != process]
+    assert action(doc) == "HOLD_SERVING_EVIDENCE_INCOMPLETE"
+
+
+@pytest.mark.parametrize("field, value, hold", [
+    ("challengeNonce", "fixture-old-0000", "HOLD_SERVING_EVIDENCE_INCOMPLETE"),
+    ("anchorDigest", gen.h("prior-only-bundle"), "HOLD_SERVING_EVIDENCE_INCOMPLETE"),
+    ("policyDigest", gen.h("old-policy"), "HOLD_SERVING_EVIDENCE_INCOMPLETE"),
+    ("cpClientURI", "spiffe://saintvision.ai/tenant/x/control-plane/epoch/y", "HOLD_SERVING_EVIDENCE_INCOMPLETE"),
+    ("peerLeafSHA256", gen.h("unplanned-leaf"), "HOLD_FOREIGN_WRITER"),
+])
+def test_f3_settlement_needs_a_fresh_handshake_under_the_new_pins(field, value, hold):
+    doc = state(A["A7"], enroll=False)
+    shake = doc["checkpoint"]["readback"]["serving"]["handshakes"][1]
+    shake[field] = value
+    assert action(doc) == hold
+
+
+@pytest.mark.parametrize("age, ok", [(checker.HEARTBEAT_SECONDS, True), (checker.HEARTBEAT_SECONDS + 1, False)])
+def test_f3_heartbeat_freshness_boundary(age, ok):
+    doc = state(A["A7"], enroll=False)
+    at = checker._ts(doc["checkpoint"]["resumeAt"])
+    doc["checkpoint"]["readback"]["serving"]["handshakes"][0]["heartbeatAt"] = checker._iso(at - timedelta(seconds=age))
+    assert (action(doc) == "COMPLETE") is ok
+
+
+@pytest.mark.parametrize("age, ok", [(checker.FRESHNESS_SECONDS, True), (checker.FRESHNESS_SECONDS + 1, False)])
+def test_f3_observation_freshness_boundary(age, ok):
+    doc = state(A["A7"], enroll=False)
+    at = checker._ts(doc["checkpoint"]["resumeAt"])
+    doc["checkpoint"]["readback"]["serving"]["challengeIssuedAt"] = checker._iso(at - timedelta(seconds=600))
+    doc["checkpoint"]["readback"]["serving"]["processes"][2]["observedAt"] = checker._iso(at - timedelta(seconds=age))
+    assert (action(doc) == "COMPLETE") is ok
+
+
+@pytest.mark.parametrize("collection", ["members", "processes", "handshakes", "reservations"])
+def test_f3_duplicate_evidence_is_never_collapsed(collection):
+    doc = state(A["E1"], A["E2"])
+    rb = doc["checkpoint"]["readback"]
+    items = rb[collection] if collection in ("members", "reservations") else rb["serving"][collection]
+    if not items:
+        items.append(copy.deepcopy(rb["serving"]["handshakes"][0]) if collection == "handshakes" else None)
+    items.append(copy.deepcopy(items[0]))
+    assert action(doc) == "HOLD_DUPLICATE_EVIDENCE"
+
+
+@pytest.mark.parametrize("pc", ["PC2", "PC3", "PC4"])
+def test_f3_a3_waits_for_verified_staging_on_every_member(pc):
+    doc = state(A["A2"])
+    assert checker.recovery_action(doc)[:2] == ("RESUME_FORWARD", A["A3"])
+    gen.row(doc, pc)["nodeObservedAt"] = None
+    assert action(doc) == "HOLD_ANCHOR_STAGING_UNVERIFIED"
+    gen.row(doc, pc).update(nodeObservedAt=gen.row(doc, "PC2" if pc != "PC2" else "PC3")["nodeObservedAt"],
+                            stagedAnchorDigest=gen.h("half-staged"))
+    assert action(doc) == "HOLD_FOREIGN_WRITER"
+
+
+def test_f3_serving_is_gated_on_the_reviewed_binary_migration():
+    doc = gen.proposal("t-binary")
+    doc["servingBinaryMigration"] = {"status": "NOT_REVIEWED", "reviewRef": None}
+    assert checker.evaluate(doc, SCHEMA) == ["AR-HOLD-REQUIRED"]
+
+
+@pytest.mark.parametrize("site", checker.SITES)
+def test_f3_inventory_covers_all_five_sites(site):
+    doc = gen.proposal("t-inv")
+    inv = doc["controlPlaneClient"]["processInventory"]
+    inv[:] = [p for p in inv if p["site"] != site]
+    pad = next(s for s in checker.SITES if s != site)
+    inv.extend([{"site": pad, "processID": f"pad-{i}", "kind": "SERVICE"} for i in range(5 - len(inv))])
+    assert "AR-PROCESS-INVENTORY" in checker.evaluate(gen.seal(doc), SCHEMA)
+
+
+# ---------------------------------------------------------------- F4 retry after a committed effect
+
+
+def test_f4_drive_every_phase_with_crash_replay_and_duplicate_delivery():
+    """From A1 durable to COMPLETE: at every phase, crash after the effects and before the journal
+    write, re-decide, and run the decided step again. The second execution must mutate nothing."""
+    doc = state(A["A1"])
+    audits_seen = 0
+    for _ in range(len(checker.PHASES)):
+        act, phase, apply, ack = checker.recovery_action(doc)
+        if act == "COMPLETE":
+            break
+        assert act == "RESUME_FORWARD", act
+        crashed, mutations = checker.execute_resume(doc)
+        ops = {op["opID"]: op for op in checker.expected_manifest(doc)["operations"]}
+        assert set(mutations) == {o for o in apply if ops[o]["kind"] != "SETTLE"}
+        # Re-decide after the crash: everything that landed is acknowledged, nothing re-applied.
+        again = checker.recovery_action(crashed)
+        assert again[:2] == ("RESUME_FORWARD", phase) and again[2] == []
+        assert sorted(again[3]) == sorted(apply + ack)
+        replay, second = checker.execute_resume(crashed)
+        assert second == []
+        assert replay["checkpoint"]["readback"] == crashed["checkpoint"]["readback"]
+        audits_seen = sum(len(r["channelAuditOpIDs"]) + len(r["policyJournalOpIDs"])
+                          for r in crashed["checkpoint"]["readback"]["members"])
+        doc = checker.journal_durable(crashed)
+    assert checker.recovery_action(doc)[0] == "COMPLETE"
+    assert doc["checkpoint"]["lastDurablePhase"] == "E5_ENROLLMENT_SETTLED"
+    rotation = 3
+    assert audits_seen == rotation * 2 + 2  # one CAS + one policy audit per rotation, provision + policy for PC1
+    for r in doc["checkpoint"]["readback"]["members"]:
+        assert all(r["channelAuditOpIDs"].count(o) == 1 for o in r["channelAuditOpIDs"])
+
+
+@pytest.mark.parametrize("phase", [A["A2"], A["A3"], A["A4"], A["A5"], A["A6"], A["E3"], A["E4"]])
+def test_f4_crash_after_any_prefix_of_a_phase_applies_exactly_the_rest(phase):
+    probe = state(checker.PHASES[checker.INDEX[phase] - 1], phase)
+    ops = [op["opID"] for op in gen.manifest_ops(probe) if op["phase"] == phase]
+    for k in range(len(ops) + 1):
+        landed = set(ops[:k])
+        doc = state(checker.PHASES[checker.INDEX[phase] - 1], phase, landed=lambda op: op["opID"] in landed)
+        assert checker.recovery_action(doc) == ("RESUME_FORWARD", phase, ops[k:], ops[:k])
+
+
+def test_f4_executor_refuses_an_operation_whose_preimage_moved():
+    doc = state(A["A3"], A["A4"])
+    gen.row(doc, "PC3")["channelVersion"] += 1  # concurrent writer advanced the row
+    with pytest.raises(ValueError):  # decision is already HOLD; the executor never runs
+        checker.execute_resume(doc)
+    assert action(doc) == "HOLD_FOREIGN_WRITER"
+    cas = gen.op_of(state(A["A3"], A["A4"]), A["A4"], "PC3")
+    moved = state(A["A3"], A["A4"])
+    gen.row(moved, "PC3")["channelVersion"] += 1
+    assert checker.op_state(moved, cas) == checker.CONFLICT  # NODE-0034 analogue
+
+
+@pytest.mark.parametrize("audit", [0, 2])
+def test_f4_postimage_needs_exactly_one_audit_row(audit):
+    doc = state(A["A3"], A["A4"], landed=gen.on(gen.ids("PC2")))
+    op = gen.op_of(doc, A["A4"], "PC2")["opID"]
+    gen.row(doc, "PC2")["channelAuditOpIDs"] = [op] * audit
+    assert action(doc) == "HOLD_FOREIGN_WRITER"
+
+
+def test_f4_old_fingerprint_is_compared_when_the_version_is_unchanged():
+    doc = state(A["A3"], A["A4"])
+    gen.row(doc, "PC4")["channelCertificateSHA256"] = gen.h("swapped")
+    assert action(doc) == "HOLD_FOREIGN_WRITER"
+
+
+def test_f4_policy_bytes_not_just_the_floor_decide_commitment():
+    doc = state(A["A4"], A["A5"], landed=gen.on(gen.ids("PC2")))
+    assert checker.recovery_action(doc)[0] == "RESUME_FORWARD"
+    gen.row(doc, "PC2")["installedPolicyDigest"] = gen.h("other-bytes")
+    assert action(doc) == "HOLD_FOREIGN_WRITER"
+
+
+@pytest.mark.parametrize("phase, pc", [(A["A4"], "PC2"), (A["A5"], "PC3"), (A["E1"], "PC1")])
+def test_f4_effect_of_a_phase_never_marked_in_flight_is_a_foreign_writer(phase, pc):
+    """With no phase in flight, the next phase's effect cannot be ours: it must not be acknowledged."""
+    last = checker.PHASES[checker.INDEX[phase] - 1]
+    doc = state(last)
+    checker.apply_op(doc, gen.op_of(doc, phase, pc))
+    assert action(doc) == "HOLD_FOREIGN_WRITER"
+
+
+def test_f4_writer_fence_and_manifest_pin_are_required():
+    doc = state(A["A4"], A["A5"])
+    doc["checkpoint"]["readback"]["writerFence"] = None
+    assert action(doc) == "HOLD_WRITER_FENCE"
+    doc = state(A["A4"], A["A5"])
+    doc["checkpoint"]["readback"]["journalManifestDigest"] = None
+    assert action(doc) == "HOLD_MANIFEST_MISMATCH"
+
+
+def test_f4_manifest_changes_when_any_frozen_input_changes():
+    doc = base("t-manifest")
+    pin = checker.manifest_pin(doc)
+    for mutate in (lambda d: gen.member(d, "PC2")["counters"].update(channelVersionBefore=7, channelVersionAfter=8),
+                   lambda d: gen.member(d, "PC3").update(endpoint="https://10.0.0.3:7444"),
+                   lambda d: d["preservedEpoch"].update(epoch=gen.OTHER_EPOCH),
+                   lambda d: d["trustTransition"].update(targetGeneration=3)):
+        changed = copy.deepcopy(doc)
+        mutate(changed)
+        assert checker.manifest_pin(changed)["digest"] != pin["digest"]
+        assert "AR-MANIFEST" in checker.evaluate(changed, SCHEMA)
+
+
+def test_f4_manifest_sample_is_the_frozen_manifest_of_its_source():
+    sample = load(gen.MANIFEST_SAMPLE_PATH)
+    source = load(sample["sourcePlan"])
+    assert sample["manifest"] == checker.expected_manifest(source)
+    kinds = [op["kind"] for op in sample["manifest"]["operations"]]
+    assert kinds.count("CHANNEL_CAS") == 3 and kinds.count("CP_CONTEXT_SWITCH") == len(gen.INVENTORY)
+    cas = next(op for op in sample["manifest"]["operations"] if op["kind"] == "CHANNEL_CAS")
+    assert cas["expectedVersion"] == cas["pre"]["channelVersion"] and cas["endpoint"].startswith("https://")
+    assert cas["pre"]["channelCertificateSHA256"] and cas["post"]["channelCertificateSHA256"]
+
+
+def test_f4_a1_resume_is_deterministic_re_signing():
+    doc = load("fixtures/positive/p23-a1-in-flight-key-present-resume.json")
+    first, signed = checker.execute_resume(doc)
+    assert len(signed) == 3  # PC4, PC1 and the CP leaf were missing
+    second, again = checker.execute_resume(first)
+    assert again == []
+    # Re-signing reproduces byte-identical leaves (Ed25519 is deterministic).
+    rebuilt = gen.ceremony(gen.proposal("p23-a1-in-flight-key-present-resume"))
+    assert [m["leafDER"] for m in rebuilt["members"]] == [m["leafDER"] for m in doc["members"]]
+
+
+# ---------------------------------------------------------------- F5 expiry and advance renewal
+
+
+def _a4_in_flight(resume_at):
+    return state(A["A3"], A["A4"], resume_at=resume_at)
+
+
+def test_f5_policy_deadline_boundary_at_resume_time():
+    # Remaining A4..E5 = 9 phases x 600 s; margin 660 s; policy notAfter 2026-11-20T12:00Z; lead 86400 s.
+    remaining = 600 * len(checker.PHASES[checker.INDEX[A["A4"]]:])
+    assert remaining == 5400
+    limit = checker._ts("2026-11-20T12:00:00Z") - timedelta(seconds=86400 + remaining + 660)
+    assert action(_a4_in_flight(checker._iso(limit))) == "RESUME_FORWARD"
+    assert action(_a4_in_flight(checker._iso(limit + timedelta(seconds=1)))) == "HOLD_DEADLINE_INSUFFICIENT"
+
+
+def test_f5_leaf_deadline_is_checked_from_the_actual_certificate():
+    doc = gen.proposal("t-leafdl")
+    doc["newAuthority"]["leafValidity"]["notAfter"] = "2026-11-21T12:00:00Z"
+    doc = gen.ceremony(gen.seal(doc))
+    for m in doc["members"]:
+        m["plannedPolicy"]["notAfter"] = "2026-11-20T00:00:00Z"
+    doc = gen.seal(doc)
+    # Leaf lead is 259200 s: at 2026-11-18T14:00Z the leaf has ~3d-2h-11m left after the work.
+    assert action(gen.at_state(doc, A["A3"], A["A4"])) == "HOLD_DEADLINE_INSUFFICIENT"
+    cert = checker.load_certificate(gen.member(doc, "PC2")["leafDER"])
+    assert checker._iso(cert.not_valid_after_utc) == "2026-11-21T12:00:00Z"
+
+
+def test_f5_successor_must_be_valid_at_use_time():
+    doc = load("fixtures/positive/p33-successor-not-yet-valid-hold.json")
+    assert action(doc) == "HOLD_DEADLINE_INSUFFICIENT"
+    doc["checkpoint"]["resumeAt"] = "2026-11-18T15:00:00Z"
+    for r in doc["checkpoint"]["readback"]["members"]:
+        r["nodeObservedAt"] = "2026-11-18T14:59:30Z"
+    for p in doc["checkpoint"]["readback"]["serving"]["processes"]:
+        p["observedAt"] = "2026-11-18T14:59:30Z"
+    doc["checkpoint"]["readback"]["serving"]["challengeIssuedAt"] = "2026-11-18T14:59:00Z"
+    assert action(doc) == "RESUME_FORWARD"
+
+
+@pytest.mark.parametrize("field, value", [
+    ("newAuthority.notBefore", "2026-11-18T14:00:01Z"),
+    ("newAuthority.leafValidity.notBefore", "2026-11-18T14:00:01Z"),
+])
+def test_f5_each_not_before_is_checked_independently(field, value):
+    """Each validity start is its own condition; one may not mask the other."""
+    doc = _a4_in_flight(gen.RESUME)
+    assert checker.deadline_insufficient(doc, A["A4"]) is False
+    target = doc
+    *path, last = field.split(".")
+    for part in path:
+        target = target[part]
+    target[last] = value
+    assert checker.deadline_insufficient(doc, A["A4"]) is True
+
+
+ADV = {"mode": "ADVANCE_RENEWAL", "enroll": False}
+
+
+def test_f5_advance_overlap_deadline_boundary():
+    # Remaining A5..A7 = 3 x 600 s + 660 s must end by mustEndBy 2026-11-19T06:00Z.
+    limit = checker._ts("2026-11-19T06:00:00Z") - timedelta(seconds=1800 + 660)
+    ok = gen.at_state(base("t-adv", **ADV), A["A4"], resume_at=checker._iso(limit))
+    late = gen.at_state(base("t-adv", **ADV), A["A4"], resume_at=checker._iso(limit + timedelta(seconds=1)))
+    assert action(ok) == "RESUME_FORWARD"
+    assert action(late) == "HOLD_DEADLINE_INSUFFICIENT"
+
+
+def test_f5_advance_dual_stages_both_anchors_then_retires_the_prior():
+    doc = load("fixtures/positive/p36-advance-dual-complete-retired.json")
+    tt = doc["trustTransition"]
+    assert tt["stagedAnchorBundle"] == sorted([doc["priorAuthority"]["caCertificateSHA256"],
+                                               doc["newAuthority"]["caCertificateSHA256"]])
+    assert tt["finalAnchorBundle"] == [doc["newAuthority"]["caCertificateSHA256"]]
+    final = checker.anchor_digest(tt["finalAnchorBundle"])
+    rb = doc["checkpoint"]["readback"]
+    assert all(r["stagedAnchorDigest"] == final for r in rb["members"])
+    assert all(p["loadedAnchorDigest"] == final for p in rb["serving"]["processes"])
+    # Without the retirement proof on one process, COMPLETE is refused.
+    rb["serving"]["processes"][0]["loadedAnchorDigest"] = checker.anchor_digest(tt["stagedAnchorBundle"])
+    assert action(doc) == "HOLD_FOREIGN_WRITER"
+
+
+def test_f5_advance_retire_before_its_phase_is_a_foreign_writer():
+    doc = gen.at_state(base("t-early", **ADV), A["A4"])
+    final = checker.anchor_digest(doc["trustTransition"]["finalAnchorBundle"])
+    gen.row(doc, "PC3")["stagedAnchorDigest"] = final
+    assert action(doc) == "HOLD_FOREIGN_WRITER"
+
+
+def test_f5_terminal_checker_still_rejects_staging_the_expired_ca():
+    doc = base("t-term")
+    doc["trustTransition"]["stagedAnchorBundle"] = sorted([doc["priorAuthority"]["caCertificateSHA256"],
+                                                           doc["newAuthority"]["caCertificateSHA256"]])
+    assert checker.evaluate(gen.seal(doc), SCHEMA) == ["AR-TERMINAL-ANCHOR"]
+
+
+@pytest.mark.parametrize("prior_not_after, ok", [
+    ("2026-12-18T12:00:00Z", True),   # exactly the 30-day successor lead
+    ("2026-12-18T11:59:59Z", False),
+])
+def test_f5_advance_must_start_with_the_successor_lead_remaining(prior_not_after, ok):
+    doc = gen.proposal("t-lead", prior_not_after=prior_not_after, **ADV)
+    assert (checker.evaluate(doc, SCHEMA) == []) is ok
+
+
+# ---------------------------------------------------------------- handoff (medium finding 6)
+
+
+def test_handoff_is_scoped_as_four_member_migration_evidence():
+    from tools.five_node_lab_preflight import validate_five_node_inventory
+
+    handoff = load(gen.HANDOFF_PATH)
+    plan_bytes = (checker.CONTRACT_DIR / handoff["sourcePlan"]).read_bytes()
+    assert handoff["sourcePlanSHA256"] == hashlib.sha256(plan_bytes).hexdigest()
+    inventory = handoff["fiveNodeInventory"]
+    assert validate_five_node_inventory(inventory) is inventory
+    assert handoff["acceptance"]["scope"] == "FOUR_MEMBER_MIGRATION"
+    assert handoff["acceptance"]["fiveNodeReadiness"] == "NOT_ESTABLISHED"
+    assert handoff["acceptance"]["excludedFromThisAdmission"] == ["PC5"]
+    colocated = [n for n in inventory["nodes"] if n["coLocatedWithControlPlane"]]
+    assert len(inventory["nodes"]) == 4 and len(colocated) == 1
+    assert colocated[0]["nodeId"] == gen.NODE["PC3"] and colocated[0]["exclusionReason"] == "cp-host-colocation"
+    assert handoff["activation"] == "NOT_AUTHORIZED"
+
+
+@pytest.mark.parametrize("rel", [
+    "fixtures/positive/p14-pc1-first-enrollment-ready.json",
+    "fixtures/positive/p16-e3-channel-missing-apply.json",
+    "fixtures/positive/p29-stale-handshake-hold.json",
+    "fixtures/rejection/r09-pc1-copies-pc4-identity.json",
+])
+def test_handoff_refuses_unsettled_or_rejected_plans(rel):
+    raw = (checker.CONTRACT_DIR / rel).read_bytes()
+    with pytest.raises(ValueError):
+        checker.enrollment_handoff(json.loads(raw), rel, raw, hosts=gen.HANDOFF_HOSTS,
+                                   control_plane_host=gen.HANDOFF_CP_HOST)

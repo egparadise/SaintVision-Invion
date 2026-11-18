@@ -1,0 +1,639 @@
+{
+ "schema": "fleet5-authority-replacement-expectations:2",
+ "status": "PROPOSED_NOT_IMPLEMENTED",
+ "generator": "tools/generate_fleet5_authority_replacement_r2_fixtures.py",
+ "checker": "tools/check_fleet5_authority_replacement_r2.py",
+ "documents": [
+  {
+   "path": "instances/fleet5-nov18-ca-terminal-hold-r2.json",
+   "codes": [],
+   "why": "Real Nov18 fleet plan from Root544 evidence; HOLD with every unknown null."
+  },
+  {
+   "path": "fixtures/positive/p01-proposed-not-started.json",
+   "codes": [],
+   "why": "Complete PROPOSED plan before A1: 3 rotations + PC1 enrollment, nothing started."
+  },
+  {
+   "path": "fixtures/positive/p02-a1-durable-resume-anchor-stage.json",
+   "codes": [],
+   "why": "A1 ceremony durable (root, leaves, manifest); next is A2 on all members."
+  },
+  {
+   "path": "fixtures/positive/p03-a1-unknown-no-key-abandon.json",
+   "codes": [],
+   "why": "Ceremony interrupted; custody proves no new key exists: abandon is safe."
+  },
+  {
+   "path": "fixtures/positive/p04-a4-partial-cas-ack-and-apply.json",
+   "codes": [],
+   "why": "F4: PC2's CAS committed (exact postimage + one audit row), PC3/PC4 at exact preimage: ack PC2, apply the rest."
+  },
+  {
+   "path": "fixtures/positive/p05-complete.json",
+   "codes": [],
+   "why": "Every phase durable with fresh serving evidence for every process and member."
+  },
+  {
+   "path": "fixtures/positive/p06-db-unavailable-hold.json",
+   "codes": [],
+   "why": "Interrupted after A5 while the DB cannot be read: HOLD, no blind replay."
+  },
+  {
+   "path": "fixtures/positive/p07-custody-mismatch-hold.json",
+   "codes": [],
+   "why": "New CA key in custody differs from the plan after A2: HOLD."
+  },
+  {
+   "path": "fixtures/positive/p08-rotation-only-complete.json",
+   "codes": [],
+   "why": "Rotation cohort completes without any enrollment: the tracks are separable."
+  },
+  {
+   "path": "fixtures/positive/p09-durable-cas-undone-hold.json",
+   "codes": [],
+   "why": "Journal says A4 durable but PC3 is back at its exact preimage: HOLD."
+  },
+  {
+   "path": "fixtures/positive/p10-enrollment-before-rotation-hold.json",
+   "codes": [],
+   "why": "A PC1 row exists while rotation is only at A5: HOLD."
+  },
+  {
+   "path": "fixtures/positive/p11-epoch-diverged-hold.json",
+   "codes": [],
+   "why": "DB control epoch differs from the preserved epoch: HOLD, never adopt it."
+  },
+  {
+   "path": "fixtures/positive/p12-floor-above-plan-hold.json",
+   "codes": [],
+   "why": "PC2's floor is above the planned P: a foreign policy publication, HOLD."
+  },
+  {
+   "path": "fixtures/positive/p13-unplanned-row-hold.json",
+   "codes": [],
+   "why": "A Node row that is neither planned nor pre-existing appeared: HOLD."
+  },
+  {
+   "path": "fixtures/positive/p14-pc1-first-enrollment-ready.json",
+   "codes": [],
+   "why": "Rotation settled with fresh evidence; no PC1 reservation or row yet; next is the fenced E1 reservation."
+  },
+  {
+   "path": "fixtures/positive/p15-e2-row-landed-acknowledge.json",
+   "codes": [],
+   "why": "F1: crash after the reserved PC1 row was created, before channel provisioning: acknowledge ROW_ADMIT."
+  },
+  {
+   "path": "fixtures/positive/p16-e3-channel-missing-apply.json",
+   "codes": [],
+   "why": "F1: E2 durable (row with matching reservation, C=0), E3 in flight, nothing landed: apply CHANNEL_PROVISION."
+  },
+  {
+   "path": "fixtures/positive/p17-foreign-row-reservation-hold.json",
+   "codes": [],
+   "why": "F1: a PC1 row exists but was created under another reservation: HOLD, never adopt it."
+  },
+  {
+   "path": "fixtures/positive/p18-cas-old-fingerprint-differs-hold.json",
+   "codes": [],
+   "why": "F4: PC3 is at the expected old version but carries a different fingerprint: HOLD, no CAS."
+  },
+  {
+   "path": "fixtures/positive/p19-policy-floor-matches-digest-differs-hold.json",
+   "codes": [],
+   "why": "F4: PC4's floor equals the planned P but different policy bytes landed: HOLD."
+  },
+  {
+   "path": "fixtures/positive/p20-cas-postimage-without-audit-hold.json",
+   "codes": [],
+   "why": "F4: PC2 shows the planned version and leaf but no audit row for the operation: HOLD."
+  },
+  {
+   "path": "fixtures/positive/p21-writer-fence-lost-hold.json",
+   "codes": [],
+   "why": "F4: another plan holds the writer fence: HOLD, never write."
+  },
+  {
+   "path": "fixtures/positive/p22-journal-manifest-mismatch-hold.json",
+   "codes": [],
+   "why": "F4: the durable journal pins a different manifest: HOLD."
+  },
+  {
+   "path": "fixtures/positive/p23-a1-in-flight-key-present-resume.json",
+   "codes": [],
+   "why": "F4: ceremony interrupted with the planned key present and two leaves signed: resume A1 (deterministic re-signing)."
+  },
+  {
+   "path": "fixtures/positive/p24-second-ca-key-hold.json",
+   "codes": [],
+   "why": "F4: custody shows a second CA key was generated: HOLD."
+  },
+  {
+   "path": "fixtures/positive/p25-extra-leaf-signed-hold.json",
+   "codes": [],
+   "why": "F4: a second, different leaf was issued for PC2: HOLD."
+  },
+  {
+   "path": "fixtures/positive/p26-duplicate-readback-row-hold.json",
+   "codes": [],
+   "why": "F3: two readback rows for PC3 (never collapsed): HOLD."
+  },
+  {
+   "path": "fixtures/positive/p27-a3-without-verified-staging-hold.json",
+   "codes": [],
+   "why": "F3: A2 durable but PC4's anchor readback answers an old challenge: A3 stays blocked."
+  },
+  {
+   "path": "fixtures/positive/p28-settled-journal-missing-process-evidence-hold.json",
+   "codes": [],
+   "why": "F3: journal says A7 durable but the separately invoked storage-check client has no trust readback: HOLD."
+  },
+  {
+   "path": "fixtures/positive/p29-stale-handshake-hold.json",
+   "codes": [],
+   "why": "F3: PC2's handshake is older than the freshness window: COMPLETE is refused."
+  },
+  {
+   "path": "fixtures/positive/p30-a6-rolling-switch-resume.json",
+   "codes": [],
+   "why": "F3: A6 in flight; observer-1 and delivery-1 reloaded the new trust, the rest still on the prior: apply the rest."
+  },
+  {
+   "path": "fixtures/positive/p31-a7-awaiting-fresh-handshakes-resume.json",
+   "codes": [],
+   "why": "F3: A7 in flight; only PC2 has a fresh handshake under the new pins: observe PC3 and PC4 again."
+  },
+  {
+   "path": "fixtures/positive/p32-paused-policy-expiry-hold.json",
+   "codes": [],
+   "why": "F5: paused one day before A4; the planned policy cannot cover the outstanding work: HOLD, re-plan."
+  },
+  {
+   "path": "fixtures/positive/p33-successor-not-yet-valid-hold.json",
+   "codes": [],
+   "why": "F5: at resume time the new CA and its leaves are not yet valid: HOLD."
+  },
+  {
+   "path": "fixtures/positive/p34-advance-dual-not-started.json",
+   "codes": [],
+   "why": "F5: ADVANCE_RENEWAL while the current CA is valid: bounded dual-anchor overlap, nothing started."
+  },
+  {
+   "path": "fixtures/positive/p35-advance-dual-a4-resume.json",
+   "codes": [],
+   "why": "F5: advance renewal inside the overlap, PC2's CAS committed: resume A4."
+  },
+  {
+   "path": "fixtures/positive/p36-advance-dual-complete-retired.json",
+   "codes": [],
+   "why": "F5: every member and process retired the prior anchor (final bundle only) with fresh handshakes: COMPLETE."
+  },
+  {
+   "path": "fixtures/positive/p37-advance-overlap-elapsed-hold.json",
+   "codes": [],
+   "why": "F5: resuming A5 would finish after the overlap's mustEndBy: HOLD, never extend the overlap."
+  },
+  {
+   "path": "fixtures/positive/p38-advance-quiesced-not-started.json",
+   "codes": [],
+   "why": "F5: ADVANCE_RENEWAL by explicitly quiesced cutover (singleton successor anchor), nothing started."
+  },
+  {
+   "path": "fixtures/positive/p39-advance-a7-partial-retire-resume.json",
+   "codes": [],
+   "why": "F5: A7 in flight; PC2 and observer-1 retired the prior anchor: retire the rest, then observe."
+  },
+  {
+   "path": "fixtures/rejection/r01-new-ca-is-prior.json",
+   "codes": [
+    "AR-PRIOR-REUSE"
+   ],
+   "why": "New CA certificate is the prior CA."
+  },
+  {
+   "path": "fixtures/rejection/r02-new-ca-key-is-prior.json",
+   "codes": [
+    "AR-PRIOR-REUSE",
+    "AR-ROLE-SEPARATION"
+   ],
+   "why": "New CA re-uses the prior CA key (same-CA renewal in disguise)."
+  },
+  {
+   "path": "fixtures/rejection/r03-new-ca-subject-reused.json",
+   "codes": [
+    "AR-PRIOR-REUSE"
+   ],
+   "why": "New CA subject equals the prior CA subject."
+  },
+  {
+   "path": "fixtures/rejection/r04-terminal-in-anchor-bundle.json",
+   "codes": [
+    "AR-TERMINAL-ANCHOR"
+   ],
+   "why": "Expired CA kept as a trust anchor."
+  },
+  {
+   "path": "fixtures/rejection/r05-cross-signed-by-prior.json",
+   "codes": [
+    "AR-SCHEMA"
+   ],
+   "why": "New CA chained to the prior CA."
+  },
+  {
+   "path": "fixtures/rejection/r06-epoch-replaced.json",
+   "codes": [
+    "AR-EPOCH-SPIFFE",
+    "AR-PRIOR-BINDING"
+   ],
+   "why": "A rotation identity would carry a new epoch; its prior leaf cannot authenticate it."
+  },
+  {
+   "path": "fixtures/rejection/r07-channel-counter-reset.json",
+   "codes": [
+    "AR-CHANNEL-NONMONOTONE"
+   ],
+   "why": "Channel version reset instead of C+1."
+  },
+  {
+   "path": "fixtures/rejection/r08-policy-not-above-floor.json",
+   "codes": [
+    "AR-POLICY-NONMONOTONE"
+   ],
+   "why": "New policy version equals the authenticated floor."
+  },
+  {
+   "path": "fixtures/rejection/r09-pc1-copies-pc4-identity.json",
+   "codes": [
+    "AR-ENROLLMENT-REUSES-IDENTITY",
+    "AR-IDENTITY-COLLISION"
+   ],
+   "why": "PC1 re-uses PC4's NodeID (copied share directory)."
+  },
+  {
+   "path": "fixtures/rejection/r10-pc1-reuses-retired-row.json",
+   "codes": [
+    "AR-ENROLLMENT-REUSES-IDENTITY"
+   ],
+   "why": "PC1 revives a retired NodeID."
+  },
+  {
+   "path": "fixtures/rejection/r11-pc1-reuses-existing-key.json",
+   "codes": [
+    "AR-ENROLLMENT-REUSES-IDENTITY"
+   ],
+   "why": "PC1 enrolls with a key bound to a disabled row."
+  },
+  {
+   "path": "fixtures/rejection/r12-rotation-key-changed.json",
+   "codes": [
+    "AR-ROTATION-KEY-CHANGED"
+   ],
+   "why": "Rotation CSR proves a different key than the authenticated prior leaf."
+  },
+  {
+   "path": "fixtures/rejection/r13-rotation-of-unknown-identity.json",
+   "codes": [
+    "AR-PRIOR-BINDING",
+    "AR-ROTATION-UNKNOWN-IDENTITY"
+   ],
+   "why": "ROTATION for an identity absent from the DB tuples."
+  },
+  {
+   "path": "fixtures/rejection/r14-enrollment-counter-nonzero.json",
+   "codes": [
+    "AR-ENROLLMENT-COUNTER"
+   ],
+   "why": "New enrollment does not start from an empty channel."
+  },
+  {
+   "path": "fixtures/rejection/r15-proposed-with-unknown-budget.json",
+   "codes": [
+    "AR-HOLD-REQUIRED"
+   ],
+   "why": "PROPOSED while a budget is unknown; must be HOLD."
+  },
+  {
+   "path": "fixtures/rejection/r16-proposed-with-historical-epoch.json",
+   "codes": [
+    "AR-HOLD-REQUIRED"
+   ],
+   "why": "PROPOSED from a historical epoch, not a DB readback."
+  },
+  {
+   "path": "fixtures/rejection/r17-successor-lead-too-short.json",
+   "codes": [
+    "AR-RENEWAL-BUDGET"
+   ],
+   "why": "Successor CA lead shorter than one leaf lifetime + budgets."
+  },
+  {
+   "path": "fixtures/rejection/r18-seven-day-ca-repeats-failure.json",
+   "codes": [
+    "AR-RENEWAL-BUDGET"
+   ],
+   "why": "Seven-day CA (the Nov 14 failure shape)."
+  },
+  {
+   "path": "fixtures/rejection/r19-leaf-lead-below-budget.json",
+   "codes": [
+    "AR-RENEWAL-BUDGET"
+   ],
+   "why": "Leaf renewal lead below budget + overlap + 660 s."
+  },
+  {
+   "path": "fixtures/rejection/r20-terminal-not-yet-expired.json",
+   "codes": [
+    "AR-TERMINAL-NOT-EXPIRED"
+   ],
+   "why": "Prior CA still valid: TERMINAL_REPLACEMENT is not the applicable branch."
+  },
+  {
+   "path": "fixtures/rejection/r21-activation-released.json",
+   "codes": [
+    "AR-SCHEMA"
+   ],
+   "why": "A proposal document cannot carry an operating release."
+  },
+  {
+   "path": "fixtures/rejection/r22-private-material-embedded.json",
+   "codes": [
+    "AR-SECRET-MATERIAL"
+   ],
+   "why": "Private key material embedded in the plan."
+  },
+  {
+   "path": "fixtures/rejection/r23-resume-over-undone-cas.json",
+   "codes": [
+    "AR-RECOVERY-MISMATCH"
+   ],
+   "why": "Declares RESUME where readback proves a foreign writer."
+  },
+  {
+   "path": "fixtures/rejection/r24-rollback-to-terminal.json",
+   "codes": [
+    "AR-SCHEMA"
+   ],
+   "why": "Rollback to the expired authority is not representable."
+  },
+  {
+   "path": "fixtures/rejection/r25-shared-planned-leaf.json",
+   "codes": [
+    "AR-CERT-LEAF",
+    "AR-PLANNED-LEAF-REUSE"
+   ],
+   "why": "Two members pinned to one leaf certificate."
+  },
+  {
+   "path": "fixtures/rejection/r26-leaf-from-impostor-root.json",
+   "codes": [
+    "AR-CERT-LEAF"
+   ],
+   "why": "F2: PC3's leaf is signed by an impostor CA with the same subject."
+  },
+  {
+   "path": "fixtures/rejection/r27-leaf-uri-other-node.json",
+   "codes": [
+    "AR-CERT-LEAF"
+   ],
+   "why": "F2: PC3's leaf carries PC4's SPIFFE URI."
+  },
+  {
+   "path": "fixtures/rejection/r28-leaf-client-eku.json",
+   "codes": [
+    "AR-CERT-LEAF"
+   ],
+   "why": "F2: a Node leaf with clientAuth instead of serverAuth."
+  },
+  {
+   "path": "fixtures/rejection/r29-leaf-ip-san-differs.json",
+   "codes": [
+    "AR-CERT-LEAF"
+   ],
+   "why": "F2: PC4's leaf address SAN differs from its inventory address."
+  },
+  {
+   "path": "fixtures/rejection/r30-leaf-validity-not-planned.json",
+   "codes": [
+    "AR-CERT-LEAF"
+   ],
+   "why": "F2: PC2's leaf outlives the planned leaf validity."
+  },
+  {
+   "path": "fixtures/rejection/r31-csr-signature-tampered.json",
+   "codes": [
+    "AR-CSR-POP"
+   ],
+   "why": "F2: PC3's CSR signature does not verify: no proof of possession."
+  },
+  {
+   "path": "fixtures/rejection/r32-csr-subject-not-node.json",
+   "codes": [
+    "AR-CSR-POP"
+   ],
+   "why": "F2: PC2's CSR subject is not its NodeID."
+  },
+  {
+   "path": "fixtures/rejection/r33-prior-leaf-forged.json",
+   "codes": [
+    "AR-PRIOR-BINDING"
+   ],
+   "why": "F2: PC4's prior tuple is consistent but its leaf was not signed by the prior CA."
+  },
+  {
+   "path": "fixtures/rejection/r34-prior-leaf-not-row-tuple.json",
+   "codes": [
+    "AR-PRIOR-BINDING"
+   ],
+   "why": "F2: PC2's prior leaf is not the leaf the DB row pins."
+  },
+  {
+   "path": "fixtures/rejection/r35-role-key-equals-cp-key.json",
+   "codes": [
+    "AR-ROLE-SEPARATION"
+   ],
+   "why": "F2: the launch signer is the CP client key."
+  },
+  {
+   "path": "fixtures/rejection/r36-role-key-equals-new-ca-key.json",
+   "codes": [
+    "AR-ROLE-SEPARATION"
+   ],
+   "why": "F2: the launch signer is the new CA key."
+  },
+  {
+   "path": "fixtures/rejection/r37-retained-signer-compromised.json",
+   "codes": [
+    "AR-ROLE-CONTINUITY"
+   ],
+   "why": "F2: a signer Root found compromised cannot be retained."
+  },
+  {
+   "path": "fixtures/rejection/r38-retained-cp-key-changed.json",
+   "codes": [
+    "AR-ROTATION-KEY-CHANGED"
+   ],
+   "why": "F2: CP key declared RETAINED but the CSR proves a different key."
+  },
+  {
+   "path": "fixtures/rejection/r39-root-not-a-ca.json",
+   "codes": [
+    "AR-CERT-ROOT"
+   ],
+   "why": "F2: the new root is not a CA certificate (BasicConstraints CA=false)."
+  },
+  {
+   "path": "fixtures/rejection/r40-retained-signer-wrong-scope.json",
+   "codes": [
+    "AR-ROLE-CONTINUITY"
+   ],
+   "why": "F2: retained launch signer continuity verified for another scope."
+  },
+  {
+   "path": "fixtures/rejection/r41-reservation-plan-digest-stale.json",
+   "codes": [
+    "AR-ENROLLMENT-RESERVATION"
+   ],
+   "why": "F1: PC1's reservation binds an older plan."
+  },
+  {
+   "path": "fixtures/rejection/r42-reservation-node-state-not-empty.json",
+   "codes": [
+    "AR-ENROLLMENT-RESERVATION"
+   ],
+   "why": "F1: PC1 has Node-owned state left over: not a first admission."
+  },
+  {
+   "path": "fixtures/rejection/r43-rows-readback-excludes-retired.json",
+   "codes": [
+    "AR-HOLD-REQUIRED"
+   ],
+   "why": "F1: historical uniqueness was not checked against retired rows."
+  },
+  {
+   "path": "fixtures/rejection/r44-reservation-csr-mismatch.json",
+   "codes": [
+    "AR-ENROLLMENT-RESERVATION"
+   ],
+   "why": "F1: the reservation binds a different CSR than PC1's proof of possession."
+  },
+  {
+   "path": "fixtures/rejection/r45-process-inventory-missing-site.json",
+   "codes": [
+    "AR-PROCESS-INVENTORY"
+   ],
+   "why": "F3: the separately invoked storage-check client is not inventoried."
+  },
+  {
+   "path": "fixtures/rejection/r46-complete-declared-over-stale-evidence.json",
+   "codes": [
+    "AR-RECOVERY-MISMATCH"
+   ],
+   "why": "F3: declares COMPLETE from the journal over stale evidence."
+  },
+  {
+   "path": "fixtures/rejection/r47-serving-binary-not-reviewed.json",
+   "codes": [
+    "AR-HOLD-REQUIRED"
+   ],
+   "why": "F3: serving under the new trust without the reviewed binary migration."
+  },
+  {
+   "path": "fixtures/rejection/r48-manifest-digest-altered.json",
+   "codes": [
+    "AR-MANIFEST"
+   ],
+   "why": "F4: the pinned manifest is not the plan's frozen manifest."
+  },
+  {
+   "path": "fixtures/rejection/r49-ceremony-missing-after-a1.json",
+   "codes": [
+    "AR-CEREMONY-INCOMPLETE"
+   ],
+   "why": "F4: A1 durable without PC3's leaf or a frozen manifest."
+  },
+  {
+   "path": "fixtures/rejection/r50-apply-declared-for-committed-op.json",
+   "codes": [
+    "AR-RECOVERY-MISMATCH"
+   ],
+   "why": "F4: plans to re-apply PC2's committed CAS (would hit NODE-0034)."
+  },
+  {
+   "path": "fixtures/rejection/r51-ceremony-before-a1.json",
+   "codes": [
+    "AR-CHECKPOINT-ORDER"
+   ],
+   "why": "F4: ceremony outputs exist while the journal says nothing started."
+  },
+  {
+   "path": "fixtures/rejection/r52-terminal-mode-with-dual-bundle.json",
+   "codes": [
+    "AR-TERMINAL-ANCHOR"
+   ],
+   "why": "F5: a terminal replacement may not stage the expired CA."
+  },
+  {
+   "path": "fixtures/rejection/r53-advance-mode-prior-expired.json",
+   "codes": [
+    "AR-ADVANCE-WINDOW"
+   ],
+   "why": "F5: ADVANCE_RENEWAL over an expired CA is a terminal replacement."
+  },
+  {
+   "path": "fixtures/rejection/r54-advance-overlap-exceeds-lead.json",
+   "codes": [
+    "AR-ADVANCE-WINDOW"
+   ],
+   "why": "F5: dual-anchor overlap longer than the successor lead."
+  },
+  {
+   "path": "fixtures/rejection/r55-advance-started-too-late.json",
+   "codes": [
+    "AR-ADVANCE-WINDOW"
+   ],
+   "why": "F5: advance renewal started with less than the successor lead left."
+  },
+  {
+   "path": "fixtures/rejection/r56-resume-declared-over-expiry.json",
+   "codes": [
+    "AR-RECOVERY-MISMATCH"
+   ],
+   "why": "F5: declares RESUME after a pause the planned validity cannot cover."
+  },
+  {
+   "path": "fixtures/rejection/r57-quiesced-without-evidence.json",
+   "codes": [
+    "AR-HOLD-REQUIRED"
+   ],
+   "why": "F5: quiesced cutover without quiesce evidence: must be HOLD."
+  },
+  {
+   "path": "fixtures/rejection/r58-terminal-mode-with-overlap.json",
+   "codes": [
+    "AR-MODE"
+   ],
+   "why": "F5: a terminal replacement has no overlap window."
+  }
+ ],
+ "handoffs": [
+  {
+   "path": "handoff/pc1-first-enrollment-handoff.json",
+   "sourcePlan": "fixtures/positive/p05-complete.json",
+   "hosts": {
+    "PC1": "host-pc1",
+    "PC2": "host-pc2",
+    "PC3": "host-pc3",
+    "PC4": "host-pc4"
+   },
+   "controlPlaneHostId": "host-pc3",
+   "why": "PC1 first-enrollment handoff, scoped as four-member migration evidence."
+  }
+ ],
+ "manifestSamples": [
+  {
+   "path": "manifests/p02-operation-manifest.json",
+   "sourcePlan": "fixtures/positive/p02-a1-durable-resume-anchor-stage.json"
+  }
+ ]
+}
