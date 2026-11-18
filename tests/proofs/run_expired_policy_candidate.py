@@ -93,7 +93,7 @@ def collect_fixture_nodes(f,image_id,nodes):
             from contextlib import ExitStack
             cid=descriptor['nodes'][node]['cid']
             pid=collector.inspect(cid,'sv.fixture')['pid']
-            diag={'holds':obs['holds'],'exit':attempt.returncode,'mounts':{}}
+            diag={'holds':obs['holds'],'fields':obs['facts'].get('changedContainerFields',[]),'exit':attempt.returncode,'mounts':{}}
             REPORT['nodeCollectorRefusal']=diag
             with ExitStack() as stack:
                 for kind in ('config','state'):
