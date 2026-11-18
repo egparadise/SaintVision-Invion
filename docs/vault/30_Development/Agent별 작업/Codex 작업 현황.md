@@ -1,15 +1,19 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.503"
+version: "1.0.504"
 status: "review"
 author: "Codex"
-updated: "2026-11-08T11:20:49+09:00"
+updated: "2026-11-18T20:33:43+09:00"
 source_of_truth: "Git"
 active_card: "FLEET5 continued supervision with PORTAL-REFRESH-FLEET-20261106"
-active_card_status: "D476SourceCandidateActuallyAcceptedByClaudeFC902_Mandatory0; IntegrationF1F4HardeningAndReadonlyPreflightCodeReady_ProductionGatesHold"
-active_card_next: "Publish Root542 exact Docs/Obsidian then original Codex F1-F4 code hardening plus read-only current-cohort authority collector/guards, distinct fixtureF5 and expired PREPAREDF6 boundary. Actual source review before Root private read-only preflight; production publisher/CAS/context/migration and B_Rpolicy/release remain HOLD. Original2approvers/PC1key/PC5safeNode/GPUstorage/manual/full5 remain."
+active_card_status: "Nov18OriginalTaskFailed_ResumeSameTaskNoReset; CAterminalActualRead_NoLiveRecovery; HistoricalCodeMaturityAround72AndFormalCard4.17Separate_CurrentWholePercentAuditPending"
+active_card_next: "Finish Root543 exact Docs/Obsidian; retry originalTask_a5be5caa3c69 with retry-ofctx_ac834214080c in fresh isolated Orca workspace/setupskip and immediate updated Nov18 CAterminal/canonical instructions. One actual Claude audits existing48 rubric plus separate expandedVF denominator. Preserve old releaseunknown/evidence; no sameCA renewal or automatic restart/deploy."
 ---
+
+## 2026-11-18T20:33:43+09:00 11-18 실제 재개·중단 상태·완료율 감사
+
+11-18실제재점검에서마지막Agent는완료가아닌11-11프로세스종료/exit1073807364/failure1로중단된것을확인했다. read는identitychanged/release는unknown이므로강제닫기나해제완료주장을하지않는다. 현재OSboot11-12가옛dispatch이후여서옛프로세스의생존불가를별도증명했고같은Task의fresh격리retry를준비한다. 2·3·4번SSH/기존CID실행은성공하지만기존CA11-14/CPleaf11-09만료를공개cert에서직접확인했고PC1key거부·Main기존web/API포트없음을확인했다. 동일CA재갱신은금지된terminal분기라source/read-only작업만계속하고새권한교체는별도계약으로다룬다. 완료율은공식카드2/48=4.17%와마지막문서상기존48개구현성숙도71.35~72.40%(11-04)를구분하며현재전체·확대범위완료율은아직미확정이다. 원래rubric와최신증거로별도실제Claude감사를배정한다. 다음첫행동/담당은Root543정확게시뒤동일Task안전retry와별도실제Claude완료율감사이며기존미확인값을완료로바꾸지않는다.
 
 ## 2026-11-08T11:20:49+09:00 복구 후보 실제 source/security 수락과 통합 선행 코드
 

@@ -1,0 +1,33 @@
+import concurrent.futures,datetime,hashlib,json,shlex,subprocess
+from pathlib import Path
+r=Path(__file__).resolve().parents[1];out=r/'.work/resume-20261118-readonly';assert not out.exists();out.mkdir()
+k=Path(r'D:\Project\SaintVisionI-Invion\fleet5-worker-readiness-20261105\.work\f5-low-closure-26607075f612\known_hosts.f5.pinned');before=k.read_bytes();assert hashlib.sha256(before).hexdigest()=='0dcbf0f4cfc363e4affc30810ad8a9e57bd2c4a31991e2c8285bdae7052ec2d2'
+flags=['-i',r'C:\Users\inviz\.ssh\sv-lan-ed25519','-o','IdentitiesOnly=yes','-o','BatchMode=yes','-o','ConnectionAttempts=1','-o','ConnectTimeout=5','-o','StrictHostKeyChecking=yes','-o','UserKnownHostsFile='+str(k)]
+targets=[{'PC':1,'host':'inviz@192.168.45.13','CID':None},{'PC':2,'host':'saintvision-invion@192.168.45.143','CID':'fd4bdef2db94c434b740916d50fc0d3e80c5aa49bfe01f45b415f23877e03084'},{'PC':3,'host':'saintvision-invion3@192.168.45.222','CID':'702fa3fbc43e8deded94e67c6e5299eb4549958e074ba4aeb40c216db29752f7'},{'PC':4,'host':'inviz@192.168.45.210','CID':'e74fde5e18c65df59e3f19e4ba988c43ff27a3ff76021412eb71cc79957d489e'}]
+program=r'''import datetime,hashlib,json,os,socket,ssl,stat,subprocess,sys
+from pathlib import Path
+p=json.load(sys.stdin);now=datetime.datetime.now(datetime.timezone.utc);o={'PC':p['PC'],'atUTC':now.isoformat(timespec='seconds'),'hostname':socket.gethostname(),'UID':os.getuid(),'readOnly':True,'mutation':False}
+q=subprocess.run(['sh','-c','command -v docker'],capture_output=True,timeout=3);o['dockerCLIAvailable']=q.returncode==0
+if p['CID'] and q.returncode==0:
+ q=subprocess.run(['docker','container','inspect',p['CID']],capture_output=True,timeout=8);o['exactPriorNodeInspectExit']=q.returncode
+ if q.returncode==0:
+  v=json.loads(q.stdout)[0];o['priorNode']={'CID':v['Id'],'name':v['Name'],'image':v['Image'],'running':v['State']['Running'],'status':v['State']['Status'],'PID':v['State']['Pid'],'startedAt':v['State']['StartedAt'],'ownerLabels':{k:v for k,v in v['Config'].get('Labels',{}).items() if k.startswith('ai.saintvision.')},'user':v['Config']['User'],'readonlyRoot':v['HostConfig']['ReadonlyRootfs']}
+if p['PC']==3:
+ root=Path('/home/saintvision-invion3/saintvision-share/ops-fresh-cpu-1efea-r1-20261107/pki-r1');certs=[]
+ for name in ['ca-cert.pem','cp-client-cert.pem']:
+  path=root/name;row={'publicFile':str(path),'exists':path.exists()}
+  if path.exists():
+   s=path.stat();assert not path.is_symlink() and stat.S_ISREG(s.st_mode) and s.st_size<16384;raw=path.read_bytes();cert=ssl._ssl._test_decode_cert(str(path));notAfter=ssl.cert_time_to_seconds(cert['notAfter']);notBefore=ssl.cert_time_to_seconds(cert['notBefore']);der=ssl.PEM_cert_to_DER_cert(raw.decode());row.update(SHA256_PEM=hashlib.sha256(raw).hexdigest(),SHA256_DER=hashlib.sha256(der).hexdigest(),notBefore=cert['notBefore'],notAfter=cert['notAfter'],dateValidAtRead=notBefore<=now.timestamp()<notAfter)
+  certs.append(row)
+ o['publicAuthorityCertificates']=certs
+print(json.dumps(o))
+'''
+(out/'remote-readonly.py.txt').write_text(program,encoding='utf-8')
+def inspect(t):
+    q=subprocess.run(['ssh','-T',*flags,t['host'],'python3','-I','-B','-c',shlex.quote(program)],input=json.dumps(t).encode(),capture_output=True,timeout=22)
+    text=q.stderr.decode('utf-8','replace');result={'PC':t['PC'],'host':t['host'],'SSHExit':q.returncode,'stderrBytes':len(q.stderr),'failureClass':'publickey-rejected' if 'Permission denied' in text else 'connection-timeout' if 'timed out' in text else 'host-key-mismatch' if 'HOST IDENTIFICATION' in text else 'connection-refused' if 'Connection refused' in text else 'remote-error' if q.returncode else None,'remote':json.loads(q.stdout) if q.returncode==0 and q.stdout else None};(out/('PC'+str(t['PC'])+'.json')).write_text(json.dumps(result,indent=2)+'\n',encoding='utf-8');return result
+with concurrent.futures.ThreadPoolExecutor(max_workers=4) as pool:rows=list(pool.map(inspect,targets))
+assert k.read_bytes()==before
+registry=json.loads((r/'docs/task-registry.json').read_bytes());counts={s:sum(t['status']==s for t in registry['tasks']) for s in sorted({t['status'] for t in registry['tasks']})}
+result={'atKST':datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=9))).isoformat(timespec='seconds'),'nodes':rows,'knownHostsUnchanged':True,'noPasswordGuessOrCredentialChange':True,'noPrivateCertificateKeyRead':True,'noNodeOrServiceMutation':True,'registeredTaskCounts':counts,'formalTaskCompletionPercent':round(100*counts.get('done',0)/len(registry['tasks']),2),'formalTaskPercentIsNotActualCodeCompletion':True,'historicalCodeBaselinePercent':57.81,'historicalCodeBaselineAsOf':'2026-09-15','currentTotalCodePercent':'NOT_YET_RECALCULATED','wholeProgramComplete':False}
+(out/'receipt.json').write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n',encoding='utf-8');print(json.dumps(result,ensure_ascii=False),flush=True)

@@ -1,6 +1,6 @@
 {
   "schema": "fleet5-root-review-resource-sequence:1",
-  "atKST": "2026-11-08T11:20:49+09:00",
+  "atKST": "2026-11-18T20:33:43+09:00",
   "completedB": {
     "task": "task_d4c4c809ed4e",
     "review": "ac9182c3e3d606ec027c0be2e90e049ff50d54f1",
@@ -15,17 +15,16 @@
   "active": null,
   "pending": [
     {
-      "kind": "ORIGINAL_CODEX_INTEGRATION_READINESS_HARDENING_AND_READONLY_PREFLIGHT_CODE",
-      "id": "FLEET5-EXPIRED-POLICY-INTEGRATION-HARDENING-AND-READONLY-PREFLIGHT-R1",
-      "sourceBase": "d47630d730278aa9e49b15a63cd221696da8dc00",
-      "state": "READY_AFTER_ROOT542_PUBLICATION",
-      "sourceFindings": [
-        "D476-SRC-R1-F1",
-        "D476-SRC-R1-F2",
-        "D476-SRC-R1-F3",
-        "D476-SRC-R1-F4"
-      ],
-      "productionActivation": false
+      "kind": "RETRY_SAME_FAILED_CODE_TASK",
+      "task": "task_a5be5caa3c69",
+      "retryOf": "ctx_ac834214080c",
+      "state": "READY_AFTER_ROOT543",
+      "temporalGate": "CA_TERMINAL_READONLY_CODE_ONLY"
+    },
+    {
+      "kind": "ACTUAL_CLAUDE_COMPLETION_RESCORE",
+      "state": "READY_AFTER_ROOT543",
+      "scope": "48-task existing rubric and separate expanded VF scope/current reality"
     }
   ],
   "authorParallelWork": "B frozen b51 awaiting actual delta verdict; H12 accepted6d7 plus read-only five-row audit delivered, Root owns first CPU journey preflight. Optional Low backlog is not a mandatory new scope.",
@@ -36,7 +35,7 @@
     "review": "0e53fc024ca773b7719182e170e5e126aeaf5b95",
     "verdict": "ACCEPT TEST-ONLY; R-L1 CLOSED; no new findings"
   },
-  "nextActualReviewTrigger": "After Root542 publication assign original Codex finite F1-F4 hardening/read-only preflight code and real hosted tests; then actual Claude source review. Candidate source accepted, production migration/publication/context/B_Rpolicy still HOLD, no additional broad plan-only loop.",
+  "nextActualReviewTrigger": "Retry same code Task in a fresh isolated Orca workspace; queue Nov18/newcanonical/CAterminal correction immediately. Independently audit percent via one actual Claude. No stale cert reissue, phase reset or forged full5 completion.",
   "completedIntegration": {
     "task": "task_78064fb4b7ff",
     "dispatch": "ctx_ed7ec73163d6",
@@ -5137,6 +5136,65 @@
         "bytes": 15220,
         "SHA256": "32d3a231b1c860a1c582b1aaa713e77b5f28a466855cecf2a1d90eb1acf90949"
       }
+    ],
+    "wholeProgramComplete": false
+  },
+  "Root20261118Resume": {
+    "atKST": "2026-11-18T20:33:43+09:00",
+    "taskID": "FLEET5-20261118-RESUME-FAILED-TASK-AND-WHOLE-SOLUTION-COMPLETION-AUDIT",
+    "owner": "Root Codex coordinator",
+    "managementBase": "44af9eff71ae45da8171d5831e74bf37096be6b0",
+    "previousSealedRoot": 542,
+    "acceptedSource": "d47630d730278aa9e49b15a63cd221696da8dc00",
+    "actualSourceReview": "fc9025c6a7c42ba58974f179b80b5099b4ec8244",
+    "failedTask": "task_a5be5caa3c69",
+    "failedDispatch": "ctx_ac834214080c",
+    "failureCount": 1,
+    "failureExitCode": 1073807364,
+    "completedAt": "2026-11-11T16:29:20.559Z",
+    "oldAssignmentCapabilityRevokedAt": "2026-11-11T16:29:20.559Z",
+    "oldTerminalRead": "worker_identity_changed",
+    "oldTerminalRelease": "release_unknown/processAction none; not falsely marked released",
+    "currentBoot": "2026-11-12T01:33:36.5009380+09:00",
+    "oldProcessPhysicallyCannotHaveSurvivedCurrentBoot": true,
+    "retryPolicy": "Same Task with retry-of old dispatch, fresh isolated Orca worktree/terminal, setup skip, no reset/counter bypass, old workspace/evidence retained. Temporal update immediately queued to retry.",
+    "currentReachablePCs": [
+      2,
+      3,
+      4
+    ],
+    "oldNodeContainersStillRunningButNotSecureAcceptance": true,
+    "PC1SSH": "publickey rejected; no password/key guesses",
+    "actualPublicCAExpiry": "2026-11-14T07:15:30Z, expired at current read",
+    "actualCPClientExpiry": "2026-11-09T07:15:30Z, expired at current read",
+    "authorityDecision": "CA_TERMINAL. No same-CA policy/leaf renewal or restart/migration under old authority. Continue source hardening/read-only inspection; separately reviewed authority replacement/recommissioning must precede any live recovery.",
+    "mainPortsObservation": "20:25KST no Listen entries among3100/18080/55461/8080/8443; no process started or stopped",
+    "formalTaskCompletion": {
+      "source": "current authoritative management registry1.0.1",
+      "done": 2,
+      "blocked": 4,
+      "planned": 42,
+      "total": 48,
+      "percent": 4.17,
+      "meaning": "accepted-card completion only, NOT code maturity or full expanded product percent"
+    },
+    "lastDocumentedCodeMaturity": {
+      "source": "docs/vault/30_Development/2026-09-28 48 task 진행률 재채점.md",
+      "docID": "PROGRESS-RESCORE-20260928-CLAUDE",
+      "version": "1.21.1",
+      "updated": "2026-11-04T13:26:09+09:00",
+      "landedScore": 3425,
+      "candidateScore": 3475,
+      "denominator": 4800,
+      "landedPercent": 71.35,
+      "candidatePercent": 72.4,
+      "meaning": "Historical original48-task code/test maturity rubric, not certified current full expanded-solution completion; current evidence remapping pending"
+    },
+    "currentWholeSolutionPercent": "UNCONFIRMED_PENDING_FRESH_EVIDENCE_AUDIT",
+    "expandedScopeDenominator": "Not retroactively mixed into original48 denominator",
+    "nextIndependentWork": [
+      "Retry same original Codex hardening/read-only preflight task with CA-terminal temporal correction",
+      "One actual Claude metadata-only original48 rubric rescore + expanded VF scope/current operational gaps, no fabricated percent"
     ],
     "wholeProgramComplete": false
   }

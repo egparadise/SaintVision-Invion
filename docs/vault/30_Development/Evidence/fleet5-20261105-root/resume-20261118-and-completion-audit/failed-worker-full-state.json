@@ -1,0 +1,186 @@
+{
+  "dispatch": {
+    "id": "ctx_ac834214080c",
+    "runId": "run_e57ecd84a7bc",
+    "taskId": "task_a5be5caa3c69",
+    "task_id": "task_a5be5caa3c69",
+    "contractVersion": 1,
+    "assigneeHandle": "term_8c323cd4338ecaa4c41a23296662b362",
+    "assigneePaneKey": "c8843b38-8e01-4fa0-860d-0dd9145cae8c:64bc7b0b-43c9-464d-a58b-d1b421c05297",
+    "processIncarnation": "serve-a24254b4-ba46-43be-834d-bd863af17fca:798686ef-d3c3-4fce-bf88-4b864b26925f",
+    "capabilityRevokedAt": "2026-11-11T16:29:20.559Z",
+    "retryOfDispatchId": null,
+    "creatorDispatchId": null,
+    "followUpOf": "ctx_e55b82334c37",
+    "hostScope": {
+      "kind": "local",
+      "hostId": "local"
+    },
+    "status": "failed",
+    "failureCount": 1,
+    "lastFailure": "Agent process exited with code 1073807364",
+    "terminationReason": "exited",
+    "depth": 1,
+    "dispatchedAt": "2026-11-08 02:26:05",
+    "completedAt": "2026-11-11T16:29:20.559Z",
+    "createdAt": "2026-11-08 02:26:05",
+    "lastHeartbeatAt": null
+  },
+  "worker": {
+    "dispatchId": "ctx_ac834214080c",
+    "runtimeEpoch": "f5ea1323-7593-4fa0-b864-0070ecbe6f0a",
+    "state": "failed",
+    "stage": "process_exited",
+    "worktreeId": "d98dc9d3-fe61-4cb2-9776-dff349347a61::D:/Project/SaintVisionI-Invion/fleet5-compute-storage-contract-20261105",
+    "agentTerminalHandle": "term_8c323cd4338ecaa4c41a23296662b362",
+    "setupState": "not_applicable",
+    "effects": [
+      {
+        "kind": "worktree",
+        "action": "reused",
+        "id": "d98dc9d3-fe61-4cb2-9776-dff349347a61::D:/Project/SaintVisionI-Invion/fleet5-compute-storage-contract-20261105"
+      },
+      {
+        "kind": "setup",
+        "action": "not_applicable",
+        "state": "not_applicable"
+      },
+      {
+        "kind": "terminal",
+        "role": "agent",
+        "action": "created",
+        "id": "term_8c323cd4338ecaa4c41a23296662b362"
+      },
+      {
+        "kind": "dispatch_input",
+        "role": "agent",
+        "id": "term_8c323cd4338ecaa4c41a23296662b362",
+        "state": "accepted"
+      }
+    ],
+    "residualResources": [
+      {
+        "kind": "terminal",
+        "role": "agent",
+        "action": "created",
+        "id": "term_8c323cd4338ecaa4c41a23296662b362"
+      }
+    ],
+    "startOptions": {
+      "worktree": "id:d98dc9d3-fe61-4cb2-9776-dff349347a61::D:/Project/SaintVisionI-Invion/fleet5-compute-storage-contract-20261105",
+      "mode": {
+        "mode": "terminal",
+        "preferred": "terminal",
+        "reason": "user_default",
+        "detail": "Started a terminal agent worker, the default for new agent tabs in your settings."
+      },
+      "resolvedWorktreeId": "d98dc9d3-fe61-4cb2-9776-dff349347a61::D:/Project/SaintVisionI-Invion/fleet5-compute-storage-contract-20261105",
+      "name": null,
+      "repo": null,
+      "baseBranch": null,
+      "terminal": null,
+      "agent": "codex",
+      "launch": {
+        "requested": {
+          "agent": "codex",
+          "model": null,
+          "effort": null
+        },
+        "effective": {
+          "agent": "codex",
+          "model": null,
+          "effort": null
+        }
+      },
+      "timeoutMs": 60000,
+      "setup": "not_applicable",
+      "setupSource": "existing_worktree"
+    },
+    "lastError": "Agent process exited with code 1073807364",
+    "createdAt": "2026-11-08 02:26:05",
+    "updatedAt": "2026-11-11T16:29:20.564Z"
+  },
+  "projection": {
+    "id": "ctx_ac834214080c",
+    "dispatchId": "ctx_ac834214080c",
+    "taskId": "task_a5be5caa3c69",
+    "runId": "run_e57ecd84a7bc",
+    "role": "worker",
+    "parent": null,
+    "provider": null,
+    "host": {
+      "kind": "local",
+      "id": "local"
+    },
+    "workspace": {
+      "id": "d98dc9d3-fe61-4cb2-9776-dff349347a61::D:/Project/SaintVisionI-Invion/fleet5-compute-storage-contract-20261105",
+      "kind": "folder_or_worktree"
+    },
+    "stage": {
+      "worker": "failed",
+      "dispatch": "failed",
+      "detail": "process_exited",
+      "activity": "unknown"
+    },
+    "outcome": "failed",
+    "liveness": {
+      "verdict": "exited",
+      "source": "execution_host"
+    },
+    "evidence": {
+      "durable": true,
+      "liveStatus": "unavailable",
+      "lastObservedAt": null
+    },
+    "resource": {
+      "state": "owned",
+      "id": "wtr_8199ca0a2790",
+      "ownerDispatchId": "ctx_ac834214080c",
+      "releaseState": "unknown",
+      "terminalState": "release_unknown"
+    },
+    "nextAction": {
+      "kind": "release",
+      "argv": [
+        "orchestration",
+        "worker-release",
+        "--dispatch",
+        "ctx_ac834214080c"
+      ]
+    },
+    "attention": {
+      "categories": [
+        "failure"
+      ],
+      "requiresAction": true
+    }
+  },
+  "terminal": null,
+  "observation": {
+    "status": "missing",
+    "exactWorker": false
+  },
+  "terminalResource": {
+    "id": "wtr_8199ca0a2790",
+    "ownershipState": "owned",
+    "releaseState": "unknown",
+    "retainedReason": null,
+    "terminalHandle": "term_8c323cd4338ecaa4c41a23296662b362",
+    "worktreeId": "d98dc9d3-fe61-4cb2-9776-dff349347a61::D:/Project/SaintVisionI-Invion/fleet5-compute-storage-contract-20261105",
+    "endpointId": "f5ea1323-7593-4fa0-b864-0070ecbe6f0a",
+    "endpointIncarnation": "serve-a24254b4-ba46-43be-834d-bd863af17fca:798686ef-d3c3-4fce-bf88-4b864b26925f",
+    "originDispatchId": "ctx_ac834214080c",
+    "ownerDispatchId": "ctx_ac834214080c",
+    "releaseRequestedAt": "2026-11-18 11:22:56",
+    "releaseCompletedAt": null,
+    "releaseError": "The recorded terminal no longer resolves; whether its process is gone cannot be proven.",
+    "recoveryAttemptCount": 0,
+    "lastRecoveryAt": null,
+    "autoReleaseAt": null,
+    "archive": {
+      "source": null,
+      "status": null
+    }
+  },
+  "autoReleaseAt": null
+}

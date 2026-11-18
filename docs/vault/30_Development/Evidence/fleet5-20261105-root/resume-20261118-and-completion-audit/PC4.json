@@ -1,0 +1,32 @@
+{
+  "PC": 4,
+  "host": "inviz@192.168.45.210",
+  "SSHExit": 0,
+  "stderrBytes": 0,
+  "failureClass": null,
+  "remote": {
+    "PC": 4,
+    "atUTC": "2026-11-18T11:26:13+00:00",
+    "hostname": "inviz-Precision-3450",
+    "UID": 1000,
+    "readOnly": true,
+    "mutation": false,
+    "dockerCLIAvailable": true,
+    "exactPriorNodeInspectExit": 0,
+    "priorNode": {
+      "CID": "e74fde5e18c65df59e3f19e4ba988c43ff27a3ff76021412eb71cc79957d489e",
+      "name": "/saintvision-nod_01M6TGSXV1J7XWC5D5H7N6EW1D",
+      "image": "sha256:de654cd385307ac7147baf6757a480f803361eb5b30d40c7991b272a6889d87f",
+      "running": true,
+      "status": "running",
+      "PID": 453802,
+      "startedAt": "2026-11-07T21:49:28.266847692Z",
+      "ownerLabels": {
+        "ai.saintvision.node": "nod_01M6TGSXV1J7XWC5D5H7N6EW1D",
+        "ai.saintvision.owner": "root-cpu-1efea-r1"
+      },
+      "user": "1000:1000",
+      "readonlyRoot": true
+    }
+  }
+}

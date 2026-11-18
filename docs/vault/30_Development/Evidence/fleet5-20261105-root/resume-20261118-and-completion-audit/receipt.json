@@ -1,0 +1,144 @@
+{
+  "atKST": "2026-11-18T20:26:13+09:00",
+  "nodes": [
+    {
+      "PC": 1,
+      "host": "inviz@192.168.45.13",
+      "SSHExit": 255,
+      "stderrBytes": 62,
+      "failureClass": "publickey-rejected",
+      "remote": null
+    },
+    {
+      "PC": 2,
+      "host": "saintvision-invion@192.168.45.143",
+      "SSHExit": 0,
+      "stderrBytes": 0,
+      "failureClass": null,
+      "remote": {
+        "PC": 2,
+        "atUTC": "2026-11-18T11:26:13+00:00",
+        "hostname": "saintvision-invion-Precision-3450",
+        "UID": 1000,
+        "readOnly": true,
+        "mutation": false,
+        "dockerCLIAvailable": true,
+        "exactPriorNodeInspectExit": 0,
+        "priorNode": {
+          "CID": "fd4bdef2db94c434b740916d50fc0d3e80c5aa49bfe01f45b415f23877e03084",
+          "name": "/saintvision-nod_01M6TGQZ8S3DAFS7TYE8TY1PX2",
+          "image": "sha256:de654cd385307ac7147baf6757a480f803361eb5b30d40c7991b272a6889d87f",
+          "running": true,
+          "status": "running",
+          "PID": 3498919,
+          "startedAt": "2026-11-07T21:39:57.845745085Z",
+          "ownerLabels": {
+            "ai.saintvision.node": "nod_01M6TGQZ8S3DAFS7TYE8TY1PX2",
+            "ai.saintvision.owner": "root-cpu-1efea-r1"
+          },
+          "user": "1000:1000",
+          "readonlyRoot": true
+        }
+      }
+    },
+    {
+      "PC": 3,
+      "host": "saintvision-invion3@192.168.45.222",
+      "SSHExit": 0,
+      "stderrBytes": 0,
+      "failureClass": null,
+      "remote": {
+        "PC": 3,
+        "atUTC": "2026-11-18T11:26:13+00:00",
+        "hostname": "saintvision-invion3-Precision-3450",
+        "UID": 1000,
+        "readOnly": true,
+        "mutation": false,
+        "dockerCLIAvailable": true,
+        "exactPriorNodeInspectExit": 0,
+        "priorNode": {
+          "CID": "702fa3fbc43e8deded94e67c6e5299eb4549958e074ba4aeb40c216db29752f7",
+          "name": "/saintvision-nod_01M6TAWG25JTA3F7J7S1EE4N2W",
+          "image": "sha256:de654cd385307ac7147baf6757a480f803361eb5b30d40c7991b272a6889d87f",
+          "running": true,
+          "status": "running",
+          "PID": 692332,
+          "startedAt": "2026-11-07T21:49:20.986639356Z",
+          "ownerLabels": {
+            "ai.saintvision.node": "nod_01M6TAWG25JTA3F7J7S1EE4N2W",
+            "ai.saintvision.owner": "root-cpu-1efea-r1"
+          },
+          "user": "1000:1000",
+          "readonlyRoot": true
+        },
+        "publicAuthorityCertificates": [
+          {
+            "publicFile": "/home/saintvision-invion3/saintvision-share/ops-fresh-cpu-1efea-r1-20261107/pki-r1/ca-cert.pem",
+            "exists": true,
+            "SHA256_PEM": "b8d777ab04c65a44f827fdda9629d54a086e9ff8cc752b90a09023a93341c5a3",
+            "SHA256_DER": "b27c4bb4050ce4732f7d86af5f977b869b6268f9650a2df8258084f23c69f660",
+            "notBefore": "Nov  7 07:10:30 2026 GMT",
+            "notAfter": "Nov 14 07:15:30 2026 GMT",
+            "dateValidAtRead": false
+          },
+          {
+            "publicFile": "/home/saintvision-invion3/saintvision-share/ops-fresh-cpu-1efea-r1-20261107/pki-r1/cp-client-cert.pem",
+            "exists": true,
+            "SHA256_PEM": "671c57160c87471a0251252e1ee55adfa0ec52b36042189bcc56915fb3c9b6bd",
+            "SHA256_DER": "48911c5ddf7d12f05b9866feea0f0005c193d76a956274e2510492d0c2f76481",
+            "notBefore": "Nov  7 07:10:30 2026 GMT",
+            "notAfter": "Nov  9 07:15:30 2026 GMT",
+            "dateValidAtRead": false
+          }
+        ]
+      }
+    },
+    {
+      "PC": 4,
+      "host": "inviz@192.168.45.210",
+      "SSHExit": 0,
+      "stderrBytes": 0,
+      "failureClass": null,
+      "remote": {
+        "PC": 4,
+        "atUTC": "2026-11-18T11:26:13+00:00",
+        "hostname": "inviz-Precision-3450",
+        "UID": 1000,
+        "readOnly": true,
+        "mutation": false,
+        "dockerCLIAvailable": true,
+        "exactPriorNodeInspectExit": 0,
+        "priorNode": {
+          "CID": "e74fde5e18c65df59e3f19e4ba988c43ff27a3ff76021412eb71cc79957d489e",
+          "name": "/saintvision-nod_01M6TGSXV1J7XWC5D5H7N6EW1D",
+          "image": "sha256:de654cd385307ac7147baf6757a480f803361eb5b30d40c7991b272a6889d87f",
+          "running": true,
+          "status": "running",
+          "PID": 453802,
+          "startedAt": "2026-11-07T21:49:28.266847692Z",
+          "ownerLabels": {
+            "ai.saintvision.node": "nod_01M6TGSXV1J7XWC5D5H7N6EW1D",
+            "ai.saintvision.owner": "root-cpu-1efea-r1"
+          },
+          "user": "1000:1000",
+          "readonlyRoot": true
+        }
+      }
+    }
+  ],
+  "knownHostsUnchanged": true,
+  "noPasswordGuessOrCredentialChange": true,
+  "noPrivateCertificateKeyRead": true,
+  "noNodeOrServiceMutation": true,
+  "registeredTaskCounts": {
+    "blocked": 4,
+    "done": 2,
+    "planned": 42
+  },
+  "formalTaskCompletionPercent": 4.17,
+  "formalTaskPercentIsNotActualCodeCompletion": true,
+  "historicalCodeBaselinePercent": 57.81,
+  "historicalCodeBaselineAsOf": "2026-09-15",
+  "currentTotalCodePercent": "NOT_YET_RECALCULATED",
+  "wholeProgramComplete": false
+}
