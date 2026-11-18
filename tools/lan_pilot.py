@@ -41,6 +41,7 @@ from inv.node_channels import certificate_identity, node_uri, provision_channel,
 from inv.node_transport import NodeTLSClient
 from inv.observer_worker import ObservationWorker
 from inv.tooling import NodePrincipal
+from a1_writer_fence import Writer, interrupted_a1_hold
 from lan_pki import ca_pair, csr_public_key, fingerprint, issue, pem, private_pem
 from worker_leaf_rotation import FILE_NAMES as ROTATION_FILE_NAMES
 from worker_leaf_rotation import MANIFEST_KEYS as ROTATION_MANIFEST_KEYS
@@ -2194,6 +2195,14 @@ def prepare_leaf_rotation_recovery_batch(args):
     )
 
 
+def inspect_interrupted_a1(args):
+    """Report the blocking prerequisite without performing any recovery operation."""
+    expected = json.loads(args.expected_writer.read_text("utf-8"))
+    writer = Writer(expected["holderPlanDigest"], expected["token"], expected["generation"])
+    print(interrupted_a1_hold(args.state / "a1-writer.sqlite3", writer))
+    raise SystemExit(2)
+
+
 def prepare_fully_expired_leaf_rotation_recovery_batch(args):
     """Recover an all-expired pilot without accepting an expired leaf as authority."""
     path, state = args.state, load(args.state)
@@ -3844,6 +3853,8 @@ def main():
     p.add_argument("--bundle", type=Path, required=True)
     p.add_argument("--node-receipt", type=Path, required=True)
     p.add_argument("--output", type=Path, required=True)
+    p = commands.add_parser("inspect-interrupted-a1", help="Report the interrupted A1 hold")
+    p.add_argument("--expected-writer", type=Path, required=True)
     commands.add_parser("status")
     p = commands.add_parser("observe")
     p.add_argument("--once", action="store_true")

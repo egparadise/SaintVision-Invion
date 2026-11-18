@@ -1,0 +1,96 @@
+[
+  {
+    "command": "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe tools/check_docs.py",
+    "kst": "2026-11-19T03:21:16.685704+09:00",
+    "exit": 0,
+    "tail": [
+      "PASS: 24 original hashes, 1282 versioned documents, wiki links, 48 tasks, 12 outcomes, owner/reviewer/skills, dependency DAG."
+    ]
+  },
+  {
+    "command": "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe tools/check_ontology.py",
+    "kst": "2026-11-19T03:22:08.687428+09:00",
+    "exit": 0,
+    "tail": [
+      "PASS: RDF parsing, defined terms, TTL/JSON-LD equivalence, 48 task mappings, positive SHACL, 4 rejected invalid fixtures, 4 competency queries, Obsidian mirrors."
+    ]
+  },
+  {
+    "command": "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe tools/check_contract_bindings.py",
+    "kst": "2026-11-19T03:22:11.209860+09:00",
+    "exit": 0,
+    "tail": [
+      "PASS check_contract_bindings: 57 fixtures each referenced by a test; 21 bound kernel response TYPES each have >=1 serving-anchor test (counted PER TYPE, not per anchor SITE: those types occupy 27 anchor sites; a multi-site type counts covered even if only one site is tested -- site-level weight is not decidable here, use tools/check_anchor_weight.py + the mutation harness); 14 replay guards present.",
+      "  UNIT NOTE: TYPE count <= SITE count. Multi-site types (per-type coverage can mask an untested site): ApprovalView(2 sites: ['approvals']), BusinessBindingView(2 sites: ['business_handoff']), BusinessEditLockReleaseView(2 sites: ['business_handoff']), BusinessEditLockView(2 sites: ['business_handoff']), ControlRunDetail(3 sites: ['control']), ControlRunView(2 sites: ['control']), EvidenceEnvelope(6 sites: ['build_governance', 'results', 'runs', 'shard_completion', 'storage_commit', 'storage_view']), ModelExecutionManifestObservation(2 sites: ['model_uri_resolver', 'model_view']), NodeExecutionPermit(2 sites: ['node_execution', 'node_transport']), NodeResourceSnapshot(4 sites: ['capacity', 'gpu', 'observation']), WorkspaceCheckoutView(2 sites: ['workspace_recovery']), WorkspaceEnqueueResult(3 sites: ['workspace_api']), WorkspacePrepareResult(2 sites: ['workspace_api']), WorkspaceRestoreView(2 sites: ['workspace_recovery']), WorkspaceStartEnqueueResult(3 sites: ['workspace_start']), WorkspaceStartPrepareResult(2 sites: ['workspace_start'])",
+      "  (Reporting sites is not a regression -- the TYPE number never meant 'sites verified'; this makes the counting unit explicit. EvidenceEnvelope-class multi-site anchors are why.)"
+    ]
+  },
+  {
+    "command": "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe tools/check_frontend_integrity.py",
+    "kst": "2026-11-19T03:22:22.907368+09:00",
+    "exit": 0,
+    "tail": [
+      "Scanning 94 frontend production source files under apps/web/src ...",
+      "",
+      "PASS Frontend Integrity Check: all 9 integrity rules satisfied (0 violations)."
+    ]
+  },
+  {
+    "command": "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe tools/check_doc_single_source.py --ratchet",
+    "kst": "2026-11-19T03:22:24.585796+09:00",
+    "exit": 0,
+    "tail": [
+      "PASS check_doc_single_source --ratchet: 16 pairs, all in baseline, none stale."
+    ]
+  },
+  {
+    "command": "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe tools/check_response_freshness.py",
+    "kst": "2026-11-19T03:22:25.197393+09:00",
+    "exit": 0,
+    "tail": [
+      "  ok      kernel:RunResultView.completedAt",
+      "  ok      kernel:RunResultView.stateUpdatedAt",
+      "  ok      kernel:ShardObservation.stateAsOf",
+      "  ok      kernel:StorageObservationView.createdAt",
+      "  ok      saintvision:NodeResponse.lastHeartbeatAt",
+      "  ok      saintvision:ReplicaObservationResponse.observedAt",
+      "  (structural floor only. Whether a NEW response is freshness-critical is human judgment -- review this map when responses are added. Staleness behaviour needs a clock-advance test with PG.)"
+    ]
+  },
+  {
+    "command": "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe tools/check_fleet5_authority_replacement_r2.py",
+    "kst": "2026-11-19T03:22:25.322741+09:00",
+    "exit": 0,
+    "tail": [
+      "PASS fleet5 authority replacement R2: 113 documents matched their expected verdicts"
+    ]
+  },
+  {
+    "command": "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe tools/generate_fleet5_authority_replacement_r2_fixtures.py --check",
+    "kst": "2026-11-19T03:22:27.271508+09:00",
+    "exit": 0,
+    "tail": []
+  },
+  {
+    "command": "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe -m pytest -q tests/core/test_a1_writer_fence.py tests/core/test_fleet5_authority_replacement_r2.py tests/core/test_serving_anchors.py tests/test_route_coverage.py tests/test_lan_leaf_rotation.py",
+    "kst": "2026-11-19T03:22:28.317755+09:00",
+    "exit": 0,
+    "tail": [
+      "........................................................................ [ 28%]",
+      "........................................................................ [ 43%]",
+      "........................................................................ [ 57%]",
+      "........................................................................ [ 72%]",
+      "........................................................................ [ 86%]",
+      "..................................................................       [100%]",
+      "498 passed in 22.71s"
+    ]
+  },
+  {
+    "command": "D:\\Project\\SaintVisionI-Invion\\.venv\\Scripts\\python.exe tools/sync_obsidian.py --check",
+    "kst": "2026-11-19T03:22:52.597020+09:00",
+    "exit": 0,
+    "tail": [
+      "CHECK: 3820 managed files, 28 pending exports, 0 conflicts. No writes."
+    ]
+  }
+]
