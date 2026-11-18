@@ -6,7 +6,12 @@ from datetime import datetime, timezone
 from pathlib import PurePosixPath
 
 API_SOURCE = "96afd799d49717fd40e4ddabd538d82accbe1958"
-SCHEMA = "0068_first_workspace_intent"
+# Exact Alembic head of integration/all-agents-unified. The collector refuses every
+# other revision (DATABASE_REVISION_UNKNOWN), including 0068_first_workspace_intent:
+# this unified candidate does not authorize observing a 0068 database. 0068 adds only
+# a writer role, two inv functions and public-schema grants/policies, none of which
+# the queries below read; a 0068 target needs its own reviewed retarget.
+SCHEMA = "0067_audit_reader_revoke"
 
 
 class Hold(ValueError):

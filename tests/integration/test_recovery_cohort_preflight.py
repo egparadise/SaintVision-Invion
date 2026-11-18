@@ -1,4 +1,4 @@
-"""Dedicated input rows in the hosted disposable schema0068 PostgreSQL fixture."""
+"""Dedicated input rows in the hosted disposable schema0067 PostgreSQL fixture."""
 import sys
 import json
 import os
@@ -98,7 +98,7 @@ def test_cohort_visibility_and_readonly_transaction(request):
             def checksum(items):
                 return hashlib.sha256(json.dumps(items,default=str).encode()).hexdigest()
             (folder/"observations.json").write_text(json.dumps(dict(sourceSHA=os.environ["GITHUB_SHA"],
-                fixture="disposable-postgres-schema0068",hiddenChannelCount=hidden,hiddenDisposition=str(failure.value),
+                fixture="disposable-postgres-schema0067",hiddenChannelCount=hidden,hiddenDisposition=str(failure.value),
                 bindingNegatives=negatives,observed=out["facts"],holds=out["holds"],channelRowsBefore=checksum(before),channelRowsAfter=checksum(after),
                 activationAllowed=False),indent=2))
     finally:
