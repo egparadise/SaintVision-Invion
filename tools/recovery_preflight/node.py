@@ -58,6 +58,22 @@ def inspect(cid,label):
     return dict(zip(fields,map(json.loads,lines)))
 
 
+def cert_expired(value):
+    return datetime.fromisoformat(value)<=datetime.now(timezone.utc)
+
+
+def process_security(pid):
+    # Numeric PID from exact CID; only four named public security fields leave this scope.
+    require(type(pid) is int and pid>0,"PROCESS_UNKNOWN")
+    with open(f"/proc/{pid}/status","rb") as f:
+        lines=f.read(65537).splitlines()
+    fields={k.decode():v.strip().decode("ascii") for line in lines
+            for k,sep,v in [line.partition(b":")] if sep and k in (b"Uid",b"CapEff",b"CapBnd",b"NoNewPrivs")}
+    require(set(fields)=={"Uid","CapEff","CapBnd","NoNewPrivs"} and fields["Uid"].split()==["1000"]*4
+            and int(fields["CapEff"],16)==int(fields["CapBnd"],16)==0 and fields["NoNewPrivs"]=="1","PROCESS_PRIVILEGES_UNKNOWN")
+    return fields
+
+
 def gather(d,node,out):
     from cryptography import x509
     from cryptography.hazmat.primitives.serialization import Encoding
@@ -79,6 +95,7 @@ def gather(d,node,out):
     facts.update(node=node,cid=initial["cid"],image=initial["image"],pid=initial["pid"],uid=initial["user"],
                  argvMatched=True,ownerMatched=True,readOnlyRoot=initial["readOnlyRoot"],
                  capDrop=initial["capDrop"],security=initial["security"],files={},directories={})
+    facts["processSecurity"]=process_security(initial["pid"])
     raw={}
     with ExitStack() as stack:
         roots={kind:directory(member[kind],stack) for kind in PUBLIC}
@@ -110,6 +127,8 @@ def gather(d,node,out):
             facts[key]={"derSHA256":digest(cert.public_bytes(Encoding.DER)),
                         "expiresAt":cert.not_valid_after_utc.isoformat()}
         require(facts["ca"]["derSHA256"]==d["caDER"],"CA_IDENTITY_UNKNOWN")
+        if cert_expired(facts["ca"]["expiresAt"]):
+            out["holds"].append("CA_TERMINAL")
         policy=decode(raw["peer-policy.json"])
         floor=decode(raw[".peer-policy"])
         ident=decode(raw["identity.json"])
@@ -120,7 +139,7 @@ def gather(d,node,out):
                 floor=={"Hash":digest(raw["peer-policy.json"]),"Version":policy["version"]},"POLICY_FLOOR_UNKNOWN")
         require(len(raw["launch-signer.pub"])==32,"LAUNCH_SIGNER_UNKNOWN")
         facts["policy"]={"P":policy["version"],"expiresAt":policy["expiresAt"],"cpDER":d["cpDER"]}
-        require(inspect(member["cid"],d["ownerLabel"])==initial,"CONTAINER_CHANGED")
+        require(process_security(initial["pid"])==facts["processSecurity"] and inspect(member["cid"],d["ownerLabel"])==initial,"CONTAINER_CHANGED")
         for kind,root in roots.items():
             check=directory(member[kind],stack)
             require(os.path.samestat(os.fstat(root),os.fstat(check)) and mount(root)==mount(check),"DIRECTORY_CHANGED")
@@ -130,7 +149,8 @@ def gather(d,node,out):
     for key,code in (("ca","CA_TERMINAL"),("leaf","LEAF_EXPIRED"),("policy","POLICY_EXPIRED")):
         expiry=datetime.fromisoformat(facts[key]["expiresAt"].replace("Z","+00:00"))
         if expiry<=datetime.now(timezone.utc):
-            out["holds"].append(code)
+            if code not in out["holds"]:
+                out["holds"].append(code)
     out["observationComplete"]=True
 
 

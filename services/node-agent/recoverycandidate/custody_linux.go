@@ -118,7 +118,7 @@ func ownHistory(root *os.File, pub ed25519.PublicKey, binding Binding) ([]string
 		proofRaw, _ := Canonical(record["proof"])
 		checkpoint, _, err := Verify(Object(record, "checkpoint"), CheckpointDomain, pub)
 		if proofErr != nil || Text(proof,"schema") != "sv-expired-policy-nonserving-proof:2" || Text(checkpoint,"proofDigest") != Hash(proofRaw) || Text(proof,"requestDigest") != Text(record,"requestDigest") { return nil,nil,refuse("RECOVERY_HOLD_HISTORY") }
-		if err != nil || Number(checkpoint, "counter") != int64(i+1) || Text(checkpoint, "previousCheckpoint") != previous || Text(checkpoint, "requestDigest") != Text(record, "requestDigest") { return nil, nil, refuse("RECOVERY_HOLD_HISTORY") }
+		if err != nil || Text(checkpoint,"schema") != "sv-expired-policy-candidate-checkpoint:2" || Number(checkpoint, "counter") != int64(i+1) || Text(checkpoint, "previousCheckpoint") != previous || Text(checkpoint, "requestDigest") != Text(record, "requestDigest") { return nil, nil, refuse("RECOVERY_HOLD_HISTORY") }
 		for _, body := range []map[string]any{proof,checkpoint} { if Text(body,"authorizerSHA256") != binding.AuthorizerHash || Text(body,"operatorSHA256") != binding.OperatorHash || Text(body,"tenantId") != binding.Tenant || Text(body,"epoch") != binding.Epoch || Text(body,"nodeId") != binding.Node { return nil,nil,refuse("RECOVERY_HOLD_HISTORY_SCOPE") } }
 		if name != fmt.Sprintf("%08d-%s.json", i+1, Text(checkpoint, "operation")) { return nil, nil, refuse("RECOVERY_HOLD_HISTORY") }
 		previous = Hash(raw); last = record
@@ -166,7 +166,16 @@ func Run(request []byte, binding Binding, input io.Reader, out io.Writer) error 
         roots[spec.path]=f
     }
     custody,state,config,trust:=roots[binding.CustodyRoot],roots[binding.StateRoot],roots[binding.ConfigRoot],roots[binding.TrustRoot]
-    observedRequest,_,err:=readRegular(trust,"request.json",false)
+    // Remember every inode originally read, including role keys and private-key
+    // metadata. At checkpoint, same bytes on a replacement inode still HOLD.
+    type observedFile struct { root *os.File; name string; stat syscall.Stat_t }
+    observations:=[]observedFile{}
+    read:=func(root *os.File,name string,empty bool)([]byte,*syscall.Stat_t,error) {
+        raw,st,err:=readRegular(root,name,empty)
+        if err==nil { observations=append(observations,observedFile{root,name,*st}) }
+        return raw,st,err
+    }
+    observedRequest,_,err:=read(trust,"request.json",false)
     if err!=nil || !bytes.Equal(observedRequest,request) { return refuse("RECOVERY_CUSTODY_CHANGED") }
     journalLock, lockStat, err := lockExisting(state,".lock"); if err != nil { return err }; defer journalLock.Close()
 	if !supportedFilesystemNumber(uint64(lockStat.Dev)) || !supportedFilesystemNumber(lockStat.Ino) { return refuse("RECOVERY_HOLD_FILESYSTEM_NUMBER_RANGE") }
@@ -175,18 +184,18 @@ func Run(request []byte, binding Binding, input io.Reader, out io.Writer) error 
 	for _, entry := range initialEntries { if entry.Name() != ".lock" && entry.Name() != ".peer-policy" && entry.Name() != "identity.json" { return refuse("RECOVERY_HOLD_ACTIVE_OR_UNKNOWN_JOURNAL") } }
 	public := map[string][]byte{}
 	for _, name := range []string{"node-cert.pem", "client-ca.pem", "launch-signer.pub", "peer-policy.json"} {
-		raw, _, err := readRegular(config,name, false); if err != nil { return err }; public[name] = raw
+		raw, _, err := read(config,name, false); if err != nil { return err }; public[name] = raw
 	}
 	if len(public["launch-signer.pub"]) != 32 { return refuse("RECOVERY_SIGNER") }
-	keyRaw, _, err := readRegular(config,"node-key.pem", false); if err != nil { return err }
+	keyRaw, _, err := read(config,"node-key.pem", false); if err != nil { return err }
 	keyDER, err := pemBlock(keyRaw, "PRIVATE KEY"); if err != nil { return err }
 	k, err := x509.ParsePKCS8PrivateKey(keyDER); if err != nil { return refuse("RECOVERY_KEY") }
 	key, ok := k.(ed25519.PrivateKey); if !ok { return refuse("RECOVERY_ALGORITHM") }
 	nodeDER, err := pemBlock(public["node-cert.pem"], "CERTIFICATE"); if err != nil { return err }
 	nodeCert, err := x509.ParseCertificate(nodeDER); if err != nil || !bytes.Equal(nodeCert.RawSubjectPublicKeyInfo, mustPKIX(key.Public())) { return refuse("RECOVERY_KEY_CONTINUITY") }
 	caDER, err := pemBlock(public["client-ca.pem"], "CERTIFICATE"); if err != nil { return err }
-	cpPub, _, err := readRegular(trust,"authorizer.pub", false); if err != nil { return err }
-	opPub, _, err := readRegular(trust,"operator.pub", false); if err != nil { return err }
+	cpPub, _, err := read(trust,"authorizer.pub", false); if err != nil { return err }
+	opPub, _, err := read(trust,"operator.pub", false); if err != nil { return err }
 	if len(cpPub) != 32 || len(opPub) != 32 || Hash(cpPub) != binding.AuthorizerHash || Hash(opPub) != binding.OperatorHash || bytes.Equal(cpPub, opPub) || bytes.Equal(cpPub, key.Public().(ed25519.PublicKey)) || bytes.Equal(opPub, key.Public().(ed25519.PublicKey)) { return refuse("RECOVERY_ROLE_SEPARATION") }
 	r, err := Parse(request); if err != nil || !Closed(r, "authorization", "operator") { return refuse("RECOVERY_REQUEST") }
 	auth, authRaw, err := Verify(Object(r, "authorization"), AuthorizationDomain, cpPub); if err != nil { return err }
@@ -218,7 +227,7 @@ func Run(request []byte, binding Binding, input io.Reader, out io.Writer) error 
 	name := fmt.Sprintf("%08d-%s.json",Number(auth,"counter"),Text(auth,"operation"))
 	for _, existing := range names {
 		if existing == name {
-			raw, _, err := readRegular(custody,existing,false); if err != nil { return err }; record, err := Parse(raw)
+			raw, _, err := read(custody,existing,false); if err != nil { return err }; record, err := Parse(raw)
 			if err != nil || Text(record,"requestDigest") != Hash(request) { return refuse("RECOVERY_REPLAY_MISMATCH") }
 			return signedLine(out,map[string]any{"kind":"completed-candidate-checkpoint-replay","record":record})
 		}
@@ -226,10 +235,10 @@ func Run(request []byte, binding Binding, input io.Reader, out io.Writer) error 
 	if err := Fresh(auth,now); err != nil { return err }; if err := Fresh(op,now); err != nil { return err }
 	for _, der := range [][]byte{cpDER,nodeDER} { cert, _ := x509.ParseCertificate(der); if cert.NotAfter.Unix()-now <= Number(auth,"candidateBudgetSeconds")+660 { return refuse("RECOVERY_DEADLINE") } }
 	if Number(auth,"candidateBudgetSeconds") < 1 || Number(auth,"candidateBudgetSeconds") > 60 || now+Number(auth,"candidateBudgetSeconds") >= Number(auth,"deadline") { return refuse("RECOVERY_DEADLINE") }
-	previous := ""; if last != nil { raw, _, err := readRegular(custody,names[len(names)-1],false); if err!=nil{return err}; previous = Hash(raw) }
+	previous := ""; if last != nil { raw, _, err := read(custody,names[len(names)-1],false); if err!=nil{return err}; previous = Hash(raw) }
 	if Number(auth,"counter") != int64(len(names)+1) || Text(member,"previousCheckpoint") != previous { return refuse("RECOVERY_COUNTER_REUSE") }
-	identityRaw, _, err := readRegular(state,"identity.json",false); if err != nil { return err }
-	floorRaw, _, err := readRegular(state,".peer-policy",false); if err != nil { return err }
+	identityRaw, _, err := read(state,"identity.json",false); if err != nil { return err }
+	floorRaw, _, err := read(state,".peer-policy",false); if err != nil { return err }
 	identity, err := ParseJournal(identityRaw); if err != nil || !Closed(identity,"Tenant","Node","Epoch") || Text(identity,"Tenant") != binding.Tenant || Text(identity,"Node") != binding.Node || Text(identity,"Epoch") != binding.Epoch { return refuse("RECOVERY_JOURNAL_IDENTITY") }
 	floor, err := ParseJournal(floorRaw); if err != nil || !Closed(floor,"Version","Hash") || Number(floor,"Version") != Number(member,"priorP") || Text(floor,"Hash") != Hash(public["peer-policy.json"]) || Hash(floorRaw) != Text(member,"floorSHA256") || Hash(identityRaw) != Text(member,"identitySHA256") { return refuse("RECOVERY_AUTHENTICATED_FLOOR") }
 	policy, err := ParseJournal(public["peer-policy.json"])
@@ -270,6 +279,17 @@ func Run(request []byte, binding Binding, input io.Reader, out io.Writer) error 
     }
 	for name, original := range public { current, _, err := readRegular(config,name,false); if err != nil || !bytes.Equal(original,current) { return refuse("RECOVERY_CUSTODY_CHANGED") } }
 	for name, original := range map[string][]byte{"identity.json":identityRaw,".peer-policy":floorRaw} { current, _, err := readRegular(state,name,false); if err != nil || !bytes.Equal(original,current) { return refuse("RECOVERY_CUSTODY_CHANGED") } }
+    for _,item:=range observations {
+        fd,err:=openChild(item.root,item.name,syscall.O_RDONLY)
+        if err!=nil { return refuse("RECOVERY_CUSTODY_CHANGED") }
+        var st syscall.Stat_t
+        err=syscall.Fstat(fd,&st)
+        syscall.Close(fd)
+        before:=item.stat
+        if err!=nil || st.Dev!=before.Dev || st.Ino!=before.Ino || st.Ctim!=before.Ctim || st.Nlink!=1 {
+            return refuse("RECOVERY_CUSTODY_CHANGED")
+        }
+    }
 	checkpoint := map[string]any{"schema":"sv-expired-policy-candidate-checkpoint:2","authorizerSHA256":binding.AuthorizerHash,"operatorSHA256":binding.OperatorHash,"operation":auth["operation"],"counter":auth["counter"],"requestDigest":Hash(request),"proofDigest":Hash(proofBytes),"ackDigest":Hash(ackRaw),"batchProofDigest":ack["batchProofDigest"],"previousCheckpoint":previous,"nodeId":binding.Node,"tenantId":binding.Tenant,"epoch":binding.Epoch,"checkpointAt":Clock(),"lockHeldThroughCheckpoint":true,"activationAllowed":false}
 	checkpointEnvelope, err := Sign(checkpoint,CheckpointDomain,key); if err != nil { return err }
 	record := map[string]any{"schema":"sv-expired-policy-record:2","requestDigest":Hash(request),"proof":proofEnvelope,"checkpoint":checkpointEnvelope}; recordRaw, err := Canonical(record); if err != nil { return err }
