@@ -220,6 +220,21 @@
    "why": "Ceremony interrupted with no key, but the fence was re-acquired at a later generation: HOLD, not abandon."
   },
   {
+   "path": "fixtures/positive/p43-live-replica-outside-inventory-hold.json",
+   "codes": [],
+   "why": "F3: a delivery replica absent from the frozen inventory is serving (R2 ignored it and completed): HOLD."
+  },
+  {
+   "path": "fixtures/positive/p44-consumed-challenge-hold.json",
+   "codes": [],
+   "why": "F3: the readback answers a challenge an earlier decision already consumed: HOLD, re-challenge."
+  },
+  {
+   "path": "fixtures/positive/p45-challenge-issued-too-long-ago-hold.json",
+   "codes": [],
+   "why": "F3: every answer is recent but the challenge itself was issued beyond its lifetime: HOLD."
+  },
+  {
    "path": "fixtures/rejection/r01-new-ca-is-prior.json",
    "codes": [
     "AR-PRIOR-REUSE"
@@ -629,6 +644,13 @@
     "AR-MODE"
    ],
    "why": "F5: a terminal replacement has no overlap window."
+  },
+  {
+   "path": "fixtures/rejection/r59-serving-window-above-cap.json",
+   "codes": [
+    "AR-SERVING-WINDOW"
+   ],
+   "why": "F3: a measured freshness window wider than the 120 s contract cap."
   }
  ],
  "handoffs": [

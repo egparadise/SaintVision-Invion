@@ -87,8 +87,14 @@ A7 = INDEX["A7_ROTATION_SETTLED"]
 LEAF_MIN_SECONDS = 60
 LEAF_MAX_SECONDS = 518400  # existing lan_pki/lan_pilot six-day cap
 OVERLAP_MAX_SECONDS = 21600
-FRESHNESS_SECONDS = 120  # a serving observation older than this at resumeAt is stale
-HEARTBEAT_SECONDS = 15  # NodeChannels.snapshot accepts a heartbeat at most 15 s old
+# Serving windows are plan inputs (measuredBudgets) that need fleet measurement; these are the
+# contract caps a measured value may only tighten.
+FRESHNESS_CAP_SECONDS = 120  # an observation received longer ago than this at resumeAt is stale
+HEARTBEAT_CAP_SECONDS = 15  # NodeChannels.snapshot accepts a heartbeat at most 15 s old
+CHALLENGE_CAP_SECONDS = 300  # a one-use challenge issued longer ago than this at resumeAt is stale
+SERVING_WINDOWS = {"observationFreshnessSeconds": FRESHNESS_CAP_SECONDS,
+                   "heartbeatFreshnessSeconds": HEARTBEAT_CAP_SECONDS,
+                   "challengeLifetimeSeconds": CHALLENGE_CAP_SECONDS}
 SITES = ("observer_worker", "delivery_worker", "workspace_runtime", "build_product_runtime",
          "storage_check_collector")
 CP_CSR_COMMON_NAME = "control-plane"
@@ -168,6 +174,12 @@ def final_phase(doc: dict) -> str:
 
 def plan_phases(doc: dict) -> tuple[str, ...]:
     return PHASES[: INDEX[final_phase(doc)] + 1]
+
+
+def window(doc: dict, key: str) -> int:
+    """A measured serving window; unknown is 0 so that nothing is fresh (fail closed)."""
+    value = doc["measuredBudgets"][key]
+    return 0 if value is None else value
 
 
 def dual(doc: dict) -> bool:
@@ -478,6 +490,7 @@ def _nulls(doc: dict) -> list[str]:
     if budgets["source"] != "MEASURED" or budgets["evidenceRef"] is None:
         missing.append("measuredBudgets")
     missing += [f"measuredBudgets.{p}" for p in plan_phases(doc) if budgets["phaseSeconds"].get(p) is None]
+    missing += [f"measuredBudgets.{k}" for k in SERVING_WINDOWS if budgets[k] is None]
     migration = doc["servingBinaryMigration"]
     if migration["status"] != "REVIEWED" or migration["reviewRef"] is None:
         missing.append("servingBinaryMigration")
@@ -778,6 +791,12 @@ def _counter_errors(doc: dict) -> list[str]:
     return sorted(errors)
 
 
+def _window_errors(doc: dict) -> list[str]:
+    budgets = doc["measuredBudgets"]
+    return ["AR-SERVING-WINDOW"] if any(budgets[k] is not None and budgets[k] > cap
+                                        for k, cap in SERVING_WINDOWS.items()) else []
+
+
 def _inventory_errors(doc: dict) -> list[str]:
     errors: set[str] = set()
     inventory = doc["controlPlaneClient"]["processInventory"]
@@ -837,17 +856,24 @@ class _Context:
         self.rows = {r["nodeID"]: r for r in self.rb["members"]}
         self.procs = {} if serving is None else {p["processID"]: p for p in serving["processes"]}
         self.shakes = {} if serving is None else {h["nodeID"]: h for h in serving["handshakes"]}
+        self.live = {} if serving is None else {p["processID"]: p for p in serving["liveInventory"]["processes"]}
+        self.freshness = window(doc, "observationFreshnessSeconds")
+        self.heartbeat = window(doc, "heartbeatFreshnessSeconds")
+        self.skew = doc["advanceRenewal"]["clockSkewSeconds"] or 0
         tt = doc["trustTransition"]
         self.prior_d = anchor_digest([doc["priorAuthority"]["caCertificateSHA256"]])
         self.staged_d = None if tt["stagedAnchorBundle"] is None else anchor_digest(tt["stagedAnchorBundle"])
         self.final_d = None if tt["finalAnchorBundle"] is None else anchor_digest(tt["finalAnchorBundle"])
         self.kinds = {m["nodeID"]: m["kind"] for m in doc["members"]}
 
-    def fresh(self, observed_at: str | None, nonce: str | None) -> bool:
-        if observed_at is None or self.nonce is None or nonce != self.nonce:
+    def fresh(self, observed_at: str | None, received_at: str | None, nonce: str | None) -> bool:
+        """Answers this challenge, received by the CP (trusted clock) after issuance and within the
+        freshness window, with the responder's own clock within the skew bound of that receipt."""
+        if observed_at is None or received_at is None or self.nonce is None or nonce != self.nonce:
             return False
-        at = _ts(observed_at)
-        return self.issued <= at <= self.at and (self.at - at).total_seconds() <= FRESHNESS_SECONDS
+        observed, received = _ts(observed_at), _ts(received_at)
+        return (self.issued <= received <= self.at and (self.at - received).total_seconds() <= self.freshness
+                and abs((observed - received).total_seconds()) <= self.skew)
 
 
 def _duplicates(rb: dict) -> bool:
@@ -855,9 +881,30 @@ def _duplicates(rb: dict) -> bool:
         values = [i[key] for i in items]
         return len(values) != len(set(values))
 
-    serving = rb["serving"] or {"processes": [], "handshakes": []}
+    serving = rb["serving"] or {"processes": [], "handshakes": [], "liveInventory": {"processes": []}}
     return (dup(rb["members"], "nodeID") or dup(rb["reservations"], "nodeID")
-            or dup(serving["processes"], "processID") or dup(serving["handshakes"], "nodeID"))
+            or dup(serving["processes"], "processID") or dup(serving["handshakes"], "nodeID")
+            or dup(serving["liveInventory"]["processes"], "processID"))
+
+
+def _serving_hold(doc: dict, ctx: "_Context") -> str | None:
+    """Gate every post-A1 decision on one fresh, unconsumed challenge and an unchanged live inventory."""
+    serving = ctx.rb["serving"]
+    if serving is None or serving["challengeNonce"] in doc["checkpoint"]["consumedChallengeNonces"]:
+        return "HOLD_SERVING_EVIDENCE_INCOMPLETE"  # no challenge, or a challenge an earlier decision used
+    age = (ctx.at - ctx.issued).total_seconds()
+    if age < 0 or age > window(doc, "challengeLifetimeSeconds"):
+        return "HOLD_SERVING_EVIDENCE_INCOMPLETE"  # issuance itself is too old (or in the future)
+    live = serving["liveInventory"]
+    if live["source"] != "CP_PROCESS_REGISTRY" or not ctx.fresh(live["observedAt"], live["receivedAt"],
+                                                                 live["challengeNonce"]):
+        return "HOLD_SERVING_EVIDENCE_INCOMPLETE"
+    planned = {p["processID"]: (p["site"], p["kind"]) for p in doc["controlPlaneClient"]["processInventory"]}
+    if {pid: (p["site"], p["kind"]) for pid, p in ctx.live.items()} != planned:
+        return "HOLD_PROCESS_INVENTORY_CHANGED"  # a replica started, stopped or moved: re-plan, never ignore it
+    if any(planned.get(pid, (None,))[0] != p["site"] for pid, p in ctx.procs.items()):
+        return "HOLD_PROCESS_INVENTORY_CHANGED"  # trust readback from a process the plan does not cover
+    return None
 
 
 def op_state(doc: dict, op: dict, ctx: _Context | None = None) -> str:
@@ -866,7 +913,7 @@ def op_state(doc: dict, op: dict, ctx: _Context | None = None) -> str:
     kind, target, pre, post = op["kind"], op["target"], op["pre"], op["post"]
     row = ctx.rows.get(target)
     present = row is not None and row["rowPresent"]
-    node_fresh = present and ctx.fresh(row["nodeObservedAt"], row["nodeChallengeNonce"])
+    node_fresh = present and ctx.fresh(row["nodeObservedAt"], row["nodeReceivedAt"], row["nodeChallengeNonce"])
     enrolling = ctx.kinds.get(target) == "NEW_ENROLLMENT"
     if kind in ("ANCHOR_STAGE", "ANCHOR_RETIRE", "LEAF_INSTALL"):
         if not present:
@@ -912,9 +959,10 @@ def op_state(doc: dict, op: dict, ctx: _Context | None = None) -> str:
             return COMMITTED
         return CONFLICT
     if kind in ("CP_CONTEXT_SWITCH", "CP_ANCHOR_RETIRE"):
-        proc = ctx.procs.get(target)
-        if proc is None or not ctx.fresh(proc["observedAt"], proc["challengeNonce"]):
-            return UNVERIFIED
+        proc, live = ctx.procs.get(target), ctx.live.get(target)
+        if (proc is None or live is None or proc["instanceID"] != live["instanceID"]
+                or not ctx.fresh(proc["observedAt"], proc["receivedAt"], proc["challengeNonce"])):
+            return UNVERIFIED  # no readback, or a readback from an instance that is no longer the live one
         leaf, loaded = proc["clientLeafSHA256"], proc["loadedAnchorDigest"]
         if kind == "CP_CONTEXT_SWITCH":
             if leaf == pre["clientLeafSHA256"] and loaded == pre["loadedAnchorDigest"]:
@@ -943,14 +991,14 @@ def op_state(doc: dict, op: dict, ctx: _Context | None = None) -> str:
         return COMMITTED if row["reservationDigest"] == post["reservationDigest"] else CONFLICT
     if kind == "SETTLE":
         shake = ctx.shakes.get(target)
-        if shake is None or not ctx.fresh(shake["observedAt"], shake["challengeNonce"]):
+        if shake is None or not ctx.fresh(shake["observedAt"], shake["receivedAt"], shake["challengeNonce"]):
             return PENDING
         if shake["peerLeafSHA256"] != post["peerLeafSHA256"]:
             return CONFLICT
         heartbeat = _ts(shake["heartbeatAt"])
         if (shake["anchorDigest"] == post["anchorDigest"] and shake["policyDigest"] == post["policyDigest"]
                 and shake["cpClientURI"] == ctx.doc["controlPlaneClient"]["spiffeURI"]
-                and heartbeat <= ctx.at and (ctx.at - heartbeat).total_seconds() <= HEARTBEAT_SECONDS):
+                and heartbeat <= ctx.at and (ctx.at - heartbeat).total_seconds() <= ctx.heartbeat):
             return COMMITTED
         return PENDING
     raise ValueError(f"unknown operation kind {kind}")
@@ -1020,7 +1068,7 @@ def fence_held(doc: dict) -> bool:
     if fence["readAt"] is None:
         return False
     read, at = _ts(fence["readAt"]), _ts(doc["checkpoint"]["resumeAt"])
-    return read <= at and (at - read).total_seconds() <= FRESHNESS_SECONDS
+    return read <= at and (at - read).total_seconds() <= window(doc, "observationFreshnessSeconds")
 
 
 def _a1_custody_hold(doc: dict) -> str | None:
@@ -1098,6 +1146,9 @@ def recovery_action(doc: dict) -> tuple[str, str | None, list[str], list[str]]:
     if rb["journalManifestDigest"] != manifest["digest"]:
         return "HOLD_MANIFEST_MISMATCH", None, *none
     ctx = _Context(doc)
+    hold = _serving_hold(doc, ctx)
+    if hold:
+        return hold, None, *none
     planned_ids = {m["nodeID"] for m in doc["members"]}
     known = {r["nodeID"] for r in doc["existingNodeRows"]["rows"]}
     for node_id, row in ctx.rows.items():
@@ -1147,7 +1198,8 @@ def apply_op(doc: dict, op: dict) -> bool:
     """Apply one manifest operation's exact postimage to the readback model. Returns True on mutation."""
     rb = doc["checkpoint"]["readback"]
     observed_at = _iso(_ts(doc["checkpoint"]["resumeAt"]) - timedelta(seconds=30))
-    stamp = {"nodeObservedAt": observed_at, "nodeChallengeNonce": rb["serving"]["challengeNonce"]}
+    stamp = {"nodeObservedAt": observed_at, "nodeReceivedAt": observed_at,
+             "nodeChallengeNonce": rb["serving"]["challengeNonce"]}
     kind, target, post = op["kind"], op["target"], op["post"]
     rows = {r["nodeID"]: r for r in rb["members"]}
     row = rows.get(target)
@@ -1163,7 +1215,7 @@ def apply_op(doc: dict, op: dict) -> bool:
         row["policyJournalOpIDs"] = row["policyJournalOpIDs"] + [op["opID"]]
     elif kind in ("CP_CONTEXT_SWITCH", "CP_ANCHOR_RETIRE"):
         proc = next(p for p in rb["serving"]["processes"] if p["processID"] == target)
-        proc.update({k: v for k, v in post.items()}, observedAt=observed_at,
+        proc.update({k: v for k, v in post.items()}, observedAt=observed_at, receivedAt=observed_at,
                     challengeNonce=rb["serving"]["challengeNonce"])
     elif kind == "RESERVE":
         rb["reservations"].append({"nodeID": target, "reservationDigest": post["reservationDigest"],
@@ -1179,7 +1231,7 @@ def apply_op(doc: dict, op: dict) -> bool:
     elif kind == "SETTLE":
         handshakes = rb["serving"]["handshakes"]
         handshakes[:] = [h for h in handshakes if h["nodeID"] != target]
-        handshakes.append({"nodeID": target, "observedAt": observed_at,
+        handshakes.append({"nodeID": target, "observedAt": observed_at, "receivedAt": observed_at,
                            "challengeNonce": rb["serving"]["challengeNonce"], "peerLeafSHA256": post["peerLeafSHA256"],
                            "anchorDigest": post["anchorDigest"], "cpClientURI": doc["controlPlaneClient"]["spiffeURI"],
                            "heartbeatAt": _iso(_ts(doc["checkpoint"]["resumeAt"]) - timedelta(seconds=5)),
@@ -1221,9 +1273,37 @@ def execute_resume(doc: dict) -> tuple[dict, list[str]]:
         if apply_op(new, ops[op_id]):
             mutations.append(op_id)
     cp = new["checkpoint"]
+    if phase != "A1_NEW_TRUST_AUTHORIZED":
+        cp["consumedChallengeNonces"].append(cp["readback"]["serving"]["challengeNonce"])  # one use
     if cp["inFlightPhase"] is None:
         cp["inFlightPhase"], cp["inFlightOutcome"] = phase, "UNKNOWN"
     return new, mutations
+
+
+def observe(doc: dict, nonce: str) -> dict:
+    """Model a fresh Root readback under a new one-use challenge issued by the CP. The world state is
+    unchanged; every observation the model holds is re-stamped with the new challenge and CP times."""
+    new = copy.deepcopy(doc)
+    cp = new["checkpoint"]
+    rb = cp["readback"]
+    at = _ts(cp["resumeAt"])
+    seen = _iso(at - timedelta(seconds=30))
+    if rb["writerFence"] is not None:
+        rb["writerFence"]["readAt"] = seen
+    serving = rb["serving"]
+    if serving is None:
+        return new
+    serving.update(challengeNonce=nonce, challengeIssuedAt=_iso(at - timedelta(seconds=60)))
+    for row in rb["members"]:
+        if row["nodeObservedAt"] is not None:
+            row.update(nodeObservedAt=seen, nodeReceivedAt=seen, nodeChallengeNonce=nonce)
+    for proc in serving["processes"]:
+        proc.update(observedAt=seen, receivedAt=seen, challengeNonce=nonce)
+    for shake in serving["handshakes"]:
+        shake.update(observedAt=seen, receivedAt=seen, challengeNonce=nonce,
+                     heartbeatAt=_iso(at - timedelta(seconds=5)))
+    serving["liveInventory"].update(observedAt=seen, receivedAt=seen, challengeNonce=nonce)
+    return new
 
 
 def journal_durable(doc: dict) -> dict:
@@ -1250,6 +1330,7 @@ def evaluate(doc: Any, schema: dict | None = None) -> list[str]:
     codes.update(_counter_errors(doc))
     codes.update(_renewal_errors(doc))
     codes.update(_inventory_errors(doc))
+    codes.update(_window_errors(doc))
     if doc["status"] == "PROPOSED" and _nulls(doc):
         codes.add("AR-HOLD-REQUIRED")
     order = _checkpoint_errors(doc)

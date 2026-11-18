@@ -91,7 +91,10 @@
    "E3_ENROLLMENT_CHANNEL_PROVISIONED": 600,
    "E4_ENROLLMENT_POLICY_PUBLISHED": 600,
    "E5_ENROLLMENT_SETTLED": 600
-  }
+  },
+  "observationFreshnessSeconds": 120,
+  "heartbeatFreshnessSeconds": 15,
+  "challengeLifetimeSeconds": 300
  },
  "servingBinaryMigration": {
   "status": "REVIEWED",
@@ -339,6 +342,7 @@
   "inFlightPhase": "A6_CP_CONTEXT_SWITCH",
   "inFlightOutcome": "UNKNOWN",
   "resumeAt": "2026-11-18T14:00:00Z",
+  "consumedChallengeNonces": [],
   "readback": {
    "dbAvailable": true,
    "epoch": "00000000-0000-4000-8000-0000000000e1",
@@ -393,6 +397,7 @@
      "installedLeafSHA256": "b2ed795a6a875d095c59ebfff631c3511d10e189448c2fcb3eee0d510e9d5cc0",
      "stagedAnchorDigest": "74ff0c7aad69a27e5a334d1d78cde59e29375b8a6ee3c33fe26aee72d6103f81",
      "nodeObservedAt": "2026-11-18T13:59:30Z",
+     "nodeReceivedAt": "2026-11-18T13:59:30Z",
      "nodeChallengeNonce": "fixture-challenge-0001"
     },
     {
@@ -412,6 +417,7 @@
      "installedLeafSHA256": "1d4f0a321a46a39bdda5c5b6e35591542783ed425b646821cb8163512561cf93",
      "stagedAnchorDigest": "74ff0c7aad69a27e5a334d1d78cde59e29375b8a6ee3c33fe26aee72d6103f81",
      "nodeObservedAt": "2026-11-18T13:59:30Z",
+     "nodeReceivedAt": "2026-11-18T13:59:30Z",
      "nodeChallengeNonce": "fixture-challenge-0001"
     },
     {
@@ -431,6 +437,7 @@
      "installedLeafSHA256": "6dc786f0238020f69e7328b35e27b2bf79645a4125162f77ab46f9c39669a98e",
      "stagedAnchorDigest": "74ff0c7aad69a27e5a334d1d78cde59e29375b8a6ee3c33fe26aee72d6103f81",
      "nodeObservedAt": "2026-11-18T13:59:30Z",
+     "nodeReceivedAt": "2026-11-18T13:59:30Z",
      "nodeChallengeNonce": "fixture-challenge-0001"
     }
    ],
@@ -438,59 +445,115 @@
    "serving": {
     "challengeNonce": "fixture-challenge-0001",
     "challengeIssuedAt": "2026-11-18T13:59:00Z",
+    "liveInventory": {
+     "source": "CP_PROCESS_REGISTRY",
+     "observedAt": "2026-11-18T13:59:30Z",
+     "receivedAt": "2026-11-18T13:59:30Z",
+     "challengeNonce": "fixture-challenge-0001",
+     "processes": [
+      {
+       "site": "observer_worker",
+       "processID": "observer-1",
+       "kind": "SERVICE",
+       "instanceID": "observer-1-i1"
+      },
+      {
+       "site": "delivery_worker",
+       "processID": "delivery-1",
+       "kind": "SERVICE",
+       "instanceID": "delivery-1-i1"
+      },
+      {
+       "site": "delivery_worker",
+       "processID": "delivery-2",
+       "kind": "SERVICE",
+       "instanceID": "delivery-2-i1"
+      },
+      {
+       "site": "workspace_runtime",
+       "processID": "workspace-1",
+       "kind": "SERVICE",
+       "instanceID": "workspace-1-i1"
+      },
+      {
+       "site": "build_product_runtime",
+       "processID": "build-product-1",
+       "kind": "SERVICE",
+       "instanceID": "build-product-1-i1"
+      },
+      {
+       "site": "storage_check_collector",
+       "processID": "storage-check-cli",
+       "kind": "INVOKED_CLIENT",
+       "instanceID": "storage-check-cli-i1"
+      }
+     ]
+    },
     "processes": [
      {
       "site": "observer_worker",
       "processID": "observer-1",
+      "instanceID": "observer-1-i1",
       "trustGeneration": 2,
       "loadedAnchorDigest": "74ff0c7aad69a27e5a334d1d78cde59e29375b8a6ee3c33fe26aee72d6103f81",
       "clientLeafSHA256": "d0e948b0d16a3a5ab1ca26252bd5e461966e008fd13b41a7d63296d2d612b684",
       "observedAt": "2026-11-18T13:59:30Z",
+      "receivedAt": "2026-11-18T13:59:30Z",
       "challengeNonce": "fixture-challenge-0001"
      },
      {
       "site": "delivery_worker",
       "processID": "delivery-1",
+      "instanceID": "delivery-1-i1",
       "trustGeneration": 2,
       "loadedAnchorDigest": "74ff0c7aad69a27e5a334d1d78cde59e29375b8a6ee3c33fe26aee72d6103f81",
       "clientLeafSHA256": "d0e948b0d16a3a5ab1ca26252bd5e461966e008fd13b41a7d63296d2d612b684",
       "observedAt": "2026-11-18T13:59:30Z",
+      "receivedAt": "2026-11-18T13:59:30Z",
       "challengeNonce": "fixture-challenge-0001"
      },
      {
       "site": "delivery_worker",
       "processID": "delivery-2",
+      "instanceID": "delivery-2-i1",
       "trustGeneration": 1,
       "loadedAnchorDigest": "4a2609680c620d9942cf6dc3d8d9cdac804c61899b81ce5c935c5fb847d4c7c7",
       "clientLeafSHA256": "bbb66f2434308be2a7259fff03993ea75d71107e623d0a524d87f045c92718c9",
       "observedAt": "2026-11-18T13:59:30Z",
+      "receivedAt": "2026-11-18T13:59:30Z",
       "challengeNonce": "fixture-challenge-0001"
      },
      {
       "site": "workspace_runtime",
       "processID": "workspace-1",
+      "instanceID": "workspace-1-i1",
       "trustGeneration": 1,
       "loadedAnchorDigest": "4a2609680c620d9942cf6dc3d8d9cdac804c61899b81ce5c935c5fb847d4c7c7",
       "clientLeafSHA256": "bbb66f2434308be2a7259fff03993ea75d71107e623d0a524d87f045c92718c9",
       "observedAt": "2026-11-18T13:59:30Z",
+      "receivedAt": "2026-11-18T13:59:30Z",
       "challengeNonce": "fixture-challenge-0001"
      },
      {
       "site": "build_product_runtime",
       "processID": "build-product-1",
+      "instanceID": "build-product-1-i1",
       "trustGeneration": 1,
       "loadedAnchorDigest": "4a2609680c620d9942cf6dc3d8d9cdac804c61899b81ce5c935c5fb847d4c7c7",
       "clientLeafSHA256": "bbb66f2434308be2a7259fff03993ea75d71107e623d0a524d87f045c92718c9",
       "observedAt": "2026-11-18T13:59:30Z",
+      "receivedAt": "2026-11-18T13:59:30Z",
       "challengeNonce": "fixture-challenge-0001"
      },
      {
       "site": "storage_check_collector",
       "processID": "storage-check-cli",
+      "instanceID": "storage-check-cli-i1",
       "trustGeneration": 1,
       "loadedAnchorDigest": "4a2609680c620d9942cf6dc3d8d9cdac804c61899b81ce5c935c5fb847d4c7c7",
       "clientLeafSHA256": "bbb66f2434308be2a7259fff03993ea75d71107e623d0a524d87f045c92718c9",
       "observedAt": "2026-11-18T13:59:30Z",
+      "receivedAt": "2026-11-18T13:59:30Z",
       "challengeNonce": "fixture-challenge-0001"
      }
     ],

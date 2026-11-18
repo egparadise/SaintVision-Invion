@@ -342,7 +342,7 @@ def test_f3_settlement_needs_a_fresh_handshake_under_the_new_pins(field, value, 
     assert action(doc) == hold
 
 
-@pytest.mark.parametrize("age, ok", [(checker.HEARTBEAT_SECONDS, True), (checker.HEARTBEAT_SECONDS + 1, False)])
+@pytest.mark.parametrize("age, ok", [(gen.HEARTBEAT, True), (gen.HEARTBEAT + 1, False)])
 def test_f3_heartbeat_freshness_boundary(age, ok):
     doc = state(A["A7"], enroll=False)
     at = checker._ts(doc["checkpoint"]["resumeAt"])
@@ -350,12 +350,14 @@ def test_f3_heartbeat_freshness_boundary(age, ok):
     assert (action(doc) == "COMPLETE") is ok
 
 
-@pytest.mark.parametrize("age, ok", [(checker.FRESHNESS_SECONDS, True), (checker.FRESHNESS_SECONDS + 1, False)])
+@pytest.mark.parametrize("age, ok", [(gen.FRESHNESS, True), (gen.FRESHNESS + 1, False)])
 def test_f3_observation_freshness_boundary(age, ok):
     doc = state(A["A7"], enroll=False)
     at = checker._ts(doc["checkpoint"]["resumeAt"])
-    doc["checkpoint"]["readback"]["serving"]["challengeIssuedAt"] = checker._iso(at - timedelta(seconds=600))
-    doc["checkpoint"]["readback"]["serving"]["processes"][2]["observedAt"] = checker._iso(at - timedelta(seconds=age))
+    serving = doc["checkpoint"]["readback"]["serving"]
+    serving["challengeIssuedAt"] = checker._iso(at - timedelta(seconds=gen.CHALLENGE))
+    received = checker._iso(at - timedelta(seconds=age))
+    serving["processes"][2].update(observedAt=received, receivedAt=received)
     assert (action(doc) == "COMPLETE") is ok
 
 
@@ -397,6 +399,151 @@ def test_f3_inventory_covers_all_five_sites(site):
     assert "AR-PROCESS-INVENTORY" in checker.evaluate(gen.seal(doc), SCHEMA)
 
 
+# ---------------------------------------------------------------- review R2 finding 3: freshness, inventory
+
+
+def _complete() -> dict:
+    doc = state(A["A7"], enroll=False)
+    assert action(doc) == "COMPLETE"
+    return doc
+
+
+def _serving(doc: dict) -> dict:
+    return doc["checkpoint"]["readback"]["serving"]
+
+
+@pytest.mark.parametrize("age, ok", [(gen.CHALLENGE, True), (gen.CHALLENGE + 1, False), (-1, False)])
+def test_r2f3_challenge_issuance_age_is_bounded(age, ok):
+    """R2 bounded only the age of each answer, never the age of the challenge they answered."""
+    doc = _complete()
+    _serving(doc)["challengeIssuedAt"] = checker._iso(_AT - timedelta(seconds=age))
+    assert action(doc) == ("COMPLETE" if ok else "HOLD_SERVING_EVIDENCE_INCOMPLETE")
+
+
+def _evidence(doc: dict, target: str) -> tuple[dict, str, str]:
+    """(record, responder-clock field, trusted CP receipt field) for one kind of challenged evidence."""
+    rb = doc["checkpoint"]["readback"]
+    return {"row": (rb["members"][1], "nodeObservedAt", "nodeReceivedAt"),
+            "process": (rb["serving"]["processes"][3], "observedAt", "receivedAt"),
+            "handshake": (rb["serving"]["handshakes"][2], "observedAt", "receivedAt"),
+            "live-inventory": (rb["serving"]["liveInventory"], "observedAt", "receivedAt")}[target]
+
+
+EVIDENCE_HOLD = {"row": "HOLD_ANCHOR_STAGING_UNVERIFIED", "process": "HOLD_SERVING_EVIDENCE_INCOMPLETE",
+                 "handshake": "HOLD_SERVING_EVIDENCE_INCOMPLETE", "live-inventory": "HOLD_SERVING_EVIDENCE_INCOMPLETE"}
+
+
+@pytest.mark.parametrize("target", list(EVIDENCE_HOLD))
+@pytest.mark.parametrize("fault", ["received-before-issuance", "received-after-resume", "responder-clock-skewed",
+                                   "other-challenge"])
+def test_r2f3_freshness_is_judged_on_trusted_cp_issuance_and_receipt_times(target, fault):
+    doc = _complete()
+    record, observed, received = _evidence(doc, target)
+    issued = checker._ts(_serving(doc)["challengeIssuedAt"])
+    if fault == "received-before-issuance":
+        record[observed] = record[received] = checker._iso(issued - timedelta(seconds=1))
+    elif fault == "received-after-resume":
+        record[observed] = record[received] = checker._iso(_AT + timedelta(seconds=1))
+    elif fault == "responder-clock-skewed":
+        skew = doc["advanceRenewal"]["clockSkewSeconds"]
+        record[observed] = checker._iso(checker._ts(record[received]) - timedelta(seconds=skew + 1))
+    else:
+        record["nodeChallengeNonce" if target == "row" else "challengeNonce"] = "fixture-challenge-other"
+    assert action(doc) == EVIDENCE_HOLD[target]
+
+
+@pytest.mark.parametrize("target", list(EVIDENCE_HOLD))
+def test_r2f3_responder_clock_within_the_skew_bound_is_accepted(target):
+    doc = _complete()
+    record, observed, received = _evidence(doc, target)
+    record[observed] = checker._iso(checker._ts(record[received]) + timedelta(
+        seconds=doc["advanceRenewal"]["clockSkewSeconds"]))
+    assert action(doc) == "COMPLETE"
+
+
+def test_r2f3_a_measured_window_tighter_than_the_cap_is_the_one_applied():
+    doc = _complete()
+    doc["measuredBudgets"]["observationFreshnessSeconds"] = 60
+    record, observed, received = _evidence(doc, "process")
+    record[observed] = record[received] = checker._iso(_AT - timedelta(seconds=61))
+    assert action(doc) == "HOLD_SERVING_EVIDENCE_INCOMPLETE"
+    record[observed] = record[received] = checker._iso(_AT - timedelta(seconds=60))
+    assert action(doc) == "COMPLETE"
+
+
+@pytest.mark.parametrize("key", list(checker.SERVING_WINDOWS))
+def test_r2f3_serving_windows_are_measured_plan_inputs_under_contract_caps(key):
+    doc = gen.proposal("t-window")
+    doc["measuredBudgets"][key] = None
+    assert checker.evaluate(doc, SCHEMA) == ["AR-HOLD-REQUIRED"]
+    doc["measuredBudgets"][key] = checker.SERVING_WINDOWS[key] + 1
+    assert checker.evaluate(doc, SCHEMA) == ["AR-SERVING-WINDOW"]
+
+
+def test_r2f3_a_challenge_decides_once():
+    doc = state(A["A3"], A["A4"])
+    assert action(doc) == "RESUME_FORWARD"
+    crashed, _ = checker.execute_resume(doc)
+    assert crashed["checkpoint"]["consumedChallengeNonces"] == [gen.NONCE]
+    assert checker.recovery_action(crashed) == ("HOLD_SERVING_EVIDENCE_INCOMPLETE", None, [], [])
+    with pytest.raises(ValueError):
+        checker.execute_resume(crashed)  # replaying the consumed evidence executes nothing
+    assert action(checker.observe(crashed, "fixture-challenge-0002")) == "RESUME_FORWARD"
+
+
+def _replica(site="delivery_worker", pid="delivery-3", kind="SERVICE", instance="delivery-3-i1") -> dict:
+    return {"site": site, "processID": pid, "kind": kind, "instanceID": instance}
+
+
+INVENTORY_CHURN = {
+    "replica-started-live-only": lambda s: s["liveInventory"]["processes"].append(_replica()),
+    "replica-started-with-readback": lambda s: (
+        s["liveInventory"]["processes"].append(_replica()),
+        s["processes"].append(dict(copy.deepcopy(s["processes"][1]), processID="delivery-3",
+                                   instanceID="delivery-3-i1"))),
+    "planned-process-stopped": lambda s: s["liveInventory"]["processes"].pop(2),
+    "process-moved-site": lambda s: s["liveInventory"]["processes"][2].update(site="observer_worker"),
+    "process-kind-changed": lambda s: s["liveInventory"]["processes"][5].update(kind="SERVICE"),
+    "readback-from-unplanned-process": lambda s: s["processes"].append(
+        dict(copy.deepcopy(s["processes"][0]), processID="observer-9", instanceID="observer-9-i1")),
+    "readback-site-differs": lambda s: s["processes"][0].update(site="workspace_runtime"),
+}
+
+
+@pytest.mark.parametrize("position", ["A3-durable", "A6-in-flight", "complete"])
+@pytest.mark.parametrize("churn", list(INVENTORY_CHURN))
+def test_r2f3_live_inventory_churn_is_never_ignored(churn, position):
+    """R2 visited only inventoried processes at settlement, so an unplanned live replica was ignored."""
+    doc = {"A3-durable": lambda: state(A["A3"], enroll=False),
+           "A6-in-flight": lambda: state(A["A5"], A["A6"], enroll=False),
+           "complete": _complete}[position]()
+    assert action(doc) in ("RESUME_FORWARD", "COMPLETE")
+    INVENTORY_CHURN[churn](_serving(doc))
+    assert checker.recovery_action(doc) == ("HOLD_PROCESS_INVENTORY_CHANGED", None, [], [])
+
+
+def test_r2f3_a_restarted_process_needs_a_readback_from_its_live_instance():
+    doc = _complete()
+    live = next(p for p in _serving(doc)["liveInventory"]["processes"] if p["processID"] == "observer-1")
+    live["instanceID"] = "observer-1-i2"  # restarted under the same ID after its trust readback was taken
+    assert action(doc) == "HOLD_SERVING_EVIDENCE_INCOMPLETE"
+    next(p for p in _serving(doc)["processes"] if p["processID"] == "observer-1")["instanceID"] = "observer-1-i2"
+    assert action(doc) == "COMPLETE"
+
+
+def test_r2f3_live_inventory_must_come_from_the_cp_registry():
+    doc = _complete()
+    _serving(doc)["liveInventory"]["source"] = "UNKNOWN"
+    assert action(doc) == "HOLD_SERVING_EVIDENCE_INCOMPLETE"
+
+
+def test_r2f3_duplicate_live_inventory_entries_are_never_collapsed():
+    doc = _complete()
+    procs = _serving(doc)["liveInventory"]["processes"]
+    procs.append(copy.deepcopy(procs[0]))
+    assert action(doc) == "HOLD_DUPLICATE_EVIDENCE"
+
+
 # ---------------------------------------------------------------- F4 retry after a committed effect
 
 
@@ -405,6 +552,7 @@ def test_f4_drive_every_phase_with_crash_replay_and_duplicate_delivery():
     write, re-decide, and run the decided step again. The second execution must mutate nothing."""
     doc = state(A["A1"])
     audits_seen = 0
+    challenges = iter(f"fixture-challenge-{i:04d}" for i in range(2, 100))
     for _ in range(len(checker.PHASES)):
         act, phase, apply, ack = checker.recovery_action(doc)
         if act == "COMPLETE":
@@ -413,6 +561,9 @@ def test_f4_drive_every_phase_with_crash_replay_and_duplicate_delivery():
         crashed, mutations = checker.execute_resume(doc)
         ops = {op["opID"]: op for op in checker.expected_manifest(doc)["operations"]}
         assert set(mutations) == {o for o in apply if ops[o]["kind"] != "SETTLE"}
+        # The executor consumed the challenge it acted on: the same evidence decides nothing again.
+        assert checker.recovery_action(crashed)[0] == "HOLD_SERVING_EVIDENCE_INCOMPLETE"
+        crashed = checker.observe(crashed, next(challenges))
         # Re-decide after the crash: everything that landed is acknowledged, nothing re-applied.
         again = checker.recovery_action(crashed)
         assert again[:2] == ("RESUME_FORWARD", phase) and again[2] == []
@@ -422,7 +573,7 @@ def test_f4_drive_every_phase_with_crash_replay_and_duplicate_delivery():
         assert replay["checkpoint"]["readback"] == crashed["checkpoint"]["readback"]
         audits_seen = sum(len(r["channelAuditOpIDs"]) + len(r["policyJournalOpIDs"])
                           for r in crashed["checkpoint"]["readback"]["members"])
-        doc = checker.journal_durable(crashed)
+        doc = checker.observe(checker.journal_durable(crashed), next(challenges))
     assert checker.recovery_action(doc)[0] == "COMPLETE"
     assert doc["checkpoint"]["lastDurablePhase"] == "E5_ENROLLMENT_SETTLED"
     rotation = 3
@@ -534,7 +685,7 @@ FENCE_FAULTS = {
     "plan-transferred": lambda f: {**f, "holderPlanDigest": gen.h("other-plan")},
     "generation-advanced": lambda f: {**f, "generation": f["generation"] + 1},
     "generation-behind": lambda f: {**f, "generation": f["generation"] - 1},
-    "read-stale": lambda f: {**f, "readAt": checker._iso(_AT - timedelta(seconds=checker.FRESHNESS_SECONDS + 1))},
+    "read-stale": lambda f: {**f, "readAt": checker._iso(_AT - timedelta(seconds=gen.FRESHNESS + 1))},
     "read-after-resume": lambda f: {**f, "readAt": checker._iso(_AT + timedelta(seconds=1))},
     "read-unknown": lambda f: {**f, "readAt": None},
 }
@@ -555,8 +706,7 @@ def test_r2f4_interrupted_a1_decides_nothing_outside_the_live_fence(fault, key):
 
 def test_r2f4_fence_read_exactly_at_the_freshness_bound_is_held():
     doc = _a1_in_flight()
-    doc["checkpoint"]["readback"]["writerFence"]["readAt"] = checker._iso(
-        _AT - timedelta(seconds=checker.FRESHNESS_SECONDS))
+    doc["checkpoint"]["readback"]["writerFence"]["readAt"] = checker._iso(_AT - timedelta(seconds=gen.FRESHNESS))
     assert action(doc) == "RESUME_FORWARD"
 
 
@@ -647,12 +797,7 @@ def test_f5_successor_must_be_valid_at_use_time():
     doc = load("fixtures/positive/p33-successor-not-yet-valid-hold.json")
     assert action(doc) == "HOLD_DEADLINE_INSUFFICIENT"
     doc["checkpoint"]["resumeAt"] = "2026-11-18T15:00:00Z"
-    for r in doc["checkpoint"]["readback"]["members"]:
-        r["nodeObservedAt"] = "2026-11-18T14:59:30Z"
-    for p in doc["checkpoint"]["readback"]["serving"]["processes"]:
-        p["observedAt"] = "2026-11-18T14:59:30Z"
-    doc["checkpoint"]["readback"]["serving"]["challengeIssuedAt"] = "2026-11-18T14:59:00Z"
-    doc["checkpoint"]["readback"]["writerFence"]["readAt"] = "2026-11-18T14:59:30Z"  # re-read with the rest
+    doc = checker.observe(doc, "fixture-challenge-0002")  # re-read everything, the fence included
     assert action(doc) == "RESUME_FORWARD"
 
 

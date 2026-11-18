@@ -157,6 +157,7 @@ INVENTORY = [
 ]
 NONCE = "fixture-challenge-0001"
 FENCE_GENERATION = 7
+FRESHNESS, HEARTBEAT, CHALLENGE = 120, 15, 300  # fixture "measured" serving windows (= the contract caps)
 
 
 def prior_ca(doc: dict):
@@ -223,7 +224,7 @@ def live_fence(doc: dict, resume_at: str, **override) -> dict:
 
 def checkpoint(last=None, flight=None, outcome=None, resume_at=OBSERVED, readback=None) -> dict:
     return {"lastDurablePhase": last, "inFlightPhase": flight, "inFlightOutcome": outcome, "resumeAt": resume_at,
-            "readback": readback or empty_readback(), "expectedRecoveryAction": "NOT_STARTED",
+            "consumedChallengeNonces": [], "readback": readback or empty_readback(), "expectedRecoveryAction": "NOT_STARTED",
             "expectedResumePhase": None, "expectedApply": [], "expectedAcknowledge": []}
 
 
@@ -275,7 +276,9 @@ def proposal(name: str, *, mode: str = "TERMINAL_REPLACEMENT", enroll: bool = Tr
             "caSuccessorBudgetSeconds": 86400, "safetySeconds": 630, "clockSkewSeconds": 30,
         },
         "measuredBudgets": {"source": "MEASURED", "evidenceRef": "fixture:budget/measured",
-                            "phaseSeconds": {p: 600 for p in checker.PHASES}},
+                            "phaseSeconds": {p: 600 for p in checker.PHASES},
+                            "observationFreshnessSeconds": FRESHNESS, "heartbeatFreshnessSeconds": HEARTBEAT,
+                            "challengeLifetimeSeconds": CHALLENGE},
         "servingBinaryMigration": {"status": "REVIEWED", "reviewRef": "fixture:review/node-binary-migration"},
         "writerFence": {"token": "fence:fixture-arp-r2", "generation": FENCE_GENERATION},
         "placement": {"controlPlaneHostPC": "PC3", "excludedPCs": ["PC5"]},
@@ -377,12 +380,16 @@ def initial_readback(doc: dict, resume_at: str) -> dict:
              "channelCertificateSHA256": checker.prior_leaf_sha(m), "channelAuditOpIDs": [],
              "policyFloor": m["counters"]["policyFloorBefore"], "installedPolicyDigest": m["priorPolicyDigest"],
              "policyJournalOpIDs": [], "installedLeafSHA256": checker.prior_leaf_sha(m),
-             "stagedAnchorDigest": prior_d, "nodeObservedAt": observed, "nodeChallengeNonce": NONCE}
+             "stagedAnchorDigest": prior_d, "nodeObservedAt": observed, "nodeReceivedAt": observed,
+             "nodeChallengeNonce": NONCE}
             for m in doc["members"] if m["kind"] == "ROTATION"]
     cp = doc["controlPlaneClient"]
-    processes = [{"site": p["site"], "processID": p["processID"], "trustGeneration": 1,
-                  "loadedAnchorDigest": prior_d, "clientLeafSHA256": checker.prior_leaf_sha(cp),
-                  "observedAt": observed, "challengeNonce": NONCE} for p in cp["processInventory"]]
+    processes = [{"site": p["site"], "processID": p["processID"], "instanceID": f"{p['processID']}-i1",
+                  "trustGeneration": 1, "loadedAnchorDigest": prior_d, "clientLeafSHA256": checker.prior_leaf_sha(cp),
+                  "observedAt": observed, "receivedAt": observed, "challengeNonce": NONCE}
+                 for p in cp["processInventory"]]
+    live = {"source": "CP_PROCESS_REGISTRY", "observedAt": observed, "receivedAt": observed, "challengeNonce": NONCE,
+            "processes": [dict(p, instanceID=f"{p['processID']}-i1") for p in cp["processInventory"]]}
     signed = [{"subject": m["nodeID"], "leafSHA256": m["plannedLeafSHA256"]} for m in doc["members"]
               if m["plannedLeafSHA256"] is not None]
     if cp["plannedLeafSHA256"] is not None:
@@ -393,7 +400,7 @@ def initial_readback(doc: dict, resume_at: str) -> dict:
             "journalManifestDigest": None if pin is None else pin["digest"],
             "ceremonyLog": {"caKeysCreated": 1, "signed": signed}, "members": rows, "reservations": [],
             "serving": {"challengeNonce": NONCE, "challengeIssuedAt": _iso(at - timedelta(seconds=60)),
-                        "processes": processes, "handshakes": []}}
+                        "liveInventory": live, "processes": processes, "handshakes": []}}
 
 
 Selector = Callable[[dict], bool]
@@ -553,7 +560,7 @@ def positives() -> dict[str, tuple[str, dict]]:
             "nodeID": member(doc, "PC1")["nodeID"], "rowPresent": True, "reservationDigest": h("foreign-reservation"),
             "channelVersion": 0, "channelCertificateSHA256": None, "channelAuditOpIDs": [], "policyFloor": 0,
             "installedPolicyDigest": None, "policyJournalOpIDs": [], "installedLeafSHA256": None,
-            "stagedAnchorDigest": None, "nodeObservedAt": None, "nodeChallengeNonce": None})
+            "stagedAnchorDigest": None, "nodeObservedAt": None, "nodeReceivedAt": None, "nodeChallengeNonce": None})
     hold("p17-foreign-row-reservation-hold",
          "F1: a PC1 row exists but was created under another reservation: HOLD, never adopt it.", A["E1"],
          "HOLD_RESERVATION_MISMATCH", flight=A["E2"], mutate=foreign_row)
@@ -611,7 +618,7 @@ def positives() -> dict[str, tuple[str, dict]]:
     def stale_handshake(doc):
         shake = next(s for s in doc["checkpoint"]["readback"]["serving"]["handshakes"]
                      if s["nodeID"] == member(doc, "PC2")["nodeID"])
-        shake["observedAt"] = _iso(_ts(RESUME) - timedelta(seconds=checker.FRESHNESS_SECONDS + 1))
+        shake["observedAt"] = shake["receivedAt"] = _iso(_ts(RESUME) - timedelta(seconds=FRESHNESS + 1))
     hold("p29-stale-handshake-hold", "F3: PC2's handshake is older than the freshness window: COMPLETE is refused.",
          A["A7"], "HOLD_SERVING_EVIDENCE_INCOMPLETE", mutate=stale_handshake, enroll=False)
     resume("p30-a6-rolling-switch-resume",
@@ -678,6 +685,24 @@ def positives() -> dict[str, tuple[str, dict]]:
     add("p42-a1-interrupted-no-key-stale-fence-hold",
         "Ceremony interrupted with no key, but the fence was re-acquired at a later generation: HOLD, not abandon.",
         expect(d, "HOLD_WRITER_FENCE"))
+
+    # Review R2 finding 3: the authoritative live inventory, one-use challenges and their issuance age.
+    def extra_replica(doc):
+        serving = doc["checkpoint"]["readback"]["serving"]
+        serving["liveInventory"]["processes"].append(
+            {"site": "delivery_worker", "processID": "delivery-3", "kind": "SERVICE", "instanceID": "delivery-3-i1"})
+        serving["processes"].append(dict(copy.deepcopy(serving["processes"][1]), processID="delivery-3",
+                                         instanceID="delivery-3-i1"))
+    hold("p43-live-replica-outside-inventory-hold",
+         "F3: a delivery replica absent from the frozen inventory is serving (R2 ignored it and completed): HOLD.",
+         A["A7"], "HOLD_PROCESS_INVENTORY_CHANGED", mutate=extra_replica, enroll=False)
+    hold("p44-consumed-challenge-hold",
+         "F3: the readback answers a challenge an earlier decision already consumed: HOLD, re-challenge.", A["A3"],
+         "HOLD_SERVING_EVIDENCE_INCOMPLETE", mutate=lambda d: d["checkpoint"]["consumedChallengeNonces"].append(NONCE))
+    hold("p45-challenge-issued-too-long-ago-hold",
+         "F3: every answer is recent but the challenge itself was issued beyond its lifetime: HOLD.", A["A3"],
+         "HOLD_SERVING_EVIDENCE_INCOMPLETE", mutate=lambda d: d["checkpoint"]["readback"]["serving"].update(
+             challengeIssuedAt=_iso(_ts(RESUME) - timedelta(seconds=CHALLENGE + 1))))
     return out
 
 
@@ -909,6 +934,9 @@ def rejections() -> dict[str, tuple[str, list[str], dict]]:
     d = prop("r58-terminal-mode-with-overlap")
     d["trustTransition"]["overlap"] = {"startsAt": OBSERVED, "mustEndBy": "2026-11-19T06:00:00Z"}
     add("r58-terminal-mode-with-overlap", "F5: a terminal replacement has no overlap window.", ["AR-MODE"], seal(d))
+    d = prop("r59-serving-window-above-cap"); d["measuredBudgets"]["observationFreshnessSeconds"] = 600
+    add("r59-serving-window-above-cap", "F3: a measured freshness window wider than the 120 s contract cap.",
+        ["AR-SERVING-WINDOW"], d)
     return out
 
 
@@ -993,7 +1021,9 @@ def current_instance() -> dict:
             "policyRenewalLeadSeconds": 86400, "overlapSeconds": 14400, "normalBudgetSeconds": None,
             "caSuccessorBudgetSeconds": None, "safetySeconds": 630, "clockSkewSeconds": 30,
         },
-        "measuredBudgets": {"source": "UNKNOWN", "evidenceRef": None, "phaseSeconds": {p: None for p in checker.PHASES}},
+        "measuredBudgets": {"source": "UNKNOWN", "evidenceRef": None, "phaseSeconds": {p: None for p in checker.PHASES},
+                            "observationFreshnessSeconds": None, "heartbeatFreshnessSeconds": None,
+                            "challengeLifetimeSeconds": None},
         "servingBinaryMigration": {"status": "NOT_REVIEWED", "reviewRef": None},
         "writerFence": {"token": None, "generation": None},
         "placement": {"controlPlaneHostPC": "PC3", "excludedPCs": ["PC5"]},

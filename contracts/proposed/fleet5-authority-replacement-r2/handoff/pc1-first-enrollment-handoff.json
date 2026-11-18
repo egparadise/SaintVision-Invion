@@ -3,7 +3,7 @@
  "fixture": true,
  "activation": "NOT_AUTHORIZED",
  "sourcePlan": "fixtures/positive/p05-complete.json",
- "sourcePlanSHA256": "d08fb6764745b49d06e81819e1fa382fc05dee33f7439a7fef2f11c0555da2e8",
+ "sourcePlanSHA256": "c303b27d0b2a8a96e198877c19ba652ef300ed5842362d9d409228e928cd99d2",
  "acceptance": {
   "scope": "FOUR_MEMBER_MIGRATION",
   "members": [

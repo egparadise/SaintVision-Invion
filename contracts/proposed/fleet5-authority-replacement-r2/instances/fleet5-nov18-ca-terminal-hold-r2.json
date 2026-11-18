@@ -87,7 +87,10 @@
    "E3_ENROLLMENT_CHANNEL_PROVISIONED": null,
    "E4_ENROLLMENT_POLICY_PUBLISHED": null,
    "E5_ENROLLMENT_SETTLED": null
-  }
+  },
+  "observationFreshnessSeconds": null,
+  "heartbeatFreshnessSeconds": null,
+  "challengeLifetimeSeconds": null
  },
  "servingBinaryMigration": {
   "status": "NOT_REVIEWED",
@@ -272,6 +275,7 @@
   "inFlightPhase": null,
   "inFlightOutcome": null,
   "resumeAt": "2026-11-18T11:53:13Z",
+  "consumedChallengeNonces": [],
   "readback": {
    "dbAvailable": false,
    "epoch": null,

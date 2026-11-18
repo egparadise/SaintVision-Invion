@@ -157,10 +157,14 @@
       "description": "Measured wall-clock seconds per phase. Remaining work at resumeAt is the sum from the resume phase to the final phase.",
       "type": "object",
       "additionalProperties": false,
-      "required": ["source", "evidenceRef", "phaseSeconds"],
+      "required": ["source", "evidenceRef", "phaseSeconds", "observationFreshnessSeconds",
+                   "heartbeatFreshnessSeconds", "challengeLifetimeSeconds"],
       "properties": {
         "source": {"enum": ["MEASURED", "UNKNOWN"]},
         "evidenceRef": {"type": ["string", "null"], "maxLength": 300},
+        "observationFreshnessSeconds": {"description": "Measured; at most 120 (AR-SERVING-WINDOW). An observation the CP received longer ago at resumeAt is stale.", "$ref": "#/$defs/nullablePositiveSeconds"},
+        "heartbeatFreshnessSeconds": {"description": "Measured; at most 15, the NodeChannels.snapshot acceptance.", "$ref": "#/$defs/nullablePositiveSeconds"},
+        "challengeLifetimeSeconds": {"description": "Measured; at most 300. A one-use challenge issued longer ago at resumeAt is stale.", "$ref": "#/$defs/nullablePositiveSeconds"},
         "phaseSeconds": {
           "type": "object",
           "additionalProperties": false,
@@ -331,6 +335,7 @@
     "nullablePositiveSeconds": {"type": ["integer", "null"], "minimum": 1, "maximum": 94608000},
     "nodeID": {"type": "string", "pattern": "^nod_[0-9A-HJKMNP-TV-Z]{26}$"},
     "processID": {"type": "string", "pattern": "^[a-z][a-z0-9-]{1,47}$"},
+    "instanceID": {"description": "The live process instance (registry incarnation); a restart is a new instance.", "type": "string", "pattern": "^[a-z0-9][a-z0-9-]{1,63}$"},
     "pc": {"enum": ["PC1", "PC2", "PC3", "PC4", "PC5"]},
     "site": {"enum": ["observer_worker", "delivery_worker", "workspace_runtime", "build_product_runtime", "storage_check_collector"]},
     "endpoint": {"type": "string", "pattern": "^https://[0-9.]{7,15}:[0-9]{1,5}$"},
@@ -427,7 +432,7 @@
       "required": [
         "nodeID", "rowPresent", "reservationDigest", "channelVersion", "channelCertificateSHA256", "channelAuditOpIDs",
         "policyFloor", "installedPolicyDigest", "policyJournalOpIDs", "installedLeafSHA256", "stagedAnchorDigest",
-        "nodeObservedAt", "nodeChallengeNonce"
+        "nodeObservedAt", "nodeReceivedAt", "nodeChallengeNonce"
       ],
       "properties": {
         "nodeID": {"$ref": "#/$defs/nodeID"},
@@ -441,7 +446,8 @@
         "policyJournalOpIDs": {"type": "array", "maxItems": 16, "items": {"type": "string", "pattern": "^op_[0-9a-f]{24}$"}},
         "installedLeafSHA256": {"$ref": "#/$defs/nullableSha256"},
         "stagedAnchorDigest": {"$ref": "#/$defs/nullableSha256"},
-        "nodeObservedAt": {"$ref": "#/$defs/observation"},
+        "nodeObservedAt": {"description": "Responder (Node) clock.", "$ref": "#/$defs/observation"},
+        "nodeReceivedAt": {"description": "Trusted CP clock: when the CP received the challenged answer.", "$ref": "#/$defs/observation"},
         "nodeChallengeNonce": {"type": ["string", "null"], "maxLength": 80}
       }
     },
@@ -449,14 +455,18 @@
       "type": "object",
       "additionalProperties": false,
       "required": [
-        "lastDurablePhase", "inFlightPhase", "inFlightOutcome", "resumeAt", "readback", "expectedRecoveryAction",
-        "expectedResumePhase", "expectedApply", "expectedAcknowledge"
+        "lastDurablePhase", "inFlightPhase", "inFlightOutcome", "resumeAt", "consumedChallengeNonces", "readback",
+        "expectedRecoveryAction", "expectedResumePhase", "expectedApply", "expectedAcknowledge"
       ],
       "properties": {
         "lastDurablePhase": {"oneOf": [{"$ref": "#/$defs/phase"}, {"type": "null"}]},
         "inFlightPhase": {"oneOf": [{"$ref": "#/$defs/phase"}, {"type": "null"}]},
         "inFlightOutcome": {"enum": ["UNKNOWN", "FAILED_BEFORE_MUTATION", null]},
         "resumeAt": {"$ref": "#/$defs/timestamp"},
+        "consumedChallengeNonces": {
+          "description": "Journal of challenges earlier decisions consumed. A challenge is one-use: evidence answering a consumed challenge is never fresh.",
+          "type": "array", "maxItems": 64, "uniqueItems": true, "items": {"type": "string", "maxLength": 80}
+        },
         "readback": {
           "type": "object",
           "additionalProperties": false,
@@ -529,24 +539,52 @@
                 {
                   "type": "object",
                   "additionalProperties": false,
-                  "required": ["challengeNonce", "challengeIssuedAt", "processes", "handshakes"],
+                  "required": ["challengeNonce", "challengeIssuedAt", "liveInventory", "processes", "handshakes"],
                   "properties": {
                     "challengeNonce": {"type": "string", "minLength": 8, "maxLength": 80},
-                    "challengeIssuedAt": {"$ref": "#/$defs/timestamp"},
+                    "challengeIssuedAt": {"description": "Trusted CP clock at issuance; bounded by challengeLifetimeSeconds at resumeAt.", "$ref": "#/$defs/timestamp"},
+                    "liveInventory": {
+                      "description": "Authoritative live process inventory from the CP process registry, answered under the challenge. Must equal the frozen processInventory (site, processID, kind); any churn is HOLD_PROCESS_INVENTORY_CHANGED.",
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": ["source", "observedAt", "receivedAt", "challengeNonce", "processes"],
+                      "properties": {
+                        "source": {"enum": ["CP_PROCESS_REGISTRY", "UNKNOWN"]},
+                        "observedAt": {"$ref": "#/$defs/timestamp"},
+                        "receivedAt": {"$ref": "#/$defs/timestamp"},
+                        "challengeNonce": {"type": "string", "maxLength": 80},
+                        "processes": {
+                          "type": "array", "maxItems": 32,
+                          "items": {
+                            "type": "object",
+                            "additionalProperties": false,
+                            "required": ["site", "processID", "kind", "instanceID"],
+                            "properties": {
+                              "site": {"$ref": "#/$defs/site"},
+                              "processID": {"$ref": "#/$defs/processID"},
+                              "kind": {"enum": ["SERVICE", "INVOKED_CLIENT"]},
+                              "instanceID": {"$ref": "#/$defs/instanceID"}
+                            }
+                          }
+                        }
+                      }
+                    },
                     "processes": {
                       "type": "array", "maxItems": 32,
                       "items": {
                         "type": "object",
                         "additionalProperties": false,
-                        "required": ["site", "processID", "trustGeneration", "loadedAnchorDigest", "clientLeafSHA256",
-                                     "observedAt", "challengeNonce"],
+                        "required": ["site", "processID", "instanceID", "trustGeneration", "loadedAnchorDigest",
+                                     "clientLeafSHA256", "observedAt", "receivedAt", "challengeNonce"],
                         "properties": {
                           "site": {"$ref": "#/$defs/site"},
                           "processID": {"$ref": "#/$defs/processID"},
+                          "instanceID": {"$ref": "#/$defs/instanceID"},
                           "trustGeneration": {"type": "integer", "minimum": 0},
                           "loadedAnchorDigest": {"$ref": "#/$defs/sha256"},
                           "clientLeafSHA256": {"$ref": "#/$defs/nullableSha256"},
                           "observedAt": {"$ref": "#/$defs/timestamp"},
+                          "receivedAt": {"$ref": "#/$defs/timestamp"},
                           "challengeNonce": {"type": "string", "maxLength": 80}
                         }
                       }
@@ -556,11 +594,12 @@
                       "items": {
                         "type": "object",
                         "additionalProperties": false,
-                        "required": ["nodeID", "observedAt", "challengeNonce", "peerLeafSHA256", "anchorDigest",
-                                     "cpClientURI", "heartbeatAt", "policyDigest"],
+                        "required": ["nodeID", "observedAt", "receivedAt", "challengeNonce", "peerLeafSHA256",
+                                     "anchorDigest", "cpClientURI", "heartbeatAt", "policyDigest"],
                         "properties": {
                           "nodeID": {"$ref": "#/$defs/nodeID"},
                           "observedAt": {"$ref": "#/$defs/timestamp"},
+                          "receivedAt": {"$ref": "#/$defs/timestamp"},
                           "challengeNonce": {"type": "string", "maxLength": 80},
                           "peerLeafSHA256": {"$ref": "#/$defs/sha256"},
                           "anchorDigest": {"$ref": "#/$defs/sha256"},
@@ -583,7 +622,8 @@
             "HOLD_EPOCH_DIVERGED", "HOLD_CUSTODY_UNRESOLVED", "HOLD_FOREIGN_WRITER", "HOLD_POLICY_ABOVE_PLAN",
             "HOLD_ENROLLMENT_BEFORE_ROTATION_SETTLED", "HOLD_UNPLANNED_ROW", "HOLD_WRITER_FENCE",
             "HOLD_MANIFEST_MISMATCH", "HOLD_DUPLICATE_EVIDENCE", "HOLD_ANCHOR_STAGING_UNVERIFIED",
-            "HOLD_SERVING_EVIDENCE_INCOMPLETE", "HOLD_DEADLINE_INSUFFICIENT", "HOLD_RESERVATION_MISMATCH"
+            "HOLD_SERVING_EVIDENCE_INCOMPLETE", "HOLD_DEADLINE_INSUFFICIENT", "HOLD_RESERVATION_MISMATCH",
+            "HOLD_PROCESS_INVENTORY_CHANGED"
           ]
         },
         "expectedResumePhase": {"oneOf": [{"$ref": "#/$defs/phase"}, {"type": "null"}]},
