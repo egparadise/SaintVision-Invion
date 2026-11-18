@@ -608,7 +608,7 @@ def test_f4_drive_every_phase_with_crash_replay_and_duplicate_delivery():
         replay, second = checker.execute_resume(crashed)
         assert second == []
         assert replay["checkpoint"]["readback"] == crashed["checkpoint"]["readback"]
-        audits_seen = sum(len(r["channelAuditOpIDs"]) + len(r["policyJournalOpIDs"])
+        audits_seen = sum(len(r["channelAudit"]) + len(r["policyJournal"])
                           for r in crashed["checkpoint"]["readback"]["members"])
         doc = checker.observe(checker.journal_durable(crashed), next(challenges))
     assert checker.recovery_action(doc)[0] == "COMPLETE"
@@ -616,7 +616,8 @@ def test_f4_drive_every_phase_with_crash_replay_and_duplicate_delivery():
     rotation = 3
     assert audits_seen == rotation * 2 + 2  # one CAS + one policy audit per rotation, provision + policy for PC1
     for r in doc["checkpoint"]["readback"]["members"]:
-        assert all(r["channelAuditOpIDs"].count(o) == 1 for o in r["channelAuditOpIDs"])
+        assert all(r["channelAudit"].count(e) == 1 for e in r["channelAudit"])
+        assert all(e["manifestDigest"] == doc["operationManifest"]["digest"] for e in r["channelAudit"])
 
 
 @pytest.mark.parametrize("phase", [A["A2"], A["A3"], A["A4"], A["A5"], A["A6"], A["E3"], A["E4"]])
@@ -645,7 +646,7 @@ def test_f4_executor_refuses_an_operation_whose_preimage_moved():
 def test_f4_postimage_needs_exactly_one_audit_row(audit):
     doc = state(A["A3"], A["A4"], landed=gen.on(gen.ids("PC2")))
     op = gen.op_of(doc, A["A4"], "PC2")["opID"]
-    gen.row(doc, "PC2")["channelAuditOpIDs"] = [op] * audit
+    gen.row(doc, "PC2")["channelAudit"] = [checker.audit_key(doc, op)] * audit
     assert action(doc) == "HOLD_FOREIGN_WRITER"
 
 
@@ -799,6 +800,61 @@ def test_f4_a1_resume_is_deterministic_re_signing():
     # Re-signing reproduces byte-identical leaves (Ed25519 is deterministic).
     rebuilt = gen.ceremony(gen.proposal("p23-a1-in-flight-key-present-resume"))
     assert [m["leafDER"] for m in rebuilt["members"]] == [m["leafDER"] for m in doc["members"]]
+
+
+# ---------------------------------------------------------------- review R2: manifest-scoped identities
+
+
+def _r2_op_id(plan_digest_value: str, op: dict) -> str:
+    """The R2 derivation: pre-ceremony plan digest, phase, kind and target only."""
+    return "op_" + checker.digest({"planDigest": plan_digest_value, "phase": op["phase"], "kind": op["kind"],
+                                   "target": op["target"]})[:24]
+
+
+def test_r2id_ceremony_outputs_that_differ_never_share_an_op_id():
+    doc = base("t-ids")
+    other = copy.deepcopy(doc)
+    gen.member(other, "PC2")["plannedLeafSHA256"] = gen.h("another-ceremony-leaf")  # same frozen inputs
+    assert checker.plan_digest(other) == checker.plan_digest(doc)
+    mine, theirs = gen.op_of(doc, A["A3"], "PC2"), gen.op_of(other, A["A3"], "PC2")
+    assert mine["post"] != theirs["post"]
+    assert _r2_op_id(checker.plan_digest(doc), mine) == _r2_op_id(checker.plan_digest(other), theirs)  # R2 collided
+    assert mine["opID"] != theirs["opID"]
+    assert checker.manifest_pin(doc)["digest"] != checker.manifest_pin(other)["digest"]
+
+
+def test_r2id_every_op_id_is_its_canonical_body_under_the_plan_digest():
+    manifest = checker.expected_manifest(base("t-ids-body"))
+    ids = [op["opID"] for op in manifest["operations"]]
+    assert len(ids) == len(set(ids))
+    for op in manifest["operations"]:
+        body = {k: v for k, v in op.items() if k != "opID"}
+        assert op["opID"] == checker.operation_id(manifest["planDigest"], body)
+
+
+@pytest.mark.parametrize("position", ["in-flight", "durable"])
+@pytest.mark.parametrize("journal", ["channelAudit", "policyJournal"])
+def test_r2id_an_op_id_under_another_manifest_is_never_acknowledged(journal, position):
+    phase = A["A4"] if journal == "channelAudit" else A["A5"]
+    prev = checker.PHASES[checker.INDEX[phase] - 1]
+    doc = state(prev, phase, landed=gen.on(gen.ids("PC2"))) if position == "in-flight" else state(phase)
+    assert action(doc) == "RESUME_FORWARD"
+    r = gen.row(doc, "PC2")
+    r[journal] = [dict(e, manifestDigest=gen.h("other-manifest")) for e in r[journal]]
+    assert action(doc) == "HOLD_FOREIGN_WRITER"
+
+
+def test_r2id_audit_history_of_other_operations_is_not_confused_with_ours():
+    doc = state(A["A3"], A["A4"])
+    gen.row(doc, "PC3")["channelAudit"] = [{"manifestDigest": gen.h("earlier-plan"), "opID": "op_" + "a" * 24}]
+    assert checker.recovery_action(doc)[2] == [op["opID"] for op in gen.manifest_ops(doc) if op["phase"] == A["A4"]]
+
+
+def test_r2id_a_bare_op_id_is_not_an_audit_key():
+    doc = state(A["A4"])
+    r = gen.row(doc, "PC2")
+    r["channelAudit"] = [e["opID"] for e in r["channelAudit"]]
+    assert checker.evaluate(doc, SCHEMA) == ["AR-SCHEMA"]
 
 
 # ---------------------------------------------------------------- F5 expiry and advance renewal

@@ -380,10 +380,10 @@ def initial_readback(doc: dict, resume_at: str) -> dict:
     pin = doc["operationManifest"]
     rows = [{"nodeID": m["nodeID"], "reservationDigest": None,
              "channelVersion": m["counters"]["channelVersionBefore"],
-             "channelCertificateSHA256": checker.prior_leaf_sha(m), "channelAuditOpIDs": [],
+             "channelCertificateSHA256": checker.prior_leaf_sha(m), "channelAudit": [],
              "policyFloor": m["counters"]["policyFloorBefore"], "installedPolicyDigest": m["priorPolicyDigest"],
              "installedPolicyNotAfter": PRIOR_POLICY_NOT_AFTER,
-             "policyJournalOpIDs": [], "installedLeafSHA256": checker.prior_leaf_sha(m),
+             "policyJournal": [], "installedLeafSHA256": checker.prior_leaf_sha(m),
              "stagedAnchorDigest": prior_d, "nodeObservedAt": observed, "nodeReceivedAt": observed,
              "nodeChallengeNonce": NONCE}
             for m in doc["members"] if m["kind"] == "ROTATION"]
@@ -526,7 +526,7 @@ def positives() -> dict[str, tuple[str, dict]]:
     def undo_pc3_cas(doc):
         r = row(doc, "PC3")
         r.update(channelVersion=CHANNEL["PC3"], channelCertificateSHA256=checker.prior_leaf_sha(member(doc, "PC3")),
-                 channelAuditOpIDs=[])
+                 channelAudit=[])
     hold("p09-durable-cas-undone-hold", "Journal says A4 durable but PC3 is back at its exact preimage: HOLD.",
          A["A4"], "HOLD_FOREIGN_WRITER", mutate=undo_pc3_cas)
 
@@ -543,7 +543,7 @@ def positives() -> dict[str, tuple[str, dict]]:
 
     def unplanned(doc):
         extra = copy.deepcopy(row(doc, "PC2"))
-        extra.update(nodeID=nid("XTRA"), channelAuditOpIDs=[], policyJournalOpIDs=[])
+        extra.update(nodeID=nid("XTRA"), channelAudit=[], policyJournal=[])
         doc["checkpoint"]["readback"]["members"].append(extra)
     hold("p13-unplanned-row-hold", "A Node row that is neither planned nor pre-existing appeared: HOLD.", A["A7"],
          "HOLD_UNPLANNED_ROW", flight=A["E1"], mutate=unplanned)
@@ -562,8 +562,8 @@ def positives() -> dict[str, tuple[str, dict]]:
     def foreign_row(doc):
         doc["checkpoint"]["readback"]["members"].append({
             "nodeID": member(doc, "PC1")["nodeID"], "reservationDigest": h("foreign-reservation"),
-            "channelVersion": 0, "channelCertificateSHA256": None, "channelAuditOpIDs": [], "policyFloor": 0,
-            "installedPolicyDigest": None, "installedPolicyNotAfter": None, "policyJournalOpIDs": [], "installedLeafSHA256": None,
+            "channelVersion": 0, "channelCertificateSHA256": None, "channelAudit": [], "policyFloor": 0,
+            "installedPolicyDigest": None, "installedPolicyNotAfter": None, "policyJournal": [], "installedLeafSHA256": None,
             "stagedAnchorDigest": None, "nodeObservedAt": None, "nodeReceivedAt": None, "nodeChallengeNonce": None})
     hold("p17-foreign-row-reservation-hold",
          "F1: a PC1 row exists but was created under another reservation: HOLD, never adopt it.", A["E1"],
@@ -578,11 +578,11 @@ def positives() -> dict[str, tuple[str, dict]]:
          "F4: PC4's floor equals the planned P but different policy bytes landed: HOLD.", A["A4"],
          "HOLD_FOREIGN_WRITER", flight=A["A5"],
          mutate=lambda d: row(d, "PC4").update(policyFloor=FLOOR["PC4"] + 1, installedPolicyDigest=h("foreign-policy"),
-                                               policyJournalOpIDs=[op_of(d, A["A5"], "PC4")["opID"]]))
+                                               policyJournal=[checker.audit_key(d, op_of(d, A["A5"], "PC4")["opID"])]))
     hold("p20-cas-postimage-without-audit-hold",
          "F4: PC2 shows the planned version and leaf but no audit row for the operation: HOLD.", A["A3"],
          "HOLD_FOREIGN_WRITER", flight=A["A4"], landed=on(ids("PC2")),
-         mutate=lambda d: row(d, "PC2").update(channelAuditOpIDs=[]))
+         mutate=lambda d: row(d, "PC2").update(channelAudit=[]))
     hold("p21-writer-fence-lost-hold", "F4: another plan holds the writer fence: HOLD, never write.", A["A4"],
          "HOLD_WRITER_FENCE", flight=A["A5"],
          mutate=lambda d: d["checkpoint"]["readback"]["writerFence"].update(holderPlanDigest=h("other-plan")))
@@ -723,6 +723,14 @@ def positives() -> dict[str, tuple[str, dict]]:
          "F5: advance renewal; PC3's installed prior policy (validity readback) lapses before A5 can replace it.",
          A["A3"], "HOLD_DEADLINE_INSUFFICIENT", flight=A["A4"],
          mutate=lambda d: row(d, "PC3").update(installedPolicyNotAfter="2026-11-18T14:20:00Z"), **adv)
+
+    # Review R2 remaining question: audit identity is the manifest digest plus the opID.
+    def foreign_manifest_audit(doc):
+        r = row(doc, "PC2")
+        r["channelAudit"] = [dict(e, manifestDigest=h("other-manifest")) for e in r["channelAudit"]]
+    hold("p49-audit-under-other-manifest-hold",
+         "F4: PC2 shows the planned CAS postimage, but its audit row carries this opID under another manifest: HOLD.",
+         A["A3"], "HOLD_FOREIGN_WRITER", flight=A["A4"], landed=on(ids("PC2")), mutate=foreign_manifest_audit)
     return out
 
 

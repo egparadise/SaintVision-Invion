@@ -250,6 +250,11 @@
    "why": "F5: advance renewal; PC3's installed prior policy (validity readback) lapses before A5 can replace it."
   },
   {
+   "path": "fixtures/positive/p49-audit-under-other-manifest-hold.json",
+   "codes": [],
+   "why": "F4: PC2 shows the planned CAS postimage, but its audit row carries this opID under another manifest: HOLD."
+  },
+  {
    "path": "fixtures/rejection/r01-new-ca-is-prior.json",
    "codes": [
     "AR-PRIOR-REUSE"

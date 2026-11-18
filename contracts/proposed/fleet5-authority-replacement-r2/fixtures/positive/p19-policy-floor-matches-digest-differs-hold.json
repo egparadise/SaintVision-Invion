@@ -335,7 +335,7 @@
  },
  "operationManifest": {
   "planDigest": "587eca09e5b90917796729a956f0afee28ff3df0d642824395440d9b60065b37",
-  "digest": "865243a79ff8ab6951c4682e5463de2800be685277bd6251e394235d576761a5",
+  "digest": "1f2ade259b30c5d2ed1064db378301fd15e0e867ff6ec888230bdf19121474fb",
   "operationCount": 26
  },
  "checkpoint": {
@@ -354,7 +354,7 @@
     "holderPlanDigest": "587eca09e5b90917796729a956f0afee28ff3df0d642824395440d9b60065b37",
     "readAt": "2026-11-18T13:59:30Z"
    },
-   "journalManifestDigest": "865243a79ff8ab6951c4682e5463de2800be685277bd6251e394235d576761a5",
+   "journalManifestDigest": "1f2ade259b30c5d2ed1064db378301fd15e0e867ff6ec888230bdf19121474fb",
    "ceremonyLog": {
     "caKeysCreated": 1,
     "signed": [
@@ -386,13 +386,16 @@
      "reservationDigest": null,
      "channelVersion": 2,
      "channelCertificateSHA256": "b2ed795a6a875d095c59ebfff631c3511d10e189448c2fcb3eee0d510e9d5cc0",
-     "channelAuditOpIDs": [
-      "op_26aef36c9621b72e038f4387"
+     "channelAudit": [
+      {
+       "manifestDigest": "1f2ade259b30c5d2ed1064db378301fd15e0e867ff6ec888230bdf19121474fb",
+       "opID": "op_cfeec408ea7ec581216f866a"
+      }
      ],
      "policyFloor": 2,
      "installedPolicyDigest": "1edf078d8b0045b3bf7b57394e36c486b4a5cff7cc3264b5821c3a03f279de8b",
      "installedPolicyNotAfter": "2026-11-20T06:00:00Z",
-     "policyJournalOpIDs": [],
+     "policyJournal": [],
      "installedLeafSHA256": "b2ed795a6a875d095c59ebfff631c3511d10e189448c2fcb3eee0d510e9d5cc0",
      "stagedAnchorDigest": "74ff0c7aad69a27e5a334d1d78cde59e29375b8a6ee3c33fe26aee72d6103f81",
      "nodeObservedAt": "2026-11-18T13:59:30Z",
@@ -404,13 +407,16 @@
      "reservationDigest": null,
      "channelVersion": 2,
      "channelCertificateSHA256": "1d4f0a321a46a39bdda5c5b6e35591542783ed425b646821cb8163512561cf93",
-     "channelAuditOpIDs": [
-      "op_74719afc5c1e4504c171ef10"
+     "channelAudit": [
+      {
+       "manifestDigest": "1f2ade259b30c5d2ed1064db378301fd15e0e867ff6ec888230bdf19121474fb",
+       "opID": "op_7e60914a2c5fece0047620b5"
+      }
      ],
      "policyFloor": 2,
      "installedPolicyDigest": "337643bf0099b8574d42461802cc808ca4fde84ad1117be1e5c7281256734921",
      "installedPolicyNotAfter": "2026-11-20T06:00:00Z",
-     "policyJournalOpIDs": [],
+     "policyJournal": [],
      "installedLeafSHA256": "1d4f0a321a46a39bdda5c5b6e35591542783ed425b646821cb8163512561cf93",
      "stagedAnchorDigest": "74ff0c7aad69a27e5a334d1d78cde59e29375b8a6ee3c33fe26aee72d6103f81",
      "nodeObservedAt": "2026-11-18T13:59:30Z",
@@ -422,14 +428,20 @@
      "reservationDigest": null,
      "channelVersion": 4,
      "channelCertificateSHA256": "6dc786f0238020f69e7328b35e27b2bf79645a4125162f77ab46f9c39669a98e",
-     "channelAuditOpIDs": [
-      "op_8e3878d95da8217760468847"
+     "channelAudit": [
+      {
+       "manifestDigest": "1f2ade259b30c5d2ed1064db378301fd15e0e867ff6ec888230bdf19121474fb",
+       "opID": "op_ca6c355e463d0ca64881c915"
+      }
      ],
      "policyFloor": 6,
      "installedPolicyDigest": "956789119c427091f9ec31f4a70ce293a3f6e42a189a764ca6e5cefbf4f73220",
      "installedPolicyNotAfter": "2026-11-20T06:00:00Z",
-     "policyJournalOpIDs": [
-      "op_2be8369a8c5013e452630c9c"
+     "policyJournal": [
+      {
+       "manifestDigest": "1f2ade259b30c5d2ed1064db378301fd15e0e867ff6ec888230bdf19121474fb",
+       "opID": "op_76e65c89d2bdb2b4b6a8b71b"
+      }
      ],
      "installedLeafSHA256": "6dc786f0238020f69e7328b35e27b2bf79645a4125162f77ab46f9c39669a98e",
      "stagedAnchorDigest": "74ff0c7aad69a27e5a334d1d78cde59e29375b8a6ee3c33fe26aee72d6103f81",

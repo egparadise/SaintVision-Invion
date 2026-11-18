@@ -392,9 +392,9 @@ def expected_manifest(doc: dict) -> dict | None:
     ops: list[dict] = []
 
     def op(phase, kind, target, pre, post, *, expected=None, endpoint=None):
-        op_id = "op_" + digest({"planDigest": pd, "phase": phase, "kind": kind, "target": target})[:24]
-        ops.append({"opID": op_id, "phase": phase, "kind": kind, "target": target, "epoch": epoch,
-                    "expectedVersion": expected, "endpoint": endpoint, "pre": pre, "post": post})
+        body = {"phase": phase, "kind": kind, "target": target, "epoch": epoch, "expectedVersion": expected,
+                "endpoint": endpoint, "pre": pre, "post": post}
+        ops.append({"opID": operation_id(pd, body), **body})
 
     rotation = [m for m in doc["members"] if m["kind"] == "ROTATION"]
     for m in rotation:
@@ -450,6 +450,17 @@ def expected_manifest(doc: dict) -> dict | None:
            {"peerLeafSHA256": m["plannedLeafSHA256"], "anchorDigest": final_d,
             "policyDigest": m["plannedPolicy"]["digest"]})
     return {"planDigest": pd, "digest": digest({"planDigest": pd, "operations": ops}), "operations": ops}
+
+
+def operation_id(plan_digest_value: str, body: dict) -> str:
+    """Identity of one operation: its canonical body (pre/post images included) under its plan digest.
+    Two manifests whose ceremony outputs differ never share an opID for the same phase/kind/target."""
+    return "op_" + digest({"planDigest": plan_digest_value, **body})[:24]
+
+
+def audit_key(doc: dict, op_id: str) -> dict:
+    """Audit / idempotency key: the immutable manifest digest plus the opID. A bare opID is not a key."""
+    return {"manifestDigest": doc["operationManifest"]["digest"], "opID": op_id}
 
 
 def manifest_pin(doc: dict) -> dict | None:
@@ -871,6 +882,14 @@ class _Context:
         self.staged_d = None if tt["stagedAnchorBundle"] is None else anchor_digest(tt["stagedAnchorBundle"])
         self.final_d = None if tt["finalAnchorBundle"] is None else anchor_digest(tt["finalAnchorBundle"])
         self.kinds = {m["nodeID"]: m["kind"] for m in doc["members"]}
+        pin = doc["operationManifest"]
+        self.manifest_digest = None if pin is None else pin["digest"]
+
+    def audits(self, entries: list[dict], op_id: str) -> int | None:
+        """Entries for ``op_id`` under this manifest; None when the opID appears under another manifest."""
+        if any(e["opID"] == op_id and e["manifestDigest"] != self.manifest_digest for e in entries):
+            return None
+        return sum(e == {"manifestDigest": self.manifest_digest, "opID": op_id} for e in entries)
 
     def fresh(self, observed_at: str | None, received_at: str | None, nonce: str | None) -> bool:
         """Answers this challenge, received by the CP (trusted clock) after issuance and within the
@@ -941,7 +960,9 @@ def op_state(doc: dict, op: dict, ctx: _Context | None = None) -> str:
     if kind in ("CHANNEL_CAS", "CHANNEL_PROVISION"):
         if not present:
             return PENDING if kind == "CHANNEL_PROVISION" else CONFLICT
-        audits = row["channelAuditOpIDs"].count(op["opID"])
+        audits = ctx.audits(row["channelAudit"], op["opID"])
+        if audits is None:
+            return CONFLICT  # the same opID audited under a different manifest is never ours
         version, cert = row["channelVersion"], row["channelCertificateSHA256"]
         if version == pre["channelVersion"] and cert == pre["channelCertificateSHA256"] and audits == 0:
             return PENDING
@@ -954,7 +975,9 @@ def op_state(doc: dict, op: dict, ctx: _Context | None = None) -> str:
         if not node_fresh:
             return UNVERIFIED
         floor, installed = row["policyFloor"], row["installedPolicyDigest"]
-        journal = row["policyJournalOpIDs"].count(op["opID"])
+        journal = ctx.audits(row["policyJournal"], op["opID"])
+        if journal is None:
+            return CONFLICT
         if floor is None or floor < pre["policyFloor"]:
             return CONFLICT
         if floor > post["policyFloor"]:
@@ -1255,11 +1278,11 @@ def apply_op(doc: dict, op: dict) -> bool:
         row.update(installedLeafSHA256=post["installedLeafSHA256"], **stamp)
     elif kind in ("CHANNEL_CAS", "CHANNEL_PROVISION"):
         row.update(channelVersion=post["channelVersion"], channelCertificateSHA256=post["channelCertificateSHA256"])
-        row["channelAuditOpIDs"] = row["channelAuditOpIDs"] + [op["opID"]]
+        row["channelAudit"] = row["channelAudit"] + [audit_key(doc, op["opID"])]
     elif kind == "POLICY_PUBLISH":
         row.update(policyFloor=post["policyFloor"], installedPolicyDigest=post["installedPolicyDigest"],
                    installedPolicyNotAfter=post["installedPolicyNotAfter"], **stamp)
-        row["policyJournalOpIDs"] = row["policyJournalOpIDs"] + [op["opID"]]
+        row["policyJournal"] = row["policyJournal"] + [audit_key(doc, op["opID"])]
     elif kind in ("CP_CONTEXT_SWITCH", "CP_ANCHOR_RETIRE"):
         proc = next(p for p in rb["serving"]["processes"] if p["processID"] == target)
         proc.update({k: v for k, v in post.items()}, observedAt=observed_at, receivedAt=observed_at,
@@ -1273,9 +1296,9 @@ def apply_op(doc: dict, op: dict) -> bool:
         member = next(m for m in doc["members"] if m["nodeID"] == target)
         rb["members"].append({
             "nodeID": target, "reservationDigest": post["reservationDigest"],
-            "channelVersion": 0, "channelCertificateSHA256": None, "channelAuditOpIDs": [],
+            "channelVersion": 0, "channelCertificateSHA256": None, "channelAudit": [],
             "policyFloor": 0, "installedPolicyDigest": None, "installedPolicyNotAfter": None,
-            "policyJournalOpIDs": [],
+            "policyJournal": [],
             "installedLeafSHA256": member["plannedLeafSHA256"],
             "stagedAnchorDigest": anchor_digest(doc["trustTransition"]["finalAnchorBundle"]), **stamp})
     elif kind == "SETTLE":

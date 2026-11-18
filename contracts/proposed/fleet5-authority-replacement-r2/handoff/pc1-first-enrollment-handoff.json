@@ -3,7 +3,7 @@
  "fixture": true,
  "activation": "NOT_AUTHORIZED",
  "sourcePlan": "fixtures/positive/p05-complete.json",
- "sourcePlanSHA256": "4da2f75f50e9897c2ddab3cb93cab199b3f6d2b8126348e466a158bafcc87fdc",
+ "sourcePlanSHA256": "1723d0a0055192febf70a96d97cc0c379ccf1984603791eab0e0dced9fa185a7",
  "acceptance": {
   "scope": "FOUR_MEMBER_MIGRATION",
   "members": [
@@ -41,7 +41,7 @@
   ],
   "trustDecisionRef": "fixture:decision/new-trust",
   "excludedPriorCACertificateSHA256": "8de8c2603c7661b7bbf739ef5d3c4671af4acd66bd30c627a47c9a301301fd37",
-  "operationManifestDigest": "8329a82e34c01d2b9e47b489076bd6d99b4a5ff92736aed020b83ed5c8418701"
+  "operationManifestDigest": "eb3092fa9b2819d29ff4b5a3790e30998055ca244b9882ba2fe487aa156cae5d"
  },
  "validity": {
   "evaluatedAt": "2026-11-18T14:00:00Z",
