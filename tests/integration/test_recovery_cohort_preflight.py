@@ -93,6 +93,35 @@ def set_grant(env,binding,column,value):
         sql.Identifier(column)),(value,env.tenant,binding["subject"]))
 
 
+CONTROL_FUNCTION=sql.SQL("FUNCTION pg_catalog.pg_control_system()")
+
+
+def withdraw_control_privilege(env):
+    """PostgreSQL grants EXECUTE on pg_control_system() to PUBLIC by default, so revoking the
+    role's own grant alone leaves the privilege in place. Function ACLs live in this disposable
+    database's pg_proc, so withdraw PUBLIC and any direct grant here, prove it is gone, and
+    return exactly what to restore."""
+    with psycopg.connect(env.owner) as owner:
+        public,direct=owner.execute("""SELECT has_function_privilege('public','pg_catalog.pg_control_system()','EXECUTE'),
+            EXISTS(SELECT 1 FROM pg_proc p,aclexplode(p.proacl) a JOIN pg_roles r ON r.oid=a.grantee
+                   WHERE p.oid='pg_catalog.pg_control_system()'::regprocedure AND r.rolname=%s
+                   AND a.privilege_type='EXECUTE')""",(env.runtime_role,)).fetchone()
+        owner.execute(sql.SQL("REVOKE EXECUTE ON {} FROM PUBLIC").format(CONTROL_FUNCTION))
+        owner.execute(sql.SQL("REVOKE EXECUTE ON {} FROM {}").format(CONTROL_FUNCTION,sql.Identifier(env.runtime_role)))
+        held,=owner.execute("SELECT has_function_privilege(%s,'pg_catalog.pg_control_system()','EXECUTE')",
+                            (env.runtime_role,)).fetchone()
+    assert held is False,"runtime role still holds pg_control_system() through another membership"
+    return {"public":public,"direct":direct}
+
+
+def restore_control_privilege(env,acl):
+    with psycopg.connect(env.owner) as owner:
+        if acl["public"]:
+            owner.execute(sql.SQL("GRANT EXECUTE ON {} TO PUBLIC").format(CONTROL_FUNCTION))
+        if acl["direct"]:
+            owner.execute(sql.SQL("GRANT EXECUTE ON {} TO {}").format(CONTROL_FUNCTION,sql.Identifier(env.runtime_role)))
+
+
 def refused_guard(db,d,binding):
     """The public result stays one code; the guard is recovered from outside the collector."""
     traced=TracingConnection(db)
@@ -119,6 +148,7 @@ def guard_statements(trace):
 def test_cohort_visibility_and_readonly_transaction(request):
     env=request.getfixturevalue("env")
     d,binding,prior=seed_cohort(env)
+    control_acl=None
     try:
         def rows():
             with psycopg.connect(env.owner) as db:
@@ -174,14 +204,11 @@ def test_cohort_visibility_and_readonly_transaction(request):
             negative_codes={}
             negative_guards={}
             for label,candidate,guard,guard_rows in negatives:
-                if label=="control-privilege-revoked" and prior[0]:
-                    negative_guards[label]={"guard":"not-applicable-preexisting-privilege"}
-                    continue
                 if label=="contain-withdrawn":
                     set_grant(env,binding,"can_contain",False)
                 if label=="control-privilege-revoked":
-                    owner_execute(env,sql.SQL("REVOKE EXECUTE ON FUNCTION pg_catalog.pg_control_system() FROM {}").format(
-                        sql.Identifier(env.runtime_role)))
+                    control_acl=withdraw_control_privilege(env)
+                    control_withdrawn=dict(control_acl)
                 if label=="revoked-grant":
                     set_grant(env,binding,"enabled",False)
                 result,_=refused_guard(db,d,candidate)
@@ -191,8 +218,8 @@ def test_cohort_visibility_and_readonly_transaction(request):
                 if label=="contain-withdrawn":
                     set_grant(env,binding,"can_contain",True)
                 if label=="control-privilege-revoked":
-                    owner_execute(env,sql.SQL("GRANT EXECUTE ON FUNCTION pg_catalog.pg_control_system() TO {}").format(
-                        sql.Identifier(env.runtime_role)))
+                    restore_control_privilege(env,control_acl)
+                    control_acl=None
         after=rows()
         assert before==after
         def checksum(items):
@@ -200,9 +227,12 @@ def test_cohort_visibility_and_readonly_transaction(request):
         write_receipt("observations.json",dict(fixture="disposable-postgres-schema0067",hiddenChannelCount=hidden,
             hiddenDisposition=hidden_result["code"],hiddenGuard=hidden_result["guard"],
             bindingNegatives=negative_codes,bindingNegativeGuards=negative_guards,
+            controlPrivilegeWithdrawnFrom=control_withdrawn,
             observed=out["facts"],holds=out["holds"],channelRowsBefore=checksum(before),channelRowsAfter=checksum(after),
             activationAllowed=False))
     finally:
+        if control_acl is not None:
+            restore_control_privilege(env,control_acl)
         restore_privileges(env,prior)
 
 
