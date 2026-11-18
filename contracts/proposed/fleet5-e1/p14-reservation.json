@@ -1,0 +1,14 @@
+{
+  "tenantID": "00000000-0000-4000-8000-0000000000a1",
+  "epoch": "00000000-0000-4000-8000-0000000000e1",
+  "pc": "PC1",
+  "nodeID": "nod_00000000000000000000000PC1",
+  "csrSHA256": "8fb485a6bf8d3c774c04b122a45b811b158f1c1e08146bfc898a306c16d842d7",
+  "planDigest": "f1ca120934a1d7306c18fec2409a015820ae8b6262427a187f38f5559444524d",
+  "fenceToken": "fence:fixture-arp-r2",
+  "rowsReadbackSHA256": "5091dd3e3200648bf983c23a869ddc0065590e64bcc4b6b8478804a87c2a7479",
+  "nodeStateEmpty": {
+    "verified": true,
+    "evidenceRef": "fixture:node-state/pc1-empty"
+  }
+}
