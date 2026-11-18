@@ -85,7 +85,27 @@ Two test bugs found during authoring were corrected:
 - The inventory padding re-added the removed site.
 - The deadline arithmetic counted 10 phases instead of 9.
 
-The full local gate set and hosted runs are recorded in `docs/vault/30_Development/Evidence/fleet5-authority-replacement-r2-20261119-claude/`.
+**Full local gate set.** The argv driver ran 14 gates individually, 2026-11-19 00:58–01:00 KST. **All 14 exited 0**:
+- check_docs (1278 documents)
+- path-citation ratchet against `bb6e028d`
+- contract bindings, frontend integrity, test_sync
+- ontology generation, ontology check, single-source ratchet
+- sync_obsidian `--check` (no apply)
+- the R1 checker and R1 generator `--check`
+- the R2 checker and R2 generator `--check`
+- pytest R1+R2 (379 passed)
+
+Record: `Evidence/fleet5-authority-replacement-r2-20261119-claude/local-gates.json`. It was taken on base `bb6e028d` with the candidate files uncommitted.
+
+**Hosted runs** at exact candidate `14ddc8e9efa198918d433ae1ac21afd66605cb89`, dispatched with correlation IDs `ar-r2-14ddc8e9-*`:
+
+| Workflow | Run | State at handoff |
+|---|---|---|
+| Docs | 44342327704 | **success** |
+| Core | 44342335017 | in progress; job s01-storage-roundtrip success, job `core` still running |
+| Backend | 44342342100 | in progress; mlflow-live success, 3.12 and 3.14 still running |
+
+The local run watcher was stopped by the host for low memory and was not restarted. `hosted-ci.json` is therefore a snapshot taken at handoff. Core and Backend have **no verdict recorded yet** and must be confirmed at the exact SHA before the candidate counts as hosted-verified.
 
 ## Next
 

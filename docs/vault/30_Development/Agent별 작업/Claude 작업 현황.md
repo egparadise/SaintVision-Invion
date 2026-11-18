@@ -42,7 +42,13 @@ source_of_truth: "Git"
   - R2 checker는 98개 문서가 기대 판정과 일치했다. generator `--check` drift는 0이다.
   - pytest는 R2와 R1을 합쳐 379 passed다.
   - 단일 결함 mutant 23개를 모두 kill했다. checker hash는 복원 전후가 같다.
-  - 로컬 게이트 전체와 hosted CI는 `Evidence/fleet5-authority-replacement-r2-20261119-claude/`에 있다. 상세는 [[2026-11-19_FLEET5_Authority_Replacement_Contract_R2_Claude]].
+  - 로컬 게이트 14개가 모두 exit 0이다(`local-gates.json`).
+  - 후보 `14ddc8e9`의 hosted CI는 인계 시점 기준으로 다음과 같다(`hosted-ci.json`, 인계 시점 snapshot).
+    - Docs 44342327704: success
+    - Core 44342335017: 진행 중
+    - Backend 44342342100: 진행 중
+    - Core와 Backend는 아직 판정이 없다. 정확한 SHA에서 확인해야 한다.
+  - 증거 폴더는 `Evidence/fleet5-authority-replacement-r2-20261119-claude/`다. 상세는 [[2026-11-19_FLEET5_Authority_Replacement_Contract_R2_Claude]].
 - **하지 않은 것**:
   - live 자격증명·SSH·DB·Docker·키 접근, 등록, 활성화, canonical sync apply, 운영 cutover
   - Codex custody·preflight 파일과 검토자 worktree 변경

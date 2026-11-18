@@ -1,0 +1,113 @@
+{
+ "schema": "claude-hosted-ci:1",
+ "task": "task_150a776816d0",
+ "candidateSHA": "14ddc8e9efa198918d433ae1ac21afd66605cb89",
+ "branch": "egparadise/fleet5-authority-replacement-r2-20261119",
+ "dispatch": "gh workflow run <wf> --ref <branch> -f correlation_id=ar-r2-14ddc8e9-<wf>",
+ "recordedAtUTC": "2026-11-18T16:05:59+00:00",
+ "note": "Snapshot at worker handoff. Runs still in_progress here have no verdict yet; confirm them at the exact SHA.",
+ "runs": [
+  {
+   "runID": 44342327704,
+   "workflow": "Documentation Build",
+   "displayTitle": "ar-r2-14ddc8e9-docs.yml",
+   "event": "workflow_dispatch",
+   "attempt": 1,
+   "headSha": "14ddc8e9efa198918d433ae1ac21afd66605cb89",
+   "status": "completed",
+   "conclusion": "success",
+   "createdAt": "2026-11-18T16:01:21Z",
+   "updatedAt": "2026-11-18T16:01:58Z",
+   "url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/44342327704",
+   "jobs": [
+    {
+     "name": "docs",
+     "jobID": 134935360942,
+     "status": "completed",
+     "conclusion": "success",
+     "steps": 19,
+     "stepsNotSuccess": [],
+     "stepsPending": 0
+    }
+   ],
+   "pytestSummaryFromJobLog": {}
+  },
+  {
+   "runID": 44342335017,
+   "workflow": "Core Build",
+   "displayTitle": "ar-r2-14ddc8e9-core.yml",
+   "event": "workflow_dispatch",
+   "attempt": 1,
+   "headSha": "14ddc8e9efa198918d433ae1ac21afd66605cb89",
+   "status": "in_progress",
+   "conclusion": "",
+   "createdAt": "2026-11-18T16:01:23Z",
+   "updatedAt": "2026-11-18T16:01:35Z",
+   "url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/44342335017",
+   "jobs": [
+    {
+     "name": "s01-storage-roundtrip",
+     "jobID": 134935393273,
+     "status": "completed",
+     "conclusion": "success",
+     "steps": 16,
+     "stepsNotSuccess": [],
+     "stepsPending": 0
+    },
+    {
+     "name": "core",
+     "jobID": 134935393740,
+     "status": "in_progress",
+     "conclusion": "",
+     "steps": 43,
+     "stepsNotSuccess": [],
+     "stepsPending": 27
+    }
+   ],
+   "pytestSummaryFromJobLog": {}
+  },
+  {
+   "runID": 44342342100,
+   "workflow": "Backend Build",
+   "displayTitle": "ar-r2-14ddc8e9-backend.yml",
+   "event": "workflow_dispatch",
+   "attempt": 1,
+   "headSha": "14ddc8e9efa198918d433ae1ac21afd66605cb89",
+   "status": "in_progress",
+   "conclusion": "",
+   "createdAt": "2026-11-18T16:01:26Z",
+   "updatedAt": "2026-11-18T16:01:31Z",
+   "url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/44342342100",
+   "jobs": [
+    {
+     "name": "mlflow-live",
+     "jobID": 134935417728,
+     "status": "completed",
+     "conclusion": "success",
+     "steps": 9,
+     "stepsNotSuccess": [],
+     "stepsPending": 0
+    },
+    {
+     "name": "backend (3.14)",
+     "jobID": 134935418347,
+     "status": "in_progress",
+     "conclusion": "",
+     "steps": 17,
+     "stepsNotSuccess": [],
+     "stepsPending": 5
+    },
+    {
+     "name": "backend (3.12)",
+     "jobID": 134935418588,
+     "status": "in_progress",
+     "conclusion": "",
+     "steps": 17,
+     "stepsNotSuccess": [],
+     "stepsPending": 5
+    }
+   ],
+   "pytestSummaryFromJobLog": {}
+  }
+ ]
+}
