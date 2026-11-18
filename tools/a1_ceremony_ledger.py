@@ -31,8 +31,22 @@ def _transaction(path, plan, write):
         db.execute("BEGIN IMMEDIATE" if write else "BEGIN")
         current = db.execute("SELECT plan_digest, token, generation FROM fence WHERE singleton=1").fetchone()
         if current != (digest, fence["token"], fence["generation"]):
-            raise ValueError("Writer fence changed")
+            raise _FenceChanged("Writer fence changed")
         yield db, digest
+
+
+def _prepare(db):
+    tables = {row[0] for row in db.execute(
+        "SELECT name FROM sqlite_master WHERE type='table' AND name IN ('ceremony_event','ceremony_conflict')"
+    )}
+    if tables and len(tables) != 2:
+        raise ValueError("Legacy or incomplete ledger requires independent reconciliation")
+    db.execute("""CREATE TABLE IF NOT EXISTS ceremony_event (
+        plan TEXT NOT NULL, event_id TEXT NOT NULL, subject TEXT NOT NULL, fingerprint TEXT NOT NULL,
+        PRIMARY KEY(plan, event_id), UNIQUE(plan, subject))""")
+    db.execute("""CREATE TABLE IF NOT EXISTS ceremony_conflict (
+        plan TEXT NOT NULL, event_id TEXT NOT NULL, subject TEXT NOT NULL, fingerprint TEXT NOT NULL,
+        PRIMARY KEY(plan, event_id, subject, fingerprint))""")
 
 
 def record(path, plan, event_id, subject, fingerprint):
@@ -45,17 +59,7 @@ def record(path, plan, event_id, subject, fingerprint):
     if not isinstance(subject, str):
         raise ValueError("Invalid subject")
     with _transaction(path, plan, True) as (db, digest):
-        tables = {row[0] for row in db.execute(
-            "SELECT name FROM sqlite_master WHERE type='table' AND name IN ('ceremony_event','ceremony_conflict')"
-        )}
-        if tables and len(tables) != 2:
-            raise ValueError("Legacy or incomplete ledger requires independent reconciliation")
-        db.execute("""CREATE TABLE IF NOT EXISTS ceremony_event (
-            plan TEXT NOT NULL, event_id TEXT NOT NULL, subject TEXT NOT NULL, fingerprint TEXT NOT NULL,
-            PRIMARY KEY(plan, event_id), UNIQUE(plan, subject))""")
-        db.execute("""CREATE TABLE IF NOT EXISTS ceremony_conflict (
-            plan TEXT NOT NULL, event_id TEXT NOT NULL, subject TEXT NOT NULL, fingerprint TEXT NOT NULL,
-            PRIMARY KEY(plan, event_id, subject, fingerprint))""")
+        _prepare(db)
         previous = db.execute("SELECT subject, fingerprint FROM ceremony_event WHERE plan=? AND event_id=?",
                               (digest, event_id)).fetchone()
         if previous == (subject, fingerprint):
@@ -67,6 +71,12 @@ def record(path, plan, event_id, subject, fingerprint):
                                   (digest, event_id, subject, fingerprint))
             if inserted.rowcount:
                 return
+        if subject and expected.get(subject) == fingerprint and not ca_present and not previous:
+            db.execute("""CREATE TABLE IF NOT EXISTS ceremony_early_leaf (
+                plan TEXT, event_id TEXT, subject TEXT, fingerprint TEXT,
+                PRIMARY KEY(plan,event_id,subject,fingerprint))""")
+            db.execute("INSERT OR IGNORE INTO ceremony_early_leaf VALUES (?,?,?,?)",
+                       (digest, event_id, subject, fingerprint))
         db.execute("INSERT OR IGNORE INTO ceremony_conflict VALUES (?, ?, ?, ?)",
                    (digest, event_id, subject, fingerprint))
     # Surface the conflict only after its transaction commits.
@@ -80,8 +90,81 @@ def readback(path, plan):
         rows = db.execute("SELECT subject, fingerprint FROM ceremony_event WHERE plan=? ORDER BY subject",
                           (digest,)).fetchall()
         conflict = db.execute("SELECT 1 FROM ceremony_conflict WHERE plan=? LIMIT 1", (digest,)).fetchone()
-        if conflict or dict(rows) != expected or len(rows) != len(expected):
+        zero_table = db.execute("SELECT 1 FROM sqlite_master WHERE type='table' AND name='ceremony_zero'").fetchone()
+        zero = zero_table and db.execute("SELECT 1 FROM ceremony_zero WHERE plan=? LIMIT 1", (digest,)).fetchone()
+        if zero or conflict or dict(rows) != expected or len(rows) != len(expected):
             raise ValueError("Incomplete or conflicting ceremony evidence")
         return {"caKeysCreated": 1, "signed": [
             {"subject": subject, "leafSHA256": fingerprint} for subject, fingerprint in rows if subject
         ]}
+
+
+def attest_zero(path, plan, observation_id):
+    """Record the stable reference to an explicit synthetic zero-key custody observation."""
+    _expected(plan)
+    if not isinstance(observation_id, str) or not observation_id.strip():
+        raise ValueError("Missing zero-key observation reference")
+    with _transaction(path, plan, True) as (db, binding):
+        _prepare(db)
+        db.execute("""CREATE TABLE IF NOT EXISTS ceremony_zero (
+            plan TEXT, observation_id TEXT, PRIMARY KEY(plan, observation_id))""")
+        db.execute("INSERT OR IGNORE INTO ceremony_zero VALUES (?,?)", (binding, observation_id))
+
+
+class _FenceChanged(ValueError):
+    pass
+
+
+def inspect(path, plan):
+    """Fail closed on unavailable storage and stale ownership."""
+    try:
+        return _inspect(path, plan)
+    except _FenceChanged:
+        hold = "HOLD_WRITER_FENCE"
+    except sqlite3.Error:
+        hold = "HOLD_DB_READBACK_REQUIRED"
+    return {"hold": hold, "state": "unavailable", "ceremonyLog": None,
+            "zeroObservations": [], "conflicts": [], "reconciled": []}
+
+
+def _inspect(path, plan):
+    """Read one fenced synthetic snapshot. No classification grants recovery authority."""
+    expected = _expected(plan)
+    custody = "HOLD_CUSTODY_UNRESOLVED"
+    result = {"hold": custody, "state": "absent", "ceremonyLog": None,
+              "zeroObservations": [], "conflicts": [], "reconciled": []}
+    with _transaction(path, plan, False) as (db, binding):
+        tables = {name for name, in db.execute("SELECT name FROM sqlite_master WHERE type='table'")}
+        if "ceremony_event" not in tables and "ceremony_conflict" not in tables:
+            return result
+        events = db.execute("SELECT event_id,subject,fingerprint FROM ceremony_event WHERE plan=? ORDER BY subject",
+                            (binding,)).fetchall()
+        conflicts = db.execute("SELECT event_id,subject,fingerprint FROM ceremony_conflict WHERE plan=? ORDER BY 1,2,3",
+                               (binding,)).fetchall()
+        early = set()
+        if "ceremony_early_leaf" in tables:
+            early.update(db.execute("SELECT event_id,subject,fingerprint FROM ceremony_early_leaf WHERE plan=?", (binding,)))
+        if "ceremony_zero" in tables:
+            result["zeroObservations"] = [ref for ref, in db.execute(
+                "SELECT observation_id FROM ceremony_zero WHERE plan=? ORDER BY observation_id", (binding,))]
+    observed = {subject: fingerprint for _, subject, fingerprint in events}
+    # A committed exact replay after CA arrival links the original refusal to an accepted event.
+    # Older refusals without recorded ordering provenance stay unresolved.
+    reconciled = early.intersection(events, conflicts)
+    unresolved = set(conflicts) - reconciled
+    result.update(conflicts=conflicts, reconciled=sorted(reconciled))
+    if result["zeroObservations"] and (events or conflicts):
+        result["state"] = "conflicting"
+    elif unresolved:
+        result["state"] = "conflicting"
+        if all(subject for _, subject, _ in unresolved):
+            result["hold"] = ("HOLD_FOREIGN_WRITER" if any(expected.get(s) != f for _, s, f in unresolved)
+                              else "HOLD_DUPLICATE_EVIDENCE" if all(s in observed for _, s, _ in unresolved)
+                              else custody)
+    elif result["zeroObservations"]:
+        result.update(state="zero", ceremonyLog={"caKeysCreated": 0, "signed": []})
+    elif events and observed.get("") == expected[""] and all(expected.get(s) == f for s, f in observed.items()):
+        result.update(state="complete" if observed == expected else "partial",
+                      ceremonyLog={"caKeysCreated": 1, "signed": [
+                          {"subject": s, "leafSHA256": f} for _, s, f in events if s]})
+    return result

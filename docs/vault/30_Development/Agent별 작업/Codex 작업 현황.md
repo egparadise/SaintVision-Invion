@@ -1,15 +1,17 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.511"
+version: "1.0.512"
 status: "review"
 author: "Codex"
-updated: "2026-11-19T06:35:00+09:00"
+updated: "2026-11-19T07:23:40+09:00"
 source_of_truth: "Git"
 active_card: "FLEET5 continued supervision with PORTAL-REFRESH-FLEET-20261106"
 active_card_status: "MainTransportAutoReconnectVerified6.561s_LogonRegistered_RebootNotRun; PC234SSHAndSystemdAndNodeRestartPolicyVerified_PC1Still255; CodeRetryAndWholePercentAuditReady_CAterminalNoLiveRecovery"
 active_card_next: "Seal Root544 exact Docs and canonical sync; capture new fullstate baseline; actual sameTask retry fresh isolated Orca workspace with temporalCAterminal correction; actual Claude independently audits percent, initialplan and operator transport. Await PC1 nonsecret auth diagnosis. No sameCA bypass or DB reset."
 ---
+
+Codex task_725811f0bfaf on review base cfbd678c, agent/codex/fleet5-runtime-a1-986a845b. Synthetic ceremony classification and exact replay inspection. Claude independent review pending. [[2026-11-19_FLEET5_A1_Ceremony_Inspection]]
 
 task_3b5339418900 on agent/codex/fleet5-runtime-a1-986a845b, review base bdf737d8. Synthetic R2 validation and fenced conflict persistence implemented. Next reviewer Claude. [[2026-11-19_FLEET5_A1_Runtime_Fence]]
 

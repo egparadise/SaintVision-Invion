@@ -1,0 +1,78 @@
+{
+  "base": "cfbd678cadbd9dd5a46d2278a357b3985e56f9e8",
+  "python": "3.14.7",
+  "gates": [
+    {
+      "command": "python -m pytest -q tests/core/test_a1_ceremony_ledger.py tests/core/test_a1_writer_fence.py tests/core/test_fleet5_authority_replacement_r2.py tests/core/test_serving_anchors.py tests/test_route_coverage.py tests/test_lan_leaf_rotation.py tests/test_intranet_pki.py",
+      "exit": 0,
+      "tail": [
+        "........................................................................ [ 97%]",
+        "..............                                                           [100%]",
+        "518 passed in 91.34s (0:01:31)"
+      ],
+      "kst": "2026-11-19T07:26:29.182028+09:00"
+    },
+    {
+      "command": "python tools/check_docs.py",
+      "exit": 0,
+      "tail": [
+        "PASS: 24 original hashes, 1287 versioned documents, wiki links, 48 tasks, 12 outcomes, owner/reviewer/skills, dependency DAG."
+      ],
+      "kst": "2026-11-19T07:28:17.705937+09:00"
+    },
+    {
+      "command": "python tools/check_ontology.py",
+      "exit": 0,
+      "tail": [
+        "PASS: RDF parsing, defined terms, TTL/JSON-LD equivalence, 48 task mappings, positive SHACL, 4 rejected invalid fixtures, 4 competency queries, Obsidian mirrors."
+      ],
+      "kst": "2026-11-19T07:28:20.109463+09:00"
+    },
+    {
+      "command": "python tools/sync_obsidian.py --check",
+      "exit": 0,
+      "tail": [
+        "CHECK: 3845 managed files, 53 pending exports, 0 conflicts. No writes."
+      ],
+      "kst": "2026-11-19T07:28:50.594630+09:00"
+    },
+    {
+      "command": "python tools/check_contract_bindings.py",
+      "exit": 0,
+      "tail": [
+        "PASS check_contract_bindings: 57 fixtures each referenced by a test; 21 bound kernel response TYPES each have >=1 serving-anchor test (counted PER TYPE, not per anchor SITE: those types occupy 27 anchor sites; a multi-site type counts covered even if only one site is tested -- site-level weight is not decidable here, use tools/check_anchor_weight.py + the mutation harness); 14 replay guards present.",
+        "  UNIT NOTE: TYPE count <= SITE count. Multi-site types (per-type coverage can mask an untested site): ApprovalView(2 sites: ['approvals']), BusinessBindingView(2 sites: ['business_handoff']), BusinessEditLockReleaseView(2 sites: ['business_handoff']), BusinessEditLockView(2 sites: ['business_handoff']), ControlRunDetail(3 sites: ['control']), ControlRunView(2 sites: ['control']), EvidenceEnvelope(6 sites: ['build_governance', 'results', 'runs', 'shard_completion', 'storage_commit', 'storage_view']), ModelExecutionManifestObservation(2 sites: ['model_uri_resolver', 'model_view']), NodeExecutionPermit(2 sites: ['node_execution', 'node_transport']), NodeResourceSnapshot(4 sites: ['capacity', 'gpu', 'observation']), WorkspaceCheckoutView(2 sites: ['workspace_recovery']), WorkspaceEnqueueResult(3 sites: ['workspace_api']), WorkspacePrepareResult(2 sites: ['workspace_api']), WorkspaceRestoreView(2 sites: ['workspace_recovery']), WorkspaceStartEnqueueResult(3 sites: ['workspace_start']), WorkspaceStartPrepareResult(2 sites: ['workspace_start'])",
+        "  (Reporting sites is not a regression -- the TYPE number never meant 'sites verified'; this makes the counting unit explicit. EvidenceEnvelope-class multi-site anchors are why.)"
+      ],
+      "kst": "2026-11-19T07:29:01.378302+09:00"
+    },
+    {
+      "command": "python tools/check_frontend_integrity.py",
+      "exit": 0,
+      "tail": [
+        "Scanning 94 frontend production source files under apps/web/src ...",
+        "",
+        "PASS Frontend Integrity Check: all 9 integrity rules satisfied (0 violations)."
+      ],
+      "kst": "2026-11-19T07:29:02.631983+09:00"
+    },
+    {
+      "command": "python tools/check_doc_single_source.py --ratchet",
+      "exit": 0,
+      "tail": [
+        "PASS check_doc_single_source --ratchet: 16 pairs, all in baseline, none stale."
+      ],
+      "kst": "2026-11-19T07:29:03.506947+09:00"
+    },
+    {
+      "command": "python tools/check_response_freshness.py",
+      "exit": 0,
+      "tail": [
+        "  ok      saintvision:NodeResponse.lastHeartbeatAt",
+        "  ok      saintvision:ReplicaObservationResponse.observedAt",
+        "  (structural floor only. Whether a NEW response is freshness-critical is human judgment -- review this map when responses are added. Staleness behaviour needs a clock-advance test with PG.)"
+      ],
+      "kst": "2026-11-19T07:29:03.717009+09:00"
+    }
+  ]
+}

@@ -130,3 +130,56 @@ def test_legacy_observations_require_reconciliation(ceremony):
         ledger.record(path, plan, "key", "", key)
     with pytest.raises(sqlite3.OperationalError):
         ledger.readback(path, plan)
+
+
+def test_zero_requires_explicit_observation(ceremony):
+    path, plan, owner = ceremony
+    assert ledger.inspect(path, plan)["state"] == "absent"
+    assert ledger.inspect(path, plan)["ceremonyLog"] is None
+    for _ in range(2):
+        ledger.attest_zero(path, plan, "custody-001")
+    result = ledger.inspect(path, plan)
+    assert result["zeroObservations"] == ["custody-001"]
+    assert result["ceremonyLog"] == {"caKeysCreated": 0, "signed": []}
+    ledger.record(path, plan, "key", "", plan["newAuthority"]["caPublicKeySHA256"])
+    for leaf in plan["checkpoint"]["readback"]["ceremonyLog"]["signed"]:
+        ledger.record(path, plan, leaf["subject"], leaf["subject"], leaf["leafSHA256"])
+    assert ledger.inspect(path, plan)["state"] == "conflicting"
+    with pytest.raises(ValueError):
+        ledger.readback(path, plan)
+    fence.transfer(path, owner, "next", "token")
+    assert ledger.inspect(path, plan)["hold"] == "HOLD_WRITER_FENCE"
+    with pytest.raises(ValueError):
+        ledger.attest_zero(path, plan, "stale")
+
+
+def test_ordering_reconciliation_survives_restart(ceremony):
+    path, plan, _ = ceremony
+    leaf = plan["checkpoint"]["readback"]["ceremonyLog"]["signed"][0]
+    args = ("stable", leaf["subject"], leaf["leafSHA256"])
+    with pytest.raises(ValueError):
+        ledger.record(path, plan, *args)
+    ledger.record(path, plan, "key", "", plan["newAuthority"]["caPublicKeySHA256"])
+    assert ledger.inspect(path, plan)["ceremonyLog"] is None
+    for _ in range(2):
+        ledger.record(path, plan, *args)
+    script = """
+import json, sys
+from pathlib import Path
+from tools.a1_ceremony_ledger import inspect
+print(json.dumps(inspect(sys.argv[1], json.loads(Path(sys.argv[2]).read_bytes()))))
+"""
+    result = json.loads(subprocess.check_output([sys.executable, "-c", script, str(path), str(FIXTURE)],
+                                                cwd=Path(__file__).resolve().parents[2]))
+    assert result["state"] == "partial"
+    assert result["conflicts"] == result["reconciled"] == [list(args)]
+    assert result["ceremonyLog"] == {"caKeysCreated": 1, "signed": [leaf]}
+    with pytest.raises(ValueError):
+        ledger.record(path, plan, "new-id", *args[1:])
+    assert ledger.inspect(path, plan)["hold"] == "HOLD_DUPLICATE_EVIDENCE"
+    with pytest.raises(ValueError):
+        ledger.record(path, plan, "new-id", "foreign", args[-1])
+    assert ledger.inspect(path, plan)["hold"] == "HOLD_FOREIGN_WRITER"
+    with pytest.raises(ValueError):
+        ledger.record(path, plan, "second", "", plan["newAuthority"]["caPublicKeySHA256"])
+    assert ledger.inspect(path, plan)["hold"] == "HOLD_CUSTODY_UNRESOLVED"
