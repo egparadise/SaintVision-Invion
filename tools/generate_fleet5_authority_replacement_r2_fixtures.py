@@ -156,6 +156,7 @@ INVENTORY = [
     {"site": "storage_check_collector", "processID": "storage-check-cli", "kind": "INVOKED_CLIENT"},
 ]
 NONCE = "fixture-challenge-0001"
+FENCE_GENERATION = 7
 
 
 def prior_ca(doc: dict):
@@ -210,6 +211,14 @@ def enrollment_member(doc: dict) -> dict:
 def empty_readback(db: bool = True, epoch: str | None = EPOCH, custody: str = "NOT_READ") -> dict:
     return {"dbAvailable": db, "epoch": epoch, "custodyState": custody, "writerFence": None,
             "journalManifestDigest": None, "ceremonyLog": None, "members": [], "reservations": [], "serving": None}
+
+
+def live_fence(doc: dict, resume_at: str, **override) -> dict:
+    """The live writer-fence row as held by this plan, read 30 s before resumeAt."""
+    fence = {"token": doc["writerFence"]["token"], "generation": doc["writerFence"]["generation"],
+             "holderPlanDigest": checker.plan_digest(doc), "readAt": _iso(_ts(resume_at) - timedelta(seconds=30))}
+    fence.update(override)
+    return fence
 
 
 def checkpoint(last=None, flight=None, outcome=None, resume_at=OBSERVED, readback=None) -> dict:
@@ -268,7 +277,7 @@ def proposal(name: str, *, mode: str = "TERMINAL_REPLACEMENT", enroll: bool = Tr
         "measuredBudgets": {"source": "MEASURED", "evidenceRef": "fixture:budget/measured",
                             "phaseSeconds": {p: 600 for p in checker.PHASES}},
         "servingBinaryMigration": {"status": "REVIEWED", "reviewRef": "fixture:review/node-binary-migration"},
-        "writerFence": {"token": "fence:fixture-arp-r2"},
+        "writerFence": {"token": "fence:fixture-arp-r2", "generation": FENCE_GENERATION},
         "placement": {"controlPlaneHostPC": "PC3", "excludedPCs": ["PC5"]},
         "controlPlaneClient": {"spiffeURI": cp_uri(TENANT, EPOCH), "keyContinuity": "RETAINED",
                                "publicKeySHA256": spki("cp-client"),
@@ -380,7 +389,7 @@ def initial_readback(doc: dict, resume_at: str) -> dict:
         signed.append({"subject": "control-plane", "leafSHA256": cp["plannedLeafSHA256"]})
     return {"dbAvailable": True, "epoch": doc["preservedEpoch"]["epoch"],
             "custodyState": "NEW_KEY_PRESENT_MATCHES_PLAN",
-            "writerFence": {"token": doc["writerFence"]["token"], "holderPlanDigest": checker.plan_digest(doc)},
+            "writerFence": live_fence(doc, resume_at),
             "journalManifestDigest": None if pin is None else pin["digest"],
             "ceremonyLog": {"caKeysCreated": 1, "signed": signed}, "members": rows, "reservations": [],
             "serving": {"challengeNonce": NONCE, "challengeIssuedAt": _iso(at - timedelta(seconds=60)),
@@ -479,7 +488,9 @@ def positives() -> dict[str, tuple[str, dict]]:
            A["A1"], None, no, A["A2"])
 
     d = proposal("p03-a1-unknown-no-key-abandon")
-    d["checkpoint"] = checkpoint(A["A0"], A["A1"], "UNKNOWN", RESUME, empty_readback(custody="NO_NEW_KEY"))
+    rb = empty_readback(custody="NO_NEW_KEY")
+    rb["writerFence"] = live_fence(d, RESUME)
+    d["checkpoint"] = checkpoint(A["A0"], A["A1"], "UNKNOWN", RESUME, rb)
     add("p03-a1-unknown-no-key-abandon", "Ceremony interrupted; custody proves no new key exists: abandon is safe.",
         expect(d, "ABANDON_BEFORE_NEW_TRUST"))
 
@@ -643,6 +654,30 @@ def positives() -> dict[str, tuple[str, dict]]:
            "F5: A7 in flight; PC2 and observer-1 retired the prior anchor: retire the rest, then observe.",
            A["A6"], A["A7"], lambda op: op["target"] in ids("PC2") | {"observer-1"} and op["kind"] != "SETTLE",
            A["A7"], **adv)
+
+    # Review R2 finding 4: the writer fence and the ceremony log gate every A1-in-flight decision.
+    d = ceremony_done("p40-a1-interrupted-fence-transferred-hold")
+    rb = initial_readback(d, RESUME)
+    rb["ceremonyLog"]["signed"] = rb["ceremonyLog"]["signed"][:2]
+    rb["writerFence"].update(token="fence:fixture-other-writer", holderPlanDigest=h("other-plan"))
+    d["checkpoint"] = checkpoint(A["A0"], A["A1"], "UNKNOWN", RESUME, rb)
+    add("p40-a1-interrupted-fence-transferred-hold",
+        "Ceremony interrupted with the planned key present, but another writer now holds the fence: HOLD, never re-sign.",
+        expect(d, "HOLD_WRITER_FENCE"))
+    d = proposal("p41-a1-interrupted-log-absent-hold")
+    rb = initial_readback(d, RESUME)
+    rb["ceremonyLog"] = None
+    d["checkpoint"] = checkpoint(A["A0"], A["A1"], "UNKNOWN", RESUME, rb)
+    add("p41-a1-interrupted-log-absent-hold",
+        "Ceremony interrupted: custody reports a key, the plan records none and there is no ceremony log: HOLD.",
+        expect(d, "HOLD_CUSTODY_UNRESOLVED"))
+    d = proposal("p42-a1-interrupted-no-key-stale-fence-hold")
+    rb = empty_readback(custody="NO_NEW_KEY")
+    rb["writerFence"] = live_fence(d, RESUME, generation=FENCE_GENERATION + 1)
+    d["checkpoint"] = checkpoint(A["A0"], A["A1"], "UNKNOWN", RESUME, rb)
+    add("p42-a1-interrupted-no-key-stale-fence-hold",
+        "Ceremony interrupted with no key, but the fence was re-acquired at a later generation: HOLD, not abandon.",
+        expect(d, "HOLD_WRITER_FENCE"))
     return out
 
 
@@ -960,7 +995,7 @@ def current_instance() -> dict:
         },
         "measuredBudgets": {"source": "UNKNOWN", "evidenceRef": None, "phaseSeconds": {p: None for p in checker.PHASES}},
         "servingBinaryMigration": {"status": "NOT_REVIEWED", "reviewRef": None},
-        "writerFence": {"token": None},
+        "writerFence": {"token": None, "generation": None},
         "placement": {"controlPlaneHostPC": "PC3", "excludedPCs": ["PC5"]},
         "controlPlaneClient": {"spiffeURI": cp_uri(tenant, epoch), "keyContinuity": "RETAINED",
                                "publicKeySHA256": None, "csrDER": None, "priorLeafDER": None, "leafDER": None,

@@ -333,7 +333,7 @@ def plan_digest(doc: dict) -> str:
         "newAuthority": {k: new[k] for k in ("subjectCommonName", "notBefore", "notAfter", "leafValidity",
                                              "trustAuthorization")},
         "trustTransition": {k: doc["trustTransition"][k] for k in ("cutover", "overlap", "targetGeneration")},
-        "writerFence": doc["writerFence"]["token"],
+        "writerFence": {k: doc["writerFence"][k] for k in ("token", "generation")},
         "controlPlaneClient": {"spiffeURI": cp["spiffeURI"], "keyContinuity": cp["keyContinuity"],
                                "publicKeySHA256": cp["publicKeySHA256"], "csrSHA256": csr_sha(cp["csrDER"]),
                                "priorLeafSHA256": prior_leaf_sha(cp), "processInventory": cp["processInventory"]},
@@ -481,8 +481,7 @@ def _nulls(doc: dict) -> list[str]:
     migration = doc["servingBinaryMigration"]
     if migration["status"] != "REVIEWED" or migration["reviewRef"] is None:
         missing.append("servingBinaryMigration")
-    if doc["writerFence"]["token"] is None:
-        missing.append("writerFence.token")
+    missing += [f"writerFence.{k}" for k in ("token", "generation") if doc["writerFence"][k] is None]
     cp = doc["controlPlaneClient"]
     missing += [f"controlPlaneClient.{k}" for k in ("publicKeySHA256", "csrDER", "priorLeafDER", "processInventory")
                 if cp[k] is None]
@@ -1006,12 +1005,38 @@ def deadline_insufficient(doc: dict, resume_phase: str) -> bool:
     return False
 
 
+def fence_held(doc: dict) -> bool:
+    """True only when the live writer fence is held by exactly this plan, at its planned generation,
+    and was read back fresh at resumeAt. Checked before every decision that can write, including
+    the decisions taken while A1 (the ceremony) is in flight."""
+    plan = doc["writerFence"]
+    fence = doc["checkpoint"]["readback"]["writerFence"]
+    if fence is None or plan["token"] is None or plan["generation"] is None:
+        return False  # missing
+    if fence["token"] != plan["token"] or fence["holderPlanDigest"] != plan_digest(doc):
+        return False  # transferred to another writer or another plan
+    if fence["generation"] != plan["generation"]:
+        return False  # stale: the fence was re-acquired after this plan took it
+    if fence["readAt"] is None:
+        return False
+    read, at = _ts(fence["readAt"]), _ts(doc["checkpoint"]["resumeAt"])
+    return read <= at and (at - read).total_seconds() <= FRESHNESS_SECONDS
+
+
+def _a1_custody_hold(doc: dict) -> str | None:
+    """A1 in flight with a key in custody: the plan must record which key, and the log must agree."""
+    new = doc["newAuthority"]
+    if new["certificateDER"] is None or new["caPublicKeySHA256"] is None:
+        return "HOLD_CUSTODY_UNRESOLVED"  # a key exists that the plan never recorded: cannot "match plan"
+    return _ceremony_log_hold(doc, durable_a1=False)
+
+
 def _ceremony_log_hold(doc: dict, durable_a1: bool) -> str | None:
     log = doc["checkpoint"]["readback"]["ceremonyLog"]
     if log is None:
-        return "HOLD_CUSTODY_UNRESOLVED"
-    if log["caKeysCreated"] > 1:
-        return "HOLD_CUSTODY_UNRESOLVED"  # a second CA key was generated "to be safe"
+        return "HOLD_CUSTODY_UNRESOLVED"  # no log: what was signed is unknown
+    if log["caKeysCreated"] != 1:
+        return "HOLD_CUSTODY_UNRESOLVED"  # a second CA key "to be safe", or a key custody cannot account for
     planned = {m["nodeID"]: m["plannedLeafSHA256"] for m in doc["members"]}
     planned["control-plane"] = doc["controlPlaneClient"]["plannedLeafSHA256"]
     signed = [(s["subject"], s["leafSHA256"]) for s in log["signed"]]
@@ -1044,6 +1069,8 @@ def recovery_action(doc: dict) -> tuple[str, str | None, list[str], list[str]]:
         return "HOLD_DB_READBACK_REQUIRED", None, *none
     if rb["epoch"] != doc["preservedEpoch"]["epoch"]:
         return "HOLD_EPOCH_DIVERGED", None, *none
+    if not fence_held(doc):  # before any custody, ceremony or resume decision, A1 in flight included
+        return "HOLD_WRITER_FENCE", None, *none
     custody = rb["custodyState"]
     if li < A1:  # A1 in flight
         if outcome in ("FAILED_BEFORE_MUTATION", "UNKNOWN") and custody == "NO_NEW_KEY":
@@ -1055,10 +1082,9 @@ def recovery_action(doc: dict) -> tuple[str, str | None, list[str], list[str]]:
     if _duplicates(rb):
         return "HOLD_DUPLICATE_EVIDENCE", None, *none
     if li < A1:  # A1 in flight with the planned key present: deterministic re-signing only
-        if ceremony_present(doc) or (rb["ceremonyLog"] and rb["ceremonyLog"]["signed"]):
-            hold = _ceremony_log_hold(doc, durable_a1=False)
-            if hold:
-                return hold, None, *none
+        hold = _a1_custody_hold(doc)  # always: an absent log or unrecorded key is never "nothing to check"
+        if hold:
+            return hold, None, *none
         if deadline_insufficient(doc, "A1_NEW_TRUST_AUTHORIZED"):
             return "HOLD_DEADLINE_INSUFFICIENT", None, *none
         return "RESUME_FORWARD", "A1_NEW_TRUST_AUTHORIZED", *none
@@ -1069,9 +1095,6 @@ def recovery_action(doc: dict) -> tuple[str, str | None, list[str], list[str]]:
     manifest = expected_manifest(doc)
     if pinned is None or manifest is None or pinned != manifest_pin(doc):
         return "HOLD_MANIFEST_MISMATCH", None, *none
-    fence = rb["writerFence"]
-    if fence is None or fence["token"] != doc["writerFence"]["token"] or fence["holderPlanDigest"] != manifest["planDigest"]:
-        return "HOLD_WRITER_FENCE", None, *none
     if rb["journalManifestDigest"] != manifest["digest"]:
         return "HOLD_MANIFEST_MISMATCH", None, *none
     ctx = _Context(doc)
@@ -1176,10 +1199,14 @@ def execute_resume(doc: dict) -> tuple[dict, list[str]]:
     action, phase, apply, _ = recovery_action(doc)
     if action != "RESUME_FORWARD":
         raise ValueError(f"not resumable: {action}")
+    if not fence_held(doc):  # defence in depth: the model never writes without the live fence
+        raise ExecutorConflict("writer fence not held")
     new = copy.deepcopy(doc)
     mutations: list[str] = []
     if phase == "A1_NEW_TRUST_AUTHORIZED":
         log = new["checkpoint"]["readback"]["ceremonyLog"]
+        if log is None:
+            raise ExecutorConflict("no ceremony log")
         signed = {(s["subject"], s["leafSHA256"]) for s in log["signed"]}
         wanted = [(m["nodeID"], m["plannedLeafSHA256"]) for m in new["members"]]
         wanted.append(("control-plane", new["controlPlaneClient"]["plannedLeafSHA256"]))

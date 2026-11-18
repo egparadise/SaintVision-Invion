@@ -98,7 +98,8 @@
   "reviewRef": "fixture:review/node-binary-migration"
  },
  "writerFence": {
-  "token": "fence:fixture-arp-r2"
+  "token": "fence:fixture-arp-r2",
+  "generation": 7
  },
  "placement": {
   "controlPlaneHostPC": "PC3",
@@ -281,7 +282,7 @@
     "pc": "PC1",
     "nodeID": "nod_00000000000000000000000PC1",
     "csrSHA256": "8fb485a6bf8d3c774c04b122a45b811b158f1c1e08146bfc898a306c16d842d7",
-    "planDigest": "98023eb7da01fd50b27d9b26b92f64072ab3820bbb40eea8ed3442ec4a2f8a09",
+    "planDigest": "d52c633529d921c4ed948691a2ac99b7f9c56b2c3c866a95e2180219da16d7a7",
     "fenceToken": "fence:fixture-arp-r2",
     "rowsReadbackSHA256": "5091dd3e3200648bf983c23a869ddc0065590e64bcc4b6b8478804a87c2a7479",
     "nodeStateEmpty": {
@@ -329,8 +330,8 @@
   ]
  },
  "operationManifest": {
-  "planDigest": "98023eb7da01fd50b27d9b26b92f64072ab3820bbb40eea8ed3442ec4a2f8a09",
-  "digest": "6773d6c193ed7277478c2ba685aee2c6069739870cc3ceebfd3c6444ae52a080",
+  "planDigest": "d52c633529d921c4ed948691a2ac99b7f9c56b2c3c866a95e2180219da16d7a7",
+  "digest": "d65ba5548f36b3d2c02e5c92435b62e848a32307f03689bb7c28b059843af4f9",
   "operationCount": 26
  },
  "checkpoint": {

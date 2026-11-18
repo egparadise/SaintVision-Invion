@@ -205,6 +205,21 @@
    "why": "F5: A7 in flight; PC2 and observer-1 retired the prior anchor: retire the rest, then observe."
   },
   {
+   "path": "fixtures/positive/p40-a1-interrupted-fence-transferred-hold.json",
+   "codes": [],
+   "why": "Ceremony interrupted with the planned key present, but another writer now holds the fence: HOLD, never re-sign."
+  },
+  {
+   "path": "fixtures/positive/p41-a1-interrupted-log-absent-hold.json",
+   "codes": [],
+   "why": "Ceremony interrupted: custody reports a key, the plan records none and there is no ceremony log: HOLD."
+  },
+  {
+   "path": "fixtures/positive/p42-a1-interrupted-no-key-stale-fence-hold.json",
+   "codes": [],
+   "why": "Ceremony interrupted with no key, but the fence was re-acquired at a later generation: HOLD, not abandon."
+  },
+  {
    "path": "fixtures/rejection/r01-new-ca-is-prior.json",
    "codes": [
     "AR-PRIOR-REUSE"

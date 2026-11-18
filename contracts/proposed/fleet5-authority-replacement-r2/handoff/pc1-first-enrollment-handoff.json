@@ -3,7 +3,7 @@
  "fixture": true,
  "activation": "NOT_AUTHORIZED",
  "sourcePlan": "fixtures/positive/p05-complete.json",
- "sourcePlanSHA256": "9437226cf30f3182978342235f758b9f8f2fb97fdeb7d95aa9e27027f6aee4d1",
+ "sourcePlanSHA256": "d08fb6764745b49d06e81819e1fa382fc05dee33f7439a7fef2f11c0555da2e8",
  "acceptance": {
   "scope": "FOUR_MEMBER_MIGRATION",
   "members": [
@@ -26,7 +26,7 @@
   "epoch": "00000000-0000-4000-8000-0000000000e1",
   "nodePublicKeySHA256": "2bb5160bc0f106fb82a8717426a4fc37ff6afe49cfab7bf6e9ee089d30542520",
   "leafCertificateSHA256": "3be50dc4c06ddbfe7ce6dda36bb8d12ea0d37b1c7c8b766b3ac5157ede7694d6",
-  "reservationDigest": "1f80bdad0926bb03116a5bfbec339e6f5685bfade3ab6d80f4539163d904948d",
+  "reservationDigest": "cb36e975c59ccabf81e2c52fe0387af5c6073bb93fffb0b20003472eb824a569",
   "channelVersion": 1,
   "policyVersion": 1
  },
@@ -41,7 +41,7 @@
   ],
   "trustDecisionRef": "fixture:decision/new-trust",
   "excludedPriorCACertificateSHA256": "8de8c2603c7661b7bbf739ef5d3c4671af4acd66bd30c627a47c9a301301fd37",
-  "operationManifestDigest": "f739bb572a2dc275760a53403dff69d6b018b04a454f76718c3e4b2093c725f1"
+  "operationManifestDigest": "d4ea3b9203b3bc8b37157c71937da09c7617bdc2d0520866f7fe20becaaebbf8"
  },
  "verifier": {
   "tool": "tools/five_node_lab_preflight.py",

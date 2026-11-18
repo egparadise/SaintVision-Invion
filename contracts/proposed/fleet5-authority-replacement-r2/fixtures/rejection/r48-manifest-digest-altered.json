@@ -98,7 +98,8 @@
   "reviewRef": "fixture:review/node-binary-migration"
  },
  "writerFence": {
-  "token": "fence:fixture-arp-r2"
+  "token": "fence:fixture-arp-r2",
+  "generation": 7
  },
  "placement": {
   "controlPlaneHostPC": "PC3",
@@ -281,7 +282,7 @@
     "pc": "PC1",
     "nodeID": "nod_00000000000000000000000PC1",
     "csrSHA256": "8fb485a6bf8d3c774c04b122a45b811b158f1c1e08146bfc898a306c16d842d7",
-    "planDigest": "e4bd9bac8506a095d92b11a698142218552bf483520dfd0a9e7f369e07955360",
+    "planDigest": "ebb3b8145b94b1040f112e272254070448d4cca16dbf8e022bca318e12dab0f0",
     "fenceToken": "fence:fixture-arp-r2",
     "rowsReadbackSHA256": "5091dd3e3200648bf983c23a869ddc0065590e64bcc4b6b8478804a87c2a7479",
     "nodeStateEmpty": {
@@ -329,7 +330,7 @@
   ]
  },
  "operationManifest": {
-  "planDigest": "e4bd9bac8506a095d92b11a698142218552bf483520dfd0a9e7f369e07955360",
+  "planDigest": "ebb3b8145b94b1040f112e272254070448d4cca16dbf8e022bca318e12dab0f0",
   "digest": "326cbd54ed090e190e027f54f7091b3c1e0fc4bdec5e140f2f139e3fbc74797c",
   "operationCount": 26
  },
@@ -344,9 +345,11 @@
    "custodyState": "NEW_KEY_PRESENT_MATCHES_PLAN",
    "writerFence": {
     "token": "fence:fixture-arp-r2",
-    "holderPlanDigest": "e4bd9bac8506a095d92b11a698142218552bf483520dfd0a9e7f369e07955360"
+    "generation": 7,
+    "holderPlanDigest": "ebb3b8145b94b1040f112e272254070448d4cca16dbf8e022bca318e12dab0f0",
+    "readAt": "2026-11-18T13:59:30Z"
    },
-   "journalManifestDigest": "47132884e629617f4712265629ec215be7d43ee3c223858fc130d95dba05de24",
+   "journalManifestDigest": "ede2286a4a0b8263cb2cee2370e1f52a3e253d318e3cf5995f8bfa1b02ebbe4c",
    "ceremonyLog": {
     "caKeysCreated": 1,
     "signed": [
@@ -485,9 +488,9 @@
   "expectedRecoveryAction": "RESUME_FORWARD",
   "expectedResumePhase": "A2_ANCHOR_STAGED",
   "expectedApply": [
-   "op_8c4fa1e57367d8a9c5f1bcd8",
-   "op_e77ce0f9d6432f443fbc6099",
-   "op_11c9431fb79cfc33d1968885"
+   "op_31a6a75b686619b29c80ccd1",
+   "op_89b07174266385207cb1cc9a",
+   "op_de75a95107a0f00a80cf4566"
   ],
   "expectedAcknowledge": []
  }

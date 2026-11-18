@@ -94,7 +94,8 @@
   "reviewRef": null
  },
  "writerFence": {
-  "token": null
+  "token": null,
+  "generation": null
  },
  "placement": {
   "controlPlaneHostPC": "PC3",

@@ -98,7 +98,8 @@
   "reviewRef": "fixture:review/node-binary-migration"
  },
  "writerFence": {
-  "token": "fence:fixture-arp-r2"
+  "token": "fence:fixture-arp-r2",
+  "generation": 7
  },
  "placement": {
   "controlPlaneHostPC": "PC3",
@@ -281,7 +282,7 @@
     "pc": "PC1",
     "nodeID": "nod_00000000000000000000000PC1",
     "csrSHA256": "8fb485a6bf8d3c774c04b122a45b811b158f1c1e08146bfc898a306c16d842d7",
-    "planDigest": "b914384861dbda3d3d584dfeabcc424c948f8239d75ed8854b4e9105f0f72b79",
+    "planDigest": "8ea0802448f69cdfd64586ede9b012d579d2e5fb27db803f81621048a890fc3c",
     "fenceToken": "fence:fixture-arp-r2",
     "rowsReadbackSHA256": "5091dd3e3200648bf983c23a869ddc0065590e64bcc4b6b8478804a87c2a7479",
     "nodeStateEmpty": {
@@ -329,8 +330,8 @@
   ]
  },
  "operationManifest": {
-  "planDigest": "b914384861dbda3d3d584dfeabcc424c948f8239d75ed8854b4e9105f0f72b79",
-  "digest": "15f80a9bd5416a59e1220d2d693b9ff1607c12421e988ff5e74b44e2365bde89",
+  "planDigest": "8ea0802448f69cdfd64586ede9b012d579d2e5fb27db803f81621048a890fc3c",
+  "digest": "07e6bcb8047dc9007b0ba718b4ea80637a08817f02dd7c664efd091be87e586a",
   "operationCount": 26
  },
  "checkpoint": {
@@ -344,9 +345,11 @@
    "custodyState": "NEW_KEY_PRESENT_MATCHES_PLAN",
    "writerFence": {
     "token": "fence:fixture-arp-r2",
-    "holderPlanDigest": "b914384861dbda3d3d584dfeabcc424c948f8239d75ed8854b4e9105f0f72b79"
+    "generation": 7,
+    "holderPlanDigest": "8ea0802448f69cdfd64586ede9b012d579d2e5fb27db803f81621048a890fc3c",
+    "readAt": "2026-11-18T13:59:30Z"
    },
-   "journalManifestDigest": "15f80a9bd5416a59e1220d2d693b9ff1607c12421e988ff5e74b44e2365bde89",
+   "journalManifestDigest": "07e6bcb8047dc9007b0ba718b4ea80637a08817f02dd7c664efd091be87e586a",
    "ceremonyLog": {
     "caKeysCreated": 1,
     "signed": [
@@ -485,9 +488,9 @@
   "expectedRecoveryAction": "RESUME_FORWARD",
   "expectedResumePhase": "A2_ANCHOR_STAGED",
   "expectedApply": [
-   "op_1541acc43baf184fc995b857",
-   "op_73029aab750b9a491c487b69",
-   "op_070160bcff4f6eeab1c8f9e1"
+   "op_51c77cd51fa99a868d347099",
+   "op_18a747fa4f2a0cd3727069b4",
+   "op_061bfcd312eafcc39fc794b9"
   ],
   "expectedAcknowledge": []
  }

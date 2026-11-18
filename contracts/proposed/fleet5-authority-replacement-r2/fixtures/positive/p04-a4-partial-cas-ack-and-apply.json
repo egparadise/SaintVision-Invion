@@ -98,7 +98,8 @@
   "reviewRef": "fixture:review/node-binary-migration"
  },
  "writerFence": {
-  "token": "fence:fixture-arp-r2"
+  "token": "fence:fixture-arp-r2",
+  "generation": 7
  },
  "placement": {
   "controlPlaneHostPC": "PC3",
@@ -281,7 +282,7 @@
     "pc": "PC1",
     "nodeID": "nod_00000000000000000000000PC1",
     "csrSHA256": "8fb485a6bf8d3c774c04b122a45b811b158f1c1e08146bfc898a306c16d842d7",
-    "planDigest": "4ad622edfb4a86bb9c105530068554b836f71ec2f60e7271deeca16bbb070133",
+    "planDigest": "14ebdef5f003ea11e1f7d37a2b246f8ad76dfd5adcbcfe5971c428b7ae6f05c2",
     "fenceToken": "fence:fixture-arp-r2",
     "rowsReadbackSHA256": "5091dd3e3200648bf983c23a869ddc0065590e64bcc4b6b8478804a87c2a7479",
     "nodeStateEmpty": {
@@ -329,8 +330,8 @@
   ]
  },
  "operationManifest": {
-  "planDigest": "4ad622edfb4a86bb9c105530068554b836f71ec2f60e7271deeca16bbb070133",
-  "digest": "0de0499a1bd5af978993e6c05f9a6a3d12694318ac682ce1e50014efd968d16e",
+  "planDigest": "14ebdef5f003ea11e1f7d37a2b246f8ad76dfd5adcbcfe5971c428b7ae6f05c2",
+  "digest": "c3274d0a7e89ff61d51ba71400bb2e800d1436fb4e23d3b303f33aa0e4558a1d",
   "operationCount": 26
  },
  "checkpoint": {
@@ -344,9 +345,11 @@
    "custodyState": "NEW_KEY_PRESENT_MATCHES_PLAN",
    "writerFence": {
     "token": "fence:fixture-arp-r2",
-    "holderPlanDigest": "4ad622edfb4a86bb9c105530068554b836f71ec2f60e7271deeca16bbb070133"
+    "generation": 7,
+    "holderPlanDigest": "14ebdef5f003ea11e1f7d37a2b246f8ad76dfd5adcbcfe5971c428b7ae6f05c2",
+    "readAt": "2026-11-18T13:59:30Z"
    },
-   "journalManifestDigest": "0de0499a1bd5af978993e6c05f9a6a3d12694318ac682ce1e50014efd968d16e",
+   "journalManifestDigest": "c3274d0a7e89ff61d51ba71400bb2e800d1436fb4e23d3b303f33aa0e4558a1d",
    "ceremonyLog": {
     "caKeysCreated": 1,
     "signed": [
@@ -380,7 +383,7 @@
      "channelVersion": 2,
      "channelCertificateSHA256": "b2ed795a6a875d095c59ebfff631c3511d10e189448c2fcb3eee0d510e9d5cc0",
      "channelAuditOpIDs": [
-      "op_fd8317952f72218ac8a04087"
+      "op_7e4cc72cc0ebf44c4aa7f461"
      ],
      "policyFloor": 2,
      "installedPolicyDigest": "1edf078d8b0045b3bf7b57394e36c486b4a5cff7cc3264b5821c3a03f279de8b",
@@ -487,11 +490,11 @@
   "expectedRecoveryAction": "RESUME_FORWARD",
   "expectedResumePhase": "A4_CHANNEL_CAS",
   "expectedApply": [
-   "op_e5c7de085e68add67b4d155d",
-   "op_917ee9696c4caf19f67a8466"
+   "op_4e63c910bb4a3b722c149363",
+   "op_c58107f55b3c9995f2c09be3"
   ],
   "expectedAcknowledge": [
-   "op_fd8317952f72218ac8a04087"
+   "op_7e4cc72cc0ebf44c4aa7f461"
   ]
  }
 }

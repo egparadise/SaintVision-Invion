@@ -516,6 +516,93 @@ def test_f4_manifest_sample_is_the_frozen_manifest_of_its_source():
     assert cas["pre"]["channelCertificateSHA256"] and cas["post"]["channelCertificateSHA256"]
 
 
+def _a1_in_flight(name: str = "t-a1", *, key: bool = True, outputs: bool = True, signed: int = 2) -> dict:
+    """A1 (the ceremony) interrupted: journal at A0, A1 in flight with an UNKNOWN outcome."""
+    doc = base(name) if outputs else gen.proposal(name)
+    rb = gen.initial_readback(doc, gen.RESUME)
+    rb["ceremonyLog"]["signed"] = rb["ceremonyLog"]["signed"][:signed]
+    if not key:
+        rb["custodyState"] = "NO_NEW_KEY"
+    doc["checkpoint"] = gen.checkpoint(A["A0"], A["A1"], "UNKNOWN", gen.RESUME, rb)
+    return doc
+
+
+_AT = checker._ts(gen.RESUME)
+FENCE_FAULTS = {
+    "missing": lambda f: None,
+    "token-transferred": lambda f: {**f, "token": "fence:fixture-other-writer"},
+    "plan-transferred": lambda f: {**f, "holderPlanDigest": gen.h("other-plan")},
+    "generation-advanced": lambda f: {**f, "generation": f["generation"] + 1},
+    "generation-behind": lambda f: {**f, "generation": f["generation"] - 1},
+    "read-stale": lambda f: {**f, "readAt": checker._iso(_AT - timedelta(seconds=checker.FRESHNESS_SECONDS + 1))},
+    "read-after-resume": lambda f: {**f, "readAt": checker._iso(_AT + timedelta(seconds=1))},
+    "read-unknown": lambda f: {**f, "readAt": None},
+}
+
+
+@pytest.mark.parametrize("key", [True, False], ids=["key-present", "no-key"])
+@pytest.mark.parametrize("fault", FENCE_FAULTS)
+def test_r2f4_interrupted_a1_decides_nothing_outside_the_live_fence(fault, key):
+    """Review R2 finding 4 (high): A1 RESUME was returned before the live fence was compared."""
+    doc = _a1_in_flight(key=key)
+    assert action(doc) == ("RESUME_FORWARD" if key else "ABANDON_BEFORE_NEW_TRUST")
+    rb = doc["checkpoint"]["readback"]
+    rb["writerFence"] = FENCE_FAULTS[fault](rb["writerFence"])
+    assert checker.recovery_action(doc) == ("HOLD_WRITER_FENCE", None, [], [])
+    with pytest.raises(ValueError):  # not resumable: no deterministic re-signing outside the fence
+        checker.execute_resume(doc)
+
+
+def test_r2f4_fence_read_exactly_at_the_freshness_bound_is_held():
+    doc = _a1_in_flight()
+    doc["checkpoint"]["readback"]["writerFence"]["readAt"] = checker._iso(
+        _AT - timedelta(seconds=checker.FRESHNESS_SECONDS))
+    assert action(doc) == "RESUME_FORWARD"
+
+
+@pytest.mark.parametrize("position", ["A4-in-flight", "A7-durable-complete", "E2-in-flight"])
+@pytest.mark.parametrize("fault", ["missing", "generation-advanced", "read-stale"])
+def test_r2f4_every_later_decision_also_requires_the_live_fence(position, fault):
+    doc = {"A4-in-flight": lambda: state(A["A3"], A["A4"]),
+           "A7-durable-complete": lambda: state(A["A7"], enroll=False),
+           "E2-in-flight": lambda: state(A["E1"], A["E2"])}[position]()
+    assert action(doc) in ("RESUME_FORWARD", "COMPLETE")
+    rb = doc["checkpoint"]["readback"]
+    rb["writerFence"] = FENCE_FAULTS[fault](rb["writerFence"])
+    assert action(doc) == "HOLD_WRITER_FENCE"  # COMPLETE is not declared under a lost fence either
+
+
+def test_r2f4_executor_refuses_to_sign_without_the_fence_even_if_told_to_resume(monkeypatch):
+    doc = _a1_in_flight()
+    doc["checkpoint"]["readback"]["writerFence"] = None
+    monkeypatch.setattr(checker, "recovery_action", lambda d: ("RESUME_FORWARD", A["A1"], [], []))
+    with pytest.raises(checker.ExecutorConflict):
+        checker.execute_resume(doc)
+
+
+@pytest.mark.parametrize("outputs", [True, False], ids=["outputs-recorded", "no-outputs"])
+@pytest.mark.parametrize("log", [None, "empty", "zero-keys", "two-keys"])
+def test_r2f4_interrupted_a1_with_a_key_needs_a_consistent_ceremony_log(outputs, log):
+    """R2 skipped log validation when no outputs and no signed entries existed, then the executor
+    dereferenced the absent log. Every such state is now a custody HOLD, never a resume."""
+    doc = _a1_in_flight(outputs=outputs)
+    rb = doc["checkpoint"]["readback"]
+    rb["ceremonyLog"] = {None: None, "empty": {"caKeysCreated": 1, "signed": []},
+                         "zero-keys": {"caKeysCreated": 0, "signed": rb["ceremonyLog"]["signed"]},
+                         "two-keys": {"caKeysCreated": 2, "signed": rb["ceremonyLog"]["signed"]}}[log]
+    want = "RESUME_FORWARD" if (outputs and log == "empty") else "HOLD_CUSTODY_UNRESOLVED"
+    assert action(doc) == want
+    if want != "RESUME_FORWARD":
+        with pytest.raises(ValueError):
+            checker.execute_resume(doc)
+
+
+def test_r2f4_an_unrecorded_key_in_custody_never_matches_the_plan():
+    doc = _a1_in_flight(outputs=False, signed=0)
+    assert doc["newAuthority"]["caPublicKeySHA256"] is None
+    assert action(doc) == "HOLD_CUSTODY_UNRESOLVED"
+
+
 def test_f4_a1_resume_is_deterministic_re_signing():
     doc = load("fixtures/positive/p23-a1-in-flight-key-present-resume.json")
     first, signed = checker.execute_resume(doc)
@@ -565,6 +652,7 @@ def test_f5_successor_must_be_valid_at_use_time():
     for p in doc["checkpoint"]["readback"]["serving"]["processes"]:
         p["observedAt"] = "2026-11-18T14:59:30Z"
     doc["checkpoint"]["readback"]["serving"]["challengeIssuedAt"] = "2026-11-18T14:59:00Z"
+    doc["checkpoint"]["readback"]["writerFence"]["readAt"] = "2026-11-18T14:59:30Z"  # re-read with the rest
     assert action(doc) == "RESUME_FORWARD"
 
 

@@ -98,7 +98,8 @@
   "reviewRef": "fixture:review/node-binary-migration"
  },
  "writerFence": {
-  "token": "fence:fixture-arp-r2"
+  "token": "fence:fixture-arp-r2",
+  "generation": 7
  },
  "placement": {
   "controlPlaneHostPC": "PC3",
@@ -281,7 +282,7 @@
     "pc": "PC1",
     "nodeID": "nod_00000000000000000000000PC1",
     "csrSHA256": "8fb485a6bf8d3c774c04b122a45b811b158f1c1e08146bfc898a306c16d842d7",
-    "planDigest": "dc9c96f998fe5756fd54d4a69f1c9277d4b809c1b3e2fd4d309595de3b3ac6d2",
+    "planDigest": "2698a35310898fcd8d888d83506886a98d43c5f99af14ebdf984d66050cca3b5",
     "fenceToken": "fence:fixture-arp-r2",
     "rowsReadbackSHA256": "5091dd3e3200648bf983c23a869ddc0065590e64bcc4b6b8478804a87c2a7479",
     "nodeStateEmpty": {
@@ -329,8 +330,8 @@
   ]
  },
  "operationManifest": {
-  "planDigest": "dc9c96f998fe5756fd54d4a69f1c9277d4b809c1b3e2fd4d309595de3b3ac6d2",
-  "digest": "ce9aa2150fcb903f9d8f970092d1cebbd7593bd820c9fbad6bda0106917148fd",
+  "planDigest": "2698a35310898fcd8d888d83506886a98d43c5f99af14ebdf984d66050cca3b5",
+  "digest": "038ac361d0866714e0113c49c616c9837ab3f88117cebb1382a782537133051c",
   "operationCount": 26
  },
  "checkpoint": {
@@ -344,9 +345,11 @@
    "custodyState": "NEW_KEY_PRESENT_MATCHES_PLAN",
    "writerFence": {
     "token": "fence:fixture-arp-r2",
-    "holderPlanDigest": "dc9c96f998fe5756fd54d4a69f1c9277d4b809c1b3e2fd4d309595de3b3ac6d2"
+    "generation": 7,
+    "holderPlanDigest": "2698a35310898fcd8d888d83506886a98d43c5f99af14ebdf984d66050cca3b5",
+    "readAt": "2026-11-18T13:59:30Z"
    },
-   "journalManifestDigest": "ce9aa2150fcb903f9d8f970092d1cebbd7593bd820c9fbad6bda0106917148fd",
+   "journalManifestDigest": "038ac361d0866714e0113c49c616c9837ab3f88117cebb1382a782537133051c",
    "ceremonyLog": {
     "caKeysCreated": 1,
     "signed": [
@@ -380,12 +383,12 @@
      "channelVersion": 2,
      "channelCertificateSHA256": "b2ed795a6a875d095c59ebfff631c3511d10e189448c2fcb3eee0d510e9d5cc0",
      "channelAuditOpIDs": [
-      "op_39d5ff88212e9f255a89d5b4"
+      "op_f0c2e682186ffc1426c3ef38"
      ],
      "policyFloor": 3,
      "installedPolicyDigest": "daf7b6e6ed57ba4aa57e48d8f77d2caa70c5ea189a6a7b3e2b135f85faa607aa",
      "policyJournalOpIDs": [
-      "op_20fd9e1877e929b01d804e1a"
+      "op_dc01af2fdb61146c393eab1b"
      ],
      "installedLeafSHA256": "b2ed795a6a875d095c59ebfff631c3511d10e189448c2fcb3eee0d510e9d5cc0",
      "stagedAnchorDigest": "74ff0c7aad69a27e5a334d1d78cde59e29375b8a6ee3c33fe26aee72d6103f81",
@@ -399,12 +402,12 @@
      "channelVersion": 2,
      "channelCertificateSHA256": "1d4f0a321a46a39bdda5c5b6e35591542783ed425b646821cb8163512561cf93",
      "channelAuditOpIDs": [
-      "op_66ee4f1ef0234c32964d58e7"
+      "op_c28155401c2ceafcb4a0bf3f"
      ],
      "policyFloor": 3,
      "installedPolicyDigest": "8e07717072508d38b6584add0a646319161703d32da500a50e5fe30c6d3191a7",
      "policyJournalOpIDs": [
-      "op_c23b11832a5eef18ce2f21fb"
+      "op_0077d0ee25e831be29fd7766"
      ],
      "installedLeafSHA256": "1d4f0a321a46a39bdda5c5b6e35591542783ed425b646821cb8163512561cf93",
      "stagedAnchorDigest": "74ff0c7aad69a27e5a334d1d78cde59e29375b8a6ee3c33fe26aee72d6103f81",
@@ -418,12 +421,12 @@
      "channelVersion": 4,
      "channelCertificateSHA256": "6dc786f0238020f69e7328b35e27b2bf79645a4125162f77ab46f9c39669a98e",
      "channelAuditOpIDs": [
-      "op_b257663d6649631871ab0a8e"
+      "op_1118122b24d1644e24939500"
      ],
      "policyFloor": 6,
      "installedPolicyDigest": "e5cdcc28582ec6360eb3b89a24055fd70453af47cbc5f77c3a3e4906aaf72ec0",
      "policyJournalOpIDs": [
-      "op_dd40e1590def21db3ce06937"
+      "op_3e4aef58db34ec8d13a28153"
      ],
      "installedLeafSHA256": "6dc786f0238020f69e7328b35e27b2bf79645a4125162f77ab46f9c39669a98e",
      "stagedAnchorDigest": "74ff0c7aad69a27e5a334d1d78cde59e29375b8a6ee3c33fe26aee72d6103f81",
@@ -433,7 +436,7 @@
     {
      "nodeID": "nod_00000000000000000000000PC1",
      "rowPresent": true,
-     "reservationDigest": "1b88d049304bbcfa1dcae51507684bdca9c08419e567c44212dbc0a94cdfdde7",
+     "reservationDigest": "ec8265d3d376e2974dd414c208902d932d4859103c1fe45da7ceec7814250d0c",
      "channelVersion": 0,
      "channelCertificateSHA256": null,
      "channelAuditOpIDs": [],
@@ -449,7 +452,7 @@
    "reservations": [
     {
      "nodeID": "nod_00000000000000000000000PC1",
-     "reservationDigest": "1b88d049304bbcfa1dcae51507684bdca9c08419e567c44212dbc0a94cdfdde7",
+     "reservationDigest": "ec8265d3d376e2974dd414c208902d932d4859103c1fe45da7ceec7814250d0c",
      "fenceToken": "fence:fixture-arp-r2"
     }
    ],
@@ -549,7 +552,7 @@
   "expectedRecoveryAction": "RESUME_FORWARD",
   "expectedResumePhase": "E3_ENROLLMENT_CHANNEL_PROVISIONED",
   "expectedApply": [
-   "op_881588d41460d8c6d093c960"
+   "op_ad8ba513937a5c2b73d86d6a"
   ],
   "expectedAcknowledge": []
  }

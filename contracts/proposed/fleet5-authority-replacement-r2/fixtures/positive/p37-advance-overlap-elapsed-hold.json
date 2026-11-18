@@ -102,7 +102,8 @@
   "reviewRef": "fixture:review/node-binary-migration"
  },
  "writerFence": {
-  "token": "fence:fixture-arp-r2"
+  "token": "fence:fixture-arp-r2",
+  "generation": 7
  },
  "placement": {
   "controlPlaneHostPC": "PC3",
@@ -293,8 +294,8 @@
   ]
  },
  "operationManifest": {
-  "planDigest": "287a38708b87683091bdcfe831b7ad44ccb93b7c36257ce73d82230c489aff3c",
-  "digest": "1b3274b099e2039d9d2eb98daacf80780b700c0a6709de4aeed05177eac17726",
+  "planDigest": "7317afb0e77c2db67337aff91fe50556fda4fc10cf6b486ea69acadef8b74627",
+  "digest": "3899ce0f3b2371f46d79d2f390d0eac579b1699d1c1bc510fdc0d4c7c98fba6a",
   "operationCount": 30
  },
  "checkpoint": {
@@ -308,9 +309,11 @@
    "custodyState": "NEW_KEY_PRESENT_MATCHES_PLAN",
    "writerFence": {
     "token": "fence:fixture-arp-r2",
-    "holderPlanDigest": "287a38708b87683091bdcfe831b7ad44ccb93b7c36257ce73d82230c489aff3c"
+    "generation": 7,
+    "holderPlanDigest": "7317afb0e77c2db67337aff91fe50556fda4fc10cf6b486ea69acadef8b74627",
+    "readAt": "2026-11-19T05:39:30Z"
    },
-   "journalManifestDigest": "1b3274b099e2039d9d2eb98daacf80780b700c0a6709de4aeed05177eac17726",
+   "journalManifestDigest": "3899ce0f3b2371f46d79d2f390d0eac579b1699d1c1bc510fdc0d4c7c98fba6a",
    "ceremonyLog": {
     "caKeysCreated": 1,
     "signed": [
@@ -340,7 +343,7 @@
      "channelVersion": 2,
      "channelCertificateSHA256": "b2ed795a6a875d095c59ebfff631c3511d10e189448c2fcb3eee0d510e9d5cc0",
      "channelAuditOpIDs": [
-      "op_f75bc59bfd64e84346116ca3"
+      "op_ad766521b10b12779e232eca"
      ],
      "policyFloor": 2,
      "installedPolicyDigest": "1edf078d8b0045b3bf7b57394e36c486b4a5cff7cc3264b5821c3a03f279de8b",
@@ -357,7 +360,7 @@
      "channelVersion": 2,
      "channelCertificateSHA256": "1d4f0a321a46a39bdda5c5b6e35591542783ed425b646821cb8163512561cf93",
      "channelAuditOpIDs": [
-      "op_3676421a3972e96ae00c1550"
+      "op_44b95a29e85cd689c8785858"
      ],
      "policyFloor": 2,
      "installedPolicyDigest": "337643bf0099b8574d42461802cc808ca4fde84ad1117be1e5c7281256734921",
@@ -374,7 +377,7 @@
      "channelVersion": 4,
      "channelCertificateSHA256": "6dc786f0238020f69e7328b35e27b2bf79645a4125162f77ab46f9c39669a98e",
      "channelAuditOpIDs": [
-      "op_841f2f0533be936b5c0b9f48"
+      "op_7510602ef33e45a71dd43a56"
      ],
      "policyFloor": 5,
      "installedPolicyDigest": "99adecec28daf1e212bc95b5b7ccf6fbf4b9f41d27a56ff7ea22ca4d5a75035a",

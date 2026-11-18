@@ -2,11 +2,11 @@
  "schema": "fleet5-authority-replacement-manifest-sample:2",
  "sourcePlan": "fixtures/positive/p02-a1-durable-resume-anchor-stage.json",
  "manifest": {
-  "planDigest": "3349493772989a406b6f370fbc546f98e8b95e2ab6f9de79c0fa43e9700e0a28",
-  "digest": "235ec655c64770dda57cf0a5abbbcbcce818f119be5d9cea905399d40d3962e4",
+  "planDigest": "46f09c297913b575f94512b20f51e8935f176b92584174e92e125d84891bdedc",
+  "digest": "b9b7c2000cda75262bcdf0ccb97599a635039aaf774f1d494f0f4326a3a998f0",
   "operations": [
    {
-    "opID": "op_0200f145aecb6dd81d91577a",
+    "opID": "op_05021c48f1db4a99e7a35a2e",
     "phase": "A2_ANCHOR_STAGED",
     "kind": "ANCHOR_STAGE",
     "target": "nod_00000000000000000000000PC2",
@@ -21,7 +21,7 @@
     }
    },
    {
-    "opID": "op_3b9e246e43c6c70c777b071a",
+    "opID": "op_b4e478f40e038eaf28740cd7",
     "phase": "A2_ANCHOR_STAGED",
     "kind": "ANCHOR_STAGE",
     "target": "nod_00000000000000000000000PC3",
@@ -36,7 +36,7 @@
     }
    },
    {
-    "opID": "op_86e9375cf6122454d4928616",
+    "opID": "op_c788b89985b472ced005c32f",
     "phase": "A2_ANCHOR_STAGED",
     "kind": "ANCHOR_STAGE",
     "target": "nod_00000000000000000000000PC4",
@@ -51,7 +51,7 @@
     }
    },
    {
-    "opID": "op_d83978272f6534e3fe04b8df",
+    "opID": "op_d1036f6ad4b71eedd97ca06a",
     "phase": "A3_ROTATION_LEAVES_INSTALLED",
     "kind": "LEAF_INSTALL",
     "target": "nod_00000000000000000000000PC2",
@@ -66,7 +66,7 @@
     }
    },
    {
-    "opID": "op_c3a5dc802a3367472559e375",
+    "opID": "op_5bc3b66db891811dc8d315f3",
     "phase": "A3_ROTATION_LEAVES_INSTALLED",
     "kind": "LEAF_INSTALL",
     "target": "nod_00000000000000000000000PC3",
@@ -81,7 +81,7 @@
     }
    },
    {
-    "opID": "op_e4bd4c6accbc278f247dc499",
+    "opID": "op_768be9b192c4d4700a09902d",
     "phase": "A3_ROTATION_LEAVES_INSTALLED",
     "kind": "LEAF_INSTALL",
     "target": "nod_00000000000000000000000PC4",
@@ -96,7 +96,7 @@
     }
    },
    {
-    "opID": "op_7b04caa859143e97dff464a7",
+    "opID": "op_a41a1e397587599e6314d9a1",
     "phase": "A4_CHANNEL_CAS",
     "kind": "CHANNEL_CAS",
     "target": "nod_00000000000000000000000PC2",
@@ -113,7 +113,7 @@
     }
    },
    {
-    "opID": "op_cda3bf2020c387054ada3e9a",
+    "opID": "op_efd3696a20d67132c85b3dc2",
     "phase": "A4_CHANNEL_CAS",
     "kind": "CHANNEL_CAS",
     "target": "nod_00000000000000000000000PC3",
@@ -130,7 +130,7 @@
     }
    },
    {
-    "opID": "op_5d2ce925d07318bd377e4b27",
+    "opID": "op_b06f20415c13f819c09b5e5f",
     "phase": "A4_CHANNEL_CAS",
     "kind": "CHANNEL_CAS",
     "target": "nod_00000000000000000000000PC4",
@@ -147,7 +147,7 @@
     }
    },
    {
-    "opID": "op_9139b8b03c23943b92eb677e",
+    "opID": "op_fe5491b567791ff2a59b4396",
     "phase": "A5_POLICY_PUBLISHED",
     "kind": "POLICY_PUBLISH",
     "target": "nod_00000000000000000000000PC2",
@@ -164,7 +164,7 @@
     }
    },
    {
-    "opID": "op_8bb8316ddfa6eb2b0f1ae4b2",
+    "opID": "op_bad17698fec6eb94ab44dbf7",
     "phase": "A5_POLICY_PUBLISHED",
     "kind": "POLICY_PUBLISH",
     "target": "nod_00000000000000000000000PC3",
@@ -181,7 +181,7 @@
     }
    },
    {
-    "opID": "op_dd8ba3572f92a742bd8c249a",
+    "opID": "op_b91ebfd818f4ae29b8b306e1",
     "phase": "A5_POLICY_PUBLISHED",
     "kind": "POLICY_PUBLISH",
     "target": "nod_00000000000000000000000PC4",
@@ -198,7 +198,7 @@
     }
    },
    {
-    "opID": "op_5a65b8097bdc3bf6469ace02",
+    "opID": "op_5f9ecf5fcdb10721cdc7680d",
     "phase": "A6_CP_CONTEXT_SWITCH",
     "kind": "CP_CONTEXT_SWITCH",
     "target": "observer-1",
@@ -216,7 +216,7 @@
     }
    },
    {
-    "opID": "op_4b5f5fa9e827d9128bbfedd3",
+    "opID": "op_5e1bb6321d9ade5f1c62a838",
     "phase": "A6_CP_CONTEXT_SWITCH",
     "kind": "CP_CONTEXT_SWITCH",
     "target": "delivery-1",
@@ -234,7 +234,7 @@
     }
    },
    {
-    "opID": "op_e707858497c7639c9b346f6e",
+    "opID": "op_0acb4abecc152468edd7a42a",
     "phase": "A6_CP_CONTEXT_SWITCH",
     "kind": "CP_CONTEXT_SWITCH",
     "target": "delivery-2",
@@ -252,7 +252,7 @@
     }
    },
    {
-    "opID": "op_e774f32cef12fcbb3c27ed02",
+    "opID": "op_f17690b539104f0448b071ab",
     "phase": "A6_CP_CONTEXT_SWITCH",
     "kind": "CP_CONTEXT_SWITCH",
     "target": "workspace-1",
@@ -270,7 +270,7 @@
     }
    },
    {
-    "opID": "op_94e9883dde4229af970e99f6",
+    "opID": "op_645d2c5e05fe5f693309697d",
     "phase": "A6_CP_CONTEXT_SWITCH",
     "kind": "CP_CONTEXT_SWITCH",
     "target": "build-product-1",
@@ -288,7 +288,7 @@
     }
    },
    {
-    "opID": "op_ba78d4800b8c59b871b05a04",
+    "opID": "op_c3d1633782801016a5099c1d",
     "phase": "A6_CP_CONTEXT_SWITCH",
     "kind": "CP_CONTEXT_SWITCH",
     "target": "storage-check-cli",
@@ -306,7 +306,7 @@
     }
    },
    {
-    "opID": "op_ba83a8eef52f0408f76435c0",
+    "opID": "op_398c95dacd788763994f0719",
     "phase": "A7_ROTATION_SETTLED",
     "kind": "SETTLE",
     "target": "nod_00000000000000000000000PC2",
@@ -321,7 +321,7 @@
     }
    },
    {
-    "opID": "op_ad36312702b893aca086a3c9",
+    "opID": "op_0602fde733e791be94d2e7bc",
     "phase": "A7_ROTATION_SETTLED",
     "kind": "SETTLE",
     "target": "nod_00000000000000000000000PC3",
@@ -336,7 +336,7 @@
     }
    },
    {
-    "opID": "op_08408a7e1e7266ae24abf46f",
+    "opID": "op_00b55361472e076eef7a66a4",
     "phase": "A7_ROTATION_SETTLED",
     "kind": "SETTLE",
     "target": "nod_00000000000000000000000PC4",
@@ -351,7 +351,7 @@
     }
    },
    {
-    "opID": "op_5a79dbe2909e9174897817f5",
+    "opID": "op_ad837979a94aeb238e050876",
     "phase": "E1_ENROLLMENT_RESERVED",
     "kind": "RESERVE",
     "target": "nod_00000000000000000000000PC1",
@@ -362,11 +362,11 @@
      "reservationDigest": null
     },
     "post": {
-     "reservationDigest": "ae6b3285f029f056801ef16aae9efabc3564799ea65ca252afa9f880e27add18"
+     "reservationDigest": "f6250e4c03393cea251669667a884827f15796860d3c839764abd38e57a106a7"
     }
    },
    {
-    "opID": "op_94fc716271f0eccbf61cab8c",
+    "opID": "op_70666c67ff272b6f28f28380",
     "phase": "E2_ENROLLMENT_ROW_ADMITTED",
     "kind": "ROW_ADMIT",
     "target": "nod_00000000000000000000000PC1",
@@ -378,11 +378,11 @@
     },
     "post": {
      "rowPresent": true,
-     "reservationDigest": "ae6b3285f029f056801ef16aae9efabc3564799ea65ca252afa9f880e27add18"
+     "reservationDigest": "f6250e4c03393cea251669667a884827f15796860d3c839764abd38e57a106a7"
     }
    },
    {
-    "opID": "op_5f079d532931b244e78380dd",
+    "opID": "op_bfbf13e90284eff73bca0476",
     "phase": "E3_ENROLLMENT_CHANNEL_PROVISIONED",
     "kind": "CHANNEL_PROVISION",
     "target": "nod_00000000000000000000000PC1",
@@ -399,7 +399,7 @@
     }
    },
    {
-    "opID": "op_dd7fb529e55d1bf820f6f255",
+    "opID": "op_ca0854ecd340ee302c601cd4",
     "phase": "E4_ENROLLMENT_POLICY_PUBLISHED",
     "kind": "POLICY_PUBLISH",
     "target": "nod_00000000000000000000000PC1",
@@ -416,7 +416,7 @@
     }
    },
    {
-    "opID": "op_be524f3d8339265ff53ee106",
+    "opID": "op_2e0c9991935dbb23063ca329",
     "phase": "E5_ENROLLMENT_SETTLED",
     "kind": "SETTLE",
     "target": "nod_00000000000000000000000PC1",

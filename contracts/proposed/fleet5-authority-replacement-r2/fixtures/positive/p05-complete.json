@@ -98,7 +98,8 @@
   "reviewRef": "fixture:review/node-binary-migration"
  },
  "writerFence": {
-  "token": "fence:fixture-arp-r2"
+  "token": "fence:fixture-arp-r2",
+  "generation": 7
  },
  "placement": {
   "controlPlaneHostPC": "PC3",
@@ -281,7 +282,7 @@
     "pc": "PC1",
     "nodeID": "nod_00000000000000000000000PC1",
     "csrSHA256": "8fb485a6bf8d3c774c04b122a45b811b158f1c1e08146bfc898a306c16d842d7",
-    "planDigest": "26b9f85c093b574bc005c24fbfeda2cb12125f3b1c87af819531fa95815cd761",
+    "planDigest": "f95f72a32f621e347beb9a8ac2e17c206751dd963514d2af80f45caf4b9f3636",
     "fenceToken": "fence:fixture-arp-r2",
     "rowsReadbackSHA256": "5091dd3e3200648bf983c23a869ddc0065590e64bcc4b6b8478804a87c2a7479",
     "nodeStateEmpty": {
@@ -329,8 +330,8 @@
   ]
  },
  "operationManifest": {
-  "planDigest": "26b9f85c093b574bc005c24fbfeda2cb12125f3b1c87af819531fa95815cd761",
-  "digest": "f739bb572a2dc275760a53403dff69d6b018b04a454f76718c3e4b2093c725f1",
+  "planDigest": "f95f72a32f621e347beb9a8ac2e17c206751dd963514d2af80f45caf4b9f3636",
+  "digest": "d4ea3b9203b3bc8b37157c71937da09c7617bdc2d0520866f7fe20becaaebbf8",
   "operationCount": 26
  },
  "checkpoint": {
@@ -344,9 +345,11 @@
    "custodyState": "NEW_KEY_PRESENT_MATCHES_PLAN",
    "writerFence": {
     "token": "fence:fixture-arp-r2",
-    "holderPlanDigest": "26b9f85c093b574bc005c24fbfeda2cb12125f3b1c87af819531fa95815cd761"
+    "generation": 7,
+    "holderPlanDigest": "f95f72a32f621e347beb9a8ac2e17c206751dd963514d2af80f45caf4b9f3636",
+    "readAt": "2026-11-18T13:59:30Z"
    },
-   "journalManifestDigest": "f739bb572a2dc275760a53403dff69d6b018b04a454f76718c3e4b2093c725f1",
+   "journalManifestDigest": "d4ea3b9203b3bc8b37157c71937da09c7617bdc2d0520866f7fe20becaaebbf8",
    "ceremonyLog": {
     "caKeysCreated": 1,
     "signed": [
@@ -380,12 +383,12 @@
      "channelVersion": 2,
      "channelCertificateSHA256": "b2ed795a6a875d095c59ebfff631c3511d10e189448c2fcb3eee0d510e9d5cc0",
      "channelAuditOpIDs": [
-      "op_01b068aeb62786fcbd230e4d"
+      "op_5082152d4feef2f20dbef8b6"
      ],
      "policyFloor": 3,
      "installedPolicyDigest": "daf7b6e6ed57ba4aa57e48d8f77d2caa70c5ea189a6a7b3e2b135f85faa607aa",
      "policyJournalOpIDs": [
-      "op_09176c8ed3c4ff258f3147e7"
+      "op_2503d98edd6dd722e5a49fd0"
      ],
      "installedLeafSHA256": "b2ed795a6a875d095c59ebfff631c3511d10e189448c2fcb3eee0d510e9d5cc0",
      "stagedAnchorDigest": "74ff0c7aad69a27e5a334d1d78cde59e29375b8a6ee3c33fe26aee72d6103f81",
@@ -399,12 +402,12 @@
      "channelVersion": 2,
      "channelCertificateSHA256": "1d4f0a321a46a39bdda5c5b6e35591542783ed425b646821cb8163512561cf93",
      "channelAuditOpIDs": [
-      "op_4a998df134559f6cc5632145"
+      "op_be2e5d18e224af9a97547321"
      ],
      "policyFloor": 3,
      "installedPolicyDigest": "8e07717072508d38b6584add0a646319161703d32da500a50e5fe30c6d3191a7",
      "policyJournalOpIDs": [
-      "op_05520f26a675da8babaec944"
+      "op_e75df2bb91b725336c9c1dca"
      ],
      "installedLeafSHA256": "1d4f0a321a46a39bdda5c5b6e35591542783ed425b646821cb8163512561cf93",
      "stagedAnchorDigest": "74ff0c7aad69a27e5a334d1d78cde59e29375b8a6ee3c33fe26aee72d6103f81",
@@ -418,12 +421,12 @@
      "channelVersion": 4,
      "channelCertificateSHA256": "6dc786f0238020f69e7328b35e27b2bf79645a4125162f77ab46f9c39669a98e",
      "channelAuditOpIDs": [
-      "op_0216a1fc2d1a7c5e72bd336f"
+      "op_07f8441e4a72ba6be9b383a0"
      ],
      "policyFloor": 6,
      "installedPolicyDigest": "e5cdcc28582ec6360eb3b89a24055fd70453af47cbc5f77c3a3e4906aaf72ec0",
      "policyJournalOpIDs": [
-      "op_6f17f7edc5b778a6d656beca"
+      "op_e9cff1b6056d81de1758fffe"
      ],
      "installedLeafSHA256": "6dc786f0238020f69e7328b35e27b2bf79645a4125162f77ab46f9c39669a98e",
      "stagedAnchorDigest": "74ff0c7aad69a27e5a334d1d78cde59e29375b8a6ee3c33fe26aee72d6103f81",
@@ -433,16 +436,16 @@
     {
      "nodeID": "nod_00000000000000000000000PC1",
      "rowPresent": true,
-     "reservationDigest": "1f80bdad0926bb03116a5bfbec339e6f5685bfade3ab6d80f4539163d904948d",
+     "reservationDigest": "cb36e975c59ccabf81e2c52fe0387af5c6073bb93fffb0b20003472eb824a569",
      "channelVersion": 1,
      "channelCertificateSHA256": "3be50dc4c06ddbfe7ce6dda36bb8d12ea0d37b1c7c8b766b3ac5157ede7694d6",
      "channelAuditOpIDs": [
-      "op_189bbd243dbff1237a3cd1f3"
+      "op_917425bdd94eed4cc33d061e"
      ],
      "policyFloor": 1,
      "installedPolicyDigest": "ff156cbeec328e674bf695595f2ccb2923d45079d6a347443d9c339d2eaa2943",
      "policyJournalOpIDs": [
-      "op_cb0639be2130a3ae3f84d49b"
+      "op_3bd0adb2cf2e4eba0589c952"
      ],
      "installedLeafSHA256": "3be50dc4c06ddbfe7ce6dda36bb8d12ea0d37b1c7c8b766b3ac5157ede7694d6",
      "stagedAnchorDigest": "74ff0c7aad69a27e5a334d1d78cde59e29375b8a6ee3c33fe26aee72d6103f81",
@@ -453,7 +456,7 @@
    "reservations": [
     {
      "nodeID": "nod_00000000000000000000000PC1",
-     "reservationDigest": "1f80bdad0926bb03116a5bfbec339e6f5685bfade3ab6d80f4539163d904948d",
+     "reservationDigest": "cb36e975c59ccabf81e2c52fe0387af5c6073bb93fffb0b20003472eb824a569",
      "fenceToken": "fence:fixture-arp-r2"
     }
    ],

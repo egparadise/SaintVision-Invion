@@ -94,7 +94,8 @@
   "reviewRef": "fixture:review/node-binary-migration"
  },
  "writerFence": {
-  "token": "fence:fixture-arp-r2"
+  "token": "fence:fixture-arp-r2",
+  "generation": 7
  },
  "placement": {
   "controlPlaneHostPC": "PC3",
@@ -261,7 +262,7 @@
     "pc": "PC1",
     "nodeID": "nod_00000000000000000000000PC1",
     "csrSHA256": "566474cc92ac3963b1a57d1cec8798f9fa8e2fb5317773c67d5a410408a6413c",
-    "planDigest": "5a8ea2629e6eb728427bb90a660e4a4dd0b7d9457e7c11f7d76f343982075296",
+    "planDigest": "9276bcbeef225c5da9c91bcdcf100452d556313d96eed38b71cf5b0efd6d75bf",
     "fenceToken": "fence:fixture-arp-r2",
     "rowsReadbackSHA256": "5091dd3e3200648bf983c23a869ddc0065590e64bcc4b6b8478804a87c2a7479",
     "nodeStateEmpty": {

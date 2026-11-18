@@ -98,7 +98,8 @@
   "reviewRef": "fixture:review/node-binary-migration"
  },
  "writerFence": {
-  "token": "fence:fixture-arp-r2"
+  "token": "fence:fixture-arp-r2",
+  "generation": 7
  },
  "placement": {
   "controlPlaneHostPC": "PC3",
@@ -281,7 +282,7 @@
     "pc": "PC1",
     "nodeID": "nod_00000000000000000000000PC1",
     "csrSHA256": "8fb485a6bf8d3c774c04b122a45b811b158f1c1e08146bfc898a306c16d842d7",
-    "planDigest": "a0284ff3e9d15e0fcb189a391b0a2daeaf0f8cdbd3aa703ac02a17bc4ca60029",
+    "planDigest": "69c57a32159aafa0ae67852b675b19c6f5119beef9a3c0a798d41c456c54acca",
     "fenceToken": "fence:fixture-arp-r2",
     "rowsReadbackSHA256": "5091dd3e3200648bf983c23a869ddc0065590e64bcc4b6b8478804a87c2a7479",
     "nodeStateEmpty": {
@@ -329,8 +330,8 @@
   ]
  },
  "operationManifest": {
-  "planDigest": "a0284ff3e9d15e0fcb189a391b0a2daeaf0f8cdbd3aa703ac02a17bc4ca60029",
-  "digest": "deddc01717156ce3c03a04aa18ca9d2b7800733f4527ca7a4b315045598d9484",
+  "planDigest": "69c57a32159aafa0ae67852b675b19c6f5119beef9a3c0a798d41c456c54acca",
+  "digest": "af7c8c708abc7f79356587a661ad956223abee002a45e988b151f0bf74948b94",
   "operationCount": 26
  },
  "checkpoint": {
@@ -344,9 +345,11 @@
    "custodyState": "NEW_KEY_PRESENT_MATCHES_PLAN",
    "writerFence": {
     "token": "fence:fixture-arp-r2",
-    "holderPlanDigest": "a0284ff3e9d15e0fcb189a391b0a2daeaf0f8cdbd3aa703ac02a17bc4ca60029"
+    "generation": 7,
+    "holderPlanDigest": "69c57a32159aafa0ae67852b675b19c6f5119beef9a3c0a798d41c456c54acca",
+    "readAt": "2026-11-18T13:59:30Z"
    },
-   "journalManifestDigest": "deddc01717156ce3c03a04aa18ca9d2b7800733f4527ca7a4b315045598d9484",
+   "journalManifestDigest": "af7c8c708abc7f79356587a661ad956223abee002a45e988b151f0bf74948b94",
    "ceremonyLog": {
     "caKeysCreated": 1,
     "signed": [

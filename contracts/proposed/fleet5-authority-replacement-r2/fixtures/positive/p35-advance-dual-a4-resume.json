@@ -102,7 +102,8 @@
   "reviewRef": "fixture:review/node-binary-migration"
  },
  "writerFence": {
-  "token": "fence:fixture-arp-r2"
+  "token": "fence:fixture-arp-r2",
+  "generation": 7
  },
  "placement": {
   "controlPlaneHostPC": "PC3",
@@ -293,8 +294,8 @@
   ]
  },
  "operationManifest": {
-  "planDigest": "d59120ac1f99275596735670fefaf775106c6f7d06500d3cba52d6ed90338770",
-  "digest": "32b6affaf1282e09f7b31ae09ca71149384fc9dd41e881c6d466c4625aee1b0e",
+  "planDigest": "52b24930cd3807104059fb59add10a01ddad3d3a4744eb05d7085d9a92759621",
+  "digest": "dacbb943ce445973eb59c01b41db41ac92a6aab6c14fbc79be494c2e865932e3",
   "operationCount": 30
  },
  "checkpoint": {
@@ -308,9 +309,11 @@
    "custodyState": "NEW_KEY_PRESENT_MATCHES_PLAN",
    "writerFence": {
     "token": "fence:fixture-arp-r2",
-    "holderPlanDigest": "d59120ac1f99275596735670fefaf775106c6f7d06500d3cba52d6ed90338770"
+    "generation": 7,
+    "holderPlanDigest": "52b24930cd3807104059fb59add10a01ddad3d3a4744eb05d7085d9a92759621",
+    "readAt": "2026-11-18T13:59:30Z"
    },
-   "journalManifestDigest": "32b6affaf1282e09f7b31ae09ca71149384fc9dd41e881c6d466c4625aee1b0e",
+   "journalManifestDigest": "dacbb943ce445973eb59c01b41db41ac92a6aab6c14fbc79be494c2e865932e3",
    "ceremonyLog": {
     "caKeysCreated": 1,
     "signed": [
@@ -340,7 +343,7 @@
      "channelVersion": 2,
      "channelCertificateSHA256": "b2ed795a6a875d095c59ebfff631c3511d10e189448c2fcb3eee0d510e9d5cc0",
      "channelAuditOpIDs": [
-      "op_9c2124d79c7757b6106ea084"
+      "op_c11a8210035dd718d4515872"
      ],
      "policyFloor": 2,
      "installedPolicyDigest": "1edf078d8b0045b3bf7b57394e36c486b4a5cff7cc3264b5821c3a03f279de8b",
@@ -447,11 +450,11 @@
   "expectedRecoveryAction": "RESUME_FORWARD",
   "expectedResumePhase": "A4_CHANNEL_CAS",
   "expectedApply": [
-   "op_4f288d441092884be5c02fcb",
-   "op_14cd42fd42d48d99dca5ee66"
+   "op_60caf1fc6e617b5fa0bcca78",
+   "op_6b578277bf92928dedc2f1a4"
   ],
   "expectedAcknowledge": [
-   "op_9c2124d79c7757b6106ea084"
+   "op_c11a8210035dd718d4515872"
   ]
  }
 }

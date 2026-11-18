@@ -98,7 +98,8 @@
   "reviewRef": "fixture:review/node-binary-migration"
  },
  "writerFence": {
-  "token": "fence:fixture-arp-r2"
+  "token": "fence:fixture-arp-r2",
+  "generation": 7
  },
  "placement": {
   "controlPlaneHostPC": "PC3",
@@ -281,7 +282,7 @@
     "pc": "PC1",
     "nodeID": "nod_00000000000000000000000PC1",
     "csrSHA256": "8fb485a6bf8d3c774c04b122a45b811b158f1c1e08146bfc898a306c16d842d7",
-    "planDigest": "a2b4fe75527f57abc0340aa592a803b1e98f7617e84e636197692917c418ee53",
+    "planDigest": "338a0f609c20706551a54de048f4594f420243484144aa7834e0eff97b66362e",
     "fenceToken": "fence:fixture-arp-r2",
     "rowsReadbackSHA256": "5091dd3e3200648bf983c23a869ddc0065590e64bcc4b6b8478804a87c2a7479",
     "nodeStateEmpty": {
@@ -329,8 +330,8 @@
   ]
  },
  "operationManifest": {
-  "planDigest": "a2b4fe75527f57abc0340aa592a803b1e98f7617e84e636197692917c418ee53",
-  "digest": "969280a963fe97ef6c4e456d7293d06fb24ce5140f272fc93d3818fe8ad3898e",
+  "planDigest": "338a0f609c20706551a54de048f4594f420243484144aa7834e0eff97b66362e",
+  "digest": "7ce95200f7a42c5ae4a07f3b6f39f8aafc42d8fe95adda01f6b4e68be97ba692",
   "operationCount": 26
  },
  "checkpoint": {
@@ -344,9 +345,11 @@
    "custodyState": "NEW_KEY_PRESENT_MATCHES_PLAN",
    "writerFence": {
     "token": "fence:fixture-arp-r2",
-    "holderPlanDigest": "a2b4fe75527f57abc0340aa592a803b1e98f7617e84e636197692917c418ee53"
+    "generation": 7,
+    "holderPlanDigest": "338a0f609c20706551a54de048f4594f420243484144aa7834e0eff97b66362e",
+    "readAt": "2026-11-18T13:59:30Z"
    },
-   "journalManifestDigest": "969280a963fe97ef6c4e456d7293d06fb24ce5140f272fc93d3818fe8ad3898e",
+   "journalManifestDigest": "7ce95200f7a42c5ae4a07f3b6f39f8aafc42d8fe95adda01f6b4e68be97ba692",
    "ceremonyLog": {
     "caKeysCreated": 1,
     "signed": [
@@ -380,12 +383,12 @@
      "channelVersion": 2,
      "channelCertificateSHA256": "b2ed795a6a875d095c59ebfff631c3511d10e189448c2fcb3eee0d510e9d5cc0",
      "channelAuditOpIDs": [
-      "op_58402be203e76695ef7f0ca4"
+      "op_20a6f36c5a99754027eea20a"
      ],
      "policyFloor": 3,
      "installedPolicyDigest": "daf7b6e6ed57ba4aa57e48d8f77d2caa70c5ea189a6a7b3e2b135f85faa607aa",
      "policyJournalOpIDs": [
-      "op_c07a8452086e0791629719bf"
+      "op_cb84301a338266626bfb8e76"
      ],
      "installedLeafSHA256": "b2ed795a6a875d095c59ebfff631c3511d10e189448c2fcb3eee0d510e9d5cc0",
      "stagedAnchorDigest": "74ff0c7aad69a27e5a334d1d78cde59e29375b8a6ee3c33fe26aee72d6103f81",
@@ -399,12 +402,12 @@
      "channelVersion": 2,
      "channelCertificateSHA256": "1d4f0a321a46a39bdda5c5b6e35591542783ed425b646821cb8163512561cf93",
      "channelAuditOpIDs": [
-      "op_d35f724591fff87f0c8797af"
+      "op_36d8de3918251c29df470b94"
      ],
      "policyFloor": 3,
      "installedPolicyDigest": "8e07717072508d38b6584add0a646319161703d32da500a50e5fe30c6d3191a7",
      "policyJournalOpIDs": [
-      "op_77827dc91fec1b2a6b565e0a"
+      "op_d06a3f3e8cd75c18bf63d1e5"
      ],
      "installedLeafSHA256": "1d4f0a321a46a39bdda5c5b6e35591542783ed425b646821cb8163512561cf93",
      "stagedAnchorDigest": "74ff0c7aad69a27e5a334d1d78cde59e29375b8a6ee3c33fe26aee72d6103f81",
@@ -418,12 +421,12 @@
      "channelVersion": 4,
      "channelCertificateSHA256": "6dc786f0238020f69e7328b35e27b2bf79645a4125162f77ab46f9c39669a98e",
      "channelAuditOpIDs": [
-      "op_7d691e98cc15b648423b7969"
+      "op_59dbfb6d2a4696c8e1d6bcb8"
      ],
      "policyFloor": 6,
      "installedPolicyDigest": "e5cdcc28582ec6360eb3b89a24055fd70453af47cbc5f77c3a3e4906aaf72ec0",
      "policyJournalOpIDs": [
-      "op_1ac220af7789fc4e1c4fe90f"
+      "op_4d91cf0cef21c6a115227aa6"
      ],
      "installedLeafSHA256": "6dc786f0238020f69e7328b35e27b2bf79645a4125162f77ab46f9c39669a98e",
      "stagedAnchorDigest": "74ff0c7aad69a27e5a334d1d78cde59e29375b8a6ee3c33fe26aee72d6103f81",
@@ -508,11 +511,11 @@
   "expectedRecoveryAction": "RESUME_FORWARD",
   "expectedResumePhase": "A7_ROTATION_SETTLED",
   "expectedApply": [
-   "op_800b256e4921cb1744d3b5a6",
-   "op_4cbb0e5c7c209b44c2da1860"
+   "op_bdc85304956cf651b968be76",
+   "op_548029447ecc621e84da224b"
   ],
   "expectedAcknowledge": [
-   "op_3f79c3ca3564037acb6bab5a"
+   "op_3811069dbb98feec984aea56"
   ]
  }
 }
