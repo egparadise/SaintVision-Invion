@@ -1,15 +1,17 @@
 ---
 doc_id: "WORKBOARD-CODEX-001"
 title: "Codex 작업 현황"
-version: "1.0.508"
+version: "1.0.509"
 status: "review"
 author: "Codex"
-updated: "2026-11-19T04:02:17+09:00"
+updated: "2026-11-19T04:45:50+09:00"
 source_of_truth: "Git"
 active_card: "FLEET5 continued supervision with PORTAL-REFRESH-FLEET-20261106"
 active_card_status: "MainTransportAutoReconnectVerified6.561s_LogonRegistered_RebootNotRun; PC234SSHAndSystemdAndNodeRestartPolicyVerified_PC1Still255; CodeRetryAndWholePercentAuditReady_CAterminalNoLiveRecovery"
 active_card_next: "Seal Root544 exact Docs and canonical sync; capture new fullstate baseline; actual sameTask retry fresh isolated Orca workspace with temporalCAterminal correction; actual Claude independently audits percent, initialplan and operator transport. Await PC1 nonsecret auth diagnosis. No sameCA bypass or DB reset."
 ---
+
+Codex task_a5a7ea66e8f6 adds local writer-transfer retry on review base 055254c1. Claude review of the retry is pending. [[2026-11-19_FLEET5_A1_Runtime_Fence]]
 
 
 Interrupted A1 remains on HOLD. Codex restored the card150 pilot CLI and moved HOLD inspection to a standalone command. Claude re-review follows exact-SHA Core and Backend CI. [[2026-11-19_FLEET5_A1_Runtime_Fence]]

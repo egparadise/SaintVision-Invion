@@ -1,10 +1,10 @@
-﻿---
+---
 doc_id: "HISTORY-FLEET5-A1-RUNTIME-FENCE"
 title: "Interrupted A1 runtime fence prerequisite"
-version: "1.0.1"
+version: "1.0.2"
 status: "review"
 author: "Codex"
-updated: "2026-11-19T04:02:17+09:00"
+updated: "2026-11-19T04:45:50+09:00"
 source_of_truth: "Git"
 ---
 
@@ -30,6 +30,14 @@ The fully expired preparation path calls _load_external_ca, enforces current roo
 
 ## Independent review correction
 
-Codex began task_319373acf0fd at 04:01 KST from clean 700b9480 on the same branch after Claude review msg_353a0df9eb55. Input boards were 1.0.546 and 1.0.507. Restore the card150 pilot blob 35c2668690b0681ab87da86099400e83f39d098b and retain the historical evidence. Local gates include tests/test_intranet_pki.py at candidate HEAD and both HOLD outcomes through the standalone CLI.
+Codex began task_319373acf0fd at 04:01 KST from clean 700b9480 on the same branch after Claude review msg_353a0df9eb55. Input boards were 1.0.546 and 1.0.507. Restore the card150 pilot blob 35c2668690b0681ab87da86099400e83f39d098b and retain the historical evidence. The 03:22 KST local-gates.json belongs to 700b9480 (498 tests). For 990978075d9fe53fe9c1c8f11b3bdf0e4d4f64e3, Claude recorded the 504-test run including tests/test_intranet_pki.py in Evidence/fleet5-a1-990978-independent-review/local-gates.json and both standalone HOLD outcomes in probe-result.json, committed at 055254c1.
 
 Initialization reserves the path before creating the schema. A crash in between can leave an empty ledger that blocks initialization retries and yields HOLD on inspection. A committed transfer whose acknowledgement was lost rejects a retry with the old ownership tuple. The caller must reconcile ownership before deciding its next action. Root retains custody and crash-recovery integration. Claude re-review requires fresh Core and both Backend Python jobs at the pushed SHA.
+
+## Local transfer retry, 2026-11-19 04:44 KST
+
+Codex task_a5a7ea66e8f6, agent/codex/fleet5-runtime-a1-986a845b, review base 055254c1. Input boards INDEX-PROGRESS-001 1.0.548 and WORKBOARD-CODEX-001 1.0.508. Claude reviewed the preceding inspection implementation. The new transfer records its exact predecessor in the same SQLite write transaction as the successor. Only a matching retry while that successor is current returns the original generation. A later transfer expires that receipt. A pre-upgrade ledger accepts a normal transfer from its current owner.
+
+Claude owns independent retry review. Codex retains two open implementation items: fleet-wide writer enforcement and the authoritative signer ceremony ledger. Root owns operational integration. Inspection remains HOLD-only.
+
+Local validation on Windows, Python 3.14.7, 2026-11-19 04:44–04:46 KST: reran each of the ten commands listed in Evidence/fleet5-a1-runtime-fence/local-gates.json with immediate exit checks, adding tests/test_intranet_pki.py to pytest. All exited 0. Pytest passed 505 cases including a subprocess that exits after commit, concurrent identical requests and stale retries after a later transfer. Sync check found 33 pending exports and zero conflicts. Shared vault export is deferred to integration.

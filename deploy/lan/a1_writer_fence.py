@@ -33,11 +33,28 @@ def initialize(path: Path) -> None:
 
 
 def transfer(path: Path, previous: Writer | None, plan_digest: str, token: str) -> Writer:
-    """Compare and swap ownership under the database write lock."""
+    """Replay the current committed transfer or atomically replace its predecessor."""
     generation = 1 if previous is None else previous.generation + 1
     successor = Writer(plan_digest, token, generation)
     with closing(sqlite3.connect(path.resolve().as_uri() + "?mode=rw", uri=True)) as db, db:
         db.execute("BEGIN IMMEDIATE")
+        # Older ledgers have only the fence table. Never infer their predecessor.
+        db.execute("""CREATE TABLE IF NOT EXISTS transfer_receipt (
+            singleton INTEGER PRIMARY KEY CHECK (singleton = 1),
+            previous_plan TEXT, previous_token TEXT, previous_generation INTEGER,
+            generation INTEGER NOT NULL
+        )""")
+        prior = (None, None, None) if previous is None else (
+            previous.plan_digest, previous.token, previous.generation
+        )
+        replay = db.execute(
+            """SELECT 1 FROM fence JOIN transfer_receipt USING (singleton, generation)
+               WHERE plan_digest=? AND token=? AND generation=?
+               AND previous_plan IS ? AND previous_token IS ? AND previous_generation IS ?""",
+            (plan_digest, token, generation, *prior),
+        ).fetchone()
+        if replay:
+            return successor
         if previous is None:
             changed = db.execute(
                 "INSERT INTO fence SELECT 1, ?, ?, 1 WHERE NOT EXISTS (SELECT 1 FROM fence)",
@@ -52,6 +69,10 @@ def transfer(path: Path, previous: Writer | None, plan_digest: str, token: str) 
             )
         if changed.rowcount != 1:
             raise ValueError("Writer fence changed")
+        db.execute(
+            "INSERT OR REPLACE INTO transfer_receipt VALUES (1, ?, ?, ?, ?)",
+            (*prior, generation),
+        )
     return successor
 
 

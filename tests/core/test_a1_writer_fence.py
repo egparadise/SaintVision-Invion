@@ -73,3 +73,38 @@ def test_inspection_entry_point_reports_hold(tmp_path, monkeypatch):
     result = inspect()
     assert result.returncode == 2
     assert result.stdout.strip() == "HOLD_WRITER_FENCE"
+
+def test_lost_ack_and_concurrent_retries(tmp_path, monkeypatch):
+    from threading import Barrier
+
+    module_dir = Path(__file__).resolve().parents[2] / "deploy" / "lan"
+    monkeypatch.syspath_prepend(str(module_dir))
+    fence = import_module("a1_writer_fence")
+    path = tmp_path / "ledger"
+    fence.initialize(path)
+    first = fence.transfer(path, None, "p", "a")
+    assert fence.transfer(path, None, "p", "a") == first
+    child = subprocess.run(
+        [sys.executable, "-c",
+         "import os, sys; from pathlib import Path; from a1_writer_fence import Writer, transfer; "
+         "transfer(Path(sys.argv[1]), Writer('p', 'a', 1), 'q', 'b'); os._exit(43)",
+         str(path)], cwd=module_dir, check=False,
+    )
+    assert child.returncode == 43
+    second = fence.Writer("q", "b", 2)
+    assert fence.transfer(path, first, "q", "b") == second
+    with pytest.raises(ValueError):
+        fence.transfer(path, fence.Writer("wrong", "a", 1), "q", "b")
+    barrier = Barrier(4)
+
+    def same_request(_):
+        barrier.wait(timeout=10)
+        return fence.transfer(path, second, "p", "a")
+
+    third = fence.Writer("p", "a", 3)
+    with ThreadPoolExecutor(4) as pool:
+        assert list(pool.map(same_request, range(4))) == [third] * 4
+    for predecessor, plan, token in [(None, "p", "a"), (first, "q", "b"), (second, "q", "x")]:
+        with pytest.raises(ValueError):
+            fence.transfer(path, predecessor, plan, token)
+    assert fence.interrupted_a1_hold(path, third) == "HOLD_CUSTODY_UNRESOLVED"
