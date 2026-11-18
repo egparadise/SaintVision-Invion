@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-CLAUDE-001"
 title: "Claude 작업 현황"
-version: "1.2.140"
+version: "1.2.141"
 status: "review"
 author: "Claude"
-updated: "2026-11-19T05:36:00+09:00"
+updated: "2026-11-19T06:30:00+09:00"
 
 
 
@@ -12,6 +12,35 @@ updated: "2026-11-19T05:36:00+09:00"
 
 source_of_truth: "Git"
 ---
+
+## 2026-11-19 FLEET5 A1 synthetic ceremony ledger 독립 검토 f4af7bb8 (Claude 직접 기록)
+
+- **작업** (task_174a021b9057 / ctx_7c75c9345756): Codex task_b51f6917ccef가 4fdc9a33 위에 만든 `f4af7bb8`(agent/codex/fleet5-runtime-a1-986a845b)을 정확한 SHA의 격리 detached worktree에서 검토했다. Codex 브랜치는 바꾸지 않았다. 기록은 `agent/claude/fleet5-a1-f4af7b-review`에 있다.
+- **판정**: 수락한다. 범위는 로컬 synthetic HOLD-only ceremony evidence prerequisite다. 이 범위의 차단 결함은 없다. 단, 지적 1이 고쳐질 때까지 readback을 R2 `ceremonyLog`로 복구 판단에 넣으면 안 된다.
+  - `record()`는 fence 확인, CA 선행 확인, replay 확인, INSERT를 fence와 같은 파일의 한 `BEGIN IMMEDIATE`에서 처리한다. 그 사이에 transfer가 끼어들 수 없다.
+  - `readback()`은 `mode=ro` 한 읽기 트랜잭션에서 fence와 event를 읽는다.
+  - 행은 writerFence token·generation을 포함한 `plan_digest`로 묶인다. 이후 세대는 이전 행을 보지 못한다.
+- **탐침**: 일회용 p02 fixture로 Python 3.14.7/SQLite 3.50.4와 3.10.11/3.40.1에서 각 25건, 합계 50/50을 통과했다.
+  - 원자성: 진행 중인 record와 readback 동안 transfer가 기다렸다. commit 전 마지막 leaf는 incomplete로만 보였다.
+  - 동시성: thread 8개와 process 8개로 시험했고, 서로 다른 CA key 경쟁에서는 하나만 commit됐다.
+  - 재시작: commit 뒤·commit 전 종료, RESERVED 보유 프로세스 강제 종료(hot journal), 새 프로세스 readback을 확인했다.
+  - 누락·충돌 입력과 stale writer는 모두 거부됐다. complete evidence에서도 inspection은 HOLD였다.
+- **확인**:
+  - 로컬: 정확한 SHA에서 Codex의 7파일 세트 508 passed(Codex 수치와 일치), 3.10에서 ledger·fence test 6 passed, check_docs PASS.
+  - hosted: Core 44393750942(ledger test 3건 포함 9443 passed), Backend 44393757575(3.12/3.14 각 9085 passed), Docs 44393764341, Portal 44393751537이 모두 정확한 SHA에서 success다.
+- **지적**:
+  1. 소비자 연결 전에 고쳐야 한다. 충돌 관측(두 번째 CA key, foreign leaf)은 `ValueError`로 거부만 되고 기록되지 않는다. 그 뒤 계획 집합이 채워지면 readback은 깨끗한 로그를 돌려주고, R2 `_ceremony_log_hold`는 None을 낸다. "conflicting evidence rejects readback" 주장은 누락에만 성립한다. zero-key·partial 로그도 표현할 수 없다.
+  2. `caPublicKeySHA256`·`plannedLeafSHA256`은 digest에 묶이지 않는다. ledger는 R2 `evaluate`를 호출하지 않으므로, 변조 문서가 먼저 기록하면 그 값이 고정된다.
+  3. 오류 타입이 섞여 있다: `OperationalError`, TypeError, KeyError. 모두 fail-closed다.
+  4. 재시도 때 event ID를 새로 만들면 Conflicting으로 막힌다. 안정된 ID는 호출자 책임이다.
+  5. Codex local-gates.json에 SHA가 없다. 이전 board 문장이 stale이다.
+  6. 990978·9e21 검토의 지적이 그대로 남아 있다.
+- **하지 않은 것**: 실제 key·signer 사용, fleet 연결, 배포, 활성화, merge, PR, push, vault export, Codex 브랜치 변경
+- **다음 첫 행동/담당**:
+  - Codex: 지적 1·2, 실제 signer ceremony ledger, fleet-wide writer enforcement
+  - Root(coordinator): 통합, 게시, canonical export, signer custody
+  - Claude: 지적 1·2 수정 뒤 재검토
+  - [[2026-11-19_FLEET5_A1_f4af7b_Independent_Review]]
 
 ## 2026-11-19 FLEET5 A1 writer-transfer replay 독립 검토 9e2142a9 (Claude 직접 기록)
 

@@ -1,0 +1,444 @@
+{
+ "candidateSha": "f4af7bb8f571c0cba326aeeeb9888e5514dd118c",
+ "fixture": "contracts/proposed/fleet5-authority-replacement-r2/fixtures/positive/p02-a1-durable-resume-anchor-stage.json (public synthetic)",
+ "runs": [
+  {
+   "python": "3.14.7",
+   "sqlite": "3.50.4",
+   "platform": "Windows-11-10.0.26300-SP0",
+   "passed": 25,
+   "total": 25,
+   "results": [
+    {
+     "area": "atomic",
+     "probe": "complete readback equals planned ceremonyLog",
+     "ok": true,
+     "detail": "6 events; caKeysCreated=1, 5 signed, sorted by subject"
+    },
+    {
+     "area": "atomic",
+     "probe": "readback is read-only and byte-identical",
+     "ok": true,
+     "detail": "3 readbacks left the file hash unchanged and no journal"
+    },
+    {
+     "area": "atomic",
+     "probe": "readback snapshot spans fence and events while a transfer waits",
+     "ok": true,
+     "detail": "transfer blocked while the reader held its snapshot; order=['readback-done', 'transfer-done']; later readback -> ValueError: Writer fence changed"
+    },
+    {
+     "area": "atomic",
+     "probe": "check-and-insert holds the write lock against a concurrent transfer",
+     "ok": true,
+     "detail": "transfer waited for the in-flight record; order=['record-done', 'transfer-done']; post-transfer record -> ValueError: Writer fence changed"
+    },
+    {
+     "area": "atomic",
+     "probe": "concurrent writer observes pre-commit state as incomplete, never partial",
+     "ok": true,
+     "detail": "during uncommitted final leaf: ValueError: Incomplete or conflicting ceremony evidence; after commit: complete"
+    },
+    {
+     "area": "atomic",
+     "probe": "8 threads x identical CA event -> one row",
+     "ok": true,
+     "detail": "8 identical concurrent records produced exactly one event"
+    },
+    {
+     "area": "atomic",
+     "probe": "8 processes: 6 identical + 2 conflicting CA events",
+     "ok": true,
+     "detail": "one committed event (key); outputs=['ok', 'ok', 'ok', 'ok', 'ok', 'ok', 'reject Conflicting ceremony event', 'reject Conflicting ceremony event']"
+    },
+    {
+     "area": "restart",
+     "probe": "lost ack after commit: identical retry is a no-op",
+     "ok": true,
+     "detail": "child exited 74 after COMMIT; retry left 1 event"
+    },
+    {
+     "area": "restart",
+     "probe": "lost ack retried under a NEW event ID is rejected",
+     "ok": true,
+     "detail": "ValueError: Conflicting ceremony event; event IDs must be stable across restarts"
+    },
+    {
+     "area": "restart",
+     "probe": "exit before first COMMIT rolls back the table creation",
+     "ok": true,
+     "detail": "no ceremony_event after crash; retry committed 1 event"
+    },
+    {
+     "area": "restart",
+     "probe": "hard kill holding RESERVED on a leaf insert: hot journal, readback, retry",
+     "ok": true,
+     "detail": "killed rc=1, hot journal=True; readback under hot journal -> ValueError: Incomplete or conflicting ceremony evidence; inspection HOLD_CUSTODY_UNRESOLVED; retry completed"
+    },
+    {
+     "area": "restart",
+     "probe": "fresh-process readback after restart matches",
+     "ok": true,
+     "detail": "separate interpreter read back the same complete log"
+    },
+    {
+     "area": "missing",
+     "probe": "missing evidence: each case rejects readback",
+     "ok": true,
+     "detail": {
+      "no-table": "OperationalError: no such table: ceremony_event",
+      "ca-only": "ValueError: Incomplete or conflicting ceremony evidence",
+      "one-leaf-missing": "ValueError: Incomplete or conflicting ceremony evidence",
+      "no-file": "OperationalError: unable to open database file",
+      "no-fence-row": "ValueError: Writer fence changed"
+     }
+    },
+    {
+     "area": "missing",
+     "probe": "leaf before CA key is rejected and leaves nothing",
+     "ok": true,
+     "detail": "ValueError: Missing planned CA key event; CREATE TABLE rolled back"
+    },
+    {
+     "area": "missing",
+     "probe": "plan with unrecorded planned leaf cannot complete",
+     "ok": true,
+     "detail": {
+      "record": "ValueError: Unexpected ceremony evidence",
+      "readback": "ValueError: Incomplete or conflicting ceremony evidence"
+     }
+    },
+    {
+     "area": "missing",
+     "probe": "malformed inputs are rejected before any write",
+     "ok": true,
+     "detail": {
+      "blank-id": "ValueError: Missing event identity",
+      "none-id": "ValueError: Missing event identity",
+      "upper-hex": "ValueError: Missing or invalid fingerprint",
+      "short": "ValueError: Missing or invalid fingerprint",
+      "int-fp": "ValueError: Missing or invalid fingerprint",
+      "none-subject": "ValueError: Unexpected ceremony evidence",
+      "list-subject": "TypeError: cannot use 'list' as a dict key (unhashable type: 'list')",
+      "manifest-digest": "ValueError: Plan digest mismatch",
+      "duplicate-node": "ValueError: Invalid planned subjects"
+     }
+    },
+    {
+     "area": "conflict",
+     "probe": "conflicting records are rejected and leave the ledger unchanged",
+     "ok": true,
+     "detail": {
+      "second-ca-key": "ValueError: Unexpected ceremony evidence",
+      "same-ca-new-id": "ValueError: Conflicting ceremony event",
+      "reuse-id-other-subject": "ValueError: Conflicting ceremony event",
+      "foreign-subject": "ValueError: Unexpected ceremony evidence",
+      "wrong-leaf": "ValueError: Unexpected ceremony evidence",
+      "leaf-is-ca-key": "ValueError: Unexpected ceremony evidence",
+      "same-subject-new-id": "ValueError: Conflicting ceremony event"
+     }
+    },
+    {
+     "area": "conflict",
+     "probe": "a rejected conflicting observation does not poison later readback",
+     "ok": true,
+     "detail": "second key -> ValueError: Unexpected ceremony evidence; foreign leaf -> ValueError: Unexpected ceremony evidence; later readback returned a clean complete log (caKeysCreated=1), and R2 _ceremony_log_hold on it -> None. The observations that R2 maps to HOLD_CUSTODY_UNRESOLVED / HOLD_FOREIGN_WRITER are not durably recorded"
+    },
+    {
+     "area": "conflict",
+     "probe": "expected fingerprints are not bound by plan_digest (first writer pins)",
+     "ok": true,
+     "detail": "same digest=True; the first record accepted the mutated document's CA key; the real document's key then -> ValueError: Conflicting ceremony event; real readback -> ValueError: Incomplete or conflicting ceremony evidence; R2 evaluate (not called by the ledger) -> {'real': [], 'ca-mutated': ['AR-CERT-ROOT', 'AR-MANIFEST'], 'leaf-mutated': ['AR-CERT-LEAF', 'AR-MANIFEST']}"
+    },
+    {
+     "area": "conflict",
+     "probe": "two processes with different CA keys under one digest: exactly one wins",
+     "ok": true,
+     "detail": "one key committed (planned); outputs=['ok', 'reject Conflicting ceremony event', 'ok', 'reject Conflicting ceremony event', 'ok', 'reject Conflicting ceremony event']"
+    },
+    {
+     "area": "ownership",
+     "probe": "stale or wrong writer plan is rejected for record and readback",
+     "ok": true,
+     "detail": {
+      "older-generation:record": "ValueError: Writer fence changed",
+      "older-generation:readback": "ValueError: Writer fence changed",
+      "wrong-token:record": "ValueError: Writer fence changed",
+      "wrong-token:readback": "ValueError: Writer fence changed",
+      "bool-generation:record": "ValueError: Writer fence changed",
+      "bool-generation:readback": "ValueError: Writer fence changed"
+     }
+    },
+    {
+     "area": "ownership",
+     "probe": "transfer away then fresh epoch: old events never satisfy the new plan",
+     "ok": true,
+     "detail": {
+      "record": "ValueError: Writer fence changed",
+      "readback": "ValueError: Writer fence changed",
+      "inspection": "HOLD_WRITER_FENCE",
+      "new-epoch-readback": "ValueError: Incomplete or conflicting ceremony evidence",
+      "old-plan-rows-kept": 6
+     }
+    },
+    {
+     "area": "ownership",
+     "probe": "record never takes or moves the fence",
+     "ok": true,
+     "detail": "fence and transfer_receipt rows identical before and after a full ceremony"
+    },
+    {
+     "area": "hold",
+     "probe": "complete evidence still inspects as HOLD",
+     "ok": true,
+     "detail": {
+      "current-owner": "HOLD_CUSTODY_UNRESOLVED",
+      "stale-owner": "HOLD_WRITER_FENCE",
+      "lan_pilot_mentions_ceremony": false
+     }
+    },
+    {
+     "area": "hold",
+     "probe": "ledger surface has no network, subprocess, signing or activation entry point",
+     "ok": true,
+     "detail": {
+      "imports": [
+       "from contextlib import closing, contextmanager",
+       "from pathlib import Path",
+       "from tools.check_fleet5_authority_replacement_r2 import plan_digest",
+       "import re",
+       "import sqlite3"
+      ],
+      "public": [
+       "readback",
+       "record"
+      ],
+      "repo_references": [
+       "docs/vault/30_Development/Evidence/fleet5-a1-ceremony-ledger/local-gates.json",
+       "tests/core/test_a1_ceremony_ledger.py"
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "python": "3.10.11",
+   "sqlite": "3.40.1",
+   "platform": "Windows-10-10.0.26300-SP0",
+   "passed": 25,
+   "total": 25,
+   "results": [
+    {
+     "area": "atomic",
+     "probe": "complete readback equals planned ceremonyLog",
+     "ok": true,
+     "detail": "6 events; caKeysCreated=1, 5 signed, sorted by subject"
+    },
+    {
+     "area": "atomic",
+     "probe": "readback is read-only and byte-identical",
+     "ok": true,
+     "detail": "3 readbacks left the file hash unchanged and no journal"
+    },
+    {
+     "area": "atomic",
+     "probe": "readback snapshot spans fence and events while a transfer waits",
+     "ok": true,
+     "detail": "transfer blocked while the reader held its snapshot; order=['readback-done', 'transfer-done']; later readback -> ValueError: Writer fence changed"
+    },
+    {
+     "area": "atomic",
+     "probe": "check-and-insert holds the write lock against a concurrent transfer",
+     "ok": true,
+     "detail": "transfer waited for the in-flight record; order=['record-done', 'transfer-done']; post-transfer record -> ValueError: Writer fence changed"
+    },
+    {
+     "area": "atomic",
+     "probe": "concurrent writer observes pre-commit state as incomplete, never partial",
+     "ok": true,
+     "detail": "during uncommitted final leaf: ValueError: Incomplete or conflicting ceremony evidence; after commit: complete"
+    },
+    {
+     "area": "atomic",
+     "probe": "8 threads x identical CA event -> one row",
+     "ok": true,
+     "detail": "8 identical concurrent records produced exactly one event"
+    },
+    {
+     "area": "atomic",
+     "probe": "8 processes: 6 identical + 2 conflicting CA events",
+     "ok": true,
+     "detail": "one committed event (key); outputs=['ok', 'ok', 'ok', 'ok', 'ok', 'ok', 'reject Conflicting ceremony event', 'reject Conflicting ceremony event']"
+    },
+    {
+     "area": "restart",
+     "probe": "lost ack after commit: identical retry is a no-op",
+     "ok": true,
+     "detail": "child exited 74 after COMMIT; retry left 1 event"
+    },
+    {
+     "area": "restart",
+     "probe": "lost ack retried under a NEW event ID is rejected",
+     "ok": true,
+     "detail": "ValueError: Conflicting ceremony event; event IDs must be stable across restarts"
+    },
+    {
+     "area": "restart",
+     "probe": "exit before first COMMIT rolls back the table creation",
+     "ok": true,
+     "detail": "no ceremony_event after crash; retry committed 1 event"
+    },
+    {
+     "area": "restart",
+     "probe": "hard kill holding RESERVED on a leaf insert: hot journal, readback, retry",
+     "ok": true,
+     "detail": "killed rc=1, hot journal=True; readback under hot journal -> ValueError: Incomplete or conflicting ceremony evidence; inspection HOLD_CUSTODY_UNRESOLVED; retry completed"
+    },
+    {
+     "area": "restart",
+     "probe": "fresh-process readback after restart matches",
+     "ok": true,
+     "detail": "separate interpreter read back the same complete log"
+    },
+    {
+     "area": "missing",
+     "probe": "missing evidence: each case rejects readback",
+     "ok": true,
+     "detail": {
+      "no-table": "OperationalError: no such table: ceremony_event",
+      "ca-only": "ValueError: Incomplete or conflicting ceremony evidence",
+      "one-leaf-missing": "ValueError: Incomplete or conflicting ceremony evidence",
+      "no-file": "OperationalError: unable to open database file",
+      "no-fence-row": "ValueError: Writer fence changed"
+     }
+    },
+    {
+     "area": "missing",
+     "probe": "leaf before CA key is rejected and leaves nothing",
+     "ok": true,
+     "detail": "ValueError: Missing planned CA key event; CREATE TABLE rolled back"
+    },
+    {
+     "area": "missing",
+     "probe": "plan with unrecorded planned leaf cannot complete",
+     "ok": true,
+     "detail": {
+      "record": "ValueError: Unexpected ceremony evidence",
+      "readback": "ValueError: Incomplete or conflicting ceremony evidence"
+     }
+    },
+    {
+     "area": "missing",
+     "probe": "malformed inputs are rejected before any write",
+     "ok": true,
+     "detail": {
+      "blank-id": "ValueError: Missing event identity",
+      "none-id": "ValueError: Missing event identity",
+      "upper-hex": "ValueError: Missing or invalid fingerprint",
+      "short": "ValueError: Missing or invalid fingerprint",
+      "int-fp": "ValueError: Missing or invalid fingerprint",
+      "none-subject": "ValueError: Unexpected ceremony evidence",
+      "list-subject": "TypeError: unhashable type: 'list'",
+      "manifest-digest": "ValueError: Plan digest mismatch",
+      "duplicate-node": "ValueError: Invalid planned subjects"
+     }
+    },
+    {
+     "area": "conflict",
+     "probe": "conflicting records are rejected and leave the ledger unchanged",
+     "ok": true,
+     "detail": {
+      "second-ca-key": "ValueError: Unexpected ceremony evidence",
+      "same-ca-new-id": "ValueError: Conflicting ceremony event",
+      "reuse-id-other-subject": "ValueError: Conflicting ceremony event",
+      "foreign-subject": "ValueError: Unexpected ceremony evidence",
+      "wrong-leaf": "ValueError: Unexpected ceremony evidence",
+      "leaf-is-ca-key": "ValueError: Unexpected ceremony evidence",
+      "same-subject-new-id": "ValueError: Conflicting ceremony event"
+     }
+    },
+    {
+     "area": "conflict",
+     "probe": "a rejected conflicting observation does not poison later readback",
+     "ok": true,
+     "detail": "second key -> ValueError: Unexpected ceremony evidence; foreign leaf -> ValueError: Unexpected ceremony evidence; later readback returned a clean complete log (caKeysCreated=1), and R2 _ceremony_log_hold on it -> None. The observations that R2 maps to HOLD_CUSTODY_UNRESOLVED / HOLD_FOREIGN_WRITER are not durably recorded"
+    },
+    {
+     "area": "conflict",
+     "probe": "expected fingerprints are not bound by plan_digest (first writer pins)",
+     "ok": true,
+     "detail": "same digest=True; the first record accepted the mutated document's CA key; the real document's key then -> ValueError: Conflicting ceremony event; real readback -> ValueError: Incomplete or conflicting ceremony evidence; R2 evaluate (not called by the ledger) -> {'real': [], 'ca-mutated': ['AR-CERT-ROOT', 'AR-MANIFEST'], 'leaf-mutated': ['AR-CERT-LEAF', 'AR-MANIFEST']}"
+    },
+    {
+     "area": "conflict",
+     "probe": "two processes with different CA keys under one digest: exactly one wins",
+     "ok": true,
+     "detail": "one key committed (planned); outputs=['ok', 'reject Conflicting ceremony event', 'ok', 'reject Conflicting ceremony event', 'ok', 'reject Conflicting ceremony event']"
+    },
+    {
+     "area": "ownership",
+     "probe": "stale or wrong writer plan is rejected for record and readback",
+     "ok": true,
+     "detail": {
+      "older-generation:record": "ValueError: Writer fence changed",
+      "older-generation:readback": "ValueError: Writer fence changed",
+      "wrong-token:record": "ValueError: Writer fence changed",
+      "wrong-token:readback": "ValueError: Writer fence changed",
+      "bool-generation:record": "ValueError: Writer fence changed",
+      "bool-generation:readback": "ValueError: Writer fence changed"
+     }
+    },
+    {
+     "area": "ownership",
+     "probe": "transfer away then fresh epoch: old events never satisfy the new plan",
+     "ok": true,
+     "detail": {
+      "record": "ValueError: Writer fence changed",
+      "readback": "ValueError: Writer fence changed",
+      "inspection": "HOLD_WRITER_FENCE",
+      "new-epoch-readback": "ValueError: Incomplete or conflicting ceremony evidence",
+      "old-plan-rows-kept": 6
+     }
+    },
+    {
+     "area": "ownership",
+     "probe": "record never takes or moves the fence",
+     "ok": true,
+     "detail": "fence and transfer_receipt rows identical before and after a full ceremony"
+    },
+    {
+     "area": "hold",
+     "probe": "complete evidence still inspects as HOLD",
+     "ok": true,
+     "detail": {
+      "current-owner": "HOLD_CUSTODY_UNRESOLVED",
+      "stale-owner": "HOLD_WRITER_FENCE",
+      "lan_pilot_mentions_ceremony": false
+     }
+    },
+    {
+     "area": "hold",
+     "probe": "ledger surface has no network, subprocess, signing or activation entry point",
+     "ok": true,
+     "detail": {
+      "imports": [
+       "from contextlib import closing, contextmanager",
+       "from pathlib import Path",
+       "from tools.check_fleet5_authority_replacement_r2 import plan_digest",
+       "import re",
+       "import sqlite3"
+      ],
+      "public": [
+       "readback",
+       "record"
+      ],
+      "repo_references": [
+       "docs/vault/30_Development/Evidence/fleet5-a1-ceremony-ledger/local-gates.json",
+       "tests/core/test_a1_ceremony_ledger.py"
+      ]
+     }
+    }
+   ]
+  }
+ ]
+}

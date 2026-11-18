@@ -1,0 +1,72 @@
+{
+ "candidateSha": "f4af7bb8f571c0cba326aeeeb9888e5514dd118c",
+ "checkout": "isolated detached worktree at the candidate, then review branch agent/claude/fleet5-a1-f4af7b-review with docs-only additions",
+ "note": "Each gate ran separately from a Python argv driver after this record was written. HEAD is still the candidate (uncommitted docs only), and no tracked file under tools/, deploy/ or tests/ differs from it.",
+ "gates": [
+  {
+   "command": "git rev-parse HEAD",
+   "interpreter": null,
+   "kst": "2026-11-19T06:31:16.910914+09:00",
+   "exit": 0,
+   "tail": [
+    "f4af7bb8f571c0cba326aeeeb9888e5514dd118c"
+   ]
+  },
+  {
+   "command": "git diff --name-only f4af7bb8f571c0cba326aeeeb9888e5514dd118c -- tools deploy tests",
+   "interpreter": null,
+   "kst": "2026-11-19T06:31:16.949551+09:00",
+   "exit": 0,
+   "tail": []
+  },
+  {
+   "command": "python -m pytest -q -p no:cacheprovider tests/core/test_a1_ceremony_ledger.py tests/core/test_a1_writer_fence.py tests/core/test_fleet5_authority_replacement_r2.py tests/core/test_serving_anchors.py tests/test_route_coverage.py tests/test_lan_leaf_rotation.py tests/test_intranet_pki.py",
+   "interpreter": "3.14.7",
+   "kst": "2026-11-19T06:31:17.004164+09:00",
+   "exit": 0,
+   "tail": [
+    "........................................................................ [ 99%]",
+    "....                                                                     [100%]",
+    "508 passed in 20.66s"
+   ]
+  },
+  {
+   "command": "python -m pytest -q -p no:cacheprovider tests/core/test_a1_ceremony_ledger.py",
+   "interpreter": "3.14.7",
+   "kst": "2026-11-19T06:31:39.058085+09:00",
+   "exit": 0,
+   "tail": [
+    "...                                                                      [100%]",
+    "3 passed in 2.37s"
+   ]
+  },
+  {
+   "command": "python -m pytest -q -p no:cacheprovider tests/core/test_a1_ceremony_ledger.py tests/core/test_a1_writer_fence.py",
+   "interpreter": "3.10.11",
+   "kst": "2026-11-19T06:31:42.618672+09:00",
+   "exit": 0,
+   "tail": [
+    "......                                                                   [100%]",
+    "6 passed in 2.59s"
+   ]
+  },
+  {
+   "command": "python tools/check_docs.py",
+   "interpreter": "3.14.7",
+   "kst": "2026-11-19T06:31:46.448067+09:00",
+   "exit": 0,
+   "tail": [
+    "PASS: 24 original hashes, 1285 versioned documents, wiki links, 48 tasks, 12 outcomes, owner/reviewer/skills, dependency DAG."
+   ]
+  },
+  {
+   "command": "python tools/sync_obsidian.py --check",
+   "interpreter": "3.14.7",
+   "kst": "2026-11-19T06:31:49.123976+09:00",
+   "exit": 0,
+   "tail": [
+    "CHECK: 3835 managed files, 43 pending exports, 0 conflicts. No writes."
+   ]
+  }
+ ]
+}
