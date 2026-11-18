@@ -2,15 +2,57 @@
 import sys
 sys.dont_write_bytecode=True
 import json
+import os
+import stat
+from contextlib import ExitStack
 from datetime import datetime, timezone
 from common import Hold, SCHEMA, decode, now, report, require, scope
 
 TABLES = ("project_nodes","nodes","resources","node_channels","node_channel_audit",
-          "runs","execution_deliveries","resource_leases","tool_claims")
+          "runs","execution_deliveries","resource_leases","tool_claims","operator_grants")
 POLICY = "(tenant_id = (NULLIF(current_setting('inv.tenant_id'::text, true), ''::text))::uuid)"
 
 
-def observe(db,d,out):
+def provisioned_reader():
+    """Fixed operator-installed public descriptor. No caller path override."""
+    flags=os.O_RDONLY|os.O_CLOEXEC|os.O_NOFOLLOW|os.O_NONBLOCK
+    try:
+        with ExitStack() as stack:
+            fd=os.open("/",flags|os.O_DIRECTORY)
+            stack.callback(os.close,fd)
+            for name in ("etc","saintvision","recovery-reader.json"):
+                fd=os.open(name,flags|(0 if name.endswith(".json") else os.O_DIRECTORY),dir_fd=fd)
+                stack.callback(os.close,fd)
+                st=os.fstat(fd)
+                require(st.st_uid==0 and not st.st_mode&0o022,"OPERATOR_VISIBILITY_UNKNOWN")
+            require(stat.S_ISREG(st.st_mode) and st.st_nlink==1 and 0<st.st_size<=65536,"OPERATOR_VISIBILITY_UNKNOWN")
+            raw=os.read(fd,65537)
+            require(len(raw)==st.st_size and os.fstat(fd).st_ctime_ns==st.st_ctime_ns,"OPERATOR_VISIBILITY_UNKNOWN")
+            return decode(raw)
+    except Exception:
+        raise Hold("OPERATOR_VISIBILITY_UNKNOWN") from None
+
+
+def verify_reader(c,d,binding):
+    unknown="OPERATOR_VISIBILITY_UNKNOWN"
+    require(type(binding) is dict and set(binding)=={"schema","role","roleOID","clusterID","database","databaseOID",
+            "tenant","epoch","project","subject","person","grant"} and binding["schema"]=="sv-db-operator-binding:1"
+            and binding["grant"]=="can_contain" and binding["role"]==d["databaseRole"] and
+            all(binding[k]==d[k] for k in ("tenant","epoch","project")),unknown)
+    c.execute("""SELECT r.oid::text,db.datname,db.oid::text FROM pg_roles r,pg_database db
+                 WHERE r.rolname=session_user AND db.datname=current_database()""")
+    require(c.fetchall()==[(binding["roleOID"],binding["database"],binding["databaseOID"])],unknown)
+    c.execute("SELECT has_function_privilege(current_user,'pg_catalog.pg_control_system()','EXECUTE')")
+    require(c.fetchone()==(True,),unknown)
+    c.execute("SELECT system_identifier::text FROM pg_control_system()")
+    require(c.fetchall()==[(binding["clusterID"],)],unknown)
+    c.execute("""SELECT subject_id,person_id::text FROM inv.operator_grants WHERE tenant_id=%s AND
+                 subject_id=%s AND person_id=%s AND enabled AND can_contain""",
+              (binding["tenant"],binding["subject"],binding["person"]))
+    require(c.fetchall()==[(binding["subject"],binding["person"])],unknown)
+
+
+def observe(db,d,out,binding=None):
     tenant,epoch,project=d["tenant"],d["epoch"],d["project"]
     members=sorted(d["nodes"])
     with db.cursor() as c:
@@ -24,6 +66,10 @@ def observe(db,d,out):
         out["facts"]["transactionReadOnly"]=ro
         require(ro=="on" and user==login==d["databaseRole"] and bound==tenant and
                 not superuser and not bypass,"OPERATOR_VISIBILITY_UNKNOWN")
+        try:
+            verify_reader(c,d,binding if binding is not None else provisioned_reader())
+        except Exception:
+            raise Hold("OPERATOR_VISIBILITY_UNKNOWN") from None
         c.execute("SELECT version_num FROM public.alembic_version")
         require(c.fetchall()==[(SCHEMA,)],"DATABASE_REVISION_UNKNOWN")
         c.execute("""SELECT c.relname,c.relrowsecurity,c.relforcerowsecurity,
