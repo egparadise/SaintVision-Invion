@@ -27,32 +27,49 @@ def ceremony(tmp_path):
     return path, plan, owner
 
 
-def test_complete_snapshot_and_conflicts(ceremony):
+@pytest.mark.parametrize("conflict", ["second-key", "id-reuse", "wrong-leaf", "unknown"])
+def test_complete_snapshot_and_conflicts(ceremony, conflict):
     path, plan, owner = ceremony
     key = plan["newAuthority"]["caPublicKeySHA256"]
     log = plan["checkpoint"]["readback"]["ceremonyLog"]
-    leaf = log["signed"][0]
     with pytest.raises(sqlite3.OperationalError):
         ledger.readback(path, plan)
-    with pytest.raises(ValueError):
-        ledger.record(path, plan, "early", leaf["subject"], leaf["leafSHA256"])
     with ThreadPoolExecutor(4) as pool:
         list(pool.map(lambda _: ledger.record(path, plan, "key", "", key), range(4)))
     with pytest.raises(ValueError):
         ledger.readback(path, plan)
-    for args in [("second-key", "", key), ("key", leaf["subject"], leaf["leafSHA256"]),
-                 ("foreign", "unknown", key), ("wrong-leaf", leaf["subject"], key)]:
-        with pytest.raises(ValueError):
-            ledger.record(path, plan, *args)
     for event in log["signed"]:
         ledger.record(path, plan, event["subject"], event["subject"], event["leafSHA256"])
     assert ledger.readback(path, plan) == {**log, "signed": sorted(log["signed"], key=lambda e: e["subject"])}
+    leaf = log["signed"][0]
+    args = {"second-key": ("again", "", key), "id-reuse": ("key", leaf["subject"], leaf["leafSHA256"]),
+            "wrong-leaf": ("wrong", leaf["subject"], key), "unknown": ("unknown", "foreign", key)}[conflict]
+    for _ in range(2):
+        with pytest.raises(ValueError):
+            ledger.record(path, plan, *args)
+    script = """
+import json, sys
+from pathlib import Path
+from tools import a1_ceremony_ledger as ledger
+try:
+    ledger.readback(sys.argv[1], json.loads(Path(sys.argv[2]).read_bytes()))
+except ValueError as exc:
+    sys.exit(0 if 'conflicting' in str(exc) else 2)
+sys.exit(1)
+"""
+    subprocess.run([sys.executable, "-c", script, str(path), str(FIXTURE)], check=True,
+                   cwd=Path(__file__).resolve().parents[2])
+    ledger.record(path, plan, "key", "", key)
+    with pytest.raises(ValueError, match="conflicting"):
+        ledger.readback(path, plan)
     assert fence.interrupted_a1_hold(path, owner) == "HOLD_CUSTODY_UNRESOLVED"
     fence.transfer(path, owner, "next-plan", "next-token")
     with pytest.raises(ValueError):
         ledger.readback(path, plan)
     with pytest.raises(ValueError):
-        ledger.record(path, plan, "key", "", key)
+        ledger.record(path, plan, "stale", "", key)
+    with sqlite3.connect(path) as db:
+        assert db.execute("SELECT event_id, subject, fingerprint FROM ceremony_conflict").fetchall() == [args]
 
 
 @pytest.mark.parametrize("before_commit", [True, False])
@@ -81,3 +98,35 @@ os._exit(74)
     ledger.record(path, plan, "key", "", plan["newAuthority"]["caPublicKeySHA256"])
     with sqlite3.connect(path) as db:
         assert db.execute("SELECT count(*) FROM ceremony_event").fetchone() == (1,)
+
+@pytest.mark.parametrize("alter", ["member", "client", "authority", "manifest"])
+def test_plan_alteration(ceremony, alter):
+    path, plan, _ = ceremony
+    key = plan["newAuthority"]["caPublicKeySHA256"]
+    ledger.record(path, plan, "key", "", key)
+    original = plan_digest(plan)
+    if alter == "manifest":
+        plan["operationManifest"] = None
+    elif alter == "authority":
+        plan["newAuthority"]["caPublicKeySHA256"] = "0" * 64
+    else:
+        target = plan["members"][0] if alter == "member" else plan["controlPlaneClient"]
+        target["plannedLeafSHA256"] = "0" * 64
+    assert plan_digest(plan) == original
+    with pytest.raises(ValueError):
+        ledger.record(path, plan, "second", "", key)
+    with pytest.raises(ValueError):
+        ledger.readback(path, plan)
+    with sqlite3.connect(path) as db:
+        assert db.execute("SELECT count(*) FROM ceremony_conflict").fetchone() == (0,)
+
+def test_legacy_observations_require_reconciliation(ceremony):
+    path, plan, _ = ceremony
+    key = plan["newAuthority"]["caPublicKeySHA256"]
+    ledger.record(path, plan, "key", "", key)
+    with sqlite3.connect(path) as db:
+        db.execute("DROP TABLE ceremony_conflict")
+    with pytest.raises(ValueError, match="reconciliation"):
+        ledger.record(path, plan, "key", "", key)
+    with pytest.raises(sqlite3.OperationalError):
+        ledger.readback(path, plan)

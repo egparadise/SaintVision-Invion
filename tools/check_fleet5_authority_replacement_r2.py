@@ -1412,8 +1412,8 @@ def journal_durable(doc: dict) -> dict:
 # ---------------------------------------------------------------- evaluation
 
 
-def evaluate(doc: Any, schema: dict | None = None) -> list[str]:
-    """Return the sorted rejection codes for ``doc``; [] means internally consistent."""
+def validate_plan(doc: Any, schema: dict | None = None) -> list[str]:
+    """Validate R2 evidence and immutable plan inputs without selecting a recovery action."""
     schema = schema if schema is not None else json.loads(SCHEMA_PATH.read_text("utf-8"))
     if any(marker.casefold() in s.casefold() for s in _strings(doc) for marker in SECRET_MARKERS):
         return ["AR-SECRET-MATERIAL"]
@@ -1432,6 +1432,11 @@ def evaluate(doc: Any, schema: dict | None = None) -> list[str]:
     codes.update(order)
     if not order:
         codes.update(_ceremony_errors(doc))
+    return sorted(codes)
+
+
+def evaluate(doc: Any, schema: dict | None = None) -> list[str]:
+    codes = set(validate_plan(doc, schema))
     if not codes:
         cp = doc["checkpoint"]
         got = recovery_action(doc)
