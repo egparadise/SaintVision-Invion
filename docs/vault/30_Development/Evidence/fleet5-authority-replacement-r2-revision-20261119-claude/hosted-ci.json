@@ -1,0 +1,100 @@
+{
+ "schema": "claude-hosted-ci:1",
+ "task": "task_f0b055d0a9ae",
+ "candidateSHA": "ab22abd1f4947a0c588f54601118a6c190fe5f98",
+ "branch": "egparadise/fleet5-authority-replacement-r3-20261119",
+ "dispatch": "gh workflow run <wf> --ref <branch> -f correlation_id=ar-r2rev-ab22abd1-<wf>",
+ "recordedAtUTC": "2026-11-18T16:52:45+00:00",
+ "note": "Snapshot at worker handoff. The host stopped the run watcher for low memory and it was not restarted. All three runs were in_progress here, so none has a verdict yet; confirm them at the exact SHA.",
+ "runs": [
+  {
+   "runID": 44352170807,
+   "workflow": "Documentation Build",
+   "displayTitle": "ar-r2rev-ab22abd1-docs",
+   "event": "workflow_dispatch",
+   "attempt": 1,
+   "headSha": "ab22abd1f4947a0c588f54601118a6c190fe5f98",
+   "status": "in_progress",
+   "conclusion": "",
+   "createdAt": "2026-11-18T16:52:06Z",
+   "updatedAt": "2026-11-18T16:52:10Z",
+   "url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/44352170807",
+   "jobs": [
+    {
+     "name": "docs",
+     "jobID": 134970479248,
+     "status": "in_progress",
+     "conclusion": ""
+    }
+   ]
+  },
+  {
+   "runID": 44352177896,
+   "workflow": "Core Build",
+   "displayTitle": "ar-r2rev-ab22abd1-core",
+   "event": "workflow_dispatch",
+   "attempt": 1,
+   "headSha": "ab22abd1f4947a0c588f54601118a6c190fe5f98",
+   "status": "in_progress",
+   "conclusion": "",
+   "createdAt": "2026-11-18T16:52:08Z",
+   "updatedAt": "2026-11-18T16:52:12Z",
+   "url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/44352177896",
+   "jobs": [
+    {
+     "name": "core",
+     "jobID": 134970503015,
+     "status": "in_progress",
+     "conclusion": ""
+    },
+    {
+     "name": "s01-storage-roundtrip",
+     "jobID": 134970503254,
+     "status": "in_progress",
+     "conclusion": ""
+    }
+   ]
+  },
+  {
+   "runID": 44352186580,
+   "workflow": "Backend Build",
+   "displayTitle": "ar-r2rev-ab22abd1-backend",
+   "event": "workflow_dispatch",
+   "attempt": 1,
+   "headSha": "ab22abd1f4947a0c588f54601118a6c190fe5f98",
+   "status": "in_progress",
+   "conclusion": "",
+   "createdAt": "2026-11-18T16:52:11Z",
+   "updatedAt": "2026-11-18T16:52:16Z",
+   "url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/44352186580",
+   "jobs": [
+    {
+     "name": "backend (3.12)",
+     "jobID": 134970538379,
+     "status": "in_progress",
+     "conclusion": ""
+    },
+    {
+     "name": "backend (3.14)",
+     "jobID": 134970538778,
+     "status": "in_progress",
+     "conclusion": ""
+    },
+    {
+     "name": "mlflow-live",
+     "jobID": 134970538975,
+     "status": "in_progress",
+     "conclusion": ""
+    }
+   ]
+  }
+ ],
+ "r2CandidateRunsCompletedSince": {
+  "sha": "14ddc8e9efa198918d433ae1ac21afd66605cb89",
+  "runs": {
+   "44342327704": "Documentation Build success",
+   "44342335017": "Core Build success",
+   "44342342100": "Backend Build success"
+  }
+ }
+}
