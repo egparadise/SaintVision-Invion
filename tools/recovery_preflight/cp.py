@@ -1,5 +1,6 @@
 """PC3 operator collector. The caller supplies a pinned session on stdin."""
 import sys
+sys.dont_write_bytecode=True
 import json
 from datetime import datetime, timezone
 from common import Hold, SCHEMA, decode, now, report, require, scope
@@ -68,12 +69,18 @@ def observe(db,d,out):
           (SELECT count(*) FROM inv.execution_deliveries WHERE tenant_id=%s AND node_id=ANY(%s) AND phase<>'stopped'),
           (SELECT count(*) FROM inv.tool_claims t WHERE t.tenant_id=%s AND t.node_id=ANY(%s) AND NOT EXISTS
             (SELECT 1 FROM inv.execution_deliveries e WHERE e.tenant_id=t.tenant_id AND e.command_id=t.command_id AND e.phase='stopped')),
-          (SELECT count(*) FROM inv.runs WHERE tenant_id=%s AND project_id=%s AND state NOT IN ('succeeded','failed','cancelled'))""",
-          (tenant,members,tenant,members,tenant,members,tenant,project))
+          (SELECT count(*) FROM inv.runs r WHERE r.tenant_id=%s AND r.state NOT IN ('succeeded','failed','cancelled')
+           AND (r.project_id=%s OR EXISTS (SELECT 1 FROM inv.tool_claims c WHERE c.tenant_id=r.tenant_id AND c.run_id=r.run_id AND c.node_id=ANY(%s))))""",
+          (tenant,members,tenant,members,tenant,members,tenant,project,members))
         counts=c.fetchone()
         out["facts"]["obligations"]=dict(zip(("unreleasedLeases","deliveries","unsettledClaims","openRuns"),counts))
         if any(counts):
             out["holds"].append("ACTIVE_WORK_REQUIRES_RECONCILIATION")
+        c.execute("""SELECT count(*),sum(n_tup_ins),sum(n_tup_upd),sum(n_tup_del)
+                     FROM pg_stat_xact_user_tables WHERE schemaname='inv'""")
+        tables,inserted,updated,deleted=c.fetchone()
+        require(tables>=len(TABLES) and (inserted,updated,deleted)==(0,0,0),"UNEXPECTED_TRANSACTION_MUTATION")
+        out["facts"]["transactionTupleChanges"]={"inserted":int(inserted),"updated":int(updated),"deleted":int(deleted)}
         c.execute("SELECT pg_current_xact_id_if_assigned()::text")
         xid,=c.fetchone()
         out["facts"]["assignedTransactionID"]=xid

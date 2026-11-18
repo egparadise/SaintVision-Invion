@@ -1,6 +1,7 @@
 """Join public observations from a single descriptor and bounded observation window."""
 import json
 import sys
+sys.dont_write_bytecode=True
 from datetime import datetime, timezone
 from common import Hold, decode, now, report, require, scope
 

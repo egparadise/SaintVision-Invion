@@ -1,5 +1,8 @@
 """Dedicated input rows in the hosted disposable schema0068 PostgreSQL fixture."""
 import sys
+import json
+import os
+import hashlib
 from pathlib import Path
 
 import psycopg
@@ -48,8 +51,9 @@ def test_cohort_visibility_and_readonly_transaction(request):
                 db.execute("SELECT set_config('inv.tenant_id',%s,false)",(tenant,))
                 out={"facts":{},"holds":[]}
                 if tenant!=env.tenant:
-                    assert db.execute("SELECT count(*) FROM inv.node_channels WHERE tenant_id=%s",(env.tenant,)).fetchone()==(0,)
-                    with pytest.raises(Hold,match="OPERATOR_VISIBILITY_UNKNOWN"):
+                    hidden,=db.execute("SELECT count(*) FROM inv.node_channels WHERE tenant_id=%s",(env.tenant,)).fetchone()
+                    assert hidden==0
+                    with pytest.raises(Hold,match="OPERATOR_VISIBILITY_UNKNOWN") as failure:
                         observe(db,d,out)
                 else:
                     observe(db,d,out)
@@ -61,7 +65,17 @@ def test_cohort_visibility_and_readonly_transaction(request):
                         ch=out["facts"]["channels"][node]
                         assert (ch["C"],ch["leafDER"],ch["expiresAt"])==(version,der,expiry.isoformat())
                 db.execute("ROLLBACK")
-        assert before==rows()
+        after=rows()
+        assert before==after
+        if os.environ.get("SV_PREFLIGHT_PG_RECEIPT")=="1":
+            folder=Path("dist/recovery-readonly-pg")
+            folder.mkdir(parents=True,exist_ok=True)
+            def checksum(items):
+                return hashlib.sha256(json.dumps(items,default=str).encode()).hexdigest()
+            (folder/"observations.json").write_text(json.dumps(dict(sourceSHA=os.environ["GITHUB_SHA"],
+                fixture="disposable-postgres-schema0068",hiddenChannelCount=hidden,hiddenDisposition=str(failure.value),
+                observed=out["facts"],holds=out["holds"],channelRowsBefore=checksum(before),channelRowsAfter=checksum(after),
+                activationAllowed=False),indent=2))
     finally:
         if not prior_grant:
             with psycopg.connect(env.owner) as owner:

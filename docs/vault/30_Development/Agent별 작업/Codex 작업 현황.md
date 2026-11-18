@@ -7,9 +7,13 @@ author: "Codex"
 updated: "2026-11-18T21:07:57+09:00"
 source_of_truth: "Git"
 active_card: "FLEET5-EXPIRED-POLICY-INTEGRATION-HARDENING-AND-READONLY-PREFLIGHT-R1"
-active_card_status: "Implementation in progress. Hosted proof pending."
+active_card_status: "Candidate and collectors implemented. Final hosted verification pending."
 active_card_next: "Complete fixture proofs and hand off for independent review."
 ---
+
+## Fleet5 recovery preflight on 2026-11-18
+
+Codex owns the source in the isolated resume workspace. First Core run 44302282769 exposed a history-test API mismatch. The corrected intermediate fixture produced six checkpoints over two cycles. Final exact-source CI and independent Claude review are separate gates. The task History and unique Evidence directory carry the run receipts and the board handoff. Root owns production provisioning and CA replacement.
 
 ## 2026-11-08T09:14:58+09:00 expired-policy executable candidate R1
 
