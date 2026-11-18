@@ -1,0 +1,34 @@
+"""Single-fault mutants for the ab22 custody fix; restores the checker and verifies its hash."""
+import hashlib, json, subprocess, sys
+from pathlib import Path
+root = Path(sys.argv[1]); py = sys.argv[2]; out = Path(sys.argv[3])
+src = root / "tools/check_fleet5_authority_replacement_r2.py"
+orig = src.read_bytes(); h0 = hashlib.sha256(orig).hexdigest()
+M = {
+ "abandon-on-custody-alone": ('return (_a1_no_key_hold(doc) or "ABANDON_BEFORE_NEW_TRUST"), None, *none',
+                              'return "ABANDON_BEFORE_NEW_TRUST", None, *none'),
+ "absent-log-accepted": ('    if log is None:\n        return "HOLD_CUSTODY_UNRESOLVED"  # no log: whether a key',
+                         '    if log is None:\n        return None  # no log: whether a key'),
+ "logged-key-ignored": ('if log["caKeysCreated"] != 0 or log["signed"]:', 'if log["signed"]:'),
+ "logged-signature-ignored": ('if log["caKeysCreated"] != 0 or log["signed"]:', 'if log["caKeysCreated"] != 0:'),
+ "recorded-output-ignored": ('    if any(value is not None for value in ceremony_outputs(doc).values()):\n        return "HOLD_CUSTODY_UNRESOLVED"  # the plan',
+                             '    if False:\n        return "HOLD_CUSTODY_UNRESOLVED"  # the plan'),
+ "only-ca-output-checked": ('if any(value is not None for value in ceremony_outputs(doc).values()):',
+                            'if doc["newAuthority"]["certificateDER"] is not None:'),
+}
+res = []
+try:
+    for name, (a, b) in M.items():
+        text = orig.decode("utf-8")
+        assert text.count(a) == 1, name
+        src.write_bytes(text.replace(a, b).encode("utf-8"))
+        r = subprocess.run([py, "-m", "pytest", "-q", "-x", "-p", "no:cacheprovider",
+                            "tests/core/test_fleet5_authority_replacement_r2.py"], cwd=root, capture_output=True, text=True)
+        tail = r.stdout.strip().splitlines()[-1] if r.stdout.strip() else r.stderr[-200:]
+        res.append({"mutant": name, "exit": r.returncode, "killed": r.returncode != 0, "summary": tail})
+        print(name, r.returncode, tail)
+finally:
+    src.write_bytes(orig)
+h1 = hashlib.sha256(src.read_bytes()).hexdigest()
+out.write_text(json.dumps({"checkerSHA256Before": h0, "checkerSHA256After": h1, "mutants": res}, indent=1) + "\n", encoding="utf-8", newline="\n")
+print("restored", h0 == h1, h0)

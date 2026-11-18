@@ -1,10 +1,10 @@
 ---
 doc_id: "ADR-PROPOSED-FLEET5-AUTHORITY-REPLACEMENT-R2"
 title: "Proposed FLEET5 authority replacement and advance-renewal contract R2"
-version: "1.1.0"
+version: "1.2.0"
 status: "review"
 author: "Claude"
-updated: "2026-11-19T01:49:19+09:00"
+updated: "2026-11-19T02:39:01+09:00"
 source_of_truth: "Git"
 ---
 
@@ -22,6 +22,8 @@ source_of_truth: "Git"
 - The branch is `egparadise/fleet5-authority-replacement-r3-20261119`.
 - Paths and the schema ID are unchanged. R2 was never accepted, so nothing consumes the earlier shape, and a document in that shape now fails the schema.
 - The sections below describe revision 2. *Revision 2 changes* lists the deltas.
+
+**Revision 3 (1.2.0).** The independent Codex review of revision 2 (candidate `ab22abd1`, evidence `eaa73b9f`, report `docs/vault/30_Development/History/2026-11-19_FLEET5_ab22_Independent_Review.md` in the reviewer checkout `sv-r3-ab22-review`, not committed here) found one high-priority defect. With A1 in flight and the fence held, custody `NO_NEW_KEY` returned ABANDON_BEFORE_NEW_TRUST before the ceremony log was reconciled. Revision 3 fixes only that, on branch `agent/claude/fleet5-r3-custody-hold-20261119`. *Revision 3 changes* lists the delta.
 
 **The review report:**
 - The report is `docs/vault/30_Development/History/2026-11-19_FLEET5_Authority_Replacement_R1_Codex_Review.md`.
@@ -41,8 +43,8 @@ source_of_truth: "Git"
 
 **The corpus (revision 2):**
 - 1 real HOLD instance.
-- 49 positive fixtures, which together cover every one of the 20 recovery actions.
-- 61 rejection fixtures, covering 31 rejection codes.
+- 50 positive fixtures, which together cover every one of the 20 recovery actions (revision 3 adds p50).
+- 62 rejection fixtures, covering 31 rejection codes (revision 3 adds r62).
 - 1 operator handoff.
 - 1 human-readable full operation manifest.
 
@@ -101,6 +103,12 @@ Revision 2 adds HOLD_PROCESS_INVENTORY_CHANGED and HOLD_VALIDITY_LAPSED, for a t
 | 5: prior leaves and installed policy unbudgeted in advance renewal | Still-serving prior leaves are budgeted. The installed prior policy is budgeted through `installedPolicyNotAfter` validity readback. |
 | 5: dual overlap is conditional | DUAL_ANCHOR_OVERLAP requires `overlapRuntimeEvidenceRef`, or the plan is HOLD. QUIESCED keeps its own quiesce evidence. |
 | Question: opID from pre-ceremony inputs; bare opID across manifests | The opID is the digest of the canonical operation body under the plan digest. Audit and journal rows are keyed by `{manifestDigest, opID}`. The same opID under another manifest is CONFLICT. |
+
+# Revision 3 changes
+
+| ab22 review finding | Revision 3 |
+|---|---|
+| High: A1 in flight, fence held, custody `NO_NEW_KEY` abandoned before the log was reconciled; the fence regression expected ABANDON with one logged CA key and two signed leaves | Custody alone never authorizes abandonment. `NO_NEW_KEY` abandons only when the ceremony log is read back with zero CA keys and zero signed leaves and the plan records no A1 output (`ceremony_outputs()`). An absent log, a logged key, a logged signature or a recorded output is HOLD_CUSTODY_UNRESOLVED. The fence is still checked first. p03 now carries the explicit zero-key log; p50 holds on the reviewed state; r62 claims ABANDON on it and is AR-RECOVERY-MISMATCH. The fence regression now expects HOLD for that state. |
 
 # Contract
 
@@ -244,6 +252,8 @@ The resulting decisions:
 | A1 interrupted with the planned key present, fence held, log present with exactly one key, CA key recorded in the plan | RESUME at A1 by deterministic re-signing. Ed25519 makes the leaves byte-identical. |
 | A1 interrupted with a key present but no log, zero keys, or a key the plan never recorded | HOLD_CUSTODY_UNRESOLVED (revision 2) |
 | A1 interrupted under a missing, transferred or stale fence (key present or not) | HOLD_WRITER_FENCE (revision 2), never re-signing or abandon |
+| A1 interrupted, fence held, custody `NO_NEW_KEY`, log read back with zero CA keys and zero signed leaves, no A1 output in the plan | ABANDON_BEFORE_NEW_TRUST (revision 3) |
+| A1 interrupted, fence held, custody `NO_NEW_KEY`, but no log, a logged CA key, a logged signed leaf, or an A1 output recorded in the plan | HOLD_CUSTODY_UNRESOLVED (revision 3): the evidence contradicts custody. The fence proves who may write, not what was issued. |
 
 **Reference executor model.**
 - `apply_op`, `execute_resume` and `journal_durable` model the executor.
@@ -309,11 +319,14 @@ The gate is `tests/core/test_fleet5_authority_replacement_r2.py`. Its test names
 | R2 review 4: E2 row representation | p15–p17 regenerated | `test_r2f4_*`: placeholder fails schema; no second row; interrupted E2 resumes to exactly one row |
 | R2 review 3: freshness and inventory | p43 (unplanned live replica), p44 (consumed challenge), p45 (issuance too old); r59 | `test_r2f3_*`: issuance age ±1 s; receipt before issuance, after resume, responder skew, other challenge for row, process, handshake and live inventory; skew bound; tighter measured window; window caps; one-use challenge; 7 kinds of inventory churn × 3 positions; restarted instance; registry source; duplicate live entries |
 | R2 review 5: validity | p46 (COMPLETE after pause), p47 (policy not yet valid), p48 (installed prior policy lapses); r60, r61 | `test_r2f5_*`: COMPLETE validity ±1 s; six dependencies independently; policy start; handoff at later time, at bound, before settlement; prior leaf for PC2, PC4 and CP; installed-policy readback missing, short and stale; replaced policy no longer a dependency; committed policy validity; conditional overlap |
+| ab22 review: custody vs signing log | p03 (coherent no-key, explicit zero log), p50 (contradicted: HOLD); r62 (claimed ABANDON) | `test_ab22_*`: coherent no-key abandons at `recovery_action` and `evaluate` for both A1 outcomes; six log contradictions × both outcomes hold at both boundaries; each of 19 recorded A1 output fields holds; the reviewed state; an empty log without `NO_NEW_KEY` holds. `test_r2f4_interrupted_a1_decides_nothing_outside_the_live_fence` covers key-present, coherent and contradicted no-key under 8 fence faults |
 | R2 review: manifest-scoped identity | p49 (audit under other manifest) | `test_r2id_*`: different ceremony outputs give different opIDs (R2 collision shown); opID = body digest; foreign-manifest audit at postimage and preimage for both journals; unrelated history ignored; bare opID fails schema |
 
 **Mutation check.** The checker gets 23 single-fault mutants: each one removes one F1–F5 safeguard. The gate kills all 23, and the checker hash is restored afterwards. Section *Verification* in [[2026-11-19_FLEET5_Authority_Replacement_Contract_R2_Claude]] has the record.
 
 **Revision 2 mutation check.** 29 further single-fault mutants each remove one guard added in revision 2. The gate kills 28. The 29th (`ID-exact-key-not-required`) is equivalent: the schema limits an audit key to exactly `{manifestDigest, opID}`, and any entry with this opID under another manifest is already CONFLICT. Matching the opID alone therefore means the same thing. The record is in [[2026-11-19_FLEET5_Authority_Replacement_R2_Revision_Claude]].
+
+**Revision 3 mutation check.** Six single-fault mutants each remove one revision 3 guard: abandon on custody alone, accept an absent log, ignore a logged key, ignore a logged signature, ignore recorded outputs, and check only the CA certificate output. The gate kills all six, and the checker hash is restored. The record is in [[2026-11-19_FLEET5_Authority_Replacement_R2_Revision3_Custody_Claude]].
 
 # Runtime integration gaps
 

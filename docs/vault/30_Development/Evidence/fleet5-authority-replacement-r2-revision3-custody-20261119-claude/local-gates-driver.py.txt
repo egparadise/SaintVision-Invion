@@ -1,0 +1,61 @@
+"""Argv-list local gate driver for R2 revision 3 (each gate individually, exit codes recorded)."""
+import json
+import os
+import subprocess
+import sys
+from datetime import datetime, timedelta, timezone
+from pathlib import Path
+
+root = Path(sys.argv[1])
+out_path = Path(sys.argv[2])
+base_ref = sys.argv[3]
+KST = timezone(timedelta(hours=9))
+env = dict(os.environ, PYTHONUTF8="1")
+py = sys.executable
+
+
+def now():
+    return datetime.now(KST).isoformat(timespec="seconds")
+
+
+def git(*args):
+    return subprocess.run(["git", *args], cwd=root, capture_output=True, text=True, encoding="utf-8").stdout
+
+
+GATES = [
+    [py, "tools/check_docs.py"],
+    [py, "tools/check_doc_path_citations.py", "--ratchet", "--base-ref", base_ref],
+    [py, "tools/check_contract_bindings.py"],
+    [py, "tools/check_frontend_integrity.py"],
+    [py, "tools/test_sync.py"],
+    [py, "tools/check_ontology_generation.py"],
+    [py, "tools/check_ontology.py"],
+    [py, "tools/check_doc_single_source.py", "--ratchet"],
+    [py, "tools/sync_obsidian.py", "--check"],
+    [py, "tools/check_fleet5_authority_replacement.py"],
+    [py, "tools/generate_fleet5_authority_replacement_fixtures.py", "--check"],
+    [py, "tools/check_fleet5_authority_replacement_r2.py"],
+    [py, "tools/generate_fleet5_authority_replacement_r2_fixtures.py", "--check"],
+    [py, "-m", "pytest", "tests/core/test_fleet5_authority_replacement_r2.py",
+     "tests/core/test_fleet5_authority_replacement_proposal.py", "-q", "-p", "no:cacheprovider"],
+]
+
+record = {
+    "schema": "claude-local-gates:1",
+    "task": "task_5bf1837a153a",
+    "dispatch": "ctx_2c36507be87c",
+    "environment": {"os": "Windows 11", "python": sys.version.split()[0], "PYTHONUTF8": "1"},
+    "headAtRun": git("rev-parse", "HEAD").strip(),
+    "workingTreeAtRun": [line for line in git("status", "--porcelain").splitlines() if line],
+    "gates": [],
+}
+for argv in GATES:
+    started = now()
+    proc = subprocess.run(argv, cwd=root, env=env, capture_output=True, text=True, encoding="utf-8", errors="replace")
+    lines = [line for line in (proc.stdout + proc.stderr).splitlines() if line.strip()]
+    cmd = " ".join(["python" if a == py else a for a in argv])
+    record["gates"].append({"command": cmd, "exitCode": proc.returncode, "startedKST": started, "endedKST": now(),
+                            "outputTail": lines[-3:]})
+    print(f"exit={proc.returncode} {cmd} | {lines[-1] if lines else ''}", flush=True)
+out_path.write_text(json.dumps(record, indent=1, ensure_ascii=False) + "\n", "utf-8")
+print("all zero:", all(g["exitCode"] == 0 for g in record["gates"]))

@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-CLAUDE-001"
 title: "Claude 작업 현황"
-version: "1.2.137"
+version: "1.2.138"
 status: "review"
 author: "Claude"
-updated: "2026-11-19T01:49:19+09:00"
+updated: "2026-11-19T02:39:01+09:00"
 
 
 
@@ -12,6 +12,31 @@ updated: "2026-11-19T01:49:19+09:00"
 
 source_of_truth: "Git"
 ---
+
+## 2026-11-19 FLEET5 authority 교체 계약 R2 3차 개정: ab22 독립 검토 high 지적 대응 (Claude 직접 기록)
+
+- **작업** (task_5bf1837a153a / ctx_2c36507be87c): 검토 후보 `ab22abd1`과 evidence `eaa73b9f`를 그대로 두고, 그 위에 격리 브랜치 `agent/claude/fleet5-r3-custody-hold-20261119`를 만들었다. worktree는 새로 만들지 않고 `fleet5-authority-replacement-r3-20261119`를 재사용했다.
+  - Codex ab22 독립 검토 보고서 전문을 먼저 읽었다. 보고서는 `sv-r3-ab22-review` checkout의 `a8c9aea2`에 있고, 커밋된 blob의 sha256은 `50c4004f…d2ad545`다. 이 브랜치로 복사하지 않았다.
+  - 판 버전은 1.2.138로 올렸다. 통합은 Root가 한다.
+- **수정** (`4a495f70`, fixture·source만):
+  - A1 진행 중이고 fence가 유지된 상태에서 custody `NO_NEW_KEY`만으로는 abandon하지 않는다. ceremony log가 CA key 0개·서명 0건으로 읽히고, plan에 A1 산출물이 하나도 없을 때만 ABANDON_BEFORE_NEW_TRUST다.
+  - 로그 부재, 기록된 CA key, 기록된 서명 leaf, plan에 기록된 산출물은 모두 모순 증거로 보고 HOLD_CUSTODY_UNRESOLVED로 처리한다. fence 검사는 여전히 먼저 한다.
+  - p03에 명시적 0-key 로그를 넣었다. p50(검토 상태 HOLD)과 r62(같은 상태에서 ABANDON을 주장하면 AR-RECOVERY-MISMATCH)를 추가했다.
+  - 기존 fence 회귀의 no-key 기대값을 바로잡았다. 일관된 no-key, 모순된 no-key, key-present 세 상태로 나눴다. `test_ab22_*` 38건이 recovery_action과 evaluate 경계를 함께 덮는다.
+  - 계약 R2는 1.2.0이 됐다.
+- **확인**:
+  - R2 gate는 357건에서 405 passed가 됐다. 수정 직후, 테스트를 고치기 전에는 검토가 지목한 `[*-no-key]` 8건만 실패했다.
+  - revision 3 guard를 하나씩 제거한 mutant 6개를 모두 kill했다. checker hash는 실행 전후가 같다.
+  - 로컬 게이트 14개가 모두 exit 0이다(Python 3.10.11). R2 checker 113개 문서가 기대 판정과 일치했고, pytest는 R2 405건과 R1 155건을 합쳐 560 passed다.
+  - 증거 폴더는 `Evidence/fleet5-authority-replacement-r2-revision3-custody-20261119-claude/`다.
+- **하지 않은 것**:
+  - live 자격증명·SSH·DB·Docker·키 접근, 운영 변경, canonical sync apply
+  - 검토자 checkout과 R1 산출물 변경
+  - 이 개정의 독립 재검토. 아직 수행되지 않았다.
+- **다음 첫 행동/담당**:
+  - Codex: 인계에 적힌 정확한 SHA에서 독립 재검토한다.
+  - Root: 운영 수락, DB 복구, custody, PC1을 맡는다. runtime ceremony 도구는 key를 만들기 전에 로그부터 남겨야 한다. 로그가 없으면 이제 항상 HOLD이기 때문이다.
+  - 상세는 [[2026-11-19_FLEET5_Authority_Replacement_R2_Revision3_Custody_Claude]].
 
 ## 2026-11-19 FLEET5 authority 교체 계약 R2 2차 개정: Codex R2 검토 지적 대응 (Claude 직접 기록)
 
